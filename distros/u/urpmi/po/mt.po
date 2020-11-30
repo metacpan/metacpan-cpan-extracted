@@ -1,41 +1,38 @@
-# translation of mt.po to Maltese
-# translation of urpmi-mt.po to
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR Free Software Foundation, Inc.
 #
-# Latest versions of po files are at http://www.mandrivalinux.com/l10n/mt.php3
-#
-# translation of urpmi-mt.po to Maltese
-# Copyright (C) 2002,2003, 2004 Free Software Foundation, Inc.
-# Ramon Casha <ramon.casha@linux.org.mt>, 2002,2003, 2004.
-# Ramon Casha <rcasha@waldonet.net.mt>, 2003.
-#
+# Translators:
+# Ramon Casha <ramon.casha@linux.org.mt>, 2002-2004
+# Ramon Casha <rcasha@waldonet.net.mt>, 2003
 msgid ""
 msgstr ""
-"Project-Id-Version: mt\n"
-"Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-01-18 09:59+0200\n"
-"PO-Revision-Date: 2004-09-07 05:59+0200\n"
-"Last-Translator: Ramon Casha <ramon.casha@linux.org.mt>\n"
-"Language-Team: Maltese <mt@li.org>\n"
+"Project-Id-Version: Mageia\n"
+"POT-Creation-Date: 2020-07-10 17:41+0100\n"
+"PO-Revision-Date: 2020-07-10 16:45+0000\n"
+"Last-Translator: Yuri Chornoivan <yurchor@ukr.net>\n"
+"Language-Team: Maltese (http://www.transifex.com/MageiaLinux/mageia/language/"
+"mt/)\n"
 "Language: mt\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
-"Content-Transfer-Encoding: 8bit\n"
-"X-Generator: KBabel 1.3\n"
+"Content-Transfer-Encoding: 8-bit\n"
+"Plural-Forms: nplurals=4; plural=(n==1 ? 0 : n==0 || ( n%100>1 && n"
+"%100<11) ? 1 : (n%100>10 && n%100<20 ) ? 2 : 3);\n"
 
 #: ../gurpm/RPMProgressDialog.pm:47
-#, fuzzy, c-format
+#, c-format
 msgid "Distribution Upgrade"
-msgstr "qed jiġi distribwit %s"
+msgstr ""
 
 #: ../gurpm/RPMProgressDialog.pm:47
-#, fuzzy, c-format
+#, c-format
 msgid "Packages installation"
-msgstr "Installazzjoni ta' pakketti..."
+msgstr ""
 
 #: ../gurpm/RPMProgressDialog.pm:128
-#, fuzzy, c-format
+#, c-format
 msgid "Please wait..."
-msgstr "Stenna ftit."
+msgstr ""
 
 #: ../gurpm/RPMProgressDialog.pm:290
 #, c-format
@@ -48,9 +45,9 @@ msgid "Preparing..."
 msgstr "Qed nipprepara..."
 
 #: ../gurpm/RPMProgressDialog.pm:313
-#, fuzzy, c-format
+#, c-format
 msgid "Removing package `%s' ..."
-msgstr "ed jitneħħa l-pakkett %s"
+msgstr ""
 
 #: ../gurpm/RPMProgressDialog.pm:316
 #, c-format
@@ -67,7 +64,7 @@ msgstr "Qed jitniżżel il-pakkett \"%s\"..."
 msgid "Cancel"
 msgstr "Ikkanċella"
 
-#: ../gurpm/RPMProgressDialog.pm:359 ../urpm.pm:452 ../urpm/download.pm:882
+#: ../gurpm/RPMProgressDialog.pm:359 ../urpm.pm:454 ../urpm/download.pm:882
 #: ../urpm/get_pkgs.pm:277 ../urpm/media.pm:1149 ../urpm/media.pm:1682
 #: ../urpm/media.pm:1833
 #, c-format
@@ -75,9 +72,9 @@ msgid "...retrieving failed: %s"
 msgstr "...qari falla: %s"
 
 #: ../gurpmi:50
-#, fuzzy, c-format
+#, c-format
 msgid "RPM installation"
-msgstr "Installazzjoni tas-sistema"
+msgstr ""
 
 #: ../gurpmi:64
 #, c-format
@@ -90,7 +87,7 @@ msgid "_Ok"
 msgstr "_Ok"
 
 #: ../gurpmi:85
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "You have selected a source package:\n"
 "\n"
@@ -101,17 +98,9 @@ msgid ""
 "\n"
 "What would you like to do?"
 msgstr ""
-"Int għażilt pakkett ta' sors:\n"
-"\n"
-"%s\n"
-"\n"
-"Aktarx ma xtaqtx tinstallah fuq il-kompjuter (jekk tinstallah tkun tista' "
-"tagħmel tibdiliet lis-sors u mbgħad tikkompilah).\n"
-"\n"
-"X'tixtieq tagħmel?"
 
 #: ../gurpmi:93 ../gurpmi:104
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "You are about to install the following software packages on your computer:\n"
 "\n"
@@ -119,11 +108,6 @@ msgid ""
 "\n"
 "Proceed?"
 msgstr ""
-"Int se tinstalla dawn il-pakketti ta' softwer fuq il-kompjuter:\n"
-"\n"
-"%s\n"
-"\n"
-"Inkella tista' sempliċiment tikteb il-fajls. X'tippreferi?"
 
 #: ../gurpmi:99
 #, c-format
@@ -141,14 +125,14 @@ msgstr ""
 "Inkella tista' sempliċiment tikteb il-fajls. X'tippreferi?"
 
 #: ../gurpmi:117
-#, fuzzy, c-format
+#, c-format
 msgid "_Install"
-msgstr "Installa"
+msgstr ""
 
 #: ../gurpmi:118
-#, fuzzy, c-format
+#, c-format
 msgid "_Save"
-msgstr "Ikteb"
+msgstr ""
 
 #: ../gurpmi:119 ../gurpmi2:174
 #, c-format
@@ -198,13 +182,11 @@ msgstr ""
 "  --force        - imponi l-invokazzjoni anke jekk xi pakketti ma jeżistux.\n"
 
 #: ../gurpmi.pm:61 ../urpmi:131
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "  --verify-rpm   - verify rpm signature before installation\n"
 "                   (--no-verify-rpm disables it, default is enabled).\n"
 msgstr ""
-"  --verify-rpm   - ivverifika l-firma tal-pakkett qabel tinstalla.\n"
-"                   (--no-verify-rpm itfih, impliċitament mixgħul).\n"
 
 #: ../gurpmi.pm:63 ../urpmf:36 ../urpmi:68 ../urpmq:43
 #, c-format
@@ -228,27 +210,27 @@ msgid "  --root         - use another root for rpm installation.\n"
 msgstr "  --root         - uża root ieħor għall-installazzjoni rpm.\n"
 
 #: ../gurpmi.pm:67 ../urpmi:133
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "  --test         - only verify if the installation can be achieved "
 "correctly.\n"
-msgstr "  --test         - ivverifika li l-installazzjoni tista' ssir sew.\n"
+msgstr ""
 
 #: ../gurpmi.pm:68 ../urpmi:71
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "  --searchmedia  - use only the given media to search requested packages.\n"
-msgstr "  --media        - uża biss is-sorsi llistjati b'virgoli.\n"
+msgstr ""
 
 #: ../gurpmi.pm:115
-#, fuzzy, c-format
+#, c-format
 msgid "No packages specified"
-msgstr "Ebda kmand speċifikat"
+msgstr ""
 
 #: ../gurpmi2:47
-#, fuzzy, c-format
+#, c-format
 msgid "Must be root"
-msgstr "Port tal-maws"
+msgstr ""
 
 #: ../gurpmi2:77
 #, c-format
@@ -265,29 +247,27 @@ msgstr ""
 "%s"
 
 #: ../gurpmi2:100
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "Some requested packages cannot be installed:\n"
 "%s\n"
 "Continue installation anyway?"
 msgstr ""
-"Xi pakketti mitluba ma jistgħux jiġu nstallati:\n"
-"%s"
 
-#: ../gurpmi2:120
+#: ../gurpmi2:120 ../gurpmi2:386
 #, c-format
 msgid "Warning"
 msgstr "Twissija"
 
 #: ../gurpmi2:170
-#, fuzzy, c-format
+#, c-format
 msgid " (to upgrade)"
-msgstr "Aġġornament"
+msgstr ""
 
 #: ../gurpmi2:171
-#, fuzzy, c-format
+#, c-format
 msgid " (to install)"
-msgstr "Oħroġ mill-installazzjoni"
+msgstr ""
 
 #: ../gurpmi2:174
 #, c-format
@@ -300,19 +280,17 @@ msgid "One of the following packages is needed:"
 msgstr "Wieħed minn dawn il-pakketti huwa meħtieġ:"
 
 #: ../gurpmi2:204
-#, fuzzy, c-format
+#, c-format
 msgid "_Abort"
-msgstr "Waqqaf"
+msgstr ""
 
 #: ../gurpmi2:239
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "The following packages have to be removed for others to be upgraded:\n"
 "%s\n"
 "Continue installation anyway?"
 msgstr ""
-"Dawn il-pakketti jridu jitneħħew qabel oħrajn jiġu aġġornati:\n"
-"%s"
 
 #: ../gurpmi2:250 ../urpmi:617
 #, c-format
@@ -335,21 +313,20 @@ msgid "Proceed with the installation of one package?"
 msgid_plural "Proceed with the installation of the %d packages?"
 msgstr[0] ""
 msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
 
 #: ../gurpmi2:259 ../urpmi:608
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "To satisfy dependencies, the following package is going to be installed:"
 msgstr ""
-"Biex nissodisfa d-dipendenzi, dawn il-pakketti jridu jiġu nstallati wkoll "
-"(%d MB)"
 
 #: ../gurpmi2:260 ../urpmi:609
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "To satisfy dependencies, the following packages are going to be installed:"
 msgstr ""
-"Biex nissodisfa d-dipendenzi, %d pakkett/i jridu jiġu nstallati wkoll (%d MB)"
 
 #: ../gurpmi2:270 ../urpm/main_loop.pm:468
 #, c-format
@@ -357,9 +334,9 @@ msgid "unable to get source packages, aborting"
 msgstr "ma nistax inġib il-pakketti tas-sors, se noħroġ"
 
 #: ../gurpmi2:287 ../urpmi:636
-#, fuzzy, c-format
+#, c-format
 msgid "Please insert the medium named \"%s\""
-msgstr "Jekk jogħġbok daħħal id-diska mmarkata \"%s\" fl-apparat [%s]"
+msgstr ""
 
 #: ../gurpmi2:307
 #, c-format
@@ -367,30 +344,26 @@ msgid "An error occurred:"
 msgstr ""
 
 #: ../gurpmi2:319
-#, fuzzy, c-format
+#, c-format
 msgid "_Done"
-msgstr "Lest"
+msgstr ""
 
 #: ../gurpmi2:336 ../urpm/main_loop.pm:82
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "Installation failed, some files are missing:\n"
 "%s"
-msgstr "installazzjoni falliet"
+msgstr ""
 
 #: ../gurpmi2:339
-#, fuzzy, c-format
+#, c-format
 msgid "You may want to update your urpmi database."
 msgstr ""
-"L-installazzjoni falliet, xi fajls huma nieqsa:\n"
-"\n"
-"%s\n"
-"Forsi trid taġġorna d-database urpmi"
 
 #: ../gurpmi2:343 ../urpm/main_loop.pm:289 ../urpm/main_loop.pm:581
-#, fuzzy, c-format
+#, c-format
 msgid "Installation failed:"
-msgstr "installazzjoni falliet"
+msgstr ""
 
 #: ../gurpmi2:348
 #, c-format
@@ -406,6 +379,16 @@ msgstr "Installazzjoni lesta"
 #, c-format
 msgid "restarting urpmi"
 msgstr "qed jiġi ristartjat urpmi"
+
+#: ../gurpmi2:386
+#, c-format
+msgid "No"
+msgstr "Le"
+
+#: ../gurpmi2:386
+#, c-format
+msgid "Yes"
+msgstr "Iva"
 
 #: ../rpm-find-leaves:15
 #, c-format
@@ -437,9 +420,9 @@ msgid "                    defaults to %s.\n"
 msgstr "                    l-istandard huwa %s.\n"
 
 #: ../rpm-find-leaves:21
-#, fuzzy, c-format
+#, c-format
 msgid "   -f             - output rpm full name (NVRA)\n"
-msgstr "  -g             - uri l-gruppi flimkien ma' l-isem.\n"
+msgstr ""
 
 #: ../rurpmi:12 ../urpmi:266
 #, c-format
@@ -456,137 +439,137 @@ msgstr ""
 msgid "While some packages may have been installed, there were failures.\n"
 msgstr ""
 
-#: ../urpm.pm:193
-#, fuzzy, c-format
+#: ../urpm.pm:195
+#, c-format
 msgid "fail to create directory %s"
-msgstr "Ma nistax noħloq id-direttorju [%s] għar-rapport tal-bug"
+msgstr ""
 
-#: ../urpm.pm:194
+#: ../urpm.pm:196
 #, c-format
 msgid "invalid owner for directory %s"
 msgstr ""
 
-#: ../urpm.pm:237
-#, fuzzy, c-format
+#: ../urpm.pm:239
+#, c-format
 msgid "Can not download packages into %s"
-msgstr "Qed jitniżżel il-pakkett \"%s\"..."
+msgstr ""
 
-#: ../urpm.pm:253
+#: ../urpm.pm:255
 #, c-format
 msgid "Environment directory %s does not exist"
 msgstr ""
 
-#: ../urpm.pm:254 ../urpmf:244 ../urpmq:163
+#: ../urpm.pm:256 ../urpmf:244 ../urpmq:163
 #, c-format
 msgid "using specific environment on %s\n"
 msgstr "qed jintuża ambjent speċifiku fuq %s\n"
 
-#: ../urpm.pm:422
+#: ../urpm.pm:424
 #, c-format
 msgid "unable to open rpmdb"
 msgstr "ma nistax niftaħ rpmdb"
 
-#: ../urpm.pm:441
+#: ../urpm.pm:443
 #, c-format
 msgid "invalid rpm file name [%s]"
 msgstr "isem tal-fajl rpm [%s] invalidu"
 
-#: ../urpm.pm:447
+#: ../urpm.pm:449
 #, c-format
 msgid "retrieving rpm file [%s] ..."
 msgstr "qed jinġab il-fajl rpm [%s] ..."
 
-#: ../urpm.pm:449 ../urpm/get_pkgs.pm:275
+#: ../urpm.pm:451 ../urpm/get_pkgs.pm:275
 #, c-format
 msgid "...retrieving done"
 msgstr "...qari lest"
 
-#: ../urpm.pm:457
+#: ../urpm.pm:459
 #, c-format
 msgid "unable to access rpm file [%s]"
 msgstr "ma nistax naċċessa l-fajl rpm [%s]"
 
-#: ../urpm.pm:462
-#, fuzzy, c-format
+#: ../urpm.pm:464
+#, c-format
 msgid "unable to parse spec file %s [%s]"
-msgstr "ma nistax nifli \"%s\" fil-fajl [%s]"
+msgstr ""
 
-#: ../urpm.pm:470
+#: ../urpm.pm:472
 #, c-format
 msgid "unable to register rpm file"
 msgstr "ma nistax nirreġistra l-fajl rpm"
 
-#: ../urpm.pm:472
+#: ../urpm.pm:474
 #, c-format
 msgid "Incompatible architecture for rpm [%s]"
 msgstr ""
 
-#: ../urpm.pm:476
+#: ../urpm.pm:478
 #, c-format
 msgid "error registering local packages"
 msgstr "problema fir-reġistrazzjoni ta' pakketti lokali"
 
-#: ../urpm.pm:588
+#: ../urpm.pm:590
 #, c-format
 msgid "This operation is forbidden while running in restricted mode"
 msgstr ""
 
-#: ../urpm/args.pm:156 ../urpm/args.pm:165
+#: ../urpm/args.pm:157 ../urpm/args.pm:166
 #, c-format
 msgid "bad proxy declaration on command line\n"
 msgstr "dikjarazzjoni ta' \"proxy\" ħażina fil-linja ta' kmand\n"
 
-#: ../urpm/args.pm:320
+#: ../urpm/args.pm:321
 #, c-format
 msgid "urpmq: cannot read rpm file \"%s\"\n"
 msgstr "urpmq: ma nistax naqra l-fajl rpm \"%s\"\n"
 
-#: ../urpm/args.pm:388
+#: ../urpm/args.pm:389
 #, c-format
 msgid "unexpected expression %s"
 msgstr ""
 
-#: ../urpm/args.pm:389
-#, fuzzy, c-format
+#: ../urpm/args.pm:390
+#, c-format
 msgid "missing expression before %s"
-msgstr "Firma nieqsa (%s)"
+msgstr ""
 
-#: ../urpm/args.pm:395
+#: ../urpm/args.pm:396
 #, c-format
 msgid "unexpected expression %s (suggestion: use -a or -o ?)"
 msgstr ""
 
-#: ../urpm/args.pm:399
+#: ../urpm/args.pm:400
 #, c-format
 msgid "no expression to close"
 msgstr ""
 
-#: ../urpm/args.pm:408
+#: ../urpm/args.pm:409
 #, c-format
 msgid "by default urpmf awaits a regexp. you should use option \"--literal\""
 msgstr ""
 
-#: ../urpm/args.pm:482
+#: ../urpm/args.pm:483
 #, c-format
 msgid "chroot directory doesn't exist"
 msgstr ""
 
-#: ../urpm/args.pm:505
+#: ../urpm/args.pm:506
 #, c-format
 msgid "Can't use %s without %s"
 msgstr ""
 
-#: ../urpm/args.pm:508 ../urpm/args.pm:511 ../urpmq:155
+#: ../urpm/args.pm:509 ../urpm/args.pm:512 ../urpmq:155
 #, c-format
 msgid "Can't use %s with %s"
 msgstr ""
 
-#: ../urpm/args.pm:519
+#: ../urpm/args.pm:520
 #, c-format
 msgid "Too many arguments\n"
 msgstr ""
 
-#: ../urpm/args.pm:527
+#: ../urpm/args.pm:528
 #, c-format
 msgid ""
 "%s version %s\n"
@@ -603,7 +586,7 @@ msgstr ""
 "\n"
 "użu:\n"
 
-#: ../urpm/args.pm:533
+#: ../urpm/args.pm:534
 #, c-format
 msgid "Copyright (C) %s by %s"
 msgstr ""
@@ -626,9 +609,9 @@ msgid "Udisks daemon (udisks-daemon) is not running or not ready"
 msgstr ""
 
 #: ../urpm/cdrom.pm:173 ../urpm/cdrom.pm:178
-#, fuzzy, c-format
+#, c-format
 msgid "medium \"%s\" is not available"
-msgstr "sors \"%s\" mhuwiex magħżul"
+msgstr ""
 
 #: ../urpm/cdrom.pm:217
 #, c-format
@@ -636,14 +619,14 @@ msgid "unable to read rpm file [%s] from medium \"%s\""
 msgstr "ma nistax naqra l-rpm [%s] mis-sors \"%s\""
 
 #: ../urpm/cfg.pm:73
-#, fuzzy, c-format
+#, c-format
 msgid "syntax error in config file at line %s"
-msgstr "ma setax jinkiteb il-fajl ta' konfigurazzjoni [%s]"
+msgstr ""
 
 #: ../urpm/cfg.pm:106
-#, fuzzy, c-format
+#, c-format
 msgid "unable to read config file [%s]"
-msgstr "ma setax jinkiteb il-fajl ta' konfigurazzjoni [%s]"
+msgstr ""
 
 #: ../urpm/cfg.pm:132
 #, c-format
@@ -696,19 +679,19 @@ msgid "%s failed: exited with %d"
 msgstr ""
 
 #: ../urpm/download.pm:331
-#, fuzzy, c-format
+#, c-format
 msgid "copy failed"
-msgstr "Ikkupjar falla"
+msgstr ""
 
 #: ../urpm/download.pm:337
-#, fuzzy, c-format
+#, c-format
 msgid "wget is missing\n"
-msgstr "minħabba %s nieqes"
+msgstr ""
 
 #: ../urpm/download.pm:404
-#, fuzzy, c-format
+#, c-format
 msgid "curl is missing\n"
-msgstr "minħabba %s nieqes"
+msgstr ""
 
 #: ../urpm/download.pm:539
 #, c-format
@@ -736,9 +719,9 @@ msgid "Couldn't execute prozilla\n"
 msgstr ""
 
 #: ../urpm/download.pm:687
-#, fuzzy, c-format
+#, c-format
 msgid "aria2 is missing\n"
-msgstr "minħabba %s nieqes"
+msgstr ""
 
 #: ../urpm/download.pm:736
 #, c-format
@@ -756,14 +739,14 @@ msgid "        %s%% completed, speed = %s"
 msgstr ""
 
 #: ../urpm/download.pm:940
-#, fuzzy, c-format
+#, c-format
 msgid "retrieving %s"
-msgstr "qed jitneħħa %s"
+msgstr ""
 
 #: ../urpm/download.pm:958
-#, fuzzy, c-format
+#, c-format
 msgid "retrieved %s"
-msgstr "...qari falla: %s"
+msgstr ""
 
 #: ../urpm/download.pm:1021
 #, c-format
@@ -781,9 +764,9 @@ msgid "unable to handle protocol: %s"
 msgstr "ma nistax nuża l-protokoll: %s"
 
 #: ../urpm/get_pkgs.pm:28
-#, fuzzy, c-format
+#, c-format
 msgid "cleaning %s and %s"
-msgstr "qed jiġi nstallat %s"
+msgstr ""
 
 #: ../urpm/get_pkgs.pm:140
 #, c-format
@@ -800,48 +783,48 @@ msgstr "qed jinġabu l-fajls rpm mis-sors \"%s\"..."
 msgid "removing %s"
 msgstr "qed jitneħħa %s"
 
-#: ../urpm/install.pm:215
-#, fuzzy, c-format
+#: ../urpm/install.pm:217
+#, c-format
 msgid "unable to extract rpm from delta-rpm package %s"
-msgstr "ma nistax inneħħi l-pakkett %s"
+msgstr ""
 
-#: ../urpm/install.pm:242
+#: ../urpm/install.pm:245
 #, c-format
 msgid "unable to install package %s"
 msgstr "ma nistax ninstalla l-pakkett %s"
 
-#: ../urpm/install.pm:245
-#, fuzzy, c-format
+#: ../urpm/install.pm:248
+#, c-format
 msgid "removing bad rpm (%s) from %s"
-msgstr "qed jiġi nstallat %s"
+msgstr ""
 
-#: ../urpm/install.pm:246 ../urpm/install.pm:393
-#, fuzzy, c-format
+#: ../urpm/install.pm:249 ../urpm/install.pm:397
+#, c-format
 msgid "removing %s failed: %s"
-msgstr "...qari falla: %s"
+msgstr ""
 
-#: ../urpm/install.pm:295
+#: ../urpm/install.pm:298
 #, c-format
 msgid "removing package %s"
 msgstr "ed jitneħħa l-pakkett %s"
 
-#: ../urpm/install.pm:359
+#: ../urpm/install.pm:362
 #, c-format
 msgid ""
 "created transaction for installing on %s (remove=%d, install=%d, upgrade=%d)"
 msgstr "qed tinħoloq tranżazzjoni għal %s (neħħi=%d, installa=%d, aġġorna=%d)"
 
-#: ../urpm/install.pm:362
+#: ../urpm/install.pm:365
 #, c-format
 msgid "unable to create transaction"
 msgstr "ma nistax noħloq tranżazzjoni"
 
-#: ../urpm/install.pm:391
-#, fuzzy, c-format
+#: ../urpm/install.pm:395
+#, c-format
 msgid "removing installed rpms (%s) from %s"
-msgstr "qed jiġi nstallat %s"
+msgstr ""
 
-#: ../urpm/install.pm:400
+#: ../urpm/install.pm:404
 #, c-format
 msgid "More information on package %s"
 msgstr "Iżjed informazzjoni dwar pakkett %s"
@@ -862,9 +845,9 @@ msgid "No server defined, missing uri or host"
 msgstr ""
 
 #: ../urpm/ldap.pm:177
-#, fuzzy, c-format
+#, c-format
 msgid "No base defined"
-msgstr "Ebda kmand speċifikat"
+msgstr ""
 
 #: ../urpm/ldap.pm:187 ../urpm/ldap.pm:190
 #, c-format
@@ -872,9 +855,9 @@ msgid "Cannot connect to ldap uri:"
 msgstr ""
 
 #: ../urpm/lock.pm:98
-#, fuzzy, c-format
+#, c-format
 msgid "%s database is locked, process %d is already using it"
-msgstr "database urpmi imsakkar"
+msgstr ""
 
 #: ../urpm/lock.pm:100
 #, c-format
@@ -882,14 +865,14 @@ msgid "%s database is locked (another program is already using it)"
 msgstr ""
 
 #: ../urpm/lock.pm:114
-#, fuzzy, c-format
+#, c-format
 msgid "%s database is locked. Waiting..."
-msgstr "database urpmi imsakkar"
+msgstr ""
 
 #: ../urpm/lock.pm:115
-#, fuzzy, c-format
+#, c-format
 msgid "aborting"
-msgstr "Twissija"
+msgstr ""
 
 #: ../urpm/main_loop.pm:58
 #, c-format
@@ -897,20 +880,16 @@ msgid "Retry?"
 msgstr ""
 
 #: ../urpm/main_loop.pm:85
-#, fuzzy, c-format
+#, c-format
 msgid "You may need to update your urpmi database."
 msgstr ""
-"L-installazzjoni falliet, xi fajls huma nieqsa:\n"
-"\n"
-"%s\n"
-"Forsi trid taġġorna d-database urpmi"
 
 #: ../urpm/main_loop.pm:89
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "Installation failed, bad rpms:\n"
 "%s"
-msgstr "installazzjoni falliet"
+msgstr ""
 
 #: ../urpm/main_loop.pm:108
 #, c-format
@@ -921,9 +900,9 @@ msgid ""
 msgstr ""
 
 #: ../urpm/main_loop.pm:138
-#, fuzzy, c-format
+#, c-format
 msgid "The following package has bad signature"
-msgstr "Dawn il-pakketti fihom firem ħżiena"
+msgstr ""
 
 #: ../urpm/main_loop.pm:139
 #, c-format
@@ -942,9 +921,9 @@ msgid "Installation failed"
 msgstr "installazzjoni falliet"
 
 #: ../urpm/main_loop.pm:159
-#, fuzzy, c-format
+#, c-format
 msgid "removing installed rpms (%s)"
-msgstr "qed jiġi nstallat %s"
+msgstr ""
 
 #: ../urpm/main_loop.pm:185
 #, c-format
@@ -952,9 +931,9 @@ msgid "Try to continue anyway?"
 msgstr ""
 
 #: ../urpm/main_loop.pm:237
-#, fuzzy, c-format
+#, c-format
 msgid "installing %s from %s"
-msgstr "qed jiġi nstallat %s"
+msgstr ""
 
 #: ../urpm/main_loop.pm:239
 #, c-format
@@ -967,14 +946,14 @@ msgid "distributing %s"
 msgstr "qed jiġi distribwit %s"
 
 #: ../urpm/main_loop.pm:292
-#, fuzzy, c-format
+#, c-format
 msgid "Try installation without checking dependencies?"
-msgstr "Trid tinstalla mingħajr ma niċċekkja d-dipendenzi? (i/L) "
+msgstr ""
 
 #: ../urpm/main_loop.pm:300
-#, fuzzy, c-format
+#, c-format
 msgid "Try harder to install (--force)?"
-msgstr "Trid tipprova b'iżjed qawwa (--force)? (i/L)"
+msgstr ""
 
 #: ../urpm/main_loop.pm:591
 #, c-format
@@ -1002,14 +981,14 @@ msgid "unable to access list file of \"%s\", medium ignored"
 msgstr "ma nistax naċċessa l-fajl tal-lista \"%s\", sors injorat"
 
 #: ../urpm/media.pm:272
-#, fuzzy, c-format
+#, c-format
 msgid "unable to access synthesis file of \"%s\", medium ignored"
-msgstr "ma nistax naċċessa l-fajl hdlist ta' \"%s\", sors injorat"
+msgstr ""
 
 #: ../urpm/media.pm:298
-#, fuzzy, c-format
+#, c-format
 msgid "trying to override existing medium \"%s\", skipping"
-msgstr "qed nipprova naqbeż is-sors eżistenti \"%s\""
+msgstr ""
 
 #: ../urpm/media.pm:514
 #, c-format
@@ -1032,23 +1011,21 @@ msgid "using associated media for parallel mode: %s"
 msgstr "qed tintuża sors assoċjat għal modalità parallela: %s"
 
 #: ../urpm/media.pm:678
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "--synthesis cannot be used with --media, --excludemedia, --sortmedia, --"
 "update, --use-distrib or --parallel"
 msgstr ""
-"--synthesis ma jistax jintuża ma' --media, --excludemedia, --sortmedia,  --"
-"update jew --parallel"
 
 #: ../urpm/media.pm:793
-#, fuzzy, c-format
+#, c-format
 msgid "ignoring non-free medium `%s'"
-msgstr "Editja s-sors \"%s\":"
+msgstr ""
 
 #: ../urpm/media.pm:803
-#, fuzzy, c-format
+#, c-format
 msgid "un-ignoring non-free medium `%s' b/c nonfree packages are installed"
-msgstr "Editja s-sors \"%s\":"
+msgstr ""
 
 #: ../urpm/media.pm:807
 #, c-format
@@ -1056,16 +1033,16 @@ msgid "un-ignoring tainted medium `%s' b/c tainted packages are installed"
 msgstr ""
 
 #: ../urpm/media.pm:816
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "un-ignoring 32bit medium `%s' b/c 32-bit packages are installed or system is "
 "32-bit EFI"
-msgstr "Editja s-sors \"%s\":"
+msgstr ""
 
 #: ../urpm/media.pm:844
-#, fuzzy, c-format
+#, c-format
 msgid "Search start: %s end: %s"
-msgstr "Fittex fonts installati"
+msgstr ""
 
 #: ../urpm/media.pm:861
 #, c-format
@@ -1088,19 +1065,19 @@ msgid "(ignored by default)"
 msgstr ""
 
 #: ../urpm/media.pm:1014
-#, fuzzy, c-format
+#, c-format
 msgid "adding medium \"%s\" before remote medium \"%s\""
-msgstr "qed naqra l-\"headers\" mis-sors \"%s\""
+msgstr ""
 
 #: ../urpm/media.pm:1020
-#, fuzzy, c-format
+#, c-format
 msgid "adding medium \"%s\""
-msgstr "qed jitneħħa s-sors \"%s\""
+msgstr ""
 
 #: ../urpm/media.pm:1044
-#, fuzzy, c-format
+#, c-format
 msgid "failed to copy media.cfg to %s (%d)"
-msgstr "ma nistax niftaħ rpmdb"
+msgstr ""
 
 #: ../urpm/media.pm:1115
 #, c-format
@@ -1113,16 +1090,14 @@ msgid "this location doesn't seem to contain any distribution"
 msgstr ""
 
 #: ../urpm/media.pm:1147
-#, fuzzy, c-format
+#, c-format
 msgid "unable to parse media.cfg"
-msgstr "ma nistax niftaħ rpmdb"
+msgstr ""
 
 #: ../urpm/media.pm:1150
-#, fuzzy, c-format
+#, c-format
 msgid "unable to access the distribution medium (no media.cfg file found)"
 msgstr ""
-"ma nistax naċċessa l-ewwel sors ta' installazzjoni (ma nstabx il-fajl "
-"hdlists)"
 
 #: ../urpm/media.pm:1184
 #, c-format
@@ -1130,9 +1105,9 @@ msgid "skipping non compatible media `%s' (for %s)"
 msgstr ""
 
 #: ../urpm/media.pm:1242
-#, fuzzy, c-format
+#, c-format
 msgid "retrieving media.cfg file..."
-msgstr "qed naqra l-fajl \"hdlists\"..."
+msgstr ""
 
 #: ../urpm/media.pm:1285
 #, c-format
@@ -1170,9 +1145,9 @@ msgid "Error generating names file: dependency %d not found"
 msgstr ""
 
 #: ../urpm/media.pm:1515
-#, fuzzy, c-format
+#, c-format
 msgid "medium \"%s\" is up-to-date"
-msgstr "sors \"%s\" mhuwiex magħżul"
+msgstr ""
 
 #: ../urpm/media.pm:1526
 #, c-format
@@ -1185,9 +1160,9 @@ msgid "problem reading synthesis file of medium \"%s\""
 msgstr "problema fil-qari tas-sinteżi għas-sors \"%s\""
 
 #: ../urpm/media.pm:1559 ../urpm/media.pm:1654
-#, fuzzy, c-format
+#, c-format
 msgid "copying [%s] for medium \"%s\"..."
-msgstr "qed jinkiteb il-fajl b'lista għas-sors \"%s\""
+msgstr ""
 
 #: ../urpm/media.pm:1561 ../urpm/media.pm:1631 ../urpm/media.pm:1884
 #, c-format
@@ -1210,49 +1185,49 @@ msgid "copy of [%s] failed (file is suspiciously small)"
 msgstr "l-ikkuppjar tal-fajl [%s] falla (il-fajl jidher żgħir wisq)"
 
 #: ../urpm/media.pm:1708
-#, fuzzy, c-format
+#, c-format
 msgid "computing md5sum of retrieved source synthesis"
-msgstr "qed tiġi kalkulata l-md5sum għall-hdlist jew sinteżi tas-sors imniżżel"
+msgstr ""
 
 #: ../urpm/media.pm:1710 ../urpm/media.pm:2193
-#, fuzzy, c-format
+#, c-format
 msgid "retrieval of [%s] failed (md5sum mismatch)"
-msgstr "l-ikkuppjar tal-fajl [%s] falla (md5sum ma qablitx)"
+msgstr ""
 
 #: ../urpm/media.pm:1725
-#, fuzzy, c-format
+#, c-format
 msgid "genhdlist2 failed on %s"
-msgstr "qed jiġi eżaminat il-fajl hdlist [%s]"
+msgstr ""
 
 #: ../urpm/media.pm:1735
-#, fuzzy, c-format
+#, c-format
 msgid "comparing %s and %s"
-msgstr "qed jiġi nstallat %s"
+msgstr ""
 
 #: ../urpm/media.pm:1765
-#, fuzzy, c-format
+#, c-format
 msgid "invalid hdlist file %s for medium \"%s\""
-msgstr "ma nstabx fajl hdlists għas-sors \"%s\""
+msgstr ""
 
 #: ../urpm/media.pm:1791
-#, fuzzy, c-format
+#, c-format
 msgid "copying MD5SUM file of \"%s\"..."
-msgstr "qed nikkopja l-fajl ta' deskrizzjoni ta' \"%s\""
+msgstr ""
 
 #: ../urpm/media.pm:1831
-#, fuzzy, c-format
+#, c-format
 msgid "invalid MD5SUM file (downloaded from %s)"
-msgstr "isem tal-fajl rpm [%s] invalidu"
+msgstr ""
 
 #: ../urpm/media.pm:1834
-#, fuzzy, c-format
+#, c-format
 msgid "no metadata found for medium \"%s\""
-msgstr "ma nstabx fajl hdlists għas-sors \"%s\""
+msgstr ""
 
 #: ../urpm/media.pm:1866
-#, fuzzy, c-format
+#, c-format
 msgid "retrieving source synthesis of \"%s\"..."
-msgstr "qed jinġab l-hdlist jew sinteżi sors għal \"%s\"..."
+msgstr ""
 
 #: ../urpm/media.pm:1932
 #, c-format
@@ -1270,14 +1245,14 @@ msgid "unable to import pubkey file of \"%s\""
 msgstr "ma stajtx nimporta fajl pubkey ta' \"%s\""
 
 #: ../urpm/media.pm:1989
-#, fuzzy, c-format
+#, c-format
 msgid "no synthesis file found for medium \"%s\""
-msgstr "ma nstabx fajl hdlists għas-sors \"%s\""
+msgstr ""
 
 #: ../urpm/media.pm:2022
-#, fuzzy, c-format
+#, c-format
 msgid "updated medium \"%s\""
-msgstr "ġie miżjud is-sors %s"
+msgstr ""
 
 #: ../urpm/media.pm:2187
 #, c-format
@@ -1300,9 +1275,9 @@ msgid "found geolocalisation %s %.2f %.2f from timezone %s"
 msgstr ""
 
 #: ../urpm/mirrors.pm:306
-#, fuzzy, c-format
+#, c-format
 msgid "getting mirror list from %s"
-msgstr "qed jinqraw fajls rpm minn [%s]"
+msgstr ""
 
 #: ../urpm/msg.pm:74 ../urpmi:492 ../urpmi:510 ../urpmi:628
 #, c-format
@@ -1341,9 +1316,9 @@ msgid "Release"
 msgstr ""
 
 #: ../urpm/msg.pm:160
-#, fuzzy, c-format
+#, c-format
 msgid "Arch"
-msgstr "Fittex"
+msgstr ""
 
 #: ../urpm/msg.pm:169
 #, c-format
@@ -1351,9 +1326,9 @@ msgid "(recommended)"
 msgstr ""
 
 #: ../urpm/msg.pm:184
-#, fuzzy, c-format
+#, c-format
 msgid "medium \"%s\""
-msgstr "qed jitneħħa s-sors \"%s\""
+msgstr ""
 
 #: ../urpm/msg.pm:184
 #, c-format
@@ -1391,7 +1366,7 @@ msgid "Marking %s as manually installed, it won't be auto-orphaned"
 msgstr ""
 
 #: ../urpm/orphans.pm:613
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "The following package:\n"
 "%s\n"
@@ -1400,15 +1375,19 @@ msgid_plural ""
 "The following packages:\n"
 "%s\n"
 "are now orphaned."
-msgstr[0] "Wieħed minn dawn il-pakketti huwa meħtieġ:"
-msgstr[1] "Wieħed minn dawn il-pakketti huwa meħtieġ:"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
 
 #: ../urpm/orphans.pm:616
-#, fuzzy, c-format
+#, c-format
 msgid "You may wish to remove it."
 msgid_plural "You may wish to remove them."
-msgstr[0] "M'hemm xejn x'inneħħi"
-msgstr[1] "M'hemm xejn x'inneħħi"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
 
 #: ../urpm/orphans.pm:633
 #, c-format
@@ -1424,6 +1403,8 @@ msgid_plural ""
 "orphans\""
 msgstr[0] ""
 msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
 
 #: ../urpm/parallel.pm:31
 #, c-format
@@ -1451,9 +1432,9 @@ msgid "on node %s"
 msgstr ""
 
 #: ../urpm/parallel.pm:335
-#, fuzzy, c-format
+#, c-format
 msgid "Installation failed on node %s"
-msgstr "installazzjoni falliet"
+msgstr ""
 
 #: ../urpm/parallel_ka_run.pm:57
 #, c-format
@@ -1483,9 +1464,9 @@ msgid ""
 msgstr ""
 
 #: ../urpm/removable.pm:45
-#, fuzzy, c-format
+#, c-format
 msgid "unable to access medium \"%s\"."
-msgstr "ma nistax naċċessa s-sors \"%s\""
+msgstr ""
 
 #: ../urpm/removable.pm:85 ../urpm/removable.pm:100
 #, c-format
@@ -1524,19 +1505,19 @@ msgid "You should use \"-a\" to use all of them"
 msgstr ""
 
 #: ../urpm/select.pm:371
-#, fuzzy, c-format
+#, c-format
 msgid "found package(s) %s in urpmi db, but none are installed"
-msgstr "kollox diġà installat"
+msgstr ""
 
 #: ../urpm/select.pm:606
-#, fuzzy, c-format
+#, c-format
 msgid "Package %s is already installed"
-msgstr "kollox diġà installat"
+msgstr ""
 
 #: ../urpm/select.pm:607
-#, fuzzy, c-format
+#, c-format
 msgid "Packages %s are already installed"
-msgstr "kollox diġà installat"
+msgstr ""
 
 #: ../urpm/select.pm:624 ../urpm/select.pm:711
 #, c-format
@@ -1559,13 +1540,11 @@ msgid "in order to keep %s"
 msgstr "sabiex inżomm %s"
 
 #: ../urpm/select.pm:673
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "The following package has to be removed for others to be upgraded:\n"
 "%s"
 msgstr ""
-"Dawn il-pakketti jridu jitneħħew qabel oħrajn jiġu aġġornati:\n"
-"%s"
 
 #: ../urpm/select.pm:674
 #, c-format
@@ -1592,9 +1571,9 @@ msgid "Invalid signature (%s)"
 msgstr "Firma invalida (%s)"
 
 #: ../urpm/signature.pm:76
-#, fuzzy, c-format
+#, c-format
 msgid "SECURITY: The following package is _NOT_ signed (%s): %s"
-msgstr "Dawn il-pakketti fihom %s: %s"
+msgstr ""
 
 #: ../urpm/signature.pm:82
 #, c-format
@@ -1642,19 +1621,19 @@ msgid "You should restart %s for %s"
 msgstr ""
 
 #: ../urpm/sys.pm:377
-#, fuzzy, c-format
+#, c-format
 msgid "Can't write file"
-msgstr "ma setax jinkiteb il-fajl [%s]"
+msgstr ""
 
 #: ../urpm/sys.pm:377
-#, fuzzy, c-format
+#, c-format
 msgid "Can't open file"
-msgstr "Ikkupjar falla"
+msgstr ""
 
 #: ../urpm/sys.pm:390
-#, fuzzy, c-format
+#, c-format
 msgid "Can't move file %s to %s"
-msgstr "Ikkupjar falla"
+msgstr ""
 
 #: ../urpme:43
 #, c-format
@@ -1667,9 +1646,9 @@ msgid "  --auto-orphans - remove orphans\n"
 msgstr ""
 
 #: ../urpme:45
-#, fuzzy, c-format
+#, c-format
 msgid "  --test         - verify if the removal can be achieved correctly.\n"
-msgstr "  --test         - ivverifika li l-installazzjoni tista' ssir sew.\n"
+msgstr ""
 
 #: ../urpme:47 ../urpmi:106 ../urpmq:66
 #, c-format
@@ -1677,39 +1656,37 @@ msgid "  --parallel     - distributed urpmi across machines of alias.\n"
 msgstr "  --parallel     - iddistribwixxi urpmi fuq il-magni ta' alias.\n"
 
 #: ../urpme:48
-#, fuzzy, c-format
+#, c-format
 msgid "  --root         - use another root for rpm removal.\n"
-msgstr "  --root         - uża root ieħor għall-installazzjoni rpm.\n"
+msgstr ""
 
 #: ../urpme:49 ../urpmf:35 ../urpmi:108 ../urpmi.addmedia:73
 #: ../urpmi.removemedia:45 ../urpmi.update:49 ../urpmq:68
-#, fuzzy, c-format
+#, c-format
 msgid "  --urpmi-root   - use another root for urpmi db & rpm installation.\n"
-msgstr "  --root         - uża root ieħor għall-installazzjoni rpm.\n"
+msgstr ""
 
 #: ../urpme:50 ../urpmi:96
-#, fuzzy, c-format
+#, c-format
 msgid "  --justdb       - update only the rpm db, not the filesystem.\n"
-msgstr "  --update       - uża s-sorsi ta' aġġornament biss.\n"
+msgstr ""
 
 #: ../urpme:51
-#, fuzzy, c-format
+#, c-format
 msgid "  --noscripts    - do not execute package scriptlet(s).\n"
-msgstr "  --description   - uri t-tag \"description\": deskrizzjoni\n"
+msgstr ""
 
 #: ../urpme:52
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "  --use-distrib  - configure urpme on the fly from a distrib tree, useful\n"
 "                   to (un)install a chroot with --root option.\n"
 msgstr ""
-"  --use-distrib  - ikkonfigura urpmi dak il-ħin minn distrib, utli "
-"biex                   tinstalla jew tneħħi chroot permezz ta' --root.\n"
 
 #: ../urpme:54 ../urpmi:150 ../urpmq:87
-#, fuzzy, c-format
+#, c-format
 msgid "  --verbose, -v  - verbose mode.\n"
-msgstr "  -verbose       - modalità b'ħafna dettalji.\n"
+msgstr ""
 
 #: ../urpme:55
 #, c-format
@@ -1717,9 +1694,9 @@ msgid "  -a             - select all packages matching expression.\n"
 msgstr "  -a             - agħżel kull ma jaqbel fuq il-linja tal-kmand.\n"
 
 #: ../urpme:70
-#, fuzzy, c-format
+#, c-format
 msgid "Only superuser is allowed to remove packages"
-msgstr "Is-\"superuser\" biss għandu l-awtorità ineħħi sorsi"
+msgstr ""
 
 #: ../urpme:103
 #, c-format
@@ -1732,11 +1709,13 @@ msgid "unknown package"
 msgstr "pakkett mhux magħruf"
 
 #: ../urpme:118
-#, fuzzy, c-format
+#, c-format
 msgid "Removing the following package will break your system:"
 msgid_plural "Removing the following packages will break your system:"
-msgstr[0] "jekk tneħħi l-pakkett %s is-sistema ma tibqax taħdem sew"
-msgstr[1] "jekk tneħħi l-pakkett %s is-sistema ma tibqax taħdem sew"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
 
 #: ../urpme:123
 #, c-format
@@ -1744,38 +1723,42 @@ msgid "Nothing to remove"
 msgstr "M'hemm xejn x'inneħħi"
 
 #: ../urpme:140
-#, fuzzy, c-format
+#, c-format
 msgid "No orphans to remove"
-msgstr "M'hemm xejn x'inneħħi"
+msgstr ""
 
 #: ../urpme:146
-#, fuzzy, c-format
+#, c-format
 msgid "To satisfy dependencies, the following package will be removed"
 msgid_plural ""
 "To satisfy dependencies, the following %d packages will be removed"
 msgstr[0] ""
-"Biex nissodisfa d-dipendenzi, dawn il-pakketti jridu jitneħħew ukoll (%d MB)"
 msgstr[1] ""
-"Biex nissodisfa d-dipendenzi, dawn il-pakketti jridu jitneħħew ukoll (%d MB)"
+msgstr[2] ""
+msgstr[3] ""
 
 #: ../urpme:151
-#, fuzzy, c-format
+#, c-format
 msgid "(orphan package)"
 msgid_plural "(orphan packages)"
-msgstr[0] "pakkett mhux magħruf"
-msgstr[1] "pakkett mhux magħruf"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
 
 #: ../urpme:158
-#, fuzzy, c-format
+#, c-format
 msgid "Remove %d package?"
 msgid_plural "Remove %d packages?"
-msgstr[0] "ed jitneħħa l-pakkett %s"
-msgstr[1] "ed jitneħħa l-pakkett %s"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
 
 #: ../urpme:163
-#, fuzzy, c-format
+#, c-format
 msgid "testing removal of %s"
-msgstr "qed nieħu l-apparat li jitneħħa bħala \"%s\""
+msgstr ""
 
 #: ../urpme:180
 #, c-format
@@ -1783,14 +1766,14 @@ msgid "Removal failed"
 msgstr "Tneħħija falliet"
 
 #: ../urpme:182
-#, fuzzy, c-format
+#, c-format
 msgid "Removal is possible"
-msgstr "Tneħħija falliet"
+msgstr ""
 
 #: ../urpmf:31
-#, fuzzy, c-format
+#, c-format
 msgid "  --version      - print this tool's version number.\n"
-msgstr "  --help         - uri dan il-messaġġ ta' għajnuna.\n"
+msgstr ""
 
 #: ../urpmf:32 ../urpmi:130 ../urpmq:78
 #, c-format
@@ -1817,9 +1800,9 @@ msgstr ""
 "  --sortmedia    - issortja s-sorsi skond strings separati b'virgola.\n"
 
 #: ../urpmf:38
-#, fuzzy, c-format
+#, c-format
 msgid "  --use-distrib  - use the given path to access media\n"
-msgstr "  --synthesis    - uża s-sinteżi mogħti minflok id-database urpmi.\n"
+msgstr ""
 
 #: ../urpmf:39 ../urpmi:73 ../urpmq:47
 #, c-format
@@ -1847,9 +1830,9 @@ msgid "  -i             - ignore case distinctions in patterns.\n"
 msgstr "  -i             - qis ittri kbar u żgħar l-istess f'kull mudell.\n"
 
 #: ../urpmf:44
-#, fuzzy, c-format
+#, c-format
 msgid "  -I             - honor case distinctions in patterns (default).\n"
-msgstr "  -i             - qis ittri kbar u żgħar l-istess f'kull mudell.\n"
+msgstr ""
 
 #: ../urpmf:45
 #, c-format
@@ -1887,38 +1870,34 @@ msgid "  !              - unary NOT.\n"
 msgstr "  !              - operatur NOT.\n"
 
 #: ../urpmf:52
-#, fuzzy, c-format
+#, c-format
 msgid "  ( )            - left and right parentheses.\n"
 msgstr ""
-"  (              - parenteżi tal-lemin, biex tagħlaq grupp ta' "
-"espressjonijiet.\n"
 
 #: ../urpmf:53
-#, fuzzy, c-format
+#, c-format
 msgid "List of tags:\n"
 msgstr ""
-"Lista ta' informazzjoni x'tirrestawra:\n"
-"\n"
 
 #: ../urpmf:54
-#, fuzzy, c-format
+#, c-format
 msgid "  --qf           - specify a printf-like output format\n"
-msgstr "  --X            - uża l-interfaċċja X.\n"
+msgstr ""
 
 #: ../urpmf:55
-#, fuzzy, c-format
+#, c-format
 msgid "                   example: '%%name:%%files'\n"
-msgstr "                    l-istandard huwa %s.\n"
+msgstr ""
 
 #: ../urpmf:56
-#, fuzzy, c-format
+#, c-format
 msgid "  --arch         - architecture\n"
-msgstr "  --url          - uri l-url.\n"
+msgstr ""
 
 #: ../urpmf:57
-#, fuzzy, c-format
+#, c-format
 msgid "  --buildhost    - build host\n"
-msgstr "  --buildhost    - uri t-tag \"buildhost\": kompjuter fejn inbena.\n"
+msgstr ""
 
 #: ../urpmf:58
 #, c-format
@@ -1926,19 +1905,19 @@ msgid "  --buildtime    - build time\n"
 msgstr ""
 
 #: ../urpmf:59
-#, fuzzy, c-format
+#, c-format
 msgid "  --conffiles    - configuration files\n"
-msgstr "Konfigurazzjoni ta' Konsole"
+msgstr ""
 
 #: ../urpmf:60
-#, fuzzy, c-format
+#, c-format
 msgid "  --conflicts    - conflict tags\n"
-msgstr "  --conflicts     - uri \"conflicts\": kull ma joħloq konflitt\n"
+msgstr ""
 
 #: ../urpmf:61
-#, fuzzy, c-format
+#, c-format
 msgid "  --description  - package description\n"
-msgstr "  --description   - uri t-tag \"description\": deskrizzjoni\n"
+msgstr ""
 
 #: ../urpmf:62
 #, c-format
@@ -1946,89 +1925,89 @@ msgid "  --distribution - distribution\n"
 msgstr ""
 
 #: ../urpmf:63
-#, fuzzy, c-format
+#, c-format
 msgid "  --epoch        - epoch\n"
-msgstr "  --epoch        - uri t-tag epoch: epoka.\n"
+msgstr ""
 
 #: ../urpmf:64
-#, fuzzy, c-format
+#, c-format
 msgid "  --filename     - filename of the package\n"
-msgstr "  --name         - uri biss l-ismijiet tal-pakketti.\n"
+msgstr ""
 
 #: ../urpmf:65
-#, fuzzy, c-format
+#, c-format
 msgid "  --files        - list of files contained in the package\n"
-msgstr "  -l             - illistja l-fajls fil-pakkett.\n"
+msgstr ""
 
 #: ../urpmf:66
-#, fuzzy, c-format
+#, c-format
 msgid "  --group        - group\n"
-msgstr "  --group         - uri l-grupp.\n"
+msgstr ""
 
 #: ../urpmf:67
-#, fuzzy, c-format
+#, c-format
 msgid "  --license      - license\n"
-msgstr "  --name         - uri biss l-ismijiet tal-pakketti.\n"
+msgstr ""
 
 #: ../urpmf:68
-#, fuzzy, c-format
+#, c-format
 msgid "  --name         - package name\n"
-msgstr "  --name         - uri biss l-ismijiet tal-pakketti.\n"
+msgstr ""
 
 #: ../urpmf:69
-#, fuzzy, c-format
+#, c-format
 msgid "  --obsoletes    - obsoletes tags\n"
-msgstr "  --obsoletes     - ipprintja l-kontenut ta' \"obsoletes\"\n"
+msgstr ""
 
 #: ../urpmf:70
-#, fuzzy, c-format
+#, c-format
 msgid "  --packager     - packager\n"
-msgstr "  --packager     - uri t-tag \"packager\": pakkeġġjatur.\n"
+msgstr ""
 
 #: ../urpmf:71
-#, fuzzy, c-format
+#, c-format
 msgid "  --provides     - provides tags\n"
-msgstr "  --provides      - uri \"provides\" - kull ma jipprovdi\n"
+msgstr ""
 
 #: ../urpmf:72
-#, fuzzy, c-format
+#, c-format
 msgid "  --requires     - requires tags\n"
-msgstr "  --requires      - uri \"requires\": kull ma jeħtieġ\n"
+msgstr ""
 
 #: ../urpmf:73
-#, fuzzy, c-format
+#, c-format
 msgid "  --size         - installed size\n"
-msgstr "  --size          - uri d-daqs.\n"
+msgstr ""
 
 #: ../urpmf:74
-#, fuzzy, c-format
+#, c-format
 msgid "  --sourcerpm    - source rpm name\n"
-msgstr "  --sourcerpm    - print tag \"sourcerpm\": rpm tas-sors.\n"
+msgstr ""
 
 #: ../urpmf:75
-#, fuzzy, c-format
+#, c-format
 msgid "  --recommends   - recommends tags\n"
-msgstr "  --requires      - uri \"requires\": kull ma jeħtieġ\n"
+msgstr ""
 
 #: ../urpmf:76
-#, fuzzy, c-format
+#, c-format
 msgid "  --summary      - summary\n"
-msgstr "  --summary       - uri t-tag \"summary\": sommarju.\n"
+msgstr ""
 
 #: ../urpmf:77
-#, fuzzy, c-format
+#, c-format
 msgid "  --url          - url\n"
-msgstr "  --url          - uri l-url.\n"
+msgstr ""
 
 #: ../urpmf:78
-#, fuzzy, c-format
+#, c-format
 msgid "  --vendor       - vendor\n"
-msgstr "  -verbose       - modalità b'ħafna dettalji.\n"
+msgstr ""
 
 #: ../urpmf:79
-#, fuzzy, c-format
+#, c-format
 msgid "  -m             - the media in which the package was found\n"
-msgstr "  -l             - illistja l-fajls fil-pakkett.\n"
+msgstr ""
 
 #: ../urpmf:80 ../urpmq:97
 #, c-format
@@ -2047,35 +2026,34 @@ msgid "Incorrect format: you may use only one multi-valued tag"
 msgstr ""
 
 #: ../urpmf:287
-#, fuzzy, c-format
+#, c-format
 msgid "no hdlist available for medium \"%s\""
-msgstr "ma nstabx fajl hdlists għas-sors \"%s\""
+msgstr ""
 
 #: ../urpmf:294
-#, fuzzy, c-format
+#, c-format
 msgid "no synthesis available for medium \"%s\""
-msgstr "ibni l-fajl ta' sintesi tal-hdlist għas-sors \"%s\""
+msgstr ""
 
 #: ../urpmf:303
-#, fuzzy, c-format
+#, c-format
 msgid "no xml-info available for medium \"%s\""
-msgstr "qed jinkiteb il-fajl b'lista għas-sors \"%s\""
+msgstr ""
 
 #: ../urpmi:76
-#, fuzzy, c-format
+#, c-format
 msgid "  --auto-update  - update media then upgrade the system.\n"
 msgstr ""
-"  --auto-select  - agħżel pakketti awtomatikament biex taġġorna s-sistema.\n"
 
 #: ../urpmi:77
-#, fuzzy, c-format
+#, c-format
 msgid "    --no-md5sum    - disable MD5SUM file checking.\n"
-msgstr "  --no-md5sum    - tiċċekkjax MD5SUM.\n"
+msgstr ""
 
 #: ../urpmi:78
-#, fuzzy, c-format
+#, c-format
 msgid "    --force-key    - force update of gpg key.\n"
-msgstr "  --force-key    - ġiegħel iċ-ċifrarju gpg jiġi aġġornat.\n"
+msgstr ""
 
 #: ../urpmi:79
 #, c-format
@@ -2083,9 +2061,9 @@ msgid "  --auto-orphans - remove orphans without asking\n"
 msgstr ""
 
 #: ../urpmi:80 ../urpmq:52
-#, fuzzy, c-format
+#, c-format
 msgid "  --no-recommends - do not auto select \"recommended\" packages.\n"
-msgstr "  --obsoletes     - ipprintja l-kontenut ta' \"obsoletes\"\n"
+msgstr ""
 
 #: ../urpmi:81
 #, c-format
@@ -2097,10 +2075,9 @@ msgstr ""
 "installazzjoni.\n"
 
 #: ../urpmi:82
-#, fuzzy, c-format
+#, c-format
 msgid "  --no-install   - don't install packages (only download)\n"
 msgstr ""
-"  --install-src  - installa biss pakketti bis-sorsi (mingħajr binarji).\n"
 
 #: ../urpmi:83 ../urpmq:54
 #, c-format
@@ -2129,14 +2106,14 @@ msgid "  --split-length - small transaction length, default is %d.\n"
 msgstr "  --split-length - tul qasir ta' tranżazzjoni, impliċitament %d.\n"
 
 #: ../urpmi:91
-#, fuzzy, c-format
+#, c-format
 msgid "  --fuzzy, -y    - impose fuzzy search.\n"
-msgstr "  --fuzzy        - imponi tfittix \"fuzzy\" (l-istess bħal -y).\n"
+msgstr ""
 
 #: ../urpmi:92
-#, fuzzy, c-format
+#, c-format
 msgid "  --buildrequires - install the buildrequires of the packages\n"
-msgstr "  --requires      - uri \"requires\": kull ma jeħtieġ\n"
+msgstr ""
 
 #: ../urpmi:93
 #, c-format
@@ -2150,9 +2127,9 @@ msgid "  --clean        - remove rpm from cache before anything else.\n"
 msgstr "  --clean        - neħħi rpms mill-cache qabel affarijiet oħra.\n"
 
 #: ../urpmi:95
-#, fuzzy, c-format
+#, c-format
 msgid "  --noclean      - don't clean rpms from cache.\n"
-msgstr "  --noclean      - żomm rpms mhux użati fil-cache.\n"
+msgstr ""
 
 #: ../urpmi:97
 #, c-format
@@ -2187,9 +2164,9 @@ msgstr ""
 "                   u integrità.\n"
 
 #: ../urpmi:105
-#, fuzzy, c-format
+#, c-format
 msgid "  --allow-recommends - auto select \"recommended\" packages.\n"
-msgstr "  --obsoletes     - ipprintja l-kontenut ta' \"obsoletes\"\n"
+msgstr ""
 
 #: ../urpmi:109
 #, c-format
@@ -2300,26 +2277,24 @@ msgid "  --excludedocs  - exclude doc files.\n"
 msgstr "  --excludedocs  - eskludi fajls ta' dokumentazzjoni.\n"
 
 #: ../urpmi:136
-#, fuzzy, c-format
+#, c-format
 msgid "  --ignoresize   - don't verify disk space before installation.\n"
 msgstr ""
-"  --no-uninstall - tistaqsi qatt biex tneħħi pakkett, waqqaf l-"
-"installazzjoni.\n"
 
 #: ../urpmi:137
-#, fuzzy, c-format
+#, c-format
 msgid "  --ignorearch   - allow to install rpms for unmatched architectures.\n"
-msgstr "  --url          - uri l-url.\n"
+msgstr ""
 
 #: ../urpmi:138
-#, fuzzy, c-format
+#, c-format
 msgid "  --noscripts    - do not execute package scriptlet(s)\n"
-msgstr "  --description   - uri t-tag \"description\": deskrizzjoni\n"
+msgstr ""
 
 #: ../urpmi:139
-#, fuzzy, c-format
+#, c-format
 msgid "  --replacefiles - ignore file conflicts\n"
-msgstr "  --conflicts     - uri \"conflicts\": kull ma joħloq konflitt\n"
+msgstr ""
 
 #: ../urpmi:140
 #, c-format
@@ -2328,10 +2303,9 @@ msgstr ""
 "  --skip         - pakketti li l-installazzjoni tagħhom għandha tinqabeż\n"
 
 #: ../urpmi:141
-#, fuzzy, c-format
+#, c-format
 msgid "  --prefer       - packages which should be preferred\n"
 msgstr ""
-"  --skip         - pakketti li l-installazzjoni tagħhom għandha tinqabeż\n"
 
 #: ../urpmi:142
 #, c-format
@@ -2343,9 +2317,9 @@ msgstr ""
 "                   għażliet minn dak impliċitu.\n"
 
 #: ../urpmi:144
-#, fuzzy, c-format
+#, c-format
 msgid "  --nolock       - don't lock rpm db.\n"
-msgstr "  --noclean      - żomm rpms mhux użati fil-cache.\n"
+msgstr ""
 
 #: ../urpmi:145
 #, c-format
@@ -2358,14 +2332,14 @@ msgid "  -a             - select all matches on command line.\n"
 msgstr "  -a             - agħżel kull ma jaqbel fuq il-linja tal-kmand.\n"
 
 #: ../urpmi:149
-#, fuzzy, c-format
+#, c-format
 msgid "  --quiet, -q    - quiet mode.\n"
-msgstr "  -q             - modalità kwieta.\n"
+msgstr ""
 
 #: ../urpmi:151
-#, fuzzy, c-format
+#, c-format
 msgid "  --debug        - very verbose mode.\n"
-msgstr "  -verbose       - modalità b'ħafna dettalji.\n"
+msgstr ""
 
 #: ../urpmi:152
 #, c-format
@@ -2386,9 +2360,9 @@ msgid ""
 msgstr ""
 
 #: ../urpmi:217
-#, fuzzy, c-format
+#, c-format
 msgid "You can't install binary rpm files when using --install-src"
-msgstr "X'jista' jsir minn fajls rpm binarji meta tuża --install-src"
+msgstr ""
 
 #: ../urpmi:218
 #, c-format
@@ -2429,35 +2403,34 @@ msgstr ""
 
 #. -PO: here format is "<package_name>: <summary> (to upgrade)"
 #: ../urpmi:426
-#, fuzzy, c-format
+#, c-format
 msgid "%s: %s (to upgrade)"
-msgstr "Aġġornament"
+msgstr ""
 
 #. -PO: here format is "<package_name> (to upgrade)"
 #: ../urpmi:428
-#, fuzzy, c-format
+#, c-format
 msgid "%s (to upgrade)"
-msgstr "Aġġornament"
+msgstr ""
 
 #. -PO: here format is "<package_name>: <summary> (to install)"
 #: ../urpmi:432
-#, fuzzy, c-format
+#, c-format
 msgid "%s: %s (to install)"
-msgstr "Oħroġ mill-installazzjoni"
+msgstr ""
 
 #. -PO: here format is "<package_name> (to install)"
 #: ../urpmi:434
-#, fuzzy, c-format
+#, c-format
 msgid "%s (to install)"
-msgstr "Oħroġ mill-installazzjoni"
+msgstr ""
 
 #: ../urpmi:440
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "In order to satisfy the '%s' dependency, one of the following packages is "
 "needed:"
 msgstr ""
-"Biex nissodisfa d-dipendenzi, dawn il-pakketti jridu jitneħħew ukoll (%d MB)"
 
 #: ../urpmi:443
 #, c-format
@@ -2481,11 +2454,11 @@ msgid ""
 msgstr ""
 
 #: ../urpmi:493 ../urpmi:511
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "\n"
 "Continue installation anyway?"
-msgstr "Trid tkompli xorta?"
+msgstr ""
 
 #: ../urpmi:494 ../urpmi:512 ../urpmi:629 ../urpmi.addmedia:136
 #, c-format
@@ -2493,13 +2466,11 @@ msgid " (Y/n) "
 msgstr " (I/l) "
 
 #: ../urpmi:505
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "A requested package cannot be installed:\n"
 "%s"
 msgstr ""
-"Xi pakketti mitluba ma jistgħux jiġu nstallati:\n"
-"%s"
 
 #: ../urpmi:526
 #, c-format
@@ -2507,15 +2478,12 @@ msgid "removing package %s will break your system"
 msgstr "jekk tneħħi l-pakkett %s is-sistema ma tibqax taħdem sew"
 
 #: ../urpmi:534
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "The installation cannot continue because the following package\n"
 "has to be removed for others to be upgraded:\n"
 "%s\n"
 msgstr ""
-"L-installazzjoni ma tistax tkompli għax dawn il-pakketti jridu \n"
-"jitneħħew sabiex oħrajn jiġu aġġornati:\n"
-"%s\n"
 
 #: ../urpmi:536
 #, c-format
@@ -2534,23 +2502,21 @@ msgid "(test only, removal will not be actually done)"
 msgstr ""
 
 #: ../urpmi:563
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "You must first call urpmi with --buildrequires to install the following "
 "dependencies:\n"
 "%s\n"
 msgstr ""
-"Trid tkun \"root\" biex tinstalla dawn id-dipendenzi:\n"
-"%s\n"
 
 #: ../urpmi:573
-#, fuzzy, c-format
+#, c-format
 msgid "The following orphan package will be removed."
 msgid_plural "The following orphan packages will be removed."
 msgstr[0] ""
-"Biex nissodisfa d-dipendenzi, dawn il-pakketti jridu jitneħħew ukoll (%d MB)"
 msgstr[1] ""
-"Biex nissodisfa d-dipendenzi, dawn il-pakketti jridu jitneħħew ukoll (%d MB)"
+msgstr[2] ""
+msgstr[3] ""
 
 #: ../urpmi:599
 #, c-format
@@ -2563,14 +2529,14 @@ msgid "(test only, installation will not be actually done)"
 msgstr ""
 
 #: ../urpmi:642
-#, fuzzy, c-format
+#, c-format
 msgid "Press Enter when mounted..."
-msgstr "Agħfas Enter meta tlesti..."
+msgstr ""
 
 #. -PO: The URI types strings 'file:', 'ftp:', 'http:', and 'cdrom:' must not be translated!
 #. -PO: neither the ``with''.  Only what is between <brackets> can be translated.
 #: ../urpmi.addmedia:36
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "usage: urpmi.addmedia [options] <name> <url>\n"
 "where <url> is one of\n"
@@ -2592,16 +2558,6 @@ msgid ""
 "\n"
 "and [options] are from\n"
 msgstr ""
-"użu: urpmi.addmedia [għażliet] <isem> <url> [with <direttorju_relattiv>]\n"
-"fejn <url> huwa wieħed minn:\n"
-"       [file:/]/<path> with <isem tal-hdlist relattiv>\n"
-"       ftp://<login>:<password>@<host>/<path> with <isem tal-hdlist "
-"relattiv>\n"
-"       ftp://<host>/<path> with <isem tal-hdlist relattiv>\n"
-"       http://<host>/<path> with <isem tal-hdlist relattiv>\n"
-"       removable://<path> with <isem tal-hdlist relattiv>\n"
-"\n"
-"u [għażliet] huma minn\n"
 
 #: ../urpmi.addmedia:56 ../urpmi.update:34 ../urpmq:71
 #, c-format
@@ -2614,14 +2570,14 @@ msgid "  --curl         - use curl to retrieve distant files.\n"
 msgstr "  --curl         - uża curl biex iġġib fajls remoti.\n"
 
 #: ../urpmi.addmedia:58 ../urpmi.update:36 ../urpmq:73
-#, fuzzy, c-format
+#, c-format
 msgid "  --prozilla     - use prozilla to retrieve distant files.\n"
-msgstr "  --curl         - uża curl biex iġġib fajls remoti.\n"
+msgstr ""
 
 #: ../urpmi.addmedia:59 ../urpmi.update:37
-#, fuzzy, c-format
+#, c-format
 msgid "  --aria2        - use aria2 to retrieve distant files.\n"
-msgstr "  --curl         - uża curl biex iġġib fajls remoti.\n"
+msgstr ""
 
 #: ../urpmi.addmedia:66
 #, c-format
@@ -2639,9 +2595,9 @@ msgid ""
 msgstr ""
 
 #: ../urpmi.addmedia:70
-#, fuzzy, c-format
+#, c-format
 msgid "  --probe-synthesis - use synthesis file.\n"
-msgstr "  --probe-synthesis - ipprova sib il-fajl \"synthesis\".\n"
+msgstr ""
 
 #: ../urpmi.addmedia:71
 #, c-format
@@ -2649,9 +2605,9 @@ msgid "  --probe-rpms   - use rpm files (instead of synthesis).\n"
 msgstr ""
 
 #: ../urpmi.addmedia:72
-#, fuzzy, c-format
+#, c-format
 msgid "  --no-probe     - do not try to find any synthesis file.\n"
-msgstr "  --no-probe     - tippruvax tfittex fajls sinteżi jew hdlist.\n"
+msgstr ""
 
 #: ../urpmi.addmedia:74
 #, c-format
@@ -2667,17 +2623,14 @@ msgid "  --interactive  - with --distrib, ask confirmation for each media\n"
 msgstr ""
 
 #: ../urpmi.addmedia:77
-#, fuzzy, c-format
+#, c-format
 msgid "  --all-media    - with --distrib, add every listed media\n"
-msgstr "  --list-media   - illistja s-sorsi disponibbli.\n"
+msgstr ""
 
 #: ../urpmi.addmedia:78
-#, fuzzy, c-format
+#, c-format
 msgid "  --virtual      - create virtual media wich are always up-to-date.\n"
 msgstr ""
-"  --virtual      - oħloq sors virtwali li huwa dejjem aġġornat. Il-"
-"protokoll\n"
-"                   file:// biss huwa permess.\n"
 
 #: ../urpmi.addmedia:79 ../urpmi.update:45
 #, c-format
@@ -2725,19 +2678,19 @@ msgid "Only superuser is allowed to add media"
 msgstr "Is-\"superuser\" biss għandu l-awtorità iżid sorsi"
 
 #: ../urpmi.addmedia:119
-#, fuzzy, c-format
+#, c-format
 msgid "creating config file [%s]"
-msgstr "ikteb fajl ta' konfigurazzjoni [%s]"
+msgstr ""
 
 #: ../urpmi.addmedia:120
-#, fuzzy, c-format
+#, c-format
 msgid "Can't create config file [%s]"
-msgstr "ikteb fajl ta' konfigurazzjoni [%s]"
+msgstr ""
 
 #: ../urpmi.addmedia:128
-#, fuzzy, c-format
+#, c-format
 msgid "no need to give <relative path of synthesis> with --distrib"
-msgstr "m'hemmx għalfejn tagħti <isem tal-hdlist relattiv> ma' --distrib"
+msgstr ""
 
 #: ../urpmi.addmedia:136
 #, c-format
@@ -2747,14 +2700,14 @@ msgid ""
 msgstr ""
 
 #: ../urpmi.addmedia:156 ../urpmi.addmedia:181
-#, fuzzy, c-format
+#, c-format
 msgid "unable to add medium"
-msgstr "ma nistax naċċessa s-sors \"%s\""
+msgstr ""
 
 #: ../urpmi.addmedia:164
-#, fuzzy, c-format
+#, c-format
 msgid "<relative path of synthesis> missing\n"
-msgstr "<isem tal-hdlist relattiv> mhux speċifikat\n"
+msgstr ""
 
 #: ../urpmi.addmedia:167
 #, c-format
@@ -2819,9 +2772,9 @@ msgid "  --force-key    - force update of gpg key.\n"
 msgstr "  --force-key    - ġiegħel iċ-ċifrarju gpg jiġi aġġornat.\n"
 
 #: ../urpmi.update:47
-#, fuzzy, c-format
+#, c-format
 msgid "  --ignore       - don't update, mark the media as ignored.\n"
-msgstr "  --update       - uża s-sorsi ta' aġġornament biss.\n"
+msgstr ""
 
 #: ../urpmi.update:48
 #, c-format
@@ -2829,24 +2782,24 @@ msgid "  --no-ignore    - don't update, mark the media as enabled.\n"
 msgstr ""
 
 #: ../urpmi.update:50
-#, fuzzy, c-format
+#, c-format
 msgid "  --probe-rpms   - do not use synthesis, use rpm files directly\n"
-msgstr "  --no-probe     - tippruvax tfittex fajls sinteżi jew hdlist.\n"
+msgstr ""
 
 #: ../urpmi.update:51
-#, fuzzy, c-format
+#, c-format
 msgid "  -a             - select all enabled non-removable media.\n"
-msgstr "  -a             - agħżel is-sorsi kollha li ma jitneħħewx.\n"
+msgstr ""
 
 #: ../urpmi.update:52
-#, fuzzy, c-format
+#, c-format
 msgid "  -f             - force updating synthesis\n"
-msgstr "  -f             - ġiegħel il-fajls hdlist jiġu ġenerati.\n"
+msgstr ""
 
 #: ../urpmi.update:53
-#, fuzzy, c-format
+#, c-format
 msgid "  -ff            - really force updating synthesis\n"
-msgstr "  -f             - ġiegħel il-fajls hdlist jiġu ġenerati.\n"
+msgstr ""
 
 #: ../urpmi.update:70
 #, c-format
@@ -2873,21 +2826,21 @@ msgid "\"%s\""
 msgstr "\"%s\""
 
 #: ../urpmi.update:100
-#, fuzzy, c-format
+#, c-format
 msgid "ignoring media %s"
-msgstr "Editja s-sors \"%s\":"
+msgstr ""
 
 #: ../urpmi.update:100
-#, fuzzy, c-format
+#, c-format
 msgid "enabling media %s"
-msgstr "qed jitneħħa s-sors \"%s\""
+msgstr ""
 
 #: ../urpmq:44
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "  --searchmedia  - use only the given media to search requested (or updated) "
 "packages.\n"
-msgstr "  --media        - uża biss is-sorsi llistjati b'virgoli.\n"
+msgstr ""
 
 #: ../urpmq:49
 #, c-format
@@ -2947,16 +2900,14 @@ msgstr ""
 "s).\n"
 
 #: ../urpmq:63
-#, fuzzy, c-format
+#, c-format
 msgid "  --sources      - print source URLs of selected packages\n"
 msgstr ""
-"  --src          - il-pakkett li jmiss huwa pakkett sors (l-istess bħal -"
-"s).\n"
 
 #: ../urpmq:65
-#, fuzzy, c-format
+#, c-format
 msgid "  --ignorearch   - allow to query rpms for unmatched architectures.\n"
-msgstr "  --url          - uri l-url.\n"
+msgstr ""
 
 #: ../urpmq:69
 #, c-format
@@ -2974,46 +2925,46 @@ msgid "  --changelog    - print changelog.\n"
 msgstr "  --changelog    - uri \"changelog\": lista ta' tibdiliet.\n"
 
 #: ../urpmq:80
-#, fuzzy, c-format
+#, c-format
 msgid "  --conflicts    - print conflicts.\n"
-msgstr "  --conflicts     - uri \"conflicts\": kull ma joħloq konflitt\n"
+msgstr ""
 
 #: ../urpmq:81
-#, fuzzy, c-format
+#, c-format
 msgid "  --obsoletes    - print obsoletes.\n"
-msgstr "  --obsoletes     - ipprintja l-kontenut ta' \"obsoletes\"\n"
+msgstr ""
 
 #: ../urpmq:82
-#, fuzzy, c-format
+#, c-format
 msgid "  --provides     - print provides.\n"
-msgstr "  --provides      - uri \"provides\" - kull ma jipprovdi\n"
+msgstr ""
 
 #: ../urpmq:83
-#, fuzzy, c-format
+#, c-format
 msgid "  --requires     - print requires.\n"
-msgstr "  --requires      - uri \"requires\": kull ma jeħtieġ\n"
+msgstr ""
 
 #: ../urpmq:84
-#, fuzzy, c-format
+#, c-format
 msgid "  --recommends   - print recommends.\n"
-msgstr "  --requires      - uri \"requires\": kull ma jeħtieġ\n"
+msgstr ""
 
 #: ../urpmq:85
-#, fuzzy, c-format
+#, c-format
 msgid "  --sourcerpm    - print sourcerpm.\n"
-msgstr "  --sourcerpm    - print tag \"sourcerpm\": rpm tas-sors.\n"
+msgstr ""
 
 #: ../urpmq:86
-#, fuzzy, c-format
+#, c-format
 msgid "  --summary, -S  - print summary.\n"
-msgstr "  --summary       - uri t-tag \"summary\": sommarju.\n"
+msgstr ""
 
 #: ../urpmq:88
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "  --requires-recursive, -d\n"
 "                   - query package dependencies.\n"
-msgstr "  -d             - estendi t-tfittix għad-dipendenzi tal-pakketti.\n"
+msgstr ""
 
 #: ../urpmq:90
 #, c-format
@@ -3023,20 +2974,18 @@ msgstr ""
 "pakkett.\n"
 
 #: ../urpmq:91
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "  --whatrequires-recursive\n"
 "                   - extended reverse search (includes virtual packages).\n"
 msgstr ""
-"  -R             - tfittix bil-kontra, għal dak li jirrikjedi dan il-"
-"pakkett.\n"
 
 #: ../urpmq:93
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "  --whatprovides, -p\n"
 "                   - search in provides to find package.\n"
-msgstr "  -p             - fittex fil-\"provides\" biex issib pakkett.\n"
+msgstr ""
 
 #: ../urpmq:96
 #, c-format
@@ -3059,9 +3008,9 @@ msgid "  -l             - list files in package.\n"
 msgstr "  -l             - illistja l-fajls fil-pakkett.\n"
 
 #: ../urpmq:101
-#, fuzzy, c-format
+#, c-format
 msgid "  -m             - equivalent to -du\n"
-msgstr "  -q             - modalità kwieta.\n"
+msgstr ""
 
 #: ../urpmq:102
 #, c-format
@@ -3113,49 +3062,40 @@ msgid "--list-nodes can only be used with --parallel"
 msgstr "--list-nodes tista' tintuża biss ma' --parallel"
 
 #: ../urpmq:231
-#, fuzzy, c-format
+#, c-format
 msgid "use -l to list files"
-msgstr "ma nistax nikteb il-fajl tal-lista \"%s\""
+msgstr ""
 
 #: ../urpmq:415
-#, fuzzy, c-format
+#, c-format
 msgid "no xml info for medium \"%s\", only partial result for package %s"
 msgstr ""
-"Nota: peress li ebda sors imfittex ma juża hdlists, urpmf ma setax "
-"jirritorna riżultati\n"
 
 #: ../urpmq:416
-#, fuzzy, c-format
+#, c-format
 msgid "no xml info for medium \"%s\", only partial result for packages %s"
 msgstr ""
-"Nota: peress li ebda sors imfittex ma juża hdlists, urpmf ma setax "
-"jirritorna riżultati\n"
 
 #: ../urpmq:419
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "no xml info for medium \"%s\", unable to return any result for package %s"
 msgstr ""
-"Nota: peress li ebda sors imfittex ma juża hdlists, urpmf ma setax "
-"jirritorna riżultati\n"
 
 #: ../urpmq:420
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "no xml info for medium \"%s\", unable to return any result for packages %s"
 msgstr ""
-"Nota: peress li ebda sors imfittex ma juża hdlists, urpmf ma setax "
-"jirritorna riżultati\n"
 
-#: ../urpmq:487
+#: ../urpmq:488
 #, c-format
 msgid "No changelog found\n"
 msgstr "Ma nstabx changelog\n"
 
 #: ../gurpmi.desktop.in.h:1
-#, fuzzy
 msgid "Software Installer"
-msgstr "Installatur ta' softwer"
+msgstr ""
 
 #: ../gurpmi.desktop.in.h:2
 msgid "Graphical front end to install RPM files"
@@ -3168,638 +3108,3 @@ msgstr ""
 #: ../polkit/org.mageia.gurpmi2.policy.in.h:2
 msgid "Authentication is required to run Mageia Package Installer"
 msgstr ""
-
-#, fuzzy
-#~ msgid "  --suggests     - suggests tags\n"
-#~ msgstr "  --obsoletes     - ipprintja l-kontenut ta' \"obsoletes\"\n"
-
-#, fuzzy
-#~ msgid "  --suggests     - print suggests.\n"
-#~ msgstr "  --obsoletes     - ipprintja l-kontenut ta' \"obsoletes\"\n"
-
-#, fuzzy
-#~ msgid "  --repackage    - Re-package the files before erasing\n"
-#~ msgstr "  --packager     - uri t-tag \"packager\": pakkeġġjatur.\n"
-
-#, fuzzy
-#~ msgid "  --noclean      - don't clean repackage directory on checkpoint\n"
-#~ msgstr "  --noclean      - żomm rpms mhux użati fil-cache.\n"
-
-#, fuzzy
-#~ msgid ""
-#~ "  --list         - list transactions since provided date/duration "
-#~ "argument\n"
-#~ msgstr "  --list-url     - illistja s-sorsi disponibbli u l-urls tagħhom.\n"
-
-#, fuzzy
-#~ msgid "  --list-all     - list all transactions in rpmdb (long)\n"
-#~ msgstr "  --list-url     - illistja s-sorsi disponibbli u l-urls tagħhom.\n"
-
-#, fuzzy
-#~ msgid "  --list-safe    - list transactions since checkpoint\n"
-#~ msgstr "  --list-url     - illistja s-sorsi disponibbli u l-urls tagħhom.\n"
-
-#, fuzzy
-#~ msgid "  --disable      - turn off repackaging\n"
-#~ msgstr "  --name         - uri biss l-ismijiet tal-pakketti.\n"
-
-#, fuzzy
-#~ msgid "Repackage directory not defined\n"
-#~ msgstr "pakkett %s ma nstabx."
-
-#, fuzzy
-#~ msgid "Can't write to repackage directory [%s]\n"
-#~ msgstr "Ma nistax noħloq id-direttorju [%s] għar-rapport tal-bug"
-
-#, fuzzy
-#~ msgid "Cleaning up repackage directory [%s]...\n"
-#~ msgstr "Ma nistax noħloq id-direttorju [%s] għar-rapport tal-bug"
-
-#, fuzzy
-#~ msgid "Writing rpm macros file [%s]...\n"
-#~ msgstr "qed jinġab il-fajl rpm [%s] ..."
-
-#, fuzzy
-#~ msgid "No rollback date found\n"
-#~ msgstr "Ma nstabx lista ta' fajls\n"
-
-#, fuzzy
-#~ msgid "Disabling repackaging\n"
-#~ msgstr "  --name         - uri biss l-ismijiet tal-pakketti.\n"
-
-#, fuzzy
-#~ msgid ""
-#~ "urpme version %s\n"
-#~ "%s\n"
-#~ "This is free software and may be redistributed under the terms of the GNU "
-#~ "GPL.\n"
-#~ "\n"
-#~ "usage:\n"
-#~ msgstr ""
-#~ "urpme verżjoni %s\n"
-#~ "%s\n"
-#~ "Dan huwa softwer ħieles u jista' jiġi distribwit taħt it-termini tal-GNU "
-#~ "GPL.\n"
-#~ "\n"
-#~ "użu:\n"
-
-#, fuzzy
-#~ msgid ""
-#~ "urpmf version %s\n"
-#~ "%s\n"
-#~ "This is free software and may be redistributed under the terms of the GNU "
-#~ "GPL.\n"
-#~ "\n"
-#~ "usage: urpmf [options] pattern-expression\n"
-#~ msgstr ""
-#~ "urpmf verżjoni %s\n"
-#~ "%s\n"
-#~ "Dan huwa softwer ħieles u jista' jiġi distribwit taħt it-termini tal-GNU "
-#~ "GPL.\n"
-#~ "\n"
-#~ "użu:\n"
-
-#, fuzzy
-#~ msgid ""
-#~ "urpmi.recover version %s\n"
-#~ "%s\n"
-#~ "This is free software and may be redistributed under the terms of the GNU "
-#~ "GPL.\n"
-#~ "\n"
-#~ "usage:\n"
-#~ msgstr ""
-#~ "urpme verżjoni %s\n"
-#~ "%s\n"
-#~ "Dan huwa softwer ħieles u jista' jiġi distribwit taħt it-termini tal-GNU "
-#~ "GPL.\n"
-#~ "\n"
-#~ "użu:\n"
-
-#, fuzzy
-#~ msgid ""
-#~ "urpmq version %s\n"
-#~ "%s\n"
-#~ "This is free software and may be redistributed under the terms of the GNU "
-#~ "GPL.\n"
-#~ "\n"
-#~ "usage:\n"
-#~ msgstr ""
-#~ "urpmq verżjoni %s\n"
-#~ "%s\n"
-#~ "Dan huwa softwer ħieles u jista' jiġi distribwit taħt it-termini tal-GNU "
-#~ "GPL.\n"
-#~ "\n"
-#~ "użu:\n"
-
-#~ msgid ""
-#~ "Installation failed, some files are missing:\n"
-#~ "%s\n"
-#~ "You may want to update your urpmi database"
-#~ msgstr ""
-#~ "L-installazzjoni falliet, xi fajls huma nieqsa:\n"
-#~ "\n"
-#~ "%s\n"
-#~ "Forsi trid taġġorna d-database urpmi"
-
-#, fuzzy
-#~ msgid "Cannot write DUDF file.\n"
-#~ msgstr "ma setax jinkiteb il-fajl [%s]"
-
-#~ msgid ""
-#~ "  --sources      - give all source packages before downloading (root "
-#~ "only).\n"
-#~ msgstr ""
-#~ "  --sources      - agħti l-pakketti sorsi kollha qabel tniżżilhom (root "
-#~ "biss).\n"
-
-#, fuzzy
-#~ msgid "due to already installed %s"
-#~ msgstr "kollox diġà installat"
-
-#~ msgid ""
-#~ "  --from         - use specified url for list of mirrors, the default is\n"
-#~ "                   %s\n"
-#~ msgstr ""
-#~ "  --from         - uża l-url speċifikat għal-lista tal-mirja, impliċitu "
-#~ "huwa\n"
-#~ "                   %s\n"
-
-#, fuzzy
-#~ msgid "examining %s file"
-#~ msgstr "qed jiġi eżaminat il-fajl MD5SUM"
-
-#, fuzzy
-#~ msgid "found probed synthesis as %s"
-#~ msgstr "sibt l-hdlist (jew sinteżi) bħala %s"
-
-#~ msgid "  --update       - create an update medium.\n"
-#~ msgstr "  --update       - oħloq sors ta' aġġornament.\n"
-
-#, fuzzy
-#~ msgid "malformed URL: [%s]"
-#~ msgstr "input iffurmat ħażin [%s]"
-
-#, fuzzy
-#~ msgid "%d installation transaction failed"
-#~ msgid_plural "%d installation transactions failed"
-#~ msgstr[0] "%d tranżazzjonijiet ta' installazzjoni fallew"
-#~ msgstr[1] "%d tranżazzjonijiet ta' installazzjoni fallew"
-
-#, fuzzy
-#~ msgid "Package %s can not be installed"
-#~ msgstr "kollox diġà installat"
-
-#~ msgid "Checking to remove the following packages"
-#~ msgstr "Qed niċċekkja biex jitneħħa wieħed minn dawn il-pakketti"
-
-#, fuzzy
-#~ msgid "%s database locked"
-#~ msgstr "database urpmi imsakkar"
-
-#, fuzzy
-#~ msgid "Unknown option %s"
-#~ msgstr ""
-#~ "\n"
-#~ "għażla \"%s\" mhux magħrufa\n"
-
-#~ msgid "too many mount points for removable medium \"%s\""
-#~ msgstr "wisq punti ta' mmuntar għas-sors li jitneħħa \"%s\""
-
-#~ msgid "using different removable device [%s] for \"%s\""
-#~ msgstr "qed jintuża apparat [%s] għal \"%s\""
-
-#~ msgid "unable to retrieve pathname for removable medium \"%s\""
-#~ msgstr "ma nistax nikseb il-path għal sors li jitneħħa \"%s\""
-
-#, fuzzy
-#~ msgid "unable to mount the distribution medium"
-#~ msgstr "ma nistax naċċessa l-ewwel sors ta' installazzjoni"
-
-#~ msgid ""
-#~ "unable to access medium \"%s\",\n"
-#~ "this could happen if you mounted manually the directory when creating the "
-#~ "medium."
-#~ msgstr ""
-#~ "ma nistax naċċessa s-sors \"%s\",\n"
-#~ "dan jista' jiġri jekk timmonta d-direttorju manwalment waqt li qed "
-#~ "jinħoloq is-sors."
-
-#~ msgid "inconsistent medium \"%s\" marked removable but not really"
-#~ msgstr "sors \"%s\" immarkat li jista' jitneħħa, imma m'hux"
-
-#~ msgid "  -c             - clean headers cache directory.\n"
-#~ msgstr "  -c             - naddaf id-direttorju tal-cache tal-headers.\n"
-
-#, fuzzy
-#~ msgid "virtual medium needs to be local"
-#~ msgstr "sors virtwali \"%s\" mhux lokali; sors injorat"
-
-#, fuzzy
-#~ msgid "unable to parse synthesis file of \"%s\""
-#~ msgstr "ma nistax nifli l-fajl hdlist ta' \"%s\""
-
-#, fuzzy
-#~ msgid "computing md5sum of existing source hdlist (or synthesis) [%s]"
-#~ msgstr ""
-#~ "qed tiġi kalkulata l-md5sum ta l-hdlist (jew sinteżi) tas-sors eżistenti"
-
-#~ msgid ""
-#~ "virtual medium \"%s\" should not have defined hdlist or list file, medium "
-#~ "ignored"
-#~ msgstr ""
-#~ "sors virtwali \"%s\" ma jistax ikollu hdlist jew fajl ta' lista definit; "
-#~ "sors injorat"
-
-#, fuzzy
-#~ msgid "invalid hdlist name"
-#~ msgstr "isem tal-fajl rpm [%s] invalidu"
-
-#~ msgid "unable to find list file for \"%s\", medium ignored"
-#~ msgstr "ma nistax insib il-fajl tal-lista għal \"%s\", sors injorat."
-
-#, fuzzy
-#~ msgid "\"synthesis\" should not be set (medium \"%s\")"
-#~ msgstr "qed nipprova naċċessa sors ineżistenti \"%s\""
-
-#, fuzzy
-#~ msgid "\"synthesis\" should be set (medium \"%s\")"
-#~ msgstr "ibni l-fajl ta' sintesi tal-hdlist għas-sors \"%s\""
-
-#, fuzzy
-#~ msgid "unable to access list file of \"%s\""
-#~ msgstr "ma nistax nifli l-fajl hdlist ta' \"%s\""
-
-#~ msgid "medium \"%s\" trying to use an already used hdlist, medium ignored"
-#~ msgstr "sors \"%s\" qed jipprova juża hdlist li diġà użat, sors injorat"
-
-#~ msgid "medium \"%s\" trying to use an already used list, medium ignored"
-#~ msgstr "is-sors \"%s\" jipprova juża lista diġà użata, sors injorat"
-
-#, fuzzy
-#~ msgid ""
-#~ "Note: no hdlist for medium \"%s\", unable to return any result for it"
-#~ msgstr ""
-#~ "Nota: peress li ebda sors imfittex ma juża hdlists, urpmf ma setax "
-#~ "jirritorna riżultati\n"
-
-#~ msgid "performing second pass to compute dependencies\n"
-#~ msgstr "Qed ngħaddi t-tieni passata biex niddetermina dipendenzi\n"
-
-#~ msgid "building hdlist [%s]"
-#~ msgstr "qed jinbena hdlist [%s]"
-
-#~ msgid "problem reading hdlist or synthesis file of medium \"%s\""
-#~ msgstr "problema fil-qari tal-hdlist jew sinteżi għas-sors \"%s\""
-
-#~ msgid "computing md5sum of copied source hdlist (or synthesis)"
-#~ msgstr "qed nikkalkula md5sum tal-hdlist jew sinteżi kkupjat"
-
-#~ msgid "...retrieving failed: md5sum mismatch"
-#~ msgstr "...qari falla: md5sum ma qablitx"
-
-#~ msgid "no rpm files found from [%s]"
-#~ msgstr "ebda fajls rpm ma nstabu minn [%s]"
-
-#~ msgid "unable to read rpm files from [%s]: %s"
-#~ msgstr "ma setgħux jinqraw l-fajls rpm minn [%s]: %s"
-
-#~ msgid "reading headers from medium \"%s\""
-#~ msgstr "qed naqra l-\"headers\" mis-sors \"%s\""
-
-#, fuzzy
-#~ msgid "    --probe-synthesis - use synthesis file.\n"
-#~ msgstr "  --probe-synthesis - ipprova sib il-fajl \"synthesis\".\n"
-
-#, fuzzy
-#~ msgid "    --probe-hdlist - use hdlist file.\n"
-#~ msgstr "  --probe-hdlist - ipprova sib il-fajl \"hdlist\".\n"
-
-#~ msgid ""
-#~ "Note: since no media searched uses hdlists, urpmf was unable to return "
-#~ "any result\n"
-#~ msgstr ""
-#~ "Nota: peress li ebda sors imfittex ma juża hdlists, urpmf ma setax "
-#~ "jirritorna riżultati\n"
-
-#~ msgid "You may want to use --name to search for package names.\n"
-#~ msgstr "Forsi trid tuża --name biex tfittex ismijiet tal-pakketti.\n"
-
-#, fuzzy
-#~ msgid "  --probe-hdlist - use hdlist file.\n"
-#~ msgstr "  --probe-hdlist - ipprova sib il-fajl \"hdlist\".\n"
-
-#~ msgid "unable to update medium \"%s\"\n"
-#~ msgstr "ma nistax naġġorna s-sors \"%s\"\n"
-
-#~ msgid "unable to create medium \"%s\"\n"
-#~ msgstr "ma nistax noħloq sors \"%s\"\n"
-
-#~ msgid "there are multiple packages with the same rpm filename \"%s\""
-#~ msgstr "hemm diversi pakketti bl-istess isem ta' rpm \"%s\""
-
-#~ msgid "unable to correctly parse [%s] on value \"%s\""
-#~ msgstr "ma nistax nifli sew [%s] fuq il-valur \"%s\""
-
-#~ msgid ""
-#~ "medium \"%s\" uses an invalid list file:\n"
-#~ "  mirror is probably not up-to-date, trying to use alternate method"
-#~ msgstr ""
-#~ "sors \"%s\" juża lista ta' fajls invalida:\n"
-#~ "  mera aktarx mhux aġġornata; se nipprova mod ieħor"
-
-#~ msgid "medium \"%s\" does not define any location for rpm files"
-#~ msgstr "sors \"%s\" ma jiddefinixxi ebda lokazzjoni tal-fajls rpm"
-
-#~ msgid "unrequested"
-#~ msgstr "mhux mitlub"
-
-#~ msgid "adding package %s (id=%d, eid=%d, update=%d, file=%s)"
-#~ msgstr "qed jiġi miżlud pakkett \"%s\" (id=%d eid=%d, aġġorna=%d, fajl=%s)"
-
-#, fuzzy
-#~ msgid ""
-#~ "The following packages have bad signatures:\n"
-#~ "%s\n"
-#~ "\n"
-#~ "Do you want to continue installation ?"
-#~ msgstr ""
-#~ "Dawn il-pakketti għandhom firma ħażina:\n"
-#~ "\n"
-#~ "%s\n"
-#~ "\n"
-#~ "Trid tkompli bl-installazzjoni?"
-
-#, fuzzy
-#~ msgid "You need to be root to use --use-distrib"
-#~ msgstr "Trid tkun \"root\" biex tuża dan il-kmand ! \n"
-
-#~ msgid "unable to remove package %s"
-#~ msgstr "ma nistax inneħħi l-pakkett %s"
-
-#~ msgid "No filelist found\n"
-#~ msgstr "Ma nstabx lista ta' fajls\n"
-
-#~ msgid "medium \"%s\" is not selected"
-#~ msgstr "sors \"%s\" mhuwiex magħżul"
-
-#~ msgid "  -f             - force generation of hdlist files.\n"
-#~ msgstr "  -f             - ġiegħel il-fajls hdlist jiġu ġenerati.\n"
-
-#~ msgid ""
-#~ "  -P             - do not search in provides to find package (default).\n"
-#~ msgstr ""
-#~ "  -P             - tfittixx fil-\"provides\" biex issib pakkett "
-#~ "(impliċitu).\n"
-
-#~ msgid "  -R             - reverse search to what requires package.\n"
-#~ msgstr ""
-#~ "  -R             - tfittix bil-kontra, għal dak li jirrikjedi dan il-"
-#~ "pakkett.\n"
-
-#~ msgid "  --probe-synthesis - try to find and use synthesis file.\n"
-#~ msgstr "  --probe-synthesis - ipprova sib il-fajl \"synthesis\".\n"
-
-#~ msgid "  --probe-hdlist - try to find and use hdlist file.\n"
-#~ msgstr "  --probe-hdlist - ipprova sib il-fajl \"hdlist\".\n"
-
-#~ msgid "`with' missing for network media\n"
-#~ msgstr "\"with\" nieqes għal sors tan-network\n"
-
-#~ msgid ""
-#~ "\n"
-#~ "unknown options '%s'\n"
-#~ msgstr ""
-#~ "\n"
-#~ "għażla \"%s\" mhux magħrufa\n"
-
-#~ msgid "unable to find hdlist file for \"%s\", medium ignored"
-#~ msgstr "ma nistax insib il-fajl hdlist għal \"%s\", sors injorat"
-
-#~ msgid "inconsistent list file for \"%s\", medium ignored"
-#~ msgstr "fajl tal-lista ta' \"%s\" ma jinftehimx, sors injorat"
-
-#~ msgid "unable to inspect list file for \"%s\", medium ignored"
-#~ msgstr "ma nistax jispezzjona l-fajl tal-lista għal \"%s\", sors injorat"
-
-#~ msgid "virtual medium \"%s\" is not local, medium ignored"
-#~ msgstr "sors virtwali \"%s\" mhux lokali; sors injorat"
-
-#~ msgid ""
-#~ "virtual medium \"%s\" should have valid source hdlist or synthesis, "
-#~ "medium ignored"
-#~ msgstr ""
-#~ "sors virtwali \"%s\" għandu jkollu hdlist jew sinteżi validu, sors injorat"
-
-#~ msgid "copying source hdlist (or synthesis) of \"%s\"..."
-#~ msgstr "qed nikkopja l-hdlist (jew sinteżi) sors ta' \"%s\"..."
-
-#~ msgid "retrieval of source hdlist (or synthesis) failed"
-#~ msgstr "il-qari tal-hdlist jew sinteżi sors falla."
-
-#~ msgid "file [%s] already used in the same medium \"%s\""
-#~ msgstr "fajl [%s] diġà użat fl-istess sors \"%s\""
-
-#~ msgid "nothing written in list file for \"%s\""
-#~ msgstr "ma nkiteb xejn fil-lista għal \"%s\""
-
-#~ msgid "found %d headers in cache"
-#~ msgstr "instabu %d headers fil-cache"
-
-#~ msgid "removing %d obsolete headers in cache"
-#~ msgstr "qed inneħħi %d headers antiki mill-cache"
-
-#~ msgid "using process %d for executing transaction"
-#~ msgstr "qed jintuża l-proċess %d biex jagħmel tranżazzjoni"
-
-#~ msgid "copying hdlists file..."
-#~ msgstr "qed nikkopja l-fajl hdlist..."
-
-#~ msgid "invalid hdlist description \"%s\" in hdlists file"
-#~ msgstr "deskrizzjoni tal-hdlist \"%s\" invalida fil-fajl hdlist"
-
-#~ msgid "Is this OK?"
-#~ msgstr "Tajjeb?"
-
-#~ msgid ""
-#~ "  --version      - use specified distribution version, the default is "
-#~ "taken\n"
-#~ "                   from the version of the distribution told by the\n"
-#~ "                   installed mandriva-release package.\n"
-#~ msgstr ""
-#~ "  --version      - uża l-verżjoni ta' distribuzzjoni speċifikata. "
-#~ "Impliċitament\n"
-#~ "                   tintuża l-verżjoni tad-distribuzzjoni meħuda mill-"
-#~ "pakkett\n"
-#~ "                   mandriva-release li hemm installat.\n"
-
-#~ msgid ""
-#~ "  --arch         - use specified architecture, the default is arch of\n"
-#~ "                   mandriva-release package installed.\n"
-#~ msgstr ""
-#~ "  --arch         - uża l-arkitettura speċifikata. Impliċitament tintuża "
-#~ "l-\n"
-#~ "                   verżjoni tad-distribuzzjoni meħuda mill-pakkett\n"
-#~ "                   mandriva-release li hemm installat.\n"
-
-#~ msgid ""
-#~ "  --headers      - extract headers for package listed from urpmi db to\n"
-#~ "                   stdout (root only).\n"
-#~ msgstr ""
-#~ "  --headers      - oħroġ il-headers għall-pakkett imsemmi mid-db urpmi\n"
-#~ "                   għal stdout (root biss).\n"
-
-#~ msgid ""
-#~ "To satisfy dependencies, the following %d packages are going to be "
-#~ "installed (%d MB)"
-#~ msgstr ""
-#~ "Biex nissodisfa d-dipendenzi, %d pakkett/i jridu jiġu nstallati wkoll (%d "
-#~ "MB)"
-
-#~ msgid "installing %s\n"
-#~ msgstr "qed jiġi nstallat %s\n"
-
-#~ msgid ""
-#~ "Automatic installation of packages...\n"
-#~ "You requested installation of package %s\n"
-#~ msgstr ""
-#~ "Installazzjoni awtomatika ta' pakketti...\n"
-#~ "Int tlabt l-installazzjoni tal-pakkett %s\n"
-
-#~ msgid "%s: command not found\n"
-#~ msgstr "%s: kmand ma nstabx\n"
-
-#~ msgid "md5sum mismatch"
-#~ msgstr "md5sum ma qablitx"
-
-#~ msgid ""
-#~ "urpmf version %s\n"
-#~ "%s\n"
-#~ "This is free software and may be redistributed under the terms of the GNU "
-#~ "GPL.\n"
-#~ "\n"
-#~ "usage:\n"
-#~ msgstr ""
-#~ "urpmf verżjoni %s\n"
-#~ "%s\n"
-#~ "Dan huwa softwer ħieles u jista' jiġi distribwit taħt it-termini tal-GNU "
-#~ "GPL.\n"
-#~ "\n"
-#~ "użu:\n"
-
-#~ msgid "  --synthesis    - use the synthesis given instead of urpmi db.\n"
-#~ msgstr ""
-#~ "  --synthesis    - uża s-sinteżi mogħti minflok id-database urpmi.\n"
-
-#~ msgid ""
-#~ "  --quiet        - do not print tag name (default if no tag given on "
-#~ "command\n"
-#~ "                   line, incompatible with interactive mode).\n"
-#~ msgstr ""
-#~ "  --quiet         - turix t-tag \"name\" (impliċitu jekk il-kmand ma fihx "
-#~ "tag,\n"
-#~ "                   inkompatibbli mal-modalità interattiva).\n"
-
-#~ msgid "  --uniq         - do not print identical lines.\n"
-#~ msgstr "  --uniq         - turix linji identiċi.\n"
-
-#~ msgid "  --all          - print all tags.\n"
-#~ msgstr "  --all           - uri t-tags kollha.\n"
-
-#~ msgid "  --summary      - print tag summary: summary.\n"
-#~ msgstr "  --summary       - uri t-tag \"summary\": sommarju.\n"
-
-#~ msgid "  --description  - print tag description: description.\n"
-#~ msgstr "  --description   - uri t-tag \"description\": deskrizzjoni\n"
-
-#~ msgid "  --buildhost    - print tag buildhost: build host.\n"
-#~ msgstr ""
-#~ "  --buildhost    - uri t-tag \"buildhost\": kompjuter fejn inbena.\n"
-
-#~ msgid "  --provides     - print tag provides: all provides.\n"
-#~ msgstr "  --provides      - uri \"provides\" - kull ma jipprovdi\n"
-
-#~ msgid "  --requires     - print tag requires: all requires.\n"
-#~ msgstr "  --requires      - uri \"requires\": kull ma jeħtieġ\n"
-
-#~ msgid "  --files        - print tag files: all files.\n"
-#~ msgstr "  --files         - uri \"files\": il-files kollha\n"
-
-#~ msgid "  --obsoletes    - print tag obsoletes: all obsoletes.\n"
-#~ msgstr "  --obsoletes     - ipprintja l-kontenut ta' \"obsoletes\"\n"
-
-#~ msgid ""
-#~ "  --env          - use specific environment (typically a bug\n"
-#~ "                   report).\n"
-#~ msgstr ""
-#~ "  --env          - uża ambjent speċifiku (tipikament f'rapport ta' bug).\n"
-
-#~ msgid "  -i             - ignore case distinctions in every pattern.\n"
-#~ msgstr "  -i             - qis ittri kbar u żgħar l-istess f'kull mudell.\n"
-
-#~ msgid ""
-#~ "  -a             - binary AND operator, true if both expression are "
-#~ "true.\n"
-#~ msgstr ""
-#~ "  -a             - operatur AND - veru jekk iż-żewġ espressjonijiet huma "
-#~ "veru.\n"
-
-#~ msgid ""
-#~ "  -o             - binary OR operator, true if one expression is true.\n"
-#~ msgstr ""
-#~ "  -o             - operatur OR binarju: veru jekk espressjoni minnhom "
-#~ "veru.\n"
-
-#~ msgid "  !              - unary NOT, true if expression is false.\n"
-#~ msgstr ""
-#~ "  !              - operatur NOT, veru jekk l-espressjoni hija falza.\n"
-
-#~ msgid "  (              - left parenthesis to open group expression.\n"
-#~ msgstr ""
-#~ "  (              - parenteżi tax-xellug, biex tiftaħ grupp ta' "
-#~ "espressjonijiet.\n"
-
-#~ msgid "  )              - right parenthesis to close group expression.\n"
-#~ msgstr ""
-#~ "  (              - parenteżi tal-lemin, biex tagħlaq grupp ta' "
-#~ "espressjonijiet.\n"
-
-#~ msgid ""
-#~ "callback is:\n"
-#~ "%s\n"
-#~ msgstr ""
-#~ "callback huwa :\n"
-#~ "%s\n"
-
-#~ msgid ""
-#~ "\n"
-#~ "Continue?"
-#~ msgstr ""
-#~ "\n"
-#~ "Tkompli?"
-
-#~ msgid ""
-#~ "Some package requested cannot be installed:\n"
-#~ "%s"
-#~ msgstr ""
-#~ "Xi pakketti mitluba ma jistgħux jiġu nstallati:\n"
-#~ "%s"
-
-#~ msgid ""
-#~ "  --distrib-XXX  - automatically create a medium for XXX part of a\n"
-#~ "                   distribution, XXX may be main, contrib, updates or\n"
-#~ "                   anything else that has been configured ;-)\n"
-#~ msgstr ""
-#~ "  --distrib-XXX  - awtomatikament oħloq sors għall-parti XXX ta' \n"
-#~ "                   distribuzzjoni. XXX tista' tkun main, contrib, "
-#~ "updates\n"
-#~ "                   jew sors oħra li ġie konfigurat.\n"
-
-#~ msgid "found version %s and arch %s ..."
-#~ msgstr "sibt verżjoni %s u arkitettura %s ..."
-
-#~ msgid "cannot add updates of a cooker distribution\n"
-#~ msgstr ""
-#~ "ma jistgħux jiġu miżjuda aġġornamenti ta' distribuzzjoni \"cooker\"\n"
-
-#~ msgid "retrieving mirrors at %s ..."
-#~ msgstr "qed jinġabu mirja minn %s ..."

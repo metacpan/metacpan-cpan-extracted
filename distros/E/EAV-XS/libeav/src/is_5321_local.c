@@ -62,7 +62,9 @@ is_5321_local (const char *start, const char *end)
             } break;
             case '.': {
                 /* '.' is allowed after an atom and only once */
-                if (cp == start || ((cp + 1) < end && cp[1] == '.'))
+                if (cp == start || (cp + 1) == end)
+                    return inverse(EEAV_LPART_MISPLACED_DOT);
+                if ((cp + 1) < end && (cp[1] == '.'))
                     return inverse(EEAV_LPART_TOO_MANY_DOTS);
             } break;
             /* specials & SPACE are not allowed outside quote-string */

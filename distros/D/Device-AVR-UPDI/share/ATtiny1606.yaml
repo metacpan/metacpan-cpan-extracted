@@ -17,38 +17,6 @@ fusemap:
       - caption: Enabled with wake-up halted until BOD is ready
         name: ENWAKE
         value: 12
-  CMPA:
-    mask: 1
-    name: CMPA
-    reg: TCD0CFG
-  CMPAEN:
-    mask: 16
-    name: CMPAEN
-    reg: TCD0CFG
-  CMPB:
-    mask: 2
-    name: CMPB
-    reg: TCD0CFG
-  CMPBEN:
-    mask: 32
-    name: CMPBEN
-    reg: TCD0CFG
-  CMPC:
-    mask: 4
-    name: CMPC
-    reg: TCD0CFG
-  CMPCEN:
-    mask: 64
-    name: CMPCEN
-    reg: TCD0CFG
-  CMPD:
-    mask: 8
-    name: CMPD
-    reg: TCD0CFG
-  CMPDEN:
-    mask: 128
-    name: CMPDEN
-    reg: TCD0CFG
   CRCSRC:
     mask: 192
     name: CRCSRC
@@ -89,24 +57,9 @@ fusemap:
       - caption: 1.8 V
         name: BODLEVEL0
         value: 0
-      - caption: 2.1 V
-        name: BODLEVEL1
-        value: 32
       - caption: 2.6 V
         name: BODLEVEL2
         value: 64
-      - caption: 2.9 V
-        name: BODLEVEL3
-        value: 96
-      - caption: 3.3 V
-        name: BODLEVEL4
-        value: 128
-      - caption: 3.7 V
-        name: BODLEVEL5
-        value: 160
-      - caption: 4.0 V
-        name: BODLEVEL6
-        value: 192
       - caption: 4.2 V
         name: BODLEVEL7
         value: 224
@@ -275,14 +228,6 @@ fuses:
   - EESAVE
   - RSTPINCFG
   - SUT
-  - CMPA
-  - CMPAEN
-  - CMPB
-  - CMPBEN
-  - CMPC
-  - CMPCEN
-  - CMPD
-  - CMPDEN
   - PERIOD
   - WINDOW
 reginfos:
@@ -310,10 +255,6 @@ reginfos:
     mask: 7
     name: SYSCFG1
     offset: 4742
-  - default: 0
-    mask: 255
-    name: TCD0CFG
-    offset: 4740
   - default: 0
     mask: 255
     name: WDTCFG

@@ -38,7 +38,7 @@ it 'most common workflow' => sub {
 	
 	my %options = (
 		db					=> '/tmp/simple-backuper-test/db',
-		compression_level	=> 9,
+		compression_level	=> 0,
 		space_limit			=> 10_000_000,
 		files				=> {
 			'/tmp/simple-backuper-test/src'	=> 5,

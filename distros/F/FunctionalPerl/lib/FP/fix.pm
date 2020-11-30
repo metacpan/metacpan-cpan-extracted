@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2015 Christian Jaeger, copying@christianjaeger.ch
+# Copyright (c) 2015-2020 Christian Jaeger, copying@christianjaeger.ch
 #
 # This is free software, offered under either the same terms as perl 5
 # or the terms of the Artistic License version 2 or the terms of the
@@ -69,6 +69,8 @@ our @EXPORT      = qw(fix fixn);
 our @EXPORT_OK   = qw();
 our %EXPORT_TAGS = (all => [@EXPORT, @EXPORT_OK]);
 
+use FP::Carp;
+
 # Alternative implementations:
 
 # Y combinator
@@ -81,7 +83,8 @@ our %EXPORT_TAGS = (all => [@EXPORT, @EXPORT_OK]);
         }
     };
 
-    sub ($) {
+    sub {
+        @_ == 1 or fp_croak_nargs 1;
         my ($f) = @_;
         &$fix0($fix0, $f)
     }
@@ -132,7 +135,8 @@ TEST {
 };
 
 # indirectly self-referencing through package variable
-*rec = sub ($) {
+*rec = sub {
+    @_ == 1 or fp_croak_nargs 1;
     my ($f) = @_;
     sub {
         #@_ = (fix ($f), @_); goto &$f;
@@ -144,8 +148,10 @@ TEST {
 # directly locally self-referencing
 
 use Scalar::Util 'weaken';
+use FP::Carp;
 
-*weakcycle = sub ($) {
+*weakcycle = sub {
+    @_ == 1 or fp_croak_nargs 1;
     my ($f) = @_;
     my $f2;
     $f2 = sub {
@@ -159,7 +165,7 @@ use Scalar::Util 'weaken';
 
 # choose implementation:
 
-sub fix ($);
+sub fix;
 
 *fix = *weakcycle;
 

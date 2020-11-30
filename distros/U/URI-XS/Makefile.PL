@@ -15,18 +15,13 @@ my %params = (
     },
 );
 
-if ($ENV{TEST_FULL}) {
-    $params{LIBS}[0] .= ' -lubsan';
-    ($params{CCFLAGS}||='') .= ' -fsanitize=undefined';
-}
-
 if ($ENV{DEV}) {
     my $postamble = '';
     my $gentype = "-G2";
-    for (qw/parser.rl/) {
+    for (qw/parser.rl parser_ext.rl/) {
         my $file = "src/panda/uri/$_";
         my $cfile = $file; $cfile =~ s/\.rl/.cc/;
-        $postamble .= "parser : $cfile\n\n";
+        $postamble .= "parser :: $cfile\n\n";
         $postamble .= "$cfile : $file\n".
                       "\t ragel -C $gentype $file -o $cfile\n\n";
     }

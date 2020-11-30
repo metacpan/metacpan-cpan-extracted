@@ -32,6 +32,9 @@ $Data{'langvar'}{'iana'}{'orig'}{'name'} = {
    "Portuguese Language Orthographic Agreement of 1990 (Acordo Ortografico da Lingua Portuguesa de 1990)",
    "Niçard"                           => "Nicard",
    "Provençal"                       => "Provencal",
+   "Østgrønlands"                 =>"Ostgronlands",
+   "Latvian orthography used before 1920s (\"vecā druka\")" =>
+   "Latvian orthography used before 1920s (\"veca druka\")",
 };
 
 $Data{'langvar'}{'iana'}{'ignore'} = {

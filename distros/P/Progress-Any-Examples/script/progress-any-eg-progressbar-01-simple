@@ -1,5 +1,10 @@
 #!perl
 
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-07-09'; # DATE
+our $DIST = 'Progress-Any-Examples'; # DIST
+our $VERSION = '0.005'; # VERSION
+
 use 5.010001;
 use strict;
 use warnings;
@@ -31,7 +36,7 @@ progress-any-eg-progressbar-01-simple - A simple progress bar on the terminal
 
 =head1 VERSION
 
-This document describes version 0.003 of progress-any-eg-progressbar-01-simple (from Perl distribution Progress-Any-Examples), released on 2020-07-09.
+This document describes version 0.005 of progress-any-eg-progressbar-01-simple (from Perl distribution Progress-Any-Examples), released on 2020-07-09.
 
 =head1 SYNOPSIS
 

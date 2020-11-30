@@ -74,6 +74,7 @@ examples/README
 examples/Windows/027_winfont
 examples/Windows/Win32.pm
 lib/PDF/Builder.pm
+lib/PDF/Builder/Basic/PDF.pm
 lib/PDF/Builder/Basic/PDF/Filter/ASCII85Decode.pm
 lib/PDF/Builder/Basic/PDF/Filter/ASCIIHexDecode.pm
 lib/PDF/Builder/Basic/PDF/Filter/FlateDecode.pm

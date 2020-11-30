@@ -41,27 +41,22 @@ main (int argc, char *argv[])
     idn_result_t r;
     static int tld_count[TLD_TYPE_MAX]; /* zero everything */
     int t;
+    int errors = 0;
     FILE *fh;
     char *file = NULL;
-    int expect_tld_test = -1;   /* how many expect TLDs with test type */
-    int expect_tld_na = -1;     /* how many expect not assigned TLDs */
 
-
-    if (argc >= 5 || argc < 4) {
-        msg_warn ("usage: %s TLD_TEST_COUNT TLD_NA_COUNT FILE\n", argv[0]);
+    if (argc != 2) {
+        msg_warn ("usage: %s FILE\n", argv[0]);
         return 2;
     }
 
     setlocale(LC_ALL, "en_US.UTF-8");
 
-    file = argv[3];
-    expect_tld_test = atoi (argv[1]);
-    expect_tld_na = atoi (argv[2]);
-
+    file = argv[1];
     fh = fopen (file, "r");
 
     if (fh == NULL) {
-        msg_warn ("open: %s: %s", argv[argc], strerror(errno));
+        msg_warn ("open: %s: %s", file, strerror(errno));
         return 3;
     }
 
@@ -75,47 +70,51 @@ main (int argc, char *argv[])
 
         t = is_utf8_domain (ctx, actions, &r, line, line + strlen (line), true);
 
-        if (t >= 0 &&
-            t != TLD_TYPE_NOT_ASSIGNED &&
-            t != TLD_TYPE_TEST &&
-            t != TLD_TYPE_SPECIAL)
+
+        if (t >= 0)
         {
-            printf ("PASS: %s\n", line);
+            tld_count[t]++;
         }
         else
         {
-            printf ("FAIL: %s\n", line);
-            printf ("      %s (%d)\n", idn_result_tostring (t), t);
+            errors++;
+            printf ("FAIL: %s: type = %d error = %s\n",
+                    line, t, idn_result_tostring (t));
         }
-
-        if (t >= 0)
-            tld_count[t]++;
-    }
-
-    if (tld_count[TLD_TYPE_TEST] != expect_tld_test) {
-        msg_warn ("%s: expected %d test TLDs, but got %d [%d]\n",
-                argv[0],
-                expect_tld_test,
-                tld_count[TLD_TYPE_TEST],
-                TLD_TYPE_TEST);
-        return 5;
-    }
-
-    if (tld_count[TLD_TYPE_NOT_ASSIGNED] != expect_tld_na) {
-        msg_warn ("%s: expected %d not assigned TLDs, but got %d [%d]\n",
-                argv[0],
-                expect_tld_na,
-                tld_count[TLD_TYPE_NOT_ASSIGNED],
-                TLD_TYPE_NOT_ASSIGNED);
-        return 6;
     }
 
     if (line != NULL)
         free (line);
+
     fclose (fh);
-    idn_resconf_destroy (ctx);
+
+    printf ("TLD statistic:\n");
+    const char* fmt = "  %-18s %d\n";
+    printf (fmt, "country-code", tld_count[TLD_TYPE_COUNTRY_CODE]);
+    printf (fmt, "generic", tld_count[TLD_TYPE_GENERIC]);
+    printf (fmt, "generic-restricted", tld_count[TLD_TYPE_GENERIC_RESTRICTED]);
+    printf (fmt, "infrastructure", tld_count[TLD_TYPE_INFRASTRUCTURE]);
+    printf (fmt, "not assigned", tld_count[TLD_TYPE_NOT_ASSIGNED]);
+    printf (fmt, "retired", tld_count[TLD_TYPE_RETIRED]);
+    printf (fmt, "special", tld_count[TLD_TYPE_SPECIAL]);
+    printf (fmt, "sponsored", tld_count[TLD_TYPE_SPONSORED]);
+    printf (fmt, "test", tld_count[TLD_TYPE_TEST]);
+
+    if (tld_count[TLD_TYPE_UNUSED] != 0)
+    {
+        printf ("ERROR: found %d unused TLD.\n",
+                tld_count[TLD_TYPE_UNUSED]);
+        msg_warn ("%s: FAIL\n", argv[0]);
+        return 4;
+    }
+
+    if (errors >= 1)
+    {
+        printf ("ERROR: there are some errors above.\n");
+        msg_warn ("%s: FAIL\n", argv[0]);
+        return 5;
+    }
 
     msg_ok ("%s: PASS\n", argv[0]);
-
     return 0;
 }

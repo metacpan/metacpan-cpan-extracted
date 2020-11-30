@@ -5,8 +5,8 @@ use base 'PDF::Builder::Basic::PDF::Dict';
 use strict;
 no warnings qw( deprecated recursion uninitialized );
 
-our $VERSION = '3.019'; # VERSION
-my $LAST_UPDATE = '3.019'; # manually update whenever code is changed
+our $VERSION = '3.020'; # VERSION
+my $LAST_UPDATE = '3.020'; # manually update whenever code is changed
 
 use Carp;
 use Compress::Zlib qw();
@@ -1271,14 +1271,8 @@ point or coordinate is left over at the end, it is discarded (as usual practice
 for excess data to a routine). There is no check for duplicate points or other 
 degeneracies.
 
-The former name of B<spline> has been deprecated and will be removed.
-
 =cut
 
-sub spline {
-    warn "Use qbspline instead of spline";
-    return  qbspline(@_); 
-}
 sub qbspline {
     my ($self) = shift;
 
@@ -3523,7 +3517,7 @@ sub _metaEnd {
 Takes an array of hashes produced by HarfBuzz::Shaper and outputs them to the
 PDF output file. HarfBuzz outputs glyph CIDs and positioning information. 
 It may rearrange and swap characters (glyphs), and the result may bear no
-resemblence to the original Unicode point list. You should see 
+resemblance to the original Unicode point list. You should see 
 examples/HarfBuzz.pl, which shows a number of examples with Latin and non-Latin 
 text, as well as vertical writing. 
 examples/resources/HarfBuzz_example.pdf is available in case you want to see 

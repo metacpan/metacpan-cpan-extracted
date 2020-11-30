@@ -14,7 +14,7 @@ use DynaLoader;
 
 our @ISA = qw/DynaLoader/;
 
-our $VERSION = '1.107';
+our $VERSION = '1.108';
 
 sub dl_load_flags { $^O eq 'darwin' ? 0x00 : 0x01 }
 
@@ -355,6 +355,16 @@ C<$cr-E<gt>restore> to restore to the saved state.
 =over
 
 =item $name: string
+
+=back
+
+=item Predefined names:
+
+=over
+
+=item Cairo::TAG_DEST [1.16]
+
+=item Cairo::TAG_LINK [1.16]
 
 =back
 
@@ -1369,6 +1379,54 @@ For hysterical reasons, you can also use the following syntax:
 
 =item $type = $surface->get_type [1.2]
 
+=item $surface->set_mime_data ($mime_type, $mime_data) [1.10]
+
+=item $mime_data = $surface->get_mime_data ($mime_type) [1.10]
+
+=item $bool = $surface->supports_mime_type ($mime_type) [1.12]
+
+=over
+
+=item $mime_type: string
+
+=over
+
+=item Predefined MIME types:
+
+=over
+
+=item Cairo::Surface::MIME_TYPE_JP2 [1.10]
+
+=item Cairo::Surface::MIME_TYPE_JPEG [1.10]
+
+=item Cairo::Surface::MIME_TYPE_PNG [1.10]
+
+=item Cairo::Surface::MIME_TYPE_URI [1.10]
+
+=item Cairo::Surface::MIME_TYPE_UNIQUE_ID [1.12]
+
+=item Cairo::Surface::MIME_TYPE_JBIG2 [1.14]
+
+=item Cairo::Surface::MIME_TYPE_JBIG2_GLOBAL [1.14]
+
+=item Cairo::Surface::MIME_TYPE_JBIG2_GLOBAL_PARAMS [1.14]
+
+=item Cairo::Surface::MIME_TYPE_CCITT_FAX [1.16]
+
+=item Cairo::Surface::MIME_TYPE_CCITT_FAX_PARAMS [1.16]
+
+=item Cairo::Surface::MIME_TYPE_EPS [1.16]
+
+=item Cairo::Surface::MIME_TYPE_EPS_PARAMS [1.16]
+
+=back
+
+=back
+
+=item $mime_data: binary data string
+
+=back
+
 =item $status = $surface->copy_page [1.6]
 
 =over
@@ -1509,6 +1567,22 @@ For hysterical reasons, you can also use the following syntax:
 
 =back
 
+=item $item_id = $surface->add_outline($parent_id, $name, $attributes, $flags) [1.16]
+
+=over
+
+=item $item_id: int, item ID
+
+=item $parent_id: parent item id or Cairo::PdfSurface::OUTLINE_ROOT
+
+=item $name: string, item display
+
+=item $attributes: string, item attributes
+
+=item $flags: list reference, item flags
+
+=back
+
 =item $surface->set_metadata($name, $value) [1.16]
 
 =over
@@ -1516,6 +1590,24 @@ For hysterical reasons, you can also use the following syntax:
 =item $name: string
 
 =item $value: string
+
+=back
+
+=item $surface->set_page_label($label) [1.16]
+
+=over
+
+=item $label: string, page label
+
+=back
+
+=item $surface->set_thumbnail_size($width, $height) [1.16]
+
+=over
+
+=item $width: int, thumbnail width
+
+=item $height: int, thumbnail height
 
 =back
 
@@ -1694,6 +1786,14 @@ For hysterical reasons, you can also use the following syntax:
 =back
 
 =item ($x0, $y0, $width, $height) = $surface->ink_extents [1.10]
+
+=item $extents_ref = $surface->get_extents [1.12]
+
+=over
+
+=item $extents_ref: I<Cairo::Rectangle> reference
+
+=back
 
 =back
 

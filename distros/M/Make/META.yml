@@ -24,8 +24,9 @@ requires:
   Config: '0'
   Cwd: '0'
   File::Spec: '0'
+  Graph: '0.9709'
   Text::Balanced: '2.03'
-  Text::ParseWords: '3.30'
+  Text::ParseWords: '3.24'
   perl: '5.006'
   strict: '0'
   warnings: '0'
@@ -34,5 +35,5 @@ resources:
   bugtracker: https://github.com/klp2/Make/issues
   homepage: https://metacpan.org/pod/Make
   repository: https://github.com/klp2/Make.git
-version: '2.007'
+version: '2.009'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

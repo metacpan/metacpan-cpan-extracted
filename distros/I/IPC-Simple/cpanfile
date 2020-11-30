@@ -1,4 +1,4 @@
-requires 'AnyEvent'         => '0';
+requires 'AnyEvent'         => '7.11';
 requires 'AnyEvent::Handle' => '0';
 requires 'AnyEvent::Util'   => '0';
 requires 'Carp'             => '0';

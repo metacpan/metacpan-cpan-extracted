@@ -4,7 +4,7 @@
 
 TEST("100 continue") {
     ResponseParser p;
-    p.set_context_request(new Request(Method::GET, new URI("/"), Headers().add("Expect", "100-continue")));
+    p.set_context_request(new Request(Method::Get, new URI("/"), Headers().add("Expect", "100-continue")));
 
     auto result = p.parse("HTTP/1.1 100 Continue\r\n\r\n");
     auto res = result.response;
@@ -40,7 +40,7 @@ TEST("204 no content") {
 
 TEST("HEAD response with content length") {
     ResponseParser p;
-    p.set_context_request(new Request(Method::HEAD, new URI("/")));
+    p.set_context_request(new Request(Method::Head, new URI("/")));
     string raw =
         "HTTP/1.1 200 OK\r\n"
         "Content-Length: 100500\r\n"

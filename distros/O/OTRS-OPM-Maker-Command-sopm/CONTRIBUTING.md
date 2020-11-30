@@ -5,7 +5,7 @@ The distribution is contained in a Git repository, so simply clone the
 repository
 
 ```
-$ git clone http://github.com/perlservices/OTRS-OPM-Maker-Command-sopm.git
+$ git clone https://github.com/perlservices/OTRS-OPM-Maker-Command-sopm.git
 ```
 
 and change into the newly-created directory.

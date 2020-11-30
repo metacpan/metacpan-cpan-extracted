@@ -40,4 +40,10 @@ subtest "run in order" => sub {
     is $s, "123";
 };
 
+subtest "bind error" => sub {
+    my $port = 123; # < 1000, to trigger erroor
+    my $server = UniEvent::Tcp->new;
+    throws_ok( sub { $server->bind('127.0.0.1', 8888, undef, UniEvent::Tcp::IPV6ONLY); }, qr/bind error/, 'wrapped error');
+};
+
 done_testing();

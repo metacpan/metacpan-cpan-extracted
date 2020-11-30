@@ -49,31 +49,32 @@
    "provides" : {
       "OTRS::OPM::Maker::Command::sopm" : {
          "file" : "lib/OTRS/OPM/Maker/Command/sopm.pm",
-         "version" : "1.41"
+         "version" : "1.43"
       },
       "OTRS::OPM::Maker::Utils::OTRS3" : {
          "file" : "lib/OTRS/OPM/Maker/Utils/OTRS3.pm",
-         "version" : "1.41"
+         "version" : "1.43"
       },
       "OTRS::OPM::Maker::Utils::OTRS4" : {
          "file" : "lib/OTRS/OPM/Maker/Utils/OTRS4.pm",
-         "version" : "1.41"
+         "version" : "1.43"
       }
    },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "http://github.com/perlservices/OTRS-OPM-Maker-Command-sopm/issues"
+         "web" : "https://github.com/perlservices/OTRS-OPM-Maker-Command-sopm/issues"
       },
-      "homepage" : "http://github.com/perlservices/OTRS-OPM-Maker-Command-sopm",
+      "homepage" : "https://github.com/perlservices/OTRS-OPM-Maker-Command-sopm",
       "repository" : {
          "type" : "git",
-         "url" : "http://github.com/perlservices/OTRS-OPM-Maker-Command-sopm.git",
-         "web" : "http://github.com/perlservices/OTRS-OPM-Maker-Command-sopm"
+         "url" : "https://github.com/perlservices/OTRS-OPM-Maker-Command-sopm.git",
+         "web" : "https://github.com/perlservices/OTRS-OPM-Maker-Command-sopm"
       }
    },
-   "version" : "1.41",
+   "version" : "1.43",
    "x_contributors" : [
+      "Gabor Szabo <gabor@szabgab.com>",
       "reneeb <github@renee-baecker.de>",
       "reneeb <info@perl-services.de>"
    ],

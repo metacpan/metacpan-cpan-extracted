@@ -39,7 +39,7 @@ cmp_deeply(
       pass => 0,
       children => [
         superhashof({
-          details => 'result is invalid',
+          details => 'test failed',
           pass => 0,
         }),
       ],
@@ -49,7 +49,7 @@ cmp_deeply(
       pass => 1,
       children => [
         superhashof({
-          details => 'result is valid',
+          details => 'test passes',
           pass => 1,
         }),
       ],

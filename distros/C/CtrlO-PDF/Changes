@@ -1,5 +1,9 @@
 Revision history for CtrlO::PDF
 
+0.06 Tue Nov 24 2020
+
+    * Add header option
+
 0.05 Thu Jul 2 2020
 
     * Automatically add space for logo whenever starting new page

@@ -14,8 +14,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: Mageia\n"
-"POT-Creation-Date: 2020-01-18 09:59+0200\n"
-"PO-Revision-Date: 2020-01-23 23:17+0000\n"
+"POT-Creation-Date: 2020-07-10 17:41+0100\n"
+"PO-Revision-Date: 2020-07-10 16:45+0000\n"
 "Last-Translator: Filip Komar <filip.komar@guest.arnes.si>\n"
 "Language-Team: Slovenian (http://www.transifex.com/MageiaLinux/mageia/"
 "language/sl/)\n"
@@ -71,7 +71,7 @@ msgstr "Prenos paketa »%s« …"
 msgid "Cancel"
 msgstr "Prekliči"
 
-#: ../gurpm/RPMProgressDialog.pm:359 ../urpm.pm:452 ../urpm/download.pm:882
+#: ../gurpm/RPMProgressDialog.pm:359 ../urpm.pm:454 ../urpm/download.pm:882
 #: ../urpm/get_pkgs.pm:277 ../urpm/media.pm:1149 ../urpm/media.pm:1682
 #: ../urpm/media.pm:1833
 #, c-format
@@ -282,7 +282,7 @@ msgstr ""
 "%s\n"
 "Ali naj se namestitev vseeno nadaljuje?"
 
-#: ../gurpmi2:120
+#: ../gurpmi2:120 ../gurpmi2:386
 #, c-format
 msgid "Warning"
 msgstr "Opozorilo"
@@ -413,6 +413,16 @@ msgstr "Namestitev je končana"
 msgid "restarting urpmi"
 msgstr "ponovno zaganjanje urpmi"
 
+#: ../gurpmi2:386
+#, c-format
+msgid "No"
+msgstr "Ne"
+
+#: ../gurpmi2:386
+#, c-format
+msgid "Yes"
+msgstr "Da"
+
 #: ../rpm-find-leaves:15
 #, c-format
 msgid ""
@@ -464,138 +474,138 @@ msgstr ""
 "Nekateri paketi so se mogoče lahko uspešno namestili, a nekaj jih je gotovo "
 "spodletelo.\n"
 
-#: ../urpm.pm:193
+#: ../urpm.pm:195
 #, c-format
 msgid "fail to create directory %s"
 msgstr "Ustvarjanje mape %s je spodletelo"
 
-#: ../urpm.pm:194
+#: ../urpm.pm:196
 #, c-format
 msgid "invalid owner for directory %s"
 msgstr "Neveljaven lastnik mape %s"
 
-#: ../urpm.pm:237
+#: ../urpm.pm:239
 #, c-format
 msgid "Can not download packages into %s"
 msgstr "V mapo %s ni mogoče prenašati paketov"
 
-#: ../urpm.pm:253
+#: ../urpm.pm:255
 #, c-format
 msgid "Environment directory %s does not exist"
 msgstr "Mapa %s ne obstaja"
 
-#: ../urpm.pm:254 ../urpmf:244 ../urpmq:163
+#: ../urpm.pm:256 ../urpmf:244 ../urpmq:163
 #, c-format
 msgid "using specific environment on %s\n"
 msgstr "uporabljam specifično okolje pri %s\n"
 
-#: ../urpm.pm:422
+#: ../urpm.pm:424
 #, c-format
 msgid "unable to open rpmdb"
 msgstr "odpiranje rpmdb ni možno"
 
-#: ../urpm.pm:441
+#: ../urpm.pm:443
 #, c-format
 msgid "invalid rpm file name [%s]"
 msgstr "napačno ime datoteke rpm [%s]"
 
-#: ../urpm.pm:447
+#: ../urpm.pm:449
 #, c-format
 msgid "retrieving rpm file [%s] ..."
 msgstr "prenos datoteke rpm [%s] …"
 
-#: ../urpm.pm:449 ../urpm/get_pkgs.pm:275
+#: ../urpm.pm:451 ../urpm/get_pkgs.pm:275
 #, c-format
 msgid "...retrieving done"
 msgstr "… prenos je opravljen"
 
-#: ../urpm.pm:457
+#: ../urpm.pm:459
 #, c-format
 msgid "unable to access rpm file [%s]"
 msgstr "do datoteke rpm [%s] ni mogoče dostopati"
 
-#: ../urpm.pm:462
+#: ../urpm.pm:464
 #, c-format
 msgid "unable to parse spec file %s [%s]"
 msgstr "datoteke spec %s [%s] ni mogoče razčleniti"
 
-#: ../urpm.pm:470
+#: ../urpm.pm:472
 #, c-format
 msgid "unable to register rpm file"
 msgstr "datoteke rpm ni mogoče registrirati"
 
-#: ../urpm.pm:472
+#: ../urpm.pm:474
 #, c-format
 msgid "Incompatible architecture for rpm [%s]"
 msgstr "Arhitektura ni združljiva za rpm [%s]"
 
-#: ../urpm.pm:476
+#: ../urpm.pm:478
 #, c-format
 msgid "error registering local packages"
 msgstr "napaka pri registraciji krajevnih paketov"
 
-#: ../urpm.pm:588
+#: ../urpm.pm:590
 #, c-format
 msgid "This operation is forbidden while running in restricted mode"
 msgstr "Ta postopek ni dovoljen v omejenem načinu"
 
-#: ../urpm/args.pm:156 ../urpm/args.pm:165
+#: ../urpm/args.pm:157 ../urpm/args.pm:166
 #, c-format
 msgid "bad proxy declaration on command line\n"
 msgstr "napačna deklaracija posredniškega strežnika v ukazni vrstici\n"
 
-#: ../urpm/args.pm:320
+#: ../urpm/args.pm:321
 #, c-format
 msgid "urpmq: cannot read rpm file \"%s\"\n"
 msgstr "urpmq: datoteke rpm »%s« ni mogoče brati\n"
 
-#: ../urpm/args.pm:388
+#: ../urpm/args.pm:389
 #, c-format
 msgid "unexpected expression %s"
 msgstr "nepričakovan izraz %s"
 
-#: ../urpm/args.pm:389
+#: ../urpm/args.pm:390
 #, c-format
 msgid "missing expression before %s"
 msgstr "manjkajoč izraz pred %s"
 
-#: ../urpm/args.pm:395
+#: ../urpm/args.pm:396
 #, c-format
 msgid "unexpected expression %s (suggestion: use -a or -o ?)"
 msgstr "nepričakovan izraz %s (predlog: uporabite -a ali -o ?)"
 
-#: ../urpm/args.pm:399
+#: ../urpm/args.pm:400
 #, c-format
 msgid "no expression to close"
 msgstr "ni izraza za zaprtje"
 
-#: ../urpm/args.pm:408
+#: ../urpm/args.pm:409
 #, c-format
 msgid "by default urpmf awaits a regexp. you should use option \"--literal\""
 msgstr ""
 "Privzeto urpmf pričakuje regularni izraz. Uporabite argument »--literal«"
 
-#: ../urpm/args.pm:482
+#: ../urpm/args.pm:483
 #, c-format
 msgid "chroot directory doesn't exist"
 msgstr "mapa za chroot ne obstaja"
 
-#: ../urpm/args.pm:505
+#: ../urpm/args.pm:506
 #, c-format
 msgid "Can't use %s without %s"
 msgstr "Ni mogoče uporabiti %s brez %s"
 
-#: ../urpm/args.pm:508 ../urpm/args.pm:511 ../urpmq:155
+#: ../urpm/args.pm:509 ../urpm/args.pm:512 ../urpmq:155
 #, c-format
 msgid "Can't use %s with %s"
 msgstr "Ni mogoče uporabiti %s z/s %s"
 
-#: ../urpm/args.pm:519
+#: ../urpm/args.pm:520
 #, c-format
 msgid "Too many arguments\n"
 msgstr "Preveč argumentov\n"
 
-#: ../urpm/args.pm:527
+#: ../urpm/args.pm:528
 #, c-format
 msgid ""
 "%s version %s\n"
@@ -612,7 +622,7 @@ msgstr ""
 "\n"
 "Uporaba:\n"
 
-#: ../urpm/args.pm:533
+#: ../urpm/args.pm:534
 #, c-format
 msgid "Copyright (C) %s by %s"
 msgstr "Avtorske pravice (C) %s %s"
@@ -813,32 +823,32 @@ msgstr "prenos datotek rpm iz vira »%s« …"
 msgid "removing %s"
 msgstr "odstranjevanje %s"
 
-#: ../urpm/install.pm:215
+#: ../urpm/install.pm:217
 #, c-format
 msgid "unable to extract rpm from delta-rpm package %s"
 msgstr "razširitev paketa rpm iz paketa delta-rpm %s ni možna"
 
-#: ../urpm/install.pm:242
+#: ../urpm/install.pm:245
 #, c-format
 msgid "unable to install package %s"
 msgstr "namestitev paketa %s ni možna"
 
-#: ../urpm/install.pm:245
+#: ../urpm/install.pm:248
 #, c-format
 msgid "removing bad rpm (%s) from %s"
 msgstr "odstranjevanje paketa rpm z napako (%s) iz %s"
 
-#: ../urpm/install.pm:246 ../urpm/install.pm:393
+#: ../urpm/install.pm:249 ../urpm/install.pm:397
 #, c-format
 msgid "removing %s failed: %s"
 msgstr "odstranjevanje %s je spodletelo: %s"
 
-#: ../urpm/install.pm:295
+#: ../urpm/install.pm:298
 #, c-format
 msgid "removing package %s"
 msgstr "odstranjevanje paketa %s"
 
-#: ../urpm/install.pm:359
+#: ../urpm/install.pm:362
 #, c-format
 msgid ""
 "created transaction for installing on %s (remove=%d, install=%d, upgrade=%d)"
@@ -846,17 +856,17 @@ msgstr ""
 "določeno je bilo opravilo za nameščanje na %s (odstrani=%d, namesti=%d, "
 "nadgradi=%d)"
 
-#: ../urpm/install.pm:362
+#: ../urpm/install.pm:365
 #, c-format
 msgid "unable to create transaction"
 msgstr "opravila ni mogoče izvesti"
 
-#: ../urpm/install.pm:391
+#: ../urpm/install.pm:395
 #, c-format
 msgid "removing installed rpms (%s) from %s"
 msgstr "odstranjevanje nameščenega rpm (%s) iz %s"
 
-#: ../urpm/install.pm:400
+#: ../urpm/install.pm:404
 #, c-format
 msgid "More information on package %s"
 msgstr "Več podatkov o paketu %s"
@@ -3258,7 +3268,7 @@ msgstr ""
 "Ni podatkov v obliki XML za vir »%s«, ni bilo možno najti nobenega rezultata "
 "za pakete %s"
 
-#: ../urpmq:487
+#: ../urpmq:488
 #, c-format
 msgid "No changelog found\n"
 msgstr "Dnevnik sprememb ni bil najden\n"

@@ -72,7 +72,9 @@ sub Backup {
 	$state->{profile}->{init_ids} += time;
 	
 	print "total weight " if $options->{verbose};
-	$state->{total_weight} += $parts->unpack($_)->{size} foreach @$parts;
+	for(my $q = 0; $q <= $#$parts; $q++) {
+		$state->{total_weight} += $parts->unpack($parts->[ $q ])->{size};
+	}
 	print fmt_weight($state->{total_weight}).", " if $options->{verbose};
 	
 	my $cur_backup = {name => $options->{'backup-name'}, id => ++$state->{last_backup_id}, files_cnt => 0, max_files_cnt => 0};
@@ -163,19 +165,35 @@ sub Backup {
 		print "Updating dir $full_path..." if $options->{verbose};
 		my $file = $files->find_by_parent_id_name($dir2upd->{parent_id}, $dir2upd->{filename});
 		my @stat = lstat($full_path);
+		next if ! @stat;
 		my($uid, $gid) =_proc_uid_gid($stat[4], $stat[5], $state->{db}->{uids_gids});
-		$file->{versions}->[-1] = {
-			%{ $file->{versions}->[-1] },
-			backup_id_max	=> $state->{last_backup_id},
-			uid				=> $uid,
-			gid				=> $gid,
-			size			=> $stat[7],
-			mode			=> $stat[2],
-			mtime			=> $stat[9],
-			block_id		=> 0,
-			symlink_to		=> undef,
-			parts			=> [],
-		};
+		if($file->{versions}->[-1]->{backup_id_max} == $state->{last_backup_id} - 1) {
+			$file->{versions}->[-1] = {
+				%{ $file->{versions}->[-1] },
+				backup_id_max	=> $state->{last_backup_id},
+				uid				=> $uid,
+				gid				=> $gid,
+				size			=> $stat[7],
+				mode			=> $stat[2],
+				mtime			=> $stat[9],
+				block_id		=> 0,
+				symlink_to		=> undef,
+				parts			=> [],
+			};
+		} else {
+			push @{ $file->{versions} }, {
+				backup_id_min	=> $state->{last_backup_id},
+				backup_id_max	=> $state->{last_backup_id},
+				uid				=> $uid,
+				gid				=> $gid,
+				size			=> $stat[7],
+				mode			=> $stat[2],
+				mtime			=> $stat[9],
+				block_id		=> 0,
+				symlink_to		=> undef,
+				parts			=> [],
+			}
+		}
 		$files->upsert({ id => $file->{id}, parent_id => $file->{parent_id} }, $file);
 		print "OK\n" if $options->{verbose};
 	}

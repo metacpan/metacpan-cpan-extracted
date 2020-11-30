@@ -1,0 +1,13 @@
+{
+  "okapi": {
+    "url": "https://uchicago-test-okapi.folio.indexdata.com",
+    "tenant": "uchicago"
+  },
+  "login": {
+    "username": "${OKAPI_USER-uchicago_admin}",
+    "password": "${OKAPI_CHICAGO_PASSWORD}"
+  },
+  "indexMap": {
+    "7": "identifiers/@value/@identifierTypeId=\"cf0a2485-22e9-5be4-ac5c-fe393fb964e4\""
+  }
+}

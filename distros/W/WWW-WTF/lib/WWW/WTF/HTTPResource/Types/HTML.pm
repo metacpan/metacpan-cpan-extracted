@@ -34,7 +34,7 @@ sub get_a_tags {
             my $href_uri = URI->new($href);
             $href_uri->authority;
 
-            next if($href_uri =~ m/$base_uri/);
+            next if ($href_uri =~ m/$base_uri/);
         }
 
         push @tags, $token;
@@ -51,7 +51,10 @@ sub get_links {
 
     foreach my $token ($self->get_a_tags) {
         if (exists $o->{filter}->{title}) {
-            next unless(($token->[1]->{title} // '') =~ m/$o->{filter}->{title}/i);
+            next unless (($token->[1]->{title} // '') =~ m/$o->{filter}->{title}/i);
+        }
+        elsif (exists $o->{filter}->{href_regex}) {
+            next unless (($token->[1]->{href}  // '') =~ $o->{filter}->{href_regex});
         }
 
         push @links, URI->new($token->[1]->{href});
@@ -67,7 +70,7 @@ sub get_image_uris {
 
     while (my $token = $self->parser->get_tag(qw/img/)) {
         if (exists $o->{filter}->{alt}) {
-            next unless(($token->[1]->{alt} // '') =~ m/$o->{filter}->{alt}/);
+            next unless (($token->[1]->{alt} // '') =~ m/$o->{filter}->{alt}/);
         }
 
         push @links, URI->new($token->[1]->{src});

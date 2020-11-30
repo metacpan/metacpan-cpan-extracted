@@ -1,6 +1,6 @@
 NAME
     StreamFinder - Fetch actual raw streamable URLs from various
-    radio-station and video websites.
+    radio-station, video & podcast websites.
 
 INSTALLATION
             To install this module, run the following commands:
@@ -129,8 +129,8 @@ DESCRIPTION
     (StreamFinder::Blogger), brighteon.com (StreamFinder::Brighteon),
     castbox.fm (StreamFinder::Castbox), iheartradio.com
     (StreamFinder::IHeartRadio), radio.net (StreamFinder::RadioNet),
-    reciva.com (StreamFinder::Reciva), sermonaudio.com
-    (StreamFinder::SermonAudio) spreaker.com podcasts
+    reciva.com (StreamFinder::Reciva), rumble.com (StreamFinder::Rumble),
+    sermonaudio.com (StreamFinder::SermonAudio), spreaker.com podcasts
     (StreamFinder::Spreaker), tunein.com (StreamFinder::Tunein), vimeo.com
     (StreamFinder::Vimeo), and (youtube.com, et. al and other sites that
     youtube-dl supports) (StreamFinder::Youtube).
@@ -256,9 +256,9 @@ SUBROUTINES/METHODS
     $station->getType()
         Returns the station / podcast / video's type (*submodule-name*).
         (one of: "Apple", "BitChute", "Blogger", "Brighteon", "Castbox",
-        "IHeartRadio", "RadioNet", "Reciva", "SermonAudio", "Spreaker",
-        "Tunein", "Youtube" or "Vimeo" - depending on the sight that matched
-        the URL.
+        "IHeartRadio", "RadioNet", "Reciva", "Rumble", "SermonAudio",
+        "Spreaker", "Tunein", "Youtube" or "Vimeo" - depending on the sight
+        that matched the URL.
 
 CONFIGURATION FILES
     ~/.config/StreamFinder/config
@@ -319,10 +319,6 @@ SEE ALSO
     *   RT: CPAN's request tracker (report bugs here)
 
         <http://rt.cpan.org/NoAuth/Bugs.html?Dist=StreamFinder>
-
-    *   AnnoCPAN: Annotated CPAN documentation
-
-        <http://annocpan.org/dist/StreamFinder>
 
     *   CPAN Ratings
 

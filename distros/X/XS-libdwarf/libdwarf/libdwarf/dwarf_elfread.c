@@ -68,10 +68,18 @@ EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifdef HAVE_STDLIB_H
 #include <stdlib.h>
 #endif /* HAVE_STDLIB_H */
+#ifdef HAVE_STRING_H
 #include <string.h>
+#endif /* HAVE_STRING_H */
+#ifdef HAVE_STDLIB_H
 #include <stdlib.h>
-#include <sys/types.h> /* open() */
+#endif /* HAVE_STDLIB_H */
+#ifdef HAVE_SYS_TYPES_H
+#include <sys/types.h> /* open(), off_t, size_t, ssize_t */
+#endif /* HAVE_SYS_TYPES_H */
+#ifdef HAVE_SYS_STAT_H
 #include <sys/stat.h> /* open() */
+#endif /* HAVE_SYS_STAT_H */
 #include <fcntl.h> /* open() */
 #include <time.h>
 #ifdef HAVE_UNISTD_H
@@ -104,22 +112,38 @@ EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define TYP(n,l) char n[l]
 #endif /* TYPE */
 
-
 #ifdef WORDS_BIGENDIAN
-#define WRITE_UNALIGNED(dbg,dest,source, srclength,len_out) \
+#define READ_UNALIGNED_SAFE(dbg,dest, source, length) \
+    do {                                             \
+        Dwarf_Unsigned _ltmp = 0;                    \
+        dbg->de_copy_word( (((char *)(&_ltmp)) +     \
+            sizeof(_ltmp) - length),source, length); \
+        dest = _ltmp;                                \
+    } while (0)
+
+#define WRITE_UNALIGNED_LOCAL(dbg,dest,source, srclength,len_out) \
     {                                             \
         dbg->de_copy_word(dest,                   \
             ((char *)source) +srclength-len_out,  \
             len_out) ;                            \
     }
 #else /* LITTLE ENDIAN */
-#define WRITE_UNALIGNED(dbg,dest,source, srclength,len_out) \
+#define READ_UNALIGNED_SAFE(dbg,dest, source, srclength) \
+    do  {                                     \
+        Dwarf_Unsigned _ltmp = 0;             \
+        dbg->de_copy_word( (char *)(&_ltmp),  \
+            source, srclength) ;              \
+        dest = _ltmp;                         \
+    } while (0)
+
+#define WRITE_UNALIGNED_LOCAL(dbg,dest,source, srclength,len_out) \
     {                               \
         dbg->de_copy_word( (dest) , \
             ((char *)source) ,      \
             len_out) ;              \
     }
-#endif /* end LITTLE- BIG-ENDIAN */
+#endif /* *-ENDIAN */
+
 
 #ifdef WORDS_BIGENDIAN
 #define ASNAR(func,t,s)                         \
@@ -225,8 +249,12 @@ elf_load_nolibelf_section (void *obj, Dwarf_Half section_index,
         if (!sp->gh_size) {
             return DW_DLV_NO_ENTRY;
         }
-        if ((sp->gh_size + sp->gh_offset) >
-            elf->f_filesize) {
+        /*  Guarding against bad values and
+            against overflow */
+        if (sp->gh_size > elf->f_filesize ||
+            sp->gh_offset > elf->f_filesize ||
+            (sp->gh_size + sp->gh_offset) >
+                elf->f_filesize) {
             *error = DW_DLE_ELF_SECTION_ERROR;
             return DW_DLV_ERROR;
         }
@@ -238,7 +266,8 @@ elf_load_nolibelf_section (void *obj, Dwarf_Half section_index,
         }
         res = RRMOA(elf->f_fd,
             sp->gh_content, (off_t)sp->gh_offset,
-            (size_t)sp->gh_size, (off_t)elf->f_filesize, error);
+            (size_t)sp->gh_size,
+            (off_t)elf->f_filesize, error);
         if (res != DW_DLV_OK) {
             free(sp->gh_content);
             sp->gh_content = 0;
@@ -309,6 +338,9 @@ find_section_to_relocate(Dwarf_Debug dbg,Dwarf_Half section_index,
     MATCH_REL_SEC(section_index,dbg->de_debug_aranges,relocatablesec);
     MATCH_REL_SEC(section_index,dbg->de_debug_sup,relocatablesec);
     MATCH_REL_SEC(section_index,dbg->de_debug_str_offsets,relocatablesec);
+    MATCH_REL_SEC(section_index,dbg->de_debug_addr,relocatablesec);
+    MATCH_REL_SEC(section_index,dbg->de_debug_gnu_pubnames,relocatablesec);
+    MATCH_REL_SEC(section_index,dbg->de_debug_gnu_pubtypes,relocatablesec);
     /* dbg-> de_debug_tu_index,reloctablesec); */
     /* dbg-> de_debug_cu_index,reloctablesec); */
     /* dbg-> de_debug_gdbindex,reloctablesec); */
@@ -337,6 +369,7 @@ update_entry(Dwarf_Debug dbg,
     Dwarf_Unsigned reloc_size = 0;
     Dwarf_Half machine  = obj->f_machine;
     struct generic_symentry *symp = 0;
+    int is_rela = rela->gr_is_rela;
 
     offset = rela->gr_offset;
     addend = rela->gr_addend;
@@ -359,6 +392,9 @@ update_entry(Dwarf_Debug dbg,
         reloc_size = 4;
     } else if (_dwarf_is_64bit_abs_reloc(type, machine)) {
         reloc_size = 8;
+    } else if (machine == EM_X86_64 && type == R_X86_64_NONE) {
+        /*  There is nothing to do. */
+        return DW_DLV_OK;
     } else {
         *error = DW_DLE_RELOC_SECTION_RELOC_TARGET_SIZE_UNKNOWN;
         return DW_DLV_ERROR;
@@ -372,15 +408,29 @@ update_entry(Dwarf_Debug dbg,
         *error = DW_DLE_RELOC_INVALID;
         return DW_DLV_ERROR;
     }
-    {
-        /*  Assuming we do not need to do a READ_UNALIGNED here
-            at target_section + offset and add its value to
-            outval.  Some ABIs say no read (for example MIPS),
-            but if some do then which ones? */
-        Dwarf_Unsigned outval = symp->gs_value + addend;
-        /*  The 0th byte goes at offset. */
-        WRITE_UNALIGNED(dbg, target_section + offset,
-            &outval, sizeof(outval), (unsigned long)reloc_size);
+    /*  Assuming we do not need to do a READ_UNALIGNED here
+        at target_section + offset and add its value to
+        outval.  Some ABIs say no read (for example MIPS),
+        but if some do then which ones? */
+    {   /* .rel. (addend is 0), or .rela. */
+        Dwarf_Small *targ = target_section+offset;
+        Dwarf_Unsigned presentval = 0;
+        Dwarf_Unsigned outval = 0;
+        /*  See also: READ_UNALIGNED_SAFE in
+            dwarf_elf_access.c  */
+
+        if (!is_rela) {
+            READ_UNALIGNED_SAFE(dbg,presentval,
+                targ,reloc_size);
+        }
+        /*  There is no addend in .rel.
+            Normally presentval is correct
+            and st_value will be zero.
+            But a few compilers have
+            presentval zero and st_value set. */
+        outval = presentval + symp->gs_value + addend;
+        WRITE_UNALIGNED_LOCAL(dbg,targ,
+            &outval,sizeof(outval),reloc_size);
     }
     return DW_DLV_OK;
 }
@@ -590,6 +640,9 @@ _dwarf_elf_nlsetup(int fd,
     return res;
 }
 
+/*  dwarf_elf_access method table for use with non-libelf.
+    See also the methods table in dwarf_elf_access.c for libelf.
+*/
 static Dwarf_Obj_Access_Methods const elf_nlmethods = {
     elf_get_nolibelf_section_info,
     elf_get_nolibelf_byte_order,
@@ -694,34 +747,38 @@ _dwarf_elf_object_access_internals_init(
     for ( i = 1; i < intfc->f_loc_shdr.g_count; ++i) {
         struct generic_shdr *shp = 0;
         Dwarf_Unsigned section_type = 0;
+        enum RelocRela localrel = RelocIsRela;
 
         shp = intfc->f_shdr +i;
         section_type = shp->gh_type;
-        if (section_type == SHT_RELA) {
-            /*  Possibly we should check if the target section
-                is one we care about before loading rela
-                FIXME */
-            res = _dwarf_load_elf_rela(intfc,i,errcode);
-            if (res == DW_DLV_ERROR) {
-                localdoas->object = intfc;
-                localdoas->methods = 0;
-                    _dwarf_destruct_elf_nlaccess(localdoas);
-                localdoas = 0;
-                return res;
-            }
+        if (!shp->gh_namestring) {
+            /*  A serious error which we ignore here
+                as it will be caught elsewhere
+                if necessary. */
+            continue;
+        } else if (section_type == SHT_REL ||
+            (!strncmp(".rel.",shp->gh_namestring,5))) {
+            localrel = RelocIsRel;
+        } else if (section_type == SHT_RELA ||
+            (!strncmp(".rela.",shp->gh_namestring,6))) {
+            localrel = RelocIsRela;
+        } else {
+            continue;
+        }
+        /*  ASSERT: local rel is either RelocIsRel or
+            RelocIsRela. Never any other value. */
+        /*  Possibly we should check if the target section
+            is one we care about before loading rela
+            FIXME */
+        res = _dwarf_load_elf_relx(intfc,i,localrel,errcode);
+        if (res == DW_DLV_ERROR) {
+            localdoas->object = intfc;
+            localdoas->methods = 0;
+            _dwarf_destruct_elf_nlaccess(localdoas);
+            localdoas = 0;
+            return res;
         }
     }
-#if 0
-    /* Right now we don't need the .rel sections.Maybe later.*/
-    res = _dwarf_load_elf_rel(intfc,i,errcode);
-    if (res != DW_DLV_OK) {
-        localdoas->object = intfc;
-        localdoas->methods = 0;
-        _dwarf_destruct_elf_nlaccess(localdoas);
-        localdoas = 0;
-        return res;
-    }
-#endif
     free(localdoas);
     localdoas = 0;
     return DW_DLV_OK;

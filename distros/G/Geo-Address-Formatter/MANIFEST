@@ -13,8 +13,8 @@ address-formatting/bin/coverage.pl
 address-formatting/bin/run_tests.t
 address-formatting/conf/abbreviations/ca.yaml
 address-formatting/conf/abbreviations/cs.yaml
+address-formatting/conf/abbreviations/da.yaml
 address-formatting/conf/abbreviations/de.yaml
-address-formatting/conf/abbreviations/dk.yaml
 address-formatting/conf/abbreviations/en.yaml
 address-formatting/conf/abbreviations/es.yaml
 address-formatting/conf/abbreviations/et.yaml
@@ -294,6 +294,7 @@ address-formatting/testcases/other/null.yaml
 dist.ini
 lib/Geo/Address/Formatter.pm
 opencage_logo_300_150.png
+t/blackbox/check_yaml.t
 t/blackbox/countries.t
 t/blackbox/state_code.t
 t/unit/abbreviate.t

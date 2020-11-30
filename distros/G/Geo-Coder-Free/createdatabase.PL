@@ -1,17 +1,27 @@
 #!/usr/bin/env perl
 
-# Import data from openaddresses.io and whosonfirst.org into an SQLite database.
-# Set OPENADDR_HOME and WHOSONFIRST_HOME to the directories where the data has been downloaded
+# Import geo-coding data into an SQLite database.
+
+# Set OSM_HOME, OPENADDR_HOME, DR5HN_HOME and WHOSONFIRST_HOME to the directories where the data will be downloaded
+
+# see bin/download_databases which will download the databases and call this script
+
 # Download the OPENADDR_HOME data from http://results.openaddresses.io.
 #	/usr/bin/wget -nc --quiet https://s3.amazonaws.com/data.openaddresses.io/openaddr-collected-global.zip
 #	/usr/bin/wget -nc --quiet https://s3.amazonaws.com/data.openaddresses.io/openaddr-collected-global-sa.zip
 
 #	Remove all the data you're not going to use, I only keep au, ca, us
-# Download the WHOSONFIRST_HOME data from reposotiries such as
+
+# Download the WHOSONFIRST_HOME data from repositories such as
 #	https://github.com/whosonfirst-data/whosonfirst-data-venue-us.git
 #	I use whosonfirst-data-[venue|admin]-[au|gb|us|ca].git
 #	I use whosonfirst-data-[venue]-us-??.git
 
+# Download the DR5HN database:
+#	cd $DR5HN_HOME && git clone https://github.com/dr5hn/countries-states-cities-database.git
+
+# Openstreetmap.org data
+#	cd $OSM_HOME && /usr/bin/wget https://download.geofabrik.de/europe-latest.osm.bz2
 # Note that this can take a day to load in just AU, CA, GB, US
 
 # You can look up a WOF place by https://spelunker.whosonfirst.org/id/$locality_id
@@ -24,6 +34,7 @@
 #	https://spelunker.whosonfirst.org/id/1108937103
 
 # TODO: perhaps use a layered approach to the database schema
+# TODO: import https://raw.githubusercontent.com/dr5hn/countries-states-cities-database/master/countries%2Bstates%2Bcities.json
 
 use 5.010;
 use strict;
@@ -39,6 +50,9 @@ use File::Slurp;
 use Geo::Coder::Abbreviations;
 use JSON;
 use LWP::UserAgent::Throttled;
+use Locale::AU;	# TODO: use Locale::Geocode
+use Locale::CA;
+use Locale::Country;
 use Locale::US;
 use Digest::MD5;
 use Encode;
@@ -53,6 +67,9 @@ use Lingua::EN::AddressParse;
 use Locale::SubCountry;
 use Text::CSV;
 use Try::Tiny;
+use XML::LibXML::Reader;
+
+use	constant	AIO_READAHEAD_SIZE => 1048576;	# 1MB
 
 use	constant	DEBUG_OFF => 0;
 use	constant	DEBUG_INVALID_LENGTH => 1;
@@ -69,6 +86,8 @@ use	constant	DEBUG => DEBUG_OFF;
 use	constant	MAX_INSERT_COUNT => 250;	# Maximum number of CSV rows to insert in a single statement
 # use	constant	MAX_INSERT_COUNT => 1;	# Maximum number of CSV rows to insert in a single statement
 use	constant	SQLITE_CHUNK_SIZE => 1_000;	# Number of rows to read at a time
+
+binmode(STDOUT, "encoding(UTF-8)");
 
 my %zipcodes = (
 	'04350' => { city => 'Litchfield', county => 'Kennebec' },
@@ -859,6 +878,10 @@ if($ENV{'REDIS_SERVER'}) {
 	$redis->flushdb();
 }
 
+my $au = Locale::AU->new();
+my $ca = Locale::CA->new();
+my $us = Locale::US->new();
+
 my $filename = 'lib/Geo/Coder/Free/OpenAddresses/databases/states.txt';
 if(-r $filename) {
 	# Import US states and counties from https://github.com/openaddresses/openaddresses/tree/master/us-data
@@ -891,7 +914,7 @@ if(-r $filename) {
 	while(my $row = $csv->getline_hr($fin)) {
 		# print Data::Dumper->new([\$row])->Dump();
 		my $state;
-		unless($state = Locale::US->new()->{state2code}{uc($row->{'Name'})}) {
+		unless($state = $us->{state2code}{uc($row->{'Name'})}) {
 			die $row->{'Name'};
 		}
 		$state_fips{$row->{'State FIPS'}} = $state;
@@ -976,11 +999,11 @@ if((-r 'lib/Geo/Coder/Free/GeoNames/databases/allCountries.txt') &&
    (my $admin2 = File::Open::NoCache::ReadOnly->new('lib/Geo/Coder/Free/MaxMind/databases/admin2.db'))) {
    # open(my $fin2, '<', 'lib/Geo/Coder/Free/MaxMind/databases/admin2.db')) {
 	my $fin = $all_countries->fd();
-	aio_readahead($fin, 0, 10240);
+	aio_readahead($fin, 0, AIO_READAHEAD_SIZE);
 	my $fin1 = $admin1->fd();
-	aio_readahead($fin1, 0, 10240);
+	aio_readahead($fin1, 0, AIO_READAHEAD_SIZE);
 	my $fin2 = $admin2->fd();
-	aio_readahead($fin2, 0, 10240);
+	aio_readahead($fin2, 0, AIO_READAHEAD_SIZE);
 
 	$| = 1;
 	printf "%-70s\r", 'lib/Geo/Coder/Free/GeoNames/databases/allCountries.txt';
@@ -1018,6 +1041,7 @@ if((-r 'lib/Geo/Coder/Free/GeoNames/databases/allCountries.txt') &&
 	$admin2->close();
 
 	my $inserts = 0;
+	my $offset = AIO_READAHEAD_SIZE;
 
 	while(my $line = <$fin>) {
 		my @fields = split(/\t/, $line);
@@ -1094,6 +1118,8 @@ if((-r 'lib/Geo/Coder/Free/GeoNames/databases/allCountries.txt') &&
 		$inserts += import(row => \%columns, file => "$country/countrywide.csv", ua => $ua, dbh => $dbh, redis => $redis, global => 1);
 		if($inserts >= MAX_INSERT_COUNT) {
 			flush_queue($dbh, $redis);
+			aio_readahead($fin, $offset, AIO_READAHEAD_SIZE);
+			$offset += AIO_READAHEAD_SIZE;
 			$inserts = 0;
 		}
 	}
@@ -1110,6 +1136,7 @@ flush_queue($dbh, $redis);
 my $inserts = 0;
 
 my %address_parsers;
+
 # my $wof_global_dbh;
 if(my $whosonfirst = $ENV{'WHOSONFIRST_HOME'}) {
 	# Find all of the .geojson files in $WHOSONFIRST_HOME
@@ -1429,8 +1456,6 @@ foreach my $csv_file (create_tree($oa, 1)) {
 			$current_country = $country;
 		}
 
-		my $inserts = 0;
-
 		# Import this state's hand curated data
 		if(my $k = $known_places{$f}) {
 			# print "Known place:\n\t", Data::Dumper->new([\$k])->Dump();
@@ -1449,7 +1474,8 @@ foreach my $csv_file (create_tree($oa, 1)) {
 		my $fin = $fh->fd();
 
 		# open(my $fin, '<', $csv_file);
-		aio_readahead($fin, 0, 10240);
+		aio_readahead($fin, 0, AIO_READAHEAD_SIZE);
+		my $offset = AIO_READAHEAD_SIZE;
 
 		$| = 1;
 		printf "%-70s\r", $f;
@@ -1473,8 +1499,11 @@ foreach my $csv_file (create_tree($oa, 1)) {
 			$inserts += import(country => $country, state => $state, row => $row, file => $csv_file, ua => $ua, dbh => $dbh, redis => $redis);
 			if($inserts >= MAX_INSERT_COUNT) {
 				flush_queue($dbh, $redis);
+				aio_readahead($fin, $offset, AIO_READAHEAD_SIZE);
 				$inserts = 0;
+				$offset += AIO_READAHEAD_SIZE;
 			}
+
 		}
 
 		$fh->close();
@@ -1496,7 +1525,6 @@ flush_queue($dbh, $redis);	# Check for hanging dups in last state
 
 foreach my $country(@whosonfirst_only_countries) {
 	# Import this country's hand curated data
-	my $inserts = 0;
 	if(my $k = $known_places{'other'}) {
 		# print "Known place:\n\t", Data::Dumper->new([\$k])->Dump();
 		foreach my $row(@{$k}) {
@@ -1512,6 +1540,242 @@ foreach my $country(@whosonfirst_only_countries) {
 
 flush_queue($dbh, $redis);
 %whosonfirst = ();
+
+if(my $dr5hn = $ENV{'DR5HN_HOME'}) {
+	my $filename = File::Spec->catfile($dr5hn, 'countries+states+cities.json');
+
+	$| = 1;
+	printf "%-70s\r", $filename;
+	print "\n" if(DEBUG);
+	$| = 0;
+
+	my $j = JSON->new()->utf8();
+
+	my $data = File::Slurp::read_file($filename);
+	$data = $j->decode($data);
+
+	foreach my $country(@{$data}) {
+		if(($country->{'iso3'} eq 'USA') || ($country->{'iso3'} eq 'CAN') || ($country->{'iso3'} eq 'AUS')) {
+			if($country->{'name'} eq 'United Statees') {
+				$country->{'name'} = 'US';
+			}
+			foreach my $state(@{$country->{'states'}}) {
+				foreach my $city(@{$state->{'cities'}}) {
+					my $row = {
+						'COUNTRY' => $country->{'name'},
+						'STATE' => $state->{'state_code'},
+						'CITY' => $city->{'name'},
+						'LAT' => $city->{'latitude'},
+						'LON' => $city->{'longitude'},
+					};
+					$inserts += import(row => $row, file => $filename, ua => $ua, dbh => $dbh, redis => $redis);
+					# print Data::Dumper->new([$row])->Dump();
+					if($inserts >= MAX_INSERT_COUNT) {
+						flush_queue($dbh, $redis);
+						$inserts = 0;
+					}
+				}
+			}
+		# } elsif($country->{'iso3'} eq 'GBR') {
+			# TODO
+		};
+	}
+
+	flush_queue($dbh, $redis);
+	$inserts = 0;
+}
+
+if(my $osm = $ENV{'OSM_HOME'}) {
+	# Openstreetmap
+
+	my @files = ('north-america-latest.osm.bz2', 'europe-latest.osm.bz2', 'australia-oceania-latest.osm.bz2');
+
+	foreach my $file(@files) {
+		my $filename = File::Spec->catfile($osm, $file);
+
+		$| = 1;
+		printf "%-70s\r", $filename;
+		$| = 0;
+		print "\n" if(MAX_INSERT_COUNT == 1);
+
+		# TODO: check for the presence of bzcat
+		open(my $pin, '-|', "bzcat $filename");
+		my $reader = XML::LibXML::Reader->new(FD => $pin)
+			or die "cannot read $filename";
+
+		my $in_node;
+		my $node;
+		my $key;
+		my $name;
+		my $is_in;
+		my $lat;
+		my $lon;
+		my $place;
+
+		while($reader->read()) {
+			# These constants are not exported by default :-(
+			if($reader->nodeType() == 1) {
+				$node = $reader->name();
+				if($node eq 'node') {
+					if($reader->hasAttributes()) {
+						$lat = $reader->getAttribute('lat');
+						$lon = $reader->getAttribute('lon');
+						$in_node = 1;
+						$name = undef;
+						$is_in = undef;
+					}
+				} elsif($in_node) {
+					if($node eq 'tag') {
+						if($reader->hasAttributes()) {
+							my $key = $reader->getAttribute('k');
+							# print "$key\n";
+							if($key eq 'name:en') {
+								$name = $reader->getAttribute('v');
+								# print "$name\n";
+							} elsif(($key eq 'name') && !defined($name)) {
+								$name = $reader->getAttribute('v');
+							} elsif($key eq 'is_in') {
+								$is_in = $reader->getAttribute('v');
+							} elsif($key eq 'is_in:country') {
+								my $country = $reader->getAttribute('v');
+								if(defined($is_in) && ($is_in !~ /\Q$country\E$/)) {
+									$is_in .= ", $country";
+								} elsif(!defined($is_in)) {
+									$is_in = $country;
+								}
+							} elsif($key eq 'place') {
+								$place = $reader->getAttribute('v');
+							}
+						}
+					}
+				}
+			} elsif($reader->nodeType() == 15) {
+				if(defined($name) && defined($is_in) && defined($lat) && defined($lon) && defined($place)) {
+					my $add_record = 1;
+
+					$is_in =~ s/,(\w)/, $1/g;
+					$is_in =~ s/, United Kingdom/, GB/;
+					$is_in =~ s/, UK,.+$/, GB/;
+					$is_in =~ s/^UK, UK$/GB/;
+					$is_in =~ s/GB, GB$/GB/;
+					$is_in =~ s/, UK$/, GB/;
+					$is_in =~ s/(England|Scotland|Wales), GB/GB/;
+					$is_in =~ s/Yorkshire, UK/Yorkshire, GB/;
+					$is_in =~ s/, Europe$//;
+					$is_in =~ s/;\s?/, /g;
+					$is_in =~ s/United States of America.*/US/;
+					$is_in =~ s/United States$/US/;
+					$is_in =~ s/USA$/US/;
+					$is_in =~ s/(\w)? USA$/$1, US/;
+					my $preamble;
+					my $state;
+					my $country;
+					if($is_in =~ /(.+), (.+), US/) {
+						$preamble = $1;
+						$state = $2;
+						$country = 'US';
+					} elsif($is_in =~ /^(.+), US/) {
+						$state = $1;
+						$country = 'US';
+					}
+					if($state && (length($state) > 2)) {
+						if(my $code = $us->{state2code}{uc($state)}) {
+							if($preamble) {
+								$is_in = "$preamble, $code, US";
+							} else {
+								$is_in = "$code, US";
+							}
+							$country = 'US';
+						} else {
+							warn "$is_in: unknown US state $state" if(DEBUG&DEBUG_DATA_VALIDATE);
+							$add_record = 0;
+						}
+					} elsif(my $code = $us->{state2code}{uc($is_in)}) {
+						$is_in = "$code, US";
+					} elsif($code = $ca->{province2code}{uc($is_in)}) {
+						$is_in = "$code, Canada";
+						$country = 'Canada';
+					} elsif($code = $au->{state2code}{uc($is_in)}) {
+						$is_in = "$code, Australia";
+						$country = 'Australia';
+					} else {
+						if($is_in =~ /(.+), (.+), Canada/) {
+							$preamble = $1;
+							$state = $2;
+							$country = 'Canada';
+						} elsif($is_in =~ /^(.+), Canada/) {
+							$state = $1;
+							$country = 'Canada';
+						}
+						if($state && (length($state) > 2)) {
+							if($state =~ /Qu.bec/) {
+								$state = 'Quebec';
+							}
+							if(my $code = $ca->{province2code}{uc($state)}) {
+
+								if($preamble) {
+									$is_in = "$preamble, $code, Canada";
+								} else {
+									$is_in = "$code, Canada";
+								}
+								$country = 'Canada';
+							} else {
+								die "$is_in: unknown Canadian province $state";
+							}
+						} elsif($is_in =~ /(Australia|Canada|US|GB)$/) {
+							$add_record = 0;
+						}
+					}
+					if($add_record) {
+						if($is_in !~ /,/) {
+							if($is_in ne 'GB') {
+								if(!Locale::Country::country2code($is_in)) {
+									$add_record = 0;
+								}
+							}
+						} elsif($is_in =~ /(.+), (.+)$/) {
+							my $place = $1;
+							$country = $2;
+							if($country ne 'GB') {
+								if(!Locale::Country::country2code($country)) {
+									$add_record = 0;
+								}
+							}
+						}
+						$add_record = 0 if($is_in =~ /,.+,/);	# Just towns for now
+						# means it's another country
+						$add_record = 0 if(!defined($country));
+						if($add_record) {
+							print "$name, $is_in: $lat, $lon\n" if(DEBUG&DEBUG_ALL);
+							my $row = {
+								'CITY' => $name,
+								'STATE' => $state,
+								'COUNTRY' => $country,
+								'LAT' => $lat,
+								'LON' => $lon,
+							};
+							$inserts += import(country => $country, state => $state, row => $row, file => $filename, ua => $ua, dbh => $dbh, redis => $redis);
+							if($inserts >= MAX_INSERT_COUNT) {
+								flush_queue($dbh, $redis);
+								$inserts = 0;
+							}
+						}
+					}
+					$name = undef;
+					$lat = undef;
+					$lon = undef;
+					$is_in = undef;
+					$key = undef;
+					$node = undef;
+					$in_node = 0;
+				}
+			}
+		}
+	}
+
+	flush_queue($dbh, $redis);	# Check for hanging dups in current state
+	$inserts = 0;
+}
 
 $| = 1;
 printf "%-70s\r", 'creating cities';
@@ -2097,7 +2361,7 @@ sub flush_queue
 			print "writing to redis\n" if(DEBUG&DEBUG_FLUSH);
 			$redis->hmset($md5, 'LAT', $row->{'LAT'}, 'LON', $row->{'LON'}, sub {});
 		}
-		$query .=  $row->{'LAT'} . ',' . $row->{'LON'} . ",'$md5')";
+		$query .= $row->{'LAT'} . ',' . $row->{'LON'} . ",'$md5')";
 
 		# my $key = city_key($row->{'CITY'}, $row->{'COUNTY'}, $state, $country);
 		# foreach my $column(@columns) {

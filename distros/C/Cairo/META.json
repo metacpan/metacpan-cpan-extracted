@@ -61,11 +61,11 @@
       ],
       "repository" : {
          "type" : "git",
-         "url" : "git://git.gnome.org/perl-Cairo",
-         "web" : "http://git.gnome.org/browse/perl-Cairo"
+         "url" : "https://gitlab.gnome.org/GNOME/perl-cairo.git",
+         "web" : "https://gitlab.gnome.org/GNOME/perl-cairo"
       },
       "x_MailingList" : "https://mail.gnome.org/mailman/listinfo/gtk-perl-list"
    },
-   "version" : "1.107",
+   "version" : "1.108",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

@@ -32,3 +32,6 @@ Revision history for Perl extension Template::Nest.
 0.08  Wed Dec 04 23:40:02 2019
 	- Correct missing 'g' from substitution line when
 	  replacing defaults
+
+0.09  Sun Nov 29 20:51:02 2020
+	- Correct incorrect token resolution when using square bracket tokens

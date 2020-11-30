@@ -817,17 +817,17 @@ perl_png_scalar_read (png_structp pngstruct,
         croak ("Trying to read from a PNG in memory but there is no PNG in memory");
     }
 
-    MESSAGE ("Length of data is %d. "
+    MESSAGE ("Length of data is %zu. "
              "Read position is %d. "
-             "Length to read is %d. ",
+             "Length to read is %zu. ",
              png->data_length, png->read_position,
              byte_count_to_read);
     if (png->read_position + byte_count_to_read > png->data_length) {
         /* There was an attempt to read some data from a Perl scalar
            which went beyond the expected end of the scalar in
            memory. */
-        croak ("Request for too many bytes %d on a scalar "
-                        "of length %d at read position %d.\n",
+        croak ("Request for too many bytes %zu on a scalar "
+                        "of length %zu at read position %d.\n",
                         byte_count_to_read, png->data_length,
                         png->read_position);
         return;
@@ -2157,7 +2157,7 @@ static void perl_png_set_rows (perl_libpng_t * png, AV * rows)
         row_i = * av_fetch (rows, i, 0);
 	pr = (unsigned char *) SvPV (row_i, length);
 	if (length > rbytes) {
-	    warn ("Row %d is %d bytes, which is too long; truncating to %d",
+	    warn ("Row %d is %zu bytes, which is too long; truncating to %d",
 		  i, length, rbytes);
 	    length = rbytes;
 	}
@@ -2553,7 +2553,7 @@ perl_png_set_keep_unknown_chunks (perl_libpng_t * png, int keep,
             }
             chunk_i_name = SvPV (*chunk_i_sv_ptr, chunk_i_length);
             if (chunk_i_length != PERL_PNG_CHUNK_NAME_LENGTH) {
-                croak ("chunk %i has bad length %d: should be %d in chunk list", i, chunk_i_length, PERL_PNG_CHUNK_NAME_LENGTH);
+                croak ("chunk %i has bad length %zu: should be %d in chunk list", i, chunk_i_length, PERL_PNG_CHUNK_NAME_LENGTH);
             }
             MESSAGE ("Keeping chunk '%s'\n", chunk_i_name);
             for (j = 0; j < PERL_PNG_CHUNK_NAME_LENGTH; j++) {

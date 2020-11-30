@@ -36,37 +36,12 @@ qx.Class.define("callbackery.ui.Popup", {
         if (cfg.set){
             this.set(cfg.set);
         }
-        
-        // make sure it gets added tro the translation
-        this.tr('Cancel');
-        var extraAction = {
-            label : 'Cancel',
-            action : 'cancel'
-        };
-        if (cfg.cancelLabel) {
-            extraAction.label = cfg.cancelLabel;
-        }
-        cfg.instantiationMode = 'onStartup';
-        var screen = new callbackery.ui.Screen(cfg,getParentFormData,extraAction);
-        this.add(screen);
-        screen.addListener('actionResponse',function(e){
-            var data = e.getData();
-            this.fireDataEvent('actionResponse',data);
-            switch (data.action){
-                case 'dataSaved':
-                case 'cancel':
-                    this.close();
-            }
-        },this);
-        this.addListener('keydown',function(e){
-            if (e.getKeyIdentifier() == 'Escape'){
-                e.preventDefault();
-                e.stopPropagation();
-                screen.fireDataEvent('actionResponse',{action: 'cancel'});
-            }
-        },this);
+        var parentFormData = getParentFormData();
+        this.add(this._createContent(cfg,getParentFormData));
     },
     members: {
+        _screen : null,
+
         __autoMax: function() {
             let bounds = this.getApplicationRoot().getBounds();
             // make sure the window does not get larger than the screen by default ... 
@@ -74,6 +49,40 @@ qx.Class.define("callbackery.ui.Popup", {
                 this.setMaxWidth(bounds.width-20);
                 this.setMaxHeight(bounds.height-20);
             }
+        },
+        replaceContent : function(cfg,getParentFormData) {
+            this.remove(this._screen);
+            this.add(this._createContent(cfg,getParentFormData));
+        },
+        _createContent : function(cfg,getParentFormData) {
+            // make sure it gets added to the translation
+            this.tr('Cancel');
+            var extraAction = {
+                label : 'Cancel',
+                action : 'cancel'
+            };
+            if (cfg.cancelLabel) {
+                extraAction.label = cfg.cancelLabel;
+            }
+            cfg.instantiationMode = 'onStartup';
+            var screen = this._screen = new callbackery.ui.Screen(cfg,getParentFormData,extraAction);
+            screen.addListener('actionResponse',function(e){
+                var data = e.getData();
+                this.fireDataEvent('actionResponse',data);
+                switch (data.action){
+                case 'dataSaved':
+                case 'cancel':
+                    this.close();
+                }
+            },this);
+            this.addListener('keydown',function(e){
+                if (e.getKeyIdentifier() == 'Escape'){
+                    e.preventDefault();
+                    e.stopPropagation();
+                    screen.fireDataEvent('actionResponse',{action: 'cancel'});
+                }
+            },this);
+            return screen;
         }
     },
     events: {

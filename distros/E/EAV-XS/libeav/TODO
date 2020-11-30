@@ -1,2 +1,3 @@
-* Verisign IDNA support
-* fix error messages for ".@ha.com", current errmsg is wrong: local-part has too many dots
+x Verisign IDNA support
+v fix error messages for ".@ha.com", current errmsg is wrong: local-part has too many dots
+* src/is_tld.c: add hash lookup

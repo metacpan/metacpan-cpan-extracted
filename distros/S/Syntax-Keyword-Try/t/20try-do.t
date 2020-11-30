@@ -71,6 +71,13 @@ SKIP: {
 
    like( $warnings, qr/^'try do' syntax is experimental/,
       'try do syntax produces experimental warnings' );
+
+   # warning can be disabled
+   use Syntax::Keyword::Try qw( :experimental(try_value) );
+   $warnings = "";
+
+   eval "try do { 3 } catch { 4 }" or die $@;
+   is( $warnings, "", 'no warnings when :experimental(try_value) is enabled' );
 }
 
 done_testing;

@@ -1,5 +1,6 @@
 severity = 1
 [-CodeLayout::RequireASCII]
+[-CodeLayout::RequireTidyCode]
 [-Tics::ProhibitLongLines]
 [-Miscellanea::ProhibitUselessNoCritic]
 [-Compatibility::PodMinimumVersion]

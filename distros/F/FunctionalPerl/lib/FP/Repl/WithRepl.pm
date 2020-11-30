@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2015-2019 Christian Jaeger, copying@christianjaeger.ch
+# Copyright (c) 2015-2020 Christian Jaeger, copying@christianjaeger.ch
 #
 # This is free software, offered under either the same terms as perl 5
 # or the terms of the Artistic License version 2 or the terms of the
@@ -68,7 +68,7 @@ sub WithRepl_eval (&;$) {
 
     # my ($arg, $maybe_package) = @_;
     if (ref $_[0]) {
-        @_ == 1 or die "wrong number of arguments";
+        @_ == 1 or fp_croak_nargs(1);
         my ($arg) = @_;
         eval { &$arg() }
     } else {
@@ -81,7 +81,8 @@ sub WithRepl_eval (&;$) {
     }
 }
 
-sub WithRepl_eval_e ($;$$) {
+sub WithRepl_eval_e {
+    @_ >= 1 and @_ <= 3 or fp_croak_nargs("1-3");
 
     # my ($arg, $maybe_package, $wantarray) = @_;
     if (ref $_[0]) {
@@ -109,6 +110,7 @@ use FP::Repl;
 use FP::Repl::Stack;
 use Chj::TEST;
 use FP::Show;
+use FP::Carp;
 
 # test that 'no' variables are seen (yeah, could do better)
 TEST { &WithRepl_eval('"Hello $arg"') } ();
@@ -139,7 +141,8 @@ TEST {
 # bigger stack depths, easily turning algorithms into O(n^2)! Needs a
 # solution in XS.
 
-sub current_user_frame ($) {
+sub current_user_frame {
+    @_ == 1 or fp_croak_nargs 1;
     my ($skip) = @_;
     if ($skip) { $skip >= 0 or die "expecting maybe(natural0), got '$skip'"; }
     my @v;
@@ -167,7 +170,8 @@ sub current_user_frame ($) {
 
 our $debug = 0;
 
-sub have_eval_since_frame ($) {
+sub have_eval_since_frame {
+    @_ == 1 or fp_croak_nargs 1;
     my ($startframe) = @_;
 
     my @v;
@@ -214,7 +218,8 @@ SKIP: {
     0
 }
 
-sub handler_for ($$) {
+sub handler_for {
+    @_ == 2 or fp_croak_nargs 2;
     my ($startframe, $orig_handler) = @_;
     bless sub {
         my ($e) = @_;
@@ -252,7 +257,8 @@ sub handler_for ($$) {
         }, "FP::Repl::WithRepl::Handler"  # just to mark, for Chj::Backtrace ugh
 }
 
-sub handler ($) {
+sub handler {
+    @_ == 1 or fp_croak_nargs 1;
     my ($skip) = @_;
     handler_for(current_user_frame($skip), $SIG{__DIE__})
 }
@@ -273,13 +279,15 @@ TEST {
 
 our @stack;
 
-sub push_withrepl ($) {
+sub push_withrepl {
+    @_ == 1 or fp_croak_nargs 1;
     my ($skip) = @_;
     push @stack, $SIG{__DIE__};
     $SIG{__DIE__} = handler($skip);
 }
 
-sub pop_withrepl () {
+sub pop_withrepl {
+    @_ == 0 or fp_croak_nargs 0;
     $SIG{__DIE__} = pop @stack;
 }
 

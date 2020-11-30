@@ -1,5 +1,12 @@
 Revision history for MIDI-Util
 
+0.0700 2020-11-30 08:08:24
+    - Add the add_octave() function.
+    - Improve documentation.
+
+0.0602 2020-11-26 11:33:55
+    - Don't import anything from MIDI::Simple.
+
 0.0601 2020-08-26 11:02:47
     - Add missing signature documentation.
 

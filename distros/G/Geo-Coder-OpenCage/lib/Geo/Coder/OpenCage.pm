@@ -1,6 +1,6 @@
 package Geo::Coder::OpenCage;
 # ABSTRACT: Geocode coordinates and addresses with the OpenCage Geocoder
-$Geo::Coder::OpenCage::VERSION = '0.27';
+$Geo::Coder::OpenCage::VERSION = '0.28';
 use strict;
 use warnings;
 
@@ -9,7 +9,7 @@ use HTTP::Tiny;
 use JSON::MaybeXS;
 use URI;
 # FIXME - must be a way to get this from dist.ini?
-my $version = 0.27;
+my $version = 0.28;
 my $ua_string;
 
 sub new {
@@ -140,7 +140,7 @@ Geo::Coder::OpenCage - Geocode coordinates and addresses with the OpenCage Geoco
 
 =head1 VERSION
 
-version 0.27
+version 0.28
 
 =head1 SYNOPSIS
 

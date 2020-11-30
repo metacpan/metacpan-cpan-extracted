@@ -21,5 +21,5 @@ requires:
   perl: '5.006001'
 resources:
   repository: https://github.com/vasko-de-gama/Minio.git
-version: '0.04'
+version: '0.07'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

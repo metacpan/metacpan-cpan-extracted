@@ -1,10 +1,9 @@
-use strict;
 use warnings;
 
 package Git::Hooks::CheckDiff;
 # ABSTRACT: Git::Hooks plugin to enforce commit policies
-$Git::Hooks::CheckDiff::VERSION = '2.14.0';
-use 5.010;
+$Git::Hooks::CheckDiff::VERSION = '3.0.0';
+use 5.016;
 use utf8;
 use Carp;
 use Log::Any '$log';
@@ -12,67 +11,23 @@ use Git::Hooks;
 use Path::Tiny;
 
 my $PKG = __PACKAGE__;
-(my $CFG = __PACKAGE__) =~ s/.*::/githooks./;
+my $CFG = __PACKAGE__ =~ s/.*::/githooks./r;
 
 # Install hooks
-PRE_APPLYPATCH   \&check_pre_commit;
-PRE_COMMIT       \&check_pre_commit;
-UPDATE           \&check_affected_refs;
-PRE_RECEIVE      \&check_affected_refs;
-REF_UPDATE       \&check_affected_refs;
-COMMIT_RECEIVED  \&check_affected_refs;
-SUBMIT           \&check_affected_refs;
-PATCHSET_CREATED \&check_patchset;
-DRAFT_PUBLISHED  \&check_patchset;
+GITHOOKS_CHECK_AFFECTED_REFS \&_check_ref;
+GITHOOKS_CHECK_PRE_COMMIT    \&check_commit;
+GITHOOKS_CHECK_PATCHSET      \&check_patchset;
 
-sub check_pre_commit {
-    my ($git) = @_;
-
-    $log->debug(__PACKAGE__ . "::check_pre_commit");
-
-    my $current_branch = $git->get_current_branch();
-
-    return 1 unless $git->is_reference_enabled($current_branch);
+sub check_commit {
+    my ($git, $current_branch) = @_;
 
     return _check_everything($git, {ref => $current_branch}, qw/diff-index --cached HEAD/);
 }
 
 sub check_patchset {
-    my ($git, $opts) = @_;
-
-    $log->debug(__PACKAGE__ . "::check_patchset");
-
-    return 1 if $git->im_admin();
-
-    # The --branch argument contains the branch short-name if it's in the
-    # refs/heads/ namespace. But we need to always use the branch long-name,
-    # so we change it here.
-    my $branch = $opts->{'--branch'};
-    $branch = "refs/heads/$branch"
-        unless $branch =~ m:^refs/:;
-
-    return 1 unless $git->is_reference_enabled($branch);
-
-    my $commit = $opts->{'--commit'};
+    my ($git, $branch, $commit) = @_;
 
     return _check_everything($git, {ref => $branch, commit => $commit}, 'diff-tree', $commit);
-}
-
-sub check_affected_refs {
-    my ($git) = @_;
-
-    $log->debug(__PACKAGE__ . "::check_affected_refs");
-
-    return 1 if $git->im_admin();
-
-    my $errors = 0;
-
-    foreach my $ref ($git->get_affected_refs()) {
-        next unless $git->is_reference_enabled($ref);
-        $errors += _check_ref($git, $ref);
-    }
-
-    return $errors == 0;
 }
 
 sub _check_ref {
@@ -215,14 +170,6 @@ sub _check_token {
     my @deny_tokens = $git->get_config($CFG => 'deny-token')
         or return 0;
 
-    if ($git->version_lt('1.7.4')) {
-        $git->fault(<<'EOS', {option => 'deny-token'});
-This option requires Git 1.7.4 or later but your Git is older.
-Please, upgrade your Git or disable this option.
-EOS
-        return 1;
-    }
-
     my $errors = 0;
 
     foreach my $deny_token (@deny_tokens) {
@@ -295,7 +242,7 @@ Git::Hooks::CheckDiff - Git::Hooks plugin to enforce commit policies
 
 =head1 VERSION
 
-version 2.14.0
+version 3.0.0
 
 =head1 SYNOPSIS
 
@@ -374,7 +321,7 @@ option:
     [githooks]
       plugin = CheckDiff
 
-=for Pod::Coverage check_affected_refs check_patchset check_pre_commit
+=for Pod::Coverage check_patchset check_commit
 
 =head1 NAME
 
@@ -411,8 +358,6 @@ a '!' character, which reverses the matching logic, effectively selecting paths
 not matching it. If the remaining string initiates with a '^' it's treated as a
 Perl regular expression anchored at the beginning, which is used to match file
 paths. Otherwise, the string matches files paths having it as a prefix.
-
-Note that this option requires Git 1.7.4 or newer.
 
 =head2 shell COMMAND
 

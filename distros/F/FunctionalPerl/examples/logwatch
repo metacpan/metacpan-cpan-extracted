@@ -170,7 +170,7 @@ my ($r, $w) = xpipe;
 
 use Chj::xtmpfile;
 
-sub xtmpfile_noautoclean() {
+sub xtmpfile_noautoclean () {
     my $t = xtmpfile;
     $t->autoclean(0);
     $t

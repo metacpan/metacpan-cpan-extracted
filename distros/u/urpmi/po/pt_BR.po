@@ -11,8 +11,8 @@
 # Felipe Arruda <felipemiguel@gmail.com>, 2006,2008
 # Gustavo Sverzut Barbieri <gustavo@linuxdicas.com.br>, 2003
 # Klaus Orian Vicaro <kvicaro@gmx.net>, 2004
-# lucasbackes <inactive+lucasbackes@transifex.com>, 2014
-# lucasbackes <inactive+lucasbackes@transifex.com>, 2014
+# ecc43ba9615e67defa05f36a41c75f2e_2b4afea <bf58dbd5cfe5ceb008fbc18c571e578a_190276>, 2014
+# ecc43ba9615e67defa05f36a41c75f2e_2b4afea <bf58dbd5cfe5ceb008fbc18c571e578a_190276>, 2014
 # Marcio Andre Padula <padula1000@gmail.com>, 2013-2014
 # Marcio Andre Padula <padula1000@gmail.com>, 2015-2016,2019
 # Michael Martins <michaelfm21@gmail.com>, 2017
@@ -25,9 +25,9 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: Mageia\n"
-"POT-Creation-Date: 2020-01-18 09:59+0200\n"
-"PO-Revision-Date: 2019-07-23 22:28+0000\n"
-"Last-Translator: Michael Martins <michaelfm21@gmail.com>\n"
+"POT-Creation-Date: 2020-07-10 17:41+0100\n"
+"PO-Revision-Date: 2020-07-10 16:45+0000\n"
+"Last-Translator: Marcio Andre Padula <padula1000@gmail.com>\n"
 "Language-Team: Portuguese (Brazil) (http://www.transifex.com/MageiaLinux/"
 "mageia/language/pt_BR/)\n"
 "Language: pt_BR\n"
@@ -81,7 +81,7 @@ msgstr "Baixando o pacote `%s'..."
 msgid "Cancel"
 msgstr "Cancelar"
 
-#: ../gurpm/RPMProgressDialog.pm:359 ../urpm.pm:452 ../urpm/download.pm:882
+#: ../gurpm/RPMProgressDialog.pm:359 ../urpm.pm:454 ../urpm/download.pm:882
 #: ../urpm/get_pkgs.pm:277 ../urpm/media.pm:1149 ../urpm/media.pm:1682
 #: ../urpm/media.pm:1833
 #, c-format
@@ -298,7 +298,7 @@ msgstr ""
 "%s\n"
 "Prosseguir com a instalação mesmo assim?"
 
-#: ../gurpmi2:120
+#: ../gurpmi2:120 ../gurpmi2:386
 #, c-format
 msgid "Warning"
 msgstr "Aviso"
@@ -428,6 +428,16 @@ msgstr "Instalação concluída"
 msgid "restarting urpmi"
 msgstr "reiniciando urpmi"
 
+#: ../gurpmi2:386
+#, c-format
+msgid "No"
+msgstr "Não"
+
+#: ../gurpmi2:386
+#, c-format
+msgid "Yes"
+msgstr "Sim"
+
 #: ../rpm-find-leaves:15
 #, c-format
 msgid ""
@@ -477,138 +487,138 @@ msgstr "Executando o urpmi no modo restrito..."
 msgid "While some packages may have been installed, there were failures.\n"
 msgstr "Houve falhas enquanto instalava alguns pacotes.\n"
 
-#: ../urpm.pm:193
+#: ../urpm.pm:195
 #, c-format
 msgid "fail to create directory %s"
 msgstr "falha ao criar diretório %s"
 
-#: ../urpm.pm:194
+#: ../urpm.pm:196
 #, c-format
 msgid "invalid owner for directory %s"
 msgstr "dono inválido para diretório %s"
 
-#: ../urpm.pm:237
+#: ../urpm.pm:239
 #, c-format
 msgid "Can not download packages into %s"
 msgstr "Não foi possível fazer o download dos programas em %s"
 
-#: ../urpm.pm:253
+#: ../urpm.pm:255
 #, c-format
 msgid "Environment directory %s does not exist"
 msgstr "Diretório de ambiente %s não existe"
 
-#: ../urpm.pm:254 ../urpmf:244 ../urpmq:163
+#: ../urpm.pm:256 ../urpmf:244 ../urpmq:163
 #, c-format
 msgid "using specific environment on %s\n"
 msgstr "usando o ambiente específico em %s\n"
 
-#: ../urpm.pm:422
+#: ../urpm.pm:424
 #, c-format
 msgid "unable to open rpmdb"
 msgstr "incapaz de abrir rpmdb"
 
-#: ../urpm.pm:441
+#: ../urpm.pm:443
 #, c-format
 msgid "invalid rpm file name [%s]"
 msgstr "nome rpm inválido [%s]"
 
-#: ../urpm.pm:447
+#: ../urpm.pm:449
 #, c-format
 msgid "retrieving rpm file [%s] ..."
 msgstr "buscando o arquivo rpm [%s]...."
 
-#: ../urpm.pm:449 ../urpm/get_pkgs.pm:275
+#: ../urpm.pm:451 ../urpm/get_pkgs.pm:275
 #, c-format
 msgid "...retrieving done"
 msgstr "...busca completa"
 
-#: ../urpm.pm:457
+#: ../urpm.pm:459
 #, c-format
 msgid "unable to access rpm file [%s]"
 msgstr "incapaz de acessar o arquivo rpm [%s]"
 
-#: ../urpm.pm:462
+#: ../urpm.pm:464
 #, c-format
 msgid "unable to parse spec file %s [%s]"
 msgstr "incapaz de processar arquivo spec %s [%s]"
 
-#: ../urpm.pm:470
+#: ../urpm.pm:472
 #, c-format
 msgid "unable to register rpm file"
 msgstr "incapaz de registrar arquivo rpm"
 
-#: ../urpm.pm:472
+#: ../urpm.pm:474
 #, c-format
 msgid "Incompatible architecture for rpm [%s]"
 msgstr "Arquitetura incompatível para o rpm [%s]"
 
-#: ../urpm.pm:476
+#: ../urpm.pm:478
 #, c-format
 msgid "error registering local packages"
 msgstr "erro ao registrar pacotes locais"
 
-#: ../urpm.pm:588
+#: ../urpm.pm:590
 #, c-format
 msgid "This operation is forbidden while running in restricted mode"
 msgstr "Esta operação não é permitida no modo restrito"
 
-#: ../urpm/args.pm:156 ../urpm/args.pm:165
+#: ../urpm/args.pm:157 ../urpm/args.pm:166
 #, c-format
 msgid "bad proxy declaration on command line\n"
 msgstr "declaração de proxy errada na linha de comando\n"
 
-#: ../urpm/args.pm:320
+#: ../urpm/args.pm:321
 #, c-format
 msgid "urpmq: cannot read rpm file \"%s\"\n"
 msgstr "urpmq: não pode ler o arquivo rpm \"%s\"\n"
 
-#: ../urpm/args.pm:388
+#: ../urpm/args.pm:389
 #, c-format
 msgid "unexpected expression %s"
 msgstr "expressão inesperada %s"
 
-#: ../urpm/args.pm:389
+#: ../urpm/args.pm:390
 #, c-format
 msgid "missing expression before %s"
 msgstr "expressão faltando antes %s"
 
-#: ../urpm/args.pm:395
+#: ../urpm/args.pm:396
 #, c-format
 msgid "unexpected expression %s (suggestion: use -a or -o ?)"
 msgstr "expressão inesperada %s (sugestão: usar -a ou -o ?)"
 
-#: ../urpm/args.pm:399
+#: ../urpm/args.pm:400
 #, c-format
 msgid "no expression to close"
 msgstr "sem expressão para fechar"
 
-#: ../urpm/args.pm:408
+#: ../urpm/args.pm:409
 #, c-format
 msgid "by default urpmf awaits a regexp. you should use option \"--literal\""
 msgstr ""
 "por padrão urpmf espera uma regexp. você pode usar a opção \"--literal\""
 
-#: ../urpm/args.pm:482
+#: ../urpm/args.pm:483
 #, c-format
 msgid "chroot directory doesn't exist"
 msgstr "diretório chroot não existe"
 
-#: ../urpm/args.pm:505
+#: ../urpm/args.pm:506
 #, c-format
 msgid "Can't use %s without %s"
 msgstr "Não é possível usar %s sem %s"
 
-#: ../urpm/args.pm:508 ../urpm/args.pm:511 ../urpmq:155
+#: ../urpm/args.pm:509 ../urpm/args.pm:512 ../urpmq:155
 #, c-format
 msgid "Can't use %s with %s"
 msgstr "Não é possível usar %s com %s"
 
-#: ../urpm/args.pm:519
+#: ../urpm/args.pm:520
 #, c-format
 msgid "Too many arguments\n"
 msgstr "Muitos parâmetros\n"
 
-#: ../urpm/args.pm:527
+#: ../urpm/args.pm:528
 #, c-format
 msgid ""
 "%s version %s\n"
@@ -625,7 +635,7 @@ msgstr ""
 "\n"
 "uso:\n"
 
-#: ../urpm/args.pm:533
+#: ../urpm/args.pm:534
 #, c-format
 msgid "Copyright (C) %s by %s"
 msgstr "Copyright (C) %s por %s"
@@ -827,49 +837,49 @@ msgstr "buscando os arquivos rpm da mídia \"%s\"..."
 msgid "removing %s"
 msgstr "removendo %s"
 
-#: ../urpm/install.pm:215
+#: ../urpm/install.pm:217
 #, c-format
 msgid "unable to extract rpm from delta-rpm package %s"
 msgstr "incapaz de extrair rpm do pacote delta-rpm %s"
 
-#: ../urpm/install.pm:242
+#: ../urpm/install.pm:245
 #, c-format
 msgid "unable to install package %s"
 msgstr "incapaz de instalar o pacote %s"
 
-#: ../urpm/install.pm:245
+#: ../urpm/install.pm:248
 #, c-format
 msgid "removing bad rpm (%s) from %s"
 msgstr "removendo rpm ruim (%s) de %s"
 
-#: ../urpm/install.pm:246 ../urpm/install.pm:393
+#: ../urpm/install.pm:249 ../urpm/install.pm:397
 #, c-format
 msgid "removing %s failed: %s"
 msgstr "removendo %s com falha: %s"
 
-#: ../urpm/install.pm:295
+#: ../urpm/install.pm:298
 #, c-format
 msgid "removing package %s"
 msgstr "removendo pacote %s"
 
-#: ../urpm/install.pm:359
+#: ../urpm/install.pm:362
 #, c-format
 msgid ""
 "created transaction for installing on %s (remove=%d, install=%d, upgrade=%d)"
 msgstr ""
 "Criada transação para instalar em %s (remover=%d, instalar=%d, atualizar=%d)"
 
-#: ../urpm/install.pm:362
+#: ../urpm/install.pm:365
 #, c-format
 msgid "unable to create transaction"
 msgstr "incapaz de criar a transação"
 
-#: ../urpm/install.pm:391
+#: ../urpm/install.pm:395
 #, c-format
 msgid "removing installed rpms (%s) from %s"
 msgstr "removendo rpms instalados (%s) de %s"
 
-#: ../urpm/install.pm:400
+#: ../urpm/install.pm:404
 #, c-format
 msgid "More information on package %s"
 msgstr "Mais informações no pacote %s"
@@ -1085,11 +1095,11 @@ msgid "un-ignoring tainted medium `%s' b/c tainted packages are installed"
 msgstr "ignorando tainted medio `%s' b/c pacotes tainted sera instalados"
 
 #: ../urpm/media.pm:816
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "un-ignoring 32bit medium `%s' b/c 32-bit packages are installed or system is "
 "32-bit EFI"
-msgstr "Ignorando a mídia 32bit `%s' sistema b/c é 32-bit EFI"
+msgstr ""
 
 #: ../urpm/media.pm:844
 #, c-format
@@ -3222,7 +3232,7 @@ msgid ""
 msgstr ""
 "sem xml info para a mídia \"%s\", incapaz de retornar resultados para %s"
 
-#: ../urpmq:487
+#: ../urpmq:488
 #, c-format
 msgid "No changelog found\n"
 msgstr "Arquivo com as alterações não foi encontrado \n"

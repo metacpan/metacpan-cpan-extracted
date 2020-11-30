@@ -1,5 +1,9 @@
 Revision history for Perl extension Text-ANSI-Fold
 
+2.07 2020-11-20T08:54:39Z
+
+    - Add dependency for List::Util.
+
 2.06 2020-11-12T04:18:29Z
 
     - More robust definition of CSI sequence.

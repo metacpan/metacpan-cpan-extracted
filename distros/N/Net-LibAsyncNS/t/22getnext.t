@@ -1,8 +1,9 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
 
 use strict;
+use warnings;
 
-use Test::More tests => 10;
+use Test::More;
 use Test::Refcount;
 
 use Net::LibAsyncNS;
@@ -45,3 +46,5 @@ is_deeply( \@done,
              [ "127.0.0.1", 12346 ],
              [ "127.0.0.1", 12347 ] ],
            'Queries gave the right answers' );
+
+done_testing;

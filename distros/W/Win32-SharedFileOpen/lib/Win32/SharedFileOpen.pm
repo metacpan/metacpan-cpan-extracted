@@ -121,7 +121,7 @@ BEGIN {
 
     Exporter::export_ok_tags(qw(retry));
     
-    $VERSION = '4.03';
+    $VERSION = '4.04';
 
     # Get the ERROR_SHARING_VIOLATION constant loaded now, otherwise loading it
     # later the first time that we test for an error can actually interfere with
@@ -1328,7 +1328,7 @@ that is even leaner and meaner than using C<Symbol::gensym()>: the "First-Class
 Filehandle Trick".  It is described in an article by Mark-Jason Dominus called
 "Seven Useful Uses of Local", which first appeared in The Perl Journal and can
 also be found (at the time of writing) on his website at the URL
-L<http://perl.plover.com/local.html>.  It consists simply of the following:
+L<https://perl.plover.com/local.html>.  It consists simply of the following:
 
     my $fh = do { local *FH };
 
@@ -1543,13 +1543,13 @@ Currently active requests on the CPAN Request Tracker can be viewed at
 L<https://rt.cpan.org/Public/Dist/Display.html?Status=Active;Queue=Win32-SharedFileOpen>.
 
 Please test this distribution.  See CPAN Testers Reports at
-L<http://www.cpantesters.org/> for details of how to get involved.
+L<https://www.cpantesters.org/> for details of how to get involved.
 
 Previous test results on CPAN Testers Reports can be viewed at
-L<http://www.cpantesters.org/distro/W/Win32-SharedFileOpen.html>.
+L<https://www.cpantesters.org/distro/W/Win32-SharedFileOpen.html>.
 
 Please rate this distribution on CPAN Ratings at
-L<http://cpanratings.perl.org/rate/?distribution=Win32-SharedFileOpen>.
+L<https://cpanratings.perl.org/rate/?distribution=Win32-SharedFileOpen>.
 
 =head1 SEE ALSO
 
@@ -1592,9 +1592,9 @@ L<perlmodlib/"CPAN"> for details) at
 
 L<https://metacpan.org/release/Win32-SharedFileOpen> or
 
-L<http://www.cpan.org/authors/id/S/SH/SHAY/> or
+L<https://www.cpan.org/authors/id/S/SH/SHAY/> or
 
-L<http://www.cpan.org/modules/by-module/Win32/>.
+L<https://www.cpan.org/modules/by-module/Win32/>.
 
 The latest source code is available from GitHub at
 L<https://github.com/steve-m-hay/Win32-SharedFileOpen>.
@@ -1609,7 +1609,7 @@ Steve Hay E<lt>L<shay@cpan.org|mailto:shay@cpan.org>E<gt>.
 
 =head1 COPYRIGHT
 
-Copyright (C) 2001-2008, 2013-2015 Steve Hay.  All rights reserved.
+Copyright (C) 2001-2008, 2013-2015, 2018, 2020 Steve Hay.  All rights reserved.
 
 =head1 LICENCE
 
@@ -1619,11 +1619,11 @@ License or the Artistic License, as specified in the F<LICENCE> file.
 
 =head1 VERSION
 
-Version 4.03
+Version 4.04
 
 =head1 DATE
 
-31 Jul 2018
+25 Nov 2020
 
 =head1 HISTORY
 

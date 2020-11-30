@@ -39,7 +39,7 @@ my %WriteMakefileArgs = (
     "Test::More" => 0,
     "Weasel::Driver::Mock" => "0.02"
   },
-  "VERSION" => "0.14",
+  "VERSION" => "0.15",
   "test" => {
     "TESTS" => "t/*.t"
   }

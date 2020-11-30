@@ -6,6 +6,51 @@ pod_spelling_system:
   stopwords:
     - unparseable
     - bitmask
+    - Acklam
+    - Alexey
+    - Andreas
+    - Bron
+    - Chrysostomos
+    - DAVIDRW
+    - Denaxas
+    - Esterer
+    - FWILES
+    - Froehlich
+    - Gondwana
+    - Graeme
+    - Grossmann
+    - Hanak
+    - Hedlund
+    - Hukins
+    - Kapranoff
+    - Karaban
+    - Kilgore
+    - Koenig
+    - Legner
+    - Lipcon
+    - Ondrej
+    - Rabbitson
+    - Rezic
+    - Rolf
+    - Schilli
+    - Sjogren
+    - Skytt
+    - Slaven
+    - Spiros
+    - Steinbrunner
+    - Stosberg
+    - Toru
+    - Tourbin
+    - Ville
+    - Yamaguchi
+    - Zefram
+    - amire
+    - jefflee
+    - mschilli
+    - murphy
+    - phrstbrn
+    - sasao
+
 
 pod_coverage:
   skip: 0

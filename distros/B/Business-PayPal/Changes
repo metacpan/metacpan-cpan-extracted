@@ -1,5 +1,10 @@
 Revision history for Perl extension Business::PayPal.
 
+0.20 2020.04.23
+    - Maintainer changed to Josh Rabinowitz.
+    - Give names to unnamed tests.
+    - Update to new cert valid Mar 10 00:00:00 2020 GMT - Mar 15 12:00:00 2022 GMT.
+
 0.19 2020.03.07
     - New certs.
     - Cleaning up white-spaces.

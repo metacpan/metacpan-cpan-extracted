@@ -6,14 +6,14 @@ TEST("method") {
     auto req = Request::Builder().uri("/").build();
     string mstr;
     bool clforce = false;
-    SECTION("OPTIONS") { mstr = "OPTIONS"; req->method_raw(Method::OPTIONS); }
-    SECTION("GET")     { mstr = "GET";     req->method_raw(Method::GET);}
-    SECTION("HEAD")    { mstr = "HEAD";    req->method_raw(Method::HEAD); }
-    SECTION("POST")    { mstr = "POST";    req->method_raw(Method::POST); clforce = true; }
-    SECTION("PUT")     { mstr = "PUT";     req->method_raw(Method::PUT); clforce = true; }
-    SECTION("DELETE")  { mstr = "DELETE";  req->method_raw(Method::DELETE); }
-    SECTION("TRACE")   { mstr = "TRACE";   req->method_raw(Method::TRACE); }
-    SECTION("CONNECT") { mstr = "CONNECT"; req->method_raw(Method::CONNECT); }
+    SECTION("OPTIONS") { mstr = "OPTIONS"; req->method_raw(Method::Options); }
+    SECTION("GET")     { mstr = "GET";     req->method_raw(Method::Get);}
+    SECTION("HEAD")    { mstr = "HEAD";    req->method_raw(Method::Head); }
+    SECTION("POST")    { mstr = "POST";    req->method_raw(Method::Post); clforce = true; }
+    SECTION("PUT")     { mstr = "PUT";     req->method_raw(Method::Put); clforce = true; }
+    SECTION("DELETE")  { mstr = "DELETE";  req->method_raw(Method::Delete); }
+    SECTION("TRACE")   { mstr = "TRACE";   req->method_raw(Method::Trace); }
+    SECTION("CONNECT") { mstr = "CONNECT"; req->method_raw(Method::Connect); }
 
     string extra;
     if (clforce) extra = "Content-Length: 0\r\n";
@@ -63,7 +63,7 @@ TEST("http version") {
 
 TEST("example") {
     auto req = Request::Builder()
-        .method(Method::POST)
+        .method(Method::Post)
         .uri("http://crazypanda.ru/hello/world")
         .http_version(10)
         .headers(Headers().add("MyHeader", "my value"))

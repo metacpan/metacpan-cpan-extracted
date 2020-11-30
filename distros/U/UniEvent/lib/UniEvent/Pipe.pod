@@ -1,0 +1,117 @@
+=head1 NAME
+
+UniEvent::Pipe - file streaming abstraction on local machine
+
+=head1 SYNOPSIS
+
+    my $loop = UniEvent::Loop->new);
+    # just a client
+	my $client = UniEvent::Pipe->new($loop);
+	$client->connect('/path/to/pipe', sub {
+		my ($client, $err) = @_;
+        die $err if $err;
+        $client->write("hello");
+
+        $client->read_callback(sub {
+            my ($handle, $data, $err) = @_;
+            die $err if $err;
+            say "got $data";
+        	$client->shutdown(sub {
+        		say "post-shutdown callback";
+            });
+        });
+	});
+
+    # pair of connected sockets
+    my ($reader, $writer) = UniEvent::Pipe::pair($loop);
+
+
+=head1 DESCRIPTION
+
+Pipe handles provide an abstraction over streaming files on Unix
+(including local domain sockets, pipes, and FIFOs) and named pipes on Windows.
+It is inherited from L<UniEvent::Stream>.
+
+=head1 FUNCTIONS
+
+=head2 pair($reader, $writer)
+
+=head2 pair($loop)
+
+Opens a pair of connected pipes like the corresponding system call. If only
+C<$loop> argument is specified, then C<$reader> and C<$writer> pipes
+are created and connected.
+
+If C<$writer> is missing, it will be created.
+
+It returns pair of L<UniEvent::Pipe> handles.
+
+See L<perlipc> and L<pipe> how to work with pair of connected pipes.
+
+=head1 METHODS
+
+=head2 new([$loop = UniEvent::Loop->default_loop, [$ipc = false]])
+
+Constructs new Pipe handle and binds it to the specified event loop. The C<$ipc>
+argument is a boolean to indicate if this pipe will be used for handle passing
+between processes (which may change the bytes on the wire). Only a connected pipe
+that will be passing the handles should have this flag set, not the listening pipe.
+
+The Pipe hanlde is inherited from L<UniEvent::Handle>.
+
+=head2 open($fd, [$connected = false])
+
+Open an existing file descriptor C<$fd> as a pipe. The C<$connected> flag marks
+the connected state of the stream (see L<UniEvent::Stream>).
+
+=head2 bind($name)
+
+Bind the pipe to a file path (Unix) or a name (Windows). On windows it should
+be something like C<"\\\\.\\pipe\\$name">.
+
+=head2 connect($name [, $callback = undef]).
+
+Connect to the Unix domain socket or the named pipe. Optionally the C<$callback>
+can be specified, which will be called upon connect. The C++ signature is:
+
+    void(const StreamSP& handle, const ErrorCode& err, const ConnectRequestSP& req)
+
+i.e. it will be invoked as:
+
+    $callback->($pipe_handle, $error_code, $connect_request)
+
+The method returns L<connect_request|UniEvent::Request::Connect>, using which the
+connection request can be tracked.
+
+=head2 sockname()
+
+Get the name of the Unix domain socket or the named pipe.
+
+=head2 peername()
+
+Get the name of the Unix domain socket or the named pipe which the handle
+is connected to.
+
+=head2 pending_instances($count)
+
+Set the number of pending pipe instance handles when the pipe server is waiting
+for connections. Applicable for Windows only.
+
+=head1 CONSTANTS
+
+=head2 TYPE
+
+Pipe type constant
+
+=head1 REFERENCES
+
+L<UniEvent::Handle>
+
+L<UniEvent::Stream>
+
+L<UniEvent::Request::Connect>
+
+L<XS::Framework::CallbackDispatcher>
+
+=cut
+

@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2007-2019 Christian Jaeger, copying@christianjaeger.ch
+# Copyright (c) 2007-2020 Christian Jaeger, copying@christianjaeger.ch
 #
 # This is free software, offered under either the same terms as perl 5
 # or the terms of the Artistic License version 2 or the terms of the
@@ -33,6 +33,8 @@ our @EXPORT      = qw(exitcode);
 our @EXPORT_OK   = qw(exitcode);
 our %EXPORT_TAGS = (all => \@EXPORT_OK);
 
+use FP::Carp;
+
 package Chj::Unix::Exitcode::Exitcode {
 
     use Chj::Unix::Signal;
@@ -65,7 +67,8 @@ package Chj::Unix::Exitcode::Exitcode {
     end Chj::Class::Array;
 }
 
-sub exitcode ( $ ) {
+sub exitcode {
+    @_ == 1 or fp_croak_nargs 1;
     my ($code) = @_;
     Chj::Unix::Exitcode::Exitcode->new($code)->as_string;
 }

@@ -33,8 +33,10 @@ lives_ok {
         return $p;'
     );
     $parser->read('t/example-compare_native_perl-3.txt');
-    my $root = $parser->_ExAWK_symbol_table;
-    is( scalar( keys %{$root} ),        0, 'No more shared variables' );
+    my (%stash) = $parser->stashed;
+    is( scalar( keys %stash ), 3, 'Can read all stashed variables' );
+    is_deeply( [ $parser->stashed(qw(school grade info)) ],
+        [qw(Hogwarts 3 Score)], 'Last values for each of these variables' );
     is( scalar( $parser->get_records ), 2, 'Two records' );
     is_deeply(
         [ $parser->get_records ],

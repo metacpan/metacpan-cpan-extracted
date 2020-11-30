@@ -56,6 +56,6 @@
          "web" : "https://github.com/dmitry-novozhilov/simple-backuper"
       }
    },
-   "version" : "v0.2.15",
+   "version" : "v0.2.17",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

@@ -120,6 +120,7 @@ use FP::Predicates ":all";
 #use Chj::TEST;
 use FP::List;
 use FP::Combinators2 qw(right_associate_);
+use FP::Carp;
 
 # import the constructors of the classes defined below
 for my $name (@classes) {
@@ -165,7 +166,8 @@ package FP::AST::Perl::Var {
     "FP::AST::Perl::Var";    ## XX Are those not all auto generated MAN ???
 
 # XX move to FP::Predicates? Or FP::Parser::Perl ?
-sub is_lexvar_string ($) {
+sub is_lexvar_string {
+    @_ == 1 or fp_croak_nargs 1;
     my ($str) = @_;
     $str =~ /^\w+\z/
 }
@@ -219,7 +221,7 @@ package FP::AST::Perl::Expr {
 }
 
 *is_expr         = instance_of "FP::AST::Perl::Expr";
-*is_nonnoop_expr = both * is_expr, complement * is_noop;
+*is_nonnoop_expr = both \&is_expr, complement \&is_noop;
 
 # Do we need to distinguish context (list vs. scalar [vs. void]),
 # really? No, since the *dynamic* context determines this!
@@ -287,7 +289,7 @@ package FP::AST::Perl::App {
 
     use FP::Struct [
         [*FP::AST::Perl::is_expr, 'proc'],
-        [list_of * FP::AST::Perl::is_expr, 'argexprs'],
+        [list_of(*FP::AST::Perl::is_expr), 'argexprs'],
 
         # ^ yes, proc is also an expr, but only yielding one (usable)
         # value, as opposed to argexprs which may yield more used
@@ -411,8 +413,8 @@ package FP::AST::Perl::Noop {
 
 *is_noop = instance_of "FP::AST::Perl::Noop";
 
-*semicolons = right_associate_ * Semicolon, Noop();
-*commas     = right_associate_ * Comma,     Noop();
+*semicolons = right_associate_ \&Semicolon, Noop();
+*commas     = right_associate_ \&Comma,     Noop();
 
 package FP::AST::Perl::Let {
     use FP::Predicates;
@@ -420,7 +422,7 @@ package FP::AST::Perl::Let {
     use FP::Ops ":all";
 
     use FP::Struct [
-        [list_of * FP::AST::Perl::is_var, 'vars'],
+        [list_of(*FP::AST::Perl::is_var), 'vars'],
         [*FP::AST::Perl::is_nonnoop_expr, 'expr'],
         [*FP::AST::Perl::is_expr,         'body'],
     ] => "FP::AST::Perl::Expr";

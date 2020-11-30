@@ -57,7 +57,7 @@ use PPIx::Regexp::Util qw{
 
 use Scalar::Util qw{ looks_like_number };
 
-our $VERSION = '0.075';
+our $VERSION = '0.076';
 
 our $DEFAULT_POSTDEREF;
 defined $DEFAULT_POSTDEREF
@@ -223,6 +223,10 @@ sub cookie {
     my ( $self, $name, @args ) = @_;
     defined $name
 	or confess "Programming error - undefined cookie name";
+    if ( $self->{trace} ) {
+	local $" = ', ';
+	warn "cookie( '$name', @args )\n";
+    }
     @args or return $self->{cookie}{$name};
     my $cookie = shift @args;
     if ( CODE_REF eq ref $cookie ) {
@@ -232,6 +236,20 @@ sub cookie {
     } else {
 	return delete $self->{cookie}{$name};
     }
+}
+
+# NOTE: Currently this is called only against
+# COOKIE_LOOKAROUND_ASSERTION, once in PPIx::Token::GroupType::Assertion
+# to prevent the cookie from being remade if it already exists, and once
+# in PPIx::Regexp::Token::Assertion to determine if \K is inside a
+# lookaround assertion. If it gets used other places, or if there is
+# call for it, I should consider removing the underscores and
+# documenting it as public.
+sub __cookie_exists {
+    my ( $self, $name ) = @_;
+    defined $name
+	or confess "Programming error - undefined cookie name";
+    return $self->{cookie}{$name};
 }
 
 sub default_modifiers {

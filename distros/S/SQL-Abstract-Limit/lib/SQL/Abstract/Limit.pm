@@ -15,7 +15,7 @@ SQL::Abstract::Limit - portable LIMIT emulation
 
 =cut    
 
-our $VERSION = '0.141';
+our $VERSION = '0.142';
 
 # additions / error reports welcome !
 our %SyntaxMap = (  mssql    => 'Top',
@@ -154,7 +154,7 @@ or an arrayref, or C<undef>.
 
 sub select {
     my $self   = shift;
-    my $table  = $self->_table(shift);
+    my $table  = shift;
     my $fields = shift;
     my $where  = shift; #  if ref( $_[0] ) eq 'HASH';
 
@@ -162,9 +162,8 @@ sub select {
     
     $fields ||= '*';    # in case someone supplies '' or undef
 
-    # with no LIMIT parameters, defer to SQL::Abstract [ don't know why the first way fails ]
-    # return $self->SUPER::select( $table, $fields, $where, $order ) unless $rows;
-    return SQL::Abstract->new->select( $table, $fields, $where, $order ) unless $rows;
+    # with no LIMIT parameters, defer to SQL::Abstract
+    return $self->SUPER::select( $table, $fields, $where, $order ) unless $rows;
     
     # with LIMIT parameters, get the basic SQL without the ORDER BY clause
     my ( $sql, @bind ) = $self->SUPER::select( $table, $fields, $where );
@@ -213,7 +212,7 @@ sub where
 
     my ( $sql, @bind );
 
-    if ( $rows )
+    if ( defined $rows )
     {
         ( $sql, @bind ) = $self->SUPER::where( $where );
         
@@ -238,7 +237,7 @@ sub _get_args {
 
     my $order  = shift;
     my $rows   = shift;
-    my $offset = shift if ( $_[0] && $_[0] =~ /^\d+$/ );
+    my $offset = shift if ( defined $_[0] && $_[0] =~ /^\d+$/ );
     my $syntax = shift || $self->_default_limit_syntax;
 
     return $order, $rows, $offset, $syntax;
@@ -824,7 +823,7 @@ This method relies on having a column with unique values as the first column in
 the C<SELECT> clause (i.e. the first column in the C<\@fields> parameter). The
 results will be sorted by that unique column, so any C<$order> parameter is
 ignored, unless it matches the unique column, in which case the direction of
-the sort is honoured.
+the sort is honored.
 
 =over 8
 
@@ -869,7 +868,8 @@ sub _GenericSubQ {
 
     # get specified sort order and swap it to get the expected output (I think?)
     my ( $asc_desc ) = $order_by =~ /\b$pk\s+(ASC|DESC)\s*/i;
-    $asc_desc = uc( $asc_desc ) || 'ASC';
+    $asc_desc = 'ASC' unless defined $asc_desc;
+    $asc_desc = uc( $asc_desc );
     $asc_desc = $asc_desc eq 'ASC' ? 'DESC' : 'ASC';
 
     $sql =~ s/FROM $table /FROM $table X /;
@@ -1123,19 +1123,18 @@ L<DBIx::RecordSet|DBIx::RecordSet>.
 
 =head1 BUGS
 
-Please report all bugs via the CPAN Request Tracker at
+Please report all bugs (patches welcome) via GitHub
+at Lhttps://github.com/asb-capfan/SQL-Abstract-Limit>
+or via the CPAN Request Tracker at
 L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=SQL-Abstract-Limit>.
 
-=head1 COPYRIGHT AND LICENSE
+=head1 AUTHOR, COPYRIGHT AND LICENSE
 
-Copyright 2004 by David Baird.
+Copyright 2004-2020 by David Baird.
+Currently maintained by Alexander Becker.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
-
-=head1 AUTHOR
-
-David Baird, C<cpan@riverside-cms.co.uk>
 
 =head1 HOW IS IT DONE ELSEWHERE
 

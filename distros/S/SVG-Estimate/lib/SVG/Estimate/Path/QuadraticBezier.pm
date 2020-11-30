@@ -1,5 +1,5 @@
 package SVG::Estimate::Path::QuadraticBezier;
-$SVG::Estimate::Path::QuadraticBezier::VERSION = '1.0114';
+$SVG::Estimate::Path::QuadraticBezier::VERSION = '1.0115';
 use Moo;
 use List::Util qw/min max/;
 use Clone qw/clone/;
@@ -15,7 +15,7 @@ SVG::Estimate::Path::QuadraticBezier - Handles estimating quadratic bezier curve
 
 =head1 VERSION
 
-version 1.0114
+version 1.0115
 
 =head1 SYNOPSIS
 
@@ -80,7 +80,7 @@ sub BUILDARGS {
     $args->{min_y} = min $args->{start_point}->[1], $args->{control}->[1], $args->{point}->[1];
     $args->{max_y} = max $args->{start_point}->[1], $args->{control}->[1], $args->{point}->[1];
 
-    $args->{shape_length}  = $class->segment_length($args, 0, 1, $start, $end, 1e-4, 5, 0);
+    $args->{shape_length}  = $class->segment_length($args, 0, 1, $start, $end, 1e-4, 7, 0);
     $args->{travel_length} = 0;
 
     return $args;

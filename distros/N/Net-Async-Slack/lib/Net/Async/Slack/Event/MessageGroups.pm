@@ -3,7 +3,7 @@ package Net::Async::Slack::Event::MessageGroups;
 use strict;
 use warnings;
 
-our $VERSION = '0.004'; # VERSION
+our $VERSION = '0.005'; # VERSION
 
 use Net::Async::Slack::EventType;
 

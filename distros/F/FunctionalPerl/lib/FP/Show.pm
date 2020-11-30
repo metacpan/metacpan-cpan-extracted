@@ -124,8 +124,10 @@ use Scalar::Util qw(reftype);
 use Devel::Peek q(DumpWithOP);
 use Capture::Tiny qw(capture_stderr);
 use Scalar::Util qw(blessed);
+use FP::Carp;
 
-sub keyshow ($) {
+sub keyshow {
+    @_ == 1 or fp_croak_nargs 1;
     my ($str) = @_;
     (
         $str =~ /^\w+$/s
@@ -233,22 +235,23 @@ our $primitive_show = +{
     },
 };
 
-sub show ($) {
+sub show {
+    @_ == 1 or fp_croak_nargs 1;
     my ($v) = @_;
     if (defined blessed($v)) {
         if (my $m = $v->can("FP_Show_show")) {
-            (&$m($v, *show))[0]
+            (&$m($v, \&show))[0]
         } elsif ($m = $$primitive_show{ reftype $v}) {
 
             # blessed basic type
-            my ($str, $includes_blessing) = &$m($v, *show);
+            my ($str, $includes_blessing) = &$m($v, \&show);
             $includes_blessing ? $str : "bless($str, " . &show(ref($v)) . ")"
         } else {
             terseDumper($v)
         }
     } elsif (length(my $r = ref $v)) {
         if (my $m = $$primitive_show{$r}) {
-            (&$m($v, *show))[0]
+            (&$m($v, \&show))[0]
         } else {
             terseDumper($v)
         }

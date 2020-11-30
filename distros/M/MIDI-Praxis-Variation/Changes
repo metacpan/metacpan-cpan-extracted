@@ -1,5 +1,8 @@
 Revision history for MIDI::Praxis::Variation
 
+0.0606 2020-11-26 11:36:29
+    - Don't import anything from MIDI::Simple.
+
 0.0605 2020-08-11 15:58:56
     - Improve SYNOPSIS.
 

@@ -1,5 +1,18 @@
 Revision history for Text-Parser
 
+1.000     2020-11-27 20:38:18-08:00 America/Los_Angeles
+  - Replaces many error classes in Text::Parser::Errors with a single class Text::Parser::Error.
+    - Text::Parser::Error is just a child of Throwable::Error and can be handled as all Throwable::Error objects.
+    - This is not backward compatible with previous versions which were throwing objects of Text::Parser::Errors.
+  - New attribute line_wrap_style, new method custom_line_unwrap_routines
+  - New attributes track_indentation, indentation_str, and custom_line_trimmer
+  - New methods custom_line_unwrap_routines, and this_indent in Text::Parser
+  - Feature to use 'stashed variables'.
+  - 2x performance improvement.
+  - Text::Parser::RuleSpec provides syntactical sugar to subclass Text::Parser
+    - Text::Parser::RuleSpec provides syntactical sugar to subclass Text::Parser: applies_rule, unwraps_lines_using, disables_superclass_rules
+  - Improved POD documentation to reflect latest features
+
 0.927     2019-06-22 20:35:56-07:00 America/Los_Angeles
   - Speed improvement: reduced runtime of read() calls to about 50% of original runtime.
   - Added an initial version of Text::Parser::RuleSpec. Not ready for use yet. Don't use this yet.

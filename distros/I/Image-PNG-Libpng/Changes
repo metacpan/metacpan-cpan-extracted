@@ -1,3 +1,8 @@
+0.48 2020-11-22
+
+- Makefile.PL and printf fixes
+- Add ppport.h to distribution
+
 0.47 2020-09-17
 
 - Added "split_alpha"

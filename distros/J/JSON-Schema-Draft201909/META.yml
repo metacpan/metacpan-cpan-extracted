@@ -44,29 +44,57 @@ no_index:
 provides:
   JSON::Schema::Draft201909:
     file: lib/JSON/Schema/Draft201909.pm
-    version: '0.016'
+    version: '0.017'
   JSON::Schema::Draft201909::Annotation:
     file: lib/JSON/Schema/Draft201909/Annotation.pm
-    version: '0.016'
+    version: '0.017'
   JSON::Schema::Draft201909::Document:
     file: lib/JSON/Schema/Draft201909/Document.pm
-    version: '0.016'
+    version: '0.017'
   JSON::Schema::Draft201909::Error:
     file: lib/JSON/Schema/Draft201909/Error.pm
-    version: '0.016'
+    version: '0.017'
   JSON::Schema::Draft201909::Result:
     file: lib/JSON/Schema/Draft201909/Result.pm
-    version: '0.016'
+    version: '0.017'
+  JSON::Schema::Draft201909::Utilities:
+    file: lib/JSON/Schema/Draft201909/Utilities.pm
+    version: '0.017'
+  JSON::Schema::Draft201909::Vocabulary:
+    file: lib/JSON/Schema/Draft201909/Vocabulary.pm
+    version: '0.017'
+  JSON::Schema::Draft201909::Vocabulary::Applicator:
+    file: lib/JSON/Schema/Draft201909/Vocabulary/Applicator.pm
+    version: '0.017'
+  JSON::Schema::Draft201909::Vocabulary::Content:
+    file: lib/JSON/Schema/Draft201909/Vocabulary/Content.pm
+    version: '0.017'
+  JSON::Schema::Draft201909::Vocabulary::Core:
+    file: lib/JSON/Schema/Draft201909/Vocabulary/Core.pm
+    version: '0.017'
+  JSON::Schema::Draft201909::Vocabulary::Format:
+    file: lib/JSON/Schema/Draft201909/Vocabulary/Format.pm
+    version: '0.017'
+  JSON::Schema::Draft201909::Vocabulary::MetaData:
+    file: lib/JSON/Schema/Draft201909/Vocabulary/MetaData.pm
+    version: '0.017'
+  JSON::Schema::Draft201909::Vocabulary::Validation:
+    file: lib/JSON/Schema/Draft201909/Vocabulary/Validation.pm
+    version: '0.017'
 requires:
+  B: '0'
   Carp: '0'
+  Exporter: '0'
   File::ShareDir: '0'
   JSON::MaybeXS: '1.004001'
   JSON::PP: '0'
   List::Util: '1.55'
+  Module::Runtime: '0'
   Mojo::JSON::Pointer: '0'
   Mojo::URL: '0'
   Mojolicious: '7.23'
   Moo: '0'
+  Moo::Role: '0'
   MooX::HandlesVia: '0'
   MooX::TypeTiny: '0.002002'
   Path::Tiny: '0'
@@ -87,10 +115,10 @@ resources:
   bugtracker: https://github.com/karenetheridge/JSON-Schema-Draft201909/issues
   homepage: https://github.com/karenetheridge/JSON-Schema-Draft201909
   repository: https://github.com/karenetheridge/JSON-Schema-Draft201909.git
-version: '0.016'
+version: '0.017'
 x_Dist_Zilla:
   perl:
-    version: '5.033002'
+    version: '5.033004'
   plugins:
     -
       class: Dist::Zilla::Plugin::Run::BeforeRelease
@@ -634,7 +662,7 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::EnsureLatestPerl
       config:
         Dist::Zilla::Plugin::EnsureLatestPerl:
-          Module::CoreList: '5.20200920'
+          Module::CoreList: '5.20201120'
       name: '@Author::ETHER/EnsureLatestPerl'
       version: '0.008'
     -
@@ -798,7 +826,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v0.016
+          tag: v0.017
           tag_format: v%V
           tag_message: v%v%t
         Dist::Zilla::Role::Git::Repo:
@@ -992,7 +1020,7 @@ x_Dist_Zilla:
       is_trial: '0'
     version: '6.017'
 x_authority: cpan:ETHER
-x_generated_by_perl: v5.33.2
+x_generated_by_perl: v5.33.4
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'
 x_static_install: 1

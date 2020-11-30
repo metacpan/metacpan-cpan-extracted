@@ -1,0 +1,87 @@
+use alienfile;
+use strict;
+use Config;
+
+plugin 'Probe::CBuilder' => (
+  libs    => '-lsnappy',
+  lang    => 'C++', # to include snappy-stubs-public.h
+  version => qr/version = 'version = [0-9\.]+'/,
+  program => <<'EO_SNAPPY_VERSION'
+#include <stdio.h>
+#include <snappy-c.h>
+#include <snappy-stubs-public.h>
+
+int main() {
+printf("version = '%d.%d.%d', link_ok='%d'\n", SNAPPY_MAJOR, SNAPPY_MINOR, SNAPPY_PATCHLEVEL, snappy_max_compressed_length(1));
+return 0;
+}
+EO_SNAPPY_VERSION
+);
+
+meta->after_hook( probe_system => sub {
+    my ($build) = @_;
+    use Data::Dumper;
+    print Dumper($build);
+  #$build->runtime_prop->{$flag} = '-Wl,-rpath,/usr/pkg/lib ' . $build->runtime_prop->{$flag};
+});
+
+after 'gather' => sub {
+    my ($build) = @_;
+    use Data::Dumper; CORE::say Dumper($build);
+};
+
+share {
+    # The tarball from the 1.1.8 release and the 1.1.8 tag produce different
+    # libraries -- and from some preliminary testing, the tarball version isn't
+    # compatible with most existing uses(?!).
+    # Could be the bug github bug that's been biting me with libgraphqlparser,
+    # where they sometimes serve the wrong binaries.  Still, the tag never lies,
+    # so download that:
+    plugin 'Download::GitHub' => (
+        github_user => 'google',
+        github_repo => 'snappy',
+        tags_only   => 1,
+        prefer      => '1.1.8',
+    );
+
+    plugin Extract => 'tar.gz';
+
+    patch [
+        '%{patch} -p1 < %{.install.patch}/0001-fPIC-for-the-static-library.patch',
+    ];
+
+    plugin 'Build::CMake' => ();
+    my @cmake_args = (
+        '-DSNAPPY_BUILD_TESTS=OFF', # otherwise it requires a bunch of libraries
+        '-DCMAKE_CXX_STANDARD=11',
+        '-DCMAKE_CXX_STANDARD_REQUIRED=ON',
+        '-DCMAKE_CXX_EXTENSIONS=NO',
+        @{ meta->prop->{plugin_build_cmake}->{args} },
+        '%{.install.extract}',
+    );
+    build [
+        [
+            '%{cmake}', '.',
+                '-DBUILD_SHARED_LIBS=OFF',
+                @cmake_args,
+        ],
+        '%{make} VERBOSE=1',
+        '%{make} install',
+        '%{make} clean',
+        [
+            '%{cmake}', '.',
+                '-DBUILD_SHARED_LIBS=ON',
+                @cmake_args,
+        ],
+        '%{make}',
+        '%{make} install',
+    ];
+
+    gather sub {
+        my ($build) = @_;
+        my $prefix = $build->runtime_prop->{prefix};
+        $build->runtime_prop->{cflags}      ||= " -I$prefix/include ";
+        $build->runtime_prop->{libs}        ||= " -L$prefix/lib -lsnappy ";
+        $build->runtime_prop->{libs_static} ||= " -L$prefix/lib -lsnappy -stdlib=libc++ ",
+    };
+}

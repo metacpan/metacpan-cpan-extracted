@@ -1,0 +1,94 @@
+Revision history for RDF::LDF
+
+0.251  2020-11-30 10:26:07 CET
+  - Adding more travis platforms to build
+
+0.25  2019-10-08 10:06:15 CEST
+  - Adding missing dependencies [manwar]
+
+0.24  2018-05-30 13:00:57 CEST
+  - Release 0.24
+
+0.23_01  2018-05-28 14:59:17 CEST
+  - Update to use hydra:template rather than VoID
+
+0.23  2017-05-09 14:35:20 CEST
+  - Fixing changing state of global RDF::Trine useragent bug
+
+0.22  2016-05-12 16:24:47 CEST
+  - Fixing stale hydra statements which end up in result set
+
+0.21  2016-04-04 10:52:38 CEST
+  - Better handling of accept headers
+
+0.20  2016-04-04 10:50:12 CEST
+  - Better handling of accept headers
+
+0.19  2016-03-31 20:47:34 CEST
+  - Update page predicates to latest Hydra spec which breaks existing LDF clients
+
+0.18  2016-03-16 11:46:48 CET
+  - Removing the caching component into a separate module
+
+0.17  2016-02-22 10:36:32 CET
+  - Removing Data::Util dependency
+
+0.16  2015-12-10 09:38:40 CET
+  - Fix missing JSON-LD support bug
+
+0.15  2015-06-24 16:04:14 CEST
+  - Provide better UTF8 tests and updated the documentation
+  - Add support for federated queries
+
+0.14  2015-05-27 11:37:24 CEST
+  - Make LDF parser more forgiving for UTF-8 errors in the http response
+
+0.13  2015-05-27 09:27:30 CEST
+  - Fixing utf8 problem
+
+0.12  2015-05-22 09:54:00 CEST
+  - Requiring minimal RDF::NS for the REVERSE method
+
+0.11  2015-05-22 09:32:21 CEST
+  - Downgrading Perl dependencies
+
+0.10  2015-05-21 10:18:52 CEST
+  - Deleting some dependencies
+
+0.09  2015-05-06 13:03:50 CEST
+  - Minor fixed in build scripts
+
+0.08  2015-04-24 09:53:02 CEST
+  - Fixing command line creating JSON as output
+
+0.07  2015-03-18 11:09:23 CET
+  - Fixing missing Throwable
+  - Fixing UTF-8 security bug in File::Slurp
+
+0.06  2015-03-16 13:10:10 CET
+  - Update requirements for HTTP::Message
+  - Fixing Error and Moo conflict
+
+0.05  2015-02-26 21:35:38 CET
+  - adding better error handling
+  - Catmandu::Error->throw is called but not loaded
+  - use RDF::Trine::Parser to load URL contents into a model
+  - use URI::Template in constructing fragment URLs
+  - Improved use of RDF::Trine user agent and added mocked network tests
+  - Enabled more get_pattern tests
+  - Network test are optional with RDFLDF_NETWORK_TESTS=1
+
+0.04  2015-02-23 16:38:51 CET
+  - fixing the non-zero results bug
+  - adding example sparql for testing
+
+0.03  2015-02-23 15:09:04 CET
+  - adding RDF::Trine::Store support
+  - adding a ldf-client.pl command line client
+  - provide example sparql queries
+
+0.02  2015-02-19 20:24:24 CET
+  - adding required modules in cpanfile
+
+0.01  2015-02-19 10:48:34 CET
+  - initial release

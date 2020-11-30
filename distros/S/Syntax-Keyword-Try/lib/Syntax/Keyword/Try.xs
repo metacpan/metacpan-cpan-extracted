@@ -7,32 +7,6 @@
 #include "perl.h"
 #include "XSUB.h"
 
-/* Before perl 5.22 these were not visible */
-
-#ifndef cv_clone
-#define cv_clone(a)            Perl_cv_clone(aTHX_ a)
-#endif
-
-#ifndef block_end
-#define block_end(a,b)         Perl_block_end(aTHX_ a,b)
-#endif
-
-#ifndef block_start
-#define block_start(a)         Perl_block_start(aTHX_ a)
-#endif
-
-#ifndef intro_my
-#define intro_my()             Perl_intro_my(aTHX)
-#endif
-
-#ifndef OpSIBLING
-#define OpSIBLING(op)          (op->op_sibling)
-#endif
-
-#ifndef OpMORESIB_set
-#define OpMORESIB_set(op,sib)  ((op)->op_sibling = (sib))
-#endif
-
 #define HAVE_PERL_VERSION(R, V, S) \
     (PERL_REVISION > (R) || (PERL_REVISION == (R) && (PERL_VERSION > (V) || (PERL_VERSION == (V) && (PERL_SUBVERSION >= (S))))))
 
@@ -54,17 +28,7 @@ typedef I32 array_ix_t;
 #  include "wrap_keyword_plugin.c.inc"
 #endif
 
-/* On Perl 5.14 this had a different name */
-#ifndef pad_add_name_pvn
-#define pad_add_name_pvn(name, len, flags, typestash, ourstash)  MY_pad_add_name(aTHX_ name, len, flags, typestash, ourstash)
-PADOFFSET MY_pad_add_name(pTHX_ const char *name, STRLEN len, U32 flags, HV *typestash, HV *ourstash)
-{
-  /* perl 5.14's Perl_pad_add_name requires a NUL-terminated name */
-  SV *namesv = sv_2mortal(newSVpvn(name, len));
-
-  return Perl_pad_add_name(aTHX_ SvPV_nolen(namesv), SvCUR(namesv), flags, typestash, ourstash);
-}
-#endif
+#include "perl-backcompat.c.inc"
 
 #include "lexer-additions.c.inc"
 
@@ -249,7 +213,7 @@ static OP *MY_newSTATEOP_nowarnings(pTHX)
   ((COP *)op)->cop_warnings = warnings;
 
   warning_bits = (char *)(warnings + 1);
-  warning_bits[Off(2*WARN_EXITING)] &= ~Bit(2*WARN_EXITING);
+  warning_bits[(2*WARN_EXITING) / 8] &= ~(1 << (2*WARN_EXITING % 8));
 
   return op;
 }
@@ -467,8 +431,10 @@ static int try_keyword(pTHX_ OP **op)
     is_value = TRUE;
 
 #ifdef WARN_EXPERIMENTAL
-    Perl_ck_warner(aTHX_ packWARN(WARN_EXPERIMENTAL),
-      "'try do' syntax is experimental and may be changed or removed without notice");
+    if(!hints || !hv_fetchs(hints, "Syntax::Keyword::Try/experimental(try_value)", 0)) {
+      Perl_ck_warner(aTHX_ packWARN(WARN_EXPERIMENTAL),
+        "'try do' syntax is experimental and may be changed or removed without notice");
+    }
 #endif
   }
 

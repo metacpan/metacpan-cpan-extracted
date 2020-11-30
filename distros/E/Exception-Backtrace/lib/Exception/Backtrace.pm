@@ -1,15 +1,14 @@
 package Exception::Backtrace;
 use 5.018;
 use warnings;
-use XS::libpanda;
-use XS::libdwarf;
-use XS::Framework;
+
+use XS::libpanda::backtrace;
 
 use overload
     '""'     => sub { shift->{_value} },
     fallback => 1;
 
-our $VERSION = '1.0.9';
+our $VERSION = '1.0.10';
 
 
 require XS::Loader;

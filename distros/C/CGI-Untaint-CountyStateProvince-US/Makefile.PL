@@ -13,6 +13,7 @@ WriteMakefile(
     PL_FILES            => {},
     TEST_REQUIRES => {
 	'Test::Most' => 0,
+	'File::Spec' => 3.4,
     },
     PREREQ_PM => {
 	'CGI::Untaint' => 0,

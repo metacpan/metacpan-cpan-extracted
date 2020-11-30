@@ -1,11 +1,14 @@
 ##----------------------------------------------------------------------------
 ## A real Try Catch Block Implementation Using Perl Filter - ~/lib/Nice/Try.pm
-## Version v0.1.5
+## Version v0.1.6
 ## Copyright(c) 2020 DEGUEST Pte. Ltd.
-## Author: Jacques Deguest <@gabriel.tokyo.deguest.jp>
+## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2020/05/17
-## Modified 2020/09/13
+## Modified 2020/11/08
+## All rights reserved
 ## 
+## This program is free software; you can redistribute  it  and/or  modify  it
+## under the same terms as Perl itself.
 ##----------------------------------------------------------------------------
 package Nice::Try;
 BEGIN
@@ -18,7 +21,7 @@ BEGIN
     use Scalar::Util;
     use List::Util ();
     # use Devel::Confess;
-    our $VERSION = 'v0.1.5';
+    our $VERSION = 'v0.1.6';
     our $ERROR;
     our( $CATCH, $DIED, $EXCEPTION, $FINALLY, $HAS_CATCH, @RETVAL, $SENTINEL, $TRY, $WANTARRAY );
 }
@@ -238,7 +241,7 @@ sub _parse
             my $spaces = [];
             foreach my $arr ( @$tmp_ref )
             {
-                $self->_messagef( 3, "Adding statement block with %d children after '$last_obj'", scalar( @$arr ) );
+                $self->_message( 3, "Adding statement block with ", scalar( @$arr ), " children after '$last_obj'" );
                 ## Get the trailing insignificant elements at the end of the statement and move them out of the statement
                 my $insignificants = [];
                 while( scalar( @$arr ) > 0 )
@@ -260,26 +263,68 @@ sub _parse
                     $st->add_element( $old );
                 }
                 my $err = '';
-                ## $self->_messagef( 3, "Adding the statement object after last object of class '%s'.", $last_obj->class );
-                my $rc = $last_obj->insert_after( $st );
+                $self->_messagef( 3, "Adding the statement object after last object '%s' of class '%s' with parent with class '%s'.", Scalar::Util::refaddr( $last_obj ), $last_obj->class, $last_obj->parent->class );
+                $self->_message( 4, "In other word, adding:\n'$st'\nAFTER:\n'$last_obj'" );
+                # my $rc = $last_obj->insert_after( $st );
+                my $rc;
+                if( $last_obj->class eq 'PPI::Token::Whitespace' )
+                {
+                    $rc = $last_obj->__insert_after( $st );
+                }
+                else
+                {
+                    $rc = $last_obj->insert_after( $st );
+                }
+                
                 if( !defined( $rc ) )
                 {
                     $err = sprintf( 'Object to be added after last try-block statement must be a PPI::Element. Class provided is \"%s\".', $st->class );
                 }
                 elsif( !$rc )
                 {
-                    $err = sprintf( "Object of class \"%s\" could not be added after object of class '%s': '$last_obj'.", $st->class, $last_obj->class );
+                    $err = sprintf( "Object of class \"%s\" could not be added after object '%s' of class '%s' with parent '%s' with class '%s': '$last_obj'.", $st->class, Scalar::Util::refaddr( $last_obj ), $last_obj->class, Scalar::Util::refaddr( $last_obj->parent ), $last_obj->parent->class );
                 }
-                $last_obj = $st;
-                if( scalar( @$insignificants ) )
+                else
                 {
-                    ## $self->_messagef( 3, "Adding %d trailing insignificant objects after last element of class '%s'", scalar( @$insignificants ), $last_obj->class );
-                    foreach my $o ( @$insignificants )
+                    $last_obj = $st;
+                    if( scalar( @$insignificants ) )
                     {
-                        ## $self->_messagef( 3, "Adding trailing insignificant object of class '%s' after last element of class '%s'", $o->class, $last_obj->class );
-                        $last_obj->insert_after( $o ) ||
-                        warn( "Failed to insert object of class '", $o->class, "' before last object of class '", $st->class, "'\n" );
-                        $last_obj = $o;
+                        ## $self->_messagef( 3, "Adding %d trailing insignificant objects after last element of class '%s'", scalar( @$insignificants ), $last_obj->class );
+                        foreach my $o ( @$insignificants )
+                        {
+                            ## $self->_messagef( 3, "Adding trailing insignificant object of class '%s' after last element of class '%s'", $o->class, $last_obj->class );
+                            ## printf( STDERR "Inserting object '%s' (%s) of type '%s' after object '%s' (%s) of type %s who has parent '%s' of type '%s'\n", overload::StrVal( $o ), Scalar::Util::refaddr( $o ), ref( $o ), overload::StrVal( $last_obj), Scalar::Util::refaddr( $last_obj ), ref( $last_obj ), overload::StrVal( $last_obj->parent ), ref( $last_obj->parent ) );
+                            eval
+                            {
+                                $rc = $last_obj->insert_after( $o ) ||
+                                do
+                                {
+                                    warn( "Failed to insert object of class '", $o->class, "' before last object of class '", $st->class, "'\n" ) if( $self->{debug} );
+                                };
+                            };
+                            if( $@ )
+                            {
+                                if( ref( $o ) )
+                                {
+                                    warn( "Failed to insert object of class '", $o->class, "' before last object of class '", $st->class, "': $@\n" ) if( $self->{debug} );
+                                }
+                                else
+                                {
+                                    warn( "Was expecting an object to insert before last object of class '", $st->class, "', but instead got '$o': $@\n" ) if( $self->{debug} );
+                                }
+                            }
+                            elsif( !defined( $rc ) )
+                            {
+                                warn( sprintf( 'Object to be added after last try-block statement must be a PPI::Element. Class provided is \"%s\".', $o->class ) ) if( $self->{debug} );
+                            }
+                            elsif( !$rc )
+                            {
+                                warn( sprintf( "Object of class \"%s\" could not be added after object of class '%s': '$last_obj'.", $o->class, $last_obj->class ) ) if( $self->{debug} );
+                            }
+                            ## printf( STDERR "Object inserted '%s' (%s) of class '%s' now has parent '%s' (%s) of class '%s'\n", overload::StrVal( $o ), Scalar::Util::refaddr( $o ), ref( $o ), overload::StrVal( $o->parent ), Scalar::Util::refaddr( $o->parent ), ref( $o->parent ) );
+                            $o->parent( $last_obj->parent ) if( !$o->parent );
+                            $last_obj = $o;
+                        }
                     }
                 }
                 die( $err ) if( length( $err ) );
@@ -1081,7 +1126,7 @@ When run, this would produce, as one would expect:
 
 =head1 VERSION
 
-    v0.1.5
+    v0.1.6
 
 =head1 DESCRIPTION
 

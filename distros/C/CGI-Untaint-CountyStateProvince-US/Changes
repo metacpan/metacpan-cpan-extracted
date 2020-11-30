@@ -1,5 +1,9 @@
 Revision history for CGI-Untaint-CountyStateProvince-US
 
+0.04	Mon Nov 23 08:38:22 EST 2020
+	Fix http://www.cpantesters.org/cpan/report/a376e91c-b37f-11e7-bcf2-71d4db1c1d4b
+	Fix RT#108877
+
 0.03	Mon Oct 16 14:22:09 EDT 2017
 	Bump minimum version of Locale::SubCountry to 1.47
 	Corrected some variable names and the contact e-mail address.

@@ -20,7 +20,7 @@ module. `mod-inventory-storage` defines the FOLIO inventory formats: one each fo
 and
 [item records](https://github.com/folio-org/mod-inventory-storage/blob/master/ramls/item.json).
 
-However, many libraries remain wedded to [MARC records](https://en.wikipedia.org/wiki/MARC_standards), a standard from the 1960s that has comfortably outlives many of the citics who have pronounced its death over the years. FOLIO therefore provides a Source Record Storage (SRS) facility. Using this, MARC records may be uploaded to a FOLIO service. When this upload is performed using
+However, many libraries remain wedded to [MARC records](https://en.wikipedia.org/wiki/MARC_standards), a standard from the 1960s that has comfortably outlived many of the citics who have pronounced its death over the years. FOLIO therefore provides a Source Record Storage (SRS) facility. Using this, MARC records may be uploaded to a FOLIO service. When this upload is performed using
 [`mod-data-import`](https://github.com/folio-org/mod-data-import),
 the records are automatically converted into instance records which are inked to the source records -- the latter being retained by the system and remaining the version of record.
 

@@ -1,6 +1,6 @@
-Date::Extract::P800Picture is Copyright (C) 2008-2019, Roland van Ipenburg
+Date::Extract::P800Picture is Copyright (C) 2008-2020, Roland van Ipenburg
 
-Date::Extract::P800Picture version v1.1.2
+Date::Extract::P800Picture version v1.1.4
 =========================================
 
 This module can be used to extract the date and hour found in the filenames
@@ -27,13 +27,21 @@ DEPENDENCIES
 
 This module requires these other modules and libraries:
 
-  Exception::Class    0
-  English          1.04
-  Readonly         1.03
-  DateTime         0.45
-  POSIX            1.13
-  Moose               0
-  Test::More       0.86
+  Exception::Class           0
+  English                 1.04
+  Readonly                1.03
+  DateTime                0.45
+  POSIX                   1.13
+  Moose                      0
+  Log::Log4perl              0
+  Image::ExifTool            0
+  File::Basename             0
+  File::Slurp                0
+  File::stat                 0
+  Getopt::Long               0
+  Pod::Usage                 0
+  Pod::Usage::CommandLine    0
+  Test::More              0.86
 
 LICENSE INFORMATION
 

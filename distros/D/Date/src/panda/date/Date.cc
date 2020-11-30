@@ -18,7 +18,7 @@ inline static ptime_t date_cmp (const datetime& d1, uint32_t mks1, const datetim
     return epoch_cmp(pseudo_epoch(d1), mks1, pseudo_epoch(d2), mks2);
 }
 
-void Date::set (string_view str, const Timezone* zone, int fmt) {
+void Date::set (string_view str, const TimezoneSP& zone, int fmt) {
     if (zone) _zone = zone;
     parse(str, fmt); // parse() can parse and create zone
     if (!_zone) _zone = tzlocal();
@@ -31,7 +31,7 @@ void Date::set (string_view str, const Timezone* zone, int fmt) {
     else epoch(0);
 }
 
-void Date::set (int32_t year, ptime_t month, ptime_t day, ptime_t hour, ptime_t min, ptime_t sec, ptime_t mksec, int isdst, const Timezone* zone) {
+void Date::set (int32_t year, ptime_t month, ptime_t day, ptime_t hour, ptime_t min, ptime_t sec, ptime_t mksec, int isdst, const TimezoneSP& zone) {
     _zone_set(zone);
     _error      = errc::ok;
     _date.year  = year;
@@ -53,7 +53,7 @@ void Date::set (int32_t year, ptime_t month, ptime_t day, ptime_t hour, ptime_t 
     if (_range_check) validate_range();
 }
 
-void Date::set (const Date& source, const Timezone* zone) {
+void Date::set (const Date& source, const TimezoneSP& zone) {
     _error = source._error;
     if (!zone || _error != errc::ok) {
         _has_epoch  = source._has_epoch;

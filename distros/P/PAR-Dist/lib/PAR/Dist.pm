@@ -4,7 +4,7 @@ use strict;
 require Exporter;
 use vars qw/$VERSION @ISA @EXPORT @EXPORT_OK $DEBUG/;
 
-$VERSION    = '0.50';
+$VERSION    = '0.51';
 @ISA        = 'Exporter';
 @EXPORT     = qw/
   blib_to_par
@@ -1094,12 +1094,11 @@ sub _unzip_to_tmpdir {
     require Cwd;
 
     my $dist   = File::Spec->rel2abs($args{dist});
-    my $tmpdirname = File::Spec->catdir(File::Spec->tmpdir, "parXXXXX");
-    my $tmpdir = File::Temp::mkdtemp($tmpdirname)
-      or die "Could not create temporary directory from template '$tmpdirname': $!";
+    my $tmpdir = File::Temp::tempdir("parXXXXX", TMPDIR => 1, CLEANUP => 1)
+      or die "Could not create temporary directory: $!";
+    $tmpdir = Cwd::abs_path($tmpdir);  #  symlinks cause Archive::Zip issues on some systems
     my $path = $tmpdir;
     $path = File::Spec->catdir($tmpdir, $args{subdir}) if defined $args{subdir};
-    $path = Cwd::realpath($path);  #  symlinks cause Archive::Zip issues on some systems
 
     _unzip(dist => $dist, path => $path);
 

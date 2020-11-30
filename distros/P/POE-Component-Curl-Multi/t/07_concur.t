@@ -50,7 +50,8 @@ sub client_got_response {
     warn "`", '-' x 78, "\n";
   };
 
-  is ($http_response->code, 200, 'Got OK response');
+  is ($http_response->code, 200, 'Got OK response')
+    or diag( $http_response->as_string );
 
   $heap->{count}--;
   $kernel->post( weeble => 'shutdown' ) if $heap->{count} <= 0;

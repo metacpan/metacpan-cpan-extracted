@@ -74,9 +74,6 @@ extern "C" {
     Copies the actual path into outpath, (an error
     if the length in outpath_len is less than needed
     for the object found).
-    For non-MacOS outpath will contain the string
-    taken from path.
-
     If DW_DLV_NO_ENTRY or DW_DLV_ERROR returned
     the argument values other than path
     must be considered to be in an unknown state. */

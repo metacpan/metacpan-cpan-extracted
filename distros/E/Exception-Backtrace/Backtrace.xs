@@ -1,8 +1,8 @@
 #include <xs.h>
 #include "src/xs/backtrace.h"
+#include <panda/backtrace.h>
 
 using namespace xs;
-using namespace panda::backtrace;
 using namespace panda;
 
 MODULE = Exception::Backtrace                PACKAGE = Exception::Backtrace
@@ -11,7 +11,11 @@ PROTOTYPES: DISABLE
 BOOT {
     backtrace_c_marker.svt_free = &xs::payload_backtrace_c_free;
     install_exception_processor();  // XS::Framework
-    install_backtracer();           // XS::libpanda
+
+    panda::backtrace::install();
+    xs::at_perl_destroy([]{
+        panda::backtrace::uninstall();
+     });
 }
 
 panda::string get_backtrace_string(Ref except) {

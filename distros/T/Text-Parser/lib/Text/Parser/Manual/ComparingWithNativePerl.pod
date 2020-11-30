@@ -15,7 +15,7 @@ Text::Parser::Manual::ComparingWithNativePerl - A comparison of text parsing wit
 
 =head1 VERSION
 
-version 0.927
+version 1.000
 
 =head1 LIMITATIONS OF THE PERL ONE-LINER
 
@@ -23,9 +23,9 @@ When people compare Perl against AWK, the usual answer is this:
 
     $ > perl -lane 'print;' file.txt
 
-But the problem is that it isn't useful for anything more than just oneliners. Secondly, this cannot be used in a complex program. And even if you could write some one-liner code, you cannot follow good programming practices like C<use strict>.
+But the problem is that it isn't useful for anything more than just oneliners. Secondly, this cannot be used in a complex program. And even if you could write some code in a separate file, you cannot follow good programming practices like C<use strict>.
 
-The Perl one-liner is surely not a useful solution for serious programs. But if you're not convinced, we'll go through some examples here.
+The Perl one-liner is surely not a useful solution for serious programs that have to parse the content of complex file formats. But if you're not convinced, we'll go through some examples here.
 
 =head1 A SIMPLE EXAMPLE
 
@@ -50,11 +50,13 @@ You have to write code that would parse this to create a data structure with all
     .
     .
 
+The important thing to note is that C<NAME>, and C<ADDRESS> fields can be long strings.
+
 =head2 Perl one-liner
 
 Could we do this using a Perl one-liner?
 
-    perl -lane 'BEGIN {
+    perl -lane 'BEGIN {\
         @data = ();\
         }\
         if($F[0] eq "NAME:") {\
@@ -68,7 +70,7 @@ Could we do this using a Perl one-liner?
             $d->{address} = join ' ', @F;\
         }' info.txt
 
-So much for a one-liner! But you can't do anything else with this, can you?
+So much for a one-liner! But you can't make it shorter, can you?
 
 =head2 Native Perl script
 
@@ -98,11 +100,11 @@ Here's how you'd write the same thing with L<Text::Parser>.
     use Text::Parser;
 
     my $parser = Text::Parser->new();
-    $parser->add_rule( if => '$1 eq "NAME:"', do => 'return { name => ${2+} }' );
+    $parser->add_rule( if => '$1 eq "NAME:"', do => 'return { name => ${2+} };' );
     $parser->add_rule( if => '$1 eq "EMAIL:"',
-        do => 'my $rec = $this->pop_record; $rec->{email} = $2; return $rec' );
+        do => 'my $rec = $this->pop_record; $rec->{email} = $2; return $rec;' );
     $parser->add_rule( if => '$1 eq "ADDRESS:"',
-        do => 'my $rec = $this->pop_record; $rec->{email} = ${2+}; return $rec' );
+        do => 'my $rec = $this->pop_record; $rec->{email} = ${2+}; return $rec;' );
     $parser->read('info.txt');
 
 =head2 Quick observations
@@ -129,7 +131,7 @@ parsing files has never been this intuiive, especially with shortcuts like C<${2
 
 =back
 
-Besides, did you notice the bug in the C<while> loop of the native Perl script above? Hint: What happens if we C<split> a string with leading and trailing spaces?
+Besides, did you notice the bug in the C<while> loop of the native Perl script above? It is hard to notice.
 
 =head1 ANOTHER SIMPLE EXAMPLE
 
@@ -290,7 +292,7 @@ You want to parse this into a data structure like this:
 
 This problem comes from L<a source|https://stackoverflow.com/questions/47982949/how-to-parse-complex-text-files-using-python/47984221> where the solution was implemented in Python using a PEG parser.
 
-=head2 Native Perl
+=head2 Perl on-liner or Native Perl
 
 Do I have to really do this? Why don't I let you try this yourself.
 
@@ -299,15 +301,21 @@ Do I have to really do this? Why don't I let you try this yourself.
     use Text::Parser;
 
     my $parser = Text::Parser->new(FS => qr/\s+\=\s+|,\s+/);
-    $parser->add_rule(if => '$1 eq "School"',
-        do => '~school = $2; return {$2 => {}};');
-    $parser->add_rule(if => '$1 eq "Grade"',
-        do => 'my $p = $this->pop_record;
-        $p->{~school}{$2} = {};
-        ~grade = $2;
-        return $p;');
-    $parser->add_rule(if => '$1 eq "Student number"',
-        do => '~info = $2;', dont_record => 1);
+    $parser->add_rule(
+        if          => '$1 eq "School"',
+        do          => '~school = $2;', 
+        dont_record => 1, 
+    );
+    $parser->add_rule(
+        if          => '$1 eq "Grade"',
+        do          => '~grade = $2;', 
+        dont_record => 1, 
+    );
+    $parser->add_rule(
+        if          => '$1 eq "Student number"',
+        do          => '~info = $2;',
+        dont_record => 1
+    );
     $parser->add_rule(
         do => 'my $p = $this->pop_record;
         $p->{~school}{~grade}{$1}{~info} = $2;
@@ -315,9 +323,17 @@ Do I have to really do this? Why don't I let you try this yourself.
     );
     $parser->read('info.txt');
 
-That's it!
+That's it! Just notice how elegant it looks.
 
 By now, you I<should> have concluded that the L<Text::Parser> way is much better. If not, you must know a better solution and perhaps you should make a Perl module (or feel free to contact me and contribute if you like this project).
+
+=head1 PERFORMANCE
+
+There will be a compile-time penalty in using L<Text::Parser>. If compile-time performance is important for you, this package is not for you.
+
+But run-time performance is something I want to improve and am committed to working on improving. I have to admit that run-time performance is slower than native Perl. But I know where there is scope to improve on runtime, and will come up with some statistics on that.
+
+For now, you should assume that C<Text::Parser> takes roughly 2x run-time. Earlier versions where about 5x slower than native Perl.
 
 L<Table of contents|Text::Parser::Manual> | L<Next|Text::Parser::Manual::ExtendedAWKSyntax>
 

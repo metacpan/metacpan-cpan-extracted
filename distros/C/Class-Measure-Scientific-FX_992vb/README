@@ -1,6 +1,6 @@
 Class::Measure::Scientific::FX_992vb is Copyright (C) 2020, Roland van Ipenburg
 
-Class::Measure::Scientific::FX_992vb version v0.0.4
+Class::Measure::Scientific::FX_992vb version v0.0.5
 ===================================================
 
 This module can be used to convert measurements like the CASIO fx-992vb.

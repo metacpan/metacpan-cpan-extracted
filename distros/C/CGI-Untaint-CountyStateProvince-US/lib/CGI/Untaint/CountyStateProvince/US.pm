@@ -13,11 +13,11 @@ CGI::Untaint::CountyStateProvince::US - Add U.S. states to CGI::Untaint::CountyS
 
 =head1 VERSION
 
-Version 0.03
+Version 0.04
 
 =cut
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 =head1 SYNOPSIS
 
@@ -140,10 +140,6 @@ You can also look for information at:
 
 L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=CGI-Untaint-CountyStateProvince-US>
 
-=item * AnnoCPAN: Annotated CPAN documentation
-
-L<http://annocpan.org/dist/CGI-Untaint-CountyStateProvince-US>
-
 =item * CPAN Ratings
 
 L<http://cpanratings.perl.org/d/CGI-Untaint-CountyStateProvince-US>
@@ -154,16 +150,14 @@ L<http://search.cpan.org/dist/CGI-Untaint-CountyStateProvince-US>
 
 =back
 
-
 =head1 ACKNOWLEDGEMENTS
 
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2012 Nigel Horne.
+Copyright 2012-2019 Nigel Horne.
 
-This program is released under the following licence: GPL
-
+This program is released under the following licence: GPL2
 
 =cut
 

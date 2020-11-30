@@ -1,0 +1,77 @@
+NAME
+    Acme::CPANModules::ColorThemed - Modules that has color theme support
+
+VERSION
+    This document describes version 0.002 of Acme::CPANModules::ColorThemed
+    (from Perl distribution Acme-CPANModules-ColorThemed), released on
+    2020-11-21.
+
+DESCRIPTION
+    ColorTheme
+
+    Modules which support color themes and follow the ColorTheme
+    specification.
+
+    JSON::Color
+
+    Text::ANSITable
+
+    Others
+
+MODULES INCLUDED IN THIS ACME::CPANMODULES MODULE
+    *   ColorTheme
+
+    *   JSON::Color
+
+    *   Text::ANSITable
+
+FAQ
+  What are ways to use this Acme::CPANModules module?
+    Aside from reading this Acme::CPANModules module's POD documentation,
+    you can install all the listed modules (entries) using cpanmodules CLI
+    (from App::cpanmodules distribution):
+
+        % cpanmodules ls-entries ColorThemed | cpanm -n
+
+    or Acme::CM::Get:
+
+        % perl -MAcme::CM::Get=ColorThemed -E'say $_->{module} for @{ $LIST->{entries} }' | cpanm -n
+
+    or directly:
+
+        % perl -MAcme::CPANModules::ColorThemed -E'say $_->{module} for @{ $Acme::CPANModules::ColorThemed::LIST->{entries} }' | cpanm -n
+
+    This Acme::CPANModules module also helps lcpan produce a more meaningful
+    result for "lcpan related-mods" command when it comes to finding related
+    modules for the modules listed in this Acme::CPANModules module.
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Acme-CPANModules-ColorThemed>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Acme-CPANModules-ColorThemed>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Acme-CPANModules-Colo
+    rThemed>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    Acme::CPANModules - about the Acme::CPANModules namespace
+
+    cpanmodules - CLI tool to let you browse/view the lists
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2020 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

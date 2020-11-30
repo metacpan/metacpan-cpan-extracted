@@ -47,7 +47,7 @@ src/panda/protocol/http/Message.h
 src/panda/protocol/http/MessageParser.cc
 src/panda/protocol/http/MessageParser.h
 src/panda/protocol/http/MessageParser.rl
-src/panda/protocol/http/MessageParser.tcc
+src/panda/protocol/http/MessageParser_impl.cc
 src/panda/protocol/http/Request.cc
 src/panda/protocol/http/Request.h
 src/panda/protocol/http/RequestParser.cc

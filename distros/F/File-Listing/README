@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    version 6.11
+    version 6.14
 
 SYNOPSIS
 
@@ -101,11 +101,107 @@ SEE ALSO
       Provides the same interface but uses XS and the parser implementation
       from ftpcopy.
 
-AUTHORS
+AUTHOR
 
-      * Gisle Aas
+    Original author: Gisle Aas
 
-      * Graham Ollis <plicease@cpan.org>
+    Current maintainer: Graham Ollis <plicease@cpan.org>
+
+    Contributors:
+
+    Adam Kennedy
+
+    Adam Sjogren
+
+    Alex Kapranoff
+
+    Alexey Tourbin
+
+    Andreas J. Koenig
+
+    Bill Mann
+
+    Bron Gondwana
+
+    DAVIDRW
+
+    Daniel Hedlund
+
+    David E. Wheeler
+
+    David Steinbrunner
+
+    Erik Esterer
+
+    FWILES
+
+    Father Chrysostomos
+
+    Gavin Peters
+
+    Graeme Thompson
+
+    Hans-H. Froehlich
+
+    Ian Kilgore
+
+    Jacob J
+
+    Mark Stosberg
+
+    Mike Schilli
+
+    Ondrej Hanak
+
+    Peter John Acklam
+
+    Peter Rabbitson
+
+    Robert Stone
+
+    Rolf Grossmann
+
+    Sean M. Burke
+
+    Simon Legner
+
+    Slaven Rezic
+
+    Spiros Denaxas
+
+    Steve Hay
+
+    Todd Lipcon
+
+    Tom Hukins
+
+    Tony Finch
+
+    Toru Yamaguchi
+
+    Ville Skyttä
+
+    Yuri Karaban
+
+    Zefram
+
+    amire80
+
+    jefflee
+
+    john9art
+
+    mschilli
+
+    murphy
+
+    phrstbrn
+
+    ruff
+
+    sasao
+
+    uid39246
 
 COPYRIGHT AND LICENSE
 

@@ -1,4 +1,5 @@
 MANIFEST
+META.json
 META.yml
 Makefile.PL
 NEWS
@@ -10,4 +11,3 @@ lib/Math/MatrixDecomposition/Util.pm
 t/00-util.t
 t/01-lu.t
 t/02-eig.t
-META.json                                Module JSON meta-data (added by MakeMaker)

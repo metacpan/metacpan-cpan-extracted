@@ -1,5 +1,11 @@
 Revision history for Perl extension WebService-Slack-WebApi
 
+0.16 2020-11-28T14:02:16Z
+    - correct parameter name for conversations.join (thx mikkoi)
+    - replace deprecated method in README (thx sironekotoro)
+    - add Test::Exception to META file
+    - avoid using `use` specified version
+
 0.15 2019-01-21T15:21:08Z
     - add bots and bigration (thx poptix)
 

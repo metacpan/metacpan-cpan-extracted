@@ -115,7 +115,7 @@ TEST("fragmented chunks") {
 
     auto req = result.request;
     CHECK(result.state == State::done);
-    CHECK(req->method_raw() == Method::POST);
+    CHECK(req->method_raw() == Method::Post);
     CHECK(req->http_version == 11);
     CHECK(req->headers.get("Transfer-Encoding") == "chunked");
     CHECK(req->headers.get("Trailer") == "Expires");

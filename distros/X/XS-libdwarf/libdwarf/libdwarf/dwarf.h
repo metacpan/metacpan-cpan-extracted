@@ -1,27 +1,30 @@
 /*
   Copyright (C) 2000-2006 Silicon Graphics, Inc.  All Rights Reserved.
   Portions Copyright 2002-2010 Sun Microsystems, Inc. All rights reserved.
-  Portions Copyright 2007-2017 David Anderson. All rights reserved.
+  Portions Copyright 2007-2020 David Anderson. All rights reserved.
 
-  This program is free software; you can redistribute it and/or modify it
-  under the terms of version 2.1 of the GNU Lesser General Public License
-  as published by the Free Software Foundation.
+  This program is free software; you can redistribute it
+  and/or modify it under the terms of version 2.1 of the
+  GNU Lesser General Public License as published by the Free
+  Software Foundation.
 
-  This program is distributed in the hope that it would be useful, but
-  WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  This program is distributed in the hope that it would be
+  useful, but WITHOUT ANY WARRANTY; without even the implied
+  warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+  PURPOSE.
 
-  Further, this software is distributed without any warranty that it is
-  free of the rightful claim of any third person regarding infringement
-  or the like.  Any license provided herein, whether implied or
-  otherwise, applies only to this software file.  Patent licenses, if
-  any, provided herein do not apply to combinations of this program with
-  other software, or any other product whatsoever.
+  Further, this software is distributed without any warranty
+  that it is free of the rightful claim of any third person
+  regarding infringement or the like.  Any license provided
+  herein, whether implied or otherwise, applies only to this
+  software file.  Patent licenses, if any, provided herein
+  do not apply to combinations of this program with other
+  software, or any other product whatsoever.
 
-  You should have received a copy of the GNU Lesser General Public
-  License along with this program; if not, write the Free Software
-  Foundation, Inc., 51 Franklin Street - Fifth Floor, Boston MA 02110-1301,
-  USA.
+  You should have received a copy of the GNU Lesser General
+  Public License along with this program; if not, write the
+  Free Software Foundation, Inc., 51 Franklin Street - Fifth
+  Floor, Boston MA 02110-1301, USA.
 
 */
 
@@ -251,10 +254,11 @@ extern "C" {
 #define DW_FORM_addrx3                  0x2b /* DWARF5 */
 #define DW_FORM_addrx4                  0x2c /* DWARF5 */
 
-#define DW_FORM_GNU_addr_index          0x1f01 /* GNU extension in debug_info.dwo.*/
-#define DW_FORM_GNU_str_index           0x1f02 /* GNU extension, somewhat like DW_FORM_strp */
-#define DW_FORM_GNU_ref_alt             0x1f20 /* GNU extension. Offset in .debug_info. */
-#define DW_FORM_GNU_strp_alt            0x1f21 /* GNU extension. Offset in .debug_str of another object file. */
+/* Extensions http://gcc.gnu.org/wiki/DebugFission.  */
+#define DW_FORM_GNU_addr_index 0x1f01 /* GNU,  debug_info.dwo.*/
+#define DW_FORM_GNU_str_index  0x1f02 /* GNU, somewhat like DW_FORM_strp */
+#define DW_FORM_GNU_ref_alt    0x1f20 /* GNU, Offset in .debug_info. */
+#define DW_FORM_GNU_strp_alt   0x1f21 /* GNU extension. Offset in .debug_str of another object file. */
 
 #define DW_AT_sibling                           0x01
 #define DW_AT_location                          0x02
@@ -492,6 +496,7 @@ extern "C" {
 #define DW_AT_GNU_all_source_call_sites         0x2118 /* GNU */
 /*  Section offset to .debug_macro section. */
 #define DW_AT_GNU_macros                        0x2119 /* GNU */
+#define DW_AT_GNU_deleted                       0x211a /* GNU */
 /* The GNU DebugFission project: http://gcc.gnu.org/wiki/DebugFission */
 #define DW_AT_GNU_dwo_name                      0x2130 /* GNU */
 #define DW_AT_GNU_dwo_id                        0x2131 /* GNU */
@@ -503,7 +508,10 @@ extern "C" {
 
 /* To distinguish distinct basic blocks in a single source line. */
 #define DW_AT_GNU_discriminator                 0x2136 /* GNU */
+#define DW_AT_GNU_locviews                      0x2137 /* GNU */
+#define DW_AT_GNU_entry_view                    0x2138 /* GNU */
 /*  Ada GNAT gcc attributes. constant integer forms. */
+#define DW_AT_GNAT_descriptive_type             0x2302
 #define DW_AT_GNU_numerator                     0x2303 /* GNU */
 #define DW_AT_GNU_denominator                   0x2304 /* GNU */
 #define DW_AT_GNU_bias                          0x2305 /* GNU */
@@ -512,6 +520,7 @@ extern "C" {
 
 /* ALTIUM extension: ALTIUM Compliant location lists (flag) */
 #define DW_AT_ALTIUM_loclist    0x2300          /* ALTIUM  */
+
 
 /* Sun extensions */
 #define DW_AT_SUN_template                      0x2201 /* SUN */
@@ -784,8 +793,9 @@ extern "C" {
 #define DW_OP_GNU_convert               0xf7 /* GNU */
 #define DW_OP_GNU_reinterpret           0xf9 /* GNU */
 #define DW_OP_GNU_parameter_ref         0xfa /* GNU */
-#define DW_OP_GNU_addr_index            0xfb /* GNU DebugFission */
-#define DW_OP_GNU_const_index           0xfc /* GNU DebugFission */
+#define DW_OP_GNU_addr_index            0xfb /* GNU Fission */
+#define DW_OP_GNU_const_index           0xfc /* GNU Fission */
+#define DW_OP_GNU_variable_value        0xfd /* GNU 2017 */
 
     /* HP extensions. */
 #define DW_OP_HP_unknown                0xe0 /* HP conflict: GNU */
@@ -804,31 +814,31 @@ extern "C" {
 
 #define DW_OP_hi_user                   0xff
 
-#define DW_ATE_address                  0x01
-#define DW_ATE_boolean                  0x02
-#define DW_ATE_complex_float            0x03
-#define DW_ATE_float                    0x04
-#define DW_ATE_signed                   0x05
-#define DW_ATE_signed_char              0x06
-#define DW_ATE_unsigned                 0x07
-#define DW_ATE_unsigned_char            0x08
-#define DW_ATE_imaginary_float          0x09  /* DWARF3 */
-#define DW_ATE_packed_decimal           0x0a  /* DWARF3f */
-#define DW_ATE_numeric_string           0x0b  /* DWARF3f */
-#define DW_ATE_edited                   0x0c  /* DWARF3f */
-#define DW_ATE_signed_fixed             0x0d  /* DWARF3f */
-#define DW_ATE_unsigned_fixed           0x0e  /* DWARF3f */
-#define DW_ATE_decimal_float            0x0f  /* DWARF3f */
-#define DW_ATE_UTF                      0x10  /* DWARF4 */
-#define DW_ATE_UCS                      0x11  /* DWARF5 */
-#define DW_ATE_ASCII                    0x12  /* DWARF5 */
+#define DW_ATE_address                0x01
+#define DW_ATE_boolean                0x02
+#define DW_ATE_complex_float          0x03
+#define DW_ATE_float                  0x04
+#define DW_ATE_signed                 0x05
+#define DW_ATE_signed_char            0x06
+#define DW_ATE_unsigned               0x07
+#define DW_ATE_unsigned_char          0x08
+#define DW_ATE_imaginary_float        0x09  /* DWARF3 */
+#define DW_ATE_packed_decimal         0x0a  /* DWARF3f */
+#define DW_ATE_numeric_string         0x0b  /* DWARF3f */
+#define DW_ATE_edited                 0x0c  /* DWARF3f */
+#define DW_ATE_signed_fixed           0x0d  /* DWARF3f */
+#define DW_ATE_unsigned_fixed         0x0e  /* DWARF3f */
+#define DW_ATE_decimal_float          0x0f  /* DWARF3f */
+#define DW_ATE_UTF                    0x10  /* DWARF4 */
+#define DW_ATE_UCS                    0x11  /* DWARF5 */
+#define DW_ATE_ASCII                  0x12  /* DWARF5 */
 
 
 /* ALTIUM extensions. x80, x81 */
 #define DW_ATE_ALTIUM_fract           0x80 /* ALTIUM __fract type */
 
 /* Follows extension so dwarfdump prints the most-likely-useful name. */
-#define DW_ATE_lo_user                  0x80
+#define DW_ATE_lo_user                0x80
 
 /* Shown here to help dwarfdump build script. */
 #define DW_ATE_ALTIUM_accum           0x81 /* ALTIUM __accum type */
@@ -845,64 +855,76 @@ extern "C" {
 #define DW_ATE_HP_imaginary_float128  0x86 /* HP */
 
 /* Sun extensions */
-#define DW_ATE_SUN_interval_float       0x91
-#define DW_ATE_SUN_imaginary_float      0x92 /* Obsolete: See DW_ATE_imaginary_float */
-
-#define DW_ATE_hi_user                  0xff
-
+#define DW_ATE_SUN_interval_float     0x91
+#define DW_ATE_SUN_imaginary_float    0x92 /* Obsolete: See DW_ATE_imaginary_float */
+#define DW_ATE_hi_user                0xff
 
 /*   DWARF5  Defaulted Member Encodings. */
-#define DW_DEFAULTED_no                 0x0      /* DWARF5 */
-#define DW_DEFAULTED_in_class           0x1      /* DWARF5 */
-#define DW_DEFAULTED_out_of_class       0x2      /* DWARF5 */
+#define DW_DEFAULTED_no             0x0      /* DWARF5 */
+#define DW_DEFAULTED_in_class       0x1      /* DWARF5 */
+#define DW_DEFAULTED_out_of_class   0x2      /* DWARF5 */
 
-
-#define DW_IDX_compile_unit             0x1      /* DWARF5 */
-#define DW_IDX_type_unit                0x2      /* DWARF5 */
-#define DW_IDX_die_offset               0x3      /* DWARF5 */
-#define DW_IDX_parent                   0x4      /* DWARF5 */
-#define DW_IDX_type_hash                0x5      /* DWARF5 */
-#define DW_IDX_lo_user                  0x2000   /* DWARF5 */
-#define DW_IDX_hi_user                  0x0fff   /* DWARF5 */
+#define DW_IDX_compile_unit         0x1      /* DWARF5 */
+#define DW_IDX_type_unit            0x2      /* DWARF5 */
+#define DW_IDX_die_offset           0x3      /* DWARF5 */
+#define DW_IDX_parent               0x4      /* DWARF5 */
+#define DW_IDX_type_hash            0x5      /* DWARF5 */
+#define DW_IDX_lo_user              0x2000   /* DWARF5 */
+#define DW_IDX_hi_user              0x0fff   /* DWARF5 */
 
 /* These with not-quite-the-same-names were used in DWARF4
    and never official and should not be used by anyone. */
-#define DW_LLEX_end_of_list_entry        0x0      /* DWARF4 experimental */
+#define DW_LLEX_end_of_list_entry   0x0      /* DWARF4 experimental */
 #define DW_LLEX_base_address_selection_entry 0x01 /* DWARF4 experimental */
-#define DW_LLEX_start_end_entry          0x02     /* DWARF4 experimental */
-#define DW_LLEX_start_length_entry       0x03     /* DWARF4 experimental */
-#define DW_LLEX_offset_pair_entry        0x04     /* DWARF4 experimental */
+#define DW_LLEX_start_end_entry     0x02     /* DWARF4 experimental */
+#define DW_LLEX_start_length_entry  0x03     /* DWARF4 experimental */
+#define DW_LLEX_offset_pair_entry   0x04     /* DWARF4 experimental */
 
 /* DWARF5 Location List Entries in Split Objects */
-#define DW_LLE_end_of_list              0x0      /* DWARF5 */
-#define DW_LLE_base_addressx            0x01     /* DWARF5 */
-#define DW_LLE_startx_endx              0x02     /* DWARF5 */
-#define DW_LLE_startx_length            0x03     /* DWARF5 */
-#define DW_LLE_offset_pair              0x04     /* DWARF5 */
-#define DW_LLE_default_location         0x05     /* DWARF5 */
-#define DW_LLE_base_address             0x06     /* DWARF5 */
-#define DW_LLE_start_end                0x07     /* DWARF5 */
-#define DW_LLE_start_length             0x08     /* DWARF5 */
+#define DW_LLE_end_of_list          0x0      /* DWARF5 */
+#define DW_LLE_base_addressx        0x01     /* DWARF5 */
+#define DW_LLE_startx_endx          0x02     /* DWARF5 */
+#define DW_LLE_startx_length        0x03     /* DWARF5 */
+#define DW_LLE_offset_pair          0x04     /* DWARF5 */
+#define DW_LLE_default_location     0x05     /* DWARF5 */
+#define DW_LLE_base_address         0x06     /* DWARF5 */
+#define DW_LLE_start_end            0x07     /* DWARF5 */
+#define DW_LLE_start_length         0x08     /* DWARF5 */
 
 /* DWARF5 Range List Entries */
-#define DW_RLE_end_of_list              0x00     /* DWARF5 */
-#define DW_RLE_base_addressx            0x01     /* DWARF5 */
-#define DW_RLE_startx_endx              0x02     /* DWARF5 */
-#define DW_RLE_startx_length            0x03     /* DWARF5 */
-#define DW_RLE_offset_pair              0x04     /* DWARF5 */
-#define DW_RLE_base_address             0x05     /* DWARF5 */
-#define DW_RLE_start_end                0x06     /* DWARF5 */
-#define DW_RLE_start_length             0x07     /* DWARF5 */
+#define DW_RLE_end_of_list          0x00     /* DWARF5 */
+#define DW_RLE_base_addressx        0x01     /* DWARF5 */
+#define DW_RLE_startx_endx          0x02     /* DWARF5 */
+#define DW_RLE_startx_length        0x03     /* DWARF5 */
+#define DW_RLE_offset_pair          0x04     /* DWARF5 */
+#define DW_RLE_base_address         0x05     /* DWARF5 */
+#define DW_RLE_start_end            0x06     /* DWARF5 */
+#define DW_RLE_start_length         0x07     /* DWARF5 */
+
+/*  GNUIndex encodings non-standard. New in 2020,
+    used in .debug_gnu_pubnames .debug_gnu_pubtypes
+    but no spellings provided in documentation. */
+#define DW_GNUIVIS_global   0
+#define DW_GNUIVIS_static   1
+
+/*  GNUIndex encodings non-standard. New in 2020,
+    used in .debug_gnu_pubnames .debug_gnu_pubtypes
+    but no spellings provided in documentation. */
+#define DW_GNUIKIND_none     0
+#define DW_GNUIKIND_type     1
+#define DW_GNUIKIND_variable 2
+#define DW_GNUIKIND_function 3
+#define DW_GNUIKIND_other    4
 
 /* DWARF5 Unit header unit type encodings */
-#define DW_UT_compile                   0x01  /* DWARF5 */
-#define DW_UT_type                      0x02  /* DWARF5 */
-#define DW_UT_partial                   0x03  /* DWARF5 */
-#define DW_UT_skeleton                  0x04  /* DWARF5 */
-#define DW_UT_split_compile             0x05  /* DWARF5 */
-#define DW_UT_split_type                0x06  /* DWARF5 */
-#define DW_UT_lo_user                   0x80  /* DWARF5 */
-#define DW_UT_hi_user                   0xff  /* DWARF5 */
+#define DW_UT_compile               0x01  /* DWARF5 */
+#define DW_UT_type                  0x02  /* DWARF5 */
+#define DW_UT_partial               0x03  /* DWARF5 */
+#define DW_UT_skeleton              0x04  /* DWARF5 */
+#define DW_UT_split_compile         0x05  /* DWARF5 */
+#define DW_UT_split_type            0x06  /* DWARF5 */
+#define DW_UT_lo_user               0x80  /* DWARF5 */
+#define DW_UT_hi_user               0xff  /* DWARF5 */
 
 
 /*  DWARF5 DebugFission object section id values

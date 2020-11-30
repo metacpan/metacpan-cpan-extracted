@@ -1,0 +1,13 @@
+Revision history for Alien-libzookeeper
+
+0.02    2020-11-22
+        * Several patches for the manually built libzookeeper
+        * Handling for several ways libzookeeper can show up on the system:
+            as libzookeeper, with pkg-config
+            as libzookeeper, with no pkg-config
+            as libzookeeper_mt, with no pkg-config
+        * Docs!
+
+0.01    2020-11-21
+        First version, released on an unsuspecting world.
+

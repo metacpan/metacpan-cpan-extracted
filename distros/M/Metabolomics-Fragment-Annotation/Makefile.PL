@@ -23,6 +23,7 @@ my %WriteMakefileArgs = (
         'File::Share' => '0.25',
     },
     PREREQ_PM => {
+    	'Text::CSV_XS' => '1.39', 
         'Text::CSV' => '2.0',
         'XML::Twig' => '3.48',
         'File::Share' => '0.25',

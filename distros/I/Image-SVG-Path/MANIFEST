@@ -13,6 +13,7 @@ README
 t/doubled-path-commands.t
 t/gorlov-checks.t
 t/Image-SVG-Path.t
+t/multiple-subpaths-absolute.t
 t/number-paths.t
 t/regex-export.t
 t/svg-signs.t

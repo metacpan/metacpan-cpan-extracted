@@ -46,7 +46,7 @@ use PPIx::Regexp::Constant qw{
     @CARP_NOT
 };
 
-our $VERSION = '0.075';
+our $VERSION = '0.076';
 
 use constant UNICODE_PROPERTY_LITERAL_VALUE => qr/
 		\{ \s* \^? \w [\w:=\s-]* \} |

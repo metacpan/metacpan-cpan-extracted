@@ -8,7 +8,7 @@ use Socket 'IPPROTO_IP';
 my $loop = UniEvent::Loop->default_loop;
 
 my $s = new UniEvent::Tcp;
-$s->bind_addr(SA_LOOPBACK_ANY);
+$s->bind_addr(SOCKADDR_LOOPBACK);
 $s->listen;
 $s->connection_callback(sub {
     my (undef, $client) = @_;

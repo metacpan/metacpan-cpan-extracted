@@ -12,7 +12,7 @@ use XS::Install::Payload;
 use XS::Install::CMake;
 use Data::Dumper;
 
-our $VERSION = '1.3.0';
+our $VERSION = '1.3.1';
 my $THIS_MODULE = 'XS::Install';
 
 our @EXPORT_OK = qw/write_makefile not_available/;
@@ -86,7 +86,7 @@ sub makemaker_args {
     process_BIN_SHARE($params);
     attach_BIN_DEPENDENT($params);
     warn_BIN_DEPENDENT($params);
-    fix_CCFLAGS($params);
+    fix_flags($params);
     
     post_process($params);
     
@@ -136,6 +136,9 @@ sub pre_process {
     
     $params->{UNIQUE_LIBNAME} //= $win32;
     *DynaLoader::mod2fname = \&XS::Loader::mod2fname_unique if delete $params->{UNIQUE_LIBNAME};
+    
+    $params->{BIN_SHARE} = {} if $params->{BIN_SHARE} && !ref($params->{BIN_SHARE});
+    $params->{BIN_SHARE}{LINK} //= $params->{LINK} if $params->{BIN_SHARE} && $params->{LINK};
 }
 
 sub process_FROM {
@@ -638,9 +641,15 @@ sub process_CCFLAGS {
     _string_merge($params->{CCFLAGS}, '-Wno-unused-parameter') if $win32; # on Strawberry's mingw PERL_UNUSED_DECL doesn't work
 }
 
-sub fix_CCFLAGS {
+sub fix_flags {
     my $params = shift;
     _string_merge($params->{CCFLAGS}, '-o $@');
+    
+    if ($params->{OPTIMIZE} =~ /(^|\s)-g(\s|$)/) { # remove stripping flag is debug enabled
+        1 while $params->{OPTIMIZE} =~ s/(^|\s)-s(\s|$)/ /;
+        $params->{OPTIMIZE} =~ s/\s+/ /g; $params->{OPTIMIZE} =~ s/^\s+//; $params->{OPTIMIZE} =~ s/\s+$//;
+        1 while $params->{LDDLFLAGS} =~ s/(^|\s)-s(\s|$)/ /;
+    }
 }
 
 sub process_LD {
@@ -663,10 +672,8 @@ sub process_LD {
         $params->{LDFROM} .= ' '.$str if $str;
     }
     
-    if (my $ldf = $params->{LDDLFLAGS}) {
-        my $cf = $Config{lddlflags};
-        $params->{LDDLFLAGS} = string_merge($cf, $ldf) if index($ldf, $cf) == -1;
-    }
+    my $cfg_lddlflags = $Config{lddlflags};
+    $params->{LDDLFLAGS} = string_merge($cfg_lddlflags, $params->{LDDLFLAGS}) if index($params->{LDDLFLAGS} || '', $cfg_lddlflags) == -1;
 }
 
 sub process_test {
@@ -789,9 +796,10 @@ sub run_cmake {
 
 sub apply_CMAKE {
     my ($params, $props) = @_;
+    my $bs = $params->{BIN_SHARE};
     $params->{INC} ||= '';
     for my $i (@{$props->{INCLUDE}}) {
-        $params->{BIN_SHARE}{INCLUDE}{$i} = '/';
+        $bs->{INCLUDE}{$i} = '/' if $bs;
         _string_merge($params->{INC}, "-I$i");
         _string_merge($params->{test}{INC}, "-I$i") if $params->{test};
     }
@@ -800,15 +808,16 @@ sub apply_CMAKE {
     _string_merge($params->{INC}, @incs);
     _string_merge($params->{test}{INC}, @incs) if $params->{test};
 
-    $params->{BIN_SHARE} ||= {};
-    _string_merge($params->{BIN_SHARE}->{CCFLAGS}, @{$props->{CCFLAGS}});
-    _string_merge($params->{BIN_SHARE}->{DEFINE}, @{$props->{DEFINE}});
-    _string_merge($params->{BIN_SHARE}->{INC}, @incs);
-    _string_merge($params->{BIN_SHARE}->{LINK}, @{$props->{LIBS}});
-
+    if ($bs) {
+        _string_merge($bs->{CCFLAGS}, @{$props->{CCFLAGS}});
+        _string_merge($bs->{DEFINE},  @{$props->{DEFINE}});
+        _string_merge($bs->{INC},     @incs);
+        _string_merge($bs->{LINK},    @{$props->{LIBS}});
+    }
+    
     $params->{CCFLAGS} = string_merge($params->{CCFLAGS}, @{$props->{CCFLAGS}});
-    $params->{DEFINE} = string_merge($params->{DEFINE}, @{$props->{DEFINE}});
-    $params->{LINK} = string_merge($params->{LINK}, @{$props->{LIBS}});
+    $params->{DEFINE}  = string_merge($params->{DEFINE}, @{$props->{DEFINE}});
+    $params->{LINK}    = string_merge($params->{LINK}, @{$props->{LIBS}});
 }
 
 sub post_process {
@@ -819,6 +828,7 @@ sub post_process {
     if  (my $link = $params->{LINK}) {
         my $dl = $params->{dynamic_lib} ||= {};
         _string_merge($dl->{OTHERLDFLAGS}, $link);
+        $dl->{OTHERLDFLAGS} = _uniq_link($dl->{OTHERLDFLAGS});
     }
     
     delete @$params{qw/C H OBJECT XS CCFLAGS LDFROM OPTIMIZE XSOPT/} unless has_binary($params);
@@ -1174,5 +1184,26 @@ sub _pkg_last {
 }
 
 sub _pkg_file { return _pkg_slash(shift).'.pm'  }
+
+sub _split_path_args {
+    my $str = shift;
+    
+    my $simple_arg  = qr/[^"' \t]+/;
+    my $dquoted_arg = qr/"([^"]+|\\")*"/;
+    my $quoted_arg  = qr/'([^']+|\\')*'/;
+
+    my @args;
+    push @args, $1 while $str =~ s/^\s*($simple_arg|$dquoted_arg|$quoted_arg)(\s+|$)//g;
+    
+    return @args;
+}
+
+sub _uniq_link {
+    my $link = shift;
+    my @args = _split_path_args($link);
+    my %uniq;
+    @args = grep { !$uniq{$_}++ } @args;
+    return join ' ', @args;
+}
 
 1;

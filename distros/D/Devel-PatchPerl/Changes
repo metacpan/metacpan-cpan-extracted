@@ -1,6 +1,21 @@
 ==================================================
-Changes from 2015-11-10 00:00:00 +0000 to present.
+Changes from 2015-11-22 00:00:00 +0000 to present.
 ==================================================
+
+-----------------------------------------
+version 2.04 at 2020-11-20 12:36:29 +0000
+-----------------------------------------
+
+  Change: 771e4fd9595bcc90f482f454203d84c568814966
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2020-11-20 12:36:29 +0000
+
+    Tweaked hints patching
+
+    Hints file patching now occurs before other patching and has an
+    independent certified perl version.
+
+    Updated included hints files to v5.33.4 level. 
 
 -----------------------------------------
 version 2.02 at 2020-11-08 19:28:50 +0000
@@ -680,5 +695,5 @@ version 1.40 at 2015-12-16 23:26:59 +0000
     Add BuiltbyPatchPerl entry to %Config::Config 
 
 =================================================
-Plus 69 releases after 2015-11-10 00:00:00 +0000.
+Plus 69 releases after 2015-11-22 00:00:00 +0000.
 =================================================

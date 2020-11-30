@@ -18,7 +18,7 @@ name: Class-Measure-Scientific-FX_992vb
 provides:
   Class::Measure::Scientific::FX_992vb:
     file: lib/Class/Measure/Scientific/FX_992vb.pm
-    version: v0.0.4
+    version: v0.0.5
 requires:
   Class::Measure: '0.08'
   List::MoreUtils: '0'
@@ -30,5 +30,5 @@ requires:
 resources:
   license: http://dev.perl.org/licenses/
   repository: https://bitbucket.org/rolandvanipenburg/class-measure-scientific-fx_992vb
-version: v0.0.4
+version: v0.0.5
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

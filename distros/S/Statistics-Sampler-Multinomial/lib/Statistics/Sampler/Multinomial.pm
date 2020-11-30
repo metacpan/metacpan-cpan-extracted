@@ -4,13 +4,15 @@ use 5.014;
 use warnings;
 use strict;
 
-our $VERSION = '0.86';
+our $VERSION = '1.01';
 
 use Carp;
 use Ref::Util qw /is_arrayref/;
 use List::Util qw /min sum/;
 use List::MoreUtils qw /first_index/;
 use Scalar::Util qw /blessed looks_like_number/;
+#use parent qw/Clone/;
+use Clone ();
 
 sub new {
     my ($class, %args) = @_;
@@ -23,7 +25,7 @@ sub new {
     croak 'data argument is an empty array'
       if !scalar @$data;
 
-    my $first_neg_idx = first_index {$_ < 0} @$data;
+    my $first_neg_idx = first_index {($_ // 0) < 0} @$data;
     croak "negative values passed in data array ($data->[$first_neg_idx] at index $first_neg_idx)\n"
       if $first_neg_idx >= 0;
     
@@ -42,6 +44,29 @@ sub new {
       // "${class}::DefaultPRNG"->new;
 
     return $self;
+}
+
+sub clone {
+    my $self = shift;
+    my $clone;
+    
+    if ($self->{prng}->can('clone')) {
+        $clone = do {
+            delete local $self->{prng};
+            Clone::clone ($self);
+        };
+        $clone->{prng} = $self->{prng}->clone;
+    }
+    else {
+        $clone = Clone::clone ($self);
+    }
+    return $clone;
+}
+
+sub set_prng {
+    my ($self, $prng) = @_;
+    $self->_validate_prng_object($prng);
+    $self->{prng} = $prng;
 }
 
 sub _validate_prng_object {
@@ -95,6 +120,41 @@ sub get_class_count {
 
 #  simplified version of draw_n_samples
 #  as we need a single index result
+#  superseded by faster method
+sub draw_slow {
+    my ($self) = @_;
+
+    my $prng = $self->{prng};
+
+    my $data  = $self->{data}
+      // croak 'it appears setup has not been run yet';
+
+    my $norm = $self->{sum}
+      // do {$self->_initialise; $self->{sum}};
+
+    my $kk = -1;
+    foreach my $data_kk (@$data) {
+        $kk++;
+        next if !$data_kk;
+
+        return $kk
+          if $prng->rand < ($data_kk / $norm);
+
+        $norm -= $data_kk;
+    }
+
+    #  we should not get here
+    return;
+}
+
+#  Simplified version of draw
+#  that minimises calls to the PRNG.
+#  Profiling indicated this was a major bottleneck,
+#  at least with MRMA.  
+#  The use of a linear scan is not optimal,
+#  but maintaining a sorted index for binary search
+#  leads to overheads when the list is changed.
+#  Could try a red-black tree or similar...
 sub draw {
     my ($self) = @_;
 
@@ -102,22 +162,38 @@ sub draw {
 
     my $data  = $self->{data}
       // croak 'it appears setup has not been run yet';
-    my $K    = scalar @$data - 1;
-    my $norm = $self->{sum} // do {$self->_initialise; $self->{sum}};
 
-    foreach my $kk (0..$K) {
-        #  avoid repeated derefs below - unbenchmarked micro-optimisation
-        my $data_kk = $data->[$kk];
-        next if !$data_kk;
+    my $norm = $self->{sum}
+      // do {$self->_initialise; $self->{sum}};
 
-        return $kk
-          if   ($data_kk > $norm)  #  MRMA blows up if prob>1, due to rounding errors
-            || $prng->binomial (
-                  $data_kk / $norm,
-                  1,  # constant for single draw 
-               );
+    my $rand = $prng->rand;
+    
+    if ($rand < 0.5) {
+        $rand = $rand * $norm;
+        my $cumsum; # = $data->[0];
+        my $kk = -1;  #  start one before the start
+        foreach my $data_kk (@$data) {
+            $kk++;
+            next if !$data_kk;
+            $cumsum += $data_kk;
 
-        $norm -= $data_kk;
+            return $kk
+              if $rand <= $cumsum;
+        }
+    }
+    else {
+        #  work from the end
+        $rand = (1 - $rand) * $norm;
+        my $cumsum;
+        my $kk = scalar @$data;  # start one beyond the end
+        foreach my $data_kk (reverse @$data) {
+            $kk--;
+            next if !$data_kk;
+            $cumsum += $data_kk;
+
+            return $kk
+              if $rand <= $cumsum;
+        }
     }
 
     #  we should not get here
@@ -289,7 +365,10 @@ method implemented in L<Statistics::Sampler::Multinomial::AliasMethod>,
 presumably because the calls to the PRNG are inside XS and avoid
 perl subroutine overheads
 (and profiling showed the RNG calls to be the main bottleneck
-for the Alias method).  
+for the Alias method).
+
+There is a subclass that uses a hierarchical index for the draw() method
+in L<Statistics::Sampler::Multinomial::Indexed>.
 
 For more details and background about the various approaches,
 see L<http://www.keithschwarz.com/darts-dice-coins>.
@@ -318,10 +397,33 @@ stream used, and can use it as part of a separate analysis.
 The only requirement of such an object is that it has a binomial()
 method.
 
+=item $object->clone
+
+Create a clone of the sampler object.
+
+=item $object->set_prng($prng)
+
+Set the PRNG object to be used.
+Useful to reset the PRNG after a call
+to the clone method.
+
 =item $object->draw
 
 Draw one sample from the distribution.
 Returns the sampled class number (array index).
+
+=item $object->draw_slow
+
+Draw one sample from the distribution.
+Returns the sampled class number (array index).
+
+This was the draw method prior to version 1.00.
+The current method is faster since it uses only
+one call to the random number generator (profiing shows that
+to be a key slow point).  Note that the
+random draw sequence differs between the two methods so repeatability
+is affected.
+
 
 =item $object->draw_n_samples ($n)
 

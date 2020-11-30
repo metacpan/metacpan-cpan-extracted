@@ -4,13 +4,13 @@
       "chocolateboy <chocolate@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 6.62, CPAN::Meta::Converter version 2.130880",
+   "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Getopt-Module",
    "no_index" : {
@@ -36,20 +36,22 @@
             "Data::Dumper" : "0",
             "Exporter" : "0",
             "Scalar::Util" : "0",
-            "constant" : "0"
+            "constant" : "0",
+            "version" : "0.77"
          }
       }
    },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "http://github.com/chocolateboy/Getopt-Module/issues"
+         "web" : "https://github.com/chocolateboy/Getopt-Module/issues"
       },
       "repository" : {
-         "url" : "http://github.com/chocolateboy/Getopt-Module"
+         "url" : "https://github.com/chocolateboy/Getopt-Module"
       }
    },
-   "version" : "v0.0.2",
+   "version" : "v1.0.0",
+   "x_serialization_backend" : "JSON::PP version 4.04",
    "x_test_requires" : {
       "Test::More" : 0
    }

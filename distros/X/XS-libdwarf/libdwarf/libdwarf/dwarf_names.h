@@ -1,5 +1,5 @@
 /* Generated routines, do not edit. */
-/* Generated sourcedate  2020-01-14 10:13:32-08:00   */
+/* Generated sourcedate  2020-11-23 18:16:30-08:00   */
 
 /* BEGIN FILE */
 
@@ -21,6 +21,8 @@ extern int dwarf_get_IDX_name(unsigned int /*val_in*/, const char ** /*s_out */)
 extern int dwarf_get_LLEX_name(unsigned int /*val_in*/, const char ** /*s_out */);
 extern int dwarf_get_LLE_name(unsigned int /*val_in*/, const char ** /*s_out */);
 extern int dwarf_get_RLE_name(unsigned int /*val_in*/, const char ** /*s_out */);
+extern int dwarf_get_GNUIVIS_name(unsigned int /*val_in*/, const char ** /*s_out */);
+extern int dwarf_get_GNUIKIND_name(unsigned int /*val_in*/, const char ** /*s_out */);
 extern int dwarf_get_UT_name(unsigned int /*val_in*/, const char ** /*s_out */);
 extern int dwarf_get_SECT_name(unsigned int /*val_in*/, const char ** /*s_out */);
 extern int dwarf_get_DS_name(unsigned int /*val_in*/, const char ** /*s_out */);

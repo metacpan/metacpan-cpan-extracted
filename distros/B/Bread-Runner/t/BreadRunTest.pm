@@ -18,6 +18,7 @@ my $c = container 'BreadRunTest' => as {
                 flag     => { isa => 'Bool', required => 1 },
                 int => { isa => 'Int', optional => 1 },
                 array => { isa => 'ArrayRef', optional => 1 },
+                hash => { isa => 'HashRef', optional => 1 },
             },
         );
         service 'will_die' => (

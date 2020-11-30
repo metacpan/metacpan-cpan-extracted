@@ -19,6 +19,33 @@ sub _types_list { qw(
  isa
 )}
 
+#has '__types_list', is => 'ro', lazy => 1, default => sub {
+#  my $self = shift;
+#  my @list = qw(
+#     columns
+#     relationships
+#     constraints
+#     table_name
+#     isa
+#  );
+#  $self->split_db_schema_from_table_name and push @list, 'db_schema';
+#  \@list
+#}, isa => ArrayRef;
+#
+#sub _types_list { @{(shift)->__types_list} }
+#
+#
+#has 'split_db_schema_from_table_name', 
+#  is => 'ro',
+#  is => Bool,
+#  default => sub { 0 };
+#
+#has 'null_db_schema_value',
+#  is => 'ro',
+#  isa => Str,
+#  default => sub { '<null>' };
+
+
 
 # Adapted from Hash::Diff, but heavily modified and specific to
 # the unique needs of this module...

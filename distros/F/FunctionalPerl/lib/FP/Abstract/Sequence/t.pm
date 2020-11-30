@@ -31,6 +31,8 @@ use strict;
 use warnings;
 use warnings FATAL => 'uninitialized';
 
+use FP::Carp;
+
 # from SYNOPSIS:
 
 use FP::Predicates;    # qw(is_sequence is_seq);
@@ -69,7 +71,7 @@ TEST { t_fn *is_proper_sequence }
 TEST { t_fn *is_seq }
 [1, 1, 1, 1, 0, 0, 0, 0, 1, undef, undef, undef, undef, undef];
 
-my $t_seqs = $t_vals->filter(*is_proper_sequence);
+my $t_seqs = $t_vals->filter(\&is_proper_sequence);
 TEST { $t_seqs->map(the_method "stream")->map(the_method "list") }
 GIVES {
     list(
@@ -107,7 +109,7 @@ TEST { list(3, 4, 5, -1)->min } -1;
 TEST { purearray(3, -2, 5)->min } -2;
 TEST { [stream(3, 4, 5, -1)->minmax] } [-1, 5];
 
-TEST { [list([3, "a"], [4, "b"], [5, "c"], [-1, "d"])->minmax(*array_first)] }
+TEST { [list([3, "a"], [4, "b"], [5, "c"], [-1, "d"])->minmax(\&array_first)] }
 [[-1, "d"], [5, "c"]];
 
 TEST { F list(qw())->intersperse("-") }
@@ -122,9 +124,10 @@ list('a', '-', 'b', '-', 'c');
 TEST { stream(1, 44, 2)->join("-") }
 '1-44-2';
 
-sub is_pair_purearray ($) {
+sub is_pair_purearray {
+    @_ == 1 or fp_croak_nargs 1;
     my ($v) = @_;
-    [is_pair $v, is_purearray $v ]
+    [is_pair($v), is_purearray($v)]
 }
 
 # consing onto a purearray just builds an improper list:
@@ -155,8 +158,8 @@ TEST { $b->ref(2) }
 
 # XX add more interesting tests
 TEST {
-    my $s = purearray(3, 4, 4, 5, 6, 8, 5, 5)->map_with_index(*array)->stream;
-    my $r = $s->group(on * array_second, *number_eq)->array;
+    my $s = purearray(3, 4, 4, 5, 6, 8, 5, 5)->map_with_index(\&array)->stream;
+    my $r = $s->group(on \&array_second, \&number_eq)->array;
     [$s, $r]
 }
 [

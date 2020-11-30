@@ -105,8 +105,8 @@ struct SockAddr::Inet4 : SockAddr {
     static const in_addr addr_loopback;
     static const in_addr addr_broadcast;
     static const in_addr addr_none;
-    static const Inet4   sa_any;
-    static const Inet4   sa_loopback;
+    static const Inet4   sockaddr_any;
+    static const Inet4   sockaddr_loopback;
 
     Inet4 (const sockaddr_in* sa) : SockAddr(sa)        {}
     Inet4 (const Inet4& oth)      : SockAddr(oth.get()) {}
@@ -127,8 +127,8 @@ struct SockAddr::Inet4 : SockAddr {
 struct SockAddr::Inet6 : SockAddr {
     static const in6_addr addr_any;
     static const in6_addr addr_loopback;
-    static const Inet6    sa_any;
-    static const Inet6    sa_loopback;
+    static const Inet6    sockaddr_any;
+    static const Inet6    sockaddr_loopback;
 
     Inet6 (const sockaddr_in6* sa) : SockAddr(sa)        {}
     Inet6 (const Inet6& oth)       : SockAddr(oth.get()) {}

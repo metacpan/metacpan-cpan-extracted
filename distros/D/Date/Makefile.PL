@@ -19,11 +19,6 @@ my %params = (
     },
 );
 
-if ($ENV{SANITIZE}) {
-    ($params{CCFLAGS}||='') .= ' -fsanitize=undefined -fsanitize=address -fno-omit-frame-pointer';
-    $params{LIBS}[0] .= ' -lubsan -lasan'; #sanitizer
-}
-
 if ($ENV{DEV}) {
     my $postamble = '';
     my $gentype = "-G2";

@@ -1,28 +1,31 @@
 /*
    Copyright (C) 2000-2006 Silicon Graphics, Inc.  All Rights Reserved.
-   Portions Copyright (C) 2007-2019 David Anderson. All Rights Reserved.
+   Portions Copyright (C) 2007-2020 David Anderson. All Rights Reserved.
    Portions Copyright (C) 2010-2012 SN Systems Ltd. All Rights Reserved.
    Portions Copyright (C) 2015-2015 Google, Inc. All Rights Reserved.
 
-   This program is free software; you can redistribute it and/or modify it
-   under the terms of version 2.1 of the GNU Lesser General Public License
-   as published by the Free Software Foundation.
+   This program is free software; you can redistribute it
+   and/or modify it under the terms of version 2.1 of the
+   GNU Lesser General Public License as published by the Free
+   Software Foundation.
 
-   This program is distributed in the hope that it would be useful, but
-   WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+   This program is distributed in the hope that it would be
+   useful, but WITHOUT ANY WARRANTY; without even the implied
+   warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+   PURPOSE.
 
-   Further, this software is distributed without any warranty that it is
-   free of the rightful claim of any third person regarding infringement
-   or the like.  Any license provided herein, whether implied or
-   otherwise, applies only to this software file.  Patent licenses, if
-   any, provided herein do not apply to combinations of this program with
-   other software, or any other product whatsoever.
+   Further, this software is distributed without any warranty
+   that it is free of the rightful claim of any third person
+   regarding infringement or the like.  Any license provided
+   herein, whether implied or otherwise, applies only to this
+   software file.  Patent licenses, if any, provided herein
+   do not apply to combinations of this program with other
+   software, or any other product whatsoever.
 
-   You should have received a copy of the GNU Lesser General Public
-   License along with this program; if not, write the Free Software
-   Foundation, Inc., 51 Franklin Street - Fifth Floor, Boston MA 02110-1301,
-   USA.
+   You should have received a copy of the GNU Lesser General
+   Public License along with this program; if not, write
+   the Free Software Foundation, Inc., 51 Franklin Street -
+   Fifth Floor, Boston MA 02110-1301, USA.
 
 */
 
@@ -37,6 +40,7 @@
 #include "dwarf_util.h"
 #include "dwarf_line.h"
 #include "dwarfstring.h"
+#include "dwarf_debuglink.h"
 
 /* Line Register Set initial conditions. */
 static struct Dwarf_Line_Registers_s _dwarf_line_table_regs_default_values = {
@@ -58,12 +62,19 @@ static struct Dwarf_Line_Registers_s _dwarf_line_table_regs_default_values = {
 
 void
 _dwarf_set_line_table_regs_default_values(Dwarf_Line_Registers regs,
-    unsigned lineversion,
+    UNUSEDARG unsigned lineversion,
     Dwarf_Bool is_stmt)
 {
     *regs = _dwarf_line_table_regs_default_values;
     if (lineversion == DW_LINE_VERSION5) {
-        /* DWARF5 file base is zero. */
+        /*  In DWARF5 change the default this way.
+            We are ignoring the DWARF5 Section 2.14
+            considering 0 a special value meaning
+            no file.
+            The DWARF5 standard is self-contradictory
+            on this, considered as a whole.
+            So with default 0 and numbering files from 0
+            things work ok. */
         regs->lr_file = 0;
     }
     regs->lr_is_stmt = is_stmt;
@@ -117,41 +128,20 @@ _dwarf_file_name_is_full_path(Dwarf_Small  *fname)
 }
 #include "dwarf_line_table_reader_common.h"
 
-static void
-special_cat(char *dst,char *src,
-    UNUSEDARG int srclen)
-{
-#if defined (HAVE_WINDOWS_PATH)
-    /*  Always '/' instead of '\\', this is a Windows -> Unix
-        issue. */
-    int i1 = 0;
-    int i2 = 0;
-
-    for ( ; dst[i1] ; ++i1) {
-    }
-    for (; i2 < srclen; ++i2,++i1) {
-        dst[i1] = src[i2];
-        if (dst[i1] == '\\') {
-            dst[i1] = '/';
-        }
-    }
-#else
-    strcat(dst, src);
-#endif /* HAVE_WINDOWS_PATH */
-    return;
-}
-
 /*  With this routine we ensure the file full path
     is calculated identically for
     dwarf_srcfiles() and dwarf_filename()
 
-    We sometimes return a string pointer  that points inside a dwarfsection,
-    yet sometimes we return a _dwarf_get_alloc allocated string.
-    This is safe because dwarf_dealloc (which users should
-    call eventually)will not actually deallocate
-    a string unless _dwarf_get_alloc allocated the pointed-to area.
+    As of March 14 2020 this *always*
+    does an allocation for the string. dwarf_dealloc
+    is crucial to do no matter what.
+    So we have consistency.
 
     dwarf_finish() will do the dealloc if nothing else does.
+    Unless the calling application did the call
+    dwarf_set_de_alloc_flag(0).
+
+    _dwarf_pathjoinl() takes care of / and Windows \
 */
 static int
 create_fullest_file_path(Dwarf_Debug dbg,
@@ -163,6 +153,13 @@ create_fullest_file_path(Dwarf_Debug dbg,
     Dwarf_Unsigned dirno = 0;
     char *full_name = 0;
     char *file_name = 0;
+    /*  Large enough that almost never will any malloc
+        be needed by dwarfstring.  Arbitrary size. */
+    static char targbuf[300];
+    static char nbuf[300];
+    dwarfstring targ;
+    dwarfstring nxt;
+    unsigned linetab_version = line_context->lc_version_number;
 
     dirno = fe->fi_dir_index;
     file_name = (char *) fe->fi_file_name;
@@ -170,96 +167,112 @@ create_fullest_file_path(Dwarf_Debug dbg,
         _dwarf_error(dbg, error, DW_DLE_NO_FILE_NAME);
         return (DW_DLV_ERROR);
     }
-
     if (_dwarf_file_name_is_full_path((Dwarf_Small *)file_name)) {
-#ifdef HAVE_WINDOWS_PATH
-        {   unsigned len = strlen(file_name);
-            char *tmp = (char *) _dwarf_get_alloc(dbg, DW_DLA_STRING,
-                len+1);
-            if(tmp) {
-                tmp[0] = 0;
-                special_cat(tmp,file_name,len);
-                if (strcmp(tmp,file_name)) {
-                    /* We transformed the name. Use the new name. */
-                    *name_ptr_out = tmp;
-                    return DW_DLV_OK;
-                } else {
-                    dwarf_dealloc(dbg,tmp,DW_DLA_STRING);
-                    /* Just fall through. file_name ok. */
-                }
-            }   /* else out of memory, just fall through to keep going. */
-        }
-#endif
-        *name_ptr_out = file_name;
-        return DW_DLV_OK;
-    } else {
-        char *comp_dir_name = "";
-        char *inc_dir_name = "";
-        Dwarf_Unsigned incdirnamelen = 0;
-        Dwarf_Unsigned filenamelen = strlen(file_name);
-        Dwarf_Unsigned compdirnamelen = 0;
+        char *tmp = 0;
+        dwarfstring_constructor_static(&targ,
+            targbuf,sizeof(targbuf));
+        dwarfstring_constructor_static(&nxt,
+            nbuf,sizeof(nbuf));
 
+        dwarfstring_append(&nxt,file_name);
+        _dwarf_pathjoinl(&targ,&nxt);
+        tmp = (char *) _dwarf_get_alloc(dbg, DW_DLA_STRING,
+            dwarfstring_strlen(&targ)+1);
+        if(tmp) {
+            strcpy(tmp,dwarfstring_string(&targ));
+            *name_ptr_out = tmp;
+            dwarfstring_destructor(&targ);
+            dwarfstring_destructor(&nxt);
+            return DW_DLV_OK;
+        }
+        dwarfstring_destructor(&targ);
+        dwarfstring_destructor(&nxt);
+        _dwarf_error(dbg,error,DW_DLE_ALLOC_FAIL);
+        return DW_DLV_ERROR;
+    }
+    {
+        int need_dir = FALSE;
+        unsigned include_dir_offset = 1;
+        static char compdirbuf[300];
+        static char incdirbuf[300];
+        static char filenamebuf[300];
+        dwarfstring compdir;
+        dwarfstring incdir;
+        dwarfstring filename;
+
+        dwarfstring_constructor_static(&targ,
+            targbuf,sizeof(targbuf));
+        dwarfstring_constructor_static(&compdir,
+            compdirbuf,sizeof(compdirbuf));
+        dwarfstring_constructor_static(&incdir,
+            incdirbuf,sizeof(incdirbuf));
+        dwarfstring_constructor_static(&filename,
+            filenamebuf,sizeof(filenamebuf));
         if (line_context->lc_compilation_directory) {
-            /*  This is safe because dwarf_dealloc is careful to not
-                dealloc strings which  dwarf_get_alloc did not
-                allocate.  */
-            comp_dir_name = (char *)line_context->lc_compilation_directory;
-            compdirnamelen = strlen(comp_dir_name);
+            char * comp_dir_name =
+                (char *)line_context->lc_compilation_directory;
+            dwarfstring_append(&compdir,comp_dir_name);
         }
 
         if (dirno > line_context->lc_include_directories_count) {
+            dwarfstring_destructor(&targ);
+            dwarfstring_destructor(&incdir);
+            dwarfstring_destructor(&compdir);
+            dwarfstring_destructor(&filename);
             _dwarf_error(dbg, error, DW_DLE_INCL_DIR_NUM_BAD);
             return (DW_DLV_ERROR);
         }
-        if (dirno > 0 && fe->fi_dir_index > 0) {
-            inc_dir_name = (char *) line_context->lc_include_directories[
-                fe->fi_dir_index - 1];
+
+        if (linetab_version == DW_LINE_VERSION5) {
+            include_dir_offset = 0;
+            need_dir = TRUE;
+        } else if (dirno > 0 && fe->fi_dir_index > 0) {
+            include_dir_offset = 1;
+            need_dir = TRUE;
+        }
+        if (need_dir) {
+            char *inc_dir_name =
+                (char *)line_context->lc_include_directories[
+                fe->fi_dir_index - include_dir_offset];
             if (!inc_dir_name) {
                 /*  This should never ever happen except in case
                     of a corrupted object file. */
                 inc_dir_name = "<erroneous NULL include dir pointer>";
             }
-            incdirnamelen = strlen(inc_dir_name);
+            dwarfstring_append(&incdir,inc_dir_name);
+        }
+        dwarfstring_append(&filename,file_name);
+        if (dwarfstring_strlen(&incdir) > 0 &&
+            _dwarf_file_name_is_full_path(
+                (Dwarf_Small*)dwarfstring_string(&incdir))) {
+            _dwarf_pathjoinl(&targ,&incdir);
+            _dwarf_pathjoinl(&targ,&filename);
+        } else {
+            if (dwarfstring_strlen(&compdir) > 0) {
+                _dwarf_pathjoinl(&targ,&compdir);
+            }
+            if (dwarfstring_strlen(&incdir) > 0) {
+                _dwarf_pathjoinl(&targ,&incdir);
+            }
+            _dwarf_pathjoinl(&targ,&filename);
         }
         full_name = (char *) _dwarf_get_alloc(dbg, DW_DLA_STRING,
-            compdirnamelen + 1 +
-            incdirnamelen + 1 +
-            filenamelen + 1);
-        if (full_name == NULL) {
+            dwarfstring_strlen(&targ) +1);
+        if (!full_name) {
+            dwarfstring_destructor(&targ);
+            dwarfstring_destructor(&incdir);
+            dwarfstring_destructor(&compdir);
+            dwarfstring_destructor(&filename);
             _dwarf_error(dbg, error, DW_DLE_ALLOC_FAIL);
             return (DW_DLV_ERROR);
         }
-        if (fe->fi_dir_index == 0) {
-            /*  Just use comp dir name */
-            if (compdirnamelen > 0) {
-                special_cat(full_name,comp_dir_name,compdirnamelen);
-                strcat(full_name, "/");
-            }
-            special_cat(full_name,file_name,filenamelen);
-            *name_ptr_out =  full_name;
-            return DW_DLV_OK;
-        }
-        if (incdirnamelen > 0 &&
-            _dwarf_file_name_is_full_path((Dwarf_Small*)inc_dir_name) ) {
-            /*  Just use inc dir. */
-                special_cat(full_name,inc_dir_name,incdirnamelen);
-            strcat(full_name,"/");
-            special_cat(full_name,file_name,filenamelen);
-            *name_ptr_out = full_name;
-            return DW_DLV_OK;
-        }
-        /* Concat all three names. */
-        if (compdirnamelen > 0) {
-            special_cat(full_name,comp_dir_name,compdirnamelen);
-            strcat(full_name, "/");
-        }
-        if (incdirnamelen > 0) {
-            special_cat(full_name,inc_dir_name,incdirnamelen);
-            strcat(full_name, "/");
-        }
-        special_cat(full_name,file_name,filenamelen);
+        strcpy(full_name,dwarfstring_string(&targ));
+        *name_ptr_out = full_name;
+        dwarfstring_destructor(&targ);
+        dwarfstring_destructor(&incdir);
+        dwarfstring_destructor(&compdir);
+        dwarfstring_destructor(&filename);
     }
-    *name_ptr_out = full_name;
     return DW_DLV_OK;
 }
 
@@ -272,15 +285,19 @@ create_fullest_file_path(Dwarf_Debug dbg,
 
     In DWARF2,3,4 the array of sourcefiles is represented
     differently than DWARF5.
-    DWARF 2,3,4:
-        Take the line number from macro information or lines data
-        and subtract 1 to  index into srcfiles.  Any with line
-        number zero are taken to refer to DW_AT_comp_dir from the
-        CU DIE
+    DWARF 2,3,4, and experimental line table:
+        Subtract 1 from the DW_AT_decl_file etc
+        to index into the array of names.
+        zero means there is no file.
     DWARF 5:
-        Index (from macro or lines data) directly into
-        srcfiles. Index zero is the base
-        compilation directory name. */
+        DW_AT_decl_file etc numbers should be directly
+        used to index into the array of names.
+        Do not subtract anything.
+    For further information
+    see the discussion of dwarf_srcfiles() in
+    libdwarf2.1.pdf version 3.16 and later, Section
+    6.14 around page 117.
+*/
 int
 dwarf_srcfiles(Dwarf_Die die,
     char ***srcfiles,
@@ -365,8 +382,28 @@ dwarf_srcfiles(Dwarf_Die die,
     if (attrform != DW_FORM_data4 && attrform != DW_FORM_data8 &&
         attrform != DW_FORM_sec_offset  &&
         attrform != DW_FORM_GNU_ref_alt) {
+        dwarfstring m;
+        dwarfstring f;
+        const char *formname = 0;
+
+        dwarfstring_constructor(&f);
+        dwarf_get_FORM_name(attrform,&formname);
+        if (!formname) {
+            dwarfstring_append_printf_u(&f,"Invalid Form Code "
+                " 0x" DW_PR_DUx,attrform);
+        } else {
+            dwarfstring_append(&f,(char *)formname);
+        }
         dwarf_dealloc(dbg, stmt_list_attr, DW_DLA_ATTR);
-        _dwarf_error(dbg, error, DW_DLE_LINE_OFFSET_WRONG_FORM);
+        dwarfstring_constructor(&m);
+        dwarfstring_append_printf_s(&m,
+            "DW_DLE_LINE_OFFSET_WRONG_FORM: form %s "
+            "instead of an allowed section offset form.",
+            dwarfstring_string(&f));
+        _dwarf_error_string(dbg, error, DW_DLE_LINE_OFFSET_WRONG_FORM,
+            dwarfstring_string(&m));
+        dwarfstring_destructor(&m);
+        dwarfstring_destructor(&f);
         return (DW_DLV_ERROR);
     }
     lres = dwarf_global_formref(stmt_list_attr, &line_offset, error);
@@ -398,6 +435,7 @@ dwarf_srcfiles(Dwarf_Die die,
         }
     }
     dwarf_dealloc(dbg, stmt_list_attr, DW_DLA_ATTR);
+    stmt_list_attr = 0;
 
     resattr = _dwarf_internal_get_die_comp_dir(die, &const_comp_dir,
         &const_comp_name,error);
@@ -442,7 +480,7 @@ dwarf_srcfiles(Dwarf_Die die,
     }
     /*  For DWARF5, use of DW_AT_comp_dir not needed.
         Line table file names and directories
-        start with comp_dir and name.  FIXME DWARF5 */
+        start with comp_dir and name. */
     line_context->lc_compilation_directory = comp_dir;
     /* We are in dwarf_srcfiles() */
     {
@@ -512,15 +550,15 @@ dwarf_srcfiles(Dwarf_Die die,
     curr_chain = head_chain;
     for (i = 0; i < line_context->lc_file_entry_count; i++) {
         *(ret_files + i) = curr_chain->ch_item;
+        curr_chain->ch_item = 0;
         prev_chain = curr_chain;
         curr_chain = curr_chain->ch_next;
         dwarf_dealloc(dbg, prev_chain, DW_DLA_CHAIN);
     }
     /*  Our chain is not recorded in the line_context so
-        the line_context destructor will not destroy our list of strings
-        or our strings.
+        the line_context destructor will not destroy our
+        list of strings or our strings.
         Our caller has to do the deallocations.  */
-
     *srcfiles = ret_files;
     *srcfilecount = line_context->lc_file_entry_count;
     dwarf_dealloc(dbg, line_context, DW_DLA_LINE_CONTEXT);
@@ -659,6 +697,7 @@ _dwarf_internal_srclines(Dwarf_Die die,
     dwarf_dealloc(dbg, stmt_list_attr, DW_DLA_ATTR);
     if ((line_offset + fission_offset) > dbg->de_debug_line.dss_size) {
         _dwarf_error(dbg, error, DW_DLE_LINE_OFFSET_BAD);
+        return DW_DLV_ERROR;
     }
     if (line_ptr > section_end) {
         _dwarf_error(dbg, error, DW_DLE_LINE_OFFSET_BAD);
@@ -878,7 +917,7 @@ dwarf_get_line_section_name_from_die(Dwarf_Die die,
     struct Dwarf_Section_s *sec = 0;
 
     /*  ***** BEGIN CODE ***** */
-    if (error != NULL) {
+    if (error) {
         *error = NULL;
     }
 
@@ -1020,7 +1059,8 @@ dwarf_srclines_from_linecontext(Dwarf_Line_Context line_context,
         return (DW_DLV_ERROR);
     }
     if (!line_context->lc_new_style_access) {
-        _dwarf_error(NULL, error, DW_DLE_LINE_CONTEXT_BOTCH);
+        _dwarf_error(line_context->lc_dbg, error,
+            DW_DLE_LINE_CONTEXT_BOTCH);
         return (DW_DLV_ERROR);
     }
     *linebuf =           line_context->lc_linebuf_logicals;
@@ -1042,7 +1082,8 @@ dwarf_srclines_two_level_from_linecontext(Dwarf_Line_Context line_context,
         return (DW_DLV_ERROR);
     }
     if (!line_context->lc_new_style_access) {
-        _dwarf_error(NULL, error, DW_DLE_LINE_CONTEXT_BOTCH);
+        _dwarf_error(line_context->lc_dbg, error,
+            DW_DLE_LINE_CONTEXT_BOTCH);
         return (DW_DLV_ERROR);
     }
     *linebuf =           line_context->lc_linebuf_logicals;
@@ -1064,7 +1105,8 @@ dwarf_srclines_table_offset(Dwarf_Line_Context line_context,
         return (DW_DLV_ERROR);
     }
     if( line_context->lc_magic != DW_CONTEXT_MAGIC) {
-        _dwarf_error(NULL, error, DW_DLE_LINE_CONTEXT_BOTCH);
+        _dwarf_error(NULL, error,
+            DW_DLE_LINE_CONTEXT_BOTCH);
         return (DW_DLV_ERROR);
     }
     *offset = line_context->lc_section_offset;
@@ -1075,9 +1117,8 @@ dwarf_srclines_table_offset(Dwarf_Line_Context line_context,
 /*  If the CU DIE  has no DW_AT_comp_dir then
     the pointer pushed back to *compilation_directory
     will be NULL.
-    Foy DWARF5 the line table header has the compilation
-    directory. FIXME DWARF5.
-    */
+    For DWARF5 the line table header has the compilation
+    directory.  */
 int dwarf_srclines_comp_dir(Dwarf_Line_Context line_context,
     const char **  compilation_directory,
     Dwarf_Error  *  error)
@@ -1087,7 +1128,8 @@ int dwarf_srclines_comp_dir(Dwarf_Line_Context line_context,
         return (DW_DLV_ERROR);
     }
     if( line_context->lc_magic != DW_CONTEXT_MAGIC) {
-        _dwarf_error(NULL, error, DW_DLE_LINE_CONTEXT_BOTCH);
+        _dwarf_error(NULL, error,
+            DW_DLE_LINE_CONTEXT_BOTCH);
         return (DW_DLV_ERROR);
     }
     *compilation_directory =
@@ -1136,7 +1178,8 @@ dwarf_srclines_subprog_data(Dwarf_Line_Context line_context,
         return (DW_DLV_ERROR);
     }
     if (index < 1 || index > line_context->lc_subprogs_count) {
-        _dwarf_error(NULL, error, DW_DLE_LINE_CONTEXT_INDEX_WRONG);
+        _dwarf_error(line_context->lc_dbg, error,
+            DW_DLE_LINE_CONTEXT_INDEX_WRONG);
         return (DW_DLV_ERROR);
     }
     sub = line_context->lc_subprogs + (index-1);
@@ -1153,7 +1196,8 @@ dwarf_srclines_files_count(Dwarf_Line_Context line_context,
     Dwarf_Signed *count_out,
     Dwarf_Error *error)
 {
-    if (!line_context || line_context->lc_magic != DW_CONTEXT_MAGIC) {
+    if (!line_context ||
+        line_context->lc_magic != DW_CONTEXT_MAGIC) {
         _dwarf_error(NULL, error, DW_DLE_LINE_CONTEXT_BOTCH);
         return (DW_DLV_ERROR);
     }
@@ -1236,14 +1280,16 @@ dwarf_srclines_files_data_b(Dwarf_Line_Context line_context,
     }
     fi = line_context->lc_file_entries;
     if (index < baseindex || index >= endindex) {
-        _dwarf_error(NULL, error, DW_DLE_LINE_CONTEXT_INDEX_WRONG);
+        _dwarf_error(line_context->lc_dbg, error,
+            DW_DLE_LINE_CONTEXT_INDEX_WRONG);
             return DW_DLV_ERROR;
     }
     for ( i = baseindex;i < index; i++) {
         fi = fi->fi_next;
         if(!fi) {
-            _dwarf_error(NULL, error, DW_DLE_LINE_HEADER_CORRUPT);
-                return DW_DLV_ERROR;
+            _dwarf_error(line_context->lc_dbg, error,
+                DW_DLE_LINE_HEADER_CORRUPT);
+            return DW_DLV_ERROR;
         }
     }
 
@@ -1297,16 +1343,31 @@ dwarf_srclines_include_dir_data(Dwarf_Line_Context line_context,
         But that cannot be fixed in interfaces for compatibility.
         So we adjust here. */
     Dwarf_Unsigned index = index_in;
+    unsigned int version = 0;
 
     if (!line_context || line_context->lc_magic != DW_CONTEXT_MAGIC) {
         _dwarf_error(NULL, error, DW_DLE_LINE_CONTEXT_BOTCH);
         return (DW_DLV_ERROR);
     }
-    if (index < 1 || index > line_context->lc_include_directories_count) {
-        _dwarf_error(NULL, error, DW_DLE_LINE_CONTEXT_INDEX_WRONG);
-        return (DW_DLV_ERROR);
+    version = line_context->lc_version_number;
+    if (version == DW_LINE_VERSION5) {
+        if (index >= line_context->lc_include_directories_count) {
+            _dwarf_error(line_context->lc_dbg, error,
+                DW_DLE_LINE_CONTEXT_INDEX_WRONG);
+            return (DW_DLV_ERROR);
+        }
+        *name = (const char *)
+            (line_context->lc_include_directories[index]);
+    } else {
+        if (index < 1 ||
+            index > line_context->lc_include_directories_count) {
+            _dwarf_error(line_context->lc_dbg, error,
+                DW_DLE_LINE_CONTEXT_INDEX_WRONG);
+            return (DW_DLV_ERROR);
+        }
+        *name = (const char *)
+            (line_context->lc_include_directories[index-1]);
     }
-    *name = (const char *)(line_context->lc_include_directories[index-1]);
     return DW_DLV_OK;
 }
 
@@ -1410,10 +1471,9 @@ dwarf_line_srcfileno(Dwarf_Line line,
         _dwarf_error(NULL, error, DW_DLE_DWARF_LINE_NULL);
         return DW_DLV_ERROR;
     }
-    /*  li_file must be <= line->li_context->lc_file_entry_count else it
-        is trash. li_file 0 means not attributable to any source file
-        per dwarf2/3 spec.
-
+    /*  li_file must be <= line->li_context->lc_file_entry_count else
+        it is trash. li_file 0 means not attributable to
+        any source file per dwarf2/3 spec.
         For DWARF5, li_file < lc_file_entry_count */
     *ret_fileno = (line->li_addr_line.li_l_data.li_file);
     return DW_DLV_OK;
@@ -1515,21 +1575,43 @@ dwarf_filename(Dwarf_Line_Context context,
     /*  Negative values not sensible. Leaving traditional
         signed interfaces in place. */
     Dwarf_Signed fileno = fileno_in;
+    unsigned linetab_version = context->lc_version_number;
 
     res =  dwarf_srclines_files_indexes(context, &baseindex,
         &file_count, &endindex, error);
     if (res != DW_DLV_OK) {
         return res;
     }
-    if (fileno < baseindex || fileno >= endindex) {
-        _dwarf_error(dbg, error, DW_DLE_NO_FILE_NAME);
-        return (DW_DLV_ERROR);
+    if (fileno >= endindex) {
+        dwarfstring m;
+
+        dwarfstring_constructor(&m);
+        dwarfstring_append_printf_i(&m,
+            "DW_DLE_NO_FILE_NAME: the file number is %d ",
+            fileno);
+        dwarfstring_append_printf_u(&m,
+            "( this is a DWARF 0x%x linetable)",
+            linetab_version);
+        dwarfstring_append_printf_i(&m,
+            " yet the highest allowed file name index is %d.",
+            endindex-1);
+        _dwarf_error_string(dbg, error, DW_DLE_NO_FILE_NAME,
+            dwarfstring_string(&m));
+        dwarfstring_destructor(&m);
+        return DW_DLV_ERROR;
+    } else {
+        if (linetab_version <= DW_LINE_VERSION4 ||
+            linetab_version == EXPERIMENTAL_LINE_TABLES_VERSION) {
+            if (!fileno) {
+                return DW_DLV_NO_ENTRY;
+            }
+            /* else ok */
+        }  /* else DW_LINE_VERSION5 so file index 0 is fine */
     }
 
     file_entry = context->lc_file_entries;
-    /*  ASSERT: li_file > 0, dwarf correctness issue, see line table
-        definition of dwarf2/3 spec. */
-
+    /*  zero fileno allowed for DWARF5 table. For DWARF4,
+        zero fileno handled above. */
     for (i =  baseindex; i < fileno ; i++) {
         file_entry = file_entry->fi_next;
     }
@@ -1645,14 +1727,11 @@ dwarf_line_subprog(Dwarf_Line line,
         _dwarf_error(NULL, error, DW_DLE_DWARF_LINE_NULL);
         return DW_DLV_ERROR;
     }
-
     if (line->li_context == NULL) {
         _dwarf_error(NULL, error, DW_DLE_LINE_CONTEXT_NULL);
         return DW_DLV_ERROR;
     }
-
     dbg = line->li_context->lc_dbg;
-
     subprog_no = line->li_addr_line.li_l_data.li_subprogram;
     if (subprog_no == 0) {
         *subprog_name = NULL;
@@ -1660,26 +1739,26 @@ dwarf_line_subprog(Dwarf_Line line,
         *decl_line = 0;
         return DW_DLV_OK;
     }
-
     if (subprog_no > line->li_context->lc_subprogs_count) {
         _dwarf_error(dbg, error, DW_DLE_NO_FILE_NAME);
         return DW_DLV_ERROR;
     }
-
+    /*  Adjusting for 1 origin subprog no */
     subprog = &line->li_context->lc_subprogs[subprog_no - 1];
-
     *subprog_name = (char *)subprog->ds_subprog_name;
     *decl_line = subprog->ds_decl_line;
 
-    res = dwarf_filename(line->li_context, subprog->ds_decl_file,
+    res = dwarf_filename(line->li_context,
+        subprog->ds_decl_file,
         decl_filename, error);
     if (res != DW_DLV_OK) {
         *decl_filename = NULL;
+        return res;
     }
-
     return DW_DLV_OK;
 }
 
+/*  This is another line_context_destructor. */
 static void
 delete_line_context_itself(Dwarf_Line_Context context)
 {
@@ -1708,6 +1787,10 @@ delete_line_context_itself(Dwarf_Line_Context context)
         free(context->lc_subprogs);
         context->lc_subprogs = 0;
     }
+    free(context->lc_directory_format_values);
+    context->lc_directory_format_values = 0;
+    free(context->lc_file_format_values);
+    context->lc_file_format_values = 0;
     if (context->lc_include_directories) {
         free(context->lc_include_directories);
         context->lc_include_directories = 0;
@@ -1831,20 +1914,24 @@ dwarf_srclines_dealloc_b(Dwarf_Line_Context line_context)
         return;
     }
     linestable = line_context->lc_linebuf_logicals;
-    linescount = line_context->lc_linecount_logicals;
-    for (i = 0; i < linescount ; ++i) {
-        dwarf_dealloc(dbg, linestable[i], DW_DLA_LINE);
+    if (linestable) {
+        linescount = line_context->lc_linecount_logicals;
+        for (i = 0; i < linescount ; ++i) {
+            dwarf_dealloc(dbg, linestable[i], DW_DLA_LINE);
+        }
+        dwarf_dealloc(dbg, linestable, DW_DLA_LIST);
     }
-    dwarf_dealloc(dbg, linestable, DW_DLA_LIST);
     line_context->lc_linebuf_logicals = 0;
     line_context->lc_linecount_logicals = 0;
 
     linestable = line_context->lc_linebuf_actuals;
-    linescount = line_context->lc_linecount_actuals;
-    for (i = 0; i <linescount ; ++i) {
-        dwarf_dealloc(dbg, linestable[i], DW_DLA_LINE);
+    if (linestable) {
+        linescount = line_context->lc_linecount_actuals;
+        for (i = 0; i <linescount ; ++i) {
+            dwarf_dealloc(dbg, linestable[i], DW_DLA_LINE);
+        }
+        dwarf_dealloc(dbg, linestable, DW_DLA_LIST);
     }
-    dwarf_dealloc(dbg, linestable, DW_DLA_LIST);
     line_context->lc_linebuf_actuals = 0;
     line_context->lc_linecount_actuals = 0;
     delete_line_context_itself(line_context);
@@ -1867,28 +1954,40 @@ _dwarf_print_header_issue(Dwarf_Debug dbg,
     }
     /* Are we in verbose mode */
     if (dwarf_cmdline_options.check_verbose_mode){
-        dwarf_printf(dbg,
-            "\n*** DWARF CHECK: "
-            ".debug_line: %s %" DW_PR_DSd,
-            specific_msg,value);
-        if (index || tabv || linetabv) {
-            dwarf_printf(dbg,"; Mismatch index %u stdval %u linetabval %u",
-                index,tabv,linetabv);
-        }
+        dwarfstring m1;
 
+        dwarfstring_constructor(&m1);
+        dwarfstring_append(&m1,
+            "\n*** DWARF CHECK: "
+            ".debug_line: ");
+        dwarfstring_append(&m1,(char *)specific_msg);
+        dwarfstring_append_printf_i(&m1,
+            " %" DW_PR_DSd,value);
+        if (index || tabv || linetabv) {
+            dwarfstring_append_printf_u(&m1,
+                "; Mismatch index %u",index);
+            dwarfstring_append_printf_u(&m1,
+                " stdval %u",tabv);
+            dwarfstring_append_printf_u(&m1,
+                " linetabval %u",linetabv);
+        }
         if (data_start >= dbg->de_debug_line.dss_data &&
             (data_start < (dbg->de_debug_line.dss_data +
             dbg->de_debug_line.dss_size))) {
-            Dwarf_Unsigned off = data_start - dbg->de_debug_line.dss_data;
-            dwarf_printf(dbg,
-                " at offset 0x%" DW_PR_XZEROS DW_PR_DUx
-                "  ( %" DW_PR_DUu " ) ",
-                off,off);
+            Dwarf_Unsigned off =
+                data_start - dbg->de_debug_line.dss_data;
+
+            dwarfstring_append_printf_u(&m1,
+                " at offset 0x%" DW_PR_XZEROS DW_PR_DUx,off);
+            dwarfstring_append_printf_u(&m1,
+                "  ( %" DW_PR_DUu " ) ",off);
         } else {
-            dwarf_printf(dbg,
+            dwarfstring_append(&m1,
                 " (unknown section location) ");
         }
-        dwarf_printf(dbg,"***\n");
+        dwarfstring_append(&m1,"***\n");
+        _dwarf_printf(dbg,dwarfstring_string(&m1));
+        dwarfstring_destructor(&m1);
     }
     *err_count_out += 1;
 }
@@ -1998,14 +2097,23 @@ _dwarf_free_chain_entries(Dwarf_Debug dbg,Dwarf_Chain head,int count)
     Dwarf_Chain curr_chain = head;
     for (i = 0; i < count; i++) {
         Dwarf_Chain t = curr_chain;
+        void *item = t->ch_item;
+        int itype = t->ch_itemtype;
+
+        if (item && itype) { /* valid DW_DLA types are never 0 */
+            dwarf_dealloc(dbg,item,itype);
+            t->ch_item = 0;
+        }
         curr_chain = curr_chain->ch_next;
         dwarf_dealloc(dbg, t, DW_DLA_CHAIN);
     }
 }
 
 int
-_dwarf_add_to_files_list(Dwarf_Line_Context context, Dwarf_File_Entry fe)
+_dwarf_add_to_files_list(Dwarf_Line_Context context,
+    Dwarf_File_Entry fe)
 {
+    unsigned int version = context->lc_version_number;
     if (!context->lc_file_entries) {
         context->lc_file_entries = fe;
     } else {
@@ -2016,14 +2124,12 @@ _dwarf_add_to_files_list(Dwarf_Line_Context context, Dwarf_File_Entry fe)
     /*  Here we attempt to write code to make it easy to interate
         though source file names without having to code specially
         for DWARF2,3,4 vs DWARF5 */
-    if (context->lc_version_number >= DW_LINE_VERSION5 &&
-        context->lc_version_number != EXPERIMENTAL_LINE_TABLES_VERSION) {
+    if (version == DW_LINE_VERSION5) {
         context->lc_file_entry_baseindex = 0;
         context->lc_file_entry_endindex = context->lc_file_entry_count;
     } else {
-        /* DWARF2,3,4 and the EXPERIMENTAL_LINE_TABLES_VERSION. */
         context->lc_file_entry_baseindex = 1;
-        context->lc_file_entry_endindex = context->lc_file_entry_count+1;
+        context->lc_file_entry_endindex = context->lc_file_entry_count +1;
     }
     return DW_DLV_OK;
 }
@@ -2046,7 +2152,9 @@ _dwarf_line_context_constructor(Dwarf_Debug dbg, void *m)
     be dealloc'd either manually
     or, at closing the libdwarf dbg,
     automatically.  So we DO NOT
-    touch the lines tables here */
+    touch the lines tables here
+    See also: delete_line_context_itself()
+*/
 void
 _dwarf_line_context_destructor(void *m)
 {
@@ -2074,6 +2182,10 @@ _dwarf_line_context_destructor(void *m)
         line_context->lc_file_entry_baseindex   = 0;
         line_context->lc_file_entry_endindex    = 0;
     }
+    free(line_context->lc_directory_format_values);
+    line_context->lc_directory_format_values = 0;
+    free(line_context->lc_file_format_values);
+    line_context->lc_file_format_values = 0;
 
     if (line_context->lc_subprogs) {
         free(line_context->lc_subprogs);

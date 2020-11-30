@@ -16,7 +16,7 @@ use Scalar::Util 'weaken', 'isweak';
 use Try::Tiny;
 use PerlX::Maybe;
 
-our $VERSION = '0.61';
+our $VERSION = '0.64';
 our @CARP_NOT;
 
 =head1 NAME
@@ -243,18 +243,19 @@ sub connect( $self, %args ) {
 
     $done = $done->then(sub {
         $self->{l} = $self->transport->add_listener('Target.receivedMessageFromTarget', sub {
-            #use Data::Dumper;
-            #warn Dumper \@_;
-            my $payload = $_[0]->{params}->{message};
-            $s->on_response( undef, $payload );
+            if( $s ) {
+                my $id = $s->targetId;
+                if( !$id or $id eq $_[0]->{params}->{targetId}) {
+                    my $payload = $_[0]->{params}->{message};
+                    $s->on_response( undef, $payload );
+                };
+            #} else {
+            #    warn "Target listener for answers has gone away";
+            #    use Data::Dumper; warn Dumper($_[0]);
+            };
         });
         Future->done;
     });
-
-    # Here we need to handle all the stuff for setting up a fresh tab
-    #if( $args{ tab } and ref $args{ tab } eq 'HASH' ) {
-        #$endpoint = $args{ tab }->{webSocketDebuggerUrl};
-        #$self->log('trace', "Using webSocketDebuggerUrl endpoint $endpoint");
 
     if( $args{ new_tab } ) { # should be renamed "separate_session"
         if( $args{ separate_session }) {
@@ -267,10 +268,9 @@ sub connect( $self, %args ) {
 
         } else {
             # Find an existing browser context and use that one
-            #$done = $done->then( sub { $s->transport->send_message('Target.attachToBrowserTarget')})
             $done = $done->then( sub { $s->getTargets })
             ->then( sub( @targets ) {
-                $self->browserContextId( $targets[0]->{browserContextId} );
+                #$self->browserContextId( $targets[0]->{browserContextId} );
                 Future->done();
             });
         }
@@ -279,7 +279,6 @@ sub connect( $self, %args ) {
             my $id = $self->browserContextId;
 
             $s->createTarget(
-                #url => 'about:blank',
                 url => $args{ start_url } || 'about:blank',
                 maybe browserContextId => $id,
             );

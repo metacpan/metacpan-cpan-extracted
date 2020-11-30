@@ -86,6 +86,7 @@ t/not-both.t
 t/not-methods.t
 t/overloaded-coderefs.t
 t/overridden-core-funcs.t
+t/role-conflicts-moox.t
 t/strictures.t
 t/sub-and-handles.t
 t/subconstructor.t

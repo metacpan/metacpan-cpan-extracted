@@ -1,3 +1,8 @@
+1.1.2     25.11.2020
+           - remove XLog usage from tests
+1.1.1     25.11.2020
+           - fix exceptions messages
+           - misc improvements
 1.1.0     30.10.2020
            - c-ares update
            - c++ part moved to XS::libunievent

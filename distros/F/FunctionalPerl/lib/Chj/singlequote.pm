@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2004-2018 Christian Jaeger, copying@christianjaeger.ch
+# Copyright (c) 2004-2020 Christian Jaeger, copying@christianjaeger.ch
 #
 # This is free software, offered under either the same terms as perl 5
 # or the terms of the Artistic License version 2 or the terms of the
@@ -62,6 +62,7 @@ use strict;
 use warnings;
 use warnings FATAL => 'uninitialized';
 use Exporter "import";
+use FP::Carp;
 
 our @EXPORT    = qw(singlequote);
 our @EXPORT_OK = qw(singlequote_sh singlequote_many many with_maxlen
@@ -82,7 +83,8 @@ sub with_maxlen ($&) {
 
 # Perl style:
 
-sub singlequote($ ;$ ) {
+sub singlequote {
+    @_ >= 1 and @_ <= 2 or fp_croak_nargs "1-2";
     my ($str, $alternative) = @_;
     if (defined $str) {
         if (defined $maybe_maxlen and length($str) > $maybe_maxlen) {
@@ -122,7 +124,8 @@ sub many {
 
 # Shell (Bash) style:
 
-sub singlequote_sh($ ;$ ) {
+sub singlequote_sh {
+    @_ >= 1 and @_ <= 2 or fp_croak_nargs "1-2";
     my ($str, $alternative) = @_;
     if (defined $str) {
         $str =~ s/\'/'\\\''/sg;
@@ -135,7 +138,8 @@ sub singlequote_sh($ ;$ ) {
 
 # don't quote bare words or simply formatted paths that don't need to
 # be quoted
-sub possibly_singlequote_sh ($) {
+sub possibly_singlequote_sh {
+    @_ == 1 or fp_croak_nargs 1;
     my ($str) = @_;
     if ($str =~ m{^[\w/.-]+\z}) {
         $str
@@ -148,7 +152,8 @@ sub singlequote_sh_many {
     join " ", map { possibly_singlequote_sh $_ } @_
 }
 
-sub quote_javascript ($) {
+sub quote_javascript {
+    @_ == 1 or fp_croak_nargs 1;
     my ($str) = @_;
 
     #require JSON::MaybeXS;
@@ -168,7 +173,8 @@ sub quote_javascript ($) {
         # <mst> intentionally
 }
 
-sub _quote_C($) {
+sub _quote_C {
+    @_ == 1 or fp_croak_nargs 1;
     my ($str) = @_;
     $str =~ s{(.)}{
         my $c = $1;
@@ -186,7 +192,8 @@ sub _quote_C($) {
     $str
 }
 
-sub quote_C($) {
+sub quote_C {
+    @_ == 1 or fp_croak_nargs 1;
     my ($str) = @_;
     '"' . _quote_C($str) . '"'
 }

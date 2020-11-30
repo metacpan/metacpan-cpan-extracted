@@ -75,6 +75,7 @@ and [options] are from
                    medium.
 ") . N("  --interactive  - with --distrib, ask confirmation for each media
 ") . N("  --all-media    - with --distrib, add every listed media
+") . N("  --ignorearch   - with --distrib, add media from incompatible archs
 ") . N("  --virtual      - create virtual media wich are always up-to-date.
 ") . N("  --no-md5sum    - disable MD5SUM file checking.
 ") . N("  --nopubkey     - don't import pubkey of added media
@@ -153,6 +154,7 @@ if ($options{distrib}) {
 	ask_media => $add_media_callback,
 	'verify-rpm' => $options{'verify-rpm'},
 	'xml-info' => $options{'xml-info'},
+	ignorearch => $options{ignorearch},
     ) or $urpm->{fatal}(10, N("unable to add medium"));
     $ok = urpm::media::update_media($urpm, %options, 
 			      quiet => $options{verbose} < 0,		      

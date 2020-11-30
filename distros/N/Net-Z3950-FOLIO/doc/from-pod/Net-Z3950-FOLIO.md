@@ -5,7 +5,7 @@ Net::Z3950::FOLIO - Z39.50 server for FOLIO bibliographic data
 # SYNOPSIS
 
     use Net::Z3950::FOLIO;
-    $service = new Net::Z3950::FOLIO('config.json');
+    $service = new Net::Z3950::FOLIO('config');
     $service->launch_server("someServer", @ARGV);
 
 # DESCRIPTION
@@ -24,12 +24,12 @@ the `launch_server()` method is invoked on it to start the server.
 
 # METHODS
 
-## new($configFile)
+## new($configBase)
 
-    $s2z = new Net::Z3950::FOLIO('config.json');
+    $s2z = new Net::Z3950::FOLIO('config');
 
 Creates and returns a new Net::Z3950::FOLIO object, configured according to
-the JSON file `$configFile` that is the only argument.  The format of
+the JSON file `$configFile.json` specified by the only argument.  The format of
 this file is described in `Net::Z3950::FOLIO::Config`.
 
 ## launch\_server($label, @ARGV)

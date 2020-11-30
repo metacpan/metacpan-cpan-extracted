@@ -45,14 +45,14 @@ is_5322_local (const char *start, const char *end)
     for (cp = start; cp < end && (ch = *(unsigned char *) cp) != 0; cp++) {
         if (ch > 127)
             return inverse(EEAV_LPART_NOT_ASCII);
-        /* rfc5322 allows next CTRLs in qtext:
-         *    %d1-8 / %d11 / %d12 / %d14-31 / %d127
-         * in quoted-pairs:
-         *    %d0 / %d1-8 / %d11 / %d12 / %d14-31 / %d127 / LF / CR
-         */
-        if (ISCNTRL(ch) && !quote && !qpair)
-            return inverse(EEAV_LPART_CTRL_CHAR);
         if (!quote) {
+            /* rfc5322 allows next CTRLs in qtext:
+             *    %d1-8 / %d11 / %d12 / %d14-31 / %d127
+             * in quoted-pairs:
+             *    %d0 / %d1-8 / %d11 / %d12 / %d14-31 / %d127 / LF / CR
+             */
+            if (!qpair && ISCNTRL(ch))
+                return inverse(EEAV_LPART_CTRL_CHAR);
             switch (ch) {
             case '"': {
                 /* quote-strings are allowed at the start
@@ -65,7 +65,9 @@ is_5322_local (const char *start, const char *end)
             } break;
             case '.': {
                 /* '.' is allowed after an atom and only once */
-                if (cp == start || ((cp + 1) < end && cp[1] == '.'))
+                if (cp == start || (cp + 1) == end)
+                    return inverse(EEAV_LPART_MISPLACED_DOT);
+                if ((cp + 1) < end && (cp[1] == '.'))
                     return inverse(EEAV_LPART_TOO_MANY_DOTS);
             } break;
             /* specials & SPACE are not allowed outside quote-string */

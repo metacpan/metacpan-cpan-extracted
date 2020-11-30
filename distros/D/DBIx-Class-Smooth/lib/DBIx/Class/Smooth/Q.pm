@@ -6,7 +6,7 @@ package DBIx::Class::Smooth::Q;
 
 # ABSTRACT: Short intro
 our $AUTHORITY = 'cpan:CSSON'; # AUTHORITY
-our $VERSION = '0.0107';
+our $VERSION = '0.0108';
 
 use Carp qw/croak/;
 use Safe::Isa qw/$_isa/;
@@ -117,7 +117,7 @@ DBIx::Class::Smooth::Q - Short intro
 
 =head1 VERSION
 
-Version 0.0107, released 2020-10-28.
+Version 0.0108, released 2020-11-29.
 
 =head1 SOURCE
 

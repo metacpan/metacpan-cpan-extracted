@@ -1,0 +1,4 @@
+1.0.0     24.11.2020
+    - C++ part moved from Exception::Backtrace
+    - Fix issues with clang-generated traces (affected FreeBSD)
+

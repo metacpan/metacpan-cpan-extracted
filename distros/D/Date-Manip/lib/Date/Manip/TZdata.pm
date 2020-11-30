@@ -13,7 +13,7 @@ use integer;
 use warnings;
 
 our $VERSION;
-$VERSION='6.82';
+$VERSION='6.83';
 END { undef $VERSION; }
 
 ###############################################################################
@@ -40,7 +40,6 @@ $Verbose      = 0;
                australasia
                europe
                northamerica
-               pacificnew
                southamerica
                etcetera
                backward

@@ -2,9 +2,13 @@
 
 Net::SockAddr - Socket address OO-wrapper with Perl and C++ interface.
 
+
+
 =head1 DESCRIPTION
 
 Supports AF_INET, AF_INET6 and AF_UNIX, can create sockaddrs and pack/unpack ips.
+
+
 
 =head1 SYNOPSIS
 
@@ -22,11 +26,15 @@ Supports AF_INET, AF_INET6 and AF_UNIX, can create sockaddrs and pack/unpack ips
     } else { # UNIX socket
         say $sa->path;
     }
-                       
+
+
+                 
 =head1 C SYNOPSIS
 
     #include <panda/net/sockaddr.h>
     using panda::net::SockAddr;
+    
+    
     
 =head1 METHODS
 
@@ -50,6 +58,8 @@ C<$sa> may be:
 =back
 
 If C<$sa> is undefined or contains sockaddr with AF_UNSPEC family, constructor returns undef.
+
+Classes L<Net::SockAddr::Inet4>, L<Net::SockAddr::Inet6> and L<Net::SockAddr::Unix> contains more specialised constructors from ip/port or path.
 
 =head4 family()
 
@@ -79,6 +89,85 @@ Object stringifies to "ip:port" for IPv4, "[ip]:port" for IPv6 and "path" for AF
 
 Two objects are equal if all properties of their underlying sockaddrs are equal
 
+
+
+=head1 CONSTANTS
+
+=over
+
+=item AF_UNSPEC
+
+=item AF_INET
+
+=item AF_INET6
+
+=item AF_UNIX
+
+Only for Unix systems
+
+=item INADDR_ANY
+
+Binary IPv4 address for binding to all interfaces on machine.
+
+    my $sa = Net::SockAddr::Inet4::from_addr(Net::SockAddr::INADDR_ANY, 80);
+    $server->bind($sa);
+
+=item INADDR_LOOPBACK
+
+Binary IPv4 address of the loopback interface
+
+=item INADDR_BROADCAST
+
+Binary IPv4 broadcast address
+
+=item INADDR_NONE
+
+Binary IPv4 invalid address (usually '255.255.255.255')
+
+=item SOCKADDR_ANY
+
+IPv4 sockaddr for binding to all interfaces with auto-selected port.
+
+    $server->bind(Net::SockAddr::SOCKADDR_ANY); 
+    
+C<SOCKADDR_ANY> is the same as
+
+    Net::SockAddr::Inet4->new(Net::SockAddr::INADDR_ANY, 0);
+
+=item SOCKADDR_LOOPBACK
+
+IPv4 sockaddr for binding to loopback interface with auto-selected port. The same as
+
+    Net::SockAddr::Inet4->new(Net::SockAddr::INADDR_LOOPBACK, 0);
+
+=item IN6ADDR_ANY
+
+Binary IPv6 address for binding to all interfaces on machine.
+
+=item IN6ADDR_LOOPBACK
+
+Binary IPv6 address of the loopback interface
+
+=item SOCKADDR6_ANY
+
+IPv6 sockaddr for binding to all interfaces with auto-selected port.
+
+    $server->bind(Net::SockAddr::SOCKADDR6_ANY); 
+    
+C<SOCKADDR6_ANY> is the same as
+
+    Net::SockAddr::Inet6->new(Net::SockAddr::IN6ADDR_ANY, 0);
+
+=item SOCKADDR6_LOOPBACK
+
+IPV6 sockaddr for binding to loopback interface with auto-selected port. The same as
+
+    Net::SockAddr::Inet6->new(Net::SockAddr::IN6ADDR_LOOPBACK, 0);
+
+=back
+
+
+
 =head1 TYPEMAP
 
 This module exposes C<panda::net::SockAddr> typemap to use from XS modules. This typemap allows for receiving binary or object-based sockaddr from perl.
@@ -89,11 +178,26 @@ This module exposes C<panda::net::SockAddr> typemap to use from XS modules. This
         RETVAL = sa->ip();
     }
 
+
+
+=head SEE ALSO
+
+L<Net::SockAddr::Inet4>
+
+L<Net::SockAddr::Inet6>
+
+L<Net::SockAddr::Unix>
+
+
+
 =head1 AUTHORS
 
-Pronin Oleg <syber@crazypanda.ru>, Crazy Panda LTD
+Pronin Oleg <syber@crazypanda.ru>
 
-Ivan Baidakou <i.baydakov@crazypanda.ru>, Crazy Panda LTD
+Ivan Baidakou <i.baydakov@crazypanda.ru>
+
+Crazy Panda LTD
+
 
 
 =head1 LICENSE

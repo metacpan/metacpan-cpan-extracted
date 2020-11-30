@@ -100,6 +100,10 @@ METHODS
             *TLD_GENERIC_RESTRICTED* | *TLD_INFRASTRUCTURE* |
             *TLD_SPONSORED* | *TLD_SPECIAL*.
 
+    *   setup (%options)
+
+        Updates options, see description above.
+
     *   $yes_no = is_email ( $email )
 
         Validates the specified email. Returns true if the email is valid,

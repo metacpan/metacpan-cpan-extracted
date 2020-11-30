@@ -1,5 +1,12 @@
 Revision history for Perl distribution Win32-SharedFileOpen
 
+4.04 2020-11-25
+
+    - Hopefully fixed occasional test failures in t/12_variables.t by allowing a
+      larger tolerance.
+
+    - Fixed 64-bit compiler warning.
+
 4.03 2018-07-31
 
     - Fixed broken link for active bugs on the CPAN Request Tracker.

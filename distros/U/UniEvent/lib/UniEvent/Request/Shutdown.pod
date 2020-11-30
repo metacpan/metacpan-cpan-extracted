@@ -1,0 +1,25 @@
+=head1 NAME
+
+UniEvent::Request::Shutdown - stream shutdown request
+
+=head1 DESCRIPTION
+
+The entire purpose of the class is to allow track shutdown requests.
+It is probably has no use cases, as the shutdown request is always
+unique within the stream.
+
+=head1 METHODS
+
+There are no methods
+
+=head1 REFERENCES
+
+L<UniEvent::Pipe>
+
+L<UniEvent::Stream>
+
+L<UniEvent::Tcp>
+
+L<UniEvent::Tty>
+
+=cut

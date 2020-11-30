@@ -1,0 +1,13 @@
+Revision history for Alien-libsnappy
+
+0.04    2020-11-25
+        * Forgot to include the -fPIC patch in MANIFEST
+
+0.03    2020-11-25
+        * libsnappy now gets compiled with -fPIC
+        * libsnappy now gets compiled with c++11
+        * ->libs_static now correctly reports -stdlib=libc++
+
+0.02    2020-11-22
+        First version, released on an unsuspecting world.
+

@@ -23,8 +23,9 @@ no_index:
     - inc
 requires:
   Carp: '0'
+  Clone: '0'
   List::MoreUtils: '0'
-  List::Util: '0'
+  List::Util: '1.29'
   Math::Random::MT::Auto: '0'
   Ref::Util: '0'
   Scalar::Util: '0'
@@ -33,5 +34,5 @@ requires:
 resources:
   bugtracker: https://github.com/shawnlaffan/perl-statistics-sampler-multinomial/issues/
   repository: https://github.com/shawnlaffan/perl-statistics-sampler-multinomial.git
-version: '0.86'
+version: '1.01'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

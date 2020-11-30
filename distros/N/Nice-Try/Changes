@@ -1,5 +1,8 @@
 Revision history for Perl module Nice::Try
 
+0.1.6 2020-11-08T15:48:58+0900
+    - Correcting a bug in adding back insignificant elements in between try-catch blocks
+
 0.1.5 2020-09-13T22:00:15+0900
     - Corrected processing error when 2 or more consecutive try-catch blocks were found
 

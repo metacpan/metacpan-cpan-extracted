@@ -13,6 +13,7 @@ MANIFEST.bak
 
 .html
 
+.tar$
 tar.gz$
 
 ^Makefile$

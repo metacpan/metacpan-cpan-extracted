@@ -1,3 +1,8 @@
+2.18    2020-11-25      Abhijit Menon-Sen <ams@toroid.org>
+
+    * Fix Makefile.PL to use -I. when executing tab/tables.pl, so that
+      it can find tab/misc.h (suggested by Tim V)
+
 2.16    2013-04-10      Abhijit Menon-Sen <ams@toroid.org>
 
     * Another attempt to silence cpantesters. No functional changes.

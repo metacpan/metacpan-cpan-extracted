@@ -1,0 +1,29 @@
+use alienfile;
+use strict;
+
+plugin 'PkgConfig' => (
+    pkg_name        => 'jansson',
+);
+
+share {
+    plugin Download => (
+        url     => 'https://digip.org/jansson/releases/jansson-2.13.1.tar.gz',
+        version => qr/jansson-([0-9\.]+)\.tar\.gz$/,
+    );
+
+    plugin Extract => 'tar.gz';
+
+    plugin 'Build::CMake' => ();
+    build [
+        [
+            '%{cmake}',
+                '.',
+                '-DJANSSON_BUILD_DOCS=OFF',
+                @{ meta->prop->{plugin_build_cmake}->{args} },
+                '%{.install.extract}',
+        ],
+        '%{make}',
+        '%{make} install',
+    ];
+};
+

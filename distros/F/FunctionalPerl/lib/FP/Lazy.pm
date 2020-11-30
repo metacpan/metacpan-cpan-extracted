@@ -72,7 +72,7 @@ FP::Lazy - lazy evaluation (delayed evaluation, promises)
 
     # runtime conditional lazyness:
 
-    sub condprom($) {
+    sub condprom {
         my ($cond) = @_;
         lazy_if { 1 / 0 } $cond
     }
@@ -202,6 +202,7 @@ our @EXPORT_OK   = qw(delay force_noeval lazy_backtrace);
 our %EXPORT_TAGS = (all => [@EXPORT, @EXPORT_OK]);
 
 use Carp;
+use FP::Carp;
 use FP::Mixin::Utils;
 use FP::Show;
 use Scalar::Util 'blessed';
@@ -219,15 +220,16 @@ sub die_not_a_Lazy_Promise {
 # index 1: value once evaluated
 # index 2: backtrace if $debug is true
 
-sub lazy_backtrace ($) {    # not a method to avoid shadowing any
-                            # 'contained' method
+sub lazy_backtrace {    # not a method to avoid shadowing any
+                        # 'contained' method
+    @_ == 1 or fp_croak_nargs 1;
     my ($v) = @_;
     blessed($v) // die_not_a_Lazy_Promise($v);
 
     # Consciously not working for Light ones!
     if ($v->isa("FP::Lazy::Promise")) {
-        $$v[2]    # really assume such an access works, no fallback to a
-                  # method like in FP::List
+        $$v[2]          # really assume such an access works, no fallback to a
+                        # method like in FP::List
     } else {
         die_not_a_Lazy_Promise($v);
     }
@@ -258,7 +260,8 @@ sub lazyLight (&) {
     $eager ? goto $_[0] : bless $_[0], "FP::Lazy::PromiseLight"
 }
 
-sub is_promise ($) {
+sub is_promise {
+    @_ == 1 or fp_croak_nargs 1;
     blessed($_[0]) // return;
     $_[0]->isa("FP::Lazy::AnyPromise")
 }
@@ -268,7 +271,8 @@ sub delay (&);
 sub delayLight (&);
 *delayLight = \&lazyLight;
 
-sub force ($;$) {
+sub force {
+    @_ >= 1 and @_ <= 2 or fp_croak_nargs "1-2";
     my ($perhaps_promise, $nocache) = @_;
 LP: {
         if (defined blessed($perhaps_promise)) {
@@ -298,7 +302,8 @@ LP: {
 }
 
 # just remove promise wrapper, don't actually force its evaluation
-sub force_noeval ($) {
+sub force_noeval {
+    @_ == 1 or fp_croak_nargs 1;
     my ($s) = @_;
     if (defined blessed($s)) {
         if ($s->isa("FP::Lazy::Promise")) {

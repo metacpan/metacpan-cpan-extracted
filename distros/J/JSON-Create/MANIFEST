@@ -11,6 +11,8 @@ examples/escape-slash.pl
 examples/exception.pl
 examples/fatal-errors.pl
 examples/hash.pl
+examples/indent-format.pl
+examples/indent.pl
 examples/js-safe.pl
 examples/json-parse-bool.pl
 examples/json-unicode-gzip-bytes.pl
@@ -44,9 +46,11 @@ ppport.h
 README
 t/bool.t
 t/code.t
+t/dualvar.t
 t/escape-slash.t
 t/fformat.t
 t/float.t
+t/indent.t
 t/json-create.t
 t/json-parse.t
 t/leading-zero.t

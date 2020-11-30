@@ -14,7 +14,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '6.64'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.56, CPAN::Meta::Converter version 2.150010'
 license: gpl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -30,7 +30,7 @@ provides:
     version: '0'
   urpmi:
     file: urpmi.pm
-    version: v8.123.0
+    version: v8.124.0
 requires:
   Filesys::Df: '0'
   Getopt::Long: '0'
@@ -44,5 +44,5 @@ requires:
   perl: '5.010000'
 resources:
   repository: git://git.mageia.org/software/rpm/urpmi/
-version: v8.123
+version: v8.124
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

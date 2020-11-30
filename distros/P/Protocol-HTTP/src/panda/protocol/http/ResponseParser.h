@@ -35,6 +35,10 @@ struct ResponseParser : MessageParser {
 
     void reset () { _reset(false); }
 
+protected:
+    bool on_headers    ();
+    bool on_empty_body ();
+
 private:
     RequestSP _context_request;
 

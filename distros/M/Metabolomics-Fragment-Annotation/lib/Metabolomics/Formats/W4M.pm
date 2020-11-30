@@ -45,34 +45,40 @@ Metabolomics::Formats::W4M - Perl W4M extension of the metabolomics::fragment::a
 
 =head1 VERSION
 
-Version 0.1
+Version 0.2 - Adding POD
 
 =cut
 
-our $VERSION = '0.1';
+our $VERSION = '0.2';
 
 
 =head1 SYNOPSIS
 
-    use Metabolomics::Formats::W4M ;
+    use Metabolomics::Formats::W4M qw( :all ) ;
 
 =head1 DESCRIPTION
 
 	Metabolomics::Formats::W4M is a module allowing to access at uptodate W4M formatters, parsers and writters during annotation steps 
-	
 
 =head1 EXPORT
 
-=head1 SUBROUTINES/METHODS
+use Metabolomics::Formats::W4M ;
 
-=head2 METHOD new
+=head1 PUBLIC METHODS 
+
+=head2 Metabolomics::Fragment::Annotation
+
+=over 4
+
+=item new
 
 	## Description : set a new utils object
 	## Input : NA
 	## Output : $oUtils
 	## Usage : my ( $oFormat ) = Metabolomics::Formats::W4M->new ( ) ;
-	
+
 =cut
+
 ## START of SUB
 sub new {
 	## Variables
@@ -85,14 +91,15 @@ sub new {
 }
 ### END of SUB
 
-=head2 METHOD _parsingW4mTabularFile
+=item parserTabularFile
 
 	## Description : parsing a full W4M variable metadata tabular file and create a array of arrats object
 	## Input : $inputTabularFile
 	## Output : $oVariableMetadataTable
-	## Usage : my ( $oVariableMetadataTable ) = parsingW4mTabularFile ( $inputTabularFile ) ;
-	
+	## Usage : my ( $oVariableMetadataTable ) = parserTabularFile ( $inputTabularFile ) ;
+
 =cut
+
 ## START of SUB
 sub parserTabularFile {
     ## Retrieve Values
@@ -124,13 +131,13 @@ sub parserTabularFile {
 }
 ### END of SUB
 
-
-
 __END__
+
+=back
 
 =head1 AUTHOR
 
-Franck Giacomoni, C<< <franck.giacomoni at inra.fr> >>
+Franck Giacomoni, C<< <franck.giacomoni at inrae.fr> >>
 
 =head1 SEE ALSO
 
@@ -172,6 +179,7 @@ L<https://metacpan.org/release/Metabolomics-Fragment-Annotation>
 
 =head1 ACKNOWLEDGEMENTS
 
+Thank you to INRAE and All metabolomics colleagues.
 
 =head1 LICENSE AND COPYRIGHT
 
@@ -179,9 +187,9 @@ CeCILL Copyright (C) 2019 by Franck Giacomoni
 
 Initiated by Franck Giacomoni
 
-followed by INRA PFEM team
+followed by INRAE PFEM team
 
-Web Site = INRA PFEM
+Web Site = INRAE PFEM
 
 
 =cut

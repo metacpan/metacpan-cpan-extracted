@@ -52,20 +52,22 @@ is_6531_local (const char *start, const char *end)
         if (ch > 0x007f)
             continue;
 
-#ifdef RFC6531_FOLLOW_RFC5322
-        /* rfc5322 allows next CTRLs in qtext:
-         *    %d1-8 / %d11 / %d12 / %d14-31 / %d127
-         * in quoted-pairs:
-         *    %d0 / %d1-8 / %d11 / %d12 / %d14-31 / %d127 / LF / CR
-         */
-        if (ISCNTRL(ch) && !quote && !qpair)
-            return inverse(EEAV_LPART_CTRL_CHAR);
-#else
+        /* rfc5321 does not allow any CTRL chars */
+#ifndef RFC6531_FOLLOW_RFC5322
         if (ISCNTRL(ch))
             return inverse(EEAV_LPART_CTRL_CHAR);
 #endif
 
         if (!quote) {
+#ifdef RFC6531_FOLLOW_RFC5322
+            /* rfc5322 allows next CTRLs in qtext:
+             *    %d1-8 / %d11 / %d12 / %d14-31 / %d127
+             * in quoted-pairs:
+             *    %d0 / %d1-8 / %d11 / %d12 / %d14-31 / %d127 / LF / CR
+             */
+            if (!qpair && ISCNTRL(ch))
+                return inverse(EEAV_LPART_CTRL_CHAR);
+#endif
             switch (ch) {
             case '"': {
                 /* quote-strings are allowed at the start
@@ -78,8 +80,11 @@ is_6531_local (const char *start, const char *end)
             } break;
             case '.': {
                 /* '.' is allowed after an atom and only once */
-                if (start[prev] == '.')
+                int pos = utf8_decode_at_byte(&u);
+                if (pos >= 1 && start[prev] == '.')
                     return inverse(EEAV_LPART_TOO_MANY_DOTS);
+                if (pos == 0 || (start + pos + 1) == end)
+                    return inverse(EEAV_LPART_MISPLACED_DOT);
             } break;
             /* specials & SPACE are not allowed outside quote-string */
             case '(': case ')': case '<': case '>': case '@':

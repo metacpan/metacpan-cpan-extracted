@@ -57,7 +57,7 @@ need to make sure that we're storing enough information to get to a 'lastrule'.
 Run the following:
 
    cd tzdata
-   grep Rule africa antarctica asia australasia europe northamerica pacificnew \
+   grep Rule africa antarctica asia australasia europe northamerica \
              southamerica | \
       awk '{print $3}' | sort -u | egrep '^[1-9]' | sort -n | tail -1
    cd ..

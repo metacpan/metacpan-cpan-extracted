@@ -4,7 +4,7 @@ use ExtUtils::MakeMaker;
 
 WriteMakefile(
     'NAME'      => q{UTF8::R2},
-    'VERSION'   => q{0.06},
+    'VERSION'   => q{0.07},
     'ABSTRACT'  => q{makes UTF-8 scripting easy for enterprise use or LTS},
     'PREREQ_PM' => {
         'Carp' => '0',

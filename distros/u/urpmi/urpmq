@@ -37,7 +37,7 @@ our @names;
 our @src_names;
 
 sub usage() {
-    print urpm::args::copyright('urpmq', [ '2000-2010', 'Mandriva' ], [ '2011-2017', 'Mageia' ])
+    print urpm::args::copyright('urpmq', [ '2000-2010', 'Mandriva' ], [ '2011-2020', 'Mageia' ])
 	. N("  --help         - print this help message.
 ") . N("  --update       - use only update media.
 ") . N("  --media        - use only the given media, separated by comma.

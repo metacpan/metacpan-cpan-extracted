@@ -4,7 +4,7 @@ using namespace panda::unievent;
 
 const HandleType Udp::TYPE("udp");
 
-AddrInfoHints Udp::defhints = AddrInfoHints(AF_UNSPEC, SOCK_DGRAM, 0, AddrInfoHints::PASSIVE);
+AddrInfoHints Udp::defhints = AddrInfoHints(AF_UNSPEC, SOCK_DGRAM, 0, 0);
 
 backend::HandleImpl* Udp::new_impl () {
     return loop()->impl()->new_udp(this, domain);

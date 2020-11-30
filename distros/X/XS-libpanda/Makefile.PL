@@ -3,9 +3,11 @@ use Config;
 use XS::Install;
 
 my %libs = (
-    MSWin32 => '-lexecinfo -ldbgeng -lole32',
+    MSWin32 => '-ldbgeng -lole32',
     linux   => '',
+    darwin  => '',
     freebsd => '-lexecinfo',
+    openbsd => '',
     default => '-lexecinfo',
 );
 
@@ -22,21 +24,16 @@ my %params = (
     test             => {
         CPLUS    => 14,
         BIN_DEPS => 'Test::Catch',
-        CLIB => {
+        CLIB     => {
             CMAKE_TARGET => 'panda-lib-tests',
             FILE => 'libpanda-lib-tests.a',
             DIR  => '.',
         },
         RECURSIVE_TEST_FILES => 1,
     },
-    LIBS               => [$libs{$^O} // $libs{default}],
+    LINK               => $libs{$^O} // $libs{default},
+    BIN_SHARE          => 1,
     CONFIGURE_REQUIRES => {'Alien::cmake3' => 0},
 );
-
-if ($ENV{SANITIZE}) {
-    ($params{CCFLAGS}||='') .= ' -fsanitize=undefined -fsanitize=address -fno-omit-frame-pointer';
-    $params{LIBS}[1] .= ' -lubsan -lasan'; #sanitizer
-    $params{LIBS}[0] .= ' -lubsan -lasan'; #sanitizer
-}
 
 write_makefile(%params);

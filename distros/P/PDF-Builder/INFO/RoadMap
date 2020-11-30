@@ -1,4 +1,4 @@
-Road Map for Future Development of PDF::Builder              11 September 2019
+Road Map for Future Development of PDF::Builder              22 November 2020
 
 In order to encourage others to contribute code and/or algorithms to the
 effort, I am publishing this road map of where I would like the product to go.
@@ -76,7 +76,7 @@ D. PDF/A (archival document management, RT 120375): this might be more than
 
 E. JPEG2000 image file support (CTS 12): I don't know if this is worth it, as
    there seems to be very little use of this, but if someone is interested,
-   have at it...
+   have at it...  any other newish image formats that PDF can support?
 
 F. Fix Bar Code generation (CTS 1): there seems to be something quite wrong
    with the current bar code generation, so it's possible that no one is using
@@ -130,7 +130,7 @@ K. Text method to move to arbitrary points: relative or absolute movement
    traditional way, e.g., to the next n8-th column) is useful only for 
    monospaced fonts, and no changes in font size in the line. Thus, tab stops 
    would be more useful when defined by some absolute dimension (e.g., inches 
-   or ems) of column position. Second, tabbing is usually done to get text 
+   or mms) of column position. Second, tabbing is usually done to get text
    columns (sub columns), which involves a lot of manual setup and twiddling of 
    text. Consider using a TABLE within the column or page to get text organized 
    into the desired format (see "tbl" addition in section II).
@@ -142,19 +142,46 @@ K. Text method to move to arbitrary points: relative or absolute movement
 
 L. Determine what it is about "CJK" fonts (.ttf and .otf) that makes them
    incompatible with synfont [RT 130040] and embedding [RT 130041], and fix if 
-   possible. Are separate CJK fonts even necessary these days?
+   possible. Are separate CJK fonts even necessary these days? Also note that
+   many CJK fonts refuse to "subset" when embedded (the entire font gets
+   embedded, even if you only use a handful of glyphs!).
 
 M. Add decorative rectangular box effects around sections of text. With or
    without border (allow rounded corners) and background color, drop shadows
    (3D effect), etc. The box is drawn at given dimensions and location, and
    the text written over it in the usual manner. Content clipping might also
-   be supported.
+   be supported. See PDF::Table for drawing rules (and borders) for ideas, as
+   well as block background colors (gfx_bg object before text object).
 
-I. Extend HarfBuzz::Shaper use (see A.) to flow paragraphs and sections (fill)
+N. Extend HarfBuzz::Shaper use (see A.) to flow paragraphs and sections (fill)
    to match capability of existing text-fill calls. Architect so as to extend
    easily to full paragraph shaping and "pouring" text into arbitrary columns,
    with balancing. Justification to avoid ragged-left or -right needs to be
    handled carefully for connected glyphs (e.g., Arabic, Indic, cursive Latin).
+
+   Treat HarfBuzz::Shaper handled-fonts just like any other font when it comes
+   to various text-handling routines (including length, justifying and aligning
+   text, filling lines, paragraph, section, textlabel, etc.).
+
+O. ## DONE ## release 3.020
+   Support for PNM and related graphics images. See RT 132844.
+
+P. Look into using TeX::Hyphen or Text::Hyphen to split words properly. The
+   latter supports 3 languages besides English. Both use TeX (Knuth-Liang)
+   algorithms. Eventually need means to override built-in hyphenation (e.g.,
+   force 're-cord' or 'rec-ord', per context), similar to ligature control. 
+   One way would be to insert soft-hypen &SHY;, this might require all 
+   syllable breaks to be so marked, since TH might not see it any more.
+   Use any place where a string is flowed into multiple lines, and eventually 
+   for complete paragraph shaping. Retain camelCase and punctuation/numeric 
+   splitting as fallback for non-words. Consider own built-in version of either
+   TH, using CTAN directly (would take rewrite of the Perl code?), if can't
+   get owner to upgrade it.
+
+Q. ## DONE ## release 3.020
+   Look at Basic/PDF/File.pm 'Q>' unpack (ref RT 133131). Supposedly will not
+   run on a 32 bit platform -- will it work on such platform to check if high
+   33 bits are all 0, and convert the low 32 bits to a fullword integer?
 
 =============================================================================
 II. Items to add to a separate area (new module or sub-module)
@@ -169,6 +196,19 @@ A. Hyphenation and paragraph shaping: including CTS 20 (Hyphenation) and CTS 24
    paragraph shaping algorithms to flow text into a space in a visually 
    pleasing manner, while obeying widows and orphans constraints (as well as
    not orphaning headings). Pango may help here with line and word splitting.
+   ** Look into item P in section I **
+   Text::KnuthPlass might be usable for general paragraph setup (allows non-
+   rectangular paragaph), uses Text::Hyphen internally, don't know yet if it 
+   does the full Knuth-Plass "rivers of white" and "too many hyphens in a row" 
+   bit. Interaction with Text::Layout stuff (font, size, changes)?
+
+   I've gotten Text::Hyphen and Text::KnuthPlass working, and tests suggest 
+   that they (mostly) work great. Unfortunately, KP doesn't build on all 
+   systems (a simple fix), so I may have to forcibly take it over if the owner 
+   doesn't respond reasonably soon, or just take it into the product. Hyphen 
+   could use some improvements for multilanguage support, also waiting for a 
+   response. Some sort of "virtual printing (see 'B') would be necessary, as 
+   dealing with widows and orphans would be much easier that way.
 
 B. Virtual pages: this would be related to item (A) (paragraph shaping), where
    PDF code would not be immediately written to an output page, but would be
@@ -180,6 +220,12 @@ B. Virtual pages: this would be related to item (A) (paragraph shaping), where
    virtuality (virtual line output) could be useful for resetting a baseline
    to accommodate a change in font size -- this might involve tagging a word or
    block of words of the same height.
+
+   PDF::Table product (or table functionality within Builder) could make use
+   of virtual printing to "print" to a mini-page within a cell (fixed width,
+   min/max height). If it doesn't fit on the page, decide where to split row
+   to avoid widows and orphans. Also knowing cell height and row height, can
+   vertically align a cell's contents.
 
 C. General text flowing capability, to fill irregularly shaped columns (such
    as with intruding inserts or margin notes) in a balanced manner, including
@@ -235,6 +281,75 @@ G. Prepress production markup: convenience functions to place a watermark or
 
    Page background color or pattern should extend to the full size of the page
    and not end when content ends part way down the page. Remind users that 
-   most printers will not print all the way to the edge.
+   most printers will not print all the way to the edge. See Boxes.pl example.
+
+H. Incorporate PDF::Table into PDF::Builder::Table. Simplify it somewhat (e.g.,
+   instead of separate line-width and color settings, use a list: w (width in
+   points with default color and solid line), or [w, color, optional-dash-
+   pattern]. Use it for borders and rules, and possibly frames. A "frame" would
+   be the enclosure for the table, and would be either a line spec or a width
+   and pattern (3D raised, 3D sunken, sunken table, raised table, floating
+   table with shadow, etc.). A "rule" would be horizontal and vertical
+   divider lines, and a "border" would be cell dividers ([w, color, margin-to-
+   cell edge, optional-dash-pattern]). Other simplifications and consolidations
+   of settings as justified (do not have to maintain absolute compatibility
+   with existing PDF::Table). Tables continued to the next page would not get
+   a full frame at the bottom/top, but a heavy dashed line (if breaking in
+   middle of a cell) or heavy solid line (if breaking at a row boundary). It
+   might be good not to automatically create a next page and start outputting
+   the rest of the table, but hold the contents and alert the programmer that
+   at least one more call is needed to finish.
+
+   Currently, PDF::Table basically equalizes column widths as much as it can,
+   but consider a starting point of relative and/or absolute column widths,
+   like many other table implementations. Some columns absolute widths, and
+   remaining space divided up even among *'s (with a column N*), subject to
+   minimum and maximum widths.
+
+   Within a cell, ideally it would be treated as a mini-page, with all the 
+   normal PDF construction capabilities including paragraph shaping, flow into
+   column(s), images, etc. This would be better than the "text_block" used in
+   PDF::Table (more uniform coding and treatment), although some ideas from
+   text_block might find a home. However, such complex treatment (a table 
+   could embed a table) requires virtual pages to permit a lot of rearrangement.
+
+I. Consider Optional Content Groups (Layers), per 32000-2008 section 8.11.
+   This permits drawings to be shown by layer, or a watermark/copyright layer
+   to show only on printing.
+
+J. ## DONE ## release 3.020  (documentation improved)
+   Per wkHTMLtoPDF issue 4846, at least some phone cameras output "portrait"
+   mode photos in landscape mode (rotated), with an "orientation" tag. JPEG
+   (at least) image handling may need a rotation flag in the call, and/or 
+   pay attention to the Exif orientation flag. Confirmed that
+   Builder JPEG support does NOT respect the orientation flag.
+   https://www.google.com/search?client=firefox-b-1-d&q=jpeg+orientation+metadata
+   Unfortunately, there are a number of ways to specify the orientation flag
+   including XML '<exif:Orientation>Top-left</exif::Orientation>' and buried
+   somewhere in the Exif or JFIF header of the file. It might be best to ask
+   the image what its orientation is, and leave translation and rotation of
+   the placed image to user code, rather than trying to flip the contents of
+   the image file directly. See writeup in Docs.pm.
+
+K. A means to update PDF content already written to the $pdf data structure, 
+   but not yet written to file. This could involve moving a text write (one
+   or more translates) to somewhere else on the page, or even moving from one
+   page to another. More general editing of material already "written" out,
+   such as changing a font size or a color -- would need a way to find the
+   desired content to be modified. Ability to erase content or move it from
+   page to page (e.g., started a table and then found it wouldn't fit on one
+   page -- move it to the top of the next page to allow display on a single
+   page). If virtual pages, design with all this in mind, so easy to update
+   content before being "written" out. If nothing is written to the PDF file
+   until the end (save or saveas), this might even supersede virtual pages.
+
+L. (See B and H items above) Consider a $page->subpage(x, y, w, h, opts) to
+   subclass a page into a restricted area (not necessarily rectangular, or
+   bounded in height). Things like columns and table cells could then be
+   treated as normal pages (inherit text and graphics contexts?) and anything
+   could be put into them. May want to wait until have virtual write 
+   capability rather than writing to file right away, for fitting table cells
+   into a page, and balancing columns. Once in, build-in PDF::Table capability
+   as PDF::Builder::Table, and can have arbitrary content in a table cell.
 
 =============================================================================

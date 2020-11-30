@@ -1,0 +1,33 @@
+---
+abstract: 'Schema migrations via checksums instead of versions'
+author:
+  - 'Henry Van Styn <vanstyn@cpan.org>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.031, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: DBIx-Class-StateMigrations
+requires:
+  Class::Inspector: 0
+  DBIx::Class::Schema::Diff: 1.11
+  DBIx::Class::Schema::Diff::State: 0
+  Data::Dump: 0
+  Module::Locate: 0
+  Module::Runtime: 0
+  Moo: 0
+  Path::Class: 0
+  SQL::SplitStatement: 0
+  Scalar::Util: 0
+  Try::Tiny: 0
+  Types::Standard: 0
+  strict: 0
+  warnings: 0
+resources:
+  bugtracker: https://github.com/vanstyn/DBIx-Class-StateMigrations/issues
+  repository: https://github.com/vanstyn/DBIx-Class-StateMigrations.git
+version: 0.001

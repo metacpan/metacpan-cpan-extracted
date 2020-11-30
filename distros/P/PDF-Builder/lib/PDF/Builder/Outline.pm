@@ -5,8 +5,8 @@ use base 'PDF::Builder::Basic::PDF::Dict';
 use strict;
 use warnings;
 
-our $VERSION = '3.019'; # VERSION
-my $LAST_UPDATE = '3.016'; # manually update whenever code is changed
+our $VERSION = '3.020'; # VERSION
+my $LAST_UPDATE = '3.020'; # manually update whenever code is changed
 
 use Carp qw(croak);
 use PDF::Builder::Basic::PDF::Utils;
@@ -34,6 +34,8 @@ sub new {
     $self->{'Prev'}   = $prev   if defined $prev;
     $self->{' api'}   = $api;
     weaken $self->{' api'};
+    weaken $self->{'Parent'} if defined $parent;
+    weaken $self->{'Prev'} if defined $prev;
 
     return $self;
 }
@@ -42,6 +44,7 @@ sub new {
 sub parent {
     my $self = shift();
     $self->{'Parent'} = shift() if defined $_[0];
+    weaken $self->{'Parent'};
     return $self->{'Parent'};
 }
 
@@ -49,6 +52,7 @@ sub parent {
 sub prev {
     my $self = shift();
     $self->{'Prev'} = shift() if defined $_[0];
+    weaken $self->{'Prev'};
     return $self->{'Prev'};
 }
 
@@ -56,6 +60,7 @@ sub prev {
 sub next {
     my $self = shift();
     $self->{'Next'} = shift() if defined $_[0];
+    weaken $self->{'Next'};
     return $self->{'Next'};
 }
 
@@ -65,6 +70,7 @@ sub first {
 
     $self->{'First'} = $self->{' children'}->[0] 
         if defined $self->{' children'} and defined $self->{' children'}->[0];
+    weaken $self->{'First'};
     return $self->{'First'};
 }
 
@@ -74,6 +80,7 @@ sub last {
 
     $self->{'Last'} = $self->{' children'}->[-1] 
         if defined $self->{' children'} and defined $self->{' children'}->[-1];
+    weaken $self->{'Last'};
     return $self->{'Last'};
 }
 
@@ -291,17 +298,7 @@ Defines the destination of the outline as a PDF-file with filepath
 C<$pdffile>, on page C<$pagenum> (default 0), and position C<%position> 
 (same as dest()).
 
-The old name, I<pdfile>, is still available but is B<deprecated> and will be
-removed at some time in the future.
-
 =cut
-
-# to be removed no earlier than October, 2020
-sub pdfile {
-    my ($self, $file, $page_number, %position) = @_;
-    warn "use pdf_file() method instead of pdfile()";
-    return $self->pdf_file($file, $page_number, %position);
-}
 
 sub pdf_file {
     my ($self, $file, $page_number, %position) = @_;

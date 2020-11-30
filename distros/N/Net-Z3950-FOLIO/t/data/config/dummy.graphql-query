@@ -1,0 +1,5 @@
+query($cql: String) {
+  instance_storage_instances(query: $cql) {
+    totalRecords
+  }
+}

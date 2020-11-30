@@ -158,15 +158,15 @@ template<Level level> struct RV2SV {
 template<template <Level> class Backend>
 backend_t apply(Level level)  {
     switch (level) {
-    case VERBOSE_DEBUG:  return &Backend<VERBOSE_DEBUG>::pp;
-    case DEBUG:          return &Backend<DEBUG>::pp;
-    case INFO:           return &Backend<INFO>::pp;
-    case NOTICE:         return &Backend<NOTICE>::pp;
-    case WARNING:        return &Backend<WARNING>::pp;
-    case ERROR:          return &Backend<ERROR>::pp;
-    case CRITICAL:       return &Backend<CRITICAL>::pp;
-    case ALERT:          return &Backend<ALERT>::pp;
-    case EMERGENCY:      return &Backend<EMERGENCY>::pp;
+    case Level::VerboseDebug : return &Backend<Level::VerboseDebug>::pp;
+    case Level::Debug        : return &Backend<Level::Debug>::pp;
+    case Level::Info         : return &Backend<Level::Info>::pp;
+    case Level::Notice       : return &Backend<Level::Notice>::pp;
+    case Level::Warning      : return &Backend<Level::Warning>::pp;
+    case Level::Error        : return &Backend<Level::Error>::pp;
+    case Level::Critical     : return &Backend<Level::Critical>::pp;
+    case Level::Alert        : return &Backend<Level::Alert>::pp;
+    case Level::Emergency    : return &Backend<Level::Emergency>::pp;
     }
     std::abort();
 }
@@ -179,11 +179,11 @@ enum class LevelAccess  { op_const, op_padsv, op_rv2sv };
 enum class ModuleAccess { op_const, op_padsv, op_rv2sv, deduce };
 using LevelOption = panda::optional<Level>;
 
-static inline LevelOption sv2level(SV* sv)  {
+static inline LevelOption sv2level (SV* sv)  {
     using namespace panda::log;
     if (sv) {
         int l = SvIV(sv);
-        if (l >= VERBOSE_DEBUG && l <= EMERGENCY) return LevelOption((Level)l);
+        if (l >= (int)Level::VerboseDebug && l <= (int)Level::Emergency) return LevelOption((Level)l);
     }
     return LevelOption{};
 }
@@ -191,41 +191,41 @@ static inline LevelOption sv2level(SV* sv)  {
 template<LevelAccess> struct GetLevel;
 
 template<> struct GetLevel<LevelAccess::op_const> {
-    static LevelOption get(OP* op)  {
+    static LevelOption get (OP* op)  {
         return sv2level(access::constsv(op));
     }
 };
 
 template<> struct GetLevel<LevelAccess::op_padsv> {
-    static LevelOption get(OP* op)  {
+    static LevelOption get (OP* op)  {
         return sv2level(access::padsv(op));
     }
 };
 
 template<> struct GetLevel<LevelAccess::op_rv2sv> {
-    static LevelOption get(OP* op)  {
+    static LevelOption get (OP* op)  {
         return sv2level(access::rv2sv(op));
     }
 };
 
 template<ModuleAccess> struct GetModule;
 template<> struct GetModule<ModuleAccess::op_const> {
-    static SV* get(OP* op_prev)  { return access::constsv(OpSIBLING(op_prev)); }
+    static SV* get (OP* op_prev)  { return access::constsv(OpSIBLING(op_prev)); }
 };
 template<> struct GetModule<ModuleAccess::op_padsv> {
-    static SV* get(OP* op_prev)  { return access::padsv(OpSIBLING(op_prev)); }
+    static SV* get (OP* op_prev)  { return access::padsv(OpSIBLING(op_prev)); }
 };
 template<> struct GetModule<ModuleAccess::op_rv2sv> {
-    static SV* get(OP* op_prev)  { return access::rv2sv(OpSIBLING(op_prev)); }
+    static SV* get (OP* op_prev)  { return access::rv2sv(OpSIBLING(op_prev)); }
 };
 template<> struct GetModule<ModuleAccess::deduce> {
-    static SV* get(OP*)  { return nullptr; }
+    static SV* get (OP*)  { return nullptr; }
 };
 
 
 template<LevelAccess L, ModuleAccess M>
 struct OpAccessor {
-    static OP* pp(pTHX) {
+    static OP* pp (pTHX) {
         auto check = [&]() {
             auto op = OpSIBLING(PL_op);
             bool skip = false;
@@ -240,7 +240,7 @@ struct OpAccessor {
     }
 };
 
-backend_t compose(LevelAccess level_access, ModuleAccess module_access) {
+backend_t compose (LevelAccess level_access, ModuleAccess module_access) {
     switch (module_access) {
     case ModuleAccess::op_const: {
         switch (level_access) {
@@ -273,7 +273,7 @@ backend_t compose(LevelAccess level_access, ModuleAccess module_access) {
 
 }
 
-static void optimize(size_t module_pos, Optimizer&& optimizer) {
+static void optimize (size_t module_pos, Optimizer&& optimizer) {
     OP* op = PL_op;
     bool already_optimized = op->op_spare & 1;
     if (already_optimized) return;
@@ -319,7 +319,7 @@ static void optimize(size_t module_pos, Optimizer&& optimizer) {
     }
 }
 
-void optimize() {
+void optimize () {
     auto optimizer = [] (const Args& args) -> backend_t {
         using namespace fetch_level;
         LevelAccess level_access;
@@ -344,7 +344,7 @@ void optimize() {
 }
 
 
-void optimize(panda::log::Level level) {
+void optimize (panda::log::Level level) {
     auto optimizer = [level] (const Args& args) -> backend_t {
         using namespace with_level;
         switch (args.front()) {

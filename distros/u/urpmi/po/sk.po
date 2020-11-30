@@ -11,16 +11,17 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: Mageia\n"
-"POT-Creation-Date: 2020-01-18 09:59+0200\n"
-"PO-Revision-Date: 2015-05-13 09:02+0000\n"
+"POT-Creation-Date: 2020-07-10 17:41+0100\n"
+"PO-Revision-Date: 2020-07-10 16:45+0000\n"
 "Last-Translator: Milan Baša <minkob@mail.t-com.sk>\n"
-"Language-Team: Slovak (http://www.transifex.com/projects/p/mageia/language/"
+"Language-Team: Slovak (http://www.transifex.com/MageiaLinux/mageia/language/"
 "sk/)\n"
 "Language: sk\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8-bit\n"
-"Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
+"Plural-Forms: nplurals=4; plural=(n % 1 == 0 && n == 1 ? 0 : n % 1 == 0 && n "
+">= 2 && n <= 4 ? 1 : n % 1 != 0 ? 2: 3);\n"
 
 #: ../gurpm/RPMProgressDialog.pm:47
 #, c-format
@@ -67,7 +68,7 @@ msgstr "Získavanie balíka `%s'..."
 msgid "Cancel"
 msgstr "Zrušiť"
 
-#: ../gurpm/RPMProgressDialog.pm:359 ../urpm.pm:452 ../urpm/download.pm:882
+#: ../gurpm/RPMProgressDialog.pm:359 ../urpm.pm:454 ../urpm/download.pm:882
 #: ../urpm/get_pkgs.pm:277 ../urpm/media.pm:1149 ../urpm/media.pm:1682
 #: ../urpm/media.pm:1833
 #, c-format
@@ -87,7 +88,7 @@ msgstr "Chyba: nie je možné nájsť súbor %s, operácia sa zruší."
 #: ../gurpmi:65 ../gurpmi2:174 ../gurpmi2:203
 #, c-format
 msgid "_Ok"
-msgstr "_Ok"
+msgstr "Ok"
 
 #: ../gurpmi:85
 #, c-format
@@ -148,12 +149,12 @@ msgstr "_Inštalácia"
 #: ../gurpmi:118
 #, c-format
 msgid "_Save"
-msgstr "_Uložiť"
+msgstr "Uložiť"
 
 #: ../gurpmi:119 ../gurpmi2:174
 #, c-format
 msgid "_Cancel"
-msgstr "_Zrušiť"
+msgstr "Zrušiť"
 
 #: ../gurpmi:127
 #, c-format
@@ -280,7 +281,7 @@ msgstr ""
 "%s\n"
 "Pokračovať v inštallácii aj tak?"
 
-#: ../gurpmi2:120
+#: ../gurpmi2:120 ../gurpmi2:386
 #, c-format
 msgid "Warning"
 msgstr "Varovanie"
@@ -308,7 +309,7 @@ msgstr "Jeden z nasledujúcich balíkov je potrebný:"
 #: ../gurpmi2:204
 #, c-format
 msgid "_Abort"
-msgstr "_Zrušiť"
+msgstr "Zrušiť"
 
 #: ../gurpmi2:239
 #, c-format
@@ -343,6 +344,7 @@ msgid_plural "Proceed with the installation of the %d packages?"
 msgstr[0] "Pokračovať v inštalácii jedného balika?"
 msgstr[1] "Pokračovať v inštalácii %d balikov?"
 msgstr[2] "Pokračovať v inštalácii %d balikov?"
+msgstr[3] "Pokračovať v inštalácii %d balikov?"
 
 #: ../gurpmi2:259 ../urpmi:608
 #, c-format
@@ -376,7 +378,7 @@ msgstr "Nastala chyba:"
 #: ../gurpmi2:319
 #, c-format
 msgid "_Done"
-msgstr "_Hotovo"
+msgstr "Hotovo"
 
 #: ../gurpmi2:336 ../urpm/main_loop.pm:82
 #, c-format
@@ -411,6 +413,16 @@ msgstr "Inštalácia ukončená"
 #, c-format
 msgid "restarting urpmi"
 msgstr "znovuspustenie urpmi"
+
+#: ../gurpmi2:386
+#, c-format
+msgid "No"
+msgstr "Nie"
+
+#: ../gurpmi2:386
+#, c-format
+msgid "Yes"
+msgstr "Áno"
 
 #: ../rpm-find-leaves:15
 #, c-format
@@ -463,138 +475,138 @@ msgid "While some packages may have been installed, there were failures.\n"
 msgstr ""
 "Hoci sa nejaké balíky nainštalovali, objavili sa pri tom nejaké chyby.\n"
 
-#: ../urpm.pm:193
+#: ../urpm.pm:195
 #, c-format
 msgid "fail to create directory %s"
 msgstr "zlyhalo vytvorenie adresára %s"
 
-#: ../urpm.pm:194
+#: ../urpm.pm:196
 #, c-format
 msgid "invalid owner for directory %s"
 msgstr "neplatný vlastník pre adresár %s"
 
-#: ../urpm.pm:237
+#: ../urpm.pm:239
 #, c-format
 msgid "Can not download packages into %s"
 msgstr "Nie je možné stiahnuť balíky do %s"
 
-#: ../urpm.pm:253
+#: ../urpm.pm:255
 #, c-format
 msgid "Environment directory %s does not exist"
 msgstr "Adresár prostredia %s neexistuje"
 
-#: ../urpm.pm:254 ../urpmf:244 ../urpmq:163
+#: ../urpm.pm:256 ../urpmf:244 ../urpmq:163
 #, c-format
 msgid "using specific environment on %s\n"
 msgstr "použitie špecifického prostredia na %s\n"
 
-#: ../urpm.pm:422
+#: ../urpm.pm:424
 #, c-format
 msgid "unable to open rpmdb"
 msgstr "nemôžem otvoriť rpmdb"
 
-#: ../urpm.pm:441
+#: ../urpm.pm:443
 #, c-format
 msgid "invalid rpm file name [%s]"
 msgstr "nesprávne meno rpm súboru [%s]"
 
-#: ../urpm.pm:447
+#: ../urpm.pm:449
 #, c-format
 msgid "retrieving rpm file [%s] ..."
 msgstr "získavanie rpm súboru [%s] ..."
 
-#: ../urpm.pm:449 ../urpm/get_pkgs.pm:275
+#: ../urpm.pm:451 ../urpm/get_pkgs.pm:275
 #, c-format
 msgid "...retrieving done"
 msgstr "...získavanie ukončené"
 
-#: ../urpm.pm:457
+#: ../urpm.pm:459
 #, c-format
 msgid "unable to access rpm file [%s]"
 msgstr "nie je možné pristúpiť k rpm súboru [%s]"
 
-#: ../urpm.pm:462
+#: ../urpm.pm:464
 #, c-format
 msgid "unable to parse spec file %s [%s]"
 msgstr "nie je možné správne prečítať %s  [%s]"
 
-#: ../urpm.pm:470
+#: ../urpm.pm:472
 #, c-format
 msgid "unable to register rpm file"
 msgstr "nie je možné zaregistrovať rpm súbor"
 
-#: ../urpm.pm:472
+#: ../urpm.pm:474
 #, c-format
 msgid "Incompatible architecture for rpm [%s]"
 msgstr "Nekompatibilná architektúra pre rpm [%s]"
 
-#: ../urpm.pm:476
+#: ../urpm.pm:478
 #, c-format
 msgid "error registering local packages"
 msgstr "chyba pri registrácii lokálnych balíkov"
 
-#: ../urpm.pm:588
+#: ../urpm.pm:590
 #, c-format
 msgid "This operation is forbidden while running in restricted mode"
 msgstr "Táto operácia nie je povolená ak program beží v reštriktívnom režime"
 
-#: ../urpm/args.pm:156 ../urpm/args.pm:165
+#: ../urpm/args.pm:157 ../urpm/args.pm:166
 #, c-format
 msgid "bad proxy declaration on command line\n"
 msgstr "nesprávna deklarácia proxy v príkazovom riadku\n"
 
-#: ../urpm/args.pm:320
+#: ../urpm/args.pm:321
 #, c-format
 msgid "urpmq: cannot read rpm file \"%s\"\n"
 msgstr "urpmq: nie je možné prečítať súbor \"%s\"\n"
 
-#: ../urpm/args.pm:388
+#: ../urpm/args.pm:389
 #, c-format
 msgid "unexpected expression %s"
 msgstr "neočakávaný výraz %s"
 
-#: ../urpm/args.pm:389
+#: ../urpm/args.pm:390
 #, c-format
 msgid "missing expression before %s"
 msgstr "chýbajúci výraz pred %s"
 
-#: ../urpm/args.pm:395
+#: ../urpm/args.pm:396
 #, c-format
 msgid "unexpected expression %s (suggestion: use -a or -o ?)"
 msgstr "neočakávaný výraz %s (návrh: použitie -a alebo -o?)"
 
-#: ../urpm/args.pm:399
+#: ../urpm/args.pm:400
 #, c-format
 msgid "no expression to close"
 msgstr "žiaden výraz na uzavretie"
 
-#: ../urpm/args.pm:408
+#: ../urpm/args.pm:409
 #, c-format
 msgid "by default urpmf awaits a regexp. you should use option \"--literal\""
 msgstr ""
 "implicitne urpmf čaká na regexp. Mali by ste použiť možnosť \"--literal\""
 
-#: ../urpm/args.pm:482
+#: ../urpm/args.pm:483
 #, c-format
 msgid "chroot directory doesn't exist"
 msgstr "chroot adresár neexistuje"
 
-#: ../urpm/args.pm:505
+#: ../urpm/args.pm:506
 #, c-format
 msgid "Can't use %s without %s"
 msgstr "Nie je možné použiť  %s bez  %s"
 
-#: ../urpm/args.pm:508 ../urpm/args.pm:511 ../urpmq:155
+#: ../urpm/args.pm:509 ../urpm/args.pm:512 ../urpmq:155
 #, c-format
 msgid "Can't use %s with %s"
 msgstr "Nie je možné použiť  %s s  %s"
 
-#: ../urpm/args.pm:519
+#: ../urpm/args.pm:520
 #, c-format
 msgid "Too many arguments\n"
 msgstr "Priveľa argumentov\n"
 
-#: ../urpm/args.pm:527
+#: ../urpm/args.pm:528
 #, c-format
 msgid ""
 "%s version %s\n"
@@ -611,7 +623,7 @@ msgstr ""
 "\n"
 "použitie:\n"
 
-#: ../urpm/args.pm:533
+#: ../urpm/args.pm:534
 #, c-format
 msgid "Copyright (C) %s by %s"
 msgstr "Copyright (C) %s od %s"
@@ -811,32 +823,32 @@ msgstr "sťahovanie rpm súborov zo zdroja \"%s\"..."
 msgid "removing %s"
 msgstr "odstraňovanie %s"
 
-#: ../urpm/install.pm:215
+#: ../urpm/install.pm:217
 #, c-format
 msgid "unable to extract rpm from delta-rpm package %s"
 msgstr "nie je možné rozbaliť rpm z balíka delta-rpm %s"
 
-#: ../urpm/install.pm:242
+#: ../urpm/install.pm:245
 #, c-format
 msgid "unable to install package %s"
 msgstr "nie je možné nainštalovať balík %s"
 
-#: ../urpm/install.pm:245
+#: ../urpm/install.pm:248
 #, c-format
 msgid "removing bad rpm (%s) from %s"
 msgstr "odstraňovanie chybného balíka (%s) z %s"
 
-#: ../urpm/install.pm:246 ../urpm/install.pm:393
+#: ../urpm/install.pm:249 ../urpm/install.pm:397
 #, c-format
 msgid "removing %s failed: %s"
 msgstr "odstraňovanie %s zlyhalo: %s"
 
-#: ../urpm/install.pm:295
+#: ../urpm/install.pm:298
 #, c-format
 msgid "removing package %s"
 msgstr "odstraňovanie balíka %s"
 
-#: ../urpm/install.pm:359
+#: ../urpm/install.pm:362
 #, c-format
 msgid ""
 "created transaction for installing on %s (remove=%d, install=%d, upgrade=%d)"
@@ -844,17 +856,17 @@ msgstr ""
 "vytvorenie transakcie pre inštaláciu %s (odstrániť=%d, inštalovať=%d, "
 "aktualizácia=%d)"
 
-#: ../urpm/install.pm:362
+#: ../urpm/install.pm:365
 #, c-format
 msgid "unable to create transaction"
 msgstr "nie je možné vytvoriť transakciu"
 
-#: ../urpm/install.pm:391
+#: ../urpm/install.pm:395
 #, c-format
 msgid "removing installed rpms (%s) from %s"
 msgstr "odstraňovanie inštalovaných rpm (%s) z %s"
 
-#: ../urpm/install.pm:400
+#: ../urpm/install.pm:404
 #, c-format
 msgid "More information on package %s"
 msgstr "Viac informácií o balíku %s"
@@ -1073,11 +1085,11 @@ msgid "un-ignoring tainted medium `%s' b/c tainted packages are installed"
 msgstr "neignorovanie tainted zdroja  `%s', tzn. tainted balíky sa inštalujú"
 
 #: ../urpm/media.pm:816
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "un-ignoring 32bit medium `%s' b/c 32-bit packages are installed or system is "
 "32-bit EFI"
-msgstr "neignorovanie tainted zdroja  `%s', tzn. tainted balíky sa inštalujú"
+msgstr ""
 
 #: ../urpm/media.pm:844
 #, c-format
@@ -1429,6 +1441,10 @@ msgstr[2] ""
 "Nasledujúce balíky:\n"
 " %s\n"
 "sú odteraz osirotené."
+msgstr[3] ""
+"Nasledujúce balíky:\n"
+" %s\n"
+"sú odteraz osirotené."
 
 #: ../urpm/orphans.pm:616
 #, c-format
@@ -1437,6 +1453,7 @@ msgid_plural "You may wish to remove them."
 msgstr[0] "Bolo by vhodné ho odstrániť."
 msgstr[1] "Bolo by vhodné ich odstrániť."
 msgstr[2] "Bolo by vhodné ich odstrániť."
+msgstr[3] "Bolo by vhodné ich odstrániť."
 
 #: ../urpm/orphans.pm:633
 #, c-format
@@ -1461,6 +1478,11 @@ msgstr[1] ""
 "sú odteraz osirotené, ak si ich želáte odstrániť, môžete použiť \"urpme --"
 "auto-orphans\""
 msgstr[2] ""
+"Nasledujúce balíky:\n"
+" %s\n"
+"sú odteraz osirotené, ak si ich želáte odstrániť, môžete použiť \"urpme --"
+"auto-orphans\""
+msgstr[3] ""
 "Nasledujúce balíky:\n"
 " %s\n"
 "sú odteraz osirotené, ak si ich želáte odstrániť, môžete použiť \"urpme --"
@@ -1791,6 +1813,7 @@ msgid_plural "Removing the following packages will break your system:"
 msgstr[0] "Odstránenie nasledujúceho balíka spôsobí zrútenie systému:"
 msgstr[1] "Odstránenie nasledujúcich balíkov spôsobí zrútenie systému:"
 msgstr[2] "Odstránenie nasledujúcich balíkov spôsobí zrútenie systému:"
+msgstr[3] "Odstránenie nasledujúcich balíkov spôsobí zrútenie systému:"
 
 #: ../urpme:123
 #, c-format
@@ -1810,6 +1833,7 @@ msgid_plural ""
 msgstr[0] "Kvôli zachovaniu závislostí bude nasledujúci balík odstránený"
 msgstr[1] "Kvôli zachovaniu závislostí budú nasledujúce balíky %d odstránené"
 msgstr[2] "Kvôli zachovaniu závislostí budú nasledujúce balíky %d odstránené"
+msgstr[3] "Kvôli zachovaniu závislostí budú nasledujúce balíky %d odstránené"
 
 #: ../urpme:151
 #, c-format
@@ -1818,6 +1842,7 @@ msgid_plural "(orphan packages)"
 msgstr[0] "(balík - sirota)"
 msgstr[1] "(balíky - siroty)"
 msgstr[2] "(balíky - siroty)"
+msgstr[3] "(balíky - siroty)"
 
 #: ../urpme:158
 #, c-format
@@ -1826,6 +1851,7 @@ msgid_plural "Remove %d packages?"
 msgstr[0] "Odstrániť balík %d ?"
 msgstr[1] "Odstrániť balíky %d ?"
 msgstr[2] "Odstrániť balíky %d ?"
+msgstr[3] "Odstrániť balíky %d ?"
 
 #: ../urpme:163
 #, c-format
@@ -2674,6 +2700,7 @@ msgid_plural "The following orphan packages will be removed."
 msgstr[0] "Nasledujúci balík - sirota bude odstránený."
 msgstr[1] "Nasledujúce balíky - sirotkovia budú odstránené."
 msgstr[2] "Nasledujúce balíky - sirotkovia budú odstránené."
+msgstr[3] "Nasledujúce balíky - sirotkovia budú odstránené."
 
 #: ../urpmi:599
 #, c-format
@@ -3341,7 +3368,7 @@ msgid ""
 "no xml info for medium \"%s\", unable to return any result for packages %s"
 msgstr "žiadne xml info pr zdroj \"%s\", žiadny výsledok pre balíky %s"
 
-#: ../urpmq:487
+#: ../urpmq:488
 #, c-format
 msgid "No changelog found\n"
 msgstr "Nebol nájdený zoznam zmien\n"

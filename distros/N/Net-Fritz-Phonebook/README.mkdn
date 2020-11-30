@@ -53,7 +53,7 @@ This URL is used to access the phone book contents.
     };
 
 Arrayref of the entries in this phone book. Each entry is
-a [Net::Fritz::Phonebook::Entry](https://metacpan.org/pod/Net::Fritz::Phonebook::Entry).
+a [Net::Fritz::PhonebookEntry](https://metacpan.org/pod/Net::Fritz::PhonebookEntry).
 
 # METHODS
 

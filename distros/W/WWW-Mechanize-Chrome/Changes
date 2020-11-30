@@ -2,28 +2,34 @@
     * Tested against Google Chrome 78.0.3904.97, thanks Travis CI
     * Tested against Chrome/75.0.3770.90 / Win64, thanks AppVeyor
     * Windows tests
-    * Tested against Chromium HeadlessChrome/62.0.3202.94
-    * Tested against Chromium HeadlessChrome/63.0.3239.132
-    * Tested against Chromium HeadlessChrome/64.0.3282.119
-    * Tested against Chromium HeadlessChrome/65.0.3325.181
-    * Tested against Chromium HeadlessChrome/66.0.3359.139
-    * Tested against Chromium HeadlessChrome/67.0.3396.99
-    * Tested against Chromium HeadlessChrome/68.0.3440.84
-    * Tested against Chromium HeadlessChrome/69.0.3497.100
-    * Tested against Chromium HeadlessChrome/70.0.3538.102
-    * Tested against Chromium HeadlessChrome/71.0.3578.98
-    * Tested against Chrome   HeadlessChrome/72.0.3626.96
-    * Tested against Chromium HeadlessChrome/73.0.3683.103
-    * Tested against Chromium HeadlessChrome/74.0.3729.131
-    * Tested against Chromium HeadlessChrome/75.0.3770.90
-    * Tested against Chromium HeadlessChrome/76.0.3798.0
-    * Tested against Chromium HeadlessChrome/77.0.3865.75
-    * Tested against Chromium HeadlessChrome/78.0.3904.70
-    * Tested against Chromium HeadlessChrome/79.0.3945.88
-    * Tested against Chromium HeadlessChrome/80.0.3969.0
-    * Tested against Chromium HeadlessChrome/81.0.4007.0
+    * Tested against Chrome/62.0.3202.94
+    * Tested against Chrome/63.0.3239.132
+    * Tested against Chrome/64.0.3282.119
+    * Tested against Chrome/65.0.3325.181
+    * Tested against Chrome/66.0.3359.139
+    * Tested against Chrome/67.0.3396.99
+    * Tested against Chrome/68.0.3440.84
+    * Tested against Chrome/69.0.3497.100
+    * Tested against Chrome/70.0.3538.102
+    * Tested against Chrome/71.0.3578.98
+    * Tested against Chrome/72.0.3626.96
+    * Tested against Chrome/73.0.3683.103
+    * Tested against Chrome/74.0.3729.131
+    * Tested against Chrome/75.0.3770.90
+    * Tested against Chrome/76.0.3798.0
+    * Tested against Chrome/77.0.3865.75
+    * Tested against Chrome/78.0.3904.70
+    * Tested against Chrome/79.0.3945.117
+    * Tested against Chrome/80.0.3987.149
+    * Tested against Chrome/80.0.3987.163
+    * Tested against Chrome/81.0.4024.0
+    * Tested against Chrome/82.0.4052.0
+    * Tested against Chrome/83.0.4102.0
+    * Tested against Chrome/84.0.4112.0
+    * Tested against Chrome/86.0.4240.198
+    * Tested against Chrome/87.0.4280.66
     * Linux tests
-    * Tested against Chromium Chromium/80.0.3987.162
+    * Tested against Chromium Chromium/83.0.4103.116
     * Tested against Chromium Chromium/65.0.3325.181
     * Tested against Chromium Chromium/66.0.3359.139
     * Tested against Chromium Chromium/67.0.3396.87
@@ -31,6 +37,33 @@
     * Tested against Chromium Chromium/77.0.3865.120
     * Tested against Chromium Chromium/78.0.3904.108
     * Tested against Chromium Chromium/80.0.3987.106
+    * Tested against Chromium Chromium/83.0.4103.97
+    * Tested against Chromium Chromium/85.0.4183.102
+
+0.64 2020-11-29
+    * Add ->on_popup() callback
+    * Add ->list_tabs() method
+    * Add various asynchronous implementations for methods
+    * Don't wait in ->close() anymore for the close to finish
+    * New tabs don't have a way to notice when they are fully loaded yet
+    * Fix rare error when a node with nodeId 0 could not be fetched
+
+0.63 2020-11-28
+    * Fix ->new_tab() to actually work, add a unit test for it
+    * Fix cookie handling to preserve "immediately" expiring cookies for
+      one second so HTTP::Cookies does not immediately discard them. Add a
+      unit test for this new behaviour.
+    * The information TCP connection needed for TCP communication with
+      Chrome is now gleaned from the endpoint information as a fallback
+      (Thanks to Patrik)
+    * Test::HTTP::LocalServer 0.71 is now required as a minimum, since there
+      are some tests that require the new form value behaviour
+    * Chrome 62 doesn't handle setting cookies well, so skip the tests on
+      that too
+
+0.62 2020-11-27
+    * Add ->new_tab() method to create a new tab in the current session
+      (suggested by Patrik)
 
 0.61 2020-11-03
     * ->content(format => 'text') and ->text() now properly skip the content

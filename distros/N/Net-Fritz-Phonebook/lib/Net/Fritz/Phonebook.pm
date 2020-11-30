@@ -10,7 +10,7 @@ use XML::Simple; # because that's what Net::Fritz uses...
 use Net::Fritz::PhonebookEntry;
 
 use vars '$VERSION';
-$VERSION = '0.04';
+$VERSION = '0.05';
 
 =head1 NAME
 
@@ -117,7 +117,7 @@ has 'content' => (
   };
 
 Arrayref of the entries in this phone book. Each entry is
-a L<Net::Fritz::Phonebook::Entry>.
+a L<Net::Fritz::PhonebookEntry>.
 
 =cut
 

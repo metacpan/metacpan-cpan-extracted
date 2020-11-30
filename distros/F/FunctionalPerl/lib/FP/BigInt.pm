@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2019 Christian Jaeger, copying@christianjaeger.ch
+# Copyright (c) 2019-2020 Christian Jaeger, copying@christianjaeger.ch
 #
 # This is free software, offered under either the same terms as perl 5
 # or the terms of the Artistic License version 2 or the terms of the
@@ -47,10 +47,12 @@ our @EXPORT_OK   = qw();
 our %EXPORT_TAGS = (all => [@EXPORT, @EXPORT_OK]);
 
 use Math::BigInt;
+use FP::Carp;
 
 #use FP::Interfaces;
 
-sub bigint ($) {
+sub bigint {
+    @_ == 1 or fp_croak_nargs 1;
     Math::BigInt->new($_[0])
 }
 

@@ -4,6 +4,7 @@ use common::sense;
 
 use Moose;
 
+use File::Slurper qw(write_binary);
 use Test::LongString qw//;
 
 use overload
@@ -49,6 +50,14 @@ sub lacks_regex {
     $description = qq{Content is unlike "$regex"} if not defined $description;
 
     return Test::LongString::unlike_string($self->data, $regex, $description);
+}
+
+sub write_to {
+    my ($self, $path) = @_;
+
+    write_binary($path, $self->data);
+
+    return;
 }
 
 1;

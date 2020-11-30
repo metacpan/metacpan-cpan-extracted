@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2019, David Anderson All rights reserved.
+Copyright (c) 2020, David Anderson All rights reserved.
 
 Redistribution and use in source and binary forms, with
 or without modification, are permitted provided that the
@@ -47,9 +47,15 @@ EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifdef HAVE_STDLIB_H
 #include <stdlib.h>
 #endif /* HAVE_STDLIB_H */
+#ifdef HAVE_STRING_H
 #include <string.h> /* memcpy */
-#include <sys/types.h> /* open() */
+#endif /* HAVE_STRING_H */
+#ifdef HAVE_SYS_TYPES_H
+#include <sys/types.h> /* open(), off_t, size_t, ssize_t */
+#endif /* HAVE_SYS_TYPES_H */
+#ifdef HAVE_SYS_STAT_H
 #include <sys/stat.h> /* open() */
+#endif /* HAVE_SYS_STAT_H */
 #include <fcntl.h> /* open() */
 #include <time.h>
 #ifdef HAVE_UNISTD_H
@@ -91,6 +97,21 @@ EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef SIZEOFT32
 #define SIZEOFT32 4
 #endif /* SIZEOFT32 */
+#if 0
+static void
+dump_bytes(char * msg,Dwarf_Small * start, long len)
+{
+    Dwarf_Small *end = start + len;
+    Dwarf_Small *cur = start;
+
+    printf("%s len %ld ",msg,len);
+    for (; cur < end; cur++) {
+        printf("%02x ", *cur);
+    }
+    printf("\n");
+}
+#endif
+
 
 static int _dwarf_pe_object_access_init(
     int  fd,
@@ -115,6 +136,19 @@ magic_copy(char *d, unsigned len)
     }
     return v;
 }
+static int
+check_valid_string(char *tab,
+    Dwarf_Unsigned size,
+    Dwarf_Unsigned startindex)
+{
+    Dwarf_Unsigned i = startindex;
+    for(  ; i < size; ++i) {
+        if (!tab[i]) {
+            return DW_DLV_OK;
+        }
+    }
+    return DW_DLV_ERROR;
+}
 
 #ifdef WORDS_BIGENDIAN
 #define ASNAR(func,t,s)                         \
@@ -131,19 +165,20 @@ magic_copy(char *d, unsigned len)
     } while (0)
 #endif /* end LITTLE- BIG-ENDIAN */
 
-/*  name_array is 8 byte string */
+/*  Name_array is 8 byte string, or it is supposed to be
+    anyway.  */
 static int
 pe_section_name_get(dwarf_pe_object_access_internals_t *pep,
     const char *name_array,
     const char ** name_out,
     int *errcode)
 {
-
     if (name_array[0] == '/') {
         long v = 0;
         unsigned long u = 0;
         const char *s = 0;
         char temp_array[9];
+        int res = 0;
 
         memcpy(temp_array,name_array+1,7);
         temp_array[7] = 0;
@@ -153,10 +188,21 @@ pe_section_name_get(dwarf_pe_object_access_internals_t *pep,
             return DW_DLV_ERROR;
         }
         u = v;
-        if (u > pep->pe_string_table_size) {
+        if (!pep->pe_string_table) {
             *errcode = DW_DLE_STRING_OFFSET_BAD;
             return DW_DLV_ERROR;
         }
+        if (u >= pep->pe_string_table_size) {
+            *errcode = DW_DLE_STRING_OFFSET_BAD;
+            return DW_DLV_ERROR;
+        }
+        res = check_valid_string(pep->pe_string_table,
+            pep->pe_string_table_size,u);
+        if (res != DW_DLV_OK) {
+            *errcode = DW_DLE_STRING_OFFSET_BAD;
+            return DW_DLV_ERROR;
+        }
+
         s = pep->pe_string_table +u;
         *name_out = s;
         return DW_DLV_OK;
@@ -214,7 +260,7 @@ pe_get_section_info (void *obj,
         struct dwarf_pe_generic_image_section_header *sp = 0;
         sp = pep->pe_sectionptr + section_index;
         return_section->addr = pep->pe_OptionalHeader.ImageBase +
-            sp->VirtualAddress; ;
+            sp->VirtualAddress;
         return_section->type = 0;
         /*  SizeOfRawData can be rounded or truncated,
             use VirtualSize for the real analog of Elf
@@ -298,6 +344,8 @@ load_optional_header64(dwarf_pe_object_access_internals_t *pep,
         hdr.Magic);
     pep->pe_OptionalHeader.MajorLinkerVersion= hdr.MajorLinkerVersion;
     pep->pe_OptionalHeader.MinorLinkerVersion= hdr.MinorLinkerVersion;
+    ASNAR(pep->pe_copy_word,pep->pe_OptionalHeader.ImageBase,
+        hdr.ImageBase);
     ASNAR(pep->pe_copy_word,pep->pe_OptionalHeader.SizeOfCode,
         hdr.SizeOfCode);
     ASNAR(pep->pe_copy_word,pep->pe_OptionalHeader.SizeOfImage,
@@ -340,7 +388,11 @@ pe_load_section (void *obj, Dwarf_Half section_index,
             *error = DW_DLE_FILE_TOO_SMALL;
             return DW_DLV_ERROR;
         }
-        sp->loaded_data = malloc((size_t)sp->SizeOfRawData);
+        /*  VirtualSize > SizeOfRawData  if trailing zeros
+            in the section were not written to disc.
+            Malloc enough for the whole section, read in
+            the bytes we have. */
+        sp->loaded_data = malloc((size_t)sp->VirtualSize);
         if(!sp->loaded_data) {
             *error = DW_DLE_ALLOC_FAIL;
             return DW_DLV_ERROR;
@@ -378,7 +430,7 @@ _dwarf_destruct_pe_access(
         return;
     }
     pep = (dwarf_pe_object_access_internals_t*)(aip->object);
-    if (pep->pe_destruct_close_fd) {
+    if (pep->pe_destruct_close_fd && pep->pe_fd !=-1) {
         close(pep->pe_fd);
         pep->pe_fd = -1;
     }
@@ -439,9 +491,6 @@ dwarf_pe_load_dwarf_section_headers(
         (struct dwarf_pe_generic_image_section_header * )
         calloc((size_t)pep->pe_section_count,
         sizeof(struct dwarf_pe_generic_image_section_header));
-
-
-
     if (!pep->pe_sectionptr) {
         *errcode = DW_DLE_ALLOC_FAIL;
         return DW_DLV_ERROR;
@@ -455,7 +504,7 @@ dwarf_pe_load_dwarf_section_headers(
 
         int res = 0;
         IMAGE_SECTION_HEADER_dw filesect;
-        char safe_name[IMAGE_SIZEOF_SHORT_NAME +1];
+        char        safe_name[IMAGE_SIZEOF_SHORT_NAME +1];
         const char *expname = 0;
 
         res =  _dwarf_object_read_random(pep->pe_fd,
@@ -473,13 +522,17 @@ dwarf_pe_load_dwarf_section_headers(
         /*  Then add NUL terminator. */
         safe_name[IMAGE_SIZEOF_SHORT_NAME] = 0;
         sec_outp->name = strdup(safe_name);
+
         res = pe_section_name_get(pep,
             safe_name,&expname,errcode);
         if (res != DW_DLV_OK) {
             return res;
         }
-        sec_outp->dwarfsectname = strdup(expname);
-
+        if (expname) {
+            sec_outp->dwarfsectname = strdup(expname);
+        } else {
+            sec_outp->dwarfsectname = strdup("<sec name missing>");
+        }
         if ( !sec_outp->name || !sec_outp->dwarfsectname) {
             *errcode = DW_DLE_ALLOC_FAIL;
             return DW_DLV_ERROR;
@@ -700,10 +753,13 @@ dwarf_load_pe_sections(
             return DW_DLV_ERROR;
         }
         res = _dwarf_object_read_random(pep->pe_fd,
-            (char *)pep->pe_string_table, (off_t)pep->pe_string_table_offset,
+            (char *)pep->pe_string_table,
+            (off_t)pep->pe_string_table_offset,
             (size_t)pep->pe_string_table_size,
             (off_t)pep->pe_filesize,errcode);
         if (res != DW_DLV_OK) {
+            free(pep->pe_string_table);
+            pep->pe_string_table = 0;
             return res;
         }
     }

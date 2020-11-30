@@ -2,7 +2,6 @@ Changes
 lib/Mojolicious/Plugin/PlackMiddleware.pm
 Makefile.PL
 MANIFEST			This list of files
-MANIFEST.SKIP
 README.pod
 t/00_load.t
 t/01_pertial.t
@@ -13,7 +12,6 @@ t/mws/errors/404.html
 t/mws/errors/500.html
 t/mws/jsonp.t
 t/public/css.css
-xt/compat/.DS_Store
 xt/compat/app.t
 xt/compat/charset_lite_app.t
 xt/compat/command.t

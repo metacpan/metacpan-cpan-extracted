@@ -341,6 +341,9 @@ sub _getDevice {
         delete $device->{$key} if $device->{$key} eq '';
     }
 
+    # Name may have to be fixed (as example, Kyocera & Ricoh printers are concerned)
+    $device->setSnmpHostname();
+
     # Find and set Mac address
     $device->setMacAddress();
 
@@ -739,7 +742,7 @@ sub _setPrinterProperties {
         if (ref $variable->{oid} eq 'ARRAY') {
             foreach my $oid (@{$variable->{oid}}) {
                 $value = $snmp->get($oid);
-                last if $value;
+                last if defined($value) && isInteger($value);
             }
         } else {
             my $oid = $variable->{oid};
@@ -1230,6 +1233,7 @@ sub _getCDPInfo {
     my $cdpCacheDeviceId   = $snmp->walk('.1.3.6.1.4.1.9.9.23.1.2.1.1.6');
     my $cdpCacheDevicePort = $snmp->walk('.1.3.6.1.4.1.9.9.23.1.2.1.1.7');
     my $cdpCachePlatform   = $snmp->walk('.1.3.6.1.4.1.9.9.23.1.2.1.1.8');
+    my $cdpCacheSysName    = $snmp->walk('.1.3.6.1.4.1.9.9.23.1.2.1.1.17');
 
     # each cdp variable matches the following scheme:
     # $prefix.x.y = $value
@@ -1258,6 +1262,10 @@ sub _getCDPInfo {
             $connection->{IFDESCR} = getCanonicalString($devicePort);
         }
 
+        my $sysname = getCanonicalString($cdpCacheSysName->{$suffix});
+        $connection->{SYSNAME} = $sysname
+            if $sysname;
+
         # cdpCacheDeviceId is either remote host name, either remote mac address
         my $deviceId = $cdpCacheDeviceId->{$suffix};
         if ($deviceId =~ /^0x/) {
@@ -1265,15 +1273,25 @@ sub _getCDPInfo {
                 # let's assume it is a mac address if the length is 6 bytes
                 $connection->{SYSMAC} = lc(alt2canonical($deviceId));
             } else {
-                # otherwise it's an hex-encode hostname
-                $connection->{SYSNAME} = getCanonicalString($deviceId);
+                # otherwise it's may be an hex-encode hostname
+                $deviceId = getCanonicalString($deviceId);
+                if ($deviceId =~ /^[0-9A-Fa-f]{12}$/) {
+                    # let's assume it is a mac address if the length is 12 chars
+                    $connection->{SYSMAC} = lc(alt2canonical($deviceId));
+                } elsif (!$connection->{SYSNAME}) {
+                    $connection->{SYSNAME} = $deviceId;
+                }
             }
-        } else {
+        } elsif (!$connection->{SYSNAME}) {
             $connection->{SYSNAME} = $deviceId;
         }
 
         if ($connection->{SYSNAME} &&
             $connection->{SYSNAME} =~ /^SIP([A-F0-9a-f]*)$/) {
+            $connection->{SYSMAC} = lc(alt2canonical("0x".$1));
+        } elsif ($connection->{SYSNAME} &&
+            $connection->{SYSNAME} =~ /^SIP-(.*)$/ &&
+            $deviceId =~ /^$1([0-9A-Fa-f]{12})$/) {
             $connection->{SYSMAC} = lc(alt2canonical("0x".$1));
         }
 
@@ -1351,12 +1369,12 @@ sub _getEDPInfo {
     return $results;
 }
 
-
 sub _setVlans {
     my (%params) = @_;
 
     my $vlans = _getVlans(
         snmp  => $params{snmp},
+        ports => $params{ports}
     );
     return unless $vlans;
 
@@ -1367,9 +1385,9 @@ sub _setVlans {
         # safety check
         if (! exists $ports->{$port_id}) {
             $logger->debug(
-                "invalid interface ID $port_id while setting vlans, aborting"
+                "invalid interface ID $port_id while setting vlans, skipping"
             ) if $logger;
-            last;
+            next;
         }
         $ports->{$port_id}->{VLANS}->{VLAN} = $vlans->{$port_id};
     }
@@ -1379,6 +1397,7 @@ sub _getVlans {
     my (%params) = @_;
 
     my $snmp = $params{snmp};
+    my $ports = $params{ports};
 
     my $results;
     my $vtpVlanName  = $snmp->walk('.1.3.6.1.4.1.9.9.46.1.3.1.1.4.1');
@@ -1401,35 +1420,105 @@ sub _getVlans {
         }
     }
 
-    # For other switches, we use another methods
-    # used for Alcatel-Lucent and ExtremNetworks (and perhaps others)
-    my $vlanIdName = $snmp->walk('.1.0.8802.1.1.2.1.5.32962.1.2.3.1.2');
-    my $portLink = $snmp->walk('.1.0.8802.1.1.2.1.3.7.1.3');
-    if($vlanIdName && $portLink){
-        foreach my $suffix (sort keys %{$vlanIdName}) {
-            my ($port, $vlan) = split(/\./, $suffix);
-            if ($portLink->{$port}) {
-                # case generic where $portLink = port number
-                my $portnumber = $portLink->{$port};
-                # case Cisco where $portLink = port name
-                unless ($portLink->{$port} =~ /^[0-9]+$/) {
-                    $portnumber = $port;
+    # For Switch with dot1qVlanStaticEntry and dot1qVlanCurrent Present
+    my $dot1qVlanStaticName = $snmp->walk('.1.3.6.1.2.1.17.7.1.4.3.1.1');
+    my $dot1qVlanStaticEgressPorts = $snmp->walk('.1.3.6.1.2.1.17.7.1.4.3.1.2');
+    my $dot1qVlanStaticUntaggedPorts = $snmp->walk('.1.3.6.1.2.1.17.7.1.4.3.1.4');
+    my $dot1qVlanStaticRowStatus = $snmp->walk('.1.3.6.1.2.1.17.7.1.4.3.1.5');
+    # each result matches either of the following schemes :
+    # $prefix.$i    = $value with $i as vlan_id, and each bit of $value represent the Egress (or Untagged) is present (1st bit = ifnumber 1, 2nd bit => ifnumber 2, etc...)
+    my $dot1qVlanCurrentEgressPorts = $snmp->walk('.1.3.6.1.2.1.17.7.1.4.2.1.4');
+    my $dot1qVlanCurrentUntaggedPorts = $snmp->walk('.1.3.6.1.2.1.17.7.1.4.2.1.5');
+
+    if ($dot1qVlanStaticName && $dot1qVlanStaticRowStatus) {
+        foreach my $vlan_id (sort keys %{$dot1qVlanStaticRowStatus}) {
+            if ($dot1qVlanStaticRowStatus->{$vlan_id} eq 1) {
+                my $name = getCanonicalString($dot1qVlanStaticName->{$vlan_id});
+
+                my ($suffix, $EgressPorts);
+                if ($dot1qVlanCurrentEgressPorts) {
+                    $suffix = defined($dot1qVlanCurrentEgressPorts->{$vlan_id}) ? $vlan_id : "0.".$vlan_id;
+                    # Suffix may not start by "0." for other vendors
+                    unless (defined($dot1qVlanCurrentEgressPorts->{$suffix})) {
+                        ($suffix) = grep { /\.$vlan_id$/ } keys(%{$dot1qVlanCurrentEgressPorts});
+                    }
+                    if ($suffix && defined($dot1qVlanCurrentEgressPorts->{$suffix})) {
+                        $EgressPorts = $dot1qVlanCurrentEgressPorts->{$suffix};
+                    }
                 }
-                push @{$results->{$portnumber}}, {
-                    NUMBER => $vlan,
-                    NAME   => getCanonicalString($vlanIdName->{$suffix})
-                };
+                if (!defined($EgressPorts)) {
+                    if ($dot1qVlanStaticEgressPorts && defined($dot1qVlanStaticEgressPorts->{$vlan_id})) {
+                        $EgressPorts = $dot1qVlanStaticEgressPorts->{$vlan_id};
+                    } else {
+                        next;
+                    }
+                }
+
+                # Tagged & Untagged VLAN
+                my $bEgress = unpack("B*", hex2char($EgressPorts));
+                my @bEgress = split(//,$bEgress);
+                next unless @bEgress;
+
+                my $UntaggedPorts;
+                if ($suffix && $dot1qVlanCurrentUntaggedPorts && defined($dot1qVlanCurrentUntaggedPorts->{$suffix})) {
+                    $UntaggedPorts = $dot1qVlanCurrentUntaggedPorts->{$suffix};
+                } elsif ($dot1qVlanStaticUntaggedPorts && defined($dot1qVlanStaticUntaggedPorts->{$vlan_id})) {
+                    $UntaggedPorts = $dot1qVlanStaticUntaggedPorts->{$vlan_id};
+                } else {
+                    next;
+                }
+
+                # Untagged VLAN
+                my $bUntagged = unpack("B*", hex2char($UntaggedPorts));
+                my @bUntagged = split(//,$bUntagged);
+                next unless @bUntagged;
+
+                foreach my $port_id (keys %{$ports}) {
+                    next if $port_id > @bEgress || $port_id > @bUntagged;
+                    my $port_index = $port_id - 1;
+                    my $isUntagged = $bUntagged[$port_index];
+                    my $isTagged   = $isUntagged eq '0' ? $bEgress[$port_index] : '0';
+                    push @{$results->{$port_id}}, {
+                        NUMBER  => $vlan_id,
+                        NAME    => $name,
+                        TAGGED  => $isTagged
+                    } if $isTagged || $isUntagged;
+                }
             }
         }
-    } else {
-        # A last method
-        my $vlanId = $snmp->walk('.1.0.8802.1.1.2.1.5.32962.1.2.1.1.1');
-        if($vlanId){
-            foreach my $port (sort keys %{$vlanId}) {
-                push @{$results->{$port}}, {
-                    NUMBER => $vlanId->{$port},
-                    NAME   => "VLAN " . $vlanId->{$port}
-                };
+    }
+
+    unless ($results) {
+        # For other switches, we use another methods
+        # used for Alcatel-Lucent and ExtremNetworks (and perhaps others)
+        my $vlanIdName = $snmp->walk('.1.0.8802.1.1.2.1.5.32962.1.2.3.1.2');
+        my $portLink = $snmp->walk('.1.0.8802.1.1.2.1.3.7.1.3');
+        if ($vlanIdName && $portLink) {
+            foreach my $suffix (sort keys %{$vlanIdName}) {
+                my ($port, $vlan) = split(/\./, $suffix);
+                if ($portLink->{$port}) {
+                    # case generic where $portLink = port number
+                    my $portnumber = $portLink->{$port};
+                    # case Cisco where $portLink = port name
+                    unless ($portLink->{$port} =~ /^[0-9]+$/) {
+                        $portnumber = $port;
+                    }
+                    push @{$results->{$portnumber}}, {
+                        NUMBER => $vlan,
+                        NAME   => getCanonicalString($vlanIdName->{$suffix})
+                    };
+                }
+            }
+        } else {
+            # A last method
+            my $vlanId = $snmp->walk('.1.0.8802.1.1.2.1.5.32962.1.2.1.1.1');
+            if ($vlanId) {
+                foreach my $port (sort keys %{$vlanId}) {
+                    push @{$results->{$port}}, {
+                        NUMBER => $vlanId->{$port},
+                        NAME   => "VLAN " . $vlanId->{$port}
+                    };
+                }
             }
         }
     }

@@ -22,7 +22,7 @@ our @SVG_REGEX = qw/
 our @FUNCTIONS = qw/extract_path_info reverse_path create_path_string/;
 our @EXPORT_OK = (@FUNCTIONS, @SVG_REGEX);
 our %EXPORT_TAGS = (all => \@FUNCTIONS, regex => \@SVG_REGEX);
-our $VERSION = '0.33';
+our $VERSION = '0.34';
 
 use Carp;
 
@@ -585,6 +585,7 @@ sub extract_path_info
         my $begin_drawing = 1;  ##This will get updated after
         for my $element (@path_info) {
             if ($element->{type} eq 'moveto') {
+		$begin_drawing = 1;
                 if ($element->{position} eq 'relative') {
                     my $ip = $options_ref->{initial_position};
                     if ($ip) {
@@ -721,9 +722,6 @@ sub extract_path_info
             }
 	    elsif ($element->{type} eq 'arc') {
 
-		# Untested.
-#		print "before: @abs_pos\n";
-
                 if ($element->{position} eq 'relative') {
 		    $element->{x} += $abs_pos[0];
 		    $element->{y} += $abs_pos[1];
@@ -736,10 +734,8 @@ sub extract_path_info
 		    @start_drawing = @abs_pos;
                 }
                 @abs_pos = ($element->{x}, $element->{y});
-		#		print "after: @abs_pos\n";
 	    }
             elsif ($element->{type} eq 'closepath') {
-                # Bookkeeping
                 if ($verbose) {
 		    printf "Closing drawing shape to [%.4f, %.4f]\n", @start_drawing;
                 }

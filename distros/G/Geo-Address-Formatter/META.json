@@ -1,5 +1,5 @@
 {
-   "abstract" : "Geo::Address::Formatter - format structured address data according to various global/country rules",
+   "abstract" : "format structured address data according to various global/country rules",
    "author" : [
       "Ed Freyfogle"
    ],
@@ -48,7 +48,7 @@
    "provides" : {
       "Geo::Address::Formatter" : {
          "file" : "lib/Geo/Address/Formatter.pm",
-         "version" : "1.83"
+         "version" : "1.85"
       }
    },
    "release_status" : "stable",
@@ -62,7 +62,7 @@
          "web" : "https://github.com/OpenCageData/perl-Geo-Address-Formatter"
       }
    },
-   "version" : "1.83",
+   "version" : "1.85",
    "x_generated_by_perl" : "v5.26.3",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.08",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"

@@ -40,6 +40,9 @@ often compresses better than CBOR though, so if you plan to compress the
 data later and speed is less important you might want to compare both
 formats first).
 
+The primary goal of this module is to be I<correct> and the secondary goal
+is to be I<fast>. To reach the latter goal it was written in C.
+
 To give you a general idea about speed, with texts in the megabyte range,
 C<CBOR::XS> usually encodes roughly twice as fast as L<Storable> or
 L<JSON::XS> and decodes about 15%-30% faster than those. The shorter the
@@ -54,9 +57,6 @@ number of extensions, to support cyclic and shared data structures
 (see C<allow_sharing> and C<allow_cycles>), string deduplication (see
 C<pack_strings>) and scalar references (always enabled).
 
-The primary goal of this module is to be I<correct> and the secondary goal
-is to be I<fast>. To reach the latter goal it was written in C.
-
 See MAPPING, below, on how CBOR::XS maps perl values to CBOR values and
 vice versa.
 
@@ -66,7 +66,7 @@ package CBOR::XS;
 
 use common::sense;
 
-our $VERSION = 1.71;
+our $VERSION = 1.81;
 our @ISA = qw(Exporter);
 
 our @EXPORT = qw(encode_cbor decode_cbor);
@@ -217,7 +217,7 @@ resulting data structure might be unusable.
 
 Detecting shared values incurs a runtime overhead when values are encoded
 that have a reference counter large than one, and might unnecessarily
-increase the encoded size, as potentially shared values are encode as
+increase the encoded size, as potentially shared values are encoded as
 shareable whether or not they are actually shared.
 
 At the moment, only targets of references can be shared (e.g. scalars,
@@ -332,10 +332,11 @@ strings as CBOR byte strings.
 This option does not affect C<decode> in any way.
 
 This option has similar advantages and disadvantages as C<text_keys>. In
-addition, this option effectively removes the ability to encode byte
-strings, which might break some C<FREEZE> and C<TO_CBOR> methods that rely
-on this, such as bignum encoding, so this option is mainly useful for very
-simple data.
+addition, this option effectively removes the ability to automatically
+encode byte strings, which might break some C<FREEZE> and C<TO_CBOR>
+methods that rely on this.
+
+A workaround is to use explicit type casts, which are unaffected by this option.
 
 =item $cbor = $cbor->validate_utf8 ([$enable])
 
@@ -455,7 +456,8 @@ stop parsing there and return the number of characters consumed so far.
 
 This is useful if your CBOR texts are not delimited by an outer protocol
 and you need to know where the first CBOR string ends amd the next one
-starts.
+starts - CBOR strings are self-delimited, so it is possible to concatenate
+CBOR strings without any delimiters or size fields and recover their data.
 
    CBOR::XS->new->decode_prefix ("......")
    => ("...", 3)
@@ -669,10 +671,13 @@ You can force the type to be a CBOR string by stringifying it:
    print $x;    # perl does it for you, too, quite often
 
 You can force whether a string is encoded as byte or text string by using
-C<utf8::upgrade> and C<utf8::downgrade> (if C<text_strings> is disabled):
+C<utf8::upgrade> and C<utf8::downgrade> (if C<text_strings> is disabled).
 
   utf8::upgrade $x;   # encode $x as text string
   utf8::downgrade $x; # encode $x as byte string
+
+More options are available, see L<TYPE CASTS>, below, and the C<text_keys>
+and C<text_strings> options.
 
 Perl doesn't define what operations up- and downgrade strings, so if the
 difference between byte and text is important, you should up- or downgrade
@@ -697,6 +702,71 @@ represent numerical values are supported, but might suffer loss of
 precision.
 
 =back
+
+=head2 TYPE CASTS
+
+B<EXPERIMENTAL>: As an experimental extension, C<CBOR::XS> allows you to
+force specific cbor types to be used when encoding. That allows you to
+encode types not normally accessible (e.g. half floats) as well as force
+string types even when C<text_strings> is in effect.
+
+Type forcing is done by calling a special "cast" function which keeps a
+copy of the value and returns a new value that can be handed over to any
+CBOR encoder function.
+
+The following casts are currently available (all of which are unary operators):
+
+=over
+
+=item CBOR::XS::as_int $value
+
+Forces the value to be encoded as some form of (basic, not bignum) integer
+type.
+
+=item CBOR::XS::as_text $value
+
+Forces the value to be encoded as (UTF-8) text values.
+
+=item CBOR::XS::as_bytes $value
+
+Forces the value to be encoded as a (binary) string value.
+
+=item CBOR::XS::as_float16 $value
+
+Forces half-float (IEEE 754 binary16) encoding of the given value.
+
+=item CBOR::XS::as_float32 $value
+
+Forces single-float (IEEE 754 binary32) encoding of the given value.
+
+=item CBOR::XS::as_float64 $value
+
+Forces double-float (IEEE 754 binary64) encoding of the given value.
+
+=item, CBOR::XS::as_cbor $cbor_text
+
+Bot a type cast per-se, this type cast forces the argument to eb encoded
+as-is. This can be used to embed pre-encoded CBOR data.
+
+Note that no checking on the validity of the C<$cbor_text> is done - it's
+the callers responsibility to correctly encode values.
+
+=back
+
+Example: encode a perl string as binary even though C<text_strings> is in
+effect.
+
+   CBOR::XS->new->text_strings->encode ([4, "text", CBOR::XS::bytes "bytevalue"]);
+
+=cut
+
+sub CBOR::XS::as_cbor    ($) { bless [$_[0], 0, undef], CBOR::XS::Tagged:: }
+sub CBOR::XS::as_int     ($) { bless [$_[0], 1, undef], CBOR::XS::Tagged:: }
+sub CBOR::XS::as_bytes   ($) { bless [$_[0], 2, undef], CBOR::XS::Tagged:: }
+sub CBOR::XS::as_text    ($) { bless [$_[0], 3, undef], CBOR::XS::Tagged:: }
+sub CBOR::XS::as_float16 ($) { bless [$_[0], 4, undef], CBOR::XS::Tagged:: }
+sub CBOR::XS::as_float32 ($) { bless [$_[0], 5, undef], CBOR::XS::Tagged:: }
+sub CBOR::XS::as_float64 ($) { bless [$_[0], 6, undef], CBOR::XS::Tagged:: }
 
 =head2 OBJECT SERIALISATION
 
@@ -1059,7 +1129,8 @@ CBOR intact.
 =head1 SECURITY CONSIDERATIONS
 
 Tl;dr... if you want to decode or encode CBOR from untrusted sources, you
-should start with a coder object created via C<new_safe>:
+should start with a coder object created via C<new_safe> (which implements
+the mitigations explained below):
 
    my $coder = CBOR::XS->new_safe;
 
@@ -1091,7 +1162,7 @@ untrusted sources can invoke those and trigger bugs in those.
 
 So, if you are not sure about the security of all the modules you
 have loaded (you shouldn't), you should disable this part using
-C<forbid_objects>.
+C<forbid_objects> or using C<new_safe>.
 
 =item CBOR can be extended with tags that call library code
 
@@ -1100,9 +1171,9 @@ conversion functions for many existing tags that can be extended via
 third-party modules (see the C<filter> method).
 
 If you don't trust these, you should configure the "safe" filter function,
-C<CBOR::XS::safe_filter>, which by default only includes conversion
-functions that are considered "safe" by the author (but again, they can be
-extended by third party modules).
+C<CBOR::XS::safe_filter> (C<new_safe> does this), which by default only
+includes conversion functions that are considered "safe" by the author
+(but again, they can be extended by third party modules).
 
 Depending on your level of paranoia, you can use the "safe" filter:
 
@@ -1127,8 +1198,9 @@ run out, that's just fine (e.g. by using a separate process that can
 crash safely). The size of a CBOR string in octets is usually a good
 indication of the size of the resources required to decode it into a Perl
 structure. While CBOR::XS can check the size of the CBOR text (using
-C<max_size>), it might be too late when you already have it in memory, so
-you might want to check the size before you accept the string.
+C<max_size> - done by C<new_safe>), it might be too late when you already
+have it in memory, so you might want to check the size before you accept
+the string.
 
 As for encoding, it is possible to construct data structures that are
 relatively small but result in large CBOR texts (for example by having an
@@ -1151,10 +1223,10 @@ method.
 =item Resource-starving attacks: CPU en-/decoding complexity
 
 CBOR::XS will use the L<Math::BigInt>, L<Math::BigFloat> and
-L<Math::BigRat> libraries to represent encode/decode bignums. These can
-be very slow (as in, centuries of CPU time) and can even crash your
-program (and are generally not very trustworthy). See the next section for
-details.
+L<Math::BigRat> libraries to represent encode/decode bignums. These can be
+very slow (as in, centuries of CPU time) and can even crash your program
+(and are generally not very trustworthy). See the next section on bignum
+security for details.
 
 =item Data breaches: leaking information in error messages
 
@@ -1227,9 +1299,10 @@ Strict mode and canonical mode are not implemented.
 On perls that were built without 64 bit integer support (these are rare
 nowadays, even on 32 bit architectures, as all major Perl distributions
 are built with 64 bit integer support), support for any kind of 64 bit
-integer in CBOR is very limited - most likely, these 64 bit values will
+value in CBOR is very limited - most likely, these 64 bit values will
 be truncated, corrupted, or otherwise not decoded correctly. This also
-includes string, array and map sizes that are stored as 64 bit integers.
+includes string, float, array and map sizes that are stored as 64 bit
+integers.
 
 
 =head1 THREADS

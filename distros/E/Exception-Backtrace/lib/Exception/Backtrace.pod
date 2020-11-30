@@ -46,6 +46,9 @@ Exception::Backtrace - Get C and Perl backtraces
     my $bt3 = Exception::Backtrace::get_backtrace($@);
     say $bt3->to_string;
 
+    # get the current trace without exception
+    my $bt = Exception::Backtrace::create_backtrace;
+
     # perl trace
     my $perl_trace = $bt->perl_trace;
     say $perl_trace->to_string; # stringifies just perl backtrace

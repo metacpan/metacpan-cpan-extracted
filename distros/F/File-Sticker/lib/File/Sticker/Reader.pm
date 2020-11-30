@@ -1,12 +1,12 @@
 package File::Sticker::Reader;
-$File::Sticker::Reader::VERSION = '1.01';
+$File::Sticker::Reader::VERSION = '1.0603';
 =head1 NAME
 
 File::Sticker::Reader - read and standardize meta-data from files
 
 =head1 VERSION
 
-version 1.01
+version 1.0603
 
 =head1 SYNOPSIS
 
@@ -121,6 +121,28 @@ sub name {
     my @bits = split('::', $fullname);
     return pop @bits;
 } # name
+
+=head2 priority
+
+The priority of this reader.  Readers with higher priority
+get tried first.  This is useful where there may be more
+than one possible meta-data format for a file, such as
+EXIF versus XATTR.
+
+This works as either a class function or a method.
+
+This must be overridden by the specific writer class.
+
+$priority = $self->priority();
+
+$priority = File::Sticker::Reader::priority($class);
+
+=cut
+
+sub priority {
+    my $class = shift;
+    return 0;
+} # priority
 
 =head2 allow
 

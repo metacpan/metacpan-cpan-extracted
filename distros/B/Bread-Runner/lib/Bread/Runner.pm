@@ -5,7 +5,7 @@ use warnings;
 
 # ABSTRACT: run ALL the apps via Bread::Board
 
-our $VERSION = '0.902';
+our $VERSION = '0.903';
 
 use Carp;
 use Module::Runtime qw(use_module);
@@ -92,6 +92,7 @@ sub setup {
                 elsif ( $isa eq 'Str' )      { $spec .= "=s" }
                 elsif ( $isa eq 'Bool' )     { $spec .= '!' }
                 elsif ( $isa eq 'ArrayRef' ) { $spec .= '=s@' }
+                elsif ( $isa eq 'HashRef' )  { $spec .= '=s%' }
             }
 
             # TODO required
@@ -155,7 +156,7 @@ Bread::Runner - run ALL the apps via Bread::Board
 
 =head1 VERSION
 
-version 0.902
+version 0.903
 
 =head1 SYNOPSIS
 

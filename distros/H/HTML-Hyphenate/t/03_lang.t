@@ -253,8 +253,13 @@ my @fragments = (
     ],
     [
 '<p lang="zh-latn">Supercalifragilisticexpialidocious</p>',
-'<p lang="zh-latn">Su­per­ca­li­f­ra­gi­li­sti­ce­xpia­li­do­cious</p>',
+'<p lang="zh-latn">Su­per­ca­li­fra­gi­li­sti­ce­xpia­li­do­cious</p>',
         'lang zh-latn'
+    ],
+    [
+'<p lang="zh-latn_pinyin_ec">Supercalifragilisticexpialidocious</p>',
+'<p lang="zh-latn_pinyin_ec">Su­per­ca­li­f­ra­gi­li­sti­ce­xpia­li­do­cious</p>',
+        'lang zh-latn_pinyin_ec'
     ],
     [
 '<p lang="zu-za">Supercalifragilisticexpialidocious</p>',
@@ -268,7 +273,7 @@ my @fragments = (
     ],
 );
 
-my @utf8_fragments = (
+my @tricky_fragments = (
     [
 '<p lang="is">Upplýsingatæknifyrirtæki</p>',
 '<p lang="is">Upp­lýs­inga­tæknifyr­ir­tæki</p>',
@@ -281,12 +286,12 @@ my @utf8_fragments = (
     ],
     [
 '<p lang="bg">Supercalifragilisticexpialidocious</p>',
-'<p lang="bg">Supercalifragilisticexpialidocious</p>',
+'<p lang="bg">­Supercalifragilisticexpialidocious</p>',
         'lang bg'
     ],
     [
-'<p lang="sr-cyrl">Реализовали</p>',
-'<p lang="sr-cyrl">Ре­а­ли­зо­ва­ли</p>',
+'<p lang="sr-cyrl">програ-мирање</p>',
+'<p lang="sr-cyrl">про-гра-ми-ра-ње</p>',
         'lang sr-cyrl'
     ],
     [
@@ -340,8 +345,8 @@ my @utf8_fragments = (
         'lang el-polyton'
     ],
 );
-# 50 fragments + 14 utf8 fragments
-plan tests => ( 0 + @fragments + @utf8_fragments ) + 1;
+
+plan tests => ( 0 + @fragments + @tricky_fragments ) + 1;
 
 use HTML::Hyphenate;
 my $h = HTML::Hyphenate->new();
@@ -350,8 +355,8 @@ foreach my $frag (@fragments) {
 }
 
 TODO: {
-	local $TODO = q{utf8 patterns not yet supported by TeX::Hyphen};
-	foreach my $frag (@utf8_fragments) {
+	local $TODO = q{Some utf8 patterns not yet supported by TeX::Hyphen};
+	foreach my $frag (@tricky_fragments) {
 		is( $h->hyphenated( @{$frag}[0] ), @{$frag}[1], @{$frag}[2] );
 	}
 };

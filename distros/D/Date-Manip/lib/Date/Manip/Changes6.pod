@@ -27,9 +27,17 @@ For the most part, Date::Manip has remained backward compatible at
 every release, but occasionally, a change is made which is backward
 incompatible. These are marked with an exclamation mark (!).
 
-=head1 VERSION 6.84 (planned 2020-12-01)
+=head1 VERSION 6.83 (2020-12-01)
 
-=head1 VERSION 6.83 (planned 2020-09-01)
+=over 5
+
+=item Time zone fixes
+
+No new zoneinfo data so no release on 2020-09-01.
+
+Newest zoneinfo data (tzdata 2020d).  Requested by Shawn Carroll (GitHub #32)
+
+=back
 
 =head1 VERSION 6.82 (2020-06-01)
 

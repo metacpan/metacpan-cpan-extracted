@@ -21,7 +21,8 @@ Makefile$
 ^.releaserc
 ^.*.cmd
 ^chrome-versions
-^WWW-Mechanize-Chrome
+^Net-Fritz-Phonebook-.*
 ^frame-\d+.png
 ^demo/
 ^.*\.credentials
+^.prove

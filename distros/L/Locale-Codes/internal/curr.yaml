@@ -46364,6 +46364,7 @@ langvar:
       vaidika: Vedic Sanskrit
       valencia: Valencian
       vallader: Vallader idiom of Romansh
+      vecdruka: Latvian orthography used before 1920s ("veca druka")
       vivaraup: Vivaro-Alpine
       wadegile: Wade-Giles romanization
       xsistemo: Standard X-system orthographic fallback for spelling Esperanto
@@ -46467,6 +46468,9 @@ langvar:
       latino sine flexione: 
         - peano
         - Latino Sine Flexione
+      latvian orthography used before 1920s ("veca druka"): 
+        - vecdruka
+        - Latvian orthography used before 1920s ("veca druka")
       limousin: 
         - lemosin
         - Limousin

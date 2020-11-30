@@ -1,0 +1,8 @@
+# perl -I lib bin/ldf-client.pl  http://fragments.dbpedia.org/2014/en sparql06.txt
+PREFIX ontology: <http://dbpedia.org/ontology/>
+PREFIX property: <http://dbpedia.org/property/>
+
+SELECT ?craft
+WHERE {
+    ?craft a ontology:Spacecraft .
+} LIMIT 150

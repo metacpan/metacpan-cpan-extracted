@@ -1,27 +1,29 @@
 /*
   Copyright (C) 2000-2005 Silicon Graphics, Inc.  All Rights Reserved.
-  Portions Copyright (C) 2009-2019 David Anderson. All Rights Reserved.
+  Portions Copyright (C) 2009-2020 David Anderson. All Rights Reserved.
 
-  This program is free software; you can redistribute it and/or modify it
-  under the terms of version 2.1 of the GNU Lesser General Public License
-  as published by the Free Software Foundation.
+  This program is free software; you can redistribute it
+  and/or modify it under the terms of version 2.1 of the
+  GNU Lesser General Public License as published by the Free
+  Software Foundation.
 
-  This program is distributed in the hope that it would be useful, but
-  WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  This program is distributed in the hope that it would be
+  useful, but WITHOUT ANY WARRANTY; without even the implied
+  warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+  PURPOSE.
 
-  Further, this software is distributed without any warranty that it is
-  free of the rightful claim of any third person regarding infringement
-  or the like.  Any license provided herein, whether implied or
-  otherwise, applies only to this software file.  Patent licenses, if
-  any, provided herein do not apply to combinations of this program with
-  other software, or any other product whatsoever.
+  Further, this software is distributed without any warranty
+  that it is free of the rightful claim of any third person
+  regarding infringement or the like.  Any license provided
+  herein, whether implied or otherwise, applies only to this
+  software file.  Patent licenses, if any, provided herein
+  do not apply to combinations of this program with other
+  software, or any other product whatsoever.
 
-  You should have received a copy of the GNU Lesser General Public
-  License along with this program; if not, write the Free Software
-  Foundation, Inc., 51 Franklin Street - Fifth Floor, Boston MA 02110-1301,
-  USA.
-
+  You should have received a copy of the GNU Lesser General
+  Public License along with this program; if not, write the
+  Free Software Foundation, Inc., 51 Franklin Street - Fifth
+  Floor, Boston MA 02110-1301, USA.
 */
 
 #include "config.h"
@@ -31,6 +33,7 @@
 #include "dwarf_alloc.h"
 #include "dwarf_error.h"
 #include "dwarf_util.h"
+#include "dwarfstring.h"
 
 #define TRUE 1
 #define FALSE 0
@@ -92,8 +95,19 @@ _dwarf_count_abbrev_entries(Dwarf_Debug dbg,
         DECODE_LEB128_UWORD_CK(abbrev_ptr, attr_form,
             dbg,error,abbrev_section_end);
         if (!_dwarf_valid_form_we_know(attr_form,attr_name)) {
-            _dwarf_error(dbg, error, DW_DLE_UNKNOWN_FORM);
-            return (DW_DLV_ERROR);
+            dwarfstring m;
+
+            dwarfstring_constructor(&m);
+            dwarfstring_append_printf_u(&m,
+                "DW_DLE_UNKNOWN_FORM: Abbrev invalid form 0x%"
+                DW_PR_DUx,attr_form);
+            dwarfstring_append_printf_u(&m,
+                " with attribute 0x%" DW_PR_DUx,attr_name);
+            dwarfstring_append(&m," so abbreviations unusable. ");
+            _dwarf_error_string(dbg, error, DW_DLE_UNKNOWN_FORM,
+                dwarfstring_string(&m));
+            dwarfstring_destructor(&m);
+            return DW_DLV_ERROR;
         }
         if (attr_form ==  DW_FORM_implicit_const) {
             /* The value is here, not in a DIE. */
@@ -141,7 +155,8 @@ dwarf_get_abbrev(Dwarf_Debug dbg,
     if (offset >= dbg->de_debug_abbrev.dss_size) {
         return DW_DLV_NO_ENTRY;
     }
-    ret_abbrev = (Dwarf_Abbrev) _dwarf_get_alloc(dbg, DW_DLA_ABBREV, 1);
+    ret_abbrev = (Dwarf_Abbrev) _dwarf_get_alloc(dbg,
+        DW_DLA_ABBREV, 1);
     if (ret_abbrev == NULL) {
         _dwarf_error(dbg, error, DW_DLE_ALLOC_FAIL);
         return DW_DLV_ERROR;
@@ -163,9 +178,16 @@ dwarf_get_abbrev(Dwarf_Debug dbg,
     abbrev_ptr = dbg->de_debug_abbrev.dss_data + offset;
     abbrev_section_end =
         dbg->de_debug_abbrev.dss_data + dbg->de_debug_abbrev.dss_size;
-
+#if 0
     DECODE_LEB128_UWORD_CK(abbrev_ptr, utmp,
         dbg,error,abbrev_section_end);
+#endif
+    res = _dwarf_leb128_uword_wrapper(dbg,&abbrev_ptr,
+        abbrev_section_end,&utmp,error);
+    if (res == DW_DLV_ERROR) {
+        dwarf_dealloc(dbg, ret_abbrev, DW_DLA_ABBREV);
+        return res;
+    }
     ret_abbrev->dab_code = utmp;
     if (ret_abbrev->dab_code == 0) {
         *returned_abbrev = ret_abbrev;
@@ -176,26 +198,45 @@ dwarf_get_abbrev(Dwarf_Debug dbg,
         return DW_DLV_OK;
     }
 
+#if 0
     DECODE_LEB128_UWORD_CK(abbrev_ptr, utmp,
         dbg,error,abbrev_section_end);
-    if (utmp > DW_TAG_hi_user) {
-        _dwarf_error(dbg, error,DW_DLE_TAG_CORRUPT);
-        return DW_DLV_ERROR;
+#endif
+    res = _dwarf_leb128_uword_wrapper(dbg,&abbrev_ptr,
+        abbrev_section_end,&utmp,error);
+    if (res == DW_DLV_ERROR) {
+        dwarf_dealloc(dbg, ret_abbrev, DW_DLA_ABBREV);
+        return res;
     }
-
+    if (utmp > DW_TAG_hi_user) {
+        return _dwarf_format_TAG_err_msg(dbg,
+            utmp,"DW_DLE_TAG_CORRUPT",
+            error);
+    }
     ret_abbrev->dab_tag = utmp;
     if (abbrev_ptr >= abbrev_section_end) {
-        _dwarf_error(dbg, error, DW_DLE_ABBREV_DECODE_ERROR);
+        dwarfstring m;
+        dwarf_dealloc(dbg, ret_abbrev, DW_DLA_ABBREV);
+
+        dwarfstring_constructor(&m);
+        dwarfstring_append_printf_u(&m,
+            "DW_DLE_ABBREV_DECODE_ERROR: Ran off the end "
+            "of the abbrev section reading tag, starting at"
+            " abbrev section offset 0x%x",offset);
+        _dwarf_error_string(dbg, error,
+            DW_DLE_ABBREV_DECODE_ERROR,
+            dwarfstring_string(&m));
+        dwarfstring_destructor(&m);
         return DW_DLV_ERROR;
     }
     ret_abbrev->dab_has_child = *(abbrev_ptr++);
     ret_abbrev->dab_abbrev_ptr = abbrev_ptr;
     ret_abbrev->dab_next_ptr = abbrev_ptr;
     ret_abbrev->dab_next_index = 0;
-
     res = _dwarf_count_abbrev_entries(dbg,abbrev_ptr,
         abbrev_section_end,&labbr_count,&abbrev_ptr_out,error);
     if (res == DW_DLV_ERROR) {
+        dwarf_dealloc(dbg, ret_abbrev, DW_DLA_ABBREV);
         return res;
     }
     abbrev_ptr = abbrev_ptr_out;
@@ -205,6 +246,10 @@ dwarf_get_abbrev(Dwarf_Debug dbg,
     ret_abbrev->dab_count = labbr_count;
     if (abbrev_ptr > abbrev_section_end) {
         dwarf_dealloc(dbg, ret_abbrev, DW_DLA_ABBREV);
+        _dwarf_error_string(dbg, error,
+            DW_DLE_ABBREV_DECODE_ERROR,
+            "DW_DLE_ABBREV_DECODE_ERROR: Ran off the end "
+            "of the abbrev section reading abbrev_entries.");
         _dwarf_error(dbg, error, DW_DLE_ABBREV_DECODE_ERROR);
         return DW_DLV_ERROR;
     }
@@ -223,11 +268,11 @@ dwarf_get_abbrev_code(Dwarf_Abbrev abbrev,
 {
     if (abbrev == NULL) {
         _dwarf_error(NULL, error, DW_DLE_DWARF_ABBREV_NULL);
-        return (DW_DLV_ERROR);
+        return DW_DLV_ERROR;
     }
 
     *returned_code = abbrev->dab_code;
-    return (DW_DLV_OK);
+    return DW_DLV_OK;
 }
 
 /*  DWARF defines DW_TAG_hi_user as 0xffff so no tag should be
@@ -265,7 +310,7 @@ dwarf_get_abbrev_children_flag(Dwarf_Abbrev abbrev,
     does it return all bits of the uleb attribute
     nor does it return all bits of the uleb form
     value.
-    Ugh. FIXME by providing a better function.
+    See dwarf_get_abbrev_entry_b().
 */
 
 int
@@ -389,7 +434,10 @@ dwarf_get_abbrev_entry_b(Dwarf_Abbrev abbrev,
     }
 
     if (abbrev_ptr >= abbrev_end) {
-        _dwarf_error(dbg, error, DW_DLE_ABBREV_DECODE_ERROR);
+        _dwarf_error_string(dbg, error,
+            DW_DLE_ABBREV_DECODE_ERROR,
+            "DW_DLE_ABBREV_DECODE_ERROR: Ran off the end "
+            "of the abbrev section reading abbrev entries..");
         return DW_DLV_ERROR;
     }
 

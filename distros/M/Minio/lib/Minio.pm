@@ -15,7 +15,7 @@ Version 0.04
 
 =cut
 
-our $VERSION = '0.04';
+our $VERSION = '0.07';
 
 =head1 SYNOPSIS
 
@@ -41,8 +41,14 @@ our $VERSION = '0.04';
   my $M2L = $MObj->Minio2Local({minio_path=>'myminio/pub/00/11/22/33/44/file.txt',local_path=>'/tmp/file2.txt'});
   print Data::Dumper::Dumper($M2L);
 
+  my $Delete = $MObj->Delete({minio_path=>'myminio/pub/00/11/22/33/44/file.txt'});
+  print Data::Dumper::Dumper($Delete);
+
   my $LS = $MObj->LS({minio_path=>'myminio/pub/00/11/22/33/44/'});
   print Data::Dumper::Dumper($LS);
+
+  my $Cat = $MObj->Cat({minio_path=>'myminio/pub/00/11/22/33/44/file.txt'});
+  print $Cat;
 
   my $Tree = $MObj->Tree({minio_path=>'myminio/pub',json=>0});
   print $Tree;
@@ -122,16 +128,38 @@ sub _ex {
 sub Lookup {
   my $X = shift;
   my $Args = shift;
-  my $Path = $Args->{'minio_path'} || return {status=>'error',error_message=>"Path minio not defined"};
+  my $Path = $Args->{'minio_path'} || return {status=>'error',error_message=>"'minio_path' not defined"};
   my $Look = LS($X,{'minio_path'=>$Path});
   return $Look if $Look->{'status'} eq 'error';
   return $Look->{'data'}->[0] && $Look->{'data'}->[0]->{'key'} ? ($Args->{'info'}?$Look->{'data'}->[0]:1) : 0;
 }
 
+sub Cat {
+  my $X = shift;
+  my $JS = $X->{'json'};
+  $X->{'json'} = 0;
+  my $Args = shift;
+  my $Path = $Args->{'minio_path'} || return {status=>'error',error_message=>"'minio_path' not defined"};
+  my $Cmd = 'cat '.$Path;
+  $Args->{'as_array'}=1;
+  my $Ret = $X->_ex($Cmd, $Args);
+  $X->{'json'} = $JS;
+  return $Ret;
+}
+
+sub Delete {
+  my $X = shift;
+  my $Args = shift;
+  my $Path = $Args->{'minio_path'} || return {status=>'error',error_message=>"'minio_path' not defined"};
+  my $Cmd = 'rm '.$Path;
+  $Args->{'as_array'}=1;
+  return $X->_ex($Cmd, $Args);
+}
+
 sub LS {
   my $X = shift;
   my $Args = shift;
-  my $Path = $Args->{'minio_path'} || return {status=>'error',error_message=>"Path minio not defined"};
+  my $Path = $Args->{'minio_path'} || return {status=>'error',error_message=>"'minio_path' not defined"};
   my $Cmd = 'ls '.$Path;
   $Args->{'as_array'}=1;
   return $X->_ex($Cmd, $Args);
@@ -140,7 +168,7 @@ sub LS {
 sub Tree {
   my $X = shift;
   my $Args = shift;
-  my $Path = $Args->{'minio_path'} || return {status=>'error',error_message=>"Path minio defined"};
+  my $Path = $Args->{'minio_path'} || return {status=>'error',error_message=>"'minio_path' not defined"};
   my $Cmd = 'tree '.$Path;
   $Args->{'as_array'}=1;
   return $X->_ex($Cmd, $Args);

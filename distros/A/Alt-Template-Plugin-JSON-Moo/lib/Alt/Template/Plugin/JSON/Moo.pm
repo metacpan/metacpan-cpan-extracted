@@ -1,6 +1,6 @@
 package Alt::Template::Plugin::JSON::Moo;
-our $AUTHORITY = 'cpan:JwRIGHT';
-our $VERSION = '0.01';
+our $AUTHORITY = 'cpan:JWRIGHT';
+our $VERSION = '0.04';
 
 =pod
 
@@ -12,7 +12,7 @@ Alt::Template::Plugin::JSON::Moo - Alternate Template::Plugin::JSON - using Moo
 
 =head1 SYNOPSIS
 
-	> cpanm Alt::Template::Plugin::JSON::Moo 
+	> PERL_ALT_INSTALL=OVERWRITE cpanm Alt::Template::Plugin::JSON::Moo 
 
 	[% USE JSON %]
 

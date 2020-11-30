@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2016-2019 -- leonerd@leonerd.org.uk
 
-package Syntax::Keyword::Try 0.18;
+package Syntax::Keyword::Try 0.20;
 
 use v5.14;
 use warnings;
@@ -55,6 +55,8 @@ a more fine-grained approach you can instead use the import line for this
 module to only silence this module's warnings selectively:
 
    use Syntax::Keyword::Try qw( try :experimental(typed) );
+
+   use Syntax::Keyword::Try qw( try :experimental(try_value) );
 
    use Syntax::Keyword::Try qw( try :experimental );  # all of the above
 
@@ -375,7 +377,7 @@ sub import
    $class->import_into( $caller, @_ );
 }
 
-my @EXPERIMENTAL = qw( typed );
+my @EXPERIMENTAL = qw( typed try_value );
 
 sub import_into
 {
@@ -404,6 +406,8 @@ sub import_into
    # Ignore requests for these, as they come automatically with `try`
    delete @syms{qw( catch finally )};
 
+   $^H{"Syntax::Keyword::Try/try_value"}++ if $^H{"Syntax::Keyword::Try/experimental(try_value)"};
+
    croak "Unrecognised import symbols @{[ keys %syms ]}" if keys %syms;
 }
 
@@ -430,7 +434,29 @@ C<return> from inside C<try>.
       }
    }
 
-=head1 KNOWN BUGS
+=head1 ISSUES
+
+=head2 Context propagation during C<return>
+
+A C<return> statement inside a C<try> block will currently always propagate
+a scalar context, even if the function it appears in itself is in list
+context.
+
+   sub inner
+   {
+      return wantarray ? (qw( a list of things )) : "a single scalar";
+   }
+
+   sub outer
+   {
+      try { return inner() }
+      catch {}
+   }
+
+   my @result = outer();
+   print for @result;  # prints "a single scalar"
+
+This is discussed at L<https://rt.cpan.org/Ticket/Display.html?id=124229>.
 
 =head2 Thread-safety at load time cannot be assured before perl 5.16
 

@@ -75,6 +75,13 @@ See https://tools.ietf.org/html/rfc3986#section-4.5
 
 If true, URI::XS will use ';' as delimiter between query string params instead of a default '&'. Both for input and output.
 
+=item ALLOW_EXTENDED_CHARS
+
+Allow non-rfc urls with additional chars in query string for parsing ('"', '{', '}') like browsers or other software with user input,
+for example http://host.com?param={"key":"val"}
+
+The stringified form however will always be RFC-compliant
+
 =back
 
 =head4 register_scheme($scheme, $perl_class)

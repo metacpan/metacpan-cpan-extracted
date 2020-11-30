@@ -1,5 +1,8 @@
 Revision history for Data-MoneyCurrency
 
+0.12    Fri Nov 20 06:48:48 CET 2020
+        fix version mismatch between Module and dist
+
 0.11    Sat Nov 14 21:18:10 CET 2020
         new ruby-money conf
 

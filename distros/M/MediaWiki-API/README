@@ -1,7 +1,7 @@
 MediaWiki-API
 
 This module provides an interface between perl and the MediaWiki API
-(http://www.mediawiki.org/wiki/API) allowing creation of scripts to automate
+(https://www.mediawiki.org/wiki/API) allowing creation of scripts to automate
 editing and extraction of data from MediaWiki driven sites like Wikipedia.
 
 The latest source/development version is available at
@@ -26,7 +26,7 @@ To install this module, run the following commands:
     make test
     make install
 
-Note: make test will make some edits on http://testwiki.exotica.org.uk/wiki/Main_Page
+Note: make test will make some edits on https://testwiki.exotica.org.uk/wiki/Main_Page
 to check that it is working correctly. This will leave some data (including ip address)
 on the wiki (which is cleaned regularly). If you do not want this, please skip the
 "make test".

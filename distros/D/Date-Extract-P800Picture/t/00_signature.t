@@ -1,3 +1,7 @@
+use strict;
+use warnings;
+use utf8;
+
 use Test::More;
 
 if ( !$ENV{TEST_SIGNATURE} ) {

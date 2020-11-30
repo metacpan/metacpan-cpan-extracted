@@ -1,0 +1,55 @@
+=head1 NAME
+
+UniEvent::Streamer::Output - Pure Perl Output stream bridge
+
+=head1 DESCRIPTION
+
+This is pure perl output stream, meant to be assigned with L<UniEvent::Streamer>.
+It is assumed, that the class will consume data fed by L<UniEvent::Streamer>.
+
+For example, it can output the TCP Input stream into terminal, or calculate
+the input stream MD5 checksum.
+
+It is derived from L<UniEvent::Streamer::IOutput>.
+
+=head1 METHODS
+
+=head2 new()
+
+Constructs new pupe perl output stream.
+
+=head2 start($loop)
+
+This method is invoked upon underlying L<UniEvent::Streamer> start. Executed
+once per Streamer/Output lifetime.
+
+=head2 stop()
+
+This method is invoked upon underlying L<UniEvent::Streamer> stop. Executed
+once per Streamer/Output lifetime. No any further I/O is expected.
+
+=head2 write($data)
+
+Consumes the input data. Meant to be overriden in descendant classes to
+do something useful.
+
+The method returns L<XS::ErrorCode> to let the L<UniEvent::Streamer> know
+about success or failure of data consumption.
+
+=head2 write_queue_size()
+
+The method is invoked by the L<UniEvent::Streamer> to determine max size of
+single data chunk.
+
+=head2 handle_write($error_code)
+
+This method can be invoked, to let the L<UniEvent::Streamer> know, that
+something has happend with the output.
+
+=head1 REFERENCES
+
+L<UniEvent::Streamer>
+
+L<UniEvent::Streamer::IOutput>
+
+=cut

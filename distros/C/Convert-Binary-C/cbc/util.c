@@ -48,6 +48,7 @@ static int load_indexed_hash_module_ex(pTHX_ CBC *THIS, const char **modlist, in
 static const char *gs_IxHashMods[] = {
   NULL, /* custom preferred module */
   "Tie::Hash::Indexed",
+  "Hash::Ordered",
   "Tie::IxHash"
 };
 

@@ -4,7 +4,7 @@
       "Jordan Torbiak"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
    ],
@@ -38,12 +38,15 @@
    },
    "release_status" : "stable",
    "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/torbiak/git-autofixup/issues"
+      },
       "repository" : {
          "type" : "git",
          "url" : "https://github.com/torbiak/git-autofixup.git",
          "web" : "https://github.com/torbiak/git-autofixup"
       }
    },
-   "version" : 0.002007,
-   "x_serialization_backend" : "JSON::PP version 2.97001"
+   "version" : 0.003001,
+   "x_serialization_backend" : "JSON::PP version 4.04"
 }

@@ -1,3 +1,6 @@
+2.1.0    25.11.2020
+           - added ALLOW_EXTENDED_CHARS flag
+           - fix strict uris when using from other shared library
 2.0.1    31.01.2020
            - typemap bugfix
 2.0.0    20.01.2020

@@ -16,6 +16,15 @@ sub new {
     }, $class;
 }
 
+sub total_count {
+    my $this = shift();
+    my($newVal) = @_;
+
+    my $old = $this->{total_count};
+    $this->{total_count} = $newVal if defined $newVal;
+    return $old;
+}
+
 sub insert_records {
     my $this = shift();
     my($offset, $records) = @_;
@@ -26,6 +35,13 @@ sub insert_records {
     }
 }
 
+sub record {
+    my $this = shift();
+    my($index0) = @_;
+
+    return $this->{records}->[$index0];
+}
+
 sub insert_marcRecords {
     my $this = shift();
     my($marcRecords) = @_;
@@ -34,22 +50,6 @@ sub insert_marcRecords {
 	# The records are passed in and stored as MARC::Record objects
 	$this->{marcRecords}->{$instanceId} = $marcRecords->{$instanceId};
     }
-}
-
-sub total_count {
-    my $this = shift();
-    my($newVal) = @_;
-
-    my $old = $this->{total_count};
-    $this->{total_count} = $newVal if defined $newVal;
-    return $old;
-}
-
-sub record {
-    my $this = shift();
-    my($index0) = @_;
-
-    return $this->{records}->[$index0];
 }
 
 sub marcRecord {

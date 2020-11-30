@@ -1,0 +1,29 @@
+2.05
+
+- Change the colon to hyphens in cache files such that it will work
+  for Windows file systems.
+
+2.04
+
+- Prefer to use the XDG_DATA_HOME environment variable if set.
+
+- Prefer to use $HOME/.local if the environment variable is set and
+  the directory exists.
+
+- Prefer to use the $APPDATA environment variable if set (for
+  Windows).
+
+- Continue to use $HOME/.moku-pona even if one of the previous options
+  is available. Just move the directory to the correct place if you'd
+  like to change this.
+
+2.01
+
+- New feature: monitors Gemini and web URLs in addition to Gopher URLs
+
+- Incompatible change: the resulting updates.txt is now uses Gemini
+  format
+
+- Incompatible change: creates local Gemini files for Atom and RSS
+  feeds it finds and links to them from updates.txt
+

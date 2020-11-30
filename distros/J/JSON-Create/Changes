@@ -1,3 +1,13 @@
+0.28 2020-11-24
+* Test context-dependent variables & use numerical part only if valid.
+
+0.27 2020-11-22
+* Add indentation of output
+* Use integer not string for all context-dependent variables
+
+0.26 2020-11-22
+* Use string with quotes for integer context-dependent variables
+
 0.25 2020-02-14
 * Bug fix for uninitialised arrays
 

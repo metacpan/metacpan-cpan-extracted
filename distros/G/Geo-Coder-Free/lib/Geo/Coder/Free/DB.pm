@@ -277,7 +277,9 @@ sub _open {
 				}
 				$dbh->func($table, 'XML', $slurp_file, 'xmlsimple_import');
 			} else {
-				throw Error::Simple("Can't open $slurp_file");
+				my @call_details = caller(0);
+				throw Error::Simple("Can't open $slurp_file called from " .
+					$call_details[2] . ' of ' . $call_details[1]);
 			}
 			$self->{'type'} = 'XML';
 		}

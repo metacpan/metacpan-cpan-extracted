@@ -1,0 +1,12 @@
+--- ./zookeeper-client/zookeeper-client-c/src/zookeeper.c	2019-10-08 22:14:39.000000000 +0200
++++ ./zookeeper-client/zookeeper-client-c/src/zookeeper.c	2020-11-22 02:57:37.000000000 +0100
+@@ -1724,7 +1724,8 @@
+             }
+         }
+     }
+-    if (zoo_lock_auth(zh) == 0) {
++    zoo_lock_auth(zh);
++    {
+         a_list.completion = NULL;
+         a_list.next = NULL;
+

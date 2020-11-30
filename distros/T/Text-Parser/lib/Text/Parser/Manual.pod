@@ -15,7 +15,11 @@ Text::Parser::Manual - A manual for the Text::Parser class
 
 =head1 VERSION
 
-version 0.927
+version 1.000
+
+=head1 QUICK START
+
+L<Jump right here|Text::Parser::Manual::ExtendedAWKSyntax> for a quickstart!
 
 =head1 MOTIVATION
 
@@ -78,29 +82,27 @@ What if:
 
 =item *
 
-a utility took care of all the "mundane" boilerplate like C<open>, C<close> etc.?
+a utility took care of all the "mundane" boilerplate like checking if it is a text file, (potentially uncompressing content), calling C<open>, C<close> etc.?
 
 =item *
 
-parsing line-wrapped files were as simple as writing a small function that joins lines to unwrap?
+parsing line-wrapped files were as simple as setting an attribute, or writing two small routines to unwrap them?
 
 =item *
 
-data extraction could be done with a set of self-explanatory rules that don't need to be documented?
+data extraction could be done with a set of intuitively written, self-explanatory rules that don't need to be documented?
+
+=item *
+
+the code could be re-used for other text formats with same/similar syntax with minor modifications, instead of re-writing the whole thing?
 
 =item *
 
 the resulting code "reads like well-written prose"?
 
-=item *
-
-developers could easily extend a text parser written by another developer?
-
 =back
 
-L<Text::Parser> can help you accomplish all of these and more!
-
-The programmer needs to specify a set of parsing rules which look quite like AWK. And the rest is all taken care of. So now, a programmer need only focus on the grammar of the file they intend to parse.
+L<Text::Parser> accomplishes all of these and more! The programmer needs to specify a set of parsing rules, and the rest is all taken care of.
 
 =head1 CHAPTERS
 
@@ -110,15 +112,17 @@ This manual is divided into chapters:
 
 =item *
 
-L<Comparing with native Perl|Text::Parser::Manual::ComparingWithNativePerl> - this chapter should explain why one should consider using L<Text::Parser> instead of native Perl.
+L<Comparing with native Perl|Text::Parser::Manual::ComparingWithNativePerl> - compares native Perl solutions against L<Text::Parser> lists some of the pros and cons of both.
 
 =item *
 
 L<The Extended AWK Syntax|Text::Parser::Manual::ExtendedAWKSyntax> - this chapter outlines the syntax for the rules
 
-=back
+=item *
 
-You can L<jump here|Text::Parser::Manual::ExtendedAWKSyntax> for a quickstart.
+L<Collected Examples|Text::Parser::Manual::CollectedExamples> - a collection of examples using L<Text::Parser>. This will need to be expanded.
+
+=back
 
 =head1 BUGS
 

@@ -1,5 +1,5 @@
 /* Generated routines, do not edit. */
-/* Generated sourcedate  2020-01-14 10:13:32-08:00   */
+/* Generated sourcedate  2020-11-23 18:16:30-08:00   */
 
 /* BEGIN FILE */
 
@@ -1053,6 +1053,9 @@ dwarf_get_AT_name (unsigned int val,const char ** s_out)
     case DW_AT_GNU_macros:
         *s_out = "DW_AT_GNU_macros";
         return DW_DLV_OK;
+    case DW_AT_GNU_deleted:
+        *s_out = "DW_AT_GNU_deleted";
+        return DW_DLV_OK;
     case DW_AT_GNU_dwo_name:
         *s_out = "DW_AT_GNU_dwo_name";
         return DW_DLV_OK;
@@ -1073,6 +1076,12 @@ dwarf_get_AT_name (unsigned int val,const char ** s_out)
         return DW_DLV_OK;
     case DW_AT_GNU_discriminator:
         *s_out = "DW_AT_GNU_discriminator";
+        return DW_DLV_OK;
+    case DW_AT_GNU_locviews:
+        *s_out = "DW_AT_GNU_locviews";
+        return DW_DLV_OK;
+    case DW_AT_GNU_entry_view:
+        *s_out = "DW_AT_GNU_entry_view";
         return DW_DLV_OK;
     case DW_AT_SUN_template:
         *s_out = "DW_AT_SUN_template";
@@ -1222,6 +1231,7 @@ dwarf_get_AT_name (unsigned int val,const char ** s_out)
     case DW_AT_GNAT_descriptive_type:
         *s_out = "DW_AT_GNAT_descriptive_type";
         return DW_DLV_OK;
+    /* Skipping alternate spelling of value 0x2302. DW_AT_GNAT_descriptive_type */
     case DW_AT_GNU_numerator:
         *s_out = "DW_AT_GNU_numerator";
         return DW_DLV_OK;
@@ -1851,6 +1861,9 @@ dwarf_get_OP_name (unsigned int val,const char ** s_out)
     case DW_OP_GNU_const_index:
         *s_out = "DW_OP_GNU_const_index";
         return DW_DLV_OK;
+    case DW_OP_GNU_variable_value:
+        *s_out = "DW_OP_GNU_variable_value";
+        return DW_DLV_OK;
     case DW_OP_hi_user:
         *s_out = "DW_OP_hi_user";
         return DW_DLV_OK;
@@ -2084,6 +2097,43 @@ dwarf_get_RLE_name (unsigned int val,const char ** s_out)
         return DW_DLV_OK;
     case DW_RLE_start_length:
         *s_out = "DW_RLE_start_length";
+        return DW_DLV_OK;
+    }
+    return DW_DLV_NO_ENTRY;
+}
+/* ARGSUSED */
+int
+dwarf_get_GNUIVIS_name (unsigned int val,const char ** s_out)
+{
+    switch (val) {
+    case DW_GNUIVIS_global:
+        *s_out = "DW_GNUIVIS_global";
+        return DW_DLV_OK;
+    case DW_GNUIVIS_static:
+        *s_out = "DW_GNUIVIS_static";
+        return DW_DLV_OK;
+    }
+    return DW_DLV_NO_ENTRY;
+}
+/* ARGSUSED */
+int
+dwarf_get_GNUIKIND_name (unsigned int val,const char ** s_out)
+{
+    switch (val) {
+    case DW_GNUIKIND_none:
+        *s_out = "DW_GNUIKIND_none";
+        return DW_DLV_OK;
+    case DW_GNUIKIND_type:
+        *s_out = "DW_GNUIKIND_type";
+        return DW_DLV_OK;
+    case DW_GNUIKIND_variable:
+        *s_out = "DW_GNUIKIND_variable";
+        return DW_DLV_OK;
+    case DW_GNUIKIND_function:
+        *s_out = "DW_GNUIKIND_function";
+        return DW_DLV_OK;
+    case DW_GNUIKIND_other:
+        *s_out = "DW_GNUIKIND_other";
         return DW_DLV_OK;
     }
     return DW_DLV_NO_ENTRY;

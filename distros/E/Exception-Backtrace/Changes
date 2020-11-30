@@ -1,3 +1,6 @@
+1.0.10   24.11.2020
+    - separate out C++ sources into dedicated XS::libpanda::backtrace
+    - relax tests checks for *bsd with new libpanda
 1.0.9    30.07.2020
     - use heap istead of stack to avoid stack corruption on
       large backtraces

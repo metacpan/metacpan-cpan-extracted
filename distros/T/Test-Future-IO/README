@@ -1,0 +1,87 @@
+NAME
+
+    Test::Future::IO - unit testing on Future::IO
+
+SYNOPSIS
+
+       use Test::More;
+       use Test::Future::IO;
+    
+       my $controller = Test::Future::IO->controller;
+    
+       {
+          $controller->expect_syswrite( "Hello, world\n" );
+          $controller->expect_sysread( 256 )
+             ->returns( "A string\n");
+    
+          code_under_test();
+    
+          $controller->check_and_clear( 'code under test did correct IO' );
+       }
+
+DESCRIPTION
+
+    This package provides a means to apply unit testing around code which
+    uses Future::IO. It operates in an "expect-and-check" style of mocking,
+    requiring the test script to declare upfront what methods are expected
+    to be called, and what values they return.
+
+EXPECTATIONS
+
+    Each of the actual Future::IO methods has a corresponding expectation
+    method on the controller object, whose name is prefixed with expect_. A
+    single call to one of these methods by the unit test script represents
+    a single call to a Future::IO method that the code under test is
+    expected to make. The arguments to the expectation method should match
+    those given by the code under test. Each expectation method returns an
+    object which has additional methods to control the behaviour of that
+    invocation.
+
+       $exp = $controller->expect_sleep( $secs )
+    
+       $exp = $controller->expect_sysread( $len )
+       $exp = $controller->expect_syswrite( $bytes )
+
+    Note that the sysread and syswrite expectations currently ignore the
+    filehandle argument. This behaviour will be changed in a future
+    version. To keep this behaviour use the following methods instead:
+
+       $exp = $controller->expect_sysread_anyfh( $len )
+       $exp = $controller->expect_syswrite_anyfh( $bytes )
+
+    The returned expectation object allows the test script to specify what
+    such an invocation should return.
+
+       $exp->returns( @result )
+
+    Expectations can make methods fail instead.
+
+       $exp->fails( $message )
+       $exp->fails( $message, $category, @details )
+
+METHODS
+
+ controller
+
+       $controller = Test::Future::IO->controller;
+
+    Returns the control object, on which the various expect_* methods and
+    check_and_clear can be invoked.
+
+ check_and_clear
+
+       $controller->check_and_clear( $name );
+
+    Checks that by now, every expected method has been called, and emits a
+    new test output line via Test::Builder. Regardless, the expectations
+    are also cleared out ready for the start of the next test.
+
+TODO
+
+      * Configurable matching on filehandles. Provision of a mock
+      filehandle object to assist unit tests.
+
+AUTHOR
+
+    Paul Evans <leonerd@leonerd.org.uk>
+

@@ -1,5 +1,17 @@
 Revision history for Device-AVR-UPDI
 
+0.06    2020-11-25
+        [BUGFIXES]
+         * Remember to pack t/lib/MockFH.pm into MANIFEST
+
+0.05    2020-11-25
+        [CHANGES]
+         * Rebuild with latest ATtiny ATDF files
+            + Adds support for ATtiny 2-series chips
+            + Fixes erroneous TCD0CFG fuse for ATtiny160x chips
+         * Syntax fix for length($_) on older perls
+         * Use Test::ExpectAndCheck instead of Test::EasyMock
+
 0.04    2020-11-17
         [CHANGES]
          * Display named fuse fields on `read-fuses` command

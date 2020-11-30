@@ -15,6 +15,14 @@ lib/JSON/Schema/Draft201909/Annotation.pm
 lib/JSON/Schema/Draft201909/Document.pm
 lib/JSON/Schema/Draft201909/Error.pm
 lib/JSON/Schema/Draft201909/Result.pm
+lib/JSON/Schema/Draft201909/Utilities.pm
+lib/JSON/Schema/Draft201909/Vocabulary.pm
+lib/JSON/Schema/Draft201909/Vocabulary/Applicator.pm
+lib/JSON/Schema/Draft201909/Vocabulary/Content.pm
+lib/JSON/Schema/Draft201909/Vocabulary/Core.pm
+lib/JSON/Schema/Draft201909/Vocabulary/Format.pm
+lib/JSON/Schema/Draft201909/Vocabulary/MetaData.pm
+lib/JSON/Schema/Draft201909/Vocabulary/Validation.pm
 share/2019-09/hyper-schema.json
 share/2019-09/links.json
 share/2019-09/meta/applicator.json
@@ -37,7 +45,6 @@ t/additional-tests/faux-buggy-schemas.json
 t/additional-tests/format-duration.json
 t/additional-tests/future-keywords-draft2019-09.json
 t/additional-tests/id.json
-t/additional-tests/invalid-id-and-anchor.json
 t/additional-tests/keyword-independence.json
 t/additional-tests/loose-types-const-enum.json
 t/additional-tests/not-an-anchor.json
@@ -61,6 +68,7 @@ t/max_traversal_depth.t
 t/output_format.t
 t/pattern.t
 t/ref.t
+t/traverse.t
 t/type.t
 t/zzz-acceptance.t
 update-schemas

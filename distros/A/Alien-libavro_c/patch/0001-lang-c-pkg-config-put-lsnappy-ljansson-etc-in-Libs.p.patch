@@ -1,0 +1,54 @@
+From e96db72149ddaa7fb4852c4aa9d2fad69ba32d42 Mon Sep 17 00:00:00 2001
+From: Brian Fraser <brian.fraser@booking.com>
+Date: Mon, 23 Nov 2020 19:00:05 +0100
+Subject: [PATCH 1/6] lang/c pkg-config: put -lsnappy -ljansson etc in
+ Libs.private
+
+Changes this:
+
+    ; pkg-config --libs --static avro-c
+    -L/install/dir -lavro
+
+Into this:
+
+    ; pkg-config --libs --static avro-c
+    -L/install/dir -lavro -lzma -ljansson -lpthreads
+
+Assuming those are needed to link statically.
+---
+ lang/c/src/CMakeLists.txt | 7 +++++++
+ lang/c/src/avro-c.pc.in   | 1 +
+ 2 files changed, 8 insertions(+)
+
+diff --git a/lang/c/src/CMakeLists.txt b/lang/c/src/CMakeLists.txt
+index c1761c8d..1ec6ab05 100644
+--- a/lang/c/src/CMakeLists.txt
++++ b/lang/c/src/CMakeLists.txt
+@@ -123,6 +123,13 @@ install(TARGETS avro-static avro-shared
+ endif(WIN32)
+ 
+ # Install pkg-config file
++get_target_property(avro-static-libraries avro-static LINK_LIBRARIES)
++foreach(lib ${avro-static-libraries})
++    if(${lib} MATCHES "^[A-Za-z0-9_]+$")
++        list(APPEND CODEC_LIBRARIES_STATIC_LIST "${CMAKE_LINK_LIBRARY_FLAG}${lib}")
++    endif()
++endforeach()
++string(REPLACE ";" " " CODEC_LIBRARIES_STATIC "${CODEC_LIBRARIES_STATIC_LIST}")
+ 
+ set(prefix ${CMAKE_INSTALL_PREFIX})
+ set(VERSION ${AVRO_VERSION})
+diff --git a/lang/c/src/avro-c.pc.in b/lang/c/src/avro-c.pc.in
+index 013afe4d..515ecf58 100644
+--- a/lang/c/src/avro-c.pc.in
++++ b/lang/c/src/avro-c.pc.in
+@@ -3,5 +3,6 @@ Description: C library for parsing Avro data
+ Version: @VERSION@
+ URL: https://avro.apache.org/
+ Libs: -L@prefix@/lib -lavro
++Libs.private: @CODEC_LIBRARIES_STATIC@
+ Cflags: -I@prefix@/include
+ Requires: @CODEC_PKG@
+-- 
+2.29.2
+

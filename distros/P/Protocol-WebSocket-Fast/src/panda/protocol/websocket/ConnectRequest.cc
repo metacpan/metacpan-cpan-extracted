@@ -9,7 +9,7 @@ namespace panda { namespace protocol { namespace websocket {
 void ConnectRequest::process_headers () {
     bool ok;
 
-    if (_method != Method::GET) {
+    if (_method != Method::Get) {
         error = errc::method_mustbe_get;
         return;
     }
@@ -86,7 +86,7 @@ string ConnectRequest::to_string() {
         throw Error("ConnectRequest[to_string] http body is not allowed for websocket handshake request");
     }
 
-    _method = Request::Method::GET;
+    _method = Request::Method::Get;
 
     if (!ws_key) {
         int32_t keybuf[] = {std::rand(), std::rand(), std::rand(), std::rand()};

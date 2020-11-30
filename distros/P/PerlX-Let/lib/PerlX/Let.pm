@@ -11,7 +11,7 @@ use Const::Fast ();
 use Keyword::Simple 0.04;
 use Text::Balanced ();
 
-our $VERSION = 'v0.2.7';
+our $VERSION = 'v0.2.8';
 
 
 sub import {
@@ -90,14 +90,16 @@ PerlX::Let - Syntactic sugar for lexical state constants
 
 =head1 VERSION
 
-version v0.2.7
+version v0.2.8
 
 =head1 SYNOPSIS
 
   use PerlX::Let;
 
-  let $x = 1,
-      $y = "string" {
+  {
+
+      let $x = 1;
+      let $y = "string";
 
       if ( ($a->($y} - $x) > ($b->{$y} + $x) )
       {
@@ -117,7 +119,8 @@ keyword, for example, code such as
 
 is liable to typos. You could simplify it with
 
-  let $key = "username" {
+  {
+      let $key = "username";
 
       if (defined $arg{$key}) {
           $row->update( { $key => $arg{$key} );
@@ -147,7 +150,6 @@ This is roughly equivalent to using
 
 However, if the value contains a sigil, or (for versions of Perl
 before 5.28) the value is not a scalar, then this uses a my variable
-variable
 
   use Const::Fast ();
 
@@ -164,16 +166,27 @@ variable as read-only, particularly for deeper data structures.
 However, the tradeoff for using this is that the variables remain
 allocated until the process exits.
 
-If the code block is omitted, then this can be used to declare a
-state constant in the current scope, e.g.
+=head1 DEPRECATED SYNTAX
 
-  let $x = "foo";
+Adding a code block after the let assignment is deprecated:
 
-  say $x;
+  let $x = "foo" {
+    ...
+  }
 
-Note that this may enable the state L<feature> in the current scope.
+Instead, put the assignment inside of the block.
+
+Specifying multiple assignments is also deprecated:
+
+  let $x = "foo",
+      $y = "bar";
+
+Instead, use multiple let statements.
 
 =head1 KNOWN ISSUES
+
+A let assignment will enable the state feature inside of the current
+context.
 
 The parsing of assignments is rudimentary, and may fail when assigning
 to another variable or the result of a function.  Because of this,

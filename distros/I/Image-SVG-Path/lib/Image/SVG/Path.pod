@@ -50,13 +50,13 @@ produces output
             ];
 
 
-(This example is included as L<F<synopsis.pl>|https://fastapi.metacpan.org/source/BKB/Image-SVG-Path-0.33/examples/synopsis.pl> in the distribution.)
+(This example is included as L<F<synopsis.pl>|https://fastapi.metacpan.org/source/BKB/Image-SVG-Path-0.34/examples/synopsis.pl> in the distribution.)
 
 
 =head1 VERSION
 
-This documents version 0.33 of Image-SVG-Path
-corresponding to L<git commit 97a7754b59911531c89c334ae0e7731229fa1bbd|https://github.com/benkasminbullock/Image-SVG-Path/commit/97a7754b59911531c89c334ae0e7731229fa1bbd> released on Sat Jun 27 10:10:03 2020 +0900.
+This documents version 0.34 of Image-SVG-Path
+corresponding to L<git commit 931e05690ab464fbf610bd664b7b5011062c0cab|https://github.com/benkasminbullock/Image-SVG-Path/commit/931e05690ab464fbf610bd664b7b5011062c0cab> released on Tue Nov 24 14:05:51 2020 +0900.
 
 =head1 DESCRIPTION
 
@@ -102,7 +102,7 @@ produces output
     MOVE TO 148 214.
 
 
-(This example is included as L<F<xml-parser.pl>|https://fastapi.metacpan.org/source/BKB/Image-SVG-Path-0.33/examples/xml-parser.pl> in the distribution.)
+(This example is included as L<F<xml-parser.pl>|https://fastapi.metacpan.org/source/BKB/Image-SVG-Path-0.34/examples/xml-parser.pl> in the distribution.)
 
 
 SVG means "scalable vector graphics" and it is a standard of the W3
@@ -192,7 +192,7 @@ produces output
        type -> closepath
 
 
-(This example is included as L<F<extract-path-info.pl>|https://fastapi.metacpan.org/source/BKB/Image-SVG-Path-0.33/examples/extract-path-info.pl> in the distribution.)
+(This example is included as L<F<extract-path-info.pl>|https://fastapi.metacpan.org/source/BKB/Image-SVG-Path-0.34/examples/extract-path-info.pl> in the distribution.)
 
 
 The return value is a list of hash references. Each hash reference has
@@ -238,9 +238,7 @@ upper case.
 If the hash element C<no_smooth> is set to a true value then smooth
 cubic bezier curves, "S" curves, are changed into the equivalent "C"
 curves. This only works in combination with the "absolute" option,
-otherwise it does nothing. It does not work with smooth quadratic
-bezier curves. See L</no_smooth does not work with quadratic bezier
-curves>.
+otherwise it does nothing.
 
 In versions of this module up to C<0.30>, C<no_smooth> was erroneously
 named C<no_shortcuts>. The name C<no_shortcuts> is still accepted by
@@ -276,7 +274,7 @@ produces output
     M15.160000,91.180000 C16.400000,91.690000 17.650000,91.410000 18.390000,90.150000 C21.260000,85.250000 24.140000,79.250000 26.750000,73.000000 
 
 
-(This example is included as L<F<test-reverse.pl>|https://fastapi.metacpan.org/source/BKB/Image-SVG-Path-0.33/examples/test-reverse.pl> in the distribution.)
+(This example is included as L<F<test-reverse.pl>|https://fastapi.metacpan.org/source/BKB/Image-SVG-Path-0.34/examples/test-reverse.pl> in the distribution.)
 
 
 =head2 create_path_string
@@ -567,15 +565,6 @@ also exists.
 
 
 =over
-
-=item no_smooth does not work with quadratic bezier curves
-
-The L</no_smooth> option to L</extract_path_info> does not work
-with quadratic bezier curves. See also L</HISTORY>.
-
-
-This is L<bug 19|https://github.com/benkasminbullock/Image-SVG-Path/issues/19> on the issue tracker.
-
 
 =item reverse_path only works for cubic bezier curves
 

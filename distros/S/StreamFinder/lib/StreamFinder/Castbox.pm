@@ -393,7 +393,13 @@ sub new
 	$self->{'title'} = ($html =~ s#\<meta\s+property\=\"(?:og|twitter)\:title\"\s+content\=\"([^\"]+)\"\s*\/?\>##s) ? $1 : '';
 	$self->{'title'} ||= $1  if ($html =~ s#\<meta\s+name\=\"title\"\s+content\=\"([^\"]+)\"\s*\/?\>##s);
 	$self->{'title'} ||= $1  if ($html =~ s#\<TITLE\>\s*([^\|\<]+)##s);
-	$self->{'description'} = ($html =~ s#\<meta\s+name\=\"description\"\s+content\=\"([^\"]+)\"\s*\/?\>##s) ? $1 : '';
+	$self->{'description'} = '';
+	if ($html =~ m#class\=\"trackinfo\-des\"\>(.+?)\<\/div\>#s) {
+		my $desc = $1;
+		$desc = $1  if ($desc =~ m#\<div[^\>]*\>(.+)$#s);
+		$self->{'description'} = $desc;
+	}
+	$self->{'description'} ||= $1  if ($html =~ s#\<meta\s+name\=\"description\"\s+content\=\"([^\"]+)\"\s*\/?\>##s);
 	$self->{'description'} ||= $1  if ($html =~ s#\<meta\s+property\=\"(?:og|twitter)\:description\"\s+content\=\"([^\"]+)\"\s*\/"\>##s);
 	if ($html =~ s#\>\s*Update\:\s+([^\<]+)\<##s) {
 		my $datestuff = $1;

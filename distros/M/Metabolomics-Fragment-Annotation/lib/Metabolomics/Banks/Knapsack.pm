@@ -48,12 +48,11 @@ Metabolomics::Banks::Knapsack - Perl extension for Knapsack bank
 
 =head1 VERSION
 
-Version 0.1
+Version 0.2 - Adding POD
 
 =cut
 
-our $VERSION = '0.1';
-
+our $VERSION = '0.2';
 
 =head1 SYNOPSIS
 
@@ -61,14 +60,19 @@ our $VERSION = '0.1';
 
 =head1 DESCRIPTION
 
-	Metabolomics::Banks::Knapsack is a full package for Perl allowing to build a generic Perl bank object from Blood exposome bank resource.
-	
+	Metabolomics::Banks::Knapsack is a full package for Perl allowing to build a generic Perl bank object from Knapsack bank resource.
 
 =head1 EXPORT
 
-=head1 SUBROUTINES/METHODS
+	use Metabolomics::Banks::Knapsack qw( :all ) ;
 
-=head2 METHOD new
+=head1 PUBLIC METHODS 
+
+=head2 Metabolomics::Banks::Knapsack
+
+=over 4
+
+=item new
 
 	## Description : new
 	## Input : $self
@@ -94,174 +98,15 @@ sub new {
 }
 ### END of SUB
 
-=head2 METHOD __refKnapsackEntry__
-
-	## Description : init a new blood exposome entry
-	## Input : void	
-	## Output : refEntry
-	## Usage : $self->__refKnapsackEntry__() ;
-	
-=cut
-## START of SUB
-sub __refKnapsackEntry__ {
-    ## Variables
-    my ($class,$args) = @_;
-    my $self={};
-
-    bless($self) ;
-    
-    $self->{_KNAPSACK_ID_} = 'knapsack_id' ; # 
-    $self->{_COMPOUND_NAME_} = 'compound_name' ; # 
-	$self->{_MOLECULAR_FORMULA_} = 'molecular_formula' ;
-	$self->{_INCHIKEY_} = 'inchikey' ;
-	$self->{_CAS_} = 'cas' ;
-    $self->{_EXACT_MASS_} = 'exact_mass' ;
-
-    return $self ;
-}
-### END of SUB
-
-=head2 METHOD _getEntry_INCHIKEY
-
-	## Description : PRIVATE method _getEntry_INCHIKEY on a refKnapsackEntry object
-	## Input : void
-	## Output : $INCHIKEY
-	## Usage : my ( $INCHIKEY ) = $entry->_getEntry_INCHIKEY () ;
-	
-=cut
-## START of SUB
-sub _getEntry_INCHIKEY {
-    ## Retrieve Values
-    my $self = shift ;
-    
-    my $INCHIKEY = undef ;
-    
-    if ( (defined $self->{_INCHIKEY_}) and ( $self->{_INCHIKEY_} > 0 ) or $self->{_INCHIKEY_} < 0  ) {	$INCHIKEY = $self->{_INCHIKEY_} ; }
-    else {	 $INCHIKEY = 0 ; warn "[WARN] the method _getEntry_INCHIKEY can't _get a undef or non numerical value\n" ; }
-    
-    return ( $INCHIKEY ) ;
-}
-### END of SUB
-
-=head2 METHOD _getEntry_EXACT_MASS
-
-	## Description : PRIVATE method _getEntry_EXACT_MASS on a refKnapsackEntry object
-	## Input : void
-	## Output : $EXACT_MASS
-	## Usage : my ( $EXACT_MASS ) = $entry->_getEntry_EXACT_MASS () ;
-	
-=cut
-## START of SUB
-sub _getEntry_EXACT_MASS {
-    ## Retrieve Values
-    my $self = shift ;
-    
-    my $EXACT_MASS = undef ;
-    
-    if ( (defined $self->{_EXACT_MASS_}) and ( $self->{_EXACT_MASS_} > 0 ) or $self->{_EXACT_MASS_} < 0  ) {	$EXACT_MASS = $self->{_EXACT_MASS_} ; }
-    else {	 $EXACT_MASS = 0 ; warn "[WARN] the method _getEntry_EXACT_MASS can't _get a undef or non numerical value\n" ; }
-    
-    return ( $EXACT_MASS ) ;
-}
-### END of SUB
-
-=head2 METHOD _getEntry_KNAPSACK_ID
-
-	## Description : PRIVATE method _getEntry_CAS on a refKnapsackEntry object
-	## Input : void
-	## Output : $KNAPSACK_ID
-	## Usage : my ( $KNAPSACK_ID ) = $entry->_getEntry_KNAPSACK_ID () ;
-	
-=cut
-## START of SUB
-sub _getEntry_KNAPSACK_ID {
-    ## Retrieve Values
-    my $self = shift ;
-    
-    my $KNAPSACK_ID = undef ;
-    
-    if ( ( defined $self->{_KNAPSACK_ID_} ) and ( $self->{_KNAPSACK_ID_} ne '' )   ) {	$KNAPSACK_ID = $self->{_KNAPSACK_ID_} ; }
-    else {	 $KNAPSACK_ID = 0 ; warn "[WARN] the method _getEntry_KNAPSACK_ID can't _get a undef or non numerical value\n" ; }
-    
-    return ( $KNAPSACK_ID ) ;
-}
-### END of SUB
-
-=head2 METHOD _getEntry_CAS
-
-	## Description : PRIVATE method _getEntry_CAS on a refKnapsackEntry object
-	## Input : void
-	## Output : $CAS
-	## Usage : my ( $CAS ) = $entry->_getEntry_CAS () ;
-	
-=cut
-## START of SUB
-sub _getEntry_CAS {
-    ## Retrieve Values
-    my $self = shift ;
-    
-    my $CAS = undef ;
-    
-    if ( (defined $self->{_CAS_}) and ( $self->{_CAS_} > 0  or $self->{_CAS_} < 0 or $self->{_CAS_} == 0 )   ) {	$CAS = $self->{_CAS_} ; }
-    else {	 $CAS = 0 ; warn "[WARN] the method _getEntry_CAS can't _get a undef or non numerical value\n" ; }
-    
-    return ( $CAS ) ;
-}
-### END of SUB
-
-=head2 METHOD _getEntry_MOLECULAR_FORMULA
-
-	## Description : PRIVATE method _getEntry_MOLECULAR_FORMULA on a refKnapsackEntry object
-	## Input : void
-	## Output : $COMPOUND_FORMULA
-	## Usage : my ( $COMPOUND_FORMULA ) = $entry->_getEntry_MOLECULAR_FORMULA () ;
-	
-=cut
-## START of SUB
-sub _getEntry_MOLECULAR_FORMULA {
-    ## Retrieve Values
-    my $self = shift ;
-    
-    my $COMPOUND_FORMULA = undef ;
-    
-    if ( (defined $self->{_MOLECULAR_FORMULA_}) and ( $self->{_MOLECULAR_FORMULA_} ne '' ) ) {	$COMPOUND_FORMULA = $self->{_MOLECULAR_FORMULA_} ; }
-    else {	 $COMPOUND_FORMULA = undef ; warn "[WARN] the method _getEntry_COMPOUND_NAME can't _get a undef or non numerical value\n" ; }
-    
-    return ( $COMPOUND_FORMULA ) ;
-}
-### END of SUB
-
-=head2 METHOD _getEntry_COMPOUND_NAME
-
-	## Description : PRIVATE method _getEntry_COMPOUND_NAME on a refKnapsackEntry object
-	## Input : void
-	## Output : $COMPOUND_NAME
-	## Usage : my ( $COMPOUND_NAME ) = $entry->_getEntry_COMPOUND_NAME () ;
-	
-=cut
-## START of SUB
-sub _getEntry_COMPOUND_NAME {
-    ## Retrieve Values
-    my $self = shift ;
-    
-    my $COMPOUND_NAME = undef ;
-    
-    if ( (defined $self->{_COMPOUND_NAME_}) and ( $self->{_COMPOUND_NAME_} ne '' ) ) {	$COMPOUND_NAME = $self->{_COMPOUND_NAME_} ; }
-    else {	 $COMPOUND_NAME = undef ; warn "[WARN] the method _getEntry_COMPOUND_NAME can't _get a undef or non numerical value\n" ; }
-    
-    return ( $COMPOUND_NAME ) ;
-}
-### END of SUB
-
-
-=head2 METHOD getMetabolitesFromSource
+=item getMetabolitesFromSource
 
 	## Description : get the list of metabolite entries from $source file and set the Metabolomics::Banks::Knapsack object
 	## Input : $source (file from the metabolomics-references project)
 	## Output : an int as $entriesNb
 	## Usage : my ( $entriesNb ) = $self->getMetabolitesFromSource ( $source ) ;
-	
+
 =cut
+
 ## START of SUB
 sub getKSMetabolitesFromSource {
     ## Retrieve Values
@@ -326,15 +171,15 @@ sub getKSMetabolitesFromSource {
 }
 ### END of SUB
 
-
-=head2 METHOD buildTheoPeakBankFromEntries
+=item METHOD buildTheoPeakBankFromEntries
 
 	## Description : building from a Metabolomics::Banks::Knapsack object, a bank integrating each potential entry in a metabolomics format (POSITIVE or NEGATIVE forms)
 	## Input : $queryMode [POS|NEG]
 	## Output : int as $entryNb
 	## Usage : my $nb = $oBank->buildTheoPeakBankFromEntries() ;
-	
+
 =cut
+
 ## START of SUB
 sub buildTheoPeakBankFromKnapsack {
     ## Retrieve Values
@@ -404,11 +249,183 @@ sub buildTheoPeakBankFromKnapsack {
 }
 ### END of SUB
 
+=back
 
+=head1 PRIVATE METHODS
 
+=head2 Metabolomics::Banks::Knapsack
 
+=over 4
+
+=item PRIVATE_ONLY __refKnapsackEntry__
+
+	## Description : init a new blood exposome entry
+	## Input : void	
+	## Output : refEntry
+	## Usage : $self->__refKnapsackEntry__() ;
+
+=cut
+
+## START of SUB
+sub __refKnapsackEntry__ {
+    ## Variables
+    my ($class,$args) = @_;
+    my $self={};
+
+    bless($self) ;
+    
+    $self->{_KNAPSACK_ID_} = 'knapsack_id' ; # 
+    $self->{_COMPOUND_NAME_} = 'compound_name' ; # 
+	$self->{_MOLECULAR_FORMULA_} = 'molecular_formula' ;
+	$self->{_INCHIKEY_} = 'inchikey' ;
+	$self->{_CAS_} = 'cas' ;
+    $self->{_EXACT_MASS_} = 'exact_mass' ;
+
+    return $self ;
+}
+### END of SUB
+
+=item PRIVATE_ONLY _getEntry_INCHIKEY
+
+	## Description : PRIVATE method _getEntry_INCHIKEY on a refKnapsackEntry object
+	## Input : void
+	## Output : $INCHIKEY
+	## Usage : my ( $INCHIKEY ) = $entry->_getEntry_INCHIKEY () ;
+
+=cut
+
+## START of SUB
+sub _getEntry_INCHIKEY {
+    ## Retrieve Values
+    my $self = shift ;
+    
+    my $INCHIKEY = undef ;
+    
+    if ( (defined $self->{_INCHIKEY_}) and ( $self->{_INCHIKEY_} > 0 ) or $self->{_INCHIKEY_} < 0  ) {	$INCHIKEY = $self->{_INCHIKEY_} ; }
+    else {	 $INCHIKEY = 0 ; warn "[WARN] the method _getEntry_INCHIKEY can't _get a undef or non numerical value\n" ; }
+    
+    return ( $INCHIKEY ) ;
+}
+### END of SUB
+
+=item PRIVATE_ONLY _getEntry_EXACT_MASS
+
+	## Description : PRIVATE method _getEntry_EXACT_MASS on a refKnapsackEntry object
+	## Input : void
+	## Output : $EXACT_MASS
+	## Usage : my ( $EXACT_MASS ) = $entry->_getEntry_EXACT_MASS () ;
+
+=cut
+
+## START of SUB
+sub _getEntry_EXACT_MASS {
+    ## Retrieve Values
+    my $self = shift ;
+    
+    my $EXACT_MASS = undef ;
+    
+    if ( (defined $self->{_EXACT_MASS_}) and ( $self->{_EXACT_MASS_} > 0 ) or $self->{_EXACT_MASS_} < 0  ) {	$EXACT_MASS = $self->{_EXACT_MASS_} ; }
+    else {	 $EXACT_MASS = 0 ; warn "[WARN] the method _getEntry_EXACT_MASS can't _get a undef or non numerical value\n" ; }
+    
+    return ( $EXACT_MASS ) ;
+}
+### END of SUB
+
+=item PRIVATE_ONLY _getEntry_KNAPSACK_ID
+
+	## Description : PRIVATE method _getEntry_CAS on a refKnapsackEntry object
+	## Input : void
+	## Output : $KNAPSACK_ID
+	## Usage : my ( $KNAPSACK_ID ) = $entry->_getEntry_KNAPSACK_ID () ;
+
+=cut
+
+## START of SUB
+sub _getEntry_KNAPSACK_ID {
+    ## Retrieve Values
+    my $self = shift ;
+    
+    my $KNAPSACK_ID = undef ;
+    
+    if ( ( defined $self->{_KNAPSACK_ID_} ) and ( $self->{_KNAPSACK_ID_} ne '' )   ) {	$KNAPSACK_ID = $self->{_KNAPSACK_ID_} ; }
+    else {	 $KNAPSACK_ID = 0 ; warn "[WARN] the method _getEntry_KNAPSACK_ID can't _get a undef or non numerical value\n" ; }
+    
+    return ( $KNAPSACK_ID ) ;
+}
+### END of SUB
+
+=item PRIVATE_ONLY _getEntry_CAS
+
+	## Description : PRIVATE method _getEntry_CAS on a refKnapsackEntry object
+	## Input : void
+	## Output : $CAS
+	## Usage : my ( $CAS ) = $entry->_getEntry_CAS () ;
+
+=cut
+
+## START of SUB
+sub _getEntry_CAS {
+    ## Retrieve Values
+    my $self = shift ;
+    
+    my $CAS = undef ;
+    
+    if ( (defined $self->{_CAS_}) and ( $self->{_CAS_} > 0  or $self->{_CAS_} < 0 or $self->{_CAS_} == 0 )   ) {	$CAS = $self->{_CAS_} ; }
+    else {	 $CAS = 0 ; warn "[WARN] the method _getEntry_CAS can't _get a undef or non numerical value\n" ; }
+    
+    return ( $CAS ) ;
+}
+### END of SUB
+
+=item PRIVATE_ONLY _getEntry_MOLECULAR_FORMULA
+
+	## Description : PRIVATE method _getEntry_MOLECULAR_FORMULA on a refKnapsackEntry object
+	## Input : void
+	## Output : $COMPOUND_FORMULA
+	## Usage : my ( $COMPOUND_FORMULA ) = $entry->_getEntry_MOLECULAR_FORMULA () ;
+
+=cut
+
+## START of SUB
+sub _getEntry_MOLECULAR_FORMULA {
+    ## Retrieve Values
+    my $self = shift ;
+    
+    my $COMPOUND_FORMULA = undef ;
+    
+    if ( (defined $self->{_MOLECULAR_FORMULA_}) and ( $self->{_MOLECULAR_FORMULA_} ne '' ) ) {	$COMPOUND_FORMULA = $self->{_MOLECULAR_FORMULA_} ; }
+    else {	 $COMPOUND_FORMULA = undef ; warn "[WARN] the method _getEntry_COMPOUND_NAME can't _get a undef or non numerical value\n" ; }
+    
+    return ( $COMPOUND_FORMULA ) ;
+}
+### END of SUB
+
+=item PRIVATE_ONLY _getEntry_COMPOUND_NAME
+
+	## Description : PRIVATE method _getEntry_COMPOUND_NAME on a refKnapsackEntry object
+	## Input : void
+	## Output : $COMPOUND_NAME
+	## Usage : my ( $COMPOUND_NAME ) = $entry->_getEntry_COMPOUND_NAME () ;
+
+=cut
+
+## START of SUB
+sub _getEntry_COMPOUND_NAME {
+    ## Retrieve Values
+    my $self = shift ;
+    
+    my $COMPOUND_NAME = undef ;
+    
+    if ( (defined $self->{_COMPOUND_NAME_}) and ( $self->{_COMPOUND_NAME_} ne '' ) ) {	$COMPOUND_NAME = $self->{_COMPOUND_NAME_} ; }
+    else {	 $COMPOUND_NAME = undef ; warn "[WARN] the method _getEntry_COMPOUND_NAME can't _get a undef or non numerical value\n" ; }
+    
+    return ( $COMPOUND_NAME ) ;
+}
+### END of SUB
 
 __END__
+
+=back
 
 =head1 AUTHOR
 
@@ -454,6 +471,7 @@ L<https://metacpan.org/release/Metabolomics-Fragment-Annotation>
 
 =head1 ACKNOWLEDGEMENTS
 
+Thank you to INRAE and All metabolomics colleagues.
 
 =head1 LICENSE AND COPYRIGHT
 

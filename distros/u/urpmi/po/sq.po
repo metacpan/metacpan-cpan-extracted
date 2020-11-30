@@ -7,8 +7,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: Mageia\n"
-"POT-Creation-Date: 2020-01-18 09:59+0200\n"
-"PO-Revision-Date: 2019-05-02 13:40+0000\n"
+"POT-Creation-Date: 2020-07-10 17:41+0100\n"
+"PO-Revision-Date: 2020-07-10 16:45+0000\n"
 "Last-Translator: Ardit Dani <ardit.dani@gmail.com>\n"
 "Language-Team: Albanian (http://www.transifex.com/MageiaLinux/mageia/"
 "language/sq/)\n"
@@ -63,7 +63,7 @@ msgstr "Shkarkimi i pakos `%s'..."
 msgid "Cancel"
 msgstr "Anulo"
 
-#: ../gurpm/RPMProgressDialog.pm:359 ../urpm.pm:452 ../urpm/download.pm:882
+#: ../gurpm/RPMProgressDialog.pm:359 ../urpm.pm:454 ../urpm/download.pm:882
 #: ../urpm/get_pkgs.pm:277 ../urpm/media.pm:1149 ../urpm/media.pm:1682
 #: ../urpm/media.pm:1833
 #, c-format
@@ -280,7 +280,7 @@ msgstr ""
 "%s\n"
 "Vazhdo instalimin gjithsesi?"
 
-#: ../gurpmi2:120
+#: ../gurpmi2:120 ../gurpmi2:386
 #, c-format
 msgid "Warning"
 msgstr "Kujdes"
@@ -409,6 +409,16 @@ msgstr "Instalimi përfundoi"
 msgid "restarting urpmi"
 msgstr "rifillimi urpmi"
 
+#: ../gurpmi2:386
+#, c-format
+msgid "No"
+msgstr "Jo"
+
+#: ../gurpmi2:386
+#, c-format
+msgid "Yes"
+msgstr "Po"
+
 #: ../rpm-find-leaves:15
 #, c-format
 msgid ""
@@ -458,139 +468,139 @@ msgstr "Lësho urpmi në mënyrë të kufizuar..."
 msgid "While some packages may have been installed, there were failures.\n"
 msgstr "Ndërsa disa paketa mund të jenë instaluar, ka pasur dështime.\n"
 
-#: ../urpm.pm:193
+#: ../urpm.pm:195
 #, c-format
 msgid "fail to create directory %s"
 msgstr "dështojnë për të krijuar kartelën %s"
 
-#: ../urpm.pm:194
+#: ../urpm.pm:196
 #, c-format
 msgid "invalid owner for directory %s"
 msgstr "pronari i pavlefshëm për kartelën %s"
 
-#: ../urpm.pm:237
+#: ../urpm.pm:239
 #, c-format
 msgid "Can not download packages into %s"
 msgstr "Nuk mund të shkarkoni paketa në %s"
 
-#: ../urpm.pm:253
+#: ../urpm.pm:255
 #, c-format
 msgid "Environment directory %s does not exist"
 msgstr "Mjedisi kartelës %s nuk ekziston"
 
-#: ../urpm.pm:254 ../urpmf:244 ../urpmq:163
+#: ../urpm.pm:256 ../urpmf:244 ../urpmq:163
 #, c-format
 msgid "using specific environment on %s\n"
 msgstr "përdorim specifik i mjedisit në %s\n"
 
-#: ../urpm.pm:422
+#: ../urpm.pm:424
 #, c-format
 msgid "unable to open rpmdb"
 msgstr "e pa mundur hapja e rpmdb"
 
-#: ../urpm.pm:441
+#: ../urpm.pm:443
 #, c-format
 msgid "invalid rpm file name [%s]"
 msgstr "emri i skedares rpm është invalid [%s]"
 
-#: ../urpm.pm:447
+#: ../urpm.pm:449
 #, c-format
 msgid "retrieving rpm file [%s] ..."
 msgstr "rikuperimi i skedareve rpm [%s]..."
 
-#: ../urpm.pm:449 ../urpm/get_pkgs.pm:275
+#: ../urpm.pm:451 ../urpm/get_pkgs.pm:275
 #, c-format
 msgid "...retrieving done"
 msgstr "...rikuperim i bërë"
 
-#: ../urpm.pm:457
+#: ../urpm.pm:459
 #, c-format
 msgid "unable to access rpm file [%s]"
 msgstr "e pa mundur hyrja në skedaren rpm [%s]"
 
-#: ../urpm.pm:462
+#: ../urpm.pm:464
 #, c-format
 msgid "unable to parse spec file %s [%s]"
 msgstr "i paaftë për të analizuar skedarin e spekulimit %s [%s]"
 
-#: ../urpm.pm:470
+#: ../urpm.pm:472
 #, c-format
 msgid "unable to register rpm file"
 msgstr "i pa mundur regjistrimi i skedares rpm"
 
-#: ../urpm.pm:472
+#: ../urpm.pm:474
 #, c-format
 msgid "Incompatible architecture for rpm [%s]"
 msgstr "Arkitektura e papërshtatshme për rpm [%s]"
 
-#: ../urpm.pm:476
+#: ../urpm.pm:478
 #, c-format
 msgid "error registering local packages"
 msgstr "gabim gjatë regjistrimit të pakove lokale"
 
-#: ../urpm.pm:588
+#: ../urpm.pm:590
 #, c-format
 msgid "This operation is forbidden while running in restricted mode"
 msgstr "Ky operacion është i ndaluar gjatë lëshimit në regjimin e kufizuar"
 
-#: ../urpm/args.pm:156 ../urpm/args.pm:165
+#: ../urpm/args.pm:157 ../urpm/args.pm:166
 #, c-format
 msgid "bad proxy declaration on command line\n"
 msgstr "proxy që është deklaruar në linjën komanduese nuk është i saktë\n"
 
-#: ../urpm/args.pm:320
+#: ../urpm/args.pm:321
 #, c-format
 msgid "urpmq: cannot read rpm file \"%s\"\n"
 msgstr "urpmq: nuk mund ta lexojë skedaren rpm \"%s\"\n"
 
-#: ../urpm/args.pm:388
+#: ../urpm/args.pm:389
 #, c-format
 msgid "unexpected expression %s"
 msgstr "shprehja e papritur %s"
 
-#: ../urpm/args.pm:389
+#: ../urpm/args.pm:390
 #, c-format
 msgid "missing expression before %s"
 msgstr "mungon shprehja para %s"
 
-#: ../urpm/args.pm:395
+#: ../urpm/args.pm:396
 #, c-format
 msgid "unexpected expression %s (suggestion: use -a or -o ?)"
 msgstr "shprehje e papritur %s (sugjerime: përdor -a ose -o ?)"
 
-#: ../urpm/args.pm:399
+#: ../urpm/args.pm:400
 #, c-format
 msgid "no expression to close"
 msgstr "asnjë shprehje për t'u mbyllur"
 
-#: ../urpm/args.pm:408
+#: ../urpm/args.pm:409
 #, c-format
 msgid "by default urpmf awaits a regexp. you should use option \"--literal\""
 msgstr ""
 "sipas parazgjedhjes urpmf pret një regexp. ju duhet të përdorni alternativë "
 "\"--literal\""
 
-#: ../urpm/args.pm:482
+#: ../urpm/args.pm:483
 #, c-format
 msgid "chroot directory doesn't exist"
 msgstr "skedari chroot nuk ekziston"
 
-#: ../urpm/args.pm:505
+#: ../urpm/args.pm:506
 #, c-format
 msgid "Can't use %s without %s"
 msgstr "Nuk mund të përdorni %s pa %s"
 
-#: ../urpm/args.pm:508 ../urpm/args.pm:511 ../urpmq:155
+#: ../urpm/args.pm:509 ../urpm/args.pm:512 ../urpmq:155
 #, c-format
 msgid "Can't use %s with %s"
 msgstr "Nuk mund të përdorni %s me %s"
 
-#: ../urpm/args.pm:519
+#: ../urpm/args.pm:520
 #, c-format
 msgid "Too many arguments\n"
 msgstr "Shumë argumente\n"
 
-#: ../urpm/args.pm:527
+#: ../urpm/args.pm:528
 #, c-format
 msgid ""
 "%s version %s\n"
@@ -606,7 +616,7 @@ msgstr ""
 "\n"
 "përdorim:\n"
 
-#: ../urpm/args.pm:533
+#: ../urpm/args.pm:534
 #, c-format
 msgid "Copyright (C) %s by %s"
 msgstr "E Drejta Autorit (C) %s %s"
@@ -807,32 +817,32 @@ msgstr "rikuperimi i skedareve rpm nga burimi\"%s\"..."
 msgid "removing %s"
 msgstr "heqje %s"
 
-#: ../urpm/install.pm:215
+#: ../urpm/install.pm:217
 #, c-format
 msgid "unable to extract rpm from delta-rpm package %s"
 msgstr "i paaftë për nxjerrjen e rpm nga paketa delta-rpm %s"
 
-#: ../urpm/install.pm:242
+#: ../urpm/install.pm:245
 #, c-format
 msgid "unable to install package %s"
 msgstr "i pa mundur instalimi i pakos %s"
 
-#: ../urpm/install.pm:245
+#: ../urpm/install.pm:248
 #, c-format
 msgid "removing bad rpm (%s) from %s"
 msgstr "heqje e rpm së keqe (%s) nga %s"
 
-#: ../urpm/install.pm:246 ../urpm/install.pm:393
+#: ../urpm/install.pm:249 ../urpm/install.pm:397
 #, c-format
 msgid "removing %s failed: %s"
 msgstr "heqja %s dështoj: %s"
 
-#: ../urpm/install.pm:295
+#: ../urpm/install.pm:298
 #, c-format
 msgid "removing package %s"
 msgstr "heqje paketës %s"
 
-#: ../urpm/install.pm:359
+#: ../urpm/install.pm:362
 #, c-format
 msgid ""
 "created transaction for installing on %s (remove=%d, install=%d, upgrade=%d)"
@@ -840,17 +850,17 @@ msgstr ""
 "krijimi i një akcioni transmetues për një instalim në %s (remove=%d, install="
 "%d, upgrade=%d)"
 
-#: ../urpm/install.pm:362
+#: ../urpm/install.pm:365
 #, c-format
 msgid "unable to create transaction"
 msgstr "i pa mundur krijimi i një akcioni transmetues"
 
-#: ../urpm/install.pm:391
+#: ../urpm/install.pm:395
 #, c-format
 msgid "removing installed rpms (%s) from %s"
 msgstr "heqja e rpms së instaluar (%s) nga %s"
 
-#: ../urpm/install.pm:400
+#: ../urpm/install.pm:404
 #, c-format
 msgid "More information on package %s"
 msgstr "Më shumë informacion mbi paketën %s"
@@ -1070,12 +1080,11 @@ msgid "un-ignoring tainted medium `%s' b/c tainted packages are installed"
 msgstr ""
 
 #: ../urpm/media.pm:816
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "un-ignoring 32bit medium `%s' b/c 32-bit packages are installed or system is "
 "32-bit EFI"
 msgstr ""
-"jo-injorim i non-free medium `%s' b/c janë instaluar programe jo të lirë"
 
 #: ../urpm/media.pm:844
 #, c-format
@@ -3104,7 +3113,7 @@ msgid ""
 "no xml info for medium \"%s\", unable to return any result for packages %s"
 msgstr ""
 
-#: ../urpmq:487
+#: ../urpmq:488
 #, c-format
 msgid "No changelog found\n"
 msgstr ""

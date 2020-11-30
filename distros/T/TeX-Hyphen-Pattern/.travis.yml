@@ -1,0 +1,20 @@
+language: perl
+perl:
+  - "5.30"
+  - "5.14"
+env:
+  global:
+    - AUTHOR_TESTING=1
+jobs:
+  include:
+    - stage: Windows
+      os: windows
+      language: shell
+      before_install:
+        - cinst -y strawberryperl
+        - export "PATH=/c/Strawberry/perl/site/bin:/c/Strawberry/perl/bin:/c/Strawberry/c/bin:$PATH"
+      install:
+        - cpanm --quiet --notest Module::Build Test::TestCoverage Test::Perl::Critic Test::Kwalitee
+        - cpanm --quiet --notest --installdeps .
+      script:
+        - cpanm -v --test-only .

@@ -7,7 +7,7 @@ use utf8;
 use open ':std', ':locale';
 use Test::More;
 
-our $VERSION = v1.1.2;
+our $VERSION = v1.1.1;
 
 eval {
     require TeX::Hyphen;
@@ -26,41 +26,60 @@ if ( $ENV{'AUTHOR_TESTING'} ) {
 }
 
 my %todos = (
-    'As'            => 'Assamese',
-    'Bg'            => 'Bulgarian',
-    'Bg_t2a'        => 'Bulgarian t2a encoded',
-    'Bn'            => 'Bengali',
-    'Cop'           => 'Very experimental coptic for "copto" font',
-    'El_monoton'    => 'Modern Monotonic Greek',
-    'El_polyton'    => 'Modern Polytonic Greek',
-    'Eo'            => 'Esperanto',
-    'Grc'           => 'Ancient Greek',
-    'Gu'            => 'Gujarati',
-    'Hi'            => 'Hindi',
-    'Hy'            => 'Armenian',
-    'Ka'            => 'Georgian',
-    'Ka_t8m'        => 'Georgian t8m encoded',
-    'Kn'            => 'Kannada',
-    'Ml'            => 'Malayalam',
-    'Mn_cyrl'       => 'Mongolian',
-    'Mn_cyrl_t2a'   => 'Mongolian t2a encoded',
-    'Mn_cyrl_x_lmc' => 'Mongolian LMC encoded',
-    'Mr'            => 'Marathi',
-    'Mul_ethi'      => 'Experimental Ethiopic',
-    'Or'            => 'Oriya',
-    'Pa'            => 'Panjabi',
-    'Ru'            => 'Russian',
-    'Ru_t2a'        => 'Russian t2a encoded',
-    'Sh'            => 'Serbocroatian',
-    'Sh_cyrl'       => 'Serbocroatian in Cyrillic',
-    'Sh_cyrl_t2a'   => 'Serbian in Cyrillic t2a encoded',
-    'Sr'            => 'Serbian',
-    'Sr_cyrl'       => 'Serbian in Cyrillic',
-    'Ta'            => 'Tamil',
-    'Te'            => 'Telugu',
-    'Th'            => 'Thai',
-    'Th_lth'        => 'Thai lth encoded',
-    'Uk'            => 'Ukranian',
+    'Ar'                   => 'Arabic - has no hyphenation',
+    'As'                   => 'Assamese',
+    'Be'                   => 'Belarusian',
+    'Bg'                   => 'Bulgarian',
+    'Bg_t2a'               => 'Bulgarian t2a encoded',
+    'Bn'                   => 'Bengali',
+    'Cop'                  => 'Very experimental coptic for "copto" font',
+    'Cu'                   => 'Church Slavonic',
+    'El_monoton'           => 'Modern Monotonic Greek',
+    'El_polyton'           => 'Modern Polytonic Greek',
+    'Eo'                   => 'Esperanto',
+    'Fa'                   => 'Persian - has no hyphenation',
+    'Grc'                  => 'Ancient Greek',
+    'Grc_x_ibycus'         => 'Ancient Greek in Ibycus encoding',
+    'Gu'                   => 'Gujarati',
+    'Hi'                   => 'Hindi',
+    'Hy'                   => 'Armenian',
+    'Ka'                   => 'Georgian',
+    'Ka_t8m'               => 'Georgian t8m encoded',
+    'Kn'                   => 'Kannada',
+    'Mk'                   => 'Macedonian',
+    'Ml'                   => 'Malayalam',
+    'Mn_cyrl'              => 'Mongolian',
+    'Mn_cyrl_t2a'          => 'Mongolian t2a encoded',
+    'Mn_cyrl_x_lmc'        => 'Mongolian LMC encoded',
+    'Mr'                   => 'Marathi',
+    'Mul_ethi'             => 'Experimental Ethiopic',
+    'Nb'                   => 'Norwegian Bokmål',
+    'Nn'                   => 'Norwegian Nynorsk',
+    'Or'                   => 'Oriya',
+    'Pa'                   => 'Panjabi',
+    'Ru'                   => 'Russian',
+    'Ru_t2a'               => 'Russian t2a encoded',
+    'Sh'                   => 'Serbocroatian',
+    'Sh_cyrl'              => 'Serbocroatian in Cyrillic',
+    'Sh_cyrl_t2a'          => 'Serbian in Cyrillic t2a encoded',
+    'Sr'                   => 'Serbian',
+    'Sr_cyrl'              => 'Serbian in Cyrillic',
+    'Ta'                   => 'Tamil',
+    'Te'                   => 'Telugu',
+    'Th'                   => 'Thai',
+    'Th_lth'               => 'Thai lth encoded',
+    'Uk'                   => 'Ukranian',
+    'Quote_af'             => 'Quote af',
+    'Quote_be'             => 'Quote be',
+    'Quote_fr'             => 'Quote fr',
+    'Quote_fur'            => 'Quote fur',
+    'Quote_it'             => 'Quote it',
+    'Quote_oc'             => 'Quote oc',
+    'Quote_pms'            => 'Quote pms',
+    'Quote_rm'             => 'Quote rm',
+    'Quote_uk'             => 'Quote uk',
+    'Quote_zh_latn_pinyin' => 'Quote zh latn pinyin',
+    'Utf8'                 => 'Utf-8',
 );
 use TeX::Hyphen::Pattern;
 my $SPACE = q{ };
@@ -102,7 +121,7 @@ isnt( 0 + @labels, 0, q{Number of patterns available} );
 for my $label (@labels) {
     note($label);
     $thp->label($label);
-    my $hyph = TeX::Hyphen->new( $thp->filename );
+    my $hyph   = TeX::Hyphen->new( $thp->filename );
     my $broken = join q{ }, map { $hyph->visualize($_) } split / /sm, $words;
     isnt( $words, $broken, qq{using pattern for '$label' in TeX::Hyphen} );
 }
@@ -111,7 +130,7 @@ TODO: {
     for my $label (@todos) {
         note($label);
         $thp->label($label);
-        my $hyph = TeX::Hyphen->new( $thp->filename );
+        my $hyph   = TeX::Hyphen->new( $thp->filename );
         my $broken = join q{ }, map { $hyph->visualize($_) } split / /sm,
           $words;
         isnt( $words, $broken, qq{using pattern for '$label' in TeX::Hyphen} );

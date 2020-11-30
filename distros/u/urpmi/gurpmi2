@@ -380,8 +380,23 @@ return_with_exit_code:
 
 sub ask_yes_or_no {
     my ($_title, $msg) = @_;
-    # MessageDialogs have no titles unless using 'secondary-text'
-    my $w = Gtk3::MessageDialog->new($mainw, [qw(modal destroy-with-parent)], 'warning', 'yes-no', $msg);
+    my $w;
+    my $nb_lines = $msg =~ tr/\n/\n/;
+    if ($nb_lines > 20) {
+        $w = Gtk3::Dialog->new(N("Warning"), $mainw, [qw(modal destroy-with-parent)], N("No"), 'no', N("Yes"), 'yes');
+        my @lines = split("\n", $msg);
+        my $vbox = Gtk3::VBox->new(0, 5);
+        $vbox->pack_start(new_label($lines[0]), 1, 1, 0);
+        $vbox->pack_start(new_label(join("\n", @lines[1 .. $nb_lines - 1])), 1, 1, 0);
+        $vbox->pack_start(new_label($lines[$nb_lines]), 1, 1, 0);
+        $vbox->set_size_request(400, 320);
+        $w->get_child->add($vbox);
+        $vbox->show_all;
+        $w->set_default_response('yes');
+    } else {
+        # MessageDialogs have no titles unless using 'secondary-text'
+        $w = Gtk3::MessageDialog->new($mainw, [qw(modal destroy-with-parent)], 'warning', 'yes-no', $msg);
+    }
     my $response = $w->run;
     $w->destroy;
     $response eq 'yes';

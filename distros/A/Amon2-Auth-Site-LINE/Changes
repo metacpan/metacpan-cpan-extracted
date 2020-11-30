@@ -1,0 +1,20 @@
+Revision history for Perl extension Amon2::Auth::Site::LINE
+
+0.04 2020-11-26T07:03:55Z
+        - Replace `//` to `||` operator to support Perl version 5.8.x properly.
+        - Fix pod.
+        - Fix cpanfile.
+
+0.03 2020-11-25T01:32:28Z
+        - Modify to be able to get a token result in `on_finished()` callback
+          as an argument, not just a user profile data
+          with keeping backward compatibility.
+        - Fix pod and README.
+
+0.02 2020-11-23T00:04:20Z
+        - Fix pod.
+        - Fix cpanfile.
+
+0.01 2020-11-21T06:33:44Z
+        - original version
+

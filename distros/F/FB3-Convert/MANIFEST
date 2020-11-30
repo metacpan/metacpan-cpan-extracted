@@ -8,6 +8,8 @@ lib/FB3/Convert/Epub.pm
 lib/FB3/Convert/FB2.pm
 lib/FB3/Euristica.pm
 MANIFEST			This list of files
+META.json
+META.yml
 README
 share/body.xsl
 share/body_rels.xsl
@@ -24,6 +26,8 @@ t/examples/cutfb3/0_152022.fb3
 t/examples/cutfb3/0_152022.xml
 t/examples/cutfb3/195_141392.fb3
 t/examples/cutfb3/195_141392.xml
+t/examples/cutfb3/2500_200277.fb3
+t/examples/cutfb3/2500_200277.xml
 t/examples/cutfb3/o0_img_and_links_152022.fb3
 t/examples/cutfb3/o0_img_and_links_152022.xml
 t/examples/cutfb3/o0_notesempty_152022.fb3
@@ -132,10 +136,14 @@ t/examples/fb2/subtitle_114533.fb2
 t/examples/fb2/subtitle_114533.xml
 t/examples/fb2/subtitle_cite_109783.fb2
 t/examples/fb2/subtitle_cite_109783.xml
-t/examples/fb3_to_fb2/clipped_section_189097.fb2
-t/examples/fb3_to_fb2/clipped_section_189097.fb3
-t/examples/fb3_to_fb2/id_inside_td_189599.fb2
+t/examples/fb3_to_fb2/author_exists_193286.fb3
+t/examples/fb3_to_fb2/author_exists_193286.xml
+t/examples/fb3_to_fb2/author_not_exists_193286.fb3
+t/examples/fb3_to_fb2/author_not_exists_193286.xml
+t/examples/fb3_to_fb2/clipped_section_190994.fb3
+t/examples/fb3_to_fb2/clipped_section_190994.xml
 t/examples/fb3_to_fb2/id_inside_td_189599.fb3
+t/examples/fb3_to_fb2/id_inside_td_189599.xml
 t/examples/fb3_to_fb2/marker_156543.fb3
 t/examples/fb3_to_fb2/marker_156543.xml
 t/examples/fb3_to_fb2/move_id_from_a_to_block_136561.fb3
@@ -149,5 +157,3 @@ t/examples/fb3_to_fb2/table_title_189446.xml
 t/test1.t
 t/test2.t
 t/test3.t
-META.yml
-META.json

@@ -3,13 +3,13 @@
 [![Dependency Status](https://dependencyci.com/github/nigelhorne/CGI-Untaint-CountyStateProvince-US/badge)](https://dependencyci.com/github/nigelhorne/Untaint-CountyStateProvince-US-Info)
 [![Coverage Status](https://coveralls.io/repos/github/nigelhorne/CGI-Untaint-CountyStateProvince-US/badge.svg?branch=master)](https://coveralls.io/github/nigelhorne/CGI-Untaint-CountyStateProvince-US?branch=master)
 
-# CGI::Untaint::CountyStateProvince::US
+# NAME
 
-Add U.S. states to CGI::Untaint::CountyStateProvince tables
+CGI::Untaint::CountyStateProvince::US - Add U.S. states to CGI::Untaint::CountyStateProvince tables
 
 # VERSION
 
-Version 0.03
+Version 0.04
 
 # SYNOPSIS
 
@@ -70,10 +70,6 @@ You can also look for information at:
 
     [http://rt.cpan.org/NoAuth/Bugs.html?Dist=CGI-Untaint-CountyStateProvince-US](http://rt.cpan.org/NoAuth/Bugs.html?Dist=CGI-Untaint-CountyStateProvince-US)
 
-- AnnoCPAN: Annotated CPAN documentation
-
-    [http://annocpan.org/dist/CGI-Untaint-CountyStateProvince-US](http://annocpan.org/dist/CGI-Untaint-CountyStateProvince-US)
-
 - CPAN Ratings
 
     [http://cpanratings.perl.org/d/CGI-Untaint-CountyStateProvince-US](http://cpanratings.perl.org/d/CGI-Untaint-CountyStateProvince-US)
@@ -86,6 +82,6 @@ You can also look for information at:
 
 # LICENSE AND COPYRIGHT
 
-Copyright 2012-2017 Nigel Horne.
+Copyright 2012-2019 Nigel Horne.
 
-This program is released under the following licence: GPL
+This program is released under the following licence: GPL2

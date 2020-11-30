@@ -2,3 +2,26 @@ language: perl
 perl:
   - "5.30"
   - "5.16"
+env:
+  global:
+    - AUTHOR_TESTING=1
+before_install:
+    - cpanm --quiet --notest Test::Perl::Critic Perl::Critic::More Perl::Critic::Bangs Perl::Critic::StricterSubs Perl::Critic::Tics Test::Kwalitee Test::Pod::Coverage Test::Pod Test::NoWarnings Test::Warn
+install:
+    - cpanm --notest --installdeps .
+script:
+    - cpanm -v --test-only .
+jobs:
+  include:
+    - stage: Windows
+      os: windows
+      language: shell
+      before_install:
+        - cinst -y strawberryperl
+        - export "PATH=/c/Strawberry/perl/site/bin:/c/Strawberry/perl/bin:/c/Strawberry/c/bin:$PATH"
+        - export AUTHOR_TESTING=
+        - cpanm --quiet --notest Test::Perl::Critic Perl::Critic::More Perl::Critic::Bangs Perl::Critic::StricterSubs Perl::Critic::Tics Test::Kwalitee Test::Pod::Coverage Test::Pod Test::NoWarnings Test::Warn
+      install:
+        - cpanm --notest --installdeps .
+      script:
+        - cpanm -v --test-only .

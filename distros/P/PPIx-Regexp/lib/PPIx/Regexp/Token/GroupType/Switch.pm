@@ -37,7 +37,7 @@ use base qw{ PPIx::Regexp::Token::GroupType };
 
 use PPIx::Regexp::Constant qw{ @CARP_NOT };
 
-our $VERSION = '0.075';
+our $VERSION = '0.076';
 
 sub __match_setup {
     my ( undef, $tokenizer ) = @_;	# Invocant unused
@@ -45,13 +45,14 @@ sub __match_setup {
     return;
 }
 
-__PACKAGE__->__setup_class(
-    {
-	'?'	=> {
-	    expl	=> q<Match one of the following '|'-delimited alternatives>,
-	    intro	=> '5.005',
-	},
+use constant DEF	=> {
+    '?'	=> {
+	expl	=> q<Match one of the following '|'-delimited alternatives>,
+	intro	=> '5.005',
     },
+};
+
+__PACKAGE__->__setup_class(
     {
 	suffix	=> '(',
     },

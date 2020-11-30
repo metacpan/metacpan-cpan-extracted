@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: uz\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-01-18 09:59+0200\n"
+"POT-Creation-Date: 2020-07-10 17:41+0100\n"
 "PO-Revision-Date: 2007-09-13 16:43+0200\n"
 "Last-Translator: Mashrab Kuvatov <kmashrab@uni-bremen.de>\n"
 "Language-Team: Uzbek <floss-uz-l10n@googlegroups.com>\n"
@@ -64,7 +64,7 @@ msgstr "\"%s\" пакети олинмоқда..."
 msgid "Cancel"
 msgstr "Бекор қилиш"
 
-#: ../gurpm/RPMProgressDialog.pm:359 ../urpm.pm:452 ../urpm/download.pm:882
+#: ../gurpm/RPMProgressDialog.pm:359 ../urpm.pm:454 ../urpm/download.pm:882
 #: ../urpm/get_pkgs.pm:277 ../urpm/media.pm:1149 ../urpm/media.pm:1682
 #: ../urpm/media.pm:1833
 #, c-format
@@ -264,7 +264,7 @@ msgstr ""
 "%s\n"
 "Бунга қарамасдан ўрнатишни давом эттиришни истайсизми?"
 
-#: ../gurpmi2:120
+#: ../gurpmi2:120 ../gurpmi2:386
 #, c-format
 msgid "Warning"
 msgstr "Диққат"
@@ -393,6 +393,16 @@ msgstr "Ўрнатиш тугади"
 msgid "restarting urpmi"
 msgstr "urpmi қайтадан ишга тушмоқда"
 
+#: ../gurpmi2:386
+#, c-format
+msgid "No"
+msgstr ""
+
+#: ../gurpmi2:386
+#, c-format
+msgid "Yes"
+msgstr ""
+
 #: ../rpm-find-leaves:15
 #, c-format
 msgid ""
@@ -444,137 +454,137 @@ msgstr ""
 msgid "While some packages may have been installed, there were failures.\n"
 msgstr ""
 
-#: ../urpm.pm:193
+#: ../urpm.pm:195
 #, fuzzy, c-format
 msgid "fail to create directory %s"
 msgstr "тўпламни яратиб бўлмади: \"%s\"\n"
 
-#: ../urpm.pm:194
+#: ../urpm.pm:196
 #, c-format
 msgid "invalid owner for directory %s"
 msgstr ""
 
-#: ../urpm.pm:237
+#: ../urpm.pm:239
 #, fuzzy, c-format
 msgid "Can not download packages into %s"
 msgstr "\"%s\" пакети олинмоқда..."
 
-#: ../urpm.pm:253
+#: ../urpm.pm:255
 #, c-format
 msgid "Environment directory %s does not exist"
 msgstr ""
 
-#: ../urpm.pm:254 ../urpmf:244 ../urpmq:163
+#: ../urpm.pm:256 ../urpmf:244 ../urpmq:163
 #, c-format
 msgid "using specific environment on %s\n"
 msgstr ""
 
-#: ../urpm.pm:422
+#: ../urpm.pm:424
 #, c-format
 msgid "unable to open rpmdb"
 msgstr "rpmdb'ни очиб бўлмади"
 
-#: ../urpm.pm:441
+#: ../urpm.pm:443
 #, c-format
 msgid "invalid rpm file name [%s]"
 msgstr "RPM-файлининг номи (%s) нотўғри"
 
-#: ../urpm.pm:447
+#: ../urpm.pm:449
 #, c-format
 msgid "retrieving rpm file [%s] ..."
 msgstr "RPM-файли (%s) олинмоқда..."
 
-#: ../urpm.pm:449 ../urpm/get_pkgs.pm:275
+#: ../urpm.pm:451 ../urpm/get_pkgs.pm:275
 #, c-format
 msgid "...retrieving done"
 msgstr "...олиш тугади"
 
-#: ../urpm.pm:457
+#: ../urpm.pm:459
 #, c-format
 msgid "unable to access rpm file [%s]"
 msgstr "RPM-файлига (%s) мурожаат қилиб бўлмади"
 
-#: ../urpm.pm:462
+#: ../urpm.pm:464
 #, c-format
 msgid "unable to parse spec file %s [%s]"
 msgstr ""
 
-#: ../urpm.pm:470
+#: ../urpm.pm:472
 #, c-format
 msgid "unable to register rpm file"
 msgstr "RPM-файлини рўйхатдан ўтказиб бўлмади"
 
-#: ../urpm.pm:472
+#: ../urpm.pm:474
 #, c-format
 msgid "Incompatible architecture for rpm [%s]"
 msgstr ""
 
-#: ../urpm.pm:476
+#: ../urpm.pm:478
 #, c-format
 msgid "error registering local packages"
 msgstr ""
 
-#: ../urpm.pm:588
+#: ../urpm.pm:590
 #, c-format
 msgid "This operation is forbidden while running in restricted mode"
 msgstr ""
 
-#: ../urpm/args.pm:156 ../urpm/args.pm:165
+#: ../urpm/args.pm:157 ../urpm/args.pm:166
 #, c-format
 msgid "bad proxy declaration on command line\n"
 msgstr ""
 
-#: ../urpm/args.pm:320
+#: ../urpm/args.pm:321
 #, c-format
 msgid "urpmq: cannot read rpm file \"%s\"\n"
 msgstr "urpmq: RPM-файлини (%s) ўқиб бўлмади\n"
 
-#: ../urpm/args.pm:388
+#: ../urpm/args.pm:389
 #, c-format
 msgid "unexpected expression %s"
 msgstr ""
 
-#: ../urpm/args.pm:389
+#: ../urpm/args.pm:390
 #, fuzzy, c-format
 msgid "missing expression before %s"
 msgstr "Имзо етишмайди (%s)"
 
-#: ../urpm/args.pm:395
+#: ../urpm/args.pm:396
 #, c-format
 msgid "unexpected expression %s (suggestion: use -a or -o ?)"
 msgstr ""
 
-#: ../urpm/args.pm:399
+#: ../urpm/args.pm:400
 #, c-format
 msgid "no expression to close"
 msgstr ""
 
-#: ../urpm/args.pm:408
+#: ../urpm/args.pm:409
 #, c-format
 msgid "by default urpmf awaits a regexp. you should use option \"--literal\""
 msgstr ""
 
-#: ../urpm/args.pm:482
+#: ../urpm/args.pm:483
 #, c-format
 msgid "chroot directory doesn't exist"
 msgstr "chroot директорияси мавжуд эмас"
 
-#: ../urpm/args.pm:505
+#: ../urpm/args.pm:506
 #, c-format
 msgid "Can't use %s without %s"
 msgstr "%s амалидан %s амалисиз фойдаланиб бўлмайди"
 
-#: ../urpm/args.pm:508 ../urpm/args.pm:511 ../urpmq:155
+#: ../urpm/args.pm:509 ../urpm/args.pm:512 ../urpmq:155
 #, c-format
 msgid "Can't use %s with %s"
 msgstr "%s амалидан %s амали билан бирга фойдаланиб бўлмайди"
 
-#: ../urpm/args.pm:519
+#: ../urpm/args.pm:520
 #, c-format
 msgid "Too many arguments\n"
 msgstr ""
 
-#: ../urpm/args.pm:527
+#: ../urpm/args.pm:528
 #, c-format
 msgid ""
 "%s version %s\n"
@@ -590,7 +600,7 @@ msgstr ""
 "\n"
 "Фойдаланиш:\n"
 
-#: ../urpm/args.pm:533
+#: ../urpm/args.pm:534
 #, c-format
 msgid "Copyright (C) %s by %s"
 msgstr "Copyright (C) %s by %s"
@@ -787,48 +797,48 @@ msgstr "RPM-файллари \"%s\" тўпламидан олинмоқда..."
 msgid "removing %s"
 msgstr "%s ўчирилмоқда"
 
-#: ../urpm/install.pm:215
+#: ../urpm/install.pm:217
 #, c-format
 msgid "unable to extract rpm from delta-rpm package %s"
 msgstr "delta-rpm пакетидан RPM-файлини ажратиб бўлмади: %s"
 
-#: ../urpm/install.pm:242
+#: ../urpm/install.pm:245
 #, c-format
 msgid "unable to install package %s"
 msgstr "%s пакетини ўрнатиб бўлмади"
 
-#: ../urpm/install.pm:245
+#: ../urpm/install.pm:248
 #, fuzzy, c-format
 msgid "removing bad rpm (%s) from %s"
 msgstr "тўплам олиб ташланмоқда: \"%s\""
 
-#: ../urpm/install.pm:246 ../urpm/install.pm:393
+#: ../urpm/install.pm:249 ../urpm/install.pm:397
 #, fuzzy, c-format
 msgid "removing %s failed: %s"
 msgstr "...олиш муваффақиятсиз тугади: %s"
 
-#: ../urpm/install.pm:295
+#: ../urpm/install.pm:298
 #, c-format
 msgid "removing package %s"
 msgstr "%s пакети олиб ташланмоқда"
 
-#: ../urpm/install.pm:359
+#: ../urpm/install.pm:362
 #, c-format
 msgid ""
 "created transaction for installing on %s (remove=%d, install=%d, upgrade=%d)"
 msgstr ""
 
-#: ../urpm/install.pm:362
+#: ../urpm/install.pm:365
 #, c-format
 msgid "unable to create transaction"
 msgstr ""
 
-#: ../urpm/install.pm:391
+#: ../urpm/install.pm:395
 #, c-format
 msgid "removing installed rpms (%s) from %s"
 msgstr ""
 
-#: ../urpm/install.pm:400
+#: ../urpm/install.pm:404
 #, c-format
 msgid "More information on package %s"
 msgstr "%s пакети ҳақида кўпроқ маълумот"
@@ -3065,7 +3075,7 @@ msgid ""
 "no xml info for medium \"%s\", unable to return any result for packages %s"
 msgstr ""
 
-#: ../urpmq:487
+#: ../urpmq:488
 #, c-format
 msgid "No changelog found\n"
 msgstr "Changelog файли топилмади\n"

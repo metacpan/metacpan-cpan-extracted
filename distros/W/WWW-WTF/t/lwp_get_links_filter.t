@@ -13,6 +13,12 @@ $test->run_test(sub {
 
     is(scalar @links, 1);
     is($links[0], '/foo.html');
+
+    my $http_resource_pdf = $self->ua_lwp->get($self->uri_for('/pdf.html'));
+    my @links_pdf = $http_resource_pdf->get_links({ filter => { href_regex => qr!\.pdf$! } });
+
+    is(scalar @links_pdf, 1);
+    is($links_pdf[0], '/letter.pdf');
 });
 
 done_testing();

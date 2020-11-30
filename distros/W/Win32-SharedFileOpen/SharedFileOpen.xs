@@ -6,7 +6,8 @@
  *   C and XS portions of Win32::SharedFileOpen module.
  *
  * COPYRIGHT
- *   Copyright (C) 2001-2004, 2006, 2008, 2014 Steve Hay.  All rights reserved.
+ *   Copyright (C) 2001-2004, 2006, 2008, 2014, 2018 Steve Hay.  All rights
+ *   reserved.
  *
  * LICENCE
  *   This file is free software; you can redistribute it and/or modify it under
@@ -528,7 +529,7 @@ _sopen(fh, file, oflag, shflag, ...)
         dMY_CXT;
         int pmode;
 
-        pmode = (items > 4 ? SvIV(ST(4)) : 0);
+        pmode = (items > 4 ? (int)SvIV(ST(4)) : 0);
 
         if (Win32SharedFileOpen_Sopen(aTHX_ aMY_CXT_
                 fh, file, oflag, shflag, pmode)) {

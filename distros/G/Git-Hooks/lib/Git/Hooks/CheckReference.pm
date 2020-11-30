@@ -1,16 +1,15 @@
-use strict;
 use warnings;
 
 package Git::Hooks::CheckReference;
 # ABSTRACT: Git::Hooks plugin for checking references
-$Git::Hooks::CheckReference::VERSION = '2.14.0';
-use 5.010;
+$Git::Hooks::CheckReference::VERSION = '3.0.0';
+use 5.016;
 use utf8;
 use Log::Any '$log';
 use Git::Hooks;
 use List::MoreUtils qw/any none/;
 
-(my $CFG = __PACKAGE__) =~ s/.*::/githooks./;
+my $CFG = __PACKAGE__ =~ s/.*::/githooks./r;
 
 # Assign meaningful names to action codes.
 my %ACTION = (
@@ -65,18 +64,6 @@ EOS
         }
     }
 
-    # Check deprecated options
-    if ($action eq 'C') {
-        if (any  {$ref =~ qr/$_/} $git->get_config($CFG => 'deny') and
-            none {$ref =~ qr/$_/} $git->get_config($CFG => 'allow')) {
-            $git->fault(<<'EOS', {ref => $ref, option => 'deny'});
-The reference name is not allowed.
-Please, check your configuration option.
-EOS
-            ++$errors;
-        }
-    }
-
     if ($ref =~ m:^refs/tags/:
             && $git->get_config_boolean($CFG => 'require-annotated-tags')) {
         my $rev_type = $git->run('cat-file', '-t', $new_commit);
@@ -93,31 +80,8 @@ EOS
     return $errors;
 }
 
-# This routine can act both as an update or a pre-receive hook.
-sub check_affected_refs {
-    my ($git) = @_;
-
-    $log->debug(__PACKAGE__ . "::check_affected_refs");
-
-    return 1 if $git->im_admin();
-
-    my $errors = 0;
-
-    foreach my $ref ($git->get_affected_refs()) {
-        next unless $git->is_reference_enabled($ref);
-        check_ref($git, $ref)
-            or ++$errors;
-    }
-
-    return $errors == 0;
-}
-
 # Install hooks
-UPDATE           \&check_affected_refs;
-PRE_RECEIVE      \&check_affected_refs;
-REF_UPDATE       \&check_affected_refs;
-COMMIT_RECEIVED  \&check_affected_refs;
-SUBMIT           \&check_affected_refs;
+GITHOOKS_CHECK_AFFECTED_REFS \&check_ref;
 
 1;
 
@@ -133,7 +97,7 @@ Git::Hooks::CheckReference - Git::Hooks plugin for checking references
 
 =head1 VERSION
 
-version 2.14.0
+version 3.0.0
 
 =head1 SYNOPSIS
 
@@ -197,7 +161,7 @@ option:
     [githooks]
       plugin = CheckReference
 
-=for Pod::Coverage check_ref check_affected_refs
+=for Pod::Coverage check_ref
 
 =head1 NAME
 
@@ -206,7 +170,7 @@ CheckReference - Git::Hooks plugin for checking references
 =head1 CONFIGURATION
 
 The plugin is configured by the following git options under the
-C<githooks.checkacls> subsection.
+C<githooks.checkreference> subsection.
 
 It can be disabled for specific references via the C<githooks.ref> and
 C<githooks.noref> options about which you can read in the L<Git::Hooks>
@@ -262,38 +226,6 @@ See the L</SYNOPSIS> section for some examples.
 By default one can push lightweight or annotated tags but if you want to require
 that only annotated tags be pushed to the repository you can set this option to
 true.
-
-=head2 [DEPRECATED] deny REGEXP
-
-This option is deprecated. Please, use an C<acl> option like this instead:
-
-  [githooks "checkreference"]
-    acl = deny C ^<REGEXP>
-
-This directive denies references with names matching REGEXP.
-
-=head2 [DEPRECATED] allow REGEXP
-
-This option is deprecated. Please, use an C<acl> option like this instead:
-
-  [githooks "checkreference"]
-    acl = allow C ^<REGEXP>
-
-This directive allows references with names matching REGEXP. Since by
-default all names are allowed this directive is useful only to prevent a
-B<githooks.checkreference.deny> directive to deny the same name.
-
-The checks are evaluated so that a reference is denied only if it's name
-matches any B<deny> directive and none of the B<allow> directives.  So, for
-instance, you would apply it like this to allow only the creation of
-branches with names prefixed by F<feature/>, F<release/>, and F<hotfix/>,
-denying all others.
-
-    [githooks "checkreference"]
-        deny  = ^refs/heads/
-        allow = ^refs/heads/(?:feature|release|hotfix)/
-
-Note that the order of the directives is irrelevant.
 
 =head1 REFERENCES
 

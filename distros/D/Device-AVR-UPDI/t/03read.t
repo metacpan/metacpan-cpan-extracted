@@ -4,20 +4,22 @@ use v5.20;
 use warnings;
 
 use Test::More;
-use Test::EasyMock qw( create_mock verify );
 use Test::Future::IO;
+
+use lib 't/lib';
+use MockFH;
 
 use Device::AVR::UPDI;
 
 my $mockfio = Test::Future::IO->controller;
 
-my $updi = Device::AVR::UPDI->new( fh => create_mock(), part => "ATtiny814" );
+my $updi = Device::AVR::UPDI->new( fh => MockFH->new, part => "ATtiny814" );
 # can't easily ->init_link without upsetting $mockfio
 
 # read_updirev
 {
-   $mockfio->expect_syswrite( "\x55\x80" );
-   $mockfio->expect_sysread( 3 )
+   $mockfio->expect_syswrite_anyfh( "\x55\x80" );
+   $mockfio->expect_sysread_anyfh( 3 )
       ->returns( "\x55\x80" . "\x10" );
    $mockfio->expect_sleep( 0.1 );
 
@@ -28,8 +30,8 @@ my $updi = Device::AVR::UPDI->new( fh => create_mock(), part => "ATtiny814" );
 
 # read_sib
 {
-   $mockfio->expect_syswrite( "\x55\xE5" );
-   $mockfio->expect_sysread( 18 )
+   $mockfio->expect_syswrite_anyfh( "\x55\xE5" );
+   $mockfio->expect_sysread_anyfh( 18 )
       ->returns( "\x55\xE5" . "tinyAVR P:0D:0 3" );
    $mockfio->expect_sleep( 0.1 );
 
@@ -47,16 +49,16 @@ my $updi = Device::AVR::UPDI->new( fh => create_mock(), part => "ATtiny814" );
 
 # read_signature
 {
-   $mockfio->expect_syswrite( "\x55\x69\x00\x11" );
-   $mockfio->expect_sysread( 5 )
+   $mockfio->expect_syswrite_anyfh( "\x55\x69\x00\x11" );
+   $mockfio->expect_sysread_anyfh( 5 )
       ->returns( "\x55\x69\x00\x11" . "\x40" );
    $mockfio->expect_sleep( 0.1 );
-   $mockfio->expect_syswrite( "\x55\xA0\x02" );
-   $mockfio->expect_sysread( 3 )
+   $mockfio->expect_syswrite_anyfh( "\x55\xA0\x02" );
+   $mockfio->expect_sysread_anyfh( 3 )
       ->returns( "\x55\xA0\x02" );
    $mockfio->expect_sleep( 0.1 );
-   $mockfio->expect_syswrite( "\x55\x24" );
-   $mockfio->expect_sysread( 5 )
+   $mockfio->expect_syswrite_anyfh( "\x55\x24" );
+   $mockfio->expect_sysread_anyfh( 5 )
       ->returns( "\x55\x24" . "\x1E\x93\x22" );
    $mockfio->expect_sleep( 0.1 );
 

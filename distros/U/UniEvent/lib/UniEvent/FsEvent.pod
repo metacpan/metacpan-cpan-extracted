@@ -6,7 +6,7 @@ UniEvent::FsEvent - cross-platform file monitoring
 
     use UniEvent::FsEvent; # imports constants
 
-    my $loop = UniEvent::Loop->default_loop;
+    my $loop = UniEvent::Loop->new;
     my $h = UniEvent::FsEvent->new($loop);
     my $dir = "/tmp/";
     $h->start($dir);
@@ -64,12 +64,13 @@ interface.
 
 =head2 event_listener($delegate [, $weak = false])
 
-Delegates callback invocation to the C<$delegate> object of arbitrary
-class having C<on_fs_event> method. The object can optionally be weakened.
+Creates and returns wrapper around the C<$delegate> object of arbitrary
+class, having the following methods:
 
-The method will be invoked as
+  $delegate->on_fs_event($filename, $events, $error_code);
 
-  $obj->on_fs_event($filename, $events, $error_code);
+The delegated object can be seen as alternative of setting indivitual callbacks
+or as a way of groupping them. The C<$delegate> object can optionally be weakened.
 
 =head2 path()
 

@@ -3,7 +3,7 @@ Locale::Codes::LangVar_Codes;
 
 # This file was automatically generated.  Any changes to this file will
 # be lost the next time 'harvest_data' is run.
-#    Generated on: Tue Sep  1 12:57:08 EDT 2020
+#    Generated on: Mon Nov 30 11:54:24 EST 2020
 
 use strict;
 require 5.006;
@@ -11,9 +11,9 @@ use warnings;
 use utf8;
 
 our($VERSION);
-$VERSION='3.65';
+$VERSION='3.66';
 
-$Locale::Codes::Data{'langvar'}{'id'} = '0102';
+$Locale::Codes::Data{'langvar'}{'id'} = '0103';
 
 $Locale::Codes::Data{'langvar'}{'id2names'} = {
    q(0001) => [
@@ -339,12 +339,15 @@ $Locale::Codes::Data{'langvar'}{'id2names'} = {
       q(Vallader idiom of Romansh),
       ],
    q(0099) => [
-      q(Vivaro-Alpine),
+      q(Latvian orthography used before 1920s ("veca druka")),
       ],
    q(0100) => [
-      q(Wade-Giles romanization),
+      q(Vivaro-Alpine),
       ],
    q(0101) => [
+      q(Wade-Giles romanization),
+      ],
+   q(0102) => [
       q(Standard X-system orthographic fallback for spelling Esperanto),
       ],
 };
@@ -530,6 +533,10 @@ $Locale::Codes::Data{'langvar'}{'alias2id'} = {
       q(0071),
       q(0),
       ],
+   q(latvian orthography used before 1920s ("veca druka")) => [
+      q(0099),
+      q(0),
+      ],
    q(limousin) => [
       q(0053),
       q(0),
@@ -711,7 +718,7 @@ $Locale::Codes::Data{'langvar'}{'alias2id'} = {
       q(0),
       ],
    q(standard x-system orthographic fallback for spelling esperanto) => [
-      q(0101),
+      q(0102),
       q(0),
       ],
    q(standardized resian orthography) => [
@@ -835,7 +842,7 @@ $Locale::Codes::Data{'langvar'}{'alias2id'} = {
       q(0),
       ],
    q(vivaro-alpine) => [
-      q(0099),
+      q(0100),
       q(0),
       ],
    q(volapuk nuladik) => [
@@ -855,7 +862,7 @@ $Locale::Codes::Data{'langvar'}{'alias2id'} = {
       q(0),
       ],
    q(wade-giles romanization) => [
-      q(0100),
+      q(0101),
       q(0),
       ],
    q(x-sampa transcription) => [
@@ -1262,16 +1269,20 @@ $Locale::Codes::Data{'langvar'}{'code2id'} = {
          q(0098),
          q(0),
          ],
-      q(vivaraup) => [
+      q(vecdruka) => [
          q(0099),
          q(0),
          ],
-      q(wadegile) => [
+      q(vivaraup) => [
          q(0100),
          q(0),
          ],
-      q(xsistemo) => [
+      q(wadegile) => [
          q(0101),
+         q(0),
+         ],
+      q(xsistemo) => [
+         q(0102),
          q(0),
          ],
       },
@@ -1377,9 +1388,10 @@ $Locale::Codes::Data{'langvar'}{'id2code'} = {
       q(0096) => q(vaidika),
       q(0097) => q(valencia),
       q(0098) => q(vallader),
-      q(0099) => q(vivaraup),
-      q(0100) => q(wadegile),
-      q(0101) => q(xsistemo),
+      q(0099) => q(vecdruka),
+      q(0100) => q(vivaraup),
+      q(0101) => q(wadegile),
+      q(0102) => q(xsistemo),
       },
 };
 

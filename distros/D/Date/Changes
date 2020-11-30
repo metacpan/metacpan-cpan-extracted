@@ -1,3 +1,6 @@
+5.2.2    25.11.2020
+           - support for magical vars in date & daterel ctor
+           - change Timezone* -> TimezoneSP back
 5.2.1    30.10.2020
            - libcatch related bump
 5.2.0    19.06.2020

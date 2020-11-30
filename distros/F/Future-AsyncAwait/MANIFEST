@@ -5,6 +5,7 @@ hax/cx_pusheval.c.inc
 hax/docatch.c.inc
 hax/lexer-additions.c.inc
 hax/perl-additions.c.inc
+hax/perl-backcompat.c.inc
 hax/README
 hax/save_clearpadrange.c.inc
 hax/wrap_keyword_plugin.c.inc
@@ -22,7 +23,7 @@ t/00use.t
 t/01async-immediate.t
 t/02await-immediate.t
 t/03await.t
-t/04await-twice.t
+t/04await-toplevel.t
 t/05await-expr.t
 t/06await-nested.t
 t/07await-label.t

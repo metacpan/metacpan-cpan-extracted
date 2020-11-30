@@ -56,14 +56,29 @@ sub get_device_list {
     return @i2cdevs;
 }
 
+sub _get_i2c_node_name {
+    my $self = shift;
+    my $devname = $self->devicename || '/dev/i2c-1';
+    my ( $i2cnodename ) = ( $devname =~ /^\/dev\/(i2c-[0-9]{1,2})/ );
+    return $i2cnodename;
+}
+
 sub get_baudrate {
     my ($class) = @_;
+    
     if ( $modvers == I2C_BCM2835 ) {
         my $sysfile = '/sys/class/i2c-adapter/i2c-1/of_node/clock-frequency';
         my $sysfile0 = '/sys/class/i2c-adapter/i2c-0/of_node/clock-frequency';
+        
+        if ( $class && $class->isa('HiPi::Device::I2C') ) {
+            my $nodename = $class->_get_i2c_node_name();
+            $sysfile0 = $sysfile = qq(/sys/class/i2c-adapter/$nodename/of_node/clock-frequency);
+        }
+
         if( -e $sysfile0 && !-e $sysfile ) {
             $sysfile = $sysfile0;
         }
+        
         if( -e $sysfile ) {
             my $baudrate = qx(xxd -ps $sysfile);
             chomp $baudrate;

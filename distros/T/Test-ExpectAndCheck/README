@@ -1,0 +1,90 @@
+NAME
+
+    Test::ExpectAndCheck - expect/check-style unit testing with object
+    methods
+
+SYNOPSIS
+
+       use Test::More;
+       use Test::ExpectAndCheck;
+    
+       my ( $controller, $puppet ) = Test::ExpectAndCheck->create;
+    
+       {
+          $controller->expect( act => 123, 45 )
+             ->returns( 678 );
+    
+          is( $puppet->act( 123, 45 ), 678, '$puppet->act returns result' );
+    
+          $controller->check_and_clear( '->act' );
+       }
+    
+       done_testing;
+
+DESCRIPTION
+
+    This package creates objects that assist in writing unit tests with
+    mocked object instances. Each mocked "puppet" instance will expect to
+    receive a given list of method calls. Each method call is checked that
+    it received the right arguments, and will return a prescribed result.
+    At the end of each test, each object is checked to ensure all the
+    expected methods were called.
+
+METHODS
+
+ create
+
+       ( $controller, $puppet ) = Test::ExpectAndCheck->create;
+
+    Objects are created in "entangled pairs" by the create method. The
+    first object is called the "controller", and is used by the unit
+    testing script to set up what method calls are to be expected, and what
+    their results shall be. The second object is the "puppet", the object
+    to be passed to the code being tested, on which the expected method
+    calls are (hopefully) invoked. It will have whatever interface is
+    implied by the method call expectations.
+
+ expect
+
+       $exp = $controller->expect( $method, @args )
+
+    Specifies that the puppet will expect to receive a method call of the
+    given name, with the given arguments.
+
+    The argument values are compared using "cmp_deeply" in Test::Deep.
+    Values can be specified literally, or using any of the "Special
+    Comparisons" defined by Test::Deep.
+
+    The test script can call the "returns" or "throws" methods on the
+    expectation to set what the result of invoking this method will be.
+
+ check_and_clear
+
+       $controller->check_and_clear( $name );
+
+    Checks that by now, every expected method has been called, and emits a
+    new test output line via Test::Builder. Regardless, the expectations
+    are also cleared out ready for the start of the next test.
+
+EXPECTATIONS
+
+    Each value returned by the "expect" method is an "expectation", an
+    object that represents one expected method call, the arguments it
+    should receive, and the return value it should provide.
+
+ returns
+
+       $exp->returns( @result )
+
+    Sets the result that will be returned by this method call.
+
+ throws
+
+       $exp->throws( $e )
+
+    Sets the exception that will be thrown by this method call.
+
+AUTHOR
+
+    Paul Evans <leonerd@leonerd.org.uk>
+

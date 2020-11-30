@@ -16,7 +16,7 @@ Net::SSLeay::CTX_load_verify_locations($client_ctx, $SERV_CERT, '') or die "some
 subtest 'ssl doesnt emit empty messages' => sub {
     my $srv = new UE::Tcp;
     $srv->use_ssl($serv_ctx);
-    $srv->bind_addr(SA_LOOPBACK_ANY);
+    $srv->bind_addr(SOCKADDR_LOOPBACK);
     $srv->listen;
     
     my $cnt = 10;
@@ -53,7 +53,7 @@ subtest 'ssl doesnt emit empty messages' => sub {
 subtest 'unknown shit' => sub {
     my $srv = new UE::Tcp;
     $srv->use_ssl($serv_ctx);
-    $srv->bind_addr(SA_LOOPBACK_ANY);
+    $srv->bind_addr(SOCKADDR_LOOPBACK);
     $srv->listen;
     my $sa = $srv->sockaddr;
     

@@ -6,3 +6,7 @@ Updating manifest file for release on cpan.
 
 0.012 Thu Mar 31 14:45:00 CET 2020
 Updating installation notes and instructions
+
+0.013 Fri Oct 20 10:15:00 CET 2020
+Removing generated buildfiles
+New bindings for libsoup so webkit2 can handle cookies from SoupCookie

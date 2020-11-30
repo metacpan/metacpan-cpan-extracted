@@ -27,7 +27,7 @@ TEST("trivial get response") {
 
 TEST("trivial head response") {
     ResponseParser p;
-    p.set_context_request(new Request(Method::HEAD, new URI("/")));
+    p.set_context_request(new Request(Method::Head, new URI("/")));
     string raw =
         "HTTP/1.0 200 OK\r\n"
         "Host: host1\r\n"
@@ -46,7 +46,7 @@ TEST("trivial head response") {
 
 TEST("redirect response") {
     ResponseParser p;
-    p.set_context_request(new Request(Method::HEAD, new URI("/")));
+    p.set_context_request(new Request(Method::Head, new URI("/")));
     string raw =
         "HTTP/1.1 301 Moved Permanently\r\n"
         "Date: Thu, 22 Mar 2018 16:25:43 GMT\r\n"
@@ -148,7 +148,7 @@ TEST("response with chunks") {
 
 TEST("parsing response byte by byte") {
     ResponseParser p;
-    p.set_context_request(new Request(Method::GET, new URI("http://dev/")));
+    p.set_context_request(new Request(Method::Get, new URI("http://dev/")));
 
     string s =
         "HTTP/1.1 101 Switching Protocols\r\n"

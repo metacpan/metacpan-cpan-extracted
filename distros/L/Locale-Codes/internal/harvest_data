@@ -23,7 +23,7 @@ use Mojo::DOM;
 use lib "./internal";
 
 our $VERSION;
-$VERSION='3.65';
+$VERSION='3.66';
 
 # Some required executables
 my @exe     = qw( wget xls2csv );
@@ -572,39 +572,27 @@ Click on:
    'Online Browsing Platform'
    'Officially assigned codes'
    300 results per page
-
-Select <Save Page As> and save to this file.
+Select the entire chart (not including the header).  If not all of the
+countries fit on a single page, do it in multiple steps.
 );
 
-      my $html  = _read_file('type'      => 'manual',
-                             'inst'      => $inst,
-                            );
-      my $dom   = Mojo::DOM->new($html);
-
-      # Get the table with the data
-      my $coll  = $dom->find('table[role=grid]');
-      my $table = $coll->first();
-
-      # Get the rows, but discard the first (headers)
-      my @rows  = @{ $table->find('tr')->to_array() };
-      shift(@rows);
-      $in       = \@rows;
+      $in = _read_file('type'      => 'manual',
+                       'inst'      => $inst,
+                       'as_list'   => 1,
+                      );
    }
 
    sub _read_country_iso {
       while (@$in) {
-         my $row    = shift(@$in);
-
-         my @col    = @{ $row->find('td') };
-         my $name   = $col[0]->all_text();
-         my $alpha2 = lc($col[2]->all_text());
-         my $alpha3 = lc($col[3]->all_text());
-         my $num    = $col[4]->all_text();
-         $name      =~ s/^\s*//;
+         my $name   = shift(@$in);
+         shift(@$in);
+         my $alpha2 = lc(shift(@$in));
+         my $alpha3 = lc(shift(@$in));
+         my $num    = shift(@$in);
+         $name      =~ s/\(the/\(The/;
          $alpha2    =~ s/^\s*//;
          $alpha3    =~ s/^\s*//;
          $num       =~ s/^\s*//;
-         $name      =~ s/\(the/\(The/;
          return($alpha2,$alpha3,$num,_country_name($name));
       }
       return ();
@@ -1735,7 +1723,7 @@ use warnings;
 use utf8;
 
 our(\$VERSION);
-\$VERSION='3.65';
+\$VERSION='3.66';
 
 \$Locale::Codes::Data{'$type'}{'id'} = '$ID';
 

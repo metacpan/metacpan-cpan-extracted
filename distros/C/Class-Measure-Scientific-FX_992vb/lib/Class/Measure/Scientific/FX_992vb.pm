@@ -1,6 +1,6 @@
 # -*- cperl; cperl-indent-level: 4 -*-
 # Copyright (C) 2020, Roland van Ipenburg
-package Class::Measure::Scientific::FX_992vb v0.0.4;
+package Class::Measure::Scientific::FX_992vb v0.0.5;
 use Moose;
 use MooseX::NonMoose;
 use List::MoreUtils qw(uniq);
@@ -155,51 +155,51 @@ Readonly::Array my @CONST => (
     [ 41, q{atm},     q{standard atmosphere},     101_325,             $PA ],
     [ 42, q{ct},      q{metric carat},            2e-4,                $KG ],
     [ 43, q{D},       q{denier},                  50 / 450_000_000,    $KGPM ],
-    [ 44, q{G},      q{gravitational constant},  6.672e-11,        $NM2PKG2 ],
-    [ 45, q{kgf},    q{kilogramforce},           9.806_65,         $NEWTON ],
-    [ 46, q{mH2O},   q{meter of water},          9_806.65,         $PA ],
-    [ 47, q{mmHg},   q{mm of mercury},           101_325 / 760,    $PA ],
-    [ 48, q{PS},     q{metric horsepower},       735.49875,        $WATT ],
-    [ 49, q{Torr},   q{Torr},                    101_325 / 760,    $PA ],
-    [ 50, q{cwt_uk}, q{hundred-weight},          50.802_345_44,    $KG ],
-    [ 51, q{cwt_us}, q{hundred-weight},          45.359_237,       $KG ],
-    [ 52, q{ftlbf},  q{foot pound-force},        1.355_817_948_33, $JOULE ],
-    [ 53, q{ftH2O},  q{foot of water},           2_989.066_92,     $PA ],
-    [ 54, q{gr},     q{grain},                   6.479_891e-5,     $KG ],
-    [ 55, q{hp},     q{horsepower},              745.699_871_582,  $JOULE ],
-    [ 56, q{inH2O},  q{inch of water},           249.088_91,       $PA ],
-    [ 57, q{inHg},   q{inch of mercury},         3_386.388_157_89, $PA ],
-    [ 58, q{lb},     q{pound},                   0.453_592_37,     $KG ],
-    [ 59, q{lbf},    q{pound-force},             4.448_221_615_26, $NEWTON ],
-    [ 60, q{lbt},    q{troy pound},              0.373_241_721_6,  $KG ],
-    [ 61, q{oz},     q{ounce},                   0.028_349_523_12, $KG ],
-    [ 62, q{ozt},    q{troy ounce},              0.031_103_476_8,  $KG ],
-    [ 63, q{pdl},    q{poundal},                 0.138_254_954_37, $NEWTON ],
-    [ 64, q{psi},    q{pounds per square inch},  6_894.757_293_17, $PA ],
-    [ 65, q{slug},   q{slug},                    14.593_902_937_2, $KG ],
-    [ 66, q{ton_uk}, q{long ton},                1_016.046_908_8,  $KG ],
-    [ 67, q{ton_us}, q{short ton},               907.184_74,       $KG ],
-    [ 68, q{zC},     q{zero Celsius},            273.15,           $SKIP ],
-    [ 69, q{cal15},  q{15 degree calorie},       4.185_5,          $JOULE ],
-    [ 70, q{calit},  q{I.T. calorie},            4.186_8,          $JOULE ],
-    [ 71, q{calth},  q{thermo chemical calorie}, 4.184,            $JOULE ],
-    [ 72, q{FK},     q{degree Fahrenheit},       5 / 9,            $SKIP ],
-    [ 73, q{zF},     q{zero Fahrenheit in Celsius}, -160 / 9,         $SKIP ],
-    [ 74, q{BTU},    q{British thermal unit},       1_055.055_852_62, $JOULE ],
-    [ 75, q{BTUlbR}, q{specific heat capacity},     4_186.8,          $JPKGK ],
-    [ 76, q{BTUh},   q{Btu per hour},               0.293_071_070_17, $WATT ],
-    [ 77, q{BTUlb},  q{specific internal enegry},   2_326,            $JPKG ],
-    [ 78, q{therm},  q{therm},                      105_505_585.262,  $JOULE ],
-    [ 79, q{eps0}, q{permittivity of vacuum},   8.854_187_817_62e-12, $FPM ],
-    [ 80, q{mu0},  q{permeability of vacuum},   1.256_637_061_44e-6,  $HPM ],
-    [ 81, q{Cs},   q{G. electric capacitance},  1.112_650_056_05e-12, $FARAD ],
-    [ 82, q{Ds},   q{G. electric flux density}, 2.654_418_729_44e-7,  $CPM2 ],
-    [ 83, q{Es}, q{G. electric field strength}, 29_979.245_8,      $VPM ],
-    [ 84, q{Is}, q{G. electric current},        3.33564095198e-10, $AMPERE ],
-    [ 85, q{Oe}, q{Hs, G. magnetic field strength}, 79.5774715459, $APM ],
-    [ 86, q{Ps}, q{G. electric polarization}, 3.335_640_951_98e-6,  $CPM2 ],
-    [ 87, q{Qs}, q{G. electric charge},       3.335_640_951_98e-10, $COULOMB ],
-    [ 88, q{Vs}, q{G. electric potential},    299.792458,           $VOLT ],
+    [ 44, q{G},       q{gravitational constant},  6.672e-11,        $NM2PKG2 ],
+    [ 45, q{kgf},     q{kilogramforce},           9.806_65,         $NEWTON ],
+    [ 46, q{mH2O},    q{meter of water},          9_806.65,         $PA ],
+    [ 47, q{mmHg},    q{mm of mercury},           101_325 / 760,    $PA ],
+    [ 48, q{PS},      q{metric horsepower},       735.49875,        $WATT ],
+    [ 49, q{Torr},    q{Torr},                    101_325 / 760,    $PA ],
+    [ 50, q{cwt_uk},  q{hundred-weight},          50.802_345_44,    $KG ],
+    [ 51, q{cwt_us},  q{hundred-weight},          45.359_237,       $KG ],
+    [ 52, q{ftlbf},   q{foot pound-force},        1.355_817_948_33, $JOULE ],
+    [ 53, q{ftH2O},   q{foot of water},           2_989.066_92,     $PA ],
+    [ 54, q{gr},      q{grain},                   6.479_891e-5,     $KG ],
+    [ 55, q{hp},      q{horsepower},              745.699_871_582,  $JOULE ],
+    [ 56, q{inH2O},   q{inch of water},           249.088_91,       $PA ],
+    [ 57, q{inHg},    q{inch of mercury},         3_386.388_157_89, $PA ],
+    [ 58, q{lb},      q{pound},                   0.453_592_37,     $KG ],
+    [ 59, q{lbf},     q{pound-force},             4.448_221_615_26, $NEWTON ],
+    [ 60, q{lbt},     q{troy pound},              0.373_241_721_6,  $KG ],
+    [ 61, q{oz},      q{ounce},                   0.028_349_523_12, $KG ],
+    [ 62, q{ozt},     q{troy ounce},              0.031_103_476_8,  $KG ],
+    [ 63, q{pdl},     q{poundal},                 0.138_254_954_37, $NEWTON ],
+    [ 64, q{psi},     q{pounds per square inch},  6_894.757_293_17, $PA ],
+    [ 65, q{slug},    q{slug},                    14.593_902_937_2, $KG ],
+    [ 66, q{ton_uk},  q{long ton},                1_016.046_908_8,  $KG ],
+    [ 67, q{ton_us},  q{short ton},               907.184_74,       $KG ],
+    [ 68, q{zC},      q{zero Celsius},            273.15,           $SKIP ],
+    [ 69, q{cal15},   q{15 degree calorie},       4.185_5,          $JOULE ],
+    [ 70, q{calit},   q{I.T. calorie},            4.186_8,          $JOULE ],
+    [ 71, q{calth},   q{thermo chemical calorie}, 4.184,            $JOULE ],
+    [ 72, q{FK},      q{degree Fahrenheit},       5 / 9,            $SKIP ],
+    [ 73, q{zF},      q{zero Fahrenheit in Celsius}, -160 / 9,         $SKIP ],
+    [ 74, q{BTU},     q{British thermal unit},       1_055.055_852_62, $JOULE ],
+    [ 75, q{BTUlbR},  q{specific heat capacity},     4_186.8,          $JPKGK ],
+    [ 76, q{BTUh},    q{Btu per hour},               0.293_071_070_17, $WATT ],
+    [ 77, q{BTUlb},   q{specific internal enegry},   2_326,            $JPKG ],
+    [ 78, q{therm},   q{therm},                      105_505_585.262,  $JOULE ],
+    [ 79, q{eps0}, q{permittivity of vacuum},   8.854_187_817_62e-12,  $FPM ],
+    [ 80, q{mu0},  q{permeability of vacuum},   1.256_637_061_44e-6,   $HPM ],
+    [ 81, q{Cs},   q{G. electric capacitance},  1.112_650_056_05e-12,  $FARAD ],
+    [ 82, q{Ds},   q{G. electric flux density}, 2.654_418_729_44e-7,   $CPM2 ],
+    [ 83, q{Es},   q{G. electric field strength}, 29_979.245_8,      $VPM ],
+    [ 84, q{Is},   q{G. electric current},        3.33564095198e-10, $AMPERE ],
+    [ 85, q{Oe},   q{Hs, G. magnetic field strength}, 79.5774715459, $APM ],
+    [ 86, q{Ps}, q{G. electric polarization}, 3.335_640_951_98e-6,   $CPM2 ],
+    [ 87, q{Qs}, q{G. electric charge},       3.335_640_951_98e-10,  $COULOMB ],
+    [ 88, q{Vs}, q{G. electric potential},    299.792458,            $VOLT ],
     [ 89,  q{sigma}, q{Stefan-Boltzmann constant}, 5.67032e-8,       $WPM2K4 ],
     [ 90,  q{c},     q{speed of light},            299_792_458,      $MPS ],
     [ 91,  q{c1},    q{first radiation constant},  3.741_832e-16,    $WM2 ],
@@ -215,12 +215,12 @@ Readonly::Array my @CONST => (
     [ 101, q{R},     q{molar gas constant},        8.314_41,         $JPMOLK ],
     [ 102, q{Vm},    q{molar volume},              0.02241383,       $M3PMOL ],
     [
-        103,               q{alpha}, q{G. el. polarizability of molecule},
+        103, q{alpha}, q{G. el. polarizability of molecule},
         1.11265005605e-16, $CM2PV,
     ],
     [ 104, q{p}, q{mu, G. el. dipole of molecule}, 3.33564095198e-12, $CM ],
     [ 105, q{a}, q{fine-structure constant},       7.297_350_6e-3,    $SKIP ],
-    [ 106, q{gammap}, q{gyromagnetic ratio of proton}, 267_519_870, $AM2PJS ],
+    [ 106, q{gammap}, q{gyromagnetic ratio of proton}, 267_519_870,   $AM2PJS ],
     [
         107,         q{gammapalt}, q{gyromagnetic ratio of proton in water},
         267_513_010, $AM2PJS,
@@ -342,11 +342,12 @@ for my $const (@CONST) {
 
 sub CONST {
     my $idx = shift;
-    if ( exists $CONST[ $idx - 1 ] ) {
-        return $CONST[ $idx - 1 ][ $IDX{'multiplier'} ];
+    $idx--;
+    if ( exists $CONST[$idx] && defined $CONST[$idx][ $IDX{'idx'} ] ) {
+        return $CONST[$idx][ $IDX{'multiplier'} ];
     }
     else {
-        $log->error( sprintf $LOG{'CONST'}, $idx );
+        $log->error( sprintf $LOG{'CONST'}, $idx + 1 );
         return;
     }
 }
@@ -364,9 +365,9 @@ sub new {
         $class->reg_convs(@convs);
     }
 
-    my $obj = $class->SUPER::new( $amount, $unit );
+    my $measure = $class->SUPER::new( $amount, $unit );
 ## no critic (ProhibitHashBarewords)
-    return $class->meta->new_object( __INSTANCE__ => $obj, $amount, $unit );
+    return $class->meta->new_object( __INSTANCE__ => $measure, $amount, $unit );
 ## use critic
 }
 
@@ -391,7 +392,7 @@ Class::Measure::Scientific::FX_992vb - units of measurement like the CASIO fx-99
 
 =head1 VERSION
 
-This document describes Class::Measure::Scientific::FX_992vb v0.0.4.
+This document describes Class::Measure::Scientific::FX_992vb v0.0.5.
 
 =head1 SYNOPSIS
 

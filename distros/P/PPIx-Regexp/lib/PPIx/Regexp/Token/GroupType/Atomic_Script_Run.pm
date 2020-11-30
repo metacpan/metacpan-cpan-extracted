@@ -11,23 +11,22 @@ use base qw{ PPIx::Regexp::Token::GroupType };
 
 use PPIx::Regexp::Constant qw{ @CARP_NOT };
 
-our $VERSION = '0.075';
+our $VERSION = '0.076';
 
-{
-    my $expl = 'All characters must be in same script, atomic version';
+use constant EXPL => 'All characters must be in same script, atomic version';
 
-    __PACKAGE__->__setup_class( {
-	    '*atomic_script_run:'	=> {
-		expl	=> $expl,
-		intro	=> '5.027009',
-	    },
-	    '*asr:'	=> {
-		expl	=> $expl,
-		intro	=> '5.027009',
-	    },
-	},
-    );
-}
+use constant DEF => {
+    '*atomic_script_run:'	=> {
+	expl	=> EXPL,
+	intro	=> '5.027009',
+    },
+    '*asr:'	=> {
+	expl	=> EXPL,
+	intro	=> '5.027009',
+    },
+};
+
+__PACKAGE__->__setup_class();
 
 1;
 

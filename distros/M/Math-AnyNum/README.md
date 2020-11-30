@@ -1,4 +1,4 @@
-# Math-AnyNum
+# Math::AnyNum
 
 Arbitrary size precision for integers, rationals, floating-points and complex numbers.
 
@@ -34,39 +34,31 @@ say log(-1);                                  #=> 3.1415926535897932384626433832
 
 To install this module, run the following commands:
 
-    perl Build.PL
-    ./Build
-    ./Build test
-    ./Build install
+```console
+perl Build.PL
+./Build
+./Build test
+./Build install
+```
 
 # SUPPORT AND DOCUMENTATION
 
 After installing, you can find documentation for this module with the
 perldoc command.
 
-    perldoc Math::AnyNum
-
-You can also look for information at:
-
-    AnnoCPAN, Annotated CPAN documentation
-        http://annocpan.org/dist/Math-AnyNum
-
-    CPAN Ratings
-        http://cpanratings.perl.org/d/Math-AnyNum
-
-    Search CPAN
-        http://search.cpan.org/dist/Math-AnyNum/
-
+```console
+perldoc Math::AnyNum
+```
 
 # LICENSE AND COPYRIGHT
 
-Copyright (C) 2017-2020 Daniel Șuteu
+Copyright (C) 2017-2020 by Daniel "Trizen" Șuteu
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of the the Artistic License (2.0). You may obtain a
 copy of the full license at:
 
-http://www.perlfoundation.org/artistic_license_2_0
+https://www.perlfoundation.org/artistic-license-20.html
 
 Any use, modification, and distribution of the Standard or Modified
 Versions is governed by this Artistic License. By using, modifying or

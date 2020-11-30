@@ -10,7 +10,7 @@ use DBD::SQLite;
 use JSON::XS;
 use Try::Tiny;
 
-our $VERSION = '1.26'; # VERSION
+our $VERSION = '1.27'; # VERSION
 
 sub init {
     my ($bot) = @_;
@@ -106,7 +106,7 @@ Bot::IRC::Store::SQLite - Bot::IRC persistent data storage with SQLite
 
 =head1 VERSION
 
-version 1.26
+version 1.27
 
 =head1 SYNOPSIS
 
@@ -150,7 +150,7 @@ Gryphon Shafer <gryphon@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by Gryphon Shafer.
+This software is copyright (c) 2021 by Gryphon Shafer.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

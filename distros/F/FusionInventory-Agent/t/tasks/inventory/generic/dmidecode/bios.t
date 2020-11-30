@@ -52,7 +52,7 @@ my %tests = (
         bios => {
             MMANUFACTURER => 'ASUSTeK Computer INC.',
             SSN           => 'System Serial Number',
-            SKUNUMBER     => 'To Be Filled By O.E.M.',
+            SKUNUMBER     => undef,
             ASSETTAG      => 'Asset-1234567890',
             BMANUFACTURER => 'American Megatrends Inc.',
             MSN           => 'MS1C93BB0H00980',
@@ -321,7 +321,7 @@ my %tests = (
             SKUNUMBER     => undef,
             ASSETTAG      => 'No Asset Tag',
             BMANUFACTURER => 'Phoenix Technologies LTD',
-            MSN           => 'None',
+            MSN           => undef,
             SMODEL        => 'VMware Virtual Platform',
             SMANUFACTURER => 'VMware, Inc.',
             BDATE         => '07/22/2008',
@@ -340,7 +340,7 @@ my %tests = (
             SKUNUMBER     => undef,
             ASSETTAG      => 'No Asset Tag',
             BMANUFACTURER => 'Phoenix Technologies LTD',
-            MSN           => 'None',
+            MSN           => undef,
             SMODEL        => 'VMware Virtual Platform',
             SMANUFACTURER => 'VMware, Inc.',
             BDATE         => '10/13/2009',
@@ -359,7 +359,7 @@ my %tests = (
             SKUNUMBER     => undef,
             ASSETTAG      => 'No Asset Tag',
             BMANUFACTURER => 'Phoenix Technologies LTD',
-            MSN           => 'None',
+            MSN           => undef,
             SMODEL        => 'VMware Virtual Platform',
             SMANUFACTURER => 'VMware, Inc.',
             BDATE         => undef,
@@ -483,6 +483,25 @@ my %tests = (
         hardware => {
             CHASSIS_TYPE  => 'Notebook',
             UUID          => '725BA801-507B-11CB-95E6-C66052AAC597'
+        }
+    },
+    'surface-go-2' => {
+        bios => {
+            BMANUFACTURER => 'Microsoft Corporation',
+            MSN           => '002460202151',
+            BDATE         => '02/07/2020',
+            SMODEL        => 'Surface Go 2',
+            SMANUFACTURER => 'Microsoft Corporation',
+            SKUNUMBER     => 'Surface_Go_2_1926',
+            MMANUFACTURER => 'Microsoft Corporation',
+            BVERSION      => '1.0.05',
+            MMODEL        => 'Surface Go 2',
+            SSN           => '48368130c2f8',
+            ASSETTAG      => undef
+        },
+        hardware => {
+            CHASSIS_TYPE  => 'Laptop',
+            UUID          => '0e985de7-da00-4662-a18c-a957308c3ad7'
         }
     }
 );

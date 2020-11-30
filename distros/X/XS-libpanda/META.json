@@ -4,7 +4,7 @@
       "unknown"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.46, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.50, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "unknown"
    ],
@@ -27,13 +27,13 @@
          "requires" : {
             "Alien::cmake3" : "0",
             "Test::Catch" : "v1.0.14",
-            "XS::Install" : "v1.2.21",
+            "XS::Install" : "v1.3.1",
             "XS::libcatch" : "v2.12.1.1"
          }
       },
       "runtime" : {
          "requires" : {
-            "XS::Install" : "v1.2.21",
+            "XS::Install" : "v1.3.1",
             "perl" : "5.012000"
          }
       },
@@ -48,6 +48,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "v1.4.10",
+   "version" : "v1.4.11",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

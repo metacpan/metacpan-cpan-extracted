@@ -30,6 +30,12 @@ my $reason = $Config{useithreads} || $Config{use5005threads}
              ? "unsupported threads configuration"
              : "no threads";
 
+if ($have_threads && $] > 5.009004 && $] < 5.010001) {
+  # Threads are broken between 5.9.4 and 5.10.1
+  $reason = "threads are broken in this perl version";
+  $have_threads = 0;
+}
+
 my @t;
 
 if ($have_threads) {

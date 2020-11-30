@@ -480,7 +480,7 @@ BOOT:
       else if (isALPHA(str[0]))
       {
         gs_OrderMembers = 1;
-        set_preferred_indexed_hash_module(str);
+        set_preferred_indexed_hash_module(strdup(str));
       }
     }
   }

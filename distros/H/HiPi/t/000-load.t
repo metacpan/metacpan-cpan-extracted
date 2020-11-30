@@ -1,6 +1,6 @@
 #!perl
 
-use Test::More tests => 76;
+use Test::More tests => 77;
 
 BEGIN {
     use_ok( 'HiPi' );
@@ -65,6 +65,7 @@ BEGIN {
     use_ok( 'HiPi::Interface::PCA9544' );
     use_ok( 'HiPi::Interface::PCA9685' );
     use_ok( 'HiPi::Interface::PCF8574' );
+    use_ok( 'HiPi::Interface::Seesaw' );
     use_ok( 'HiPi::Interface::SerLCD' );
     use_ok( 'HiPi::Interface::Si470N' );
     use_ok( 'HiPi::Interface::TMP102' );

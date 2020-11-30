@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2015-2019 Christian Jaeger, copying@christianjaeger.ch
+# Copyright (c) 2015-2020 Christian Jaeger, copying@christianjaeger.ch
 #
 # This is free software, offered under either the same terms as perl 5
 # or the terms of the Artistic License version 2 or the terms of the
@@ -34,6 +34,7 @@ use FP::Trie;
 use FP::List qw(string_to_list);
 use FP::Ops "the_method";
 use Chj::TEST;
+use FP::Carp;
 
 my $t = empty_trie->set(string_to_list("Hello"), "World");
 
@@ -152,13 +153,15 @@ TEST {
     my $trie = empty_trie;
     my $hash = {};
 
-    my $set_both = sub ($$) {
+    my $set_both = sub {
+        @_ == 2 or fp_croak_nargs 2;
         my ($k, $i) = @_;
         $trie = $trie->set(string_to_list($k), $i);
         $$hash{$k} = $i;
     };
 
-    my $delete_both = sub ($) {
+    my $delete_both = sub {
+        @_ == 1 or fp_croak_nargs 1;
         my ($k) = @_;
         $trie = $trie->delete(string_to_list $k);
         delete $$hash{$k};

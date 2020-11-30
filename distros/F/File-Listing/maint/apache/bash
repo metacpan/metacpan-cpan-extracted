@@ -1,0 +1,7 @@
+#!/bin/sh
+
+cd $(dirname $0)/../..
+
+set -ex
+
+docker run --rm -it -v "$PWD":/usr/local/apache2/htdocs/File-Listing plicease/perl-file-listing:apache bash

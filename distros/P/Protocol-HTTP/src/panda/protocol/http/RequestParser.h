@@ -33,6 +33,9 @@ struct RequestParser : MessageParser {
     }
 
     void reset ();
+protected:
+    bool on_headers    ();
+    bool on_empty_body ();
 
 private:
     IFactory* factory;

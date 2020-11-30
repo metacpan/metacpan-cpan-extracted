@@ -1,0 +1,14 @@
+Changes
+CONTRIBUTING.md
+lib/App/lupapona.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+MYMETA.json
+MYMETA.yml
+README.md
+script/lupa-pona
+t/basic.t
+update-readme
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

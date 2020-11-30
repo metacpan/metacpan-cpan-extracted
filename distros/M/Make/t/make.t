@@ -111,6 +111,10 @@ for my $l (@CMDs) {
     is_deeply $got, $expected;
 }
 
+my @NAME_DATA = ( [ [], '' ], [ [qw(node a:l%l)], 'node:a%3al%25l' ], );
+is Make::name_encode( $_->[0] ),        $_->[1], "enc to $_->[1]" for @NAME_DATA;
+is_deeply Make::name_decode( $_->[1] ), $_->[0], "dec $_->[1]"    for @NAME_DATA;
+
 SKIP: {
     skip '', 2 if !$ENV{AUTHOR_TESTING};    # avoid blowing up on dmake
     my $m = Make->new;
@@ -158,6 +162,175 @@ is_deeply $got, ['other'] or diag explain $got;
 $got = $all_rule->auto_vars($all_target);
 ok exists $got->{'@'}, 'Rules.Vars.EXISTS';
 is_deeply [ keys %$got ], [qw( @ * ^ ? < )] or diag explain $got;
+
+my $recmake_fsmap = make_fsmap(
+    {
+        Makefile                    => [ 1, "MK=make\nall: bar sany\nsany:\n\tcd subdir && \$(MK)\n\tsay hi\n" ],
+        'subdir/Makefile'           => [ 1, "all: sbar sfoo ../first\n\tcd subsubdir && make\n" ],
+        'subdir/subsubdir/Makefile' => [ 1, "all: /top/level\n\techo L3\n" ],
+    }
+);
+$m = Make->new( FSFunctionMap => $recmake_fsmap )->parse;
+my $g = $m->as_graph( no_rules => 1 );
+$got = [ $g->as_hashes ];
+is_deeply $got,
+    [
+    {
+        'all'  => {},
+        'bar'  => {},
+        'sany' => {}
+    },
+    {
+        'all' => {
+            'bar'  => {},
+            'sany' => {}
+        },
+    }
+    ],
+    'no_rules graph'
+    or diag explain $got;
+
+$g   = $m->as_graph;
+$got = [ $g->as_hashes ];
+is_deeply $got,
+    [
+    {
+        'rule:all:0' => {
+            'recipe'     => [],
+            'recipe_raw' => []
+        },
+        'rule:sany:0' => {
+            'recipe'     => [ 'cd subdir && $(MK)', 'say hi' ],
+            'recipe_raw' => [ 'cd subdir && $(MK)', 'say hi' ]
+        },
+        'target:all'  => {},
+        'target:bar'  => {},
+        'target:sany' => {}
+    },
+    {
+        'rule:all:0' => {
+            'target:bar'  => {},
+            'target:sany' => {}
+        },
+        'target:all' => {
+            'rule:all:0' => {}
+        },
+        'target:sany' => {
+            'rule:sany:0' => {}
+        }
+    }
+    ],
+    'shallow graph'
+    or diag explain $got;
+$got = [ $m->find_recursive_makes ];
+is_deeply $got, [ [ 'sany', 0, 0, 'subdir', undef, [], [] ] ], 'find_recursive_makes'
+    or diag explain $got;
+
+$g   = $m->as_graph( recursive_make => 1 );
+$got = [ $g->as_hashes ];
+is_deeply $got,
+    [
+    {
+        'rule:all:0' => {
+            'recipe'     => [],
+            'recipe_raw' => []
+        },
+        'rule:sany:0' => {
+            'recipe'     => [ 'cd subdir && $(MK)', 'say hi' ],
+            'recipe_raw' => [ 'cd subdir && $(MK)', 'say hi' ]
+        },
+        'rule:subdir/all:0' => {
+            'recipe'     => ['cd subsubdir && make'],
+            'recipe_raw' => ['cd subsubdir && make']
+        },
+        'rule:subdir/subsubdir/all:0' => {
+            'recipe'     => ['echo L3'],
+            'recipe_raw' => ['echo L3']
+        },
+        'target:/top/level'           => {},
+        'target:all'                  => {},
+        'target:bar'                  => {},
+        'target:first'                => {},
+        'target:sany'                 => {},
+        'target:subdir/all'           => {},
+        'target:subdir/sbar'          => {},
+        'target:subdir/sfoo'          => {},
+        'target:subdir/subsubdir/all' => {},
+    },
+    {
+        'rule:all:0' => {
+            'target:bar'  => {},
+            'target:sany' => {}
+        },
+        'rule:sany:0' => {
+            'target:subdir/all' => {
+                'fromline' => 0
+            }
+        },
+        'rule:subdir/all:0' => {
+            'target:first'                => {},
+            'target:subdir/sbar'          => {},
+            'target:subdir/sfoo'          => {},
+            'target:subdir/subsubdir/all' => {
+                'fromline' => 0
+            }
+        },
+        'rule:subdir/subsubdir/all:0' => {
+            'target:/top/level' => {},
+        },
+        'target:all' => {
+            'rule:all:0' => {}
+        },
+        'target:sany' => {
+            'rule:sany:0' => {}
+        },
+        'target:subdir/all' => {
+            'rule:subdir/all:0' => {}
+        },
+        'target:subdir/subsubdir/all' => {
+            'rule:subdir/subsubdir/all:0' => {}
+        }
+    }
+    ],
+    'recursive_make graph'
+    or diag explain $got;
+
+$g   = $m->as_graph( recursive_make => 1, no_rules => 1 );
+$got = [ $g->as_hashes ];
+is_deeply $got,
+    [
+    {
+        'all'                  => {},
+        'bar'                  => {},
+        'first'                => {},
+        'sany'                 => {},
+        'subdir/all'           => {},
+        'subdir/sbar'          => {},
+        'subdir/sfoo'          => {},
+        'subdir/subsubdir/all' => {},
+        '/top/level'           => {},
+    },
+    {
+        'all' => {
+            'bar'  => {},
+            'sany' => {},
+        },
+        'sany' => {
+            'subdir/all' => {},
+        },
+        'subdir/all' => {
+            'subdir/subsubdir/all' => {},
+            'subdir/sbar'          => {},
+            'subdir/sfoo'          => {},
+            'first'                => {},
+        },
+        'subdir/subsubdir/all' => {
+            '/top/level' => {},
+        },
+    }
+    ],
+    'recursive_make+no_rules graph'
+    or diag explain $got;
 
 $m = Make->new;
 $m->parse( \sprintf <<'EOF', $tempfile, $^X );
@@ -215,7 +388,7 @@ done_testing;
 
 sub make_fsmap {
     my ( $vfs, $maybe_prefix ) = @_;
-    my %vfs_copy = map +( Make::in_dir( $_, $maybe_prefix ) => $vfs->{$_} ), keys %$vfs;
+    my %vfs_copy = map +( join( '/', grep defined, $maybe_prefix, $_ ) => $vfs->{$_} ), keys %$vfs;
     my %fh2file_tuple;
     return {
         glob => sub {
@@ -239,5 +412,6 @@ sub make_fsmap {
         fh_write      => sub { my $fh = shift; $fh2file_tuple{$fh}[0] = time; print {$fh} @_ },
         file_readable => sub { exists $vfs_copy{ $_[0] } },
         mtime         => sub { ( $vfs_copy{ $_[0] } || [] )->[0] },
+        is_abs        => sub { $_[0] =~ /^\// },
     };
 }

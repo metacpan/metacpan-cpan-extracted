@@ -1,5 +1,5 @@
 package Util::Medley::Roles::Attributes::Cache;
-$Util::Medley::Roles::Attributes::Cache::VERSION = '0.053';
+$Util::Medley::Roles::Attributes::Cache::VERSION = '0.055';
 use Modern::Perl;
 use Moose::Role;
 use Util::Medley::Cache;
@@ -10,7 +10,7 @@ Util::Medley::Roles::Attributes::Cache
 
 =head1 VERSION
 
-version 0.053
+version 0.055
 
 =cut
 

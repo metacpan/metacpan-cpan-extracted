@@ -7,8 +7,8 @@ use warnings;
 
 no warnings 'uninitialized';
 
-our $VERSION = '3.019'; # VERSION
-my $LAST_UPDATE = '3.011'; # manually update whenever code is changed
+our $VERSION = '3.020'; # VERSION
+my $LAST_UPDATE = '3.020'; # manually update whenever code is changed
 
 use Compress::Zlib;
 
@@ -252,7 +252,7 @@ sub read_tiff {
     if ($tif->{'colorSpace'} eq 'Indexed') {
         my $dict = PDFDict();
         $pdf->new_obj($dict);
-        $self->colorspace(PDFArray(PDFName($tif->{'colorSpace'}), PDFName('DeviceRGB'), PDFNum(255), $dict));
+        $self->colorspace(PDFArray(PDFName($tif->{'colorSpace'}), PDFName('DeviceRGB'), PDFNum(2**$tif->{'bitsPerSample'}-1), $dict));
         $dict->{'Filter'} = PDFArray(PDFName('FlateDecode'));
         $tif->{'fh'}->seek($tif->{'colorMapOffset'}, 0);
         my $colormap;

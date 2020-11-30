@@ -1,7 +1,7 @@
 Business/PayPal
 ============================
 
-[![Build Status](https://travis-ci.org/szabgab/Business-PayPal.png)](https://travis-ci.org/szabgab/Business-PayPal)
+[![Build Status](https://travis-ci.org/joshrabinowitz/Business-PayPal.png)](https://travis-ci.org/joshrabinowitz/Business-PayPal)
 
 This module attempts to make the automation of PayPal transactions as simple
 as Credit Card transactions currently are.  This should allow PayPal to be

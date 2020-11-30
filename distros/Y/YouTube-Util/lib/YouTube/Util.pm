@@ -1,9 +1,9 @@
 package YouTube::Util;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-04-01'; # DATE
+our $DATE = '2020-11-26'; # DATE
 our $DIST = 'YouTube-Util'; # DIST
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.003'; # VERSION
 
 use 5.010001;
 use strict;
@@ -40,6 +40,7 @@ _
         {args => {arg => 'https://www.youtube.com/watch?v=cl1p7SOwnEk&list=PLjxOg4YY7Ah2JGb_QvA6KSB6YmikzA2fo&index=2&t=0s'}, result => 'cl1p7SOwnEk'},
         {args => {arg => 'https://www.youtube.com/watch?list=PLjxOg4YY7Ah2JGb_QvA6KSB6YmikzA2fo&v=cl1p7SOwnEk&index=2&t=0s'}, result => 'cl1p7SOwnEk'},
         {args => {arg => 'https://www.youtube.com/embed/U9v2S49sHeQ?rel=0'}, result => 'U9v2S49sHeQ'},
+        {args => {arg => 'https://youtu.be/U9v2S49sHeQ'}, result => 'U9v2S49sHeQ'},
         {args => {arg => '$100,000 Name That Tune - Nick vs. Carol-SY-DnVZeFH0.mp4'}, result => 'SY-DnVZeFH0'},
         {args => {arg => 'GNdALsnBjh8'}, result => 'GNdALsnBjh8'},
         {args => {arg => 'foo'}, result => undef},
@@ -51,6 +52,8 @@ sub extract_youtube_video_id {
     my $re = $Regexp::Pattern::YouTube::RE{video_id}{pat};
     if ($arg =~ /\A$re\z/) {
         return $arg;
+    } elsif ($arg =~ m!\Ahttps?://youtu\.be/($re)(?:\?|\#|\z)!) {
+        return $1;
     } elsif ($arg =~ m!\Ahttps?://.+/embed/! &&
                  $arg =~ m!/embed/($re)(?:\?|\#|\z)!) {
         return $1;
@@ -81,7 +84,7 @@ YouTube::Util - YouTube-related utilities
 
 =head1 VERSION
 
-This document describes version 0.002 of YouTube::Util (from Perl distribution YouTube-Util), released on 2020-04-01.
+This document describes version 0.003 of YouTube::Util (from Perl distribution YouTube-Util), released on 2020-11-26.
 
 =head1 FUNCTIONS
 
@@ -124,13 +127,17 @@ Result:
 
 =item * Example #5:
 
- extract_youtube_video_id("\$100,000 Name That Tune - Nick vs. Carol-SY-DnVZeFH0.mp4"); # -> "SY-DnVZeFH0"
+ extract_youtube_video_id("https://youtu.be/U9v2S49sHeQ"); # -> "U9v2S49sHeQ"
 
 =item * Example #6:
 
- extract_youtube_video_id("GNdALsnBjh8"); # -> "GNdALsnBjh8"
+ extract_youtube_video_id("\$100,000 Name That Tune - Nick vs. Carol-SY-DnVZeFH0.mp4"); # -> "SY-DnVZeFH0"
 
 =item * Example #7:
+
+ extract_youtube_video_id("GNdALsnBjh8"); # -> "GNdALsnBjh8"
+
+=item * Example #8:
 
  extract_youtube_video_id("foo"); # -> undef
 

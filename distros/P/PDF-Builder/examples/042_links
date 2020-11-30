@@ -111,6 +111,34 @@ $annotation->link($tgt_page,
 $text->fillcolor('black');
 $text->text(" to go to Page 1.");
 
+# same, except position and zoom
+$x = 100;
+$y = 400;
+
+$text->translate($x, $y);
+$text->text("Click ");
+$x += $text->advancewidth("Click ");
+
+# x,y should be at LL corner of "here" (on baseline)
+$text->fillcolor('blue');
+$text->text("here");
+$target_width = $text->advancewidth("here");
+
+$annotation = $page->annotation();
+$tgt_page = $pdf->openpage(1);  # target page 1
+$annotation->link($tgt_page,
+	         -rect => [$x-1, $y-5, $x+1+$target_width, $y-5+1+$font_size],
+		                         # clickable area
+		 -border => [0, 0, $border],    # show border
+		 -color => [$b_red, $b_green, $b_blue], # border color
+                 -xyz => [ 200,550, 1.5 ],  # new position, zoom factor 150%
+		);
+
+# restore color and do rest of line
+$text->fillcolor('black');
+$text->text(" to go to Page 1 positioned/zoomed.");
+
+
 # ---------- go to a page in ANOTHER document
 $page = $pdf->page();  # page 3
 $text = $page->text();
@@ -145,6 +173,33 @@ $annotation->pdf_file("resources/HarfBuzz_example.pdf",
 # restore color and do rest of line
 $text->fillcolor('black');
 $text->text(" to go to Page 1 of another PDF document.");
+
+# same, except position and zoom
+$x = 100;
+$y = 400;
+
+$text->translate($x, $y);
+$text->text("Click ");
+$x += $text->advancewidth("Click ");
+
+# x,y should be at LL corner of "here" (on baseline)
+$text->fillcolor('blue');
+$text->text("here");
+$target_width = $text->advancewidth("here");
+
+$annotation = $page->annotation();
+$annotation->pdf_file("resources/HarfBuzz_example.pdf",
+                 1, # page number
+	         -rect => [$x-1, $y-5, $x+1+$target_width, $y-5+1+$font_size],
+		                         # clickable area
+		 -border => [0, 0, $border],    # show border
+		 -color => [$b_red, $b_green, $b_blue], # border color
+                 -fitr => [100,350, 300,550], # new viewport
+		);
+
+# restore color and do rest of line
+$text->fillcolor('black');
+$text->text(" to go to Page 1 of another PDF document, windowed.");
 
 # ---------- launch (default OS action) another file
 $page = $pdf->page();  # page 4

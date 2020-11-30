@@ -3,6 +3,7 @@
 use strict;
 use warnings FATAL => 'uninitialized';
 use utf8;
+use experimental 'signatures';
 
 use Cwd 'abs_path';
 
@@ -18,12 +19,13 @@ use lib "$mydir/../lib";
 
 use Chj::xtmpfile;
 use Chj::xopen 'xopen_read';
+use Chj::TEST;
 
 (my $email = 'ch%christianjaeger,ch') =~ tr/%,/@./;
 
 sub usage {
     print STDERR map {"$_\n"} @_ if @_;
-    print "$myname ..
+    print "$myname --op opname file(s)
 
   (Christian Jaeger <$email>)
 ";
@@ -31,25 +33,112 @@ sub usage {
 }
 
 use Getopt::Long;
-our $verbose = 0;
-our $opt_opspaces;
-our $opt_functionparameters2signatures;
+my $verbose = 0;
+my @opt_op;
+my $opt_test;
+my $opt_repl;
 
 #our $opt_dry;
 GetOptions(
-    "verbose"                       => \$verbose,
-    "help"                          => sub {usage},
-    "opspaces"                      => \$opt_opspaces,
-    "functionparameters2signatures" => \$opt_functionparameters2signatures,
+    "verbose" => \$verbose,
+    "help"    => sub {usage},
+    "op=s"    => sub {
+        my (undef, $val) = @_;
+        push @opt_op, $val;
+    },
+    "test" => \$opt_test,
+    "repl" => \$opt_repl,
 
     #"dry-run"=> \$opt_dry,
 ) or exit 1;
 
-sub opspaces {
-    if (/http|href/) {
-        $_
+sub protos_to_arity ($str) {
+    my @p     = grep { length $_ } split /\s*/, $str;
+    my $s     = join('', @p);
+    my @parts = split /;/, $s;
+    my $l0    = length($parts[0]);
+    if (@parts == 1) {
+        [$l0]
+    } elsif (@parts == 2) {
+        my $l1 = length($parts[1]);
+        [$l0, $l0 + $l1]
+    } elsif (@parts == 0) {
+        [0]
     } else {
-        s{ ([^/>=~<!|+*-]) (=|=>|==|=~|/=|//=|>=|<=|<<|>>|!=|\|\||\|\|=|\+=|-=|\*=) ([^/>=~<!|]) }{
+        die "invalid prototype decl: '$s'"
+    }
+}
+
+TEST { protos_to_arity '$' } [1];
+TEST { protos_to_arity ' $  $$' } [3];
+TEST { protos_to_arity '$$ ; $' } [2, 3];
+TEST { protos_to_arity '&$' } [2];
+TEST { protos_to_arity '@$' } [2];
+TEST { protos_to_arity '' } [0];
+
+sub checkcode_for_arity ($arity) {
+    my ($min, $maybe_max) = @$arity;
+    if (!defined $maybe_max) {
+        "\@_ == $min or fp_croak_nargs $min;\n"
+    } else {
+        "\@_ >= $min and \@_ <= $maybe_max or fp_croak_nargs \"$min-$maybe_max\";\n"
+    }
+}
+
+my $compare_re = qr(<|>|<=|>=|==);
+
+my %rising  = map { $_ => 1 } qw(> >=);
+my %falling = map { $_ => 1 } qw(< <=);
+my %equal   = map { $_ => 1 } qw(==);
+
+sub compare_range {
+    my ($compare1, $n1, $maybe_andor, $maybe_compare2, $maybe_n2) = @_;
+    if (defined $maybe_andor) {
+        if ($maybe_andor eq '&&' or $maybe_andor eq 'and') {
+            if ($rising{$compare1} and $falling{$maybe_compare2}) {
+                "$n1-$maybe_n2"
+            } else {
+                die "don't know how to handle '$compare1 and $maybe_compare2'"
+            }
+        } elsif ($maybe_andor eq '||' or $maybe_andor eq 'or') {
+            if ($equal{$compare1} and $equal{$maybe_compare2}) {
+                "$n1 or $maybe_n2"
+            } else {
+
+                # XX could simply say "$compare1 $n1 or $maybe_compare2
+                # $maybe_n2" or 'optimize' it in the cases where it's
+                # ==
+                die "don't know how to handle '$compare1 and $maybe_compare2'"
+            }
+        } else {
+            die "invalid andor: $maybe_andor"
+        }
+    } else {
+        $compare1 eq "==" ? $n1 : "$compare1 $n1"
+    }
+}
+
+TEST { compare_range qw(> 5) } '> 5';
+TEST { compare_range qw(<= 5) } '<= 5';
+TEST { compare_range qw(== 5) } '5';
+TEST_EXCEPTION { compare_range qw(== 5 and == 6) }
+'don\'t know how to handle \'== and ==\'';
+TEST { compare_range qw(== 5 or == 6) } '5 or 6';
+TEST_EXCEPTION { compare_range qw(== 5 or > 6) }
+'don\'t know how to handle \'== and >\'';
+
+our $current_file;
+
+my %ops = (
+
+    # [ needs_whole_file, proc ]
+    opspaces => [
+        0,
+        sub {
+            if (/http|href/) {
+                $_
+            } else {
+                s{ ([^/>=~<!|+*-]) (=|=>|==|=~|/=|//=|>=|<=|<<|>>|!=|\|\||\|\|=|\+=|-=|\*=) ([^/>=~<!|]) }{
             my ($a,$b,$c)=($1,$2,$3);
             my $all = "$a$b$c";
             my $pre= substr($_, 0, pos($_)+1);
@@ -68,12 +157,15 @@ sub opspaces {
                 $all
             }
         }sgex and s/[ \t]*$//;
-        $_
-    }
-}
+                $_
+            }
+        }
+    ],
 
-sub functionparameters2signatures {
-    s{
+    functionparameters2signatures => [
+        1,
+        sub {
+            s{
          \b(method|fun)(\s+\w+)
          (?:
              (\s*\(\s*)
@@ -90,29 +182,138 @@ sub functionparameters2signatures {
               : "$a$b$c")
            . $end
     }sgex;
-    $_
+            $_
+        }
+    ],
+
+    excise_prototypes => [
+        1,
+        sub {
+            return $_
+                if /use +experimental [^\n;]*signatures[^\n;]*;/
+                ;    # since `()` is ambiguous
+            s{
+                 ( \bsub\b \ *)(\w+)?( \ * )
+                 \( ([\@\$; ]*) \)  # do *not* include & here, as those are needed
+                 ( \s* \{ \s* )
+                 ( (?:[^\n]*\n){0,2} )
+            }{
+                my ($_pre, $maybe_name, $_post, $protos, $post, $bodystart)
+                   = ($1,$2,$3,$4,$5,$6);
+                my $pre = $_pre . ($maybe_name // "") . $_post;
+
+                if (defined $maybe_name and $maybe_name =~ /^[A-Z0-9_]+\z/
+                    and $protos =~ /^\s*\z/ and $bodystart =~ /^\s*\d+\}/) {
+                    # constant, leave as is
+                    "$pre($protos)$post$bodystart"
+                } else {
+                    # make sure bodystart doesn't slurp over a subsequent definition
+                    die "accidentally slurping up subsequent definition"
+                        if $bodystart =~ /(\bsub\b \ *(?:\w+)?) \ * (?:\([@$&;]*\))? (\s* \{)/;
+
+                    my $checkcode = do {
+                        if ($bodystart =~ /\@_ *(?:==|<=|>=|<|>) *\d+/) {
+                            ""
+                        } else {
+                            checkcode_for_arity(protos_to_arity($protos))
+                        }
+                    };
+                    # Make sure there's no empty line before the checkcode
+                    my $post_and_checkcode = "$post$checkcode";
+                    $post_and_checkcode =~ s/^(\s*\{)[ \t]*\n\s*/$1\n    /s;
+                    "$pre$post_and_checkcode    $bodystart"
+                }
+            }sgex;
+            $_
+        }
+    ],
+
+    move_to_fp_croak_nargs => [
+        1,
+        sub {
+            my $replacements = s{
+                 ( ; | \{ \s* )
+                 ( \(? \s* \@_ \s* ($compare_re) \s* (\d+) \s*
+                     (?: ( and | && | or | \|\| ) \s* \@_ ($compare_re) (\d+) )? \s* \)?  \s* )
+                 ( or \s+ (?:die|(?:\w+::)*croak) \s*
+                     (?: "[^"]*wrong\ number\ of\ arguments[^"]*" |
+                         "[^"]*(?:expecting|expects|needs?) \s+ \d+
+                            (?: \ * (?:-|to) \ * \d+)? \s+ (?:parameter|argument)s?[^"]*" |
+                         "[^"]*not\ enough\ arguments[^"]*"
+                     ) \s* ;)
+            }{
+                my ($pre, $compare, $compare1, $n1, $maybe_andor, $maybe_compare2, $maybe_n2, $or_part)
+                  = ($1,$2,$3,$4,$5,$6,$7,$8);
+                my $range = compare_range($compare1, $n1, $maybe_andor, $maybe_compare2, $maybe_n2);
+                unless ($range =~ /^\d+$/s) {
+                    $range = "\"$range\"";
+                }
+                "$pre$compare or fp_croak_nargs $range;"
+            }sgex;
+            if ($replacements) {
+                unless (/use FP::Carp/) {
+                    do {
+                        if (/[\@\%]EXPORT/) {
+
+                            # force it after 'EXPORT'
+                            s{(.*[\@\%]EXPORT.*\nuse [A-Z][^;\n]+;[^\n]*\n)}{${1}use FP::Carp;\n}s
+                        } else {
+                            s{(.*\nuse [A-Z][^;\n]+;[^\n]*\n)}{${1}use FP::Carp;\n}s
+                        }
+                        }
+                        or
+                        warn "could not insert FP::Carp into $current_file\n";
+                }
+            }
+            $_
+        }
+    ],
+);
+
+sub run {
+    @opt_op or usage "no op given, use the --op option";
+
+    my @op = map { $ops{$_} // die "unknown op '$_'" } @opt_op;
+
+    my %needs_whole_file = map { $_->[0] ? (1 => undef) : (0 => undef) } @op;
+
+    (keys %needs_whole_file) == 1
+        or die
+        "can't satisfy ops of different needs_whole_file requirement at the same time";
+
+    my ($needs_whole_file) = keys %needs_whole_file;
+
+    for my $file (@ARGV) {
+        local $current_file = $file;
+        my $f     = xopen_read $file;
+        my @lines = do {
+            local $/ = $needs_whole_file ? undef : $/;
+            $f->xreadline;
+        };
+        $f->xclose;
+
+        my $t = xtmpfile $file;
+        $t->xprint(
+            map {
+                for my $op (@op) {
+                    my (undef, $proc) = @$op;
+                    $_ = &$proc($_);
+                }
+                $_
+            } @lines
+        );
+        $t->xclose;
+        $t->xputback;
+    }
 }
 
-for my $file (@ARGV) {
-    my $f     = xopen_read $file;
-    my @lines = do {
-        local $/ = $opt_functionparameters2signatures ? undef : $/;
-        die "can't satisfy both options at same time here^ "
-            if $opt_functionparameters2signatures && $opt_opspaces;
-        $f->xreadline;
-    };
-    $f->xclose;
-
-    my $t = xtmpfile $file;
-    $t->xprint(
-        map {
-            $_ = opspaces $_ if $opt_opspaces;
-            $_ = functionparameters2signatures $_
-                if $opt_functionparameters2signatures;
-            $_
-        } @lines
-    );
-    $t->xclose;
-    $t->xputback;
+if ($opt_test) {
+    Chj::TEST::run_tests(__PACKAGE__);
+} elsif ($opt_repl) {
+    require FP::Repl;
+    FP::Repl->import("repl");
+    repl();
+} else {
+    run
 }
 

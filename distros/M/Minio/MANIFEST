@@ -5,5 +5,7 @@ README
 script/example.pl
 script/minio-mc
 script/minio/config.json
+script/minio/share/downloads.json
+script/minio/share/uploads.json
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

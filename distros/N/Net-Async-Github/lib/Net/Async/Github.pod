@@ -1,7 +1,6 @@
 =encoding utf8
 
 =for comment POD_DERIVED_INDEX_GENERATED
-
 The following documentation is automatically generated.  Please do not edit
 this file, but rather the original, inline with Net::Async::Github
 at lib/Net/Async/Github.pm
@@ -107,6 +106,44 @@ Expects the following named parameters:
 
 Resolves to the current status.
 
+=head2 create_branch
+
+Creates a new branch.
+
+Takes the following named parameters:
+
+=over 4
+
+=item * C<owner> - which organisation owns the target repository
+
+=item * C<repo> - the repository to raise the PR against
+
+=item * C<branch> - new branch name that will be created
+
+=item * C<sha> - the SHA1 value for this branch
+
+=back
+
+=head2 update_ref
+
+Update a reference to a new commit
+
+Takes the following named parameters:
+
+=over 4
+
+=item * C<owner> - which organisation owns the target repository
+
+=item * C<repo> - the repository to raise the PR against
+
+=item * C<ref> - ref name that we are updating.
+
+=item * C<sha> - the SHA1 value of comment that the ref will point to
+
+=item * C<force> - force update ref even if it is not fast-forward if it is true.
+
+=back
+
 =head2 create_pr
 
 Creates a new pull request.
@@ -122,6 +159,27 @@ Takes the following named parameters:
 =item * C<head> - head commit starting point, typically the latest commit on your fork's branch
 
 =item * C<base> - base commit this PR applies changes to typically you'd want the target repo C<master>
+
+=back
+
+=head2 create_commit
+
+Creates an empty commit. Can be used to simulate C<git commit --allow-empty>
+or to create a merge commit from multiple heads.
+
+Takes the following named parameters:
+
+=over 4
+
+=item * C<owner> - which organisation owns the target repository
+
+=item * C<repo> - the repository to raise the PR against
+
+=item * C<message> - The commit message
+
+=item * C<tree> - The SHA of tree object that commit will point to
+
+=item * C<parents> - Arrayref that include the parents of the commit
 
 =back
 

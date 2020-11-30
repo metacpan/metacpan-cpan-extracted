@@ -17,8 +17,9 @@ use parent 'App::XML::DocBook::Docmake';
 
 sub _exec_command
 {
-    my ( $self, $cmd ) = @_;
+    my ( $self, $args ) = @_;
 
+    my $cmd = $args->{cmd};
     push @commands_executed, [@$cmd];
 }
 

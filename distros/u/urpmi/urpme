@@ -38,7 +38,7 @@ my $yesexpr =
   N("Yy");
 
 sub usage() {
-    print urpm::args::copyright('urpme', [ '1999-2010', 'Mandriva' ], [ '2011-2017', 'Mageia' ])
+    print urpm::args::copyright('urpme', [ '1999-2010', 'Mandriva' ], [ '2011-2020', 'Mageia' ])
    . N("  --help         - print this help message.
 ") . N("  --auto         - automatically select a package in choices.
 ") . N("  --auto-orphans - remove orphans

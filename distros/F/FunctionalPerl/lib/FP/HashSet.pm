@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2013-2019 Christian Jaeger, copying@christianjaeger.ch
+# Copyright (c) 2013-2020 Christian Jaeger, copying@christianjaeger.ch
 #
 # This is free software, offered under either the same terms as perl 5
 # or the terms of the Artistic License version 2 or the terms of the
@@ -18,11 +18,11 @@ FP::HashSet - set operations for hash tables
 
     my $A = array_to_hashset ["a","b","c"];
     my $B = array_to_hashset ["a","c","d"];
-    is_equal hashset_to_array hashset_union($A,$B),
+    is_equal hashset_to_array(hashset_union($A,$B)),
              ["a","b","c","d"];
-    is_equal hashset_to_array hashset_intersection($A,$B),
+    is_equal hashset_to_array(hashset_intersection($A,$B)),
              ["a","c"];
-    is_equal hashset_to_array hashset_difference($A,$B),
+    is_equal hashset_to_array(hashset_difference($A,$B)),
              ["b"];
     ok not hashset_is_subset($B,$A);
     ok hashset_is_subset(+{b => 1},$A);
@@ -83,34 +83,44 @@ our @EXPORT_OK   = qw(hashset_add_hashset_d);
 our %EXPORT_TAGS = (all => [@EXPORT, @EXPORT_OK]);
 
 use Chj::TEST;
+use FP::Carp;
 
-sub array_to_hashset ($) {
+sub array_to_hashset {
+    @_ == 1 or fp_croak_nargs 1;
     +{ map { $_ => $_ } @{ $_[0] } }
 }
 
-sub array_to_lchashset ($) {
+sub array_to_lchashset {
+    @_ == 1 or fp_croak_nargs 1;
     +{ map { lc($_) => $_ } @{ $_[0] } }
 }
 
-sub hashset_to_array ($) { [sort values %{ $_[0] }] }
+sub hashset_to_array {
+    @_ == 1 or fp_croak_nargs 1;
+    [sort values %{ $_[0] }]
+}
 
-sub hashset_to_predicate ($) {
+sub hashset_to_predicate {
+    @_ == 1 or fp_croak_nargs 1;
     my ($s) = @_;
     sub {
-        @_ == 1 or die "wrong number of arguments";
+        @_ == 1 or fp_croak_nargs 1;
         exists $$s{ $_[0] }
     }
 }
 
-sub hashset_keys_unsorted ($) {
+sub hashset_keys_unsorted {
+    @_ == 1 or fp_croak_nargs 1;
     keys %{ $_[0] }
 }
 
-sub hashset_keys ($) {
+sub hashset_keys {
+    @_ == 1 or fp_croak_nargs 1;
     sort keys %{ $_[0] }
 }
 
-sub hashset_add_hashset_d ($ $) {
+sub hashset_add_hashset_d {
+    @_ == 2 or fp_croak_nargs 2;
     my ($r, $s) = @_;
     for (keys %$s) {
         $$r{$_} = $$s{$_} unless exists $$r{$_};
@@ -125,7 +135,8 @@ sub hashset_union {
 
 # same as hashset_union but check definedness, not existence
 
-sub hashset_add_hashset_defined_d ($ $) {
+sub hashset_add_hashset_defined_d {
+    @_ == 2 or fp_croak_nargs 2;
     my ($r, $s) = @_;
     for (keys %$s) {
         $$r{$_} = $$s{$_} unless defined $$r{$_};
@@ -140,7 +151,8 @@ sub hashset_union_defined {
 
 # /same
 
-sub hashset_intersection ($ $) {
+sub hashset_intersection {
+    @_ == 2 or fp_croak_nargs 2;
     my ($a, $b) = @_;
     my %r;
     for (keys %$a) {
@@ -149,7 +161,8 @@ sub hashset_intersection ($ $) {
     \%r
 }
 
-sub hashset_difference ($ $) {
+sub hashset_difference {
+    @_ == 2 or fp_croak_nargs 2;
     my ($a, $b) = @_;
     my %r;
     for (keys %$a) {
@@ -158,7 +171,8 @@ sub hashset_difference ($ $) {
     \%r
 }
 
-sub hashset_is_subset ($ $) {
+sub hashset_is_subset {
+    @_ == 2 or fp_croak_nargs 2;
     my ($subset, $set) = @_;
     my %r;
     for (keys %$subset) {
@@ -167,15 +181,18 @@ sub hashset_is_subset ($ $) {
     1
 }
 
-sub hashset_size ($) {
+sub hashset_size {
+    @_ == 1 or fp_croak_nargs 1;
     scalar keys %{ $_[0] }
 }
 
-sub hashset_empty ($) {
+sub hashset_empty {
+    @_ == 1 or fp_croak_nargs 1;
     not keys %{ $_[0] }
 }
 
-sub hashset_diff ($ $) {
+sub hashset_diff {
+    @_ == 2 or fp_croak_nargs 2;
     my ($a, $b) = @_;
     my %r;
     for (keys %$a) {

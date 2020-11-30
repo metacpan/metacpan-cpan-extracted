@@ -22,7 +22,7 @@ struct XSStreamListener : IStreamListener, XSListener {
         auto ret = call<Scalar>(cbn.create_connection, xs::out(h));
         return ret ? xs::in<StreamSP>(ret) : StreamSP();
     }
-    
+
     void on_connection (const StreamSP& h, const StreamSP& client, const ErrorCode& err) override {
         call(cbn.on_connection, xs::out(h), xs::out(client), xs::out(err));
     }
@@ -42,7 +42,7 @@ struct XSStreamListener : IStreamListener, XSListener {
     void on_shutdown (const StreamSP& h, const ErrorCode& err, const ShutdownRequestSP& req) override {
         call(cbn.on_shutdown, xs::out(h), xs::out(err), xs::out(req));
     }
-    
+
     void on_eof (const StreamSP& h) override {
         call(cbn.on_eof, xs::out(h));
     }
@@ -54,7 +54,7 @@ PROTOTYPES: DISABLE
 BOOT {
     Stash s(__PACKAGE__);
     s.inherit("UniEvent::Handle");
-    
+
     xs::at_perl_destroy([]() {
         cbn.create_connection = nullptr;
         cbn.on_connection     = nullptr;
@@ -68,7 +68,7 @@ BOOT {
 
 bool Stream::readable ()
 
-bool Stream::writable ()    
+bool Stream::writable ()
 
 bool Stream::listening ()
 
@@ -164,7 +164,7 @@ void Stream::listen (Sv cb_bl = Sv(), int backlog = Stream::DEFAULT_BACKLOG) {
     }
     auto ret = THIS->listen(backlog);
     if (GIMME_V == G_VOID) {
-        if (!ret) throw ret.error();
+        if (!ret) panda::exthrow(ret.error());
         XSRETURN_EMPTY;
     }
     XPUSHs(boolSV(ret));
@@ -180,20 +180,21 @@ void Stream::read_start ()
 
 void Stream::read_stop ()
 
-void Stream::write (Sv sv, Stream::write_fn cb = nullptr) {
+WriteRequestSP Stream::write (Sv sv, Stream::write_fn cb = nullptr) {
     auto buf = sv2buf(sv);
     if (!buf) XSRETURN(0);
-    
-    WriteRequestSP req = new WriteRequest(buf);
+
+    WriteRequestSP req = make_backref<WriteRequest>(buf);
     if (cb) req->event.add(cb);
     THIS->write(req);
+    RETVAL = req;
 }
 
 #// shutdown([$timeout], [$cb]) or shutdown($cb)
-void Stream::shutdown (Sv arg1 = {}, Sv arg2 = {}) {
+ShutdownRequestSP Stream::shutdown (Sv arg1 = {}, Sv arg2 = {}) {
     double timeout = 0;
     Stream::shutdown_fn cb;
-    
+
     if (arg2) {
         timeout = SvNV(arg1);
         cb = xs::in<Stream::shutdown_fn>(arg2);
@@ -203,7 +204,9 @@ void Stream::shutdown (Sv arg1 = {}, Sv arg2 = {}) {
         else                   timeout = SvNV(arg1);
     }
 
-    THIS->shutdown(timeout * 1000, cb);
+    ShutdownRequestSP req = make_backref<ShutdownRequest>(cb, timeout * 1000);
+    THIS->shutdown(req);
+    RETVAL = req;
 }
 
 void Stream::disconnect ()

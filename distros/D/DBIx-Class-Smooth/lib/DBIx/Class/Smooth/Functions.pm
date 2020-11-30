@@ -6,7 +6,7 @@ package DBIx::Class::Smooth::Functions;
 
 # ABSTRACT: Specify columns
 our $AUTHORITY = 'cpan:CSSON'; # AUTHORITY
-our $VERSION = '0.0107';
+our $VERSION = '0.0108';
 
 use Carp qw/croak/;
 use List::Util qw/uniq/;
@@ -23,6 +23,7 @@ use Sub::Exporter::Progressive -setup => {
         ConcatWS
         Elt
         ExportSet
+        Hex
         Substring
     /]
 };
@@ -96,6 +97,8 @@ sub Elt($index, @list) { return all_is_voc elt => $index, @list; }
 
 sub ExportSet($bits, $on, $off, $separator, $number_of_bits) { return all_is_voc export_set => drop_last_if_undef(drop_last_if_undef $bits, $on, $off, $separator, $number_of_bits); }
 
+sub Hex($voc) { return first_is_voc hex => $voc; }
+
 sub Substring($voc, $pos, $length = undef) { return first_is_voc substring => drop_last_if_undef($voc, $pos, $length); }
 
 __END__
@@ -110,7 +113,7 @@ DBIx::Class::Smooth::Functions - Specify columns
 
 =head1 VERSION
 
-Version 0.0107, released 2020-10-28.
+Version 0.0108, released 2020-11-29.
 
 =head1 SYNOPSIS
 

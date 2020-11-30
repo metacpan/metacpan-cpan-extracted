@@ -38,13 +38,12 @@ a hash containing the data from the config file
 has cfgHash => sub ($self) {
     my $cfg = eval { LoadFile($self->file) };
     if ($@) {
-      Mojo::Exception->throw("Loading ".$self->file.": $@");
+        Mojo::Exception->throw("Loading ".$self->file.": $@");
     }
     if (my @errors = $self->validator->validate($cfg)){
-      Mojo::Exception->throw("Validating ".$self->file.":\n".join "\n",@errors);
+        Mojo::Exception->throw("Validating ".$self->file.":\n".join "\n",@errors);
     }
-    $self->postProcessCfg($cfg);
-    
+    return $cfg;
 };
 
 =head2 pod
@@ -87,7 +86,8 @@ by the application.
 
 =cut
 
-sub postProcessCfg ($self,$cfg) {
+sub postProcessCfg ($self) {
+    my $cfg = $self->cfgHash;
     my $schema = $self->schema;
     my @items;
     my %pluginMap;
@@ -119,9 +119,8 @@ sub postProcessCfg ($self,$cfg) {
             required => [ $name ],
             additionalProperties => false,
         };
-        
     }
-    
+
     $schema->{properties}{PLUGIN}{items} = {
         anyOf => \@items
     };
@@ -135,8 +134,7 @@ sub postProcessCfg ($self,$cfg) {
     if (my @errors = $self->validator->validate($cfg)){
         Mojo::Exception->throw(join "\n",@errors);
     }
-    
-    
+
     $cfg->{PLUGIN} = {
         prototype => \%pluginMap,
         list => \@pluginList
@@ -248,7 +246,7 @@ properties:
         $ref: "#/definitions/plugin"
       passwordreset_popup:
         $ref: "#/definitions/plugin"
-          
+
     PLUGIN:
       type: array
       items:
@@ -282,6 +280,7 @@ S<Tobias Oetiker E<lt>tobi@oetiker.chE<gt>>
 =head1 HISTORY
 
  2020-02-18 to 1.0 first version
+ 2020-11-20 fz 1.1 call postProcessCfg from CallBackery.pm
 
 =cut
 

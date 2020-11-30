@@ -6,7 +6,7 @@ namespace panda { namespace unievent {
 
 const HandleType Tcp::TYPE("tcp");
 
-const AddrInfoHints Tcp::defhints = AddrInfoHints(AF_UNSPEC, SOCK_STREAM, 0, AddrInfoHints::PASSIVE);
+const AddrInfoHints Tcp::defhints = AddrInfoHints(AF_UNSPEC, SOCK_STREAM, 0, 0);
 
 Tcp::Tcp (const LoopSP& loop, int domain) : domain(domain) {
     panda_log_ctor();

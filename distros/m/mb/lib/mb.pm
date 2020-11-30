@@ -11,7 +11,7 @@ package mb;
 use 5.00503;    # Universal Consensus 1998 for primetools
 # use 5.008001; # Lancaster Consensus 2013 for toolchains
 
-$VERSION = '0.11';
+$VERSION = '0.12';
 $VERSION = $VERSION;
 
 # internal use
@@ -167,7 +167,7 @@ END
         # poor file locking
         local $SIG{__DIE__} = sub { rmdir("$ARGV[0].lock"); };
         if (mkdir("$ARGV[0].lock", 0755)) {
-            mb::_open_w(my $fh, ">$script_oo") or die "$0(@{[__LINE__]}): cant't open file: $script_oo\n";
+            mb::_open_w(my $fh, $script_oo) or die "$0(@{[__LINE__]}): cant't open file: $script_oo\n";
             print {$fh} mb::parse();
             close $fh;
             rmdir("$ARGV[0].lock");
@@ -296,7 +296,7 @@ sub mb::do {
                 # poor file locking
                 local $SIG{__DIE__} = sub { rmdir("$prefix_file.lock"); };
                 if (mkdir("$prefix_file.lock", 0755)) {
-                    mb::_open_w(my $fh, ">$prefix_file_oo") or confess "$0(@{[__LINE__]}): cant't open file: $prefix_file_oo\n";
+                    mb::_open_w(my $fh, $prefix_file_oo) or confess "$0(@{[__LINE__]}): cant't open file: $prefix_file_oo\n";
                     print {$fh} mb::parse();
                     close $fh;
                     rmdir("$prefix_file.lock");
@@ -546,7 +546,7 @@ sub mb::require {
                     # poor file locking
                     local $SIG{__DIE__} = sub { rmdir("$prefix_file.lock"); };
                     if (mkdir("$prefix_file.lock", 0755)) {
-                        mb::_open_w(my $fh, ">$prefix_file_oo") or confess "$0(@{[__LINE__]}): cant't open file: $prefix_file_oo\n";
+                        mb::_open_w(my $fh, $prefix_file_oo) or confess "$0(@{[__LINE__]}): cant't open file: $prefix_file_oo\n";
                         print {$fh} mb::parse();
                         close $fh;
                         rmdir("$prefix_file.lock");
@@ -638,6 +638,12 @@ sub mb::rindex_byte {
 # set OSNAME
 sub mb::set_OSNAME {
     $OSNAME = $_[0];
+}
+
+#---------------------------------------------------------------------
+# get OSNAME
+sub mb::get_OSNAME {
+    return $OSNAME;
 }
 
 #---------------------------------------------------------------------
@@ -740,6 +746,12 @@ sub mb::set_script_encoding {
     @{mb::_s} = "[\\t\\n\\f\\r\\x20]";
     @{mb::_v} = "[\\x0A\\x0B\\x0C\\x0D]";
     @{mb::_w} = "[A-Za-z0-9_]";
+}
+
+#---------------------------------------------------------------------
+# get script encoding name
+sub mb::get_script_encoding {
+    return $script_encoding;
 }
 
 #---------------------------------------------------------------------
@@ -1243,7 +1255,7 @@ sub mb::_cc {
 }
 
 #---------------------------------------------------------------------
-# makes clustered code point from string
+# makes clustered codepoint from string
 sub mb::_clustered_codepoint {
     if (my @codepoint = $_[0] =~ /\G(${mb::x})/xmsgc) {
         if (CORE::length($codepoint[$#codepoint]) == 1) {
@@ -1261,22 +1273,22 @@ sub mb::_clustered_codepoint {
 #---------------------------------------------------------------------
 # open for append by undefined filehandle
 sub mb::_open_a {
-    $_[0] = \do { local *_ };
-    return open($_[0], ">>$_[1]");
+    $_[0] = \do { local *_ } if $] < 5.006;
+    return open($_[0], ">> $_[1]");
 }
 
 #---------------------------------------------------------------------
 # open for read by undefined filehandle
 sub mb::_open_r {
-    $_[0] = \do { local *_ };
+    $_[0] = \do { local *_ } if $] < 5.006;
     return open($_[0], $_[1]);
 }
 
 #---------------------------------------------------------------------
 # open for write by undefined filehandle
 sub mb::_open_w {
-    $_[0] = \do { local *_ };
-    return open($_[0], $_[1]);
+    $_[0] = \do { local *_ } if $] < 5.006;
+    return open($_[0], "> $_[1]");
 }
 
 #---------------------------------------------------------------------
@@ -1399,11 +1411,17 @@ sub mb::_split {
 # chdir() for MSWin32
 sub mb::_chdir {
 
-    # works on MSWin32 only
+    # not on MSWin32 or UTF-8
     if (($OSNAME !~ /MSWin32/) or ($script_encoding !~ /\A (?: sjis | gbk | uhc | big5 | big5hkscs | gb18030 ) \z/xms)) {
-        return CORE::chdir $_[0];
+        if (@_ == 0) {
+            return CORE::chdir;
+        }
+        else {
+            return CORE::chdir $_[0];
+        }
     }
 
+    # on MSWin32
     if (@_ == 0) {
         return CORE::chdir;
     }
@@ -3392,7 +3410,7 @@ END
 }
 
 #---------------------------------------------------------------------
-# parse code point class
+# parse codepoint class
 sub parse_re_codepoint_class {
     my($classmate) = @_;
     my $parsed = '';
@@ -4055,7 +4073,7 @@ sub parse_tr_modifier {
 }
 
 #---------------------------------------------------------------------
-# makes code point class from string
+# makes codepoint class from string
 sub codepoint_tr {
     my($searchlist) = $_[0] =~ /\A [\x00-\xFF] (.*) [\x00-\xFF] \z/xms;
     my $look_ahead = ($_[1] =~ /c/) ? '(?:(?!' : '(?:(?=';
@@ -4191,7 +4209,7 @@ mb - run Perl script in MBCS encoding (not only CJK ;-)
 
 =head1 SYNOPSIS
 
-  $ perl mb.pm              MBCS_Perl_script.pl
+  $ perl mb.pm              MBCS_Perl_script.pl (auto detect encoding of script)
   $ perl mb.pm -e big5      MBCS_Perl_script.pl
   $ perl mb.pm -e big5hkscs MBCS_Perl_script.pl
   $ perl mb.pm -e eucjp     MBCS_Perl_script.pl
@@ -4312,7 +4330,7 @@ To install this software without make, type the following:
 
 =item * character
 
-=item * code point
+=item * codepoint
 
 =item * grapheme
 
@@ -4347,18 +4365,27 @@ To install this software without make, type the following:
              81..FE    00..FF
              00..7F
              https://en.wikipedia.org/wiki/Big5
+             * needs multibyte anchoring
+             * needs escaping meta char of 2nd octet
+             * unsafe US-ASCII casefolding
   ------------------------------------------------------------------------------
   big5hkscs (Big5-HKSCS)
              1st       2nd
              81..FE    00..FF
              00..7F
              https://en.wikipedia.org/wiki/Hong_Kong_Supplementary_Character_Set
+             * needs multibyte anchoring
+             * needs escaping meta char of 2nd octet
+             * unsafe US-ASCII casefolding
   ------------------------------------------------------------------------------
   eucjp (EUC-JP)
              1st       2nd
              A1..FE    00..FF
              00..7F
              https://en.wikipedia.org/wiki/Extended_Unix_Code#EUC-JP
+             * needs multibyte anchoring
+             * needs no escaping meta char of 2nd octet
+             * safe US-ASCII casefolding
   ------------------------------------------------------------------------------
   gb18030 (GB18030)
              1st       2nd       3rd       4th
@@ -4366,12 +4393,18 @@ To install this software without make, type the following:
              81..FE    00..FF
              00..7F
              https://en.wikipedia.org/wiki/GB_18030
+             * needs multibyte anchoring
+             * needs escaping meta char of 2nd octet
+             * unsafe US-ASCII casefolding
   ------------------------------------------------------------------------------
   gbk (GBK)
              1st       2nd
              81..FE    00..FF
              00..7F
              https://en.wikipedia.org/wiki/GBK_(character_encoding)
+             * needs multibyte anchoring
+             * needs escaping meta char of 2nd octet
+             * unsafe US-ASCII casefolding
   ------------------------------------------------------------------------------
   sjis (Shift_JIS-like encodings)
              1st       2nd
@@ -4380,12 +4413,18 @@ To install this software without make, type the following:
              80..FF
              00..7F
              https://en.wikipedia.org/wiki/Shift_JIS
+             * needs multibyte anchoring
+             * needs escaping meta char of 2nd octet
+             * unsafe US-ASCII casefolding
   ------------------------------------------------------------------------------
   uhc (UHC)
              1st       2nd
              81..FE    00..FF
              00..7F
              https://en.wikipedia.org/wiki/Unified_Hangul_Code
+             * needs multibyte anchoring
+             * needs escaping meta char of 2nd octet
+             * unsafe US-ASCII casefolding
   ------------------------------------------------------------------------------
   utf8 (UTF-8)
              1st       2nd       3rd       4th
@@ -4399,6 +4438,9 @@ To install this software without make, type the following:
              F4..F4    80..8F    80..BF    80..BF
              00..7F
              https://en.wikipedia.org/wiki/UTF-8
+             * needs no multibyte anchoring
+             * needs no escaping meta char of 1st-4th octets
+             * safe US-ASCII casefolding
   ------------------------------------------------------------------------------
 
 =head1 MBCS subroutines provided by this software
@@ -4467,14 +4509,14 @@ To install this software without make, type the following:
 
   index brothers
   ------------------------------------------------------------------------------------------
-  functions or subs       works           returns         considered
+  functions or subs       works as        returns as      considered
   ------------------------------------------------------------------------------------------
-  index                   as octet        as octet        useful, bare Perl like
-  rindex                  as octet        as octet        useful, bare Perl like
-  mb::index               as codepoint    as codepoint    not so useful, utf8 pragma like
-  mb::rindex              as codepoint    as codepoint    not so useful, utf8 pragma like
-  mb::index_byte          as codepoint    as octet        useful, JPerl like
-  mb::rindex_byte         as codepoint    as octet        useful, JPerl like
+  index                   octet           octet           useful, bare Perl like
+  rindex                  octet           octet           useful, bare Perl like
+  mb::index               codepoint       codepoint       not so useful, utf8 pragma like
+  mb::rindex              codepoint       codepoint       not so useful, utf8 pragma like
+  mb::index_byte          codepoint       octet           useful, JPerl like
+  mb::rindex_byte         codepoint       octet           useful, JPerl like
   ------------------------------------------------------------------------------------------
 
 =head1 MBCS special variables provided by this software
@@ -5141,22 +5183,19 @@ To install this software without make, type the following:
 
 =head1 DEPENDENCIES
 
-This software requires perl5.00503 or later.
+  This mb.pm modulino requires perl5.00503 or later to use. Also requires 'strict'
+  module. It requires the 'warnings' module, too if perl 5.6 or later.
 
-=head1 BUGS, LIMITATIONS, and COMPATIBILITY
+=head1 BUGS Avoidable by Your Doing
 
-I have tested and verified this software using the best of my ability.
-However, a software containing much regular expression is bound to contain
-some bugs. Thus, if you happen to find a bug that's in this software and
-not your own program, you can try to reduce it to a minimal test case and
-then report it to the following author's address. If you have an idea that
-could make this a more useful tool, please let everyone share it.
+You can avoid the following bugs with little hacks.
 
 =over 2
 
 =item * Special Variables $` and $& need /( Capture All )/
 
-  Because $` and $& use $1.
+If you use the special variables $ ` or $&, you must enclose the entire regular
+expression in parentheses. Because $` and $& needs $1 to implement its.
 
   ----------------------------------------------------------------------------------------------------------------------
   in your script      after m//, works as                         after s///, works as
@@ -5171,33 +5210,83 @@ could make this a more useful tool, please let everyone share it.
   ${^MATCH}           $1                                          CORE::substr($&, CORE::length($1))
   ----------------------------------------------------------------------------------------------------------------------
 
+In the past, Perl scripts with special variables $` and $& had a problem with
+slow execution. Both that era and today, capturing by parentheses works well.
+
+=item * character ranges by hyphen
+
+Character ranges by hyphen of regular expression supports US-ASCII only.
+And tr///, y/// doesn't support ranges by hyphen. This limitation dares to exist
+to help you when you change the encoding of your script. If you want to be
+perfect, you need to check the use of the following operators when changing the
+encoding of your script.
+
+  eq  ne  le  lt  ge  gt  cmp  sort
+
 =item * return value from tr///s
 
 tr/// (or y///) operator with /s modifier returns 1 always. If you need right
 number, you can use mb::tr().
 
-=item * chdir
-
-Function chdir() cannot work if path is ended by chr(0x5C).
-
-  see also,
-  Bug #81839
-  chdir does not work with chr(0x5C) at end of path
-  http://bugs.activestate.com/show_bug.cgi?id=81839
+  $var1 = 'AAA';
+  $got = $var1 =~ tr/A/1/s; # works as $got = $var1 =~ s{[\x00-\xFF]*}{mb::tr($&,q/A/,q/1/,'sr')}e;
+    BAD ==> got 1
+  
+  $var2 = 'BBB';
+  $got = $var2 =~ tr/A/1/s; # works as $got = $var2 =~ s{[\x00-\xFF]*}{mb::tr($&,q/A/,q/1/,'sr')}e;
+    BAD ==> got 1
+  
+  $var3 = 'AAA';
+  $got = mb::tr($var3,'A','1','s'); # works as $got = mb::tr($var3,'A','1','s');
+    GOOD ==> got 3
+  
+  Transliteration routine
+  
+  $return = mb::tr($MBCS_string, $searchlist, $replacementlist, $modifier);
+  $return = mb::tr($MBCS_string, $searchlist, $replacementlist);
+  
+  This subroutine is a runtime routine to implement tr/// operator for MBCS
+  codepoint. This subroutine scans an $MBCS_string by codepoint and replaces all
+  occurrences of the codepoint found in $searchlist with the corresponding
+  codepoint in $replacementlist. It returns the number of codepoint replaced or
+  deleted except on /s modifier used.
+  
+  $modifier are:
+  
+  ---------------------------------------------------------------------------
+  Modifier   Meaning
+  ---------------------------------------------------------------------------
+  c          Complement $searchlist.
+  d          Delete found but unreplaced characters.
+  s          Squash duplicate replaced characters.
+  r          Return transliteration and leave the original string untouched.
+  ---------------------------------------------------------------------------
+  
+  To use with a read-only value without raising an exception, use the /r modifier.
+  
+  print mb::tr('bookkeeper','boep','peob','r'); # prints 'peekkoobor'
 
 =item * mb::substr as Lvalue
 
-If Perl version is older than 5.14, mb::substr differs from CORE::substr, and
-cannot be used as a lvalue. To change part of a string, you need use the optional
+If perl version is older than 5.14, mb::substr differs from CORE::substr, and
+cannot be used as an lvalue. To change part of a string, you need use the optional
 fourth argument which is the replacement string.
 
 mb::substr($string, 13, 4, "JPerl");
 
+If you use perl 5.14 or later, you can use lvalue feature.
+
+=back
+
+=head1 BUGS Unavoidable, LIMITATIONS, and COMPATIBILITY
+
+=over 2
+
 =item * Limitation of Regular Expression
 
-This software has limitation from \G in multibyte anchoring. Only Perl 5.30.0 or
+This software has limitation from \G in multibyte anchoring. Only perl 5.30.0 or
 later can treat the codepoint string which exceeds 65534 octets with a regular
-expression, and only Perl 5.10.1 or later can 32766 octets.
+expression, and only perl 5.10.1 or later can 32766 octets.
 
   see also,
   
@@ -5216,63 +5305,90 @@ expression, and only Perl 5.10.1 or later can 32766 octets.
   perlre length limit
   http://stackoverflow.com/questions/4592467/perlre-length-limit
 
+Everything in this world has limits. If you use perl 5.10 or later, or perl 5.30
+or later, you can increase those limits. That's all.
+
+=item * chdir
+
+Function chdir() cannot work if path is ended by chr(0x5C).
+
+  This problem is specific to Microsoft Windows. It is not caused by the mb.pm
+  modulino or the perl interpreter.
+  
+  # chdir.pl
+  mkdir((qw( `/ ))[0], 0777);
+  print "got=", chdir((qw( `/ ))[0]), " cwd=", `cd`;
+  
+  C:\HOME>perl5.00503.exe chdir.pl
+    GOOD ==> got=1 cwd=C:\HOME\`/
+  
+  C:\HOME>strawberry-perl-5.8.9.5.exe chdir.pl
+    BAD ==> got=1 cwd=C:\HOME
+
+This is a lost technology in this century.
+
+=item * Look-behind Assertion
+
+The look-behind assertion like (?<=[A-Z]) or (?<![A-Z]) are not prevented from
+matching trail octet of the previous MBCS codepoint.
+
+Please give us your good hack on this.
+
+=back
+
+=head1 BUGS Avoidable by Other Modules
+
+mb.pm modulino does not support the following features. In our experience with
+JPerl, these features are rarely needed. Moreover, if we are going to implement
+these, we will need a large amount of code, and we will need to update it
+frequently. If we are going to implement these, it's better to implement them
+as other modules.
+
+=over 2
+
 =item * fc(), lc(), lcfirst(), uc(), and ucfirst()
 
 fc() not supported. lc(), lcfirst(), uc(), and ucfirst() support US-ASCII only.
 
-=item * character ranges by hyphen
-
-Character ranges by hyphen of regular expression supports US-ASCII only.
-And tr///, y/// doesn't support ranges by hyphen.
-
-=item * cloister of regular expression
-
-The cloister (?s) and (?i) of a regular expression will not be implemented for
-the time being. Cloister (?s) can be substituted with the .(dot) and \N on /s
-modifier.
-
-=item * Empty Variable in Regular Expression
-
-Unlike literal null string, an interpolated variable evaluated to the empty string
-can't use the most recent pattern from a previous successful regular expression.
-
-=item * Limitation of ?? and m??
-
-Multibyte character needs ( ) which is before {n,m}, {n,}, {n}, *, and + in ?? or
-m??. As a result, you need to rewrite a script about $1,$2,$3,... You cannot use
-(?: ), ?, {n,m}?, {n,}?, and {n}? in ?? and m??, because delimiter of m?? is '?'.
-
-=item * Look-behind Assertion
-
-The look-behind assertion like (?<=[A-Z]) is not prevented from matching trail
-octet of the previous MBCS codepoint.
-
-=item * Modifier /a /d /l and /u of Regular Expression
-
-The concept of this software is not to use two or more encoding methods as
-literal string and literal of regexp in one Perl script. Therefore, modifier
-/a, /d, /l, and /u are not supported.
-\d means [0-9] universally.
+  # suggested module name
+  use mb::Casing; # supports for all MBCS, including UTF-8
+  my $lc_string      = mb::Casing::lc($string);
+  my $lcfirst_string = mb::Casing::lcfirst($string);
+  my $uc_string      = mb::Casing::uc($string);
+  my $ucfirst_string = mb::Casing::ucfirst($string);
+  my $fc_string      = mb::Casing::fc($string);
 
 =item * Named Codepoint
 
 A named codepoint, such \N{GREEK SMALL LETTER EPSILON}, \N{greek:epsilon}, or
 \N{epsilon} is not supported.
 
+  # suggested module name
+  use mb::Charnames qw( %N ); # supports for all MBCS, including UTF-8
+  print "$N{'GREEK SMALL LETTER EPSILON'}";
+
 =item * Unicode Properties (aka Codepoint Properties) of Regular Expression
 
 Unicode properties (aka codepoint properties) of regexp are not available.
-Also (?[]) in regexp of Perl 5.18 is not available. There is no plans to currently
+Also (?[]) in regexp of perl 5.18 is not available. There is no plans to currently
 support these.
 
-=item * Delimiter of String and Regexp
+  # suggested module name
+  use mb::RegExp::Properties qw( %p %P ); # supports for all MBCS, including UTF-8
+  $string =~ /$p{Uppercase}/;
 
-qq//, q//, qw//, qx//, qr//, m//, s///, tr///, and y/// can't use a wide codepoint
-as the delimiter.
+This feature (\p{prop} and \P{prop}) is not stable in the Perl specification.
+Thus, this feature is not available in scripts that require long-term maintenance.
 
-=item * \b{...} Boundaries in Regular Expressions
+  For example, [:alpha:]
+  at Perl 5.005   (not supported)
+  at Perl 5.6     \p{IsAlpha}
+  at Perl 5.12.1  \p{PosixAlpha}, and \p{Alpha}
+  at Perl 5.14    \p{X_POSIX_Alpha}, \p{POSIX_Alpha}, \p{XPosixAlpha}, and \p{PosixAlpha}
 
-Following \b{...} available starting in v5.22 are not supported.
+=item * \b{...} \B{...} Boundaries in Regular Expressions
+
+Following \b{...} \B{...} available starting in Perl 5.22 are not supported.
 
   \b{gcb} or \b{g}   Unicode "Grapheme Cluster Boundary"
   \b{sb}             Unicode "Sentence Boundary"
@@ -5281,13 +5397,66 @@ Following \b{...} available starting in v5.22 are not supported.
   \B{sb}             Unicode "Sentence Boundary" doesn't match
   \B{wb}             Unicode "Word Boundary" doesn't match
 
-=item * format
+  # suggested module name
+  use mb::RegExp::Boundaries qw( %b %B ); # supports for all MBCS, including UTF-8
+  $string =~ /$b{wb}(.+)$b{wb}/;
 
-Function "format" can't handle MBCS codepoints unlike JPerl.
+This feature (\b{...} and \B{...}) considered not yet stable in the Perl specification.
 
 =back
 
-=head1 UTF8 Flag Considered Harmful, and Our Goal
+=head1 Other BUGS
+
+The following is a description of the minor incompatibilities. These are not
+likely to be programming constraints.
+
+=over 2
+
+=item * format
+
+Unlike JPerl, mb.pm modulino does not support the format feature. Because it is
+difficult to implement and you can write the same script in other any ways.
+
+=item * Delimiter of String and Regexp
+
+qq//, q//, qw//, qx//, qr//, m//, s///, tr///, and y/// can't use a wide codepoint
+as the delimiter.
+I didn't implement this feature because it's rarely needed.
+
+=item * Limitation of ?? and m??
+
+Multibyte character needs ( ) which is before {n,m}, {n,}, {n}, *, and + in ?? or
+m??. As a result, you need to rewrite a script about $1,$2,$3,... You cannot use
+(?: ), ?, {n,m}?, {n,}?, and {n}? in ?? and m??, because delimiter of m?? is '?'.
+Here's a quote words from Dan Kogai-san.
+"I'm just a programmer, so I can't fix the bug of the spec."
+
+=item * Empty Variable in Regular Expression
+
+An empty literal string as regexp means empty string. Unlike original Perl, if
+'pattern' is an empty string, the last successfully matched regexp is NOT used.
+Similarly, empty string made by interpolated variable means empty string, too.
+
+=item * Modifier /a /d /l and /u of Regular Expression
+
+I have removed these modifiers to remove your headache.
+The concept of this software is not to use two or more encoding methods as
+literal string and literal of regexp in one Perl script. Therefore, modifier
+/a, /d, /l, and /u are not supported.
+\d means [0-9] universally.
+
+=item * cloister of regular expression
+
+The cloister (?i) and (?i:...) of a regular expression on encoding of big5,
+big5hkscs, gb18030, gbk, sjis, and uhc will not be implemented for the time being.
+I didn't implement this feature because it was difficult to implement and less
+necessary. If you're interested in this issue, try challenge it.
+
+=back
+
+=head1 UTF8 Flag Considered Harmful, and Our Goals
+
+Larry Wall must think that "escaping" is the best solution in this case.
 
 P.401 See chapter 15: Unicode
 of ISBN 0-596-00027-8 Programming Perl Third Edition.
@@ -5514,88 +5683,6 @@ This software is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
-=head1 ACKNOWLEDGEMENTS
-
-This software was made referring to software and the document that the
-following hackers or persons had made. 
-I am thankful to all persons.
-
- Rick Yamashita, Shift_JIS
- https://shino.tumblr.com/post/116166805/%E5%B1%B1%E4%B8%8B%E8%89%AF%E8%94%B5%E3%81%A8%E7%94%B3%E3%81%97%E3%81%BE%E3%81%99-%E7%A7%81%E3%81%AF1981%E5%B9%B4%E5%BD%93%E6%99%82us%E3%81%AE%E3%83%9E%E3%82%A4%E3%82%AF%E3%83%AD%E3%82%BD%E3%83%95%E3%83%88%E3%81%A7%E3%82%B7%E3%83%95%E3%83%88jis%E3%81%AE%E3%83%87%E3%82%B6%E3%82%A4%E3%83%B3%E3%82%92%E6%8B%85%E5%BD%93
- http://www.wdic.org/w/WDIC/%E3%82%B7%E3%83%95%E3%83%88JIS
-
- Larry Wall, Perl
- http://www.perl.org/
-
- Kazumasa Utashiro, jcode.pl
- https://metacpan.org/author/UTASHIRO
- ftp://ftp.iij.ad.jp/pub/IIJ/dist/utashiro/perl/
-
- Jeffrey E. F. Friedl, Mastering Regular Expressions
- http://regex.info/
-
- SADAHIRO Tomoyuki, The right way of using Shift_JIS
- http://nomenclator.la.coocan.jp/perl/shiftjis.htm
- https://metacpan.org/author/SADAHIRO
-
- Yukihiro "Matz" Matsumoto, YAPC::Asia2006 Ruby on Perl(s)
- https://archive.org/details/YAPCAsia2006TokyoRubyonPerls
-
- jscripter, For jperl users
- http://text.world.coocan.jp/jperl.html
-
- Bruce., Unicode in Perl
- http://www.rakunet.org/tsnet/TSabc/18/546.html
-
- Hiroaki Izumi, Shouldn't use Perl5.8 / Perl5.10 on the Windows
- https://sites.google.com/site/hiroa63iz/perlwin
-
- Yuki Kimoto, Is it true that you shouldn't use Perl on Windows?
- https://philosophy.perlzemi.com/blog/20200122080040.html
-
- chaichanPaPa, Matching Shift_JIS file name
- http://chaipa.hateblo.jp/entry/20080802/1217660826
-
- SUZUKI Norio, Jperl
- http://www.dennougedougakkai-ndd.org/alte/3tte/jperl-5.005_03@ap522/homepage2.nifty.com..kipp..perl..jperl..index.html
-
- WATANABE Hirofumi, Jperl
- https://www.cpan.org/src/5.0/jperl/
- https://metacpan.org/author/WATANABE
- ftp://ftp.oreilly.co.jp/pcjp98/watanabe/jperlconf.ppt
-
- Chuck Houpt, Michiko Nozu, MacJPerl
- https://habilis.net/macjperl/index.j.html
-
- Kenichi Ishigaki, Pod-PerldocJp, Welcome to modern Perl world
- https://metacpan.org/release/Pod-PerldocJp
- http://gihyo.jp/dev/serial/01/modern-perl/0031
- http://gihyo.jp/dev/serial/01/modern-perl/0032
- http://gihyo.jp/dev/serial/01/modern-perl/0033
-
- Fuji, Goro (gfx), Perl Hackers Hub No.16
- http://gihyo.jp/dev/serial/01/perl-hackers-hub/001602
-
- Dan Kogai, Encode module
- https://metacpan.org/release/Encode
- https://archive.org/details/YAPCAsia2006TokyoPerl58andUnicodeMythsFactsandChanges
- http://yapc.g.hatena.ne.jp/jkondo/
-
- Takahashi Masatuyo, JPerl Wiki
- https://jperl.fandom.com/ja/wiki/JPerl_Wiki
-
- Juerd, Perl Unicode Advice
- https://juerd.nl/site.plp/perluniadvice
-
- daily dayflower, 2008-06-25 perluniadvice
- https://dayflower.hatenablog.com/entry/20080625/1214374293
-
- Unicode issues in Perl
- https://www.i-programmer.info/programming/other-languages/1973-unicode-issues-in-perl.html
-
- Jesse Vincent, Compatibility is a virtue
- https://www.nntp.perl.org/group/perl.perl5.porters/2010/05/msg159825.html
-
 =head1 SEE ALSO
 
  perlunicode, Encode, open, utf8, bytes, Arabic, Big5, Big5HKSCS, CP932::R2,
@@ -5612,10 +5699,6 @@ I am thankful to all persons.
  Latin10, Latin2, Latin3, Latin4, Latin5, Latin6, Latin7, Latin8, Latin9,
  Modern::Open, SJIS2004::R2, Sjis, UTF2, UTF8::R2, Windows1250, Windows1252,
  Windows1254, Windows1257, Windows1258.
-
- Announcing Perl 7
- Jun 24, 2020 by brian d foy
- https://www.perl.com/article/announcing-perl-7/
 
  PERL PUROGURAMINGU
  Larry Wall, Randal L.Schwartz, Yoshiyuki Kondo
@@ -5722,6 +5805,10 @@ I am thankful to all persons.
  ISBN 10:1-56592-409-6
  http://shop.oreilly.com/product/9781565924093.do
 
+ Announcing Perl 7
+ Jun 24, 2020 by brian d foy
+ https://www.perl.com/article/announcing-perl-7/
+
  MODAN Perl NYUMON
  By Daisuke Maki
  2009/2/10
@@ -5736,13 +5823,25 @@ I am thankful to all persons.
  ISBN 10: 1-56592-043-0 | ISBN 13: 9781565920439
  http://shop.oreilly.com/product/9781565920439.do
 
- CJKV Information Processing
- Chinese, Japanese, Korean & Vietnamese Computing
+ CJKV Information Processing Chinese, Japanese, Korean & Vietnamese Computing
  By Ken Lunde
- First Edition  January 1999
+ O'Reilly Media
+ Print: January 1999
+ Ebook: June 2009
  Pages: 1128
- ISBN 10: 1-56592-224-7 | ISBN 13: 9781565922242
+ Print ISBN:978-1-56592-224-2 | ISBN 10:1-56592-224-7
+ Ebook ISBN:978-0-596-55969-4 | ISBN 10:0-596-55969-0
  http://shop.oreilly.com/product/9781565922242.do
+
+ CJKV Information Processing, 2nd Edition
+ By Ken Lunde
+ O'Reilly Media
+ Print: December 2008
+ Ebook: June 2009
+ Pages: 912
+ Print ISBN: 978-0-596-51447-1 | ISBN 10:0-596-51447-6
+ Ebook ISBN: 978-0-596-15782-1 | ISBN 10:0-596-15782-7
+ http://shop.oreilly.com/product/9780596514471.do
 
  DB2 GIJUTSU ZENSHO
  By BM Japan Systems Engineering Co.,Ltd. and IBM Japan, Ltd.
@@ -5790,6 +5889,11 @@ I am thankful to all persons.
  Pages: 172
  T1008901080816 ZASSHI 08901-8
 
+ Shell Script Magazine vol.41
+ 2016 September
+ Pages: 64
+ https://shell-mag.com/
+
  LINUX NIHONGO KANKYO
  By YAMAGATA Hiroo, Stephen J. Turnbull, Craig Oda, Robert J. Bickel
  June, 2000
@@ -5810,50 +5914,6 @@ I am thankful to all persons.
  Pages: 594
  ISBN 10: 0-7356-2262-0 | ISBN 13: 978-0-7356-2262-3
  https://www.abebooks.com/9780735622623/Windows-Command-Line-Administrators-Pocket-Consultant-0735622620/plp
-
- Kaoru Maeda, Perl's history Perl 1,2,3,4
- https://www.slideshare.net/KaoruMaeda/perl-perl-1234
-
- nurse, What is "string"
- https://naruse.hateblo.jp/entries/2014/11/07#1415355181
-
- NISHIO Hirokazu, What's meant "string as a sequence of characters"?
- https://nishiohirokazu.hatenadiary.org/entry/20141107/1415286729
-
- nurse, History of Japanese EUC 22:00
- https://naruse.hateblo.jp/entries/2009/03/08
-
- Mike Whitaker, Perl And Unicode
- https://www.slideshare.net/Penfold/perl-and-unicode
-
- About Windows and Japanese text
- https://blogs.windows.com/japan/2020/02/20/about-windows-and-japanese-text/
-
- About Windows diagnostic data
- https://blogs.windows.com/japan/2019/12/05/about-windows-diagnostic-data/
-
- Ricardo Signes, Perl 5.14 for Pragmatists
- https://www.slideshare.net/rjbs/perl-514-8809465
-
- Ricardo Signes, What's New in Perl? v5.10 - v5.16 #'
- https://www.slideshare.net/rjbs/whats-new-in-perl-v510-v516
-
- YAP(achimon)C::Asia Hachioji 2016 mid in Shinagawa
- Kenichi Ishigaki (@charsbar) July 3, 2016 YAP(achimon)C::Asia Hachioji 2016mid
- https://www.slideshare.net/charsbar/cpan-63708689
-
- Causes and countermeasures for garbled Japanese characters in perl
- https://prozorec.hatenablog.com/entry/2018/03/19/080000
-
- Perl regular expression bug?
- http://moriyoshi.hatenablog.com/entry/20090315/1237103809
- http://moriyoshi.hatenablog.com/entry/20090320/1237562075
-
- About Windows and Japanese text
- https://blogs.windows.com/japan/2020/02/20/about-windows-and-japanese-text/
-
- About Windows diagnostic data
- https://blogs.windows.com/japan/2019/12/05/about-windows-diagnostic-data/
 
  CPAN Directory INABA Hitoshi
  https://metacpan.org/author/INA
@@ -5901,5 +5961,141 @@ I am thankful to all persons.
  https://zh-classical.wikipedia.org/wiki/%E4%B8%83%E5%A4%95
  https://zh-yue.wikipedia.org/wiki/%E4%B8%83%E5%A7%90%E8%AA%95
  https://zh.wikipedia.org/wiki/%E4%B8%83%E5%A4%95
+
+=head1 ACKNOWLEDGEMENTS
+
+This software was made referring to software and the document that the
+following hackers or persons had made. 
+I am thankful to all persons.
+
+ Larry Wall, Perl
+ http://www.perl.org/
+
+ Jesse Vincent, Compatibility is a virtue
+ https://www.nntp.perl.org/group/perl.perl5.porters/2010/05/msg159825.html
+
+ Kazumasa Utashiro, jcode.pl: Perl library for Japanese character code conversion, Kazumasa Utashiro
+ https://metacpan.org/author/UTASHIRO
+ ftp://ftp.iij.ad.jp/pub/IIJ/dist/utashiro/perl/
+ http://web.archive.org/web/20090608090304/http://srekcah.org/jcode/
+ ftp://ftp.oreilly.co.jp/pcjp98/utashiro/
+ http://mail.pm.org/pipermail/tokyo-pm/2002-March/001319.html
+ https://twitter.com/uta46/status/11578906320
+
+ Jeffrey E. F. Friedl, Mastering Regular Expressions
+ http://regex.info/
+
+ SADAHIRO Tomoyuki, Handling of Shift-JIS text correctly using bare Perl
+ http://nomenclator.la.coocan.jp/perl/shiftjis.htm
+ https://metacpan.org/author/SADAHIRO
+
+ Yukihiro "Matz" Matsumoto, YAPC::Asia2006 Ruby on Perl(s)
+ https://archive.org/details/YAPCAsia2006TokyoRubyonPerls
+
+ jscripter, For jperl users
+ http://text.world.coocan.jp/jperl.html
+
+ Bruce., Unicode in Perl
+ http://www.rakunet.org/tsnet/TSabc/18/546.html
+
+ Hiroaki Izumi, Cannot use Perl5.8/5.10 on Windows ?
+ https://sites.google.com/site/hiroa63iz/perlwin
+
+ Yuki Kimoto, Is it true that cannot use Perl5.8/5.10 on Windows ?
+ https://philosophy.perlzemi.com/blog/20200122080040.html
+
+ chaichanPaPa, Matching Shift_JIS file name
+ http://chaipa.hateblo.jp/entry/20080802/1217660826
+
+ SUZUKI Norio, Jperl
+ http://www.dennougedougakkai-ndd.org/alte/3tte/jperl-5.005_03@ap522/homepage2.nifty.com..kipp..perl..jperl..index.html
+
+ WATANABE Hirofumi, Jperl
+ https://www.cpan.org/src/5.0/jperl/
+ https://metacpan.org/author/WATANABE
+ ftp://ftp.oreilly.co.jp/pcjp98/watanabe/jperlconf.ppt
+
+ Chuck Houpt, Michiko Nozu, MacJPerl
+ https://habilis.net/macjperl/index.j.html
+
+ Kenichi Ishigaki, 31st about encoding; To JPerl users as old men
+ https://gihyo.jp/dev/serial/01/modern-perl/0031
+
+ Fuji, Goro (gfx), Perl Hackers Hub No.16
+ http://gihyo.jp/dev/serial/01/perl-hackers-hub/001602
+
+ Dan Kogai, Encode module
+ https://metacpan.org/release/Encode
+ https://archive.org/details/YAPCAsia2006TokyoPerl58andUnicodeMythsFactsandChanges
+ http://yapc.g.hatena.ne.jp/jkondo/
+
+ Takahashi Masatuyo, JPerl Wiki
+ https://jperl.fandom.com/ja/wiki/JPerl_Wiki
+
+ Juerd, Perl Unicode Advice
+ https://juerd.nl/site.plp/perluniadvice
+
+ daily dayflower, 2008-06-25 perluniadvice
+ https://dayflower.hatenablog.com/entry/20080625/1214374293
+
+ Unicode issues in Perl
+ https://www.i-programmer.info/programming/other-languages/1973-unicode-issues-in-perl.html
+
+ numa's Diary: CSI and UCS Normalization
+ https://srad.jp/~numa/journal/580177/
+
+ Unicode Processing on Windows with Perl
+ http://blog.livedoor.jp/numa2666/archives/52344850.html
+ http://blog.livedoor.jp/numa2666/archives/52344851.html
+ http://blog.livedoor.jp/numa2666/archives/52344852.html
+ http://blog.livedoor.jp/numa2666/archives/52344853.html
+ http://blog.livedoor.jp/numa2666/archives/52344854.html
+ http://blog.livedoor.jp/numa2666/archives/52344855.html
+ http://blog.livedoor.jp/numa2666/archives/52344856.html
+
+ Kaoru Maeda, Perl's history Perl 1,2,3,4
+ https://www.slideshare.net/KaoruMaeda/perl-perl-1234
+
+ nurse, What is "string"
+ https://naruse.hateblo.jp/entries/2014/11/07#1415355181
+
+ NISHIO Hirokazu, What's meant "string as a sequence of characters"?
+ https://nishiohirokazu.hatenadiary.org/entry/20141107/1415286729
+
+ Rick Yamashita, Shift_JIS
+ https://shino.tumblr.com/post/116166805/%E5%B1%B1%E4%B8%8B%E8%89%AF%E8%94%B5%E3%81%A8%E7%94%B3%E3%81%97%E3%81%BE%E3%81%99-%E7%A7%81%E3%81%AF1981%E5%B9%B4%E5%BD%93%E6%99%82us%E3%81%AE%E3%83%9E%E3%82%A4%E3%82%AF%E3%83%AD%E3%82%BD%E3%83%95%E3%83%88%E3%81%A7%E3%82%B7%E3%83%95%E3%83%88jis%E3%81%AE%E3%83%87%E3%82%B6%E3%82%A4%E3%83%B3%E3%82%92%E6%8B%85%E5%BD%93
+ http://www.wdic.org/w/WDIC/%E3%82%B7%E3%83%95%E3%83%88JIS
+
+ nurse, History of Japanese EUC 22:00
+ https://naruse.hateblo.jp/entries/2009/03/08
+
+ Mike Whitaker, Perl And Unicode
+ https://www.slideshare.net/Penfold/perl-and-unicode
+
+ Ricardo Signes, Perl 5.14 for Pragmatists
+ https://www.slideshare.net/rjbs/perl-514-8809465
+
+ Ricardo Signes, What's New in Perl? v5.10 - v5.16 #'
+ https://www.slideshare.net/rjbs/whats-new-in-perl-v510-v516
+
+ YAP(achimon)C::Asia Hachioji 2016 mid in Shinagawa
+ Kenichi Ishigaki (@charsbar) July 3, 2016 YAP(achimon)C::Asia Hachioji 2016mid
+ https://www.slideshare.net/charsbar/cpan-63708689
+
+ Causes and countermeasures for garbled Japanese characters in perl
+ https://prozorec.hatenablog.com/entry/2018/03/19/080000
+
+ Perl regular expression bug?
+ http://moriyoshi.hatenablog.com/entry/20090315/1237103809
+ http://moriyoshi.hatenablog.com/entry/20090320/1237562075
+
+ Impressions of talking of Larry Wall at LL Future
+ https://hnw.hatenablog.com/entry/20080903
+
+ About Windows and Japanese text
+ https://blogs.windows.com/japan/2020/02/20/about-windows-and-japanese-text/
+
+ About Windows diagnostic data
+ https://blogs.windows.com/japan/2019/12/05/about-windows-diagnostic-data/
 
 =cut

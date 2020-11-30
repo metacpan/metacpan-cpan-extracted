@@ -10,6 +10,7 @@ lib/RxPerl/ConnectableObservable.pm
 lib/RxPerl/Observable.pm
 lib/RxPerl/Operators/Creation.pm
 lib/RxPerl/Operators/Pipeable.pm
+lib/RxPerl/ReplaySubject.pm
 lib/RxPerl/Subject.pm
 lib/RxPerl/Subscriber.pm
 lib/RxPerl/Subscription.pm

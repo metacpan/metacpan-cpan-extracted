@@ -205,6 +205,14 @@ $state->reset;
 
    is( $prop,  PROP_TITLE, '$prop after settermprop' );
    is( $value, "Title",    '$value after settermprop' );
+
+   undef $value;
+
+   $vt->input_write( "\e]2;Another" );
+   ok( !defined $value, '$value not yet set after split write' );
+
+   $vt->input_write( " Title\e\\" );
+   is( $value, "Another Title", '$value after second split write' );
 }
 
 # bell

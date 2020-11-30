@@ -156,7 +156,7 @@ static inline ptime_t _calc_rule_epoch (int is_leap, const datetime* curdate, da
     return _timegmll(&border);
 }
 
-bool anytime (ptime_t epoch, datetime* result, const Timezone* zone) {
+bool anytime (ptime_t epoch, datetime* result, const TimezoneSP& zone) {
     bool r = is_epoch_valid(epoch);
     if (r) {
         if (epoch < zone->ltrans.start) {
@@ -195,7 +195,7 @@ bool anytime (ptime_t epoch, datetime* result, const Timezone* zone) {
     return r;
 }
 
-ptime_t timeany (datetime* date, const Timezone* zone) {
+ptime_t timeany (datetime* date, const TimezoneSP& zone) {
 #   define PTIME_ANY_NORMALIZE
     if (date->isdst > 0) {
 #       undef PTIME_AMBIGUOUS_LATER
@@ -207,7 +207,7 @@ ptime_t timeany (datetime* date, const Timezone* zone) {
 #   undef PTIME_ANY_NORMALIZE
 }
 
-ptime_t timeanyl (datetime* date, const Timezone* zone) {
+ptime_t timeanyl (datetime* date, const TimezoneSP& zone) {
     if (date->isdst > 0) {
 #       undef PTIME_AMBIGUOUS_LATER
 #       include <panda/time/timeany_impl.icc>

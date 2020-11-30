@@ -11,7 +11,6 @@ my @files = (
     'lib/Package/Stash.pm',
     'lib/Package/Stash/Conflicts.pm',
     'lib/Package/Stash/PP.pm',
-    't/00-compile.t',
     't/00-report-prereqs.dd',
     't/00-report-prereqs.t',
     't/addsub.t',
@@ -41,19 +40,23 @@ my @files = (
     't/synopsis.t',
     't/warnings-taint.t',
     't/warnings.t',
+    't/zzz-check-breaks.t',
+    'xt/author/00-compile.t',
     'xt/author/changes_has_content.t',
+    'xt/author/distmeta.t',
     'xt/author/eol.t',
     'xt/author/kwalitee.t',
     'xt/author/leaks-debug.t',
     'xt/author/leaks.t',
+    'xt/author/minimum-version.t',
     'xt/author/mojibake.t',
     'xt/author/no-tabs.t',
     'xt/author/pod-no404s.t',
+    'xt/author/pod-spell.t',
     'xt/author/pod-syntax.t',
     'xt/author/portability.t',
     'xt/release/changes_has_content.t',
-    'xt/release/cpan-changes.t',
-    'xt/release/distmeta.t'
+    'xt/release/cpan-changes.t'
 );
 
 notabs_ok($_) foreach @files;

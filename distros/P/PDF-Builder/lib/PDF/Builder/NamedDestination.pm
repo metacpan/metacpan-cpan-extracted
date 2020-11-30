@@ -5,8 +5,8 @@ use base 'PDF::Builder::Basic::PDF::Dict';
 use strict;
 no warnings qw[ recursion uninitialized ];
 
-our $VERSION = '3.019'; # VERSION
-my $LAST_UPDATE = '3.017'; # manually update whenever code is changed
+our $VERSION = '3.020'; # VERSION
+my $LAST_UPDATE = '3.020'; # manually update whenever code is changed
 
 # TBD: do -rect and -border apply to Named Destinations (link, url, file)? 
 #      There is nothing to implement these options. Perhaps the code was copied 
@@ -115,17 +115,7 @@ sub file {
 Defines the destination as a PDF-file with filepath C<$pdffile>, on page
 C<$pagenum>, and options %opts (same as dest()).
 
-The old name, I<pdfile>, is still available but is B<deprecated> and will be
-removed at some time in the future.
-
 =cut
-
-# to be removed no earlier than October, 2020
-sub pdfile {
-    my ($self, $url, $pnum, %opts) = @_;
-    warn "use pdf_file() method instead of pdfile()";
-    return $self->pdf_file($url, $pnum, %opts);
-}
 
 sub pdf_file {
     my ($self, $url, $pnum, %opts) = @_;

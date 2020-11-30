@@ -1,4 +1,3 @@
-.gdb_history
 Backtrace.xs
 BacktraceInfo.xsi
 Changes
@@ -17,13 +16,6 @@ MANIFEST			This list of files
 misc/devel-trace.pl
 misc/exception-bactrace.pl
 misc/named-subs.pl
-src/panda/dl.h
-src/panda/dwarf.cc
-src/panda/dwarf.h
-src/panda/glibc-dl.cc
-src/panda/macos-dl.cc
-src/panda/SharedObjectInfo.h
-src/panda/win-dl.cc
 src/xs/backtrace.cc
 src/xs/backtrace.h
 src/xs/DualTrace.cc

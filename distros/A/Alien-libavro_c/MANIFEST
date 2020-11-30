@@ -1,0 +1,27 @@
+Changes
+lib/Alien/libavro_c.pm
+Makefile.PL
+MANIFEST			This list of files
+README.md
+t/00-load.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+alienfile
+ignore.txt
+patch/0001-lang-c-pkg-config-put-lsnappy-ljansson-etc-in-Libs.p.patch
+patch/0002-lang-c-cmake-option-to-skip-building-the-tests.patch
+patch/0003-lang-c-snappy-has-no-pkg-config-entry.patch
+patch/0004-lang-c-fix-pkg-config-Requires.patch
+patch/0005-lang-c-include-jansson-in-the-pkg-config-Requires-se.patch
+patch/0006-lang-c-fix-the-pkg-config-name-for-jansson-no-lib-pr.patch
+patch/0007-prefer-CXX-for-linking-due-to-snappy.patch
+patch/0001-lang-c-pkg-config-put-lsnappy-ljansson-etc-in-Libs.p.patch
+patch/0002-lang-c-cmake-option-to-skip-building-the-tests.patch
+patch/0003-lang-c-snappy-has-no-pkg-config-entry.patch
+patch/0004-lang-c-fix-pkg-config-Requires.patch
+patch/0005-lang-c-include-jansson-in-the-pkg-config-Requires-se.patch
+patch/0006-lang-c-fix-the-pkg-config-name-for-jansson-no-lib-pr.patch
+patch/0007-prefer-CXX-for-linking-due-to-snappy.patch
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

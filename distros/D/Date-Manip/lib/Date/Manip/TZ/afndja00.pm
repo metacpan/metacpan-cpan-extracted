@@ -6,9 +6,9 @@ Date::Manip::TZ::afndja00;
 
 # This file was automatically generated.  Any changes to this file will
 # be lost the next time 'tzdata' is run.
-#    Generated on: Mon Jun  1 07:57:12 EDT 2020
-#    Data version: tzdata2020a
-#    Code version: tzcode2020a
+#    Generated on: Mon Nov 30 13:52:21 EST 2020
+#    Data version: tzdata2020d
+#    Code version: tzcode2020d
 
 # This module contains data from the zoneinfo time zone database.  The original
 # data was obtained from the URL:
@@ -25,7 +25,7 @@ END {
 }
 
 our ($VERSION);
-$VERSION='6.82';
+$VERSION='6.83';
 END { undef $VERSION; }
 
 %Dates         = (

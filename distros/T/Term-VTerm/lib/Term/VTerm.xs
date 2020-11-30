@@ -1,7 +1,7 @@
 /*  You may distribute under the terms of either the GNU General Public License
  *  or the Artistic License (the same terms as Perl itself)
  *
- *  (C) Paul Evans, 2014 -- leonerd@leonerd.org.uk
+ *  (C) Paul Evans, 2014-2020 -- leonerd@leonerd.org.uk
  */
 
 
@@ -33,6 +33,8 @@ typedef struct Term__VTerm {
     CV *dcs;
     CV *resize;
   } parser_cb;
+
+  SV *strbuf;
 
 } *Term__VTerm;
 
@@ -96,6 +98,9 @@ static int dmd_helper_vterm(pTHX_ const SV *sv)
     ret += DMD_ANNOTATE_SV(sv, (const SV *)self->parser_cb.dcs, "the 'dcs' parser callback");
   if(self->parser_cb.resize)
     ret += DMD_ANNOTATE_SV(sv, (const SV *)self->parser_cb.resize, "the 'resize' parser callback");
+
+  if(self->strbuf)
+    ret += DMD_ANNOTATE_SV(sv, self->strbuf, "the temporary string buffer");
 
   return ret;
 }
@@ -248,10 +253,11 @@ static SV *newSVvalue(VTermValue *val, VTermValueType type)
       return val->boolean ? &PL_sv_yes : &PL_sv_no;
     case VTERM_VALUETYPE_INT:
       return newSViv(val->number);
-    case VTERM_VALUETYPE_STRING:
-      return newSVpv(val->string, 0);
     case VTERM_VALUETYPE_COLOR:
       return newSVcolor(&val->color);
+
+    case VTERM_VALUETYPE_STRING:
+      croak("ARGH should never invoke newSVvalue() on type=VTERM_VALUETYPE_STRING");
   }
 }
 
@@ -383,23 +389,29 @@ static int parser_csi(const char *leader, const long args[], int argcount, const
   return 1;
 }
 
-static int parser_osc(const char *command, size_t cmdlen, void *user)
+static int parser_osc(int command, VTermStringFragment frag, void *user)
 {
   dSP;
   Term__VTerm self = user;
   CV *cb = self->parser_cb.osc;
 
-  SV *str = newSVpv(command, cmdlen);
-
   if(!cb)
     return 0;
+
+  if(frag.initial)
+    SvCUR_set(self->strbuf, 0);
+  if(frag.len)
+    sv_catpvn(self->strbuf, frag.str, frag.len);
+  if(!frag.final)
+    return 1;
 
   ENTER;
   SAVETMPS;
 
   PUSHMARK(SP);
-  EXTEND(SP, 1);
-  mPUSHs(str);
+  EXTEND(SP, 2);
+  mPUSHi(command);
+  PUSHs(self->strbuf);
   PUTBACK;
 
   call_sv((SV*)cb, G_VOID);
@@ -407,26 +419,32 @@ static int parser_osc(const char *command, size_t cmdlen, void *user)
   FREETMPS;
   LEAVE;
 
-  return cmdlen;
+  return 1;
 }
 
-static int parser_dcs(const char *command, size_t cmdlen, void *user)
+static int parser_dcs(const char *command, size_t commandlen, VTermStringFragment frag, void *user)
 {
   dSP;
   Term__VTerm self = user;
   CV *cb = self->parser_cb.dcs;
 
-  SV *str = newSVpv(command, cmdlen);
-
   if(!cb)
     return 0;
+
+  if(frag.initial)
+    SvCUR_set(self->strbuf, 0);
+  if(frag.len)
+    sv_catpvn(self->strbuf, frag.str, frag.len);
+  if(!frag.final)
+    return 1;
 
   ENTER;
   SAVETMPS;
 
   PUSHMARK(SP);
-  EXTEND(SP, 1);
-  mPUSHs(str);
+  EXTEND(SP, 2);
+  mPUSHp(command, commandlen);
+  PUSHs(self->strbuf);
   PUTBACK;
 
   call_sv((SV*)cb, G_VOID);
@@ -434,7 +452,7 @@ static int parser_dcs(const char *command, size_t cmdlen, void *user)
   FREETMPS;
   LEAVE;
 
-  return cmdlen;
+  return 1;
 }
 
 static int parser_resize(int rows, int cols, void *user)
@@ -621,6 +639,8 @@ static int state_initpen(void *user)
   ENTER;
   SAVETMPS;
 
+  PUSHMARK(SP);
+
   call_sv((SV*)cb, G_VOID);
 
   FREETMPS;
@@ -637,6 +657,8 @@ static int state_setpenattr(VTermAttr attr, VTermValue *val, void *user)
 
   if(!cb)
     return 0;
+
+  /* pen attrs are never VTERM_VALUETYPE_STRING */
 
   ENTER;
   SAVETMPS;
@@ -660,9 +682,22 @@ static int state_settermprop(VTermProp prop, VTermValue *val, void *user)
   dSP;
   Term__VTerm__State self = user;
   CV *cb = self->cb.settermprop;
+  VTermValueType type = vterm_get_prop_type(prop);
+  SV *strbuf;
 
   if(!cb)
     return 0;
+
+  if(type == VTERM_VALUETYPE_STRING) {
+    strbuf = (INT2PTR(Term__VTerm, SvIV(SvRV(self->vterm))))->strbuf;
+
+    if(val->string.initial)
+      SvCUR_set(strbuf, 0);
+    if(val->string.len)
+      sv_catpvn(strbuf, val->string.str, val->string.len);
+    if(!val->string.final)
+      return 1;
+  }
 
   ENTER;
   SAVETMPS;
@@ -670,7 +705,10 @@ static int state_settermprop(VTermProp prop, VTermValue *val, void *user)
   PUSHMARK(SP);
   EXTEND(SP, 2);
   mPUSHi(prop);
-  mPUSHs(newSVvalue(val, vterm_get_prop_type(prop)));
+  if(type == VTERM_VALUETYPE_STRING)
+    PUSHs(strbuf);
+  else
+    mPUSHs(newSVvalue(val, type));
   PUTBACK;
 
   call_sv((SV*)cb, G_VOID);
@@ -692,6 +730,8 @@ static int state_bell(void *user)
 
   ENTER;
   SAVETMPS;
+
+  PUSHMARK(SP);
 
   call_sv((SV*)cb, G_VOID);
 
@@ -842,9 +882,22 @@ static int screen_settermprop(VTermProp prop, VTermValue *val, void *user)
   dSP;
   Term__VTerm__Screen self = user;
   CV *cb = self->cb.settermprop;
+  VTermValueType type = vterm_get_prop_type(prop);
+  SV *strbuf;
 
   if(!cb)
     return 0;
+
+  if(type == VTERM_VALUETYPE_STRING) {
+    strbuf = (INT2PTR(Term__VTerm, SvIV(SvRV(self->vterm))))->strbuf;
+
+    if(val->string.initial)
+      SvCUR_set(strbuf, 0);
+    if(val->string.len)
+      sv_catpvn(strbuf, val->string.str, val->string.len);
+    if(!val->string.final)
+      return 1;
+  }
 
   ENTER;
   SAVETMPS;
@@ -852,7 +905,10 @@ static int screen_settermprop(VTermProp prop, VTermValue *val, void *user)
   PUSHMARK(SP);
   EXTEND(SP, 2);
   mPUSHi(prop);
-  mPUSHs(newSVvalue(val, vterm_get_prop_type(prop)));
+  if(type == VTERM_VALUETYPE_STRING)
+    PUSHs(strbuf);
+  else
+    mPUSHs(newSVvalue(val, type));
   PUTBACK;
 
   call_sv((SV*)cb, G_VOID);
@@ -874,6 +930,8 @@ static int screen_bell(void *user)
 
   ENTER;
   SAVETMPS;
+
+  PUSHMARK(SP);
 
   call_sv((SV*)cb, G_VOID);
 
@@ -1001,6 +1059,9 @@ _new(package,rows,cols)
     Newxz(RETVAL, 1, struct Term__VTerm);
     RETVAL->vt = vt;
 
+    RETVAL->strbuf = newSV(256);
+    SvPOK_on(RETVAL->strbuf);
+
   OUTPUT:
     RETVAL
 
@@ -1017,6 +1078,8 @@ DESTROY(self)
     FREE_CB(parser_cb.osc);
     FREE_CB(parser_cb.dcs);
     FREE_CB(parser_cb.resize);
+
+    SvREFCNT_dec(self->strbuf);
 
     vterm_free(self->vt);
     Safefree(self);

@@ -21,6 +21,6 @@ requires:
   Try::Tiny: '0'
 resources:
   repository: git://github.com/domm/Bread-Runner.git
-version: '0.902'
+version: '0.903'
 x_generated_by_perl: v5.24.0
 x_serialization_backend: 'YAML::Tiny version 1.69'

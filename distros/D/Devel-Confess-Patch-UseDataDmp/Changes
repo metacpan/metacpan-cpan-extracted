@@ -1,12 +1,19 @@
-Revision history for Devel-Confess-Patch-UseDataDmp
+0.030   2020-06-19  Released-By: PERLANCAR; Urgency: low
 
-0.02    2015-12-31 (PERLANCAR)
+	- No functional changes.
+
+	- [doc] Mention Data::Dmp.
+
+        - Update prereqs.
+
+
+0.02    2015-12-31  Released-By: PERLANCAR
 
 	- Fix example (-d:Confess is not used because it'll cause
 	  Devel::Confess loaded before the patch module and Module::Patch
 	  complaining).
 
 
-0.01    2015-12-31 (PERLANCAR)
+0.01    2015-12-31  Released-By: PERLANCAR
 
         - First release.

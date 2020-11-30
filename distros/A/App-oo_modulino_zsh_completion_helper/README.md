@@ -4,7 +4,7 @@ App::oo\_modulino\_zsh\_completion\_helper - provides zsh completion for OO-Modu
 
 # SYNOPSIS
 
-When you install this module and \_perl\_modulino zsh completer,
+When you install this module and \_perl\_oo\_modulino zsh completer,
 
     ./Your_OO_Modulino.pm <TAB>
 
@@ -19,7 +19,7 @@ inherited methods/options are included too.
 
 # DESCRIPTION
 
-App::oo\_modulino\_zsh\_completion\_helper provides underlying implementation of \`\_perl\_modulino\` zsh completer.
+App::oo\_modulino\_zsh\_completion\_helper provides underlying implementation of \`\_perl\_oo\_modulino\` zsh completer.
 
 # LICENSE
 

@@ -8,14 +8,14 @@ my $build = Module::Build::Using::PkgConfig->new(
    configure_requires => {
       'ExtUtils::CChecker' => '0.05',
       'ExtUtils::PkgConfig' => 0,
-      'Module::Build' => '0.88', # test_requires
+      'Module::Build' => '0.4004', # test_requires
       'Module::Build::Using::PkgConfig' => 0,
    },
    requires => {
       'Exporter' => '5.57',
    },
    test_requires => {
-      'Test::More' => 0,
+      'Test::More' => '0.88', # done_testing
       'Test::Identity' => 0,
       'Test::Refcount' => 0,
    },

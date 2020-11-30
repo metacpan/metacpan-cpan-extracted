@@ -1,0 +1,33 @@
+---
+abstract: 'Miscellaneous utilities for Linux.'
+author:
+  - 'John Gravatt <gravattj@cpan.org>'
+build_requires:
+  Test::More: '0'
+  Util::Medley::File: '0'
+  Util::Medley::Spawn: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Linux-Utils
+requires:
+  Alt::Devel::CallParser::ButWorking: '0'
+  Data::Printer: '0'
+  English: '0'
+  Kavorka: '0'
+  Modern::Perl: '0'
+  Moose: '0'
+  Util::Medley: '0.053'
+  Util::Medley::Roles::Attributes::Spawn: '0'
+  Util::Medley::Roles::Attributes::String: '0'
+  namespace::autoclean: '0'
+resources:
+  repository: https://github.com/gravattj/Linux-Utils-perl.git
+version: '0.002'
+x_generated_by_perl: v5.16.3
+x_serialization_backend: 'YAML::Tiny version 1.73'

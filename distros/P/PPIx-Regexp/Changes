@@ -1,3 +1,13 @@
+0.076		2020-11-28	T. R. Wyant
+    Correct (I hope) detection of \K in nested assertions.
+
+    Variable-length look-behind is version 5.029009.
+    
+    Look-behinds quantified longer than 255 characters are an error, and
+    are made into unknown tokens or structures. I ended up refactoring
+    the PPIx::Regexp::Token::GroupType class initialization for the
+    latter two changes.
+
 0.075		2020-10-08	T. R. Wyant
     Warn on first use of attribute 'postderef'.
 

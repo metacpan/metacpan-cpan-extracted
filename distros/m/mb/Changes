@@ -1,5 +1,13 @@
 Revision history for this software.
 
+0.12  2020-11-28 00:00:00
+  - was changed interface of mb::_open_w()
+  - supports mb::get_OSNAME()
+  - supports mb::get_script_encoding()
+  - supports autovivification of file handle only on perl 5.005
+  - supports mb::_chdir() with no parameters
+  - created by INABA Hitoshi
+
 0.11  2020-09-05 00:00:00
   - INCOMPATIBLE CHANGE: transpiles eval 'string' to eval 'string' (NOT mb::eval 'string')
   - INCOMPATIBLE CHANGE: transpiles do 'file' to do 'file' (NOT mb::do 'string')

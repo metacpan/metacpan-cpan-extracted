@@ -71,24 +71,24 @@ static string readfile (const string_view& path) {
 
 namespace panda { namespace time {
 
-using Timezones = panda::unordered_string_map<string, const Timezone*>;
+using Timezones = panda::unordered_string_map<string, TimezoneSP>;
 
-static string          _tzdir;
-static string          _tzsysdir = __PTIME_TZDIR;
-static Timezones       _tzcache;
-static const Timezone* _localzone;
+static string     _tzdir;
+static string     _tzsysdir = __PTIME_TZDIR;
+static Timezones  _tzcache;
+static TimezoneSP _localzone;
 
-static const Timezone* _tzget (const string_view& zname);
+static TimezoneSP _tzget (const string_view& zname);
 
 static bool _virtual_zone     (const string_view& zonename, Timezone* zone);
 static void _virtual_fallback (Timezone* zone);
 
-const Timezone* tzlocal () {
+const TimezoneSP& tzlocal () {
     if (!_localzone) tzset();
     return _localzone;
 }
 
-const Timezone* tzget (const string_view& zonename) {
+TimezoneSP tzget (const string_view& zonename) {
     if (!zonename.length()) return tzlocal();
     auto it = _tzcache.find(zonename);
     if (it != _tzcache.cend()) return it->second;
@@ -98,7 +98,8 @@ const Timezone* tzget (const string_view& zonename) {
     return zone;
 }
 
-void tzset (const Timezone* zone) {
+void tzset (const TimezoneSP& _zone) {
+    TimezoneSP zone = _zone;
     if (!zone) {
         const char* s = getenv("TZ");
         string_view etzname = s ? s : "";
@@ -129,10 +130,11 @@ static string get_localzone_name () {
     return string(GMT_FALLBACK);
 }
 
-static const Timezone* _tzget (const string_view& zname) {
+static TimezoneSP _tzget (const string_view& zname) {
     auto zonename = string(zname);
     //printf("ptime: tzget for zone %s\n", zonename);
     auto zone = new Timezone();
+    TimezoneSP ret = zone;
     zone->is_local = false;
     
     if (!zonename.length()) {
@@ -144,7 +146,7 @@ static const Timezone* _tzget (const string_view& zname) {
     if (zonename.length() > TZNAME_MAX) {
         //fprintf(stderr, "ptime: tzrule too long\n");
         _virtual_fallback(zone);
-        return zone;
+        return ret;
     }
 
     string filename;
@@ -157,7 +159,7 @@ static const Timezone* _tzget (const string_view& zname) {
         if (!dir) {
             fprintf(stderr, "ptime: tzget: this OS has no olson timezone files, you must explicitly set tzdir(DIR)\n");
             _virtual_fallback(zone);
-            return zone;
+            return ret;
         }
         zone->name = zonename;
         filename = dir + '/' + zonename;
@@ -170,7 +172,7 @@ static const Timezone* _tzget (const string_view& zname) {
         if (!_virtual_zone(zonename, zone)) {
             //fprintf(stderr, "ptime: parsing rule '%s' failed\n", zonename);
             _virtual_fallback(zone);
-            return zone;
+            return ret;
         }
     }
     else { // tz file
@@ -179,11 +181,11 @@ static const Timezone* _tzget (const string_view& zname) {
         if (!result) {
             //fprintf(stderr, "ptime: parsing file '%s' failed\n", filename.c_str());
             _virtual_fallback(zone);
-            return zone;
+            return ret;
         }
     }
     
-    return zone;
+    return ret;
 }
 
 static void _virtual_fallback (Timezone* zone) {

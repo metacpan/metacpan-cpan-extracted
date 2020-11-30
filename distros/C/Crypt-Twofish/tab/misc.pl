@@ -1,6 +1,5 @@
 #!/usr/bin/perl -w
-# $Id: misc.pl,v 1.2 2001/02/12 23:32:27 ams Exp $
-# Copyright 2001 Abhijit Menon-Sen <ams@wiw.org>
+# Copyright 2001 Abhijit Menon-Sen <ams@toroid.org>
 
 use strict;
 

@@ -24,13 +24,13 @@ The FOLIO Z39.50 server is [a FOLIO module](https://github.com/folio-org/Net-Z39
 
 The server is implemented as a Perl module, [`Net::Z3950::FOLIO`](https://metacpan.org/pod/Net::Z3950::FOLIO), which is available on CPAN (the Perl software repository) like any other Perl module. (Perl was chosen because [the `Net::Z3950::SimpleServer` module](https://metacpan.org/pod/Net::Z3950::SimpleServer) makes it so much easier to implement a Z39.50 server than in other languages.)
 
-The behaviour of the Z39.50 server is driven in part by [a configuration file](from-pod/Net-Z3950-FOLIO-Config.md). The server is distributed with [a standard configuration](../etc/config.json) which specifies things like how to determine what FOLIO servive to access, where to find the GraphQL query that extracts holdings information, and how Z39.50 queries are mapped into the CQL queries that FOLIO uses. It is possible to run the server with a different configuration, but this document describes capabilities such as the supported searches under the assumption that the standard configuration is in user. Standard disclaimers apply.
+The behaviour of the Z39.50 server is driven in part by [a configuration file](from-pod/Net-Z3950-FOLIO-Config.md). The server is distributed with [a standard configuration](../etc/config.json) which specifies things like how to determine what FOLIO service to access, where to find the GraphQL query that extracts holdings information, and how Z39.50 queries are mapped into the CQL queries that FOLIO uses. It is possible to run the server with a different configuration, but this document describes capabilities such as the supported searches under the assumption that the standard configuration is in use. Standard disclaimers apply.
 
 
 
 ## Server deployment
 
-Since the FOLIO Z39.50 server is strictly a client to the rest of FOLIO (it uses `mod-graphql` and `mod-source-record-storage`), it does not need to be installed as a part of FOLIO itself, and can run outside of a FOLIO installation provided it is furnished with the credentials for a user with all necessary permissions. However, it will typically be run as a FOLIO module itself, described by the provided [module descriptor](../ModuleDescriptor.json) and packaged to run as a contained by the provided [Docker file](../Dockerfile) (see [below](#running-under-docker)).
+Since the FOLIO Z39.50 server is strictly a client to the rest of FOLIO (it uses `mod-graphql` and `mod-source-record-storage`), it does not need to be installed as a part of FOLIO itself, and can run outside of a FOLIO installation provided it is furnished with the credentials for a user with all necessary permissions. However, it will typically be run as a FOLIO module itself, described by the provided [module descriptor](../ModuleDescriptor.json) and packaged to run as a container by the provided [Docker file](../Dockerfile) (see [below](#running-under-docker)).
 
 When using the standard configuration file (see above), it is necessary to provide four pieces of information as environment variables:
 
@@ -99,7 +99,7 @@ services are not supported by the underlying SimpleServer library, so there is n
 
 ### Z39.50 authentication
 
-If no default username and password are specified in the server's configuration, or if the user has reason to want to authenticate onto FOLIO as a differet user, these tokens can be provided in the Z39.50 Init request as a single "open" authentication string, separated by a forward slash (`/`). (In the YAZ command-line clientw, this can be done using the command `auth user/pass`. If authentication onto FOLIO is rejected &mdash; because of incorrect tokens or for any other reason &mdash; the Z39.50 server will reject the Init request, with the response including a diagnostic `otherInfo` unit.
+If no default username and password are specified in the server's configuration, or if the user has reason to want to authenticate onto FOLIO as a different user, these tokens can be provided in the Z39.50 Init request as a single "open" authentication string, separated by a forward slash (`/`). (In the YAZ command-line client, this can be done using the command `auth user/pass`. If authentication onto FOLIO is rejected &mdash; because of incorrect tokens or for any other reason &mdash; the Z39.50 server will reject the Init request, with the response including a diagnostic `otherInfo` unit.
 
 Here's how that looks using the YAZ command-line client:
 
@@ -124,9 +124,9 @@ Here's how that looks using the YAZ command-line client:
 	Name   : z2folio gateway/GFS/YAZ
 	Version: 1.2/5.30.3 2af59bc45cf4508d5c84f350ee99804c4354b3b3
 	Options: search present delSet triggerResourceCtrl sort namedResultSets
-	Z> 
+	Z>
 
-Usually, the Z39.50 server will be configured to default to logging in as a specied user (see the discussion of `OKAPI_USER` and `OKAPI_PASSWORD` [above](#server-deployment)).
+Usually, the Z39.50 server will be configured to default to logging in as a specified user (see the discussion of `OKAPI_USER` and `OKAPI_PASSWORD` [above](#server-deployment)).
 
 
 ### Z39.50 searching
@@ -148,6 +148,7 @@ The standard configuration supports searching on the following use attributes (t
 * **1108.** DC-Source. Same as 1019.
 * **1155.** Sources of Data. Same as 1019.
 * **1211.** OCLC Number. **Does not work** with the present inventory module.
+* **9998.** A non-standard access-point used for searching by the barcode of items.
 * **9999.** A special non-standard access-point that searches contributors, title, HRID and subjects. This is similar to the set of fields indexed as "keyword" (access-point 1016), but implemented as a four-way OR, so less efficient (but more inclusive).
 
 When no access-point is specified for a term, that term is searched for in the "keyword" index by default, i.e. finding title, contributors and identifiers.
@@ -178,7 +179,7 @@ The following truncation attributes (type 5) are supported:
 * **2.** Left truncation
 * **3.** Left and right
 * **100.** Do not truncate
-* **101.** Process # in search trm
+* **101.** Process # in search term
 * **104.** Z39.58 (CCL-style masking)
 
 The following completeness attributes (type 6) are supported:
@@ -211,24 +212,24 @@ The Z39.50 Sort service is supported as follows:
 * Only one result-set can be sorted at once, i.e. the service cannot be used to merge multiple result sets.
 * "Generic" sorting is supported; "database-specific" sorting is not.
 * Within each sort key:
-  * Sort-fields can be specified as a sort-attribute of type 1 (use attribute) with value coresponding to the field to sort on. These values are the same as for use attributes when searching.
+  * Sort-fields can be specified as a sort-attribute of type 1 (use attribute) with value corresponding to the field to sort on. These values are the same as for use attributes when searching.
   * Relations 0 (ascending) and 1 (descending) are supported. Relations 3 (ascending by frequency) and 4 (descending by frequency) are not.
   * Cases 0 (case-sensitive) and 1 (case-insensitive) are supported.
   * Missing-value specifications 1 (fail) and 2 (null value) are supported. Value 3 (treat missing as a specified value) is not.
 
 So, for example, the YAZ command-line client comment `sort 1=4 s< 1=21 i>` will sort first by title, case-insensitively in ascending order, then by HRID, case-sensitively in descending order.
 
-**NOTE.** As with searching, "support" here means that the Z39.50 server generates the correct CQL query to express the Z39.50 query using these attributes: the FOLIO back-end does not necessarily support all the CQL queries. Where a given index does not support some of the sort-index modifiers that it ought, these can be explicily omitted using [the `omitSortIndexModifiers` configuration option](from-pod/Net-Z3950-FOLIO-Config.md#omitSortIndexModifiers).
+**NOTE.** As with searching, "support" here means that the Z39.50 server generates the correct CQL query to express the Z39.50 query using these attributes: the FOLIO back-end does not necessarily support all the CQL queries. Where a given index does not support some of the sort-index modifiers that it ought, these can be explicitly omitted using [the `omitSortIndexModifiers` configuration option](from-pod/Net-Z3950-FOLIO-Config.md#omitSortIndexModifiers).
 
 
 
 ## SRU
 
-[The SRU standard](https://www.loc.gov/standards/sru/) is a recasting of Z39.50-like semantics into a more web-friendly format, in which requests are expressed as HTTP URLs with specific query parameters, and responses are XML documents. Unlike Z39.50, it is stateless: each request is self-contained and does not depend on earlier operations. As a result, it has no concept of session initialization, and no result sets: each request is its own search and immedately returns the relevant records. A typical SRU request looks like this:
+[The SRU standard](https://www.loc.gov/standards/sru/) is a recasting of Z39.50-like semantics into a more web-friendly format, in which requests are expressed as HTTP URLs with specific query parameters, and responses are XML documents. Unlike Z39.50, it is stateless: each request is self-contained and does not depend on earlier operations. As a result, it has no concept of session initialization, and no result sets: each request is its own search and immediately returns the relevant records. A typical SRU request looks like this:
 
 http://lehigh-z3950-test.folio.indexdata.com:9997/sru/TEST?version=1.1&operation=searchRetrieve&query=title=a&maximumRecords=1&recordSchema=opac
 
-When building new clients to integrate with this server, SRU may be easier to use than Z39.50 because it is defined as in terms of XML and HTTP, a format and protocol for which there are many libriaries available in many languages.
+When building new clients to integrate with this server, SRU may be easier to use than Z39.50 because it is defined as in terms of XML and HTTP, a format and protocol for which there are many libraries available in many languages.
 
 
 ### SRU authentication
@@ -242,8 +243,9 @@ http://lehigh-z3950-test.folio.indexdata.com:9997/sru/TEST?version=1.1&operation
 
 ### SRU searching
 
-In SRU, the query is expressed is CQL, the same query language that FOLIO uses internally. The FOLIO SRU server therefore passes the query straight through to the back-end, and all CQL queries that work in FOLIO's inventory instances store will work in CQL. (The `indexMap` part of the configuration file is therefore not used when serving SRU requests.)
+In SRU, the query is expressed as CQL, the same query language that FOLIO uses internally. The FOLIO SRU server therefore passes the query straight through to the back-end, and all CQL queries that work in FOLIO's inventory instances store will work in CQL. (The `indexMap` part of the configuration file is therefore not used when serving SRU requests.)
 
+To see some of the CQL searches that are supported on the FOLIO back-end, see the values corresponding to the BIB-1 use attributes in the `indexMap` part of [the standard configuration](../etc/config.json): for example, `item.barcode=14120137` can be used to search for bibliographic records of instances that have an item with the specific barcode.
 
 ### SRU retrieval
 

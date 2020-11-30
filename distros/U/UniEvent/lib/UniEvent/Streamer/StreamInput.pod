@@ -1,0 +1,32 @@
+=head1 NAME
+
+UniEvent::Streamer::StreamInput - stream input for streamer
+
+=head1 DESCRIPTION
+
+Pulls in data from stream and pushes it into L<UniEvent::Streamer>.
+The underlying stream can be L<UniEvent::Tcp>, L<UniEvent::Pipe>
+or L<UniEvent::Tty>.
+
+L<UniEvent::Streamer::StreamInput> is derived from L<UniEvent::Streamer::IInput>.
+
+It is implemented in C++ for the speed, so it meant not to be
+derived from; in other words it is use only class.
+
+=head1 METHODS
+
+=head2 new($stream_handle)
+
+Constructs new input stream for from the L<UniEvent::Stream> handle.
+
+=head1 REFERENCES
+
+L<UniEvent::Stream>
+
+L<UniEvent::Streamer>
+
+L<UniEvent::Streamer::IInput>
+
+L<UniEvent::Streamer::StreamOutput>
+
+=cut

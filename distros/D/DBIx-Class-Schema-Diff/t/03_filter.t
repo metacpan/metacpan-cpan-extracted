@@ -93,7 +93,29 @@ is_deeply(
   $only_Address_expected_diff,
   'filter all but Address (3)'
 );
+is_deeply(
+  $Diff->filter('Addre*')->diff,
+  $only_Address_expected_diff,
+  'filter all but Address using wildcard'
+);
 
+is_deeply(
+  $Diff->filter('A?dre*')->diff,
+  $only_Address_expected_diff,
+  'filter all but Address using wildcards'
+);
+
+is_deeply(
+  $Diff->filter('[Aa]ddress')->diff,
+  $only_Address_expected_diff,
+  'filter all but Address using wildcards (2)'
+);
+
+is_deeply(
+  $Diff->filter('[Aa]ddress:')->diff,
+  $only_Address_expected_diff,
+  'filter all but Address using wildcards (3)'
+);
 
 my $only_isa_expected_diff = {
   Address => {
@@ -123,6 +145,28 @@ is_deeply(
   $only_isa_expected_diff,
   'filter all but isa (4)'
 );
+
+# not yet supported:
+#is_deeply(
+#  $Diff->filter('*Test::DummyClass')->diff,
+#  $only_isa_expected_diff,
+#  'filter to specific isa using wildcard'
+#);
+
+# not yet supported
+#is_deeply(
+#  $Diff->filter('Addre*:isa')->diff,
+#  $only_isa_expected_diff,
+#  'filter all but Address isa using wildcard'
+#);
+is_deeply(
+  $Diff->filter('Addre*')->filter('isa')->diff,
+  $only_isa_expected_diff,
+  'filter all but Address isa using wildcard (2)'
+);
+
+
+
 
 
 is_deeply(
@@ -205,6 +249,54 @@ is_deeply(
   "Filter to anything in City or Film, but only relationships in Address"
 );
 
+my $only_address_staffs_relationship = {
+  Address => {
+    _event => "changed",
+    relationships => {
+      staffs => {
+        _event => "changed",
+        diff => {
+          attrs => {
+            cascade_delete => 1
+          }
+        }
+      }
+    }
+  },
+};
+
+is_deeply(
+  $Diff->filter('Address:relationships/st*')->diff,
+  $only_address_staffs_relationship,
+  "Filter to only the 'staffs' relationship in Address using wildcard"
+);
+
+
+is_deeply(
+  $Diff->filter('*:relationships/st*')->diff,
+  $only_address_staffs_relationship,
+  "Filter to any relationship starting with 'st'"
+);
+
+is_deeply(
+  $Diff->filter('*:relationships/*ffs')->diff,
+  $only_address_staffs_relationship,
+  "Filter to any relationship ending with 'ffs'"
+);
+
+is_deeply(
+  $Diff->filter('*:relationships/*ff*')->diff,
+  $only_address_staffs_relationship,
+  "Filter to any relationship containing 'ff'"
+);
+
+is_deeply(
+  $Diff->filter('*ff*')->diff,
+  $only_address_staffs_relationship,
+  "Filter to anything containing 'ff'"
+);
+
+
 is_deeply(
   $Diff->filter(qw(table_name))->diff,
   {
@@ -263,6 +355,9 @@ is_deeply(
   },
   "Filter to only contraints, then filter_out 'rental_date'"
 );
+
+
+
 
 is_deeply(
   $Diff->filter(qw(constraints relationships))

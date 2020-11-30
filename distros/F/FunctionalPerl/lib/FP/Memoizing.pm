@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2015-2019 Christian Jaeger, copying@christianjaeger.ch
+# Copyright (c) 2015-2020 Christian Jaeger, copying@christianjaeger.ch
 #
 # This is free software, offered under either the same terms as perl 5
 # or the terms of the Artistic License version 2 or the terms of the
@@ -65,24 +65,28 @@ our %EXPORT_TAGS = (all => [@EXPORT, @EXPORT_OK]);
 use Chj::TEST;
 use Storable qw(nfreeze nstore_fd fd_retrieve);
 use Digest;
+use FP::Hash qw(hash_cache);
+use FP::Carp;
 
 #use Chj::TerseDumper;
-use FP::Hash qw(hash_cache);
 
 # ----------------------------------------------------------------
 # For keys:
 
-# sub xnfreeze ($) {
+# sub xnfreeze {
+#    @_ == 1 or die "wrong number of arguments";
 #     nfreeze ($_[0])
 #       // die "can't freeze this: ".TerseDumper ($_[0]);
 # }
 
-sub xncanonicalfreeze ($) {
+sub xncanonicalfreeze {
+    @_ == 1 or fp_croak_nargs 1;
     local $Storable::canonical = 1;
     nfreeze($_[0])
 }
 
-#sub xthaw ($) {
+#sub xthaw {
+#    @_ == 1 or die "wrong number of arguments";
 #    thaw ($_[0])
 #      // die "corrupted file, can't thaw";
 #}
@@ -99,7 +103,7 @@ our $freeze_args = \&xncanonicalfreeze;
 # please
 
 our $digest = sub {
-    @_ == 1 or die "wrong number of arguments";
+    @_ == 1 or fp_croak_nargs 1;
     my $ctx = Digest->new("SHA-256");
     $ctx->add($_[0]);
     my $d = $ctx->b64digest;
@@ -119,7 +123,8 @@ our $digest_args = sub {
 # 1. values must be wrapped in an array;
 # 2. OS errors versus format errors? No go, right?
 
-sub fh_xnstore ($$) {
+sub fh_xnstore {
+    @_ == 2 or fp_croak_nargs 2;
 
     # fh, arrayref
     nstore_fd($_[1], $_[0])
@@ -132,13 +137,15 @@ sub fh_xnstore ($$) {
     # either. Sigh.
 }
 
-sub fh_xdeserialize ($) {
+sub fh_xdeserialize {
+    @_ == 1 or fp_croak_nargs 1;
     fd_retrieve($_[0]) // die "SOME retrieval error";
 }
 
 # ----------------------------------------------------------------
 
-sub memoizing_ ($$$) {
+sub memoizing_ {
+    @_ == 3 or fp_croak_nargs 3;
     my ($fn, $cache, $getcache) = @_;
     sub {
         my @args      = @_;
@@ -158,7 +165,8 @@ sub memoizing_ ($$$) {
     }
 }
 
-sub memoizing ($) {
+sub memoizing {
+    @_ == 1 or fp_croak_nargs 1;
     my ($fn) = @_;
     memoizing_ $fn, +{}, \&hash_cache
 }
@@ -170,7 +178,8 @@ use Chj::xtmpfile;
 # CAREFUL, $k is not checked for subversive values ("../" etc.), only
 # use with hashed keys or so!
 
-sub file_cache ($$$) {
+sub file_cache {
+    @_ == 3 or fp_croak_nargs 3;
     my ($basepath, $k, $generate) = @_;
 
     my $path = $basepath . $k;
@@ -189,13 +198,15 @@ sub file_cache ($$$) {
     }
 }
 
-sub memoizing_to_dir ($$) {
+sub memoizing_to_dir {
+    @_ == 2 or fp_croak_nargs 2;
     my ($dirpath, $f) = @_;
     $dirpath .= "/" unless $dirpath =~ /\/$/s;
     memoizing_ $f, $dirpath, \&file_cache
 }
 
-sub tests_for ($) {
+sub tests_for {
+    @_ == 1 or fp_croak_nargs 1;
     my ($memoizing) = @_;
 
     my ($t_count, $f);

@@ -12,8 +12,10 @@ use List::MoreUtils qw(uniq);
 use DBIx::Class::Schema::Diff::InfoPacket;
 
 has 'name',       required => 1, is => 'ro', isa => Str;
-has 'old_source', required => 1, is => 'ro', isa => Maybe[HashRef];
+has 'old_source', is => 'ro', isa => Maybe[HashRef], default => sub { undef };
 has 'new_source', required => 1, is => 'ro', isa => Maybe[HashRef];
+
+has 'diff_added', is => 'ro', isa => Bool, default => sub { 0 };
 
 has '_schema_diff', required => 1, is => 'ro', isa => InstanceOf[
   'DBIx::Class::Schema::Diff::Schema'
@@ -39,11 +41,10 @@ has 'columns', is => 'ro', lazy => 1, default => sub {
   my @columns = uniq(try{keys %{$o->{columns}}}, try{keys %{$n->{columns}}});
   
   return {
-    map { $_ => DBIx::Class::Schema::Diff::InfoPacket->new(
+    map { $_ => $self->_new_InfoPacket(
       name        => $_,
       old_info    => $o ? $o->{columns}{$_} : undef,
       new_info    => $n ? $n->{columns}{$_} : undef,
-      _source_diff => $self,
     ) } @columns 
   };
 
@@ -59,11 +60,10 @@ has 'relationships', is => 'ro', lazy => 1, default => sub {
   my @rels = uniq(try{keys %{$o->{relationships}}}, try{keys %{$n->{relationships}}});
   
   return {
-    map { $_ => DBIx::Class::Schema::Diff::InfoPacket->new(
+    map { $_ => $self->_new_InfoPacket(
       name        => $_,
       old_info    => $o ? $o->{relationships}{$_} : undef,
       new_info    => $n ? $n->{relationships}{$_} : undef,
-      _source_diff => $self,
     ) } @rels
   };
   
@@ -79,11 +79,10 @@ has 'constraints', is => 'ro', lazy => 1, default => sub {
   my @consts = uniq(try{keys %{$o->{constraints}}}, try{keys %{$n->{constraints}}});
   
   return {
-    map { $_ => DBIx::Class::Schema::Diff::InfoPacket->new(
+    map { $_ => $self->_new_InfoPacket(
       name        => $_,
       old_info    => $o ? $o->{constraints}{$_} : undef,
       new_info    => $n ? $n->{constraints}{$_} : undef,
-      _source_diff => $self,
     ) } @consts
   };
   
@@ -114,8 +113,8 @@ has 'diff', is => 'ro', lazy => 1, default => sub {
   my $self = shift;
   
   # There is no reason to diff in the case of added/deleted:
-  return { _event => 'added'   } if ($self->added);
   return { _event => 'deleted' } if ($self->deleted);
+  return { _event => 'added'   } if ($self->added && ! $self->diff_added);
   
   my $diff = {};
   
@@ -150,6 +149,14 @@ has 'diff', is => 'ro', lazy => 1, default => sub {
   return $diff;
   
 }, init_arg => undef, isa => Maybe[HashRef];
+
+
+sub _new_InfoPacket {
+  my $self = shift;
+  DBIx::Class::Schema::Diff::InfoPacket->new(
+    _source_diff => $self, diff_added => $self->diff_added, @_
+  )
+}
 
 
 1;

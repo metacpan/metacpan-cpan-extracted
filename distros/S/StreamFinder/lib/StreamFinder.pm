@@ -1,6 +1,6 @@
 =head1 NAME
 
-StreamFinder - Fetch actual raw streamable URLs from various radio-station and video websites.
+StreamFinder - Fetch actual raw streamable URLs from various radio-station, video & podcast websites.
 
 =head1 INSTALLATION
 
@@ -130,7 +130,8 @@ The currently-supported websites are:  podcasts.apple.com (L<StreamFinder::Apple
 bitchute.com (L<StreamFinder::Bitchute>, blogger.com (L<StreamFinder::Blogger>), 
 brighteon.com (L<StreamFinder::Brighteon>), castbox.fm (L<StreamFinder::Castbox>), 
 iheartradio.com (L<StreamFinder::IHeartRadio>), radio.net (L<StreamFinder::RadioNet>), 
-reciva.com (L<StreamFinder::Reciva>), sermonaudio.com (L<StreamFinder::SermonAudio>)
+reciva.com (L<StreamFinder::Reciva>), rumble.com (L<StreamFinder::Rumble>),
+sermonaudio.com (L<StreamFinder::SermonAudio>), 
 spreaker.com podcasts (L<StreamFinder::Spreaker>), 
 tunein.com (L<StreamFinder::Tunein>), vimeo.com (L<StreamFinder::Vimeo>), 
 and (youtube.com, et. al and other sites that youtube-dl supports) 
@@ -270,8 +271,8 @@ the "icon image" data, if any, will be returned.
 
 Returns the station / podcast / video's type (I<submodule-name>).  
 (one of:  "Apple", "BitChute", "Blogger", "Brighteon", "Castbox", 
-"IHeartRadio", "RadioNet", "Reciva", "SermonAudio", "Spreaker", 
-"Tunein", "Youtube" or "Vimeo" - 
+"IHeartRadio", "RadioNet", "Reciva", "Rumble", "SermonAudio", 
+"Spreaker", "Tunein", "Youtube" or "Vimeo" - 
 depending on the sight that matched the URL.
 
 =back
@@ -346,10 +347,6 @@ Fauxdacious media player - (L<https://wildstar84.wordpress.com/fauxdacious>)
 
 L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=StreamFinder>
 
-=item * AnnoCPAN: Annotated CPAN documentation
-
-L<http://annocpan.org/dist/StreamFinder>
-
 =item * CPAN Ratings
 
 L<http://cpanratings.perl.org/d/StreamFinder>
@@ -410,7 +407,7 @@ use strict;
 use warnings;
 use vars qw(@ISA @EXPORT $VERSION);
 
-our $VERSION = '1.36';
+our $VERSION = '1.37';
 our $DEBUG = 0;
 
 require Exporter;
@@ -418,7 +415,7 @@ require Exporter;
 @ISA = qw(Exporter);
 @EXPORT = qw();
 my @supported_mods = (qw(Apple Bitchute Blogger Brighteon Castbox IHeartRadio
-		RadioNet Reciva SermonAudio Spreaker Tunein Vimeo Youtube));
+		RadioNet Reciva Rumble SermonAudio Spreaker Tunein Vimeo Youtube));
 
 my %haveit;
 
@@ -438,17 +435,12 @@ sub new
 
 	my @args = @_;
 	push @args, ('-debug', $DEBUG)  if ($DEBUG);
-#	if ($haveit{'BannedVideo'} && $url =~ m#\bbanned\.video\/#) {
-#		return new StreamFinder::BannedVideo($url, @args);
-#	} elsif ($haveit{'IHeartRadio'} && $url =~ m#\biheart(?:radio)?\.#i) {
 	if ($haveit{'IHeartRadio'} && $url =~ m#\biheart(?:radio)?\.#i) {
 		return new StreamFinder::IHeartRadio($url, @args);
 	} elsif ($haveit{'Tunein'} && $url =~ m#\btunein\.#) {  #NOTE:ALSO USES youtube-dl!
 		return new StreamFinder::Tunein($url, @args);
 	} elsif ($haveit{'RadioNet'} && $url =~ m#\bradio\.net\/#) {
 		return new StreamFinder::RadioNet($url, @args);
-#	} elsif ($haveit{'Radionomy'} && $url =~ m#\bradionomy\.com\/#) {
-#		return new StreamFinder::Radionomy($url, @args);
 	} elsif ($haveit{'Reciva'} && $url =~ m#\breciva\.com\/#) {
 		return new StreamFinder::Reciva($url, @args);
 	} elsif ($haveit{'Brighteon'} && $url =~ m#\bbrighteon\.com\/#) {  #NOTE:ALSO USES youtube-dl!
@@ -457,17 +449,17 @@ sub new
 		return new StreamFinder::Vimeo($url, @args);
 	} elsif ($haveit{'Apple'} && $url =~ m#\b(?:podcasts?|music)\.apple\.com\/#) {  #NOTE:ALSO USES youtube-dl!
 		return new StreamFinder::Apple($url, @args);
-	} elsif ($haveit{'Spreaker'} && $url =~ m#\.spreaker\.#) {
+	} elsif ($haveit{'Spreaker'} && $url =~ m#\bspreaker\.#) {
 		return new StreamFinder::Spreaker($url, @args);
-#	} elsif ($haveit{'Facebook'} && ($url =~ m#^http[s]?\:\/\/\w*\.facebook\.#)) {  #REMOVED SUPPORT AS FB NOW LOCKS YOUR ACCOUNT & FORCES PASSWORD CHANGE!
-#		return new StreamFinder::Facebook($url, @args);
-	} elsif ($haveit{'Bitchute'} && $url =~ m#\.bitchute\.#) {  #DEFAULT TO youtube-dl SINCE SO MANY URLS ARE HANDLED THERE NOW.
+	} elsif ($haveit{'Bitchute'} && $url =~ m#\bbitchute\.#) {
 		return new StreamFinder::Bitchute($url, @args);
-	} elsif ($haveit{'Blogger'} && $url =~ m#\.blogger\.#) {  #DEFAULT TO youtube-dl SINCE SO MANY URLS ARE HANDLED THERE NOW.
+	} elsif ($haveit{'Rumble'} && $url =~ m#\brumble\.com\/#) {
+		return new StreamFinder::Rumble($url, @args);
+	} elsif ($haveit{'Blogger'} && $url =~ m#\bblogger\.#) {
 		return new StreamFinder::Blogger($url, @args);
-	} elsif ($haveit{'Castbox'} && $url =~ m#\bcastbox\.\w+\/#) {  #DEFAULT TO youtube-dl SINCE SO MANY URLS ARE HANDLED THERE NOW.
+	} elsif ($haveit{'Castbox'} && $url =~ m#\bcastbox\.\w+\/#) {
 		return new StreamFinder::Castbox($url, @args);
-	} elsif ($haveit{'SermonAudio'} && $url =~ m#\.sermonaudio\.com\/#) {  #DEFAULT TO youtube-dl SINCE SO MANY URLS ARE HANDLED THERE NOW.
+	} elsif ($haveit{'SermonAudio'} && $url =~ m#\bsermonaudio\.com\/#) {
 		return new StreamFinder::SermonAudio($url, @args);
 	} elsif ($haveit{'Youtube'}) {  #DEFAULT TO youtube-dl SINCE SO MANY URLS ARE HANDLED THERE NOW.
 		return new StreamFinder::Youtube($url, @args);

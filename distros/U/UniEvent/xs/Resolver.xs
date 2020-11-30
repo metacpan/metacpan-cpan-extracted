@@ -11,7 +11,6 @@ PROTOTYPES: DISABLE
 BOOT {
     Stash s(__PACKAGE__);
     xs::exp::create_constants(s, {
-        {"PASSIVE",     AddrInfoHints::PASSIVE    },
         {"NUMERICSERV", AddrInfoHints::NUMERICSERV},
         {"CANONAME",    AddrInfoHints::CANONNAME  }
     });

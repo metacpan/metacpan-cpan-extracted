@@ -11,7 +11,7 @@ do { my $x = {
                     },
        'runtime' => {
                       'requires' => {
-                                      'AnyEvent' => '0',
+                                      'AnyEvent' => '7.11',
                                       'AnyEvent::Handle' => '0',
                                       'AnyEvent::Util' => '0',
                                       'Carp' => '0',

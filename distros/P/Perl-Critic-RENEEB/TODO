@@ -1,0 +1,17 @@
+# Rule "ProhibitUselessRegex"
+
+ !$var =~ ...
+ $var  != qr//
+ $var  != m{}
+
+# Rule "ProhibitUselessTopic"
+
+  Original, plus erlaubt:
+
+  * Funktionen aus List::Util
+  * https://github.com/Perl-Critic/Perl-Critic/issues/830
+  * https://github.com/Perl-Critic/Perl-Critic/issues/829
+
+# Rule "UnnecessaryShellCommand"
+
+  https://github.com/Perl-Critic/Perl-Critic/issues/839

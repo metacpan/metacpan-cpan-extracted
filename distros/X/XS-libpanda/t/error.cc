@@ -100,7 +100,7 @@ TEST("bad_expected_access") {
     } catch (bad_expected_access<ErrorCode>& e) {
         what = e.what();
     }
-    REQUIRE(what == "Bad expected access: MyErr1 (1:MyCategory)");
+    REQUIRE(what == "MyErr1 (1:MyCategory)");
 }
 
 TEST("contains") {

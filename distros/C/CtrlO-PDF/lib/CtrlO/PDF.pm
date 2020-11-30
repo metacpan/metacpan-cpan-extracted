@@ -12,7 +12,7 @@ use PDF::API2;
 use PDF::Table;
 use PDF::TextBlock;
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 =head1 NAME 
 
@@ -239,6 +239,16 @@ has top_padding => (
     default => 0,
 );
 
+=head2 header
+
+Sets or returns the header text.
+
+=cut
+
+has header => (
+    is => 'ro',
+);
+
 =head2 footer
 
 Sets or returns the footer text. Page numbers are added automatically.
@@ -406,7 +416,9 @@ has _y => (
 
 sub _y_start_default
 {   my $self = shift;
-    $self->height - $self->margin - $self->top_padding;
+    my $start = $self->height - $self->margin - $self->top_padding;
+    $start -= 15 if $self->header; # Arbitrary number to allow 10px of header text
+    $start;
 }
 
 =head2 heading($text, %options)
@@ -538,6 +550,9 @@ sub table
     my $data = delete $options{data};
 
     # Keep separate so easy to dump for debug
+    my $hf_space = 0;
+    $hf_space += 40 if $self->footer;
+    $hf_space += 40 if $self->header;
     my %dimensions = (
         next_h    => $self->height - $self->margin - ($self->height - $self->_y_start_default) - $self->margin,
         x         => $self->_x,
@@ -545,7 +560,7 @@ sub table
         font_size => 10,
         padding   => 5,
         start_y   => $self->_y,
-        start_h   => $self->height - ($self->height - $self->_y) - $self->margin - 40, # additional space for footer
+        start_h   => $self->height - ($self->height - $self->_y) - $self->margin - $hf_space,
         next_y    => $self->height - $self->margin - ($self->height - $self->_y_start_default),
     );
     my ($final_page, $number_of_pages, $final_y) = $table->table(
@@ -630,6 +645,11 @@ sub content
         }
         my $text = $page->text;
         $text->font($self->font, 10);
+        if (my $header = $self->header)
+        {
+            $text->translate(int($self->width / 2), $self->height - $self->margin);
+            $text->text_center($header);
+        }
         $text->translate($self->width - $self->margin, $self->margin);
         $text->text_right("Page $p of $count");
         if (my $footer = $self->footer)

@@ -70,7 +70,7 @@ subtest "perl exception thrown" => sub {
                 }
                 else {
                     my ($f1) = grep { $_->library =~ /Backtrace\./} @$frames;
-                    my ($f2) = grep { $_->library =~ /libpanda\./} @$frames;
+                    my ($f2) = grep { $_->library =~ /(libpanda\.)|(perl)/} @$frames;
                     ok $f1;
                     ok $f2;
                     ok $f1->address;
@@ -136,14 +136,14 @@ SKIP: {
                 if ($f) {
                     like $f->library, qr/libpanda.(so|xs.dll)/;
                     like $f->name, qr/panda::(exception::exception)|(Backtrace::Backtrace)/;
-                    like $f->file, qr/exception.cc/;
+                    like $f->file, qr/exception.(cc|h)/;
                     ok $f->line_no;
                     ok $f->address;
                     ok $f->offset;
                 }
                 else {
                     my ($f1) = grep { $_->library =~ /MyTest\./} @$frames;
-                    my ($f2) = grep { $_->library =~ /libpanda\./} @$frames;
+                    my ($f2) = grep { $_->library =~ /(libpanda\.)|(perl)/} @$frames;
                     ok $f1;
                     ok $f2;
                     ok $f1->address;
@@ -221,13 +221,13 @@ subtest "create backtrace" => sub {
                 if ($f) {
                     like $f->library, qr/libpanda.(so|xs.dll)/;
                     like $f->name, qr/panda::Backtrace::Backtrace/;
-                    like $f->file, qr/exception.cc/;
+                    like $f->file, qr/exception.(h|cc)/;
                     ok $f->line_no;
                     ok $f->address;
                     ok $f->offset;
                 }
                 else {
-                    my ($f1) = grep { $_->library =~ /libpanda\./} @$frames;
+                    my ($f1) = grep { $_->library =~ /(libpanda\.)|(perl)/} @$frames;
                     ok $f1;
                     ok $f1->address;
                     ok $f1->offset;

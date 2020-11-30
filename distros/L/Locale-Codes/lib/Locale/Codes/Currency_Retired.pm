@@ -3,7 +3,7 @@ Locale::Codes::Currency_Retired;
 
 # This file was automatically generated.  Any changes to this file will
 # be lost the next time 'deprecate_codes' is run.
-#    Generated on: Tue Sep  1 12:58:23 EDT 2020
+#    Generated on: Mon Nov 30 11:55:23 EST 2020
 
 use strict;
 require 5.006;
@@ -11,7 +11,7 @@ use warnings;
 use utf8;
 
 our($VERSION);
-$VERSION='3.65';
+$VERSION='3.66';
 
 $Locale::Codes::Retired{'currency'}{'alpha'}{'code'} = {
    q(ADP) => q(Andorran Peseta),

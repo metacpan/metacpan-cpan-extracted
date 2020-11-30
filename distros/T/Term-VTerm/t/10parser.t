@@ -92,28 +92,48 @@ is_refcount( \$var, 3, '\$var has refcount 3 when captured by callback closure' 
 
 # osc
 {
-   my $osc;
+   my ( $osc_cmd, $osc_str );
    $vt->parser_set_callbacks(
-      on_osc => sub { $osc = $_[0] },
+      on_osc => sub { ( $osc_cmd, $osc_str ) = @_ },
    );
 
-   my $len = $vt->input_write( "\e]ABCDE\e\\" );
-   is( $len, 9, '->input_write consumed 9 bytes of OSC' );
+   my $len = $vt->input_write( "\e]15;ABCDE\e\\" );
+   is( $len, 12, '->input_write consumed 12 bytes of OSC' );
 
-   is( $osc, "ABCDE", '$osc after ->input_write' );
+   is( $osc_cmd, 15,      '$osc_cmd after ->input_write' );
+   is( $osc_str, "ABCDE", '$osc_str after ->input_write' );
+
+   undef $osc_cmd;
+
+   $vt->input_write( "\e]20;abc" );
+   ok( !defined $osc_cmd, '$osc_cmd not yet set after split write' );
+
+   $vt->input_write( "de\e\\" );
+   is( $osc_cmd, 20,      '$osc_cmd after ->input_write' );
+   is( $osc_str, "abcde", '$osc_str after ->input_write' );
 }
 
 # dcs
 {
-   my $dcs;
+   my ( $dcs_cmd, $dcs_str );
    $vt->parser_set_callbacks(
-      on_dcs => sub { $dcs = $_[0] },
+      on_dcs => sub { ( $dcs_cmd, $dcs_str ) = @_ },
    );
 
    my $len = $vt->input_write( "\ePFGHIJ\e\\" );
    is( $len, 9, '->input_write consumed 9 bytes of DCS' );
 
-   is( $dcs, "FGHIJ", '$dcs after ->input_write' );
+   is( $dcs_cmd, "F",    '$dcs_cmd after ->input_write' );
+   is( $dcs_str, "GHIJ", '$dcs_str after ->input_write' );
+
+   undef $dcs_cmd;
+
+   $vt->input_write( "\ePfg" );
+   ok( !defined $dcs_cmd, '$dcs_cmd not yet set after split write' );
+
+   $vt->input_write( "hij\e\\" );
+   is( $dcs_cmd, "f",    '$dcs_cmd after ->input_write' );
+   is( $dcs_str, "ghij", '$dcs_str after ->input_write' );
 }
 
 # resize

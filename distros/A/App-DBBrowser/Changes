@@ -1,6 +1,11 @@
 Revision history for App-DBBrowser
 
 
+2.254    2020-11-28
+        - Signalhandler: add SIGTERM and SIGHUB.
+        - Show-table-name enabled by default.
+        - New option: enable/disable input filter.
+
 2.253    2020-09-03
         - Disable warnings 'closure' in END block to avoid 'Variable "%s" will not stay shared' warning.
 

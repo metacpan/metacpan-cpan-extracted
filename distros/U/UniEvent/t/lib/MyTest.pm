@@ -18,32 +18,16 @@ my $have_time_hires = eval "require Time::HiRes; 1;";
 my $last_time_mark;
 my %used_mtimes;
 
-{
-    package Panda::W::Logger;
-    use parent 'XLog::Logger';
-
-    sub log_format {
-        my ($self, $msg, $level, $module, $file, $line, $func, $formatter) = @_;
-        $file = substr($file, rindex($file, '/'));
-        $module = substr($module, rindex($module, '::')+2);
-        my $code = "$module$file:$line";
-        my $res = sprintf '%-32s %s', $code, $msg;
-        say $res;
-    }
-}
-
-
-
 init();
 
 sub init {
     if ($ENV{LOGGER}) {
-	XLog::set_logger(Panda::W::Logger->new);
-	XLog::set_level(XLog::WARNING);
-
-        XLog::set_level(XLog::DEBUG, "UniEvent");
-        XLog::set_level(XLog::DEBUG, "UniEvent::Resolver");
-    }    
+        require XLog;
+        XLog::set_logger(XLog::Console->new);
+        XLog::set_level(XLog::WARNING());
+        XLog::set_level(XLog::DEBUG(), "UniEvent");
+        XLog::set_level(XLog::DEBUG(), "UniEvent::Resolver");
+    }
     
     # for file tests
     UniEvent::Fs::remove_all($rdir) if -d $rdir;
@@ -61,7 +45,7 @@ sub import {
     foreach my $sym_name (qw/
         linux freebsd win32 darwin winWSL netbsd openbsd dragonfly
         is cmp_deeply ok done_testing skip isnt time_mark check_mark pass fail cmp_ok like isa_ok unlike diag plan
-        var pipe create_file create_dir move change_file_mtime change_file unlink_file remove_dir subtest new_ok dies_ok catch_run any
+        var pipe create_file create_dir move change_file_mtime change_file unlink_file remove_dir subtest new_ok dies_ok throws_ok catch_run any
     /) {
         no strict 'refs';
         *{"${caller}::$sym_name"} = \&{$sym_name};

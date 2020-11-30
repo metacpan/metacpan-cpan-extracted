@@ -11,7 +11,7 @@ use Perl::Critic::Utils qw{ :severities };
 
 use base 'Perl::Critic::Policy';
 
-our $VERSION = '2.02';
+our $VERSION = '2.04';
 
 #-----------------------------------------------------------------------------
 
@@ -55,7 +55,7 @@ Perl::Critic::Policy::Reneeb::ProhibitBlockEval - Do not use the Block-eval. Use
 
 =head1 VERSION
 
-version 2.02
+version 2.04
 
 =head1 DESCRIPTION
 

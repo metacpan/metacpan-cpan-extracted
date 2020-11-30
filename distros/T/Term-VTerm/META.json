@@ -4,7 +4,7 @@
       "Paul Evans <leonerd@leonerd.org.uk>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4224",
+   "generated_by" : "Module::Build version 0.4231",
    "license" : [
       "perl_5"
    ],
@@ -35,15 +35,15 @@
    "provides" : {
       "Term::VTerm" : {
          "file" : "lib/Term/VTerm.pm",
-         "version" : "0.05"
+         "version" : "0.06"
       },
       "Term::VTerm::Screen" : {
          "file" : "lib/Term/VTerm/Screen.pm",
-         "version" : "0.05"
+         "version" : "0.06"
       },
       "Term::VTerm::State" : {
          "file" : "lib/Term/VTerm/State.pm",
-         "version" : "0.05"
+         "version" : "0.06"
       }
    },
    "release_status" : "stable",
@@ -52,6 +52,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.05",
-   "x_serialization_backend" : "JSON::PP version 4.04"
+   "version" : "0.06",
+   "x_serialization_backend" : "JSON::PP version 4.05"
 }

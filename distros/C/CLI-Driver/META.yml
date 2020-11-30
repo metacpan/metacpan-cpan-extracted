@@ -1,5 +1,5 @@
 ---
-abstract: unknown
+abstract: 'Drive your cli tool with YAML'
 author:
   - 'John Gravatt <john.gravatt@act.org>'
 build_requires:
@@ -34,5 +34,9 @@ requires:
   YAML::Tiny: '1.73'
   namespace::autoclean: '0'
   perl: '5.006'
-version: '0.68'
+resources:
+  bugtracker: https://github.com/gravattj/CLI-Driver-perl/issues
+  homepage: https://github.com/gravattj/CLI-Driver-perl
+  repository: https://github.com/gravattj/CLI-Driver-perl.git
+version: '0.69'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

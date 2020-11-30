@@ -23,7 +23,7 @@ use vars qw( @ISA $VERSION $AUTOLOAD );
 
 @ISA = qw(DynaLoader);
 
-$VERSION = '0.83';
+$VERSION = '0.84';
 
 bootstrap Convert::Binary::C $VERSION;
 
@@ -1524,15 +1524,15 @@ as it can already handle C<AV> pointers. And this is what we get:
     'sv_refcnt' => 1,
     'sv_flags' => 536870924,
     'sv_u' => {
-      'svu_pv' => '94206640063120',
-      'svu_iv' => '94206640063120',
-      'svu_uv' => '94206640063120',
-      'svu_nv' => '4.65442644653192e-310',
-      'svu_rv' => '94206640063120',
-      'svu_array' => '94206640063120',
-      'svu_hash' => '94206640063120',
-      'svu_gp' => '94206640063120',
-      'svu_fp' => '94206640063120'
+      'svu_pv' => '94716517508048',
+      'svu_iv' => '94716517508048',
+      'svu_uv' => '94716517508048',
+      'svu_nv' => '4.67961773944475e-310',
+      'svu_rv' => '94716517508048',
+      'svu_array' => '94716517508048',
+      'svu_hash' => '94716517508048',
+      'svu_gp' => '94716517508048',
+      'svu_fp' => '94716517508048'
     }
   };
 
@@ -2426,11 +2426,11 @@ This will print something like:
   };
 
 To be able to use this option, you have to install
-either the L<Tie::Hash::Indexed|Tie::Hash::Indexed> or
-the L<Tie::IxHash|Tie::IxHash> module. If both are
-installed, Convert::Binary::C will give preference
-to L<Tie::Hash::Indexed|Tie::Hash::Indexed> because
-it's faster.
+one of the following modules: L<Tie::Hash::Indexed|Tie::Hash::Indexed>,
+L<Hash::Ordered|Hash::Ordered> or L<Tie::IxHash|Tie::IxHash>.
+If more than one of these modules is installed,
+Convert::Binary::C will use them in that order
+of preference.
 
 When using this option, you should keep in mind that
 tied hashes are significantly slower and consume

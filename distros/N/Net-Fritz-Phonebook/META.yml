@@ -4,13 +4,16 @@ author:
   - 'Max Maischein <corion@cpan.org>'
 build_requires:
   Data::Dumper: '0'
+  Encode: '0'
   ExtUtils::MakeMaker: '0'
+  Net::CardDAVTalk: '0'
+  Net::CardDAVTalk::VCard: '0'
   Test::More: '0'
   charnames: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150005'
+generated_by: 'ExtUtils::MakeMaker version 7.1002, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -25,11 +28,14 @@ requires:
   Filter::signatures: '0'
   Moo: '2'
   Net::Fritz: '0'
+  Net::Fritz::Box: '0'
   PerlX::Maybe: '0'
+  URI::URL: '0'
+  XML::Simple: '0'
   perl: '5.006'
 resources:
   license: https://dev.perl.org/licenses/
   repository: git://github.com/Corion/Net-Fritz-Phonebook.git
-version: '0.04'
+version: '0.05'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 1

@@ -23,6 +23,7 @@ libunievent/backend-uv/src/UVTimer.h
 libunievent/backend-uv/src/UVTty.h
 libunievent/backend-uv/src/UVUdp.h
 libunievent/backend-uv/src/UVWork.h
+libunievent/cmake/modules/Findlibuv.cmake
 libunievent/CMakeLists.txt
 libunievent/src/panda/unievent.h
 libunievent/src/panda/unievent/AddrInfo.cc

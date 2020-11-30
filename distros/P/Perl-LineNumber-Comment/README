@@ -1,0 +1,105 @@
+NAME
+    Perl::LineNumber::Comment - Add line number to Perl source as comment
+
+VERSION
+    This document describes version 0.001 of Perl::LineNumber::Comment (from
+    Perl distribution Perl-LineNumber-Comment), released on 2020-11-27.
+
+SYNOPSIS
+     use Perl::LineNumber::Comment qw(add_line_number_comments_to_perl_source);
+     print add_line_number_comments_to_perl_source(<<'EOF');
+     #!/usr/bin/env perl
+
+     use 5.010001;
+     use strict;
+     use warnings;
+
+     print "Hello, world 1!";
+     print "Hello, world 2!";                   # a comment
+     print "A multiline
+     string";
+
+     print <<EOF2;
+     A heredoc (not shown in node->content).
+
+     Line three.
+     EOF2
+
+     exit 0;
+
+     __END__
+     one
+     two
+     three
+     EOF
+
+    will print:
+
+     #!/usr/bin/env perl
+
+     use 5.010001;
+     use strict;
+     use warnings; # line 5
+
+     print "Hello, world 1!";
+     print "Hello, world 2!";                   # a comment
+     print "A multiline
+     string"; # line 10
+
+     print <<EOF;
+
+     exit 0;
+
+     __END__
+     one
+     two
+     three
+
+FUNCTIONS
+  add_line_number_comments_to_perl_source
+    Usage:
+
+     add_line_number_comments_to_perl_source(%args) -> any
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   column => *posint* (default: 80)
+
+        Currently not implemented
+
+    *   every => *posint* (default: 5)
+
+    *   format => *str* (default: " # line %d")
+
+    *   source* => *str*
+
+    Return value: (any)
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Perl-LineNumber-Comment>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Perl-LineNumber-Comment>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Perl-LineNumber-Comme
+    nt>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2020 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

@@ -274,5 +274,6 @@ urpmi(8), urpmi.update(8), urpmi.removemedia(8), urpmf(8), urpmq(8), urpmi.files
 
 =head1 Author
 
-Pascal Rigaux <pixel@mandriva.com> (original author and current maintainer), 
+Thierry Vignaud <tv@mageia.org> (current maintainer),
+Pascal Rigaux (original author),
 FranE<ccedil>ois Pons, Rafael Garcia-Suarez 

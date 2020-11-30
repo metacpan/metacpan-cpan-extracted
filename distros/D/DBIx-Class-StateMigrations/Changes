@@ -1,0 +1,5 @@
+Revision history for perl module DBIx::Class::StateMigrations
+
+0.001 2020-11-24
+   - EXPERIMENTAL non-production ready release (VANSTYN)
+

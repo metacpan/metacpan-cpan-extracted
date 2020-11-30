@@ -1,6 +1,6 @@
 package IPC::Simple::Group;
 # ABSTRACT: work with several processes as a group
-$IPC::Simple::Group::VERSION = '0.04';
+$IPC::Simple::Group::VERSION = '0.07';
 
 use strict;
 use warnings;
@@ -68,7 +68,12 @@ sub launch {
 
 sub terminate {
   my $self = shift;
-  $_->terminate for $self->members;
+  $_->terminate(@_) for $self->members;
+}
+
+sub signal {
+  my ($self, $signal) = @_;
+  $self->signal($signal) for $self->members;
 }
 
 sub join {
@@ -95,7 +100,7 @@ IPC::Simple::Group - work with several processes as a group
 
 =head1 VERSION
 
-version 0.04
+version 0.07
 
 =head1 DESCRIPTION
 
@@ -128,7 +133,15 @@ Launches all of the processes in this group.
 
 =head2 terminate
 
-Terminates all of the processes in this group.
+Terminates all of the processes in this group. Arguments are forwarded to
+L<IPC::Simple/terminate>.
+
+=head2 signal
+
+Sends a signal to all members of the group. Arguments are forwarded to
+L<IPC::Simple/signal>.
+
+  $group->signal('HUP');
 
 =head2 join
 

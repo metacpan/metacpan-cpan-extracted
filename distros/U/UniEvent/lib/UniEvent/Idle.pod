@@ -4,8 +4,8 @@ UniEvent::Idle - runs the given callback once per loop iteration
 
 =head1 SYNOPSIS
 
-    my $loop = UniEvent::Loop->default_loop;
-    my $h = UniEvent::Idle->new;
+    my $loop = UniEvent::Loop->new;
+    my $h = UniEvent::Idle->new($loop);
     $h->event->add(sub { say 'hello' });
     $h->start;
     $loop->run_nowait;  # prints 'hello'
@@ -44,7 +44,7 @@ iteration.
 =head2 callback($code)
 
 Sets the callback, which will be invoked after loop run. All previously
-set event listeners or callbacks will be discarded.
+set event listeners or callbacks are discarded.
 
 =head2 event()
 
@@ -62,12 +62,13 @@ interface.
 
 =head2 event_listener($delegate [, $weak = false])
 
-Delegates callback invocation to the C<$delegate> object of arbitrary
-class having C<on_idle> method. The object can optionally be weakened.
+Creates and returns wrapper around the C<$delegate> object of arbitrary
+class, having the following methods:
 
-The method will be invoked as
+  $delegate->on_idle($handle);
 
-  $obj->on_idle($handle);
+The delegated object can be seen as alternative of setting indivitual callbacks
+or as a way of groupping them. The C<$delegate> object can optionally be weakened.
 
 =head2 call_now()
 
@@ -86,5 +87,8 @@ L<UniEvent::Check>
 
 L<UniEvent::Handle>
 
+L<UniEvent::Prepare>
+
 L<XS::Framework::CallbackDispatcher>
+
 =cut

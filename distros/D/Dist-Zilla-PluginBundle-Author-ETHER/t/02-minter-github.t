@@ -69,7 +69,7 @@ like(
 
 like(
      $module,
-    qr/^our \$VERSION = '0.001';\n\nno if "\$\]" >= 5.031009, feature => 'indirect';$/m,
+    qr/^our \$VERSION = '0.001';\n\nuse 5\.016;\nno if "\$\]" >= 5.031009, feature => 'indirect';$/m,
     'initial module $VERSION is calculated correctly',
 );
 

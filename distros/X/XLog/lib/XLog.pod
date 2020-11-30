@@ -334,6 +334,7 @@ Optimization enabled when:
 =item Module/message argument is simple
 
 In the following examples, evaluation is skipped
+
     XLog::debug("message");
     XLog::debug($message);
     XLog::log(XLog::DEBUG, "hi");

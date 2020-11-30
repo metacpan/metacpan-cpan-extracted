@@ -21,7 +21,10 @@ use constant SUB_NAME	=> "${CLASS}::load_module_ok";
 my $line;
 
 
+=begin comment
+
 {
+
     like
 	intercept {
 	    all_modules_tried_ok(); $line = __LINE__;
@@ -90,6 +93,10 @@ my $line;
 	},
 	"clear_modules_tried() made us forget we tried $CLASS";
 }
+
+=end comment
+
+=cut
 
 
 {

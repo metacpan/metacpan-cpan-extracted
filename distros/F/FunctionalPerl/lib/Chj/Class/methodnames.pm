@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2004-2019 Christian Jaeger, copying@christianjaeger.ch
+# Copyright (c) 2004-2020 Christian Jaeger, copying@christianjaeger.ch
 #
 # This is free software, offered under either the same terms as perl 5
 # or the terms of the Artistic License version 2 or the terms of the
@@ -42,12 +42,14 @@ or on the L<website|http://functional-perl.org/>.
 =cut
 
 package Chj::Class::methodnames;
-use Exporter "import";
-our @EXPORT = qw(methodnames);
-
 use strict;
 use warnings;
 use warnings FATAL => 'uninitialized';
+
+use Exporter "import";
+our @EXPORT = qw(methodnames);
+
+use FP::Carp;
 
 our $stop = {};
 
@@ -135,7 +137,8 @@ sub methods_of_class {
     }
 }
 
-sub methodnames ( $ ) {
+sub methodnames {
+    @_ == 1 or fp_croak_nargs 1;
     my ($obj_or_class) = @_;
     my $class = ref($obj_or_class) || $obj_or_class;
     methods_of_class $class;

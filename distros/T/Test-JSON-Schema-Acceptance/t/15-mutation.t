@@ -67,7 +67,7 @@ foreach my $test (
           pass => 0,
           children => [
             superhashof({
-              details => 'result is valid',
+              details => 'test passes',
               pass => 1,
             }),
             superhashof({

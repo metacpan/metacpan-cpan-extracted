@@ -2,7 +2,7 @@
 
 use warnings;
 use strict;
-use Test::Most tests => 102;
+use Test::Most tests => 103;
 use Test::Carp;
 use Test::Deep;
 use Test::Number::Delta;
@@ -173,7 +173,7 @@ MAXMIND: {
 				methods('lat' => num(38.25, 1e-2), 'long' => num(-76.74, 1e-2)));
 
 			@locations = $geo_coder->geocode('Sheppey, Kent, England');
-			ok(scalar(@locations) > 1);
+			ok(scalar(@locations) == 0);
 			# diag(scalar(@locations));
 
 			$location = $geo_coder->geocode('Nebraska, USA');
@@ -187,13 +187,17 @@ MAXMIND: {
 
 			@locations = $geo_coder->geocode('New Brunswick, Canada');
 			ok(scalar(@locations) == 1);
+
+			@locations = $geo_coder->geocode('Putnam, Indiana, USA');
+			ok(scalar(@locations) == 0);
+
 			@locations = $geo_coder->geocode('Maryland, USA');
 			ok(scalar(@locations) == 1);
 			cmp_deeply($locations[0],
 				methods('lat' => num(38.25, 1e-2), 'long' => num(-76.74, 1e-2)));
+
 			@locations = $geo_coder->geocode('Kent, England');
 			ok(scalar(@locations) == 1);
-
 			# like($geo_coder->reverse_geocode(latlng => '51.50,-0.13'), qr/London/i, 'test reverse');
 			@locations = $geo_coder->reverse_geocode(latlng => '51.50,-0.13');
 			ok(scalar(@locations) > 1);
@@ -230,7 +234,7 @@ MAXMIND: {
 			}
 		} else {
 			diag('Author tests not required for installation');
-			skip('Author tests not required for installation', 101);
+			skip('Author tests not required for installation', 102);
 		}
 	}
 }

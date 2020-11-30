@@ -93,7 +93,7 @@ Forks then runs the passed thunk in the child. The child process
 captures any uncaught exceptions and runs exit(1), otherwise upon
 ending the thunk exit(0).
 
-=item xLmtimed($), XLmtimed($)
+=item xLmtimed($path), XLmtimed($path)
 
 Those call lstat first, then if it's a symlink, also stat, then return
 an object with an mtime method that returns the newer mtime of the
@@ -106,7 +106,7 @@ any directory in any of the paths has newer mtime. Thus the result
 can't be relied on for security (well, couldn't anyway since mtime can
 be set, of course).
 
-=item xLmtime($), XLmtime($)
+=item xLmtime($path), XLmtime($path)
 
 Same as xLmtimed, XLmtimed but return the mtime value (or undef)
 instead of a wrapper object.
@@ -273,6 +273,7 @@ our @EXPORT_OK = qw(
 our %EXPORT_TAGS = (all => [@EXPORT, @EXPORT_OK]);
 
 use Carp;
+use FP::Carp;
 use Chj::singlequote 'singlequote_many';    # the only dependency so far
 use Chj::Unix::Exitcode qw(exitcode);
 
@@ -286,7 +287,8 @@ BEGIN {
     }
 }
 
-sub xfork() {
+sub xfork {
+    @_ == 0 or fp_croak_nargs 0;
     my $pid = fork;
     defined $pid or croak "xfork: $!";
     $pid
@@ -294,6 +296,7 @@ sub xfork() {
 
 # thread-like API; incomplete, for sure.
 sub xfork_(&) {
+    @_ == 1 or fp_croak_nargs 1;
     my ($thunk) = @_;
     my $pid = xfork;
     if ($pid) {
@@ -394,7 +397,8 @@ sub xxsystem_safe {
     $? == 0 or croak "xxsystem_safe: process terminated with " . exitcode($?);
 }
 
-sub xwaitpid ( $ ; $ ) {
+sub xwaitpid {
+    @_ >= 1 and @_ <= 2 or fp_croak_nargs "1-2";
     my ($pid, $flags) = @_;
     defined $flags or $flags = 0;
     my $kid = waitpid $pid, $flags;
@@ -405,7 +409,8 @@ sub xwaitpid ( $ ; $ ) {
     $kid
 }
 
-sub xxwaitpid ( $ ; $ ) {
+sub xxwaitpid {
+    @_ >= 1 and @_ <= 2 or fp_croak_nargs "1-2";
     my ($pid, $flags) = @_;
     defined $flags or $flags = 0;
     my $kid = xwaitpid $pid, $flags;
@@ -416,14 +421,14 @@ sub xxwaitpid ( $ ; $ ) {
 }
 
 sub xwait {
-    @_ == 0 or croak "xwait: expecting 0 arguments";
+    @_ == 0 or fp_croak_nargs 0;
     my $kid = wait;
     defined $kid or die "xwait: $!";    # when can this happen? EINTR?
     wantarray ? ($kid, $?) : $kid
 }
 
 sub xxwait {
-    @_ == 0 or croak "xxwait: expecting 0 arguments";
+    @_ == 0 or fp_croak_nargs 0;
     my $kid = wait;
     defined $kid or die "xxwait: $!";    # when can this happen? EINTR?
     my $status = $?;
@@ -433,12 +438,12 @@ sub xxwait {
 }
 
 sub xrename {
-    @_ == 2 or croak "xrename: wrong number of arguments";
+    @_ == 2 or fp_croak_nargs 2;
     rename $_[0], $_[1] or croak "xrename(" . join(", ", @_) . "): $!";
 }
 
 sub xlinkunlink {
-    @_ == 2 or croak "xlinkunlink: wrong number of arguments";
+    @_ == 2 or fp_croak_nargs 2;
     link $_[0], $_[1]
         or croak "xlinkunlink("
         . join(", ", @_)
@@ -465,7 +470,7 @@ sub xlinkunlink {
 # Since xlinkunlink doesn't work for directories, or not always under
 # grsec: (But note: it's careful, not guaranteed to be safe.)
 sub xxcarefulrename {
-    @_ == 2 or croak "xxcarefulrename: wrong number of arguments";
+    @_ == 2 or fp_croak_nargs 2;
     my ($source, $dest) = @_;
     if (link $source, $dest) {
         unlink $source or do {
@@ -505,7 +510,7 @@ sub xxcarefulrename {
 }
 
 sub xlinkreplace {
-    @_ == 2 or croak "xlinkreplace: wrong number of arguments";
+    @_ == 2 or fp_croak_nargs 2;
     my ($source, $dest) = @_;
     ## schon wieder dieser temporary try mechanismus. sollte ich dringend eine generische func oder ein makro dafür haben theoretisch
 # nun im gegensatz zu Tempfile.pm brauchen wir kein eval hier. Aber auch das waer ja per func/macro machbar
@@ -565,14 +570,14 @@ sub stat_possiblyhires {
     if ($time_hires) {
         require Time::HiRes;    # (that's not slow, right?)
         if (@_) {
-            @_ == 1 or die "wrong number of arguments";
+            @_ == 1 or fp_croak_nargs 1;
             Time::HiRes::stat($_[0])
         } else {
             Time::HiRes::stat($_)
         }
     } else {
         if (@_) {
-            @_ == 1 or die "wrong number of arguments";
+            @_ == 1 or fp_croak_nargs 1;
             stat($_[0])
         } else {
             stat($_)
@@ -584,14 +589,14 @@ sub lstat_possiblyhires {
     if ($time_hires) {
         require Chj::Linux::HiRes;
         if (@_) {
-            @_ == 1 or die "wrong number of arguments";
+            @_ == 1 or fp_croak_nargs 1;
             Chj::Linux::HiRes::lstat($_[0])
         } else {
             Chj::Linux::HiRes::lstat($_)
         }
     } else {
         if (@_) {
-            @_ == 1 or die "wrong number of arguments";
+            @_ == 1 or fp_croak_nargs 1;
             lstat($_[0])
         } else {
             lstat($_)
@@ -676,7 +681,7 @@ sub mk_caching_getANYid {
     my ($function, $scalarindex, $methodname) = @_;
     my %cache;
     sub {
-        @_ == 1 or die "wrong number of arguments";
+        @_ == 1 or fp_croak_nargs 1;
         my ($id) = @_;
         if (defined $id) {
             my $v;
@@ -702,7 +707,8 @@ sub mk_caching_getANYid {
 
 our $fstype_for_device;
 
-sub fstype_for_device_init() {
+sub fstype_for_device_init {
+    @_ == 0 or fp_croak_nargs 0;
     open my $mounts, "<", "/proc/mounts" or die "/proc/mounts: $!";
     local $/ = "\n";
     my %t;
@@ -746,7 +752,8 @@ sub fstype_for_device_init() {
     $fstype_for_device = \%t;
 }
 
-sub fstype_for_device($) {
+sub fstype_for_device {
+    @_ == 1 or fp_croak_nargs 1;
     my ($dev) = @_;
     my $t = $fstype_for_device->{$dev};
     if (!defined $t) {
@@ -1038,7 +1045,8 @@ use FP::Div qw(min max);    # min just for the backwards-compatible
     }
 }
 
-sub XLmtimed ($) {
+sub XLmtimed {
+    @_ == 1 or fp_croak_nargs 1;
     my ($path) = @_;
     if (my $ls = Xlstat $path) {
         bless do {
@@ -1057,18 +1065,21 @@ sub XLmtimed ($) {
     }
 }
 
-sub xLmtimed ($) {
+sub xLmtimed {
+    @_ == 1 or fp_croak_nargs 1;
     my ($path) = @_;
     my $t = XLmtimed $path;
     (defined $t) ? $t : die "xLmtimed: '$path': $!"
 }
 
-sub xLmtime ($) {
+sub xLmtime {
+    @_ == 1 or fp_croak_nargs 1;
     my ($path) = @_;
     xLmtimed($path)->mtime
 }
 
-sub XLmtime ($) {
+sub XLmtime {
+    @_ == 1 or fp_croak_nargs 1;
     my ($path) = @_;
     if (defined(my $s = XLmtimed($path))) {
         $s->mtime
@@ -1116,7 +1127,8 @@ sub XLmtime ($) {
     }
 }
 
-sub xlocaltime (;$ ) {
+sub xlocaltime {
+    @_ >= 0 and @_ <= 1 or fp_croak_nargs "0-1";
     bless [localtime(defined $_[0] ? $_[0] : time)],
         "Chj::xperlfunc::xlocaltime"
 }
@@ -1201,17 +1213,17 @@ sub xunlink {
 }
 
 sub xlink {
-    @_ == 2 or croak "xlink: wrong number of arguments";
+    @_ == 2 or fp_croak_nargs 2;
     link $_[0], $_[1] or croak "xlink '$_[0]','$_[1]': $!";
 }
 
 sub xsymlink {
-    @_ == 2 or croak "xsymlink: wrong number of arguments";
+    @_ == 2 or fp_croak_nargs 2;
     symlink $_[0], $_[1] or croak "xsymlink to '$_[1]': $!";
 }
 
 sub xutime {
-    @_ >= 2 or croak "xutime: wrong number of arguments";
+    @_ >= 2 or fp_croak_nargs ">= 2";
     my ($atime, $mtime) = (shift, shift);
     utime $atime, $mtime, @_ or croak "xutime @_: $!";
 }
@@ -1221,12 +1233,14 @@ sub xkill {
     kill $sig, @_ or croak "xkill $sig @_: $!";
 }
 
-sub xchroot ( $ ) {
+sub xchroot {
+    @_ == 1 or fp_croak_nargs 1;
     my ($rtd) = @_;
     chroot $rtd or die "could not chroot to '$rtd': $!";
 }
 
-sub xeval( $ ) {    # meant for string eval only, of course.
+sub xeval {    # meant for string eval only, of course.
+    @_ == 1 or die "wrong number of arguments";
     ## hm ps should one localize $@ here?
     if (defined wantarray) {
         if (wantarray) {
@@ -1262,7 +1276,8 @@ sub xfileno {
     croak "xfileno: '$arg' is not a filehandle nor a file descriptor number";
 }
 
-sub xsysread ( $ $ $ ; $ ) {
+sub xsysread {
+    @_ >= 3 and @_ <= 4 or fp_croak_nargs "3-4";
     my $rv = do {
         if (@_ == 4) {
             sysread $_[0], $_[1], $_[2], $_[3]
@@ -1279,7 +1294,8 @@ sub xsysread ( $ $ $ ; $ ) {
 
 use FP::Show qw(show_many);
 
-sub basename ($;$$) {
+sub basename {
+    @_ >= 1 and @_ <= 3 or fp_croak_nargs "1-3";
     my ($path, $maybe_suffixS, $insensitive) = @_;
     my $copy = $path;
     $copy =~ s|.*/||s;
@@ -1335,7 +1351,8 @@ sub basename ($;$$) {
 #blabla
 # so no, do not strip before basenaming, really do it afterwards as I do
 
-sub dirname ($ ) {
+sub dirname {
+    @_ == 1 or fp_croak_nargs 1;
     my ($path) = @_;
     if ($path =~ s|/+[^/]+/*\z||) {
         if (length $path) {
@@ -1358,9 +1375,10 @@ sub dirname ($ ) {
     }
 }
 
-sub xmkdir_p ($ );
+sub xmkdir_p;
 
-sub xmkdir_p ($ ) {
+sub xmkdir_p {
+    @_ == 1 or fp_croak_nargs 1;
     my ($path) = @_;
 
     # (XX: see commit d1abd3c2 in megacopy for possible improvement)
@@ -1384,13 +1402,15 @@ sub xmkdir_p ($ ) {
     }
 }
 
-sub xlink_p ($ $ ) {
+sub xlink_p {
+    @_ == 2 or fp_croak_nargs 2;
     my ($from, $to) = @_;
     xmkdir_p(dirname $to);
     xlink $from, $to
 }
 
-# sub xuser_uid ( $ ) {
+# sub xuser_uid  {
+#     @_ == 1 or die "wrong number of arguments";
 #     my ($user) = @_;
 #     my ($login,$pass,$uid,$gid) = getpwnam($user)
 #       or die "xuser_uid: '$user' not in passwd file";
@@ -1415,7 +1435,8 @@ sub xlink_p ($ $ ) {
     end Chj::Class::Array;
 }
 
-sub xgetpwnam ( $ ) {
+sub xgetpwnam {
+    @_ == 1 or fp_croak_nargs 1;
     my ($user) = @_;
     if (wantarray) {
         my @f = Chj::xperlfunc::Getpwnam->perhaps_get($user);
@@ -1445,7 +1466,8 @@ sub xgetpwnam ( $ ) {
     end Chj::Class::Array;
 }
 
-sub xgetgrnam ( $ ) {
+sub xgetgrnam {
+    @_ == 1 or fp_croak_nargs 1;
     my ($group) = @_;
     if (wantarray) {
         my @f = Chj::xperlfunc::Getgrnam->perhaps_get($group);
@@ -1471,7 +1493,8 @@ sub xprintln {
     print $fh @_, "\n" or die "printing to $fh: $!"
 }
 
-sub xgetfile_utf8 ($) {
+sub xgetfile_utf8 {
+    @_ == 1 or fp_croak_nargs 1;
     my ($path) = @_;
     open my $in, "<", $path or die "xgetfile_utf8($path): open: $!";
     binmode $in, ":encoding(UTF-8)" or die "binmode";
@@ -1481,7 +1504,7 @@ sub xgetfile_utf8 ($) {
     $cnt
 }
 
-sub xslurp ($);
+sub xslurp;
 *xslurp = \&xgetfile_utf8;
 
 1;

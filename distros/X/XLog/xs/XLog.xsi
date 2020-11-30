@@ -97,7 +97,6 @@ static void xslog (Level level, SV** args, I32 items) {
     });
 }
 
-
 MODULE = XLog                PACKAGE = XLog
 PROTOTYPES: DISABLE
 
@@ -105,15 +104,15 @@ BOOT {
     Stash stash(__PACKAGE__);
     
     xs::exp::create_constants(stash, {
-        {"VERBOSE_DEBUG", VERBOSE_DEBUG},
-        {"DEBUG",         DEBUG},
-        {"INFO",          INFO},
-        {"NOTICE",        NOTICE},
-        {"WARNING",       WARNING},
-        {"ERROR",         ERROR},
-        {"CRITICAL",      CRITICAL},
-        {"ALERT",         ALERT},
-        {"EMERGENCY",     EMERGENCY},
+        {"VERBOSE_DEBUG", (int)Level::VerboseDebug},
+        {"DEBUG",         (int)Level::Debug},
+        {"INFO",          (int)Level::Info},
+        {"NOTICE",        (int)Level::Notice},
+        {"WARNING",       (int)Level::Warning},
+        {"ERROR",         (int)Level::Error},
+        {"CRITICAL",      (int)Level::Critical},
+        {"ALERT",         (int)Level::Alert},
+        {"EMERGENCY",     (int)Level::Emergency},
     });
     
     stash.add_const_sub("default_format", xs::out(default_format));
@@ -140,7 +139,8 @@ void log (Level level, ...) {
     if (!(PL_op->op_spare & 1)) xlog::optimize();
 }
 
-void __logXXX (...) : ALIAS(verbose_debug=VERBOSE_DEBUG, debug=DEBUG, info=INFO, notice=NOTICE, warning=WARNING, error=ERROR, critical=CRITICAL, alert=ALERT, emergency=EMERGENCY) {
-    xslog((Level)ix, &ST(0), items);
-    if (!(PL_op->op_spare & 1)) xlog::optimize((Level)ix);
+void __logXXX (...) : ALIAS(verbose_debug=0, debug=1, info=2, notice=3, warning=4, error=5, critical=6, alert=7, emergency=8) {
+    Level level = Level((int)Level::VerboseDebug + ix);
+    xslog(level, &ST(0), items);
+    if (!(PL_op->op_spare & 1)) xlog::optimize(level);
 }

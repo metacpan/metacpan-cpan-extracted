@@ -170,13 +170,14 @@ subtest 'Select data (two steps binding)' => sub {
             toTestName($expected) );
     }
     $sth->finish;
+    $DBIx::NamedParams::KeepBindingIfNoKey = 0;
 };
 
 subtest 'KeepBindingIfNoKey' => sub {
     $DBIx::NamedParams::KeepBindingIfNoKey = 1;
     my @inputs = (
         { ID => 7, Name => 'Tiffany', State => 7, },
-        { ID => 8, Name => 'Dana', },                  # `State` is not defined.
+        { ID => 8, Name => 'Dana', },                      # `State` is not defined.
         { ID => 9, Name => 'Cartia', State => undef, },    # clear `State`.
     );
     my @expecteds = (
@@ -205,6 +206,7 @@ subtest 'KeepBindingIfNoKey' => sub {
         is_deeply( $sth->fetchrow_hashref, $expected, toTestName($expected) );
     }
     $sth->finish;
+    $DBIx::NamedParams::KeepBindingIfNoKey = 0;
 };
 
 subtest 'prepare_ex need hash' => sub {
@@ -267,12 +269,85 @@ subtest 'bind_param_ex need hash' => sub {
     $sth->finish;
 };
 
+subtest 'Multi statements' => sub {
+    my $sth_check;
+    ok( $sth_check = $dbh->prepare_ex(
+            q{  SELECT * 
+                FROM `Users` 
+                WHERE `ID` = :ID-INTEGER },
+        ),
+        'Prepare CHECK'
+    ) or diag($DBI::errstr);
+    my $sth_insert;
+    ok( $sth_insert = $dbh->prepare_ex(
+            q{  INSERT INTO `Users` ( `ID`, `Name`, `Status` ) 
+                VALUES ( :ID-INTEGER, :Name-VARCHAR, :State-INTEGER ) }
+        ),
+        'Prepare INSERT'
+    ) or diag($DBI::errstr);
+    my $sth_update;
+    ok( $sth_update = $dbh->prepare_ex(
+            q{  UPDATE `Users` 
+                SET `Name` = :Name-VARCHAR, 
+                    `Status` = :State-INTEGER 
+                WHERE `ID` = :ID-INTEGER }
+        ),
+        'Prepare UPDATE'
+    ) or diag($DBI::errstr);
+    showAll();
+    my @inputs = (
+        { ID => 2,  Name => 'Misery', State => 3, Action => 'Update', },
+        { ID => 10, Name => 'Elle',   State => 4, Action => 'Insert', },
+        { ID => 3,  Name => 'Ilina',  State => 5, Action => 'Update', },
+        { ID => 11, Name => 'Risa',   State => 6, Action => 'Insert', },
+    );
+    foreach my $input (@inputs) {
+        $sth_check->bind_param_ex($input) or diag($DBI::errstr);
+        $sth_check->execute()             or diag($DBI::errstr);
+        if ( !$sth_check->fetchrow_hashref ) {
+            is( $input->{'Action'}, 'Insert', toTestName( $input, 'Insert' ) );
+            $sth_insert->bind_param_ex($input) or diag($DBI::errstr);
+            $sth_insert->execute()             or diag($DBI::errstr);
+        } else {
+            is( $input->{'Action'}, 'Update', toTestName( $input, 'Update' ) );
+            $sth_update->bind_param_ex($input) or diag($DBI::errstr);
+            $sth_update->execute()             or diag($DBI::errstr);
+        }
+        $sth_check->bind_param_ex($input) or diag($DBI::errstr);
+        $sth_check->execute()             or diag($DBI::errstr);
+        is_deeply(
+            $sth_check->fetchrow_hashref,
+            {   ID     => $input->{'ID'},
+                Name   => $input->{'Name'},
+                Status => $input->{'State'},
+            },
+            toTestName($input)
+        );
+    }
+    $sth_check->finish;
+    $sth_insert->finish;
+    $sth_update->finish;
+    showAll();
+};
+
 $dbh->disconnect;
 unlink('dbfile');
 
 done_testing;
 
+sub showAll {
+    my @fields = qw(ID Name Status);
+    my $sth    = $dbh->prepare( 'SELECT * FROM `Users`', ) or diag($DBI::errstr);
+    $sth->execute() or diag($DBI::errstr);
+    note( join( "\t", @fields ) );
+    while ( my $row = $sth->fetchrow_hashref ) {
+        note( join( "\t", map { $row->{$_} } @fields ) );
+    }
+    $sth->finish;
+}
+
 sub toTestName {
     my $expected = shift or return 'No more data';
-    return "Get $expected->{ID}:$expected->{Name}";
+    my $action   = shift || 'Get';
+    return "$action $expected->{ID}:$expected->{Name}";
 }

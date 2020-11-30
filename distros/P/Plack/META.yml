@@ -9,7 +9,7 @@ configure_requires:
   ExtUtils::MakeMaker: '0'
   File::ShareDir::Install: '0.06'
 dynamic_config: 0
-generated_by: 'Dist::Milla version v1.0.18, Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Milla version v1.0.20, Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.143240'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -30,7 +30,7 @@ requires:
   Devel::StackTrace::AsHTML: '0.11'
   File::ShareDir: '1.00'
   Filesys::Notify::Simple: '0'
-  HTTP::Entity::Parser: '0.17'
+  HTTP::Entity::Parser: '0.25'
   HTTP::Headers::Fast: '0.18'
   HTTP::Message: '5.814'
   HTTP::Tiny: '0.034'
@@ -47,7 +47,7 @@ resources:
   bugtracker: https://github.com/plack/Plack/issues
   homepage: https://github.com/plack/Plack
   repository: https://github.com/plack/Plack.git
-version: '1.0047'
+version: '1.0048'
 x_authority: cpan:MIYAGAWA
 x_contributors:
   - 'Aaron Trevena <aaron.trevena@gmail.com>'
@@ -84,6 +84,7 @@ x_contributors:
   - 'David Steinbrunner <dsteinbrunner@MountainBook-Pro.local>'
   - 'dmaestro <dmaestro@users.noreply.github.com>'
   - 'Eduardo Arino de la Rubia <earino@rent.com>'
+  - 'Emmanuel Seyman <emmanuel@seyman.fr>'
   - 'Eric Johnson <eric.git@iijo.org>'
   - 'Eugen Konkov <kes-kes@yandex.ru>'
   - 'Fabrice Gabolde <fabrice.gabolde@gmail.com>'
@@ -129,7 +130,10 @@ x_contributors:
   - 'Masahiro Chiba <chiba@everqueue.com>'
   - 'Masahiro Nagano <kazeburo@gmail.com>'
   - 'Michael G. Schwern <schwern@pobox.com>'
+  - 'Michal Josef Špaček <michal.josef.spacek@gmail.com>'
   - 'mickey <mickey75@gmail.com>'
+  - 'Narsimham Chelluri <nchelluri@maxmind.com>'
+  - 'Narsimham Chelluri <nchelluri@users.noreply.github.com>'
   - 'Nick Wellnhofer <wellnhofer@aevum.de>'
   - 'Nobuo Danjou <nobuo.danjou@gmail.com>'
   - 'Olaf Alders <olaf@wundersolutions.com>'
@@ -141,6 +145,7 @@ x_contributors:
   - 'Panu Ervamaa <panu.ervamaa@frantic.com>'
   - 'Paul Driver <frodwith@gmail.com>'
   - 'Pedro Melo <melo@simplicidade.org>'
+  - 'Perlover <perlover@perlover.com>'
   - 'Peter Flanigan <github@roxsoft.co.uk>'
   - 'Peter Makholm <peter@makholm.net>'
   - 'Piotr Roszatycki <piotr.roszatycki@gmail.com>'
@@ -152,6 +157,7 @@ x_contributors:
   - 'Ricky Morse <remorse@partners.org>'
   - 'Robert Rothenberg <rrwo@cpan.org>'
   - 'Rob Hoelz <rob@hoelz.ro>'
+  - 'runarb <rb@searchdaimon.com>'
   - 'Ryo Miyake <ryo.studiom@gmail.com>'
   - 'Sawyer X <xsawyerx@cpan.org>'
   - 'Scott S. McCoy <smccoy@saymedia.com>'
@@ -163,7 +169,9 @@ x_contributors:
   - 'Stuart A Johnston <saj_git@thecommune.net>'
   - 'Takeshi OKURA <okura3@gmail.com>'
   - 'Tatsuhiko Miyagawa <miyagawa@bulknews.net>'
+  - 'The Dumb Terminal <thedumbterminal@users.noreply.github.com>'
   - 'Thomas Klausner <domm@plix.at>'
+  - 'Thomas Sibley <tsibley@cpan.org>'
   - 'Tim Bunce <Tim.Bunce@pobox.com>'
   - 'Tokuhiro Matsuno <tokuhirom@gmail.com>'
   - 'Tomas Doran <bobtfish@bobtfish.net>'
@@ -176,4 +184,6 @@ x_contributors:
   - 'Yury Zavarin <yury.zavarin@gmail.com>'
   - 'Yuval Kogman <nothingmuch@woobling.org>'
   - '唐鳳 <audreyt@audreyt.org>'
-x_serialization_backend: 'YAML::Tiny version 1.70'
+x_generated_by_perl: v5.20.1
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_static_install: 1

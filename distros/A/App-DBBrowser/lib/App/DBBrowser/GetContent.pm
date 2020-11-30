@@ -159,6 +159,9 @@ sub get_content {
                     $sf->{i}{gc}{bu_insert_into_args} = [ map { [ @$_ ] } @{$sql->{insert_into_args}} ];
                 }
                 $skip_to = '';
+                if ( ! $sf->{o}{insert}{enable_input_filter} ) {
+                    return 1;
+                }
 
                 FILTER: while ( 1 ) {
                     my $ok = $cf->input_filter( $sql );

@@ -1,13 +1,15 @@
 package Devel::Confess::Patch::UseDataDmp;
 
-our $DATE = '2015-12-31'; # DATE
-our $VERSION = '0.02'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-06-19'; # DATE
+our $DIST = 'Devel-Confess-Patch-UseDataDmp'; # DIST
+our $VERSION = '0.030'; # VERSION
 
 use 5.010001;
 use strict;
 no warnings;
 
-use Module::Patch 0.12 qw();
+use Module::Patch;
 use base qw(Module::Patch);
 
 our %config;
@@ -48,7 +50,7 @@ Devel::Confess::Patch::UseDataDmp - Use Data::Dmp to stringify reference
 
 =head1 VERSION
 
-This document describes version 0.02 of Devel::Confess::Patch::UseDataDmp (from Perl distribution Devel-Confess-Patch-UseDataDmp), released on 2015-12-31.
+This document describes version 0.030 of Devel::Confess::Patch::UseDataDmp (from Perl distribution Devel-Confess-Patch-UseDataDmp), released on 2020-06-19.
 
 =head1 SYNOPSIS
 
@@ -57,8 +59,6 @@ This document describes version 0.02 of Devel::Confess::Patch::UseDataDmp (from 
 =head1 DESCRIPTION
 
 =for Pod::Coverage ^()$
-
-=head1 SEE ALSO
 
 =head1 HOMEPAGE
 
@@ -76,13 +76,17 @@ When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
 
+=head1 SEE ALSO
+
+L<Data::Dmp>
+
 =head1 AUTHOR
 
 perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2015 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

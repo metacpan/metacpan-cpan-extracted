@@ -85,6 +85,37 @@ METHODS
 
     Resolves to the current status.
 
+ create_branch
+
+    Creates a new branch.
+
+    Takes the following named parameters:
+
+      * owner - which organisation owns the target repository
+
+      * repo - the repository to raise the PR against
+
+      * branch - new branch name that will be created
+
+      * sha - the SHA1 value for this branch
+
+ update_ref
+
+    Update a reference to a new commit
+
+    Takes the following named parameters:
+
+      * owner - which organisation owns the target repository
+
+      * repo - the repository to raise the PR against
+
+      * ref - ref name that we are updating.
+
+      * sha - the SHA1 value of comment that the ref will point to
+
+      * force - force update ref even if it is not fast-forward if it is
+      true.
+
  create_pr
 
     Creates a new pull request.
@@ -100,6 +131,23 @@ METHODS
 
       * base - base commit this PR applies changes to typically you'd want
       the target repo master
+
+ create_commit
+
+    Creates an empty commit. Can be used to simulate git commit
+    --allow-empty or to create a merge commit from multiple heads.
+
+    Takes the following named parameters:
+
+      * owner - which organisation owns the target repository
+
+      * repo - the repository to raise the PR against
+
+      * message - The commit message
+
+      * tree - The SHA of tree object that commit will point to
+
+      * parents - Arrayref that include the parents of the commit
 
  user
 

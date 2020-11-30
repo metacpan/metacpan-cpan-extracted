@@ -5,7 +5,7 @@ use Mojo::Base 'Mojolicious::Plugin';
 use Plack::Util;
 use Mojo::Message::Request;
 use Mojo::Message::Response;
-our $VERSION = '0.37';
+our $VERSION = '0.38';
 use Scalar::Util 'weaken';
     
     ### ---
@@ -16,12 +16,13 @@ use Scalar::Util 'weaken';
         
         my $plack_app = sub {
             my $env = shift;
-            my $tx = $env->{'mojo.c'}->tx;
+            my $c = $env->{'mojo.c'};
+            my $tx = $c->tx;
             
             $tx->req(psgi_env_to_mojo_req($env));
             
             if ($env->{'mojo.routed'}) {
-                my $stash = $env->{'mojo.c'}->stash;
+                my $stash = $c->stash;
                 for my $key (grep {$_ =~ qr{^mojo\.}} keys %{$stash}) {
                     delete $stash->{$key};
                 }
@@ -29,6 +30,7 @@ use Scalar::Util 'weaken';
                 my $sever = $tx->res->headers->header('server');
                 $tx->res(Mojo::Message::Response->new);
                 $tx->res->headers->header('server', $sever);
+                $c->match(Mojolicious::Routes::Match->new->root($c->app->routes));
                 $env->{'mojo.inside_app'}->();
             } else {
                 $env->{'mojo.inside_app'}->();

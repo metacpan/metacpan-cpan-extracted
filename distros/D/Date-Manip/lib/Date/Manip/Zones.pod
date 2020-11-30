@@ -5,9 +5,9 @@
 
 # This file was automatically generated.  Any changes to this file will
 # be lost the next time 'tzdata' is run.
-#    Generated on: Mon Jun  1 07:59:10 EDT 2020
-#    Data version: tzdata2020a
-#    Code version: tzcode2020a
+#    Generated on: Mon Nov 30 13:52:50 EST 2020
+#    Data version: tzdata2020d
+#    Code version: tzcode2020d
 
 # This module contains data from the zoneinfo time zone database.  The original
 # data was obtained from the URL:
@@ -665,7 +665,6 @@ The zoneinfo database provides several standard aliases, including:
      US/Michigan                          America/Detroit
      US/Mountain                          America/Denver
      US/Pacific                           America/Los_Angeles
-     US/Pacific-New                       America/Los_Angeles
      US/Samoa                             Pacific/Pago_Pago
      W-SU                                 Europe/Moscow
 
@@ -686,9 +685,9 @@ default alias can be overridden as described above.
                                           Australia/Currie
                                           Australia/Hobart
                                           Australia/Sydney
+                                          Antarctica/Macquarie
                                           Australia/Lindeman
                                           Australia/Brisbane
-                                          Antarctica/Macquarie
      AHST10AHDT                           America/Anchorage
      AKST9AKDT                            America/Anchorage
                                           America/Juneau
@@ -1664,8 +1663,8 @@ L<Date::Manip::TZ> module.
      0      +00:06:04   Europe/Andorra
      0      +00:09:21   Europe/Paris
                         Africa/Tunis
-                        Europe/Monaco
                         Africa/Algiers
+                        Europe/Monaco
      0      +00:12:12   Africa/Algiers
      0      +00:13:36   Africa/Lagos
      0      +00:17:30   Europe/Brussels
@@ -2163,6 +2162,7 @@ L<Date::Manip::TZ> module.
                         Etc/GMT+10
                         W
                         Antarctica/DumontDUrville
+                        Antarctica/Macquarie
                         Asia/Magadan
                         Asia/Sakhalin
                         Pacific/Bougainville
@@ -2176,7 +2176,6 @@ L<Date::Manip::TZ> module.
                         Pacific/Majuro
                         Pacific/Pohnpei
                         Australia/Broken_Hill
-                        Antarctica/Macquarie
      0      +10:03:12   Asia/Magadan
      0      +10:04:52   Australia/Sydney
      0      +10:07:08   Pacific/Chuuk
@@ -2201,7 +2200,7 @@ L<Date::Manip::TZ> module.
                         Pacific/Norfolk
                         Etc/GMT+11
                         X
-                        Antarctica/Macquarie
+                        Antarctica/Casey
                         Asia/Ust-Nera
                         Asia/Vladivostok
                         Asia/Kamchatka
@@ -2209,7 +2208,6 @@ L<Date::Manip::TZ> module.
                         Asia/Khandyga
                         Pacific/Kwajalein
                         Pacific/Majuro
-                        Antarctica/Casey
      0      +11:05:48   Pacific/Noumea
      0      +11:06:28   Pacific/Wake
      0      +11:07:40   Pacific/Nauru
@@ -2683,6 +2681,7 @@ L<Date::Manip::TZ> module.
                         Australia/Melbourne
                         Australia/Sydney
                         Australia/Lord_Howe
+                        Antarctica/Macquarie
                         Asia/Vladivostok
                         Asia/Sakhalin
                         Asia/Khandyga
@@ -2692,7 +2691,6 @@ L<Date::Manip::TZ> module.
                         Asia/Srednekolymsk
                         Asia/Ust-Nera
                         Pacific/Guam
-                        Antarctica/Macquarie
      1      +11:30:00   Australia/Lord_Howe
      1      +12:00:00   Pacific/Norfolk
                         Asia/Magadan
@@ -2765,18 +2763,18 @@ most commonly used, I'm willing to entertain arguments for altering the order.
                       Australia/Currie
                       Australia/Hobart
                       Australia/Sydney
+                      Antarctica/Macquarie
                       Australia/Lindeman
                       Australia/Brisbane
-                      Antarctica/Macquarie
      AEST             Australia/Melbourne
                       Australia/Brisbane
                       Australia/Lindeman
                       Australia/Currie
                       Australia/Hobart
                       Australia/Sydney
+                      Antarctica/Macquarie
                       Australia/Lord_Howe
                       Australia/Broken_Hill
-                      Antarctica/Macquarie
      AHDT             America/Anchorage
      AHST             America/Anchorage
                       America/Adak
@@ -3435,9 +3433,9 @@ most commonly used, I'm willing to entertain arguments for altering the order.
                       Asia/Pontianak
                       Asia/Yekaterinburg
                       Africa/Tunis
-                      Europe/Monaco
                       Europe/Paris
                       Africa/Algiers
+                      Europe/Monaco
                       Europe/Prague
      PPMT             America/Port-au-Prince
      PPT              America/Los_Angeles

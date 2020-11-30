@@ -1,5 +1,8 @@
 Revision history for perl distribution LinkEmbedder
 
+1.15 2020-11-25T10:43:25+0900
+ - Add support for Jitsi links
+
 1.14 2020-09-21T08:47:37+0900
  - Select github line ranges when specified
    Contributor: Joel Berger

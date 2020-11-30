@@ -3,7 +3,7 @@ NAME
     date/time string
 
 VERSION
-    This document describes version 0.004 of
+    This document describes version 0.005 of
     DateTime::Format::ISO8601::Format (from Perl distribution
     DateTime-Format-ISO8601-Format), released on 2020-08-21.
 
@@ -140,9 +140,10 @@ SEE ALSO
     not feature a "format_datetime()" method, so
     DateTime::Format::ISO8601::Format supplies that functionality. After
     v0.12, DateTime::Format::ISO8601 already has "format_datetime()", but
-    currently DateTime::Format::ISO8601::Format's version is faster and
-    there's "format_date" and "format_time" as well. So I'm keeping this
-    module for now.
+    currently DateTime::Format::ISO8601::Format's version is faster (see
+    Bencher::Scenario::FormattingISO8601DateTime) and there are
+    "format_date" and "format_time" as well. So I'm keeping this module for
+    now.
 
     DateTime::Format::Duration::ISO8601 to parse and format ISO8601
     durations.

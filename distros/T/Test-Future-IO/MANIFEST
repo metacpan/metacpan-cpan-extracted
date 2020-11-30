@@ -1,0 +1,13 @@
+Build.PL
+Changes
+lib/Test/Future/IO.pm
+LICENSE
+MANIFEST			This list of files
+META.json
+META.yml
+README
+t/00use.t
+t/01sleep.t
+t/02sysread.t
+t/03syswrite.t
+t/99pod.t

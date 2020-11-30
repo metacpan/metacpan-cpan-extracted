@@ -20,4 +20,4 @@ no_index:
 requires:
   Math::BLAS: 0
   perl: 5.010
-version: 1.03
+version: 1.04

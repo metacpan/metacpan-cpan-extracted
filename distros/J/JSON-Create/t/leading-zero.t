@@ -13,7 +13,7 @@ use JSON::Create 'create_json';
 # Get a PV value into $h{b} with leading zeros.
 my %h = (a => '1', b => '00', c => '01');
 # Get an IV value into $h{b} by forcing it to integer.
-my $dummy = sprintf ("%d", $h{b});
+#my $dummy = sprintf ("%d", $h{b});
 my $j = create_json (\%h);
 #print $h{b}, "\n";
 #TODO: {

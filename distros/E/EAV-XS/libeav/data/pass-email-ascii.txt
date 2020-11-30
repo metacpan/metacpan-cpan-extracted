@@ -61,7 +61,6 @@ this_is.also."valid"@ok.com
 "very.(),:;<>[]\".VERY.\"very@\\\ \"very\".unusual"@ok.com
 "\abc"@rfc822.net
 -abc@rfc822.net
-abc.@rfc822.com
 #
 #
 #

@@ -41,3 +41,7 @@ Change to how page loading is checked in fire events.
 
 0.128 Wed Nov 18 10:20:00 CET 2020
 - better error handling for get_html_source
+
+0.129 Thu Nov 19 14:00:00 CET 2020
+- Remove uneeded lib path in test file
+- Improved cookie management using Webkit2s Website data manage and cookie manager

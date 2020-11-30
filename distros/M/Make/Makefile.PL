@@ -56,7 +56,8 @@ my %WriteMakefileArgs = (
         "strict"           => 0,
         "warnings"         => 0,
         "Text::Balanced"   => '2.03',
-        "Text::ParseWords" => '3.30',
+        "Text::ParseWords" => '3.24',
+        "Graph"            => '0.9709',    # path_count
     },
     "TEST_REQUIRES" => {
         "Test::More" => "1.00",

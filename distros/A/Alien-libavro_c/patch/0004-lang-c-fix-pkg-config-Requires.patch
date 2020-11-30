@@ -1,0 +1,33 @@
+From d3be5e69a61ddbc6871a6612cd64505d1fc35373 Mon Sep 17 00:00:00 2001
+From: Brian Fraser <brian.fraser@booking.com>
+Date: Mon, 23 Nov 2020 19:08:54 +0100
+Subject: [PATCH 4/6] lang/c fix pkg-config Requires
+
+Code was expecting a double-interpolation from cmake which didn't
+happen, leaving the Requires section like this:
+
+    Requires: @ZLIB_PKG@ @LZMA_PKG@ @SNAPPY_PKG@
+
+This patch fixes that:
+
+    Requires zlib liblzma
+---
+ lang/c/CMakeLists.txt | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/lang/c/CMakeLists.txt b/lang/c/CMakeLists.txt
+index 5c8311b1..ac46b1da 100644
+--- a/lang/c/CMakeLists.txt
++++ b/lang/c/CMakeLists.txt
+@@ -176,7 +176,7 @@ else (LZMA_FOUND)
+ endif (LZMA_FOUND)
+ 
+ set(CODEC_LIBRARIES ${ZLIB_LIBRARIES} ${LZMA_LIBRARIES} ${SNAPPY_LIBRARIES})
+-set(CODEC_PKG "@ZLIB_PKG@ @LZMA_PKG@ @SNAPPY_PKG@")
++set(CODEC_PKG "${ZLIB_PKG} ${LZMA_PKG} ${SNAPPY_PKG}")
+ 
+ # Jansson JSON library
+ pkg_check_modules(JANSSON jansson>=2.3)
+-- 
+2.29.2
+

@@ -4,7 +4,7 @@
       "Philippe Bruhat (BooK) <book@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -54,6 +54,7 @@
             "Acme::CPANAuthors::Polish" : "0",
             "Acme::CPANAuthors::Portuguese" : "0",
             "Acme::CPANAuthors::Russian" : "0",
+            "Acme::CPANAuthors::Slovak" : "0",
             "Acme::CPANAuthors::Spanish" : "0",
             "Acme::CPANAuthors::Swedish" : "0",
             "Acme::CPANAuthors::Taiwanese" : "0",
@@ -86,7 +87,8 @@
          "web" : "http://github.com/book/Task-CPANAuthors-Regional"
       }
    },
-   "version" : "1.002",
-   "x_serialization_backend" : "JSON::XS version 3.03"
+   "version" : "1.003",
+   "x_generated_by_perl" : "v5.28.1",
+   "x_serialization_backend" : "JSON::XS version 3.04"
 }
 

@@ -86,10 +86,10 @@ if (!defined $pid) {
 } elsif ($pid == 0) {
   say "This is the server...";
   if (not -f "t/cert.pem" or not -f "t/key.pem") {
-    my $version = qx(openssl version);
-    if (not $version) {
-      die "Cannot invoke openssl to create certificates\n";
-    } elsif ($version =~ /^OpenSSL 1\.0\./) {
+    my $version = qx(openssl version)
+	or die "Cannot invoke openssl to create certificates\n";
+    print $version;
+    if ($version =~ /^OpenSSL 1\.0\./) {
       my $cmd = qq(openssl req -new -x509 -newkey rsa -subj /CN=localhost )
 	  . qq( -days 1825 -nodes -out t/cert.pem -keyout t/key.pem);
       system($cmd) == 0 or die "openssl failed to create t/cert.pem and t/key.pem: $?";

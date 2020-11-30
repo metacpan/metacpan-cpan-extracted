@@ -4,6 +4,20 @@ TODO: pack_keys?
 TODO: document encode_cbor_sharing?
 TODO: weaken cyclic structures?
 TODO: large negative integers
+TODO: type cast tests.
+TODO: possibly implement https://peteroupc.github.io/CBOR/extended.html, but NaNs are nonportable. rely on libecb?
+TODO: https://github.com/svaarala/cbor-specs/blob/master/cbor-nonutf8-string-tags.rst, but maybe that is overkill?
+
+1.81 Mon Nov 30 19:29:33 CET 2020
+	- cast funbctions were broken due to last-minute renaming. thats
+          what you egt for not havign a tessuite.
+	- Math::BigInt and Math::BigFloat are pretty broken (again),
+          so disable some tests. (try printing the bigfloat
+          799999999999999999998E99999999999999999998).
+
+1.8  Sun Nov 29 22:35:13 CET 2020
+	- experimental support for some type casts, as well as embedding
+          raw cbor data.
 
 1.71 Thu Nov 15 20:52:13 CET 2018
 	- work around what smells like a perl bug w.r.t. exceptions

@@ -7,6 +7,7 @@ use parent 'Exporter';
 use English qw(-no_match_vars);
 use Memoize;
 use File::stat;
+use File::Basename qw(basename);
 
 use FusionInventory::Agent::Tools;
 
@@ -67,14 +68,19 @@ sub getDmidecodeInfos {
 
         next unless $line =~ /^\s+ ([^:]+) : \s (.*\S)/x;
 
-        next if
-            $2 eq 'N/A'                        ||
-            $2 eq 'Not Specified'              ||
-            $2 eq 'Not Present'                ||
-            $2 eq 'Unknown'                    ||
-            $2 eq '<BAD INDEX>'                ||
-            $2 eq '<OUT OF SPEC>'              ||
-            $2 eq '<OUT OF SPEC><OUT OF SPEC>' ;
+        next if $2 =~ m{
+            ^(?:
+                N/A                                |
+                None                               |
+                Unknown                            |
+                Not \s* Specified                  |
+                Not \s* Present                    |
+                Not \s* Available                  |
+                <BAD \s* INDEX>                    |
+                (?:<OUT \s* OF \s* SPEC>){1,2}     |
+                \s* To \s* Be \s* Filled \s* By \s* O\.E\.M\.
+            )$
+        }xi ;
 
         $block->{$1} = trimWhitespace($2);
     }
@@ -85,8 +91,9 @@ sub getDmidecodeInfos {
         push(@{$info->{$type}}, $block);
     }
 
-    # do not return anything if dmidecode output is obviously truncated
-    return if keys %$info < 2;
+    # do not return anything if dmidecode output is obviously truncated, but that's
+    # okay during tests
+    return if keys %$info < 2 && !$params{file};
 
     return $info;
 }
@@ -174,20 +181,35 @@ sub getCpusFromDmidecode {
 sub getHdparmInfo {
     my (%params) = @_;
 
-    my $handle = getFileHandle(
-        %params,
-        command => $params{device} ? "hdparm -I $params{device}" : undef,
-    );
-    return unless $handle;
+    return unless $params{device} || $params{file};
+
+    $params{command} = "hdparm -I $params{device}" if $params{device};
+
+    # We need to support dump params to permit full testing when root params is set
+    if ($params{root}) {
+        $params{file} = "$params{root}/hdparm-".basename($params{device});
+    } elsif ($params{dump}) {
+        $params{dump}->{"hdparm-".basename($params{device})} = getAllLines(%params);
+    }
+
+    my $handle = getFileHandle(%params)
+        or return;
 
     my $info;
+
     while (my $line = <$handle>) {
-        $info->{model}     = $1 if $line =~ /Model Number:\s+(\S.+\S)/;
-        $info->{firmware}  = $1 if $line =~ /Firmware Revision:\s+(\S+)/;
-        $info->{serial}    = $1 if $line =~ /Serial Number:\s+(\S*)/;
-        $info->{size}      = $1 if $line =~ /1000:\s+(\d*)\sMBytes/;
-        $info->{transport} = $1 if $line =~ /Transport:.+(SCSI|SATA|USB)/;
-        $info->{wwn}       = $1 if $line =~ /WWN Device Identifier:\s+(\S+)/;
+        if ($line =~ /Integrity word not set/) {
+            $info = {};
+            last;
+        }
+
+        $info->{DESCRIPTION}  = $1 if $line =~ /Transport:.+(SATA|SAS|SCSI|USB)/;
+        $info->{DISKSIZE}     = $1 if $line =~ /1000:\s+(\d*)\sMBytes/;
+        $info->{FIRMWARE}     = $1 if $line =~ /Firmware Revision:\s+(\w+)/;
+        $info->{INTERFACE}    = $1 if $line =~ /Transport:.+(SATA|SAS|SCSI|USB)/;
+        $info->{MODEL}        = $1 if $line =~ /Model Number:\s+(\w.+\w)/;
+        $info->{SERIALNUMBER} = $1 if $line =~ /Serial Number:\s+(\w*)/;
+        $info->{WWN}          = $1 if $line =~ /WWN Device Identifier:\s+(\w+)/;
     }
     close $handle;
 
@@ -296,12 +318,15 @@ my @datadirs = ($OSNAME ne 'linux') ? () : (
 sub _getIdsFile {
     my (%params) = @_;
 
-    return "$params{datadir}/$params{idsfile}"
+    # Initialize datadir to share if run from tests
+    my $datadir = $params{datadir} || "share";
+
+    return "$datadir/$params{idsfile}"
         unless @datadirs;
 
     # Try to use the most recent ids file from well-known places
     my %files = map { $_ => stat($_)->ctime() } grep { -s $_ }
-        map { "$_/$params{idsfile}" } @datadirs, $params{datadir} ;
+        map { "$_/$params{idsfile}" } @datadirs, $datadir ;
 
     # Sort by creation time
     my @sorted_files = sort { $files{$a} <=> $files{$b} } keys(%files);

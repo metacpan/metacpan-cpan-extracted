@@ -1,6 +1,6 @@
 /*
   Copyright (C) 2000-2006 Silicon Graphics, Inc.  All Rights Reserved.
-  Portions Copyright (C) 2007-2019 David Anderson. All Rights Reserved.
+  Portions Copyright (C) 2007-2020 David Anderson. All Rights Reserved.
   Portions Copyright 2012 SN Systems Ltd. All rights reserved.
 
   This program is free software; you can redistribute it
@@ -30,10 +30,15 @@
 
 #include "config.h"
 #include <stdio.h>
+#ifdef HAVE_STDINT_H
+#include <stdint.h> /* for uintptr_t */
+#endif
 #include "dwarf_incl.h"
 #include "dwarf_alloc.h"
 #include "dwarf_error.h"
 #include "dwarf_util.h"
+#include "dwarf_str_offsets.h"
+#include "dwarfstring.h"
 #include "dwarf_die_deliv.h"
 
 #define FALSE 0
@@ -45,22 +50,15 @@
 
 static void assign_correct_unit_type(Dwarf_CU_Context cu_context);
 static int find_cu_die_base_fields(Dwarf_Debug dbg,
+    Dwarf_CU_Context cucon,
     Dwarf_Die cudie,
-    Dwarf_Sig8 *    dwoid_return,
-    Dwarf_Bool *    dwoid_present_return,
-    Dwarf_Unsigned *str_offsets_base_return,
-    Dwarf_Bool *    str_offsets_base_present_return,
-    Dwarf_Unsigned *addr_base_return,
-    Dwarf_Bool *    addr_base_present_return,
-    Dwarf_Unsigned *ranges_base_return, /* rnglists_base */
-    Dwarf_Bool *    ranges_base_present_return,
-    Dwarf_Unsigned *loclists_base_return, /* rnglists_base */
-    Dwarf_Bool *    loclists_base_present_return,
-    char **         dwo_name_return, /* rnglists_base */
-    Dwarf_Bool *    dwo_name_present_return,
-    Dwarf_Bool *    has_children_return,
     Dwarf_Error*    error);
 
+static int _dwarf_siblingof_internal(Dwarf_Debug dbg,
+    Dwarf_Die die,
+    Dwarf_CU_Context context,
+    Dwarf_Bool is_info,
+    Dwarf_Die * caller_ret_die, Dwarf_Error * error);
 
 /*  see cuandunit.txt for an overview of the
     DWARF5 split dwarf sections and values
@@ -69,13 +67,6 @@ static int find_cu_die_base_fields(Dwarf_Debug dbg,
     the final DWARF5).
 */
 
-/*  New October 2011.  Enables client code to know if
-    it is a debug_info or debug_types context. */
-Dwarf_Bool
-dwarf_get_die_infotypes_flag(Dwarf_Die die)
-{
-    return die->di_is_info;
-}
 
 #if 0
 static void
@@ -93,6 +84,13 @@ dump_bytes(char * msg,Dwarf_Small * start, long len)
 #endif
 
 
+/*  New October 2011.  Enables client code to know if
+    it is a debug_info or debug_types context. */
+Dwarf_Bool
+dwarf_get_die_infotypes_flag(Dwarf_Die die)
+{
+    return die->di_is_info;
+}
 
 /*
     For a given Dwarf_Debug dbg, this function checks
@@ -129,7 +127,8 @@ _dwarf_find_CU_Context(Dwarf_Debug dbg, Dwarf_Off offset,Dwarf_Bool is_info)
         dis->de_cu_context->cc_debug_offset <= offset) {
 
         for (cu_context = dis->de_cu_context;
-            cu_context != NULL; cu_context = cu_context->cc_next) {
+            cu_context != NULL;
+            cu_context = cu_context->cc_next) {
 
             if (offset >= cu_context->cc_debug_offset &&
                 offset < cu_context->cc_debug_offset +
@@ -142,7 +141,8 @@ _dwarf_find_CU_Context(Dwarf_Debug dbg, Dwarf_Off offset,Dwarf_Bool is_info)
     }
 
     for (cu_context = dis->de_cu_context_list;
-        cu_context != NULL; cu_context = cu_context->cc_next) {
+        cu_context != NULL;
+        cu_context = cu_context->cc_next) {
 
         if (offset >= cu_context->cc_debug_offset &&
             offset < cu_context->cc_debug_offset +
@@ -152,30 +152,6 @@ _dwarf_find_CU_Context(Dwarf_Debug dbg, Dwarf_Off offset,Dwarf_Bool is_info)
             return (cu_context);
         }
     }
-
-    return (NULL);
-}
-
-
-/*  This routine checks the dwarf_offdie() list of
-    CU contexts for the right CU context.  */
-static Dwarf_CU_Context
-_dwarf_find_offdie_CU_Context(Dwarf_Debug dbg, Dwarf_Off offset,
-    Dwarf_Bool is_info)
-{
-    Dwarf_CU_Context cu_context = 0;
-    Dwarf_Debug_InfoTypes dis = is_info? &dbg->de_info_reading:
-        &dbg->de_types_reading;
-
-    for (cu_context = dis->de_offdie_cu_context;
-        cu_context != NULL; cu_context = cu_context->cc_next)
-
-        if (offset >= cu_context->cc_debug_offset &&
-            offset < cu_context->cc_debug_offset +
-            cu_context->cc_length + cu_context->cc_length_size
-            + cu_context->cc_extension_size)
-
-            return (cu_context);
 
     return (NULL);
 }
@@ -292,7 +268,30 @@ section_name_ends_with_dwo(const char *name)
     return TRUE;
 }
 
+void
+_dwarf_create_address_size_dwarf_error(Dwarf_Debug dbg,
+    Dwarf_Error *error,
+    Dwarf_Unsigned addrsize,
+    int errcode,const char *errname)
+{
+    dwarfstring m;
+    const char *bites = "bytes";
+    if (addrsize == 1) {
+        bites = "byte";
+    }
 
+    dwarfstring_constructor(&m);
+    dwarfstring_append(&m,(char *)errname);
+    dwarfstring_append_printf_u(&m,
+        ": Address size of %u ",
+        addrsize);
+    dwarfstring_append_printf_s(&m,
+        "%s is not supported. Corrupt DWARF.",
+        (char *)bites);
+    _dwarf_error_string(dbg,error,errcode,
+        dwarfstring_string(&m));
+    dwarfstring_destructor(&m);
+}
 
 /*  New January 2017 */
 static int
@@ -312,7 +311,7 @@ _dwarf_read_cu_version_and_abbrev_offset(Dwarf_Debug dbg,
     int            unit_type = 0;
     Dwarf_Ubyte    addrsize =  0;
     Dwarf_Unsigned abbrev_offset = 0;
-    Dwarf_Half     version = 0;
+    Dwarf_Half version = 0;
 
     READ_UNALIGNED_CK(dbg, version, Dwarf_Half,
         dataptr,DWARF_HALF_SIZE,error,end_data);
@@ -328,7 +327,20 @@ _dwarf_read_cu_version_and_abbrev_offset(Dwarf_Debug dbg,
         /* We do not need is_info flag in DWARF5 */
         if (is_unknown_UT_value(unit_type)) {
             /*  DWARF5 object file is corrupt. Invalid value */
-            _dwarf_error(dbg, error, DW_DLE_CU_UT_TYPE_ERROR);
+            dwarfstring m;
+            dwarfstring_constructor(&m);
+            dwarfstring_append_printf_u(&m,
+                "DW_DLE_CU_UT_TYPE_ERROR: we do not know "
+                " the CU header unit_type 0x%x",unit_type);
+            dwarfstring_append_printf_u(&m," (%u) so cannot"
+                "process this compilation_unit. A valid type ",
+                unit_type);
+            dwarfstring_append(&m,"would be DW_UT_compile"
+                ", for example");
+            _dwarf_error_string(dbg, error,
+                DW_DLE_CU_UT_TYPE_ERROR,
+                dwarfstring_string(&m));
+            dwarfstring_destructor(&m);
             return DW_DLV_ERROR;
         }
         READ_UNALIGNED_CK(dbg, addrsize, unsigned char,
@@ -371,11 +383,16 @@ _dwarf_read_cu_version_and_abbrev_offset(Dwarf_Debug dbg,
     }
     if (addrsize < MINIMUM_ADDRESS_SIZE ||
         addrsize > MAXIMUM_ADDRESS_SIZE ) {
-        _dwarf_error(dbg,error,DW_DLE_ADDRESS_SIZE_ERROR);
+        _dwarf_create_address_size_dwarf_error(dbg,error,addrsize,
+            DW_DLE_ADDRESS_SIZE_ERROR,
+            "DW_DLE_ADDRESS_SIZE_ERROR::");
         return DW_DLV_ERROR;
     }
     if (addrsize  > sizeof(Dwarf_Addr)) {
-        _dwarf_error(dbg, error, DW_DLE_CU_ADDRESS_SIZE_BAD);
+        _dwarf_create_address_size_dwarf_error(dbg,error,addrsize,
+            DW_DLE_ADDRESS_SIZE_ERROR,
+            "DW_DLE_ADDRESS_SIZE_ERROR: not representable"
+            " in Dwarf_Addr field.");
         return DW_DLV_ERROR;
     }
 
@@ -491,8 +508,11 @@ fill_in_dwp_offsets_if_present(Dwarf_Debug dbg,
         if (resdf == DW_DLV_ERROR) {
             return resdf;
         } else if (resdf == DW_DLV_NO_ENTRY) {
-            _dwarf_error(dbg, error,
-                DW_DLE_MISSING_REQUIRED_CU_OFFSET_HASH);
+            _dwarf_error_string(dbg, error,
+                DW_DLE_MISSING_REQUIRED_CU_OFFSET_HASH,
+                "DW_DLE_MISSING_REQUIRED_CU_OFFSET_HASH: "
+                " dwarf_get_debugfission_for_key returned"
+                " DW_DLV_NO_ENTRY, something is wrong");
             return DW_DLV_ERROR;
         }
     } else {
@@ -506,8 +526,11 @@ fill_in_dwp_offsets_if_present(Dwarf_Debug dbg,
         if (resdf == DW_DLV_ERROR) {
             return resdf;
         } else if (resdf == DW_DLV_NO_ENTRY) {
-            _dwarf_error(dbg, error,
-                DW_DLE_MISSING_REQUIRED_CU_OFFSET_HASH);
+            _dwarf_error_string(dbg, error,
+                DW_DLE_MISSING_REQUIRED_CU_OFFSET_HASH,
+                "DW_DLE_MISSING_REQUIRED_CU_OFFSET_HASH: "
+                " dwarf_get_debugfission_for_offset returned"
+                " DW_DLV_NO_ENTRY, something is wrong");
             return DW_DLV_ERROR;
         }
         cu_context->cc_signature =
@@ -517,28 +540,19 @@ fill_in_dwp_offsets_if_present(Dwarf_Debug dbg,
     return DW_DLV_OK;
 }
 
-static Dwarf_Bool
-_dwarf_may_have_base_fields(Dwarf_CU_Context cu_context)
-{
-    if (cu_context->cc_version_stamp < DW_CU_VERSION4) {
-        return FALSE;
-    }
-    return TRUE;
-}
-
 static int
 finish_cu_context_via_cudie_inner(
     Dwarf_Debug dbg,
     Dwarf_CU_Context cu_context,
     Dwarf_Error *error)
 {
-    if (_dwarf_may_have_base_fields(cu_context)) {
+    {
         /*  DW4: Look for DW_AT_dwo_id and
+            DW_AT_low_pc and more.
             if there is one pick up the hash
             DW5: hash in skeleton CU die
             Also pick up cc_str_offset_base and
             any other base values. */
-
         Dwarf_Die cudie = 0;
         int resdwo = 0;
 
@@ -550,85 +564,22 @@ finish_cu_context_via_cudie_inner(
             cu_context->cc_is_info,
             &cudie, error);
         if (resdwo == DW_DLV_OK) {
-            Dwarf_Sig8 dwosignature;
-            Dwarf_Bool dwoid_present = FALSE;
-            Dwarf_Unsigned str_offsets_base = 0;
-            Dwarf_Unsigned addr_base = 0;
-            Dwarf_Unsigned ranges_base = 0;
-            Dwarf_Unsigned loclists_base = 0;
-            char *     dwo_name = 0;
-            Dwarf_Bool str_offsets_base_present = FALSE;
-            Dwarf_Bool addr_base_present = FALSE;
-            Dwarf_Bool ranges_base_present = FALSE;
-            Dwarf_Bool loclists_base_present = FALSE;
-            Dwarf_Bool dwo_name_present = FALSE;
-            Dwarf_Bool has_children = TRUE;
             Dwarf_Half cutag = 0;
             int resdwob = 0;
-
-            memset(&dwosignature,0,sizeof(dwosignature));
             resdwob = find_cu_die_base_fields(dbg,
-                cudie,&dwosignature,&dwoid_present,
-                &str_offsets_base,&str_offsets_base_present,
-                &addr_base,&addr_base_present,
-                &ranges_base,&ranges_base_present,
-                &loclists_base,&loclists_base_present,
-                &dwo_name,&dwo_name_present,
-                &has_children,
+                cu_context,
+                cudie,
                 error);
-
-            if (resdwob == DW_DLV_OK) {
-                if(dwoid_present) {
-                    if(!cu_context->cc_signature_present) {
-                        /*  this can be in executable or ordinary .o
-                            or .dwo or .dwp.  Non-standard DWARF4. */
-                        cu_context->cc_signature = dwosignature;
-                        cu_context->cc_signature_present = TRUE;
-                    } else {
-                        /*  VERIFY signatures match.
-                            It's not clear if we ever get here
-                            except in case of a corrupted
-                            object file (so bad DWARF). */
-                        /*  FIXME how report? Or just let it go
-                            for the consumer to find? */
-#if 0
-                        if (memcmp(&cu_context->cc_signature,
-                            &dwosignature,sizeof(Dwarf_Sig8))) {
-                            _dwarf_error(NULL, error,
-                                DW_DLE_DWP_SIGNATURE_MISMATCH);
-                            return DW_DLV_ERROR;
-                        }
-#endif
-                    }
-                }
-                cu_context->cc_cu_die_has_children = has_children;
-                if (addr_base_present) {
-                    cu_context->cc_addr_base = addr_base;
-                    cu_context->cc_addr_base_present = TRUE;
-                }
-
-                if(str_offsets_base_present) {
-                    cu_context->cc_str_offsets_base = str_offsets_base;
-                    cu_context->cc_str_offsets_base_present = TRUE;
-                }
-                if(ranges_base_present) {
-                    cu_context->cc_ranges_base = ranges_base;
-                    cu_context->cc_ranges_base_present = TRUE;
-                }
-                if(loclists_base_present) {
-                    cu_context->cc_loclists_base = ranges_base;
-                    cu_context->cc_loclists_base_present = TRUE;
-                }
-                if (dwo_name_present ) {
-                    cu_context->cc_dwo_name = dwo_name;
-                }
-            } else  if (resdwob == DW_DLV_NO_ENTRY) {
+            if (resdwob == DW_DLV_NO_ENTRY) {
                 /* The CU die has no children */
                 dwarf_dealloc(dbg,cudie,DW_DLA_DIE);
+                cudie = 0;
+                cu_context->cc_cu_die_has_children = FALSE;
                 return DW_DLV_OK;
-            } else {
+            } else if (resdwob == DW_DLV_ERROR) {
                 /*  Not applicable or an error */
                 dwarf_dealloc(dbg,cudie,DW_DLA_DIE);
+                cudie = 0;
                 return resdwob;
             }
             resdwob = dwarf_tag(cudie,&cutag,error);
@@ -638,15 +589,54 @@ finish_cu_context_via_cudie_inner(
             dwarf_dealloc(dbg,cudie,DW_DLA_DIE);
             return resdwob;
         } else  if (resdwo == DW_DLV_NO_ENTRY) {
-            /* no die. Empty CU */
+            /* no cudie. Empty CU. */
             return DW_DLV_OK;
         } else {
+            /* no cudie. Error.*/
             return resdwo;
         }
     }
     return DW_DLV_OK;
 }
 
+static void
+local_dealloc_cu_context(Dwarf_Debug dbg,
+    Dwarf_CU_Context context)
+{
+    Dwarf_Hash_Table hash_table = 0;
+
+    if (!context) {
+        return;
+    }
+    hash_table = context->cc_abbrev_hash_table;
+    if (hash_table) {
+        _dwarf_free_abbrev_hash_table_contents(dbg,hash_table);
+        hash_table->tb_entries = 0;
+        dwarf_dealloc(dbg,hash_table, DW_DLA_HASH_TABLE);
+        context->cc_abbrev_hash_table = 0;
+    }
+    dwarf_dealloc(dbg, context, DW_DLA_CU_CONTEXT);
+}
+
+static void
+report_local_unit_type_error(Dwarf_Debug dbg,
+    int unit_type,
+    const char *msg,
+    Dwarf_Error *err)
+{
+    dwarfstring m;
+
+    dwarfstring_constructor(&m);
+    dwarfstring_append_printf_s(&m,
+        "DW_DLE_CU_UT_TYPE_VALUE: %s ",(char *)msg);
+    dwarfstring_append_printf_u(&m,
+        "the compilation unit unit_type is 0x%x,"
+        " which is unknown to libdwarf. Corrupt DWARF.",
+        unit_type);
+    _dwarf_error_string(dbg,err,DW_DLE_CU_UT_TYPE_VALUE,
+        dwarfstring_string(&m));
+    dwarfstring_destructor(&m);
+}
 
 /*  This function is used to create a CU Context for
     a compilation-unit that begins at offset in
@@ -696,9 +686,10 @@ _dwarf_make_CU_Context(Dwarf_Debug dbg,
     Dwarf_Small *    dataptr = 0;
     int              res = 0;
 
+    memset(&signaturedata,0,sizeof(signaturedata));
     cu_context =
-        (Dwarf_CU_Context) _dwarf_get_alloc(dbg, DW_DLA_CU_CONTEXT, 1);
-    if (cu_context == NULL) {
+        (Dwarf_CU_Context)_dwarf_get_alloc(dbg, DW_DLA_CU_CONTEXT, 1);
+    if (!cu_context) {
         _dwarf_error(dbg, error, DW_DLE_ALLOC_FAIL);
         return DW_DLV_ERROR;
     }
@@ -709,17 +700,17 @@ _dwarf_make_CU_Context(Dwarf_Debug dbg,
         dbg->de_debug_types.dss_data;
     /*  Preliminary sanity checking. */
     if (!dataptr) {
-        dwarf_dealloc(dbg, cu_context, DW_DLA_CU_CONTEXT);
+        local_dealloc_cu_context(dbg,cu_context);
         _dwarf_error(dbg, error, DW_DLE_INFO_HEADER_ERROR);
         return DW_DLV_ERROR;
     }
     if (offset >= section_size) {
-        dwarf_dealloc(dbg, cu_context, DW_DLA_CU_CONTEXT);
+        local_dealloc_cu_context(dbg,cu_context);
         _dwarf_error(dbg, error, DW_DLE_INFO_HEADER_ERROR);
         return DW_DLV_ERROR;
     }
     if ((offset+4) > section_size) {
-        dwarf_dealloc(dbg, cu_context, DW_DLA_CU_CONTEXT);
+        local_dealloc_cu_context(dbg,cu_context);
         _dwarf_error(dbg, error, DW_DLE_INFO_HEADER_ERROR);
         return DW_DLV_ERROR;
     }
@@ -738,7 +729,7 @@ _dwarf_make_CU_Context(Dwarf_Debug dbg,
         &max_cu_global_offset,
         error);
     if (res != DW_DLV_OK) {
-        dwarf_dealloc(dbg, cu_context, DW_DLA_CU_CONTEXT);
+        local_dealloc_cu_context(dbg,cu_context);
         return res;
     }
     local_length_size = cu_context->cc_length_size;
@@ -753,14 +744,14 @@ _dwarf_make_CU_Context(Dwarf_Debug dbg,
         section_end_ptr,
         &bytes_read,error);
     if (res != DW_DLV_OK) {
-        dwarf_dealloc(dbg, cu_context, DW_DLA_CU_CONTEXT);
+        local_dealloc_cu_context(dbg,cu_context);
         return res;
     }
     version = cu_context->cc_version_stamp;
     cu_ptr += bytes_read;
     unit_type = cu_context->cc_unit_type;
     if (cu_ptr > section_end_ptr) {
-        dwarf_dealloc(dbg, cu_context, DW_DLA_CU_CONTEXT);
+        local_dealloc_cu_context(dbg,cu_context);
         _dwarf_error(dbg, error, DW_DLE_INFO_HEADER_ERROR);
         return DW_DLV_ERROR;
     }
@@ -795,8 +786,9 @@ _dwarf_make_CU_Context(Dwarf_Debug dbg,
             break;
         default:
             /*  Data corruption in libdwarf? */
-            dwarf_dealloc(dbg, cu_context, DW_DLA_CU_CONTEXT);
-            _dwarf_error(dbg,error,DW_DLE_CU_UT_TYPE_VALUE);
+            report_local_unit_type_error(dbg, unit_type,
+                "(DW4 or DW5)",error);
+            local_dealloc_cu_context(dbg,cu_context);
             return DW_DLV_ERROR;
         }
     }
@@ -810,7 +802,7 @@ _dwarf_make_CU_Context(Dwarf_Debug dbg,
         /* and finally size of the rest of the header: */
         types_extra_len)) {
 
-        dwarf_dealloc(dbg, cu_context, DW_DLA_CU_CONTEXT);
+        local_dealloc_cu_context(dbg,cu_context);
         _dwarf_error(dbg, error, DW_DLE_CU_LENGTH_ERROR);
         return DW_DLV_ERROR;
     }
@@ -822,6 +814,7 @@ _dwarf_make_CU_Context(Dwarf_Debug dbg,
     switch(unit_type) {
     case DW_UT_split_type:
     case DW_UT_type: {
+        int tres = 0;
         /*  ASSERT: DW_CU_VERSION4 or DW_CU_VERSION5,
             determined by logic above.
             Now read the debug_types extra header fields of
@@ -832,13 +825,18 @@ _dwarf_make_CU_Context(Dwarf_Debug dbg,
         */
         memcpy(&signaturedata,cu_ptr,sizeof(signaturedata));
         cu_ptr += sizeof(signaturedata);
-        READ_UNALIGNED_CK(dbg, typeoffset, Dwarf_Unsigned,
-            cu_ptr, local_length_size,error,section_end_ptr);
+        tres = _dwarf_read_unaligned_ck_wrapper(dbg,
+            &typeoffset,cu_ptr,local_length_size,
+            section_end_ptr,error);
+        if (tres != DW_DLV_OK ) {
+            local_dealloc_cu_context(dbg,cu_context);
+            return tres;
+        }
         cu_context->cc_signature = signaturedata;
-        cu_context->cc_signature_offset = typeoffset;
         cu_context->cc_signature_present = TRUE;
+        cu_context->cc_signature_offset = typeoffset;
         if (typeoffset >= max_cu_local_offset) {
-            dwarf_dealloc(dbg, cu_context, DW_DLA_CU_CONTEXT);
+            local_dealloc_cu_context(dbg,cu_context);
             _dwarf_error(dbg, error,
                 DW_DLE_DEBUG_TYPEOFFSET_BAD);
             return DW_DLV_ERROR;
@@ -859,15 +857,18 @@ _dwarf_make_CU_Context(Dwarf_Debug dbg,
     case DW_UT_compile:
     case DW_UT_partial:
         break;
-    default:
+    default: {
         /*  Data corruption in libdwarf? */
-        dwarf_dealloc(dbg, cu_context, DW_DLA_CU_CONTEXT);
-        _dwarf_error(dbg,error,DW_DLE_CU_UT_TYPE_VALUE);
+        report_local_unit_type_error(dbg, unit_type,
+            "",error);
+        local_dealloc_cu_context(dbg,cu_context);
         return DW_DLV_ERROR;
+        }
     }
     cu_context->cc_abbrev_hash_table =
         (Dwarf_Hash_Table) _dwarf_get_alloc(dbg, DW_DLA_HASH_TABLE, 1);
     if (cu_context->cc_abbrev_hash_table == NULL) {
+        local_dealloc_cu_context(dbg,cu_context);
         _dwarf_error(dbg, error, DW_DLE_ALLOC_FAIL);
         return DW_DLV_ERROR;
     }
@@ -1034,206 +1035,317 @@ dwarf_next_cu_header_d(Dwarf_Debug dbg,
 }
 
 
+static void
+local_attrlist_dealloc(Dwarf_Debug dbg,
+    Dwarf_Signed atcount,
+    Dwarf_Attribute *alist)
+{
+    Dwarf_Signed i = 0;
+
+    for ( ; i < atcount; ++i) {
+        dwarf_dealloc(dbg,alist[i],DW_DLA_ATTR);
+    }
+    dwarf_dealloc(dbg,alist,DW_DLA_LIST);
+}
+
+
 
 /*
-    A DWO/DWP CU has different base fields than
-    a normal object/executable, but this finds
-    the base fields for both types.
+    For a DWP/DWO the base fields
+    of a CU are inherited from the skeleton.
+    DWARF5 section 3.1.3
+    "Split Full Compilation Unit Entries".
 */
 static int
 find_cu_die_base_fields(Dwarf_Debug dbg,
+    Dwarf_CU_Context cucon,
     Dwarf_Die cudie,
-    Dwarf_Sig8 *    dwoid_return,
-    Dwarf_Bool *    dwoid_present_return,
-    Dwarf_Unsigned *str_offsets_base_return,
-    Dwarf_Bool *    str_offsets_base_present_return,
-    Dwarf_Unsigned *addr_base_return,
-    Dwarf_Bool *    addr_base_present_return,
-    Dwarf_Unsigned *ranges_base_return, /* rnglists_base */
-    Dwarf_Bool *    ranges_base_present_return,
-    Dwarf_Unsigned *loclists_base_return, /* rnglists_base */
-    Dwarf_Bool *    loclists_base_present_return,
-    char **         dwo_name_return, /* rnglists_base */
-    Dwarf_Bool *    dwo_name_present_return,
-    Dwarf_Bool *    has_children_return,
     Dwarf_Error*    error)
 {
-    Dwarf_Sig8 signature;
-    Dwarf_Bool dwoid_sig_present = FALSE;
-    Dwarf_Off  str_offsets_base = 0;
-    Dwarf_Off  ranges_base = 0;
-    Dwarf_Off  addr_base = 0;
-    Dwarf_Bool str_offsets_base_present = FALSE;
-    Dwarf_Bool addr_base_present = FALSE;
-    Dwarf_Bool ranges_base_present = FALSE;
-    Dwarf_Off  loclists_base = 0;
-    Dwarf_Bool loclists_base_present = 0;
-    char *     dwo_name = 0;
-    Dwarf_Bool dwo_name_present = 0;
-    Dwarf_Half version_stamp = 0;
     Dwarf_CU_Context  cu_context = 0;
     Dwarf_Attribute * alist = 0;
     Dwarf_Signed      atcount = 0;
+    unsigned          version_stamp = 2;
     int               alres = 0;
-    Dwarf_Half        has_children = TRUE;
-    int chres = 0;
+    Dwarf_Signed      i = 0;
+    Dwarf_Signed low_pc_attrnum = -1;
+    Dwarf_Signed at_addr_base_attrnum = -1;
 
     cu_context = cudie->di_cu_context;
     version_stamp = cu_context->cc_version_stamp;
 
     alres = dwarf_attrlist(cudie, &alist,
         &atcount,error);
-    if(alres == DW_DLV_OK) {
-        /*  DW_AT_dwo_id and/or DW_AT_GNU_dwo_id
-            are only found  in some
-            experimental DWARF4.
-            DWARF5 changed CU header contents
-            to make this attribute unnecessary.
-            DW_AT_GNU_odr_signature is the same format,
-            but is in a different namespace so not
-            appropriate here..
-        */
-        Dwarf_Signed i = 0;
-        for(i = 0;  i < atcount; ++i) {
-            Dwarf_Half attrnum;
-            int ares = 0;
-            Dwarf_Attribute attr = alist[i];
-            ares = dwarf_whatattr(attr,&attrnum,error);
-            if (ares == DW_DLV_OK) {
-                switch(attrnum) {
-                case DW_AT_dwo_id:
-                case DW_AT_GNU_dwo_id: {
-                    /*  This is for DWARF4 with an early
-                        non-standard version
-                        of split dwarf. Not DWARF5. */
-                    int sres = 0;
-                    if (version_stamp < DW_CU_VERSION4) {
-                        /* Not supposed to happen. */
-                        _dwarf_error(dbg,error,
-                            DW_DLE_IMPROPER_DWO_ID);
-                        return DW_DLV_ERROR;
-                    }
-
-                    sres = dwarf_formsig8_const(attr,
-                        &signature,error);
-                    if(sres == DW_DLV_OK) {
-                        dwoid_sig_present = TRUE;
-                    } else {
-                        /* Something is badly wrong. */
-                        dwarf_dealloc(dbg,attr,DW_DLA_ATTR);
-                        dwarf_dealloc(dbg,alist,DW_DLA_LIST);
-                        return sres;
-                    }
-                    break;
-                }
-                case DW_AT_str_offsets_base:{
-                    int udres = 0;
-                    udres = dwarf_global_formref(attr,&str_offsets_base,
-                        error);
-                    if(udres == DW_DLV_OK) {
-                        str_offsets_base_present = TRUE;
-                    } else {
-                        dwarf_dealloc(dbg,attr,DW_DLA_ATTR);
-                        dwarf_dealloc(dbg,alist,DW_DLA_LIST);
-                        /* Something is badly wrong. */
-                        return udres;
-                    }
-                    break;
-                }
-                case DW_AT_addr_base:
-                case DW_AT_GNU_addr_base: {
-                    int udres = 0;
-                    udres = dwarf_global_formref(attr,&addr_base,
-                        error);
-                    if(udres == DW_DLV_OK) {
-                        addr_base_present = TRUE;
-                    } else {
-                        dwarf_dealloc(dbg,attr,DW_DLA_ATTR);
-                        dwarf_dealloc(dbg,alist,DW_DLA_LIST);
-                        /* Something is badly wrong. */
-                        return udres;
-                    }
-                    break;
-                }
-                case DW_AT_GNU_ranges_base:
-                /*  The DW4 ranges base was never used in GNU
-                    but did get emitted in skeletons.
-                    http://llvm.1065342.n5.nabble.com/DebugInfo-DW-AT-GNU-ranges-base-in-non-fission-td64194.html
-                    We therefore ignore it.  */
-                    break;
-                case  DW_AT_rnglists_base: {
-                    int udres = 0;
-                    udres = dwarf_global_formref(attr,&ranges_base,
-                        error);
-                    if(udres == DW_DLV_OK) {
-                        ranges_base_present = TRUE;
-                    } else {
-                        dwarf_dealloc(dbg,attr,DW_DLA_ATTR);
-                        dwarf_dealloc(dbg,alist,DW_DLA_LIST);
-                        /* Something is badly wrong. */
-                        return udres;
-                    }
-                    break;
-                }
-                case DW_AT_GNU_dwo_name:
-                case DW_AT_dwo_name: {
-                    int dnres = 0;
-
-                    dwo_name_present = TRUE;
-                    dnres = dwarf_formstring(attr,
-                        &dwo_name,error);
-                    if (dnres != DW_DLV_OK) {
-                        return dnres;
-                    }
-                    break;
-                }
-                case DW_AT_loclists_base: {
-                    int udres = 0;
-                    udres = dwarf_global_formref(attr,&loclists_base,
-                        error);
-                    if(udres == DW_DLV_OK) {
-                        loclists_base_present = TRUE;
-                    } else {
-                        dwarf_dealloc(dbg,attr,DW_DLA_ATTR);
-                        dwarf_dealloc(dbg,alist,DW_DLA_LIST);
-                        /* Something is badly wrong. */
-                        return udres;
-                    }
-                    break;
-                }
-                default: /* do nothing, not an attribute
-                    we need to deal with here. */
-                    break;
-                }
-            }
-            dwarf_dealloc(dbg,attr,DW_DLA_ATTR);
-        }
-        dwarf_dealloc(dbg,alist,DW_DLA_LIST);
-    } else {
+    if(alres != DW_DLV_OK) {
         /* Something is badly wrong. No attrlist! */
         return alres;
     }
-    *dwoid_present_return =            dwoid_sig_present;
-    *dwoid_return =                    signature;
-    *str_offsets_base_present_return = str_offsets_base_present;
-    *str_offsets_base_return =         str_offsets_base;
-    *addr_base_present_return =        addr_base_present;
-    *addr_base_return =                addr_base;
-    *ranges_base_present_return =      ranges_base_present;
-    *ranges_base_return =              ranges_base;
-    *loclists_base_present_return =    loclists_base_present;
-    *loclists_base_return =            loclists_base;
-    *dwo_name_present_return =         dwo_name_present;
-    *dwo_name_return =                 dwo_name;
-    chres = dwarf_die_abbrev_children_flag(cudie, &has_children);
-    *has_children_return = TRUE;
-    if (chres == DW_DLV_OK) {
-        if (!has_children) {
-            *has_children_return = FALSE;
+    /*  DW_AT_dwo_id and/or DW_AT_GNU_dwo_id
+        are only found  in some
+        experimental DWARF4.
+        Even DWARF3,4 use DW_AT_low_pc as base address
+        DWARF5 changed CU header contents
+        to make this attribute unnecessary.
+        DW_AT_GNU_odr_signature is the same format,
+        but is in a different namespace so not
+        appropriate here..
+    */
+    for(i = 0;  i < atcount; ++i) {
+        Dwarf_Half attrnum = 0;
+        Dwarf_Half form = 0;
+        int ares = 0;
+        int ares2 = 0;
+        Dwarf_Attribute attr = alist[i];
+
+        ares = dwarf_whatattr(attr,&attrnum,error);
+        if (ares == DW_DLV_ERROR) {
+            dwarf_dealloc_error(dbg,*error);
+            *error = 0;
         }
-    } else {
-        /*  Nothing we do here makes much sense. Pretend has
-            children. */
+        ares2 = dwarf_whatform(attr,&form,error);
+        if (ares2 == DW_DLV_ERROR) {
+            dwarf_dealloc_error(dbg,*error);
+            *error = 0;
+        }
+        /*  We are not returning on DW_DLV_NO_ENTRY
+            or DW_DLV_ERROR here. Such will be
+            caught later. Lets finish a CU die
+            scan and finish the cu_context  */
+        if (ares == DW_DLV_OK && ares2 == DW_DLV_OK) {
+            switch(form) {
+            case DW_FORM_strx:
+            case DW_FORM_strx1:
+            case DW_FORM_strx2:
+            case DW_FORM_strx3:
+            case DW_FORM_strx4:
+                cucon->cc_at_strx_present = TRUE;
+            }
+            switch(attrnum) {
+            case DW_AT_dwo_id:
+            case DW_AT_GNU_dwo_id: {
+                Dwarf_Sig8 signature;
+                /*  This is for DWARF4 with an early
+                    non-standard version
+                    of split dwarf. Not DWARF5. */
+                int sres = 0;
+                if (version_stamp != DW_CU_VERSION4 ) {
+                    /* Not supposed to happen. */
+                    local_attrlist_dealloc(dbg,atcount,alist);
+                    _dwarf_error(dbg,error,
+                        DW_DLE_IMPROPER_DWO_ID);
+                    return DW_DLV_ERROR;
+                }
+                memset(&signature, 0, sizeof(signature));
+                sres = dwarf_formsig8_const(attr,
+                    &signature,error);
+                if(sres == DW_DLV_OK) {
+                    if (!cucon->cc_signature_present) {
+                        cucon->cc_signature = signature;
+                        cucon->cc_signature_present = TRUE;
+                    } else {
+                        /*  Something wrong. Two styles of sig?
+                            Can happen with DWARF4
+                            debug-fission extension DWO_id.  
+                        */
+                        if (memcmp(&signature,&cucon->cc_signature,
+                            sizeof(signature))) {
+                            /*  The two sigs do not match! */
+                            const char *m="DW_DLE_SIGNATURE_MISMATCH"
+                                "DWARF4 extension fission signature"
+                                " and DW_AT_GNU_dwo_id do not match"
+                                " ignoring DW_AT[_GNU]_dwo_id";
+                            dwarf_insert_harmless_error(dbg,
+                                (char*)m);
+                        }
+                    }
+                } else {
+                    /* Something is badly wrong. */
+                    local_attrlist_dealloc(dbg,atcount,alist);
+                    return sres;
+                }
+                    /* Something is badly wrong. */
+                break;
+            }
+            /*  If, in .debug_rnglists for a CU the
+                applicable range has no base address
+                this attribute provides a base address.
+                If this is indexed doing this now would
+                lead to an infinite recursion.
+                So wait till all the other fields seen.
+            */
+            case DW_AT_low_pc: {
+                low_pc_attrnum = i;
+                break;
+            }
+
+            /*  The offset is of the first offset in
+                .debug_str_offsets that is the string table
+                for this CU. */
+            case DW_AT_str_offsets_base:{
+                int udres = 0;
+                udres = dwarf_global_formref(attr,
+                    &cucon->cc_str_offsets_base,
+                    error);
+                if(udres == DW_DLV_OK) {
+                    cucon->cc_str_offsets_base_present = TRUE;
+                } else {
+                    local_attrlist_dealloc(dbg,atcount,alist);
+                    /* Something is badly wrong. */
+                    return udres;
+                }
+                break;
+            }
+            /*  offset in .debug_loclists  of the offsets table
+                applicable to this CU. */
+            case DW_AT_loclists_base: {
+                int udres = 0;
+                udres = dwarf_global_formref(attr,
+                    &cucon->cc_loclists_base,
+                    error);
+                if(udres == DW_DLV_OK) {
+                    cucon->cc_loclists_base_present = TRUE;
+                } else {
+                    local_attrlist_dealloc(dbg,atcount,alist);
+                    /* Something is badly wrong. */
+                    return udres;
+                }
+                break;
+                }
+            /*  Base offset  in .debug_addr of the addr table
+                for this CU. DWARF5 (and possibly GNU DWARF4) */
+            case DW_AT_addr_base:
+            case DW_AT_GNU_addr_base: {
+                int udres = 0;
+                at_addr_base_attrnum = i;
+                udres = dwarf_global_formref(attr,
+                    &cucon->cc_addr_base,
+                    error);
+                if(udres == DW_DLV_OK) {
+                    cucon->cc_addr_base_present = TRUE;
+                } else {
+                    local_attrlist_dealloc(dbg,atcount,alist);
+                    /* Something is badly wrong. */
+                    return udres;
+                }
+                break;
+            }
+            case DW_AT_GNU_ranges_base: {
+            /*  The DW4 ranges base was never used in GNU
+                but did get emitted in skeletons.
+                http://llvm.1065342.n5.nabble.com/
+                DebugInfo-DW-AT-GNU-ranges-base-in-
+                non-fission-td64194.html
+                But we accept it anyway. */
+            /*  offset in .debug_rnglists  of the offsets table
+                applicable to this CU.
+                Note that this base applies when
+                referencing from the dwp, but NOT
+                when referencing from the a.out */
+                int udres = 0;
+
+                udres = dwarf_global_formref(attr,
+                    &cucon->cc_ranges_base,
+                    error);
+                if(udres == DW_DLV_OK) {
+                    cucon->cc_ranges_base_present = TRUE;
+                } else {
+                    local_attrlist_dealloc(dbg,atcount,alist);
+                    /* Something is badly wrong. */
+                    return udres;
+                }
+                break;
+                }
+            case  DW_AT_rnglists_base: {
+                int udres = 0;
+                udres = dwarf_global_formref(attr,
+                    &cucon->cc_rnglists_base,
+                    error);
+                if(udres == DW_DLV_OK) {
+                    cucon->cc_rnglists_base_present = TRUE;
+                } else {
+                    local_attrlist_dealloc(dbg,atcount,alist);
+                    /* Something is badly wrong. */
+                    return udres;
+                }
+                break;
+                }
+            /*  A signature, found in a DWARF5 skeleton
+                compilation unit. */
+            case DW_AT_GNU_dwo_name:
+            case DW_AT_dwo_name: {
+                int dnres = 0;
+
+                dnres = dwarf_formstring(attr,
+                    &cucon->cc_dwo_name,error);
+                if (dnres != DW_DLV_OK) {
+                    local_attrlist_dealloc(dbg,atcount,alist);
+                    return dnres;
+                }
+                cucon->cc_dwo_name_present = TRUE;
+                break;
+                }
+            default: /* do nothing, not an attribute
+                we need to deal with here. */
+                break;
+            }
+        }
+    }
+    if (low_pc_attrnum >= 0 ){
+        int lres = 0;
+        Dwarf_Attribute attr = alist[low_pc_attrnum];
+        Dwarf_Half form = 0;
+
+        /* If the form is indexed, we better have
+            seen DW_AT_addr_base.! */
+        lres = dwarf_whatform(attr,&form,error);
+        if (lres != DW_DLV_OK) {
+            local_attrlist_dealloc(dbg,atcount,alist);
+            return lres;
+        }
+        if (dwarf_addr_form_is_indexed(form)) {
+            if (at_addr_base_attrnum < 0) {
+                dwarfstring m;
+
+                dwarfstring_constructor(&m);
+                dwarfstring_append(&m,
+                    "DW_DLE_ATTR_NO_CU_CONTEXT: "
+                    "The DW_AT_low_pc  CU_DIE uses "
+                    "an indexed attribute yet "
+                    "DW_AT_addr_base is not in the CU DIE.");
+                _dwarf_error_string(dbg,error,
+                    DW_DLE_ATTR_NO_CU_CONTEXT,
+                    dwarfstring_string(&m));
+                dwarfstring_destructor(&m);
+                local_attrlist_dealloc(dbg,atcount,alist);
+                return DW_DLV_ERROR;
+            }
+        }
+        lres = dwarf_formaddr(attr,
+            &cucon->cc_low_pc,error);
+        if(lres == DW_DLV_OK) {
+            cucon->cc_low_pc_present = TRUE;
+        } else {
+            /* Something is badly wrong. */
+            local_attrlist_dealloc(dbg,atcount,alist);
+            return lres;
+        }
+    }
+    local_attrlist_dealloc(dbg,atcount,alist);
+    alist = 0;
+    atcount = 0;
+    {
+        int chres = 0;
+        Dwarf_Half flag = 0;
+
+        /*  always winds up with cc_cu_die_has_children
+            set intentionally...to something. */
+        cucon->cc_cu_die_has_children = TRUE;
+        chres = dwarf_die_abbrev_children_flag(cudie,&flag);
+        /*  If chres is not DW_DLV_OK the assumption
+            of children remains true. */
+        if (chres == DW_DLV_OK) {
+            cucon->cc_cu_die_has_children = flag;
+        }
     }
     return DW_DLV_OK;
 }
@@ -1272,8 +1384,12 @@ finish_up_cu_context_from_cudie(Dwarf_Debug dbg,
     int res = 0;
 
 
+    memset(&signaturedata,0,sizeof(signaturedata));
     signaturedata = cu_context->cc_signature;
 
+    /*  Loads and initializes the dwarf .debug_cu_index
+        and .debug_tu_index split dwarf package
+        file sections */
     res = fill_in_dwp_offsets_if_present(dbg,
         cu_context,
         &signaturedata,
@@ -1303,8 +1419,9 @@ finish_up_cu_context_from_cudie(Dwarf_Debug dbg,
     }
     /*  Now we can read the CU die and determine
         the correct DW_UT_ type for DWARF4 and some
-        offset base fields for DW4-fission and DW5 */
-    if (version == DW_CU_VERSION4 || version == DW_CU_VERSION5) {
+        offset base fields for DW4-fission and DW5,
+        and even DW3 and DW4 and some non-std DW2 */
+    {
         res = finish_cu_context_via_cudie_inner(dbg,
             cu_context,
             error);
@@ -1317,8 +1434,89 @@ finish_up_cu_context_from_cudie(Dwarf_Debug dbg,
         if (version == DW_CU_VERSION4) {
             assign_correct_unit_type(cu_context);
         }
+        if (cu_context->cc_signature_present) {
+            /*  Initially just for DW_SECT_STR_OFFSETS,
+                finds the section offset of the
+                contribution which is not the same
+                as the table offset. */
+            res = _dwarf_find_all_offsets_via_fission(dbg,
+                cu_context,error);
+            if (res == DW_DLV_ERROR) {
+                /* something seriously wrong. */
+                return res;
+            }
+        }
     }
     return DW_DLV_OK;
+}
+/*
+    CU_Contexts do not overlap.
+    cu_context we see here is not in the list we
+    are updating. See _dwarf_find_CU_Context()
+
+    Invariant: cc_debug_offset in strictly
+        ascending order in the list.
+*/
+static void
+insert_into_cu_context_list(Dwarf_Debug_InfoTypes dis,
+    Dwarf_CU_Context icu_context)
+{
+    Dwarf_Unsigned ioffset = icu_context->cc_debug_offset;
+    Dwarf_Unsigned eoffset = 0;
+    Dwarf_Unsigned hoffset = 0;
+    Dwarf_Unsigned coffset = 0;
+    Dwarf_CU_Context next = 0;
+    Dwarf_CU_Context past = 0;
+    Dwarf_CU_Context cur = 0;
+
+    /*  Add the context into the section context list.
+        This is the one and only place where it is
+        saved for re-use and eventual dealloc. */
+    if (!dis->de_cu_context_list) {
+        /*  First cu encountered. */
+        dis->de_cu_context_list = icu_context;
+        dis->de_cu_context_list_end = icu_context;
+        return;
+    }
+    eoffset = dis->de_cu_context_list_end->cc_debug_offset;
+    if (eoffset < ioffset) {
+        /* Normal case, add at end. */
+        dis->de_cu_context_list_end->cc_next = icu_context;
+        dis->de_cu_context_list_end = icu_context;
+        return;
+    }
+    hoffset = dis->de_cu_context_list->cc_debug_offset;
+    if (hoffset > ioffset) {
+        /* insert as new head. Unusual. */
+        next =  dis->de_cu_context_list;
+        dis->de_cu_context_list = icu_context;
+        dis->de_cu_context_list->cc_next = next;
+        /*  No need to touch de_cu_context_list_end */
+        return;
+    }
+    cur = dis->de_cu_context_list;
+    past = 0;
+    /*  Insert in middle somewhere. Neither at
+        start nor end.
+        ASSERT: cur non-null
+        ASSERT: past non-null */
+    past = cur;
+    cur = cur->cc_next;
+    for ( ; cur ; cur = next) {
+        next = cur->cc_next;
+        coffset = cur->cc_debug_offset;
+        if (coffset  >  ioffset) {
+            /*  Insert before cur, using past.
+                ASSERT: past non-null  */
+            past->cc_next = icu_context;
+            icu_context->cc_next = cur;
+            return;
+        }
+        past = cur;
+    }
+    /*  Impossible, for end, coffset (ie, eoffset) > ioffset  */
+    /* NOTREACHED */
+    return;
 }
 
 int
@@ -1397,6 +1595,10 @@ _dwarf_next_cu_header_internal(Dwarf_Debug dbg,
                     /*  Fall thru to use the newly loaded section.
                         even though it might not be adequately
                         relocated. */
+                    if (resd == DW_DLV_ERROR) {
+                        dwarf_dealloc_error(dbg,err2);
+                        err2 = 0;
+                    }
                 } else {
                     if (error) {
                         *error = err2;
@@ -1438,7 +1640,7 @@ _dwarf_next_cu_header_internal(Dwarf_Debug dbg,
     cu_context = _dwarf_find_CU_Context(dbg, new_offset,is_info);
 
     /* If not, make CU Context for it. */
-    if (cu_context == NULL) {
+    if (!cu_context) {
         res = _dwarf_make_CU_Context(dbg, new_offset,is_info,
             &cu_context,error);
         if (res == DW_DLV_ERROR) {
@@ -1450,51 +1652,42 @@ _dwarf_next_cu_header_internal(Dwarf_Debug dbg,
         res = finish_up_cu_context_from_cudie(dbg,new_offset,
             cu_context,error);
         if (res == DW_DLV_ERROR) {
-            dwarf_dealloc(dbg, cu_context, DW_DLA_CU_CONTEXT);
+            local_dealloc_cu_context(dbg,cu_context);
             return res;
         }
         if (res == DW_DLV_NO_ENTRY) {
-            dwarf_dealloc(dbg, cu_context, DW_DLA_CU_CONTEXT);
+            local_dealloc_cu_context(dbg,cu_context);
             return res;
         }
 
         dis->de_cu_context = cu_context;
-        if (dis->de_cu_context_list == NULL) {
-            dis->de_cu_context_list = cu_context;
-            dis->de_cu_context_list_end = cu_context;
-        } else {
-            dis->de_cu_context_list_end->cc_next = cu_context;
-            dis->de_cu_context_list_end = cu_context;
-        }
-
+        insert_into_cu_context_list(dis,cu_context);
     } else {
         dis->de_cu_context = cu_context;
     }
 
-    if (cu_header_length != NULL) {
+    if (cu_header_length) {
         *cu_header_length = cu_context->cc_length;
     }
 
-    if (version_stamp != NULL) {
+    if (version_stamp) {
         *version_stamp = cu_context->cc_version_stamp;
     }
-    if (abbrev_offset != NULL) {
+    if (abbrev_offset) {
         *abbrev_offset = cu_context->cc_abbrev_offset;
     }
-
-    if (address_size != NULL) {
+    if (address_size) {
         *address_size = cu_context->cc_address_size;
     }
-    if (offset_size != NULL) {
+    if (offset_size) {
         *offset_size = cu_context->cc_length_size;
     }
-    if (extension_size != NULL) {
+    if (extension_size) {
         *extension_size = cu_context->cc_extension_size;
     }
     if (header_type) {
         *header_type = cu_context->cc_unit_type;
     }
-
     if (typeoffset) {
         *typeoffset = cu_context->cc_signature_offset;
     }
@@ -1510,6 +1703,24 @@ _dwarf_next_cu_header_internal(Dwarf_Debug dbg,
     /*  Allowing null argument starting 22 April 2019. */
     if (next_cu_offset) {
         *next_cu_offset = new_offset;
+    }
+    {
+        Dwarf_Debug tieddbg = 0;
+        int tres = 0;
+        tieddbg = dbg->de_tied_data.td_tied_object;
+        if (tieddbg) {
+            tres = _dwarf_merge_all_base_attrs_of_cu_die(
+                dbg, cu_context,
+                tieddbg, 0,
+                error);
+        }
+        if (tres == DW_DLV_ERROR) {
+            /*  We'll assume any errors will be
+                discovered later. Lets get our CU_context
+                finished.  */
+            dwarf_dealloc_error(dbg,*error);
+            *error = 0;
+        }
     }
     return DW_DLV_OK;
 }
@@ -1778,7 +1989,9 @@ _dwarf_next_die_info_ptr(Dwarf_Byte_Ptr die_info_ptr,
     Dwarf_Debug dbg = 0;
     Dwarf_Byte_Ptr abbrev_end = 0;
     int lres = 0;
+    Dwarf_Unsigned highest_code = 0;
 
+    dbg = cu_context->cc_dbg;
     info_ptr = die_info_ptr;
     DECODE_LEB128_UWORD_CK(info_ptr, utmp,dbg,error,die_info_end);
     abbrev_code = (Dwarf_Unsigned) utmp;
@@ -1788,14 +2001,28 @@ _dwarf_next_die_info_ptr(Dwarf_Byte_Ptr die_info_ptr,
         return DW_DLV_ERROR;
     }
 
-
     lres = _dwarf_get_abbrev_for_code(cu_context, abbrev_code,
-        &abbrev_list,error);
+        &abbrev_list,&highest_code,error);
     if (lres == DW_DLV_ERROR) {
         return lres;
     }
     if (lres == DW_DLV_NO_ENTRY) {
-        _dwarf_error(dbg, error, DW_DLE_NEXT_DIE_NO_ABBREV_LIST);
+        dwarfstring m;
+
+        dwarfstring_constructor(&m);
+        dwarfstring_append_printf_u(&m,
+            " DW_DLE_NEXT_DIE_NO_ABBREV_LIST "
+            "There is no abbrev present for code %u"
+            " in this compilation unit. ",
+            abbrev_code);
+        dwarfstring_append_printf_u(&m,
+            "The highest known code in any "
+            "compilation unit is %u.",
+            highest_code);
+        _dwarf_error_string(dbg, error,
+            DW_DLE_NEXT_DIE_NO_ABBREV_LIST,
+            dwarfstring_string(&m));
+        dwarfstring_destructor(&m);
         return DW_DLV_ERROR;
     }
     dbg = cu_context->cc_dbg;
@@ -1892,9 +2119,12 @@ _dwarf_next_die_info_ptr(Dwarf_Byte_Ptr die_info_ptr,
                 are at the end, do not return error. Higher level
                 will detect that we are at the end. */
             {   /*  Care required here. Offset can be garbage. */
-                ptrdiff_t plen = die_info_end - cu_info_start;
-                ptrdiff_t signdoffset = (ptrdiff_t)offset;
-                if (signdoffset > plen || signdoffset < 0) {
+                Dwarf_Unsigned plen = 0;
+
+                /*  ptrdiff_t is generated but not named */
+                plen = (die_info_end >= cu_info_start)?
+                    (die_info_end - cu_info_start):0;
+                if (offset > plen) {
                     /* Error case, bad DWARF. */
                     _dwarf_error(dbg, error,DW_DLE_SIBLING_OFFSET_WRONG);
                     return DW_DLV_ERROR;
@@ -1909,7 +2139,7 @@ _dwarf_next_die_info_ptr(Dwarf_Byte_Ptr die_info_ptr,
         if (attr_form != 0 && attr_form != DW_FORM_implicit_const) {
             int res = 0;
             Dwarf_Unsigned sizeofval = 0;
-            ptrdiff_t  sizeb = 0;
+            Dwarf_Unsigned  ssize = 0;
 
             res = _dwarf_get_size_of_val(cu_context->cc_dbg,
                 attr_form,
@@ -1923,19 +2153,47 @@ _dwarf_next_die_info_ptr(Dwarf_Byte_Ptr die_info_ptr,
             if(res != DW_DLV_OK) {
                 return res;
             }
-            /*  It is ok for info_ptr == die_info_end, as we will test
-                later before using a too-large info_ptr */
-            sizeb = (ptrdiff_t)sizeofval;
-            if (sizeb > (die_info_end - info_ptr) ||
-                sizeb < 0) {
-                _dwarf_error(dbg, error, DW_DLE_NEXT_DIE_PAST_END);
+            /*  It is ok for info_ptr == die_info_end, as we
+                will test later before using a too-large info_ptr */
+            /*  ptrdiff_t is generated but not named */
+            ssize = (die_info_end >= info_ptr)?
+                (die_info_end - info_ptr): 0;
+            if (sizeofval > ssize) {
+                dwarfstring m;
+
+                dwarfstring_constructor(&m);
+                dwarfstring_append_printf_u(&m,
+                    "DW_DLE_NEXT_DIE_PAST_END:"
+                    " the DIE value just checked is %u"
+                    " bytes long, and that would extend"
+                    " past the end of the section.",
+                    sizeofval);
+                _dwarf_error_string(dbg, error,
+                    DW_DLE_NEXT_DIE_PAST_END,
+                    dwarfstring_string(&m));
+                dwarfstring_destructor(&m);
                 return DW_DLV_ERROR;
             }
             info_ptr += sizeofval;
             if (info_ptr > die_info_end) {
+                dwarfstring m;
+
+                dwarfstring_constructor(&m);
+                dwarfstring_append_printf_u(&m,
+                    "DW_DLE_NEXT_DIE_PAST_END:"
+                    " the DIE value just checked is %u"
+                    " bytes long, and puts us past"
+                    " the end of the section",
+                    sizeofval);
+                dwarfstring_append_printf_u(&m,
+                    " which is 0x%x",
+                    (Dwarf_Unsigned)(uintptr_t)die_info_end);
+                _dwarf_error_string(dbg, error,
+                    DW_DLE_NEXT_DIE_PAST_END,
+                    dwarfstring_string(&m));
+                dwarfstring_destructor(&m);
                 /*  More than one-past-end indicates a bug somewhere,
                     likely bad dwarf generation. */
-                _dwarf_error(dbg, error, DW_DLE_NEXT_DIE_PAST_END);
                 return DW_DLV_ERROR;
             }
         }
@@ -2016,7 +2274,8 @@ dwarf_siblingof_b(Dwarf_Debug dbg,
         is_info,caller_ret_die,error);
     return res;
 }
-int
+
+static int
 _dwarf_siblingof_internal(Dwarf_Debug dbg,
     Dwarf_Die die,
     Dwarf_CU_Context context,
@@ -2031,7 +2290,9 @@ _dwarf_siblingof_internal(Dwarf_Debug dbg,
     Dwarf_Byte_Ptr die_info_end = 0;
     Dwarf_Unsigned abbrev_code = 0;
     Dwarf_Unsigned utmp = 0;
+    Dwarf_Unsigned highest_code = 0;
     int lres = 0;
+    int dieres = 0;
     /* Since die may be NULL, we rely on the input argument. */
     Dwarf_Small *dataptr =  0;
 
@@ -2041,7 +2302,6 @@ _dwarf_siblingof_internal(Dwarf_Debug dbg,
     }
     dataptr = is_info? dbg->de_debug_info.dss_data:
         dbg->de_debug_types.dss_data;
-
     if (die == NULL) {
         /*  Find root die of cu */
         /*  die_info_end is untouched here, need not be set in this
@@ -2053,7 +2313,7 @@ _dwarf_siblingof_internal(Dwarf_Debug dbg,
         /*  If we've not loaded debug_info
             context will be NULL. */
         if (!context) {
-            _dwarf_error(dbg, error, DW_DLE_DBG_NO_CU_CONTEXT);
+            local_dealloc_cu_context(dbg,context);
             return (DW_DLV_ERROR);
         }
         off2 = context->cc_debug_offset;
@@ -2096,6 +2356,7 @@ _dwarf_siblingof_internal(Dwarf_Debug dbg,
         do {
             int res2 = 0;
             Dwarf_Byte_Ptr die_info_ptr2 = 0;
+
             res2 = _dwarf_next_die_info_ptr(die_info_ptr,
                 context, die_info_end,
                 cu_info_start, true, &has_child,
@@ -2107,17 +2368,47 @@ _dwarf_siblingof_internal(Dwarf_Debug dbg,
             if (die_info_ptr2 < die_info_ptr) {
                 /*  There is something very wrong, our die value
                     decreased.  Bad DWARF. */
-                _dwarf_error(dbg, error, DW_DLE_NEXT_DIE_LOW_ERROR);
+                dwarfstring m;
+
+                dwarfstring_constructor(&m);
+                dwarfstring_append_printf_u(&m,
+                    "DW_DLE_NEXT_DIE_LOW_ERROR: "
+                    "Somehow the next die pointer 0x%x",
+                    (Dwarf_Unsigned)(uintptr_t)die_info_ptr2);
+                dwarfstring_append_printf_u(&m,
+                    " points before the current die "
+                    "pointer 0x%x so an "
+                    "overflow of some sort happened",
+                    (Dwarf_Unsigned)(uintptr_t)die_info_ptr);
+                _dwarf_error_string(dbg, error,
+                    DW_DLE_NEXT_DIE_LOW_ERROR,
+                    dwarfstring_string(&m));
+                dwarfstring_destructor(&m);
                 return (DW_DLV_ERROR);
             }
             if (die_info_ptr2 > die_info_end) {
-                _dwarf_error(dbg, error, DW_DLE_NEXT_DIE_PAST_END);
-                return (DW_DLV_ERROR);
+                dwarfstring m;
+
+                dwarfstring_constructor(&m);
+                dwarfstring_append_printf_u(&m,
+                    "DW_DLE_NEXT_DIE_PAST_END: "
+                    "the next DIE at 0x%x",
+                    (Dwarf_Unsigned)(uintptr_t)die_info_ptr2);
+                dwarfstring_append_printf_u(&m,
+                    " would be past "
+                    " the end of the section (0x%x),"
+                    " which is an error.",
+                    (Dwarf_Unsigned)(uintptr_t)die_info_end);
+                _dwarf_error_string(dbg, error,
+                    DW_DLE_NEXT_DIE_PAST_END,
+                    dwarfstring_string(&m));
+                dwarfstring_destructor(&m);
+                return DW_DLV_ERROR;
             }
             die_info_ptr = die_info_ptr2;
 
             /*  die_info_end is one past end. Do not read it!
-                A test for ``!= die_info_end''  would work as well,
+                A test for '!= die_info_end'  would work as well,
                 but perhaps < reads more like the meaning. */
             if (die_info_ptr < die_info_end) {
                 if ((*die_info_ptr) == 0 && has_child) {
@@ -2196,7 +2487,12 @@ _dwarf_siblingof_internal(Dwarf_Debug dbg,
     ret_die->di_cu_context =
         die == NULL ? context : die->di_cu_context;
 
-    DECODE_LEB128_UWORD_CK(die_info_ptr, utmp,dbg,error,die_info_end);
+    dieres = _dwarf_leb128_uword_wrapper(dbg,
+        &die_info_ptr,die_info_end,&utmp,error);
+    if (dieres == DW_DLV_ERROR) {
+        dwarf_dealloc(dbg, ret_die, DW_DLA_DIE);
+        return dieres;
+    }
     if (die_info_ptr > die_info_end) {
         /*  We managed to go past the end of the CU!.
             Something is badly wrong. */
@@ -2211,15 +2507,30 @@ _dwarf_siblingof_internal(Dwarf_Debug dbg,
         return (DW_DLV_NO_ENTRY);
     }
     ret_die->di_abbrev_code = abbrev_code;
-    lres = _dwarf_get_abbrev_for_code(ret_die->di_cu_context, abbrev_code,
-        &ret_die->di_abbrev_list,error);
+    lres = _dwarf_get_abbrev_for_code(ret_die->di_cu_context,
+        abbrev_code,
+        &ret_die->di_abbrev_list,
+        &highest_code,error);
     if (lres == DW_DLV_ERROR) {
         dwarf_dealloc(dbg, ret_die, DW_DLA_DIE);
         return lres;
     }
     if (lres == DW_DLV_NO_ENTRY) {
+        dwarfstring m;
         dwarf_dealloc(dbg, ret_die, DW_DLA_DIE);
-        _dwarf_error(dbg, error, DW_DLE_DIE_ABBREV_LIST_NULL);
+        dwarfstring_constructor(&m);
+        dwarfstring_append_printf_u(&m,
+            "DW_DLE_DIE_ABBREV_LIST_NULL: "
+            "There is no abbrev present for code %u"
+            " in this compilation unit. ",
+            abbrev_code);
+        dwarfstring_append_printf_u(&m,
+            "The highest known code"
+            " in any compilation unit is %u .",
+            highest_code);
+        _dwarf_error_string(dbg, error,
+            DW_DLE_DIE_ABBREV_LIST_NULL,dwarfstring_string(&m));
+        dwarfstring_destructor(&m);
         return DW_DLV_ERROR;
     }
     if (die == NULL && !is_cu_tag(ret_die->di_abbrev_list->abl_tag)) {
@@ -2229,7 +2540,7 @@ _dwarf_siblingof_internal(Dwarf_Debug dbg,
     }
 
     *caller_ret_die = ret_die;
-    return (DW_DLV_OK);
+    return DW_DLV_OK;
 }
 
 
@@ -2252,6 +2563,7 @@ dwarf_child(Dwarf_Die die,
     int res = 0;
     Dwarf_CU_Context context = 0;
     int lres = 0;
+    Dwarf_Unsigned highest_code = 0;
 
     CHECK_DIE(die, DW_DLV_ERROR);
     dbg = die->di_cu_context->cc_dbg;
@@ -2323,25 +2635,42 @@ dwarf_child(Dwarf_Die die,
             ++dis->de_last_di_ptr;
         }
 
-        /*  We have arrived at a null DIE, at the end of a CU or the end
+        /*  We have arrived at a null DIE,
+            at the end of a CU or the end
             of a list of siblings. */
         *caller_ret_die = 0;
         dwarf_dealloc(dbg, ret_die, DW_DLA_DIE);
+        ret_die = 0;
         return DW_DLV_NO_ENTRY;
     }
     ret_die->di_abbrev_code = abbrev_code;
-    lres = _dwarf_get_abbrev_for_code(die->di_cu_context, abbrev_code,
-        &ret_die->di_abbrev_list,error);
+    lres = _dwarf_get_abbrev_for_code(die->di_cu_context,
+        abbrev_code,
+        &ret_die->di_abbrev_list,
+        &highest_code,error);
     if (lres == DW_DLV_ERROR) {
         dwarf_dealloc(dbg, ret_die, DW_DLA_DIE);
+        ret_die = 0;
         return lres;
     }
     if (lres == DW_DLV_NO_ENTRY) {
-        dwarf_dealloc(dbg, ret_die, DW_DLA_DIE);
-        _dwarf_error(dbg, error, DW_DLE_ABBREV_MISSING);
+        dwarfstring m;
+
+        dwarfstring_constructor(&m);
+        dwarf_dealloc_die(ret_die);
+        ret_die = 0;
+        dwarfstring_append_printf_u(&m,
+            "DW_DLE_ABBREV_MISSING: the abbrev code not found "
+            " in dwarf_child() is %u. ",abbrev_code);
+        dwarfstring_append_printf_u(&m,
+            "The highest known code"
+            " in any compilation unit is %u.",
+            highest_code);
+        _dwarf_error_string(dbg, error, DW_DLE_ABBREV_MISSING,
+            dwarfstring_string(&m));
+        dwarfstring_destructor(&m);
         return DW_DLV_ERROR;
     }
-
     *caller_ret_die = ret_die;
     return (DW_DLV_OK);
 }
@@ -2375,6 +2704,7 @@ dwarf_offdie_b(Dwarf_Debug dbg,
     int lres = 0;
     Dwarf_Debug_InfoTypes dis = 0;
     Dwarf_Byte_Ptr die_info_end = 0;
+    Dwarf_Unsigned highest_code = 0;
 
     if (dbg == NULL) {
         _dwarf_error(NULL, error, DW_DLE_DBG_NULL);
@@ -2385,11 +2715,8 @@ dwarf_offdie_b(Dwarf_Debug dbg,
 
     cu_context = _dwarf_find_CU_Context(dbg, offset,is_info);
     if (cu_context == NULL) {
-        cu_context = _dwarf_find_offdie_CU_Context(dbg, offset,is_info);
-    }
-
-    if (cu_context == NULL) {
-        Dwarf_Unsigned section_size = is_info? dbg->de_debug_info.dss_size:
+        Dwarf_Unsigned section_size = is_info?
+            dbg->de_debug_info.dss_size:
             dbg->de_debug_types.dss_size;
         int res = is_info?_dwarf_load_debug_info(dbg, error):
             _dwarf_load_debug_types(dbg,error);
@@ -2398,16 +2725,15 @@ dwarf_offdie_b(Dwarf_Debug dbg,
             return res;
         }
 
-        if (dis->de_offdie_cu_context_end != NULL) {
+        if (dis->de_cu_context_list_end != NULL) {
             Dwarf_CU_Context lcu_context =
-                dis->de_offdie_cu_context_end;
+                dis->de_cu_context_list_end;
             new_cu_offset =
                 lcu_context->cc_debug_offset +
                 lcu_context->cc_length +
                 lcu_context->cc_length_size +
                 lcu_context->cc_extension_size;
         }
-
 
         do {
             if ((new_cu_offset +
@@ -2422,23 +2748,20 @@ dwarf_offdie_b(Dwarf_Debug dbg,
                 return res;
             }
 
+            /*  The called func does not dealloc cu_context
+                in case of error, so we do it here. */
             res = finish_up_cu_context_from_cudie(dbg,new_cu_offset,
                 cu_context,error);
             if (res == DW_DLV_ERROR) {
-                dwarf_dealloc(dbg, cu_context, DW_DLA_CU_CONTEXT);
+                local_dealloc_cu_context(dbg,cu_context);
                 return res;
             }
             if (res == DW_DLV_NO_ENTRY) {
-                dwarf_dealloc(dbg, cu_context, DW_DLA_CU_CONTEXT);
+                local_dealloc_cu_context(dbg,cu_context);
                 return res;
             }
-            if (dis->de_offdie_cu_context == NULL) {
-                dis->de_offdie_cu_context = cu_context;
-                dis->de_offdie_cu_context_end = cu_context;
-            } else {
-                dis->de_offdie_cu_context_end->cc_next = cu_context;
-                dis->de_offdie_cu_context_end = cu_context;
-            }
+            /*  Add the new cu_context to a list of contexts */
+            insert_into_cu_context_list(dis,cu_context);
             new_cu_offset = new_cu_offset + cu_context->cc_length +
                 cu_context->cc_length_size +
                 cu_context->cc_extension_size;
@@ -2447,7 +2770,7 @@ dwarf_offdie_b(Dwarf_Debug dbg,
 
     die_info_end = _dwarf_calculate_info_section_end_ptr(cu_context);
     die = (Dwarf_Die) _dwarf_get_alloc(dbg, DW_DLA_DIE, 1);
-    if (die == NULL) {
+    if (!die) {
         _dwarf_error(dbg, error, DW_DLE_ALLOC_FAIL);
         return (DW_DLV_ERROR);
     }
@@ -2460,24 +2783,48 @@ dwarf_offdie_b(Dwarf_Debug dbg,
         info_ptr = dataptr + offset;
     }
     die->di_debug_ptr = info_ptr;
-    DECODE_LEB128_UWORD_CK(info_ptr, utmp,dbg,error,die_info_end);
+    lres = _dwarf_leb128_uword_wrapper(dbg,&info_ptr,die_info_end,
+        &utmp,error);
+    if (lres != DW_DLV_OK) {
+        dwarf_dealloc_die(die);
+        return lres;
+    }
     abbrev_code = utmp;
     if (abbrev_code == 0) {
         /* we are at a null DIE (or there is a bug). */
-        *new_die = 0;
-        dwarf_dealloc(dbg, die, DW_DLA_DIE);
+        dwarf_dealloc_die(die);
+        die = 0;
         return DW_DLV_NO_ENTRY;
     }
     die->di_abbrev_code = abbrev_code;
     lres = _dwarf_get_abbrev_for_code(cu_context, abbrev_code,
-        &die->di_abbrev_list,error);
+        &die->di_abbrev_list,
+        &highest_code,error);
     if (lres == DW_DLV_ERROR) {
-        dwarf_dealloc(dbg, die, DW_DLA_DIE);
+        dwarf_dealloc_die(die);
+        die = 0;
         return lres;
     }
     if (lres == DW_DLV_NO_ENTRY) {
-        dwarf_dealloc(dbg, die, DW_DLA_DIE);
-        _dwarf_error(dbg, error, DW_DLE_DIE_ABBREV_LIST_NULL);
+        dwarfstring m;
+
+        dwarf_dealloc_die(die);
+        die = 0;
+        dwarfstring_constructor(&m);
+        dwarfstring_append_printf_u(&m,
+            "DW_DLE_DIE_ABBREV_LIST_NULL: "
+            "There is no abbrev present for code %u"
+            " in this compilation unit"
+            " when calling dwarf_offdie_b(). ",
+            abbrev_code);
+        dwarfstring_append_printf_u(&m,
+            "The highest known code "
+            "in any compilation unit is %u .",
+            highest_code);
+        _dwarf_error_string(dbg, error,
+            DW_DLE_DIE_ABBREV_LIST_NULL,
+            dwarfstring_string(&m));
+        dwarfstring_destructor(&m);
         return DW_DLV_ERROR;
     }
     *new_die = die;

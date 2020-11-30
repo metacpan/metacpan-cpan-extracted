@@ -45,11 +45,11 @@ Metabolomics::Utils - Perl Utils extension metabolomics::fragment::annotation mo
 
 =head1 VERSION
 
-Version 0.1
+Version 0.2 - Adding POD
 
 =cut
 
-our $VERSION = '0.1';
+our $VERSION = '0.2';
 
 
 =head1 SYNOPSIS
@@ -59,20 +59,26 @@ our $VERSION = '0.1';
 =head1 DESCRIPTION
 
 	Metabolomics::Utils is a module containing little helper as formatters, parsers, conf called during annotation steps 
-	
 
 =head1 EXPORT
 
-=head1 SUBROUTINES/METHODS
+	use Metabolomics::Utils;
 
-=head2 METHOD new
+=head1 PUBLIC METHODS 
+
+=head2 Metabolomics::Utils ;
+
+=over 4
+
+=item new
 
 	## Description : set a new utils object
 	## Input : NA
 	## Output : $oUtils
 	## Usage : my ( $oBank ) = Metabolomics::Utils->new ( ) ;
-	
+
 =cut
+
 ## START of SUB
 sub new {
 	## Variables
@@ -85,14 +91,15 @@ sub new {
 }
 ### END of SUB
 
-=head2 METHOD _roundFloat
+=item roundFloat
 
 	## Description : round a float by the sended decimal
 	## Input : $number, $decimal
 	## Output : $round_num
-	## Usage : my ( $round_num ) = round_num( $number, $decimal ) ;
-	
+	## Usage : my ( $round_num ) = roundFloat( $number, $decimal ) ;
+
 =cut
+
 ## START of SUB 
 sub roundFloat {
     ## Retrieve Values
@@ -114,14 +121,15 @@ sub roundFloat {
 }
 ## END of SUB
 
-=head2 METHOD getSmallestDecimalPartOf2Numbers
+=item METHOD getSmallestDecimalPartOf2Numbers
 
 	## Description : get the smallest decimal part of two numbers
 	## Input : $float01, $float02
 	## Output : $commonLenghtDecimalPart
 	## Usage : my ( $commonLenghtDecimalPart ) = getSmallestDecimalPartOf2Numbers ( $float01, $float02 ) ;
-	
+
 =cut
+
 ## START of SUB
 sub getSmallestDecimalPartOf2Numbers {
     ## Retrieve Values
@@ -147,14 +155,15 @@ sub getSmallestDecimalPartOf2Numbers {
 }
 ### END of SUB
 
-=head2 METHOD utilsAsConf
+=item utilsAsConf
 
 	## Description : build a conf from a conf file with KEY=VALUE structure
 	## Input : $file
 	## Ouput : $oConf (a hash)
 	## Usage : my ( $oConf ) = utilsAsConf( $file ) ;
-	
+
 =cut
+
 ## START of SUB
 sub utilsAsConf {
 	## Retrieve Values
@@ -197,9 +206,9 @@ sub utilsAsConf {
 }
 ## END of SUB
 
-
-
 __END__
+
+=back
 
 =head1 AUTHOR
 
@@ -242,9 +251,9 @@ L<https://metacpan.org/release/Metabolomics-Fragment-Annotation>
 
 =back
 
-
 =head1 ACKNOWLEDGEMENTS
 
+Thank you to INRAE and All metabolomics colleagues.
 
 =head1 LICENSE AND COPYRIGHT
 

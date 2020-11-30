@@ -4,13 +4,13 @@
       "Steve Hay <shay@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.150001",
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Win32-SharedFileOpen",
    "no_index" : {
@@ -109,8 +109,9 @@
    "resources" : {
       "repository" : {
          "type" : "git",
-         "url" : "https://github.com/steve-m-hay/Win32-SharedFileOpen.git"
+         "web" : "https://github.com/steve-m-hay/Win32-SharedFileOpen"
       }
    },
-   "version" : "4.03"
+   "version" : "4.04",
+   "x_serialization_backend" : "JSON::PP version 4.02"
 }

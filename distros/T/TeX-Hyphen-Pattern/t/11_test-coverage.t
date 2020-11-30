@@ -1,32 +1,23 @@
-#!/usr/bin/env perl -w    # -*- cperl -*-
 use strict;
 use warnings;
-use 5.014000;
 use utf8;
 
 use Test::More;
+use TeX::Hyphen::Pattern;
 
-our $VERSION = v1.1.2;
-
-if ( not $ENV{'AUTHOR_TESTING'} ) {
-    my $msg =
-q{Author test. Set the environment variable AUTHOR_TESTING to enable this test.};
-    plan 'skip_all' => $msg;
+if ( !eval { require Test::TestCoverage; 1 } ) {
+    plan skip_all => q{Test::TestCoverage required for testing test coverage};
 }
-
-eval {
-    require Test::TestCoverage;
-    1;
-} or do {
-    my $msg = q{Test::TestCoverage 0.08 required to check spelling of POD};
-    plan 'skip_all' => $msg;
-};
-
 plan 'tests' => 1;
 Test::TestCoverage::test_coverage('TeX::Hyphen::Pattern');
 
 my $thp = TeX::Hyphen::Pattern->new();
 $thp->label(q{nl});
+$thp->filename();
+$thp->filename();
+$thp->label(q{Da_DK});
+$thp->filename();
+$thp->label(q{NON_EXISTING_LANGUAGE_LABEL});
 $thp->filename();
 $thp->meta();
 $thp->packaged();

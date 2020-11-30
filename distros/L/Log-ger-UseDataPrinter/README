@@ -2,8 +2,8 @@ NAME
     Log::ger::UseDataPrinter - Use Data::Printer to dump data structures
 
 VERSION
-    This document describes version 0.002 of Log::ger::UseDataPrinter (from
-    Perl distribution Log-ger-UseDataPrinter), released on 2020-06-04.
+    This document describes version 0.003 of Log::ger::UseDataPrinter (from
+    Perl distribution Log-ger-UseDataPrinter), released on 2020-06-06.
 
 SYNOPSIS
      use Log::ger::UseDataPrinter;
@@ -30,9 +30,25 @@ SEE ALSO
 
     Data::Printer
 
-    Other modules to set data dumper for Log::ger: Log::ger::UseDataDump,
-    Log::ger::UseDataDumpColor, Log::ger::UseDataDumpObjectAsString,
-    Log::ger::UseDataDumpOptions, Log::ger::UseDataDumper.
+    Other modules to set data dumper for Log::ger:
+
+    *   Log::ger::UseBaheForDump
+
+    *   Log::ger::UseDataDump
+
+    *   Log::ger::UseDataDumpColor
+
+    *   Log::ger::UseDataDumpObjectAsString
+
+    *   Log::ger::UseDataDumpOptions
+
+    *   Log::ger::UseDataDumper
+
+    *   Log::ger::UseDataDumperCompact
+
+    *   Log::ger::UseJSONForDump
+
+    *   Log::ger::UseYAMLForDump
 
 AUTHOR
     perlancar <perlancar@cpan.org>

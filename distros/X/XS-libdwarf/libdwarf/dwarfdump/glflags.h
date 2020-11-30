@@ -1,25 +1,31 @@
 /*
-  Copyright (C) 2017-2017 David Anderson. All Rights Reserved.
+Copyright (C) 2017-2020 David Anderson. All Rights Reserved.
 
-  This program is free software; you can redistribute it and/or modify it
-  under the terms of version 2 of the GNU General Public License as
-  published by the Free Software Foundation.
+  This program is free software; you can redistribute it and/or
+  modify it under the terms of version 2 of the GNU General
+  Public License as published by the Free Software Foundation.
 
-  This program is distributed in the hope that it would be useful, but
-  WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  This program is distributed in the hope that it would be
+  useful, but WITHOUT ANY WARRANTY; without even the implied
+  warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+  PURPOSE.
 
-  Further, this software is distributed without any warranty that it is
-  free of the rightful claim of any third person regarding infringement
-  or the like.  Any license provided herein, whether implied or
-  otherwise, applies only to this software file.  Patent licenses, if
-  any, provided herein do not apply to combinations of this program with
-  other software, or any other product whatsoever.
+  Further, this software is distributed without any warranty
+  that it is free of the rightful claim of any third person
+  regarding infringement or the like.  Any license provided
+  herein, whether implied or otherwise, applies only to this
+  software file.  Patent licenses, if any, provided herein
+  do not apply to combinations of this program with other
+  software, or any other product whatsoever.
 
-  You should have received a copy of the GNU General Public License along
-  with this program; if not, write the Free Software Foundation, Inc., 51
-  Franklin Street - Fifth Floor, Boston MA 02110-1301, USA.
+  You should have received a copy of the GNU General Public
+  License along with this program; if not, write the Free
+  Software Foundation, Inc., 51 Franklin Street - Fifth Floor,
+  Boston MA 02110-1301, USA.
 */
+
+#ifndef GLFLAGS_H
+#define GLFLAGS_H
 
 /*  All the dwarfdump flags are gathered into a single
     global struct as it has been hard to know how many there
@@ -110,13 +116,16 @@ struct glflags_s {
 
     boolean gf_abbrev_flag;
     boolean gf_aranges_flag; /* .debug_aranges section. */
-    boolean gf_debug_names_flag;
+    boolean gf_debug_names_flag; /* .debug_names section */
     boolean gf_eh_frame_flag;   /* GNU .eh_frame section. */
     boolean gf_frame_flag;      /* .debug_frame section. */
     boolean gf_gdbindex_flag;   /* .gdbindex section. */
     boolean gf_gnu_debuglink_flag;   /* .gnu_debuglink section. */
+    boolean gf_debug_gnu_flag;  /* .debug_gnu_pubtypes, pubnames*/
+    boolean gf_debug_sup_flag;  /* .debug_sup */
     boolean gf_info_flag;  /* .debug_info */
     boolean gf_line_flag;
+    boolean gf_no_follow_debuglink;
     boolean gf_line_print_pc;
     boolean gf_line_skeleton_flag;
     boolean gf_loc_flag;
@@ -198,11 +207,26 @@ struct glflags_s {
         otherwise print (under the circumstances). */
 
     boolean gf_check_debug_names;
+    boolean gf_no_sanitize_strings;
 
     /* Display parent/children when in wide format? */
     boolean gf_display_parent_tree;
     boolean gf_display_children_tree;
     int     gf_stop_indent_level;
+
+    /*  ====Searching for function name (printing frame data).  */
+
+    /*  split dwarf lookup by address or die.
+        if non-zero then .debug_addr is needed but missing. */
+    char     gf_debug_addr_missing_search_by_address;
+
+    /* Other error in lookup by address or by_die */
+    int     gf_error_code_in_name_search_by_address;
+
+    /* Avoid some unneccesary work lookup by address. */
+    char    gf_all_cus_seen_search_by_address;
+
+    /*  ====End searching for function name. */
 
     /* Print search results in wide format? */
     boolean gf_search_wide_format;
@@ -215,19 +239,30 @@ struct glflags_s {
     boolean gf_show_global_offsets;
     boolean gf_display_offsets;
     boolean gf_print_str_offsets;
+    boolean gf_expr_ops_joined;
+    boolean gf_print_raw_rnglists;
+    boolean gf_print_raw_loclists;
 
     unsigned long gf_count_major_errors;
 
-    /*  Base address has a special meaning in DWARF4 relative to address ranges. */
+    char **  gf_global_debuglink_paths;
+    unsigned gf_global_debuglink_count;
+
+    /*  Base address has a special meaning in DWARF4,5
+        relative to address ranges. */
     boolean seen_PU;                  /* Detected a PU */
     boolean seen_CU;                  /* Detected a CU */
     boolean need_CU_name;             /* Need CU name */
     boolean need_CU_base_address;     /* Need CU Base address */
     boolean need_CU_high_address;     /* Need CU High address */
     boolean need_PU_valid_code;       /* Need PU valid code */
+    boolean in_valid_code;            /* set/reset in  subprogram
+        and compile-unit DIES.*/
 
-    boolean seen_PU_base_address;     /* Detected a Base address for PU */
-    boolean seen_PU_high_address;     /* Detected a High address for PU */
+    boolean seen_PU_base_address;     /* Detected a Base address
+        for PU */
+    boolean seen_PU_high_address;     /* Detected a High address
+        for PU */
     Dwarf_Addr PU_base_address;       /* PU Base address */
     Dwarf_Addr PU_high_address;       /* PU High address */
 
@@ -331,6 +366,8 @@ struct glflags_s {
 
     /*  Check errors. */
     int check_error;
+
+    int gf_print_alloc_sums;
 };
 
 extern struct glflags_s glflags;
@@ -375,6 +412,12 @@ boolean cu_data_is_set(void);
 #define DEBUG_FRAME_EH_GNU 16
 #define DEBUG_MACRO       17
 #define DEBUG_NAMES       18
+#define DEBUG_RNGLISTS    19
+#define DEBUG_LOCLISTS    20
+#define DEBUG_GNU_PUBNAMES 21
+#define DEBUG_GNU_PUBTYPES 22
+#define DEBUG_SUP         23
 
 /* Print the information only if unique errors is set and it is first time */
 #define PRINTING_UNIQUE (!glflags.gf_found_error_message)
+#endif /* GLFLAGS_H */

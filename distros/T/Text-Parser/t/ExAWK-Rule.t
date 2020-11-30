@@ -4,7 +4,6 @@ use warnings;
 
 use Test::More;
 use Test::Exception;
-use Text::Parser::Errors;
 
 BEGIN {
     use_ok 'Text::Parser::Rule';
@@ -14,7 +13,7 @@ BEGIN {
 throws_ok {
     my $rule = Text::Parser::Rule->new();
 }
-ExAWK(), 'Throws an error for no arguments';
+'Text::Parser::Error', 'Throws an error for no arguments';
 
 lives_ok {
     my $rule = Text::Parser::Rule->new( if => '' );
@@ -36,7 +35,7 @@ lives_ok {
     throws_ok {
         $rule->add_precondition('${-1 eq "ELSE"');
     }
-    ExAWK(), 'Throws for bad syntax';
+    'Text::Parser::Error', 'Throws for bad syntax';
     is( $rule->min_nf, 4, 'Min NF changes to 4' );
     $rule->action('return $5');
     is( $rule->min_nf, 5, 'Min NF changes to 5' );
@@ -55,7 +54,7 @@ lives_ok {
     throws_ok {
         $rule->continue_to_next(1);
     }
-    ExAWK(), 'Cannot continue to next if recording output';
+    'Text::Parser::Error', 'Cannot continue to next if recording output';
     $rule->dont_record(1);
 }
 'Empty rule starting with empty condition';
@@ -102,7 +101,7 @@ lives_ok {
     throws_ok {
         $rule->run;
     }
-    ExAWK();
+    'Text::Parser::Error', 'rule run without args';
     is $rule->test($parser), 0, 'Wont pass';
     $rule->run($parser);
     is_deeply( [ $parser->get_records ], [], 'Store undef' );

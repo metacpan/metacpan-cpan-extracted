@@ -7,7 +7,7 @@ use utf8;
 require Exporter;
 our @ISA = qw(Exporter);
 
-our $VERSION = '0.56';
+our $VERSION = '0.57';
 
 use Carp 'croak';
 use Convert::Moji qw/make_regex length_one unambiguous/;
@@ -653,6 +653,8 @@ sub romaji2kana
     $input =~ s/([kstfhmrgzdbpjqvwy])(?=\1y?[aiueo])/ッ/g;
     # kkya -> っきゃ etc.
     $input =~ s/ttsu/ッツ/g;
+    # xtsu -> っ
+    $input =~ s/xtsu/ッ/g;
     # ssha -> っしゃ
     $input =~ s/([s])(?=\1h[aiueo])/ッ/g;
     # Passport romaji,
@@ -1313,6 +1315,19 @@ sub hangul2kana
     return $hangul;
 }
 
+my %small2large = qw!
+ゃ や
+ゅ ゆ
+ょ よ
+ぁ あ
+ぃ い
+ぅ う
+ぇ え
+ぉ お
+っ つ
+ゎ わ
+!;
+
 sub kana_to_large
 {
     my ($kana) = @_;
@@ -1582,6 +1597,8 @@ sub cleanup_kana
     # confusing, note that the LHS are all kanji, and the RHS are all
     # kana/chouon
     $kana =~ tr/囗口八力二一/ロロハカニー/;
+    # Turn silly small youon kana into big ones
+    $kana =~ s/([^きぎしじちぢにひびぴみり]|^)([ゃゅょ])/$1$small2large{$2}/g;
     return $kana;
 }
 

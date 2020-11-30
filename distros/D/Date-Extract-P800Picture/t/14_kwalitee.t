@@ -1,16 +1,17 @@
+use strict;
+use warnings;
+use utf8;
+
 use Test::More;
 
 if ( not $ENV{AUTHOR_TESTING} ) {
-    my $msg = 'Author test. Set $ENV{AUTHOR_TESTING} to a true value to run.';
+    my $msg = 'Set $ENV{AUTHOR_TESTING} to run author tests.';
     plan( skip_all => $msg );
 }
-else {
 
-	eval {
-		require Test::Kwalitee;
-		Test::Kwalitee->import( tests => [qw( -has_meta_yml)] );
-	};
+eval {
+    require Test::Kwalitee;
+    Test::Kwalitee->import( tests => [qw( -has_meta_yml)] );
+};
 
-	plan( skip_all => 'Test::Kwalitee not installed; skipping' ) if $@;
-
-}
+plan( skip_all => 'Test::Kwalitee not installed; skipping' ) if $@;

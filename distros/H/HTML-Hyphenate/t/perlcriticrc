@@ -1,5 +1,2 @@
 severity = 1
-[Documentation::PodSpelling]
-stop_words = MERCHANTABILITY
-[Subroutines::ProhibitCallsToUndeclaredSubs]
-exempt_subs = Readonly::Readonly Readonly::Scalar Readonly::Array Readonly::Hash
+verbose = 8

@@ -10,6 +10,12 @@ using panda::unievent::Fs;
 
 #define TEST(name) TEST_CASE("log-file: " name, "[log-file]")
 
+#ifdef _WIN32
+    #define NL "\r\n"
+#else
+    #define NL "\n"
+#endif
+
 struct StderrCapture {
     std::stringstream ss;
     std::streambuf*   old;
@@ -25,7 +31,15 @@ struct Ctx {
     }
 
     ~Ctx () {
+        set_logger(nullptr);
         Fs::remove_all(dir);
+    }
+
+    string readfile (string path) {
+        auto fd = Fs::open(path, Fs::OpenFlags::RDONLY).value();
+        auto content = Fs::read(fd, 999).value();
+        Fs::close(fd);
+        return content;
     }
 };
 
@@ -53,7 +67,7 @@ TEST("log") {
     cfg.file = c.dir + "/file.log";
     set_logger(new FileLogger(cfg));
     set_format("%m");
-    set_level(DEBUG);
+    set_level(Level::Debug);
     panda_log_debug("hello");
     set_logger(nullptr);
 
@@ -61,9 +75,7 @@ TEST("log") {
     panda_log_debug("world");
     set_logger(nullptr); // need to close file to flush it
 
-    auto fd = Fs::open(cfg.file, Fs::OpenFlags::RDONLY).value();
-    auto txt = Fs::read(fd, 999).value();
-    CHECK(txt == "hello\nworld\n");
+    CHECK(c.readfile(cfg.file) == "hello" NL "world" NL);
 }
 
 TEST("autoflush") {
@@ -73,21 +85,18 @@ TEST("autoflush") {
     cfg.autoflush = true;
     set_logger(new FileLogger(cfg));
     set_format("%m");
-    set_level(DEBUG);
+    set_level(Level::Debug);
 
     panda_log_debug("hello");
 
-    auto fd = Fs::open(cfg.file, Fs::OpenFlags::RDONLY).value();
-    auto txt = Fs::read(fd, 999).value();
-    CHECK(txt == "hello\n");
+    CHECK(c.readfile(cfg.file) == "hello" NL);
 
     panda_log_debug("world");
 
-    fd = Fs::open(cfg.file, Fs::OpenFlags::RDONLY).value();
-    txt = Fs::read(fd, 999).value();
-    CHECK(txt == "hello\nworld\n");
+    CHECK(c.readfile(cfg.file) == "hello" NL "world" NL);
 }
 
+#ifndef _WIN32 // windows will not allow to change busy file
 TEST("reopen log file if moved/deleted/etc") {
     Ctx c;
     FileLogger::Config cfg;
@@ -96,22 +105,19 @@ TEST("reopen log file if moved/deleted/etc") {
     cfg.check_freq = 0;
     set_logger(new FileLogger(cfg));
     set_format("%m");
-    set_level(DEBUG);
+    set_level(Level::Debug);
 
     panda_log_debug("hello");
 
-    auto fd = Fs::open(cfg.file, Fs::OpenFlags::RDONLY).value();
-    auto txt = Fs::read(fd, 999).value();
-    CHECK(txt == "hello\n");
+    CHECK(c.readfile(cfg.file) == "hello" NL);
 
     Fs::remove(cfg.file);
 
     panda_log_debug("world");
 
-    fd = Fs::open(cfg.file, Fs::OpenFlags::RDONLY).value();
-    txt = Fs::read(fd, 999).value();
-    CHECK(txt == "world\n");
+    CHECK(c.readfile(cfg.file) == "world" NL);
 }
+#endif
 
 TEST("ignore logging if log file could not be created/written") {
     Ctx c;
@@ -141,5 +147,5 @@ TEST("ignore logging if log file could not be created/written") {
 
     auto fd = Fs::open(cfg.file, Fs::OpenFlags::RDONLY).value();
     auto txt = Fs::read(fd, 999).value();
-    CHECK(txt == "this log should NOT be ignored\n");
+    CHECK(txt == "this log should NOT be ignored" NL);
 }

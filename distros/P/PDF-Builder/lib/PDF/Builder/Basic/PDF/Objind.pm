@@ -14,9 +14,10 @@ package PDF::Builder::Basic::PDF::Objind;
 
 use strict;
 use warnings;
+use Scalar::Util 'isweak';
 
-our $VERSION = '3.019'; # VERSION
-my $LAST_UPDATE = '3.016'; # manually update whenever code is changed
+our $VERSION = '3.020'; # VERSION
+my $LAST_UPDATE = '3.020'; # manually update whenever code is changed
 
 =head1 NAME
 
@@ -114,7 +115,7 @@ the entire internal data structure purged.
 sub release {
     my ($self) = @_;
 
-    my @tofree = values %$self;
+    my @tofree = grep { !isweak $_ } values %$self;
     %$self = ();
 
     while (my $item = shift @tofree) {

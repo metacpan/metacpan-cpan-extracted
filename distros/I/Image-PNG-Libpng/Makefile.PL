@@ -19,7 +19,7 @@ if (! $vars) {
 
 my %wm = (
     NAME         => 'Image::PNG::Libpng',
-    VERSION      => '0.47',
+    VERSION      => '0.48',
     ABSTRACT     => 'Perl interface to libpng',
     OBJECT       => 'Libpng.o',
     LIBS         => '-lpng',
@@ -43,8 +43,8 @@ if ($vars) {
     if ($vars->{inc}) {
 	$wm{INC} = "$vars->{inc}";
     }
-    if ($vars->{lib}) {
-	$wm{LIBS} = "$vars->{lib} $wm{LIBS}";
+    if ($vars->{libs}) {
+	$wm{LIBS} = "$vars->{libs}";
     }
 }
 

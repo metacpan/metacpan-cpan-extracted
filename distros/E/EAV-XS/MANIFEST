@@ -119,7 +119,7 @@ t/08-file.t
 t/09-pod.t
 t/10-rfc822.t
 t/11-rfc5321.t
-t/11-rfc5322.t
+t/12-rfc5322.t
 t/13-not-tld.t
 t/14-error.t
 t/15-tld.t
@@ -127,6 +127,7 @@ t/16-get-lpart.t
 t/17-get-domain.t
 t/18-get-domain-type.t
 t/19-retired.t
+t/20-dots.t
 t/check-fail.txt
 t/check-pass.txt
 typemap

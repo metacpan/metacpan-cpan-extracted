@@ -262,7 +262,8 @@ invalid.
 
 =head1 AUTHOR
 
-Pascal Rigaux <pixel@mandriva.com> (original author and current maintainer), 
+Thierry Vignaud <tv@mageia.org> (current maintainer),
+Pascal Rigaux (original author),
 FranE<ccedil>ois Pons, Rafael Garcia-Suarez 
 
 =head1 SEE ALSO

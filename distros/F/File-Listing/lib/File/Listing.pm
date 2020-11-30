@@ -7,7 +7,7 @@ use HTTP::Date qw(str2time);
 use base qw( Exporter );
 
 # ABSTRACT: Parse directory listing
-our $VERSION = '6.11'; # VERSION
+our $VERSION = '6.14'; # VERSION
 
 sub Version { $File::Listing::VERSION; }
 
@@ -56,6 +56,7 @@ sub file_mode ($)
     while (/(.)/g) {
         $mode <<= 1;
         $mode |= 1 if $1 ne "-" &&
+                      $1 ne "*" &&
                       $1 ne 'S' &&
                       $1 ne 'T';
     }
@@ -151,7 +152,7 @@ sub line
 
     my ($kind, $size, $date, $name);
     if (($kind, $size, $date, $name) =
-        /^([\-FlrwxsStTdD]{10})                   # Type and permission bits
+        /^([\-\*FlrwxsStTdD]{10})                 # Type and permission bits
          .*                                       # Graps
          \D(\d+)                                  # File size
          \s+                                      # Some space
@@ -301,7 +302,7 @@ sub line {
     my($tz, $error) = @_; # ignored for now...
 
     s!</?t[rd][^>]*>! !g;  # clean away various table stuff
-    if (m!<A\s+HREF=\"([^\"]+)\">.*</A>.*?(\d+)-([a-zA-Z]+|\d+)-(\d+)\s+(\d+):(\d+)\s+(?:([\d\.]+[kMG]?|-))!i) {
+    if (m!<A\s+HREF=\"([^?\"]+)\">.*</A>.*?(\d+)-([a-zA-Z]+|\d+)-(\d+)\s+(\d+):(\d+)\s+(?:([\d\.]+[kMG]?|-))!i) {
         my($filename, $filesize) = ($1, $7);
         my($d,$m,$y, $H,$M) = ($2,$3,$4,$5,$6);
         if ($m =~ /^\d+$/) {
@@ -327,6 +328,15 @@ sub line {
         my $filetime = Time::Local::timelocal(0,$M,$H,$d,$m-1,_guess_year($y));
         my $filetype = ($filename =~ s|/$|| ? "d" : "f");
         return [$filename, $filetype, $filesize, $filetime, undef];
+    }
+
+    # the default listing doesn't include timestamps or file sizes
+    # but we don't want to grab navigation links, so we ignore links
+    # that have a non-trailing slash / character or ?
+    elsif(m!<A\s+HREF=\"([^?/\"]+/?)\">.*</A>!i) {
+        my $filename = $1;
+        my $filetype = ($filename =~ s|/$|| ? "d" : "f");
+        return [$filename, $filetype, undef, undef, undef];
     }
 
     return ();
@@ -389,7 +399,7 @@ File::Listing - Parse directory listing
 
 =head1 VERSION
 
-version 6.11
+version 6.14
 
 =head1 SYNOPSIS
 
@@ -494,19 +504,107 @@ Provides the same interface but uses XS and the parser implementation from C<ftp
 
 =back
 
-=head1 AUTHORS
+=head1 AUTHOR
 
-=over 4
+Original author: Gisle Aas
 
-=item *
+Current maintainer: Graham Ollis E<lt>plicease@cpan.orgE<gt>
 
-Gisle Aas
+Contributors:
 
-=item *
+Adam Kennedy
 
-Graham Ollis <plicease@cpan.org>
+Adam Sjogren
 
-=back
+Alex Kapranoff
+
+Alexey Tourbin
+
+Andreas J. Koenig
+
+Bill Mann
+
+Bron Gondwana
+
+DAVIDRW
+
+Daniel Hedlund
+
+David E. Wheeler
+
+David Steinbrunner
+
+Erik Esterer
+
+FWILES
+
+Father Chrysostomos
+
+Gavin Peters
+
+Graeme Thompson
+
+Hans-H. Froehlich
+
+Ian Kilgore
+
+Jacob J
+
+Mark Stosberg
+
+Mike Schilli
+
+Ondrej Hanak
+
+Peter John Acklam
+
+Peter Rabbitson
+
+Robert Stone
+
+Rolf Grossmann
+
+Sean M. Burke
+
+Simon Legner
+
+Slaven Rezic
+
+Spiros Denaxas
+
+Steve Hay
+
+Todd Lipcon
+
+Tom Hukins
+
+Tony Finch
+
+Toru Yamaguchi
+
+Ville Skyttä
+
+Yuri Karaban
+
+Zefram
+
+amire80
+
+jefflee
+
+john9art
+
+mschilli
+
+murphy
+
+phrstbrn
+
+ruff
+
+sasao
+
+uid39246
 
 =head1 COPYRIGHT AND LICENSE
 

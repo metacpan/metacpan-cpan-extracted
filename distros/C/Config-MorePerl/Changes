@@ -1,0 +1,28 @@
+1.2.0    25.11.2020
+          - fix paths for windows
+          - renamed to Config::MorePerl
+1.1.8    14.02.2020
+          - moved to XS::Install/Framework
+1.1.7    13.03.2017
+          - compile with all warnings enabled
+1.1.6    16.06.2016
+          - allow to rewrite assign at config assemble time (this allow you to save magic)
+1.1.5    23.06.2015
+          - bugfix: when processing configs several times, previous data was not deleted
+            so that configs got mixed with each other. now fixed.
+1.1.4    08.06.2015
+          - remove debug shit
+          - keep possible foreign PL_check override for OP_SASSIGN working_
+1.1.3    08.06.2015
+          - Bugfix: module hasn't been automerging hashes inside 'if', 'for', and other blocks.
+1.1.2    17.04.2015
+          - fix: config file might croak if end with a comment
+1.1.1    17.04.2015
+          - fix compilation on threaded perls
+1.1.0    17.04.2015
+          - Change hashrefs assigment behaviour - they are now automatically merged. MERGE() has been deprecated and removed.
+          - list assignment doesn't merge hashrefs
+1.0.1    09.04.2015
+          - remove lib::abs from test code
+1.0.0    08.04.2015
+          - first release

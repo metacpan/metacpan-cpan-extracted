@@ -1,5 +1,5 @@
 /* Automatically generated, do not edit. */
-/* Generated sourcedate  2020-01-14 10:13:32-08:00   */
+/* Generated sourcedate  2020-11-23 18:16:30-08:00   */
 
 /* BEGIN FILE */
 
@@ -22,6 +22,8 @@ int DWPREFIX(get_IDX_name) (unsigned int, const char **);
 int DWPREFIX(get_LLEX_name) (unsigned int, const char **);
 int DWPREFIX(get_LLE_name) (unsigned int, const char **);
 int DWPREFIX(get_RLE_name) (unsigned int, const char **);
+int DWPREFIX(get_GNUIVIS_name) (unsigned int, const char **);
+int DWPREFIX(get_GNUIKIND_name) (unsigned int, const char **);
 int DWPREFIX(get_UT_name) (unsigned int, const char **);
 int DWPREFIX(get_SECT_name) (unsigned int, const char **);
 int DWPREFIX(get_DS_name) (unsigned int, const char **);

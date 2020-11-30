@@ -19,12 +19,14 @@ t/03_lang.t
 t/04_register.t
 t/05_svg.t
 t/06_doctype.t
+t/07_nested.t
 t/09_pod.t
 t/10_pod-coverage.t
 t/11_test-coverage.t
 t/12_manifest.t
 t/13_critic.t
 t/14_kwalitee.t
+t/99_benchmark.t
 t/perlcriticrc
 t/rt.t
 META.yml

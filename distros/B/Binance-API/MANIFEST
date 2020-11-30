@@ -1,6 +1,3 @@
-Binance-API-1.03.tar.gz
-Binance-API-1.03/META.json
-Binance-API-1.03/META.yml
 Changes
 cpanfile
 lib/Binance/API.pm
@@ -8,6 +5,7 @@ lib/Binance/API/Logger.pm
 lib/Binance/API/Request.pm
 lib/Binance/Constants.pm
 lib/Binance/Exception.pm
+lib/Binance/Exception/Parameter/BadValue.pm
 lib/Binance/Exception/Parameter/Required.pm
 lib/Binance/PerlDependencies.pm
 LICENSE

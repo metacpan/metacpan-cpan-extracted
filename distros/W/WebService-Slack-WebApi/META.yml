@@ -4,12 +4,13 @@ author:
   - 'Mihyaeru/mihyaeru21 <mihyaeru21@gmail.com>'
 build_requires:
   Devel::Cover::Report::Coveralls: '0'
+  Test::Exception: '0'
   Test::Mock::Furl: '0'
   Test::More: '0'
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v3.0.13, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Minilla/v3.1.11, CPAN::Meta::Converter version 2.150010'
 license: mit
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -28,7 +29,7 @@ no_index:
 provides:
   WebService::Slack::WebApi:
     file: lib/WebService/Slack/WebApi.pm
-    version: '0.15'
+    version: '0.16'
   WebService::Slack::WebApi::Api:
     file: lib/WebService/Slack/WebApi/Api.pm
   WebService::Slack::WebApi::Auth:
@@ -98,14 +99,17 @@ resources:
   bugtracker: https://github.com/mihyaeru21/p5-WebService-Slack-WebApi/issues
   homepage: https://github.com/mihyaeru21/p5-WebService-Slack-WebApi
   repository: git://github.com/mihyaeru21/p5-WebService-Slack-WebApi.git
-version: '0.15'
+version: '0.16'
 x_contributors:
   - 'Askar Timirgazin <anotheroneackap@gmail.com>'
   - 'Ivan Wills <Ivan.Wills2@optus.com.au>'
   - 'Matt Hallacy <mhallacy+github@haproxy.com>'
+  - 'Mikko Koivunalho <mikko.koivunalho@iki.fi>'
   - 'Sterling Hanenkamp <sterling@hanenkamp.com>'
   - 'Sterling Hanenkamp <sterling@ziprecruiter.com>'
   - 'Steven Arnott <steven.arnott@grantstreet.com>'
   - 'Yanick Champoux <yanick@babyl.dyndns.org>'
   - 'likkradyus <git@li.que.jp>'
+  - 'sironekotoro <develop@sironekotoro.com>'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

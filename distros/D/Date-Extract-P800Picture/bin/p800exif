@@ -1,12 +1,13 @@
-#!/usr/bin/env perl -w    # -*- cperl; cperl-indent-level: 4 -*-
-# Copyright (C) 2008-2019, Roland van Ipenburg
+#!/usr/bin/env perl
+# -*- cperl; cperl-indent-level: 4 -*-
+# Copyright (C) 2008-2020, Roland van Ipenburg
 use strict;
 use warnings;
 
 use utf8;
 use 5.014000;
 
-BEGIN { our $VERSION = v1.1.1; }
+BEGIN { our $VERSION = v1.1.3; }
 
 use Image::ExifTool            ();
 use Date::Extract::P800Picture ();

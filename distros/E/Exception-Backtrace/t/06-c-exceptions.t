@@ -35,7 +35,7 @@ subtest "std::logic_error is thrown" => sub {
     my $bt = Exception::Backtrace::get_backtrace_string($@);
     note $bt;
     my $found = (($bt =~ /panda::Backtrace::Backtrace/) && ($bt !~ /panda::exception/))
-             || (($bt =~ /libpanda\./) && ($bt =~ /MyTest((\.)|(_xsgen))/))
+             || ($bt =~ /MyTest((\.)|(_xsgen))/)
              || ($bt =~ /panda::Backtrace::zzz/);
     ok $found, "seems valid backtrace found";
 };
@@ -48,7 +48,7 @@ subtest "perl exception is thrown from C code" => sub {
 
     my $bt = Exception::Backtrace::get_backtrace_string($@);
     note $bt;
-    my $re = qr/(panda::Backtrace::Backtrace)|(libpanda\.)/;
+    my $re = qr/(panda::Backtrace::Backtrace)|(libpanda\.)|(MyTest((\.)|(_xsgen)))/;
     like $bt, $re, "seems valid backtrace found";
 };
 
@@ -61,7 +61,7 @@ subtest "exception with newline is thrown" => sub {
     my $bt = Exception::Backtrace::get_backtrace_string($@);
     note $bt;
     my $found = (($bt =~ /panda::Backtrace::Backtrace/))
-             || (($bt =~ /libpanda\./) && ($bt =~ /MyTest((\.)|(_xsgen))/));
+             || ($bt =~ /MyTest((\.)|(_xsgen))/);
     ok $found, "seems valid backtrace found";
 };
 

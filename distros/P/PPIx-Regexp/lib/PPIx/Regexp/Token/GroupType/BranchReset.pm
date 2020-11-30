@@ -36,7 +36,7 @@ use base qw{ PPIx::Regexp::Token::GroupType };
 
 use PPIx::Regexp::Constant qw{ @CARP_NOT };
 
-our $VERSION = '0.075';
+our $VERSION = '0.076';
 
 =begin comment
 
@@ -65,14 +65,14 @@ sub __defining_string {
 
 =cut
 
-__PACKAGE__->__setup_class(
-    {
-	'?|'	=> {
-	    expl	=> 'Re-use capture group numbers',
-	    intro	=> '5.009005',
-	},
+use constant DEF	=> {
+    '?|'	=> {
+	expl	=> 'Re-use capture group numbers',
+	intro	=> '5.009005',
     },
-);
+};
+
+__PACKAGE__->__setup_class();
 
 1;
 

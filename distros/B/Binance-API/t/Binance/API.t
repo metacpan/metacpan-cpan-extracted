@@ -25,7 +25,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 9;
+use Test::More tests => 10;
 use Test::Warn;
 
 use Binance::API;
@@ -127,6 +127,235 @@ subtest 'klines() tests' => sub {
     my $klines = $api->klines( symbol => 'ETHBTC', interval => '1M' );
     ok(defined $klines, 'Requested klines');
     ok($klines->[0]->[0] > 0, 'Got a successful response');
+};
+
+subtest 'order() tests' => sub {
+    plan tests => 13;
+
+    ok(Binance::API->can('order'), 'method order() available');
+
+    eval { $api->order_test( symbol => 'ETHBTC', side => 'SELL' ) };
+    is(ref($@), 'Binance::Exception::Parameter::Required', 'Exception thrown '
+       .'when missing a parameter');
+    is($@->parameters->[0], 'type', 'Missing parameter "type"');
+
+    eval { $api->order_test( type => 'NONEXISTENT' ) };
+    is(ref($@), 'Binance::Exception::Parameter::BadValue', 'Exception thrown '
+       .'when given a bad parameter');
+    is($@->parameters->[0], 'type', 'Missing parameter "type"');
+    ok($@->format, 'Format describes what is expected');
+
+    subtest 'type: LIMIT' => sub {
+        eval { $api->order_test( type => 'LIMIT' ) };
+        is(ref($@), 'Binance::Exception::Parameter::Required', 'Exception thrown '
+           .'when missing a parameter');
+        is($@->parameters->[0], 'symbol', 'Missing parameter "symbol"');
+
+        eval { $api->order_test( type => 'LIMIT', symbol => 'ETHBTC' ) };
+        is(ref($@), 'Binance::Exception::Parameter::Required', 'Exception thrown '
+           .'when missing a parameter');
+        is($@->parameters->[0], 'side', 'Missing parameter "side"');
+
+        eval { $api->order_test(
+            type => 'LIMIT', symbol => 'ETHBTC', side => 'SELL'
+        ) };
+        is(ref($@), 'Binance::Exception::Parameter::Required', 'Exception thrown '
+           .'when missing a parameter');
+        is($@->parameters->[0], 'timeInForce', 'Missing parameter "timeInForce"');
+
+        eval { $api->order_test(
+            type => 'LIMIT', symbol => 'ETHBTC', side => 'SELL',
+            timeInForce => 1
+        ) };
+        is(ref($@), 'Binance::Exception::Parameter::Required', 'Exception thrown '
+           .'when missing a parameter');
+        is($@->parameters->[0], 'quantity', 'Missing parameter "quantity"');
+
+        eval { $api->order_test(
+            type => 'LIMIT', symbol => 'ETHBTC', side => 'SELL',
+            timeInForce => 1, quantity => 1
+        ) };
+        is(ref($@), 'Binance::Exception::Parameter::Required', 'Exception thrown '
+           .'when missing a parameter');
+        is($@->parameters->[0], 'price', 'Missing parameter "price"');
+    };
+
+    subtest 'type: MARKET' => sub {
+        eval { $api->order_test(
+            type => 'MARKET', symbol => 'ETHBTC', side => 'SELL'
+        ) };
+        is(ref($@), 'Binance::Exception::Parameter::Required', 'Exception thrown '
+           .'when missing a parameter');
+        is($@->parameters->[0], 'quantity', 'Missing parameter "quantity" ...');
+        is($@->parameters->[1], 'quoteOrderQty', '... or missing parameter "quoteOrderQty"');
+    };
+
+    subtest 'type: STOP_LOSS' => sub {
+        eval { $api->order_test( type => 'STOP_LOSS' ) };
+        is(ref($@), 'Binance::Exception::Parameter::Required', 'Exception thrown '
+           .'when missing a parameter');
+        is($@->parameters->[0], 'symbol', 'Missing parameter "symbol"');
+
+        eval { $api->order_test( type => 'STOP_LOSS', symbol => 'ETHBTC' ) };
+        is(ref($@), 'Binance::Exception::Parameter::Required', 'Exception thrown '
+           .'when missing a parameter');
+        is($@->parameters->[0], 'side', 'Missing parameter "side"');
+
+        eval { $api->order_test(
+            type => 'STOP_LOSS', symbol => 'ETHBTC', side => 'SELL'
+        ) };
+        is(ref($@), 'Binance::Exception::Parameter::Required', 'Exception thrown '
+           .'when missing a parameter');
+        is($@->parameters->[0], 'quantity', 'Missing parameter "quantity"');
+
+        eval { $api->order_test(
+            type => 'STOP_LOSS', symbol => 'ETHBTC', side => 'SELL',
+            quantity => 1
+        ) };
+        is(ref($@), 'Binance::Exception::Parameter::Required', 'Exception thrown '
+           .'when missing a parameter');
+        is($@->parameters->[0], 'stopPrice', 'Missing parameter "stopPrice"');
+    };
+
+    subtest 'type: STOP_LOSS_LIMIT' => sub {
+        eval { $api->order_test( type => 'STOP_LOSS_LIMIT' ) };
+        is(ref($@), 'Binance::Exception::Parameter::Required', 'Exception thrown '
+           .'when missing a parameter');
+        is($@->parameters->[0], 'symbol', 'Missing parameter "symbol"');
+
+        eval { $api->order_test( type => 'STOP_LOSS_LIMIT', symbol => 'ETHBTC' ) };
+        is(ref($@), 'Binance::Exception::Parameter::Required', 'Exception thrown '
+           .'when missing a parameter');
+        is($@->parameters->[0], 'side', 'Missing parameter "side"');
+
+        eval { $api->order_test(
+            type => 'STOP_LOSS_LIMIT', symbol => 'ETHBTC', side => 'SELL'
+        ) };
+        is(ref($@), 'Binance::Exception::Parameter::Required', 'Exception thrown '
+           .'when missing a parameter');
+        is($@->parameters->[0], 'timeInForce', 'Missing parameter "timeInForce"');
+
+        eval { $api->order_test(
+            type => 'STOP_LOSS_LIMIT', symbol => 'ETHBTC', side => 'SELL',
+            timeInForce => 1
+        ) };
+        is(ref($@), 'Binance::Exception::Parameter::Required', 'Exception thrown '
+           .'when missing a parameter');
+        is($@->parameters->[0], 'quantity', 'Missing parameter "quantity"');
+
+        eval { $api->order_test(
+            type => 'STOP_LOSS_LIMIT', symbol => 'ETHBTC', side => 'SELL',
+            timeInForce => 1, quantity => 1
+        ) };
+        is(ref($@), 'Binance::Exception::Parameter::Required', 'Exception thrown '
+           .'when missing a parameter');
+        is($@->parameters->[0], 'price', 'Missing parameter "price"');
+
+        eval { $api->order_test(
+            type => 'STOP_LOSS_LIMIT', symbol => 'ETHBTC', side => 'SELL',
+            timeInForce => 1, quantity => 1, price => 0,
+        ) };
+        is(ref($@), 'Binance::Exception::Parameter::Required', 'Exception thrown '
+           .'when missing a parameter');
+        is($@->parameters->[0], 'stopPrice', 'Missing parameter "stopPrice"');
+    };
+
+    subtest 'type: TAKE_PROFIT' => sub {
+        eval { $api->order_test( type => 'TAKE_PROFIT' ) };
+        is(ref($@), 'Binance::Exception::Parameter::Required', 'Exception thrown '
+           .'when missing a parameter');
+        is($@->parameters->[0], 'symbol', 'Missing parameter "symbol"');
+
+        eval { $api->order_test( type => 'TAKE_PROFIT', symbol => 'ETHBTC' ) };
+        is(ref($@), 'Binance::Exception::Parameter::Required', 'Exception thrown '
+           .'when missing a parameter');
+        is($@->parameters->[0], 'side', 'Missing parameter "side"');
+
+        eval { $api->order_test(
+            type => 'TAKE_PROFIT', symbol => 'ETHBTC', side => 'SELL'
+        ) };
+        is(ref($@), 'Binance::Exception::Parameter::Required', 'Exception thrown '
+           .'when missing a parameter');
+        is($@->parameters->[0], 'quantity', 'Missing parameter "quantity"');
+
+        eval { $api->order_test(
+            type => 'TAKE_PROFIT', symbol => 'ETHBTC', side => 'SELL',
+            quantity => 1
+        ) };
+        is(ref($@), 'Binance::Exception::Parameter::Required', 'Exception thrown '
+           .'when missing a parameter');
+        is($@->parameters->[0], 'stopPrice', 'Missing parameter "stopPrice"');
+    };
+
+    subtest 'type: TAKE_PROFIT_LIMIT' => sub {
+        eval { $api->order_test( type => 'TAKE_PROFIT_LIMIT' ) };
+        is(ref($@), 'Binance::Exception::Parameter::Required', 'Exception thrown '
+           .'when missing a parameter');
+        is($@->parameters->[0], 'symbol', 'Missing parameter "symbol"');
+
+        eval { $api->order_test( type => 'TAKE_PROFIT_LIMIT', symbol => 'ETHBTC' ) };
+        is(ref($@), 'Binance::Exception::Parameter::Required', 'Exception thrown '
+           .'when missing a parameter');
+        is($@->parameters->[0], 'side', 'Missing parameter "side"');
+
+        eval { $api->order_test(
+            type => 'TAKE_PROFIT_LIMIT', symbol => 'ETHBTC', side => 'SELL'
+        ) };
+        is(ref($@), 'Binance::Exception::Parameter::Required', 'Exception thrown '
+           .'when missing a parameter');
+        is($@->parameters->[0], 'timeInForce', 'Missing parameter "timeInForce"');
+
+        eval { $api->order_test(
+            type => 'TAKE_PROFIT_LIMIT', symbol => 'ETHBTC', side => 'SELL',
+            timeInForce => 1
+        ) };
+        is(ref($@), 'Binance::Exception::Parameter::Required', 'Exception thrown '
+           .'when missing a parameter');
+        is($@->parameters->[0], 'quantity', 'Missing parameter "quantity"');
+
+        eval { $api->order_test(
+            type => 'TAKE_PROFIT_LIMIT', symbol => 'ETHBTC', side => 'SELL',
+            timeInForce => 1, quantity => 1
+        ) };
+        is(ref($@), 'Binance::Exception::Parameter::Required', 'Exception thrown '
+           .'when missing a parameter');
+        is($@->parameters->[0], 'price', 'Missing parameter "price"');
+
+        eval { $api->order_test(
+            type => 'TAKE_PROFIT_LIMIT', symbol => 'ETHBTC', side => 'SELL',
+            timeInForce => 1, quantity => 1, price => 0,
+        ) };
+        is(ref($@), 'Binance::Exception::Parameter::Required', 'Exception thrown '
+           .'when missing a parameter');
+        is($@->parameters->[0], 'stopPrice', 'Missing parameter "stopPrice"');
+    };
+
+    subtest 'type: LIMIT_MAKER' => sub {
+        eval { $api->order_test( type => 'LIMIT_MAKER' ) };
+        is(ref($@), 'Binance::Exception::Parameter::Required', 'Exception thrown '
+           .'when missing a parameter');
+        is($@->parameters->[0], 'symbol', 'Missing parameter "symbol"');
+
+        eval { $api->order_test( type => 'LIMIT_MAKER', symbol => 'ETHBTC' ) };
+        is(ref($@), 'Binance::Exception::Parameter::Required', 'Exception thrown '
+           .'when missing a parameter');
+        is($@->parameters->[0], 'side', 'Missing parameter "side"');
+
+        eval { $api->order_test(
+            type => 'LIMIT_MAKER', symbol => 'ETHBTC', side => 'SELL'
+        ) };
+        is(ref($@), 'Binance::Exception::Parameter::Required', 'Exception thrown '
+           .'when missing a parameter');
+        is($@->parameters->[0], 'quantity', 'Missing parameter "quantity"');
+
+        eval { $api->order_test(
+            type => 'LIMIT_MAKER', symbol => 'ETHBTC', side => 'SELL',
+            timeInForce => 1, quantity => 1
+        ) };
+        is(ref($@), 'Binance::Exception::Parameter::Required', 'Exception thrown '
+           .'when missing a parameter');
+        is($@->parameters->[0], 'price', 'Missing parameter "price"');
+    };
 };
 
 subtest 'ping() tests' => sub {

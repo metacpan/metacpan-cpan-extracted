@@ -42,6 +42,9 @@ subtest group_1 => sub {
     is Country->annotate_get(element => Elt('id', \'S', \'w', \'e')), 'S';
     is Country->annotate_get(exports => ExportSet(\'3', \'y', \'n', 'id', \'4')), 'y1y1n1n';
     is Country->annotate_get(export_length => CharLength(ExportSet(\'3', \'y', \'n', 'id', \'4'))), 7 or diag explain CharLength(ExportSet(\'3', \'y', \'n', 'id', \'4'));
+
+    is Country->annotate_get(hex => Hex('name')), '53776564656E';
+    is Country->annotate_get(hex => Hex(\'name')), '6E616D65';
 };
 
 

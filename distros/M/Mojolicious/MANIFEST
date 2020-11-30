@@ -208,6 +208,10 @@ t/mojo/lib/Mojo/LoaderException2.pm
 t/mojo/lib/Mojo/LoaderTest/A.pm
 t/mojo/lib/Mojo/LoaderTest/B.pm
 t/mojo/lib/Mojo/LoaderTest/C.pm
+t/mojo/lib/Mojo/LoaderTest/D.txt
+t/mojo/lib/Mojo/LoaderTest/E/F.pm
+t/mojo/lib/Mojo/LoaderTest/E/G.txt
+t/mojo/lib/Mojo/LoaderTestException/A.pm
 t/mojo/lib/Mojo/Server/Morbo/Backend/TestBackend.pm
 t/mojo/lib/Mojo/TestConnectProxy.pm
 t/mojo/lib/myapp.pl
@@ -286,9 +290,9 @@ t/mojolicious/lib/MojoliciousTest.pm
 t/mojolicious/lib/MojoliciousTest/Baz.pm
 t/mojolicious/lib/MojoliciousTest/Command/_test2_command.pm
 t/mojolicious/lib/MojoliciousTest/Command/test_command.pm
+t/mojolicious/lib/MojoliciousTest/Controller/Foo/Bar.pm
 t/mojolicious/lib/MojoliciousTest/Exceptional.pm
 t/mojolicious/lib/MojoliciousTest/Foo.pm
-t/mojolicious/lib/MojoliciousTest/Foo/Bar.pm
 t/mojolicious/lib/MojoliciousTest/Plugin/Test/SomePlugin2.pm
 t/mojolicious/lib/MojoliciousTest/Plugin/UPPERCASETestPlugin.pm
 t/mojolicious/lib/MojoliciousTest/PODTest.pm

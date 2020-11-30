@@ -23,8 +23,9 @@ subtest pretest => sub {
 
 	my $button1 = $pp1->button();
 	ok($button1, 'button created');
-    like $button1, qr{<form method="post" action="https://www.paypal.com/cgi-bin/webscr" enctype="multipart/form-data"\s*>};
-    like $button1, qr{<input type="image" name="submit" src="http://images.paypal.com/images/x-click-but01.gif" alt="Make payments with PayPal" />};
+    like $button1, qr{<form method="post" action="https://www.paypal.com/cgi-bin/webscr" enctype="multipart/form-data"\s*>}, "html form method ";
+    like $button1, qr{<input type="image" name="submit" src="http://images.paypal.com/images/x-click-but01.gif" alt="Make payments with PayPal" />},
+        "html input type";
 
 	like($button1,
 	    qr/name\s*=\s*"{0,1}custom"{0,1}\s+value\s*=\s*"{0,1}$id1"{0,1}/i,
@@ -37,12 +38,12 @@ subtest pretest => sub {
 	$pp1->check_cert(0);
 	my ($success1, $reason1) = $pp1->ipnvalidate(\%query);
 	is($success1, undef, 'expected failure');
-	is($reason1, 'PayPal says transaction INVALID');
+	is($reason1, 'PayPal says transaction INVALID', 'no cert-check transaction invalid');
 
 	$pp1->check_cert(1);
 	my ($success, $reason) = $pp1->ipnvalidate(\%query);
 	is($success, undef, 'expected failure');
-	is($reason, 'PayPal says transaction INVALID') or do {
+	is($reason, 'PayPal says transaction INVALID', 'cert-check transaction invalid') or do {
 	  open my $fh, '>', 'cert.txt' or die;
 	  print $fh $reason;
 	  close $fh;
@@ -66,11 +67,12 @@ subtest loop => sub {
 		);
 		#diag $button;
 
-        like $button, qr{<form method="post" action="https://www.paypal.com/cgi-bin/webscr" enctype="multipart/form-data"\s*>};
+        like $button, qr{<form method="post" action="https://www.paypal.com/cgi-bin/webscr" enctype="multipart/form-data"\s*>}, "button form method";
 		like $button, qr{action="https://www.paypal.com/cgi-bin/webscr"}, 'address';
 		like $button, qr{foo\@bar\.com}, 'email';
 		like $button, qr{<input type="hidden" name="amount" value="99.99" />}, 'amount';
-        like $button, qr{<input type="image" name="submit" src="http://images.paypal.com/images/x-click-but01.gif" alt="Make payments with PayPal" />};
+        like $button, qr{<input type="image" name="submit" src="http://images.paypal.com/images/x-click-but01.gif" alt="Make payments with PayPal" />},
+            "button input type";
 	}
 };
 
@@ -100,12 +102,13 @@ subtest 'sandbox' => sub {
 	like $button, qr{action="https://www.sandbox.paypal.com/cgi-bin/webscr"}, 'address';
 	like $button, qr{foo\@bar\.com}, 'email';
 	unlike $button, qr{amount}, 'no amount when recurring';
-	like $button, qr{<input type="hidden" name="a3" value="9" />};
-	like $button, qr{<input type="hidden" name="p3" value="1" />};
-	like $button, qr{<input type="hidden" name="src" value="1" />};
-	like $button, qr{<input type="hidden" name="t3" value="M" />};
-    like $button, qr{<form method="post" action="https://www.sandbox.paypal.com/cgi-bin/webscr" enctype="multipart/form-data"\s*id="my_paypal_form">};
-    unlike $button, qr{x-click-but01};
-    like $button, qr{<button type="button" class="btn btn-success">9 USD per month</button>};
+	like $button, qr{<input type="hidden" name="a3" value="9" />}, 'button has hidden a3';
+	like $button, qr{<input type="hidden" name="p3" value="1" />}, 'button has hidden p3';
+	like $button, qr{<input type="hidden" name="src" value="1" />}, 'button has hidden src';
+	like $button, qr{<input type="hidden" name="t3" value="M" />}, 'button has hidden t3';
+    like $button, qr{<form method="post" action="https://www.sandbox.paypal.com/cgi-bin/webscr" enctype="multipart/form-data"\s*id="my_paypal_form">},
+        'button post action';
+    unlike $button, qr{x-click-but01}, "button doesn't include x-click-but01";
+    like $button, qr{<button type="button" class="btn btn-success">9 USD per month</button>}, 'button price';
 };
 

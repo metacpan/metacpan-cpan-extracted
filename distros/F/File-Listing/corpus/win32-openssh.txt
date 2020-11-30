@@ -1,0 +1,5 @@
+-rw-******    1 -        -            2090 Nov  2 16:52 .bash_history
+-rw-******    1 -        -              54 Oct 29 16:07 .minttyrc
+drwx******    1 -        -            4096 Nov  2 14:17 .ssh
+-rw-******    1 -        -               0 Nov  2 10:00 .tig_history
+-rw-******    1 -        -             890 Nov  2 14:42 .viminfo

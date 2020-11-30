@@ -18,9 +18,9 @@ my $build = Module::Build->new(
       'perl' => '5.020',
    },
    test_requires => {
-      'Test::Future::IO' => 0,
+      'Test::ExpectAndCheck' => 0,
+      'Test::Future::IO' => '0.02', # ->expect_sys*_anyfh
       'Test::More' => '0.88', # done_testing
-      'Test::EasyMock' => 0,
    },
    share_dir => {
       module => { "Device::AVR::UPDI" => "share" },

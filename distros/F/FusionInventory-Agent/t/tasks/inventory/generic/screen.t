@@ -152,6 +152,12 @@ my %edid_tests = (
         SERIAL       => '0000033f',
         DESCRIPTION  => '52/2004'
     },
+    'iiyama-PL2779A' => {
+        MANUFACTURER => 'Iiyama North America',
+        CAPTION      => 'PL2779Q',
+        SERIAL       => '01010101',
+        DESCRIPTION  => '2013'
+    },
     'lcd.acer-al1921' => {
         MANUFACTURER => 'Acer Technologies',
         CAPTION      => 'Acer AL1921',
@@ -221,6 +227,34 @@ my %edid_tests = (
         ALTSERIAL    => 'TAHEE0014200',
         DESCRIPTION  => '32/2017'
     },
+    'lcd.acer-g227hql' => {
+        MANUFACTURER => 'Acer Technologies',
+        CAPTION      => 'G227HQL',
+        SERIAL       => 'T0LEE0145350147f2431',
+        ALTSERIAL    => 'T0LEE0142431',
+        DESCRIPTION  => '35/2015'
+    },
+    'lcd.acer-g236hl' => {
+        MANUFACTURER => 'Acer Technologies',
+        CAPTION      => 'Acer G236HL',
+        SERIAL       => 'LVB080013127cc394200',
+        ALTSERIAL    => 'LVB080014200',
+        DESCRIPTION  => '12/2013'
+    },
+    'lcd.acer-r221q' => {
+        MANUFACTURER => 'Acer Technologies',
+        CAPTION      => 'R221Q',
+        SERIAL       => 'T6KEE00160303ff52400',
+        ALTSERIAL    => 'T6KEE0012400',
+        DESCRIPTION  => '3/2016'
+    },
+    'lcd.acer-s273hl' => {
+        MANUFACTURER => 'Acer Technologies',
+        CAPTION      => 'S273HL',
+        SERIAL       => 'LQA0C015140000358001',
+        ALTSERIAL    => 'LQA0C0158001',
+        DESCRIPTION  => '40/2011'
+    },
     'lcd.acer-v193.2' => {
         MANUFACTURER => 'Acer Technologies',
         CAPTION      => 'Acer V193',
@@ -270,6 +304,27 @@ my %edid_tests = (
         ALTSERIAL    => 'LFV0C0034030',
         DESCRIPTION  => '11/2009'
     },
+    'lcd.acer-h226hql' => {
+        MANUFACTURER => 'Acer Technologies',
+        CAPTION      => 'Acer H226HQL',
+        SERIAL       => 'LX2EE0023497a1aa4200',
+        ALTSERIAL    => 'LX2EE0024200',
+        DESCRIPTION  => '49/2013'
+    },
+    'lcd.acer-k222hql' => {
+        MANUFACTURER => 'Acer Technologies',
+        CAPTION      => 'K222HQL',
+        SERIAL       => 'T5XEE017725050102456',
+        ALTSERIAL    => 'T5XEE0172456',
+        DESCRIPTION  => '25/2017'
+    },
+    'lcd.acer-sa220q' => {
+        MANUFACTURER => 'Acer Technologies',
+        CAPTION      => 'SA220Q',
+        SERIAL       => 'T90EE00273901d732410',
+        ALTSERIAL    => 'T90EE0022410',
+        DESCRIPTION  => '39/2017'
+    },
     'lcd.b-101750' => {
         MANUFACTURER => 'Rogen Tech Distribution Inc',
         CAPTION      => 'B_101750',
@@ -291,7 +346,7 @@ my %edid_tests = (
     'lcd.cmc-17-AD' => {
         MANUFACTURER => 'Chi Mei Optoelectronics corp.',
         CAPTION      => 'CMC 17" AD',
-        SERIAL       => '0',
+        SERIAL       => '00000000',
         DESCRIPTION  => '34/2004'
     },
     'lcd.compaq-evo-n1020v' => {
@@ -311,6 +366,24 @@ my %edid_tests = (
         CAPTION      => 'XD570',
         SERIAL       => '00000000',
         DESCRIPTION  => '0/2005',
+    },
+    'lcd.dell-U2410' => {
+        MANUFACTURER => 'Dell Inc.',
+        CAPTION      => 'DELL U2410',
+        SERIAL       => 'F525M1AGAP6L',
+        DESCRIPTION  => '42/2011'
+    },
+    'lcd.dell-U2413' => {
+        MANUFACTURER => 'Dell Inc.',
+        CAPTION      => 'DELL U2413',
+        SERIAL       => '84K96386ACRL',
+        DESCRIPTION  => '32/2013'
+    },
+    'lcd.dell-U2415' => {
+        MANUFACTURER => 'Dell Inc.',
+        CAPTION      => 'DELL U2415',
+        SERIAL       => '7MT019AI34EU',
+        DESCRIPTION  => '42/2019'
     },
     'lcd.eizo-l997' => {
         MANUFACTURER => 'Eizo Nanao Corporation',
@@ -379,6 +452,12 @@ my %edid_tests = (
         SERIAL       => '9Y676',
         ALTSERIAL    => '00052af4',
         DESCRIPTION  => '11/2007'
+    },
+    'lcd.lg.tv.22MT44DP-PZ' => {
+        MANUFACTURER => 'Goldstar Company Ltd',
+        CAPTION      => '2D FHD LG TV',
+        SERIAL       => '01010101',
+        DESCRIPTION  => '1/2013'
     },
     'lcd.lenovo-3000-v100' => {
         MANUFACTURER => 'AU Optronics',
@@ -455,6 +534,13 @@ my %edid_tests = (
         SERIAL       => '0276H4MF200047',
         ALTSERIAL    => 'H4MF200047',
         DESCRIPTION  => '6/2014'
+    },
+    'lcd.samsung-s24e450' => {
+        MANUFACTURER => 'Samsung Electric Company',
+        CAPTION      => 'S24E450',
+        SERIAL       => 'ZZHAH4ZKA00739',
+        ALTSERIAL    => 'H4ZKA00739',
+        DESCRIPTION  => '42/2018'
     },
     'lcd.tv.VQ32-1T' => {
         MANUFACTURER => 'Fujitsu Siemens Computers GmbH',

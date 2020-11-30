@@ -1,0 +1,43 @@
+From b2a392087e8185dea27f3e798e178de847aa4b78 Mon Sep 17 00:00:00 2001
+From: Brian Fraser <brian.fraser@booking.com>
+Date: Mon, 23 Nov 2020 19:15:34 +0100
+Subject: [PATCH 5/6] lang/c include jansson in the pkg-config Requires section
+
+---
+ lang/c/CMakeLists.txt   | 2 +-
+ lang/c/src/avro-c.pc.in | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/lang/c/CMakeLists.txt b/lang/c/CMakeLists.txt
+index ac46b1da..cea4faaa 100644
+--- a/lang/c/CMakeLists.txt
++++ b/lang/c/CMakeLists.txt
+@@ -176,7 +176,6 @@ else (LZMA_FOUND)
+ endif (LZMA_FOUND)
+ 
+ set(CODEC_LIBRARIES ${ZLIB_LIBRARIES} ${LZMA_LIBRARIES} ${SNAPPY_LIBRARIES})
+-set(CODEC_PKG "${ZLIB_PKG} ${LZMA_PKG} ${SNAPPY_PKG}")
+ 
+ # Jansson JSON library
+ pkg_check_modules(JANSSON jansson>=2.3)
+@@ -188,6 +187,7 @@ else (JANSSON_FOUND)
+     message(FATAL_ERROR "libjansson >=2.3 not found")
+ endif (JANSSON_FOUND)
+ 
++set(AVRO_REQUIRES "${ZLIB_PKG} ${LZMA_PKG} ${SNAPPY_PKG} ${JANSSON_PKG}")
+ 
+ add_subdirectory(src)
+ add_subdirectory(examples)
+diff --git a/lang/c/src/avro-c.pc.in b/lang/c/src/avro-c.pc.in
+index 515ecf58..a4c4b589 100644
+--- a/lang/c/src/avro-c.pc.in
++++ b/lang/c/src/avro-c.pc.in
+@@ -5,4 +5,4 @@ URL: https://avro.apache.org/
+ Libs: -L@prefix@/lib -lavro
+ Libs.private: @CODEC_LIBRARIES_STATIC@
+ Cflags: -I@prefix@/include
+-Requires: @CODEC_PKG@
++Requires: @AVRO_REQUIRES@
+-- 
+2.29.2
+

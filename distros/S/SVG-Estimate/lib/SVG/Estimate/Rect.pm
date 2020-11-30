@@ -1,5 +1,5 @@
 package SVG::Estimate::Rect;
-$SVG::Estimate::Rect::VERSION = '1.0114';
+$SVG::Estimate::Rect::VERSION = '1.0115';
 use Moo;
 
 extends 'SVG::Estimate::Shape';
@@ -11,7 +11,7 @@ SVG::Estimate::Rect - Handles estimating rectangles.
 
 =head1 VERSION
 
-version 1.0114
+version 1.0115
 
 =head1 SYNOPIS
 

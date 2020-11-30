@@ -8,8 +8,10 @@ with 'DBIx::Class::Schema::Diff::Role::Common';
 use Types::Standard qw(:all);
 
 has 'name', required => 1, is => 'ro', isa => Str;
-has 'old_info', required => 1, is => 'ro', isa => Maybe[HashRef];
+has 'old_info', is => 'ro', isa => Maybe[HashRef], default => sub { undef };
 has 'new_info', required => 1, is => 'ro', isa => Maybe[HashRef];
+
+has 'diff_added', is => 'ro', isa => Bool, default => sub { 0 };
 
 has '_source_diff', required => 1, is => 'ro', isa => InstanceOf[
   'DBIx::Class::Schema::Diff::Source'
@@ -30,8 +32,8 @@ has 'diff', is => 'ro', lazy => 1, default => sub {
   my $self = shift;
   
   # There is no reason to diff in the case of added/deleted:
-  return { _event => 'added'   } if ($self->added);
   return { _event => 'deleted' } if ($self->deleted);
+  return { _event => 'added'   } if ($self->added && ! $self->diff_added);
   
   my ($o,$n) = ($self->old_info,$self->new_info);
   my $diff = $self->_info_diff($o,$n) or return undef;

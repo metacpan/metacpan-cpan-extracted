@@ -9,7 +9,7 @@ my %params = (
     DEFINE        => $ENV{DEBUG} ? '-DDEBUG' : '',
     SRC           => ['src'],
     INC           => '-Isrc',
-    LIBS          => [qw/-lz/],
+    LINK          => '-lz',
     BIN_SHARE     => {INCLUDE  => {'src' => '/'}},
     CCFLAGS       => '-Wall -Wextra -Wno-implicit-fallthrough -Wno-unused-const-variable',
     test          => {
@@ -18,11 +18,6 @@ my %params = (
         BIN_DEPS             => 'Test::Catch',
     },
 );
-
-if ($ENV{SANITIZE}) {
-    ($params{CCFLAGS}||='') .= ' -fsanitize=undefined -fsanitize=address -fno-omit-frame-pointer';
-    push @{$params{LIBS}}, qw/-lubsan -lasan/
-}
 
 if ($ENV{DEV}) {
     my $postamble = '';

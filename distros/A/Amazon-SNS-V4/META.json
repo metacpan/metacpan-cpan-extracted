@@ -1,0 +1,47 @@
+{
+   "abstract" : "Amazon Simple Notification Service, V4 Signatures",
+   "author" : [
+      "James Wright <jwright@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Amazon-SNS-V4",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "AWS::Signature4" : "0",
+            "Class::Accessor::Fast" : "0",
+            "JSON" : "0",
+            "LWP::UserAgent" : "0",
+            "URI::Escape" : "0",
+            "XML::Simple" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "1.4",
+   "x_serialization_backend" : "JSON::PP version 4.02"
+}

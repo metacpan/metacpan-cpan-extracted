@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2015-2019 Christian Jaeger, copying@christianjaeger.ch
+# Copyright (c) 2015-2020 Christian Jaeger, copying@christianjaeger.ch
 #
 # This is free software, offered under either the same terms as perl 5
 # or the terms of the Artistic License version 2 or the terms of the
@@ -99,10 +99,12 @@ our @EXPORT_OK = qw(
 our %EXPORT_TAGS = (all => [@EXPORT, @EXPORT_OK]);
 
 use Scalar::Util ();
+use FP::Carp;
 
 our $weaken = \&Scalar::Util::weaken;
 
-sub weaken ($) {
+sub weaken {
+    @_ == 1 or fp_croak_nargs 1;
     goto &$weaken
 }
 
@@ -111,25 +113,29 @@ sub weaken ($) {
 
 # protect a variable from being pruned by callees that prune their
 # arguments
-sub Keep ($) {
+sub Keep {
+    @_ == 1 or fp_croak_nargs 1;
     my ($v) = @_;
     $v
 }
 
 # weaken a variable, but also provide a non-weakened reference to its
 # value as result
-sub Weakened ($) {
+sub Weakened {
+    @_ == 1 or fp_croak_nargs 1;
     my ($ref) = @_;
     weaken $_[0];
     $ref
 }
 
-sub noweaken ($) {
+sub noweaken {
+    @_ == 1 or fp_croak_nargs 1;
 
     # noop
 }
 
-sub noWeakened ($) {
+sub noWeakened {
+    @_ == 1 or fp_croak_nargs 1;
     $_[0]
 }
 
@@ -137,12 +143,14 @@ sub with_noweaken (&) { local $weaken = \&noweaken; &{ $_[0] }() }
 
 use Carp;
 
-sub warnweaken ($) {
+sub warnweaken {
+    @_ == 1 or fp_croak_nargs 1;
     carp "weaken ($_[0])";
     Scalar::Util::weaken($_[0]);
 }
 
-sub warnWeakened ($) {
+sub warnWeakened {
+    @_ == 1 or fp_croak_nargs 1;
     carp "weaken ($_[0])";
     Weakened($_[0]);
 }
@@ -150,20 +158,24 @@ sub warnWeakened ($) {
 sub with_warnweaken (&) { local $weaken = \&warnweaken; &{ $_[0] }() }
 
 use Carp 'cluck';
+use FP::Carp;
 
-sub cluckweaken ($) {
+sub cluckweaken {
+    @_ == 1 or fp_croak_nargs 1;
     cluck "weaken ($_[0])";
     Scalar::Util::weaken($_[0]);
 }
 
-sub cluckWeakened ($) {
+sub cluckWeakened {
+    @_ == 1 or fp_croak_nargs 1;
     cluck "weaken ($_[0])";
     Weakened($_[0]);
 }
 
 sub with_cluckweaken (&) { local $weaken = \&cluckweaken; &{ $_[0] }() }
 
-sub do_weaken ($) {
+sub do_weaken {
+    @_ == 1 or fp_croak_nargs 1;
     my ($v) = @_;
     my $w = $v
         ? (

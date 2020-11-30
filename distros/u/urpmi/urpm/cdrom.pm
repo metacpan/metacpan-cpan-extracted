@@ -4,7 +4,7 @@ package urpm::cdrom;
 use strict;
 use urpm::msg;
 use urpm::sys;
-use urpm::util qw(basename copy_and_own difference2 remove_internal_name);
+use urpm::util qw(basename copy_and_own difference2);
 use urpm::get_pkgs;
 use urpm::removable;
 use urpm 'file_from_local_medium';
@@ -174,7 +174,7 @@ sub _mount_cdrom {
 
 	    _may_eject_cdrom($urpm);
 
-	    $ask_for_medium->(remove_internal_name($medium->{name}))
+	    $ask_for_medium->($medium->{name})
 	      or $urpm->{fatal}(4, N("medium \"%s\" is not available", $medium->{name}));
     }
 }

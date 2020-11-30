@@ -3,7 +3,7 @@ package Make;
 use strict;
 use warnings;
 
-our $VERSION = '2.007';
+our $VERSION = '2.009';
 
 use Carp qw(confess croak);
 use Config;
@@ -14,6 +14,7 @@ use Make::Rule   ();
 use File::Temp;
 use Text::Balanced qw(extract_bracketed);
 use Text::ParseWords qw(parse_line);
+use File::Spec::Functions qw(file_name_is_absolute);
 ## no critic (ValuesAndExpressions::ProhibitConstantPragma)
 use constant DEBUG => $ENV{MAKE_DEBUG};
 ## use critic
@@ -27,7 +28,20 @@ my %fs_function_map = (
     fh_write      => sub { my $fh = shift;                                     print {$fh} @_ },
     file_readable => sub { -r $_[0] },
     mtime         => sub { ( stat $_[0] )[9] },
+    is_abs        => sub { goto &file_name_is_absolute },
 );
+my @RECMAKE_FINDS = ( \&_find_recmake_cd, );
+
+sub _find_recmake_cd {
+    my ($cmd) = @_;
+    return unless $cmd =~ /\bcd\s+([^\s;&]+)\s*(?:;|&&)\s*make\s*(.*)/;
+    my ( $dir, $makeargs ) = ( $1, $2 );
+    require Getopt::Long;
+    local @ARGV = Text::ParseWords::shellwords($makeargs);
+    Getopt::Long::GetOptions( "f=s" => \my $makefile );
+    my ( $vars, $targets ) = parse_args(@ARGV);
+    return ( $dir, $makefile, $vars, $targets );
+}
 
 ## no critic (Subroutines::RequireArgUnpacking Subroutines::RequireFinalReturn)
 sub load_modules {
@@ -97,20 +111,28 @@ sub patmatch {
 }
 
 sub in_dir {
-    my ( $file, $dir ) = @_;
-    ## no critic ( BuiltinFunctions::RequireBlockGrep )
-    join '/', grep defined, $dir, $file;
-    ## use critic
+    my ( $fsmap, $dir, $file ) = @_;
+    return $file if defined $file and $fsmap->{is_abs}->($file);
+    my @dir  = defined($dir) ? split /\//, $dir : ();
+    my @file = split /\//, $file;
+    while ( @dir and @file and $file[0] eq '..' ) {
+
+        # normalise out ../ in $file - no account taken of symlinks
+        shift @file;
+        pop @dir;
+    }
+    join '/', @dir, @file;
 }
 
 sub locate {
     my ( $self, $file ) = @_;
-    my $readable = $self->fsmap->{file_readable};
+    my $fsmap    = $self->fsmap;
+    my $readable = $fsmap->{file_readable};
     foreach my $key ( sort keys %{ $self->{Vpath} } ) {
         next unless defined( my $Pat = patmatch( $key, $file ) );
         foreach my $dir ( @{ $self->{Vpath}{$key} } ) {
             ( my $maybe_file = $dir ) =~ s/%/$Pat/g;
-            return $maybe_file if $readable->( in_dir $maybe_file, $self->{InDir} );
+            return $maybe_file if $readable->( in_dir $fsmap, $self->{InDir}, $maybe_file );
         }
     }
     return;
@@ -130,7 +152,7 @@ sub dotrules {
             my $thisrule = $r->rules->[-1];             # last-specified
             die "Failed on pattern rule for '$f$t', no prereqs allowed"
                 if @{ $thisrule->prereqs };
-            my $rule = Make::Rule->new( '::', [ '%' . $f ], $thisrule->recipe );
+            my $rule = Make::Rule->new( '::', [ '%' . $f ], $thisrule->recipe, $thisrule->recipe_raw );
             $self->target( '%' . $t )->add_rule($rule);
         }
     }
@@ -142,8 +164,9 @@ sub dotrules {
 #
 sub date {
     my ( $self, $name ) = @_;
+    my $fsmap = $self->fsmap;
     unless ( exists $date{$name} ) {
-        $date{$name} = $self->fsmap->{mtime}->( in_dir $name, $self->{InDir} );
+        $date{$name} = $self->fsmap->{mtime}->( in_dir $fsmap, $self->{InDir}, $name );
     }
     return $date{$name};
 }
@@ -177,7 +200,7 @@ sub patrule {
             }
             DEBUG and print STDERR "  " . ( @failed ? "Failed: (@failed)" : "Matched (@dep)" ) . "\n";
             next if @failed;
-            return Make::Rule->new( $kind, \@dep, $rule->recipe );
+            return Make::Rule->new( $kind, \@dep, $rule->recipe, $rule->recipe_raw );
         }
     }
     return;
@@ -321,8 +344,9 @@ sub process_ast_bit {
         my ($tokens) = tokenize( $self->expand( $args[1] ) );
         foreach my $file (@$tokens) {
             eval {
-                $file = in_dir $file, $self->{InDir};
-                my $mf  = $self->fsmap->{fh_open}->( '<', $file );
+                my $fsmap = $self->fsmap;
+                $file = in_dir $fsmap, $self->{InDir}, $file;
+                my $mf  = $fsmap->{fh_open}->( '<', $file );
                 my $ast = parse_makefile($mf);
                 close($mf);
                 $self->process_ast_bit(@$_) for @$ast;
@@ -440,13 +464,13 @@ sub find_makefile {
     my @dirs = grep defined, $self->{InDir}, $dir;
     $dir = join '/', @dirs if @dirs;
     ## use critic
-    return in_dir $file, $dir if defined $file;
+    my $fsmap = $self->fsmap;
+    return in_dir $fsmap, $dir, $file if defined $file;
     my @search = qw(makefile Makefile);
     unshift @search, 'GNUmakefile' if $self->{GNU};
     ## no critic (BuiltinFunctions::RequireBlockMap)
-    @search = map in_dir( $_, $dir ), @search;
+    @search = map in_dir( $fsmap, $dir, $_ ), @search;
     ## use critic
-    my $fsmap = $self->fsmap;
     for (@search) {
         return $_ if $fsmap->{file_readable}->($_);
     }
@@ -472,7 +496,7 @@ sub parse {
 
     $self->pseudos;     # Pull out .SUFFIXES etc.
     $self->dotrules;    # Convert .c.o into %.o : %.c
-    return;
+    return $self;
 }
 
 sub PrintVars {
@@ -495,6 +519,31 @@ sub parse_cmdline {
     $parsed{can_fail} = 1 if $prefix =~ /-/;
     return \%parsed;
 }
+
+## no critic (BuiltinFunctions::RequireBlockMap)
+my %NAME_QUOTING     = map +( $_ => sprintf "%%%02x", ord $_ ), qw(% :);
+my $NAME_QUOTE_CHARS = join '', '[', ( map quotemeta, sort keys %NAME_QUOTING ), ']';
+
+sub name_encode {
+    join ':', map {
+        my $s = $_;
+        $s =~ s/($NAME_QUOTE_CHARS)/$NAME_QUOTING{$1}/gs;
+        $s
+    } @{ $_[0] };
+}
+
+sub name_decode {
+    my ($s) = @_;
+    [
+        map {
+            my $s = $_;
+            $s =~ s/%(..)/chr hex $1/ges;
+            $s
+        } split ':',
+        $_[0]
+    ];
+}
+## use critic
 
 ## no critic (Subroutines::ProhibitBuiltinHomonyms)
 sub exec {
@@ -530,6 +579,122 @@ sub parse_args {
     return \@vars, \@targets;
 }
 ## use critic
+
+sub _rmf_search_rule {
+    my ( $rule, $target_obj, $target, $rule_no, $rmfs ) = @_;
+    my @found;
+    my $line = -1;
+    for my $cmd ( $rule->exp_recipe($target_obj) ) {
+        $line++;
+        my @rec_vars;
+        for my $rf (@$rmfs) {
+            last if @rec_vars = $rf->($cmd);
+        }
+        next unless @rec_vars;
+        push @found, [ $target, $rule_no, $line, @rec_vars ];
+    }
+    return @found;
+}
+
+sub find_recursive_makes {
+    my ($self) = @_;
+    my $g = $self->as_graph;
+    my @found;
+    my $rmfs = $self->{RecursiveMakeFinders};
+    for my $target ( sort $self->targets ) {
+        my $target_obj = $self->target($target);
+        my $rule_no    = 0;
+        ## no critic (BuiltinFunctions::RequireBlockMap)
+        push @found, map _rmf_search_rule( $_, $target_obj, $target, $rule_no++, $rmfs ), @{ $target_obj->rules };
+        ## use critic
+    }
+    return @found;
+}
+
+sub as_graph {
+    my ( $self,     %options )        = @_;
+    my ( $no_rules, $recursive_make ) = @options{qw(no_rules recursive_make)};
+    require Graph;
+    my $g = Graph->new;
+    my ( %recipe_cache, %seen );
+    my $rmfs      = $self->{RecursiveMakeFinders};
+    my $fsmap     = $self->fsmap;
+    my $fr        = $fsmap->{file_readable};
+    my %make_args = (
+        FunctionPackages => $self->function_packages,
+        FSFunctionMap    => $fsmap,
+    );
+    my $InDir = $self->{InDir};
+
+    for my $target ( sort $self->targets ) {
+        my $node_name = $no_rules ? $target : name_encode( [ 'target', $target ] );
+        $g->add_vertex($node_name);
+        my $rule_no    = -1;
+        my $target_obj = $self->target($target);
+        for my $rule ( @{ $target_obj->rules } ) {
+            $rule_no++;
+            my $recipe = $rule->recipe;
+            my $from_id;
+            if ($no_rules) {
+                $from_id = $node_name;
+            }
+            else {
+                $from_id = $recipe_cache{$recipe}
+                    || ( $recipe_cache{$recipe} = name_encode( [ 'rule', $target, $rule_no ] ) );
+                $g->set_vertex_attributes(
+                    $from_id,
+                    {
+                        recipe     => $recipe,
+                        recipe_raw => $rule->recipe_raw,
+                    }
+                );
+                $g->add_edge( $node_name, $from_id );
+            }
+            for my $dep ( @{ $rule->prereqs } ) {
+                my $dep_node = $no_rules ? $dep : name_encode( [ 'target', $dep ] );
+                $g->add_vertex($dep_node);
+                $g->add_edge( $from_id, $dep_node );
+            }
+            next if !$recursive_make;
+            for my $t ( _rmf_search_rule( $rule, $target_obj, $target, $rule_no, $rmfs ) ) {
+                my ( undef, $rule_index, $line, $dir, $makefile, $vars, $targets ) = @$t;
+                my $from           = $no_rules ? $target : name_encode( [ 'rule', $target, $rule_index ] );
+                my $indir_makefile = $self->find_makefile( $makefile, $dir );
+                next unless $indir_makefile && $fr->($indir_makefile);
+                ## no critic (BuiltinFunctions::RequireBlockMap)
+                my $cache_key = join ' ', $indir_makefile, sort map join( '=', @$_ ), @$vars;
+                ## use critic
+                if ( !$seen{$cache_key}++ ) {
+                    my $make2 = ref($self)->new( %make_args, InDir => in_dir( $fsmap, $InDir, $dir ) );
+                    $make2->parse($makefile);
+                    $make2->set_var(@$_) for @$vars;
+                    $targets = [ $make2->{Vars}{'.DEFAULT_GOAL'} ] unless @$targets;
+                    my $g2 = $make2->as_graph(%options);
+                    $g2->rename_vertices(
+                        sub {
+                            return in_dir( $fsmap, $dir, $_[0] ) if $no_rules;
+                            my ( $type, $name, @other ) = @{ name_decode( $_[0] ) };
+                            name_encode( [ $type, in_dir( $fsmap, $dir, $name ), @other ] );
+                        }
+                    );
+                    $g->ingest($g2);
+                }
+                if ($no_rules) {
+                    ## no critic (BuiltinFunctions::RequireBlockMap)
+                    $g->add_edge( $from, $_ ) for map "$dir/$_", @$targets;
+                    ## use critic
+                }
+                else {
+                    ## no critic (BuiltinFunctions::RequireBlockMap)
+                    $g->set_edge_attribute( $from, $_, fromline => $line )
+                        for map name_encode( [ 'target', "$dir/$_" ] ), @$targets;
+                    ## use critic
+                }
+            }
+        }
+    }
+    return $g;
+}
 
 sub apply {
     my ( $self, $method, @args ) = @_;
@@ -576,15 +741,16 @@ sub Make {
 sub new {
     my ( $class, %args ) = @_;
     my $self = bless {
-        Pattern          => {},                      # GNU style %.o : %.c
-        Dot              => {},                      # Trad style .c.o
-        Vpath            => {},                      # vpath %.c info
-        Vars             => {},                      # Variables defined in makefile
-        Depend           => {},                      # hash of targets
-        Pass             => 0,                       # incremented each sweep
-        Done             => {},
-        FunctionPackages => [qw(Make::Functions)],
-        FSFunctionMap    => \%fs_function_map,
+        Pattern              => {},                      # GNU style %.o : %.c
+        Dot                  => {},                      # Trad style .c.o
+        Vpath                => {},                      # vpath %.c info
+        Vars                 => {},                      # Variables defined in makefile
+        Depend               => {},                      # hash of targets
+        Pass                 => 0,                       # incremented each sweep
+        Done                 => {},
+        FunctionPackages     => [qw(Make::Functions)],
+        FSFunctionMap        => \%fs_function_map,
+        RecursiveMakeFinders => \@RECMAKE_FINDS,
         %args,
     }, $class;
     $self->set_var( 'CC',     $Config{cc} );
@@ -604,8 +770,7 @@ Make - Pure-Perl implementation of a somewhat GNU-like make.
 
     require Make;
     my $make = Make->new;
-    $make->parse($file);
-    $make->Make(@ARGV);
+    $make->parse($file)->Make(@ARGV);
 
     # to see what it would have done
     print $make->Script(@ARGV);
@@ -614,7 +779,7 @@ Make - Pure-Perl implementation of a somewhat GNU-like make.
     $make->Print(@ARGV);
 
     my $targ = $make->target($name);
-    my $rule = Make::Rule->new(':', \@prereqs, \@recipe);
+    my $rule = Make::Rule->new(':', \@prereqs, \@recipe, \@recipe_raw);
     $targ->add_rule($rule);
     my @rules = @{ $targ->rules };
 
@@ -697,12 +862,29 @@ Hash-ref of file-system functions by which to access the
 file-system. Created to help testing, but might be more widely useful.
 Defaults to code accessing the actual local filesystem. The various
 functions are expected to return real Perl filehandles. Relevant keys:
-C<glob>, C<fh_open>, C<fh_write>, C<mtime>.
+C<glob>, C<fh_open>, C<fh_write>, C<mtime>, C<file_readable>,
+C<is_abs>.
 
 =head3 InDir
 
 Optional. If supplied, will be treated as the current directory instead
 of the default which is the real current directory.
+
+=head3 RecursiveMakeFinders
+
+Array-ref of functions to be called in order, searching an expanded
+recipe line for a recursive make invocation (cf
+L<Recursive Make Considered Harmful|http://www.real-linux.org.uk/recursivemake.pdf>)
+that would run a C<make> in a subdirectory. Each returns either an empty
+list, or
+
+    ($dir, $makefile, $vars, $targets)
+
+The C<$makefile> might be <undef>, in which case the default will be
+searched for. C<$vars> and C<$targets> are array-refs of pairs and
+strings, respectively. The C<$targets> can be empty.
+
+Defaults to a single, somewhat-suitable, function.
 
 =head2 parse
 
@@ -710,6 +892,8 @@ Parses the given makefile. If none or C<undef>, these files will be tried,
 in order: F<GNUmakefile> if L</GNU>, F<makefile>, F<Makefile>.
 
 If a scalar-ref, will be makefile text.
+
+Returns the make object for chaining.
 
 =head2 Make
 
@@ -759,6 +943,17 @@ target-name. Returns a L<Make::Rule> for that of the given kind, or false.
 Uses GNU make's "exists or can be made" algorithm on each rule's proposed
 requisite to see if that rule matches.
 
+=head2 find_recursive_makes
+
+    my @found = $make->find_recursive_makes;
+
+Iterate over all the rules, expanding them for their targets, and find
+any recursive make invocations using the L</RecursiveMakeFinders>.
+
+Returns a list of array-refs with:
+
+    [ $from_target, $rule_index, $line_index, $dir, $makefile, $vars, $targets ]
+
 =head1 ATTRIBUTES
 
 These are read-only.
@@ -775,7 +970,48 @@ Returns an array-ref of the packages to search for macro functions.
 
 Returns a hash-ref of the L</FSFunctionMap>.
 
+=head2 as_graph
+
+Returns a L<Graph::Directed> object representing the makefile.
+Takes options as a hash:
+
+=head3 recursive_make
+
+If true (default false), uses L</RecursiveMakeFinders> to find recursive
+make invocations in the current makefile, parses those, then includes
+them, with an edge created to the relevant target.
+
+=head3 no_rules
+
+If true, the graph will only have target vertices.
+
+If false (the default), the vertices are named either C<target:name>
+(representing L<Make::Target>s) or C<rule:name:rule_index> (representing
+L<Make::Rule>s). The names encoded with L</name_encode>. Rules are named
+according to the first (alphabetically) target they are attached to.
+
+The rule vertices have attributes with the same values as the
+L<Make::Rule> attributes:
+
+=over
+
+=item recipe
+
+=item recipe_raw
+
+=back
+
 =head1 FUNCTIONS
+
+=head2 name_encode
+
+=head2 name_decode
+
+    my $encoded = Make::name_encode([ 'target', 'all' ]);
+    my $tuple = Make::name_decode($encoded); # [ 'target', 'all' ]
+
+Uses C<%>-encoding and -decoding to allow C<%> and C<:> characters in
+components without problems.
 
 =head2 parse_makefile
 

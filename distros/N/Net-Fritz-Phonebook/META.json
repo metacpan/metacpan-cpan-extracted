@@ -4,7 +4,7 @@
       "Max Maischein <corion@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "ExtUtils::MakeMaker version 7.1002, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -36,13 +36,19 @@
             "Filter::signatures" : "0",
             "Moo" : "2",
             "Net::Fritz" : "0",
+            "Net::Fritz::Box" : "0",
             "PerlX::Maybe" : "0",
+            "URI::URL" : "0",
+            "XML::Simple" : "0",
             "perl" : "5.006"
          }
       },
       "test" : {
          "requires" : {
             "Data::Dumper" : "0",
+            "Encode" : "0",
+            "Net::CardDAVTalk" : "0",
+            "Net::CardDAVTalk::VCard" : "0",
             "Test::More" : "0",
             "charnames" : "0"
          }
@@ -59,7 +65,7 @@
          "web" : "https://github.com/Corion/Net-Fritz-Phonebook"
       }
    },
-   "version" : "0.04",
-   "x_serialization_backend" : "JSON::PP version 2.27203",
+   "version" : "0.05",
+   "x_serialization_backend" : "JSON::PP version 2.27300_01",
    "x_static_install" : 1
 }

@@ -11,7 +11,7 @@
 namespace panda { namespace date {
 
 using panda::time::ptime_t;
-using panda::time::Timezone;
+using panda::time::TimezoneSP;
 using panda::time::datetime;
 using panda::time::tzlocal;
 
@@ -60,27 +60,27 @@ struct Date {
 
     Date () { set((ptime_t)0, nullptr); }
 
-    explicit Date (ptime_t epoch, const Timezone* zone = {}) { set(epoch, zone); }
+    explicit Date (ptime_t epoch, const TimezoneSP& zone = {}) { set(epoch, zone); }
 
     template <class T, typename = std::enable_if_t<std::is_floating_point<T>::value>> // otherwise would be ambiguity with previous ctor if passed not ptime_t and not double
-    explicit Date (T epoch, const Timezone* zone = {}) { set(epoch, zone); }
+    explicit Date (T epoch, const TimezoneSP& zone = {}) { set(epoch, zone); }
 
-    Date (ptime_t epoch, ptime_t mksec, const Timezone* zone = {}) { set(epoch, mksec, zone); }
+    Date (ptime_t epoch, ptime_t mksec, const TimezoneSP& zone = {}) { set(epoch, mksec, zone); }
 
-    explicit Date (string_view str, const Timezone* zone = {}, int fmt = InputFormat::all) { set(str, zone, fmt); }
+    explicit Date (string_view str, const TimezoneSP& zone = {}, int fmt = InputFormat::all) { set(str, zone, fmt); }
 
-    Date (int32_t year, ptime_t mon, ptime_t day, ptime_t hour = 0, ptime_t min = 0, ptime_t sec = 0, ptime_t mksec = 0, int isdst = -1, const Timezone* zone = {}) {
+    Date (int32_t year, ptime_t mon, ptime_t day, ptime_t hour = 0, ptime_t min = 0, ptime_t sec = 0, ptime_t mksec = 0, int isdst = -1, const TimezoneSP& zone = {}) {
         set(year, mon, day, hour, min, sec, mksec, isdst, zone);
     }
 
-    Date (const Date& source, const Timezone* zone = {}) { set(source, zone); }
+    Date (const Date& source, const TimezoneSP& zone = {}) { set(source, zone); }
 
-    void set (ptime_t ep, const Timezone* zone = {}) {
+    void set (ptime_t ep, const TimezoneSP& zone = {}) {
         _zone_set(zone);
         epoch(ep);
     }
 
-    void set (ptime_t ep, ptime_t mksec, const Timezone* zone = {}) {
+    void set (ptime_t ep, ptime_t mksec, const TimezoneSP& zone = {}) {
         if (mksec >= 0 && mksec < MICROSECONDS_IN_SECOND) {
             set(ep, zone);
             _mksec = mksec;
@@ -91,18 +91,18 @@ struct Date {
         }
     }
 
-    void set (double ep, const Timezone* zone = {}) {
+    void set (double ep, const TimezoneSP& zone = {}) {
         _zone_set(zone);
         epoch(ep);
     }
 
-    void set (const Date& source, const Timezone* zone = {});
-    void set (string_view str, const Timezone* zone = {}, int = InputFormat::all);
-    void set (int32_t year, ptime_t month, ptime_t day, ptime_t hour = 0, ptime_t min = 0, ptime_t sec = 0, ptime_t mksec = 0, int isdst= -1, const Timezone* zone = {});
+    void set (const Date& source, const TimezoneSP& zone = {});
+    void set (string_view str, const TimezoneSP& zone = {}, int = InputFormat::all);
+    void set (int32_t year, ptime_t month, ptime_t day, ptime_t hour = 0, ptime_t min = 0, ptime_t sec = 0, ptime_t mksec = 0, int isdst= -1, const TimezoneSP& zone = {});
 
     Date& operator= (const Date& source) { set(source); return *this; }
 
-    Date clone (int32_t year, ptime_t mon=-1, ptime_t day=-1, ptime_t hour=-1, ptime_t min=-1, ptime_t sec=-1, ptime_t mksec=-1, int isdst=-1, const Timezone* zone = {}) const {
+    Date clone (int32_t year, ptime_t mon=-1, ptime_t day=-1, ptime_t hour=-1, ptime_t min=-1, ptime_t sec=-1, ptime_t mksec=-1, int isdst=-1, const TimezoneSP& zone = {}) const {
         dcheck();
         return Date(
             year  >= 0 ? year : _date.year,
@@ -117,20 +117,20 @@ struct Date {
         );
     }
 
-    const datetime& date       () const { dcheck(); return _date; }
-    bool            has_epoch  () const { return _has_epoch; }
-    bool            has_date   () const { return _has_date; }
-    bool            normalized () const { return _normalized; }
-    std::error_code error      () const { return _error; }
-    const Timezone* timezone   () const { return _zone; }
+    const datetime&   date       () const { dcheck(); return _date; }
+    bool              has_epoch  () const { return _has_epoch; }
+    bool              has_date   () const { return _has_date; }
+    bool              normalized () const { return _normalized; }
+    std::error_code   error      () const { return _error; }
+    const TimezoneSP& timezone   () const { return _zone; }
 
-    void timezone (const Timezone* zone) {
+    void timezone (const TimezoneSP& zone) {
         dcheck();
         _zone = zone ? zone : tzlocal();
         dchg_auto();
     }
 
-    void to_timezone (const Timezone* zone) {
+    void to_timezone (const TimezoneSP& zone) {
         echeck();
         _zone = zone ? zone : tzlocal();
         echg();
@@ -264,7 +264,7 @@ private:
 
     mutable ptime_t  _epoch;
     mutable datetime _date;
-    const Timezone*  _zone = nullptr;
+    TimezoneSP       _zone;
     mutable bool     _has_epoch;
     mutable bool     _has_date;
     mutable bool     _normalized;
@@ -303,7 +303,7 @@ private:
         echg();
     }
 
-    void _zone_set (const Timezone* zone) {
+    void _zone_set (const TimezoneSP& zone) {
         if (!_zone) _zone = zone ? zone : tzlocal();
         else if (zone) _zone = zone;
     }

@@ -367,6 +367,7 @@ my %options_spec = (
 	nopubkey => \$options{nopubkey},
 	raw => \$options{raw},
 	'verify-rpm!' => sub { ${options}{'verify-rpm'} = $_[1] },
+	'ignorearch' => sub { $options{ignorearch} = 1 },
     },
 
 );

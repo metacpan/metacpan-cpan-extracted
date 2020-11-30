@@ -34,8 +34,8 @@ SKIP: {
         my $result;
         warning_like
             { $result = $geocoder->reverse_geocode('lat'=> 41.40139, 'lng'=> 2.12870); }
-            [ qr/403, suspended/ ],
-            "got suspended warning";
+            [ qr/403, disabled/ ],
+            "got disabled Warning";
             is($result, undef, 'correctly returned undef for 403 response');
     }
 }

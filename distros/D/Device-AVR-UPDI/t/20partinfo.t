@@ -4,12 +4,14 @@ use v5.20;
 use warnings;
 
 use Test::More;
-use Test::EasyMock qw( create_mock );
+use Test::Future::IO;
+
+use lib 't/lib';
+use MockFH;
 
 use Device::AVR::UPDI;
 
-my $mockfh = create_mock();
-my $updi = Device::AVR::UPDI->new( fh => $mockfh, part => "ATtiny814" );
+my $updi = Device::AVR::UPDI->new( fh => MockFH->new, part => "ATtiny814" );
 
 ok( my $partinfo = $updi->partinfo, 'have partinfo' );
 

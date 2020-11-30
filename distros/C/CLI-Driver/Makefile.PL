@@ -30,7 +30,7 @@ WriteMakefile(
 		'Kavorka'         => 0,
 		'Modern::Perl'    => 0,
 		'Moose'           => 0,
-        'namespace::autoclean' => 0,
+		'namespace::autoclean' => 0,
 		'Data::Printer'   => 0,
 		'Devel::Confess'  => 0,
 		'Capture::Tiny'   => 0,
@@ -43,4 +43,18 @@ WriteMakefile(
 	},
 	dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
 	clean => { FILES    => 'CLI-Driver-*' },
+	META_MERGE => {
+		'meta-spec' => { version => 2 },
+		resources => {
+			repository => {
+				type => 'git',
+				url  => 'https://github.com/gravattj/CLI-Driver-perl.git',
+				web  => 'https://github.com/gravattj/CLI-Driver-perl/Task-DWIM',
+			},
+			bugtracker => {
+				web => 'https://github.com/gravattj/CLI-Driver-perl/issues'
+			},
+			homepage   => 'https://github.com/gravattj/CLI-Driver-perl',
+		},
+	},
 );

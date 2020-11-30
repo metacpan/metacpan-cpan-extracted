@@ -2,7 +2,7 @@
 # PODNAME: githooks.pl
 # ABSTRACT: Git::Hooks driver script
 
-use strict;
+use 5.016;
 use warnings;
 use Git::Hooks;
 
@@ -20,7 +20,7 @@ githooks.pl - Git::Hooks driver script
 
 =head1 VERSION
 
-version 2.14.0
+version 3.0.0
 
 =head1 AUTHOR
 

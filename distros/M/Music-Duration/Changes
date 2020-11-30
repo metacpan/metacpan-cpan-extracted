@@ -1,5 +1,8 @@
 Revision history for Music-Duration
 
+0.0801 2020-11-26 11:20:41
+    - Don't import anything from MIDI::Simple.
+
 0.0800 2020-06-19 00:54:01
     - Improve documentation.
     - Add the ultra simple add_duration() function.

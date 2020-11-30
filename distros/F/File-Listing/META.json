@@ -14,6 +14,11 @@
       "version" : 2
    },
    "name" : "File-Listing",
+   "no_index" : {
+      "directory" : [
+         "maint"
+      ]
+   },
    "prereqs" : {
       "configure" : {
          "requires" : {
@@ -54,6 +59,7 @@
       },
       "test" : {
          "requires" : {
+            "Data::Dumper" : "0",
             "Test::More" : "0.98",
             "perl" : "5.006"
          }
@@ -71,9 +77,60 @@
          "web" : "https://github.com/PerlAlien/File-Listing"
       }
    },
-   "version" : "6.11",
-   "x_generated_by_perl" : "v5.32.0",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.19",
+   "version" : "6.14",
+   "x_contributors" : [
+      "Gisle Aas",
+      "Graham Ollis <plicease@cpan.org>",
+      "Adam Kennedy",
+      "Adam Sjogren",
+      "Alex Kapranoff",
+      "Alexey Tourbin",
+      "Andreas J. Koenig",
+      "Bill Mann",
+      "Bron Gondwana",
+      "DAVIDRW",
+      "Daniel Hedlund",
+      "David E. Wheeler",
+      "David Steinbrunner",
+      "Erik Esterer",
+      "FWILES",
+      "Father Chrysostomos",
+      "Gavin Peters",
+      "Graeme Thompson",
+      "Hans-H. Froehlich",
+      "Ian Kilgore",
+      "Jacob J",
+      "Mark Stosberg",
+      "Mike Schilli",
+      "Ondrej Hanak",
+      "Peter John Acklam",
+      "Peter Rabbitson",
+      "Robert Stone",
+      "Rolf Grossmann",
+      "Sean M. Burke",
+      "Simon Legner",
+      "Slaven Rezic",
+      "Spiros Denaxas",
+      "Steve Hay",
+      "Todd Lipcon",
+      "Tom Hukins",
+      "Tony Finch",
+      "Toru Yamaguchi",
+      "Ville Skytt\u00e4",
+      "Yuri Karaban",
+      "Zefram",
+      "amire80",
+      "jefflee",
+      "john9art",
+      "mschilli",
+      "murphy",
+      "phrstbrn",
+      "ruff",
+      "sasao",
+      "uid39246"
+   ],
+   "x_generated_by_perl" : "v5.33.3",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.24",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later",
    "x_use_unsafe_inc" : 0
 }

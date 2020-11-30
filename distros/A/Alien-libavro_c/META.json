@@ -1,0 +1,95 @@
+{
+   "abstract" : "libavro_c, with alien",
+   "author" : [
+      "B Fraser <fraserbn@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Alien-libavro_c",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Alien::Base" : "0.038",
+            "Alien::Build::MM" : "0.25",
+            "Alien::Build::Plugin::Build::CMake" : "0",
+            "Alien::cmake3" : "0.02",
+            "Archive::Tar" : "0",
+            "Config" : "0",
+            "HTTP::Tiny" : "0.044",
+            "IO::Socket::SSL" : "1.56",
+            "IO::Zlib" : "0",
+            "Mojo::DOM" : "0",
+            "Mojolicious" : "7.00",
+            "Net::SSLeay" : "1.49",
+            "Sort::Versions" : "0",
+            "URI" : "0",
+            "URI::Escape" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Alien::Build::MM" : "0.25",
+            "Alien::Build::Plugin::Build::CMake" : "0.99",
+            "Alien::libjansson" : "0",
+            "Alien::libsnappy" : "0",
+            "ExtUtils::CBuilder" : "0",
+            "ExtUtils::MakeMaker" : "6.52"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Alien::Base" : "0.038",
+            "Alien::Build" : "0.25",
+            "Alien::Build::Plugin::Build::CMake" : "0",
+            "perl" : "5.006"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "web" : "https://github.com/Hugmeir/p5-alien-libavro_c"
+      }
+   },
+   "version" : "0.03",
+   "x_alienfile" : {
+      "generated_by" : "Alien::Build::MM version 2.37",
+      "requires" : {
+         "share" : {
+            "Alien::cmake3" : "0.02",
+            "Archive::Tar" : "0",
+            "Config" : "0",
+            "HTTP::Tiny" : "0.044",
+            "IO::Socket::SSL" : "1.56",
+            "IO::Zlib" : "0",
+            "Mojo::DOM" : "0",
+            "Mojolicious" : "7.00",
+            "Net::SSLeay" : "1.49",
+            "Sort::Versions" : "0",
+            "URI" : "0",
+            "URI::Escape" : "0"
+         },
+         "system" : {}
+      }
+   },
+   "x_serialization_backend" : "JSON::PP version 2.97001"
+}

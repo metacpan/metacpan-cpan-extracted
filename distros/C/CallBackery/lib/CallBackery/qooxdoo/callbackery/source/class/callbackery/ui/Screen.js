@@ -19,7 +19,7 @@ qx.Class.define("callbackery.ui.Screen", {
         this.base(arguments);
         // just a reference to the Dock layout to make sure
         // it gets included
-        qx.ui.layout.Dock; 
+        qx.ui.layout.Dock;
         qx.ui.layout.Canvas;
         // end
         this.__cfg = cfg;
@@ -96,6 +96,42 @@ qx.Class.define("callbackery.ui.Screen", {
                     that.setLayout(lc);
                     content.set(containerSet);
                     that.add(content,containerAddProps);
+
+                    // Show (legal) disclaimer and hide screen content until
+                    // checkbox is set and btn is executed.
+                    var disclaimerCfg = options.disclaimer;
+                    if (disclaimerCfg) {
+                        content.hide();
+                        // force widget visibility because it is tied to
+                        // content visibility above
+                        that.setVisibility('visible');
+
+                        var disclaimerContainer = new qx.ui.container.Composite(new qx.ui.layout.VBox(10));
+                        var disclaimer = new qx.ui.basic.Label(that.xtr(disclaimerCfg.note)).set({
+                            rich: true
+                        });
+
+                        var btnRow     = new qx.ui.container.Composite(new qx.ui.layout.HBox(10, 'right'));
+
+                        var okBtnLabel = disclaimerCfg.okButtonLabel ? that.xtr(disclaimerCfg.okButtonLabel)
+                                                                     : that.xtr('OK');
+                        var okBtn = new qx.ui.form.Button(okBtnLabel).set({enabled : false});
+                        okBtn.addListener('execute', function() {
+                            content.show();
+                            disclaimerContainer.hide();
+                        }, that);
+                        btnRow.add(okBtn);
+
+                        var check = new qx.ui.form.CheckBox(that.xtr(disclaimerCfg.label)).set({
+                            rich: true
+                        });
+                        check.bind('changeValue', okBtn, 'enabled');
+
+                        disclaimerContainer.add(disclaimer);
+                        disclaimerContainer.add(check);
+                        disclaimerContainer.add(btnRow);
+                        that.add(disclaimerContainer);
+                    }
                 }
                 else {
                     that.debug('Invalid plugin type:"' + type + '"');

@@ -4,7 +4,7 @@ package JSON::Schema::Draft201909::Result;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Contains the result of a JSON Schema evaluation
 
-our $VERSION = '0.016';
+our $VERSION = '0.017';
 
 use 5.016;
 no if "$]" >= 5.031009, feature => 'indirect';
@@ -17,7 +17,6 @@ use MooX::HandlesVia;
 use JSON::Schema::Draft201909::Annotation;
 use JSON::Schema::Draft201909::Error;
 use JSON::PP ();
-use constant { true => JSON::PP::true, false => JSON::PP::false };
 use namespace::clean;
 
 use overload
@@ -28,7 +27,7 @@ use overload
 has result => (
   is => 'ro',
   isa => InstanceOf['JSON::PP::Boolean'],
-  coerce => sub { $_[0] ? true : false },
+  coerce => sub { $_[0] ? JSON::PP::true : JSON::PP::false },
 );
 
 has $_.'s' => (
@@ -135,7 +134,7 @@ JSON::Schema::Draft201909::Result - Contains the result of a JSON Schema evaluat
 
 =head1 VERSION
 
-version 0.016
+version 0.017
 
 =head1 SYNOPSIS
 

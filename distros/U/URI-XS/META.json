@@ -4,7 +4,7 @@
       "unknown"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.36, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.50, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "unknown"
    ],
@@ -25,19 +25,19 @@
       },
       "configure" : {
          "requires" : {
-            "Export::XS" : "v3.0.3",
-            "XS::Framework" : "v1.2.5",
-            "XS::Install" : "v1.2.13",
-            "XS::libpanda" : "v1.3.9",
+            "Export::XS" : "v3.0.5",
+            "XS::Framework" : "v1.3.3",
+            "XS::Install" : "v1.3.1",
+            "XS::libpanda" : "v1.4.11",
             "next::XS" : "v1.0.7"
          }
       },
       "runtime" : {
          "requires" : {
-            "Export::XS" : "v3.0.3",
-            "XS::Framework" : "v1.2.5",
-            "XS::Install" : "v1.2.13",
-            "XS::libpanda" : "v1.3.9",
+            "Export::XS" : "v3.0.5",
+            "XS::Framework" : "v1.3.3",
+            "XS::Install" : "v1.3.1",
+            "XS::libpanda" : "v1.4.11",
             "next::XS" : "v1.0.7"
          }
       },
@@ -51,6 +51,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "v2.0.1",
-   "x_serialization_backend" : "JSON::PP version 4.02"
+   "version" : "v2.1.0",
+   "x_serialization_backend" : "JSON::PP version 4.04"
 }

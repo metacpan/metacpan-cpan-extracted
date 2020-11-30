@@ -25,7 +25,7 @@ produces output
     アイウエオ
 
 
-(This example is included as L<F<synopsis.pl>|https://fastapi.metacpan.org/source/BKB/Lingua-JA-Moji-0.56/examples/synopsis.pl> in the distribution.)
+(This example is included as L<F<synopsis.pl>|https://fastapi.metacpan.org/source/BKB/Lingua-JA-Moji-0.57/examples/synopsis.pl> in the distribution.)
 
 
 Convert between different forms of kana:
@@ -51,13 +51,13 @@ produces output
     ㋐㋑㋒㋓㋔㋕゛ッ㋫゜㋪゜ョン
 
 
-(This example is included as L<F<syn-kana.pl>|https://fastapi.metacpan.org/source/BKB/Lingua-JA-Moji-0.56/examples/syn-kana.pl> in the distribution.)
+(This example is included as L<F<syn-kana.pl>|https://fastapi.metacpan.org/source/BKB/Lingua-JA-Moji-0.57/examples/syn-kana.pl> in the distribution.)
 
 
 =head1 VERSION
 
-This document describes Lingua::JA::Moji version 0.56
-corresponding to git commit L<9d66e200b70c2626458efcecb58e721e5847b812|https://github.com/benkasminbullock/Lingua-JA-Moji/commit/9d66e200b70c2626458efcecb58e721e5847b812> made on Mon Mar 25 13:40:46 2019 +0900.
+This document describes Lingua::JA::Moji version 0.57
+corresponding to git commit L<003fbbfa1e950d90086eb1c6666cda8f23b96a70|https://github.com/benkasminbullock/Lingua-JA-Moji/commit/003fbbfa1e950d90086eb1c6666cda8f23b96a70> made on Thu Nov 26 15:46:46 2020 +0900.
 
 =head1 DESCRIPTION
 
@@ -1590,7 +1590,7 @@ produces output
     アッタカ〜イ -> アッタカアイ
 
 
-(This example is included as L<F<onbiki.pl>|https://fastapi.metacpan.org/source/BKB/Lingua-JA-Moji-0.56/examples/onbiki.pl> in the distribution.)
+(This example is included as L<F<onbiki.pl>|https://fastapi.metacpan.org/source/BKB/Lingua-JA-Moji-0.57/examples/onbiki.pl> in the distribution.)
 
 
 =item L<Lingua::JA::Jtruncate>
@@ -1691,7 +1691,8 @@ and numerals". See L<What is "wide ASCII"?|http://www.sljfaq.org/afaq/wide-ascii
 =item youon
 
 Youon (拗音) means the use of kana ending in "i" with a small ya, yu,
-or yo kana. These are called "glides" by linguists.
+or yo kana, such as しゃ (sha) or きょ (kyo). These are called
+"glides" by linguists.
 
 =back
 
@@ -1819,7 +1820,7 @@ Ben Bullock, <bkb@cpan.org>
 =head1 COPYRIGHT & LICENCE
 
 This package and associated files are copyright (C) 
-2008-2019
+2008-2020
 Ben Bullock.
 
 You can use, copy, modify and redistribute this package and associated

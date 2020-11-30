@@ -28,8 +28,8 @@ use Net::Z3950::FOLIO::OPACXMLRecord;
 my $dummyMarc = makeDummyMarc();
 
 for (my $i = 1; $i <= 2; $i++) {
-    my $expected = readFile("t/data/expectedOutput$i.xml");
-    my $folioJson = readFile("t/data/input$i.json");
+    my $expected = readFile("t/data/records/expectedOutput$i.xml");
+    my $folioJson = readFile("t/data/records/input$i.json");
     my $folioHoldings = decode_json($folioJson);
     my $holdingsXml = Net::Z3950::FOLIO::OPACXMLRecord::_makeSingleHoldingsRecord($folioHoldings, $dummyMarc);
     is($holdingsXml, $expected, "generated holdings $i match expected XML");

@@ -4,21 +4,20 @@ package JSON::Schema::Draft201909::Document;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: One JSON Schema document
 
-our $VERSION = '0.016';
+our $VERSION = '0.017';
 
 use 5.016;
 no if "$]" >= 5.031009, feature => 'indirect';
 no if "$]" >= 5.033001, feature => 'multidimensional';
 use Mojo::URL;
 use Carp 'croak';
-use Ref::Util 0.100 qw(is_plain_arrayref is_plain_hashref);
 use List::Util 1.29 'pairs';
 use Safe::Isa;
 use Moo;
 use strictures 2;
 use MooX::TypeTiny;
 use MooX::HandlesVia;
-use Types::Standard qw(InstanceOf HashRef Str Dict);
+use Types::Standard qw(InstanceOf HashRef Str Dict ArrayRef);
 use namespace::clean;
 
 extends 'Mojo::JSON::Pointer';
@@ -34,6 +33,7 @@ has canonical_uri => (
   lazy => 1,
   default => sub { Mojo::URL->new },
   coerce => sub { $_[0]->$_isa('Mojo::URL') ? $_[0] : Mojo::URL->new($_[0]) },
+  clearer => '_clear_canonical_uri',
 );
 
 has resource_index => (
@@ -75,6 +75,27 @@ has _serialized_schema => (
   init_arg => undef,
 );
 
+has _evaluator => (
+  is => 'ro',
+  isa => InstanceOf['JSON::Schema::Draft201909'],
+  weak_ref => 1,
+  lazy => 1,
+  default => sub { JSON::Schema::Draft201909->new },
+);
+
+has errors => (
+  is => 'bare',
+  handles_via => 'Array',
+  handles => {
+    errors => 'elements',
+    has_errors => 'count',
+  },
+  writer => '_set_errors',
+  isa => ArrayRef[InstanceOf['JSON::Schema::Draft201909::Error']],
+  lazy => 1,
+  default => sub { [] },
+);
+
 around _add_resources => sub {
   my $orig = shift;
   my $self = shift;
@@ -105,11 +126,14 @@ sub BUILD {
   croak 'canonical_uri cannot contain a fragment' if defined $self->canonical_uri->fragment;
 
   my $original_uri = $self->canonical_uri->clone;
-  my $schema = $self->schema;
-  my @identifiers = _traverse_for_identifiers($schema, '', $original_uri->clone);
+  my $traversed_state = $self->_evaluator->traverse($self->schema,
+    { canonical_schema_uri => $self->canonical_uri->clone });
 
-  if (is_plain_hashref($self->schema) and my $id = $self->get('/$id')) {
-    $self->_set_canonical_uri(Mojo::URL->new($id)) if $id ne $self->canonical_uri;
+  $self->_set_canonical_uri($traversed_state->{canonical_schema_uri});
+
+  if (@{$traversed_state->{errors}}) {
+    $self->_set_errors($traversed_state->{errors});
+    return;
   }
 
   # make sure the root schema is always indexed against *something*.
@@ -117,48 +141,7 @@ sub BUILD {
     if (not "$original_uri" and $original_uri eq $self->canonical_uri)
       or "$original_uri";
 
-  $self->_add_resources(@identifiers);
-}
-
-sub _traverse_for_identifiers {
-  my ($data, $path, $canonical_uri) = @_;
-  my @identifiers;
-  if (is_plain_arrayref($data)) {
-    return map
-      __SUB__->($data->[$_], jsonp($path, $_),
-        $canonical_uri->clone->fragment($canonical_uri->fragment.'/'.$_)),
-      0 .. $#{$data};
-  }
-  elsif (is_plain_hashref($data)) {
-    if (exists $data->{'$id'} and JSON::Schema::Draft201909->_is_type('string', $data->{'$id'})) {
-      my $uri = Mojo::URL->new($data->{'$id'});
-      if (not length $uri->fragment) {
-        $canonical_uri = $uri->is_abs ? $uri : $uri->to_abs($canonical_uri);
-        $canonical_uri->fragment(undef);
-        push @identifiers, $canonical_uri => { path => $path, canonical_uri => $canonical_uri->clone };
-      }
-    }
-    if (exists $data->{'$anchor'} and JSON::Schema::Draft201909->_is_type('string', $data->{'$anchor'})
-        and $data->{'$anchor'} =~ /^[A-Za-z][A-Za-z0-9_:.-]+$/) {
-      my $uri = Mojo::URL->new->to_abs($canonical_uri)->fragment($data->{'$anchor'});
-      push @identifiers, $uri => { path => $path, canonical_uri => $canonical_uri->clone };
-    }
-
-    return
-      @identifiers,
-      map
-        __SUB__->($data->{$_}, jsonp($path, $_),
-          $canonical_uri->clone->fragment(jsonp($canonical_uri->fragment, $_))),
-        keys %$data;
-  }
-
-  return ();
-}
-
-# shorthand for creating and appending json pointers
-use namespace::clean 'jsonp';
-sub jsonp {
-  return join('/', (shift // ''), map s/~/~0/gr =~ s!/!~1!gr, @_);
+  $self->_add_resources(@{$traversed_state->{identifiers}});
 }
 
 1;
@@ -177,7 +160,7 @@ JSON::Schema::Draft201909::Document - One JSON Schema document
 
 =head1 VERSION
 
-version 0.016
+version 0.017
 
 =head1 SYNOPSIS
 
@@ -222,6 +205,12 @@ C<resource_pairs> which returns a list of tuples as arrayrefs.
 
 An index of json paths (from the document root) to canonical URIs. This is the inversion of
 L</resource_index> and is constructed as that is built up.
+
+=head2 errors
+
+A list of L<JSON::Schema::Draft201909::Error> objects that resulted when the schema document was
+originally parsed. (If a syntax error occurred, usually there will be just one error, as parse
+errors halt the parsing process.) Documents with errors cannot be evaluated.
 
 =head1 METHODS
 

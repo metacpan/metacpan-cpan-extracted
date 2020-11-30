@@ -22,7 +22,7 @@ no_index:
 provides:
   HiPi:
     file: lib/HiPi.pm
-    version: '0.84'
+    version: '0.85'
   HiPi::Class:
     file: lib/HiPi/Class.pm
     version: '0.81'
@@ -454,6 +454,9 @@ provides:
   HiPi::Interface::PCF8574:
     file: lib/HiPi/Interface/PCF8574.pm
     version: '0.81'
+  HiPi::Interface::Seesaw:
+    file: lib/HiPi/Interface/Seesaw.pm
+    version: '0.85'
   HiPi::Interface::SerLCD:
     file: lib/HiPi/Interface/SerLCD.pm
     version: '0.81'
@@ -512,5 +515,5 @@ requires:
 resources:
   homepage: http://raspberry.znix.com/
   license: http://dev.perl.org/licenses/
-version: '0.84'
+version: '0.85'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

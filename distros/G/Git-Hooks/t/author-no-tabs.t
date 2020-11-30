@@ -16,7 +16,6 @@ use Test::NoTabs;
 
 my @files = (
     'lib/Git/Hooks.pm',
-    'lib/Git/Hooks/CheckAcls.pm',
     'lib/Git/Hooks/CheckCommit.pm',
     'lib/Git/Hooks/CheckDiff.pm',
     'lib/Git/Hooks/CheckFile.pm',
@@ -36,7 +35,6 @@ my @files = (
     'scripts/githooks.pl',
     't/00-load.t',
     't/01-setup.t',
-    't/02-check-acls.t',
     't/02-check-commit.t',
     't/02-check-diff.t',
     't/02-check-file.t',

@@ -51,6 +51,25 @@ static int init () {
 }
 static const int __init = init();
 
+void URI::parse (const string& str) {
+    bool authority_has_pct = false;
+    bool ok = !(_flags & Flags::allow_extended_chars) ? _parse(str, authority_has_pct) : _parse_ext(str, authority_has_pct);
+
+    if (!ok) {
+        clear();
+        return;
+    }
+
+    if (authority_has_pct) {
+        decode_uri_component(_user_info, _user_info);
+        decode_uri_component(_host, _host);
+    }
+
+    if (_qstr) ok_qstr();
+    if (_flags & Flags::allow_suffix_reference && !_host.length()) guess_suffix_reference();
+    sync_scheme_info();
+}
+
 void URI::guess_suffix_reference () {
     // try to find out if it was an url with leading authority ('ya.ru', 'ya.ru:80/a/b/c', 'user@mysite.com/a/b/c')
     // in either case host is always empty and there are 2 cases

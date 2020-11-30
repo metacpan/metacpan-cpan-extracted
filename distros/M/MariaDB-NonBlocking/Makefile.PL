@@ -5,12 +5,9 @@ use ExtUtils::MakeMaker;
 
 use File::Spec;
 use Config       qw/%Config/;
-use Cwd          qw//;
-use FindBin      qw/$Bin/;
-use IPC::Cmd     qw/can_run run/;
 use Getopt::Long qw/GetOptions/;
-use File::Basename qw//;
-use File::Path qw//;
+use Alien::libmariadbclient;
+use Text::ParseWords qw(shellwords);
 
 my $opt = {};
 GetOptions(
@@ -25,82 +22,6 @@ GetOptions(
     "testsocket=s",
 );
 my $mariadb_path = $opt->{mariadb_path};
-
-sub _run {
-    my @cmd = @_;
-    print "Will run: @cmd\n";
-    system { $cmd[0] } @cmd;
-}
-
-use constant MARIADB_TARBALL_BASENAME => 'mariadb-connector-c-3.1.9-src.tar.gz';
-use constant MARIADB_SRC_BASENAME     => 'mariadb-connector-c-3.1.9-src';
-sub compile_mariadb_connector_c {
-    my $our_src_root = $Bin;
-    my $deps_dir     = File::Spec->catdir($our_src_root, 'deps');
-
-    my $mariadb_src_tarball = File::Spec->catfile($deps_dir, MARIADB_TARBALL_BASENAME);
-    my $mariadb_src_dir     = File::Spec->catdir($deps_dir, MARIADB_SRC_BASENAME);
-
-    return $mariadb_src_dir if -x File::Spec->catfile($mariadb_src_dir, 'mariadb_config');
-
-    File::Path::remove_tree($mariadb_src_dir);
-
-    my $untar_out           = `tar -xf $mariadb_src_tarball -C $deps_dir`;
-
-    my $patches = [
-        {
-            orig_file  => File::Spec->catfile($mariadb_src_dir, 'plugins', 'auth', 'CMakeLists.txt'),
-            patch_file => File::Spec->catfile($deps_dir, 'statically_link_auth_plugins.patch'),
-            explain    => 'authentication plugins are dynamically linked to libmariadbclient, we need them statically linked',
-        }
-    ];
-
-    my $cwd = Cwd::cwd();
-    {
-        # Apply patches:
-        foreach my $patch ( @$patches ) {
-            my $target_file = $patch->{orig_file};
-            my $patch_file  = $patch->{patch_file};
-            _run( patch => $target_file => $patch_file );
-        }
-        chdir $mariadb_src_dir or die "cannot chdir to '$mariadb_src_dir': $!";
-        my @cmake_args = qw(
-            -DCMAKE_BUILD_TYPE=RelWithDebInfo
-            -DWITH_SSL=OPENSSL
-        );
-
-        # cargo-cult; without this cmake in OSX cannot find openssl, but why is it hardcoded to these directories??
-        push @cmake_args,
-            qw<
-                -DOPENSSL_ROOT_DIR=/usr/local/opt/openssl
-                -DOPENSSL_LIBRARIES=/usr/local/opt/openssl/lib
-            >
-            if $^O eq 'darwin';
-
-        # Internal zlib ends up causing memory corruption due to
-        # certain "internal" zlib symbols being in the global namespace,
-        # causing silent clashes with the system zlib library.
-        push @cmake_args, qw<
-            -DWITH_EXTERNAL_ZLIB=yes
-        >;
-        _run(cmake => @cmake_args);
-        _run(make => qw< mariadb_config >);
-        _run(make => qw< mariadbclient  >);
-        chdir $cwd;
-    }
-
-    return $mariadb_src_dir;
-}
-
-my $INSTALL_BASE;
-foreach my $arg ( grep defined, @ARGV, $ENV{PERL_MM_OPT} ) {
-    next unless $arg =~ /\bINSTALL_BASE=((?:\S+|\s(?!\S+=))+)\b/sm;
-    $INSTALL_BASE = $1;
-    last;
-}
-
-$mariadb_path ||= compile_mariadb_connector_c();
-local $ENV{PATH} .= ':' . $mariadb_path if $mariadb_path; # TODO: pathsep
 
 sub write_config_for_tests {
     my $opt = $_[0];
@@ -144,179 +65,84 @@ EOPERL
     close $fh || die "Failed to create $test_lib: $!";
 }
 
-sub libname_to_so_names {
-    my ($wanted_lib) = @_;
-
-    my @config_entries = qw/dlext so/;
-
-    my @libs_as_paths = map +( $_, "lib$_" ),
-                        map "${wanted_lib}$_",
-                        map +(/\A\./ ? $_ : ".$_"),
-                        grep +(defined($_) && length($_)),
-                          @Config{@config_entries};
-
-    return @libs_as_paths;
-}
-
-sub get_paths_out_of_config_and_split {
-    my @paths;
-    foreach my $config_key ( @_ ) {
-        next unless defined($Config{$config_key})
-                 && length($Config{$config_key});
-        # TODO: Embedded spaces???
-        push @paths, split /\s+/, $Config{$config_key};
-    }
-    return grep defined, @paths;
-}
-
-{
-    my @libpaths = get_paths_out_of_config_and_split(qw/
-                        libpth
-                        libpath
-                        libspath
-                        loclibpth
-                        xlibpth
-                        glibpth
-                        glibpath
-                    /);
-
-    for my $rootdir ( grep defined, $mariadb_path, $INSTALL_BASE ) {
-        unshift @libpaths,
-            $rootdir,
-            File::Spec->catdir($rootdir, "lib"),
-            File::Spec->catdir($rootdir, "libmariadb"),
-        ;
-    }
-
-    sub find_libpath_for { grep defined, map find_file_in($_, @libpaths), @_ }
-}
-
-{
-    my @incpaths = get_paths_out_of_config_and_split(qw/
-                        incpath
-                        incpth
-                        locincpth
-                        locincpath
-                        usrinc
-                    /);
-
-    for my $rootdir ( grep defined, $mariadb_path, $INSTALL_BASE ) {
-        unshift @incpaths, $rootdir, File::Spec->catdir($rootdir, "include");
-    }
-
-    sub find_incpath_for { grep defined, map find_file_in($_, @incpaths), @_ }
-}
-
-sub find_file_in {
-    my ($file, @dirs) = @_;
-
-    foreach my $dir ( @dirs ) {
-        my @try_in = (
-            $dir,
-            map scalar File::Spec->catdir($dir, $_), qw/mariadb maria mysqldb mysql/,
-        );
-
-        for my $path (@try_in) {
-	        my $full_path = File::Spec->catfile($path, $file);
-	        if (-f $full_path) {
-	            return $path;
-	        }
-        }
-    }
-
-    return;
-}
-
-
-sub run_grab_output {
-    my ($cmd) = @_;
-    my( undef, undef, $full_buf, $stdout_buf, $stderr_buf )
-        = run( command => $cmd, verbose => 0 );
-
-    my $out = @{$stdout_buf // []}[0] // '';
-
-    chomp($out);
-
-    return $out;
+sub prepare_lddlflags {
+    my ($lddlflags) = @_;
+    # `-Wl,-z,now` breaks static linking to libmariadbclient.a, and
+    # the perl you get from pacman in ArchLinux has that by default
+    # in lddlflags.
+    $lddlflags =~ s<,-z[,= ]now><>g;
+    $lddlflags =~ s<,--as-needed\b><>g;
+    $lddlflags =~ s<-Wl\s>< >g; # did we remove every linker option?
+    return $lddlflags;
 }
 
 write_config_for_tests($opt);
 
-my @wanted_libs = qw( ssl crypto iconv  );
-
-my ($libs, $inc, $ccflags, $lddlflags) = map $_//'',@Config{qw/libs inc ccflags lddlflags/};
-
-# Perl might want to compile using -lgdbm or somesuch, but
-# no such file may exist on this system.  So so some sleuthing.
-my $cleaned_libs = "";
-foreach my $lib ( split / /, $libs ) {
-    if ( $lib !~ /\A-l/ ) {
-        $cleaned_libs .= "$lib ";
-        next;
-    }
-
-    my $wanted_lib = $lib;
-    $wanted_lib =~ s/-l//;
-
-    my @wanted_so = libname_to_so_names($wanted_lib);
-
-    next unless @wanted_so;
-    next unless find_libpath_for(@wanted_so);
-
-    $cleaned_libs .= "$lib ";
-}
-$libs = $cleaned_libs;
-
 $opt->{static_link_to_mariadbclient} //= 1;
 
+my $ccflags   = $Config{ccflags} // '';
+my $lddlflags = prepare_lddlflags($Config{lddlflags} // '');
+
+my ($libs, $cflags);
 if ( $opt->{static_link_to_mariadbclient} ) {
-    my @needed_libs = qw( mariadbclient );
-
-    my $ext = $Config{lib_ext};
-    my @libfilenames = map {
-        ( "lib${_}${ext}", "${_}${ext}" )
-    } @needed_libs;
-
-    my @libpaths = find_libpath_for(@libfilenames);
-
-    LIB:
-    foreach my $path (@libpaths) {
-        PATH:
-        foreach my $lib (@libfilenames) {
-            my $file = File::Spec->catfile($path, $lib);
-            next unless -f $file;
-            $libs      .= " -L$path -lmariadbclient";
-            next LIB;
-        }
-    }
+    $libs   = Alien::libmariadbclient->libs_static   || Alien::libmariadbclient->libs;
+    $cflags = Alien::libmariadbclient->cflags_static || Alien::libmariadbclient->cflags;
 }
 else {
-    push @wanted_libs, 'mariadbclient';
-
-    if ( can_run('mariadb_config') ) {
-        # woo!
-        $libs    .= ' ' . run_grab_output([qw/mariadb_config --libs_r/]);
-        $inc     .= ' ' . run_grab_output([qw/mariadb_config --include/]);
-        $ccflags .= ' ' . run_grab_output([qw/mariadb_config --cflags/]);
-    }
+    $libs   = Alien::libmariadbclient->libs;
+    $cflags = Alien::libmariadbclient->cflags;
 }
 
-LIB:
-foreach my $wanted_lib (@wanted_libs) {
-    my @libs_as_paths = libname_to_so_names($wanted_lib);
+# Work around a cmake/OSX bug; -lz gets transformed into
+#   -l/path/to/libz.tbd
+# on systems that have Apple's "built-in dynamic linker cache";
+# so transform it into just a full path.
+$libs =~ s<\B-l/></>g;
 
-    foreach my $lib ( @libs_as_paths ) {
-        my ($libpath) = find_libpath_for($lib);
-        next unless $libpath;
+my $makemaker_libs = [];
+my $makemaker_inc  = '';
 
-        $ccflags .= ' -L'.$libpath;
-        $libs    .= ' -l'.$wanted_lib;
-
-        next LIB;
+my @archive_after;
+my $lib_ext = $Config{lib_ext};
+my $found_libmariadbclient_a = 0;
+foreach my $maybe_lib ( shellwords($libs) ) {
+    if ( $maybe_lib =~ m/\B-l(\S+)/ ) {
+        # -lfoo
+        push @$makemaker_libs, $maybe_lib;
+    }
+    elsif ( $maybe_lib =~ m<-L(\S+)> ) {
+        my $lib_dir = $1;
+        # /path/to/libs
+        # add '-Wl,-rpath=$dir'
+        $libs = '-Wl,-rpath,' . $lib_dir . ' ' . $libs;
+        if ( $opt->{static_link_to_mariadbclient} && !$found_libmariadbclient_a ) {
+            # if we are statically linking, don't leave it up to the linker to
+            # use the libmariadbclient.a file -- explicitly pass it:
+            my $libmariadb = File::Spec->catfile($lib_dir, 'libmariadbclient' . $lib_ext);
+            if ( -e $libmariadb ) {
+                $found_libmariadbclient_a = 1;
+                push @archive_after, $libmariadb;
+            }
+        }
+    }
+    elsif ( $maybe_lib =~ m<^/.+$lib_ext$> ) {
+        # .a file in pkg-config --libs output -- this needs to come after the -o
+        push @archive_after, $maybe_lib;
     }
 }
+$lddlflags .= ' ' . $libs;
 
-$inc = join " ", map('-I'.$_, find_incpath_for('mysql.h')), $inc;
+if ($found_libmariadbclient_a) {
+    $_ =~ s/\B-lmariadb\b/-lmariadbclient/g
+        for $lddlflags, @$makemaker_libs; # static library has a different name!
+}
+
+foreach my $maybe_inc ( shellwords($cflags) ) {
+    next unless $maybe_inc =~ m/\B-I(\S+)/;
+    my $inc = $1;
+    $makemaker_inc .= $inc;
+}
+$ccflags .= ' ' . $cflags;
 
 WriteMakefile(
     NAME             => 'MariaDB::NonBlocking',
@@ -328,18 +154,22 @@ WriteMakefile(
     MIN_PERL_VERSION => '5.006',
     CONFIGURE_REQUIRES => {
         'ExtUtils::MakeMaker' => '0',
+        'Alien::libmariadbclient' => '0.01',
     },
     BUILD_REQUIRES => {
         'Test::More' => '0',
     },
     PREREQ_PM => {
-        #'ABC'              => '1.6',
-        #'Foo::Bar::Module' => '5.0401',
+        'AnyEvent'             => '0',
+        'Ref::Util'            => '0',
+        'Sub::StrictDecl'      => '0',
+        'AnyEvent::XSPromises' => '0',
     },
-    LIBS    => $libs,
-    INC     => $inc,
+    LIBS    => $makemaker_libs,
+    INC     => $makemaker_inc,
     CCFLAGS   => $ccflags,
     LDDLFLAGS => $lddlflags,
+    PERL_ARCHIVE_AFTER => join(' ', @archive_after),
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => [
         'MariaDB-NonBlocking-*',

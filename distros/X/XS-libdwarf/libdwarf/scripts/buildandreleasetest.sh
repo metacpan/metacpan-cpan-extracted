@@ -1,21 +1,26 @@
 #!/bin/sh
 #  A script verifying the distribution gets all needed files
-#  for building, including 'make check'
+#  for building, including "make check"
 # First, get the current configure.ac version into v:
-
 # if stdint.h does not define uintptr_t and intptr_t
 # Then dwarfgen (being c++) will not build
 # Use --disable-libelf to disable reliance on libelf
 # and dwarfgen.
 # To just eliminate dwarfgen build/test/install use --disable-dwarfgen.
+
 genopta="--enable-dwarfgen"
 genoptb="-DBUILD_DWARFGEN=ON"
 libelfopt=''
 wd=`pwd`
 nonstdprintf=
+# If passes, remove the /tmp/bart working directory.
+# Useful to consider if all intended files actually present,
+# including any possibly not used.
+savebart=n
 while [ $# -ne 0 ]
 do
   case $1 in
+   --savebart ) savebart=y ; shift  ;;
    --disable-libelf ) genopta='' ; genoptb='' 
         libelfopt=$1 ; shift ;;
    --enable-libelf )  shift  ;;
@@ -24,7 +29,7 @@ do
    * ) echo "Unknown buildandreleasetest.sh option $1. Error." ; exit 1 ;;
   esac
 done
-
+echo "savebart flag about temp files:...: $savebart"
 if [ -f ./configure.ac ]
 then
   f=./configure.ac
@@ -44,189 +49,144 @@ then
    echo FAIL did not get configure.ac version
    exit 1
 fi
+
+chkres() {
+  if [ $1 -ne 0 ]
+  then
+    echo "$2"
+    exit 1
+  fi
+}
+
+mdirs() {
+while [ $# -ne 0 ]
+do
+  f=$1
+  rm -rf $f
+  mkdir $f
+  chkres $? "mkdir $f failed!"
+  shift
+done
+}
+
+safecd() {
+  f=$1
+  cd $f
+  chkres $? "cd $f failed $2" 
+}
+safemv() {
+  s=$1
+  t=$2 
+  echo "mv $s $t"
+  mv $s $t
+  chkres $?  "mv $f $t failed  $3"
+}
+
 configloc=$wd/configure
+bart=/tmp/bart
+abld=$bart/a-dwbld
+ainstall=$bart/a-install
+binstrelp=$bart/a-installrelp
+binstrelbld=$bart/b-installrelbld
+blibsrc=$bart/b-libsrc
+crelbld=$bart/c-installrelbld
+cinstrelp=$bart/c-installrelp
+dbigend=$bart/d-bigendian
+ecmakebld=$bart/e-cmakebld
+mdirs $bart $abld $ainstall $binstrelp $binstrelbld $crelbld
+mdirs $cinstrelp $dbigend $ecmakebld 
+relset=$bart/a-gzfilelist
+atfout=$bart/a-tarftout
+btfout=$bart/b-tarftout
 
-
-rm -rf /tmp/dwbld
-rm -rf /tmp/dwinstall
-rm -rf /tmp/dwinstallrel
-rm -rf /tmp/dwinstallrelbld
-rm -rf /tmp/dwbigendianbld
-rm -rf /tmp/dwinstallrelbldall
-rm -f /tmp/dwrelease.tar.gz
-rm -rf /tmp/dwreleasebld
-rm -rf /tmp/cmakebld
-mkdir  /tmp/dwbld
-if [ $? -ne 0 ] 
-then
-   echo FAIL A1 mkdir
-   exit 1
-fi
-mkdir /tmp/dwinstall
-if [ $? -ne 0 ] 
-then
-   echo FAIL A2 mkdir
-   exit 1
-fi
-mkdir /tmp/dwinstallrel
-if [ $? -ne 0 ] 
-then
-   echo FAIL A3 mkdir
-   exit 1
-fi
-mkdir /tmp/dwinstallrelbld
-if [ $? -ne 0 ] 
-then
-   echo FAIL A3b mkdir
-   exit 1
-fi
-mkdir /tmp/dwinstallrelbldall
-if [ $? -ne 0 ] 
-then
-   echo FAIL A3c mkdir /tmp/dwinstallrelbldall
-   exit 1
-fi
-
-mkdir /tmp/dwbigendianbld
-if [ $? -ne 0 ] 
-then
-   echo FAIL A3bigend mkdir /tmp/dwbigendianbld
-   exit 1
-fi
-
-mkdir /tmp/cmakebld
-if [ $? -ne 0 ] 
-then
-   echo FAIL A3d mkdir /tmp/cmakebld
-   exit 1
-fi
-
+arelgz=$bart/a-dwrelease.tar.gz
+brelgz=$bart/b-dwrelease.tar.gz
+rm -rf $bart/a-dwrelease
+rm -rf $blibsrc
+rm -rf $arelgz
 echo "dirs created empty"
-echo cd /tmp/dwbld
-cd /tmp/dwbld
-if [ $? -ne 0 ]
-then
-  echo FAIL A cd $v
-      exit 1
-fi
-echo "now: $configloc --prefix=/tmp/dwinstall $libelfopt $nonstdprintf"
-$configloc --prefix=/tmp/dwinstall $libelfopt $nonstdprintf
-if [ $? -ne 0 ]
-then
-  echo FAIL A4a configure fail
-  exit 1
-fi
-echo "TEST: initial (dwinstall) make install"
+
+echo cd $abld
+safecd $abld "FAIL A cd failed"
+echo "now: $configloc --prefix=$ainstall $libelfopt $nonstdprintf"
+$configloc --prefix=$ainstall $libelfopt $nonstdprintf
+chkres $? "FAIL A4a configure fail"
+echo "TEST Section A: initial $ainstall make install"
 make install
-if [ $? -ne 0 ]
-then
-  echo FAIL A4b make install 
-  exit 1
-fi
-ls -lR /tmp/dwinstall
+chkres $? "FAIL Secton A 4b make install"
+ls -lR $ainstall
 make dist
-ls -1 *tar.gz >/tmp/dwrelset
-ct=`wc < /tmp/dwrelset`
-echo "count of gz files $ct"
-cp *.tar.gz /tmp/dwrelease.tar.gz
-cd /tmp
-if [ $? -ne 0 ]
-then
-  echo FAIL B2  cd /tmp
-  exit 1
-fi
-tar -zxf /tmp/dwrelease.tar.gz
-ls -d *dw*
-################
-echo "TEST: now cd libdwarf-$v for second build install"
-cd /tmp/dwinstallrelbld
-if [ $? -ne 0 ]
-then
-  echo FAIL C cd /tmp/dwinstallrelbld
-      exit 1
-fi
-echo "TEST: now second install install, prefix /tmp/dwinstallrel"
-echo "TEST: Expecting src in /tmp/libdwarf-$v"
-/tmp/libdwarf-$v/configure --enable-wall --prefix=/tmp/dwinstallrel $libelfopt $nonstdprintf
-if [ $? -ne 0 ]
-then
-  echo FAIL C2  configure fail
-  exit 1
-fi
-echo "TEST: In dwinstallrelbld make install from /tmp/libdwarf-$v/configure"
+chkres $? "FAIL make dist Section A" 
+# We know there is just one tar.gz in $abld, that we just created
+ls -1 ./*tar.gz 
+chkres $? "FAIL Section A  ls ./*tar.gz"
+safemv ./*.tar.gz $arelgz "FAIL Section A moving gz"
+ls -l $arelgz
+tar -zxf $arelgz
+chkres $? "FAIL B2tar tar -zxf $arelgz"
+safemv  libdwarf-$v $blibsrc "FAIL moving libdwarf srcdir"
+echo "  End Section A  $bart"
+################ End Section A
+################ Start Section B
+echo "TEST Section B: now cd $binstrelbld for second build install"
+safecd $binstrelbld "FAIL C cd"
+echo "TEST: now second install install, prefix $binstrelp"
+echo "TEST: Expecting src in $blibsrc"
+$blibsrc/configure --enable-wall --enable-dwarfgen --enable-dwarfexample --prefix=$binstrelp $libelfopt $nonstdprintf
+chkres $? "FAIL configure fail in Section B"
+echo "TEST: In $binstrelbld make install from $blibsrc/configure"
 make install
-if [ $? -ne 0 ]
-then
-  echo FAIL C3  final install fail
-  exit 1
-fi
-ls -lR /tmp/dwinstallrel
+chkres $? "FAIL Section B install fail"
+ls -lR $binstrelp
 echo "TEST: Now lets see if make check works"
 make check
-if [ $? -ne 0 ]
-then
-  echo FAIL make check C4 
-  exit 1
-fi
-################
+chkres $? "FAIL make check in Section B"
+make dist
+chkres $? "FAIL make dist  Section B"
+# We know there is just one tar.gz in $abld, that we just created
+ls -1 ./*tar.gz
+safemv ./*.tar.gz $brelgz "FAIL Section B moving gz"
+ls -l $arelgz
+ls -l $brelgz
+# gzip does not build diffs quite identically to the byte.
+# Lots of diffs, So we do tar tf to get the file name list. 
+echo "Now tar -tf on $arelgz and $brelgz "
+tar -tf $arelgz > $atfout
+tar -tf $brelgz > $btfout
+echo "Now diff the respective -tf output file lists"
+diff $atfout $btfout
+chkres $? "FAIL second gen tar gz file list does not match first gen"
+echo "  End Section B  $bart"
+################ End section B
 
-################
-echo "TEST: now cd libdwarf-$v for big-endian build (not runnable) "
+################ Start section C
+echo "TEST Section C: now cd $dbigend for big-endian build (not runnable) "
 
-cd /tmp/dwbigendianbld
-if [ $? -ne 0 ]
-then
-  echo FAIL C be1 /tmp/dwbigendianbld
-  exit 1
-fi
-echo "TEST: now second install install, prefix /tmp/dwinstallrel"
-echo "TEST: Expecting src in /tmp/libdwarf-$v"
-echo "TEST: /tmp/libdwarf-$v/configure $genopta --enable-wall --enable-dwarfexample --prefix=/tmp/dwinstallrel $libelfopt $nonstdprintf"
-/tmp/libdwarf-$v/configure $genopta --enable-wall --enable-dwarfexample --prefix=/tmp/dwinstallrel $libelfopt $nonstdprintf
-if [ $? -ne 0 ]
-then
-  echo FAIL be2  configure fail
-  exit 1
-fi
+safecd $dbigend "FAIL C be1 "
+echo "TEST: now second install install, prefix $crelbld"
+echo "TEST: Expecting src in $blibsrc"
+echo "TEST: $blibsrc/configure $genopta --enable-wall --enable-dwarfexample --prefix=$crelbld $libelfopt $nonstdprintf"
+$blibsrc/configure $genopta --enable-wall --enable-dwarfexample --prefix=$cinstrelp $libelfopt $nonstdprintf
+chkres $? "FAIL be2  configure fail"
 echo "#define WORDS_BIGENDIAN 1" >> config.h
-echo "TEST: Compile In dwbigendianbld make from /tmp/libdwarf-$v/configure"
+echo "TEST: Compile In $dbigend make from $blibsrc/configure"
 make
-if [ $? -ne 0 ]
-then
-  echo FAIL be3  Build failed
-  exit 1
-fi
-################
+chkres $? "FAIL be3  Build failed"
+echo "  End Section C  $bart"
+################ End section C
 
-
-
-cd /tmp/dwinstallrelbldall
-if [ $? -ne 0 ]
-then
-  echo FAIL Ca cd /dwinstallrelbldall
-  exit 1
-fi
-echo "TEST: Now configure from source dir /tmp/libdwarf-$v/ in build dir /tmp/dwinstallrelbldall"
-/tmp/libdwarf-$v/configure --enable-wall --enable-dwarfexample $genopta
+################ Start section D
+safecd $crelbld "FAIL section D cd "
+echo "TEST: Now configure from source dir $blibsrc/ in build dir $crelbld"
+$blibsrc/configure --enable-wall --enable-dwarfexample $genopta
 $nonstdprintf
-if [ $? -ne 0 ]
-then
-  echo FAIL C9  /tmp/libdwarf-$v/configure 
-  exit 1
-fi
+chkres $? "FAIL C9  $blibsrc/configure"
 make
-if [ $? -ne 0 ]
-then
-  echo FAIL C9  /tmp/libdwarf-$v/configure  make
-  exit 1
-fi
-cd /tmp/cmakebld
-if [ $? -ne 0 ]
-then
-  echo FAIL C10  cd /tmp/cmakebld
-  exit 1
-fi
-
+chkres $? "FAIL C9  $blibsrc/configure  make"
+echo "  End Section D  $bart"
+################### End Section D
+################### Cmake test E
+safecd $ecmakebld "FAIL C10 Section E cd"
 havecmake=n
 which cmake >/dev/null
 if [ $? -eq 0 ]
@@ -234,35 +194,27 @@ then
   havecmake=y
   echo "We have cmake and can test it."
 fi
-
 if [ $havecmake = "y" ]
 then
-  echo "TEST: Now cmake from source dir /tmp/libdwarf-$v/ in build dir /tmp/cmakebld"
-  cmake $genoptb -DWALL=ON -DBUILD_DWARFEXAMPLE=ON -DDO_TESTING=ON /tmp/libdwarf-$v/
-  if [ $? -ne 0 ]
-  then
-    echo "FAIL C10b  cmake in /tmp/cmakebld"
-    exit 1
-  fi
+  echo "TEST: Now cmake from source dir $blibsrc/ in build dir  $ecmakebld"
+  cmake $genoptb -DWALL=ON -DBUILD_DWARFEXAMPLE=ON -DDO_TESTING=ON $blibsrc
+  chkres $? "FAIL C10b  cmake in $ecmakdbld"
   make
-  if [ $? -ne 0 ]
-  then
-    echo "FAIL C10c  cmake make in /tmp/cmakebld"
-    exit 1
-  fi
+  chkres $? "FAIL C10c  cmake make in $ecmakebld"
   make test
-  if [ $? -ne 0 ]
-  then
-    echo "FAIL C10d  cmake make test in /tmp/cmakebld"
-    exit 1
-  fi
+  chkres $? "FAIL C10d  cmake make test in $ecmakebld"
   ctest -R self
-  if [ $? -ne 0 ]
-  then
-    echo "FAIL C10e  ctest -R self in /tmp/cmakebld"
-    exit 1
-  fi
+  chkres $? "FAIL C10e  ctest -R self in $ecmakebld"
 else
   echo "cmake is not installed so not tested."
+fi
+echo " End Section E  $bart (ls output follows)"
+ls  $bart
+############ End Section E
+
+echo "PASS scripts/buildandreleasetest.sh"
+if [ "$savebart" = "n" ]
+then
+  rm -rf $bart
 fi
 exit 0

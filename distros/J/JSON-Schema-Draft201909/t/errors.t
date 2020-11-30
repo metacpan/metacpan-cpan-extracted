@@ -712,9 +712,9 @@ subtest 'exceptions' => sub {
       valid => bool(0),
       errors => [
         {
-          instanceLocation => '/x',
+          instanceLocation => '',
           keywordLocation => '/allOf/0/properties/x',
-          error => 'EXCEPTION: invalid schema type: number',
+          error => 'invalid schema type: number',
         },
       ],
     },
@@ -737,7 +737,7 @@ subtest 'exceptions' => sub {
         {
           instanceLocation => '',
           keywordLocation => '/allOf/0/type',
-          error => 'EXCEPTION: unrecognized type "whargarbl"',
+          error => 'unrecognized type "whargarbl"',
         },
       ],
     },
@@ -907,7 +907,7 @@ subtest 'abort due to a schema error' => sub {
         {
           instanceLocation => '',
           keywordLocation => '/oneOf/2/type',
-          error => 'EXCEPTION: unrecognized type "whargarbl"',
+          error => 'unrecognized type "whargarbl"',
         },
       ],
     },
@@ -967,61 +967,59 @@ subtest 'sorted property names' => sub {
 };
 
 subtest 'bad regex in schema' => sub {
+  cmp_deeply(
+    $js->evaluate(
+      {
+        my_pattern => 'foo',
+        my_patternProperties => { foo => 1 },
+      },
+      {
+        type => 'object',
+        properties => {
+          my_pattern => {
+            type => 'string',
+            pattern => '(',
+          },
+          my_patternProperties => {
+            type => 'object',
+            patternProperties => { '(' => true },
+            additionalProperties => false,
+          },
+          my_runtime_pattern => {
+            type => 'string',
+            pattern => '\p{main::IsFoo}', # qr/$pattern/ will not find this error, but m/$pattern/ will
+          },
+        },
+      },
+    )->TO_JSON,
+    {
+      valid => bool(0),
+      errors => [
+        {
+          instanceLocation => '',
+          keywordLocation => '/properties/my_pattern/pattern',
+          error => re(qr/^Unmatched \( in regex/),
+        },
+        {
+          instanceLocation => '',
+          keywordLocation => '/properties/my_patternProperties/patternProperties/(',
+          error => re(qr/^Unmatched \( in regex/),
+        },
+        # Note no error for missing IsFoo
+      ],
+    },
+    'bad "pattern" and "patternProperties" regexes are properly noted in error',
+  );
+
   my $schema = {
     type => 'object',
     properties => {
-      my_pattern => {
-        type => 'string',
-        pattern => '(',
-      },
-      my_patternProperties => {
-        type => 'object',
-        patternProperties => { '(' => true },
-        additionalProperties => false,
-      },
       my_runtime_pattern => {
         type => 'string',
         pattern => '\p{main::IsFoo}', # qr/$pattern/ will not find this error, but m/$pattern/ will
       },
     },
   };
-
-  cmp_deeply(
-    $js->evaluate(
-      { my_pattern => 'foo' },
-      $schema,
-    )->TO_JSON,
-    {
-      valid => bool(0),
-      errors => [
-        {
-          instanceLocation => '/my_pattern',
-          keywordLocation => '/properties/my_pattern/pattern',
-          error => re(qr/^EXCEPTION: Unmatched \( in regex/),
-        },
-      ],
-    },
-    'bad "pattern" regex is properly noted in error',
-  );
-
-  cmp_deeply(
-    $js->evaluate(
-      { my_patternProperties => { foo => 1 } },
-      $schema,
-    )->TO_JSON,
-    {
-      valid => bool(0),
-      errors => [
-        {
-          instanceLocation => '/my_patternProperties',
-          keywordLocation => '/properties/my_patternProperties/patternProperties/(',
-          error => re(qr/^EXCEPTION: Unmatched \( in regex/),
-        },
-      ],
-    },
-    'bad "patternProperties" regex is properly noted in error',
-  );
-
   cmp_deeply(
     $js->evaluate(
       { my_runtime_pattern => 'foo' },
@@ -1031,15 +1029,15 @@ subtest 'bad regex in schema' => sub {
       valid => bool(0),
       errors => [
         {
-          instanceLocation => '/my_runtime_pattern',
-          keywordLocation => '/properties/my_runtime_pattern/pattern',
+          instanceLocation => '',
+          keywordLocation => '',
           # in 5.28 and earlier: Can't find Unicode property definition "IsFoo"
           # in 5.30 and later:   Unknown user-defined property name \p{main::IsFoo}
           error => re(qr/^EXCEPTION: .*property.*IsFoo/),
         },
       ],
     },
-    'bad "pattern" regex is properly noted in error',
+    'bad "pattern" regex is properly noted in error, but locations are lost because this is an exceptional error',
   );
 
   no warnings 'once';
@@ -1178,10 +1176,9 @@ subtest 'JSON pointer escaping' => sub {
       valid => bool(0),
       errors => [
         {
-          instanceLocation => '/{}',
-          keywordLocation => '/$ref/properties/{}/patternProperties/(',
-          absoluteKeywordLocation => '#/$defs/mydef/properties/%7B%7D/patternProperties/(',
-          error => re(qr{^\QEXCEPTION: Unmatched ( in regex; marked by <-- HERE in m/( <-- HERE\E}),
+          instanceLocation => '',
+          keywordLocation => '/$defs/mydef/properties/{}/patternProperties/(',
+          error => re(qr{^\QUnmatched ( in regex; marked by <-- HERE in m/( <-- HERE\E}),
         },
       ],
     },
@@ -1207,7 +1204,7 @@ subtest 'invalid $schema' => sub {
         {
           instanceLocation => '',
           keywordLocation => '/allOf/1/$schema',
-          error => 'EXCEPTION: $schema can only appear at the schema resource root',
+          error => '$schema can only appear at the schema resource root',
         },
       ],
     },
@@ -1232,7 +1229,7 @@ subtest 'invalid $schema' => sub {
           instanceLocation => '',
           keywordLocation => '/allOf/1/$schema',
           absoluteKeywordLocation => 'https://bloop.com#/allOf/1/$schema',
-          error => 'EXCEPTION: $schema can only appear at the schema resource root',
+          error => '$schema can only appear at the schema resource root',
         },
       ],
     },
@@ -1277,13 +1274,13 @@ subtest 'invalid $schema' => sub {
       errors => [
         {
           instanceLocation => '',
-          keywordLocation => '/$ref/$schema',
+          keywordLocation => '/$defs/my_def/$schema',
           absoluteKeywordLocation => 'https://bloop3.com#/$defs/my_def/$schema',
-          error => 'EXCEPTION: $schema can only appear at the schema resource root',
+          error => '$schema can only appear at the schema resource root',
         },
       ],
     },
-    '$state->{schema_path} is empty, but this is still not a resource root',
+    'this is still not a resource root, even in a $ref target',
   );
 };
 

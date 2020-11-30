@@ -7,16 +7,16 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: Mageia\n"
-"POT-Creation-Date: 2020-01-18 09:59+0200\n"
-"PO-Revision-Date: 2015-02-13 05:26+0000\n"
+"POT-Creation-Date: 2020-07-10 17:41+0100\n"
+"PO-Revision-Date: 2020-07-10 16:45+0000\n"
 "Last-Translator: Yuri Chornoivan <yurchor@ukr.net>\n"
-"Language-Team: Icelandic (http://www.transifex.com/projects/p/mageia/"
+"Language-Team: Icelandic (http://www.transifex.com/MageiaLinux/mageia/"
 "language/is/)\n"
 "Language: is\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8-bit\n"
-"Plural-Forms: nplurals=2; plural=(n % 10 == 1 || n % 100 != 11);\n"
+"Plural-Forms: nplurals=2; plural=(n % 10 != 1 || n % 100 == 11);\n"
 
 #: ../gurpm/RPMProgressDialog.pm:47
 #, c-format
@@ -63,7 +63,7 @@ msgstr "Sæki pakka `%s'..."
 msgid "Cancel"
 msgstr "Hætta við"
 
-#: ../gurpm/RPMProgressDialog.pm:359 ../urpm.pm:452 ../urpm/download.pm:882
+#: ../gurpm/RPMProgressDialog.pm:359 ../urpm.pm:454 ../urpm/download.pm:882
 #: ../urpm/get_pkgs.pm:277 ../urpm/media.pm:1149 ../urpm/media.pm:1682
 #: ../urpm/media.pm:1833
 #, c-format
@@ -276,7 +276,7 @@ msgstr ""
 "%s\n"
 "Halda samt áfram með uppsetningu?"
 
-#: ../gurpmi2:120
+#: ../gurpmi2:120 ../gurpmi2:386
 #, c-format
 msgid "Warning"
 msgstr "Aðvörun"
@@ -336,7 +336,7 @@ msgstr "%s af gögnum verður sótt."
 #, c-format
 msgid "Proceed with the installation of one package?"
 msgid_plural "Proceed with the installation of the %d packages?"
-msgstr[0] "Halda áfram með uppsetningu á einum pakka?"
+msgstr[0] "Halda áfram með uppsetningu á %d pakka?"
 msgstr[1] "Halda áfram með uppsetningu á %d pökkum?"
 
 #: ../gurpmi2:259 ../urpmi:608
@@ -405,6 +405,16 @@ msgstr "Innsetningu lokið"
 msgid "restarting urpmi"
 msgstr "endurræsi urpmi"
 
+#: ../gurpmi2:386
+#, c-format
+msgid "No"
+msgstr "Nei"
+
+#: ../gurpmi2:386
+#, c-format
+msgid "Yes"
+msgstr "Já"
+
 #: ../rpm-find-leaves:15
 #, c-format
 msgid ""
@@ -454,139 +464,139 @@ msgstr "Keyri urpmi í vernduðum ham..."
 msgid "While some packages may have been installed, there were failures.\n"
 msgstr ""
 
-#: ../urpm.pm:193
+#: ../urpm.pm:195
 #, c-format
 msgid "fail to create directory %s"
 msgstr "get ekki búið til möppu %s"
 
-#: ../urpm.pm:194
+#: ../urpm.pm:196
 #, c-format
 msgid "invalid owner for directory %s"
 msgstr "ógildur eigandi möppu %s"
 
-#: ../urpm.pm:237
+#: ../urpm.pm:239
 #, c-format
 msgid "Can not download packages into %s"
 msgstr "Get ekki sótt pakka í möppu %s"
 
-#: ../urpm.pm:253
+#: ../urpm.pm:255
 #, c-format
 msgid "Environment directory %s does not exist"
 msgstr "Umhverfismappa %s er ekki til"
 
-#: ../urpm.pm:254 ../urpmf:244 ../urpmq:163
+#: ../urpm.pm:256 ../urpmf:244 ../urpmq:163
 #, c-format
 msgid "using specific environment on %s\n"
 msgstr "nota tilgreint umhverfi á %s\n"
 
-#: ../urpm.pm:422
+#: ../urpm.pm:424
 #, c-format
 msgid "unable to open rpmdb"
 msgstr "gat ekki opnað rpmdb"
 
-#: ../urpm.pm:441
+#: ../urpm.pm:443
 #, c-format
 msgid "invalid rpm file name [%s]"
 msgstr "ógilt rpm skráarnafn [%s]"
 
-#: ../urpm.pm:447
+#: ../urpm.pm:449
 #, c-format
 msgid "retrieving rpm file [%s] ..."
 msgstr "sæki rpm skrá [%s] ..."
 
-#: ../urpm.pm:449 ../urpm/get_pkgs.pm:275
+#: ../urpm.pm:451 ../urpm/get_pkgs.pm:275
 #, c-format
 msgid "...retrieving done"
 msgstr "...niðurhali lokið"
 
-#: ../urpm.pm:457
+#: ../urpm.pm:459
 #, c-format
 msgid "unable to access rpm file [%s]"
 msgstr "get ekki lesið rpm skrá [%s]"
 
-#: ../urpm.pm:462
+#: ../urpm.pm:464
 #, c-format
 msgid "unable to parse spec file %s [%s]"
 msgstr "get ekki unnið úr spec skrá %s [%s]"
 
-#: ../urpm.pm:470
+#: ../urpm.pm:472
 #, c-format
 msgid "unable to register rpm file"
 msgstr "gat ekki skráð rpm skrá"
 
-#: ../urpm.pm:472
+#: ../urpm.pm:474
 #, c-format
 msgid "Incompatible architecture for rpm [%s]"
 msgstr "ósamhæfður vélbúnaður fyrir rpm [%s]"
 
-#: ../urpm.pm:476
+#: ../urpm.pm:478
 #, c-format
 msgid "error registering local packages"
 msgstr "villa við að skrá staðbundna pakka"
 
-#: ../urpm.pm:588
+#: ../urpm.pm:590
 #, c-format
 msgid "This operation is forbidden while running in restricted mode"
 msgstr "Þessi aðgerð er bönnuð þegar keyrt er í vernduðum ham"
 
-#: ../urpm/args.pm:156 ../urpm/args.pm:165
+#: ../urpm/args.pm:157 ../urpm/args.pm:166
 #, c-format
 msgid "bad proxy declaration on command line\n"
 msgstr "röng staðgengils-skilgreining á skipanalínu\n"
 
-#: ../urpm/args.pm:320
+#: ../urpm/args.pm:321
 #, c-format
 msgid "urpmq: cannot read rpm file \"%s\"\n"
 msgstr "urpmq: get ekki lesið rpm skrá \"%s\"\n"
 
-#: ../urpm/args.pm:388
+#: ../urpm/args.pm:389
 #, c-format
 msgid "unexpected expression %s"
 msgstr "óvænt segð %s"
 
-#: ../urpm/args.pm:389
+#: ../urpm/args.pm:390
 #, c-format
 msgid "missing expression before %s"
 msgstr "Vantar segð á undan %s"
 
-#: ../urpm/args.pm:395
+#: ../urpm/args.pm:396
 #, c-format
 msgid "unexpected expression %s (suggestion: use -a or -o ?)"
 msgstr "óvænt segð %s (tillaga: notið -a eða -o ?)"
 
-#: ../urpm/args.pm:399
+#: ../urpm/args.pm:400
 #, c-format
 msgid "no expression to close"
 msgstr "engin segð sem ætti að loka"
 
-#: ../urpm/args.pm:408
+#: ../urpm/args.pm:409
 #, c-format
 msgid "by default urpmf awaits a regexp. you should use option \"--literal\""
 msgstr ""
 "sjálfgefið væntir urpmf reglulegrar segðar (regexp) þú ættir að nota valkost "
 "\"--literal\""
 
-#: ../urpm/args.pm:482
+#: ../urpm/args.pm:483
 #, c-format
 msgid "chroot directory doesn't exist"
 msgstr "chroot mappa er ekki til"
 
-#: ../urpm/args.pm:505
+#: ../urpm/args.pm:506
 #, c-format
 msgid "Can't use %s without %s"
 msgstr "Get ekki notað %s án %s"
 
-#: ../urpm/args.pm:508 ../urpm/args.pm:511 ../urpmq:155
+#: ../urpm/args.pm:509 ../urpm/args.pm:512 ../urpmq:155
 #, c-format
 msgid "Can't use %s with %s"
 msgstr "Get ekki notað %s með %s"
 
-#: ../urpm/args.pm:519
+#: ../urpm/args.pm:520
 #, c-format
 msgid "Too many arguments\n"
 msgstr "Of mörg viðföng\n"
 
-#: ../urpm/args.pm:527
+#: ../urpm/args.pm:528
 #, c-format
 msgid ""
 "%s version %s\n"
@@ -602,7 +612,7 @@ msgstr ""
 "\n"
 "notkun:\n"
 
-#: ../urpm/args.pm:533
+#: ../urpm/args.pm:534
 #, c-format
 msgid "Copyright (C) %s by %s"
 msgstr "Höfundaréttur (C) %s %s"
@@ -802,49 +812,49 @@ msgstr "sæki rpm skrá frá miðli \"%s\"..."
 msgid "removing %s"
 msgstr "fjarlægi %s"
 
-#: ../urpm/install.pm:215
+#: ../urpm/install.pm:217
 #, c-format
 msgid "unable to extract rpm from delta-rpm package %s"
 msgstr "gat ekki dregið rpm úr breytinga-rpm pakka %s"
 
-#: ../urpm/install.pm:242
+#: ../urpm/install.pm:245
 #, c-format
 msgid "unable to install package %s"
 msgstr "get ekki sett inn pakka %s"
 
-#: ../urpm/install.pm:245
+#: ../urpm/install.pm:248
 #, c-format
 msgid "removing bad rpm (%s) from %s"
 msgstr "fjarlægi gallað rpm (%s) frá %s"
 
-#: ../urpm/install.pm:246 ../urpm/install.pm:393
+#: ../urpm/install.pm:249 ../urpm/install.pm:397
 #, c-format
 msgid "removing %s failed: %s"
 msgstr "mistókst að fjarlægja %s: %s"
 
-#: ../urpm/install.pm:295
+#: ../urpm/install.pm:298
 #, c-format
 msgid "removing package %s"
 msgstr "fjarlægi pakka %s"
 
-#: ../urpm/install.pm:359
+#: ../urpm/install.pm:362
 #, c-format
 msgid ""
 "created transaction for installing on %s (remove=%d, install=%d, upgrade=%d)"
 msgstr ""
 "bjó til færslu fyrir uppsetningu á %s (fjarlægi=%d, set inn=%d, uppfæri=%d)"
 
-#: ../urpm/install.pm:362
+#: ../urpm/install.pm:365
 #, c-format
 msgid "unable to create transaction"
 msgstr "Gat ekki búið til færslu"
 
-#: ../urpm/install.pm:391
+#: ../urpm/install.pm:395
 #, c-format
 msgid "removing installed rpms (%s) from %s"
 msgstr "fjarlægi uppsett rpm (%s) frá %s"
 
-#: ../urpm/install.pm:400
+#: ../urpm/install.pm:404
 #, c-format
 msgid "More information on package %s"
 msgstr "Meiri upplýsingar um pakka %s"
@@ -1757,7 +1767,7 @@ msgstr "Enga munaðarleysingja er hægt fjarlægja"
 msgid "To satisfy dependencies, the following package will be removed"
 msgid_plural ""
 "To satisfy dependencies, the following %d packages will be removed"
-msgstr[0] "Til að viðhalda samræmi, verður eftirfarandi pakki fjarlægður"
+msgstr[0] "Til að viðhalda samræmi, verður eftirfarandi %d pakki fjarlægður"
 msgstr[1] "Til að viðhalda samræmi, verða eftirtaldir %d pakkar fjarlægðir"
 
 #: ../urpme:151
@@ -3153,7 +3163,7 @@ msgid ""
 msgstr ""
 "engin XML-info skrá fyrir miðil \"%s\", fann engar upplýsingar fyrir pakka %s"
 
-#: ../urpmq:487
+#: ../urpmq:488
 #, c-format
 msgid "No changelog found\n"
 msgstr "Enginn breytilisti fannst\n"

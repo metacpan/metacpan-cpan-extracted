@@ -1,5 +1,9 @@
 Revision history for perl module Lingua::JA::Moji
 
+0.57 2020-11-26
+
+* romaji2hiragana ('xtsu') bug fixed (should produce small tsu)
+
 0.56 2019-03-25
 
 * smallize_kana now handles fa, fi, fe, fo.

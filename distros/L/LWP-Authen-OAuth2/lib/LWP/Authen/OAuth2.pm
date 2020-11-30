@@ -216,9 +216,12 @@ sub refresh_access_token {
             if (not (ref($tokens))) {
                 # Did I get JSON?
                 my $data = eval {decode_json($tokens)};
+
                 if ($data and not $@) {
-                    # Assume I got it.
-                    $tokens = $data;
+                    my $class = $data->{_class} or croak("No _class in token_string '$tokens'");
+                    eval {load($class)};
+                    if ($@) { croak("Can't load access token class '$class': $@"); }
+                    $tokens = $class->from_ref($data);
                 }
             }
             return $self->_set_tokens(tokens => $tokens, skip_save => 1);
@@ -335,8 +338,7 @@ Version 0.15
 
 =cut
 
-our $VERSION = '0.16';
-
+our $VERSION = '0.17';
 
 =head1 SYNOPSIS
 
@@ -649,7 +651,7 @@ tokens too quickly, so this can be important.
 =item C<user_agent =E<gt> $ua,>
 
 What user agent gets used under the hood?  Defaults to a new
-L<lWP::UserAgent> created on the fly.
+L<LWP::UserAgent> created on the fly.
 
 =back
 

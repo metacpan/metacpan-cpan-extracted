@@ -4,7 +4,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = "0.01";
+our $VERSION = "0.04";
 
 use MOP4Import::Base::CLI_JSON -as_base
   , [fields => [eol => default => "\n"]]
@@ -239,7 +239,7 @@ App::oo_modulino_zsh_completion_helper - provides zsh completion for OO-Modulino
 
 =head1 SYNOPSIS
 
-When you install this module and _perl_modulino zsh completer,
+When you install this module and _perl_oo_modulino zsh completer,
 
     ./Your_OO_Modulino.pm <TAB>
 
@@ -254,7 +254,7 @@ inherited methods/options are included too.
 
 =head1 DESCRIPTION
 
-App::oo_modulino_zsh_completion_helper provides underlying implementation of `_perl_modulino` zsh completer.
+App::oo_modulino_zsh_completion_helper provides underlying implementation of `_perl_oo_modulino` zsh completer.
 
 =head1 LICENSE
 

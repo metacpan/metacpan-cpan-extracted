@@ -3,8 +3,8 @@ package PDF::Builder::Docs;
 use strict;
 use warnings;
 
-our $VERSION = '3.019'; # VERSION
-my $LAST_UPDATE = '3.018'; # manually update whenever code is changed
+our $VERSION = '3.020'; # VERSION
+my $LAST_UPDATE = '3.020'; # manually update whenever code is changed
 
 # originally part of Builder.pm, it was split out due to its length
 
@@ -76,9 +76,18 @@ will give you improved speed, the ability to use 16 bit samples, and the
 ability to read interlaced PNG files. See resolved bug report RT 124349, as well
 as C<image_png>, for more information.
 
-Note that the installation process will B<not> attempt to install these 
-libraries automatically. If you wish to use them, you will have to manually 
-initiate the installation of such modules (e.g., with "cpan install").
+B<*> HarfBuzz::Shaper -- This library enables PDF::Builder to handle complex
+scripts (Arabic, Devanagari, etc.) as well as non-LTR writing systems. It is
+also useful for Latin and other simple scripts, for ligatures and improved
+kerning. HarfBuzz::Shaper is based on a set of HarfBuzz libraries, which it
+will attempt to build if they are not found. See C<textHS> for more 
+information.
+
+Note that the installation process B<will> attempt to install these 
+libraries automatically. If you don't wish to use one or more of them, you are
+free to uninstall the optional librarie(s). If one or more failed to install,
+no need to panic -- you simply won't be able to use some advanced features,
+unless you are able to manually install the modules (e.g., with "cpan install").
 
 =head2 Strings (Character Text)
 
@@ -507,7 +516,7 @@ to PDF::Builder, to reduce the chance of confusion due to parallel development.
 Perry's intent is to keep all internal methods as upwardly compatible with
 PDF::API2 as possible, although it is likely that there will be some drift
 (incompatibilities) over time. At least initially, any program written based on 
-PDF::API2 should be convertable to PDF::Builder simply by changing "API2" 
+PDF::API2 should be convertible to PDF::Builder simply by changing "API2" 
 anywhere it occurs to "Builder". See the INFO/KNOWN_INCOMP known 
 incompatibilities file for further information.
 
@@ -521,6 +530,41 @@ C<stringify()>. There is some cleanup and other operations done internally
 which make the object unusable for further operations. You will likely receive
 an error message about B<can't call method new_obj on an undefined value> if
 you try to keep using a PDF object.
+
+=head2 IntegrityCheck 
+
+The PDF::Builder methods that open an existing PDF file, pass it by the
+integrity checker method, C<$self-E<gt>IntegrityCheck(level, content)>. This method
+servers two purposes: 1) to find any C</Version> settings that override the
+PDF version found in the PDF heading, and 2) perform some basic validations on
+the contents of the PDF.
+
+The C<level> parameter accepts the following values:
+
+=over
+
+=item 0 = Do not output any diagnostic messages; just return any version override.
+
+=item 1 = Output error-level (serious) diagnostic messages, as well as returning any version override.
+
+Errors include, in no place was the /Root object specified, or if it was, the indicated object was not found. An object claims another object as its child (/Kids list), but another object has already claimed that child. An object claims a child, but that child does not list a Parent, or the child lists a different Parent.
+
+=item 2 = Output error- (serious) and warning- (less serious) level diagnostic messages, as well as returning any version override. B<This is the default.>
+
+=item 3 = Output error- (serious), warning- (less serious), and note- (informational) level diagnostic messages, as well as returning any version override.
+
+Notes include, in no place was the (optional) /Info object specified, or if it was, the indicated object was not found. An object was referenced, but no entry for it was found among the objects. (This may be OK if the object is not defined, or is on the free list, as the reference will then be ignored.) An object is defined, but it appears that no other object is referencing it.
+
+=item 4 = Output error-, warning-, and note-level diagnostic messages, as well as returning any version override. Also dump the diagnostic data structure.
+
+=item 5 = Output error-, warning-, and note-level diagnostic messages, as well as returning any version override. Also dump the diagnostic data structure and the C<$self> data structure (generally useful only if you have already read in the PDF file).
+
+=back
+
+The version is a string (e.g., '1.5') if found, otherwise C<undef> (undefined value) is returned.
+
+For controlling the "automatic" call to IntegrityCheck (via opens), the level 
+may be given with the option (flag) C<-diaglevel =E<gt> I<n>>, where C<n> is between 0 and 5.
 
 =head2 Preferences - set user display preferences
 
@@ -1617,6 +1661,75 @@ PNG images. See specific information listings for GD, GIF, JPEG, and PNM image
 formats. In addition, see C<examples/Content.pl> for an example of placing an
 image on a page, as well as using in a "Form".
 
+=head3 Why is my image flipped or rotated?
+
+Something not uncommonly seen when using JPEG photos in a PDF is that the 
+images will be rotated and/or mirrored (flipped). This may happen when using
+TIFF images too. What happens is that the camera stores an image just as it
+comes off the CCD sensor, regardless of the camera orientation, and does not
+rotate it to the correct orientation! It I<does> store a separate 
+"orientation" flag to suggest how the image might be corrected, but not all
+image processing obeys this flag (PDF::Builder does B<not>.). For example, if
+you take a "portrait" (tall) photo of a tree (with the phone held vertically), 
+and then use it in a PDF, the tree may appear to have been cut down! (appears 
+in landscape mode)
+
+I have found some code that should allow the C<image_jpeg> or C<image> routine
+to auto-rotate to (supposedly) the correct orientation, by looking for the Exif
+metadata "Orientation" tag in the file. However, three problems arise: 
+B<1)> if a photo has been edited, and rotated or flipped in the process, there is no guarantee that the Orientation tag has been corrected. 
+B<2)> more than one Orientation tag may exist (e.g., in the binary APP1/Exif header, I<and> in XML data), and they may not agree with each other -- which should be used? 
+B<3)> the code would need to uncompress the raster data, swap and/or transpose rows and/or columns, and recompress the raster data for inclusion into the PDF. This is costly and error-prone.
+In any case, the user would need to be able to override any auto-rotate function.
+
+For the time being, PDF::Builder will simply leave it up to the user of the
+library to take care of rotating and/or flipping an image which displays 
+incorrectly. It is possible that we will consider adding some sort of query or warning that the image appears to I<not> be "normally" oriented (Orientation value 1 or "Top-left"), according to the Orientation flag. You can consider either (re-)saving the photo in an editor such as PhotoShop or GIMP, or using PDF::Builder code similar to the following (for images rotated 180 degrees):
+
+    $pW = 612; $pH = 792;  # page dimensions (US Letter)
+    my $img = $pdf->image_jpeg("AliceLake.jpeg");
+    # raw size WxH 4032x3024, scaled down to 504x378
+    $sW = 4032/8; $sH = 3024/8;
+    # intent is to center on US Letter sized page (LL at 54,207)
+    # Orientation flag on this image is 3 (rotated 180 degrees). 
+    # if naively displayed (just $gfx->image call), it will be upside down
+
+    $gfx->save();
+    
+    ## method 0: simple display, is rotated 180 degrees!
+    #$gfx->image($img, ($pW-$sW)/2,($pH-$sH)/2, $sW,$sH);
+
+    ## method 1: translate, then rotate
+    #$gfx->translate($pW,$pH);             # to new origin (media UR corner)
+    #$gfx->rotate(180);                    # rotate around new origin
+    #$gfx->image($img, ($pW-$sW)/2,($pH-$sH)/2, $sW,$sH); 
+                                           # image's UR corner, not LL
+
+    # method 2: rotate, then translate
+    $gfx->rotate(180);                     # rotate around current origin
+    $gfx->translate(-$sW,-$sH);            # translate in rotated coordinates
+    $gfx->image($img, -($pW-$sW)/2,-($pH-$sH)/2, $sW,$sH); 
+                                           # image's UR corner, not LL
+
+    ## method 3: flip (mirror) twice
+    #$scale = 1;  # not rescaling here
+    #$size_page = $pH/$scale;
+    #$invScale = 1.0/$scale;
+    #$gfx->add("-$invScale 0 0 -$invScale 0 $size_page cm");
+    #$gfx->image($img, -($pW-$sW)/2-$sW,($pH-$sH)/2, $sW,$sH);
+
+    $gfx->restore();
+
+If your image is also mirrored (flipped about an axis), simple rotation will
+not suffice. You could do something with a reversal of the coordinate system, as in "method 3" above (see L<PDF::Builder::Content/Advanced Methods>). To mirror only left/right, the second C<$invScale> would be positive; to mirror only top/bottom, the first would be positive. If all else fails, you could save a mirrored copy in a photo editor. 
+90 or 270 degree rotations will require a C<rotate> call, possibly with "cm" usage to reverse mirroring.
+Incidentally, do not confuse this issue with the coordinate flipping performed 
+by some Chrome browsers when printing a page to PDF.
+
+Note that TIFF images may have the same rotation/mirroring problems as JPEG,
+which is not surprising, as the Exif format was lifted from TIFF for use in
+JPEG. The cure will be similar to JPEG's.
+
 =head3 TIFF Images
 
 Note that the Graphics::TIFF support library does B<not> currently permit a 
@@ -1713,7 +1826,7 @@ provided.
 
 =back
 
-=head2 Using Shaper
+=head2 USING SHAPER (HarfBuzz::Shaper library)
 
     # if HarfBuzz::Shaper is not installed, either bail out, or try to
     # use regular TTF calls instead

@@ -1,3 +1,6 @@
+1.0.2  25.11.2020
+           - log levels related changes
+           - fix tests for windows
 1.0.1  30.10.2020
            - libcatch related bump
 1.0.0  26.08.2020

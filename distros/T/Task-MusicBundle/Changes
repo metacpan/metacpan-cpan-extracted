@@ -1,62 +1,66 @@
 Revision history for Task-MusicBundle
 
+0.1900 2020-11-26 19:59:11
+    - Add Music::Duration::Partition.
+    - Add MIDI::Chord::Guitar.
+
 0.1800 2019-08-11 17:40:43
-    - Added Music::Cadence.
+    - Add Music::Cadence.
 
 0.1700 2019-06-06 19:44:44
-    - Added MIDI::Util.
+    - Add MIDI::Util.
 
 0.16 2018-11-17 22:07:20
-    - Added Music::ToRoman.
+    - Add Music::ToRoman.
 
 0.15 2018-09-14 20:09:59
-    - Added MIDI::Ngram.
+    - Add MIDI::Ngram.
 
 0.14 2018-04-06 15:30:42
-    - Added Music::ScaleNote.
+    - Add Music::ScaleNote.
 
 0.13 2018-03-24 19:36:21
-    - Added Guitar::Scale.
+    - Add Guitar::Scale.
 
 0.12 2018-02-22 23:21:49
-    - Added Music::Note::Frequency and Music::Interval::Barycentric
+    - Add Music::Note::Frequency and Music::Interval::Barycentric
 
 0.11 2018-02-22 23:14:07
-    - Added Music::PitchNum and MIDI::Drummer::Tiny
+    - Add Music::PitchNum and MIDI::Drummer::Tiny
 
 0.10 2018-02-22 23:00:30
-    - Added Music::Voss
+    - Add Music::Voss
 
 0.09 2018-02-22 22:46:51
-    - Added Music::Note::Role::Operators
+    - Add Music::Note::Role::Operators
 
 0.08 2017-08-19 06:28:59
-    - Added Csound
+    - Add Csound
 
 0.07 2016-07-16 10:53:40
-    - Added Music::RecRhythm
+    - Add Music::RecRhythm
 
 0.06 2016-04-18 07:27:40
-    - Added Music::VoiceGen
+    - Add Music::VoiceGen
 
 0.05  2014-09-27
-    - Added Music::Intervals
+    - Add Music::Intervals
 
 0.04  2014-08-30
-    - Fixed POD
+    - Fix POD
 
 0.0301 2014-08-16
-    - Added Music::PitchNum
+    - Add Music::PitchNum
 
 0.03  2013-09-23
-    - Removed MetaResources in dist.ini
-    - Added Music::ChordBot
+    - Remove MetaResources in dist.ini
+    - Add Music::ChordBot
 
 0.02  2013-05-27
-    - Added Music::NeoRiemannianTonnetz.
-    - Added Music::Scala.
-    - Added handy dzil plugins.
+    - Add Music::NeoRiemannianTonnetz.
+    - Add Music::Scala.
+    - Add handy dzil plugins.
 
 0.01 2013-02-10 20:33:20 America/Los_Angeles
-    - Added contents of Bundle::Music to Prereqs.
-    - Minted by Dist::Zilla.
+    - Add contents of Bundle::Music to Prereqs.
+    - Mint by Dist::Zilla.

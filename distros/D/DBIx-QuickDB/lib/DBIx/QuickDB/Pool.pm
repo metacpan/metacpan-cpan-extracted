@@ -2,7 +2,7 @@ package DBIx::QuickDB::Pool;
 use strict;
 use warnings;
 
-our $VERSION = '0.000017';
+our $VERSION = '0.000018';
 
 use Carp qw/croak/;
 use Fcntl qw/:flock/;
@@ -135,9 +135,8 @@ sub add_db {
     my $self = shift;
     my ($name, %params) = @_;
 
-    my $from = $params{from} or $self->throw("You must specify a 'from' database", %params);
-    $self->throw("Cannot build '$name' from '$from' which has not been defined")
-        unless $self->{+DATABASES}->{$from};
+    my $from      = $params{from}                or $self->throw("You must specify a 'from' database", %params);
+    my $from_spec = $self->{+DATABASES}->{$from} or $self->throw("Cannot build '$name' from '$from' which has not been defined");
 
     $self->throw("Database '$name' is already defined", %params)
         if $self->{+DATABASES}->{$name};
@@ -158,7 +157,7 @@ sub add_db {
         );
     }
 
-    $self->{+DATABASES}->{$name} = {%params, name => $name};
+    $self->{+DATABASES}->{$name} = {%params, name => $name, driver => $from_spec->{driver}};
 
     return;
 }

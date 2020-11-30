@@ -904,6 +904,11 @@ void cairo_tag_begin (cairo_t * cr, const char_utf8 * tag_name, const char_utf8 
 
 void cairo_tag_end (cairo_t * cr, const char_utf8 * tag_name);
 
+BOOT:
+    HV *stash = gv_stashpv("Cairo", 0);
+    newCONSTSUB (stash, "TAG_DEST",  newSVpv (CAIRO_TAG_DEST, 0));
+    newCONSTSUB (stash, "TAG_LINK",  newSVpv (CAIRO_TAG_LINK, 0));
+
 #endif
 
 # --------------------------------------------------------------------------- #

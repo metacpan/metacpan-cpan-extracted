@@ -1,0 +1,56 @@
+{
+   "abstract" : "unknown",
+   "author" : [
+      "Alexander Becker, C<asb@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "SQL-Abstract-Limit",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "DBI" : "0",
+            "Data::Dumper" : "0",
+            "ExtUtils::MakeMaker" : "6.64",
+            "SQL::Abstract" : "1.2",
+            "Scalar::Util" : "0",
+            "Test::Builder" : "0",
+            "Test::Deep" : "0",
+            "Test::Exception" : "0",
+            "Test::More" : "0",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "url" : "https://github.com/asb-capfan/SQL-Abstract-Limit"
+      }
+   },
+   "version" : "0.142",
+   "x_serialization_backend" : "JSON::PP version 4.04"
+}

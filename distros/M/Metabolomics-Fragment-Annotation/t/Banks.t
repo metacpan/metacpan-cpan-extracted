@@ -19,7 +19,7 @@ use Metabolomics::Banks::AbInitioFragments qw( :all ) ;
 use Metabolomics::Banks::MaConDa qw( :all ) ;
 use Metabolomics::Banks::Knapsack qw( :all ) ;
 
-use Test::More tests =>  28 ;
+use Test::More tests =>  33 ;
 use Data::Dumper ;
 
 
@@ -54,6 +54,13 @@ BEGIN {
 	print "\n** Test $current_test FragNot package **\n" ; $current_test++ ;
 	use_ok('Metabolomics::Banks::MaConDa') ;
 	
+#########################	
+	print "\n** Test $current_test FragNot package **\n" ; $current_test++ ;
+	use_ok('Metabolomics::Banks::Knapsack') ;
+
+#########################	
+	print "\n** Test $current_test FragNot package **\n" ; $current_test++ ;
+	use_ok('Metabolomics::Banks::PhytoHub') ;
 	
 ## #################################################################################################################################
 ##
@@ -62,7 +69,7 @@ BEGIN {
 ####################################################################################################################################
 
 #########################		
-	print "\n** Test $current_test getMetaboliteFromSource **\n" ; $current_test++;
+	print "\n** Test $current_test init_BloodExposomeBankObject **\n" ; $current_test++;
 	is_deeply( init_BloodExposomeBankObject_TEST(),
 		bless( {
                  '_DATABASE_NAME_' => 'Blood Exposome',
@@ -80,7 +87,7 @@ BEGIN {
 	
 #########################	
 
-	print "\n** Test $current_test getMetaboliteFromSource **\n" ; $current_test++;
+	print "\n** Test $current_test getBloodExposomeFromSource **\n" ; $current_test++;
 	is_deeply( getBloodExposomeFromSourceTest(
 			$modulePath.'/BloodExposome_v1_0_part.txt'),
 			31, ## Nb of entries
@@ -103,7 +110,7 @@ BEGIN {
 ####################################################################################################################################
 
 #########################		
-	print "\n** Test $current_test getMetaboliteFromSource **\n" ; $current_test++;
+	print "\n** Test $current_test init_AbInitioFragBankObject **\n" ; $current_test++;
 	is_deeply( init_AbInitioFragBankObject_TEST(),
 		##Expected:
 		bless( {
@@ -120,7 +127,7 @@ BEGIN {
 		'Method \'initBloodExpBankObject\' init a well formatted bank object'
 	) ;
 
-	print "\n** Test $current_test getFragmentsFromSource **\n" ; $current_test++;
+	print "\n** Test $current_test getFragmentsFromSource for AbInitioFrag **\n" ; $current_test++;
 	is_deeply( getFragmentsFromSourceTest(
 		## Argts
 			$modulePath.'/MS_fragments-adducts-isotopes-test.txt'),
@@ -191,6 +198,10 @@ BEGIN {
 			bless( {
                  '_THEO_PEAK_LIST_' => [
                                          bless( {
+                                         		  '_ANNOTATION_INCHIKEY_' => undef,
+                                                  '_ANNOTATION_IS_A_METABOLITE_' => undef,
+                                                  '_ANNOTATION_IS_A_PRECURSOR_' => undef,
+                                                  '_ANNOTATION_SMILES_' => undef,
                                                   '_ID_' => undef,
                                                   '_ANNOTATION_IN_NEG_MODE_' => undef,
                                                   '_ANNOTATION_ONLY_IN_' => undef,
@@ -204,6 +215,10 @@ BEGIN {
                                                   '_ANNOTATION_FORMULA_' => undef,
                                                 }, 'Metabolomics::Banks' ),
                                          bless( {
+                                         		  '_ANNOTATION_INCHIKEY_' => undef,
+                                                  '_ANNOTATION_IS_A_METABOLITE_' => undef,
+                                                  '_ANNOTATION_IS_A_PRECURSOR_' => undef,
+                                                  '_ANNOTATION_SMILES_' => undef,
                                                   '_ID_' => undef,
                                                   '_ANNOTATION_IN_NEG_MODE_' => undef,
                                                   '_ANNOTATION_NAME_' => '-H+K',
@@ -217,6 +232,10 @@ BEGIN {
                                                   '_ANNOTATION_IN_POS_MODE_' => undef
                                                 }, 'Metabolomics::Banks' ),
                                          bless( {
+                                         		  '_ANNOTATION_INCHIKEY_' => undef,
+                                                  '_ANNOTATION_IS_A_METABOLITE_' => undef,
+                                                  '_ANNOTATION_IS_A_PRECURSOR_' => undef,
+                                                  '_ANNOTATION_SMILES_' => undef,
                                                   '_MMU_ERROR_' => 0,
                                                   '_COMPUTED_MONOISOTOPIC_MASS_' => '118.588',
                                                   '_MESURED_MONOISOTOPIC_MASS_' => 0,
@@ -230,6 +249,10 @@ BEGIN {
                                                   '_PPM_ERROR_' => 0
                                                 }, 'Metabolomics::Banks' ),
                                          bless( {
+                                         		  '_ANNOTATION_INCHIKEY_' => undef,
+                                                  '_ANNOTATION_IS_A_METABOLITE_' => undef,
+                                                  '_ANNOTATION_IS_A_PRECURSOR_' => undef,
+                                                  '_ANNOTATION_SMILES_' => undef,
                                                   '_PPM_ERROR_' => 0,
                                                   '_ANNOTATION_IN_POS_MODE_' => undef,
                                                   '_ANNOTATION_TYPE_' => 'isotope',
@@ -309,6 +332,10 @@ BEGIN {
                  '_DATABASE_URL_' => 'database_url',
                  '_THEO_PEAK_LIST_' => [
                                          bless( {
+                                         		  '_ANNOTATION_INCHIKEY_' => undef,
+                                                  '_ANNOTATION_IS_A_METABOLITE_' => undef,
+                                                  '_ANNOTATION_IS_A_PRECURSOR_' => undef,
+                                                  '_ANNOTATION_SMILES_' => undef,
                                                   '_PPM_ERROR_' => 0,
                                                   '_MMU_ERROR_' => 0,
                                                   '_ANNOTATION_IN_NEG_MODE_' => undef,
@@ -322,6 +349,10 @@ BEGIN {
                                                   '_MESURED_MONOISOTOPIC_MASS_' => 0
                                                 }, 'Metabolomics::Banks' ),
                                          bless( {
+                                         		  '_ANNOTATION_INCHIKEY_' => undef,
+                                                  '_ANNOTATION_IS_A_METABOLITE_' => undef,
+                                                  '_ANNOTATION_IS_A_PRECURSOR_' => undef,
+                                                  '_ANNOTATION_SMILES_' => undef,
                                                   '_ANNOTATION_ONLY_IN_' => undef,
                                                   '_ANNOTATION_IN_POS_MODE_' => undef,
                                                   '_COMPUTED_MONOISOTOPIC_MASS_' => 137.95589,
@@ -335,6 +366,10 @@ BEGIN {
                                                   '_ANNOTATION_NAME_' => '-H+K'
                                                 }, 'Metabolomics::Banks' ),
                                          bless( {
+                                         		  '_ANNOTATION_INCHIKEY_' => undef,
+                                                  '_ANNOTATION_IS_A_METABOLITE_' => undef,
+                                                  '_ANNOTATION_IS_A_PRECURSOR_' => undef,
+                                                  '_ANNOTATION_SMILES_' => undef,
                                                   '_COMPUTED_MONOISOTOPIC_MASS_' => 100.50169,
                                                   '_MESURED_MONOISOTOPIC_MASS_' => 0,
                                                   '_ANNOTATION_ONLY_IN_' => undef,
@@ -348,6 +383,10 @@ BEGIN {
                                                   '_PPM_ERROR_' => 0
                                                 }, 'Metabolomics::Banks' ),
                                          bless( {
+                                         		  '_ANNOTATION_INCHIKEY_' => undef,
+                                                  '_ANNOTATION_IS_A_METABOLITE_' => undef,
+                                                  '_ANNOTATION_IS_A_PRECURSOR_' => undef,
+                                                  '_ANNOTATION_SMILES_' => undef,
                                                   '_PPM_ERROR_' => 0,
                                                   '_MMU_ERROR_' => 0,
                                                   '_ANNOTATION_IN_NEG_MODE_' => undef,
@@ -424,6 +463,10 @@ BEGIN {
                  '_DATABASE_URL_' => 'database_url',
                  '_THEO_PEAK_LIST_' => [
                                          bless( {
+                                         		  '_ANNOTATION_INCHIKEY_' => undef,
+                                                  '_ANNOTATION_IS_A_METABOLITE_' => undef,
+                                                  '_ANNOTATION_IS_A_PRECURSOR_' => undef,
+                                                  '_ANNOTATION_SMILES_' => undef,
                                                   '_PPM_ERROR_' => 0,
                                                   '_MMU_ERROR_' => 0,
                                                   '_ANNOTATION_IN_NEG_MODE_' => undef,
@@ -437,6 +480,10 @@ BEGIN {
                                                   '_MESURED_MONOISOTOPIC_MASS_' => 0
                                                 }, 'Metabolomics::Banks' ),
                                          bless( {
+                                         		  '_ANNOTATION_INCHIKEY_' => undef,
+                                                  '_ANNOTATION_IS_A_METABOLITE_' => undef,
+                                                  '_ANNOTATION_IS_A_PRECURSOR_' => undef,
+                                                  '_ANNOTATION_SMILES_' => undef,
                                                   '_ANNOTATION_ONLY_IN_' => undef,
                                                   '_ANNOTATION_IN_POS_MODE_' => undef,
                                                   '_COMPUTED_MONOISOTOPIC_MASS_' => 137.95589,
@@ -450,6 +497,10 @@ BEGIN {
                                                   '_ANNOTATION_NAME_' => '-H+K'
                                                 }, 'Metabolomics::Banks' ),
                                          bless( {
+                                         		  '_ANNOTATION_INCHIKEY_' => undef,
+                                                  '_ANNOTATION_IS_A_METABOLITE_' => undef,
+                                                  '_ANNOTATION_IS_A_PRECURSOR_' => undef,
+                                                  '_ANNOTATION_SMILES_' => undef,
                                                   '_COMPUTED_MONOISOTOPIC_MASS_' => 100.50169,
                                                   '_MESURED_MONOISOTOPIC_MASS_' => 0,
                                                   '_ANNOTATION_ONLY_IN_' => undef,
@@ -463,6 +514,10 @@ BEGIN {
                                                   '_PPM_ERROR_' => 0
                                                 }, 'Metabolomics::Banks' ),
                                          bless( {
+                                         		  '_ANNOTATION_INCHIKEY_' => undef,
+                                                  '_ANNOTATION_IS_A_METABOLITE_' => undef,
+                                                  '_ANNOTATION_IS_A_PRECURSOR_' => undef,
+                                                  '_ANNOTATION_SMILES_' => undef,
                                                   '_PPM_ERROR_' => 0,
                                                   '_MMU_ERROR_' => 0,
                                                   '_ANNOTATION_IN_NEG_MODE_' => undef,
@@ -537,6 +592,10 @@ BEGIN {
                  '_DATABASE_ENTRIES_NB_' => 'database_entries_nb',
                  '_THEO_PEAK_LIST_' => [
                                          bless( {
+                                         		  '_ANNOTATION_INCHIKEY_' => undef,
+                                                  '_ANNOTATION_IS_A_METABOLITE_' => undef,
+                                                  '_ANNOTATION_IS_A_PRECURSOR_' => undef,
+                                                  '_ANNOTATION_SMILES_' => undef,
                                                   '_PPM_ERROR_' => 0,
                                                   '_ANNOTATION_ONLY_IN_' => undef,
                                                   '_ANNOTATION_IN_NEG_MODE_' => undef,
@@ -550,6 +609,10 @@ BEGIN {
                                                   '_ANNOTATION_TYPE_' => 'adduct'
                                                 }, 'Metabolomics::Banks' ),
                                          bless( {
+                                         		  '_ANNOTATION_INCHIKEY_' => undef,
+                                                  '_ANNOTATION_IS_A_METABOLITE_' => undef,
+                                                  '_ANNOTATION_IS_A_PRECURSOR_' => undef,
+                                                  '_ANNOTATION_SMILES_' => undef,
                                                   '_COMPUTED_MONOISOTOPIC_MASS_' => '137.95589',
                                                   '_MMU_ERROR_' => 0,
                                                   '_ANNOTATION_TYPE_' => 'adduct',
@@ -563,6 +626,10 @@ BEGIN {
                                                   '_ID_' => undef
                                                 }, 'Metabolomics::Banks' ),
                                          bless( {
+                                         		  '_ANNOTATION_INCHIKEY_' => undef,
+                                                  '_ANNOTATION_IS_A_METABOLITE_' => undef,
+                                                  '_ANNOTATION_IS_A_PRECURSOR_' => undef,
+                                                  '_ANNOTATION_SMILES_' => undef,
                                                   '_PPM_ERROR_' => 0,
                                                   '_ANNOTATION_IN_NEG_MODE_' => undef,
                                                   '_ANNOTATION_ONLY_IN_' => undef,
@@ -576,6 +643,10 @@ BEGIN {
                                                   '_ANNOTATION_IN_POS_MODE_' => undef
                                                 }, 'Metabolomics::Banks' ),
                                          bless( {
+                                         		  '_ANNOTATION_INCHIKEY_' => undef,
+                                                  '_ANNOTATION_IS_A_METABOLITE_' => undef,
+                                                  '_ANNOTATION_IS_A_PRECURSOR_' => undef,
+                                                  '_ANNOTATION_SMILES_' => undef,
                                                   '_PPM_ERROR_' => 0,
                                                   '_ANNOTATION_ONLY_IN_' => undef,
                                                   '_ANNOTATION_IN_NEG_MODE_' => undef,
@@ -589,6 +660,10 @@ BEGIN {
                                                   '_ANNOTATION_TYPE_' => 'isotope'
                                                 }, 'Metabolomics::Banks' ),
                                          bless( {
+                                         		  '_ANNOTATION_INCHIKEY_' => undef,
+                                                  '_ANNOTATION_IS_A_METABOLITE_' => undef,
+                                                  '_ANNOTATION_IS_A_PRECURSOR_' => undef,
+                                                  '_ANNOTATION_SMILES_' => undef,
                                                   '_MMU_ERROR_' => 0,
                                                   '_COMPUTED_MONOISOTOPIC_MASS_' => '228.02314',
                                                   '_ANNOTATION_TYPE_' => 'dimeric adduct',
@@ -602,6 +677,10 @@ BEGIN {
                                                   '_MESURED_MONOISOTOPIC_MASS_' => 0
                                                 }, 'Metabolomics::Banks' ),
                                          bless( {
+                                         		  '_ANNOTATION_INCHIKEY_' => undef,
+                                                  '_ANNOTATION_IS_A_METABOLITE_' => undef,
+                                                  '_ANNOTATION_IS_A_PRECURSOR_' => undef,
+                                                  '_ANNOTATION_SMILES_' => undef,
                                                   '_MMU_ERROR_' => 0,
                                                   '_COMPUTED_MONOISOTOPIC_MASS_' => '242.03384',
                                                   '_ANNOTATION_TYPE_' => 'dimeric adduct',
@@ -615,6 +694,14 @@ BEGIN {
                                                   '_ANNOTATION_NAME_' => '2M+ACN+H'
                                                 }, 'Metabolomics::Banks' ),
                                          bless( {
+                                         		  '_ANNOTATION_INCHIKEY_' => undef,
+                                                  '_ANNOTATION_IS_A_METABOLITE_' => undef,
+                                                  '_ANNOTATION_IS_A_PRECURSOR_' => undef,
+                                                  '_ANNOTATION_SMILES_' => undef,
+                                         		  '_ANNOTATION_INCHIKEY_' => undef,
+                                                  '_ANNOTATION_IS_A_METABOLITE_' => undef,
+                                                  '_ANNOTATION_IS_A_PRECURSOR_' => undef,
+                                                  '_ANNOTATION_SMILES_' => undef,
                                                   '_ANNOTATION_IN_POS_MODE_' => '2M+ACN+Na',
                                                   '_ANNOTATION_TYPE_' => 'dimeric adduct',
                                                   '_COMPUTED_MONOISOTOPIC_MASS_' => '264.01578',
@@ -628,6 +715,10 @@ BEGIN {
                                                   '_ANNOTATION_ONLY_IN_' => undef
                                                 }, 'Metabolomics::Banks' ),
                                          bless( {
+                                         		  '_ANNOTATION_INCHIKEY_' => undef,
+                                                  '_ANNOTATION_IS_A_METABOLITE_' => undef,
+                                                  '_ANNOTATION_IS_A_PRECURSOR_' => undef,
+                                                  '_ANNOTATION_SMILES_' => undef,
                                                   '_COMPUTED_MONOISOTOPIC_MASS_' => '201.00730',
                                                   '_MMU_ERROR_' => 0,
                                                   '_ANNOTATION_IN_POS_MODE_' => '2M+H',
@@ -641,6 +732,14 @@ BEGIN {
                                                   '_ID_' => undef
                                                 }, 'Metabolomics::Banks' ),
                                          bless( {
+                                         		  '_ANNOTATION_INCHIKEY_' => undef,
+                                                  '_ANNOTATION_IS_A_METABOLITE_' => undef,
+                                                  '_ANNOTATION_IS_A_PRECURSOR_' => undef,
+                                                  '_ANNOTATION_SMILES_' => undef,
+                                         		  '_ANNOTATION_INCHIKEY_' => undef,
+                                                  '_ANNOTATION_IS_A_METABOLITE_' => undef,
+                                                  '_ANNOTATION_IS_A_PRECURSOR_' => undef,
+                                                  '_ANNOTATION_SMILES_' => undef,
                                                   '_PPM_ERROR_' => 0,
                                                   '_ANNOTATION_IN_NEG_MODE_' => undef,
                                                   '_ANNOTATION_ONLY_IN_' => undef,
@@ -654,6 +753,10 @@ BEGIN {
                                                   '_ANNOTATION_IN_POS_MODE_' => '2M+K'
                                                 }, 'Metabolomics::Banks' ),
                                          bless( {
+                                         		  '_ANNOTATION_INCHIKEY_' => undef,
+                                                  '_ANNOTATION_IS_A_METABOLITE_' => undef,
+                                                  '_ANNOTATION_IS_A_PRECURSOR_' => undef,
+                                                  '_ANNOTATION_SMILES_' => undef,
                                                   '_ANNOTATION_IN_POS_MODE_' => '2M+Na',
                                                   '_ANNOTATION_TYPE_' => 'dimeric adduct',
                                                   '_COMPUTED_MONOISOTOPIC_MASS_' => '222.98924',
@@ -667,6 +770,10 @@ BEGIN {
                                                   '_ANNOTATION_IN_NEG_MODE_' => undef
                                                 }, 'Metabolomics::Banks' ),
                                          bless( {
+                                         		  '_ANNOTATION_INCHIKEY_' => undef,
+                                                  '_ANNOTATION_IS_A_METABOLITE_' => undef,
+                                                  '_ANNOTATION_IS_A_PRECURSOR_' => undef,
+                                                  '_ANNOTATION_SMILES_' => undef,
                                                   '_ANNOTATION_TYPE_' => 'dimeric adduct',
                                                   '_ANNOTATION_IN_POS_MODE_' => '2M+NH4',
                                                   '_MMU_ERROR_' => 0,
@@ -740,6 +847,10 @@ BEGIN {
                  '_DATABASE_URL_' => 'database_url',
                  '_THEO_PEAK_LIST_' => [
                                          bless( {
+                                         		  '_ANNOTATION_INCHIKEY_' => undef,
+                                                  '_ANNOTATION_IS_A_METABOLITE_' => undef,
+                                                  '_ANNOTATION_IS_A_PRECURSOR_' => undef,
+                                                  '_ANNOTATION_SMILES_' => undef,
                                                   '_PPM_ERROR_' => 0,
                                                   '_MMU_ERROR_' => 0,
                                                   '_ANNOTATION_IN_NEG_MODE_' => undef,
@@ -753,6 +864,10 @@ BEGIN {
                                                   '_MESURED_MONOISOTOPIC_MASS_' => 0
                                                 }, 'Metabolomics::Banks' ),
                                          bless( {
+                                         		  '_ANNOTATION_INCHIKEY_' => undef,
+                                                  '_ANNOTATION_IS_A_METABOLITE_' => undef,
+                                                  '_ANNOTATION_IS_A_PRECURSOR_' => undef,
+                                                  '_ANNOTATION_SMILES_' => undef,
                                                   '_ANNOTATION_ONLY_IN_' => undef,
                                                   '_ANNOTATION_IN_POS_MODE_' => undef,
                                                   '_COMPUTED_MONOISOTOPIC_MASS_' => 137.95589,
@@ -766,6 +881,10 @@ BEGIN {
                                                   '_ANNOTATION_NAME_' => '-H+K'
                                                 }, 'Metabolomics::Banks' ),
                                          bless( {
+                                         		  '_ANNOTATION_INCHIKEY_' => undef,
+                                                  '_ANNOTATION_IS_A_METABOLITE_' => undef,
+                                                  '_ANNOTATION_IS_A_PRECURSOR_' => undef,
+                                                  '_ANNOTATION_SMILES_' => undef,
                                                   '_COMPUTED_MONOISOTOPIC_MASS_' => 100.50169,
                                                   '_MESURED_MONOISOTOPIC_MASS_' => 0,
                                                   '_ANNOTATION_ONLY_IN_' => undef,
@@ -779,6 +898,10 @@ BEGIN {
                                                   '_PPM_ERROR_' => 0
                                                 }, 'Metabolomics::Banks' ),
                                          bless( {
+                                         		  '_ANNOTATION_INCHIKEY_' => undef,
+                                                  '_ANNOTATION_IS_A_METABOLITE_' => undef,
+                                                  '_ANNOTATION_IS_A_PRECURSOR_' => undef,
+                                                  '_ANNOTATION_SMILES_' => undef,
                                                   '_PPM_ERROR_' => 0,
                                                   '_MMU_ERROR_' => 0,
                                                   '_ANNOTATION_IN_NEG_MODE_' => undef,
@@ -896,6 +1019,10 @@ BEGIN {
                  '_EXP_PEAK_LIST_' => [],
                  '_THEO_PEAK_LIST_' => [
                                          bless( {
+                                         		  '_ANNOTATION_INCHIKEY_' => undef,
+                                                  '_ANNOTATION_IS_A_METABOLITE_' => undef,
+                                                  '_ANNOTATION_IS_A_PRECURSOR_' => undef,
+                                                  '_ANNOTATION_SMILES_' => undef,
                                                   '_ANNOTATION_TYPE_' => 'adduct',
                                                   '_ID_' => undef,
                                                   '_ANNOTATION_IN_POS_MODE_' => undef,
@@ -909,6 +1036,10 @@ BEGIN {
                                                   '_ANNOTATION_IN_NEG_MODE_' => undef
                                                 }, 'Metabolomics::Banks' ),
                                          bless( {
+                                         		  '_ANNOTATION_INCHIKEY_' => undef,
+                                                  '_ANNOTATION_IS_A_METABOLITE_' => undef,
+                                                  '_ANNOTATION_IS_A_PRECURSOR_' => undef,
+                                                  '_ANNOTATION_SMILES_' => undef,
                                                   '_PPM_ERROR_' => 0,
                                                   '_COMPUTED_MONOISOTOPIC_MASS_' => '137.95589',
                                                   '_MESURED_MONOISOTOPIC_MASS_' => 0,
@@ -922,6 +1053,10 @@ BEGIN {
                                                   '_ANNOTATION_NAME_' => '-H+K'
                                                 }, 'Metabolomics::Banks' ),
                                          bless( {
+                                         		  '_ANNOTATION_INCHIKEY_' => undef,
+                                                  '_ANNOTATION_IS_A_METABOLITE_' => undef,
+                                                  '_ANNOTATION_IS_A_PRECURSOR_' => undef,
+                                                  '_ANNOTATION_SMILES_' => undef,
                                                   '_ANNOTATION_IN_NEG_MODE_' => undef,
                                                   '_MESURED_MONOISOTOPIC_MASS_' => 0,
                                                   '_COMPUTED_MONOISOTOPIC_MASS_' => '100.50169',
@@ -935,6 +1070,10 @@ BEGIN {
                                                   '_ANNOTATION_IN_POS_MODE_' => undef
                                                 }, 'Metabolomics::Banks' ),
                                          bless( {
+                                         		  '_ANNOTATION_INCHIKEY_' => undef,
+                                                  '_ANNOTATION_IS_A_METABOLITE_' => undef,
+                                                  '_ANNOTATION_IS_A_PRECURSOR_' => undef,
+                                                  '_ANNOTATION_SMILES_' => undef,
                                                   '_ANNOTATION_TYPE_' => 'isotope',
                                                   '_ID_' => undef,
                                                   '_ANNOTATION_IN_POS_MODE_' => undef,
@@ -948,6 +1087,10 @@ BEGIN {
                                                   '_ANNOTATION_IN_NEG_MODE_' => undef
                                                 }, 'Metabolomics::Banks' ),
                                          bless( {
+                                         		  '_ANNOTATION_INCHIKEY_' => undef,
+                                                  '_ANNOTATION_IS_A_METABOLITE_' => undef,
+                                                  '_ANNOTATION_IS_A_PRECURSOR_' => undef,
+                                                  '_ANNOTATION_SMILES_' => undef,
                                                   '_PPM_ERROR_' => 0,
                                                   '_COMPUTED_MONOISOTOPIC_MASS_' => '160.43952',
                                                   '_MESURED_MONOISOTOPIC_MASS_' => 0,
@@ -961,6 +1104,10 @@ BEGIN {
                                                   '_MMU_ERROR_' => 0
                                                 }, 'Metabolomics::Banks' ),
                                          bless( {
+                                         		  '_ANNOTATION_INCHIKEY_' => undef,
+                                                  '_ANNOTATION_IS_A_METABOLITE_' => undef,
+                                                  '_ANNOTATION_IS_A_PRECURSOR_' => undef,
+                                                  '_ANNOTATION_SMILES_' => undef,
                                                   '_ANNOTATION_ONLY_IN_' => undef,
                                                   '_ANNOTATION_NAME_' => '-2H+Na+K_15N',
                                                   '_MMU_ERROR_' => 0,
@@ -974,6 +1121,10 @@ BEGIN {
                                                   '_MESURED_MONOISOTOPIC_MASS_' => 0
                                                 }, 'Metabolomics::Banks' ),
                                          bless( {
+                                         		  '_ANNOTATION_INCHIKEY_' => undef,
+                                                  '_ANNOTATION_IS_A_METABOLITE_' => undef,
+                                                  '_ANNOTATION_IS_A_PRECURSOR_' => undef,
+                                                  '_ANNOTATION_SMILES_' => undef,
                                                   '_ANNOTATION_IN_POS_MODE_' => 'x_13C db ',
                                                   '_ID_' => undef,
                                                   '_ANNOTATION_TYPE_' => 'isotopic massif',
@@ -987,6 +1138,10 @@ BEGIN {
                                                   '_ANNOTATION_IN_NEG_MODE_' => undef
                                                 }, 'Metabolomics::Banks' ),
                                          bless( {
+                                         		  '_ANNOTATION_INCHIKEY_' => undef,
+                                                  '_ANNOTATION_IS_A_METABOLITE_' => undef,
+                                                  '_ANNOTATION_IS_A_PRECURSOR_' => undef,
+                                                  '_ANNOTATION_SMILES_' => undef,
                                                   '_ANNOTATION_ONLY_IN_' => undef,
                                                   '_ANNOTATION_NAME_' => '-H+K_15N',
                                                   '_MMU_ERROR_' => 0,
@@ -1675,6 +1830,10 @@ BEGIN {
                  '_DATABASE_VERSION_' => '1.0',
                  '_THEO_PEAK_LIST_' => [
                                          bless( {
+                                         		  '_ANNOTATION_INCHIKEY_' => undef,
+                                                  '_ANNOTATION_IS_A_METABOLITE_' => undef,
+                                                  '_ANNOTATION_IS_A_PRECURSOR_' => undef,
+                                                  '_ANNOTATION_SMILES_' => undef,
                                                   '_MESURED_MONOISOTOPIC_MASS_' => 0,
                                                   '_ANNOTATION_NAME_' => 'Acetic Acid',
                                                   '_MMU_ERROR_' => 0,
@@ -2112,6 +2271,129 @@ BEGIN {
 
 ## #################################################################################################################################
 ##
+#########################	######################### PhytoHUB TESTS #########################  #########################
+##
+####################################################################################################################################
+
+#########################
+	print "\n** Test $current_test initPhytoHubBankObject **\n" ; $current_test++;
+	is_deeply( initPhytoHubBankObject_TEST(),
+		bless( {
+                 '_DATABASE_VERSION_' => '1.4_Beta',
+                 '_DATABASE_ENTRIES_NB_' => 1757,
+                 '_DATABASE_URL_' => 'http://phytohub.eu/',
+                 '_DATABASE_ENTRIES_' => [],
+                 '_DATABASE_DOI_' => 'NA',
+                 '_THEO_PEAK_LIST_' => [],
+                 '_DATABASE_NAME_' => 'PhytoHub',
+                 '_EXP_PEAK_LIST_' => []
+               }, 'Metabolomics::Banks::PhytoHub'  ) ,
+		'Method \'initPhytoHubBankObject\' init a well formatted bank object'
+	) ;
+
+#########################	
+
+	print "\n** Test $current_test getMetaboliteFromSource **\n" ; $current_test++;
+	is_deeply( getPhytoHubFromSource_Test(
+			$modulePath.'/PhytoHUB__dump.tsv'),
+			7, ## Nb of entries
+			'Method \'getMetabolitesFromSource\' works with PhytoHub db as a well formatted source file');
+
+#########################	
+	print "\n** Test $current_test buildTheoPeakBankFromPhytoHub **\n" ; $current_test++;
+	is_deeply( buildTheoPeakBankFromPhytoHubTest(
+		# oBank
+		bless( {
+                 '_EXP_PEAK_LIST_' => [],
+                 '_DATABASE_ENTRIES_NB_' => 1757,
+                 '_DATABASE_URL_' => 'http://phytohub.eu/',
+                 '_THEO_PEAK_LIST_' => [],
+                 '_DATABASE_DOI_' => 'NA',
+                 '_DATABASE_NAME_' => 'PhytoHub',
+                 '_DATABASE_VERSION_' => '1.4_Beta',
+                 '_DATABASE_ENTRIES_' => [
+                                           bless( {
+                                                    '_INCHIKEY_' => 'BDVVNPOGDNWUOI-VVHJISIGSA-N',
+                                                    '_IS_A_PRECURSOR_' => '1',
+                                                    '_MOLECULAR_FORMULA_' => 'C21H30O3',
+                                                    '_IS_A_METABOLITE_' => '0',
+                                                    '_COMPOUND_NAME_' => '16-O-Methylcafestol',
+                                                    '_SMILES_' => 'CO[C@]1(CO)C[C@]23C[C@@H]1CC[C@H]2[C@]1(C)CCC2=C(C=CO2)[C@H]1CC3',
+                                                    '_EXACT_MASS_' => '330.2194948260',
+                                                    '_PHYTOHUB_ID_' => 'PHUB000001'
+                                                  }, 'Metabolomics::Banks::PhytoHub' ),
+                                           bless( {
+                                                    '_EXACT_MASS_' => '728.3619211030',
+                                                    '_MOLECULAR_FORMULA_' => 'C36H56O15',
+                                                    '_IS_A_PRECURSOR_' => '1',
+                                                    '_INCHIKEY_' => 'DOYDQNQLCHBFDK-KSEREDHQSA-N',
+                                                    '_COMPOUND_NAME_' => '3\'-O-beta-D-glucopyranosyl-2\'-O-isovaleryl-2beta-(2-desoxy-atractyligenin)-beta-D-glucopyranoside',
+                                                    '_SMILES_' => '[H][C@]12C[C@@]3(CC[C@]4([H])[C@@H](C[C@H](C[C@@]4(C)[C@]3([H])CC1)OC1O[C@H](CO)[C@@H](O)[C@H](O[C@@H]3O[C@H](CO)[C@@H](O)[C@H](O)[C@H]3O)[C@H]1OC(=O)CC(C)C)C(O)=O)[C@@H](O)C2=C',
+                                                    '_IS_A_METABOLITE_' => '0',
+                                                    '_PHYTOHUB_ID_' => 'PHUB000002'
+                                                  }, 'Metabolomics::Banks::PhytoHub' ),
+                                           bless( {
+                                                    '_PHYTOHUB_ID_' => 'PHUB000003',
+                                                    '_COMPOUND_NAME_' => 'Atractyligenin',
+                                                    '_SMILES_' => '[H][C@]12C[C@@]3(CC[C@]4([H])[C@@H](C[C@@H](O)C[C@@]4(C)[C@]3([H])CC1)C(O)=O)[C@@H](O)C2=C',
+                                                    '_IS_A_METABOLITE_' => '0',
+                                                    '_MOLECULAR_FORMULA_' => 'C19H28O4',
+                                                    '_INCHIKEY_' => 'YRHWUYVCCPXYMB-JIMOHSCASA-N',
+                                                    '_IS_A_PRECURSOR_' => '1',
+                                                    '_EXACT_MASS_' => '320.1987593820'
+                                                  }, 'Metabolomics::Banks::PhytoHub' ),
+                                           bless( {
+                                                    '_EXACT_MASS_' => '480.2723182480',
+                                                    '_IS_A_PRECURSOR_' => '1',
+                                                    '_INCHIKEY_' => 'YEAZCNLETNYACR-DRBRKHBCSA-N',
+                                                    '_MOLECULAR_FORMULA_' => 'C26H40O8',
+                                                    '_IS_A_METABOLITE_' => '0',
+                                                    '_SMILES_' => '[H][C@]12C[C@@]3(CC[C@]4([H])[C@@H](C[C@H](C[C@@]4(C)[C@]3([H])CC1)OC1O[C@H](CO)[C@@H](O)[C@H](C)[C@H]1O)C(O)=O)[C@@H](O)C2=C',
+                                                    '_COMPOUND_NAME_' => 'Atractyligenin (2-O-beta-glucopyranosyl-)',
+                                                    '_PHYTOHUB_ID_' => 'PHUB000004'
+                                                  }, 'Metabolomics::Banks::PhytoHub' ),
+                                           bless( {
+                                                    '_EXACT_MASS_' => '724.2081748450',
+                                                    '_INCHIKEY_' => 'FYQXODZRNSCOTR-QLKRWLHJSA-L',
+                                                    '_IS_A_PRECURSOR_' => '1',
+                                                    '_MOLECULAR_FORMULA_' => 'C30H44O16S2',
+                                                    '_IS_A_METABOLITE_' => '0',
+                                                    '_COMPOUND_NAME_' => 'Atractyloside',
+                                                    '_SMILES_' => '[H][C@]12C[C@@]3(CC[C@]4([H])[C@@H](C[C@H](C[C@@]4(C)[C@]3([H])CC1)O[C@@H]1O[C@H](CO)[C@@H](OS([O-])(=O)=O)[C@H](OS([O-])(=O)=O)[C@H]1OC(=O)CC(C)C)C(O)=O)[C@@H](O)C2=C',
+                                                    '_PHYTOHUB_ID_' => 'PHUB000005'
+                                                  }, 'Metabolomics::Banks::PhytoHub' ),
+                                           bless( {
+                                                    '_INCHIKEY_' => 'DNJVYWXIDISQRD-JTSSGKSMSA-N',
+                                                    '_IS_A_PRECURSOR_' => '1',
+                                                    '_MOLECULAR_FORMULA_' => 'C20H28O3',
+                                                    '_IS_A_METABOLITE_' => '0',
+                                                    '_COMPOUND_NAME_' => 'Cafestol',
+                                                    '_SMILES_' => 'C[C@@]12CCC3=C(C=CO3)[C@H]1CC[C@@]13C[C@H](CC[C@@H]21)[C@@](O)(CO)C3',
+                                                    '_EXACT_MASS_' => '316.2038447620',
+                                                    '_PHYTOHUB_ID_' => 'PHUB000006'
+                                                  }, 'Metabolomics::Banks::PhytoHub' ),
+                                           bless( {
+                                                    '_PHYTOHUB_ID_' => 'PHUB000007',
+                                                    '_EXACT_MASS_' => '768.1980040850',
+                                                    '_IS_A_PRECURSOR_' => '1',
+                                                    '_INCHIKEY_' => 'NULL',
+                                                    '_MOLECULAR_FORMULA_' => 'C31H44O18S2',
+                                                    '_IS_A_METABOLITE_' => '0',
+                                                    '_SMILES_' => '[H]OC([H])([H])C1([H])OC([H])(OC2([H])C([H])([H])C(C([O-])=O)(C([O-])=O)C3([H])C([H])([H])C([H])([H])[C@@]45C([H])([H])[C@]([H])(C(=C([H])[H])[C@@]4([H])O[H])C([H])([H])C([H])([H])C5([H])[C@@]3(C([H])([H])[H])C2([H])[H])C([H])(OC(=O)C([H])([H])C([H])(C([H])([H])[H])C([H])([H])[H])C([H])(OS(=O)(=O)O[H])C1([H])OS(=O)(=O)O[H]',
+                                                    '_COMPOUND_NAME_' => 'Carboxyatractyloside'
+                                                  }, 'Metabolomics::Banks::PhytoHub' )
+                                         ]
+               }, 'Metabolomics::Banks::PhytoHub' ),
+		# query mode
+        'POSITIVE'
+		),
+		##### Expected results
+		7,
+		## MSG
+		'Method \'buildTheoPeakBankFromPhytoHub\' works with Bank and Phytohub objects and \'ION\' mode');
+
+## #################################################################################################################################
+##
 #########################	######################### 		ALL TESTS SUB		 #########################  ########################
 ##
 ####################################################################################################################################
@@ -2125,7 +2407,7 @@ BEGIN {
 	## SUB TEST for test bank object init
 	sub init_BloodExposomeBankObject_TEST {
 	    # get values
-	    my (  ) = @_;
+	    #
 	    my $o = Metabolomics::Banks::BloodExposome->new() ;
 #	    print Dumper $o ;
 	    return($o) ;
@@ -2160,7 +2442,7 @@ BEGIN {
 	## SUB TEST for test bank object init
 	sub init_AbInitioFragBankObject_TEST {
 	    # get values
-	    my (  ) = @_;
+	    #
 	    my $o = Metabolomics::Banks::AbInitioFragments->new() ;
 #	    print Dumper $o ;
 	    return($o) ;
@@ -2225,7 +2507,7 @@ BEGIN {
 	## SUB TEST for test bank object init
 	sub init_MaConDaBankObject_TEST {
 	    # get values
-	    my (  ) = @_;
+	    #
 	    my $o = Metabolomics::Banks::MaConDa->new() ;
 #	    print Dumper $o ;
 	    return($o) ;
@@ -2345,7 +2627,7 @@ BEGIN {
 	## SUB TEST for test bank object init
 	sub init_KnapSackBankObject_TEST {
 	    # get values
-	    my (  ) = @_;
+	    #
 	    my $o = Metabolomics::Banks::Knapsack->new() ;
 #	    print Dumper $o ;
 	    return($o) ;
@@ -2371,6 +2653,36 @@ BEGIN {
 	    return($oBankNb) ;
 	}	
 
+##
+#########################	######################### 	PHYTOHUB TESTS SUB	 #########################  ####################
+##
+	## sub
+	sub initPhytoHubBankObject_TEST {
+		# get values
+	    #
+	    my $o = Metabolomics::Banks::PhytoHub->new() ;
+#	    print Dumper $o ;
+	    return($o) ;
+	}
+	## END
+	
+	## sub
+	sub getPhytoHubFromSource_Test {
+		my ( $source ) = @_ ;
+		my $o = Metabolomics::Banks::PhytoHub->new() ;
+		my $MetaboliteNb = $o->getMetabolitesFromSource($source) ;
+#		print Dumper $o ;
+		return ($MetaboliteNb) ;
+	}
+	
+	sub buildTheoPeakBankFromPhytoHubTest {
+		# get values
+	    my ( $oBank, $queryMode ) = @_;
+	    
+	    my $oBankNb = $oBank->buildTheoPeakBankFromPhytoHub($queryMode ) ;
+#	    print Dumper $oBank ;
+	    return($oBankNb) ;
+	}
 	
 }## END BEGIN part
 

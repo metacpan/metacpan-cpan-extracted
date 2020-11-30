@@ -88,20 +88,19 @@ sub new {
 		$self->{backups}->upsert({ id => $backup_id }, $backup );
 	}
 	
-	foreach my $part ( map {$self->{parts}->unpack($_)} @{ $self->{parts} } ) {
-		next if $self->{blocks}->find_row({ id => $part->{block_id} });
-		die "Block not found! ".Dumper($part);
-		use Data::Dumper;
-	}
-	
-	foreach my $file ( map {$self->{files}->unpack($_)} @{ $self->{files} } ) {
-		foreach my $version (@{ $file->{versions} }) {
-			next if ! $version->{block_id};
-			next if $self->{blocks}->find_row({ id => $version->{block_id} });
-			die "Block not found! ".Dumper($file);
-			use Data::Dumper;
-		}
-	}
+	# DEBUG:
+	#foreach my $part ( @{ $self->{parts} } ) {
+	#	next if $self->{blocks}->find_row({ id => $self->{parts}->unpack($part)->{block_id} });
+	#	die "Block not found!";
+	#}
+	#
+	#foreach my $file ( @{ $self->{files} } ) {
+	#	foreach my $version (@{ $self->{files}->unpack($file)->{versions} }) {
+	#		next if ! $version->{block_id};
+	#		next if $self->{blocks}->find_row({ id => $version->{block_id} });
+	#		die "Block not found!";
+	#	}
+	#}
 	
 	return $self;
 }

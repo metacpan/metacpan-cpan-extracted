@@ -39,6 +39,7 @@ Function name
 Filename.
 
 x=0: only filename
+
 x=1: full path as it appeared during loading module (perl) or compilation (C)
 
 =item %l
@@ -56,9 +57,13 @@ Current time.
 Modifier C<x> chooses time format, C<y> chooses microseconds precision
 
 x=0: YYYY/MM/DD HH:MM:SS
+
 x=1: YY/MM/DD HH:MM:SS
+
 x=2: HH:MM:SS
+
 x=3: UNIX TIMESTAMP
+
 y>0: high resolution time, adds fractional part after seconds with "y" digits precision
 
 Examples:
@@ -81,7 +86,7 @@ Current process title
 
 =item %c
 
-Start colored text. Insert special control characters and all text after this token will be colored according to log level. Only for unix consoles.
+Start colored text. Inserts special control characters and all text after this token will be colored according to log level. Only for unix consoles.
 
 =item %C
 

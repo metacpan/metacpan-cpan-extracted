@@ -1,0 +1,24 @@
+=head1 NAME
+
+XS::libpanda::backtrace - C++ runtime backtraces library for XS
+
+=head1 DESCRIPTION
+
+This library is intended to use only from XS modules.
+No perl interface.
+
+=head1 SEE ALSO
+
+L<XS::Install>
+
+L<XS::libdwarf>
+
+=head1 AUTHOR
+
+Ivan Baidakou <i.baydakov@crazypanda.ru>, Crazy Panda, CP Decision LTD
+
+=head1 LICENSE
+
+You may distribute this code under the same terms as Perl itself.
+
+=cut

@@ -6,7 +6,7 @@
 ************************************************************************ */
 
 /**
- * Abstract Visualization widget.
+ * HTML Visualization widget.
  */
 qx.Class.define("callbackery.ui.plugin.Html", {
     extend : qx.ui.container.Composite,

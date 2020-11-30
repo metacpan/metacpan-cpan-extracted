@@ -86,6 +86,7 @@ static PerlTraceSP get_trace() noexcept {
     const PERL_CONTEXT *dbcx = nullptr;
     const PERL_CONTEXT* cx = caller_cx(level, &dbcx);
     while (cx) {
+        if (!cx->blk_oldcop) break;
         auto pv_raw = CopSTASHPV(cx->blk_oldcop);
         auto file = CopFILE(cx->blk_oldcop);
         auto line = CopLINE(cx->blk_oldcop);

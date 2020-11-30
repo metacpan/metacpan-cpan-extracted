@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2015-2019 Christian Jaeger, copying@christianjaeger.ch
+# Copyright (c) 2015-2020 Christian Jaeger, copying@christianjaeger.ch
 #
 # This is free software, offered under either the same terms as perl 5
 # or the terms of the Artistic License version 2 or the terms of the
@@ -191,9 +191,12 @@ our @EXPORT_OK
     optionally poptionally);
 our %EXPORT_TAGS = (all => [@EXPORT, @EXPORT_OK]);
 
+use FP::Carp;
+
 # Functions to change the kind of optionals API:
 
-sub perhaps_to_maybe ($) {
+sub perhaps_to_maybe {
+    @_ == 1 or fp_croak_nargs 1;
     my ($f) = @_;
     sub {
         if (my ($v) = &$f(@_)) {
@@ -204,7 +207,8 @@ sub perhaps_to_maybe ($) {
     }
 }
 
-sub perhaps_to_x ($$) {
+sub perhaps_to_x {
+    @_ == 2 or fp_croak_nargs 2;
     my ($f, $exception) = @_;
     sub {
         if (my ($v) = &$f(@_)) {
@@ -215,10 +219,11 @@ sub perhaps_to_x ($$) {
     }
 }
 
-sub perhaps_to_or ($) {
+sub perhaps_to_or {
+    @_ == 1 or fp_croak_nargs 1;
     my ($f) = @_;
     sub {
-        @_ == 3 or die "wrong number of arguments";
+        @_ == 3 or fp_croak_nargs 3;
         my ($t, $k, $other) = @_;
         if (my ($v) = &$f($t, $k)) {
             $v
@@ -228,7 +233,8 @@ sub perhaps_to_or ($) {
     }
 }
 
-sub perhaps_to_exists ($) {
+sub perhaps_to_exists {
+    @_ == 1 or fp_croak_nargs 1;
     my ($f) = @_;
     sub {
         if (my ($_v) = &$f(@_)) {
@@ -243,7 +249,8 @@ sub perhaps_to_exists ($) {
 
 # build functions that short-cut the 'nothing' case:
 
-sub optionally ($;$) {
+sub optionally {
+    @_ >= 1 and @_ <= 2 or fp_croak_nargs "1-2";
     my ($f, $maybe_pos) = @_;
     my $pos = $maybe_pos // 0;
     sub {
@@ -258,7 +265,8 @@ sub optionally ($;$) {
 }
 
 # perhaps-based optionally: (XX better name? perhapsionally??)
-sub poptionally ($) {
+sub poptionally {
+    @_ == 1 or fp_croak_nargs 1;
     my ($f) = @_;
     sub {
         if (@_) {

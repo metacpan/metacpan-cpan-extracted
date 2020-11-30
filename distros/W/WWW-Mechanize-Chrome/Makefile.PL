@@ -75,6 +75,7 @@ my %module = (
 
         'URI'                => 0,    # For URL handling
         'URI::file'          => 0,    # For URL handling, just to be explicit
+        'URI::ws'            => 0,    # For port parsing from Websockets
         'Future::HTTP'       => 0.06, # fixes Mojolicious error handling
         'JSON'               => 0,
         'Moo'                => 2, # for some hashes-as-objects
@@ -104,7 +105,7 @@ my %module = (
         'Data::Dump'         => 0, # to paper over a bug in Struct::Dumb
                                    # https://rt.cpan.org/Public/Bug/Display.html?id=132378
         'Image::Info'  => 0,
-        'Test::HTTP::LocalServer' => 0.61, # we want the improved IPC
+        'Test::HTTP::LocalServer' => 0.71, # we want the IPv6 support, and other stuff
         'URI'          => 0,
         'URI::file'    => 0,
         'Test::Memory::Cycle' => 0,

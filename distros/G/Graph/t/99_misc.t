@@ -1,6 +1,6 @@
 use strict; use warnings;
 
-use Test::More tests => 34;
+use Test::More tests => 36;
 
 use Graph::Directed;
 use Graph::Undirected;
@@ -10,6 +10,15 @@ my $g0 = Graph::Directed->new;
 my @E = ([qw(a b)], [qw(a c)], [qw(b d)], [qw(b e)], [qw(c f)], [qw(c g)]);
 
 $g0->add_edge(@$_) for @E;
+
+is_deeply [ $g0->as_hashes ], [
+    { map +($_ => {}), qw(a b c d e f g) },
+    {
+      a => { map +($_ => {}), qw(b c) },
+      b => { map +($_ => {}), qw(d e) },
+      c => { map +($_ => {}), qw(f g) },
+    },
+];
 
 my $da0 = $g0->subgraph_by_radius('a', 0);
 my $da1 = $g0->subgraph_by_radius('a', 1);
@@ -30,6 +39,18 @@ is($db0, "b");
 is($db1, "b-d,b-e");
 is($db2, "b-d,b-e");
 is($db3, "b-d,b-e");
+
+{
+    my $gi0 = Graph->new;
+    $gi0->set_edge_attribute(qw(a b), weight => 1);
+    my $gi1 = Graph->new;
+    $gi1->set_vertex_attribute('x', shape => 1);
+    $gi1->set_edge_attribute(qw(x y), weight => 2);
+    is_deeply [ $gi0->ingest($gi1)->as_hashes ], [
+        { x => { shape => 1 }, map +($_ => {}), qw(a b y) },
+        { a => { b => { weight => 1 } }, x => { y => { weight => 2 } } },
+    ];
+}
 
 {
   my $gh = Graph->new(hypervertexed => 1);

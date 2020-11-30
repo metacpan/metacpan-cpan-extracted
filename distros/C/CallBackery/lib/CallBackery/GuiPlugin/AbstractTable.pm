@@ -17,7 +17,7 @@ CallBackery::GuiPlugin::AbstractTable - Base Class for a table plugin
 
 =head1 DESCRIPTION
 
-The base class for reporter reporters.
+The base class for table plugins, derived from CallBackery::GuiPlugin::AbstractForm
 
 =cut
 
@@ -96,7 +96,7 @@ sub getData {
     }
 }
 
-=head2 getTableData({formData=>{},firstRow=>{},lastRow=>{},sortColumn=>'key',sortDesc=>true)
+=head2 getTableData({formData=>{},firstRow=>{},lastRow=>{},sortColumn=>'key',sortDesc=>true})
 
 return data appropriate for the remote table widget
 

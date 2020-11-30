@@ -186,8 +186,7 @@ PEPIMAKEFILETEMPLATE
     #$libpaths =~ s/\s+/ -L/g;
     my $ldflags = $optimise . ' ' . $Config{ldflags} ;
     $template =~ s/REPLACELDFLAGS/$ldflags/g;
-    
-    my $ldlibs = '-ldl -lm -lpthread -lc -lcrypt -lz -lperl';
+    my $ldlibs = $Config{perllibs} . ' -lz -lperl';
     $template =~ s/REPLACELDLIBS/$ldlibs/g;
     
     return $template;

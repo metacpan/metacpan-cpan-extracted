@@ -97,10 +97,12 @@ our %EXPORT_TAGS = (all => [@EXPORT, @EXPORT_OK]);
 use FP::Interfaces;
 use Carp;
 use Scalar::Util qw(blessed);
+use FP::Carp;
 
 our $immutable = 1;    # whether new instances are to be immutable
 
-sub is_purearray ($) {
+sub is_purearray {
+    @_ == 1 or fp_croak_nargs 1;
     my ($v) = @_;
     my $r = blessed($v) // return;
     $v->isa("FP::_::PureArray")
@@ -110,11 +112,13 @@ sub purearray {
     FP::_::PureArray->new_from_array([@_])
 }
 
-sub array_clone_to_purearray ($) {
+sub array_clone_to_purearray {
+    @_ == 1 or fp_croak_nargs 1;
     FP::_::PureArray->new_from_array([@{ $_[0] }])
 }
 
-sub array_to_purearray ($) {
+sub array_to_purearray {
+    @_ == 1 or fp_croak_nargs 1;
     FP::_::PureArray->new_from_array($_[0])
 }
 
@@ -137,10 +141,11 @@ package FP::_::PureArray {
     use base qw(FP::Array::Mixin);
     use FP::Interfaces;
     use Carp;
+    use FP::Carp;
     use Chj::NamespaceCleanAbove;
 
     sub new_from_array {
-        @_ == 2 or die "wrong number of arguments";
+        @_ == 2 or fp_croak_nargs 2;
         my ($class, $a) = @_;
         bless $a, $class;
         if ($FP::PureArray::immutable) {
@@ -151,13 +156,13 @@ package FP::_::PureArray {
     }
 
     sub purearray {
-        @_ == 1 or die "wrong number of arguments";
+        @_ == 1 or fp_croak_nargs 1;
         my $s = shift;
         $s
     }
 
     sub mutablearray {
-        @_ == 1 or die "wrong number of arguments";
+        @_ == 1 or fp_croak_nargs 1;
         my $s = shift;
         FP::_::MutableArray->new_from_array([@$s])
     }
@@ -179,14 +184,14 @@ package FP::_::PureArray {
     our $pure_warned = 0;
 
     sub pure {
-        @_ == 1 or die "wrong number of arguments";
+        @_ == 1 or fp_croak_nargs 1;
         my $a = shift;
         carp "is already pure" unless $pure_warned++;
         $a
     }
 
     sub unsafe_mutable {
-        @_ == 1 or die "wrong number of arguments";
+        @_ == 1 or fp_croak_nargs 1;
         my $a = shift;
         Internals::SvREADONLY $_, 0 for @$a;
         Internals::SvREADONLY @$a, 0;

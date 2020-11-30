@@ -33,9 +33,10 @@ use Scalar::Util qw( blessed );
 use Binance::API::Logger;
 use Binance::API::Request;
 
+use Binance::Exception::Parameter::BadValue;
 use Binance::Exception::Parameter::Required;
 
-our $VERSION = '1.04';
+our $VERSION = '1.05';
 
 =head1 NAME
 
@@ -782,19 +783,29 @@ B<PARAMETERS>
 
 =item type
 
-[REQUIRED] LIMIT or MARKET.
+[REQUIRED] LIMIT|STOP_LOSS|STOP_LOSS_LIMIT|TAKE_PROFIT|TAKE_PROFIT_LIMIT|LIMIT_MAKER|MARKET.
 
 =item timeInForce
 
-[REQUIRED] GTC or IOC.
+[OPTIONAL] GTC or IOC.
 
 =item quantity
 
-[REQUIRED] Quantity (of symbols) in order.
+[OPTIONAL] Quantity (of symbols) in order.
+
+=item quoteOrderQty
+
+[OPTIONAL] MARKET orders using quoteOrderQty specifies the amount the user wants
+to spend (when buying) or receive (when selling) the quote asset; the correct
+quantity will be determined based on the market liquidity and quoteOrderQty.
+
+E.g. Using the symbol BTCUSDT:
+BUY side, the order will buy as many BTC as quoteOrderQty USDT can.
+SELL side, the order will sell as much BTC needed to receive quoteOrderQty USDT.
 
 =item price
 
-[REQUIRED] Price (of symbol) in order.
+[OPTIONAL] Price (of symbol) in order.
 
 =item newClientOrderId
 
@@ -808,6 +819,16 @@ if not sent.
 =item icebergQty
 
 [OPTIONAL] Used with iceberg orders.
+
+=item newOrderRespType
+
+[OPTIONAL] Set the response JSON. ACK, RESULT, or FULL; MARKET and LIMIT order
+types default to FULL, all other orders default to ACK.
+
+=item test
+
+[OPTIONAL] Test new order creation and signature/recvWindow long. Creates and
+validates a new order but does not send it into the matching engine.
 
 =back
 
@@ -826,9 +847,53 @@ B<RETURNS>
 sub order {
     my ($self, %params) = @_;
 
+    unless (defined $params{'type'}) {
+        $self->log->error('Parameter "type" required');
+        Binance::Exception::Parameter::Required->throw(
+            error => 'Parameter "type" required',
+            parameters => ['type']
+        );
+    }
+
     my @required = (
-        'symbol', 'side', 'type', 'timeInForce', 'quantity', 'price'
+        'symbol', 'side',
     );
+
+    if ($params{'type'} eq 'LIMIT') {
+        push @required, ('timeInForce', 'quantity', 'price');
+    }
+    elsif ($params{'type'} eq 'STOP_LOSS') {
+        push @required, ('quantity', 'stopPrice');
+    }
+    elsif ($params{'type'} eq 'STOP_LOSS_LIMIT') {
+        push @required, ('timeInForce', 'quantity', 'price', 'stopPrice');
+    }
+    elsif ($params{'type'} eq 'TAKE_PROFIT') {
+        push @required, ('quantity', 'stopPrice');
+    }
+    elsif ($params{'type'} eq 'TAKE_PROFIT_LIMIT') {
+        push @required, ('timeInForce', 'quantity', 'price', 'stopPrice');
+    }
+    elsif ($params{'type'} eq 'LIMIT_MAKER') {
+        push @required, ('quantity', 'price');
+    }
+    elsif ($params{'type'} eq 'MARKET') {
+        if (!defined $params{'quantity'} && !defined $params{'quoteOrderQty'}) {
+            $self->log->error('One of parameters "quantity" or "quoteOrderQty" is required');
+            Binance::Exception::Parameter::Required->throw(
+                error => 'One of parameters "quantity" or "quoteOrderQty" is required',
+                parameters => ["quantity", "quoteOrderQty"]
+            );
+        }
+    } else {
+        $self->log->error('Invalid value for parameter "type"');
+        Binance::Exception::Parameter::BadValue->throw(
+            error => 'Invalid value for parameter "type"',
+            parameters => ["type"],
+            format => '(LIMIT|STOP_LOSS|STOP_LOSS_LIMIT|TAKE_PROFIT|TAKE_PROFIT_LIMIT|LIMIT_MAKER|MARKET)'
+        );
+    }
+
     foreach my $param (@required) {
         unless (defined ($params{$param})) {
             $self->log->error('Parameter "'.$param.'" required');
@@ -845,13 +910,23 @@ sub order {
         type             => $params{'type'},
         timeInForce      => $params{'timeInForce'},
         quantity         => $params{'quantity'},
+        quoteOrderQty    => $params{'quoteOrderQty'},
         price            => $params{'price'},
         newClientOrderId => $params{'newClientOrderId'},
         stopPrice        => $params{'stopPrice'},
         icebergQty       => $params{'icebergQty'},
+        newOrderRespType => $params{'newOrderRespType'},
     };
 
-    return $self->ua->post('/api/v3/order', { signed => 1, body => $body } );
+    # Enable dry mode
+    my $url = '/api/v3/order';
+
+    if ($params{'test'}) {
+        $self->{logger}->debug('Test flag enabled - using order_test() instead of order()');
+        $url .= '/test'
+    }
+
+    return $self->ua->post($url, { signed => 1, body => $body } );
 }
 
 =head2 order_test
@@ -863,46 +938,7 @@ a new order but does not send it into the matching engine.
 
 B<PARAMETERS>
 
-=over
-
-=item symbol
-
-[REQUIRED] Symbol, for example C<ETHBTC>.
-
-=item side
-
-[REQUIRED] BUY or SELL.
-
-=item type
-
-[REQUIRED] LIMIT or MARKET.
-
-=item timeInForce
-
-[REQUIRED] GTC or IOC.
-
-=item quantity
-
-[REQUIRED] Quantity (of symbols) in order.
-
-=item price
-
-[REQUIRED] Price (of symbol) in order.
-
-=item newClientOrderId
-
-[OPTIONAL] A unique id for the order. Automatically generated
-if not sent.
-
-=item stopPrice
-
-[OPTIONAL] Used with stop orders.
-
-=item icebergQty
-
-[OPTIONAL] Used with iceberg orders.
-
-=back
+    Same as C<order()>.
 
 B<RETURNS>
     An empty HASHref
@@ -914,34 +950,9 @@ B<RETURNS>
 sub order_test {
     my ($self, %params) = @_;
 
-    my @required = (
-        'symbol', 'side', 'type', 'timeInForce', 'quantity', 'price'
-    );
-    foreach my $param (@required) {
-        unless (defined ($params{$param})) {
-            $self->log->error('Parameter "'.$param.'" required');
-            Binance::Exception::Parameter::Required->throw(
-                error => 'Parameter "'.$param.'" required',
-                parameters => [$param]
-            );
-        }
-    }
+    $params{'test'} = 1;
 
-    my $body = {
-        symbol           => $params{'symbol'},
-        side             => $params{'side'},
-        type             => $params{'type'},
-        timeInForce      => $params{'timeInForce'},
-        quantity         => $params{'quantity'},
-        price            => $params{'price'},
-        newClientOrderId => $params{'newClientOrderId'},
-        stopPrice        => $params{'stopPrice'},
-        icebergQty       => $params{'icebergQty'},
-    };
-
-    return $self->ua->post(
-        '/api/v3/order/test', { signed => 1, body => $body }
-    );
+    return $self->order(%params);
 }
 
 =head2 cancel_order

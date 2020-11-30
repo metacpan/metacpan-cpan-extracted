@@ -1,0 +1,15 @@
+{
+  "postProcessing": {
+    "marc": {
+      "005": [
+        { "op": "regsub", "pattern": "[123]", "replacement": "X/Y", "flags": "g" }
+      ],
+      "008": { "op": "regsub", "pattern": "([13579])", "replacement": "[$1]", "flags": "g" },
+      "245$a": [
+        { "op": "stripDiacritics" },
+        { "op": "regsub", "pattern": "[abc]", "replacement": "*", "flags": "g" }
+      ]
+    }
+  },
+  "chunkSize": 1
+}

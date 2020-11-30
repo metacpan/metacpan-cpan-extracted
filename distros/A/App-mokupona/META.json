@@ -1,0 +1,55 @@
+{
+   "abstract" : "a feed aggregator for Gopher, Gemini, RSS and Atom",
+   "author" : [
+      "Alex Schroeder"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "agpl_3"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "App-mokupona",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Modern::Perl" : "1.20180701",
+            "Mojo::IOLoop" : "0",
+            "URI::Escape" : "0",
+            "XML::LibXML" : "0",
+            "perl" : "5.026000",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://alexschroeder.ch/cgit/moku-pona",
+         "web" : "https://alexschroeder.ch/cgit/moku-pona/about/"
+      }
+   },
+   "version" : 2.08,
+   "x_serialization_backend" : "JSON::PP version 2.97001"
+}

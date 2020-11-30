@@ -13,7 +13,7 @@ my $file = "$dir/file.log";
 sub test ($&) {
     my ($name, $sub) = @_;
     subtest $name => $sub;
-    UniEvent::Fs::remove_all($dir);
+    (undef) = UniEvent::Fs::remove_all($dir); # ignore errors for windows
 }
 
 test "log" => sub {
@@ -24,9 +24,7 @@ test "log" => sub {
     XLog::debug("hello world");
     XLog::set_logger(undef);
 
-    open my $fh, '<', $file or die $!;
-    my $content = join '', <$fh>;
-    is $content, "hello world\n";
+    is readfile($file), "hello world\n";
 };
 
 test 'autoflush' => sub {
@@ -39,15 +37,19 @@ test 'autoflush' => sub {
 
     XLog::debug("hello");
     
-    open my $fh, '<', $file or die $!;
-    my $content = join '', <$fh>;
-    is $content, "hello\n";
+    is readfile($file), "hello\n";
     
     XLog::debug("world");
 
-    open $fh, '<', $file or die $!;
-    $content = join '', <$fh>;
-    is $content, "hello\nworld\n";
+    is readfile($file), "hello\nworld\n";
 };
 
 done_testing();
+
+sub readfile {
+    my $file = shift;
+    open my $fh, '<', $file or die $!;
+    my $content = join '', <$fh>;
+    close $fh;
+    return $content;
+}

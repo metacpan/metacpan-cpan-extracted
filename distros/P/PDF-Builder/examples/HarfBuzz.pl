@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 ##########################
-# CAUTION: cannot merge until new HarfBuzz::Shaper released
-#          ditto for Content.pm changes
+# NOTE: appears to bring in the entire Ming font (Chinese), rather than a
+#       subset. sorry about that! ref RT 130041
 # Note to maintainer: don't forget to refresh HarfBuzz_example.pdf
 ##########################
 # demonstrate some usage of HarfBuzz::Shaper and related text calls
@@ -11,7 +11,7 @@
 use strict;
 use warnings;
 
-our $VERSION = '3.019'; # VERSION
+our $VERSION = '3.020'; # VERSION
 my $LAST_UPDATE = '3.019'; # manually update whenever code is changed
 
 my $PDFname = $0;
@@ -60,6 +60,8 @@ my $arabicFont = '/Program Files (x86)/Adobe/Acrobat Reader DC/Resource/Font/Ado
 # to be.
 
 my $pdf = PDF::Builder->new(-compress => 'none');
+#my $pdf = PDF::Builder->new();
+
 $pdf->mediabox('universal');  # narrower and shorter of US letter and A4, so
                               # it should be printable on either paper
 my $labelFont = $pdf->corefont('Helvetica');
@@ -386,10 +388,12 @@ $y = 750;
    # some random Chinese characters. most interested in what direction is
    # the default, and what is settable
    'TTBChinese' => { 'title' => 'TTBChinese',
-   	        'fontFile' => '/Program Files (x86)/Adobe/Acrobat Reader DC/Resource/CIDFont/AdobeMingStd-Light.otf',
+#   	        'fontFile' => '/Program Files (x86)/Adobe/Acrobat Reader DC/Resource/CIDFont/AdobeMingStd-Light.otf',
+   	        'fontFile' => '/Program Files (x86)/Adobe/Acrobat Reader DC/Resource/CIDFont/AdobeGothicStd-Light.otf',
  	  	'dir' => 'T',  
  	  	'script' => 'Chin',
- 	  	'text' => ["\x{5A40}\x{5A41}\x{5A42}\x{5A43}", " PDF::Builder ", "\x{5A44}\x{5A45}"] },
+# 	  	'text' => ["\x{5A40}\x{5A41}\x{5A42}\x{5A43}", " PDF::Builder ", "\x{5A44}\x{5A45}"] },
+ 	  	'text' => ["\x{58D8}\x{5A41}\x{5C62}\x{6A13}", " PDF::Builder ", "\x{6DDA}\x{6F0F}"] },
 
    # Languages which are normally RTL don't seem to behave with TTB.
    # I would expect them to be reversed, but they aren't. Maybe the direction

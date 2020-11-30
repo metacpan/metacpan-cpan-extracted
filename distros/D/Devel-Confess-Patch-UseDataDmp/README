@@ -1,8 +1,40 @@
-SYNOPSIS
+NAME
+    Devel::Confess::Patch::UseDataDmp - Use Data::Dmp to stringify reference
 
+VERSION
+    This document describes version 0.030 of
+    Devel::Confess::Patch::UseDataDmp (from Perl distribution
+    Devel-Confess-Patch-UseDataDmp), released on 2020-06-19.
+
+SYNOPSIS
      % PERL5OPT=-MDevel::Confess::Patch::UseDataDmp -MDevel::Confess=dump yourscript.pl
 
 DESCRIPTION
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Devel-Confess-Patch-UseDataDmp>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Devel-Confess-Patch-UseDataDmp>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Devel-Confess-Patch-U
+    seDataDmp>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
 
 SEE ALSO
+    Data::Dmp
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2020, 2015 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 

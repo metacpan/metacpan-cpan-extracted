@@ -1,0 +1,95 @@
+Tk::Zinc - another Canvas which proposes many new functions, some based on openGL
+
+Tk::Zinc for Perl/Tk is available for Linux, Windows and MacOSX. 
+the easiest way could be to use he CPAN.
+To build it you need:
+
+* On a Linux system, you need Perl (>= 5.6) and perl-tk (800 or 804) as well as
+  perl-tk developpement packages.
+
+* On MacOSX you need:
+  - fink with tk-pm package and its dependencies (http://fink.sf.net)
+    tk-pm is available in unstable. You can add this binary unstable tree to you /sw/etc/apt/sources.list:
+    deb http://fink.opendarwin.org/bbraun 10.3/unstable main crypto
+    deb http://fink.opendarwin.org/bbraun 10.3/stable main crypto
+  - X11 et X11 sdk from Apple (http://www.apple.com/macosx/x11/)
+
+* On WinXP you need:
+  - activeperl (5.8.6.811 or higher) from activatestate.com 
+  - and
+    - if you want to compile TkZinc by yourself:
+      Visual C++ or the Free Visual C++ Command Line Tools
+
+
+Install:
+
+  perl Makefile.PL
+  # you can use the following options: --with-gl=yes|no --with-atc=yes|no --with-shape=yes|no
+  # current defaults are  --with-gl=yes --with-atc=yes --with-shape=yes
+
+  make
+  make test
+
+  # to run demos before installing:
+  perl -Iblib/arch -Iblib/lib demos/zinc-demos
+
+  make install
+
+
+
+WATCH OUT! On Linux it is quite frequent to have both Mesa and proprietary
+           openGL libraries installed. This may lead to big problems at
+           runtime if the linker picks the wrong library. It is often the
+           the case between the static (libGL.a) Mesa library and the dynamic
+           (libGL.so) NVidia library. It is very important to assert that
+           the link is done with the library matching the openGL driver
+           loaded in the X server.
+
+In the case you need to use another version of perl-tk than the one installed in the 
+system, you should use the following command as a template to adapt to follow your 
+specific pathes of the alternative perl-tk installation:
+
+  env PERL5LIB=/usr/local/test/804_027/lib/perl5/site_perl/5.8.1/i386-linux-thread-multi perl Makefile.PL
+  make
+  env PERL5LIB=/usr/local/test/804_027/lib/perl5/5.8.1/i386-linux-thread-multi:/usr/local/test/804_027/lib/perl5/site_perl/5.8.1/i386-linux-thread-multi make test
+
+  # to run demos before installing:
+  env PERL5LIB=/usr/local/test/804_027/lib/perl5/5.8.1/i386-linux-thread-multi:/usr/local/test/804_027/lib/perl5/site_perl/5.8.1/i386-linux-thread-multi perl -Iblib/arch -Iblib/lib demos/zinc-demos
+
+  # and finally
+  make install
+
+  # and to run your script:
+  env PERL5LIB=/usr/local/test/804_027/lib/perl5/5.8.1/i386-linux-thread-multi:/usr/local/test/804_027/lib/perl5/site_perl/5.8.1/i386-linux-thread-multi perl <your_script.pl>
+
+
+
+
+documentation is also available at https://github.com/asb-capfan/TkZinc
+The source of the reference manual is available in the full source package,
+which also includes TkZinc for Tcl/Tk, for Perl/Tk, and for Python.
+
+
+After installation, we recommend you to launch the zinc-demos script,
+a frontend to more than 30 small demos.
+
+For more information on building Tk::Zinc, a README is available in 
+the tkzinc-*tgz tar file (on Tkzinc web site) used for building all
+flavor of TkZinc (ie tcl, perl and python)
+
+This software is delivered under new  BSD licence.
+For the copyright, please, read the Copyright file.
+
+For any question on Tk::Zinc usage, build or installation pb,
+please file an inquiry here: https://github.com/asb-capfan/TkZinc/issues
+
+
+Authors and Contributors:
+
+Tk::Zinc main author is Patrick Lecoanet (CENA)
+Sub-Modules, demos and documentation have been developped by
+Daniel Etienne (CENA), Christophe Mertz (formerly CENA and now IntuiLab), 
+Jean-Luc Vinot (CENA), with contributions from Stéphane Chatty (Intuilab), 
+Céline Schlienger (IntuiLab), Alexandre Lemort (IntuiLab)
+Stéphane Conversy (CENA) contributed to the MacOSX port.
+Many others contributed with their bug reports!

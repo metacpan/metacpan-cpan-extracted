@@ -1,14 +1,14 @@
 Generating CA key...
-Generating RSA private key, 2048 bit long modulus
-......+++
-....................................+++
-e is 65537 (0x10001)
+Generating RSA private key, 2048 bit long modulus (2 primes)
+...........................+++++
+.....................................+++++
+e is 65537 (0x010001)
 Generating CA cert...
 Generating alternate key & certs...
 Key + CSR...
-Generating a 2048 bit RSA private key
-...........................+++
-.................................+++
+Generating a RSA private key
+...........................................................................+++++
+..................................+++++
 writing new private key to 'key/alternate.pem'
 -----
 CRT...
@@ -20,15 +20,15 @@ organizationName      :PRINTABLE:'fusioninventory.org'
 organizationalUnitName:PRINTABLE:'alternative trusted test certificate'
 commonName            :PRINTABLE:'test.fusioninventory.org'
 emailAddress          :IA5STRING:'test@fusioninventory.org'
-Certificate is to be certified until Jun  7 14:34:08 2026 GMT (3650 days)
+Certificate is to be certified until Nov 24 09:49:47 2030 GMT (3650 days)
 
 Write out database with 1 new entries
 Data Base Updated
 Generating good key & certs...
 Key + CSR...
-Generating a 2048 bit RSA private key
-....................+++
-....+++
+Generating a RSA private key
+..................+++++
+...........+++++
 writing new private key to 'key/good.pem'
 -----
 CRT...
@@ -40,15 +40,15 @@ organizationName      :PRINTABLE:'fusioninventory.org'
 organizationalUnitName:PRINTABLE:'trusted test certificate'
 commonName            :PRINTABLE:'127.0.0.1'
 emailAddress          :IA5STRING:'test@fusioninventory.org'
-Certificate is to be certified until Jun  7 14:34:08 2026 GMT (3650 days)
+Certificate is to be certified until Nov 24 09:49:47 2030 GMT (3650 days)
 
 Write out database with 1 new entries
 Data Base Updated
 Generating wrong key & certs...
 Key + CSR...
-Generating a 2048 bit RSA private key
-...............................................................................................................+++
-......................+++
+Generating a RSA private key
+..........................................+++++
+......+++++
 writing new private key to 'key/wrong.pem'
 -----
 CRT...
@@ -60,15 +60,15 @@ organizationName      :ASN.1 12:'fusioninventory.org'
 organizationalUnitName:ASN.1 12:'wrong trusted test certificate'
 commonName            :ASN.1 12:'test.fusioninventory.org'
 emailAddress          :IA5STRING:'test@fusioninventory.org'
-Certificate is to be certified until Jun  7 14:34:09 2026 GMT (3650 days)
+Certificate is to be certified until Nov 24 09:49:47 2030 GMT (3650 days)
 
 Write out database with 1 new entries
 Data Base Updated
 Generating bad key & certs...
 Key + CSR...
-Generating a 2048 bit RSA private key
-.................................................................+++
-........................................................................................+++
+Generating a RSA private key
+....+++++
+.....................................................................+++++
 writing new private key to 'key/bad.pem'
 -----
 CRT...
@@ -80,7 +80,7 @@ organizationName      :ASN.1 12:'fusioninventory.org'
 organizationalUnitName:ASN.1 12:'untrusted test certificate'
 commonName            :ASN.1 12:'localhost'
 emailAddress          :IA5STRING:'test@fusioninventory.org'
-Certificate is to be certified until Jun  7 14:34:09 2026 GMT (3650 days)
+Certificate is to be certified until Nov 24 09:49:47 2030 GMT (3650 days)
 
 Write out database with 1 new entries
 Data Base Updated

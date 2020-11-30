@@ -21,10 +21,10 @@ no_index:
     - t
     - xt
 requires:
-  Mojolicious: '6.10'
+  Mojolicious: '8.65'
   Plack: '1.0031'
   Test::More: '0.47'
   Test::UseAllModules: '0.10'
 resources: {}
-version: '0.37'
+version: '0.38'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

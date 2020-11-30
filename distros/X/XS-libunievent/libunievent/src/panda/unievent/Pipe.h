@@ -25,8 +25,9 @@ struct Pipe : virtual Stream {
 
     virtual void open    (fd_t file, Ownership ownership = Ownership::TRANSFER, bool connected = false);
     virtual void bind    (string_view name);
-    virtual void connect (const PipeConnectRequestSP& req);
-    /*INL*/ void connect (const string& name, connect_fn callback = nullptr);
+
+    virtual PipeConnectRequestSP connect (const PipeConnectRequestSP& req);
+    /*INL*/ PipeConnectRequestSP connect (const string& name, connect_fn callback = nullptr);
 
     virtual void pending_instances (int count);
 
@@ -67,8 +68,9 @@ private:
 };
 
 
-inline void Pipe::connect (const string& name, connect_fn callback) {
-    connect(new PipeConnectRequest(name, callback));
+inline PipeConnectRequestSP Pipe::connect (const string& name, connect_fn callback) {
+    PipeConnectRequestSP connect_request = new PipeConnectRequest(name, callback);
+    return connect(connect_request);
 }
 
 

@@ -3,7 +3,11 @@ package FusionInventory::Agent::Version;
 use strict;
 use warnings;
 
-our $VERSION = "2.5";
+# For CPAN releases right versions ordering, as 2.6 is evaluated to v2.600 by
+# version module for versions comparaison, 2.6 following versions should be:
+# - kept as major.minor (2.7, 2.8, ...)
+# - or use the "alpha" notation to set revision: 2.6_01 is evaluated to v2.601
+our $VERSION = "2.6";
 our $PROVIDER = "FusionInventory";
 our $COMMENTS = [];
 
@@ -33,5 +37,5 @@ agent issue is reported.
 One very useful information should be first defined like in that example:
 
 our $COMMENTS = [
-    "Based on FusionInventory Agent v2.4.2"
+    "Based on FusionInventory Agent v2.5.1"
 ];

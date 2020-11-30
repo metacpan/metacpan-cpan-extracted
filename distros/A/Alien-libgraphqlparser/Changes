@@ -1,0 +1,9 @@
+Revision history for Alien-libgraphqlparser
+
+0.02    2020-11-21
+        Removed the IsolateDynamic plugin; the built library now
+        keeps its original structure.
+
+0.01    2020-11-21
+        First version, released on an unsuspecting world.
+

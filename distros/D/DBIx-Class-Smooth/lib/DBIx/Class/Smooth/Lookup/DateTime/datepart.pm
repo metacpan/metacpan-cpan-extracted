@@ -6,7 +6,7 @@ package DBIx::Class::Smooth::Lookup::DateTime::datepart;
 
 # ABSTRACT: Short intro
 our $AUTHORITY = 'cpan:CSSON'; # AUTHORITY
-our $VERSION = '0.0107';
+our $VERSION = '0.0108';
 
 use parent 'DBIx::Class::Smooth::Lookup::Util';
 use Carp qw/carp confess/;
@@ -47,7 +47,7 @@ DBIx::Class::Smooth::Lookup::DateTime::datepart - Short intro
 
 =head1 VERSION
 
-Version 0.0107, released 2020-10-28.
+Version 0.0108, released 2020-11-29.
 
 =head1 SOURCE
 

@@ -18,8 +18,7 @@ for my $spec (
     [qw(G2  m)],
 ) {
     my $chords = $mcg->transform(@$spec);
-#warn Dumper($chords);
-
+#    print Dumper($chords);
     my $x = [map { '' . median(@$_) } @$chords];
-warn "@$spec: @$x\n";
+    print "@$spec: @$x\n";
 }

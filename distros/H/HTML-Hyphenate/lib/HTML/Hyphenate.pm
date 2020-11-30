@@ -1,13 +1,13 @@
 # -*- cperl; cperl-indent-level: 4 -*-
 # Copyright (C) 2009-2020, Roland van Ipenburg
-package HTML::Hyphenate v1.1.5;
+package HTML::Hyphenate v1.1.7;
 use Moose;
 use utf8;
 use 5.016000;
 
-use charnames qw(:full);
+use charnames ();
 
-use Log::Log4perl qw(:easy get_logger);
+#use Log::Log4perl qw(:resurrect :easy get_logger);
 use Set::Scalar;
 use TeX::Hyphen;
 use TeX::Hyphen::Pattern 0.100;
@@ -15,9 +15,10 @@ use Mojo::DOM;
 
 use Readonly;
 ## no critic qw(ProhibitCallsToUnexportedSubs)
+Readonly::Scalar my $EMPTY        => q{};
 Readonly::Scalar my $DOT          => q{.};
-Readonly::Scalar my $SOFT_HYPHEN  => qq{\N{SOFT HYPHEN}};
-Readonly::Scalar my $CLASS_JOINER => q{, .};                # for CSS classnames
+Readonly::Scalar my $SOFT_HYPHEN  => charnames::string_vianame(q{SOFT HYPHEN});
+Readonly::Scalar my $CLASS_JOINER => q{, .};               # for CSS classnames
 Readonly::Scalar my $ONE_LEVEL_UP => -1;
 Readonly::Scalar my $DOCTYPE      => q{<!DOCTYPE html>};
 
@@ -47,11 +48,14 @@ Readonly::Hash my %LOG => (
     'HTML_PROPERTY' => q{Using HTML property '%s'},
     'NOT_HYPHEN'    => q{No pattern found for '%s'},
     'REGISTER'      => q{Registering TeX::Hyphen object for label '%s'},
+    'NO_CLASSES'    => q{No classes defined, so not check for them},
 );
 ## use critic
 
-Log::Log4perl->easy_init( { 'level' => $ERROR, 'utf8' => 1 } );
-my $log = get_logger();
+## no critic qw(ProhibitCommentedOutCode)
+###l4p Log::Log4perl->easy_init( { 'level' => $DEBUG, 'utf8' => 1 } );
+###l4p my $log = get_logger();
+## use critic
 
 ## no critic qw(ProhibitHashBarewords ProhibitCallsToUnexportedSubs ProhibitCallsToUndeclaredSubs)
 has html     => ( is => 'rw', isa => 'Str' );
@@ -65,7 +69,7 @@ after 'html' => sub {
             $self->_doctype( ${+}{doctype} );
         }
         else {
-            $self->_doctype();
+            $self->_doctype($EMPTY);
         }
     }
 };
@@ -81,30 +85,53 @@ has classes_included =>
   ( is => 'rw', isa => 'ArrayRef', default => sub { [] } );
 has classes_excluded =>
   ( is => 'rw', isa => 'ArrayRef', default => sub { [] } );
+after 'classes_included' => sub {
+    my ( $self, $ar ) = @_;
+    if ( defined $ar ) {
+        $self->_classes(
+            ( scalar $self->classes_excluded + scalar $self->classes_included )
+            > 0 );
+    }
 
-has _hyphenators => ( is => 'rw', isa => 'HashRef', default => sub { {} } );
-has _lang        => ( is => 'rw', isa => 'Str' );
-has _doctype     => ( is => 'rw', isa => 'Str' );
-has _dom         => ( is => 'rw', isa => 'Mojo::DOM' );
+};
+after 'classes_excluded' => sub {
+    my ( $self, $ar ) = @_;
+    if ( defined $ar ) {
+        $self->_classes(
+            ( scalar $self->classes_excluded + scalar $self->classes_included )
+            > 0 );
+    }
+};
+
+has _hyphenators   => ( is => 'rw', isa => 'HashRef', default => sub { {} } );
+has _lang          => ( is => 'rw', isa => 'Str' );
+has _doctype       => ( is => 'rw', isa => 'Str' );
+has _dom           => ( is => 'rw', isa => 'Mojo::DOM' );
+has _scope_is_root => ( is => 'rw', isa => 'Bool', default => sub { 0 } );
+has _classes       => ( is => 'rw', isa => 'Bool', default => sub { 0 } );
 ## use critic
 
 ## no critic qw(ProhibitCallsToUnexportedSubs)
 Readonly::Scalar my $LANG  => q{lang};
+Readonly::Scalar my $HTML  => q{html};
 Readonly::Scalar my $TEXT  => q{text};
 Readonly::Scalar my $TAG   => q{tag};
 Readonly::Scalar my $RAW   => q{raw};
 Readonly::Scalar my $PRE   => q{pre};
 Readonly::Scalar my $CLASS => q{class};
+## no critic qw(RequireDotMatchAnything RequireExtendedFormatting RequireLineBoundaryMatching)
+Readonly::Scalar my $NONSPACE => qr{\S+};
 ## use critic
 
 sub hyphenated {
     my ( $self, $html ) = @_;
     if ( defined $html ) {
-        $log->debug( sprintf $LOG{'HTML_METHOD'}, $html );
+
+        ###l4p $log->debug( sprintf $LOG{'HTML_METHOD'}, $html );
         $self->html($html);
     }
     else {
-        $log->debug( sprintf $LOG{'HTML_PROPERTY'}, $self->html );
+        ###l4p $log->debug( sprintf $LOG{'HTML_PROPERTY'}, $self->html );
     }
     $self->_reset_dom;
     $self->_dom->parse( $self->html );
@@ -123,7 +150,8 @@ sub register_tex_hyphen {
       )
     {
         my $cache = $self->_hyphenators;
-        $log->debug( sprintf $LOG{'REGISTER'}, $label );
+
+        ###l4p $log->debug( sprintf $LOG{'REGISTER'}, $label );
         ${$cache}{$label} = $tex;
         $self->_hyphenators($cache);
     }
@@ -133,21 +161,35 @@ sub register_tex_hyphen {
 sub _traverse_dom {
     my ( $self, $node ) = @_;
     if ( $self->_hyphenable($node) ) {
-        if ( $node->type eq $TAG ) {
-            $log->debug( sprintf $LOG{'TRAVERSE'}, $node->tag );
+        my $type = $node->type;
+        if ( $TAG eq $type ) {
+
+            ###l4p $log->debug( sprintf $LOG{'TRAVERSE'}, $node->tag );
             $self->_configure_lang($node);
-            foreach my $attr ( keys %{ $node->attr } ) {
-                if ( $text_attr->has($attr) ) {
-                    $node->attr( $attr, $self->_hyphen( $node->attr($attr) ) );
+            while ( my ( $k, $v ) = each %{ $node->attr } ) {
+                if ( $text_attr->has($k)
+                    && length $v >= $self->min_length )
+                {
+                    $node->attr( $k, $self->_hyphen($v) );
                 }
             }
         }
-        elsif ( $TEXT eq $node->type || $RAW eq $node->type ) {
-            if ( !defined $self->_lang ) {
+        elsif ( $TEXT eq $type || $RAW eq $type ) {
+            my $string = $node->to_string;
+            ###l4p $log->trace( sprintf $LOG{'TEXT_NODE'}, $string );
+            if (
+                length $string >= $self->min_length
+## no critic qw(RequireDotMatchAnything RequireLineBoundaryMatching)
+                && $string =~ m{$NONSPACE}x
+              )
+## use critic
+            {
                 $self->_configure_lang($node);
+                my $hyphened = $self->_hyphen($string);
+                if ( $hyphened ne $string ) {
+                    $node->replace($hyphened);
+                }
             }
-            $log->debug( sprintf $LOG{'TEXT_NODE'}, $node->to_string );
-            $node->replace( $self->_hyphen( $node->to_string ) );
             return;
         }
     }
@@ -161,7 +203,7 @@ sub _clean_html {
     my ($self) = @_;
     my $html = $self->_dom->to_string();
     $self->_reset_dom;
-    if ( defined $self->_doctype ) {
+    if ( $EMPTY ne $self->_doctype ) {
         $html = $self->_doctype . $html;
     }
     return $html;
@@ -169,7 +211,8 @@ sub _clean_html {
 
 sub _hyphen {
     my ( $self, $text ) = @_;
-    $log->debug( sprintf $LOG{'HYPHEN_TEXT'}, $text );
+
+    ###l4p $log->debug( sprintf $LOG{'HYPHEN_TEXT'}, $text );
     $text =~ s/(\w{@{[$self->min_length]},})/$self->_hyphen_word($1)/xsmeg;
     return $text;
 }
@@ -177,8 +220,9 @@ sub _hyphen {
 sub _hyphen_word {
     my ( $self, $word ) = @_;
     if ( defined $self->_hyphenators->{ $self->_lang } ) {
-        $log->debug( sprintf $LOG{'HYPHEN_WORD'},
-            $word, $self->_hyphenators->{ $self->_lang }->visualize($word) );
+
+        ###l4p $log->debug( sprintf $LOG{'HYPHEN_WORD'},
+        ###l4p     $word, $self->_hyphenators->{ $self->_lang }->visualize($word) );
         my $number = 0;
         foreach
           my $pos ( $self->_hyphenators->{ $self->_lang }->hyphenate($word) )
@@ -188,25 +232,55 @@ sub _hyphen_word {
         }
     }
     else {
-        $log->warn( sprintf $LOG{'NOT_HYPHEN'}, $self->_lang );
+        ###l4p $log->warn( sprintf $LOG{'NOT_HYPHEN'}, $self->_lang );
     }
     return $word;
 }
 
+## no critic qw(RequireArgUnpacking)
+sub __lang_attr {
+    if ( $_[0] ) {
+        return $_[0]->attr($LANG) || $_[0]->attr(qq{xml:$LANG});
+## use critic
+    }
+    else {
+        return;
+    }
+}
+
 sub _configure_lang {
     my ( $self, $element ) = @_;
-    my $lang = $element->attr($LANG);
-    $lang ||= $element->attr(qq{xml:$LANG});
-    my %hyphen_opts = (
-        q{leftmin}  => $self->min_pre,
-        q{rightmin} => $self->min_post,
-    );
-    defined $self->style
-      && ( $hyphen_opts{'style'} = $self->style );
-    defined $lang || ( $lang = $self->default_lang );
+    my $lang = __lang_attr($element);
+    if ( defined $lang ) {
+        $self->_scope_is_root( $HTML eq $element->tag );
+    }
+    if ( !defined $lang ) {
+        $lang = __lang_attr( $element->parent );
+        if ( defined $lang ) {
+            $self->_scope_is_root( $HTML eq $element->parent->tag );
+        }
+    }
+    if ( !defined $lang ) {
+
+        # If the scope was already set by the root element we don't have to
+        # check if it has gone out of scope because we never leave the root
+        # scope:
+        if ( !$self->_scope_is_root ) {
+            my $recent = $element->ancestors(qq{[$LANG]})->first();
+            $self->_scope_is_root( $recent && $HTML eq $recent->tag );
+            $lang = __lang_attr($recent);
+        }
+        else {
+            $lang = $self->_lang;
+        }
+    }
+    if ( !defined $lang ) {
+        $lang = $self->default_lang;
+    }
     if ( !defined $self->_lang || $lang ne $self->_lang ) {
         $self->_lang($lang);
-        $log->debug( sprintf $LOG{'LANGUAGE_SET'}, $lang );
+
+        ###l4p $log->debug( sprintf $LOG{'LANGUAGE_SET'}, $lang );
         if ( !exists $self->_hyphenators->{$lang} ) {
             $self->_add_tex_hyphen_to_cache();
         }
@@ -220,7 +294,8 @@ sub _add_tex_hyphen_to_cache {
     $thp->label( $self->_lang );
     my $cache = $self->_hyphenators;
     if ( my $file = $thp->filename ) {
-        $log->debug( sprintf $LOG{'PATTERN_FILE'}, $file );
+
+        ###l4p $log->debug( sprintf $LOG{'PATTERN_FILE'}, $file );
         ${$cache}{ $self->_lang } = TeX::Hyphen->new(
             q{file}     => $file,
             q{leftmin}  => $self->min_pre,
@@ -250,16 +325,26 @@ sub _hyphenable_by_class {
     return !( $excluded_level > $included_level );
 }
 
+sub __parent_is_pre {
+    my ($node) = @_;
+    my $parent = $node->parent;
+    return defined $parent
+      && ( ( $parent->tag || $EMPTY ) eq $PRE );
+}
+
 sub _hyphenable {
     my ( $self, $node ) = @_;
-    return !( $node->ancestors($PRE)->size
-        || !$self->_hyphenable_by_class($node) );
+
+    ###l4p $self->_classes || $log->debug( $LOG{'NO_CLASSES'} );
+    return !( __parent_is_pre($node)
+        || ( $self->_classes && !$self->_hyphenable_by_class($node) ) );
 }
 
 sub _get_nearest_ancestor_level_by_classname {
     my ( $self, $node, $ar_classnames, $level ) = @_;
     my $classnames = Set::Scalar->new( @{$ar_classnames} );
-    $log->debug( sprintf $LOG{'LOOKING_UP'}, $classnames->size );
+
+    ###l4p $log->debug( sprintf $LOG{'LOOKING_UP'}, $classnames->size );
     if ( !$classnames->is_empty
         && ( $node->ancestors->size ) )
     {
@@ -289,11 +374,11 @@ __END__
 
 =head1 NAME
 
-HTML::Hyphenate - insert soft hyphens into HTML.
+HTML::Hyphenate - insert soft hyphens into HTML
 
 =head1 VERSION
 
-This document describes HTML::Hyphenate version v1.1.5.
+This document describes HTML::Hyphenate version v1.1.7.
 
 =head1 SYNOPSIS
 
@@ -384,7 +469,8 @@ Registers a TeX::Hyphen object to handle the language defined by C<lang>.
 
 =head1 CONFIGURATION AND ENVIRONMENT
 
-The output is generated by L<Mojo::DOM|Mojo::DOM>.
+The output is generated by L<Mojo::DOM|Mojo::DOM> so the environment variable
+C<MOJO_DOM_CSS_DEBUG> can be set to debug it's CSS selection process.
 
 =head1 DEPENDENCIES
 
@@ -395,8 +481,6 @@ The output is generated by L<Mojo::DOM|Mojo::DOM>.
 =item * L<Moose|Moose>
 
 =item * L<Mojolicious|Mojolicious> for L<Mojo::Dom|Mojo::Dom>
-
-=item * L<Log::Log4perl|Log::Log4perl>
 
 =item * L<Readonly|Readonly>
 
@@ -411,11 +495,12 @@ The output is generated by L<Mojo::DOM|Mojo::DOM>.
 =head1 INCOMPATIBILITIES
 
 This module has the same limits as TeX::Hyphen, TeX::Hyphen::Pattern and
-Mojo::DOM.
+Mojo::DOM. Tests might fail if the patterns used for them are updated and
+change the test result.
 
 =head1 DIAGNOSTICS
 
-This module uses Log::Log4perl for logging.
+This module uses Log::Log4perl for logging when it's resurrected.
 
 =over 4
 
@@ -432,8 +517,8 @@ TeX::Hyphen::Pattern
 hyphen somewhere in a word, and sometimes requires semantics to get it right.
 For example C<cafeetje> should be hyphenated as C<cafe-tje> and not
 C<cafee-tje> and C<buurtje> can be hyphenated as C<buur-tje> or C<buurt-je>,
-depending on it's meaning. While HTML could provide a bit more context –
-mainly the language being used – than plain text to handle these issues, the
+depending on it's meaning. While HTML could provide a bit more context -
+mainly the language being used - than plain text to handle these issues, the
 initial purpose of this module is to make it possible for HTML rendering
 engines that support soft hyphens to be able to break long words over multiple
 lines to avoid unwanted overflow.

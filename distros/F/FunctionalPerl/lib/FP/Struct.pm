@@ -172,10 +172,10 @@ package FP::Struct;
 use strict;
 use warnings;
 use warnings FATAL => 'uninitialized';
-use Carp;
 use Chj::NamespaceClean;
 use FP::Show qw(show);
 use FP::Interface qw(require_package package_check_possible_interface);
+use FP::Carp;
 
 sub all_fields {
     my ($isa) = @_;
@@ -193,24 +193,27 @@ sub all_fields {
     )
 }
 
-sub field_maybe_predicate ($) {
+sub field_maybe_predicate {
+    @_ == 1 or fp_croak_nargs 1;
     my ($s) = @_;
     (ref $s) ? $$s[0] : undef
 }
 
-sub field_name ($) {
+sub field_name {
+    @_ == 1 or fp_croak_nargs 1;
     my ($s) = @_;
     (ref $s) ? $$s[1] : $s
 }
 
-sub field_maybe_predicate_and_name ($) {
-
-    # returns nothing at all if a predicate was given but is undef
+# returns nothing at all if a predicate was given but is undef
+sub field_maybe_predicate_and_name {
+    @_ == 1 or fp_croak_nargs 1;
     my ($s) = @_;
     (ref $s) ? (defined($$s[0]) ? @$s : ()) : (undef, $s)
 }
 
-sub field_has_predicate ($) {
+sub field_has_predicate {
+    @_ == 1 or fp_croak_nargs 1;
     my ($s) = @_;
     ref $s
 }
@@ -269,11 +272,12 @@ sub import {
     };
     *{"${package}::new"} = sub {
         my $class = shift;
-        @_ <= @$allfields or croak "too many arguments to ${package}::new";
+        @_ <= @$allfields or fp_croak "too many arguments to ${package}::new";
         for (@$allfields_i_with_predicate) {
             my ($pred, $name, $i) = @$_;
             &$pred($_[$i])
-                or die "unacceptable value for field '$name': " . show($_[$i]);
+                or fp_croak "unacceptable value for field '$name': "
+                . show($_[$i]);
         }
         my %s;
         for (my $i = 0; $i < @_; $i++) {
@@ -289,11 +293,12 @@ sub import {
 
         # XX bah, almost copy-paste, because want to avoid sub call
         # overhead (inlining please finally?):
-        @_ <= @$allfields or croak "too many arguments to ${package}::new";
+        @_ <= @$allfields or fp_croak "too many arguments to ${package}::new";
         for (@$allfields_i_with_predicate) {
             my ($pred, $name, $i) = @$_;
             &$pred($_[$i])
-                or die "unacceptable value for field '$name': " . show($_[$i]);
+                or fp_croak "unacceptable value for field '$name': "
+                . show($_[$i]);
         }
         my %s;
         for (my $i = 0; $i < @_; $i++) {
@@ -323,7 +328,7 @@ sub import {
     # constructor with hash parameter:
     *{"${package}::new__"} = sub {
         my $class = shift;
-        @_ == 1 or croak "wrong number of arguments to ${package}::new__";
+        @_ == 1 or fp_croak "wrong number of arguments to ${package}::new__";
         my ($h) = @_;
         $class->unsafe_new__(+{%$h})
     }, *{"${package}::unsafe_new__"} = sub {
@@ -331,18 +336,18 @@ sub import {
         # NOTE: reuses (blesses) the argument hash! careful!
         my $class = shift;
         @_ == 1
-            or croak "wrong number of arguments to ${package}::unsafe_new__";
+            or fp_croak "wrong number of arguments to ${package}::unsafe_new__";
         my ($s) = @_;
         scalar(keys %$s) <= (@$allfields * 2)
-            or croak "too many arguments to ${package}::new_";
+            or fp_croak "too many arguments to ${package}::new_";
         for (keys %$s) {
-            exists $$allfields_h{$_} or die "unknown field '$_'";
+            exists $$allfields_h{$_} or fp_croak "unknown field '$_'";
             Internals::SvREADONLY $$s{$_}, 1 if $is_pure && $immutable;
         }
         for (@$allfields_with_predicate) {
             my ($pred, $name) = @$_;
             &$pred($$s{$name})
-                or die "unacceptable value for field '$name': "
+                or fp_croak "unacceptable value for field '$name': "
                 . show($$s{$name});
         }
         bless $s, $class;
@@ -365,7 +370,7 @@ sub import {
         for my $_field (@$fields) {
             my ($maybe_predicate, $name)
                 = field_maybe_predicate_and_name($_field)
-                or croak "type predicate given but undef (this can happen "
+                or fp_croak "type predicate given but undef (this can happen "
                 . "due to phasing, e.g. referring to a lexical variable "
                 . "defined in the same file) for field "
                 . (defined($$_field[1]) ? "'$$_field[1]'" : "undef");
@@ -392,10 +397,10 @@ sub import {
                 $maybe_predicate
                 ? sub {
                     my $s = shift;
-                    @_ == 1 or die "${name}_set: need 1 argument";
+                    @_ == 1 or fp_croak "${name}_set: need 1 argument";
                     my $v = shift;
                     &$maybe_predicate($v)
-                        or die "unacceptable value for field '$name': "
+                        or fp_croak "unacceptable value for field '$name': "
                         . show($v);
                     my $new = +{%$s};
                     $$new{$name} = $v;
@@ -403,7 +408,7 @@ sub import {
                 }
                 : sub {
                     my $s = shift;
-                    @_ == 1 or die "${name}_set: need 1 argument";
+                    @_ == 1 or fp_croak "${name}_set: need 1 argument";
                     my $new = +{%$s};
                     ($$new{$name}) = @_;
                     bless $new, ref $s
@@ -414,18 +419,18 @@ sub import {
                 "_update",
                 $maybe_predicate
                 ? sub {
-                    @_ == 2 or die "${name}_update: need 1 argument";
+                    @_ == 2 or fp_croak "${name}_update: need 2 arguments";
                     my ($s, $fn) = @_;
                     my $v = &$fn($s->{$name});
                     &$maybe_predicate($v)
-                        or die "unacceptable value for field '$name': "
+                        or fp_croak "unacceptable value for field '$name': "
                         . show($v);
                     my $new = +{%$s};
                     $$new{$name} = $v;
                     bless $new, ref $s
                 }
                 : sub {
-                    @_ == 2 or die "${name}_update: need 1 argument";
+                    @_ == 2 or fp_croak "${name}_update: need 2 arguments";
                     my ($s, $fn) = @_;
                     my $v   = &$fn($s->{$name});
                     my $new = +{%$s};

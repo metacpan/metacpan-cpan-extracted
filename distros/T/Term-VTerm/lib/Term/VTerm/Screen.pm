@@ -8,7 +8,7 @@ package Term::VTerm::Screen;
 use strict;
 use warnings;
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 =head1 NAME
 
@@ -73,36 +73,36 @@ Sets the screen-layer callbacks. Takes the following named arguments:
 
 =item on_damage => CODE
 
- $on_damage->( $rect )
+   $on_damage->( $rect )
 
 C<$rect> is a C<VTermRect> structure.
 
 =item on_moverect => CODE
 
- $on_moverect->( $dest, $src )
+   $on_moverect->( $dest, $src )
 
 C<$dest> and C<$src> are C<VTermRect> structures.
 
 =item on_movecursor => CODE
 
- $on_movecursor->( $pos, $oldpos, $is_visible )
+   $on_movecursor->( $pos, $oldpos, $is_visible )
 
 C<$pos> and C<$oldpos> are a C<VTermPos>. C<$is_visible> is a boolean.
 
 =item on_settermprop => CODE
 
- $on_settermprop->( $prop, $value )
+   $on_settermprop->( $prop, $value )
 
 C<$prop> is one of the C<PROP_*> constants. The type of C<$value> depends on
 the property type - see similar to C<get_penattr>.
 
 =item on_bell => CODE
 
- $on_bell->()
+   $on_bell->()
 
 =item on_resize => CODE
 
- $on_resize->( $rows, $cols )
+   $on_resize->( $rows, $cols )
 
 =back
 

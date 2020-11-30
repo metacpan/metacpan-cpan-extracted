@@ -127,7 +127,6 @@ my @expected_files = qw(
     xt/author/clean-namespaces.t
     xt/release/changes_has_content.t
     xt/release/cpan-changes.t
-    xt/release/distmeta.t
     xt/author/mojibake.t
     xt/author/pod-coverage.t
     xt/author/pod-syntax.t
@@ -137,6 +136,10 @@ my @expected_files = qw(
 push @expected_files, eval { Dist::Zilla::Plugin::Test::NoTabs->VERSION('0.09'); 1 }
     ? 'xt/author/no-tabs.t'
     : 'xt/release/no-tabs.t';
+
+push @expected_files, eval { Dist::Zilla::Plugin::MetaTests->VERSION('6.017'); 1 }
+    ? 'xt/author/distmeta.t'
+    : 'xt/release/distmeta.t';
 
 push @expected_files, 't/00-report-prereqs.dd'
     if Dist::Zilla::Plugin::Test::ReportPrereqs->VERSION >= 0.014;

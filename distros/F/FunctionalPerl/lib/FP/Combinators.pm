@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2014-2019 Christian Jaeger, copying@christianjaeger.ch
+# Copyright (c) 2014-2020 Christian Jaeger, copying@christianjaeger.ch
 #
 # This is free software, offered under either the same terms as perl 5
 # or the terms of the Artistic License version 2 or the terms of the
@@ -54,6 +54,7 @@ our @EXPORT_OK = qw(compose compose_scalar maybe_compose compose_1side
 our %EXPORT_TAGS = (all => [@EXPORT, @EXPORT_OK]);
 
 use Chj::TEST;
+use FP::Carp;
 
 sub compose {
     my (@fn) = reverse @_;
@@ -134,7 +135,8 @@ TEST {
 [2, 3];
 
 # a compose with 1 "side argument" (passed to subsequent invocations unmodified)
-sub compose_1side ($$) {
+sub compose_1side {
+    @_ == 2 or fp_croak_nargs 2;
     my ($f, $g) = @_;
     sub {
         my ($a, $b) = @_;
@@ -151,10 +153,11 @@ use Carp;
 # two? That would save the need for flip2of3 etc., but it would also
 # be less helpful for error-checking.
 
-sub flip ($) {
+sub flip {
+    @_ == 1 or fp_croak_nargs 1;
     my ($f) = @_;
     sub {
-        @_ == 2 or croak "expecting 2 arguments";
+        @_ == 2 or fp_croak_nargs 2;
         @_ = ($_[1], $_[0]);
         goto &$f
     }
@@ -166,28 +169,31 @@ TEST {
 3 / 2;
 
 # same as flip but pass a 3rd argument unchanged (flip 2 in 3)
-sub flip2of3 ($) {
+sub flip2of3 {
+    @_ == 1 or fp_croak_nargs 1;
     my ($f) = @_;
     sub {
-        @_ == 3 or croak "expecting 3 arguments";
+        @_ == 3 or fp_croak_nargs 3;
         @_ = ($_[1], $_[0], $_[2]);
         goto &$f
     }
 }
 
-sub rot3right ($) {
+sub rot3right {
+    @_ == 1 or fp_croak_nargs 1;
     my ($f) = @_;
     sub {
-        @_ == 3 or croak "expecting 3 arguments";
+        @_ == 3 or fp_croak_nargs 3;
         @_ = ($_[2], $_[0], $_[1]);
         goto &$f
     }
 }
 
-sub rot3left ($) {
+sub rot3left {
+    @_ == 1 or fp_croak_nargs 1;
     my ($f) = @_;
     sub {
-        @_ == 3 or croak "expecting 3 arguments";
+        @_ == 3 or fp_croak_nargs 3;
         @_ = ($_[1], $_[2], $_[0]);
         goto &$f
     }

@@ -5,7 +5,7 @@ use base 'PDF::Builder::Resource::Font';
 use strict;
 no warnings qw[ deprecated recursion uninitialized ];
 
-our $VERSION = '3.019'; # VERSION
+our $VERSION = '3.020'; # VERSION
 my $LAST_UPDATE = '3.017'; # manually update whenever code is changed
 
 use Math::Trig;    # CAUTION: deg2rad(0) = deg2rad(360) = 0!

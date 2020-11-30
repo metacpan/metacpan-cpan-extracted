@@ -386,7 +386,7 @@ sub request_required_params {
 }
 
 sub request_optional_params {
-    return qw(state);
+    return qw(state redirect_uri);
 }
 
 sub request_default_params {

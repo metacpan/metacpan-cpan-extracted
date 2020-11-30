@@ -134,6 +134,13 @@ CODE:
 	jc->strict = SvTRUE (onoff) ? 1 : 0;
 
 void
+indent (jc, onoff)
+	JSON::Create jc;
+	SV * onoff;
+CODE:
+	jc->indent = SvTRUE (onoff) ? 1 : 0;
+
+void
 set_handlers (jc, handlers)
 	JSON::Create jc
 	HV * handlers

@@ -556,11 +556,17 @@ IXHV::STORE(key, value)
 
     THI_INVALIDATE_ITERATORS;
 
+    bool has_rv = ix == 1 && GIMME_V != G_VOID;
+
+    if (has_rv)
+    {
+      ST(0) = sv_mortalcopy(value);
+    }
+
     ixhv_store(aTHX_ THIS, key, value, SM_SET);
 
-    if (ix == 1 && GIMME_V != G_VOID)
+    if (has_rv)
     {
-      ST(0) = value;
       XSRETURN(1);
     }
 
@@ -801,7 +807,7 @@ IXHV::items(...)
     THI_DEBUG_METHOD;
     THI_CHECK_OBJECT;
 
-    num_keys = items > 1 ? (items - 1) : HvUSEDKEYS(THIS->hv);
+    num_keys = items > 1 ? (unsigned)(items - 1) : HvUSEDKEYS(THIS->hv);
     num_items = (ix == 0 ? 2 : 1)*num_keys;
 
     if (GIMME_V == G_SCALAR)
@@ -1109,7 +1115,7 @@ IXHV::add(key, val)
 
     link = ixhv_store(aTHX_ THIS, key, NULL, SM_GET);
 #if !HAS_OP_DOR
-    if (ix == 6)
+    if (ix == 6 || ix == 7)
     {
       if (!SvOK(link->val))
       {

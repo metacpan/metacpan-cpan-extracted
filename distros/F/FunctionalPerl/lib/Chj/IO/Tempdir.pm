@@ -1,6 +1,6 @@
 # Mon Jul 14 07:58:53 2003  Christian Jaeger, christian.jaeger@ethlife.ethz.ch
 #
-# Copyright 2003 by Christian Jaeger
+# Copyright 2003-2020 by Christian Jaeger
 # Published under the same terms as perl itself.
 #
 # $Id$
@@ -30,6 +30,7 @@ use warnings;
 use warnings FATAL => 'uninitialized';
 use Carp;
 use Errno qw(EEXIST EINTR);
+use FP::Carp;
 use overload
     '""' => \&stringify,
     '0+' => \&numify,
@@ -58,14 +59,15 @@ sub stringify {
     $self->path
 }
 
-sub _Addslash ($) {
+sub _Addslash {
+    @_ == 1 or fp_croak_nargs 1;
     my ($str) = @_;
     $str =~ m|/$|s ? $str : $str . "/"
 }
 
 sub xtmpdir {
     my $class = shift;
-    @_ <= 2 or croak "xtmpdir expects 0 to 2 arguments";
+    @_ <= 2 or fp_croak_nargs "<= 2";
     my ($opt_basepath, $opt_mask) = @_;
     my $basepath
         = (defined($opt_basepath) ? $opt_basepath : $ENV{CHJ_TEMPDIR_BASEPATH}

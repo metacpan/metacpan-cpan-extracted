@@ -16,7 +16,7 @@ m4_define([lt_age], [v_min])
 
 ### Sets the release name. 
 ###m4_define([v_date], [m4_esyscmd_s([date "+%Y%m%d"])])
-m4_define([v_date], [20200114])])
+m4_define([v_date], [20201123])])
 
 AC_PREREQ([2.52])
 ### 2nd arg to AC_INIT is the version 'number'.
@@ -38,7 +38,6 @@ AC_ARG_ENABLE([dwarfgen],
         [enable_dwarfgen="no"])
    ],
    [enable_dwarfgen="no"])
-
 AM_CONDITIONAL([HAVE_DWARFGEN], [test "x${enable_dwarfgen}" = "xyes"])
 
 AC_ARG_ENABLE([dwarfexample],
@@ -51,8 +50,17 @@ AC_ARG_ENABLE([dwarfexample],
         [enable_dwarfexample="no"])
    ],
    [enable_dwarfexample="no"])
-
 AM_CONDITIONAL([HAVE_DWARFEXAMPLE], [test "x${enable_dwarfexample}" = "xyes"])
+
+### Solely for checking libdwarf allocation counts,sizes
+### Do not use without a good reason . See libdwarf/dwarf_alloc.c
+AC_ARG_ENABLE(globalallocsums,AS_HELP_STRING([--enable-global-alloc-sums],
+        [Enables some allocation counting in dwarf_alloc.c (default is NO)]),
+        [ AC_DEFINE([HAVE_GLOBAL_ALLOC_SUMS],[1],
+           [Define 1 if want some specialized allocation counting] )
+           [enable_globalallocsums="yes"]
+        ],
+        [enable_globalallocsums="no"])
 
 AC_ARG_ENABLE([sanitize],
    [AS_HELP_STRING([--enable-sanitize],
@@ -514,14 +522,14 @@ AS_IF(
     [test "x${enable_sanitize}" = "xyes"],
     [
      CFLAGS_save=${CFLAGS}
-     CFLAGS="${CFLAGS} -fsanitize=address -fsanitize=leak -fsanitize=undefined"
+     CFLAGS="${CFLAGS} -fsanitize=address -fsanitize=leak -fsanitize=undefined -fno-omit-frame-pointer"
      DWARF_CFLAGS=
      AC_COMPILE_IFELSE(
          [AC_LANG_PROGRAM([[]], [[]])],
          [
           enable_sanitize="yes"
-          DWARF_CFLAGS="$DWARF_CFLAGS -fsanitize=address -fsanitize=leak -fsanitize=undefined"
-          LDFLAGS="$LDFLAGS -fsanitize=address -fsanitize=leak -fsanitize=undefined"
+          DWARF_CFLAGS="$DWARF_CFLAGS -fsanitize=address -fsanitize=leak -fsanitize=undefined -fno-omit-frame-pointer"
+          LDFLAGS="$LDFLAGS -fsanitize=address -fsanitize=leak -fsanitize=undefined -fno-omit-frame-pointer"
          ],
          [enable_sanitize="no"])
      CFLAGS="${CFLAGS_save} ${DWARF_CFLAGS}" 
@@ -579,6 +587,7 @@ AS_IF(
     [
      have_zlib="yes"
      AC_DEFINE([HAVE_ZLIB], [1], [Set to 1 if zlib decompression is available.])
+     AC_DEFINE([HAVE_ZLIB_H], [1], [Set to 1 if zlib.h header file is available.])
     ],
     [
      have_zlib="no"

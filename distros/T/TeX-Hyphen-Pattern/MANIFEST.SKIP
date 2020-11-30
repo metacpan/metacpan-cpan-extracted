@@ -1,8 +1,7 @@
-# git
 ^.git/
 ^.gitmodules$
 ^git2cl/
-.gitignore$ # Wherever it appears
+.gitignore$
 ^Makefile$
 ^blib/
 ^pm_to_blib
@@ -12,5 +11,10 @@
 ^_build/
 ^MYMETA.yml$
 ^MYMETA.json$
+^MYMETA.json.lock$
 ^.gitignore$
 ^perltidy.LOG$
+^bitbucket-pipelines.yml$
+.bak$
+^cover_db/
+\b.*\.(bak|zip|tmp)$

@@ -74,7 +74,7 @@ TEST("Accept-Encoding") {
 TEST("gzip compression") {
     SECTION("small body") {
         auto req = Request::Builder()
-            .method(Method::POST)
+            .method(Method::Post)
             .body("my body")
             .compress(Compression::GZIP)
             .build();
@@ -117,7 +117,7 @@ Nullam quis tempus lectus. Quisque purus est, venenatis at auctor a, laoreet in 
 )END";
         string body_sample(body_raw);
         auto req = Request::Builder()
-            .method(Method::POST)
+            .method(Method::Post)
             .body(body_sample)
             .compress(Compression::GZIP, Compression::Level::optimal)
             .build();
@@ -149,7 +149,7 @@ Nullam quis tempus lectus. Quisque purus est, venenatis at auctor a, laoreet in 
         Body body;
         string body_concat;
         for(auto& it : body_raw) { body.parts.push_back(string(it)); body_concat += string(it); }
-        auto req = Request::Builder().method(Method::POST).body(std::move(body)).chunked().compress(Compression::GZIP).build();
+        auto req = Request::Builder().method(Method::Post).body(std::move(body)).chunked().compress(Compression::GZIP).build();
         auto data = req->to_string();
         REQUIRE_THAT(data, StartsWith(
             "POST / HTTP/1.1\r\n"
@@ -166,7 +166,7 @@ Nullam quis tempus lectus. Quisque purus est, venenatis at auctor a, laoreet in 
         REQUIRE(req->body.to_string() == body_concat);
 
         SECTION("make it piece by piece") {
-            auto req = Request::Builder().method(Method::POST).chunked().compress(Compression::GZIP).build();
+            auto req = Request::Builder().method(Method::Post).chunked().compress(Compression::GZIP).build();
             auto content = req->to_string();
             for(auto& it : body_raw) {
                 auto c = req->make_chunk(string(it));
@@ -181,7 +181,7 @@ Nullam quis tempus lectus. Quisque purus est, venenatis at auctor a, laoreet in 
         }
 
         SECTION("make it as final piece") {
-            auto req = Request::Builder().method(Method::POST).chunked().compress(Compression::GZIP).build();
+            auto req = Request::Builder().method(Method::Post).chunked().compress(Compression::GZIP).build();
             auto content = req->to_string();
             string body_str;
             for(auto& it : body_raw) { body_str += string(it); }
@@ -196,7 +196,7 @@ Nullam quis tempus lectus. Quisque purus est, venenatis at auctor a, laoreet in 
 
 TEST("ignore compression in response if request didn't support it") {
     auto req = Request::Builder()
-        .method(Method::GET)
+        .method(Method::Get)
         .allow_compression(Compression::IDENTITY)
         .uri("/")
         .build();
@@ -212,7 +212,7 @@ TEST("ignore compression in response if request didn't support it") {
 
 TEST("brotli is ignored if there is no plugin for it") {
     auto req = Request::Builder()
-        .method(Method::GET)
+        .method(Method::Get)
         .allow_compression(Compression::IDENTITY)
         .allow_compression(Compression::BROTLI)
         .uri("/")
@@ -240,7 +240,7 @@ TEST("is_valid_compression") {
 
 TEST("[SRV-1757] allow_compression accumulates identity") {
     auto req = Request::Builder()
-        .method(Method::GET)
+        .method(Method::Get)
         .allow_compression(Compression::IDENTITY)
         .uri("/")
         .build();

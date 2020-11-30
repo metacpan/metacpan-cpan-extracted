@@ -37,9 +37,3 @@ struct Typemap<panda::Stackframe*>: TypemapObject<panda::Stackframe*, panda::Sta
 };
 
 };
-
-namespace panda { namespace backtrace {
-
-void install_backtracer();
-
-}}

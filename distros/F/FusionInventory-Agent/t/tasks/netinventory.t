@@ -110,7 +110,7 @@ my %responses = (
         cmp     => {
             jobs    => 2,
             devices => [ 1, 1 ],
-            lastlog => qr/cleaning 1 worker threads/
+            lastlog => qr/All netinventory threads terminated/
         },
         PROLOG  =>
 '<?xml version="1.0" encoding="UTF-8"?>
@@ -260,7 +260,7 @@ my %responses = (
         cmp     => {
             jobs    => 1,
             devices => [ 1 ],
-            lastlog => qr/cleaning 1 worker threads/
+            lastlog => qr/All netinventory threads terminated/
         },
         PROLOG  =>
 '<?xml version="1.0" encoding="UTF-8"?>
@@ -340,7 +340,7 @@ my %responses = (
         cmp     => {
             jobs    => 2,
             devices => [ 2, 1 ],
-            lastlog => qr/cleaning 1 worker threads/
+            lastlog => qr/All netinventory threads terminated/
         },
         PROLOG  =>
 '<?xml version="1.0" encoding="UTF-8"?>
@@ -438,7 +438,7 @@ my %responses = (
         cmp     => {
             jobs    => 1,
             devices => [ 1 ],
-            lastlog => qr/cleaning 1 worker threads/
+            lastlog => qr/All netinventory threads terminated/
         },
         PROLOG  =>
 '<?xml version="1.0" encoding="UTF-8"?>
@@ -485,6 +485,9 @@ foreach my $case (keys(%responses)) {
 
 plan tests => $plan_tests_count ;
 
+my $queue = Thread::Queue->new();
+my $tid = threads->tid();
+
 my $client_module = Test::MockModule->new('FusionInventory::Agent::HTTP::Client::OCS');
 $client_module->mock('send', sub {
     my ($self, %params) = @_;
@@ -503,7 +506,29 @@ $client_module->mock('send', sub {
         my $sent = $params{message}->getContent();
         my $message = shift @{$response}
             or die "\nUnexpected $query sent message:\n$sent\n";
-        cmp_deeply($sent, $message, "Sent $query message");
+
+        # Dirty hack: the test was working as messages was ordered thanks to not
+        # working multi-threading algorithm. So try to compare messages while they
+        # have the same length but we need to handle the case where many responses has
+        # the same length and in that case, we better try to find it in the list
+        my @matchs = grep { length($sent) == length($_) } @{$response};
+        if (@matchs) {
+            my $max = @{$response};
+            my @others = ();
+            while ($max-- && @matchs>1 ? $sent ne $message : length($sent) != length($message)) {
+                push @others, $message;
+                $message = shift @{$response};
+            }
+            unshift @{$response}, @others if @others;
+        }
+
+        # When received in another thread than test thread, keep %params to be
+        # re-used for the same call later from the test thread
+        if (threads->tid() != $tid) {
+            $queue->enqueue(\%params);
+        } else {
+            cmp_deeply($sent, $message, "Sent $query message");
+        }
     }
 
     return $query eq 'PROLOG' ?
@@ -541,12 +566,17 @@ foreach my $case (keys(%responses)) {
 
     $task->run() if $task->isEnabled($response);
 
+    # "Re-send" in test thread calls from other threads, see client send() mock up
+    while (my $sent = $queue->dequeue_nb()) {
+        $client->send(%{$sent});
+    }
+
     ok(
         @{ $task->{jobs} || [] } == $responses{$case}->{cmp}->{jobs},
         "$case: total jobs"
     );
 
-    my @devices = map { scalar @{$_->{devices}} } @{$task->{jobs}};
+    my @devices = map { $_->count() } @{$task->{jobs}};
     cmp_deeply(
         \@devices, $responses{$case}->{cmp}->{devices},
         "$case: devices by jobs"

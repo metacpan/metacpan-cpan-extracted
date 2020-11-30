@@ -1,5 +1,8 @@
 Revision history for perl module Hash::Layout
 
+2.00 2020-11-21
+    - Added glob/wildcard substring match support
+
 1.02 2014-07-26
     - Travis + Coveralls support
     - Fixed bad files modes (files erroneously set with execute bit)

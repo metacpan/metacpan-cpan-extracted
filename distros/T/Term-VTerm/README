@@ -125,36 +125,42 @@ METHODS
 
     on_text => CODE
 
-       $on_text->( $text )
+         $on_text->( $text )
 
     on_control => CODE
 
-       $on_control->( $ctrl )
+         $on_control->( $ctrl )
 
       $ctrl is an integer giving a C0 or C1 control byte value.
 
     on_escape => CODE
 
-       $on_escape->( $str )
+         $on_escape->( $str )
 
     on_csi => CODE
 
-       $on_csi->( $leader, $command, @args )
+         $on_csi->( $leader, $command, @args )
 
       Where $leader may be undef, and each element of @args is an ARRAY
       reference containing sub-arguments. Each sub-argument may be undef.
 
     on_osc => CODE
 
-       $on_osc->( $command )
+         $on_osc->( $command, $str )
+
+      Where $command contains the parsed command number (or -1 if none was
+      found) and $str contains the full text after the ;.
 
     on_dcs => CODE
 
-       $on_dcs->( $str )
+         $on_dcs->( $command, $str )
+
+      Where $command contains the parsed DCS command identifier string and
+      $str contains the full text after it.
 
     on_resize => CODE
 
-       $on_resize->( $rows, $cols )
+         $on_resize->( $rows, $cols )
 
  obtain_state
 

@@ -8,7 +8,7 @@ namespace xs {
     template <> struct Typemap<panda::log::Level> : TypemapBase<panda::log::Level> {
         static inline panda::log::Level in (SV* sv) {
             int l = SvIV(sv);
-            if (l < panda::log::VERBOSE_DEBUG || l > panda::log::EMERGENCY) throw panda::exception("invalid log level");
+            if (l < (int)panda::log::Level::VerboseDebug || l > (int)panda::log::Level::Emergency) throw panda::exception("invalid log level");
             return (panda::log::Level)l;
         }
         static inline Sv out (panda::log::Level l, const Sv& = {}) {

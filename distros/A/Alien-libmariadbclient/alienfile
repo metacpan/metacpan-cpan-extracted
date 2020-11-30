@@ -1,0 +1,62 @@
+use alienfile;
+use strict;
+
+# Bandaid for OSX:
+# The default openssl is installed here:
+$ENV{PKG_CONFIG_PATH} .= ':/usr/local/opt/openssl/lib/pkgconfig/'
+    if $^O eq 'darwin';
+# but the path is not part of the default pkg-config search path,
+# so this is rarely found.
+# Worse: if you install mariadbclient using brew, pkg-config --exists libmariadb
+# will fail, because one of its required dependencies is libcrypto.
+
+plugin 'PkgConfig' => (
+    pkg_name => 'libmariadb',
+);
+
+share {
+    plugin Download => (
+        url     => 'https://github.com/mariadb-corporation/mariadb-connector-c/archive/v3.1.11.tar.gz',
+        version => qr/\bv([0-9\.]+)\.tar\.gz$/
+    );
+
+    plugin Extract => 'tar.gz';
+
+    plugin 'Build::CMake' => ();
+
+    patch [
+        '%{patch} -p1 < %{.install.patch}/0001-statically-link-against-auth-plugins.patch',
+    ];
+
+    my @extra_cmake_args;
+    # cargo-cult; without this cmake in OSX cannot find openssl, but why is it hardcoded to these directories??
+    push @extra_cmake_args, qw<
+        -DOPENSSL_ROOT_DIR=/usr/local/opt/openssl
+        -DOPENSSL_LIBRARIES=/usr/local/opt/openssl/lib
+    > if $^O eq 'darwin';
+
+    build [
+        [
+            '%{cmake}', '.',
+                '-DCMAKE_BUILD_TYPE=RelWithDebInfo',
+                '-DWITH_SSL=OPENSSL',
+                @extra_cmake_args,
+                # Internal zlib ends up causing memory corruption due to
+                # certain "internal" zlib symbols being in the global namespace,
+                # causing silent clashes with the system zlib library.
+                '-DWITH_EXTERNAL_ZLIB=yes',
+                @{ meta->prop->{plugin_build_cmake}->{args} },
+                '%{.install.extract}',
+        ],
+        [
+            '%{make}' => 'mariadb_config',
+        ],
+        [
+            '%{make}' => 'mariadbclient',
+        ],
+        [
+            '%{make}' => 'install',
+        ]
+    ];
+};
+

@@ -1,5 +1,5 @@
 package Task::CPANAuthors::Regional;
-$Task::CPANAuthors::Regional::VERSION = '1.002';
+$Task::CPANAuthors::Regional::VERSION = '1.003';
 use strict;
 use warnings;
 
@@ -15,7 +15,7 @@ Task::CPANAuthors::Regional - All regional Acme::CPANAuthors modules at once
 
 =head1 VERSION
 
-version 1.002
+version 1.003
 
 =head1 SYNOPSIS
 
@@ -86,11 +86,13 @@ L<Acme::CPANAuthors::Portuguese> - We are the Portuguese CPAN Authors
 
 L<Acme::CPANAuthors::Russian> - We are Russian CPAN authors
 
+L<Acme::CPANAuthors::Slovak> - We are Slovak CPAN authors
+
 L<Acme::CPANAuthors::Spanish> - We are the Spanish CPAN Authors
 
 L<Acme::CPANAuthors::Swedish> - Vi är svenska kontribuerare till CPAN
 
-L<Acme::CPANAuthors::Taiwanese>
+L<Acme::CPANAuthors::Taiwanese> - We are Taiwanese CPAN Authors!
 
 L<Acme::CPANAuthors::Turkish> - Türk CPAN Yazarları
 
@@ -116,7 +118,7 @@ Philippe Bruhat (BooK) <book@cpan.org>
 
 =head1 COPYRIGHT
 
-Copyright 2014-2019 Philippe Bruhat (BooK), All Rights Reserved.
+Copyright 2014-2020 Philippe Bruhat (BooK), All Rights Reserved.
 
 =head1 LICENSE
 

@@ -81,6 +81,7 @@ our @EXPORT_OK = qw(
 our %EXPORT_TAGS = (all => [@EXPORT, @EXPORT_OK]);
 
 use Carp 'croak';
+use FP::Carp;
 
 sub package_is_populated {
     my ($package) = @_;
@@ -91,7 +92,8 @@ sub package_is_populated {
     %$pr ? 1 : 0
 }
 
-sub require_package ($) {
+sub require_package {
+    @_ == 1 or fp_croak_nargs 1;
     my ($package) = @_;
     if (not package_is_populated $package) {
         $package =~ s|::|/|g;
@@ -100,7 +102,8 @@ sub require_package ($) {
     }
 }
 
-sub package_check_possible_interface ($$) {
+sub package_check_possible_interface {
+    @_ == 2 or fp_croak_nargs 2;
     my ($caller, $possible_interface_package) = @_;
     if (my $m = $possible_interface_package->can("FP_Interface__method_names"))
     {
@@ -122,7 +125,7 @@ sub package_check_possible_interface ($$) {
 }
 
 sub implemented_with_caller {
-    @_ == 2 or die "wrong number of arguments";
+    @_ == 2 or fp_croak_nargs 2;
     my ($caller, $interface) = @_;
     my ($caller_package, $caller_file, $caller_line) = @$caller;
     require_package $interface;

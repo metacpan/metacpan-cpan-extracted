@@ -1,5 +1,9 @@
 Revision history for Package-Stash
 
+0.39      2020-11-22 01:26:43Z
+     - updated distribution metadata and packaging
+     - configuration phase now uses ExtUtils::HasCompiler
+
 0.38      2018-12-31 03:25:07Z
      - avoid new warning in 5.21.x regarding too many arguments for
        printf/sprintf (Renée Bäcker)

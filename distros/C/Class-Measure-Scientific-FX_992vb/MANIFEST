@@ -2,9 +2,11 @@ Build.PL
 Changes
 CONTRIBUTING
 lib/Class/Measure/Scientific/FX_992vb.pm
+LICENSE
 LICENSES/Artistic
 LICENSES/Copying
-MANIFEST			This list of files
+MANIFEST
+MANIFEST.SKIP
 README
 t/00_base.t
 t/00_signature.t

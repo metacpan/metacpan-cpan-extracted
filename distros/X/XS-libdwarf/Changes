@@ -1,4 +1,8 @@
+20201123.0   24.11.2020
+    - version bump
+    - improved cmake support (accepted by upstream)
 20200114.8   22.06.2020
+    - improve makefile
     - add stub.c for compatibility
 20200114.7   19.06.2020
     - remove useless xs file

@@ -8,7 +8,7 @@ use base qw{ Exporter };
 # CAVEAT: do not include any other PPIx-Regexp modules in this one, or
 # you will end up with a circular dependency.
 
-our $VERSION = '0.075';
+our $VERSION = '0.076';
 
 our @EXPORT_OK = qw{
     ARRAY_REF
@@ -31,6 +31,7 @@ our @EXPORT_OK = qw{
     LOCATION_LOGICAL_FILE
     MINIMUM_PERL
     MODIFIER_GROUP_MATCH_SEMANTICS
+    MSG_LOOK_BEHIND_TOO_LONG
     MSG_PROHIBITED_BY_STRICT
     NODE_UNKNOWN
     RE_CAPTURE_NAME
@@ -41,6 +42,7 @@ our @EXPORT_OK = qw{
     TOKEN_LITERAL
     TOKEN_UNKNOWN
     TRUE
+    VARIABLE_LENGTH_LOOK_BEHIND_INTRODUCED
     @CARP_NOT
 };
 
@@ -156,6 +158,8 @@ use constant MINIMUM_PERL	=> '5.000';
 
 use constant MODIFIER_GROUP_MATCH_SEMANTICS => 'match_semantics';
 
+use constant MSG_LOOK_BEHIND_TOO_LONG	=>
+    'Lookbehind longer than 255 not implemented';
 use constant MSG_PROHIBITED_BY_STRICT	=>
     q<prohibited by "use re 'strict'">;
 
@@ -176,6 +180,8 @@ use constant SUFFICIENT_UTF8_SUPPORT_FOR_WEIRD_DELIMITERS => $] ge '5.008003';
 
 use constant TOKEN_LITERAL	=> 'PPIx::Regexp::Token::Literal';
 use constant TOKEN_UNKNOWN	=> 'PPIx::Regexp::Token::Unknown';
+
+use constant VARIABLE_LENGTH_LOOK_BEHIND_INTRODUCED	=> '5.029009';
 
 1;
 
@@ -304,6 +310,12 @@ The name of the
 L<PPIx::Regexp::Token::Modifier|PPIx::Regexp::Token::Modifier> group
 used to control match semantics.
 
+=head2 MSG_LOOK_BEHIND_TOO_LONG
+
+An appropriate error message for an unknown entity created from a
+quantifier which would make a look-behind assertion too long. This is
+cribbed verbatim from the Perl error message.
+
 =head2 MSG_PROHIBITED_BY_STRICT
 
 An appropriate error message for an unknown entity created because
@@ -351,6 +363,12 @@ L<PPIx::Regexp::Token::Literal|PPIx::Regexp::Token::Literal>.
 
 The name of the class that represents the unknown token. That is,
 L<PPIx::Regexp::Token::Unknown|PPIx::Regexp::Token::Unknown>.
+
+=head2 VARIABLE_LENGTH_LOOK_BEHIND_INTRODUCED
+
+The version in which variable-length look-behinds were introduced.
+Currently this is C<'5.029009'>, and implies the limited lookbehind
+introduced at or about that version.
 
 =head1 SUPPORT
 

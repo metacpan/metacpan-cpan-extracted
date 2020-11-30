@@ -1,5 +1,19 @@
 Revision history for MariaDB-NonBlocking
 
+0.29    2020-11-30
+        * Support systems that provide libmariadb.so but no
+          libmariadbclient.a (e.g. alpine's apk)
+
+0.28    2020-11-30
+        * Better support for some default linker flags;
+        --as-needed and -z=now break libmariadbclient's
+        linking to openssl, and those happen to be on
+        in ArchLinux's default Perl.
+
+0.27    2020-11-30
+        * Switch to using Alien::libmariadbclient instead
+          of building & bundling mariadb-connector-c.
+
 0.26    2020-08-21
         * Catch writing past the end of the buffer when quoting
           values & identifiers.

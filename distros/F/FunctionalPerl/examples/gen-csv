@@ -47,7 +47,7 @@ use FP::Ops qw(add);
 use FP::fix;
 use FP::Currying;
 
-sub fibs() {
+sub fibs () {
 
     # (Also see the [[fibs]] example script; unlike there, where
     # global scope is used, here we don't use Keep around $fibs as
@@ -66,7 +66,7 @@ sub exps;
     }
 };
 
-sub series() {
+sub series () {
     my $a    = 1.01;
     my $b    = 0.99;
     my $ns   = rest stream_iota;

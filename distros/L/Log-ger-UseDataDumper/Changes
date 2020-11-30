@@ -1,3 +1,12 @@
+0.005   2020-06-06  Released-By: PERLANCAR; Urgency: low
+
+	- No functional changes.
+
+	- [doc] Mention
+	  Log::ger::Use{BaheForDump,DataDumperCompact,JSONForDump,YAMLForDu
+	  mp}.
+
+
 0.004   2020-06-04  Released-By: PERLANCAR; Urgency: low
 
 	- No functional changes.

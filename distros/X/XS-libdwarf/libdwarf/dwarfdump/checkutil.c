@@ -1,6 +1,6 @@
 /*
-  Copyright (C) 2011-2012 SN Systems Ltd. All Rights Reserved.
-  Portions Copyright (C) 2011-2019 David Anderson. All Rights Reserved.
+Copyright (C) 2011-2012 SN Systems Ltd. All Rights Reserved.
+Portions Copyright (C) 2011-2019 David Anderson. All Rights Reserved.
 
   This program is free software; you can redistribute it and/or
   modify it under the terms of version 2 of the GNU General
@@ -199,7 +199,6 @@ AddEntryIntoBucketGroup(Bucket_Group *pBucketGroup,
         pBucket->Entries[0] = data;
         return;
     }
-
     pBucket = pBucketGroup->pTail;
 
     /*  Check if we have a previous allocated set of
@@ -448,7 +447,8 @@ IsValidInBucketGroup(Bucket_Group *pBucketGroup,Dwarf_Addr address)
     /* Check the address is within the allowed limits */
     if (address >= pBucketGroup->lower &&
         address <= pBucketGroup->upper) {
-        for (pBucket = pBucketGroup->pHead;
+        pBucket = pBucketGroup->pHead;
+        for ( ;
             pBucket && pBucket->nEntries;
             pBucket = pBucket->pNext) {
             for (nIndex = 0; nIndex < pBucket->nEntries; ++nIndex) {
@@ -472,7 +472,11 @@ ResetLimitsBucketSet(Bucket_Group *pBucketGroup)
     pBucketGroup->upper = 0;
 }
 
-/*  Limits are set only for ranges, so only in pRangesInfo. */
+/*  Limits are set only for ranges, so only in pRangesInfo.
+    But is used for ranges and location lists.
+    The default is set from object data (virt addr,
+    size in object file) but that does not work
+    sensibly in PE object files. */
 void
 SetLimitsBucketGroup(Bucket_Group *pBucketGroup,
     Dwarf_Addr lower,Dwarf_Addr upper)
@@ -566,10 +570,6 @@ Dwarf_Bool IsValidInLinkonce(Bucket_Group *pLo,
     /*  Build the name that represents the linkonce section (.text).
         This is not defined in DWARF so not correct for all
         compilers. */
-#ifdef ORIGINAL_SPRINTF
-    snprintf(section_name,sizeof(section_name),"%s%s",lo_text,name);
-    pBucketData = FindNameInBucketGroup(pLo,section_name);
-#else
     struct esb_s sn;
 
     esb_constructor_fixed(&sn,section_name,sizeof(section_name));
@@ -577,7 +577,6 @@ Dwarf_Bool IsValidInLinkonce(Bucket_Group *pLo,
     esb_append(&sn,name);
     pBucketData = FindNameInBucketGroup(pLo,esb_get_string(&sn));
     esb_destructor(&sn);
-#endif
     if (pBucketData) {
         if (lopc >= pBucketData->low && lopc <= pBucketData->high) {
             if (hipc >= pBucketData->low && hipc <= pBucketData->high) {

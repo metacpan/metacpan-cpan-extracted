@@ -1,3 +1,4 @@
+Changes
 gurpmi
 gurpmi.desktop.in
 gurpmi.pm
@@ -8,7 +9,6 @@ Makefile.PL
 MANIFEST
 MANIFEST.SKIP
 META.yml			Module meta-data (added by MakeMaker)
-NEWS
 README.zeroconf
 urpmi-repository-http.service
 po/af.po
@@ -102,6 +102,7 @@ rurpmi
 skip.list
 t/01compile.t
 t/02create_pkgs.t
+t/03kwality.t
 t/cfg.t
 t/data/media.cfg
 t/data/reconfig.urpmi

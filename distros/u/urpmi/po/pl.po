@@ -15,17 +15,18 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: Mageia\n"
-"POT-Creation-Date: 2020-01-18 09:59+0200\n"
-"PO-Revision-Date: 2015-05-05 13:43+0000\n"
-"Last-Translator: Daniel Napora <napcok@gmail.com>\n"
-"Language-Team: Polish (http://www.transifex.com/projects/p/mageia/language/"
+"POT-Creation-Date: 2020-07-10 17:41+0100\n"
+"PO-Revision-Date: 2020-07-10 16:45+0000\n"
+"Last-Translator: Dominik Adrian Grzywak\n"
+"Language-Team: Polish (http://www.transifex.com/MageiaLinux/mageia/language/"
 "pl/)\n"
 "Language: pl\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8-bit\n"
-"Plural-Forms: nplurals=3; plural=(n==1 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 "
-"|| n%100>=20) ? 1 : 2);\n"
+"Plural-Forms: nplurals=4; plural=(n==1 ? 0 : (n%10>=2 && n%10<=4) && (n"
+"%100<12 || n%100>14) ? 1 : n!=1 && (n%10>=0 && n%10<=1) || (n%10>=5 && n"
+"%10<=9) || (n%100>=12 && n%100<=14) ? 2 : 3);\n"
 
 #: ../gurpm/RPMProgressDialog.pm:47
 #, c-format
@@ -72,7 +73,7 @@ msgstr "Pobieranie pakietu \"%s\"..."
 msgid "Cancel"
 msgstr "Anuluj"
 
-#: ../gurpm/RPMProgressDialog.pm:359 ../urpm.pm:452 ../urpm/download.pm:882
+#: ../gurpm/RPMProgressDialog.pm:359 ../urpm.pm:454 ../urpm/download.pm:882
 #: ../urpm/get_pkgs.pm:277 ../urpm/media.pm:1149 ../urpm/media.pm:1682
 #: ../urpm/media.pm:1833
 #, c-format
@@ -291,7 +292,7 @@ msgstr ""
 "%s\n"
 "Czy kontynuować mimo to?"
 
-#: ../gurpmi2:120
+#: ../gurpmi2:120 ../gurpmi2:386
 #, c-format
 msgid "Warning"
 msgstr "Ostrzeżenie"
@@ -354,6 +355,7 @@ msgid_plural "Proceed with the installation of the %d packages?"
 msgstr[0] "Rozpocząć instalację jednego pakietu? "
 msgstr[1] "Rozpocząć instalację %d pakietów?"
 msgstr[2] "Rozpocząć instalację 1 pakietu? (%d MB)"
+msgstr[3] "Rozpocząć instalację 1 pakietu? (%d MB)"
 
 #: ../gurpmi2:259 ../urpmi:608
 #, c-format
@@ -423,6 +425,16 @@ msgstr "Instalacja zakończona"
 msgid "restarting urpmi"
 msgstr "ponownie uruchamianie urpmi"
 
+#: ../gurpmi2:386
+#, c-format
+msgid "No"
+msgstr "Nie"
+
+#: ../gurpmi2:386
+#, c-format
+msgid "Yes"
+msgstr "Tak"
+
 #: ../rpm-find-leaves:15
 #, c-format
 msgid ""
@@ -473,137 +485,137 @@ msgid "While some packages may have been installed, there were failures.\n"
 msgstr ""
 "Podczas gdy niektóre pakiety mogły zostać zainstalowane, nastąpiły błędy.\n"
 
-#: ../urpm.pm:193
+#: ../urpm.pm:195
 #, c-format
 msgid "fail to create directory %s"
 msgstr "utworzenie katalogu %s było niemożliwe"
 
-#: ../urpm.pm:194
+#: ../urpm.pm:196
 #, c-format
 msgid "invalid owner for directory %s"
 msgstr "nieprawidłowy właściciel katalogu %s"
 
-#: ../urpm.pm:237
+#: ../urpm.pm:239
 #, c-format
 msgid "Can not download packages into %s"
 msgstr "Pobranie pakietów do %s było niemożliwe"
 
-#: ../urpm.pm:253
+#: ../urpm.pm:255
 #, c-format
 msgid "Environment directory %s does not exist"
 msgstr "Katalog %s nie istnieje"
 
-#: ../urpm.pm:254 ../urpmf:244 ../urpmq:163
+#: ../urpm.pm:256 ../urpmf:244 ../urpmq:163
 #, c-format
 msgid "using specific environment on %s\n"
 msgstr "używając określonego środowiska na %s\n"
 
-#: ../urpm.pm:422
+#: ../urpm.pm:424
 #, c-format
 msgid "unable to open rpmdb"
 msgstr "nie można otworzyć bazy danych rpm"
 
-#: ../urpm.pm:441
+#: ../urpm.pm:443
 #, c-format
 msgid "invalid rpm file name [%s]"
 msgstr "niepoprawna nazwa pliku rpm [%s]"
 
-#: ../urpm.pm:447
+#: ../urpm.pm:449
 #, c-format
 msgid "retrieving rpm file [%s] ..."
 msgstr "pobieranie pliku rpm [%s] ..."
 
-#: ../urpm.pm:449 ../urpm/get_pkgs.pm:275
+#: ../urpm.pm:451 ../urpm/get_pkgs.pm:275
 #, c-format
 msgid "...retrieving done"
 msgstr "...pobieranie zakończone"
 
-#: ../urpm.pm:457
+#: ../urpm.pm:459
 #, c-format
 msgid "unable to access rpm file [%s]"
 msgstr "nie można uzyskać dostępu do pliku rpm [%s]"
 
-#: ../urpm.pm:462
+#: ../urpm.pm:464
 #, c-format
 msgid "unable to parse spec file %s [%s]"
 msgstr "nie można przetworzyć pliku konfiguracyjnego %s [%s]"
 
-#: ../urpm.pm:470
+#: ../urpm.pm:472
 #, c-format
 msgid "unable to register rpm file"
 msgstr "nie można zarejestrować pliku rpm"
 
-#: ../urpm.pm:472
+#: ../urpm.pm:474
 #, c-format
 msgid "Incompatible architecture for rpm [%s]"
 msgstr "Niezgodna architektura dla pakietu rpm [%s]"
 
-#: ../urpm.pm:476
+#: ../urpm.pm:478
 #, c-format
 msgid "error registering local packages"
 msgstr "błąd w trakcie rejestrowania pakietów lokalnych"
 
-#: ../urpm.pm:588
+#: ../urpm.pm:590
 #, c-format
 msgid "This operation is forbidden while running in restricted mode"
 msgstr "Operacja niedozwolona podczas pracy w trybie restrykcyjnym"
 
-#: ../urpm/args.pm:156 ../urpm/args.pm:165
+#: ../urpm/args.pm:157 ../urpm/args.pm:166
 #, c-format
 msgid "bad proxy declaration on command line\n"
 msgstr "niepoprawna deklaracja serwera pośredniczącego w wierszu poleceń\n"
 
-#: ../urpm/args.pm:320
+#: ../urpm/args.pm:321
 #, c-format
 msgid "urpmq: cannot read rpm file \"%s\"\n"
 msgstr "urpmq: nie można odczytać pliku rpm \"%s\"\n"
 
-#: ../urpm/args.pm:388
+#: ../urpm/args.pm:389
 #, c-format
 msgid "unexpected expression %s"
 msgstr "niespodziewane wyrażenie %s"
 
-#: ../urpm/args.pm:389
+#: ../urpm/args.pm:390
 #, c-format
 msgid "missing expression before %s"
 msgstr "brakujące wyrażenie przed %s"
 
-#: ../urpm/args.pm:395
+#: ../urpm/args.pm:396
 #, c-format
 msgid "unexpected expression %s (suggestion: use -a or -o ?)"
 msgstr "niespodziewane wyrażenie %s (sugestia: użyj -a lub -o ?)"
 
-#: ../urpm/args.pm:399
+#: ../urpm/args.pm:400
 #, c-format
 msgid "no expression to close"
 msgstr "brak wyrażenia do zamknięcia"
 
-#: ../urpm/args.pm:408
+#: ../urpm/args.pm:409
 #, c-format
 msgid "by default urpmf awaits a regexp. you should use option \"--literal\""
 msgstr "w domyślnym ustawieniu urpmf oczekuje regexp. Użyj opcji \"--literal\""
 
-#: ../urpm/args.pm:482
+#: ../urpm/args.pm:483
 #, c-format
 msgid "chroot directory doesn't exist"
 msgstr "Katalog chroot nie istnieje"
 
-#: ../urpm/args.pm:505
+#: ../urpm/args.pm:506
 #, c-format
 msgid "Can't use %s without %s"
 msgstr "Nie można użyć %s bez %s"
 
-#: ../urpm/args.pm:508 ../urpm/args.pm:511 ../urpmq:155
+#: ../urpm/args.pm:509 ../urpm/args.pm:512 ../urpmq:155
 #, c-format
 msgid "Can't use %s with %s"
 msgstr "Nie można użyć %s z %s"
 
-#: ../urpm/args.pm:519
+#: ../urpm/args.pm:520
 #, c-format
 msgid "Too many arguments\n"
 msgstr "Zbyt wiele argumentów\n"
 
-#: ../urpm/args.pm:527
+#: ../urpm/args.pm:528
 #, c-format
 msgid ""
 "%s version %s\n"
@@ -620,7 +632,7 @@ msgstr ""
 "\n"
 "użycie:\n"
 
-#: ../urpm/args.pm:533
+#: ../urpm/args.pm:534
 #, c-format
 msgid "Copyright (C) %s by %s"
 msgstr "Copyright (C) %s by %s"
@@ -821,32 +833,32 @@ msgstr "pobieranie plików rpm z nośnika \"%s\"..."
 msgid "removing %s"
 msgstr "usuwanie %s"
 
-#: ../urpm/install.pm:215
+#: ../urpm/install.pm:217
 #, c-format
 msgid "unable to extract rpm from delta-rpm package %s"
 msgstr "nie można wypakować pakietu rpm z pakietu delta-rpm %s"
 
-#: ../urpm/install.pm:242
+#: ../urpm/install.pm:245
 #, c-format
 msgid "unable to install package %s"
 msgstr "nie można zainstalować pakietu %s"
 
-#: ../urpm/install.pm:245
+#: ../urpm/install.pm:248
 #, c-format
 msgid "removing bad rpm (%s) from %s"
 msgstr "usuwanie niepoprawnego pakietu rpm (%s) z %s"
 
-#: ../urpm/install.pm:246 ../urpm/install.pm:393
+#: ../urpm/install.pm:249 ../urpm/install.pm:397
 #, c-format
 msgid "removing %s failed: %s"
 msgstr "usuwanie %s nie powiodło się: %s"
 
-#: ../urpm/install.pm:295
+#: ../urpm/install.pm:298
 #, c-format
 msgid "removing package %s"
 msgstr "usuwanie pakietu %s"
 
-#: ../urpm/install.pm:359
+#: ../urpm/install.pm:362
 #, c-format
 msgid ""
 "created transaction for installing on %s (remove=%d, install=%d, upgrade=%d)"
@@ -854,17 +866,17 @@ msgstr ""
 "utworzono transakcję dla instalacji na %s (usuwanie=%d, instalacja=%d, "
 "aktualizacja=%d)"
 
-#: ../urpm/install.pm:362
+#: ../urpm/install.pm:365
 #, c-format
 msgid "unable to create transaction"
 msgstr "nie można utworzyć transakcji"
 
-#: ../urpm/install.pm:391
+#: ../urpm/install.pm:395
 #, c-format
 msgid "removing installed rpms (%s) from %s"
 msgstr "usuwanie zainstalowanych pakietów rpm (%s) z %s"
 
-#: ../urpm/install.pm:400
+#: ../urpm/install.pm:404
 #, c-format
 msgid "More information on package %s"
 msgstr "Więcej informacji o pakiecie %s"
@@ -1444,6 +1456,10 @@ msgstr[2] ""
 "Poniższe pakiety:\n"
 "%s\n"
 "są osierocone."
+msgstr[3] ""
+"Poniższe pakiety:\n"
+"%s\n"
+"są osierocone."
 
 #: ../urpm/orphans.pm:616
 #, c-format
@@ -1452,6 +1468,7 @@ msgid_plural "You may wish to remove them."
 msgstr[0] "Być może chciałbyś odinstalować to"
 msgstr[1] "Być może chciałbyś odinstalować to"
 msgstr[2] "Być może chciałbyś odinstalować to"
+msgstr[3] "Być może chciałbyś odinstalować to"
 
 #: ../urpm/orphans.pm:633
 #, c-format
@@ -1476,6 +1493,11 @@ msgstr[1] ""
 "są osierocone, jeśli chcesz je usunąć, użyj polecenia \"urpme --auto-orphans"
 "\""
 msgstr[2] ""
+"Następujące pakiety:\n"
+"%s\n"
+"są osierocone, jeśli chcesz je usunąć, użyj polecenia \"urpme --auto-orphans"
+"\""
+msgstr[3] ""
 "Następujące pakiety:\n"
 "%s\n"
 "są osierocone, jeśli chcesz je usunąć, użyj polecenia \"urpme --auto-orphans"
@@ -1810,6 +1832,7 @@ msgid_plural "Removing the following packages will break your system:"
 msgstr[0] "Usunięcie poniższego pakietu spowoduje uszkodzenie systemu:"
 msgstr[1] "Usunięcie poniższych pakietów spowoduje uszkodzenie systemu:"
 msgstr[2] "Usunięcie poniższych pakietów spowoduje uszkodzenie systemu:"
+msgstr[3] "Usunięcie poniższych pakietów spowoduje uszkodzenie systemu:"
 
 #: ../urpme:123
 #, c-format
@@ -1829,6 +1852,7 @@ msgid_plural ""
 msgstr[0] "W celu spełnienia zależności zostanie usunięty następujący pakiet"
 msgstr[1] "W celu spełnienia zależności  usunięte zostaną %d pakiety"
 msgstr[2] "W celu spełnienia zależności  usunięte zostaną %d pakiety"
+msgstr[3] "W celu spełnienia zależności  usunięte zostaną %d pakiety"
 
 #: ../urpme:151
 #, c-format
@@ -1837,6 +1861,7 @@ msgid_plural "(orphan packages)"
 msgstr[0] "(osierocony pakiet)"
 msgstr[1] "(osierocone pakiety)"
 msgstr[2] "nieznany pakiet"
+msgstr[3] "nieznany pakiet"
 
 #: ../urpme:158
 #, c-format
@@ -1845,6 +1870,7 @@ msgid_plural "Remove %d packages?"
 msgstr[0] "Usunąć pakiet %d?"
 msgstr[1] "Usunąć pakiety %d?"
 msgstr[2] "Usunąć pakiet %d?"
+msgstr[3] "Usunąć pakiet %d?"
 
 #: ../urpme:163
 #, c-format
@@ -2651,6 +2677,7 @@ msgid_plural "The following orphan packages will be removed."
 msgstr[0] "Zostanie usunięty następujący osierocony pakiet."
 msgstr[1] "Zostaną usunięte następujące osierocone pakiety."
 msgstr[2] "Zostaną usunięte następujące osierocone pakiety."
+msgstr[3] "Zostaną usunięte następujące osierocone pakiety."
 
 #: ../urpmi:599
 #, c-format
@@ -3279,7 +3306,7 @@ msgstr ""
 "brak  informacji xml dla nośnika \"%s\", uzyskanie wyników dla pakietów %s "
 "było niemożliwe"
 
-#: ../urpmq:487
+#: ../urpmq:488
 #, c-format
 msgid "No changelog found\n"
 msgstr "Nie znaleziono dziennika zmian\n"

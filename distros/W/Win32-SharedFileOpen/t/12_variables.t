@@ -7,7 +7,7 @@
 #   Test script to check $ErrStr, $Trace and retry variables.
 #
 # COPYRIGHT
-#   Copyright (C) 2002-2006, 2014 Steve Hay.  All rights reserved.
+#   Copyright (C) 2002-2006, 2014, 2020 Steve Hay.  All rights reserved.
 #
 # LICENCE
 #   This script is free software; you can redistribute it and/or modify it under
@@ -66,7 +66,10 @@ BEGIN {
 
 MAIN: {
     my $err  = qr/^Invalid value for '(.*?)': '(.*?)' is not a natural number/o;
-    my $tol = 0.02; # Resolution is often around 1ms-15ms, so allow 20ms.
+
+    # Resolution is often around 1ms-15ms, but allow 100ms since times of around
+    # 55ms longer than expected are quite commonly seen in testing.
+    my $tol = 0.1;
 
     my($file, $fh1, $fh2, $output, $ret, $start, $finish, $time, $max_time);
 

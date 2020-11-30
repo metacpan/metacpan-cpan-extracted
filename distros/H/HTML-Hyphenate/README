@@ -1,6 +1,6 @@
 HTML::Hyphenate is Copyright (C) 2009-2020, Roland van Ipenburg
 
-HTML::Hyphenate version v1.1.5
+HTML::Hyphenate version v1.1.7
 ==============================
 
 This module can be used to insert soft hyphens into HTML.
@@ -9,24 +9,22 @@ INSTALLATION
 
 To install this module type the following:
 
-   perl Build.PL
-   ./Build
-   ./Build test
-   ./Build install
+   - perl Build.PL
+   - ./Build
+   - ./Build test
+   - ./Build install
 
 DEPENDENCIES
 
 This module requires these other modules and libraries:
 
-  Moose
-  Encode
-  Mojo::DOM
-  Log::Log4perl
-  Readonly              1.03
-  Set::Scalar
-  TeX::Hyphen
-  TeX::Hyphen::Pattern  0.103
-  version
+  - Moose
+  - Mojo::DOM
+  - Readonly              1.03
+  - Set::Scalar
+  - TeX::Hyphen
+  - TeX::Hyphen::Pattern  1.1.5
+  - version
 
 LICENSE INFORMATION
 

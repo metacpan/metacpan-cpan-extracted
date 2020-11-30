@@ -8,7 +8,6 @@ namespace panda { namespace unievent {
 
 // addrinfo extract, there are fields needed for hinting only
 struct AddrInfoHints {
-    static constexpr const int PASSIVE     = ARES_AI_PASSIVE;
     static constexpr const int CANONNAME   = ARES_AI_CANONNAME;
     static constexpr const int NUMERICSERV = ARES_AI_NUMERICSERV;
 

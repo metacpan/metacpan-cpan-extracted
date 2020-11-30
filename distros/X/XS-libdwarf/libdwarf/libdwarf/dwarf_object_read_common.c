@@ -36,8 +36,12 @@ EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "config.h"
 #include <stdio.h>
+#ifdef HAVE_STRING_H
 #include <string.h> /* memcpy */
-#include <sys/types.h> /* lseek and read */
+#endif /* HAVE_STRING_H */
+#ifdef HAVE_SYS_TYPES_H
+#include <sys/types.h> /* open(), off_t, size_t, ssize_t */
+#endif /* HAVE_SYS_TYPES_H */
 #ifdef HAVE_UNISTD_H
 #include <unistd.h> /* lseek read close */
 #elif defined(_WIN32) && defined(_MSC_VER)

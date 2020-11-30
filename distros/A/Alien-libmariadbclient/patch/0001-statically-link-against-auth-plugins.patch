@@ -1,0 +1,51 @@
+From ebc34eb9977b9431b5cd8495d60b92fa5c18b0ff Mon Sep 17 00:00:00 2001
+From: Brian Fraser <brian.fraser@booking.com>
+Date: Mon, 30 Nov 2020 00:26:42 +0100
+Subject: [PATCH] statically link against auth plugins
+
+---
+ plugins/auth/CMakeLists.txt | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/plugins/auth/CMakeLists.txt b/plugins/auth/CMakeLists.txt
+index 121f6e9..66a55d8 100644
+--- a/plugins/auth/CMakeLists.txt
++++ b/plugins/auth/CMakeLists.txt
+@@ -30,7 +30,7 @@ REGISTER_PLUGIN(TARGET mysql_native_password
+ REGISTER_PLUGIN(TARGET dialog
+                 TYPE MARIADB_CLIENT_PLUGIN_AUTH
+                 CONFIGURATIONS DYNAMIC STATIC OFF
+-                DEFAULT DYNAMIC
++                DEFAULT STATIC
+                 SOURCES ${CC_SOURCE_DIR}/plugins/auth/dialog.c
+                         ${CC_SOURCE_DIR}/libmariadb/get_password.c)
+ 
+@@ -70,7 +70,7 @@ IF(CRYPTO_PLUGIN)
+   REGISTER_PLUGIN(TARGET caching_sha2_password
+                 TYPE MARIADB_CLIENT_PLUGIN_AUTH
+                 CONFIGURATIONS DYNAMIC STATIC OFF
+-                DEFAULT DYNAMIC
++                DEFAULT STATIC
+                 SOURCES ${CC_SOURCE_DIR}/plugins/auth/caching_sha2_pw.c 
+                         ${CRYPT_SOURCE}
+                 LIBRARIES ${CRYPT_LIBS})
+@@ -81,7 +81,7 @@ IF(CRYPTO_PLUGIN)
+     REGISTER_PLUGIN(TARGET sha256_password
+                     TYPE MARIADB_CLIENT_PLUGIN_AUTH
+                     CONFIGURATIONS DYNAMIC STATIC OFF
+-                    DEFAULT DYNAMIC
++                    DEFAULT STATIC
+                     SOURCES ${AUTH_DIR}/sha256_pw.c
+                     LIBRARIES ${CRYPT_LIBS})
+   ENDIF()
+@@ -126,6 +126,6 @@ REGISTER_PLUGIN(TARGET mysql_old_password
+ REGISTER_PLUGIN(TARGET mysql_clear_password
+                 TYPE MARIADB_CLIENT_PLUGIN_AUTH
+                 CONFIGURATIONS DYNAMIC STATIC OFF
+-                DEFAULT DYNAMIC
++                DEFAULT STATIC
+                 SOURCES ${AUTH_DIR}/mariadb_cleartext.c)
+ 
+-- 
+2.29.2
+

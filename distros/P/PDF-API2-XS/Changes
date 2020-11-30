@@ -1,3 +1,8 @@
+1.002     2020-11-24
+
+    - Switched the license to be the same terms as Perl 5.
+
+
 1.001     2020-08-31
 
     - Removed -Ofast optimization due to compatibility issues.

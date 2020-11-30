@@ -3,6 +3,8 @@ use warnings;
 use lib 'lib';
 use feature qw(say);
 use Data::Dumper;
+$Data::Dumper::Sortkeys = 1;
+
 use File::Basename;
 use File::Find::Rule;
 use File::Slurper 'read_text';
@@ -39,39 +41,11 @@ ok(1);
 
 if ( -d $path ){
 
-    my $conf_path = $af_path . '/conf/';
-
-    my @files = File::Find::Rule->file()->name( '*.yaml' )->in( $path );
-
-    ok(scalar(@files), 'found at least one yaml file');
-
     my $CLASS = 'Geo::Address::Formatter';
-    use_ok($CLASS);
+    use_ok($CLASS);    
+
+    my $conf_path = $af_path . '/conf/';    
     my $GAF = $CLASS->new( conf_path => $conf_path );
-
-
-    # check the conf file for formatting errors
-    my $conffile = $conf_path . 'countries/worldwide.yaml';
-    ok(-e $conffile, 'found worldwide conf file');
-
-    # escaped parens and \d need to be double escaped for python
-    my $no_bad_parens = 1;
-    open my $FH, "<:encoding(UTF-8)", $conffile
-        or die "unable to open $conffile $!";
-    while (my $line = <$FH>){
-        next if ($line =~ m/^\s*#/);
-        my @probchars = ('\(', '\)', 'd');
-        foreach my $c (@probchars){
-            if ($line =~ m/\\$c/ && $line !~ m/\\\\$c/){
-                warn $line;
-                $no_bad_parens = 0;
-                last; # bail out
-            }
-        }
-    }
-    close $FH;
-    ok($no_bad_parens == 1, 'no badly escaped parens in worldwide conf file');
-
 
     # ok, time to actually run the country tests
     sub _one_testcase {
@@ -81,8 +55,6 @@ if ( -d $path ){
         my $expected = $rh_testcase->{expected};
         my $actual = $GAF->format_address($rh_testcase->{components});
 
-        #warn "e1 $expected\n";
-        #warn "a1 $actual\n";
         if (0) { # turn on for char by char comparison
             my @e = (split//, $expected);
             my @a = (split//, $actual);
@@ -95,10 +67,6 @@ if ( -d $path ){
                 }
                 $c++;
             }
-            #$expected =~ s/\n/, /g;
-            #$actual =~ s/\n/, /g;
-            #warn "e2 $expected\n";
-            #warn "a2 $actual\n";
         }
 
         is(
@@ -108,7 +76,9 @@ if ( -d $path ){
         );
     }
 
-    foreach my $filename (@files){
+    # get list of country specific tests
+    my @files = File::Find::Rule->file()->name( '*.yaml' )->in( $path );    
+    foreach my $filename (sort @files){
 
         my $country = basename($filename);
         $country =~ s/\.\w+$//; # us.yaml => us
@@ -127,41 +97,6 @@ if ( -d $path ){
             @a_testcases = LoadFile($filename);
         } "parsing file $filename";
 
-        {
-          my $text = read_text($filename);
-
-          ## example "Stauffenstra\u00dfe" which should be "Stauffenstraße"
-          if ( $text =~ m/\\u00/ ){
-              unlike(
-                $text,
-                qr!\\u00!,
-                'don\'t use Javascript utf8 encoding, use characters directly'
-             );
-          }
-
-          if ( $text =~ m/\t/ ){
-              unlike(
-                $text,
-                qr/\t/,
-                'there is a TAB in the YAML file. That will cause parsing errors'
-              );
-          }
-          if ( $text !~ m/\n$/ ){
-              like(
-                $text,
-                qr!\n$!,
-                'file doesnt end in newline. This will cause parsing errors'
-             );
-          }
-          if ( $text =~ /:\s*0/ ){
-              like(
-                $text,
-                qr!:s\*0!,
-                'zero unquoted. The PHP YAML parser will convert 0012 to 12'
-              );
-          }
-
-        }
         foreach my $rh_testcase (@a_testcases){
             _one_testcase($country, $rh_testcase);
         }

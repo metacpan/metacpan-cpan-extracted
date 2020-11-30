@@ -1,5 +1,12 @@
 Revision history for perl module DBIx::Class::Schema::Diff
 
+1.11 2020-11-24
+   - Add new 'DBIx::Class::Schema::Diff::State' class (VANSTYN)
+   - Add new fingerprint method to Diff/State object classes (VANSTYN)
+
+1.10 2020-11-21
+    - Add support for wildcards in filter to match sub strings (VANSTYN)
+
 1.07 2017-10-11
     - Tweak tests for upcoming (after 0.082840) DBIx::Class release (VANSTYN)
     - 1.06 was a broken upload

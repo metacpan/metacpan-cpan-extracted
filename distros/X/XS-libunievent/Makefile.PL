@@ -10,6 +10,7 @@ my %params = (
         FILE         => 'libunievent.a',
         DIR          => 'libunievent',
     },
+    BIN_SHARE     => 1,
     test          => {
         BIN_DEPS => 'Test::Catch',
         CLIB => {

@@ -24,9 +24,9 @@ is_bin INADDR_NONE,      Socket::INADDR_NONE,      "INADDR_NONE";
 is_bin IN6ADDR_ANY,      Socket::IN6ADDR_ANY,      "IN6ADDR_ANY";
 is_bin IN6ADDR_LOOPBACK, Socket::IN6ADDR_LOOPBACK, "IN6ADDR_LOOPBACK";
 
-ok SA_ANY_ANY       == Net::SockAddr::Inet4::from_addr(INADDR_ANY,       0), "SA_ANY_ANY";
-ok SA_LOOPBACK_ANY  == Net::SockAddr::Inet4::from_addr(INADDR_LOOPBACK,  0), "SA_LOOPBACK_ANY";
-ok SA6_ANY_ANY      == Net::SockAddr::Inet6::from_addr(IN6ADDR_ANY,      0), "SA6_ANY_ANY";
-ok SA6_LOOPBACK_ANY == Net::SockAddr::Inet6::from_addr(IN6ADDR_LOOPBACK, 0), "SA6_LOOPBACK_ANY";
+ok SOCKADDR_ANY       == Net::SockAddr::Inet4::from_addr(INADDR_ANY,       0), "SOCKADDR_ANY";
+ok SOCKADDR_LOOPBACK  == Net::SockAddr::Inet4::from_addr(INADDR_LOOPBACK,  0), "SOCKADDR_LOOPBACK";
+ok SOCKADDR6_ANY      == Net::SockAddr::Inet6::from_addr(IN6ADDR_ANY,      0), "SOCKADDR6_ANY";
+ok SOCKADDR6_LOOPBACK == Net::SockAddr::Inet6::from_addr(IN6ADDR_LOOPBACK, 0), "SOCKADDR6_LOOPBACK";
 
 done_testing();

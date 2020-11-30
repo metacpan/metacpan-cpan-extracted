@@ -1,3 +1,11 @@
+1.0.3     25.11.2020
+           - fix blackhole addr for tests for ip6-default OS
+           - fix exception rethrow for resolver
+           - fix clang 8 compiler bug on freebsd
+           - lower cmake requirements
+           - disable some tests for windows
+           - log levels related changes
+           - fix makefile
 1.0.2     30.10.2020
            - stream-stream bugfix
            - stream::write API change (compatible)

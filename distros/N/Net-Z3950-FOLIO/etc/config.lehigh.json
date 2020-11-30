@@ -1,0 +1,10 @@
+{
+  "okapi": {
+    "url": "https://lehigh-test-okapi.folio.indexdata.com",
+    "tenant": "lu"
+  },
+  "login": {
+    "username": "${OKAPI_USER-lehighEdgeZ3950}",
+    "password": "${OKAPI_LEHIGH_PASSWORD}"
+  }
+}

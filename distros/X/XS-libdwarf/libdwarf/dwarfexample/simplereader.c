@@ -1,29 +1,35 @@
 /*
-  Copyright (c) 2009-2019 David Anderson.  All rights reserved.
+  Copyright (c) 2009-2020 David Anderson.  All rights reserved.
 
-  Redistribution and use in source and binary forms, with or without
-  modification, are permitted provided that the following conditions are met:
-  * Redistributions of source code must retain the above copyright
-    notice, this list of conditions and the following disclaimer.
-  * Redistributions in binary form must reproduce the above copyright
-    notice, this list of conditions and the following disclaimer in the
-    documentation and/or other materials provided with the distribution.
-  * Neither the name of the example nor the
-    names of its contributors may be used to endorse or promote products
-    derived from this software without specific prior written permission.
+Redistribution and use in source and binary forms, with
+or without modification, are permitted provided that the
+following conditions are met:
 
-  THIS SOFTWARE IS PROVIDED BY David Anderson ''AS IS'' AND ANY
-  EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
-  THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
-  PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL David
-  Anderson BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
-  SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
-  NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
-  LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
-  HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
-  CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE
-  OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
-  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+    (1) Redistributions of source code must retain the above
+    copyright notice, this list of conditions and the
+    following disclaimer.
+
+    (2) Redistributions in binary form must reproduce the
+    above copyright notice, this list of conditions and
+    the following disclaimer in the documentation and/or
+    other materials provided with the distribution.
+
+    (3)The name of the author may not be used to endorse
+    or promote products derived from this software without
+    specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY
+EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
+TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
+FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL
+THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
+NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
+EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 */
 /*  simplereader.c
@@ -233,8 +239,8 @@ xfrm_to_sig8(const char *cuhash_in, Dwarf_Sig8 *hash_out)
 
     memset(localhash,0,fixed_size);
     if (hashin_len > fixed_size) {
-        printf("FAIL: argument hash too long, len %u val:\"%s\"\n",hashin_len,
-            cuhash_in);
+        printf("FAIL: argument hash too long, len %u val:\"%s\"\n",
+            hashin_len, cuhash_in);
         exit(1);
     }
     if (hashin_len  < fixed_size) {
@@ -298,7 +304,8 @@ startswithextractstring(const char *arg,const char *lookfor,
     dupstrarray[dupstrused] = *ptrout;
     dupstrused++;
     if (dupstrused >= DUPSTRARRAYSIZE) {
-        printf("FAIL: increase the value DUPSTRARRAYSIZE for test purposes\n");
+        printf("FAIL: increase the value DUPSTRARRAYSIZE"
+            " for test purposes\n");
         exit(1);
     }
     return TRUE;
@@ -359,7 +366,7 @@ print_debug_fission_header(struct Dwarf_Debug_Fission_Per_CU_s *fsd)
             nstring = "Unknown SECT";
         }
         off = fsd->pcu_offset[i];
-        printf("  %-19s = 0x%" DW_PR_XZEROS DW_PR_DUx 
+        printf("  %-19s = 0x%" DW_PR_XZEROS DW_PR_DUx
             " 0x%" DW_PR_XZEROS DW_PR_DUx " %2u\n",
             nstring,
             off,
@@ -438,6 +445,11 @@ main(int argc, char **argv)
             printf("Unknown argument \"%s\", give up \n",argv[i]);
             exit(1);
         }
+    }
+    if (i >= argc) {
+        printf("simplereader not given file to open\n");
+        printf("simplereader exits\n");
+        exit(1);
     }
     filepath = argv[i];
     if (dumpallnames) {
@@ -965,10 +977,13 @@ static void
 resetsrcfiles(Dwarf_Debug dbg,struct srcfilesdata *sf)
 {
     Dwarf_Signed sri = 0;
-    for (sri = 0; sri < sf->srcfilescount; ++sri) {
-        dwarf_dealloc(dbg, sf->srcfiles[sri], DW_DLA_STRING);
+    if (sf->srcfiles) {
+        for (sri = 0; sri < sf->srcfilescount; ++sri) {
+            dwarf_dealloc(dbg, sf->srcfiles[sri],
+                DW_DLA_STRING);
+        }
+        dwarf_dealloc(dbg, sf->srcfiles, DW_DLA_LIST);
     }
-    dwarf_dealloc(dbg, sf->srcfiles, DW_DLA_LIST);
     sf->srcfilesres = DW_DLV_ERROR;
     sf->srcfiles = 0;
     sf->srcfilescount = 0;
@@ -1055,7 +1070,6 @@ print_die_data_i(Dwarf_Debug dbg, Dwarf_Die print_me,
     Dwarf_Error error = 0;
     Dwarf_Half tag = 0;
     const char *tagname = 0;
-    int localname = 0;
     int res = 0;
     Dwarf_Error *errp = 0;
     Dwarf_Attribute attr = 0;
@@ -1074,7 +1088,6 @@ print_die_data_i(Dwarf_Debug dbg, Dwarf_Die print_me,
     }
     if(res == DW_DLV_NO_ENTRY) {
         name = "<no DW_AT_name attr>";
-        localname = 1;
     }
     res = dwarf_tag(print_me,&tag,errp);
     if(res != DW_DLV_OK) {
@@ -1128,9 +1141,11 @@ print_die_data_i(Dwarf_Debug dbg, Dwarf_Die print_me,
         }
         printf("\n");
     }
-    if(!localname) {
-        dwarf_dealloc(dbg,name,DW_DLA_STRING);
-    }
+    /*  This dwarf_dealloc was always wrong but
+        before March 14, 2020 the documentation said
+        the dwarf_dealloc was necessary.
+        dwarf_dealloc(dbg,name,DW_DLA_STRING); */
+
 }
 
 static void
@@ -1155,12 +1170,12 @@ print_die_data(Dwarf_Debug dbg, Dwarf_Die print_me,
             res = dwarf_get_debugfission_for_die(print_me,
                 &percu,errp);
             if(res == DW_DLV_ERROR) {
-                printf("FAIL: Error in dwarf_diename  on fissionfordie %d\n",
+                printf("FAIL: Error in dwarf_get_debugfission_for_die %d\n",
                     fissionfordie);
                 exit(1);
             }
             if(res == DW_DLV_NO_ENTRY) {
-                printf("FAIL: no-entry in dwarf_diename  on fissionfordie %d\n",
+                printf("FAIL: no-entry in dwarf_get_debugfission_for_die %d\n",
                     fissionfordie);
                 exit(1);
             }

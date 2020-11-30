@@ -20,6 +20,10 @@ C<PPIx::Regexp::Token::Quantifier> has no descendants.
 This class represents an atomic quantifier; that is, one of the
 characters C<*>, C<+>, or C<?>.
 
+B<Note> that if they occur inside a variable-length look-behind, C<'?'>
+implies a minimum Perl version of C<5.29.9>, and C<'+'> and C<'*'> are
+regarded as parse errors and reblessed into the unknown token.
+
 =head1 METHODS
 
 This class provides the following public methods. Methods not documented
@@ -37,10 +41,13 @@ use base qw{ PPIx::Regexp::Token };
 
 use PPIx::Regexp::Constant qw{
     LITERAL_LEFT_CURLY_ALLOWED
+    MSG_LOOK_BEHIND_TOO_LONG
+    TOKEN_UNKNOWN
+    VARIABLE_LENGTH_LOOK_BEHIND_INTRODUCED
     @CARP_NOT
 };
 
-our $VERSION = '0.075';
+our $VERSION = '0.076';
 
 # Return true if the token can be quantified, and false otherwise
 sub can_be_quantified { return };
@@ -80,6 +87,28 @@ sub could_be_quantifier {
 
 sub __following_literal_left_curly_disallowed_in {
     return LITERAL_LEFT_CURLY_ALLOWED;
+}
+
+{
+    my $variable_look_behind_introduced = {
+	'*'	=> undef,
+	'+'	=> undef,
+	'?'	=> VARIABLE_LENGTH_LOOK_BEHIND_INTRODUCED,
+    };
+
+    sub __PPIX_LEXER__finalize {
+	my ( $self ) = @_;
+	if ( $self->__in_look_behind() ) {
+	    $self->{perl_version_introduced} =
+		$variable_look_behind_introduced->{$self->content()}
+		and return 0;
+	    TOKEN_UNKNOWN->__PPIX_ELEM__rebless( $self,
+		error	=> MSG_LOOK_BEHIND_TOO_LONG,
+	    );
+	    return 1;
+	}
+	return 0;
+    }
 }
 
 sub __PPIX_TOKENIZER__regexp {

@@ -1,0 +1,28 @@
+From 42a5b910d085a646be8f71b42a5308d5560932a3 Mon Sep 17 00:00:00 2001
+From: Brian Fraser <brian.fraser@booking.com>
+Date: Mon, 23 Nov 2020 19:02:26 +0100
+Subject: [PATCH 2/6] lang/c: cmake option to skip building the tests
+
+---
+ lang/c/CMakeLists.txt | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/lang/c/CMakeLists.txt b/lang/c/CMakeLists.txt
+index 6c8d7aaf..72cfd2e3 100644
+--- a/lang/c/CMakeLists.txt
++++ b/lang/c/CMakeLists.txt
+@@ -191,7 +191,10 @@ endif (JANSSON_FOUND)
+ 
+ add_subdirectory(src)
+ add_subdirectory(examples)
+-add_subdirectory(tests)
++if(NOT AVRO_SKIP_BUILD_TESTS)
++    add_subdirectory(tests)
++endif()
++
+ add_subdirectory(docs)
+ 
+ add_custom_target(pretty
+-- 
+2.29.2
+

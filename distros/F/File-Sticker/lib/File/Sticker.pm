@@ -1,12 +1,12 @@
 package File::Sticker;
-$File::Sticker::VERSION = '1.01';
+$File::Sticker::VERSION = '1.0603';
 =head1 NAME
 
 File::Sticker - Read, Write file meta-data
 
 =head1 VERSION
 
-version 1.01
+version 1.0603
 
 =head1 SYNOPSIS
 
@@ -25,11 +25,11 @@ use common::sense;
 use File::Sticker::Reader;
 use File::Sticker::Writer;
 use File::Sticker::Database;
-use Hash::Merge;
 use POSIX qw(strftime);
 use String::CamelCase qw(wordsplit);
 use YAML::Any;
 use Path::Tiny;
+use Hash::Merge;
 
 use Module::Pluggable instantiate => 'new',
 search_path => ['File::Sticker::Reader'],
@@ -89,11 +89,13 @@ sub new {
 
     # -------------------------------------
     # Readers
+    # Find out what readers are available, and group them by priority
     my @readers = $self->all_readers();
-    $self->{_readers} = [];
+    $self->{_read_pri} = {};
     foreach my $rd (@readers)
     {
         my $nm = $rd->name();
+	my $priority = $rd->priority();
         if ($to_disable{$nm})
         {
             print STDERR "DISABLE READER: ${nm}\n" if $self->{verbose} > 1;
@@ -102,17 +104,22 @@ sub new {
         {
             print STDERR "READER: ${nm}\n" if $self->{verbose} > 1;
             $rd->init(%new_args);
-            push @{$self->{_readers}}, $rd;
+            if (!exists $self->{_read_pri}->{$priority})
+            {
+                $self->{_read_pri}->{$priority} = [];
+            }
+            push @{$self->{_read_pri}->{$priority}}, $rd;
         }
     }
 
     # -------------------------------------
     # Writers
-    my @writers = ();
-    my @fallback_writers = ();
+    # Find out what writers are available, and group them by priority
+    $self->{_write_pri} = {};
     foreach my $wt ($self->all_writers())
     {
         my $nm = $wt->name();
+	my $priority = $wt->priority();
         if ($to_disable{$nm})
         {
             print STDERR "DISABLE WRITER: ${nm}\n" if $self->{verbose} > 1;
@@ -121,18 +128,13 @@ sub new {
         {
             print STDERR "WRITER: ${nm}\n" if $self->{verbose} > 1;
             $wt->init(%new_args);
-            if ($wt->is_fallback())
+            if (!exists $self->{_write_pri}->{$priority})
             {
-                push @fallback_writers, $wt;
+                $self->{_write_pri}->{$priority} = [];
             }
-            else
-            {
-                push @writers, $wt;
-            }
+            push @{$self->{_write_pri}->{$priority}}, $wt;
         }
     }
-    $self->{_writers} = \@writers;
-    $self->{_fallback_writers} = \@fallback_writers;
 
     # -------------------------------------
     # Database (optional)
@@ -183,21 +185,52 @@ sub read_meta ($%) {
         return {};
     }
 
-    # Set the merge to RIGHT_PRECEDENT because
-    # both Xattr and Yaml support more values
-    # and they also both come at the end of the alphabet
-    # so therefore, give the later (rightmost) hashes precedence.
-    my $merge = Hash::Merge->new('RIGHT_PRECEDENT');
-    my $meta = {};
-    foreach my $reader (@{$self->{_readers}})
+    # Don't limit this to only one reader, due to data being
+    # held in multiple forms, we need a fallback.
+    my @possible_readers = ();
+    # Look for the high-priority readers first
+    foreach my $pri (reverse sort keys %{$self->{_read_pri}})
     {
-        if ($reader->allow($filename))
+        foreach my $rd (@{$self->{_read_pri}->{$pri}})
         {
-            print STDERR "Reader ", $reader->name(), " can read $filename\n" if $self->{verbose} > 1;
-            my $info = $reader->read_meta($filename);
-            my $newmeta = $merge->merge($meta, $info);
-            $meta = $newmeta;
-            print STDERR "META: ", Dump($meta), "\n" if $self->{verbose} > 1;
+            if ($rd->allow($filename))
+            {
+                push @possible_readers, $rd;
+                say STDERR "Reader($pri) ", $rd->name() if $self->{verbose} > 1;
+            }
+        }
+    }
+
+    # Merge in ALL found data; LEFT_PRECEDENT because the
+    # earlier readers have higher priority.
+    my $merge = Hash::Merge->new('LEFT_PRECEDENT');
+    my $meta = {};
+    foreach my $reader (@possible_readers)
+    {
+        say STDERR "Reading ", $reader->name() if $self->{verbose} > 1;
+        my $info = $reader->read_meta($filename);
+        my $newmeta = $merge->merge($meta, $info);
+        $meta = $newmeta;
+        print STDERR "META: ", Dump($meta), "\n" if $self->{verbose} > 1;
+    }
+
+    # If read_all or derive, add in the derived values
+    if ($args{read_all} or $args{derive})
+    {
+        my $derived = $self->derive_values(filename=>$filename,meta=>$meta);
+        foreach my $field (sort keys %{$derived})
+        {
+            # only add a derived field if it isn't there already
+            if (!exists $meta->{$field} and $derived->{$field})
+            {
+                $meta->{$field} = $derived->{$field};
+            }
+            # Unless it is the file size, which must always be taken
+            # from the actual file size
+            if ($field eq 'filesize')
+            {
+                $meta->{$field} = $derived->{$field};
+            }
         }
     }
 
@@ -212,17 +245,6 @@ sub read_meta ($%) {
             if (! exists $self->{wanted_fields}->{$fn})
             {
                 delete $meta->{$fn};
-            }
-        }
-    }
-    else # read all, including derived values
-    {
-        my $derived = $self->derive_values(filename=>$filename,meta=>$meta);
-        foreach my $field (sort keys %{$derived})
-        {
-            if (!exists $meta->{$field} and $derived->{$field})
-            {
-                $meta->{$field} = $derived->{$field};
             }
         }
     }
@@ -253,6 +275,12 @@ sub add_field_to_file {
     {
         return undef;
     }
+    # Never over-write the filesize, though.
+    if ($field eq 'filesize')
+    {
+        return undef;
+    }
+
     my $old_meta = $self->read_meta(filename=>$filename,read_all=>0);
     my $derived = $self->derive_values(filename=>$filename,meta=>$old_meta);
     if ($self->{derive} and defined $derived->{$field})
@@ -260,34 +288,14 @@ sub add_field_to_file {
         $value = $derived->{$field};
     }
 
-    my $writer_found = 0;
-    foreach my $writer (@{$self->{_writers}})
+    my $writer = $self->_get_writer($filename);
+    if (defined $writer)
     {
-        if ($writer->allow($filename))
-        {
-            $writer_found = 1;
-            print STDERR "Writer ", $writer->name(), " can write $filename\n" if $self->{verbose} > 1;
-            $writer->add_field_to_file(
-                filename=>$filename,
-                field=>$field,
-                value=>$value,
-                old_meta=>$old_meta);
-        }
-    }
-    if (!$writer_found)
-    {
-        foreach my $writer (@{$self->{_fallback_writers}})
-        {
-            if ($writer->allow($filename))
-            {
-                print STDERR "Writer ", $writer->name(), " can write $filename\n" if $self->{verbose} > 1;
-                $writer->add_field_to_file(
-                    filename=>$filename,
-                    field=>$field,
-                    value=>$value,
-                    old_meta=>$old_meta);
-            }
-        }
+        $writer->add_field_to_file(
+            filename=>$filename,
+            field=>$field,
+            value=>$value,
+            old_meta=>$old_meta);
     }
 }
 
@@ -308,15 +316,12 @@ sub delete_field_from_file {
     my $filename = $args{filename};
     my $field = $args{field};
 
-    foreach my $writer (@{$self->{_writers}}, @{$self->{_fallback_writers}})
+    my $writer = $self->_get_writer($filename);
+    if (defined $writer)
     {
-        if ($writer->allow($filename))
-        {
-            print STDERR "Writer ", $writer->name(), " can write $filename\n" if $self->{verbose} > 1;
-            $writer->delete_field_from_file(
-                filename=>$filename,
-                field=>$field);
-        }
+        $writer->delete_field_from_file(
+            filename=>$filename,
+            field=>$field);
     }
 } # delete_field_from_file
 
@@ -336,33 +341,13 @@ sub replace_all_meta {
     my $filename = $args{filename};
     my $meta = $args{meta};
 
-    my $okay = 0;
-    foreach my $writer (@{$self->{_writers}})
+    my $writer = $self->_get_writer($filename);
+    if (defined $writer)
     {
-        if ($writer->allow($filename))
-        {
-            $okay = 1;
-            print STDERR "Writer ", $writer->name(), " can write $filename\n" if $self->{verbose} > 1;
-            $writer->replace_all_meta(
-                filename=>$filename,
-                meta=>$meta);
-        }
+        $writer->replace_all_meta(
+            filename=>$filename,
+            meta=>$meta);
     }
-    if (!$okay)
-    {
-        foreach my $writer (@{$self->{_fallback_writers}})
-        {
-            if ($writer->allow($filename))
-            {
-                $okay = 1;
-                print STDERR "Writer ", $writer->name(), " can write $filename\n" if $self->{verbose} > 1;
-                $writer->replace_all_meta(
-                    filename=>$filename,
-                    meta=>$meta);
-            }
-        }
-    }
-    return $okay;
 } # replace_all_meta
 
 =head2 query_by_tags
@@ -490,6 +475,12 @@ sub update_db {
         foreach my $field (@{$self->{field_order}})
         {
             if (!$meta->{$field} and $derived->{$field})
+            {
+                $meta->{$field} = $derived->{$field};
+            }
+            # Unless it is the file size, which must always be taken
+            # from the actual file size
+            if ($field eq 'filesize')
             {
                 $meta->{$field} = $derived->{$field};
             }
@@ -622,6 +613,37 @@ sub derive_values {
 
     return $meta;
 } # derive_values
+
+=head2 _get_writer
+
+Pick the appropriate writer for this file
+
+    my $writer = $sticker->_get_writer($filename);
+
+=cut
+sub _get_writer {
+    my $self = shift;
+    my $filename = shift;
+
+    my $writer;
+    foreach my $pri (reverse sort keys %{$self->{_write_pri}})
+    {
+        foreach my $wt (@{$self->{_write_pri}->{$pri}})
+        {
+            if ($wt->allow($filename))
+            {
+                $writer = $wt;
+                say STDERR "Writer($pri) ", $writer->name() if $self->{verbose} > 1;
+                last;
+            }
+        }
+        if (defined $writer)
+        {
+            last;
+        }
+    }
+    return $writer;
+} # _get_writer
 
 =head1 BUGS
 

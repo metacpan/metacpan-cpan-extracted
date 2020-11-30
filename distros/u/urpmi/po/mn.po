@@ -1,43 +1,42 @@
-# translation of urpmi.po to Mongolian
-# This file is distributed under the same license as the PACKAGE package.
-# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
-# Khurelbaatar Lkhagvasuren <hujii@dhtech.com>, 2003
-# Khurelbaatar Lkhagvasuren <hujii247@yahoo.com>, 2003
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR Free Software Foundation, Inc.
 #
+# Translators:
+# Khurelbaatar Lkhagvasuren <hujii247@yahoo.com>, 2003
+# Khurelbaatar Lkhagvasuren <hujii@dhtech.com>, 2003
 msgid ""
 msgstr ""
-"Project-Id-Version: urpmi\n"
-"Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-01-18 09:59+0200\n"
-"PO-Revision-Date: 2003-08-22 19:38+0200\n"
-"Last-Translator: Khurelbaatar Lkhagvasuren <hujii247@yahoo.com>\n"
-"Language-Team: Mongolian <openmn-core@lists.sourceforge.net>\n"
+"Project-Id-Version: Mageia\n"
+"POT-Creation-Date: 2020-07-10 17:41+0100\n"
+"PO-Revision-Date: 2020-07-10 16:45+0000\n"
+"Last-Translator: Yuri Chornoivan <yurchor@ukr.net>\n"
+"Language-Team: Mongolian (http://www.transifex.com/MageiaLinux/mageia/"
+"language/mn/)\n"
 "Language: mn\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
-"Content-Transfer-Encoding: 8bit\n"
-"X-Generator: KBabel 1.0.1\n"
+"Content-Transfer-Encoding: 8-bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 #: ../gurpm/RPMProgressDialog.pm:47
-#, fuzzy, c-format
+#, c-format
 msgid "Distribution Upgrade"
-msgstr "%s-ийг суулгаж байна\n"
+msgstr ""
 
 #: ../gurpm/RPMProgressDialog.pm:47
-#, fuzzy, c-format
+#, c-format
 msgid "Packages installation"
-msgstr "Багц суулгалт..."
+msgstr ""
 
 #: ../gurpm/RPMProgressDialog.pm:128
-#, fuzzy, c-format
+#, c-format
 msgid "Please wait..."
-msgstr "Хүлээнэ үү."
+msgstr ""
 
 #: ../gurpm/RPMProgressDialog.pm:290
-#, fuzzy, c-format
+#, c-format
 msgid "Verifying package signatures..."
-msgstr "Дараах багцууд суулгагдах гэж байна"
+msgstr ""
 
 #: ../gurpm/RPMProgressDialog.pm:309 ../urpm/install.pm:108
 #, c-format
@@ -45,9 +44,9 @@ msgid "Preparing..."
 msgstr "Бэлдэж байна..."
 
 #: ../gurpm/RPMProgressDialog.pm:313
-#, fuzzy, c-format
+#, c-format
 msgid "Removing package `%s' ..."
-msgstr "%s багцийг устгалт"
+msgstr ""
 
 #: ../gurpm/RPMProgressDialog.pm:316
 #, c-format
@@ -64,7 +63,7 @@ msgstr "`%s' багцыг татан авч байна..."
 msgid "Cancel"
 msgstr "Хүчингүй"
 
-#: ../gurpm/RPMProgressDialog.pm:359 ../urpm.pm:452 ../urpm/download.pm:882
+#: ../gurpm/RPMProgressDialog.pm:359 ../urpm.pm:454 ../urpm/download.pm:882
 #: ../urpm/get_pkgs.pm:277 ../urpm/media.pm:1149 ../urpm/media.pm:1682
 #: ../urpm/media.pm:1833
 #, c-format
@@ -72,9 +71,9 @@ msgid "...retrieving failed: %s"
 msgstr "...хүлээн авалт бүтэлгүйтлээ: %s"
 
 #: ../gurpmi:50
-#, fuzzy, c-format
+#, c-format
 msgid "RPM installation"
-msgstr "Суулгалтын бэлтгэл"
+msgstr ""
 
 #: ../gurpmi:64
 #, c-format
@@ -100,14 +99,14 @@ msgid ""
 msgstr ""
 
 #: ../gurpmi:93 ../gurpmi:104
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "You are about to install the following software packages on your computer:\n"
 "\n"
 "%s\n"
 "\n"
 "Proceed?"
-msgstr "Та г с"
+msgstr ""
 
 #: ../gurpmi:99
 #, c-format
@@ -175,13 +174,11 @@ msgid ""
 msgstr ""
 
 #: ../gurpmi.pm:61 ../urpmi:131
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "  --verify-rpm   - verify rpm signature before installation\n"
 "                   (--no-verify-rpm disables it, default is enabled).\n"
 msgstr ""
-"\n"
-" үгүй бол"
 
 #: ../gurpmi.pm:63 ../urpmf:36 ../urpmi:68 ../urpmq:43
 #, c-format
@@ -189,19 +186,19 @@ msgid "  --media        - use only the given media, separated by comma.\n"
 msgstr ""
 
 #: ../gurpmi.pm:64 ../urpmi:147
-#, fuzzy, c-format
+#, c-format
 msgid "  -p             - allow search in provides to find package.\n"
-msgstr "ямх"
+msgstr ""
 
 #: ../gurpmi.pm:65 ../urpmi:148
-#, fuzzy, c-format
+#, c-format
 msgid "  -P             - do not search in provides to find package.\n"
-msgstr "ямх"
+msgstr ""
 
 #: ../gurpmi.pm:66 ../urpmi:107 ../urpmq:67
-#, fuzzy, c-format
+#, c-format
 msgid "  --root         - use another root for rpm installation.\n"
-msgstr "Мөр"
+msgstr ""
 
 #: ../gurpmi.pm:67 ../urpmi:133
 #, c-format
@@ -217,9 +214,9 @@ msgid ""
 msgstr ""
 
 #: ../gurpmi.pm:115
-#, fuzzy, c-format
+#, c-format
 msgid "No packages specified"
-msgstr "Тухайлсан тушаал алга"
+msgstr ""
 
 #: ../gurpmi2:47
 #, c-format
@@ -227,26 +224,26 @@ msgid "Must be root"
 msgstr ""
 
 #: ../gurpmi2:77
-#, fuzzy, c-format
+#, c-format
 msgid "Preparing packages installation..."
-msgstr "Багц суулгалт..."
+msgstr ""
 
 #: ../gurpmi2:92 ../urpmi:506
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "Some requested packages cannot be installed:\n"
 "%s"
-msgstr "Бүх зүйл хэдийн суусан байна"
+msgstr ""
 
 #: ../gurpmi2:100
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "Some requested packages cannot be installed:\n"
 "%s\n"
 "Continue installation anyway?"
-msgstr "г с вы?"
+msgstr ""
 
-#: ../gurpmi2:120
+#: ../gurpmi2:120 ../gurpmi2:386
 #, c-format
 msgid "Warning"
 msgstr "Анхааруулга"
@@ -257,9 +254,9 @@ msgid " (to upgrade)"
 msgstr ""
 
 #: ../gurpmi2:171
-#, fuzzy, c-format
+#, c-format
 msgid " (to install)"
-msgstr "ямх"
+msgstr ""
 
 #: ../gurpmi2:174
 #, c-format
@@ -272,17 +269,17 @@ msgid "One of the following packages is needed:"
 msgstr "Дараах багцуудын нэг нь шаардлагатай:"
 
 #: ../gurpmi2:204
-#, fuzzy, c-format
+#, c-format
 msgid "_Abort"
-msgstr "Таслах"
+msgstr ""
 
 #: ../gurpmi2:239
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "The following packages have to be removed for others to be upgraded:\n"
 "%s\n"
 "Continue installation anyway?"
-msgstr "г с вы?"
+msgstr ""
 
 #: ../gurpmi2:250 ../urpmi:617
 #, c-format
@@ -307,26 +304,26 @@ msgstr[0] ""
 msgstr[1] ""
 
 #: ../gurpmi2:259 ../urpmi:608
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "To satisfy dependencies, the following package is going to be installed:"
-msgstr "Дараах багцууд суулгагдах гэж байна"
+msgstr ""
 
 #: ../gurpmi2:260 ../urpmi:609
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "To satisfy dependencies, the following packages are going to be installed:"
-msgstr "Дараах багцууд суулгагдах гэж байна"
+msgstr ""
 
 #: ../gurpmi2:270 ../urpm/main_loop.pm:468
-#, fuzzy, c-format
+#, c-format
 msgid "unable to get source packages, aborting"
-msgstr "%s багцийг устгаж болсонгүй"
+msgstr ""
 
 #: ../gurpmi2:287 ../urpmi:636
-#, fuzzy, c-format
+#, c-format
 msgid "Please insert the medium named \"%s\""
-msgstr "с с"
+msgstr ""
 
 #: ../gurpmi2:307
 #, c-format
@@ -334,29 +331,26 @@ msgid "An error occurred:"
 msgstr ""
 
 #: ../gurpmi2:319
-#, fuzzy, c-format
+#, c-format
 msgid "_Done"
-msgstr "Биелэгдэв"
+msgstr ""
 
 #: ../gurpmi2:336 ../urpm/main_loop.pm:82
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "Installation failed, some files are missing:\n"
 "%s"
-msgstr "Суулгалтын асуудал"
+msgstr ""
 
 #: ../gurpmi2:339
-#, fuzzy, c-format
+#, c-format
 msgid "You may want to update your urpmi database."
 msgstr ""
-"Суулгалт бүтэлгүйтэв, учир нь зарим файл байхгүй байна:\n"
-"%s\n"
-"Та магадгүй urpmi баазаа шинэчлэх хэрэгтэй байх"
 
 #: ../gurpmi2:343 ../urpm/main_loop.pm:289 ../urpm/main_loop.pm:581
-#, fuzzy, c-format
+#, c-format
 msgid "Installation failed:"
-msgstr "Суулгалтын асуудал"
+msgstr ""
 
 #: ../gurpmi2:348
 #, c-format
@@ -364,14 +358,24 @@ msgid "The package(s) are already installed"
 msgstr "Бүх зүйл хэдийн суусан байна"
 
 #: ../gurpmi2:350
-#, fuzzy, c-format
+#, c-format
 msgid "Installation finished"
-msgstr "Суулгалт боломжтой"
+msgstr ""
 
 #: ../gurpmi2:363 ../urpmi:694
 #, c-format
 msgid "restarting urpmi"
 msgstr ""
+
+#: ../gurpmi2:386
+#, c-format
+msgid "No"
+msgstr "Үгүй"
+
+#: ../gurpmi2:386
+#, c-format
+msgid "Yes"
+msgstr "Тийм"
 
 #: ../rpm-find-leaves:15
 #, c-format
@@ -386,29 +390,29 @@ msgid "   -h|--help      - print this help message.\n"
 msgstr "   -h|--help      - Энэ тусламжийг хэвлэх.\n"
 
 #: ../rpm-find-leaves:18
-#, fuzzy, c-format
+#, c-format
 msgid "   --root <path>  - use the given root instead of /\n"
-msgstr "аас"
+msgstr ""
 
 #: ../rpm-find-leaves:19
-#, fuzzy, c-format
+#, c-format
 msgid "   -g [group]     - restrict results to specified group.\n"
-msgstr "бүлэг бүлэг бүлэг"
+msgstr ""
 
 #: ../rpm-find-leaves:20
-#, fuzzy, c-format
+#, c-format
 msgid "                    defaults to %s.\n"
-msgstr "  --list         - боломжтой багцуудын жагсаалт.\n"
+msgstr ""
 
 #: ../rpm-find-leaves:21
-#, fuzzy, c-format
+#, c-format
 msgid "   -f             - output rpm full name (NVRA)\n"
-msgstr "  --all          - бүх тагуудыг хэвлэх.\n"
+msgstr ""
 
 #: ../rurpmi:12 ../urpmi:266
-#, fuzzy, c-format
+#, c-format
 msgid "Only superuser is allowed to install packages"
-msgstr "%s багцийг суулгаж болсонгүй"
+msgstr ""
 
 #: ../rurpmi:19
 #, c-format
@@ -420,137 +424,137 @@ msgstr ""
 msgid "While some packages may have been installed, there were failures.\n"
 msgstr ""
 
-#: ../urpm.pm:193
-#, fuzzy, c-format
+#: ../urpm.pm:195
+#, c-format
 msgid "fail to create directory %s"
-msgstr "с"
+msgstr ""
 
-#: ../urpm.pm:194
+#: ../urpm.pm:196
 #, c-format
 msgid "invalid owner for directory %s"
 msgstr ""
 
-#: ../urpm.pm:237
-#, fuzzy, c-format
+#: ../urpm.pm:239
+#, c-format
 msgid "Can not download packages into %s"
-msgstr "`%s' багцыг татан авч байна..."
+msgstr ""
 
-#: ../urpm.pm:253
+#: ../urpm.pm:255
 #, c-format
 msgid "Environment directory %s does not exist"
 msgstr ""
 
-#: ../urpm.pm:254 ../urpmf:244 ../urpmq:163
-#, fuzzy, c-format
+#: ../urpm.pm:256 ../urpmf:244 ../urpmq:163
+#, c-format
 msgid "using specific environment on %s\n"
-msgstr "с"
+msgstr ""
 
-#: ../urpm.pm:422
+#: ../urpm.pm:424
 #, c-format
 msgid "unable to open rpmdb"
 msgstr "rpmdb-г нээж болсонгүй"
 
-#: ../urpm.pm:441
+#: ../urpm.pm:443
 #, c-format
 msgid "invalid rpm file name [%s]"
 msgstr "буруу rpm файлын нэр [%s]"
 
-#: ../urpm.pm:447
+#: ../urpm.pm:449
 #, c-format
 msgid "retrieving rpm file [%s] ..."
 msgstr "rpm файлыг хүлээн авч байна [%s] ..."
 
-#: ../urpm.pm:449 ../urpm/get_pkgs.pm:275
+#: ../urpm.pm:451 ../urpm/get_pkgs.pm:275
 #, c-format
 msgid "...retrieving done"
 msgstr "...хүлээн авалт дууслаа"
 
-#: ../urpm.pm:457
+#: ../urpm.pm:459
 #, c-format
 msgid "unable to access rpm file [%s]"
 msgstr "[%s] rpm файл руу хандаж болсонгүй"
 
-#: ../urpm.pm:462
-#, fuzzy, c-format
+#: ../urpm.pm:464
+#, c-format
 msgid "unable to parse spec file %s [%s]"
-msgstr "[%s] rpm файл руу хандаж болсонгүй"
+msgstr ""
 
-#: ../urpm.pm:470
+#: ../urpm.pm:472
 #, c-format
 msgid "unable to register rpm file"
 msgstr "rpm файлыг бүртгэж болсонгүй"
 
-#: ../urpm.pm:472
+#: ../urpm.pm:474
 #, c-format
 msgid "Incompatible architecture for rpm [%s]"
 msgstr ""
 
-#: ../urpm.pm:476
-#, fuzzy, c-format
+#: ../urpm.pm:478
+#, c-format
 msgid "error registering local packages"
-msgstr "локал"
+msgstr ""
 
-#: ../urpm.pm:588
+#: ../urpm.pm:590
 #, c-format
 msgid "This operation is forbidden while running in restricted mode"
 msgstr ""
 
-#: ../urpm/args.pm:156 ../urpm/args.pm:165
+#: ../urpm/args.pm:157 ../urpm/args.pm:166
 #, c-format
 msgid "bad proxy declaration on command line\n"
 msgstr "тушаалын мөрөнд буруу proxy зарлалт\n"
 
-#: ../urpm/args.pm:320
+#: ../urpm/args.pm:321
 #, c-format
 msgid "urpmq: cannot read rpm file \"%s\"\n"
 msgstr "urpmq: rpm файлыг уншиж чадахгүй \"%s\"\n"
 
-#: ../urpm/args.pm:388
+#: ../urpm/args.pm:389
 #, c-format
 msgid "unexpected expression %s"
 msgstr ""
 
-#: ../urpm/args.pm:389
+#: ../urpm/args.pm:390
 #, c-format
 msgid "missing expression before %s"
 msgstr ""
 
-#: ../urpm/args.pm:395
+#: ../urpm/args.pm:396
 #, c-format
 msgid "unexpected expression %s (suggestion: use -a or -o ?)"
 msgstr ""
 
-#: ../urpm/args.pm:399
+#: ../urpm/args.pm:400
 #, c-format
 msgid "no expression to close"
 msgstr ""
 
-#: ../urpm/args.pm:408
+#: ../urpm/args.pm:409
 #, c-format
 msgid "by default urpmf awaits a regexp. you should use option \"--literal\""
 msgstr ""
 
-#: ../urpm/args.pm:482
+#: ../urpm/args.pm:483
 #, c-format
 msgid "chroot directory doesn't exist"
 msgstr ""
 
-#: ../urpm/args.pm:505
+#: ../urpm/args.pm:506
 #, c-format
 msgid "Can't use %s without %s"
 msgstr ""
 
-#: ../urpm/args.pm:508 ../urpm/args.pm:511 ../urpmq:155
+#: ../urpm/args.pm:509 ../urpm/args.pm:512 ../urpmq:155
 #, c-format
 msgid "Can't use %s with %s"
 msgstr ""
 
-#: ../urpm/args.pm:519
+#: ../urpm/args.pm:520
 #, c-format
 msgid "Too many arguments\n"
 msgstr ""
 
-#: ../urpm/args.pm:527
+#: ../urpm/args.pm:528
 #, c-format
 msgid ""
 "%s version %s\n"
@@ -567,7 +571,7 @@ msgstr ""
 "\n"
 "Ашиглалт: \n"
 
-#: ../urpm/args.pm:533
+#: ../urpm/args.pm:534
 #, c-format
 msgid "Copyright (C) %s by %s"
 msgstr ""
@@ -590,24 +594,24 @@ msgid "Udisks daemon (udisks-daemon) is not running or not ready"
 msgstr ""
 
 #: ../urpm/cdrom.pm:173 ../urpm/cdrom.pm:178
-#, fuzzy, c-format
+#, c-format
 msgid "medium \"%s\" is not available"
-msgstr "с бол"
+msgstr ""
 
 #: ../urpm/cdrom.pm:217
-#, fuzzy, c-format
+#, c-format
 msgid "unable to read rpm file [%s] from medium \"%s\""
-msgstr "[%s] rpm файл руу хандаж болсонгүй"
+msgstr ""
 
 #: ../urpm/cfg.pm:73
-#, fuzzy, c-format
+#, c-format
 msgid "syntax error in config file at line %s"
-msgstr "[%s] тохируулгын файлыг бичиж болсонгүй"
+msgstr ""
 
 #: ../urpm/cfg.pm:106
-#, fuzzy, c-format
+#, c-format
 msgid "unable to read config file [%s]"
-msgstr "[%s] тохируулгын файлыг бичиж болсонгүй"
+msgstr ""
 
 #: ../urpm/cfg.pm:132
 #, c-format
@@ -660,9 +664,9 @@ msgid "%s failed: exited with %d"
 msgstr ""
 
 #: ../urpm/download.pm:331
-#, fuzzy, c-format
+#, c-format
 msgid "copy failed"
-msgstr "Хуулалт бүтэлгүйтэв"
+msgstr ""
 
 #: ../urpm/download.pm:337
 #, c-format
@@ -720,14 +724,14 @@ msgid "        %s%% completed, speed = %s"
 msgstr ""
 
 #: ../urpm/download.pm:940
-#, fuzzy, c-format
+#, c-format
 msgid "retrieving %s"
-msgstr "%s-г устгаж байна"
+msgstr ""
 
 #: ../urpm/download.pm:958
-#, fuzzy, c-format
+#, c-format
 msgid "retrieved %s"
-msgstr "...хүлээн авалт бүтэлгүйтлээ: %s"
+msgstr ""
 
 #: ../urpm/download.pm:1021
 #, c-format
@@ -740,75 +744,75 @@ msgid "no webfetch found, supported webfetch are: %s\n"
 msgstr ""
 
 #: ../urpm/download.pm:1050
-#, fuzzy, c-format
+#, c-format
 msgid "unable to handle protocol: %s"
-msgstr "%s багцийг суулгаж болсонгүй"
+msgstr ""
 
 #: ../urpm/get_pkgs.pm:28
-#, fuzzy, c-format
+#, c-format
 msgid "cleaning %s and %s"
-msgstr "%s-ийг суулгаж байна\n"
+msgstr ""
 
 #: ../urpm/get_pkgs.pm:140
-#, fuzzy, c-format
+#, c-format
 msgid "package %s is not found."
-msgstr "с бол."
+msgstr ""
 
 #: ../urpm/get_pkgs.pm:268
-#, fuzzy, c-format
+#, c-format
 msgid "retrieving rpm files from medium \"%s\"..."
-msgstr "rpm файлыг хүлээн авч байна [%s] ..."
+msgstr ""
 
 #: ../urpm/install.pm:116 ../urpme:164
-#, fuzzy, c-format
+#, c-format
 msgid "removing %s"
-msgstr "%s-г устгаж байна"
+msgstr ""
 
-#: ../urpm/install.pm:215
-#, fuzzy, c-format
+#: ../urpm/install.pm:217
+#, c-format
 msgid "unable to extract rpm from delta-rpm package %s"
-msgstr "%s багцийг устгаж болсонгүй"
+msgstr ""
 
-#: ../urpm/install.pm:242
+#: ../urpm/install.pm:245
 #, c-format
 msgid "unable to install package %s"
 msgstr "%s багцийг суулгаж болсонгүй"
 
-#: ../urpm/install.pm:245
-#, fuzzy, c-format
+#: ../urpm/install.pm:248
+#, c-format
 msgid "removing bad rpm (%s) from %s"
-msgstr "%s-ийг суулгаж байна\n"
+msgstr ""
 
-#: ../urpm/install.pm:246 ../urpm/install.pm:393
-#, fuzzy, c-format
+#: ../urpm/install.pm:249 ../urpm/install.pm:397
+#, c-format
 msgid "removing %s failed: %s"
-msgstr "...хүлээн авалт бүтэлгүйтлээ: %s"
+msgstr ""
 
-#: ../urpm/install.pm:295
+#: ../urpm/install.pm:298
 #, c-format
 msgid "removing package %s"
 msgstr "%s багцийг устгалт"
 
-#: ../urpm/install.pm:359
-#, fuzzy, c-format
+#: ../urpm/install.pm:362
+#, c-format
 msgid ""
 "created transaction for installing on %s (remove=%d, install=%d, upgrade=%d)"
-msgstr "с"
+msgstr ""
 
-#: ../urpm/install.pm:362
-#, fuzzy, c-format
+#: ../urpm/install.pm:365
+#, c-format
 msgid "unable to create transaction"
-msgstr "ssh таних тэмдэг үүсгэх боломжгүй"
+msgstr ""
 
-#: ../urpm/install.pm:391
-#, fuzzy, c-format
+#: ../urpm/install.pm:395
+#, c-format
 msgid "removing installed rpms (%s) from %s"
-msgstr "%s-ийг суулгаж байна\n"
+msgstr ""
 
-#: ../urpm/install.pm:400
-#, fuzzy, c-format
+#: ../urpm/install.pm:404
+#, c-format
 msgid "More information on package %s"
-msgstr "%s багцийг устгалт"
+msgstr ""
 
 #: ../urpm/ldap.pm:41
 #, c-format
@@ -826,9 +830,9 @@ msgid "No server defined, missing uri or host"
 msgstr ""
 
 #: ../urpm/ldap.pm:177
-#, fuzzy, c-format
+#, c-format
 msgid "No base defined"
-msgstr "Тухайлсан тушаал алга"
+msgstr ""
 
 #: ../urpm/ldap.pm:187 ../urpm/ldap.pm:190
 #, c-format
@@ -851,9 +855,9 @@ msgid "%s database is locked. Waiting..."
 msgstr ""
 
 #: ../urpm/lock.pm:115
-#, fuzzy, c-format
+#, c-format
 msgid "aborting"
-msgstr "Анхааруулга"
+msgstr ""
 
 #: ../urpm/main_loop.pm:58
 #, c-format
@@ -861,19 +865,16 @@ msgid "Retry?"
 msgstr ""
 
 #: ../urpm/main_loop.pm:85
-#, fuzzy, c-format
+#, c-format
 msgid "You may need to update your urpmi database."
 msgstr ""
-"Суулгалт бүтэлгүйтэв, учир нь зарим файл байхгүй байна:\n"
-"%s\n"
-"Та магадгүй urpmi баазаа шинэчлэх хэрэгтэй байх"
 
 #: ../urpm/main_loop.pm:89
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "Installation failed, bad rpms:\n"
 "%s"
-msgstr "Суулгалтын асуудал"
+msgstr ""
 
 #: ../urpm/main_loop.pm:108
 #, c-format
@@ -884,14 +885,14 @@ msgid ""
 msgstr ""
 
 #: ../urpm/main_loop.pm:138
-#, fuzzy, c-format
+#, c-format
 msgid "The following package has bad signature"
-msgstr "Дараах багцууд суулгагдах гэж байна"
+msgstr ""
 
 #: ../urpm/main_loop.pm:139
-#, fuzzy, c-format
+#, c-format
 msgid "The following packages have bad signatures"
-msgstr "Дараах багцууд суулгагдах гэж байна"
+msgstr ""
 
 #: ../urpm/main_loop.pm:140
 #, c-format
@@ -900,14 +901,14 @@ msgstr "Та суулгалтыг үргэлжлүүлэхийг хүсэж ба
 
 #: ../urpm/main_loop.pm:155 ../urpm/main_loop.pm:184 ../urpm/main_loop.pm:291
 #: ../urpm/main_loop.pm:299
-#, fuzzy, c-format
+#, c-format
 msgid "Installation failed"
-msgstr "Суулгалтын асуудал"
+msgstr ""
 
 #: ../urpm/main_loop.pm:159
-#, fuzzy, c-format
+#, c-format
 msgid "removing installed rpms (%s)"
-msgstr "%s-ийг суулгаж байна\n"
+msgstr ""
 
 #: ../urpm/main_loop.pm:185
 #, c-format
@@ -915,29 +916,29 @@ msgid "Try to continue anyway?"
 msgstr ""
 
 #: ../urpm/main_loop.pm:237
-#, fuzzy, c-format
+#, c-format
 msgid "installing %s from %s"
-msgstr "%s-ийг суулгаж байна\n"
+msgstr ""
 
 #: ../urpm/main_loop.pm:239
-#, fuzzy, c-format
+#, c-format
 msgid "installing %s"
-msgstr "%s-ийг суулгаж байна\n"
+msgstr ""
 
 #: ../urpm/main_loop.pm:246
-#, fuzzy, c-format
+#, c-format
 msgid "distributing %s"
-msgstr "%s-ийг суулгаж байна\n"
+msgstr ""
 
 #: ../urpm/main_loop.pm:292
-#, fuzzy, c-format
+#, c-format
 msgid "Try installation without checking dependencies?"
-msgstr "Хамаарлыг шалгахгүйгээр суулгахыг оролдох уу? (y/N) "
+msgstr ""
 
 #: ../urpm/main_loop.pm:300
-#, fuzzy, c-format
+#, c-format
 msgid "Try harder to install (--force)?"
-msgstr "Reyna т N "
+msgstr ""
 
 #: ../urpm/main_loop.pm:591
 #, c-format
@@ -955,24 +956,24 @@ msgid "warning: md5sum for %s unavailable in MD5SUM file"
 msgstr ""
 
 #: ../urpm/media.pm:267
-#, fuzzy, c-format
+#, c-format
 msgid "virtual medium \"%s\" should have a clear url, medium ignored"
-msgstr "с жигсаалт"
+msgstr ""
 
 #: ../urpm/media.pm:269
-#, fuzzy, c-format
+#, c-format
 msgid "unable to access list file of \"%s\", medium ignored"
-msgstr "[%s] rpm файл руу хандаж болсонгүй"
+msgstr ""
 
 #: ../urpm/media.pm:272
-#, fuzzy, c-format
+#, c-format
 msgid "unable to access synthesis file of \"%s\", medium ignored"
-msgstr "[%s] rpm файл руу хандаж болсонгүй"
+msgstr ""
 
 #: ../urpm/media.pm:298
-#, fuzzy, c-format
+#, c-format
 msgid "trying to override existing medium \"%s\", skipping"
-msgstr "с"
+msgstr ""
 
 #: ../urpm/media.pm:514
 #, c-format
@@ -980,9 +981,9 @@ msgid "failed to migrate removable device, ignoring media"
 msgstr ""
 
 #: ../urpm/media.pm:563
-#, fuzzy, c-format
+#, c-format
 msgid "wrote config file [%s]"
-msgstr "[%s] тохируулгын файлыг бичиж болсонгүй"
+msgstr ""
 
 #: ../urpm/media.pm:654
 #, c-format
@@ -990,9 +991,9 @@ msgid "Can't use parallel mode with use-distrib mode"
 msgstr ""
 
 #: ../urpm/media.pm:662
-#, fuzzy, c-format
+#, c-format
 msgid "using associated media for parallel mode: %s"
-msgstr "горим"
+msgstr ""
 
 #: ../urpm/media.pm:678
 #, c-format
@@ -1002,14 +1003,14 @@ msgid ""
 msgstr ""
 
 #: ../urpm/media.pm:793
-#, fuzzy, c-format
+#, c-format
 msgid "ignoring non-free medium `%s'"
-msgstr "с"
+msgstr ""
 
 #: ../urpm/media.pm:803
-#, fuzzy, c-format
+#, c-format
 msgid "un-ignoring non-free medium `%s' b/c nonfree packages are installed"
-msgstr "с"
+msgstr ""
 
 #: ../urpm/media.pm:807
 #, c-format
@@ -1017,16 +1018,16 @@ msgid "un-ignoring tainted medium `%s' b/c tainted packages are installed"
 msgstr ""
 
 #: ../urpm/media.pm:816
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "un-ignoring 32bit medium `%s' b/c 32-bit packages are installed or system is "
 "32-bit EFI"
-msgstr "с"
+msgstr ""
 
 #: ../urpm/media.pm:844
-#, fuzzy, c-format
+#, c-format
 msgid "Search start: %s end: %s"
-msgstr "Суулгагдсан бичгийн хэвүүдийг хайх"
+msgstr ""
 
 #: ../urpm/media.pm:861
 #, c-format
@@ -1034,14 +1035,14 @@ msgid "skipping package %s"
 msgstr "%s багцийг алгасаж байна"
 
 #: ../urpm/media.pm:877
-#, fuzzy, c-format
+#, c-format
 msgid "would install instead of upgrade package %s"
-msgstr "%s багцийг устгаж болсонгүй"
+msgstr ""
 
 #: ../urpm/media.pm:960
-#, fuzzy, c-format
+#, c-format
 msgid "medium \"%s\" already exists"
-msgstr "с"
+msgstr ""
 
 #: ../urpm/media.pm:1008
 #, c-format
@@ -1049,19 +1050,19 @@ msgid "(ignored by default)"
 msgstr ""
 
 #: ../urpm/media.pm:1014
-#, fuzzy, c-format
+#, c-format
 msgid "adding medium \"%s\" before remote medium \"%s\""
-msgstr "с"
+msgstr ""
 
 #: ../urpm/media.pm:1020
-#, fuzzy, c-format
+#, c-format
 msgid "adding medium \"%s\""
-msgstr "%s багцийг устгалт"
+msgstr ""
 
 #: ../urpm/media.pm:1044
-#, fuzzy, c-format
+#, c-format
 msgid "failed to copy media.cfg to %s (%d)"
-msgstr "rpmdb-г нээж болсонгүй"
+msgstr ""
 
 #: ../urpm/media.pm:1115
 #, c-format
@@ -1074,14 +1075,14 @@ msgid "this location doesn't seem to contain any distribution"
 msgstr ""
 
 #: ../urpm/media.pm:1147
-#, fuzzy, c-format
+#, c-format
 msgid "unable to parse media.cfg"
-msgstr "rpmdb-г нээж болсонгүй"
+msgstr ""
 
 #: ../urpm/media.pm:1150
-#, fuzzy, c-format
+#, c-format
 msgid "unable to access the distribution medium (no media.cfg file found)"
-msgstr "үгүй"
+msgstr ""
 
 #: ../urpm/media.pm:1184
 #, c-format
@@ -1089,39 +1090,39 @@ msgid "skipping non compatible media `%s' (for %s)"
 msgstr ""
 
 #: ../urpm/media.pm:1242
-#, fuzzy, c-format
+#, c-format
 msgid "retrieving media.cfg file..."
-msgstr "hdlists файлыг хүлээн авч байна..."
+msgstr ""
 
 #: ../urpm/media.pm:1285
-#, fuzzy, c-format
+#, c-format
 msgid "trying to select nonexistent medium \"%s\""
-msgstr "с"
+msgstr ""
 
 #: ../urpm/media.pm:1288
-#, fuzzy, c-format
+#, c-format
 msgid "selecting multiple media: %s"
-msgstr "с"
+msgstr ""
 
 #: ../urpm/media.pm:1347
-#, fuzzy, c-format
+#, c-format
 msgid "removing medium \"%s\""
-msgstr "%s багцийг устгалт"
+msgstr ""
 
 #: ../urpm/media.pm:1438
-#, fuzzy, c-format
+#, c-format
 msgid "reconfiguring urpmi for media \"%s\""
-msgstr "с."
+msgstr ""
 
 #: ../urpm/media.pm:1472
-#, fuzzy, c-format
+#, c-format
 msgid "...reconfiguration failed"
-msgstr "Цэсний тохируулга хадгалагдсан"
+msgstr ""
 
 #: ../urpm/media.pm:1478
-#, fuzzy, c-format
+#, c-format
 msgid "reconfiguration done"
-msgstr "Серверийн тохируулга"
+msgstr ""
 
 #: ../urpm/media.pm:1494
 #, c-format
@@ -1129,24 +1130,24 @@ msgid "Error generating names file: dependency %d not found"
 msgstr ""
 
 #: ../urpm/media.pm:1515
-#, fuzzy, c-format
+#, c-format
 msgid "medium \"%s\" is up-to-date"
-msgstr "с бол"
+msgstr ""
 
 #: ../urpm/media.pm:1526
-#, fuzzy, c-format
+#, c-format
 msgid "examining synthesis file [%s]"
-msgstr "MD5SUM файлыг шалгаж байна"
+msgstr ""
 
 #: ../urpm/media.pm:1546
-#, fuzzy, c-format
+#, c-format
 msgid "problem reading synthesis file of medium \"%s\""
-msgstr "аас с"
+msgstr ""
 
 #: ../urpm/media.pm:1559 ../urpm/media.pm:1654
-#, fuzzy, c-format
+#, c-format
 msgid "copying [%s] for medium \"%s\"..."
-msgstr "жигсаалт с"
+msgstr ""
 
 #: ../urpm/media.pm:1561 ../urpm/media.pm:1631 ../urpm/media.pm:1884
 #, c-format
@@ -1154,9 +1155,9 @@ msgid "...copying failed"
 msgstr "...хуулалт бүтэлгүйтэв"
 
 #: ../urpm/media.pm:1627
-#, fuzzy, c-format
+#, c-format
 msgid "copying description file of \"%s\"..."
-msgstr "Тодорхойлолт аас с."
+msgstr ""
 
 #: ../urpm/media.pm:1629 ../urpm/media.pm:1658
 #, c-format
@@ -1164,79 +1165,79 @@ msgid "...copying done"
 msgstr "...хуулждууслаа"
 
 #: ../urpm/media.pm:1660
-#, fuzzy, c-format
+#, c-format
 msgid "copy of [%s] failed (file is suspiciously small)"
-msgstr "аас с"
+msgstr ""
 
 #: ../urpm/media.pm:1708
-#, fuzzy, c-format
+#, c-format
 msgid "computing md5sum of retrieved source synthesis"
-msgstr "аас"
+msgstr ""
 
 #: ../urpm/media.pm:1710 ../urpm/media.pm:2193
-#, fuzzy, c-format
+#, c-format
 msgid "retrieval of [%s] failed (md5sum mismatch)"
-msgstr "аас с"
+msgstr ""
 
 #: ../urpm/media.pm:1725
-#, fuzzy, c-format
+#, c-format
 msgid "genhdlist2 failed on %s"
-msgstr "hdlist [%s]-ийг байгуулж байна"
+msgstr ""
 
 #: ../urpm/media.pm:1735
-#, fuzzy, c-format
+#, c-format
 msgid "comparing %s and %s"
-msgstr "%s-ийг суулгаж байна\n"
+msgstr ""
 
 #: ../urpm/media.pm:1765
-#, fuzzy, c-format
+#, c-format
 msgid "invalid hdlist file %s for medium \"%s\""
-msgstr "[%s]-ээс ямар нэг rpm олдсонгүй"
+msgstr ""
 
 #: ../urpm/media.pm:1791
-#, fuzzy, c-format
+#, c-format
 msgid "copying MD5SUM file of \"%s\"..."
-msgstr "Тодорхойлолт аас с."
+msgstr ""
 
 #: ../urpm/media.pm:1831
-#, fuzzy, c-format
+#, c-format
 msgid "invalid MD5SUM file (downloaded from %s)"
-msgstr "буруу rpm файлын нэр [%s]"
+msgstr ""
 
 #: ../urpm/media.pm:1834
-#, fuzzy, c-format
+#, c-format
 msgid "no metadata found for medium \"%s\""
-msgstr "[%s]-ээс ямар нэг rpm олдсонгүй"
+msgstr ""
 
 #: ../urpm/media.pm:1866
-#, fuzzy, c-format
+#, c-format
 msgid "retrieving source synthesis of \"%s\"..."
-msgstr "hdlists файлыг хүлээн авч байна..."
+msgstr ""
 
 #: ../urpm/media.pm:1932
-#, fuzzy, c-format
+#, c-format
 msgid "examining pubkey file of \"%s\"..."
-msgstr "\"%s\" хэвлэгчийн устгаж байна..."
+msgstr ""
 
 #: ../urpm/media.pm:1944
-#, fuzzy, c-format
+#, c-format
 msgid "...imported key %s from pubkey file of \"%s\""
-msgstr "%s файлыг нээж болохгүй байна\n"
+msgstr ""
 
 #: ../urpm/media.pm:1948
-#, fuzzy, c-format
+#, c-format
 msgid "unable to import pubkey file of \"%s\""
-msgstr "%s файлыг нээж болохгүй байна\n"
+msgstr ""
 
 #: ../urpm/media.pm:1989
-#, fuzzy, c-format
+#, c-format
 msgid "no synthesis file found for medium \"%s\""
-msgstr "[%s]-ээс ямар нэг rpm олдсонгүй"
+msgstr ""
 
 #: ../urpm/media.pm:2022
-#, fuzzy, c-format
+#, c-format
 msgid "updated medium \"%s\""
-msgstr "%s файлыг нээж болохгүй байна\n"
+msgstr ""
 
 #: ../urpm/media.pm:2187
 #, c-format
@@ -1259,9 +1260,9 @@ msgid "found geolocalisation %s %.2f %.2f from timezone %s"
 msgstr ""
 
 #: ../urpm/mirrors.pm:306
-#, fuzzy, c-format
+#, c-format
 msgid "getting mirror list from %s"
-msgstr "[%s]-ээс ямар нэг rpm олдсонгүй"
+msgstr ""
 
 #: ../urpm/msg.pm:74 ../urpmi:492 ../urpmi:510 ../urpmi:628
 #, c-format
@@ -1300,9 +1301,9 @@ msgid "Release"
 msgstr ""
 
 #: ../urpm/msg.pm:160
-#, fuzzy, c-format
+#, c-format
 msgid "Arch"
-msgstr "Тандах"
+msgstr ""
 
 #: ../urpm/msg.pm:169
 #, c-format
@@ -1310,9 +1311,9 @@ msgid "(recommended)"
 msgstr ""
 
 #: ../urpm/msg.pm:184
-#, fuzzy, c-format
+#, c-format
 msgid "medium \"%s\""
-msgstr "%s багцийг устгалт"
+msgstr ""
 
 #: ../urpm/msg.pm:184
 #, c-format
@@ -1350,7 +1351,7 @@ msgid "Marking %s as manually installed, it won't be auto-orphaned"
 msgstr ""
 
 #: ../urpm/orphans.pm:613
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "The following package:\n"
 "%s\n"
@@ -1359,15 +1360,15 @@ msgid_plural ""
 "The following packages:\n"
 "%s\n"
 "are now orphaned."
-msgstr[0] "Дараах багцуудын нэг нь шаардлагатай:"
-msgstr[1] "Дараах багцуудын нэг нь шаардлагатай:"
+msgstr[0] ""
+msgstr[1] ""
 
 #: ../urpm/orphans.pm:616
-#, fuzzy, c-format
+#, c-format
 msgid "You may wish to remove it."
 msgid_plural "You may wish to remove them."
-msgstr[0] "Юу ч үгүй"
-msgstr[1] "Юу ч үгүй"
+msgstr[0] ""
+msgstr[1] ""
 
 #: ../urpm/orphans.pm:633
 #, c-format
@@ -1385,24 +1386,24 @@ msgstr[0] ""
 msgstr[1] ""
 
 #: ../urpm/parallel.pm:31
-#, fuzzy, c-format
+#, c-format
 msgid "unable to parse \"%s\" in file [%s]"
-msgstr "[%s] rpm файл руу хандаж болсонгүй"
+msgstr ""
 
 #: ../urpm/parallel.pm:40
-#, fuzzy, c-format
+#, c-format
 msgid "examining parallel handler in file [%s]"
-msgstr "ямх с"
+msgstr ""
 
 #: ../urpm/parallel.pm:51
-#, fuzzy, c-format
+#, c-format
 msgid "found parallel handler for nodes: %s"
-msgstr "ямх с"
+msgstr ""
 
 #: ../urpm/parallel.pm:55
-#, fuzzy, c-format
+#, c-format
 msgid "unable to use parallel option \"%s\""
-msgstr "%s багцийг устгаж болсонгүй"
+msgstr ""
 
 #: ../urpm/parallel.pm:120
 #, c-format
@@ -1410,9 +1411,9 @@ msgid "on node %s"
 msgstr ""
 
 #: ../urpm/parallel.pm:335
-#, fuzzy, c-format
+#, c-format
 msgid "Installation failed on node %s"
-msgstr "Суулгалтын асуудал"
+msgstr ""
 
 #: ../urpm/parallel_ka_run.pm:57
 #, c-format
@@ -1442,14 +1443,14 @@ msgid ""
 msgstr ""
 
 #: ../urpm/removable.pm:45
-#, fuzzy, c-format
+#, c-format
 msgid "unable to access medium \"%s\"."
-msgstr "[%s] rpm файл руу хандаж болсонгүй"
+msgstr ""
 
 #: ../urpm/removable.pm:85 ../urpm/removable.pm:100
-#, fuzzy, c-format
+#, c-format
 msgid "mounting %s"
-msgstr "%s-ийг салгаж байна"
+msgstr ""
 
 #: ../urpm/removable.pm:112
 #, c-format
@@ -1468,9 +1469,9 @@ msgid ""
 msgstr ""
 
 #: ../urpm/select.pm:219
-#, fuzzy, c-format
+#, c-format
 msgid "No package named %s"
-msgstr "%s нэртэй багц байхгүй байна"
+msgstr ""
 
 #: ../urpm/select.pm:221 ../urpme:112
 #, c-format
@@ -1483,19 +1484,19 @@ msgid "You should use \"-a\" to use all of them"
 msgstr ""
 
 #: ../urpm/select.pm:371
-#, fuzzy, c-format
+#, c-format
 msgid "found package(s) %s in urpmi db, but none are installed"
-msgstr "Бүх зүйл хэдийн суусан байна"
+msgstr ""
 
 #: ../urpm/select.pm:606
-#, fuzzy, c-format
+#, c-format
 msgid "Package %s is already installed"
-msgstr "Бүх зүйл хэдийн суусан байна"
+msgstr ""
 
 #: ../urpm/select.pm:607
-#, fuzzy, c-format
+#, c-format
 msgid "Packages %s are already installed"
-msgstr "Бүх зүйл хэдийн суусан байна"
+msgstr ""
 
 #: ../urpm/select.pm:624 ../urpm/select.pm:711
 #, c-format
@@ -1508,33 +1509,33 @@ msgid "due to unsatisfied %s"
 msgstr ""
 
 #: ../urpm/select.pm:631
-#, fuzzy, c-format
+#, c-format
 msgid "trying to promote %s"
-msgstr "Юу ч үгүй"
+msgstr ""
 
 #: ../urpm/select.pm:632
-#, fuzzy, c-format
+#, c-format
 msgid "in order to keep %s"
-msgstr "ямх"
+msgstr ""
 
 #: ../urpm/select.pm:673
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "The following package has to be removed for others to be upgraded:\n"
 "%s"
-msgstr "Дараах багцууд суулгагдах гэж байна"
+msgstr ""
 
 #: ../urpm/select.pm:674
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "The following packages have to be removed for others to be upgraded:\n"
 "%s"
-msgstr "Дараах багцууд суулгагдах гэж байна"
+msgstr ""
 
 #: ../urpm/select.pm:701
-#, fuzzy, c-format
+#, c-format
 msgid "in order to install %s"
-msgstr "%s багцийг суулгаж болсонгүй"
+msgstr ""
 
 #: ../urpm/select.pm:707
 #, c-format
@@ -1547,9 +1548,9 @@ msgid "Invalid signature (%s)"
 msgstr ""
 
 #: ../urpm/signature.pm:76
-#, fuzzy, c-format
+#, c-format
 msgid "SECURITY: The following package is _NOT_ signed (%s): %s"
-msgstr "Дараах багцууд %s: %s-ийг агуулж байна"
+msgstr ""
 
 #: ../urpm/signature.pm:82
 #, c-format
@@ -1597,24 +1598,24 @@ msgid "You should restart %s for %s"
 msgstr ""
 
 #: ../urpm/sys.pm:377
-#, fuzzy, c-format
+#, c-format
 msgid "Can't write file"
-msgstr "[%s] тохируулгын файлыг бичиж болсонгүй"
+msgstr ""
 
 #: ../urpm/sys.pm:377
-#, fuzzy, c-format
+#, c-format
 msgid "Can't open file"
-msgstr "Хуулалт бүтэлгүйтэв"
+msgstr ""
 
 #: ../urpm/sys.pm:390
-#, fuzzy, c-format
+#, c-format
 msgid "Can't move file %s to %s"
-msgstr "Хуулалт бүтэлгүйтэв"
+msgstr ""
 
 #: ../urpme:43
-#, fuzzy, c-format
+#, c-format
 msgid "  --auto         - automatically select a package in choices.\n"
-msgstr "Автоматаар сонгогдсон багцуудыг харуулах"
+msgstr ""
 
 #: ../urpme:44
 #, c-format
@@ -1627,30 +1628,30 @@ msgid "  --test         - verify if the removal can be achieved correctly.\n"
 msgstr ""
 
 #: ../urpme:47 ../urpmi:106 ../urpmq:66
-#, fuzzy, c-format
+#, c-format
 msgid "  --parallel     - distributed urpmi across machines of alias.\n"
-msgstr "аас"
+msgstr ""
 
 #: ../urpme:48
-#, fuzzy, c-format
+#, c-format
 msgid "  --root         - use another root for rpm removal.\n"
-msgstr "Мөр"
+msgstr ""
 
 #: ../urpme:49 ../urpmf:35 ../urpmi:108 ../urpmi.addmedia:73
 #: ../urpmi.removemedia:45 ../urpmi.update:49 ../urpmq:68
-#, fuzzy, c-format
+#, c-format
 msgid "  --urpmi-root   - use another root for urpmi db & rpm installation.\n"
-msgstr "Мөр"
+msgstr ""
 
 #: ../urpme:50 ../urpmi:96
-#, fuzzy, c-format
+#, c-format
 msgid "  --justdb       - update only the rpm db, not the filesystem.\n"
-msgstr "„mdkupdate“ хэрэгслээс багцуудыг шинэчилэхэд алдаа.\n"
+msgstr ""
 
 #: ../urpme:51
-#, fuzzy, c-format
+#, c-format
 msgid "  --noscripts    - do not execute package scriptlet(s).\n"
-msgstr "Тодорхойлолт Тодорхойлолт Тодорхойлолт"
+msgstr ""
 
 #: ../urpme:52
 #, c-format
@@ -1660,19 +1661,19 @@ msgid ""
 msgstr ""
 
 #: ../urpme:54 ../urpmi:150 ../urpmq:87
-#, fuzzy, c-format
+#, c-format
 msgid "  --verbose, -v  - verbose mode.\n"
-msgstr "Нарийвчилан харах бол Esc товч дарна уу"
+msgstr ""
 
 #: ../urpme:55
-#, fuzzy, c-format
+#, c-format
 msgid "  -a             - select all packages matching expression.\n"
-msgstr "  -c             - түр санах ойн хавтасын толгойг цэвэрлэх.\n"
+msgstr ""
 
 #: ../urpme:70
-#, fuzzy, c-format
+#, c-format
 msgid "Only superuser is allowed to remove packages"
-msgstr "бол"
+msgstr ""
 
 #: ../urpme:103
 #, c-format
@@ -1685,63 +1686,63 @@ msgid "unknown package"
 msgstr "үл мэдэгдэх багц"
 
 #: ../urpme:118
-#, fuzzy, c-format
+#, c-format
 msgid "Removing the following package will break your system:"
 msgid_plural "Removing the following packages will break your system:"
-msgstr[0] "%s багцийг устгах нь таны системийн ажиллагааг таслах болно"
-msgstr[1] "%s багцийг устгах нь таны системийн ажиллагааг таслах болно"
+msgstr[0] ""
+msgstr[1] ""
 
 #: ../urpme:123
-#, fuzzy, c-format
+#, c-format
 msgid "Nothing to remove"
-msgstr "Юу ч үгүй"
+msgstr ""
 
 #: ../urpme:140
-#, fuzzy, c-format
+#, c-format
 msgid "No orphans to remove"
-msgstr "Юу ч үгүй"
+msgstr ""
 
 #: ../urpme:146
-#, fuzzy, c-format
+#, c-format
 msgid "To satisfy dependencies, the following package will be removed"
 msgid_plural ""
 "To satisfy dependencies, the following %d packages will be removed"
-msgstr[0] "тийш МБ"
-msgstr[1] "тийш МБ"
+msgstr[0] ""
+msgstr[1] ""
 
 #: ../urpme:151
-#, fuzzy, c-format
+#, c-format
 msgid "(orphan package)"
 msgid_plural "(orphan packages)"
-msgstr[0] "үл мэдэгдэх багц"
-msgstr[1] "үл мэдэгдэх багц"
+msgstr[0] ""
+msgstr[1] ""
 
 #: ../urpme:158
-#, fuzzy, c-format
+#, c-format
 msgid "Remove %d package?"
 msgid_plural "Remove %d packages?"
-msgstr[0] "%s багцийг устгалт"
-msgstr[1] "%s багцийг устгалт"
+msgstr[0] ""
+msgstr[1] ""
 
 #: ../urpme:163
-#, fuzzy, c-format
+#, c-format
 msgid "testing removal of %s"
-msgstr "с"
+msgstr ""
 
 #: ../urpme:180
-#, fuzzy, c-format
+#, c-format
 msgid "Removal failed"
-msgstr "Хуулалт бүтэлгүйтэв"
+msgstr ""
 
 #: ../urpme:182
-#, fuzzy, c-format
+#, c-format
 msgid "Removal is possible"
-msgstr "Хуулалт бүтэлгүйтэв"
+msgstr ""
 
 #: ../urpmf:31
-#, fuzzy, c-format
+#, c-format
 msgid "  --version      - print this tool's version number.\n"
-msgstr "  --help         - Энэ тусламжийг хэвлэх.\n"
+msgstr ""
 
 #: ../urpmf:32 ../urpmi:130 ../urpmq:78
 #, c-format
@@ -1766,19 +1767,19 @@ msgid ""
 msgstr ""
 
 #: ../urpmf:38
-#, fuzzy, c-format
+#, c-format
 msgid "  --use-distrib  - use the given path to access media\n"
-msgstr "аас"
+msgstr ""
 
 #: ../urpmf:39 ../urpmi:73 ../urpmq:47
-#, fuzzy, c-format
+#, c-format
 msgid "  --synthesis    - use the given synthesis instead of urpmi db.\n"
-msgstr "аас"
+msgstr ""
 
 #: ../urpmf:40
-#, fuzzy, c-format
+#, c-format
 msgid "  --uniq         - do not print identical lines twice.\n"
-msgstr "  --all          - бүх тагуудыг хэвлэх.\n"
+msgstr ""
 
 #: ../urpmf:41 ../urpmi:70 ../urpmq:42
 #, c-format
@@ -1786,19 +1787,19 @@ msgid "  --update       - use only update media.\n"
 msgstr ""
 
 #: ../urpmf:42
-#, fuzzy, c-format
+#, c-format
 msgid "  --verbose      - verbose mode.\n"
-msgstr "Нарийвчилан харах бол Esc товч дарна уу"
+msgstr ""
 
 #: ../urpmf:43
-#, fuzzy, c-format
+#, c-format
 msgid "  -i             - ignore case distinctions in patterns.\n"
-msgstr "  -c             - түр санах ойн хавтасын толгойг цэвэрлэх.\n"
+msgstr ""
 
 #: ../urpmf:44
-#, fuzzy, c-format
+#, c-format
 msgid "  -I             - honor case distinctions in patterns (default).\n"
-msgstr "  -c             - түр санах ойн хавтасын толгойг цэвэрлэх.\n"
+msgstr ""
 
 #: ../urpmf:45
 #, c-format
@@ -1816,51 +1817,49 @@ msgid "  text           - any text is parsed as a regexp, unless -l is used.\n"
 msgstr ""
 
 #: ../urpmf:48
-#, fuzzy, c-format
+#, c-format
 msgid "  -e             - include perl code directly as perl -e.\n"
-msgstr "  -c             - түр санах ойн хавтасын толгойг цэвэрлэх.\n"
+msgstr ""
 
 #: ../urpmf:49
-#, fuzzy, c-format
+#, c-format
 msgid "  -a             - binary AND operator.\n"
-msgstr "  --all          - бүх тагуудыг хэвлэх.\n"
+msgstr ""
 
 #: ../urpmf:50
-#, fuzzy, c-format
+#, c-format
 msgid "  -o             - binary OR operator.\n"
-msgstr "бол"
+msgstr ""
 
 #: ../urpmf:51
-#, fuzzy, c-format
+#, c-format
 msgid "  !              - unary NOT.\n"
-msgstr "  --all          - бүх тагуудыг хэвлэх.\n"
+msgstr ""
 
 #: ../urpmf:52
-#, fuzzy, c-format
+#, c-format
 msgid "  ( )            - left and right parentheses.\n"
-msgstr "баруун бүлэг"
+msgstr ""
 
 #: ../urpmf:53
-#, fuzzy, c-format
+#, c-format
 msgid "List of tags:\n"
 msgstr ""
-"Сэргээх өгөгдөлүүдийн жагсаалт:\n"
-"\n"
 
 #: ../urpmf:54
-#, fuzzy, c-format
+#, c-format
 msgid "  --qf           - specify a printf-like output format\n"
-msgstr "  --all          - бүх тагуудыг хэвлэх.\n"
+msgstr ""
 
 #: ../urpmf:55
-#, fuzzy, c-format
+#, c-format
 msgid "                   example: '%%name:%%files'\n"
-msgstr "  --list         - боломжтой багцуудын жагсаалт.\n"
+msgstr ""
 
 #: ../urpmf:56
-#, fuzzy, c-format
+#, c-format
 msgid "  --arch         - architecture\n"
-msgstr "  --all          - бүх тагуудыг хэвлэх.\n"
+msgstr ""
 
 #: ../urpmf:57
 #, c-format
@@ -1873,9 +1872,9 @@ msgid "  --buildtime    - build time\n"
 msgstr ""
 
 #: ../urpmf:59
-#, fuzzy, c-format
+#, c-format
 msgid "  --conffiles    - configuration files\n"
-msgstr "Консол тохируулгын модул"
+msgstr ""
 
 #: ../urpmf:60
 #, c-format
@@ -1883,9 +1882,9 @@ msgid "  --conflicts    - conflict tags\n"
 msgstr ""
 
 #: ../urpmf:61
-#, fuzzy, c-format
+#, c-format
 msgid "  --description  - package description\n"
-msgstr "Тодорхойлолт Тодорхойлолт Тодорхойлолт"
+msgstr ""
 
 #: ../urpmf:62
 #, c-format
@@ -1893,34 +1892,34 @@ msgid "  --distribution - distribution\n"
 msgstr ""
 
 #: ../urpmf:63
-#, fuzzy, c-format
+#, c-format
 msgid "  --epoch        - epoch\n"
-msgstr "  --help         - Энэ тусламжийг хэвлэх.\n"
+msgstr ""
 
 #: ../urpmf:64
-#, fuzzy, c-format
+#, c-format
 msgid "  --filename     - filename of the package\n"
-msgstr "  --all          - бүх тагуудыг хэвлэх.\n"
+msgstr ""
 
 #: ../urpmf:65
-#, fuzzy, c-format
+#, c-format
 msgid "  --files        - list of files contained in the package\n"
-msgstr "  --list         - боломжтой багцуудын жагсаалт.\n"
+msgstr ""
 
 #: ../urpmf:66
-#, fuzzy, c-format
+#, c-format
 msgid "  --group        - group\n"
-msgstr "  --help         - Энэ тусламжийг хэвлэх.\n"
+msgstr ""
 
 #: ../urpmf:67
-#, fuzzy, c-format
+#, c-format
 msgid "  --license      - license\n"
-msgstr "  --all          - бүх тагуудыг хэвлэх.\n"
+msgstr ""
 
 #: ../urpmf:68
-#, fuzzy, c-format
+#, c-format
 msgid "  --name         - package name\n"
-msgstr "  --all          - бүх тагуудыг хэвлэх.\n"
+msgstr ""
 
 #: ../urpmf:69
 #, c-format
@@ -1928,9 +1927,9 @@ msgid "  --obsoletes    - obsoletes tags\n"
 msgstr ""
 
 #: ../urpmf:70
-#, fuzzy, c-format
+#, c-format
 msgid "  --packager     - packager\n"
-msgstr "  --list         - боломжтой багцуудын жагсаалт.\n"
+msgstr ""
 
 #: ../urpmf:71
 #, c-format
@@ -1943,9 +1942,9 @@ msgid "  --requires     - requires tags\n"
 msgstr ""
 
 #: ../urpmf:73
-#, fuzzy, c-format
+#, c-format
 msgid "  --size         - installed size\n"
-msgstr "  --all          - бүх тагуудыг хэвлэх.\n"
+msgstr ""
 
 #: ../urpmf:74
 #, c-format
@@ -1958,29 +1957,29 @@ msgid "  --recommends   - recommends tags\n"
 msgstr ""
 
 #: ../urpmf:76
-#, fuzzy, c-format
+#, c-format
 msgid "  --summary      - summary\n"
-msgstr "  --all          - бүх тагуудыг хэвлэх.\n"
+msgstr ""
 
 #: ../urpmf:77
-#, fuzzy, c-format
+#, c-format
 msgid "  --url          - url\n"
-msgstr "  --all          - бүх тагуудыг хэвлэх.\n"
+msgstr ""
 
 #: ../urpmf:78
-#, fuzzy, c-format
+#, c-format
 msgid "  --vendor       - vendor\n"
-msgstr "Нарийвчилан харах бол Esc товч дарна уу"
+msgstr ""
 
 #: ../urpmf:79
-#, fuzzy, c-format
+#, c-format
 msgid "  -m             - the media in which the package was found\n"
-msgstr "  --list         - боломжтой багцуудын жагсаалт.\n"
+msgstr ""
 
 #: ../urpmf:80 ../urpmq:97
-#, fuzzy, c-format
+#, c-format
 msgid "  -f             - print version, release and arch with name.\n"
-msgstr "нэр"
+msgstr ""
 
 #: ../urpmf:149
 #, c-format
@@ -1993,24 +1992,24 @@ msgid "Incorrect format: you may use only one multi-valued tag"
 msgstr ""
 
 #: ../urpmf:287
-#, fuzzy, c-format
+#, c-format
 msgid "no hdlist available for medium \"%s\""
-msgstr "[%s]-ээс ямар нэг rpm олдсонгүй"
+msgstr ""
 
 #: ../urpmf:294
-#, fuzzy, c-format
+#, c-format
 msgid "no synthesis available for medium \"%s\""
-msgstr "с"
+msgstr ""
 
 #: ../urpmf:303
-#, fuzzy, c-format
+#, c-format
 msgid "no xml-info available for medium \"%s\""
-msgstr "жигсаалт с"
+msgstr ""
 
 #: ../urpmi:76
-#, fuzzy, c-format
+#, c-format
 msgid "  --auto-update  - update media then upgrade the system.\n"
-msgstr "„mdkupdate“ хэрэгслээс багцуудыг шинэчилэхэд алдаа.\n"
+msgstr ""
 
 #: ../urpmi:77
 #, c-format
@@ -2028,9 +2027,9 @@ msgid "  --auto-orphans - remove orphans without asking\n"
 msgstr ""
 
 #: ../urpmi:80 ../urpmq:52
-#, fuzzy, c-format
+#, c-format
 msgid "  --no-recommends - do not auto select \"recommended\" packages.\n"
-msgstr "Тодорхойлолт Тодорхойлолт Тодорхойлолт"
+msgstr ""
 
 #: ../urpmi:81
 #, c-format
@@ -2040,9 +2039,9 @@ msgid ""
 msgstr ""
 
 #: ../urpmi:82
-#, fuzzy, c-format
+#, c-format
 msgid "  --no-install   - don't install packages (only download)\n"
-msgstr "үгүй"
+msgstr ""
 
 #: ../urpmi:83 ../urpmq:54
 #, c-format
@@ -2065,19 +2064,19 @@ msgid "  --split-length - small transaction length, default is %d.\n"
 msgstr ""
 
 #: ../urpmi:91
-#, fuzzy, c-format
+#, c-format
 msgid "  --fuzzy, -y    - impose fuzzy search.\n"
-msgstr "т"
+msgstr ""
 
 #: ../urpmi:92
-#, fuzzy, c-format
+#, c-format
 msgid "  --buildrequires - install the buildrequires of the packages\n"
-msgstr "  -c             - түр санах ойн хавтасын толгойг цэвэрлэх.\n"
+msgstr ""
 
 #: ../urpmi:93
-#, fuzzy, c-format
+#, c-format
 msgid "  --install-src  - install only source package (no binaries).\n"
-msgstr "үгүй"
+msgstr ""
 
 #: ../urpmi:94
 #, c-format
@@ -2085,9 +2084,9 @@ msgid "  --clean        - remove rpm from cache before anything else.\n"
 msgstr ""
 
 #: ../urpmi:95
-#, fuzzy, c-format
+#, c-format
 msgid "  --noclean      - don't clean rpms from cache.\n"
-msgstr "ямх"
+msgstr ""
 
 #: ../urpmi:97
 #, c-format
@@ -2117,9 +2116,9 @@ msgid ""
 msgstr ""
 
 #: ../urpmi:105
-#, fuzzy, c-format
+#, c-format
 msgid "  --allow-recommends - auto select \"recommended\" packages.\n"
-msgstr "Тодорхойлолт Тодорхойлолт Тодорхойлолт"
+msgstr ""
 
 #: ../urpmi:109
 #, c-format
@@ -2178,38 +2177,32 @@ msgid "  --limit-rate   - limit the download speed.\n"
 msgstr ""
 
 #: ../urpmi:122
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "  --resume       - resume transfer of partially-downloaded files\n"
 "                   (--no-resume disables it, default is disabled).\n"
 msgstr ""
-"\n"
-" үгүй бол"
 
 #: ../urpmi:124 ../urpmi.addmedia:62 ../urpmi.update:40 ../urpmq:74
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "  --proxy        - use specified HTTP proxy, the port number is assumed\n"
 "                   to be 1080 by default (format is <proxyhost[:port]>).\n"
 msgstr ""
-"бол\n"
-" бол<proxyhost[:port]>"
 
 #: ../urpmi:126 ../urpmi.addmedia:64 ../urpmi.update:42 ../urpmq:76
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "  --proxy-user   - specify user and password to use for proxy\n"
 "                   authentication (format is <user:password>).\n"
 msgstr ""
-"\n"
-" бол<user:password>"
 
 #: ../urpmi:128
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "  --bug          - output a bug report in directory indicated by\n"
 "                   next arg.\n"
-msgstr "гаралт ямх\n"
+msgstr ""
 
 #: ../urpmi:134
 #, c-format
@@ -2227,19 +2220,19 @@ msgid "  --ignoresize   - don't verify disk space before installation.\n"
 msgstr ""
 
 #: ../urpmi:137
-#, fuzzy, c-format
+#, c-format
 msgid "  --ignorearch   - allow to install rpms for unmatched architectures.\n"
-msgstr "  --all          - бүх тагуудыг хэвлэх.\n"
+msgstr ""
 
 #: ../urpmi:138
-#, fuzzy, c-format
+#, c-format
 msgid "  --noscripts    - do not execute package scriptlet(s)\n"
-msgstr "Тодорхойлолт Тодорхойлолт Тодорхойлолт"
+msgstr ""
 
 #: ../urpmi:139
-#, fuzzy, c-format
+#, c-format
 msgid "  --replacefiles - ignore file conflicts\n"
-msgstr "  --all          - бүх тагуудыг хэвлэх.\n"
+msgstr ""
 
 #: ../urpmi:140
 #, c-format
@@ -2259,9 +2252,9 @@ msgid ""
 msgstr ""
 
 #: ../urpmi:144
-#, fuzzy, c-format
+#, c-format
 msgid "  --nolock       - don't lock rpm db.\n"
-msgstr "ямх"
+msgstr ""
 
 #: ../urpmi:145
 #, c-format
@@ -2269,24 +2262,24 @@ msgid "  --strict-arch  - upgrade only packages with the same architecture.\n"
 msgstr ""
 
 #: ../urpmi:146 ../urpmq:95
-#, fuzzy, c-format
+#, c-format
 msgid "  -a             - select all matches on command line.\n"
-msgstr "  -c             - түр санах ойн хавтасын толгойг цэвэрлэх.\n"
+msgstr ""
 
 #: ../urpmi:149
-#, fuzzy, c-format
+#, c-format
 msgid "  --quiet, -q    - quiet mode.\n"
-msgstr "  --all          - бүх тагуудыг хэвлэх.\n"
+msgstr ""
 
 #: ../urpmi:151
-#, fuzzy, c-format
+#, c-format
 msgid "  --debug        - very verbose mode.\n"
-msgstr "Нарийвчилан харах бол Esc товч дарна уу"
+msgstr ""
 
 #: ../urpmi:152
-#, fuzzy, c-format
+#, c-format
 msgid "  names or rpm files given on command line will be installed.\n"
-msgstr "Нээх"
+msgstr ""
 
 #: ../urpmi:180
 #, c-format
@@ -2301,9 +2294,9 @@ msgid ""
 msgstr ""
 
 #: ../urpmi:217
-#, fuzzy, c-format
+#, c-format
 msgid "You can't install binary rpm files when using --install-src"
-msgstr "Хийгдсэн"
+msgstr ""
 
 #: ../urpmi:218
 #, c-format
@@ -2329,9 +2322,9 @@ msgid ""
 msgstr ""
 
 #: ../urpmi:251
-#, fuzzy, c-format
+#, c-format
 msgid "Unable to create directory [%s] for bug report"
-msgstr "с"
+msgstr ""
 
 #: ../urpmi:272
 #, c-format
@@ -2354,22 +2347,22 @@ msgstr ""
 
 #. -PO: here format is "<package_name>: <summary> (to install)"
 #: ../urpmi:432
-#, fuzzy, c-format
+#, c-format
 msgid "%s: %s (to install)"
-msgstr "ямх"
+msgstr ""
 
 #. -PO: here format is "<package_name> (to install)"
 #: ../urpmi:434
-#, fuzzy, c-format
+#, c-format
 msgid "%s (to install)"
-msgstr "ямх"
+msgstr ""
 
 #: ../urpmi:440
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "In order to satisfy the '%s' dependency, one of the following packages is "
 "needed:"
-msgstr "тийш МБ"
+msgstr ""
 
 #: ../urpmi:443
 #, c-format
@@ -2393,11 +2386,11 @@ msgid ""
 msgstr ""
 
 #: ../urpmi:493 ../urpmi:511
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "\n"
 "Continue installation anyway?"
-msgstr "Ямар ч байсан үргэлжлүүлэх үү?"
+msgstr ""
 
 #: ../urpmi:494 ../urpmi:512 ../urpmi:629 ../urpmi.addmedia:136
 #, c-format
@@ -2405,11 +2398,11 @@ msgid " (Y/n) "
 msgstr " (Y/n) "
 
 #: ../urpmi:505
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "A requested package cannot be installed:\n"
 "%s"
-msgstr "Бүх зүйл хэдийн суусан байна"
+msgstr ""
 
 #: ../urpmi:526
 #, c-format
@@ -2417,20 +2410,20 @@ msgid "removing package %s will break your system"
 msgstr "%s багцийг устгах нь таны системийн ажиллагааг таслах болно"
 
 #: ../urpmi:534
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "The installation cannot continue because the following package\n"
 "has to be removed for others to be upgraded:\n"
 "%s\n"
-msgstr "г с вы?"
+msgstr ""
 
 #: ../urpmi:536
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "The installation cannot continue because the following packages\n"
 "have to be removed for others to be upgraded:\n"
 "%s\n"
-msgstr "г с вы?"
+msgstr ""
 
 #: ../urpmi:544
 #, c-format
@@ -2438,19 +2431,19 @@ msgid "(test only, removal will not be actually done)"
 msgstr ""
 
 #: ../urpmi:563
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "You must first call urpmi with --buildrequires to install the following "
 "dependencies:\n"
 "%s\n"
-msgstr "Та г с"
+msgstr ""
 
 #: ../urpmi:573
-#, fuzzy, c-format
+#, c-format
 msgid "The following orphan package will be removed."
 msgid_plural "The following orphan packages will be removed."
-msgstr[0] "тийш МБ"
-msgstr[1] "тийш МБ"
+msgstr[0] ""
+msgstr[1] ""
 
 #: ../urpmi:599
 #, c-format
@@ -2463,9 +2456,9 @@ msgid "(test only, installation will not be actually done)"
 msgstr ""
 
 #: ../urpmi:642
-#, fuzzy, c-format
+#, c-format
 msgid "Press Enter when mounted..."
-msgstr "Бэлэн болонгуут Enter товчоо дарна уу..."
+msgstr ""
 
 #. -PO: The URI types strings 'file:', 'ftp:', 'http:', and 'cdrom:' must not be translated!
 #. -PO: neither the ``with''.  Only what is between <brackets> can be translated.
@@ -2509,9 +2502,9 @@ msgid "  --prozilla     - use prozilla to retrieve distant files.\n"
 msgstr ""
 
 #: ../urpmi.addmedia:59 ../urpmi.update:37
-#, fuzzy, c-format
+#, c-format
 msgid "  --aria2        - use aria2 to retrieve distant files.\n"
-msgstr "  --all          - бүх тагуудыг хэвлэх.\n"
+msgstr ""
 
 #: ../urpmi.addmedia:66
 #, c-format
@@ -2529,9 +2522,9 @@ msgid ""
 msgstr ""
 
 #: ../urpmi.addmedia:70
-#, fuzzy, c-format
+#, c-format
 msgid "  --probe-synthesis - use synthesis file.\n"
-msgstr "аас"
+msgstr ""
 
 #: ../urpmi.addmedia:71
 #, c-format
@@ -2539,9 +2532,9 @@ msgid "  --probe-rpms   - use rpm files (instead of synthesis).\n"
 msgstr ""
 
 #: ../urpmi.addmedia:72
-#, fuzzy, c-format
+#, c-format
 msgid "  --no-probe     - do not try to find any synthesis file.\n"
-msgstr "үгүй\n"
+msgstr ""
 
 #: ../urpmi.addmedia:74
 #, c-format
@@ -2556,9 +2549,9 @@ msgid "  --interactive  - with --distrib, ask confirmation for each media\n"
 msgstr ""
 
 #: ../urpmi.addmedia:77
-#, fuzzy, c-format
+#, c-format
 msgid "  --all-media    - with --distrib, add every listed media\n"
-msgstr "  --list         - боломжтой багцуудын жагсаалт.\n"
+msgstr ""
 
 #: ../urpmi.addmedia:78
 #, c-format
@@ -2581,9 +2574,9 @@ msgid "  --raw          - add the media in config, but don't update it.\n"
 msgstr ""
 
 #: ../urpmi.addmedia:82 ../urpmi.removemedia:43 ../urpmi.update:54
-#, fuzzy, c-format
+#, c-format
 msgid "  -q             - quiet mode.\n"
-msgstr "  --all          - бүх тагуудыг хэвлэх.\n"
+msgstr ""
 
 #: ../urpmi.addmedia:83 ../urpmi.removemedia:44 ../urpmi.update:55
 #, c-format
@@ -2606,24 +2599,24 @@ msgid "bad <url> (for local directory, the path must be absolute)"
 msgstr ""
 
 #: ../urpmi.addmedia:116
-#, fuzzy, c-format
+#, c-format
 msgid "Only superuser is allowed to add media"
-msgstr "бол"
+msgstr ""
 
 #: ../urpmi.addmedia:119
-#, fuzzy, c-format
+#, c-format
 msgid "creating config file [%s]"
-msgstr "[%s] тохируулгын файлыг бичиж болсонгүй"
+msgstr ""
 
 #: ../urpmi.addmedia:120
-#, fuzzy, c-format
+#, c-format
 msgid "Can't create config file [%s]"
-msgstr "[%s] тохируулгын файлыг бичиж болсонгүй"
+msgstr ""
 
 #: ../urpmi.addmedia:128
-#, fuzzy, c-format
+#, c-format
 msgid "no need to give <relative path of synthesis> with --distrib"
-msgstr "с<relative path of hdlist>"
+msgstr ""
 
 #: ../urpmi.addmedia:136
 #, c-format
@@ -2633,16 +2626,14 @@ msgid ""
 msgstr ""
 
 #: ../urpmi.addmedia:156 ../urpmi.addmedia:181
-#, fuzzy, c-format
+#, c-format
 msgid "unable to add medium"
-msgstr "[%s] rpm файл руу хандаж болсонгүй"
+msgstr ""
 
 #: ../urpmi.addmedia:164
-#, fuzzy, c-format
+#, c-format
 msgid "<relative path of synthesis> missing\n"
 msgstr ""
-"с\n"
-"<relative path of hdlist>"
 
 #: ../urpmi.addmedia:167
 #, c-format
@@ -2650,45 +2641,45 @@ msgid "Can't use %s with remote medium"
 msgstr ""
 
 #: ../urpmi.removemedia:38
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "usage: urpmi.removemedia (-a | <name> ...)\n"
 "where <name> is a medium name to remove.\n"
-msgstr "<name><name> бол нэр"
+msgstr ""
 
 #: ../urpmi.removemedia:41
-#, fuzzy, c-format
+#, c-format
 msgid "  -a             - select all media.\n"
-msgstr "  --all          - бүх тагуудыг хэвлэх.\n"
+msgstr ""
 
 #: ../urpmi.removemedia:42
-#, fuzzy, c-format
+#, c-format
 msgid "  -y             - fuzzy match on media names.\n"
-msgstr "Нээх"
+msgstr ""
 
 #: ../urpmi.removemedia:59
-#, fuzzy, c-format
+#, c-format
 msgid "Only superuser is allowed to remove media"
-msgstr "бол"
+msgstr ""
 
 #: ../urpmi.removemedia:71
-#, fuzzy, c-format
+#, c-format
 msgid "nothing to remove (use urpmi.addmedia to add a media)\n"
-msgstr "юу ч үгүй"
+msgstr ""
 
 #: ../urpmi.removemedia:77
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "the entry to remove is missing\n"
 "(one of %s)\n"
-msgstr "бол г аас с"
+msgstr ""
 
 #: ../urpmi.update:31
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "usage: urpmi.update [options] <name> ...\n"
 "where <name> is a medium name to update.\n"
-msgstr "<name><name> бол нэр"
+msgstr ""
 
 #: ../urpmi.update:44
 #, c-format
@@ -2711,41 +2702,41 @@ msgid "  --no-ignore    - don't update, mark the media as enabled.\n"
 msgstr ""
 
 #: ../urpmi.update:50
-#, fuzzy, c-format
+#, c-format
 msgid "  --probe-rpms   - do not use synthesis, use rpm files directly\n"
-msgstr "үгүй\n"
+msgstr ""
 
 #: ../urpmi.update:51
-#, fuzzy, c-format
+#, c-format
 msgid "  -a             - select all enabled non-removable media.\n"
-msgstr "  -c             - түр санах ойн хавтасын толгойг цэвэрлэх.\n"
+msgstr ""
 
 #: ../urpmi.update:52
-#, fuzzy, c-format
+#, c-format
 msgid "  -f             - force updating synthesis\n"
-msgstr "  -c             - түр санах ойн хавтасын толгойг цэвэрлэх.\n"
+msgstr ""
 
 #: ../urpmi.update:53
-#, fuzzy, c-format
+#, c-format
 msgid "  -ff            - really force updating synthesis\n"
-msgstr "  -c             - түр санах ойн хавтасын толгойг цэвэрлэх.\n"
+msgstr ""
 
 #: ../urpmi.update:70
-#, fuzzy, c-format
+#, c-format
 msgid "Only superuser is allowed to update media"
-msgstr "бол"
+msgstr ""
 
 #: ../urpmi.update:87
-#, fuzzy, c-format
+#, c-format
 msgid "nothing to update (use urpmi.addmedia to add a media)\n"
-msgstr "юу ч үгүй"
+msgstr ""
 
 #: ../urpmi.update:88
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "the entry to update is missing\n"
 "(one of %s)\n"
-msgstr "бол г аас с"
+msgstr ""
 
 #: ../urpmi.update:99
 #, c-format
@@ -2753,14 +2744,14 @@ msgid "\"%s\""
 msgstr "\"%s\""
 
 #: ../urpmi.update:100
-#, fuzzy, c-format
+#, c-format
 msgid "ignoring media %s"
-msgstr "с"
+msgstr ""
 
 #: ../urpmi.update:100
-#, fuzzy, c-format
+#, c-format
 msgid "enabling media %s"
-msgstr "с"
+msgstr ""
 
 #: ../urpmq:44
 #, c-format
@@ -2782,9 +2773,9 @@ msgid ""
 msgstr ""
 
 #: ../urpmq:53
-#, fuzzy, c-format
+#, c-format
 msgid "  --fuzzy        - impose fuzzy search (same as -y).\n"
-msgstr "т"
+msgstr ""
 
 #: ../urpmq:56
 #, c-format
@@ -2792,24 +2783,24 @@ msgid "  --list         - list available packages.\n"
 msgstr "  --list         - боломжтой багцуудын жагсаалт.\n"
 
 #: ../urpmq:57
-#, fuzzy, c-format
+#, c-format
 msgid "  --list-media   - list available media.\n"
-msgstr "  --list         - боломжтой багцуудын жагсаалт.\n"
+msgstr ""
 
 #: ../urpmq:58
-#, fuzzy, c-format
+#, c-format
 msgid "  --list-url     - list available media and their url.\n"
-msgstr "  --list         - боломжтой багцуудын жагсаалт.\n"
+msgstr ""
 
 #: ../urpmq:59
-#, fuzzy, c-format
+#, c-format
 msgid "  --list-nodes   - list available nodes when using --parallel.\n"
-msgstr "  --list         - боломжтой багцуудын жагсаалт.\n"
+msgstr ""
 
 #: ../urpmq:60
-#, fuzzy, c-format
+#, c-format
 msgid "  --list-aliases - list available parallel aliases.\n"
-msgstr "  --list         - боломжтой багцуудын жагсаалт.\n"
+msgstr ""
 
 #: ../urpmq:61
 #, c-format
@@ -2818,19 +2809,19 @@ msgid ""
 msgstr ""
 
 #: ../urpmq:62
-#, fuzzy, c-format
+#, c-format
 msgid "  --src          - next package is a source package (same as -s).\n"
-msgstr "  --list         - боломжтой багцуудын жагсаалт.\n"
+msgstr ""
 
 #: ../urpmq:63
-#, fuzzy, c-format
+#, c-format
 msgid "  --sources      - print source URLs of selected packages\n"
-msgstr "  --list         - боломжтой багцуудын жагсаалт.\n"
+msgstr ""
 
 #: ../urpmq:65
-#, fuzzy, c-format
+#, c-format
 msgid "  --ignorearch   - allow to query rpms for unmatched architectures.\n"
-msgstr "  --all          - бүх тагуудыг хэвлэх.\n"
+msgstr ""
 
 #: ../urpmq:69
 #, c-format
@@ -2840,128 +2831,127 @@ msgid ""
 msgstr ""
 
 #: ../urpmq:79
-#, fuzzy, c-format
+#, c-format
 msgid "  --changelog    - print changelog.\n"
-msgstr "  --all          - бүх тагуудыг хэвлэх.\n"
+msgstr ""
 
 #: ../urpmq:80
-#, fuzzy, c-format
+#, c-format
 msgid "  --conflicts    - print conflicts.\n"
-msgstr "  --all          - бүх тагуудыг хэвлэх.\n"
+msgstr ""
 
 #: ../urpmq:81
-#, fuzzy, c-format
+#, c-format
 msgid "  --obsoletes    - print obsoletes.\n"
-msgstr "  --all          - бүх тагуудыг хэвлэх.\n"
+msgstr ""
 
 #: ../urpmq:82
-#, fuzzy, c-format
+#, c-format
 msgid "  --provides     - print provides.\n"
-msgstr "  --all          - бүх тагуудыг хэвлэх.\n"
+msgstr ""
 
 #: ../urpmq:83
-#, fuzzy, c-format
+#, c-format
 msgid "  --requires     - print requires.\n"
-msgstr "  --all          - бүх тагуудыг хэвлэх.\n"
+msgstr ""
 
 #: ../urpmq:84
-#, fuzzy, c-format
+#, c-format
 msgid "  --recommends   - print recommends.\n"
-msgstr "  --all          - бүх тагуудыг хэвлэх.\n"
+msgstr ""
 
 #: ../urpmq:85
-#, fuzzy, c-format
+#, c-format
 msgid "  --sourcerpm    - print sourcerpm.\n"
-msgstr "  --all          - бүх тагуудыг хэвлэх.\n"
+msgstr ""
 
 #: ../urpmq:86
-#, fuzzy, c-format
+#, c-format
 msgid "  --summary, -S  - print summary.\n"
-msgstr "  --all          - бүх тагуудыг хэвлэх.\n"
+msgstr ""
 
 #: ../urpmq:88
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "  --requires-recursive, -d\n"
 "                   - query package dependencies.\n"
-msgstr "  -c             - түр санах ойн хавтасын толгойг цэвэрлэх.\n"
+msgstr ""
 
 #: ../urpmq:90
-#, fuzzy, c-format
+#, c-format
 msgid "  --whatrequires - reverse search to what requires package.\n"
-msgstr "  -c             - түр санах ойн хавтасын толгойг цэвэрлэх.\n"
+msgstr ""
 
 #: ../urpmq:91
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "  --whatrequires-recursive\n"
 "                   - extended reverse search (includes virtual packages).\n"
-msgstr "  -c             - түр санах ойн хавтасын толгойг цэвэрлэх.\n"
+msgstr ""
 
 #: ../urpmq:93
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "  --whatprovides, -p\n"
 "                   - search in provides to find package.\n"
-msgstr "ямх"
+msgstr ""
 
 #: ../urpmq:96
-#, fuzzy, c-format
+#, c-format
 msgid "  -c             - complete output with package to be removed.\n"
-msgstr "  -c             - түр санах ойн хавтасын толгойг цэвэрлэх.\n"
+msgstr ""
 
 #: ../urpmq:98
-#, fuzzy, c-format
+#, c-format
 msgid "  -g             - print groups with name also.\n"
-msgstr "  --all          - бүх тагуудыг хэвлэх.\n"
+msgstr ""
 
 #: ../urpmq:99
-#, fuzzy, c-format
+#, c-format
 msgid "  -i             - print useful information in human readable form.\n"
 msgstr ""
-"  -i             - хэрэгтэй мэдээллийг хүн уншиж болохоор хэлбэрээр хэвлэх.\n"
 
 #: ../urpmq:100
-#, fuzzy, c-format
+#, c-format
 msgid "  -l             - list files in package.\n"
-msgstr "  --list         - боломжтой багцуудын жагсаалт.\n"
+msgstr ""
 
 #: ../urpmq:101
-#, fuzzy, c-format
+#, c-format
 msgid "  -m             - equivalent to -du\n"
-msgstr "  --all          - бүх тагуудыг хэвлэх.\n"
+msgstr ""
 
 #: ../urpmq:102
-#, fuzzy, c-format
+#, c-format
 msgid "  -r             - print version and release with name also.\n"
-msgstr "  --all          - бүх тагуудыг хэвлэх.\n"
+msgstr ""
 
 #: ../urpmq:103
-#, fuzzy, c-format
+#, c-format
 msgid "  -s             - next package is a source package (same as --src).\n"
-msgstr "с бол"
+msgstr ""
 
 #: ../urpmq:104
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "  -u             - remove package if a more recent version is already "
 "installed.\n"
-msgstr "бол"
+msgstr ""
 
 #: ../urpmq:105
-#, fuzzy, c-format
+#, c-format
 msgid "  -y             - impose fuzzy search (same as --fuzzy).\n"
-msgstr "т"
+msgstr ""
 
 #: ../urpmq:106
-#, fuzzy, c-format
+#, c-format
 msgid "  -Y             - like -y, but forces to match case-insensitively.\n"
-msgstr "Нээх"
+msgstr ""
 
 #: ../urpmq:107
-#, fuzzy, c-format
+#, c-format
 msgid "  names or rpm files given on command line are queried.\n"
-msgstr "Нээх"
+msgstr ""
 
 #: ../urpmq:154
 #, c-format
@@ -2969,14 +2959,14 @@ msgid "usage: \"urpmq --auto-orphans\" with no argument"
 msgstr ""
 
 #: ../urpmq:207
-#, fuzzy, c-format
+#, c-format
 msgid "--list-nodes can only be used with --parallel"
-msgstr "жигсаалт"
+msgstr ""
 
 #: ../urpmq:231
-#, fuzzy, c-format
+#, c-format
 msgid "use -l to list files"
-msgstr "[%s] тохируулгын файлыг бичиж болсонгүй"
+msgstr ""
 
 #: ../urpmq:415
 #, c-format
@@ -3000,20 +2990,18 @@ msgid ""
 "no xml info for medium \"%s\", unable to return any result for packages %s"
 msgstr ""
 
-#: ../urpmq:487
-#, fuzzy, c-format
+#: ../urpmq:488
+#, c-format
 msgid "No changelog found\n"
-msgstr "Зураг олдсонгүй"
+msgstr ""
 
 #: ../gurpmi.desktop.in.h:1
-#, fuzzy
 msgid "Software Installer"
-msgstr "Бичиг-Суулгалт"
+msgstr ""
 
 #: ../gurpmi.desktop.in.h:2
-#, fuzzy
 msgid "Graphical front end to install RPM files"
-msgstr "PostScript файлуудыг харах график GhostScript-гадаргуу"
+msgstr ""
 
 #: ../polkit/org.mageia.gurpmi2.policy.in.h:1
 msgid "Run Mageia Package Installer"
@@ -3022,559 +3010,3 @@ msgstr ""
 #: ../polkit/org.mageia.gurpmi2.policy.in.h:2
 msgid "Authentication is required to run Mageia Package Installer"
 msgstr ""
-
-#, fuzzy
-#~ msgid "  --suggests     - print suggests.\n"
-#~ msgstr "  --all          - бүх тагуудыг хэвлэх.\n"
-
-#, fuzzy
-#~ msgid "(%d package, %d MB)"
-#~ msgid_plural "(%d packages, %d MB)"
-#~ msgstr[0] "Тааруухан багц"
-#~ msgstr[1] "Тааруухан багц"
-
-#, fuzzy
-#~ msgid "  --repackage    - Re-package the files before erasing\n"
-#~ msgstr "  --list         - боломжтой багцуудын жагсаалт.\n"
-
-#, fuzzy
-#~ msgid "  --noclean      - don't clean repackage directory on checkpoint\n"
-#~ msgstr "ямх"
-
-#, fuzzy
-#~ msgid ""
-#~ "  --list         - list transactions since provided date/duration "
-#~ "argument\n"
-#~ msgstr "  --list         - боломжтой багцуудын жагсаалт.\n"
-
-#, fuzzy
-#~ msgid "  --list-all     - list all transactions in rpmdb (long)\n"
-#~ msgstr "  --list         - боломжтой багцуудын жагсаалт.\n"
-
-#, fuzzy
-#~ msgid "  --list-safe    - list transactions since checkpoint\n"
-#~ msgstr "  --list         - боломжтой багцуудын жагсаалт.\n"
-
-#, fuzzy
-#~ msgid "  --disable      - turn off repackaging\n"
-#~ msgstr "  --all          - бүх тагуудыг хэвлэх.\n"
-
-#, fuzzy
-#~ msgid "Repackage directory not defined\n"
-#~ msgstr "с бол."
-
-#, fuzzy
-#~ msgid "Can't write to repackage directory [%s]\n"
-#~ msgstr "с"
-
-#, fuzzy
-#~ msgid "Cleaning up repackage directory [%s]...\n"
-#~ msgstr "с"
-
-#, fuzzy
-#~ msgid "Writing rpm macros file [%s]...\n"
-#~ msgstr "rpm файлыг хүлээн авч байна [%s] ..."
-
-#, fuzzy
-#~ msgid "No rollback date found\n"
-#~ msgstr "Зураг олдсонгүй"
-
-#, fuzzy
-#~ msgid "Disabling repackaging\n"
-#~ msgstr "  --all          - бүх тагуудыг хэвлэх.\n"
-
-#, fuzzy
-#~ msgid ""
-#~ "urpme version %s\n"
-#~ "%s\n"
-#~ "This is free software and may be redistributed under the terms of the GNU "
-#~ "GPL.\n"
-#~ "\n"
-#~ "usage:\n"
-#~ msgstr ""
-#~ "mdkupdate Version %s\n"
-#~ "%s\n"
-#~ "Энэ бол чөлөөт программ хангамж ба GNU GPL лицензын дагуу цааш \n"
-#~ "тарааж болно.\n"
-#~ "\n"
-#~ "Ашиглалт: \n"
-
-#, fuzzy
-#~ msgid ""
-#~ "urpmf version %s\n"
-#~ "%s\n"
-#~ "This is free software and may be redistributed under the terms of the GNU "
-#~ "GPL.\n"
-#~ "\n"
-#~ "usage: urpmf [options] pattern-expression\n"
-#~ msgstr ""
-#~ "mdkupdate Version %s\n"
-#~ "%s\n"
-#~ "Энэ бол чөлөөт программ хангамж ба GNU GPL лицензын дагуу цааш \n"
-#~ "тарааж болно.\n"
-#~ "\n"
-#~ "Ашиглалт: \n"
-
-#, fuzzy
-#~ msgid ""
-#~ "urpmi.recover version %s\n"
-#~ "%s\n"
-#~ "This is free software and may be redistributed under the terms of the GNU "
-#~ "GPL.\n"
-#~ "\n"
-#~ "usage:\n"
-#~ msgstr ""
-#~ "mdkupdate Version %s\n"
-#~ "%s\n"
-#~ "Энэ бол чөлөөт программ хангамж ба GNU GPL лицензын дагуу цааш \n"
-#~ "тарааж болно.\n"
-#~ "\n"
-#~ "Ашиглалт: \n"
-
-#, fuzzy
-#~ msgid ""
-#~ "urpmq version %s\n"
-#~ "%s\n"
-#~ "This is free software and may be redistributed under the terms of the GNU "
-#~ "GPL.\n"
-#~ "\n"
-#~ "usage:\n"
-#~ msgstr ""
-#~ "mdkupdate Version %s\n"
-#~ "%s\n"
-#~ "Энэ бол чөлөөт программ хангамж ба GNU GPL лицензын дагуу цааш \n"
-#~ "тарааж болно.\n"
-#~ "\n"
-#~ "Ашиглалт: \n"
-
-#~ msgid ""
-#~ "Installation failed, some files are missing:\n"
-#~ "%s\n"
-#~ "You may want to update your urpmi database"
-#~ msgstr ""
-#~ "Суулгалт бүтэлгүйтэв, учир нь зарим файл байхгүй байна:\n"
-#~ "%s\n"
-#~ "Та магадгүй urpmi баазаа шинэчлэх хэрэгтэй байх"
-
-#, fuzzy
-#~ msgid "Cannot write DUDF file.\n"
-#~ msgstr "[%s] тохируулгын файлыг бичиж болсонгүй"
-
-#, fuzzy
-#~ msgid "due to already installed %s"
-#~ msgstr "Бүх зүйл хэдийн суусан байна"
-
-#, fuzzy
-#~ msgid ""
-#~ "  --from         - use specified url for list of mirrors, the default is\n"
-#~ "                   %s\n"
-#~ msgstr ""
-#~ "жигсаалт аас бол\n"
-#~ " с"
-
-#, fuzzy
-#~ msgid "examining %s file"
-#~ msgstr "MD5SUM файлыг шалгаж байна"
-
-#, fuzzy
-#~ msgid "found probed synthesis as %s"
-#~ msgstr "аас с."
-
-#, fuzzy
-#~ msgid "  --update       - create an update medium.\n"
-#~ msgstr "„mdkupdate“ хэрэгслээс багцуудыг шинэчилэхэд алдаа.\n"
-
-#, fuzzy
-#~ msgid "malformed URL: [%s]"
-#~ msgstr "с"
-
-#, fuzzy
-#~ msgid "%d installation transaction failed"
-#~ msgid_plural "%d installation transactions failed"
-#~ msgstr[0] "Суулгалт боломжтой"
-#~ msgstr[1] "Суулгалт боломжтой"
-
-#, fuzzy
-#~ msgid "Package %s can not be installed"
-#~ msgstr "Бүх зүйл хэдийн суусан байна"
-
-#~ msgid "Checking to remove the following packages"
-#~ msgstr "Дараах багцуудыг устгахаар шалгаж байна"
-
-#, fuzzy
-#~ msgid "Unknown option %s"
-#~ msgstr ""
-#~ "\n"
-#~ "үл мэдэгдэх сонголтууд '%s'\n"
-
-#, fuzzy
-#~ msgid "too many mount points for removable medium \"%s\""
-#~ msgstr "Цэг с"
-
-#, fuzzy
-#~ msgid "using different removable device [%s] for \"%s\""
-#~ msgstr "с с"
-
-#, fuzzy
-#~ msgid "unable to retrieve pathname for removable medium \"%s\""
-#~ msgstr "с"
-
-#, fuzzy
-#~ msgid "unable to mount the distribution medium"
-#~ msgstr "[%s] rpm файл руу хандаж болсонгүй"
-
-#, fuzzy
-#~ msgid "inconsistent medium \"%s\" marked removable but not really"
-#~ msgstr "с"
-
-#~ msgid "  -c             - clean headers cache directory.\n"
-#~ msgstr "  -c             - түр санах ойн хавтасын толгойг цэвэрлэх.\n"
-
-#, fuzzy
-#~ msgid "virtual medium needs to be local"
-#~ msgstr "с жигсаалт"
-
-#, fuzzy
-#~ msgid "unable to parse synthesis file of \"%s\""
-#~ msgstr "[%s] тохируулгын файлыг бичиж болсонгүй"
-
-#, fuzzy
-#~ msgid "computing md5sum of existing source hdlist (or synthesis) [%s]"
-#~ msgstr "аас"
-
-#, fuzzy
-#~ msgid ""
-#~ "virtual medium \"%s\" should not have defined hdlist or list file, medium "
-#~ "ignored"
-#~ msgstr "с"
-
-#, fuzzy
-#~ msgid "invalid hdlist name"
-#~ msgstr "буруу rpm файлын нэр [%s]"
-
-#, fuzzy
-#~ msgid "unable to find list file for \"%s\", medium ignored"
-#~ msgstr "жигсаалт с"
-
-#, fuzzy
-#~ msgid "\"synthesis\" should not be set (medium \"%s\")"
-#~ msgstr "с"
-
-#, fuzzy
-#~ msgid "\"synthesis\" should be set (medium \"%s\")"
-#~ msgstr "с"
-
-#, fuzzy
-#~ msgid "unable to access list file of \"%s\""
-#~ msgstr "[%s] тохируулгын файлыг бичиж болсонгүй"
-
-#, fuzzy
-#~ msgid "medium \"%s\" trying to use an already used hdlist, medium ignored"
-#~ msgstr "с"
-
-#, fuzzy
-#~ msgid "medium \"%s\" trying to use an already used list, medium ignored"
-#~ msgstr "с жигсаалт"
-
-#, fuzzy
-#~ msgid "performing second pass to compute dependencies\n"
-#~ msgstr "секунд"
-
-#~ msgid "building hdlist [%s]"
-#~ msgstr "hdlist [%s]-ийг байгуулж байна"
-
-#, fuzzy
-#~ msgid "problem reading hdlist or synthesis file of medium \"%s\""
-#~ msgstr "аас с"
-
-#, fuzzy
-#~ msgid "computing md5sum of copied source hdlist (or synthesis)"
-#~ msgstr "аас"
-
-#, fuzzy
-#~ msgid "...retrieving failed: md5sum mismatch"
-#~ msgstr "...хүлээн авалт бүтэлгүйтлээ: %s"
-
-#~ msgid "no rpm files found from [%s]"
-#~ msgstr "[%s]-ээс ямар нэг rpm олдсонгүй"
-
-#, fuzzy
-#~ msgid "unable to read rpm files from [%s]: %s"
-#~ msgstr "[%s] rpm файл руу хандаж болсонгүй"
-
-#, fuzzy
-#~ msgid "reading headers from medium \"%s\""
-#~ msgstr "с"
-
-#, fuzzy
-#~ msgid "    --probe-synthesis - use synthesis file.\n"
-#~ msgstr "аас"
-
-#, fuzzy
-#~ msgid "  --probe-hdlist - use hdlist file.\n"
-#~ msgstr "аас"
-
-#, fuzzy
-#~ msgid "unable to update medium \"%s\"\n"
-#~ msgstr "%s файлыг нээж болохгүй байна\n"
-
-#, fuzzy
-#~ msgid "unable to create medium \"%s\"\n"
-#~ msgstr "%s багцийг устгаж болсонгүй"
-
-#~ msgid "there are multiple packages with the same rpm filename \"%s\""
-#~ msgstr "энд \"%s\" гэсэн ижил rpm файл нэртэй олон багцууд байна"
-
-#, fuzzy
-#~ msgid "unable to correctly parse [%s] on value \"%s\""
-#~ msgstr "с с"
-
-#, fuzzy
-#~ msgid ""
-#~ "medium \"%s\" uses an invalid list file:\n"
-#~ "  mirror is probably not up-to-date, trying to use alternate method"
-#~ msgstr ""
-#~ "с хүчингүй жигсаалт\n"
-#~ " бол"
-
-#, fuzzy
-#~ msgid "medium \"%s\" does not define any location for rpm files"
-#~ msgstr "с"
-
-#, fuzzy
-#~ msgid "adding package %s (id=%d, eid=%d, update=%d, file=%s)"
-#~ msgstr "с с"
-
-#, fuzzy
-#~ msgid ""
-#~ "The following packages have bad signatures:\n"
-#~ "%s\n"
-#~ "\n"
-#~ "Do you want to continue installation ?"
-#~ msgstr "Дараах багцууд суулгагдах гэж байна"
-
-#, fuzzy
-#~ msgid "You need to be root to use --use-distrib"
-#~ msgstr "Та хавтаснуудыг бусдад түгээхийн тулд шалгагдсан байх хэрэгтэй"
-
-#~ msgid "unable to remove package %s"
-#~ msgstr "%s багцийг устгаж болсонгүй"
-
-#, fuzzy
-#~ msgid "No filelist found\n"
-#~ msgstr "Зураг олдсонгүй"
-
-#, fuzzy
-#~ msgid ""
-#~ "  -P             - do not search in provides to find package (default).\n"
-#~ msgstr "ямх"
-
-#, fuzzy
-#~ msgid "  -R             - reverse search to what requires package.\n"
-#~ msgstr "  -c             - түр санах ойн хавтасын толгойг цэвэрлэх.\n"
-
-#, fuzzy
-#~ msgid ""
-#~ "To satisfy dependencies, the following package is going to be installed"
-#~ msgid_plural ""
-#~ "To satisfy dependencies, the following packages are going to be installed"
-#~ msgstr[0] "Дараах багцууд суулгагдах гэж байна"
-#~ msgstr[1] "Дараах багцууд суулгагдах гэж байна"
-
-#, fuzzy
-#~ msgid ""
-#~ "To satisfy dependencies, the following %d packages are going to be "
-#~ "installed:\n"
-#~ "%s\n"
-#~ msgstr "Дараах багцууд суулгагдах гэж байна"
-
-#, fuzzy
-#~ msgid ""
-#~ "To satisfy dependencies, the following packages are going to be installed"
-#~ msgid_plural ""
-#~ "To satisfy dependencies, the following package is going to be installed"
-#~ msgstr[0] "Дараах багцууд суулгагдах гэж байна"
-#~ msgstr[1] "Дараах багцууд суулгагдах гэж байна"
-
-#, fuzzy
-#~ msgid "Installing packages on nodes..."
-#~ msgstr "`%s' (%s/%s) багцийг суулгаж байна..."
-
-#, fuzzy
-#~ msgid "Propagating synthesis to %s..."
-#~ msgstr "MD5SUM файлыг шалгаж байна"
-
-#, fuzzy
-#~ msgid "Distributing files to %s..."
-#~ msgstr "%s-ийг суулгаж байна\n"
-
-#, fuzzy
-#~ msgid "Performing install on %s..."
-#~ msgstr "Багц суулгалт..."
-
-#, fuzzy
-#~ msgid "Preparing install on %s..."
-#~ msgstr "Багц суулгалт..."
-
-#, fuzzy
-#~ msgid "`with' missing for network media\n"
-#~ msgstr "с г"
-
-#~ msgid ""
-#~ "\n"
-#~ "unknown options '%s'\n"
-#~ msgstr ""
-#~ "\n"
-#~ "үл мэдэгдэх сонголтууд '%s'\n"
-
-#, fuzzy
-#~ msgid "unable to find hdlist file for \"%s\", medium ignored"
-#~ msgstr "с"
-
-#, fuzzy
-#~ msgid "inconsistent list file for \"%s\", medium ignored"
-#~ msgstr "жигсаалт с"
-
-#, fuzzy
-#~ msgid "unable to inspect list file for \"%s\", medium ignored"
-#~ msgstr "жигсаалт с"
-
-#, fuzzy
-#~ msgid "virtual medium \"%s\" is not local, medium ignored"
-#~ msgstr "с жигсаалт"
-
-#, fuzzy
-#~ msgid ""
-#~ "virtual medium \"%s\" should have valid source hdlist or synthesis, "
-#~ "medium ignored"
-#~ msgstr "с"
-
-#, fuzzy
-#~ msgid "retrieval of source hdlist (or synthesis) failed"
-#~ msgstr "аас"
-
-#, fuzzy
-#~ msgid "file [%s] already used in the same medium \"%s\""
-#~ msgstr "с ямх с"
-
-#, fuzzy
-#~ msgid "nothing written in list file for \"%s\""
-#~ msgstr "юу ч үгүй ямх жигсаалт с"
-
-#~ msgid "found %d headers in cache"
-#~ msgstr "%d толгой кэйшид олдлоо"
-
-#, fuzzy
-#~ msgid "removing %d obsolete headers in cache"
-#~ msgstr "%d толгой кэйшид олдлоо"
-
-#, fuzzy
-#~ msgid "The following package names were assumed: %s"
-#~ msgstr "Дараах багцууд %s: %s-ийг агуулж байна"
-
-#, fuzzy
-#~ msgid "copying hdlists file..."
-#~ msgstr "hdlists файлыг хүлээн авч байна..."
-
-#, fuzzy
-#~ msgid "invalid hdlist description \"%s\" in hdlists file"
-#~ msgstr "хүчингүй Тодорхойлолт с ямх"
-
-#, fuzzy
-#~ msgid "Is this OK?"
-#~ msgstr "Ок?"
-
-#, fuzzy
-#~ msgid ""
-#~ "  --version      - use specified distribution version, the default is "
-#~ "taken\n"
-#~ "                   from the version of the distribution told by the\n"
-#~ "                   installed mandriva-release package.\n"
-#~ msgstr ""
-#~ "бол\n"
-#~ " аас\n"
-
-#, fuzzy
-#~ msgid ""
-#~ "  --arch         - use specified architecture, the default is arch of\n"
-#~ "                   mandriva-release package installed.\n"
-#~ msgstr "бол аас\n"
-
-#, fuzzy
-#~ msgid ""
-#~ "To satisfy dependencies, the following %d packages are going to be "
-#~ "installed (%d MB)"
-#~ msgstr "Дараах багцууд суулгагдах гэж байна"
-
-#~ msgid "installing %s\n"
-#~ msgstr "%s-ийг суулгаж байна\n"
-
-#, fuzzy
-#~ msgid ""
-#~ "Automatic installation of packages...\n"
-#~ "You requested installation of package %s\n"
-#~ msgstr "Автоматаар аас аас с"
-
-#~ msgid "%s: command not found\n"
-#~ msgstr "%s: тушаал олдсонгүй\n"
-
-#, fuzzy
-#~ msgid "md5sum mismatch"
-#~ msgstr "Тохирохгүй байна"
-
-#, fuzzy
-#~ msgid "  --synthesis    - use the synthesis given instead of urpmi db.\n"
-#~ msgstr "аас"
-
-#, fuzzy
-#~ msgid ""
-#~ "  --quiet        - do not print tag name (default if no tag given on "
-#~ "command\n"
-#~ "                   line, incompatible with interactive mode).\n"
-#~ msgstr ""
-#~ "аяархан нэр үгүй\n"
-#~ " горим"
-
-#~ msgid "  --all          - print all tags.\n"
-#~ msgstr "  --all          - бүх тагуудыг хэвлэх.\n"
-
-#, fuzzy
-#~ msgid "  --summary      - print tag summary: summary.\n"
-#~ msgstr "  --all          - бүх тагуудыг хэвлэх.\n"
-
-#, fuzzy
-#~ msgid "  !              - unary NOT, true if expression is false.\n"
-#~ msgstr "бол"
-
-#, fuzzy
-#~ msgid "  (              - left parenthesis to open group expression.\n"
-#~ msgstr "зүүн бүлэг"
-
-#, fuzzy
-#~ msgid ""
-#~ "callback is:\n"
-#~ "%s\n"
-#~ msgstr "бол г с"
-
-#, fuzzy
-#~ msgid ""
-#~ "\n"
-#~ "Continue?"
-#~ msgstr "Үргэлжилүүлэх"
-
-#, fuzzy
-#~ msgid ""
-#~ "  --distrib-XXX  - automatically create a medium for XXX part of a\n"
-#~ "                   distribution, XXX may be main, contrib, updates or\n"
-#~ "                   anything else that has been configured ;-)\n"
-#~ msgstr ""
-#~ "аас\n"
-#~ "\n"
-
-#, fuzzy
-#~ msgid "cannot add updates of a cooker distribution\n"
-#~ msgstr "аас"
-
-#, fuzzy
-#~ msgid "retrieving mirrors at %s ..."
-#~ msgstr "rpm файлыг хүлээн авч байна [%s] ..."

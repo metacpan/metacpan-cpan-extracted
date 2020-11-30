@@ -1,12 +1,8 @@
-#!/usr/bin/env perl -w    # -*- cperl -*-
 use strict;
 use warnings;
-use 5.014000;
 use utf8;
 
 use Test::More tests => 2;
-
-our $VERSION = v1.1.2;
 
 eval {
     require ExtUtils::Manifest;

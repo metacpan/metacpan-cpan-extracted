@@ -31,9 +31,9 @@ requires 'Net::IP'            => '0';
 requires 'Text::Template'     => '0';
 requires 'UNIVERSAL::require' => '0';
 requires 'XML::TreePP'        => '0.26';
-if ($OSNAME =~ /darwin/i) {
-    requires 'XML::XPath'        => '0';
-}
+requires 'XML::XPath'         => '0';
+requires 'YAML::Tiny'         => '0';
+requires 'Memoize'            => '0';
 
 if ($OSNAME eq 'MSWin32') {
     requires 'Win32::OLE'         => '0';
@@ -104,6 +104,7 @@ install_script 'bin/fusioninventory-wakeonlan';
 install_script 'bin/fusioninventory-netdiscovery';
 install_script 'bin/fusioninventory-netinventory';
 install_script 'bin/fusioninventory-esx';
+install_script 'bin/fusioninventory-remoteinventory';
 
 resources
     homepage    => "http://www.fusioninventory.org",
@@ -241,20 +242,20 @@ sub install {
 config_install : pure_install
 	$(MKPATH) $(DESTDIR)$(SYSCONFDIR)
 	$(NOECHO) $(CHMOD) $(PERM_DIR) $(DESTDIR)$(SYSCONFDIR)
-	for config in agent.cfg inventory-server-plugin.cfg server-test-plugin.cfg ssl-server-plugin.cfg ; \
+	for config in agent.cfg $(shell cd etc; echo *-plugin.cfg ); \
 	do \
-	  if $(TEST_F) $(DESTDIR)/$(SYSCONFDIR)/$$config; then \
+	  if $(TEST_F) $(DESTDIR)$(SYSCONFDIR)/$$config; then \
 	    $(RM_F) $(DESTDIR)$(SYSCONFDIR)/$$config.new; \
-	    $(CP) etc/agent.cfg $(DESTDIR)$(SYSCONFDIR)/$$config.new; \
+	    $(CP) etc/$$config $(DESTDIR)$(SYSCONFDIR)/$$config.new; \
 	    $(CHMOD) $(PERM_RW) $(DESTDIR)$(SYSCONFDIR)/$$config.new; \
 	  else \
-	    $(CP) etc/agent.cfg $(DESTDIR)$(SYSCONFDIR)/$$config; \
+	    $(CP) etc/$$config $(DESTDIR)$(SYSCONFDIR)/$$config; \
 	    $(CHMOD) $(PERM_RW) $(DESTDIR)$(SYSCONFDIR)/$$config; \
 	  fi; \
 	done
 	$(ABSPERLRUN) -pi \
 	    -e "s|=> undef, # SYSCONFDIR.*|=> '$(SYSCONFDIR)',|;" \
-	        $(DESTDIR)$(DATADIR)/lib/FusionInventory/Agent/Config.pm
+	        $(DESTDIR)$(INSTALLSITELIB)/FusionInventory/Agent/Config.pm
 
 data_install : pure_install
 	$(MOD_INSTALL) "share" "$(DESTDIR)$(DATADIR)"
@@ -265,9 +266,9 @@ setup_install : pure_install
 	    -e 'undef $$_ if m/^use (File::Spec|Cwd)/;' \
 	    -e 'if (m/# Compute/) { print "1;\n"; last; };' \
 	    -e 's|datadir => .*|datadir => "$(DATADIR)",|;' \
-	    -e 's|libdir  => .*|libdir  => "$(DATADIR)/lib",|;' \
+	    -e 's|libdir  => .*|libdir  => "$(INSTALLSITELIB)",|;' \
 	    -e 's|vardir  => .*|vardir  => "$(LOCALSTATEDIR)",|' \
-	        $(DESTDIR)$(DATADIR)/lib/setup.pm
+	        $(DESTDIR)$(INSTALLSITELIB)/setup.pm
 
 version_install : pure_install
 	# Cleanup and update Version module during install
@@ -275,7 +276,7 @@ version_install : pure_install
 	    -e 'last if m|^__END__|;' \
 	    -e 's|^our \$$VERSION =.*|our \$$VERSION = "$(VERSION)";|;' \
 	    -e 's|^our \$$COMMENTS =.*|our \$$COMMENTS = [$(RAWCOMMENTS)];|;' \
-	        $(DESTDIR)$(DATADIR)/lib/FusionInventory/Agent/Version.pm
+	        $(DESTDIR)$(INSTALLSITELIB)/FusionInventory/Agent/Version.pm
 EOF
     return $install;
 }
@@ -291,7 +292,7 @@ sub installbin {
 
     $installbin .= <<'EOF';
 FINALIZE = $(ABSPERLRUN) -pi \
-    -e 's|use lib .*|use lib "$(DATADIR)/lib";|;' \
+    -e 's|use lib .*|use lib "$(INSTALLSITELIB)";|;' \
     --
 EOF
     return $installbin;

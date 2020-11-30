@@ -37,7 +37,6 @@
             "Data::Printer" : "0",
             "DateTime::Format::ISO8601" : "0",
             "DateTime::Format::ISO8601::Format" : "0",
-            "English" : "0",
             "Fcntl" : "0",
             "File::Basename" : "0",
             "File::LibMagic" : "0",
@@ -89,7 +88,7 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.053",
+   "version" : "0.055",
    "x_generated_by_perl" : "v5.16.3",
    "x_serialization_backend" : "JSON::XS version 4.02"
 }

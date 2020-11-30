@@ -21,7 +21,7 @@ my $timeout = AnyEvent->timer(
   after => 10,
   cb => sub{
     diag 'timeout reached';
-    $group->terminate;
+    $group->signal('KILL');
     die 'timeout reached';
   },
 );

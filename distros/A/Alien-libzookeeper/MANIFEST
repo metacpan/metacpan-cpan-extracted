@@ -1,0 +1,18 @@
+Changes
+lib/Alien/libzookeeper.pm
+Makefile.PL
+MANIFEST			This list of files
+README.md
+t/00-load.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+alienfile
+ignore.txt
+patch/0001-add-pkg-config-template.patch
+patch/0002-add-make-install-target.patch
+patch/0003-statically-link-libzookeeper-against-the-hashmap-impl-it-needs.patch
+patch/0004-zookeeper.c-use-after-free-patched-upstream.patch
+
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

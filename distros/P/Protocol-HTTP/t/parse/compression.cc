@@ -416,7 +416,7 @@ TEST("request with gzip payload, no content-length") {
 
     string raw(reinterpret_cast<char*>(data), sizeof (data));
     ResponseParser p;
-    p.set_context_request(new Request(Method::GET, new URI("/")));
+    p.set_context_request(new Request(Method::Get, new URI("/")));
     auto result = p.parse(raw);
     auto res = result.response;
     CHECK(result.state == State::body);
@@ -507,7 +507,7 @@ TEST("response with gzipped chunked response") {
 
     string raw(reinterpret_cast<char*>(data), sizeof (data));
     ResponseParser p;
-    p.set_context_request(new Request(Method::GET, new URI("/")));
+    p.set_context_request(new Request(Method::Get, new URI("/")));
     auto result = p.parse(raw);
     auto res = result.response;
     CHECK(result.state == State::done);
@@ -560,7 +560,7 @@ TEST("response with corrupted gzipped chunked response") {
 
     string raw(reinterpret_cast<char*>(data), sizeof (data));
     ResponseParser p;
-    p.set_context_request(new Request(Method::GET, new URI("/")));
+    p.set_context_request(new Request(Method::Get, new URI("/")));
     auto result = p.parse(raw);
     auto res = result.response;
     CHECK(result.state == State::error);
@@ -657,7 +657,7 @@ TEST("MEIACORE-1427 bugfix (1)") {
     string piece_2 =string((char*)piese_2_raw, sizeof(piese_2_raw));
 
     ResponseParser p;
-    p.set_context_request(new Request(Method::GET, new URI("/")));
+    p.set_context_request(new Request(Method::Get, new URI("/")));
     auto res1 = p.parse_shift(piece_1);
     REQUIRE(res1.state == State::body);
 
@@ -740,7 +740,7 @@ TEST("MEIACORE-1427 bugfix (2)") {
     string piece = string((char*)raw, sizeof(raw));
 
     ResponseParser p;
-    p.set_context_request(new Request(Method::GET, new URI("/")));
+    p.set_context_request(new Request(Method::Get, new URI("/")));
     auto res1 = p.parse_shift(piece);
     REQUIRE(res1.state == State::done);
 };

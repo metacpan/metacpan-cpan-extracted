@@ -17,26 +17,27 @@ name: Device-Chip
 provides:
   Device::Chip:
     file: lib/Device/Chip.pm
-    version: '0.14'
+    version: '0.15'
   Device::Chip::Adapter:
     file: lib/Device/Chip/Adapter.pm
-    version: '0.14'
+    version: '0.15'
   Device::Chip::Base::RegisteredI2C:
     file: lib/Device/Chip/Base/RegisteredI2C.pm
-    version: '0.14'
+    version: '0.15'
   Device::Chip::ProtocolBase::SPI:
     file: lib/Device/Chip/ProtocolBase/SPI.pm
-    version: '0.14'
+    version: '0.15'
   Test::Device::Chip::Adapter:
     file: lib/Test/Device/Chip/Adapter.pm
-    version: '0.14'
+    version: '0.15'
 requires:
   Future: '0.26'
   List::Util: '1.33'
   Struct::Dumb: '0'
   Test::Builder: '0'
+  Test::ExpectAndCheck::Future: '0'
   perl: '5.010'
 resources:
   license: http://dev.perl.org/licenses/
-version: '0.14'
+version: '0.15'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

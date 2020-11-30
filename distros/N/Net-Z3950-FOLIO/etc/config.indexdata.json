@@ -1,0 +1,10 @@
+{
+  "okapi": {
+    "url": "https://indexdata-test-okapi.folio.indexdata.com",
+    "tenant": "indexdata"
+  },
+  "login": {
+    "username": "${OKAPI_USER-id_admin}",
+    "password": "${OKAPI_INDEXDATA_PASSWORD}"
+  }
+}

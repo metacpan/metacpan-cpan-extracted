@@ -1,14 +1,19 @@
-[![Linux Build Status](https://travis-ci.org/nigelhorne/Data-Fetch.svg?branch=master)](https://travis-ci.org/nigelhorne/Data-Fetch)
-[![Windows Build status](https://ci.appveyor.com/api/projects/status/uexrsduxn2yk58on/branch/master?svg=true)](https://ci.appveyor.com/project/nigelhorne/data-fetch/branch/master)
-[![Dependency Status](https://dependencyci.com/github/nigelhorne/Data-Fetch/badge)](https://dependencyci.com/github/nigelhorne/Data-Fetch)
+[![Actions Status](https://github.com/nigelhorne/Data-Fetch/workflows/.github/workflows/all.yml/badge.svg)](https://github.com/nigelhorne/Data-Fetch/actions)
+[![Travis Status](https://travis-ci.org/nigelhorne/Data-Fetch.svg?branch=master)](https://travis-ci.org/nigelhorne/Data-Fetch)
+[![Appveyor Status](https://ci.appveyor.com/api/projects/status/1t1yhvagx00c2qi8?svg=true)](https://ci.appveyor.com/project/nigelhorne/cgi-info)
+[![Appveyor status](https://ci.appveyor.com/api/projects/status/uexrsduxn2yk58on/branch/master?svg=true)](https://ci.appveyor.com/project/nigelhorne/data-fetch/branch/master)
+[![Coveralls Status](https://coveralls.io/repos/github/nigelhorne/Data-Fetch/badge.svg?branch=master)](https://coveralls.io/github/nigelhorne/Data-Fetch?branch=master)
+[![CPAN](https://img.shields.io/cpan/v/Data-Fetch.svg)](http://search.cpan.org/~nhorne/Data-Fetch/)
+[![Kritika Analysis Status](https://kritika.io/users/nigelhorne/repos/5642353356298438/heads/master/status.svg)](https://kritika.io/users/nigelhorne/repos/5642353356298438/heads/master/)
+[![Kwalitee](https://cpants.cpanauthors.org/dist/Data-Fetch.png)](http://cpants.cpanauthors.org/dist/Data-Fetch)
 
-# Data::Fetch
+# NAME
 
-Give advance warning that you'll be needing a value
+Data::Fetch - give advance warning that you'll be needing a value
 
 # VERSION
 
-Version 0.05
+Version 0.06
 
 # SYNOPSIS
 
@@ -32,6 +37,8 @@ Creates a Data::Fetch object.  Takes no argument.
 ## prime
 
 Say what is is you'll be needing later.
+Call in an array context if get() is to be used in an array context.
+
 Takes two mandatory parameters:
 
     object - the object you'll be sending the message to
@@ -43,7 +50,10 @@ Takes one optional parameter:
 
 ## get
 
-Retrieve get a value you've primed.  Takes two mandatory parameters:
+Retrieve get a value you've primed.
+Call in an array context only works if prime() was called in an array context, or the value wasn't primed
+
+Takes two mandatory parameters:
 
     object - the object you'll be sending the message to
     message - the message you'll be sending
@@ -60,8 +70,6 @@ but in this scenerio you gain nothing over using CHI to cache your values.
 Nigel Horne, `<njh at bandsman.co.uk>`
 
 # BUGS
-
-ARRAY contexts not supported.
 
 Can't pass more than one argument to the message.
 
@@ -89,24 +97,32 @@ You can find documentation for this module with the perldoc command.
 
 You can also look for information at:
 
+- MetaCPAN
+
+    [https://metacpan.org/release/Data-Fetch](https://metacpan.org/release/Data-Fetch)
+
 - RT: CPAN's request tracker
 
-    [http://rt.cpan.org/NoAuth/Bugs.html?Dist=Data-Fetch](http://rt.cpan.org/NoAuth/Bugs.html?Dist=Data-Fetch)
+    [https://rt.cpan.org/NoAuth/Bugs.html?Dist=Data-Fetch](https://rt.cpan.org/NoAuth/Bugs.html?Dist=Data-Fetch)
 
-- AnnoCPAN: Annotated CPAN documentation
+- CPANTS
 
-    [http://annocpan.org/dist/Data-Fetch](http://annocpan.org/dist/Data-Fetch)
+    [http://cpants.cpanauthors.org/dist/Data-Fetch](http://cpants.cpanauthors.org/dist/Data-Fetch)
+
+- CPAN Testers' Matrix
+
+    [http://matrix.cpantesters.org/?dist=Data-Fetch](http://matrix.cpantesters.org/?dist=Data-Fetch)
 
 - CPAN Ratings
 
     [http://cpanratings.perl.org/d/Data-Fetch](http://cpanratings.perl.org/d/Data-Fetch)
 
-- Search CPAN
+- CPAN Testers Dependencies
 
-    [http://search.cpan.org/dist/Data-Fetch/](http://search.cpan.org/dist/Data-Fetch/)
+    [http://deps.cpantesters.org/?module=Data::Fetch](http://deps.cpantesters.org/?module=Data::Fetch)
 
 # LICENSE AND COPYRIGHT
 
-Copyright 2016 Nigel Horne.
+Copyright 2010-2020 Nigel Horne.
 
-This program is released under the following licence: GPL
+This program is released under the following licence: GPL2

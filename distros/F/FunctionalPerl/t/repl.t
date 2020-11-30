@@ -1,6 +1,6 @@
 #!/usr/bin/env perl
 
-# Copyright (c) 2015-2019 Christian Jaeger, copying@christianjaeger.ch
+# Copyright (c) 2015-2020 Christian Jaeger, copying@christianjaeger.ch
 # This is free software. See the file COPYING.md that came bundled
 # with this file.
 
@@ -19,9 +19,11 @@ use Chj::xpipe;
 use Chj::xperlfunc;
 use Chj::xperlfunc qw(xlaunch);
 use Chj::xhome qw(xeffectiveuserhome);
+use FP::Carp;
 my $HOME = xeffectiveuserhome;
 
-sub clean ($) {
+sub clean {
+    @_ == 1 or fp_croak_nargs 1;
     my ($s) = @_;
 
     $s =~ s/^\s*//s;

@@ -1,36 +1,45 @@
 /*
-  Copyright (C) 2008-2018 David Anderson. All Rights Reserved.
+  Copyright (C) 2008-2020 David Anderson. All Rights Reserved.
   Portions Copyright 2012 SN Systems Ltd. All rights reserved.
 
-  This program is free software; you can redistribute it and/or modify it
-  under the terms of version 2.1 of the GNU Lesser General Public License
-  as published by the Free Software Foundation.
+  This program is free software; you can redistribute it
+  and/or modify it under the terms of version 2.1 of the
+  GNU Lesser General Public License as published by the Free
+  Software Foundation.
 
-  This program is distributed in the hope that it would be useful, but
-  WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  This program is distributed in the hope that it would be
+  useful, but WITHOUT ANY WARRANTY; without even the implied
+  warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+  PURPOSE.
 
-  Further, this software is distributed without any warranty that it is
-  free of the rightful claim of any third person regarding infringement
-  or the like.  Any license provided herein, whether implied or
-  otherwise, applies only to this software file.  Patent licenses, if
-  any, provided herein do not apply to combinations of this program with
-  other software, or any other product whatsoever.
+  Further, this software is distributed without any warranty
+  that it is free of the rightful claim of any third person
+  regarding infringement or the like.  Any license provided
+  herein, whether implied or otherwise, applies only to this
+  software file.  Patent licenses, if any, provided herein
+  do not apply to combinations of this program with other
+  software, or any other product whatsoever.
 
-  You should have received a copy of the GNU Lesser General Public
-  License along with this program; if not, write the Free Software
-  Foundation, Inc., 51 Franklin Street - Fifth Floor, Boston MA 02110-1301,
-  USA.
+  You should have received a copy of the GNU Lesser General
+  Public License along with this program; if not, write the
+  Free Software Foundation, Inc., 51 Franklin Street - Fifth
+  Floor, Boston MA 02110-1301, USA.
 
 */
 
 #include "config.h"
 #include <stdio.h>
+#ifdef HAVE_STDLIB_H
 #include <stdlib.h>
+#endif /* HAVE_STDLIB_H */
 #include "dwarf_incl.h"
 #include "dwarf_alloc.h"
 #include "dwarf_error.h"
 #include "dwarf_util.h"
+#include "dwarfstring.h"
+
+#define FALSE 0
+#define TRUE  1
 
 struct ranges_entry {
    struct ranges_entry *next;
@@ -87,10 +96,34 @@ read_unaligned_addr_check(Dwarf_Debug dbg,
     If incoming die is NULL there is no context, so do not look
     for a tied file, and address_size is the size
     of the overall object, not the address_size of the context. */
-#define MAX_ADDR ((address_size == 8)?0xffffffffffffffffULL:0xffffffff)
+#define MAX_ADDR ((address_size == 8)? \
+    0xffffffffffffffffULL:0xffffffff)
 int dwarf_get_ranges_a(Dwarf_Debug dbg,
     Dwarf_Off rangesoffset,
     Dwarf_Die die,
+    Dwarf_Ranges ** rangesbuf,
+    Dwarf_Signed * listlen,
+    Dwarf_Unsigned * bytecount,
+    Dwarf_Error * error)
+{
+    Dwarf_Off finaloffset = 0;
+    int res = 0;
+
+    res = dwarf_get_ranges_b(
+        dbg,rangesoffset,die,
+        &finaloffset,rangesbuf,listlen,
+        bytecount,error);
+    return res;
+}
+/*  New 10 September 2020 to accomodate the
+    GNU extension of DWARF4 split-dwarf.
+    The actual_offset field is set by the function
+    to the actual final offset of the ranges
+    in the separate tied (a.out) file. */
+int dwarf_get_ranges_b(Dwarf_Debug dbg,
+    Dwarf_Off rangesoffset,
+    Dwarf_Die die,
+    Dwarf_Off *actual_offset,
     Dwarf_Ranges ** rangesbuf,
     Dwarf_Signed * listlen,
     Dwarf_Unsigned * bytecount,
@@ -108,12 +141,12 @@ int dwarf_get_ranges_a(Dwarf_Debug dbg,
     Dwarf_Half address_size = 0;
     int res = DW_DLV_ERROR;
     Dwarf_Unsigned ranges_base = 0;
-    Dwarf_Unsigned addr_base = 0;
     Dwarf_Debug localdbg = dbg;
     Dwarf_Error localerror = 0;
     Dwarf_Half die_version = 3; /* default for dwarf_get_ranges() */
     UNUSEDARG Dwarf_Half offset_size = 4;
     Dwarf_CU_Context cucontext = 0;
+    Dwarf_Bool rangeslocal = TRUE;
 
     if (!dbg) {
         _dwarf_error(NULL, error, DW_DLE_DBG_NULL);
@@ -138,119 +171,90 @@ int dwarf_get_ranges_a(Dwarf_Debug dbg,
         }
         cucontext = die->di_cu_context;
         /*  The DW4 ranges base was never used in GNU
-            but did get emitted.
-            http://llvm.1065342.n5.nabble.com/DebugInfo-DW-AT-GNU-ranges-base-in-non-fission-td64194.html
+            but did get emitted, the note says, but
+            the note is probably obsolete (so, now wrong).
+            http://llvm.1065342.n5.nabble.com/DebugInfo\
+            -DW-AT-GNU-ranges-base-in-non-fission-\
+            td64194.html
             */
-        if (cucontext->cc_unit_type != DW_UT_skeleton &&
-            cucontext->cc_version_stamp != DW_CU_VERSION4 &&
-            cucontext->cc_ranges_base_present) {
-            /* Never needed? */
-            ranges_base = cucontext->cc_ranges_base;
-        }
+        /* ranges_base was merged from tied context. */
+        ranges_base = cucontext->cc_ranges_base;
         address_size = cucontext->cc_address_size;
     }
 
-    /*  If tied object exists,
-        base object is DWP and tied object is the
-        skeleton/executabl CU containing a skeleton CU
-        with DW_AT_addr_base/DW_AT_GNU_addr_base and
-        DW_AT_rnglists_base/DW_AT_GNU_ranges base. */
-    if (die &&dbg->de_tied_data.td_tied_object) {
-
-        int restied = 0;
-
-        /*  dwo/dwp CU  may have (DW5 pg 63)
-            DW_AT_name
-            DW_AT_language
-            DW_AT_macros
-            DW_AT_producer
-            DW_AT_identifier_case
-            DW_AT_main_subprogram
-            DW_AT_entry_pc
-            DW_AT_ranges if DW5 offset of header (see
-                ranges_base/rnglists_base below),
-                else of ranges
-            DW_AT_GNU_pubnames
-            DW_AT_stmt_list, a trivial stmt list with
-                the list of directories and file names
-                where needed for Type Units (DW5 pg 64)
-            and must have
-            DW_AT_[GNU_]dwo_id
-            and inherited from skeleton:
-            DW_AT_low_pc, DW_AT_high_pc, DW_AT_ranges,
-            DW_AT_stmt_list, DW_AT_comp_dir,
-            DW_AT_use_UTF8, DW_AT_str_offsets_base,
-            DW_AT_addr_base and DW_AT_rnglists_base.
-
-            skeleton CU may have (DW5 pg 62)
-            DW_AT_[GNU_]addr_base   possibly needed by dwp
-            DW_AT_str_offsets_base  possibly needed by dwp
-            DW_AT_GNU_ranges_base (GNU)possibly needed by dwp
-            DW_AT_rnglists_base   (DWARF5)possibly needed by dwp
-            DW_AT_low_pc
-            DW_AT_high_pc
-            DW_AT_ranges
-            DW_AT_str_offsets_base
-            DW_AT_[GNU_]dwo_name
-            DW_AT_stmt_list
-            DW_AT_comp_dir
-            DW_AT_use_UTF8
-            and must have
-            DW_AT_[GNU_]dwo_id
-            .debug_ranges does not
-            exist in the DWP, it is only in the executable.
-        */
-        restied = _dwarf_get_ranges_base_attr_from_tied(dbg,
-            cucontext,
-            &ranges_base,
-            &addr_base,
-            error);
-        if (restied == DW_DLV_ERROR ) {
-            if(!error) {
-                return restied;
-            }
-            dwarf_dealloc(localdbg,*error,DW_DLA_ERROR);
-            *error = 0;
-            /* Nothing else to do. Look in original dbg. */
-        } else if (restied == DW_DLV_NO_ENTRY ) {
-            /* Nothing else to do. Look in original dbg. */
-        } else {
-            /*  Ranges are never in a split dwarf object.
-                In the base object
-                instead. Use the tied_object */
-            localdbg = dbg->de_tied_data.td_tied_object;
-        }
-    }
-
-    res = _dwarf_load_section(localdbg, &localdbg->de_debug_ranges,&localerror);
+    localdbg = dbg;
+    res = _dwarf_load_section(localdbg, &localdbg->de_debug_ranges,
+        error);
     if (res == DW_DLV_ERROR) {
-        _dwarf_error_mv_s_to_t(localdbg,&localerror,dbg,error);
         return res;
     } else if (res == DW_DLV_NO_ENTRY) {
-        return res;
+        /* data is in a.out, not dwp */
+        localdbg = dbg->de_tied_data.td_tied_object;
+        if (!localdbg) {
+            return DW_DLV_NO_ENTRY;
+        }
+        res = _dwarf_load_section(localdbg, &localdbg->de_debug_ranges,
+            &localerror);
+        if (res == DW_DLV_ERROR) {
+            _dwarf_error_mv_s_to_t(localdbg,&localerror,dbg,error);
+            return res;
+        } else if (res == DW_DLV_NO_ENTRY) {
+            return res;
+        }
+        rangeslocal = FALSE;
     }
 
     /*  Be safe in case adding rangesoffset and rangebase
         overflows. */
     if (rangesoffset  >= localdbg->de_debug_ranges.dss_size) {
-        _dwarf_error(dbg, error, DW_DLE_DEBUG_RANGES_OFFSET_BAD);
-        return (DW_DLV_ERROR);
+        /* Documented behavior in libdwarf2.1.mm */
+        return DW_DLV_NO_ENTRY;
     }
     if (ranges_base >= localdbg->de_debug_ranges.dss_size) {
-        _dwarf_error(dbg, error, DW_DLE_DEBUG_RANGES_OFFSET_BAD);
-        return (DW_DLV_ERROR);
+        dwarfstring m;
+
+        dwarfstring_constructor(&m);
+        dwarfstring_append_printf_u(&m,
+            "DW_DLE_DEBUG_RANGES_OFFSET_BAD: "
+            " ranges base is 0x%lx ",ranges_base);
+        dwarfstring_append_printf_u(&m,
+            " and section size is 0x%lx.",
+            localdbg->de_debug_ranges.dss_size);
+        _dwarf_error_string(dbg, error,
+            DW_DLE_DEBUG_RANGES_OFFSET_BAD,
+            dwarfstring_string(&m));
+        dwarfstring_destructor(&m);
+        return DW_DLV_ERROR;
     }
-    if ((rangesoffset +ranges_base) >=
-        localdbg->de_debug_ranges.dss_size) {
-        _dwarf_error(dbg, error, DW_DLE_DEBUG_RANGES_OFFSET_BAD);
-        return (DW_DLV_ERROR);
+    if (!rangeslocal && ((rangesoffset +ranges_base) >=
+        localdbg->de_debug_ranges.dss_size)) {
+        dwarfstring m;
+
+        dwarfstring_constructor(&m);
+        dwarfstring_append_printf_u(&m,
+            "DW_DLE_DEBUG_RANGES_OFFSET_BAD: "
+            " ranges base+offset  is 0x%lx ",
+            ranges_base+rangesoffset);
+        dwarfstring_append_printf_u(&m,
+            " and section size is 0x%lx.",
+            localdbg->de_debug_ranges.dss_size);
+        _dwarf_error_string(dbg, error,
+            DW_DLE_DEBUG_RANGES_OFFSET_BAD,
+            dwarfstring_string(&m));
+        dwarfstring_destructor(&m);
+        return DW_DLV_ERROR;
     }
 
     /*  tied address_size must match the dwo address_size */
     section_end = localdbg->de_debug_ranges.dss_data +
         localdbg->de_debug_ranges.dss_size;
-    rangeptr = localdbg->de_debug_ranges.dss_data +
-        rangesoffset + ranges_base;
+    rangeptr = localdbg->de_debug_ranges.dss_data;
+    if (!rangeslocal) {
+        /* printing ranges where range source is dwp,
+            here we just assume present. */
+        rangesoffset += ranges_base;
+    }
+    rangeptr += rangesoffset;
     beginrangeptr = rangeptr;
 
     for (;;) {
@@ -260,22 +264,36 @@ int dwarf_get_ranges_a(Dwarf_Debug dbg,
             break;
         }
         if (rangeptr  > section_end) {
+            dwarfstring m;
+
             free_allocated_ranges(base);
-            _dwarf_error(dbg, error, DW_DLE_DEBUG_RANGES_OFFSET_BAD);
-            return (DW_DLV_ERROR);
-            break;
+            dwarfstring_constructor(&m);
+            dwarfstring_append(&m,
+                "DW_DLE_DEBUG_RANGES_OFFSET_BAD: "
+                " ranges pointer ran off the end "
+                "of the  section");
+            _dwarf_error_string(dbg, error,
+                DW_DLE_DEBUG_RANGES_OFFSET_BAD,
+                dwarfstring_string(&m));
+            dwarfstring_destructor(&m);
+            return DW_DLV_ERROR;
         }
         re = calloc(sizeof(struct ranges_entry),1);
         if (!re) {
             free_allocated_ranges(base);
             _dwarf_error(dbg, error, DW_DLE_DEBUG_RANGES_OUT_OF_MEM);
-            return (DW_DLV_ERROR);
+            return DW_DLV_ERROR;
         }
         if ((rangeptr + (2*address_size)) > section_end) {
             free(re);
             free_allocated_ranges(base);
-            _dwarf_error(dbg, error, DW_DLE_DEBUG_RANGES_OFFSET_BAD);
-            return (DW_DLV_ERROR);
+            _dwarf_error_string(dbg, error,
+                DW_DLE_DEBUG_RANGES_OFFSET_BAD,
+                "DW_DLE_DEBUG_RANGES_OFFSET_BAD: "
+                " Not at the end of the ranges section "
+                " but there is not enough room in the section "
+                " for the next ranges entry");
+            return  DW_DLV_ERROR;
         }
         entry_count++;
         res = read_unaligned_addr_check(localdbg,&re->cur.dwr_addr1,
@@ -333,6 +351,9 @@ int dwarf_get_ranges_a(Dwarf_Debug dbg,
     free_allocated_ranges(base);
     base = 0;
     /* Callers will often not care about the bytes used. */
+    if (actual_offset) {
+        *actual_offset = rangesoffset;
+    }
     if (bytecount) {
         *bytecount = rangeptr - beginrangeptr;
     }

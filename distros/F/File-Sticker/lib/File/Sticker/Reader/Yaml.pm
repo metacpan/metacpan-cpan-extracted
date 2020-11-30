@@ -1,12 +1,12 @@
 package File::Sticker::Reader::Yaml;
-$File::Sticker::Reader::Yaml::VERSION = '1.01';
+$File::Sticker::Reader::Yaml::VERSION = '1.0603';
 =head1 NAME
 
 File::Sticker::Reader::Yaml - read and standardize meta-data from YAML file
 
 =head1 VERSION
 
-version 1.01
+version 1.0603
 
 =head1 SYNOPSIS
 
@@ -40,6 +40,17 @@ Used for debugging info
 sub whoami  { ( caller(1) )[3] }
 
 =head1 METHODS
+
+=head2 priority
+
+The priority of this reader.  Readers with higher priority get tried first.
+
+=cut
+
+sub priority {
+    my $class = shift;
+    return 2;
+} # priority
 
 =head2 allowed_file
 

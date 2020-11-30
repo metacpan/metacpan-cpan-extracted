@@ -22,8 +22,8 @@ WriteMakefile(
     'IO::Socket::INET6' => 0,
     'IO::Socket::SSL' => 0,
     'File::Slurper' => 0,
-    'Modern::Perl' => 0,
     'Net::Server' => 0,
+    'Modern::Perl' => 1.20180701, # for '2018'
     'URI::Escape' => 0,
   },
   META_MERGE => {

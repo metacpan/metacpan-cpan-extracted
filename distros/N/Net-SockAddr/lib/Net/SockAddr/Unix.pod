@@ -2,9 +2,13 @@
 
 Net::SockAddr::Unix - AF_UNIX sockaddr
 
+
+
 =head1 SYNOPSIS & DESCRIPTION
 
 See L<Net::SockAddr>.
+
+
 
 =head1 METHODS
 
@@ -12,9 +16,12 @@ See L<Net::SockAddr>.
 
 Creates object from file path. Dies if C<$path> is too long to fit in current system's sockaddr_un.
 
+
 =head4 path()
 
 Returns path
+
+
 
 =head1 LIMITATIONS
 
@@ -22,9 +29,15 @@ This class is unavailable on Windows systems.
 
 Windows 10 supports AF_UNIX since Build 17063. However support for it hasn't been implemented in this module yet.
 
+
+
 =head1 AUTHOR
 
-Pronin Oleg <syber@crazypanda.ru>, Crazy Panda LTD
+Pronin Oleg <syber@crazypanda.ru>
+
+Crazy Panda LTD
+
+
 
 =head1 LICENSE
 

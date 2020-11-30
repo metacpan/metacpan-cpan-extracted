@@ -28,7 +28,11 @@ this\ still\"not\\allowed
 john..doe
 .
 .abc
+# fail
 abc.
+# pass
+"abc."
+#
 abc.@
 abc. space-before
 	tab-before

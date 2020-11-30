@@ -1,5 +1,14 @@
 Revision history for Net-Async-Github
 
+0.008     2020-11-26 14:53:58+08:00 Asia/Kuala_Lumpur
+    New features:
+
+    - support for creating commits (thanks Chylli)
+
+    Bugs fixed:
+
+    - pull request creation should actually work now
+
 0.007     2020-10-28 07:34:00+08:00 Asia/Kuala_Lumpur
     New features:
 

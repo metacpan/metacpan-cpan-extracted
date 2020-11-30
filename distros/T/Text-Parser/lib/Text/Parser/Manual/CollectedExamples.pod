@@ -1,0 +1,82 @@
+
+# PODNAME: Text::Parser::Manual::CollectedExamples
+
+# ABSTRACT: A collection of examples using Text::Parser
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Text::Parser::Manual::CollectedExamples - A collection of examples using Text::Parser
+
+=head1 VERSION
+
+version 1.000
+
+=head1 SIMPLE EXAMPLES
+
+=head2 Log statistics
+
+    use strict;
+    use Text::Parser;
+
+    my $parser = Text::Parser->new();
+    $parser->BEGIN_rule(
+        do => '~errors = 0; ~warnings = 0; ~fatal = 0; ~info = 0;'
+    );
+    $parser->add_rule(
+        if          => '$1 eq "ERROR:"', 
+        do          => '~errors++;', 
+        dont_record => 1, 
+    );
+    $parser->add_rule(
+        if          => '$1 eq "WARNING:"', 
+        do          => '~warnings++;', 
+        dont_record => 1, 
+    );
+    $parser->add_rule(
+        if          => '$1 eq "INFO:"', 
+        do          => '~info++;', 
+        dont_record => 1, 
+    );
+    $parser->add_rule(
+        if          => '$1 eq "FATAL:"', 
+        do          => '~fatal++;', 
+        dont_record => 1, 
+    );
+    $parser->read('/path/to/logfile.log');
+    my (%log_stats) = $parser->stashed;
+
+=head1 COMPLEX EXAMPLES
+
+This is a stub...
+
+=head1 INVITATION TO CONTRIBUTE
+
+You're invited to contribute your examples of how you use this package. Contributions will be acknowledged.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website
+L<http://github.com/balajirama/Text-Parser/issues>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 AUTHOR
+
+Balaji Ramasubramanian <balajiram@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2018-2019 by Balaji Ramasubramanian.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

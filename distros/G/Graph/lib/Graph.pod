@@ -113,7 +113,7 @@ I<connected components> of the graph (see L</is_connected>,
 L</connected_components>, L</connected_component_by_vertex>,
 L</connected_component_by_index>, and L</same_connected_components>).
 If C<unionfind> is used, adding edges (and vertices) becomes slower,
-but connectedness queries become faster.  You B<must not> delete egdes or
+but connectedness queries become faster.  You B<must not> delete edges or
 vertices of an unionfind graph, only add them.  You can test a graph for
 "union-findness" with
 
@@ -619,6 +619,13 @@ Returns the graph.
 Calls a function for each vertex-name, renaming it to the return value.
 
 Returns the graph.
+
+=item ingest
+
+    $g->ingest($g2)
+
+Ingests all the vertices and edges of the given graph, including
+attributes. Returns the ingesting graph.
 
 =back
 
@@ -1266,6 +1273,20 @@ Return the self-loop vertices of the graph.
 In scalar context return the number of self-loop vertices.
 See L</is_self_loop_vertex> for the definition of a self-loop vertex.
 
+=item as_hashes
+
+    ($nodes, $edges) = $g->as_hashes
+
+Return hash-refs which map vertices to their attributes, and for edges,
+a two-level hash mapping the predecessor to its successors, mapped to
+the attributes.
+
+If C<multivertexed> is true, the vertices hash will have the second-level
+values be the multivertex's ID, and the third level will be attributes
+as above.
+
+If C<multiedged> is true, similar will be true for the edges hash.
+
 =back
 
 =head2 Connected Graphs and Their Components
@@ -1747,7 +1768,7 @@ See L</"Clearing cached results">.
 Return as a graph the single-source shortest paths of the graph using
 Bellman-Ford's algorithm.  The graph can contain negative edges but
 not negative cycles (negative cycles cause the algorithm to abort
-with an error message C<Graph::SPT_Bellman_Ford: negative cycle exists/>).
+with an error message C<Graph::SPT_Bellman_Ford: negative cycle exists>).
 
 You can choose the start vertex of the result with either a single
 vertex argument or with $opt{ first_root }, otherwise a random vertex
@@ -1772,7 +1793,7 @@ can be retrieved by
 vertex can have several successors.  You can first find the
 C<neighbors()> vertices and then remove the predecessor vertex.)
 
-If you want to find the shortes path between two vertices,
+If you want to find the shortest path between two vertices,
 see L</SP_Bellman_Ford>.
 
 =item SSSP_Bellman_Ford
@@ -1849,9 +1870,11 @@ Return the list of vertices along the shortest path.
 
 Returns the predecessor of vertex $v in the all-pairs shortest paths.
 
-=back
+=item all_paths
 
-=over 8
+    my @paths = $apsp->all_paths($u, $v);
+
+Return list of array-refs with all the paths from $u to $v.
 
 =item average_path_length
 
@@ -2181,7 +2204,8 @@ reserved for the internal use of the Graph module.
 
     $attr = $g->get_vertex_attributes($v)
 
-Return all the attributes of the vertex as an anonymous hash.
+Return all the attributes of the vertex as an anonymous hash, or C<undef>
+if no such vertex.
 
 =item get_vertex_attribute_names
 
@@ -2293,7 +2317,8 @@ reserved for the internal use of the Graph module.
 
     $attr = $g->get_edge_attributes($u, $v)
 
-Return all the attributes of the edge as an anonymous hash.
+Return all the attributes of the edge as an anonymous hash, or C<undef>
+if no such edge.
 
 =item get_edge_attribute_names
 

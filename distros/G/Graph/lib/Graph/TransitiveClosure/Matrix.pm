@@ -5,9 +5,16 @@ use warnings;
 
 use Graph::AdjacencyMatrix;
 use Graph::Matrix;
+use Scalar::Util qw(weaken);
+
+sub _A() { 0 } # adjacency
+sub _D() { 1 } # distance
+sub _P() { 2 } # predecessors
+sub _V() { 3 } # vertices
+sub _G() { 4 } # the original graph (OG)
 
 sub _new {
-    my ($g, $class, $opt, $want_transitive, $want_reflexive, $want_path, $want_path_vertices) = @_;
+    my ($g, $class, $opt, $want_transitive, $want_reflexive, $want_path, $want_path_vertices, $want_path_count) = @_;
     my $m = Graph::AdjacencyMatrix->new($g, %$opt);
     my @V = $g->vertices;
     my $am = $m->adjacency_matrix;
@@ -124,6 +131,8 @@ sub _new {
 	    if ($want_path && !$want_transitive) {
 		for my $w (@V) {
 		    my $aiw = $ai{$w};
+		    my $diw = $di{$w};
+		    $didiv->[$diw] ||= 0 if $want_path_count; # force defined
 		    next unless
 			# See XXX above.
 			# $am->get($v, $u)
@@ -133,7 +142,10 @@ sub _new {
 			# $am->get($u, $w)
 			vec($aiaiu, $aiw, 1)
 			    ;
-		    my $diw = $di{$w};
+		    if ($want_path_count) {
+			$didiv->[$diw]++ if $w ne $u and $w ne $v and $u ne $v;
+			next;
+		    }
 		    my ($d0, $d1a, $d1b);
 		    if (defined $dm) {
 			# See XXX above.
@@ -183,61 +195,40 @@ sub _new {
 	$pm->[0] = \@pi;
 	$pm->[1] = \%pi;
     }
-    bless [ $am, $dm, $pm, \%V ], $class;
+    weaken(my $og = $g);
+    bless [ $am, $dm, $pm, \%V, $og ], $class;
 }
 
 sub new {
     my ($class, $g, %opt) = @_;
     my %am_opt = (distance_matrix => 1);
-    if (exists $opt{attribute_name}) {
-	$am_opt{attribute_name} = $opt{attribute_name};
-	delete $opt{attribute_name};
-    }
-    if ($opt{distance_matrix}) {
-	$am_opt{distance_matrix} = $opt{distance_matrix};
-    }
-    delete $opt{distance_matrix};
-    if (exists $opt{path}) {
-	$opt{path_length}   = $opt{path};
-	$opt{path_vertices} = $opt{path};
-	delete $opt{path};
-    }
-    my $want_path_length;
-    if (exists $opt{path_length}) {
-	$want_path_length = $opt{path_length};
-	delete $opt{path_length};
-    }
-    my $want_path_vertices;
-    if (exists $opt{path_vertices}) {
-	$want_path_vertices = $opt{path_vertices};
-	delete $opt{path_vertices};
-    }
-    my $want_reflexive;
-    if (exists $opt{reflexive}) {
-	$want_reflexive = $opt{reflexive};
-	delete $opt{reflexive};
-    }
-    my $want_transitive;
-    if (exists $opt{is_transitive}) {
-	$want_transitive = $opt{is_transitive};
-	$am_opt{is_transitive} = $want_transitive;
-	delete $opt{is_transitive};
-    }
+    $am_opt{attribute_name} = delete $opt{attribute_name}
+	if exists $opt{attribute_name};
+    $am_opt{distance_matrix} = delete $opt{distance_matrix}
+	if $opt{distance_matrix};
+    $opt{path_length} = $opt{path_vertices} = delete $opt{path}
+	if exists $opt{path};
+    my $want_path_length = delete $opt{path_length};
+    my $want_path_count = delete $opt{path_count};
+    my $want_path_vertices = delete $opt{path_vertices};
+    my $want_reflexive = delete $opt{reflexive};
+    $am_opt{is_transitive} = my $want_transitive = delete $opt{is_transitive}
+	if exists $opt{is_transitive};
     die "Graph::TransitiveClosure::Matrix::new: Unknown options: @{[map { qq['$_' => $opt{$_}]} keys %opt]}"
 	if keys %opt;
     $want_reflexive = 1 unless defined $want_reflexive;
-    my $want_path = $want_path_length || $want_path_vertices;
+    my $want_path = $want_path_length || $want_path_vertices || $want_path_count;
     # $g->expect_dag if $want_path;
     _new($g, $class,
 	 \%am_opt,
 	 $want_transitive, $want_reflexive,
-	 $want_path, $want_path_vertices);
+	 $want_path, $want_path_vertices, $want_path_count);
 }
 
 sub has_vertices {
     my $tc = shift;
     for my $v (@_) {
-	return 0 unless exists $tc->[3]->{ $v };
+	return 0 unless exists $tc->[ _V ]->{ $v };
     }
     return 1;
 }
@@ -246,7 +237,7 @@ sub is_reachable {
     my ($tc, $u, $v) = @_;
     return undef unless $tc->has_vertices($u, $v);
     return 1 if $u eq $v;
-    $tc->[0]->get($u, $v);
+    $tc->[ _A ]->get($u, $v);
 }
 
 sub is_transitive {
@@ -255,7 +246,7 @@ sub is_transitive {
     } else {		# A TC graph.
 	my ($tc, $u, $v) = @_;
 	return undef unless $tc->has_vertices($u, $v);
-	$tc->[0]->get($u, $v);
+	$tc->[ _A ]->get($u, $v);
     }
 }
 
@@ -268,14 +259,14 @@ sub path_length {
     my ($tc, $u, $v) = @_;
     return undef unless $tc->has_vertices($u, $v);
     return 0 if $u eq $v;
-    $tc->[1]->get($u, $v);
+    $tc->[ _D ]->get($u, $v);
 }
 
 sub path_predecessor {
     my ($tc, $u, $v) = @_;
     return undef if $u eq $v;
     return undef unless $tc->has_vertices($u, $v);
-    $tc->[2]->get($u, $v);
+    $tc->[ _P ]->get($u, $v);
 }
 
 sub path_vertices {
@@ -287,8 +278,21 @@ sub path_vertices {
 	last unless defined($u = $tc->path_predecessor($u, $v));
 	push @v, $u;
     }
-    $tc->[2]->set($u, $v, [ @v ]) if @v;
+    $tc->[ _P ]->set($u, $v, [ @v ]) if @v;
     return @v;
+}
+
+sub all_paths {
+    my ($tc, $u, $v) = @_;
+    return if $u eq $v;
+    my @found;
+    push @found, [$u, $v] if $tc->[ _G ]->has_edge($u, $v);
+    push @found,
+        map [$u, @$_],
+        map $tc->all_paths($_, $v),
+        grep $tc->is_reachable($_, $v),
+        grep $_ ne $v, $tc->[ _G ]->successors($u);
+    @found;
 }
 
 1;
@@ -391,6 +395,14 @@ By default the paths are not computed, only the boolean transitivity.
 By using true for C<path_vertices> also the paths will be computed,
 they can be retrieved using the path_vertices() method.
 
+=item path_count => boolean
+
+As an alternative to setting C<path_length>, if this is true then the
+matrix will store the quantity of paths between the two vertices. This
+is still retrieved using the path_length() method. The path vertices
+will not be available. You should probably only use this on a DAG,
+and not with C<reflexive>.
+
 =back
 
 =back
@@ -433,6 +445,10 @@ Return the list of vertices in the transitive closure matrix.
 
 Return the predecessor of vertex $v in the transitive closure path
 going back to vertex $u.
+
+=item all_paths($u, $v)
+
+Return list of array-refs with all the paths from $u to $v.
 
 =back
 

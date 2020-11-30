@@ -25,6 +25,9 @@ requires:
   Net::Z3950::PQF: 1
   Net::Z3950::SimpleServer: 1.21
   Net::Z3950::ZOOM: 1.3
-  URI::Escape: 3.31
+  Unicode::Diacritic::Strip: 0.13
   XML::Simple: 2.25
-version: 1.3
+resources:
+  bugtracker: https://issues.folio.org/projects/ZF/issues
+  repository: https://github.com/folio-org/Net-Z3950-FOLIO.git
+version: 1.5

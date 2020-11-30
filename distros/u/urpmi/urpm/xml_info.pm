@@ -44,7 +44,7 @@ sub open_lzma {
 sub _open_xml_reader {
     my ($xml_info_file) = @_;
 
-    my $reader = new XML::LibXML::Reader(IO => open_lzma($xml_info_file), huge => 1) or die "cannot read $xml_info_file\n";
+    my $reader = XML::LibXML::Reader->new(IO => open_lzma($xml_info_file), huge => 1) or die "cannot read $xml_info_file\n";
 
     $reader->read;
     $reader->name eq 'media_info' or die "global <media_info> tag not found\n";

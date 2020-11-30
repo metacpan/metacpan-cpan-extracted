@@ -25,6 +25,7 @@ static const char * const errors[EEAV_MAX] = {
     "local-part has misplaced double quote" /* EEAV_LPART_MISPLACED_QUOTE */,
     "local-part has open double quote"      /* EEAV_LPART_UNQUOTED */,
     "local-part has too many dots"          /* EEAV_LPART_TOO_MANY_DOTS */,
+    "local-part has misplaced dot"          /* EEAV_LPART_MISPLACED_DOT */,
     "local-part has unquoted characters"    /* EEAV_LPART_UNQUOTED_FWS */,
     "local-part has invalid UTF-8 data"     /* EEAV_LPART_INVALID_UTF8 */,
     "domain is empty"                       /* EEAV_DOMAIN_EMPTY */,

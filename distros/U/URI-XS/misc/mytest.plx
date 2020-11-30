@@ -27,6 +27,8 @@ sub parse {
     my $sml = "http://crazypanda.ru";
     my $enc = "http://y%20a.%20r%20u/a/b?c=d#e=f";
     my $min = "/";
+    my $ex1 = 'http://jopa.com?"key"="val"&param={"key","val"}';
+    my $ex2 = 'http://jopa.com?key11=val11&param=keyvalkeyval1';
     URI::XS::test_parse($enc);
     
     timethese(-1, {
@@ -35,6 +37,8 @@ sub parse {
         sml => sub { URI::XS::bench_parse($sml) },
         enc => sub { URI::XS::bench_parse($enc) },
         min => sub { URI::XS::bench_parse($min) },
+        ex1 => sub { URI::XS::bench_parse($ex1, ALLOW_EXTENDED_CHARS) },
+        ex2 => sub { URI::XS::bench_parse($ex2, ALLOW_EXTENDED_CHARS) },
     });
 };
 

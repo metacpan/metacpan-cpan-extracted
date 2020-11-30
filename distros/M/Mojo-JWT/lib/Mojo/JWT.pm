@@ -2,23 +2,39 @@ package Mojo::JWT;
 
 use Mojo::Base -base;
 
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 $VERSION = eval $VERSION;
 
+use Scalar::Util qw/blessed/;
+use List::Util qw/first/;
 use Mojo::JSON qw/encode_json decode_json/;
 use MIME::Base64 qw/encode_base64url decode_base64url/;
 
 use Carp;
 
+my $isa = sub { blessed $_[0] && $_[0]->isa($_[1]) };
+
 has header => sub { {} };
 has algorithm => 'HS256';
 has [qw/allow_none set_iat/] => 0;
 has claims => sub { {} };
+has jwks => sub { [] };
 has [qw/expires not_before/];
 has [qw/public secret/] => '';
 
 my $re_hs = qr/^HS(\d+)$/;
 my $re_rs = qr/^RS(\d+)$/;
+
+sub add_jwkset {
+  my ($self, $jwkset) = @_;
+  if (ref $jwkset eq 'HASH') {
+    push @{ $self->jwks }, @{ $jwkset->{keys} };
+  }
+  if (ref $jwkset eq 'ARRAY') {
+    push @{ $self->jwks }, @{ $jwkset };
+  }
+  return $self;
+}
 
 sub decode {
   my ($self, $token, $peek) = @_;
@@ -39,6 +55,8 @@ sub decode {
   croak 'Required header field "alg" not specified'
     unless my $algo = $self->algorithm(delete $header->{alg})->algorithm;
   $self->header($header);
+
+  $self->_try_jwks($algo, $header);
 
   $self->$peek($claims) if $peek;
 
@@ -69,6 +87,27 @@ sub decode {
   }
 
   return $self->claims($claims)->claims;
+}
+
+sub _try_jwks {
+  my ($self, $algo, $header) = @_;
+  return unless @{$self->jwks} && $header->{kid};
+
+  # Check we have the JWK for this JWT
+  my $jwk = first { exists $header->{kid} && $_->{kid} eq $header->{kid} } @{$self->jwks};
+  return unless $jwk;
+
+  if ($algo =~ /^RS/) {
+    require Crypt::OpenSSL::Bignum;
+    my $n = Crypt::OpenSSL::Bignum->new_from_bin(decode_base64url $jwk->{n});
+    my $e = Crypt::OpenSSL::Bignum->new_from_bin(decode_base64url $jwk->{e});
+
+    require Crypt::OpenSSL::RSA;
+    my $pubkey = Crypt::OpenSSL::RSA->new_key_from_parameters($n, $e);
+    $self->public($pubkey);
+  } elsif ($algo =~ /^HS/) {
+    $self->secret( decode_base64url $jwk->{k} )
+  }
 }
 
 sub encode {
@@ -103,9 +142,10 @@ sub now { time }
 
 sub sign_hmac {
   my ($self, $size, $payload) = @_;
+  croak 'symmetric secret not specified' unless my $secret = $self->secret;
   require Digest::SHA;
   my $f = Digest::SHA->can("hmac_sha$size") || croak 'Unsupported HS signing algorithm';
-  return $f->($payload, $self->secret);
+  return $f->($payload, $secret);
 }
 
 sub sign_rsa {
@@ -122,7 +162,8 @@ sub token { shift->{token} }
 sub verify_rsa {
   my ($self, $size, $payload, $signature) = @_;
   require Crypt::OpenSSL::RSA;
-  my $crypt = Crypt::OpenSSL::RSA->new_public_key($self->public || croak 'public key not specified');
+  croak 'public key not specified' unless my $public = $self->public;
+  my $crypt = $public->$isa('Crypt::OpenSSL::RSA') ? $public : Crypt::OpenSSL::RSA->new_public_key($public);
   my $method = $crypt->can("use_sha${size}_hash") || croak 'Unsupported RS verification algorithm';
   $crypt->$method;
   return $crypt->verify($payload, $signature);
@@ -196,9 +237,28 @@ The symmetric secret (eg. HMAC) or else the private key used in encoding an asym
 
 If true (false by default), then the C<iat> claim will be set to the value of L</now> during L</encode>.
 
+=head2 jwks
+
+An arrayref of JWK objects used by C<decode> to verify the input token when matching with the JWTs C<kid> field.
+
+    my $jwks = Mojo::UserAgent->new->get('https://example.com/oidc/jwks.json')->result->json('/keys');
+    my $jwt = Mojo::JWT->new(jwks => $jwks);
+    $jwk->decode($token);
+
 =head1 METHODS
 
 L<Mojo::JWT> inherits all of the methods from L<Mojo::Base> and implements the following new ones.
+
+=head2 add_jwkset
+
+    my $jwkset = Mojo::UserAgent->new->get('https://example.com/oidc/jwks.json')->result->json;
+    my $jwt = Mojo::JWT->new->add_jwkset($jwksset);
+    $jwk->decode($token);
+
+Helper for appending a jwkset to the L</jwks>.
+Accepts a hashref with a C<keys> field that is an arrayref of jwks and also an arrayref directly.
+Appends the JWKs to L</jwks>.
+Returns the instance.
 
 =head2 decode
 
@@ -219,6 +279,10 @@ Parsing occurs as follows
 =item *
 
 The L</algorithm> is extracted from the header and set, if not present or permissible an exception is thrown
+
+=item *
+
+Any JWKs in C</jwks> are checked against the headers and if one is found then it is set in L</public> or L</secret> as appropriate to the L</algorithm>
 
 =item *
 
@@ -320,6 +384,8 @@ Joel Berger, E<lt>joel.a.berger@gmail.comE<gt>
 =head1 CONTRIBUTORS
 
 Christopher Raa (mishanti1)
+
+Cameron Daniel (ccakes)
 
 =head1 COPYRIGHT AND LICENSE
 

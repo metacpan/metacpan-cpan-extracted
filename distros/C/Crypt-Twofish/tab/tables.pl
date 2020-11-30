@@ -1,6 +1,5 @@
 #!/usr/bin/perl -w
-# $Id: tables.pl,v 2.12 2001/05/21 17:38:02 ams Exp $
-# Copyright 2001 Abhijit Menon-Sen <ams@wiw.org>
+# Copyright 2001 Abhijit Menon-Sen <ams@toroid.org>
 
 use strict;
 require 'tab/misc.pl';

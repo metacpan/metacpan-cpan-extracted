@@ -1,3 +1,8 @@
+0.003   2020-11-26  Released-By: PERLANCAR; Urgency: medium
+
+	- Recognize youtu.be links (thanks Charles-William Roy, GH#1).
+
+
 0.002   2020-04-01  Released-By: PERLANCAR; Urgency: medium
 
 	- Handle YouTube embed URL, e.g.

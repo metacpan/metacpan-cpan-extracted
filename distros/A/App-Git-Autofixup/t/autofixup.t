@@ -13,7 +13,7 @@ if ($OSNAME eq 'MSWin32') {
 } elsif (!has_git()) {
     plan skip_all => 'git version 1.7.4+ required'
 } else {
-    plan tests => 34;
+    plan tests => 40;
 }
 
 require './git-autofixup';
@@ -63,6 +63,7 @@ sub test_autofixup_strict {
 # upstream_commits: sub or hash refs that must not be fixed up
 # topic_commits: sub or hash refs representing commits that can be fixed up
 # unstaged: sub or hash ref of working directory changes
+# staged: sub or hash ref of index changes
 # log_want: expected log output
 # autofixup_opts: command-line options to pass thru to autofixup
 sub test_autofixup {
@@ -73,9 +74,14 @@ sub test_autofixup {
     my $topic_commits = $args->{topic_commits} || [];
     my $unstaged = defined($args->{unstaged}) ? $args->{unstaged}
                  : croak "no unstaged changes given";
+    my $staged = $args->{staged};
     my $log_want = defined($args->{log_want}) ? $args->{log_want}
                  : croak "wanted log output not given";
+    my $staged_want = $args->{staged_want};
+    my $unstaged_want = $args->{unstaged_want};
+    my $exit_code_want = $args->{exit_code};
     my $autofixup_opts = $args->{autofixup_opts} || [];
+    push @{$autofixup_opts}, '--exit-code';
     if (!$upstream_commits && !$topic_commits) {
         croak "no upstream or topic commits given";
     }
@@ -83,7 +89,10 @@ sub test_autofixup {
         croak "strict key given; use test_autofixup_strict instead";
     }
 
+    my $exit_code_got;
     my $log_got;
+    my $staged_got;
+    my $unstaged_got;
     my $orig_dir = getcwd();
     my $dir = File::Temp::tempdir(CLEANUP => 1);
     chdir $dir or die "$!";
@@ -107,11 +116,22 @@ sub test_autofixup {
         }
         my $pre_fixup_rev = get_revision_sha();
 
+        if (defined($staged)) {
+            apply_change($staged);
+            # We're at the repo root, so using -A will change everything even
+            # in pre-v2 versions of git. See git commit 808d3d717e8.
+            run("git add -A");
+        }
+
         apply_change($unstaged);
 
         run("git --no-pager log --format='%h %s' ${upstream_rev}..");
-        autofixup(@{$autofixup_opts}, $upstream_rev);
-        $log_got = get_git_log($pre_fixup_rev);
+        $exit_code_got = autofixup(@{$autofixup_opts}, $upstream_rev);
+        $log_got = git_log(${pre_fixup_rev});
+        $staged_got = diff('--cached');
+        if (defined($unstaged_want)) {
+            $unstaged_got = diff('HEAD');
+        }
     };
     my $err = $@;
     chdir $orig_dir or die "$!";
@@ -120,7 +140,38 @@ sub test_autofixup {
         fail($name);
         return;
     }
-    is($log_got, $log_want, $name);
+
+    my $failed = 0;
+    if ($log_got ne $log_want) {
+        diag("log_got=<<EOF\n${log_got}EOF\nlog_want=<<EOF\n${log_want}EOF\n");
+        $failed = 1;
+    }
+
+    if (!defined($staged_want) && $staged_got) {
+        diag("staged_got=<<EOF\n${staged_got}EOF\nno staged changes expected\n");
+        $failed = 1;
+    }
+    if (defined($staged_want) && $staged_want ne $staged_got) {
+        diag("staged_got=<<EOF\n${staged_got}EOF\nstaged_want=<<EOF\n${staged_want}EOF\n");
+        $failed = 1;
+    }
+
+
+    if (defined($unstaged_want) && $unstaged_want ne $unstaged_got) {
+        diag("unstaged_got=<<EOF\n${unstaged_got}EOF\nunstaged_want=<<EOF\n${unstaged_want}EOF\n");
+        $failed = 1;
+    }
+
+    if (defined($exit_code_want) && $exit_code_got != $exit_code_want) {
+        diag("exit_code_want=$exit_code_want,exit_code_got=$exit_code_got");
+        $failed = 1;
+    }
+
+    if ($failed) {
+        fail($name);
+    } else {
+        pass($name);
+    }
 }
 
 sub init_repo {
@@ -166,13 +217,22 @@ sub write_file {
     close $fh or croak "$!";
 }
 
-sub get_git_log {
+sub git_log {
     my $revision = shift;
-    my $log = qx{git log -p --format=%s ${revision}..};
+    my $log = qx{git -c diff.noprefix=false log -p --format=%s ${revision}..};
     if ($? != 0) {
         croak "git log: $?\n";
     }
     return $log;
+}
+
+sub diff {
+    my $revision = shift;
+    my $diff = qx{git -c diff.noprefix=false diff ${revision}};
+    if ($? != 0) {
+        croak "git diff $?\n";
+    }
+    return $diff;
 }
 
 sub get_revision_sha {
@@ -185,8 +245,8 @@ sub get_revision_sha {
 
 sub autofixup {
     local @ARGV = @_;
-    print "# git-autofixup\n";
-    main() == 0 or die "git-autofixup: nonzero exit";
+    print "# git-autofixup ", join(' ', @ARGV), "\n";
+    return main();
 }
 
 
@@ -195,7 +255,9 @@ test_autofixup_strict({
     strict => [0..2],
     topic_commits => [{a => "a1\n"}],
     unstaged => {a => "a2\n"},
-    log_want => q{fixup! commit0
+    exit_code => 0,
+    log_want => <<'EOF'
+fixup! commit0
 
 diff --git a/a b/a
 index da0f8ed..c1827f0 100644
@@ -204,7 +266,8 @@ index da0f8ed..c1827f0 100644
 @@ -1 +1 @@
 -a1
 +a2
-}});
+EOF
+});
 
 test_autofixup_strict({
     name => "adjacent change gets autofixed",
@@ -212,7 +275,9 @@ test_autofixup_strict({
     upstream_commits => [{a => "a3\n"}],
     topic_commits => [{a => "a1\na3\n"}],
     unstaged => {a => "a1\na2\na3\n"},
-    log_want => q{fixup! commit1
+    exit_code => 0,
+    log_want => <<'EOF'
+fixup! commit1
 
 diff --git a/a b/a
 index 76642d4..2cdcdb0 100644
@@ -222,15 +287,17 @@ index 76642d4..2cdcdb0 100644
  a1
 +a2
  a3
-}});
+EOF
+});
 
 test_autofixup({
     name => "adjacent change doesn't get autofixed if strict=2",
     upstream_commits => [{a => "a3\n"}],
     topic_commits => [{a => "a1\na3\n"}],
     unstaged => {a => "a1\na2\na3\n"},
-    log_want => q{},
+    log_want => '',
     autofixup_opts => ['-s2'],
+    exit_code => 2,
 });
 
 test_autofixup({
@@ -238,7 +305,9 @@ test_autofixup({
     topic_commits => [{a => "a1\na3\n", b => "b1\n", c => "c2\n"}],
     unstaged => {a => "a1\na2\na3\n", b => "b1\nb2\n", c => "c1\nc2\n"},
     autofixup_opts => ['-s2'],
-    log_want => q{fixup! commit0
+    exit_code => 0,
+    log_want => <<'EOF'
+fixup! commit0
 
 diff --git a/a b/a
 index 76642d4..2cdcdb0 100644
@@ -262,14 +331,16 @@ index 16f9ec0..d0aaf97 100644
 @@ -1 +1,2 @@
 +c1
  c2
-}});
+EOF
+});
 
 test_autofixup_strict({
     name => "removed file doesn't get autofixed",
     strict => [0..2],
     topic_commits => [sub { write_file(a => "a1\n"); }],
     unstaged => sub { unlink 'a'; },
-    log_want => q{},
+    exit_code => 3,
+    log_want => '',
 });
 
 test_autofixup_strict({
@@ -280,7 +351,8 @@ test_autofixup_strict({
         sub { unlink 'a'; },
     ],
     unstaged => sub { write_file(a => "a1a\n"); },
-    log_want => q{},
+    exit_code => 3,
+    log_want => '',
 });
 
 test_autofixup_strict({
@@ -297,8 +369,10 @@ test_autofixup_strict({
         {a => "a1\na2\n"},
         {a => "a1\n"},
     ],
+    exit_code => 0,
     unstaged => {a => "a1\na2\n"},
-    log_want => q{fixup! commit0
+    log_want => <<'EOF'
+fixup! commit0
 
 diff --git a/a b/a
 index da0f8ed..0016606 100644
@@ -307,14 +381,17 @@ index da0f8ed..0016606 100644
 @@ -1 +1,2 @@
  a1
 +a2
-}});
+EOF
+});
 
 test_autofixup_strict({
     name => "removed lines get autofixed",
     strict => [0..2],
     topic_commits => [{a => "a1\n", b => "b1\nb2\n"}],
     unstaged => {a => "", b => "b2\n"},
-    log_want => q{fixup! commit0
+    exit_code => 0,
+    log_want => <<'EOF'
+fixup! commit0
 
 diff --git a/a b/a
 index da0f8ed..e69de29 100644
@@ -329,14 +406,16 @@ index 9b89cd5..e6bfff5 100644
 @@ -1,2 +1 @@
 -b1
  b2
-}});
+EOF
+});
 
 test_autofixup_strict({
     name => 'no fixups are created for upstream commits',
     strict => [0..2],
     upstream_commits => [{a => "a1\n"}],
     unstaged => {a => "a1a\n"},
-    log_want => q{},
+    exit_code => 2,
+    log_want => '',
 });
 
 test_autofixup({
@@ -346,7 +425,9 @@ test_autofixup({
     upstream_commits => [{a => "a1\na2\na3\n"}],
     topic_commits => [{a => "a1\na2a\na3a\n"}],
     unstaged => {a => "a1b\na2b\na3b\n"},
-    log_want => q{fixup! commit1
+    exit_code => 0,
+    log_want => <<'EOF'
+fixup! commit1
 
 diff --git a/a b/a
 index 125d560..cc1aa32 100644
@@ -359,7 +440,8 @@ index 125d560..cc1aa32 100644
 +a1b
 +a2b
 +a3b
-}});
+EOF
+});
 test_autofixup_strict({
     name => 'no fixups are created for hunks changing lines blamed by upstream if strict > 0',
     # This depends on the number of context lines kept when creating diffs. git
@@ -368,7 +450,8 @@ test_autofixup_strict({
     upstream_commits => [{a => "a1\na2\na3\n"}],
     topic_commits => [{a => "a1\na2a\na3a\n"}],
     unstaged => {a => "a1b\na2b\na3b\n"},
-    log_want => q{},
+    exit_code => 2,
+    log_want => '',
 });
 
 test_autofixup_strict({
@@ -381,8 +464,10 @@ test_autofixup_strict({
             run(qw(git commit -a --fixup=HEAD));
         },
     ],
+    exit_code => 0,
     unstaged => {a => "a2\na3\n"},
-    log_want => q{fixup! commit0
+    log_want => <<'EOF'
+fixup! commit0
 
 diff --git a/a b/a
 index c1827f0..b792f74 100644
@@ -391,14 +476,17 @@ index c1827f0..b792f74 100644
 @@ -1 +1,2 @@
  a2
 +a3
-}});
+EOF
+});
 
 test_autofixup({
     name => "removed line gets autofixed when context=0",
     topic_commits => [{a => "a1\na2\n"}],
     unstaged => {a => "a1\n"},
     autofixup_opts => ['-c' => 0],
-    log_want => q{fixup! commit0
+    exit_code => 0,
+    log_want => <<'EOF'
+fixup! commit0
 
 diff --git a/a b/a
 index 0016606..da0f8ed 100644
@@ -407,14 +495,16 @@ index 0016606..da0f8ed 100644
 @@ -1,2 +1 @@
  a1
 -a2
-}});
+EOF
+});
 
 test_autofixup({
     name => "added line is ignored when context=0",
     topic_commits => [{a => "a1\n"}],
     unstaged => {a => "a1\na2\n"},
     autofixup_opts => ['-c' => 0],
-    log_want => q{},
+    exit_code => 2,
+    log_want => '',
 });
 
 test_autofixup({
@@ -423,8 +513,10 @@ test_autofixup({
         {a => "a1\n"},
         {a => "a1\na2\n"},
     ],
+    exit_code => 0,
     unstaged => {a => "a1\na2a\n"},
-    log_want => q{fixup! commit1
+    log_want => <<'EOF'
+fixup! commit1
 
 diff --git a/a b/a
 index 0016606..a0ef52c 100644
@@ -434,7 +526,8 @@ index 0016606..a0ef52c 100644
  a1
 -a2
 +a2a
-}});
+EOF
+});
 
 test_autofixup({
     name => "Works when run in a subdir of the repo root",
@@ -445,8 +538,10 @@ test_autofixup({
             write_file("a", "a1\n");
         }
     ],
+    exit_code => 0,
     unstaged => {'a' => "a1\na2\n"},
-    log_want => q{fixup! commit0
+    log_want => <<'EOF'
+fixup! commit0
 
 diff --git a/sub/a b/sub/a
 index da0f8ed..0016606 100644
@@ -455,13 +550,16 @@ index da0f8ed..0016606 100644
 @@ -1 +1,2 @@
  a1
 +a2
-}});
+EOF
+});
 
 test_autofixup({
     name => "file without newline at EOF gets autofixed",
     topic_commits => [{a => "a1\na2"}],
     unstaged => {'a' => "a1\na2\n"},
-    log_want => q{fixup! commit0
+    exit_code => 0,
+    log_want => <<'EOF'
+fixup! commit0
 
 diff --git a/a b/a
 index c928c51..0016606 100644
@@ -472,7 +570,8 @@ index c928c51..0016606 100644
 -a2
 \ No newline at end of file
 +a2
-}});
+EOF
+});
 
 test_autofixup({
     name => "multiple hunks in the same file get autofixed",
@@ -482,7 +581,9 @@ test_autofixup({
         {a => "a1.2\na2\na3\na4\na5\na6\na7\na8\na9.1\n"},
     ],
     unstaged => {'a' =>  "a1.3\na2\na3\na4\na5\na6\na7\na8\na9.3\n"},
-    log_want => q{fixup! commit1
+    exit_code => 0,
+    log_want => <<'EOF'
+fixup! commit1
 
 diff --git a/a b/a
 index d9f44da..5b9ebcd 100644
@@ -506,4 +607,172 @@ index 50de7e8..d9f44da 100644
  a2
  a3
  a4
+EOF
+});
+
+test_autofixup({
+    name => "single-line change gets autofixed when mnemonic prefixes are enabled",
+    topic_commits => [{a => "a1\n"}],
+    unstaged => {a => "a2\n"},
+    autofixup_opts => ['-g', '-c', '-g', 'diff.mnemonicPrefix=true'],
+    exit_code => 0,
+    log_want => <<'EOF'
+fixup! commit0
+
+diff --git a/a b/a
+index da0f8ed..c1827f0 100644
+--- a/a
++++ b/a
+@@ -1 +1 @@
+-a1
++a2
+EOF
+});
+
+test_autofixup({
+    name => "single-line change gets autofixed when diff.external is set",
+    topic_commits => [{a => "a1\n"}],
+    unstaged => {a => "a2\n"},
+    autofixup_opts => ['-g', '-c', '-g', 'diff.external=vimdiff'],
+    exit_code => 0,
+    log_want => <<'EOF'
+fixup! commit0
+
+diff --git a/a b/a
+index da0f8ed..c1827f0 100644
+--- a/a
++++ b/a
+@@ -1 +1 @@
+-a1
++a2
+EOF
+});
+
+test_autofixup({
+    name => 'exit code is 1 when some hunks are assigned',
+    upstream_commits => [{a => "a1\n"}],
+    topic_commits => [{b => "b1\n"}],
+    unstaged => {a => "a1a\n", b => "b2\n"},
+    exit_code => 1,
+    log_want => <<'EOF'
+fixup! commit1
+
+diff --git a/b b/b
+index c9c6af7..e6bfff5 100644
+--- a/b
++++ b/b
+@@ -1 +1 @@
+-b1
++b2
+EOF
+});
+
+test_autofixup({
+    name => "multiple hunks to the same commit get autofixed",
+    topic_commits => [
+        {a => "a1.0\na2\na3\na4\na5\na6\na7\na8\na9.0\n"},
+        {b => "b1.0\n"},
+    ],
+    unstaged => {'a' =>  "a1.1\na2\na3\na4\na5\na6\na7\na8\na9.1\n", b => "b1.1\n"},
+    exit_code => 0,
+    log_want => q{fixup! commit1
+
+diff --git a/b b/b
+index 253a619..6419a9e 100644
+--- a/b
++++ b/b
+@@ -1 +1 @@
+-b1.0
++b1.1
+fixup! commit0
+
+diff --git a/a b/a
+index 5d11004..0054137 100644
+--- a/a
++++ b/a
+@@ -1,4 +1,4 @@
+-a1.0
++a1.1
+ a2
+ a3
+ a4
+@@ -6,4 +6,4 @@ a5
+ a6
+ a7
+ a8
+-a9.0
++a9.1
 }});
+
+test_autofixup({
+    name => "only staged hunks get autofixed",
+    topic_commits => [{a => "a1\n", b => "b1\n"}],
+    staged => {a => "a2\n"},
+    unstaged => {b => "b2\n"},
+    exit_code => 0,
+    log_want => <<'EOF'
+fixup! commit0
+
+diff --git a/a b/a
+index da0f8ed..c1827f0 100644
+--- a/a
++++ b/a
+@@ -1 +1 @@
+-a1
++a2
+EOF
+    , unstaged_want => <<'EOF'
+diff --git a/b b/b
+index c9c6af7..e6bfff5 100644
+--- a/b
++++ b/b
+@@ -1 +1 @@
+-b1
++b2
+EOF
+});
+
+test_autofixup({
+    name => "staged hunks that aren't autofixed remain in index",
+    upstream_commits => [{b => "b1\n"}],
+    topic_commits => [{a => "a1\n", , c => "c1\n"}],
+    staged => {a => "a2\n", b => "b2\n"},
+    unstaged => {c => "c2\n"},
+    exit_code => 1,
+    log_want => <<'EOF'
+fixup! commit1
+
+diff --git a/a b/a
+index da0f8ed..c1827f0 100644
+--- a/a
++++ b/a
+@@ -1 +1 @@
+-a1
++a2
+EOF
+    , unstaged_want => <<'EOF'
+diff --git a/b b/b
+index c9c6af7..e6bfff5 100644
+--- a/b
++++ b/b
+@@ -1 +1 @@
+-b1
++b2
+diff --git a/c b/c
+index ae93045..16f9ec0 100644
+--- a/c
++++ b/c
+@@ -1 +1 @@
+-c1
++c2
+EOF
+    , staged_want => <<'EOF'
+diff --git a/b b/b
+index c9c6af7..e6bfff5 100644
+--- a/b
++++ b/b
+@@ -1 +1 @@
+-b1
++b2
+EOF
+});

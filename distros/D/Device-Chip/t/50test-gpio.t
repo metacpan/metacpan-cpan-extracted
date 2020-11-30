@@ -13,9 +13,9 @@ my $gpio = $adapter->make_protocol( 'GPIO' )->get;
 
 {
    test_out( qr/\s*# Subtest: ->write_gpios\n/ );
-   test_out( '    ok 1 - write_gpios' );
-   test_out( '    1..1' );
-   test_out( 'ok 1 - ->write_gpios' );
+   test_out( "    ok 1 - ->write_gpios('A,!B')" );
+   test_out( "    1..1" );
+   test_out( "ok 1 - ->write_gpios" );
 
    $adapter->expect_write_gpios( { A => 1, B => 0 } );
    $gpio->write_gpios( { A => 1, B => 0 } )->get;
@@ -25,11 +25,11 @@ my $gpio = $adapter->make_protocol( 'GPIO' )->get;
 }
 
 {
-   test_out( 'ok 1 - ->read_gpios returns values' );
+   test_out( "ok 1 - ->read_gpios returns values" );
    test_out( qr/\s*# Subtest: ->read_gpios\n/ );
-   test_out( '    ok 1 - read_gpios' );
-   test_out( '    1..1' );
-   test_out( 'ok 2 - ->read_gpios' );
+   test_out( "    ok 1 - ->read_gpios('A,B')" );
+   test_out( "    1..1" );
+   test_out( "ok 2 - ->read_gpios" );
 
    $adapter->expect_read_gpios( [ 'A', 'B' ] )
       ->returns( { A => 1, B => 0 } );

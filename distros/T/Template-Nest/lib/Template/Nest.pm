@@ -6,7 +6,7 @@ use File::Spec;
 use Carp;
 use Data::Dumper;
 
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 
 sub new{
 	my ($class,%opts) = @_;
@@ -282,7 +282,7 @@ sub params{
 
     my %rem;
     for my $i (0..$#frags){
-        my @f = $frags[$i] =~ m/(?<!\Q$esc\E)$tda(.*?)$tdb/g;
+        my @f = $frags[$i] =~ m/(?<!\Q$esc\E)\Q$tda\E(.*?)\Q$tdb\E/g;
         for my $f ( @f ){
             $f =~ s/^\s*//;
             $f =~ s/\s*$//;
@@ -326,9 +326,9 @@ sub _fill_in{
             for my $i (0..$#frags){
                 my @spaces_repl;
                 if ( $esc ){
-                    @spaces_repl = $frags[$i] =~ m/([^\S\r\n]*)(?<!\Q$esc\E)($tda\s+$param_name\s+$tdb)/g;
+                    @spaces_repl = $frags[$i] =~ m/([^\S\r\n]*)(?<!\Q$esc\E)(\Q$tda\E\s+$param_name\s+\Q$tdb\E)/g;
                 } else {
-                    @spaces_repl = $frags[$i] =~ m/([^\S\r\n]*)($tda\s+$param_name\s+$tdb)/g;
+                    @spaces_repl = $frags[$i] =~ m/([^\S\r\n]*)(\Q$tda\E\s+$param_name\s+\Q$tdb\E)/g;
                 }
 
                 while(@spaces_repl){
@@ -347,9 +347,9 @@ sub _fill_in{
         } else { #if no fixed_indent global search/replace is probably quicker
             for my $i (0..$#frags){
                 if ( $esc ){
-                    $replaced = 1 if $frags[$i] =~ s/(?<!\Q$esc\E)$tda\s+$param_name\s+$tdb/$param_val/g;
+                    $replaced = 1 if $frags[$i] =~ s/(?<!\Q$esc\E)\Q$tda\E\s+$param_name\s+\Q$tdb\E/$param_val/g;
                 } else {
-                    $replaced = 1 if $frags[$i] =~ s/$tda\s+$param_name\s+$tdb/$param_val/g;
+                    $replaced = 1 if $frags[$i] =~ s/\Q$tda\E\s+$param_name\s+\Q$tdb\E/$param_val/g;
                 }
             }
         }
@@ -365,7 +365,7 @@ sub _fill_in{
         my $char = $self->{defaults_namespace_char};
         for my $i (0..$#frags){
 
-            my @rem = $frags[$i] =~ m/(?<!\Q$esc\E)$tda\s+(.*?)\s+$tdb/g;
+            my @rem = $frags[$i] =~ m/(?<!\Q$esc\E)\Q$tda\E\s+(.*?)\s+\Q$tdb\E/g;
             my %rem;
             for my $name ( @rem ){;
 #                $name =~ s/^\s*//;
@@ -377,13 +377,13 @@ sub _fill_in{
                 my @parts = ( $name );
                 @parts = split( /\Q$char\E/, $name ) if $char;
                 my $val = $self->_get_default_val($self->{defaults},@parts);
-                $frags[$i] =~ s/(?<!\Q$esc\E)$tda\s+$name\s+$tdb/$val/g;
+                $frags[$i] =~ s/(?<!\Q$esc\E)\Q$tda\E\s+$name\s+\Q$tdb\E/$val/g;
             }
             
             if ( $esc ){
-                $frags[$i] =~ s/(?<!\Q$esc\E)$tda\s.*?\s$tdb//g;
+                $frags[$i] =~ s/(?<!\Q$esc\E)\Q$tda\E\s.*?\s\Q$tdb\E//g;
             } else {
-                $frags[$i] =~ s/$tda\s.*?\s$tdb//g;
+                $frags[$i] =~ s/\Q$tda\E\s.*?\s\Q$tdb\E//g;
             }
         }
 
@@ -392,9 +392,9 @@ sub _fill_in{
         # we don't have any defaults, so quicker to directly remove any params that weren't specified
         for my $i (0..$#frags){
             if ( $esc ){
-                $frags[$i] =~ s/(?<!\Q$esc\E)$tda\s.*?\s$tdb//g;
+                $frags[$i] =~ s/(?<!\Q$esc\E)\Q$tda\E\s.*?\s\Q$tdb\E//g;
             } else {
-                $frags[$i] =~ s/$tda\s.*?\s$tdb//g;
+                $frags[$i] =~ s/\Q$tda\E\s.*?\s\Q$tdb\E//g;
             }
         }
     }

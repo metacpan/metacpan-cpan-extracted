@@ -26,6 +26,7 @@ struct URI : Refcnt {
     struct Flags {
         static constexpr const int allow_suffix_reference = 1; // https://tools.ietf.org/html/rfc3986#section-4.5 uri may omit leading "SCHEME://"
         static constexpr const int query_param_semicolon  = 2; // query params are delimited by ';' instead of '&'
+        static constexpr const int allow_extended_chars   = 4; // non-RFC input: allow some unencoded chars in query string
     };
 
     template <class TYPE1, class TYPE2 = void> struct Strict;
@@ -252,7 +253,7 @@ struct URI : Refcnt {
 protected:
     SchemeInfo* scheme_info;
 
-    virtual void parse (const string& uristr);
+    virtual void parse (const string&);
 
     static SchemeInfo* get_scheme_info (const std::type_info*);
 
@@ -305,6 +306,9 @@ private:
         size_t final_size = encode_uri_component(src, buf, unsafe);
         dest.length(dest.length() + final_size);
     }
+
+    bool _parse     (const string&, bool&);
+    bool _parse_ext (const string&, bool&);
 };
 
 using URISP = iptr<URI>;

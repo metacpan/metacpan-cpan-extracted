@@ -1,5 +1,9 @@
 Revision history for Math-AnyNum
 
+0.36    2020-11-22
+
+        - Make a copy of Math::{GMPz,GMPq,MPC,MPFR} objects when passed to Math::AnyNum->new().
+
 0.35    2020-09-13
 
         [ADDITIONS]

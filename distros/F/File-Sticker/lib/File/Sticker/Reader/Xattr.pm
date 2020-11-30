@@ -1,12 +1,12 @@
 package File::Sticker::Reader::Xattr;
-$File::Sticker::Reader::Xattr::VERSION = '1.01';
+$File::Sticker::Reader::Xattr::VERSION = '1.0603';
 =head1 NAME
 
 File::Sticker::Reader::Xattr - read and standardize meta-data from ExtAttr file
 
 =head1 VERSION
 
-version 1.01
+version 1.0603
 
 =head1 SYNOPSIS
 
@@ -40,6 +40,17 @@ Used for debugging info
 sub whoami  { ( caller(1) )[3] }
 
 =head1 METHODS
+
+=head2 priority
+
+The priority of this reader.  Readers with higher priority get tried first.
+
+=cut
+
+sub priority {
+    my $class = shift;
+    return 0;
+} # priority
 
 =head2 allowed_file
 

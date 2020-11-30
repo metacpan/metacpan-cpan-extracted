@@ -1,24 +1,28 @@
 /*
   Copyright 2015-2016 David Anderson. All rights reserved.
 
-  This program is free software; you can redistribute it and/or modify it
-  under the terms of version 2 of the GNU General Public License as
-  published by the Free Software Foundation.
+  This program is free software; you can redistribute it and/or
+  modify it under the terms of version 2 of the GNU General
+  Public License as published by the Free Software Foundation.
 
-  This program is distributed in the hope that it would be useful, but
-  WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  This program is distributed in the hope that it would be
+  useful, but WITHOUT ANY WARRANTY; without even the implied
+  warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+  PURPOSE.
 
-  Further, this software is distributed without any warranty that it is
-  free of the rightful claim of any third person regarding infringement
-  or the like.  Any license provided herein, whether implied or
-  otherwise, applies only to this software file.  Patent licenses, if
-  any, provided herein do not apply to combinations of this program with
-  other software, or any other product whatsoever.
+  Further, this software is distributed without any warranty
+  that it is free of the rightful claim of any third person
+  regarding infringement or the like.  Any license provided
+  herein, whether implied or otherwise, applies only to this
+  software file.  Patent licenses, if any, provided herein
+  do not apply to combinations of this program with other
+  software, or any other product whatsoever.
 
-  You should have received a copy of the GNU General Public License along
-  with this program; if not, write the Free Software Foundation, Inc., 51
-  Franklin Street - Fifth Floor, Boston MA 02110-1301, USA.
+  You should have received a copy of the GNU General Public
+  License along with this program; if not, write the Free
+  Software Foundation, Inc., 51 Franklin Street - Fifth Floor,
+  Boston MA 02110-1301, USA.
+
 */
 
 #include "globals.h"
@@ -27,6 +31,7 @@
 #endif /* HAVE_STDINT_H */
 #include "dwarf_tsearch.h"
 #include "macrocheck.h"
+#include "esb.h"
 
 #define TRUE 1
 #define FALSE 0
@@ -53,6 +58,7 @@ static Dwarf_Unsigned macro_count_recs(void **base);
 
 #ifdef SELFTEST
 int failcount = 0;
+struct glflags_s glflags;
 #endif /* SELFTEST */
 
 
@@ -223,6 +229,7 @@ macro_walk_find_lowest(const void *nodep,const DW_VISIT  which,
     }
 }
 
+/* Never returns DW_DLV_ERROR */
 int
 get_next_unprinted_macro_offset(void **tree, Dwarf_Unsigned * off)
 {
@@ -289,9 +296,10 @@ qsort_compare(const void *lin, const void *rin)
     return 0;
 }
 
-void
+int
 print_macro_statistics(const char *name,void **tsbase,
-    Dwarf_Unsigned section_size)
+    Dwarf_Unsigned section_size,
+    UNUSEDARG Dwarf_Error * err)
 {
     Dwarf_Unsigned count = 0;
     Dwarf_Unsigned lowest = -1ll;
@@ -303,11 +311,11 @@ print_macro_statistics(const char *name,void **tsbase,
     Dwarf_Unsigned i = 0;
 
     if(! *tsbase) {
-        return;
+        return DW_DLV_NO_ENTRY;
     }
     count = macro_count_recs(tsbase);
     if (count < 1) {
-        return;
+        return DW_DLV_NO_ENTRY;
     }
     free(mac_as_array);
     mac_as_array = 0;
@@ -318,11 +326,13 @@ print_macro_statistics(const char *name,void **tsbase,
 #ifdef SELFTEST
         ++failcount;
 #endif
-        printf("  Macro checking ERROR %s: "
+        glflags.gf_count_major_errors++;
+        printf("\nERROR:  Macro checking %s: "
             "unable to allocate %" DW_PR_DUu "pointers\n",
             name,
             count);
-        return;
+        /*  Return OK so dwarfdump.c won't look for Dwarf_Error */
+        return DW_DLV_OK;
     }
     dwarf_twalk(*tsbase,macro_walk_to_array);
     printf("  Macro unit count %s: %" DW_PR_DUu "\n",name,count);
@@ -353,9 +363,10 @@ print_macro_statistics(const char *name,void **tsbase,
 #ifdef SELFTEST
             ++failcount;
 #endif
-            printf(" ERROR: For offset 0x%" DW_PR_XZEROS DW_PR_DUx
+            glflags.gf_count_major_errors++;
+            printf("\nERROR: For offset 0x%" DW_PR_XZEROS DW_PR_DUx
                 " %" DW_PR_DUu
-                " there is a primary count of "
+                " there is a primary reference count of "
                 "0x%"  DW_PR_XZEROS DW_PR_DUx
                 " %"  DW_PR_DUu "\n",
                 r->mp_key,
@@ -367,7 +378,8 @@ print_macro_statistics(const char *name,void **tsbase,
 #ifdef SELFTEST
             ++failcount;
 #endif
-            printf(" ERROR: For offset 0x%" DW_PR_XZEROS DW_PR_DUx
+            glflags.gf_count_major_errors++;
+            printf("\nERROR: For offset 0x%" DW_PR_XZEROS DW_PR_DUx
                 " %" DW_PR_DUu
                 " there is a nonzero primary count of "
                 "0x%"  DW_PR_XZEROS DW_PR_DUx
@@ -406,6 +418,7 @@ print_macro_statistics(const char *name,void **tsbase,
 #ifdef SELFTEST
             ++failcount;
 #endif
+            glflags.gf_count_major_errors++;
             printf(" ERROR: For offset 0x%" DW_PR_XZEROS DW_PR_DUx
                 " %" DW_PR_DUu
                 " there is a crazy overlap with the previous end offset of "
@@ -455,6 +468,7 @@ print_macro_statistics(const char *name,void **tsbase,
     free (mac_as_array);
     mac_as_array = 0;
     mac_as_array_next = 0;
+    return DW_DLV_OK;
 }
 
 void
@@ -475,6 +489,7 @@ main()
     void * base = 0;
     Dwarf_Unsigned count = 0;
     int basefailcount = 0;
+    Dwarf_Error err = 0;
 
     /* Test 1 */
     add_macro_import(&base,TRUE,200);
@@ -483,7 +498,7 @@ main()
         printf("FAIL: expect count 1, got %" DW_PR_DUu "\n",count);
         ++failcount;
     }
-    print_macro_statistics("test1",&base,2000);
+    print_macro_statistics("test1",&base,2000,&err);
 
     /* Test two */
     add_macro_area_len(&base,200,100);
@@ -494,7 +509,7 @@ main()
         printf("FAIL: expect count 2, got %" DW_PR_DUu "\n",count);
         ++failcount;
     }
-    print_macro_statistics("test 2",&base,2000);
+    print_macro_statistics("test 2",&base,2000,&err);
     clear_macro_statistics(&base);
 
     /* Test three */
@@ -515,7 +530,7 @@ main()
     }
     printf("\n  Expect an ERROR about overlap with "
         "the end of section\n");
-    print_macro_statistics("test 3",&base,2000);
+    print_macro_statistics("test 3",&base,2000,&err);
     clear_macro_statistics(&base);
     if ((basefailcount+1) != failcount) {
         printf("FAIL: Found no error in test 3 checking!\n");
@@ -538,7 +553,7 @@ main()
         "  primaries"
         " and a secondary\n");
     printf( "  and Expect an ERROR about crazy overlap 60\n\n");
-    print_macro_statistics("test 4",&base,2000);
+    print_macro_statistics("test 4",&base,2000,&err);
     clear_macro_statistics(&base);
     if ((basefailcount + 3) != failcount) {
         printf("FAIL: Found wrong errors in test 4 checking!\n");

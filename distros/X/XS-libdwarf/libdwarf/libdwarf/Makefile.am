@@ -16,12 +16,14 @@ dwarf_alloc.h \
 dwarf_arange.c \
 dwarf_arange.h \
 dwarf_base_types.h \
+dwarf_crc32.c \
 dwarf_debuglink.c \
 dwarf_debuglink.h \
 dwarf_die_deliv.c \
 dwarf_die_deliv.h \
-dwarf_dnames.c \
-dwarf_dnames.h \
+dwarf_debug_names.c \
+dwarf_debug_names.h \
+dwarf_debug_sup.c \
 dwarf_dsc.c \
 dwarf_dsc.h \
 dwarf_elf_access.c \
@@ -44,6 +46,7 @@ dwarf_elfstructs.h \
 dwarf_errmsg_list.h \
 dwarf_error.c \
 dwarf_error.h \
+dwarf_fission_to_cu.c \
 dwarf_form.c \
 dwarf_frame.c \
 dwarf_frame.h \
@@ -55,6 +58,8 @@ dwarf_gdbindex.h \
 dwarf_generic_init.c \
 dwarf_global.c \
 dwarf_global.h \
+dwarf_gnu_index.h \
+dwarf_gnu_index.c \
 dwarf_groups.c \
 dwarf_harmless.c \
 dwarf_harmless.h \
@@ -66,7 +71,8 @@ dwarf_line.h \
 dwarf_line_table_reader_common.h \
 dwarf_loc.c \
 dwarf_loc.h \
-dwarf_loc2.h \
+dwarf_locationop_read.c \
+dwarf_loclists.c \
 dwarf_macho_loader.h \
 dwarf_machoread.c \
 dwarf_machoread.h \
@@ -89,6 +95,8 @@ dwarf_print_lines.c \
 dwarf_pubtypes.c \
 dwarf_query.c \
 dwarf_ranges.c \
+dwarf_rnglists.c \
+dwarf_rnglists.h \
 dwarf_reading.h \
 dwarf_reloc_386.h \
 dwarf_reloc_arm.h \
@@ -115,6 +123,7 @@ dwarf_weaks.c \
 dwarf_weaks.h \
 dwarf_xu_index.c \
 dwarf_xu_index.h \
+crc32.c \
 libdwarf.h \
 libdwarf_version.h \
 libdwarfdefs.h \
@@ -125,6 +134,7 @@ pro_alloc.c \
 pro_alloc.h \
 pro_arange.c \
 pro_arange.h \
+pro_debug_sup.c \
 pro_die.c \
 pro_die.h \
 pro_dnames.h \
@@ -240,6 +250,7 @@ mips_extensions.pdf  \
 dwgetopt.h \
 dwgetopt.c \
 CMakeLists.txt \
+cmake/libdwarf-config.cmake \
 libdwarf.h.in \
 testdebuglink.sh \
 generated_libdwarf.h.in \

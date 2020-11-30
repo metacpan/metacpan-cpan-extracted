@@ -59,6 +59,10 @@ if ($^O eq 'MSWin32') {
 } else {
 	ok(-e $timezone->directory(), "\$timezone->directory() returns the correct directory");
 }
+if (!$timezone->timezone()) {
+	$timezone->timezone('UTC');
+	diag("$^O does not have a default timezone, setting to " . $timezone->timezone());
+}
 ok($timezone->timezone() =~ /^\w+(?:\/[\w\-\/]+)?$/, "\$timezone->timezone() parses correctly");
 if ($timezone->location()) {
 	ok($timezone->area() . '/' . $timezone->location() eq $timezone->timezone(), "\$timezone->area() and \$timezone->location() contain the area and location of the current timezone");
@@ -69,7 +73,7 @@ ok((grep /^Australia$/, $timezone->areas()), "Found 'Australia' in \$timezone->a
 ok((grep /^Melbourne$/, $timezone->locations('Australia')), "Found 'Melbourne' in \$timezone->areas('Australia')");
 if ($^O eq 'MSWin32') {
 	diag("$^O comment for Australia/Melbourne is '" . Encode::encode('UTF-8', $timezone->comment('Australia/Melbourne'), 1) . "'");
-	ok($timezone->comment('Australia/Melbourne') =~ /^[(]GMT[+]10:00[)][ ]/smx, "\$timezone->comment('Australia/Melbourne') contains //^[(]GMT[+]10:00[)][ ]");
+	ok($timezone->comment('Australia/Melbourne') =~ /^[(](?:GMT|UTC)[+]10:00[)][ ]/smx, "\$timezone->comment('Australia/Melbourne') contains //^[(]GMT[+]10:00[)][ ]");
 } else {
 	ok($timezone->comment('Australia/Melbourne') =~ /Victoria/smx, "\$timezone->comment('Australia/Melbourne') contains /Victoria/");
 }
@@ -136,8 +140,16 @@ ok($revert_time <= $now, "\$timezone->time_local(\$timezone->local_time(\$now)) 
 
 $timezone->timezone("Australia/Melbourne");
 
-if ($^O ne 'MSWin32') {
+if (($^O eq 'linux') || ($^O =~ /bsd/)) {
 	ok($timezone->equiv("Australia/Hobart") && !$timezone->equiv("Australia/Perth") && !$timezone->equiv("Australia/Hobart", 0), "Successfully compared Melbourne to Perth and Hobart timezones");
+} else {
+	if (!$timezone->equiv("Australia/Hobart")) {
+		diag("$^O does not agree that Melbourne and Hobart time are the same from now on");
+	}
+	ok(!$timezone->equiv("Australia/Perth"), "Successfully compared Melbourne to Perth timezones");
+	if ($timezone->equiv("Australia/Hobart", 0)) {
+		diag("$^O does not agree that Melbourne and Hobart time have NOT been the same since the UNIX epoch");
+	}
 }
 Test::More::done_testing();
 

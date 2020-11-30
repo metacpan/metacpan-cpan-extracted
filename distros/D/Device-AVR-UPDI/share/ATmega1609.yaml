@@ -57,24 +57,9 @@ fusemap:
       - caption: 1.8 V
         name: BODLEVEL0
         value: 0
-      - caption: 2.1 V
-        name: BODLEVEL1
-        value: 32
       - caption: 2.6 V
         name: BODLEVEL2
         value: 64
-      - caption: 2.9 V
-        name: BODLEVEL3
-        value: 96
-      - caption: 3.3 V
-        name: BODLEVEL4
-        value: 128
-      - caption: 3.7 V
-        name: BODLEVEL5
-        value: 160
-      - caption: 4.0 V
-        name: BODLEVEL6
-        value: 192
       - caption: 4.2 V
         name: BODLEVEL7
         value: 224

@@ -2,7 +2,7 @@
 
 # Binance::API
 
-Perl module for interacting with the [Binance API](https://github.com/binance-exchange/binance-official-api-docs/blob/master/rest-api.mdl).
+Perl module for interacting with the [Binance API](https://github.com/binance-exchange/binance-official-api-docs/blob/master/rest-api.md).
 
 ### Requirements
 
@@ -86,6 +86,12 @@ Feel free to provide pull requests!
 Lari Taskula
 
 ## Tip jars
+
+This repository is maintained by a private individual. Binance is not financially
+involved in this project in any ways. Maintaining a GitHub repository can sometimes
+be a time consuming process and the maintainers need beer to keep up the good work.
+
+You can donate a beer or more here
 
 * BNB: 0x28226081c6d662cf10662403cf0d8af8a2a9f104
 * BTC: 1786L4tQ3uYw3CFUaayAiZB6zsfzQ27i4f

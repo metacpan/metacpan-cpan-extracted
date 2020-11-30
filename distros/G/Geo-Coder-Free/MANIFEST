@@ -29,13 +29,11 @@ lib/Geo/Coder/Free/Local.pm
 lib/Geo/Coder/Free/MaxMind.pm
 lib/Geo/Coder/Free/MaxMind/databases/MAXMIND.LICENCE
 lib/Geo/Coder/Free/OpenAddresses.pm
-lib/Geo/Coder/Free/OpenAddresses/databases/codes.txt
-lib/Geo/Coder/Free/OpenAddresses/databases/counties.txt
-lib/Geo/Coder/Free/OpenAddresses/databases/states.txt
 lib/Geo/Coder/Free/Utils.pm
 LICENSE
 Makefile.PL
 MANIFEST			This list of files
+MANIFEST.SKIP
 README
 README.md
 t/00-load.t
@@ -47,6 +45,7 @@ t/cities.t
 t/coverage.t
 t/critic.t
 t/eol.t
+t/fixme.t
 t/gv.t
 t/kwalitee.t
 t/lib/MyLogger.pm

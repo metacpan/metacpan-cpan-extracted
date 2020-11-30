@@ -12,6 +12,7 @@ use Music::Duration::Partition;
 my $max = shift || 8;   # Loop boundary
 my $bpm = shift || 100; # Beats per minute
 
+# List the known fills
 my @fills = (
     \&fill_1,
     \&fill_2,

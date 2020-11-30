@@ -61,7 +61,7 @@
    "provides" : {
       "File::ShouldUpdate" : {
          "file" : "lib/File/ShouldUpdate.pm",
-         "version" : "v0.0.1"
+         "version" : "v0.2.0"
       }
    },
    "release_status" : "stable",
@@ -76,7 +76,7 @@
          "web" : "https://github.com/shlomif/perl-File-ShouldUpdate"
       }
    },
-   "version" : "0.0.1",
+   "version" : "0.2.0",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.032000"

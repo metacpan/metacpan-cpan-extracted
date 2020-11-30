@@ -22,7 +22,7 @@ name: File-ShouldUpdate
 provides:
   File::ShouldUpdate:
     file: lib/File/ShouldUpdate.pm
-    version: v0.0.1
+    version: v0.2.0
 requires:
   Exporter: '0'
   Time::HiRes: '0'
@@ -34,7 +34,7 @@ resources:
   bugtracker: https://github.com/shlomif/perl-File-ShouldUpdate/issues
   homepage: http://metacpan.org/release/File-ShouldUpdate
   repository: git://github.com/shlomif/perl-File-ShouldUpdate.git
-version: 0.0.1
+version: 0.2.0
 x_Dist_Zilla:
   perl:
     version: '5.032000'

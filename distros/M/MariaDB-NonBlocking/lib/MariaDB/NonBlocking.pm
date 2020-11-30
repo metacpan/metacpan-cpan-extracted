@@ -17,7 +17,7 @@ MariaDB::NonBlocking - Nonblocking connections to MySQL using libmariadbclient
 
 =head1 VERSION
 
-Version 0.26
+Version 0.29
 
 =cut
 
@@ -25,7 +25,7 @@ use Exporter qw(import);
 use XSLoader qw();
 
 BEGIN {
-    our $VERSION = '0.26';
+    our $VERSION = '0.29';
     XSLoader::load(__PACKAGE__);
 };
 
@@ -264,7 +264,7 @@ sub DESTROY {
     my $pending_num = 0;
     if ( my $reject_cb = delete $self->{pending} ) {
         $pending_num++;
-        $reject_cb->("Connection object went away");
+        $reject_cb->("Connection object released before pending query was finished");
     }
     DEBUG && $pending_num && TELL "Had $pending_num operations still running when we were freed";
 }

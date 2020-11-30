@@ -283,6 +283,26 @@ TEST_CASE("FrameSender & Message builder", "[deflate-extension]") {
             auto it = messages_it.begin();
             REQUIRE(it->payload.empty());
         }
+
+        SECTION("compressed, empty, compressed") {
+            string sample = R""('{"cmd":"get","request":{"project_id":"62","data_filters":[],"limit":176,"visual_filters":[],"grid_filters":[],"conditions":{},"columns":[{"name":"deviceId","regexp":"deviceId:\\s+(.+?)\\n"}]}}{"cmd":"get","request":{"project_id":"62","data_filters":[],"limit":176,"visual_filters":[],"grid_filters":[],"conditions":{},"columns":[{"name":"deviceId","regexp":"deviceId:\\s+(.+?)\\n"}]}}{"cmd":"get","request":{"project_id":"62","data_filters":[],"limit":176,"visual_filters":[],"grid_filters":[],"conditions":{},"columns":[{"name":"deviceId","regexp":"deviceId:\\s+(.+?)\\n"}]}}{"cmd":"get","request":{"project_id":"62","data_filters":[],"limit":176,"visual_filters":[],"grid_filters":[],"conditions":{},"columns":[{"name":"deviceId","regexp":"deviceId:\\s+(.+?)\\n"}]}}{"cmd":"get","request":{"project_id":"62","data_filters":[],"limit":176,"visual_filters":[],"grid_filters":[],"conditions":{},"columns":[{"name":"deviceId","regexp":"deviceId:\\s+(.+?)\\n"}]}}{"cmd":"get","request":{"project_id":"62","data_filters":[],"limit":176,"visual_filters":[],"grid_filters":[],"conditions":{},"columns":[{"name":"deviceId","regexp":"deviceId:\\s+(.+?)\\n"}]}}{"cmd":"get","request":{"project_id":"62","data_filters":[],"limit":176,"visual_filters":[],"grid_filters":[],"conditions":{},"columns":[{"name":"deviceId","regexp":"deviceId:\\s+(.+?)\\n"}]}}{"cmd":"get","request":{"project_id":"62","data_filters":[],"limit":176,"visual_filters":[],"grid_filters":[],"conditions":{},"columns":[{"name":"deviceId","regexp":"deviceId:\\s+(.+?)\\n"}]}}')"";
+            string sample_orig = sample;
+
+            string empty;
+            auto data = server.message().opcode(Opcode::PING).send(empty);
+            auto data_string = to_string(data);
+            auto messages_it = client.get_messages(data_string);
+            REQUIRE(std::distance(messages_it.begin(), messages_it.end()) == 1);
+            REQUIRE(messages_it.begin()->payload.empty());
+
+            sample = sample_orig;
+            data = server.message().deflate(true).send(sample);
+            data_string = to_string(data);
+            //REQUIRE(data_string.length() < sample_orig.length()); // compressed
+            messages_it = client.get_messages(data_string);
+            REQUIRE(std::distance(messages_it.begin(), messages_it.end()) == 1);
+            REQUIRE(messages_it.begin()->payload[0] == sample_orig);
+        }
     }
 
     SECTION("empty compressed frame with zero payload") {

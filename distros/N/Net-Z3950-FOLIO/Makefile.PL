@@ -13,9 +13,9 @@ WriteMakefile(
 	MARC::Record => 2.0,
 	MARC::File::XML => 1.0.5,
 	Net::Z3950::ZOOM => 1.30,
-	URI::Escape => 3.31,
 	XML::Simple => 2.25,
 	Net::Z3950::PQF => 1.0,
+	Unicode::Diacritic::Strip => 0.13,
     },
     META_ADD => {
 	no_index => {
@@ -25,4 +25,19 @@ WriteMakefile(
     ($] >= 5.005 ?     ## Add these new keywords supported since 5.005
       (ABSTRACT_FROM  => 'lib/Net/Z3950/FOLIO.pm', # retrieve abstract from module
        AUTHOR         => 'Mike Taylor <mike@indexdata.com>') : ()),
+
+    (eval { ExtUtils::MakeMaker->VERSION(6.46) } ? (META_MERGE => {
+        'meta-spec' => { version => 2 },
+         resources => {
+             repository => {
+                 type => 'git',
+                 url  => 'https://github.com/folio-org/Net-Z3950-FOLIO.git',
+                 web  => 'https://github.com/folio-org/Net-Z3950-FOLIO',
+             },
+             bugtracker => {
+                 web => 'https://issues.folio.org/projects/ZF/issues',
+             },
+         }})
+         : ()
+    ),
 );

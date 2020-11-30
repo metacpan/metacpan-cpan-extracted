@@ -6,7 +6,7 @@ use warnings;
 use Stream::Buffered;
 use Module::Load;
 
-our $VERSION = "0.24";
+our $VERSION = "0.25";
 
 our $BUFFER_LENGTH = 65536;
 
@@ -44,11 +44,7 @@ sub parse {
     my ($self, $env) = @_;
 
     my $buffer_length = $self->[1];
-    my $ct = $env->{CONTENT_TYPE};
-    if (!$ct) {
-        # No Content-Type
-        return ([], []);
-    }
+    my $ct = $env->{CONTENT_TYPE} || '';
 
     my $parser;
     for my $handler (@{$self->[0]}) {

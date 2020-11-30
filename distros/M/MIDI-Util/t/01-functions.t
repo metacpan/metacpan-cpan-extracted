@@ -71,4 +71,13 @@ is $x->[-1], 'raw_data', 'nontext_meta_events';
 my @notes = MIDI::Util::midi_format('C','C#','Db','D'); # C, Cs, Df, D
 is_deeply \@notes, [qw/C Cs Df D/], 'midi_format';
 
+@notes = MIDI::Util::add_octave(4, qw(C E G));
+is_deeply \@notes, [qw/C4 E4 G4/], 'add_octave';
+
+@notes = MIDI::Util::add_octave(4, qw(E G C));
+is_deeply \@notes, [qw/E4 G4 C5/], 'add_octave';
+
+@notes = MIDI::Util::add_octave(4, qw(G C E));
+is_deeply \@notes, [qw/G4 C5 E5/], 'add_octave';
+
 done_testing();

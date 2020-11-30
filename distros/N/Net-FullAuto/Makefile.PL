@@ -26,7 +26,7 @@
 ################################################################
 
 
-our $VERSION='1.0000541';
+our $VERSION='1.0000543';
 
 
 if ($ENV{'AUTOMATED_TESTING'}) {
@@ -1865,7 +1865,7 @@ if ($^O ne 'MSWin32' && $^O ne 'MSWin64') {
    &fa_install_module('ExtUtils::Helpers','install','Makefile');
    &fa_install_module('Test::Harness','install','Makefile','','3.33');
    &fa_install_module('Module::Build::Tiny','install','Build');
-   &fa_install_module('IO::Socket::IP','install','Makefile');
+   &fa_install_module('IO::Socket::IP','install','Build');
    &fa_install_module('Test::Needs','install','Makefile');
    if ($^O ne 'cygwin'
          || grep { /-*add[-_]?dependencies/i } @ARGV) {

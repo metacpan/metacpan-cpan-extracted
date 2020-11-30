@@ -21,6 +21,10 @@ examples/microdotphat/tiny_font.pl
 examples/microdotphat/vertical_text.pl
 examples/mihome.pl
 examples/pantilt.pl
+examples/seesaw/info.pl
+examples/seesaw/interrupt.pl
+examples/seesaw/neopixel.pl
+examples/seesaw/pwm.pl
 Exec.xs
 GPIO.xs
 I2C.xs
@@ -170,6 +174,7 @@ lib/HiPi/Interface/MS5611.pm
 lib/HiPi/Interface/PCA9544.pm
 lib/HiPi/Interface/PCA9685.pm
 lib/HiPi/Interface/PCF8574.pm
+lib/HiPi/Interface/Seesaw.pm
 lib/HiPi/Interface/SerLCD.pm
 lib/HiPi/Interface/Si470N.pm
 lib/HiPi/Interface/TMP102.pm

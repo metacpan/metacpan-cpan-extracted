@@ -49,14 +49,20 @@ my %module = (
     PREREQ_PM => {
         'Carp'         => 0,
         'Filter::signatures' => 0,
-        'Net::Fritz'   => 0,
-        'Moo'          => 2,
-        'PerlX::Maybe' => 0,
+        'Net::Fritz'      => 0,
+        'Net::Fritz::Box' => 0, # supplied by Net::Fritz
+        'XML::Simple'     => 0, # implied by Net::Fritz
+        'Moo'             => 2,
+        'PerlX::Maybe'    => 0,
+        'URI::URL'        => 0,
     },
     TEST_REQUIRES => {
         'Test::More'   => 0,
         'Data::Dumper' => 0,
         'charnames'    => 0,
+        'Encode'       => 0,
+        'Net::CardDAVTalk' => 0,
+        'Net::CardDAVTalk::VCard' => 0,
     },
 
     dist                => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },

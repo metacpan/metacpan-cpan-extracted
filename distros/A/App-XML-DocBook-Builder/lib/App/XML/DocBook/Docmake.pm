@@ -1,5 +1,5 @@
 package App::XML::DocBook::Docmake;
-$App::XML::DocBook::Docmake::VERSION = '0.1002';
+$App::XML::DocBook::Docmake::VERSION = '0.1003';
 use 5.014;
 use strict;
 use warnings;
@@ -27,6 +27,9 @@ use Class::XSAccessor {
             )
     ]
 };
+
+use Test::Trap
+    qw( trap $trap :flow:stderr(systemsafe):stdout(systemsafe):warn );
 
 
 my %modes = (
@@ -163,16 +166,40 @@ sub _init
 
 sub _exec_command
 {
-    my ( $self, $cmd ) = @_;
+    my ( $self, $args ) = @_;
+
+    my $cmd = $args->{cmd};
 
     if ( $self->_verbose() )
     {
         print( join( " ", @$cmd ), "\n" );
     }
 
-    if ( system(@$cmd) )
+    my $exit_code;
+    trap
     {
-        die qq/<<@$cmd>> failed./;
+        local $ENV{LC_ALL} = "C.utf-8";
+        $exit_code = system(@$cmd);
+    };
+
+    my $stderr = $trap->stderr();
+
+    if ( not( ( defined($exit_code) ) and ( !$exit_code ) ) )
+    {
+        if ( $stderr =~ m#Attempt to load network entity# )
+        {
+            if ( $args->{xsltproc} )
+            {
+                die <<"EOF";
+Running xsltproc failed due to lacking local DocBook 5/XSL stylesheets and data.
+See: https://github.com/shlomif/fortune-mod/issues/45 and
+https://github.com/docbook/wiki/wiki/DocBookXslStylesheets
+
+Command was <<@$cmd>>;
+EOF
+            }
+        }
+        die qq/$stderr\n<<@$cmd>> failed./;
     }
 
     return 0;
@@ -359,17 +386,21 @@ sub _pre_proc_command
     my $input_file  = $args->{input};
     my $output_file = $args->{output};
     my $template    = $args->{template};
+    my $xsltproc    = ( $args->{xsltproc} // ( die "no xsltproc key" ) );
 
-    return [
-        map {
-                  ( ref($_) eq '' ) ? $_
-                : $_->is_output()   ? $output_file
-                : $_->is_input()    ? $input_file
+    return +{
+        xsltproc => $xsltproc,
+        cmd      => [
+            map {
+                      ( ref($_) eq '' ) ? $_
+                    : $_->is_output()   ? $output_file
+                    : $_->is_input()    ? $input_file
 
-                # Not supposed to happen
-                : do { die "Unknown Argument in Command Template."; }
-        } @$template
-    ];
+                    # Not supposed to happen
+                    : do { die "Unknown Argument in Command Template."; }
+            } @$template
+        ]
+    };
 }
 
 sub _run_input_output_cmd
@@ -456,6 +487,7 @@ sub _run_xslt
         {
             input => $self->_input_path(),
             $self->_on_output( '_calc_output_params', $args ),
+            xsltproc => 1,
             template => [
                 "xsltproc",
                 "--nonet",
@@ -501,6 +533,7 @@ sub _run_xslt_and_from_fo
                 "fop", ( "-" . $args->{fo_out_format} ),
                 $self->_output_cmd_comp(), $self->_input_cmd_comp(),
             ],
+            xsltproc => 0,
         },
     );
 }
@@ -552,7 +585,7 @@ sub _output_cmd_comp
 }
 
 package App::XML::DocBook::Docmake::CmdComponent;
-$App::XML::DocBook::Docmake::CmdComponent::VERSION = '0.1002';
+$App::XML::DocBook::Docmake::CmdComponent::VERSION = '0.1003';
 use Class::XSAccessor {
     accessors => [
 
@@ -586,7 +619,7 @@ App::XML::DocBook::Docmake - translate DocBook/XML to other formats
 
 =head1 VERSION
 
-version 0.1002
+version 0.1003
 
 =head1 SYNOPSIS
 

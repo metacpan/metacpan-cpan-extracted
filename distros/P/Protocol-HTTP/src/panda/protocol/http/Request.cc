@@ -15,14 +15,14 @@ static const bool _inited = _init();
 static inline string _method_str (Request::Method rm) {
     using Method = Request::Method;
     switch (rm) {
-        case Method::OPTIONS : return "OPTIONS";
-        case Method::GET     : return "GET";
-        case Method::HEAD    : return "HEAD";
-        case Method::POST    : return "POST";
-        case Method::PUT     : return "PUT";
-        case Method::DELETE  : return "DELETE";
-        case Method::TRACE   : return "TRACE";
-        case Method::CONNECT : return "CONNECT";
+        case Method::Options : return "OPTIONS";
+        case Method::Get     : return "GET";
+        case Method::Head    : return "HEAD";
+        case Method::Post    : return "POST";
+        case Method::Put     : return "PUT";
+        case Method::Delete  : return "DELETE";
+        case Method::Trace   : return "TRACE";
+        case Method::Connect : return "CONNECT";
         default: return "[UNKNOWN]";
     }
 }
@@ -44,16 +44,16 @@ string Request::_generate_boundary() noexcept {
 }
 
 Request::Method Request::method() const noexcept {
-    if (_method == Method::unspecified) {
-        bool use_post = (form && form.enc_type() == EncType::MULTIPART && (!form.empty() || (uri && !uri->query().empty()))) // complete form
-                     || _form_streaming != FormStreaming::none;
-        return use_post ? Method::POST : Method::GET;
+    if (_method == Method::Unspecified) {
+        bool use_post = (form && form.enc_type() == EncType::Multipart && (!form.empty() || (uri && !uri->query().empty()))) // complete form
+                     || _form_streaming != FormStreaming::None;
+        return use_post ? Method::Post : Method::Get;
     }
     return _method;
 }
 
 static inline bool _method_has_meaning_for_body (Request::Method method) {
-    return method == Request::Method::POST || method == Request::Method::PUT;
+    return method == Request::Method::Post || method == Request::Method::Put;
 }
 
 string Request::_http_header (SerializationContext& ctx) const {
@@ -186,10 +186,10 @@ string Request::_http_header (SerializationContext& ctx) const {
 
 std::vector<string> Request::to_vector () const {
     SerializationContext ctx;
-    if (_form_streaming != FormStreaming::none && _form_streaming != FormStreaming::started)
+    if (_form_streaming != FormStreaming::None && _form_streaming != FormStreaming::Started)
         throw "form streaming wasn't finished";
 
-    bool form_streaming =  _form_streaming == FormStreaming::started;
+    bool form_streaming =  _form_streaming == FormStreaming::Started;
     /* it seems nobody supports muliptart + gzip + chunk */
     ctx.compression = !form_streaming ? compression.type : Compression::Type::IDENTITY;
     ctx.body        = &body;
@@ -205,7 +205,7 @@ std::vector<string> Request::to_vector () const {
     Body form_body;
     URI form_uri;
     if (form) {
-        if (form.enc_type() == EncType::MULTIPART) {
+        if (form.enc_type() == EncType::Multipart) {
             if (!form.empty() || (uri && !uri->query().empty())) {
                 auto boundary = form_streaming ? _form_boundary : _generate_boundary();
                 ctx.uri  = form.to_body(form_body, form_uri, uri, boundary);
@@ -215,7 +215,7 @@ std::vector<string> Request::to_vector () const {
                 add_form_header(_form_boundary);
             }
         }
-        else if((form.enc_type() == EncType::URLENCODED) && !form.empty()) {
+        else if((form.enc_type() == EncType::UrlEncoded) && !form.empty()) {
             form.to_uri(form_uri, uri);
             ctx.uri = &form_uri;
         }
@@ -365,7 +365,7 @@ template<> struct Helper<tag::uri> {
 };
 
 void Request::form_file_finalize(string& out) noexcept {
-    if (_form_streaming == FormStreaming::file) {
+    if (_form_streaming == FormStreaming::File) {
         if (compressor) {
             out += compressor->flush();
             compressor.reset();
@@ -376,20 +376,20 @@ void Request::form_file_finalize(string& out) noexcept {
 
 
 Request::wrapped_chunk Request::form_finish() {
-    if (_form_streaming == FormStreaming::none) throw "form streaming was not started";
-    if (_form_streaming == FormStreaming::done) throw "form streaming already complete";
+    if (_form_streaming == FormStreaming::None) throw "form streaming was not started";
+    if (_form_streaming == FormStreaming::Done) throw "form streaming already complete";
 
     string data;
     form_file_finalize(data);
     data += form_trailer(_form_boundary);
-    _form_streaming = FormStreaming::done;
+    _form_streaming = FormStreaming::Done;
     return final_chunk(data);
 }
 
 Request::wrapped_chunk Request::form_field(const string& name, const string& content, const string& filename, const string& mime_type) {
     using H = Helper<tag::form>;
-    if (_form_streaming == FormStreaming::none) throw "form streaming was not started";
-    if (_form_streaming == FormStreaming::done) throw "form streaming already complete";
+    if (_form_streaming == FormStreaming::None) throw "form streaming was not started";
+    if (_form_streaming == FormStreaming::Done) throw "form streaming already complete";
 
     string data;
     form_file_finalize(data);
@@ -399,12 +399,12 @@ Request::wrapped_chunk Request::form_field(const string& name, const string& con
 
 Request::wrapped_chunk Request::form_file(const string& name, const string filename, const string& mime_type) {
     using H = Helper<tag::form>;
-    if (_form_streaming == FormStreaming::none) throw "form streaming was not started";
-    if (_form_streaming == FormStreaming::done) throw "form streaming already complete";
+    if (_form_streaming == FormStreaming::None) throw "form streaming was not started";
+    if (_form_streaming == FormStreaming::Done) throw "form streaming already complete";
 
     string data;
     form_file_finalize(data);
-    _form_streaming = FormStreaming::file;
+    _form_streaming = FormStreaming::File;
 
     H::append(data, H::PatrialField{name, mime_type, filename, false}, _form_boundary);
     data += "\r\n";
@@ -413,7 +413,7 @@ Request::wrapped_chunk Request::form_file(const string& name, const string filen
 }
 
 Request::wrapped_chunk Request::form_data(const string& content) {
-    if (_form_streaming != FormStreaming::file) throw "form file streaming was not started";
+    if (_form_streaming != FormStreaming::File) throw "form file streaming was not started";
     return make_chunk(content);
 }
 

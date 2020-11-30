@@ -4,15 +4,17 @@ PerlX::Let - Syntactic sugar for lexical state constants
 
 # VERSION
 
-version v0.2.7
+version v0.2.8
 
 # SYNOPSIS
 
 ```perl
 use PerlX::Let;
 
-let $x = 1,
-    $y = "string" {
+{
+
+    let $x = 1;
+    let $y = "string";
 
     if ( ($a->($y} - $x) > ($b->{$y} + $x) )
     {
@@ -36,7 +38,8 @@ if (defined $arg{username}) {
 is liable to typos. You could simplify it with
 
 ```perl
-let $key = "username" {
+{
+    let $key = "username";
 
     if (defined $arg{$key}) {
         $row->update( { $key => $arg{$key} );
@@ -69,7 +72,6 @@ use Const::Fast ();
 
 However, if the value contains a sigil, or (for versions of Perl
 before 5.28) the value is not a scalar, then this uses a my variable
-variable
 
 ```perl
 use Const::Fast ();
@@ -88,18 +90,31 @@ variable as read-only, particularly for deeper data structures.
 However, the tradeoff for using this is that the variables remain
 allocated until the process exits.
 
-If the code block is omitted, then this can be used to declare a
-state constant in the current scope, e.g.
+# DEPRECATED SYNTAX
+
+Adding a code block after the let assignment is deprecated:
 
 ```
-let $x = "foo";
-
-say $x;
+let $x = "foo" {
+  ...
+}
 ```
 
-Note that this may enable the state [feature](https://metacpan.org/pod/feature) in the current scope.
+Instead, put the assignment inside of the block.
+
+Specifying multiple assignments is also deprecated:
+
+```
+let $x = "foo",
+    $y = "bar";
+```
+
+Instead, use multiple let statements.
 
 # KNOWN ISSUES
+
+A let assignment will enable the state feature inside of the current
+context.
 
 The parsing of assignments is rudimentary, and may fail when assigning
 to another variable or the result of a function.  Because of this,

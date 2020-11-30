@@ -1,3 +1,9 @@
+0.1003  2020-11-26
+    - Try to handle the lack of local DocBook 5/XSL resources more gracefully.
+        - https://github.com/shlomif/fortune-mod/issues/45
+        - New testing and runtime dep: https://metacpan.org/pod/Test::Trap
+        - Thanks to @Vonfry for the report.
+
 0.1002  2020-10-13
     - Remove leftover old POD sections.
 

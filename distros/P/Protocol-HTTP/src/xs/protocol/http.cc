@@ -28,7 +28,7 @@ static inline void msgfill (Message* m, const Hash& h) {
 static Request::EncType get_encoding(const Sv& sv) {
     using Type = Request::EncType;
     int val = SvIV(sv);
-    if (val < (int)Type::MULTIPART || val > (int)Type::URLENCODED) throw "invalid form encoding";
+    if (val < (int)Type::Multipart || val > (int)Type::UrlEncoded) throw "invalid form encoding";
     return (Type)val;
 }
 
@@ -66,7 +66,7 @@ void fill_form(Request* req, const Sv& sv) {
     auto& form = req->form;
     if (sv.is_hash_ref()) {
         Hash h(sv);
-        Request::EncType type = h.exists("enc_type") ? get_encoding(h.fetch("enc_type")) : Request::EncType::MULTIPART;
+        Request::EncType type = h.exists("enc_type") ? get_encoding(h.fetch("enc_type")) : Request::EncType::Multipart;
         Sv fields;
         if ((fields = h.fetch("fields"))) {
             Array arr(fields);
@@ -76,7 +76,7 @@ void fill_form(Request* req, const Sv& sv) {
     }
     else if (sv.is_array_ref()) {
         Array arr(sv);
-        fill(form, arr, Request::EncType::MULTIPART);
+        fill(form, arr, Request::EncType::Multipart);
     }
     else form.enc_type(get_encoding(sv));
 }
@@ -120,7 +120,7 @@ void set_headers (Message* p, const Hash& hv) {
 void set_method (Request* req, const Sv& method) {
     using Method = Request::Method;
     int num = SvIV_nomg(method);
-    if (num < (int)Method::OPTIONS || num > (int)Method::CONNECT) throw panda::exception("invalid http method");
+    if (num < (int)Method::Options || num > (int)Method::Connect) throw panda::exception("invalid http method");
     req->method_raw((Method)num);
 }
 

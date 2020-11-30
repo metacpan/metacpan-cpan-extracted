@@ -1,0 +1,30 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+
+use Data::Dumper::Compact 'ddc';
+use MIDI::Simple;
+use Music::Duration::Partition;
+use Music::Scales;
+
+my $mdp = Music::Duration::Partition->new(
+  size    => 8,
+  pool    => [qw(hn qn ten)],
+  groups  => [0, 0, 3],
+  verbose => 1,
+);
+
+my $motif = $mdp->motif;
+warn(__PACKAGE__,' ',__LINE__," MARK: ",ddc($motif));
+
+my @scale = get_scale_MIDI('C', 4, 'major');
+
+my $score = MIDI::Simple->new_score;
+
+for my $n (0 .. $#$motif * 8 - 1) {
+    $score->n($motif->[$n % @$motif], $scale[int rand @scale]);
+}
+
+$score->n('wn', $scale[0]);
+
+$score->write_score("$0.mid");

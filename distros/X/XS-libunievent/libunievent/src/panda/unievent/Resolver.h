@@ -140,6 +140,8 @@ private:
 
         void handle_poll (int, const std::error_code&) override;
 
+        void rethrow_exception ();
+
         using Polls = std::map<sock_t, BPoll*>;
 
         Resolver*          resolver;

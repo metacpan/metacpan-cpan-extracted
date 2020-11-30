@@ -71,7 +71,7 @@ query($cql: String, $offset: Int, $limit: Int) {
         }
         formerIds
         # No need to loop back to holdingsInstance
-        holdingsItems {
+        bareHoldingsItems {
           accessionNumber
           barcode
           chronology
@@ -98,6 +98,12 @@ query($cql: String, $offset: Int, $limit: Int) {
           itemLevelCallNumberPrefix
           itemLevelCallNumberSuffix
           itemLevelCallNumberTypeId
+          materialTypeId
+          materialType {
+            id
+            name
+            source
+          }
           metadata {
             createdByUserId
             createdByUsername

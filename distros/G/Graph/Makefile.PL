@@ -20,6 +20,7 @@ if ($] >= 5.008) {
     $PREREQ_PM{'Safe'	 } = 0,
 }
 
+my $repo = 'graphviz-perl/Graph';
 WriteMakefile(
     NAME            => 'Graph',
     VERSION_FROM    => 'lib/Graph.pm',
@@ -41,11 +42,11 @@ WriteMakefile(
         : (META_MERGE => {
             'meta-spec' => { version => 2 },
             resources => {
-                bugtracker  => { web => 'https://github.com/neilb/Graph/issues' },
+                bugtracker  => { web => "https://github.com/$repo/issues" },
                 repository  => {
                     type => 'git',
-                    web  => 'https://github.com/neilb/Graph',
-                    url  => 'git://github.com/neilb/Graph.git',
+                    web  => "https://github.com/$repo",
+                    url  => "git://github.com/$repo.git",
                 },
             },
             prereqs => {
@@ -59,6 +60,9 @@ WriteMakefile(
                     requires => {
                         'Test::More'	=> '0.82', # explain
                         'Math::Complex'	=> 0,
+                    },
+                    recommends => {
+                        'App::Prove' => '3.00', # prove -j4
                     },
                 },
             },

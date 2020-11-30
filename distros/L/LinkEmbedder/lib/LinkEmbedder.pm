@@ -11,7 +11,7 @@ use constant TLS => eval { require IO::Socket::SSL; IO::Socket::SSL->VERSION('2.
 
 use constant DEBUG => $ENV{LINK_EMBEDDER_DEBUG} || 0;
 
-our $VERSION = '1.14';
+our $VERSION = '1.15';
 
 my $PROTOCOL_RE = qr!^(\w+):\w+!i;    # Examples: mail:, spotify:, ...
 
@@ -30,6 +30,7 @@ has url_to_link => sub {
     'imgur.com'          => 'LinkEmbedder::Link::Imgur',
     'instagram.com'      => 'LinkEmbedder::Link::Instagram',
     'ix.io'              => 'LinkEmbedder::Link::Ix',
+    'meet.jit.si'        => 'LinkEmbedder::Link::Jitsi',
     'metacpan.org'       => 'LinkEmbedder::Link::Metacpan',
     'nhl.com'            => 'LinkEmbedder::Link::NHL',
     'paste.opensuse.org' => 'LinkEmbedder::Link::OpenSUSE',

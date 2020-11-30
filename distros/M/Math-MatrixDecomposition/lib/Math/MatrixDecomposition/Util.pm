@@ -12,17 +12,31 @@ package Math::MatrixDecomposition::Util;
 use strict;
 use warnings;
 use Exporter qw(import);
-use POSIX qw(DBL_EPSILON fmod);
+use POSIX qw(fmod);
 
 BEGIN
 {
-  our $VERSION = '1.03';
+  our $VERSION = '1.04';
   our @EXPORT_OK = qw(eps mod min max sign hypot cdiv);
   our %EXPORT_TAGS = (all => [@EXPORT_OK]);
 }
 
 # Machine precision.
-*eps = \&DBL_EPSILON;
+my $epsilon = 1.0;
+
+*eps = sub () { $epsilon; };
+
+INIT
+{
+  my $tem;
+
+  while (1)
+    {
+      $tem = 1.0 + $epsilon / 2.0;
+      last if $tem == 1.0;
+      $epsilon /= 2.0;
+    }
+}
 
 # Remainder of floating-point division.
 *mod = \&fmod;

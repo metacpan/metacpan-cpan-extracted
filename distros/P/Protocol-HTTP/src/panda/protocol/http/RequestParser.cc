@@ -1,5 +1,7 @@
 #include "RequestParser.h"
-#include "MessageParser.tcc"
+
+#define PARSER_DEFINITIONS_ONLY
+#include "MessageParser.cc"
 
 namespace panda { namespace protocol { namespace http {
 
@@ -18,19 +20,21 @@ RequestParser::Result RequestParser::parse (const string& buffer) {
         message = request;
     }
 
-    auto pos = MessageParser::parse(buffer,
-        [this] {
-            for (const auto& s : request->headers.get_multi("Cookie")) parse_cookie(s);
-            return true;
-        },
-        [this] {
-            state = State::done;
-            return false;
-        }
-   );
+    auto pos = MessageParser::_parse(buffer);
     Result ret = {request, pos, state, error};
     if (state >= State::done) reset();
     return ret;
 }
+
+bool RequestParser::on_headers    () {
+    for (const auto& s : request->headers.get_multi("Cookie")) parse_cookie(s);
+    return true;
+}
+
+bool RequestParser::on_empty_body () {
+    state = State::done;
+    return false;
+}
+
 
 }}}

@@ -4,13 +4,14 @@ use warnings;
 
 # ABSTRACT: hashes with predefined layouts, composite keys and default values
 
-our $VERSION = '1.02';
+our $VERSION = '2.00';
 
 use Moo;
 use Types::Standard qw(:all);
 use Scalar::Util qw(blessed looks_like_number);
 use Hash::Merge::Simple 'merge';
 use Clone;
+use Text::Glob qw( match_glob );
 
 use Hash::Layout::Level;
 
@@ -26,11 +27,13 @@ has 'allow_deep_values', is => 'ro', isa => Bool, default => sub { 1 };
 has 'deep_delimiter',    is => 'ro', isa => Str,  default => sub { '.' };
 has 'no_fill',           is => 'ro', isa => Bool, default => sub { 0 };
 has 'no_pad',            is => 'ro', isa => Bool, default => sub { 0 };
+has 'enable_globmatch',  is => 'ro', isa => Bool, default => sub { 0 };
 
 has 'lookup_mode', is => 'rw', isa => Enum[qw(get fallback merge)], 
   default => sub { 'merge' };
 
 has '_Hash', is => 'ro', isa => HashRef, default => sub {{}}, init_arg => undef;
+has '_Hash_fq_composite', is => 'ro', isa => HashRef, default => sub {{}}, init_arg => undef;
 has '_all_level_keys', is => 'ro', isa => HashRef, default => sub {{}}, init_arg => undef;
 
 # List of bitmasks representing every key path which includes
@@ -54,9 +57,11 @@ sub level_keys {
 # Clears the Hash of any existing data
 sub reset {
   my $self = shift;
-  %{$self->_Hash}             = ();
-  %{$self->_all_level_keys}   = ();
-  %{$self->_def_key_bitmasks} = ();
+  %{$self->_Hash}                 = ();
+  %{$self->_Hash_fq_composite}    = ();
+  %{$self->_all_level_keys}       = ();
+  %{$self->_def_key_bitmasks}     = ();
+  $self->{_lookup_path_globmatch} = {};
   return $self;
 }
 
@@ -131,8 +136,10 @@ sub lookup {
   return $self->lookup_path( $self->resolve_key_path($key_str) );
 }
 
+
 sub lookup_path {
   my ($self, @path) = @_;
+
    # lookup_path() is the same as get_path() when lookup_mode is 'get':
   return $self->get_path(@path) if ($self->lookup_mode eq 'get');
   
@@ -183,6 +190,29 @@ sub lookup_leaf_path {
   return (ref $v && ref($v) eq 'HASH' && scalar(keys %$v) > 0) ? undef : $v; 
 }
 
+sub _lookup_path_globmatch {
+  my $self = shift;
+  $self->enable_globmatch ? $self->lookup_path_globmatch(@_) : undef
+}
+
+sub lookup_path_globmatch {
+  my ($self, @path) = @_;
+  my $key_str = scalar(@path) == 1 ? $path[0] : $self->path_to_composite_key(@path);
+  $self->{_lookup_path_globmatch}{$key_str} //= do {
+    my $value = undef;
+    for my $c_key (keys %{$self->_Hash_fq_composite}) {
+      local $Text::Glob::strict_wildcard_slash = 0;
+      if(match_glob($c_key,$key_str)) {
+        $value = $self->_Hash_fq_composite->{$c_key};
+        last
+      }
+    }
+    $value
+  }
+}
+
+
+
 sub get {
   my ($self, $key_str, @addl) = @_;
   return undef unless (defined $key_str);
@@ -193,6 +223,8 @@ sub get {
   return $self->get_path( $self->resolve_key_path($key_str) );
 }
 
+
+
 sub get_path {
   my ($self, @path) = @_;
   return undef unless (defined $path[0]);
@@ -201,7 +233,7 @@ sub get_path {
   my $ev_path = $self->_as_eval_path(@path);
   eval join('','$value = $self->Data->',$ev_path);
   
-  return $value;
+  $value || $self->_lookup_path_globmatch(@path)
 }
 
 sub exists {
@@ -219,7 +251,8 @@ sub exists_path {
   return 0 unless (defined $path[0]);
 
   my $ev_path = $self->_as_eval_path(@path);
-  return eval join('','exists $self->Data->',$ev_path);
+  return 1 if (eval join('','exists $self->Data->',$ev_path));
+  $self->_lookup_path_globmatch(@path) ? 1 : 0
 }
 
 sub delete {
@@ -299,11 +332,15 @@ sub _enumerate_default_paths {
 
 sub load {
   my $self = shift;
-  return $self->_load(0,$self->_Hash,@_);
+
+  $self->_load(0,$self->_Hash,@_);
 }
 
 sub _load {
   my ($self, $index, $noderef, @args) = @_;
+  
+  local $self->{_fq_composite_prefix} = $self->{_fq_composite_prefix} || undef;
+  $self->{_fq_composite_prefix} = '' if ($index == 0);
   
   my $Lvl = $self->levels->[$index] or die "Bad level index '$index'";
   my $last_level = ! $self->levels->[$index+1];
@@ -314,6 +351,7 @@ sub _load {
     my $force_composite = $self->{_force_composite} || 0;
     local $self->{_force_composite} = 0; #<-- clear if set to prevetn deep recursion
     unless (ref $arg) {
+      $self->_Hash_fq_composite->{$arg} = $self->default_value;
       # hanging string/scalar, convert using default value
       $arg = { $arg => $self->default_value };
       $force_composite = 1;
@@ -324,7 +362,15 @@ sub _load {
     for my $key (keys %$arg) {
       die "Only scalar/string keys are allowed" 
         unless (defined $key && ! ref($key));
-        
+      
+      my $c_key = undef;
+      local $self->{_fq_composite_prefix} = $self->{_fq_composite_prefix};
+      if(defined $self->{_fq_composite_prefix}) {
+        $c_key = join('',$self->{_fq_composite_prefix},$key);
+        $self->{_fq_composite_prefix} = $c_key;
+        $self->{_fq_composite_prefix} .= $Lvl->delimiter if ($Lvl->delimiter);
+      }
+
       my $val = $arg->{$key};
       my $is_hashval = ref $val && ref($val) eq 'HASH';
       
@@ -364,6 +410,7 @@ sub _load {
         }
         else {
           $noderef->{$key} = $val;
+          $self->_Hash_fq_composite->{$c_key} = $val if ($c_key);
         }
         
         if($index == 0 && $$bmref) {
@@ -751,6 +798,11 @@ key is looked up, the value of the first closest found key path using default ke
 instead of C<undef> as is the case with C<get> mode. C<merge> mode is like C<fallback> mode, except 
 hashref values are merged with matching default key paths which are also hashrefs. Defaults to C<merge>.
 
+=item enable_globmatch
+
+If true, key value lookup calls will automatically try to match wildcard (text glob) expressions.
+Defaults to false (0).
+
 =back
 
 =head2 clone
@@ -836,6 +888,12 @@ Used internally by C<lookup()>.
 
 Like C<lookup_path()>, but only returns the value if it is a I<"leaf"> (i.e. not a hashref with deeper sub-values).
 Empty hashrefs (C<{}>) are also considered leaf values.
+
+=head2 lookup_path_globmatch
+
+Like C<lookup_path()>, but matches/returns by comparing a full composite key string with wildcard (text glob)
+expressions.
+
 
 =head2 delete
 

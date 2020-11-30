@@ -6,7 +6,7 @@ sticker - sticks tags onto files, populates a database with file meta-data
 
 =head1 VERSION
 
-version 1.01
+version 1.0603
 
 =head1 SYNOPSIS
 
@@ -27,6 +27,7 @@ version 1.01
     sticker --query query-string ...
     sticker --file_info file ...
     sticker --db_info file ...
+    sticker --has_data file
     sticker --tags
 
 =head1 DESCRIPTION
@@ -355,6 +356,7 @@ sub process_args () {
                'update',
                'db_info|dinfo',
                'file_info|finfo',
+               'has_data',
                'tags',
                'settings=s',
                'derive!',
@@ -388,6 +390,7 @@ sub print_meta {
 
     say STDERR "== $filename ==";
     my $meta = $sticker->read_meta(filename=>$filename,
+        derive=>$opts->{derive},
         read_all=>$opts->{read_all});
     print STDERR Dump($meta);
 } # print_meta
@@ -401,6 +404,7 @@ sub meta_from_file {
     my $from_file = $args{from_file};
 
     my $meta = $sticker->read_meta(filename=>$from_file,
+        derive=>$opts->{derive},
         read_all=>$opts->{read_all});
 
     $sticker->replace_all_meta(filename=>$filename,meta=>$meta);
@@ -437,6 +441,7 @@ sub do_stuff {
             or $opts->{delete}
             or $opts->{extract}
             or $opts->{from_file}
+            or $opts->{has_data}
             or $opts->{db_info}
             or $opts->{file_info})
     {
@@ -502,9 +507,25 @@ sub do_stuff {
             elsif ($opts->{file_info})
             {
                 my $file_meta = $sticker->read_meta(filename=>$file,
+                    derive=>$opts->{derive},
                     read_all=>$opts->{read_all});
                 say "== $file ==";
                 print Dump($file_meta);
+            }
+            elsif ($opts->{has_data})
+            {
+                my $file_meta = $sticker->read_meta(filename=>$file,
+                    derive=>$opts->{derive},
+                    read_all=>$opts->{read_all});
+                # Check if the returned hash is empty
+                if (keys %{$file_meta})
+                {
+                    exit 0;
+                }
+                else
+                {
+                    exit 1; # no data
+                }
             }
         }
     }

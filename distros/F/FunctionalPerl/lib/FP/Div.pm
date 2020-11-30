@@ -38,32 +38,33 @@ our @EXPORT_OK = qw(inc dec square average
 our %EXPORT_TAGS = (all => [@EXPORT, @EXPORT_OK]);
 
 use Chj::TEST;
+use FP::Carp;
 
 # XX should `indentity` pass multiple values, and this be called
 # `identity_scalar`? :
 
-sub identity ($) {
-    @_ == 1 or die "wrong number of arguments";
+sub identity {
+    @_ == 1 or fp_croak_nargs 1;
     $_[0]
 }
 
-sub inc ($) {
-    @_ == 1 or die "wrong number of arguments";
+sub inc {
+    @_ == 1 or fp_croak_nargs 1;
     $_[0] + 1
 }
 
-sub dec ($) {
-    @_ == 1 or die "wrong number of arguments";
+sub dec {
+    @_ == 1 or fp_croak_nargs 1;
     $_[0] - 1
 }
 
-sub square ($) {
-    @_ == 1 or die "wrong number of arguments";
+sub square {
+    @_ == 1 or fp_croak_nargs 1;
     $_[0] * $_[0]
 }
 
-sub average($$) {
-    @_ == 2 or die "wrong number of arguments";
+sub average {
+    @_ == 2 or fp_croak_nargs 2;
     ($_[0] + $_[1]) / 2
 }
 
@@ -95,8 +96,8 @@ sub minmax {
 
 # is there any better idea than ucfirst to distinguish from the
 # builtin? `fchomp` ?
-sub Chomp ($) {
-    @_ == 1 or die "wrong number of arguments";
+sub Chomp {
+    @_ == 1 or fp_croak_nargs 1;
     my ($str) = @_;
     chomp $str;
     $str

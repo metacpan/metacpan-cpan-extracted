@@ -1,0 +1,19 @@
+=head1 NAME
+
+UniEvent::Streamer::IInput - base class for input streams for streamer
+
+=head1 DESCRIPTION
+
+This is abstract interface class, which has no methods.
+
+=head1 REFERENCES
+
+L<UniEvent::Streamer>
+
+L<UniEvent::Streamer::Input>
+
+L<UniEvent::Streamer::FileInput>
+
+L<UniEvent::Streamer::StreamInput>
+
+=cut

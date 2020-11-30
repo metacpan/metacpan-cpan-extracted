@@ -1,6 +1,6 @@
 package Gtk3::WebKit2;
 {
-  $Gtk3::WebKit2::VERSION = '0.012';
+  $Gtk3::WebKit2::VERSION = '0.013';
 }
 
 =head1 NAME

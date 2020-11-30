@@ -34,7 +34,7 @@
          "requires" : {
             "Carp" : "0",
             "JSON" : "2.12",
-            "Moo" : "1",
+            "Moo" : "1.000000",
             "Template" : "2.20",
             "Type::Tiny" : "1.000006",
             "namespace::clean" : "0",
@@ -55,6 +55,6 @@
          "web" : "https://github.com/tehmoth/Alt-Template-Plugin-JSON-Moo"
       }
    },
-   "version" : "0.01",
+   "version" : "0.04",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

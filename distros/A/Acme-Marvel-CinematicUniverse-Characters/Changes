@@ -1,0 +1,17 @@
+Acme-Marvel-CinematicUniverse-Characters
+========================================
+
+Created:      2020-11-21
+Home page:    <https://metacpan.org/release/Acme-Marvel-CinematicUniverse-Characters>
+Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=Acme-Marvel-CinematicUniverse-Characters>
+Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
+
+0.002	2020-11-23
+
+ [ Documentation ]
+ - Correct year of movie.
+
+ [ Packaging ]
+ - Include repo link.
+
+0.001	2020-11-21	Initial release

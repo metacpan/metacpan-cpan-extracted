@@ -25,6 +25,10 @@ if ($timezone->win32_registry()) {
 	diag("Olson tz directory is " . $timezone->directory() . " for $^O");
 }
 
+if (!$timezone->timezone()) {
+	$timezone->timezone('UTC');
+	diag("$^O does not have a default timezone, setting to " . $timezone->timezone());
+}
 diag("Local timezone has been determined to be " . $timezone->timezone() );
 ok($timezone->timezone(), "Local timezone has been determined to be " . $timezone->timezone() );
 if (defined $timezone->determining_path()) {

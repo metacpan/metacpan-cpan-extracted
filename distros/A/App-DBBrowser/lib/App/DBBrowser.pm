@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.010001;
 
-our $VERSION = '2.253';
+our $VERSION = '2.254';
 
 use File::Basename        qw( basename );
 use File::Spec::Functions qw( catfile catdir );
@@ -138,7 +138,7 @@ sub __options {
 sub run {
     my ( $sf ) = @_;
     local $| = 1;
-    local $SIG{INT} = sub {
+    local $SIG{INT} = local $SIG{TERM} = local $SIG{HUB} = sub {
         if ( defined $sf->{i}{f_copy_and_paste} && -e $sf->{i}{f_copy_and_paste} ) {
             unlink $sf->{i}{f_copy_and_paste};
         }
@@ -747,7 +747,7 @@ App::DBBrowser - Browse SQLite/MySQL/PostgreSQL databases and their tables inter
 
 =head1 VERSION
 
-Version 2.253
+Version 2.254
 
 =head1 DESCRIPTION
 

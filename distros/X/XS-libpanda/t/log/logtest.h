@@ -17,7 +17,7 @@ struct Ctx {
             fstr  = formatter.format(_str, _info);
             ++cnt;
         });
-        set_level(WARNING);
+        set_level(Level::Warning);
     }
 
     void check_called () {

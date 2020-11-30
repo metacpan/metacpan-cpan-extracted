@@ -7,12 +7,19 @@
         <MANUFACTURER>Hewlett-Packard</MANUFACTURER>
         <NAME>ProCurve 5406zl (J8697A)</NAME>
         <TYPE>device</TYPE>
+        <VERSION>K.15.28</VERSION>
+      </FIRMWARES>
+      <FIRMWARES>
+        <DESCRIPTION>HP Web Management Software version</DESCRIPTION>
+        <MANUFACTURER>HP</MANUFACTURER>
+        <NAME>HP-HttpMg-Version</NAME>
+        <TYPE>system</TYPE>
         <VERSION>K.15.04.0015m</VERSION>
       </FIRMWARES>
       <INFO>
         <COMMENTS>ProCurve J8697A Switch 5406zl, revision K.15.04.0015m, ROM K.15.28 (/ws/swbuildm/ec_rel_charleston_qaoff/code/build/btm(ec_rel_</COMMENTS>
         <CONTACT>systeme@example.com</CONTACT>
-        <FIRMWARE>K.15.04.0015m</FIRMWARE>
+        <FIRMWARE>K.15.28</FIRMWARE>
         <ID>0</ID>
         <IPS>
           <IP>127.0.0.1</IP>
@@ -70,12 +77,6 @@
           <IFTYPE>6</IFTYPE>
           <MAC>00:18:71:c1:f0:ff</MAC>
           <TRUNK>0</TRUNK>
-          <VLANS>
-            <VLAN>
-              <NAME>VLAN 1</NAME>
-              <NUMBER>1</NUMBER>
-            </VLAN>
-          </VLANS>
         </PORT>
         <PORT>
           <CONNECTIONS>
@@ -106,12 +107,6 @@
           <IFTYPE>6</IFTYPE>
           <MAC>00:18:71:c1:f0:fe</MAC>
           <TRUNK>0</TRUNK>
-          <VLANS>
-            <VLAN>
-              <NAME>VLAN 1</NAME>
-              <NUMBER>1</NUMBER>
-            </VLAN>
-          </VLANS>
         </PORT>
         <PORT>
           <CONNECTIONS>
@@ -142,12 +137,6 @@
           <IFTYPE>6</IFTYPE>
           <MAC>00:18:71:c1:f0:fd</MAC>
           <TRUNK>0</TRUNK>
-          <VLANS>
-            <VLAN>
-              <NAME>VLAN 1</NAME>
-              <NUMBER>1</NUMBER>
-            </VLAN>
-          </VLANS>
         </PORT>
         <PORT>
           <CONNECTIONS>
@@ -178,12 +167,6 @@
           <IFTYPE>6</IFTYPE>
           <MAC>00:18:71:c1:f0:fc</MAC>
           <TRUNK>0</TRUNK>
-          <VLANS>
-            <VLAN>
-              <NAME>VLAN 1</NAME>
-              <NUMBER>1</NUMBER>
-            </VLAN>
-          </VLANS>
         </PORT>
         <PORT>
           <CONNECTIONS>
@@ -214,12 +197,6 @@
           <IFTYPE>6</IFTYPE>
           <MAC>00:18:71:c1:f0:fb</MAC>
           <TRUNK>0</TRUNK>
-          <VLANS>
-            <VLAN>
-              <NAME>VLAN 1</NAME>
-              <NUMBER>1</NUMBER>
-            </VLAN>
-          </VLANS>
         </PORT>
         <PORT>
           <CONNECTIONS>
@@ -250,12 +227,6 @@
           <IFTYPE>6</IFTYPE>
           <MAC>00:18:71:c1:f0:fa</MAC>
           <TRUNK>0</TRUNK>
-          <VLANS>
-            <VLAN>
-              <NAME>VLAN 1</NAME>
-              <NUMBER>1</NUMBER>
-            </VLAN>
-          </VLANS>
         </PORT>
         <PORT>
           <CONNECTIONS>
@@ -286,12 +257,6 @@
           <IFTYPE>6</IFTYPE>
           <MAC>00:18:71:c1:f0:f9</MAC>
           <TRUNK>0</TRUNK>
-          <VLANS>
-            <VLAN>
-              <NAME>VLAN 1</NAME>
-              <NUMBER>1</NUMBER>
-            </VLAN>
-          </VLANS>
         </PORT>
         <PORT>
           <CONNECTIONS>
@@ -322,12 +287,6 @@
           <IFTYPE>6</IFTYPE>
           <MAC>00:18:71:c1:f0:f8</MAC>
           <TRUNK>0</TRUNK>
-          <VLANS>
-            <VLAN>
-              <NAME>VLAN 1</NAME>
-              <NUMBER>1</NUMBER>
-            </VLAN>
-          </VLANS>
         </PORT>
         <PORT>
           <CONNECTIONS>
@@ -358,12 +317,6 @@
           <IFTYPE>6</IFTYPE>
           <MAC>00:18:71:c1:f0:f7</MAC>
           <TRUNK>0</TRUNK>
-          <VLANS>
-            <VLAN>
-              <NAME>VLAN 1</NAME>
-              <NUMBER>1</NUMBER>
-            </VLAN>
-          </VLANS>
         </PORT>
         <PORT>
           <CONNECTIONS>
@@ -394,12 +347,6 @@
           <IFTYPE>6</IFTYPE>
           <MAC>00:18:71:c1:f0:f6</MAC>
           <TRUNK>0</TRUNK>
-          <VLANS>
-            <VLAN>
-              <NAME>VLAN 1</NAME>
-              <NUMBER>1</NUMBER>
-            </VLAN>
-          </VLANS>
         </PORT>
         <PORT>
           <IFINERRORS>0</IFINERRORS>
@@ -419,8 +366,9 @@
           <TRUNK>0</TRUNK>
           <VLANS>
             <VLAN>
-              <NAME>VLAN 1</NAME>
+              <NAME>DEFAULT_VLAN</NAME>
               <NUMBER>1</NUMBER>
+              <TAGGED>0</TAGGED>
             </VLAN>
           </VLANS>
         </PORT>
@@ -442,8 +390,9 @@
           <TRUNK>0</TRUNK>
           <VLANS>
             <VLAN>
-              <NAME>VLAN 1</NAME>
+              <NAME>DEFAULT_VLAN</NAME>
               <NUMBER>1</NUMBER>
+              <TAGGED>0</TAGGED>
             </VLAN>
           </VLANS>
         </PORT>
@@ -476,12 +425,6 @@
           <IFTYPE>6</IFTYPE>
           <MAC>00:18:71:c1:f0:f3</MAC>
           <TRUNK>0</TRUNK>
-          <VLANS>
-            <VLAN>
-              <NAME>VLAN 1</NAME>
-              <NUMBER>1</NUMBER>
-            </VLAN>
-          </VLANS>
         </PORT>
         <PORT>
           <IFINERRORS>0</IFINERRORS>
@@ -501,8 +444,9 @@
           <TRUNK>0</TRUNK>
           <VLANS>
             <VLAN>
-              <NAME>VLAN 1</NAME>
+              <NAME>DEFAULT_VLAN</NAME>
               <NUMBER>1</NUMBER>
+              <TAGGED>0</TAGGED>
             </VLAN>
           </VLANS>
         </PORT>
@@ -535,12 +479,6 @@
           <IFTYPE>6</IFTYPE>
           <MAC>00:18:71:c1:f0:f1</MAC>
           <TRUNK>0</TRUNK>
-          <VLANS>
-            <VLAN>
-              <NAME>VLAN 1</NAME>
-              <NUMBER>1</NUMBER>
-            </VLAN>
-          </VLANS>
         </PORT>
         <PORT>
           <IFINERRORS>0</IFINERRORS>
@@ -560,8 +498,9 @@
           <TRUNK>0</TRUNK>
           <VLANS>
             <VLAN>
-              <NAME>VLAN 1</NAME>
+              <NAME>DEFAULT_VLAN</NAME>
               <NUMBER>1</NUMBER>
+              <TAGGED>0</TAGGED>
             </VLAN>
           </VLANS>
         </PORT>
@@ -594,12 +533,6 @@
           <IFTYPE>6</IFTYPE>
           <MAC>00:18:71:c1:f0:ef</MAC>
           <TRUNK>0</TRUNK>
-          <VLANS>
-            <VLAN>
-              <NAME>VLAN 1</NAME>
-              <NUMBER>1</NUMBER>
-            </VLAN>
-          </VLANS>
         </PORT>
         <PORT>
           <IFINERRORS>0</IFINERRORS>
@@ -619,8 +552,9 @@
           <TRUNK>0</TRUNK>
           <VLANS>
             <VLAN>
-              <NAME>VLAN 1</NAME>
+              <NAME>DEFAULT_VLAN</NAME>
               <NUMBER>1</NUMBER>
+              <TAGGED>0</TAGGED>
             </VLAN>
           </VLANS>
         </PORT>
@@ -653,12 +587,6 @@
           <IFTYPE>6</IFTYPE>
           <MAC>00:18:71:c1:f0:ed</MAC>
           <TRUNK>0</TRUNK>
-          <VLANS>
-            <VLAN>
-              <NAME>VLAN 1</NAME>
-              <NUMBER>1</NUMBER>
-            </VLAN>
-          </VLANS>
         </PORT>
         <PORT>
           <IFINERRORS>0</IFINERRORS>
@@ -678,8 +606,9 @@
           <TRUNK>0</TRUNK>
           <VLANS>
             <VLAN>
-              <NAME>VLAN 1</NAME>
+              <NAME>DEFAULT_VLAN</NAME>
               <NUMBER>1</NUMBER>
+              <TAGGED>0</TAGGED>
             </VLAN>
           </VLANS>
         </PORT>
@@ -712,12 +641,6 @@
           <IFTYPE>6</IFTYPE>
           <MAC>00:18:71:c1:f0:eb</MAC>
           <TRUNK>0</TRUNK>
-          <VLANS>
-            <VLAN>
-              <NAME>VLAN 1</NAME>
-              <NUMBER>1</NUMBER>
-            </VLAN>
-          </VLANS>
         </PORT>
         <PORT>
           <CONNECTIONS>
@@ -748,12 +671,6 @@
           <IFTYPE>6</IFTYPE>
           <MAC>00:18:71:c1:f0:ea</MAC>
           <TRUNK>0</TRUNK>
-          <VLANS>
-            <VLAN>
-              <NAME>VLAN 1</NAME>
-              <NUMBER>1</NUMBER>
-            </VLAN>
-          </VLANS>
         </PORT>
         <PORT>
           <CONNECTIONS>
@@ -784,12 +701,6 @@
           <IFTYPE>6</IFTYPE>
           <MAC>00:18:71:c1:f0:e9</MAC>
           <TRUNK>0</TRUNK>
-          <VLANS>
-            <VLAN>
-              <NAME>VLAN 1</NAME>
-              <NUMBER>1</NUMBER>
-            </VLAN>
-          </VLANS>
         </PORT>
         <PORT>
           <CONNECTIONS>
@@ -820,12 +731,6 @@
           <IFTYPE>6</IFTYPE>
           <MAC>00:18:71:c1:f0:e8</MAC>
           <TRUNK>0</TRUNK>
-          <VLANS>
-            <VLAN>
-              <NAME>VLAN 1</NAME>
-              <NUMBER>1</NUMBER>
-            </VLAN>
-          </VLANS>
         </PORT>
         <PORT>
           <CONNECTIONS>
@@ -856,12 +761,6 @@
           <IFTYPE>6</IFTYPE>
           <MAC>00:18:71:c1:f0:e7</MAC>
           <TRUNK>0</TRUNK>
-          <VLANS>
-            <VLAN>
-              <NAME>VLAN 1</NAME>
-              <NUMBER>1</NUMBER>
-            </VLAN>
-          </VLANS>
         </PORT>
         <PORT>
           <CONNECTIONS>
@@ -892,12 +791,6 @@
           <IFTYPE>6</IFTYPE>
           <MAC>00:18:71:c1:f0:e6</MAC>
           <TRUNK>0</TRUNK>
-          <VLANS>
-            <VLAN>
-              <NAME>VLAN 1</NAME>
-              <NUMBER>1</NUMBER>
-            </VLAN>
-          </VLANS>
         </PORT>
         <PORT>
           <CONNECTIONS>
@@ -928,12 +821,6 @@
           <IFTYPE>6</IFTYPE>
           <MAC>00:18:71:c1:f0:e5</MAC>
           <TRUNK>0</TRUNK>
-          <VLANS>
-            <VLAN>
-              <NAME>VLAN 1</NAME>
-              <NUMBER>1</NUMBER>
-            </VLAN>
-          </VLANS>
         </PORT>
         <PORT>
           <CONNECTIONS>
@@ -964,12 +851,6 @@
           <IFTYPE>6</IFTYPE>
           <MAC>00:18:71:c1:f0:e4</MAC>
           <TRUNK>0</TRUNK>
-          <VLANS>
-            <VLAN>
-              <NAME>VLAN 1</NAME>
-              <NUMBER>1</NUMBER>
-            </VLAN>
-          </VLANS>
         </PORT>
         <PORT>
           <CONNECTIONS>
@@ -1000,12 +881,6 @@
           <IFTYPE>6</IFTYPE>
           <MAC>00:18:71:c1:f0:e3</MAC>
           <TRUNK>0</TRUNK>
-          <VLANS>
-            <VLAN>
-              <NAME>VLAN 1</NAME>
-              <NUMBER>1</NUMBER>
-            </VLAN>
-          </VLANS>
         </PORT>
         <PORT>
           <IFDESCR>B6</IFDESCR>
@@ -1024,12 +899,6 @@
           <IFTYPE>6</IFTYPE>
           <MAC>00:18:71:c1:f0:e2</MAC>
           <TRUNK>0</TRUNK>
-          <VLANS>
-            <VLAN>
-              <NAME>VLAN 1</NAME>
-              <NUMBER>1</NUMBER>
-            </VLAN>
-          </VLANS>
         </PORT>
         <PORT>
           <CONNECTIONS>
@@ -1060,12 +929,6 @@
           <IFTYPE>6</IFTYPE>
           <MAC>00:18:71:c1:f0:e1</MAC>
           <TRUNK>0</TRUNK>
-          <VLANS>
-            <VLAN>
-              <NAME>VLAN 1</NAME>
-              <NUMBER>1</NUMBER>
-            </VLAN>
-          </VLANS>
         </PORT>
         <PORT>
           <CONNECTIONS>
@@ -1096,12 +959,6 @@
           <IFTYPE>6</IFTYPE>
           <MAC>00:18:71:c1:f0:e0</MAC>
           <TRUNK>0</TRUNK>
-          <VLANS>
-            <VLAN>
-              <NAME>VLAN 1</NAME>
-              <NUMBER>1</NUMBER>
-            </VLAN>
-          </VLANS>
         </PORT>
         <PORT>
           <CONNECTIONS>
@@ -1132,12 +989,6 @@
           <IFTYPE>6</IFTYPE>
           <MAC>00:18:71:c1:f0:df</MAC>
           <TRUNK>0</TRUNK>
-          <VLANS>
-            <VLAN>
-              <NAME>VLAN 1</NAME>
-              <NUMBER>1</NUMBER>
-            </VLAN>
-          </VLANS>
         </PORT>
         <PORT>
           <CONNECTIONS>
@@ -1168,12 +1019,6 @@
           <IFTYPE>6</IFTYPE>
           <MAC>00:18:71:c1:f0:de</MAC>
           <TRUNK>0</TRUNK>
-          <VLANS>
-            <VLAN>
-              <NAME>VLAN 1</NAME>
-              <NUMBER>1</NUMBER>
-            </VLAN>
-          </VLANS>
         </PORT>
         <PORT>
           <IFINERRORS>0</IFINERRORS>
@@ -1193,8 +1038,9 @@
           <TRUNK>0</TRUNK>
           <VLANS>
             <VLAN>
-              <NAME>VLAN 1</NAME>
+              <NAME>DEFAULT_VLAN</NAME>
               <NUMBER>1</NUMBER>
+              <TAGGED>0</TAGGED>
             </VLAN>
           </VLANS>
         </PORT>
@@ -1216,8 +1062,9 @@
           <TRUNK>0</TRUNK>
           <VLANS>
             <VLAN>
-              <NAME>VLAN 1</NAME>
+              <NAME>DEFAULT_VLAN</NAME>
               <NUMBER>1</NUMBER>
+              <TAGGED>0</TAGGED>
             </VLAN>
           </VLANS>
         </PORT>
@@ -1250,12 +1097,6 @@
           <IFTYPE>6</IFTYPE>
           <MAC>00:18:71:c1:f0:db</MAC>
           <TRUNK>0</TRUNK>
-          <VLANS>
-            <VLAN>
-              <NAME>VLAN 1</NAME>
-              <NUMBER>1</NUMBER>
-            </VLAN>
-          </VLANS>
         </PORT>
         <PORT>
           <IFINERRORS>0</IFINERRORS>
@@ -1275,8 +1116,9 @@
           <TRUNK>0</TRUNK>
           <VLANS>
             <VLAN>
-              <NAME>VLAN 1</NAME>
+              <NAME>DEFAULT_VLAN</NAME>
               <NUMBER>1</NUMBER>
+              <TAGGED>0</TAGGED>
             </VLAN>
           </VLANS>
         </PORT>
@@ -1309,12 +1151,6 @@
           <IFTYPE>6</IFTYPE>
           <MAC>00:18:71:c1:f0:d9</MAC>
           <TRUNK>0</TRUNK>
-          <VLANS>
-            <VLAN>
-              <NAME>VLAN 1</NAME>
-              <NUMBER>1</NUMBER>
-            </VLAN>
-          </VLANS>
         </PORT>
         <PORT>
           <IFINERRORS>0</IFINERRORS>
@@ -1334,8 +1170,9 @@
           <TRUNK>0</TRUNK>
           <VLANS>
             <VLAN>
-              <NAME>VLAN 1</NAME>
+              <NAME>DEFAULT_VLAN</NAME>
               <NUMBER>1</NUMBER>
+              <TAGGED>0</TAGGED>
             </VLAN>
           </VLANS>
         </PORT>
@@ -1368,12 +1205,6 @@
           <IFTYPE>6</IFTYPE>
           <MAC>00:18:71:c1:f0:d7</MAC>
           <TRUNK>0</TRUNK>
-          <VLANS>
-            <VLAN>
-              <NAME>VLAN 1</NAME>
-              <NUMBER>1</NUMBER>
-            </VLAN>
-          </VLANS>
         </PORT>
         <PORT>
           <IFINERRORS>0</IFINERRORS>
@@ -1393,8 +1224,9 @@
           <TRUNK>0</TRUNK>
           <VLANS>
             <VLAN>
-              <NAME>VLAN 1</NAME>
+              <NAME>DEFAULT_VLAN</NAME>
               <NUMBER>1</NUMBER>
+              <TAGGED>0</TAGGED>
             </VLAN>
           </VLANS>
         </PORT>
@@ -1427,12 +1259,6 @@
           <IFTYPE>6</IFTYPE>
           <MAC>00:18:71:c1:f0:d5</MAC>
           <TRUNK>0</TRUNK>
-          <VLANS>
-            <VLAN>
-              <NAME>VLAN 1</NAME>
-              <NUMBER>1</NUMBER>
-            </VLAN>
-          </VLANS>
         </PORT>
         <PORT>
           <IFINERRORS>0</IFINERRORS>
@@ -1452,8 +1278,9 @@
           <TRUNK>0</TRUNK>
           <VLANS>
             <VLAN>
-              <NAME>VLAN 1</NAME>
+              <NAME>DEFAULT_VLAN</NAME>
               <NUMBER>1</NUMBER>
+              <TAGGED>0</TAGGED>
             </VLAN>
           </VLANS>
         </PORT>
@@ -1486,12 +1313,6 @@
           <IFTYPE>6</IFTYPE>
           <MAC>00:18:71:c1:f0:d3</MAC>
           <TRUNK>0</TRUNK>
-          <VLANS>
-            <VLAN>
-              <NAME>VLAN 1</NAME>
-              <NUMBER>1</NUMBER>
-            </VLAN>
-          </VLANS>
         </PORT>
         <PORT>
           <CONNECTIONS>
@@ -1522,12 +1343,6 @@
           <IFTYPE>6</IFTYPE>
           <MAC>00:18:71:c1:f0:d2</MAC>
           <TRUNK>0</TRUNK>
-          <VLANS>
-            <VLAN>
-              <NAME>VLAN 1</NAME>
-              <NUMBER>1</NUMBER>
-            </VLAN>
-          </VLANS>
         </PORT>
         <PORT>
           <CONNECTIONS>
@@ -1558,12 +1373,6 @@
           <IFTYPE>6</IFTYPE>
           <MAC>00:18:71:c1:f0:d1</MAC>
           <TRUNK>0</TRUNK>
-          <VLANS>
-            <VLAN>
-              <NAME>VLAN 1</NAME>
-              <NUMBER>1</NUMBER>
-            </VLAN>
-          </VLANS>
         </PORT>
         <PORT>
           <CONNECTIONS>
@@ -1594,12 +1403,6 @@
           <IFTYPE>6</IFTYPE>
           <MAC>00:18:71:c1:f0:d0</MAC>
           <TRUNK>0</TRUNK>
-          <VLANS>
-            <VLAN>
-              <NAME>VLAN 1</NAME>
-              <NUMBER>1</NUMBER>
-            </VLAN>
-          </VLANS>
         </PORT>
         <PORT>
           <AGGREGATE>
@@ -1639,6 +1442,238 @@
           <IFSTATUS>1</IFSTATUS>
           <IFTYPE>161</IFTYPE>
           <MAC>00:18:71:c1:e0:00</MAC>
+          <VLANS>
+            <VLAN>
+              <NAME>DEFAULT_VLAN</NAME>
+              <NUMBER>1</NUMBER>
+              <TAGGED>0</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>VOIP_ASTERISK</NAME>
+              <NUMBER>13</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>DMZ227</NAME>
+              <NUMBER>14</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>COLLECTE_IP_RIHDA</NAME>
+              <NUMBER>149</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>INTERCO-CSS</NAME>
+              <NUMBER>15</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>RENATER</NAME>
+              <NUMBER>150</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>FW-DMZ-INFRA</NAME>
+              <NUMBER>152</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>FW-VLAN-LIBRE</NAME>
+              <NUMBER>153</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>FW-INTERCO-FOUNDRY</NAME>
+              <NUMBER>154</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>FW-DMZ</NAME>
+              <NUMBER>155</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>FW-Libre_Service</NAME>
+              <NUMBER>156</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>FW-DMZ-PEDA</NAME>
+              <NUMBER>157</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>FW-DMZ-INFRA2</NAME>
+              <NUMBER>158</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>FW-PUG-DRRT</NAME>
+              <NUMBER>159</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>SERVEUR-CSS</NAME>
+              <NUMBER>16</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>ToIP_RIHDA</NAME>
+              <NUMBER>160</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>LIBR_SERVICE</NAME>
+              <NUMBER>162</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>INTER_EQUANT_RECTORAT</NAME>
+              <NUMBER>17</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>DATA_RIHDA</NAME>
+              <NUMBER>170</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>DATA_POLY</NAME>
+              <NUMBER>171</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>DATA_CEPE</NAME>
+              <NUMBER>172</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>INT_EQUANT_ETABLISSEMENTS</NAME>
+              <NUMBER>18</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>video_RIHDA</NAME>
+              <NUMBER>180</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>postesIP_RIHDA</NAME>
+              <NUMBER>190</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>ADMIN_RESEAU</NAME>
+              <NUMBER>196</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>SERVERS</NAME>
+              <NUMBER>2</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>PERIPHERIQUES</NAME>
+              <NUMBER>201</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>UTIL_NVEAU_BAT</NAME>
+              <NUMBER>202</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>UTIL_FORMATION</NAME>
+              <NUMBER>204</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>UTIL_CATI</NAME>
+              <NUMBER>205</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>UTIL_INVITES</NAME>
+              <NUMBER>214</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>UTIL_SYST_RESEAUX</NAME>
+              <NUMBER>215</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>DMZ_HD</NAME>
+              <NUMBER>22</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>ZONE_PUBLIQUE</NAME>
+              <NUMBER>3</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>RESEAU_DRRT-PUG</NAME>
+              <NUMBER>30</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>COLLECTE-TEST</NAME>
+              <NUMBER>3000</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>TEST-APPLI</NAME>
+              <NUMBER>3002</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>TEST-AGRIATE</NAME>
+              <NUMBER>3006</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>TEST-ETAB</NAME>
+              <NUMBER>3007</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>INTERCO_RACINE_API</NAME>
+              <NUMBER>4</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>VLAN401</NAME>
+              <NUMBER>401</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>wifi_recteur</NAME>
+              <NUMBER>402</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>DMZ_ELGG</NAME>
+              <NUMBER>403</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>DMZ</NAME>
+              <NUMBER>5</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>AGRIATES</NAME>
+              <NUMBER>6</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>ACCUEIL_ETABLISSEMENTS</NAME>
+              <NUMBER>7</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+          </VLANS>
         </PORT>
         <PORT>
           <AGGREGATE>
@@ -1681,6 +1716,218 @@
           <IFSTATUS>1</IFSTATUS>
           <IFTYPE>161</IFTYPE>
           <MAC>00:18:71:c1:e0:00</MAC>
+          <VLANS>
+            <VLAN>
+              <NAME>DEFAULT_VLAN</NAME>
+              <NUMBER>1</NUMBER>
+              <TAGGED>0</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>VOIP_ASTERISK</NAME>
+              <NUMBER>13</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>DMZ227</NAME>
+              <NUMBER>14</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>COLLECTE_IP_RIHDA</NAME>
+              <NUMBER>149</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>INTERCO-CSS</NAME>
+              <NUMBER>15</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>RENATER</NAME>
+              <NUMBER>150</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>FW-DMZ-INFRA</NAME>
+              <NUMBER>152</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>FW-VLAN-LIBRE</NAME>
+              <NUMBER>153</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>FW-INTERCO-FOUNDRY</NAME>
+              <NUMBER>154</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>FW-DMZ</NAME>
+              <NUMBER>155</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>FW-Libre_Service</NAME>
+              <NUMBER>156</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>FW-DMZ-PEDA</NAME>
+              <NUMBER>157</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>FW-DMZ-INFRA2</NAME>
+              <NUMBER>158</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>FW-PUG-DRRT</NAME>
+              <NUMBER>159</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>SERVEUR-CSS</NAME>
+              <NUMBER>16</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>ToIP_RIHDA</NAME>
+              <NUMBER>160</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>LIBR_SERVICE</NAME>
+              <NUMBER>162</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>INTER_EQUANT_RECTORAT</NAME>
+              <NUMBER>17</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>DATA_RIHDA</NAME>
+              <NUMBER>170</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>DATA_POLY</NAME>
+              <NUMBER>171</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>DATA_CEPE</NAME>
+              <NUMBER>172</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>INT_EQUANT_ETABLISSEMENTS</NAME>
+              <NUMBER>18</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>video_RIHDA</NAME>
+              <NUMBER>180</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>postesIP_RIHDA</NAME>
+              <NUMBER>190</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>ADMIN_RESEAU</NAME>
+              <NUMBER>196</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>SERVERS</NAME>
+              <NUMBER>2</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>PERIPHERIQUES</NAME>
+              <NUMBER>201</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>UTIL_NVEAU_BAT</NAME>
+              <NUMBER>202</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>UTIL_FORMATION</NAME>
+              <NUMBER>204</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>UTIL_CATI</NAME>
+              <NUMBER>205</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>UTIL_INVITES</NAME>
+              <NUMBER>214</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>UTIL_SYST_RESEAUX</NAME>
+              <NUMBER>215</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>DMZ_HD</NAME>
+              <NUMBER>22</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>ZONE_PUBLIQUE</NAME>
+              <NUMBER>3</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>RESEAU_DRRT-PUG</NAME>
+              <NUMBER>30</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>INTERCO_RACINE_API</NAME>
+              <NUMBER>4</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>VLAN401</NAME>
+              <NUMBER>401</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>wifi_recteur</NAME>
+              <NUMBER>402</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>DMZ_ELGG</NAME>
+              <NUMBER>403</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>DMZ</NAME>
+              <NUMBER>5</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>AGRIATES</NAME>
+              <NUMBER>6</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>ACCUEIL_ETABLISSEMENTS</NAME>
+              <NUMBER>7</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+          </VLANS>
         </PORT>
         <PORT>
           <AGGREGATE>
@@ -1780,6 +2027,218 @@
           <IFSTATUS>1</IFSTATUS>
           <IFTYPE>161</IFTYPE>
           <MAC>00:18:71:c1:e0:00</MAC>
+          <VLANS>
+            <VLAN>
+              <NAME>DEFAULT_VLAN</NAME>
+              <NUMBER>1</NUMBER>
+              <TAGGED>0</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>VOIP_ASTERISK</NAME>
+              <NUMBER>13</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>DMZ227</NAME>
+              <NUMBER>14</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>COLLECTE_IP_RIHDA</NAME>
+              <NUMBER>149</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>INTERCO-CSS</NAME>
+              <NUMBER>15</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>RENATER</NAME>
+              <NUMBER>150</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>FW-DMZ-INFRA</NAME>
+              <NUMBER>152</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>FW-VLAN-LIBRE</NAME>
+              <NUMBER>153</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>FW-INTERCO-FOUNDRY</NAME>
+              <NUMBER>154</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>FW-DMZ</NAME>
+              <NUMBER>155</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>FW-Libre_Service</NAME>
+              <NUMBER>156</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>FW-DMZ-PEDA</NAME>
+              <NUMBER>157</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>FW-DMZ-INFRA2</NAME>
+              <NUMBER>158</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>FW-PUG-DRRT</NAME>
+              <NUMBER>159</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>SERVEUR-CSS</NAME>
+              <NUMBER>16</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>ToIP_RIHDA</NAME>
+              <NUMBER>160</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>LIBR_SERVICE</NAME>
+              <NUMBER>162</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>INTER_EQUANT_RECTORAT</NAME>
+              <NUMBER>17</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>DATA_RIHDA</NAME>
+              <NUMBER>170</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>DATA_POLY</NAME>
+              <NUMBER>171</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>DATA_CEPE</NAME>
+              <NUMBER>172</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>INT_EQUANT_ETABLISSEMENTS</NAME>
+              <NUMBER>18</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>video_RIHDA</NAME>
+              <NUMBER>180</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>postesIP_RIHDA</NAME>
+              <NUMBER>190</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>ADMIN_RESEAU</NAME>
+              <NUMBER>196</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>SERVERS</NAME>
+              <NUMBER>2</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>PERIPHERIQUES</NAME>
+              <NUMBER>201</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>UTIL_NVEAU_BAT</NAME>
+              <NUMBER>202</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>UTIL_FORMATION</NAME>
+              <NUMBER>204</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>UTIL_CATI</NAME>
+              <NUMBER>205</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>UTIL_INVITES</NAME>
+              <NUMBER>214</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>UTIL_SYST_RESEAUX</NAME>
+              <NUMBER>215</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>DMZ_HD</NAME>
+              <NUMBER>22</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>ZONE_PUBLIQUE</NAME>
+              <NUMBER>3</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>RESEAU_DRRT-PUG</NAME>
+              <NUMBER>30</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>INTERCO_RACINE_API</NAME>
+              <NUMBER>4</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>VLAN401</NAME>
+              <NUMBER>401</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>wifi_recteur</NAME>
+              <NUMBER>402</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>DMZ_ELGG</NAME>
+              <NUMBER>403</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>DMZ</NAME>
+              <NUMBER>5</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>AGRIATES</NAME>
+              <NUMBER>6</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>ACCUEIL_ETABLISSEMENTS</NAME>
+              <NUMBER>7</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+          </VLANS>
         </PORT>
         <PORT>
           <AGGREGATE>
@@ -1842,6 +2301,218 @@
           <IFSTATUS>1</IFSTATUS>
           <IFTYPE>161</IFTYPE>
           <MAC>00:18:71:c1:e0:00</MAC>
+          <VLANS>
+            <VLAN>
+              <NAME>DEFAULT_VLAN</NAME>
+              <NUMBER>1</NUMBER>
+              <TAGGED>0</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>VOIP_ASTERISK</NAME>
+              <NUMBER>13</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>DMZ227</NAME>
+              <NUMBER>14</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>COLLECTE_IP_RIHDA</NAME>
+              <NUMBER>149</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>INTERCO-CSS</NAME>
+              <NUMBER>15</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>RENATER</NAME>
+              <NUMBER>150</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>FW-DMZ-INFRA</NAME>
+              <NUMBER>152</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>FW-VLAN-LIBRE</NAME>
+              <NUMBER>153</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>FW-INTERCO-FOUNDRY</NAME>
+              <NUMBER>154</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>FW-DMZ</NAME>
+              <NUMBER>155</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>FW-Libre_Service</NAME>
+              <NUMBER>156</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>FW-DMZ-PEDA</NAME>
+              <NUMBER>157</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>FW-DMZ-INFRA2</NAME>
+              <NUMBER>158</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>FW-PUG-DRRT</NAME>
+              <NUMBER>159</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>SERVEUR-CSS</NAME>
+              <NUMBER>16</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>ToIP_RIHDA</NAME>
+              <NUMBER>160</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>LIBR_SERVICE</NAME>
+              <NUMBER>162</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>INTER_EQUANT_RECTORAT</NAME>
+              <NUMBER>17</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>DATA_RIHDA</NAME>
+              <NUMBER>170</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>DATA_POLY</NAME>
+              <NUMBER>171</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>DATA_CEPE</NAME>
+              <NUMBER>172</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>INT_EQUANT_ETABLISSEMENTS</NAME>
+              <NUMBER>18</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>video_RIHDA</NAME>
+              <NUMBER>180</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>postesIP_RIHDA</NAME>
+              <NUMBER>190</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>ADMIN_RESEAU</NAME>
+              <NUMBER>196</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>SERVERS</NAME>
+              <NUMBER>2</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>PERIPHERIQUES</NAME>
+              <NUMBER>201</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>UTIL_NVEAU_BAT</NAME>
+              <NUMBER>202</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>UTIL_FORMATION</NAME>
+              <NUMBER>204</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>UTIL_CATI</NAME>
+              <NUMBER>205</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>UTIL_INVITES</NAME>
+              <NUMBER>214</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>UTIL_SYST_RESEAUX</NAME>
+              <NUMBER>215</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>DMZ_HD</NAME>
+              <NUMBER>22</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>ZONE_PUBLIQUE</NAME>
+              <NUMBER>3</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>RESEAU_DRRT-PUG</NAME>
+              <NUMBER>30</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>INTERCO_RACINE_API</NAME>
+              <NUMBER>4</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>VLAN401</NAME>
+              <NUMBER>401</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>wifi_recteur</NAME>
+              <NUMBER>402</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>DMZ_ELGG</NAME>
+              <NUMBER>403</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>DMZ</NAME>
+              <NUMBER>5</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>AGRIATES</NAME>
+              <NUMBER>6</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>ACCUEIL_ETABLISSEMENTS</NAME>
+              <NUMBER>7</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+          </VLANS>
         </PORT>
         <PORT>
           <AGGREGATE>
@@ -1899,6 +2570,218 @@
           <IFSTATUS>1</IFSTATUS>
           <IFTYPE>161</IFTYPE>
           <MAC>00:18:71:c1:e0:00</MAC>
+          <VLANS>
+            <VLAN>
+              <NAME>DEFAULT_VLAN</NAME>
+              <NUMBER>1</NUMBER>
+              <TAGGED>0</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>VOIP_ASTERISK</NAME>
+              <NUMBER>13</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>DMZ227</NAME>
+              <NUMBER>14</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>COLLECTE_IP_RIHDA</NAME>
+              <NUMBER>149</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>INTERCO-CSS</NAME>
+              <NUMBER>15</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>RENATER</NAME>
+              <NUMBER>150</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>FW-DMZ-INFRA</NAME>
+              <NUMBER>152</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>FW-VLAN-LIBRE</NAME>
+              <NUMBER>153</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>FW-INTERCO-FOUNDRY</NAME>
+              <NUMBER>154</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>FW-DMZ</NAME>
+              <NUMBER>155</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>FW-Libre_Service</NAME>
+              <NUMBER>156</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>FW-DMZ-PEDA</NAME>
+              <NUMBER>157</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>FW-DMZ-INFRA2</NAME>
+              <NUMBER>158</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>FW-PUG-DRRT</NAME>
+              <NUMBER>159</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>SERVEUR-CSS</NAME>
+              <NUMBER>16</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>ToIP_RIHDA</NAME>
+              <NUMBER>160</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>LIBR_SERVICE</NAME>
+              <NUMBER>162</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>INTER_EQUANT_RECTORAT</NAME>
+              <NUMBER>17</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>DATA_RIHDA</NAME>
+              <NUMBER>170</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>DATA_POLY</NAME>
+              <NUMBER>171</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>DATA_CEPE</NAME>
+              <NUMBER>172</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>INT_EQUANT_ETABLISSEMENTS</NAME>
+              <NUMBER>18</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>video_RIHDA</NAME>
+              <NUMBER>180</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>postesIP_RIHDA</NAME>
+              <NUMBER>190</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>ADMIN_RESEAU</NAME>
+              <NUMBER>196</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>SERVERS</NAME>
+              <NUMBER>2</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>PERIPHERIQUES</NAME>
+              <NUMBER>201</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>UTIL_NVEAU_BAT</NAME>
+              <NUMBER>202</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>UTIL_FORMATION</NAME>
+              <NUMBER>204</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>UTIL_CATI</NAME>
+              <NUMBER>205</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>UTIL_INVITES</NAME>
+              <NUMBER>214</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>UTIL_SYST_RESEAUX</NAME>
+              <NUMBER>215</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>DMZ_HD</NAME>
+              <NUMBER>22</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>ZONE_PUBLIQUE</NAME>
+              <NUMBER>3</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>RESEAU_DRRT-PUG</NAME>
+              <NUMBER>30</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>INTERCO_RACINE_API</NAME>
+              <NUMBER>4</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>VLAN401</NAME>
+              <NUMBER>401</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>wifi_recteur</NAME>
+              <NUMBER>402</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>DMZ_ELGG</NAME>
+              <NUMBER>403</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>DMZ</NAME>
+              <NUMBER>5</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>AGRIATES</NAME>
+              <NUMBER>6</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>ACCUEIL_ETABLISSEMENTS</NAME>
+              <NUMBER>7</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+          </VLANS>
         </PORT>
         <PORT>
           <AGGREGATE>
@@ -1934,6 +2817,238 @@
           <IFSTATUS>1</IFSTATUS>
           <IFTYPE>161</IFTYPE>
           <MAC>00:18:71:c1:e0:00</MAC>
+          <VLANS>
+            <VLAN>
+              <NAME>DEFAULT_VLAN</NAME>
+              <NUMBER>1</NUMBER>
+              <TAGGED>0</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>VOIP_ASTERISK</NAME>
+              <NUMBER>13</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>DMZ227</NAME>
+              <NUMBER>14</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>COLLECTE_IP_RIHDA</NAME>
+              <NUMBER>149</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>INTERCO-CSS</NAME>
+              <NUMBER>15</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>RENATER</NAME>
+              <NUMBER>150</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>FW-DMZ-INFRA</NAME>
+              <NUMBER>152</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>FW-VLAN-LIBRE</NAME>
+              <NUMBER>153</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>FW-INTERCO-FOUNDRY</NAME>
+              <NUMBER>154</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>FW-DMZ</NAME>
+              <NUMBER>155</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>FW-Libre_Service</NAME>
+              <NUMBER>156</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>FW-DMZ-PEDA</NAME>
+              <NUMBER>157</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>FW-DMZ-INFRA2</NAME>
+              <NUMBER>158</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>FW-PUG-DRRT</NAME>
+              <NUMBER>159</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>SERVEUR-CSS</NAME>
+              <NUMBER>16</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>ToIP_RIHDA</NAME>
+              <NUMBER>160</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>LIBR_SERVICE</NAME>
+              <NUMBER>162</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>INTER_EQUANT_RECTORAT</NAME>
+              <NUMBER>17</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>DATA_RIHDA</NAME>
+              <NUMBER>170</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>DATA_POLY</NAME>
+              <NUMBER>171</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>DATA_CEPE</NAME>
+              <NUMBER>172</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>INT_EQUANT_ETABLISSEMENTS</NAME>
+              <NUMBER>18</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>video_RIHDA</NAME>
+              <NUMBER>180</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>postesIP_RIHDA</NAME>
+              <NUMBER>190</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>ADMIN_RESEAU</NAME>
+              <NUMBER>196</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>SERVERS</NAME>
+              <NUMBER>2</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>PERIPHERIQUES</NAME>
+              <NUMBER>201</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>UTIL_NVEAU_BAT</NAME>
+              <NUMBER>202</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>UTIL_FORMATION</NAME>
+              <NUMBER>204</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>UTIL_CATI</NAME>
+              <NUMBER>205</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>UTIL_INVITES</NAME>
+              <NUMBER>214</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>UTIL_SYST_RESEAUX</NAME>
+              <NUMBER>215</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>DMZ_HD</NAME>
+              <NUMBER>22</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>ZONE_PUBLIQUE</NAME>
+              <NUMBER>3</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>RESEAU_DRRT-PUG</NAME>
+              <NUMBER>30</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>COLLECTE-TEST</NAME>
+              <NUMBER>3000</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>TEST-APPLI</NAME>
+              <NUMBER>3002</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>TEST-AGRIATE</NAME>
+              <NUMBER>3006</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>TEST-ETAB</NAME>
+              <NUMBER>3007</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>INTERCO_RACINE_API</NAME>
+              <NUMBER>4</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>VLAN401</NAME>
+              <NUMBER>401</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>wifi_recteur</NAME>
+              <NUMBER>402</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>DMZ_ELGG</NAME>
+              <NUMBER>403</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>DMZ</NAME>
+              <NUMBER>5</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>AGRIATES</NAME>
+              <NUMBER>6</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>ACCUEIL_ETABLISSEMENTS</NAME>
+              <NUMBER>7</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+          </VLANS>
         </PORT>
         <PORT>
           <AGGREGATE>
@@ -1967,6 +3082,238 @@
           <IFSTATUS>1</IFSTATUS>
           <IFTYPE>161</IFTYPE>
           <MAC>00:18:71:c1:e0:00</MAC>
+          <VLANS>
+            <VLAN>
+              <NAME>DEFAULT_VLAN</NAME>
+              <NUMBER>1</NUMBER>
+              <TAGGED>0</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>VOIP_ASTERISK</NAME>
+              <NUMBER>13</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>DMZ227</NAME>
+              <NUMBER>14</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>COLLECTE_IP_RIHDA</NAME>
+              <NUMBER>149</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>INTERCO-CSS</NAME>
+              <NUMBER>15</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>RENATER</NAME>
+              <NUMBER>150</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>FW-DMZ-INFRA</NAME>
+              <NUMBER>152</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>FW-VLAN-LIBRE</NAME>
+              <NUMBER>153</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>FW-INTERCO-FOUNDRY</NAME>
+              <NUMBER>154</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>FW-DMZ</NAME>
+              <NUMBER>155</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>FW-Libre_Service</NAME>
+              <NUMBER>156</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>FW-DMZ-PEDA</NAME>
+              <NUMBER>157</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>FW-DMZ-INFRA2</NAME>
+              <NUMBER>158</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>FW-PUG-DRRT</NAME>
+              <NUMBER>159</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>SERVEUR-CSS</NAME>
+              <NUMBER>16</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>ToIP_RIHDA</NAME>
+              <NUMBER>160</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>LIBR_SERVICE</NAME>
+              <NUMBER>162</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>INTER_EQUANT_RECTORAT</NAME>
+              <NUMBER>17</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>DATA_RIHDA</NAME>
+              <NUMBER>170</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>DATA_POLY</NAME>
+              <NUMBER>171</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>DATA_CEPE</NAME>
+              <NUMBER>172</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>INT_EQUANT_ETABLISSEMENTS</NAME>
+              <NUMBER>18</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>video_RIHDA</NAME>
+              <NUMBER>180</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>postesIP_RIHDA</NAME>
+              <NUMBER>190</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>ADMIN_RESEAU</NAME>
+              <NUMBER>196</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>SERVERS</NAME>
+              <NUMBER>2</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>PERIPHERIQUES</NAME>
+              <NUMBER>201</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>UTIL_NVEAU_BAT</NAME>
+              <NUMBER>202</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>UTIL_FORMATION</NAME>
+              <NUMBER>204</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>UTIL_CATI</NAME>
+              <NUMBER>205</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>UTIL_INVITES</NAME>
+              <NUMBER>214</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>UTIL_SYST_RESEAUX</NAME>
+              <NUMBER>215</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>DMZ_HD</NAME>
+              <NUMBER>22</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>ZONE_PUBLIQUE</NAME>
+              <NUMBER>3</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>RESEAU_DRRT-PUG</NAME>
+              <NUMBER>30</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>COLLECTE-TEST</NAME>
+              <NUMBER>3000</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>TEST-APPLI</NAME>
+              <NUMBER>3002</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>TEST-AGRIATE</NAME>
+              <NUMBER>3006</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>TEST-ETAB</NAME>
+              <NUMBER>3007</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>INTERCO_RACINE_API</NAME>
+              <NUMBER>4</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>VLAN401</NAME>
+              <NUMBER>401</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>wifi_recteur</NAME>
+              <NUMBER>402</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>DMZ_ELGG</NAME>
+              <NUMBER>403</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>DMZ</NAME>
+              <NUMBER>5</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>AGRIATES</NAME>
+              <NUMBER>6</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>ACCUEIL_ETABLISSEMENTS</NAME>
+              <NUMBER>7</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+          </VLANS>
         </PORT>
         <PORT>
           <AGGREGATE>
@@ -2007,6 +3354,238 @@
           <IFSTATUS>1</IFSTATUS>
           <IFTYPE>161</IFTYPE>
           <MAC>00:18:71:c1:e0:00</MAC>
+          <VLANS>
+            <VLAN>
+              <NAME>DEFAULT_VLAN</NAME>
+              <NUMBER>1</NUMBER>
+              <TAGGED>0</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>VOIP_ASTERISK</NAME>
+              <NUMBER>13</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>DMZ227</NAME>
+              <NUMBER>14</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>COLLECTE_IP_RIHDA</NAME>
+              <NUMBER>149</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>INTERCO-CSS</NAME>
+              <NUMBER>15</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>RENATER</NAME>
+              <NUMBER>150</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>FW-DMZ-INFRA</NAME>
+              <NUMBER>152</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>FW-VLAN-LIBRE</NAME>
+              <NUMBER>153</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>FW-INTERCO-FOUNDRY</NAME>
+              <NUMBER>154</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>FW-DMZ</NAME>
+              <NUMBER>155</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>FW-Libre_Service</NAME>
+              <NUMBER>156</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>FW-DMZ-PEDA</NAME>
+              <NUMBER>157</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>FW-DMZ-INFRA2</NAME>
+              <NUMBER>158</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>FW-PUG-DRRT</NAME>
+              <NUMBER>159</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>SERVEUR-CSS</NAME>
+              <NUMBER>16</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>ToIP_RIHDA</NAME>
+              <NUMBER>160</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>LIBR_SERVICE</NAME>
+              <NUMBER>162</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>INTER_EQUANT_RECTORAT</NAME>
+              <NUMBER>17</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>DATA_RIHDA</NAME>
+              <NUMBER>170</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>DATA_POLY</NAME>
+              <NUMBER>171</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>DATA_CEPE</NAME>
+              <NUMBER>172</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>INT_EQUANT_ETABLISSEMENTS</NAME>
+              <NUMBER>18</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>video_RIHDA</NAME>
+              <NUMBER>180</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>postesIP_RIHDA</NAME>
+              <NUMBER>190</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>ADMIN_RESEAU</NAME>
+              <NUMBER>196</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>SERVERS</NAME>
+              <NUMBER>2</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>PERIPHERIQUES</NAME>
+              <NUMBER>201</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>UTIL_NVEAU_BAT</NAME>
+              <NUMBER>202</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>UTIL_FORMATION</NAME>
+              <NUMBER>204</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>UTIL_CATI</NAME>
+              <NUMBER>205</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>UTIL_INVITES</NAME>
+              <NUMBER>214</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>UTIL_SYST_RESEAUX</NAME>
+              <NUMBER>215</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>DMZ_HD</NAME>
+              <NUMBER>22</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>ZONE_PUBLIQUE</NAME>
+              <NUMBER>3</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>RESEAU_DRRT-PUG</NAME>
+              <NUMBER>30</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>COLLECTE-TEST</NAME>
+              <NUMBER>3000</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>TEST-APPLI</NAME>
+              <NUMBER>3002</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>TEST-AGRIATE</NAME>
+              <NUMBER>3006</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>TEST-ETAB</NAME>
+              <NUMBER>3007</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>INTERCO_RACINE_API</NAME>
+              <NUMBER>4</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>VLAN401</NAME>
+              <NUMBER>401</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>wifi_recteur</NAME>
+              <NUMBER>402</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>DMZ_ELGG</NAME>
+              <NUMBER>403</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>DMZ</NAME>
+              <NUMBER>5</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>AGRIATES</NAME>
+              <NUMBER>6</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>ACCUEIL_ETABLISSEMENTS</NAME>
+              <NUMBER>7</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+          </VLANS>
         </PORT>
         <PORT>
           <AGGREGATE>
@@ -2073,6 +3652,218 @@
           <IFSTATUS>1</IFSTATUS>
           <IFTYPE>161</IFTYPE>
           <MAC>00:18:71:c1:e0:00</MAC>
+          <VLANS>
+            <VLAN>
+              <NAME>DEFAULT_VLAN</NAME>
+              <NUMBER>1</NUMBER>
+              <TAGGED>0</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>VOIP_ASTERISK</NAME>
+              <NUMBER>13</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>DMZ227</NAME>
+              <NUMBER>14</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>COLLECTE_IP_RIHDA</NAME>
+              <NUMBER>149</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>INTERCO-CSS</NAME>
+              <NUMBER>15</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>RENATER</NAME>
+              <NUMBER>150</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>FW-DMZ-INFRA</NAME>
+              <NUMBER>152</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>FW-VLAN-LIBRE</NAME>
+              <NUMBER>153</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>FW-INTERCO-FOUNDRY</NAME>
+              <NUMBER>154</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>FW-DMZ</NAME>
+              <NUMBER>155</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>FW-Libre_Service</NAME>
+              <NUMBER>156</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>FW-DMZ-PEDA</NAME>
+              <NUMBER>157</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>FW-DMZ-INFRA2</NAME>
+              <NUMBER>158</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>FW-PUG-DRRT</NAME>
+              <NUMBER>159</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>SERVEUR-CSS</NAME>
+              <NUMBER>16</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>ToIP_RIHDA</NAME>
+              <NUMBER>160</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>LIBR_SERVICE</NAME>
+              <NUMBER>162</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>INTER_EQUANT_RECTORAT</NAME>
+              <NUMBER>17</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>DATA_RIHDA</NAME>
+              <NUMBER>170</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>DATA_POLY</NAME>
+              <NUMBER>171</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>DATA_CEPE</NAME>
+              <NUMBER>172</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>INT_EQUANT_ETABLISSEMENTS</NAME>
+              <NUMBER>18</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>video_RIHDA</NAME>
+              <NUMBER>180</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>postesIP_RIHDA</NAME>
+              <NUMBER>190</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>ADMIN_RESEAU</NAME>
+              <NUMBER>196</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>SERVERS</NAME>
+              <NUMBER>2</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>PERIPHERIQUES</NAME>
+              <NUMBER>201</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>UTIL_NVEAU_BAT</NAME>
+              <NUMBER>202</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>UTIL_FORMATION</NAME>
+              <NUMBER>204</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>UTIL_CATI</NAME>
+              <NUMBER>205</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>UTIL_INVITES</NAME>
+              <NUMBER>214</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>UTIL_SYST_RESEAUX</NAME>
+              <NUMBER>215</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>DMZ_HD</NAME>
+              <NUMBER>22</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>ZONE_PUBLIQUE</NAME>
+              <NUMBER>3</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>RESEAU_DRRT-PUG</NAME>
+              <NUMBER>30</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>INTERCO_RACINE_API</NAME>
+              <NUMBER>4</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>VLAN401</NAME>
+              <NUMBER>401</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>wifi_recteur</NAME>
+              <NUMBER>402</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>DMZ_ELGG</NAME>
+              <NUMBER>403</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>DMZ</NAME>
+              <NUMBER>5</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>AGRIATES</NAME>
+              <NUMBER>6</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>ACCUEIL_ETABLISSEMENTS</NAME>
+              <NUMBER>7</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+          </VLANS>
         </PORT>
         <PORT>
           <AGGREGATE>
@@ -2116,6 +3907,218 @@
           <IFSTATUS>1</IFSTATUS>
           <IFTYPE>161</IFTYPE>
           <MAC>00:18:71:c1:e0:00</MAC>
+          <VLANS>
+            <VLAN>
+              <NAME>DEFAULT_VLAN</NAME>
+              <NUMBER>1</NUMBER>
+              <TAGGED>0</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>VOIP_ASTERISK</NAME>
+              <NUMBER>13</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>DMZ227</NAME>
+              <NUMBER>14</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>COLLECTE_IP_RIHDA</NAME>
+              <NUMBER>149</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>INTERCO-CSS</NAME>
+              <NUMBER>15</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>RENATER</NAME>
+              <NUMBER>150</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>FW-DMZ-INFRA</NAME>
+              <NUMBER>152</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>FW-VLAN-LIBRE</NAME>
+              <NUMBER>153</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>FW-INTERCO-FOUNDRY</NAME>
+              <NUMBER>154</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>FW-DMZ</NAME>
+              <NUMBER>155</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>FW-Libre_Service</NAME>
+              <NUMBER>156</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>FW-DMZ-PEDA</NAME>
+              <NUMBER>157</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>FW-DMZ-INFRA2</NAME>
+              <NUMBER>158</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>FW-PUG-DRRT</NAME>
+              <NUMBER>159</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>SERVEUR-CSS</NAME>
+              <NUMBER>16</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>ToIP_RIHDA</NAME>
+              <NUMBER>160</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>LIBR_SERVICE</NAME>
+              <NUMBER>162</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>INTER_EQUANT_RECTORAT</NAME>
+              <NUMBER>17</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>DATA_RIHDA</NAME>
+              <NUMBER>170</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>DATA_POLY</NAME>
+              <NUMBER>171</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>DATA_CEPE</NAME>
+              <NUMBER>172</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>INT_EQUANT_ETABLISSEMENTS</NAME>
+              <NUMBER>18</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>video_RIHDA</NAME>
+              <NUMBER>180</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>postesIP_RIHDA</NAME>
+              <NUMBER>190</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>ADMIN_RESEAU</NAME>
+              <NUMBER>196</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>SERVERS</NAME>
+              <NUMBER>2</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>PERIPHERIQUES</NAME>
+              <NUMBER>201</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>UTIL_NVEAU_BAT</NAME>
+              <NUMBER>202</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>UTIL_FORMATION</NAME>
+              <NUMBER>204</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>UTIL_CATI</NAME>
+              <NUMBER>205</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>UTIL_INVITES</NAME>
+              <NUMBER>214</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>UTIL_SYST_RESEAUX</NAME>
+              <NUMBER>215</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>DMZ_HD</NAME>
+              <NUMBER>22</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>ZONE_PUBLIQUE</NAME>
+              <NUMBER>3</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>RESEAU_DRRT-PUG</NAME>
+              <NUMBER>30</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>INTERCO_RACINE_API</NAME>
+              <NUMBER>4</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>VLAN401</NAME>
+              <NUMBER>401</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>wifi_recteur</NAME>
+              <NUMBER>402</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>DMZ_ELGG</NAME>
+              <NUMBER>403</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>DMZ</NAME>
+              <NUMBER>5</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>AGRIATES</NAME>
+              <NUMBER>6</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>ACCUEIL_ETABLISSEMENTS</NAME>
+              <NUMBER>7</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+          </VLANS>
         </PORT>
         <PORT>
           <AGGREGATE>
@@ -2269,6 +4272,218 @@
           <IFSTATUS>1</IFSTATUS>
           <IFTYPE>161</IFTYPE>
           <MAC>00:18:71:c1:e0:00</MAC>
+          <VLANS>
+            <VLAN>
+              <NAME>DEFAULT_VLAN</NAME>
+              <NUMBER>1</NUMBER>
+              <TAGGED>0</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>VOIP_ASTERISK</NAME>
+              <NUMBER>13</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>DMZ227</NAME>
+              <NUMBER>14</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>COLLECTE_IP_RIHDA</NAME>
+              <NUMBER>149</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>INTERCO-CSS</NAME>
+              <NUMBER>15</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>RENATER</NAME>
+              <NUMBER>150</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>FW-DMZ-INFRA</NAME>
+              <NUMBER>152</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>FW-VLAN-LIBRE</NAME>
+              <NUMBER>153</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>FW-INTERCO-FOUNDRY</NAME>
+              <NUMBER>154</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>FW-DMZ</NAME>
+              <NUMBER>155</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>FW-Libre_Service</NAME>
+              <NUMBER>156</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>FW-DMZ-PEDA</NAME>
+              <NUMBER>157</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>FW-DMZ-INFRA2</NAME>
+              <NUMBER>158</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>FW-PUG-DRRT</NAME>
+              <NUMBER>159</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>SERVEUR-CSS</NAME>
+              <NUMBER>16</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>ToIP_RIHDA</NAME>
+              <NUMBER>160</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>LIBR_SERVICE</NAME>
+              <NUMBER>162</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>INTER_EQUANT_RECTORAT</NAME>
+              <NUMBER>17</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>DATA_RIHDA</NAME>
+              <NUMBER>170</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>DATA_POLY</NAME>
+              <NUMBER>171</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>DATA_CEPE</NAME>
+              <NUMBER>172</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>INT_EQUANT_ETABLISSEMENTS</NAME>
+              <NUMBER>18</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>video_RIHDA</NAME>
+              <NUMBER>180</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>postesIP_RIHDA</NAME>
+              <NUMBER>190</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>ADMIN_RESEAU</NAME>
+              <NUMBER>196</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>SERVERS</NAME>
+              <NUMBER>2</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>PERIPHERIQUES</NAME>
+              <NUMBER>201</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>UTIL_NVEAU_BAT</NAME>
+              <NUMBER>202</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>UTIL_FORMATION</NAME>
+              <NUMBER>204</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>UTIL_CATI</NAME>
+              <NUMBER>205</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>UTIL_INVITES</NAME>
+              <NUMBER>214</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>UTIL_SYST_RESEAUX</NAME>
+              <NUMBER>215</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>DMZ_HD</NAME>
+              <NUMBER>22</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>ZONE_PUBLIQUE</NAME>
+              <NUMBER>3</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>RESEAU_DRRT-PUG</NAME>
+              <NUMBER>30</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>INTERCO_RACINE_API</NAME>
+              <NUMBER>4</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>VLAN401</NAME>
+              <NUMBER>401</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>wifi_recteur</NAME>
+              <NUMBER>402</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>DMZ_ELGG</NAME>
+              <NUMBER>403</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>DMZ</NAME>
+              <NUMBER>5</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>AGRIATES</NAME>
+              <NUMBER>6</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+            <VLAN>
+              <NAME>ACCUEIL_ETABLISSEMENTS</NAME>
+              <NUMBER>7</NUMBER>
+              <TAGGED>1</TAGGED>
+            </VLAN>
+          </VLANS>
         </PORT>
         <PORT>
           <IFALIAS>DEFAULT_VLAN</IFALIAS>
@@ -3978,7 +6193,7 @@
         </COMPONENT>
     </COMPONENTS>
     </DEVICE>
-    <MODULEVERSION>2.3.99</MODULEVERSION>
+    <MODULEVERSION>4.0</MODULEVERSION>
     <PROCESSNUMBER>1</PROCESSNUMBER>
   </CONTENT>
   <DEVICEID>beria-2012-08-02-20-50-16</DEVICEID>

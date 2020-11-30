@@ -28,4 +28,9 @@ is (romaji2hiragana ($juyokka), 'じゅうよっか', "u-macron to u kana");
 my $yoka = 'yōka';
 is (romaji2hiragana ($yoka), 'ようか', "o-macron to u kana");
 
+is (romaji2hiragana ('ixtsu'), 'いっ', "ixtsu to i-small tsu");
+is (romaji2hiragana ('ixtu'), 'いっ', "ixtu to i-small tsu");
+is (romaji2hiragana ('xwa'), 'ゎ', "xwa to small wa");
+is (romaji2hiragana ('xa'), 'ぁ', "xa to small a");
+
 done_testing ();

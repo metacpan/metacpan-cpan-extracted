@@ -8,4 +8,4 @@ BEGIN {
 
 use Test::More;
 use Test::MinimumVersion;
-all_minimum_version_from_metayml_ok();
+all_minimum_version_ok('5.014000');

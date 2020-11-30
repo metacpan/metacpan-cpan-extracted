@@ -1,5 +1,15 @@
 Revision history for PerlX-Let:
 
+v0.2.8    2020-11-21 12:25:31+00:00 Europe/London
+  [Documentation]
+  - Fixed typo in POD.
+
+  - Changed the coding style of most examples, and noted that "prefix"
+    assignments and multiple assignments are deprecated.
+
+  [Tests]
+  - Added tests for recommended syntax.
+
 v0.2.7    2020-07-31 15:06:15+01:00 Europe/London
   [Documentation]
   - Updated copyright year.

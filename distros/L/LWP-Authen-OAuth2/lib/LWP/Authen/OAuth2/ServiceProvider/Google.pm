@@ -254,7 +254,7 @@ Google's documentation.
 
 It can be specified in the constructor with:
 
-    client_type => "web server",
+    client_type => "installed",
 
 On the first time it is the client's responsibility to open a browser and
 send the user to C<$oauth2->authorization_url(...)>.  If you pass in

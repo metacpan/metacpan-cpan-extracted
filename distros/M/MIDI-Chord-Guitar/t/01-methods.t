@@ -6,7 +6,9 @@ use Test::More;
 
 use_ok 'MIDI::Chord::Guitar';
 
-my $mcg = new_ok 'MIDI::Chord::Guitar';
+my $mcg = new_ok 'MIDI::Chord::Guitar' => [
+    voicing_file => 'share/midi-guitar-chord-voicings.csv',
+];
 
 my $got = $mcg->transform('X', '', 0);
 my $expect = [60, 64, 67, 72]; # C4

@@ -15,7 +15,7 @@ Log::Log4perl->easy_init($ERROR);  # Set priority of root logger to ERROR
 
 # What instances of Chrome will we try?
 my @instances = t::helper::browser_instances();
-my $testcount = 14;
+my $testcount = 15;
 
 if (my $err = t::helper::default_unavailable) {
     plan skip_all => "Couldn't connect to Chrome: $@";
@@ -43,7 +43,7 @@ t::helper::run_across_instances(\@instances, \&new_mech, $testcount, sub {
     my $cookies = $mech->cookie_jar;
     isa_ok $cookies, 'HTTP::Cookies';
 
-    if( $version =~ /\b(\d+)\b/ and ($1 >= 59 and $1 <= 61)) {
+    if( $version =~ /\b(\d+)\b/ and ($1 >= 59 and $1 <= 62)) {
         SKIP: {
             skip "Chrome v$1 doesn't properly handle setting cookies...", $testcount-1;
         };
@@ -122,6 +122,12 @@ t::helper::run_across_instances(\@instances, \&new_mech, $testcount, sub {
         $mech->cookie_jar->load;
         $mech->get($server->url);
         like $mech->content, qr/\btasty2\b/, "Our cookie gets sent";
+        $mech->cookie_jar->load;
+
+        $count = 0;
+        @c = ();
+        $cookies->scan(sub{$count++; push @c,[@_]});
+        cmp_ok $count, '>=', 3, "We keep the cookies our test server sends";
 
     }
 

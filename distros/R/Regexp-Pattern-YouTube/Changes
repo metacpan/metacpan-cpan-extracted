@@ -1,15 +1,27 @@
-0.003   2018-09-10 (PERLANCAR)
+0.005   2020-08-21  Released-By: PERLANCAR; Urgency: medium
+
+	- Add regexes: youtube::channel_id, youtube::playlist_id.
+
+
+0.004   2020-08-21  Released-By: PERLANCAR; Urgency: low
+
+	- No functional changes.
+
+	- [doc] Add notes/caveats to youtube::video_id.
+
+
+0.003   2018-09-10  Released-By: PERLANCAR
 
 	- Add examples.
 
 
-0.002   2016-09-13 (PERLANCAR)
+0.002   2016-09-13  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- [dist] Use {DZP,PWP}:Regexp::Pattern.
 
 
-0.001   2016-09-12 (PERLANCAR)
+0.001   2016-09-12  Released-By: PERLANCAR
 
         - First release.

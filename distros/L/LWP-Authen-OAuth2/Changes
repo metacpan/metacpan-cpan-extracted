@@ -1,5 +1,12 @@
 Revision history for LWP-Authen-OAuth2
 
+0.17	2020-11-22T17:42:02
+    - fix bug in token-refresh, RT132661 (Ruud)
+    - fix doc error reported by niceperl in RT133154 (niceperl)
+    - add redirect_uri as optional request param (suggested by john ridley)
+    - Fix casing of LWP::UserAgent in Pod link (Olaf Alders)
+
+
 0.16    2019-02-25T21:39:03
     - remove useless links to search.cpan.org (Thomas Klausner)
     - add Michael Stevens to thank-you section (Thomas Klausner)

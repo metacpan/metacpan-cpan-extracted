@@ -4,12 +4,19 @@ use warnings;
 
 use base 'RxPerl::Observable';
 
-our $VERSION = "v6.1.1";
+our $VERSION = "v6.2.1";
 
 # over-rideable
-sub _on_subscribe {
-    my ($self, $subscriber) = @_;
-}
+# sub _on_subscribe {
+#     my ($self, $subscriber) = @_;
+#     ...
+# }
+
+# over-rideable
+# sub _on_subscribe_closed {
+#     my ($self, $subscriber) = @_;
+#     ...
+# }
 
 sub new {
     my ($class) = @_;
@@ -20,13 +27,14 @@ sub new {
         my ($subscriber) = @_;
 
         if ($self->{_closed}) {
+            $self->_on_subscribe_closed($subscriber) if $self->can('_on_subscribe_closed');
             my ($type, @args) = @{ $self->{_closed} };
             $subscriber->{$type}->(@args) if defined $subscriber->{$type};
             return;
         }
 
         $subscribers{$subscriber} = $subscriber;
-        $self->_on_subscribe($subscriber);
+        $self->_on_subscribe($subscriber) if $self->can('_on_subscribe');
 
         return sub {
             delete $subscribers{$subscriber};

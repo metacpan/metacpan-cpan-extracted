@@ -1,6 +1,5 @@
 # bash completion for urpmi and friends
 # Copyright (c) 2002-2006 Guillaume Rousse <guillomovitch@mandriva.com>
-# $Id: urpmi.bash-completion 266536 2010-02-26 21:07:37Z guillomovitch $
 
 common_options="-q --quiet -v --verbose --debug -h --help --urpmi-root --wait-lock"
 

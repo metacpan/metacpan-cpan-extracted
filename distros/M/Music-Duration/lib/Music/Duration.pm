@@ -6,9 +6,9 @@ our $AUTHORITY = 'cpan:GENE';
 use strict;
 use warnings;
 
-use MIDI::Simple;
+use MIDI::Simple ();
 
-our $VERSION = '0.0800';
+our $VERSION = '0.0801';
 
 
 {
@@ -67,7 +67,7 @@ Music::Duration - Add 32nd, 64th, 128th and tuplet durations to MIDI-Perl
 
 =head1 VERSION
 
-version 0.0800
+version 0.0801
 
 =head1 SYNOPSIS
 

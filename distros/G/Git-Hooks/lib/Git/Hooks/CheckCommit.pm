@@ -1,10 +1,9 @@
-use strict;
 use warnings;
 
 package Git::Hooks::CheckCommit;
 # ABSTRACT: Git::Hooks plugin to enforce commit policies
-$Git::Hooks::CheckCommit::VERSION = '2.14.0';
-use 5.010;
+$Git::Hooks::CheckCommit::VERSION = '3.0.0';
+use 5.016;
 use utf8;
 use Carp;
 use Log::Any '$log';
@@ -13,7 +12,7 @@ use Git::Repository::Log;
 use List::MoreUtils qw/any none/;
 
 my $PKG = __PACKAGE__;
-(my $CFG = __PACKAGE__) =~ s/.*::/githooks./;
+my $CFG = __PACKAGE__ =~ s/.*::/githooks./r;
 
 #############
 # Grok hook configuration, check it and set defaults.
@@ -359,16 +358,8 @@ EOS
     return $errors;
 }
 
-sub check_pre_commit {
+sub check_commit {
     my ($git) = @_;
-
-    $log->debug(__PACKAGE__ . "::check_pre_commit");
-
-    _setup_config($git);
-
-    my $current_branch = $git->get_current_branch();
-
-    return 1 unless $git->is_reference_enabled($current_branch);
 
     # Grok author and committer information from git's environment variables, if
     # they're defined. Sometimes they aren't...
@@ -386,11 +377,11 @@ sub check_pre_commit {
         message   => "Fake\n",
     );
 
-    return 0 ==
-        (match_errors($git, $commit) +
-         email_valid_errors($git, $commit) +
-         canonical_errors($git, $commit) +
-         code_errors($git, $commit));
+    return
+        match_errors($git, $commit) +
+        email_valid_errors($git, $commit) +
+        canonical_errors($git, $commit) +
+        code_errors($git, $commit);
 }
 
 sub check_post_commit {
@@ -409,62 +400,21 @@ sub check_post_commit {
     return signature_errors($git, $commit);
 }
 
-# This routine can act both as an update or a pre-receive hook.
-sub check_affected_refs {
-    my ($git) = @_;
-
-    $log->debug(__PACKAGE__ . "::check_affected_refs");
-
-    _setup_config($git);
-
-    return 1 if $git->im_admin();
-
-    my $errors = 0;
-
-    foreach my $ref ($git->get_affected_refs()) {
-        next unless $git->is_reference_enabled($ref);
-        $errors += check_ref($git, $ref);
-    }
-
-    return $errors == 0;
-}
-
 sub check_patchset {
-    my ($git, $opts) = @_;
+    my ($git, $branch, $commit) = @_;
 
-    $log->debug(__PACKAGE__ . "::check_patchset");
-
-    _setup_config($git);
-
-    return 1 if $git->im_admin();
-
-    my $sha1   = $opts->{'--commit'};
-    my $commit = $git->get_commit($sha1);
-
-    # The --branch argument contains the branch short-name if it's in the
-    # refs/heads/ namespace. But we need to always use the branch long-name,
-    # so we change it here.
-    my $branch = $opts->{'--branch'};
-    $branch = "refs/heads/$branch"
-        unless $branch =~ m:^refs/:;
-
-    return 1 unless $git->is_reference_enabled($branch);
-
-    return commit_errors($git, $commit) == 0;
+    return commit_errors($git, $commit, $branch);
 }
 
 # Install hooks
-PRE_APPLYPATCH   \&check_pre_commit;
+my $options = {config => \&_setup_config};
+
+GITHOOKS_CHECK_AFFECTED_REFS \&check_ref,      $options;
+GITHOOKS_CHECK_PRE_COMMIT    \&check_commit,   $options;
+GITHOOKS_CHECK_PATCHSET      \&check_patchset, $options;
+
 POST_APPLYPATCH  \&check_post_commit;
-PRE_COMMIT       \&check_pre_commit;
 POST_COMMIT      \&check_post_commit;
-UPDATE           \&check_affected_refs;
-PRE_RECEIVE      \&check_affected_refs;
-REF_UPDATE       \&check_affected_refs;
-COMMIT_RECEIVED  \&check_affected_refs;
-SUBMIT           \&check_affected_refs;
-PATCHSET_CREATED \&check_patchset;
-DRAFT_PUBLISHED  \&check_patchset;
 
 1;
 
@@ -480,7 +430,7 @@ Git::Hooks::CheckCommit - Git::Hooks plugin to enforce commit policies
 
 =head1 VERSION
 
-version 2.14.0
+version 3.0.0
 
 =head1 SYNOPSIS
 
@@ -582,7 +532,7 @@ option:
     [githooks]
       plugin = CheckCommit
 
-=for Pod::Coverage match_errors merge_errors email_valid_errors canonical_errors identity_errors signature_errors spelling_errors pattern_errors subject_errors body_errors footer_errors commit_errors code_errors check_pre_commit check_post_commit check_ref check_affected_refs check_patchset
+=for Pod::Coverage match_errors merge_errors email_valid_errors canonical_errors identity_errors signature_errors spelling_errors pattern_errors subject_errors body_errors footer_errors commit_errors code_errors check_commit check_post_commit check_ref check_patchset
 
 =head1 NAME
 

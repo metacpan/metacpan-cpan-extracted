@@ -12,6 +12,7 @@ build_requires:
   warnings: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
+  perl: '5.006'
 dynamic_config: 0
 generated_by: 'Dist::Zilla version 6.015, CPAN::Meta::Converter version 2.150010'
 license: perl
@@ -26,11 +27,12 @@ requires:
   Music::Duration: '0'
   constant: '0'
   namespace::clean: '0'
+  perl: '5.006'
   strictures: '2'
 resources:
   homepage: https://github.com/ology/MIDI-Drummer-Tiny
   repository: https://github.com/ology/MIDI-Drummer-Tiny.git
-version: '0.1801'
+version: '0.1802'
 x_Dist_Zilla:
   perl:
     version: '5.030002'
@@ -39,6 +41,10 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::VersionFromModule
       name: VersionFromModule
       version: '0.08'
+    -
+      class: Dist::Zilla::Plugin::MinimumPerl
+      name: MinimumPerl
+      version: '1.006'
     -
       class: Dist::Zilla::Plugin::AutoPrereqs
       name: AutoPrereqs

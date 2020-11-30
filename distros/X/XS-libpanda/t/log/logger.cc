@@ -68,7 +68,7 @@ TEST("set_logger") {
 
     if (grep) REQUIRE_THAT(str, Catch::Contains("hello"));
     else      REQUIRE(str == "hello");
-    REQUIRE(info.level == ALERT);
+    REQUIRE(info.level == Level::Alert);
     REQUIRE(info.func == __func__);
     REQUIRE(info.file.length() > 0);
     REQUIRE(info.line == chk_line);

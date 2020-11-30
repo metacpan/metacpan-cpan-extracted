@@ -5,9 +5,10 @@ author:
 build_requires:
   Test::More: '0'
 configure_requires:
+  Alien::libmariadbclient: '0.01'
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.56, CPAN::Meta::Converter version 2.150010'
 license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -18,6 +19,10 @@ no_index:
     - t
     - inc
 requires:
+  AnyEvent: '0'
+  AnyEvent::XSPromises: '0'
+  Ref::Util: '0'
+  Sub::StrictDecl: '0'
   perl: '5.006'
-version: '0.26'
+version: '0.29'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

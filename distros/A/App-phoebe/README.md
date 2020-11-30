@@ -122,13 +122,13 @@ GNU Affero General Public License
 
 Using `cpan`:
 
-    $ cpan App::phoebe
+    cpan App::phoebe
 
 Manual install:
 
-    $ perl Makefile.PL
-    $ make
-    $ make install
+    perl Makefile.PL
+    make
+    make install
 
 ## Dependencies
 
@@ -163,43 +163,29 @@ The `update-readme.pl` script I use to generate `README.md` also requires
 
 ## Quickstart
 
-Right now there aren't any releases. You just get the latest version from the
-repository and that's it. I'm going to assume that you're going to create a new
-user just to be safe.
+I'm going to assume that you're going to create a new user just to be safe.
 
     sudo adduser --disabled-login --disabled-password phoebe
-    sudo su phoebe
+    sudo su phoebe --shell=/bin/bash
     cd
 
 Now you're in your home directory, `/home/phoebe`. We're going to install
-things right here. First, get the source code:
+things right here.
 
-    curl --output phoebe https://alexschroeder.ch/cgit/phoebe/plain/phoebe
+    cpan App::phoebe
 
-Since Phoebe traffic is encrypted, we need to generate a certificate and a key.
-These are both stored in PEM files. To create your own copies of these files
-(and you should!), use "make cert" if you have a copy of the Makefile. If you
-don't, use this:
+Start Phoebe. It's going to prompt you for a hostname and create certificates
+for you. If in doubt, answer `localhost`. The certificate and a private key are
+stored in the `cert.pem` and `key.pem` files, using elliptic curves, valid for
+five years, without password protection.
 
-    openssl req -new -x509 -newkey ec \
-    -pkeyopt ec_paramgen_curve:prime256v1 \
-    -days 1825 -nodes -out cert.pem -keyout key.pem
-
-This creates a certificate and a private key, both of them unencrypted, using
-eliptic curves of a particular kind, valid for five years.
-
-You should have three files, now: `phoebe`, `cert.pem`, and
-`key.pem`. That's enough to get started! Start the server:
-
-    perl phoebe
+    perl5/bin/phoebe
 
 This starts the server in the foreground. If it aborts, see the
 ["Troubleshooting"](#troubleshooting) section below. If it runs, open a second terminal and test
 it:
 
-    echo gemini://localhost \
-      | openssl s_client --quiet --connect localhost:1965 2>/dev/null
-
+    perl5/bin/gemini gemini://localhost/
 You should see a Gemini page starting with the following:
 
     20 text/gemini; charset=UTF-8
@@ -211,8 +197,7 @@ Let's create a new page using the Titan protocol, from the command line:
 
     echo "Welcome to the wiki!" > test.txt
     echo "Please be kind." >> test.txt
-    echo "titan://localhost/raw/Welcome;mime=text/plain;size="`wc --bytes < test.txt`";token=hello" \
-      | cat - test.txt | openssl s_client --quiet --connect localhost:1965 2>/dev/null
+    perl5/bin/titan --url=titan://localhost/raw/Welcome --token=hello test.txt
 
 You should get a nice redirect message, with an appropriate date.
 
@@ -220,8 +205,7 @@ You should get a nice redirect message, with an appropriate date.
 
 You can check the page, now (replacing the appropriate date):
 
-    echo gemini://localhost:1965/page/Welcome \
-      | openssl s_client --quiet --connect localhost:1965 2>/dev/null
+    perl5/bin/gemini gemini://localhost:1965/page/Welcome
 
 You should get back a page that starts as follows:
 
@@ -230,17 +214,6 @@ You should get back a page that starts as follows:
     Please be kind.
 
 Yay! 😁🎉 🚀🚀
-
-Let me return to the topic of Titan-enabled clients for a moment. With those,
-you can do simple things like this:
-
-    echo "Hello! This is a test!" | titan --url=localhost/test --token=hello
-
-Or this:
-
-    titan --url=localhost/test --token=hello test.txt
-
-That makes it a lot easier to upload new content! 😅
 
 If you have a bunch of Gemtext files in a directory, you can upload them all in
 one go:
@@ -262,11 +235,11 @@ with a list of common MIME types.
 Let's continue using the setup we used for the ["Quickstart"](#quickstart) section. Restart
 the server and allow photos:
 
-    perl phoebe --wiki_mime_type=image/jpeg
+    perl5/bin/phoebe --wiki_mime_type=image/jpeg
 
 Upload the image using the `titan` script:
 
-    titan --url=titan://localhost:1965/jupiter.jpg \
+    perl5/bin/titan --url=titan://localhost:1965/jupiter.jpg \
       --token=hello Pictures/Planets/Juno.jpg
 
 You should get back a redirect to the uploaded image:
@@ -334,6 +307,14 @@ repo has the necessary files which you can use to do a quick test. Copy them
 into the installation directory where you want to run Phoebe and try again. Once
 it works, you should _generate your own_ using the Makefile: `make cert`
 should do it.
+
+🔥 **1408A0C1:SSL routines:ssl3\_get\_client\_hello:no shared cipher** 🔥 If you
+created a new certificate and key using elliptic curves using an older OpenSSL,
+you might run into this. Try to create a RSA key instead. It is larger, but at
+least it'll work.
+
+    openssl req -new -x509 -newkey rsa \
+    -days 1825 -nodes -out cert.pem -keyout key.pem
 
 ## Wiki Directory
 

@@ -9,19 +9,33 @@ Types::Core - Core types defined as tests and literals (ease of use)
 
 =head1 VERSION
 
-Version "0.2.7";
+Version "0.3.0";
 
 =cut
 
 
+################################################################################
 { package Types::Core;
-
-  use strict;
-  use warnings;
+	use strict; use warnings;
+  our $VERSION='0.3.0';
   use mem;
-  our $VERSION='0.2.7';
   use constant Self => __PACKAGE__;
 
+# 0.3.0		- NOTE: change in false value of blessed + type from
+#						"undef" to "" (0 length string)
+#						This was done to provide compatibility with "ref" when
+#						it is used on a non-reference or on undef.  Logic _seems_
+#						to be	that a non-ref, untyped or unblessed value is 
+#						empty -- not undefined. While this is arbitrary, that
+#						"ref" returns an empty string, establishes precedent.
+#						The same logic would not apply using 'length' on an 
+#						"undef" value, as "undef" would likely be considered
+#						dimensionless and therefore would have no length.
+#						classname for 'undef'.
+#				  - Finished test 't06' that exercises 'Cmp' and made sure
+#						Cmp is working (as per test). Will fix problems as found.
+# 0.2.8		- isnum was broken
+#					- ErV+EhV didn't argcheck undefs. Hmph! 
 # 0.2.7		- EhV didn't properly test a blessed HASH (but ErV did)
 #					- Added tests for both in t00.t and fixed code
 # 0.2.6   -	Removed another spurious ref, this time to Carp::Always.  
@@ -91,75 +105,56 @@ Version "0.2.7";
     @EXPORT     = (@CORETYPES, qw(EhV ErV));  
     @EXPORT_OK  = ( qw( typ   type  blessed 
                         LongSub     ShortSub 
-                        LongSubName ShortSubName
-                        LongFunc    ShortFunc
                         isnum       Cmp
-                        _getClass   _InClass
-                        _Obj
+                        InClass IsClass
+                        Obj
 												mk_array		mkARRAY
 											 	mk_hash			mkHASH
                         )  );
-  }
+		use Xporter;
 
-  sub _getClass($) { blessed $_[0] }
+		sub InClass($;$) {
+			my $class = shift;
+			if (!@_) { return sub ($) { ref $_[0] eq $class } }
+			else { return ref $_[0] eq $class }
+		}
+		sub IsClass($;$) { goto &InClass }
+										
+		use constant shortest_type    => 'REF';
+		use constant last_let_offset  => length(shortest_type)-1;
+		use constant Empty						=> "";
 
-  sub _InClass($;$) {
-    my $class = shift;
-    if (!@_) { return sub ($) { ref $_[0] eq $class } }
-    else { return ref $_[0] eq $class }
-  }
-  sub _IsClass($;$) { goto &_InClass }
-                  
-  use constant shortest_type    => 'REF';
-  use constant last_let_offset  => length(shortest_type)-1;
+		eval '# line ' . __LINE__ .' '. __FILE__ .' 
+			sub _type ($) {
+				return Empty unless defined $_[0];
+				my $end = index $_[0], "(";
+				return Empty unless $end > '. &last_let_offset .';
+				my $start = 1+rindex($_[0], "=", $end);
+				substr $_[0], $start, $end-$start; 
+			}
+				
+			sub _isatype($$) {
+				my ($var, $type) = @_;
+				ref $var && (1 + index($var, $type."(" )) ? $var : Empty;
+			}
+			sub blessed ($) { 
+				my $arg = $_[0]; 
+				return Empty unless defined $arg;
+				my $ref_arg = ref $arg;
+				return Empty unless $ref_arg;
+				($ref_arg && !$type_lens{$ref_arg}) ? $arg : do {
+					my $len = $type_lens{$ref_arg};
+					$ref_arg."=" eq substr($arg, 0, $len+1) ? $arg : Empty };
+			}
+			';    #end of eval
+		$@ && die "_isatype+blessed eval(2): $@";
 
-  our $Use_Scalar_Util;
-
-  BEGIN {
-    # see if we have some short-cuts available
-    #
-    eval { require Scalar::Util };
-    $Use_Scalar_Util = !$@;
-
-    if ($Use_Scalar_Util) {
-
-      eval '# line ' . __LINE__ .' '. __FILE__ .' 
-      sub _type ($) { Scalar::Util::reftype($_[0]) }
-      sub _isatype ($$) { 
-        (_type($_[0]) || "") eq ( $_[1] || "") ? $_[0] : undef };
-      sub blessed ($) { Scalar::Util::blessed($_[0]) ? $_[0] : undef }';
-
-      $@ && die "_isatype eval(1): $@";
-
-    } else {
-        
-      eval '# line ' . __LINE__ .' '. __FILE__ .' 
-        sub _type ($) {
-          my $end = index $_[0], "(";
-          return undef unless $end > '. &last_let_offset .';
-          my $start = 1+rindex($_[0], "=", $end);
-          substr $_[0], $start, $end-$start; 
-        }
-          
-        sub _isatype($$) {
-          my ($var, $type) = @_;
-          ref $var && (1 + index($var, $type."(" )) ? $var : undef;
-        }
-
-        sub blessed ($) { my $arg = $_[0]; my $tp;
-          my $ra = ref $arg;
-          $ra && !exists $type_lens{$ra} ? $arg : do {
-            my $len = $type_lens{$ra};
-            $ra."=" eq substr ("$arg", 0, $len+1) ? $arg : undef };
-        }
-        ';    #end of eval
-      $@ && die "_isatype eval(2): $@";
-    }
-  }
+	}
 
   sub isatype($$) {goto &_isatype}
   sub typ($) {goto &_type}
   sub type($) {goto &_type}
+
 
   
 =head1 SYNOPSIS
@@ -299,7 +294,16 @@ but a 'friend' of the class might in order to offer helper functions.
     blessed REF;                #test if REF is blessed or not
 
 
-Included for it's usefulness in type checking.  Similar functionality
+Needed for consistency with 'ref' (and typ). 'ref' passes back the
+actual value of the 'ref' if it is a ref.  Following that example,
+'typ' return the underlying type of a perl-ref if it is a reference.
+In the same way, 'blessed' returns the name of the object's
+blessing (its class or package name) if it is 'blessed'.
+
+Warning: take care that L<Scalar::Util>'s version of C<blessed>
+isn't also included, as it throws away the package or blessing
+name and only returns '1' if its argument is blessed.
+perl-type of a reference if it is a reference.Included for it's usefulness in type checking.  Similar functionality
 as implemented in L<Scalar::Util>. This version of C<blessed>
 will use the C<Scalar::Util> version if it is already present.
 Otherwise it uses a pure-perl implementation.
@@ -365,6 +369,9 @@ Multiple levels of hashes or arrays may be tested in one usage. Example:
   BEGIN {
     sub ErV ($*;******************************) { 
       my ($arg, $field) = (shift, shift);
+			return undef unless $field && $arg;
+			my $offset;
+			$field = substr $field,$offset+2 if 1 + ($offset = rindex $field,'::');
       my $h;
       while (defined $field and
             (($h=HASH $arg) && exists $arg->{$field} or
@@ -376,9 +383,12 @@ Multiple levels of hashes or arrays may be tested in one usage. Example:
       return undef;
     }
 
-    sub EhV ($*;******************************) { 
-      my ($arg, $field) = (shift, shift);
-      while (defined($arg) && typ $arg eq 'HASH' and 
+    sub EhV ($*;******************************) {
+      my ($arg, $field) = (shift, shift); 
+			return undef unless $field && $arg;
+			my $offset;
+			$field = substr $field,$offset+2 if 1 + ($offset = rindex $field,'::');
+      while (defined($arg) && typ($arg) eq 'HASH' and 
 							defined($field) && exists $arg->{$field}) {
 				return $arg->{$field} unless @_ > 0;
 				$arg		= $arg->{$field};
@@ -388,32 +398,27 @@ Multiple levels of hashes or arrays may be tested in one usage. Example:
     }
 
 
-    sub LongFunc(;$) { (caller (@_ ? 1+$_[0] : 1))[3] }
-    sub ShortFunc(;$) { 
-      my $f = (@_ ? LongFunc(1+$_[0]) : LongFunc(1) ) || ""; 
+    sub LongSub(;$) { ((caller (@_ ? 1+$_[0] : 1))[3]) || __PACKAGE__."::" }
+    sub ShortSub(;$) { 
+      my $f = (@_ ? LongSub(1+$_[0]) : LongSub(1) ) || ""; 
       substr $f, (1+rindex $f,':') }
 
-    sub LongSub(;$) { goto &LongFunc }
-    sub ShortSub(;$) { goto &ShortFunc }
-    sub LongSubName(;$) { goto &LongFunc }
-    sub ShortSubName(;$) { goto &ShortFunc }
-    
     sub mk_array($) { $_[0] = [] unless q(ARRAY) eq ref $_[0] ; $_[0] }
     sub mkARRAY($) { goto &mk_array }
     sub mk_hash($) { $_[0] = {} unless q(HASH) eq ref $_[0] ; $_[0] }
     sub mkHASH($) { goto &mk_hash }
 
-    # for testing only (EXPERIMENTAL):
-    # _Obj - 1 or 2 parms (on top of "objref" ($p))
+    # Obj - 1 or 2 parms (on top of "objref" ($p))
     ##1st param - name to verify against; verify against objptr by default
     #2nd optional parm = verify against this ref instead of objptr
     #
-    sub _Obj($;$) { my $p = shift if ref $_[0] || $_[0] eq Self;
-      my $objname = shift;                      # txt name
-      my $objref = @_ ? ref $_[0] : ref $p;     # if another parm, chk it as ref
-      $objref && $objref eq $objname
+    sub Obj($;$) { 
+			my $objref	= ref $_[0] || $_[0] eq Self ? shift : "";
+      my $objname	= shift;                  # txt name
+      $objref	= ref $_[0] if @_;						# if another parm, chk it as ref
+      return $objref eq $objname ? $objname : "";
     }
-  
+
   }
 
 
@@ -503,79 +508,87 @@ use constant numRE => qr{^ (
 sub isnum(;$) { 
 	local $_ = @_ ? $_[0] : $_;
 	return undef unless defined $_;
-	my $numRE = numRE;
-	m{$numRE} && return $1;
-	undef;
+	#my $numRE = numRE;
+	m{&numRE} ? 1 : 0;
 }
 
 
-sub Cmp (;$$$);
-sub Cmp (;$$$) { my $r=0; my $dbg;
-  if (@_) {
-    $dbg = @_==1 ? $_[0] : @_==3 ? $_[2] : undef;
-   ($a, $b) = @_ if @_>1;
-  }
-	$a="" unless defined $a;
-	$b="" unless defined $b;
+sub Cmp($$;$);
+sub Cmp ($$;$) { my $r=0;
+   my ($a, $b) = @_;
+    my $dbg = @_==3 ? $_[2] : undef;
   require P if $dbg;
-  my ($ra, $rb)   = (defined(ref $a)||"", defined(ref $b)||"");
-  my ($ta, $tb)   = (defined(type $a) || "", defined(type $b)||"");
-  do {  P::Pe("ta=%s, tb=%s", $ta, $tb);
-        P::Pe("ra=%s, rb=%s", $ra, $rb) } if $dbg;
+	return undef unless defined $a && defined $b;
+  my ($ra, $rb)   = (ref $a, ref $b);
+  my ($ta, $tb)   = (typ $a, typ $b);
+	return undef unless defined $ra && defined $rb;
   my ($dta, $dtb) = (defined $ta, defined $tb);
+	return undef unless $dta && $dtb;
+  do {  my $out = P::P("a='%s', b='%s'; ", $a, $b);
+					$out .= P::P("ta='%s', tb='%s'; ", $ta, $tb);
+					$out .= P::P("ra='%s', rb='%s'; ", $ra, $rb);
+					P::Pe("%s", $out)	} if $dbg;
 
-  # first handle "values" (neither are a type reference)
-  if ($dta && $dtb) {
-    $r = isnum($a) && isnum($b)
-                    ? $a <=> $b
-                    : $a cmp $b;
-    P::Pe("isnum, a=%s, b=%s, r=%s", isnum($a), isnum($b), $r) if $dbg;
-    return $r } 
-  # then handle unequal type references
-  elsif ($dta ^ $dtb) { return (undef, 1) } 
-  elsif ($dta && $dtb && $ta ne $tb) { return (undef, 2) }
+	return undef if $ta ne $tb;
+
+	unless ($ta || $tb) {						# do val processing if both are vals
+		# handle values, nums if nums, else as strings
+		$r = isnum($a) && isnum($b)
+										? $a <=> $b
+										: $a cmp $b;
+		P::Pe("isnum(a)=%s, isnum(b)=%s, r=%s", isnum($a), isnum($b), $r) if $dbg;
+		return $r 
+	}
+  
+	# then handle unequal type references
+  if ($dta ^ $dtb) {  			# one defined
+		return (undef, 1);
+	}
+	unless ($dta && $dtb) { return (undef, 2) }		#either undef
 
   # now, either do same thing again, or handle differing classes
   # the no-class on either implies no type-ref on either & is handled above
   my ($dra, $drb) = (defined $ra, defined $rb);
-  if ($dra ^ $drb) { return (undef, 3) } 
-  elsif ($dra && $drb && $ra ne $rb) { return (undef, 4) }
+  if ($dra ^ $drb) { return (undef, 4) } 
+  elsif ($dra && $drb && $ra ne $rb) { return (undef, 5) }
 
   # now start comparing references: dereference and call Cmp again
   if ($ta eq SCALAR) {
-    return Cmp($$a, $$b) }
+    return Cmp($$a, $$b, $dbg) }
   elsif ($ta eq ARRAY) {
 
-    P::Pe("len of array a vs. b: (%s <=> %s)", @$a, @$b) if $dbg;
+    P::Pe("len of array a vs. b: (%s <=> %s)", 0+@$a, 0+@$b) if $dbg;
     return $r if $r = @$a <=> @$b;
 
     # for each member, compare them using Cmp
-    for (my $i=0; $i<@$a; ++$i) {
-      P::Pe("a->[i] Cmp b->[i]...\0x83", $a->[$i], $b->[$i]) if $dbg;
-      $r = Cmp($a->[$i], $b->[$i]);
-      P::Pe("a->[i] Cmp b->[i], r=%s", $a->[$i], $b->[$i], $r) if $dbg;
+    for (my $i=0; $i < 0+@$a; ++$i) {
+      P::Pe("a->[$i] Cmp b->[$i]...\x83") if $dbg;
+      
+			$r = Cmp($a->[$i], $b->[$i], $dbg);
+      
+			P::Pe("%s Cmp %s, r=%s", $a->[$i], $b->[$i], $r) if $dbg;
       return $r if $r;
     }
     return 0;   # arrays are equal
   } elsif ($ta eq HASH) {
     my @ka = sort keys %$a;
     my @kb = sort keys %$b;
-    $r = Cmp(0+@ka, 0+@kb);
+    $r = Cmp(0+@ka, 0+@kb, $dbg);
     P::Pe("Cmp #keys a(%s) b(%s), in hashes: r=%s", 0+@ka, 0+@kb, $r) if $dbg;
     return $r if $r;
 
-    $r = Cmp(\@ka, \@kb);
+    $r = Cmp(\@ka, \@kb, $dbg);
     P::Pe("Cmp keys of hash: r=%s", $r) if $dbg;
     return $r if $r;
 
     my @va = map {$a->{$_}} @ka;
     my @vb = map {$b->{$_}} @kb;
-    $r = Cmp(\@va, \@vb);
+    $r = Cmp(\@va, \@vb, $dbg);
     P::Pe("Cmp values for each key, r=%s", $r) if $dbg;
     return $r;
   } else {
     P::Pe("no comparison for type %s, ref %s", $ta, $ra) if $dbg;
-    return (undef,5); ## unimplemented comparison
+    return (undef,6); ## unimplemented comparison
   }
 }
     use Xporter;

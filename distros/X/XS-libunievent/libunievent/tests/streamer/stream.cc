@@ -51,6 +51,8 @@ TEST("normal input") {
     CHECK(i->stop_reading_cnt == 0);
 }
 
+#ifndef _WIN32 // win32 has low timer resolution for this test
+
 TEST("pause input") {
     AsyncTest test(3000, 1);
     auto p = make_pair(test.loop, 1000, 20);
@@ -67,6 +69,8 @@ TEST("pause input") {
     test.run();
     CHECK(i->stop_reading_cnt > 0);
 }
+
+#endif
 
 TEST("normal output") {
     AsyncTest test(3000, 2);

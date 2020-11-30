@@ -16,3 +16,6 @@
 ^perltidy.LOG$
 ^bitbucket-pipelines.yml$
 ^cover_db/
+\b.*\.(bak|zip|tmp)$
+nytprof.out
+^nytprof/

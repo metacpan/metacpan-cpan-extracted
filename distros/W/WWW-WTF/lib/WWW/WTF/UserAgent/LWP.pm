@@ -57,6 +57,7 @@ sub get {
             content     => WWW::WTF::HTTPResource::Content->new( data => $response->content ),
             successful  => ($response->is_success ? 1 : 0),
             request_uri => $uri,
+            redirects   => [$response->redirects],
         );
 
         $self->cache->set("get/$checksum", $http_resource) if $self->cache;

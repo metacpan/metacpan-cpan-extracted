@@ -1,0 +1,13 @@
+Build.PL
+Changes
+lib/Test/ExpectAndCheck.pm
+lib/Test/ExpectAndCheck/Future.pm
+MANIFEST			This list of files
+t/00use.t
+t/01expect.t
+t/10future.t
+t/99pod.t
+README
+LICENSE
+META.yml
+META.json

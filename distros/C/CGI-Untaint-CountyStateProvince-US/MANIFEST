@@ -3,8 +3,8 @@ ignore.txt
 lib/CGI/Untaint/CountyStateProvince/US.pm
 LICENSE
 Makefile.PL
-MANIFEST
-META.yml			Module meta-data (added by MakeMaker)
+MANIFEST			This list of files
+MANIFEST.SKIP
 README
 README.md
 t/00-load.t
@@ -15,8 +15,10 @@ t/csp-us.t
 t/cv.t
 t/gv.t
 t/kwalitee.t
+t/links.t
 t/manifest.t
 t/metrics.t
+t/no404s.t
 t/noplan.t
 t/pod-cm.t
 t/pod.t
@@ -27,4 +29,5 @@ t/spelling.t
 t/taint.t
 t/untaint.t
 t/vars.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

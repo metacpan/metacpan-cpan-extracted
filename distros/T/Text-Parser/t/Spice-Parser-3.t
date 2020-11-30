@@ -78,7 +78,7 @@ sub _add_instance {
 sub save_record {
     my ( $self, $line ) = @_;
     $line = trim $line;
-    return if $line !~ /\S+/;
+    return                             if $line !~ /\S+/;
     return $self->_add_instance($line) if $line !~ /^[.]/;
     $self->_call_spice_command($line);
 }
@@ -120,8 +120,7 @@ lives_ok { $sp->read('t/example-4.sp'); } 'Works fine again';
 is( scalar( $sp->get_records() ), 2, '2 records saved' );
 is( $sp->lines_parsed(),          4, '4 lines parsed' );
 
-throws_ok { $sp->read('t/bad-spice.sp'); }
-'Text::Parser::Errors::UnexpectedCont',
+throws_ok { $sp->read('t/bad-spice.sp'); } 'Text::Parser::Error',
     'Dies as expected';
 
 lives_ok { $sp->read('t/example-5.sp'); }

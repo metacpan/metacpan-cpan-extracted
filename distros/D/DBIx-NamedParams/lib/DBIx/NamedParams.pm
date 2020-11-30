@@ -13,10 +13,11 @@ use POSIX qw( strftime );
 use Scalar::Util qw( reftype );
 use Term::Encoding qw( term_encoding );
 
-use version 0.77; our $VERSION = version->declare("v0.0.10");
+use version 0.77; our $VERSION = version->declare("v0.0.11");
 
 our $KeepBindingIfNoKey = 0;
 
+my $_package              = __PACKAGE__;
 my $_default_log_filename = $ENV{'HOME'} || $ENV{'USERPROFILE'} || $ENV{'TMP'} || '/tmp';
 $_default_log_filename =~ s#\\#/#g;
 $_default_log_filename .= '/DBIx-NamedParams.log';
@@ -24,14 +25,13 @@ $_default_log_filename .= '/DBIx-NamedParams.log';
 my %_SQL_TypeRefs = ();
 my %_SQL_TypeInvs = ();
 my $_SQL_Types    = '';
-my @_NamedParams  = ();
-my $_index;
-my $_log = undef;
+my $_log          = undef;
 
 sub import {
     DBI->import();
     *{DBI::db::driver_typename_map} = \&driver_typename_map;
     *{DBI::db::prepare_ex}          = \&prepare_ex;
+    *{DBI::st::mapped_params}       = \&mapped_params;
     *{DBI::st::bind_param_ex}       = \&bind_param_ex;
     _init();
 }
@@ -91,7 +91,6 @@ sub driver_typename_map {
 
 sub prepare_ex {
     my ( $self, $sqlex, $refHash ) = @_;
-    my $ret       = undef;
     my $validHash = defined($refHash) && ( reftype($refHash) || '' ) eq 'HASH';
     if ( $sqlex =~ /\:([\w]+)\+-($_SQL_Types)\b/ ) {
         if ($validHash) {
@@ -100,17 +99,17 @@ sub prepare_ex {
             croak("prepare_ex need a hash reference when SQL is variable length.");
         }
     }
-    @_NamedParams = ();
-    $_index       = 1;
-    $sqlex =~ s/\:([\w]+)(?:\{(\d+)\})?-($_SQL_Types)\b/_parse_ex2($1,$2,$3);/ge;
+    my @params = ();
+    $sqlex =~ s/\:([\w]+)(?:\{(\d+)\})?-($_SQL_Types)\b/_parse_ex2(\@params,$1,$2,$3);/ge;
     if ($_log) {
         $_log->info( _thisFuncName(), 'sql_raw', "{{$sqlex}}" );
     }
-    $ret = $self->prepare($sqlex) or croak($DBI::errstr);
+    my $sth = $self->prepare($sqlex) or croak($DBI::errstr);
+    $sth->mapped_params(@params);
     if ($validHash) {
-        $ret->bind_param_ex($refHash);
+        $sth->bind_param_ex($refHash);
     }
-    return $ret;
+    return $sth;
 }
 
 sub _parse_ex1 {
@@ -125,33 +124,46 @@ sub _parse_ex1 {
 }
 
 sub _parse_ex2 {
+    my $params = shift;
     my $name   = shift || '';
     my $repeat = shift || 0;
     my $type   = shift || '';
-    my $ret    = '';
+    my $index  = scalar( @{$params} ) + 1;
 
     if ($_log) {
-        $_log->info( _thisFuncName(), "[$_index]", "\"$name\"",
+        $_log->info( _thisFuncName(), "[${index}]", "\"${name}\"",
             ( !$repeat ) ? "scalar" : "array[$repeat]", $type );
     }
     if ( !$repeat ) {    # scalar
-        $_NamedParams[ $_index++ ] = {
-            Name  => $name,
-            Type  => $_SQL_TypeRefs{$type},
-            Array => -1,
-        };
-        $ret = '?';
+        push(
+            @{$params},
+            {   Name  => $name,
+                Type  => $_SQL_TypeRefs{$type},
+                Array => -1,
+            }
+        );
+        return '?';
     } else {             # array
         for ( my $i = 0; $i < $repeat; ++$i ) {
-            $_NamedParams[ $_index++ ] = {
-                Name  => $name,
-                Type  => $_SQL_TypeRefs{$type},
-                Array => $i,
-            };
+            push(
+                @{$params},
+                {   Name  => $name,
+                    Type  => $_SQL_TypeRefs{$type},
+                    Array => $i,
+                }
+            );
         }
-        $ret = substr( '?,' x $repeat, 0, -1 );
+        return substr( '?,' x $repeat, 0, -1 );
     }
-    return $ret;
+}
+
+sub mapped_params {
+    my $self  = shift;
+    my $inner = tied( %{$self} );
+    if (@_) {
+        $inner->{$_package}{MappedParams} = [@_];
+    }
+    return @{ $inner->{$_package}{MappedParams} || [] };
 }
 
 sub bind_param_ex {
@@ -161,8 +173,9 @@ sub bind_param_ex {
         croak("bind_param_ex need a hash reference.");
     }
     my $thisFunc = _thisFuncName();
-    for ( my $i = 1; $i < @_NamedParams; ++$i ) {
-        my $param = $_NamedParams[$i];
+    my $i        = 0;
+    foreach my $param ( $self->mapped_params() ) {
+        ++$i;
         if ( $KeepBindingIfNoKey && !exists( $refHash->{ $param->{'Name'} } ) ) {
             next;
         }
@@ -282,7 +295,7 @@ When the SQL statement doesn't have the variable array C<:E<lt>NameE<gt>+-E<lt>T
 
     my $sth = $dbh->prepare_ex( $statement, $hashref ) or die($DBI::errstr);
 
-=head2 Database Handle Methods
+=head2 Statement Handle Methods
 
 =head3 bind_param_ex
 

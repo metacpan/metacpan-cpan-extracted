@@ -1,31 +1,34 @@
 /*
-  Copyright 2016-2018 David Anderson. All rights reserved.
+Copyright 2016-2018 David Anderson. All rights reserved.
 
-  This program is free software; you can redistribute it and/or modify it
-  under the terms of version 2 of the GNU General Public License as
-  published by the Free Software Foundation.
+  This program is free software; you can redistribute it and/or
+  modify it under the terms of version 2 of the GNU General
+  Public License as published by the Free Software Foundation.
 
-  This program is distributed in the hope that it would be useful, but
-  WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  This program is distributed in the hope that it would be
+  useful, but WITHOUT ANY WARRANTY; without even the implied
+  warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+  PURPOSE.
 
-  Further, this software is distributed without any warranty that it is
-  free of the rightful claim of any third person regarding infringement
-  or the like.  Any license provided herein, whether implied or
-  otherwise, applies only to this software file.  Patent licenses, if
-  any, provided herein do not apply to combinations of this program with
-  other software, or any other product whatsoever.
+  Further, this software is distributed without any warranty
+  that it is free of the rightful claim of any third person
+  regarding infringement or the like.  Any license provided
+  herein, whether implied or otherwise, applies only to this
+  software file.  Patent licenses, if any, provided herein
+  do not apply to combinations of this program with other
+  software, or any other product whatsoever.
 
-  You should have received a copy of the GNU General Public License along
-  with this program; if not, write the Free Software Foundation, Inc., 51
-  Franklin Street - Fifth Floor, Boston MA 02110-1301, USA.
+  You should have received a copy of the GNU General Public
+  License along with this program; if not, write the Free
+  Software Foundation, Inc., 51 Franklin Street - Fifth Floor,
+  Boston MA 02110-1301, USA.
 
 */
 
 /*  Definitions for TRUE, FALSE, etc. */
-#include "defined_types.h"
-
+#include "globals.h"
 #include "esb.h"
+#include "glflags.h"
 #include "sanitized.h"
 
 /*  This does a uri-style conversion of control characters.
@@ -97,7 +100,6 @@ we turn all non-ASCII to %xx below.
 
 static struct esb_s localesb = {0,0,0,0,0};
 
-boolean no_sanitize_string_garbage = FALSE;
 
 /*  do_sanity_insert() and no_questionable_chars()
     absolutely must have the same idea of
@@ -112,7 +114,8 @@ do_sanity_insert( const char *s,struct esb_s *mesb)
 
         if (c == '%') {
             /* %xx for this too. Simple and unambiguous */
-            esb_append_printf(mesb, "%%%02x",c & 0xff);
+            esb_append(mesb, "%");
+            esb_append_printf_u(mesb, "%02x",c & 0xff);
             continue;
         }
         if (c >= 0x20 && c <=0x7e) {
@@ -127,12 +130,14 @@ do_sanity_insert( const char *s,struct esb_s *mesb)
         }
 #endif /* _WIN32 */
         if (c < 0x20) {
-            esb_append_printf(mesb, "%%%02x",c & 0xff);
+            esb_append(mesb, "%");
+            esb_append_printf_u(mesb, "%02x",c & 0xff);
             continue;
         }
         /* ASSERT:  (c >= 0x7f)  */
         /* ISO-8859 or UTF-8. Not handled well yet. */
-        esb_append_printf(mesb, "%%%02x",c & 0xff);
+        esb_append(mesb, "%");
+        esb_append_printf_u(mesb, "%02x",c & 0xff);
     }
 }
 
@@ -188,7 +193,7 @@ sanitized(const char *s)
 {
     const char *sout = 0;
 
-    if (no_sanitize_string_garbage) {
+    if (glflags.gf_no_sanitize_strings) {
         return s;
     }
     if (no_questionable_chars(s)) {

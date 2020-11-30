@@ -13,13 +13,15 @@ example usage, etc.
 Alternatively, you can obtain the full source files from
 https://github.com/PhilterPaper/Perl-PDF-Builder, where the ticket list (bugs,
 enhancement requests, etc.) is also kept. Unlike the installable CPAN version, 
-this will have to be manually installed (copy files).
+this will have to be manually installed (copy files; there are no XS compiles
+at this time).
 
 Note that there are several "optional" libraries (Perl modules) used to extend
 and improve PDF::Builder. The installation process will not attempt to install 
-them if not present -- you need to do this manually (if you want to use them). 
-Read about the list of optional libraries in PDF::Builder::Docs, and decide 
-whether or not you want to manually install any of them.
+them if not present -- you need to do this manually (if you want to use them),
+or at least, give the go-ahead during the installation process to try
+installing them. Read about the list of optional libraries in 
+PDF::Builder::Docs, and decide whether or not you want to install any of them.
 
 REQUIREMENTS ======================================================
 
@@ -30,6 +32,26 @@ Perl 5.20 or higher. It will likely run on somewhat earlier versions, but
   not supported. The intent is to not waste time and effort trying to fix bugs
   which are an artifact of old Perl releases.
 
+  If you MUST install on an older (pre 5.20) Perl, you can try the following
+  for Strawberry Perl (Windows). NO PROMISES! Something similar MAY work for 
+  other OS's and Perl installations:
+    Unpack installation file (.tar.gz, via a utility such as 7-Zip) into a
+      directory, and cd to that directory
+    Edit .perl-version and change 5.20.0 to 5.16.0 or whatever level desired
+    Edit Makefile.PL and change use 5.020000; to use 5.016000;
+                         change $PERL_version from '5.020000' to '5.016000'
+    cpan .
+
+  Note that some Perl installers MAY have a means to override or suppress the
+  Perl version check. That may be easier to use. Or, you may have to repack
+  the edited directory back into a .tar.gz installable. YMMV.
+
+  If all goes well, PDF::Builder will be installed on your system. Whether or
+  not it will RUN is another matter. Please do NOT open a bug report (ticket)
+  unless you're absolutely sure that the problem is not a result of using an
+  old Perl release, e.g., PDF::Builder is using a feature introduced in Perl
+  5.008 and you're trying to run Perl 5.002!
+
 Libraries used, available from CPAN --
 
  REQUIRED, should be automatically installed...
@@ -38,10 +60,11 @@ Libraries used, available from CPAN --
   Test::Exception (needed only for installation tests)
   Test::Memory::Cycle (needed only for installation tests)
 
- OPTIONAL, install manually if wanted...
-  Graphics::TIFF (recommended if using TIFF image functions)
-  Image::PNG::Libpng (recommended for enhanced PNG image function processing)
-  HarfBuzz::Shaper (recommended for Latin script ligatures and kerning, as
+ OPTIONAL, install manually if wanted AND they failed to install 
+  automatically when requested...
+   Graphics::TIFF (recommended if using TIFF image functions)
+   Image::PNG::Libpng (recommended for enhanced PNG image function processing)
+   HarfBuzz::Shaper (recommended for Latin script ligatures and kerning, as
                     well as for any complex script such as Arabic, Indic
                     scripts, or Khmer)
 
@@ -61,6 +84,11 @@ This is free software, licensed under:
 
   The GNU Lesser General Public License, Version 2.1, February 1999
 
+EXCEPT for some files which are explicitly under other licenses. You are
+permitted (at your option) to redistribute and/or modify this software (those
+portions under LGPL) at an LGPL version greater than 2.1. See INFO/LICENSE for 
+more information on the licenses and warranty statement. 
+
 See INFO/RoadMap file for the PDF::Builder road map.
 See CONTRIBUTING file for how to contribute to the project.
 See INFO/SUPPORT file for information on reporting bugs, etc. via GitHub Issues
@@ -69,7 +97,6 @@ See INFO/DEPRECATED file for information on deprecated features.
 See INFO/KNOWN_INCOMP file for known incompatibilities with PDF::API2.
 See INFO/Changes* files for older change logs.
 See INFO/PATENTS file for information on patents.
-See INFO/LICENSE file for the license.
 See INFO/CONVERSION file for how to convert from PDF::API2 to PDF::Builder
 
 INFO/old/ also has some build and test tool files that are not currently used.

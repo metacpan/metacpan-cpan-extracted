@@ -9,8 +9,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: Mageia\n"
-"POT-Creation-Date: 2020-01-18 09:59+0200\n"
-"PO-Revision-Date: 2020-01-31 14:19+0000\n"
+"POT-Creation-Date: 2020-07-10 17:41+0100\n"
+"PO-Revision-Date: 2020-07-10 16:45+0000\n"
 "Last-Translator: tomaja <toma.jankovic@gmail.com>\n"
 "Language-Team: Serbian (http://www.transifex.com/MageiaLinux/mageia/language/"
 "sr/)\n"
@@ -66,7 +66,7 @@ msgstr "Преузимам пакет `%s'..."
 msgid "Cancel"
 msgstr "Одустани"
 
-#: ../gurpm/RPMProgressDialog.pm:359 ../urpm.pm:452 ../urpm/download.pm:882
+#: ../gurpm/RPMProgressDialog.pm:359 ../urpm.pm:454 ../urpm/download.pm:882
 #: ../urpm/get_pkgs.pm:277 ../urpm/media.pm:1149 ../urpm/media.pm:1682
 #: ../urpm/media.pm:1833
 #, c-format
@@ -281,7 +281,7 @@ msgstr ""
 "%s\n"
 "Да ли свеједно да наставим са инсталацијом?"
 
-#: ../gurpmi2:120
+#: ../gurpmi2:120 ../gurpmi2:386
 #, c-format
 msgid "Warning"
 msgstr "Упозорење"
@@ -341,7 +341,7 @@ msgstr "%s пакета ће бити преузето."
 #, c-format
 msgid "Proceed with the installation of one package?"
 msgid_plural "Proceed with the installation of the %d packages?"
-msgstr[0] "Настави за инсталацијом пакета?"
+msgstr[0] "Настави за инсталацијом %d пакета?"
 msgstr[1] "Настави за инсталацијом %d пакета?"
 msgstr[2] "Настави за инсталацијом %d пакета?"
 
@@ -411,6 +411,16 @@ msgstr "Инсталација завршена"
 msgid "restarting urpmi"
 msgstr "рестартујем urpmi"
 
+#: ../gurpmi2:386
+#, c-format
+msgid "No"
+msgstr "Не"
+
+#: ../gurpmi2:386
+#, c-format
+msgid "Yes"
+msgstr "Да"
+
 #: ../rpm-find-leaves:15
 #, c-format
 msgid ""
@@ -460,139 +470,139 @@ msgstr "Покрећем urpmi у ограниченом моду..."
 msgid "While some packages may have been installed, there were failures.\n"
 msgstr "Иако су неки пакети можда инсталирани, било је неуспешног.\n"
 
-#: ../urpm.pm:193
+#: ../urpm.pm:195
 #, c-format
 msgid "fail to create directory %s"
 msgstr "није успело креирање директоријума %s"
 
-#: ../urpm.pm:194
+#: ../urpm.pm:196
 #, c-format
 msgid "invalid owner for directory %s"
 msgstr "погрешан власник директоријума %s"
 
-#: ../urpm.pm:237
+#: ../urpm.pm:239
 #, c-format
 msgid "Can not download packages into %s"
 msgstr "Не могу да преузимем пакете у %s"
 
-#: ../urpm.pm:253
+#: ../urpm.pm:255
 #, c-format
 msgid "Environment directory %s does not exist"
 msgstr "Околни директоријум %s не постоји"
 
-#: ../urpm.pm:254 ../urpmf:244 ../urpmq:163
+#: ../urpm.pm:256 ../urpmf:244 ../urpmq:163
 #, c-format
 msgid "using specific environment on %s\n"
 msgstr "користим дато окружење на %s\n"
 
-#: ../urpm.pm:422
+#: ../urpm.pm:424
 #, c-format
 msgid "unable to open rpmdb"
 msgstr "не могу да отворим rpmdb"
 
-#: ../urpm.pm:441
+#: ../urpm.pm:443
 #, c-format
 msgid "invalid rpm file name [%s]"
 msgstr "погрешно име rpm датотеке [%s]"
 
-#: ../urpm.pm:447
+#: ../urpm.pm:449
 #, c-format
 msgid "retrieving rpm file [%s] ..."
 msgstr "добављам rpm фајл [%s] ..."
 
-#: ../urpm.pm:449 ../urpm/get_pkgs.pm:275
+#: ../urpm.pm:451 ../urpm/get_pkgs.pm:275
 #, c-format
 msgid "...retrieving done"
 msgstr "... добављање завршено"
 
-#: ../urpm.pm:457
+#: ../urpm.pm:459
 #, c-format
 msgid "unable to access rpm file [%s]"
 msgstr "не могу да приступим rpm датотеци [%s]"
 
-#: ../urpm.pm:462
+#: ../urpm.pm:464
 #, c-format
 msgid "unable to parse spec file %s [%s]"
 msgstr "није могуће парсирати спец фајл %s [%s]"
 
-#: ../urpm.pm:470
+#: ../urpm.pm:472
 #, c-format
 msgid "unable to register rpm file"
 msgstr "не могу да региструјем  rpm фајл"
 
-#: ../urpm.pm:472
+#: ../urpm.pm:474
 #, c-format
 msgid "Incompatible architecture for rpm [%s]"
 msgstr "Неодговарајућа архитектура за rpm [%s]"
 
-#: ../urpm.pm:476
+#: ../urpm.pm:478
 #, c-format
 msgid "error registering local packages"
 msgstr "грешка при регистровању локалних пакета"
 
-#: ../urpm.pm:588
+#: ../urpm.pm:590
 #, c-format
 msgid "This operation is forbidden while running in restricted mode"
 msgstr "Ова операција је забрањена док користе програм у ограниченом моду"
 
-#: ../urpm/args.pm:156 ../urpm/args.pm:165
+#: ../urpm/args.pm:157 ../urpm/args.pm:166
 #, c-format
 msgid "bad proxy declaration on command line\n"
 msgstr "лоша proxy-декларација у командној линији\n"
 
-#: ../urpm/args.pm:320
+#: ../urpm/args.pm:321
 #, c-format
 msgid "urpmq: cannot read rpm file \"%s\"\n"
 msgstr "urpmq: не могу да прочитам rpm фајл \"%s\"\n"
 
-#: ../urpm/args.pm:388
+#: ../urpm/args.pm:389
 #, c-format
 msgid "unexpected expression %s"
 msgstr "неочекивани израз %s"
 
-#: ../urpm/args.pm:389
+#: ../urpm/args.pm:390
 #, c-format
 msgid "missing expression before %s"
 msgstr "недостаје израз испред %s"
 
-#: ../urpm/args.pm:395
+#: ../urpm/args.pm:396
 #, c-format
 msgid "unexpected expression %s (suggestion: use -a or -o ?)"
 msgstr "неочекивани израз %s (предлог: користи -a или -o ?)"
 
-#: ../urpm/args.pm:399
+#: ../urpm/args.pm:400
 #, c-format
 msgid "no expression to close"
 msgstr "нема израза за затварање"
 
-#: ../urpm/args.pm:408
+#: ../urpm/args.pm:409
 #, c-format
 msgid "by default urpmf awaits a regexp. you should use option \"--literal\""
 msgstr ""
 "подразумевано urpmf очекује regexp. требали би да користите опцију \"--"
 "literal\""
 
-#: ../urpm/args.pm:482
+#: ../urpm/args.pm:483
 #, c-format
 msgid "chroot directory doesn't exist"
 msgstr "chroot директоријум не постоји"
 
-#: ../urpm/args.pm:505
+#: ../urpm/args.pm:506
 #, c-format
 msgid "Can't use %s without %s"
 msgstr "Не могу да користим %s без %s"
 
-#: ../urpm/args.pm:508 ../urpm/args.pm:511 ../urpmq:155
+#: ../urpm/args.pm:509 ../urpm/args.pm:512 ../urpmq:155
 #, c-format
 msgid "Can't use %s with %s"
 msgstr "Не могу да користим %s са %s"
 
-#: ../urpm/args.pm:519
+#: ../urpm/args.pm:520
 #, c-format
 msgid "Too many arguments\n"
 msgstr "Превише аргумената\n"
 
-#: ../urpm/args.pm:527
+#: ../urpm/args.pm:528
 #, c-format
 msgid ""
 "%s version %s\n"
@@ -608,7 +618,7 @@ msgstr ""
 "\n"
 "употреба:\n"
 
-#: ../urpm/args.pm:533
+#: ../urpm/args.pm:534
 #, c-format
 msgid "Copyright (C) %s by %s"
 msgstr "Сва права (C) %s задржава %s"
@@ -808,32 +818,32 @@ msgstr "добављам rpm фајлове ѕа медиј \"%s\"..."
 msgid "removing %s"
 msgstr "уклањам %s"
 
-#: ../urpm/install.pm:215
+#: ../urpm/install.pm:217
 #, c-format
 msgid "unable to extract rpm from delta-rpm package %s"
 msgstr "није могуће распаковати rpm из delta-rpm пакета %s"
 
-#: ../urpm/install.pm:242
+#: ../urpm/install.pm:245
 #, c-format
 msgid "unable to install package %s"
 msgstr "не могу да инсталирам пакет %s"
 
-#: ../urpm/install.pm:245
+#: ../urpm/install.pm:248
 #, c-format
 msgid "removing bad rpm (%s) from %s"
 msgstr "уклањам лошег rpm (%s) изfrom %s"
 
-#: ../urpm/install.pm:246 ../urpm/install.pm:393
+#: ../urpm/install.pm:249 ../urpm/install.pm:397
 #, c-format
 msgid "removing %s failed: %s"
 msgstr "уклањање %s није успело: %s"
 
-#: ../urpm/install.pm:295
+#: ../urpm/install.pm:298
 #, c-format
 msgid "removing package %s"
 msgstr "уклањам пакет %s"
 
-#: ../urpm/install.pm:359
+#: ../urpm/install.pm:362
 #, c-format
 msgid ""
 "created transaction for installing on %s (remove=%d, install=%d, upgrade=%d)"
@@ -841,17 +851,17 @@ msgstr ""
 "креирана трансакција за инсталирање на  %s (уклони=%d, инсталирај=%d, "
 "ажурирај=%d)"
 
-#: ../urpm/install.pm:362
+#: ../urpm/install.pm:365
 #, c-format
 msgid "unable to create transaction"
 msgstr "не могу да креирам трансакцију"
 
-#: ../urpm/install.pm:391
+#: ../urpm/install.pm:395
 #, c-format
 msgid "removing installed rpms (%s) from %s"
 msgstr "уклањање инсталираних rpm-ова (%s) из %s"
 
-#: ../urpm/install.pm:400
+#: ../urpm/install.pm:404
 #, c-format
 msgid "More information on package %s"
 msgstr "Више информација о пакету %s"
@@ -1799,7 +1809,7 @@ msgstr "Нема непотребних пакета за уклањање"
 msgid "To satisfy dependencies, the following package will be removed"
 msgid_plural ""
 "To satisfy dependencies, the following %d packages will be removed"
-msgstr[0] "Да би се задовољиле зависности, следећи пакет че бити уклоњен"
+msgstr[0] "Да би се задовољиле зависности, следећи %d пакет че бити уклоњен"
 msgstr[1] ""
 "Да би се задовољиле зависности, следећих пар %d пакета ће бити уклоњено"
 msgstr[2] "Да би се задовољиле зависности, следећи %d пакети ће бити уклоњени"
@@ -3231,7 +3241,7 @@ msgstr ""
 "Нема xml инфа за медиј \"%s\", није могуће приказати било који резултат за "
 "пакетe %s"
 
-#: ../urpmq:487
+#: ../urpmq:488
 #, c-format
 msgid "No changelog found\n"
 msgstr "Лог са изменама није пронађен\n"

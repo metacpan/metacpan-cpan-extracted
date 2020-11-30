@@ -21,5 +21,7 @@ no_index:
     - inc
 requires:
   XSLoader: '0'
-version: v0.5.1
+resources:
+  repository: https://github.com/gh0stwizard/p5-EAV-XS.git
+version: v0.5.3
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

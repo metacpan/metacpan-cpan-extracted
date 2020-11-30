@@ -1,10 +1,9 @@
-use strict;
 use warnings;
 
 package Git::Hooks::CheckFile;
 # ABSTRACT: Git::Hooks plugin for checking files
-$Git::Hooks::CheckFile::VERSION = '2.14.0';
-use 5.010;
+$Git::Hooks::CheckFile::VERSION = '3.0.0';
+use 5.016;
 use utf8;
 use Carp;
 use Log::Any '$log';
@@ -13,7 +12,7 @@ use Text::Glob qw/glob_to_regex/;
 use Path::Tiny;
 use List::MoreUtils qw/any none/;
 
-(my $CFG = __PACKAGE__) =~ s/.*::/githooks./;
+my $CFG = __PACKAGE__ =~ s/.*::/githooks./r;
 
 #############
 # Grok hook configuration, check it and set defaults.
@@ -39,7 +38,7 @@ sub check_command {
         or return;
 
     # interpolate filename in $command
-    (my $cmd = $command) =~ s/\{\}/\'$tmpfile\'/g;
+    my $cmd = $command =~ s/\{\}/\'$tmpfile\'/gr;
 
     # execute command and update $errors
     my ($exit, $output);
@@ -116,11 +115,6 @@ sub check_new_files {           ## no critic (ProhibitExcessComplexity)
 
     # Grok all REGEXP checks
     my %re_checks;
-    foreach my $name (qw/basename path/) {
-        foreach my $check (qw/deny allow/) {
-            $re_checks{$name}{$check} = [map {qr/$_/} $git->get_config("$CFG.$name" => $check)];
-        }
-    }
     foreach ($git->get_config("$CFG.basename" => 'sizelimit')) {
         my ($bytes, $regexp) = split ' ', $_, 2;
         unshift @{$re_checks{basename}{sizelimit}}, [qr/$regexp/, $bytes];
@@ -149,26 +143,6 @@ sub check_new_files {           ## no critic (ProhibitExcessComplexity)
         next unless $name2status->{$file} =~ /[AM]/;
 
         my $basename = path($file)->basename;
-
-        if (any  {$basename =~ $_} @{$re_checks{basename}{deny}} and
-            none {$basename =~ $_} @{$re_checks{basename}{allow}}) {
-            $git->fault(<<"EOS", {%$ctx, option => 'basename.{allow,deny}'});
-The file '$file' basename is not allowed.
-Please, check your configuration options.
-EOS
-            ++$errors;
-            next FILE;          # Don't botter checking the contents of invalid files
-        }
-
-        if (any  {$file =~ $_} @{$re_checks{path}{deny}} and
-            none {$file =~ $_} @{$re_checks{path}{allow}}) {
-            $git->fault(<<"EOS", {%$ctx, option => 'path.{allow,deny}'});
-The file '$file' path is not allowed.
-Please, check your configuration options.
-EOS
-            ++$errors;
-            next FILE;          # Don't botter checking the contents of invalid files
-        }
 
         my $size = $git->file_size($commit, $file);
 
@@ -300,14 +274,6 @@ sub deny_token {
     my $regex = $git->get_config($CFG => 'deny-token')
         or return 0;
 
-    if ($git->version_lt('1.7.4')) {
-        $git->fault(<<'EOS', {option => 'deny-token'});
-This option requires Git 1.7.4 or later but your Git is older.
-Please, upgrade your Git or disable this option.
-EOS
-        return 1;
-    }
-
     # Extract only the lines showing addition of the $regex
     my @diff = grep {/^\+.*?(?:$regex)/}
         ($commit ne ':0'
@@ -422,52 +388,33 @@ sub check_everything {
         deny_token($git, \%context, $commit);
 }
 
-# This routine can act both as an update or a pre-receive hook.
-sub check_affected_refs {
-    my ($git) = @_;
+sub check_ref {
+    my ($git, $ref) = @_;
 
-    $log->debug(__PACKAGE__ . "::check_affected_refs");
+    my ($old_commit, $new_commit) = $git->get_affected_ref_range($ref);
 
-    _setup_config($git);
-
-    return 1 if $git->im_admin();
+    my @commits = $git->get_commits(
+        $old_commit,
+        $new_commit,
+        [qw/--name-status --ignore-submodules -r --cc/],
+    );
 
     my $errors = 0;
 
-    foreach my $ref ($git->get_affected_refs()) {
-        next unless $git->is_reference_enabled($ref);
-
-        my ($old_commit, $new_commit) = $git->get_affected_ref_range($ref);
-
-        my @commits = $git->get_commits(
-            $old_commit,
-            $new_commit,
-            [qw/--name-status --ignore-submodules -r --cc/],
-        );
-
-        foreach my $commit (@commits) {
-            $errors += check_everything($git, $ref, $commit->commit, $commit->extra);
-        }
+    foreach my $commit (@commits) {
+        $errors += check_everything($git, $ref, $commit->commit, $commit->extra);
     }
 
-    return $errors == 0;
+    return $errors;
 }
 
 sub check_commit {
-    my ($git) = @_;
-
-    $log->debug(__PACKAGE__ . "::check_commit");
-
-    _setup_config($git);
-
-    my $current_branch = $git->get_current_branch();
-
-    return 1 unless $git->is_reference_enabled($current_branch);
+    my ($git, $current_branch) = @_;
 
     my $extra = $git->run(qw/diff-index --name-status --ignore-submodules --no-commit-id --cached -r/,
                           $git->get_head_or_empty_tree);
 
-    return 0 == check_everything(
+    return check_everything(
         $git,
         $current_branch,
         ':0',                   # mark to signify the index
@@ -476,42 +423,17 @@ sub check_commit {
 }
 
 sub check_patchset {
-    my ($git, $opts) = @_;
+    my ($git, $branch, $commit) = @_;
 
-    $log->debug(__PACKAGE__ . "::check_patchset");
-
-    _setup_config($git);
-
-    return 1 if $git->im_admin();
-
-    # The --branch argument contains the branch short-name if it's in the
-    # refs/heads/ namespace. But we need to always use the branch long-name,
-    # so we change it here.
-    my $branch = $opts->{'--branch'};
-    $branch = "refs/heads/$branch"
-        unless $branch =~ m:^refs/:;
-
-    return 1 unless $git->is_reference_enabled($branch);
-
-    my ($commit) = $git->get_commits(
-        "$opts->{'--commit'}^",
-        $opts->{'--commit'},
-        [qw/-n 1 --name-status --ignore-submodules -r --cc/],
-    );
-
-    return 0 == check_everything($git, $branch, $commit->commit, $commit->extra);
+    return check_everything($git, $branch, $commit->commit, $commit->extra);
 }
 
 # Install hooks
-PRE_APPLYPATCH   \&check_commit;
-PRE_COMMIT       \&check_commit;
-UPDATE           \&check_affected_refs;
-PRE_RECEIVE      \&check_affected_refs;
-REF_UPDATE       \&check_affected_refs;
-COMMIT_RECEIVED  \&check_affected_refs;
-SUBMIT           \&check_affected_refs;
-PATCHSET_CREATED \&check_patchset;
-DRAFT_PUBLISHED  \&check_patchset;
+my $options = {config => \&_setup_config};
+
+GITHOOKS_CHECK_AFFECTED_REFS \&check_ref,      $options;
+GITHOOKS_CHECK_PRE_COMMIT    \&check_commit,   $options;
+GITHOOKS_CHECK_PATCHSET      \&check_patchset, $options;
 
 1;
 
@@ -527,7 +449,7 @@ Git::Hooks::CheckFile - Git::Hooks plugin for checking files
 
 =head1 VERSION
 
-version 2.14.0
+version 3.0.0
 
 =head1 SYNOPSIS
 
@@ -615,7 +537,7 @@ option:
     [githooks]
       plugin = CheckFile
 
-=for Pod::Coverage check_command check_new_files deny_case_conflicts deny_token check_acls check_everything check_affected_refs check_commit check_patchset
+=for Pod::Coverage check_command check_new_files deny_case_conflicts deny_token check_acls check_everything check_ref check_commit check_patchset
 
 =head1 NAME
 
@@ -824,55 +746,6 @@ such as FIXME or TODO. These marks are usually a reminder to fix things before
 commit, but as it so often happens, they end up being forgotten.
 
 Note that this option requires Git 1.7.4 or newer.
-
-=head2 [DEPRECATED] basename.deny REGEXP
-
-This option is deprecated. Please, use an C<acl> option like this, instead:
-
-  [githooks "checkfile"]
-    acl = deny A ^.*<REGEXP>$
-
-This directive denies files which basenames match REGEXP.
-
-=head2 [DEPRECATED] basename.allow REGEXP
-
-This option is deprecated. Please, use an C<acl> option like this, instead:
-
-  [githooks "checkfile"]
-    acl = allow A ^.*<REGEXP>$
-
-This directive allows files which basenames match REGEXP. Since by default
-all basenames are allowed this directive is useful only to prevent a
-B<githooks.checkfile.basename.deny> directive to deny the same basename.
-
-The basename checks are evaluated so that a file is denied only if it's
-basename matches any B<basename.deny> directive and none of the
-B<basename.allow> directives.  So, for instance, you would apply it like
-this to allow the versioning of F<.gitignore> file while denying any other
-file with a name beginning with a dot.
-
-    [githooks "checkfile"]
-        basename.allow ^\\.gitignore
-        basename.deny  ^\\.
-
-=head2 [DEPRECATED] path.deny REGEXP
-
-This option is deprecated. Please, use an C<acl> option like this, instead:
-
-  [githooks "checkfile"]
-    acl = deny A ^<REGEXP>
-
-This directive denies files which full paths match REGEXP.
-
-=head2 [DEPRECATED] path.allow REGEXP
-
-This option is deprecated. Please, use an C<acl> option like this, instead:
-
-  [githooks "checkfile"]
-    acl = allow A ^<REGEXP>
-
-This directive allows files which full paths match REGEXP. It's useful in
-the same way that B<githooks.checkfile.basename.deny> is.
 
 =head1 AUTHOR
 

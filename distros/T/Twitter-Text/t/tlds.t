@@ -1,6 +1,11 @@
 use Test2::V0;
 use Test2::Plugin::NoWarnings;
-use Test2::Plugin::GitHub::Actions::AnnotateFailedTest;
+BEGIN {
+    eval {
+        require Test2::Plugin::GitHub::Actions::AnnotateFailedTest;
+        Test2::Plugin::GitHub::Actions::AnnotateFailedTest->import;
+    };
+}
 
 use Twitter::Text::Util;
 use Twitter::Text;

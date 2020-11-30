@@ -94,7 +94,7 @@
    "provides" : {
       "MooX::Const" : {
          "file" : "lib/MooX/Const.pm",
-         "version" : "v0.4.4"
+         "version" : "v0.4.5"
       }
    },
    "release_status" : "stable",
@@ -109,7 +109,7 @@
          "web" : "https://github.com/robrwo/MooX-Const"
       }
    },
-   "version" : "v0.4.4",
+   "version" : "v0.4.5",
    "x_authority" : "cpan:RRWO",
    "x_contributors" : [
       "Kang-min Liu \u5289\u5eb7\u6c11 <gugod@gugod.org>"

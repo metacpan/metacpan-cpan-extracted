@@ -1089,6 +1089,10 @@ only_updates : only add "update" media (used by rpmdrake)
 
 =item *
 
+ignorearch : add media even if the arch is not compatible with current one, for example to create a chroot
+
+=item *
+
 mirrorlist
 
 =item *
@@ -1180,7 +1184,7 @@ sub add_distrib_media {
         my $media_name = $distribconf->getvalue($media, 'name') || '';
 
         if (my $media_arch = $distribconf->getvalue($media, 'arch')) {
-            if (!URPM::archscore($media_arch)) {
+            if (!$options{ignorearch} && !URPM::archscore($media_arch)) {
                 $urpm->{log}(N("skipping non compatible media `%s' (for %s)",
 			       $media, $media_arch));
                 next;

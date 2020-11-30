@@ -1,3 +1,14 @@
+0.07 2020-11-25
+- Bugfix: use array of arguments for commands in tests to ensure we're
+  controlling a single sub-process
+
+0.06 2020-11-22
+- New: method signal() added
+- New: terminate() now accepts $timeout after which child process is killed
+
+0.05 2020-11-22
+- Set min version of AnyEvent to 7.11 when AnyEvent::fh_unblock was added
+
 0.04 2020-11-15
 - NOTE: there are backward incompatible changes to the API in this release
 - New: importable convenience constructor spawn()

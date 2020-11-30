@@ -55,6 +55,7 @@ main (int argc, char *argv[])
         }
         else {
             printf ("FAIL: %s\n", sanitize_utf8(line, len));
+            printf ("  code = %d\n", r);
             failed++;
         }
     }

@@ -1,10 +1,9 @@
-use strict;
 use warnings;
 
 package Git::Hooks;
 # ABSTRACT: Framework for implementing Git (and Gerrit) hooks
-$Git::Hooks::VERSION = '2.14.0';
-use 5.010;
+$Git::Hooks::VERSION = '3.0.0';
+use 5.016;
 use utf8;
 use Carp;
 use Exporter qw/import/;
@@ -17,7 +16,7 @@ our @EXPORT; ## no critic (Modules::ProhibitAutomaticExportation)
 my %Hooks;
 
 BEGIN {                         ## no critic (RequireArgUnpacking)
-    my @installers =
+    my @directives =
         qw/ APPLYPATCH_MSG PRE_APPLYPATCH POST_APPLYPATCH
             PRE_COMMIT PREPARE_COMMIT_MSG COMMIT_MSG
             POST_COMMIT PRE_REBASE POST_CHECKOUT POST_MERGE
@@ -28,11 +27,18 @@ BEGIN {                         ## no critic (RequireArgUnpacking)
             COMMIT_RECEIVED SUBMIT
           /;
 
-    for my $installer (@installers) {
-        my $hook = $installer;
+    my @drivers =
+        qw/ GITHOOKS_CHECK_AFFECTED_REFS
+            GITHOOKS_CHECK_PRE_COMMIT
+            GITHOOKS_CHECK_PATCHSET
+            GITHOOKS_CHECK_MESSAGE_FILE
+          /;
+
+    for my $directive (@directives) {
+        my $hook = $directive;
         $hook =~ tr/A-Z_/a-z-/;
         no strict 'refs';       ## no critic (ProhibitNoStrict)
-        *{"Git::Hooks::$installer"} = sub (&) {
+        *{"Git::Hooks::$directive"} = sub (&) {
             push @{$Hooks{$hook}}, {
                 package => scalar(caller),
                 sub     => shift(@_),
@@ -40,8 +46,166 @@ BEGIN {                         ## no critic (RequireArgUnpacking)
         }
     }
 
-    @EXPORT = (@installers, 'run_hook');
+    @EXPORT = (@directives, @drivers, 'run_hook');
+}
 
+sub GITHOOKS_CHECK_AFFECTED_REFS (&;$) {
+    my ($check_ref, $options) = @_;
+    $options //= {};
+    my $caller = caller;
+
+    my $hook = {
+        package => $caller,
+        sub     => sub {
+            my ($git) = @_;
+
+            $log->debug("$caller(GITHOOKS_CHECK_AFFECTED_REFS)");
+
+            $options->{config}($git) if exists $options->{config};
+
+            return 1 if $git->im_admin();
+
+            my $errors = 0;
+
+            foreach my $ref ($git->get_affected_refs()) {
+                next unless $git->is_reference_enabled($ref);
+                $errors += $check_ref->($git, $ref);
+            }
+
+            $options->{destroy}($git) if exists $options->{destroy};
+
+            return $errors == 0;
+        },
+    };
+
+    foreach my $name (qw/commit-received pre-receive ref-update submit update/) {
+        push @{$Hooks{$name}}, $hook;
+    }
+
+    return;
+}
+
+sub GITHOOKS_CHECK_PRE_COMMIT (&;$) {
+    my ($check_commit, $options) = @_;
+    $options //= {};
+    my $caller = caller;
+
+    my $hook = {
+        package => $caller,
+        sub     => sub {
+            my ($git) = @_;
+
+            $log->debug("$caller(GITHOOKS_CHECK_COMMIT)");
+
+            return 1 if $git->im_admin();
+
+            $options->{config}($git) if exists $options->{config};
+
+            my $current_branch = $git->get_current_branch();
+
+            return 1 unless $git->is_reference_enabled($current_branch);
+
+            my $errors = $check_commit->($git, $current_branch);
+
+            $options->{destroy}($git) if exists $options->{destroy};
+
+            return $errors == 0;
+        },
+    };
+
+    foreach my $name (qw/pre-applypatch pre-commit/) {
+        push @{$Hooks{$name}}, $hook;
+    }
+
+    return;
+}
+
+sub GITHOOKS_CHECK_PATCHSET (&;$) {
+    my ($check_patchset, $options) = @_;
+    $options //= {};
+    my $caller = caller;
+
+    my $hook = {
+        package => $caller,
+        sub     => sub {
+            my ($git, $opts) = @_;
+
+            $log->debug("$caller(GITHOOKS_CHECK_PATCHSET)");
+
+            return 1 if $git->im_admin();
+
+            $options->{config}($git) if exists $options->{config};
+
+            my $sha1   = $opts->{'--commit'};
+            my $commit = $git->get_commit($sha1);
+
+            # The --branch argument contains the branch short-name if it's in the
+            # refs/heads/ namespace. But we need to always use the branch long-name,
+            # so we change it here.
+            my $branch = $opts->{'--branch'};
+            $branch = "refs/heads/$branch"
+                unless $branch =~ m:^refs/:;
+
+            return 1 unless $git->is_reference_enabled($branch);
+
+            my $errors = $check_patchset->($git, $branch, $commit);
+
+            $options->{destroy}($git) if exists $options->{destroy};
+
+            return $errors == 0;
+        },
+    };
+
+    foreach my $name (qw/draft-published patchset-created/) {
+        push @{$Hooks{$name}}, $hook;
+    }
+
+    return;
+}
+
+sub GITHOOKS_CHECK_MESSAGE_FILE (&;$) {
+    my ($check_message_file, $options) = @_;
+    $options //= {};
+    my $caller = caller;
+    (my $cfg = $caller) =~ s/.*::/githooks./;
+
+    my $hook = {
+        package => $caller,
+        sub     => sub {
+            my ($git, $commit_msg_file) = @_;
+
+            $log->debug("$caller(GITHOOKS_CHECK_MESSAGE_FILE)");
+
+            return 1 if $git->im_admin();
+
+            $options->{config}($git) if exists $options->{config};
+
+            my $current_branch = $git->get_current_branch();
+
+            return 1 unless $git->is_reference_enabled($current_branch);
+
+            my $msg = eval {$git->read_commit_msg_file($commit_msg_file)};
+
+            unless (defined $msg) {
+                $git->fault(<<"EOS", {details => $@});
+I cannot read the commit message file '$commit_msg_file'.
+EOS
+                return 0;
+            }
+
+            my $errors = $check_message_file->($git, $msg, $current_branch);
+
+            $options->{destroy}($git) if exists $options->{destroy};
+
+            return $errors == 0;
+        },
+    };
+
+    foreach my $name (qw/applypatch-msg commit-msg/) {
+        push @{$Hooks{$name}}, $hook;
+    }
+
+    return;
 }
 
 # This is the main routine of Git::Hooks. It gets the original hook
@@ -79,7 +243,7 @@ sub run_hook {
             unless ($ok) {
                 # Let's see if there is a help-on-error message configured
                 # specifically for this plugin.
-                (my $CFG = $hook->{package}) =~ s/.*::/githooks./;
+                my $CFG = $hook->{package} =~ s/.*::/githooks./r;
                 if (my $help = $git->get_config(lc $CFG => 'help-on-error')) {
                     $git->fault($help, {prefix => $hook->{package}});
                 }
@@ -134,7 +298,7 @@ Git::Hooks - Framework for implementing Git (and Gerrit) hooks
 
 =head1 VERSION
 
-version 2.14.0
+version 3.0.0
 
 =head1 SYNOPSIS
 
@@ -162,13 +326,15 @@ options. (More on this later.)
 
         #!/usr/bin/env perl
 
+        use 5.016;
+        use warnings;
         use Git::Hooks;
 
         run_hook($0, @ARGV);
 
-In fact, this module installs a script called F<githooks.pl> containing the
-three lines above, so that all you have to do is to create symbolic links in
-your Git repository's F<.git/hook> pointing to it.
+In fact, this module installs a script called F<githooks.pl> exactly like that,
+so that all you have to do is to create symbolic links in your Git repository's
+F<.git/hook> pointing to it.
 
 =head1 INTRODUCTION
 
@@ -472,8 +638,8 @@ The CONFIGURATION section below explains this in more detail.
 Plugins are simply Perl modules inside the Git::Hooks name space. Choose a
 descriptive name for it so that it can be installed by means of the
 C<githooks.plugin> configuration option. The only requirement of a plugin is
-that it record one of more functions as hooks using the HOOK DIRECTIVES
-described above.
+that it record one of more functions as hooks using the HOOK DIRECTIVES or the
+HOOK DRIVERS described below.
 
 As an example of a bare-bones plugin we could transform the pre-commit hook
 checking for file sizes that we implemented above into a proper plugin
@@ -575,6 +741,58 @@ make this check work for other hooks as well:
 
 Now it can check file sizes on the Git server, when the user pushes commits
 to it.
+
+With a few changes we could make this plugin more general and consistent with
+the standard plugins. We just need to use the Hook Drivers like this:
+
+    package Git::Hooks::CheckFileSize;
+    # ABSTRACT: Git::Hooks plugin for checking file sizes
+
+    use Git::Hooks;
+
+    # Check if every added/updated file is smaller than a fixed limit.
+
+    my $LIMIT = 10 * 1024 * 1024; # 10MB
+
+    sub check_new_files {
+        my ($git, $commit, @files) = @_;
+
+        my $errors = 0;
+
+        foreach ($git->run(qw/ls-files -s/, @files)) {
+            my ($mode, $sha, $n, $name) = split ' ';
+            my $size = $git->file_size(":0:$name");
+            if ($size > $LIMIT) {
+                $git->fault("File '$name' has $size bytes, more than our limit of $LIMIT",
+                            {prefix => 'CheckSize', commit => $commit});
+                ++$errors;
+            }
+        }
+
+        return $errors;
+    }
+
+    sub check_commit {
+        my ($git) = @_;
+
+        return check_new_files($git, ':0', $git->filter_files_in_index('AM'));
+    }
+
+    sub check_ref {
+        my ($git, $ref) = @_;
+
+        my ($old_commit, $new_commit) = $git->get_affected_ref_range($ref);
+
+        return check_new_files(
+            $git,
+            $new_commit,
+            $git->filter_files_in_range('AM', $old_commit, $new_commit),
+        );
+    }
+
+    # Install hooks
+    GITHOOKS_CHECK_PRE_COMMIT        \&check_commit;
+    GITHOOKS_CHECK_AFFECTED_REFS \&check_ref;
 
 Plugins usually can be configured in their own configuration section. For
 instance, we could allow the user to configure the size limit by putting
@@ -884,6 +1102,98 @@ a C<Gerrit::REST> object is created and inserted in the OPTS hash with
 the key 'gerrit'. This object can be used to interact with the Gerrit
 server.  For more information, please, read the L</Gerrit Hooks>
 section.
+
+=head1 HOOK DRIVERS
+
+As shown in the example above in the L</Implementing Plugins> section, the
+methods in L<Git::Repository::Plugin::GitHooks> make it easy to implement checks
+that can be associated with several hooks at once. For example, the standard
+plugins L<Git::Hooks::CheckCommit>,
+L<Git::Hooks::CheckDiff>, L<Git::Hooks::CheckFile>, L<Git::Hooks::CheckJira>,
+L<Git::Hooks::CheckLog>, L<Git::Hooks::CheckReference>, and
+L<Git::Hooks::CheckWhitespace> all implement their checks for the following
+hooks: F<commit-received>, F<pre-receive>, F<ref-update>, F<submit>, and
+F<update>. In order to make it easier for similar plugins to associate
+themselves to the same hooks, and to make their behaviour more consistent,
+Git::Hooks implements some HOOK DRIVERS, which are kind of "meta-directives"
+used to register routines as several related hooks at once.
+
+Each driver gets a routine-ref or a single block (anonymous routine) as a
+required first argument. Optionally, they can get a hash-ref as its second
+argument.
+
+The first argument must be a routine to check the changes being performed by a
+Git command. Each driver associates this check routine with a set of hooks,
+invoking them passing a Git::Repository object and a few other arguments. The
+routines passed to the drivers must all return zero if all checks pass or a
+positive number if any check fails.
+
+The second argument may contain one or more of the following extra options:
+
+=over 4
+
+=item * B<config>
+
+This must map to another routine-ref which will be invoked once before the
+routine passed as the first argument is invoked in order to setup the plugin
+configuration options. It will be passed the Git::Repository as the sole
+argument.
+
+=item * B<destroy>
+
+This must map to another routine-ref which will be invoked once after the
+routine passed as the first argument is invoked in order to tear down any
+resources acquired by the plugin. It will be passed the Git::Repository as the
+sole argument.
+
+=back
+
+All drivers check the C<githooks.admin> configuration option and do not do
+anything if the user performing the action is an admin.
+
+=head2 GITHOOKS_CHECK_AFFECTED_REFS(SUB, [, OPTIONS])
+
+This driver associates the routine SUB to the following hooks:
+F<commit-received>, F<pre-receive>, F<ref-update>, F<submit>, and F<update>.
+
+They will invoke SUB once for each affected reference, as long as it is enabled
+as specified by the C<githooks.ref> and the C<githooks.noref> options.
+
+The SUB routine will receive two arguments: a Git::Repository object and the
+reference name.
+
+=head2 GITHOOKS_CHECK_PRE_COMMIT(SUB [, OPTIONS])
+
+This driver associates the routine SUB to the following hooks: F<pre-applypatch>
+and F<pre-commit>.
+
+They will invoke SUB once for the current branch, as long as it is enabled as
+specified by the C<githooks.ref> and the C<githooks.noref> options.
+
+The SUB routine will receive two arguments: a Git::Repository object and the
+current branch name.
+
+=head2 GITHOOKS_CHECK_PATCHSET(SUB [, OPTIONS])
+
+This driver associates the routine SUB to the following hooks:
+F<draft-published> and F<patchset-created>.
+
+They will invoke SUB once for the current branch, as long as it is enabled as
+specified by the C<githooks.ref> and the C<githooks.noref> options.
+
+The SUB routine will receive two arguments: a Git::Repository object and a hash
+containing the options the hook obtained from Gerrit.
+
+=head2 GITHOOKS_CHECK_MESSAGE_FILE(SUB [, OPTIONS])
+
+This driver associates the routine SUB to the following hooks: F<applypatch-msg>
+and F<commit-msg>.
+
+They will invoke SUB once for the current branch, as long as it is enabled as
+specified by the C<githooks.ref> and the C<githooks.noref> options.
+
+The SUB routine will receive three arguments: a Git::Repository object, the
+commit message, and the current branch name.
 
 =head1 CONFIGURATION
 
@@ -1361,24 +1671,24 @@ The indented lines providing details for error messages. (Default value is empty
 
 =back
 
-=head1 GIT AND PERL COMPATIBILITY POLICY
+=head1 GIT AND PERL VERSION COMPATIBILITY POLICY
 
-Currently L<Git::Hooks> require Perl 5.10 and Git 1.7.1.
+Currently L<Git::Hooks> require Perl 5.16 and Git 1.8.3.
 
 We try to be compatible with the Git and Perl native packages of the oldest
 L<Ubuntu LTS|https://www.ubuntu.com/info/release-end-of-life> and
 L<CentOS|https://wiki.centos.org/About/Product> Linux distributions still
 getting maintenance updates.
 
-  +-----------------------+------+--------+-------------+
-  | Distro                | Perl |   Git  | End of Life |
-  +-----------------------+------+--------+-------------+
-  | Ubuntu 14.04 (trusty) | 5.18 |  1.9.1 |   2019-04   |
-  | Ubuntu 16.04 (xenial) | 5.22 |  2.7.4 |   2021-04   |
-  | Ubuntu 18.04 (bionic) | 5.26 | 2.15.1 |   2023-04   |
-  | CentOS 6              | 5.10 |  1.7.1 |   2020-12   |
-  | CentOS 7              | 5.16 |  1.8.3 |   2024-07   |
-  +-----------------------+------+--------+-------------+
+  +-------------+-----------------------+------+--------+
+  | End of Life | Distro                | Perl |   Git  |
+  +-------------+-----------------------+------+--------+
+  |   2021-04   | Ubuntu 16.04 (xenial) | 5.22 |  2.7.4 |
+  |   2023-04   | Ubuntu 18.04 (bionic) | 5.26 | 2.15.1 |
+  |   2024-07   | CentOS 7              | 5.16 |  1.8.3 |
+  |   2025-04   | Ubuntu 20.04 (focal ) | 5.30 | 2.25.1 |
+  |   2029-05   | CentOS 8              | 5.26 | 2.18.4 |
+  +-------------+-----------------------+------+--------+
 
 As you can see, we're kept behind mostly by the slow pace of CentOS (actually,
 RHEL) releases.

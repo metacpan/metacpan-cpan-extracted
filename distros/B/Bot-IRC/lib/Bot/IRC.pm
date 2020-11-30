@@ -11,10 +11,9 @@ use IO::Socket::IP -register;
 use IO::Socket::SSL;
 use Time::Crontab;
 use Date::Format 'time2str';
-use Encode 'encode';
 use Try::Tiny;
 
-our $VERSION = '1.26'; # VERSION
+our $VERSION = '1.27'; # VERSION
 
 sub new {
     my $class = shift;
@@ -97,7 +96,7 @@ sub run {
 sub note {
     my ( $self, $msg, $err ) = @_;
     chomp($msg);
-    $msg = '[' . time2str( '%d/%b/%Y:%H:%M:%S %z', time() ) . '] ' . encode( 'utf-8' => $msg ) . "\n";
+    $msg = '[' . time2str( '%d/%b/%Y:%H:%M:%S %z', time() ) . '] ' . $msg . "\n";
 
     if ($err) {
         die $msg if ( $err eq 'die' );
@@ -595,7 +594,7 @@ sub say {
     my $self = shift;
 
     for (@_) {
-        my $string = encode( 'utf-8' => $_ );
+        my $string = $_;
         $self->{socket}->print( $string . "\r\n" );
         $self->note("<<< $string");
     }
@@ -680,10 +679,10 @@ Bot::IRC - Yet Another IRC Bot
 
 =head1 VERSION
 
-version 1.26
+version 1.27
 
-=for markdown [![Build Status](https://travis-ci.org/gryphonshafer/Bot-IRC.svg)](https://travis-ci.org/gryphonshafer/Bot-IRC)
-[![Coverage Status](https://coveralls.io/repos/gryphonshafer/Bot-IRC/badge.png)](https://coveralls.io/r/gryphonshafer/Bot-IRC)
+=for markdown [![test](https://github.com/gryphonshafer/Bot-IRC/workflows/test/badge.svg)](https://github.com/gryphonshafer/Bot-IRC/actions?query=workflow%3Atest)
+[![codecov](https://codecov.io/gh/gryphonshafer/Bot-IRC/graph/badge.svg)](https://codecov.io/gh/gryphonshafer/Bot-IRC)
 
 =head1 SYNOPSIS
 
@@ -1350,11 +1349,11 @@ L<MetaCPAN|https://metacpan.org/pod/Bot::IRC>
 
 =item *
 
-L<Travis CI|https://travis-ci.org/gryphonshafer/Bot-IRC>
+L<GitHub Actions|https://github.com/gryphonshafer/Bot-IRC/actions>
 
 =item *
 
-L<Coveralls|https://coveralls.io/r/gryphonshafer/Bot-IRC>
+L<Codecov|https://codecov.io/gh/gryphonshafer/Bot-IRC>
 
 =item *
 
@@ -1372,7 +1371,7 @@ Gryphon Shafer <gryphon@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by Gryphon Shafer.
+This software is copyright (c) 2021 by Gryphon Shafer.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

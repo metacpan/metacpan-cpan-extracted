@@ -1,0 +1,10 @@
+Revision history for Genealogy::ObituaryDailyTimes
+
+0.03	Mon Nov 23 08:13:44 EST 2020
+	Fix https://www.cpantesters.org/cpan/report/2d3bc734-2d40-11eb-84bc-edd243e66a77
+
+0.02	Sun Nov 22 10:59:25 EST 2020
+	Dereference the return so that we get an array of hash refs
+
+0.01	Sat Nov 21 21:17:41 EST 2020
+	First draft

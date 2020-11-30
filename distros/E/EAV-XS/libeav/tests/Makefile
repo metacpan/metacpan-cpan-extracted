@@ -56,28 +56,28 @@ check-domain: $(TARGETS) $(PARTIAL_TRT)
 	# =====================================================
 	# domain tests
 	# =====================================================
-	./t-all-tlds-test.bin 11 62 ../data/tld-domains.txt
+	./t-all-tlds-test.bin ../data/tld-domains.txt
 	./t-domain-length.bin 4 3 ../data/domain-length.txt
 	./t-dash-domains.bin ../data/xn-dash-domains.txt
 	./t-retired.bin 2 2 ../data/retired.txt
 
 check-lpart: $(TARGETS) $(PARTIAL_TRT)
 	# === localpart tests
-	./t-822-localpart.bin 24 18 ../data/localpart-ascii.txt
-	./t-5321-localpart.bin 21 21 ../data/localpart-ascii.txt
-	./t-5322-localpart.bin 23 19 ../data/localpart-ascii.txt
+	./t-822-localpart.bin 24 19 ../data/localpart-ascii.txt
+	./t-5321-localpart.bin 21 22 ../data/localpart-ascii.txt
+	./t-5322-localpart.bin 23 20 ../data/localpart-ascii.txt
 ifeq ($(RFC6531_FOLLOW_RFC5322),ON)
 ifeq ($(RFC6531_FOLLOW_RFC20),ON)
 	#
 	# --- RFC6531_FOLLOW_RFC5322 = ON ; RFC6531_FOLLOW_RFC20 = ON
 	#
-	./t-6531-localpart.bin 22 20 ../data/localpart-ascii.txt
+	./t-6531-localpart.bin 22 21 ../data/localpart-ascii.txt
 	./t-6531-localpart.bin 15 2 ../data/localpart-utf8.txt
 else
 	#
 	# --- RFC6531_FOLLOW_RFC5322 = ON ; RFC6531_FOLLOW_RFC20 = OFF
 	#
-	./t-6531-localpart.bin 23 19 ../data/localpart-ascii.txt
+	./t-6531-localpart.bin 23 20 ../data/localpart-ascii.txt
 	./t-6531-localpart.bin 15 2 ../data/localpart-utf8.txt
 endif
 else
@@ -85,13 +85,13 @@ ifeq ($(RFC6531_FOLLOW_RFC20),ON)
 	#
 	# --- RFC6531_FOLLOW_RFC5322 = OFF ; RFC6531_FOLLOW_RFC20 = ON
 	#
-	./t-6531-localpart.bin 20 22 ../data/localpart-ascii.txt
+	./t-6531-localpart.bin 20 23 ../data/localpart-ascii.txt
 	./t-6531-localpart.bin 13 4 ../data/localpart-utf8.txt
 else
 	#
 	# --- RFC6531_FOLLOW_RFC5322 = OFF ; RFC6531_FOLLOW_RFC20 = OFF
 	#
-	./t-6531-localpart.bin 21 21 ../data/localpart-ascii.txt
+	./t-6531-localpart.bin 21 22 ../data/localpart-ascii.txt
 	./t-6531-localpart.bin 13 4 ../data/localpart-utf8.txt
 endif
 endif
@@ -108,20 +108,20 @@ check-email: check-email-5322 check-email-6531
 
 check-email-822: $(TARGETS) $(PARTIAL_TRT)
 	# === RFC 822 email address tests
-	./t-822-email.bin 47 0 ../data/pass-email-ascii.txt
-	./t-822-email.bin 0 39 ../data/fail-email-ascii.txt
+	./t-822-email.bin 46 0 ../data/pass-email-ascii.txt
+	./t-822-email.bin 0 44 ../data/fail-email-ascii.txt
 
 
 check-email-5321: $(TARGETS) $(PARTIAL_TRT)
 	# === RFC 5321 email address tests
-	./t-5321-email.bin 41 6 ../data/pass-email-ascii.txt
-	./t-5321-email.bin 0 39 ../data/fail-email-ascii.txt
+	./t-5321-email.bin 40 6 ../data/pass-email-ascii.txt
+	./t-5321-email.bin 0 44 ../data/fail-email-ascii.txt
 
 
 check-email-5322: $(TARGETS) $(PARTIAL_TRT)
 	# === RFC 5322 email address tests
-	./t-5322-email.bin 45 2 ../data/pass-email-ascii.txt
-	./t-5322-email.bin 0 39 ../data/fail-email-ascii.txt
+	./t-5322-email.bin 44 2 ../data/pass-email-ascii.txt
+	./t-5322-email.bin 0 44 ../data/fail-email-ascii.txt
 
 
 check-email-6531:
@@ -131,118 +131,118 @@ ifeq ($(RFC6531_FOLLOW_RFC20),ON)
 	#
 	# --- RFC6531_FOLLOW_RFC5322 = ON ; RFC6531_FOLLOW_RFC20 = ON
 	#
-	./t-6531-email.bin 44 3 ../data/pass-email-ascii.txt
-	./t-6531-email.bin 0 39 ../data/fail-email-ascii.txt
+	./t-6531-email.bin 43 3 ../data/pass-email-ascii.txt
+	./t-6531-email.bin 0 44 ../data/fail-email-ascii.txt
 ifeq (${_withidn},idn)
 	./t-6531-email.bin 8 16 ../data/email-utf8.txt
 else
 	./t-6531-email.bin 7 17 ../data/email-utf8.txt
 endif
 	./t-6531-email.bin 7 1 ../data/email-reg.ru.txt
-	./t-6531-email-fqdn.bin 44 3 ../data/pass-email-ascii.txt
-	./t-6531-email-fqdn.bin 0 39 ../data/fail-email-ascii.txt
+	./t-6531-email-fqdn.bin 43 3 ../data/pass-email-ascii.txt
+	./t-6531-email-fqdn.bin 0 44 ../data/fail-email-ascii.txt
 ifeq (${_withidn},idn)
 	./t-6531-email-fqdn.bin 8 16 ../data/email-utf8.txt
 else
 	./t-6531-email-fqdn.bin 7 17 ../data/email-utf8.txt
 endif
 	./t-6531-email-fqdn.bin 7 1 ../data/email-reg.ru.txt
-	./t-6531-email-tld.bin 34 13 ../data/pass-email-ascii.txt
-	./t-6531-email-tld.bin 0 39 ../data/fail-email-ascii.txt
+	./t-6531-email-tld.bin 33 13 ../data/pass-email-ascii.txt
+	./t-6531-email-tld.bin 0 44 ../data/fail-email-ascii.txt
 ifeq (${_withidn},idn)
 	./t-6531-email-tld.bin 5 19 ../data/email-utf8.txt
 else
 	./t-6531-email-tld.bin 4 20 ../data/email-utf8.txt
 endif
 	./t-6531-email-tld.bin 6 2 ../data/email-reg.ru.txt
-	./t-6531-email-tld-special.bin 34 13 ../data/pass-email-ascii.txt
-	./t-6531-email-tld-special.bin 0 39 ../data/fail-email-ascii.txt
+	./t-6531-email-tld-special.bin 33 13 ../data/pass-email-ascii.txt
+	./t-6531-email-tld-special.bin 0 44 ../data/fail-email-ascii.txt
 else
 	# --- RFC6531_FOLLOW_RFC5322 = ON ; RFC6531_FOLLOW_RFC20 = OFF
-	./t-6531-email.bin 45 2 ../data/pass-email-ascii.txt
-	./t-6531-email.bin 0 39 ../data/fail-email-ascii.txt
+	./t-6531-email.bin 44 2 ../data/pass-email-ascii.txt
+	./t-6531-email.bin 0 44 ../data/fail-email-ascii.txt
 ifeq (${_withidn},idn)
 	./t-6531-email.bin 12 12 ../data/email-utf8.txt
 else
 	./t-6531-email.bin 11 13 ../data/email-utf8.txt
 endif
 	./t-6531-email.bin 7 1 ../data/email-reg.ru.txt
-	./t-6531-email-fqdn.bin 45 2 ../data/pass-email-ascii.txt
-	./t-6531-email-fqdn.bin 0 39 ../data/fail-email-ascii.txt
+	./t-6531-email-fqdn.bin 44 2 ../data/pass-email-ascii.txt
+	./t-6531-email-fqdn.bin 0 44 ../data/fail-email-ascii.txt
 ifeq (${_withidn},idn)
 	./t-6531-email-fqdn.bin 12 12 ../data/email-utf8.txt
 else
 	./t-6531-email-fqdn.bin 11 13 ../data/email-utf8.txt
 endif
 	./t-6531-email-fqdn.bin 7 1 ../data/email-reg.ru.txt
-	./t-6531-email-tld.bin 35 12 ../data/pass-email-ascii.txt
-	./t-6531-email-tld.bin 0 39 ../data/fail-email-ascii.txt
+	./t-6531-email-tld.bin 34 12 ../data/pass-email-ascii.txt
+	./t-6531-email-tld.bin 0 44 ../data/fail-email-ascii.txt
 ifeq (${_withidn},idn)
 	./t-6531-email-tld.bin 5 19 ../data/email-utf8.txt
 else
 	./t-6531-email-tld.bin 4 20 ../data/email-utf8.txt
 endif
 	./t-6531-email-tld.bin 6 2 ../data/email-reg.ru.txt
-	./t-6531-email-tld-special.bin 35 12 ../data/pass-email-ascii.txt
-	./t-6531-email-tld-special.bin 0 39 ../data/fail-email-ascii.txt
+	./t-6531-email-tld-special.bin 34 12 ../data/pass-email-ascii.txt
+	./t-6531-email-tld-special.bin 0 44 ../data/fail-email-ascii.txt
 endif
 else
 ifeq ($(RFC6531_FOLLOW_RFC20),ON)
 	# --- RFC6531_FOLLOW_RFC5322 = OFF ; RFC6531_FOLLOW_RFC20 = ON
-	./t-6531-email.bin 40 7 ../data/pass-email-ascii.txt
-	./t-6531-email.bin 0 39 ../data/fail-email-ascii.txt
+	./t-6531-email.bin 39 7 ../data/pass-email-ascii.txt
+	./t-6531-email.bin 0 44 ../data/fail-email-ascii.txt
 ifeq (${_withidn},idn)
 	./t-6531-email.bin 8 16 ../data/email-utf8.txt
 else
 	./t-6531-email.bin 7 17 ../data/email-utf8.txt
 endif
 	./t-6531-email.bin 7 1 ../data/email-reg.ru.txt
-	./t-6531-email-fqdn.bin 40 7 ../data/pass-email-ascii.txt
-	./t-6531-email-fqdn.bin 0 39 ../data/fail-email-ascii.txt
+	./t-6531-email-fqdn.bin 39 7 ../data/pass-email-ascii.txt
+	./t-6531-email-fqdn.bin 0 44 ../data/fail-email-ascii.txt
 ifeq (${_withidn},idn)
 	./t-6531-email-fqdn.bin 8 16 ../data/email-utf8.txt
 else
 	./t-6531-email-fqdn.bin 7 17 ../data/email-utf8.txt
 endif
 	./t-6531-email-fqdn.bin 7 1 ../data/email-reg.ru.txt
-	./t-6531-email-tld.bin 30 17 ../data/pass-email-ascii.txt
-	./t-6531-email-tld.bin 0 39 ../data/fail-email-ascii.txt
+	./t-6531-email-tld.bin 29 17 ../data/pass-email-ascii.txt
+	./t-6531-email-tld.bin 0 44 ../data/fail-email-ascii.txt
 ifeq (${_withidn},idn)
 	./t-6531-email-tld.bin 5 19 ../data/email-utf8.txt
 else
 	./t-6531-email-tld.bin 4 20 ../data/email-utf8.txt
 endif
 	./t-6531-email-tld.bin 6 2 ../data/email-reg.ru.txt
-	./t-6531-email-tld-special.bin 30 17 ../data/pass-email-ascii.txt
-	./t-6531-email-tld-special.bin 0 39 ../data/fail-email-ascii.txt
+	./t-6531-email-tld-special.bin 29 17 ../data/pass-email-ascii.txt
+	./t-6531-email-tld-special.bin 0 44 ../data/fail-email-ascii.txt
 else
 	# --- RFC6531_FOLLOW_RFC5322 = OFF ; RFC6531_FOLLOW_RFC20 = OFF
-	./t-6531-email.bin 41 6 ../data/pass-email-ascii.txt
-	./t-6531-email.bin 0 39 ../data/fail-email-ascii.txt
+	./t-6531-email.bin 40 6 ../data/pass-email-ascii.txt
+	./t-6531-email.bin 0 44 ../data/fail-email-ascii.txt
 ifeq (${_withidn},idn)
 	./t-6531-email.bin 12 12 ../data/email-utf8.txt
 else
 	./t-6531-email.bin 11 13 ../data/email-utf8.txt
 endif
 	./t-6531-email.bin 7 1 ../data/email-reg.ru.txt
-	./t-6531-email-fqdn.bin 41 6 ../data/pass-email-ascii.txt
-	./t-6531-email-fqdn.bin 0 39 ../data/fail-email-ascii.txt
+	./t-6531-email-fqdn.bin 40 6 ../data/pass-email-ascii.txt
+	./t-6531-email-fqdn.bin 0 44 ../data/fail-email-ascii.txt
 ifeq (${_withidn},idn)
 	./t-6531-email-fqdn.bin 12 12 ../data/email-utf8.txt
 else
 	./t-6531-email-fqdn.bin 11 13 ../data/email-utf8.txt
 endif
 	./t-6531-email-fqdn.bin 7 1 ../data/email-reg.ru.txt
-	./t-6531-email-tld.bin 31 16 ../data/pass-email-ascii.txt
-	./t-6531-email-tld.bin 0 39 ../data/fail-email-ascii.txt
+	./t-6531-email-tld.bin 30 16 ../data/pass-email-ascii.txt
+	./t-6531-email-tld.bin 0 44 ../data/fail-email-ascii.txt
 ifeq (${_withidn},idn)
 	./t-6531-email-tld.bin 5 19 ../data/email-utf8.txt
 else
 	./t-6531-email-tld.bin 4 20 ../data/email-utf8.txt
 endif
 	./t-6531-email-tld.bin 6 2 ../data/email-reg.ru.txt
-	./t-6531-email-tld-special.bin 31 16 ../data/pass-email-ascii.txt
-	./t-6531-email-tld-special.bin 0 39 ../data/fail-email-ascii.txt
+	./t-6531-email-tld-special.bin 30 16 ../data/pass-email-ascii.txt
+	./t-6531-email-tld-special.bin 0 44 ../data/fail-email-ascii.txt
 endif
 endif
 
@@ -259,8 +259,8 @@ else
 	./t-eav.bin 4 20 ../data/email-utf8.txt
 endif
 	./t-eav.bin 7 1 ../data/email-reg.ru.txt
-	./t-eav-all-modes.bin 221 14 ../data/pass-email-ascii.txt
-	./t-eav-all-modes.bin 0 195 ../data/fail-email-ascii.txt
+	./t-eav-all-modes.bin 216 14 ../data/pass-email-ascii.txt
+	./t-eav-all-modes.bin 0 220 ../data/fail-email-ascii.txt
 else
 	#
 	# --- RFC6531_FOLLOW_RFC5322 = ON ; RFC6531_FOLLOW_RFC20 = OFF
@@ -271,8 +271,8 @@ else
 	./t-eav.bin 8 16 ../data/email-utf8.txt
 endif
 	./t-eav.bin 7 1 ../data/email-reg.ru.txt
-	./t-eav-all-modes.bin 223 12 ../data/pass-email-ascii.txt
-	./t-eav-all-modes.bin 0 195 ../data/fail-email-ascii.txt
+	./t-eav-all-modes.bin 218 12 ../data/pass-email-ascii.txt
+	./t-eav-all-modes.bin 0 220 ../data/fail-email-ascii.txt
 endif
 else
 ifeq ($(RFC6531_FOLLOW_RFC20),ON)
@@ -285,8 +285,8 @@ else
 	./t-eav.bin 4 20 ../data/email-utf8.txt
 endif
 	./t-eav.bin 7 1 ../data/email-reg.ru.txt
-	./t-eav-all-modes.bin 213 22 ../data/pass-email-ascii.txt
-	./t-eav-all-modes.bin 0 195 ../data/fail-email-ascii.txt
+	./t-eav-all-modes.bin 208 22 ../data/pass-email-ascii.txt
+	./t-eav-all-modes.bin 0 220 ../data/fail-email-ascii.txt
 else
 	#
 	# --- RFC6531_FOLLOW_RFC5322 = OFF ; RFC6531_FOLLOW_RFC20 = OFF
@@ -297,8 +297,8 @@ else
 	./t-eav.bin 8 16 ../data/email-utf8.txt
 endif
 	./t-eav.bin 7 1 ../data/email-reg.ru.txt
-	./t-eav-all-modes.bin 215 20 ../data/pass-email-ascii.txt
-	./t-eav-all-modes.bin 0 195 ../data/fail-email-ascii.txt
+	./t-eav-all-modes.bin 210 20 ../data/pass-email-ascii.txt
+	./t-eav-all-modes.bin 0 220 ../data/fail-email-ascii.txt
 endif
 endif
 	./t-result.bin 7 18 ../data/email-result-check.txt

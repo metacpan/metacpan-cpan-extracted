@@ -6,9 +6,10 @@ my %params = (
     CPLUS         => 11,
     TEST_REQUIRES => {'Test::Exception' => 0, 'Test::Warnings' => 0, 'Test::Fatal' => 0},
     BIN_DEPS      => ['Export::XS', 'URI::XS', 'Encode::Base2N', 'Protocol::HTTP'],
-    LIBS          => ['-lcrypto -lz'],
+    PKG_CONFIG    => $^O eq 'darwin' ? 'libcrypto' : '',
+    LINK          => '-lz -lcrypto',
     SRC           => 'src',
-    INC           => '-Isrc -I/usr/local/opt/openssl/include',
+    INC           => '-Isrc',
     BIN_SHARE     => {INCLUDE  => {'src' => '/'}},
     CCFLAGS       => '-Wall -Wextra',
     test          => {
@@ -17,10 +18,5 @@ my %params = (
         BIN_DEPS             => 'Test::Catch',
     },
 );
-
-if ($ENV{SANITIZE}) {
-    ($params{CCFLAGS}||='') .= ' -fsanitize=undefined -fsanitize=address -fno-omit-frame-pointer';
-    $params{LIBS}[0] .= ' -lubsan -lasan'; #sanitizer
-}
 
 write_makefile(%params);

@@ -3,7 +3,7 @@ package Net::Async::Github;
 use strict;
 use warnings;
 
-our $VERSION = '0.007';
+our $VERSION = '0.008';
 our $AUTHORITY = 'cpan:TEAM'; # AUTHORITY
 
 use parent qw(IO::Async::Notifier);
@@ -247,6 +247,83 @@ sub Net::Async::Github::Repository::grant_team {
     )
 }
 
+=head2 create_branch
+
+Creates a new branch.
+
+Takes the following named parameters:
+
+=over 4
+
+=item * C<owner> - which organisation owns the target repository
+
+=item * C<repo> - the repository to raise the PR against
+
+=item * C<branch> - new branch name that will be created
+
+=item * C<sha> - the SHA1 value for this branch
+
+=back
+
+=cut
+
+sub create_branch {
+    my ($self, %args) = @_;
+    $self->validate_args(%args);
+    $self->http_post(
+        uri => $self->endpoint(
+            'git_refs_create',
+            owner => $args{owner},
+            repo  => $args{repo},
+        ),
+        data => {
+            ref => "refs/heads/$args{branch}",
+            sha => $args{sha}
+        },
+    )
+}
+
+
+=head2 update_ref
+
+Update a reference to a new commit
+
+Takes the following named parameters:
+
+=over 4
+
+=item * C<owner> - which organisation owns the target repository
+
+=item * C<repo> - the repository to raise the PR against
+
+=item * C<ref> - ref name that we are updating.
+
+=item * C<sha> - the SHA1 value of comment that the ref will point to
+
+=item * C<force> - force update ref even if it is not fast-forward if it is true.
+
+=back
+
+=cut
+
+sub update_ref {
+    my ($self, %args) = @_;
+    $self->validate_args(%args);
+    $self->http_patch(
+        uri => $self->endpoint(
+            'git_refs',
+            owner => $args{owner},
+            repo  => $args{repo},
+            category => 'heads',
+            ref => $args{ref},
+        ),
+        data => {
+            sha => $args{sha},
+            force => ($args{force} ? JSON->true : JSON->false)
+        },
+    )
+}
+
 =head2 create_pr
 
 Creates a new pull request.
@@ -269,10 +346,9 @@ Takes the following named parameters:
 
 sub create_pr {
     my ($self, %args) = @_;
-    my $gh = $self->github;
-    $gh->validate_args(%args);
-    $self->github->http_post(
-        uri => $self->github->endpoint(
+    $self->validate_args(%args);
+    $self->http_post(
+        uri => $self->endpoint(
             'pull_request',
             owner => $args{owner},
             repo  => $args{repo},
@@ -280,6 +356,48 @@ sub create_pr {
         data => {
             head => $args{head},
             base => $args{base},
+            title => $args{title},
+            $args{body} ? (body => $args{body}) : (),
+        },
+    )
+}
+
+=head2 create_commit
+
+Creates an empty commit. Can be used to simulate C<git commit --allow-empty>
+or to create a merge commit from multiple heads.
+
+Takes the following named parameters:
+
+=over 4
+
+=item * C<owner> - which organisation owns the target repository
+
+=item * C<repo> - the repository to raise the PR against
+
+=item * C<message> - The commit message
+
+=item * C<tree> - The SHA of tree object that commit will point to
+
+=item * C<parents> - Arrayref that include the parents of the commit
+
+=back
+
+=cut
+
+sub create_commit {
+    my ($self, %args) = @_;
+    $self->validate_args(%args);
+    $self->http_post(
+        uri => $self->endpoint(
+            'commits',
+            owner => $args{owner},
+            repo  => $args{repo},
+        ),
+        data => {
+            message => $args{message},
+            tree => $args{tree},
+            parents => $args{parents},
         },
     )
 }
@@ -928,9 +1046,10 @@ sub http_put {
     my $data = delete $args{data};
     $log->tracef("%s %s { %s } <= %s", $method, $uri->as_string, \%args, $data);
     $data = $json->encode($data) if ref $data;
-    $self->http->$method(
-        $uri,
-        $data,
+    $self->http->do_request(
+        method       => $method,
+        uri          => $uri,
+        content      => $data,
         content_type => 'application/json',
         %args,
     )->then(sub {

@@ -1,13 +1,17 @@
 
 #line 1 "src/panda/uri/parser.rl"
-#include "URI.h"
+#include "parser.h"
 
 namespace panda { namespace uri {
 
 // ============== RFC3986 compliant parser ===================
 
 
-#line 11 "src/panda/uri/parser.cc"
+#line 87 "src/panda/uri/parser.rl"
+
+
+
+#line 15 "src/panda/uri/parser.cc"
 static const int uri_parser_start = 171;
 static const int uri_parser_first_final = 171;
 static const int uri_parser_error = 0;
@@ -15,13 +19,13 @@ static const int uri_parser_error = 0;
 static const int uri_parser_en_uri = 171;
 
 
-#line 94 "src/panda/uri/parser.rl"
+#line 100 "src/panda/uri/parser.rl"
 
 
 #define SAVE(dest)  dest = str.substr(mark, p - ps - mark);
 #define NSAVE(dest) dest = acc; acc = 0
 
-void URI::parse (const string& str) {
+bool URI::_parse (const string& str, bool& authority_has_pct) {
     const char* ps  = str.data();
     const char* p   = ps;
     const char* pe  = p + str.length();
@@ -29,10 +33,9 @@ void URI::parse (const string& str) {
     int         cs  = uri_parser_start;
     size_t      mark;
     int acc = 0;
-    bool authority_has_pct = false;
     
     
-#line 36 "src/panda/uri/parser.cc"
+#line 39 "src/panda/uri/parser.cc"
 	{
 	if ( p == pe )
 		goto _test_eof;
@@ -73,7 +76,7 @@ st172:
 	if ( ++p == pe )
 		goto _test_eof172;
 case 172:
-#line 77 "src/panda/uri/parser.cc"
+#line 80 "src/panda/uri/parser.cc"
 	switch( (*p) ) {
 		case 33: goto st172;
 		case 35: goto tr178;
@@ -144,7 +147,7 @@ st173:
 	if ( ++p == pe )
 		goto _test_eof173;
 case 173:
-#line 148 "src/panda/uri/parser.cc"
+#line 151 "src/panda/uri/parser.cc"
 	switch( (*p) ) {
 		case 33: goto tr181;
 		case 37: goto tr182;
@@ -171,7 +174,7 @@ st174:
 	if ( ++p == pe )
 		goto _test_eof174;
 case 174:
-#line 175 "src/panda/uri/parser.cc"
+#line 178 "src/panda/uri/parser.cc"
 	switch( (*p) ) {
 		case 33: goto st174;
 		case 37: goto st1;
@@ -198,7 +201,7 @@ st1:
 	if ( ++p == pe )
 		goto _test_eof1;
 case 1:
-#line 202 "src/panda/uri/parser.cc"
+#line 205 "src/panda/uri/parser.cc"
 	if ( (*p) < 65 ) {
 		if ( 48 <= (*p) && (*p) <= 57 )
 			goto st2;
@@ -231,7 +234,7 @@ st3:
 	if ( ++p == pe )
 		goto _test_eof3;
 case 3:
-#line 235 "src/panda/uri/parser.cc"
+#line 238 "src/panda/uri/parser.cc"
 	if ( (*p) < 65 ) {
 		if ( 48 <= (*p) && (*p) <= 57 )
 			goto st4;
@@ -288,7 +291,7 @@ st175:
 	if ( ++p == pe )
 		goto _test_eof175;
 case 175:
-#line 292 "src/panda/uri/parser.cc"
+#line 295 "src/panda/uri/parser.cc"
 	switch( (*p) ) {
 		case 33: goto st175;
 		case 35: goto tr178;
@@ -317,7 +320,7 @@ st5:
 	if ( ++p == pe )
 		goto _test_eof5;
 case 5:
-#line 321 "src/panda/uri/parser.cc"
+#line 324 "src/panda/uri/parser.cc"
 	if ( (*p) < 65 ) {
 		if ( 48 <= (*p) && (*p) <= 57 )
 			goto st6;
@@ -378,7 +381,7 @@ st176:
 	if ( ++p == pe )
 		goto _test_eof176;
 case 176:
-#line 382 "src/panda/uri/parser.cc"
+#line 385 "src/panda/uri/parser.cc"
 	switch( (*p) ) {
 		case 33: goto tr185;
 		case 35: goto tr186;
@@ -406,7 +409,7 @@ st177:
 	if ( ++p == pe )
 		goto _test_eof177;
 case 177:
-#line 410 "src/panda/uri/parser.cc"
+#line 413 "src/panda/uri/parser.cc"
 	switch( (*p) ) {
 		case 33: goto st177;
 		case 35: goto tr188;
@@ -434,7 +437,7 @@ st7:
 	if ( ++p == pe )
 		goto _test_eof7;
 case 7:
-#line 438 "src/panda/uri/parser.cc"
+#line 441 "src/panda/uri/parser.cc"
 	if ( (*p) < 65 ) {
 		if ( 48 <= (*p) && (*p) <= 57 )
 			goto st8;
@@ -467,7 +470,7 @@ st178:
 	if ( ++p == pe )
 		goto _test_eof178;
 case 178:
-#line 471 "src/panda/uri/parser.cc"
+#line 474 "src/panda/uri/parser.cc"
 	switch( (*p) ) {
 		case 33: goto st175;
 		case 35: goto tr178;
@@ -523,7 +526,7 @@ st180:
 	if ( ++p == pe )
 		goto _test_eof180;
 case 180:
-#line 527 "src/panda/uri/parser.cc"
+#line 530 "src/panda/uri/parser.cc"
 	switch( (*p) ) {
 		case 33: goto st180;
 		case 35: goto tr199;
@@ -561,7 +564,7 @@ st9:
 	if ( ++p == pe )
 		goto _test_eof9;
 case 9:
-#line 565 "src/panda/uri/parser.cc"
+#line 568 "src/panda/uri/parser.cc"
 	if ( (*p) < 65 ) {
 		if ( 48 <= (*p) && (*p) <= 57 )
 			goto st10;
@@ -607,7 +610,7 @@ st181:
 	if ( ++p == pe )
 		goto _test_eof181;
 case 181:
-#line 611 "src/panda/uri/parser.cc"
+#line 614 "src/panda/uri/parser.cc"
 	switch( (*p) ) {
 		case 33: goto st11;
 		case 35: goto tr204;
@@ -666,7 +669,7 @@ st12:
 	if ( ++p == pe )
 		goto _test_eof12;
 case 12:
-#line 670 "src/panda/uri/parser.cc"
+#line 673 "src/panda/uri/parser.cc"
 	if ( (*p) < 65 ) {
 		if ( 48 <= (*p) && (*p) <= 57 )
 			goto st13;
@@ -705,7 +708,7 @@ st182:
 	if ( ++p == pe )
 		goto _test_eof182;
 case 182:
-#line 709 "src/panda/uri/parser.cc"
+#line 712 "src/panda/uri/parser.cc"
 	switch( (*p) ) {
 		case 33: goto tr208;
 		case 35: goto tr192;
@@ -737,7 +740,7 @@ st183:
 	if ( ++p == pe )
 		goto _test_eof183;
 case 183:
-#line 741 "src/panda/uri/parser.cc"
+#line 744 "src/panda/uri/parser.cc"
 	switch( (*p) ) {
 		case 33: goto st183;
 		case 35: goto tr199;
@@ -774,7 +777,7 @@ st14:
 	if ( ++p == pe )
 		goto _test_eof14;
 case 14:
-#line 778 "src/panda/uri/parser.cc"
+#line 781 "src/panda/uri/parser.cc"
 	if ( (*p) < 65 ) {
 		if ( 48 <= (*p) && (*p) <= 57 )
 			goto st15;
@@ -820,7 +823,7 @@ st184:
 	if ( ++p == pe )
 		goto _test_eof184;
 case 184:
-#line 824 "src/panda/uri/parser.cc"
+#line 827 "src/panda/uri/parser.cc"
 	switch( (*p) ) {
 		case 35: goto tr204;
 		case 47: goto tr205;
@@ -839,7 +842,7 @@ st16:
 	if ( ++p == pe )
 		goto _test_eof16;
 case 16:
-#line 843 "src/panda/uri/parser.cc"
+#line 846 "src/panda/uri/parser.cc"
 	switch( (*p) ) {
 		case 58: goto st152;
 		case 118: goto st167;
@@ -3295,7 +3298,7 @@ st186:
 	if ( ++p == pe )
 		goto _test_eof186;
 case 186:
-#line 3299 "src/panda/uri/parser.cc"
+#line 3302 "src/panda/uri/parser.cc"
 	switch( (*p) ) {
 		case 33: goto st172;
 		case 35: goto tr178;
@@ -3330,7 +3333,7 @@ st187:
 	if ( ++p == pe )
 		goto _test_eof187;
 case 187:
-#line 3334 "src/panda/uri/parser.cc"
+#line 3337 "src/panda/uri/parser.cc"
 	switch( (*p) ) {
 		case 33: goto tr216;
 		case 35: goto st173;
@@ -3607,28 +3610,16 @@ case 187:
 #line 23 "src/panda/uri/parser.rl"
 	{ SAVE(_path); }
 	break;
-#line 3611 "src/panda/uri/parser.cc"
+#line 3614 "src/panda/uri/parser.cc"
 	}
 	}
 
 	_out: {}
 	}
 
-#line 110 "src/panda/uri/parser.rl"
+#line 115 "src/panda/uri/parser.rl"
     
-    if (cs < uri_parser_first_final) {
-        clear();
-        return;
-    }
-    
-    if (authority_has_pct) {
-        decode_uri_component(_user_info, _user_info);
-        decode_uri_component(_host, _host);
-    }
-    
-    if (_qstr) ok_qstr();
-    if (_flags & Flags::allow_suffix_reference && !_host.length()) guess_suffix_reference();
-    sync_scheme_info();
+    return cs >= uri_parser_first_final;
 }
 
 }}

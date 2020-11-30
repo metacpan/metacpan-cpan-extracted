@@ -19,6 +19,9 @@ qx.Class.define("callbackery.ui.Plugins", {
                 form: function(pluginConfig,getParentFormData) {
                     return new callbackery.ui.plugin.Form(pluginConfig,getParentFormData);
                 },
+                cardlist: function(pluginConfig,getParentFormData) {
+                    return new callbackery.ui.plugin.CardList(pluginConfig,getParentFormData);
+                },
                 table: function(pluginConfig,getParentFormData) {
                     return new callbackery.ui.plugin.Table(pluginConfig,getParentFormData);
                 },

@@ -1,5 +1,5 @@
 ---
-abstract: 'use Panda::Config::Perl with catalyst.'
+abstract: 'use Config::MorePerl with catalyst.'
 author:
   - unknown
 build_requires:
@@ -7,9 +7,9 @@ build_requires:
   Test::More: '0'
   Test::Simple: '0.96'
 configure_requires:
-  XS::Install: v1.2.16
+  XS::Install: v1.3.1
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.50, CPAN::Meta::Converter version 2.150010'
 license: unknown
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -22,7 +22,7 @@ no_index:
 requires:
   Catalyst::Runtime: '0'
   Class::Accessor::Inherited::XS: '0.07'
-  Panda::Config::Perl: '0'
-  XS::Install: v1.2.16
-version: v1.0.4
+  Config::MorePerl: '0'
+  XS::Install: v1.3.1
+version: v1.1.0
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

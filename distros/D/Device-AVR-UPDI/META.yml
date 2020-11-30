@@ -3,8 +3,8 @@ abstract: 'interact with an F<AVR> microcontroller over F<UPDI>'
 author:
   - 'Paul Evans <leonerd@leonerd.org.uk>'
 build_requires:
-  Test::EasyMock: '0'
-  Test::Future::IO: '0'
+  Test::ExpectAndCheck: '0'
+  Test::Future::IO: '0.02'
   Test::More: '0.88'
 configure_requires:
   Module::Build: '0.4004'
@@ -18,7 +18,7 @@ name: Device-AVR-UPDI
 provides:
   Device::AVR::UPDI:
     file: lib/Device/AVR/UPDI.pm
-    version: '0.04'
+    version: '0.06'
 requires:
   File::ShareDir: '1.00'
   Future::AsyncAwait: '0'
@@ -28,5 +28,5 @@ requires:
   perl: '5.020'
 resources:
   license: http://dev.perl.org/licenses/
-version: '0.04'
+version: '0.06'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

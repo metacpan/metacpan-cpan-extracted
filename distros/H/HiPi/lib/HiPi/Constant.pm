@@ -1284,6 +1284,105 @@ my $const = {
         BM280_BMP_STANDBY_2000 => 0b111,
         
     },
+    
+    seesaw => {
+        
+        SEESAW_ATSAMD09         => 0x01,
+        
+        SEESAW_STATUS_BASE      => 0x00,
+        SEESAW_GPIO_BASE        => 0x01,
+        SEESAW_SERCOM0_BASE     => 0x02,
+        SEESAW_TIMER_BASE       => 0x08,
+        SEESAW_ADC_BASE         => 0x09,
+        SEESAW_DAC_BASE         => 0x0A,
+        SEESAW_INTERRUPT_BASE   => 0x0B,
+        SEESAW_DAP_BASE         => 0x0C,
+        SEESAW_EEPROM_BASE      => 0x0D,
+        SEESAW_NEOPIXEL_BASE    => 0x0E,
+        SEESAW_TOUCH_BASE       => 0x0F,
+        
+        SEESAW_STATUS_HW_ID     => 0x01,
+        SEESAW_STATUS_VERSION   => 0x02,
+        SEESAW_STATUS_OPTIONS   => 0x03,
+        SEESAW_STATUS_TEMP      => 0x04,
+        SEESAW_STATUS_SWRST     => 0x7F,
+        
+        SEESAW_GPIO_DIRSET_BULK => 0x02,
+        SEESAW_GPIO_DIRCLR_BULK => 0x03,
+        SEESAW_GPIO_BULK        => 0x04,
+        SEESAW_GPIO_BULK_SET    => 0x05,
+        SEESAW_GPIO_BULK_CLR    => 0x06,
+        SEESAW_GPIO_BULK_TOGGLE => 0x07,
+        SEESAW_GPIO_INTENSET    => 0x08,
+        SEESAW_GPIO_INTENCLR    => 0x09,
+        SEESAW_GPIO_INTFLAG     => 0x0A,
+        SEESAW_GPIO_PULLENSET   => 0x0B,
+        SEESAW_GPIO_PULLENCLR   => 0x0C,
+        
+        SEESAW_TIMER_STATUS     => 0x00,
+        SEESAW_TIMER_PWM        => 0x01,
+        SEESAW_TIMER_FREQ       => 0x02,
+        
+        SEESAW_ADC_STATUS       => 0x00,
+        SEESAW_ADC_INTEN        => 0x02,
+        SEESAW_ADC_INTENCLR     => 0x03,
+        SEESAW_ADC_WINMODE      => 0x04,
+        SEESAW_ADC_WINTHRESH    => 0x05,
+        SEESAW_ADC_CHANNEL_OFFSET => 0x07,
+        
+        SEESAW_SERCOM_STATUS    => 0x00,
+        SEESAW_SERCOM_INTEN     => 0x02,
+        SEESAW_SERCOM_INTENCLR  => 0x03,
+        SEESAW_SERCOM_BAUD      => 0x04,
+        SEESAW_SERCOM_DATA      => 0x05,
+        
+        SEESAW_NEOPIXEL_STATUS  => 0x00,
+        SEESAW_NEOPIXEL_PIN     => 0x01,
+        SEESAW_NEOPIXEL_SPEED   => 0x02,
+        SEESAW_NEOPIXEL_BUF_LENGTH => 0x03,
+        SEESAW_NEOPIXEL_BUF     => 0x04,
+        SEESAW_NEOPIXEL_SHOW    => 0x05,
+        
+        SEESAW_NEOPIXEL_KHZ800  => 0x01,
+        SEESAW_NEOPIXEL_KHZ400  => 0x00,
+        
+        SEESAW_NEOPIXEL_RGB     => 0x01,
+        SEESAW_NEOPIXEL_GRB     => 0x02,
+        SEESAW_NEOPIXEL_RGBW    => 0x03,
+        SEESAW_NEOPIXEL_GRBW    => 0x04,
+
+        SEESAW_TOUCH_CHANNEL_OFFSET => 0x10,
+        
+        SEESAW_HW_ID_CODE       => 0x55,
+        SEESAW_EEPROM_I2C_ADDR  => 0x3F,
+        
+        SEESAW_INPUT            => 0x00,
+        SEESAW_OUTPUT           => 0x01,
+        SEESAW_INPUT_PULLUP     => 0x02,
+        SEESAW_INPUT_PULLDOWN   => 0x03,
+        
+        # ADC
+        SEESAW_PA02             => 2,
+        SEESAW_PA03             => 3,
+        SEESAW_PA04             => 4,
+        
+        # PWM
+        SEESAW_PA05             => 5,
+        SEESAW_PA06             => 6,
+        SEESAW_PA07             => 7,
+
+        SEESAW_IRQ              => 8,
+        
+        #GPIO
+        SEESAW_PA09             => 9,
+        SEESAW_PA010            => 10,
+        SEESAW_PA011            => 11,
+        SEESAW_PA014            => 14,
+        SEESAW_PA015            => 15,
+        SEESAW_PA024            => 24,
+        SEESAW_PA025            => 25,
+        
+    },
 };
 
 my $tagaliases = {

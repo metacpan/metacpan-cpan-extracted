@@ -1,4 +1,14 @@
 -------------------------
+Version 0.08 (2020-11-20)
+-------------------------
+
+* fix return value of `set` for threaded perls
+
+* fix OP_DOR handling for older perls
+
+* documentation updates
+
+-------------------------
 Version 0.07 (2020-11-19)
 -------------------------
 

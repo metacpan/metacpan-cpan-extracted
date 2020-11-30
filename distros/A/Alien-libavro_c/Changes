@@ -1,0 +1,16 @@
+Revision history for Alien-libavro_c
+
+0.03    2020-11-25
+        * Build libavro so that it can be statically linked against
+
+0.02    2020-11-22
+        * Several patches for the manually built libavro_c
+        * Handling for several ways libavro_c can show up on the system:
+            as libavro_c, with pkg-config
+            as libavro_c, with no pkg-config
+            as libavro_c_mt, with no pkg-config
+        * Docs!
+
+0.01    2020-11-21
+        First version, released on an unsuspecting world.
+

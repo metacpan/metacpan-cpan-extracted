@@ -14,6 +14,13 @@
 #  define hv_deletes(hv, skey, flags)  hv_delete((hv), ("" skey ""), (sizeof(skey) - 1), flags)
 #endif
 
+#if HAVE_PERL_VERSION(5, 22, 0)
+#  define PadnameOUTER_off(pn)  (PadnameFLAGS(pn) &= ~PADNAMEt_OUTER)
+#else
+   /* PadnameOUTER is really the SvFAKE flag */
+#  define PadnameOUTER_off(pn)  SvFAKE_off(pn)
+#endif
+
 #define save_strndup(s, l)  S_save_strndup(aTHX_ s, l)
 static char *S_save_strndup(pTHX_ char *s, STRLEN l)
 {

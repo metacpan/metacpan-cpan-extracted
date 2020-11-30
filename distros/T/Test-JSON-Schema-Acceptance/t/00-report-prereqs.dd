@@ -8,7 +8,7 @@ do { my $x = {
                       },
        'develop' => {
                       'recommends' => {
-                                        'Dist::Zilla::PluginBundle::Author::ETHER' => '0.158',
+                                        'Dist::Zilla::PluginBundle::Author::ETHER' => '0.159',
                                         'Dist::Zilla::PluginBundle::Git::VersionManager' => '0.007'
                                       },
                       'requires' => {
@@ -43,7 +43,7 @@ do { my $x = {
                                       'List::Util' => '1.33',
                                       'Moo' => '0',
                                       'MooX::TypeTiny' => '0.002002',
-                                      'Path::Tiny' => '0.062',
+                                      'Path::Tiny' => '0.069',
                                       'Storable' => '3.00',
                                       'Test2::API' => '0',
                                       'Test2::Todo' => '0',

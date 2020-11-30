@@ -55,7 +55,7 @@ static bool get_window_bits(const string& value, std::uint8_t& bits) {
 DeflateExt::EffectiveConfig DeflateExt::select(const HeaderValues& values, const Config& cfg, Role role) {
     for(auto& header: values) {
         if (header.name == extension_name) {
-            EffectiveConfig ecfg(cfg, EffectiveConfig::NegotiationsResult::ERROR);
+            EffectiveConfig ecfg(cfg, EffectiveConfig::NegotiationsResult::Error);
             bool params_correct = true;
             for(auto it = begin(header.params); params_correct && it != end(header.params); ++it) {
                 auto& param_name = it->first;
@@ -101,7 +101,7 @@ DeflateExt::EffectiveConfig DeflateExt::select(const HeaderValues& values, const
             }
             if (params_correct) {
                 // first best match wins (for server & client)
-                ecfg.result = EffectiveConfig::NegotiationsResult::SUCCESS;
+                ecfg.result = EffectiveConfig::NegotiationsResult::Success;
                 return ecfg;
             }
             else if (role == Role::CLIENT) {
@@ -111,7 +111,7 @@ DeflateExt::EffectiveConfig DeflateExt::select(const HeaderValues& values, const
 
         }
     }
-    return EffectiveConfig(EffectiveConfig::NegotiationsResult::NOT_FOUND);
+    return EffectiveConfig(EffectiveConfig::NegotiationsResult::NotFound);
 }
 
 DeflateExt* DeflateExt::uplift(const EffectiveConfig& ecfg, HeaderValues& extensions, Role role) {

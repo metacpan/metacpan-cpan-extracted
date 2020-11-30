@@ -1,26 +1,29 @@
 /*
-  Copyright (C) 2010-2018 David Anderson. All Rights Reserved.
+  Copyright (C) 2010-2020 David Anderson. All Rights Reserved.
   Portions Copyright 2012 SN Systems Ltd. All rights reserved.
 
-  This program is free software; you can redistribute it and/or modify it
-  under the terms of version 2.1 of the GNU Lesser General Public License
-  as published by the Free Software Foundation.
+  This program is free software; you can redistribute it
+  and/or modify it under the terms of version 2.1 of the
+  GNU Lesser General Public License as published by the Free
+  Software Foundation.
 
-  This program is distributed in the hope that it would be useful, but
-  WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  This program is distributed in the hope that it would be
+  useful, but WITHOUT ANY WARRANTY; without even the implied
+  warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+  PURPOSE.
 
-  Further, this software is distributed without any warranty that it is
-  free of the rightful claim of any third person regarding infringement
-  or the like.  Any license provided herein, whether implied or
-  otherwise, applies only to this software file.  Patent licenses, if
-  any, provided herein do not apply to combinations of this program with
-  other software, or any other product whatsoever.
+  Further, this software is distributed without any warranty
+  that it is free of the rightful claim of any third person
+  regarding infringement or the like.  Any license provided
+  herein, whether implied or otherwise, applies only to this
+  software file.  Patent licenses, if any, provided herein
+  do not apply to combinations of this program with other
+  software, or any other product whatsoever.
 
-  You should have received a copy of the GNU Lesser General Public
-  License along with this program; if not, write the Free Software
-  Foundation, Inc., 51 Franklin Street - Fifth Floor, Boston MA 02110-1301,
-  USA.
+  You should have received a copy of the GNU Lesser General
+  Public License along with this program; if not, write the
+  Free Software Foundation, Inc., 51 Franklin Street - Fifth
+  Floor, Boston MA 02110-1301, USA.
 
 */
 
@@ -135,7 +138,8 @@ void dwarf_insert_harmless_error(Dwarf_Debug dbg,
         return;
     }
     msgspace = dhp->dh_errors[cur];
-    safe_strncpy(msgspace, newerror,DW_HARMLESS_ERROR_MSG_STRING_SIZE);
+    safe_strncpy(msgspace, newerror,
+        DW_HARMLESS_ERROR_MSG_STRING_SIZE);
     next = (cur+1) % dhp->dh_maxcount;
     dhp->dh_errs_count++;
     dhp->dh_next_to_use = next;
@@ -171,9 +175,11 @@ unsigned dwarf_set_harmless_error_list_size(Dwarf_Debug dbg,
             dwarf_harmless_init(dhp,maxcount-1);
             if (oldarray.dh_next_to_use != oldarray.dh_first) {
                 unsigned i = 0;
-                for (i = oldarray.dh_first; i != oldarray.dh_next_to_use;
+                for (i = oldarray.dh_first;
+                    i != oldarray.dh_next_to_use;
                     i = (i+1)%oldarray.dh_maxcount) {
-                    dwarf_insert_harmless_error(dbg,oldarray.dh_errors[i]);
+                    dwarf_insert_harmless_error(dbg,
+                        oldarray.dh_errors[i]);
                 }
                 if (oldarray.dh_errs_count > dhp->dh_errs_count) {
                     dhp->dh_errs_count = oldarray.dh_errs_count;
@@ -193,7 +199,7 @@ dwarf_harmless_init(struct Dwarf_Harmless_s *dhp,unsigned size)
     unsigned i = 0;
     memset(dhp,0,sizeof(*dhp));
     dhp->dh_maxcount = size +1;
-    dhp->dh_errors = (char **)malloc(sizeof( char *) *dhp->dh_maxcount);
+    dhp->dh_errors = (char **)malloc(sizeof(char *)*dhp->dh_maxcount);
     if (!dhp->dh_errors) {
         dhp->dh_maxcount = 0;
         return;

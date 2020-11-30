@@ -20,7 +20,7 @@ BEGIN {
     }
 }
 
-our $VERSION = '0.31';
+our $VERSION = '0.36';
 
 sub _SIZE_OF_TZ_HEADER                     { return 44 }
 sub _SIZE_OF_TRANSITION_TIME_V1            { return 4 }
@@ -655,6 +655,7 @@ sub equiv {
     $from_time = defined $from_time ? $from_time : time;
     my $class   = ref $self;
     my $compare = $class->new( 'timezone' => $compare_time_zone );
+    my $now     = time;
     my %offsets_compare;
     foreach my $transition_time ( $compare->transition_times() ) {
         if ( $transition_time >= $from_time ) {
@@ -2830,7 +2831,7 @@ sub _read_v1_tzfile {
     $self->{_tzdata}->{$tz}->{is_std} =
       $self->_read_is_standard_time( $handle, $path, $header->{ttisstdcnt} );
     $self->{_tzdata}->{$tz}->{is_gmt} =
-      $self->_read_is_gmt( $handle, $path, $header->{ttisstdcnt} );
+      $self->_read_is_gmt( $handle, $path, $header->{ttisgmtcnt} );
     return;
 }
 
@@ -2862,7 +2863,7 @@ sub _read_v2_tzfile {
           $self->_read_is_standard_time( $handle, $path,
             $header->{ttisstdcnt} );
         $self->{_tzdata}->{$tz}->{is_gmt} =
-          $self->_read_is_gmt( $handle, $path, $header->{ttisstdcnt} );
+          $self->_read_is_gmt( $handle, $path, $header->{ttisgmtcnt} );
         $self->{_tzdata}->{$tz}->{tz_definition} =
           $self->_read_tz_definition( $handle, $path );
     }
@@ -3196,7 +3197,7 @@ Time::Zone::Olson - Provides an Olson timezone database interface
 
 =head1 VERSION
 
-Version 0.31
+Version 0.36
 
 =cut
 

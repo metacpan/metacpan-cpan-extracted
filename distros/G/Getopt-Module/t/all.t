@@ -12,22 +12,6 @@ use constant OPTION_NAME => 'module';
 
 sub pp($) { Getopt::Module::_pp($_[0]) }
 
-=begin comment
-
-    my $spec = {
-        args      => \@args,
-        eval      => $eval,
-        method    => $method,
-        module    => $module,
-        name      => $name,
-        statement => $statement,
-        value     => $value,
-    };
-
-=end comment
-
-=cut
-
 sub _qw_to_split($) {
     my $evals = shift;
     my $ref = ref($evals);
@@ -75,30 +59,33 @@ sub is_parsed {
     my $ref = ref($_want);
     my $want;
 
-    # $want can be the expected target, or a subset of the spec hash returned
-    # by GetModule. if it's the former, convert it into the latter
-    # XXX squashed bug: watch out for perl flakiness if trying to do (something like)
-    # this without an intermediary temp value: $want = { target => \$want }
+    # $want can be the expected target, or a subset of the parsed components
+    # (hash) returned by GetModule. if it's the former, convert it into the
+    # latter.
+    #
+    # XXX squashed bug: watch out for perl flakiness if trying to do (something
+    # like) this without an intermediary temp value:
+    #
+    #   $want = { target => \$want }
+
     if (($ref eq 'HASH') && ($_want->{eval})) {
         $_want->{eval} = _qw_to_split($_want->{eval});
         $want = $_want;
-    } else {
-        if ($ref) {
-            if ($ref eq 'ARRAY') {
-                $_want = _qw_to_split($_want);
-            } elsif ($ref eq 'HASH') {
-                for my $key (keys %$_want) {
-                    $_want->{$key} = _qw_to_split($_want->{$key});
-                }
-            } else {
-                die "unexpected want type: $ref", $/;
+    } elsif ($ref) {
+        if ($ref eq 'ARRAY') {
+            $_want = _qw_to_split($_want);
+        } elsif ($ref eq 'HASH') {
+            for my $key (keys %$_want) {
+                $_want->{$key} = _qw_to_split($_want->{$key});
             }
-
-            $want = { target => $_want };
         } else {
-            my $eval = _qw_to_split($_want);
-            $want = { target => \$eval };
+            die "unexpected want type: $ref", $/;
         }
+
+        $want = { target => $_want };
+    } else {
+        my $eval = _qw_to_split($_want);
+        $want = { target => \$eval };
     }
 
     $want->{name} = OPTION_NAME;
@@ -117,7 +104,7 @@ sub is_parsed {
 
     for my $key (sort { ($pos->($a) <=> $pos->($b)) || ($a cmp $b) } keys %$want) {
         my $test_name = sprintf(
-            "GetModule(%s, %s)->(%s, %s)->{%s} is %s",
+            'GetModule(%s, %s)->(%s, %s)->{%s} is %s',
             $old_target,
             pp($options),
             pp(OPTION_NAME),

@@ -15,9 +15,9 @@ ok( defined $uart, 'defined $uart' );
 
 {
    test_out( qr/\s*# Subtest: ->write\n/ );
-   test_out( '    ok 1 - write' );
-   test_out( '    1..1' );
-   test_out( 'ok 1 - ->write' );
+   test_out( "    ok 1 - ->write('ABC')" );
+   test_out( "    1..1" );
+   test_out( "ok 1 - ->write" );
 
    $adapter->expect_write( "ABC" );
    $uart->write( "ABC" )->get;

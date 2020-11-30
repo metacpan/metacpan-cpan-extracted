@@ -28,6 +28,12 @@ DESCRIPTION
     other languages; notably C# 5, EcmaScript 6, Python 3, Dart. Rust is
     considering adding it.
 
+    This module is still under active development. While it now seems
+    relatively stable enough for most use-cases and has received a lot of
+    "battle-testing" in a wide variety of scenarios, there may still be the
+    occasional case of memory leak left in it, especially if still-pending
+    futures are abandoned.
+
     The new syntax takes the form of two new keywords, async and await.
 
  async
@@ -130,11 +136,22 @@ DESCRIPTION
     the call itself propagate the exception, which is usually what you
     wanted when dealing with futures.
 
-    This module is still under active development. While it now seems
-    relatively stable enough for most use-cases and has received a lot of
-    "battle-testing" in a wide variety of scenarios, there may still be the
-    occasional case of memory leak left in it, especially if still-pending
-    futures are abandoned.
+ await (toplevel)
+
+    Since version 0.47.
+
+    An await expression is also permitted directly in the main script at
+    toplevel, outside of async sub. This is implemented by simply invoking
+    the get method on the future value. Thus, the following two lines are
+    directly equivalent:
+
+       await afunc();
+       afunc()->get;
+
+    This is provided as a syntax convenience for unit tests, toplevel
+    scripts, and so on. It allows code to be written in a style that can be
+    easily moved into an async sub, and avoids encouraging "bad habits" of
+    invoking the get method directly.
 
  CANCEL
 

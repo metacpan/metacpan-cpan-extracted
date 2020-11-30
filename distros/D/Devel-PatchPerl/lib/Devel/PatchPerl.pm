@@ -1,5 +1,5 @@
 package Devel::PatchPerl;
-$Devel::PatchPerl::VERSION = '2.02';
+$Devel::PatchPerl::VERSION = '2.04';
 # ABSTRACT: Patch perl source a la Devel::PPPort's buildperl.pl
 
 use strict;
@@ -13,6 +13,7 @@ use Module::Pluggable search_path => ['Devel::PatchPerl::Plugin'];
 use vars qw[@ISA @EXPORT_OK];
 
 use constant CERTIFIED => 5.031004; # Anything less than this
+use constant HINTSCERT => 5.033004; # Hints certified to this
 
 @ISA       = qw(Exporter);
 @EXPORT_OK = qw(patch_source);
@@ -184,7 +185,6 @@ my @patch = (
     subs => [
               [ \&_patch_conf_solaris ],
               [ \&_patch_bitrig ],
-              [ \&_patch_hints ],
               [ \&_patch_patchlevel ],
               [ \&_patch_develpatchperlversion ],
               [ \&_patch_errno_gcc5 ],
@@ -303,11 +303,16 @@ sub patch_source {
       die "You didn't provide a perl version and I don't appear to be in a perl source tree\n";
     }
   }
-  if ( _norm_ver( $vers ) >= CERTIFIED ) {
-      warn "Nothing to do '$vers' is fine\n";
+  my $normver = _norm_ver( $vers );
+  $source = File::Spec->rel2abs($source);
+  if ( $normver <  HINTSCERT ) {
+    my $dir = pushd( $source );
+    _patch_hints();
+  }
+  if ( $normver >= CERTIFIED ) {
+      warn "Nothing else to do, '$vers' is fine\n";
       return;
   }
-  $source = File::Spec->rel2abs($source);
   {
     my $dir = pushd( $source );
     for my $p ( grep { _is( $_->{perl}, $vers ) } @patch ) {
@@ -520,6 +525,7 @@ sub _patch_hints {
   foreach my $os ( @os ) {
     return unless my ($file,$data) = hint_file( $os );
     my $path = File::Spec->catfile( 'hints', $file );
+    warn "Patching '$path'\n";
     if ( -e $path ) {
       chmod 0644, $path or die "$!\n";
     }
@@ -10463,7 +10469,7 @@ Devel::PatchPerl - Patch perl source a la Devel::PPPort's buildperl.pl
 
 =head1 VERSION
 
-version 2.02
+version 2.04
 
 =head1 SYNOPSIS
 

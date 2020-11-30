@@ -3,16 +3,18 @@ use warnings;
 
 use Test::More;
 use Test::Exception;
+use Text::Parser::Error;
 
 BEGIN { use_ok 'Text::Parser'; }
 BEGIN { use_ok 'FileHandle'; }
 
 my $fname = 'text-simple.txt';
 
+my $err = 'Text::Parser::Error';
+
 my $pars;
 throws_ok { $pars = Text::Parser->new('balaji'); }
-'Moose::Exception::SingleParamsToNewMustBeHashRef',
-    'Throws an exception for non-hash input';
+$err, 'single non-hashref arg';
 throws_ok { $pars = Text::Parser->new( balaji => 1 ); }
 'Moose::Exception::Legacy', 'Throws an exception for bad keys';
 throws_ok { $pars = Text::Parser->new( multiline_type => 'balaji' ); }
@@ -45,8 +47,7 @@ throws_ok {
         'join_next', 'Make it another type of Multiline Parser' );
     $pars->read('t/example-wrapped.txt');
 }
-'Text::Parser::Errors::UnexpectedEof',
-    'No errors on changing multiline_type, but error in reading';
+$err, 'No errors on changing multiline_type, but error in reading';
 
 lives_ok {
     is( $pars->multiline_type('join_last'),
@@ -67,15 +68,14 @@ throws_ok { $pars->filename( { a => 'b' } ); }
 'Moose::Exception::ValidationFailedForInlineTypeConstraint',
     'filename() will take only string as input';
 throws_ok { $pars->filename('') }
-'Text::Parser::Errors::InvalidFilename', 'Empty filename string';
+$err;
 throws_ok { $pars->filename($fname) }
-'Text::Parser::Errors::InvalidFilename', 'No file by this name';
+$err;
 throws_ok { $pars->read( bless {}, 'Something' ); }
 'Moose::Exception::ValidationFailedForInlineTypeConstraint',
     'filehandle() will take only a GLOB or FileHandle input';
 throws_ok { $pars->read($fname); }
-'Text::Parser::Errors::InvalidFilename',
-    'Throws exception for non-existent file';
+$err, 'Throws exception for non-existent file';
 
 lives_ok { $pars->read(); } 'Returns doing nothing';
 is( $pars->lines_parsed, 0, 'Nothing parsed' );
@@ -95,13 +95,13 @@ SKIP: {
     close OFILE;
     chmod 0200, 't/unreadable.txt';
     throws_ok { $pars->filename('t/unreadable.txt'); }
-    'Text::Parser::Errors::FileNotReadable', 'This file cannot be read';
+    $err;
     is( $pars->filename(), undef, 'Still no file has been read so far' );
     unlink 't/unreadable.txt';
 }
 
 throws_ok { $pars->filename('t/example.gzip.txt.gz'); }
-'Text::Parser::Errors::FileNotPlainText', 'This file is binary';
+$err;
 is( $pars->filename(), undef, 'Still no file has been read so far' );
 
 my $content = "This is a file with one line\n";

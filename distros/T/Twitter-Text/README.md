@@ -1,3 +1,4 @@
+[![Actions Status](https://github.com/utgwkk/Twitter-Text/workflows/CI/badge.svg)](https://github.com/utgwkk/Twitter-Text/actions)
 # NAME
 
 Twitter::Text - Perl implementation of the twitter-text parsing library

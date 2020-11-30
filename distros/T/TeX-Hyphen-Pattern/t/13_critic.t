@@ -1,28 +1,21 @@
-#!/usr/bin/env perl -w    # -*- cperl -*-
 use strict;
 use warnings;
-use 5.014000;
 use utf8;
 
 use File::Spec;
 use Test::More;
+use English qw(-no_match_vars);
 
-our $VERSION = v1.1.2;
-
-if ( not $ENV{'AUTHOR_TESTING'} ) {
-    my $msg =
-q{Author test. Set the environment variable AUTHOR_TESTING to enable this test.};
-    plan 'skip_all' => $msg;
+if ( not $ENV{AUTHOR_TESTING} ) {
+    my $msg = 'Set $ENV{AUTHOR_TESTING} to run author tests.';
+    plan( skip_all => $msg );
 }
 
-eval {
-    require Test::Perl::Critic;
-    1;
-} or do {
-    my $msg = 'Test::Perl::Critic required to criticise code';
-    plan 'skip_all' => $msg;
-};
-
-my $rcfile = File::Spec->catfile( 't', 'perlcriticrc' );
-Test::Perl::Critic->import( '-profile' => $rcfile );
-Test::Perl::Critic::all_critic_ok(qw(blib t));
+if ( !eval { require Test::Perl::Critic; 1 } ) {
+    plan skip_all => q{Test::Perl::Critic required for testing PBP compliance};
+}
+else {
+	Test::Perl::Critic->import(
+    	-profile => File::Spec->catfile( 't', 'perlcriticrc' ) );
+	Test::Perl::Critic::all_critic_ok();
+}

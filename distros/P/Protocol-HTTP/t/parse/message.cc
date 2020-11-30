@@ -241,7 +241,7 @@ TEST("max_body_size with content-length") {
 
 TEST("max_body_size without content-length") {
     ResponseParser p;
-    p.set_context_request(new Request(Method::GET, new URI()));
+    p.set_context_request(new Request(Method::Get, new URI()));
 
     int sz;
     SECTION("ok")         { sz = 10; }

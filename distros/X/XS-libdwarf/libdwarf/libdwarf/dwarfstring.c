@@ -35,6 +35,11 @@ EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
     but has features (such as ensuring
     data always has a NUL byte following
     the data area used) most useful for C strings.
+
+    All these return either TRUE (the values altered)
+    or FALSE (something went wrong, quite likely
+    the caller presented a bad format string for the
+    value).
 */
 
 #include "config.h"
@@ -42,7 +47,9 @@ EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifdef HAVE_STDLIB_H
 #include <stdlib.h> /* for malloc */
 #endif /* HAVE_STDLIB_H */
+#ifdef HAVE_STRING_H
 #include <string.h> /* for strlen */
+#endif /* HAVE_STRING_H */
 #ifdef HAVE_MALLOC_H
 /* Useful include for some Windows compilers. */
 #include <malloc.h>
@@ -61,14 +68,6 @@ EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define  UNUSEDARG
 #endif
 
-#ifndef DW_DLV_OK
-/* DW_DLV_OK  must match libdwarf.h */
-/* DW_DLV_ERROR  must match libdwarf.h  */
-/* DW_DLV_NO_ENTRY  unused here  */
-#define DW_DLV_OK 0
-#define DW_DLV_NO_ENTRY -1
-#define DW_DLV_ERROR 1
-#endif /* DW_DLV_OK */
 
 static unsigned long minimumnewlen = 30;
 /*
@@ -98,7 +97,7 @@ dwarfstring_resize_to(struct dwarfstring_s *g,unsigned long newlen)
         g->s_size - g->s_avail;
     unsigned long malloclen = newlen+1;
 
-    if(malloclen < minimumnewlen) {
+    if (malloclen < minimumnewlen) {
         malloclen = minimumnewlen;
     }
     b = malloc(malloclen);
@@ -133,7 +132,8 @@ dwarfstring_reset(struct dwarfstring_s *g)
 }
 
 int
-dwarfstring_constructor_fixed(struct dwarfstring_s *g,unsigned long len)
+dwarfstring_constructor_fixed(struct dwarfstring_s *g,
+    unsigned long len)
 {
     int r = FALSE;
 
@@ -168,6 +168,7 @@ dwarfstring_destructor(struct dwarfstring_s *g)
     if (g->s_malloc) {
         free(g->s_data);
         g->s_data = 0;
+        g->s_malloc = 0;
     }
     dwarfstring_constructor(g);
 }
@@ -206,7 +207,7 @@ dwarfstring_append(struct dwarfstring_s *g,char *str)
 {
     unsigned long dlen = 0;
 
-    if(!str) {
+    if (!str) {
         return TRUE;
     }
     dlen = strlen(str);
@@ -237,7 +238,7 @@ _dwarfstring_append_spaces(dwarfstring *data,
     while (l > charct) {
         res = dwarfstring_append_length(data,spacebuf,charct);
         l -= charct;
-        if (res != DW_DLV_OK) {
+        if (res != TRUE) {
             return res;
         }
     }
@@ -249,13 +250,14 @@ static int
 _dwarfstring_append_zeros(dwarfstring *data, size_t l)
 {
     int res = 0;
-    static char zeros[] = {"0000000000000000000000000000000000000000"};
+    static char zeros[] = {
+        "0000000000000000000000000000000000000000"};
     size_t charct = sizeof(zeros)-1;
 
     while (l > charct) {
         res = dwarfstring_append_length(data,zeros,charct);
         l -= charct;
-        if (res != DW_DLV_OK) {
+        if (res != TRUE) {
             return res;
         }
     }
@@ -268,7 +270,7 @@ _dwarfstring_append_zeros(dwarfstring *data, size_t l)
 int dwarfstring_append_printf_s(dwarfstring *data,
     char *format,char *s)
 {
-    size_t stringlen = strlen(s);
+    size_t stringlen = 0;
     size_t next = 0;
     long val = 0;
     char *endptr = 0;
@@ -280,6 +282,15 @@ int dwarfstring_append_printf_s(dwarfstring *data,
     size_t prefixlen = 0;
     int res = 0;
 
+    if (!s) {
+        s="<ERROR: null string pointer to "
+            "dwarfstring_append_printf_s>";
+    }
+    stringlen = strlen(s);
+    if (!format) {
+        format="<ERROR: null format pointer to "
+            "dwarfstring_append_printf_s>";
+    }
     while (format[next] && format[next] != '%') {
         ++next;
         ++prefixlen;
@@ -288,7 +299,7 @@ int dwarfstring_append_printf_s(dwarfstring *data,
         dwarfstring_append_length(data,format,prefixlen);
     }
     if (!format[next]) {
-        return DW_DLV_OK;
+        return TRUE;
     }
     next++;
     if (format[next] == '-') {
@@ -302,29 +313,30 @@ int dwarfstring_append_printf_s(dwarfstring *data,
     }
     next = (endptr - format);
     if (format[next] != 's') {
-        return DW_DLV_ERROR;
+        return FALSE;
     }
     next++;
 
+    if (fixedlen && (stringlen >= fixedlen)) {
+        /*  Ignore  leftjustify (if any) and the stringlen
+            as the actual string overrides those. */
+        leftjustify = 0;
+    }
     if (leftjustify) {
-        if (fixedlen && fixedlen <= stringlen) {
-            /* This lets us have fixedlen < stringlen */
-            dwarfstring_append_length(data,s,fixedlen);
-        } else {
 
-            dwarfstring_append_length(data,s,stringlen);
-            if(fixedlen) {
-                size_t trailingspaces = fixedlen - stringlen;
+        dwarfstring_append_length(data,s,stringlen);
+        if (fixedlen) {
+            size_t trailingspaces = fixedlen - stringlen;
 
-                _dwarfstring_append_spaces(data,trailingspaces);
-            }
+            _dwarfstring_append_spaces(data,trailingspaces);
         }
     } else {
-        if (fixedlen && fixedlen <= stringlen) {
-            /* This lets us have fixedlen < stringlen */
-            dwarfstring_append_length(data,s,fixedlen);
+        if (fixedlen && fixedlen < stringlen) {
+            /*  This lets us have fixedlen < stringlen by
+                taking all the chars from s*/
+            dwarfstring_append_length(data,s,stringlen);
         } else {
-            if(fixedlen) {
+            if (fixedlen) {
                 size_t leadingspaces = fixedlen - stringlen;
                 size_t k = 0;
 
@@ -336,7 +348,7 @@ int dwarfstring_append_printf_s(dwarfstring *data,
         }
     }
     if (!format[next]) {
-        return DW_DLV_OK;
+        return TRUE;
     }
     {
         char * startpt = format+next;
@@ -360,18 +372,19 @@ static char Xtable[16] = {
 };
 
 /*  We deal with formats like:
-    %d   %5d %05d %+d %+5d (and ld and lld too). */
+    %d   %5d %05d %+d %+5d %-5d (and ld and lld too). */
 int dwarfstring_append_printf_i(dwarfstring *data,
     char *format,
     dwarfstring_i v)
 {
-    int res = DW_DLV_OK;
+    int res = TRUE;
     size_t next = 0;
     long val = 0;
     char *endptr = 0;
     const char *numptr = 0;
     size_t fixedlen = 0;
     int leadingzero = 0;
+    int minuscount = 0; /*left justify */
     int pluscount = 0;
     int lcount = 0;
     int ucount = 0;
@@ -382,6 +395,10 @@ int dwarfstring_append_printf_i(dwarfstring *data,
     size_t prefixlen = 0;
     int done = 0;
 
+    if (!format) {
+        format="<ERROR: null format pointer to "
+            "dwarfstring_append_printf_i>";
+    }
     while (format[next] && format[next] != '%') {
         ++next;
         ++prefixlen;
@@ -389,15 +406,19 @@ int dwarfstring_append_printf_i(dwarfstring *data,
     dwarfstring_append_length(data,format,prefixlen);
     if (format[next] != '%') {
         /*   No % operator found, we are done */
-        return DW_DLV_OK;
+        return TRUE;
     }
     next++;
     if (format[next] == '-') {
-        /*ESBERR("ESBERR_printf_i - format not supported"); */
+        minuscount++;
         next++;
     }
     if (format[next] == '+') {
         pluscount++;
+        next++;
+    }
+    if (format[next] == '-') {
+        minuscount++;
         next++;
     }
     if (format[next] == '0') {
@@ -434,6 +455,10 @@ int dwarfstring_append_printf_i(dwarfstring *data,
         lcount++;
         next++;
     }
+    if (format[next] == 'l') {
+        lcount++;
+        next++;
+    }
     if (format[next] == 'u') {
         ucount++;
         next++;
@@ -452,13 +477,37 @@ int dwarfstring_append_printf_i(dwarfstring *data,
     }
     if (format[next] == 's') {
         /* ESBERR("ESBERR_pct_scount_in_i"); */
-        return DW_DLV_ERROR;
+        dwarfstring_append(data,
+            "<ERROR: format %s passed to "
+            "dwarfstring_append_printf_i>");
+        return FALSE;
+    }
+    if (xcount || Xcount) {
+        /*  Use the printf_u for %x and the like
+            just copying the entire format makes
+            it easier for coders to understand
+            nothing much was done */
+        dwarfstring_append(data,
+            "<ERROR: format %x or %X passed to "
+            "dwarfstring_append_printf_i>");
+        dwarfstring_append(data,format+prefixlen);
+        return FALSE;
     }
     if (!dcount || (lcount >2) ||
-        (Xcount +xcount+dcount+ucount) > 1) {
+        (Xcount+xcount+dcount+ucount) > 1) {
         /* error */
+        dwarfstring_append(data,
+            "<ERROR: format has too many %x/d/u/l passed to "
+            "dwarfstring_append_printf_i>");
         /* ESBERR("ESBERR_xcount_etc_i"); */
-        return DW_DLV_ERROR;
+        return FALSE;
+    }
+    if (pluscount && minuscount) {
+        /* We don't allow  format +- */
+        dwarfstring_append(data,
+            "<ERROR: format disallowed. +- passed to "
+            "dwarfstring_append_printf_i>");
+        return FALSE;
     }
     {
         char digbuf[36];
@@ -497,12 +546,16 @@ int dwarfstring_append_printf_i(dwarfstring *data,
                     remaining = -v;
                 }
             }else {
+                dwarfstring_append(data,
+                    "<ERROR: v passed to "
+                    "dwarfstring_append_printf_i "
+                    "cannot be handled:integer size>");
                 /* ESBERR("ESBERR_sizeof_v_i"); */
                 /* error */
-                return DW_DLV_ERROR;
+                return FALSE;
             }
         }
-        if(!done) {
+        if (!done) {
             for ( ;; ) {
                 dwarfstring_u dig = 0;
 
@@ -515,7 +568,7 @@ int dwarfstring_append_printf_i(dwarfstring *data,
                 }
                 --digptr;
             }
-            if (vissigned) {
+            if (vissigned) { /* could check minuscount instead */
                 --digptr;
                 digcharlen++;
                 *digptr = '-';
@@ -561,7 +614,7 @@ int dwarfstring_append_printf_i(dwarfstring *data,
         size_t trailinglen = strlen(format+next);
         res = dwarfstring_append_length(data,format+next,trailinglen);
     }
-    return res; 
+    return res;
 }
 
 #if 0
@@ -570,21 +623,21 @@ int dwarfstring_append_printf_i(dwarfstring *data,
 static unsigned
 trimleadingzeros(char *ptr,unsigned digits,unsigned keepcount)
 {
-     char *cp = ptr;
-     unsigned leadzeroscount = 0;
-     unsigned trimoff = 0;
+    char *cp = ptr;
+    unsigned leadzeroscount = 0;
+    unsigned trimoff = 0;
 
-     for(; *cp; ++cp) { 
-         if (*cp == '0') {
+    for (; *cp; ++cp) {
+        if (*cp == '0') {
             leadzeroscount++;
             continue;
-         }
-     }
-     trimoff = keepcount - digits;
-     if (trimoff&1) {
+        }
+    }
+    trimoff = keepcount - digits;
+    if (trimoff&1) {
         trimoff--;
-     }
-     return trimoff;
+    }
+    return trimoff;
 }
 #endif /* 0 */
 
@@ -617,6 +670,10 @@ int dwarfstring_append_printf_u(dwarfstring *data,
     size_t divisor = 0;
     size_t prefixlen = 0;
 
+    if (!format) {
+        format="<ERROR: null format pointer to "
+            "dwarfstring_append_printf_u>";
+    }
     while (format[next] && format[next] != '%') {
         ++next;
         ++prefixlen;
@@ -624,13 +681,16 @@ int dwarfstring_append_printf_u(dwarfstring *data,
     dwarfstring_append_length(data,format,prefixlen);
     if (format[next] != '%') {
         /*   No % operator found, we are done */
-        /*ESBERR("ESBERR..esb_append_printf_u has no % operator"); */
-        return DW_DLV_OK;
+        return TRUE;
     }
     next++;
     if (format[next] == '-') {
+        dwarfstring_append(data,
+            "<ERROR: format - passed to "
+            "dwarfstring_append_printf_u "
+            "cannot be handled>");
         /*ESBERR("ESBERR_printf_u - format not supported"); */
-        next++;
+        return FALSE;
     }
     if (format[next] == '0') {
         leadingzero = 1;
@@ -666,6 +726,10 @@ int dwarfstring_append_printf_u(dwarfstring *data,
         lcount++;
         next++;
     }
+    if (format[next] == 'l') {
+        lcount++;
+        next++;
+    }
     if (format[next] == 'u') {
         ucount++;
         next++;
@@ -683,23 +747,46 @@ int dwarfstring_append_printf_u(dwarfstring *data,
         next++;
     }
     if (format[next] == 's') {
+        dwarfstring_append(data,
+            "<ERROR: format %s passed to "
+            "dwarfstring_append_printf_u "
+            "cannot be handled>");
         /* ESBERR("ESBERR_pct_scount_in_u"); */
-        return DW_DLV_ERROR;
+        return FALSE;
     }
-
     if ( (Xcount +xcount+dcount+ucount) > 1) {
+        dwarfstring_append(data,
+            "<ERROR: format %x X d u repeats to "
+            "dwarfstring_append_printf_u "
+            "cannot be handled>");
         /* ESBERR("ESBERR_pct_xcount_etc_u"); */
-        return DW_DLV_ERROR;
+        return FALSE;
+    }
+    if ( (Xcount +xcount+dcount+ucount) == 0) {
+        dwarfstring_append(data,
+            "<ERROR: format %x X d u missing to "
+            "dwarfstring_append_printf_u "
+            "cannot be handled>");
+        /* ESBERR("ESBERR_pct_xcount_etc_u"); */
+        return FALSE;
     }
     if (lcount > 2) {
+        dwarfstring_append(data,
+            "<ERROR: format % lll to "
+            "dwarfstring_append_printf_u "
+            "cannot be handled>");
         /* ESBERR("ESBERR_pct_lcount_error_u"); */
         /* error */
-        return DW_DLV_ERROR;
+        return FALSE;
     }
     if (dcount > 0) {
+        dwarfstring_append(data,
+            "<ERROR: format %d to "
+            "dwarfstring_append_printf_u "
+            "cannot be handled>");
         /*ESBERR("ESBERR_pct_dcount_error_u");*/
         /* error */
-        return DW_DLV_ERROR;
+        return FALSE;
     }
     if (ucount) {
         divisor = 10;
@@ -765,6 +852,5 @@ int dwarfstring_append_printf_u(dwarfstring *data,
         size_t trailinglen = strlen(format+next);
         dwarfstring_append_length(data,format+next,trailinglen);
     }
-    return DW_DLV_OK;
+    return FALSE;
 }
-

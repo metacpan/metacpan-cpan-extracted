@@ -1,5 +1,5 @@
 package Util::Medley::Exec;
-$Util::Medley::Exec::VERSION = '0.053';
+$Util::Medley::Exec::VERSION = '0.055';
 use Modern::Perl;
 use Moose;
 use namespace::autoclean;
@@ -24,7 +24,7 @@ Util::Medley::Exec - proxy for cmdline to libs
 
 =head1 VERSION
 
-version 0.053
+version 0.055
 
 =cut
 

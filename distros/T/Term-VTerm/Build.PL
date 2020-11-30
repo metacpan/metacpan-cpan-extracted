@@ -14,7 +14,9 @@ my $build = Module::Build::Using::PkgConfig->new(
    create_readme  => 1,
 );
 
-$build->use_pkgconfig( "vterm" );
+$build->use_pkgconfig( "vterm",
+   atleast_version => '0.1',
+);
 
 if( eval { require Devel::MAT::Dumper::Helper and
             Devel::MAT::Dumper::Helper->VERSION( '0.41' ) } ) {

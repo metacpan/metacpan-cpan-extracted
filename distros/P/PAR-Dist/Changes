@@ -1,3 +1,10 @@
+0.51  2020-11-30
+
+- Fix problem with Cwd::realpath()
+
+  Some versions of Cwd::realpath() must be called on an *existing* path,
+  otherwise they will return undef.
+
 0.50  2020-11-17
 
 - Fix RT#132067: fix for Archive::Zip related test failures due to symlinks

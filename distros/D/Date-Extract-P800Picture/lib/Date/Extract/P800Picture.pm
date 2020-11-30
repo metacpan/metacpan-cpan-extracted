@@ -1,6 +1,6 @@
 # -*- cperl; cperl-indent-level: 4 -*-
-# Copyright (C) 2008-2019, Roland van Ipenburg
-package Date::Extract::P800Picture v1.1.2;
+# Copyright (C) 2008-2020, Roland van Ipenburg
+package Date::Extract::P800Picture v1.1.4;
 
 use strict;
 use warnings;
@@ -18,7 +18,6 @@ use Date::Extract::P800Picture::Exceptions ();
 
 use Readonly ();
 ## no critic (ProhibitCallsToUnexportedSubs)
-Readonly::Scalar my $EMPTY             => q{};
 Readonly::Scalar my $EPOCH_YEAR        => 2000;
 Readonly::Scalar my $MONTHS_IN_YEAR    => 12;
 Readonly::Scalar my $MAX_DAYS_IN_MONTH => 31;
@@ -26,10 +25,6 @@ Readonly::Scalar my $HOURS_IN_DAY      => 24;
 Readonly::Scalar my $BASE_N            => 36;
 Readonly::Scalar my $TZ                => 'UTC';
 Readonly::Hash my %ERR                 => (
-    'PARSING_YEAR'     => q{Could not parse year char '%s'},
-    'PARSING_MONTH'    => q{Could not parse month char '%s'},
-    'PARSING_DAY'      => q{Could not parse day char '%s'},
-    'PARSING_HOUR'     => q{Could not parse hour char '%s'},
     'MISSING_DATE'     => q{No date found in filename '%s'},
     'MISSING_FILENAME' => q{Filename is not set, nothing to extract},
 );
@@ -77,29 +72,18 @@ sub extract {
             $LAST_PAREN_MATCH{'year'}, $LAST_PAREN_MATCH{'month'},
             $LAST_PAREN_MATCH{'day'},  $LAST_PAREN_MATCH{'hour'},
         );
+
         if ( defined $year ) {
-            $self->_parse( \$year, $BASE_N, $ERR{'PARSING_YEAR'} )
-              && $self->_parse( \$month, $MONTHS_IN_YEAR,
-                $ERR{'PARSING_MONTH'} )
-              && $self->_parse( \$day, $MAX_DAYS_IN_MONTH, $ERR{'PARSING_DAY'} )
-              && $self->_parse( \$hour, $HOURS_IN_DAY, $ERR{'PARSING_HOUR'} )
-              && (
-                eval {
-                    $self->datetime->set(
-                        'year'  => $year + $EPOCH_YEAR,
-                        'month' => $month + 1,
-                        'day'   => $day + 1,
-                        'hour'  => $hour,
-                    );
-                    1;
-                } || do {
-## no critic (RequireExplicitInclusion)
-                    DateExtractP800PictureException->throw(
-## use critic
-                        'error' => $EVAL_ERROR,
-                    );
-                }
-              );
+            $self->_parse( \$year,  $BASE_N );
+            $self->_parse( \$month, $MONTHS_IN_YEAR );
+            $self->_parse( \$day,   $MAX_DAYS_IN_MONTH );
+            $self->_parse( \$hour,  $HOURS_IN_DAY );
+            $self->datetime->set(
+                'year'  => $year + $EPOCH_YEAR,
+                'month' => $month + 1,
+                'day'   => $day + 1,
+                'hour'  => $hour,
+            );
         }
         else {
 ## no critic (RequireExplicitInclusion)
@@ -120,32 +104,15 @@ sub extract {
     return $self->datetime;
 }
 
-# Converts a character to a number given base. Changes the referenced part
-# returns true on succes.
+# Converts a character to a number given base. Changes the referenced part.
 
 sub _parse {
-    my ( $self, $sr_part, $base, $error_message ) = @_;
+    my ( $self, $sr_part, $base ) = @_;
     my $n_unparsed = 0;
-    local $OS_ERROR = 0;
-    if ( defined ${$sr_part} ) {
+
 ## no critic (ProhibitCallsToUnexportedSubs)
-        ( ${$sr_part}, $n_unparsed ) = POSIX::strtol( ${$sr_part}, $base );
+    return ( ${$sr_part}, $n_unparsed ) = POSIX::strtol( ${$sr_part}, $base );
 ## use critic
-    }
-    if (   !defined ${$sr_part}
-        || ${$sr_part} eq $EMPTY
-        || $n_unparsed != 0
-        || $OS_ERROR )
-    {
-## no critic (RequireExplicitInclusion)
-        DateExtractP800PictureException->throw(
-## use critic
-            'error' => sprintf $error_message,
-            defined ${$sr_part} ? ${$sr_part} : 'undef',
-        );
-        ${$sr_part} = undef;
-    }
-    return defined ${$sr_part};
 }
 
 1;
@@ -159,11 +126,11 @@ YMDH DateTime undef perl Readonly perls Ipenburg
 
 =head1 NAME
 
-Date::Extract::P800Picture - extract the date from Sony Ericsson P800 pictures.
+Date::Extract::P800Picture - extract the date from Sony Ericsson P800 pictures
 
 =head1 VERSION
 
-This document describes Date::Extract::P800Picture version v1.1.2.
+This document describes Date::Extract::P800Picture version v1.1.4.
 
 =head1 SYNOPSIS
 
@@ -252,14 +219,6 @@ from the string:
 
 =over 4
 
-=item * Could not parse year char '%s'
-
-=item * Could not parse month char '%s'
-
-=item * Could not parse day char '%s'
-
-=item * Could not parse hour char '%s'
-
 =item * No date found in filename '%s'
 
 =item * Filename is not set, nothing to extract
@@ -286,11 +245,11 @@ https://rt.cpan.org/Dist/Display.html?Queue=Date-Extract-P800Picture>.
 
 =head1 AUTHOR
 
-Roland van Ipenburg, E<lt>ipenburg@xs4all.nlE<gt>
+Roland van Ipenburg, E<lt>roland@rolandvanipenburg.comE<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2008-2019, Roland van Ipenburg
+Copyright (C) 2008-2020, Roland van Ipenburg
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.14.0 or,

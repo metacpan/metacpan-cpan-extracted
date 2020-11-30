@@ -3,6 +3,7 @@ use strict;
 use warnings;
 
 use Test::More;
+use Test::Exception;
 
 BEGIN { use_ok 'Text::Parser'; }
 
@@ -33,4 +34,30 @@ is( $parser->last_record,
     'Right whitespace trimmed'
 );
 
+my $p2 = Text::Parser->new();
+isa_ok( $p2, 'Text::Parser' );
+throws_ok {
+    $p2->custom_line_trimmer('');
+}
+'Moose::Exception::ValidationFailedForInlineTypeConstraint';
+lives_ok {
+    $p2->custom_line_trimmer( \&_trimmer );
+}
+'Sets the line trimmer';
+
+lives_ok {
+    $p2->read('t/trim_slash.txt');
+    is_deeply(
+        [ $p2->get_records() ],
+        ["something 1 2 3 kskslu 28nks jk\n"],
+        'Trimmed out slashes'
+    );
+}
+'Everything works fine';
 done_testing;
+
+sub _trimmer {
+    my $l = shift;
+    $l =~ s/\s+\/\s+/ /g;
+    return $l;
+}

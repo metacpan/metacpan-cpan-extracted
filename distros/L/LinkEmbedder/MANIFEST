@@ -14,6 +14,7 @@ lib/LinkEmbedder/Link/Google.pm
 lib/LinkEmbedder/Link/Imgur.pm
 lib/LinkEmbedder/Link/Instagram.pm
 lib/LinkEmbedder/Link/Ix.pm
+lib/LinkEmbedder/Link/Jitsi.pm
 lib/LinkEmbedder/Link/Metacpan.pm
 lib/LinkEmbedder/Link/NHL.pm
 lib/LinkEmbedder/Link/oEmbed.pm
@@ -40,6 +41,7 @@ t/greatcirclemapper.t
 t/imgur.t
 t/instagram.t
 t/ix.t
+t/jitsi.t
 t/link.t
 t/metacpan.t
 t/mojopaste.t

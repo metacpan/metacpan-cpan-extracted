@@ -25,7 +25,7 @@ use HTTP::Cookies::ChromeDevTools;
 use POSIX ':sys_wait_h';
 #use Future::IO;
 
-our $VERSION = '0.61';
+our $VERSION = '0.64';
 our @CARP_NOT;
 
 # add Browser.setPermission , .grantPermission for
@@ -824,22 +824,26 @@ sub log( $self, $level, $message, @args ) {
     };
 }
 
+sub _preferred_transport($class, $options) {
+       ref( $options->{ transport } )
+    || $options->{ transport }
+    || $ENV{ WWW_MECHANIZE_CHROME_TRANSPORT }
+    || 'Chrome::DevToolsProtocol::Transport'
+}
+
 # Find out what connection style (websocket, pipe) the user wants:
 sub connection_style( $class, $options ) {
     if( $options->{pipe} ) {
         return 'pipe'
     } else {
-        my $t =    ref( $options->{ transport } )
-                || $options->{ transport }
-                || 'Chrome::DevToolsProtocol::Transport';
-        ;
+        my $t = $class->_preferred_transport($options);
         eval "require $t; 1"
             or warn $@;
         return $t->new->type || 'websocket';
     };
 };
 
-sub new($class, %options) {
+sub new_future($class, %options) {
 
     if (! exists $options{ autodie }) {
         $options{ autodie } = 1
@@ -861,7 +865,7 @@ sub new($class, %options) {
 
     $options{ js_events } ||= [];
     if( ! exists $options{ transport }) {
-        $options{ transport } ||= $ENV{ WWW_MECHANIZE_CHROME_TRANSPORT };
+        $options{ transport } = $class->_preferred_transport(\%options);
     };
 
     $options{start_url} = 'about:blank'
@@ -901,7 +905,8 @@ sub new($class, %options) {
                                    : $^O =~ /darwin/i  ? 'SIGKILL'
                                                        : 'SIGTERM';
 
-    my $self= bless \%options => $class;
+    my $self= bless \%options => (ref $class || $class);
+
     $self->{log} ||= $self->_build_log;
 
     my( $to_chrome, $from_chrome );
@@ -981,6 +986,7 @@ sub new($class, %options) {
         transport => $options{ transport },
         log => $options{ log },
     );
+
     $options{ target } ||= Chrome::DevToolsProtocol::Target->new(
         auto_close => 0,
         transport  => delete $options{ driver_transport },
@@ -997,16 +1003,27 @@ sub new($class, %options) {
         log => $options{ log },
     );
 
-    # Synchronously connect here, just for easy API compatibility
-    $self->_connect(%options);
+    my $reuse_transport = delete $options{ reuse_transport };
+    my $res = $self->_connect(
+        reuse => $reuse_transport,
+        %options,
+    )->then(sub {
+        return Future->done( $self )
+    });
 
-    $self
+    return $res
 };
+
+sub new( $class, %args ) {
+    # Synchronously connect here, just for easy API compatibility
+    return $class->new_future(%args)->get;
+}
 
 sub _setup_driver_future( $self, %options ) {
     $self->target->connect(
-        new_tab          => !$options{ existing_tab },
+        new_tab          => !$options{ existing_tab } || $options{ new_tab },
         tab              => $options{ tab },
+        #reuse            => $options{ reuse_transport },
         separate_session => $options{ separate_session },
         start_url        => $options{ start_url } ? "".$options{ start_url } : undef,
     )->catch( sub(@args) {
@@ -1022,11 +1039,11 @@ sub _setup_driver_future( $self, %options ) {
 # This (tries to) connects to the devtools in the browser
 sub _connect( $self, %options ) {
     my $err;
-    $self->_setup_driver_future( %options )
+    my $setup = $self->_setup_driver_future( %options )
     ->catch( sub(@args) {
         $err = $args[0];
         Future->fail( @args );
-    })->get;
+    });
 
     # if Chrome started, but so slow or unresponsive that we cannot connect
     # to it, kill it manually to avoid waiting for it indefinitely
@@ -1042,41 +1059,46 @@ sub _connect( $self, %options ) {
 
     my $s = $self;
     weaken $s;
-    my $collect_JS_problems = sub( $msg ) {
-        $s->_handleConsoleAPICall( $msg->{params} )
-    };
-    $self->{consoleAPIListener} =
-        $self->add_listener( 'Runtime.consoleAPICalled', $collect_JS_problems );
-    $self->{exceptionThrownListener} =
-        $self->add_listener( 'Runtime.exceptionThrown', $collect_JS_problems );
-    $self->{nodeGenerationChange} =
-        $self->add_listener( 'DOM.attributeModified', sub { $s->new_generation() } );
-    $self->new_generation;
 
-    my @setup = (
-        $self->target->send_message('DOM.enable'),
-        $self->target->send_message('Overlay.enable'),
-        $self->target->send_message('Page.enable'),    # capture DOMLoaded
-        $self->target->send_message('Network.enable'), # capture network
-        $self->target->send_message('Runtime.enable'), # capture console messages
-        #$self->target->send_message('Debugger.enable'), # capture "script compiled" messages
-        $self->set_download_directory_future($self->{download_directory}),
+    my $res = $setup->then(sub {
+        my $collect_JS_problems = sub( $msg ) {
+            $s->_handleConsoleAPICall( $msg->{params} )
+        };
+        $s->{consoleAPIListener} =
+            $self->add_listener( 'Runtime.consoleAPICalled', $collect_JS_problems );
+        $s->{exceptionThrownListener} =
+            $self->add_listener( 'Runtime.exceptionThrown', $collect_JS_problems );
+        $s->{nodeGenerationChange} =
+            $self->add_listener( 'DOM.attributeModified', sub { $s->new_generation() } );
+        $s->new_generation;
 
-        keys %{$options{ extra_headers }} ? $self->_set_extra_headers_future( %{$options{ extra_headers }} ) : (),
-    );
+        my @setup = (
+            $s->target->send_message('DOM.enable'),
+            $s->target->send_message('Overlay.enable'),
+            $s->target->send_message('Page.enable'),    # capture DOMLoaded
+            $s->target->send_message('Network.enable'), # capture network
+            $s->target->send_message('Runtime.enable'), # capture console messages
+            #$self->target->send_message('Debugger.enable'), # capture "script compiled" messages
+            $s->set_download_directory_future($self->{download_directory}),
 
-    if( my $agent = delete $options{ user_agent }) {
-        push @setup, $self->agent_future( $agent );
-    };
+            keys %{$options{ extra_headers }} ? $s->_set_extra_headers_future( %{$options{ extra_headers }} ) : (),
+        );
 
-    Future->wait_all(
-        @setup,
-    )->get;
+        if( my $agent = delete $options{ user_agent }) {
+            push @setup, $s->agent_future( $agent );
+        };
+        my $res = Future->wait_all(
+            @setup,
+        )->on_done(sub {
 
-    # ->get() doesn't have ->get_future() yet
-    if( ! (exists $options{ tab } )) {
-        $self->get($options{ start_url }); # Reset to clean state, also initialize our frame id
-    };
+            # ->get() doesn't have ->get_future() yet
+            if( ! (exists $options{ tab } )) {
+                $self->get($options{ start_url }); # Reset to clean state, also initialize our frame id
+            };
+        });
+    });
+
+    return $res
 }
 
 sub _handleConsoleAPICall( $self, $msg ) {
@@ -1242,6 +1264,107 @@ This represents the tab we control.
 sub tab( $self ) {
     $self->target->tab
 }
+
+=head2 C<< $mech->new_tab >>
+
+=head2 C<< $mech->new_tab_future >>
+
+    my $tab2 = $mech->new_tab_future(
+        start_url => 'https://google.com',
+    )->get;
+
+Creates a new tab (basically, a new WWW::Mechanize::Chrome object) connected
+to the same Chrome session.
+
+    # Use a targetInfo structure from Chrome
+    my $tab2 = $mech->new_tab_future(
+        tab => {
+            'targetId' => '1F42BDF32A30700805DDC21EDB5D8C4A',
+        },
+    )->get;
+
+It returns a L<Future> because most event loops do not like recursing within
+themselves, which happens if you want to access a fresh new tab within another
+callback.
+
+=cut
+
+sub new_tab_future( $self, %options ) {
+    my $new_tab = $options{ tab } ? undef : 1;
+    return $self->new_future(
+        %options,
+        maybe new_tab    => $new_tab,
+        headless         => $self->{headless},
+        driver           => $self->driver,
+        driver_transport => $self->transport,
+    );
+}
+
+sub new_tab( $self, %options ) {
+    $self->new_tab_future( %options )->get
+};
+
+=head2 C<< $mech->on_popup >>
+
+    my $opened;
+    $mech->on_popup(sub( $tab_f ) {
+        # This is a bit heavyweight, but ...
+        $tab_f->on_done(sub($tab) {
+            say "New window/tab was popped up:";
+            $tab->uri_future->then(sub($uri) {
+                say $uri;
+            });
+            $opened = $tab;
+        })->retain;
+    });
+
+    $mech->click({ selector => '#popup_window' });
+    if( $opened ) {
+        say $opened->title;
+    } else {
+        say "Did not find new tab?";
+    };
+
+Callback whenever a new tab/window gets popped up or created. The callback
+is handed a complete WWW::Mechanize::Chrome instance. Note that depending on
+your event loop, you are quite restricted on what synchronous methods you can
+call from within the callback.
+
+=cut
+
+sub on_popup( $self, $popup ) {
+    if( $popup ) {
+        # Remember all known targets, because setDiscoverTargets will list all
+        # existing targets too :-/
+        my %known_targets;
+        my $setup = $self->transport->getTargets()->then(sub( @targets ) {
+            %known_targets = map { $_->{targetId} => 1 } @targets;
+            Future->done(1);
+        });
+
+        $self->{target_created} = $self->add_listener('Target.targetCreated' => sub($targetInfo) {
+            #use Data::Dumper; warn Dumper $targetInfo;
+            my $id = $targetInfo->{params}->{targetInfo}->{targetId};
+            if( $targetInfo->{params}->{targetInfo}->{type} eq 'page'
+                && ! $known_targets{ $id }
+            ) {
+                # use Data::Dumper; warn "--- New target"; warn Dumper $targetInfo;
+                my $tab = $self->new_tab_future( tab => $targetInfo->{params}->{targetInfo});
+                $popup->($tab);
+            } else {
+                # warn "...- already know it";
+            };
+        });
+
+        $setup->then(sub {
+            $self->target->send_message('Target.setDiscoverTargets' => discover => JSON::true() )
+        })->get;
+    } else {
+        $self->target->send_message('Target.setDiscoverTargets' => discover => JSON::false() )->get;
+        delete $self->{target_created};
+    };
+};
+
 
 sub autodie {
     my( $self, $val )= @_;
@@ -1738,7 +1861,7 @@ sub close {
     #    $_[0]->target->close_tab({ id => $tab_id })->get();
     #};
     if( $_[0]->{autoclose} and $_[0]->target and $_[0]->tab  ) {
-        $_[0]->target->close->get();
+        $_[0]->target->close->retain();
     };
 
     #if( $pid and $_[0]->{cached_version} > 65) {
@@ -1820,6 +1943,19 @@ sub DESTROY {
     #warn "Closing mechanize";
     $_[0]->close();
     %{ $_[0] }= (); # clean out all other held references
+}
+
+=head2 C<< $mech->list_tabs >>
+
+    my @open_tabs = $mech->list_tabs()->get;
+    say $open_tabs[0]->{title};
+
+Returns the open tabs as a list of hashrefs.
+
+=cut
+
+sub list_tabs( $self ) {
+    $self->transport->getTargets;
 }
 
 =head2 C<< $mech->highlight_node( @nodes ) >>
@@ -1963,7 +2099,7 @@ sub _waitForNavigationEnd( $self, %options ) {
 
     my $frameId = $options{ frameId } || $self->frameId;
     my $requestId = $options{ requestId } || $self->requestId;
-    my $msg = sprintf "Capturing events until 'Page.frameStoppedLoading' for frame %s",
+    my $msg = sprintf "Capturing events until 'Page.frameStoppedLoading' or 'Page.frameClearedScheduledNavigation' for frame %s",
                       $frameId || '-';
     $msg .= " or 'Network.loadingFailed' or 'Network.loadingFinished' for request '$requestId'"
         if $requestId;
@@ -1986,6 +2122,9 @@ sub _waitForNavigationEnd( $self, %options ) {
                        && $requestId
                        && (! exists $ev->{params}->{requestId}
                            or ($ev->{params}->{requestId} eq $requestId)));
+        $internal_navigation ||= (   $ev->{method} eq 'Page.frameClearedScheduledNavigation'
+                       && $ev->{params}->{frameId} eq $frameId);
+
         # This is far too early, but some requests only send this?!
         # Maybe this can be salvaged by setting a timeout when we see this?!
         my $domcontent = (  1 # $options{ just_request }
@@ -2419,6 +2558,18 @@ sub httpMessageFromEvents( $self, $frameId, $events, $url ) {
         );
         $response->request( $request );
 
+    # Popup window, handled in a new instance, if captured
+    } elsif ( $res = $events{ 'Page.frameClearedScheduledNavigation' }
+              and $res->{params}->{frameId} eq $frameId) {
+    #warn "Network.frameNavigated (file)";
+        $response = HTTP::Response->new(
+            200, # is 0 for files?!
+            "OK",
+            HTTP::Headers->new(),
+        );
+        $response->request( $request );
+
+
     } elsif ( $res = $events{ 'Page.frameStoppedLoading' }
               and $res->{params}->{frameId} eq $frameId) {
     #warn "Network.frameStoppedLoading";
@@ -2599,7 +2750,12 @@ sub set_download_directory( $self, $dir="" ) {
     my $cookies = $mech->cookie_jar
 
 Returns all the Chrome cookies in a L<HTTP::Cookies::ChromeDevTools> instance.
-Setting a cookie in there will also set the cookie in Chrome.
+Setting a cookie in there will also set the cookie in Chrome. Note that
+the C<< ->cookie_jar >> does not automatically refresh when a new page is
+loaded. To manually refresh the state of the cookie jar, use:
+
+    $mech->get('https://example.com/some_page');
+    $mech->cookie_jar->load;
 
 =cut
 
@@ -2825,17 +2981,25 @@ sub stop( $self ) {
 }
 
 =head2 C<< $mech->uri() >>
+=head2 C<< $mech->uri_future() >>
 
     print "We are at " . $mech->uri;
+    print "We are at " . $mech->uri_future->get;
 
 Returns the current document URI.
 
 =cut
 
-sub uri( $self ) {
-    my $d = $self->document;
-    URI->new( $d->{root}->{documentURL} )
+sub uri_future( $self ) {
+    $self->document_future->then(sub($d) {
+        Future->done( URI->new( $d->{root}->{documentURL} ))
+    });
 }
+
+sub uri( $self ) {
+    $self->uri_future->get
+}
+
 
 =head2 C<< $mech->infinite_scroll( [$wait_time_in_seconds] ) >>
 
@@ -3133,13 +3297,7 @@ Returns the current document title.
 =cut
 
 sub title( $self ) {
-    #if( $self->tab ) {
-    #    my $id = $self->tab->{id};
-    #    (my $tab_now) = grep { $_->{id} eq $id } $self->target->list_tabs->get;
-    #    return $tab_now->{title};
-    #} else {
-        $self->target->info->{title}
-    #}
+    $self->target->info->{title}
 };
 
 =head1 EXTRACTION METHODS
@@ -5062,6 +5220,12 @@ field name and value pairs. If there is more than one field with the same
 name, the first one found is set. If you want to select which of the
 duplicate field to set, use a value which is an anonymous array which
 has the field value and its number as the 2 elements.
+
+  $mech->set_fields(
+      user => 'me',
+      pass => 'secret',
+      pass => [ 'secret', 2 ], # repeated password field
+  );
 
 =cut
 

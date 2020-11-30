@@ -39,6 +39,7 @@ do { my $x = {
                                       'Acme::CPANAuthors::Polish' => '0',
                                       'Acme::CPANAuthors::Portuguese' => '0',
                                       'Acme::CPANAuthors::Russian' => '0',
+                                      'Acme::CPANAuthors::Slovak' => '0',
                                       'Acme::CPANAuthors::Spanish' => '0',
                                       'Acme::CPANAuthors::Swedish' => '0',
                                       'Acme::CPANAuthors::Taiwanese' => '0',

@@ -28,7 +28,6 @@ our @EXPORT = qw(add2hash_
     put_in_hash
     quotespace
     reduce_pathname
-    remove_internal_name
     same_size_and_mtime
     uefi_type
     uniq
@@ -44,7 +43,6 @@ sub max  { my $n = shift; $_ > $n and $n = $_ foreach @_; $n }
 #- quoting/unquoting a string that may be containing space chars.
 sub quotespace		 { my $x = $_[0] || ''; $x =~ s/(\s)/\\$1/g; $x }
 sub unquotespace	 { my $x = $_[0] || ''; $x =~ s/\\(\s)/$1/g; $x }
-sub remove_internal_name { my $x = $_[0] || ''; $x =~ s/\(\S+\)$/$1/g; $x }
 
 sub dirname { local $_ = shift; s|[^/]*/*\s*$||; s|(.)/*$|$1|; $_ || '.' }
 sub basename { local $_ = shift; s|/*\s*$||; s|.*/||; $_ }

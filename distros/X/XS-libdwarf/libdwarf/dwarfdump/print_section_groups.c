@@ -1,24 +1,27 @@
 /*
-  Copyright (C) 2017-2017  David Anderson. All rights reserved.
+Copyright (C) 2017-2017  David Anderson. All rights reserved.
 
-  This program is free software; you can redistribute it and/or modify it
-  under the terms of version 2 of the GNU General Public License as
-  published by the Free Software Foundation.
+  This program is free software; you can redistribute it and/or
+  modify it under the terms of version 2 of the GNU General
+  Public License as published by the Free Software Foundation.
 
-  This program is distributed in the hope that it would be useful, but
-  WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  This program is distributed in the hope that it would be
+  useful, but WITHOUT ANY WARRANTY; without even the implied
+  warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+  PURPOSE.
 
-  Further, this software is distributed without any warranty that it is
-  free of the rightful claim of any third person regarding infringement
-  or the like.  Any license provided herein, whether implied or
-  otherwise, applies only to this software file.  Patent licenses, if
-  any, provided herein do not apply to combinations of this program with
-  other software, or any other product whatsoever.
+  Further, this software is distributed without any warranty
+  that it is free of the rightful claim of any third person
+  regarding infringement or the like.  Any license provided
+  herein, whether implied or otherwise, applies only to this
+  software file.  Patent licenses, if any, provided herein
+  do not apply to combinations of this program with other
+  software, or any other product whatsoever.
 
-  You should have received a copy of the GNU General Public License along
-  with this program; if not, write the Free Software Foundation, Inc., 51
-  Franklin Street - Fifth Floor, Boston MA 02110-1301, USA.
+  You should have received a copy of the GNU General Public
+  License along with this program; if not, write the Free
+  Software Foundation, Inc., 51 Franklin Street - Fifth Floor,
+  Boston MA 02110-1301, USA.
 
 */
 
@@ -63,7 +66,7 @@ freeall_groups_tables(void)
 
 #define TRUE 1
 #define FALSE 0
-
+#if 0
 static struct  glfsetting_s {
     const char *secname;
     boolean *flag;
@@ -93,7 +96,7 @@ static struct  glfsetting_s {
 {".debug_weaknames",    &glflags.gf_weakname_flag,FALSE,FALSE}, /* SGI only */
 {0,0,0,0}
 };
-
+#endif /* 0 */
 
 /*  If a section is not in group N but is in group 1
     then turn off its flag. Since sections are never
@@ -106,6 +109,7 @@ static struct  glfsetting_s {
     FIXME: It would be good if, for a wholly missing
     section related to a flag, that the flag got turned
     off.  */
+#if 0
 static void
 turn_off_subsidiary_flags(UNUSEDARG Dwarf_Debug dbg)
 {
@@ -129,6 +133,7 @@ turn_off_subsidiary_flags(UNUSEDARG Dwarf_Debug dbg)
     }
 }
 
+#endif
 /*  Restoring original condition in the glftab array
     and in the global flags it points to.
     So that when processing an archive one can restore
@@ -139,11 +144,13 @@ turn_off_subsidiary_flags(UNUSEDARG Dwarf_Debug dbg)
 void
 groups_restore_subsidiary_flags(void)
 {
+#if 0
     unsigned k = 0;
+#endif
 
     /*  Duplicative but harmless free. */
     freeall_groups_tables();
-
+#if 0
     for( ; glftab[k].secname; ++k ) {
         if(glftab[k].origset) {
             *(glftab[k].flag) = glftab[k].origflag;
@@ -151,6 +158,7 @@ groups_restore_subsidiary_flags(void)
             glftab[k].origflag = FALSE;
         }
     }
+#endif
 }
 
 
@@ -166,7 +174,8 @@ groups_restore_subsidiary_flags(void)
     changed.
     */
 void
-update_section_flags_per_groups(Dwarf_Debug dbg)
+update_section_flags_per_groups(
+    UNUSEDARG Dwarf_Debug dbg)
 {
     if (!sec_names) {
         /*  The tables are absent. Internal logic
@@ -182,7 +191,9 @@ update_section_flags_per_groups(Dwarf_Debug dbg)
         freeall_groups_tables();
         return;
     }
+#if 0
     turn_off_subsidiary_flags(dbg);
+#endif
     freeall_groups_tables();
 }
 
@@ -190,18 +201,19 @@ update_section_flags_per_groups(Dwarf_Debug dbg)
     Reports on section groupings like DWO(split dwarf)
     and COMDAT groups. As a side effect creates local
     table of section and group data */
-void
-print_section_groups_data(Dwarf_Debug dbg)
+int
+print_section_groups_data(Dwarf_Debug dbg,Dwarf_Error *error)
 {
     int res = 0;
-    Dwarf_Error error = 0;
     Dwarf_Unsigned i = 0;
 
     res = dwarf_sec_group_sizes(dbg,&section_count,
         &group_count,&selected_group, &group_map_entry_count,
-        &error);
+        error);
     if(res != DW_DLV_OK) {
-        print_error(dbg, "dwarf_sec_group_sizes", res, error);
+        simple_err_return_msg_either_action(res,
+            "ERROR: dwarf_sec_group_sizes failed");
+        return res;
     }
     if (group_count == 1 && selected_group ==1 ) {
         /*  This is the traditional DWARF with no split-dwarf
@@ -209,7 +221,7 @@ print_section_groups_data(Dwarf_Debug dbg)
             We don't want to print anything as we do not want
             to see differences from existing output in this case.
             Simplifies regression testing for now. */
-        return;
+        return DW_DLV_OK;
     }
     printf("Section Groups data\n");
     printf("  Number of Elf-like sections: %4" DW_PR_DUu "\n",
@@ -223,33 +235,38 @@ print_section_groups_data(Dwarf_Debug dbg)
 
     sec_nums = calloc(group_map_entry_count,sizeof(Dwarf_Unsigned));
     if(!sec_nums) {
+        glflags.gf_count_major_errors++;
         printf("ERROR: Unable to allocate %4" DW_PR_DUu
             " map section values, cannot print group map\n",
             group_map_entry_count);
-        return;
+        return DW_DLV_OK;
     }
     group_nums = calloc(group_map_entry_count,sizeof(Dwarf_Unsigned));
     if(!group_nums) {
         free(group_nums);
+        glflags.gf_count_major_errors++;
         printf("ERROR: Unable to allocate %4" DW_PR_DUu
             " map group values, cannot print group map\n",
             group_map_entry_count);
-        return;
+        return DW_DLV_OK;
     }
     sec_names = calloc(group_map_entry_count,sizeof(char*));
     if(!sec_names) {
         free(group_nums);
         free(sec_nums);
+        glflags.gf_count_major_errors++;
         printf("ERROR: Unable to allocate %4" DW_PR_DUu
             " section name pointers, cannot print group map\n",
             group_map_entry_count);
-        return;
+        return DW_DLV_OK;
     }
 
     res = dwarf_sec_group_map(dbg,group_map_entry_count,
-        group_nums,sec_nums,sec_names,&error);
+        group_nums,sec_nums,sec_names,error);
     if(res != DW_DLV_OK) {
-        print_error(dbg, "dwarf_sec_group_map", res, error);
+        simple_err_return_msg_either_action(res,
+            "ERROR: dwarf_sec_group_map failed");
+        return res;
     }
 
     for( i = 0; i < group_map_entry_count; ++i) {
@@ -262,6 +279,7 @@ print_section_groups_data(Dwarf_Debug dbg)
             " %s\n",i,
             group_nums[i],sec_nums[i],sanitized(sec_names[i]));
     }
-    /* Do not free our allocations. Will do later. */
-    return;
+    /*  Do not free our allocations. Will do later
+        using freeall_groups_tables() */
+    return DW_DLV_OK;
 }

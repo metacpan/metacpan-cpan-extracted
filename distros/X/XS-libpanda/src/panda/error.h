@@ -148,9 +148,7 @@ namespace details {
         explicit bad_expected_access_code (E e) : _val(std::move(e)) {}
 
         virtual const char* what () const noexcept override {
-            if (_message.empty()) {
-                _message = "Bad expected access: " + error_message(_val);
-            }
+            if (_message.empty()) _message = error_message(_val);
             return _message.c_str();
         }
 

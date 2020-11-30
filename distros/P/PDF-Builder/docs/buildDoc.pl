@@ -2,8 +2,8 @@
 # buildDoc.pl builds documentation tree from Perl .pod and .pm files (POD)
 #   in case of duplicate names, .pod is used in preference to .pm
 # 
-# (c) copyright 2018 Catskill Technology Services, LLC
-# licensed under license used in PDF::Builder package
+# (c) copyright 2018-2020 Catskill Technology Services, LLC
+# licensed under license used in PDF::Builder package (LGPL 2.1+)
 #
 # there is partial code to implement --all to build all PODs, or update an
 # existing documentation tree with specific name(s), but the whole process
@@ -16,8 +16,8 @@ use strict;
 use warnings;
 use Getopt::Long;
 
-our $VERSION = '3.019'; # VERSION
-my $LAST_UPDATE = '3.011'; # manually update whenever code is changed
+our $VERSION = '3.020'; # VERSION
+my $LAST_UPDATE = '3.020'; # manually update whenever code is changed
 
 # =============
 # CONFIGURATION  these may be overridden by command-line flags. If reading from
@@ -73,6 +73,9 @@ my @file_list; # complete list of files (in filepath format). array of hashes
 	       #                              be an .html file)
 	       #  accessible => accessible (from root) flag 0=no 1=yes
 	       #  abstract => text  from NAME POD entry
+	       #  parents => []  build list of parent(s) chain
+	       #  siblings => []  build list of any siblings
+	       #  children => []  build list of any children
 
 # command line flags and files
 if (scalar(@ARGV) == 0) { help(); exit(1); }
@@ -119,7 +122,7 @@ if (!$all && scalar(@ARGV) >= 1) {
 if ($all) {
 	# any stray stuff? ARGV should be empty by now
 	foreach (@ARGV) {
-		print "$_ WARNING  extra command line content ignored\n";
+		print "WARNING  extra command line content '$_' ignored\n";
 	}
 
 	# get complete list of filepaths in @file_list and initialize flags
@@ -182,7 +185,12 @@ if ($all) {
 			           pmname=>toPM($_), # PM format name
 				   status=>-1,       # status -1 ready to read
 				   accessible=>1,    # root accessible yes
-			   	   abstract=>'' };   # no abstract yet
+			   	   abstract=>'',     # no abstract yet
+				   parents=>[],      # no parents yet
+				   siblings=>[],     # no siblings yet
+				   children=>[],     # no children yet
+				   depth=>0,         # depth of directory
+			         };
 	}
 
 	if ($rootname eq '') {
@@ -229,22 +237,32 @@ for (my $max_i=$#file_list; $max_i>0; $max_i--) {
 			# need to swap records i and i+1
 			# copying one hash to another can be tricky business, so
 			#   we'll do it the hard way
+			# parents, siblings, children arrays s/b empty
 			my %temp;
 			$temp{'pmname'} = $file_list[$i]{'pmname'};
 			$temp{'fpname'} = $file_list[$i]{'fpname'};
 			$temp{'status'} = $file_list[$i]{'status'};
 			$temp{'accessible'} = $file_list[$i]{'accessible'};
 			$temp{'abstract'} = $file_list[$i]{'abstract'};
+		        $temp{'parents'} = $file_list[$i]{'parents'};
+		        $temp{'siblings'} = $file_list[$i]{'siblings'};
+		        $temp{'children'} = $file_list[$i]{'children'};
 			$file_list[$i]{'pmname'} = $file_list[$i+1]{'pmname'};
 			$file_list[$i]{'fpname'} = $file_list[$i+1]{'fpname'};
 			$file_list[$i]{'status'} = $file_list[$i+1]{'status'};
 			$file_list[$i]{'accessible'} = $file_list[$i+1]{'accessible'};
 			$file_list[$i]{'abstract'} = $file_list[$i+1]{'abstract'};
+		        $file_list[$i]{'parents'} = $file_list[$i+1]{'parents'};
+		        $file_list[$i]{'siblings'} = $file_list[$i+1]{'siblings'};
+		        $file_list[$i]{'children'} = $file_list[$i+1]{'children'};
 			$file_list[$i+1]{'pmname'} = $temp{'pmname'};
 			$file_list[$i+1]{'fpname'} = $temp{'fpname'};
 			$file_list[$i+1]{'status'} = $temp{'status'};
 			$file_list[$i+1]{'accessible'} = $temp{'accessible'};
 			$file_list[$i+1]{'abstract'} = $temp{'abstract'};
+		        $file_list[$i+1]{'parents'} = $temp{'parents'};
+		        $file_list[$i+1]{'siblings'} = $temp{'siblings'};
+		        $file_list[$i+1]{'children'} = $temp{'children'};
 			$swap = 1;
 		}
 	}
@@ -432,6 +450,7 @@ do {
 
 			# write $htmlfile back out to its .html file ($target)
 			spew($htmlfile, $target);
+                        $file_list[$i]{'htmlname'} = $target;
 
 		} # processed a .pod or .pm file into .html (was status -1)
 	} # for loop through all entries, looking for status -1
@@ -485,11 +504,12 @@ for (my $i=0; $i<scalar @file_list; $i++) {
 		next;
 	}
 	# put 'X' at left margin if not accessible from root, else space
-	if ($file_list[$i]{'accessible'} == 1) {
+       ## with NAVIGATION LINKS, all should be accessible from within
+       #if ($file_list[$i]{'accessible'} == 1) {
 		print $fh "<span class=\"fixedwidth\"> </span>";
-	} else {
-		print $fh "<span class=\"fixedwidth\">X</span>";
-	}
+       #} else {
+       #	print $fh "<span class=\"fixedwidth\">X</span>";
+       #}
 
 	my $fname = $file_list[$i]{'fpname'};
 	$fname =~ s#$libtop/$leading/##;
@@ -530,6 +550,326 @@ close $fh;
 # cleanup
 unlink "pod2htmd.tmp";
 unlink "pod2html.stderr";
+
+# now that the individual HTML files and the master index are done,
+# 1) generate pmnameA array for each entry in @file_list
+# 2) generate children, siblings, and parents lists
+# 3) go through all HTML files (ex master index) and update with NAVIGATION
+if (scalar(@file_list) <= 1) {
+    print "Only 0 or 1 file_list entries. Do not create NAVIGATION LINKS.\n";
+    exit(0);
+}
+make_pmnameA();
+my ($j, $ref);
+
+process(0, scalar(@file_list));
+
+# entire file_list should have been recursively processed
+# we have filled in the 'children' of each node. now give each node its
+# parent, and then siblings
+do_parents();
+# remove duplicate children (grandchildren) AFTER parents set, so that an 
+# element may have chain of parents all the way up to the root
+remove_grandchildren();
+do_siblings();
+
+# update existing HTML files
+update_HTML();
+exit(0);
+
+# ==================================
+sub update_HTML{
+    my ($i, $fname, $string, @count, $ref, $pos, $newstring, @list);
+
+    for ($i=0; $i<scalar(@file_list); $i++) {
+        # read POD from file $file_list[$i]{'fpname'} 
+        # wrote HTML to $file_list[$i]{'htmlname'}     
+	$fname = $file_list[$i]{'htmlname'};
+	print "Updating NAVIGATION LINKS in $fname\n";
+
+#   print "file_list[$i]: $file_list[$i]{'pmname'}  -  $file_list[$i]{'abstract'}\n";
+        # read in HTML into $string, modify 
+	$string = slurp($fname);
+	if (length $string == 0) {
+	    print "ERROR: unable to read in file $fname for Navigation Links update!\n";
+	    next;
+	}
+	@count = (0, 0, 0); # no parents, siblings, or children
+	# count of parents
+        $ref = $file_list[$i]{'parents'};
+        if (defined $ref) { $count[0] = scalar(@$ref); }
+	$count[0]++;  # always the master index
+	# count of siblings
+        $ref = $file_list[$i]{'siblings'};
+        if (defined $ref) { $count[1] = scalar(@$ref); }
+	# count of children
+        $ref = $file_list[$i]{'children'};
+        if (defined $ref) { $count[2] = scalar(@$ref); }
+
+	# update link directory at top of file
+	# guaranteed there's at least one parent entry
+	$pos = index $string, '<ul id="index">';
+	if ($pos < 0) {
+	    print "ERROR: can't find link index in file $fname.\n";
+	    next;
+	}
+	$pos = index $string, "\n</ul>", $pos;
+	if ($pos < 0) {
+	    print "ERROR: can't find end of link index in file $fname.\n";
+	    next;
+	}
+	# split point is $pos+1 (just before </ul>)
+	
+        $newstring =  "  <li><a href=\"#NAVIGATION-LINKS\">NAVIGATION LINKS</a>\n" .
+	              "    <ul>\n" .
+		      "      <li><a href=\"#Up-Parents\">Up (Parents)</a></li>\n";
+	if ($count[1]) {
+	    $newstring .= 
+		      "      <li><a href=\"#Siblings\">Siblings</a></li>\n";
+	}
+	if ($count[2]) {
+	    $newstring .= 
+		      "      <li><a href=\"#Down-Children\">Down (Children)</a></li>\n";
+	}
+	$newstring .= "    </ul>\n" . 
+	              "  </li>\n";
+	$string = substr($string, 0, $pos+1) . $newstring . substr($string, $pos+1);
+	
+	# just before </body> will be location of new section
+	$pos = index $string, "\n</body>\n";
+
+	$newstring =  "<h1 id=\"NAVIGATION-LINKS\">NAVIGATION LINKS</h1>\n";
+
+        # if parents (should be), output that section
+	$newstring .= "\n<h2 id=\"Up-Parents\">Up (Parents)</h2>\n";
+	# add ever-present master index entry at same level as [0] entry
+	# note: omitting id= because it's not used anywhere
+	$newstring .= "\n<dl>\n\n<dt>" .
+	              "<a href=\"".go_up($file_list[$i]{'depth'}-1) .
+		      "index.html\">Master Index</a>&nbsp;</dt>\n<dd>\n\n</dd>\n";
+
+        $ref = $file_list[$i]{'parents'};
+        if (defined $ref && scalar(@$ref)) {
+	    # @$ref is an ordered array of @file_list indice(s)
+	    # pointing back to any parents
+	    @list = @$ref;
+	    foreach (@list) {
+	        $newstring .= "<a href=\"".go_up($file_list[$i]{'depth'}) .
+		              "$file_list[$_]{'htmlname'}\">$file_list[$_]{'pmname'}</a> -- $file_list[$_]{'abstract'}</dt>\n<dd>\n\n</dd>\n";
+            }
+        }
+	$newstring .= "</dl>\n";
+
+        # if any siblings, output that section
+	if ($count[1]) {
+            $ref = $file_list[$i]{'siblings'};
+            if (defined $ref && scalar(@$ref)) {
+	        $newstring .= "\n<h2 id=\"Siblings\">Siblings</h2>\n";
+	        # @$ref is an ordered array of @file_list indice(s)
+	        # pointing back to any siblings
+	        @list = @$ref;
+	        foreach (@list) {
+	            $newstring .= "<a href=\"".go_up($file_list[$i]{'depth'}) .
+		                  "$file_list[$_]{'htmlname'}\">$file_list[$_]{'pmname'}</a> -- $file_list[$_]{'abstract'}</dt>\n<dd>\n\n</dd>\n";
+                }
+	        $newstring .= "</dl>\n";
+            }
+        }
+
+        # if any children, output that section
+	if ($count[2]) {
+            $ref = $file_list[$i]{'children'};
+            if (defined $ref && scalar(@$ref)) {
+	        $newstring .= "\n<h2 id=\"Down-Children\">Down (Children)</h2>\n";
+	        # @$ref is an ordered array of @file_list indice(s)
+	        # pointing back to any children
+	        @list = @$ref;
+	        foreach (@list) {
+	            $newstring .= "<a href=\"".go_up($file_list[$i]{'depth'}) .
+		                  "$file_list[$_]{'htmlname'}\">$file_list[$_]{'pmname'}</a> -- $file_list[$_]{'abstract'}</dt>\n<dd>\n\n</dd>\n";
+                }
+	        $newstring .= "</dl>\n";
+            }
+        }
+
+        # write file back out
+	$string = substr($string, 0, $pos+1) . $newstring . substr($string, $pos+1);
+	spew($string, $fname);
+    }
+    return;
+}
+
+sub go_up {
+    my $depth = shift;
+    if ($depth == 1) { return ''; }
+    return '../' x ($depth-1);
+}
+
+# ==================================
+# recursively process this range of file_list rows, filling in children array
+# handle a subset (initially the whole thing) of file_list
+sub process {
+    my ($start, $len) = @_;
+    # starting element number in file_list, and count of rows
+
+    if ($len <= 1) { return; }  # single element won't have any children
+
+    my ($i, $j, $dir);
+    my ($start2, $len2, $ref, $refc);
+    
+    # if $start row's pmnameA is now empty, that means that $start is the 
+    # parent of everything else below it
+    $ref = $file_list[$start]{'pmnameA'};
+    if (scalar(@$ref) == 0) {
+	# element $start is parent to all (1..$len-1) other elements
+        # we want only DIRECT children (leaves), not nodes (grandchildren),
+        #  so later we will remove grandchildren (duplicates)
+        $refc = $file_list[$start]{'children'};
+        for ($j=1; $j<$len; $j++) {
+	    push @$refc, $start+$j;
+	}
+	# remove first element (empty pmnameA) from further consideration
+	process($start+1, $len-1);
+	return;
+    }
+
+    # strip first element from each pmnameA if ALL are duplicates
+    LOOP: while (1) {
+	$ref = $file_list[$start]{'pmnameA'};
+	last if !scalar(@$ref[0]); # first element is empty?
+	$dir = @$ref[0];
+	for ($i=1; $i<$len; $i++) {
+	    last LOOP if @{ $file_list[$start+$i]{'pmnameA'} }[0] ne $dir;
+	}
+	# if we got to here, entire section's [0] element is the same
+	# so remove it
+        for ($i=0; $i<$len; $i++) {
+	    shift @{ $file_list[$start+$i]{'pmnameA'} };
+        }
+
+	process($start, $len);
+	return;
+    }
+
+    # now break up remainder into two subranges (first pmnameA element
+    # is NOT the same in all rows) 
+    $len2 = 0;
+    for ($i=$start; $i<$start+$len; $i++) {
+	$ref = $file_list[$i]{'pmnameA'};
+        if ($len2 == 0) {
+            # should NOT see an empty pmnameA for element start!
+	    $dir = @$ref[0];
+	    $len2++;
+	    next;
+        }
+
+        if (@$ref[0] eq $dir) {
+	    # still a match
+	    $len2++;
+	    next;
+
+        } else {
+	    # no longer a match. len2 always at least a run of 1
+	    process($start, $len2);
+            # $len2 .. end is remainder, process it
+            process($start+$len2, $len-$len2);
+    
+            return;
+        }
+    } # for loop through file_list section, first level of chunking
+    
+    return;  # probably never hit this
+}
+
+# ==================================
+# remove an element's grandchildren from its children list
+sub remove_grandchildren {
+    my ($start, $ref, $refs, $ele, $i, $j);
+
+    for ($start=1; $start<scalar(@file_list); $start++) {
+	# if this element has children, check 0..start-1 for duplicate
+	# children (who are actually grandchildren) and remove them from there
+	$refs = $file_list[$start]{'children'};
+	if (!defined $refs) { next; }
+	if (!scalar(@$refs)) { next; }  # no children for this element
+
+	for ($ele=0; $ele<$start; $ele++) {
+	    $ref = $file_list[$ele]{'children'};
+	    if (!defined $ref) { next; }
+            if (!scalar(@$ref)) { next; }  # no children for this element
+
+	    # remove duplicates (grandchildren) from $ele's children
+            for ($i=0; $i<scalar(@$refs); $i++) {
+		for ($j=0; $j<scalar(@$ref); $j++) {
+		    if (@$ref[$j] == @$refs[$i]) {
+			# $j is a grandchild, so remove it
+			splice(@$ref, $j, 1);
+		    }
+		}
+	    }
+        }
+    }
+
+    return;
+}
+
+# ==================================
+# follow children links to set their parents
+sub do_parents {
+    my ($i, @children, $child);
+    for ($i=0; $i<scalar(@file_list); $i++) {
+	if (!defined $file_list[$i]{'children'}) { next; }
+	@children = @{ $file_list[$i]{'children'} };
+	if (!scalar(@children)) { next; }  # no children?
+
+	while (scalar(@children)) {
+	    $child = shift @children;
+	    push @{ $file_list[$child]{'parents'} }, $i;
+	}
+    }
+
+    return;
+}
+
+# ==================================
+# find siblings from children of a given node
+sub do_siblings {
+    my ($i, $j, $k, $refs, @children, $child);
+    for ($i=0; $i<scalar(@file_list); $i++) {
+	if (!defined $file_list[$i]{'children'}) { next; }
+	@children = @{ $file_list[$i]{'children'} };
+
+	# no children, or a lonely only child? it has no siblings
+	if (scalar(@children) <= 1) { next; }
+
+	for ($j=0; $j<scalar(@children); $j++) {
+	    $child = $children[$j];
+	    $refs = $file_list[$child]{'siblings'};
+	    # this child's siblings is the entire children list except itself
+	    for ($k=0; $k<scalar(@children); $k++) {
+	        push @$refs, $children[$k] if $children[$k] != $child;
+	    }
+	}
+    }
+
+    return;
+}
+
+# ==================================
+# split up pmname into pmnameA, and while here, set depth
+sub make_pmnameA {
+    my (@tempA, $i, $j);
+    for ($i=0; $i<scalar(@file_list); $i++) {
+	@tempA = split /::/, $file_list[$i]{'pmname'};
+	$file_list[$i]{'depth'} = scalar(@tempA);
+	$file_list[$i]{'pmnameA'} = [];
+	for ($j=0; $j<scalar(@tempA); $j++) {
+            @{$file_list[$i]{'pmnameA'}}[$j] = $tempA[$j];
+	}
+    }
+
+  return;
+}
 
 # ==================================
 # function to spew a one-string file out to the file
@@ -599,7 +939,7 @@ sub buildList {
 				}
 				next; 
 			}
-			push @list, { fpname=>"$dirname/$direntry", pmname=>toPM("$dirname/$direntry"), status=>-2, accessible=>1, abstract=>'' };
+			push @list, { fpname=>"$dirname/$direntry", pmname=>toPM("$dirname/$direntry"), status=>-2, accessible=>1, abstract=>'', parents=>[], siblings=>[], children=>[], depth=>0 };
 		} else {
 			# it should be a directory. recursively process it
 			if (!-d "$dirname/$direntry") { print "$dirname/$direntry WARNING  is not a directory or file, ignored\n"; next; }

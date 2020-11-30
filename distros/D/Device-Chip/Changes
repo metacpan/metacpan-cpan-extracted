@@ -1,5 +1,10 @@
 Revision history for Device-Chip
 
+0.15    2020-11-25
+        [CHANGES]
+         * Migrate Test::Device::Chip::Adapter testing logic into
+           Test::ExpectAndCheck
+
 0.14    2020-11-13
         [CHANGES]
          * Migrated Tickit UI files into their own distribution

@@ -36,20 +36,24 @@ BEGIN {
     );
 }
 
-use Test::More tests => 2*scalar(@tests) + 2;
+use Test::More tests => 2*scalar(@tests) + 4;
 
 BEGIN { use_ok('Net::Z3950::FOLIO') };
 
 # Avoid warnings from failed variable substitution
 $ENV{OKAPI_URL} = $ENV{OKAPI_TENANT} = $ENV{OKAPI_USER} = $ENV{OKAPI_PASSWORD} = 'x';
 
-my $service = new Net::Z3950::FOLIO('etc/config.json');
+my $service = new Net::Z3950::FOLIO('etc/config');
 ok(defined $service, 'made FOLIO service object');
+my $session = new Net::Z3950::FOLIO::Session($service, 'dummy');
+ok(defined $session, 'made FOLIO session object');
+$session->reload_config_file();
+ok(defined $session, 'loaded session config file');
 
 foreach my $test (@tests) {
     my($input, $output) = @$test;
 
-    my $result = $service->_sortspecs2cql($input);
+    my $result = $session->sortspecs2cql($input);
     ok(defined $result, "translated sort-spec");
     is($result, $output, "generated correct sortspec: $output");
 }

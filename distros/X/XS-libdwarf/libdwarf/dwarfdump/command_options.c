@@ -1,24 +1,28 @@
 /*
   Copyright 2010-2018 David Anderson. All rights reserved.
 
-  This program is free software; you can redistribute it and/or modify it
-  under the terms of version 2 of the GNU General Public License as
-  published by the Free Software Foundation.
+  This program is free software; you can redistribute it and/or
+  modify it under the terms of version 2 of the GNU General
+  Public License as published by the Free Software Foundation.
 
-  This program is distributed in the hope that it would be useful, but
-  WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  This program is distributed in the hope that it would be
+  useful, but WITHOUT ANY WARRANTY; without even the implied
+  warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+  PURPOSE.
 
-  Further, this software is distributed without any warranty that it is
-  free of the rightful claim of any third person regarding infringement
-  or the like.  Any license provided herein, whether implied or
-  otherwise, applies only to this software file.  Patent licenses, if
-  any, provided herein do not apply to combinations of this program with
-  other software, or any other product whatsoever.
+  Further, this software is distributed without any warranty
+  that it is free of the rightful claim of any third person
+  regarding infringement or the like.  Any license provided
+  herein, whether implied or otherwise, applies only to this
+  software file.  Patent licenses, if any, provided herein
+  do not apply to combinations of this program with other
+  software, or any other product whatsoever.
 
-  You should have received a copy of the GNU General Public License along
-  with this program; if not, write the Free Software Foundation, Inc., 51
-  Franklin Street - Fifth Floor, Boston MA 02110-1301, USA.
+  You should have received a copy of the GNU General Public
+  License along with this program; if not, write the Free
+  Software Foundation, Inc., 51 Franklin Street - Fifth Floor,
+  Boston MA 02110-1301, USA.
+
 */
 
 #include "globals.h"
@@ -87,6 +91,9 @@ do_all(void)
     glflags.gf_info_flag = TRUE;
     glflags.gf_types_flag =  TRUE; /* .debug_types */
     glflags.gf_line_flag = TRUE;
+    glflags.gf_no_follow_debuglink = FALSE;
+    glflags.gf_global_debuglink_paths = 0;
+    glflags.gf_global_debuglink_count = 0;
     glflags.gf_pubnames_flag = TRUE;
     glflags.gf_macinfo_flag = TRUE;
     glflags.gf_macro_flag = TRUE;
@@ -97,7 +104,9 @@ do_all(void)
         glflags.gf_ranges_flag = TRUE;
         because nothing in
         the DWARF spec guarantees the sections are free of
-        random bytes in areas not referenced by .debug_info */
+        random bytes in areas not referenced by .debug_info.
+        though for DWARF5 .debug_loclists is free
+        of random bytes. See --print_raw_loclists */
     glflags.gf_string_flag = TRUE;
     /*  Do not do
         glflags.gf_reloc_flag = TRUE;
@@ -108,13 +117,8 @@ do_all(void)
         and dwarf_pubtypes. */
     glflags.gf_weakname_flag = TRUE; /* SGI only*/
     glflags.gf_gnu_debuglink_flag = FALSE;
-#if 0
-    glflags.gf_header_flag = TRUE;
-    /*  Setting this flag without saying what sections to print
-        means no section headers print. So the above
-        gf_header_flag setting here has long been a no-op. */
-#endif
     glflags.gf_debug_names_flag = TRUE;
+    glflags.gf_debug_sup_flag = TRUE;
 }
 
 static int
@@ -231,6 +235,17 @@ static void suppress_check_dwarf(void)
     set_checks_off();
 }
 
+static struct esb_s uri_esb_data;
+void
+uri_data_constructor(void)
+{
+    esb_constructor(&uri_esb_data);
+}
+void
+uri_data_destructor(void)
+{
+    esb_destructor(&uri_esb_data);
+}
 /*  The strings whose pointers are returned here
     from makename are never destructed, but
     that is ok since there are only about 10 created at most.  */
@@ -257,8 +272,10 @@ do_uri_translation(const char *s,const char *context)
 }
 
 /*  Support for short (-option) and long (--option) names options.
-    These functions implement the individual options. They are called from
-    short names and long names options. Implementation code is shared for
+    These functions implement the individual options.
+    They are called from
+    short names and long names options.
+    Implementation code is shared for
     both types of formats. */
 
 /*  Handlers for the short/long names options. */
@@ -320,6 +337,7 @@ static void arg_file_use_no_libelf(void);
 static void arg_format_attr_name(void);
 static void arg_format_dense(void);
 static void arg_format_ellipsis(void);
+static void arg_format_expr_ops_joined(void);
 static void arg_format_extensions(void);
 static void arg_format_global_offsets(void);
 static void arg_format_loc(void);
@@ -345,6 +363,8 @@ static void arg_print_aranges(void);
 static void arg_print_debug_frame(void);
 static void arg_print_debug_names(void);
 static void arg_print_gnu_debuglink(void);
+static void arg_print_debug_gnu(void);
+static void arg_print_debug_sup(void);
 static void arg_print_fission(void);
 static void arg_print_gnu_frame(void);
 static void arg_print_info(void);
@@ -355,6 +375,8 @@ static void arg_print_macinfo(void);
 static void arg_print_pubnames(void);
 static void arg_print_producers(void);
 static void arg_print_ranges(void);
+static void arg_print_raw_loclists(void);
+static void arg_print_raw_rnglists(void);
 static void arg_print_static(void);
 static void arg_print_static_func(void);
 static void arg_print_static_var(void);
@@ -372,6 +394,10 @@ static void arg_reloc_line(void);
 static void arg_reloc_loc(void);
 static void arg_reloc_pubnames(void);
 static void arg_reloc_ranges(void);
+
+static void arg_no_follow_debuglink(void);
+static void arg_add_debuglink_path(void);
+static void arg_debuglink_path_invalid(void);
 
 static void arg_search_any(void);
 static void arg_search_any_count(void);
@@ -438,12 +464,15 @@ static const char *usage_long_text[] = {
 "-r   --print-aranges     Print aranges section",
 "-F   --print-eh-frame    Print gnu .eh_frame section",
 "-I   --print-fission     Print fission sections:",
-"                         .gdb_index, .debug_cu_index, .debug_tu_index,",
-"                         .debug_tu_index, .gdb_index, .debug_cu_index,",
-"                         .debug_tu_index, .debug_tu_index, .gdb_index,",
-"                         .debug_cu_index, .debug_tu_index",
-"-f   --print-frame       Print dwarf frame section",
-"     --print-gnu-debuglink Print .gnu_debuglink section",
+"                         .gdb_index, .debug_cu_index,",
+"                         .debug_tu_index, .gnu.debuglink,",
+"                         .note.gnu.build-id",
+"     --print-gnu-debuglink Print .gnu_debuglink,",
+"                         .note.gnu.build-id sections",
+"     --print-debug-gnu   Print .debug_gnu_pubtypes and",
+"                         .debug_gnu_pubnames sections",
+"     --print-debug-names Print .debug_names section",
+"     --print-debug-sup   Print .debug_sup section",
 "-i   --print-info        Print info section",
 "-l   --print-lines       Print line section",
 "-ls  --print-lines-short Print line section, but do not",
@@ -453,6 +482,8 @@ static const char *usage_long_text[] = {
 "-P   --print-producers   Print list of compile units per producer",
 "-p   --print-pubnames    Print pubnames section",
 "-N   --print-ranges      Print ranges section",
+"     --print-raw-rnglists Print entire .debug_rnglists section",
+"     --print-raw-loclists Print entire .debug_loclists section",
 "-ta  --print-static      Print both static sections",
 "-tf  --print-static-func Print static func section",
 "-tv  --print-static-var  Print static var section",
@@ -462,7 +493,7 @@ static const char *usage_long_text[] = {
 "-w   --print-weakname    Print weakname section",
 " ",
 "----------------------------------------------------------------------",
-"Print Relocations Info",
+"Print Elf Relocation Data",
 "----------------------------------------------------------------------",
 #ifdef DWARF_WITH_LIBELF
 "-o   --reloc           Print relocation info [afiloprR]",
@@ -480,7 +511,7 @@ static const char *usage_long_text[] = {
 #endif /* DWARF_WITH_LIBELF */
 " ",
 "----------------------------------------------------------------------",
-"Print ELF sections header",
+"Print Elf Section Headers",
 "----------------------------------------------------------------------",
 #ifdef DWARF_WITH_LIBELF
 "-E   --elf           Print object Header and/or section information",
@@ -540,7 +571,7 @@ static const char *usage_long_text[] = {
 "                            Unless -C option given certain common",
 "                            tag-attr and tag-tag extensions are",
 "                            assumed to be ok (not reported).",
-"-ky  --check-type           Eexamine type info",
+"-ky  --check-type           Examine type info",
 "-kG  --check-unique         Print only unique errors",
 #ifdef HAVE_USAGE_TAG_ATTR
 "-ku  --check-usage          Print tag-tree & tag-attr usage",
@@ -556,33 +587,36 @@ static const char *usage_long_text[] = {
 "-d   --format-dense            One line per entry (info section only)",
 "-e   --format-ellipsis         Short names for tags, attrs etc.",
 "-G   --format-global-offsets   Show global die offsets",
-"-g   --format-loc              (incomplete loclist support. Do not use.)",
+"-g   --format-loc              (Was loclist support. Do not use.)",
+"     --format-expr-ops-joined  Print each group of DWARF DW_OPs",
+"                               on one line rather than one per line.",
 "-R   --format-registers        Print frame register names as r33 etc",
 "                               and allow up to 1200 registers.",
 "                               Print using a 'generic' register set.",
 "-Q   --format-suppress-data    Suppress printing section data",
 "-x noprintsectiongroups",
-"     --format-suppress-group   do not print section groups",
+"     --format-suppress-group   Do not print section groups",
 "-n   --format-suppress-lookup  Suppress frame information function name",
 "                               lookup(when printing frame information",
 "                               from multi-gigabyte object files this",
 "                               option may save significant time).",
-"-D   --format-suppress-offsets do not show offsets",
-#if 0
+"-D   --format-suppress-offsets Do not show offsets",
 "-x nosanitizestrings",
-"     --format-suppress-sanitize Bogus string characters come thru printf",
-#endif
+"     --format-suppress-sanitize Arbitrary string characters come thru printf",
 "-U   --format-suppress-uri     Suppress uri-translate",
 "-q   --format-suppress-uri-msg Suppress uri-did-translate notification",
-"-C   --format-extensions       Activate printing (with -i) of warnings",
-"                               about certain common DWARF extensions.",
+"-C   --format-extensions       Print (with -ki) warnings",
+"                               for some common DWARF extensions",
+"                               (by default extensions accepted",
+"                               as standard).",
 " ",
 "----------------------------------------------------------------------",
 "Print Output Limiters",
 "----------------------------------------------------------------------",
 "-u<file> --format-file=<file>  Print only specified file (CU name)",
 "-cg      --format-gcc          Check only GCC compiler objects",
-"-x groupnumber=<n>    --format-group=<n>      Groupnumber to print",
+"-x groupnumber=<n>    ",
+"         --format-group-number=<n> Groupnumber to print",
 "-H<num>  --format-limit=<num>  Limit output to the first <num>",
 "                               major units.",
 "                               Stop after <num> compilation units",
@@ -606,6 +640,15 @@ static const char *usage_long_text[] = {
 "                 --file-use-no-libelf  Use non-libelf to read objects",
 "                                         (as much as possible)",
 " ",
+"----------------------------------------------------------------------",
+"GNU debuglink options",
+"----------------------------------------------------------------------",
+" --no-follow-debuglink       Do not follow GNU debuglink, ",
+"                             just use the file directly so,",
+"                             debuglink  global paths are ignored.",
+" --add-debuglink_path=<text> Add the path to the list of",
+"                             global paths debuglink searches",
+
 "----------------------------------------------------------------------",
 "Search text in attributes",
 "----------------------------------------------------------------------",
@@ -699,35 +742,38 @@ enum longopts_vals {
   OPT_FILE_USE_NO_LIBELF,       /* --file-use-no-libelf=<path>        */
 
   /* Print Output Qualifiers                                         */
-  OPT_FORMAT_ATTR_NAME,         /* -M   --format-attr-name           */
-  OPT_FORMAT_DENSE,             /* -d   --format-dense               */
-  OPT_FORMAT_ELLIPSIS,          /* -e   --format-ellipsis            */
-  OPT_FORMAT_EXTENSIONS,        /* -C   --format-extensions          */
-  OPT_FORMAT_GLOBAL_OFFSETS,    /* -G   --format-global-offsets      */
-  OPT_FORMAT_LOC,               /* -g   --format-loc                 */
-  OPT_FORMAT_REGISTERS,         /* -R   --format-registers           */
-  OPT_FORMAT_SUPPRESS_DATA,     /* -Q   --format-suppress-data       */
-  OPT_FORMAT_SUPPRESS_GROUP  ,  /* -x   --format-suppress-group      */
-  OPT_FORMAT_SUPPRESS_LOOKUP,   /* -n   --format-suppress-lookup     */
-  OPT_FORMAT_SUPPRESS_OFFSETS,  /* -D   --format-suppress-offsets    */
-  OPT_FORMAT_SUPPRESS_SANITIZE, /* -x?? --format-suppress-sanitize   */
-  OPT_FORMAT_SUPPRESS_URI,      /* -U   --format-suppress-uri        */
-  OPT_FORMAT_SUPPRESS_URI_MSG,  /* -q   --format-suppress-uri-msg    */
+  OPT_FORMAT_ATTR_NAME,         /* -M   --format-attr-name         */
+  OPT_FORMAT_DENSE,             /* -d   --format-dense             */
+  OPT_FORMAT_ELLIPSIS,          /* -e   --format-ellipsis          */
+  OPT_FORMAT_EXPR_OPS_JOINED,   /*      --format-expr-ops-joined */
+  OPT_FORMAT_EXTENSIONS,        /* -C   --format-extensions        */
+  OPT_FORMAT_GLOBAL_OFFSETS,    /* -G   --format-global-offsets    */
+  OPT_FORMAT_LOC,               /* -g   --format-loc               */
+  OPT_FORMAT_REGISTERS,         /* -R   --format-registers         */
+  OPT_FORMAT_SUPPRESS_DATA,     /* -Q   --format-suppress-data     */
+  OPT_FORMAT_SUPPRESS_GROUP  ,  /* -x   --format-suppress-group    */
+  OPT_FORMAT_SUPPRESS_LOOKUP,   /* -n   --format-suppress-lookup   */
+  OPT_FORMAT_SUPPRESS_OFFSETS,  /* -D   --format-suppress-offsets  */
+  OPT_FORMAT_SUPPRESS_SANITIZE, /* -x no-sanitize-strings --format-suppress-sanitize  */
+  OPT_FORMAT_SUPPRESS_URI,      /* -U   --format-suppress-uri      */
+  OPT_FORMAT_SUPPRESS_URI_MSG,  /* -q   --format-suppress-uri-msg  */
 
   /* Print Output Limiters                                            */
-  OPT_FORMAT_FILE,              /* -u<file> --format-file=<file>    */
-  OPT_FORMAT_GCC,               /* -cg      --format-gcc            */
-  OPT_FORMAT_GROUP_NUMBER,      /* -x<n>    --format-group-number=<n>  */
-  OPT_FORMAT_LIMIT,             /* -H<num>  --format-limit=<num>       */
-  OPT_FORMAT_PRODUCER,          /* -c<str>  --format-producer=<str>    */
-  OPT_FORMAT_SNC,               /* -cs      --format-snc               */
+  OPT_FORMAT_FILE,              /* -u<file> --format-file=<file>   */
+  OPT_FORMAT_GCC,               /* -cg      --format-gcc           */
+  OPT_FORMAT_GROUP_NUMBER,      /* -x<n>    --format-group-number=<n>*/
+  OPT_FORMAT_LIMIT,             /* -H<num>  --format-limit=<num>   */
+  OPT_FORMAT_PRODUCER,          /* -c<str>  --format-producer=<str> */
+  OPT_FORMAT_SNC,               /* -cs      --format-snc           */
 
   /* Print Debug Sections                                   */
   OPT_PRINT_ABBREV,             /* -b   --print-abbrev      */
   OPT_PRINT_ALL,                /* -a   --print-all         */
   OPT_PRINT_ARANGES,            /* -r   --print-aranges     */
-  OPT_PRINT_DEBUG_NAMES,        /*      --print-debug-name  */
+  OPT_PRINT_DEBUG_NAMES,        /*      --print-debug-names */
   OPT_PRINT_GNU_DEBUGLINK,      /*      --print-gnu-debuglink  */
+  OPT_PRINT_DEBUG_GNU,          /*      --print-debug-gnu   */
+  OPT_PRINT_DEBUG_SUP,          /*      --print-debug-sup   */
   OPT_PRINT_EH_FRAME,           /* -F   --print-eh-frame    */
   OPT_PRINT_FISSION,            /* -I   --print-fission     */
   OPT_PRINT_FRAME,              /* -f   --print-frame       */
@@ -739,6 +785,8 @@ enum longopts_vals {
   OPT_PRINT_PRODUCERS,          /* -P   --print-producers   */
   OPT_PRINT_PUBNAMES,           /* -p   --print-pubnames    */
   OPT_PRINT_RANGES,             /* -N   --print-ranges      */
+  OPT_PRINT_RAW_LOCLISTS,       /*      --print-raw-loclists */
+  OPT_PRINT_RAW_RNGLISTS,       /*      --print-raw-rnglists */
   OPT_PRINT_STATIC,             /* -ta  --print-static      */
   OPT_PRINT_STATIC_FUNC,        /* -tf  --print-static-func */
   OPT_PRINT_STATIC_VAR,         /* -tv  --print-static-var  */
@@ -758,7 +806,11 @@ enum longopts_vals {
   OPT_RELOC_PUBNAMES,           /* -op  --reloc-pubnames    */
   OPT_RELOC_RANGES,             /* -oR  --reloc-ranges      */
 
-  /* Search text in attributes                                               */
+  /* debuglink options */
+  OPT_NO_FOLLOW_DEBUGLINK,     /* --no-follow-debuglink */
+  OPT_ADD_DEBUGLINK_PATH,       /* --add-debuglink-path=<text> */
+
+  /* Search text in attributes                        */
   OPT_SEARCH_ANY,               /* -S any=<text>   --search-any=<text>       */
   OPT_SEARCH_ANY_COUNT,         /* -Svany=<text>   --search-any-count=<text> */
   OPT_SEARCH_MATCH,             /* -S match=<text> --search-match=<text>     */
@@ -779,6 +831,10 @@ enum longopts_vals {
 
   /* Trace                                                     */
   OPT_TRACE,                    /* -# --trace=<num>            */
+
+  /* allocation statistics */
+  OPT_ALLOC_PRINT_SUMS,         /* --print-alloc-sums */
+  OPT_ALLOC_TREE_OFF,           /* --suppress-de-alloc-tree */
 
   OPT_END
 };
@@ -846,6 +902,7 @@ static struct dwoption longopts[] =  {
   {"format-attr-name",         dwno_argument, 0, OPT_FORMAT_ATTR_NAME        },
   {"format-dense",             dwno_argument, 0, OPT_FORMAT_DENSE            },
   {"format-ellipsis",          dwno_argument, 0, OPT_FORMAT_ELLIPSIS         },
+  {"format-expr-ops-joined",  dwno_argument, 0, OPT_FORMAT_EXPR_OPS_JOINED },
   {"format-extensions",        dwno_argument, 0, OPT_FORMAT_EXTENSIONS       },
   {"format-global-offsets",    dwno_argument, 0, OPT_FORMAT_GLOBAL_OFFSETS   },
   {"format-loc",               dwno_argument, 0, OPT_FORMAT_LOC              },
@@ -871,7 +928,9 @@ static struct dwoption longopts[] =  {
   {"print-all",         dwno_argument, 0, OPT_PRINT_ALL        },
   {"print-aranges",     dwno_argument, 0, OPT_PRINT_ARANGES    },
   {"print-debug-names", dwno_argument, 0, OPT_PRINT_DEBUG_NAMES},
-  {"print-gnu-debuglink", dwno_argument, 0, OPT_PRINT_GNU_DEBUGLINK},
+  {"print-gnu-debuglink", dwno_argument,0,OPT_PRINT_GNU_DEBUGLINK},
+  {"print-debug-gnu",   dwno_argument, 0, OPT_PRINT_DEBUG_GNU  },
+  {"print-debug-sup",   dwno_argument, 0, OPT_PRINT_DEBUG_SUP  },
   {"print-eh-frame",    dwno_argument, 0, OPT_PRINT_EH_FRAME   },
   {"print-fission",     dwno_argument, 0, OPT_PRINT_FISSION    },
   {"print-frame",       dwno_argument, 0, OPT_PRINT_FRAME      },
@@ -883,6 +942,8 @@ static struct dwoption longopts[] =  {
   {"print-producers",   dwno_argument, 0, OPT_PRINT_PRODUCERS  },
   {"print-pubnames",    dwno_argument, 0, OPT_PRINT_PUBNAMES   },
   {"print-ranges",      dwno_argument, 0, OPT_PRINT_RANGES     },
+  {"print-raw-loclists",dwno_argument, 0, OPT_PRINT_RAW_LOCLISTS},
+  {"print-raw-rnglists",dwno_argument, 0, OPT_PRINT_RAW_RNGLISTS},
   {"print-static",      dwno_argument, 0, OPT_PRINT_STATIC     },
   {"print-static-func", dwno_argument, 0, OPT_PRINT_STATIC_FUNC},
   {"print-static-var",  dwno_argument, 0, OPT_PRINT_STATIC_VAR },
@@ -902,18 +963,23 @@ static struct dwoption longopts[] =  {
   {"reloc-pubnames", dwno_argument, 0, OPT_RELOC_PUBNAMES},
   {"reloc-ranges",   dwno_argument, 0, OPT_RELOC_RANGES  },
 
+  /*  GNU debuglink options */
+  {"no-follow-debuglink", dwno_argument, 0,OPT_NO_FOLLOW_DEBUGLINK},
+  {"add-debuglink-path", dwrequired_argument, 0,OPT_ADD_DEBUGLINK_PATH},
+
   /* Search text in attributes. */
-  {"search-any",            dwrequired_argument, 0, OPT_SEARCH_ANY           },
+  {"search-any",            dwrequired_argument, 0, OPT_SEARCH_ANY  },
   {"search-any-count",      dwrequired_argument, 0, OPT_SEARCH_ANY_COUNT     },
-  {"search-match",          dwrequired_argument, 0, OPT_SEARCH_MATCH         },
+  {"search-match",          dwrequired_argument, 0, OPT_SEARCH_MATCH },
   {"search-match-count",    dwrequired_argument, 0, OPT_SEARCH_MATCH_COUNT   },
   {"search-print-children", dwno_argument,       0, OPT_SEARCH_PRINT_CHILDREN},
   {"search-print-parent",   dwno_argument,       0, OPT_SEARCH_PRINT_PARENT  },
   {"search-print-tree",     dwno_argument,       0, OPT_SEARCH_PRINT_TREE    },
 #ifdef HAVE_REGEX
-  {"search-regex",          dwrequired_argument, 0, OPT_SEARCH_REGEX         },
+  {"search-regex",          dwrequired_argument, 0, OPT_SEARCH_REGEX },
   {"search-regex-count",    dwrequired_argument, 0, OPT_SEARCH_REGEX_COUNT   },
 #endif /* HAVE_REGEX */
+
 
   /* Help & Version. */
   {"help",          dwno_argument, 0, OPT_HELP         },
@@ -924,29 +990,42 @@ static struct dwoption longopts[] =  {
   /* Trace. */
   {"trace", dwrequired_argument, 0, OPT_TRACE},
 
+  /* alloc sums. */
+  {"print-alloc-sums", dwno_argument, 0, OPT_ALLOC_PRINT_SUMS},
+  {"suppress-de-alloc-tree",dwno_argument,0,OPT_ALLOC_TREE_OFF},
+
   {0,0,0,0}
 };
 
 /*  Handlers for the command line options. */
 
-/*  Option 'print_debug_names' */
+/*  Option '--print-debug-names' */
 void arg_print_debug_names(void)
 {
     glflags.gf_debug_names_flag = TRUE;
 }
-/*  Option 'print_gnu_debuglink' */
+/*  Option '--print-gnu-debuglink' */
 void arg_print_gnu_debuglink(void)
 {
     glflags.gf_gnu_debuglink_flag = TRUE;
 }
+/*  Option '--print-debug-gnu' */
+void arg_print_debug_gnu(void)
+{
+    glflags.gf_debug_gnu_flag = TRUE;
+}
+/*  Option '--print-debug-sup' */
+void arg_print_debug_sup(void)
+{
+    glflags.gf_debug_sup_flag = TRUE;
+}
 
-/*  Option '--print_str_offsets' */
+/*  Option '--print-str-offsets' */
 void arg_print_str_offsets(void)
 {
     glflags.gf_print_str_offsets = TRUE;
 }
 
-/*  Option '-#' */
 void arg_trace(void)
 {
     int nTraceLevel = atoi(dwoptarg);
@@ -1024,6 +1103,12 @@ void arg_format_producer(void)
     }
 }
 
+/*  Option '--format-expr-ops-joined' 
+    restoring pre- December 2020 expression block printing */
+void arg_format_expr_ops_joined(void)
+{
+    glflags.gf_expr_ops_joined = TRUE;
+}
 /*  Option '-C' */
 void arg_format_extensions(void)
 {
@@ -1687,6 +1772,18 @@ void arg_print_ranges(void)
     glflags.gf_ranges_flag = TRUE;
     suppress_check_dwarf();
 }
+/*  Option '--print-raw-rnglists' */
+void arg_print_raw_rnglists(void)
+{
+    glflags.gf_print_raw_rnglists = TRUE;
+    suppress_check_dwarf();
+}
+/*  Option '--print-raw-loclists' */
+void arg_print_raw_loclists(void)
+{
+    glflags.gf_print_raw_loclists = TRUE;
+    suppress_check_dwarf();
+}
 
 /*  Option '-o[...]' */
 void arg_o_multiple_selection(void)
@@ -1878,6 +1975,69 @@ void arg_S_multiple_selection(void)
     }
 }
 
+/*  Option --no-follow-debuglink */
+void arg_no_follow_debuglink(void)
+{
+    glflags.gf_no_follow_debuglink = TRUE;
+}
+
+static int
+insert_debuglink_path(char *p)
+{
+    char ** newarray = 0;
+    unsigned int curcount = glflags.gf_global_debuglink_count;
+    unsigned newcount = curcount+1;
+    unsigned u = 0;
+    char * pstr = 0;
+
+    newarray = (char **)malloc(newcount * sizeof(char *));
+    if (!newarray) {
+        fprintf(stderr,"ERROR Unable to malloc space for"
+            " debuglink paths. "
+            " malloc %u pointers failed.\n",newcount);
+        fprintf(stderr,"Global debuglink path ignored: %s\n",
+            sanitized(p));
+        return DW_DLV_ERROR;
+    }
+    pstr = strdup(p);
+    if (!pstr) {
+        fprintf(stderr,"ERROR Unable to malloc space"
+            " for debuglink path: "
+            "count stays at %u\n",curcount);
+        fprintf(stderr,"Global debuglink path ignored: %s\n",
+            sanitized(p));
+        free(newarray);
+        return DW_DLV_ERROR;
+    }
+    for( u = 0; u < curcount; ++u) {
+        newarray[u] = glflags.gf_global_debuglink_paths[u];
+    }
+    newarray[curcount] = pstr;
+    free(glflags.gf_global_debuglink_paths);
+    glflags.gf_global_debuglink_paths = newarray;
+    glflags.gf_global_debuglink_count = newcount;
+    return DW_DLV_OK;
+}
+
+
+/*  Option --add-debuglink-path=<text> */
+void arg_add_debuglink_path(void)
+{
+    int res = 0;
+    if (strncmp(dwoptarg,"add-debuglink-path=",21) == 0) {
+        dwoptarg = &dwoptarg[21];
+        if (strlen(dwoptarg)) {
+            /*  dosomething debuglink  FIXME */
+            res = insert_debuglink_path(dwoptarg);
+            if (res == DW_DLV_OK) {
+                return;
+            }
+        }
+    }
+    arg_debuglink_path_invalid();
+}
+
+
 /*  Option '-S any=' */
 void arg_search_any(void)
 {
@@ -1941,7 +2101,8 @@ void arg_search_regex(void)
             glflags.search_regex_text,
             REG_EXTENDED)) {
             fprintf(stderr,
-                "regcomp: unable to compile %s\n",
+                "regcomp: unable to compile "
+                " search regular expression %s\n",
                 glflags.search_regex_text);
         }
     } else {
@@ -2183,10 +2344,10 @@ static void arg_format_suppress_group(void)
     glflags.gf_section_groups_flag = FALSE;
 }
 
-/*  Option '-x nosanitizestrings' */
+/*  Option '-x nosanitizestrings' '--format-suppress-sanitize' */
 static void arg_format_suppress_sanitize(void)
 {
-    no_sanitize_string_garbage = TRUE;
+    glflags.gf_no_sanitize_strings = TRUE;
 }
 
 /*  Option '-x tied=' */
@@ -2224,6 +2385,15 @@ static void arg_not_supported(void)
     fprintf(stderr, "-%c is no longer supported:ignored\n",arg_option);
 }
 
+/* Error message for --add-debuglink-path=path  */
+static void arg_debuglink_path_invalid(void)
+{
+    fprintf(stderr,
+        "--add-debuglink-path=<text>\n");
+    fprintf(stderr, "is allowed, not  %s\n",dwoptarg);
+    arg_usage_error = TRUE;
+
+}
 /*  Error message for invalid '-S' option. */
 static void arg_search_invalid(void)
 {
@@ -2365,20 +2535,36 @@ set_command_options(int argc, char *argv[])
         case OPT_FILE_USE_NO_LIBELF:   arg_file_use_no_libelf();   break;
 
         /* Print Output Qualifiers. */
-        case OPT_FORMAT_ATTR_NAME:        arg_format_attr_name();        break;
-        case OPT_FORMAT_DENSE:            arg_format_dense();            break;
-        case OPT_FORMAT_ELLIPSIS:         arg_format_ellipsis();         break;
-        case OPT_FORMAT_EXTENSIONS:       arg_format_extensions();       break;
-        case OPT_FORMAT_GLOBAL_OFFSETS:   arg_format_global_offsets();   break;
-        case OPT_FORMAT_LOC:              arg_format_loc();              break;
-        case OPT_FORMAT_REGISTERS:        arg_format_registers();        break;
-        case OPT_FORMAT_SUPPRESS_DATA:    arg_format_suppress_data();    break;
-        case OPT_FORMAT_SUPPRESS_GROUP:   arg_format_suppress_group();   break;
-        case OPT_FORMAT_SUPPRESS_OFFSETS: arg_format_suppress_offsets(); break;
-        case OPT_FORMAT_SUPPRESS_LOOKUP:  arg_format_suppress_lookup();  break;
-        case OPT_FORMAT_SUPPRESS_SANITIZE:arg_format_suppress_sanitize();break;
-        case OPT_FORMAT_SUPPRESS_URI:     arg_format_suppress_uri();     break;
-        case OPT_FORMAT_SUPPRESS_URI_MSG: arg_format_suppress_uri_msg(); break;
+        case OPT_FORMAT_ATTR_NAME:
+            arg_format_attr_name();        break;
+        case OPT_FORMAT_DENSE:
+            arg_format_dense();            break;
+        case OPT_FORMAT_ELLIPSIS:
+            arg_format_ellipsis();         break;
+        case OPT_FORMAT_EXPR_OPS_JOINED:
+            arg_format_expr_ops_joined(); break;
+        case OPT_FORMAT_EXTENSIONS:       
+            arg_format_extensions();       break;
+        case OPT_FORMAT_GLOBAL_OFFSETS:
+            arg_format_global_offsets();   break;
+        case OPT_FORMAT_LOC:
+            arg_format_loc();              break;
+        case OPT_FORMAT_REGISTERS:
+            arg_format_registers();        break;
+        case OPT_FORMAT_SUPPRESS_DATA:
+            arg_format_suppress_data();    break;
+        case OPT_FORMAT_SUPPRESS_GROUP:
+            arg_format_suppress_group();   break;
+        case OPT_FORMAT_SUPPRESS_OFFSETS:
+            arg_format_suppress_offsets(); break;
+        case OPT_FORMAT_SUPPRESS_LOOKUP:
+            arg_format_suppress_lookup();  break;
+        case OPT_FORMAT_SUPPRESS_SANITIZE:
+            arg_format_suppress_sanitize();break;
+        case OPT_FORMAT_SUPPRESS_URI:
+            arg_format_suppress_uri();     break;
+        case OPT_FORMAT_SUPPRESS_URI_MSG:
+            arg_format_suppress_uri_msg(); break;
 
         /* Print Output Limiters. */
         case OPT_FORMAT_FILE:         arg_format_file();        break;
@@ -2394,6 +2580,8 @@ set_command_options(int argc, char *argv[])
         case OPT_PRINT_ARANGES:     arg_print_aranges();     break;
         case OPT_PRINT_DEBUG_NAMES: arg_print_debug_names(); break;
         case OPT_PRINT_GNU_DEBUGLINK: arg_print_gnu_debuglink(); break;
+        case OPT_PRINT_DEBUG_GNU:   arg_print_debug_gnu(); break;
+        case OPT_PRINT_DEBUG_SUP:   arg_print_debug_sup(); break;
         case OPT_PRINT_EH_FRAME:    arg_print_gnu_frame();   break;
         case OPT_PRINT_FISSION:     arg_print_fission();     break;
         case OPT_PRINT_FRAME:       arg_print_debug_frame(); break;
@@ -2405,6 +2593,8 @@ set_command_options(int argc, char *argv[])
         case OPT_PRINT_PRODUCERS:   arg_print_producers();   break;
         case OPT_PRINT_PUBNAMES:    arg_print_pubnames();    break;
         case OPT_PRINT_RANGES:      arg_print_ranges();      break;
+        case OPT_PRINT_RAW_LOCLISTS:arg_print_raw_loclists();break;
+        case OPT_PRINT_RAW_RNGLISTS:arg_print_raw_rnglists();break;
         case OPT_PRINT_STATIC:      arg_print_static();      break;
         case OPT_PRINT_STATIC_FUNC: arg_print_static_func(); break;
         case OPT_PRINT_STATIC_VAR:  arg_print_static_var();  break;
@@ -2413,7 +2603,7 @@ set_command_options(int argc, char *argv[])
         case OPT_PRINT_TYPE:        arg_print_types();       break;
         case OPT_PRINT_WEAKNAME:    arg_print_weaknames();   break;
 
-        /* Print Relocations Info. */
+        /* Print Relocations Info (only with libelf). */
         case OPT_RELOC:          arg_reloc();          break;
         case OPT_RELOC_ABBREV:   arg_reloc_abbrev();   break;
         case OPT_RELOC_ARANGES:  arg_reloc_aranges();  break;
@@ -2423,6 +2613,10 @@ set_command_options(int argc, char *argv[])
         case OPT_RELOC_LOC:      arg_reloc_loc();      break;
         case OPT_RELOC_PUBNAMES: arg_reloc_pubnames(); break;
         case OPT_RELOC_RANGES:   arg_reloc_ranges();   break;
+
+        /* debuglink attributes */
+        case OPT_NO_FOLLOW_DEBUGLINK: arg_no_follow_debuglink();break;
+        case OPT_ADD_DEBUGLINK_PATH: arg_add_debuglink_path();  break;
 
         /* Search text in attributes. */
         case OPT_SEARCH_ANY:            arg_search_any();            break;
@@ -2446,9 +2640,57 @@ set_command_options(int argc, char *argv[])
         /* Trace. */
         case OPT_TRACE: arg_trace(); break;
 
+        case OPT_ALLOC_PRINT_SUMS:
+            glflags.gf_print_alloc_sums = TRUE;
+            break;
+        case OPT_ALLOC_TREE_OFF:
+            /*  Suppress nearly all libdwarf de_alloc_tree
+                record keeping. */
+            dwarf_set_de_alloc_flag(FALSE);
+            break;
+
         default: arg_usage_error = TRUE; break;
         }
     }
+}
+
+/*  This is a hack allowing us to pretend that
+    dwarfdump --print-alloc-sums --suppress-de-alloc-tree foo.o
+    has no arguments.  Because the args here really
+    are special for use by dwarfdump developers and
+    even with these special args we want do_all() to be
+    called by process_args() below if there are no
+    'normal' - or -- args.
+    So regression testing can behave identically
+    with or without the two specials.
+    Function new March 6, 2020  */
+static int
+lacking_normal_args (int argct,char **args)
+{
+    char * curarg = 0;
+    int i = 0;
+
+    for ( i = 0; i < argct ; ++i) {
+        curarg = args[i];
+        if (curarg[0] != '-') {
+            /*  Standard case. */
+            return TRUE;
+        }
+        if (!strcmp(curarg,"--print-alloc-sums")) {
+            /* Ok. One of the specials. Check more. */
+            continue;
+        }
+        if (!strcmp(curarg,"--suppress-de-alloc-tree")) {
+            /* Ok. One of the specials. Check more. */
+            continue;
+        }
+        /*  Not one of the specials, a normal argument,
+            so we have some 'real' args. */
+        return FALSE;
+    }
+    /*  Never found any argument at all, let regular
+        arg processing deal with it. */
+    return TRUE;
 }
 
 /* process arguments and return object filename */
@@ -2459,37 +2701,38 @@ process_args(int argc, char *argv[])
     glflags.program_fullname = argv[0];
 
     suppress_check_dwarf();
-    if (argv[1] != NULL && argv[1][0] != '-') {
+    if (argv[1] && lacking_normal_args(argc-1,argv+1)) {
+        /*  The default setting of what to print or do */
         do_all();
     }
     glflags.gf_section_groups_flag = TRUE;
 
     /*  Process the arguments and sets the appropiated option */
     set_command_options(argc, argv);
-
-    init_conf_file_data(glflags.config_file_data);
     if (config_file_abi && glflags.gf_generic_1200_regs) {
         printf("Specifying both -R and -x abi= is not allowed. Use one "
             "or the other.  -x abi= ignored.\n");
-        config_file_abi = FALSE;
+        config_file_abi = 0;
     }
-    if (glflags.gf_generic_1200_regs) {
-        init_generic_config_1200_regs(glflags.config_file_data);
-    }
-    if (config_file_abi &&
-        (glflags.gf_frame_flag || glflags.gf_eh_frame_flag)) {
+    {   /*  even with no abi we look as there may be
+            a dwarfdump option there we know about. */
         int res = 0;
         res = find_conf_file_and_read_config(
             esb_get_string(glflags.config_file_path),
             config_file_abi,
             config_file_defaults,
             glflags.config_file_data);
-
-        if (res > 0) {
-            printf
-                ("Frame not configured due to error(s). Giving up.\n");
+        if (res == FOUND_ERROR) {
+            printf("Frame not configured due to error(s)."
+               " using generic 100 registers.\n");
             glflags.gf_eh_frame_flag = FALSE;
             glflags.gf_frame_flag = FALSE;
+        } else if (res == FOUND_DONE || res == FOUND_OPTION) {
+            if (glflags.gf_generic_1200_regs) {
+                init_generic_config_1200_regs(glflags.config_file_data);
+            }
+        } else { 
+            /* FOUND_ABI_START nothing to do. */
         }
     }
     if (arg_usage_error ) {
@@ -2497,9 +2740,18 @@ process_args(int argc, char *argv[])
         printf("To see the options list: %s -h\n",glflags.program_name);
         exit(FAILED);
     }
-    if (dwoptind != (argc - 1)) {
-        printf("No object file name provided to %s\n",glflags.program_name);
+    if (dwoptind < (argc - 1)) {
+        printf("Multiple apparent object file names "
+            "provided to %s\n",glflags.program_name);
+        printf("Only a single object name is allowed\n");
         printf("To see the options list: %s -h\n",glflags.program_name);
+        exit(FAILED);
+    }
+    if (dwoptind > (argc - 1)) {
+        printf("No object file name provided to %s\n",
+            glflags.program_name);
+        printf("To see the options list: %s -h\n",
+            glflags.program_name);
         exit(FAILED);
     }
     /*  FIXME: it seems silly to be printing section names

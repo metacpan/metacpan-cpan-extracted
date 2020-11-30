@@ -1,16 +1,15 @@
-use strict;
 use warnings;
 
 package Git::Hooks::PrepareLog;
 # ABSTRACT: Git::Hooks plugin to prepare commit messages before being edited
-$Git::Hooks::PrepareLog::VERSION = '2.14.0';
-use 5.010;
+$Git::Hooks::PrepareLog::VERSION = '3.0.0';
+use 5.016;
 use utf8;
 use Log::Any '$log';
 use Git::Hooks;
 use Path::Tiny;
 
-(my $CFG = __PACKAGE__) =~ s/.*::/githooks./;
+my $CFG = __PACKAGE__ =~ s/.*::/githooks./r;
 
 #############
 # Grok hook configuration, check it and set defaults.
@@ -147,7 +146,7 @@ Git::Hooks::PrepareLog - Git::Hooks plugin to prepare commit messages before bei
 
 =head1 VERSION
 
-version 2.14.0
+version 3.0.0
 
 =head1 SYNOPSIS
 
@@ -203,7 +202,7 @@ being edited
 =head1 CONFIGURATION
 
 The plugin is configured by the following git options under the
-C<githooks.checkacls> subsection.
+C<githooks.preparelog> subsection.
 
 =head2 issue-branch-regex REGEX
 

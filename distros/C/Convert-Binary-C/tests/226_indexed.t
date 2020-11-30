@@ -45,6 +45,10 @@ my $data = pack 'C*', map { rand(256) } 1 .. $u->sizeof('order');
 my $unp_u = $u->unpack( 'order', $data );
 my $unp_o = $o->unpack( 'order', $data );
 
+if ($order) {
+  print "# Using ", ref tied %$unp_o, " for ordering\n";
+}
+
 my $fail = 0;
 my $keys = join ',', @keys;
 

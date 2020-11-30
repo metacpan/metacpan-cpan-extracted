@@ -1,6 +1,11 @@
 History for OTRS::OPM::Maker::Command::sopm
 ===========================================
 
+1.43 2020-11-30
+
+    [IMPROVEMENTS]
+    * add new feature: in the json metadata the package author can define the package name for the var::packagesetup module
+
 1.41 2020-09-10
 
     [IMPROVEMENTS]

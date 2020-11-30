@@ -39,6 +39,24 @@ my %config = (
         'httpd-trust' => [],
         'tasks'       => ['inventory', 'deploy', 'inventory'],
         'conf-reload-interval' => 60
+    },
+    include7 => {
+        'tag'         => "include7",
+        'logfile'     => $OSNAME eq 'MSWin32' ? "C:\\tmp\\logfile.txt" : "/tmp/logfile.txt",
+        'timeout'     => 16,
+        'no-task'     => [],
+        'no-category' => [],
+        'httpd-trust' => [],
+        'conf-reload-interval' => 0
+    },
+    include8 => {
+        'tag'     => "include8",
+        'logfile' => "",
+        'timeout' => 16,
+        'no-task'     => [],
+        'no-category' => [],
+        'httpd-trust' => [],
+        'conf-reload-interval' => 0
     }
 );
 
@@ -69,14 +87,14 @@ my %include = (
     }
 );
 
-plan tests => (scalar keys %config) * 4 + (scalar keys %include) * 2 + 16 + 18;
+plan tests => (scalar keys %config) * 4 + (scalar keys %include) * 2 + 40;
 
 foreach my $test (keys %config) {
     my $c = FusionInventory::Agent::Config->new(options => {
         'conf-file' => "resources/config/$test"
     });
 
-    foreach my $k (qw/ no-task no-category httpd-trust conf-reload-interval /) {
+    foreach my $k (qw/ no-task no-category httpd-trust conf-reload-interval logfile /) {
         cmp_deeply($c->{$k}, $config{$test}->{$k}, $test." ".$k);
     }
 
@@ -110,7 +128,7 @@ foreach my $test (keys %include) {
         }
     );
     # Reload cfg to validate loadedConfs has been reset between loads
-    $cfg->reloadFromInputAndBackend();
+    $cfg->reload();
 
     foreach my $k (qw/ tag timeout /) {
         is($cfg->{$k}, $include{$test}->{$k}, $test." ".$k);
@@ -123,12 +141,12 @@ my $c = FusionInventory::Agent::Config->new(options => {
 ok (ref($c->{'no-task'}) eq 'ARRAY');
 ok (scalar(@{$c->{'no-task'}}) == 2);
 
-$c->reloadFromInputAndBackend();
+$c->reload();
 ok (ref($c->{'no-task'}) eq 'ARRAY');
 ok (scalar(@{$c->{'no-task'}}) == 2);
 
 $c->{'conf-file'} = "resources/config/sample2";
-$c->reloadFromInputAndBackend();
+$c->reload();
 my %cNoCategory = map {$_ => 1} @{$c->{'no-category'}};
 ok (defined($cNoCategory{'printer'}));
 ok (scalar(@{$c->{'no-category'}}) == 1, 'structure size is ' . scalar(@{$c->{'no-category'}}));

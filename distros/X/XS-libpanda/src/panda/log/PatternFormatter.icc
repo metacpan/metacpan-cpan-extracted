@@ -112,15 +112,15 @@ string PatternFormatter::format (std::string& msg, const Info& info) const {
             }
             case 'L': {
                 switch (info.level) {
-                    case VERBOSE_DEBUG : ret += "DEBUG";     break;
-                    case DEBUG         : ret += "debug";     break;
-                    case INFO          : ret += "info";      break;
-                    case NOTICE        : ret += "notice";    break;
-                    case WARNING       : ret += "warning";   break;
-                    case ERROR         : ret += "error";     break;
-                    case CRITICAL      : ret += "critical";  break;
-                    case ALERT         : ret += "alert";     break;
-                    case EMERGENCY     : ret += "emergency"; break;
+                    case Level::VerboseDebug : ret += "DEBUG";     break;
+                    case Level::Debug        : ret += "debug";     break;
+                    case Level::Info         : ret += "info";      break;
+                    case Level::Notice       : ret += "notice";    break;
+                    case Level::Warning      : ret += "warning";   break;
+                    case Level::Error        : ret += "error";     break;
+                    case Level::Critical     : ret += "critical";  break;
+                    case Level::Alert        : ret += "alert";     break;
+                    case Level::Emergency    : ret += "emergency"; break;
                     default: break;
                 }
                 break;
@@ -146,8 +146,8 @@ string PatternFormatter::format (std::string& msg, const Info& info) const {
                 ret += get$0();
                 break;
             }
-            case 'c': if (colors[info.level]) ret += colors[info.level]; break;
-            case 'C': if (colors[info.level]) ret += clear_color; break;
+            case 'c': if (colors[(size_t)info.level]) ret += colors[(size_t)info.level]; break;
+            case 'C': if (colors[(size_t)info.level]) ret += clear_color; break;
             case '.': {
                 if (s == se) throw exception("bad formatter pattern");
                 dot = true;

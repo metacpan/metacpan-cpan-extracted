@@ -68,7 +68,7 @@
    "provides" : {
       "HTTP::Entity::Parser" : {
          "file" : "lib/HTTP/Entity/Parser.pm",
-         "version" : "0.24"
+         "version" : "0.25"
       },
       "HTTP::Entity::Parser::JSON" : {
          "file" : "lib/HTTP/Entity/Parser/JSON.pm"
@@ -94,11 +94,12 @@
          "web" : "https://github.com/kazeburo/HTTP-Entity-Parser"
       }
    },
-   "version" : "0.24",
+   "version" : "0.25",
    "x_contributors" : [
       "José Joaquín Atria <jjatria@gmail.com>",
       "Karen Etheridge <ether@cpan.org>",
       "Shoichi Kaji <skaji@cpan.org>",
+      "Tatsuhiko Miyagawa <miyagawa@bulknews.net>",
       "Todd Rinaldo <toddr@cpan.org>",
       "commojun <junpooooow@gmail.com>",
       "jrubinator <jjrs.pam+github@gmail.com>",

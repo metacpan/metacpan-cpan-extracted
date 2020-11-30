@@ -25,20 +25,6 @@
 #  define HAVE_ITERVAR
 #endif
 
-#if HAVE_PERL_VERSION(5, 24, 0)
-#  define OLDSAVEIX(cx)  (cx->blk_oldsaveix)
-#else
-#  define OLDSAVEIX(cx)  (PL_scopestack[cx->blk_oldscopesp-1])
-#endif
-
-#ifndef CX_CUR
-#  define CX_CUR() (&cxstack[cxstack_ix])
-#endif
-
-#ifndef OpSIBLING
-#  define OpSIBLING(op)  (op->op_sibling)
-#endif
-
 #ifdef SAVEt_CLEARPADRANGE
 #  include "save_clearpadrange.c.inc"
 #endif
@@ -52,39 +38,14 @@
 #  define CvPADLIST_set(cv, padlist)  (CvPADLIST(cv) = padlist)
 #endif
 
-#if !HAVE_PERL_VERSION(5, 18, 0)
-#  define PadARRAY(pad)           AvARRAY(pad)
-#  define PadMAX(pad)             AvFILLp(pad)
-
-typedef AV PADNAMELIST;
-#  define PadlistARRAY(pl)        ((PAD **)AvARRAY(pl))
-#  define PadlistNAMES(pl)        (*PadlistARRAY(pl))
-
-typedef SV PADNAME;
-#  define PadnamePV(pn)           (SvPOKp(pn) ? SvPVX(pn) : NULL)
-#  define PadnameLEN(pn)          SvCUR(pn)
-#  define PadnameOUTER(pn)        !!SvFAKE(pn)
-#  define PadnamelistARRAY(pnl)   AvARRAY(pnl)
-#  define PadnamelistMAX(pnl)     AvFILLp(pnl)
-#endif
-
-/* Before perl 5.22 these were not visible */
-
-#ifndef block_end
-#define block_end(a,b)         Perl_block_end(aTHX_ a,b)
-#endif
-
-#ifndef block_start
-#define block_start(a)         Perl_block_start(aTHX_ a)
-#endif
-
 #ifndef wrap_keyword_plugin
 #  include "wrap_keyword_plugin.c.inc"
 #endif
 
-#include "lexer-additions.c.inc"
-
+#include "perl-backcompat.c.inc"
 #include "perl-additions.c.inc"
+
+#include "lexer-additions.c.inc"
 
 /* Currently no version of perl makes this visible, so we always want it. Maybe
  * one day in the future we can make it version-dependent
@@ -2076,6 +2037,23 @@ static OP *newAWAITOP(I32 flags, OP *expr)
   return op;
 }
 
+static OP *newAWAITOP_toplevel(I32 flags, OP *expr)
+{
+  /* A toplevel await should just look like a ->get method call */
+  OP *op = op_append_elem(OP_LIST,
+    expr,
+#if HAVE_PERL_VERSION(5, 22, 0)
+    newMETHOP_named(OP_METHOD_NAMED, 0, newSVpvs_share("get"))
+#else
+    /* Before perl 5.22 this was just a plain SVOP */
+    newSVOP(OP_METHOD_NAMED, 0, newSVpvs_share("get"))
+#endif
+    );
+  op = op_convert_list(OP_ENTERSUB, OPf_STACKED, op);
+
+  return op;
+}
+
 static XOP xop_pushcancel;
 static OP *pp_pushcancel(pTHX)
 {
@@ -2251,7 +2229,11 @@ static int async_keyword_plugin(pTHX_ OP **op_ptr)
 static int await_keyword_plugin(pTHX_ OP **op_ptr)
 {
   SV **asynccvp = hv_fetchs(GvHV(PL_hintgv), "Future::AsyncAwait/PL_compcv", 0);
-  if(!asynccvp || SvUV(*asynccvp) != PTR2UV(PL_compcv))
+  if(asynccvp && SvUV(*asynccvp) == PTR2UV(PL_compcv))
+    ; /* await inside regular `async sub` */
+  else if(PL_compcv == PL_main_cv)
+    ; /* toplevel await */
+  else
     croak(CvEVAL(PL_compcv) ?
       "await is not allowed inside string eval" :
       "Cannot 'await' outside of an 'async sub'");
@@ -2277,11 +2259,15 @@ static int await_keyword_plugin(pTHX_ OP **op_ptr)
 
   op_contextualize(expr, OP_SCALAR);
 
-  *op_ptr = newAWAITOP(0, expr);
+  if(PL_compcv == PL_main_cv)
+    *op_ptr = newAWAITOP_toplevel(0, expr);
+  else {
+    *op_ptr = newAWAITOP(0, expr);
 
-  PADOFFSET precancel_padix = SvUV(SvRV(*hv_fetchs(GvHV(PL_hintgv), "Future::AsyncAwait/*precancel_padix", 0)));
-  if(precancel_padix)
-    (*op_ptr)->op_targ = precancel_padix;
+    PADOFFSET precancel_padix = SvUV(SvRV(*hv_fetchs(GvHV(PL_hintgv), "Future::AsyncAwait/*precancel_padix", 0)));
+    if(precancel_padix)
+      (*op_ptr)->op_targ = precancel_padix;
+  }
 
   return KEYWORD_PLUGIN_EXPR;
 }

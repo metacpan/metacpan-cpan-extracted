@@ -1,13 +1,14 @@
 use strict;
 use warnings;
-package Dist::Zilla::PluginBundle::Author::ETHER; # git description: v0.157-2-g8b96f45
+package Dist::Zilla::PluginBundle::Author::ETHER; # git description: v0.158-6-g6e7b621
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: A plugin bundle for distributions built by ETHER
 # KEYWORDS: author bundle distribution tool
 
-our $VERSION = '0.158';
+our $VERSION = '0.159';
 
 no if "$]" >= 5.031009, feature => 'indirect';
+no if "$]" >= 5.033001, feature => 'multidimensional';
 use Moose;
 with
     'Dist::Zilla::Role::PluginBundle::Easy',
@@ -662,7 +663,7 @@ Dist::Zilla::PluginBundle::Author::ETHER - A plugin bundle for distributions bui
 
 =head1 VERSION
 
-version 0.158
+version 0.159
 
 =head1 SYNOPSIS
 

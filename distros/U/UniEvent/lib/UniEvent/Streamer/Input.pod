@@ -1,0 +1,67 @@
+=head1 NAME
+
+UniEvent::Streamer::Input - Pure Perl Input stream bridge
+
+=head1 DESCRIPTION
+
+This is pure perl input stream, meant to be assigned with L<UniEvent::Streamer>.
+It is assumed, that some external source will generate data and eof event, and
+via the L<UniEvent::Streamer::Input> it will be fed into L<UniEvent::Streamer>.
+
+For example, it can read a file, encrypt it and conduct it further to TCP
+output stream.
+
+It is derived from L<UniEvent::Streamer::IInput>.
+
+=head1 METHODS
+
+=head2 new()
+
+Constructs new pupe perl input stream.
+
+=head2 start($loop)
+
+This method is invoked upon underlying L<UniEvent::Streamer> start. Executed
+once per Streamer/Input lifetime.
+
+=head2 stop()
+
+This method is invoked upon underlying L<UniEvent::Streamer> stop. Executed
+once per Streamer/Input lifetime. No any further I/O is expected.
+
+=head2 start_reading()
+
+This method is invoked when underlying L<UniEvent::Streamer> asks
+to start reading. Can be executed multiple times during the object lifetime.
+
+It is assumed, that C<handle_read>/C<handle_eof> will be invoked in future.
+
+=head2 stop_reading()
+
+This method is invoked when underlying L<UniEvent::Streamer> asks
+to stop reading.  Can be executed multiple times during the object lifetime.
+
+C<handle_read>/C<handle_eof> must not be invoked after the method been
+called.
+
+=head2 handle_read($data [, $error_code = undef])
+
+Data consumption method, which must be invoked to feed incoming C<$data>
+with possible C<$error_code> to stop L<UniEvent::Streamer>. By the
+implementation the data is forwarded either to internal buffer of the
+assigned streamer or directly to the output stream.
+
+In the case of error the streamer will stop.
+
+=head2 handle_eof()
+
+Let the assigned streamer know, that no more data is available from
+the input.
+
+=head1 REFERENCES
+
+L<UniEvent::Streamer>
+
+L<UniEvent::Streamer::IInput>
+
+=cut

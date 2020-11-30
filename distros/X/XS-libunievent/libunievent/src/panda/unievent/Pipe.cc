@@ -29,9 +29,10 @@ StreamSP Pipe::create_connection () {
     return new Pipe(loop(), _ipc);
 }
 
-void Pipe::connect (const PipeConnectRequestSP& req) {
+PipeConnectRequestSP Pipe::connect (const PipeConnectRequestSP& req) {
     req->set(this);
     queue.push(req);
+    return req;
 }
 
 void PipeConnectRequest::exec () {

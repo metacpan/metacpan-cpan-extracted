@@ -131,8 +131,8 @@ our $valid_reply = qr/^(?:[$UNICODE_SPACES$DIRECTIONAL_CHARACTERS])*$at_signs([a
 # Used in Extractor for final filtering
 our $end_mention_match = qr/\A(?:$at_signs|$latin_accents|:\/\/)/i;
 
-our $valid_subdomain = qr/(?:(?:$DOMAIN_VALID_CHARS(?:[_-]|$DOMAIN_VALID_CHARS)*)?$DOMAIN_VALID_CHARS\.)/io;
-our $valid_domain_name = qr/(?:(?:$DOMAIN_VALID_CHARS(?:[-]|$DOMAIN_VALID_CHARS)*)?$DOMAIN_VALID_CHARS\.)/io;
+our $valid_subdomain = qr/(?:(?:$DOMAIN_VALID_CHARS(?:[_-]|$DOMAIN_VALID_CHARS)*)?$DOMAIN_VALID_CHARS\.)/i;
+our $valid_domain_name = qr/(?:(?:$DOMAIN_VALID_CHARS(?:[-]|$DOMAIN_VALID_CHARS)*)?$DOMAIN_VALID_CHARS\.)/i;
 
 our $GENERIC_TLDS = join '|', @{$TLDS->{generic}};
 our $CC_TLDS = join '|', @{$TLDS->{country}};
@@ -155,23 +155,23 @@ our $valid_punycode = qr/(?:xn--[0-9a-z]+)/i;
 our $valid_domain = qr/(?:
     $valid_subdomain*$valid_domain_name
     (?:$valid_gTLD|$valid_ccTLD|$valid_punycode)
-)/iox;
+)/ix;
 
 # This is used in Extractor
 our $valid_ascii_domain = qr/
     (?:(?:[a-z0-9\-_]|$latin_accents)+\.)+
     (?:$valid_gTLD|$valid_ccTLD|$valid_punycode)
-/iox;
+/ix;
 
 # This is used in Extractor for stricter t.co URL extraction
 our $valid_tco_url = qr/^https?:\/\/t\.co\/([a-z0-9]+)/i;
 
 our $valid_port_number = qr/[0-9]+/;
 
-our $valid_url_preceding_chars = qr/(?:[^A-Z0-9@＠\$#＃$INVALID_CHARACTERS]|[$DIRECTIONAL_CHARACTERS]|^)/io;
+our $valid_url_preceding_chars = qr/(?:[^A-Z0-9@＠\$#＃$INVALID_CHARACTERS]|[$DIRECTIONAL_CHARACTERS]|^)/i;
 our $invalid_url_without_protocol_preceding_chars = qr/[-_.\/]$/;
 
-our $valid_general_url_path_chars = qr/[a-z\p{Cyrillic}0-9!\*';:=\+\,\.\$\/%#\[\]\p{Pd}_~&\|$LATIN_ACCENTS]/io;
+our $valid_general_url_path_chars = qr/[a-z\p{Cyrillic}0-9!\*';:=\+\,\.\$\/%#\[\]\p{Pd}_~&\|$LATIN_ACCENTS]/i;
 # Allow URL paths to contain up to two nested levels of balanced parens
 #  1. Used in Wikipedia URLs like /Primer_(film)
 #  2. Used in IIS sessions like /S(dfd346)/
@@ -191,17 +191,17 @@ our $valid_url_balanced_parens = qr/
         )
     )
     \)
-/iox;
+/ix;
 # Valid end-of-path chracters (so /foo. does not gobble the period).
 #   1. Allow =&# for empty URL parameters and other URL-join artifacts
-our $valid_url_path_ending_chars = qr/[a-z\p{Cyrillic}0-9=_#\/\+\-$LATIN_ACCENTS]|(?:$valid_url_balanced_parens)/io;
+our $valid_url_path_ending_chars = qr/[a-z\p{Cyrillic}0-9=_#\/\+\-$LATIN_ACCENTS]|(?:$valid_url_balanced_parens)/i;
 our $valid_url_path = qr/(?:
     (?:
     $valid_general_url_path_chars*
     (?:$valid_url_balanced_parens $valid_general_url_path_chars*)*
     $valid_url_path_ending_chars
     )|(?:$valid_general_url_path_chars+\/)
-)/iox;
+)/ix;
 our $valid_url_query_chars = qr/[a-z0-9!?\*'\(\);:&=\+\$\/%#\[\]\-_\.,~|@]/i;
 our $valid_url_query_ending_chars = qr/[a-z0-9_&=#\/\-]/i;
 our $valid_url = qr{
@@ -228,7 +228,7 @@ our $validate_url_pchar = qr/(?:
     $validate_url_pct_encoded|
     $validate_url_sub_delims|
     [:\|@]
-)/iox;
+)/ix;
 
 our $validate_url_scheme = qr/(?:[a-z][a-z0-9+\-.]*)/i;
 our $validate_url_userinfo = qr/(?:
@@ -236,11 +236,11 @@ our $validate_url_userinfo = qr/(?:
     $validate_url_pct_encoded|
     $validate_url_sub_delims|
     :
-)*/iox;
+)*/ix;
 
 our $validate_url_dec_octet = qr/(?:[0-9]|(?:[1-9][0-9])|(?:1[0-9]{2})|(?:2[0-4][0-9])|(?:25[0-5]))/i;
 our $validate_url_ipv4 =
-    qr/(?:$validate_url_dec_octet(?:\.$validate_url_dec_octet){3})/iox;
+    qr/(?:$validate_url_dec_octet(?:\.$validate_url_dec_octet){3})/ix;
 
 # Punting on real IPv6 validation for now
 our $validate_url_ipv6 = qr/(?:\[[a-f0-9:\.]+\])/i;
@@ -249,7 +249,7 @@ our $validate_url_ipv6 = qr/(?:\[[a-f0-9:\.]+\])/i;
 our $validate_url_ip = qr/(?:
     $validate_url_ipv4|
     $validate_url_ipv6
-)/iox;
+)/ix;
 
 # This is more strict than the rfc specifies
 our $validate_url_subdomain_segment = qr/(?:[a-z0-9](?:[a-z0-9_\-]*[a-z0-9])?)/i;
@@ -257,12 +257,12 @@ our $validate_url_domain_segment = qr/(?:[a-z0-9](?:[a-z0-9\-]*[a-z0-9])?)/i;
 our $validate_url_domain_tld = qr/(?:[a-z](?:[a-z0-9\-]*[a-z0-9])?)/i;
 our $validate_url_domain = qr/(?:(?:$validate_url_subdomain_segment\.)*
                                 (?:$validate_url_domain_segment\.)
-                                $validate_url_domain_tld)/iox;
+                                $validate_url_domain_tld)/ix;
 
 our $validate_url_host = qr/(?:
     $validate_url_ip|
     $validate_url_domain
-)/iox;
+)/ix;
 
 # Unencoded internationalized domains - this doesn't check for invalid UTF-8 sequences
 our $validate_url_unicode_subdomain_segment =
@@ -273,12 +273,12 @@ our $validate_url_unicode_domain_tld =
     qr/(?:(?:[a-z]|[^\x00-\x7f])(?:(?:[a-z0-9\-]|[^\x00-\x7f])*(?:[a-z0-9]|[^\x00-\x7f]))?)/ix;
 our $validate_url_unicode_domain = qr/(?:(?:$validate_url_unicode_subdomain_segment\.)*
                                         (?:$validate_url_unicode_domain_segment\.)
-                                        $validate_url_unicode_domain_tld)/iox;
+                                        $validate_url_unicode_domain_tld)/ix;
 
 our $validate_url_unicode_host = qr/(?:
     $validate_url_ip|
     $validate_url_unicode_domain
-)/iox;
+)/ix;
 
 our $validate_url_port = qr/[0-9]{1,5}/;
 

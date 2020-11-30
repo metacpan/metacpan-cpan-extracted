@@ -5,7 +5,7 @@ The distribution is contained in a Git repository, so simply clone the
 repository
 
 ```
-$ git clone http://github.com/reneeb/Perl-Critic-RENEEB.git
+$ git clone https://github.com/reneeb/Perl-Critic-RENEEB.git
 ```
 
 and change into the newly-created directory.

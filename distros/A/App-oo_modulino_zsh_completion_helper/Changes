@@ -1,5 +1,8 @@
 Revision history for Perl extension App-oo_modulino_zsh_completion_helper
 
+0.04
+    - Fixed test failures
+
 0.01
 
     - Initial release

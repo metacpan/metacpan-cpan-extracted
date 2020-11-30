@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: MIDI pitches for guitar chord voicings
 
-our $VERSION = '0.0304';
+our $VERSION = '0.0400';
 
 use strict;
 use warnings;
@@ -17,6 +17,17 @@ use strictures 2;
 use namespace::clean;
 
 
+has voicing_file => (
+  is => 'lazy',
+);
+
+sub _build_voicing_file {
+    my ($self) = @_;
+    my $file = eval { dist_dir('MIDI-Chord-Guitar') . '/midi-guitar-chord-voicings.csv' };
+    return $file;
+}
+
+
 has chords => (
   is       => 'lazy',
   init_arg => undef,
@@ -25,7 +36,7 @@ has chords => (
 sub _build_chords {
     my ($self) = @_;
 
-    my $file = $self->as_file();
+    my $file = $self->voicing_file;
 
     my %data;
 
@@ -49,23 +60,20 @@ sub _build_chords {
 }
 
 
-sub as_file {
-    my ($self) = @_;
-    my $file = eval { dist_dir('MIDI-Chord-Guitar') . '/midi-guitar-chord-voicings.csv' };
-    $file = 'share/midi-guitar-chord-voicings.csv'
-        unless $file && -e $file;
-    return $file;
-}
-
-
 sub transform {
     my ($self, $target, $chord_name, $variation) = @_;
+
     $target = Music::Note->new($target, 'ISO')->format('midinum');
+
     $chord_name //= '';
+
     my @notes;
+
     if (defined $variation) {
       my $pitches = $self->chords->{ 'C' . $chord_name }[$variation];
+
       my $diff = $target - _lowest_c($pitches);
+
       @notes = map { $_ + $diff } @$pitches;
     }
     else {
@@ -74,39 +82,51 @@ sub transform {
             push @notes, [ map { $_ + $diff } @$pitches ];
         }
     }
+
     return \@notes;
 }
 
 sub _lowest_c {
     my ($pitches) = @_;
+
     my $lowest = 0;
+
     for my $c (48, 60, 72) {
         if (any { $_ == $c } @$pitches) {
             $lowest = $c;
             last;
         }
     }
+
     return $lowest;
 }
 
 
 sub voicings {
     my ($self, $chord_name, $format) = @_;
+
     $chord_name //= '';
     $format ||= '';
+
     my $voicings = $self->chords->{ 'C' . $chord_name };
+
     if ($format) {
         my $temp;
+
         for my $chord (@$voicings) {
             my $span;
+
             for my $n (@$chord) {
                 my $note = Music::Note->new($n, 'midinum')->format($format);
                 push @$span, $note;
             }
+
             push @$temp, $span;
         }
+
         $voicings = $temp;
     }
+
     return $voicings;
 }
 
@@ -124,7 +144,7 @@ MIDI::Chord::Guitar - MIDI pitches for guitar chord voicings
 
 =head1 VERSION
 
-version 0.0304
+version 0.0400
 
 =head1 SYNOPSIS
 
@@ -158,6 +178,12 @@ of an C<E A D G B E> tuned guitar.
 <img src="https://raw.githubusercontent.com/ology/MIDI-Chord-Guitar/main/guitar-position-midi-numbers.png">
 
 =head1 ATTRIBUTES
+
+=head2 voicing_file
+
+The CSV file with which to find the MIDI numbered chord voicings.
+
+If not given, L<File::ShareDir> is used.
 
 =head2 chords
 
@@ -199,12 +225,6 @@ The known chord names are as follows:
 
 =head1 METHODS
 
-=head2 as_file
-
-  $filename = $mcg->as_file;
-
-Return the guitar chord data filename location.
-
 =head2 transform
 
   $chord = $mcg->transform($target, $chord_name, $variation);
@@ -220,8 +240,8 @@ If no B<chord_name> is given, C<major> is used.
 
 If no B<variation> is given, all transformed voicings are returned.
 
-For example, here are the open chord specs for each note in the key of
-C:
+For example, here are the open major chord specs for each note in the
+key of C:
 
   'C3', '', 0
   'D3', '', 4
@@ -246,7 +266,7 @@ So, the first variations are at lower frets.  Please use the above
 diagrams to figure out the exact neck positions.
 
 Here is an example of the voicing CSV file which can be found with the
-B<as_file> method:
+B<voicing_file> attribute:
 
   C,48,52,55,60,,
   C,48,55,60,64,67,

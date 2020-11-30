@@ -1,3 +1,7 @@
+1.0.6    25.11.2020
+         - lower cmake requirements
+         - improve docs
+         - change some constants names
 1.0.5    30.10.2020
          - libcatch related bump
 1.0.4    12.10.2020

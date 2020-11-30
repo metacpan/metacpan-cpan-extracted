@@ -1,5 +1,9 @@
 Revision history for Perl extension Getopt-EX
 
+v1.21.1 2020-11-30T13:28:04Z
+
+    - Declare version number in all modules.
+
 v1.21.0 2020-11-07T12:23:35Z
 
     - Official release of new function interface.

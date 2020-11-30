@@ -11,15 +11,15 @@ no if $] ge '5.020', feature => qw{ signatures };
 
 use Carp;
 use Exporter 5.567;	# Comes with Perl 5.8.1.
-use File::Find ();
-use File::Spec ();
-use Getopt::Long 2.34;	# Comes with Perl 5.8.1.
+# use File::Find ();
+# use File::Spec ();
+# use Getopt::Long 2.34;	# Comes with Perl 5.8.1.
 use Test2::API ();
 use Test2::Util ();
 
 use base qw{ Exporter };
 
-our $VERSION = '0.003';
+our $VERSION = '0.004';
 $VERSION =~ s/ _ //smxg;
 
 {
@@ -125,6 +125,10 @@ use constant TEST_MORE_OPT		=> {
 	my @where = @_;
 	@where
 	    or @where = ( 'blib/lib', 'blib/arch' );
+
+	require File::Find;
+	require File::Spec;
+
 	my @not_tried;
 	foreach my $d ( @where ) {
 	    File::Find::find( sub {
@@ -234,8 +238,7 @@ sub _load_module {
 }
 
 {
-    my $psr = Getopt::Long::Parser->new();
-    $psr->configure( qw{ posix_default } );
+    my $psr;
 
     # Because we want to work with Perl 5.8.1 we are limited to
     # Getopt::Long 2.34, and therefore getoptions(). So we expect the
@@ -247,6 +250,13 @@ sub _load_module {
 	my ( $opt ) = @_;
 	$opt ||= {};
 	{
+	    unless ( $psr ) {
+		require Getopt::Long;
+		Getopt::Long->VERSION( 2.34 );
+		$psr = Getopt::Long::Parser->new();
+		$psr->configure( qw{ posix_default } );
+	    }
+
 	    my $opt_err;
 	    local $SIG{__WARN__} = sub { $opt_err = $_[0] };
 	    $psr->getoptions( $opt, qw{
@@ -478,6 +488,28 @@ of modules. I ran into this in the early phases of implementation, and
 fixed it for my own use by initializing the testing system as late as
 possible, but I can not promise that all such problems have been
 eliminated.
+
+=head1 CAVEAT
+
+Accurately testing whether a module can be loaded is more complicated
+than it might first appear. One known issue is that you can get a false
+pass if the module under test forgets to load a module it needs, but
+this module loads it for its own use.
+
+Ideally this module would use nothing that C<Test2> does not, but that
+seems to require a fair amount of wheel-reinventing. What this module
+does try to do is to load the extra modules only if it really needs
+them. Specifically:
+
+L<Getopt::Long|Getopt::Long> is loaded only if arguments are passed to
+the C<use Test::Tools::LoadModule> statement.
+
+L<File::Find|File::Find> and L<File::Spec|File::Spec> are loaded only if
+L<all_modules_tried_ok()|/all_modules_tried_ok> is called.
+
+Because L<Carp|Carp> and L<Exporter|Exporter> are used by
+L<Test2::API|Test2::API> (at least as of version C<1.302181>), this
+module makes no attempt to avoid their use.
 
 =head1 SUBROUTINES
 

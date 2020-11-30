@@ -4,7 +4,7 @@ Text::ANSI::Fold - Text folding library supporting ANSI terminal sequence and As
 
 # VERSION
 
-Version 2.06
+Version 2.07
 
 # SYNOPSIS
 
@@ -165,6 +165,9 @@ function as well as **new** and **configure** method.
     enough space will be provided to hold the word on next call with same
     width.
 
+    If the color of text is altered within a word, that position is also
+    treated as an boundary.
+
 - **padding** => _bool_
 
     If **padding** option is given with true value, margin space is filled
@@ -285,10 +288,10 @@ characters with prohibited character handling.
 
     ANSI escape code definition.
 
-- [https://www.w3.org/TR/2012/NOTE-jlreq-20120403/](https://www.w3.org/TR/2012/NOTE-jlreq-20120403/)
+- [https://www.w3.org/TR/jlreq/](https://www.w3.org/TR/jlreq/)
 
     Requirements for Japanese Text Layout,
-    W3C Working Group Note 3 April 2012
+    W3C Working Group Note 11 August 2020
 
 - [http://www.ecma-international.org/publications/files/ECMA-ST/Ecma-048.pdf](http://www.ecma-international.org/publications/files/ECMA-ST/Ecma-048.pdf)
 
@@ -296,7 +299,7 @@ characters with prohibited character handling.
 
 # LICENSE
 
-Copyright (C) 2018- Kazumasa Utashiro.
+Copyright 2018- Kazumasa Utashiro.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

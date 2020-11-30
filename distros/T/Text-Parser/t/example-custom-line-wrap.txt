@@ -1,0 +1,3 @@
+This is a long line that is wrapped around with a custom
+~ character - the tilde. It is unusual, but hey, we're
+~ showing an example.

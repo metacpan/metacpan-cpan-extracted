@@ -43,6 +43,8 @@ Experimental Features
 
        use Syntax::Keyword::Try qw( try :experimental(typed) );
     
+       use Syntax::Keyword::Try qw( try :experimental(try_value) );
+    
        use Syntax::Keyword::Try qw( try :experimental );  # all of the above
 
     Don't forget to import the main try symbol itself, to activate the
@@ -357,7 +359,29 @@ WITH OTHER MODULES
           }
        }
 
-KNOWN BUGS
+ISSUES
+
+ Context propagation during return
+
+    A return statement inside a try block will currently always propagate a
+    scalar context, even if the function it appears in itself is in list
+    context.
+
+       sub inner
+       {
+          return wantarray ? (qw( a list of things )) : "a single scalar";
+       }
+    
+       sub outer
+       {
+          try { return inner() }
+          catch {}
+       }
+    
+       my @result = outer();
+       print for @result;  # prints "a single scalar"
+
+    This is discussed at https://rt.cpan.org/Ticket/Display.html?id=124229.
 
  Thread-safety at load time cannot be assured before perl 5.16
 

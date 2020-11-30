@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2016-2020 -- leonerd@leonerd.org.uk
 
-package Future::AsyncAwait 0.46;
+package Future::AsyncAwait 0.47;
 
 use v5.14;
 use warnings;
@@ -43,6 +43,11 @@ performs asynchronous operations using futures look neater and more expressive
 than simply using C<then> chaining and other techniques on the futures
 themselves. It is also a similar syntax used by a number of other languages;
 notably C# 5, EcmaScript 6, Python 3, Dart. Rust is considering adding it.
+
+This module is still under active development. While it now seems relatively
+stable enough for most use-cases and has received a lot of "battle-testing" in
+a wide variety of scenarios, there may still be the occasional case of memory
+leak left in it, especially if still-pending futures are abandoned.
 
 The new syntax takes the form of two new keywords, C<async> and C<await>.
 
@@ -144,10 +149,22 @@ be turned into an immediate-failed C<Future> rather than making the call
 itself propagate the exception, which is usually what you wanted when dealing
 with futures.
 
-This module is still under active development. While it now seems relatively
-stable enough for most use-cases and has received a lot of "battle-testing" in
-a wide variety of scenarios, there may still be the occasional case of memory
-leak left in it, especially if still-pending futures are abandoned.
+=head2 await (toplevel)
+
+I<Since version 0.47.>
+
+An C<await> expression is also permitted directly in the main script at
+toplevel, outside of C<async sub>. This is implemented by simply invoking the
+C<get> method on the future value. Thus, the following two lines are directly
+equivalent:
+
+   await afunc();
+   afunc()->get;
+
+This is provided as a syntax convenience for unit tests, toplevel scripts, and
+so on. It allows code to be written in a style that can be easily moved into
+an C<async sub>, and avoids encouraging "bad habits" of invoking the C<get>
+method directly.
 
 =head2 C<CANCEL>
 

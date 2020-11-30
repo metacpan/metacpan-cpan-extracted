@@ -19,7 +19,7 @@ $Data::Dumper::Sortkeys = 1;
 my $rh_currency_for_country = {};
 
 
-our $VERSION = '0.10';
+our $VERSION = '0.12';
 
 
 my $rh_currency_iso; # contains character strings
@@ -300,7 +300,7 @@ Data::MoneyCurrency - Get information for different currencies
 
 =head1 VERSION
 
-version 0.11
+version 0.12
 
 =head1 SYNOPSIS
 
@@ -323,7 +323,7 @@ dependency on it, the relevant data files are already included.
 
 =head1 VERSION
 
-Version 0.10
+Version 0.12
 
 =head1 EXPORT
 

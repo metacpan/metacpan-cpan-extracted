@@ -1,0 +1,54 @@
+{
+   "abstract" : "C<expect/check>-style unit testing with object methods",
+   "author" : [
+      "Paul Evans <leonerd@leonerd.org.uk>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4231",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Test-ExpectAndCheck",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.4004"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "List::Util" : "0",
+            "Test::Builder" : "1.302",
+            "Test::Deep" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Builder::Tester" : "0",
+            "Test::More" : "0.88"
+         }
+      }
+   },
+   "provides" : {
+      "Test::ExpectAndCheck" : {
+         "file" : "lib/Test/ExpectAndCheck.pm",
+         "version" : "0.01"
+      },
+      "Test::ExpectAndCheck::Future" : {
+         "file" : "lib/Test/ExpectAndCheck/Future.pm",
+         "version" : "0.01"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "0.01",
+   "x_serialization_backend" : "JSON::PP version 4.05"
+}

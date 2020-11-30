@@ -22,8 +22,8 @@ ahead or look behind, and either positive or negative.
 
 =head1 METHODS
 
-This class provides no public methods beyond those provided by its
-superclass.
+This class provides the following public methods beyond those provided
+by its superclass.
 
 =cut
 
@@ -34,17 +34,53 @@ use warnings;
 
 use base qw{ PPIx::Regexp::Structure };
 
-our $VERSION = '0.075';
+use Carp qw{ confess };
+
+our $VERSION = '0.076';
 
 use PPIx::Regexp::Constant qw{
     LITERAL_LEFT_CURLY_ALLOWED
     @CARP_NOT
 };
 
+=head2 is_look_ahead
+
+This method returns a true value if the assertion is a look-ahead
+assertion, or a false value if it is a look-behind assertion.
+
+=cut
+
+sub is_look_ahead {
+    my ( $self ) = @_;
+    return $self->_get_type()->is_look_ahead();
+}
+
+=head2 is_positive
+
+This method returns a true value if the assertion is a positive
+assertion, or a false value if it is a negative assertion.
+
+=cut
+
+sub is_positive {
+    my ( $self ) = @_;
+    return $self->_get_type()->is_positive();
+}
+
 # An un-escaped literal left curly bracket can always follow this
 # element.
 sub __following_literal_left_curly_disallowed_in {
     return LITERAL_LEFT_CURLY_ALLOWED;
+}
+
+sub _get_type {
+    my ( $self ) = @_;
+    my $type = $self->type()
+	or confess 'Programming error - no type object';
+    $type->isa( 'PPIx::Regexp::Token::GroupType::Assertion' )
+	or confess 'Programming error - type object is ', ref $type,
+	    ' not PPIx::Regexp::Token::GroupType::Assertion';
+    return $type;
 }
 
 1;

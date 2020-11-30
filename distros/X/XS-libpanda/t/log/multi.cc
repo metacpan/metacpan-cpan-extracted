@@ -10,7 +10,7 @@ TEST("log to multi channels") {
     set_logger(new MultiLogger({
         {
             fn2logger([&](const string& msg, const Info& info) {
-                CHECK(info.level == CRITICAL);
+                CHECK(info.level == Level::Critical);
                 CHECK(info.line == 28);
                 CHECK(msg == "hi");
                 ++cnt;
@@ -18,7 +18,7 @@ TEST("log to multi channels") {
         },
         {
             fn2logger([&](const string& msg, const Info& info) {
-                CHECK(info.level == CRITICAL);
+                CHECK(info.level == Level::Critical);
                 CHECK(info.line == 28);
                 CHECK(msg == "hi");
                 ++cnt;
@@ -33,9 +33,9 @@ TEST("using min_level") {
     Ctx c;
     int cnt = 0;
     set_logger(new MultiLogger({
-        { fn2logger([&](const string&, const Info&) { cnt += 1; }), NOTICE },
-        { fn2logger([&](const string&, const Info&) { cnt += 100; }), ERROR },
-        { fn2logger([&](const string&, const Info&) { cnt += 10; }), WARNING },
+        { fn2logger([&](const string&, const Info&) { cnt += 1; }), Level::Notice },
+        { fn2logger([&](const string&, const Info&) { cnt += 100; }), Level::Error },
+        { fn2logger([&](const string&, const Info&) { cnt += 10; }), Level::Warning },
     }));
     panda_log_warning("hi");
     CHECK(cnt == 11);
@@ -46,7 +46,7 @@ TEST("using different formatters") {
     set_format("F1:%m");
     string m1,m2,m3;
     set_logger(new MultiLogger({
-        { fn2logger([&](const string& m, const Info&) { m1=m; }), new PatternFormatter("F2:%m"), DEBUG },
+        { fn2logger([&](const string& m, const Info&) { m1=m; }), new PatternFormatter("F2:%m"), Level::Debug },
         { fn2logger([&](const string& m, const Info&) { m2=m; }), new PatternFormatter("F3:%m") },
         { fn2logger([&](const string& m, const Info&) { m3=m; }) },
     }));

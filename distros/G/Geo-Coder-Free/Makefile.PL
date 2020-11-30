@@ -9,7 +9,7 @@ my @needfull;
 # Install Pre-requisites
 BEGIN {
 	my @modules = (
-		'LWP::Protocol::https', 'LWP::Simple'
+		'File::HomeDir', 'LWP::Protocol::https', 'LWP::Simple::WithCache'
 	);
 
 	foreach my $module(@modules) {
@@ -86,9 +86,14 @@ if(eval { require HTTP::Cache::Transparent; }) {
 	if(my $e = $ENV{'CACHEDIR'}) {
 		$cachedir = File::Spec->catfile($e, 'http-cache-transparent');
 	} else {
-		$cachedir = File::Spec->catfile(File::Spec->tmpdir(), 'cache', 'http-cache-transparent');
+		# $cachedir = File::Spec->catfile(File::Spec->tmpdir(), 'cache', 'http-cache-transparent');
+		$cachedir = File::Spec->catfile(File::HomeDir->my_home(), '.cache', 'http-cache-transparent');
 	}
 
+	if(!-d $cachedir) {
+		print "Creating the download directory $cachedir\n";
+		mkdir $cachedir || die "$cachedir: $@";
+	}
 	HTTP::Cache::Transparent::init({
 		BasePath => $cachedir,
 		# Verbose => $opts{'v'} ? 1 : 0,
@@ -108,7 +113,7 @@ foreach my $url(keys %urls) {
 	}
 
 	print "Downloading $url to $file\n";
-	if(is_error(my $rc = mirror($url, $file))) {
+	if(LWP::Simple::WithCache::is_error(my $rc = LWP::Simple::WithCache::mirror($url, $file))) {
 		die "$url: LWP error $rc";
 	}
 	die $file if(!-r $file);
@@ -187,6 +192,7 @@ WriteMakefile(
 		'JSON' => 0,
 		'LWP::UserAgent::Throttled' => 0,
 		'Try::Tiny' => 0,
+		'XML::LibXML::Reader' => 0,	# FIXME: only if $OSM_HOME is set
 	},
 	TEST_REQUIRES => $test_requires,
 	PREREQ_PM => {
@@ -199,6 +205,7 @@ WriteMakefile(
 		'Encode' => 0,
 		'List::MoreUtils' => 0,
 		'Locale::Country' => 0,
+		'Locale::AU' => 0,
 		'Locale::CA' => 0,
 		'Locale::SubCountry' => 0,
 		'Locale::US' => 0,
@@ -225,6 +232,10 @@ WriteMakefile(
 				# version => '0.01',
 				# file => 'MaxMind.pm',
 			# },
+			# 'Geo::Coder::Free::Local' => {
+				# version => '0.01',
+				# file => 'Local.pm',
+			# }
 			# 'Geo::Coder::Free::OpenAddresses' => {
 				# version => '0.01',
 				# file => 'OpenAddresses.pm',
@@ -238,12 +249,11 @@ WriteMakefile(
 				type => 'git',
 				url => 'git://github.com/nigelhorne/Geo-Coder-Free.git',
 				web => 'https://github.com/nigelhorne/Geo-Coder-Free',
-			},
-			bugtracker => {
+			}, bugtracker => {
 				# web => 'https://rt.cpan.org/Public/Dist/Display.html?Name=Geo-Coder-Free',
 				web => 'https://github.com/nigelhorne/Geo-Coder-Free/issues',
 				mailto => 'bug-Geo-Coder-Free@rt.cpan.org'
-			}
+			}, homepage => 'https://geocode.nigelhorne.com'
 		},
 	},
 	# PPM_INSTALL_EXEC	=> 'bash',

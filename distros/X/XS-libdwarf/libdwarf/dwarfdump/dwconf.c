@@ -1,30 +1,35 @@
 /*
-  Copyright (C) 2006 Silicon Graphics, Inc.  All Rights Reserved.
-  Portions Copyright 2011-2019 David Anderson. All Rights Reserved.
-  Portions Copyright 2012 SN Systems Ltd. All rights reserved.
+Copyright (C) 2006 Silicon Graphics, Inc.  All Rights Reserved.
+Portions Copyright 2011-2019 David Anderson. All Rights Reserved.
+Portions Copyright 2012 SN Systems Ltd. All rights reserved.
 
-  This program is free software; you can redistribute it and/or modify it
-  under the terms of version 2 of the GNU General Public License as
-  published by the Free Software Foundation.
+  This program is free software; you can redistribute it and/or
+  modify it under the terms of version 2 of the GNU General
+  Public License as published by the Free Software Foundation.
 
-  This program is distributed in the hope that it would be useful, but
-  WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  This program is distributed in the hope that it would be
+  useful, but WITHOUT ANY WARRANTY; without even the implied
+  warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+  PURPOSE.
 
-  Further, this software is distributed without any warranty that it is
-  free of the rightful claim of any third person regarding infringement
-  or the like.  Any license provided herein, whether implied or
-  otherwise, applies only to this software file.  Patent licenses, if
-  any, provided herein do not apply to combinations of this program with
-  other software, or any other product whatsoever.
+  Further, this software is distributed without any warranty
+  that it is free of the rightful claim of any third person
+  regarding infringement or the like.  Any license provided
+  herein, whether implied or otherwise, applies only to this
+  software file.  Patent licenses, if any, provided herein
+  do not apply to combinations of this program with other
+  software, or any other product whatsoever.
 
-  You should have received a copy of the GNU General Public License along
-  with this program; if not, write the Free Software Foundation, Inc., 51
-  Franklin Street - Fifth Floor, Boston MA 02110-1301, USA.
+  You should have received a copy of the GNU General Public
+  License along with this program; if not, write the Free
+  Software Foundation, Inc., 51 Franklin Street - Fifth Floor,
+  Boston MA 02110-1301, USA.
+
 */
 
-/* Windows specific */
 #include "config.h"
+#include "globals.h"
+#include "esb.h"
 
 /* Windows specific header files */
 #if defined(_WIN32) && defined(HAVE_STDAFX_H)
@@ -67,7 +72,8 @@ enum linetype_e {
     LT_REG_TABLE_SIZE,
     LT_ADDRESS_SIZE,
     LT_INCLUDEABI,
-    LT_ENDABI
+    LT_ENDABI,
+    LT_OPTION
 };
 
 struct comtable_s {
@@ -90,6 +96,7 @@ static char name_reg_table_size[] = "reg_table_size:";
 static char name_address_size[] = "address_size:";
 static char name_includeabi[] = "includeabi:";
 static char name_endabi[] = "endabi:";
+static char name_option[] = "option:";
 
 /*  The namelen field is filled in at runtime with
     the correct value. Filling in a fake '1' avoids
@@ -106,6 +113,7 @@ static struct comtable_s comtable[] = {
     {LT_ADDRESS_SIZE, name_address_size,1},
     {LT_INCLUDEABI, name_includeabi,1},
     {LT_ENDABI, name_endabi,1},
+    {LT_OPTION, name_option,1},
 };
 
 struct conf_internal_s {
@@ -141,14 +149,18 @@ init_conf_internal(struct conf_internal_s *s,
     s->conf_out = conf_out;
 }
 
-static unsigned size_of_comtable = sizeof(comtable) / sizeof(comtable[0]);
+static unsigned size_of_comtable = sizeof(comtable) /
+    sizeof(comtable[0]);
 
 static FILE *find_a_file(const char *named_file, char **defaults,
     const char** name_used);
-static int find_abi_start(FILE * stream, const char *abi_name, long *offset,
+static int find_abi_start(FILE * stream, const char *abi_name,
+    long *offset,
     unsigned long *lineno_out);
-static int parse_abi(FILE * stream, const char *fname, const char *abiname,
-    struct conf_internal_s *out, unsigned long lineno, unsigned nest_level);
+static int parse_abi(FILE * stream, const char *fname,
+    const char *abiname,
+    struct conf_internal_s *out, unsigned long lineno,
+    unsigned nest_level);
 static char *get_token(char *cp, struct token_s *outtok);
 
 /*  This finds a dwarfdump.conf file and
@@ -160,11 +172,17 @@ static char *get_token(char *cp, struct token_s *outtok);
     If the first file it finds does not have that ABI entry it
     gives up.
 
-    It would also be reasonable to search every 'dwarfdump.conf'
-    it finds for the abi. But we stop at the first dwarfdump.conf
+    It would also be reasonable to search every
+    'dwarfdump.conf'
+    it finds for the abi.
+    But we stop at the first dwarfdump.conf
     we find.
-    This is the internal call to get the conf data to implement
+    This is the internal call to get the
+    conf data to implement
     a crude 'includeabi' feature.
+
+    Each call here starts at offset 0 of
+    a new stream.
 
     Returns 0 if no errors found, else returns > 0.
 */
@@ -183,40 +201,53 @@ find_conf_file_and_read_config_inner(const char *named_file,
 
     errcount = 0;
 
-    conf_stream = find_a_file(named_file, conf_internal->conf_defaults,
+    conf_stream = find_a_file(named_file,
+        conf_internal->conf_defaults,
         &name_used);
     if (!conf_stream) {
         ++errcount;
         printf("dwarfdump found no file %s!\n",
             named_file ? named_file : "readable for configuration. "
             "(add options -v -v to see what file names tried)\n");
-        return errcount;
+        return FOUND_ERROR;
     }
-    if (glflags.verbose > 1) {
+    if (glflags.verbose > 6) {
         printf("dwarfdump using configuration file %s\n", name_used);
     }
     conf_internal->conf_name_used = name_used;
 
+    /*  And option: lines must come before any abi data. */
     res = find_abi_start(conf_stream, named_abi, &offset, &lineno);
-    if (errcount > 0 || res == FALSE) {
+    if (res == FOUND_DONE ||res == FOUND_OPTION) {
+       /* nothing more to do */
+       fclose(conf_stream);
+       return FOUND_DONE;
+    }
+    if (res == FOUND_ERROR) {
         ++errcount;
         fclose(conf_stream);
-        printf("dwarfdump found no ABI %s in file %s.\n",
-            named_abi, name_used);
-        return errcount;
+        printf("dwarfdump found no usable abi %s in file %s.\n",
+            named_abi?named_abi:"<not looking for abi>",
+            name_used);
+        return FOUND_ERROR;
     }
+    /* res == FOUND_ABI_START */
     res = fseek(conf_stream, offset, SEEK_SET);
     if (res != 0) {
         ++errcount;
         fclose(conf_stream);
         printf("dwarfdump seek to %ld offset in %s failed!\n",
             offset, name_used);
-        return errcount;
+        return FOUND_ERROR;
     }
-    parse_abi(conf_stream, name_used, named_abi, conf_internal, lineno,
+    parse_abi(conf_stream, name_used, named_abi,
+        conf_internal, lineno,
         nest_level);
     fclose(conf_stream);
-    return errcount;
+    if (errcount) {
+        return FOUND_ERROR;
+    }
+    return FOUND_ABI_START;
 }
 
 /* This is the external-facing call to get the conf data. */
@@ -365,11 +396,16 @@ find_a_file(const char *named_file, char **defaults, const char ** name_used)
 #endif /* BUILD_FOR_TEST */
 
     if (lname && (strlen(lname) > 0)) {
-        /* Name given, just assume it is fully correct, try no other. */
+        /*  Name given, just assume it is fully correct,
+            try no other. */
+#ifdef BUILD_FOR_TEST
+#endif /* BUILD_FOR_TEST */
+        printf("dwarfdump looking for"
+            " configuration as %s\n", lname);
+        #if 0
         if (glflags.verbose > 1) {
-            printf("dwarfdump looking for configuration as %s\n",
-                lname);
         }
+        #endif
         fin = fopen(lname, type);
         if (fin) {
             *name_used = lname;
@@ -418,10 +454,14 @@ find_a_file(const char *named_file, char **defaults, const char ** name_used)
             }
         }
 #endif /* _WIN32 */
+#ifdef BUILD_FOR_TEST
+        printf("dwarfdump looking for"
+            " configuration as %s\n", lname);
+#endif /* BUILD_FOR_TEST */
+#if 0
         if (glflags.verbose > 1) {
-            printf("dwarfdump looking for configuration as %s\n",
-                lname);
         }
+#endif
         fin = fopen(lname, type);
         if (fin) {
             *name_used = lname;
@@ -496,7 +536,6 @@ find_abi_start(FILE * stream, const char *abi_name,
     unsigned long lineno = 0;
 
     for (; !feof(stream);) {
-
         struct token_s tok;
         char *line = 0;
         long loffset = ftell(stream);
@@ -504,33 +543,52 @@ find_abi_start(FILE * stream, const char *abi_name,
         line = fgets(buf, sizeof(buf), stream);
         ++lineno;
         if (!line) {
+            if (!abi_name) {
+                return FOUND_DONE;
+            }
             ++errcount;
-            return FALSE;
+            return FOUND_ERROR;
         }
-
         line = get_token(buf, &tok);
-
-        if (strcmp(tok.tk_data, name_begin_abi) != 0) {
+        if (!strcmp(tok.tk_data, "option:")) {
+            get_token(line, &tok);
+            if (tok.tk_data && !strcmp(tok.tk_data,
+                "--format-expr-ops-joined")) {
+                /*  print expr ops joined onto one line:
+                    matching historical behavior. */
+                glflags.gf_expr_ops_joined = TRUE;
+            } else {
+                printf("ERROR: option command %s is not understood"
+                    " giving up\n",tok.tk_data);
+                ++errcount;
+                return FOUND_ERROR;
+            }
+            continue;
+        }
+        if (strcmp(tok.tk_data, "beginabi:")) {
+            continue;
+        }
+        /*  Is beginabi: */
+        if (!abi_name) {
             continue;
         }
         get_token(line, &tok);
-        if (strcmp(tok.tk_data, abi_name) != 0) {
+        if (strcmp(tok.tk_data, abi_name)) {
             continue;
         }
-
         *offset = loffset;
         *lineno_out = lineno;
-        return TRUE;
+        return FOUND_ABI_START;
     }
-
+    if (!abi_name) {
+        /* All is ok */
+        return FOUND_DONE;
+    }
     ++errcount;
     return FALSE;
 }
 
-static char *tempstr = 0;
-static unsigned tempstr_len = 0;
-
-/*  Use a global buffer (tempstr) to turn a non-delimited
+/*  Turn a non-delimited
     input char array into a NUL-terminated C string
     (with the help of makename() to get a permanent
     address for the result ing string).
@@ -538,13 +596,15 @@ static unsigned tempstr_len = 0;
 static char *
 build_string(unsigned tlen, char *cp)
 {
-    if (tlen >= tempstr_len) {
-        free(tempstr);
-        tempstr = malloc(tlen + 100);
-    }
-    strncpy(tempstr, cp, tlen);
-    tempstr[tlen] = 0;
-    return makename(tempstr);
+    struct esb_s x;
+    char buffer[32];
+    char *ret = 0;
+
+    esb_constructor_fixed(&x,buffer,sizeof(buffer));
+    esb_appendn(&x,cp,tlen);
+    ret = makename(esb_get_string(&x));
+    esb_destructor(&x);
+    return ret;
 }
 
 /*  The tokenizer for our simple parser.
@@ -609,6 +669,31 @@ which_command(char *cp, struct comtable_s **tableentry)
     return LT_ERROR;
 }
 
+static int
+parseoption(char *cp, const char *fname,unsigned long lineno,
+    struct comtable_s *comtab)
+{
+    size_t clen = comtab->namelen;
+    struct token_s tok;
+
+    cp = cp + clen + 1;
+    cp = skipwhite(cp);
+    get_token(cp, &tok);
+    if (!tok.tk_data) {
+        printf("ERROR: empty option: command is ignored");
+        return FALSE;
+    }
+    ensure_has_no_more_tokens(cp + tok.tk_len, fname, lineno);
+    if (!strcmp(tok.tk_data,"--format-expr-ops-joined")) {
+        glflags.gf_expr_ops_joined = TRUE;
+    } else {
+        printf("ERROR: option command %s is not understood"
+            " and is ignored",tok.tk_data);
+        return FALSE;
+    }
+    return TRUE;
+
+}
 /* We are promised it's an abiname: command
    find the name on the line.
 */
@@ -625,9 +710,9 @@ parsebeginabi(char *cp, const char *fname, const char *abiname,
     cp = skipwhite(cp);
     get_token(cp, &tok);
     if (tok.tk_len != abinamelen ||
-        strncmp(cp, abiname, abinamelen) != 0) {
+        strncmp(cp, abiname, abinamelen)) {
         printf("dwarfdump internal error: "
-            "mismatch %s with %s   %s line %lu\n",
+            "mismatch \"%s\" with \"%s\"   \"%s\" line %lu\n",
             cp, tok.tk_data, fname, lineno);
         ++errcount;
         return FALSE;
@@ -1041,7 +1126,6 @@ parseincludeabi(char *cp, const char *fname, unsigned long lineno,
     cp = cp + clen + 1;
     cp = get_token(cp, &tok);
     name = makename(tok.tk_data);
-
     *abiname_out = name;
     res = ensure_has_no_more_tokens(cp, fname, lineno);
     return res;
@@ -1073,13 +1157,14 @@ parse_abi(FILE * stream, const char *fname, const char *abiname,
     struct dwconf_s *localconf = conf_internal->conf_out;
     char buf[1000];
     int comtype = 0;
-
     static int first_time_done = 0;
     struct comtable_s *comtabp = 0;
+    int inourabi = FALSE;
 
     if (nest_level > MAX_NEST_LEVEL) {
         ++errcount;
-        printf("dwarfdump.conf: includeabi nest too deep in %s at line %lu\n",
+        printf("dwarfdump.conf: includeabi nest "
+            "too deep in %s at line %lu\n",
             fname, lineno);
         return FALSE;
     }
@@ -1097,8 +1182,8 @@ parse_abi(FILE * stream, const char *fname, const char *abiname,
         line = fgets(buf, sizeof(buf), stream);
         if (!line) {
             ++errcount;
-            printf
-                ("dwarfdump: end of file or error before endabi: in %s, line %lu\n",
+            printf("dwarfdump: end of file or error"
+                " before endabi: in %s, line %lu\n",
                 fname, lineno);
             return FALSE;
         }
@@ -1106,6 +1191,10 @@ parse_abi(FILE * stream, const char *fname, const char *abiname,
         line = skipwhite(line);
         comtype = which_command(line, &comtabp);
         switch (comtype) {
+        case LT_OPTION:
+            if (!inourabi) break;
+            parseoption(line, fname, lineno,comtabp);
+            break;
         case LT_ERROR:
             ++errcount;
             printf
@@ -1125,14 +1214,17 @@ parse_abi(FILE * stream, const char *fname, const char *abiname,
                     lineno, conf_internal->beginabi_lineno);
             }
             conf_internal->beginabi_lineno = lineno;
-            parsebeginabi(line, fname, abiname, lineno, comtabp);
+            inourabi = parsebeginabi(line, fname, 
+                abiname, lineno, comtabp);
             break;
 
         case LT_REG:
+            if (!inourabi) break;
             parsereg(line, fname, lineno, conf_internal, comtabp);
             conf_internal->regcount++;
             break;
         case LT_FRAME_INTERFACE:
+            if (!inourabi) break;
             if (conf_internal->frame_interface_lineno > 0) {
                 ++errcount;
                 printf
@@ -1145,6 +1237,7 @@ parse_abi(FILE * stream, const char *fname, const char *abiname,
                 lineno, conf_internal, comtabp);
             break;
         case LT_CFA_REG:
+            if (!inourabi) break;
             if (conf_internal->cfa_reg_lineno > 0) {
                 printf("dwarfdump: Encountered duplicate cfa_reg: "
                     "%s line %lu previous cfa_reg line %lu\n",
@@ -1155,6 +1248,7 @@ parse_abi(FILE * stream, const char *fname, const char *abiname,
             parsecfa_reg(line, fname, lineno, conf_internal, comtabp);
             break;
         case LT_INITIAL_REG_VALUE:
+            if (!inourabi) break;
             if (conf_internal->initial_reg_value_lineno > 0) {
                 printf
                     ("dwarfdump: Encountered duplicate initial_reg_value: "
@@ -1167,6 +1261,7 @@ parse_abi(FILE * stream, const char *fname, const char *abiname,
                 lineno, conf_internal, comtabp);
             break;
         case LT_SAME_VAL_REG:
+            if (!inourabi) break;
             if (conf_internal->same_val_reg_lineno > 0) {
                 ++errcount;
                 printf
@@ -1179,6 +1274,7 @@ parse_abi(FILE * stream, const char *fname, const char *abiname,
                 lineno, conf_internal, comtabp);
             break;
         case LT_UNDEFINED_VAL_REG:
+            if (!inourabi) break;
             if (conf_internal->undefined_val_reg_lineno > 0) {
                 ++errcount;
                 printf
@@ -1186,11 +1282,13 @@ parse_abi(FILE * stream, const char *fname, const char *abiname,
                     "%s line %lu previous initial_reg_value: line %lu\n",
                     fname, lineno, conf_internal->initial_reg_value_lineno);
             }
+            if (!inourabi) break;
             conf_internal->undefined_val_reg_lineno = lineno;
             parseundefined_val_reg(line, fname,
                 lineno, conf_internal, comtabp);
             break;
         case LT_REG_TABLE_SIZE:
+            if (!inourabi) break;
             if (conf_internal->reg_table_size_lineno > 0) {
                 printf("dwarfdump: duplicate reg_table_size: "
                     "%s line %lu previous reg_table_size: line %lu\n",
@@ -1202,23 +1300,29 @@ parse_abi(FILE * stream, const char *fname, const char *abiname,
                 lineno, conf_internal, comtabp);
             break;
         case LT_ENDABI:
+            if (!inourabi) break;
             parseendabi(line, fname, abiname, lineno, comtabp);
-
-            if (conf_internal->regcount > localconf->cf_table_entry_count) {
+            if (conf_internal->regcount > 
+                localconf->cf_table_entry_count) {
                 printf("dwarfdump: more registers named than "
-                    " in  %s  ( %lu named vs  %s %lu)  %s line %lu\n",
+                    " in  %s  ( %lu named vs  %s %lu)"
+                    "  %s line %lu\n",
                     abiname, (unsigned long) conf_internal->regcount,
                     name_reg_table_size,
                     (unsigned long) localconf->cf_table_entry_count,
                     fname, (unsigned long) lineno);
                 ++errcount;
             }
+            inourabi = FALSE;
             return TRUE;
         case LT_ADDRESS_SIZE:
+            if (!inourabi) break;
             if (conf_internal->address_size_lineno > 0) {
                 printf("dwarfdump: duplicate address_size: "
-                    "%s line %lu previous address_size: line %lu\n",
-                    fname, lineno, conf_internal->address_size_lineno);
+                    "%s line %lu previous address_size:"
+                    " line %lu\n",
+                    fname, lineno,
+                    conf_internal->address_size_lineno);
                 ++errcount;
             }
             conf_internal->address_size_lineno = lineno;
@@ -1229,25 +1333,31 @@ parse_abi(FILE * stream, const char *fname, const char *abiname,
             char *abiname_inner = 0;
             unsigned long abilno = conf_internal->beginabi_lineno;
             int ires = 0;
-            ires = parseincludeabi(line,fname,lineno, &abiname_inner,comtabp);
+
+            if (!inourabi) break;
+            ires = parseincludeabi(line,fname,lineno,
+                &abiname_inner,comtabp);
             if (ires == FALSE) {
                 return FALSE;
             }
-            /*  For the nested abi read, the abi line number must be
-                set as if not-yet-read, and then restored. */
+            /*  For the nested abi read, the abi line
+                number must be set as if not-yet-read
+                and then restored. */
             conf_internal->beginabi_lineno = 0;
-            find_conf_file_and_read_config_inner(
+            ires  = find_conf_file_and_read_config_inner(
                 conf_internal->conf_name_used,
                 abiname_inner, conf_internal,nest_level+1);
+            if (ires == FOUND_ERROR) {
+                return ires;
+            }
             conf_internal->beginabi_lineno = abilno;
             }
             break;
         default:
-            printf
-                ("dwarfdump internal error, impossible line type %d  %s %lu \n",
+            printf("dwarfdump internal error,"
+                " impossible line type %d  %s %lu \n",
                 (int) comtype, fname, lineno);
             exit(1);
-
         }
     }
     ++errcount;
@@ -1311,6 +1421,9 @@ init_conf_file_data(struct dwconf_s *config_file_data)
     config_file_data->cf_config_file_path = "";
     config_file_data->cf_interface_number = 3;
     config_file_data->cf_table_entry_count = 100;
+#if 0
+printf("dadebug init generic 100 table entries\n");
+#endif
     config_file_data->cf_initial_rule_value = DW_FRAME_UNDEFINED_VAL;
     config_file_data->cf_cfa_reg =  DW_FRAME_CFA_COL3;
     config_file_data->cf_address_size =  0;
@@ -1428,4 +1541,15 @@ print_reg_from_config_data(Dwarf_Unsigned reg,
     }
     fputs(name,stdout);
     return;
+}
+
+void
+free_all_dwconf(struct dwconf_s *conf)
+{
+    if (conf->cf_regs_malloced) {
+        free(conf->cf_regs);
+    }
+    conf->cf_regs = 0;
+    conf->cf_named_regs_table_size =0;
+    conf->cf_regs_malloced = 0;
 }

@@ -7,22 +7,22 @@ namespace panda { namespace protocol { namespace http {
 
 
 struct Request : Message, AllocatedObject<Request> {
-    enum class Method {unspecified, OPTIONS, GET, HEAD, POST, PUT, DELETE, TRACE, CONNECT};
-    enum class EncType {MULTIPART, URLENCODED, disabled};
-    enum class FormStreaming { none, started, file, done };
+    enum class Method        { Unspecified, Options, Get, Head, Post, Put, Delete, Trace, Connect };
+    enum class EncType       { Multipart, UrlEncoded, Disabled };
+    enum class FormStreaming { None, Started, File, Done };
 
     static inline string method_str(Request::Method rm) noexcept {
         using Method = Request::Method;
         switch (rm) {
-            case Method::unspecified : return "[unspecified]";
-            case Method::OPTIONS     : return "OPTIONS";
-            case Method::GET         : return "GET";
-            case Method::HEAD        : return "HEAD";
-            case Method::POST        : return "POST";
-            case Method::PUT         : return "PUT";
-            case Method::DELETE      : return "DELETE";
-            case Method::TRACE       : return "TRACE";
-            case Method::CONNECT     : return "CONNECT";
+            case Method::Unspecified : return "[unspecified]";
+            case Method::Options     : return "OPTIONS";
+            case Method::Get         : return "GET";
+            case Method::Head        : return "HEAD";
+            case Method::Post        : return "POST";
+            case Method::Put         : return "PUT";
+            case Method::Delete      : return "DELETE";
+            case Method::Trace       : return "TRACE";
+            case Method::Connect     : return "CONNECT";
             default: return "[UNKNOWN]";
         }
     }
@@ -38,12 +38,12 @@ struct Request : Message, AllocatedObject<Request> {
 
     struct Form: string_multimap<string, NamedString> {
 
-        Form(EncType enc_type = EncType::disabled) noexcept :_enc_type(enc_type){}
+        Form(EncType enc_type = EncType::Disabled) noexcept :_enc_type(enc_type){}
 
         void enc_type (const EncType value) noexcept { _enc_type = value; }
         EncType enc_type () const noexcept { return _enc_type; }
 
-        operator bool () const noexcept { return _enc_type != EncType::disabled; }
+        operator bool () const noexcept { return _enc_type != EncType::Disabled; }
 
         void add(const string& key, const string& value, const string& filename = "", const string content_type = "") {
             insert({key, NamedString{value, filename, content_type}});
@@ -52,7 +52,7 @@ struct Request : Message, AllocatedObject<Request> {
     private:
         const URI* to_body (Body& body, uri::URI &uri, const URISP original_uri, const string& boundary) const noexcept;
         void to_uri  (URI& uri, const URISP original_uri) const ;
-        EncType _enc_type = EncType::MULTIPART;
+        EncType _enc_type = EncType::Multipart;
         friend struct Request;
     };
 
@@ -83,37 +83,37 @@ struct Request : Message, AllocatedObject<Request> {
         return _allow_compression(prefn...);
     }
 
-    Method method()     const noexcept;
-    Method method_raw() const noexcept { return _method; }
+    Method method     () const noexcept;
+    Method method_raw () const noexcept { return _method; }
 
-    void   method_raw(Method value) noexcept { _method = value; }
+    void   method_raw (Method value) noexcept { _method = value; }
 
     std::uint8_t allowed_compression (bool inverse = false) const noexcept;
 
-    void form_stream() {
-        if (_form_streaming == FormStreaming::none) {
-            _form_streaming = FormStreaming::started;
-            form._enc_type = EncType::MULTIPART;
+    void form_stream () {
+        if (_form_streaming == FormStreaming::None) {
+            _form_streaming = FormStreaming::Started;
+            form._enc_type = EncType::Multipart;
             _form_boundary = _generate_boundary();
         }
-        else if (_form_streaming != FormStreaming::started) {
+        else if (_form_streaming != FormStreaming::Started) {
             throw "invalid state for form streaming";
         }
     }
 
-    bool form_streaming() noexcept { return  _form_streaming == FormStreaming::started; }
+    bool form_streaming () noexcept { return  _form_streaming == FormStreaming::Started; }
 
-    wrapped_chunk form_finish();
-    wrapped_chunk form_field(const string& name, const string& content, const string& filename = "", const string& mime_type = "");
-    wrapped_chunk form_file(const string& name, const string filename = "", const string& mime_type = "application/octet-stream");
-    wrapped_chunk form_data(const string& data);
+    wrapped_chunk form_finish ();
+    wrapped_chunk form_field  (const string& name, const string& content, const string& filename = "", const string& mime_type = "");
+    wrapped_chunk form_file   (const string& name, const string filename = "", const string& mime_type = "application/octet-stream");
+    wrapped_chunk form_data   (const string& data);
 
 protected:
     struct SerializationContext: Message::SerializationContext {
         const URI* uri;
     };
 
-    string form_trailer(const string& boundary) const noexcept {
+    string form_trailer (const string& boundary) const noexcept {
         auto sz = boundary.size() + 6;
         string r(sz);
         r += "--";
@@ -122,8 +122,8 @@ protected:
         return r;
     }
 
-    Method  _method = Method::unspecified;
-    FormStreaming _form_streaming = FormStreaming::none;
+    Method  _method = Method::Unspecified;
+    FormStreaming _form_streaming = FormStreaming::None;
     string _form_boundary;
 
     template<typename... PrefN>
@@ -132,7 +132,7 @@ protected:
         return _allow_compression(prefn...);
     }
     void _allow_compression () {}
-    void form_file_finalize(string& out) noexcept;
+    void form_file_finalize (string& out) noexcept;
 
     ~Request () {} // restrict stack allocation
 
@@ -141,7 +141,7 @@ private:
 
     static Method deduce_method (bool has_form, EncType form_enc, Method _method) noexcept;
     string _http_header (SerializationContext &ctx) const;
-    static string _generate_boundary() noexcept;
+    static string _generate_boundary () noexcept;
 };
 using RequestSP = iptr<Request>;
 

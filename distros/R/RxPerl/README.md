@@ -37,7 +37,7 @@ The documentation in this POD applies to all three adapter modules as well.
 This module is an implementation of [Reactive Extensions](http://reactivex.io/) in Perl. It replicates the
 behavior of [rxjs 6](https://www.npmjs.com/package/rxjs) which is the JavaScript implementation of ReactiveX.
 
-Currently 50 of the 100+ operators in rxjs are implemented in this module.
+Currently 52 of the 100+ operators in rxjs are implemented in this module.
 
 # EXPORTABLE FUNCTIONS
 
@@ -238,6 +238,23 @@ should apply to RxPerl too).
             rx_interval(1)->pipe( op_map(sub {$_[0] * 100}) ),
             rx_interval(0.7)->pipe( op_map(sub {$_[0] * 10) ),
         )->subscribe($observer);
+
+- rx\_replay\_subject
+
+    [https://rxjs.dev/api/index/class/ReplaySubject](https://rxjs.dev/api/index/class/ReplaySubject)
+
+        # 20, 30, 40, 50, complete
+        my $rs = rx_replay_subject(2);
+        $rs->next(10);
+        $rs->next(20);
+        $rs->next(30);
+        $rs->subscribe($observer);
+        $rs->next(40);
+        $rs->next(50);
+        $rs->complete;
+
+        # or...
+        my $rs = rx_replay_subject(2, 3); # params: buffer_size, window_time
 
 - rx\_subject
 

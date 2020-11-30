@@ -6,9 +6,9 @@ Date::Manip::TZ::amwhit00;
 
 # This file was automatically generated.  Any changes to this file will
 # be lost the next time 'tzdata' is run.
-#    Generated on: Mon Jun  1 07:57:06 EDT 2020
-#    Data version: tzdata2020a
-#    Code version: tzcode2020a
+#    Generated on: Mon Nov 30 13:52:26 EST 2020
+#    Data version: tzdata2020d
+#    Code version: tzcode2020d
 
 # This module contains data from the zoneinfo time zone database.  The original
 # data was obtained from the URL:
@@ -25,7 +25,7 @@ END {
 }
 
 our ($VERSION);
-$VERSION='6.82';
+$VERSION='6.83';
 END { undef $VERSION; }
 
 %Dates         = (
@@ -452,8 +452,11 @@ END { undef $VERSION; }
    2020 =>
      [
         [ [2020,3,8,10,0,0],[2020,3,8,3,0,0],'-07:00:00',[-7,0,0],
+          'PDT',1,[2020,11,1,6,59,59],[2020,10,31,23,59,59],
+          '2020030810:00:00','2020030803:00:00','2020110106:59:59','2020103123:59:59' ],
+        [ [2020,11,1,7,0,0],[2020,11,1,0,0,0],'-07:00:00',[-7,0,0],
           'MST',0,[9999,12,31,0,0,0],[9999,12,30,17,0,0],
-          '2020030810:00:00','2020030803:00:00','9999123100:00:00','9999123017:00:00' ],
+          '2020110107:00:00','2020110100:00:00','9999123100:00:00','9999123017:00:00' ],
      ],
 );
 

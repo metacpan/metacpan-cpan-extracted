@@ -68,7 +68,7 @@ my %SPICE_COMMAND = (
 sub save_record {
     my $self = shift;
     is $_[0], $self->this_line, "save_record: $_[0]";
-    return if $self->NF == 0;
+    return                          if $self->NF == 0;
     return $self->_add_instance(@_) if $self->field(0) !~ /^[.]/;
     $self->_call_spice_command(@_);
 }
@@ -127,7 +127,7 @@ is( scalar( $sp->get_records() ), 2, '2 records saved' );
 is( $sp->lines_parsed(),          4, '4 lines parsed' );
 
 throws_ok { $sp->read('t/bad-spice.sp'); }
-'Text::Parser::Errors::UnexpectedCont', 'Dies as expected';
+'Text::Parser::Error', 'Dies as expected';
 
 lives_ok { $sp->read('t/example-5.sp'); }
 'Reads spice with include statement';

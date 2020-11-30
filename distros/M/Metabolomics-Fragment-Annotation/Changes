@@ -1,8 +1,9 @@
 Revision history for Metabolomics-Fragment-Annotation
 
-0.6.1	2020-10-26
+0.6.2	2020-11-02
 	- POD update
-	- 
+	- KnapSack and PhytoHUB database updates
+	- fixing CPAN bugs (131470 and 131469)
 
 0.6.1	2020-10-14
 	- fix inheritance issue

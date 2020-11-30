@@ -1,16 +1,10 @@
 use strict;
 use warnings;
 use utf8;
-use Test::More tests => 1 + 1 + 2;
-use Test::NoWarnings;
-use Test::Warn;
+use Test::More tests => 1 + 1;
+$ENV{AUTHOR_TESTING} && eval { require Test::NoWarnings };
 
-warnings_like {
-	require HTML::Hyphenate;
-} [
-], 'Warned about unescaped left brace in TeX::Hyphen';
-
-
+use HTML::Hyphenate;
 my $hyphenator = HTML::Hyphenate->new();
 
 $hyphenator->default_lang(q{da-DK});

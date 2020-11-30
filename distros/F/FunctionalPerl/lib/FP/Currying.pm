@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2013-2019 Christian Jaeger, copying@christianjaeger.ch
+# Copyright (c) 2013-2020 Christian Jaeger, copying@christianjaeger.ch
 #
 # This is free software, offered under either the same terms as perl 5
 # or the terms of the Artistic License version 2 or the terms of the
@@ -109,14 +109,16 @@ our @EXPORT = qw(
 our @EXPORT_OK   = qw();
 our %EXPORT_TAGS = (all => [@EXPORT, @EXPORT_OK]);
 
-sub curry ($) {
-    @_ == 1 or die "wrong number of arguments";
+use FP::Carp;
+
+sub curry {
+    @_ == 1 or fp_croak_nargs 1;
     my ($f) = @_;
     sub {
-        @_ == 1 or die "wrong number of arguments";
+        @_ == 1 or fp_croak_nargs 1;
         my ($a) = @_;
         sub {
-            @_ == 1 or die "wrong number of arguments";
+            @_ == 1 or fp_croak_nargs 1;
             @_ = ($a, @_);
             goto \&$f
         }
@@ -149,49 +151,54 @@ sub partial {
 
 # Macros would be useful here.
 
-sub uncurry_1_1 ($) {
+sub uncurry_1_1 {
+    @_ == 1 or fp_croak_nargs 1;
     my ($f) = @_;
     sub {
-        @_ == 2 or die "expecting 2 arguments";
+        @_ == 2 or fp_croak_nargs 2;
         my ($a, $b) = @_;
         $f->($a)->($b)
     }
 }
 
-sub uncurry ($);
+sub uncurry;
 *uncurry = *uncurry_1_1;
 
-sub uncurry_2_1 ($) {
+sub uncurry_2_1 {
+    @_ == 1 or fp_croak_nargs 1;
     my ($f) = @_;
     sub {
-        @_ == 3 or die "expecting 3 arguments";
+        @_ == 3 or fp_croak_nargs 3;
         my ($a, $b, $c) = @_;
         $f->($a, $b)->($c)
     }
 }
 
-sub uncurry_1_2 ($) {
+sub uncurry_1_2 {
+    @_ == 1 or fp_croak_nargs 1;
     my ($f) = @_;
     sub {
-        @_ == 3 or die "expecting 3 arguments";
+        @_ == 3 or fp_croak_nargs 3;
         my ($a, $b, $c) = @_;
         $f->($a)->($b, $c)
     }
 }
 
-sub uncurry_2_2 ($) {
+sub uncurry_2_2 {
+    @_ == 1 or fp_croak_nargs 1;
     my ($f) = @_;
     sub {
-        @_ == 4 or die "expecting 4 arguments";
+        @_ == 4 or fp_croak_nargs 4;
         my ($a, $b, $c, $d) = @_;
         $f->($a, $b)->($c, $d)
     }
 }
 
-sub uncurry_1_1_1 ($) {
+sub uncurry_1_1_1 {
+    @_ == 1 or fp_croak_nargs 1;
     my ($f) = @_;
     sub {
-        @_ == 3 or die "expecting 3 arguments";
+        @_ == 3 or fp_croak_nargs 3;
         my ($a, $b, $c) = @_;
         $f->($a)->($b)->($c)
     }

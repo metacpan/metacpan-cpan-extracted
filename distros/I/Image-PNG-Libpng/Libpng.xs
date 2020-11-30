@@ -2,6 +2,7 @@
 #include "EXTERN.h"
 #include "perl.h"
 #include "XSUB.h"
+#include "ppport.h"
 
 /* There is some kind of collision between a file included by "perl.h"
    and "png.h" for very old versions of libpng, like the one used on

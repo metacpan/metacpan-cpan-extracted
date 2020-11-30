@@ -109,6 +109,7 @@ sub _options {
             { name => '_csv_char',          text => "- csv settings-a",                section => 'csv'    },
             { name => '_csv_options',       text => "- csv settings-b",                section => 'csv'    },
             { name => '_split_config',      text => "- 'split' settings",              section => 'split'  },
+            { name => '_input_filter',      text => "- Enable input filter",           section => 'insert' },
             { name => '_empty_to_null',     text => "- Empty to NULL",                 section => 'insert' },
             { name => '_file_encoding',     text => "- File encoding",                 section => 'insert' },
             { name => '_data_source_type',  text => "- Source type of input data",     section => 'insert' },
@@ -366,6 +367,13 @@ sub set_options {
                     [ 'blank_is_undef',      "- blank_is_undef",      [ $no, $yes ] ],
                     [ 'binary',              "- binary",              [ $no, $yes ] ],
                     [ 'empty_is_undef',      "- empty_is_undef",      [ $no, $yes ] ],
+                ];
+                $sf->__settings_menu_wrap( $section, $sub_menu, $prompt );
+            }
+            elsif ( $opt eq '_input_filter' ) {
+                my $prompt = 'Enable input filter';
+                my $sub_menu = [
+                    [ 'enable_input_filter', "- Enable input filter", [ $no, $yes ] ]
                 ];
                 $sf->__settings_menu_wrap( $section, $sub_menu, $prompt );
             }

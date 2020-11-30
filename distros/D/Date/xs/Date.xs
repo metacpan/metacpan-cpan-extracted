@@ -77,7 +77,7 @@ BOOT {
 
 const Timezone* tzget (string_view zonename = {})
 
-void tzset (const Timezone* newzone = {})
+void tzset (TimezoneSP newzone = {})
 
 string tzdir (SV* newdir = NULL) {
     if (newdir) {
@@ -91,7 +91,7 @@ string tzsysdir () {
     RETVAL = tzsysdir();
 }
 
-void gmtime (SV* epochSV = {}, const Timezone* tz = {}) : ALIAS(localtime=1, anytime=2) {
+void gmtime (SV* epochSV = {}, TimezoneSP tz = {}) : ALIAS(localtime=1, anytime=2) {
     ptime_t epoch;
     if (epochSV) epoch = xs::in<ptime_t>(epochSV);
     else epoch = (ptime_t) ::time(NULL);
@@ -126,7 +126,7 @@ void gmtime (SV* epochSV = {}, const Timezone* tz = {}) : ALIAS(localtime=1, any
     }
 }
 
-ptime_t timegm (SV* sec, SV* min, SV* hour, SV* mday, SV* mon, SV* year, SV* isdst = {}, const Timezone* tz = {}) : ALIAS(timelocal=1, timeany=2, timegmn=3, timelocaln=4, timeanyn=5) {
+ptime_t timegm (SV* sec, SV* min, SV* hour, SV* mday, SV* mon, SV* year, SV* isdst = {}, TimezoneSP tz = {}) : ALIAS(timelocal=1, timeany=2, timegmn=3, timelocaln=4, timeanyn=5) {
     datetime date;
     date.sec  = xs::in<ptime_t>(sec);
     date.min  = xs::in<ptime_t>(min);
@@ -180,7 +180,7 @@ ptime_t today_epoch () {
     RETVAL = timelocall(&date);
 }
 
-Date* date (SV* val = {}, const Timezone* tz = {}, int fmt = Date::InputFormat::all) {
+Date* date (SV* val = {}, TimezoneSP tz = {}, int fmt = Date::InputFormat::all) {
     RETVAL = new Date(sv2date(val, tz, fmt));
 }
 
@@ -195,7 +195,7 @@ bool range_check (Simple newval = Simple()) {
 
 #///////////////////////////// OBJECT METHODS ///////////////////////////////////
 
-Date* new (SV*, SV* val = {}, const Timezone* tz = {}, int fmt = Date::InputFormat::all) {
+Date* new (SV*, SV* val = {}, TimezoneSP tz = {}, int fmt = Date::InputFormat::all) {
     RETVAL = new Date(sv2date(val, tz, fmt));
 }
 
@@ -203,7 +203,7 @@ Date* new_ymd (...) {
     RETVAL = new Date(xs_date_ymd(&ST(1), items - 1));
 }
 
-void Date::set (SV* val = {}, const Timezone* tz = {}, int fmt = Date::InputFormat::all) {
+void Date::set (SV* val = {}, TimezoneSP tz = {}, int fmt = Date::InputFormat::all) {
     THIS->set(sv2date(val, tz, fmt));
 }
 
@@ -336,12 +336,12 @@ string strftime (Sv arg0, SV* arg1, ...) {
     }
     else {
         string_view format = xs::in<string_view>(arg0);
-        const Timezone* tz = nullptr;
+        TimezoneSP tz;
         datetime date;
         date.isdst = -1;
         
         switch (items) {
-            case 9: tz = xs::in<const Timezone*>(ST(8));
+            case 9: tz = xs::in<TimezoneSP>(ST(8));
             case 8: date.isdst = SvIV(ST(7));
             case 7:
                 date.sec   = xs::in<ptime_t>(ST(1));
@@ -352,7 +352,7 @@ string strftime (Sv arg0, SV* arg1, ...) {
                 date.year  = xs::in<ptime_t>(ST(6));
                 timeany(&date, tz ? tz : tzlocal());
                 break;
-            case 3: tz = xs::in<const Timezone*>(ST(2));
+            case 3: tz = xs::in<TimezoneSP>(ST(2));
             case 2: {
                 auto epoch  = xs::in<ptime_t>(arg1);
                 if (!anytime(epoch, &date, tz ? tz : tzlocal())) XSRETURN_UNDEF;
@@ -394,7 +394,7 @@ string_view Date::tzabbr ()
 #// Date::tzname()
 #// $date->tzname()
 string tzname (Date* date = nullptr) {
-    const Timezone* zone = date ? date->timezone() : tzlocal();
+    auto& zone = date ? date->timezone() : tzlocal();
     RETVAL = zone->name;
 }
 
@@ -402,7 +402,7 @@ bool Date::tzlocal () {
     RETVAL = THIS->timezone()->is_local;
 }
 
-const Timezone* Date::timezone (const Timezone* newzone = {}) : ALIAS(tz=1, zone=2) {
+TimezoneSP Date::timezone (TimezoneSP newzone = {}) : ALIAS(tz=1, zone=2) {
     if (newzone) {
         THIS->timezone(newzone);
         XSRETURN_UNDEF;
@@ -411,7 +411,7 @@ const Timezone* Date::timezone (const Timezone* newzone = {}) : ALIAS(tz=1, zone
     PERL_UNUSED_VAR(ix);
 }
 
-void Date::to_timezone (const Timezone* newzone) : ALIAS(to_tz=1, to_zone=2) {
+void Date::to_timezone (TimezoneSP newzone) : ALIAS(to_tz=1, to_zone=2) {
     THIS->to_timezone(newzone);
     PERL_UNUSED_VAR(ix);
 }

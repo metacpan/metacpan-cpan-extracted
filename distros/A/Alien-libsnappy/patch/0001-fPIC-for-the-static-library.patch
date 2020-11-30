@@ -1,0 +1,25 @@
+From eccf0eca965587f92f8045d2514fd2a9d165de23 Mon Sep 17 00:00:00 2001
+From: Brian Fraser <brian.fraser@booking.com>
+Date: Mon, 23 Nov 2020 22:54:45 +0100
+Subject: [PATCH] -fPIC for the static library
+
+---
+ CMakeLists.txt | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 9a34d52..5a0709d 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -246,6 +246,8 @@ target_include_directories(snappy
+ set_target_properties(snappy
+   PROPERTIES VERSION ${PROJECT_VERSION} SOVERSION ${PROJECT_VERSION_MAJOR})
+ 
++set_property(TARGET snappy PROPERTY POSITION_INDEPENDENT_CODE ON)
++
+ target_compile_definitions(snappy PRIVATE -DHAVE_CONFIG_H)
+ if(BUILD_SHARED_LIBS)
+   set_target_properties(snappy PROPERTIES WINDOWS_EXPORT_ALL_SYMBOLS ON)
+-- 
+2.29.2
+

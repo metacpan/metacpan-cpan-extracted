@@ -4,7 +4,7 @@
       "Erik Huelsmann <ehuels@gmail.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -53,7 +53,7 @@
          "web" : "https://github.com/ehuelsmann/pherkin-extension-weasel"
       }
    },
-   "version" : "0.14",
+   "version" : "0.15",
    "x_contributors" : [
       "Mohammad S Anwar <mohammad.anwar@yahoo.com>",
       "Yves Lavoie <ylavoie@yveslavoie.com>"

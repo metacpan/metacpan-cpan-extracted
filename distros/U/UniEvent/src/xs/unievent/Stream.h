@@ -10,15 +10,15 @@ namespace xs {
 
 template <class TYPE> struct Typemap<panda::unievent::Stream*, TYPE> : Typemap<panda::unievent::BackendHandle*, TYPE> {};
 
-template <class TYPE> struct Typemap<panda::unievent::ConnectRequest*, TYPE> : Typemap<panda::unievent::Request*, TYPE> {
+template <class TYPE> struct Typemap<panda::unievent::ConnectRequest*, TYPE> : TypemapObject<panda::unievent::Request*, TYPE, ObjectTypeRefcntPtr, ObjectStorageMGBackref> {
     static panda::string package () { return "UniEvent::Request::Connect"; }
 };
 
-template <class TYPE> struct Typemap<panda::unievent::WriteRequest*, TYPE> : Typemap<panda::unievent::Request*, TYPE> {
+template <class TYPE> struct Typemap<panda::unievent::WriteRequest*, TYPE> : TypemapObject<panda::unievent::Request*, TYPE, ObjectTypeRefcntPtr, ObjectStorageMGBackref> {
     static panda::string package () { return "UniEvent::Request::Write"; }
 };
 
-template <class TYPE> struct Typemap<panda::unievent::ShutdownRequest*, TYPE> : Typemap<panda::unievent::Request*, TYPE> {
+template <class TYPE> struct Typemap<panda::unievent::ShutdownRequest*, TYPE> : TypemapObject<panda::unievent::Request*, TYPE, ObjectTypeRefcntPtr, ObjectStorageMGBackref> {
     static panda::string package () { return "UniEvent::Request::Shutdown"; }
 };
 

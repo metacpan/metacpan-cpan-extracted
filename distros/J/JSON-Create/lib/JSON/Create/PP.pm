@@ -56,7 +56,7 @@ use Carp qw/croak carp confess cluck/;
 use Scalar::Util qw/looks_like_number blessed reftype/;
 use Unicode::UTF8 qw/decode_utf8 valid_utf8/;
 use B;
-our $VERSION = '0.23';
+our $VERSION = '0.28';
 
 # http://stackoverflow.com/questions/1185822/how-do-i-create-or-test-for-nan-or-infinity-in-perl#1185828
 
@@ -263,6 +263,46 @@ sub handle_number
     return undef;
 }
 
+sub newline_indent
+{
+    my ($jc) = @_;
+    $jc->{output} .= "\n" . "\t" x $jc->{depth};
+}
+
+sub openB
+{
+    my ($jc, $b) = @_;
+    $jc->{output} .= $b;
+    if ($jc->{_indent}) {
+	$jc->{depth}++;
+	$jc->newline_indent ();
+    }
+}
+
+sub closeB
+{
+    my ($jc, $b) = @_;
+    if ($jc->{_indent}) {
+	$jc->{depth}--;
+	$jc->newline_indent ();
+    }
+    $jc->{output} .= $b;
+    if ($jc->{_indent}) {
+	if ($jc->{depth} == 0) {
+	    $jc->{output} .= "\n";
+	}
+    }
+}
+
+sub comma
+{
+    my ($jc) = @_;
+    $jc->{output} .= ',';
+    if ($jc->{_indent}) {
+	$jc->newline_indent ();
+    }
+}
+
 sub create_json_recursively
 {
     my ($jc, $input) = @_;
@@ -287,7 +327,7 @@ sub create_json_recursively
     }
     if ($ref) {
 	if ($ref eq 'HASH') {
-	    $jc->{output} .= '{';
+	    $jc->openB ('{');
 	    for my $k (keys %$input) {
 		my $error = stringify ($jc, $k);
 		if ($error) {
@@ -304,12 +344,13 @@ sub create_json_recursively
 			return $error;
 		    }
 		}
-		$jc->{output} .= ',';
+		$jc->comma ();
 	    }
-	    $jc->{output} =~ s/,$/}/;
+	    $jc->{output} =~ s/,(\s*)$/$1/;
+	    $jc->closeB ('}');
 	}
 	elsif ($ref eq 'ARRAY') {
-	    $jc->{output} .= '[';
+	    $jc->openB ('[');
 	    for my $k (@$input) {
 		my $bool = isbool (\$k);
 		if ($bool) {
@@ -321,9 +362,10 @@ sub create_json_recursively
 			return $error;
 		    }
 		}
-		$jc->{output} .= ',';
+		$jc->comma ();
 	    }
-	    $jc->{output} =~ s/,$/]/;
+	    $jc->{output} =~ s/,(\s*)$/$1/;
+	    $jc->closeB (']');
 	}
 	elsif ($ref eq 'SCALAR') {
 	    if ($jc->{_strict}) {
@@ -561,6 +603,12 @@ sub replace_bad_utf8
 sub validate
 {
     return JSON::Create::validate (@_);
+}
+
+sub indent
+{
+    my ($jc, $onoff) = @_;
+    $jc->{_indent} = !! $onoff;
 }
 
 1;

@@ -48,27 +48,34 @@ Metabolomics::Banks::AbInitioFragments - Perl extension for Ab Initio Fragments 
 
 =head1 VERSION
 
-Version 0.2
+Version 0.3 - Adding POD
 
 =cut
 
-our $VERSION = '0.2';
+our $VERSION = '0.3';
 
 
 =head1 SYNOPSIS
 
-    use Metabolomics::Banks::AbInitioFragments;
+use Metabolomics::Banks::AbInitioFragments;
 
 =head1 DESCRIPTION
 
-	Metabolomics::Banks::AbInitioFragments is a full package for Perl allowing to build a generic Perl bank object from Ab Initio fragments resource.
-	
+Metabolomics::Banks::AbInitioFragments is a full package for Perl allowing to build a generic Perl bank object from Ab Initio fragments resource.
 
 =head1 EXPORT
 
-=head1 SUBROUTINES/METHODS
+use Metabolomics::Banks::AbInitioFragments qw( :all ) ;
 
-=head2 METHOD new
+=head1 PUBLIC METHODS 
+
+
+=head2 Metabolomics::Banks::AbInitioFragments
+
+
+=over 4
+
+=item new 
 
 	## Description : new
 	## Input : $self
@@ -96,156 +103,16 @@ sub new {
 }
 ### END of SUB
 
-=head2 METHOD __refBloodExposomeEntry__
 
-	## Description : init a new ab initio fragment entry
-	## Input : void	
-	## Output : refEntry
-	## Usage : $self->__refAbInitioFragment__() ;
-	
-=cut
-## START of SUB
-sub __refAbInitioFragment__ {
-    ## Variables
-    my ($class,$args) = @_;
-    my $self={};
-
-    bless($self) ;
-    
-    $self->{_TYPE_} = 'type' ; # STRING as adducts, fragment or isotope
-    $self->{_LOSSES_OR_GAINS_} = 'losses_or_gains' ;
-    $self->{_DELTA_MASS_} = 'delta_mass' ;
-    $self->{_ANNOTATION_IN_POS_MODE_} = 'annotation_in_pos_mode' ;
-    $self->{_ANNOTATION_IN_NEG_MODE_} = 'annotation_in_neg_mode' ;
-
-    return $self ;
-}
-### END of SUB
-
-# * * * * * * * * * *get/setter  * * * * * * * * * *#
-
-=head2 METHOD _getANNOTATION_IN_NEG_MODE
-
-	## Description : _getANNOTATION_IN_NEG_MODE
-	## Input : void
-	## Output : $ANNOTATION_IN_NEG_MODE
-	## Usage : my ( $ANNOTATION_IN_NEG_MODE ) = _getANNOTATION_IN_NEG_MODE () ;
-	
-=cut
-## START of SUB
-sub _getFragment_ANNOTATION_IN_NEG_MODE {
-    ## Retrieve Values
-    my $self = shift ;
-    
-    my $ANNOTATION_IN_NEG_MODE = undef ;
-    
-    if ( (defined $self->{_ANNOTATION_IN_NEG_MODE_}) and ( $self->{_ANNOTATION_IN_NEG_MODE_} ne '' ) ) {	$ANNOTATION_IN_NEG_MODE = $self->{_ANNOTATION_IN_NEG_MODE_} ; }
-    #else {	 $ANNOTATION_IN_NEG_MODE = undef ; warn "[WARN] the method _getFragment_ANNOTATION_IN_NEG_MODE get a undef or null string value\n" ; }
-    
-    return ( $ANNOTATION_IN_NEG_MODE ) ;
-}
-### END of SUB
-
-
-
-=head2 METHOD _getANNOTATION_IN_POS_MODE
-
-	## Description : _getANNOTATION_IN_POS_MODE
-	## Input : void
-	## Output : $ANNOTATION_IN_POS_MODE
-	## Usage : my ( $ANNOTATION_IN_POS_MODE ) = _getANNOTATION_IN_POS_MODE () ;
-	
-=cut
-## START of SUB
-sub _getFragment_ANNOTATION_IN_POS_MODE {
-    ## Retrieve Values
-    my $self = shift ;
-    
-    my $ANNOTATION_IN_POS_MODE = undef ;
-    
-    if ( (defined $self->{_ANNOTATION_IN_POS_MODE_}) and ( $self->{_ANNOTATION_IN_POS_MODE_} ne '' ) ) {	$ANNOTATION_IN_POS_MODE = $self->{_ANNOTATION_IN_POS_MODE_} ; }
-    #else {	 $ANNOTATION_IN_POS_MODE = undef ; warn "[WARN] the method _getFragment_ANNOTATION_IN_POS_MODE get a undef or null string value\n" ; }
-    
-    return ( $ANNOTATION_IN_POS_MODE ) ;
-}
-### END of SUB
-
-
-=head2 METHOD _getDELTA_MASS
-
-	## Description : _getDELTA_MASS
-	## Input : void
-	## Output : $DELTA_MASS
-	## Usage : my ( $DELTA_MASS ) = _getDELTA_MASS () ;
-	
-=cut
-## START of SUB
-sub _getFragment_DELTA_MASS {
-    ## Retrieve Values
-    my $self = shift ;
-    
-    my $DELTA_MASS = undef ;
-    
-    if ( (defined $self->{_DELTA_MASS_}) and ( $self->{_DELTA_MASS_} > 0 ) or $self->{_DELTA_MASS_} < 0  ) {	$DELTA_MASS = $self->{_DELTA_MASS_} ; }
-    else {	 $DELTA_MASS = 0 ; warn "[WARN] the method _getFragment_DELTA_MASS can't _get a undef or non numerical value\n" ; }
-    
-    return ( $DELTA_MASS ) ;
-}
-### END of SUB
-
-=head2 METHOD _getTYPE
-
-	## Description : _getTYPE
-	## Input : void
-	## Output : $TYPE
-	## Usage : my ( $TYPE ) = _getTYPE () ;
-	
-=cut
-## START of SUB
-sub _getFragment_TYPE {
-    ## Retrieve Values
-    my $self = shift ;
-    
-    my $TYPE = undef ;
-    
-    if ( (defined $self->{_TYPE_}) and ( $self->{_TYPE_} ne '' ) ) {	$TYPE = $self->{_TYPE_} ; }
-    else {	 $TYPE = undef ; warn "[WARN] the method _getFragment_TYPE can't _get a undef or non numerical value\n" ; }
-    
-    return ( $TYPE ) ;
-}
-### END of SUB
-
-=head2 METHOD _getLOSSES_OR_GAINS
-
-	## Description : _getLOSSES_OR_GAINS
-	## Input : void
-	## Output : $LOSSES_OR_GAINS
-	## Usage : my ( $LOSSES_OR_GAINS ) = _getLOSSES_OR_GAINS () ;
-	
-=cut
-## START of SUB
-sub _getFragment_LOSSES_OR_GAINS {
-    ## Retrieve Values
-    my $self = shift ;
-    
-    my $LOSSES_OR_GAINS = undef ;
-    
-    if ( (defined $self->{_LOSSES_OR_GAINS_}) and ( $self->{_LOSSES_OR_GAINS_} ne '' ) ) {	$LOSSES_OR_GAINS = $self->{_LOSSES_OR_GAINS_} ; }
-    else {	 $LOSSES_OR_GAINS = undef ; warn "[WARN] the method _getFragment_LOSSES_OR_GAINS can't _get a undef or non numerical value\n" ; }
-    
-    return ( $LOSSES_OR_GAINS ) ;
-}
-### END of SUB
-
-
-=head2 METHOD getFragmentsFromSource
+=item METHOD getFragmentsFromSource
 
 	## Description : get the list of theorical fragments from $source file
 	## Input : $source
 	## Output : $theoFragments
 	## Usage : my ( $theoFragments ) = getFragmentsFromSource ( $source ) ;
-	
+
 =cut
+
 ## START of SUB
 sub getFragmentsFromSource {
     ## Retrieve Values
@@ -309,14 +176,15 @@ sub getFragmentsFromSource {
 ### END of SUB
 
 
-=head2 METHOD buildTheoPeakBankFromFragments
+=item METHOD buildTheoPeakBankFromFragments
 
 	## Description : building a bank integrating each potential fragments from a parent ion
 	## Input : $refBank, $mzParent, $mode (POSITIVE, NEGATIVE, NEUTRAL), $stateMolecule (POS, NEG, NEU)
 	## Output : $ionBank
 	## Usage : my ( $ionBank ) = buildTheoPeakBankFromFragments ( $refBank, $mzParent ) ;
-	
+
 =cut
+
 ## START of SUB
 sub buildTheoPeakBankFromFragments {
     ## Retrieve Values
@@ -393,14 +261,15 @@ sub buildTheoPeakBankFromFragments {
 }
 ### END of SUB
 
-=head2 METHOD buildTheoDimerFromMz
+=item METHOD buildTheoDimerFromMz
 
 	## Description : build potential dimers/trimers in NEG/POS mode
 	## Input : $Mz, $mode
 	## Output : $oBank
 	## Usage : my ( $oBank ) = buildTheoDimerFromMz ( $Mz, $mode ) ;
-	
+
 =cut
+
 ## START of SUB
 sub buildTheoDimerFromMz {
     ## Retrieve Values
@@ -488,17 +357,15 @@ sub buildTheoDimerFromMz {
 }
 ### END of SUB
 
-
-
-
-=head2 METHOD isotopicAdvancedCalculation
+=item METHOD isotopicAdvancedCalculation
 
 	## Description : if a fragment is present in theorical bank, compute its isotopic couple.
 	## Input : $refBank
 	## Output : $ionBank
 	## Usage : my ( $ionBank ) = isotopicAdvancedCalculation ( $refBank ) ;
-	
+
 =cut
+
 ## START of SUB
 sub isotopicAdvancedCalculation {
     ## Retrieve Values
@@ -571,17 +438,170 @@ sub isotopicAdvancedCalculation {
 }
 ### END of SUB
 
+=back
+
+=head1 PRIVATE METHODS
+
+=head2 Metabolomics::Banks::AbInitioFragments
+
+=over 4
+
+=item PRIVATE_ONLY __refBloodExposomeEntry__
+
+	## Description : init a new ab initio fragment entry
+	## Input : void	
+	## Output : refEntry
+	## Usage : $self->__refAbInitioFragment__() ;
+
+=cut
+
+## START of SUB
+sub __refAbInitioFragment__ {
+    ## Variables
+    my ($class,$args) = @_;
+    my $self={};
+
+    bless($self) ;
+    
+    $self->{_TYPE_} = 'type' ; # STRING as adducts, fragment or isotope
+    $self->{_LOSSES_OR_GAINS_} = 'losses_or_gains' ;
+    $self->{_DELTA_MASS_} = 'delta_mass' ;
+    $self->{_ANNOTATION_IN_POS_MODE_} = 'annotation_in_pos_mode' ;
+    $self->{_ANNOTATION_IN_NEG_MODE_} = 'annotation_in_neg_mode' ;
+
+    return $self ;
+}
+### END of SUB
+
+# * * * * * * * * * *get/setter  * * * * * * * * * *#
+
+=item PRIVATE_ONLY _getANNOTATION_IN_NEG_MODE
+
+	## Description : _getANNOTATION_IN_NEG_MODE
+	## Input : void
+	## Output : $ANNOTATION_IN_NEG_MODE
+	## Usage : my ( $ANNOTATION_IN_NEG_MODE ) = _getANNOTATION_IN_NEG_MODE () ;
+
+=cut
+
+## START of SUB
+sub _getFragment_ANNOTATION_IN_NEG_MODE {
+    ## Retrieve Values
+    my $self = shift ;
+    
+    my $ANNOTATION_IN_NEG_MODE = undef ;
+    
+    if ( (defined $self->{_ANNOTATION_IN_NEG_MODE_}) and ( $self->{_ANNOTATION_IN_NEG_MODE_} ne '' ) ) {	$ANNOTATION_IN_NEG_MODE = $self->{_ANNOTATION_IN_NEG_MODE_} ; }
+    #else {	 $ANNOTATION_IN_NEG_MODE = undef ; warn "[WARN] the method _getFragment_ANNOTATION_IN_NEG_MODE get a undef or null string value\n" ; }
+    
+    return ( $ANNOTATION_IN_NEG_MODE ) ;
+}
+### END of SUB
+
+=item PRIVATE_ONLY _getANNOTATION_IN_POS_MODE
+
+	## Description : _getANNOTATION_IN_POS_MODE
+	## Input : void
+	## Output : $ANNOTATION_IN_POS_MODE
+	## Usage : my ( $ANNOTATION_IN_POS_MODE ) = _getANNOTATION_IN_POS_MODE () ;
+
+=cut
+
+## START of SUB
+sub _getFragment_ANNOTATION_IN_POS_MODE {
+    ## Retrieve Values
+    my $self = shift ;
+    
+    my $ANNOTATION_IN_POS_MODE = undef ;
+    
+    if ( (defined $self->{_ANNOTATION_IN_POS_MODE_}) and ( $self->{_ANNOTATION_IN_POS_MODE_} ne '' ) ) {	$ANNOTATION_IN_POS_MODE = $self->{_ANNOTATION_IN_POS_MODE_} ; }
+    #else {	 $ANNOTATION_IN_POS_MODE = undef ; warn "[WARN] the method _getFragment_ANNOTATION_IN_POS_MODE get a undef or null string value\n" ; }
+    
+    return ( $ANNOTATION_IN_POS_MODE ) ;
+}
+### END of SUB
+
+=item PRIVATE_ONLY _getDELTA_MASS
+
+	## Description : _getDELTA_MASS
+	## Input : void
+	## Output : $DELTA_MASS
+	## Usage : my ( $DELTA_MASS ) = _getDELTA_MASS () ;
+
+=cut
+
+## START of SUB
+sub _getFragment_DELTA_MASS {
+    ## Retrieve Values
+    my $self = shift ;
+    
+    my $DELTA_MASS = undef ;
+    
+    if ( (defined $self->{_DELTA_MASS_}) and ( $self->{_DELTA_MASS_} > 0 ) or $self->{_DELTA_MASS_} < 0  ) {	$DELTA_MASS = $self->{_DELTA_MASS_} ; }
+    else {	 $DELTA_MASS = 0 ; warn "[WARN] the method _getFragment_DELTA_MASS can't _get a undef or non numerical value\n" ; }
+    
+    return ( $DELTA_MASS ) ;
+}
+### END of SUB
+
+=item PRIVATE_ONLY _getFragment_TYPE
+
+	## Description : _getFragment_TYPE
+	## Input : void
+	## Output : $TYPE
+	## Usage : my ( $TYPE ) = _getFragment_TYPE () ;
+
+=cut
+
+## START of SUB
+sub _getFragment_TYPE {
+    ## Retrieve Values
+    my $self = shift ;
+    
+    my $TYPE = undef ;
+    
+    if ( (defined $self->{_TYPE_}) and ( $self->{_TYPE_} ne '' ) ) {	$TYPE = $self->{_TYPE_} ; }
+    else {	 $TYPE = undef ; warn "[WARN] the method _getFragment_TYPE can't _get a undef or non numerical value\n" ; }
+    
+    return ( $TYPE ) ;
+}
+### END of SUB
+
+=item PRIVATE_ONLY _getLOSSES_OR_GAINS
+
+	## Description : _getLOSSES_OR_GAINS
+	## Input : void
+	## Output : $LOSSES_OR_GAINS
+	## Usage : my ( $LOSSES_OR_GAINS ) = _getLOSSES_OR_GAINS () ;
+
+=cut
+
+## START of SUB
+sub _getFragment_LOSSES_OR_GAINS {
+    ## Retrieve Values
+    my $self = shift ;
+    
+    my $LOSSES_OR_GAINS = undef ;
+    
+    if ( (defined $self->{_LOSSES_OR_GAINS_}) and ( $self->{_LOSSES_OR_GAINS_} ne '' ) ) {	$LOSSES_OR_GAINS = $self->{_LOSSES_OR_GAINS_} ; }
+    else {	 $LOSSES_OR_GAINS = undef ; warn "[WARN] the method _getFragment_LOSSES_OR_GAINS can't _get a undef or non numerical value\n" ; }
+    
+    return ( $LOSSES_OR_GAINS ) ;
+}
+### END of SUB
 
 
 __END__
 
+=back
+
 =head1 AUTHOR
 
-Franck Giacomoni, C<< <franck.giacomoni at inra.fr> >>
+Franck Giacomoni, C<< <franck.giacomoni at inrae.fr> >>
 
 =head1 SEE ALSO
 
-All information about Metabolomics::Fragment would be find here: https://services.pfem.clermont.inra.fr/gitlab/fgiacomoni/metabolomics-fragnot
+All information about Metabolomics::Fragment::Annotation would be find here: https://services.pfem.clermont.inra.fr/gitlab/fgiacomoni/metabolomics-fragnot
 
 =head1 BUGS
 
@@ -619,6 +639,7 @@ L<https://metacpan.org/release/Metabolomics-Fragment-Annotation>
 
 =head1 ACKNOWLEDGEMENTS
 
+Thank you to INRAE and All metabolomics colleagues.
 
 =head1 LICENSE AND COPYRIGHT
 
@@ -626,9 +647,9 @@ CeCILL Copyright (C) 2019 by Franck Giacomoni
 
 Initiated by Franck Giacomoni
 
-followed by INRA PFEM team
+followed by INRAE PFEM team
 
-Web Site = INRA PFEM
+Web Site = INRAE PFEM
 
 
 =cut

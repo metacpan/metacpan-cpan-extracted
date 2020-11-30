@@ -1,7 +1,11 @@
-1.0112 2019-05-08
+1.0115 2020-11-23
+ * Fix implicit moveto => lineto
+ * Increase number of points per curve for better estimation of min/max
+
+1.0114 2019-05-08
  * Fix estimation of quadratic Bezier curves.
 
-1.0112 2019-04-01
+1.0113 2019-04-01
  * Version bump on List::Util to allow usage of pairs.
 
 1.0112 2019-03-31

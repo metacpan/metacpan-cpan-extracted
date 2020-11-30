@@ -1,11 +1,11 @@
-#include "URI.h"
+#include "parser.h"
 
 namespace panda { namespace uri {
 
 // ============== RFC3986 compliant parser ===================
 
 %%{
-    machine uri_parser;
+    machine uri_parser_base;
     
     action mark {
         mark = p - ps;
@@ -30,6 +30,7 @@ namespace panda { namespace uri {
     gen_delim   = ":" | "/" | "?" | "#" | "[" | "]" | "@";
     reserved    = sub_delim | gen_delim;
     unreserved  = alnum | "-" | "." | "_" | "~";
+    
     pct_encoded = "%" xdigit{2};
     pchar       = unreserved | pct_encoded | sub_delim | ":" | "@";
     
@@ -80,13 +81,18 @@ namespace panda { namespace uri {
 
     hier_part = "//" authority path_abempty | path_absolute | path_rootless | path_empty;
 
-    query    = (pchar | "/" | "?")* >mark %query;
     fragment = (pchar | "/" | "?")* >mark %fragment;
 
-    absolute_uri = scheme ":" hier_part ("?" query)? ("#" fragment)?;
-
     relative_part = "//" authority path_abempty | path_absolute | path_noscheme | path_empty;
-    relative_ref  = relative_part ("?" query)? ("#" fragment)?;
+}%%
+
+%%{ 
+    machine uri_parser;
+    include uri_parser_base;
+
+    query        = (pchar | "/" | "?")* >mark %query;
+    absolute_uri = scheme ":" hier_part ("?" query)? ("#" fragment)?;
+    relative_ref = relative_part ("?" query)? ("#" fragment)?;
     
     uri := absolute_uri | relative_ref;
     
@@ -96,7 +102,7 @@ namespace panda { namespace uri {
 #define SAVE(dest)  dest = str.substr(mark, p - ps - mark);
 #define NSAVE(dest) dest = acc; acc = 0
 
-void URI::parse (const string& str) {
+bool URI::_parse (const string& str, bool& authority_has_pct) {
     const char* ps  = str.data();
     const char* p   = ps;
     const char* pe  = p + str.length();
@@ -104,23 +110,10 @@ void URI::parse (const string& str) {
     int         cs  = uri_parser_start;
     size_t      mark;
     int acc = 0;
-    bool authority_has_pct = false;
     
     %% write exec;
     
-    if (cs < uri_parser_first_final) {
-        clear();
-        return;
-    }
-    
-    if (authority_has_pct) {
-        decode_uri_component(_user_info, _user_info);
-        decode_uri_component(_host, _host);
-    }
-    
-    if (_qstr) ok_qstr();
-    if (_flags & Flags::allow_suffix_reference && !_host.length()) guess_suffix_reference();
-    sync_scheme_info();
+    return cs >= uri_parser_first_final;
 }
 
 }}

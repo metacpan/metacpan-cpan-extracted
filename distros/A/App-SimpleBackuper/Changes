@@ -1,14 +1,20 @@
-0.2.15	2020-01-15
+0.2.17	2020-11-26
+	- Reduced memory utilization at start.
+	- Undebug.
+	- Zero compression level in tests.
+0.2.16	2020-11-21
+	- Fix backuping crash when dir from config doesn't exists.
+0.2.15	2020-11-15
 	- Fix bug: infonity attempts ti read when reads more than 0 bytes and then read fails.
 	- Minor cosmetic fix for verbose mode.
-0.2.14	2020-01-15
+0.2.14	2020-11-15
 	- Fix bug with output compression ratio of zero file.
-0.2.13	2020-01-08
+0.2.13	2020-11-08
 	- Remove debug of OOM on openBSD: cause of OOM in Compress::Raw::Lzma & this compression method eats many of RAM.
-0.2.12	2020-01-05
+0.2.12	2020-11-05
 	- Removed requirements included to perl core.
 	- Debug OOM for openbsd.
-0.2.11	2020-01-02
+0.2.11	2020-11-02
 	- Do not restoring mode and ownership of symlinks.
 	- Debug OOM for openbsd.
 0.2.10	2020-10-31

@@ -5,7 +5,7 @@ use warnings;
 use LWP::UserAgent;
 use JSON;
 
-our $VERSION = 1.041;
+our $VERSION = 1.042;
 
 use Encode;
 use utf8;
@@ -22,7 +22,7 @@ sub new {
 
         _post_url => defined $params->{post_url}
         ? $params->{post_url}
-        : 'https://buscacep.correios.com.br/app/endereco/carrega-cep-endereco.php',
+        : 'https://buscacepinter.correios.com.br/app/endereco/carrega-cep-endereco.php',
 
         _post_content => defined $params->{post_content}
         ? $params->{post_content}

@@ -1,9 +1,29 @@
 ==================================================
-Changes from 2019-10-31 00:00:00 +0000 to present.
+Changes from 2019-12-01 00:00:00 +0000 to present.
 ==================================================
 
 ------------------------------------------
-version 0.053 at 2020-10-30 16:56:38 +0000
+version 0.055 at 2020-11-30 16:50:10 +0000
+------------------------------------------
+
+  Change: da94d9b658b3086c321b3f21c503c5a7922e0035
+  Author: John Gravatt <john@gravatt.org>
+  Date : 2020-11-30 10:47:46 +0000
+
+    removed PkgMgmt modules (moved to Linux-Utils) 
+
+------------------------------------------
+version 0.054 at 2020-11-25 22:08:57 +0000
+------------------------------------------
+
+  Change: 4ad7ca4fdc396ac34ab300a38d1edae29c8d3912
+  Author: John Gravatt <john@gravatt.org>
+  Date : 2020-11-25 16:08:57 +0000
+
+    moved PkgManager::* namespace to Linux::PkgMgmt::* 
+
+------------------------------------------
+version 0.053 at 2020-10-30 16:56:22 +0000
 ------------------------------------------
 
   Change: 7ae52d86b2b12608337be8646329fdb19685dee8
@@ -470,217 +490,6 @@ version 0.017 at 2019-12-02 19:42:40 +0000
 
     added maxDepth option to find* methods 
 
-------------------------------------------
-version 0.016 at 2019-11-26 20:01:26 +0000
-------------------------------------------
-
-  Change: b5ffab2061337f9129ef0880f3e9c21ff01eddfc
-  Author: John Gravatt <john@gravatt.org>
-  Date : 2019-11-26 13:58:19 +0000
-
-    added wantArrayRefs option to Spawn::capture() 
-
-------------------------------------------
-version 0.015 at 2019-11-26 19:51:39 +0000
-------------------------------------------
-
-  Change: 06e39675f1022ae72b138f51e18fc477e8f77fcf
-  Author: John Gravatt <john@gravatt.org>
-  Date : 2019-11-26 13:50:41 +0000
-
-    - added more POD - other small tweaks 
-
-------------------------------------------
-version 0.014 at 2019-11-26 19:46:39 +0000
-------------------------------------------
-
-  Change: d1464dd53898b1186fb786648daf246d4a9cd419
-  Author: John Gravatt <john@gravatt.org>
-  Date : 2019-11-26 13:46:39 +0000
-
-    modified File::find() to exclude the search dir from the results 
-
-------------------------------------------
-version 0.013 at 2019-11-21 20:46:22 +0000
-------------------------------------------
-
-  Change: 385915d304e5f2312669497c7d35c7d081d5dc02
-  Author: John Gravatt <john@gravatt.org>
-  Date : 2019-11-21 14:46:22 +0000
-
-    added medley cli 
-
-------------------------------------------
-version 0.012 at 2019-11-21 15:02:03 +0000
-------------------------------------------
-
-  Change: 5c1d61cb61f170491f09db3ddef534a64da5a22a
-  Author: John Gravatt <john@gravatt.org>
-  Date : 2019-11-21 09:01:42 +0000
-
-    added more test cases for DateTime.pm 
-
-------------------------------------------
-version 0.011 at 2019-11-21 14:59:58 +0000
-------------------------------------------
-
-  Change: 5225709e77821f254edcaee0f4bf8fa2d15d1e11
-  Author: John Gravatt <john@gravatt.org>
-  Date : 2019-11-21 08:59:58 +0000
-
-    added nsort to List.pm 
-
-  Change: 2bd01c4aeb344099f740bb90e22469a7929cffc5
-  Author: John Gravatt <john@gravatt.org>
-  Date : 2019-11-19 13:48:57 +0000
-
-    pod cleanup on XML.pm 
-
-------------------------------------------
-version 0.010 at 2019-11-19 19:47:53 +0000
-------------------------------------------
-
-  Change: 97f704f93ddae7f2f8f57d9787594ac4d660be9d
-  Author: John Gravatt <john@gravatt.org>
-  Date : 2019-11-19 13:47:53 +0000
-
-    added methods to DateTime.pm and one method to String.pm. also, cleaned
-    up some pod errors. 
-
-------------------------------------------
-version 0.009 at 2019-11-19 15:47:42 +0000
-------------------------------------------
-
-  Change: 225fa2f4549cb82211c7b5a229ba5834a0ffab38
-  Author: John Gravatt <john@gravatt.org>
-  Date : 2019-11-19 09:47:42 +0000
-
-    fixed test case in t/99-medley.t 
-
-  Change: 6af8abef8831adaa8357b0049fec34a1887a4214
-  Author: John Gravatt <john@gravatt.org>
-  Date : 2019-11-19 09:46:11 +0000
-
-    modified DateTime.pm to follow camel-case convention. added
-    localDateTimeIsValid method 
-
-  Change: 4f6e5e6df5e836dfc333814ad2ef5c93905abaf5
-  Author: John Gravatt <john@gravatt.org>
-  Date : 2019-11-14 13:26:12 +0000
-
-    updated README.build 
-
-------------------------------------------
-version 0.008 at 2019-11-14 19:25:14 +0000
-------------------------------------------
-
-  Change: 994b111a993fd242d04b1cfe4e079d41ac1a9628
-  Author: John Gravatt <john@gravatt.org>
-  Date : 2019-11-14 13:25:14 +0000
-
-    v0.008 
-
-  Change: b8b48975b40c761618b795f438e5b6a5fc0c3c4b
-  Author: John Gravatt <john@gravatt.org>
-  Date : 2019-11-14 13:23:54 +0000
-
-    refactored to use Kavorka 
-
-------------------------------------------
-version 0.007 at 2019-11-04 17:31:20 +0000
-------------------------------------------
-
-  Change: 3d95b3e3a0dab29e6f3616b2c9a3edb731be50e2
-  Author: John Gravatt <john@gravatt.org>
-  Date : 2019-11-04 11:30:54 +0000
-
-    updated documentation for lib/Util/Medley/DateTime.pm 
-
-------------------------------------------
-version 0.006 at 2019-11-04 17:25:15 +0000
-------------------------------------------
-
-  Change: a2b2616f4f973045caa3a7ae2b1bfdef0df0f423
-  Author: John Gravatt <john@gravatt.org>
-  Date : 2019-11-04 11:25:15 +0000
-
-    v0.006 
-
-  Change: f1c6622bbde22b40531f20aa9a0d246b42f14a4b
-  Author: John Gravatt <john@gravatt.org>
-  Date : 2019-11-04 11:24:37 +0000
-
-    refactored named pair args to use shorter ns 
-
-  Change: 1256ee8ccc4aeac368fdd6072a90c4c1f8fc5291
-  Author: John Gravatt <john@gravatt.org>
-  Date : 2019-11-04 11:24:04 +0000
-
-    updated documentation for Util::Medley::Crypt 
-
-  Change: 8216f878748b22e6780895704eea2313c74c2e4d
-  Author: John Gravatt <john@gravatt.org>
-  Date : 2019-11-04 10:40:52 +0000
-
-    removed Changes file 
-
-------------------------------------------
-version 0.004 at 2019-11-04 16:35:17 +0000
-------------------------------------------
-
-  Change: 125ad803228b1ad8c7141f871a0a63f63c900b5e
-  Author: John Gravatt <john@gravatt.org>
-  Date : 2019-11-04 10:35:17 +0000
-
-    fixed pod formatting in Util::Medley::File 
-
-  Change: 4e285de2edf3df97d6882c0f7118561242f0866e
-  Author: John Gravatt <john@gravatt.org>
-  Date : 2019-11-01 16:44:58 +0000
-
-    fixed pod format in lib/Util/Medley/File.pm 
-
-  Change: 3b74d17aa96de44c4384588d756100817eac2874
-  Author: John Gravatt <john@gravatt.org>
-  Date : 2019-11-01 16:41:52 +0000
-
-
-  Change: 3cbd88454cef49104a83b4cbd9c7de71b5780514
-  Author: John Gravatt <john@gravatt.org>
-  Date : 2019-10-30 15:25:26 +0000
-
-    first release 
-
-  Change: 834d6d182e30064bc2c7ee3a5331a8860a9dd5be
-  Author: John Gravatt <john@gravatt.org>
-  Date : 2019-10-28 16:40:07 +0000
-
-    checkpoint 
-
-  Change: 3089c5c181d84148ef7e1bcd3b216c256362b876
-  Author: John Gravatt <john@gravatt.org>
-  Date : 2019-10-28 12:05:56 +0000
-
-    no msg 
-
-  Change: 6b4cdd16bd20989fbd1892742824af92295db93a
-  Author: John Gravatt <john@gravatt.org>
-  Date : 2019-10-28 11:59:35 +0000
-
-    more files 
-
-  Change: d6b914d578231a3eb8ee18ddef54eead1bcc61f4
-  Author: John Gravatt <john@gravatt.org>
-  Date : 2019-10-28 11:58:17 +0000
-
-    more files 
-
-  Change: 069b34e6c84a73ddc0c32f8258057214aa672de2
-  Author: John Gravatt <john@gravatt.org>
-  Date : 2019-10-28 11:57:42 +0000
-
-    first 
-
-================
-End of releases.
-================
+=================================================
+Plus 12 releases after 2019-12-01 00:00:00 +0000.
+=================================================

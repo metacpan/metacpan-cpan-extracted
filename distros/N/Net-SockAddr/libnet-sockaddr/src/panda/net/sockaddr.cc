@@ -38,10 +38,10 @@ const in_addr SockAddr::Inet4::addr_none      = to_inaddr(INADDR_NONE);
 const in6_addr SockAddr::Inet6::addr_any      = IN6ADDR_ANY_INIT;
 const in6_addr SockAddr::Inet6::addr_loopback = IN6ADDR_LOOPBACK_INIT;
 
-const SockAddr::Inet4 SockAddr::Inet4::sa_any     (SockAddr::Inet4::addr_any, 0);
-const SockAddr::Inet4 SockAddr::Inet4::sa_loopback(SockAddr::Inet4::addr_loopback, 0);
-const SockAddr::Inet6 SockAddr::Inet6::sa_any     (SockAddr::Inet6::addr_any, 0);
-const SockAddr::Inet6 SockAddr::Inet6::sa_loopback(SockAddr::Inet6::addr_loopback, 0);
+const SockAddr::Inet4 SockAddr::Inet4::sockaddr_any     (SockAddr::Inet4::addr_any, 0);
+const SockAddr::Inet4 SockAddr::Inet4::sockaddr_loopback(SockAddr::Inet4::addr_loopback, 0);
+const SockAddr::Inet6 SockAddr::Inet6::sockaddr_any     (SockAddr::Inet6::addr_any, 0);
+const SockAddr::Inet6 SockAddr::Inet6::sockaddr_loopback(SockAddr::Inet6::addr_loopback, 0);
 
 static system_error _not_supported () { return system_error(make_error_code(errc::address_family_not_supported)); }
 

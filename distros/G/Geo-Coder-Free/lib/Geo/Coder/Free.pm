@@ -21,11 +21,11 @@ Geo::Coder::Free - Provides a Geo-Coding functionality using free databases
 
 =head1 VERSION
 
-Version 0.28
+Version 0.29
 
 =cut
 
-our $VERSION = '0.28';
+our $VERSION = '0.29';
 
 our $alternatives;
 our $abbreviations;
@@ -43,7 +43,7 @@ sub _normalize($);
     print 'Latitude: ', $location->lat(), "\n";
     print 'Longitude: ', $location->long(), "\n";
 
-    # Use a local download of http://results.openaddresses.io/
+    # Use a local download of http://results.openaddresses.io/ and https://www.whosonfirst.org/
     my $openaddr_geo_coder = Geo::Coder::Free->new(openaddr => $ENV{'OPENADDR_HOME'});
     $location = $openaddr_geo_coder->geocode(location => '1600 Pennsylvania Avenue NW, Washington DC, USA');
 
@@ -141,15 +141,19 @@ my %common_words = (
 	'the' => 1,
 	'and' => 1,
 	'at' => 1,
+	'be' => 1,
+	'by' => 1,
 	'she' => 1,
 	'of' => 1,
 	'for' => 1,
 	'on' => 1,
+	'pm' => 1,
 	'in' => 1,
 	'an' => 1,
 	'to' => 1,
 	'road' => 1,
-	'is' => 1
+	'is' => 1,
+	'was' => 1
 );
 
 sub geocode {
@@ -175,7 +179,17 @@ sub geocode {
 					# FIXME:  There are a *lot* of false positives
 					next if(exists($common_words{lc$word}));
 					if($word =~ /^[a-z]{2,}$/i) {
-						@rc = (@rc, $self->{'maxmind'}->geocode({ location => $word, region => $region }));
+						my $key = "$word/$region";
+						my @matches;
+						if($self->{'scantext'}->{$key}) {
+							# ::diag("$key: HIT");
+							@matches = @{$self->{'scantext'}->{$key}};
+						} else {
+							# ::diag("$key: MISS");
+							@matches = $self->{'maxmind'}->geocode({ location => $word, region => $region });
+						}
+						$self->{'scantext'}->{$key} = \@matches;
+						@rc = (@rc, @matches);
 					}
 
 				}
@@ -297,7 +311,7 @@ sub run {
 
 	my @rc;
 	if($ENV{'OPENADDR_HOME'}) {
-		@rc = $class->new(openaddr => $ENV{'OPENADDR_HOME'})->geocode($location);
+		@rc = $class->new(directory => $ENV{'OPENADDR_HOME'})->geocode($location);
 	} else {
 		@rc = $class->new()->geocode($location);
 	}
@@ -392,7 +406,16 @@ Can't parse and handle "London, England".
 
 =head1 SEE ALSO
 
-VWF, OpenAddresses, MaxMind and geonames.
+L<https://openaddresses.io/>,
+L<https://www.maxmind.com/en/home>,
+L<https://www.geonames.org/>,
+L<https://raw.githubusercontent.com/dr5hn/countries-states-cities-database/master/countries%2Bstates%2Bcities.json>,
+L<https://www.whosonfirst.org/> and
+L<https://github.com/nigelhorne/vwf>.
+
+L<Geo::Coder::Free::Local>,
+L<Geo::Coder::Free::Maxmind>,
+L<Geo::Coder::Free::OpenAddresses>.
 
 See L<Geo::Coder::Free::OpenAddresses> for instructions creating the SQLite database from
 L<http://results.openaddresses.io/>.

@@ -1,0 +1,15 @@
+Changes
+lib/Alien/libsnappy.pm
+Makefile.PL
+MANIFEST			This list of files
+README.md
+t/00-load.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+alienfile
+ignore.txt
+patch/0001-fPIC-for-the-static-library.patch
+
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

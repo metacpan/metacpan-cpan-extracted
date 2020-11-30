@@ -1,7 +1,7 @@
 package XS::libdwarf;
 use 5.012;
 
-our $VERSION = "20200114.8";
+our $VERSION = "20201123.0";
 
 use XS::Loader;
 
@@ -25,7 +25,7 @@ In your Makefile.PL
 
 =head1 DESCRIPTION
 
-This module makes it possible to use L<DWARF library|https://sourceforge.net/projects/libdwarf/> 
+This module makes it possible to use L<DWARF library|https://sourceforge.net/projects/libdwarf/>
 from XS modules.
 
 No perl interface.

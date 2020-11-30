@@ -13,7 +13,7 @@ BEGIN {
 
 use Graph::AdjacencyMap qw(:flags :fields);
 
-our $VERSION = '0.9708';
+our $VERSION = '0.9711';
 
 require 5.006; # Weak references are absolutely required.
 
@@ -1373,7 +1373,7 @@ sub has_vertex_attribute_by_id {
 sub get_vertex_attributes {
     my $g = shift;
     $g->expect_non_multivertexed;
-    return unless $g->has_vertex( @_ );
+    return undef unless $g->has_vertex( @_ );
     my $a = $g->[ _V ]->_get_path_attrs( @_ );
     ($g->is_compat02) ? (defined $a ? %{ $a } : ()) : $a;
 }
@@ -1552,7 +1552,7 @@ sub has_edge_attribute_by_id {
 sub get_edge_attributes {
     my $g = shift;
     $g->expect_non_multiedged;
-    return unless $g->has_edge( @_ );
+    return undef unless $g->has_edge( @_ );
     my $a = $g->[ _E ]->_get_path_attrs( $g->_vertex_ids( @_ ) );
     ($g->is_compat02) ? (defined $a ? %{ $a } : ()) : $a;
 }
@@ -1732,6 +1732,55 @@ sub rename_vertices {
         $g->rename_vertex($from, $code->($from));
     }
     return $g;
+}
+
+sub as_hashes {
+    my ($g) = @_;
+    my (%n, %e);
+    if ($g->is_multivertexed) {
+        for my $v ($g->vertices) {
+            $n{$v} = {
+                map +($_ => $g->get_vertex_attributes_by_id($v, $_) || {}),
+                    $g->get_multivertex_ids($v)
+            };
+        }
+    } else {
+        %n = map +($_ => $g->get_vertex_attributes($_) || {}), $g->vertices;
+    }
+    if ($g->is_multiedged) {
+        for my $e ($g->edges) {
+            $e{ $e->[0] }{ $e->[1] } = {
+                map +($_ => $g->get_edge_attributes_by_id(@$e, $_) || {}),
+                    $g->get_multiedge_ids(@$e)
+            };
+        }
+    } else {
+        $e{ $_->[0] }{ $_->[1] } = $g->get_edge_attributes(@$_) || {}
+            for $g->edges;
+    }
+    ( \%n, \%e );
+}
+
+sub ingest {
+    my ($g, $g2) = @_;
+    for my $v ($g2->vertices) {
+        if ($g->is_multivertexed) {
+            $g->set_vertex_attributes_by_id($v, $_, $g2->get_vertex_attributes_by_id($v, $_))
+                for $g2->get_multivertex_ids($v);
+        } else {
+            $g->set_vertex_attributes($v, $g2->get_vertex_attributes($v));
+        }
+        if ($g->is_multiedged) {
+            for my $e ($g2->edges_from($v)) {
+                $g->set_edge_attributes_by_id(@$e, $_, $g2->get_edge_attributes_by_id(@$e, $_))
+                    for $g2->get_multiedge_ids(@$e);
+            }
+        } else {
+            $g->set_edge_attributes(@$_, $g2->get_edge_attributes(@$_))
+                for $g2->edges_from($v);
+        }
+    }
+    $g;
 }
 
 ###
@@ -3667,6 +3716,12 @@ sub path_vertices {
     my $g = shift;
     my $tcm = $g->transitive_closure_matrix;
     $tcm->path_vertices(@_);
+}
+
+sub all_paths {
+    my $g = shift;
+    my $tcm = $g->transitive_closure_matrix;
+    $tcm->all_paths(@_);
 }
 
 sub is_reachable {

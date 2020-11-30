@@ -37,8 +37,9 @@ my %fields = (
     ANTIVIRUS        => [ qw/COMPANY ENABLED GUID NAME UPTODATE VERSION
                              EXPIRATION BASE_CREATION BASE_VERSION/ ],
     BATTERIES        => [ qw/CAPACITY CHEMISTRY DATE NAME SERIAL MANUFACTURER
-                             VOLTAGE/ ],
+                             VOLTAGE REAL_CAPACITY/ ],
     CONTROLLERS      => [ qw/CAPTION DRIVER NAME MANUFACTURER PCICLASS VENDORID
+                             SERIAL MODEL
                              PRODUCTID PCISUBSYSTEMID PCISLOT TYPE REV/ ],
     CPUS             => [ qw/CACHE CORE DESCRIPTION MANUFACTURER NAME THREAD
                              SERIAL STEPPING FAMILYNAME FAMILYNUMBER MODEL
@@ -58,7 +59,7 @@ my %fields = (
                              VG_UUID/ ],
     MEMORIES         => [ qw/CAPACITY CAPTION FORMFACTOR REMOVABLE PURPOSE
                              SPEED SERIALNUMBER TYPE DESCRIPTION NUMSLOTS
-                             MEMORYCORRECTION MANUFACTURER/ ],
+                             MEMORYCORRECTION MANUFACTURER MODEL/ ],
     MODEMS           => [ qw/DESCRIPTION NAME TYPE MODEL/ ],
     MONITORS         => [ qw/BASE64 CAPTION DESCRIPTION MANUFACTURER SERIAL
                              UUENCODE NAME TYPE ALTSERIAL PORT/ ],
@@ -106,7 +107,7 @@ my %fields = (
 
 my %checks = (
     STORAGES => {
-        INTERFACE => qr/^(SCSI|HDC|IDE|USB|1394|Serial-ATA|SAS)$/
+        INTERFACE => qr/^(SCSI|HDC|IDE|USB|1394|Serial-ATA|SAS|SATA)$/
     },
     VIRTUALMACHINES => {
         STATUS => qr/^(running|blocked|idle|paused|shutdown|crashed|dying|off)$/

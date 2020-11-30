@@ -1,12 +1,41 @@
 package File::ShouldUpdate;
-$File::ShouldUpdate::VERSION = '0.0.1';
+$File::ShouldUpdate::VERSION = '0.2.0';
 use strict;
 use warnings;
 use Time::HiRes qw/ stat /;
 
 use parent 'Exporter';
 use vars qw/ @EXPORT_OK /;
-@EXPORT_OK = qw/ should_update /;
+@EXPORT_OK = qw/ should_update should_update_multi /;
+
+sub should_update_multi
+{
+    my ( $new_files, $syntax_sugar, $deps ) = @_;
+    if ( $syntax_sugar ne ":" )
+    {
+        die qq#wrong syntax_sugar - not ":"!#;
+    }
+    my $min_dep;
+    foreach my $filename2 (@$new_files)
+    {
+        my @stat2 = stat($filename2);
+        if ( !@stat2 )
+        {
+            return 1;
+        }
+        my $new = $stat2[9];
+        if ( ( !defined $min_dep ) or ( $min_dep > $new ) )
+        {
+            $min_dep = $new;
+        }
+    }
+    foreach my $d (@$deps)
+    {
+        my @stat1 = stat($d);
+        return 1 if ( $stat1[9] > $min_dep );
+    }
+    return 0;
+}
 
 sub should_update
 {
@@ -15,17 +44,7 @@ sub should_update
     {
         die qq#wrong syntax_sugar - not ":"!#;
     }
-    my @stat2 = stat($filename2);
-    if ( !@stat2 )
-    {
-        return 1;
-    }
-    foreach my $d (@deps)
-    {
-        my @stat1 = stat($d);
-        return 1 if ( $stat1[9] > $stat2[9] );
-    }
-    return 0;
+    return should_update_multi( [$filename2], $syntax_sugar, \@deps );
 }
 
 1;
@@ -42,15 +61,20 @@ File::ShouldUpdate - should files be rebuilt?
 
 =head1 VERSION
 
-version 0.0.1
+version 0.2.0
 
 =head1 SYNOPSIS
 
-    use File::ShouldUpdate qw/ should_update /;
+    use File::ShouldUpdate qw/ should_update should_update_multi /;
 
     if (should_update("output.html", ":", "in.tt2", "data.sqlite"))
     {
         system("./my-gen-html");
+    }
+
+    if (should_update_multi(["output.html", "about.html", "contact.html"], ":", ["in.tt2", "data.sqlite"]))
+    {
+        system("./my-gen-html-multi");
     }
 
 =head1 DESCRIPTION
@@ -64,7 +88,15 @@ familiar makefile rules ( L<https://en.wikipedia.org/wiki/Make_(software)> ).
 
 =head2 my $verdict = should_update($target, ":", @deps);
 
-should $target be updated if it doesn't exist or older than any of the deps.
+Should $target be updated if it doesn't exist or older than any of the deps.
+
+=head2 my $verdict = should_update_multi([@targets], ":", [@deps]);
+
+Should @targets be updated if some of them do not exist B<or> any of them are older than any of the deps.
+
+Note that you must pass array references.
+
+[Added in version 0.2.0.]
 
 =for :stopwords cpan testmatrix url bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
 

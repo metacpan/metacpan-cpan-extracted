@@ -5,7 +5,7 @@ Pherkin::Extension::Weasel - Pherkin extension for web-testing
 
 =head1 VERSION
 
-0.14
+0.15
 
 =head1 SYNOPSIS
 
@@ -47,7 +47,7 @@ package Pherkin::Extension::Weasel;
 use strict;
 use warnings;
 
-our $VERSION = '0.14';
+our $VERSION = '0.15';
 
 
 use Digest::MD5 qw(md5_hex);
@@ -500,7 +500,7 @@ L<perl-weasel@googlegroups.com|mailto:perl-weasel@googlegroups.com>.
 
 =head1 COPYRIGHT
 
- (C) 2016-2019  Erik Huelsmann
+ (C) 2016-2020  Erik Huelsmann
 
 Licensed under the same terms as Perl.
 

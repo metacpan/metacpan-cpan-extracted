@@ -74,7 +74,7 @@ has actionCfgMap => sub {
     my $self = shift;
     my %map;
     for my $row (@{$self->actionCfg}){
-        next unless $row->{action} =~ /^(submit|upload|download)/;
+        next unless $row->{action} =~ /^(submit|upload|download|autoSubmit)/;
         next unless $row->{key};
         $map{$row->{key}} = $row;
     }
@@ -264,7 +264,7 @@ sub getData {
         return $self->getAllFieldValues(@_);
     }
     else {
-        die mkerror(38334, 'Requested unknown data type' . ($type // 'unknown'));
+        die mkerror(38334, 'Requested unknown data type ' . ($type // 'unknown'));
     }
 }
 
@@ -280,7 +280,7 @@ sub massageConfig {
     my $cfg = shift;
     my $actionCfg = $self->actionCfg;
     for my $button (@$actionCfg){
-        if ($button->{action} eq 'popup'){
+        if ($button->{action} =~ /popup|wizzard/){
             my $name = $button->{name};
             die "Plugin instance name $name is not unique\n"
                 if $cfg->{PLUGIN}{prototype}{$name};

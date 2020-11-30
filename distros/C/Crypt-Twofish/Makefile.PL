@@ -1,4 +1,3 @@
-# $Id: Makefile.PL,v 2.12 2001/05/21 17:38:01 ams Exp $
 # Copyright 2001 Abhijit Menon-Sen <ams@wiw.org>
 
 use Config;
@@ -49,7 +48,7 @@ open(F, ">platform.h") || die "platform.h: $!\n";
 print F $text;
 close F;
 
-sub MY::postamble { "tables.h: tab/tables.pl\n\t\$(PERL) tab/tables.pl\n" }
+sub MY::postamble { "tables.h: tab/tables.pl\n\t\$(PERL) -I. tab/tables.pl\n" }
 
 WriteMakefile(
     NAME          => 'Crypt::Twofish',

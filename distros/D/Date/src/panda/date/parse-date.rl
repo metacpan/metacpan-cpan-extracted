@@ -173,7 +173,7 @@ namespace panda { namespace date {
 static constexpr const int32_t WEEK_1_OFFSETS[] = {0, -1, -2, -3, 4, 3, 2};
 static constexpr const int32_t WEEK_2_OFFSETS[] = {8, 7, 6, 5, 9, 10, 9};
 
-static const Timezone* gmt_zone;
+static TimezoneSP gmt_zone;
 
 #define NSAVE(dest) { dest = acc; acc = 0; }
         

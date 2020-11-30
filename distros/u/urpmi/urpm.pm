@@ -14,7 +14,7 @@ use urpm::md5sum;
 # perl_checker: require urpm::media
 # perl_checker: require urpm::parallel
 
-our $VERSION = 'v8.123';
+our $VERSION = 'v8.124';
 our @ISA = qw(URPM Exporter);
 our @EXPORT_OK = ('file_from_local_url', 'file_from_local_medium', 'is_local_medium');
 

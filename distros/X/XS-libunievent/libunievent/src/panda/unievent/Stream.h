@@ -196,6 +196,7 @@ protected:
 
     void set_shutdown (bool ok) {
         flags &= ~SHUTTING;
+        flags |= SHUT;
         if (ok) clear_out_connected();
     }
 

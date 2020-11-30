@@ -2,7 +2,7 @@
 
 use warnings;
 use strict;
-use Test::Most tests => 75;
+use Test::Most tests => 76;
 use Test::Number::Delta;
 use Test::Carp;
 use Test::Deep;
@@ -75,6 +75,8 @@ LOCAL: {
 	cmp_deeply($geo_coder->geocode(location => '106 Tothill St, Minster, Thanet, Kent, England'),
 		methods('lat' => num(51.34, 1e-2), 'long' => num(1.32, 1e-2)));
 
+	ok(!defined($geo_coder->geocode('Eastbourne, Sussex, England')));
+
 	does_croak(sub {
 		my $location = $geo_coder->geocode();
 	});
@@ -107,8 +109,9 @@ sub check {
 	}
 	# diag($location);
 	my @rc = $geo_coder->geocode({ location => $location });
-	# diag(Data::Dumper->new([\@rc])->Dump());
+	diag(Data::Dumper->new([$location, \@rc])->Dump()) if($ENV{'TEST_VERBOSE'});
 	ok(scalar(@rc) > 0);
+
 	cmp_deeply(@rc,
 		methods('lat' => num($lat, 1e-2), 'long' => num($long, 1e-2)));
 

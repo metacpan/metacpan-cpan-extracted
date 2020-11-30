@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2013-2019 Christian Jaeger, copying@christianjaeger.ch
+# Copyright (c) 2013-2020 Christian Jaeger, copying@christianjaeger.ch
 #
 # This is free software, offered under either the same terms as perl 5
 # or the terms of the Artistic License version 2 or the terms of the
@@ -71,8 +71,9 @@ our %EXPORT_TAGS = (all => [@EXPORT, @EXPORT_OK]);
 
 use FP::Ops qw(string_cmp number_cmp binary_operator);
 use Chj::TEST;
+use FP::Carp;
 
-sub array_sort ($;$) {
+sub array_sort {
     @_ == 1 or @_ == 2 or die "wrong number of arguments";
     my ($in, $maybe_cmp) = @_;
     if (defined $maybe_cmp) {
@@ -88,31 +89,31 @@ sub array_sort ($;$) {
     }
 }
 
-sub array_sortCompare ($) {
-    @_ == 1 or die "wrong number of arguments";
+sub array_sortCompare {
+    @_ == 1 or fp_croak_nargs 1;
     my ($in) = @_;
     [sort { $a->FP_Compare_compare($b) } @$in]
 }
 
-sub on ($ $) {
-    @_ == 2 or die "expecting 2 arguments";
+sub on {
+    @_ == 2 or fp_croak_nargs 2;
     my ($select, $cmp) = @_;
     sub {
-        @_ == 2 or die "expecting 2 arguments";
+        @_ == 2 or fp_croak_nargs 2;
         my ($a, $b) = @_;
         &$cmp(&$select($a), &$select($b))
     }
 }
 
-sub on_maybe ($$) {
-    @_ == 2 or die "expecting 2 arguments";
+sub on_maybe {
+    @_ == 2 or fp_croak_nargs 2;
     my ($maybe_select, $cmp) = @_;
     defined $maybe_select ? on($maybe_select, $cmp) : $cmp
 }
 
 # see also `complement` from FP::Predicates
-sub cmp_complement ($) {
-    @_ == 1 or die "expecting 1 argument";
+sub cmp_complement {
+    @_ == 1 or fp_croak_nargs 1;
     my ($cmp) = @_;
     sub {
         -&$cmp(@_)

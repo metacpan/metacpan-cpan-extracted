@@ -1,13 +1,17 @@
 ---
 abstract: 'class for providing a collection of TeX hyphenation'
 author:
-  - 'Roland van Ipenburg <ipenburg@xs4all.nl>'
+  - 'Roland van Ipenburg <roland@rolandvanipenburg.com>'
 build_requires:
-  Test::More: '0.81'
+  TeX::Hyphen: '0'
+  Test::More: '0.86'
+  Test::NoWarnings: '0'
+  Test::TestCoverage: '0'
+  Test::Warn: '0'
 configure_requires:
-  Module::Build: '0.42'
+  Module::Build: '0'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4224, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Module::Build version 0.4231, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -16,415 +20,459 @@ name: TeX-Hyphen-Pattern
 provides:
   TeX::Hyphen::Pattern:
     file: lib/TeX/Hyphen/Pattern.pm
-    version: v1.1.2
+    version: v1.1.5
   TeX::Hyphen::Pattern::Af:
     file: lib/TeX/Hyphen/Pattern/Af.pm
-    version: v1.1.2
+    version: v1.1.5
   TeX::Hyphen::Pattern::Af_ZA:
     file: lib/TeX/Hyphen/Pattern/Af_ZA.pm
-    version: v1.1.2
+    version: v1.1.5
   TeX::Hyphen::Pattern::Af_ec:
     file: lib/TeX/Hyphen/Pattern/Af_ec.pm
-    version: v1.1.2
+    version: v1.1.5
+  TeX::Hyphen::Pattern::Ar:
+    file: lib/TeX/Hyphen/Pattern/Ar.pm
+    version: v1.1.5
   TeX::Hyphen::Pattern::As:
     file: lib/TeX/Hyphen/Pattern/As.pm
-    version: v1.1.2
+    version: v1.1.5
+  TeX::Hyphen::Pattern::Be:
+    file: lib/TeX/Hyphen/Pattern/Be.pm
+    version: v1.1.5
   TeX::Hyphen::Pattern::Bg:
     file: lib/TeX/Hyphen/Pattern/Bg.pm
-    version: v1.1.2
+    version: v1.1.5
   TeX::Hyphen::Pattern::Bg_t2a:
     file: lib/TeX/Hyphen/Pattern/Bg_t2a.pm
-    version: v1.1.2
+    version: v1.1.5
   TeX::Hyphen::Pattern::Bn:
     file: lib/TeX/Hyphen/Pattern/Bn.pm
-    version: v1.1.2
+    version: v1.1.5
   TeX::Hyphen::Pattern::Ca:
     file: lib/TeX/Hyphen/Pattern/Ca.pm
-    version: v1.1.2
+    version: v1.1.5
   TeX::Hyphen::Pattern::Ca_ec:
     file: lib/TeX/Hyphen/Pattern/Ca_ec.pm
-    version: v1.1.2
+    version: v1.1.5
   TeX::Hyphen::Pattern::Cop:
     file: lib/TeX/Hyphen/Pattern/Cop.pm
-    version: v1.1.2
+    version: v1.1.5
   TeX::Hyphen::Pattern::Cs:
     file: lib/TeX/Hyphen/Pattern/Cs.pm
-    version: v1.1.2
+    version: v1.1.5
   TeX::Hyphen::Pattern::Cs_ec:
     file: lib/TeX/Hyphen/Pattern/Cs_ec.pm
-    version: v1.1.2
+    version: v1.1.5
+  TeX::Hyphen::Pattern::Cu:
+    file: lib/TeX/Hyphen/Pattern/Cu.pm
+    version: v1.1.5
   TeX::Hyphen::Pattern::Cy:
     file: lib/TeX/Hyphen/Pattern/Cy.pm
-    version: v1.1.2
+    version: v1.1.5
   TeX::Hyphen::Pattern::Cy_ec:
     file: lib/TeX/Hyphen/Pattern/Cy_ec.pm
-    version: v1.1.2
+    version: v1.1.5
   TeX::Hyphen::Pattern::Da:
     file: lib/TeX/Hyphen/Pattern/Da.pm
-    version: v1.1.2
+    version: v1.1.5
   TeX::Hyphen::Pattern::Da_ec:
     file: lib/TeX/Hyphen/Pattern/Da_ec.pm
-    version: v1.1.2
+    version: v1.1.5
   TeX::Hyphen::Pattern::De_1901:
     file: lib/TeX/Hyphen/Pattern/De_1901.pm
-    version: v1.1.2
+    version: v1.1.5
   TeX::Hyphen::Pattern::De_1901_ec:
     file: lib/TeX/Hyphen/Pattern/De_1901_ec.pm
-    version: v1.1.2
+    version: v1.1.5
   TeX::Hyphen::Pattern::De_1996:
     file: lib/TeX/Hyphen/Pattern/De_1996.pm
-    version: v1.1.2
+    version: v1.1.5
   TeX::Hyphen::Pattern::De_1996_ec:
     file: lib/TeX/Hyphen/Pattern/De_1996_ec.pm
-    version: v1.1.2
+    version: v1.1.5
   TeX::Hyphen::Pattern::De_DE:
     file: lib/TeX/Hyphen/Pattern/De_DE.pm
-    version: v1.1.2
+    version: v1.1.5
   TeX::Hyphen::Pattern::De_ch_1901:
     file: lib/TeX/Hyphen/Pattern/De_ch_1901.pm
-    version: v1.1.2
+    version: v1.1.5
   TeX::Hyphen::Pattern::De_ch_1901_ec:
     file: lib/TeX/Hyphen/Pattern/De_ch_1901_ec.pm
-    version: v1.1.2
+    version: v1.1.5
   TeX::Hyphen::Pattern::El_monoton:
     file: lib/TeX/Hyphen/Pattern/El_monoton.pm
-    version: v1.1.2
+    version: v1.1.5
   TeX::Hyphen::Pattern::El_polyton:
     file: lib/TeX/Hyphen/Pattern/El_polyton.pm
-    version: v1.1.2
+    version: v1.1.5
   TeX::Hyphen::Pattern::En_gb:
     file: lib/TeX/Hyphen/Pattern/En_gb.pm
-    version: v1.1.2
+    version: v1.1.5
   TeX::Hyphen::Pattern::En_us:
     file: lib/TeX/Hyphen/Pattern/En_us.pm
-    version: v1.1.2
+    version: v1.1.5
   TeX::Hyphen::Pattern::Eo:
     file: lib/TeX/Hyphen/Pattern/Eo.pm
-    version: v1.1.2
+    version: v1.1.5
   TeX::Hyphen::Pattern::Eo_il3:
     file: lib/TeX/Hyphen/Pattern/Eo_il3.pm
-    version: v1.1.2
+    version: v1.1.5
   TeX::Hyphen::Pattern::Es:
     file: lib/TeX/Hyphen/Pattern/Es.pm
-    version: v1.1.2
+    version: v1.1.5
   TeX::Hyphen::Pattern::Es_ec:
     file: lib/TeX/Hyphen/Pattern/Es_ec.pm
-    version: v1.1.2
+    version: v1.1.5
   TeX::Hyphen::Pattern::Et:
     file: lib/TeX/Hyphen/Pattern/Et.pm
-    version: v1.1.2
+    version: v1.1.5
   TeX::Hyphen::Pattern::Et_ec:
     file: lib/TeX/Hyphen/Pattern/Et_ec.pm
-    version: v1.1.2
+    version: v1.1.5
   TeX::Hyphen::Pattern::Eu:
     file: lib/TeX/Hyphen/Pattern/Eu.pm
-    version: v1.1.2
+    version: v1.1.5
   TeX::Hyphen::Pattern::Eu_ec:
     file: lib/TeX/Hyphen/Pattern/Eu_ec.pm
-    version: v1.1.2
+    version: v1.1.5
+  TeX::Hyphen::Pattern::Fa:
+    file: lib/TeX/Hyphen/Pattern/Fa.pm
+    version: v1.1.5
   TeX::Hyphen::Pattern::Fi:
     file: lib/TeX/Hyphen/Pattern/Fi.pm
-    version: v1.1.2
+    version: v1.1.5
   TeX::Hyphen::Pattern::Fi_ec:
     file: lib/TeX/Hyphen/Pattern/Fi_ec.pm
-    version: v1.1.2
+    version: v1.1.5
   TeX::Hyphen::Pattern::Fr:
     file: lib/TeX/Hyphen/Pattern/Fr.pm
-    version: v1.1.2
+    version: v1.1.5
   TeX::Hyphen::Pattern::Fr_ec:
     file: lib/TeX/Hyphen/Pattern/Fr_ec.pm
-    version: v1.1.2
+    version: v1.1.5
   TeX::Hyphen::Pattern::Fur:
     file: lib/TeX/Hyphen/Pattern/Fur.pm
-    version: v1.1.2
+    version: v1.1.5
   TeX::Hyphen::Pattern::Fur_ec:
     file: lib/TeX/Hyphen/Pattern/Fur_ec.pm
-    version: v1.1.2
+    version: v1.1.5
   TeX::Hyphen::Pattern::Ga:
     file: lib/TeX/Hyphen/Pattern/Ga.pm
-    version: v1.1.2
+    version: v1.1.5
   TeX::Hyphen::Pattern::Ga_ec:
     file: lib/TeX/Hyphen/Pattern/Ga_ec.pm
-    version: v1.1.2
+    version: v1.1.5
   TeX::Hyphen::Pattern::Gl:
     file: lib/TeX/Hyphen/Pattern/Gl.pm
-    version: v1.1.2
+    version: v1.1.5
   TeX::Hyphen::Pattern::Gl_ec:
     file: lib/TeX/Hyphen/Pattern/Gl_ec.pm
-    version: v1.1.2
+    version: v1.1.5
   TeX::Hyphen::Pattern::Grc:
     file: lib/TeX/Hyphen/Pattern/Grc.pm
-    version: v1.1.2
+    version: v1.1.5
+  TeX::Hyphen::Pattern::Grc_x_ibycus:
+    file: lib/TeX/Hyphen/Pattern/Grc_x_ibycus.pm
+    version: v1.1.5
   TeX::Hyphen::Pattern::Gu:
     file: lib/TeX/Hyphen/Pattern/Gu.pm
-    version: v1.1.2
+    version: v1.1.5
   TeX::Hyphen::Pattern::Hi:
     file: lib/TeX/Hyphen/Pattern/Hi.pm
-    version: v1.1.2
+    version: v1.1.5
   TeX::Hyphen::Pattern::Hr:
     file: lib/TeX/Hyphen/Pattern/Hr.pm
-    version: v1.1.2
+    version: v1.1.5
   TeX::Hyphen::Pattern::Hr_ec:
     file: lib/TeX/Hyphen/Pattern/Hr_ec.pm
-    version: v1.1.2
+    version: v1.1.5
   TeX::Hyphen::Pattern::Hsb:
     file: lib/TeX/Hyphen/Pattern/Hsb.pm
-    version: v1.1.2
+    version: v1.1.5
   TeX::Hyphen::Pattern::Hsb_ec:
     file: lib/TeX/Hyphen/Pattern/Hsb_ec.pm
-    version: v1.1.2
+    version: v1.1.5
   TeX::Hyphen::Pattern::Hu:
     file: lib/TeX/Hyphen/Pattern/Hu.pm
-    version: v1.1.2
+    version: v1.1.5
   TeX::Hyphen::Pattern::Hu_ec:
     file: lib/TeX/Hyphen/Pattern/Hu_ec.pm
-    version: v1.1.2
+    version: v1.1.5
   TeX::Hyphen::Pattern::Hy:
     file: lib/TeX/Hyphen/Pattern/Hy.pm
-    version: v1.1.2
+    version: v1.1.5
   TeX::Hyphen::Pattern::Ia:
     file: lib/TeX/Hyphen/Pattern/Ia.pm
-    version: v1.1.2
+    version: v1.1.5
   TeX::Hyphen::Pattern::Id:
     file: lib/TeX/Hyphen/Pattern/Id.pm
-    version: v1.1.2
+    version: v1.1.5
   TeX::Hyphen::Pattern::Is:
     file: lib/TeX/Hyphen/Pattern/Is.pm
-    version: v1.1.2
+    version: v1.1.5
   TeX::Hyphen::Pattern::Is_ec:
     file: lib/TeX/Hyphen/Pattern/Is_ec.pm
-    version: v1.1.2
+    version: v1.1.5
   TeX::Hyphen::Pattern::It:
     file: lib/TeX/Hyphen/Pattern/It.pm
-    version: v1.1.2
+    version: v1.1.5
   TeX::Hyphen::Pattern::Ka:
     file: lib/TeX/Hyphen/Pattern/Ka.pm
-    version: v1.1.2
+    version: v1.1.5
   TeX::Hyphen::Pattern::Ka_t8m:
     file: lib/TeX/Hyphen/Pattern/Ka_t8m.pm
-    version: v1.1.2
+    version: v1.1.5
   TeX::Hyphen::Pattern::Kmr:
     file: lib/TeX/Hyphen/Pattern/Kmr.pm
-    version: v1.1.2
+    version: v1.1.5
   TeX::Hyphen::Pattern::Kmr_ec:
     file: lib/TeX/Hyphen/Pattern/Kmr_ec.pm
-    version: v1.1.2
+    version: v1.1.5
   TeX::Hyphen::Pattern::Kn:
     file: lib/TeX/Hyphen/Pattern/Kn.pm
-    version: v1.1.2
+    version: v1.1.5
   TeX::Hyphen::Pattern::La:
     file: lib/TeX/Hyphen/Pattern/La.pm
-    version: v1.1.2
+    version: v1.1.5
   TeX::Hyphen::Pattern::La_ec:
     file: lib/TeX/Hyphen/Pattern/La_ec.pm
-    version: v1.1.2
+    version: v1.1.5
   TeX::Hyphen::Pattern::La_x_classic:
     file: lib/TeX/Hyphen/Pattern/La_x_classic.pm
-    version: v1.1.2
+    version: v1.1.5
+  TeX::Hyphen::Pattern::La_x_liturgic:
+    file: lib/TeX/Hyphen/Pattern/La_x_liturgic.pm
+    version: v1.1.5
   TeX::Hyphen::Pattern::Lt:
     file: lib/TeX/Hyphen/Pattern/Lt.pm
-    version: v1.1.2
+    version: v1.1.5
   TeX::Hyphen::Pattern::Lt_l7x:
     file: lib/TeX/Hyphen/Pattern/Lt_l7x.pm
-    version: v1.1.2
+    version: v1.1.5
   TeX::Hyphen::Pattern::Lv:
     file: lib/TeX/Hyphen/Pattern/Lv.pm
-    version: v1.1.2
+    version: v1.1.5
   TeX::Hyphen::Pattern::Lv_l7x:
     file: lib/TeX/Hyphen/Pattern/Lv_l7x.pm
-    version: v1.1.2
+    version: v1.1.5
+  TeX::Hyphen::Pattern::Mk:
+    file: lib/TeX/Hyphen/Pattern/Mk.pm
+    version: v1.1.5
   TeX::Hyphen::Pattern::Ml:
     file: lib/TeX/Hyphen/Pattern/Ml.pm
-    version: v1.1.2
+    version: v1.1.5
   TeX::Hyphen::Pattern::Mn_cyrl:
     file: lib/TeX/Hyphen/Pattern/Mn_cyrl.pm
-    version: v1.1.2
+    version: v1.1.5
   TeX::Hyphen::Pattern::Mn_cyrl_t2a:
     file: lib/TeX/Hyphen/Pattern/Mn_cyrl_t2a.pm
-    version: v1.1.2
+    version: v1.1.5
   TeX::Hyphen::Pattern::Mn_cyrl_x_lmc:
     file: lib/TeX/Hyphen/Pattern/Mn_cyrl_x_lmc.pm
-    version: v1.1.2
+    version: v1.1.5
   TeX::Hyphen::Pattern::Mn_cyrl_x_lmc_lmc:
     file: lib/TeX/Hyphen/Pattern/Mn_cyrl_x_lmc_lmc.pm
-    version: v1.1.2
+    version: v1.1.5
   TeX::Hyphen::Pattern::Mr:
     file: lib/TeX/Hyphen/Pattern/Mr.pm
-    version: v1.1.2
+    version: v1.1.5
   TeX::Hyphen::Pattern::Mul_ethi:
     file: lib/TeX/Hyphen/Pattern/Mul_ethi.pm
-    version: v1.1.2
+    version: v1.1.5
   TeX::Hyphen::Pattern::Nb:
     file: lib/TeX/Hyphen/Pattern/Nb.pm
-    version: v1.1.2
+    version: v1.1.5
   TeX::Hyphen::Pattern::Nb_ec:
     file: lib/TeX/Hyphen/Pattern/Nb_ec.pm
-    version: v1.1.2
+    version: v1.1.5
   TeX::Hyphen::Pattern::Nl:
     file: lib/TeX/Hyphen/Pattern/Nl.pm
-    version: v1.1.2
+    version: v1.1.5
   TeX::Hyphen::Pattern::Nl_ec:
     file: lib/TeX/Hyphen/Pattern/Nl_ec.pm
-    version: v1.1.2
+    version: v1.1.5
   TeX::Hyphen::Pattern::Nn:
     file: lib/TeX/Hyphen/Pattern/Nn.pm
-    version: v1.1.2
+    version: v1.1.5
   TeX::Hyphen::Pattern::Nn_ec:
     file: lib/TeX/Hyphen/Pattern/Nn_ec.pm
-    version: v1.1.2
+    version: v1.1.5
   TeX::Hyphen::Pattern::No:
     file: lib/TeX/Hyphen/Pattern/No.pm
-    version: v1.1.2
+    version: v1.1.5
+  TeX::Hyphen::Pattern::Oc:
+    file: lib/TeX/Hyphen/Pattern/Oc.pm
+    version: v1.1.5
   TeX::Hyphen::Pattern::Or:
     file: lib/TeX/Hyphen/Pattern/Or.pm
-    version: v1.1.2
+    version: v1.1.5
   TeX::Hyphen::Pattern::Pa:
     file: lib/TeX/Hyphen/Pattern/Pa.pm
-    version: v1.1.2
+    version: v1.1.5
+  TeX::Hyphen::Pattern::Pi:
+    file: lib/TeX/Hyphen/Pattern/Pi.pm
+    version: v1.1.5
   TeX::Hyphen::Pattern::Pl:
     file: lib/TeX/Hyphen/Pattern/Pl.pm
-    version: v1.1.2
+    version: v1.1.5
   TeX::Hyphen::Pattern::Pl_qx:
     file: lib/TeX/Hyphen/Pattern/Pl_qx.pm
-    version: v1.1.2
+    version: v1.1.5
   TeX::Hyphen::Pattern::Pms:
     file: lib/TeX/Hyphen/Pattern/Pms.pm
-    version: v1.1.2
+    version: v1.1.5
   TeX::Hyphen::Pattern::Pt:
     file: lib/TeX/Hyphen/Pattern/Pt.pm
-    version: v1.1.2
+    version: v1.1.5
   TeX::Hyphen::Pattern::Pt_BR:
     file: lib/TeX/Hyphen/Pattern/Pt_BR.pm
-    version: v1.1.2
+    version: v1.1.5
   TeX::Hyphen::Pattern::Pt_ec:
     file: lib/TeX/Hyphen/Pattern/Pt_ec.pm
-    version: v1.1.2
+    version: v1.1.5
   TeX::Hyphen::Pattern::Quote_af:
     file: lib/TeX/Hyphen/Pattern/Quote_af.pm
+    version: v1.1.5
+  TeX::Hyphen::Pattern::Quote_be:
+    file: lib/TeX/Hyphen/Pattern/Quote_be.pm
+    version: v1.1.5
   TeX::Hyphen::Pattern::Quote_fr:
     file: lib/TeX/Hyphen/Pattern/Quote_fr.pm
+    version: v1.1.5
   TeX::Hyphen::Pattern::Quote_fur:
     file: lib/TeX/Hyphen/Pattern/Quote_fur.pm
+    version: v1.1.5
   TeX::Hyphen::Pattern::Quote_it:
     file: lib/TeX/Hyphen/Pattern/Quote_it.pm
+    version: v1.1.5
+  TeX::Hyphen::Pattern::Quote_oc:
+    file: lib/TeX/Hyphen/Pattern/Quote_oc.pm
+    version: v1.1.5
   TeX::Hyphen::Pattern::Quote_pms:
     file: lib/TeX/Hyphen/Pattern/Quote_pms.pm
+    version: v1.1.5
   TeX::Hyphen::Pattern::Quote_rm:
     file: lib/TeX/Hyphen/Pattern/Quote_rm.pm
+    version: v1.1.5
   TeX::Hyphen::Pattern::Quote_uk:
     file: lib/TeX/Hyphen/Pattern/Quote_uk.pm
+    version: v1.1.5
   TeX::Hyphen::Pattern::Quote_zh_latn_pinyin:
     file: lib/TeX/Hyphen/Pattern/Quote_zh_latn_pinyin.pm
+    version: v1.1.5
   TeX::Hyphen::Pattern::Rm:
     file: lib/TeX/Hyphen/Pattern/Rm.pm
-    version: v1.1.2
+    version: v1.1.5
   TeX::Hyphen::Pattern::Ro:
     file: lib/TeX/Hyphen/Pattern/Ro.pm
-    version: v1.1.2
+    version: v1.1.5
   TeX::Hyphen::Pattern::Ro_ec:
     file: lib/TeX/Hyphen/Pattern/Ro_ec.pm
-    version: v1.1.2
+    version: v1.1.5
   TeX::Hyphen::Pattern::Ru:
     file: lib/TeX/Hyphen/Pattern/Ru.pm
-    version: v1.1.2
+    version: v1.1.5
   TeX::Hyphen::Pattern::Ru_t2a:
     file: lib/TeX/Hyphen/Pattern/Ru_t2a.pm
-    version: v1.1.2
+    version: v1.1.5
   TeX::Hyphen::Pattern::Sa:
     file: lib/TeX/Hyphen/Pattern/Sa.pm
-    version: v1.1.2
+    version: v1.1.5
   TeX::Hyphen::Pattern::Sh:
     file: lib/TeX/Hyphen/Pattern/Sh.pm
-    version: v1.1.2
+    version: v1.1.5
   TeX::Hyphen::Pattern::Sh_cyrl:
     file: lib/TeX/Hyphen/Pattern/Sh_cyrl.pm
-    version: v1.1.2
+    version: v1.1.5
   TeX::Hyphen::Pattern::Sh_cyrl_t2a:
     file: lib/TeX/Hyphen/Pattern/Sh_cyrl_t2a.pm
-    version: v1.1.2
+    version: v1.1.5
   TeX::Hyphen::Pattern::Sh_latn:
     file: lib/TeX/Hyphen/Pattern/Sh_latn.pm
-    version: v1.1.2
+    version: v1.1.5
   TeX::Hyphen::Pattern::Sh_latn_ec:
     file: lib/TeX/Hyphen/Pattern/Sh_latn_ec.pm
-    version: v1.1.2
+    version: v1.1.5
   TeX::Hyphen::Pattern::Sk:
     file: lib/TeX/Hyphen/Pattern/Sk.pm
-    version: v1.1.2
+    version: v1.1.5
   TeX::Hyphen::Pattern::Sk_ec:
     file: lib/TeX/Hyphen/Pattern/Sk_ec.pm
-    version: v1.1.2
+    version: v1.1.5
   TeX::Hyphen::Pattern::Sl:
     file: lib/TeX/Hyphen/Pattern/Sl.pm
-    version: v1.1.2
+    version: v1.1.5
   TeX::Hyphen::Pattern::Sl_SI:
     file: lib/TeX/Hyphen/Pattern/Sl_SI.pm
-    version: v1.1.2
+    version: v1.1.5
   TeX::Hyphen::Pattern::Sl_ec:
     file: lib/TeX/Hyphen/Pattern/Sl_ec.pm
-    version: v1.1.2
+    version: v1.1.5
   TeX::Hyphen::Pattern::Sr_cyrl:
     file: lib/TeX/Hyphen/Pattern/Sr_cyrl.pm
-    version: v1.1.2
+    version: v1.1.5
   TeX::Hyphen::Pattern::Sv:
     file: lib/TeX/Hyphen/Pattern/Sv.pm
-    version: v1.1.2
+    version: v1.1.5
   TeX::Hyphen::Pattern::Sv_ec:
     file: lib/TeX/Hyphen/Pattern/Sv_ec.pm
-    version: v1.1.2
+    version: v1.1.5
   TeX::Hyphen::Pattern::Ta:
     file: lib/TeX/Hyphen/Pattern/Ta.pm
-    version: v1.1.2
+    version: v1.1.5
   TeX::Hyphen::Pattern::Te:
     file: lib/TeX/Hyphen/Pattern/Te.pm
-    version: v1.1.2
+    version: v1.1.5
   TeX::Hyphen::Pattern::Th:
     file: lib/TeX/Hyphen/Pattern/Th.pm
-    version: v1.1.2
+    version: v1.1.5
   TeX::Hyphen::Pattern::Th_lth:
     file: lib/TeX/Hyphen/Pattern/Th_lth.pm
-    version: v1.1.2
+    version: v1.1.5
   TeX::Hyphen::Pattern::Tk:
     file: lib/TeX/Hyphen/Pattern/Tk.pm
-    version: v1.1.2
+    version: v1.1.5
   TeX::Hyphen::Pattern::Tk_ec:
     file: lib/TeX/Hyphen/Pattern/Tk_ec.pm
-    version: v1.1.2
+    version: v1.1.5
   TeX::Hyphen::Pattern::Tr:
     file: lib/TeX/Hyphen/Pattern/Tr.pm
-    version: v1.1.2
+    version: v1.1.5
   TeX::Hyphen::Pattern::Tr_ec:
     file: lib/TeX/Hyphen/Pattern/Tr_ec.pm
-    version: v1.1.2
+    version: v1.1.5
   TeX::Hyphen::Pattern::Uk:
     file: lib/TeX/Hyphen/Pattern/Uk.pm
-    version: v1.1.2
+    version: v1.1.5
   TeX::Hyphen::Pattern::Uk_t2a:
     file: lib/TeX/Hyphen/Pattern/Uk_t2a.pm
-    version: v1.1.2
+    version: v1.1.5
+  TeX::Hyphen::Pattern::Utf8:
+    file: lib/TeX/Hyphen/Pattern/Utf8.pm
+    version: v1.1.5
   TeX::Hyphen::Pattern::Zh_latn_pinyin:
     file: lib/TeX/Hyphen/Pattern/Zh_latn_pinyin.pm
-    version: v1.1.2
+    version: v1.1.5
   TeX::Hyphen::Pattern::Zh_latn_pinyin_ec:
     file: lib/TeX/Hyphen/Pattern/Zh_latn_pinyin_ec.pm
-    version: v1.1.2
+    version: v1.1.5
   TeX::Hyphen::Pattern::Zu_ZA:
     file: lib/TeX/Hyphen/Pattern/Zu_ZA.pm
-    version: v1.1.2
+    version: v1.1.5
+recommends:
+  Module::Signature: '0'
+  TeX::Hyphen: '0'
 requires:
   Encode: '0'
   File::Temp: '0'
   Log::Log4perl: '0'
   Module::Pluggable: '0'
   Moose: '0'
-  Readonly: '0'
+  Readonly: '1.03'
   Set::Scalar: '0'
-  Test::More: '0.81'
-  Test::NoWarnings: '0'
   perl: v5.14.0
-  version: '0'
 resources:
   license: http://dev.perl.org/licenses/
-  repository: https://github.com/ipenburg/TeX-Hyphen-Pattern
-version: v1.1.2
+  repository: https://bitbucket.org/rolandvanipenburg/tex-hyphen-pattern
+version: v1.1.5
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

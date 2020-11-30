@@ -133,6 +133,16 @@ WriteMakefile(
         'check'             => 'check-libeav',
     },
     CONFIGURE => \&myconfigure,
+    META_MERGE => {
+        'meta-spec' => { 'version' => 2 },
+        'resources' => {
+            'repository' => {
+                'type'  => 'git',
+                'url'   => 'https://github.com/gh0stwizard/p5-EAV-XS.git',
+                'web'   => 'https://github.com/gh0stwizard/p5-EAV-XS',
+            }
+        }
+    },
 );
 
 

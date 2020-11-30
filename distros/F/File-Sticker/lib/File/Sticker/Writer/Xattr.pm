@@ -1,12 +1,12 @@
 package File::Sticker::Writer::Xattr;
-$File::Sticker::Writer::Xattr::VERSION = '1.01';
+$File::Sticker::Writer::Xattr::VERSION = '1.0603';
 =head1 NAME
 
 File::Sticker::Writer::Xattr - write and standardize meta-data from ExtAttr file
 
 =head1 VERSION
 
-version 1.01
+version 1.0603
 
 =head1 SYNOPSIS
 
@@ -42,19 +42,17 @@ sub whoami  { ( caller(1) )[3] }
 
 =head1 METHODS
 
-=head2 is_fallback
+=head2 priority
 
-Is this writer a fallback writer (to be used when others don't work)?
-This is mainly to prevent Xattr attributes being set when they don't need to be,
-because we don't want duplicate information stored in two different ways.
+The priority of this writer.  Writers with higher priority get tried first.
+Xattr is a low-priority writer.
 
 =cut
 
-sub is_fallback {
-    my $self = shift;
-    
-    return 1;
-} # is_fallback
+sub priority {
+    my $class = shift;
+    return 0;
+} # priority
 
 =head2 allowed_file
 

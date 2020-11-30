@@ -69,7 +69,7 @@ wait_for_promise $conn_3_holder->{conn_3}->connect($connect_args);
     }, sub {
         my $error = $_[0];
         pass("sleep(3) died when its connection was destroyed");
-        like($error, qr/Connection object went away/);
+        like($error, qr/Connection object released before pending query was finished/);
     });
     $p4->catch(sub { say "crap @_"});
     wait_for_promise collect($p3, $p4);

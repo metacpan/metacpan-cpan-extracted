@@ -20,7 +20,7 @@ Net-Z3950-FOLIO.md: ../../lib/Net/Z3950/FOLIO.pm
 	pod2markdown $? > $@
 	chmod ugo-w $@
 
-Net-Z3950-FOLIO-Config.md: ../../lib/Net/Z3950/FOLIO/Config.pod
+Net-Z3950-FOLIO-Config.md: ../../lib/Net/Z3950/FOLIO/Config.pm
 	rm -f $@
 	pod2markdown $? > $@
 	chmod ugo-w $@

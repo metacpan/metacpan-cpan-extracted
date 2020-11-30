@@ -36,7 +36,40 @@ use base qw{ PPIx::Regexp::Structure };
 
 use PPIx::Regexp::Constant qw{ @CARP_NOT };
 
-our $VERSION = '0.075';
+our $VERSION = '0.076';
+
+sub __new {
+    my ( $class, $content, %arg ) = @_;
+
+    my $self = $class->SUPER::__new( $content, %arg );
+
+    defined $arg{error}
+	and $self->{explanation} = $self->{error} = $arg{error};
+
+    defined $arg{explanation}
+	and $self->{explanation} = $arg{explanation};
+
+    return $self;
+}
+
+sub explain {
+    my ( $self ) = @_;
+    return $self->{explanation} || $self->SUPER::explain();
+}
+
+sub __PPIX_ELEM__rebless {
+    my ( $class, $self, %arg ) = @_;
+    my $rslt = $class->SUPER::__PPIX_ELEM__rebless( $self, %arg );
+    unless ( defined( $self->{error} = $arg{error} ) ) {
+	Carp::cluck( 'Making unknown token with no error message' );
+	$self->{error} = 'Unspecified error';
+	$rslt++;
+    }
+    $self->{explanation} = defined $arg{explanation} ?
+	$arg{explanation} :
+	$arg{error};
+    return $rslt;
+}
 
 1;
 

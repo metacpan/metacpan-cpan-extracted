@@ -42,7 +42,9 @@ my $check   = qq~<?xml version="1.0" encoding="utf-8" ?>
         <File Permission="644" Location="01_code_uninstall.t" />
         <File Permission="644" Location="02_code_uninstall_pre.t" />
         <File Permission="644" Location="03_code_uninstall_pre_3.t" />
+        <File Permission="644" Location="04_code_install_package.t" />
         <File Permission="644" Location="Test.json" />
+        <File Permission="644" Location="TestInstall.json" />
         <File Permission="644" Location="TestPre.json" />
         <File Permission="644" Location="TestPre3.json" />
     </Filelist>

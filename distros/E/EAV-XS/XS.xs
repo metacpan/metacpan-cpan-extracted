@@ -100,6 +100,35 @@ new(package, ...)
 
 
 void
+setup(self, ...)
+        EAV::XS     self
+    PREINIT:
+        I32 i;
+    CODE:
+        if (((items - 1) % 2) != 0)
+            croak ("options have the odd number of elements");
+
+        eav_t *eav = (eav_t *)self;
+
+        for (i = 1; i < items; i += 2) {
+            switch (sv_eav_param(ST(i))) {
+            case EAV_PARAM_ALLOW_TLD:
+                eav->allow_tld = SvIV(ST(i+1));
+                break;
+            case EAV_PARAM_TLD_CHECK:
+                eav->tld_check = (SvIV(ST(i+1))) ? true : false;
+                break;
+            case EAV_PARAM_RFC:
+                eav->rfc = SvIV(ST(i+1));
+                break;
+            }
+        }
+
+        if (eav_setup (eav) != EEAV_NO_ERROR)
+            croak ("eav_setup(): %s", eav_errstr (eav));
+
+
+void
 DESTROY(self)
         EAV::XS     self
     CODE:
@@ -180,7 +209,7 @@ bool
 get_is_ipv4(self)
         EAV::XS     self
     CODE:
-        RETVAL = self->result != NULL ?self->result->is_ipv4 : false;
+        RETVAL = self->result != NULL ? self->result->is_ipv4 : false;
     OUTPUT:
         RETVAL
 

@@ -1,3 +1,7 @@
+0.05 2020-11-23
+    . Docfix to link to the proper class/module
+    . No code changes, no need to upgrade
+
 0.04 2019-11-01
     . Fix UTF-8 encoding (GH #1, thanks to Johan Vromans)
     . Fix deletion of entries on FritzOS 6.x (GH #2, thanks to Johan Vromans)

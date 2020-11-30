@@ -33,12 +33,12 @@ Image::PNG::Libpng - Perl interface to the C library "libpng".
         print "$k: $header->{$k}\n";
     }
 
-(This example is included as L<F<synopsis.pl>|https://fastapi.metacpan.org/source/BKB/Image-PNG-Libpng-0.47/examples/synopsis.pl> in the distribution.)
+(This example is included as L<F<synopsis.pl>|https://fastapi.metacpan.org/source/BKB/Image-PNG-Libpng-0.48/examples/synopsis.pl> in the distribution.)
 
 
 =head1 VERSION
 
-This document describes Image::PNG::Libpng version 0.47, corresponding to git commit L<bacc581807af81359e3a430444c394c080bfeeb2|https://github.com/benkasminbullock/image-png-libpng/commit/bacc581807af81359e3a430444c394c080bfeeb2> at Thu Sep 17 15:26:53 2020 +0900.
+This document describes Image::PNG::Libpng version 0.48, corresponding to git commit L<7d88f3787cb6c47f9571491a82190f31125885fd|https://github.com/benkasminbullock/image-png-libpng/commit/7d88f3787cb6c47f9571491a82190f31125885fd> at Sun Nov 22 12:23:42 2020 +0900.
 
 =head1 DESCRIPTION
 
@@ -131,7 +131,7 @@ This is useful when image data is stored in a Perl scalar. For example
     printf "Your PNG has width %d and height %d\n", $header->{width}, $header->{height};
     
 
-(This example is included as L<F<get-www-png.pl>|https://fastapi.metacpan.org/source/BKB/Image-PNG-Libpng-0.47/examples/get-www-png.pl> in the distribution.)
+(This example is included as L<F<get-www-png.pl>|https://fastapi.metacpan.org/source/BKB/Image-PNG-Libpng-0.48/examples/get-www-png.pl> in the distribution.)
 
 
 See also L</Input/output manipulation functions>.
@@ -170,7 +170,7 @@ So, for example,
         return int (rand () * 0x100);
     }
 
-(This example is included as L<F<png-cgi.pl>|https://fastapi.metacpan.org/source/BKB/Image-PNG-Libpng-0.47/examples/png-cgi.pl> in the distribution.)
+(This example is included as L<F<png-cgi.pl>|https://fastapi.metacpan.org/source/BKB/Image-PNG-Libpng-0.48/examples/png-cgi.pl> in the distribution.)
 
 
 See also L</Input/output manipulation functions>.
@@ -199,7 +199,7 @@ The following example demonstrates copying a PNG.
     $pngout->set_text ([{key => 'Name', text => 'Shunsaku Kudo'}]); 
     # $pngout->write_png_file ('copy.png');
 
-(This example is included as L<F<copy-png.pl>|https://fastapi.metacpan.org/source/BKB/Image-PNG-Libpng-0.47/examples/copy-png.pl> in the distribution.)
+(This example is included as L<F<copy-png.pl>|https://fastapi.metacpan.org/source/BKB/Image-PNG-Libpng-0.48/examples/copy-png.pl> in the distribution.)
 
 
 =head2 set_transforms
@@ -247,6 +247,10 @@ L</set_rows> instead. Croaks if given unknown chunk.
 
 Split the alpha channel away from the other data. This only works for
 RGBA images or gray/alpha images.
+
+If your purpose of splitting out the Alpha channel is simply to
+discard it, you may get better performance by using
+C<PNG_TRANSFORM_STRIP_ALPHA> in L</read_png> instead.
 
 =head1 New-like functions
 
@@ -636,7 +640,7 @@ as in C<RGB_ALPHA>.
     my $name = color_type_name ($png->get_IHDR->{color_type});
     print "Your PNG has colour type $name.\n";
 
-(This example is included as L<F<color-type-name.pl>|https://fastapi.metacpan.org/source/BKB/Image-PNG-Libpng-0.47/examples/color-type-name.pl> in the distribution.)
+(This example is included as L<F<color-type-name.pl>|https://fastapi.metacpan.org/source/BKB/Image-PNG-Libpng-0.48/examples/color-type-name.pl> in the distribution.)
 
 
 This function does not correspond to anything in libpng. The names of
@@ -1902,7 +1906,7 @@ instances of unevaluated arguments, which have all been eliminated
 from this module.
 
 If you are interested in exactly which libpng arguments are omitted,
-you can find each instance L<in the file C<perl-libpng.c> in the top directory of the distribution|http://cpansearch.perl.org/src/BKB/Image-PNG-Libpng-0.47/perl-libpng.c> in the macro
+you can find each instance L<in the file C<perl-libpng.c> in the top directory of the distribution|http://cpansearch.perl.org/src/BKB/Image-PNG-Libpng-0.48/perl-libpng.c> in the macro
 C<UNUSED_ZERO_ARG>.
 
 =head2 Function return values are used to return values
@@ -2126,7 +2130,7 @@ Something went wrong trying to read a PNG from a Perl scalar. This probably indi
 
 
 
-=item Request for too many bytes %d on a scalar of length %d at read position %d.
+=item Request for too many bytes %zu on a scalar of length %zu at read position %d.
 
 (F) 
 There was an attempt to read some data from a Perl scalar which went beyond the expected end of the scalar in memory.
@@ -2248,7 +2252,7 @@ set_rows was called with an array of the wrong size.
 
 
 
-=item Row %d is %d bytes, which is too long; truncating to %d
+=item Row %d is %zu bytes, which is too long; truncating to %d
 
 (W) 
 
@@ -2298,7 +2302,7 @@ The chunk name was not defined.
 
 
 
-=item chunk %i has bad length %d: should be %d in chunk list
+=item chunk %i has bad length %zu: should be %d in chunk list
 
 (F) 
 

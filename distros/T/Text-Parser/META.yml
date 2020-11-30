@@ -20,13 +20,13 @@ build_requires:
   constant: '0'
   lib: '0'
   parent: '0'
-  perl: v5.14.0
+  perl: '5.006000'
   utf8: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
-  perl: v5.14.0
+  perl: '5.006000'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.017, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -35,25 +35,27 @@ name: Text-Parser
 provides:
   Text::Parser:
     file: lib/Text/Parser.pm
-    version: '0.927'
+    version: '1.000'
   Text::Parser::AutoSplit:
     file: lib/Text/Parser/AutoSplit.pm
-    version: '0.927'
-  Text::Parser::Errors:
-    file: lib/Text/Parser/Errors.pm
-    version: '0.927'
+    version: '1.000'
+  Text::Parser::Error:
+    file: lib/Text/Parser/Error.pm
+    version: '1.000'
   Text::Parser::Multiline:
     file: lib/Text/Parser/Multiline.pm
-    version: '0.927'
+    version: '1.000'
   Text::Parser::Rule:
     file: lib/Text/Parser/Rule.pm
-    version: '0.927'
+    version: '1.000'
   Text::Parser::RuleSpec:
     file: lib/Text/Parser/RuleSpec.pm
-    version: '0.927'
+    version: '1.000'
 requires:
   English: '0'
   FileHandle: '0'
+  List::MoreUtils: '0'
+  List::Util: '0'
   Moose: '0'
   Moose::Exporter: '0'
   Moose::Role: '0'
@@ -64,20 +66,21 @@ requires:
   MooseX::StrictConstructor: '0'
   Scalar::Util: '0'
   String::Util: '0'
-  Throwable::SugarFactory: '0'
+  Throwable::Error: '0'
   Try::Tiny: '0'
   feature: '0'
   namespace::autoclean: '0'
-  perl: v5.14.0
+  perl: '5.006000'
   strict: '0'
   warnings: '0'
 resources:
   bugtracker: http://github.com/balajirama/Text-Parser/issues
   homepage: https://github.com/balajirama/Text-Parser
   repository: https://github.com/balajirama/Text-Parser.git
-version: '0.927'
+version: '1.000'
 x_contributors:
   - 'H.Merijn Brand - Tux <h.m.brand@xs4all.nl>'
   - 'Mohammad S Anwar <mohammad.anwar@yahoo.com>'
-x_generated_by_perl: v5.30.0
+x_generated_by_perl: v5.32.0
 x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

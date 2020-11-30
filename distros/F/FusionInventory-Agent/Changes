@@ -1,5 +1,204 @@
 Revision history for FusionInventory agent
 
+2.6 Thu, 26 Nov 2020
+
+core:
+* as explain in Version.pm comments, actual versioning is problematic for CPAN versions,
+  so any future version will probably be defined as only major.minor but evantually
+  as major.minor_rev if a package revision is necessary. This policy could be revised
+  after any major upgrade.
+* Fix configuration reloading to keep set script options
+* Avoid a not critical perl error while reloading HTTP server
+* Fix #820: Fix config reading to permit completly empty settings
+
+inventory:
+* Bump Inventory task version to 1.10
+* Fix #771: added Acer monitor serial support for models (G227HQL, G236HL, R221Q, S273HL)
+* Fix #787: fix debian package reporting when size is not defined
+* Battery capacity support provides now canonical values
+* Battery capacity support permits to compute battery capacity usage, thanks to Thierry Bugier
+* Fix #819: Surface Go 2 was recongized has Hyper-V
+* Fix #825: Enhanced disk encryption detection under linux
+* Fix #829: added other Acer monitor serial support (H226HQL, K222HQL, SA220Q)
+* Enhanced Qemu KVM virtualization detection, thanks to Rico29
+* Dmidecode output parsing cleanup
+* Fix #804: Filter out virtual overlay FS while using docker
+* Fix #540: Added powersupplies support on MacOS
+* Fix #797: Fix ASM storage inventory
+* Better canonical manufacturer reporting
+* Fix Snap software inventory support with long summary on a package
+* Added PartNumber API to enhanced inventory memory and controllers support:
+ * Elpida, Hynix, Micron & Samsung memory partnumbers
+ * Dell controller partnumbers
+* thanks to Vadim Pisarev:
+ * Storages can now use smartctl command
+ * Enhanced HP Storage inventory with smartctl
+ * Memory inventory includes partnumber as MODEL
+ * Controller inventory includes SERIAL and MODEL
+ * Enhanced memory and controllers inventory via IPMI
+ * Better storage support
+ * Micron memories PartNumber support
+* Updated pci.ids to 2020.11.14 version
+* Updated usb.ids to 2020.08.26 version
+
+netdiscovery/netinventory:
+* Bump NetDiscovery task version to 4.2
+* Bump NetInventory task version to 4.2
+* Updated Ricoh printers support with better hostname detection
+* Updated Zebra printers support with better hostname detection
+* Introduced Siemens industrial modules support
+* Introduced Multitech industrial modules support
+* Fix #823, #856: Add Ubiquiti UniFi AP linux appliance support
+* Fix #772: Enhanced some HP switchs support
+* Introduced Hwg support, thanks to Bertrand Keller
+* Fix #830: Retrieve rigth model for Oki printers
+* Updated sysobject.ids (tagged fia-2.6 tag on github repository)
+
+ESX:
+* Bump ESX task version to 2.6
+* verify a user and password are provided before attemting to connect to ESX server
+
+injector:
+* Fix an issue with --xml-ua option triggering a perl fatal error on empty or wrong XML files
+* Fix typo in man page
+
+2.5.2 Mon, 16 Dec 2019
+
+core:
+* fix HTTP server IPv6 support as HTTP::Daemon module now supports IPv6 natively
+* Always compile IPv4 address as IPv6 too for trusted ips. This is needed when
+  system default is to listen other IPv6 or you set httpd-ip to IPv6 address
+  like '::' or '::1'.
+* win32: always detach agent thread after 10 seconds when stopping the agent
+  service when it is blocking on anything to guaranty the service stops in 10s max
+* check agent persistent datas for a "forcerun" set flag. This is firstly intended
+  to be used by win32 installer to handle the "start inventory after installation"
+  option directly from the service.
+  This can also be used to change or reset the agent deviceid.
+* Add --set-forcerun option support to fusioninventory-agent script
+* Add J-C-P contribution to simplify agent installation under linux debian/ubuntu
+* fix: don't reschedule too early on a forced run at start
+* fix: Don't use delaytime on config reload
+* fix: use target counters reset to better support config reload
+* feature: limit next run delay reduction
+  Limit next run random delay reduction to max 1/6 of the delay if less than 6 hours,
+  limit to max an hour for delay from 6 hours to 24 hours,
+  and limit to max 1/24 of the delay for delay greater than a day.
+  This would keep enough delay randomization to avoid mass agent server connection and
+  keep next seen run more coherent with the requested delay.
+* fix service shutdown when HTTP client close the connection before the agent
+* fix HTTP server keep-alive support with a 8 requests by connection maximum limit
+* service update to support a safe forking system to firstly support handling
+  parallel http request for the Proxy HTTP server plugin.
+* Proxy HTTP server plugin now support max_proxy_threads configuration which is
+  set to 10 maximum concurrent requests by default.
+
+inventory:
+* Bump Inventory task version to 1.9
+* unix: fix last log user after a reboot
+* added Samsung monitor serial support for models: B1940MR, B1940W, S22A450BW,
+  S22B420, S22E450, S22F350FHU, S27D390H, S27D850T, S27H850QFU, S19A450, SM943BM,
+  S22C450, S27H650FDU
+* macosx:
+ - fix monitors inventory using ioreg as it provides EDID block from monitors
+ - fix few perl error messages on exotic cases
+* win32: fix hyperv host wasn't filtered from installed virtual machines
+* win32: fix Adobe key detection, thanks to PR-gh
+* Megacli storage support update, thanks to po1vo
+* linux: Added macvlan/docker network interfaces support, thanks to po1vo
+* win32: fix firewall inventory cases, thanks to PR-gh
+* win32: fix Office license inventory, thanks to PR-gh
+* win32: enhanced network card inventory, thanks to PR-gh
+* linux: provides debian installed software filesize in bytes
+* linux: Added support for installed softwares by Snap
+* linux: double-check a network interface is not virtual
+* fix #723: check debian linux version in /etc/debian_version
+* fix #726: Added support for latest SPARC cpus on Solaris
+* hdparm support fixes by, thanks to po1vo
+* win32: fix software inventory failing due to unsupported UTF-16 Appx manifest XML
+* improved HP storage support, thanks to po1vo
+* fix minor edid parsing issue
+* linux: fix downed network interface speed, thanks to po1vo
+* linux: enhanced generic SCSI storage support, thanks to po1vo
+* linux: added process to enhance storage support testing
+* fix #769: fix Virtuozzo virtualization inventory
+* fix #752: normalize video cards memory on macosx
+* fix #452, #642: better macosx network cards support
+* fix #359: try to obtain remote management litemanager ID under win32
+* Updated pci.ids to 2019.12.11 version
+* Updated usb.ids to 2019.11.05 version
+
+netdiscovery/netinventory:
+* Bump NetDiscovery task version to 4.1
+* Bump NetInventory task version to 4.1
+* linux: avoid to share HTTP client with threads to fix RHEL/CentOS 7 crash
+* Add Tagged VLAN, work at least with HPE Switch, thanks to PR-gh
+* Enhanced Qlogic support to report device serial number, thanks to po1vo
+* Added StormShield support via FreeBSD MIBSupport, thanks to PR-gh
+* Fix memory and storage size normalization in some cases, thanks to PR-gh
+* fix #738: fix time expiration when netinventory is chained with netdiscovery
+  while using fusioninventory-netdiscovery script --inventory option
+* fix #741: device with empty description was no more inventoried
+* fix #717: use cdpCacheSysName when available to enhance connection detection
+  Try also to extract remote mac address from deviceId when possible (fix Meraki
+  connection detection, even support Yealink SIP phones)
+* fix #684: Added IAP Aruba serial number support
+* moved APC pdu support to mibsupport, thanks to po1vo
+* fix #751: Added Seagate storage support
+* enhanced VLAN support
+* fix #734: Fix issue with Ricoh printers
+* fix #722: Enhance LinuxAppliance support with Sophos UTG support
+* improved Ricoh printer support
+* Updated sysobject.ids (tagged fia-2.5.2 tag on github repository)
+
+2.5.1 Tue, 02 Jul 2019
+
+core:
+* build: fix fusioninventory-remoteinventory was not installed
+* fix HTTP server plugins base configuration folder
+* fix HTTP server plugins installation from Makefile
+* fix HTTP server SSL plugin so SSL sessions are not closed after one second
+* fix #679: Win32 service HTTP server wasn't answering during an inventory
+* feature: Added Proxy and SecondaryProxy HTTP server plugins
+
+inventory:
+* Bump Inventory task version to 1.8
+* fix error message while starting fusioninventory-inventory script
+* fix #667: LG tv monitor inventory failure
+* win32: VirtualBox or VPN network adapters are now set as virtual
+* added Samsung S24E450 monitor serial support
+* linux: fix megacli storage analysis
+* linux: check package status before telling it is installed on debian/ubuntu
+* fix #688: inventory on "windows x64 1903" takes too much time. That was only
+  happen when an antivirus other than Windows Defender was enabled and it blocks
+  WMI call toward MSFT_MpComputerStatus class.
+* win32: Add Symantec/Norton antivirus support
+* fix #399: Deduplicate logged users without being case sensitive on win32
+* Updated pci.ids to 2019.06.30 version
+* Updated usb.ids to 2019.05.08 version
+
+netdiscovery/netinventory:
+* Bump NetDiscovery task version to 4.0
+* Bump NetInventory task version to 4.0
+* add Hygon Dhyana Support
+* refactor: the multi-threading scheme has been re-worked so it is now working for
+  netinventory task and more efficient for netdiscovery while scanning many range
+  by job
+* refactor: Collected datas are also sent to server from threads
+* Added 2 options to fusioninventory-netdiscovery to save XMLs as file and
+  automatically start netinventory when convenient:
+  * add --inventory option to netdiscovery to automatically start netinventory
+  * add --save option to define a folder where to save related XML
+* Updated sysobject.ids (tagged fia-2.5.1 tag on github repository)
+
+esx:
+* Bump ESX task version to 2.5
+* Support EnclosureSerialNumberTag and SerialNumberTag values as availables since
+  VMware ESXi 6.5, Patch Release ESXi650-201811002 (build-10884925) and in latest
+  VMware ESXi 6.7.
+* add esx script new options:
+  Add --dump and --dumpfile option to help ESX support debugging
+
 2.5 Fri, 12 Apr 2019
 
 core:

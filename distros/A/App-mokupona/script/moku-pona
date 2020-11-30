@@ -1,0 +1,755 @@
+#!/usr/bin/perl
+# Copyright (C) 2018–2020  Alex Schroeder <alex@gnu.org>
+
+# This program is free software: you can redistribute it and/or modify it under
+# the terms of the GNU General Public License as published by the Free Software
+# Foundation, either version 3 of the License, or (at your option) any later
+# version.
+#
+# This program is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+# FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License along with
+# this program. If not, see <http://www.gnu.org/licenses/>.
+
+=encoding utf8
+
+=head1 Moku Pona
+
+Moku Pona is a Gemini based feed reader. It can monitor URLs to feeds or regular
+pages for changes and keeps and updated list of these in a Gemini list. Moku
+Pona knows how to fetch Gopher URLs, Gemini URLs, and regular web URLs.
+
+You manage your subscriptions using the command-line, with Moku Pona.
+
+You serve the resulting file using a Gemini server.
+
+You read it all using your Gemini client.
+
+=head2 Limitations
+
+Moku Pona only detects changes. Thus, if there is an item that points to a phlog
+or blog, that's great. Sometimes people put their phlog in a folder per year. If
+the Gopher menu lists each folder and a date with the latest change, then that's
+great, you can use it. Without it, you're in trouble: you need to subscribe to
+the item for the current year in order to see changes, but when the next year
+comes around, you're subscribed to the wrong item. Sometimes you're lucky and
+there will be a menu somewhere with a timestamp for the last change. Use that
+instead. Good luck!
+
+=head2 License
+
+GNU Affero General Public License
+
+=head2 Installation
+
+Using C<cpan>:
+
+    cpan App::mokupona
+
+Manual install:
+
+    perl Makefile.PL
+    make
+    make install
+
+=head2 Dependencies
+
+There are some Perl dependencies you need to satisfy in order to run this
+program:
+
+=over
+
+=item L<Modern::Perl>, or C<libmodern-perl-perl>
+
+=item L<Mojo::IOLoop>, or C<libmojolicious-perl>
+
+=item L<XML::LibXML>, or C<libxml-libxml-perl>
+
+=item L<URI::Escape>, or C<liburi-escape-xs-perl>
+
+=back
+
+=cut
+
+use Modern::Perl '2018';
+use File::Copy qw(copy);
+use Encode qw(decode_utf8);
+use Mojo::IOLoop;
+use XML::LibXML;
+use URI::Escape;
+
+=head2 The Data Directory
+
+Moku Pona keeps the list of URLs you are subscribed to in directory. It's
+probably C<~/.moku-pona> on your system.
+
+=over
+
+=item If you have the C<MOKU_PONA> environment variable set, then that's your data
+directory.
+
+=item If you have the C<XDG_DATA_HOME> environment variable set, then your data
+directory is F<$XDG_DATA_HOME/moku-pona>.
+
+=item If you you have the C<HOME> environment variable set, and you have a
+F<$HOME/.local> directory, then your data directory is
+F<$HOME/.local/moku-pona>.
+
+=item If you have the C<HOME> environment variable set, then your data directory
+is F<$HOME/.moku-pona>.
+
+=item If you have the C<APPDATA> environment variable set (Windows), then your
+data directory is F<$APPDATA/moku-pona>.
+
+=item The last option is to have the C<LOGDIR> environment variable set.
+
+=back
+
+The data directory contains a copy of the latest resources. The names of these
+cache files are simply the URL with all the slashes replaced by a hyphen.
+
+=cut
+
+our $data_dir = data_dir();
+say "Using $data_dir";
+
+sub data_dir {
+  return $ENV{MOKU_PONA} if $ENV{MOKU_PONA};
+  # find an existing directory
+  return $ENV{XDG_DATA_HOME} . '/moku-pona' if $ENV{XDG_DATA_HOME} and -d $ENV{XDG_DATA_HOME} . '/moku-pona';
+  return $ENV{HOME} . '/.local/moku-pona' if $ENV{HOME} and -d $ENV{HOME} . '/.local/moku-pona';
+  return $ENV{HOME} . '/.moku-pona' if $ENV{HOME} and -d $ENV{HOME} . '/.moku-pona';
+  return $ENV{APPDATA} . '/moku-pona' if $ENV{APPDATA} and -d $ENV{APPDATA} . '/.moku-pona';
+  return $ENV{LOGDIR} . '/.moku-pona' if $ENV{LOGDIR} and -d $ENV{LOGDIR} . '/.moku-pona';
+  # or use a new one
+  return $ENV{XDG_DATA_HOME} . '/moku-pona' if $ENV{XDG_DATA_HOME};
+  return $ENV{HOME} . '/.local/moku-pona' if $ENV{HOME} and -d $ENV{HOME} . '/.local';
+  return $ENV{HOME} . '/.moku-pona' if $ENV{HOME};
+  return $ENV{APPDATA} . '/moku-pona' if $ENV{APPDATA};
+  return $ENV{LOGDIR} . '/.moku-pona' if $ENV{LOGDIR};
+  die "Please set the MOKU_PONA environment variable to a directory name\n";
+}
+
+=pod
+
+The C<sites.txt> file is a file containing a gemtext list of links, i.e. entries
+such as these:
+
+    => gemini://alexschroeder.ch Alex Schroeder
+
+=cut
+
+our $site_list = $data_dir . '/sites.txt';
+
+=pod
+
+The C<updates.txt> file is a file containing a gemtext list of links based on
+C<sites.txt>, but with a timestamp of their last change, and with new updates
+moved to the top. The ISO date is simply inserted after the URL:
+
+    => gemini://alexschroeder.ch 2020-11-07 Alex Schroeder
+
+=cut
+
+our $updated_list = $data_dir . '/updates.txt';
+
+=pod
+
+In order to be at least somewhat backwards compatible with Moku Pona versions
+1.1 and earlier, C<sites.txt> may contain Gopher menu items. These are converted
+to Gemini URLs during processing and thus the C<updates.txt> file still contains
+regular gemtext.
+
+    1Alex Schroeder ⭾ ⭾ alexschroeder.ch ⭾ 70
+
+=cut
+
+sub convert {
+  for (@_) {
+    next if /^=> /; # is already a gemini link
+    my ($type, $desc, $selector, $host, $port) = /^([^\t])([^\t]*)\t([^\t]*)\t([^\t]*)\t([^\t\r]*)/;
+    if ($host and $port) {
+      $port //= 0;
+      $_ = "=> gopher://$host:$port/$type$selector $desc";
+    }
+  }
+  return @_;
+}
+
+=pod
+
+As was said above, however, the recommended format is the use of URLs. Moku Pona
+supports Gemini, Gopher, and the web (gemini, gopher, gophers, http, and https
+schemes).
+
+=cut
+
+sub query_gemini {
+  my $url = shift;
+  my $responses = shift;
+  my($scheme, $authority, $path, $query, $fragment) =
+      $url =~ m|(?:([^:/?#]+):)?(?://([^/?#]*))?([^?#]*)(?:\?([^#]*))?(?:#(.*))?|;
+  die "⚠ The URL '$url' must use the gemini scheme\n" unless $scheme and $scheme eq 'gemini';
+  die "⚠ The URL '$url' must have an authority\n" unless $authority;
+  my ($host, $port) = split(/:/, $authority, 2);
+  $port //= 1965;
+  Mojo::IOLoop->client(
+    {port => $port, address => $host, tls => 1, tls_verify => 0 }
+    => sub {
+      my ($loop, $err, $stream) = @_;
+      if (not $stream) {
+	warn "Cannot connect to $url\n";
+	return;
+      }
+      my $header;
+      $stream->on(read => sub {
+	my ($stream, $bytes) = @_;
+	$responses->{$url} .= $bytes;
+	$header = $responses->{$url} =~ s/^.*\r\n// unless $header});
+      $stream->write("$url\r\n")})
+}
+
+sub query_gopher {
+  my $url = shift;
+  my $responses = shift;
+  my ($selector, $host, $port) = url_to_gopher($url);
+  my $tls = $url =~ /^gophers/;
+  Mojo::IOLoop->client(
+    {port => $port, address => $host, tls => $tls }
+    => sub {
+      my ($loop, $err, $stream) = @_;
+      if (not $stream) {
+	warn "Cannot connect to $url\n";
+	return;
+      }
+      $stream->on(
+	read => sub {
+	  my ($stream, $bytes) = @_;
+	  $responses->{$url} .= $bytes});
+      $stream->write("$selector\r\n")})
+}
+
+sub url_to_gopher {
+  my $url = shift;
+  my $name = shift||$url;
+  my($scheme, $authority, $path, $query, $fragment) =
+      $url =~ m|(?:([^:/?#]+):)?(?://([^/?#]*))?([^?#]*)(?:\?([^#]*))?(?:#(.*))?|;
+  $scheme ||= "gopher";
+  return unless $scheme =~ /^gophers?$/;
+  $path = substr($path, 1) if substr($path, 0, 1) eq "/";
+  my $type = $path ? substr($path, 0, 1) : "1";
+  my $selector = $path ? substr($path, 1) : "";
+  my ($host, $port) = split(/:/, $authority, 2);
+  return ($selector, $host, $port||70);
+}
+
+sub query_web {
+  my $url = shift;
+  my $responses = shift;
+  my($scheme, $authority, $path, $query, $fragment) =
+      $url =~ m|(?:([^:/?#]+):)?(?://([^/?#]*))?([^?#]*)(?:\?([^#]*))?(?:#(.*))?|;
+  my $tls = $scheme eq "https";
+  my ($host, $port) = split(/:/, $authority, 2);
+  $path ||= "/";
+  my $selector = $path;
+  $selector .= "?" . $query if $query;
+  # ignore the fragment
+  $port ||= $tls ? 443 : 80;
+  Mojo::IOLoop->client(
+    {port => $port, address => $host, tls => $tls }
+    => sub {
+      my ($loop, $err, $stream) = @_;
+      my $header;
+      $stream->on(read => sub {
+	my ($stream, $bytes) = @_;
+	$responses->{$url} .= $bytes;
+	$header = $responses->{$url} =~ s/^.*\r\n\r\n//s unless $header});
+      $stream->write("GET $selector HTTP/1.0\r\n"
+		     . "Host: $host:$port\r\n"
+		     . "User-Agent: moku-pona\r\n"
+		     . "\r\n")});
+}
+
+=head2 Migration from 1.1
+
+The best way to migrate your setup is probably to use the C<list> subcommand
+explained later, and to recreate your list of subscriptions. Then your
+C<sites.txt> file will use gemtext format.
+
+    moku-pona list | grep "moku-pona add" > commands
+    mv ~/.moku-pona/sites.txt ~/.moku-pona/sites.txt~
+    sh commands
+
+=cut
+
+sub load_site {
+  my $file = $site_list;
+  return [] if not -f $file;
+  open(my $fh, "<:encoding(UTF-8)", $file) or die "Cannot read $file: $!\n";
+  my @lines = <$fh>;
+  chomp(@lines);
+  @lines = grep(/^=> /, convert(@lines)); # from gopher
+  return \@lines;
+}
+
+sub load_file {
+  my $file = shift;
+  return "" if not -f $file;
+  open(my $fh, "<:encoding(UTF-8)", $file)
+      or die "Cannot read $file: $!\n";
+  local $/ = undef;
+  return <$fh>;
+}
+
+sub save_file {
+  my $file = shift;
+  my $data = shift;
+  mkdir $data_dir unless -d $data_dir;
+  open(my $fh, ">:encoding(UTF-8)", $file)
+      or die "Cannot write $file: $!\n";
+  print $fh $data;
+}
+
+=head2 List your subscriptions
+
+    moku-pona list
+
+This lists all your current subscriptions in a format that is suitable for a
+shell script!
+
+Example:
+
+    moku-pona list | grep "alexschroeder"
+
+In this particular case, since I'm testing my own server, the result would be:
+
+    moku-pona add https://alexschroeder.ch/wiki?action=rss "rss"
+    moku-pona add gemini://alexschroeder.ch/ "gemini"
+    moku-pona add gopher://alexschroeder.ch/ "gopher"
+    moku-pona add gophers://alexschroeder.ch:7443/ "gophers"
+
+=cut
+
+sub do_list {
+  my $site = load_site();
+  print("Subscribed items in $site_list:\n");
+  print("none\n") unless @$site;
+  for my $line (@$site) {
+    # skip item type
+    my ($uri, $name) = $line =~ /^=> (\S+)\s+(.*)/;
+    print(qq{moku-pona add $uri "$name"\n});
+  }
+}
+
+=head2 Add a subscription
+
+    moku-pona add url [description]
+
+This adds a URL to the list of subscribed items. If the target is an Atom or RSS
+feed, then that's also supported. You can provide an optional description for
+this URL. If you don't provide a description, the URL will be used as the item's
+description.
+
+Example:
+
+    moku-pona add gemini://alexschroeder.ch kensanata
+
+=cut
+
+sub do_add {
+  my $uri = shift;
+  my $name = shift;
+  $name ||= $uri;
+  my $line = "=> $uri $name";
+  my $site = load_site();
+  my $uri_re = quotemeta($uri);
+  my $name_re = quotemeta($name);
+  if (grep(/^=> $uri_re /, @$site)) {
+    warn("$uri already exists in $site_list\n");
+  } elsif (grep(/^=> \S+ $name_re/, @$site)) {
+    warn("$name already exists in $site_list\n");
+  } else {
+    push(@$site, $line);
+  }
+  save_file($site_list, join("\n", @$site, ""));
+}
+
+=head2 Remove a subscription
+
+    moku-pona remove description
+
+This removes one or more URLs from the list of subscribed items.
+
+Example:
+
+    moku-pona remove kensanata
+
+=cut
+
+sub do_remove {
+  my @args = @_;
+  my $site = load_site();
+  my $count = 0;
+  my $i = 0;
+  while (@args and $i < @$site) {
+    my $line = $site->[$i];
+    my ($uri, $name) = $line =~ /^=> (\S+)\s+(.*)/;
+    my $found = 0;
+    my $j = 0;
+    while ($j < @args) {
+      if ($name eq $args[$j]) {
+	$count++;
+	$found = 1;
+	splice(@$site, $i, 1); # remove the site found
+	splice(@args, $j, 1); # remove the arg found
+      } else {
+	$j++;
+      }
+    }
+    $i++ unless $found;
+  }
+  if ($count) {
+    printf("Removed %d %s\n", $count,
+	   $count == 1 ? "subscription" : "subscriptions");
+    save_file($site_list, join("\n", @$site, ""));
+  } else {
+    warn("No subscriptions matching @args found\n");
+    warn("Use moku-pona list to find the correct descriptions.\n");
+  }
+}
+
+=head2 Clean up the data directory
+
+    moku-pona cleanup [--confirm]
+
+When Moku Pona updates, copies of the URL targets are saved in the data
+directory. If you remove a subscription (see above), that leaves a cache file in
+the data directory that is no longer used – and it leaves an entry in
+C<updates.txt> that is no longer wanted. The cleanup command fixes this. It
+deletes all the cached pages that you are no longer subscribed to, and it
+removes those entries from C<updates.txt> as well.
+
+Actually, just to be sure, if you run it without the C<--confirm> argument, it
+simply prints which files it would trash. Rerun it with the C<--confirm>
+argument to actually do it.
+
+Example:
+
+    moku-pona cleanup
+
+=cut
+
+sub do_cleanup {
+  my $confirm = shift||'' eq '--confirm';
+  my $todo = 0;
+  # get a hash map telling us the cache files we expect based on our sites
+  my $site = load_site();
+  my %caches = map {
+    my ($uri, $name) = /^=> (\S+)\s+(.*)/;
+    $uri =~ s/[\/:]/-/g;
+    "$data_dir/$uri" => 1;
+  } @$site;
+  # get a list of text files in the directory
+  opendir(my $dh, $data_dir) or die "Cannot read $data_dir: $!\n";
+  my @files = map { "$data_dir/$_" } grep { /^[^.]/ } readdir($dh);
+  closedir($dh);
+  # remove unnecessary cache files
+  for my $file (@files) {
+    next if $file eq $site_list;
+    next if $file eq $updated_list;
+    next if $caches{$file};
+    if ($confirm) {
+      unlink $file;
+    } else {
+      print "trash $file\n";
+      $todo++;
+    }
+  }
+  # check updates list
+  if (-f $updated_list) {
+    open(my $fh, "<:encoding(UTF-8)", $updated_list)
+	or die "Cannot read $updated_list: $!\n";
+    my @lines = <$fh>;
+    chomp(@lines);
+    # decide what to do about each line in updates, looking just at the names
+    my %sites = map { s/^=> (\S+)\s+(.*)/$2/; $_ => 1 } @$site;
+    my @deletes;
+    my @keeps;
+    for my $line (@lines) {
+      if ($line =~ /^=> \S+ \d\d\d\d-\d\d-\d\d (.+)/ and not $sites{$1}) {
+	push(@deletes, $line);
+	$todo++;
+      } else {
+	push(@keeps, $line);
+      }
+    }
+    print "Removing these entries from updates:\n"
+	. join("\n", @deletes, "") if @deletes and not $confirm;
+    # save
+    save_file($updated_list, join("\n", @keeps, "")) if $confirm;
+  }
+  if ($todo && !$confirm) {
+    print "\n";
+    print "Use moku-pona cleanup --confirm to do it.\n";
+  }
+}
+
+=head2 Update
+
+    moku-pona update [--quiet] [names...]
+
+This updates all the subscribed items and generates a new local page for you to
+visit: C<updates.txt>.
+
+Example:
+
+    moku-pona update
+
+If you call it from a cron job, you might want to use the C<--quiet> argument to
+prevent it from printing all the sites it's contacting (since cron will then
+mail this to you and you might not care for it unless there's a problem). If
+there's a problem, you'll still get a message.
+
+This is how I call it from my C<crontab>, for example
+
+    #m   h  dom mon dow   command
+    11 7,14 *   *   *     /home/alex/bin/moku-pona update --quiet
+
+If you're testing things, you can also fetch just a limited number of items by
+listing them.
+
+Example:
+
+    moku-pona update "RPG Planet"
+
+The C<updates.txt> files may contain lines that are not links at the top. These
+will remain untouched. The rest is links. New items are added at the beginning
+of the links and older copies of such items are removed from the links.
+
+=cut
+
+sub add_update {
+  my $line = shift;
+  my ($uri, $name) = $line =~ /^=> (\S+)\s+(.*)/;
+  # add current date
+  my ($sec, $min, $hour, $mday, $mon, $year) = gmtime(); # UTC
+  my $date = sprintf('%4d-%02d-%02d', $year + 1900, $mon + 1, $mday);
+  $line = "=> $uri $date $name";
+  # load file
+  my @lines;
+  if (-f $updated_list) {
+    open(my $fh, "<:encoding(UTF-8)", $updated_list)
+	or die "Cannot read $updated_list: $!\n";
+    @lines = convert(<$fh>); # from gohper
+    chomp(@lines);
+  }
+  # start the new list with the non-list links
+  my @new = grep(!/^=>/, @lines);
+  # add the line to the new list
+  push(@new, $line);
+  # add the remaining links to the new list, except for the ones matching the name of the new line
+  push(@new, grep(!/\d\d\d\d-\d\d-\d\d $name$/, grep(/^=>/, @lines)));
+  # save
+  save_file($updated_list, join("\n", @new, ""));
+}
+
+sub do_update {
+  my $quiet = grep { $_ eq '--quiet' } @_;
+  my @sites = grep { $_ ne '--quiet' } @_;
+  my $site = load_site();
+  my %responses;
+  my @uris;
+  my %names;
+  my %lines;
+  for my $line (@$site) {
+    my ($uri, $name) = $line =~ /^=> (\S+)(?:[ \t]+(.*))?/;
+    $name ||= $uri;
+    next unless @sites == 0 or grep { $_ eq $name } @sites;
+    say("Fetching $name...") unless $quiet;
+    push(@uris, $uri);
+    $names{$uri} = $name;
+    $lines{$uri} = $line;
+    if ($uri =~ /^gopher/) {
+      query_gopher($uri, \%responses);
+    } elsif ($uri =~ /^gemini/) {
+      query_gemini($uri, \%responses);
+    } elsif ($uri =~ /^http/) {
+      query_web($uri, \%responses);
+    } else {
+      warn "Don't know how to fetch $uri\n";
+    }
+  }
+
+  Mojo::IOLoop->start unless Mojo::IOLoop->is_running;
+
+  for my $uri (keys %responses) {
+    my $name = $names{$uri};
+    # decode the UTF-8 when we have the entire response
+    my $new = decode_utf8($responses{$uri});
+    if (not $new) {
+      warn("$name returned an empty document\n");
+      next;
+    }
+    my $filename = $uri;
+    $filename =~ s/[\/:]/-/g;
+    my $cache = "$data_dir/$filename";
+    if ($new =~ /^<(\?xml|rss)/) {
+      $new = to_gemini($new);
+      my $encoded = uri_escape_utf8($filename);
+      $lines{$uri} = "=> $encoded $name"; # now referring to the local cache file
+    }
+    my $old = load_file($cache);
+    if ($new ne $old) {
+      say "$name updated" unless $quiet;
+      add_update($lines{$uri});
+      save_file($cache, $new);
+    } else {
+      say "$name unchanged" unless $quiet;
+    }
+  }
+}
+
+=head2 Subscribing to feeds
+
+When the result of an update is an XML document, then it is parsed and the links
+of its items (if RSS) or entries (if Atom) are extracted and saved in the cache
+file in the data directory. The effect is this:
+
+=over
+
+=item If you subscribe to a regular page, then the link to it in C<updates.txt>
+moves to the top when it changes.
+
+=item If you subscribe to a feed, then the link in C<updates.txt> moves to the
+top when it changes and it links to a file in the data directory that links to
+the individual items in the feed.
+
+=back
+
+Example:
+
+    moku-pona add https://campaignwiki.org/rpg/feed.xml "RPG"
+    moku-pona update
+
+This adds the RPG entry to C<updates.txt> as follows:
+
+    => https%3A--campaignwiki.org-rpg-feed.xml 2020-11-07 RPG
+
+And if you check the file C<https:--campaignwiki.org-rpg-feed.xml>, you'll see
+that it's a regular Gemini list. You'll find 100 links like the following:
+
+    => https://alexschroeder.ch/wiki/2020-11-05_Episode_34 Episode 34
+
+Now use C<moku-pona publish> (see below) to move the files to the correct
+directory where your Gemini server expects them.
+
+=cut
+
+# Convert a RSS or Atom feed to Gemini links
+sub to_gemini {
+  my $xml = shift;
+  my $dom = eval {
+    require XML::LibXML;
+    my $parser = XML::LibXML->new(recover => 2); # no errors, no warnings
+    $parser->load_xml(string => $xml);
+  };
+  if ($@) {
+    warn "$@\n";
+    return '';
+  }
+  my $root = $dom->documentElement();
+  my $xpc = XML::LibXML::XPathContext->new;
+  $xpc->registerNs('atom', 'http://www.w3.org/2005/Atom');
+  my $nodes = $xpc->findnodes('//atom:entry', $root) || $root->findnodes('//item');
+  my @lines;
+  for my $node ($nodes->get_nodelist) {
+    my $titles = $xpc->findnodes('atom:title', $node) || $node->getChildrenByTagName('title');
+    my $title = $titles->shift->textContent; # take the first
+    $title =~ s/\s+$//; # trim right
+    $title =~ s/^\s+//; # trim left
+    my $links = $xpc->findnodes('atom:link', $node) || $node->getChildrenByTagName('link');
+    next unless $links;
+    my $link = $links->shift; # take the first
+    my $href = $link->getAttribute('href') || $link->textContent;
+    push(@lines, "=> $href $title");
+  }
+  return join("\n", @lines, "");
+}
+
+=head2 Publishing your subscription
+
+    moku-pona publish <directory>
+
+This takes the important files from your data directory and copies them to a
+target directory. You could just use symbolic links for C<sites.txt> and
+C<updates.txt>, of course. But if you've subscribed to actual feeds as described
+above, then the cache files need to get copied as well!
+
+Example:
+
+    mkdir ~/subs
+    moku-pona publish ~/subs
+
+=head2 Serving your subscriptions via Gemini
+
+This depends entirely on your Gemini server. If you like it really simple, you
+can use L<Lupa Pona|App::lupapona>. Here's how to create the certificate and key
+files, copy them to the C<~/subs> directory created above, and run C<lupa-pona>
+for a quick test.
+
+    make cert
+    cp *.pem ~/subs
+    cd ~/subs
+    lupa-pona
+
+=cut
+
+sub do_publish {
+  my $target = shift;
+  die "Target $target is not a directory\n" unless -d $target;
+  die "Source $site_list does not exist\n" unless -f $site_list;
+  die "Source $updated_list does not exist\n" unless -f $updated_list;
+  my $path;
+  # copy site list
+  copy($site_list, "$target/sites.txt");
+  # copy updates but with local links for the feed files
+  open(my $in, "<:encoding(UTF-8)", $updated_list)
+      or die "Cannot read $updated_list: $!\n";
+  open(my $out, ">:encoding(UTF-8)", "$target/updates.txt")
+      or die "Cannot write $target/updates.txt: $!\n";
+  for my $line (<$in>) {
+    chomp($line);
+    ($line) = convert($line);
+    my ($uri, $name) = $line =~ /^=> file:\/\/\/(\S+)\s+(.*)/;
+    # if the target is a local file, then that's because it is the result of a
+    # to_gemini call in do_update, so we need to copy it as well
+    $uri =~ s/[\/:]/-/g;
+    if (-f "$data_dir/$uri") {
+      copy("$data_dir/$uri", "$target/$uri");
+    }
+    print $out "$line\n";
+  }
+}
+
+sub do_help {
+  my $parser = Pod::Text->new();
+  $parser->parse_file($0);
+}
+
+sub main {
+  my $command = shift(@ARGV) || "help";
+  if ($command eq "add") { do_add(@ARGV) }
+  elsif ($command eq "remove") { do_remove(@ARGV) }
+  elsif ($command eq "list") { do_list() }
+  elsif ($command eq "cleanup") { do_cleanup(@ARGV) }
+  elsif ($command eq "update") { do_update(@ARGV) }
+  elsif ($command eq "convert") { do_convert() }
+  elsif ($command eq "publish") { do_publish(@ARGV) }
+  else { do_help() }
+}
+
+main() if $0 =~ /\bmoku-pona$/;
+
+1;

@@ -88,4 +88,64 @@ subtest 'no error' => sub {
     is($tore_down, 1, 'still torn down after unsubscribe');
 };
 
+subtest 'behavior subject' => sub {
+    my $bs = rx_behavior_subject->new(10);
+    my @got;
+    $bs->subscribe({
+        next     => sub {push @got, shift},
+        complete => sub {push @got, '__COMPLETE__'},
+    });
+    $bs->next(20);
+    $bs->next(30);
+    $bs->complete;
+
+    is(\@got, [10, 20, 30, '__COMPLETE__'], 'expected events');
+
+    #### subscribe behavior_subject to an observable ####
+
+    $bs = rx_behavior_subject->new(10);
+    undef @got;
+    my $s = rx_subject->new;
+    $s->subscribe($bs);
+    $s->next(20);
+
+    $bs->subscribe({
+        next     => sub {push @got, shift},
+        complete => sub {push @got, '__COMPLETE__'},
+    });
+
+    $s->next(30);
+    $s->complete;
+
+    is(\@got, [20, 30, '__COMPLETE__'], 'expected events');
+};
+
+subtest 'replay subject' => sub {
+    my $rs = rx_replay_subject->new(2);
+    my @got;
+
+    $rs->next(10);
+    $rs->next(20);
+    $rs->next(30);
+
+    $rs->subscribe({
+        next     => sub {push @got, shift},
+        complete => sub {push @got, '__COMPLETE__'},
+    });
+
+    $rs->next(40);
+    $rs->next(50);
+    $rs->complete;
+
+    is \@got, [20, 30, 40, 50, '__COMPLETE__'], 'expected events';
+
+    undef @got;
+    $rs->subscribe({
+        next     => sub {push @got, shift},
+        complete => sub {push @got, '__COMPLETE__'},
+    });
+
+    is \@got, [40, 50, '__COMPLETE__'], 'expected events';
+};
+
 done_testing();

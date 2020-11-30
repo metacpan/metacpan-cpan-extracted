@@ -1,12 +1,12 @@
 package File::Sticker::Reader::Exif;
-$File::Sticker::Reader::Exif::VERSION = '1.01';
+$File::Sticker::Reader::Exif::VERSION = '1.0603';
 =head1 NAME
 
 File::Sticker::Reader::Exif - read and standardize meta-data from EXIF file
 
 =head1 VERSION
 
-version 1.01
+version 1.0603
 
 =head1 SYNOPSIS
 
@@ -43,10 +43,22 @@ sub whoami  { ( caller(1) )[3] }
 
 =head1 METHODS
 
+=head2 priority
+
+The priority of this reader.  Readers with higher priority get tried first.
+
+=cut
+
+sub priority {
+    my $class = shift;
+    return 1;
+} # priority
+
 =head2 allowed_file
 
 If this reader can be used for the given file, then this returns true.
-File must be one of: an image or PDF.
+File must be one of: PDF or an image which is not a GIF.
+(GIF files need to be treated separately)
 (Since ExifTool can't write to EPUB, there's no point reading them either.)
 
 =cut
@@ -58,7 +70,8 @@ sub allowed_file {
 
     $file = $self->_get_the_real_file(filename=>$file);
     my $ft = $self->{file_magic}->info_from_filename($file);
-    if ($ft->{mime_type} =~ /(image|pdf)/)
+    if ($ft->{mime_type} =~ /(image|pdf)/
+            and $ft->{mime_type} !~ /gif/)
     {
         return 1;
     }
@@ -81,11 +94,9 @@ sub known_fields {
         creator=>'TEXT',
         description=>'TEXT',
         location=>'TEXT',
-        url=>'TEXT',
         tags=>'MULTI',
         date=>'TEXT',
         copyright=>'TEXT',
-        filesize=>'TEXT',
         flash=>'TEXT',
         imagesize=>'TEXT',
         imageheight=>'NUMBER',
@@ -157,19 +168,6 @@ sub read_meta {
     }
     $meta{copyright} = $copyright if $copyright;
 
-    # The URL could be from the Source or the Identifier
-    # Check through them until you find a non-empty one which contains an actual URL
-    foreach my $field (qw(Source Identifier))
-    {
-        if (exists $info->{$field}
-                and $info->{$field}
-                and $info->{$field} =~ /^http/
-                and !exists $meta{url})
-        {
-            $meta{url} = $info->{$field};
-        }
-    }
-
     # There are multiple fields which could be used as a file date.
     # Check through them until you find a non-empty one.
     my $date = '';
@@ -225,7 +223,6 @@ sub read_meta {
 
     # There are SOOOOOO many fields in EXIF data, just remember a subset of them
     foreach my $field (qw(
-FileSize
 Flash
 ImageHeight
 ImageSize
@@ -257,7 +254,7 @@ Title
         }
         elsif (!$data)
         {
-            warn __PACKAGE__, " no legal YAML";
+            warn __PACKAGE__, " no legal YAML" if $self->{verbose} > 2;
         }
         else # okay
         {

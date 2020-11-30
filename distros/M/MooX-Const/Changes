@@ -1,5 +1,9 @@
 Revision history for MooX-Const:
 
+v0.4.5    2020-11-21 12:44:03+00:00 Europe/London
+  [Documentation]
+  - Noted different meaning of "wo" attributes in Class::Accessor.
+
 v0.4.4    2020-07-31 14:44:28+01:00 Europe/London
   [Toolchain]
   - Add core modules in the prerequisites.

@@ -1,12 +1,12 @@
 package File::Sticker::Writer;
-$File::Sticker::Writer::VERSION = '1.01';
+$File::Sticker::Writer::VERSION = '1.0603';
 =head1 NAME
 
 File::Sticker::Writer - write and standardize meta-data from files
 
 =head1 VERSION
 
-version 1.01
+version 1.0603
 
 =head1 SYNOPSIS
 
@@ -93,20 +93,27 @@ sub name {
     return pop @bits;
 } # name
 
-=head2 is_fallback
+=head2 priority
 
-Is this writer a fallback writer (to be used when others don't work)?
-This is mainly to prevent Xattr attributes being set when they don't need to be,
-because we don't want duplicate information stored in two different ways.
-(default: 0)
+The priority of this writer.  Writers with higher priority
+get tried first.  This is useful where there may be more
+than one possible meta-data format for a file, such as
+EXIF versus XATTR.
+
+This works as either a class function or a method.
+
+This must be overridden by the specific writer class.
+
+$priority = $self->priority();
+
+$priority = File::Sticker::Writer::priority($class);
 
 =cut
 
-sub is_fallback {
-    my $self = shift;
-    
+sub priority {
+    my $class = shift;
     return 0;
-} # is_fallback
+} # priority
 
 =head2 allow
 

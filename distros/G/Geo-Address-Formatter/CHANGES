@@ -1,5 +1,15 @@
 Revision history for Perl module Geo::Address::Formatter.
 
+
+1.85   2020-11-20
+       - ugh, forgot to check in various files
+       - newest address-formatting templates       
+       
+1.84   2020-11-20
+       - no code changes
+       - new test to ensure validity of all yaml conf files, previously abbreviation files were not checked
+       - newest address-formatting templates
+
 1.83   2020-09-27
        - basic tests for _postformat method
        - hack for now to not deduplicate "new york, new york"

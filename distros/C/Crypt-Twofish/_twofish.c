@@ -1,7 +1,6 @@
 /*
- * $Id: _twofish.c,v 2.12 2001/05/21 17:38:01 ams Exp $
  * Copyright 1999 Dr. Brian Gladman <brian.gladman@btinternet.com>
- * Copyright 2001 Abhijit Menon-Sen <ams@wiw.org>
+ * Copyright 2001 Abhijit Menon-Sen <ams@toroid.org>
  */
 
 /* Twofish is a 128-bit symmetric block cipher with a variable length

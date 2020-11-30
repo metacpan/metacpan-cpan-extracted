@@ -17,8 +17,8 @@ package PDF::Builder::Basic::PDF::File;
 use strict;
 no warnings qw[ deprecated recursion uninitialized ];
 
-our $VERSION = '3.019'; # VERSION
-my $LAST_UPDATE = '3.018'; # manually update whenever code is changed
+our $VERSION = '3.020'; # VERSION
+my $LAST_UPDATE = '3.020'; # manually update whenever code is changed
 
 =head1 NAME
 
@@ -1168,13 +1168,45 @@ See C<open> for options allowed.
 sub _unpack_xref_stream {
     my ($self, $width, $data) = @_;
 
-    return unpack('C', $data)       if $width == 1;
-    return unpack('n', $data)       if $width == 2;
-    return unpack('N', "\x00$data") if $width == 3;
-    return unpack('N', $data)       if $width == 4;
-    return unpack('Q', $data)       if $width == 8; # PDF 1.5+?
+    # handle some oddball cases
+    if      ($width == 3) {
+	$data = "\x00$data";
+	$width = 4;
+    } elsif ($width == 5) {
+	$data = "\x00\x00\x00$data";
+	$width = 8;
+    } elsif ($width == 6) {
+	$data = "\x00\x00$data";
+	$width = 8;
+    } elsif ($width == 7) {
+	$data = "\x00$data";
+	$width = 8;
+    }
+    # in all cases, "Network" (Big-Endian) byte order assumed
+    return unpack('C', $data)  if $width == 1;
+    return unpack('n', $data)  if $width == 2;
+    return unpack('N', $data)  if $width == 4;
+    if ($width == 8) {
+	# Some ways other packages handle this, without Perl-64, according
+	# to Vadim Repin. Possibly they end up converting the value to
+	# "double" behind the scenes if on a 32-bit platform?
+	# PDF::Tiny  return hex unpack('H16', $data);
+	# CAM::PDF   my @b = unpack('C*', $data); 
+	#            my $i=0; ($i <<= 8) += shift @b while @b; return $i;
+	
+	if (substr($data, 0, 4) eq "\x00\x00\x00\x00") {
+	    # can treat as 32 bit unsigned int
+            return unpack('N', substr($data, 4, 4));
+	} else {
+            # requires 64-bit platform (chip and Perl), else fatal error
+	    # it may blow up and produce a smoking crater if 32-bit Perl!
+            # also note that Q needs Big-Endian flag (>) specified, else 
+	    #   it will use the native chip order (Big- or Little- Endian)
+            return unpack('Q>', $data);
+	}
+    }
 
-    die "Invalid column width: $width";
+    die "Unsupported field width: $width. 1-8 supported.";
 }
 
 sub readxrtr {
@@ -1385,6 +1417,7 @@ sub readxrtr {
     } elsif ($buf =~ m/^(\d+)\s+(\d+)\s+obj/i) {
         my ($xref_obj, $xref_gen) = ($1, $2);
 
+	PDF::Builder->verCheckOutput(1.5, "importing cross-reference stream");
         # XRef streams
         ($tdict, $buf) = $self->readval($buf);
 

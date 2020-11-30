@@ -34,7 +34,7 @@ use CallBackery::Plugin::Doc;
 use CallBackery::Database;
 use CallBackery::User;
 
-our $VERSION = '0.34.18';
+our $VERSION = '0.35.0';
 use Mojo::Base 'Mojolicious';
 
 =head2 config
@@ -126,6 +126,7 @@ Mojolicious calls the startup method at initialization time.
 sub startup {
     my $app = shift;
 
+    $app->config->postProcessCfg();
     my $gcfg = $app->config->cfgHash->{BACKEND};
     if ($gcfg->{log_file}){
         open my $file, '>>', $gcfg->{log_file} or die "opening logfile $gcfg->{log_file}: $!\n";
@@ -165,7 +166,6 @@ sub startup {
     }
 
     $app->secrets([ path($app->config->secretFile)->slurp ]);
-   
 
     my $routes = $app->routes;
 
@@ -241,6 +241,7 @@ S<Tobias Oetiker E<lt>tobi@oetiker.chE<gt>>
 
  2013-12-06 to 1.0 first version
  2020-02-19 to 2.0 go REST
+ 2020-11-20 fz 2.1 call Config::postProcessCfg here
 
 =cut
 

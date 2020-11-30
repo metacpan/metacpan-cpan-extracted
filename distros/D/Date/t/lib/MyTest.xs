@@ -47,7 +47,7 @@ uint64_t bench_strftime (string_view format) {
 
 uint64_t bench_tzget (string_view tz) {
     RETVAL = 0;
-    for (int i = 0; i < 1000; ++i) RETVAL += (uint64_t)panda::time::tzget(tz);
+    for (int i = 0; i < 1000; ++i) RETVAL += (uint64_t)panda::time::tzget(tz).get();
 }
 
 void bench_hints_get () {

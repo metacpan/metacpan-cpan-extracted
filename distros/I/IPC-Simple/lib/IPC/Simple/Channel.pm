@@ -1,5 +1,5 @@
 package IPC::Simple::Channel;
-$IPC::Simple::Channel::VERSION = '0.04';
+$IPC::Simple::Channel::VERSION = '0.07';
 use strict;
 use warnings;
 
@@ -97,7 +97,7 @@ IPC::Simple::Channel
 
 =head1 VERSION
 
-version 0.04
+version 0.07
 
 =head1 AUTHOR
 

@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2015 Christian Jaeger, copying@christianjaeger.ch
+# Copyright (c) 2015-2020 Christian Jaeger, copying@christianjaeger.ch
 #
 # This is free software, offered under either the same terms as perl 5
 # or the terms of the Artistic License version 2 or the terms of the
@@ -53,13 +53,16 @@ our @EXPORT_OK   = qw(untainted_with is_untainted);
 our %EXPORT_TAGS = (all => [@EXPORT, @EXPORT_OK]);
 
 use Chj::TEST;
+use FP::Carp;
 
-sub untainted ($) {
+sub untainted {
+    @_ == 1          or fp_croak_nargs 1;
     $_[0] =~ /(.*)/s or die "??";
     $1
 }
 
-sub untainted_with ($$) {
+sub untainted_with {
+    @_ == 2 or fp_croak_nargs 2;
     my ($v, $re) = @_;
     $v =~ /($re)/ or die "untainted_with: does not match regex $re: '$v'";
     $1
@@ -77,7 +80,8 @@ TEST_EXCEPTION { untainted_with "Foo ", '^\w+$' }    # /s missing.
 
 use Scalar::Util 'tainted';
 
-sub is_untainted ($) {
+sub is_untainted {
+    @_ == 1 or fp_croak_nargs 1;
     not tainted $_[0]
 }
 

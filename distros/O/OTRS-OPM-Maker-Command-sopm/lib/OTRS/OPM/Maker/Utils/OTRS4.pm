@@ -8,15 +8,24 @@ use warnings;
 use List::Util qw(first);
 use Carp;
 
+our $VERSION = 1.43;
+
 sub packagesetup {
-    my ($class, $type, $version, $function, $runtype) = @_;
+    my ($class, $type, $version, $function, $runtype, $package) = @_;
 
     $version = $version ? ' Version="' . $version . '"' : '';
 
     $runtype //= 'post';
 
+    if ( $package ) {
+        $package = sprintf "'%s'", $package;
+    }
+    else {
+        $package = '$Param{Structure}->{Name}->{Content}';
+    }
+
     return qq~    <$type Type="$runtype"$version><![CDATA[
-        \$Kernel::OM->Get('var::packagesetup::' . \$Param{Structure}->{Name}->{Content} )->$function();
+        \$Kernel::OM->Get('var::packagesetup::' . $package )->$function();
     ]]></$type>~;
 }
 
@@ -44,7 +53,7 @@ OTRS::OPM::Maker::Utils::OTRS4 - helper functions for OTRS >= 4
 
 =head1 VERSION
 
-version 1.41
+version 1.43
 
 =head1 METHODS
 

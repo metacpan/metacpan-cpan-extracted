@@ -1,3 +1,6 @@
+0.15   2020-11-22
+       - Fix uninitialized variable warning in input step "I enter X into Y"
+       - Remove duplicated preamble in 'widget_steps.pl' step file
 
 0.14   2020-04-26
        - Add steps 'When I fill in:' and 'When I fill "<>" with "<>"'
@@ -65,5 +68,3 @@
 
 
 0.01   2016-06-23
-
-

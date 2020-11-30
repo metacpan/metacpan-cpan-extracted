@@ -19,7 +19,7 @@ use Types::Standard qw( Value Object Ref );
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.4.4';
+our $VERSION = 'v0.4.5';
 
 
 sub import {
@@ -120,7 +120,7 @@ MooX::Const - Syntactic sugar for constant and write-once Moo attributes
 
 =head1 VERSION
 
-version v0.4.4
+version v0.4.5
 
 =head1 SYNOPSIS
 
@@ -200,6 +200,11 @@ This module appears to work with L<Moose>, and there is now a small
 test suite.
 
 It does not work with L<Mouse>. Pull requests are welcome.
+
+=head2 Write-Once Attributes
+
+L<Class::Accessor> antlers/moose-like mode uses "wo" for write-only
+attributes, not write-once attributes.
 
 =head1 SEE ALSO
 

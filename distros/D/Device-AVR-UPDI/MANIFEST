@@ -2,7 +2,11 @@ bin/avr-updi
 Build.PL
 Changes
 lib/Device/AVR/UPDI.pm
+LICENSE
 MANIFEST			This list of files
+META.json
+META.yml
+README
 share/ATmega1608.yaml
 share/ATmega1609.yaml
 share/ATmega3208.yaml
@@ -17,6 +21,9 @@ share/ATtiny1607.yaml
 share/ATtiny1614.yaml
 share/ATtiny1616.yaml
 share/ATtiny1617.yaml
+share/ATtiny1624.yaml
+share/ATtiny1626.yaml
+share/ATtiny1627.yaml
 share/ATtiny202.yaml
 share/ATtiny204.yaml
 share/ATtiny212.yaml
@@ -31,12 +38,18 @@ share/ATtiny412.yaml
 share/ATtiny414.yaml
 share/ATtiny416.yaml
 share/ATtiny417.yaml
+share/ATtiny424.yaml
+share/ATtiny426.yaml
+share/ATtiny427.yaml
 share/ATtiny804.yaml
 share/ATtiny806.yaml
 share/ATtiny807.yaml
 share/ATtiny814.yaml
 share/ATtiny816.yaml
 share/ATtiny817.yaml
+share/ATtiny824.yaml
+share/ATtiny826.yaml
+share/ATtiny827.yaml
 t/00use.t
 t/01init.t
 t/02reset.t
@@ -47,7 +60,4 @@ t/06write_nvm.t
 t/07write_fuse.t
 t/20partinfo.t
 t/99pod.t
-README
-LICENSE
-META.yml
-META.json
+t/lib/MockFH.pm

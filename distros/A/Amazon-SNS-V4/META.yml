@@ -1,0 +1,28 @@
+---
+abstract: 'Amazon Simple Notification Service, V4 Signatures'
+author:
+  - 'James Wright <jwright@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Amazon-SNS-V4
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  AWS::Signature4: '0'
+  Class::Accessor::Fast: '0'
+  JSON: '0'
+  LWP::UserAgent: '0'
+  URI::Escape: '0'
+  XML::Simple: '0'
+version: '1.4'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

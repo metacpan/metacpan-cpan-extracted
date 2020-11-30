@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2011-2015 Christian Jaeger, copying@christianjaeger.ch
+# Copyright (c) 2011-2020 Christian Jaeger, copying@christianjaeger.ch
 #
 # This is free software, offered under either the same terms as perl 5
 # or the terms of the Artistic License version 2 or the terms of the
@@ -33,6 +33,7 @@ use warnings FATAL => 'uninitialized';
 use Chj::TEST;
 use FP::Path "path";
 use FP::Equal;
+use FP::Carp;
 
 TEST {
     path("a/b/C")->add(path("d/e"), 0)->string
@@ -173,7 +174,8 @@ TEST_EXCEPTION { FP::Path->new(list("/foo"), 1, 1)->string }
 
 # equal:
 
-sub t_equal ($$) {
+sub t_equal {
+    @_ == 2 or fp_croak_nargs 2;
     my ($a, $b) = @_;
     equal(path($a), path($b))
 }
@@ -193,14 +195,16 @@ TEST {
 }
 1;
 
-sub t_str_clean ($) {
+sub t_str_clean {
+    @_ == 1 or fp_croak_nargs 1;
     my ($a) = @_;
     path($a)->clean_dot->xclean_dotdot;
 }
 
-sub t_equals_clean ($$) {
+sub t_equals_clean {
+    @_ == 2 or fp_croak_nargs 2;
     my ($a, $b) = @_;
-    equal(t_str_clean $a, t_str_clean $b);
+    equal(t_str_clean($a), t_str_clean($b));
 }
 
 TEST { t_equals_clean "/foo",        "/foo" } 1;
@@ -252,10 +256,11 @@ use FP::List qw(unfold);
 use FP::Array qw(array_is_null array_map);
 use FP::Ops qw(the_method);
 
-sub tupleify ($) {
+sub tupleify {
+    @_ == 1 or fp_croak_nargs 1;
     my ($f) = @_;
     sub {
-        @_ == 1 or die "wrong number of arguments";
+        @_ == 1 or fp_croak_nargs 1;
         [&$f(@{ $_[0] })]
     }
 }
@@ -272,7 +277,7 @@ sub all_splits {
         sub { array_map the_method("string"), $_[0] },
 
         # stepping function
-        tupleify the_method("perhaps_resplit_next_segment"),
+        tupleify(the_method("perhaps_resplit_next_segment")),
 
         # seed value
         [$p0->perhaps_split_first_segment]

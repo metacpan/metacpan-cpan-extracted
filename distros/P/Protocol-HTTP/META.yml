@@ -3,34 +3,34 @@ abstract: 'very fast HTTP protocol incremental parser and serializer'
 author:
   - unknown
 build_requires:
-  Date: v5.2.1
+  Date: v5.2.2
   Export::XS: v3.0.5
   Test::Catch: v1.0.14
   Test::Deep: '0'
   Test::Fatal: '0'
   Test::More: '0'
   Test::Simple: '0.96'
-  URI::XS: v2.0.1
+  URI::XS: v2.1.0
   XS::Framework: v1.3.3
   XS::libboost::mini: v1.69.0.0
   XS::libcatch: v2.12.1.1
-  XS::libpanda: v1.4.10
+  XS::libpanda: v1.4.11
   XS::librangeV3: v1.0.0
   next::XS: v1.0.7
 configure_requires:
-  Date: v5.2.1
+  Date: v5.2.2
   Export::XS: v3.0.5
   Test::Catch: v1.0.14
-  URI::XS: v2.0.1
+  URI::XS: v2.1.0
   XS::Framework: v1.3.3
-  XS::Install: v1.2.21
+  XS::Install: v1.3.1
   XS::libboost::mini: v1.69.0.0
   XS::libcatch: v2.12.1.1
-  XS::libpanda: v1.4.10
+  XS::libpanda: v1.4.11
   XS::librangeV3: v1.0.0
   next::XS: v1.0.7
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.46, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.50, CPAN::Meta::Converter version 2.150010'
 license: unknown
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -41,14 +41,14 @@ no_index:
     - t
     - inc
 requires:
-  Date: v5.2.1
+  Date: v5.2.2
   Export::XS: v3.0.5
-  URI::XS: v2.0.1
+  URI::XS: v2.1.0
   XS::Framework: v1.3.3
-  XS::Install: v1.2.21
+  XS::Install: v1.3.1
   XS::libboost::mini: v1.69.0.0
-  XS::libpanda: v1.4.10
+  XS::libpanda: v1.4.11
   XS::librangeV3: v1.0.0
   next::XS: v1.0.7
-version: v1.0.10
+version: v1.0.11
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

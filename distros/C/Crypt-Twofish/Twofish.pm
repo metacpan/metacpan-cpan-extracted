@@ -1,4 +1,3 @@
-# $Id: Twofish.pm,v 2.12 2001/05/21 17:38:01 ams Exp $
 # Copyright 2001 Abhijit Menon-Sen <ams@toroid.org>
 
 package Crypt::Twofish;
@@ -9,7 +8,7 @@ use DynaLoader;
 use vars qw( @ISA $VERSION );
 
 @ISA = qw( DynaLoader );
-$VERSION = '2.17';
+$VERSION = '2.18';
 
 bootstrap Crypt::Twofish $VERSION;
 

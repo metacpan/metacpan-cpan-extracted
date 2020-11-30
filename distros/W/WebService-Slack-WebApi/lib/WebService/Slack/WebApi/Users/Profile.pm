@@ -2,7 +2,7 @@ package WebService::Slack::WebApi::Users::Profile;
 use strict;
 use warnings;
 use utf8;
-use feature qw/ state /;
+use feature qw/state/;
 
 use parent 'WebService::Slack::WebApi::Base';
 

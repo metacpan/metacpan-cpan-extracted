@@ -57,7 +57,6 @@ has cfgHash => sub {
     my $cfg_file = shift;
     my $parser = $self->makeParser();
     my $cfg = $parser->parse($self->file, {encoding => 'utf8'}) or croak($parser->{err});
-    $self->postProcessCfg($cfg);
     return $cfg;
 };
 
@@ -335,10 +334,10 @@ by the application.
 
 sub postProcessCfg {
     my $self = shift;
-    my $cfg = shift;
+    my $cfg = $self->cfgHash;
     my %plugin;
     my @pluginOrder;
-    for my $section (keys %$cfg){
+    for my $section (sort keys %$cfg){
         my $sec = $cfg->{$section};
         next unless ref $sec eq 'HASH'; # skip non hash stuff
         for my $key (keys %$sec){
@@ -349,7 +348,6 @@ sub postProcessCfg {
             my $name = $1;
             $pluginOrder[$sec->{_order}] = $name;
             delete $sec->{_order};
-
             my $obj = $cfg->{PLUGIN}{prototype}{$name} = $sec->{module};
             delete $sec->{module};
             $obj->config($sec);
@@ -620,6 +618,7 @@ S<Fritz  Zaucker E<lt>fritz.zaucker@oetiker.chE<gt>>
 
  2014-01-11 to 1.0 first version
  2014-04-29 fz 1.1 implement plugin path
+ 2020-11-20 fz 1.2 call postProcessCfg from CallBackery.pm
 
 =cut
 

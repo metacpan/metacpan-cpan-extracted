@@ -4,4 +4,4 @@ cd $(dirname $0)/../..
 
 set -ex
 
-docker run --rm -it -p 8080:80 -v "$PWD":/usr/local/apache2/htdocs/ plicease/perl-file-listing:apache
+docker run --rm -it -p 8080:80 -v "$PWD":/usr/local/apache2/htdocs/File-Listing plicease/perl-file-listing:apache

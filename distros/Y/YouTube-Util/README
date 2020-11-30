@@ -2,8 +2,8 @@ NAME
     YouTube::Util - YouTube-related utilities
 
 VERSION
-    This document describes version 0.002 of YouTube::Util (from Perl
-    distribution YouTube-Util), released on 2020-04-01.
+    This document describes version 0.003 of YouTube::Util (from Perl
+    distribution YouTube-Util), released on 2020-11-26.
 
 FUNCTIONS
   extract_youtube_video_id
@@ -42,13 +42,17 @@ FUNCTIONS
 
     *   Example #5:
 
-         extract_youtube_video_id("\$100,000 Name That Tune - Nick vs. Carol-SY-DnVZeFH0.mp4"); # -> "SY-DnVZeFH0"
+         extract_youtube_video_id("https://youtu.be/U9v2S49sHeQ"); # -> "U9v2S49sHeQ"
 
     *   Example #6:
 
-         extract_youtube_video_id("GNdALsnBjh8"); # -> "GNdALsnBjh8"
+         extract_youtube_video_id("\$100,000 Name That Tune - Nick vs. Carol-SY-DnVZeFH0.mp4"); # -> "SY-DnVZeFH0"
 
     *   Example #7:
+
+         extract_youtube_video_id("GNdALsnBjh8"); # -> "GNdALsnBjh8"
+
+    *   Example #8:
 
          extract_youtube_video_id("foo"); # -> undef
 

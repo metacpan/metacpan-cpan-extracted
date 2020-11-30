@@ -5,9 +5,9 @@ package Date::Manip::Zones;
 
 # This file was automatically generated.  Any changes to this file will
 # be lost the next time 'tzdata' is run.
-#    Generated on: Mon Jun  1 07:59:10 EDT 2020
-#    Data version: tzdata2020a
-#    Code version: tzcode2020a
+#    Generated on: Mon Nov 30 13:52:50 EST 2020
+#    Data version: tzdata2020d
+#    Code version: tzcode2020d
 
 # This module contains data from the zoneinfo time zone database.  The original
 # data was obtained from the URL:
@@ -18,7 +18,7 @@ use warnings;
 require 5.010000;
 
 our ($VERSION);
-$VERSION='6.82';
+$VERSION='6.83';
 END { undef $VERSION; }
 
 our ($TzdataVersion,$TzcodeVersion,
@@ -37,8 +37,8 @@ END {
    undef %Offmod;
 }
 
-$TzdataVersion = 'tzdata2020a';
-$TzcodeVersion = 'tzcode2020a';
+$TzdataVersion = 'tzdata2020d';
+$TzcodeVersion = 'tzcode2020d';
 $FirstDate     = '0001010200:00:00';
 $LastDate      = '9999123100:00:00';
 $LastYear      = '2090';
@@ -1457,7 +1457,6 @@ $LastYear      = '2090';
   'us/michigan'                        => 'america/detroit',
   'us/mountain'                        => 'america/denver',
   'us/pacific'                         => 'america/los_angeles',
-  'us/pacific-new'                     => 'america/los_angeles',
   'us/samoa'                           => 'pacific/pago_pago',
   'w-su'                               => 'europe/moscow',
   'aest-10aedt'                        => 'australia/melbourne',
@@ -1679,18 +1678,18 @@ $LastYear      = '2090';
                      'australia/currie',
                      'australia/hobart',
                      'australia/sydney',
+                     'antarctica/macquarie',
                      'australia/lindeman',
-                     'australia/brisbane',
-                     'antarctica/macquarie' ],
+                     'australia/brisbane' ],
   'aest'        => [ 'australia/melbourne',
                      'australia/brisbane',
                      'australia/lindeman',
                      'australia/currie',
                      'australia/hobart',
                      'australia/sydney',
+                     'antarctica/macquarie',
                      'australia/lord_howe',
-                     'australia/broken_hill',
-                     'antarctica/macquarie' ],
+                     'australia/broken_hill' ],
   'ahdt'        => [ 'america/anchorage' ],
   'ahst'        => [ 'america/anchorage',
                      'america/adak' ],
@@ -2349,9 +2348,9 @@ $LastYear      = '2090';
                      'asia/pontianak',
                      'asia/yekaterinburg',
                      'africa/tunis',
-                     'europe/monaco',
                      'europe/paris',
                      'africa/algiers',
+                     'europe/monaco',
                      'europe/prague' ],
   'ppmt'        => [ 'america/port-au-prince' ],
   'ppt'         => [ 'america/los_angeles',

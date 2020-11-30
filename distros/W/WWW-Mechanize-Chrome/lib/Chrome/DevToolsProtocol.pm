@@ -15,8 +15,9 @@ use Data::Dumper;
 use Chrome::DevToolsProtocol::Transport;
 use Scalar::Util 'weaken', 'isweak';
 use Try::Tiny;
+use URI;
 
-our $VERSION = '0.61';
+our $VERSION = '0.64';
 our @CARP_NOT;
 
 =head1 NAME
@@ -538,9 +539,20 @@ sub current_sequence( $self ) {
 };
 
 sub build_url( $self, %options ) {
-    $options{ host } ||= $self->host;
-    $options{ port } ||= $self->port;
-    my $url = sprintf "http://%s:%s/json", $options{ host }, $options{ port };
+    my $url;
+    if( ! ($options{ host } || $options{ port })
+        and $self->{endpoint}) {
+        # recycle our endpoint if we have it
+        $url = URI->new($self->{ endpoint });
+        $url->scheme('http');
+        $url->path('json');
+        $url = "$url";
+    } else {
+        $url = URI->new('json', 'http');
+        $url->port( $self->port );
+        $url->host( $self->host );
+        $url = "$url";
+    };
     $url .= '/' . $options{domain} if $options{ domain };
     $url
 };
@@ -556,7 +568,8 @@ Requests an URL and returns decoded JSON from the future
 sub json_get($self, $domain, %options) {
     my $url = $self->build_url( domain => $domain, %options );
     $self->log('trace', "Fetching JSON from $url");
-    $self->ua->http_get( $url )->then( sub( $payload, $headers ) {
+    my $req = $self->ua->http_get( $url );
+    $req->then( sub( $payload, $headers ) {
         $self->log('trace', "JSON response", $payload);
         Future->done( $self->json->decode( $payload ))
     });
@@ -723,7 +736,7 @@ sub get_domains( $self ) {
 sub list_tabs( $self, $type = 'page' ) {
     return $self->json_get('list')->then(sub( $info ) {
         @$info = grep { defined $type ? $_->{type} =~ /$type/i : 1 } @$info;
-        return Future->done( @$info );
+        Future->done( @$info );
     });
 };
 
@@ -736,7 +749,6 @@ sub list_tabs( $self, $type = 'page' ) {
 sub new_tab( $self, $url=undef, %options ) {
     #my $u = $url ? '?' . $url : '';
     $self->log('trace', "Creating new tab");
-    #$self->json_get('new' . $u)
     $self->createTarget( url => $url, %options );
 };
 
@@ -899,7 +911,7 @@ use Filter::signatures;
 no warnings 'experimental::signatures';
 use feature 'signatures';
 
-our $VERSION = '0.61';
+our $VERSION = '0.64';
 
 has 'protocol' => (
     is => 'ro',

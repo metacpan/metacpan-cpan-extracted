@@ -7,7 +7,7 @@ use 5.012;
 use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
-  "ABSTRACT" => "Geo::Address::Formatter - format structured address data according to various global/country rules",
+  "ABSTRACT" => "format structured address data according to various global/country rules",
   "AUTHOR" => "Ed Freyfogle",
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0
@@ -36,7 +36,7 @@ my %WriteMakefileArgs = (
     "Test::Warn" => 0,
     "Text::Trim" => "1.02"
   },
-  "VERSION" => "1.83",
+  "VERSION" => "1.85",
   "test" => {
     "TESTS" => "t/blackbox/*.t t/unit/*.t"
   }

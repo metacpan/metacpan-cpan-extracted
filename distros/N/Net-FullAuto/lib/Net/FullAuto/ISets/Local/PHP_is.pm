@@ -257,7 +257,6 @@ my $configure_php=sub {
       ($stdout,$stderr)=$handle->cmd($sudo.
          'make install','__display__');
    }
-}
    ($stdout,$stderr)=$handle->cwd("/opt/source");
    # https://shaunfreeman.name/compiling-php-7-on-centos/
    # https://www.vultr.com/docs/how-to-install-php-7-x-on-centos-7

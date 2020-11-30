@@ -16,7 +16,8 @@
    "prereqs" : {
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0"
+            "ExtUtils::MakeMaker" : "0",
+            "perl" : "5.006"
          }
       },
       "develop" : {
@@ -38,6 +39,7 @@
             "Music::Duration" : "0",
             "constant" : "0",
             "namespace::clean" : "0",
+            "perl" : "5.006",
             "strictures" : "2"
          }
       },
@@ -62,7 +64,7 @@
          "web" : "https://github.com/ology/MIDI-Drummer-Tiny"
       }
    },
-   "version" : "0.1801",
+   "version" : "0.1802",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.030002"
@@ -72,6 +74,11 @@
             "class" : "Dist::Zilla::Plugin::VersionFromModule",
             "name" : "VersionFromModule",
             "version" : "0.08"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::MinimumPerl",
+            "name" : "MinimumPerl",
+            "version" : "1.006"
          },
          {
             "class" : "Dist::Zilla::Plugin::AutoPrereqs",

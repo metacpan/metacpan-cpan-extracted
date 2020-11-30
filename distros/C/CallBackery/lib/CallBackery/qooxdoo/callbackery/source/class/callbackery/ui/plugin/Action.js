@@ -6,7 +6,7 @@
 ************************************************************************ */
 
 /**
- * Abstract Visualization widget.
+ * Form Action Widget.
  */
 qx.Class.define("callbackery.ui.plugin.Action", {
     extend : qx.ui.container.Composite,
@@ -41,6 +41,15 @@ qx.Class.define("callbackery.ui.plugin.Action", {
                         callbackery.ui.MsgBox.getInstance().info(this.xtr(data.title),this.xtr(data.message));
                     }
                     break;
+                case 'print':
+                    this._print(data.content);
+                    break;
+                case 'reloadStatus':
+                case 'reload':
+                    break;
+                default:
+                    console.error('Unknown action', data.action);
+                    break;
             }
         },this);
     },
@@ -56,19 +65,48 @@ qx.Class.define("callbackery.ui.plugin.Action", {
         _tableMenu: null,
         _defaultAction: null,
         _buttonMap: null,
+        _print: function(content, left, top) {
+            var win = window.open('', '_blank');
+            var doc = win.document;
+            doc.open();
+            doc.write(content);
+            doc.close();
+            win.onafterprint=function() {
+                win.close();
+            }
+            win.print();
+        },
         _populate: function(cfg,buttonClass,getFormData){
-            var tm = this._tableMenu =  new qx.ui.menu.Menu;
+            var tm = this._tableMenu = new qx.ui.menu.Menu;
+            var menues = {};
             cfg.action.forEach(function(btCfg){
                 var button;
+                var label = btCfg.label ? this.xtr(btCfg.label) : null;
                 var menuButton;
                 switch (btCfg.action) {
+                    case 'menu':
+                        var menu = menues[btCfg.key] = new qx.ui.menu.Menu;
+                        if (btCfg.addToMenu != null) { // add submenu to menu
+                            menues[btCfg.addToMenu].add(new qx.ui.menu.Button(label, null, null, menu));
+                        }
+                        else { // add menu to form
+                            this.add(new qx.ui.form.MenuButton(label, null, menu));
+                        }
+                        return;
+                        break;
                     case 'submitVerify':
                     case 'submit':
                     case 'popup':
+                    case 'wizzard':
                     case 'logout':
                     case 'cancel':
                     case 'download':
-                        button = new buttonClass(this.xtr(btCfg.label));
+                        if (btCfg.addToMenu != null) {
+                            button = new qx.ui.menu.Button(label);
+                        }
+                        else {
+                            button = new buttonClass(label);
+                        }
                         if (btCfg.key){
                             this._buttonMap[btCfg.key]=button;
                         }
@@ -82,9 +120,9 @@ qx.Class.define("callbackery.ui.plugin.Action", {
                                 this._buttonSetMap[btCfg.key]=bs;
                             }
                         }
-                        
-                        if ( btCfg.addToContextMenu ){
-                            menuButton = new qx.ui.menu.Button(this.xtr(btCfg.label));
+
+                        if ( btCfg.addToContextMenu) {
+                            menuButton = new qx.ui.menu.Button(label);
                             [
                                 'Enabled',
                                 'Visibility',
@@ -96,8 +134,7 @@ qx.Class.define("callbackery.ui.plugin.Action", {
                                     menuButton['set'+Prop](e.getData());
                                 },this);
                                 if (btCfg.buttonSet && prop in btCfg.buttonSet){
-                                    menuButton['set'+Prop](
-                                            btCfg.buttonSet[prop]);
+                                    menuButton['set'+Prop](btCfg.buttonSet[prop]);
                                 }
                             },this);
                         }
@@ -112,6 +149,23 @@ qx.Class.define("callbackery.ui.plugin.Action", {
                         }, this);
                         this.addListener('disappear',function(){
                             timer.stop(timerId);
+                        }, this);
+                        break;
+                    case 'autoSubmit':
+                        var autoTimer = qx.util.TimerManager.getInstance();
+                        var autoTimerId;
+                        this.addListener('appear',function(){
+                            var key = btCfg.key;
+                            var that = this;
+                            var formData = getFormData();
+                            autoTimerId = autoTimer.start(function(){
+                                callbackery.data.Server.getInstance().callAsyncSmartBusy(function(ret){
+                                    that.fireDataEvent('actionResponse',ret || {});
+                                },'processPluginData',cfg.name,{ "key": key, "formData": formData });
+                            }, btCfg.interval * 1000, this);
+                        }, this);
+                        this.addListener('disappear',function(){
+                            autoTimer.stop(autoTimerId);
                         }, this);
                         break;
                     case 'upload':
@@ -147,8 +201,9 @@ qx.Class.define("callbackery.ui.plugin.Action", {
                             };
 
                             if (btCfg.action == 'submitVerify'){
+                                var title = btCfg.label != null ? btCfg.label : btCfg.key;
                                 callbackery.ui.MsgBox.getInstance().yesno(
-                                    this.xtr(btCfg.label),
+                                    this.xtr(title),
                                     this.xtr(btCfg.question)
                                 )
                                 .addListenerOnce('choice',function(e){
@@ -208,7 +263,28 @@ qx.Class.define("callbackery.ui.plugin.Action", {
                         case 'cancel':
                             this.fireDataEvent('actionResponse',{action: 'cancel'});
                             break;
+                        case 'wizzard':
+                            var parent = that.getLayoutParent();
+                            while (! parent.classname.match(/Page|Popup/) ) {
+                                parent = parent.getLayoutParent();
+                            }
+                            // This could in principal work for Page although.
+                            if (parent.classname.match(/Popup/)) { // parent already exists, replace content
+                                parent.replaceContent(btCfg,getFormData);
+                                break;
+                            }
+                            // fall through intended to create first popup content
                         case 'popup':
+                            if (! btCfg.noValidation) { // backward incompatibility work around
+                                var formData = getFormData();
+                                if (formData === false){
+                                    callbackery.ui.MsgBox.getInstance().error(
+                                        this.tr("Validation Error"),
+                                        this.tr("The form can only be submitted when all data fields have valid content.")
+                                    );
+                                    return;
+                                }
+                            }
                             var popup = new callbackery.ui.Popup(btCfg,getFormData);
 
                             var appRoot = this.getApplicationRoot();
@@ -234,14 +310,21 @@ qx.Class.define("callbackery.ui.plugin.Action", {
                         default:
                             this.debug('Invalid execute action:' + btCfg.action);
                     }
-                };
+                }; // var action = function()
 
                 if (btCfg.defaultAction){
                     this._defaultAction = action;
                 }
                 if (button){
                     button.addListener('execute',action,this);
-                    this.add(button);
+                    if (btCfg.addToMenu) {
+                        menues[btCfg.addToMenu].add(button);
+                    }
+                    else {
+                        if (btCfg.addToToolBar !== false) {
+                            this.add(button);
+                        }
+                    }
                 }
                 if (menuButton){
                     menuButton.addListener('execute',action,this);
@@ -251,13 +334,12 @@ qx.Class.define("callbackery.ui.plugin.Action", {
         },
         _makeUploadButton: function(cfg,btCfg,getFormData){
             var button;
+            var label = btCfg.label ? this.xtr(btCfg.label) : null;
             if (btCfg.btnClass == 'toolbar') {
-                button = new callbackery.ui.form.UploadToolbarButton(
-                    this.xtr(btCfg.label));
+                button = new callbackery.ui.form.UploadToolbarButton(label);
             }
             else {
-                button = new callbackery.ui.form.UploadButton(
-                    this.xtr(btCfg.label));
+                button = new callbackery.ui.form.UploadButton(label);
             }
             if (btCfg.key){
                 this._buttonMap[btCfg.key]=button;

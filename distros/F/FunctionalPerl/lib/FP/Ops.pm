@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2015-2019 Christian Jaeger, copying@christianjaeger.ch
+# Copyright (c) 2015-2020 Christian Jaeger, copying@christianjaeger.ch
 #
 # This is free software, offered under either the same terms as perl 5
 # or the terms of the Artistic License version 2 or the terms of the
@@ -127,6 +127,7 @@ our %EXPORT_TAGS = (all => [@EXPORT, @EXPORT_OK]);
 
 use Chj::TEST;
 use FP::Show;
+use FP::Carp;
 
 sub add {
     my $t = 0;
@@ -159,108 +160,109 @@ sub div {
 }
 
 sub mod {
-    @_ == 2 or die "need 2 arguments";
+    @_ == 2 or fp_croak_nargs 2;
     my ($a, $b) = @_;
     $a % $b
 }
 
 sub expt {
-    @_ == 2 or die "need 2 arguments";
+    @_ == 2 or fp_croak_nargs 2;
     my ($a, $b) = @_;
     $a**$b
 }
 
-sub string_cmp ($ $) {
-    @_ == 2 or die "need 2 arguments";
+sub string_cmp {
+    @_ == 2 or fp_croak_nargs 2;
     $_[0] cmp $_[1]
 }
 
-sub string_eq ($ $) {
-    @_ == 2 or die "need 2 arguments";
+sub string_eq {
+    @_ == 2 or fp_croak_nargs 2;
     $_[0] eq $_[1]
 }
 
-sub string_ne ($ $) {
-    @_ == 2 or die "need 2 arguments";
+sub string_ne {
+    @_ == 2 or fp_croak_nargs 2;
     $_[0] ne $_[1]
 }
 
-sub string_lt ($ $) {
-    @_ == 2 or die "need 2 arguments";
+sub string_lt {
+    @_ == 2 or fp_croak_nargs 2;
     $_[0] lt $_[1]
 }
 
-sub string_le ($ $) {
-    @_ == 2 or die "need 2 arguments";
+sub string_le {
+    @_ == 2 or fp_croak_nargs 2;
     $_[0] le $_[1]
 }
 
-sub string_gt ($ $) {
-    @_ == 2 or die "need 2 arguments";
+sub string_gt {
+    @_ == 2 or fp_croak_nargs 2;
     $_[0] gt $_[1]
 }
 
-sub string_ge ($ $) {
-    @_ == 2 or die "need 2 arguments";
+sub string_ge {
+    @_ == 2 or fp_croak_nargs 2;
     $_[0] ge $_[1]
 }
 
-sub stringify ($) {
+sub stringify {
+    @_ == 1 or fp_croak_nargs 1;
     "$_[0]"
 }
 
-sub string_lc ($) {
-    @_ == 1 or die "need 1 argument";
+sub string_lc {
+    @_ == 1 or fp_croak_nargs 1;
     lc $_[0]
 }
 
-sub string_uc ($) {
-    @_ == 1 or die "need 1 argument";
+sub string_uc {
+    @_ == 1 or fp_croak_nargs 1;
     uc $_[0]
 }
 
-sub string_lcfirst ($) {
-    @_ == 1 or die "need 1 argument";
+sub string_lcfirst {
+    @_ == 1 or fp_croak_nargs 1;
     lcfirst $_[0]
 }
 
-sub string_ucfirst ($) {
-    @_ == 1 or die "need 1 argument";
+sub string_ucfirst {
+    @_ == 1 or fp_croak_nargs 1;
     ucfirst $_[0]
 }
 
-sub number_cmp ($ $) {
-    @_ == 2 or die "need 2 arguments";
+sub number_cmp {
+    @_ == 2 or fp_croak_nargs 2;
     $_[0] <=> $_[1]
 }
 
-sub number_eq ($ $) {
-    @_ == 2 or die "need 2 arguments";
+sub number_eq {
+    @_ == 2 or fp_croak_nargs 2;
     $_[0] == $_[1]
 }
 
-sub number_ne ($ $) {
-    @_ == 2 or die "need 2 arguments";
+sub number_ne {
+    @_ == 2 or fp_croak_nargs 2;
     $_[0] != $_[1]
 }
 
-sub number_lt ($ $) {
-    @_ == 2 or die "need 2 arguments";
+sub number_lt {
+    @_ == 2 or fp_croak_nargs 2;
     $_[0] < $_[1]
 }
 
-sub number_le ($ $) {
-    @_ == 2 or die "need 2 arguments";
+sub number_le {
+    @_ == 2 or fp_croak_nargs 2;
     $_[0] <= $_[1]
 }
 
-sub number_gt ($ $) {
-    @_ == 2 or die "need 2 arguments";
+sub number_gt {
+    @_ == 2 or fp_croak_nargs 2;
     $_[0] > $_[1]
 }
 
-sub number_ge ($ $) {
-    @_ == 2 or die "need 2 arguments";
+sub number_ge {
+    @_ == 2 or fp_croak_nargs 2;
     $_[0] >= $_[1]
 }
 
@@ -277,19 +279,19 @@ sub the_method {
 }
 
 sub cut_method {
-    @_ >= 2 or die "wrong number of arguments";
+    @_ >= 2 or fp_croak_nargs ">= 2";
     my ($object, $method, @args) = @_;
     sub {
         $object->$method(@args, @_)
     }
 }
 
-sub applying ($) {
-    @_ == 1 or die "wrong number of arguments";
+sub applying {
+    @_ == 1 or fp_croak_nargs 1;
     my ($f) = @_;
 
-    sub ($) {
-        @_ == 1 or die "wrong number of arguments";
+    sub {
+        @_ == 1 or fp_croak_nargs 1;
         my ($argv) = @_;
         @_ = ref($argv) eq "ARRAY" ? @$argv : $argv->values;
         goto &$f
@@ -299,27 +301,27 @@ sub applying ($) {
 sub applying_to {
     my @v = @_;
 
-    sub ($) {
-        @_ == 1 or die "wrong number of arguments";
+    sub {
+        @_ == 1 or fp_croak_nargs 1;
         my ($f) = @_;
         @_ = @v;
         goto &$f
     }
 }
 
-sub binary_operator ($) {
-    @_ == 1 or die "need 1 argument";
+sub binary_operator {
+    @_ == 1 or fp_croak_nargs 1;
     my ($code) = @_;
-    eval 'sub ($$) { @_ == 2 or die "need 2 arguments"; $_[0] ' . $code
-        . ' $_[1] }' || die "binary_operator: " . show($code) . ": $@";
+    eval 'sub  {     @_ == 2  or fp_croak_nargs 2; $_[0] ' . $code . ' $_[1] }'
+        || die "binary_operator: " . show($code) . ": $@";
 
     # XX security?
 }
 
-sub unary_operator ($) {
-    @_ == 1 or die "need 1 argument";
+sub unary_operator {
+    @_ == 1 or fp_croak_nargs 1;
     my ($code) = @_;
-    eval 'sub ($) { @_ == 1 or die "need 1 argument"; ' . $code . ' $_[0] }'
+    eval 'sub { @_ == 1  or fp_croak_nargs 1; ' . $code . ' $_[0] }'
         || die "unary_operator: " . show($code) . ": $@";
 
     # XX security?
@@ -346,18 +348,18 @@ TEST {
 }
 [-3, 2.5, 0];
 
-sub regex_match ($) {
-    @_ == 1 or die "wrong number of arguments";
+sub regex_match {
+    @_ == 1 or fp_croak_nargs 1;
     my ($re) = @_;
     sub {
-        @_ == 1 or die "wrong number of arguments";
+        @_ == 1 or fp_croak_nargs 1;
         my ($str) = @_;
         $str =~ /$re/
     }
 }
 
 sub make_regex_substitute_coderef {
-    @_ == 1 or die "wrong number of arguments";
+    @_ == 1 or fp_croak_nargs 1;
     my ($allow_failures) = @_;
     my $name = do {
         my $x = $allow_failures ? "x" : "";
@@ -386,7 +388,7 @@ sub make_regex_substitute_coderef {
 *regex_xsubstitute_coderef = make_regex_substitute_coderef 0;
 
 sub make_regex_substitute_re {
-    @_ == 2 or die "wrong number of arguments";
+    @_ == 2 or fp_croak_nargs 2;
     my ($allow_failures, $globally) = @_;
     my $name = do {
         my $x = $allow_failures ? "x"         : "";
@@ -437,7 +439,7 @@ sub make_regex_substitute_re {
 *regex_xsubstitute_re_globally = make_regex_substitute_re 0, 1;
 
 sub make_regex_substitute {
-    @_ == 1 or die "wrong number of arguments";
+    @_ == 1 or fp_croak_nargs 1;
     my ($allow_failures) = @_;
     my $subst_coderef    = make_regex_substitute_coderef($allow_failures);
     my $subst_re         = make_regex_substitute_re($allow_failures, 0);

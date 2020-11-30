@@ -1,0 +1,27 @@
+=head1 NAME
+
+UniEvent::Streamer::FileOutput - file output streams for streamer
+
+=head1 DESCRIPTION
+
+Writes incoming pieces of data, coming from  L<UniEvent::Streamer>,
+directly into local file. It is derived from L<UniEvent::Streamer::IOutput>.
+
+It is implemented in C++ for the speed, so it meant not to be
+derived from; in other words it is use only class.
+
+=head1 METHODS
+
+=head2 new($path)
+
+Constructs new file output stream, which will write data into C<$path>.
+
+=head1 REFERENCES
+
+L<UniEvent::Streamer>
+
+L<UniEvent::Streamer::IOutput>
+
+L<UniEvent::Streamer::FileIntput>
+
+=cut

@@ -9,7 +9,7 @@ do { my $x = {
                       },
        'develop' => {
                       'recommends' => {
-                                        'Dist::Zilla::PluginBundle::Author::ETHER' => '0.158',
+                                        'Dist::Zilla::PluginBundle::Author::ETHER' => '0.159',
                                         'Dist::Zilla::PluginBundle::Git::VersionManager' => '0.007'
                                       },
                       'requires' => {
@@ -41,15 +41,19 @@ do { my $x = {
                     },
        'runtime' => {
                       'requires' => {
+                                      'B' => '0',
                                       'Carp' => '0',
+                                      'Exporter' => '0',
                                       'File::ShareDir' => '0',
                                       'JSON::MaybeXS' => '1.004001',
                                       'JSON::PP' => '0',
                                       'List::Util' => '1.55',
+                                      'Module::Runtime' => '0',
                                       'Mojo::JSON::Pointer' => '0',
                                       'Mojo::URL' => '0',
                                       'Mojolicious' => '7.23',
                                       'Moo' => '0',
+                                      'Moo::Role' => '0',
                                       'MooX::HandlesVia' => '0',
                                       'MooX::TypeTiny' => '0.002002',
                                       'Path::Tiny' => '0',

@@ -127,6 +127,7 @@ use FP::Repl::StackPlus;
 use FP::Lazy;
 use FP::Show;
 use Scalar::Util qw(blessed);
+use FP::Carp;
 
 sub maybe_tty {
     my $path = "/dev/tty";
@@ -196,7 +197,7 @@ sub new {
 my $maybe_setter = sub {
     my ($method) = @_;
     sub {
-        @_ == 2 or die "wrong number of arguments";
+        @_ == 2 or fp_croak_nargs 2;
         my ($self, $v) = @_;
         my $set_maybe_method = "set_maybe_${method}";
         defined $v
@@ -272,7 +273,8 @@ sub possibly_restore_settings {
     }
 }
 
-sub saving ($$) {
+sub saving {
+    @_ == 2 or fp_croak_nargs 2;
     my ($self, $proc) = @_;
     sub {
         &$proc(@_);
@@ -510,7 +512,7 @@ our $use_warnings = q{use warnings; use warnings FATAL => 'uninitialized';};
 
 sub eval_code {
     my $self = shift;
-    @_ == 5 or die "wrong number of arguments";
+    @_ == 5 or fp_croak_nargs 5;
     my ($code, $in_package, $maybe_lexicals, $maybe_kept_results,
         $maybe_lexical_persistence)
         = @_;

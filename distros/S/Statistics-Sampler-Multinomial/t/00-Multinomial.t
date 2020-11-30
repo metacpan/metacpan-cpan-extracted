@@ -89,7 +89,7 @@ sub test_croakers {
     $e = $EVAL_ERROR;
     ok !$e, 'no error when prng arg passed';
     
-    $result = eval {$object->draw};
+    $result = eval {$object->draw_slow};
     $e = $EVAL_ERROR;
     ok !$e, 'no error when draw called before _initialise';
 
@@ -169,13 +169,46 @@ sub test_draw {
     );
 
     my $expected_draws = [1, 3, 2, 2, 0];
-    my @draws = map {$object->draw()} (1..5);
+    my @draws = map {$object->draw_slow()} (1..5);
 
     SKIP: {
         use Config;
         skip 'prng sequence differs under 32 bit ints', 2
           if $Config{ivsize} == 4;
         is_deeply \@draws, $expected_draws, 'got expected draws using draw method';
+    }
+}
+
+sub test_draw1 {
+    my $probs = [
+        1, 0, 5, 2, 6
+    ];
+    
+    my $prng   = Math::Random::MT::Auto->new (seed => 2345);
+    my $object = Statistics::Sampler::Multinomial->new (
+        prng => $prng,
+        data => $probs,
+    );
+
+    my $expected_draws = {
+        0 => 10,
+        1 =>  0,
+        2 => 36,
+        3 => 14,
+        4 => 40,
+    };
+    my %draws = (1 => 0);
+    for (1..100) {
+        $draws{$object->draw}++;
+    }
+
+    #diag 'Draws: ' . join ' ', %draws;
+
+    SKIP: {
+        use Config;
+        skip 'prng sequence differs under 32 bit ints', 2
+          if $Config{ivsize} == 4;
+        is_deeply \%draws, $expected_draws, 'got expected draws using draw method';
     }
 }
 
@@ -191,9 +224,9 @@ sub test_draw_with_mask {
     );
 
     my $mask = [1,2];  #  mask second and third items
-    my $expected_draws = [3, 6, 3, 4, 0];
+    my $expected_draws = [5, 3, 6, 5, 5];
     my @draws = map {$object->draw_with_mask($mask)} (1..5);
-
+#diag join ' ', @draws;
     SKIP: {
         use Config;
         skip 'prng sequence differs under 32 bit ints', 2
@@ -268,6 +301,19 @@ sub test_update_values {
       'got expected data after modifying values';
 
     is $object->get_sum, $exp_sum, 'got expected sum';
+}
+
+sub test_clone {
+    
+    my $prng1   = Math::Random::MT::Auto->new (seed => 2345);
+    my $object1 = Statistics::Sampler::Multinomial->new (
+        prng => $prng1,
+        data => [1, 2, 3, 4, 5],
+    );
+    my $clone = $object1->clone;
+    
+    is_deeply $object1, $clone, 'cloned object';
+    
 }
 
 

@@ -1,10 +1,10 @@
 use strict;
 use warnings;
-package Test::JSON::Schema::Acceptance; # git description: v1.000-12-g4d5051c
+package Test::JSON::Schema::Acceptance; # git description: v1.001-8-gf2f5951
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Acceptance testing for JSON-Schema based validators like JSON::Schema
 
-our $VERSION = '1.001';
+our $VERSION = '1.002';
 
 use 5.014;
 no if "$]" >= 5.031009, feature => 'indirect';
@@ -19,7 +19,7 @@ use Moo;
 use MooX::TypeTiny 0.002002;
 use Types::Standard 1.010002 qw(Str InstanceOf ArrayRef HashRef Dict Any HasMethods Bool Optional);
 use Types::Common::Numeric 'PositiveOrZeroInt';
-use Path::Tiny 0.062;
+use Path::Tiny 0.069;
 use List::Util 1.33 qw(any max sum0);
 use namespace::clean;
 
@@ -28,6 +28,7 @@ has specification => (
   isa => Str,
   lazy => 1,
   default => 'draft2019-09',
+  predicate => '_has_specification',
 );
 
 has test_dir => (
@@ -175,6 +176,13 @@ sub acceptance {
     $ctx->$diag('with commit '.$commit);
     $ctx->$diag('from '.$url.':');
   }
+  if ($self->_has_specification) {
+    $ctx->$diag('specification version: '.$self->specification);
+  }
+  else {
+    $ctx->$diag('using custom test directory: '.$self->test_dir);
+  }
+  $ctx->$diag('optional tests included: '.($self->include_optional ? 'yes' : 'no'));
 
   $ctx->$diag('');
   my $length = max(10, map length $_->{file}, @$tests);
@@ -196,57 +204,58 @@ sub _run_test {
 
   my $test_name = $one_file->{file}.': "'.$test_group->{description}.'" - "'.$test->{description}.'"';
 
-  my ($result, $exception, $schema_before, $data_before, $schema_after, $data_after);
-  try {
-    {
-      local $Storable::flags = Storable::BLESS_OK | Storable::TIE_OK;
-      ($schema_before, $data_before) = map Storable::freeze(\$_),
-        $test_group->{schema}, $test->{data};
-    }
-
-    $result = $options->{validate_data}
-      ? $options->{validate_data}->($test_group->{schema}, $test->{data})
-      : $options->{validate_json_string}->($test_group->{schema}, $self->_json_decoder->encode($test->{data}));
-
-    {
-      local $Storable::flags = Storable::BLESS_OK | Storable::TIE_OK;
-      ($schema_after, $data_after) = map Storable::freeze(\$_),
-        $test_group->{schema}, $test->{data};
-    }
-  }
-  catch {
-    chomp($exception = $_);
-  };
-
-  my $got = $result ? 'true' : 'false';
-  my $expected = $test->{valid} ? 'true' : 'false';
-
-  my $ctx = Test2::API::context;
-
   my $pass; # ignores TODO status
 
   Test2::API::run_subtest($test_name,
     sub {
       my $ctx = Test2::API::context;
+      my ($result, $schema_before, $data_before, $schema_after, $data_after);
+      try {
+        {
+          local $Storable::flags = Storable::BLESS_OK | Storable::TIE_OK;
+          local $Storable::canonical = 1;
+          ($schema_before, $data_before) = map Storable::freeze(\$_),
+            $test_group->{schema}, $test->{data};
+        }
 
-      if ($exception) {
-        $ctx->fail('died: '.$exception);
-      }
-      else {
-        $pass = Test2::Tools::Compare::is($got, $expected, 'result is '.($test->{valid}?'':'in').'valid');
+        $result = $options->{validate_data}
+          ? $options->{validate_data}->($test_group->{schema}, $test->{data})
+          : $options->{validate_json_string}->($test_group->{schema}, $self->_json_decoder->encode($test->{data}));
+
+        {
+          local $Storable::flags = Storable::BLESS_OK | Storable::TIE_OK;
+          local $Storable::canonical = 1;
+          ($schema_after, $data_after) = map Storable::freeze(\$_),
+            $test_group->{schema}, $test->{data};
+        }
+
+        # skip the ugly matrix comparison
+        if ($result xor $test->{valid}) {
+          my $got = $result ? 'true' : 'false';
+          my $expected = $test->{valid} ? 'true' : 'false';
+          $ctx->fail('test failed', 'expected '.$expected.'; got '.$got);
+          $pass = 0;
+        }
+        else {
+          $ctx->ok(1, 'test passes');
+          $pass = 1;
+        }
 
         $pass &&= Test2::Tools::Compare::is($data_after, $data_before, 'evaluator did not mutate data')
           if $data_before ne $data_after;
         $pass &&= Test2::Tools::Compare::is($schema_after, $schema_before, 'evaluator did not mutate schema')
           if $schema_before ne $schema_after;
       }
+      catch {
+        chomp(my $exception = $_);
+        $ctx->fail('died: '.$exception);
+      };
 
       $ctx->release;
     },
     { buffered => 1, inherit_trace => 1 },
   );
 
-  $ctx->release;
   return $pass;
 }
 
@@ -326,7 +335,7 @@ Test::JSON::Schema::Acceptance - Acceptance testing for JSON-Schema based valida
 
 =head1 VERSION
 
-version 1.001
+version 1.002
 
 =head1 SYNOPSIS
 
@@ -498,6 +507,8 @@ times, with two arguments: a URI (string), and a data structure containing schem
 associated with that URI, for use in some tests that use additional resources (see above). If you do
 not provide this option, you will be responsible for ensuring that those additional resources are
 made available to your implementation for the successful execution of the tests that rely on them.
+
+For more information, see <https://json-schema.org/draft/2019-09/json-schema-core.html#rfc.section.8.2.4.5>.
 
 =head3 tests
 

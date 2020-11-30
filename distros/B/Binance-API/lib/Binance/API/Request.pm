@@ -30,6 +30,8 @@ use base 'LWP::UserAgent';
 use Digest::SHA qw( hmac_sha256_hex );
 use JSON;
 use Time::HiRes;
+use URI;
+use URI::QueryParam;
 
 use Binance::Constants qw( :all );
 
@@ -97,13 +99,13 @@ sub _exec {
         if ($@) {
             $self->{logger}->error(
                 "Error decoding response. \nStatus => " . $response->code . ",\n"
-                . 'Content => ' . $response->message ? $response->message : ''
+                . 'Content => ' . ($response->content ? $response->content : '')
             );
         }
     } else {
         $self->{logger}->error(
             "Unsuccessful request. \nStatus => " . $response->code . ",\n"
-            . 'Content => ' . $response->message ? $response->message : ''
+            . 'Content => ' . ($response->content ? $response->content : '')
         );
     }
     return $response;
@@ -119,6 +121,8 @@ sub _init {
         );
     }
 
+    my $timestamp = $params->{'timestamp'};
+    delete $params->{'timestamp'};
     # Delete undefined query parameters
     my $query = $params->{'query'};
     foreach my $param (keys %$query) {
@@ -133,66 +137,90 @@ sub _init {
 
     my $recvWindow;
     if ($params->{signed}) {
-        $recvWindow = defined $self->{'recvWindow'}
-            ? $self->{'recvWindow'} : 5000;
+        $recvWindow = $query->{'recvWindow'} // $body->{'recvWindow'} //
+            defined $self->{'recvWindow'} ? $self->{'recvWindow'} : undef;
     }
 
-    my $timestamp = int Time::HiRes::time * 1000 if $params->{'signed'};
+    $timestamp //= int Time::HiRes::time * 1000 if $params->{'signed'};
+
     my $uri = URI->new( BASE_URL . $path );
-    my $full_path;
+    my $full_path = $uri->as_string;
 
     my %data;
     # Mixed request (both query params & body params)
     if (keys %$body && keys %$query) {
-        if (!defined $query->{'recvWindow'} && defined $recvWindow) {
+        if (!defined $body->{'recvWindow'} && defined $recvWindow) {
             $query->{'recvWindow'} = $recvWindow;
         }
-        elsif (!defined $body->{'recvWindow'} && defined $recvWindow) {
+        elsif (!defined $query->{'recvWindow'} && defined $recvWindow) {
             $body->{'recvWindow'} = $recvWindow;
         }
 
-        $uri->clone->query_form($body);
-        $uri->query_form($query);
-        $full_path = $uri->as_string;
-        $body->{signature} = hmac_sha256_hex(
-            { %$body, %$query }, $self->{secretKey}
+        # First, generate escaped parameter sets
+        my $tmp = $uri->clone;
+        $tmp->query_form($query);
+        my $query_params = $tmp->query();
+        $tmp->query_form($body);
+        my $body_params = $tmp->query();
+
+        # Add timestamp to the end of body
+        $body_params .= "&timestamp=$timestamp" if defined $timestamp;
+
+        # Combine query and body parameters so that we can sign it.
+        # Binance documentation states that mixed content signature
+        # generation should not add the '&' character between query
+        # and body parameter sets.
+        my $to_sign = $query_params . $body_params;
+
+        $self->{logger}->debug("Generating signature from: '$to_sign'");
+
+        $body_params .= '&signature='.hmac_sha256_hex(
+            $to_sign, $self->{secretKey}
         ) if $params->{signed};
-        $data{'Content'} = $body;
+
+        $full_path .= "?$query_params";
+        $data{'Content'} = $body_params;
     }
     # Query parameters only
     elsif (keys %$query || !keys %$query && !keys %$body) {
-        $query->{'timestamp'} = $timestamp if defined $timestamp;
-        if (!defined $query->{'recvWindow'} && defined $recvWindow) {
-            $query->{'recvWindow'} = $recvWindow;
-        }
+        $query->{'recvWindow'} = $recvWindow if $recvWindow;
 
-        $uri->query_form($query);
-        if ($params->{signed}) {
-            $query->{signature} = hmac_sha256_hex(
-                $uri->query, $self->{secretKey}
-            );
-            $uri->query_form($query);
-        }
+        my $tmp = $uri->clone;
+        $tmp->query_form($query);
+        my $query_params = $tmp->query();
 
-        $full_path = $uri->as_string;
+        # Add timestamp to the end of query
+        $query_params .= "&timestamp=$timestamp" if defined $timestamp;
+
+        $self->{logger}->debug("Generating signature from: '$query_params'")
+            if $query_params;
+
+        $query_params .= '&signature='.hmac_sha256_hex(
+            $query_params, $self->{secretKey}
+        ) if $params->{signed};
+
+        $full_path .= "?$query_params" if $query_params;
     }
     # Body parameters only
     elsif (keys %$body) {
-        $body->{'timestamp'} = $timestamp if defined $timestamp;
-        if (!defined $body->{'recvWindow'} && defined $recvWindow) {
-            $body->{'recvWindow'} = $recvWindow;
-        }
+        $body->{'recvWindow'} = $recvWindow if $recvWindow;
 
         $full_path = $uri->as_string;
-        $uri->query_form($body);
-        if ($params->{signed}) {
-            $body->{signature} = hmac_sha256_hex(
-                $uri->query, $self->{secretKey}
-            );
-            $uri->query_form($body);
-        }
 
-        $data{'Content'} = $uri->query;
+        my $tmp = $uri->clone;
+        $tmp->query_form($body);
+        my $body_params = $tmp->query();
+
+        # Add timestamp to the end of body
+        $body_params .= "&timestamp=$timestamp" if defined $timestamp;
+
+        $self->{logger}->debug("Generating signature from: '$body_params'");
+
+        $body_params .= '&signature='.hmac_sha256_hex(
+            $body_params, $self->{secretKey}
+        ) if $params->{signed};
+
+        $data{'Content'} = $body_params;
     }
 
     if (defined $self->{apiKey}) {

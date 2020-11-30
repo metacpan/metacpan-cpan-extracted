@@ -1,10 +1,9 @@
-use strict;
 use warnings;
 
 package Git::Hooks::Notify;
 # ABSTRACT: Git::Hooks plugin to notify users via email
-$Git::Hooks::Notify::VERSION = '2.14.0';
-use 5.010;
+$Git::Hooks::Notify::VERSION = '3.0.0';
+use 5.016;
 use utf8;
 use Log::Any '$log';
 use Git::Hooks;
@@ -13,7 +12,7 @@ use Email::Sender::Simple;
 use Email::Simple;
 use List::MoreUtils qw/none part/;
 
-(my $CFG = __PACKAGE__) =~ s/.*::/githooks./;
+my $CFG = __PACKAGE__ =~ s/.*::/githooks./r;
 
 sub pretty_log {
     my ($git, $commits) = @_;
@@ -315,7 +314,7 @@ Git::Hooks::Notify - Git::Hooks plugin to notify users via email
 
 =head1 VERSION
 
-version 2.14.0
+version 3.0.0
 
 =head1 SYNOPSIS
 
@@ -441,7 +440,7 @@ Notify - Git::Hooks plugin to notify users via email
 =head1 CONFIGURATION
 
 The plugin is configured by the following git options under the
-C<githooks.checkacls> subsection.
+C<githooks.notify> subsection.
 
 It can be disabled for specific references via the C<githooks.ref> and
 C<githooks.noref> options about which you can read in the L<Git::Hooks>

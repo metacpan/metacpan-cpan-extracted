@@ -1,7 +1,6 @@
 # -*- cperl -*-
 
-use 5.010;
-use strict;
+use 5.016;
 use warnings;
 use lib qw/t lib/;
 use Git::Hooks::Test ':all';
@@ -66,17 +65,17 @@ EOF
 $repo->run(qw{config githooks.checklog.title-period deny});
 check_cannot_commit('deny an invalid message', qr/SHOULD NOT end in a period/, 'Invalid.');
 
-$repo->run(qw{config githooks.checklog.ref refs/heads/nobranch});
+$repo->run(qw{config githooks.noref refs/heads/master});
 check_can_commit('allow commit on non-enabled ref even when commit message is faulty', 'Invalid.');
 
 $repo->run(qw/config --remove-section githooks.checklog/);
 $repo->run(qw{config githooks.checklog.title-period deny});
-$repo->run(qw{config githooks.checklog.noref refs/heads/master});
+$repo->run(qw{config githooks.noref refs/heads/master});
 check_can_commit('allow commit on disabled ref even when commit message is faulty', 'Invalid.');
 
 $repo->run(qw/config --remove-section githooks.checklog/);
 $repo->run(qw{config githooks.checklog.title-period deny});
-$repo->run(qw{config githooks.checklog.ref refs/heads/master});
+$repo->run(qw{config githooks.ref refs/heads/master});
 check_cannot_commit('deny commit on enabled ref when commit message is faulty', qr/SHOULD NOT end in a period/, 'Invalid.');
 
 $repo->run(qw/config --remove-section githooks.checklog/);

@@ -12,10 +12,14 @@ With no options (but with the required \f2objectfilename\fP
 ) all sections print (but some sections cannot be printed
 independently safely, so those are only printed at offsets
 where the .debug_info section refers to those sections).
+.PP
+For split-dwarf (DWARF5) object files see
+Split Object Files, DWARF5 section 7.3.
 
 .PP
-All options are available in the traditional (single-letter)
+Nearly all options are available in the traditional (single-letter)
 form and in a long-options form with meaningful names.
+New options are only in the long-options form.
 
 .PP
 With no options 
@@ -43,15 +47,58 @@ If a script is to parse the output, the
 .BR \--format-dense\ (\-d)
 option is useful.
 .PP
+As of December 2020 DWARF expressions
+are broken out to print each expression
+(DW_OP_plus for example) in a block
+on a separate line. 
+To restore the previous behavior, sort
+of like \--format-dense but only applying
+to blocks of DWARF expression operators
+(DW_OP*).
+the
+.BR \--format-expr-ops-joined
+is useful.
+If the option is placed in the dwarfdump.conf
+file (see the file itself for the format)
+it will apply without needing to put it
+on the command line.
+
+.PP
 Not all sections actually exist in any given object file.
 .PP
-The format may change from release to release, so it is
+The output format may change from release to release, so it is
 unwise to depend too heavily on the format.
 .PP
 Frame information (.debug_frame and .eh_frame) is heavily
 dependent on the ABI/ISA of the object file. 
 By default we use a generic set of register names
 handling up to 100 registers named r0-r99.
+.PP
+As of 2020 there are three different ways
+compiler writers separate the DWARF information
+from an executable/shared-object.
+One is DWARF5 Split Dwarf (the \--file-tied
+option is useful for these). Another
+is GNU debuglink (libdwarf automatically
+finds the DWARF when given the name
+of the executable, use \--no-follow-debuglink
+to suppress this and make possible printing
+the backtrace data in section \.eh_frame).
+The third way is on MacOS: the debug DWARF
+is in a separate object (dwarfdump/libdwarf
+automatically find it if it is present,
+\--no-follow-debuglink suppresses this finding).
+.PP
+In many cases one can get additional detail
+by specifying \-v (sometimes \-v \-v gets
+even more, see the --verbose
+discussion below).
+When printing DIEs (Debugging
+Information Entries) the options \-G
+(showing global offsets)
+and \-M (naming the DW_FORM* of attributes)
+(or their -- counterparts)
+can be a great aid to understanding DWARF..
 
 The 
 .BR \--format-registers\ (\-R)
@@ -144,7 +191,7 @@ the offset applies to the
 uncompressed section (in memory), 
 not the .zdebug_ compressed section
 in \f2objectfilename\fP. 
-.SH URI STYLE INPUT STRINGS
+.SH URI-STYLE INPUT STRINGS
 .PP
 The <objectfilename> and all the options taking
 name strings look for URIs and
@@ -171,17 +218,38 @@ Options
 .BR \--format-suppress-uri-msg\ (\-q)
 (making finding
 URI sequences silent) give finer control of URI interpretation.
-PP
-As an example, to get a string'a b' make the string 'a%20b'
+.PP
+As an example, to get a string 'a b' make the string 'a%20b'
 (here the quote (') is for exposition not part of the string, though
 quote is certainly problematic in a name).
-Instead of escaping " quotes in the string, type %25, as in
- 'a "b' should be typed 'a%20%25b'
+Instead of escaping " quotes in the string, type %25, as 
+in 'a "b' should be typed 'a%20%25b'.
 Any characters can be typed in URI style, not just characters
 which are problematic to the shell or getopt.
 We strongly suggest you not type URI-style characters where
 such are not needed or use
 the % character itself in command line strings unless you must.
+.SH URI-STYLE OUTPUT (printing)
+.PP
+Dwarfdump translates any characters
+in strings which are not ordinary
+printable ASCII (and some which are ASCII)
+in the reverse of the previous section.
+It prints into a uri-style output in the form %xx,
+where xx are hex digits in the form of
+ASCII 0-9a-0f.
+The percent character(%) is printed as '%25'
+.P
+This is a clumsy way to
+deal with UTF-8 strings and sensible way
+to deal with the low ASCII values that on
+many systems cause one's terminal to behave
+oddly. Such translations are not idempotent
+so dwarfdump avoids doing the translation
+more than once on any string.
+See option \--format-suppress-sanitize
+below to eliminate the output transformation.
+
 .SH PRINTING OPTIONS
 .TP
 .BR \--print-all\ (\-a)
@@ -202,13 +270,28 @@ this print failing.
 Print locations lists.
 
 .TP
+.BR \--print-debug-gnu
+Print  the .debug_gnu_pubnames
+and .debug_gnu_typenames sections.
+
+.TP
+.BR \--print-fission
+Print  the .gdb_index, .debug_cu_index,
+ .debug_tu_index, .gnu.debuglink,
+  and .note.gnu.build-id sections.
+
+.TP
+.BR \--print-gnu-debuglink
+Print .gnu_debuglink and .note.gnu.build-id sections
+
+.TP
 .BR \--elf\ (\-E)    
 prints,
 for Elf objects, object file details.
-See the "Print ELF sections header" section of
+See the "Print ELF Section Headers" section of
 the help file for additional choices on elf printing.
 If libdwarf or dwarfdump is built without libelf
-this option is unavailable.
+this and related options are not available.
 
 .TP
 .BR \--print-frame\ (\-f)
@@ -228,7 +311,7 @@ and .debug_tu_index sections
 that exist in the object.
 
 .TP
-.BR \--print-gnu-debuglink\
+.BR \--print-gnu-debuglink
 If the .gnu_debuglink section
 is present its content is printed.
 If the .note.gnu.build-id section
@@ -295,7 +378,9 @@ Having dwarfdump print relocations may help establish whether
 dwarfdump understands any relocations that might exist.
 Other tools may be more useful than dwarfdump
 for printing object-file details.
-See "Print Relocations Info" in the help output for
+If dwarfdump or libelf is built without libelf
+the relocation options are not available.
+See "Print Elf Relocation Data" in the help output for
 additional relocation printing choices.
 
 .TP
@@ -360,7 +445,7 @@ Turns on checking for unused gaps in .debug_info (these
 gaps are not an error, just a waste of space).
 .TP
 .BR \--check-unique\ (\-kG) 
-Print only unique errors. Error lines are simpified
+Print only unique errors. Error lines are simplified
 (hex numbers removed, for example) and when
 a given message string would otherwise appear 
 again it is suppressed.
@@ -383,6 +468,12 @@ Turns on checking of aranges.
 Turns on DIE tag-attr combinations checking,
 looking for surprising attributes for DIE
 tags.
+It does not report common extensions as errors.
+Common extensions to the standard are
+allowed as if standard.
+See
+the \-C (\--format-extensions) option
+to show common extensions as errors.
 .TP
 .BR \--check-forward-refs\ (\-kR)
 Turns on reading DIEs and checking for forward declarations
@@ -397,6 +488,12 @@ Turns on checking DIE references for circular references.
 Turns on tag-tag combinations checking,
 looking for surprising parent-child DIE
 relationships.
+It does not report common extensions as errors.
+Common extensions to the standard are
+allowed as if standard.
+See
+the \-C (\--format-extensions) option
+to show common extensions as errors.
 .TP
 .BR \--check-usage\ (\-ku) 
 Print tag-tree and tag-attribute usage (basic format). 
@@ -429,12 +526,16 @@ refer to appropriate locations.
 
 .TP
 .BR \--format-extensions\ (\-C) 
+This is a secondary option 
+after \--check-tag-tag\ (\-kt)
+or \--check-tag-attr\ (\-kr).
 Normally when checking for tag-tag 
 or tag-attribute combinations
 both the standard combinations and 
-some common extensions are allowed.
-With -C the extensions are taken
-out of the allowed class of combinations.
+some common extensions are allowed
+(not reported).
+With this option the extensions are taken
+out of the class of allowed combinations.
 
 .TP
 .BR \--format-dense\ (\-d)
@@ -444,7 +545,7 @@ line as the TAG. This makes searching for DIE information
 (as with grep) much simpler as the entire DIE is on one line.
 
 .TP
-.BR \--format-supress-offsets\ (\-D)
+.BR \--format-suppress-offsets\ (\-D)
 Turns off the display of section offsets
 and attribute values in printed output.
 So the .debug_info output is just TAGs and Attributes.
@@ -469,7 +570,8 @@ the offsets printed.
 When printing or checking .debug_info, this terminates
 the search after 'number' compilation units. When printing
 frame information this terminates the FDE reporting 
-after 'number' FDEs and the CIE reporting (which occurs if one adds -v)
+after 'number' FDEs and the CIE
+reporting (which occurs if one adds -v)
 after 'number' CIEs. Example '--format-limit=1'
 
 .TP
@@ -482,9 +584,14 @@ are also shown.
 
 .TP
 .BR \--format-suppress-lookup\ (\-n) 
-When printing frames, this turns off the search for function names.
-In a really large object the search can take more time than
-one wants to wait, so this avoids the search.
+When printing frames, this turns off the search for function names
+in inner scopes.
+Unless the language used to build the object file
+supports function definitions in inner scopes
+there is no point in looking for function names in inner scopes.
+And a really large object the search can take more time than
+one wants to wait.
+This option suppresses the inner scope search.
 
 .TP
 .BR \--file-output=<path>\ (\-O file=<path>)
@@ -492,30 +599,60 @@ The <path> will be used as the file name for output instead
 of writing to stdout (stdout is the default).
 
 .TP
-.BR \-format-suppress-data\ (\-Q) 
+.BR \--format-suppress-data\ (\-Q) 
 Suppresses section data printing
 (set automatically with a checking option).
+
+.TP
+.BR \--format-suppress-sanitize
+Suppresses the default string-printing 
+translations so
+non-ascii and non-printable characters
+from the object file
+are printed as-is.
+See "URI-STYLE OUTPUT" above.
+
+.TP
+.BR \--format-suppress-uri\ (\-U) 
+Suppresses the default URI translation
+of following options on the command line.
+See "URI-STYLE INPUT STRINGS" above.
 
 .TP
 .BR \--format-registers\ (\-R) 
 When printing frames for ABIs with lots of registers, this allows
 up to 1200 registers to be named (like R999) without choosing an ABI
-with, for example '-x abi=ppc'
+with, for example '-x abi=ppc' or,
+equivalently, '--file-abi=ppc'
 
 .TP 
-.BR \--version\ (\-v)
+.BR \--verbose\ (\-v)
 Increases the detail shown when printing.
 In some sections, using more -v options
-will increase the detail (one to three are useful) or may
+will increase the detail (one to four are useful) or may
 change the report to show, for example, the actual
 line-data-commands instead of the resultant line-table.
+Two to four -v options make a difference when
+printing DIEs and rnglists (-i), 
+lines (-l), frames (-f,-F), gdb_index(-I).
+Additional -v beyond four do not currently
+add-to or change the output. 
 
-.SH SELECTIVE ENTRY PRINTING
+.SH LIMITING OUTPUT
 
 .PP
-These --search (-S) options stand alone and 
-basic print information about the compilation
+The simplest limiting option is to stop the
+examination/printing after <num> compilation units.
+See -H and  --format-limit above.
+This option also limits the number of FDEs
+and CIEs printed from any .debug_frame or .eh_frame
+section.
+
+.PP
+The --search (-S) options 
+print information about the compilation
 unit and DIE where the string(s) appear.
+These cannot be combined with other options.
 At most one of each of the following
 is effective (so for example
 one can only have one 'match', but one can 
@@ -525,12 +662,16 @@ No checking options or printing options should be supplied
 with --search(-S) options.
 The strings should use URI-style to avoid any conflicts
 with the command-line parser applicable (bash, sh, ...)
-or getopt().
+or getopt(), as well as using URI to deal with searching
+for strings in non-ASCII such as French, (etc)
+or the now-nearly-universal UTF8.
 
 These are particularly useful when the amount of
-DWARF information is really large.
+DWARF information output by -i is multiple
+gigabytes of data.
 
-If v is added to the -S option, the number of occurrences is printed.
+If -Sv used instead of -S , the
+number of occurrences is printed.
 (see below for an example).
 
 .TP
@@ -561,7 +702,7 @@ The count (Sv) form reports the count of occurrences.
 .TP
 .BR \--search-regex-count=string\ (\-Svregex=string) 
 When printing DIEs
-for each tag value or attribute name where the 'string' reqular
+for each tag value or attribute name where the 'string' regular
 expression matches print the compilation unit information
 and its section offset.
 Any CU with no match is not printed.
@@ -596,7 +737,7 @@ An example v modifier to the -S option is shown below.
 And we show the -W in context with a -S option.
 
 .TP
-.BR \--search-match-count=string1\ (\-S\ vmatch=string1)
+.BR \--search-match-count=string
 Prints information about the
 DIEs that -S matches and prints the count of occurrences.
 
@@ -606,7 +747,7 @@ DIEs that -S matches and prints the count of occurrences.
 .TP
 .BR \--search-match=string1\ \--search-print-tree
 Prints the parent tree and the children tree for the
-DIEs that -S matches.
+DIEs that --search-match  matches.
 
 .TP
 .BR \-S\ match=string2\ \-Wp 
@@ -659,14 +800,14 @@ printing frame information (here using ppc as an example).
 The abi is read as a URI string.
 
 .TP
-.BR \--format-group=<n>\ (\-x\ groupnumber=<n>)
+.BR \--format-group-number=<n>\ (\-x\ groupnumber=<n>)
 For an object file with both DWARF5 split 
 dwarf (.debug_info.dwo
 for example)  and ordinary
 DWARF sections (.debug_info for example)
 in the single object file
 one must use
-.BR \--format-group=2
+.BR \--format-group-number=2
 to print the dwo sections.
 Adding 
 .BR \--file-tied=<path>
@@ -678,9 +819,17 @@ in the non-dwo sections.
 .TP
 .BR \--file-tied=/t/i/depath
 Used when opening a main object that is a .dwo or .dwp file.
+For example if /path/to/myapp.dwp is the split-dwarf
+object and /path/to/myapp is the executable, do
+"dwarfdump --file-tied=/path/to/myapp /path/to/myapp.dwp"  . 
 The tied file path names the executable which has
 the .debug_addr section that may be referred to from
-the main object. See Split Objects (aka Debug Fission).
+the main object. See Split Objects (aka Debug Fission)
+in the DWARF5 standard.
+This cannot be used with MacOS debug
+or GNU debuglink, such files do not have
+a Split Dwarf object file.
+
 .TP
 .BR \-x\ line5=s2l
 .TP
@@ -739,6 +888,21 @@ Likely something no one needs to do.
 .TP
 .B \--help
 Show this man page.
+.SH SPLIT DWARF
+With Split Dwarf (DWARF5) the main body
+of the DWARF is in a separate file, often
+having the name suffix .dwp or .dwo .
+.PP
+For example if /path/to/myapp.dwp is the split-dwarf
+object and /path/to/myapp is the executable, do
+"dwarfdump --file-tied=/path/to/myapp /path/to/myapp.dwp"  .
+The tied file path names the executable which has
+the .debug_addr section and other sections
+that may be referred to from
+the .dwo/.dwp object.
+.PP
+See Split Object Files (sometimes called Debug Fission)
+in the DWARF5 standard, section 7.3.
 
 .SH FILES
 dwarfdump
@@ -753,8 +917,9 @@ $(HOME)/dwarfdump.conf
 .SH NOTES
 In some cases compilers use DW_FORM_data1 (for example)
 and in such cases the signedness of the value must be taken
-from context. Rather than attempt to determine the
-context, dwarfdump prints the value with both signednesses
+from context. 
+Rather than attempt to determine the
+context, dwarfdump prints the value with both signedness
 whenever there is ambiguity about the correct interpretation.
 For example, 
 "DW_AT_const_value           176(as signed = -80)".
@@ -763,4 +928,6 @@ evaluate all attributes there is no ambiguity of signedness:
 the ambiguity for dwarfdump is due to dwarfdump evaluating
 DIEs in a simple order and not keeping track of much context.
 .SH BUGS
-Support for DWARF5 is being completed but may not be complete.
+Support for printing certain DWARF5 location expressions is
+incomplete.
+Report problems to libdwarf-list -at- linuxmail -dot- org

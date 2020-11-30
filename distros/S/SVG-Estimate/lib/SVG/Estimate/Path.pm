@@ -1,5 +1,5 @@
 package SVG::Estimate::Path;
-$SVG::Estimate::Path::VERSION = '1.0114';
+$SVG::Estimate::Path::VERSION = '1.0115';
 use Moo;
 use Image::SVG::Path qw/extract_path_info/;
 use SVG::Estimate::Path::Moveto;
@@ -20,7 +20,7 @@ SVG::Estimate::Path - Handles estimating arbitrary vectors.
 
 =head1 VERSION
 
-version 1.0114
+version 1.0115
 
 =head1 SYNOPSIS
 
@@ -99,6 +99,9 @@ sub BUILDARGS {
             $args->{min_y}      = $command->min_y;
             $args->{max_y}      = $command->max_y;
             $args->{draw_start} = $command->end_point;
+        }
+        elsif ($subpath->{type} eq 'moveto') {
+            $first = $command;  ##Save for the next close, if it comes
         }
         $args->{shape_length}  += $command->shape_length;
         $args->{internal_travel_length} += $command->travel_length;

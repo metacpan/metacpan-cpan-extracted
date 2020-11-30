@@ -1,0 +1,1 @@
+openssl req -x509 -newkey rsa:4096 -keyout ca.key -out ca.pem -days 36500  -subj '/CN=localhost' -nodes

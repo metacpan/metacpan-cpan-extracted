@@ -7,7 +7,7 @@ z2folio - Z39.50 server for FOLIO bibliographic data
 `z2folio`
 \[
 `-c`
-_configFile_
+_configBase_
 \]
 \[
 `--`
@@ -25,13 +25,13 @@ FOLIO ILS.  Because it relies on the `Net::Z3950::SimpleServer`
 modules for the server functionality, because this module is based on
 the YAZ toolkit, and because YAZ transparently handles all three
 standard IR protocols (ANSI/NISO Z39.50, SRU and SRW), it can function
-as a support all three of these protocols.
+as a server for all three of these protocols.
 
 The following command-line options govern how it functions:
 
-- `-c configFile`
+- `-c configBase`
 
-    Specifies that the named _configFile_ should be used to configure the
+    Specifies that the named `configBase.json` should be used as the base configuration for the
     functionality of the server: if this option is not specified, then the
     file `config.json` in the working directory is used.  The format of
     the configuration file is described separately in

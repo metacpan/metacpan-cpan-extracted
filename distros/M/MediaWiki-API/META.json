@@ -1,16 +1,16 @@
 {
-   "abstract" : "Provides a Perl interface to the MediaWiki API (http://www.mediawiki.org/wiki/API)",
+   "abstract" : "Provides a Perl interface to the MediaWiki API (https://www.mediawiki.org/wiki/API)",
    "author" : [
       "Jools Wills <buzz@exotica.org.uk>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
    "license" : [
-      "unknown"
+      "gpl_3"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "MediaWiki-API",
    "no_index" : {
@@ -41,6 +41,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.41",
-   "x_serialization_backend" : "JSON::PP version 2.27203"
+   "version" : "0.52",
+   "x_serialization_backend" : "JSON::PP version 4.02"
 }

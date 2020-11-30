@@ -3,7 +3,7 @@ package Progress::Any::Examples;
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2020-07-09'; # DATE
 our $DIST = 'Progress-Any-Examples'; # DIST
-our $VERSION = '0.003'; # VERSION
+our $VERSION = '0.005'; # VERSION
 
 1;
 # ABSTRACT: Examples for Progress::Any
@@ -20,7 +20,7 @@ Progress::Any::Examples - Examples for Progress::Any
 
 =head1 VERSION
 
-This document describes version 0.003 of Progress::Any::Examples (from Perl distribution Progress-Any-Examples), released on 2020-07-09.
+This document describes version 0.005 of Progress::Any::Examples (from Perl distribution Progress-Any-Examples), released on 2020-07-09.
 
 =head1 SYNOPSIS
 

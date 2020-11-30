@@ -15,9 +15,9 @@ ok( defined $i2c, 'defined $i2c' );
 
 {
    test_out( qr/\s*# Subtest: ->write\n/ );
-   test_out( '    ok 1 - write' );
-   test_out( '    1..1' );
-   test_out( 'ok 1 - ->write' );
+   test_out( "    ok 1 - ->write('ABC')" );
+   test_out( "    1..1" );
+   test_out( "ok 1 - ->write" );
 
    $adapter->expect_write( "ABC" );
    $i2c->write( "ABC" )->get;
@@ -27,11 +27,11 @@ ok( defined $i2c, 'defined $i2c' );
 }
 
 {
-   test_out( 'ok 1 - ->write_then_read return' );
+   test_out( "ok 1 - ->write_then_read return" );
    test_out( qr/\s*# Subtest: ->write_then_read\n/ );
-   test_out( '    ok 1 - write_then_read' );
-   test_out( '    1..1' );
-   test_out( 'ok 2 - ->write_then_read' );
+   test_out( "    ok 1 - ->write_then_read('ABC', 3)" );
+   test_out( "    1..1" );
+   test_out( "ok 2 - ->write_then_read" );
 
    $adapter->expect_write_then_read( "ABC", 3 )
       ->returns( "DEF" );

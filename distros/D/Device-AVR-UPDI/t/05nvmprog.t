@@ -4,46 +4,48 @@ use v5.20;
 use warnings;
 
 use Test::More;
-use Test::EasyMock qw( create_mock );
 use Test::Future::IO;
+
+use lib 't/lib';
+use MockFH;
 
 use Device::AVR::UPDI;
 
 my $mockfio = Test::Future::IO->controller;
 
-my $updi = Device::AVR::UPDI->new( fh => create_mock(), part => "ATtiny814" );
+my $updi = Device::AVR::UPDI->new( fh => MockFH->new, part => "ATtiny814" );
 # can't easily ->init_link without upsetting $mockfio
 
 # enable_nvmprog
 {
    # KEY
-   $mockfio->expect_syswrite( "\x55\xE0" . " gorPMVN" );
-   $mockfio->expect_sysread( 10 )
+   $mockfio->expect_syswrite_anyfh( "\x55\xE0" . " gorPMVN" );
+   $mockfio->expect_sysread_anyfh( 10 )
       ->returns( "\x55\xE0" . " gorPMVN" );
    $mockfio->expect_sleep( 0.1 );
    # read ASI_KEY_STATUS
-   $mockfio->expect_syswrite( "\x55\x87" );
-   $mockfio->expect_sysread( 3 )
+   $mockfio->expect_syswrite_anyfh( "\x55\x87" );
+   $mockfio->expect_sysread_anyfh( 3 )
       ->returns( "\x55\x87" . "\x10" );
    $mockfio->expect_sleep( 0.1 );
    # Reset
-   $mockfio->expect_syswrite( "\x55\xC8\x59" );
-   $mockfio->expect_sysread( 3 )
+   $mockfio->expect_syswrite_anyfh( "\x55\xC8\x59" );
+   $mockfio->expect_sysread_anyfh( 3 )
       ->returns( "\x55\xC8\x59" );
    $mockfio->expect_sleep( 0.1 );
-   $mockfio->expect_syswrite( "\x55\xC8\x00" );
-   $mockfio->expect_sysread( 3 )
+   $mockfio->expect_syswrite_anyfh( "\x55\xC8\x00" );
+   $mockfio->expect_sysread_anyfh( 3 )
       ->returns( "\x55\xC8\x00" );
    $mockfio->expect_sleep( 0.1 );
    # read ASI_SYS_STATUS
-   $mockfio->expect_syswrite( "\x55\x8B" );
-   $mockfio->expect_sysread( 3 )
+   $mockfio->expect_syswrite_anyfh( "\x55\x8B" );
+   $mockfio->expect_sysread_anyfh( 3 )
       ->returns( "\x55\x8B\x00" );
    $mockfio->expect_sleep( 0.1 );
    $mockfio->expect_sleep( 0.05 )
       ->returns();
-   $mockfio->expect_syswrite( "\x55\x8B" );
-   $mockfio->expect_sysread( 3 )
+   $mockfio->expect_syswrite_anyfh( "\x55\x8B" );
+   $mockfio->expect_sysread_anyfh( 3 )
       ->returns( "\x55\x8B\x08" );
    $mockfio->expect_sleep( 0.1 );
 

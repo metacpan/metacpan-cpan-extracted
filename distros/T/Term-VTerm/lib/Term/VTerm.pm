@@ -1,14 +1,14 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2014-2018 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2014-2020 -- leonerd@leonerd.org.uk
 
 package Term::VTerm;
 
 use strict;
 use warnings;
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 use Carp;
 
@@ -194,36 +194,42 @@ Sets the parser-layer callbacks. Takes the following named arguments:
 
 =item on_text => CODE
 
- $on_text->( $text )
+   $on_text->( $text )
 
 =item on_control => CODE
 
- $on_control->( $ctrl )
+   $on_control->( $ctrl )
 
 C<$ctrl> is an integer giving a C0 or C1 control byte value.
 
 =item on_escape => CODE
 
- $on_escape->( $str )
+   $on_escape->( $str )
 
 =item on_csi => CODE
 
- $on_csi->( $leader, $command, @args )
+   $on_csi->( $leader, $command, @args )
 
 Where C<$leader> may be C<undef>, and each element of C<@args> is an ARRAY
 reference containing sub-arguments. Each sub-argument may be C<undef>.
 
 =item on_osc => CODE
 
- $on_osc->( $command )
+   $on_osc->( $command, $str )
+
+Where C<$command> contains the parsed command number (or -1 if none was found)
+and C<$str> contains the full text after the C<;>.
 
 =item on_dcs => CODE
 
- $on_dcs->( $str )
+   $on_dcs->( $command, $str )
+
+Where C<$command> contains the parsed DCS command identifier string and
+C<$str> contains the full text after it.
 
 =item on_resize => CODE
 
- $on_resize->( $rows, $cols )
+   $on_resize->( $rows, $cols )
 
 =back
 

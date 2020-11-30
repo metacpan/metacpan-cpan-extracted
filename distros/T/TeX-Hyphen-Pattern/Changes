@@ -1,20 +1,16 @@
-Revision history for TeX-Hyphen-Pattern
+Revision history for Perl extension TeX::Hyphen::Pattern
 
-v1.1.2 Fri Mar  1 19:38:10 UTC 2019
-	- Fixes MANIFEST test failures on Windows (RT#128682)
+v1.1.5 Tue Nov 24 21:45:48 UTC 2020
+    - feat: improve catalog build script
 
-v1.1.1 Wed Feb 27 21:10:50 UTC 2019
-	- Fixes MANIFEST test failures (RT#128617)
+v1.1.4 Mon Nov 23 21:53:46 UTC 2020
+    - feat: update patterns
+    - feat: improve tool to update patterns
+    - feat: drop getting source from SVN
+    - test: test \input directive in TeX pattern
 
-0.103 Sat Jul 21 12:43:58 UTC 2018
-    - Fixes fallback modules namespace
-
-0.102 Fri Jul 20 19:49:14 UTC 2018
-    - Fixes case sensitive issue with TeX/Tex namespace
-
-0.101 Sun Jul 15 14:02:58 UTC 2018
-    - Introduced fallbacks for mapping old labels to new modules
-    - Reintroduced Zu-ZA pattern
+v1.1.3 Sun Nov 22 21:50:41 UTC 2020
+    - test: improve coverage 
 
 0.100 Sun Jul 15 14:02:58 UTC 2018
     - Refactored from Class::Meta::Express to Moose
@@ -45,10 +41,10 @@ v1.1.1 Wed Feb 27 21:10:50 UTC 2019
        Tuned author tests
 
 0.03  Thu Jul 30 00:05:52 2009
-       Fixes missing TeX::Hyphen skip_all test (RT#48303)
+       Fixed missing TeX::Hyphen skip_all test (RT#48303)
 
 0.02  Wed Jul 29 17:20:12 2009
-       Fixes No warnings test failures (RT#48297 and RT#48298)
+       Fixed No warnings test failures (RT#48297 and RT#48298)
 
 0.01  Wed Jul 29 03:40:18 2009
        Initial release.

@@ -1,17 +1,13 @@
 ---
-abstract: 'insert soft hyphens into HTML.'
+abstract: 'insert soft hyphens into HTML'
 author:
   - 'Roland van Ipenburg <roland@rolandvanipenburg.com>'
 build_requires:
+  File::Spec: '0'
   Module::Build: '0'
-  TeX::Hyphen::Pattern: '0.103'
   Test::Compile: '0'
-  Test::Kwalitee: '0'
   Test::More: '0.86'
-  Test::NoWarnings: '0'
-  Test::Pod: '1'
-  Test::Pod::Coverage: '1'
-  Test::TestCoverage: '0.08'
+  Test::TestCoverage: '0'
   Test::Warn: '0'
 configure_requires:
   Module::Build: '0.42'
@@ -25,18 +21,19 @@ name: HTML-Hyphenate
 provides:
   HTML::Hyphenate:
     file: lib/HTML/Hyphenate.pm
-    version: v1.1.5
+    version: v1.1.7
 requires:
-  Log::Log4perl: '0'
+  Getopt::Long: '0'
   Mojolicious: '6'
   Moose: '0'
+  Pod::Usage: '0'
   Readonly: '1.03'
   Set::Scalar: '0'
   TeX::Hyphen: '0'
-  TeX::Hyphen::Pattern: '0.1'
+  TeX::Hyphen::Pattern: v1.1.5
   perl: v5.16.0
 resources:
   license: http://dev.perl.org/licenses/
   repository: https://bitbucket.org/rolandvanipenburg/html-hyphenate
-version: v1.1.5
+version: v1.1.7
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

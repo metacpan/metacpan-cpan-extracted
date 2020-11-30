@@ -46,11 +46,11 @@ Metabolomics::Banks::MaConDa - Perl extension for contaminants bank building
 
 =head1 VERSION
 
-Version 0.1
+Version 0.2 - Adding POD
 
 =cut
 
-our $VERSION = '0.1';
+our $VERSION = '0.2';
 
 
 =head1 SYNOPSIS
@@ -60,13 +60,18 @@ our $VERSION = '0.1';
 =head1 DESCRIPTION
 
 	Metabolomics::Banks::MaConDa is a full package for Perl allowing to build a generic Perl bank object from MaConDa resource.
-	
 
 =head1 EXPORT
 
-=head1 SUBROUTINES/METHODS
+	use Metabolomics::Banks::MaConDa qw( :all ) ;
 
-=head2 METHOD new
+=head1 PUBLIC METHODS 
+
+=head2 Metabolomics::Banks::MaConDa
+
+=over 4
+
+=item new
 
 	## Description : new
 	## Input : $self
@@ -93,14 +98,15 @@ sub new {
 }
 ### END of SUB
 
-=head2 METHOD __refContaminant__
+=item __refContaminant__
 
 	## Description : set a new contaminant object
 	## Input : NA	
 	## Output : $refContaminant
 	## Usage : my ( $refContaminant ) = __refContaminant__() ;
-	
+
 =cut
+
 ## START of SUB
 sub __refContaminant__ {
     ## Variables
@@ -122,14 +128,15 @@ sub __refContaminant__ {
 }
 ### END of SUB
 
-=head2 METHOD __refContaminantExtensive__
+=item __refContaminantExtensive__
 
 	## Description : set a new contaminant object in extensive version
 	## Input : NA	
 	## Output : $refContaminantExtensive
 	## Usage : my ( $refContaminantExtensive ) = __refContaminantExtensive__() ;
-	
+
 =cut
+
 ## START of SUB
 sub __refContaminantExtensive__ {
     ## Variables
@@ -153,14 +160,15 @@ sub __refContaminantExtensive__ {
 }
 ### END of SUB
 
-=head2 METHOD getContaminantsFromSource
+=item getContaminantsFromSource
 
 	## Description : get all contaminants information from the MaConDa resources v01
 	## Input : $source
 	## Output : $oBank
 	## Usage : my ( $oBank ) = getContaminantsFromSource ( $source ) ;
-	
+
 =cut
+
 ## START of SUB
 sub getContaminantsFromSource {
     ## Retrieve Values
@@ -245,14 +253,15 @@ sub getContaminantsFromSource {
 ### END of SUB
 
 
-=head2 METHOD getContaminantsExtensiveFromSource
+=item getContaminantsExtensiveFromSource
 
 	## Description : get all contaminants information from the MaConDa extensive resources v01
 	## Input : $source
 	## Output : $oBank
 	## Usage : my ( $oBank ) = getContaminantsFromSource ( $source ) ;
-	
+
 =cut
+
 ## START of SUB
 sub getContaminantsExtensiveFromSource {
     ## Retrieve Values
@@ -345,14 +354,15 @@ sub getContaminantsExtensiveFromSource {
 }
 ### END of SUB
 
-=head2 METHOD buildTheoPeakBankFromContaminants
+=item buildTheoPeakBankFromContaminants
 
 	## Description : building a bank integrating each potential ion from contaminants
 	## Input : $refBank, $oContaminants, $queryMode
 	## Output : $ionBank
 	## Usage : my ( $ionBank ) = buildTheoPeakBankFromContaminants ( $refBank, $oContaminants, $queryMode ) ;
-	
+
 =cut
+
 ## START of SUB
 sub buildTheoPeakBankFromContaminants {
     ## Retrieve Values
@@ -417,14 +427,15 @@ sub buildTheoPeakBankFromContaminants {
 ### END of SUB
 
 
-=head2 METHOD extractContaminantTypes
+=item extractContaminantTypes
 
 	## Description : extract contaminant types listing from contaminants object
 	## Input : $oContaminants
 	## Output : $contaminantTypes
 	## Usage : my ( $contaminantTypes ) = extractContaminantTypes ( $oContaminants ) ;
-	
+
 =cut
+
 ## START of SUB
 sub extractContaminantTypes {
     ## Retrieve Values
@@ -452,14 +463,15 @@ sub extractContaminantTypes {
 }
 ### END of SUB
 
-=head2 METHOD extractContaminantInstruments
+=item extractContaminantInstruments
 
 	## Description : extract instruments listing from contaminants object
 	## Input : $oContaminants
 	## Output : $contaminantInstruments
 	## Usage : my ( $contaminantInstruments ) = extractContaminantInstruments ( $oContaminants ) ;
-	
+
 =cut
+
 ## START of SUB
 sub extractContaminantInstruments {
     ## Retrieve Values
@@ -486,14 +498,15 @@ sub extractContaminantInstruments {
 }
 ### END of SUB
 
-=head2 METHOD extractContaminantInstrumentTypes
+=item extractContaminantInstrumentTypes
 
 	## Description : extract instrument types listing from contaminants object
 	## Input : $oContaminants
 	## Output : $contaminantInstrumentTypes
 	## Usage : my ( $contaminantInstrumentTypes ) = extractContaminantInstrumentTypes ( $oContaminants ) ;
-	
+
 =cut
+
 ## START of SUB
 sub extractContaminantInstrumentTypes {
     ## Retrieve Values
@@ -520,14 +533,15 @@ sub extractContaminantInstrumentTypes {
 }
 ### END of SUB
 
-=head2 METHOD filterContaminantIonMode
+=item filterContaminantIonMode
 
 	## Description : filtering contaminants by their ion mode (POS|NEG|BOTH)
 	## Input : $oBank, $ionMode
 	## Output : $oFilteredBank
 	## Usage : my ( $oFilteredBank ) = filterContaminantIonMode ( $oBank, $ionMode ) ;
-	
+
 =cut
+
 ## START of SUB
 sub filterContaminantIonMode {
     ## Retrieve Values
@@ -580,14 +594,15 @@ sub filterContaminantIonMode {
 }
 ### END of SUB
 
-=head2 METHOD filterContaminantInstruments
+=item filterContaminantInstruments
 
 	## Description : filtering contaminants by their instrument (array)
 	## Input : $oBank, $instruments
 	## Output : $oFilteredBank, $totalEntryNum, $fiteredEntryNum
 	## Usage : my ( $oFilteredBank ) = filterContaminantInstruments ( $oBank, $instruments ) ;
-	
+
 =cut
+
 ## START of SUB
 sub filterContaminantInstruments {
     ## Retrieve Values
@@ -637,14 +652,15 @@ sub filterContaminantInstruments {
 }
 ### END of SUB
 
-=head2 METHOD filterContaminantInstrumentTypes
+=item filterContaminantInstrumentTypes
 
 	## Description : filtering contaminants by their instrument types (array)
 	## Input : $oBank, $instrumentTypes
 	## Output : $oFilteredBank
 	## Usage : my ( $oFilteredBank ) = filterContaminantInstrumentTypes ( $oBank, $instrumentTypes ) ;
-	
+
 =cut
+
 ## START of SUB
 sub filterContaminantInstrumentTypes {
     ## Retrieve Values
@@ -697,14 +713,15 @@ sub filterContaminantInstrumentTypes {
 ## * * * * * * * * * *  * * * * * * * * * *  * * * * * * * * * * getter/setter  * * * * * * * * * *  * * * * * * * * * *  * * * * * * * * * * ##
 
 
-=head2 METHOD _setContaminantExtREFERENCE
+=item _setContaminantExtREFERENCE
 
 	## Description : _setContaminantExtREFERENCE
 	## Input : $REFERENCE
 	## Output : TRUE
 	## Usage : _setContaminantExtREFERENCE ( $ION_FORM ) ;
-	
+
 =cut
+
 ## START of SUB
 sub _setContaminantExtREFERENCE {
     ## Retrieve Values
@@ -722,14 +739,15 @@ sub _setContaminantExtREFERENCE {
 }
 ### END of SUB
 
-=head2 METHOD _getContaminantExtION_MODE
+=item _getContaminantExtION_MODE
 
 	## Description : _getContaminantExtION_MODE
 	## Input : void
 	## Output : $ION_MODE
 	## Usage : my ( $ION_MODE ) = _getContaminantExtION_MODE () ;
-	
+
 =cut
+
 ## START of SUB
 sub _getContaminantExtION_MODE {
     ## Retrieve Values
@@ -744,14 +762,15 @@ sub _getContaminantExtION_MODE {
 }
 ### END of SUB
 
-=head2 METHOD _setContaminantExtION_MODE
+=item _setContaminantExtION_MODE
 
 	## Description : _setContaminantExtION_MODE
 	## Input : $ION_MODE
 	## Output : TRUE
 	## Usage : _setContaminantExtION_MODE ( $ION_FORM ) ;
-	
+
 =cut
+
 ## START of SUB
 sub _setContaminantExtION_MODE {
     ## Retrieve Values
@@ -769,14 +788,15 @@ sub _setContaminantExtION_MODE {
 }
 ### END of SUB
 
-=head2 METHOD _setContaminantExtEXACT_ADDUCT_MASS
+=item _setContaminantExtEXACT_ADDUCT_MASS
 
 	## Description : _setContaminantExtEXACT_ADDUCT_MASS
 	## Input : $EXACT_ADDUCT_MASS
 	## Output : TRUE
 	## Usage : _setContaminantExtEXACT_ADDUCT_MASS ( $ION_FORM ) ;
-	
+
 =cut
+
 ## START of SUB
 sub _setContaminantExtEXACT_ADDUCT_MASS {
     ## Retrieve Values
@@ -794,14 +814,15 @@ sub _setContaminantExtEXACT_ADDUCT_MASS {
 }
 ### END of SUB
 
-=head2 METHOD _getContaminantExtEXACT_ADDUCT_MASS
+=item _getContaminantExtEXACT_ADDUCT_MASS
 
 	## Description : _getContaminantExtEXACT_ADDUCT_MASS
 	## Input : void
 	## Output : $EXACT_ADDUCT_MASS
 	## Usage : my ( $EXACT_ADDUCT_MASS ) = _getContaminantExtEXACT_ADDUCT_MASS () ;
-	
+
 =cut
+
 ## START of SUB
 sub _getContaminantExtEXACT_ADDUCT_MASS {
     ## Retrieve Values
@@ -816,14 +837,15 @@ sub _getContaminantExtEXACT_ADDUCT_MASS {
 }
 ### END of SUB
 
-=head2 METHOD _getContaminantExtION_FORM
+=item _getContaminantExtION_FORM
 
 	## Description : _getContaminantExtION_FORM
 	## Input : void
 	## Output : $ION_FORM
 	## Usage : my ( $ION_FORM ) = _getContaminantExtION_FORM () ;
-	
+
 =cut
+
 ## START of SUB
 sub _getContaminantExtION_FORM {
     ## Retrieve Values
@@ -839,14 +861,15 @@ sub _getContaminantExtION_FORM {
 ### END of SUB
 
 
-=head2 METHOD _setContaminantExtION_FORM
+=item _setContaminantExtION_FORM
 
 	## Description : _setContaminantExtION_FORM
 	## Input : $ION_FORM
 	## Output : TRUE
 	## Usage : _setContaminantExtION_FORM ( $ION_FORM ) ;
-	
+
 =cut
+
 ## START of SUB
 sub _setContaminantExtION_FORM {
     ## Retrieve Values
@@ -862,14 +885,15 @@ sub _setContaminantExtION_FORM {
 }
 ### END of SUB
 
-=head2 METHOD _getContaminantExtMZ
+=item _getContaminantExtMZ
 
 	## Description : _getContaminantExtMZ
 	## Input : void
 	## Output : $MZ
 	## Usage : my ( $EXACT_ADDUCT_MASS ) = _getContaminantExtMZ () ;
-	
+
 =cut
+
 ## START of SUB
 sub _getContaminantExtMZ {
     ## Retrieve Values
@@ -884,14 +908,15 @@ sub _getContaminantExtMZ {
 }
 ### END of SUB
 
-=head2 METHOD _setContaminantExtMZ
+=item _setContaminantExtMZ
 
 	## Description : _setContaminantExtMZ
 	## Input : $MZ
 	## Output : TRUE
 	## Usage : _setContaminantExtMZ ( $MZ ) ;
-	
+
 =cut
+
 ## START of SUB
 sub _setContaminantExtMZ {
     ## Retrieve Values
@@ -907,15 +932,15 @@ sub _setContaminantExtMZ {
 }
 ### END of SUB
 
-
-=head2 METHOD _getContaminantExtINSTRUMENT_TYPES
+=item _getContaminantExtINSTRUMENT_TYPES
 
 	## Description : _getContaminantExtINSTRUMENT_TYPES
 	## Input : void
 	## Output : $INSTRUMENT_TYPE
 	## Usage : my ( $INSTRUMENT_TYPE ) = _getContaminantExtINSTRUMENT_TYPES () ;
-	
+
 =cut
+
 ## START of SUB
 sub _getContaminantExtINSTRUMENT_TYPES {
     ## Retrieve Values
@@ -930,14 +955,15 @@ sub _getContaminantExtINSTRUMENT_TYPES {
 }
 ### END of SUB
 
-=head2 METHOD _setContaminantExtINSTRUMENT_TYPE
+=item _setContaminantExtINSTRUMENT_TYPE
 
 	## Description : _setContaminantExtINSTRUMENT_TYPE
 	## Input : $INSTRUMENT_TYPE
 	## Output : TRUE
 	## Usage : _setContaminantExtINSTRUMENT_TYPE ( $INSTRUMENT_TYPE ) ;
-	
+
 =cut
+
 ## START of SUB
 sub _setContaminantExtINSTRUMENT_TYPE {
     ## Retrieve Values
@@ -955,14 +981,15 @@ sub _setContaminantExtINSTRUMENT_TYPE {
 }
 ### END of SUB
 
-=head2 METHOD _getContaminantExtINSTRUMENTS
+=item _getContaminantExtINSTRUMENTS
 
 	## Description : _getContaminantExtINSTRUMENTS
 	## Input : void
 	## Output : $INSTRUMENT
 	## Usage : my ( $INSTRUMENT ) = _getContaminantExtINSTRUMENTS () ;
-	
+
 =cut
+
 ## START of SUB
 sub _getContaminantExtINSTRUMENTS {
     ## Retrieve Values
@@ -977,14 +1004,15 @@ sub _getContaminantExtINSTRUMENTS {
 }
 ### END of SUB
 
-=head2 METHOD _setContaminantExtINSTRUMENT
+=item _setContaminantExtINSTRUMENT
 
 	## Description : _setContaminantExtINSTRUMENT
 	## Input : $INSTRUMENT
 	## Output : TRUE
 	## Usage : _setContaminantExtINSTRUMENT ( $INSTRUMENT ) ;
-	
+
 =cut
+
 ## START of SUB
 sub _setContaminantExtINSTRUMENT {
     ## Retrieve Values
@@ -1002,14 +1030,15 @@ sub _setContaminantExtINSTRUMENT {
 }
 ### END of SUB
 
-=head2 METHOD _setContaminantExtCHROMATOGRAPHY
+=item _setContaminantExtCHROMATOGRAPHY
 
 	## Description : _setContaminantExtCHROMATOGRAPHY
 	## Input : $CHROMATOGRAPHY
 	## Output : TRUE
 	## Usage : _setContaminantExtCHROMATOGRAPHY ( $CHROMATOGRAPHY ) ;
-	
+
 =cut
+
 ## START of SUB
 sub _setContaminantExtCHROMATOGRAPHY {
     ## Retrieve Values
@@ -1027,14 +1056,15 @@ sub _setContaminantExtCHROMATOGRAPHY {
 }
 ### END of SUB
 
-=head2 METHOD _setContaminantExtION_SOURCE_TYPE
+=item _setContaminantExtION_SOURCE_TYPE
 
 	## Description : _setContaminantExtION_SOURCE_TYPE
 	## Input : $ION_SOURCE_TYPE
 	## Output : TRUE
 	## Usage : _setContaminantExtION_SOURCE_TYPE ( $ION_SOURCE_TYPE ) ;
-	
+
 =cut
+
 ## START of SUB
 sub _setContaminantExtION_SOURCE_TYPE {
     ## Retrieve Values
@@ -1052,14 +1082,15 @@ sub _setContaminantExtION_SOURCE_TYPE {
 }
 ### END of SUB
 
-=head2 METHOD _getContaminantExtTYPE_OF_CONTAMINANT
+=item _getContaminantExtTYPE_OF_CONTAMINANT
 
 	## Description : _getContaminantExtTYPE_OF_CONTAMINANT
 	## Input : void
 	## Output : $TYPE_OF_CONTAMINANT
 	## Usage : my ( $TYPE_OF_CONTAMINANT ) = _getContaminantExtTYPE_OF_CONTAMINANT () ;
-	
+
 =cut
+
 ## START of SUB
 sub _getContaminantExtTYPE_OF_CONTAMINANT {
     ## Retrieve Values
@@ -1075,14 +1106,15 @@ sub _getContaminantExtTYPE_OF_CONTAMINANT {
 ### END of SUB
 
 
-=head2 METHOD _setContaminantTYPE_OF_CONTAMINANT
+=item _setContaminantTYPE_OF_CONTAMINANT
 
 	## Description : _setContaminantTYPE_OF_CONTAMINANT
 	## Input : $TYPE_OF_CONTAMINANT
 	## Output : TRUE
 	## Usage : _setContaminantTYPE_OF_CONTAMINANT ( $TYPE_OF_CONTAMINANT ) ;
-	
+
 =cut
+
 ## START of SUB
 sub _setContaminantTYPE_OF_CONTAMINANT {
     ## Retrieve Values
@@ -1101,14 +1133,15 @@ sub _setContaminantTYPE_OF_CONTAMINANT {
 }
 ### END of SUB
 
-=head2 METHOD _setContaminantPUBCHEM_CID
+=item _setContaminantPUBCHEM_CID
 
 	## Description : _setContaminantPUBCHEM_CID
 	## Input : $PUBCHEM_CID
 	## Output : TRUE
 	## Usage : _setContaminantPUBCHEM_CID ( $PUBCHEM_CID ) ;
-	
+
 =cut
+
 ## START of SUB
 sub _setContaminantPUBCHEM_CID {
     ## Retrieve Values
@@ -1127,14 +1160,15 @@ sub _setContaminantPUBCHEM_CID {
 }
 ### END of SUB
 
-=head2 METHOD _setContaminantSTD_INCHI_KEY
+=item _setContaminantSTD_INCHI_KEY
 
 	## Description : _setContaminantSTD_INCHI_KEY
 	## Input : $STD_INCHI_KEY
 	## Output : TRUE
 	## Usage : _setContaminantSTD_INCHI_KEY ( $STD_INCHI_KEY ) ;
-	
+
 =cut
+
 ## START of SUB
 sub _setContaminantSTD_INCHI_KEY {
     ## Retrieve Values
@@ -1153,15 +1187,15 @@ sub _setContaminantSTD_INCHI_KEY {
 }
 ### END of SUB
 
-
-=head2 METHOD _setContaminantSTD_INCHI
+=item _setContaminantSTD_INCHI
 
 	## Description : _setContaminantSTD_INCHI
 	## Input : $STD_INCHI
 	## Output : TRUE
 	## Usage : _setContaminantSTD_INCHI ( $STD_INCHI ) ;
-	
+
 =cut
+
 ## START of SUB
 sub _setContaminantSTD_INCHI {
     ## Retrieve Values
@@ -1179,14 +1213,15 @@ sub _setContaminantSTD_INCHI {
 }
 ### END of SUB
 
-=head2 METHOD _getContaminantEXACT_MASS
+=item _getContaminantEXACT_MASS
 
 	## Description : _getContaminantEXACT_MASS
 	## Input : void
 	## Output : $EXACT_MASS
 	## Usage : my ( $EXACT_MASS ) = _getContaminantEXACT_MASS () ;
-	
+
 =cut
+
 ## START of SUB
 sub _getContaminantEXACT_MASS {
     ## Retrieve Values
@@ -1201,14 +1236,15 @@ sub _getContaminantEXACT_MASS {
 }
 ### END of SUB
 
-=head2 METHOD _setContaminantEXACT_MASS
+=item _setContaminantEXACT_MASS
 
 	## Description : _setContaminantEXACT_MASS
 	## Input : $EXACT_MASS
 	## Output : TRUE
 	## Usage : _setContaminantEXACT_MASS ( $EXACT_MASS ) ;
-	
+
 =cut
+
 ## START of SUB
 sub _setContaminantEXACT_MASS {
     ## Retrieve Values
@@ -1226,14 +1262,15 @@ sub _setContaminantEXACT_MASS {
 }
 ### END of SUB
 
-=head2 METHOD _setContaminantFORMULA
+=item _setContaminantFORMULA
 
 	## Description : _setContaminantFORMULA
 	## Input : $FORMULA
 	## Output : TRUE
 	## Usage : _setContaminantFORMULA ( $FORMULA ) ;
-	
+
 =cut
+
 ## START of SUB
 sub _setContaminantFORMULA {
     ## Retrieve Values
@@ -1251,14 +1288,15 @@ sub _setContaminantFORMULA {
 }
 ### END of SUB
 
-=head2 METHOD _getContaminantNAME
+=item _getContaminantNAME
 
 	## Description : _getContaminantNAME
 	## Input : void
 	## Output : $NAME
 	## Usage : my ( $NAME ) = _getContaminantNAME () ;
-	
+
 =cut
+
 ## START of SUB
 sub _getContaminantNAME {
     ## Retrieve Values
@@ -1273,14 +1311,15 @@ sub _getContaminantNAME {
 }
 ### END of SUB
 
-=head2 METHOD _setContaminantNAME
+=item _setContaminantNAME
 
 	## Description : _setContaminantNAME
 	## Input : $NAME
 	## Output : TRUE
 	## Usage : _setContaminantNAME ( $NAME ) ;
-	
+
 =cut
+
 ## START of SUB
 sub _setContaminantNAME {
     ## Retrieve Values
@@ -1298,14 +1337,15 @@ sub _setContaminantNAME {
 }
 ### END of SUB
 
-=head2 METHOD _getContaminantID
+=item _getContaminantID
 
 	## Description : _getContaminantID
 	## Input : void
 	## Output : $ID
 	## Usage : my ( $ID ) = _getContaminantID () ;
-	
+
 =cut
+
 ## START of SUB
 sub _getContaminantID {
     ## Retrieve Values
@@ -1320,14 +1360,15 @@ sub _getContaminantID {
 }
 ### END of SUB
 
-=head2 METHOD _setContaminantID
+=item _setContaminantID
 
 	## Description : _setContaminantID
 	## Input : $ID
 	## Output : TRUE
 	## Usage : _setContaminantID ( $ID ) ;
-	
+
 =cut
+
 ## START of SUB
 sub _setContaminantID {
     ## Retrieve Values
@@ -1345,9 +1386,9 @@ sub _setContaminantID {
 }
 ### END of SUB
 
-
-
 __END__
+
+=back
 
 =head1 AUTHOR
 
@@ -1390,9 +1431,9 @@ L<https://metacpan.org/release/Metabolomics-Fragment-Annotation>
 
 =back
 
-
 =head1 ACKNOWLEDGEMENTS
 
+Thank you to INRAE and All metabolomics colleagues.
 
 =head1 LICENSE AND COPYRIGHT
 
@@ -1400,10 +1441,9 @@ CeCILL Copyright (C) 2019 by Franck Giacomoni
 
 Initiated by Franck Giacomoni
 
-followed by INRA PFEM team
+followed by INRAE PFEM team
 
-Web Site = INRA PFEM
-
+Web Site = INRAE PFEM
 
 =cut
 

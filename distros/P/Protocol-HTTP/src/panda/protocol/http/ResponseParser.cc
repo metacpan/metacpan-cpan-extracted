@@ -1,5 +1,7 @@
 #include "ResponseParser.h"
-#include "MessageParser.tcc"
+
+#define PARSER_DEFINITIONS_ONLY
+#include "MessageParser.cc"
 
 namespace panda { namespace protocol { namespace http {
 
@@ -16,26 +18,7 @@ void ResponseParser::_reset (bool keep_context) {
 ResponseParser::Result ResponseParser::parse (const string& buffer) {
     ensure_response_created();
 
-    auto pos = MessageParser::parse(buffer,
-        [this] {
-            for (const auto& s : response->headers.get_multi("Set-Cookie")) parse_cookie(s);
-
-            if (_context_request->method_raw() == Request::Method::HEAD || response->code  < 200 || response->code == 204 || response->code == 304) {
-                if (response->chunked || (content_length > 0 && _context_request->method_raw() != Request::Method::HEAD)) {
-                    set_error(errc::unexpected_body);
-                } else {
-                    state = State::done;
-                }
-                return false;
-            }
-            return true;
-        },
-        [this] {
-            response->headers.set("Connection", "close");
-            state = State::body;
-            return true;
-        }
-    );
+    auto pos = MessageParser::_parse(buffer);
 
     Result ret = {response, pos, state, error};
 
@@ -52,6 +35,26 @@ ResponseParser::Result ResponseParser::parse (const string& buffer) {
     }
 
     return ret;
+}
+
+bool ResponseParser::on_headers    () {
+    for (const auto& s : response->headers.get_multi("Set-Cookie")) parse_cookie(s);
+
+    if (_context_request->method_raw() == Request::Method::Head || response->code  < 200 || response->code == 204 || response->code == 304) {
+        if (response->chunked || (content_length > 0 && _context_request->method_raw() != Request::Method::Head)) {
+            set_error(errc::unexpected_body);
+        } else {
+            state = State::done;
+        }
+        return false;
+    }
+    return true;
+}
+
+bool ResponseParser::on_empty_body () {
+    response->headers.set("Connection", "close");
+    state = State::body;
+    return true;
 }
 
 ResponseParser::Result ResponseParser::eof () {

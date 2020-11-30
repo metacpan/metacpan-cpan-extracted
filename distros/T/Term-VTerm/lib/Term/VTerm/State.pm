@@ -8,7 +8,7 @@ package Term::VTerm::State;
 use strict;
 use warnings;
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 =head1 NAME
 
@@ -73,66 +73,66 @@ Sets the state-layer callbacks. Takes the following named arguments:
 
 =item on_putglyph => CODE
 
- $on_putglyph->( $glyphinfo, $pos )
+   $on_putglyph->( $glyphinfo, $pos )
 
 C<$glyphinfo> is a C<VTermGlyphInfo> structure. C<$pos> is a C<VTermPos>.
 
 =item on_movecursor => CODE
 
- $on_movecursor->( $pos, $oldpos, $is_visible )
+   $on_movecursor->( $pos, $oldpos, $is_visible )
 
 C<$pos> and C<$oldpos> are a C<VTermPos>. C<$is_visible> is a boolean.
 
 =item on_scrollrect => CODE
 
- $on_scrollrect->( $rect, $downward, $rightward )
+   $on_scrollrect->( $rect, $downward, $rightward )
 
 C<$rect> is a C<VTermRect> structure. C<$downward> and C<$rightward> are
 integers.
 
 =item on_moverect => CODE
 
- $on_moverect->( $dest, $src )
+   $on_moverect->( $dest, $src )
 
 C<$dest> and C<$src> are C<VTermRect> structures.
 
 =item on_erase => CODE
 
- $on_erase->( $rect, $is_selective )
+   $on_erase->( $rect, $is_selective )
 
 C<$rect> is a C<VTermRect> structure. C<$is_selective> is a boolean.
 
 =item on_initpen => CODE
 
- $on_initpen->()
+   $on_initpen->()
 
 =item on_setpenattr => CODE
 
- $on_setpenattr->( $attr, $value )
+   $on_setpenattr->( $attr, $value )
 
 C<$attr> is one of the C<ATTR_*> constants. The type of C<$value> depends on
 the attribute type - see C<get_penattr>.
 
 =item on_settermprop => CODE
 
- $on_settermprop->( $prop, $value )
+   $on_settermprop->( $prop, $value )
 
 C<$prop> is one of the C<PROP_*> constants. The type of C<$value> depends on
 the property type - see similar to C<get_penattr>.
 
 =item on_setmousemode => CODE
 
- $on_setmousemode->( $mode )
+   $on_setmousemode->( $mode )
 
 C<$mode> is one of the C<MOUSE_*> constants.
 
 =item on_bell => CODE
 
- $on_bell->()
+   $on_bell->()
 
 =item on_setlineinfo => CODE
 
- $on_setlineinfo->( $row, $lineinfo, $oldlineinfo )
+   $on_setlineinfo->( $row, $lineinfo, $oldlineinfo )
 
 C<$row> is an integer. C<$lineinfo> and C<$oldlineinfo> are C<VTermLineInfo>
 structures.

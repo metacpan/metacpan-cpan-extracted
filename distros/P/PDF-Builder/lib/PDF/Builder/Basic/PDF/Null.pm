@@ -17,7 +17,7 @@ use base 'PDF::Builder::Basic::PDF::Objind';
 use strict;
 use warnings;
 
-our $VERSION = '3.019'; # VERSION
+our $VERSION = '3.020'; # VERSION
 my $LAST_UPDATE = '3.010'; # manually update whenever code is changed
 
 =head1 NAME

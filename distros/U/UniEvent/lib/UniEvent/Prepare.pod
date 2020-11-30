@@ -1,0 +1,96 @@
+=head1 NAME
+
+UniEvent::Prepare - runs the given callback once before polling for I/O
+
+=head1 SYNOPSIS
+
+    my $loop = UniEvent::Loop->new;
+    my $h = UniEvent::Prepare->new($loop);
+    $h->event->add(sub { say 'hello' });
+    $h->start;
+    $loop->run_nowait;  # prints 'hello'
+    $loop->run_nowait;  # prints 'hello' again
+
+    $h->stop;
+    $loop->run_nowait;  # no effect
+
+    $h->reset;
+
+=head1 DESCRIPTION
+
+The Prepare handle is useful for doing some actions (in the form of callbacks
+or listener) before polling I/O. It is inherited from L<UniEvent::Handle>.
+
+If you need to do some actions B<after> polling I/O, consider using
+L<UniEvent::Check>.
+
+=head1 METHODS
+
+=head2 new([$loop = UniEvent::Loop->default_loop])
+
+Constructs new Prepare handle and binds it to the specified event loop
+
+=head2 start([$callback = undef])
+
+Starts the prepare handle, i.e. makes it active for the next even loop
+iteration. Optionally it adds the C<$callback> to the event listeners.
+
+=head2 stop()
+
+Stops the prepare handle, i.e. makes it inactive for the next event loop
+iteration.
+
+=head2 callback($code)
+
+Sets the callback, which will be invoked before loop run. All previously
+set event listeners or callbacks are discarded.
+
+=head2 event()
+
+Returns L<XS::Framework::CallbackDispatcher> instance, where callback(s)
+can be assigned with. The callbacks will be invoked before loop run.
+
+The C++ interface is:
+
+    void(const PrepareSP&);
+
+On perl side it the callbacks will be called :
+
+    $callback->($handle);
+
+Multiple callbacks can be added via the L<XS::Framework::CallbackDispatcher>
+interface.
+
+=head2 event_listener($delegate [, $weak = false])
+
+
+Creates and returns wrapper around the C<$delegate> object of arbitrary
+class, having the following methods:
+
+  $delegate->on_prepare($handle);
+
+The delegated object can be seen as alternative of setting indivitual callbacks
+or as a way of groupping them. The C<$delegate> object can optionally be weakened.
+
+=head2 call_now()
+
+Immediately ivokes assigned callbacks and listeners in the caller context
+(i.e. not waiting loop run).
+
+=head1 CONSTANTS
+
+=head2 TYPE
+
+Prepare type constant
+
+=head1 REFERENCES
+
+L<UniEvent::Handle>
+
+L<UniEvent::Idle>
+
+L<UniEvent::Check>
+
+L<XS::Framework::CallbackDispatcher>
+
+=cut

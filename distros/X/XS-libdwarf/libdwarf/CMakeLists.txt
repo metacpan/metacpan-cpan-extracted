@@ -74,6 +74,7 @@ check_include_file( "sgidefs.h"       HAVE_SGIDEFS_H  )
 check_include_file( "stdafx.h"        HAVE_STDAFX_H   )
 check_include_file( "Windows.h"       HAVE_WINDOWS_H  )
 check_include_file( "elf.h"           HAVE_ELF_H      ) 
+check_include_file( "libelf.h"        HAVE_LIBELF_H   ) 
 check_include_file( "libelf/libelf.h" HAVE_LIBELF_LIBELF_H) 
 check_include_file( "alloca.h"        HAVE_ALLOCA_H   )
 check_include_file( "elfaccess.h"     HAVE_ELFACCESS_H)
@@ -300,6 +301,20 @@ check_c_source_compiles( [=[
       }
       return 0;
   } ]=]  HAVE_ZLIB )
+check_c_source_compiles( [=[
+  #include "zlib.h"
+  int main()
+  {
+      Bytef dest[100];
+      uLongf destlen = 100;
+      Bytef *src = 0;
+      uLong srclen = 3;
+      int res = uncompress(dest,&destlen,src,srclen);
+      if (res == Z_OK) {
+           /* ALL IS WELL */
+      }
+      return 0;
+  } ]=]  HAVE_ZLIB_H )
 set(CMAKE_REQUIRED_LIBRARIES)
 if (HAVE_ZLIB) 
   # For linking in libz
@@ -408,3 +423,20 @@ endif()
 
 message(STATUS "Install prefix ... ${CMAKE_INSTALL_PREFIX}" )
 add_custom_target(dd DEPENDS ${DWARF_TARGETS} dwarfdump)
+# installation
+install(TARGETS ${DWARF_TARGETS} EXPORT libdwarfTargets ARCHIVE DESTINATION lib)
+install(EXPORT libdwarfTargets
+    FILE libdwarf-targets.cmake
+    NAMESPACE libdwarf::
+    DESTINATION lib/cmake/libdwarf
+)
+install(
+    FILES cmake/libdwarf-config.cmake
+    DESTINATION lib/cmake/libdwarf
+)
+install(DIRECTORY libdwarf DESTINATION include/
+    FILES_MATCHING PATTERN "*.h")
+install(
+    FILES ${CMAKE_CURRENT_BINARY_DIR}/libdwarf/libdwarf.h
+    DESTINATION include/libdwarf
+)

@@ -12,6 +12,7 @@ struct MessageParser {
     size_t max_body_size    = SIZE_UNLIMITED;
     bool   uncompress_content = true;   // false have sense only for proxies
 
+    virtual ~MessageParser();
 protected:
     MessageSP       message;
     RequestSP       request;
@@ -46,12 +47,15 @@ protected:
         }
     }
 
-    template <class F1, class F2> size_t parse (const string& buffer, F1&& after_headers_cb, F2&& no_body_cb);
+    size_t _parse (const string& buffer);
 
     void set_error (const std::error_code& e) {
         error = e;
         state = State::error;
     }
+
+    virtual bool on_headers    () = 0;
+    virtual bool on_empty_body () = 0;
 
     compression::CompressorPtr compressor;
 

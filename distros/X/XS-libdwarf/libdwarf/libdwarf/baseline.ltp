@@ -1,33 +1,38 @@
-originalfullpath    : /fake/dir/path/a/b
-linkstring full path: /fake/dir/path/a/de
+Adding global path /usr/lib/debug
+Adding global path /fake/lib/debug
+executable path /a/b
+linkstring      de
+linkstring full path: /a/de
 
     Paths:
-    [ 0] "/usr/lib/debug/11/22334421222344a1a2a3a4b1b2b3b4c1c2c3c4.debug"
-    [ 1] "/fake/lib/debug/11/22334421222344a1a2a3a4b1b2b3b4c1c2c3c4.debug"
-    [ 2] "/fake/dir/path/a/de"
-    [ 3] "/fake/dir/path/a/.debug/de"
-    [ 4] "/usr/lib/debug/fake/dir/path/a/de"
-    [ 5] "/fake/lib/debug/fake/dir/path/a/de"
+    [ 0] "/usr/lib/debug/.build-id/11/22334421222344a1a2a3a4b1b2b3b4c1c2c3c4.debug"
+    [ 1] "/fake/lib/debug/.build-id/11/22334421222344a1a2a3a4b1b2b3b4c1c2c3c4.debug"
+    [ 2] "/a/de"
+    [ 3] "/a/.debug/de"
+    [ 4] "/usr/lib/debug/a/de"
+    [ 5] "/fake/lib/debug/a/de"
 
-originalfullpath    : /fake/dir/path/ge
-linkstring full path: /fake/dir/path/h/i
-
-    Paths:
-    [ 0] "/usr/lib/debug/11/22334421222344a1a2a3a4b1b2b3b4c1c2c3c4.debug"
-    [ 1] "/fake/lib/debug/11/22334421222344a1a2a3a4b1b2b3b4c1c2c3c4.debug"
-    [ 2] "/fake/dir/path/h/i"
-    [ 3] "/fake/dir/path/.debug/h/i"
-    [ 4] "/usr/lib/debug/fake/dir/path/h/i"
-    [ 5] "/fake/lib/debug/fake/dir/path/h/i"
-
-originalfullpath    : /somewherespecial/a/b/ge
-linkstring full path: /somewherespecial/a/b/h/i
+executable path /foo/ge
+linkstring      h/i
+linkstring full path: /foo/h/i
 
     Paths:
-    [ 0] "/usr/lib/debug/11/22334421222344a1a2a3a4b1b2b3b4c1c2c3c4.debug"
-    [ 1] "/fake/lib/debug/11/22334421222344a1a2a3a4b1b2b3b4c1c2c3c4.debug"
-    [ 2] "/somewherespecial/a/b/h/i"
-    [ 3] "/somewherespecial/a/b/.debug/h/i"
-    [ 4] "/usr/lib/debug/somewherespecial/a/b/h/i"
-    [ 5] "/fake/lib/debug/somewherespecial/a/b/h/i"
+    [ 0] "/usr/lib/debug/.build-id/11/22334421222344a1a2a3a4b1b2b3b4c1c2c3c4.debug"
+    [ 1] "/fake/lib/debug/.build-id/11/22334421222344a1a2a3a4b1b2b3b4c1c2c3c4.debug"
+    [ 2] "/foo/h/i"
+    [ 3] "/foo/.debug/h/i"
+    [ 4] "/usr/lib/debug/foo/h/i"
+    [ 5] "/fake/lib/debug/foo/h/i"
+
+executable path a/b/ge
+linkstring      i.debug
+linkstring full path: /exam/ple/a/b/i.debug
+
+    Paths:
+    [ 0] "/usr/lib/debug/.build-id/11/22334421222344a1a2a3a4b1b2b3b4c1c2c3c4.debug"
+    [ 1] "/fake/lib/debug/.build-id/11/22334421222344a1a2a3a4b1b2b3b4c1c2c3c4.debug"
+    [ 2] "/exam/ple/a/b/i.debug"
+    [ 3] "/exam/ple/a/b/.debug/i.debug"
+    [ 4] "/usr/lib/debug/exam/ple/a/b/i.debug"
+    [ 5] "/fake/lib/debug/exam/ple/a/b/i.debug"
 

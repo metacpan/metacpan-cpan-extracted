@@ -3,13 +3,15 @@ abstract: "give advance warning that you'll be needing a value"
 author:
   - 'Nigel Horne <njh@bandsman.co.uk>'
 build_requires:
+  ExtUtils::MakeMaker: '0'
   Test::CleanNamespaces: '0'
   Test::Most: '0'
   Test::NoWarnings: '0'
+  Test::Warn: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.52, CPAN::Meta::Converter version 2.150010'
 license: open_source
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -23,6 +25,7 @@ requires:
   perl: '5.012000'
   threads: '0'
 resources:
+  bugtracker: https://github.com/nigelhorne/Data-Fetch/issues
   repository: git://github.com/nigelhorne/Data-Fetch.git
-version: '0.05'
+version: '0.06'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

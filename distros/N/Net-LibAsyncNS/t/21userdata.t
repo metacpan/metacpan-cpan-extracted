@@ -1,8 +1,9 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
 
 use strict;
+use warnings;
 
-use Test::More tests => 11;
+use Test::More;
 use Test::Identity;
 use Test::Refcount;
 
@@ -46,3 +47,5 @@ undef $query;
 
 is( $asyncns->getnqueries, 0, '$asyncns->getnqueries 0 after cancel' );
 is_oneref( $asyncns, '$asyncns has refcount 1 after ->cancel' );
+
+done_testing;

@@ -13,7 +13,7 @@ extern panda::string_view strict_hint_name;
 
 inline bool is_strict_mode () { return Scope::Hints::exists(strict_hint_name); }
 
-Date    sv2date    (const Sv& arg, const Timezone* zone = nullptr, int fmt = Date::InputFormat::all);
+Date    sv2date    (const Sv& arg, const TimezoneSP& zone = {}, int fmt = Date::InputFormat::all);
 DateRel sv2daterel (const Sv& arg);
 
 }}
@@ -21,16 +21,18 @@ DateRel sv2daterel (const Sv& arg);
 namespace xs {
 
 template <> struct Typemap<const panda::time::Timezone*> : TypemapObject<const panda::time::Timezone*, const panda::time::Timezone*, ObjectTypeForeignPtr, ObjectStorageMG> {
-    using Super = TypemapObject<const panda::time::Timezone*, const panda::time::Timezone*, ObjectTypeForeignPtr, ObjectStorageMG>;
+    static std::string package () { return "Date::Timezone"; }
+};
 
-    static inline const panda::time::Timezone* in (const Sv& arg) {
+template <> struct Typemap<panda::time::TimezoneSP> : Typemap<const panda::time::Timezone*> {
+    using Super = Typemap<const panda::time::Timezone*>;
+
+    static inline panda::time::TimezoneSP in (const Sv& arg) {
         if (arg.is_object_ref()) return Super::in(arg);
         if (!arg) return {};
         if (!arg.is_true()) return panda::time::tzlocal();
         return panda::time::tzget(xs::in<panda::string_view>(arg));
     }
-
-    static std::string package () { return "Date::Timezone"; }
 };
 
 template <class TYPE> struct Typemap<panda::date::Date*, TYPE> : TypemapObject<panda::date::Date*, TYPE, ObjectTypePtr, ObjectStorageMG> {

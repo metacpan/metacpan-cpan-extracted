@@ -25,7 +25,7 @@ our
     ($VERSION, %FUNCS, %GLOBALS, %MIBS, %MUNGE, $AUTOLOAD, $INIT, $DEBUG, %SPEED_MAP,
      $NOSUCH, $BIGINT, $REPEATERS);
 
-$VERSION = '3.70';
+$VERSION = '3.71';
 
 =head1 NAME
 
@@ -33,7 +33,7 @@ SNMP::Info - OO Interface to Network devices and MIBs through SNMP
 
 =head1 VERSION
 
-SNMP::Info - Version 3.70
+SNMP::Info - Version 3.71
 
 =head1 AUTHOR
 
@@ -1038,6 +1038,12 @@ Subclass for Avaya Secure Routers.
 
 See documentation in L<SNMP::Info::Layer3::Tasman> for details.
 
+=item SNMP::Info::Layer3::Teltonika
+
+Subclass for Teltonika RUT9xx series routers.
+
+See documentation in L<SNMP::Info::Layer3::Teltonika> for details.
+
 =item SNMP::Info::Layer3::Timetra
 
 Alcatel-Lucent SR Class.
@@ -1663,44 +1669,44 @@ sub device_type {
     # Hash for generic fallback to a device class if unable to determine using
     # the sysDescr regex.
     my %l3sysoidmap = (
-        9    => 'SNMP::Info::Layer3::Cisco',
-        11   => 'SNMP::Info::Layer2::HP',
-        18   => 'SNMP::Info::Layer3::BayRS',
-        42   => 'SNMP::Info::Layer3::Sun',
-        43   => 'SNMP::Info::Layer2::3Com',
-        45   => 'SNMP::Info::Layer2::Baystack',
-        171  => 'SNMP::Info::Layer3::DLink',
-        244  => 'SNMP::Info::Layer3::Lantronix',
-        311  => 'SNMP::Info::Layer3::Microsoft',
+        9     => 'SNMP::Info::Layer3::Cisco',
+        11    => 'SNMP::Info::Layer2::HP',
+        18    => 'SNMP::Info::Layer3::BayRS',
+        42    => 'SNMP::Info::Layer3::Sun',
+        43    => 'SNMP::Info::Layer2::3Com',
+        45    => 'SNMP::Info::Layer2::Baystack',
+        171   => 'SNMP::Info::Layer3::DLink',
+        244   => 'SNMP::Info::Layer3::Lantronix',
+        311   => 'SNMP::Info::Layer3::Microsoft',
         664   => 'SNMP::Info::Layer2::Adtran',
-        674  => 'SNMP::Info::Layer3::Dell',
-        1588 => 'SNMP::Info::Layer3::Foundry',
-        1872 => 'SNMP::Info::Layer3::AlteonAD',
-        1890 => 'SNMP::Info::Layer3::Redlion',
-        1916 => 'SNMP::Info::Layer3::Extreme',
-        1991 => 'SNMP::Info::Layer3::Foundry',
-        2011 => 'SNMP::Info::Layer3::Huawei',
-        2021 => 'SNMP::Info::Layer3::NetSNMP',
-        2272 => 'SNMP::Info::Layer3::Passport',
-        2620 => 'SNMP::Info::Layer3::CheckPoint',
-        2636 => 'SNMP::Info::Layer3::Juniper',
-        2925 => 'SNMP::Info::Layer1::Cyclades',
-        3076 => 'SNMP::Info::Layer3::Altiga',
-        3224 => 'SNMP::Info::Layer3::Netscreen',
-        3375 => 'SNMP::Info::Layer3::F5',
-        3417 => 'SNMP::Info::Layer3::BlueCoatSG',
-        3717 => 'SNMP::Info::Layer3::Genua',
-        4413 => 'SNMP::Info::Layer2::Ubiquiti',
-        4526 => 'SNMP::Info::Layer2::Netgear',
-        4874 => 'SNMP::Info::Layer3::ERX',
-        5624 => 'SNMP::Info::Layer3::Enterasys',
-        6027 => 'SNMP::Info::Layer3::Force10',
-        6141 => 'SNMP::Info::Layer3::Ciena',
-        6486 => 'SNMP::Info::Layer3::AlcatelLucent',
-        6527 => 'SNMP::Info::Layer3::Timetra',
-        6876 => 'SNMP::Info::Layer3::VMware',
-        8072 => 'SNMP::Info::Layer3::NetSNMP',
-        9303 => 'SNMP::Info::Layer3::PacketFront',
+        674   => 'SNMP::Info::Layer3::Dell',
+        1588  => 'SNMP::Info::Layer3::Foundry',
+        1872  => 'SNMP::Info::Layer3::AlteonAD',
+        1890  => 'SNMP::Info::Layer3::Redlion',
+        1916  => 'SNMP::Info::Layer3::Extreme',
+        1991  => 'SNMP::Info::Layer3::Foundry',
+        2011  => 'SNMP::Info::Layer3::Huawei',
+        2021  => 'SNMP::Info::Layer3::NetSNMP',
+        2272  => 'SNMP::Info::Layer3::Passport',
+        2620  => 'SNMP::Info::Layer3::CheckPoint',
+        2636  => 'SNMP::Info::Layer3::Juniper',
+        2925  => 'SNMP::Info::Layer1::Cyclades',
+        3076  => 'SNMP::Info::Layer3::Altiga',
+        3224  => 'SNMP::Info::Layer3::Netscreen',
+        3375  => 'SNMP::Info::Layer3::F5',
+        3417  => 'SNMP::Info::Layer3::BlueCoatSG',
+        3717  => 'SNMP::Info::Layer3::Genua',
+        4413  => 'SNMP::Info::Layer2::Ubiquiti',
+        4526  => 'SNMP::Info::Layer2::Netgear',
+        4874  => 'SNMP::Info::Layer3::ERX',
+        5624  => 'SNMP::Info::Layer3::Enterasys',
+        6027  => 'SNMP::Info::Layer3::Force10',
+        6141  => 'SNMP::Info::Layer3::Ciena',
+        6486  => 'SNMP::Info::Layer3::AlcatelLucent',
+        6527  => 'SNMP::Info::Layer3::Timetra',
+        6876  => 'SNMP::Info::Layer3::VMware',
+        8072  => 'SNMP::Info::Layer3::NetSNMP',
+        9303  => 'SNMP::Info::Layer3::PacketFront',
         10002 => 'SNMP::Info::Layer2::Ubiquiti',
         10418 => 'SNMP::Info::Layer1::Cyclades',
         12325 => 'SNMP::Info::Layer3::Pf',
@@ -1723,6 +1729,7 @@ sub device_type {
         40310 => 'SNMP::Info::Layer3::Cumulus',
         41112 => 'SNMP::Info::Layer2::Ubiquiti',
         44641 => 'SNMP::Info::Layer3::VyOS',
+        48690 => 'SNMP::Info::Layer3::Teltonika',
     );
 
     my %l2sysoidmap = (
@@ -1746,7 +1753,7 @@ sub device_type {
         3375  => 'SNMP::Info::Layer3::F5',
         4526  => 'SNMP::Info::Layer2::Netgear',
         5624  => 'SNMP::Info::Layer3::Enterasys',
-        6141 => 'SNMP::Info::Layer3::Ciena',
+        6141  => 'SNMP::Info::Layer3::Ciena',
         6486  => 'SNMP::Info::Layer3::AlcatelLucent',
         9303  => 'SNMP::Info::Layer3::PacketFront',
         10418 => 'SNMP::Info::Layer1::Cyclades',
@@ -1760,6 +1767,7 @@ sub device_type {
         21091 => 'SNMP::Info::Layer2::Exinda',
         26543 => 'SNMP::Info::Layer3::IBMGbTor',
         26928 => 'SNMP::Info::Layer2::Aerohive',
+        48690 => 'SNMP::Info::Layer3::Teltonika',
     );
 
     my %l1sysoidmap = (
@@ -1923,6 +1931,10 @@ sub device_type {
         $objtype = 'SNMP::Info::Layer3::Scalance'
 	    if ( $soid =~ /\.1\.3\.6\.1\.4\.1\.4329\.6\.1\.2/i );
 
+        # Teltonika RUT9xx Series
+        $objtype = 'SNMP::Info::Layer3::Teltonika'
+            if (
+            $desc =~ /\bTeltonika.*RUT9\d{2}\b/);
 
         # Generic device classification based upon sysObjectID
         if (    ( $objtype eq 'SNMP::Info::Layer3' )
@@ -2133,6 +2145,11 @@ sub device_type {
         # it would flip/flop between those
         $objtype = 'SNMP::Info::Layer3::Scalance'
 	    if ( $soid =~ /\.1\.3\.6\.1\.4\.1\.4329\.6\.1\.2/i );
+
+        # Teltonika RUT9xx Series
+        $objtype = 'SNMP::Info::Layer3::Teltonika'
+            if (
+            $desc =~ /\bTeltonika.*RUT9\d{2}\b/);
 
         # Generic device classification based upon sysObjectID
         if ( defined($id) and $objtype eq 'SNMP::Info') {
@@ -4972,8 +4989,7 @@ capabilities to include dynamic methods generated at run time via AUTOLOAD.
 
 Calls parent can() first to see if method exists, if not validates that a
 method should be created then dispatches to the appropriate internal method
-for creation.  The newly created method is inserted into the symbol table
-returning to AUTOLOAD only for the initial method call.
+for creation.
 
 Returns undef if the method does not exist and can not be created.
 
@@ -5010,15 +5026,21 @@ sub can {
     # we’ll just create if/when they are called rather than pollute the
     # symbol table with entries that never get called.
 
+    # Between 2012-2020 we actually added the methods generated below to the
+    # symbol table, but they were global to the SNMP::Info class, while
+    # methods for different device classes may point to different SNMP
+    # objects. This made interacting with multiple device types from a single
+    # script somewhat unreliable.
+
     # Check for set_ ing.
     if ( $method =~ /^set_/ ) {
-        return *{$method} = _make_setter( $method, $oid, @_ );
+        return _make_setter( $method, $oid, @_ );
     }
     elsif ( defined $funcs->{$base_method} || $table ) {
-        return *{$method} = _load_attr( $method, $oid, @_ );
+        return _load_attr( $method, $oid, @_ );
     }
     else {
-        return *{$method} = _global( $method, $oid );
+        return _global( $method, $oid );
     }
 }
 
@@ -5027,9 +5049,7 @@ sub can {
 =head2 AUTOLOAD
 
 Each entry in either %FUNCS, %GLOBALS, or MIB Leaf node names present in
-loaded MIBs are used by AUTOLOAD() to create dynamic methods.  Generated
-methods are inserted into the symbol table so that subsequent calls can avoid
-AUTOLOAD() and dispatch directly.
+loaded MIBs are used by AUTOLOAD() to create dynamic methods.
 
 =over
 

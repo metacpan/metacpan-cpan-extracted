@@ -1,3 +1,14 @@
+2.009 2020-11-23
+- parse returns self for chaining
+- find_recursive_makes method
+- as_graph recursive_make, no_rules options
+- --analyse-redundancy flag for script
+
+2.008 2020-11-21
+- more accurate deps version
+- name_encode and name_decode
+- as_graph method
+
 2.007 2020-11-18
 - add Rule.recipe_raw
 

@@ -13,7 +13,7 @@ our @EXPORT_OK = (
 );
 our %EXPORT_TAGS = (all => \@EXPORT_OK);
 
-our $VERSION = "v6.1.1";
+our $VERSION = "v6.2.1";
 
 1;
 __END__
@@ -59,7 +59,7 @@ The documentation in this POD applies to all three adapter modules as well.
 This module is an implementation of L<Reactive Extensions|http://reactivex.io/> in Perl. It replicates the
 behavior of L<rxjs 6|https://www.npmjs.com/package/rxjs> which is the JavaScript implementation of ReactiveX.
 
-Currently 50 of the 100+ operators in rxjs are implemented in this module.
+Currently 52 of the 100+ operators in rxjs are implemented in this module.
 
 =head1 EXPORTABLE FUNCTIONS
 
@@ -262,6 +262,23 @@ L<https://rxjs.dev/api/index/function/race>
         rx_interval(1)->pipe( op_map(sub {$_[0] * 100}) ),
         rx_interval(0.7)->pipe( op_map(sub {$_[0] * 10) ),
     )->subscribe($observer);
+
+=item rx_replay_subject
+
+L<https://rxjs.dev/api/index/class/ReplaySubject>
+
+    # 20, 30, 40, 50, complete
+    my $rs = rx_replay_subject(2);
+    $rs->next(10);
+    $rs->next(20);
+    $rs->next(30);
+    $rs->subscribe($observer);
+    $rs->next(40);
+    $rs->next(50);
+    $rs->complete;
+
+    # or...
+    my $rs = rx_replay_subject(2, 3); # params: buffer_size, window_time
 
 =item rx_subject
 

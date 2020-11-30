@@ -5,8 +5,8 @@ use base 'PDF::Builder::Resource::XObject::Image';
 use strict;
 use warnings;
 
-our $VERSION = '3.019'; # VERSION
-my $LAST_UPDATE = '3.019'; # manually update whenever code is changed
+our $VERSION = '3.020'; # VERSION
+my $LAST_UPDATE = '3.020'; # manually update whenever code is changed
 
 use Compress::Zlib;
 use POSIX qw(ceil floor);
@@ -248,9 +248,14 @@ sub new {
 
     # transfer over the unpacked (uncompressed, unfiltered) data rows (IDAT) 
     # to self->{' stream'}.  stream is already initialized to empty
-    my $rows = $png->get_rows();
-    for (my $row = 0; $row < @{$rows}; $row++) {
-	$self->{' stream'} .= $rows->[$row];
+    # note that this loop is eliminated for RGBA and GA, as they
+    #   are read directly from $png via split_alpha
+    if ($cs != PNG_COLOR_TYPE_GRAY_ALPHA &&
+        $cs != PNG_COLOR_TYPE_RGB_ALPHA) {
+        my $rows = $png->get_rows();
+        for (my $row = 0; $row < @{$rows}; $row++) {
+	    $self->{' stream'} .= $rows->[$row];
+        }
     }
 
     $self->width($w);
@@ -449,22 +454,14 @@ sub new {
 	    # (1 or 2 bytes) to self->stream, and the second half (1 or
 	    # 2 bytes) into dict->stream as the Alpha SMask. delete 
 	    # leftover self->stream.
-	    my $clearstream = $self->{' stream'}; # s/b uncompressed, unfiltered
             delete $self->{' nofilt'};
-	    #delete $self->{' stream'}; # will reduce size 50% when Alpha removed
 	    $dict->{' stream'} = '';
 	    $self->{' stream'} = '';
-	    # TBD: the following pixel-by-pixel manipulation is SLOW as
-	    #   molasses, but I haven't found anything faster. pack(unpack(..))
-	    #   is about 3x slower, and self->stream .= doesn't work (corrupts).
-	    #   have requested that it be built into libpng.a.
-	    foreach my $n (0 .. $h*$w-1) {
-	       # pull out Alpha from pixel into separate Mask area
-		   vec($dict->{' stream'}, $n, $bpc) = vec($clearstream, $n*2+1, $bpc);
-	       # consolidate remaining 1 sample into self->stream
-		   vec($self->{' stream'}, $n, $bpc) = vec($clearstream, $n*2,   $bpc);
-	    }
-    }
+            # high-speed splitting out of alpha channel
+            my $split = split_alpha($png);
+            $self->{' stream'} = $split->{'data'};
+            $dict->{' stream'} = $split->{'alpha'};
+        }
 	# compress all but short streams
 	if (length($self->{' stream'}) > 32) {
 	    $self->{' stream'} = Compress::Zlib::compress($self->{' stream'});
@@ -523,23 +520,13 @@ sub new {
 	    # (1 or 2 bytes) to dict->stream as the Alpha SMask, and the 
 	    # first 3/4 (3 * 1 or 2 bytes) into self->stream as the image. 
 	    # delete leftover self->stream.
-	    my $clearstream = $self->{' stream'}; # s/b uncompressed, unfiltered
 	    delete $self->{' nofilt'};
-	    #delete $self->{' stream'}; # will reduce size 25% when Alpha removed
 	    $dict->{' stream'} = '';
 	    $self->{' stream'} = '';
-	    # TBD: the following pixel-by-pixel manipulation is SLOW as
-	    #   molasses, but I haven't found anything faster. pack(unpack(..))
-	    #   is about 3x slower, and self->stream .= doesn't work (corrupts).
-	    #   have requested that it be built into libpng.a.
-	    foreach my $n (0 .. $h*$w-1) {
-	       # pull out Alpha from pixel into separate Mask area
-	       vec($dict->{' stream'}, $n,     $bpc) = vec($clearstream, $n*4+3, $bpc);
-	       # close up remaining 3 samples into self->stream
-	       vec($self->{' stream'}, $n*3,   $bpc) = vec($clearstream, $n*4,   $bpc);
-	       vec($self->{' stream'}, $n*3+1, $bpc) = vec($clearstream, $n*4+1, $bpc);
-	       vec($self->{' stream'}, $n*3+2, $bpc) = vec($clearstream, $n*4+2, $bpc);
-	    }
+            # high-speed splitting out of alpha channel
+            my $split = split_alpha($png);
+            $self->{' stream'} = $split->{'data'};
+            $dict->{' stream'} = $split->{'alpha'};
         }
 	# compress all but short streams
 	if (length($self->{' stream'}) > 32) {

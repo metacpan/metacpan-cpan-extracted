@@ -11,28 +11,27 @@ use base qw{ PPIx::Regexp::Token::GroupType };
 
 use PPIx::Regexp::Constant qw{ @CARP_NOT };
 
-our $VERSION = '0.075';
+our $VERSION = '0.076';
 
-{
-    my $expl = 'All characters must be in same script';
+use constant EXPL => 'All characters must be in same script';
 
-    __PACKAGE__->__setup_class( {
-	    '+script_run:'	=> {
-		expl	=> $expl,
-		intro	=> '5.027008',
-		remov	=> '5.027009',
-	    },
-	    '*script_run:'	=> {
-		expl	=> $expl,
-		intro	=> '5.027009',
-	    },
-	    '*sr:'	=> {
-		expl	=> $expl,
-		intro	=> '5.027009',
-	    },
-	},
-    );
-}
+use constant DEF	=> {
+    '+script_run:'	=> {
+	expl	=> EXPL,
+	intro	=> '5.027008',
+	remov	=> '5.027009',
+    },
+    '*script_run:'	=> {
+	expl	=> EXPL,
+	intro	=> '5.027009',
+    },
+    '*sr:'	=> {
+	expl	=> EXPL,
+	intro	=> '5.027009',
+    },
+};
+
+__PACKAGE__->__setup_class();
 
 1;
 

@@ -3,7 +3,7 @@ package PDF::API2::XS;
 use strict;
 use warnings;
 
-our $VERSION = '1.001'; # VERSION
+our $VERSION = '1.002'; # VERSION
 
 =head1 NAME
 
@@ -23,14 +23,10 @@ Rob Scovell
 
 =head1 LICENSE
 
-This program is free software: you can redistribute it and/or modify it under
-the terms of the GNU Lesser General Public License as published by the Free
-Software Foundation, either version 2.1 of the License, or (at your option) any
-later version.
+This software is copyright (c) 2020 by Steve Simms.
 
-This library is distributed in the hope that it will be useful, but WITHOUT ANY
-WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
-PARTICULAR PURPOSE.  See the GNU Lesser General Public License for more details.
+This is free software; you can redistribute it and/or modify it under the same
+terms as the Perl 5 programming language system itself.
 
 =cut
 

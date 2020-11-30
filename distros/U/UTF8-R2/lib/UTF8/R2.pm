@@ -5,23 +5,23 @@ package UTF8::R2;
 #
 # http://search.cpan.org/dist/UTF8-R2/
 #
-# Copyright (c) 2019 INABA Hitoshi <ina@cpan.org> in a CPAN
+# Copyright (c) 2019, 2020 INABA Hitoshi <ina@cpan.org> in a CPAN
 ######################################################################
 
 use 5.00503;    # Galapagos Consensus 1998 for primetools
 # use 5.008001; # Lancaster Consensus 2013 for toolchains
 
-$VERSION = '0.06';
+$VERSION = '0.07';
 $VERSION = $VERSION;
 
 use strict;
-BEGIN { $INC{'warnings.pm'} = '' if $] < 5.006 }; use warnings; $^W=1;
+BEGIN { $INC{'warnings.pm'} = '' if $] < 5.006 }; use warnings; local $^W=1;
 use Carp ();
 use Symbol ();
 
 my %utf8_codepoint = (
-#
-    # only as memories in old men
+
+    # beautiful concept in young days
     # https://www.ietf.org/rfc/rfc2279.txt
     'RFC2279' => qr{(?>
         [\x00-\x7F\x80-\xBF\xC0-\xC1\xF5-\xFF]       |
@@ -30,7 +30,7 @@ my %utf8_codepoint = (
         [\xF0-\xF4][\x80-\xBF][\x80-\xBF][\x80-\xBF] |
         [\x00-\xFF]
     )}x,
-#
+
     # https://tools.ietf.org/rfc/rfc3629.txt
     'RFC3629' => qr{(?>
         [\x00-\x7F\x80-\xBF\xC0-\xC1\xF5-\xFF]       |
@@ -44,7 +44,7 @@ my %utf8_codepoint = (
         [\xF4-\xF4][\x80-\x8F][\x80-\xBF][\x80-\xBF] |
         [\x00-\xFF]
     )}x,
-#
+
     # optimized RFC3629 for ja_JP
     'RFC3629.ja_JP' => qr{(?>
         [\x00-\x7F\x80-\xBF\xC0-\xC1\xF5-\xFF]       |
@@ -74,6 +74,8 @@ my $bare_s = '\t\n\f\r\x20';
 my $bare_v = '\x0A\x0B\x0C\x0D';
 my $bare_w = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_';
 
+#---------------------------------------------------------------------
+# exports %mb
 sub import {
     my $self = shift @_;
     if (defined($_[0]) and ($_[0] =~ /\A[0123456789]/)) {
@@ -95,10 +97,14 @@ sub import {
     }
 }
 
+#---------------------------------------------------------------------
+# shortcut of omitted $_
 sub _ {
     @_ ? $_[0] : $_
 }
 
+#---------------------------------------------------------------------
+# chop() for UTF-8 codepoint string
 sub UTF8::R2::chop (@) {
     my $chop = '';
     for (@_ ? @_ : $_) {
@@ -110,6 +116,8 @@ sub UTF8::R2::chop (@) {
     return $chop;
 }
 
+#---------------------------------------------------------------------
+# chr() for UTF-8 codepoint string
 sub UTF8::R2::chr (;$) {
     local $_ = &_;
     if ($_ < 0) {
@@ -125,6 +133,8 @@ sub UTF8::R2::chr (;$) {
     }
 }
 
+#---------------------------------------------------------------------
+# getc() for UTF-8 codepoint string
 sub UTF8::R2::getc (;*) {
     my $fh = @_ ? Symbol::qualify_to_ref($_[0],caller()) : \*STDIN;
     my @octet = CORE::getc($fh);
@@ -143,6 +153,8 @@ sub UTF8::R2::getc (;*) {
     return join '', @octet;
 }
 
+#---------------------------------------------------------------------
+# index() for UTF-8 codepoint string
 sub UTF8::R2::index ($$;$) {
     if (@_ == 2) {
         my $index = CORE::index $_[0], $_[1];
@@ -164,12 +176,16 @@ sub UTF8::R2::index ($$;$) {
     }
 }
 
+#---------------------------------------------------------------------
+# universal lc() for UTF-8 codepoint string
 sub UTF8::R2::lc (;$) {
     #                          A a B b C c D d E e F f G g H h I i J j K k L l M m N n O o P p Q q R r S s T t U u V v W w X x Y y Z z
     return join '', map { {qw( A a B b C c D d E e F f G g H h I i J j K k L l M m N n O o P p Q q R r S s T t U u V v W w X x Y y Z z )}->{$_}||$_ } (&_ =~ /\G$x/g);
     #                          A a B b C c D d E e F f G g H h I i J j K k L l M m N n O o P p Q q R r S s T t U u V v W w X x Y y Z z
 }
 
+#---------------------------------------------------------------------
+# universal lcfirst() for UTF-8 codepoint string
 sub UTF8::R2::lcfirst (;$) {
     if (&_ =~ UTF8::R2::qr(qr/\A(.)(.*)\z/s)) {
         return UTF8::R2::lc($1) . $2;
@@ -179,10 +195,14 @@ sub UTF8::R2::lcfirst (;$) {
     }
 }
 
+#---------------------------------------------------------------------
+# length() for UTF-8 codepoint string
 sub UTF8::R2::length (;$) {
     return scalar(() = &_ =~ /\G$x/g);
 }
 
+#---------------------------------------------------------------------
+# ord() for UTF-8 codepoint string
 sub UTF8::R2::ord (;$) {
     my $ord = 0;
     if (&_ =~ /\A($x)/) {
@@ -196,26 +216,26 @@ sub UTF8::R2::ord (;$) {
 sub UTF8::R2::qr ($) {
     my $before_regex = $_[0];
     my($package,$filename,$line) = caller;
-#
+
     my $modifiers = '';
     if (($modifiers) = $before_regex =~ /\A \( \? \^? (.*?) : /x) {
         $modifiers =~ s/-.*//;
     }
-#
+
     my @after_subregex = ();
     while ($before_regex =~ s{ \A
         (?> \[ (?: (?>\\x\{[01234567890ABCDEFabcdef]+\}) | (?>\\c[\x00-\xFF]) | (?>\\$x) | $x )+? \] ) |
                    (?>\\x\{[01234567890ABCDEFabcdef]+\}) | (?>\\c[\x00-\xFF]) | (?>\\$x) | $x
     }{}x) {
         my $before_subregex = $&;
-#
+
         # [^...] or [...]
         if (my($negative,$before_class) = $before_subregex =~ /\A \[ (\^?) ((?>\\$x|$x)+?) \] \z/x) {
             my @before_subclass = $before_class =~ /\G (?: (?>\\x\{[01234567890ABCDEFabcdef]+\}) | (?>\\$x) | $x ) /xg;
             my @sbcs = ();
             my @mbcs = ();
             for my $before_subclass (@before_subclass) {
-#
+
                 # \x{unicode_hex}
                 if (($] =~ /\A5\.006/) and (my($unicode_by_hex) = $before_subclass =~ /\A \\x \{ ([01234567890ABCDEFabcdef]+) \} \z/x)) {
                     my $unicode = hex $unicode_by_hex;
@@ -226,7 +246,7 @@ sub UTF8::R2::qr ($) {
                     elsif ($unicode < 0x110000) { push @mbcs, pack('U0C*', $unicode>>18|0xF0, $unicode>>12&0x3F|0x80, $unicode>>6&0x3F|0x80, $unicode&0x3F|0x80) }
                     else { Carp::confess qq{@{[__FILE__]}: \\x{$unicode_by_hex} is out of Unicode (0 to 0x10FFFF)}; }
                 }
-#
+
                 # \any
                 elsif ($before_subclass eq '\D')          { push @mbcs, "(?:(?![$bare_d])$x)"  }
                 elsif ($before_subclass eq '\H')          { push @mbcs, "(?:(?![$bare_h])$x)"  }
@@ -244,7 +264,7 @@ sub UTF8::R2::qr ($) {
                 elsif (CORE::length($before_subclass)==1) { push @sbcs, $before_subclass       }
                 else                                      { push @mbcs, $before_subclass       }
             }
-#
+
             # [^...]
             if ($negative eq q[^]) {
                 push @after_subregex,
@@ -253,7 +273,7 @@ sub UTF8::R2::qr ($) {
                     ( @sbcs and !@mbcs) ? '(?:(?!' .                  '['.join('',@sbcs).']'  . ")$x)" :
                     '';
             }
-#
+
             # [...]
             else {
                 push @after_subregex,
@@ -263,7 +283,7 @@ sub UTF8::R2::qr ($) {
                     '';
             }
         }
-#
+
         # \x{unicode_hex}
         elsif (($] =~ /\A5\.006/) and (my($unicode_by_hex) = $before_subregex =~ /\A \\x \{ ([01234567890ABCDEFabcdef]+) \} \z/x)) {
             my $unicode = hex $unicode_by_hex;
@@ -274,7 +294,7 @@ sub UTF8::R2::qr ($) {
             elsif ($unicode < 0x110000) { push @after_subregex, pack('U0C*', $unicode>>18|0xF0, $unicode>>12&0x3F|0x80, $unicode>>6&0x3F|0x80, $unicode&0x3F|0x80) }
             else { Carp::confess qq{@{[__FILE__]}: \\x{$unicode_by_hex} is out of Unicode (0 to 0x10FFFF)}; }
         }
-#
+
         # \any or /./
         elsif ($before_subregex eq '.')  { push @after_subregex, ($modifiers =~ /s/) ? $x : "(?:(?!\\n)$x)"                    }
         elsif ($before_subregex eq '\B') { push @after_subregex, "(?:(?<![$bare_w])(?![$bare_w])|(?<=[$bare_w])(?=[$bare_w]))" }
@@ -291,7 +311,7 @@ sub UTF8::R2::qr ($) {
         elsif ($before_subregex eq '\s') { push @after_subregex, "[$bare_s]"                                                   }
         elsif ($before_subregex eq '\v') { push @after_subregex, "[$bare_v]"                                                   }
         elsif ($before_subregex eq '\w') { push @after_subregex, "[$bare_w]"                                                   }
-#
+
         # quantifiers ? + * {n} {n,} {n,m}
         elsif ($before_subregex =~ /\A[?+*{]\z/) {
             if    (0)                                                      { }
@@ -304,24 +324,42 @@ sub UTF8::R2::qr ($) {
             }
             push @after_subregex, $before_subregex;
         }
-#
+
         # else
         else { push @after_subregex, $before_subregex }
     }
-#
+
     my $after_regex = join '', @after_subregex;
     return qr/$after_regex/;
 }
 
+#---------------------------------------------------------------------
+# reverse() for UTF-8 codepoint string
 sub UTF8::R2::reverse (@) {
+
+    # in list context,
     if (wantarray) {
+
+        # returns a list value consisting of the elements of @_ in the opposite order
         return CORE::reverse @_;
     }
+
+    # in scalar context,
     else {
-        return join '', CORE::reverse( @_ ? join('',@_) =~ /\G$x/g : /\G$x/g );
+
+        # returns a string value with all characters in the opposite order of
+        return (join '',
+            CORE::reverse(
+                @_ ?
+                join('',@_) =~ /\G$x/g : # concatenates the elements of @_
+                /\G$x/g                  # $_ when without arguments
+            )
+        );
     }
 }
 
+#---------------------------------------------------------------------
+# rindex() for UTF-8 codepoint string
 sub UTF8::R2::rindex ($$;$) {
     if (@_ == 2) {
         my $rindex = CORE::rindex $_[0], $_[1];
@@ -343,6 +381,8 @@ sub UTF8::R2::rindex ($$;$) {
     }
 }
 
+#---------------------------------------------------------------------
+# split() for UTF-8 codepoint string
 sub UTF8::R2::split (;$$$) {
     if (defined($_[0]) and (($_[0] eq '') or ($_[0] =~ /\A \( \? \^? [-a-z]* : \) \z/x))) {
         my @x = (defined($_[1]) ? $_[1] : $_) =~ /\G$x/g;
@@ -374,15 +414,17 @@ sub UTF8::R2::split (;$$$) {
     }
 }
 
+#---------------------------------------------------------------------
+# substr() for UTF-8 codepoint string
 eval sprintf <<'END', ($] >= 5.014) ? ':lvalue' : '';
 #                            vv--------*******
 sub UTF8::R2::substr ($$;$$) %s {
     my @x = $_[0] =~ /\G$x/g;
-#
+
     if (($_[1] < (-1 * scalar(@x))) or (+1 * scalar(@x) < $_[1])) {
         return;
     }
-#
+
     if (@_ == 4) {
         my $substr = join '', splice @x, $_[1], $_[2], $_[3];
         $_[0] = join '', @x;
@@ -409,68 +451,70 @@ sub UTF8::R2::substr ($$;$$) %s {
 }
 END
 
+#---------------------------------------------------------------------
+# tr/// for UTF-8 codepoint string
 sub UTF8::R2::tr ($$$;$) {
     my @x           = $_[0] =~ /\G$x/g;
     my @search      = $_[1] =~ /\G$x/g;
     my @replacement = $_[2] =~ /\G$x/g;
     my %modifier    = (defined $_[3]) ? (map { $_ => 1 } CORE::split //, $_[3]) : ();
-#
+
     my %tr = ();
     for (my $i=0; $i <= $#search; $i++) {
-#
+
         # tr/AAA/123/ works as tr/A/1/
         if (not exists $tr{$search[$i]}) {
-#
+
             # tr/ABC/123/ makes %tr = ('A'=>'1','B'=>'2','C'=>'3',);
             if (defined $replacement[$i] and ($replacement[$i] ne '')) {
                 $tr{$search[$i]} = $replacement[$i];
             }
-#
+
             # tr/ABC/12/d makes %tr = ('A'=>'1','B'=>'2','C'=>'',);
             elsif (exists $modifier{d}) {
                 $tr{$search[$i]} = '';
             }
-#
+
             # tr/ABC/12/ makes %tr = ('A'=>'1','B'=>'2','C'=>'2',);
             elsif (defined $replacement[-1] and ($replacement[-1] ne '')) {
                 $tr{$search[$i]} = $replacement[-1];
             }
-#
+
             # tr/ABC// makes %tr = ('A'=>'A','B'=>'B','C'=>'C',);
             else {
                 $tr{$search[$i]} = $search[$i];
             }
         }
     }
-#
+
     my $tr = 0;
     my $replaced = '';
-#
+
     # has /c modifier
     if (exists $modifier{c}) {
-#
+
         # has /s modifier
         if (exists $modifier{s}) {
             my $last_transliterated = undef;
             while (defined(my $x = shift @x)) {
-#
+
                 # /c modifier works here
                 if (exists $tr{$x}) {
                     $replaced .= $x;
                     $last_transliterated = undef;
                 }
                 else {
-#
+
                     # /d modifier works here
                     if (exists $modifier{d}) {
                     }
-#
+
                     elsif (defined $replacement[-1]) {
-#
+
                         # /s modifier works here
                         if (defined($last_transliterated) and ($replacement[-1] eq $last_transliterated)) {
                         }
-#
+
                         # tr/// works here
                         else {
                             $replaced .= ($last_transliterated = $replacement[-1]);
@@ -480,21 +524,21 @@ sub UTF8::R2::tr ($$$;$) {
                 }
             }
         }
-#
+
         # has no /s modifier
         else {
             while (defined(my $x = shift @x)) {
-#
+
                 # /c modifier works here
                 if (exists $tr{$x}) {
                     $replaced .= $x;
                 }
                 else {
-#
+
                     # /d modifier works here
                     if (exists $modifier{d}) {
                     }
-#
+
                     # tr/// works here
                     elsif (defined $replacement[-1]) {
                         $replaced .= $replacement[-1];
@@ -504,24 +548,24 @@ sub UTF8::R2::tr ($$$;$) {
             }
         }
     }
-#
+
     # has no /c modifier
     else {
-#
+
         # has /s modifier
         if (exists $modifier{s}) {
             my $last_transliterated = undef;
             while (defined(my $x = shift @x)) {
                 if (exists $tr{$x}) {
-#
+
                     # /d modifier works here
                     if ($tr{$x} eq '') {
                     }
-#
+
                     # /s modifier works here
                     elsif (defined($last_transliterated) and ($tr{$x} eq $last_transliterated)) {
                     }
-#
+
                     # tr/// works here
                     else {
                         $replaced .= ($last_transliterated = $tr{$x});
@@ -534,7 +578,7 @@ sub UTF8::R2::tr ($$$;$) {
                 }
             }
         }
-#
+
         # has no /s modifier
         else {
             while (defined(my $x = shift @x)) {
@@ -548,12 +592,12 @@ sub UTF8::R2::tr ($$$;$) {
             }
         }
     }
-#
+
     # /r modifier works here
     if (exists $modifier{r}) {
         return $replaced;
     }
-#
+
     # has no /r modifier
     else {
         $_[0] = $replaced;
@@ -561,12 +605,16 @@ sub UTF8::R2::tr ($$$;$) {
     }
 }
 
+#---------------------------------------------------------------------
+# universal uc() for UTF-8 codepoint string
 sub UTF8::R2::uc (;$) {
     #                          a A b B c C d D e E f F g G h H i I j J k K l L m M n N o O p P q Q r R s S t T u U v V w W x X y Y z Z
     return join '', map { {qw( a A b B c C d D e E f F g G h H i I j J k K l L m M n N o O p P q Q r R s S t T u U v V w W x X y Y z Z )}->{$_}||$_ } (&_ =~ /\G$x/g);
     #                          a A b B c C d D e E f F g G h H i I j J k K l L m M n N o O p P q Q r R s S t T u U v V w W x X y Y z Z
 }
 
+#---------------------------------------------------------------------
+# universal ucfirst() for UTF-8 codepoint string
 sub UTF8::R2::ucfirst (;$) {
     if (&_ =~ UTF8::R2::qr(qr/\A(.)(.*)\z/s)) {
         return UTF8::R2::uc($1) . $2;
@@ -622,7 +670,9 @@ UTF8::R2 - makes UTF-8 scripting easy for enterprise use or LTS
     $result = UTF8::R2::length($_)
     $result = UTF8::R2::ord($_)
     $result = UTF8::R2::qr(qr/$utf8regex/imsxogc)
+    @result = UTF8::R2::reverse(@_)
     $result = UTF8::R2::reverse(@_)
+    $result = UTF8::R2::reverse()
     $result = UTF8::R2::rindex($_, 'ABC', 5)
     @result = UTF8::R2::split(qr/$utf8regex/, $_, 3)
     $result = UTF8::R2::substr($_, 0, 5)
@@ -706,7 +756,7 @@ UTF-8 codepoint semantics is provided by the new subroutine name.
   write                     (nothing)
   ------------------------------------------------------------------------------------------------------------------------------------------
 
-=head1 OUR GOAL
+=head1 UTF8 Flag Considered Harmful, and Our Goals
 
 P.401 See chapter 15: Unicode
 of ISBN 0-596-00027-8 Programming Perl Third Edition.
@@ -715,6 +765,14 @@ Before the introduction of Unicode support in perl, The eq operator
 just compared the byte-strings represented by two scalars. Beginning
 with perl 5.8, eq compares two byte-strings with simultaneous
 consideration of the UTF8 flag.
+
+-- we have been taught so for a long time.
+
+Perl is a powerful language for everyone, but UTF8 flag is a barrier
+for common beginners. Because everyone can only one task on one time.
+So calling Encode::encode() and Encode::decode() in application program
+is not better way. Making two scripts for information processing and
+encoding conversion may be better. Please trust me.
 
  /*
   * You are not expected to understand this.

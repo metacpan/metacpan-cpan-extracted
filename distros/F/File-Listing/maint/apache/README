@@ -1,0 +1,6 @@
+This directory is for building a docker iamge for testing
+with File-Listing + Apache.  It provides the same directory
+structure under a number of different formats.  You can run
+it by using the ./run script.  If you need to make
+modifications, you can run ./build to generate a new image
+locally.

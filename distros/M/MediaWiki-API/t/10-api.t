@@ -15,7 +15,7 @@ sub get_url {
   return $response;
 }
 
-my $api_url = 'http://testwiki.exotica.org.uk/mediawiki/api.php';
+my $api_url = 'https://testwiki.exotica.org.uk/w/api.php';
 
 my $response = get_url($api_url);
 
@@ -28,7 +28,7 @@ if ($response->is_success) {
 use_ok( 'MediaWiki::API' );
 my $mw = MediaWiki::API->new( { api_url => $api_url }  );
 isa_ok( $mw, 'MediaWiki::API' );
-$mw->{config}->{upload_url} = 'http://testwiki.exotica.org.uk/wiki/Special:Upload';
+$mw->{config}->{upload_url} = 'https://testwiki.exotica.org.uk/wiki/Special:Upload';
 
 my $ref;
 ok ( $ref = $mw->api( {
@@ -38,7 +38,7 @@ ok ( $ref = $mw->api( {
   '->api siteinfo call'
   );
 
-is ( $ref->{query}->{general}->{server}, 'http://testwiki.exotica.org.uk', '->api siteinfo server' );
+is ( $ref->{query}->{general}->{server}, 'https://testwiki.exotica.org.uk', '->api siteinfo server' );
 
 ok ( $mw->api( {
   action => 'query',

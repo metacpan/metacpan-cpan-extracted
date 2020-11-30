@@ -4,13 +4,13 @@
       "Nigel Horne <njh@bandsman.co.uk>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.52, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "open_source"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Data-Fetch",
    "no_index" : {
@@ -22,9 +22,7 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "Test::CleanNamespaces" : "0",
-            "Test::Most" : "0",
-            "Test::NoWarnings" : "0"
+            "ExtUtils::MakeMaker" : "0"
          }
       },
       "configure" : {
@@ -37,16 +35,29 @@
             "perl" : "5.012000",
             "threads" : "0"
          }
+      },
+      "test" : {
+         "requires" : {
+            "Test::CleanNamespaces" : "0",
+            "Test::Most" : "0",
+            "Test::NoWarnings" : "0",
+            "Test::Warn" : "0"
+         }
       }
    },
    "release_status" : "stable",
    "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-Data-Fetch@rt.cpan.org",
+         "web" : "https://github.com/nigelhorne/Data-Fetch/issues",
+         "x_url" : "https://github.com/nigelhorne/Data-Fetch/issues"
+      },
       "repository" : {
          "type" : "git",
          "url" : "git://github.com/nigelhorne/Data-Fetch.git",
          "web" : "https://github.com/nigelhorne/Data-Fetch"
       }
    },
-   "version" : "0.05",
-   "x_serialization_backend" : "JSON::PP version 2.27400"
+   "version" : "0.06",
+   "x_serialization_backend" : "JSON::PP version 4.04"
 }

@@ -1,5 +1,8 @@
 Revision history for Perl extension Class::Measure::Scientific::FX_992vb.
 
+v0.0.5 Sun Nov 22 19:39:04 UTC 2020
+       * test: add CI and improve coverage
+
 v0.0.4 Wed Aug 19 23:37:13 UTC 2020
        * Fix repository meta data
 

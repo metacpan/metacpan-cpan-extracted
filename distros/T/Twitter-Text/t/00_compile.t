@@ -1,6 +1,11 @@
 use strict;
 use Test::More 0.98;
-use Test2::Plugin::GitHub::Actions::AnnotateFailedTest;
+BEGIN {
+    eval {
+        require Test2::Plugin::GitHub::Actions::AnnotateFailedTest;
+        Test2::Plugin::GitHub::Actions::AnnotateFailedTest->import;
+    };
+}
 
 use_ok $_ for qw(
     Twitter::Text

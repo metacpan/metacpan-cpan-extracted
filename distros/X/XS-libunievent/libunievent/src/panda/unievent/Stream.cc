@@ -138,7 +138,9 @@ void Stream::finalize_handle_connect (const ErrorCode& connect_err, const Connec
     }
     else { // cancel everything till the end of queue, but call connect callback with actual status(err), not with ECANCELED
         queue.cancel([&]{
-            queue.done(req, [=]{ notify_on_connect(err, req); });
+            // temporary variable for lambda fixes some kind of bug in clang 8 compiler on FreeBSD: somewhy dtor of "req" variable is called twice
+            auto l = [=]{ notify_on_connect(err, req); };
+            queue.done(req, l);
         }, [&]{
             _reset();
         });

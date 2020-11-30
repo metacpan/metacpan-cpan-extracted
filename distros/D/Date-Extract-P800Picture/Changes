@@ -1,5 +1,12 @@
 Revision history for Perl extension Date::Extract::P800Picture.
 
+v1.1.4 Sun Nov 22 12:55:26 UTC 2020
+    - chore: avoid manifest clutter
+    - test: add Windows to Travis
+
+v1.1.3 Fri Nov 20 10:33:13 UTC 2020
+    - test: improve test coverage, drop unreachable errors
+
 v1.1.2 Tue Apr  2 07:28:44 UTC 2019
 	- chore: ignore Built.bat from manifest
 

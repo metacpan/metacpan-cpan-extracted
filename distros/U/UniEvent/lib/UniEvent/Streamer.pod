@@ -1,0 +1,92 @@
+=head1 NAME
+
+UniEvent::Streamer - generic connector for read and write streams
+
+=head1 SYNOPSIS
+
+    use UniEvent;
+
+    # let's stream self for target connection
+    my $loop   = UE::Loop->default_loop;
+    my $client = UE::Tcp->new;
+    ... # connect
+
+    my $input    = UE::Streamer::FileInput->new(__FILE__);
+    my $output   = UE::Streamer::StreamOutput->new($client);
+    my $streamer = UE::Streamer->new($input, $output);
+    $streamer->start();
+    $streamer->finish_callback(sub { $loop->stop; });
+    $loop->run;
+
+=head1 DESCRIPTION
+
+Streamer redirects byte stream from input stream (aka producer) into
+output stream (aka consumer). It automatically adjusts input stream
+speed if the consumer it too slow; to implement that the internal
+temporally buffer is used.
+
+Any input and output combination is possible, i.e. read data from
+L<file|UniEvent::Streamer::FileInput> and stream it into network over
+L<TCP connection|UniEvent::Streamer::StreamOutput>, or read data from
+L<TTY|UniEvent::Streamer::StreamInput> and stream it into
+L<Pipe|UniEvent::Streamer::StreamOutput>. Pure perl L<input|UniEvent::Streamer::Input> /
+L<output|UniEvent::Streamer::Output> is also possible to allow custom processing.
+
+=head1 METHODS
+
+=head2 new($input, $output [, $max_buf = 10_000_000] [$loop = UniEvent::Loop->default_loop])
+
+Constructs new Streamer object, connecting C<$intput> sink to C<$output> using intermediate
+buffer of C<$max_buf> size bytes.
+
+=head2 start()
+
+Starts the streamer, i.e. makes it active for the next even loop iteration.
+
+=head2 stop()
+
+Stops the streamer, i.e. makes it inactive for the next event loop iteration.
+
+=head2 finish_callback($code)
+
+Sets the callback, which will be invoked upon streaming completion. All previously
+set event listeners or callbacks are discarded.
+
+=head2 finish_event()
+
+Returns L<XS::Framework::CallbackDispatcher> instance, where callback(s)
+can be assigned with. The callbacks will be invoked upon streaming completion.
+
+The C++ interface is:
+
+    void(const ErrorCode& err)
+
+On perl side it the callbacks will be called :
+
+    $callback->($error_code);
+
+Multiple callbacks can be added via the L<XS::Framework::CallbackDispatcher>
+interface.
+
+
+=head1 REFERENCES
+
+L<UniEvent::Streamer::IInput>
+
+L<UniEvent::Streamer::Input>
+
+L<UniEvent::Streamer::Output>
+
+L<UniEvent::Streamer::IOutput>
+
+L<UniEvent::Streamer::FileInput>
+
+L<UniEvent::Streamer::FileOutput>
+
+L<UniEvent::Streamer::StreamInput>
+
+L<UniEvent::Streamer::StreamOutput>
+
+L<XS::Framework::CallbackDispatcher>
+
+=cut

@@ -1,8 +1,9 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
 
 use strict;
+use warnings;
 
-use Test::More tests => 6;
+use Test::More;
 use Test::Refcount;
 
 use Net::LibAsyncNS;
@@ -19,3 +20,5 @@ isa_ok( $asyncns->new_handle_for_fd, "IO::Handle", '$asyncns->new_handle_for_fd'
 is( $asyncns->getnqueries, 0, '$asyncns->getnqueries == 0' );
 
 ok( eval { undef $asyncns; 1 }, '$asyncns->DESTROY' );
+
+done_testing;

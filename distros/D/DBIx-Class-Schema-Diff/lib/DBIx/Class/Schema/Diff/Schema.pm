@@ -33,6 +33,8 @@ use Try::Tiny;
 use DBIx::Class::Schema::Diff::Source;
 use DBIx::Class::Schema::Diff::SchemaData;
 
+has 'new_schema_only', is => 'ro', isa => Bool, default => sub { 0 };
+
 has 'old_schema', required => 1, is => 'ro', isa => InstanceOf[
   'DBIx::Class::Schema::Diff::SchemaData'
 ], coerce => \&_coerce_schema_data;
@@ -45,6 +47,8 @@ has 'new_schema', required => 1, is => 'ro', isa => InstanceOf[
 sub all_source_names {
   my $self = shift;
   
+  return $self->new_schema->sources if ($self->new_schema_only);
+  
   my ($o,$n) = ($self->old_schema,$self->new_schema);
   
   # List of all sources in old, new, or both:
@@ -53,16 +57,7 @@ sub all_source_names {
 
 has 'sources', is => 'ro', lazy => 1, default => sub {
   my $self = shift;
-  
-  return { map {
-    $_ => DBIx::Class::Schema::Diff::Source->new(
-      name         => $_,
-      old_source   => scalar try{$self->old_schema->source($_)},
-      new_source   => scalar try{$self->new_schema->source($_)},
-      _schema_diff => $self,
-    )
-  } $self->all_source_names };
-  
+  return { map { $_ => $self->_new_Diff_Source($_) } $self->all_source_names };
 }, init_arg => undef, isa => HashRef;
 
 
@@ -80,6 +75,18 @@ has 'diff', is => 'ro', lazy => 1, default => sub {
 }, init_arg => undef, isa => Maybe[HashRef];
 
 sub _schema_diff { (shift) }
+
+
+sub _new_Diff_Source {
+  my $self = shift;
+  my $name = shift;
+  
+  DBIx::Class::Schema::Diff::Source->new( $self->new_schema_only
+    ? ( diff_added => 1 ) : ( old_source => scalar try{$self->old_schema->source($name)} ),
+    new_source => scalar try{$self->new_schema->source($name)},
+    name       => $name, _schema_diff => $self
+  )
+}
 
 
 1;

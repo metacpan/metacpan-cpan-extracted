@@ -3,6 +3,7 @@
 #include <time.h>
 #include <stdint.h>
 #include <stddef.h>
+#include <panda/refcnt.h>
 #include <panda/string.h>
 #include <panda/string_view.h>
 
@@ -40,12 +41,13 @@ struct datetime {
 };
 
 struct Timezone;
+using TimezoneSP = panda::iptr<const Timezone>;
 
-const Timezone* tzget   (const string_view& zonename);
-const Timezone* tzlocal ();
+TimezoneSP        tzget   (const string_view& zonename);
+const TimezoneSP& tzlocal ();
 
 void tzset (const string_view& zonename);
-void tzset (const Timezone* = nullptr);
+void tzset (const TimezoneSP& = {});
 
 const string& tzdir    ();
 void          tzdir    (const string&);
@@ -56,9 +58,9 @@ ptime_t timegm   (datetime* date);
 ptime_t timegml  (datetime* date);
 ptime_t timegmll (const datetime* date);
 
-bool    anytime  (ptime_t epoch, datetime* result, const Timezone* zone);
-ptime_t timeany  (datetime* date, const Timezone* zone);
-ptime_t timeanyl (datetime* date, const Timezone* zone);
+bool    anytime  (ptime_t epoch, datetime* result, const TimezoneSP& zone);
+ptime_t timeany  (datetime* date, const TimezoneSP& zone);
+ptime_t timeanyl (datetime* date, const TimezoneSP& zone);
 
 inline bool    localtime  (ptime_t epoch, datetime* result) { return anytime(epoch, result, tzlocal()); }
 inline ptime_t timelocal  (datetime* date)                  { return timeany(date, tzlocal()); }
@@ -95,7 +97,7 @@ inline uint8_t wday (int32_t year, uint8_t month, uint8_t mday) {
     return (1 + christ_days(year, month, mday)) % 7; // "1" because 1 Jan 0001 was monday :)
 }
 
-struct Timezone {
+struct Timezone : panda::Refcnt {
     struct Transition {
         ptime_t start;        // time of transition
         ptime_t local_start;  // local time of transition (epoch+offset).

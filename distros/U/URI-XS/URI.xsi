@@ -12,6 +12,7 @@ BOOT {
     xs::exp::create_constants(stash, {
         {"ALLOW_SUFFIX_REFERENCE", URI::Flags::allow_suffix_reference},
         {"QUERY_PARAM_SEMICOLON",  URI::Flags::query_param_semicolon},
+        {"ALLOW_EXTENDED_CHARS",   URI::Flags::allow_extended_chars},
         
         // deprecated names
         {"ALLOW_LEADING_AUTHORITY", URI::Flags::allow_suffix_reference},

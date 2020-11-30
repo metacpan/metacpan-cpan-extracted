@@ -1,6 +1,15 @@
 Release history for Perl::Critic::RENEEB
 ========================================
 
+2.04  2020-11-30 12:17:00
+
+  * Add one policy to require postdereferencing
+  * fix metadata (http => https) (thanks @szabgab)
+
+2.03  2020-11-26 20:35:00
+
+  * Add one policy to require the use of 'first' instead of 'grep'
+
 2.02  2018-12-17 15:40:00
 
   [TESTS]

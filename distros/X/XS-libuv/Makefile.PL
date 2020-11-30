@@ -14,6 +14,7 @@ my %params = (
     },
     LINK               => $libs{$^O},
     CONFIGURE_REQUIRES => {'Alien::cmake3' => 0},
+    BIN_SHARE          => 1,
 );
 
 write_makefile(%params);

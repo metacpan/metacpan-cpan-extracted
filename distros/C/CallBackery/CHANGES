@@ -1,3 +1,12 @@
+0.35.0 2020-11-25 11:11:23 +0100 Tobias Oetiker <tobi@oetiker.ch>
+
+ - bump the release number since we do have new functionality
+ - include the new files in the rlease 
+
+0.34.19 2020-11-24 09:21:47 +0100 Tobias Oetiker <tobi@oetiker.ch>
+
+ - new gui plugin AbstractCardlist contributed by @zaucker
+
 0.34.18 2020-11-12 11:45:30 +0100 Tobias Oetiker <tobi@oetiker.ch>
 
  - only accept POST requests as the qx plugin is very

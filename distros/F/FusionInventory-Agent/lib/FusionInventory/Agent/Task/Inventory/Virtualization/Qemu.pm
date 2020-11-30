@@ -28,6 +28,11 @@ sub _parseProcessList {
 
     my @options = split (/ -/, $process->{CMD});
 
+    my $cmd = shift @options;
+    if ($cmd =~ m/^(?:\/usr\/(s?)bin\/)?(\S+)/) {
+        $values->{vmtype} = $2 =~ /kvm/ ? "kvm" : "qemu";
+    }
+
     foreach my $option (@options) {
         if ($option =~ m/^(?:[fhsv]d[a-d]|cdrom) (\S+)/) {
             $values->{name} = $1 if !$values->{name};
@@ -40,6 +45,8 @@ sub _parseProcessList {
             $values->{mem} = getCanonicalSize($1);
         } elsif ($option =~ m/^uuid (\S+)/) {
             $values->{uuid} = $1;
+        } elsif ($option =~ m/^enable-kvm/) {
+            $values->{vmtype} = "kvm";
         }
 
         if ($option =~ /smbios/) {
@@ -52,7 +59,7 @@ sub _parseProcessList {
         }
     }
 
-    if ($values->{mem} == 0 ) {
+    if (defined($values->{mem}) && $values->{mem} =~ /^0+$/) {
         # Default value
         $values->{mem} = 128;
     }

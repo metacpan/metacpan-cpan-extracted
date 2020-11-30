@@ -1,7 +1,6 @@
 =encoding utf8
 
 =for comment POD_DERIVED_INDEX_GENERATED
-
 The following documentation is automatically generated.  Please do not edit
 this file, but rather the original, inline with Net::Async::Slack::Event::SubteamCreated
 at lib/Net/Async/Slack/Event/SubteamCreated.pm

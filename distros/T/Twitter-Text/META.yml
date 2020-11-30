@@ -3,7 +3,6 @@ abstract: 'Perl implementation of the twitter-text parsing library'
 author:
   - 'utgwkk <utagawakiki@gmail.com>'
 build_requires:
-  Test2::Plugin::GitHub::Actions::AnnotateFailedTest: '0'
   Test2::Plugin::NoWarnings: '0'
   Test2::V0: '0'
   Test::More: '0.98'
@@ -30,7 +29,7 @@ no_index:
 provides:
   Twitter::Text:
     file: lib/Twitter/Text.pm
-    version: '0.05'
+    version: '0.07'
 requires:
   Carp: '0'
   Exporter: '0'
@@ -38,7 +37,7 @@ requires:
   JSON: '0'
   List::Util: '0'
   List::UtilsBy: '0'
-  Net::IDN::Encode: '0'
+  Net::IDN::Encode: '2.100'
   Path::Tiny: '0'
   Unicode::Normalize: '0'
   YAML::PP: '0'
@@ -47,6 +46,6 @@ resources:
   bugtracker: https://github.com/utgwkk/Twitter-Text/issues
   homepage: https://github.com/utgwkk/Twitter-Text
   repository: git://github.com/utgwkk/Twitter-Text.git
-version: '0.05'
+version: '0.07'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 1

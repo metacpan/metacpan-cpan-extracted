@@ -1,0 +1,9 @@
+Revision history for Test-Future-IO
+
+0.02    2020-11-24
+        [CHANGES]
+         * Use Test::ExpectAndCheck
+         * Added ->expect_sysread_anyfh and ->expect_syswrite_anyfh
+
+0.01    2020-11-24
+        First version, released on an unsuspecting world.

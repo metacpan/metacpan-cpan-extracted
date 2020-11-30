@@ -1,5 +1,30 @@
 Revision history for Music-Duration-Partition
 
+0.0702 2020-11-26 11:17:36
+    - Use a TICKS constant.
+    - Don't import anything from MIDI::Simple.
+
+0.0701 2020-11-23 09:14:15
+    - Turn on the remainder attribute by default.
+    - Adjust the eg/grouping program.
+
+0.0700 2020-11-23 08:31:27
+    - Warn if there is a remainder duration in verbose mode.
+    - Append remainder ticks if requested with the remainder attribute.
+    - Improve the eg/grouping program.
+
+0.0602 2020-11-23 06:12:41
+    - Move the ->BUILD code to an attribute _build method.
+
+0.0601 2020-11-23 05:48:19
+    - Add handy comments to the code.
+    - Make pool_group a private attribute.
+
+0.0600 2020-11-22 08:42:26
+    - Add duration grouping logic.
+    - Add the eg/grouping program.
+    - Update documentation.
+
 0.0515 2020-09-23 11:47:25
     - Improve the eg/drum-fills-advanced program.
     - Improve documentation.

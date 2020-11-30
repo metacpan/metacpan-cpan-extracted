@@ -10,7 +10,7 @@
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Perl-Critic-RENEEB",
    "prereqs" : {
@@ -36,39 +36,48 @@
    "provides" : {
       "Perl::Critic::Policy::RegularExpressions::RequireExtendedFormattingExceptForSplit" : {
          "file" : "lib/Perl/Critic/Policy/RegularExpressions/RequireExtendedFormattingExceptForSplit.pm",
-         "version" : "2.02"
+         "version" : "2.04"
       },
       "Perl::Critic::Policy::Reneeb::Capitalization" : {
          "file" : "lib/Perl/Critic/Policy/Reneeb/Capitalization.pm",
-         "version" : "2.02"
+         "version" : "2.04"
       },
       "Perl::Critic::Policy::Reneeb::ProhibitBlockEval" : {
          "file" : "lib/Perl/Critic/Policy/Reneeb/ProhibitBlockEval.pm",
-         "version" : "2.02"
+         "version" : "2.04"
+      },
+      "Perl::Critic::Policy::Reneeb::ProhibitGrepToGetFirstFoundElement" : {
+         "file" : "lib/Perl/Critic/Policy/Reneeb/ProhibitGrepToGetFirstFoundElement.pm",
+         "version" : "2.04"
+      },
+      "Perl::Critic::Policy::Reneeb::RequirePostderef" : {
+         "file" : "lib/Perl/Critic/Policy/Reneeb/RequirePostderef.pm",
+         "version" : "2.04"
       },
       "Perl::Critic::RENEEB" : {
          "file" : "lib/Perl/Critic/RENEEB.pm",
-         "version" : "2.02"
+         "version" : "2.04"
       }
    },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "http://github.com/reneeb/Perl-Critic-RENEEB/issues"
+         "web" : "https://github.com/reneeb/Perl-Critic-RENEEB/issues"
       },
-      "homepage" : "http://github.com/reneeb/Perl-Critic-RENEEB",
+      "homepage" : "https://github.com/reneeb/Perl-Critic-RENEEB",
       "repository" : {
          "type" : "git",
-         "url" : "http://github.com/reneeb/Perl-Critic-RENEEB.git",
-         "web" : "http://github.com/reneeb/Perl-Critic-RENEEB"
+         "url" : "https://github.com/reneeb/Perl-Critic-RENEEB.git",
+         "web" : "https://github.com/reneeb/Perl-Critic-RENEEB"
       }
    },
-   "version" : "2.02",
+   "version" : "2.04",
    "x_contributors" : [
+      "Gabor Szabo <gabor@szabgab.com>",
       "Mohammad S Anwar <mohammad.anwar@yahoo.com>",
       "reneeb <github@renee-baecker.de>",
       "reneeb <info@perl-services.de>"
    ],
-   "x_serialization_backend" : "JSON::XS version 3.04"
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.19"
 }
 

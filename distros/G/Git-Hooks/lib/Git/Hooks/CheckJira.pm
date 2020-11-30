@@ -1,10 +1,9 @@
-use strict;
 use warnings;
 
 package Git::Hooks::CheckJira;
 # ABSTRACT: Git::Hooks plugin which requires citation of JIRA issues in commit messages
-$Git::Hooks::CheckJira::VERSION = '2.14.0';
-use 5.010;
+$Git::Hooks::CheckJira::VERSION = '3.0.0';
+use 5.016;
 use utf8;
 use Log::Any '$log';
 use Git::Hooks;
@@ -13,7 +12,7 @@ use Path::Tiny;
 use List::MoreUtils qw/last_index uniq/;
 
 my $PKG = __PACKAGE__;
-(my $CFG = __PACKAGE__) =~ s/.*::/githooks./;
+my $CFG = __PACKAGE__ =~ s/.*::/githooks./r;
 
 #############
 # Grok hook configuration, check it and set defaults.
@@ -223,13 +222,6 @@ EOS
             push @jqls, @and_jql[$first .. $#and_jql];
         }
 
-        # JQL terms for the deprecated configuration options
-        foreach my $option (qw/project issuetype status/) {
-            if (my @values = $git->get_config($CFG => $option)) {
-                push @jqls, "$option IN ('" . join("','", @values) . "')";
-            }
-        }
-
         # Conjunct all terms in a single JQL expression
         my $JQL = '(' . join(') AND (', @jqls) . ')';
 
@@ -382,58 +374,13 @@ sub check_commit_msg {
 }
 
 sub check_patchset {
-    my ($git, $opts) = @_;
+    my ($git, $branch, $commit) = @_;
 
-    $log->debug(__PACKAGE__ . "::check_patchset");
-
-    _setup_config($git);
-
-    return 1 if $git->im_admin();
-
-    my $sha1   = $opts->{'--commit'};
-    my $commit = $git->get_commit($sha1);
-
-    # The --branch argument contains the branch short-name if it's in the
-    # refs/heads/ namespace. But we need to always use the branch long-name,
-    # so we change it here.
-    my $branch = $opts->{'--branch'};
-    $branch = "refs/heads/$branch"
-        unless $branch =~ m:^refs/:;
-
-    return 1 unless $git->is_reference_enabled($branch);
-
-    if (my @ref = $git->get_config($CFG => 'ref')) {
-        return 1 unless $git->is_ref_enabled($branch, @ref);
-    }
-    if (my @noref = $git->get_config($CFG => 'noref')) {
-        return 0 if $git->is_ref_enabled($branch, @noref);
-    }
-
-    return check_commit_msg($git, $commit, $branch);
+    return check_commit_msg($git, $commit, $branch) ? 0 : 1;
 }
 
 sub check_message_file {
-    my ($git, $commit_msg_file) = @_;
-
-    $log->debug(__PACKAGE__ . "::check_message_file($commit_msg_file)");
-
-    _setup_config($git);
-
-    my $current_branch = $git->get_current_branch();
-
-    return 1 unless $git->is_reference_enabled($current_branch);
-
-    if (my @ref = $git->get_config($CFG => 'ref')) {
-        return 1 unless $git->is_ref_enabled($current_branch, @ref);
-    }
-    if (my @noref = $git->get_config($CFG => 'noref')) {
-        return 0 if $git->is_ref_enabled($current_branch, @noref);
-    }
-
-    my $msg = eval { path($commit_msg_file)->slurp };
-    defined $msg
-        or $git->fault("Cannot open file '$commit_msg_file' for reading:", {details => $@})
-            and return 0;
+    my ($git, $msg, $current_branch) = @_;
 
     # Remove comment lines from the message file contents.
     $msg =~ s/^#[^\n]*\n//mgs;
@@ -446,46 +393,16 @@ sub check_message_file {
         message   => $msg,
     );
 
-    return check_commit_msg($git, $commit, $current_branch);
+    return check_commit_msg($git, $commit, $current_branch) ? 0 : 1;
 }
 
 sub check_ref {
     my ($git, $ref) = @_;
 
-    if (my @ref = $git->get_config($CFG => 'ref')) {
-        return 1 unless $git->is_ref_enabled($ref, @ref);
-    }
-    if (my @noref = $git->get_config($CFG => 'noref')) {
-        return 0 if $git->is_ref_enabled($ref, @noref);
-    }
-
     my $errors = 0;
 
     foreach my $commit ($git->get_affected_ref_commits($ref)) {
         check_commit_msg($git, $commit, $ref)
-            or ++$errors;
-    }
-
-    _disconnect_jira($git);
-
-    return $errors == 0;
-}
-
-# This routine can act both as an update or a pre-receive hook.
-sub check_affected_refs {
-    my ($git) = @_;
-
-    $log->debug(__PACKAGE__ . "::check_affected_refs");
-
-    _setup_config($git);
-
-    return 1 if $git->im_admin();
-
-    my $errors = 0;
-
-    foreach my $ref ($git->get_affected_refs()) {
-        next unless $git->is_reference_enabled($ref);
-        check_ref($git, $ref)
             or ++$errors;
     }
 
@@ -530,13 +447,6 @@ EOS
 
 sub notify_ref {
     my ($git, $ref, $visibility) = @_;
-
-    if (my @ref = $git->get_config($CFG => 'ref')) {
-        return 1 unless $git->is_ref_enabled($ref, @ref);
-    }
-    if (my @noref = $git->get_config($CFG => 'noref')) {
-        return 0 if $git->is_ref_enabled($ref, @noref);
-    }
 
     my $errors = 0;
 
@@ -589,16 +499,16 @@ EOS
 }
 
 # Install hooks
-APPLYPATCH_MSG   \&check_message_file;
-COMMIT_MSG       \&check_message_file;
-UPDATE           \&check_affected_refs;
-PRE_RECEIVE      \&check_affected_refs;
-REF_UPDATE       \&check_affected_refs;
-COMMIT_RECEIVED  \&check_affected_refs;
-SUBMIT           \&check_affected_refs;
-POST_RECEIVE     \&notify_affected_refs;
-PATCHSET_CREATED \&check_patchset;
-DRAFT_PUBLISHED  \&check_patchset;
+my $options = {
+    config  => \&_setup_config,
+    destroy => \&_disconnect_jira,
+};
+
+GITHOOKS_CHECK_AFFECTED_REFS \&check_ref,          $options;
+GITHOOKS_CHECK_PATCHSET      \&check_patchset,     $options;
+GITHOOKS_CHECK_MESSAGE_FILE  \&check_message_file, $options;
+
+POST_RECEIVE \&notify_affected_refs;
 
 1;
 
@@ -614,7 +524,7 @@ Git::Hooks::CheckJira - Git::Hooks plugin which requires citation of JIRA issues
 
 =head1 VERSION
 
-version 2.14.0
+version 3.0.0
 
 =head1 SYNOPSIS
 
@@ -724,7 +634,7 @@ option:
     [githooks]
       plugin = CheckJira
 
-=for Pod::Coverage check_codes check_commit_msg check_ref notify_commit_msg notify_ref grok_msg_jiras check_affected_refs check_message_file check_patchset notify_affected_refs
+=for Pod::Coverage check_codes check_commit_msg check_ref notify_commit_msg notify_ref grok_msg_jiras check_message_file check_patchset notify_affected_refs
 
 =head1 NAME
 
@@ -733,7 +643,7 @@ CheckJira - Git::Hooks plugin to implement JIRA checks
 =head1 CONFIGURATION
 
 The plugin is configured by the following git options under the
-C<githooks.checkacls> subsection.
+C<githooks.checkjira> subsection.
 
 It can be disabled for specific references via the C<githooks.ref> and
 C<githooks.noref> options about which you can read in the L<Git::Hooks>
@@ -1021,69 +931,6 @@ In this case, the visibility isn't restricted at all.
 
 By default, all commits are checked. You can exempt merge commits from being
 checked by setting this option to true.
-
-=head2 [DEPRECATED] project KEY
-
-This option is B<DEPRECATED>. Please, use a JQL expression such the
-following to restrict by project key:
-
-  project IN (ABC, GIT)
-
-By default, the committer can reference any JIRA issue in the commit
-log. You can restrict the allowed keys to a set of JIRA projects by
-specifying a JIRA project key to this option. You can allow more than one
-project by specifying this option multiple times, once per project key.
-
-If you set this option, then any cited JIRA issue that doesn't belong to one
-of the specified projects causes an error.
-
-=head2 [DEPRECATED] status STATUSNAME
-
-This option is B<DEPRECATED>. Please, use a JQL expression such the
-following to restrict by status:
-
-  status IN (Open, "In Progress")
-
-By default, it doesn't matter in which status the JIRA issues are. By
-setting this multi-valued option you can restrict the valid statuses for the
-issues.
-
-=head2 [DEPRECATED] issuetype ISSUETYPENAME
-
-This option is B<DEPRECATED>. Please, use a JQL expression such the
-following to restrict by issue type:
-
-  issuetype IN (Bug, Story)
-
-By default, it doesn't matter what type of JIRA issues are cited. By setting
-this multi-valued option you can restrict the valid issue types.
-
-=head2 [DEPRECATED] ref REFSPEC
-
-This option is DEPRECATED. Please, use the C<githooks.ref> option instead.
-
-By default, the message of every commit is checked. If you want to
-have them checked only for some refs (usually some branch under
-refs/heads/), you may specify them with one or more instances of this
-option.
-
-The refs can be specified as a complete ref name
-(e.g. "refs/heads/master") or by a regular expression starting with a
-caret (C<^>), which is kept as part of the regexp
-(e.g. "^refs/heads/(master|fix)").
-
-=head2 [DEPRECATED] noref REFSPEC
-
-This option is DEPRECATED. Please, use the C<githooks.noref> option instead.
-
-By default, the message of every commit is checked. If you want to exclude
-some refs (usually some branch under refs/heads/), you may specify them with
-one or more instances of this option.
-
-The refs can be specified as in the same way as to the C<ref> option above.
-
-Note that the C<ref> option has precedence over the C<noref> option, i.e.,
-if a reference matches both options it will be checked.
 
 =head1 SEE ALSO
 

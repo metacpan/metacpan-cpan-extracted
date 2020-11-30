@@ -50,11 +50,12 @@ Metabolomics::Fragment::Annotation - Perl extension for fragment annotation in m
 
 =head1 VERSION
 
-Version 0.6.1
+Version 0.6.3 - Adding POD and PhytoHUB module
+
 
 =cut
 
-our $VERSION = '0.6.2';
+our $VERSION = '0.6.3';
 
 
 =head1 SYNOPSIS
@@ -89,7 +90,7 @@ Note that this documentation is intended as a reference to the module.
 		$oBank->parsingMsFragments($inputFile, $asHeader, $mzCol) ;			# get exprimental mz listing to annotate
 		my $oAnalysis = Metabolomics::Fragment::Annotation->new($oBank) ;			# init analysis object
 		$oAnalysis->compareExpMzToTheoMzList('PPM', $ppmError) ;			# compare theorical bank vs experimental bank
-    
+
 =encoding utf8
 
 =head1 DESCRIPTION
@@ -112,7 +113,7 @@ This db is developped and supported by Dinesh Kumar Barupal and Oliver Fiehn.
 The database can be used in following applications - 1) to rank chemicals for building target libraries and expand metabolomics assays 2) to associate blood compounds with phenotypes 3) to get detailed descriptions about chemicals 4) to prepare lists of blood chemical lists by chemical classes and associated properties. 5) to interpret of metabolomics datasets from plasma or serum analyses 6) to prioritize chemicals for hazard assessments.
 
 Metabolomics::Banks::BloodExposome is giving access to a up to date Blood Exposome database stored in metabolomics::references package
-	
+
 	# init the bank object
 	
 	my $oBank = Metabolomics::Banks::BloodExposome->new() ;
@@ -124,9 +125,9 @@ Metabolomics::Banks::BloodExposome is giving access to a up to date Blood Exposo
 	# produce the new theorical bank depending of chosen acquisition mode
 	
 	$oBank->buildTheoPeakBankFromEntries($IonMode) ;
-	
+
 When resources are built, Metabolomics::Fragment::Annotation drives the annotation process:
-	
+
 	# Get experimental mz listing to annotate
 	
 	$oBank->parsingMsFragments($inputFile, $asHeader, $mzCol) ;			
@@ -138,7 +139,7 @@ When resources are built, Metabolomics::Fragment::Annotation drives the annotati
 	# Compare theorical bank vs experimental bank with a delta on mz (Da or PPM are both supported)
 	
 	$oAnalysis->compareExpMzToTheoMzList('PPM', $ppmError) ;
-	
+
 Intensity and retention time variables are not used in this annotation because the reference bank does not store such features.
 
 
@@ -147,7 +148,7 @@ Intensity and retention time variables are not used in this annotation because t
 KnapSack database is a comprehensive Species-Metabolite Relationship Database with more than 53,000 metabolites and 128,000 metabolite-species pair entities.
 This db is developped and supported by Yukiko Nakamura, Hiroko Asahi, Md. Altaf-Ul-Amin, Ken Kurokawa and Shigehiko Kanaya.
 This resource is very useful for plant or natural product community trying to identify metabolites in samples analysed by LC-MS
- 
+
  	# init the bank object
 	
 	my $oBank = Metabolomics::Banks::Knapsack->new()
@@ -162,7 +163,7 @@ This resource is very useful for plant or natural product community trying to id
 	$oBank->buildTheoPeakBankFromKnapsack($IonMode) ;
 
 When resources are built, Metabolomics::Fragment::Annotation drives the annotation process:
-	
+
 	# Get experimental mz listing to annotate
 	
 	$oBank->parsingMsFragments($inputFile, $asHeader, $mzCol) ;			
@@ -174,15 +175,13 @@ When resources are built, Metabolomics::Fragment::Annotation drives the annotati
 	# Compare theorical bank vs experimental bank with a delta on mz (Da or PPM are both supported)
 	
 	$oAnalysis->compareExpMzToTheoMzList('PPM', $ppmError) ;
-	
+
 Intensity and retention time variables are not used in this annotation because the reference bank does not store such features.
 
 
 =head1 PUBLIC METHODS 
 
-
 =head2 Metabolomics::Fragment::Annotation
-
 
 =over 4
 
@@ -220,8 +219,9 @@ sub new {
 	## Input : $deltaValue, $deltaType
 	## Output : $oAnalysis with annotation results
 	## Usage : $oAnalysis->compareExpMzToTheoMzList ( $deltaValue, $deltaType ) ;
-	
+
 =cut
+
 ## START of SUB
 sub compareExpMzToTheoMzList {
     ## Retrieve Values
@@ -243,9 +243,16 @@ sub compareExpMzToTheoMzList {
     		
 #    		print "\nFOR frag $fragMz - MIN is: $$min and MAX is: $$max\n" ;
     		
-    		my ($currentPpmError, $currentDeltaErrorMmu) = (undef, undef) ;
-    		my ($currentAnnotName, $currentComputedMz, $currentAnnotType, $currentAnnotID, $currentAnnotInNegMode, $currentAnnotInPosMode) = (undef, undef, undef, undef, undef, undef) ;
-    		my ($annotName, $computedMz, $annotType, $annotID, $annotInNegMode, $annotInPosMode, $deltaErrorMmu, $deltaErrorPpm) = (undef, undef, undef, undef, undef, undef, 0) ;
+    		my ( $deltaErrorMmu, $deltaErrorPpm) = ( undef, 0 ) ;
+    		
+    		my ( $currentPpmError, $currentDeltaErrorMmu) = ( undef, undef ) ;
+    		my ( $currentAnnotName, $currentComputedMz, $currentAnnotType, $currentAnnotID) =  ( undef, undef, undef, undef ) ;
+    		my ( $currentAnnotInNegMode, $currentAnnotInPosMode, $currentAnnotFormula, $currentAnnotSmiles) = ( undef, undef, undef, undef ) ;
+    		my ( $currentAnnotInchikey, $currentAnnotIsAMetabolite, $currentAnnotIsAPrecursor) = ( undef, undef, undef ) ;
+    		
+    		my ( $annotName, $computedMz, $annotType, $annotID) = ( undef, undef, undef, undef ) ;
+    		my ( $annotInNegMode, $annotInPosMode, $annotFormula, $annotSmiles) = ( undef, undef, undef, undef ) ;
+    		my ( $annotInchikey, $annotIsAMetabolite, $annotIsAPrecursor) = ( undef, undef, undef ) ;
     		
     		foreach my $theoFrag (@{$theoFragments}) {
     			
@@ -253,15 +260,20 @@ sub compareExpMzToTheoMzList {
     			
     			if (  ($motifMz > $$min ) and ($motifMz < $$max)  ) {
     				
+    				$annotName = $theoFrag-> _getPeak_ANNOTATION_NAME();
+    				$computedMz = $theoFrag->_getPeak_COMPUTED_MONOISOTOPIC_MASS();
+    				$annotType = $theoFrag->_getPeak_ANNOTATION_TYPE() ;
+    				$annotID = $theoFrag->_getPeak_ANNOTATION_ID() if $theoFrag->_getPeak_ANNOTATION_ID ;
     				
-    				my $annotName = $theoFrag-> _getPeak_ANNOTATION_NAME();
-    				my $computedMz = $theoFrag->_getPeak_COMPUTED_MONOISOTOPIC_MASS();
-    				my $annotType = $theoFrag->_getPeak_ANNOTATION_TYPE() ;
-    				my $annotID = $theoFrag->_getPeak_ANNOTATION_ID() if $theoFrag->_getPeak_ANNOTATION_ID ;
+    				$annotInNegMode =  $theoFrag->_getPeak_ANNOTATION_IN_NEG_MODE() if $theoFrag->_getPeak_ANNOTATION_IN_NEG_MODE() ;
+    				$annotInPosMode =  $theoFrag->_getPeak_ANNOTATION_IN_POS_MODE() if $theoFrag->_getPeak_ANNOTATION_IN_POS_MODE() ;
     				
-    				my $annotInNegMode =  $theoFrag->_getPeak_ANNOTATION_IN_NEG_MODE() if $theoFrag->_getPeak_ANNOTATION_IN_NEG_MODE() ;
-    				my $annotInPosMode =  $theoFrag->_getPeak_ANNOTATION_IN_POS_MODE() if $theoFrag->_getPeak_ANNOTATION_IN_POS_MODE() ;
-    				
+    				$annotFormula = $theoFrag->_getPeak_ANNOTATION_FORMULA() if $theoFrag->_getPeak_ANNOTATION_FORMULA() ;
+    				$annotSmiles = $theoFrag->_getPeak_ANNOTATION_SMILES() if $theoFrag->_getPeak_ANNOTATION_SMILES() ;
+    				$annotInchikey = $theoFrag->_getPeak_ANNOTATION_INCHIKEY() if $theoFrag->_getPeak_ANNOTATION_INCHIKEY() ;
+    				$annotIsAMetabolite = $theoFrag->_getPeak_ANNOTATION_IS_A_METABOLITE() if ($theoFrag->_getPeak_ANNOTATION_IS_A_METABOLITE() and $theoFrag->_getPeak_ANNOTATION_IS_A_METABOLITE() != 0) ;
+    				$annotIsAPrecursor = $theoFrag->_getPeak_ANNOTATION_IS_A_PRECURSOR() if ($theoFrag->_getPeak_ANNOTATION_IS_A_PRECURSOR() and $theoFrag->_getPeak_ANNOTATION_IS_A_PRECURSOR() != 0) ;
+    				    				
 #    				print $annotInNegMode if $annotInNegMode ;
 #    				print $annotInPosMode if $annotInPosMode ;
     				
@@ -280,6 +292,11 @@ sub compareExpMzToTheoMzList {
 						$currentAnnotID = $annotID ;
 						$currentAnnotInNegMode = $annotInNegMode ;
 						$currentAnnotInPosMode = $annotInPosMode ;
+						$currentAnnotFormula = $annotFormula ;
+						$currentAnnotSmiles = $annotSmiles ;
+						$currentAnnotInchikey = $annotInchikey ;
+						$currentAnnotIsAMetabolite = $annotIsAMetabolite ;
+						$currentAnnotIsAPrecursor = $annotIsAPrecursor ;
 	    				
     				}
     				else {
@@ -296,6 +313,11 @@ sub compareExpMzToTheoMzList {
 							$currentAnnotID = $annotID ;
 							$currentAnnotInNegMode = $annotInNegMode ;
 							$currentAnnotInPosMode = $annotInPosMode ;
+							$currentAnnotFormula = $annotFormula ;
+							$currentAnnotSmiles = $annotSmiles ;
+							$currentAnnotInchikey = $annotInchikey ;
+							$currentAnnotIsAMetabolite = $annotIsAMetabolite ;
+							$currentAnnotIsAPrecursor = $annotIsAPrecursor ;
     					}
     					elsif ($currentPpmError == $deltaErrorPpm ) {
     						next ;
@@ -313,6 +335,12 @@ sub compareExpMzToTheoMzList {
     				
     			$expFrag->_setPeak_ANNOTATION_IN_NEG_MODE($currentAnnotInNegMode) if (defined $currentAnnotInNegMode);
     			$expFrag->_setPeak_ANNOTATION_IN_POS_MODE($currentAnnotInPosMode) if (defined $currentAnnotInPosMode);
+    			
+    			$expFrag->_setPeak_ANNOTATION_FORMULA($currentAnnotFormula) if (defined $currentAnnotFormula);
+    			$expFrag->_setPeak_ANNOTATION_SMILES($currentAnnotSmiles) if (defined $currentAnnotSmiles);
+    			$expFrag->_setPeak_ANNOTATION_INCHIKEY($currentAnnotInchikey) if (defined $currentAnnotInchikey);
+    			$expFrag->_setPeak_ANNOTATION_IS_A_METABOLITE($currentAnnotIsAMetabolite) if (defined $currentAnnotIsAMetabolite);
+    			$expFrag->_setPeak_ANNOTATION_IS_A_PRECURSOR($currentAnnotIsAPrecursor) if (defined $currentAnnotIsAPrecursor);
     			
 #    			print "\tOK -> $motifMz MATCHING WITH $fragMz and ppm error of $currentPpmError ($currentAnnotInPosMode)\n" ;
 
@@ -337,8 +365,9 @@ sub compareExpMzToTheoMzList {
 	## Input : $oBank, $templateTabular, $tabular
 	## Output : $tabular
 	## Usage : my ( $tabular ) = $oBank->writeTabularWithPeakBankObject ( $templateTabular, $tabular ) ;
-	
+
 =cut
+
 ## START of SUB
 sub writeTabularWithPeakBankObject {
     ## Retrieve Values
@@ -386,8 +415,9 @@ sub writeTabularWithPeakBankObject {
 	## Input : $oBank, $inputData, $templateTabular, $tabular
 	## Output : $tabular
 	## Usage : my ( $tabular ) = $oBank->writeFullTabularWithPeakBankObject ( $inputData, $templateTabular, $tabular ) ;
-	
+
 =cut
+
 ## START of SUB
 sub writeFullTabularWithPeakBankObject {
     ## Retrieve Values
@@ -466,6 +496,8 @@ sub writeFullTabularWithPeakBankObject {
 }
 ### END of SUB
 
+=back
+
 =head1 PRIVATE METHODS
 
 =head2 Metabolomics::Fragment::Annotation
@@ -478,8 +510,9 @@ sub writeFullTabularWithPeakBankObject {
 	## Input : $self, $type
 	## Output : $peakList
 	## Usage : my ( $peakList ) = $oAnalysis->_getPeakList ($type) ;
-	
+
 =cut
+
 ## START of SUB
 sub _getPeaksToAnnotated {
     ## Retrieve Values
@@ -510,8 +543,9 @@ sub _getPeaksToAnnotated {
 	## Input : $template
 	## Output : $fields
 	## Usage : my ( $fields ) = _getTEMPLATE_TABULAR_FIELDS ( $template ) ;
-	
+
 =cut
+
 ## START of SUB
 sub _getTEMPLATE_TABULAR_FIELDS {
     ## Retrieve Values
@@ -545,8 +579,9 @@ sub _getTEMPLATE_TABULAR_FIELDS {
 	## Input : $fields, $peakList
 	## Output : $rows
 	## Usage : my ( $rows ) = _mapPeakListWithTemplateFields ( $fields, $peakList ) ;
-	
+
 =cut
+
 ## START of SUB
 sub _mapPeakListWithTemplateFields {
     ## Retrieve Values
@@ -573,8 +608,9 @@ sub _mapPeakListWithTemplateFields {
 	## Input : \$mass, \$delta_type, \$mz_delta
 	## Output : \$min, \$max
 	## Usage : ($min, $max)= mz_delta_conversion($mass, $delta_type, $mz_delta) ;
-	
+
 =cut
+
 ## START of SUB
 sub _mz_delta_conversion {
 	## Retrieve Values
@@ -629,8 +665,9 @@ sub _mz_delta_conversion {
 	## Input : $expMz, $calcMz
 	## Output : $mzDeltaDa
 	## Usage : my ( $mzDeltaDa ) = _computeMzDeltaInMmu ( $expMz, $calcMz ) ;
-	
+
 =cut
+
 ## START of SUB
 sub _computeMzDeltaInMmu {
     ## Retrieve Values
@@ -659,8 +696,9 @@ sub _computeMzDeltaInMmu {
 	## Input : $expMz, $calcMz
 	## Output : $mzDeltaPpm
 	## Usage : my ( $mzDeltaPpm ) = computeMzDeltaInPpm ( $expMz, $calcMz ) ;
-	
+
 =cut
+
 ## START of SUB
 sub _computeMzDeltaInPpm {
     ## Retrieve Values
@@ -686,8 +724,9 @@ sub _computeMzDeltaInPpm {
 }
 ### END of SUB
 
-
 __END__
+
+=back
 
 =head1 AUTHOR
 
@@ -733,9 +772,9 @@ L<https://metacpan.org/release/Metabolomics-Fragment-Annotation>
 
 =back
 
-
 =head1 ACKNOWLEDGEMENTS
 
+Thank you to INRAE and All metabolomics colleagues.
 
 =head1 LICENSE AND COPYRIGHT
 
@@ -746,7 +785,6 @@ Initiated by Franck Giacomoni
 followed by INRAE PFEM team
 
 Web Site = INRAE PFEM
-
 
 =cut
 

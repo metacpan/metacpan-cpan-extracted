@@ -1,7 +1,7 @@
 This archive contains the distribution Geo-Address-Formatter,
-version 1.83:
+version 1.85:
 
-  Geo::Address::Formatter - format structured address data according to various global/country rules
+  format structured address data according to various global/country rules
 
 This software is copyright (c) 2020 by Opencage GmbH.
 

@@ -1,4 +1,6 @@
-package TeX::Hyphen::Pattern v1.1.2;    # -*- cperl; cperl-indent-level: 4 -*-
+# -*- cperl; cperl-indent-level: 4 -*-
+# Copyright (C) 2020, Roland van Ipenburg
+package TeX::Hyphen::Pattern v1.1.5;
 use Moose;
 use 5.014000;
 use utf8;
@@ -15,6 +17,7 @@ use Module::Pluggable
 use File::Temp ();
 
 use Readonly ();
+## no critic (ProhibitCallsToUnexportedSubs)
 Readonly::Scalar my $EMPTY              => q{};
 Readonly::Scalar my $DASH               => q{-};
 Readonly::Scalar my $UNDERSCORE         => q{_};
@@ -66,13 +69,16 @@ Readonly::Hash my %LOG => (
     'DELETE_SUCCES'     => q{Deleted all temporary files},
 );
 Readonly::Hash my %CARON_MAP => ( q{c} => q{č}, q{s} => q{š}, q{z} => q{ž} );
+## use critic
 
 Log::Log4perl->easy_init($ERROR);
 my $log = get_logger();
 
-has 'label' => ( 'is' => 'rw', 'isa' => 'Str', 'default' => $DEFAULT_LABEL );
+## no critic (ProhibitCallsToUndeclaredSubs)
+has 'label'  => ( 'is' => 'rw', 'isa' => 'Str', 'default' => $DEFAULT_LABEL );
 has '_cache' => ( 'is' => 'rw', 'isa' => 'HashRef',  'default' => sub { {} } );
 has '_plugs' => ( 'is' => 'rw', 'isa' => 'ArrayRef', 'default' => sub { [] } );
+## use critic
 
 sub filename {
     my ($self) = @_;
@@ -87,7 +93,7 @@ sub filename {
         $log->warn( sprintf $LOG{'FILE_UNDEF'}, $self->label );
         return;
     }
-    my $patterns = $self->_plugs->[0]->data();
+    my $patterns = $self->_plugs->[0]->pattern_data();
 
     # Strip comments to prevent parsing of commands in comments
     ## no critic qw(RequireDotMatchAnything)
@@ -98,7 +104,7 @@ sub filename {
     while ( my ($module) = $patterns =~ /$TEX_INPUT_COMMAND/xmis ) {
         $log->debug( $LOG{'PATCH_TEX_INPUT'} );
         $module = $PLUGGABLE . ucfirst $module;
-        my $input_patterns = $module->new()->data();
+        my $input_patterns = $module->new()->pattern_data();
         $patterns =~ s/$TEX_INPUT_COMMAND/$input_patterns/xmgis;
     }
 
@@ -106,11 +112,13 @@ sub filename {
     my $caron = $CARON_ESCAPE . $CLASS_BEGIN . join $EMPTY,
       keys(%CARON_MAP) . $CLASS_END;
     $log->debug( $LOG{'PATCH_CARONS'} );
-    $patterns =~ s{($caron)}{defined $1 ? $CARON_MAP{$1} : $EMPTY}exmgis;
+    $patterns =~ s{($caron)}{$CARON_MAP{$1}}xmgis;
 
     # Take care of \message command in TeX that TeX::Hyphen can't handle:
+    # uncoverable branch true
     if ( $patterns =~ /^$TEX_MESSAGE/xmgis ) {
-        $log->debug( $LOG{'PATCH_TEX_MESSAGE'} );
+        $log->debug( $LOG{'PATCH_TEX_MESSAGE'} );    # uncoverable statement
+                                                     # uncoverable statement
         $patterns =~ s{^($TEX_MESSAGE)}{$TEX_COMMENT_LINE$1}xmgis;
     }
 
@@ -123,8 +131,13 @@ sub filename {
     my $fh = File::Temp->new();
     binmode $fh, $UTF8;
     $fh->unlink_on_destroy(0);
-    print {$fh} $patterns
-      or $log->logdie( sprintf $ERR_CANT_WRITE, ( $fh->filename, $ERRNO ) );
+
+    # uncoverable branch true
+    if ( !print {$fh} $patterns ) {
+
+        # uncoverable statement
+        $log->logdie( sprintf $ERR_CANT_WRITE, ( $fh->filename, $ERRNO ) );
+    }
     my %cache = %{ $self->_cache };
     $cache{ $self->label } = $fh->filename;
     $self->_cache( {%cache} );
@@ -134,10 +147,8 @@ sub filename {
 sub available {
     my ($self) = @_;
     return map { ref }
-      grep {
-        $_->can('version')
-          && ( $_->version == $TeX::Hyphen::Pattern::VERSION )
-      } map { $_->new() } $self->_available;
+      grep     { $_->version == $TeX::Hyphen::Pattern::VERSION }
+      map      { $_->new() } $self->_available;
 }
 
 sub packaged {
@@ -203,7 +214,7 @@ patterns for use with TeX::Hyphen.
 
 =head1 VERSION
 
-This is version v1.1.2. To prevent plugging in of incompatible modules the
+This is version v1.1.4. To prevent plugging in of incompatible modules the
 version of the pluggable modules must be the same as this module.
 
 =head1 SYNOPSIS
@@ -281,29 +292,19 @@ sure this distribution complies with them.
 =item L<Module::Pluggable|Module::Pluggable>
 =item L<Readonly|Readonly>
 =item L<Set::Scalar|Set::Scalar>
-=item L<Test::More|Test::More>
-=item L<Test::NoWarnings|Test::NoWarnings>
 
 =back
 
-L<TeX::Hyphen|TeX::Hyphen> is not a dependency of C<TeX::Hyphen::Pattern>. You
-might want to use the patterns in another way, but this is mainly to prevent a
-circular dependency.  Without L<TeX::Hyphen|TeX::Hyphen> installed the
-patterns aren't tested for compatibility with L<TeX::Hyphen|TeX::Hyphen>, so
-if you want to use C<TeX::Hyphen::Pattern> with L<TeX::Hyphen|TeX::Hyphen>
-it's safer to install L<TeX::Hyphen|TeX::Hyphen> first so it can be used in
-the installation process of C<TeX::Hyphen::Pattern>.
+L<TeX::Hyphen|TeX::Hyphen> is only a test requirement of
+C<TeX::Hyphen::Pattern>. You might want to use the patterns in another way and
+this module then just provides them independent of L<TeX::Hyphen|TeX::Hyphen>.
 
 =head1 INCOMPATIBILITIES
 
 =over 4
 
 Not all available pattern files are parsed correctly by
-L<TeX::Hyphen|TeX::Hyphen>.  Versions up to and including 0.140 don't support
-C<utf8>, so patterns using C<utf8> that are included in this package have a
-version number 0.00 to ignore them. Should you patch
-L<TeX::Hyphen|TeX::Hyphen> yourself by inserting a C<binmode FILE, ":utf8";>
-you can change those version numbers to v1.1.2 to include them.
+L<TeX::Hyphen|TeX::Hyphen>.
 
 =back
 
@@ -312,7 +313,7 @@ you can change those version numbers to v1.1.2 to include them.
 This module uses L<Log::Log4perl|Log::Log4perl> for logging. It's a fatal
 error when the temporary file containing the pattern can't be written.
 
-=over
+=over 4
 
 =item C<Can't write to file '%s', stopped %s>
 
@@ -329,34 +330,19 @@ The temporary file created by L<File::Temp|File::Temp> could not be written.
 match on the string and picks what partly matches sorted, so using more exotic
 scripts this can go wrong badly.
 
-=item * Esperanto (L<TeX::Hyphen::Pattern::Eo.pm|TeX::Hyphen::Pattern::Eo.pm>)
-fails for a known reason and is not included in the package. Should you need
-support for Esperanto write to L<tex-hyphen at tug.org|tex-hyphen at tug.org>.
-
-=item * Coptic (L<TeX::Hyphen::Pattern::Cop.pm|TeX::Hyphen::Pattern::Cop.pm>)
-is a bit hard to test without a system that supports the fonts or encoding and
-is not included in the package.
-
-=item * Building the catalog creates conflicting files on file systems where
-F<En_us.pm> and F<En_US.pm> can't exist in the same directory (HFS+), so half
-of them are ignored.
-
-=item * After building the catalog the copyright notices were inserted manually
-to make sure the correct licensing was used.
+=back
 
 Please report any bugs or feature requests to
 C<bug-tex-hyphen-pattern@rt.cpan.org>, or through the web interface at
 L<RT for rt.cpan.org||http://rt.cpan.org>.
 
-=back
-
 =head1 AUTHOR
 
-Roland van Ipenburg, E<lt>ipenburg@xs4all.nlE<gt>
+Roland van Ipenburg, E<lt>roland@rolandvanipenburg.comE<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2019 by Roland van Ipenburg
+Copyright 2020 by Roland van Ipenburg
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.10.0 or,

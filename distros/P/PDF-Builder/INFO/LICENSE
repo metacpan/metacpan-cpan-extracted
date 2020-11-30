@@ -1,8 +1,27 @@
-This software is Copyright (c) 2017 by Phil M. Perry.
+This software is Copyright (c) 2017-2020 by Phil M. Perry.
+Previous copyrights are held by Steve Simms, Alfred Reibenschuh, et al.
+
+Note that some files within this software are under DIFFERENT licenses (than
+LGPL 2.1). These include (but are not necessarily limited to) 
+PDF::Builder::Matrix (same license as Perl itself), and 
+PDF::Builder::Basic::PDF files (except for the Filters and Literal.pm), which 
+are under the Perl Artistic License. If not otherwise stated in such a file, 
+the overall license is LGPL 2.1, and you may redistribute and/or modify this 
+software under the terms of the indicated license. For LGPL, you are permitted
+to redistribute and/or modify the software under a version higher than 2.1,
+at your option).
+
+This library is distributed in the hope that it will be useful, but WITHOUT ANY
+WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+PARTICULAR PURPOSE. See the GNU Lesser General Public License for more details.
 
 This is free software, licensed under:
 
   The GNU Lesser General Public License, Version 2.1, February 1999
+
+=============================================================================
+==                    Original LGPL 2.1 license text                       ==
+=============================================================================
 
 The GNU Lesser General Public License (LGPL)
 Version 2.1, February 1999

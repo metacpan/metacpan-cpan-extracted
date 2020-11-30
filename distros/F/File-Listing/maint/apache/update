@@ -1,0 +1,33 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+use 5.020;
+use Mojo::UserAgent;
+use Mojo::URL;
+use Path::Tiny qw( path );
+
+my $root = Mojo::URL->new('http://localhost:8080');
+my $ua = Mojo::UserAgent->new;
+
+sub fetch
+{
+  my $path = shift || '/';
+  my $url = $root->clone;
+  $url->path($path);
+  say "GET   $url";
+  my $result = $ua->get($url)->result;
+  $result->code == 200 or die "@{[ $result->code ]} @{[ $result->message ]}";
+  return $result;
+}
+
+my $index_html = fetch();
+
+foreach my $a ($index_html->dom->find('a')->each)
+{
+  my $name = $a->attr('href');
+  my $doc = fetch("/$name/");
+  my $output = path(__FILE__)->absolute->parent->parent->parent->child("corpus/apache-$name.html");
+  say "WRITE file://localhost$output";
+  $output->spew_utf8($doc->body);
+}

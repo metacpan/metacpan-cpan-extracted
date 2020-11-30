@@ -101,6 +101,19 @@ enum cbor_tag
   CBOR_TAG_MAGIC       = 55799, // self-describe cbor
 };
 
+// known forced types, also hardcoded in CBOR.pm
+enum
+{
+  AS_CBOR    = 0,
+  AS_INT     = 1,
+  AS_BYTES   = 2,
+  AS_TEXT    = 3,
+  AS_FLOAT16 = 4,
+  AS_FLOAT32 = 5,
+  AS_FLOAT64 = 6,
+  // possibly future enhancements: (generic) float, (generic) string
+};
+
 #define F_SHRINK          0x00000001UL
 #define F_ALLOW_UNKNOWN   0x00000002UL
 #define F_ALLOW_SHARING   0x00000004UL
@@ -235,6 +248,7 @@ encode_ch (enc_t *enc, char ch)
   *enc->cur++ = ch;
 }
 
+// used for tags, intregers, element counts and so on
 static void
 encode_uint (enc_t *enc, int major, UV len)
 {
@@ -273,6 +287,18 @@ encode_uint (enc_t *enc, int major, UV len)
        *enc->cur++ = len >>  8;
        *enc->cur++ = len;
      }
+}
+
+// encodes a perl value into a CBOR integer
+ecb_inline void
+encode_int (enc_t *enc, SV *sv)
+{
+  if (SvIsUV (sv))
+    encode_uint (enc, MAJOR_POS_INT, SvUVX (sv));
+  else if (SvIVX (sv) >= 0)
+    encode_uint (enc, MAJOR_POS_INT, SvIVX (sv));
+  else
+    encode_uint (enc, MAJOR_NEG_INT, -(SvIVX (sv) + 1));
 }
 
 ecb_inline void
@@ -343,6 +369,96 @@ encode_strref (enc_t *enc, int upgrade_utf8, int utf8, char *str, STRLEN len)
     }
 
   encode_str (enc, upgrade_utf8, utf8, str, len);
+}
+
+ecb_inline void
+encode_float16 (enc_t *enc, NV nv)
+{
+  need (enc, 1+2);
+
+  *enc->cur++ = MAJOR_MISC | MISC_FLOAT16;
+
+  uint16_t fp = ecb_float_to_binary16 (nv);
+
+  if (!ecb_big_endian ())
+    fp = ecb_bswap16 (fp);
+
+  memcpy (enc->cur, &fp, 2);
+  enc->cur += 2;
+}
+
+ecb_inline void
+encode_float32 (enc_t *enc, NV nv)
+{
+  need (enc, 1+4);
+
+  *enc->cur++ = MAJOR_MISC | MISC_FLOAT32;
+
+  uint32_t fp = ecb_float_to_binary32 (nv);
+
+  if (!ecb_big_endian ())
+    fp = ecb_bswap32 (fp);
+
+  memcpy (enc->cur, &fp, 4);
+  enc->cur += 4;
+}
+
+ecb_inline void
+encode_float64 (enc_t *enc, NV nv)
+{
+  need (enc, 1+8);
+
+  *enc->cur++ = MAJOR_MISC | MISC_FLOAT64;
+
+  uint64_t fp = ecb_double_to_binary64 (nv);
+
+  if (!ecb_big_endian ())
+    fp = ecb_bswap64 (fp);
+
+  memcpy (enc->cur, &fp, 8);
+  enc->cur += 8;
+}
+
+ecb_inline void
+encode_forced (enc_t *enc, UV type, SV *sv)
+{
+  switch (type)
+    {
+      case AS_CBOR:
+        {
+          STRLEN len;
+          char *str = SvPVbyte (sv, len);
+
+          need (enc, len);
+          memcpy (enc->cur, str, len);
+          enc->cur += len;
+        }
+        break;
+
+      case AS_BYTES:
+        {
+          STRLEN len;
+          char *str = SvPVbyte (sv, len);
+          encode_strref (enc, 0, 0, str, len);
+        }
+        break;
+
+      case AS_TEXT:
+        {
+          STRLEN len;
+          char *str = SvPVutf8 (sv, len);
+          encode_strref (enc, 1, 1, str, len);
+        }
+        break;
+
+      case AS_INT:     encode_int (enc, sv); break;
+      case AS_FLOAT16: encode_float16 (enc, SvNV (sv)); break;
+      case AS_FLOAT32: encode_float32 (enc, SvNV (sv)); break;
+      case AS_FLOAT64: encode_float64 (enc, SvNV (sv)); break;
+
+      default:
+        croak ("encountered malformed CBOR::XS::Tagged object");
+    }
 }
 
 static void encode_sv (enc_t *enc, SV *sv);
@@ -446,8 +562,22 @@ encode_rv (enc_t *enc, SV *sv)
           if (svt != SVt_PVAV)
             croak ("encountered CBOR::XS::Tagged object that isn't an array");
 
-          encode_uint (enc, MAJOR_TAG, SvUV (*av_fetch ((AV *)sv, 0, 1)));
-          encode_sv (enc, *av_fetch ((AV *)sv, 1, 1));
+          switch (av_len ((AV *)sv))
+            {
+              case 2-1:
+                // actually a tagged value
+                encode_uint (enc, MAJOR_TAG, SvUV (*av_fetch ((AV *)sv, 0, 1)));
+                encode_sv (enc, *av_fetch ((AV *)sv, 1, 1));
+                break;
+
+              case 3-1:
+                // a forced type [value, type, undef]
+                encode_forced (enc, SvUV (*av_fetch ((AV *)sv, 1, 1)), *av_fetch ((AV *)sv, 0, 1));
+                break;
+
+              default:
+                croak ("encountered malformed CBOR::XS::Tagged object");
+            }
 
           return;
         }
@@ -569,29 +699,9 @@ encode_nv (enc_t *enc, SV *sv)
     encode_uint (enc, MAJOR_POS_INT, (U32)nv);
   //TODO: maybe I32?
   else if (ecb_expect_false (nv == (float)nv))
-    {
-      *enc->cur++ = MAJOR_MISC | MISC_FLOAT32;
-
-      uint32_t fp = ecb_float_to_binary32 (nv);
-
-      if (!ecb_big_endian ())
-        fp = ecb_bswap32 (fp);
-
-      memcpy (enc->cur, &fp, 4);
-      enc->cur += 4;
-    }
+    encode_float32 (enc, nv);
   else
-    {
-      *enc->cur++ = MAJOR_MISC | MISC_FLOAT64;
-
-      uint64_t fp = ecb_double_to_binary64 (nv);
-
-      if (!ecb_big_endian ())
-        fp = ecb_bswap64 (fp);
-
-      memcpy (enc->cur, &fp, 8);
-      enc->cur += 8;
-    }
+    encode_float64 (enc, nv);
 }
 
 static void
@@ -608,14 +718,7 @@ encode_sv (enc_t *enc, SV *sv)
   else if (SvNOKp (sv))
     encode_nv (enc, sv);
   else if (SvIOKp (sv))
-    {
-      if (SvIsUV (sv))
-        encode_uint (enc, MAJOR_POS_INT, SvUVX (sv));
-      else if (SvIVX (sv) >= 0)
-        encode_uint (enc, MAJOR_POS_INT, SvIVX (sv));
-      else
-        encode_uint (enc, MAJOR_NEG_INT, -(SvIVX (sv) + 1));
-    }
+    encode_int (enc, sv);
   else if (SvROK (sv))
     encode_rv (enc, SvRV (sv));
   else if (!SvOK (sv))

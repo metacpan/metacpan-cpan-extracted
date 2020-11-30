@@ -32,12 +32,30 @@ a"b(c)d,e:f;g<h>i[j\k]l@nonono.com
 just"not"right@no.com
 this is"not\allowed@nope.org
 this\ still\"not\\allowed@nenenene.com
-john..doe@imposible.ru
+#
+# local-part = word *("." word)
+#
 .@no.com
+..@no.com
 .abc@no.com
+..abc@no.com
+abc.@no.com
+abc..@no.com
+abc..xyz@no.com
+abc...@no.com
+abc...xyz@no.com
+##abc."xyz"@pass.com
+##"abc"."xyz"@pass.com
+#
+# Curious, but this is allowed by all RFCs.
+# Specifically, they do mark quoted text chars like that:
+#   qtext = %d33 / %d35-91 / %d93-126
+#   period (.) is in range %d35-91, e.g. period = %d46
+#
+##"abc."@suckup.com
+#
 abc.@@no.com
 "\"@fail.com
 "\ @fail.com
-abc..@rfc822.com
 \@no.com
 \\@no.com

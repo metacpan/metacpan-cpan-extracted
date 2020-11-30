@@ -1,0 +1,8 @@
+rec | First Name | Last Name | Phone number
+1   | Chidi      | Anagonye  | 012-345-6789
+2   | Eleanor    | Shellstrop| 019-138-2801
+3   | Tahani     | Al-Jamil  |
+
+4   | Jason      | Mendoza   | 820-891-2930
+
+

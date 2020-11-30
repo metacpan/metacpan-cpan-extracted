@@ -106,7 +106,8 @@ if ( $OSNAME eq 'MSWin32' ) {
 												Sao[ ]Tome|
 												Saratov|
 												Sudan|
-												Volgograd
+												Volgograd|
+												Yukon
 											)[ ]Standard[ ]Time(?:[ ]2)?|
 											UTC[+]13
 										)$/smx);

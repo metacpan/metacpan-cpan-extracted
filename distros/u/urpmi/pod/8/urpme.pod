@@ -113,7 +113,8 @@ Removal of packages failed.
 
 =head1 AUTHORS
 
-Pascal Rigaux <pixel@mandriva.com> (current maintainer), 
+Thierry Vignaud <tv@mageia.org> (current maintainer),
+Pascal Rigaux,
 Francois Pons, Rafael Garcia-Suarez 
 
 =head1 SEE ALSO

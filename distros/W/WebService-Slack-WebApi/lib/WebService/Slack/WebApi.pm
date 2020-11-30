@@ -12,7 +12,7 @@ use Class::Accessor::Lite::Lazy (
 
 use WebService::Slack::WebApi::Client;
 
-our $VERSION = '0.15';
+our $VERSION = '0.16';
 
 sub _build_client {
     my $self = shift;
@@ -51,7 +51,7 @@ WebService::Slack::WebApi - a simple wrapper for Slack Web API
     my $slack = WebService::Slack::WebApi->new(token => 'access token');
 
     # getting channel's descriptions
-    my $channels = $slack->channels->list;
+    my $channels = $slack->conversations->list;
 
     # posting message to specified channel and getting message description
     my $posted_message = $slack->chat->post_message(

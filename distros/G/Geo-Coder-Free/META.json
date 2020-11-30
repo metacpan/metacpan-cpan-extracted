@@ -4,7 +4,7 @@
       "Nigel Horne <njh@bandsman.co.uk>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.48, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.56, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "open_source"
    ],
@@ -39,6 +39,7 @@
             "JSON" : "0",
             "LWP::UserAgent::Throttled" : "0",
             "Try::Tiny" : "0",
+            "XML::LibXML::Reader" : "0",
             "autodie" : "0"
          }
       },
@@ -63,6 +64,7 @@
             "Gzip::Faster" : "0",
             "Lingua::EN::AddressParse" : "0",
             "List::MoreUtils" : "0",
+            "Locale::AU" : "0",
             "Locale::CA" : "0",
             "Locale::Country" : "0",
             "Locale::SubCountry" : "0",
@@ -93,12 +95,13 @@
          "mailto" : "bug-Geo-Coder-Free@rt.cpan.org",
          "web" : "https://github.com/nigelhorne/Geo-Coder-Free/issues"
       },
+      "homepage" : "https://geocode.nigelhorne.com",
       "repository" : {
          "type" : "git",
          "url" : "git://github.com/nigelhorne/Geo-Coder-Free.git",
          "web" : "https://github.com/nigelhorne/Geo-Coder-Free"
       }
    },
-   "version" : "0.28",
+   "version" : "0.29",
    "x_serialization_backend" : "JSON::PP version 4.05"
 }

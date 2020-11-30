@@ -3,7 +3,7 @@
 # in libdwarf.h.in and dwarf_errmsg_list.h and the dwarfdump *.list files.
 # If you change any of those you should run this script
 # (which, for non-linux non-unix may mean some changes of this script
-# or of scripts/libbuild.sh or scripts.ddbuild.sh or baseconfig.h)
+# or of scripts/libbuild.sh or scripts/ddbuild.sh or baseconfig.h)
 #
 
 # This script is by David Anderson and hereby put into the public domain
@@ -32,7 +32,7 @@ then
     # Since cmake does not copy ; sensibly we will
     # provide a unique version for _Elf platforms.
     # libdwarf.h.in differs from generated_libdwarf.h.in:
-    * update the latter.
+    # update the latter.
     mv ub_temp generated_libdwarf.h.in
 fi
 rm ub_temp

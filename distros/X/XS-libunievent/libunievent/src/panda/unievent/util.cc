@@ -68,7 +68,7 @@ excepted<std::array<sock_t,2>, std::error_code> inet_socketpair (int type, int p
     if (!rets) return make_unexpected(rets.error());
     auto lsock = rets.value();
 
-    auto ret = bind(lsock, net::SockAddr::Inet4::sa_loopback);
+    auto ret = bind(lsock, net::SockAddr::Inet4::sockaddr_loopback);
     if (!ret) {
         close(lsock).nevermind();
         return make_unexpected(ret.error());

@@ -184,8 +184,13 @@ Revision history for StreamFinder
         properly return the total no. of streams found ($podcast->count()).
         - "internationalize" several sites (eliminate the ".com" from the 
         required matching regices (allow for ".eu", ".net", etc. to match").
-1.35    - Fix regex glitch breaking the sites we "internationalized" in v1.34.
-1.36    - StreamFinder::Apple: Return correct description for podcast episodes.
+1.35    2020/11/04
+        - Fix regex glitch breaking the sites we "internationalized" in v1.34.
+1.36    2020/11/16
+        - StreamFinder::Apple: Return correct description for podcast episodes.
         - StreamFinder::Spreaker: Fix minor title and image issues.
         - StreamFinder::Youtube: (For now): convert www.youtube.com to 
         youtube.be to get around youtube.com seeming to block youtube-dl.
+1.37    2020/11/25
+        - Add StreamFinder::Rumble for videos on rumble.com
+        - StreamFinder::Castbox: Return full description for podcast episodes.

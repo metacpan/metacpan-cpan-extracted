@@ -1,5 +1,12 @@
 Revision history for Perl extension HTML::Hyphenate.
 
+v1.1.7 Mon Nov 30 00:14:54 UTC 2020
+    - feat: improved performance with 800% speed increase RT#133832
+
+v1.1.6 Fri Nov 27 19:08:42 UTC 2020
+    - feat: improve nested languages
+    - test: improve testing
+
 v1.1.5 Thu Nov 12 13:49:30 UTC 2020
     - feat: improve script as pipeable RT#133707
     - test: coverage also when not AUTHOR_TESTING

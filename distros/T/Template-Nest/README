@@ -1,4 +1,4 @@
-Template-Nest version 0.08
+Template-Nest version 0.09
 ==========================
 
 Template::Nest - manipulate a generic template structure via a perl hash
@@ -22,7 +22,7 @@ This module requires these other modules and libraries:
 
 COPYRIGHT AND LICENCE
 
-Copyright (C) 2019 by Tom Gracey
+Copyright (C) 2020 by Tom Gracey
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.20.1 or,

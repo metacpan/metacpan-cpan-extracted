@@ -22,8 +22,8 @@ assertions.
 
 =head1 METHODS
 
-This class provides no public methods beyond those provided by its
-superclass.
+This class provides the following public methods beyond those provided
+by its superclass.
 
 =cut
 
@@ -39,72 +39,86 @@ use PPIx::Regexp::Constant qw{
     @CARP_NOT
 };
 
-our $VERSION = '0.075';
+our $VERSION = '0.076';
 
-{
-	my $expl_nla	= 'Negative look-ahead assertion';
-	my $expl_nlb	= 'Negative look-behind assertion';
-	my $expl_pla	= 'Positive look-ahead assertion';
-	my $expl_plb	= 'Positive look-behind assertion';
+use constant EXPL_NLA	=> 'Negative look-ahead assertion';
+use constant EXPL_NLB	=> 'Negative look-behind assertion';
+use constant EXPL_PLA	=> 'Positive look-ahead assertion';
+use constant EXPL_PLB	=> 'Positive look-behind assertion';
 
-	__PACKAGE__->__setup_class( {
+use constant DEF	=> {
 
-		'?!'	=> {
-		    expl	=> $expl_nla,
-		},
-		'*nla:'	=> {
-		    expl	=> $expl_nla,
-		    intro	=> '5.027009',
-		},
-		'*negative_lookahead:'	=> {
-		    expl	=> $expl_nla,
-		    intro	=> '5.027009',
-		},
-		'?<!'	=> {
-		    expl	=> $expl_nlb,
-		    intro	=> '5.005',
-		},
-		'*nlb:'	=> {
-		    expl	=> $expl_nlb,
-		    intro	=> '5.027009',
-		},
-		'*negative_lookbehind:'	=> {
-		    expl	=> $expl_nlb,
-		    intro	=> '5.027009',
-		},
-		'?='	=> {
-		    expl	=> $expl_pla,
-		},
-		'*pla:'	=> {
-		    expl	=> $expl_pla,
-		    intro	=> '5.027009',
-		},
-		'*positive_lookahead:'	=> {
-		    expl	=> $expl_pla,
-		    intro	=> '5.027009',
-		},
-		'?<='	=> {
-		    expl	=> $expl_plb,
-		    intro	=> '5.005',
-		},
-		'*plb:'	=> {
-		    expl	=> $expl_plb,
-		    intro	=> '5.027009',
-		},
-		'*positive_lookbehind:'	=> {
-		    expl	=> $expl_plb,
-		    intro	=> '5.027009',
-		},
-	    },
-	);
-}
+    '?!'	=> {
+	expl	=> EXPL_NLA,
+	look_ahead	=> 1,
+    },
+    '*nla:'	=> {
+	expl	=> EXPL_NLA,
+	intro	=> '5.027009',
+	look_ahead	=> 1,
+    },
+    '*negative_lookahead:'	=> {
+	expl	=> EXPL_NLA,
+	intro	=> '5.027009',
+	look_ahead	=> 1,
+    },
+    '?<!'	=> {
+	expl	=> EXPL_NLB,
+	intro	=> '5.005',
+    },
+    '*nlb:'	=> {
+	expl	=> EXPL_NLB,
+	intro	=> '5.027009',
+    },
+    '*negative_lookbehind:'	=> {
+	expl	=> EXPL_NLB,
+	intro	=> '5.027009',
+    },
+    '?='	=> {
+	expl	=> EXPL_PLA,
+	look_ahead	=> 1,
+	positive	=> 1,
+    },
+    '*pla:'	=> {
+	expl	=> EXPL_PLA,
+	intro	=> '5.027009',
+	look_ahead	=> 1,
+	positive	=> 1,
+    },
+    '*positive_lookahead:'	=> {
+	expl	=> EXPL_PLA,
+	intro	=> '5.027009',
+	look_ahead	=> 1,
+	positive	=> 1,
+    },
+    '?<='	=> {
+	expl	=> EXPL_PLB,
+	intro	=> '5.005',
+	positive	=> 1,
+    },
+    '*plb:'	=> {
+	expl	=> EXPL_PLB,
+	intro	=> '5.027009',
+	positive	=> 1,
+    },
+    '*positive_lookbehind:'	=> {
+	expl	=> EXPL_PLB,
+	intro	=> '5.027009',
+	positive	=> 1,
+    },
+};
+
+__PACKAGE__->__setup_class();
 
 sub __match_setup {
     my ( undef, $tokenizer ) = @_;	# $class not used
+    $tokenizer->__cookie_exists( COOKIE_LOOKAROUND_ASSERTION )
+	and return;
     my $nest_depth = 1;
     $tokenizer->cookie( COOKIE_LOOKAROUND_ASSERTION, sub {
 	    my ( undef, $token ) = @_;	# $tokenizer not used
-	    $token->isa( 'PPIx::Regexp::Token::Structure' )
+	    $token
+		and $token->isa( 'PPIx::Regexp::Token::Structure' )
 		and $nest_depth += ( {
 		    '('	=> 1,
 		    ')'	=> -1,
@@ -113,6 +127,30 @@ sub __match_setup {
 	},
     );
     return;
+}
+
+=head2 is_look_ahead
+
+This method returns a true value if the assertion is a look-ahead
+assertion, or a false value if it is a look-behind assertion.
+
+=cut
+
+sub is_look_ahead {
+    my ( $self ) = @_;
+    return $self->DEF->{ $self->unescaped_content() }->{look_ahead};
+}
+
+=head2 is_positive
+
+This method returns a true value if the assertion is a positive
+assertion, or a false value if it is a negative assertion.
+
+=cut
+
+sub is_positive {
+    my ( $self ) = @_;
+    return $self->DEF->{ $self->unescaped_content() }->{positive};
 }
 
 1;

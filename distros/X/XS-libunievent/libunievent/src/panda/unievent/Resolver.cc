@@ -8,7 +8,7 @@
 
 namespace panda { namespace unievent {
 
-static log::Module logmod("UniEvent::Resolver", log::WARNING);
+static log::Module logmod("UniEvent::Resolver", log::Level::Warning);
 
 static ares_addrinfo_node empty_ares_addrinfo;
 
@@ -95,7 +95,13 @@ void Resolver::Worker::handle_poll (int events, const std::error_code& err) {
         ares_process_fd(channel, socks[i], socks[i]);
         log_socket(socks[i]);
     }
-    if (exc) std::rethrow_exception(std::move(exc));
+    if (exc) rethrow_exception();
+}
+
+void Resolver::Worker::rethrow_exception () { // resume exception caused by user callback after c-ares flow done
+    auto _exc = std::move(exc);
+    exc = nullptr;
+    std::rethrow_exception(_exc);
 }
 
 void Resolver::Worker::resolve (const RequestSP& req) {
@@ -186,7 +192,7 @@ void Resolver::handle_timer () {
     panda_log_debug(logmod, this << " dns roll timer");
     for (auto& w : workers) if (w && w->request) {
         ares_process_fd(w->channel, ARES_SOCKET_BAD, ARES_SOCKET_BAD);
-        if (w->exc) std::rethrow_exception(std::move(w->exc));
+        if (w->exc) w->rethrow_exception();
     }
 }
 

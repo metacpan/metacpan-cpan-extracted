@@ -4,8 +4,8 @@ UniEvent::Check - runs the given callback once after polling for I/O
 
 =head1 SYNOPSIS
 
-    my $loop = UniEvent::Loop->default_loop;
-    my $h = UniEvent::Check->new;
+    my $loop = UniEvent::Loop->new;
+    my $h = UniEvent::Check->new($loop);
     $h->event->add(sub { say 'hello' });
     $h->start;
     $loop->run_nowait;  # prints 'hello'
@@ -20,6 +20,9 @@ UniEvent::Check - runs the given callback once after polling for I/O
 
 The Check handle is useful for doing post-I/O actions for a loop with
 the help of callback or listener. It is inherited from L<UniEvent::Handle>.
+
+If you need to do some actions B<before> polling I/O, consider using
+L<UniEvent::Prepare>.
 
 =head1 METHODS
 
@@ -40,12 +43,13 @@ iteration.
 =head2 callback($code)
 
 Sets the callback, which will be invoked after loop run. All previously
-set event listeners or callbacks will be discarded.
+set event listeners or callbacks are discarded.
 
 =head2 event()
 
 Returns L<XS::Framework::CallbackDispatcher> instance, where callback(s)
 can be assigned with. The callbacks will be invoked after loop run.
+
 The C++ interface is:
 
     void(const CheckSP&);
@@ -58,12 +62,13 @@ interface.
 
 =head2 event_listener($delegate [, $weak = false])
 
-Delegates callback invocation to the C<$delegate> object of arbitrary
-class having C<on_check> method. The object can optionally be weakened.
+Creates and returns wrapper around the C<$delegate> object of arbitrary
+class, having the following methods:
 
-The method will be invoked as
+  $delegate->on_check($handle);
 
-  $obj->on_check($handle);
+The delegated object can be seen as alternative of setting indivitual callbacks
+or as a way of groupping them. The C<$delegate> object can optionally be weakened.
 
 =head2 call_now()
 
@@ -82,6 +87,8 @@ L<UniEvent::Handle>
 
 L<UniEvent::Idle>
 
+L<UniEvent::Prepare>.
 
 L<XS::Framework::CallbackDispatcher>
+
 =cut

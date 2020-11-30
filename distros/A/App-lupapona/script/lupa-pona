@@ -1,0 +1,266 @@
+#!/usr/bin/env perl
+# Copyright (C) 2017–2020  Alex Schroeder <alex@gnu.org>
+
+# This program is free software: you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation, either version 3 of the License, or (at your option) any
+# later version.
+#
+# This program is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+# FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program. If not, see <https://www.gnu.org/licenses/>.
+
+=encoding utf8
+
+=head1 Lupa Pona
+
+Lupa Pona serves the local directory as a Gemini site.
+
+It's a super simple server: it just serves the current directory. I use
+L<Phoebe|https://alexschroeder.ch/cgit/phoebe/about/> myself, for Gemini
+hosting. It's a wiki, not just a file server.
+
+Let me know if you want to use Lupa Pona in a multi-user or virtual-hosting
+setup. All the necessary bits can be lifted from elsewhere. Right now, I'm just
+using Lupa Pona to temporarily serve a local directory, as one might
+occasionally use a few lines of Python to serve the local directory over the web
+using C<SimpleHTTPServer>.
+
+=head2 Dependencies
+
+Perl libraries you need to install if you want to run Lupa Pona:
+
+=over
+
+=item L<Mojo::Log> and L<Mojo::IOLoop>, or C<libmojolicious-perl>
+
+=item L<IO::Socket::SSL>, or C<libio-socket-ssl-perl>
+
+=item L<File::Slurper>, or C<libfile-slurper-perl>
+
+=item L<Modern::Perl>, or C<libmodern-perl-perl>
+
+=item L<URI::Escape>, or C<liburi-escape-xs-perl>
+
+=back
+
+=head2 Quickstart
+
+Since Lupa Pona traffic is encrypted, we need to generate a certificate and a
+key. When you start it for the first time, it will ask you for a hostname. Use
+'localhost' if you don't know. You can also generate your own certificate, like
+this, replacing C<$hostname> with whatever you need:
+
+    openssl req -new -x509 -newkey ec -subj "/CN=$hostname" \
+    -pkeyopt ec_paramgen_curve:prime256v1 \
+    -days 1825 -nodes -out cert.pem -keyout key.pem
+
+This creates a certificate and a private key, both of them unencrypted, using
+eliptic curves of a particular kind, valid for five years.
+
+Start the server:
+
+    lupa-pona
+
+This starts the server in the foreground, for C<gemini://localhost:1965>. If it
+aborts, see the L</Troubleshooting> section below. If it runs, open your
+favourite Gemini client and test it, or open another terminal and test it:
+
+    echo gemini://localhost \
+      | openssl s_client --quiet --connect localhost:1965 2>/dev/null
+
+You should see a Gemini page starting with the following:
+
+    20 text/gemini; charset=UTF-8
+    Welcome to Lupa Pona!
+
+Success!! 😀 🚀🚀
+
+=head2 Troubleshooting
+
+No trouble, yet!
+
+=head2 Options
+
+These are the options Lupa Pona knows about:
+
+=over
+
+=item C<--port> is the port to use; the default is 1965
+
+=item C<--log_level> is the log level to use (error, warn, info, debug, trace);
+the default is C<warn>
+
+=item C<--cert_file> is the certificate file to use; the default is C<cert.pem>
+
+=item C<--key_file> is the key file to use; the default is C<key.pem>
+
+=back
+
+=head2 Using systemd
+
+Systemd is going to handle daemonisation for us. There's more documentation
+L<available
+online|https://www.freedesktop.org/software/systemd/man/systemd.service.html>.
+
+You could create a specific user:
+
+    sudo adduser --disabled-login --disabled-password lupa-pona
+
+Copy Lupa Pona to C</home/lupa-pona/lupa-pona>.
+
+Basically, this is the template for our service:
+
+    [Unit]
+    Description=Lupa Pona
+    After=network.target
+    [Service]
+    Type=simple
+    WorkingDirectory=/home/lupa-pona
+    ExecStart=/home/lupa-pona/lupa-pona
+    Restart=always
+    User=lupa-pona
+    Group=lupa-pona
+    [Install]
+    WantedBy=multi-user.target
+
+Save this as F<lupa-pona.service>, and then link it:
+
+    sudo ln -s /home/lupa-pona/lupa-pona.service /etc/systemd/system/
+
+Reload systemd:
+
+    sudo systemctl daemon-reload
+
+Start Lupa Pona:
+
+    sudo systemctl start lupa-pona
+
+Check the log output:
+
+    sudo journalctl --unit lupa-pona
+
+All the files in C</home/lupa-pona> are going to be served, if the C<lupa-pona>
+user can read them.
+
+=head2 Privacy
+
+If you increase the log level, the server will produce more output, including
+information about the connections happening, like C<2020/06/29-15:35:59 CONNECT
+SSL Peer: "[::1]:52730" Local: "[::1]:1965"> and the like (in this case C<::1>
+is my local address so that isn't too useful but it could also be your visitor's
+IP numbers, in which case you will need to tell them about it using in order to
+comply with the
+L<GDPR|https://en.wikipedia.org/wiki/General_Data_Protection_Regulation>.
+
+=cut
+
+use Mojo::Log;
+use Mojo::IOLoop;
+use Getopt::Long;
+use File::Slurper qw(read_binary read_dir);
+use Encode qw(encode_utf8 decode_utf8);
+use Modern::Perl '2018';
+use URI::Escape;
+use Pod::Text;
+use utf8;
+
+our $port ||= 1965;
+our $cert_file ||= "cert.pem";
+our $key_file ||= "key.pem";
+our $log_level ||= "warn";  # error, warn, info, debug, trace
+
+my %args = ();
+GetOptions ("port=i"          => \$port,
+	    "cert_file=s"     => \$cert_file,
+	    "key_file=s"      => \$key_file,
+	    "log_level=s"     => \$log_level)
+    or die("Error in command line arguments\n");
+
+my $log = Mojo::Log->new;
+$log->level($log_level);
+
+if (not -f $key_file or not -f $cert_file) {
+  say "The certificate and/or key files are missing.";
+  say "Do you want to create them right now?";
+  say "The certificate uses eliptic curves and is valid for five years.";
+  say "If so, please provide your hostname (e.g. localhost).";
+  say "If not, just press Enter.";
+  local $SIG{'ALRM'} = sub {
+    die "Timed out!\n";
+  };
+  alarm(30); # timeout for the following prompt
+  my $hostname = <STDIN>;
+  alarm(0);  # done, no more alarm
+  chomp $hostname;
+  die "The hostname may not contain any whitespace\n" if $hostname =~ /\s/;
+  my $cmd = qq(openssl req -new -x509 -newkey ec -subj "/CN=$hostname" )
+      . qq(-pkeyopt ec_paramgen_curve:prime256v1 -days 1825 -nodes -out cert.pem -keyout key.pem);
+  if ($hostname) {
+    say "$cmd ";
+    system($cmd) == 0
+      or die "openssl failed: $?";
+  }
+}
+
+Mojo::IOLoop->server(
+  {
+    port => $port,
+    tls => 1,
+    tls_cert => $cert_file,
+    tls_key => $key_file,
+  } => sub {
+    my ($loop, $stream) = @_;
+    $stream->on(read => \&serve_gemini);
+  });
+
+sub serve_gemini {
+  my ($stream, $url) = @_;
+  return unless $url =~ s/\r\n.*//s; # needs URL and CR LF in one chunk
+  my ($scheme, $authority, $path, $query, $fragment) =
+      $url =~ m|(?:([^:/?#]+):)?(?://([^/?#]*))?([^?#]*)(?:\?([^#]*))?(?:#(.*))?|;
+  my ($host, $port) = split(/:/, $authority);
+  $port ||= 1965;
+  $log->info("Looking at $url");
+  if (not $url) {
+    $log->debug("The URL is empty");
+    $stream->write("59 URL expected\r\n");
+  } elsif (length($url) > 1024) {
+    $log->debug("The URL is too long");
+    $stream->write("59 The URL is too long\r\n");
+  } elsif (not $path) {
+    $stream->write("31 $url/\r\n"); # enforce trailing slash
+  } elsif ($path eq "/") {
+    $stream->write("20 text/gemini; charset=UTF-8\r\n");
+    $stream->write("Welcome to Lupa Pona!\n");
+    for (read_dir(".")) {
+      next if $_ eq $cert_file;
+      next if $_ eq $key_file;
+      next if /~$/; # Emacs backup files
+      $stream->write("=> $_") if -f;
+    }
+  } elsif ($path eq "/$cert_file" or $path eq "/$key_file") {
+    $stream->write("50 Forbidden\n");
+  } elsif ($path =~ m!^/([^/]+)$!) {
+    my $file = decode_utf8(uri_unescape($1));
+    if (-f $file) {
+      $stream->write("20 text/gemini; charset=UTF-8\r\n");
+      $stream->write(read_binary($file));
+    } else {
+      $stream->write("51 File not found: $file\r\n");
+    }
+  } elsif ($authority) {
+    $log->info("Unsupported proxy request for $url");
+    $stream->write("53 Unsupported proxy request for $url\r\n");
+  } else {
+    $log->info("No handler for $url");
+    $stream->write("59 Don't know how to handle $url\r\n");
+  }
+  $stream->close_gracefully();
+};
+
+Mojo::IOLoop->start unless Mojo::IOLoop->is_running;

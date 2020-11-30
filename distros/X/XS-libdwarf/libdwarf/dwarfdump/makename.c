@@ -1,6 +1,6 @@
 /*
-  Copyright (C) 2000,2004 Silicon Graphics, Inc. All Rights Reserved.
-  Portions Copyright(C) David Anderson 2016-2019. All Rights reserved.
+Copyright (C) 2000,2004 Silicon Graphics, Inc. All Rights Reserved.
+Portions Copyright(C) David Anderson 2016-2019. All Rights reserved.
 
   This program is free software; you can redistribute it and/or
   modify it under the terms of version 2 of the GNU General
@@ -70,7 +70,8 @@ value_compare_func(const void *l, const void *r)
     VALTYPE mr = (VALTYPE)r;
     return strcmp(ml,mr);
 }
-/* Nothing to free for the 'value' example. */
+/*  Nothing to free for the 'value' example but
+    the key itself. */
 static void
 value_node_free(void *valp)
 {
@@ -81,6 +82,7 @@ value_node_free(void *valp)
 void
 makename_destructor(void)
 {
+    /*  Pass in root, not pointer to root */
     dwarf_tdestroy(makename_data,value_node_free);
     makename_data = 0;
 }

@@ -11,6 +11,7 @@ my $post_diag;
 
 $modules{$_} = $_ for qw(
   Carp
+  Data::Dumper
   Exporter
   ExtUtils::MakeMaker
   HTTP::Date

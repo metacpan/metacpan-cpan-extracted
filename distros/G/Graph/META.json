@@ -4,7 +4,7 @@
       "Jarkko Hietaniemi <jhi@iki.fi>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.36, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.54, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -47,6 +47,9 @@
          }
       },
       "test" : {
+         "recommends" : {
+            "App::Prove" : "3.00"
+         },
          "requires" : {
             "Math::Complex" : "0",
             "Test::More" : "0.82"
@@ -56,14 +59,14 @@
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://github.com/neilb/Graph/issues"
+         "web" : "https://github.com/graphviz-perl/Graph/issues"
       },
       "repository" : {
          "type" : "git",
-         "url" : "git://github.com/neilb/Graph.git",
-         "web" : "https://github.com/neilb/Graph"
+         "url" : "git://github.com/graphviz-perl/Graph.git",
+         "web" : "https://github.com/graphviz-perl/Graph"
       }
    },
-   "version" : "0.9708",
+   "version" : "0.9711",
    "x_serialization_backend" : "JSON::PP version 4.00"
 }

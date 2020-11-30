@@ -144,10 +144,10 @@ void register_scheme (string scheme, string_view perl_class) {
     register_perl_scheme(scheme, perl_class);
 }
 
-uint64_t bench_parse (string str) {
+uint64_t bench_parse (string str, int flags = 0) {
     RETVAL = 0;
     for (int i = 0; i < 1000; ++i) {
-        URI u(str);
+        URI u(str, flags);
         RETVAL += u.path().length();
     }
 }

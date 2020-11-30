@@ -106,4 +106,22 @@ BEGIN {
    is( scalar $fret->get, "TF", '$fret for await in try/finally' );
 }
 
+# await in toplevel try
+{
+   try {
+      is( await Future->done( "success" ), "success",
+         'await in toplevel try' );
+   }
+   catch {
+      fail( 'await in toplevel try' );
+   }
+
+   try {
+      await Future->fail( "failure\n" );
+   }
+   catch ( $e ) {
+      is( $e, "failure\n", 'await in toplevel try/catch failure' );
+   }
+}
+
 done_testing;

@@ -6,7 +6,7 @@
 ************************************************************************ */
 
 /**
- * Abstract Visualization widget.
+ * Table Visualization Widget.
  */
 qx.Class.define('callbackery.ui.plugin.Table', {
     extend : callbackery.ui.plugin.Form,
@@ -23,6 +23,9 @@ qx.Class.define('callbackery.ui.plugin.Table', {
     members: {
         _populate: function(){
             this.setLayout(new qx.ui.layout.VBox(0));
+            if (this._cfg.introText) {
+                this.add(new qx.ui.basic.Label(this.xtr(this._cfg.introText)).set({rich: true}));
+            }
             this.add(this._createToolbar());
             this.add(this._createTable(), {flex: 1});
         },

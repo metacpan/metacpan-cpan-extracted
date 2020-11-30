@@ -35,5 +35,7 @@
    "user_url" : "https://api.github.com/users/{user}",
    "pull_request_merge_url" : "https://api.github.com/repos/{owner}/{repo}/pulls/{id}/merge",
    "pull_request_url" : "https://api.github.com/repos/{owner}/{repo}/pulls",
-   "git_refs_url" : "https://api.github.com/repos/{owner}/{repo}/git/refs/{category}/{ref}"
+   "git_refs_url" : "https://api.github.com/repos/{owner}/{repo}/git/refs/{category}/{ref}",
+   "git_refs_create_url" : "https://api.github.com/repos/{owner}/{repo}/git/refs",
+   "commits_url" : "https://api.github.com/repos/{owner}/{repo}/git/commits"
 }

@@ -2,36 +2,77 @@
 use strict;
 use warnings;
 
-use 5.005;    # Need look-behind assertions
-
-use Getopt::Std;
+use Getopt::Long;
 use Make;
 
-my %opt;
-
-getopts( 'Dgnpf:j:C:', \%opt );
+my (%opt, $redundancy);
+if (!GetOptions(
+    ## no critic (BuiltinFunctions::RequireBlockMap)
+    (map +("$_!" => \$opt{$_}), qw(D g n p)),
+    (map +("$_=s" => \$opt{$_}), qw(f C)),
+    (map +("$_=i" => \$opt{$_}), qw(j)),
+    ## use critic
+    'analyse-redundancy!' => \$redundancy,
+)) {
+    require Pod::Usage;
+    Pod::Usage::pod2usage(1);
+}
 
 chdir $opt{C} if $opt{C};
 
 my $info = Make->new(
-    GNU      => $opt{'g'},
+    GNU      => $opt{g},
     Vars     => { MAKE => "$^X $0" },
-    Jobs     => $opt{'j'},
+    Jobs     => $opt{j},
 );
-$info->parse($opt{'f'});
+$info->parse($opt{f});
 
-if ( $opt{'D'} ) {
+if ( $opt{D} ) {
     require Data::Dumper;
     print Data::Dumper::DumperX($info);
 }
-elsif ( $opt{'p'} ) {
+elsif ( $opt{p} ) {
     $info->Print(@ARGV);
 }
-elsif ( $opt{'n'} ) {
+elsif ( $opt{n} ) {
     print $info->Script(@ARGV);
+}
+elsif ( $redundancy ) {
+    my $g = $info->as_graph(no_rules => 1);
+    my $tcg = $g->transitive_closure(path_count => 1);
+    ## no critic (BuiltinFunctions::RequireBlockGrep BuiltinFunctions::RequireBlockMap)
+    my @r = grep $tcg->path_length(@$_) > 1, $g->edges;
+    if (!@r) {
+        print "No redundant rules found\n";
+        exit 0;
+    }
+    @r = sort { $a->[0] cmp $b->[0] or $a->[1] cmp $b->[1] } @r;
+    my %seen = map +("@$_" => 1), @r;
+    for my $e (@r) {
+        my $es = "@$e";
+        print "Redundant: $es\n";
+        print "\t$_\n"
+            for sort grep !$seen{$_}++, map "@$_", all_paths($g, $tcg, @$e);
+    }
+    ## use critic
 }
 else {
     $info->Make(@ARGV);
+}
+
+sub all_paths {
+    my ($g, $tcg, $u, $v) = @_;
+    return if $u eq $v;
+    my @found;
+    push @found, [$u, $v] if $g->has_edge($u, $v);
+    ## no critic (BuiltinFunctions::RequireBlockGrep BuiltinFunctions::RequireBlockMap)
+    push @found,
+        map [$u, @$_],
+        map all_paths($g, $tcg, $_, $v),
+        grep $tcg->is_reachable($_, $v),
+        grep $_ ne $v, $g->successors($u);
+    ## use critic
+    return @found;
 }
 
 =head1 NAME
@@ -40,7 +81,9 @@ pure-perl-make - a perl 'make' replacement
 
 =head1 SYNOPSIS
 
-  pure-perl-make [-D] [-n] [-p] [-g] [-f Makefile] [-C directory] targets
+  pure-perl-make [-D] [-n] [-p] [-g] [-f Makefile] [-C directory]
+    [--analyse-redundancy]
+    [targets] [vars]
 
 =head1 DESCRIPTION
 
@@ -66,6 +109,14 @@ Don't build, just print the expanded makefile.
 
 Turn on L<Make/GNU>.
 
+=head2 --analyse-redundancy
+
+See if there are direct dependencies that are redundant with indirect
+dependencies. E.g.:
+
+    all: L1 L2 # no need to specify L2
+    L1: L2
+
 =head1 BUGS
 
 =over
@@ -74,13 +125,11 @@ Turn on L<Make/GNU>.
 
 No B<-k> flag
 
-I strongly suspect there are lots more.
-
 =back
 
 =head1 SEE ALSO
 
-L<Make>, make(1)
+L<Make>, make(1), L<Graph>
 
 =head1 AUTHOR
 

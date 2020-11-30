@@ -3,36 +3,60 @@
 #include <cxxabi.h>
 #include <memory>
 
-#if PANDA_HAS_EXECINFO
 
-#include <execinfo.h>
-#define PANDA_GET_BACKTRACE ::backtrace
+#if PANDA_HAS_LIBUNWIND
 
-#else
+#define UNW_LOCAL_ONLY
 #include <libunwind.h>
-#define PANDA_GET_BACKTRACE ::unw_backtrace
-
 #endif
 
+#if PANDA_HAS_EXECINFO
+#include <execinfo.h>
+#endif
+
+
 namespace panda {
+
+/* prefer libunwind, otherwise there are annoying warnings on FreeBSD x86 (seems bug in it) */
+#if PANDA_HAS_LIBUNWIND
+static int bt_adapter(void **dst, int sz) {
+    unw_cursor_t cursor;
+    unw_context_t uc;
+    unw_word_t ip;
+
+    unw_getcontext(&uc);
+    unw_init_local(&cursor, &uc);
+    int count = 0;
+    while ((unw_step(&cursor) > 0) && count < sz) {
+        unw_get_reg(&cursor, UNW_REG_IP, &ip);
+        dst[++count] = (void*)ip;
+    }
+    return count;
+}
+
+
+static RawTraceProducer get_default_raw_producer() noexcept {
+    return bt_adapter;
+}
+#else
 
 #if defined (__linux__)
 
 static RawTraceProducer get_default_raw_producer() noexcept {
-    return PANDA_GET_BACKTRACE;
+    return ::backtrace;
 }
-
 #else
 
-// ::backtrace returns size_t on *BSD, and int on linux
 static int bt_adapter(void **dst, int sz) {
-    auto r = PANDA_GET_BACKTRACE(dst, sz);
+    auto r = ::backtrace(dst, sz);
     return (int)r;
 }
 
 static RawTraceProducer get_default_raw_producer() noexcept {
     return bt_adapter;
 }
+
+#endif
 #endif
 
 

@@ -61,7 +61,7 @@
          "web" : "https://github.com/perlancar/perl-Progress-Any-Examples"
       }
    },
-   "version" : "0.003",
+   "version" : "0.005",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.030000"

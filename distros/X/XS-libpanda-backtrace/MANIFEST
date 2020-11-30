@@ -1,0 +1,26 @@
+Changes
+lib/XS/libpanda/backtrace.pm
+lib/XS/libpanda/backtrace.pod
+libpanda-backtrace/CMakeLists.txt
+libpanda-backtrace/include/panda/backtrace.h
+libpanda-backtrace/src/panda/backtrace.cc
+libpanda-backtrace/src/panda/dl.h
+libpanda-backtrace/src/panda/dwarf.cc
+libpanda-backtrace/src/panda/dwarf.h
+libpanda-backtrace/src/panda/glibc-dl.cc
+libpanda-backtrace/src/panda/macos-dl.cc
+libpanda-backtrace/src/panda/SharedObjectInfo.h
+libpanda-backtrace/src/panda/win-dl.cc
+libpanda-backtrace/tests/bt.cc
+libpanda-backtrace/tests/fn.h
+libpanda-backtrace/tests/fn01.cc
+libpanda-backtrace/tests/fn02.cc
+libpanda-backtrace/tests/fn03.cc
+libpanda-backtrace/tests/main.cc
+Makefile.PL
+Makefile.test
+MANIFEST			This list of files
+t/bt.t
+t/lib/MyTest.pm
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

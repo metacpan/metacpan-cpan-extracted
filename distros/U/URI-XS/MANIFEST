@@ -24,7 +24,10 @@ src/panda/uri/encode.h
 src/panda/uri/ftp.h
 src/panda/uri/http.h
 src/panda/uri/parser.cc
+src/panda/uri/parser.h
 src/panda/uri/parser.rl
+src/panda/uri/parser_ext.cc
+src/panda/uri/parser_ext.rl
 src/panda/uri/Query.h
 src/panda/uri/socks.h
 src/panda/uri/ssh.h

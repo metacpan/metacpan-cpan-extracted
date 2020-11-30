@@ -24,6 +24,10 @@ has array => (
     isa=>'ArrayRef',
 );
 
+has hash => (
+    is=>'ro',
+    isa=>'HashRef',
+);
 
 sub run {
     my $self = shift;

@@ -29,13 +29,33 @@ OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
 EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-/* This reads elf headers and creates generic-elf
-   structures containing the Elf headers.  */
+/*
+This reads elf headers and creates generic-elf
+structures containing the Elf headers.
+
+These two enums used for type safety in passing
+values.  See dwarf_elfread.h
+
+enum RelocRela
+enum RelocOffsetSize
+
+dwarf_elfread.c
+calls
+    _dwarf_load_elf_relx(intfc,i,...,enum RelocRela,errcode)
+        calls _dwarf_elf_load_a_relx_batch(ep,...enum RelocRela,
+            enum RelocOffsetSize,errcode)
+            which calls generic_rel_from_rela32(ep,gsh,relp,grel
+            or    calls generic_rel_from_rela64(ep,gsh,relp,grel
+            or    calls generic_rel_from_rel32(ep,gsh,relp,grel...
+            or    calls generic_rel_from_rel64(ep,gsh,relp,grel...
+*/
 
 
 #include "config.h"
 #include <stdio.h>
+#ifdef HAVE_STRING_H
 #include <string.h> /* For memcpy etc */
+#endif /* HAVE_STRING_H */
 #ifdef HAVE_STDLIB_H
 #include <stdlib.h>
 #endif /* HAVE_STDLIB_H */
@@ -44,8 +64,12 @@ EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <malloc.h>
 #endif /* HAVE_MALLOC_H */
 #include <stddef.h>
-#include <sys/types.h>   /* for open() */
+#ifdef HAVE_SYS_TYPES_H
+#include <sys/types.h> /* open(), off_t, size_t, ssize_t */
+#endif /* HAVE_SYS_TYPES_H */
+#ifdef HAVE_SYS_STAT_H
 #include <sys/stat.h>   /* for open() */
+#endif /* HAVE_SYS_STAT_H */
 #include <fcntl.h>   /* for open() */
 #ifdef HAVE_UNISTD_H
 #include <unistd.h> /* lseek read close */
@@ -84,6 +108,23 @@ EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define TRUE  1
 #define FALSE 0
 
+#if 0
+/*  One example of calling this.
+    place just before DW_DLE_SECTION_SIZE_OR_OFFSET_LARGE
+    dumpsizes(__LINE__,strsectlength,strpsh->gh_offset, ep->f_filesize);
+*/
+static void
+dumpsizes(int line,Dwarf_Unsigned s,
+    Dwarf_Unsigned o,
+    Dwarf_Unsigned fsz)
+{
+    Dwarf_Unsigned tlen = s + o;
+    printf("Size Error DEBUGONLY sz 0x%llx off 0x%llx fsx 0x%llx "
+        "sum 0x%llx line %d \n",
+        s,o,fsz,tlen,line);
+}
+#endif
+
 #ifdef WORDS_BIGENDIAN
 #define ASNAR(func,t,s)                         \
     do {                                        \
@@ -100,9 +141,24 @@ EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #endif /* end LITTLE- BIG-ENDIAN */
 
 static int
-_dwarf_load_elf_section_is_dwarf(const char *sname)
+_dwarf_load_elf_section_is_dwarf(const char *sname,
+    int *is_rela,int *is_rel)
 {
+    *is_rel = FALSE;
+    *is_rela = FALSE;
+    if(_dwarf_ignorethissection(sname)) {
+        return FALSE;
+    }
     if (!strncmp(sname,".rel",4)) {
+        if (!strncmp(sname,".rela.",6)) {
+            *is_rela = TRUE;
+            return TRUE;
+        }
+        if (!strncmp(sname,".rel.",5)) {
+            *is_rela = TRUE;
+            return TRUE;
+        }
+        /*  Else something is goofy/Impossible */
         return FALSE;
     }
     if (!strncmp(sname,".debug_",7)) {
@@ -551,7 +607,8 @@ generic_shdr_from_shdr64(dwarf_elf_object_access_internals_t *ep,
         ASNAR(ep->f_copy_word,gshdr->gh_info,psh->sh_info);
         ASNAR(ep->f_copy_word,gshdr->gh_addralign,psh->sh_addralign);
         ASNAR(ep->f_copy_word,gshdr->gh_entsize,psh->sh_entsize);
-        if (gshdr->gh_type == SHT_REL || gshdr->gh_type == SHT_RELA){
+        if (gshdr->gh_type == SHT_REL ||
+            gshdr->gh_type == SHT_RELA){
             gshdr->gh_reloc_target_secnum = gshdr->gh_info;
         }
     }
@@ -711,6 +768,10 @@ dwarf_generic_elf_load_symbols(
     if(!secnum) {
         return DW_DLV_NO_ENTRY;
     }
+    if (psh->gh_size > ep->f_filesize) {
+        *errcode = DW_DLE_SECTION_SIZE_ERROR;
+        return DW_DLV_ERROR;
+    }
     if (ep->f_offsetsize == 32) {
         res = dwarf_generic_elf_load_symbols32(ep,
             &gsym,
@@ -746,6 +807,7 @@ dwarf_load_elf_dynsym_symbols(
         return DW_DLV_NO_ENTRY;
     }
     psh = ep->f_shdr + secnum;
+    if we ever use this... gh_size big?
     res = dwarf_generic_elf_load_symbols(ep,
         secnum,
         psh,
@@ -773,6 +835,10 @@ _dwarf_load_elf_symtab_symbols(
         return DW_DLV_NO_ENTRY;
     }
     psh = ep->f_shdr + secnum;
+    if (psh->gh_size > ep->f_filesize) {
+        *errcode = DW_DLE_SECTION_SIZE_ERROR;
+        return DW_DLV_ERROR;
+    }
     res = dwarf_generic_elf_load_symbols(ep,
         secnum,
         psh,
@@ -810,9 +876,9 @@ generic_rel_from_rela32(
         /* addend signed */
         ASNAR(ep->f_copy_word,grel->gr_addend,relp->r_addend);
         SIGN_EXTEND(grel->gr_addend,sizeof(relp->r_addend));
-        grel->gr_isrela = TRUE;
         grel->gr_sym  = grel->gr_info>>8; /* ELF32_R_SYM */
         grel->gr_type = grel->gr_info & 0xff;
+        grel->gr_is_rela = TRUE;
     }
     return DW_DLV_OK;
 }
@@ -862,12 +928,11 @@ generic_rel_from_rela64(
             grel->gr_sym  = grel->gr_info >> 32;
             grel->gr_type = grel->gr_info & 0xffffffff;
         }
-        grel->gr_isrela = TRUE;
+        grel->gr_is_rela = TRUE;
     }
     return DW_DLV_OK;
 }
 
-#if 0
 static int
 generic_rel_from_rel32(
     dwarf_elf_object_access_internals_t *ep,
@@ -887,19 +952,16 @@ generic_rel_from_rel32(
         return  DW_DLV_ERROR;
     }
     for ( i = 0; i < ecount; ++i,++relp,++grel) {
-        grel->gr_isrela = 0;
         ASNAR(ep->f_copy_word,grel->gr_offset,relp->r_offset);
         ASNAR(ep->f_copy_word,grel->gr_info,relp->r_info);
         grel->gr_addend  = 0; /* Unused for plain .rel */
         grel->gr_sym  = grel->gr_info >>8; /* ELF32_R_SYM */
-        grel->gr_isrela = FALSE;
+        grel->gr_is_rela = FALSE;
         grel->gr_type = grel->gr_info & 0xff;
     }
     return DW_DLV_OK;
 }
-#endif /* 0 */
 
-#if 0
 static int
 generic_rel_from_rel64(
     dwarf_elf_object_access_internals_t *ep,
@@ -922,7 +984,6 @@ generic_rel_from_rel64(
         return DW_DLV_ERROR;
     }
     for ( i = 0; i < ecount; ++i,++relp,++grel) {
-        grel->gr_isrela = 0;
         ASNAR(ep->f_copy_word,grel->gr_offset,relp->r_offset);
         ASNAR(ep->f_copy_word,grel->gr_info,relp->r_info);
         grel->gr_addend  = 0; /* Unused for plain .rel */
@@ -945,12 +1006,10 @@ generic_rel_from_rel64(
             grel->gr_sym  = grel->gr_info >>32;
             grel->gr_type = grel->gr_info & 0xffffffff;
         }
-        grel->gr_isrela = FALSE;
-
+        grel->gr_is_rela = FALSE;
     }
     return DW_DLV_OK;
 }
-#endif /* 0 */
 
 #if 0
 int
@@ -1011,6 +1070,13 @@ _dwarf_load_elf_symstr(
     /*  Alloc an extra byte as a guaranteed NUL byte
         at the end of the strings in case the section
         is corrupted and lacks a NUL at end. */
+    if (strsectlength > ep->f_filesize ||
+        strpsh->gh_offset >ep->f_filesize ||
+        (strsectlength + strpsh->gh_offset) >
+            ep->f_filesize) {
+        *errcode = DW_DLE_SECTION_SIZE_OR_OFFSET_LARGE;
+        return DW_DLV_ERROR;
+    }
     ep->f_symtab_sect_strings = calloc(1,strsectlength+1);
     if(!ep->f_symtab_sect_strings) {
         ep->f_symtab_sect_strings = 0;
@@ -1055,6 +1121,13 @@ _dwarf_elf_load_sectstrings(
         *errcode = DW_DLE_ELF_STRING_SECTION_MISSING;
         return DW_DLV_ERROR;
     }
+    if (secoffset    >=    ep->f_filesize ||
+        psh->gh_size > ep->f_filesize ||
+        (secoffset + psh->gh_size) >
+            ep->f_filesize) {
+        *errcode = DW_DLE_SECTION_SIZE_OR_OFFSET_LARGE;
+        return DW_DLV_ERROR;
+    }
     if(psh->gh_size > ep->f_elf_shstrings_max) {
         free(ep->f_elf_shstrings_data);
         ep->f_elf_shstrings_data = (char *)malloc(psh->gh_size);
@@ -1093,8 +1166,8 @@ elf_load_sectheaders32(
         (entsize > 200)||
         (count > ep->f_filesize) ||
         ((count *entsize +offset) > ep->f_filesize)) {
-            *errcode = DW_DLE_FILE_OFFSET_BAD;
-            return DW_DLV_ERROR;
+        *errcode = DW_DLE_SECTION_SIZE_OR_OFFSET_LARGE;
+        return DW_DLV_ERROR;
     }
     res = generic_shdr_from_shdr32(ep,&generic_count,
         offset,entsize,count,errcode);
@@ -1129,8 +1202,8 @@ elf_load_sectheaders64(
         (entsize > 200)||
         (count > ep->f_filesize) ||
         ((count *entsize +offset) > ep->f_filesize)) {
-            *errcode = DW_DLE_FILE_OFFSET_BAD;
-            return DW_DLV_ERROR;
+        *errcode = DW_DLE_SECTION_SIZE_OR_OFFSET_LARGE;
+        return DW_DLV_ERROR;
     }
     res = generic_shdr_from_shdr64(ep,&generic_count,
         offset,entsize,count,errcode);
@@ -1146,11 +1219,14 @@ elf_load_sectheaders64(
 
 
 static int
-_dwarf_elf_load_rela_32(
+_dwarf_elf_load_a_relx_batch(
     dwarf_elf_object_access_internals_t *ep,
     struct generic_shdr * gsh,
     struct generic_rela ** grel_out,
-    Dwarf_Unsigned *count_out, int *errcode)
+    Dwarf_Unsigned *count_out,
+    enum RelocRela localrela,
+    enum RelocOffsetSize localoffsize,
+    int *errcode)
 {
     Dwarf_Unsigned count = 0;
     Dwarf_Unsigned size = 0;
@@ -1158,9 +1234,13 @@ _dwarf_elf_load_rela_32(
     Dwarf_Unsigned sizeg = 0;
     Dwarf_Unsigned offset = 0;
     int res = 0;
-    dw_elf32_rela *relp = 0;
-    Dwarf_Unsigned object_reclen = sizeof(dw_elf32_rela);
+    Dwarf_Unsigned object_reclen = 0;
     struct generic_rela *grel = 0;
+
+    /*  ASSERT: Caller guarantees localoffsetsize
+        is a valid 4 or 8. */
+    /*  ASSERT: Caller guarantees localrela is one
+        of the 2 valid values 1 or 2 */
 
     offset = gsh->gh_offset;
     size = gsh->gh_size;
@@ -1170,36 +1250,125 @@ _dwarf_elf_load_rela_32(
     if ((offset > ep->f_filesize)||
         (size > ep->f_filesize) ||
         ((size +offset) > ep->f_filesize)) {
-            *errcode = DW_DLE_FILE_OFFSET_BAD;
-            return DW_DLV_ERROR;
-    }
-
-    count = (long)(size/object_reclen);
-    size2 = count * object_reclen;
-    if(size != size2) {
-        *errcode = DW_DLE_SECTION_SIZE_ERROR;
+        *errcode = DW_DLE_SECTION_SIZE_OR_OFFSET_LARGE;
         return DW_DLV_ERROR;
     }
-    relp = (dw_elf32_rela *)malloc(size);
-    if(!relp) {
-        *errcode = DW_DLE_ALLOC_FAIL;
-        return DW_DLV_ERROR;
-    }
-    res = RRMOA(ep->f_fd,relp,offset,size,
-        ep->f_filesize,errcode);
-    if(res != DW_DLV_OK) {
-        free(relp);
-        return res;
+    if (localoffsize == RelocOffset32) {
+        if (localrela ==  RelocIsRela) {
+            object_reclen = sizeof(dw_elf32_rela);
+            count = (long)(size/object_reclen);
+            size2 = count * object_reclen;
+            if(size != size2) {
+                *errcode = DW_DLE_SECTION_SIZE_ERROR;
+                return DW_DLV_ERROR;
+            }
+        } else {
+            object_reclen = sizeof(dw_elf32_rel);
+            count = (long)(size/object_reclen);
+            size2 = count * object_reclen;
+            if(size != size2) {
+                *errcode = DW_DLE_SECTION_SIZE_ERROR;
+                return DW_DLV_ERROR;
+            }
+        }
+    } else {
+        if (localrela ==  RelocIsRela) {
+            object_reclen = sizeof(dw_elf64_rela);
+            count = (long)(size/object_reclen);
+            size2 = count * object_reclen;
+            if(size != size2) {
+                *errcode = DW_DLE_SECTION_SIZE_ERROR;
+                return DW_DLV_ERROR;
+            }
+        } else {
+            object_reclen = sizeof(dw_elf64_rel);
+            count = (long)(size/object_reclen);
+            size2 = count * object_reclen;
+            if(size != size2) {
+                *errcode = DW_DLE_SECTION_SIZE_ERROR;
+                return DW_DLV_ERROR;
+            }
+        }
     }
     sizeg = count*sizeof(struct generic_rela);
     grel = (struct generic_rela *)malloc(sizeg);
     if (!grel) {
-        free(relp);
         *errcode = DW_DLE_ALLOC_FAIL;
         return DW_DLV_ERROR;
     }
-    res = generic_rel_from_rela32(ep,gsh,relp,grel,errcode);
-    free(relp);
+    if (localoffsize == RelocOffset32) {
+        if (localrela ==  RelocIsRela) {
+            dw_elf32_rela *relp = 0;
+            relp = (dw_elf32_rela *)malloc(size);
+            if(!relp) {
+                free(grel);
+                *errcode = DW_DLE_ALLOC_FAIL;
+                return DW_DLV_ERROR;
+            }
+            res = RRMOA(ep->f_fd,relp,offset,size,
+                ep->f_filesize,errcode);
+            if(res != DW_DLV_OK) {
+                free(relp);
+                free(grel);
+                return res;
+            }
+            res = generic_rel_from_rela32(ep,gsh,relp,grel,errcode);
+            free(relp);
+        } else {
+            dw_elf32_rel *relp = 0;
+            relp = (dw_elf32_rel *)malloc(size);
+            if(!relp) {
+                free(grel);
+                *errcode = DW_DLE_ALLOC_FAIL;
+                return DW_DLV_ERROR;
+            }
+            res = RRMOA(ep->f_fd,relp,offset,size,
+                ep->f_filesize,errcode);
+            if(res != DW_DLV_OK) {
+                free(relp);
+                free(grel);
+                return res;
+            }
+            res = generic_rel_from_rel32(ep,gsh,relp,grel,errcode);
+            free(relp);
+        }
+    } else {
+        if (localrela ==  RelocIsRela) {
+            dw_elf64_rela *relp = 0;
+            relp = (dw_elf64_rela *)malloc(size);
+            if(!relp) {
+                free(grel);
+                *errcode = DW_DLE_ALLOC_FAIL;
+                return DW_DLV_ERROR;
+            }
+            res = RRMOA(ep->f_fd,relp,offset,size,
+                ep->f_filesize,errcode);
+            if(res != DW_DLV_OK) {
+                free(relp);
+                free(grel);
+                return res;
+            }
+            res = generic_rel_from_rela64(ep,gsh,relp,grel,errcode);
+            free(relp);
+        } else {
+            dw_elf64_rel *relp = 0;
+            relp = (dw_elf64_rel *)malloc(size);
+            if(!relp) {
+                free(grel);
+                *errcode = DW_DLE_ALLOC_FAIL;
+                return DW_DLV_ERROR;
+            }
+            res = RRMOA(ep->f_fd,relp,offset,size,
+                ep->f_filesize,errcode);
+            if(res != DW_DLV_OK) {
+                free(relp);
+                free(grel);
+                return res;
+            }
+            res = generic_rel_from_rel64(ep,gsh,relp,grel,errcode);
+            free(relp);
+        }
+    }
     if (res == DW_DLV_OK) {
         gsh->gh_relcount = count;
         gsh->gh_rels = grel;
@@ -1213,215 +1382,12 @@ _dwarf_elf_load_rela_32(
     return res;
 }
 
-#if 0
-static int
-_dwarf_elf_load_rel_32(
-    dwarf_elf_object_access_internals_t *ep,
-    struct generic_shdr * gsh,struct generic_rela ** grel_out,
-    Dwarf_Unsigned *count_out,int *errcode)
-{
-    Dwarf_Unsigned count = 0;
-    Dwarf_Unsigned size = 0;
-    Dwarf_Unsigned size2 = 0;
-    Dwarf_Unsigned sizeg = 0;
-    Dwarf_Unsigned offset = 0;
-    int res = 0;
-    dw_elf32_rel* relp = 0;
-    Dwarf_Unsigned object_reclen = sizeof(dw_elf32_rel);
-    struct generic_rela *grel = 0;
 
-    offset = gsh->gh_offset;
-    size = gsh->gh_size;
-    if(size == 0) {
-        return DW_DLV_NO_ENTRY;
-    }
-    if ((offset > ep->f_filesize)||
-        (size > ep->f_filesize) ||
-        ((size +offset) > ep->f_filesize)) {
-            *errcode =  DW_DLE_FILE_OFFSET_BAD;
-            return DW_DLV_ERROR;
-    }
-
-    count = size/object_reclen;
-    size2 = count * object_reclen;
-    if(size != size2) {
-        *errcode = DW_DLE_SECTION_SIZE_ERROR;
-        return DW_DLV_ERROR;
-    }
-    relp = (dw_elf32_rel *)malloc(size);
-    if(!relp) {
-        *errcode = DW_DLE_ALLOC_FAIL;
-        return DW_DLV_ERROR;
-    }
-    res = RRMOA(ep->f_fd,relp,offset,size,
-        ep->f_filesize,errcode);
-    if(res != DW_DLV_OK) {
-        free(relp);
-        return res;
-    }
-    sizeg = count *sizeof(struct generic_rela);
-    grel = (struct generic_rela *)malloc(sizeg);
-    if (!grel) {
-        free(relp);
-        *errcode = DW_DLE_ALLOC_FAIL;
-        return DW_DLV_ERROR;
-    }
-    res = generic_rel_from_rel32(ep,gsh,relp,grel,errcode);
-    free(relp);
-    if (res == DW_DLV_OK) {
-        *count_out = count;
-        *grel_out = grel;
-        return res;
-    }
-    /* Some sort of error */
-    count_out = 0;
-    free (grel);
-    return res;
-}
-#endif /* 0 */
-
-#if 0
-static int
-_dwarf_elf_load_rel_64(
-    dwarf_elf_object_access_internals_t *ep,
-    struct generic_shdr * gsh,struct generic_rela ** grel_out,
-    Dwarf_Unsigned *count_out,int *errcode)
-{
-    Dwarf_Unsigned count = 0;
-    Dwarf_Unsigned size = 0;
-    Dwarf_Unsigned size2 = 0;
-    Dwarf_Unsigned sizeg = 0;
-    Dwarf_Unsigned offset = 0;
-    int res = 0;
-    dw_elf64_rel* relp = 0;
-    Dwarf_Unsigned object_reclen = sizeof(dw_elf64_rel);
-    struct generic_rela *grel = 0;
-
-    offset = gsh->gh_offset;
-    size = gsh->gh_size;
-    if(size == 0) {
-        *errcode = DW_DLE_SECTION_SIZE_ERROR;
-        return DW_DLV_ERROR;
-    }
-    if ((offset > ep->f_filesize)||
-        (size > ep->f_filesize) ||
-        ((size +offset) > ep->f_filesize)) {
-            *errcode =  DW_DLE_FILE_OFFSET_BAD;
-            return DW_DLV_ERROR;
-    }
-
-    count = size/object_reclen;
-    size2 = count * object_reclen;
-    if(size != size2) {
-        *errcode = DW_DLE_SECTION_SIZE_ERROR;
-        return DW_DLV_ERROR;
-    }
-    relp = (dw_elf64_rel *)malloc(size);
-    if(!relp) {
-        *errcode = DW_DLE_ALLOC_FAIL;
-        return DW_DLV_ERROR;
-    }
-    res = RRMOA(ep->f_fd,relp,offset,size,
-        ep->f_filesize,errcode);
-    if(res != DW_DLV_OK) {
-        free(relp);
-        return res;
-    }
-    sizeg = count*sizeof(struct generic_rela);
-    grel = (struct generic_rela *)malloc(sizeg);
-    if (!grel) {
-        free(relp);
-        *errcode = DW_DLE_ALLOC_FAIL;
-        return DW_DLV_ERROR;
-    }
-    res = generic_rel_from_rel64(ep,gsh,relp,grel,errcode);
-    free(relp);
-    if (res == DW_DLV_OK) {
-        *count_out = count;
-        *grel_out = grel;
-        return res;
-    }
-    /* Some sort of error */
-    count_out = 0;
-    free (grel);
-    return res;
-}
-#endif /* 0 */
-
-
-static int
-_dwarf_elf_load_rela_64(
-    dwarf_elf_object_access_internals_t *ep,
-    struct generic_shdr * gsh,
-    struct generic_rela ** grel_out,
-    Dwarf_Unsigned *count_out,int *errcode)
-{
-    Dwarf_Unsigned count = 0;
-    Dwarf_Unsigned size = 0;
-    Dwarf_Unsigned size2 = 0;
-    Dwarf_Unsigned sizeg = 0;
-    Dwarf_Unsigned offset = 0;
-    int res = 0;
-    dw_elf64_rela *relp = 0;
-    Dwarf_Unsigned object_reclen = sizeof(dw_elf64_rela);
-    struct generic_rela *grel = 0;
-
-    offset = gsh->gh_offset;
-    size = gsh->gh_size;
-    if(size == 0) {
-        *errcode = DW_DLE_SECTION_SIZE_ERROR;
-        return DW_DLV_ERROR;
-    }
-    if ((offset > ep->f_filesize)||
-        (size > ep->f_filesize) ||
-        ((size +offset) > ep->f_filesize)) {
-            *errcode =  DW_DLE_FILE_OFFSET_BAD;
-            return DW_DLV_ERROR;
-    }
-    count = (long)(size/object_reclen);
-    size2 = count * object_reclen;
-    if(size != size2) {
-        *errcode = DW_DLE_SECTION_SIZE_ERROR;
-        return DW_DLV_ERROR;
-    }
-    /* Here want native rela size from the file */
-    relp = (dw_elf64_rela *)malloc(size);
-    if(!relp) {
-        *errcode = DW_DLE_ALLOC_FAIL;
-        return DW_DLV_ERROR;
-    }
-    res = RRMOA(ep->f_fd,relp,offset,size,
-        ep->f_filesize,errcode);
-    if(res != DW_DLV_OK) {
-        free(relp);
-        return res;
-    }
-    sizeg = count*sizeof(struct generic_rela);
-    /* Here want generic-record size from the file */
-    grel = (struct generic_rela *)malloc(sizeg);
-    if (!grel) {
-        free(relp);
-        *errcode = DW_DLE_ALLOC_FAIL;
-        return DW_DLV_ERROR;
-    }
-    res = generic_rel_from_rela64(ep,gsh,relp,grel,errcode);
-    free(relp);
-    if (res == DW_DLV_OK) {
-        *count_out = count;
-        *grel_out = grel;
-        return res;
-    }
-    /* Some sort of error */
-    count_out = 0;
-    free (grel);
-    return res;
-}
-
-/*  Is this rela section related to dwarf at all?
+/*  Is this rel/rela section related to dwarf at all?
     set oksecnum zero if not. Else set targ secnum.
     Never returns DW_DLV_NO_ENTRY. */
 static int
-this_is_a_section_dwarf_related(
+this_rel_is_a_section_dwarf_related(
     dwarf_elf_object_access_internals_t *ep,
     struct generic_shdr *gshdr,
     unsigned *oksecnum_out,
@@ -1430,7 +1396,8 @@ this_is_a_section_dwarf_related(
     unsigned oksecnum = 0;
     struct generic_shdr *gstarg = 0;
 
-    if (gshdr->gh_type != SHT_RELA ) {
+    if (gshdr->gh_type != SHT_RELA &&
+        gshdr->gh_type != SHT_REL)  {
         *oksecnum_out = 0;
         return DW_DLV_OK;
     }
@@ -1445,16 +1412,17 @@ this_is_a_section_dwarf_related(
         *oksecnum_out = 0; /* no reloc needed. */
         return DW_DLV_OK;
     }
-
     *oksecnum_out = oksecnum;
     return DW_DLV_OK;
 }
 /* Secnum here is the secnum of rela. Not
-   the target of the relocations. */
+   the target of the relocations.
+   This also loads .rel. */
 int
-_dwarf_load_elf_rela(
+_dwarf_load_elf_relx(
     dwarf_elf_object_access_internals_t *ep,
     Dwarf_Unsigned secnum,
+    enum RelocRela localr,
     int *errcode)
 {
     struct generic_shdr *gshdr = 0;
@@ -1464,7 +1432,10 @@ _dwarf_load_elf_rela(
     Dwarf_Unsigned count_read = 0;
     int res = 0;
     unsigned oksec = 0;
+    enum RelocOffsetSize localoffsize = RelocOffset32;
 
+    /*  ASSERT: Caller guarantees localr is
+        a valid RelocRela  */
     if (!ep) {
         *errcode = DW_DLE_INTERNAL_NULL_POINTER;
         return DW_DLV_ERROR;
@@ -1477,28 +1448,31 @@ _dwarf_load_elf_rela(
     }
     gshdr = ep->f_shdr +secnum;
     if (is_empty_section(gshdr->gh_type)) {
+
         return DW_DLV_NO_ENTRY;
     }
 
-    res = this_is_a_section_dwarf_related(ep,gshdr,&oksec,errcode);
+    res = this_rel_is_a_section_dwarf_related(ep,gshdr,
+        &oksec,errcode);
     if (res == DW_DLV_ERROR) {
         return res;
     }
     if (!oksec) {
         return DW_DLV_OK;
     }
-    /*  We will actually read these relocations.
-        Others get ignored. */
-    if (offsetsize == 32) {
-        res = _dwarf_elf_load_rela_32(ep,
-            gshdr,&grp,&count_read,errcode);
-    } else if (offsetsize == 64) {
-        res = _dwarf_elf_load_rela_64(ep,
-            gshdr,&grp,&count_read,errcode);
+    /*  We will actually read these relocations. */
+    if (offsetsize == 64) {
+        localoffsize = RelocOffset64;
+    } else if (offsetsize == 32) {
+        localoffsize = RelocOffset32;
     } else {
         *errcode = DW_DLE_OFFSET_SIZE;
         return DW_DLV_ERROR;
     }
+    /*  ASSERT: localoffsize is now a valid enum value,
+        one of the two defined. */
+    res = _dwarf_elf_load_a_relx_batch(ep,
+        gshdr,&grp,&count_read,localr,localoffsize,errcode);
     if (res == DW_DLV_ERROR) {
         return res;
     }
@@ -1509,55 +1483,6 @@ _dwarf_load_elf_rela(
     gshdr->gh_relcount = count_read;
     return DW_DLV_OK;
 }
-#if 0
-int
-_dwarf_load_elf_rel(
-    dwarf_elf_object_access_internals_t *ep,
-    Dwarf_Unsigned secnum, int *errcode)
-{
-    struct generic_shdr *gshdr = 0;
-    Dwarf_Unsigned generic_count = 0;
-    unsigned offsetsize = 0;
-    struct generic_rela *grp = 0;
-    Dwarf_Unsigned count_read = 0;
-    int res = 0;
-
-    if (!ep) {
-        *errcode = DW_DLE_INTERNAL_NULL_POINTER;
-        return DW_DLV_ERROR;
-    }
-    offsetsize = ep->f_offsetsize;
-    generic_count = ep->f_loc_shdr.g_count;
-    if (secnum >= generic_count) {
-        *errcode = DW_DLE_ELF_SECTION_ERROR;
-        return DW_DLV_ERROR;
-    }
-    gshdr = ep->f_shdr +secnum;
-    if (is_empty_section(gshdr->gh_type)) {
-        return DW_DLV_NO_ENTRY;
-    }
-    if (offsetsize == 32) {
-        res = _dwarf_elf_load_rel_32(ep,
-            gshdr,&grp,&count_read,errcode);
-    } else if (offsetsize == 64) {
-        res = _dwarf_elf_load_rel_64(ep,
-            gshdr,&grp,&count_read,errcode);
-    } else {
-        *errcode = DW_DLE_OFFSET_SIZE;
-        return DW_DLV_ERROR;
-    }
-    if (res == DW_DLV_ERROR) {
-        return res;
-    }
-    if (res == DW_DLV_NO_ENTRY) {
-        return res;
-    }
-    gshdr->gh_rels = grp;
-    gshdr->gh_relcount = count_read;
-    return DW_DLV_OK;
-}
-#endif /* 0 */
-
 static int
 validate_section_name_string(Dwarf_Unsigned section_length,
   Dwarf_Unsigned string_loc_index,
@@ -1848,6 +1773,11 @@ read_gs_section_group(
             free(data);
             return DW_DLV_ERROR;
         }
+        if (!psh->gh_entsize) {
+            free(data);
+            *errcode = DW_DLE_ELF_SECTION_GROUP_ERROR;
+            return DW_DLV_ERROR;
+        }
         count = seclen/psh->gh_entsize;
         if (count > ep->f_loc_shdr.g_count) {
             /* Impossible */
@@ -1994,6 +1924,8 @@ _dwarf_elf_setup_all_section_groups(
     psh = ep->f_shdr;
     for (i = 0; i < count; ++psh,++i) {
         const char *name = psh->gh_namestring;
+        int is_rel = FALSE;
+        int is_rela = FALSE;
 
         if (is_empty_section(psh->gh_type)) {
             /*  No data here. */
@@ -2012,7 +1944,7 @@ _dwarf_elf_setup_all_section_groups(
             psh->gh_is_dwarf = TRUE;
             psh->gh_section_group_number = DW_GROUPNUMBER_DWO;
             ep->f_dwo_group_section_count++;
-        } else if (_dwarf_load_elf_section_is_dwarf(name)) {
+        } else if (_dwarf_load_elf_section_is_dwarf(name,&is_rela,&is_rel)) {
             if(!psh->gh_section_group_number) {
                 psh->gh_section_group_number = DW_GROUPNUMBER_BASE;
             }

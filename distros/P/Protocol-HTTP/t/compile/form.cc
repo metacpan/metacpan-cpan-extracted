@@ -37,7 +37,7 @@ TEST("multipart/form-data (complete)") {
     auto str = canonize(str_sample).first;
 
     SECTION("empty form -> no body is sent, method is still GET") {
-        Request::Form form(Request::EncType::MULTIPART);
+        Request::Form form(Request::EncType::Multipart);
         auto req = Request::Builder().form(std::move(form)).build();
         CHECK(req->to_string() ==
             "GET / HTTP/1.1\r\n"
@@ -46,7 +46,7 @@ TEST("multipart/form-data (complete)") {
     }
 
     SECTION("create simple form and serialize it") {
-        Request::Form form(Request::EncType::MULTIPART);
+        Request::Form form(Request::EncType::Multipart);
         form.add("k1", "v1");
         form.add("k2", "v2");
         auto req = Request::Builder().form(std::move(form)).build();
@@ -57,7 +57,7 @@ TEST("multipart/form-data (complete)") {
     }
 
     SECTION("send a small file") {
-        Request::Form form(Request::EncType::MULTIPART);
+        Request::Form form(Request::EncType::Multipart);
         form.add("k1", "v1", "sample.jpg", "image/jpeg");
         auto req = Request::Builder().form(std::move(form)).build();
         auto data = canonize(req->to_string()).first;
@@ -80,7 +80,7 @@ TEST("multipart/form-data (complete)") {
     }
 
     SECTION("uri query -> form") {
-        Request::Form form(Request::EncType::MULTIPART);
+        Request::Form form(Request::EncType::Multipart);
         auto req = Request::Builder()
                 .uri("/?k1=v1&k2=v2")
                 .form(std::move(form))
@@ -93,14 +93,14 @@ TEST("multipart/form-data (complete)") {
 }
 
 TEST("application/x-www-form-urlencoded") {
-    Request::Form form(Request::EncType::URLENCODED);
+    Request::Form form(Request::EncType::UrlEncoded);
     form.add("k1", "v11");
     form.add("k1", "v12");
     form.add("k2", "v2");
 
     SECTION("enrich query") {
         auto req = Request::Builder()
-                .method(Request::Method::POST)
+                .method(Request::Method::Post)
                 .uri("/path?k3=v3&k4=v4")
                 .form(std::move(form)).build();
         CHECK(req->to_string() ==

@@ -54,7 +54,7 @@ use PPIx::Regexp::Token::Backreference	();
 use PPIx::Regexp::Token::Backtrack	();
 use PPIx::Regexp::Token::Recursion	();
 
-our $VERSION = '0.075';
+our $VERSION = '0.076';
 
 # Return true if the token can be quantified, and false otherwise
 
@@ -111,11 +111,13 @@ sub is_quantifier {
     );
 
     sub perl_version_introduced {
-	my ( $self ) = @_;
-	return $perl_version_introduced{ $self->content() } || MINIMUM_PERL;
+       my ( $self ) = @_;
+       return $self->{perl_version_introduced} ||
+           $perl_version_introduced{ $self->content() } ||
+           MINIMUM_PERL;
     }
 }
-
+    
 {
 
     my %delim = map { $_ => 1 } qw/ ( ) { } [ ] /;

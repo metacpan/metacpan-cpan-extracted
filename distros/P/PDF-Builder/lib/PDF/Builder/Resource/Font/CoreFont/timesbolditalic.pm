@@ -3,7 +3,7 @@ package PDF::Builder::Resource::Font::CoreFont::timesbolditalic;
 use strict;
 use warnings;
 
-our $VERSION = '3.019'; # VERSION
+our $VERSION = '3.020'; # VERSION
 my $LAST_UPDATE = '3.019'; # manually update whenever code is changed
 
 =head1 NAME

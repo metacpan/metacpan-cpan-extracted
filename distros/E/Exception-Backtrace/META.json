@@ -25,19 +25,21 @@
       },
       "configure" : {
          "requires" : {
-            "XS::Framework" : "v1.3.2",
-            "XS::Install" : "v1.2.18",
-            "XS::libdwarf" : "20200114.8",
-            "XS::libpanda" : "v1.4.7",
+            "XS::Framework" : "v1.3.3",
+            "XS::Install" : "v1.3.1",
+            "XS::libdwarf" : "20201123.0",
+            "XS::libpanda" : "v1.4.11",
+            "XS::libpanda::backtrace" : "v1.0.0",
             "next::XS" : "v1.0.7"
          }
       },
       "runtime" : {
          "requires" : {
-            "XS::Framework" : "v1.3.2",
-            "XS::Install" : "v1.2.18",
-            "XS::libdwarf" : "20200114.8",
-            "XS::libpanda" : "v1.4.7",
+            "XS::Framework" : "v1.3.3",
+            "XS::Install" : "v1.3.1",
+            "XS::libdwarf" : "20201123.0",
+            "XS::libpanda" : "v1.4.11",
+            "XS::libpanda::backtrace" : "v1.0.0",
             "next::XS" : "v1.0.7",
             "perl" : "5.020000"
          }
@@ -48,14 +50,15 @@
             "Test::More" : "0",
             "Test::Simple" : "0.96",
             "Test::Warnings" : "0",
-            "XS::Framework" : "v1.3.2",
-            "XS::libdwarf" : "20200114.8",
-            "XS::libpanda" : "v1.4.7",
+            "XS::Framework" : "v1.3.3",
+            "XS::libdwarf" : "20201123.0",
+            "XS::libpanda" : "v1.4.11",
+            "XS::libpanda::backtrace" : "v1.0.0",
             "next::XS" : "v1.0.7"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "v1.0.9",
+   "version" : "v1.0.10",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

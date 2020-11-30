@@ -1,3 +1,10 @@
+0.004		2020-11-23	T. R. Wyant
+    Add CAVEAT section to POD, about false passes caused by the test
+    routines loading modules that the module being tested needs but
+    forgot to load. Also deferred the loading of dependencies
+    Getopt::Long, File::Find and File::Spec until they are actually
+    needed.
+
 0.003		2020-09-05	T. R. Wyant
     Disable feature 'signatures' for Perl >= 5.20 because we're using
     old-style signatures. This is probably paranoia, brought on by the

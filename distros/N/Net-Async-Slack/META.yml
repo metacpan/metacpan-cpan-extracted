@@ -9,12 +9,11 @@ build_requires:
   IPC::Open3: '0'
   Test::CheckDeps: '0.010'
   Test::More: '0.94'
-  perl: '5.006'
 configure_requires:
   ExtUtils::MakeMaker: '0'
   File::ShareDir::Install: '0.06'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.015, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.017, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -30,307 +29,307 @@ no_index:
 provides:
   Net::Async::Slack:
     file: lib/Net/Async/Slack.pm
-    version: '0.004'
+    version: '0.005'
   Net::Async::Slack::Event::AccountsChanged:
     file: lib/Net/Async/Slack/Event/AccountsChanged.pm
-    version: '0.004'
+    version: '0.005'
   Net::Async::Slack::Event::AppHomeOpened:
     file: lib/Net/Async/Slack/Event/AppHomeOpened.pm
-    version: '0.004'
+    version: '0.005'
   Net::Async::Slack::Event::AppMention:
     file: lib/Net/Async/Slack/Event/AppMention.pm
-    version: '0.004'
+    version: '0.005'
   Net::Async::Slack::Event::AppRateLimited:
     file: lib/Net/Async/Slack/Event/AppRateLimited.pm
-    version: '0.004'
+    version: '0.005'
   Net::Async::Slack::Event::AppUninstalled:
     file: lib/Net/Async/Slack/Event/AppUninstalled.pm
-    version: '0.004'
+    version: '0.005'
   Net::Async::Slack::Event::Bot:
     file: lib/Net/Async/Slack/Event/Bot.pm
-    version: '0.004'
+    version: '0.005'
   Net::Async::Slack::Event::BotAdded:
     file: lib/Net/Async/Slack/Event/BotAdded.pm
-    version: '0.004'
+    version: '0.005'
   Net::Async::Slack::Event::BotChanged:
     file: lib/Net/Async/Slack/Event/BotChanged.pm
-    version: '0.004'
+    version: '0.005'
   Net::Async::Slack::Event::Channel:
     file: lib/Net/Async/Slack/Event/Channel.pm
-    version: '0.004'
+    version: '0.005'
   Net::Async::Slack::Event::ChannelArchive:
     file: lib/Net/Async/Slack/Event/ChannelArchive.pm
-    version: '0.004'
+    version: '0.005'
   Net::Async::Slack::Event::ChannelCreated:
     file: lib/Net/Async/Slack/Event/ChannelCreated.pm
-    version: '0.004'
+    version: '0.005'
   Net::Async::Slack::Event::ChannelDeleted:
     file: lib/Net/Async/Slack/Event/ChannelDeleted.pm
-    version: '0.004'
+    version: '0.005'
   Net::Async::Slack::Event::ChannelHistoryChanged:
     file: lib/Net/Async/Slack/Event/ChannelHistoryChanged.pm
-    version: '0.004'
+    version: '0.005'
   Net::Async::Slack::Event::ChannelJoined:
     file: lib/Net/Async/Slack/Event/ChannelJoined.pm
-    version: '0.004'
+    version: '0.005'
   Net::Async::Slack::Event::ChannelLeft:
     file: lib/Net/Async/Slack/Event/ChannelLeft.pm
-    version: '0.004'
+    version: '0.005'
   Net::Async::Slack::Event::ChannelMarked:
     file: lib/Net/Async/Slack/Event/ChannelMarked.pm
-    version: '0.004'
+    version: '0.005'
   Net::Async::Slack::Event::ChannelRename:
     file: lib/Net/Async/Slack/Event/ChannelRename.pm
-    version: '0.004'
+    version: '0.005'
   Net::Async::Slack::Event::ChannelUnarchive:
     file: lib/Net/Async/Slack/Event/ChannelUnarchive.pm
-    version: '0.004'
+    version: '0.005'
   Net::Async::Slack::Event::CommandsChanged:
     file: lib/Net/Async/Slack/Event/CommandsChanged.pm
-    version: '0.004'
+    version: '0.005'
   Net::Async::Slack::Event::DndUpdated:
     file: lib/Net/Async/Slack/Event/DndUpdated.pm
-    version: '0.004'
+    version: '0.005'
   Net::Async::Slack::Event::DndUpdatedUser:
     file: lib/Net/Async/Slack/Event/DndUpdatedUser.pm
-    version: '0.004'
+    version: '0.005'
   Net::Async::Slack::Event::EmailDomainChanged:
     file: lib/Net/Async/Slack/Event/EmailDomainChanged.pm
-    version: '0.004'
+    version: '0.005'
   Net::Async::Slack::Event::EmojiChanged:
     file: lib/Net/Async/Slack/Event/EmojiChanged.pm
-    version: '0.004'
+    version: '0.005'
   Net::Async::Slack::Event::FileChange:
     file: lib/Net/Async/Slack/Event/FileChange.pm
-    version: '0.004'
+    version: '0.005'
   Net::Async::Slack::Event::FileCommentAdded:
     file: lib/Net/Async/Slack/Event/FileCommentAdded.pm
-    version: '0.004'
+    version: '0.005'
   Net::Async::Slack::Event::FileCommentDeleted:
     file: lib/Net/Async/Slack/Event/FileCommentDeleted.pm
-    version: '0.004'
+    version: '0.005'
   Net::Async::Slack::Event::FileCommentEdited:
     file: lib/Net/Async/Slack/Event/FileCommentEdited.pm
-    version: '0.004'
+    version: '0.005'
   Net::Async::Slack::Event::FileCreated:
     file: lib/Net/Async/Slack/Event/FileCreated.pm
-    version: '0.004'
+    version: '0.005'
   Net::Async::Slack::Event::FileDeleted:
     file: lib/Net/Async/Slack/Event/FileDeleted.pm
-    version: '0.004'
+    version: '0.005'
   Net::Async::Slack::Event::FilePublic:
     file: lib/Net/Async/Slack/Event/FilePublic.pm
-    version: '0.004'
+    version: '0.005'
   Net::Async::Slack::Event::FileShared:
     file: lib/Net/Async/Slack/Event/FileShared.pm
-    version: '0.004'
+    version: '0.005'
   Net::Async::Slack::Event::FileUnshared:
     file: lib/Net/Async/Slack/Event/FileUnshared.pm
-    version: '0.004'
+    version: '0.005'
   Net::Async::Slack::Event::Goodbye:
     file: lib/Net/Async/Slack/Event/Goodbye.pm
-    version: '0.004'
+    version: '0.005'
   Net::Async::Slack::Event::GridMigrationFinished:
     file: lib/Net/Async/Slack/Event/GridMigrationFinished.pm
-    version: '0.004'
+    version: '0.005'
   Net::Async::Slack::Event::GridMigrationStarted:
     file: lib/Net/Async/Slack/Event/GridMigrationStarted.pm
-    version: '0.004'
+    version: '0.005'
   Net::Async::Slack::Event::GroupArchive:
     file: lib/Net/Async/Slack/Event/GroupArchive.pm
-    version: '0.004'
+    version: '0.005'
   Net::Async::Slack::Event::GroupClose:
     file: lib/Net/Async/Slack/Event/GroupClose.pm
-    version: '0.004'
+    version: '0.005'
   Net::Async::Slack::Event::GroupDeleted:
     file: lib/Net/Async/Slack/Event/GroupDeleted.pm
-    version: '0.004'
+    version: '0.005'
   Net::Async::Slack::Event::GroupHistoryChanged:
     file: lib/Net/Async/Slack/Event/GroupHistoryChanged.pm
-    version: '0.004'
+    version: '0.005'
   Net::Async::Slack::Event::GroupJoined:
     file: lib/Net/Async/Slack/Event/GroupJoined.pm
-    version: '0.004'
+    version: '0.005'
   Net::Async::Slack::Event::GroupLeft:
     file: lib/Net/Async/Slack/Event/GroupLeft.pm
-    version: '0.004'
+    version: '0.005'
   Net::Async::Slack::Event::GroupMarked:
     file: lib/Net/Async/Slack/Event/GroupMarked.pm
-    version: '0.004'
+    version: '0.005'
   Net::Async::Slack::Event::GroupOpen:
     file: lib/Net/Async/Slack/Event/GroupOpen.pm
-    version: '0.004'
+    version: '0.005'
   Net::Async::Slack::Event::GroupRename:
     file: lib/Net/Async/Slack/Event/GroupRename.pm
-    version: '0.004'
+    version: '0.005'
   Net::Async::Slack::Event::GroupUnarchive:
     file: lib/Net/Async/Slack/Event/GroupUnarchive.pm
-    version: '0.004'
+    version: '0.005'
   Net::Async::Slack::Event::Hello:
     file: lib/Net/Async/Slack/Event/Hello.pm
-    version: '0.004'
+    version: '0.005'
   Net::Async::Slack::Event::ImClose:
     file: lib/Net/Async/Slack/Event/ImClose.pm
-    version: '0.004'
+    version: '0.005'
   Net::Async::Slack::Event::ImCreated:
     file: lib/Net/Async/Slack/Event/ImCreated.pm
-    version: '0.004'
+    version: '0.005'
   Net::Async::Slack::Event::ImHistoryChanged:
     file: lib/Net/Async/Slack/Event/ImHistoryChanged.pm
-    version: '0.004'
+    version: '0.005'
   Net::Async::Slack::Event::ImMarked:
     file: lib/Net/Async/Slack/Event/ImMarked.pm
-    version: '0.004'
+    version: '0.005'
   Net::Async::Slack::Event::ImOpen:
     file: lib/Net/Async/Slack/Event/ImOpen.pm
-    version: '0.004'
+    version: '0.005'
   Net::Async::Slack::Event::LinkShared:
     file: lib/Net/Async/Slack/Event/LinkShared.pm
-    version: '0.004'
+    version: '0.005'
   Net::Async::Slack::Event::ManualPresenceChange:
     file: lib/Net/Async/Slack/Event/ManualPresenceChange.pm
-    version: '0.004'
+    version: '0.005'
   Net::Async::Slack::Event::MemberJoinedChannel:
     file: lib/Net/Async/Slack/Event/MemberJoinedChannel.pm
-    version: '0.004'
+    version: '0.005'
   Net::Async::Slack::Event::MemberLeftChannel:
     file: lib/Net/Async/Slack/Event/MemberLeftChannel.pm
-    version: '0.004'
+    version: '0.005'
   Net::Async::Slack::Event::Message:
     file: lib/Net/Async/Slack/Event/Message.pm
-    version: '0.004'
+    version: '0.005'
   Net::Async::Slack::Event::MessageAppHome:
     file: lib/Net/Async/Slack/Event/MessageAppHome.pm
-    version: '0.004'
+    version: '0.005'
   Net::Async::Slack::Event::MessageChannels:
     file: lib/Net/Async/Slack/Event/MessageChannels.pm
-    version: '0.004'
+    version: '0.005'
   Net::Async::Slack::Event::MessageGroups:
     file: lib/Net/Async/Slack/Event/MessageGroups.pm
-    version: '0.004'
+    version: '0.005'
   Net::Async::Slack::Event::MessageIm:
     file: lib/Net/Async/Slack/Event/MessageIm.pm
-    version: '0.004'
+    version: '0.005'
   Net::Async::Slack::Event::MessageMpim:
     file: lib/Net/Async/Slack/Event/MessageMpim.pm
-    version: '0.004'
+    version: '0.005'
   Net::Async::Slack::Event::PinAdded:
     file: lib/Net/Async/Slack/Event/PinAdded.pm
-    version: '0.004'
+    version: '0.005'
   Net::Async::Slack::Event::PinRemoved:
     file: lib/Net/Async/Slack/Event/PinRemoved.pm
-    version: '0.004'
+    version: '0.005'
   Net::Async::Slack::Event::PrefChange:
     file: lib/Net/Async/Slack/Event/PrefChange.pm
-    version: '0.004'
+    version: '0.005'
   Net::Async::Slack::Event::PresenceChange:
     file: lib/Net/Async/Slack/Event/PresenceChange.pm
-    version: '0.004'
+    version: '0.005'
   Net::Async::Slack::Event::PresenceQuery:
     file: lib/Net/Async/Slack/Event/PresenceQuery.pm
-    version: '0.004'
+    version: '0.005'
   Net::Async::Slack::Event::PresenceSub:
     file: lib/Net/Async/Slack/Event/PresenceSub.pm
-    version: '0.004'
+    version: '0.005'
   Net::Async::Slack::Event::ReactionAdded:
     file: lib/Net/Async/Slack/Event/ReactionAdded.pm
-    version: '0.004'
+    version: '0.005'
   Net::Async::Slack::Event::ReactionRemoved:
     file: lib/Net/Async/Slack/Event/ReactionRemoved.pm
-    version: '0.004'
+    version: '0.005'
   Net::Async::Slack::Event::ReconnectURL:
     file: lib/Net/Async/Slack/Event/ReconnectURL.pm
-    version: '0.004'
+    version: '0.005'
   Net::Async::Slack::Event::ResourcesAdded:
     file: lib/Net/Async/Slack/Event/ResourcesAdded.pm
-    version: '0.004'
+    version: '0.005'
   Net::Async::Slack::Event::ResourcesRemoved:
     file: lib/Net/Async/Slack/Event/ResourcesRemoved.pm
-    version: '0.004'
+    version: '0.005'
   Net::Async::Slack::Event::ScopeDenied:
     file: lib/Net/Async/Slack/Event/ScopeDenied.pm
-    version: '0.004'
+    version: '0.005'
   Net::Async::Slack::Event::ScopeGranted:
     file: lib/Net/Async/Slack/Event/ScopeGranted.pm
-    version: '0.004'
+    version: '0.005'
   Net::Async::Slack::Event::StarAdded:
     file: lib/Net/Async/Slack/Event/StarAdded.pm
-    version: '0.004'
+    version: '0.005'
   Net::Async::Slack::Event::StarRemoved:
     file: lib/Net/Async/Slack/Event/StarRemoved.pm
-    version: '0.004'
+    version: '0.005'
   Net::Async::Slack::Event::SubteamCreated:
     file: lib/Net/Async/Slack/Event/SubteamCreated.pm
-    version: '0.004'
+    version: '0.005'
   Net::Async::Slack::Event::SubteamMembersChanged:
     file: lib/Net/Async/Slack/Event/SubteamMembersChanged.pm
-    version: '0.004'
+    version: '0.005'
   Net::Async::Slack::Event::SubteamSelfAdded:
     file: lib/Net/Async/Slack/Event/SubteamSelfAdded.pm
-    version: '0.004'
+    version: '0.005'
   Net::Async::Slack::Event::SubteamSelfRemoved:
     file: lib/Net/Async/Slack/Event/SubteamSelfRemoved.pm
-    version: '0.004'
+    version: '0.005'
   Net::Async::Slack::Event::SubteamUpdated:
     file: lib/Net/Async/Slack/Event/SubteamUpdated.pm
-    version: '0.004'
+    version: '0.005'
   Net::Async::Slack::Event::TeamDomainChange:
     file: lib/Net/Async/Slack/Event/TeamDomainChange.pm
-    version: '0.004'
+    version: '0.005'
   Net::Async::Slack::Event::TeamJoin:
     file: lib/Net/Async/Slack/Event/TeamJoin.pm
-    version: '0.004'
+    version: '0.005'
   Net::Async::Slack::Event::TeamMigrationStarted:
     file: lib/Net/Async/Slack/Event/TeamMigrationStarted.pm
-    version: '0.004'
+    version: '0.005'
   Net::Async::Slack::Event::TeamPlanChange:
     file: lib/Net/Async/Slack/Event/TeamPlanChange.pm
-    version: '0.004'
+    version: '0.005'
   Net::Async::Slack::Event::TeamPrefChange:
     file: lib/Net/Async/Slack/Event/TeamPrefChange.pm
-    version: '0.004'
+    version: '0.005'
   Net::Async::Slack::Event::TeamProfileChange:
     file: lib/Net/Async/Slack/Event/TeamProfileChange.pm
-    version: '0.004'
+    version: '0.005'
   Net::Async::Slack::Event::TeamProfileDelete:
     file: lib/Net/Async/Slack/Event/TeamProfileDelete.pm
-    version: '0.004'
+    version: '0.005'
   Net::Async::Slack::Event::TeamProfileReorder:
     file: lib/Net/Async/Slack/Event/TeamProfileReorder.pm
-    version: '0.004'
+    version: '0.005'
   Net::Async::Slack::Event::TeamRename:
     file: lib/Net/Async/Slack/Event/TeamRename.pm
-    version: '0.004'
+    version: '0.005'
   Net::Async::Slack::Event::TokensRevoked:
     file: lib/Net/Async/Slack/Event/TokensRevoked.pm
-    version: '0.004'
+    version: '0.005'
   Net::Async::Slack::Event::URLVerification:
     file: lib/Net/Async/Slack/Event/URLVerification.pm
-    version: '0.004'
+    version: '0.005'
   Net::Async::Slack::Event::UserChange:
     file: lib/Net/Async/Slack/Event/UserChange.pm
-    version: '0.004'
+    version: '0.005'
   Net::Async::Slack::Event::UserResourceDenied:
     file: lib/Net/Async/Slack/Event/UserResourceDenied.pm
-    version: '0.004'
+    version: '0.005'
   Net::Async::Slack::Event::UserResourceGranted:
     file: lib/Net/Async/Slack/Event/UserResourceGranted.pm
-    version: '0.004'
+    version: '0.005'
   Net::Async::Slack::Event::UserResourceRemoved:
     file: lib/Net/Async/Slack/Event/UserResourceRemoved.pm
-    version: '0.004'
+    version: '0.005'
   Net::Async::Slack::Event::UserTyping:
     file: lib/Net/Async/Slack/Event/UserTyping.pm
-    version: '0.004'
+    version: '0.005'
   Net::Async::Slack::EventType:
     file: lib/Net/Async/Slack/EventType.pm
-    version: '0.004'
+    version: '0.005'
   Net::Async::Slack::Message:
     file: lib/Net/Async/Slack/Message.pm
-    version: '0.004'
+    version: '0.005'
   Net::Async::Slack::RTM:
     file: lib/Net/Async/Slack/RTM.pm
-    version: '0.004'
+    version: '0.005'
 requires:
   Adapter::Async: '0.019'
   Bytes::Random::Secure: '0.29'
@@ -340,9 +339,7 @@ requires:
   File::ShareDir: '1.102'
   Future: '0.34'
   HTTP::Request: '0'
-  IO::Async::Notifier: '0'
   IO::Async::SSL: '0.19'
-  IO::Async::Timer::Countdown: '0'
   JSON::MaybeXS: '1.003008'
   Log::Any: '1.050'
   Net::Async::HTTP: '0.41'
@@ -351,8 +348,6 @@ requires:
   Path::Tiny: '0.098'
   Ryu: '1.003'
   Ryu::Async: '0.015'
-  Ryu::Observable: '0'
-  Scalar::Util: '0'
   Syntax::Keyword::Try: '0.04'
   Time::Moment: '0.41'
   URI: '1.71'
@@ -361,20 +356,15 @@ requires:
   URI::wss: '0'
   curry: '1.000'
   indirect: '0'
-  mro: '0'
   namespace::clean: '0'
-  parent: '0'
-  strict: '0'
-  utf8: '0'
-  warnings: '0'
 resources:
   bugtracker: https://github.com/team-at-cpan/Net-Async-Slack/issues
   homepage: https://github.com/team-at-cpan/Net-Async-Slack
   repository: https://github.com/team-at-cpan/Net-Async-Slack.git
-version: '0.004'
+version: '0.005'
 x_authority: cpan:TEAM
 x_contributors:
   - 'tm604 <tom@perlsite.co.uk>'
-x_generated_by_perl: v5.30.2
+x_generated_by_perl: v5.32.0
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

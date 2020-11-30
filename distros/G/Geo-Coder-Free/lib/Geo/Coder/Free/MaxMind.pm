@@ -45,11 +45,11 @@ Geo::Coder::Free::MaxMind - Provides a geocoding functionality using the MaxMind
 
 =head1 VERSION
 
-Version 0.28
+Version 0.29
 
 =cut
 
-our $VERSION = '0.28';
+our $VERSION = '0.29';
 
 =head1 SYNOPSIS
 
@@ -81,6 +81,26 @@ gunzip cities.csv and run it through the db2sql script to create an SQLite file.
 Takes one optional parameter, directory,
 which tells the library where to find the files admin1db, admin2.db and cities.[sql|csv.gz].
 If that parameter isn't given, the module will attempt to find the databases, but that can't be guaranteed
+
+There are 3 levels to the Maxmind database.
+Here's the method to find the location of Sittingbourne, Kent, England:
+1) admin1.db contains admin areas such as counties, states and provinces
+   A typical line is:
+     US.MD	Maryland	Maryland	4361885
+   So a look up of 'Maryland' will get the concatenated code 'US.MD'
+   Note that GB has England, Scotland and Wales at this level, not the counties
+     GB.ENG	England	England	6269131
+   So a look up of England will give the concatenated code of GB.ENG for use in admin2.db
+2) admin2.db contains admin areas drilled down from the admin1 database such as US counties
+   Note that GB has counties
+   A typical line is:
+    GB.ENG.G5	Kent	Kent	3333158
+   So a look up of 'Kent' with a contacatenated code to start with 'GB.ENG' will code the region G5 for use in cities.sql
+3) cities.sql contains the latitude and longitude of the place we want, so a search for 'sittingbourne' in
+   region 'g5' will give
+     gb,sittingbourne,Sittingbourne,G5,41148,51.333333,.75
+
+The admin2.db is far from comprehensive, see Makefile.PL for some entries that are added manually.
 
 =cut
 
@@ -213,12 +233,13 @@ sub geocode {
 		# Carp::croak(__PACKAGE__, ' only supports towns, not full addresses');
 		return;
 	}
+	my $countrycode;
 	if($country) {
 		if(defined($country) && (($country eq 'UK') || ($country eq 'United Kingdom') || ($country eq 'England'))) {
 			$country = 'Great Britain';
 			$concatenated_codes = 'GB';
 		}
-		my $countrycode = country2code($country);
+		$countrycode = country2code($country);
 		# ::diag(__LINE__, ": country $countrycode, county $county, state $state, location $location");
 		# if($county && $countrycode) {
 			# ::diag(__LINE__, ": country $countrycode, county $county, location $location");
@@ -301,11 +322,11 @@ sub geocode {
 		# ::diag(__LINE__);
 		$region = $admin2cache{$state};
 	} else {
-		# ::diag(__LINE__);
+		# ::diag(__PACKAGE__, ': ', __LINE__);
 		if(defined($county) && ($county eq 'London')) {
 			@admin2s = $self->{'admin2'}->selectall_hash(asciiname => $location);
 		} elsif(defined($county)) {
-		# ::diag(__LINE__, ": $county");
+			# ::diag(__PACKAGE__, ': ', __LINE__, ": $county");
 			@admin2s = $self->{'admin2'}->selectall_hash(asciiname => $county);
 		}
 		# ::diag(__LINE__, Data::Dumper->new([\@admin2s])->Dump());
@@ -349,8 +370,13 @@ sub geocode {
 	if((scalar(@regions) == 0) && !defined($region)) {
 		# e.g. Unitary authorities in the UK
 		# admin[12].db columns are labelled ['concatenated_codes', 'name', 'asciiname', 'geonameId']
-		# ::diag(__LINE__, ": $location");
+		# ::diag(__PACKAGE__, ': ', __LINE__, ": $location");
 		@admin2s = $self->{'admin2'}->selectall_hash(asciiname => $location);
+		if((scalar(@admin2s) == 0) && ($country =~ /^(Canada|United States|USA|US)$/) && ($location !~ /\sCounty/i)) {
+			$location .= ' County';
+			# ::diag(__PACKAGE__, ': ', __LINE__, ": $location");
+			@admin2s = $self->{'admin2'}->selectall_hash(asciiname => $location);
+		}
 		if(scalar(@admin2s) && defined($admin2s[0]->{'concatenated_codes'})) {
 			foreach my $admin2(@admin2s) {
 				my $concat = $admin2->{'concatenated_codes'};
@@ -364,6 +390,7 @@ sub geocode {
 				}
 			}
 		} elsif(defined($county)) {
+			# ::diag(__PACKAGE__, ': ', __LINE__, ": county $county");
 			# e.g. states in the US
 			if(!defined($self->{'admin1'})) {
 				$self->{'admin1'} = Geo::Coder::Free::DB::MaxMind::admin1->new(no_entry => 1) or die "Can't open the admin1 database";
@@ -423,10 +450,15 @@ sub geocode {
 	if(my $c = $param{'region'}) {
 		$options->{'Country'} = lc($c);
 		$confidence = 0.1;
+	} elsif($countrycode) {
+		$options->{'Country'} = $countrycode;
+		$confidence = 0.1;
 	}
-	# ::diag(__LINE__, ': ', Data::Dumper->new([$options])->Dump());
+	# ::diag(__PACKAGE__, ': ', __LINE__, ': ', Data::Dumper->new([$options])->Dump());
 	# This case nonsense is because DBD::CSV changes the columns to lowercase, wherease DBD::SQLite does not
-	if(wantarray && !$region_only) {
+	# if(wantarray && (!$options->{'City'}) && !$region_only) {
+	if(0) {	# We don't need to find all the cities in a state, which is what this would do
+		# ::diag(__PACKAGE__, ': ', __LINE__);
 		my @rc = $self->{'cities'}->selectall_hash($options);
 		if(scalar(@rc) == 0) {
 			if((!defined($region)) && !defined($param{'region'})) {
@@ -434,11 +466,15 @@ sub geocode {
 				Carp::carp(__PACKAGE__, ": didn't determine region from $location");
 				return;
 			}
-			@rc = $self->{'cities'}->selectall_hash('Region' => ($region || $param{'region'}));
-			if(scalar(@rc) == 0) {
-	 			# ::diag(__LINE__, ': no matches: ', Data::Dumper->new([$options])->Dump());
-				return;
+			# This would return all of the cities in the wrong region
+			if($countrycode) {
+				@rc = $self->{'cities'}->selectall_hash('Region' => ($region || $param{'region'}), 'Country' => $countrycode);
+				if(scalar(@rc) == 0) {
+					# ::diag(__PACKAGE__, ': ', __LINE__, ': no matches: ', Data::Dumper->new([$options])->Dump());
+					return;
+				}
 			}
+			# ::diag(__LINE__, ': ', Data::Dumper->new([\@rc])->Dump());
 		}
 	 	# ::diag(__LINE__, ': ', Data::Dumper->new([\@rc])->Dump());
 		foreach my $city(@rc) {
@@ -494,7 +530,7 @@ sub geocode {
 
 		return @locations;
 	}
-	# ::diag(__LINE__, ': ', Data::Dumper->new([$options])->Dump());
+	# ::diag(__PACKAGE__, ': ', __LINE__, ': ', Data::Dumper->new([$options])->Dump());
 	my $city = $self->{'cities'}->fetchrow_hashref($options);
 	if(!defined($city)) {
 		# ::diag(__LINE__, ': ', scalar(@regions));

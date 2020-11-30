@@ -1,0 +1,336 @@
+=head1 NAME
+
+Config::MorePerl - Convenient and flexible config loader in perl format.
+
+=head1 SYNOPSIS
+
+myapp.conf
+
+    $db = {
+        host     => 'db.myproj.com',
+        driver   => 'Pg',
+        user     => 'ilya',
+        password => 'rumeev',
+    };
+
+    $home    = Path::Class::Dir->new('/home/myproj');
+    $var_dir = $home->subdir('var');
+    $log_dir = $var_dir->subdir('log'); $log_dir->mkpath(0, 0755);
+
+    $host ||= 'mysite.com';
+    $uri = URI->new("http://$host");
+    
+    #include "chat.conf"
+    ...
+
+chat.conf
+    
+    #namespace chat
+    $history_cnt = 10;
+    $tmp_dir = $NS::var_dir->subdir('chat');
+    $service_uri = URI->new( $NS::uri->as_string .'/chat' );
+    ...
+
+myapp.dev.conf
+
+    $dev = 1;
+    $db->{host} = 'dev.myproj.com';
+    $NS::chat::history_cnt += 5;
+    ...other differences
+    
+local.conf
+
+    $host = 'dev.mysite.com';
+    #include "myapp.conf"
+    #include "myapp.dev.conf";
+
+in application:
+
+    my $cfg = Config::MorePerl->process('myapp.conf');
+    print $cfg->{db}{user}; # ilya
+    print $cfg->{db}{host}; # db.myproj.com
+    print $cfg->{chat}{tmp_dir}; # Path::Class::Dir object (/home/myproj/var/chat)
+    print $cfg->{host}; # mysite.com
+    print $cfg->{uri}; # URI object http://mysite.com
+    print $cfg->{chat}{service_uri}; # URI object (http://mysite.com/chat)
+
+    $cfg = Config::MorePerl->process('local.conf', {hello => 'world'});
+    print $cfg->{db}{user}; # ilya
+    print $cfg->{db}{host}; # dev.myproj.com
+    print $cfg->{host}; # dev.mysite.com
+    print $cfg->{uri}; # URI object http://dev.mysite.com
+    print $cfg->{chat}{service_uri}; # URI object http://dev.mysite.com/chat
+    print $cfg->{chat}{history_cnt}; # 15
+    print $cfg->{hello}; # world
+
+=head1 DESCRIPTION
+
+This module provides you with powerful config system.
+
+It allows you to:
+
+=over
+
+=item
+
+Write variable definitions in perl language.
+You do not need to define a huge hash in config file - you just write separate variables.
+
+    $var = 'value';
+    $arr = [1..100];
+    
+These variables are accessible in config hash by name.
+
+    $cfg = Config::MorePerl->process(...);
+    say length @{$cfg->{arr}};
+
+=item
+
+Split your configs into separate files and include them.
+
+    #include "something.conf"
+    #include $filename . ".conf"
+    if ($something) {
+        #include "something.conf"
+    }
+
+=item
+
+Access variables between configs.
+
+    $myvar = $NS::var + 10; # access variable 'var' from root namespace
+
+=item
+
+Overwrite variables from another config file. Just change their values.
+    
+    $NS::var++;
+    
+If both destination and source are hashrefs, they are merged
+
+    $NS::somehash = {a => 1};
+    $NS::somehash = {key => $NS::somehash->{a}};
+    ...
+    exists $cfg->{somehash}{a}; # true
+    exists $cfg->{somehash}{key}; # true
+   
+
+=item
+
+Use namespaces.
+
+    #namespace jopa
+    $var = 10;
+    
+Everything under namespace jopa goes to $cfg->{jopa}{...}
+
+=back
+
+This is very useful for big projects where your config might grow over 100kb.
+
+=head1 CONFIG SYNTAX
+
+Syntax is quite simple - it's perl. Just define variable with desired names.
+
+$var_name = 'value';
+
+Values can be any that scalars can be: scalar, hashref, arrayref, subroute, etc.
+DO NOT write C<use strict> or you will be forced to define variables via C<our>
+which is ugly for config.
+
+If you define in myapp.conf (root config)
+
+    $welcome_msg = 'hello world';
+
+it will be accessible via
+
+    $cfg->{welcome_msg}
+
+Hashes acts as they are expected:
+
+    $msgs = {
+        welcome => 'hello world',
+        bye     => 'bye world',
+    };
+    ...
+
+    $cfg->{msgs}{bye};
+
+It is a good idea to reuse variables in config to allow real flexibility:
+
+    $var_dir = $home->subdir('var');
+    $log_dir = $var_dir->subdir('log');
+    $chat_log_dir = $log_dir->subdir('chat');
+    ...
+
+In contrast to:
+
+    $var_dir = 'var';
+    $log_dir = 'log';
+    $chat_log_dir = 'chat';
+
+or
+
+    $var_dir = 'var';
+    $log_dir = 'var/log';
+    $chat_log_dir = 'var/log/chat';
+    ...will grow :(
+
+The second and third examples are much less flexible.
+By means of second example we just hardcoded a part of config logic in our
+application: it supposes that C<var_dir> is UNDER C<home> and C<log_dir> is UNDER C<var_dir>, etc,
+which must not be an application's headache anyway. In third example we have a lot
+of copy-paste and application still supposes that C<var_dir> is under home.
+
+=head1 NAMESPACES
+
+Initial config file (that one which was passed to C<process> method) evaluated in root namespace. That means that all variables
+appears on the first level in C<$cfg> hash.
+
+If you define a namespace then everything in that namespace goes under namespace key in C<$cfg>.
+You can change namespaces as many times as you like. Every namespace definition doesn't depend on namespace it defined in, and
+starts a namespace from current file's root namespace (which is a real root namespace in initial file).
+
+initial.conf
+
+    $var = 10; # root namespace, $cfg->{var}
+    
+    #namespace ns1
+    $var = 20; # $cfg->{ns1}{var}
+
+    #namespace ns1::subns
+    $var = 20; # $cfg->{ns1}{subns}{var}
+    
+    #namespace ns2
+    $var = 30; # $cfg->{ns2}{var}
+    
+    {
+        #namespace ns3
+        $var = 40; # $cfg->{ns3}{var}
+    }
+    $var2 = 50; # $cfg->{ns2}{var2}, because the last namespace in scope (#namespace ns2) is still in effect
+    
+    #namespace
+    $var2 = 60; # $cfg->{var2}, because '#namespace' without a name reverts to the local root namespace
+
+When you include a file it inherits current namespace and it becomes that file's local root namespace. It means that all namespaces
+that file defines are added to it's local root namespace.
+
+initial.conf
+
+    #namespace abc
+    #include "my.conf"
+    
+my.conf
+
+    $var = 10; # $cfg->{abc}{var}
+    
+    #namespace def
+    $var = 20; # $cfg->{abc}{def}{var}
+    
+    #namespace xyz
+    $var = 30; # $cfg->{abc}{xyz}{var}
+    
+    #namespace
+    $str = 'asd'; # $cfg->{abc}{str}
+    
+    #namespace-abs hi
+    $str = 'ttt'; # $cfg->{hi}{str}
+    
+    #namespace-abs
+    $str = 'yyy'; # $cfg->{str}
+    
+As you can see, C<#namespace-abs> defines a namespace which always starts from a real root namespace regardless of what local
+root namespace is set to.
+
+Namespace name must be a literal string, variables and expressions are not supported.
+
+=head1 INCLUDE
+
+You can include another config file by saying
+
+    #include "path/to/file.conf"
+    
+As you could see in C<NAMESPACES> section, included file inherits current visible namespace as local root namespace. The path
+to config file can either be an absolute path, starting with '/' or path relative to including config file
+(not a current working dir!).
+
+You can use any perl-valid expression as a filename
+
+=head1 ACCESSING VARIABLES FROM OTHER CONFIG FILES
+
+To access variable C<var> which is in root namespace, use
+
+    $NS::var
+    
+To access variable C<var> which is in namespace C<xxx::yyy>, use
+
+    $NS::xxx::yyy::var
+    
+C<$NS> stands for NameSpace root.
+
+=head1 MERGING
+
+When you change some hash contents (for example from a file which is conditionally included), instead of writing
+
+    $NS::db->{host} = 'another.host.com';
+    $NS::db->{user} = 'another_user';
+    $NS::db->{password} = 'otherpass';
+    ...
+    
+You can write
+
+    $NS::db = {
+        host => 'another.host.com',
+        user => 'another_user',
+        password => 'otherpass',
+        ...
+    };
+
+All assigment operations in config files merge hashrefs if both left and right operands are hashrefs.
+Merge is done by L<Data::Recursive>'s C<merge> function with default flags, which does hash merging extremely fast.
+
+If you really need to completely overwrite an existing hashref with a new value, use list assigment operator, because merging
+is only done for OP_SASSIGN, not for OP_AASSIGN.
+
+    ($NS::db) = { ... };
+
+=head1 CLASS METHODS
+
+=head4 process ($file, \%initial_cfg)
+
+Processes config C<$file> and returns the result as a hashref.
+
+C<initial_cfg> is a set of predefined variables which will appear in root namespace just before processing config. You can predefine
+variables in an arbitrary namespace using keys ending with '::', for example:
+
+    Config::MorePerl->process($file, {
+        var => 'str',
+        'MyNS::' => { num => 10, 'SubNS::' => { array => [1,2,3] } },
+        'OtherNS::SubNS::' => { hash => {} },
+    });
+    
+    $cfg->{var};
+    $cfg->{MyNS}{num};
+    $cfg->{MyNS}{SubNS}{array};
+    $cfg->{OtherNS}{SubNS}{hash};
+
+=head1 PERFORMANCE
+
+    It takes about 7ms to process config tree with 30 files of summary size 220kb on Core i7 3930K.
+
+=head1 SEE ALSO
+
+This module deprecates L<Catalyst::Plugin::ConfigLoader::MultiState>
+
+=head1 AUTHOR
+
+Pronin Oleg <syber@cpan.org>
+
+Crazy Panda LTD
+
+=head1 LICENSE
+
+You may distribute this code under the same terms as Perl itself.
+
+=cut

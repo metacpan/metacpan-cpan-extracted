@@ -3,8 +3,8 @@ NAME
     data structures
 
 VERSION
-    This document describes version 0.004 of Log::ger::UseDataDumper (from
-    Perl distribution Log-ger-UseDataDumper), released on 2020-06-04.
+    This document describes version 0.005 of Log::ger::UseDataDumper (from
+    Perl distribution Log-ger-UseDataDumper), released on 2020-06-06.
 
 SYNOPSIS
      use Log::ger::UseDataDumper;
@@ -47,9 +47,25 @@ SEE ALSO
 
     Data::Dumper
 
-    Other modules to set data dumper for Log::ger: Log::ger::UseDataDump,
-    Log::ger::UseDataDumpColor, Log::ger::UseDataDumpObjectAsString,
-    Log::ger::UseDataDumpOptions, Log::ger::UseDataPrinter.
+    Other modules to set data dumper for Log::ger:
+
+    *   Log::ger::UseBaheForDump
+
+    *   Log::ger::UseDataDump
+
+    *   Log::ger::UseDataDumpColor
+
+    *   Log::ger::UseDataDumpObjectAsString
+
+    *   Log::ger::UseDataDumpOptions
+
+    *   Log::ger::UseDataDumperCompact
+
+    *   Log::ger::UseDataPrinter
+
+    *   Log::ger::UseJSONForDump
+
+    *   Log::ger::UseYAMLForDump
 
 AUTHOR
     perlancar <perlancar@cpan.org>

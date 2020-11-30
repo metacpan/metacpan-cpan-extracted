@@ -1,5 +1,14 @@
 Revision history for Term-VTerm
 
+0.06    2020-11-25
+        [CHANGES]
+         * Fixes for libvterm release 0.1:
+            + VTermStringFragment API shape
+         * Parser OSC and DCS callbacks now pass command and string arguments
+
+        [BUGFIXES]
+         * Remember to PUSHMARK() before invoking all callback SVs
+
 0.05    2019-08-16 21:28:11
         [CHANGES]
          * Add helpers for Devel::MAT::Dumper

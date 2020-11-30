@@ -8,6 +8,7 @@ lib/StreamFinder/Castbox.pm
 lib/StreamFinder/IHeartRadio.pm
 lib/StreamFinder/RadioNet.pm
 lib/StreamFinder/Reciva.pm
+lib/StreamFinder/Rumble.pm
 lib/StreamFinder/SermonAudio.pm
 lib/StreamFinder/Spreaker.pm
 lib/StreamFinder/Tunein.pm

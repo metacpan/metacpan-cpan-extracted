@@ -30,7 +30,7 @@ WriteMakefile(
     },
     PREREQ_PM         => {
         'Gtk3'              => 0,
-        'Gtk3::WebKit2'     => 0.011,
+        'Gtk3::WebKit2'     => 0.013,
         Glib                => 0,
         Moose               => 0,
         'Time::HiRes'       => 0,

@@ -6,9 +6,9 @@ our $AUTHORITY = 'cpan:GENE';
 use strict;
 use warnings;
 
-our $VERSION = '0.0605';
+our $VERSION = '0.0606';
 
-use MIDI::Simple;
+use MIDI::Simple ();
 
 use Exporter 'import';
 
@@ -291,7 +291,7 @@ MIDI::Praxis::Variation - Variation techniques used in music composition
 
 =head1 VERSION
 
-version 0.0605
+version 0.0606
 
 =head1 SYNOPSIS
 

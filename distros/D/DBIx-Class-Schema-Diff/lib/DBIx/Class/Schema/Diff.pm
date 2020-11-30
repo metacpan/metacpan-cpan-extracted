@@ -4,7 +4,7 @@ use warnings;
 
 # ABSTRACT: Simple Diffing of DBIC Schemas
 
-our $VERSION = '1.07';
+our $VERSION = 1.11;
 
 use Moo;
 with 'DBIx::Class::Schema::Diff::Role::Common';
@@ -13,11 +13,19 @@ use Types::Standard qw(:all);
 use Module::Runtime;
 use Try::Tiny;
 use List::Util;
-use Hash::Layout;
+use Hash::Layout 2.00;
 use Array::Diff;
+use Data::Dumper;
 
 use DBIx::Class::Schema::Diff::Schema;
 use DBIx::Class::Schema::Diff::Filter;
+use DBIx::Class::Schema::Diff::State;
+
+sub state {
+  shift if ($_[0] && (try{ $_[0]->isa(__PACKAGE__) } || $_[0] eq __PACKAGE__));
+  DBIx::Class::Schema::Diff::State->new(@_)
+}
+
 
 has '_schema_diff', required => 1, is => 'ro', isa => InstanceOf[
   'DBIx::Class::Schema::Diff::Schema'
@@ -84,6 +92,11 @@ sub filter {
     }
   }
   
+  return $self->chain_new($diff)
+}
+
+sub chain_new {
+  my ($self, $diff) = @_;
   return __PACKAGE__->new({
     _schema_diff => $self->_schema_diff,
     diff         => $diff
@@ -100,6 +113,16 @@ sub filter_out {
 
 sub _coerce_filter_args {
   my ($self,@args) = @_;
+  
+  # This is the cleanest solution for wildcards to match as expected, not requiring the
+  # user to append a trailing '*' since they don't have to when doing an exact match
+  @args = map {
+    my ($one,$two) = ($_ && ! ref($_)) ? split (/\:/,$_,2) : ();
+    (
+      $one && $two && $one ne '*' && ($one =~ /\*/)
+      && ($two eq 'columns' || $two eq 'relationships' || $two eq 'constraints')
+    ) ? $_.'*' : $_
+  } @args;
   
   my $params = (
     scalar(@args) > 1
@@ -118,6 +141,30 @@ sub _coerce_filter_args {
     %$params,
     match => $self->MatchLayout->coerce($params->{match})
   };
+}
+
+
+
+sub fingerprint {
+  my $self = shift;
+  my $sum = Digest::SHA1->new->add( $self->_string_for_signature )->hexdigest;
+  join('-', 'diffsum', substr($sum,0,15) )
+}
+
+
+# So far this is the only thing I could find to produce a consistent string value across all
+# Travis tested perls (5.10,5.12,5.14,5.16,5.18,5.20,5.22,5.24,5.26)
+sub _string_for_signature {
+  my $self = shift;
+  
+  local $Data::Dumper::Maxdepth = 0;
+  Data::Dumper->new([ $self->diff ])
+   ->Purity(0)
+   ->Terse(1)
+   ->Indent(0)
+   ->Useqq(1)
+   ->Sortkeys(1)
+   ->Dump()
 }
 
 
@@ -160,6 +207,9 @@ DBIx::Class::Schema::Diff - Identify differences between two DBIx::Class schemas
    old_schema => '/tmp/my_schema1_data.json',
    new_schema => 'My::Schema1'
  );
+ 
+ # Git a checksum/fingerprint of the diff data:
+ my $checksum = $D->fingerprint;
  
 
 Filtering the diff:
@@ -359,6 +409,10 @@ Works like C<filter()> but the arguments exclude differences rather than restric
 
 See L<FILTERING|DBIx::Class::Schema::Diff#FILTERING> for filter argument syntax.
 
+=head2 fingerprint
+
+Returns a SHA1 checksum (as a 15 character string) of the diff data.
+
 =head1 FILTERING
 
 The L<filter|DBIx::Class::Schema::Diff#filter> (and inverse 
@@ -519,9 +573,8 @@ to some of these concepts.
 
 =item *
 
-Filter string arguments are I<NOT> glob patterns, so you can't do things like C<'Arti*'> to match
-sub-strings (this may be a worthwhile feature to add in a later version). The wildcard C<*> applies
-to whole items only.
+As of version 1.1 filter string arguments I<are> glob patterns, so you can also do things like 
+C<'Arti*'> to match sub-strings. See the unit tests for examples.
 
 =item *
 

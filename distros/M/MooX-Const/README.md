@@ -4,7 +4,7 @@ MooX::Const - Syntactic sugar for constant and write-once Moo attributes
 
 # VERSION
 
-version v0.4.4
+version v0.4.5
 
 # SYNOPSIS
 
@@ -92,6 +92,11 @@ This module appears to work with [Moose](https://metacpan.org/pod/Moose), and th
 test suite.
 
 It does not work with [Mouse](https://metacpan.org/pod/Mouse). Pull requests are welcome.
+
+## Write-Once Attributes
+
+[Class::Accessor](https://metacpan.org/pod/Class::Accessor) antlers/moose-like mode uses "wo" for write-only
+attributes, not write-once attributes.
 
 # SEE ALSO
 

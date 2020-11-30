@@ -36,7 +36,7 @@ protected:
         if (!_scheme.length()) {
             if (_host.length()) URI::scheme(TYPE1::default_scheme());
         }
-        else if (!scheme_info || (scheme_info->type_info != &typeid(TYPE1) && scheme_info->type_info != &typeid(TYPE2))) {
+        else if (!scheme_info || (*(scheme_info->type_info) != typeid(TYPE1) && *(scheme_info->type_info) != typeid(TYPE2))) {
             throw WrongScheme("URI: wrong scheme '" + _scheme + "' for " + typeid(TYPE1).name());
         }
     }

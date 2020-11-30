@@ -6,9 +6,9 @@ TEST("modules") {
     SECTION("single") {
         auto mod = new Module("mymod");
         CHECK(mod->name == "mymod");
-        set_level(DEBUG, "mymod");
+        set_level(Level::Debug, "mymod");
         delete mod;
-        CHECK_THROWS(set_level(DEBUG, "mymod"));
+        CHECK_THROWS(set_level(Level::Debug, "mymod"));
     }
     SECTION("with submodule") {
         auto mod = new Module("mymod");
@@ -20,8 +20,8 @@ TEST("modules") {
         delete mod;
         CHECK(smod.parent == nullptr); // became a root module
         CHECK(smod.name == "mymod::sub"); // name didn't change
-        CHECK_THROWS(set_level(DEBUG, "mymod"));
-        set_level(DEBUG, "mymod::sub"); // submodule still can be used
+        CHECK_THROWS(set_level(Level::Debug, "mymod"));
+        set_level(Level::Debug, "mymod::sub"); // submodule still can be used
     }
 }
 
@@ -29,7 +29,7 @@ TEST("logging to module") {
     Ctx c;
     static Module mod("mymod1");
     CHECK(mod.name == "mymod1");
-    mod.level = DEBUG;
+    mod.level = Level::Debug;
 
     panda_log_verbose_debug("hi");
     CHECK(c.cnt == 0);
@@ -49,7 +49,7 @@ TEST("logging to module") {
     c.check_called();
     CHECK(c.info.module == &mod);
 
-    mod.level = NOTICE;
+    mod.level = Level::Notice;
 
     panda_log_debug("hi");
     CHECK(c.cnt == 0);
@@ -61,38 +61,38 @@ TEST("set level for module") {
     Ctx c;
     static Module mod("mymod2");
     static Module submod("submod2", &mod);
-    mod.level = WARNING;
-    submod.level = WARNING;
+    mod.level = Level::Warning;
+    submod.level = Level::Warning;
 
     SECTION("parent affects all children") {
-        panda_log_module.set_level(INFO);
-        CHECK(panda_log_module.level == INFO);
-        CHECK(mod.level == INFO);
-        CHECK(submod.level == INFO);
+        panda_log_module.set_level(Level::Info);
+        CHECK(panda_log_module.level == Level::Info);
+        CHECK(mod.level == Level::Info);
+        CHECK(submod.level == Level::Info);
 
         //this is the same
-        set_level(NOTICE);
-        CHECK(panda_log_module.level == NOTICE);
-        CHECK(mod.level == NOTICE);
-        CHECK(submod.level == NOTICE);
+        set_level(Level::Notice);
+        CHECK(panda_log_module.level == Level::Notice);
+        CHECK(mod.level == Level::Notice);
+        CHECK(submod.level == Level::Notice);
     }
 
     SECTION("children do not affect parents") {
-        mod.set_level(DEBUG);
-        CHECK(panda_log_module.level == WARNING);
-        CHECK(mod.level == DEBUG);
-        CHECK(submod.level == DEBUG);
+        mod.set_level(Level::Debug);
+        CHECK(panda_log_module.level == Level::Warning);
+        CHECK(mod.level == Level::Debug);
+        CHECK(submod.level == Level::Debug);
     }
 
     SECTION("setting via module's name") {
-        set_level(ERROR, "mymod2");
-        CHECK(panda_log_module.level == WARNING);
-        CHECK(mod.level == ERROR);
-        CHECK(submod.level == ERROR);
-        set_level(CRITICAL, "mymod2::submod2");
-        CHECK(panda_log_module.level == WARNING);
-        CHECK(mod.level == ERROR);
-        CHECK(submod.level == CRITICAL);
+        set_level(Level::Error, "mymod2");
+        CHECK(panda_log_module.level == Level::Warning);
+        CHECK(mod.level == Level::Error);
+        CHECK(submod.level == Level::Error);
+        set_level(Level::Critical, "mymod2::submod2");
+        CHECK(panda_log_module.level == Level::Warning);
+        CHECK(mod.level == Level::Error);
+        CHECK(submod.level == Level::Critical);
     }
 }
 
@@ -101,18 +101,18 @@ TEST("secondary root module") {
     static Module rmod("rmod", nullptr);
     static Module rsmod("rsmod", &rmod);
     CHECK(rmod.parent == nullptr);
-    rmod.level = INFO;
-    rsmod.level = INFO;
+    rmod.level = Level::Info;
+    rsmod.level = Level::Info;
 
-    set_level(DEBUG);
-    CHECK(panda_log_module.level == DEBUG);
-    CHECK(rmod.level == INFO);
-    CHECK(rsmod.level == INFO);
+    set_level(Level::Debug);
+    CHECK(panda_log_module.level == Level::Debug);
+    CHECK(rmod.level == Level::Info);
+    CHECK(rsmod.level == Level::Info);
 
-    rmod.set_level(WARNING);
-    CHECK(panda_log_module.level == DEBUG);
-    CHECK(rmod.level == WARNING);
-    CHECK(rsmod.level == WARNING);
+    rmod.set_level(Level::Warning);
+    CHECK(panda_log_module.level == Level::Debug);
+    CHECK(rmod.level == Level::Warning);
+    CHECK(rsmod.level == Level::Warning);
 }
 
 TEST("logging by scopes") {

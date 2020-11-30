@@ -1,5 +1,20 @@
 Revision history for Time-Zone-Olson
 
+0.36   Fri Nov 27 20:51:00 2020
+       Fixed tests to allow for old WinXP environments and Unix environments where there is no default timezone
+
+0.35   Wed Nov 25 20:20:00 2020
+       Fixed tests to correctly identify platforms without transition times
+
+0.34   Tue Nov 24 06:43:00 2020
+       Add Yukon Standard Time to Win32 exceptions and allow UTC and GMT in Win32 comments
+
+0.33   Mon Nov 23 21:31:00 2020
+       Allow Solaris to not make Hobart and Melbourne equivalent
+
+0.32   Sun Nov 22 21:24:00 2020
+       Fixing bug with ttisgmtcnt in tz parsing
+
 0.31   Thu Dec 05 19:26:00 2019
        Allowing older perls to have alternatives for modern unpack capabilities.
 

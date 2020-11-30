@@ -10,32 +10,41 @@ target_include_directories(panda-lib PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src>
     $<INSTALL_INTERFACE:include>
 )
+
 target_compile_features(panda-lib PUBLIC cxx_std_14)
+add_library(panda::panda-lib ALIAS panda-lib)
 
 if (UNIX)
-    #check for execinfo for Backtrace
+    # needed for *bsd
+    set(CMAKE_REQUIRED_INCLUDES "/usr/local/include" "/usr/include")
     include(CheckIncludeFileCXX)
     CHECK_INCLUDE_FILE_CXX(execinfo.h execinfo_header)
     CHECK_INCLUDE_FILE_CXX(libunwind.h libunwind_header)
     find_library(execinfo_lib execinfo)
-    find_library(libunwind_lib libunwind)
+    find_library(libunwind_lib unwind)
     #  OR ((NOT execinfo_lib) AND (NOT libunwind_lib))
     if(((NOT execinfo_header) AND (NOT libunwind_header)))
         message(FATAL_ERROR "execinfo.h nor libunwind.h not found")
     endif()
     if (execinfo_header)
         target_compile_definitions(panda-lib PRIVATE "PANDA_HAS_EXECINFO")
-        message(STATUS ${exe_exists})
-        target_link_libraries(panda-lib PUBLIC execinfo)
+        message(STATUS "PANDA_HAS_EXECINFO")
+        if (execinfo_lib)
+            list(APPEND panda-lib-libraries execinfo)
+        endif()
     endif()
     if (libunwind_header)
         target_compile_definitions(panda-lib PRIVATE "PANDA_HAS_LIBUNWIND")
-        message(STATUS ${exe_exists})
-        target_link_libraries(panda-lib PUBLIC unwind)
+        message(STATUS "PANDA_HAS_LIBUNWIND")
+        if (libunwind_lib)
+            list(APPEND panda-lib-libraries unwind)
+        endif()
     endif()
 else()
-    target_link_libraries(panda-lib PUBLIC dbgeng ole32)
+    list(APPEND panda-lib-libraries dbgeng ole32)
 endif()
+
+target_link_libraries(panda-lib PUBLIC ${panda-lib-libraries})
 
 ########################tests#######################################
 file(GLOB_RECURSE testSource RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} "t/*.cc")
@@ -61,7 +70,9 @@ install(TARGETS panda-lib EXPORT panda-libTargets
 )
 
 install(EXPORT panda-libTargets
-    FILE panda-libConfig.cmake
+    FILE panda-libTargets.cmake
     NAMESPACE panda::
     DESTINATION lib/cmake/panda-lib
 )
+
+install(FILES panda-libConfig.cmake DESTINATION lib/cmake/panda-lib)

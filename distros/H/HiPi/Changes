@@ -1,3 +1,8 @@
+Version 0.85  - 28 November 2020
+                Recognise Pi 400
+                HiPi::Interface::Seesaw added for Adafruit ATSAMD09 breakout
+                64-bit debian package provided
+
 Version 0.84  - 20 June 2020
                 Fix test suite failure on non Linux systems ( for CPAN )
 

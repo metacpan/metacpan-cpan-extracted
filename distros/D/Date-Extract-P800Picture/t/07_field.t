@@ -1,6 +1,10 @@
+use strict;
+use warnings;
+use utf8;
+
 use Test::More;
 
-%preserved_field_data = (
+my %preserved_field_data = (
     '4BC90027.jpg' => '2004-12-13T09:00:00',
     '413A0048.jpg' => '2004-02-04T10:00:00',
     '4A5A0031.jpg' => '2004-11-06T10:00:00',
@@ -550,7 +554,7 @@ use Test::More;
     '414B0071.jpg' => '2004-02-05T11:00:00',
 );
 
-%shifted_field_data = (
+my %shifted_field_data = (
     '358E0093.jpg' => '2003-06-09T15:00:00',
     '35ND0008.jpg' => '2003-06-24T14:00:00',
     '37MD0001.jpg' => '2003-08-23T14:00:00',

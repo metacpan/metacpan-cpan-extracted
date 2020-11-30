@@ -68,7 +68,7 @@
          "web" : "https://github.com/ology/MIDI-Chord-Guitar"
       }
    },
-   "version" : "0.0304",
+   "version" : "0.0400",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.030002"

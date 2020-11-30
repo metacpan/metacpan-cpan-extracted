@@ -15,14 +15,14 @@ my %WriteMakefileArgs = (
     "ExtUtils::MakeMaker" => 0
   },
   "DISTNAME" => "PDF-API2-XS",
-  "LICENSE" => "lgpl",
+  "LICENSE" => "perl",
   "MIN_PERL_VERSION" => "5.010000",
   "NAME" => "PDF::API2::XS",
   "PREREQ_PM" => {},
   "TEST_REQUIRES" => {
     "PDF::API2" => 0
   },
-  "VERSION" => "1.001",
+  "VERSION" => "1.002",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -30,7 +30,7 @@ my %WriteMakefileArgs = (
 
 %WriteMakefileArgs = (
     %WriteMakefileArgs,
-    CCFLAGS => '-Wall -std=c99',
+    CCFLAGS => '-Wall -std=c99 -Doff64_t=__off64_t',
     XSMULTI => 1,
 );
 

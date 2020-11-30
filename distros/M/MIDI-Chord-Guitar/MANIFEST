@@ -10,6 +10,7 @@ README.md
 dist.ini
 eg/autumn-leaves
 eg/travis-pick
+eg/unchained-melody
 eg/voicing-stat
 lib/MIDI/Chord/Guitar.pm
 share/midi-guitar-chord-voicings.csv

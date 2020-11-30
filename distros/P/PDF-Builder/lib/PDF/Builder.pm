@@ -5,8 +5,8 @@ no warnings qw[ deprecated recursion uninitialized ];
 
 # $VERSION defined here so developers can run PDF::Builder from git.
 # it should be automatically updated as part of the CPAN build.
-our $VERSION = '3.019'; # VERSION
-my $LAST_UPDATE = '3.017'; # manually update whenever code is changed
+our $VERSION = '3.020'; # VERSION
+my $LAST_UPDATE = '3.020'; # manually update whenever code is changed
 
 use Carp;
 use Encode qw(:all);
@@ -171,17 +171,21 @@ This is free software, licensed under:
 The GNU Lesser General Public License (LGPL) Version 2.1, February 1999
 
   (The master copy of this license lives on the GNU website.)
+  (A copy is provided in the INFO/LICENSE file for your convenience.)
 
-Copyright (C) 1991, 1999 Free Software Foundation, Inc. 59
-51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
-
-I<Please see the> INFO/LICENSE I<file in the distribution root for full
-details.>
+This section of Builder.pm is intended only as a very brief summary 
+of the license; please consider INFO/LICENSE to be the controlling version, 
+if there is any conflict or ambiguity between the two.
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU Lesser General Public License, as published by the Free
 Software Foundation, either version 2.1 of the License, or (at your option) any
-later version.
+later version of this license.
+
+NOTE: there are several files in this distribution which were incorporated from
+outside sources and carry different licenses. If a file states that it is under 
+a license different than LGPL 2.1, that license and its terms will apply to 
+that file, and not LGPL 2.1.
 
 This library is distributed in the hope that it will be useful, but WITHOUT ANY
 WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
@@ -226,6 +230,13 @@ The '-msgver' option value of 1 (default) gives a warning message if the
 '-outver' PDF level has to be bumped up due to either a higher PDF level file 
 being read in, or a higher level feature was requested. A value of 0 
 suppresses the warning message.
+
+=item -diaglevel
+
+The '-diaglevel' option can be
+given to specify the level of diagnostics given by IntegrityCheck(). The
+default is level 2 (errors and warnings). 
+See L<PDF::Builder::Docs/IntegrityCheck> for more information.
 
 =back
 
@@ -281,6 +292,17 @@ sub new {
       # code should also allow integers 0 (= 'none') and >0 (= 'flate') 
       # for compatibility with old usage where forcecompress is directly set. 
     }
+    if (exists $options{'-diaglevel'}) {
+	my $diaglevel = $options{'-diaglevel'};
+	if ($diaglevel < 0 || $diaglevel > 5) {
+	    print "-diaglevel must be in range 0-5. using 2\n";
+	    $diaglevel = 2;
+	}
+	$self->{'diaglevel'} = $diaglevel;
+    } else {
+	$self->{'diaglevel'} = 2; # default: errors and warnings
+    }
+
     $self->preferences(%options);
     if (defined $options{'-outver'}) {
         if ($options{'-outver'} >= 1.4) {
@@ -449,8 +471,6 @@ B<Example:>
 
 =cut
 
-# Note: openScalar() renamed to open_scalar()
-
 sub open_scalar {
     my ($class, $content, %options) = @_;
 
@@ -461,6 +481,39 @@ sub open_scalar {
     }
 
     $self->{'content_ref'} = \$content;
+    my $diaglevel = 2;
+    if (defined $self->{'diaglevel'}) { $diaglevel = $self->{'diaglevel'}; }
+    if ($diaglevel < 0 || $diaglevel > 5) { $diaglevel = 2; }
+    my $newVer = $self->IntegrityCheck($diaglevel, $content);
+    # if Version override defined in PDF, need to overwrite the %PDF-x.y
+    # statement with the new (if higher) value. it's too late to wait until
+    # after File->open, as it's already complained about some >1.4 features.
+    if (defined $newVer) {
+	my ($verStr, $currentVer, $pos);
+	$pos = index $content, "%PDF-";
+	if ($pos < 0) { die "no PDF version found in PDF input!\n"; }
+	# assume major and minor PDF version numbers max 2 digits each for now
+	# (are 1 or 2 and 0-7 at this writing)
+	$verStr = substr($content, $pos, 10);
+	if ($verStr =~ m#^%PDF-(\d+)\.(\d+)#) {
+	    $currentVer = "$1.$2";
+	} else {
+	    die "unable to get PDF input's version number.\n";
+        }
+        if ($newVer > $currentVer) {
+	    if (length($newVer) > length($currentVer)) {
+		print STDERR "Unable to update 'content' version because override '$newVer' is longer than header version '$currentVer'.\nYou may receive warnings about features that bump up the PDF level.\n";
+	    } else {
+		if (length($newVer) < length($currentVer)) {
+		    # unlikely, but cover all the bases
+		    $newVer = substr($newVer, 0, length($currentVer));
+		} 
+	        substr($content, $pos+5, length($newVer)) = $newVer;
+		$outVer = $newVer;
+            }
+	}
+    }
+
     my $fh;
     CORE::open($fh, '+<', \$content) or die "Can't begin scalar IO";
 
@@ -489,6 +542,14 @@ sub open_scalar {
       $self->{'forcecompress'} = 'flate';
       # code should also allow integers 0 (= 'none') and >0 (= 'flate') 
       # for compatibility with old usage where forcecompress is directly set. 
+    }
+    if (exists $options{'-diaglevel'}) {
+      $self->{'diaglevel'} = $options{'-diaglevel'};
+      if ($self->{'diaglevel'} < 0 || $self->{'diaglevel'} > 5) {
+	$self->{'diaglevel'} = 2;
+      }
+    } else {
+      $self->{'diaglevel'} = 2;
     }
     $self->{'fonts'} = {};
     $self->{'infoMeta'} = [qw(Author CreationDate ModDate Creator Producer Title Subject Keywords)];
@@ -1453,6 +1514,8 @@ sub importPageIntoForm {
 
 =item $page = $pdf->import_page($source_pdf, $source_page_number, $target_page_number)
 
+=item $page = $pdf->import_page($source_pdf, $source_page_number, $target_page_object)
+
 Imports a page from $source_pdf and adds it to the specified position
 in $pdf.
 
@@ -2118,11 +2181,7 @@ sub image_tiff {
     my ($self, $file, %opts) = @_;
 
     my ($rc, $obj);
-    $rc = eval {
-        require Graphics::TIFF;
-	1;
-    };
-    if (!defined $rc) { $rc = 0; }  # else is 1
+    $rc = $self->LA_GT();
     if ($rc) {
 	# Graphics::TIFF available
 	if (defined $opts{'-nouseGT'} && $opts{'-nouseGT'} == 1) {
@@ -2141,7 +2200,7 @@ sub image_tiff {
         $self->{'pdf'}->out_obj($self->{'pages'});
 
 	if ($rc == 0 && $MSG_COUNT[0]++ == 0) {
-	    # TBD give warning message once, unless silenced (-silent) or
+	    # give warning message once, unless silenced (-silent) or
 	    # deliberately not using Graphics::TIFF (rc == -1)
 	    if (!defined $opts{'-silent'} || $opts{'-silent'} == 0) {
 	        print STDERR "Your system does not have Graphics::TIFF installed, so some\nTIFF functions may not run correctly.\n";
@@ -2230,11 +2289,7 @@ sub image_png {
     my ($self, $file, %opts) = @_;
 
     my ($rc, $obj);
-    $rc = eval {
-        require Image::PNG::Libpng;
-        1;
-    };
-    if (!defined $rc) { $rc = 0; }  # else is 1
+    $rc = $self->LA_IPL();
     if ($rc) {
         # Image::PNG::Libpng available
         if (defined $opts{'-nouseIPL'} && $opts{'-nouseIPL'} == 1) {
@@ -2253,7 +2308,7 @@ sub image_png {
         $self->{'pdf'}->out_obj($self->{'pages'});
 
         if ($rc == 0 && $MSG_COUNT[1]++ == 0) {
-            # TBD give warning message once, unless silenced (-silent) or
+            # give warning message once, unless silenced (-silent) or
             # deliberately not using Image::PNG::Libpng (rc == -1)
             if (!defined $opts{'-silent'} || $opts{'-silent'} == 0) {
                 print STDERR "Your system does not have Image::PNG::Libpng installed, so some\nPNG functions may not run correctly.\n";
@@ -2688,6 +2743,307 @@ sub named_destination {
 
     return $obj;
 } # end of named_destination()
+
+# ==================================================
+# input: level of checking, PDF as a string
+#   level: 0 just return with any version override
+#          1 return version override, and errors
+#          2 return version override, and errors and warnings
+#          3 return version override, plus errors, warnings, notes
+#          4 like (3), plus dump analysis data
+#          5 like (4), plus dump $self (PDF) contents
+# returns any /Version value found in Catalog, last one if multiple ones found,
+#   else undefined
+
+sub IntegrityCheck {
+    my ($self, $level, $string) = @_;
+
+    my $level_nodiag   = 0;
+    my $level_error    = 1;
+    my $level_warning  = 2;
+    my $level_note     = 3;
+    my $level_dump     = 4;
+    my $level_dumpself = 5;
+
+    my $IC = "PDF Integrity Check:";
+
+   #print "$IC level $level\n" if $level >= $level_error;
+    my $Version = undef;
+    my ($Info, $Root, $str, $pos, $Parent, @Kids, @others);
+
+    my $idx_defined  = 0;  # has this object been explicitly defined?
+    my $idx_refcount = 1;  # count of all pointing to this obj except as Kid
+    my $idx_par_clmd = 2;  # other object claiming this object as Kid
+    my $idx_parent   = 3;  # this object's /Parent entry
+    my $idx_kid_cnt  = 4;  # size of kid_list
+    my $idx_kid_list = 5;  # this object's /Kids list
+    # intialize each element to [ 0 0 -1 -1 -1 [] ]
+
+    return $Version if !length($string);  # nothing to examine?
+    # even if $level 0, still want to get any higher /Version
+    # build analysis data and issue errors/warnings at appropriate $level
+    my @major = split /%%EOF/, $string; # typically [0] entire PDF [1] empty
+    my %objList;
+    my $update = -1;
+    foreach (@major) {
+	# update section number 0, 1, 2... with %%EOF in-between
+	$update++;
+	next if !length($_);
+
+	# split on "endobj"
+	my @rawObjects = split /endobj/, $_;
+	# each element contains an object plus leading stuff, not incl endobj
+	
+	foreach my $rawObject (@rawObjects) {
+	    next if !length($rawObject);
+
+	    # remove bulky and unwanted stream...endstream
+	    if ($rawObject =~ m/^(.*)stream\s.*\sendstream(.*)$/s) {
+	        $rawObject = $1.$2;
+	    }
+            
+            # trim off anything before obj clause. endobj already gone.
+	    if ($rawObject =~ m/^(.*?)\s?(\d+) (\d+) obj\s(.*)$/s ||
+	        $rawObject =~ m/^(.*?)\s?(\d+) (\d+) obj(.*)$/s) {
+		$rawObject = $4;
+
+		# found an obj, full string is $rawObject. parse into
+		# selected fields, build $objList{key} entry.
+		my $objKey = "$2.$3";  # e.g., 4 0 obj -> 4.0
+		# if this is a replacement object in an update, clear Parent
+		# and Kids
+		if (defined $objList{$objKey} && $update > 0) {
+		    $objList{$objKey}->[$idx_parent]   = -1;
+		    $objList{$objKey}->[$idx_kid_cnt]  = -1;
+		    $objList{$objKey}->[$idx_kid_list] = [];
+		}
+		# might have already created this object element as target 
+		#  from another object 
+		if (!defined $objList{$objKey}) {
+		    $objList{$objKey} = [0, 0, -1, -1, -1, []];
+		}
+		# mark object as defined
+		$objList{$objKey}->[$idx_defined] = 1;
+
+                # found an object
+                # looking for /Parent x y R
+		#             /Kids [ x y R ]
+		#             /Type = /Catalog -> /Version /x.y
+		#              for now, ignoring any /BaseVersion
+		#             all other x y R
+		# remove from $rawObject as we find a match
+
+		# /Parent x y R  -> $Parent
+		if ($rawObject =~ m#/Parent(\s+)(\d+)(\s+)(\d+)(\s+)R#) {
+		    $Parent = "$2.$4";
+		    $str = "/Parent$1$2$3$4$5R";
+		    $pos = index $rawObject, $str;
+		    substr($rawObject, $pos, length($str)) = '';
+		   # TBD realistically, do we need to check for >1 /Parent ?
+                   #if ($objList{$objKey}->[$idx_parent] == -1) {
+			# first /Parent (should not be more)
+		        $objList{$objKey}->[$idx_parent] = $Parent;
+		   #} else {
+		   #    print STDERR "$IC Additional Parent ($Parent) in object $objKey, already list $objList{$objKey}->[$idx_parent] as Parent.\n" if $level >= $level_error;
+		   #}
+		}
+
+		# /Kids [ x y R ] -> @Kids
+		# should we check for multiple Kids arrays in one object (error)?
+		if ($rawObject =~ m#/Kids(\s+)\[(.*)\]#) {
+		    $str = "/Kids$1\[$2\]";
+		    $pos = index $rawObject, $str;
+		    substr($rawObject, $pos, length($str)) = '';
+
+		    my $str2 = " $2"; # guarantee a leading \s
+		    @Kids = ();
+                    while (1) {
+		        if ($str2 =~ m#(\s+)(\d+)(\s+)(\d+)(\s+)R#) {
+			    $str = "$1$2$3$4$5R";
+			    push @Kids, "$2.$4";
+		            $pos = index $str2, $str;
+		            substr($str2, $pos, length($str)) = '';
+		        } else {
+			    last;
+		        }
+		    }
+		   # TBD: realistically, any need to check for >1 /Kids?
+                   #if (!scalar(@{$objList{$objKey}->[$idx_kid_list]})) {
+			# first /Kids (should not be more)
+		        @{$objList{$objKey}->[$idx_kid_list]} = @Kids;
+			$objList{$objKey}->[$idx_kid_cnt] = scalar(@Kids);
+		   #} else {
+		   #    print STDERR "$IC Multiple Kids lists in object $objKey, already list @{$objList{$objKey}->[$idx_kid_list]} as Kids.\n" if $level >= $level_error;
+		   #}
+		}
+
+		# /Type /Catalog -> /Version /x.y -> $Version
+		# both x and y are normally single digits, but allow room
+		# just global $Version, assuming that each one physically
+		#   later overrides any earlier ones
+		if ($rawObject =~ m#/Type(\s+)/Catalog#) {
+		    my $sp1 = $1;
+		    if ($rawObject =~ m#/Version /(\d+)\.(\d+)#) {
+			$Version = "$1.$2";
+		        $str = "/Version$sp1/$Version";
+		        $pos = index $rawObject, $str;
+		        substr($rawObject, $pos, length($str)) = '';
+		    }
+		}
+
+		# if using cross-reference stream, will find /Root x y R
+		# and /Info x y R entries in an object of /Type /Xref
+		#   it looks like last ones will win
+		if ($rawObject =~ m#/Type(\s+)/XRef# ||
+		    $rawObject =~ m#/Type/XRef#) {
+		    if ($rawObject =~ m#/Root(\s+)(\d+)(\s+)(\d+)(\s+)R#) {
+			$Root = "$2.$4";
+		        $str = "/Root$1$2$3$4$5R";
+		        $pos = index $rawObject, $str;
+		        substr($rawObject, $pos, length($str)) = '';
+		    }
+		    if ($rawObject =~ m#/Info(\s+)(\d+)(\s+)(\d+)(\s+)R#) {
+			$Info = "$2.$4";
+		        $str = "/Info$1$2$3$4$5R";
+		        $pos = index $rawObject, $str;
+		        substr($rawObject, $pos, length($str)) = '';
+		    }
+		}
+
+		# all other x y R -> @others
+                @others = ();
+		while (1) {
+		    if ($rawObject =~ m#(\d+)(\s+)(\d+)(\s+)R#) {
+			$str = "$1$2$3$4R";
+			push @others, "$1.$3";
+		        $pos = index $rawObject, $str;
+		        substr($rawObject, $pos, length($str)) = '';
+		    } else {
+			last;
+		    }
+		}
+		# go through all other refs and create element if necessary,
+		#   then increment its refcnt array element
+		foreach (@others) {
+                    if (!defined $objList{$_}) {
+		        $objList{$_} = [0, 0, -1, -1, -1, []];
+		    }
+		    $objList{$_}->[$idx_refcount]++;
+		}
+		foreach (@Kids) {
+                    if (!defined $objList{$_}) {
+		        $objList{$_} = [0, 0, -1, -1, -1, []];
+		    }
+		    $objList{$_}->[$idx_refcount]++;
+		}
+
+	    } else {
+		# not an object, but could be other stuff of interest
+		# looking for trailer -> /Root x y R & /Info x y R
+		if ($rawObject =~ m/trailer/) {
+                    if ($rawObject =~ m#trailer(.*)/Info(\s+)(\d+)(\s+)(\d+)(\s+)R#s) {
+			$Info = "$3.$5";
+		    }
+                    if ($rawObject =~ m#trailer(.*)/Root(\s+)(\d+)(\s+)(\d+)(\s+)R#s) {
+			$Root = "$3.$5";
+		    }
+		}
+	    }
+	}
+    }
+
+    # increment Root and Info objects reference counts
+    # they probably SHOULD already be defined (issue warning if not)
+    if (!defined $Root) {
+	print STDERR "$IC No Root object defined!\n" if $level >= $level_error;
+    } else {
+        if (!defined $objList{$Root}) {
+	    $objList{$Root} = [1, 0, -1, -1, -1, []];
+	    print STDERR "$IC Root object $Root not found!\n" if $level >= $level_error;
+        }
+        $objList{$Root}->[$idx_refcount]++;
+    }
+
+    # Info is optional
+    if (!defined $Info) {
+	print STDERR "$IC No Info object defined!\n" if $level >= $level_note;
+    } else {
+        if (!defined $objList{$Info}) {
+	    $objList{$Info} = [1, 0, -1, -1, -1, []];
+	    print STDERR "$IC Info object $Info not found!\n" if $level >= $level_note;
+	    # possibly in a deleted object (on free list)
+        }
+        $objList{$Info}->[$idx_refcount]++;
+    }
+
+    # revisit each element in objList
+    #  visit each Kid, their $idx_par_clmd should be -1 (set to this object)
+    #                    (if not -1, is on multiple Kids lists)
+    #                  their $idx_parent should be this object
+    #                  they should have a Parent declared
+    #  any element with ref count of 0 and no Parent give warning unreachable
+    #  TBD: anything else to add to things to check?
+    foreach my $thisObj (sort keys %objList) {
+
+	# was an object actually defined for this entry?
+	# missing Info and Root messages already given, so flag is 1 ("defined")
+	if ($objList{$thisObj}->[$idx_defined] == 0) {
+	    print STDERR "$IC object $thisObj referenced, but no entry found.\n" if $level >= $level_note;
+	    # it's apparently OK if the missing object is on the free list --
+	    # it will just be ignored
+	}
+
+	# check any Kids
+	if ($objList{$thisObj}[$idx_kid_cnt] > 0) {
+	    # this object has children (/Kids), so explore them one level deep
+	    for (my $kidObj=0; $kidObj<$objList{$thisObj}[$idx_kid_cnt]; $kidObj++) {
+	        my $child = $objList{$thisObj}[$idx_kid_list]->[$kidObj];
+		# child's claimed parent should be -1, set to thisObj
+		if ($objList{$child}[$idx_par_clmd] == -1) {
+		    # no one has claimed to be parent, so set to thisObj
+		    $objList{$child}[$idx_par_clmd] = $thisObj;
+		} else {
+		    # someone else has already claimed to be parent
+		    print STDERR "$IC object $thisObj wants to claim object $child as its child, but $objList{$child}[$idx_par_clmd] already has!\nPossibly $child is on more than one /Kids list?\n" if $level >= $level_error;
+		}
+	        # if no object defined for child, already flagged as missing
+		if ($objList{$child}[$idx_defined] == 1) {
+		    # child should list thisObj as its Parent
+		    if      ($objList{$child}[$idx_parent] == -1) {
+		        print STDERR "$IC object $thisObj claims $child as a child (/Kids), but $child claims no Parent!\n" if $level >= $level_error;
+		        $objList{$child}[$idx_parent] = $thisObj;
+		    } elsif ($objList{$child}[$idx_parent] != $thisObj) {
+		        print STDERR "$IC object $thisObj claims $child as a child (/Kids), but $child claims $objList{$child}[$idx_parent] as its parent!\n" if $level >= $level_error;
+                    }
+		}
+	    }
+	}
+
+ 	if ($objList{$thisObj}[$idx_parent] == -1 &&
+ 	    $objList{$thisObj}[$idx_refcount] == 0) {
+ 	    print STDERR "$IC Warning: object $thisObj appears to be unreachable.\n" if $level >= $level_note;
+ 	}
+    }
+
+    if ($level >= $level_dump) {
+	# dump analysis data
+        use Data::Dumper;
+        my $d = Data::Dumper->new([\%objList]);
+	print "========= dump of $IC analysis data ===========\n";
+        print $d->Dump();
+    }
+
+    # if have entire processed PDF in $self
+    if ($level >= $level_dumpself) {
+    	# dump whole data
+        use Data::Dumper;
+        my $d = Data::Dumper->new([$self]);
+	print "========= dump of $IC PDF (self) data ===========\n";
+        print $d->Dump();
+    }
+
+    return $Version;
+}
 
 1;
 

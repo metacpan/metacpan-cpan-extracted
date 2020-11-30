@@ -1,3 +1,8 @@
+1.05 Thu Nov  25 23:56:56 UTC 2020
+    - Refactor signature generation
+    - Update order parameters and requirements
+    - Fix broken link in README
+
 1.04 Thu Sep  10 09:29:15 UTC 2020
     - Remove PREREQ_FATAL
 

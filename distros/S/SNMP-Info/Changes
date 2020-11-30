@@ -1,3 +1,18 @@
+Version 3.71 (2020-11-27)
+
+  [NEW FEATURES]
+
+  * #386 Teltonika RUT9XX support (jeroenvis)
+
+  [ENHANCEMENTS]
+
+  * #398, 411 more ubiquiti cleanup and support for er-12 (lbegnaud & inphobia)
+
+  [BUG FIXES]
+
+  * #409, 410 Don't add AUTOLOAD generated methods in symbol table
+  * #372, 375 fix lldp on nx-os6 (inphobia)
+
 Version 3.70 (2019-10-15)
 
   [NEW FEATURES]
@@ -171,7 +186,7 @@ Version 3.59 (2018-05-01)
 
   [BUG FIXES]
 
-  * Capture fan ans power supply status in L3::Huawei when description is
+  * Capture fan and power supply status in L3::Huawei when description is
     not available
 
 Version 3.58 (2018-04-29)
@@ -375,13 +390,13 @@ version 3.41 (2018-02-01)
 
   [BUG FIXES]
 
-  * Fixes to distriution metadata
+  * Fixes to distribution metadata
 
 version 3.40 (2018-01-28)
 
   [ENHANCEMENTS]
 
-  * #240 Support for CheckPoint devies through SNMP
+  * #240 Support for CheckPoint devices through SNMP
   * #240 Cisco SB switches fixup
   * #244 Add Adtran support
   * #241 Vyatta/VyOS support

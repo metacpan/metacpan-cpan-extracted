@@ -1,0 +1,1749 @@
+
+=head1 NAME
+
+Graphics : module Perl facilitant la creation d'objets graphiques complexes 
+par une description simplifiee.
+
+
+=head1 SYNOPSIS
+
+use Graphics;
+
+&GraphicsFunction(@params, ?option => value?, ...);
+
+=head1 DESCRIPTION
+
+Z<>
+
+=head2 Fonctions exportées
+
+=head3 1. Création de composants graphiques
+
+=over
+
+=item B<o> buildZincItem(Z<>)
+
+=item B<o> repeatZincItem(Z<>)
+
+=item B<o> buildTabBoxItem(Z<>)
+
+=back
+
+=head3 2. Calculs de formes géométriques complexes
+
+=over
+
+=item B<o> roundedRectangleCoords(Z<>)
+
+=item B<o> hippodromeCoords(Z<>)
+
+=item B<o> ellipseCoords(Z<>)
+
+=item B<o> roundedCurveCoords(Z<>)
+
+=item B<o> polygonCoords(Z<>)
+
+=item B<o> polylineCoords(Z<>)
+
+=item B<o> curveLineCoords>(Z<>)
+
+=item B<o> pathLineCoords(Z<>)
+
+=item B<o> shiftPathCoords(Z<>)
+
+=item B<o> tabBoxCoords(Z<>)
+
+=back
+
+=head3 3. Création de relief et ombre portée
+
+=over
+
+=item B<o> graphicItemRelief(Z<>)
+
+=item B<o> graphicItemShadow(Z<>)
+
+=back
+
+=head3 4. Fonctions géométriques de base
+
+=over
+
+=item B<o> perpendicularPoint(Z<>)
+
+=item B<o> lineAngle(Z<>)
+
+=item B<o> vertexAngle(Z<>)
+
+=item B<o> arc_pts(Z<>)
+
+=item B<o> rad_point(Z<>)
+
+=item B<o> bezierCompute(Z<>)
+
+=item B<o> bezierSegment(Z<>)
+
+=item B<o> bezierPoint(Z<>)
+
+=back
+
+=head3 5. Gestion des ressources images
+
+=over
+
+=item B<o> getPattern(Z<>)
+
+=item B<o> getTexture(Z<>)
+
+=item B<o> getImage(Z<>)
+
+=item B<o> init_pixmaps(Z<>)
+
+=back
+
+=head3 6. Gestion des couleurs
+
+=over
+
+=item B<o> setGradiants(Z<>)
+
+=item B<o> zincItemPredominantColor(Z<>)
+
+=item B<o> ZnColorToRGB(Z<>)
+
+=item B<o> hexaRGBcolor(Z<>)
+
+=item B<o> createGraduate(Z<>)
+
+=item B<o> MedianColor(Z<>)
+
+=item B<o> LightingColor(Z<>)
+
+=item B<o> RGBtoLCH(Z<>)
+
+=item B<o> LCHtoRGB(Z<>)
+
+=item B<o> RGBtoHLS(Z<>)
+
+=item B<o> HLStoRGB(Z<>)
+
+=back
+
+Z<>
+
+=head2 1. Création de composants graphiques
+
+
+=over
+
+=item B<buildZincItem>(widget, parentgroup, options);
+
+Creation d'items de representations Zinc.
+Les objets graphiques generes peuvent etre complexes (geometrie, multi contours, 
+operateur de forme, empilage d'items, reliefs, ombre portee, repetition, 
+transformations...) mais sont decrits par des 
+options geometriques ou de surfacage 2D 1/2 de haut niveau.
+
+=over
+    
+=item B<Parametres> :
+
+=over
+
+=item B<widget>
+
+<widget> identifiant du widget zinc.
+
+=item B<parentgroup>
+
+<tagOrId> identifiant de l'item group parent.
+
+
+=back
+
+
+=item B<Options> :
+
+						      
+=over
+
+=item B<-itemtype> => type
+
+Specifie le(s) type(s) d'item(s) souhaite(s). Peut etre celui d'un item
+natif zinc (B<group>, B<rectangle>, B<arc>, B<curve>, B<text>, B<icon>),
+ou un B<'metatype'> permettant de specifier des curves 'particulieres'. Les sections coniques
+de ces metatypes (raccords ou arcs) seront simulees par des segments quadratiques de bezier. Ces metatypes sont :
+
+=over
+
+=item roundedrectangle
+
+decrit par 2 cordonnees (haut-gauche et bas-droite du rectangle) et un rayon de raccord angulaire.
+Une liste optionnelle de realisation des raccords [0 = sans raccord|1 = avec raccord] permet de specifier pour chaque angle le type de raccord
+(angle ou arc).
+
+=item hippodrome
+
+decrit par 2 cordonnees (haut-gauche et bas-droite du rectangle englobant).
+Si l'orientation n'est pas specifiee, le rayon de raccord sera egal a la moitie du plus petit cote .
+Une liste optionnelle de realisation des raccords permet de specifier pour chaque angle le type de raccord
+(angle ou arc).
+
+=item ellipse
+
+decrit par 2 cordonnees (haut-gauche et bas-droite du rectangle englobant).  
+Une liste optionnelle de realisation des raccords permet de specifier pour chaque angle le type de raccord
+(angle ou arc).
+
+=item polygone
+
+polygone regulier a n cotes, (triangle equilateral, carre, pentagone, hexagone...)
+convexe ou en etoile. Le polygone sera inscrit dans un cercle dont le rayon est passe en parametres 
+(un 2eme rayon 'interne' decrira un polygone etoile). Un rayon de raccord et une liste de realisation des raccords permettent 
+des variantes interressantes.
+
+=item roundedcurve
+
+curve multicontours a coins arrondis, de rayon raccord unique,
+pour specifier une forme quelconque.
+
+=item polyline
+
+curve multicontours a coins arrondis. Le rayon de chaque raccord pouvant etre defini
+specifiquement.
+
+=item pathline
+
+creation d'une ligne multisegments 'epaisse',
+realisee par 'decalage' par rapport a un path donne (largeur et sens de decalage
+ [left|both|right] optionnels). Le contour transforme en surface avec l'item Zinc triangles
+permet d'appliquer un degrade de couleurs le long du trace (lineaire, transversal ou double).
+
+=back
+
+
+=item B<-coords> => \@xy
+
+<coords list> coordonnees geometriques ou de position de l'item.
+
+=item B<-metacoords> => \%metatype_params
+
+<hashtable> calcul des coordonnées de l'item par passage d'un [meta]type d'item
+différent de celui décrit par -itemtype. (ex. un pathline défini par un polygone)
+
+<coords list> coordonnees geometriques ou de position de l'item.
+
+=item B<-params> => \%zinc_attr
+
+<hashtable> parametres zinc de l'item.
+
+=item B<-contours> => \@list
+
+<contours list> arguments zinc d'ajout de contours .
+
+=item B<-clip>
+
+<coords list or hashtable> clipping d'un item group.
+
+=item B<-items>
+
+<hashtable> table d'items contenus dans un item group.
+provoque un appel récursif de la fonction buildZincItem().
+
+=item B<-texture>
+
+<imagefile> ajout d'une texture a l'item.
+
+=item B<-pattern>
+
+<imagefile> ajout d'un pattern a l'item.
+
+=item B<-relief>
+
+<hash table> creation d'un relief a l'item a l'aide d'item zinc triangles.
+Invoque la fonction du module Graphics graphicItemRelief()
+
+=item B<-shadow>
+
+<hash table> creation d'une ombre portee a l'item.
+Invoque la fonction du module Graphics graphicItemShadow()
+
+=item B<-repeat>
+
+<hash table> repetition de l'item.
+Invoque la fonction du module Graphics repeatZincItem()
+
+=item B<-scale> => scale factor or [xscale, yscale] 
+
+application d'une transformation zinc->scale a l'item
+
+=item B<-translate> => [dx,dy]
+
+ application d'une transformation zinc->translate a l'item
+
+=item B<-rotate> => <angle> (en degré) 
+
+application d'une transformation zinc->rotate a l'item
+
+=item B<-addtags>
+
+<tags list> liste de tags specifiques a ajouter aux parametre item -tags.
+
+=item B<-name>
+
+<string> nom de l'item.
+
+=back
+						      
+=back
+
+Z<>
+
+=item B<repeatZincItem>(widget, item, options);
+
+Répétition (clonage) d'un objet Zinc de representation.
+    
+=over
+
+=item B<Parametres> :
+
+=over
+
+=item B<widget>
+
+<widget> identifiant du widget zinc.
+
+=item B<item>
+
+<tagOrId> identifiant de l'item zinc a dupliquer.
+
+=back
+
+=item B<Options> :
+						      
+=over
+
+=item B<-num> => integer
+
+Nombre de répétitions.
+
+=item B<-dxy> => [dx, dy]
+
+Paramètres de translation a appliquer entre 2 copies.
+
+=item B<-angle> => <angle>
+
+angle de rotation en degré a appliquer entre 2 copies.
+
+=item B<-copytag> => <tag name>
+
+ajout d'un tag indexé pour chaque copie.
+
+=item B<-params> => \%zinc_attr
+
+Paramétrage specialises de chaque copie
+
+
+=back
+
+=back
+
+Z<>
+
+=item B<buildTabBoxItem>(widget, parentgroup, options);
+
+Construit les items de représentation d'une boîte à onglets multi-pages. 
+Le positionnement, la forme et la taille des onglets est définie automatiquement
+ou spécifiés par options. L'ajout de titres aux pages est possible. Des tags
+de base (intercalaires et titres) permettent de définir des interactions de 
+sélection/navigation par bindings. 
+
+=over
+    
+=item B<Parametres> :
+
+=over
+
+=item B<widget>
+
+<widget> identifiant du widget zinc.
+
+=item B<parentgroup>
+
+<tagOrId> identifiant de l'item group parent.
+
+=back
+
+=item B<Options> :
+						      
+=over
+
+=item B<-coords> => [[x0,y0],[x1,y1]]
+
+<coords> coordonnées haut-gauche et bas-droite de la BoundingBox du tabBox.  
+
+=item B<-numpages>
+
+<integer> nombre de pages du TabBox.
+
+=item B<-anchor> => 'n'|'e'|'s'|'w' 
+
+ancrage nord, est, sud ou ouest des onglets (par défaut 'n')
+
+=item B<-alignment> => 'left'|'center'|'right' 
+
+alignement gauche, centré ou droit des onglets sur l'ancrage (par défaut left)
+
+=item B<-tabwidth> => 'auto'|<dimension>|<dimensionList> 
+
+longeur des onglets : 'auto' longeur répartie sur le coté, longeur absolue ou liste de longeurs
+ces dimensions sont autoajustées si dépassement. (par défaut 'auto').
+
+=item B<-tabheight> => 'auto'|<dimension> 
+
+hauteur des onglets (par défaut 'auto')
+
+=item B<-tabshift> => 'auto'|<dimension> 
+
+offset de biseau entre la base et le haut de l'onglet (par défaut 'auto').
+
+=item B<-overlap> => 'auto'|<dimension> 
+
+offset de décalage entre 2 onglets (par défaut 'auto').
+
+=item B<-radius>
+
+<dimension> rayon des arrondis d'angle des onglets. (par défaut 0)
+
+=item B<-corners> 
+
+<booleanList> liste d'application du raccord aux angles sous forme booleenne 
+0 = sans raccord 1 = avec raccord.
+
+=item B<-params> => \%zinc_attr
+
+<hashtable> parametres zinc de l'item.
+
+=item B<-texture>
+
+<imagefile> ajout d'une texture a l'item.
+
+=item B<-relief>
+
+<hash table> creation d'un relief pour les pages du tabBox.
+Invoque la fonction du module Graphics graphicItemRelief()
+
+=item B<-tabtitles>
+
+<hashtable> table de hash de définition des titres d'onglets (label, params).
+
+=item B<-pageitems>
+
+<hashtable> table d'items 'complémentaire' à réaliser pour chaque page.
+provoque un appel récursif de la fonction buildZincItem().
+
+
+=back
+
+=back
+
+=back
+
+Z<>
+
+=head2 2. Calculs de formes géométriques complexes
+
+=over
+
+=item B<roundedRectangleCoords>(coords, options);
+
+Retourne les coordonnées (curve) d'un rectangle à coins arrondis
+
+=over
+
+=item B<Parametres> :
+
+=over
+
+=item B<coords> => [[x0,y0],[x1,y1]]
+
+<coordList> coordonnées haut-gauche et bas-droite du rectangle.
+
+=back
+
+=item B<Options> :
+						      
+=over
+
+=item B<-radius>  
+
+<dimension> rayon de raccord circulaire des angles.
+
+=item B<-corners> => \@cornersList
+
+Liste de réalisation des raccords de sommets [0 = pad de raccord (droit)| 1 = raccord circulaire].
+(par défaut [1,1,1,1]).
+
+=back
+
+=back
+
+Z<>
+
+=item B<hippodromeCoords>(coords, options);
+
+Retourne les coordonnées (curve) d'un hippodrome
+
+=over
+
+=item B<Parametres> :
+
+=over
+
+=item B<coords> => [[x0,y0],[x1,y1]]
+
+<coordList> coordonnées haut-gauche et bas-droite du rectangle exinscrit à l'hippodrome.
+
+=back
+
+=item B<Options> :
+						      
+=over
+
+=item B<-orientation>  => <horizontal|vertical>
+
+orientation forcée de l'hippodrome (sinon hauteur = plus petit coté).
+
+=item B<-corners> => \@cornersList
+
+Liste de réalisation des raccords de sommets [0 = pad de raccord (droit)| 1 = raccord circulaire].
+(par défaut [1,1,1,1]).
+
+=item B<-trunc>  => <left|right|top|bottom|both>
+
+troncatures des cotés circulaires de l'hippodrome.
+
+=back
+
+=back
+
+Z<>
+
+=item B<ellipseCoords>(coords, options);
+
+Retourne les coordonnées (curve) d'une ellipse
+
+=over
+
+=item B<Parametres> :
+
+=over
+
+=item B<coords> => [[x0,y0],[x1,y1]]
+
+<coordList> coordonnées haut-gauche et bas-droite du rectangle exinscrit.
+
+=back
+
+=item B<Options> :
+						      
+=over
+
+=item B<-corners> => \@cornersList
+
+Liste de réalisation des quadrants [0 = angle droit| 1 = raccord d'ellipse].
+(par défaut [1,1,1,1]).
+
+=back
+
+=back
+
+Z<>
+
+=item B<roundedCurveCoords>(coords, options);
+
+Retourne les coordonnées d'une curve à coins arrondis.
+
+=over
+
+=item B<Parametres> :
+
+=over
+
+=item B<coords> => [[x0,y0],...[xn,yn]]
+
+<coordList> coordonnées de la curve
+
+=back
+
+=item B<Options> :
+						      
+=over
+
+B<-radius> : <dimension> 
+rayon de raccord des angles. par defaut 0
+
+B<-corners> : <booleanList> 
+liste d'application du raccord circulaire aux angles sous forme booleenne 
+0 = sans raccord 1 = avec raccord. par defaut [1,1,...,1].
+
+=back
+
+=back
+
+Z<>
+
+=item B<polygonCoords>(coords, options);
+
+Retourne les coordonnées d'un polygone régulier à n cotés ou d'une étoile à
+n branches. Le polygone sera inscrit dans un cercle de rayon -radius, un 2ème
+rayon interne décrira les sommets interne de l'étoile. Raccords circulaires
+optionnels des sommets du polygone/étoile
+
+=over
+
+=item B<Parametres> :
+
+=over
+
+=item B<coords> => [x0,y0]
+
+<coords> coordonnées du centre du cercle exinscrit au polygone/étoile
+
+=back
+
+=item B<Options> :
+						      
+=over
+
+B<-numsides> : <dimension> nombre de cote du polygone ou nombre de branches de l'etoile
+
+B<-radius> : <dimension> rayon du cercle exinscrit au polygone
+
+B<-startangle> : <angle> angle de depart du trace de la figure
+
+B<-inner_radius> : <dimension> rayon du cercle des points 'internes' de l'etoile
+
+B<-corner_radius> : <dimension> rayon des raccords d'angles
+
+B<-corners> : <booleanList> liste d'application du raccord aux angles sous forme booleenne 
+0 = sans raccord 1 = avec raccord. par defaut [1,1,1,1].
+
+=back
+
+=back
+
+Z<>
+
+=item B<polylineCoords>(coords, options);
+
+Retourne les coordonnées d'une polyline, ligne 'brisée' multi-segments
+avec raccords angulaires optionnels.
+
+=over
+
+=item B<Parametres> :
+
+=over
+
+=item B<coords> => [[x0,y0],...[xn,yn]]
+
+<coordList> liste de coordonnées des sommets de la polyline
+
+=back
+
+=item B<Options> :
+						      
+=over
+
+B<-radius> : <dimension> 
+rayon global de raccord des angles. par defaut 0
+
+B<-corners> : <booleanList> 
+liste d'application du raccord circulaire aux angles sous forme booleenne 
+0 = sans raccord 1 = avec raccord. par defaut [1,1,...,1].
+
+B<-corners_radius> : <dimensionList> 
+Liste des rayons de raccord des angles.
+
+=back
+
+=back
+
+Z<>
+
+=item B<curveLineCoords>(coords, options);
+
+ATTENTION FONCTION EN CHANTIER 
+
+Retourne les coordonnées curve (de surface) d'un stroke. la ligne est décrite 
+le long d'un chemin et dessinée selon les attributs graphiques classiques 'stroke'
+(style d'épaisseur, d'extremité, de jointure, de tiret...)
+
+=over
+
+=item B<Parametres> :
+
+=over
+
+=item B<coords> => [[x0,y0],...[xn,yn]]
+
+<coordList> coordonnées de la curve
+
+=back
+
+=item B<Options> :
+						      
+=over
+
+B<-width> : <dimension> 
+épaisseur de la ligne. par defaut 1
+
+B<-linecap> : <'butt'|'round'|'square'> 
+Forme des extrémités des tracés ouverts.
+
+B<-linejoin> : <'miter'|'round'|'bevel'> 
+Forme des sommets des tracés.
+
+B<-dasharray> : <'none'|motifList> 
+Spécification du tireté : none (aucun) ou liste de longueurs tiret,[espace],[tiret]...
+permettant de définir le dessin du tireté (par défaut none)
+
+B<-dashoffset> : <dimension> 
+distance décalage de départ dans le dessin du tireté (par défaut 0)
+
+=back
+
+=back
+
+Z<>
+
+=item B<pathLineCoords>(coords, %options);
+
+retourne les coordonnées (triangles) d'une ligne multisegments 'epaisse',
+realisee par 'décalage' par rapport à un path donné (largeur et sens de décalage
+ [out|center|in] optionnels).
+
+=over
+
+=item B<Parametres> :
+
+=over
+
+=item B<coords> => [[x0,y0],...[xn,yn]]
+
+<coordList> liste de coordonnées du path
+
+=back
+
+=item B<Options> :
+						      
+=over
+
+B<-closed> : <boolean> 
+fermeture du tracé. par defaut 0
+
+B<-shifting> : <'out'|'center'|'in'> 
+sens de décalage de l'épaisseur de contour : 'center' (1/2 décalage de chaque coté du path) 'out' (décalage externe) 'in' (décalage interne) par défaut 'center'.
+
+B<-width> : <dimension> 
+Largeur du décalage de ligne (par défaut 2).
+
+=back
+
+=back
+
+Z<>
+
+=item B<shiftPathCoords>(coords, %options);
+
+retourne les coordonnées curve de 'décalage' par rapport à un path donné.
+
+=over
+
+=item B<Parametres> :
+
+=over
+
+=item B<coords> => [[x0,y0],...[xn,yn]]
+
+<coordList> liste de coordonnées du path
+
+=back
+
+=item B<Options> :
+						      
+=over
+
+B<-closed> : <boolean> 
+fermeture du tracé. par defaut 0
+
+B<-shifting> : <'out'|'in'> 
+sens de décalage du path : 'out' (décalage externe) 'in' (décalage interne) par défaut 'out'.
+
+B<-width> : <dimension> 
+Largeur du décalage de ligne (par défaut 1).
+
+=back
+
+=back
+
+Z<>
+
+=item B<tabBoxCoords>(coords, options);
+
+Retourne les coordonnées de construction d'un TabBox (boîte à onglets) : liste de curve décrivant les 'pages' du TabBox et coordonnées de position des titres onglets. 
+
+=over
+
+=item B<Parametres> :
+
+=over
+
+=item B<coords> => [[x0,y0],[x1,y1]]
+
+<coords> coordonnées haut-gauche et bas-droite de la BoundingBox du tabBox.  
+
+=back
+
+=item B<Options> :
+						      
+=over
+
+B<-numpages> : <integer> nombre de pages du TabBox.
+
+B<-anchor> : <'n'|'e'|'s'|'w'> ancrage nord, est, sud ou ouest des onglets (par défaut 'n')
+
+B<-alignment> : <'left'|'center'|'right'> alignement gauche, centré ou droit des onglets sur l'ancrage (par défaut left)
+
+B<-tabwidth> : 'auto'|<dimension|dimensionList> longeur des onglets : 'auto' longeur répartie sur le coté, longeur absolue ou liste de longeurs
+ces dimensions sont autoajustées si dépassement. (par défaut 'auto').
+
+B<-tabheight> : 'auto'|<dimension> hauteur des onglets (par défaut 'auto')
+
+B<-tabshift> : 'auto'<dimension> offset de biseau entre la base et le haut de l'onglet (par défaut 'auto').
+
+B<-overlap> : 'auto'<dimension> offset de décalage entre 2 onglets (par défaut 'auto').
+
+B<-radius> : <dimension> 
+rayon des arrondis d'angle des onglets. (par défaut 0)
+
+B<-corners> : <booleanList> liste d'application du raccord aux angles sous forme booleenne 
+0 = sans raccord 1 = avec raccord.
+
+=back
+
+=back
+
+=back
+
+Z<>
+
+=head2 3. Création de reliefs et ombre portée
+
+Z<>
+
+=over
+
+=item B<graphicItemRelief>(widget, item, %options);
+
+Construit un relief à l'item géometrique 
+(qui peut etre multicontours) en utilisant des items zinc triangles.
+Ce relief de type 'embossage' de forme possede un
+profil (flat ou rounded) et dérive en luminosite la couleur dominante
+de l'item (ou une couleur donnée) suivant l'orientation d'éclairage global zinc
+-lighangle (ou un angle de lumière donné).  
+
+=over
+    
+=item B<Parametres> :
+
+=over
+
+=item B<widget>
+
+identifiant du widget zinc.
+
+=item B<item>
+
+identifiant de l'item zinc à mettre en relief.
+
+=back
+
+=item B<Options> :
+						      
+=over
+
+B<-closed> : <boolean> fermeture (de forme) du relief (par défaut 1).
+
+B<-profil> : <'flat'|'rounded'> type de profil du relief (par défaut 'rounded').
+
+B<-relief> : <'raised'|'sunken'> sens de l'embossage (par defaut 'raised').
+
+B<-side> : <outside|inside> position externe ou interne du relief (defaut 'inside').
+
+B<-color> : <color> couleur de base du relief (défaut couleur dominante de l'item).
+
+B<-smoothed> : <boolean> lissage des 'facettes' du relief (par defaut 1).
+
+B<-lightangle> : <angle> angle de la lumiere (par defaut attribut -lightangle du widget).
+
+B<-width> : <dimension> largeur du 'contour' relief.
+
+B<-fine> : <boolean> mode precision courbe de bezier (par defaut 0 : auto-ajustee).
+
+=back
+
+=back
+
+Z<>
+
+=item B<graphicItemShadow>(widget, item, %options);
+
+Cree une ombre portee a l'item geometrique 
+(qui peut etre multicontours) en utilisant des items zinc triangles et curve.
+Cette ombre correspond a une projection de la forme en fonction
+d'une distance (par defaut 10) d'une orientation lumineuse (par defaut la valeur
+globale -lightangle du widget) et d'un 'grossissement' (par defaut 0).
+Une largeur 'width' de perimetre de diffusion/diffraction lumineuse (par defaut 4) 
+qui permet de lisser le passage de l'ombre au fond, une couleur (par defaut black) 
+et une opacite (par defaut 50) completent la specification.
+
+=over
+
+B<Parametres> : 
+
+=over
+
+B<widget> : <widget> identifiant du widget zinc
+
+B<item> : <tagOrId> identifiant de l'item zinc
+
+=back
+
+B<Options> :
+
+=over
+
+B<-opacity> : <percent> poucentage d'opacite de l'ombre (par defaut 50).
+
+B<-distance> : <dimension> distance de projection de l'ombre (par defaut 10).
+
+B<-enlarging> : <dimension> 'grossissement' cone de projection (defaut 0).
+
+B<-color> : <color> couleur de l'ombre (par defaut black).
+
+B<-lightangle> : <angle> angle de la lumiere (par defaut attribut -lightangle du widget).
+
+B<-width> : <dimension> largeur du perimetre de diffusion/diffraction (par defaut 4).
+
+=back
+
+=back
+
+=back
+
+Z<>
+
+=head2 4. Fonctions géométriques de base
+
+Z<>
+
+=over
+
+=item B<perpendicularPoint>(point, line);
+
+retourne les coordonnées du point perpendiculaire abaissé d'un point sur une ligne.
+
+=over
+
+=item B<Parametres> :
+
+=over
+
+=item B<point> => [x, y]
+
+<coords> coordonnées du point de référence.
+
+=item B<line> => [[x0, y0],[x1, y1]]
+
+<coordsList> liste de coordonnées des deux points de la ligne de référence.
+
+=back
+
+=back
+
+Z<>
+
+
+=item B<lineAngle>(startpoint, endpoint);
+
+retourne l'angle formée par un vecteur, s'utilise aussi pour connaitre l'angle 'circulaire' 
+d'un point par rapport à un centre de référence.
+
+=over
+
+=item B<Parametres> :
+
+=over
+
+=item B<startpoint> => [x, y]
+
+<coords> coordonnées du point de départ du segment (ou centre de référence).
+
+=item B<endpoint> => [x, y]
+
+<coords> coordonnées du point de fin du segment (ou point 'circulaire' de référence).
+
+=back
+
+=back
+
+Z<>
+
+=item B<lineNormal>(startpoint, endpoint);
+
+retourne la valeur d'angle perpendiculaire à un vecteur (utilisée par exemple 
+pour mesurer l'incidence de lumière d'une facette). 
+
+=over
+
+=item B<Parametres> :
+
+=over
+
+=item B<startpoint> => [x, y]
+
+<coords> coordonnées du point de départ du segment (ou centre de référence).
+
+=item B<endpoint> => [x, y]
+
+<coords> coordonnées du point de fin du segment (ou point 'circulaire' de référence).
+
+=back
+
+=back
+
+Z<>
+
+=item B<vertexAngle>(point0, point1, point2);
+
+retourne la valeur de l'angle formé par trois points ainsi que la valeur d'angle
+de la bisectrice de l'angle (fonction utilisé pour les calculs de décalages de path.
+
+=over
+
+=item B<Parametres> :
+
+=over
+
+=item B<point0> => [x, y]
+
+<coords> coordonnées du premier point de définition de l'angle.
+
+=item B<point1> => [x, y]
+
+<coords> coordonnées du deuxième point de définition de l'angle (sommet).
+
+=item B<point2> => [x, y]
+
+<coords> coordonnées du troisième point de définition de l'angle.
+
+
+=back
+
+=back
+
+Z<>
+
+=item B<arc_pts>(center, radius, %options);
+
+Calcul des points constitutifs d'un arc
+
+=over 
+
+=item B<Parametres> :
+
+=over
+
+=item B<center> => [x0,y0]
+
+<coords> coordonnées du centre de l'arc.
+
+=item B<radius>  
+
+<dimension> rayon de l'arc.
+
+=back
+
+=item B<Options> :
+						      
+=over
+
+=item B<-angle>  
+
+<angle> angle de départ (en degré) de l'arc (par défaut 0)
+
+=item B<-extent>  
+
+<angle> delta angulaire (en degré) de l'arc (par défaut 360)
+
+=item B<-step>
+
+<angle> pas de progression angulaire (en degré) de calcul des points (par défaut 10).
+
+=back
+
+=back
+
+Z<>
+
+=item B<rad_point>(center, radius, angle);
+
+Retourne le point circulaire défini par centre-rayon-angle.
+
+=over
+
+=item B<Parametres> :
+
+=over
+
+=item B<center> => [x0,y0]
+
+<coords> coordonnées du centre de l'arc.
+
+=item B<radius>  
+
+<dimension> rayon de l'arc.
+
+=item B<angle>  
+
+<angle> angle (en degré) du point de circonférence avec le centre du cercle.
+
+=back
+
+=back
+
+Z<>
+
+=item B<bezierSegment>(coords, %options);
+
+Calcul d'une approximation de segment (Quadratique ou Cubique) de bezier.
+
+=over 
+
+=item B<Parametres> :
+
+=over
+
+=item B<coords>
+
+<coordsList> Liste de coordonnées des points définissant le segment de bezier.
+
+=back
+
+=item B<Options> :
+						      
+=over
+
+=item B<-tunits>  
+
+<integer> nombre pas de division des segments bezier (par défaut 20)
+
+=item B<-skipend>  
+
+<boolean> ne pas retourner le dernier point du segment (pour chaînage de segments).
+
+=back
+
+=back
+
+Z<>
+
+=item B<bezierPoint>(t, coords);
+
+Calcul d'un point du segment (Quadratique ou Cubique) de bezier.
+t représentation du temps (de 0 à 1). 
+coords = (P1, C1, <C1>, P2) liste des points définissant le segment de bezier
+P1 et P2 : extémités du segment et pts situés sur la courbe
+C1 <C2> : point(s) de contrôle du segment
+
+courbe bezier niveau 2 sur (P1, P2, P3)   P(t) = (1-t)²P1 + 2t(1-t)P2 + t²P3
+
+courbe bezier niveau 3 sur (P1, P2, P3, P4)  P(t) = (1-t)³P1 + 3t(1-t)²P2 + 3t²(1-t)P3 + t³P4
+
+=over 
+
+=item B<Parametres> :
+
+=over
+
+=item B<t>
+
+<pourcent> (de 0 à 1) représentation du temps.
+
+=item B<coords>
+
+<coordsList> Liste de coordonnées des points définissant le segment de bezier.
+
+=back
+
+=back
+
+Z<>
+
+
+=item B<bezierCompute>(coords, %options);
+
+Calcul d'une approximation auto-ajustée de segment (Quadratique ou Cubique) de bezier.
+l'approximation se fait par subdivision successive de la courbe jusqu'à atteindre une
+distance avec la courbe théorique <= à la précision passée par option (par défaut 0.2).
+
+=over 
+
+=item B<Parametres> :
+
+=over
+
+=item B<coords>
+
+<coordsList> Liste de coordonnées des points définissant le segment de bezier.
+
+=back
+
+=item B<Options> :
+						      
+=over
+
+=item B<-precision>  
+
+<dimension> seuil limite du calcul d'approche de la courbe (par défaut .2)
+
+=item B<-skipend>  
+
+<boolean> ne pas retourner le dernier point du segment (pour chaînage de segments).
+
+=back
+
+=back
+
+=back
+
+Z<>
+
+=head2 5. Gestion des ressources images
+
+Z<>
+
+=over
+
+=item B<getPattern>(filename, %options);
+
+retourne et partage la ressource image bitmap en l'initialisant et la stockant si première utilisation.
+
+=over
+
+=item B<Parametres> :
+
+=over
+
+=item B<filename>
+
+<image filename> non du fichier bitmap pattern
+
+=back
+
+=item B<Options> :
+						      
+=over
+
+=item B<-storage>  
+
+<hashtable> référence de la table de stockage privée des patterns.
+
+=back
+
+=back
+
+Z<>
+
+=item B<getTexture>(widget, filename, %options);
+
+retourne et partage la ressource image texture en l'initialisant et la stockant si première utilisation.
+
+=over
+
+=item B<Parametres> :
+
+=over
+
+=item B<widget>
+
+<widget> identifiant du widget zinc.
+
+=item B<filename>
+
+<imagefile> non du fichier image texture
+
+=back
+
+=item B<Options> :
+						      
+=over
+
+=item B<-storage>  
+
+<hashtable> référence de la table de stockage privée des textures.
+
+=back
+
+=back
+
+Z<>
+
+=item B<getImage>(widget, filename, %options);
+
+retourne et partage la ressource image en l'initialisant et la stockant si première utilisation.
+
+=over
+
+=item B<Parametres> :
+
+=over
+
+=item B<widget>
+
+<widget> identifiant du widget zinc.
+
+=item B<filename>
+
+<imagefile> non du fichier image
+
+=back
+
+=item B<Options> :
+						      
+=over
+
+=item B<-storage>  
+
+<hashtable> référence de la table de stockage privée des images.
+
+=back
+
+=back
+
+Z<>
+
+=item B<init_pixmaps>(widget, filenames, %options);
+
+Initialise et stocke un ensemble d'images.
+
+=over
+
+=item B<Parametres> :
+
+=over
+
+=item B<widget>
+
+<widget> identifiant du widget zinc.
+
+=item B<filenames>
+
+<imagefileList> Liste des fichier images à initialiser.
+
+=back
+
+=item B<Options> :
+						      
+=over
+
+=item B<-storage>  
+
+<hashtable> référence de la table de stockage privée des images.
+
+=back
+
+=back
+
+=back
+
+Z<>
+
+=head2 6. Gestion des couleurs
+
+Z<>
+
+=over
+
+=item B<setGradients>(widget, gradients);
+
+Création de gradiants nommés Zinc
+
+=over
+
+=item B<Parametres> :
+
+=over
+
+=item B<widget>
+
+<widget> identifiant du widget Zinc
+
+=item B<gradients>  
+
+<hashtable> référence de la table de définition des gradiants zinc ('non' => 'zincGradient').
+
+=back
+
+=back
+
+Z<>
+
+=item B<zincItemPredominantColor>(widget, item);
+
+retourne la couleur dominante d'un item ('barycentre' gradiant fillcolor).
+
+=over
+
+=item B<Parametres> :
+
+=over
+
+=item B<widget>
+
+<widget> identifiant du widget Zinc
+
+=item B<item>  
+
+<tagOrId>  identifiant de l'item zinc.
+
+=back
+
+=back
+
+Z<>
+
+=item B<medianColor>(color1, color2, rate);
+
+calcul d'une couleur intermédiaire défini par un ratio ($rate) entre 2 couleurs.
+
+=over
+
+=item B<Parametres> :
+
+=over
+
+=item B<color1>
+
+<color> première couleur
+
+=item B<color2>  
+
+<color> première couleur
+
+=item B<rate>
+
+<pourcent> (de 0 à 1) position de la couleur intermédiaire.
+
+=back
+
+=back
+
+Z<>
+
+=item B<createGraduate>(widget, steps, refcolors, repeat);
+
+création d'un jeu de couleurs intermédiaires (dégradé) entre n couleurs.
+
+=over
+
+=item B<Parametres> :
+
+=over
+
+=item B<widget>
+
+<widget> identifiant du widget Zinc
+
+=item B<steps>  
+
+<integer> nombre totale de couleurs retournées.
+
+=item B<refcolors>  
+
+<colorList> liste de couleurs servant à créer le dégradé.
+
+=item B<repeat>  
+
+<integer> répétition de chaque couleur utilisé par exemple pour triangles path
+où la couleur est répétée 2 fois (par défaut 1).
+
+=back
+
+=back
+
+Z<>
+
+=item B<lightingColor>(color, newL);
+
+Modification d'une couleur par sa composante luminosité (exemple relief).
+
+=over
+
+=item B<Parametres> :
+
+=over
+
+=item B<color>
+
+<color> couleur au format zinc.
+
+=item B<newL>
+
+<pourcent> (de 0 à 1) nouvelle valeur de luminosité.
+
+=back
+
+=back
+
+Z<>
+
+=item B<ZnColorToRGB>(zncolor);
+
+conversion d'une couleur Zinc hexa au format RGBA (255,255,255,100).
+
+=over
+
+=item B<Parametres> :
+
+=over
+
+=item B<zncolor>
+
+<color> couleur au format hexa zinc (#ffffff ou #ffffffffffff).
+
+=back
+
+=back
+
+Z<>
+
+=item B<RGBtoLCH>(r, g, b);
+
+conversion d'une couleur de l'espace RGB à l'espace CIE LCH°.
+
+=over
+
+=item B<Parametres> :
+
+=over
+
+=item B<r>
+
+<pourcent> (de 0 à 1) valeur de la composante rouge de la couleur RGB.
+
+=item B<g>
+
+<pourcent> (de 0 à 1) valeur de la composante verte de la couleur RGB.
+
+=item B<b>
+
+<pourcent> (de 0 à 1) valeur de la composante bleue de la couleur RGB.
+
+=back
+
+=back
+
+Z<>
+
+=item B<LCHtoRGB>(L, C, H);
+
+conversion d'une couleur de l'espace CIE LCH° à l'espace RGB.
+
+=over
+
+=item B<Parametres> :
+
+=over
+
+=item B<L>
+
+<pourcent> (de 0 à 1) valeur de la composante luminosité de la couleur CIE LCH.
+
+=item B<C>
+
+C : <pourcent> (de 0 à 1) valeur de la composante saturation de la couleur CIE LCH
+
+=item B<H>
+
+H : <pourcent> (de 0 à 1) valeur de la composante teinte de la couleur CIE LCH
+
+=back
+
+=back
+
+Z<>
+
+=item B<RGBtoHLS>(r, g, b);
+
+conversion d'une couleur de l'espace RGB à l'espace HLS.
+
+=over
+
+=item B<Parametres> :
+
+=over
+
+=item B<r>
+
+<pourcent> (de 0 à 1) valeur de la composante rouge de la couleur RGB.
+
+=item B<g>
+
+<pourcent> (de 0 à 1) valeur de la composante verte de la couleur RGB.
+
+=item B<b>
+
+<pourcent> (de 0 à 1) valeur de la composante bleue de la couleur RGB.
+
+=back
+
+=back
+
+Z<>
+
+=item B<HLStoRGB>(H, L, S);
+
+conversion d'une couleur de l'espace HLS à l'espace RGB.
+
+=over
+
+=item B<Parametres> :
+
+=over
+
+=item B<H>
+
+<pourcent> (de 0 à 1) valeur de la composante teinte de la couleur HLS.
+
+=item B<L>
+
+C : <pourcent> (de 0 à 1) valeur de la composante luminosité de la couleur HLS.
+
+=item B<S>
+
+H : <pourcent> (de 0 à 1) valeur de la composante saturation de la couleur HLS.
+
+=back
+
+=back
+
+Z<>
+
+=item B<hexaRGBcolor>(r, g, b, a);
+
+conversion d'une couleur RGBA (255,255,255,100) au format Zinc '#ffffff'.
+
+=over
+
+=item B<Parametres> :
+
+=over
+
+=item B<r>
+
+<colorComposant> (0 à 255) composante rouge de la couleur rgba.
+
+=item B<g>
+
+<colorComposant> (0 à 255) composante verte de la couleur rgba.
+
+=item B<b>
+
+<colorComposant> (0 à 255) composante bleue de la couleur rgba.
+
+=item B<a>
+
+<colorComposant> (0 à 255) composante alpha de la couleur rgba.
+
+=back
+
+=back
+
+Z<>
+
+=back
+
+Z<>
+
+
+=head1 EXEMPLE
+
+my %gradset = (
+   'gdlens' => '=radial -15 -20|#ffb7b7;70|#bd6622;90',
+   'gdstar' => '=radial -15 -20|#ffb7b7;50|#bd6622;90');
+
+my %starstyle => (
+       # table hash parametres et options
+       -itemtype => 'group',
+       -coords => [250, 250],
+       -params => {-priority => 90,
+                   -tags => ['starlens', 'move'],
+                   -sensitive => 1,
+                   -atomic => 1,
+                   },
+       -items => {
+           'lens' => {-itemtype => 'hippodrome',
+                      -coords => [[-200, -200],
+                                  [200, 200]],
+                      -params => {-closed => 1,
+                                  -filled => 1,
+                                  -fillcolor => 'gdlens',
+                                  -linewidth => 1.5,
+                                  -linecolor => '#440000',
+                                  -priority => 10,
+                                 },
+                      -relief => {-width => 14,
+                                  -profil => 'rounded',
+                                  -lightangle => 135,
+                                  },
+                      -shadow => {-distance => 20,
+                                  -width => 18,
+                                  -lightangle => 135,
+                                  -opacity => 40,
+                                  -enlarging => 6,
+                                 },
+                      },
+          'star' => {-itemtype => 'polygone',
+                     -coords => [0, 0],
+                     -numsides => 5,
+                     -radius => 180,
+                     -inner_radius => 70,
+                     -corner_radius => 10,
+                     -startangle => 270,
+                     -corners => [0,1,0,1,0,1,0,1,0,1],
+                     -params => {-filled => 1,
+                                 -fillcolor => 'gradstar',
+                                 -linewidth => 1,
+                                 -linecolor => '#330000',
+                                 -priority => 20,
+                                },
+                     -relief => {-width => 10,
+                                 -profil => 'rounded',
+                                 -side => 'outside',
+                                 -relief => 'sunken',
+                                },
+                     },
+             },
+       );
+
+
+&setGradients($widget, \%gradset);
+
+my $star = &buildZincItem($zinc, $topgroup, \%starstyle);
+
+=head1 AUTEURS
+
+Jean-Luc Vinot <vinot@cena.fr>

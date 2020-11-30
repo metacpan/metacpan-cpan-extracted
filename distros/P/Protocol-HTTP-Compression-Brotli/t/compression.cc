@@ -10,7 +10,7 @@ using Method = Request::Method;
 
 TEST("small body compress/uncompress") {
     auto req = Request::Builder()
-        .method(Method::POST)
+        .method(Method::Post)
         .body("my body")
         .compress(Compression::BROTLI)
         .build();
@@ -53,7 +53,7 @@ Nullam quis tempus lectus. Quisque purus est, venenatis at auctor a, laoreet in 
 )END";
     string body_sample(body_raw);
     auto req = Request::Builder()
-        .method(Method::POST)
+        .method(Method::Post)
         .body(body_sample)
         .compress(Compression::BROTLI, Compression::Level::max)
         .build();
@@ -156,7 +156,7 @@ TEST("real response sample") {
     string raw(reinterpret_cast<char*>(data), sizeof (data));
     ResponseParser p;
     auto req = Request::Builder()
-        .method(Method::GET)
+        .method(Method::Get)
         .allow_compression(Compression::BROTLI)
         .uri("/")
         .build();
@@ -180,7 +180,7 @@ TEST("chunked") {
     Body body;
     string body_concat;
     for(auto& it : body_raw) { body.parts.push_back(string(it)); body_concat += string(it); }
-    auto req = Request::Builder().method(Method::POST).body(std::move(body)).chunked().compress(Compression::BROTLI).build();
+    auto req = Request::Builder().method(Method::Post).body(std::move(body)).chunked().compress(Compression::BROTLI).build();
     auto data = req->to_string();
     REQUIRE_THAT(data, StartsWith(
         "POST / HTTP/1.1\r\n"

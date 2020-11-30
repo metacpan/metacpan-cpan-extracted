@@ -16,14 +16,14 @@ my %tests = (
     'freebsd-6.2' => [
         {
             NUMSLOTS         => 1,
-            SERIALNUMBER     => 'None',
+            SERIALNUMBER     => undef,
             DESCRIPTION      => 'DIMM',
             SPEED            => undef,
             TYPE             => undef,
             CAPTION          => 'A0',
             CAPACITY         => '512',
             MANUFACTURER     => undef,
-            MEMORYCORRECTION => 'None'
+            MEMORYCORRECTION => undef
 
         }
     ],
@@ -32,23 +32,25 @@ my %tests = (
             NUMSLOTS         => 1,
             SERIALNUMBER     => '1A1541FC',
             DESCRIPTION      => 'SODIMM',
-            TYPE             => undef,
+            TYPE             => 'DDR3',
             SPEED            => '1067',
             CAPACITY         => '2048',
             CAPTION          => 'Bottom - Slot 1',
             MANUFACTURER     => 'Hynix',
-            MEMORYCORRECTION => 'None'
+            MODEL            => 'HMT125S6BFR8C-H9',
+            MEMORYCORRECTION => undef
         },
         {
             NUMSLOTS         => 2,
             SERIALNUMBER     => '1A554239',
             DESCRIPTION      => 'SODIMM',
-            TYPE             => undef,
+            TYPE             => 'DDR3',
             SPEED            => '1067',
             CAPACITY         => '2048',
             CAPTION          => 'Bottom - Slot 2',
             MANUFACTURER     => 'Hynix',
-            MEMORYCORRECTION => 'None'
+            MODEL            => 'HMT125S6BFR8C-H9',
+            MEMORYCORRECTION => undef
 
         }
     ],
@@ -62,7 +64,7 @@ my %tests = (
             CAPACITY         => '1024',
             CAPTION          => 'DIMM0',
             MANUFACTURER     => undef,
-            MEMORYCORRECTION => 'None'
+            MEMORYCORRECTION => undef
         },
         {
             NUMSLOTS         => 2,
@@ -73,7 +75,7 @@ my %tests = (
             CAPACITY         => '1024',
             CAPTION          => 'DIMM1',
             MANUFACTURER     => undef,
-            MEMORYCORRECTION => 'None'
+            MEMORYCORRECTION => undef
 
         },
         {
@@ -85,7 +87,7 @@ my %tests = (
             CAPACITY         => '1024',
             CAPTION          => 'DIMM2',
             MANUFACTURER     => undef,
-            MEMORYCORRECTION => 'None'
+            MEMORYCORRECTION => undef
 
         },
         {
@@ -97,7 +99,7 @@ my %tests = (
             CAPACITY         => '1024',
             CAPTION          => 'DIMM3',
             MANUFACTURER     => undef,
-            MEMORYCORRECTION => 'None'
+            MEMORYCORRECTION => undef
 
         }
     ],
@@ -111,7 +113,7 @@ my %tests = (
             CAPTION          => 'DIMM_A',
             CAPACITY         => '1024',
             MANUFACTURER     => undef,
-            MEMORYCORRECTION => 'None'
+            MEMORYCORRECTION => undef
         },
         {
             NUMSLOTS         => 2,
@@ -122,7 +124,7 @@ my %tests = (
             CAPTION          => 'DIMM_B',
             CAPACITY         => '1024',
             MANUFACTURER     => undef,
-            MEMORYCORRECTION => 'None'
+            MEMORYCORRECTION => undef
         }
     ],
     'openbsd-3.7' => [
@@ -168,6 +170,7 @@ my %tests = (
             CAPTION          => 'DIMM1_A',
             CAPACITY         => '512',
             MANUFACTURER     => undef,
+            MODEL            => 'M3 93T6450FZ0-CCC',
             MEMORYCORRECTION => 'Multi-bit ECC'
         },
         {
@@ -179,6 +182,7 @@ my %tests = (
             CAPTION          => 'DIMM1_B',
             CAPACITY         => '512',
             MANUFACTURER     => undef,
+            MODEL            => 'M3 93T6450FZ0-CCC',
             MEMORYCORRECTION => 'Multi-bit ECC'
         },
         {
@@ -280,6 +284,7 @@ my %tests = (
             CAPTION          => 'D11',
             CAPACITY         => '32768',
             MANUFACTURER     => 'Samsung',
+            MODEL            => 'M386A4G40DM0-CPB',
             MEMORYCORRECTION => 'Multi-bit ECC'
         },
         {
@@ -291,6 +296,7 @@ my %tests = (
             CAPTION          => 'D10',
             CAPACITY         => '32768',
             MANUFACTURER     => 'Samsung',
+            MODEL            => 'M386A4G40DM0-CPB',
             MEMORYCORRECTION => 'Multi-bit ECC'
         },
         {
@@ -312,6 +318,7 @@ my %tests = (
             CAPTION          => 'D8',
             CAPACITY         => '32768',
             MANUFACTURER     => 'Samsung',
+            MODEL            => 'M386A4G40DM0-CPB',
             MEMORYCORRECTION => 'Multi-bit ECC'
         },
         {
@@ -323,6 +330,7 @@ my %tests = (
             CAPTION          => 'D7',
             CAPACITY         => '32768',
             MANUFACTURER     => 'Samsung',
+            MODEL            => 'M386A4G40DM0-CPB',
             MEMORYCORRECTION => 'Multi-bit ECC'
         },
         {
@@ -344,6 +352,7 @@ my %tests = (
             CAPTION          => 'D0',
             CAPACITY         => '32768',
             MANUFACTURER     => 'Samsung',
+            MODEL            => 'M386A4G40DM0-CPB',
             MEMORYCORRECTION => 'Multi-bit ECC'
         },
         {
@@ -355,6 +364,7 @@ my %tests = (
             CAPTION          => 'D1',
             CAPACITY         => '32768',
             MANUFACTURER     => 'Samsung',
+            MODEL            => 'M386A4G40DM0-CPB',
             MEMORYCORRECTION => 'Multi-bit ECC'
         },
         {
@@ -376,6 +386,7 @@ my %tests = (
             CAPTION          => 'D3',
             CAPACITY         => '32768',
             MANUFACTURER     => 'Samsung',
+            MODEL            => 'M386A4G40DM0-CPB',
             MEMORYCORRECTION => 'Multi-bit ECC'
         },
         {
@@ -387,6 +398,7 @@ my %tests = (
             CAPTION          => 'D4',
             CAPACITY         => '32768',
             MANUFACTURER     => 'Samsung',
+            MODEL            => 'M386A4G40DM0-CPB',
             MEMORYCORRECTION => 'Multi-bit ECC'
         },
         {
@@ -408,6 +420,7 @@ my %tests = (
             CAPTION          => 'D11',
             CAPACITY         => '32768',
             MANUFACTURER     => 'Samsung',
+            MODEL            => 'M386A4G40DM0-CPB',
             MEMORYCORRECTION => 'Multi-bit ECC'
         },
         {
@@ -419,6 +432,7 @@ my %tests = (
             CAPTION          => 'D10',
             CAPACITY         => '32768',
             MANUFACTURER     => 'Samsung',
+            MODEL            => 'M386A4G40DM0-CPB',
             MEMORYCORRECTION => 'Multi-bit ECC'
         },
         {
@@ -440,6 +454,7 @@ my %tests = (
             CAPTION          => 'D8',
             CAPACITY         => '32768',
             MANUFACTURER     => 'Samsung',
+            MODEL            => 'M386A4G40DM0-CPB',
             MEMORYCORRECTION => 'Multi-bit ECC'
         },
         {
@@ -451,6 +466,7 @@ my %tests = (
             CAPTION          => 'D7',
             CAPACITY         => '32768',
             MANUFACTURER     => 'Samsung',
+            MODEL            => 'M386A4G40DM0-CPB',
             MEMORYCORRECTION => 'Multi-bit ECC'
         },
         {
@@ -472,6 +488,7 @@ my %tests = (
             CAPTION          => 'D0',
             CAPACITY         => '32768',
             MANUFACTURER     => 'Samsung',
+            MODEL            => 'M386A4G40DM0-CPB',
             MEMORYCORRECTION => 'Multi-bit ECC'
         },
         {
@@ -483,6 +500,7 @@ my %tests = (
             CAPTION          => 'D1',
             CAPACITY         => '32768',
             MANUFACTURER     => 'Samsung',
+            MODEL            => 'M386A4G40DM0-CPB',
             MEMORYCORRECTION => 'Multi-bit ECC'
         },
         {
@@ -504,6 +522,7 @@ my %tests = (
             CAPTION          => 'D3',
             CAPACITY         => '32768',
             MANUFACTURER     => 'Samsung',
+            MODEL            => 'M386A4G40DM0-CPB',
             MEMORYCORRECTION => 'Multi-bit ECC'
         },
         {
@@ -515,6 +534,7 @@ my %tests = (
             CAPTION          => 'D4',
             CAPACITY         => '32768',
             MANUFACTURER     => 'Samsung',
+            MODEL            => 'M386A4G40DM0-CPB',
             MEMORYCORRECTION => 'Multi-bit ECC'
         },
         {
@@ -536,7 +556,7 @@ my %tests = (
         },
         {
             NUMSLOTS         => 2,
-            TYPE             => 'UNKNOWN'
+            TYPE             => undef
         }
     ],
     'rhel-3.4' => [
@@ -549,6 +569,7 @@ my %tests = (
             CAPTION          => 'DIMM 1',
             CAPACITY         => '512',
             MANUFACTURER     => undef,
+            MODEL            => 'M3 93T6553BZ3-CCC',
             MEMORYCORRECTION => 'Single-bit ECC'
         },
         {
@@ -560,6 +581,7 @@ my %tests = (
             CAPTION          => 'DIMM 2',
             CAPACITY         => '512',
             MANUFACTURER     => undef,
+            MODEL            => 'M3 93T6553BZ3-CCC',
             MEMORYCORRECTION => 'Single-bit ECC'
         },
         {
@@ -719,8 +741,9 @@ my %tests = (
             CAPACITY         => '2048',
             CAPTION          => 'PROC 1 DIMM 2A',
             MANUFACTURER     => 'Micron',
-            MEMORYCORRECTION => 'Single-bit ECC'
-
+            MODEL            => '18JSF25672AZ-1G4F1',
+            MEMORYCORRECTION => 'Single-bit ECC',
+            TYPE             => 'DDR3',
         },
         {
             NUMSLOTS         => 2,
@@ -741,7 +764,9 @@ my %tests = (
             CAPACITY         => '2048',
             CAPTION          => 'PROC 1 DIMM 4B',
             MANUFACTURER     => 'Micron',
-            MEMORYCORRECTION => 'Single-bit ECC'
+            MODEL            => '18JSF25672AZ-1G4F1',
+            MEMORYCORRECTION => 'Single-bit ECC',
+            TYPE             => 'DDR3',
         },
         {
             NUMSLOTS         => 4,
@@ -844,7 +869,8 @@ my %tests = (
             CAPACITY         => '1024',
             CAPTION          => 'J8J1',
             MANUFACTURER     => undef,
-            MEMORYCORRECTION => 'None'
+            MODEL            => 'M3 78T2953EZ3-CE6',
+            MEMORYCORRECTION => undef
 
         },
         {
@@ -856,7 +882,8 @@ my %tests = (
             CAPACITY         => '2048',
             CAPTION          => 'J8J2',
             MANUFACTURER     => undef,
-            MEMORYCORRECTION => 'None'
+            MODEL            => 'K',
+            MEMORYCORRECTION => undef
 
         },
         {
@@ -868,7 +895,8 @@ my %tests = (
             CAPACITY         => '1024',
             CAPTION          => 'J9J1',
             MANUFACTURER     => undef,
-            MEMORYCORRECTION => 'None'
+            MODEL            => 'M3 78T2953EZ3-CE6',
+            MEMORYCORRECTION => undef
 
         },
         {
@@ -879,7 +907,7 @@ my %tests = (
             SPEED            => undef,
             CAPTION          => 'J9J2',
             MANUFACTURER     => undef,
-            MEMORYCORRECTION => 'None'
+            MEMORYCORRECTION => undef
 
         }
     ],
@@ -983,7 +1011,7 @@ my %tests = (
             CAPACITY         => '2048',
             CAPTION          => 'RAM slot #0',
             MANUFACTURER     => undef,
-            MEMORYCORRECTION => 'None'
+            MEMORYCORRECTION => undef
 
         },
         {
@@ -994,7 +1022,7 @@ my %tests = (
             SPEED            => undef,
             CAPTION          => 'RAM slot #1',
             MANUFACTURER     => undef,
-            MEMORYCORRECTION => 'None'
+            MEMORYCORRECTION => undef
 
         },
         {
@@ -1005,7 +1033,7 @@ my %tests = (
             SPEED            => undef,
             CAPTION          => 'RAM slot #2',
             MANUFACTURER     => undef,
-            MEMORYCORRECTION => 'None'
+            MEMORYCORRECTION => undef
 
         },
         {
@@ -1016,7 +1044,7 @@ my %tests = (
             SPEED            => undef,
             CAPTION          => 'RAM slot #3',
             MANUFACTURER     => undef,
-            MEMORYCORRECTION => 'None'
+            MEMORYCORRECTION => undef
 
         }
     ],
@@ -1030,7 +1058,7 @@ my %tests = (
             CAPACITY         => '2048',
             CAPTION          => 'RAM slot #0',
             MANUFACTURER     => undef,
-            MEMORYCORRECTION => 'None'
+            MEMORYCORRECTION => undef
         },
         {
             NUMSLOTS         => 2,
@@ -1040,7 +1068,7 @@ my %tests = (
             SPEED            => undef,
             CAPTION          => 'RAM slot #1',
             MANUFACTURER     => undef,
-            MEMORYCORRECTION => 'None'
+            MEMORYCORRECTION => undef
         },
         {
             NUMSLOTS         => 3,
@@ -1050,7 +1078,7 @@ my %tests = (
             SPEED            => undef,
             CAPTION          => 'RAM slot #2',
             MANUFACTURER     => undef,
-            MEMORYCORRECTION => 'None'
+            MEMORYCORRECTION => undef
         },
         {
             NUMSLOTS         => 4,
@@ -1060,7 +1088,7 @@ my %tests = (
             SPEED            => undef,
             CAPTION          => 'RAM slot #3',
             MANUFACTURER     => undef,
-            MEMORYCORRECTION => 'None'
+            MEMORYCORRECTION => undef
         },
         {
             NUMSLOTS         => 5,
@@ -1070,7 +1098,7 @@ my %tests = (
             SPEED            => undef,
             CAPTION          => 'RAM slot #4',
             MANUFACTURER     => undef,
-            MEMORYCORRECTION => 'None'
+            MEMORYCORRECTION => undef
         },
         {
             NUMSLOTS         => 6,
@@ -1080,7 +1108,7 @@ my %tests = (
             SPEED            => undef,
             CAPTION          => 'RAM slot #5',
             MANUFACTURER     => undef,
-            MEMORYCORRECTION => 'None'
+            MEMORYCORRECTION => undef
         },
         {
             NUMSLOTS         => 7,
@@ -1090,7 +1118,7 @@ my %tests = (
             SPEED            => undef,
             CAPTION          => 'RAM slot #6',
             MANUFACTURER     => undef,
-            MEMORYCORRECTION => 'None'
+            MEMORYCORRECTION => undef
         },
         {
             NUMSLOTS         => 8,
@@ -1100,7 +1128,7 @@ my %tests = (
             SPEED            => undef,
             CAPTION          => 'RAM slot #7',
             MANUFACTURER     => undef,
-            MEMORYCORRECTION => 'None'
+            MEMORYCORRECTION => undef
         },
         {
             NUMSLOTS         => 9,
@@ -1110,7 +1138,7 @@ my %tests = (
             SPEED            => undef,
             CAPTION          => 'RAM slot #8',
             MANUFACTURER     => undef,
-            MEMORYCORRECTION => 'None'
+            MEMORYCORRECTION => undef
         },
         {
             NUMSLOTS         => 10,
@@ -1120,7 +1148,7 @@ my %tests = (
             SPEED            => undef,
             CAPTION          => 'RAM slot #9',
             MANUFACTURER     => undef,
-            MEMORYCORRECTION => 'None'
+            MEMORYCORRECTION => undef
         },
         {
             NUMSLOTS         => 11,
@@ -1130,7 +1158,7 @@ my %tests = (
             SPEED            => undef,
             CAPTION          => 'RAM slot #10',
             MANUFACTURER     => undef,
-            MEMORYCORRECTION => 'None'
+            MEMORYCORRECTION => undef
         },
         {
             NUMSLOTS         => 12,
@@ -1140,7 +1168,7 @@ my %tests = (
             SPEED            => undef,
             CAPTION          => 'RAM slot #11',
             MANUFACTURER     => undef,
-            MEMORYCORRECTION => 'None'
+            MEMORYCORRECTION => undef
         },
         {
             NUMSLOTS         => 13,
@@ -1150,7 +1178,7 @@ my %tests = (
             SPEED            => undef,
             CAPTION          => 'RAM slot #12',
             MANUFACTURER     => undef,
-            MEMORYCORRECTION => 'None'
+            MEMORYCORRECTION => undef
         },
         {
             NUMSLOTS         => 14,
@@ -1160,7 +1188,7 @@ my %tests = (
             SPEED            => undef,
             CAPTION          => 'RAM slot #13',
             MANUFACTURER     => undef,
-            MEMORYCORRECTION => 'None'
+            MEMORYCORRECTION => undef
         },
         {
             NUMSLOTS         => 15,
@@ -1170,7 +1198,7 @@ my %tests = (
             SPEED            => undef,
             CAPTION          => 'RAM slot #14',
             MANUFACTURER     => undef,
-            MEMORYCORRECTION => 'None'
+            MEMORYCORRECTION => undef
         }
     ],
     'vmware-esx-2.5' => [
@@ -1246,7 +1274,7 @@ my %tests = (
             CAPTION          => 'DIMM 0',
             CAPACITY         => '256',
             MANUFACTURER     => undef,
-            MEMORYCORRECTION => 'None'
+            MEMORYCORRECTION => undef
         },
         {
             NUMSLOTS         => 2,
@@ -1257,7 +1285,7 @@ my %tests = (
             CAPTION          => 'DIMM 1',
             CAPACITY         => '512',
             MANUFACTURER     => undef,
-            MEMORYCORRECTION => 'None'
+            MEMORYCORRECTION => undef
         }
     ],
     'windows-xp' => [
@@ -1267,9 +1295,10 @@ my %tests = (
             TYPE             => 'DDR2',
             SPEED            => '800',
             CAPTION          => 'DIMM_A',
-            MEMORYCORRECTION => 'None',
+            MEMORYCORRECTION => undef,
             DESCRIPTION      => 'DIMM',
-            MANUFACTURER     => undef,
+            MANUFACTURER     => 'Elpida',
+            MODEL            => 'EBE21UE8ACUA-8G-E',
             CAPACITY         => '2048'
         },
         {
@@ -1278,16 +1307,17 @@ my %tests = (
             TYPE             => 'DDR2',
             SPEED            => '800',
             CAPTION          => 'DIMM_B',
-            MEMORYCORRECTION => 'None',
+            MEMORYCORRECTION => undef,
             DESCRIPTION      => 'DIMM',
-            MANUFACTURER     => undef,
+            MANUFACTURER     => 'Elpida',
+            MODEL            => 'EBE21UE8ACUA-8G-E',
             CAPACITY         => '2048'
         }
     ],
     'windows-7' => [
         {
             NUMSLOTS         => 1,
-            MEMORYCORRECTION => 'None',
+            MEMORYCORRECTION => undef,
             SERIALNUMBER     => 'SerNum0',
             DESCRIPTION      => 'DIMM',
             TYPE             => undef,
@@ -1301,14 +1331,15 @@ my %tests = (
             TYPE             => undef,
             SPEED            => '1600',
             CAPTION          => 'DIMM1',
-            MEMORYCORRECTION => 'None',
+            MEMORYCORRECTION => undef,
             DESCRIPTION      => 'DIMM',
             MANUFACTURER     => undef,
+            MODEL            => 'F3-12800CL9-2GBXL',
             CAPACITY         => '2048'
         },
         {
             NUMSLOTS         => 3,
-            MEMORYCORRECTION => 'None',
+            MEMORYCORRECTION => undef,
             SERIALNUMBER     => 'SerNum2',
             DESCRIPTION      => 'DIMM',
             TYPE             => undef,
@@ -1322,9 +1353,10 @@ my %tests = (
             TYPE             => undef,
             SPEED            => '1600',
             CAPTION          => 'DIMM3',
-            MEMORYCORRECTION => 'None',
+            MEMORYCORRECTION => undef,
             DESCRIPTION      => 'DIMM',
             MANUFACTURER     => undef,
+            MODEL            => 'F3-12800CL9-2GBXL',
             CAPACITY         => '2048'
         }
     ],
@@ -1338,7 +1370,8 @@ my %tests = (
             CAPACITY         => '1024',
             CAPTION          => 'DIMM_1',
             MANUFACTURER     => 'Nanya',
-            MEMORYCORRECTION => 'None'
+            MODEL            => 'NT1GT64U88D0BY-AD',
+            MEMORYCORRECTION => undef
         },{
             NUMSLOTS         => 2,
             SERIALNUMBER     => 'SerNum01',
@@ -1347,692 +1380,1422 @@ my %tests = (
             SPEED            => undef,
             CAPTION          => 'DIMM_2',
             MANUFACTURER     => undef,
-            MEMORYCORRECTION => 'None'
+            MEMORYCORRECTION => undef
         }
     ],
     'dell-fx170' => [
         {
             NUMSLOTS         => 1,
-            SERIALNUMBER     => 'None',
+            SERIALNUMBER     => undef,
             DESCRIPTION      => 'DIMM',
             TYPE             => 'DDR2',
             SPEED            => undef,
             CAPACITY         => '2048',
             CAPTION          => 'A0',
             MANUFACTURER     => undef,
-            MEMORYCORRECTION => 'None'
+            MEMORYCORRECTION => undef
         },{
             NUMSLOTS         => 2,
-            SERIALNUMBER     => 'None',
+            SERIALNUMBER     => undef,
             DESCRIPTION      => 'DIMM',
             TYPE             => undef,
             SPEED            => undef,
             CAPTION          => 'A1',
             MANUFACTURER     => undef,
-            MEMORYCORRECTION => 'None'
+            MEMORYCORRECTION => undef
         },{
             NUMSLOTS         => 3,
-            SERIALNUMBER     => 'None',
+            SERIALNUMBER     => undef,
             DESCRIPTION      => 'DIMM',
             TYPE             => undef,
             SPEED            => undef,
             CAPTION          => 'A2',
             MANUFACTURER     => undef,
-            MEMORYCORRECTION => 'None'
+            MEMORYCORRECTION => undef
         },{
             NUMSLOTS         => 4,
-            SERIALNUMBER     => 'None',
+            SERIALNUMBER     => undef,
             DESCRIPTION      => 'DIMM',
             TYPE             => undef,
             SPEED            => undef,
             CAPTION          => 'A3',
             MANUFACTURER     => undef,
-            MEMORYCORRECTION => 'None'
+            MEMORYCORRECTION => undef
         }
     ],
     'windows-hyperV' => [
         {
             NUMSLOTS         => 1,
-            SERIALNUMBER     => 'None',
+            SERIALNUMBER     => undef,
             DESCRIPTION      => undef,
             TYPE             => 'Other',
             SPEED            => undef,
             CAPACITY         => '1024',
             CAPTION          => 'M0',
             MANUFACTURER     => 'Microsoft',
-            MEMORYCORRECTION => 'None'
+            MEMORYCORRECTION => undef
         },
         {
             NUMSLOTS         => 2,
-            SERIALNUMBER     => 'None',
+            SERIALNUMBER     => undef,
             DESCRIPTION      => undef,
             TYPE             => 'Other',
             SPEED            => undef,
             CAPTION          => 'M1',
             MANUFACTURER     => 'Microsoft',
-            MEMORYCORRECTION => 'None'
+            MEMORYCORRECTION => undef
         },
         {
             NUMSLOTS         => 3,
-            SERIALNUMBER     => 'None',
+            SERIALNUMBER     => undef,
             DESCRIPTION      => undef,
             TYPE             => 'Other',
             SPEED            => undef,
             CAPTION          => 'M2',
             MANUFACTURER     => 'Microsoft',
-            MEMORYCORRECTION => 'None'
+            MEMORYCORRECTION => undef
         },
         {
             NUMSLOTS         => 4,
-            SERIALNUMBER     => 'None',
+            SERIALNUMBER     => undef,
             DESCRIPTION      => undef,
             TYPE             => 'Other',
             SPEED            => undef,
             CAPTION          => 'M3',
             MANUFACTURER     => 'Microsoft',
-            MEMORYCORRECTION => 'None'
+            MEMORYCORRECTION => undef
         },
         {
             NUMSLOTS         => 5,
-            SERIALNUMBER     => 'None',
+            SERIALNUMBER     => undef,
             DESCRIPTION      => undef,
             TYPE             => 'Other',
             SPEED            => undef,
             CAPTION          => 'M4',
             MANUFACTURER     => 'Microsoft',
-            MEMORYCORRECTION => 'None'
+            MEMORYCORRECTION => undef
         },
         {
             NUMSLOTS         => 6,
-            SERIALNUMBER     => 'None',
+            SERIALNUMBER     => undef,
             DESCRIPTION      => undef,
             TYPE             => 'Other',
             SPEED            => undef,
             CAPTION          => 'M5',
             MANUFACTURER     => 'Microsoft',
-            MEMORYCORRECTION => 'None'
+            MEMORYCORRECTION => undef
         },
         {
             NUMSLOTS         => 7,
-            SERIALNUMBER     => 'None',
+            SERIALNUMBER     => undef,
             DESCRIPTION      => undef,
             TYPE             => 'Other',
             SPEED            => undef,
             CAPTION          => 'M6',
             MANUFACTURER     => 'Microsoft',
-            MEMORYCORRECTION => 'None'
+            MEMORYCORRECTION => undef
         },
         {
             NUMSLOTS         => 8,
-            SERIALNUMBER     => 'None',
+            SERIALNUMBER     => undef,
             DESCRIPTION      => undef,
             TYPE             => 'Other',
             SPEED            => undef,
             CAPTION          => 'M7',
             MANUFACTURER     => 'Microsoft',
-            MEMORYCORRECTION => 'None'
+            MEMORYCORRECTION => undef
         },
         {
             NUMSLOTS         => 9,
-            SERIALNUMBER     => 'None',
+            SERIALNUMBER     => undef,
             DESCRIPTION      => undef,
             TYPE             => 'Other',
             SPEED            => undef,
             CAPTION          => 'M8',
             MANUFACTURER     => 'Microsoft',
-            MEMORYCORRECTION => 'None'
+            MEMORYCORRECTION => undef
         },
         {
             NUMSLOTS         => 10,
-            SERIALNUMBER     => 'None',
+            SERIALNUMBER     => undef,
             DESCRIPTION      => undef,
             TYPE             => 'Other',
             SPEED            => undef,
             CAPTION          => 'M9',
             MANUFACTURER     => 'Microsoft',
-            MEMORYCORRECTION => 'None'
+            MEMORYCORRECTION => undef
         },
         {
             NUMSLOTS         => 11,
-            SERIALNUMBER     => 'None',
+            SERIALNUMBER     => undef,
             DESCRIPTION      => undef,
             TYPE             => 'Other',
             SPEED            => undef,
             CAPTION          => 'M10',
             MANUFACTURER     => 'Microsoft',
-            MEMORYCORRECTION => 'None'
+            MEMORYCORRECTION => undef
         },
         {
             NUMSLOTS         => 12,
-            SERIALNUMBER     => 'None',
+            SERIALNUMBER     => undef,
             DESCRIPTION      => undef,
             TYPE             => 'Other',
             SPEED            => undef,
             CAPTION          => 'M11',
             MANUFACTURER     => 'Microsoft',
-            MEMORYCORRECTION => 'None'
+            MEMORYCORRECTION => undef
         },
         {
             NUMSLOTS         => 13,
-            SERIALNUMBER     => 'None',
+            SERIALNUMBER     => undef,
             DESCRIPTION      => undef,
             TYPE             => 'Other',
             SPEED            => undef,
             CAPTION          => 'M12',
             MANUFACTURER     => 'Microsoft',
-            MEMORYCORRECTION => 'None'
+            MEMORYCORRECTION => undef
         },
         {
             NUMSLOTS         => 14,
-            SERIALNUMBER     => 'None',
+            SERIALNUMBER     => undef,
             DESCRIPTION      => undef,
             TYPE             => 'Other',
             SPEED            => undef,
             CAPTION          => 'M13',
             MANUFACTURER     => 'Microsoft',
-            MEMORYCORRECTION => 'None'
+            MEMORYCORRECTION => undef
         },
         {
             NUMSLOTS         => 15,
-            SERIALNUMBER     => 'None',
+            SERIALNUMBER     => undef,
             DESCRIPTION      => undef,
             TYPE             => 'Other',
             SPEED            => undef,
             CAPTION          => 'M14',
             MANUFACTURER     => 'Microsoft',
-            MEMORYCORRECTION => 'None'
+            MEMORYCORRECTION => undef
         },
         {
             NUMSLOTS         => 16,
-            SERIALNUMBER     => 'None',
+            SERIALNUMBER     => undef,
             DESCRIPTION      => undef,
             TYPE             => 'Other',
             SPEED            => undef,
             CAPTION          => 'M15',
             MANUFACTURER     => 'Microsoft',
-            MEMORYCORRECTION => 'None'
+            MEMORYCORRECTION => undef
         },
         {
             NUMSLOTS         => 17,
-            SERIALNUMBER     => 'None',
+            SERIALNUMBER     => undef,
             DESCRIPTION      => undef,
             TYPE             => 'Other',
             SPEED            => undef,
             CAPTION          => 'M16',
             MANUFACTURER     => 'Microsoft',
-            MEMORYCORRECTION => 'None'
+            MEMORYCORRECTION => undef
         },
         {
             NUMSLOTS         => 18,
-            SERIALNUMBER     => 'None',
+            SERIALNUMBER     => undef,
             DESCRIPTION      => undef,
             TYPE             => 'Other',
             SPEED            => undef,
             CAPTION          => 'M17',
             MANUFACTURER     => 'Microsoft',
-            MEMORYCORRECTION => 'None'
+            MEMORYCORRECTION => undef
         },
         {
             NUMSLOTS         => 19,
-            SERIALNUMBER     => 'None',
+            SERIALNUMBER     => undef,
             DESCRIPTION      => undef,
             TYPE             => 'Other',
             SPEED            => undef,
             CAPTION          => 'M18',
             MANUFACTURER     => 'Microsoft',
-            MEMORYCORRECTION => 'None'
+            MEMORYCORRECTION => undef
         },
         {
             NUMSLOTS         => 20,
-            SERIALNUMBER     => 'None',
+            SERIALNUMBER     => undef,
             DESCRIPTION      => undef,
             TYPE             => 'Other',
             SPEED            => undef,
             CAPTION          => 'M19',
             MANUFACTURER     => 'Microsoft',
-            MEMORYCORRECTION => 'None'
+            MEMORYCORRECTION => undef
         },
         {
             NUMSLOTS         => 21,
-            SERIALNUMBER     => 'None',
+            SERIALNUMBER     => undef,
             DESCRIPTION      => undef,
             TYPE             => 'Other',
             SPEED            => undef,
             CAPTION          => 'M20',
             MANUFACTURER     => 'Microsoft',
-            MEMORYCORRECTION => 'None'
+            MEMORYCORRECTION => undef
         },
         {
             NUMSLOTS         => 22,
-            SERIALNUMBER     => 'None',
+            SERIALNUMBER     => undef,
             DESCRIPTION      => undef,
             TYPE             => 'Other',
             SPEED            => undef,
             CAPTION          => 'M21',
             MANUFACTURER     => 'Microsoft',
-            MEMORYCORRECTION => 'None'
+            MEMORYCORRECTION => undef
         },
         {
             NUMSLOTS         => 23,
-            SERIALNUMBER     => 'None',
+            SERIALNUMBER     => undef,
             DESCRIPTION      => undef,
             TYPE             => 'Other',
             SPEED            => undef,
             CAPTION          => 'M22',
             MANUFACTURER     => 'Microsoft',
-            MEMORYCORRECTION => 'None'
+            MEMORYCORRECTION => undef
         },
         {
             NUMSLOTS         => 24,
-            SERIALNUMBER     => 'None',
+            SERIALNUMBER     => undef,
             DESCRIPTION      => undef,
             TYPE             => 'Other',
             SPEED            => undef,
             CAPTION          => 'M23',
             MANUFACTURER     => 'Microsoft',
-            MEMORYCORRECTION => 'None'
+            MEMORYCORRECTION => undef
         },
         {
             NUMSLOTS         => 25,
-            SERIALNUMBER     => 'None',
+            SERIALNUMBER     => undef,
             DESCRIPTION      => undef,
             TYPE             => 'Other',
             SPEED            => undef,
             CAPTION          => 'M24',
             MANUFACTURER     => 'Microsoft',
-            MEMORYCORRECTION => 'None'
+            MEMORYCORRECTION => undef
         },
         {
             NUMSLOTS         => 26,
-            SERIALNUMBER     => 'None',
+            SERIALNUMBER     => undef,
             DESCRIPTION      => undef,
             TYPE             => 'Other',
             SPEED            => undef,
             CAPTION          => 'M25',
             MANUFACTURER     => 'Microsoft',
-            MEMORYCORRECTION => 'None'
+            MEMORYCORRECTION => undef
         },
         {
             NUMSLOTS         => 27,
-            SERIALNUMBER     => 'None',
+            SERIALNUMBER     => undef,
             DESCRIPTION      => undef,
             TYPE             => 'Other',
             SPEED            => undef,
             CAPTION          => 'M26',
             MANUFACTURER     => 'Microsoft',
-            MEMORYCORRECTION => 'None'
+            MEMORYCORRECTION => undef
         },
         {
             NUMSLOTS         => 28,
-            SERIALNUMBER     => 'None',
+            SERIALNUMBER     => undef,
             DESCRIPTION      => undef,
             TYPE             => 'Other',
             SPEED            => undef,
             CAPTION          => 'M27',
             MANUFACTURER     => 'Microsoft',
-            MEMORYCORRECTION => 'None'
+            MEMORYCORRECTION => undef
         },
         {
             NUMSLOTS         => 29,
-            SERIALNUMBER     => 'None',
+            SERIALNUMBER     => undef,
             DESCRIPTION      => undef,
             TYPE             => 'Other',
             SPEED            => undef,
             CAPTION          => 'M28',
             MANUFACTURER     => 'Microsoft',
-            MEMORYCORRECTION => 'None'
+            MEMORYCORRECTION => undef
         },
         {
             NUMSLOTS         => 30,
-            SERIALNUMBER     => 'None',
+            SERIALNUMBER     => undef,
             DESCRIPTION      => undef,
             TYPE             => 'Other',
             SPEED            => undef,
             CAPTION          => 'M29',
             MANUFACTURER     => 'Microsoft',
-            MEMORYCORRECTION => 'None'
+            MEMORYCORRECTION => undef
         },
         {
             NUMSLOTS         => 31,
-            SERIALNUMBER     => 'None',
+            SERIALNUMBER     => undef,
             DESCRIPTION      => undef,
             TYPE             => 'Other',
             SPEED            => undef,
             CAPTION          => 'M30',
             MANUFACTURER     => 'Microsoft',
-            MEMORYCORRECTION => 'None'
+            MEMORYCORRECTION => undef
         },
         {
             NUMSLOTS         => 32,
-            SERIALNUMBER     => 'None',
+            SERIALNUMBER     => undef,
             DESCRIPTION      => undef,
             TYPE             => 'Other',
             SPEED            => undef,
             CAPTION          => 'M31',
             MANUFACTURER     => 'Microsoft',
-            MEMORYCORRECTION => 'None'
+            MEMORYCORRECTION => undef
         },
         {
             NUMSLOTS         => 33,
-            SERIALNUMBER     => 'None',
+            SERIALNUMBER     => undef,
             DESCRIPTION      => undef,
             TYPE             => 'Other',
             SPEED            => undef,
             CAPTION          => 'M32',
             MANUFACTURER     => 'Microsoft',
-            MEMORYCORRECTION => 'None'
+            MEMORYCORRECTION => undef
         },
         {
             NUMSLOTS         => 34,
-            SERIALNUMBER     => 'None',
+            SERIALNUMBER     => undef,
             DESCRIPTION      => undef,
             TYPE             => 'Other',
             SPEED            => undef,
             CAPTION          => 'M33',
             MANUFACTURER     => 'Microsoft',
-            MEMORYCORRECTION => 'None'
+            MEMORYCORRECTION => undef
         },
         {
             NUMSLOTS         => 35,
-            SERIALNUMBER     => 'None',
+            SERIALNUMBER     => undef,
             DESCRIPTION      => undef,
             TYPE             => 'Other',
             SPEED            => undef,
             CAPTION          => 'M34',
             MANUFACTURER     => 'Microsoft',
-            MEMORYCORRECTION => 'None'
+            MEMORYCORRECTION => undef
         },
         {
             NUMSLOTS         => 36,
-            SERIALNUMBER     => 'None',
+            SERIALNUMBER     => undef,
             DESCRIPTION      => undef,
             TYPE             => 'Other',
             SPEED            => undef,
             CAPTION          => 'M35',
             MANUFACTURER     => 'Microsoft',
-            MEMORYCORRECTION => 'None'
+            MEMORYCORRECTION => undef
         },
         {
             NUMSLOTS         => 37,
-            SERIALNUMBER     => 'None',
+            SERIALNUMBER     => undef,
             DESCRIPTION      => undef,
             TYPE             => 'Other',
             SPEED            => undef,
             CAPTION          => 'M36',
             MANUFACTURER     => 'Microsoft',
-            MEMORYCORRECTION => 'None'
+            MEMORYCORRECTION => undef
         },
         {
             NUMSLOTS         => 38,
-            SERIALNUMBER     => 'None',
+            SERIALNUMBER     => undef,
             DESCRIPTION      => undef,
             TYPE             => 'Other',
             SPEED            => undef,
             CAPTION          => 'M37',
             MANUFACTURER     => 'Microsoft',
-            MEMORYCORRECTION => 'None'
+            MEMORYCORRECTION => undef
         },
         {
             NUMSLOTS         => 39,
-            SERIALNUMBER     => 'None',
+            SERIALNUMBER     => undef,
             DESCRIPTION      => undef,
             TYPE             => 'Other',
             SPEED            => undef,
             CAPTION          => 'M38',
             MANUFACTURER     => 'Microsoft',
-            MEMORYCORRECTION => 'None'
+            MEMORYCORRECTION => undef
         },
         {
             NUMSLOTS         => 40,
-            SERIALNUMBER     => 'None',
+            SERIALNUMBER     => undef,
             DESCRIPTION      => undef,
             TYPE             => 'Other',
             SPEED            => undef,
             CAPTION          => 'M39',
             MANUFACTURER     => 'Microsoft',
-            MEMORYCORRECTION => 'None'
+            MEMORYCORRECTION => undef
         },
         {
             NUMSLOTS         => 41,
-            SERIALNUMBER     => 'None',
+            SERIALNUMBER     => undef,
             DESCRIPTION      => undef,
             TYPE             => 'Other',
             SPEED            => undef,
             CAPTION          => 'M40',
             MANUFACTURER     => 'Microsoft',
-            MEMORYCORRECTION => 'None'
+            MEMORYCORRECTION => undef
         },
         {
             NUMSLOTS         => 42,
-            SERIALNUMBER     => 'None',
+            SERIALNUMBER     => undef,
             DESCRIPTION      => undef,
             TYPE             => 'Other',
             SPEED            => undef,
             CAPTION          => 'M41',
             MANUFACTURER     => 'Microsoft',
-            MEMORYCORRECTION => 'None'
+            MEMORYCORRECTION => undef
         },
         {
             NUMSLOTS         => 43,
-            SERIALNUMBER     => 'None',
+            SERIALNUMBER     => undef,
             DESCRIPTION      => undef,
             TYPE             => 'Other',
             SPEED            => undef,
             CAPTION          => 'M42',
             MANUFACTURER     => 'Microsoft',
-            MEMORYCORRECTION => 'None'
+            MEMORYCORRECTION => undef
         },
         {
             NUMSLOTS         => 44,
-            SERIALNUMBER     => 'None',
+            SERIALNUMBER     => undef,
             DESCRIPTION      => undef,
             TYPE             => 'Other',
             SPEED            => undef,
             CAPTION          => 'M43',
             MANUFACTURER     => 'Microsoft',
-            MEMORYCORRECTION => 'None'
+            MEMORYCORRECTION => undef
         },
         {
             NUMSLOTS         => 45,
-            SERIALNUMBER     => 'None',
+            SERIALNUMBER     => undef,
             DESCRIPTION      => undef,
             TYPE             => 'Other',
             SPEED            => undef,
             CAPTION          => 'M44',
             MANUFACTURER     => 'Microsoft',
-            MEMORYCORRECTION => 'None'
+            MEMORYCORRECTION => undef
         },
         {
             NUMSLOTS         => 46,
-            SERIALNUMBER     => 'None',
+            SERIALNUMBER     => undef,
             DESCRIPTION      => undef,
             TYPE             => 'Other',
             SPEED            => undef,
             CAPTION          => 'M45',
             MANUFACTURER     => 'Microsoft',
-            MEMORYCORRECTION => 'None'
+            MEMORYCORRECTION => undef
         },
         {
             NUMSLOTS         => 47,
-            SERIALNUMBER     => 'None',
+            SERIALNUMBER     => undef,
             DESCRIPTION      => undef,
             TYPE             => 'Other',
             SPEED            => undef,
             CAPTION          => 'M46',
             MANUFACTURER     => 'Microsoft',
-            MEMORYCORRECTION => 'None'
+            MEMORYCORRECTION => undef
         },
         {
             NUMSLOTS         => 48,
-            SERIALNUMBER     => 'None',
+            SERIALNUMBER     => undef,
             DESCRIPTION      => undef,
             TYPE             => 'Other',
             SPEED            => undef,
             CAPTION          => 'M47',
             MANUFACTURER     => 'Microsoft',
-            MEMORYCORRECTION => 'None'
+            MEMORYCORRECTION => undef
         },
         {
             NUMSLOTS         => 49,
-            SERIALNUMBER     => 'None',
+            SERIALNUMBER     => undef,
             DESCRIPTION      => undef,
             TYPE             => 'Other',
             SPEED            => undef,
             CAPTION          => 'M48',
             MANUFACTURER     => 'Microsoft',
-            MEMORYCORRECTION => 'None'
+            MEMORYCORRECTION => undef
         },
         {
             NUMSLOTS         => 50,
-            SERIALNUMBER     => 'None',
+            SERIALNUMBER     => undef,
             DESCRIPTION      => undef,
             TYPE             => 'Other',
             SPEED            => undef,
             CAPTION          => 'M49',
             MANUFACTURER     => 'Microsoft',
-            MEMORYCORRECTION => 'None'
+            MEMORYCORRECTION => undef
         },
         {
             NUMSLOTS         => 51,
-            SERIALNUMBER     => 'None',
+            SERIALNUMBER     => undef,
             DESCRIPTION      => undef,
             TYPE             => 'Other',
             SPEED            => undef,
             CAPTION          => 'M50',
             MANUFACTURER     => 'Microsoft',
-            MEMORYCORRECTION => 'None'
+            MEMORYCORRECTION => undef
         },
         {
             NUMSLOTS         => 52,
-            SERIALNUMBER     => 'None',
+            SERIALNUMBER     => undef,
             DESCRIPTION      => undef,
             TYPE             => 'Other',
             SPEED            => undef,
             CAPTION          => 'M51',
             MANUFACTURER     => 'Microsoft',
-            MEMORYCORRECTION => 'None'
+            MEMORYCORRECTION => undef
         },
         {
             NUMSLOTS         => 53,
-            SERIALNUMBER     => 'None',
+            SERIALNUMBER     => undef,
             DESCRIPTION      => undef,
             TYPE             => 'Other',
             SPEED            => undef,
             CAPTION          => 'M52',
             MANUFACTURER     => 'Microsoft',
-            MEMORYCORRECTION => 'None'
+            MEMORYCORRECTION => undef
         },
         {
             NUMSLOTS         => 54,
-            SERIALNUMBER     => 'None',
+            SERIALNUMBER     => undef,
             DESCRIPTION      => undef,
             TYPE             => 'Other',
             SPEED            => undef,
             CAPTION          => 'M53',
             MANUFACTURER     => 'Microsoft',
-            MEMORYCORRECTION => 'None'
+            MEMORYCORRECTION => undef
         },
         {
             NUMSLOTS         => 55,
-            SERIALNUMBER     => 'None',
+            SERIALNUMBER     => undef,
             DESCRIPTION      => undef,
             TYPE             => 'Other',
             SPEED            => undef,
             CAPTION          => 'M54',
             MANUFACTURER     => 'Microsoft',
-            MEMORYCORRECTION => 'None'
+            MEMORYCORRECTION => undef
         },
         {
             NUMSLOTS         => 56,
-            SERIALNUMBER     => 'None',
+            SERIALNUMBER     => undef,
             DESCRIPTION      => undef,
             TYPE             => 'Other',
             SPEED            => undef,
             CAPTION          => 'M55',
             MANUFACTURER     => 'Microsoft',
-            MEMORYCORRECTION => 'None'
+            MEMORYCORRECTION => undef
         },
         {
             NUMSLOTS         => 57,
-            SERIALNUMBER     => 'None',
+            SERIALNUMBER     => undef,
             DESCRIPTION      => undef,
             TYPE             => 'Other',
             SPEED            => undef,
             CAPTION          => 'M56',
             MANUFACTURER     => 'Microsoft',
-            MEMORYCORRECTION => 'None'
+            MEMORYCORRECTION => undef
         },
         {
             NUMSLOTS         => 58,
-            SERIALNUMBER     => 'None',
+            SERIALNUMBER     => undef,
             DESCRIPTION      => undef,
             TYPE             => 'Other',
             SPEED            => undef,
             CAPTION          => 'M57',
             MANUFACTURER     => 'Microsoft',
-            MEMORYCORRECTION => 'None'
+            MEMORYCORRECTION => undef
         },
         {
             NUMSLOTS         => 59,
-            SERIALNUMBER     => 'None',
+            SERIALNUMBER     => undef,
             DESCRIPTION      => undef,
             TYPE             => 'Other',
             SPEED            => undef,
             CAPTION          => 'M58',
             MANUFACTURER     => 'Microsoft',
-            MEMORYCORRECTION => 'None'
+            MEMORYCORRECTION => undef
         },
         {
             NUMSLOTS         => 60,
-            SERIALNUMBER     => 'None',
+            SERIALNUMBER     => undef,
             DESCRIPTION      => undef,
             TYPE             => 'Other',
             SPEED            => undef,
             CAPTION          => 'M59',
             MANUFACTURER     => 'Microsoft',
-            MEMORYCORRECTION => 'None'
+            MEMORYCORRECTION => undef
         },
         {
             NUMSLOTS         => 61,
-            SERIALNUMBER     => 'None',
+            SERIALNUMBER     => undef,
             DESCRIPTION      => undef,
             TYPE             => 'Other',
             SPEED            => undef,
             CAPTION          => 'M60',
             MANUFACTURER     => 'Microsoft',
-            MEMORYCORRECTION => 'None'
+            MEMORYCORRECTION => undef
         },
         {
             NUMSLOTS         => 62,
-            SERIALNUMBER     => 'None',
+            SERIALNUMBER     => undef,
             DESCRIPTION      => undef,
             TYPE             => 'Other',
             SPEED            => undef,
             CAPTION          => 'M61',
             MANUFACTURER     => 'Microsoft',
-            MEMORYCORRECTION => 'None'
+            MEMORYCORRECTION => undef
         },
         {
             NUMSLOTS         => 63,
-            SERIALNUMBER     => 'None',
+            SERIALNUMBER     => undef,
             DESCRIPTION      => undef,
             TYPE             => 'Other',
             SPEED            => undef,
             CAPTION          => 'M62',
             MANUFACTURER     => 'Microsoft',
-            MEMORYCORRECTION => 'None'
+            MEMORYCORRECTION => undef
         },
         {
             NUMSLOTS         => 64,
-            SERIALNUMBER     => 'None',
+            SERIALNUMBER     => undef,
             DESCRIPTION      => undef,
             TYPE             => 'Other',
             SPEED            => undef,
             CAPTION          => 'M63',
             MANUFACTURER     => 'Microsoft',
-            MEMORYCORRECTION => 'None'
+            MEMORYCORRECTION => undef
         }
-    ]
+    ],
+    'dell-r620' => [
+        {
+            'MANUFACTURER'     => 'Hynix',
+            'TYPE'             => 'DDR3',
+            'CAPTION'          => 'DIMM_A1',
+            'MODEL'            => 'HMT42GR7AFR4A-PB',
+            'CAPACITY'         => '16384',
+            'MEMORYCORRECTION' => 'Multi-bit ECC',
+            'SPEED'            => '1600',
+            'SERIALNUMBER'     => '1E60FA92',
+            'DESCRIPTION'      => 'DIMM',
+            'NUMSLOTS'         => 1
+        },
+        {
+            'CAPTION'          => 'DIMM_A2',
+            'MANUFACTURER'     => 'Hynix',
+            'TYPE'             => 'DDR3',
+            'SERIALNUMBER'     => '1E50FA98',
+            'SPEED'            => '1600',
+            'NUMSLOTS'         => 2,
+            'DESCRIPTION'      => 'DIMM',
+            'MODEL'            => 'HMT42GR7AFR4A-PB',
+            'CAPACITY'         => '16384',
+            'MEMORYCORRECTION' => 'Multi-bit ECC'
+        },
+        {
+            'MODEL'            => 'HMT42GR7AFR4A-PB',
+            'CAPACITY'         => '16384',
+            'MEMORYCORRECTION' => 'Multi-bit ECC',
+            'SERIALNUMBER'     => '1E10FA91',
+            'SPEED'            => '1600',
+            'DESCRIPTION'      => 'DIMM',
+            'NUMSLOTS'         => 3,
+            'MANUFACTURER'     => 'Hynix',
+            'TYPE'             => 'DDR3',
+            'CAPTION'          => 'DIMM_A3'
+        },
+        {
+            'MODEL'            => 'HMT42GR7AFR4A-PB',
+            'CAPACITY'         => '16384',
+            'MEMORYCORRECTION' => 'Multi-bit ECC',
+            'SPEED'            => '1600',
+            'SERIALNUMBER'     => '1E20FA5F',
+            'NUMSLOTS'         => 4,
+            'DESCRIPTION'      => 'DIMM',
+            'MANUFACTURER'     => 'Hynix',
+            'TYPE'             => 'DDR3',
+            'CAPTION'          => 'DIMM_A4'
+        },
+        {
+            'CAPTION'          => 'DIMM_A5',
+            'TYPE'             => 'DDR3',
+            'MANUFACTURER'     => 'Hynix',
+            'NUMSLOTS'         => 5,
+            'DESCRIPTION'      => 'DIMM',
+            'SERIALNUMBER'     => '0D7A9A0A',
+            'SPEED'            => '1600',
+            'MEMORYCORRECTION' => 'Multi-bit ECC',
+            'CAPACITY'         => '16384',
+            'MODEL'            => 'HMT42GR7AFR4A-PB'
+        },
+        {
+            'TYPE'             => 'DDR3',
+            'MANUFACTURER'     => 'Hynix',
+            'CAPTION'          => 'DIMM_A6',
+            'MEMORYCORRECTION' => 'Multi-bit ECC',
+            'CAPACITY'         => '16384',
+            'MODEL'            => 'HMT42GR7AFR4A-PB',
+            'NUMSLOTS'         => 6,
+            'DESCRIPTION'      => 'DIMM',
+            'SPEED'            => '1600',
+            'SERIALNUMBER'     => '1E30FA5D'
+        },
+        {
+            'SPEED'            => '1600',
+            'SERIALNUMBER'     => '3561867A',
+            'DESCRIPTION'      => 'DIMM',
+            'NUMSLOTS'         => 7,
+            'MODEL'            => 'HMT42GR7AFR4A-PB',
+            'MEMORYCORRECTION' => 'Multi-bit ECC',
+            'CAPACITY'         => '16384',
+            'CAPTION'          => 'DIMM_A7',
+            'MANUFACTURER'     => 'Hynix',
+            'TYPE'             => 'DDR3'
+        },
+        {
+            'MODEL'            => 'HMT42GR7AFR4A-PB',
+            'MEMORYCORRECTION' => 'Multi-bit ECC',
+            'CAPACITY'         => '16384',
+            'SERIALNUMBER'     => '1E30FA7F',
+            'SPEED'            => '1600',
+            'DESCRIPTION'      => 'DIMM',
+            'NUMSLOTS'         => 8,
+            'MANUFACTURER'     => 'Hynix',
+            'TYPE'             => 'DDR3',
+            'CAPTION'          => 'DIMM_A8'
+        },
+        {
+            'MEMORYCORRECTION' => 'Multi-bit ECC',
+            'DESCRIPTION'      => 'DIMM',
+            'NUMSLOTS'         => 9,
+            'SERIALNUMBER'     => undef,
+            'SPEED'            => undef,
+            'TYPE'             => 'DDR3',
+            'MANUFACTURER'     => undef,
+            'CAPTION'          => 'DIMM_A9'
+        },
+        {
+            'MEMORYCORRECTION' => 'Multi-bit ECC',
+            'NUMSLOTS'         => 10,
+            'DESCRIPTION'      => 'DIMM',
+            'SERIALNUMBER'     => undef,
+            'SPEED'            => undef,
+            'TYPE'             => 'DDR3',
+            'MANUFACTURER'     => undef,
+            'CAPTION'          => 'DIMM_A10'
+        },
+        {
+            'CAPTION'          => 'DIMM_A11',
+            'TYPE'             => 'DDR3',
+            'MANUFACTURER'     => undef,
+            'DESCRIPTION'      => 'DIMM',
+            'NUMSLOTS'         => 11,
+            'SERIALNUMBER'     => undef,
+            'SPEED'            => undef,
+            'MEMORYCORRECTION' => 'Multi-bit ECC'
+        },
+        {
+            'TYPE'             => 'DDR3',
+            'MANUFACTURER'     => undef,
+            'CAPTION'          => 'DIMM_A12',
+            'MEMORYCORRECTION' => 'Multi-bit ECC',
+            'DESCRIPTION'      => 'DIMM',
+            'NUMSLOTS'         => 12,
+            'SPEED'            => undef,
+            'SERIALNUMBER'     => undef
+        },
+        {
+            'TYPE'             => 'DDR3',
+            'MANUFACTURER'     => 'Hynix',
+            'CAPTION'          => 'DIMM_B1',
+            'MEMORYCORRECTION' => 'Multi-bit ECC',
+            'CAPACITY'         => '16384',
+            'MODEL'            => 'HMT42GR7AFR4A-PB',
+            'DESCRIPTION'      => 'DIMM',
+            'NUMSLOTS'         => 13,
+            'SPEED'            => '1600',
+            'SERIALNUMBER'     => '0B2B0D87'
+        },
+        {
+            'SPEED'            => '1600',
+            'SERIALNUMBER'     => '1660EDAB',
+            'DESCRIPTION'      => 'DIMM',
+            'NUMSLOTS'         => 14,
+            'MODEL'            => 'HMT42GR7AFR4A-PB',
+            'CAPACITY'         => '16384',
+            'MEMORYCORRECTION' => 'Multi-bit ECC',
+            'CAPTION'          => 'DIMM_B2',
+            'MANUFACTURER'     => 'Hynix',
+            'TYPE'             => 'DDR3'
+        },
+        {
+            'TYPE'             => 'DDR3',
+            'MANUFACTURER'     => 'Hynix',
+            'CAPTION'          => 'DIMM_B3',
+            'CAPACITY'         => '16384',
+            'MEMORYCORRECTION' => 'Multi-bit ECC',
+            'MODEL'            => 'HMT42GR7AFR4A-PB',
+            'NUMSLOTS'         => 15,
+            'DESCRIPTION'      => 'DIMM',
+            'SPEED'            => '1600',
+            'SERIALNUMBER'     => '0D6A9A06'
+        },
+        {
+            'MODEL'            => 'HMT42GR7AFR4A-PB',
+            'MEMORYCORRECTION' => 'Multi-bit ECC',
+            'CAPACITY'         => '16384',
+            'SPEED'            => '1600',
+            'SERIALNUMBER'     => '1E40FA91',
+            'NUMSLOTS'         => 16,
+            'DESCRIPTION'      => 'DIMM',
+            'MANUFACTURER'     => 'Hynix',
+            'TYPE'             => 'DDR3',
+            'CAPTION'          => 'DIMM_B4'
+        },
+        {
+            'TYPE'             => 'DDR3',
+            'MANUFACTURER'     => 'Hynix',
+            'CAPTION'          => 'DIMM_B5',
+            'MEMORYCORRECTION' => 'Multi-bit ECC',
+            'CAPACITY'         => '16384',
+            'MODEL'            => 'HMT42GR7AFR4A-PB',
+            'NUMSLOTS'         => 17,
+            'DESCRIPTION'      => 'DIMM',
+            'SPEED'            => '1600',
+            'SERIALNUMBER'     => '0B3B100A'
+        },
+        {
+            'CAPTION'          => 'DIMM_B6',
+            'MANUFACTURER'     => 'Hynix',
+            'TYPE'             => 'DDR3',
+            'SERIALNUMBER'     => '0B6B0D9E',
+            'SPEED'            => '1600',
+            'NUMSLOTS'         => 18,
+            'DESCRIPTION'      => 'DIMM',
+            'MODEL'            => 'HMT42GR7AFR4A-PB',
+            'CAPACITY'         => '16384',
+            'MEMORYCORRECTION' => 'Multi-bit ECC'
+        },
+        {
+            'CAPTION'          => 'DIMM_B7',
+            'TYPE'             => 'DDR3',
+            'MANUFACTURER'     => 'Hynix',
+            'NUMSLOTS'         => 19,
+            'DESCRIPTION'      => 'DIMM',
+            'SERIALNUMBER'     => '1E70FA94',
+            'SPEED'            => '1600',
+            'CAPACITY'         => '16384',
+            'MEMORYCORRECTION' => 'Multi-bit ECC',
+            'MODEL'            => 'HMT42GR7AFR4A-PB'
+        },
+        {
+            'TYPE'             => 'DDR3',
+            'MANUFACTURER'     => 'Hynix',
+            'CAPTION'          => 'DIMM_B8',
+            'MEMORYCORRECTION' => 'Multi-bit ECC',
+            'CAPACITY'         => '16384',
+            'MODEL'            => 'HMT42GR7AFR4A-PB',
+            'DESCRIPTION'      => 'DIMM',
+            'NUMSLOTS'         => 20,
+            'SERIALNUMBER'     => '1680EDBD',
+            'SPEED'            => '1600'
+        },
+        {
+            'MEMORYCORRECTION' => 'Multi-bit ECC',
+            'SERIALNUMBER'     => undef,
+            'SPEED'            => undef,
+            'NUMSLOTS'         => 21,
+            'DESCRIPTION'      => 'DIMM',
+            'MANUFACTURER'     => undef,
+            'TYPE'             => 'DDR3',
+            'CAPTION'          => 'DIMM_B9'
+        },
+        {
+            'SPEED'            => undef,
+            'SERIALNUMBER'     => undef,
+            'DESCRIPTION'      => 'DIMM',
+            'NUMSLOTS'         => 22,
+            'MEMORYCORRECTION' => 'Multi-bit ECC',
+            'CAPTION'          => 'DIMM_B10',
+            'MANUFACTURER'     => undef,
+            'TYPE'             => 'DDR3'
+        },
+        {
+            'MANUFACTURER'     => undef,
+            'TYPE'             => 'DDR3',
+            'CAPTION'          => 'DIMM_B11',
+            'MEMORYCORRECTION' => 'Multi-bit ECC',
+            'SERIALNUMBER'     => undef,
+            'SPEED'            => undef,
+            'DESCRIPTION'      => 'DIMM',
+            'NUMSLOTS'         => 23
+        },
+        {
+            'CAPTION'          => 'DIMM_B12',
+            'MANUFACTURER'     => undef,
+            'TYPE'             => 'DDR3',
+            'SPEED'            => undef,
+            'SERIALNUMBER'     => undef,
+            'DESCRIPTION'      => 'DIMM',
+            'NUMSLOTS'         => 24,
+            'MEMORYCORRECTION' => 'Multi-bit ECC'
+        }
+    ],
+    'hp-dl360-gen7' => [
+        {
+            'SPEED'            => undef,
+            'MEMORYCORRECTION' => 'Single-bit ECC',
+            'MANUFACTURER'     => undef,
+            'SERIALNUMBER'     => undef,
+            'TYPE'             => 'DDR3',
+            'NUMSLOTS'         => 1,
+            'CAPTION'          => 'PROC 1 DIMM 1G',
+            'DESCRIPTION'      => 'DIMM'
+        },
+        {
+            'DESCRIPTION'      => 'DIMM',
+            'CAPTION'          => 'PROC 1 DIMM 2D',
+            'CAPACITY'         => '8192',
+            'SERIALNUMBER'     => undef,
+            'MANUFACTURER'     => undef,
+            'MEMORYCORRECTION' => 'Single-bit ECC',
+            'NUMSLOTS'         => 2,
+            'TYPE'             => 'DDR3',
+            'SPEED'            => '1333'
+        },
+        {
+            'CAPTION'          => 'PROC 1 DIMM 3A',
+            'DESCRIPTION'      => 'DIMM',
+            'SPEED'            => '1333',
+            'MEMORYCORRECTION' => 'Single-bit ECC',
+            'MANUFACTURER'     => undef,
+            'TYPE'             => 'DDR3',
+            'NUMSLOTS'         => 3,
+            'SERIALNUMBER'     => undef,
+            'CAPACITY'         => '8192'
+        },
+        {
+            'SPEED'            => undef,
+            'MANUFACTURER'     => undef,
+            'MEMORYCORRECTION' => 'Single-bit ECC',
+            'NUMSLOTS'         => 4,
+            'TYPE'             => 'DDR3',
+            'SERIALNUMBER'     => undef,
+            'CAPTION'          => 'PROC 1 DIMM 4H',
+            'DESCRIPTION'      => 'DIMM'
+        },
+        {
+            'CAPTION'          => 'PROC 1 DIMM 5E',
+            'DESCRIPTION'      => 'DIMM',
+            'SPEED'            => undef,
+            'NUMSLOTS'         => 5,
+            'MANUFACTURER'     => undef,
+            'MEMORYCORRECTION' => 'Single-bit ECC',
+            'TYPE'             => 'DDR3',
+            'SERIALNUMBER'     => undef
+        },
+        {
+            'SPEED'            => '1333',
+            'CAPACITY'         => '8192',
+            'MANUFACTURER'     => undef,
+            'MEMORYCORRECTION' => 'Single-bit ECC',
+            'SERIALNUMBER'     => undef,
+            'TYPE'             => 'DDR3',
+            'NUMSLOTS'         => 6,
+            'CAPTION'          => 'PROC 1 DIMM 6B',
+            'DESCRIPTION'      => 'DIMM'
+        },
+        {
+            'MANUFACTURER'     => undef,
+            'TYPE'             => 'DDR3',
+            'MEMORYCORRECTION' => 'Single-bit ECC',
+            'SERIALNUMBER'     => undef,
+            'NUMSLOTS'         => 7,
+            'SPEED'            => undef,
+            'DESCRIPTION'      => 'DIMM',
+            'CAPTION'          => 'PROC 1 DIMM 7I'
+        },
+        {
+            'DESCRIPTION'      => 'DIMM',
+            'CAPTION'          => 'PROC 1 DIMM 8F',
+            'MANUFACTURER'     => undef,
+            'NUMSLOTS'         => 8,
+            'MEMORYCORRECTION' => 'Single-bit ECC',
+            'SERIALNUMBER'     => undef,
+            'TYPE'             => 'DDR3',
+            'SPEED'            => undef
+        },
+        {
+            'CAPACITY'         => '8192',
+            'MEMORYCORRECTION' => 'Single-bit ECC',
+            'MANUFACTURER'     => undef,
+            'TYPE'             => 'DDR3',
+            'NUMSLOTS'         => 9,
+            'SERIALNUMBER'     => undef,
+            'SPEED'            => '1333',
+            'DESCRIPTION'      => 'DIMM',
+            'CAPTION'          => 'PROC 1 DIMM 9C'
+        },
+        {
+            'CAPTION'          => 'PROC 2 DIMM 1G',
+            'DESCRIPTION'      => 'DIMM',
+            'SPEED'            => undef,
+            'MANUFACTURER'     => undef,
+            'NUMSLOTS'         => 10,
+            'MEMORYCORRECTION' => 'Single-bit ECC',
+            'SERIALNUMBER'     => undef,
+            'TYPE'             => 'DDR3'
+        },
+        {
+            'SPEED'            => '1333',
+            'SERIALNUMBER'     => undef,
+            'MANUFACTURER'     => undef,
+            'MEMORYCORRECTION' => 'Single-bit ECC',
+            'NUMSLOTS'         => 11,
+            'TYPE'             => 'DDR3',
+            'CAPACITY'         => '8192',
+            'CAPTION'          => 'PROC 2 DIMM 2D',
+            'DESCRIPTION'      => 'DIMM'
+        },
+        {
+            'DESCRIPTION'      => 'DIMM',
+            'CAPTION'          => 'PROC 2 DIMM 3A',
+            'CAPACITY'         => '8192',
+            'TYPE'             => 'DDR3',
+            'MANUFACTURER'     => undef,
+            'MEMORYCORRECTION' => 'Single-bit ECC',
+            'SERIALNUMBER'     => undef,
+            'NUMSLOTS'         => 12,
+            'SPEED'            => '1333'
+        },
+        {
+            'CAPTION'          => 'PROC 2 DIMM 4H',
+            'DESCRIPTION'      => 'DIMM',
+            'SPEED'            => undef,
+            'MEMORYCORRECTION' => 'Single-bit ECC',
+            'MANUFACTURER'     => undef,
+            'TYPE'             => 'DDR3',
+            'SERIALNUMBER'     => undef,
+            'NUMSLOTS'         => 13
+        },
+        {
+            'MANUFACTURER'     => undef,
+            'TYPE'             => 'DDR3',
+            'MEMORYCORRECTION' => 'Single-bit ECC',
+            'NUMSLOTS'         => 14,
+            'SERIALNUMBER'     => undef,
+            'SPEED'            => undef,
+            'DESCRIPTION'      => 'DIMM',
+            'CAPTION'          => 'PROC 2 DIMM 5E'
+        },
+        {
+            'CAPACITY'         => '8192',
+            'MANUFACTURER'     => undef,
+            'MEMORYCORRECTION' => 'Single-bit ECC',
+            'TYPE'             => 'DDR3',
+            'NUMSLOTS'         => 15,
+            'SERIALNUMBER'     => undef,
+            'SPEED'            => '1333',
+            'DESCRIPTION'      => 'DIMM',
+            'CAPTION'          => 'PROC 2 DIMM 6B'
+        },
+        {
+            'MEMORYCORRECTION' => 'Single-bit ECC',
+            'MANUFACTURER'     => undef,
+            'SERIALNUMBER'     => undef,
+            'NUMSLOTS'         => 16,
+            'TYPE'             => 'DDR3',
+            'SPEED'            => undef,
+            'DESCRIPTION'      => 'DIMM',
+            'CAPTION'          => 'PROC 2 DIMM 7I'
+        },
+        {
+            'SPEED'            => undef,
+            'TYPE'             => 'DDR3',
+            'MANUFACTURER'     => undef,
+            'MEMORYCORRECTION' => 'Single-bit ECC',
+            'NUMSLOTS'         => 17,
+            'SERIALNUMBER'     => undef,
+            'CAPTION'          => 'PROC 2 DIMM 8F',
+            'DESCRIPTION'      => 'DIMM'
+        },
+        {
+            'SPEED'            => '1333',
+            'MANUFACTURER'     => undef,
+            'NUMSLOTS'         => 18,
+            'MEMORYCORRECTION' => 'Single-bit ECC',
+            'TYPE'             => 'DDR3',
+            'SERIALNUMBER'     => undef,
+            'CAPACITY'         => '8192',
+            'CAPTION'          => 'PROC 2 DIMM 9C',
+            'DESCRIPTION'      => 'DIMM'
+        }
+    ],
+    'dell-r640-1' => [
+        {
+            'CAPACITY'         => 8192,
+            'CAPTION'          => 'A1',
+            'DESCRIPTION'      => 'DIMM',
+            'MANUFACTURER'     => 'Micron',
+            'MEMORYCORRECTION' => 'Multi-bit ECC',
+            'MODEL'            => '9ASF1G72PZ-3G2E2',
+            'NUMSLOTS'         => 1,
+            'SERIALNUMBER'     => 'F16A7647',
+            'SPEED'            => '3200',
+            'TYPE'             => 'DDR4'
+        },
+        {
+            'CAPACITY'         => 8192,
+            'CAPTION'          => 'A2',
+            'DESCRIPTION'      => 'DIMM',
+            'MANUFACTURER'     => 'Micron',
+            'MEMORYCORRECTION' => 'Multi-bit ECC',
+            'MODEL'            => '9ASF1G72PZ-3G2E2',
+            'NUMSLOTS'         => 2,
+            'SERIALNUMBER'     => 'F16A798E',
+            'SPEED'            => '3200',
+            'TYPE'             => 'DDR4'
+        },
+        {
+            'CAPACITY'         => 8192,
+            'CAPTION'          => 'A3',
+            'DESCRIPTION'      => 'DIMM',
+            'MANUFACTURER'     => 'Micron',
+            'MEMORYCORRECTION' => 'Multi-bit ECC',
+            'MODEL'            => '9ASF1G72PZ-3G2E2',
+            'NUMSLOTS'         => 3,
+            'SERIALNUMBER'     => 'F16A808F',
+            'SPEED'            => '3200',
+            'TYPE'             => 'DDR4'
+        },
+        {
+            'CAPACITY'         => 8192,
+            'CAPTION'          => 'A4',
+            'DESCRIPTION'      => 'DIMM',
+            'MANUFACTURER'     => 'Micron',
+            'MEMORYCORRECTION' => 'Multi-bit ECC',
+            'MODEL'            => '9ASF1G72PZ-3G2E2',
+            'NUMSLOTS'         => 4,
+            'SERIALNUMBER'     => 'F16A7991',
+            'SPEED'            => '3200',
+            'TYPE'             => 'DDR4'
+        },
+        {
+            'CAPACITY'         => 8192,
+            'CAPTION'          => 'A5',
+            'DESCRIPTION'      => 'DIMM',
+            'MANUFACTURER'     => 'Micron',
+            'MEMORYCORRECTION' => 'Multi-bit ECC',
+            'MODEL'            => '9ASF1G72PZ-3G2E2',
+            'NUMSLOTS'         => 5,
+            'SERIALNUMBER'     => 'F16A7966',
+            'SPEED'            => '3200',
+            'TYPE'             => 'DDR4'
+        },
+        {
+            'CAPACITY'         => 8192,
+            'CAPTION'          => 'A6',
+            'DESCRIPTION'      => 'DIMM',
+            'MANUFACTURER'     => 'Micron',
+            'MEMORYCORRECTION' => 'Multi-bit ECC',
+            'MODEL'            => '9ASF1G72PZ-3G2E2',
+            'NUMSLOTS'         => 6,
+            'SERIALNUMBER'     => 'F16A7965',
+            'SPEED'            => '3200',
+            'TYPE'             => 'DDR4'
+        },
+        {
+            'CAPTION'          => 'A7',
+            'DESCRIPTION'      => undef,
+            'MANUFACTURER'     => undef,
+            'MEMORYCORRECTION' => 'Multi-bit ECC',
+            'NUMSLOTS'         => 7,
+            'SERIALNUMBER'     => undef,
+            'SPEED'            => undef,
+            'TYPE'             => undef
+        },
+        {
+            'CAPTION'          => 'A8',
+            'DESCRIPTION'      => undef,
+            'MANUFACTURER'     => undef,
+            'MEMORYCORRECTION' => 'Multi-bit ECC',
+            'NUMSLOTS'         => 8,
+            'SERIALNUMBER'     => undef,
+            'SPEED'            => undef,
+            'TYPE'             => undef
+        },
+        {
+            'CAPTION'          => 'A9',
+            'DESCRIPTION'      => undef,
+            'MANUFACTURER'     => undef,
+            'MEMORYCORRECTION' => 'Multi-bit ECC',
+            'NUMSLOTS'         => 9,
+            'SERIALNUMBER'     => undef,
+            'SPEED'            => undef,
+            'TYPE'             => undef
+        },
+        {
+            'CAPTION'          => 'A10',
+            'DESCRIPTION'      => undef,
+            'MANUFACTURER'     => undef,
+            'MEMORYCORRECTION' => 'Multi-bit ECC',
+            'NUMSLOTS'         => 10,
+            'SERIALNUMBER'     => undef,
+            'SPEED'            => undef,
+            'TYPE'             => undef
+        },
+        {
+            'CAPTION'          => 'A11',
+            'DESCRIPTION'      => undef,
+            'MANUFACTURER'     => undef,
+            'MEMORYCORRECTION' => 'Multi-bit ECC',
+            'NUMSLOTS'         => 11,
+            'SERIALNUMBER'     => undef,
+            'SPEED'            => undef,
+            'TYPE'             => undef
+        },
+        {
+            'CAPTION'          => 'A12',
+            'DESCRIPTION'      => undef,
+            'MANUFACTURER'     => undef,
+            'MEMORYCORRECTION' => 'Multi-bit ECC',
+            'NUMSLOTS'         => 12,
+            'SERIALNUMBER'     => undef,
+            'SPEED'            => undef,
+            'TYPE'             => undef
+        },
+        {
+            'CAPACITY'         => 8192,
+            'CAPTION'          => 'B1',
+            'DESCRIPTION'      => 'DIMM',
+            'MANUFACTURER'     => 'Micron',
+            'MEMORYCORRECTION' => 'Multi-bit ECC',
+            'MODEL'            => '9ASF1G72PZ-3G2E2',
+            'NUMSLOTS'         => 13,
+            'SERIALNUMBER'     => 'F16A7982',
+            'SPEED'            => '3200',
+            'TYPE'             => 'DDR4'
+        },
+        {
+            'CAPACITY'         => 8192,
+            'CAPTION'          => 'B2',
+            'DESCRIPTION'      => 'DIMM',
+            'MANUFACTURER'     => 'Micron',
+            'MEMORYCORRECTION' => 'Multi-bit ECC',
+            'MODEL'            => '9ASF1G72PZ-3G2E2',
+            'NUMSLOTS'         => 14,
+            'SERIALNUMBER'     => 'F16A7ADB',
+            'SPEED'            => '3200',
+            'TYPE'             => 'DDR4'
+        },
+        {
+            'CAPACITY'         => 8192,
+            'CAPTION'          => 'B3',
+            'DESCRIPTION'      => 'DIMM',
+            'MANUFACTURER'     => 'Micron',
+            'MEMORYCORRECTION' => 'Multi-bit ECC',
+            'MODEL'            => '9ASF1G72PZ-3G2E2',
+            'NUMSLOTS'         => 15,
+            'SERIALNUMBER'     => 'F16A798C',
+            'SPEED'            => '3200',
+            'TYPE'             => 'DDR4'
+        },
+        {
+            'CAPACITY'         => 8192,
+            'CAPTION'          => 'B4',
+            'DESCRIPTION'      => 'DIMM',
+            'MANUFACTURER'     => 'Micron',
+            'MEMORYCORRECTION' => 'Multi-bit ECC',
+            'MODEL'            => '9ASF1G72PZ-3G2E2',
+            'NUMSLOTS'         => 16,
+            'SERIALNUMBER'     => 'F16A7984',
+            'SPEED'            => '3200',
+            'TYPE'             => 'DDR4'
+        },
+        {
+            'CAPACITY'         => 8192,
+            'CAPTION'          => 'B5',
+            'DESCRIPTION'      => 'DIMM',
+            'MANUFACTURER'     => 'Micron',
+            'MEMORYCORRECTION' => 'Multi-bit ECC',
+            'MODEL'            => '9ASF1G72PZ-3G2E2',
+            'NUMSLOTS'         => 17,
+            'SERIALNUMBER'     => 'F16A7AD9',
+            'SPEED'            => '3200',
+            'TYPE'             => 'DDR4'
+        },
+        {
+            'CAPACITY'         => 8192,
+            'CAPTION'          => 'B6',
+            'DESCRIPTION'      => 'DIMM',
+            'MANUFACTURER'     => 'Micron',
+            'MEMORYCORRECTION' => 'Multi-bit ECC',
+            'MODEL'            => '9ASF1G72PZ-3G2E2',
+            'NUMSLOTS'         => 18,
+            'SERIALNUMBER'     => 'F16A796C',
+            'SPEED'            => '3200',
+            'TYPE'             => 'DDR4'
+        },
+        {
+            'CAPTION'          => 'B7',
+            'DESCRIPTION'      => undef,
+            'MANUFACTURER'     => undef,
+            'MEMORYCORRECTION' => 'Multi-bit ECC',
+            'NUMSLOTS'         => 19,
+            'SERIALNUMBER'     => undef,
+            'SPEED'            => undef,
+            'TYPE'             => undef
+        },
+        {
+            'CAPTION'          => 'B8',
+            'DESCRIPTION'      => undef,
+            'MANUFACTURER'     => undef,
+            'MEMORYCORRECTION' => 'Multi-bit ECC',
+            'NUMSLOTS'         => 20,
+            'SERIALNUMBER'     => undef,
+            'SPEED'            => undef,
+            'TYPE'             => undef
+        },
+        {
+            'CAPTION'          => 'B9',
+            'DESCRIPTION'      => undef,
+            'MANUFACTURER'     => undef,
+            'MEMORYCORRECTION' => 'Multi-bit ECC',
+            'NUMSLOTS'         => 21,
+            'SERIALNUMBER'     => undef,
+            'SPEED'            => undef,
+            'TYPE'             => undef
+        },
+        {
+            'CAPTION'          => 'B10',
+            'DESCRIPTION'      => undef,
+            'MANUFACTURER'     => undef,
+            'MEMORYCORRECTION' => 'Multi-bit ECC',
+            'NUMSLOTS'         => 22,
+            'SERIALNUMBER'     => undef,
+            'SPEED'            => undef,
+            'TYPE'             => undef
+        },
+        {
+            'CAPTION'          => 'B11',
+            'DESCRIPTION'      => undef,
+            'MANUFACTURER'     => undef,
+            'MEMORYCORRECTION' => 'Multi-bit ECC',
+            'NUMSLOTS'         => 23,
+            'SERIALNUMBER'     => undef,
+            'SPEED'            => undef,
+            'TYPE'             => undef
+        },
+        {
+            'CAPTION'          => 'B12',
+            'DESCRIPTION'      => undef,
+            'MANUFACTURER'     => undef,
+            'MEMORYCORRECTION' => 'Multi-bit ECC',
+            'NUMSLOTS'         => 24,
+            'SERIALNUMBER'     => undef,
+            'SPEED'            => undef,
+            'TYPE'             => undef
+        },
+    ],
 );
 
 plan tests => (2 * scalar keys %tests) + 1;

@@ -5,19 +5,28 @@ package OTRS::OPM::Maker::Utils::OTRS3;
 use strict;
 use warnings;
 
+our $VERSION = 1.43;
+
 sub packagesetup {
-    my ($class, $type, $version, $function, $runtype) = @_;
+    my ($class, $type, $version, $function, $runtype, $package) = @_;
 
     $version = $version ? ' Version="' . $version . '"' : '';
 
     $runtype //= 'post';
+
+    if ( $package ) {
+        $package = sprintf "'%s'", $package;
+    }
+    else {
+        $package = '$Param{Structure}->{Name}->{Content}';
+    }
 
     return qq~    <$type Type="$runtype"$version><![CDATA[
         # define function name
         my \$FunctionName = '$function';
 
         # create the package name
-        my \$CodeModule = 'var::packagesetup::' . \$Param{Structure}->{Name}->{Content};
+        my \$CodeModule = 'var::packagesetup::' . $package;
 
         # load the module
         if ( \$Self->{MainObject}->Require(\$CodeModule) ) {
@@ -66,7 +75,7 @@ OTRS::OPM::Maker::Utils::OTRS3 - Provide helper functions for OTRS <= 3
 
 =head1 VERSION
 
-version 1.41
+version 1.43
 
 =head1 METHODS
 

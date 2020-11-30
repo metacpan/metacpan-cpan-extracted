@@ -19,23 +19,26 @@ use constant hipi_export_constants();
 use Scalar::Util qw( weaken isweak refaddr );
 use Carp;
 
-our $VERSION ='0.84';
+our $VERSION ='0.85';
 
 our @EXPORT_OK = hipi_export_ok();
 our %EXPORT_TAGS = hipi_export_tags();
 
 my $registered_exits = {};
+my $signal_handlers_installed = 0;
 
 our $interrupt_verbose = 0;
-
-# who knows what we can catch
-$SIG{INT}  = \&_call_registered_and_exit;
-$SIG{TERM} = \&_call_registered_and_exit;
-$SIG{HUP}  = \&_call_registered_and_exit;
 
 sub is_raspberry_pi { return HiPi::RaspberryPi::is_raspberry() ; }
 
 sub alt_func_version { return HiPi::RaspberryPi::alt_func_version() ; }
+
+sub _install_signal_handlers {
+    $SIG{INT}  = \&_call_registered_and_exit;
+    $SIG{TERM} = \&_call_registered_and_exit;
+    $SIG{HUP}  = \&_call_registered_and_exit;
+    $signal_handlers_installed = 1;
+}
 
 sub catch_sigpipe {
     $SIG{PIPE} = \&_call_registered_and_exit;
@@ -49,6 +52,16 @@ sub twos_compliment {
 
 sub register_exit_method {
     my($class, $obj, $method) = @_;
+    
+    my $tid = 0;
+    if( $HiPi::Threads::threads ) {
+        $tid = threads->tid();
+    }
+    
+    if( !$tid && !$signal_handlers_installed ) {
+        _install_signal_handlers();
+    }
+    
     my $key = refaddr( $obj );
     $registered_exits->{$key} = [ $obj, $method ];
     weaken( $registered_exits->{$key}->[0] );
@@ -128,7 +141,7 @@ Mark Dootson, C<< mdootson@cpan.org >>.
 
 =head1 COPYRIGHT
 
-Copyright (c) 2013 - 2019 Mark Dootson
+Copyright (c) 2013 - 2020 Mark Dootson
 
 =cut
 

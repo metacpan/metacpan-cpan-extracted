@@ -45,9 +45,9 @@ my %meta_merge = (
                     mailto  => 'bug-Cairo [at] rt.cpan.org',
             },
             repository  => {
-                    url     => 'git://git.gnome.org/perl-Cairo',
+                    url     => 'https://gitlab.gnome.org/GNOME/perl-cairo.git',
                     type    => 'git',
-                    web     => 'http://git.gnome.org/browse/perl-Cairo',
+                    web     => 'https://gitlab.gnome.org/GNOME/perl-cairo',
             },
         },
         prereqs => {
@@ -325,6 +325,8 @@ my $have_cairo_1_4 = ExtUtils::PkgConfig->atleast_version("cairo", "1.4.0");
 my $have_cairo_1_6 = ExtUtils::PkgConfig->atleast_version("cairo", "1.6.0");
 my $have_cairo_1_8 = ExtUtils::PkgConfig->atleast_version("cairo", "1.8.0");
 my $have_cairo_1_10 = ExtUtils::PkgConfig->atleast_version("cairo", "1.10.0");
+my $have_cairo_1_12 = ExtUtils::PkgConfig->atleast_version("cairo", "1.12.0");
+my $have_cairo_1_14 = ExtUtils::PkgConfig->atleast_version("cairo", "1.14.0");
 my $have_cairo_1_16 = ExtUtils::PkgConfig->atleast_version("cairo", "1.16.0");
 
 if ($have_cairo_1_2) {
@@ -448,6 +450,10 @@ if ($have_cairo_1_8) {
 
 if ($have_cairo_1_10) {
 	add_new_enum_values(
+		cairo_status_t => [qw/CAIRO_STATUS_INVALID_SIZE
+				      CAIRO_STATUS_USER_FONT_NOT_IMPLEMENTED
+				      CAIRO_STATUS_DEVICE_TYPE_MISMATCH
+				      CAIRO_STATUS_DEVICE_ERROR/],
 		cairo_surface_type_t => [
 			qw/CAIRO_SURFACE_TYPE_SCRIPT
 			   CAIRO_SURFACE_TYPE_QT
@@ -501,7 +507,28 @@ if ($have_cairo_1_10) {
 	$enums{cairo_region_overlap_t} = [];
 }
 
+if ($have_cairo_1_12) {
+	add_new_enum_values(
+		cairo_status_t => [qw/CAIRO_STATUS_INVALID_MESH_CONSTRUCTION
+				      CAIRO_STATUS_DEVICE_FINISHED/],
+	);
+} else {
+}
+
+if ($have_cairo_1_14) {
+	add_new_enum_values(
+		cairo_status_t => [qw/CAIRO_STATUS_JBIG2_GLOBAL_MISSING/],
+	);
+} else {
+}
+
 if ($have_cairo_1_16) {
+	add_new_enum_values(
+		cairo_status_t => [qw/CAIRO_STATUS_PNG_ERROR
+				      CAIRO_STATUS_FREETYPE_ERROR
+				      CAIRO_STATUS_WIN32_GDI_ERROR
+				      CAIRO_STATUS_TAG_ERROR/],
+	);
 	$enums{cairo_pdf_metadata_t} = [qw/
 		CAIRO_PDF_METADATA_
 		CAIRO_PDF_METADATA_TITLE
@@ -512,8 +539,21 @@ if ($have_cairo_1_16) {
 		CAIRO_PDF_METADATA_CREATE_DATE
 		CAIRO_PDF_METADATA_MOD_DATE
 	/];
+
+	$flags{cairo_pdf_outline_flags_t} = [qw/
+		CAIRO_PDF_OUTLINE_FLAG_
+		CAIRO_PDF_OUTLINE_FLAG_OPEN
+		CAIRO_PDF_OUTLINE_FLAG_BOLD
+		CAIRO_PDF_OUTLINE_FLAG_ITALIC
+	/];
+
+	 push @exports, qw/newSVCairoPdfOutline
+			SvCairoPdfOutline
+			cairo_pdf_outline_flags_from_sv
+			cairo_pdf_outline_flags_to_sv/;
 } else {
 	$enums{cairo_pdf_metadata_t} = [];
+	$flags{cairo_pdf_outline_flags_t} = [];
 }
 
 # --------------------------------------------------------------------------- #

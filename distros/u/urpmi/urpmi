@@ -63,7 +63,7 @@ $ENV{HOME} ||= "/root";
 $ENV{USER} ||= "root";
 
 sub usage () {
-    print urpm::args::copyright('urpmi', [ '1999-2010', 'Mandriva' ], [ '2011-2017', 'Mageia' ])
+    print urpm::args::copyright('urpmi', [ '1999-2010', 'Mandriva' ], [ '2011-2020', 'Mageia' ])
    . N("  --help         - print this help message.
 ") . N("  --media        - use only the given media, separated by comma.
 ") . N("  --excludemedia - do not use the given media, separated by comma.
@@ -390,7 +390,7 @@ if (@names) {
     ) || $force or exit 1;
 
     if (%requested) {
-	$urpm->{log}("found package(s): " . join(" ", map { scalar $urpm->{depslist}[$_]->fullname } 
+	$urpm->{log}("found package(s): " . join(" ", sort map { scalar $urpm->{depslist}[$_]->fullname }
 						      map { split /\|/ } keys %requested));
     }
 }

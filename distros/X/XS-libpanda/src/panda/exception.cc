@@ -44,8 +44,18 @@ string BacktraceInfo::to_string() const noexcept {
     return r;
 }
 
-void Backtrace::install_producer(BacktraceProducer& producer_) {
+void Backtrace::install_producer(const BacktraceProducer &producer_) noexcept {
     frame_producers.push_back(producer_);
+}
+
+void Backtrace::uninstall_producer(const BacktraceProducer& producer) noexcept {
+    for(auto it = frame_producers.begin(); it != frame_producers.end(); ++it) {
+        if (*it == producer) {
+            frame_producers.erase(it);
+            return;
+        }
+    }
+    assert(0 && "attempt to remove non-exiting backtrace producer");
 }
 
 Backtrace::Backtrace (const Backtrace& other) noexcept : buffer(other.buffer) {}

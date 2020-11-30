@@ -35,30 +35,24 @@ use Text::LevenshteinXS qw(distance);
 
 # TODO switch to Text::Levenshtein::XS once AUR/Debian packages become available
 
-our $VERSION = '1.51';
+our $VERSION = '1.52';
 
 # Automatically generated, see share/stations.json
 my @stations = (
 EOF
 
-for my $station (@{$stations}) {
-	if ($station->{latlong}) {
+for my $station ( @{$stations} ) {
+	if ( $station->{latlong} ) {
 		$buf .= sprintf(
 			"['%s','%s',%s,%s,%s],\n",
-			$station->{ds100},
-			$station->{name},
-			$station->{eva},
-			$station->{latlong}[1],
+			$station->{ds100}, $station->{name},
+			$station->{eva},   $station->{latlong}[1],
 			$station->{latlong}[0],
 		);
 	}
 	else {
-		$buf .= sprintf(
-			"['%s','%s',%s],\n",
-			$station->{ds100},
-			$station->{name},
-			$station->{eva}
-		);
+		$buf .= sprintf( "['%s','%s',%s],\n",
+			$station->{ds100}, $station->{name}, $station->{eva} );
 	}
 }
 
@@ -148,7 +142,12 @@ sub get_station_by_name {
 	my $min_dist    = min(@distances);
 	my @station_map = pairwise { [ $a, $b ] } @stations, @distances;
 
-	my @substring_matches = grep { $_->[1] =~ m{$name}i } @stations;
+	my @substring_matches;
+
+	# $name may be an invalid regular expression
+	eval { push(@substring_matches, grep { $_->[1] =~ m{\Q$name\E}i } @stations) };
+	eval { push(@substring_matches, grep { $_->[1] =~ m{$name}i } @stations) };
+
 	my @levenshtein_matches
 	  = map { $_->[0] } grep { $_->[1] == $min_dist } @station_map;
 
@@ -184,7 +183,7 @@ Travel::Status::DE::IRIS::Stations - Station name to station code mapping
 
 =head1 VERSION
 
-version 1.51
+version 1.52
 
 =head1 DESCRIPTION
 
@@ -297,4 +296,4 @@ station data used by this module is also available under a CC-BY 4.0 license on
 L<http://data.deutschebahn.com/dataset/data-haltestellen>.
 EOF
 
-write_file($ARGV[0], {binmode => ':utf8'}, $buf);
+write_file( $ARGV[0], { binmode => ':utf8' }, $buf );

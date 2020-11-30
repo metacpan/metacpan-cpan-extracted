@@ -153,6 +153,16 @@ subtest 'leading authority euristics' => sub {
     test('ya.ru:80a/a/b', 'ya.ru', '', '', 0, '80a/a/b');
 };
 
+subtest 'allow extended chars' => sub {
+    my $uri = URI::XS->new('http://jopa.com?"key"="val"&param={"key","val"}', ALLOW_EXTENDED_CHARS);
+    is $uri->query_string, '%22key%22=%22val%22&param=%7B%22key%22%2C%22val%22%7D';
+    is $uri->to_string, 'http://jopa.com?%22key%22=%22val%22&param=%7B%22key%22%2C%22val%22%7D';
+    is_deeply $uri->query, {
+        '"key"' => '"val"',
+        param   => '{"key","val"}',
+    };
+};
+
 subtest 'secure' => sub {
     ok(URI::XS->new("https://ya.ru")->secure);
     ok(!URI::XS->new("http://ya.ru")->secure);

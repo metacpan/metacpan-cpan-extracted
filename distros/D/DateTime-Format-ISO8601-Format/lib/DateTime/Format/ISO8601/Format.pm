@@ -3,7 +3,7 @@ package DateTime::Format::ISO8601::Format;
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2020-08-21'; # DATE
 our $DIST = 'DateTime-Format-ISO8601-Format'; # DIST
-our $VERSION = '0.004'; # VERSION
+our $VERSION = '0.005'; # VERSION
 
 use 5.010001;
 use strict;
@@ -114,7 +114,7 @@ DateTime::Format::ISO8601::Format - Format DateTime object as ISO8601 date/time 
 
 =head1 VERSION
 
-This document describes version 0.004 of DateTime::Format::ISO8601::Format (from Perl distribution DateTime-Format-ISO8601-Format), released on 2020-08-21.
+This document describes version 0.005 of DateTime::Format::ISO8601::Format (from Perl distribution DateTime-Format-ISO8601-Format), released on 2020-08-21.
 
 =head1 SYNOPSIS
 
@@ -259,8 +259,8 @@ L<DateTime::Format::ISO8601>. Before v0.12, DateTime::Format::ISO8601 does not
 feature a C<format_datetime()> method, so DateTime::Format::ISO8601::Format
 supplies that functionality. After v0.12, DateTime::Format::ISO8601 already has
 C<format_datetime()>, but currently DateTime::Format::ISO8601::Format's version
-is faster and there's C<format_date> and C<format_time> as well. So I'm keeping
-this module for now.
+is faster (see L<Bencher::Scenario::FormattingISO8601DateTime>) and there are
+C<format_date> and C<format_time> as well. So I'm keeping this module for now.
 
 L<DateTime::Format::Duration::ISO8601> to parse and format ISO8601 durations.
 

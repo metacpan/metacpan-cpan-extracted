@@ -1,10 +1,14 @@
 Changes
 lib/Net/SockAddr.pm
 lib/Net/SockAddr.pod
+lib/Net/SockAddr/Inet4.pm
 lib/Net/SockAddr/Inet4.pod
+lib/Net/SockAddr/Inet6.pm
 lib/Net/SockAddr/Inet6.pod
+lib/Net/SockAddr/Unix.pm
 lib/Net/SockAddr/Unix.pod
 libnet-sockaddr/CMakeLists.txt
+libnet-sockaddr/net-sockaddrConfig.cmake
 libnet-sockaddr/src/panda/net/pton.impl
 libnet-sockaddr/src/panda/net/sockaddr.cc
 libnet-sockaddr/src/panda/net/sockaddr.h

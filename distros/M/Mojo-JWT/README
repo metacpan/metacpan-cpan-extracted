@@ -83,10 +83,29 @@ ATTRIBUTES
     If true (false by default), then the iat claim will be set to the value
     of "now" during "encode".
 
+ jwks
+
+    An arrayref of JWK objects used by decode to verify the input token
+    when matching with the JWTs kid field.
+
+        my $jwks = Mojo::UserAgent->new->get('https://example.com/oidc/jwks.json')->result->json('/keys');
+        my $jwt = Mojo::JWT->new(jwks => $jwks);
+        $jwk->decode($token);
+
 METHODS
 
     Mojo::JWT inherits all of the methods from Mojo::Base and implements
     the following new ones.
+
+ add_jwkset
+
+        my $jwkset = Mojo::UserAgent->new->get('https://example.com/oidc/jwks.json')->result->json;
+        my $jwt = Mojo::JWT->new->add_jwkset($jwksset);
+        $jwk->decode($token);
+
+    Helper for appending a jwkset to the "jwks". Accepts a hashref with a
+    keys field that is an arrayref of jwks and also an arrayref directly.
+    Appends the JWKs to "jwks". Returns the instance.
 
  decode
 
@@ -105,6 +124,10 @@ METHODS
 
       * The "algorithm" is extracted from the header and set, if not
       present or permissible an exception is thrown
+
+      * Any JWKs in /jwks are checked against the headers and if one is
+      found then it is set in "public" or "secret" as appropriate to the
+      "algorithm"
 
       * If a $peek callback is provided, it is called with the instance and
       claims as arguments
@@ -203,6 +226,8 @@ AUTHOR
 CONTRIBUTORS
 
     Christopher Raa (mishanti1)
+
+    Cameron Daniel (ccakes)
 
 COPYRIGHT AND LICENSE
 

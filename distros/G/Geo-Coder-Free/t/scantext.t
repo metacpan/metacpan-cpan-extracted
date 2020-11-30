@@ -39,7 +39,7 @@ SCANTEXT: {
 			@locations = $geo_coder->geocode(scantext => 'Hello World');
 			ok(ref($locations[0]) eq '');
 
-			@locations = $geo_coder->geocode(scantext => "I was born at St Mary's Hospital in Newark, DE in 1987");
+			@locations = $geo_coder->geocode({ scantext => "I was born at St Mary's Hospital in Newark, DE in 1987", region => 'US' });
 			my $found = 0;
 			foreach $location(@locations) {
 				# if($location->{'city'} ne 'NEWARK') {
@@ -80,7 +80,7 @@ SCANTEXT: {
 					ok(defined($location->{'confidence'}));
 					ok($location->{'state'} eq 'IN');
 					cmp_deeply($location,
-						methods('lat' => num(39.81, 1e-2), 'long' => num(-84.89, 1e-2)));
+						methods('lat' => num(39, 1), 'long' => num(-85, 1)));
 				} elsif($city eq 'INDIANAPOLIS') {
 				# } elsif($location->{'location'} =~ /^Indianapolis,/i) {
 					$found{'INDIANAPOLIS'}++;

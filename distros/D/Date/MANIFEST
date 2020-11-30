@@ -57,6 +57,7 @@ t/integration/storable.t
 t/lib/MyTest.pm
 t/lib/MyTest.xs
 t/lib/TestAllZones.pm
+t/misc.t
 t/mksec.t
 t/operations.t
 t/range_check.t

@@ -19,7 +19,7 @@ PREREQUISITES
     Perl
 
         Perl version 5.8.1 or later.
-        The latest version of Perl is available from http://www.perl.com/.
+        The latest version of Perl is available from https://www.perl.com/.
 
     Perl Modules
 
@@ -27,7 +27,7 @@ PREREQUISITES
 
             Win32::WinError
 
-        which is available from CPAN (http://www.cpan.org/).
+        which is available from CPAN (https://www.cpan.org/).
 
 INSTALLATION
 

@@ -15,13 +15,13 @@ name: OTRS-OPM-Maker-Command-sopm
 provides:
   OTRS::OPM::Maker::Command::sopm:
     file: lib/OTRS/OPM/Maker/Command/sopm.pm
-    version: '1.41'
+    version: '1.43'
   OTRS::OPM::Maker::Utils::OTRS3:
     file: lib/OTRS/OPM/Maker/Utils/OTRS3.pm
-    version: '1.41'
+    version: '1.43'
   OTRS::OPM::Maker::Utils::OTRS4:
     file: lib/OTRS/OPM/Maker/Utils/OTRS4.pm
-    version: '1.41'
+    version: '1.43'
 requires:
   Capture::Tiny: '0.24'
   Carp: '0'
@@ -39,11 +39,12 @@ requires:
   XML::LibXML::PrettyPrint: '0'
   perl: '5.010'
 resources:
-  bugtracker: http://github.com/perlservices/OTRS-OPM-Maker-Command-sopm/issues
-  homepage: http://github.com/perlservices/OTRS-OPM-Maker-Command-sopm
-  repository: http://github.com/perlservices/OTRS-OPM-Maker-Command-sopm.git
-version: '1.41'
+  bugtracker: https://github.com/perlservices/OTRS-OPM-Maker-Command-sopm/issues
+  homepage: https://github.com/perlservices/OTRS-OPM-Maker-Command-sopm
+  repository: https://github.com/perlservices/OTRS-OPM-Maker-Command-sopm.git
+version: '1.43'
 x_contributors:
+  - 'Gabor Szabo <gabor@szabgab.com>'
   - 'reneeb <github@renee-baecker.de>'
   - 'reneeb <info@perl-services.de>'
 x_serialization_backend: 'YAML::Tiny version 1.70'

@@ -38,24 +38,24 @@ use constant {
 
 =head1 NAME
 
-MediaWiki::API - Provides a Perl interface to the MediaWiki API (http://www.mediawiki.org/wiki/API)
+MediaWiki::API - Provides a Perl interface to the MediaWiki API (https://www.mediawiki.org/wiki/API)
 
 =head1 VERSION
 
-Version 0.41
+Version 0.52
 
 =cut
 
-our $VERSION  = "0.41";
+our $VERSION  = "0.52";
 
 =head1 SYNOPSIS
 
-This module provides an interface between Perl and the MediaWiki API (http://www.mediawiki.org/wiki/API) allowing creation of scripts to automate editing and extraction of data from MediaWiki driven sites like Wikipedia.
+This module provides an interface between Perl and the MediaWiki API (https://www.mediawiki.org/wiki/API) allowing creation of scripts to automate editing and extraction of data from MediaWiki driven sites like Wikipedia.
 
   use MediaWiki::API;
 
   my $mw = MediaWiki::API->new();
-  $mw->{config}->{api_url} = 'http://en.wikipedia.org/w/api.php';
+  $mw->{config}->{api_url} = 'https://en.wikipedia.org/w/api.php';
 
   # log in to the wiki
   $mw->login( { lgname => 'username', lgpassword => 'password' } )
@@ -88,7 +88,7 @@ This module provides an interface between Perl and the MediaWiki API (http://www
 
 Returns a MediaWiki API object. You can pass a config as a hashref when calling new, or set the configuration later. When creating a new object, defaults for max lag and retries are set.
 
-  my $mw = MediaWiki::API->new( { api_url => 'http://en.wikipedia.org/w/api.php' }  );
+  my $mw = MediaWiki::API->new( { api_url => 'https://en.wikipedia.org/w/api.php' }  );
 
 Configuration options are
 
@@ -98,19 +98,19 @@ Configuration options are
 
 =item * files_url = 'Base url for files'; (needed if the api returns a relative URL for images like /images/a/picture.jpg)
 
-=item * upload_url = 'http://en.wikipedia.org/wiki/Special:Upload'; (path to the upload special page which is required if you want to upload images)
+=item * upload_url = 'https://en.wikipedia.org/wiki/Special:Upload'; (path to the upload special page which is required if you want to upload images)
 
 =item * on_error = Function reference to call if an error occurs in the module.
 
-=item * use_http_get = Boolean 0 or 1 (defaults to 0). If set to 1, the perl module will use http GET method for accessing the api. By default it uses the POST method. Note that the module will still use POST for the api calls that require POST no matter what the value of this configuration option. Currently the following actions will work with GET: query, logout, purge, paraminfo - see get_actions configuration below.
+=item * use_http_get = Boolean 0 or 1 (defaults to 0). If set to 1, the perl module will use http GET method for accessing the api. By default it uses the POST method. Note that the module will still use POST for the api calls that require POST no matter what the value of this configuration option. Currently the following actions will work with GET: query, logout, paraminfo - see get_actions configuration below.
 
-=item * get_actions = Hashref (defaults to { 'query' => 1, 'logout' => 1, purge' => 1, 'paraminfo' => 1 } ). This contains the API actions that are supported by the http GET method if it is enabled. Some wikis may have extensions that add more functions that work with an http GET request. If so, you can add actions as needed.
+=item * get_actions = Hashref (defaults to { 'query' => 1, 'logout' => 1, 'paraminfo' => 1 } ). This contains the API actions that are supported by the http GET method if it is enabled. Some wikis may have extensions that add more functions that work with an http GET request. If so, you can add actions as needed.
 
 =item * retries = Integer value; The number of retries to send an API request if an http error or JSON decoding error occurs. Defaults to 0 (try only once - don't retry). If max_retries is set to 4, and the wiki is down, the error won't be reported until after the 5th connection attempt. 
 
 =item * retry_delay = Integer value in seconds; The amount of time to wait before retrying a request if an HTTP error or JSON decoding error occurs.
 
-=item * max_lag = Integer value in seconds; Wikipedia runs on a database cluster and as such high edit rates cause the slave servers to lag. If this config option is set then if the lag is more then the value of max_lag, the api will wait before retrying the request. 5 is a recommended value. More information about this subject can be found at http://www.mediawiki.org/wiki/Manual:Maxlag_parameter. note the config option includes an underscore so match the naming scheme of the other configuration options. 
+=item * max_lag = Integer value in seconds; Wikipedia runs on a database cluster and as such high edit rates cause the slave servers to lag. If this config option is set then if the lag is more then the value of max_lag, the api will wait before retrying the request. 5 is a recommended value. More information about this subject can be found at https://www.mediawiki.org/wiki/Manual:Maxlag_parameter. note the config option includes an underscore so match the naming scheme of the other configuration options. 
 
 =item * max_lag_delay = Integer value in seconds; This configuration option specified the delay to wait before retrying a request when the server has reported a lag more than the value of max_lag. This defaults to 5 if using the max_lag configuration option.
 
@@ -217,7 +217,6 @@ sub _get_config_defaults {
   $config{get_actions} = {
     'query' => 1,
     'logout' => 1,
-    'purge' => 1,
     'paraminfo' => 1
   };
 
@@ -226,9 +225,9 @@ sub _get_config_defaults {
 
 =head2 MediaWiki::API->login( $query_hashref )
 
-Logs in to a MediaWiki. Parameters are those used by the MediaWiki API (http://www.mediawiki.org/wiki/API:Login). Returns a hashref with some login details, or undef on login failure. If Mediawiki sends requests a LoginToken the login is attempted again, but with the token sent from the initial login. Errors are stored in MediaWiki::API->{error}->{code} and MediaWiki::API->{error}->{details}.
+Logs in to a MediaWiki. Parameters are those used by the MediaWiki API (https://www.mediawiki.org/wiki/API:Login). Returns a hashref with some login details, or undef on login failure. If Mediawiki sends requests a LoginToken the login is attempted again, but with the token sent from the initial login. Errors are stored in MediaWiki::API->{error}->{code} and MediaWiki::API->{error}->{details}.
 
-  my $mw = MediaWiki::API->new( { api_url => 'http://en.wikipedia.org/w/api.php' }  );
+  my $mw = MediaWiki::API->new( { api_url => 'https://en.wikipedia.org/w/api.php' }  );
 
   #log in to the wiki
   $mw->login( {lgname => 'username', lgpassword => 'password' } )
@@ -240,19 +239,10 @@ sub login {
   my ($self, $query) = @_;
   $query->{action} = 'login';
   # attempt to login, and return undef if there was an api failure
-  return undef unless ( my $ref = $self->api( $query ) );
+  return undef unless ( my $ref = $self->edit( $query ) );
 
   # reassign hash reference to the login section
   my $login = $ref->{login};
-
-  # Do login token checking
-  if ( $login->{result} eq 'NeedToken' ) {
-    my $token = $login->{token};
-    $query->{lgtoken} = $token;
-    # Re-submit previous request with token
-    return undef unless ( $ref = $self->api( $query ) );
-    $login = $ref->{login};
-  }
 
   # return error if the login was not successful
   return $self->_error( ERR_LOGIN, 'Login Failure - ' . $login->{result} )
@@ -264,7 +254,7 @@ sub login {
 
 =head2 MediaWiki::API->api( $query_hashref, $options_hashref )
 
-Call the MediaWiki API interface. Parameters are passed as a hashref which are described on the MediaWiki API page (http://www.mediawiki.org/wiki/API). returns a hashref with the results of the call or undef on failure with the error code and details stored in MediaWiki::API->{error}->{code} and MediaWiki::API->{error}->{details}. MediaWiki::API uses the LWP::UserAgent module to send the http requests to the MediaWiki API. After any API call, the response object returned by LWP::UserAgent is available in $mw->{response}. This function will NOT modify the input query_hashref in any way.
+Call the MediaWiki API interface. Parameters are passed as a hashref which are described on the MediaWiki API page (https://www.mediawiki.org/wiki/API). returns a hashref with the results of the call or undef on failure with the error code and details stored in MediaWiki::API->{error}->{code} and MediaWiki::API->{error}->{details}. MediaWiki::API uses the LWP::UserAgent module to send the http requests to the MediaWiki API. After any API call, the response object returned by LWP::UserAgent is available in $mw->{response}. This function will NOT modify the input query_hashref in any way.
 
   binmode STDOUT, ':utf8';
 
@@ -290,7 +280,7 @@ Call the MediaWiki API interface. Parameters are passed as a hashref which are d
 MediaWiki's API uses UTF-8 and any 8 bit character string parameters are encoded automatically by the API call. If your parameters are already in UTF-8 this will be detected and the encoding will be skipped. If your parameters for some reason contain UTF-8 data but no UTF-8 flag is set (i.e. you did not use the "use utf8;" pragma) you should prevent re-encoding by passing an option skip_encoding => 1 in the $options_hash. For example:
 
  my $mw = MediaWiki::API->new();
- $mw->{config}->{api_url} = 'http://fr.wiktionary.org/w/api.php';
+ $mw->{config}->{api_url} = 'https://fr.wiktionary.org/w/api.php';
 
  my $query = {action => 'query',
    list => 'categorymembers',
@@ -462,7 +452,7 @@ sub logout {
 
 =head2 MediaWiki::API->edit( $query_hashref, $options_hashref )
 
-A helper function for doing edits using the MediaWiki API. Parameters are passed as a hashref which are described on the MediaWiki API editing page (http://www.mediawiki.org/wiki/API:Changing_wiki_content). Note that you need $wgEnableWriteAPI = true in your LocalSettings.php to use these features. This function will modify the input hashref.
+A helper function for doing edits using the MediaWiki API. Parameters are passed as a hashref which are described on the MediaWiki API editing page (https://www.mediawiki.org/wiki/API:Changing_wiki_content). Note that you need $wgEnableWriteAPI = true in your LocalSettings.php to use these features. This function will modify the input hashref.
 
 Currently
 
@@ -492,7 +482,7 @@ Currently
 
 =back
 
-are supported via this call. Use this call to edit pages without having to worry about getting an edit token from the API first. The function will cache edit tokens to speed up future edits (Except for rollback edits, which are not cachable).
+are supported via this call. Use this call to edit pages without having to worry about getting an edit token from the API first. The function will cache edit tokens to speed up future edits.
 
 Returns a hashref with the results of the call or undef on failure with the error code and details stored in MediaWiki::API->{error}->{code} and MediaWiki::API->{error}->{details}.
 
@@ -538,8 +528,31 @@ The following scrippet rolls back one or more edits from user MrVandal. If the u
 sub edit {
   my ($self, $query, $options) = @_;
 
-  # gets and sets a token for the specific action (different tokens for different edit actions such as rollback/delete etc).
-  return undef unless ( $self->_get_set_tokens( $query ) );
+  # choose token type and parameter name depending on action
+  # token types are createaccount, csrf, login, patrol, rollback, userrights, watch
+  my $action = $query->{action};
+  my $token_type = 'csrf';
+  my $token_param = 'token';
+
+  if ( $action eq 'createaccount' ) {
+    $token_type = 'createaccount';
+    $token_param = 'createtoken';
+  } elsif ( $action eq 'login' ) {
+    $token_type = 'login';
+    $token_param = 'lgtoken';
+  } elsif ( $action eq 'patrol' ) {
+    $token_type = 'patrol';
+  } elsif ( $action eq 'rollback' ) {
+    $token_type = 'rollback';
+  } elsif ( $action eq 'userrights' ) {
+    $token_type = 'userrights';
+  }
+
+  # get a token
+  return undef unless ( my $token = $self->_get_token( $token_type ) );
+
+  # set the token
+  $query->{$token_param} = $token;
 
   # do the edit
   return undef unless ( my $ref = $self->api( $query, $options ) );
@@ -579,7 +592,7 @@ Returns a hashref with the following keys or undef on an error. If the page is m
 
 =back
 
-Full information about these can be read on (http://www.mediawiki.org/wiki/API:Query_-_Properties#revisions_.2F_rv)
+Full information about these can be read on (https://www.mediawiki.org/wiki/API:Query_-_Properties#revisions_.2F_rv)
 
 =cut
 
@@ -600,7 +613,7 @@ sub get_page {
 
 =head2 MediaWiki::API->list( $query_hashref, $options_hashref )
 
-A helper function for getting lists using the MediaWiki API. Parameters are passed as a hashref which are described on the MediaWiki API editing page (http://www.mediawiki.org/wiki/API:Query_-_Lists). This function modifies the input query_hashref.
+A helper function for getting lists using the MediaWiki API. Parameters are passed as a hashref which are described on the MediaWiki API editing page (https://www.mediawiki.org/wiki/API:Query_-_Lists). This function modifies the input query_hashref.
 
 This function will return a reference to an array of hashes or undef on failure. It handles getting lists of data from the MediaWiki api, continuing the request with another connection if needed. The options_hashref currently has three parameters:
 
@@ -694,9 +707,9 @@ error handling, and supports uploading files by just passing a filename.
 A function to upload files to a MediaWiki. This function does not use the MediaWiki API currently as support for file uploading is not yet implemented. Instead it uploads using the Special:Upload page, and as such an additional configuration value is needed.
 
   my $mw = MediaWiki::API->new( {
-   api_url => 'http://en.wikipedia.org/w/api.php' }  );
+   api_url => 'https://en.wikipedia.org/w/api.php' }  );
   # configure the special upload location.
-  $mw->{config}->{upload_url} = 'http://en.wikipedia.org/wiki/Special:Upload';
+  $mw->{config}->{upload_url} = 'https://en.wikipedia.org/wiki/Special:Upload';
 
 The upload function is then called as follows
 
@@ -762,9 +775,9 @@ sub _upload_old {
 A function to download images/files from a MediaWiki. A file url may need to be configured if the api returns a relative URL.
 
   my $mw = MediaWiki::API->new( {
-    api_url => 'http://www.exotica.org.uk/mediawiki/api.php' }  );
+    api_url => 'https://www.exotica.org.uk/mediawiki/api.php' }  );
   # configure the file url. Wikipedia doesn't need this but the ExoticA wiki does.
-  $mw->{config}->{files_url} = 'http://www.exotica.org.uk';
+  $mw->{config}->{files_url} = 'https://www.exotica.org.uk';
 
 The download function is then called as follows
 
@@ -859,76 +872,26 @@ sub _make_querystring {
   return '?' . join('&',@qs);
 }
 
-# gets a token for a specified parameter and sets it in the query for the call
-sub _get_set_tokens {
-  my ($self, $query) = @_;
+# gets a token from the API (https://www.mediawiki.org/wiki/API:Tokens)
+sub _get_token {
+  my ($self, $type) = @_;
 
-  # Note that although currently many of the tokens are equivalent, we cache them separately
-  # in case this was to change.
-  if ( exists( $self->{config}->{tokens}->{$query->{action}} ) ) {
-    $query->{token} = $self->{config}->{tokens}->{$query->{action}};
-    return 1;
-  }
+  # Check if we have this token cached
+  my $token = $self->{config}->{tokens}->{$type};
+  return $token if defined $token;
 
-  # set the token actions and title depending on edit action
-  my $tokaction = $query->{action};
-  my $title = $query->{title};
-  if ( $query->{action} eq 'move' ) {
-    $title = $query->{from};
-  } elsif ( $query->{action} eq 'upload' ) {
-    $tokaction = 'edit';
-    $title = $query->{filename};
-  } elsif ( $query->{action} eq 'emailuser' ) {
-    $tokaction = 'email';
-    $title = 'User:' . $query->{target};
-  } elsif ( $query->{action} eq 'import' ) {
-    # if title was not specified get the import token using Main_Page as API docs suggest.
-    $title = "Main_Page" unless defined $query->{title};
-  }
+  my $query = { action => 'query', meta => 'tokens', type => $type };
 
-  # set the properties and token name we want to extract based on the action
-  # may merge into above ifdef depending on other token implementations
-  my $prop = 'info';
-  my $token = 'intoken';
-  my $tokquery = { action => 'query', prop => $prop, $token => $tokaction, titles => $title };  
-  if ( $tokaction eq 'rollback' ) {
-    $prop = 'revisions';
-    $token = 'rvtoken';
-  } elsif ( $tokaction eq 'patrol' ) {
-    $tokquery = { action => 'query', list => 'recentchanges', rclimit => '1', rctoken => $tokaction };
-  }
+  return undef unless ( my $ref = $self->api( $query ) );
 
-  my $ref;
-  $ref = $self->api( $tokquery );
-  return undef unless $ref;
+  $token = $ref->{query}->{tokens}->{$type . 'token'};
 
-  my ($pageid, $pageref) = each %{ $ref->{query}->{pages} };
+  return $self->_error( ERR_EDIT, "Unable to get a $type token." ) unless ( defined $token );
 
-  # if the page doesn't exist and we aren't editing/creating a new page then return an error
-  if ( defined $pageref->{missing} && $tokaction ne 'edit' && $tokaction ne 'import' ) {
-    return $self->_error( ERR_EDIT, "Unable to $tokaction page '$title'. Page does not exist.") 
-  }
+  # cache the token
+  $self->{config}->{tokens}->{$type} = $token;
 
-  if ( $query->{action} eq 'rollback' ) {
-    $query->{token} = @{ $pageref->{revisions} }[0]->{$tokaction.'token'};
-    my $lastuser = @{ $pageref->{revisions} }[0]->{user};
-    $query->{user} = @{ $pageref->{revisions} }[0]->{user} unless defined $query->{user};
-    return $self->_error( ERR_EDIT, "Unable to rollback edits from user '$query->{user}' for page '$title'. Last edit was made by user $lastuser" ) if ( $query->{user} ne $lastuser );
-  } elsif ( $tokaction eq 'patrol' ) {
-    $query->{token} = @{$ref->{query}->{recentchanges}}[0]->{patroltoken};
-  } else {
-    $query->{token} = $pageref->{$tokaction.'token'};
-  }
-
-  return $self->_error( ERR_EDIT, "Unable to get an edit token for action '$tokaction'." ) unless ( defined $query->{token} );
-
-  # cache the token. rollback tokens are specific for the page name and last edited user so can not be cached. Note that although currently many of the tokens
-  # are equivalent, we cache them separately in case this was to change.
-  if ( $query->{action} ne 'rollback' ) {
-    $self->{config}->{tokens}->{$query->{action}} = $query->{token};
-  }
-
-  return 1;
+  return $token;
 }
 
 sub _error {

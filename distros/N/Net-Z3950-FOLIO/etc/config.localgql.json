@@ -1,0 +1,5 @@
+{
+  "okapi": {
+    "graphqlUrl": "http://localhost:3001"
+  }
+}

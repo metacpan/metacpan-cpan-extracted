@@ -38,6 +38,7 @@
             "MIDI::Simple" : "0",
             "Math::Random::Discrete" : "0",
             "Moo" : "2",
+            "constant" : "0",
             "namespace::clean" : "0",
             "perl" : "5.006",
             "strictures" : "2"
@@ -73,7 +74,7 @@
          "web" : "https://github.com/ology/Music-Duration-Partition"
       }
    },
-   "version" : "0.0515",
+   "version" : "0.0702",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.030002"

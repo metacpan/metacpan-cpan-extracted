@@ -1,0 +1,196 @@
+=head1 NAME
+
+UniEvent::Resolver - performs asynchronous DNS resolution.
+
+=head1 SYNOPSIS
+
+    my $loop = UniEvent::Loop->new;
+    my $resolver = new UniEvent::Resolver($loop);
+
+    # simplified form and cancellation
+    my $req = $resolver->resolve('crazypanda.ru', sub {
+        my ($addr, $err, $req) = @_;
+        say "cancelled" if $err == UE::SystemError::operation_canceled;
+    });
+    $req->cancel;
+
+    # advanced form
+    my $req = $resolver->resolve({
+        node       => 'crazypanda.ru',
+        service    => 'https',
+        use_cache  => 1,
+        on_resolve => sub {
+            my ($addr, $err, $req) = @_;
+            return if $err;
+            say "resolved as ", $addr->[0]->ip, ":", $addr->[0]->port;
+        },
+    });
+
+
+=head1 DESCRIPTION
+
+Resolver performs asynchronous DNS resolution, i.e. it maps symbolic names like
+"crazypanda.ru" into IP addresses like 91.234.119.79.
+
+Under the hood it uses C<c-ares|https://c-ares.haxx.se/> library for performing
+resolution.
+
+There is a hidden per-loop resolver instance, so, generally, there is no need
+of creating separate Resolver instance for use L<UniEvent::Tcp> or L<UniEvent::Udp>.
+
+=head1 METHODS
+
+=head2 new([$loop = UniEvent::Loop->default_loop [, $config = {}]])
+
+Constructs new resolver instance, binding the supplied C<$loop> to it and using
+the provided config. The config is hashmap with the following properties:
+
+=over
+
+=item cache_expiration_time
+
+How much time (in seconds) should pass since cached last address resolution to
+let it be considered outdated and the new resolving operation will be performed.
+
+Default value: 120 seconds.
+
+=item cache_limit
+
+Maximum size of cached addresses in the resolver cache. Currently the cache will
+be cleared upon hiting the limit.
+
+Default value: 10000 records.
+
+=item query_timeout
+
+Timeout value for single request resolution, in seconds.
+
+Default value: 0.5 seconds.
+
+=item workers
+
+The number of concurrently resolved requests.
+
+Default value: 5.
+
+=back
+
+
+=head2 resolve($hostname [, $callback = undef [, $timeout = 5.0]])
+
+=head2 resolve($params)
+
+Initiates asynchronous DNS resolution. In the simple form, just C<$hostname> to be resolved
+is expected. In more advanced form the C<$params> is a hashref with the following options:
+
+=over
+
+=item node
+
+The host name to be resolved
+
+=item timeout
+
+Max time for address resolution, in seconds
+
+=item service
+
+The name of the service (see C</etc/services>) for port mapping. It can be a number; in that
+case the C<NUMERICSERV> address hints flag have to be specified.
+
+=item port
+
+Already mapped service to port (as a number).
+
+=item hints
+
+Address info hints. Use C<hints> function for costruction.
+
+=item use_cache
+
+Whether the default caching mechanism for resolved hosts should be used.
+
+=item on_resolve
+
+The callback.
+
+=back
+
+The L<UniEvent::Resolver::Request> is returned. It can be used for tracking address
+resolution or for the request cancellation.
+
+After request completion, the C<$callback> is invoked as:
+
+    $callback->($addresses, $error_code, $request)
+
+Where the addresses are the array of L<Net::SockAddr>.
+
+=head2 cache_expiration_time([$value = undef]) {
+
+Returns how much time (in seconds) should pass since cached last address resolution to
+let it be considered outdated and the new resolving operation will be performed.
+
+If C<$vale> is defined, it is set as the new cache expiration time.
+
+=head2 cache_limit ([$value = undef])
+
+Returns the maximum size of cached addresses in the resolver cache. Currently the
+cache will be cleared upon hiting the limit.
+
+If C<$vale> is defined, it is set as the new limit value.
+
+=head2 cache_size ()
+
+Returns the current size of cache.
+
+=head2 queue_size ()
+
+Returns the amount of requests, which are waiting to be resolved by workers.
+
+=head2 clear_cache ()
+
+Clears cache by force.
+
+=head2 reset()
+
+Cancels all resolving and pending requests.
+
+=head1 FUNCTIONS
+
+=head2 hints($family, $socktype [, $protocol = 0 [, $flags = 0]])
+
+Constructs address info hints for address resolution.
+
+    use UniEvent;
+    use UniEvent::Resolver;
+
+    my $hints = UniEvent::Resolver::hints(AF_INET, SOCK_STREAM, PF_INET)
+
+
+The address info hints is opaque structure without any user visible operations
+on it. Its sole purpose is to construct hints for the address resolution.
+
+=head1 CONSTANTS
+
+This are the resolver hints:
+
+=head2 NUMERICSERV
+
+If this option is set service field will be treated as a numeric value, i.e.
+instead of "https" it will assume the number "443" (as a string).
+
+=head2 CANONNAME
+
+Resolves L<CNAME records|https://en.wikipedia.org/wiki/CNAME_record>
+
+Check type constant
+
+=head1 REFERENCES
+
+L<Net::SockAddr>
+
+L<UniEvent::Resolver::Request>
+
+L<UniEvent>
+
+=cut

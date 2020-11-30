@@ -21,6 +21,7 @@ t/hint_hash.t
 t/lib/BogusVersion.pm
 t/lib/Present.pm
 t/load.t
+t/load_all.t
 t/load_or_skip.t
 t/load_or_skip_all.t
 t/require.t

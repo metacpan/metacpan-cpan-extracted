@@ -14,8 +14,8 @@ lives_ok {
     $parser->read('t/text-simple.txt');
 }
 'Parses a text file normally';
-is( $parser->filename(), 't/text-simple.txt', 'Last file read' );
-is( $parser->filehandle(), undef, 'Filehandle was closed' );
+is( $parser->filename(),   't/text-simple.txt', 'Last file read' );
+is( $parser->filehandle(), undef,               'Filehandle was closed' );
 
 open MYFH, "<t/text-simple.txt";
 lives_ok {

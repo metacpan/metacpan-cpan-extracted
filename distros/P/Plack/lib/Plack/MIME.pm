@@ -150,6 +150,7 @@ our $MIME_TYPES = {
     ".tiff"    => "image/tiff",
     ".torrent" => "application/x-bittorrent",
     ".tr"      => "text/troff",
+    ".ttf"     => "font/ttf",
     ".txt"     => "text/plain",
     ".vcf"     => "text/x-vcard",
     ".vcs"     => "text/x-vcalendar",
@@ -157,6 +158,7 @@ our $MIME_TYPES = {
     ".war"     => "application/java-archive",
     ".wav"     => "audio/x-wav",
     ".webm"    => "video/webm",
+    ".webp"    => "image/webp",
     ".wma"     => "audio/x-ms-wma",
     ".wmv"     => "video/x-ms-wmv",
     ".wmx"     => "video/x-ms-wmx",
@@ -166,6 +168,7 @@ our $MIME_TYPES = {
     ".xbm"     => "image/x-xbitmap",
     ".xhtml"   => "application/xhtml+xml",
     ".xls"     => "application/vnd.ms-excel",
+    ".xlsx"    => "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
     ".xml"     => "application/xml",
     ".xpm"     => "image/x-xpixmap",
     ".xsl"     => "application/xml",
@@ -179,7 +182,7 @@ my $fallback = sub { };
 
 sub mime_type {
     my($class, $file) = @_;
-    $file =~ /(\.[a-zA-Z0-9]+)$/ or return;
+    $file =~ /(\.[a-zA-Z0-9\-]+)$/ or return;
     $MIME_TYPES->{lc $1} || $fallback->(lc $1);
 }
 
@@ -226,5 +229,3 @@ selection of MIME types is based on Rack's Rack::Mime module.
 L<Rack::Mime|https://github.com/rack/rack/blob/master/lib/rack/mime.rb> L<MIME::Types>
 
 =cut
-
-

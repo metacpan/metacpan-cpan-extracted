@@ -1,0 +1,39 @@
+From 01982395b50e8f078b1945870fb65bf03b245923 Mon Sep 17 00:00:00 2001
+From: Brian Fraser <brian.fraser@booking.com>
+Date: Mon, 23 Nov 2020 19:03:19 +0100
+Subject: [PATCH 3/6] lang/c: snappy has no pkg-config entry
+
+Google explicitly is not supporting that:
+
+    https://github.com/google/snappy/pull/86
+
+Which leaves us users in a somewhat precarious state; if users
+of snappy, like avro, try to include it as a requirement in
+their pkg-config, they need to start special-casing for each
+possible packager.
+
+Currently `libsnappy` ends up in the generated `Requires` section,
+which causes any use of `pkg-config --exists avro-c` to return
+a non-zero status on a huge chunk of platforms.
+
+This commit removes `libsnappy` from the Requires.
+---
+ lang/c/CMakeLists.txt | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/lang/c/CMakeLists.txt b/lang/c/CMakeLists.txt
+index 72cfd2e3..5c8311b1 100644
+--- a/lang/c/CMakeLists.txt
++++ b/lang/c/CMakeLists.txt
+@@ -151,7 +151,7 @@ endif (ZLIB_FOUND)
+ 
+ find_package(Snappy)
+ if (SNAPPY_FOUND AND ZLIB_FOUND)  # Snappy borrows crc32 from zlib
+-    set(SNAPPY_PKG libsnappy)
++    set(SNAPPY_PKG "") # google explicitly does not provide a pkg-config for snappy: https://github.com/google/snappy/pull/86
+     add_definitions(-DSNAPPY_CODEC)
+     include_directories(${SNAPPY_INCLUDE_DIRS})
+     message("Enabled snappy codec")
+-- 
+2.29.2
+

@@ -15,9 +15,9 @@ ok( defined $spi, 'defined $spi' );
 
 {
    test_out( qr/\s*# Subtest: ->write\n/ );
-   test_out( '    ok 1 - write' );
-   test_out( '    1..1' );
-   test_out( 'ok 1 - ->write' );
+   test_out( "    ok 1 - ->write('ABC')" );
+   test_out( "    1..1" );
+   test_out( "ok 1 - ->write" );
 
    $adapter->expect_write( "ABC" );
    $spi->write( "ABC" )->get;
@@ -27,11 +27,11 @@ ok( defined $spi, 'defined $spi' );
 }
 
 {
-   test_out( 'ok 1 - ->readwrite return' );
+   test_out( "ok 1 - ->readwrite return" );
    test_out( qr/\s*# Subtest: ->readwrite\n/ );
-   test_out( '    ok 1 - readwrite' );
-   test_out( '    1..1' );
-   test_out( 'ok 2 - ->readwrite' );
+   test_out( "    ok 1 - ->readwrite('ABC')" );
+   test_out( "    1..1" );
+   test_out( "ok 2 - ->readwrite" );
 
    $adapter->expect_readwrite( "ABC" )
       ->returns( "DEF" );

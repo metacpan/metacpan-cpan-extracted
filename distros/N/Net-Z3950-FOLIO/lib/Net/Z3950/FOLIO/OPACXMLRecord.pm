@@ -73,7 +73,7 @@ sub _makeSingleHoldingsRecord {
 	$shelvingLocation = $location->{name};
     }
 
-    my $items = _makeItemRecords($holding->{holdingsItems});
+    my $items = _makeItemRecords($holding->{bareHoldingsItems});
 
     return _makeXMLElement(4, 'holding', (
         [ 'typeOfRecord', substr($marc->leader(), 5, 1) ], # LDR 06
@@ -230,7 +230,7 @@ sub _makeAvailabilityDate {
 }
 
 
-# It's anyone's guess what the <availableThru> field even means. It's
+# It's not clear what the <availableThru> field even means. It's
 # included in the name, without comment, in the Z39.50 ASN.1 and in
 # the YAZ OPAC XML schema.
 #
@@ -243,16 +243,13 @@ sub _makeAvailabilityDate {
 #   DRAFT" suggests it means "Library building location, or possibly
 #   access policy".
 #
-# Whatever it means, it is probably not in the FOLIO inventory
-# data. It may become possible to determine it in future, when the
-# current item status gets broken into three item statuses
-# (availability status, process status and needed-for status, but that
-# will have to wait).
-# See https://docs.google.com/presentation/d/11BE_G1o-yBNg1ki8HyaDTdmkrP03_cR7KGjiXQviwuQ/edit#slide=id.g8b76928899_0_0
+# But we have concrete expectations from Lehigh that it means the
+# material-type of the item: see ZF-26. It's not clear why that would
+# be called "availableThru", but ¯\_(ツ)_/¯
 #
 sub _makeAvailableThru {
     my($item) = @_;
-    return undef; # XXX for now
+    return ($item->{materialType} || {})->{name};
 }
 
 

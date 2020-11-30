@@ -10,7 +10,7 @@ configure_requires:
   ExtUtils::MakeMaker: '0'
   File::ShareDir::Install: '0.06'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -30,7 +30,7 @@ requires:
 resources:
   bugtracker: https://github.com/ehuelsmann/pherkin-extension-weasel/issues
   repository: https://github.com/ehuelsmann/pherkin-extension-weasel.git
-version: '0.14'
+version: '0.15'
 x_contributors:
   - 'Mohammad S Anwar <mohammad.anwar@yahoo.com>'
   - 'Yves Lavoie <ylavoie@yveslavoie.com>'

@@ -1,8 +1,8 @@
 package Catalyst::Plugin::Config::Perl;
 use 5.012;
-use Panda::Config::Perl;
+use Config::MorePerl;
 
-our $VERSION = '1.0.4';
+our $VERSION = '1.1.0';
 
 use Class::Accessor::Inherited::XS inherited => [qw/cfg dev config_initial/];
 
@@ -35,7 +35,7 @@ sub config_reload {
     }
     
     if ($conf_file) {
-        my $cfg = Panda::Config::Perl->process($conf_file, $initial_cfg);
+        my $cfg = Config::MorePerl->process($conf_file, $initial_cfg);
         my $old = $class->setup_finished;
         $class->setup_finished(0); # work around fucking and annoying Catalyst
         $class->config($cfg);

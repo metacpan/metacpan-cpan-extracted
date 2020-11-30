@@ -1,7 +1,9 @@
 package App::ScreensaverUtils;
 
-our $DATE = '2019-09-15'; # DATE
-our $VERSION = '0.009'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-11-22'; # DATE
+our $DIST = 'App-ScreensaverUtils'; # DIST
+our $VERSION = '0.010'; # VERSION
 
 use 5.010001;
 use strict;
@@ -126,7 +128,7 @@ App::ScreensaverUtils - CLI utilities related to screensaver
 
 =head1 VERSION
 
-This document describes version 0.009 of App::ScreensaverUtils (from Perl distribution App-ScreensaverUtils), released on 2019-09-15.
+This document describes version 0.010 of App::ScreensaverUtils (from Perl distribution App-ScreensaverUtils), released on 2020-11-22.
 
 =head1 DESCRIPTION
 
@@ -188,6 +190,7 @@ Arguments ('*' denotes required arguments):
 Explicitly set screensaver program to use.
 
 The default, when left undef, is to detect what screensaver is running,
+
 
 =back
 
@@ -259,6 +262,7 @@ Arguments ('*' denotes required arguments):
 
 =item * B<command>* => I<array[str]>
 
+
 =back
 
 Returns an enveloped result (an array).
@@ -294,7 +298,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019, 2018, 2017 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2019, 2018, 2017 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

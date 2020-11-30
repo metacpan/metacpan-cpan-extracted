@@ -1,0 +1,1 @@
+/home/oetiker/checkouts/qooxdoo/qooxdoo/tool/bin/generator.py -m QOOXDOO_PATH:/home/oetiker/checkouts/qooxdoo/qooxdoo -m CALLBACKERY_PATH:/home/oetiker/checkouts/hin-cre^Cntial-mgr-stable/hin-cred-mgr/thirdparty/lib/perl5/CallBackery/qooxdoo -m CACHE:./cache translation

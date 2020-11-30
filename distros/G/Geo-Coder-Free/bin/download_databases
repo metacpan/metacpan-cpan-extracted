@@ -1,20 +1,22 @@
 #!/usr/bin/env bash
 
+# Download the databases and create the local SQLite database
+
 set -ex
 
 export WHOSONFIRST_HOME=~/src/whosonfirst-sqlite
 export OPENADDR_HOME=~/misc/openaddr
-export http_proxy=http://zack:3128
-export https_proxy=http://zack:3128
+export DR5HN_HOME=~/src/countries-states-cities-database
+# export http_proxy=http://zack:3128
+# export https_proxy=http://zack:3128
+export http_proxy=
+export https_proxy=
 export no_proxy=localhost,127.0.0.0/8,192.168.1.0/8,utilite
 export REDIS_SERVER=
 
-rm -f ~/Downloads/openaddr-collected-global*.zip
 cd ~/src/njh/Geo-Coder-Free && git pull
-# cd ~/Downloads && /usr/bin/wget --no-check-certificate --quiet https://s3.amazonaws.com/data.openaddresses.io/openaddr-collected-global.zip
-# cd ~/Downloads && /usr/bin/wget --no-check-certificate --quiet https://s3.amazonaws.com/data.openaddresses.io/openaddr-collected-global-sa.zip
-cd ~/Downloads && /usr/bin/wget --no-check-certificate --quiet https://data.openaddresses.io/openaddr-collected-global.zip
-cd ~/Downloads && /usr/bin/wget --no-check-certificate --quiet https://data.openaddresses.io/openaddr-collected-global-sa.zip
+cd ~/Downloads && /usr/bin/wget -N -c --no-check-certificate --quiet https://data.openaddresses.io/openaddr-collected-global.zip
+cd ~/Downloads && /usr/bin/wget -N -c --no-check-certificate --quiet https://data.openaddresses.io/openaddr-collected-global-sa.zip
 cd $OPENADDR_HOME && rm -rf ?? *.txt summary br mx fr it za es pl be jp kr pt fi de by ch dk ru cz nz tw cl at kz co no uy si xk */*.vrt */*/*.vrt && unzip -o ~/Downloads/openaddr-collected-global-sa.zip && unzip -o ~/Downloads/openaddr-collected-global.zip
 
 # cd $WHOSONFIRST_HOME && ./wof-sqlite-download
@@ -24,8 +26,12 @@ if [ -r $OPENADDR_HOME/openaddresses.sql ]; then
 	mv $OPENADDR_HOME/openaddresses.sql $OPENADDR_HOME/openaddresses.sql.keep
 fi
 
+cd $DR5HN_HOME && git pull
+
+# cd ~/Downloads && /usr/bin/wget -N -c https://ftpmirror.your.org/pub/openstreetmap/planet/planet-latest.osm.bz2
+cd $OSM_HOME && /usr/bin/wget -N -c https://download.geofabrik.de/europe-latest.osm.bz2
+/usr/bin/wget -N -c https://download.geofabrik.de/north-america-latest.osm.bz2
+/usr/bin/wget -N -c https://download.geofabrik.de/australia-oceania-latest.osm.bz2
+bunzip2 -t *.osm.bz2
+
 cd ~/src/njh/Geo-Coder-Free && git pull && perl Makefile.PL && make && make test AUTHOR_TESTING=1 TEST_FILES="t/scantext.t t/whosonfirst.t t/openaddr.t t/maxmind.t t/local.t"
-
-rm -f ~/Downloads/openaddr-collected-global*.zip&
-
-cd ~/Downloads && /usr/bin/wget https://ftpmirror.your.org/pub/openstreetmap/planet/planet-latest.osm.bz2

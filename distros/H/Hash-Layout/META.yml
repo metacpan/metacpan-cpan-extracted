@@ -8,9 +8,9 @@ build_requires:
   Test::More: 0
   lib: 0
 configure_requires:
-  ExtUtils::MakeMaker: 6.30
+  ExtUtils::MakeMaker: 0
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 5.016, CPAN::Meta::Converter version 2.140640'
+generated_by: 'Dist::Zilla version 5.031, CPAN::Meta::Converter version 2.143240'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -21,9 +21,10 @@ requires:
   Hash::Merge::Simple: 0
   Moo: 0
   Scalar::Util: 0
+  Text::Glob: 0
   Types::Standard: 0
   strict: 0
   warnings: 0
 resources:
   repository: https://github.com/vanstyn/Hash-Layout.git
-version: 1.02
+version: 2.00

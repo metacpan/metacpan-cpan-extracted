@@ -11,8 +11,6 @@ LICENSES/gpl-2.0.txt
 LICENSES/gpl-3.0.txt
 MANIFEST
 MANIFEST.SKIP
-META.json
-META.yml
 README
 sample/36LC0079.jpg
 sample/36LC0079_original.jpg
@@ -33,4 +31,6 @@ t/13_critic.t
 t/14_kwalitee.t
 t/15_spell.t
 t/perlcriticrc
+META.yml
+META.json
 SIGNATURE    Added here by Module::Build

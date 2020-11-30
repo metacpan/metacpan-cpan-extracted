@@ -37,7 +37,7 @@
             "File::Slurper" : "0",
             "IO::Socket::INET6" : "0",
             "IO::Socket::SSL" : "0",
-            "Modern::Perl" : "0",
+            "Modern::Perl" : "1.20180701",
             "Net::Server" : "0",
             "URI::Escape" : "0",
             "perl" : "5.026000",
@@ -54,6 +54,6 @@
          "web" : "https://alexschroeder.ch/cgit/phoebe/about/"
       }
    },
-   "version" : 1.23,
+   "version" : 1.24,
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

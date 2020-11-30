@@ -1,3 +1,9 @@
+1.3.1    25.11.2020
+           - strip "-s" flag if "-g" is present
+           - pass {LINK} to {BIN_SHARE}{LINK} by default 
+           - fix {BIN_SHARE}{LINK} param behaviour
+           - do not automatically share CLIB
+           - "BIN_SHARE => 1" support (no explicit params but enabled)
 1.3.0    19.11.2020
            - add PKG_CONFIG and BIN_SHARE/PKG_CONFIG support
            - build with sanitizer if ENV{SANITIZE} is set (for developers) 

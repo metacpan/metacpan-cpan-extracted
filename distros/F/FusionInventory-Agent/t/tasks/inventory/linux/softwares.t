@@ -4,6 +4,7 @@ use strict;
 use warnings;
 use lib 't/lib';
 
+use Config;
 use English qw(-no_match_vars);
 
 $ENV{TZ} = 'CET';
@@ -19,6 +20,7 @@ use FusionInventory::Agent::Task::Inventory::Generic::Softwares::Deb;
 use FusionInventory::Agent::Task::Inventory::Generic::Softwares::Gentoo;
 use FusionInventory::Agent::Task::Inventory::Generic::Softwares::Nix;
 use FusionInventory::Agent::Task::Inventory::Generic::Softwares::Pacman;
+use FusionInventory::Agent::Task::Inventory::Generic::Softwares::Snap;
 
 my $rpm_packages = [
     {
@@ -138,7 +140,7 @@ my $deb_packages = [
         NAME     => 'adduser',
         ARCH     => 'all',
         VERSION  => '3.112+nmu2',
-        FILESIZE => '1228',
+        FILESIZE => '1257472',
         SYSTEM_CATEGORY => 'admin'
     },
     {
@@ -146,7 +148,7 @@ my $deb_packages = [
         NAME     => 'anthy-common',
         ARCH     => 'all',
         VERSION  => '9100h-6',
-        FILESIZE => '13068',
+        FILESIZE => '13381632',
         SYSTEM_CATEGORY => 'unknown'
     },
     {
@@ -154,7 +156,7 @@ my $deb_packages = [
         NAME     => 'apache2',
         ARCH     => 'amd64',
         VERSION  => '2.2.16-6+squeeze6',
-        FILESIZE => '36',
+        FILESIZE => '36864',
         SYSTEM_CATEGORY => 'httpd'
     },
     {
@@ -162,7 +164,7 @@ my $deb_packages = [
         NAME     => 'apache2-mpm-prefork',
         ARCH     => 'amd64',
         VERSION  => '2.2.16-6+squeeze6',
-        FILESIZE => '68',
+        FILESIZE => '69632',
         SYSTEM_CATEGORY => 'httpd'
     },
     {
@@ -170,7 +172,7 @@ my $deb_packages = [
         NAME     => 'apache2-utils',
         ARCH     => 'amd64',
         VERSION  => '2.2.16-6+squeeze6',
-        FILESIZE => '384',
+        FILESIZE => '393216',
         SYSTEM_CATEGORY => 'httpd'
     },
     {
@@ -178,7 +180,7 @@ my $deb_packages = [
         NAME     => 'apache2.2-bin',
         ARCH     => 'amd64',
         VERSION  => '2.2.16-6+squeeze6',
-        FILESIZE => '3856',
+        FILESIZE => '3948544',
         SYSTEM_CATEGORY => 'httpd'
     },
     {
@@ -186,7 +188,7 @@ my $deb_packages = [
         NAME     => 'apache2.2-common',
         ARCH     => 'amd64',
         VERSION  => '2.2.16-6+squeeze6',
-        FILESIZE => '2144',
+        FILESIZE => '2195456',
         SYSTEM_CATEGORY => 'httpd'
     },
     {
@@ -194,7 +196,7 @@ my $deb_packages = [
         NAME     => 'apt',
         ARCH     => 'amd64',
         VERSION  => '0.8.10.3+squeeze1',
-        FILESIZE => '5644',
+        FILESIZE => '5779456',
         SYSTEM_CATEGORY => 'admin'
     },
     {
@@ -202,7 +204,7 @@ my $deb_packages = [
         NAME     => 'apt-utils',
         ARCH     => 'amd64',
         VERSION  => '0.8.10.3+squeeze1',
-        FILESIZE => '540',
+        FILESIZE => '552960',
         SYSTEM_CATEGORY => 'admin'
     },
     {
@@ -210,7 +212,7 @@ my $deb_packages = [
         NAME     => 'apt-xapian-index',
         ARCH     => 'all',
         VERSION  => '0.41',
-        FILESIZE => '376',
+        FILESIZE => '385024',
         SYSTEM_CATEGORY => 'admin'
     },
     {
@@ -218,7 +220,7 @@ my $deb_packages = [
         NAME     => 'aptitude',
         ARCH     => 'amd64',
         VERSION  => '0.6.3-3.2+squeeze1',
-        FILESIZE => '11916',
+        FILESIZE => '12201984',
         SYSTEM_CATEGORY => 'admin'
     },
     {
@@ -226,7 +228,7 @@ my $deb_packages = [
         NAME     => 'aspell',
         ARCH     => 'amd64',
         VERSION  => '0.60.6-4',
-        FILESIZE => '1184',
+        FILESIZE => '1212416',
         SYSTEM_CATEGORY => 'text'
     },
     {
@@ -234,7 +236,7 @@ my $deb_packages = [
         NAME     => 'aspell-en',
         ARCH     => 'all',
         VERSION  => '6.0-0-6',
-        FILESIZE => '548',
+        FILESIZE => '561152',
         SYSTEM_CATEGORY => 'text'
     },
     {
@@ -242,7 +244,7 @@ my $deb_packages = [
         NAME     => 'aspell-fr',
         ARCH     => 'all',
         VERSION  => '0.50-3-7',
-        FILESIZE => '636',
+        FILESIZE => '651264',
         SYSTEM_CATEGORY => 'text'
     },
     {
@@ -250,8 +252,16 @@ my $deb_packages = [
         NAME     => 'at',
         ARCH     => 'amd64',
         VERSION  => '3.1.12-1',
-        FILESIZE => '220',
+        FILESIZE => '225280',
         SYSTEM_CATEGORY => 'admin'
+    },
+    {
+        FROM     => 'deb',
+        NAME     => 'jcagent',
+        ARCH     => 'amd64',
+        VERSION  => '0.24.2',
+        FILESIZE => '0',
+        SYSTEM_CATEGORY => 'base'
     }
 ];
 
@@ -388,7 +398,37 @@ my $pacman_packages = [
     }
 ];
 
-plan tests => 11;
+my $snap_packages = [
+    {
+        COMMENTS    => 'KDE Frameworks 5',
+        FILESIZE    => 286261248,
+        FROM        => 'snap',
+        HELPLINK    => 'https://www.kde.org/support/',
+        NAME        => 'kde-frameworks-5-core18',
+        PUBLISHER   => 'KDE',
+        VERSION     => '5.61.0'
+    },
+    {
+        COMMENTS    => 'Kdenlive video editor',
+        FILESIZE    => 104857600,
+        FROM        => 'snap',
+        HELPLINK    => 'https://bugs.kde.org/enter_bug.cgi?product=neon&component=Snaps',
+        NAME        => 'kdenlive',
+        PUBLISHER   => 'KDE',
+        VERSION     => '19.08.2'
+    },
+    {
+        COMMENTS    => 'Display and control your Android device',
+        FILESIZE    => 84934656,
+        FROM        => 'snap',
+        HELPLINK    => 'https://github.com/sisco311/scrcpy-snap/issues',
+        NAME        => 'scrcpy',
+        PUBLISHER   => 'sisco311',
+        VERSION     => 'v1.10'
+    }
+];
+
+plan tests => 12;
 
 my $inventory = FusionInventory::Test::Inventory->new();
 
@@ -399,6 +439,8 @@ $packages = FusionInventory::Agent::Task::Inventory::Generic::Softwares::RPM::_g
 SKIP: {
     skip ('test can fail because of timezone setting on Win32', 1)
         if ($OSNAME eq 'MSWin32');
+    skip ('test can fail because of timezone setting during debian build', 1)
+        if ($Config{cf_by} =~ /debian/i);
     cmp_deeply($packages, $rpm_packages, 'rpm: parsing');
 }
 lives_ok {
@@ -446,3 +488,14 @@ ok(
     ),
     "new equery version"
 );
+
+$packages = FusionInventory::Agent::Task::Inventory::Generic::Softwares::Snap::_getPackagesList(
+    file => "resources/linux/packaging/snap"
+);
+foreach my $snap (@{$packages}) {
+    FusionInventory::Agent::Task::Inventory::Generic::Softwares::Snap::_getPackagesInfo(
+        snap => $snap,
+        file => "resources/linux/packaging/snap_".$snap->{NAME}
+    );
+}
+cmp_deeply($packages, $snap_packages, 'snap: parsing');

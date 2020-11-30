@@ -4,6 +4,7 @@ lib/Metabolomics/Banks/AbInitioFragments.pm
 lib/Metabolomics/Banks/BloodExposome.pm
 lib/Metabolomics/Banks/MaConDa.pm
 lib/Metabolomics/Banks/Knapsack.pm
+lib/Metabolomics/Banks/PhytoHub.pm
 lib/Metabolomics/Formats/W4M.pm
 lib/Metabolomics/Fragment/Annotation.pm
 lib/Metabolomics/Utils.pm
@@ -51,7 +52,9 @@ t/pfs003129.tsv
 t/pfs003129__ANNOTATED__.TSV
 t/in_test02_pos__KNAPSACK_ANNOTATED__.TSV
 t/Knapsack__dump.csv
-
-
+t/in_test03_pos.tabular
+t/in_test03_pos__PHYTOHUB_ANNOTATED__.TSV
+t/PhytoHUB__dump.tsv
+t/_template-phytohub.tabular
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

@@ -3,16 +3,17 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Partition a musical duration into rhythmic phrases
 
-our $VERSION = '0.0515';
+our $VERSION = '0.0702';
+
+use Math::Random::Discrete;
+use MIDI::Simple ();
+use List::Util qw/ min /;
 
 use Moo;
 use strictures 2;
-
-use Math::Random::Discrete;
-use MIDI::Simple;
-use List::Util qw/ min /;
-
 use namespace::clean;
+
+use constant TICKS => 96;
 
 
 has durations => (
@@ -85,6 +86,41 @@ sub _build_weights {
 }
 
 
+has groups => (
+    is      => 'ro',
+    builder => 1,
+    lazy    => 1,
+);
+
+sub _build_groups {
+    my ($self) = @_;
+    return [ (0) x @{ $self->pool } ];
+}
+
+has _pool_group => (
+    is      => 'ro',
+    builder => 1,
+    lazy    => 1,
+);
+
+sub _build__pool_group {
+    my ($self) = @_;
+
+    my %pool_group;
+    for my $i (0 .. @{ $self->pool } - 1) {
+        $pool_group{ $self->pool->[$i] } = $self->groups->[$i];
+    }
+
+    return \%pool_group;
+}
+
+
+has remainder => (
+    is      => 'ro',
+    default => sub { return 1 },
+);
+
+
 has verbose => (
     is      => 'ro',
     default => sub { return 0 },
@@ -99,23 +135,51 @@ sub motif {
     my $format = '%.4f';
 
     my $sum = 0;
+    my $group_num = 0;
+    my $group_name = '';
 
     while ( $sum < $self->size ) {
-        my $name = $self->pool_select->();
-        my $size = $self->_duration($name);
-        my $diff = $self->size - $sum;
+        my $name = $self->pool_select->(); # Chooses a note duration
 
-        last
-            if sprintf( $format, $diff ) < sprintf( $format, $self->_min_size );
+        # Compute grouping
+        if ($group_num) {
+            $group_num--;
+            $name = $group_name;
+        }
+        else {
+            if ($self->_pool_group->{$name}) {
+                $group_num = $self->_pool_group->{$name} - 1;
+                $group_name = $name;
+            }
+            else {
+                $group_num = 0;
+                $group_name = '';
+            }
+        }
 
+        my $size = $self->_duration($name); # Get the duration of the note
+        my $diff = $self->size - $sum; # How much is left?
+
+        # The difference is less than the min_size
+        if (sprintf( $format, $diff ) < sprintf( $format, $self->_min_size )) {
+            warn "WARNING: Leftover duration: $diff\n"
+                if $self->verbose;
+            push @$motif, 'd' . sprintf('%.0f', TICKS * $diff)
+                if $self->remainder && sprintf($format, TICKS * $diff) > 0;
+            last;
+        }
+
+        # The note duration is greater than the difference
         next
             if sprintf( $format, $size ) > sprintf( $format, $diff );
 
+        # Increment the sum by the note duration
         $sum += $size;
 
         warn(__PACKAGE__,' ',__LINE__," $name, $size, $sum\n")
             if $self->verbose;
 
+        # Add the note to the motif if the sum is less than the total duration size
         push @$motif, $name
             if $sum <= $self->size;
     }
@@ -152,7 +216,7 @@ Music::Duration::Partition - Partition a musical duration into rhythmic phrases
 
 =head1 VERSION
 
-version 0.0515
+version 0.0702
 
 =head1 SYNOPSIS
 
@@ -179,11 +243,17 @@ version 0.0515
 
   $score->write_score('motif.mid');
 
-  # The pool may also be made of MIDI durations
+  # The pool may also be made of duration ticks
   $mdp = Music::Duration::Partition->new(
     size    => 100,
     pool    => [qw(d50 d25)],
     weights => [0.7, 0.3], # Optional
+  );
+
+  # The pool may also be grouped
+  $mdp = Music::Duration::Partition->new(
+    pool   => [qw(hn qn tqn)],
+    groups => [0, 0, 3], # Optional
   );
 
 =head1 DESCRIPTION
@@ -226,9 +296,9 @@ motif.
 
 Default: C<[ keys %MIDI::Simple::Length ]> (wn, hn, qn, ...)
 
-This can be B<either> a list of duration names, as in the default
-example, or duration values, specified with a preceding 'd'.  A
-mixture of both is not well defined. YMMV
+This can be B<either> a list of duration names, as in the example, or
+duration values, specified with a preceding 'd'.  A mixture of both is
+not well defined. YMMV
 
 =head2 pool_select
 
@@ -250,6 +320,28 @@ The number of weights must equal the number of pool entries.  The
 weights do not have to sum to 1 and can be any relative numbers.
 
 Default: Equal probability for each pool entry
+
+=head2 groups
+
+  $groups = $mdp->groups;
+
+An array reference of entries that represent the number of times that a
+pool item is selected in sequence.
+
+The number of groups must equal the number of pool entries.
+
+Default: Zero for each pool entry
+
+* Zero and one mean the same thing for grouping.  So if needed, an
+entry should have a value greater than one.
+
+=head2 remainder
+
+  $remainder = $mdp->remainder;
+
+Append any remaining duration ticks to the end of the motif.
+
+Default: C<1> Yes. Make it so.
 
 =head2 verbose
 

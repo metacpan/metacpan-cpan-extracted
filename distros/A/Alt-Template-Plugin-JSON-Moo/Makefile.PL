@@ -5,17 +5,20 @@ use warnings;
 
 use ExtUtils::MakeMaker 6.64;
 
+my $alt = $ENV{PERL_ALT_INSTALL} || '';
+
 WriteMakefile(
     'NAME'         => 'Alt::Template::Plugin::JSON::Moo',
     'VERSION_FROM' => 'lib/Alt/Template/Plugin/JSON/Moo.pm',
     'PREREQ_PM' => {
-        'Moo'               => '1,000000',
+        'Moo'               => '1.000000',
         'Type::Tiny'        => '1.000006',
         'Template'          => '2.20',
         'JSON'              => '2.12',
         'namespace::clean'  => 0,
         'Carp'              => 0,
     },
+    DESTDIR => $alt ? $alt eq 'OVERWRITE' ? '' : $alt : 'no-install-alt',
 
     'CONFIGURE_REQUIRES' => {
         'ExtUtils::MakeMaker' => '6.64',

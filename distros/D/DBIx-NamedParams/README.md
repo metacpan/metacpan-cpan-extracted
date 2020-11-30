@@ -93,7 +93,7 @@ When the SQL statement doesn't have the variable array `:<Name>+-<Type>`, the ha
 
     my $sth = $dbh->prepare_ex( $statement, $hashref ) or die($DBI::errstr);
 
-## Database Handle Methods
+## Statement Handle Methods
 
 ### bind\_param\_ex
 

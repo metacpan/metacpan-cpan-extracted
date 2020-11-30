@@ -1,4 +1,4 @@
-Getopt-Module version 0.0.2
+Getopt-Module version 1.0.0
 ===========================
 
 This module provides a convenient way for command-line Perl scripts to handle -M and -m options in the same way as perl.
@@ -14,8 +14,7 @@ To install this module type the following:
 
 COPYRIGHT AND LICENCE
 
-Copyright (C) 2014 by chocolateboy
+Copyright (c) 2014-2020 by chocolateboy.
 
-This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself, either Perl version 5.14.2 or,
-at your option, any later version of Perl 5 you may have available.
+This is free software; you can redistribute it and/or modify it under the
+terms of the Artistic License 2.0.

@@ -1,7 +1,14 @@
 Revision history for Perl extension Getopt::Module.
 
-0.0.2 Sun May 25 09:04:33 2014
+1.0.0 - 2020-11-25
+
+    - code cleanup
     - documentation fixes
 
-0.0.1 Sun May 25 08:30:15 2014
+0.0.2 - 2014-05-25
+
+    - documentation fixes
+
+0.0.1 - 2014-05-25
+
     - first public release

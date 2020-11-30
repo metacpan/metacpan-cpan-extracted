@@ -1,5 +1,10 @@
 Revision history for Net-LibAsyncNS
 
+0.04    2020-11-21
+        [CHANGES]
+         * Fix version dependency on Module::Build
+         * `use strict; use warnings; done_testing;` in all unit test files
+
 0.03    2020-11-04
         [CHANGES]
          * Update Build.PL to using Module::Build::Using::PkgConfig

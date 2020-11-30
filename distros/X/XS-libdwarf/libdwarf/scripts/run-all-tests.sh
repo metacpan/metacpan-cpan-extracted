@@ -1,14 +1,22 @@
 #!/bin/sh
 start=`date`
 echo "start run-all-tests.sh at $start"
+echo "This removes and recreates /tmp/dw-regression"
 # Use --disable-libelf to turn off all reference to
 # libelf and to also eliminate reliance on dwarfgen.
 # Use --enable-nonstandardprintf to use Windows specific long long
 # printf formats.
+# Removes and recreates /tmp/dwtestalldd directory
+# for the regression tests.
 here=`pwd`
 ddsrc=$here/dwarfdump
-rosrc=$here/../readelfobj
+rosrc=$here/../readelfobj/code
 rtestsrc=$here/../regressiontests
+
+# We run the regression tests here.
+ddtestdir=/tmp/dw-regression
+rm -rf $ddtestdir
+mkdir $ddtestdir
 
 ddbld=/tmp/vaddbld
 robld=/tmp/varobld
@@ -44,12 +52,13 @@ then
   echo "Use nonstandardprintf. $nonstdprintf"
 fi
 
+echo "Starting run-all-tests.sh now"
 echo run from $here
 if [ ! -d $here/dwarfdump ]
 then
    chkres 1 "A FAIL: This is not the libdwarf 'code' directory "
    echo "A FAIL: $here/dwarfdump missing. Run from 'code'"
-   
+   exit 0
 fi
 if [ ! -d $here/libdwarf ]
 then
@@ -60,6 +69,7 @@ if [ ! -d $here/dwarfexample ]
 then
   chkres 1 "C FAIL: This is not the libdwarf 'code' directory"
   echo "C FAIL: $here/dwarfexample missing"
+  exit 0
 fi
 
 
@@ -91,6 +101,7 @@ builddwarfdump() {
 
 rundistcheck()
 {
+  echo "Now rundistcheck"
   cd $here
   chkres $? "Q FAIL: scripts/buildandreleasetest.sh FAIL"
   if  [ x$1 = "--disable-libelf" ]
@@ -109,6 +120,7 @@ rundistcheck()
 #======= readelfobj, readobjpe, readobjmacho etc tests
 # with make check
 buildreadelfobj() {
+  echo "Now buildreadelfobj"
   rm -rf $robld
   mkdir $robld
   rodir=$rosrc
@@ -122,6 +134,9 @@ buildreadelfobj() {
   chkres $? "L FAIL: $robld mkdir failed, giving up."
   cd $robld
   chkres $? "M FAIL: cd $robld failed, giving up."
+  # Just safety, we do not care if distclean fails
+  make distclean
+  #
   $rodir/configure --enable-wall $nonstdprintf
   chkres $? "N FAIL: configure $rodir/configure failed, giving up."
   make 
@@ -137,8 +152,7 @@ buildreadelfobj() {
 #=================now run tests, meaning regressiontests
 
 runfullddtest() {
-  ddtestdir=$rtestsrc
-  echo "Run regressiontests in $ddtestdir"
+  echo "Run full dd test: run regressiontests in $ddtestdir"
   cd $ddtestdir
   chkres $? "H FAIL: cd $ddtestdir failed , giving up."
   # Ensure no leftovers, ok if it fails
@@ -149,8 +163,8 @@ runfullddtest() {
     # so we get any needed local alias settings.
     cp $sha SHALIAS.sh
   fi
-  echo " Now configure regressiontests ./configure $1 $nonstdprintf"
-  ./configure $1 $nonstdprintf
+  echo " Now configure regressiontests $ddtestdir/configure $1 $nonstdprintf"
+  $rtestsrc/configure $1 $nonstdprintf
   chkres $? "I FAIL: configure in $ddtestdir failed , giving up."
   make
   chkres $? "J FAIL make: tests failed in $ddtestdir. giving up."

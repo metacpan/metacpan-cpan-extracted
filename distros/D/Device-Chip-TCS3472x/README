@@ -1,0 +1,109 @@
+NAME
+
+    Device::Chip::TCS3472x - chip driver for TCS3472x-family
+
+SYNOPSIS
+
+       use Device::Chip::TCS3472x;
+    
+       my $chip = Device::Chip::TCS3472x->new;
+       $chip->mount( Device::Chip::Adapter::...->new )->get;
+    
+       # Power on and enable ADCs
+       $chip->change_config(
+          PON => 1,
+          AEN => 1,
+       )->get;
+    
+       # At default config, first sensor reading is available after
+       # 620 msec
+       sleep 0.620;
+    
+       my ( $clear, $red, $green, $blue ) = $chip->read_crgb->get;
+       print "Red=$red Green=$green Blue=$blue\n";
+
+DESCRIPTION
+
+    This Device::Chip subclass provides specific communications to a TASOC
+    Inc. TCS3472x-family RGB light sensor chip.
+
+    The reader is presumed to be familiar with the general operation of
+    this chip; the documentation here will not attempt to explain or define
+    chip-specific concepts or features, only the use of this module to
+    access them.
+
+MOUNT PARAMETERS
+
+ led
+
+    Optional name of the GPIO line attached to the LED control pin common
+    to many breakout boards. This is used by the "set_led" method.
+
+METHODS
+
+    The following methods documented in an await expression return Future
+    instances.
+
+ read_id
+
+       $id = await $chip->read_id;
+
+    Returns a 2-character string from the ID register. The expected value
+    will depend on the type of chip
+
+       "44"  # TCS34721 or TCS34725
+       "4D"  # TCS34723 or TCS34727
+
+ read_config
+
+       $config = await $chip->read_config;
+
+    Returns a hash reference containing the current chip configuration.
+
+       AEN   => bool
+       AIEN  => bool
+       AGAIN => 1 | 4 | 16 | 60
+       APERS => "EVERY" | int
+       ATIME => int
+       PON   => bool
+       WEN   => bool
+       WLONG => bool
+       WTIME => int
+
+    The returned value also contains some lowercase-named synthesized
+    fields, containing helper values derived from the chip config. These
+    keys are not supported by "change_config".
+
+       atime_cycles => int   # number of integration cycles implied by ATIME
+       atime_msec   => num   # total integration time implied by ATIME
+    
+       wtime_cycles => int   # number of wait cycles implied by WTIME
+       wtime_msec   => num   # total wait time implied by WTIME and WLONG
+
+ change_config
+
+       await $chip->change_config( %changes )
+
+    Changes the configuration. Any field names not mentioned will be
+    preserved at their existing values.
+
+ read_crgb
+
+       ( $clear, $red, $green, $blue ) = await $chip->read_crgb
+
+    Returns the result of the most recent colour acquisition.
+
+ set_led
+
+       await $chip->set_led( $on );
+
+    If the led mount parameter was specified, this method acts as a proxy
+    for the named GPIO line, setting it high or low to control the LED.
+
+    While not a feature of the TCS3472x sensor chip itself, this is common
+    to many breakout boards, so is provided here as a convenience.
+
+AUTHOR
+
+    Paul Evans <leonerd@leonerd.org.uk>
+

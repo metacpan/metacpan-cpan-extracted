@@ -25,7 +25,7 @@ static inline TcpSP create_tcp (const LoopSP& loop, int domain = AF_UNSPEC) {
 #define TCPXS_FUNC_VOID(code)  do {                         \
     auto ret = code;                                        \
     if (GIMME_V == G_VOID) {                                \
-        if (!ret) throw ret.error();                        \
+        if (!ret) panda::exthrow(ret.error());              \
         XSRETURN_EMPTY;                                     \
     }                                                       \
     XPUSHs(boolSV(ret));                                    \

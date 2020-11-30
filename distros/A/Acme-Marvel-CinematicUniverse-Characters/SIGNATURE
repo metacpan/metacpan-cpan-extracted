@@ -1,0 +1,43 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.83.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA256 7227becca6a70bbf56aef5b841f67f5d2a0b9b47bdcfbf4a4f6a07c6de2f4cf2 COPYRIGHT
+SHA256 7977c02e031153dc91d6db9d2e803671d586e59bca2c5c3dc6211f29c04d92d6 CREDITS
+SHA256 f924da9c46e3547dd99c0f449c756b74e26ed660f7e661eec3eb3fdeceee40e8 Changes
+SHA256 657936e4042c54b5beea2c0032bd16e6bb182b2ff8379ab30bd5d52cef534194 INSTALL
+SHA256 1fb7395e76eabf94c421912d7d0a4f7fa745d49e1acb76b222c21d605b66bd25 LICENSE
+SHA256 2be356442c888f35158294a1dc7af02119928673ff0beacc4495aefd5fa339d2 MANIFEST
+SHA256 bc2d8c4ec0f08e60e05b0fb622f49cd55bee563e01f75219d20c8dce1ece9c1f META.json
+SHA256 9b7ea9f6b312aa02b528c1e16cb8513e45577da140085a9e71cfaa6152165998 META.yml
+SHA256 7c1d976499ecfd4daed20e2698639b65dd84e3d64b2a5448c707bcf45492a885 Makefile.PL
+SHA256 41fc9f8babeb61b608f3457fe56d4498b37ca889c7d2da3f489e7d75ba4995c2 README
+SHA256 03ca647529303f346901475af4262165adf5161aa4852153dab4794f9e11d293 dist.ini
+SHA256 986e9c31212e48687a78c6c14d9a14ce76e57afbf8190bfc9e44ea791baa0f63 doap.ttl
+SHA256 8a70e52259f2205cedf9f52383f3914cb8421d082301505f534bfa2918beba54 lib/Acme/Marvel/CinematicUniverse/Character.pm
+SHA256 95f39b9faf47e8ad0eb6a3ec5adbdfecce87d63ca189d34519a6814b8633388d lib/Acme/Marvel/CinematicUniverse/Character/Instance/Bruce_Banner.pm
+SHA256 e7434dae02be402dd042bd81cfe010122c98f9ad4357cb878e831d7780ab1eb3 lib/Acme/Marvel/CinematicUniverse/Character/Instance/Clint_Barton.pm
+SHA256 a87836865d1667ec194c3a0bf4451b8035c75f5b2594a9bd7619d61c5b9e0b9f lib/Acme/Marvel/CinematicUniverse/Character/Instance/Natasha_Romanoff.pm
+SHA256 8f361727523f8abc1ab268a2d454b7f09f462625f40bac4b2ad656d4dbbda1b5 lib/Acme/Marvel/CinematicUniverse/Character/Instance/Steve_Rogers.pm
+SHA256 9836f2110bb6a47852eafb7e415b77390af6bc8d4935fac2110c279dced0623a lib/Acme/Marvel/CinematicUniverse/Character/Instance/Thor_Odinson.pm
+SHA256 0c8966e7ee3db5536dd340c1041021fb4247396622c9e6d7b919314150c90e8e lib/Acme/Marvel/CinematicUniverse/Character/Instance/Tony_Stark.pm
+SHA256 0aaf834e987c38292bdd174ac79232b6cbfaa45df767f2da1b972f6ec5609908 lib/Acme/Marvel/CinematicUniverse/Characters.pm
+SHA256 ff80196c3cf2dad1baa5e5e804d2b4434e1738a130d790d3e2c25687a9ed082a t/01basic.t
+-----BEGIN PGP SIGNATURE-----
+
+iF0EARECAB0WIQRVJKj/4+s6z4WzNujOv4Eoaip9OQUCX7sCGgAKCRDOv4Eoaip9
+OXRMAKCbYnd9YA0JzaueGDULxNKGA2SEKwCfV4V0Ntm9aaqgk27qlu1G59At2po=
+=L7PE
+-----END PGP SIGNATURE-----

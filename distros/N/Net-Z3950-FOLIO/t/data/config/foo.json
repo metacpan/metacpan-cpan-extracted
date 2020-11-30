@@ -1,0 +1,9 @@
+{
+  "foo": 42,
+  "bar": 3,
+  "graphqlQuery": "dummy.graphql-query",
+  "indexMap": {
+    "1": "author",
+    "4": "title"
+  }
+}

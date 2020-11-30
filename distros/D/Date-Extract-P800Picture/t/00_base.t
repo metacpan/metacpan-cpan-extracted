@@ -1,9 +1,15 @@
+use strict;
+use warnings;
+use utf8;
+
 use Test::More;
 use DateTime;
+use Test::Compile;
 
 BEGIN {
-    @methods = qw(extract filename);
-    plan tests => ( 7 + @methods );
+    @MAIN::methods = qw(extract filename);
+    @MAIN::scripts = qw(bin/p800date bin/p800exif);
+    plan tests => ( 7 + @MAIN::methods + 2 + @MAIN::scripts);
     ok(1);    # If we made it this far, we're ok.
     use_ok('Date::Extract::P800Picture');
 }
@@ -12,7 +18,7 @@ my $parser = new_ok('Date::Extract::P800Picture');
 @Date::Extract::P800Picture::Sub::ISA = qw(Date::Extract::P800Picture);
 my $parser_sub = new_ok('Date::Extract::P800Picture::Sub');
 
-foreach my $method (@methods) {
+foreach my $method (@MAIN::methods) {
     can_ok( 'Date::Extract::P800Picture', $method );
 }
 my $datetime  = $parser->extract("8B421234.JPG");
@@ -33,3 +39,7 @@ SKIP: {
 
 $parser = Date::Extract::P800Picture->new();
 is( eval '$parser->extract()', undef, "unset filename error catch" );
+
+my $test = Test::Compile->new();
+$test->all_files_ok();
+$test->pl_file_compiles($_) for @MAIN::scripts;

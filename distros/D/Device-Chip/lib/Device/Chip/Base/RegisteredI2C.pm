@@ -11,7 +11,7 @@ use base qw( Device::Chip );
 
 use utf8;
 
-our $VERSION = '0.14';
+our $VERSION = '0.15';
 
 use Carp;
 

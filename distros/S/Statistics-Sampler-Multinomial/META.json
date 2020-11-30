@@ -33,8 +33,9 @@
       "runtime" : {
          "requires" : {
             "Carp" : "0",
+            "Clone" : "0",
             "List::MoreUtils" : "0",
-            "List::Util" : "0",
+            "List::Util" : "1.29",
             "Math::Random::MT::Auto" : "0",
             "Ref::Util" : "0",
             "Scalar::Util" : "0",
@@ -62,6 +63,6 @@
          "web" : "https://github.com/shawnlaffan/perl-statistics-sampler-multinomial"
       }
    },
-   "version" : "0.86",
+   "version" : "1.01",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

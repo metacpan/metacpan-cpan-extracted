@@ -1,14 +1,14 @@
 use strict;
 use warnings;
 
-package Text::Parser::AutoSplit 0.927;
+package Text::Parser::AutoSplit 1.000;
 
 # ABSTRACT: A role that adds the ability to auto-split a line into fields
 
 use Moose::Role;
 use MooseX::CoverableModifiers;
 use String::Util qw(trim);
-use Text::Parser::Errors;
+use Text::Parser::Error;
 use English;
 
 
@@ -86,6 +86,8 @@ sub join_range {
 }
 
 
+no Moose::Role;
+
 1;
 
 __END__
@@ -100,69 +102,65 @@ Text::Parser::AutoSplit - A role that adds the ability to auto-split a line into
 
 =head1 VERSION
 
-version 0.927
+version 1.000
 
 =head1 SYNOPSIS
 
-    package MyNewParser;
+    use Text::Parser;
 
-    use parent 'Text::Parser';
-
-    sub new {
-        my $pkg = shift;
-        $pkg->SUPER::new(
-            auto_split => 1,
-            FS => qr/\s+\(*|\s*\)/,
-            @_, 
-        );
-    }
-
-    sub save_record {
-        my $self = shift;
-        return $self->abort_reading if $self->NF > 0 and $self->field(0) eq 'STOP_READING';
-        $self->SUPER::save_record(@_) if $self->NF > 0 and $self->field(0) !~ /^[#]/;
-    }
-
-    package main;
-
-    my $parser = MyNewParser->new();
-    $parser->read(shift);
-    print $parser->get_records(), "\n";
+    my $p1 = Text::Parser->new();
+    $p1->read('/path/to/file');
+    my $p2 = Text::Parser->new();
+    $p2->add_rule( do => '$this->field(0);' );
+        ## add_rule method automatically sets up auto_split
+    $p2->read('/another/file');
 
 =head1 DESCRIPTION
 
-C<Text::Parser::AutoSplit> is a role that gets automatically composed into an object of L<Text::Parser> if the C<auto_split> attribute is set during object construction. It is useful for writing complex parsers as derived classes of L<Text::Parser>, because one has access to the fields. The field separator is controlled by another attribute C<FS>, which can be accessed via an accessor method of the same name. When the C<auto_split> attribute is set to a true value, the object of C<Text::Parser> will be able to use methods described in this role.
+C<Text::Parser::AutoSplit> is a role that is automatically composed into an object of L<Text::Parser> if the C<auto_split> attribute is set during object construction, or when C<L<add_rule|Text::Parser/"add_rule">> method is called. The field separator is controlled by another C<Text::Parser> attribute C<L<FS|Text::Parser/"FS">>.
+
+When the C<auto_split> attribute is set to a true value, the object of C<Text::Parser> will be able to use methods described in this role.
 
 =head1 METHODS AVAILABLE ON AUTO-SPLIT
 
-These methods become available when C<auto_split> attribute is true. A runtime error will be thrown if they are called without C<auto_split> being set. They can used inside the subclass implementation of C<L<save_record|Text::Parser/save_record>>.
+These methods become available when C<auto_split> attribute is true. A runtime error will be thrown if they are called without C<auto_split> being set. They can be used inside a subclass or in the rules.
 
 =head2 NF
 
-The name of this method comes from the C<NF> variable in the popular L<GNU Awk program|https://www.gnu.org/software/gawk/gawk.html>. Takes no arguments, and returns the number of fields.
+The name of this method comes from the C<NF> variable in the popular L<GNU Awk program|https://www.gnu.org/software/gawk/gawk.html>.
 
-    sub save_record {
-        my $self = shift;
-        $self->save_record(@_) if $self->NF > 0;
-    }
+Returns the number of fields on a line. The field separator is specified with C<FS> attribute.
+
+    $parser->applies_rule(
+        if          => '$this->NF >= 2'
+        do          => '$this->collect_info($2);', 
+        dont_record => 1, 
+    );
+
+If your rule contains any positional identifiers (like C<$1>, C<$2>, C<$3> etc., to identify the field) the rule automatically checks that there are at least as many fields as the largest positional identifier. So the above rule could also be written as:
+
+    $parser->applies_rule(
+        do          => '$this->collect_info($2);', 
+        dont_record => 1, 
+    );
+
+It has the same results.
 
 =head2 fields
 
-Takes no argument and returns all the fields as an array.
+Takes no argument and returns all the fields as an array. The C<FS> field separator controls how fields are defined. Leading and trailing spaces are trimmed.
 
-    ## Inside your own save_record method ...
-    foreach my $fld ($self->fields) {
-        # do something ...
-    }
+    $parser->add_rule( do => 'return [ $this->fields ];' );
 
 =head2 field
 
 Takes an integer argument and returns the field whose index is passed as argument.
 
-    sub save_record {
-        my $self = shift;
-        $self->abort if $self->field(0) eq 'END';
-    }
+    $parser->add_rule(
+        if          => '$this->field(0) eq "END"', 
+        do          => '$this->abort_reading;', 
+        dont_record => 1, 
+    );
 
 You can specify negative elements to start counting from the end. For example index C<-1> is the last element, C<-2> is the penultimate one, etc. Let's say the following is the text on a line in a file:
 
@@ -174,28 +172,36 @@ You can specify negative elements to start counting from the end. For example in
 
 Takes two optional integers C<$i> and C<$j> as arguments and returns an array, where the first element is C<field($i)>, the second C<field($i+1)>, and so on, till C<field($j)>.
 
-    ## returns 4 elements starting with field(3) upto field(6)
-    my (@flds) = $self->field_range(3, 6);  
+    $parser->add_rule(
+        if => '$1 eq "NAME:"', 
+        do => 'return [ $this->field_range(1, -1) ];', 
+    );
 
 Both C<$i> and C<$j> can be negative, as is allowed by the C<field()> method. So, for example:
 
-    $self->field_range(-2, -1);    # Returns the last two elements
+    $parser->add_rule(
+        do => 'return [ $this->field_range(-2, -1) ];'    # Saves the last two fields of every line
+    );
 
-If C<$j> argument is omitted or set to C<undef>, it will be treated as C<-1> and if C<$i> is omitted, it is treated as C<0>. For example:
+If C<$j> argument is omitted or set to C<undef>, it will be treated as C<-1> and if C<$i> is omitted, it is treated as C<0>. For example the following may be used inside rules:
 
-    $self->field_range(1);         # Returns all elements omitting the first
-    $self->field_range();          # same as fields()
-    $self->field_range(undef, -2); # Returns all elements omitting the last
+    $this->field_range(1);         # Returns all elements omitting the first
+    $this->field_range();          # same as fields()
+    $this->field_range(undef, -2); # Returns all elements omitting the last
 
 =head2 join_range
 
-This method essentially joins the return value of the C<field_range> method. It takes three arguments. The first argument is the joining string, and the other two are optional integer arguments C<$i> and C<$j> just like C<field_range> method.
+This method essentially joins the return value of the C<field_range> method. It takes three arguments. The last argument is the joining string, and the first two are optional integer arguments C<$i> and C<$j> just like C<field_range> method.
 
-    $self->join_range();            # Joins all fields with $" (see perlvar)
-    $self->join_range(0, -1, '#');  # Joins with # separator
-    $self->join_range(2);           # Joins all elements starting with index 2 to the end
-                                    # with $"
-    $self->join_range(1, -2);       # Joins all elements in specified range with $"
+    $parser->add_rule(
+        do => qq(
+            $this->join_range();            # Joins all fields with $" (see perlvar)
+            $this->join_range(0, -1, '#');  # Joins with # separator
+            $this->join_range(2);           # Joins all elements starting with index 2 to the end
+                                            # with $"
+            $this->join_range(1, -2);       # Joins all elements in specified range with $"
+    ));
+    ## The return value of the last statement in the 'do' block is saved as a record
 
 =head2 find_field
 

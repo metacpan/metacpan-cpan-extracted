@@ -17,7 +17,7 @@ my $timeout = AnyEvent->timer(
   after => 10,
   cb => sub{
     diag 'timeout reached';
-    $proc->terminate;
+    $proc->signal('KILL');
     die 'timeout reached';
   },
 );
@@ -26,8 +26,8 @@ ok !$proc->is_running, 'is_running is initially false';
 ok $proc->launch, 'launch';
 ok $proc->is_running, 'is_running is true after launch';
 
-$proc->terminate; # send kill signal
-$proc->join;      # wait for process to complete
-undef $timeout;   # clear timeout so it won't go off
+$proc->terminate(10); # send kill signal
+$proc->join;          # wait for process to complete
+undef $timeout;       # clear timeout so it won't go off
 
 done_testing;

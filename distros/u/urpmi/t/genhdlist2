@@ -186,10 +186,10 @@ sub build {
     if (!$b_no_hdlist) {
 	$out_hdlist = MDV::Packdrakeng->new(
 	    archive => "$hdlist.tmp",
-	    compress => "zstd",
-	    uncompress => "zstd -d",
+	    compress => "gzip",
+	    uncompress => "gzip -d",
 	    extern => 1,
-	    comp_level => 11,
+	    comp_level => 9,
 	) or die "Can't create archive";
     }
 

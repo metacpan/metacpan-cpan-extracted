@@ -1,24 +1,27 @@
 /*
-  Copyright (C) 2017-2017 David Anderson. All Rights Reserved.
+Copyright (C) 2017-2020 David Anderson. All Rights Reserved.
 
-  This program is free software; you can redistribute it and/or modify it
-  under the terms of version 2 of the GNU General Public License as
-  published by the Free Software Foundation.
+  This program is free software; you can redistribute it and/or
+  modify it under the terms of version 2 of the GNU General
+  Public License as published by the Free Software Foundation.
 
-  This program is distributed in the hope that it would be useful, but
-  WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  This program is distributed in the hope that it would be
+  useful, but WITHOUT ANY WARRANTY; without even the implied
+  warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+  PURPOSE.
 
-  Further, this software is distributed without any warranty that it is
-  free of the rightful claim of any third person regarding infringement
-  or the like.  Any license provided herein, whether implied or
-  otherwise, applies only to this software file.  Patent licenses, if
-  any, provided herein do not apply to combinations of this program with
-  other software, or any other product whatsoever.
+  Further, this software is distributed without any warranty
+  that it is free of the rightful claim of any third person
+  regarding infringement or the like.  Any license provided
+  herein, whether implied or otherwise, applies only to this
+  software file.  Patent licenses, if any, provided herein
+  do not apply to combinations of this program with other
+  software, or any other product whatsoever.
 
-  You should have received a copy of the GNU General Public License along
-  with this program; if not, write the Free Software Foundation, Inc., 51
-  Franklin Street - Fifth Floor, Boston MA 02110-1301, USA.
+  You should have received a copy of the GNU General Public
+  License along with this program; if not, write the Free
+  Software Foundation, Inc., 51 Franklin Street - Fifth Floor,
+  Boston MA 02110-1301, USA.
 */
 
 /*  All the dwarfdump flags are gathered into a single
@@ -34,6 +37,20 @@
 #ifdef HAVE_REGEX
 regex_t _search_re;
 #endif
+
+#ifdef TRIVIAL_NAMING  /* For scripts/buildstandardsource.sh */
+struct glflags_s glflags;
+void
+safe_strcpy(char *out, long outlen, const char *in, long inlen)
+{
+    if (inlen >= (outlen - 1)) {
+        strncpy(out, in, outlen - 1);
+        out[outlen - 1] = 0;
+    } else {
+        strcpy(out, in);
+    }
+}
+#endif /*TRIVIAL_NAMING*/
 
 static struct section_high_offsets_s _section_high_offsets_global;
 static struct dwconf_s _config_file_data;
@@ -112,6 +129,7 @@ init_global_flags(void)
     glflags.gf_generic_1200_regs = FALSE;
     glflags.gf_suppress_check_extensions_tables = FALSE;
     glflags.gf_check_duplicated_attributes = FALSE;
+    glflags.gf_no_sanitize_strings = FALSE;
 
     /* lots of checks make no sense on a dwp debugfission object. */
     glflags.gf_suppress_checking_on_dwp = FALSE;
@@ -126,6 +144,10 @@ init_global_flags(void)
     glflags.gf_print_unique_errors = FALSE;
     glflags.gf_found_error_message = FALSE;
 
+    /* if TRUE, use old behavior of all expr ops joined on one line*/
+    glflags.gf_expr_ops_joined     = FALSE;
+
+    glflags.gf_print_raw_rnglists  = FALSE;
     glflags.gf_check_names = FALSE;
 
     /* During '-k' mode, display errors */
@@ -150,7 +172,8 @@ init_global_flags(void)
     glflags.gf_do_check_dwarf       = FALSE;
     glflags.gf_do_print_dwarf       = FALSE;
     glflags.gf_check_show_results   = FALSE;
-    glflags.gf_record_dwarf_error   = FALSE;  /* A test has failed, this
+    glflags.gf_record_dwarf_error   = FALSE;  /* A test has
+        failed, this
         is normally set FALSE shortly after being set TRUE, it is
         a short-range hint we should print something we might not
         otherwise print (under the circumstances). */
@@ -171,6 +194,10 @@ init_global_flags(void)
     glflags.gf_show_global_offsets  = FALSE;
     glflags.gf_display_offsets      = TRUE;
 
+    glflags.gf_debug_addr_missing_search_by_address = 0;
+    glflags.gf_error_code_in_name_search_by_address = 0;
+    glflags.gf_all_cus_seen_search_by_address = 0;
+
     /*  Base address has a special meaning in DWARF4 relative to address ranges. */
     glflags.seen_PU = FALSE;              /* Detected a PU */
     glflags.seen_CU = FALSE;              /* Detected a CU */
@@ -178,6 +205,11 @@ init_global_flags(void)
     glflags.need_CU_base_address = TRUE;  /* Need CU Base address */
     glflags.need_CU_high_address = TRUE;  /* Need CU High address */
     glflags.need_PU_valid_code = TRUE;    /* Need PU valid code */
+
+    /*  Involved with need_PU_valid_code (set
+        in dwarfdump.c), in_valid_code set when subprogram DIE
+        or CU DIE  has lowpc and highpc.   */
+    glflags.in_valid_code = FALSE;
 
     glflags.seen_PU_base_address = FALSE; /* Detected a Base address for PU */
     glflags.seen_PU_high_address = FALSE; /* Detected a High address for PU */
@@ -275,6 +307,8 @@ init_global_flags(void)
 
     /*  Check errors. */
     glflags.check_error = 0;
+
+    glflags.gf_print_alloc_sums = 0;
 }
 
 void

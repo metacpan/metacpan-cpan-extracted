@@ -1,0 +1,170 @@
+use alienfile;
+use strict;
+use Config;
+use Env qw/@PKG_CONFIG_PATH/;
+use Text::ParseWords qw(shellwords);
+use File::Spec;
+
+sub update_pkg_conf_path {
+    eval {
+        require Alien::libjansson;
+        require Alien::libsnappy;
+        1;
+    } or do {
+        # ignored
+    };
+    # avro-c.pc has jansson as a dependency, so it won't be loaded
+    # *at all* unless we have jansson.pc in the PKG_CONFIG_PATH
+    # somewhere.  And if libjansson is coming from Alien::libjansson,
+    # we MUST set this up here, otherwise the PkgConfig plugin
+    # will never be able to use avro-c.pc
+    require File::Spec;
+
+    push @PKG_CONFIG_PATH,
+        map File::Spec->catdir($_->dist_dir,  'lib', 'pkgconfig'),
+        grep $_->install_type eq 'share',
+        grep $_->can('install_type'),
+        qw/
+            Alien::libsnappy
+            Alien::libjansson
+        /,
+    ;
+    return;
+}
+
+# POS
+update_pkg_conf_path();
+
+sys {
+# And then try with Probe::CBuilder:
+plugin 'Probe::CBuilder' => (
+  libs    => '-lavro',
+  program => q{
+#include <stdio.h>
+#include <avro.h>
+#include <avro/errors.h>
+
+int main() {
+    avro_schema_t schema = avro_schema_string();
+    if ( schema == NULL ) {
+        printf("ERROR: %s\n", avro_strerror());
+    }
+    else {
+        printf("Success!\n");
+    }
+    return 0;
+}
+},
+);
+};
+
+# Try probing with pkg-config, but at least on
+# OSX the provided avro-c.pc file has some broken
+# entries, so this always fails:
+plugin 'PkgConfig' => (
+    pkg_name        => 'avro-c',
+);
+
+share {
+    plugin 'PkgConfig' => (
+        pkg_name        => 'avro-c',
+    );
+
+    require Config;
+
+    plugin Download => (
+        url     => 'https://github.com/apache/avro/archive/release-1.10.0.tar.gz',
+        version => qr/release-([0-9\.]+)\.tar\.gz$/,
+    );
+
+    plugin Extract => 'tar.gz';
+
+    patch [
+        '%{patch} -p1 < %{.install.patch}/0001-lang-c-pkg-config-put-lsnappy-ljansson-etc-in-Libs.p.patch',
+        '%{patch} -p1 < %{.install.patch}/0002-lang-c-cmake-option-to-skip-building-the-tests.patch',
+        '%{patch} -p1 < %{.install.patch}/0003-lang-c-snappy-has-no-pkg-config-entry.patch',
+        '%{patch} -p1 < %{.install.patch}/0004-lang-c-fix-pkg-config-Requires.patch',
+        '%{patch} -p1 < %{.install.patch}/0005-lang-c-include-jansson-in-the-pkg-config-Requires-se.patch',
+        '%{patch} -p1 < %{.install.patch}/0006-lang-c-fix-the-pkg-config-name-for-jansson-no-lib-pr.patch',
+        '%{patch} -p1 < %{.install.patch}/0007-prefer-CXX-for-linking-due-to-snappy.patch',
+    ];
+
+    plugin 'Build::CMake' => ();
+
+    my $snappy_cflags;
+    eval {
+        require Alien::libsnappy;
+        $snappy_cflags = Alien::libsnappy->cflags;
+        1;
+    } or do {
+        my $e = $@ || 'Zombie error';
+        warn "Cannot get libsnappy cflags: $e";
+        # ignored
+    };
+
+    my @cmake_flags = (
+        '-DCMAKE_BUILD_TYPE=RelWithDebInfo',
+        '-DAVRO_SKIP_BUILD_TESTS:BOOL=true',
+        @{ meta->prop->{plugin_build_cmake}->{args} },
+        '%{.install.extract}/lang/c',
+    );
+
+    $snappy_cflags .= ' ' . join ' ', map "-I$_", shellwords($Config::Config{incpth});
+
+    push @cmake_flags, '-DCMAKE_C_FLAGS=' . $snappy_cflags if $snappy_cflags;
+         #. ' -I/usr/local/include '
+
+    if ( Alien::libsnappy->can('install_type') && Alien::libsnappy->install_type eq 'share' ) {
+        my $snappy_root = Alien::libsnappy->dist_dir;
+
+        # when libsnappy was built by Alien::libsnappy,
+        # we need to point -DSNAPPY_ROOT_DIR to Alien's
+        # installation:
+        push @cmake_flags,
+            '-DSNAPPY_ROOT_DIR:PATH=' . $snappy_root;
+
+        # FindSnappy.cmake resolves libsnappy to a full path to the shared library,
+        # then the .so is compiled with the full path as opposed as with just
+        # -lsnappy -- which causes linking issues later on.
+        push @cmake_flags,
+            '-DSNAPPY_LIBRARIES=';
+
+        # ...and because snappy is C++, we need to link using c++:
+        # TODO: this doesn't work, so we are manually patching the avro
+        # cmake files in the patches[] section above -- see patch 0007
+        push @cmake_flags,
+            '-DCMAKE_CXX_LINKER_PREFERENCE_PROPAGATES=1',
+            '-DCMAKE_CXX_LINKER_PREFERENCE=90',
+        ;
+    }
+
+    build [
+        \&update_pkg_conf_path,
+        'cd %{.install.extract}/lang/c',
+        [ '%{cmake}' => '.', @cmake_flags ],
+        [
+            '%{make}',
+                '-C' => '%{.install.extract}/lang/c',
+                "VERBOSE=1",
+        ],
+        [
+            '%{make}',
+                '-C' => '%{.install.extract}/lang/c',
+                'install',
+        ],
+    ];
+};
+
+meta->after_hook(
+    'gather_system' => sub {
+        # the joy of using multiple hooks...
+        # if we are using the system libraries, we need to manually add -lavro into the libs
+        my ($build) = @_;
+        my $install_prop    = $build->{install_prop} // {}; # make sure not to vivify this!
+        my $cbuilder_gather = $install_prop->{plugin_probe_cbuilder_gather} // {};
+        foreach my $entry ( keys %$cbuilder_gather ) {
+            $build->{runtime_prop}->{$entry} ||= $cbuilder_gather->{$entry};
+        }
+    }
+);
+

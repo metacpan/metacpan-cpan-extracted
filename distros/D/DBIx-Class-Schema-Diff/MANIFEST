@@ -14,6 +14,7 @@ lib/DBIx/Class/Schema/Diff/Role/Common.pm
 lib/DBIx/Class/Schema/Diff/Schema.pm
 lib/DBIx/Class/Schema/Diff/SchemaData.pm
 lib/DBIx/Class/Schema/Diff/Source.pm
+lib/DBIx/Class/Schema/Diff/State.pm
 t/01_basic.t
 t/02_limit_ignore.t
 t/03_filter.t

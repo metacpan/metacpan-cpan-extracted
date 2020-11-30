@@ -1,5 +1,8 @@
 Revision history for MIDI-Drummer
 
+0.1802 2020-11-26 11:31:12
+    - Don't import anything from MIDI::Simple.
+
 0.1801 2020-11-10 16:33:21
     - Fix a tiny POD syntax issue!
 

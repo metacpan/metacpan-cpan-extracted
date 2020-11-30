@@ -1,12 +1,12 @@
 package File::Sticker::Writer::Exif;
-$File::Sticker::Writer::Exif::VERSION = '1.01';
+$File::Sticker::Writer::Exif::VERSION = '1.0603';
 =head1 NAME
 
 File::Sticker::Writer::Exif - write and standardize meta-data from EXIF file
 
 =head1 VERSION
 
-version 1.01
+version 1.0603
 
 =head1 SYNOPSIS
 
@@ -42,10 +42,23 @@ sub whoami  { ( caller(1) )[3] }
 
 =head1 METHODS
 
+=head2 priority
+
+The priority of this writer.  Writers with higher priority get tried first.
+
+=cut
+
+sub priority {
+    my $class = shift;
+    return 1;
+} # priority
+
 =head2 allowed_file
 
 If this writer can be used for the given file, then this returns true.
-File must be one of: an image or PDF. (ExifTool can't write to EPUB)
+File must be one of: PDF or an image which is not a GIF.
+(GIF files need to be treated separately)
+(ExifTool can't write to EPUB)
 
 =cut
 
@@ -56,7 +69,8 @@ sub allowed_file {
 
     $file = $self->_get_the_real_file(filename=>$file);
     my $ft = $self->{file_magic}->info_from_filename($file);
-    if ($ft->{mime_type} =~ /(image|pdf)/)
+    if ($ft->{mime_type} =~ /(image|pdf)/
+            and $ft->{mime_type} !~ /gif/)
     {
         return 1;
     }
@@ -79,7 +93,6 @@ sub known_fields {
         creator=>'TEXT',
         description=>'TEXT',
         location=>'TEXT',
-        url=>'TEXT',
         tags=>'MULTI',
         %{$self->{wanted_fields}},
     };
@@ -100,7 +113,6 @@ sub readonly_fields {
     return {
         date=>'TEXT',
         copyright=>'TEXT',
-        filesize=>'TEXT',
         flash=>'TEXT',
         imagesize=>'TEXT',
         imageheight=>'NUMBER',
@@ -135,11 +147,7 @@ sub replace_one_field {
     $et->ExtractInfo($filename);
 
     my $success;
-    if ($field eq 'url')
-    {
-        $success = $et->SetNewValue('Source', $value);
-    }
-    elsif ($field eq 'creator')
+    if ($field eq 'creator')
     {
         $success = $et->SetNewValue('Creator', $value);
     }
@@ -217,11 +225,7 @@ sub delete_field_from_file {
     $et->ExtractInfo($filename);
 
     my $success;
-    if ($field eq 'url')
-    {
-        $success = $et->SetNewValue('Source');
-    }
-    elsif ($field eq 'creator')
+    if ($field eq 'creator')
     {
         $success = $et->SetNewValue('Creator')
     }
@@ -316,7 +320,7 @@ sub _read_freeform_data {
         }
         elsif (!$ydata)
         {
-            warn __PACKAGE__, " no legal YAML";
+            warn __PACKAGE__, " no legal YAML" if $self->{verbose} > 1;
         }
     }
     say STDERR Dump($ydata) if $self->{verbose} > 2;

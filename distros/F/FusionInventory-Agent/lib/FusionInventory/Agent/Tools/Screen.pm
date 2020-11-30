@@ -26,9 +26,11 @@ sub new {
     # References:
     # http://forge.fusioninventory.org/issues/1607
     # http://forge.fusioninventory.org/issues/1614
-    $self->{_serial} = $self->{edid}->{serial_number2} ?
-        $self->{edid}->{serial_number2}->[0]           :
-        sprintf("%08x", $self->{edid}->{serial_number});
+    if ($self->{edid}->{serial_number2} && $self->{edid}->{serial_number2}->[0]) {
+        $self->{_serial} = $self->{edid}->{serial_number2}->[0];
+    } else {
+        $self->{_serial} = sprintf("%08x", $self->{edid}->{serial_number});
+    }
 
     # Setup manufacturer
     $self->manufacturer(getEDIDVendor(
@@ -79,7 +81,9 @@ sub altserial {
 
 sub week_year_manufacture {
     my ($self) = @_;
-    return $self->{edid}->{week} . "/" . $self->{edid}->{year};
+    # We should skip week if set to 255 (see specs)
+    return $self->{edid}->{week} == 255 ? $self->{edid}->{year}
+        : $self->{edid}->{week} . "/" . $self->{edid}->{year};
 }
 
 sub caption {

@@ -14,7 +14,7 @@ use Tie::Hash;
 use vars qw($VERSION @ISA);
 
 @ISA = qw(DynaLoader Tie::Hash);
-$VERSION = '0.07';
+$VERSION = '0.08';
 
 bootstrap Tie::Hash::Indexed $VERSION;
 
@@ -84,7 +84,7 @@ Tie::Hash::Indexed has an C<items> method as an alias for
 C<as_list>, which Hash::Ordered lacks. If you want to be able
 to switch modules, you should prefer to use C<as_list>.
 
-Tie::Hash::Indexed also has a C<has> method as aliases for
+Tie::Hash::Indexed also has a C<has> method as an alias for
 C<exists>.
 
 Tie::Hash::Indexed also has C<dor_assign> and C<or_assign> as
@@ -428,10 +428,8 @@ most probably receive an appropriate error message.
 =head1 BUGS
 
 If you find any bugs, Tie::Hash::Indexed doesn't seem to
-build on your system or any of its tests fail, please use
-the CPAN Request Tracker at L<http://rt.cpan.org/> to create
-a ticket for the module. Alternatively, just send a mail
-to E<lt>mhx@cpan.orgE<gt>.
+build on your system or any of its tests fail, please report
+the issue at L<https://github.com/mhx/Tie-Hash-Indexed/issues>.
 
 =head1 COPYRIGHT
 

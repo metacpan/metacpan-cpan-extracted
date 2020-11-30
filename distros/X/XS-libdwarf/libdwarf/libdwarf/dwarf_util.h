@@ -1,30 +1,32 @@
 #ifndef DWARF_UTIL_H
 #define DWARF_UTIL_H
 /*
+Copyright (C) 2000,2003,2004 Silicon Graphics, Inc.  All Rights Reserved.
+Portions Copyright (C) 2007-2020 David Anderson. All Rights Reserved.
+Portions Copyright (C) 2010-2012 SN Systems Ltd. All Rights Reserved
 
-  Copyright (C) 2000,2003,2004 Silicon Graphics, Inc.  All Rights Reserved.
-  Portions Copyright (C) 2007-2012 David Anderson. All Rights Reserved.
-  Portions Copyright (C) 2010-2012 SN Systems Ltd. All Rights Reserved
+  This program is free software; you can redistribute it
+  and/or modify it under the terms of version 2.1 of the
+  GNU Lesser General Public License as published by the Free
+  Software Foundation.
 
-  This program is free software; you can redistribute it and/or modify it
-  under the terms of version 2.1 of the GNU Lesser General Public License
-  as published by the Free Software Foundation.
+  This program is distributed in the hope that it would be
+  useful, but WITHOUT ANY WARRANTY; without even the implied
+  warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+  PURPOSE.
 
-  This program is distributed in the hope that it would be useful, but
-  WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  Further, this software is distributed without any warranty
+  that it is free of the rightful claim of any third person
+  regarding infringement or the like.  Any license provided
+  herein, whether implied or otherwise, applies only to this
+  software file.  Patent licenses, if any, provided herein
+  do not apply to combinations of this program with other
+  software, or any other product whatsoever.
 
-  Further, this software is distributed without any warranty that it is
-  free of the rightful claim of any third person regarding infringement
-  or the like.  Any license provided herein, whether implied or
-  otherwise, applies only to this software file.  Patent licenses, if
-  any, provided herein do not apply to combinations of this program with
-  other software, or any other product whatsoever.
-
-  You should have received a copy of the GNU Lesser General Public
-  License along with this program; if not, write the Free Software
-  Foundation, Inc., 51 Franklin Street - Fifth Floor, Boston MA 02110-1301,
-  USA.
+  You should have received a copy of the GNU Lesser General
+  Public License along with this program; if not, write the
+  Free Software Foundation, Inc., 51 Franklin Street - Fifth
+  Floor, Boston MA 02110-1301, USA.
 
 */
 
@@ -39,6 +41,10 @@
     'return' only in case of error
     else falls through.
 */
+void
+_dwarf_create_area_len_error(Dwarf_Debug dbg, Dwarf_Error *error,
+    Dwarf_Unsigned targ, Dwarf_Unsigned sectionlen);
+
 #define DECODE_LEB128_UWORD_CK(ptr, value,dbg,errptr,endptr) \
     do {                                              \
         Dwarf_Unsigned lu_leblen = 0;                     \
@@ -105,46 +111,8 @@
         ptr += lu_leblen;                             \
     } while (0)
 
-
-/*
-    Skips leb128_encoded numbers that are guaranteed
-    to be no more than 4 bytes long.  Same for both
-    signed and unsigned numbers.
-
-    These seem bogus as they assume 4 bytes get a 4 byte
-    word. Wrong. FIXME
-
-    'return' only in case of error
-    else falls through.
-*/
-#define SKIP_LEB128_WORD_CK(ptr,dbg,errptr,endptr)                     \
-    do {                                          \
-        if ((*(ptr++) & 0x80) != 0) {             \
-            if (ptr >= endptr) {                  \
-                _dwarf_error(dbg, errptr, DW_DLE_LEB_IMPROPER); \
-                return DW_DLV_ERROR;              \
-            }                                     \
-            if ((*(ptr++) & 0x80) != 0) {         \
-                if (ptr >= endptr) {              \
-                    _dwarf_error(dbg, errptr, DW_DLE_LEB_IMPROPER); \
-                    return DW_DLV_ERROR;          \
-                }                                 \
-                if ((*(ptr++) & 0x80) != 0) {     \
-                    if (ptr >= endptr) {          \
-                        _dwarf_error(dbg, errptr, DW_DLE_LEB_IMPROPER); \
-                        return DW_DLV_ERROR;      \
-                    }                             \
-                    ptr++;                        \
-                    if (ptr >= endptr) {          \
-                        _dwarf_error(dbg, errptr, DW_DLE_LEB_IMPROPER); \
-                        return DW_DLV_ERROR;      \
-                    }                             \
-                }                                 \
-            }                                     \
-        }                                         \
-    } while (0)
-
-
+/*  Any error  found here represents a bug that cannot
+    be dealloc-d as the caller will not know there was no dbg */
 #define CHECK_DIE(die, error_ret_value)                          \
     do {                                                         \
         if (die == NULL) {                                       \
@@ -181,20 +149,26 @@ typedef Dwarf_Unsigned BIGGEST_UINT;
 
 #ifdef WORDS_BIGENDIAN
 #define READ_UNALIGNED_CK(dbg,dest,desttype, source, length,error,endptr) \
-    do {                                                         \
-        BIGGEST_UINT _ltmp = 0;                                  \
-        Dwarf_Byte_Ptr readend = source+length;                  \
-        if (readend <  source) {                                 \
-            _dwarf_error(dbg, error, DW_DLE_READ_BIGENDIAN_ERROR); \
-            return DW_DLV_ERROR;                                 \
-        }                                                        \
-        if (readend > endptr) {                                  \
-            _dwarf_error(dbg, error, DW_DLE_READ_BIGENDIAN_ERROR); \
-            return DW_DLV_ERROR;                                 \
-        }                                                        \
-        dbg->de_copy_word( (((char *)(&_ltmp)) +                 \
-            sizeof(_ltmp) - length),source, length) ;            \
-        dest = (desttype)_ltmp;                                  \
+    do {                                                        \
+        BIGGEST_UINT _ltmp = 0;                                 \
+        Dwarf_Byte_Ptr readend = source+length;                 \
+        if (readend <  source) {                                \
+            _dwarf_error_string(dbg, error,                     \
+                DW_DLE_READ_BIGENDIAN_ERROR,                    \
+                "DW_DLE_READ_BIGENDIAN_ERROR "                  \
+                "Read would start past the end of section");    \
+            return DW_DLV_ERROR;                                \
+        }                                                       \
+        if (readend > endptr) {                                 \
+            _dwarf_error_string(dbg, error,                     \
+                DW_DLE_READ_BIGENDIAN_ERROR,                    \
+                "DW_DLE_READ_BIGENDIAN_ERROR "                  \
+                "Read would end past the end of section");      \
+            return DW_DLV_ERROR;                                \
+        }                                                       \
+        dbg->de_copy_word( (((char *)(&_ltmp)) +                \
+            sizeof(_ltmp) - length),source, length) ;           \
+        dest = (desttype)_ltmp;                                 \
     } while (0)
 
 
@@ -216,20 +190,26 @@ typedef Dwarf_Unsigned BIGGEST_UINT;
     } while (0)
 #else /* LITTLE ENDIAN */
 #define READ_UNALIGNED_CK(dbg,dest,desttype, source, length,error,endptr) \
-    do  {                                                 \
-        BIGGEST_UINT _ltmp = 0;                           \
-        Dwarf_Byte_Ptr readend = source+length;           \
-        if (readend < source) {                           \
-            _dwarf_error(dbg, error, DW_DLE_READ_LITTLEENDIAN_ERROR);\
-            return DW_DLV_ERROR;                          \
-        }                                                 \
-        if (readend > endptr) {                           \
-            _dwarf_error(dbg, error, DW_DLE_READ_LITTLEENDIAN_ERROR);\
-            return DW_DLV_ERROR;                          \
-        }                                                 \
-        dbg->de_copy_word( (char *)(&_ltmp) ,             \
-            source, length) ;                             \
-        dest = (desttype)_ltmp;                           \
+    do  {                                        \
+        BIGGEST_UINT _ltmp = 0;                  \
+        Dwarf_Byte_Ptr readend = source+length;  \
+        if (readend < source) {                  \
+            _dwarf_error_string(dbg, error,      \
+                DW_DLE_READ_LITTLEENDIAN_ERROR,  \
+                "DW_DLE_READ_LITTLEENDIAN_ERROR "\
+                "Read starts past the end of section");\
+            return DW_DLV_ERROR;                 \
+        }                                        \
+        if (readend > endptr) {                  \
+            _dwarf_error_string(dbg, error,      \
+                DW_DLE_READ_LITTLEENDIAN_ERROR,  \
+                "DW_DLE_READ_LITTLEENDIAN_ERROR "\
+                "Read would end past the end of section");\
+            return DW_DLV_ERROR;                 \
+        }                                        \
+        dbg->de_copy_word( (char *)(&_ltmp) ,    \
+            source, length) ;                    \
+        dest = (desttype)_ltmp;                   \
     } while (0)
 
 
@@ -313,8 +293,8 @@ typedef Dwarf_Unsigned BIGGEST_UINT;
                 rw_src_data_p, DISTINGUISHED_VALUE_OFFSET_SIZE,\
                 w_error,r_endptr);                             \
             if (w_target > r_sectionlen) {                     \
-                _dwarf_error(r_dbg,w_error,                    \
-                    DW_DLE_HEADER_LEN_BIGGER_THAN_SECSIZE);    \
+                _dwarf_create_area_len_error(r_dbg,w_error,    \
+                    w_target,r_sectionlen);                    \
                 return DW_DLV_ERROR;                           \
             }                                                  \
             rw_src_data_p += DISTINGUISHED_VALUE_OFFSET_SIZE;  \
@@ -326,14 +306,14 @@ typedef Dwarf_Unsigned BIGGEST_UINT;
                 if (r_dbg->de_length_size == 8) {              \
                     /* IRIX 64 bit, big endian.  This test */  \
                     /* is not a truly precise test, a precise test*/ \
-                    /* would check if the target was IRIX.  */  \
+                    /* would check if the target was IRIX.  */ \
                     READ_UNALIGNED_CK(r_dbg,w_target,r_targtype,\
-                        rw_src_data_p,                          \
-                        DISTINGUISHED_VALUE_OFFSET_SIZE,      \
+                        rw_src_data_p,                         \
+                        DISTINGUISHED_VALUE_OFFSET_SIZE,       \
                         w_error,r_endptr);                     \
                     if (w_target > r_sectionlen) {             \
-                        _dwarf_error(r_dbg,w_error,            \
-                            DW_DLE_HEADER_LEN_BIGGER_THAN_SECSIZE);\
+                        _dwarf_create_area_len_error(r_dbg,w_error,\
+                            w_target,r_sectionlen);            \
                         return DW_DLV_ERROR;                   \
                     }                                          \
                     w_length_size  = DISTINGUISHED_VALUE_OFFSET_SIZE;\
@@ -347,8 +327,8 @@ typedef Dwarf_Unsigned BIGGEST_UINT;
                 }                                              \
             } else {                                           \
                 if (w_target > r_sectionlen) {                 \
-                    _dwarf_error(r_dbg,w_error,                \
-                        DW_DLE_HEADER_LEN_BIGGER_THAN_SECSIZE);\
+                    _dwarf_create_area_len_error(r_dbg,w_error,\
+                        w_target,r_sectionlen);                \
                     return DW_DLV_ERROR;                       \
                 }                                              \
                 /* Standard 32 bit dwarf2/dwarf3 */            \
@@ -365,6 +345,11 @@ typedef Dwarf_Unsigned BIGGEST_UINT;
 int _dwarf_decode_u_leb128_chk(Dwarf_Small * leb128,
     Dwarf_Unsigned * leb128_length,
     Dwarf_Unsigned *outval,Dwarf_Byte_Ptr endptr);
+
+int _dwarf_format_TAG_err_msg(Dwarf_Debug dbg,
+    Dwarf_Unsigned tag,const char *m,
+    Dwarf_Error *error);
+
 
 int _dwarf_decode_s_leb128_chk(Dwarf_Small * leb128,
     Dwarf_Unsigned * leb128_length,
@@ -413,7 +398,9 @@ struct Dwarf_Hash_Table_Entry_s {
 
 int _dwarf_get_abbrev_for_code(Dwarf_CU_Context cu_context,
     Dwarf_Unsigned code,
-    Dwarf_Abbrev_List *list_out,Dwarf_Error *error);
+    Dwarf_Abbrev_List *list_out,
+    Dwarf_Unsigned * highest_known_code,
+    Dwarf_Error *error);
 
 
 /* return 1 if string ends before 'endptr' else
@@ -453,5 +440,38 @@ int _dwarf_what_section_are_we(Dwarf_Debug dbg,
     Dwarf_Unsigned *sec_len_out,
     Dwarf_Small    **sec_end_ptr_out,
     Dwarf_Error *error);
+
+/*  wrappers return either DW_DLV_OK or DW_DLV_ERROR.
+    Never DW_DLV_NO_ENTRY. */
+int
+_dwarf_read_unaligned_ck_wrapper(Dwarf_Debug dbg,
+    Dwarf_Unsigned *out_value,
+    Dwarf_Small *readfrom,
+    int          readlength,
+    Dwarf_Small *end_arange,
+    Dwarf_Error *err);
+int
+_dwarf_read_area_length_ck_wrapper(Dwarf_Debug dbg,
+    Dwarf_Unsigned *out_value,
+    Dwarf_Small **readfrom,
+    int    *  length_size_out,
+    int    *  exten_size_out,
+    Dwarf_Unsigned sectionlength,
+    Dwarf_Small *endsection,
+    Dwarf_Error *err);
+int
+_dwarf_leb128_uword_wrapper(Dwarf_Debug dbg,
+    Dwarf_Small ** startptr,
+    Dwarf_Small * endptr,
+    Dwarf_Unsigned *out_value,
+    Dwarf_Error * error);
+int
+_dwarf_leb128_sword_wrapper(Dwarf_Debug dbg,
+    Dwarf_Small ** startptr,
+    Dwarf_Small * endptr,
+    Dwarf_Signed *out_value,
+    Dwarf_Error * error);
+
+
 
 #endif /* DWARF_UTIL_H */

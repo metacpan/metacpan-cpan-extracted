@@ -1,5 +1,11 @@
 package CLI::Driver;
 
+=head1 NAME
+
+CLI::Driver - Drive your cli tool with YAML
+
+=cut
+
 use Modern::Perl;
 use Moose;
 use namespace::autoclean;
@@ -10,13 +16,7 @@ use CLI::Driver::Action;
 
 with 'CLI::Driver::CommonRole';
 
-our $VERSION = 0.68;
-
-=head1 NAME
-
-CLI::Driver
-
-=cut
+our $VERSION = 0.69;
 
 =head1 SYNOPSIS
 

@@ -1,0 +1,117 @@
+use alienfile;
+use strict;
+
+# problem: https://issues.apache.org/jira/browse/ZOOKEEPER-4013
+# libzookeeper doesn't come with a pkg-config file, so even if there
+# is a libzookeeper.a available, it won't show up here.
+# So first probe with pkgconfig:
+plugin 'PkgConfig' => (
+  pkg_name        => 'libzookeeper',
+  minimum_version => '3.5.0', # version here is a trick -- if there's no pkg-config result,
+                              # the PkgConfig plugin will return an empty string, which will
+                              # fail this version check, and tickle the CBuilder codepath
+);
+
+# And then try with Probe::CBuilder:
+my %zk_probe_args = (
+  version => qr/version = '[0-9\.]+'/,
+  program => q{
+#include <stdio.h>
+#include <zookeeper/zookeeper_version.h>
+
+int main() {
+#ifdef ZOO_VERSION
+    /* recent versions of zk only provide the textual version: */
+    printf("version = '%s'\n", ZOO_VERSION);
+#else
+    printf("version = '%d.%d.%d'\n", ZOO_MAJOR_VERSION, ZOO_MINOR_VERSION, ZOO_PATCH_VERSION);
+#endif
+    return 0;
+}
+},
+);
+
+plugin 'Probe::CBuilder' => (
+  # directly building the zk C source gets you a libzookeper
+  # using the maven build gets you two libraries:
+  # libzookeeper_st, which they strongly recommend not using,
+  # and libzookeeper_mt, which is actually just libzookeeper.
+  # So probe for both:
+  libs    => '-lzookeeper',
+  %zk_probe_args,
+);
+
+plugin 'Probe::CBuilder' => (
+  # directly building the zk C source gets you a libzookeper
+  # using the maven build gets you two libraries:
+  # libzookeeper_st, which they strongly recommend not using,
+  # and libzookeeper_mt, which is actually just libzookeeper.
+  # So probe for both:
+  libs    => '-lzookeeper_mt',
+  %zk_probe_args,
+);
+
+share {
+    # versions newer than 3.5.6 don't include the pre-generated files needed to
+    # compile libzookeeper, and instead need java and maven -- so stick with
+    # 3.5.6 for now.  See https://issues.apache.org/jira/browse/ZOOKEEPER-3820
+    # for details.
+    plugin Download => (
+        url     => 'https://archive.apache.org/dist/zookeeper/zookeeper-3.5.6/apache-zookeeper-3.5.6.tar.gz',
+        version => qr/(?:apache-zookeeper|zookeeper-release)-([0-9\.]+)\.tar\.gz$/,
+    );
+
+    plugin Extract => 'tar.gz';
+
+    # Patch CMakeLists.txt so that it has a `make install` target,
+    # and so that the target also creates a pkg-config file for us.
+    # See https://issues.apache.org/jira/browse/ZOOKEEPER-4012
+    # for details
+    patch [
+        '%{patch} -p1 < %{.install.patch}/0001-add-pkg-config-template.patch',
+        '%{patch} -p1 < %{.install.patch}/0002-add-make-install-target.patch',
+        '%{patch} -p1 < %{.install.patch}/0003-statically-link-libzookeeper-against-the-hashmap-impl-it-needs.patch',
+        '%{patch} -p1 < %{.install.patch}/0004-zookeeper.c-use-after-free-patched-upstream.patch',
+    ];
+
+    plugin 'Build::CMake' => ();
+    build [
+        'cd %{.install.extract}/zookeeper-client/zookeeper-client-c',
+        [
+            '%{cmake}',
+                '-DCMAKE_BUILD_TYPE=Release', # release, no debug symbols
+                '-DWANT_SYNCAPI=ON',          # sync and async symbols
+                '-DWANT_CPPUNIT=OFF',         # we don't run `make test`
+                @{ meta->prop->{plugin_build_cmake}->{args} },
+                '%{.install.extract}/zookeeper-client/zookeeper-client-c',
+        ],
+        [
+            '%{make}',
+                '-C' => '%{.install.extract}/zookeeper-client/zookeeper-client-c',
+        ],
+        [
+            '%{make}',
+                '-C' => '%{.install.extract}/zookeeper-client/zookeeper-client-c',
+                'install',
+        ],
+    ];
+
+};
+
+meta->after_hook(
+    'gather_system' => sub {
+        # if we are using the system libraries, we need to add -lzookeeper into libs:
+        # ..but because we use three different hooks, we end up with race conditions
+        # and need to do this mess:
+        my ($build) = @_;
+        my $install_prop    = $build->{install_prop} // {}; # make sure not to vivify this!
+        my $cbuilder_gather = $install_prop->{plugin_probe_cbuilder_gather} // {};
+        foreach my $gathered ( values %$cbuilder_gather ) {
+            # if we have entries, it means the CBuilder hook succeeded -- so copy
+            # the values it got!
+            $build->{runtime_prop}->{$_} ||= $gathered->{$_}
+                for keys %$gathered;
+        }
+    }
+);
+

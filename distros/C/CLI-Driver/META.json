@@ -1,5 +1,5 @@
 {
-   "abstract" : "unknown",
+   "abstract" : "Drive your cli tool with YAML",
    "author" : [
       "John Gravatt <john.gravatt@act.org>"
    ],
@@ -52,6 +52,17 @@
       }
    },
    "release_status" : "stable",
-   "version" : 0.68,
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/gravattj/CLI-Driver-perl/issues"
+      },
+      "homepage" : "https://github.com/gravattj/CLI-Driver-perl",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/gravattj/CLI-Driver-perl.git",
+         "web" : "https://github.com/gravattj/CLI-Driver-perl/Task-DWIM"
+      }
+   },
+   "version" : 0.69,
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

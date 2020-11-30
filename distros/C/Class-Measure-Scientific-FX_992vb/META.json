@@ -41,7 +41,7 @@
    "provides" : {
       "Class::Measure::Scientific::FX_992vb" : {
          "file" : "lib/Class/Measure/Scientific/FX_992vb.pm",
-         "version" : "v0.0.4"
+         "version" : "v0.0.5"
       }
    },
    "release_status" : "stable",
@@ -53,6 +53,6 @@
          "url" : "https://bitbucket.org/rolandvanipenburg/class-measure-scientific-fx_992vb"
       }
    },
-   "version" : "v0.0.4",
+   "version" : "v0.0.5",
    "x_serialization_backend" : "JSON::PP version 4.05"
 }

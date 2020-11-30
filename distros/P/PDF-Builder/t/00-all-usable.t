@@ -63,6 +63,7 @@ foreach my $file (@files) {
  		next;
 	}
     }
+    # HarfBuzz::Shaper is built into Content.pm, doesn't have its own module
     use_ok($file);
 }
 

@@ -38,7 +38,9 @@ t/changes_file/doc/CHANGES
 t/code_packagesetup/01_code_uninstall.t
 t/code_packagesetup/02_code_uninstall_pre.t
 t/code_packagesetup/03_code_uninstall_pre_3.t
+t/code_packagesetup/04_code_install_package.t
 t/code_packagesetup/Test.json
+t/code_packagesetup/TestInstall.json
 t/code_packagesetup/TestPre.json
 t/code_packagesetup/TestPre3.json
 t/column_drop/01_column_drop.t

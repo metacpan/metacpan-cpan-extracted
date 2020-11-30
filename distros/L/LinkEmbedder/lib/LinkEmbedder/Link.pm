@@ -110,8 +110,9 @@ sub _learn {
   $self->type('video')->_learn_from_url               if $ct =~ m!^video/!;
   $self->type('rich')->_learn_from_text($tx)          if $ct =~ m!^text/plain!;
   $self->type('rich')->_learn_from_dom($tx->res->dom) if $ct =~ m!^text/html!;
+  my $p = $self->_maybe_rebless_p($tx);
 
-  return $self;
+  return $p || $self;
 }
 
 sub _learn_from_dom {
@@ -158,6 +159,21 @@ sub _learn_from_url {
   my $path = $self->url->path;
 
   return $self->title(@$path ? $path->[-1] : 'Image');
+}
+
+# TODO: Not sure if this is the best solution
+sub _maybe_rebless_p {
+  my ($self, $tx) = @_;
+  return unless ref $self eq 'LinkEmbedder::Link::Basic';
+  return unless $self->type eq 'rich';
+
+  if ($tx->res->body =~ m!\bJitsiMeetJS\b!) {
+    require LinkEmbedder::Link::Jitsi;
+    bless $self, 'LinkEmbedder::Link::Jitsi';
+    return $self->learn_p;
+  }
+
+  return;
 }
 
 1;

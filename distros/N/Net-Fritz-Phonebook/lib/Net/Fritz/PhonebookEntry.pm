@@ -10,7 +10,7 @@ use Net::Fritz::PhonebookEntry::Number;
 use Net::Fritz::PhonebookEntry::Mail;
 
 use vars '$VERSION';
-$VERSION = '0.04';
+$VERSION = '0.05';
 
 our $has_DeletePhonebookEntryUID = 1;
 

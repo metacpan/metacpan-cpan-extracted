@@ -1,5 +1,7 @@
 Changes
 lib/Getopt/Module.pm
+lib/Getopt/Module.pod
+LICENSE.md
 Makefile.PL
 MANIFEST			This list of files
 README

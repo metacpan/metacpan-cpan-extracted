@@ -31,8 +31,11 @@ SockAddr AsyncTest::get_refused_addr () {
 SockAddr AsyncTest::get_blackhole_addr () {
     static SockAddr ret;
     if (!ret) {
+        struct addrinfo hints;
+        memset(&hints, 0, sizeof(hints));
+        hints.ai_family = AF_INET;
         addrinfo* res;
-        int syserr = getaddrinfo("google.com", "81", NULL, &res);
+        int syserr = getaddrinfo("google.com", "81", &hints, &res);
         if (syserr) throw std::system_error(std::make_error_code(((std::errc)syserr)));
         ret = SockAddr(res->ai_addr, sizeof(*res->ai_addr));
         freeaddrinfo(res);

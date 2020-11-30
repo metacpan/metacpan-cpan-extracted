@@ -6,7 +6,7 @@ estimatesvg - Do quick estimations of files via the CLI.
 
 =head1 VERSION
 
-version 1.0114
+version 1.0115
 
 =head1 SYNOPSIS
 
@@ -16,6 +16,7 @@ version 1.0114
 
  -h --help      Display help.
  -c --csv       Output CSV data about the estimate.
+ -v --version   Show current version of SVG::Estimate
 
 =cut
 
@@ -30,18 +31,23 @@ use Time::HiRes qw(tv_interval gettimeofday);
 my $csv;
 my $help;
 my $dpi = 72;
-my $summarize = 0;
+my ($summarize, $version) = (0,0);
 
 GetOptions(
     'h|help'       => \$help,
     'c|csv'        => \$csv,
     's|summarize'  => \$summarize,
+    'v|version'    => \$version,
     'dpi=i'        => \$dpi,
 );
 
 if ($help) {
     say "Usage: $0 /path/to/file.svg";
     exit;
+}
+
+if ($version) {
+    say $SVG::Estimate::VERSION;
 }
 
 if ($csv) {

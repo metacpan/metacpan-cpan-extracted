@@ -12,7 +12,7 @@
 
 namespace panda { namespace unievent {
 
-log::Module panda_log_module("UniEvent", log::WARNING);
+log::Module panda_log_module("UniEvent", log::Level::Warning);
 
 static std::thread::id main_thread_id = std::this_thread::get_id();
 

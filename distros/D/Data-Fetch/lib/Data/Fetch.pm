@@ -1,7 +1,7 @@
 package Data::Fetch;
 
 # Author Nigel Horne: njh@bandsman.co.uk
-# Copyright (C) 2016, Nigel Horne
+# Copyright (C) 2016-2020, Nigel Horne
 
 # Usage is subject to licence terms.
 # The licence terms of this software are as follows:
@@ -21,11 +21,11 @@ Data::Fetch - give advance warning that you'll be needing a value
 
 =head1 VERSION
 
-Version 0.05
+Version 0.06
 
 =cut
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 =head1 SYNOPSIS
 
@@ -60,6 +60,8 @@ sub new {
 =head2 prime
 
 Say what is is you'll be needing later.
+Call in an array context if get() is to be used in an array context.
+
 Takes two mandatory parameters:
 
     object - the object you'll be sending the message to
@@ -90,12 +92,21 @@ sub prime {
 	$self->{values}->{$object}->{status} = 'running';
 
 	$self->{values}->{$object}->{thread} = threads->create(sub {
-		my ($o, $m, $a) = @_;
+		my ($o, $m, $a, $wantarray) = @_;
+		if($wantarray) {
+			my @rc;
+			if($a) {
+				@rc = eval '$o->$m($a)';
+			} else {
+				@rc = eval '$o->$m()';
+			}
+			return \@rc;
+		}
 		if($a) {
 			return eval '$o->$m($a)';
 		}
 		return eval '$o->$m()';
-	}, $args{object}, $args{message}, $args{arg});
+	}, $args{object}, $args{message}, $args{arg}, wantarray);
 
 	# $self->{values}->{$object}->{thread} = async {
 		# my $o = $args{object};
@@ -111,7 +122,10 @@ sub prime {
 
 =head2 get
 
-Retrieve get a value you've primed.  Takes two mandatory parameters:
+Retrieve get a value you've primed.
+Call in an array context only works if prime() was called in an array context, or the value wasn't primed
+
+Takes two mandatory parameters:
 
     object - the object you'll be sending the message to
     message - the message you'll be sending
@@ -129,6 +143,9 @@ sub get {
 	my $self = shift;
 	my %args = (ref($_[0]) eq 'HASH') ? %{$_[0]} : @_;
 
+	# I'm not sure that silently ignoring that the two arguments are
+	#	mandatory is a good idea
+
 	return unless($args{'object'} && $args{'message'});
 
 	my $object = $args{'object'} . '->' . $args{'message'};
@@ -139,24 +156,46 @@ sub get {
 	if(!defined($self->{values}->{$object}->{status})) {
 		# my @call_details = caller(0);
 		# die 'Need to prime before getting at line ', $call_details[2], ' of ', $call_details[1];
-		my ($o, $m, $a) = ($args{object}, $args{message}, $args{arg});
-		my $rc;
-		if($a) {
-			$rc = eval '$o->$m($a)';
-		} else {
-			$rc = eval '$o->$m()';
-		}
+
 		$self->{values}->{$object}->{status} = 'complete';
-		return $self->{values}->{$object}->{value} = $rc;
+		my ($o, $m, $a) = ($args{object}, $args{message}, $args{arg});
+		if(wantarray) {
+			my @rc;
+			if($a) {
+				@rc = eval '$o->$m($a)';
+			} else {
+				@rc = eval '$o->$m()';
+			}
+			push @{$self->{values}->{$object}->{value}}, @rc;
+			return @rc;
+		} else {
+			my $rc;
+			if($a) {
+				$rc = eval '$o->$m($a)';
+			} else {
+				$rc = eval '$o->$m()';
+			}
+			return $self->{values}->{$object}->{value} = $rc;
+		}
 	}
 	if($self->{values}->{$object}->{status} eq 'complete') {
-		return $self->{values}->{$object}->{value};
+		my $value = $self->{values}->{$object}->{value};
+		if(wantarray && (ref($value) eq 'ARRAY')) {
+			my @rc = @{$value};
+			return @rc;
+		}
+		return $value;
 	}
 	if($self->{values}->{$object}->{status} eq 'running') {
-		my $rc = $self->{values}->{$object}->{thread}->join();
 		$self->{values}->{$object}->{status} = 'complete';
+		if(wantarray) {
+			my @rc = @{$self->{values}->{$object}->{thread}->join()};
+			delete $self->{values}->{$object}->{thread};
+			push @{$self->{values}->{$object}->{value}}, @rc;
+			return @rc;
+		}
+		my $rc = $self->{values}->{$object}->{thread}->join();
 		delete $self->{values}->{$object}->{thread};
-		# $self->{values}->{$object}->{thread} = undef;	# ????
 		return $self->{values}->{$object}->{value} = $rc;
 	}
 	die 'Unknown status: ', $self->{values}->{$object}->{status};
@@ -170,13 +209,18 @@ sub DESTROY {
 
 	return unless($self->{values});
 
-	foreach my $o(values %{$self->{values}}) {
-		if($o->{thread}) {
-			if($o->{thread}->is_running()) {
-				$o->{thread}->detach();
+	foreach my $v(values %{$self->{values}}) {
+		if($v->{thread}) {
+			if($v->{thread}->is_running()) {
+				$v->{thread}->detach();
+			} else {
+				# FIXME: join the thread.
+				# However that's not a good idea in a DESTROY
+				#	routine
+				warn 'Thread ', $v->{thread}->tid(), ' primed but not used';
 			}
-			delete $o->{thread};
-			delete $o->{value};
+			delete $v->{thread};
+			delete $v->{value};
 		}
 	}
 }
@@ -186,8 +230,6 @@ sub DESTROY {
 Nigel Horne, C<< <njh at bandsman.co.uk> >>
 
 =head1 BUGS
-
-ARRAY contexts not supported.
 
 Can't pass more than one argument to the message.
 
@@ -217,30 +259,38 @@ You can also look for information at:
 
 =over 4
 
+=item * MetaCPAN
+
+L<https://metacpan.org/release/Data-Fetch>
+
 =item * RT: CPAN's request tracker
 
-L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Data-Fetch>
+L<https://rt.cpan.org/NoAuth/Bugs.html?Dist=Data-Fetch>
 
-=item * AnnoCPAN: Annotated CPAN documentation
+=item * CPANTS
 
-L<http://annocpan.org/dist/Data-Fetch>
+L<http://cpants.cpanauthors.org/dist/Data-Fetch>
+
+=item * CPAN Testers' Matrix
+
+L<http://matrix.cpantesters.org/?dist=Data-Fetch>
 
 =item * CPAN Ratings
 
 L<http://cpanratings.perl.org/d/Data-Fetch>
 
-=item * Search CPAN
+=item * CPAN Testers Dependencies
 
-L<http://search.cpan.org/dist/Data-Fetch/>
+L<http://deps.cpantesters.org/?module=Data::Fetch>
 
 =back
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2016 Nigel Horne.
+Copyright 2010-2020 Nigel Horne.
 
-This program is released under the following licence: GPL
+This program is released under the following licence: GPL2
 
 =cut
 
-1; # End of Data::Fetch
+1;

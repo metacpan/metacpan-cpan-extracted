@@ -12,7 +12,7 @@ Geo::Coder::Free - Provides a Geo-Coding functionality using free databases
 
 # VERSION
 
-Version 0.28
+Version 0.29
 
 # SYNOPSIS
 
@@ -24,7 +24,7 @@ Version 0.28
     print 'Latitude: ', $location->lat(), "\n";
     print 'Longitude: ', $location->long(), "\n";
 
-    # Use a local download of http://results.openaddresses.io/
+    # Use a local download of http://results.openaddresses.io/ and https://www.whosonfirst.org/
     my $openaddr_geo_coder = Geo::Coder::Free->new(openaddr => $ENV{'OPENADDR_HOME'});
     $location = $openaddr_geo_coder->geocode(location => '1600 Pennsylvania Avenue NW, Washington DC, USA');
 
@@ -145,10 +145,55 @@ Can't parse and handle "London, England".
 
 # SEE ALSO
 
-VWF, OpenAddresses, MaxMind and geonames.
+[https://openaddresses.io/](https://openaddresses.io/),
+[https://www.maxmind.com/en/home](https://www.maxmind.com/en/home),
+[https://www.geonames.org/](https://www.geonames.org/),
+[https://raw.githubusercontent.com/dr5hn/countries-states-cities-database/master/countries%2Bstates%2Bcities.json](https://raw.githubusercontent.com/dr5hn/countries-states-cities-database/master/countries%2Bstates%2Bcities.json),
+[https://www.whosonfirst.org/](https://www.whosonfirst.org/) and
+[https://github.com/nigelhorne/vwf](https://github.com/nigelhorne/vwf).
+
+[Geo::Coder::Free::Local](https://metacpan.org/pod/Geo%3A%3ACoder%3A%3AFree%3A%3ALocal),
+[Geo::Coder::Free::Maxmind](https://metacpan.org/pod/Geo%3A%3ACoder%3A%3AFree%3A%3AMaxmind),
+[Geo::Coder::Free::OpenAddresses](https://metacpan.org/pod/Geo%3A%3ACoder%3A%3AFree%3A%3AOpenAddresses).
 
 See [Geo::Coder::Free::OpenAddresses](https://metacpan.org/pod/Geo%3A%3ACoder%3A%3AFree%3A%3AOpenAddresses) for instructions creating the SQLite database from
 [http://results.openaddresses.io/](http://results.openaddresses.io/).
+
+# SUPPORT
+
+You can find documentation for this module with the perldoc command.
+
+    perldoc Geo::Coder::Free
+
+You can also look for information at:
+
+- MetaCPAN
+
+    [https://metacpan.org/release/Geo-Coder-Free](https://metacpan.org/release/Geo-Coder-Free)
+
+- RT: CPAN's request tracker
+
+    [https://rt.cpan.org/NoAuth/Bugs.html?Dist=Geo-Coder-Free](https://rt.cpan.org/NoAuth/Bugs.html?Dist=Geo-Coder-Free)
+
+- CPANTS
+
+    [http://cpants.cpanauthors.org/dist/Geo-Coder-Free](http://cpants.cpanauthors.org/dist/Geo-Coder-Free)
+
+- CPAN Testers' Matrix
+
+    [http://matrix.cpantesters.org/?dist=Geo-Coder-Free](http://matrix.cpantesters.org/?dist=Geo-Coder-Free)
+
+- CPAN Ratings
+
+    [http://cpanratings.perl.org/d/Geo-Coder-Free](http://cpanratings.perl.org/d/Geo-Coder-Free)
+
+- CPAN Testers Dependencies
+
+    [http://deps.cpantesters.org/?module=Geo::Coder::Free](http://deps.cpantesters.org/?module=Geo::Coder::Free)
+
+- Search CPAN
+
+    [http://search.cpan.org/dist/Geo-Coder-Free/](http://search.cpan.org/dist/Geo-Coder-Free/)
 
 # LICENSE AND COPYRIGHT
 

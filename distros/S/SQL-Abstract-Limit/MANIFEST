@@ -1,4 +1,3 @@
-Build.PL
 Makefile.PL
 Changes
 MANIFEST
@@ -14,3 +13,4 @@ t/test_data.csv
 t/pod-coverage.t
 t/pod.t
 t/lib/SQL/Abstract/Limit/Test.pm
+META.json                                Module JSON meta-data (added by MakeMaker)

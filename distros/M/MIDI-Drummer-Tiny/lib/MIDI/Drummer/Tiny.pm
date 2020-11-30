@@ -3,10 +3,10 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Glorified metronome
 
-our $VERSION = '0.1801';
+our $VERSION = '0.1802';
 
 use Math::Bezier;
-use MIDI::Simple;
+use MIDI::Simple ();
 use Music::Duration;
 use Moo;
 use strictures 2;
@@ -381,7 +381,7 @@ MIDI::Drummer::Tiny - Glorified metronome
 
 =head1 VERSION
 
-version 0.1801
+version 0.1802
 
 =head1 SYNOPSIS
 

@@ -11,7 +11,7 @@ my $server = UE::Tcp->new($loop);
 my $cl;
 my $pid;
 $server->set_nodelay(1);
-$server->bind_addr(SA_LOOPBACK_ANY);
+$server->bind_addr(SOCKADDR_LOOPBACK);
 $server->listen(8);
 my $sa = $server->sockaddr;
 
