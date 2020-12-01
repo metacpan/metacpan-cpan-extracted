@@ -15,7 +15,7 @@ use warnings;
 
 use Test::Perl::Critic (-profile => "") x!! -e "";
 
-my $filenames = ['lib/App/DiffXlsText.pm','script/diff-xls-text'];
+my $filenames = ['lib/App/DiffXlsText.pm','script/diff-xls-text','script/diff-xls-text-between-conflicted-git-versions'];
 unless ($filenames && @$filenames) {
     $filenames = -d "blib" ? ["blib"] : ["lib"];
 }

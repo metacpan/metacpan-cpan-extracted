@@ -6,7 +6,7 @@ use warnings;
 
 use Test::More;
 
-plan tests => 54 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 55 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'App/CompleteCLIs.pm'
@@ -46,6 +46,7 @@ my @scripts = (
     'script/complete-perl-builtin-function',
     'script/complete-perl-builtin-symbol',
     'script/complete-perl-version',
+    'script/complete-perlmv-scriptlet',
     'script/complete-pid',
     'script/complete-pod',
     'script/complete-ppr-subpattern',

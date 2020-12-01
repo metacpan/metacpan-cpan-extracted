@@ -185,6 +185,10 @@ Include CCW devices
 
 Include CSS devices
 
+=item Sys::Virt::NodeDevice::LIST_CAP_VDPA
+
+Include VDPA devices
+
 =back
 
 =head2 EVENT ID CONSTANTS

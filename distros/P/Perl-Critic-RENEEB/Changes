@@ -1,6 +1,11 @@
 Release history for Perl::Critic::RENEEB
 ========================================
 
+2.05  2020-12-01 07:54:00
+
+  * require the current PPI version (1.270) to get the correct parsing behaviour for type casts, no change in functionality
+  * update documentation: mention the two latest policies
+
 2.04  2020-11-30 12:17:00
 
   * Add one policy to require postdereferencing

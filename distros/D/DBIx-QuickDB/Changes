@@ -1,3 +1,7 @@
+0.000019  2020-11-30 15:40:36-08:00 America/Los_Angeles
+
+    - Add watcher process to make sure cleanup happens
+
 0.000018  2020-11-20 08:46:39-08:00 America/Los_Angeles
 
     - Fix bug where driver could be forgotten in pool during reclaim

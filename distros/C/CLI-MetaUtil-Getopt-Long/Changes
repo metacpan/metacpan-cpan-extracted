@@ -1,0 +1,8 @@
+0.002   2020-12-01  Released-By: PERLANCAR; Urgency: medium
+
+	- [internal] Make @cli_argv available to outside package.
+
+
+0.001   2020-12-01  Released-By: PERLANCAR
+
+        - First release.

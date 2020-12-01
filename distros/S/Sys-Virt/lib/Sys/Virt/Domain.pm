@@ -2246,6 +2246,33 @@ Use the hypervisor driver's default timeout
 The C<$flags> parameter is currently unused and defaults
 to zero.
 
+=item my @keys = $dom->authorized_ssh_keys_get($user, $flags=0)
+
+Retrieve the list of authorized SSH keys for the user account C<$user>.
+The C<$flags> parameter is currently unused and defaults to zero.
+
+=item $dom->authorized_ssh_keys_set($user, \@keys, $flags=0)
+
+Update the list of authorized SSH keys for the user account C<$user>.
+The C<@keys> parameter should be an array reference containing the
+new keys, if any. The default behaviour is to set the authorized
+SSH keys to the exact set specified in C<@keys>. This can be modified
+via the C<$flags> parameter which takes the following constants
+
+=over 4
+
+=item Sys::Virt::Domain::AUTHORIZED_SSH_KEYS_SET_APPEND
+
+Append C<@keys> to the current set of keys, rather than replacing
+the existing keys.
+
+=item Sys::Virt::Domain::AUTHORIZED_SSH_KEYS_SET_REMOVE
+
+Remove C<@keys> from the current set of keys, rather than replacing
+the existing keys. It is not an error if the keys do not exist.
+
+=back
+
 =back
 
 =head1 CONSTANTS
@@ -2478,6 +2505,24 @@ The virtual CPU is executing code
 =item Sys::Virt::Domain::VCPU_BLOCKED
 
 The virtual CPU is waiting to be scheduled
+
+=back
+
+
+=head2 VCPU HOST PLACEMENT STATE
+
+The following constants are useful when interpreting the
+virtual CPU host placement
+
+=over 4
+
+=item Sys::Virt::Domain::VCPU_INFO_CPU_OFFLINE
+
+The virtual CPU is not online
+
+=item Sys::Virt::Domain::VCPU_INFO_CPU_UNAVAILABLE
+
+The virtual CPU placement is not available from this hypervisor
 
 =back
 
@@ -3663,6 +3708,11 @@ The domain metadata has changed
 The event occurs when the hypervisor detects that the given
 storage element was written beyond the point specified by
 threshold. The event is useful for thin-provisioned storage.
+
+=item Sys::Virt::Domain::EVENT_ID_MEMORY_FAILURE
+
+The event occurs when the hypervisor detects hardware
+memory corruption.
 
 =back
 
@@ -4922,6 +4972,59 @@ The coredump-destroy lifecycle action
 =item Sys::Virt::Domain::LIFECYCLE_ACTION_COREDUMP_RESTART
 
 The coredump-restart lifecycle action
+
+=back
+
+=head2 MEMORY FAILURE ACTION CONSTANTS
+
+=over 4
+
+=item Sys::Virt::Domain::EVENT_MEMORY_FAILURE_ACTION_IGNORE
+
+The failure could be ignored
+
+=item Sys::Virt::Domain::EVENT_MEMORY_FAILURE_ACTION_INJECT
+
+An MCE was injected to the guest
+
+=item Sys::Virt::Domain::EVENT_MEMORY_FAILURE_ACTION_FATAL
+
+The failure is non-recoverable and the hypervisor was
+not able to handle it
+
+=item Sys::Virt::Domain::EVENT_MEMORY_FAILURE_ACTION_RESET
+
+The failure is non-recoverable and the guest was
+not able to handle it.
+
+=back
+
+=head2 MEMORY FAILURE RECIPIENT CONSTANTS
+
+=over 4
+
+=item Sys::Virt::Domain::EVENT_MEMORY_FAILURE_RECIPIENT_HYPERVISOR
+
+The memory failure was in hypervisor address space
+
+=item Sys::Virt::Domain::EVENT_MEMORY_FAILURE_RECIPIENT_GUEST
+
+The memory failure was in guest address space
+
+=back
+
+=head2 MEMORY FAILURE FLAG CONSTANTS
+
+=over 4
+
+=item Sys::Virt::Domain::MEMORY_FAILURE_ACTION_REQUIRED
+
+Whether the flag is action-required or action-optional
+
+=item Sys::Virt::Domain::MEMORY_FAILURE_RECURSIVE
+
+The failure occurred while the previous fault was being
+handled.
 
 =back
 

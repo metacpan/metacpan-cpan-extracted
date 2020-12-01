@@ -9,6 +9,7 @@ README
 dist.ini
 lib/App/DiffXlsText.pm
 script/diff-xls-text
+script/diff-xls-text-between-conflicted-git-versions
 t/00-compile.t
 t/author-critic.t
 t/author-pod-coverage.t

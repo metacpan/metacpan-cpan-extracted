@@ -5,7 +5,7 @@ use Test::More;
 use Encode ();
 use Geo::Coder::GooglePlaces;
 
-if ($ENV{TEST_GEOCODER_GOOGLE_LIVE}) {
+if ($ENV{TEST_GEOCODER_GOOGLE_LIVE} || $ENV{'GMAP_KEY'}) {
   plan tests => 14;
 } else {
   plan skip_all => 'Not running live tests. Set $ENV{TEST_GEOCODER_GOOGLE_LIVE} = 1 to enable';
@@ -20,7 +20,7 @@ if ($ENV{TEST_GEOCODER_GOOGLE_LIVE}) {
 
 SKIP: {
     skip "google.co.jp suspended geocoding JP characters", 1;
-    my $geocoder = Geo::Coder::GooglePlaces->new(apikey => $ENV{GOOGLE_MAPS_APIKEY}, host => 'maps.google.co.jp');
+    my $geocoder = Geo::Coder::GooglePlaces->new(apikey => $ENV{GMAP_KEY}, host => 'maps.google.co.jp');
     my $location = $geocoder->geocode("東京都港区赤坂2-14-5");
     delta_ok($location->{Point}->{coordinates}->[0], 139.737808);
 }
@@ -32,7 +32,7 @@ SKIP: {
     delta_ok($location_es->{geometry}{location}{lng}, -4.0273231);
     my $geocoder_us = Geo::Coder::GooglePlaces->new(apiver => 3, key => $ENV{GMAP_KEY});
     my $location_us = $geocoder_us->geocode('Toledo');
-    delta_ok($location_us->{geometry}{location}{lng}, -83.555212);
+    delta_ok($location_us->{geometry}{location}{lng}, -83.53787);
 }
 
 # URL signing
@@ -55,7 +55,8 @@ SKIP: {
 SKIP: {
     my $geocoder_utf8 = Geo::Coder::GooglePlaces->new(apiver => 3, oe => 'utf8', key => $ENV{GMAP_KEY});
     my $location_utf8 = $geocoder_utf8->geocode('Bělohorská 80, 6, Czech Republic');
-    is($location_utf8->{formatted_address}, 'Bělohorská 1685/80, Břevnov, 169 00 Praha-Praha 6, Czech Republic');
+    # is($location_utf8->{formatted_address}, 'Bělohorská 1685/80, Břevnov, 169 00 Praha-Praha 6, Czech Republic');
+    is($location_utf8->{formatted_address}, 'Bělohorská 1685/80, 169 00 Praha 6-Břevnov, Czechia');
 }
 
 # Reverse Geocoding

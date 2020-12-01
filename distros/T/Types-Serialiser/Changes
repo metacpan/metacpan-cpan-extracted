@@ -1,5 +1,9 @@
 Revision history for Perl extension Types::Serialiser
 
+1.01 Tue Dec  1 02:46:33 CET 2020
+	- implement Types::Serialiser::as_bool.
+        - slight doc tweaks.
+
 1.0  Sat Nov 30 19:33:19 CET 2013
 	- clarify that the seocnd arg of FEEZE/THAW is the data
           model/data format name, not the serialsier.

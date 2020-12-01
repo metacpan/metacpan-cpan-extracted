@@ -1,3 +1,7 @@
+0.2.18	2020-12-01
+	- Fix: non-ascii files masks.
+	- Save DB every 10 min.
+	- Zero compression for files with media extentions, because it's useless.
 0.2.17	2020-11-26
 	- Reduced memory utilization at start.
 	- Undebug.

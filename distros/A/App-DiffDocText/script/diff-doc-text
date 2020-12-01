@@ -1,9 +1,9 @@
 #!perl
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-08-22'; # DATE
+our $DATE = '2020-12-01'; # DATE
 our $DIST = 'App-DiffDocText'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 use 5.010001;
 use strict;
@@ -11,89 +11,41 @@ use warnings;
 use Log::ger;
 #use Log::ger::Screen;
 
-use Getopt::Long;
+use Getopt::Long ();
+use CLI::MetaUtil::Getopt::Long qw(GetOptionsCLIWrapper);
 
 my @files;
 Getopt::Long::Configure("gnu_getopt", "no_ignore_case", "pass_through");
 
-my @diff_argv;
-my $code_push_opt     = sub { my ($cb, $optval) = @_; my $optname = $cb->name; push @diff_argv, (length($optname) > 1 ? "--" : "-").$optname };
-my $code_push_opt_val = sub { my ($cb, $optval) = @_; my $optname = $cb->name; push @diff_argv, (length($optname) > 1 ? "--" : "-").$optname, $optval };
 my $fail;
 
-GetOptions(
-    normal => $code_push_opt,
-    'brief|q' => $code_push_opt,
-    'report-identical-files|s' => $code_push_opt_val,
-    'c' => $code_push_opt,
-    'context|C' => $code_push_opt,
-    'u' => $code_push_opt,
-    'unified|U' => $code_push_opt,
-    'ed|e' => $code_push_opt,
-    'rcs|n' => $code_push_opt,
-    'side-by-side|y' => $code_push_opt,
-    'width|W=i' => $code_push_opt_val,
-    'left-column' => $code_push_opt,
-    'suppress-common-lines' => $code_push_opt,
-    'show-c-function|p' => $code_push_opt,
-    'show-function-line|F=s' => $code_push_opt_val,
-    'label=s' => $code_push_opt_val,
-    'expand-tabs|t' => $code_push_opt,
-    'initial-tab|T' => $code_push_opt,
-    'tabsize=i' => $code_push_opt_val,
-    'suppress-blank-empty' => $code_push_opt,
-    'paginate|l' => $code_push_opt,
-    'recursive|r' => $code_push_opt,
-    'new-file|N' => $code_push_opt,
-    'unidirectional-new-file' => $code_push_opt,
-    'ignore-file-name-case!' => $code_push_opt,
-    'exclude|x=s' => $code_push_opt_val,
-    'exclude-from|X=s' => $code_push_opt_val, # filename
-    'starting-file|S' => $code_push_opt_val, # filename
-    'from-file=s' => $code_push_opt_val, # filename
-    'to-file=s' => $code_push_opt_val, # filename
-    'ignore-case|i' => $code_push_opt,
-    'ignore-tab-expansion|E' => $code_push_opt,
-    'ignore-trailing-space|Z' => $code_push_opt,
-    'ignore-space-change|b' => $code_push_opt,
-    'ignore-all-space|w' => $code_push_opt,
-    'ignore-blank-lines|B' => $code_push_opt,
-    'ignore-matching-lines|I=s' => $code_push_opt_val,
-    'text|a' => $code_push_opt,
-    'strip-trailing-cr' => $code_push_opt,
-    'ifdef|D=s' => $code_push_opt_val,
-    'GTYPE-group-format=s' => $code_push_opt_val,
-    'line-format=s' => $code_push_opt_val,
-    'LTYPE-line-format=s' => $code_push_opt_val,
-    'minimal|d' => $code_push_opt,
-    'horizon-lines=i' => $code_push_opt_val,
-    'speed-large-files' => $code_push_opt,
-    'help' => $code_push_opt,
-    'version|v' => $code_push_opt,
+GetOptionsCLIWrapper(
+    cli => 'diff',
+    add_opts => {
+        '<>' => sub {
+            my $filename = $_[0];
+            unless (-f $filename) {
+                warn "diff-doc-text: No such file or not a file: '$filename'\n";
+                $fail++;
+                return;
+            }
 
-    '<>' => sub {
-        my $filename = $_[0];
-        unless (-f $filename) {
-            warn "diff-doc-text: No such file or not a file: '$filename'\n";
-            $fail++;
-            return;
-        }
-
-        require App::OfficeUtils;
-        my $res = App::OfficeUtils::officewp2txt(
-            input_file => $filename,
-            fmt => 1,
+            require App::OfficeUtils;
+            my $res = App::OfficeUtils::officewp2txt(
+                input_file => $filename,
+                fmt => 1,
             return_output_file => 1,
-        );
-        my $file;
-        if ($res->[0] == 304) {
-            $file = $_[0];
-        } elsif ($res->[0] == 200) {
-            $file = $res->[2];
-        } else {
-            die "Can't convert doc '$_[0]' to text: $res->[0] - $res->[1]";
-        }
-        push @diff_argv, $file;
+            );
+            my $file;
+            if ($res->[0] == 304) {
+                $file = $_[0];
+            } elsif ($res->[0] == 200) {
+                $file = $res->[2];
+            } else {
+                die "Can't convert doc '$_[0]' to text: $res->[0] - $res->[1]";
+            }
+            push @CLI::MetaUtil::Getopt::Long::cli_argv, $file;
+        },
     },
 );
 
@@ -107,7 +59,7 @@ my $diff_cmd =
 require IPC::System::Options;
 IPC::System::Options::system(
     {log=>1},
-    $diff_cmd, @diff_argv,
+    $diff_cmd, @ARGV,
 );
 
 # ABSTRACT: Diff the text of two Office word-processor documents (.doc, .docx, .odt, etc)
@@ -125,7 +77,7 @@ diff-doc-text - Diff the text of two Office word-processor documents (.doc, .doc
 
 =head1 VERSION
 
-This document describes version 0.001 of diff-doc-text (from Perl distribution App-DiffDocText), released on 2020-08-22.
+This document describes version 0.002 of diff-doc-text (from Perl distribution App-DiffDocText), released on 2020-12-01.
 
 =head1 SYNOPSIS
 
@@ -135,9 +87,9 @@ Use like you would use the Unix command B<diff>:
 
 =head1 DESCRIPTION
 
-This is a wrapper for the Unix command B<diff>. It assumes each file is an
-olffice word-processor documents (.doc, .docx, .odt, etc) and tries to convert
-it to plaintext first. It then pass the converted files to C<diff>.
+This is a wrapper for the Unix command B<diff>. It assumes that each file is an
+Office word-processor documents (.doc, .docx, .odt, etc) and tries to convert
+the file to plaintext first. It then passes the converted files to C<diff>.
 
 =head1 DIFF_DOC_TEXT_DIFF_CMD
 

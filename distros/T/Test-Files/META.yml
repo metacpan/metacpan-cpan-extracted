@@ -1,15 +1,27 @@
-# http://module-build.sourceforge.net/META-spec.html
-#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
-name:         Test-Files
-version:      0.14
-version_from: Files.pm
-installdirs:  site
+---
+abstract: 'A Test::Builder based module to ease testing with files and dirs'
+author:
+  - 'Phil Crow <phil@localdomain>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.36, CPAN::Meta::Converter version 2.150005'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Test-Files
+no_index:
+  directory:
+    - t
+    - inc
 requires:
-    Algorithm::Diff:               0
-    Test::Builder:                 0
-    Test::Builder::Tester:         0
-    Test::More:                    0
-    Text::Diff:                    0
-
-distribution_type: module
-generated_by: ExtUtils::MakeMaker version 6.30
+  Algorithm::Diff: '0'
+  Test::Builder: '0'
+  Test::Builder::Tester: '0'
+  Test::More: '0'
+  Text::Diff: '0'
+version: '0.15'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

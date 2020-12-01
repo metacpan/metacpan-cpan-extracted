@@ -1,5 +1,16 @@
 Revision history for Alien-libzookeeper
 
+0.04    2020-12-01
+        * Ongoing improvements to libzookeeper;
+          the version we build now works with the 'defualt' perls from
+          Debian, Fedora, Alpine, ArchLinux, CentOS, and OSX.
+
+0.03    2020-11-30
+        * Further improvements to zookeeper's cmake build process;
+          we now generate a libzookeeper_mt.{so,a}, so we should
+          be fully compatible with existing pkg-config providers,
+          and then some!
+
 0.02    2020-11-22
         * Several patches for the manually built libzookeeper
         * Handling for several ways libzookeeper can show up on the system:

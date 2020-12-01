@@ -84,6 +84,7 @@ if($options{cfg}) {
 		while(my($mask, $priority) = each %{ $options{files} }) {
 			$mask =~ s/^~([^\/]*)/(getpwuid($1 ? getpwnam($1) : $<))[7]/e;
 			$mask =~ s/\/$//;
+			Encode::_utf8_off($mask);
 			$files_rules{ $mask } = $priority;
 		}
 		$options{files} = \%files_rules;

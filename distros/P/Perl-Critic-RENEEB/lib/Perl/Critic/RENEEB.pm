@@ -5,7 +5,7 @@ use strict;
 
 # ABSTRACT: A collection of handy Perl::Critic policies
 
-our $VERSION = '2.04';
+our $VERSION = '2.05';
 
 
 1; # End of Perl::Critic::RENEEB
@@ -22,7 +22,7 @@ Perl::Critic::RENEEB - A collection of handy Perl::Critic policies
 
 =head1 VERSION
 
-version 2.04
+version 2.05
 
 =head1 SYNOPSIS
 
@@ -51,6 +51,14 @@ C<full_qualified_package_exemptions> to exclude packages by "full qualified name
     full_qualified_package_exemptions = Test::Command::.*
 
 excludes all packages in the C<Test::Command::> namespace from the check.
+
+=head2 L<Perl::Critic::Policy::Reneeb::ProhibitGrepToGetFirstFoundElement>
+
+Use List::Utils 'first' instead of grep if you want to get the first found element
+
+=head2 L<Perl::Critic::Policy::Reneeb::RequirePostderef>
+
+Use postderef (e.g. $ref->@*) instead of the "old" dereferencing (e.g. @{$ref})
 
 =head1 AUTHOR
 

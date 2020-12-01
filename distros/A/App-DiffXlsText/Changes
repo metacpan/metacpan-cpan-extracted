@@ -1,3 +1,10 @@
+0.004   2020-12-01  Released-By: PERLANCAR; Urgency: medium
+
+	[cli diff-xls-text-between-conflicted-git-versions]
+
+        - [bugfix] Forgot to pass --transpose-csv option.
+
+
 0.003   2020-10-27  Released-By: PERLANCAR; Urgency: medium
 
 	- Add option: --transpose-csv.

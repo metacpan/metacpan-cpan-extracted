@@ -9,7 +9,7 @@ BEGIN {
 use strict;
 use warnings;
 
-our $VERSION = '0.1900';
+our $VERSION = '0.1901';
 
 1;
 
@@ -25,7 +25,7 @@ Task::MusicBundle - A bundle of MIDI and music modules
 
 =head1 VERSION
 
-version 0.1900
+version 0.1901
 
 =head1 SYNOPSIS
 
@@ -48,10 +48,6 @@ Modules marked with a date, in the C<CONTENTS>, are 10 years or older. But so
 what?  B<Music is older than agriculture.>
 
 =head1 CONTENTS
-
-L<Acme::Vuvuzela>
-
-L<App::Music::PlayTab>
 
 L<App::MusicTools>
 
@@ -112,8 +108,6 @@ L<Music::Harmonics>
 L<Music::Interval::Barycentric>
 
 L<Music::Intervals>
-
-L<Music::LilyPondUtil>
 
 L<Music::NeoRiemannianTonnetz>
 

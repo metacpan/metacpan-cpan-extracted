@@ -9,6 +9,7 @@ README
 dist.ini
 lib/App/DiffDocText.pm
 script/diff-doc-text
+script/diff-doc-text-between-conflicted-git-versions
 t/00-compile.t
 t/author-critic.t
 t/author-pod-coverage.t

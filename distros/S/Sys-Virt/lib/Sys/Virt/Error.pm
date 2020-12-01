@@ -868,6 +868,10 @@ Network port already exists
 
 No domain hostname found
 
+=item Sys::Virt::Error::ERR_CHECKPOINT_INCONSISTENT
+
+The checkpoint is inconsistent
+
 =back
 
 =head1 AUTHORS

@@ -639,6 +639,12 @@ MAPPING
     CBOR::XS::as_bytes $value
         Forces the value to be encoded as a (binary) string value.
 
+    CBOR::XS::as_bool $value
+        Converts a Perl boolean (which can be any kind of scalar) into a
+        CBOR boolean. Strictly the same, but shorter to write, than:
+
+           $value ? Types::Serialiser::true : Types::Serialiser::false
+
     CBOR::XS::as_float16 $value
         Forces half-float (IEEE 754 binary16) encoding of the given value.
 

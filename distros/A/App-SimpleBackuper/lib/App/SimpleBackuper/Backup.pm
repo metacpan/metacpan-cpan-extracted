@@ -13,6 +13,8 @@ use App::SimpleBackuper::_BlockDelete;
 use App::SimpleBackuper::_BlocksInfo;
 
 const my $SIZE_OF_TOP_FILES => 10;
+const my $SAVE_DB_PERIOD => 10 * 60;
+const my $PRINT_PROGRESS_PERIOD => 60;
 
 sub _proc_uid_gid($$$) {
 	my($uid, $gid, $uids_gids) = @_;
@@ -152,18 +154,37 @@ sub Backup {
 	}
 	delete $files_queues_by_priority{ $_ } foreach grep {! @{ $files_queues_by_priority{ $_ } }} keys %files_queues_by_priority;
 	
+	my $last_db_save = time;
+	my $last_print_progress = time;
 	while(%files_queues_by_priority) {
 		my($priority) = sort {$b <=> $a} keys %files_queues_by_priority;
 		my $task = shift @{ $files_queues_by_priority{$priority} };
 		delete $files_queues_by_priority{$priority} if ! @{ $files_queues_by_priority{$priority} };
 		my @next = _file_proc( $task, $options, $state );
 		unshift @{ $files_queues_by_priority{ $_->[1] } }, $_ foreach reverse @next;
+		
+		if($options->{verbose} and time - $last_print_progress > $PRINT_PROGRESS_PERIOD) {
+			_print_progress($state);
+			$last_print_progress = time;
+		}
+		
+		if(time - $last_db_save > $SAVE_DB_PERIOD) {
+			print "Saving database\n" if $options->{verbose};
+			_save_db($options, $state, \%dirs2upd);
+			$last_db_save = time;
+		}
 	}
 	
+	_save_db($options, $state, \%dirs2upd);
 	
-	while(my($full_path, $dir2upd) = each %dirs2upd) {
+	_print_progress($state) if ! $options->{quiet};
+}
+
+sub _save_db {
+	my($options, $state, $dirs2upd) = @_;
+	while(my($full_path, $dir2upd) = each %$dirs2upd) {
 		print "Updating dir $full_path..." if $options->{verbose};
-		my $file = $files->find_by_parent_id_name($dir2upd->{parent_id}, $dir2upd->{filename});
+		my $file = $state->{db}->{files}->find_by_parent_id_name($dir2upd->{parent_id}, $dir2upd->{filename});
 		my @stat = lstat($full_path);
 		next if ! @stat;
 		my($uid, $gid) =_proc_uid_gid($stat[4], $stat[5], $state->{db}->{uids_gids});
@@ -194,25 +215,19 @@ sub Backup {
 				parts			=> [],
 			}
 		}
-		$files->upsert({ id => $file->{id}, parent_id => $file->{parent_id} }, $file);
+		$state->{db}->{files}->upsert({ id => $file->{id}, parent_id => $file->{parent_id} }, $file);
 		print "OK\n" if $options->{verbose};
 	}
 	
 	App::SimpleBackuper::BackupDB($options, $state);
-	
-	_print_progress($state, 1) if ! $options->{quiet};
 }
 
 sub _print_progress {
-	state $last_print_time = 0;
-	return if time - $last_print_time < 60 and ! $_[1];
-	
 	print "Progress: ";
 	if($_[0]->{bytes_in_last_backup}) {
 		printf "processed %s of %s in last backup, ", fmt_weight($_[0]->{bytes_processed}), fmt_weight($_[0]->{bytes_in_last_backup});
 	}
 	printf "total backups weight %s.\n", fmt_weight($_[0]->{total_weight});
-	$last_print_time = time;
 }
 
 use Text::Glob qw(match_glob);
@@ -221,8 +236,6 @@ use App::SimpleBackuper::RegularFile;
 
 sub _file_proc {
 	my($task, $options, $state) = @_;
-	
-	_print_progress($state) if $options->{verbose};
 	
 	confess "No task" if ! $task;
 	confess "No filepath" if ! $task->[0];

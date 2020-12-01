@@ -14,14 +14,19 @@ FP::Carp - report to immediate caller
 =head1 SYNOPSIS
 
     use FP::Carp;
+
+    # Like `croak` but don't skip any parent call frames:
     sub foo {
         @_ == 1 or fp_croak "I need 1 argument";
     }
-    # Easier:
+
+    # Easier if you just want to report an error about the number of
+    # arguments passed to the current subroutine:
     sub bar {
-        @_ == 2 or fp_croak_nargs 2;
+        @_ == 2 or fp_croak_arity 2;
     }
-    sub tst {
+
+    sub test {
         foo(@_);
         bar(@_);
     }
@@ -31,9 +36,11 @@ FP::Carp - report to immediate caller
         $e=~ s/\n.*//s;
         $e
     }
-    is try { tst(10) }, 'bar: need 2 arguments at lib/FP/Carp.pm line 26';
-    is try { tst(10,11) }, 'I need 1 argument at lib/FP/Carp.pm line 25';
+    is try { test(10) }, 'bar: needs 2 arguments (got 1) at lib/FP/Carp.pm line 31';
+    is try { test(10,11) }, 'I need 1 argument at lib/FP/Carp.pm line 30';
 
+    # there is currently no equivalent to `carp`, or `confess` (use
+    # Devel::Confess instead?)
 
 =head1 DESCRIPTION
 
@@ -75,7 +82,7 @@ use warnings;
 use warnings FATAL => 'uninitialized';
 use Exporter "import";
 
-our @EXPORT      = qw(fp_croak fp_croak_nargs);
+our @EXPORT      = qw(fp_croak fp_croak_arity);
 our @EXPORT_OK   = qw();
 our %EXPORT_TAGS = (all => [@EXPORT, @EXPORT_OK]);
 
@@ -87,8 +94,8 @@ sub fp_croak {
     die "$msg at $reportloc\n"
 }
 
-sub fp_croak_nargs {
-    @_ <= 1 or warn "fp_croak_nargs: wrong number of arguments";
+sub fp_croak_arity {
+    @_ <= 1 or warn "fp_croak_arity: wrong number of arguments";
     my ($maybe_n) = @_;
 
     # maybe_n can be a range, or really any string.
@@ -96,16 +103,23 @@ sub fp_croak_nargs {
     my $msg = do {
         if (defined $maybe_n) {
             my $argumentS = $maybe_n eq "1" ? "argument" : "arguments";
-            "need $maybe_n $argumentS"
+            "needs $maybe_n $argumentS"
         } else {
             "wrong number of arguments"
         }
     };
-    my @f1      = caller(1);
+    my @f1;
+    my $nargs1;
+    {
+
+        package DB;
+        @f1     = caller(1);
+        $nargs1 = @DB::args;
+    }
     my $subname = $f1[3];
     $subname =~ s/^.*:://s;
     my $reportloc = "$f1[1] line $f1[2]";
-    die "$subname: $msg at $reportloc\n"
+    die "$subname: $msg (got $nargs1) at $reportloc\n"
 }
 
 1

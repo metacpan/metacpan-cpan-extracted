@@ -8,9 +8,12 @@ TODO: type cast tests.
 TODO: possibly implement https://peteroupc.github.io/CBOR/extended.html, but NaNs are nonportable. rely on libecb?
 TODO: https://github.com/svaarala/cbor-specs/blob/master/cbor-nonutf8-string-tags.rst, but maybe that is overkill?
 
+1.82 Tue Dec  1 02:47:40 CET 2020
+	- add CBOR::XS::as_bool cast function.
+
 1.81 Mon Nov 30 19:29:33 CET 2020
-	- cast funbctions were broken due to last-minute renaming. thats
-          what you egt for not havign a tessuite.
+	- cast functions were broken due to last-minute renaming. thats
+          what you get for not having a tessuite.
 	- Math::BigInt and Math::BigFloat are pretty broken (again),
           so disable some tests. (try printing the bigfloat
           799999999999999999998E99999999999999999998).

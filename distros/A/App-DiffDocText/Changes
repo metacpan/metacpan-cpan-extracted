@@ -1,3 +1,10 @@
+0.002   2020-12-01  Released-By: PERLANCAR; Urgency: medium
+
+	- Add script: diff-doc-text-between-conflicted-git-versions.
+
+	- Use CLI::MetaUtil::Getopt::Long & CLI::Meta::diff.
+
+
 0.001   2020-08-22  Released-By: PERLANCAR
 
         - First release.

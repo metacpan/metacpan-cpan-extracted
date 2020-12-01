@@ -1,12 +1,12 @@
 #!perl
 
 # Note: This script is a CLI for Riap function /Complete/Module/complete_module
-# and generated automatically using Perinci::CmdLine::Gen version 0.496
+# and generated automatically using Perinci::CmdLine::Gen version 0.497
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-04-19'; # DATE
+our $DATE = '2020-08-02'; # DATE
 our $DIST = 'App-CompleteCLIs'; # DIST
-our $VERSION = '0.146'; # VERSION
+our $VERSION = '0.147'; # VERSION
 
 use 5.010001;
 use strict;
@@ -38,13 +38,17 @@ complete-module - Complete with installed Perl module names
 
 =head1 VERSION
 
-This document describes version 0.146 of complete-module (from Perl distribution App-CompleteCLIs), released on 2020-04-19.
+This document describes version 0.147 of complete-module (from Perl distribution App-CompleteCLIs), released on 2020-08-02.
 
 =head1 SYNOPSIS
 
 Usage:
 
- % complete-module [options] <word>
+ % complete-module [--find-pm] [--find-pmc] [--find-pod] [--find-prefix]
+     [--format=name] [--json] [--(no)naked-res] [--no-find-pm]
+     [--no-find-pmc] [--no-find-pod] [--no-find-prefix] [--nofind-pm]
+     [--nofind-pmc] [--nofind-pod] [--nofind-prefix] [--ns-prefix=s]
+     [--page-result[=program]] [--path-sep=s] <word>
 
 =head1 DESCRIPTION
 

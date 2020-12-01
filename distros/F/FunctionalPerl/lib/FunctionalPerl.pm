@@ -46,7 +46,7 @@ Tags can be expanded via:
     my ($modules, $unused_tags, $nontags) = expand_import_tags(qw(:dev :most not_a_tag));
     is $$modules{"FP::Failure"}, 2; # number of times used.
     is_deeply $unused_tags,
-              [':all', ':ast', ':csv', ':dbi', ':fix', ':git', ':io', ':path', ':pxml', ':rare', ':trampoline', ':transparentlazy'];
+              [':all', ':ast', ':csv', ':dbi', ':fix', ':git', ':io', ':paths', ':pxml', ':rare', ':trampolines', ':transparentlazy'];
     is_deeply $nontags, ['not_a_tag'];
 
 =head1 SEE ALSO
@@ -75,45 +75,45 @@ C<:doc> -> L<FP::Docstring>
 
 C<:equal> -> L<FP::Equal>
 
-C<:failure> -> L<FP::Failure>
+C<:failures> -> L<FP::Failure>
 
 C<:fix> -> L<FP::fix>
 
-C<:functions> -> C<:equal>, C<:failure>, C<:show>, L<FP::Combinators>, L<FP::Combinators2>, L<FP::Currying>, L<FP::Div>, L<FP::Memoizing>, L<FP::Ops>, L<FP::Optional>, L<FP::Predicates>, L<FP::Untainted>, L<FP::Values>
+C<:functions> -> C<:equal>, C<:failures>, C<:show>, L<FP::Combinators>, L<FP::Combinators2>, L<FP::Currying>, L<FP::Div>, L<FP::Memoizing>, L<FP::Ops>, L<FP::Optional>, L<FP::Predicates>, L<FP::Untainted>, L<FP::Values>
 
 C<:git> -> L<FP::Git::Repository>
 
 C<:io> -> L<Chj::tempdir>, L<Chj::xIO>, L<Chj::xhome>, L<Chj::xopen>, L<Chj::xopendir>, L<Chj::xoutpipe>, L<Chj::xperlfunc>, L<Chj::xpipe>, L<Chj::xtmpfile>, L<FP::IOStream>
 
-C<:lazy> -> C<:stream>, L<FP::Lazy>, L<FP::Weak>
+C<:lazy> -> C<:streams>, L<FP::Lazy>, L<FP::Weak>
 
 C<:maps> -> L<FP::Hash>, L<FP::PureHash>
 
-C<:most> -> C<:autobox>, C<:datastructures>, C<:debug>, C<:doc>, C<:equal>, C<:failure>, C<:functions>, C<:lazy>, C<:show>
+C<:most> -> C<:autobox>, C<:datastructures>, C<:debug>, C<:doc>, C<:equal>, C<:failures>, C<:functions>, C<:lazy>, C<:show>
 
 C<:numbers> -> L<FP::BigInt>
 
-C<:path> -> L<FP::Path>
+C<:paths> -> L<FP::Path>
 
 C<:pxml> -> L<PXML::Serialize>, L<PXML::Util>, L<PXML::XHTML>
 
-C<:rare> -> C<:csv>, C<:dbi>, C<:fix>, C<:git>, C<:path>, C<:trampoline>
+C<:rare> -> C<:csv>, C<:dbi>, C<:fix>, C<:git>, C<:paths>, C<:trampolines>
 
 C<:repl> -> L<FP::Repl>, L<FP::Repl::AutoTrap>
 
-C<:sequences> -> C<:stream>, L<FP::Array>, L<FP::Array_sort>, L<FP::List>, L<FP::MutableArray>, L<FP::PureArray>, L<FP::StrictList>
+C<:sequences> -> C<:streams>, L<FP::Array>, L<FP::Array_sort>, L<FP::List>, L<FP::MutableArray>, L<FP::PureArray>, L<FP::StrictList>
 
 C<:sets> -> L<FP::HashSet>, L<FP::OrderedCollection>
 
 C<:show> -> L<FP::Show>
 
-C<:stream> -> L<FP::IOStream>, L<FP::Stream>, L<FP::Weak>
+C<:streams> -> L<FP::IOStream>, L<FP::Stream>, L<FP::Weak>
 
 C<:test> -> L<Chj::TEST>
 
-C<:trampoline> -> L<FP::Trampoline>
+C<:trampolines> -> L<FP::Trampoline>
 
-C<:transparentlazy> -> C<:stream>, L<FP::TransparentLazy>, L<FP::Weak>
+C<:transparentlazy> -> C<:streams>, L<FP::TransparentLazy>, L<FP::Weak>
 
 C<:tries> -> L<FP::Trie>
 
@@ -137,7 +137,7 @@ our @EXPORT      = ();
 our @EXPORT_OK   = qw(expand_import_tags);
 our %EXPORT_TAGS = ();
 
-our $VERSION = "0.72.39";
+our $VERSION = "0.72.40";
 
 # Export tag to modules and/or other tags; each module will be
 # imported with ":all" by default. Where a module name contains " = ",
@@ -148,10 +148,10 @@ our $VERSION = "0.72.39";
 our $export_desc = +{
     ":autobox" => [qw(FP::autobox=)],
 
-    ":stream"          => [qw(FP::Stream FP::IOStream FP::Weak)],
-    ":lazy"            => [qw(FP::Lazy :stream FP::Weak)],
-    ":transparentlazy" => [qw(FP::TransparentLazy :stream FP::Weak)],
-    ":failure"         => [qw(FP::Failure)],
+    ":streams"         => [qw(FP::Stream FP::IOStream FP::Weak)],
+    ":lazy"            => [qw(FP::Lazy :streams FP::Weak)],
+    ":transparentlazy" => [qw(FP::TransparentLazy :streams FP::Weak)],
+    ":failures"        => [qw(FP::Failure)],
 
     ":doc"   => [qw(FP::Docstring)],
     ":show"  => [qw(FP::Show)],
@@ -168,7 +168,7 @@ our $export_desc = +{
             FP::Optional FP::Values
             FP::Memoizing FP::Currying
             FP::Untainted
-            :show :equal :failure)
+            :show :equal :failures)
     ],
     ":git"  => [qw(FP::Git::Repository)],
     ":pxml" => [qw(PXML::Util PXML::XHTML PXML::Serialize)],
@@ -180,7 +180,7 @@ our $export_desc = +{
         qw(FP::List FP::StrictList FP::MutableArray
             FP::Array FP::Array_sort
             FP::PureArray
-            :stream)
+            :streams)
     ],
     ":maps"           => [qw(FP::Hash FP::PureHash)],
     ":sets"           => [qw(FP::HashSet FP::OrderedCollection)],
@@ -196,15 +196,15 @@ our $export_desc = +{
     ":dbi" => [qw(FP::DBI=)],
     ":csv" => [qw(FP::Text::CSV)],
 
-    ":fix"        => [qw(FP::fix)],
-    ":trampoline" => [qw(FP::Trampoline)],
-    ":path"       => [qw(FP::Path)],
+    ":fix"         => [qw(FP::fix)],
+    ":trampolines" => [qw(FP::Trampoline)],
+    ":paths"       => [qw(FP::Path)],
 
     ":most" => [
-        qw(:lazy :datastructures :equal :show :functions :failure :debug
+        qw(:lazy :datastructures :equal :show :functions :failures :debug
             :autobox :doc)
     ],
-    ":rare" => [qw(:csv :path :git :dbi  :trampoline :fix)],
+    ":rare" => [qw(:csv :paths :git :dbi  :trampolines :fix)],
     ":all"  => [qw(:most :rare :io :dev)],
 };
 

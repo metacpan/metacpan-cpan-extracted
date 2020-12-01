@@ -1,8 +1,9 @@
 package Test::Files;
-use Test::Builder;
-use Text::Diff;
+
 use File::Find;
 use File::Spec;
+use Test::Builder;
+use Text::Diff;
 
 use strict;
 use warnings;  # This is off in Test::More, eventually it may have to go.
@@ -22,7 +23,7 @@ our @EXPORT = qw(
     compare_dirs_filter_ok
 );
 
-our $VERSION = '0.14';
+our $VERSION = '0.15';
 
 my $Test = Test::Builder->new;
 my $diff_options = {
@@ -185,9 +186,8 @@ sub _dir_missing_helper {
     unless (-d $base_dir) {
         return(0, "$base_dir absent");
     }
-    if (index(ref $list, 'ARRAY') < 0) {
+    if (ref($list) ne 'ARRAY') {
         return(0, "$function requires array ref as second arg");
-        return;
     }
 
     my @missing;
@@ -296,7 +296,7 @@ sub compare_dirs_filter_ok {
         $Test->diag("$second_dir is not a valid directory");
         return;
     }
-    unless (not defined $filter or ref($filter) =~ /CODE/) {
+    unless (not defined $filter or ref($filter) eq 'CODE') {
         $Test->ok(0, $filter);
         $Test->diag(
             "Third argument to compare_dirs_filter_ok must be "
@@ -412,7 +412,7 @@ Test::Files - A Test::Builder based module to ease testing with files and dirs
 =head1 DESCRIPTION
 
 This module is like Test::More, in fact you should use that first as shown
-above.  It exports
+above. It exports
 
 =over 4
 
@@ -521,10 +521,10 @@ the first one has.
 
 =head1 DEPENDENCIES
 
+    Algorithm::Diff
     Test::Builder
     Test::More
     Text::Diff
-    Algorithm::Diff
     Test::Builder::Tester (used only during testing)
 
 =head1 SEE ALSO
@@ -535,10 +535,12 @@ This module really just adds functions to what Test::More does.
 =head1 AUTHOR
 
 Phil Crow, E<lt>philcrow2000@yahoo.com<gt>
+Jurij Fajnberg, E<lt>fajnbergj@gmail.com<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
 Copyright 2003-2007 by Phil Crow
+Copyright 2020 by Jurij Fajnberg
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl 5.8.1 itself. 

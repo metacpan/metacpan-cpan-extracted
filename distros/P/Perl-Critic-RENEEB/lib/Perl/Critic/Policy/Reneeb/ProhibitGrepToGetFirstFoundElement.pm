@@ -12,7 +12,7 @@ use Perl::Critic::Utils qw{ :severities };
 
 use base 'Perl::Critic::Policy';
 
-our $VERSION = '2.04';
+our $VERSION = '2.05';
 
 #-----------------------------------------------------------------------------
 
@@ -67,7 +67,7 @@ Perl::Critic::Policy::Reneeb::ProhibitGrepToGetFirstFoundElement - Use List::Uti
 
 =head1 VERSION
 
-version 2.04
+version 2.05
 
 =head1 DESCRIPTION
 

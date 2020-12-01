@@ -1189,6 +1189,48 @@ _domain_event_block_threshold_callback(virConnectPtr con,
 
 
 static int
+_domain_event_memory_failure_callback(virConnectPtr con,
+				      virDomainPtr dom,
+				      int recipient,
+				      int action,
+				      unsigned int flags,
+				      void *opaque)
+{
+    AV *data = opaque;
+    SV **self;
+    SV **cb;
+    SV *domref;
+    dSP;
+
+    self = av_fetch(data, 0, 0);
+    cb = av_fetch(data, 1, 0);
+
+    SvREFCNT_inc(*self);
+
+    ENTER;
+    SAVETMPS;
+
+    PUSHMARK(SP);
+    XPUSHs(*self);
+    domref = sv_newmortal();
+    sv_setref_pv(domref, "Sys::Virt::Domain", (void *) dom);
+    virDomainRef(dom);
+    XPUSHs(domref);
+    XPUSHs(sv_2mortal(newSViv(recipient)));
+    XPUSHs(sv_2mortal(newSViv(action)));
+    XPUSHs(sv_2mortal(newSViv(flags)));
+    PUTBACK;
+
+    call_sv(*cb, G_DISCARD);
+
+    FREETMPS;
+    LEAVE;
+
+    return 0;
+}
+
+
+static int
 _network_event_lifecycle_callback(virConnectPtr con,
 				  virNetworkPtr net,
 				  int event,
@@ -3759,6 +3801,9 @@ PREINIT:
           break;
       case VIR_DOMAIN_EVENT_ID_BLOCK_THRESHOLD:
           callback = VIR_DOMAIN_EVENT_CALLBACK(_domain_event_block_threshold_callback);
+          break;
+      case VIR_DOMAIN_EVENT_ID_MEMORY_FAILURE:
+          callback = VIR_DOMAIN_EVENT_CALLBACK(_domain_event_memory_failure_callback);
           break;
       default:
           callback = VIR_DOMAIN_EVENT_CALLBACK(_domain_event_generic_callback);
@@ -6724,6 +6769,57 @@ backup_get_xml_description(dom, flags=0)
       RETVAL
 
 void
+authorized_ssh_keys_get(dom, user, flags = 0)
+      virDomainPtr dom;
+      const char *user;
+      unsigned int flags;
+  PREINIT:
+      int ret;
+      char **keys = NULL;
+      unsigned int i;
+  PPCODE:
+      if ((ret = virDomainAuthorizedSSHKeysGet(dom, user, &keys, flags)) < 0)
+          _croak_error();
+
+      EXTEND(SP, ret);
+      for (i = 0 ; i < ret ; i++) {
+          PUSHs(sv_2mortal(newSVpv(keys[i], 0)));
+          free(keys[i]);
+      }
+      free(keys);
+
+void
+authorized_ssh_keys_set(dom, user, keysSV, flags = 0)
+      virDomainPtr dom;
+      const char *user;
+      SV *keysSV;
+      unsigned int flags;
+  PREINIT:
+      AV *keysAV;
+      const char **keys;
+      unsigned int nkeys;
+      unsigned int i;
+  PPCODE:
+      keysAV = (AV*)SvRV(keysSV);
+      nkeys = av_len(keysAV) + 1;
+      if (nkeys) {
+          Newx(keys, nkeys, const char *);
+          for (i = 0 ; i < nkeys ; i++) {
+              SV **mountPoint = av_fetch(keysAV, i, 0);
+              keys[i] = SvPV_nolen(*mountPoint);
+          }
+      } else {
+	  keys = NULL;
+      }
+
+      if (virDomainAuthorizedSSHKeysSet(dom, user, keys, nkeys, flags) < 0) {
+          Safefree(keys);
+          _croak_error();
+      }
+
+      Safefree(keys);
+      
+void
 destroy(dom_rv, flags=0)
       SV *dom_rv;
       unsigned int flags;
@@ -9131,6 +9227,7 @@ BOOT:
       REGISTER_CONSTANT(VIR_CONNECT_BASELINE_CPU_MIGRATABLE, BASELINE_CPU_MIGRATABLE);
 
       REGISTER_CONSTANT(VIR_CONNECT_COMPARE_CPU_FAIL_INCOMPATIBLE, COMPARE_CPU_FAIL_INCOMPATIBLE);
+      REGISTER_CONSTANT(VIR_CONNECT_COMPARE_CPU_VALIDATE_XML, COMPARE_CPU_VALIDATE_XML);
 
       REGISTER_CONSTANT(VIR_IP_ADDR_TYPE_IPV4, IP_ADDR_TYPE_IPV4);
       REGISTER_CONSTANT(VIR_IP_ADDR_TYPE_IPV6, IP_ADDR_TYPE_IPV6);
@@ -9320,6 +9417,9 @@ BOOT:
       REGISTER_CONSTANT(VIR_VCPU_OFFLINE, VCPU_OFFLINE);
       REGISTER_CONSTANT(VIR_VCPU_RUNNING, VCPU_RUNNING);
       REGISTER_CONSTANT(VIR_VCPU_BLOCKED, VCPU_BLOCKED);
+
+      REGISTER_CONSTANT(VIR_VCPU_INFO_CPU_OFFLINE, VCPU_INFO_CPU_OFFLINE);
+      REGISTER_CONSTANT(VIR_VCPU_INFO_CPU_UNAVAILABLE, VCPU_INFO_CPU_UNAVAILABLE);
 
 
       REGISTER_CONSTANT(VIR_KEYCODE_SET_LINUX, KEYCODE_SET_LINUX);
@@ -9530,6 +9630,7 @@ BOOT:
       REGISTER_CONSTANT(VIR_DOMAIN_EVENT_ID_DEVICE_REMOVAL_FAILED, EVENT_ID_DEVICE_REMOVAL_FAILED);
       REGISTER_CONSTANT(VIR_DOMAIN_EVENT_ID_METADATA_CHANGE, EVENT_ID_METADATA_CHANGE);
       REGISTER_CONSTANT(VIR_DOMAIN_EVENT_ID_BLOCK_THRESHOLD, EVENT_ID_BLOCK_THRESHOLD);
+      REGISTER_CONSTANT(VIR_DOMAIN_EVENT_ID_MEMORY_FAILURE, EVENT_ID_MEMORY_FAILURE);
 
       REGISTER_CONSTANT(VIR_DOMAIN_EVENT_WATCHDOG_NONE, EVENT_WATCHDOG_NONE);
       REGISTER_CONSTANT(VIR_DOMAIN_EVENT_WATCHDOG_PAUSE, EVENT_WATCHDOG_PAUSE);
@@ -9917,6 +10018,21 @@ BOOT:
       REGISTER_CONSTANT(VIR_DOMAIN_GET_HOSTNAME_LEASE, GET_HOSTNAME_LEASE);
 
 
+      REGISTER_CONSTANT(VIR_DOMAIN_EVENT_MEMORY_FAILURE_ACTION_IGNORE, EVENT_MEMORY_FAILURE_ACTION_IGNORE);
+      REGISTER_CONSTANT(VIR_DOMAIN_EVENT_MEMORY_FAILURE_ACTION_INJECT, EVENT_MEMORY_FAILURE_ACTION_INJECT);
+      REGISTER_CONSTANT(VIR_DOMAIN_EVENT_MEMORY_FAILURE_ACTION_FATAL, EVENT_MEMORY_FAILURE_ACTION_FATAL);
+      REGISTER_CONSTANT(VIR_DOMAIN_EVENT_MEMORY_FAILURE_ACTION_RESET, EVENT_MEMORY_FAILURE_ACTION_RESET);
+
+      REGISTER_CONSTANT(VIR_DOMAIN_EVENT_MEMORY_FAILURE_RECIPIENT_HYPERVISOR, EVENT_MEMORY_FAILURE_RECIPIENT_HYPERVISOR);
+      REGISTER_CONSTANT(VIR_DOMAIN_EVENT_MEMORY_FAILURE_RECIPIENT_GUEST, EVENT_MEMORY_FAILURE_RECIPIENT_GUEST);
+
+      REGISTER_CONSTANT(VIR_DOMAIN_MEMORY_FAILURE_ACTION_REQUIRED, MEMORY_FAILURE_ACTION_REQUIRED);
+      REGISTER_CONSTANT(VIR_DOMAIN_MEMORY_FAILURE_RECURSIVE, MEMORY_FAILURE_RECURSIVE);
+
+      REGISTER_CONSTANT(VIR_DOMAIN_AUTHORIZED_SSH_KEYS_SET_APPEND, AUTHORIZED_SSH_KEYS_SET_APPEND);
+      REGISTER_CONSTANT(VIR_DOMAIN_AUTHORIZED_SSH_KEYS_SET_REMOVE, AUTHORIZED_SSH_KEYS_SET_REMOVE);
+
+
       stash = gv_stashpv( "Sys::Virt::DomainSnapshot", TRUE );
       REGISTER_CONSTANT(VIR_DOMAIN_SNAPSHOT_DELETE_CHILDREN, DELETE_CHILDREN);
       REGISTER_CONSTANT(VIR_DOMAIN_SNAPSHOT_DELETE_METADATA_ONLY, DELETE_METADATA_ONLY);
@@ -9960,6 +10076,7 @@ BOOT:
 
       REGISTER_CONSTANT(VIR_DOMAIN_CHECKPOINT_CREATE_REDEFINE, CREATE_REDEFINE);
       REGISTER_CONSTANT(VIR_DOMAIN_CHECKPOINT_CREATE_QUIESCE, CREATE_QUIESCE);
+      REGISTER_CONSTANT(VIR_DOMAIN_CHECKPOINT_CREATE_REDEFINE_VALIDATE, CREATE_REDEFINE_VALIDATE);
 
       REGISTER_CONSTANT(VIR_DOMAIN_CHECKPOINT_LIST_ROOTS, LIST_ROOTS);
       REGISTER_CONSTANT(VIR_DOMAIN_CHECKPOINT_LIST_DESCENDANTS, LIST_DESCENDANTS);
@@ -10107,6 +10224,7 @@ BOOT:
       REGISTER_CONSTANT(VIR_CONNECT_LIST_NODE_DEVICES_CAP_MDEV_TYPES, LIST_CAP_MDEV_TYPES);
       REGISTER_CONSTANT(VIR_CONNECT_LIST_NODE_DEVICES_CAP_CCW_DEV, LIST_CAP_CCW_DEV);
       REGISTER_CONSTANT(VIR_CONNECT_LIST_NODE_DEVICES_CAP_CSS_DEV, LIST_CAP_CSS_DEV);
+      REGISTER_CONSTANT(VIR_CONNECT_LIST_NODE_DEVICES_CAP_VDPA, LIST_CAP_VDPA);
 
       REGISTER_CONSTANT(VIR_NODE_DEVICE_EVENT_ID_LIFECYCLE, EVENT_ID_LIFECYCLE);
       REGISTER_CONSTANT(VIR_NODE_DEVICE_EVENT_ID_UPDATE, EVENT_ID_UPDATE);
@@ -10375,4 +10493,5 @@ BOOT:
       REGISTER_CONSTANT(VIR_ERR_INVALID_NETWORK_PORT, ERR_INVALID_NETWORK_PORT);
       REGISTER_CONSTANT(VIR_ERR_NETWORK_PORT_EXIST, ERR_NETWORK_PORT_EXIST);
       REGISTER_CONSTANT(VIR_ERR_NO_HOSTNAME, ERR_NO_HOSTNAME);
+      REGISTER_CONSTANT(VIR_ERR_CHECKPOINT_INCONSISTENT, ERR_CHECKPOINT_INCONSISTENT);
     }

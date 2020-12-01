@@ -66,7 +66,7 @@ package CBOR::XS;
 
 use common::sense;
 
-our $VERSION = 1.81;
+our $VERSION = 1.82;
 our @ISA = qw(Exporter);
 
 our @EXPORT = qw(encode_cbor decode_cbor);
@@ -731,6 +731,13 @@ Forces the value to be encoded as (UTF-8) text values.
 
 Forces the value to be encoded as a (binary) string value.
 
+=item CBOR::XS::as_bool $value
+
+Converts a Perl boolean (which can be any kind of scalar) into a CBOR
+boolean. Strictly the same, but shorter to write, than:
+
+   $value ? Types::Serialiser::true : Types::Serialiser::false
+
 =item CBOR::XS::as_float16 $value
 
 Forces half-float (IEEE 754 binary16) encoding of the given value.
@@ -767,6 +774,8 @@ sub CBOR::XS::as_text    ($) { bless [$_[0], 3, undef], CBOR::XS::Tagged:: }
 sub CBOR::XS::as_float16 ($) { bless [$_[0], 4, undef], CBOR::XS::Tagged:: }
 sub CBOR::XS::as_float32 ($) { bless [$_[0], 5, undef], CBOR::XS::Tagged:: }
 sub CBOR::XS::as_float64 ($) { bless [$_[0], 6, undef], CBOR::XS::Tagged:: }
+
+sub CBOR::XS::as_bool    ($) { $_[0] ? $Types::Serialiser::true : $Types::Serialiser::false }
 
 =head2 OBJECT SERIALISATION
 

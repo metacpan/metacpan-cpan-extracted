@@ -9,7 +9,7 @@ WriteMakefile(
   MIN_PERL_VERSION => 5.010001,
   NAME => 'GraphViz2::Parse::RecDescent',
   PREREQ_PM => {
-    'GraphViz2' => '2.48',
+    'GraphViz2' => '2.62',
     'Moo' => '2.001001',
     'Parse::RecDescent' => 1.965001,
   },

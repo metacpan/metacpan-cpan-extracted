@@ -6,14 +6,15 @@ use warnings;
 
 use Test::More;
 
-plan tests => 2 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 3 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'App/DiffXlsText.pm'
 );
 
 my @scripts = (
-    'script/diff-xls-text'
+    'script/diff-xls-text',
+    'script/diff-xls-text-between-conflicted-git-versions'
 );
 
 # no fake home requested

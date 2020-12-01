@@ -24,7 +24,7 @@
   },
   'cat' => {
     'attributes' => {
-      'label' => '<reject: $arg\\[0\\] ne \'meows\'> \'cat\'   '
+      'label' => '<reject: $arg[0] ne \'meows\'> \'cat\'   '
     }
   },
   'defn' => {
@@ -44,7 +44,7 @@
   },
   'id' => {
     'attributes' => {
-      'label' => '/\\[a-z\\]		# LEADING ALPHABETIC\\\\n		  \\\\w*		# FOLLOWED BY ALPHAS, DIGITS, OR UNDERSCORES\\\\n		 /ix  '
+      'label' => '/[a-z]		# LEADING ALPHABETIC\\\\n		  \\\\w*		# FOLLOWED BY ALPHAS, DIGITS, OR UNDERSCORES\\\\n		 /ix  '
     }
   },
   'is' => {
@@ -59,7 +59,7 @@
   },
   'notname' => {
     'attributes' => {
-      'label' => '/\\[a-z\\]\\\\w*/i  '
+      'label' => '/[a-z]\\\\w*/i  '
     }
   },
   'test1' => {
@@ -69,7 +69,7 @@
   },
   'test2' => {
     'attributes' => {
-      'label' => '$arg{article} $arg\\[3\\]\\[$arg{sound}\\]  '
+      'label' => '$arg{article} $arg[3][$arg{sound}]  '
     }
   },
   'test3' => {

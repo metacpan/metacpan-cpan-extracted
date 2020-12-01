@@ -37,42 +37,17 @@ plugin 'Probe::CBuilder' => (
   # libzookeeper_st, which they strongly recommend not using,
   # and libzookeeper_mt, which is actually just libzookeeper.
   # So probe for both:
-  libs    => '-lzookeeper',
-  %zk_probe_args,
-);
-
-plugin 'Probe::CBuilder' => (
-  # directly building the zk C source gets you a libzookeper
-  # using the maven build gets you two libraries:
-  # libzookeeper_st, which they strongly recommend not using,
-  # and libzookeeper_mt, which is actually just libzookeeper.
-  # So probe for both:
   libs    => '-lzookeeper_mt',
   %zk_probe_args,
 );
 
 share {
-    # versions newer than 3.5.6 don't include the pre-generated files needed to
-    # compile libzookeeper, and instead need java and maven -- so stick with
-    # 3.5.6 for now.  See https://issues.apache.org/jira/browse/ZOOKEEPER-3820
-    # for details.
+    # this is https://github.com/Hugmeir/zookeeper/tree/all-patches-for-p5-alien-libzookeeper
     plugin Download => (
-        url     => 'https://archive.apache.org/dist/zookeeper/zookeeper-3.5.6/apache-zookeeper-3.5.6.tar.gz',
-        version => qr/(?:apache-zookeeper|zookeeper-release)-([0-9\.]+)\.tar\.gz$/,
+        url     => 'https://github.com/hugmeir/zookeeper/archive/4b6b9dc0a6a419958ab27af8699e8417ab0f8dac.tar.gz',
     );
 
     plugin Extract => 'tar.gz';
-
-    # Patch CMakeLists.txt so that it has a `make install` target,
-    # and so that the target also creates a pkg-config file for us.
-    # See https://issues.apache.org/jira/browse/ZOOKEEPER-4012
-    # for details
-    patch [
-        '%{patch} -p1 < %{.install.patch}/0001-add-pkg-config-template.patch',
-        '%{patch} -p1 < %{.install.patch}/0002-add-make-install-target.patch',
-        '%{patch} -p1 < %{.install.patch}/0003-statically-link-libzookeeper-against-the-hashmap-impl-it-needs.patch',
-        '%{patch} -p1 < %{.install.patch}/0004-zookeeper.c-use-after-free-patched-upstream.patch',
-    ];
 
     plugin 'Build::CMake' => ();
     build [
@@ -82,6 +57,7 @@ share {
                 '-DCMAKE_BUILD_TYPE=Release', # release, no debug symbols
                 '-DWANT_SYNCAPI=ON',          # sync and async symbols
                 '-DWANT_CPPUNIT=OFF',         # we don't run `make test`
+                '-DWITH_CYRUS_SASL:BOOL=OFF', # TODO: should probe for sasl
                 @{ meta->prop->{plugin_build_cmake}->{args} },
                 '%{.install.extract}/zookeeper-client/zookeeper-client-c',
         ],

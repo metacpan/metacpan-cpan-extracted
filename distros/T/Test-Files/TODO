@@ -60,3 +60,8 @@ any needed changes.  If the line should be omitted, it should return "".
 I want compare_filer_ok($file1, $file2, $filter) to work like
 compare_dirs_filter but one file at a time
 (implemented in 0.06)
+
+#-----------------------------------------------------
+
+The version 0.15 causes a lot of warning being processed by Perl::Critic
+so that some style changes may improve further maintainability.

@@ -1,12 +1,12 @@
 #!perl
 
 # Note: This script is a CLI for Riap function /Complete/Regexp/Pattern/complete_regexp_pattern_module
-# and generated automatically using Perinci::CmdLine::Gen version 0.496
+# and generated automatically using Perinci::CmdLine::Gen version 0.497
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-04-19'; # DATE
+our $DATE = '2020-08-02'; # DATE
 our $DIST = 'App-CompleteCLIs'; # DIST
-our $VERSION = '0.146'; # VERSION
+our $VERSION = '0.147'; # VERSION
 
 use 5.010001;
 use strict;
@@ -38,13 +38,14 @@ complete-regexp-pattern-module - Complete with Regexp::Pattern::* module, withou
 
 =head1 VERSION
 
-This document describes version 0.146 of complete-regexp-pattern-module (from Perl distribution App-CompleteCLIs), released on 2020-04-19.
+This document describes version 0.147 of complete-regexp-pattern-module (from Perl distribution App-CompleteCLIs), released on 2020-08-02.
 
 =head1 SYNOPSIS
 
 Usage:
 
- % complete-regexp-pattern-module [options] <word>
+ % complete-regexp-pattern-module [--format=name] [--json]
+     [--(no)naked-res] [--page-result[=program]] [--path-sep=s] <word>
 
 =head1 DESCRIPTION
 

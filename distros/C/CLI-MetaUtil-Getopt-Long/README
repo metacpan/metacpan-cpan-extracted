@@ -1,0 +1,57 @@
+NAME
+    CLI::MetaUtil::Getopt::Long - Routine related to Getopt::Long
+
+VERSION
+    This document describes version 0.002 of CLI::MetaUtil::Getopt::Long
+    (from Perl distribution CLI-MetaUtil-Getopt-Long), released on
+    2020-12-01.
+
+SYNOPSIS
+FUNCTIONS
+  GetOptionsCLIWrapper
+    Usage:
+
+     GetOptionsCLIWrapper(%args) -> any
+
+    Get options for a CLI wrapper.
+
+    This routine can be used to get options for your CLI wrapper. For
+    example, if you are creating a wrapper for the "diff" command, this
+    routine will let you collect all known "diff" options (declared in
+    CLI::Meta::diff) while letting you add new options.
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   add_opts => *hash*
+
+    *   cli* => *str*
+
+    Return value: (any)
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/CLI-MetaUtil-Getopt-Long>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-CLI-MetaUtil-Getopt-Long>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=CLI-MetaUtil-Getopt-L
+    ong>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2020 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

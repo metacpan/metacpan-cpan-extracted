@@ -64,12 +64,21 @@ subtest use_it => sub {
 subtest cleanup => sub {
     my $db = get_db {drivers => \@drivers, load_sql => \%load};
     my $dir = $db->dir;
-    my $pid = $db->pid;
 
     ok(-d $dir, "Can see the db dir");
 
     $db = undef;
-    ok(!-d $dir, "Cleaned up the dir when done");
+
+    my $start = time;
+    my $dir_gone = 0;
+    while (1) {
+        $dir_gone ||= !-d $dir;
+        last if $dir_gone;
+        last if time - $start > 10;
+        sleep 0.2;
+    }
+
+    ok($dir_gone, "Cleaned up the dir when done");
 };
 
 done_testing;

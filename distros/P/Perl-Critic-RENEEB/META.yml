@@ -15,30 +15,31 @@ name: Perl-Critic-RENEEB
 provides:
   Perl::Critic::Policy::RegularExpressions::RequireExtendedFormattingExceptForSplit:
     file: lib/Perl/Critic/Policy/RegularExpressions/RequireExtendedFormattingExceptForSplit.pm
-    version: '2.04'
+    version: '2.05'
   Perl::Critic::Policy::Reneeb::Capitalization:
     file: lib/Perl/Critic/Policy/Reneeb/Capitalization.pm
-    version: '2.04'
+    version: '2.05'
   Perl::Critic::Policy::Reneeb::ProhibitBlockEval:
     file: lib/Perl/Critic/Policy/Reneeb/ProhibitBlockEval.pm
-    version: '2.04'
+    version: '2.05'
   Perl::Critic::Policy::Reneeb::ProhibitGrepToGetFirstFoundElement:
     file: lib/Perl/Critic/Policy/Reneeb/ProhibitGrepToGetFirstFoundElement.pm
-    version: '2.04'
+    version: '2.05'
   Perl::Critic::Policy::Reneeb::RequirePostderef:
     file: lib/Perl/Critic/Policy/Reneeb/RequirePostderef.pm
-    version: '2.04'
+    version: '2.05'
   Perl::Critic::RENEEB:
     file: lib/Perl/Critic/RENEEB.pm
-    version: '2.04'
+    version: '2.05'
 requires:
+  PPI: '1.270'
   Perl::Critic: '1.126'
   Readonly: '1.03'
 resources:
   bugtracker: https://github.com/reneeb/Perl-Critic-RENEEB/issues
   homepage: https://github.com/reneeb/Perl-Critic-RENEEB
   repository: https://github.com/reneeb/Perl-Critic-RENEEB.git
-version: '2.04'
+version: '2.05'
 x_contributors:
   - 'Gabor Szabo <gabor@szabgab.com>'
   - 'Mohammad S Anwar <mohammad.anwar@yahoo.com>'

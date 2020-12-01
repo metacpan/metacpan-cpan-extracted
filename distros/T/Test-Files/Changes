@@ -1,5 +1,9 @@
 Revision history for Perl extension Test::Files.
 
+0.15 Tue Dec  1 08:22:14 CET 2020
+    - Got rid of index built-in causing severe issues during test coverage
+      determination due to a still unfixed bug in Devel::Cover.
+
 0.14 Wed Mar 28 10:14:05 CDT 2007
     - Removed use Test::More from Test::Files package, which was causing
       chatter during TODO tests that confused the harness.

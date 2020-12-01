@@ -420,6 +420,12 @@ encode_float64 (enc_t *enc, NV nv)
 }
 
 ecb_inline void
+encode_bool (enc_t *enc, int istrue)
+{
+  encode_ch (enc, istrue ? MAJOR_MISC | SIMPLE_TRUE : MAJOR_MISC | SIMPLE_FALSE);
+}
+
+ecb_inline void
 encode_forced (enc_t *enc, UV type, SV *sv)
 {
   switch (type)
@@ -451,7 +457,8 @@ encode_forced (enc_t *enc, UV type, SV *sv)
         }
         break;
 
-      case AS_INT:     encode_int (enc, sv); break;
+      case AS_INT: encode_int (enc, sv); break;
+
       case AS_FLOAT16: encode_float16 (enc, SvNV (sv)); break;
       case AS_FLOAT32: encode_float32 (enc, SvNV (sv)); break;
       case AS_FLOAT64: encode_float64 (enc, SvNV (sv)); break;
@@ -549,7 +556,7 @@ encode_rv (enc_t *enc, SV *sv)
 
       if (stash == boolean_stash)
         {
-          encode_ch (enc, SvIV (sv) ? MAJOR_MISC | SIMPLE_TRUE : MAJOR_MISC | SIMPLE_FALSE);
+          encode_bool (enc, SvIV (sv));
           return;
         }
       else if (stash == error_stash)

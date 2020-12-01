@@ -12,20 +12,16 @@ build_requires:
   HTTP::Tiny: '0.044'
   IO::Socket::SSL: '1.56'
   IO::Zlib: '0'
-  Mojo::DOM: '0'
-  Mojolicious: '7.00'
   Net::SSLeay: '1.49'
-  Sort::Versions: '0'
   Test::More: '0'
   URI: '0'
-  URI::Escape: '0'
 configure_requires:
   Alien::Build::MM: '0.25'
   Alien::Build::Plugin::Build::CMake: '0.99'
   ExtUtils::CBuilder: '0'
   ExtUtils::MakeMaker: '6.52'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.56, CPAN::Meta::Converter version 2.150010'
 license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -42,7 +38,7 @@ requires:
   perl: '5.006'
 resources:
   repository: https://github.com/Hugmeir/p5-alien-libzookeeper
-version: '0.02'
+version: '0.04'
 x_alienfile:
   generated_by: 'Alien::Build::MM version 2.37'
   requires:
@@ -53,11 +49,7 @@ x_alienfile:
       HTTP::Tiny: '0.044'
       IO::Socket::SSL: '1.56'
       IO::Zlib: '0'
-      Mojo::DOM: '0'
-      Mojolicious: '7.00'
       Net::SSLeay: '1.49'
-      Sort::Versions: '0'
       URI: '0'
-      URI::Escape: '0'
     system: {}
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

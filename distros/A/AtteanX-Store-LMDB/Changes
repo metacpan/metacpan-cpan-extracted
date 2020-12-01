@@ -1,0 +1,11 @@
+AtteanX::Store::LMDB
+====================
+
+Created:      2020-05-29
+Home page:    <http://search.cpan.org/dist/AtteanX::Store::LMDB/>
+Bug tracker:  <https://github.com/kasei/atteanx-store-lmdb/issues>
+
+0.001  2020-11-30
+
+ - (Addition) Initial release.
+

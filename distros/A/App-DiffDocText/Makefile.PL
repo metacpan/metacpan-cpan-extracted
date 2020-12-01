@@ -14,13 +14,16 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "App-DiffDocText",
   "EXE_FILES" => [
-    "script/diff-doc-text"
+    "script/diff-doc-text",
+    "script/diff-doc-text-between-conflicted-git-versions"
   ],
   "LICENSE" => "perl",
   "MIN_PERL_VERSION" => "5.010001",
   "NAME" => "App::DiffDocText",
   "PREREQ_PM" => {
-    "App::OfficeUtils" => "0.003",
+    "App::OfficeUtils" => "0.005",
+    "CLI::MetaUtil::Getopt::Long" => "0.002",
+    "File::Temp" => "0.2307",
     "File::Which" => 0,
     "Getopt::Long" => "2.50",
     "IPC::System::Options" => "0.335",
@@ -34,7 +37,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.001",
+  "VERSION" => "0.002",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -42,8 +45,10 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
-  "App::OfficeUtils" => "0.003",
+  "App::OfficeUtils" => "0.005",
+  "CLI::MetaUtil::Getopt::Long" => "0.002",
   "File::Spec" => 0,
+  "File::Temp" => "0.2307",
   "File::Which" => 0,
   "Getopt::Long" => "2.50",
   "IO::Handle" => 0,

@@ -1,9 +1,9 @@
 package App::DiffDocText;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-08-22'; # DATE
+our $DATE = '2020-12-01'; # DATE
 our $DIST = 'App-DiffDocText'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 1;
 # ABSTRACT: Diff the text of two Office word-processor documents (.doc, .docx, .odt, etc)
@@ -20,7 +20,7 @@ App::DiffDocText - Diff the text of two Office word-processor documents (.doc, .
 
 =head1 VERSION
 
-This document describes version 0.001 of App::DiffDocText (from Perl distribution App-DiffDocText), released on 2020-08-22.
+This document describes version 0.002 of App::DiffDocText (from Perl distribution App-DiffDocText), released on 2020-12-01.
 
 =head1 SYNOPSIS
 

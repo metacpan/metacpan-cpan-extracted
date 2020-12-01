@@ -1,4 +1,4 @@
-BEGIN { $| = 1; print "1..20\n"; }
+BEGIN { $| = 1; print "1..24\n"; }
 
 use Types::Serialiser;
 
@@ -29,3 +29,7 @@ print $dec*2 == 2                       ? "" : "not ", "ok 19\n";
 $dec = Types::Serialiser::error;
 print Types::Serialiser::is_error  $dec ? "" : "not ", "ok 20\n";
 
+print Types::Serialiser::is_true Types::Serialiser::as_bool  0 ? "not " : "", "ok 21\n";
+print Types::Serialiser::is_false Types::Serialiser::as_bool 1 ? "not " : "", "ok 22\n";
+print Types::Serialiser::is_true Types::Serialiser::as_bool  0 ? "not " : "", "ok 23\n";
+print Types::Serialiser::is_false Types::Serialiser::as_bool 1 ? "not " : "", "ok 24\n";

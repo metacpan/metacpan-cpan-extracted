@@ -1,5 +1,19 @@
 Revision history for perl module Sys::Virt
 
+6.10.0 2020-12-01
+
+ - Add VIR_DOMAIN_CHECKPOINT_CREATE_REDEFINE_VALIDATE constant
+ - Add VIR_ERR_CHECKPOINT_INCONSISTENT constant
+ - Add VIR_VCPU_INFO_CPU_* constants
+ - Add APIs and constants for managing SSH authorized keys
+
+6.9.0 2020-11-09
+
+ - Add VIR_CONNECT_COMPARE_CPU_VALIDATE_XML constant
+ - Add VIR_CONNECT_LIST_NODE_DEVICES_CAP_VDPA constant
+ - Add support for memory failure event callbacks
+ - Add memory failure event constants
+
 6.8.0 2020-10-05
 
  - Add VIR_DOMAIN_MIGRATE_PARAM_DISKS_URI constant

@@ -17,10 +17,11 @@ meta-spec:
   version: '1.4'
 name: App-DiffXlsText
 requires:
+  CLI::Meta::diff: '0'
+  CLI::MetaUtil::Getopt::Long: '0.002'
   File::Temp: '0.2307'
   File::Which: '0'
   File::chdir: '0'
-  Getopt::Long: '2.50'
   IPC::System::Options: '0.335'
   Log::ger: '0.037'
   perl: '5.010001'
@@ -30,7 +31,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-DiffXlsText
   homepage: https://metacpan.org/release/App-DiffXlsText
   repository: git://github.com/perlancar/perl-App-DiffXlsText.git
-version: '0.003'
+version: '0.004'
 x_Dist_Zilla:
   perl:
     version: '5.030000'

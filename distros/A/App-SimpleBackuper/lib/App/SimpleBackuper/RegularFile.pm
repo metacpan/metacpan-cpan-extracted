@@ -107,10 +107,14 @@ use Compress::Raw::Lzma; # apt install libcompress-raw-lzma-perl
 sub compress {
 	my($self) = @_;
 	
+	my $compression_level = $self->{options}->{compression_level};
+	# Because is useless
+	$compression_level = 0 if $self->{filepath} =~ /\.(jpg|jpeg|mp3|mp4|avi|mkv|mov|mpg|mpeg|nef)$/i;
+	
 	my($z, $status) = Compress::Raw::Lzma::EasyEncoder->new(
-		Preset			=> $self->{options}->{compression_level},
+		Preset			=> $compression_level,
 		Check			=> LZMA_CHECK_SHA256,
-		AppendOutput	=>1,
+		AppendOutput	=> 1,
 	);
 	die "$status\n" if $status != LZMA_OK;
 	

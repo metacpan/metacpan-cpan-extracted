@@ -3,8 +3,8 @@ NAME
     (.doc, .docx, .odt, etc)
 
 VERSION
-    This document describes version 0.001 of App::DiffDocText (from Perl
-    distribution App-DiffDocText), released on 2020-08-22.
+    This document describes version 0.002 of App::DiffDocText (from Perl
+    distribution App-DiffDocText), released on 2020-12-01.
 
 SYNOPSIS
     See the included script diff-doc-text.

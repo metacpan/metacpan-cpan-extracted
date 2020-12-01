@@ -1,12 +1,12 @@
 #!perl
 
 # Note: This script is a CLI for Riap function /Complete/File/complete_file
-# and generated automatically using Perinci::CmdLine::Gen version 0.496
+# and generated automatically using Perinci::CmdLine::Gen version 0.497
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-04-19'; # DATE
+our $DATE = '2020-08-02'; # DATE
 our $DIST = 'App-CompleteCLIs'; # DIST
-our $VERSION = '0.146'; # VERSION
+our $VERSION = '0.147'; # VERSION
 
 use 5.010001;
 use strict;
@@ -38,13 +38,18 @@ complete-file - Complete file and directory from local filesystem
 
 =head1 VERSION
 
-This document describes version 0.146 of complete-file (from Perl distribution App-CompleteCLIs), released on 2020-04-19.
+This document describes version 0.147 of complete-file (from Perl distribution App-CompleteCLIs), released on 2020-08-02.
 
 =head1 SYNOPSIS
 
 Usage:
 
- % complete-file [options] <word>
+ % complete-file [--allow-dot] [--disallow-dot] [--exclude-dir]
+     [--file-ext-filter-json=s] [--file-ext-filter=s]
+     [--file-regex-filter=s] [--filter-json=s] [--filter=s] [--format=name]
+     [--handle-tilde] [--include-dir] [--json] [--(no)naked-res]
+     [--no-handle-tilde] [--nohandle-tilde] [--page-result[=program]]
+     [--starting-path=s] <word>
 
 =head1 OPTIONS
 

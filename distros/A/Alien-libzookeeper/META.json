@@ -4,7 +4,7 @@
       "B Fraser <fraserbn@gmail.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.56, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
    ],
@@ -31,12 +31,8 @@
             "HTTP::Tiny" : "0.044",
             "IO::Socket::SSL" : "1.56",
             "IO::Zlib" : "0",
-            "Mojo::DOM" : "0",
-            "Mojolicious" : "7.00",
             "Net::SSLeay" : "1.49",
-            "Sort::Versions" : "0",
-            "URI" : "0",
-            "URI::Escape" : "0"
+            "URI" : "0"
          }
       },
       "configure" : {
@@ -68,7 +64,7 @@
          "web" : "https://github.com/Hugmeir/p5-alien-libzookeeper"
       }
    },
-   "version" : "0.02",
+   "version" : "0.04",
    "x_alienfile" : {
       "generated_by" : "Alien::Build::MM version 2.37",
       "requires" : {
@@ -79,12 +75,8 @@
             "HTTP::Tiny" : "0.044",
             "IO::Socket::SSL" : "1.56",
             "IO::Zlib" : "0",
-            "Mojo::DOM" : "0",
-            "Mojolicious" : "7.00",
             "Net::SSLeay" : "1.49",
-            "Sort::Versions" : "0",
-            "URI" : "0",
-            "URI::Escape" : "0"
+            "URI" : "0"
          },
          "system" : {}
       }

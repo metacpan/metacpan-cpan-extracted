@@ -122,6 +122,10 @@ Replace/set the metadata with the checkpoint
 
 Quiesce the guest disks while taking the checkpoint
 
+=item Sys::Virt::DomainCheckpoint::CREATE_REDEFINE_VALIDATE
+
+Validate disk data state
+
 =back
 
 =head2 CHECKPOINT DELETION

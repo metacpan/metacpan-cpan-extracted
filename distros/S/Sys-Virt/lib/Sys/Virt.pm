@@ -81,7 +81,7 @@ use Sys::Virt::DomainSnapshot;
 use Sys::Virt::DomainCheckpoint;
 use Sys::Virt::Stream;
 
-our $VERSION = '6.8.0';
+our $VERSION = '6.10.0';
 require XSLoader;
 XSLoader::load('Sys::Virt', $VERSION);
 
@@ -1900,6 +1900,10 @@ can take one of the following constants
 
 Raise a fatal error if the CPUs are not compatible, instead of
 just returning a special error code.
+
+=item Sys::Virt::COMPARE_CPU_VALIDATE_XML
+
+Validate input XML document against the RNG schema.
 
 =back
 

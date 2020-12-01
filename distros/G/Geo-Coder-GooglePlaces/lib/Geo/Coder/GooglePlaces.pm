@@ -16,7 +16,7 @@ See L<Geo::Coder::GooglePlaces::V3> for usage.
 
 =cut
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 =head1 SUBROUTINES/METHODS
 
@@ -35,7 +35,7 @@ sub new {
 
 =head1 LICENSE
 
-This program is free software; you can redistribute it and/or 
+This program is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself.
 
 See L<http://www.perl.com/perl/misc/Artistic.html>

@@ -1,12 +1,12 @@
 #!perl
 
 # Note: This script is a CLI for Riap function /Complete/Perl/complete_perl_version
-# and generated automatically using Perinci::CmdLine::Gen version 0.496
+# and generated automatically using Perinci::CmdLine::Gen version 0.497
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-04-19'; # DATE
+our $DATE = '2020-08-02'; # DATE
 our $DIST = 'App-CompleteCLIs'; # DIST
-our $VERSION = '0.146'; # VERSION
+our $VERSION = '0.147'; # VERSION
 
 use 5.010001;
 use strict;
@@ -38,13 +38,15 @@ complete-perl-version - complete-perl-version
 
 =head1 VERSION
 
-This document describes version 0.146 of complete-perl-version (from Perl distribution App-CompleteCLIs), released on 2020-04-19.
+This document describes version 0.147 of complete-perl-version (from Perl distribution App-CompleteCLIs), released on 2020-08-02.
 
 =head1 SYNOPSIS
 
 Usage:
 
- % complete-perl-version [options] <word>
+ % complete-perl-version [--dev] [--format=name] [--json] [--(no)naked-res]
+     [--no-dev] [--no-use-v] [--nodev] [--nouse-v]
+     [--page-result[=program]] [--use-v] <word>
 
 =head1 OPTIONS
 

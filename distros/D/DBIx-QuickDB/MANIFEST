@@ -17,6 +17,7 @@ lib/DBIx/QuickDB/Driver/SQLite.pm
 lib/DBIx/QuickDB/Pool.pm
 lib/DBIx/QuickDB/Util.pm
 lib/DBIx/QuickDB/Util/HashBase.pm
+lib/DBIx/QuickDB/Watcher.pm
 lib/Test2/Tools/QuickDB.pm
 perltidyrc
 t/00-report.t

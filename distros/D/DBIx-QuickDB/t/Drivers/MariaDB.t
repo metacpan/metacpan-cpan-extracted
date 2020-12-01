@@ -81,14 +81,26 @@ subtest use_it => sub {
 subtest cleanup => sub {
     my $db = get_db {driver => 'MySQL', dbd_driver => 'DBD::MariaDB', load_sql => [quickdb => 't/schema/mysql.sql']};
     my $dir = $db->dir;
-    my $pid = $db->pid;
+    my $pid = $db->watcher->server_pid;
 
     ok(-d $dir, "Can see the db dir");
     ok(kill(0, $pid), "Can signal the db process (it's alive!)");
 
     $db = undef;
-    ok(!-d $dir, "Cleaned up the dir when done");
-    is(kill(0, $pid), 0, "cannot singal pid (It's dead Jim)");
+
+    my $start = time;
+    my $pid_gone = 0;
+    my $dir_gone = 0;
+    while (1) {
+        $pid_gone ||= !kill(0, $pid);
+        $dir_gone ||= !-d $dir;
+        last if $pid_gone && $dir_gone;
+        last if time - $start > 10;
+        sleep 0.2;
+    }
+
+    ok($dir_gone, "Cleaned up the dir when done");
+    ok($pid_gone, "Cleaned up the process when done");
 };
 
 subtest viable => sub {

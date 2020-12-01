@@ -2,8 +2,8 @@ NAME
     App::CompleteCLIs - CLI wrappers for complete_*() functions
 
 VERSION
-    This document describes version 0.146 of App::CompleteCLIs (from Perl
-    distribution App-CompleteCLIs), released on 2020-04-19.
+    This document describes version 0.147 of App::CompleteCLIs (from Perl
+    distribution App-CompleteCLIs), released on 2020-08-02.
 
 SYNOPSIS
 DESCRIPTION
@@ -76,6 +76,8 @@ DESCRIPTION
     *   complete-perl-builtin-symbol
 
     *   complete-perl-version
+
+    *   complete-perlmv-scriptlet
 
     *   complete-pid
 

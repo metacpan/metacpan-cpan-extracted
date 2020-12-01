@@ -4,13 +4,13 @@
       "Nigel Horne <njh@bandsman.co.uk>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.56, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Geo-Coder-GooglePlaces",
    "no_index" : {
@@ -22,8 +22,11 @@
    "prereqs" : {
       "build" : {
          "requires" : {
+            "Digest::HMAC_SHA1" : "0",
+            "MIME::Base64" : "0",
             "Test::Most" : "0",
-            "Test::NoWarnings" : "0"
+            "Test::NoWarnings" : "0",
+            "Test::Number::Delta" : "0"
          }
       },
       "configure" : {
@@ -41,14 +44,6 @@
             "URI" : "0",
             "perl" : "5.008001"
          }
-      },
-      "test" : {
-         "requires" : {
-            "Digest::HMAC_SHA1" : "0",
-            "MIME::Base64" : "0",
-            "Test::Most" : "0",
-            "Test::Number::Delta" : "0"
-         }
       }
    },
    "release_status" : "stable",
@@ -59,10 +54,11 @@
       },
       "repository" : {
          "type" : "git",
-         "url" : "https://github.com/nigelhorne/geo-coder-googleplaces.git",
-         "web" : "https://github.com/nigelhorne/geo-coder-googleplaces"
+         "url" : "https://github.com/nigelhorne/Geo-Coder-GooglePlaces.git",
+         "web" : "https://github.com/nigelhorne/Geo-Coder-GooglePlaces",
+         "x_mailto" : "bug-CGI-Info@rt.cpan.org"
       }
    },
-   "version" : "0.03",
-   "x_serialization_backend" : "JSON::PP version 2.27400"
+   "version" : "0.04",
+   "x_serialization_backend" : "JSON::PP version 4.05"
 }

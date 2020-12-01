@@ -1,87 +1,137 @@
-# Geo::Coder::GooglePlaces::V3
+[![Actions Status](https://github.com/nigelhorne/Geo-Coder-GooglePlaces/workflows/.github/workflows/all.yml/badge.svg)](https://github.com/nigelhorne/Geo-Coder-GooglePlaces/actions)
+[![Travis Status](https://travis-ci.org/nigelhorne/geo-coder-googleplaces.svg?branch=master)](https://travis-ci.org/nigelhorne/geo-coder-googleplaces)
+[![Appveyor status](https://ci.appveyor.com/api/projects/status/fe74iggarbf7vg17/branch/master?svg=true)](https://ci.appveyor.com/project/nigelhorne/geo-coder-googleplaces/branch/master)
+[![Coverage Status](https://coveralls.io/repos/github/nigelhorne/geo-coder-googleplaces/badge.svg?branch=master)](https://coveralls.io/github/nigelhorne/geo-coder-googleplaces?branch=master)
+[![CPAN](https://img.shields.io/cpan/v/Geo-Coder-GooglePlaces.svg)](http://search.cpan.org/~nhorne/Geo-Coder-GooglePlaces/)
+[![Kritika Status](https://kritika.io/users/nigelhorne/repos/5894516992072296/heads/master/status.svg)](https://kritika.io/users/nigelhorne/repos/5894516992072296/heads/master/)
+[![Kwalitee](https://cpants.cpanauthors.org/dist/Geo-Coder-GooglePlaces.png)](http://cpants.cpanauthors.org/dist/Geo-Coder-GooglePlaces)
 
-Google Maps Geocoding API V3
+# NAME
+
+Geo::Coder::GooglePlaces::V3 - Google Places Geocoding API V3
+
+# VERSION
+
+Version 0.04
 
 # SYNOPSIS
 
     use Geo::Coder::GooglePlaces;
 
     my $geocoder = Geo::Coder::GooglePlaces->new();
-    my $location = $geocoder->geocode( location => 'Hollywood and Highland, Los Angeles, CA' );
+    my $location = $geocoder->geocode(location => 'Hollywood and Highland, Los Angeles, CA');
 
 # DESCRIPTION
 
-Geo::Coder::GooglePlaces::V3 provides a geocoding functionality using Google Maps API V3.
+Geo::Coder::GooglePlaces::V3 provides a geocoding functionality using Google Places API V3.
 
-# METHODS
+# SUBROUTINES/METHODS
 
-- new
+## new
 
-        $geocoder = Geo::Coder::GooglePlaces->new();
-        $geocoder = Geo::Coder::GooglePlaces->new(language => 'ru');
-        $geocoder = Geo::Coder::GooglePlaces->new(gl => 'ca');
-        $geocoder = Geo::Coder::GooglePlaces->new(oe => 'latin1');
+    $geocoder = Geo::Coder::GooglePlaces->new();
+    $geocoder = Geo::Coder::GooglePlaces->new(language => 'ru');
+    $geocoder = Geo::Coder::GooglePlaces->new(gl => 'ca');
+    $geocoder = Geo::Coder::GooglePlaces->new(oe => 'latin1');
 
-    To specify the language of Google's response add `language` parameter
-    with a two-letter value. Note that adding that parameter does not
-    guarantee that every request returns translated data.
+To specify the language of Google's response add `language` parameter
+with a two-letter value. Note that adding that parameter does not
+guarantee that every request returns translated data.
 
-    You can also set `gl` parameter to set country code (e.g. _ca_ for Canada).
+You can also set `gl` parameter to set country code (e.g. _ca_ for Canada).
 
-    You can ask for a character encoding other than utf-8 by setting the _oe_
-    parameter, but this is not recommended.
+You can ask for a character encoding other than utf-8 by setting the _oe_
+parameter, but this is not recommended.
 
-    You can optionally use your Maps Premier Client ID, by passing your client
-    code as the `client` parameter and your private key as the `key` parameter.
-    The URL signing for Premier Client IDs requires the _Digest::HMAC\_SHA1_
-    and _MIME::Base64_ modules. To test your client, set the environment
-    variables GMAP\_CLIENT and GMAP\_KEY before running 02\_v3\_live.t
+You can optionally use your Places Premier Client ID, by passing your client
+code as the `client` parameter and your private key as the `key` parameter.
+The URL signing for Premier Client IDs requires the _Digest::HMAC\_SHA1_
+and _MIME::Base64_ modules. To test your client, set the environment
+variables GMAP\_CLIENT and GMAP\_KEY before running v3\_live.t
 
-        GMAP_CLIENT=your_id GMAP_KEY='your_key' make test
+    GMAP_CLIENT=your_id GMAP_KEY='your_key' make test
 
-- geocode
+You can get a key from https://console.developers.google.com/apis/credentials.
 
-        $location = $geocoder->geocode(location => $location);
-        @location = $geocoder->geocode(location => $location);
+## geocode
 
-    Queries _$location_ to Google Maps geocoding API and returns hash
-    reference returned back from API server. When you cann the method in
-    an array context, it returns all the candidates got back, while it
-    returns the 1st one in a scalar context.
+    $location = $geocoder->geocode(location => $location);
+    @location = $geocoder->geocode(location => $location);
 
-    When you'd like to pass non-ascii string as a location, you should
-    pass it as either UTF-8 bytes or Unicode flagged string.
+Queries _$location_ to Google Places geocoding API and returns hash
+reference returned back from API server. When you cann the method in
+an array context, it returns all the candidates got back, while it
+returns the 1st one in a scalar context.
 
-- reverse\_geocode
+When you'd like to pass non-ASCII string as a location, you should
+pass it as either UTF-8 bytes or Unicode flagged string.
 
-        $location = $geocoder->reverse_geocode(latlng => '37.778907,-122.39732');
-        @location = $geocoder->reverse_geocode(latlng => '37.778907,-122.39732');
+## reverse\_geocode
 
-    Similar to geocode except it expects a latitude/longitude parameter.
+    $location = $geocoder->reverse_geocode(latlng => '37.778907,-122.39732');
+    @location = $geocoder->reverse_geocode(latlng => '37.778907,-122.39732');
 
-- ua
+Similar to geocode except it expects a latitude/longitude parameter.
 
-    Accessor method to get and set UserAgent object used internally. You
-    can call _env\_proxy_ for example, to get the proxy information from
-    environment variables:
+## ua
 
-        $coder->ua->env_proxy;
+Accessor method to get and set UserAgent object used internally. You
+can call _env\_proxy_ for example, to get the proxy information from
+environment variables:
 
-    You can also set your own User-Agent object:
+    $coder->ua->env_proxy(1);
 
-        $coder->ua( LWPx::ParanoidAgent->new );
+You can also set your own User-Agent object:
+
+    $coder->ua( LWP::UserAgent::Throttled->new() );
+
+## key
+
+Accessor method to get and set your Google API key.
+
+    print $coder->key(), "\n";
 
 # AUTHOR
 
-Nigel Horne <njh@bandsman.co.uk>
+Nigel Horne `<njh@bandsman.co.uk>`
 
-Based on [Geo::Coder::Google](https://metacpan.org/pod/Geo::Coder::Google) by Tatsuhiko Miyagawa <miyagawa@bulknews.net>
+Based on [Geo::Coder::Google](https://metacpan.org/pod/Geo%3A%3ACoder%3A%3AGoogle) by Tatsuhiko Miyagawa `<miyagawa@bulknews.net>`
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
 
 # SEE ALSO
 
-[Geo::Coder::Yahoo](https://metacpan.org/pod/Geo::Coder::Yahoo), [http://www.google.com/apis/maps/documentation/#Geocoding\_Examples](http://www.google.com/apis/maps/documentation/#Geocoding_Examples)
+[Geo::Coder::Yahoo](https://metacpan.org/pod/Geo%3A%3ACoder%3A%3AYahoo)
 
-List of supported languages: [http://spreadsheets.google.com/pub?key=p9pdwsai2hDMsLkXsoM05KQ&gid=1](http://spreadsheets.google.com/pub?key=p9pdwsai2hDMsLkXsoM05KQ&gid=1)
+# SUPPORT
+
+You can find documentation for this module with the perldoc command.
+
+    perldoc Geo::Coder::GooglePlaces
+
+You can also look for information at:
+
+- MetaCPAN
+
+    [https://metacpan.org/release/Geo-Coder-GooglePlaces](https://metacpan.org/release/Geo-Coder-GooglePlaces)
+
+- RT: CPAN's request tracker
+
+    [https://rt.cpan.org/NoAuth/Bugs.html?Dist=Geo-Coder-GooglePlaces](https://rt.cpan.org/NoAuth/Bugs.html?Dist=Geo-Coder-GooglePlaces)
+
+- CPANTS
+
+    [http://cpants.cpanauthors.org/dist/Geo-Coder-GooglePlaces](http://cpants.cpanauthors.org/dist/Geo-Coder-GooglePlaces)
+
+- CPAN Testers' Matrix
+
+    [http://matrix.cpantesters.org/?dist=Geo-Coder-GooglePlaces](http://matrix.cpantesters.org/?dist=Geo-Coder-GooglePlaces)
+
+- CPAN Ratings
+
+    [http://cpanratings.perl.org/d/Geo-Coder-GooglePlaces](http://cpanratings.perl.org/d/Geo-Coder-GooglePlaces)
+
+- CPAN Testers Dependencies
+
+    [http://deps.cpantesters.org/?module=Geo::Coder::GooglePlaces](http://deps.cpantesters.org/?module=Geo::Coder::GooglePlaces)

@@ -15,6 +15,10 @@ SIMPLE SCALAR CONSTANTS
     normal Perl scalars. This is necessary because these have different
     representations in the serialisation formats.
 
+    In the following, functions with zero or one arguments have a prototype
+    of "()" and "($)", respectively, so act as constants and unary
+    operators.
+
   BOOLEANS (Types::Serialiser::Boolean class)
     This type has only two instances, true and false. A natural
     representation for these in Perl is 1 and 0, but serialisation formats
@@ -37,6 +41,12 @@ SIMPLE SCALAR CONSTANTS
 
         The constant is represented as a reference to a scalar containing 0
         - implementations are allowed to directly test for this.
+
+    Types::Serialiser::as_bool $value
+        Converts a Perl scalar into a boolean, which is useful syntactic
+        sugar. Strictly equivalent to:
+
+           $value ? $Types::Serialiser::true : $Types::Serialiser::false
 
     $is_bool = Types::Serialiser::is_bool $value
         Returns true iff the $value is either $Types::Serialiser::true or

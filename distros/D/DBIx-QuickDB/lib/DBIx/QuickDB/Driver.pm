@@ -2,19 +2,21 @@ package DBIx::QuickDB::Driver;
 use strict;
 use warnings;
 
-our $VERSION = '0.000018';
+our $VERSION = '0.000019';
 
 use Carp qw/croak confess/;
 use File::Path qw/remove_tree/;
 use File::Temp qw/tempdir/;
 use POSIX ":sys_wait_h";
 use Scalar::Util qw/blessed/;
-use Time::HiRes qw/sleep/;
+use Time::HiRes qw/sleep time/;
 
 use DBIx::QuickDB::Util qw/clone_dir/;
 
+use DBIx::QuickDB::Watcher;
+
 use DBIx::QuickDB::Util::HashBase qw{
-    pid -root_pid log_file
+    -root_pid
     -dir
     -_cleanup
     -autostop -autostart
@@ -23,6 +25,7 @@ use DBIx::QuickDB::Util::HashBase qw{
     username
     password
     env_vars
+    <watcher
 };
 
 sub viable { (0, "viable() is not implemented for the " . $_[0]->name . " driver") }
@@ -37,6 +40,8 @@ sub shell_command  { confess "shell_command() is not implemented for the " . $_[
 sub list_env_vars { qw/DBI_USER DBI_PASS DBI_DSN/ }
 
 sub version_string { 'unknown' }
+
+sub stop_sig { 'TERM' }
 
 sub write_config {}
 
@@ -134,7 +139,6 @@ sub clone_data {
     );
 }
 
-
 sub clone {
     my $self = shift;
     my %params = @_;
@@ -164,8 +168,7 @@ sub clone {
 
         DIR() => $new_dir,
 
-        PID()      => undef,
-        LOG_FILE() => undef,
+        WATCHER()  => undef,
     );
 
     $clone->write_config();
@@ -174,20 +177,31 @@ sub clone {
     return $clone;
 }
 
+sub gen_log {
+    my $self = shift;
+    return if $self->no_log(@_);
+    return $self->{+DIR} . "/cmd-log-$$-" . $self->{+_LOG_ID}++;
+}
+
+sub no_log {
+    my $self = shift;
+    my ($params) = @_;
+    return $self->{+VERBOSE} || $params->{no_log} || $ENV{DB_VERBOSE};
+}
 
 sub run_command {
     my $self = shift;
     my ($cmd, $params) = @_;
 
-    my $no_log = $self->{+VERBOSE} || $params->{no_log} || $ENV{DB_VERBOSE};
-    my $log_file = $no_log ? undef : $self->{+DIR} . "/cmd-log-" . $self->{+_LOG_ID}++;
+    my $no_log = $self->no_log($params);
+    my $log_file = $params->{log_file} || ($no_log ? undef : $self->gen_log);
 
     my $pid = fork();
     croak "Could not fork" unless defined $pid;
 
     if ($pid) {
-        return ($pid, $log_file) if $params->{no_wait};
         local $?;
+        return ($pid, $log_file) if $params->{no_wait};
         my $ret = waitpid($pid, 0);
         my $exit = $?;
         die "waitpid returned $ret" unless $ret == $pid;
@@ -224,7 +238,10 @@ sub should_cleanup { shift->{+_CLEANUP} }
 
 sub cleanup {
     my $self = shift;
-    remove_tree($self->{+DIR}, {safe => 1});
+
+    # Ignore errors here.
+    my $err = [];
+    remove_tree($self->{+DIR}, {safe => 1, error => \$err}) if -d $self->{+DIR};
     return;
 }
 
@@ -250,7 +267,7 @@ sub started {
     my $self = shift;
 
     my $socket = $self->socket;
-    return 1 if $self->{+PID} || -S $socket;
+    return 1 if $self->{+WATCHER} || -S $socket;
     return 0;
 }
 
@@ -261,46 +278,31 @@ sub start {
     my $dir = $self->{+DIR};
     my $socket = $self->socket;
 
-    return if $self->{+PID} || -S $socket;
+    return if $self->{+WATCHER} || -S $socket;
 
-    my ($pid, $log_file) = $self->run_command([$self->start_command, @args], {no_wait => 1});
+    my $watcher = $self->{+WATCHER} = DBIx::QuickDB::Watcher->new(db => $self, args => \@args);
 
     my $start = time;
     until (-S $socket) {
         my $waited = time - $start;
-        my $dump = 0;
 
         if ($waited > 10) {
-            kill('QUIT', $pid);
-            waitpid($pid, 0);
-            $dump = "Timeout waiting for server:";
-        }
-
-        if (waitpid($pid, WNOHANG) == $pid) {
-            $dump = "Server failed to start ($?):"
-        }
-
-        if ($dump) {
-            open(my $fh, '<', $log_file) or warn "Failed to open log: $!";
-            my $data = eval { join "" => <$fh> };
-            confess "$dump\n$data\nAborting";
+            $watcher->eliminate();
+            confess "Timed out waiting for server to start";
+            last;
         }
 
         sleep 0.01;
     }
 
-    $self->{+LOG_FILE} = $log_file;
-    $self->{+PID}      = $pid;
-
     return;
 }
 
-sub stop_sig { 'TERM' }
-
 sub stop {
     my $self = shift;
+    my %params = @_;
 
-    my $pid = $self->{+PID} or return;
+    my $watcher = delete $self->{+WATCHER} or return;
 
     DBI->visit_handles(
         sub {
@@ -314,28 +316,23 @@ sub stop {
         }
     );
 
-    local $?;
-    kill($self->stop_sig, $pid);
-    my $ret = waitpid($pid, 0);
-    my $exit = $?;
-    die "waitpid returned $ret (expected $pid)" unless $ret == $pid;
+    $watcher->stop();
 
-    if ($exit) {
-        my $name = $self->name;
-        my $msg = "";
-        if (my $lf = $self->{+LOG_FILE}) {
-            if (open(my $fh, '<', $lf)) {
-                $msg = "\n" . join "" => <$fh>;
+    my $start = time;
+    unless ($params{no_wait}) {
+        $watcher->wait();
+
+        while (-S $self->socket) {
+            my $waited = time - $start;
+
+            if ($waited > 10) {
+                confess "Times out waiting for server to stop";
+                last;
             }
-            else {
-                $msg = "\nCould not open $name log file '$lf': $!";
-            }
+
+            sleep 0.01;
         }
-        warn "$name exited badly ($exit)$msg";
     }
-
-    delete $self->{+LOG_FILE};
-    delete $self->{+PID};
 
     return;
 }
@@ -352,8 +349,12 @@ sub DESTROY {
     my $self = shift;
     return unless $self->{+ROOT_PID} && $self->{+ROOT_PID} == $$;
 
-    $self->stop    if $self->{+AUTOSTOP} || $self->{+_CLEANUP};
-    $self->cleanup if $self->{+_CLEANUP};
+    if (my $watcher = delete $self->{+WATCHER}) {
+        $watcher->eliminate();
+    }
+    elsif ($self->should_cleanup) {
+        $self->cleanup();
+    }
 
     return;
 }
@@ -361,7 +362,6 @@ sub DESTROY {
 1;
 
 __END__
-
 
 =pod
 

@@ -19,7 +19,7 @@ package Types::Serialiser;
 
 use common::sense; # required to suppress annoying warnings
 
-our $VERSION = '1.0';
+our $VERSION = '1.01';
 
 =head1 SIMPLE SCALAR CONSTANTS
 
@@ -27,6 +27,9 @@ Simple scalar constants are values that are overloaded to act like simple
 Perl values, but have (class) type to differentiate them from normal Perl
 scalars. This is necessary because these have different representations in
 the serialisation formats.
+
+In the following, functions with zero or one arguments have a prototype of
+C<()> and C<($)>, respectively, so act as constants and unary operators.
 
 =head2 BOOLEANS (Types::Serialiser::Boolean class)
 
@@ -53,6 +56,13 @@ the number C<0>. It is up to you whether you use the variable form
 
 The constant is represented as a reference to a scalar containing C<0> -
 implementations are allowed to directly test for this.
+
+=item Types::Serialiser::as_bool $value
+
+Converts a Perl scalar into a boolean, which is useful syntactic
+sugar. Strictly equivalent to:
+
+   $value ? $Types::Serialiser::true : $Types::Serialiser::false
 
 =item $is_bool = Types::Serialiser::is_bool $value
 
@@ -128,6 +138,8 @@ our $error = do { bless \(my $dummy    ), Types::Serialiser::Error::   };
 sub true  () { $true  }
 sub false () { $false }
 sub error () { $error }
+
+sub as_bool($) { $_[0] ? $true : $false }
 
 sub is_bool  ($) {           UNIVERSAL::isa $_[0], Types::Serialiser::Boolean:: }
 sub is_true  ($) {  $_[0] && UNIVERSAL::isa $_[0], Types::Serialiser::Boolean:: }
