@@ -4,7 +4,7 @@
       "Tom Molesworth <TEAM@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.015, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.017, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -61,6 +61,7 @@
             "Ryu::Async" : "0.016",
             "Scalar::Util" : "1.50",
             "Syntax::Keyword::Try" : "0.11",
+            "Template" : "3.000",
             "URI" : "0",
             "URI::db" : "0.19",
             "YAML::XS" : "0",
@@ -80,7 +81,6 @@
             "File::Spec" : "0",
             "IO::Handle" : "0",
             "IPC::Open3" : "0",
-            "Test::CPANfile" : "0",
             "Test::CheckDeps" : "0.010",
             "Test::Fatal" : "0.010",
             "Test::More" : "0.98",
@@ -91,79 +91,79 @@
    "provides" : {
       "Database::Async" : {
          "file" : "lib/Database/Async.pm",
-         "version" : "0.012"
+         "version" : "0.013"
       },
       "Database::Async::Backoff" : {
          "file" : "lib/Database/Async/Backoff.pm",
-         "version" : "0.012"
+         "version" : "0.013"
       },
       "Database::Async::Backoff::Exponential" : {
          "file" : "lib/Database/Async/Backoff/Exponential.pm",
-         "version" : "0.012"
+         "version" : "0.013"
       },
       "Database::Async::DB" : {
          "file" : "lib/Database/Async/DB.pm",
-         "version" : "0.012"
+         "version" : "0.013"
       },
       "Database::Async::Engine" : {
          "file" : "lib/Database/Async/Engine.pm",
-         "version" : "0.012"
+         "version" : "0.013"
       },
       "Database::Async::Engine::Empty" : {
          "file" : "lib/Database/Async/Engine/Empty.pm",
-         "version" : "0.012"
+         "version" : "0.013"
       },
       "Database::Async::ORM" : {
          "file" : "lib/Database/Async/ORM.pm",
-         "version" : "0.012"
+         "version" : "0.013"
       },
       "Database::Async::ORM::Constraint" : {
          "file" : "lib/Database/Async/ORM/Constraint.pm",
-         "version" : "0.012"
+         "version" : "0.013"
       },
       "Database::Async::ORM::Extension" : {
          "file" : "lib/Database/Async/ORM/Extension.pm",
-         "version" : "0.012"
+         "version" : "0.013"
       },
       "Database::Async::ORM::Field" : {
          "file" : "lib/Database/Async/ORM/Field.pm",
-         "version" : "0.012"
+         "version" : "0.013"
       },
       "Database::Async::ORM::Schema" : {
          "file" : "lib/Database/Async/ORM/Schema.pm",
-         "version" : "0.012"
+         "version" : "0.013"
       },
       "Database::Async::ORM::Table" : {
          "file" : "lib/Database/Async/ORM/Table.pm",
-         "version" : "0.012"
+         "version" : "0.013"
       },
       "Database::Async::ORM::Type" : {
          "file" : "lib/Database/Async/ORM/Type.pm",
-         "version" : "0.012"
+         "version" : "0.013"
       },
       "Database::Async::Pool" : {
          "file" : "lib/Database/Async/Pool.pm",
-         "version" : "0.012"
+         "version" : "0.013"
       },
       "Database::Async::Query" : {
          "file" : "lib/Database/Async/Query.pm",
-         "version" : "0.012"
+         "version" : "0.013"
       },
       "Database::Async::Row" : {
          "file" : "lib/Database/Async/Row.pm",
-         "version" : "0.012"
+         "version" : "0.013"
       },
       "Database::Async::StatementHandle" : {
          "file" : "lib/Database/Async/StatementHandle.pm",
-         "version" : "0.012"
+         "version" : "0.013"
       },
       "Database::Async::Test" : {
          "file" : "lib/Database/Async/Test.pm",
-         "version" : "0.012"
+         "version" : "0.013"
       },
       "Database::Async::Transaction" : {
          "file" : "lib/Database/Async/Transaction.pm",
-         "version" : "0.012"
+         "version" : "0.013"
       }
    },
    "release_status" : "stable",
@@ -178,10 +178,10 @@
          "web" : "https://github.com/team-at-cpan/Database-Async"
       }
    },
-   "version" : "0.012",
+   "version" : "0.013",
    "x_authority" : "cpan:TEAM",
-   "x_generated_by_perl" : "v5.30.2",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.24",
+   "x_generated_by_perl" : "v5.32.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.25",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }
 

@@ -1,5 +1,8 @@
 Revision history for Perl extension MOP4Import::Declare
 
+0.053 2020-12-02
+    * GH-84 - Adapt FETCH_CODE_ATTRIBUTES
+
 0.052 2020-10-14
     * GH-83 - Fix cpanfile for configure dependency of `rlib`
 

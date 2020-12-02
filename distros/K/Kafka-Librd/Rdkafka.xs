@@ -465,3 +465,12 @@ krde_to_name(code)
         RETVAL = rd_kafka_err2name(code);
     OUTPUT:
         RETVAL
+
+int
+krde_last_error()
+    CODE:
+        RETVAL = rd_kafka_last_error();
+    OUTPUT:
+        RETVAL
+
+

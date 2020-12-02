@@ -1,53 +1,73 @@
-#------------------------------------------------------------------------
-# Version 1.5    Date: 2014/11/07
-#------------------------------------------------------------------------
+Revision history for Perl distribution Class-Singleton
 
-* Work around global destruction order issue.  [Craig Manley
-  <cmanley@cpan.org>, CPAN RT#23568/68526]
+1.6 2020-12-02
 
-#------------------------------------------------------------------------
-# Version 1.4    Date: 2007/09/28
-#------------------------------------------------------------------------
+    - Fixed confusing Changes entry about Perl's licensing terms.
+      [<KENTNL@cpan.org>, CPAN RT#132843]
 
-* Added the has_instance() method to return an existing instance without
-  creating a new one.
+    - Added optional Changes testing (skipped unless AUTHOR_TESTING).
 
-* General cleanup of code, documentation and tests.
+    - Reformatted Changes file as per CPAN::Changes::Spec.
 
-* Changed licence from Perl Artistic to the same terms as Perl itself
-  (e.g. Artistic 2.0/GPL)
+    - Added optional POD coverage testing (skipped unless AUTHOR_TESTING).
 
-#------------------------------------------------------------------------
-# Version 1.03   Date: 1999/01/19
-#------------------------------------------------------------------------
+    - Added optional Perl::Critic testing (skipped unless AUTHOR_TESTING).
 
-* Incorporated patches from Andreas Koenig to inline calculation of 
-  $instance variable.  This results in a speedup of around 35%.
+    - Made code Perl::Critic clean.
 
-* Added _new_instance() constructor which is called the first time
-  _instance() is called.  This can be overloaded in derived classes 
-  to provide more specific object initialisation.
+    - Added optional POD testing (skipped unless AUTHOR_TESTING).
 
-* Updated documentation accordingly.
+    - Included GitHub repository URLs in metadata now that source code has been
+      uploaded to GitHub (as of version 1.5).
 
+    - Included META.json file in addition to META.yml.
 
-#------------------------------------------------------------------------
-# Version 1.02    Date: 1998/04/16
-#------------------------------------------------------------------------
+    - Set minimum required ExtUtils::MakeMaker version to 6.64 to ensure that
+      all parameters used are supported, to save jumping through hoops to
+      support earlier versions.  (This should not be a problem since
+      ExtUtils::MakeMaker 6.64 is easily installed into Perl 5.8.1 and above,
+      that being the whole point of the new choice of minimum supported Perl
+      version.)
 
-* Fixed minor typos and corrected example in documentation.
+    - Set minimum required Perl version to 5.8.1.  This is in line with the
+      minimum requirement of the "Perl Toolchain".
 
+    - Corrected typo in a comment.  [<dsteinbrunner@pobox.com>, CPAN RT#86336]
 
-#------------------------------------------------------------------------
-# Version 1.01    Date: 1998/02/10
-#------------------------------------------------------------------------
+1.5 2014-11-07
 
-* Minor documentation changes
+    - Work around global destruction order issue.  [Craig Manley
+      <cmanley@cpan.org>, CPAN RT#23568/68526]
 
+1.4 2007-09-28
 
-#------------------------------------------------------------------------
-# Version 1.00    Date: 1998/02/10
-#------------------------------------------------------------------------
+    - Added the has_instance() method to return an existing instance without
+      creating a new one.
 
-* Initial revision
+    - General cleanup of code, documentation and tests.
 
+    - Changed licence from Perl Artistic to the same terms as Perl itself (i.e.
+      Artistic 1.0 or GPL v1+).
+
+1.03 1999-01-19
+
+    - Incorporated patches from Andreas Koenig to inline calculation of
+      $instance variable.  This results in a speedup of around 35%.
+
+    - Added _new_instance() constructor which is called the first time
+      _instance() is called.  This can be overloaded in derived classes to
+      provide more specific object initialisation.
+
+    - Updated documentation accordingly.
+
+1.02 1998-04-16
+
+    - Fixed minor typos and corrected example in documentation.
+
+1.01 1998-02-10
+
+    - Minor documentation changes
+
+1.00 1998-02-10
+
+    - Initial revision

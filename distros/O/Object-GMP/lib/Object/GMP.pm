@@ -1,5 +1,5 @@
 package Object::GMP;
-$Object::GMP::VERSION = '0.005';
+$Object::GMP::VERSION = '0.006';
 =head1 NAME
 
 Object::GMP - Moo Role for any object has GMP field
@@ -40,8 +40,8 @@ B<CPAN Module>: L<https://metacpan.org/pod/Object::GMP>
 =cut
 
 use Moo::Role;
-use JSON::XS;
 use Math::BigInt lib => 'GMP';
+require JSON::XS;
 
 my %GMP_FIELDS = ();
 

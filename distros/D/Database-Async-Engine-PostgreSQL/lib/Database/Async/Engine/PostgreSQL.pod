@@ -16,6 +16,34 @@ Database::Async::Engine::PostgreSQL - support for PostgreSQL databases in L<Data
 
 =head1 DESCRIPTION
 
+Provide a C<postgresql://> URI when instantiating L<Database::Async> to use this engine.
+
+ $loop->add(
+  my $dbh = Database::Async->new(
+   uri => 'postgresql://localhost'
+  )
+ );
+
+Connection can also be made using a service definition, as described in L<https://www.postgresql.org/docs/current/libpq-pgservice.html>.
+
+ $loop->add(
+  my $dbh = Database::Async->new(
+   type => 'postgresql',
+   engine => {
+    service => 'example',
+   }
+  )
+ );
+
+If neither URI nor service are provided, the C<PGSERVICE> environment variable is attempted, and will fall back
+to localhost (similar to C<psql -h localhost> behaviour).
+
+ $loop->add(
+  my $dbh = Database::Async->new(
+   type => 'postgresql',
+  )
+ );
+
 =head1 METHODS
 
 =head2 connection
@@ -58,6 +86,10 @@ Establish a connection to the server.
 
 Returns a L<Future> which resolves to the L<IO::Async::Stream>
 once ready.
+
+=head2 service_conf_path
+
+Return the expected location for the pg_service.conf file.
 
 =head2 negotiate_ssl
 
@@ -194,5 +226,5 @@ Tom Molesworth C<< <TEAM@cpan.org> >>
 
 =head1 LICENSE
 
-Copyright Tom Molesworth 2011-2019. Licensed under the same terms as Perl itself.
+Copyright Tom Molesworth 2011-2020. Licensed under the same terms as Perl itself.
 

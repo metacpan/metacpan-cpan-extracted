@@ -1,5 +1,11 @@
 Revision history for Database-Async-Engine-PostgreSQL
 
+0.009     2020-12-03 00:18:17+08:00 Asia/Kuala_Lumpur
+    New features:
+
+    - support PGSERVICE, PGSERVICEFILE and PGSYSCONFDIR for locating and using
+    PostgreSQL service definitions
+
 0.008     2019-07-16 20:40:17+08:00 Asia/Kuala_Lumpur
     No new features.
 

@@ -1,5 +1,8 @@
 Revision history for Math-BSpline-Curve
 
+0.002     2020-12-02 11:12:36+00:00 UTC
+          fit a B-spline curve to a set of points
+
 0.001     2020-10-18 11:04:14+00:00 UTC
           - evaluate curve
           - evaluate derivatives

@@ -1,5 +1,5 @@
 name = "App-optex-msdoc"
-# badges = ["travis"]
+badges = ["travis"]
 authority="cpan:UTASHIRO"
 
 module_maker="ModuleBuildTiny"

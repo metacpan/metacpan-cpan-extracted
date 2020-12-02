@@ -15,39 +15,30 @@ do { my $x = {
                                       'Test::EOL' => '0',
                                       'Test::MinimumVersion' => '0',
                                       'Test::Mojibake' => '0',
-                                      'Test::More' => '0.96',
+                                      'Test::More' => '0.88',
                                       'Test::NoTabs' => '0',
                                       'Test::Pod' => '1.41',
-                                      'Test::Pod::No404s' => '0',
                                       'Test::Portability::Files' => '0',
                                       'Test::Version' => '1'
                                     }
                     },
        'runtime' => {
                       'requires' => {
-                                      'Database::Async' => '0.008',
-                                      'Database::Async::Engine' => '0',
-                                      'Database::Async::Query' => '0',
-                                      'Future' => '0.40',
+                                      'Config::Tiny' => '0',
+                                      'Database::Async' => '0.013',
+                                      'File::HomeDir' => '0',
+                                      'Future' => '0.46',
                                       'Future::AsyncAwait' => '0.28',
-                                      'IO::Async::SSL' => '0',
-                                      'IO::Socket::SSL' => '0',
                                       'Log::Any' => '1.050',
+                                      'Path::Tiny' => '0',
                                       'Protocol::Database::PostgreSQL' => '1.005',
-                                      'Protocol::Database::PostgreSQL::Client' => '0',
-                                      'Protocol::Database::PostgreSQL::Constants' => '0',
-                                      'Ryu::Async' => '0.014',
-                                      'Ryu::Observable' => '0',
-                                      'Scalar::Util' => '0',
+                                      'Ryu::Async' => '0.017',
                                       'Template' => '2.28',
                                       'URI::QueryParam' => '0',
                                       'URI::postgres' => '0',
                                       'curry' => '1.001',
                                       'indirect' => '0',
-                                      'overload' => '0',
-                                      'parent' => '0',
-                                      'strict' => '0',
-                                      'warnings' => '0'
+                                      'parent' => '0'
                                     }
                     },
        'test' => {
@@ -55,24 +46,16 @@ do { my $x = {
                                      'CPAN::Meta' => '2.120900'
                                    },
                    'requires' => {
-                                   'Database::Async' => '0.008',
                                    'ExtUtils::MakeMaker' => '0',
                                    'File::Spec' => '0',
-                                   'IO::Async::Loop' => '0',
+                                   'File::Temp' => '0',
                                    'IO::Handle' => '0',
                                    'IPC::Open3' => '0',
-                                   'Log::Any::Adapter' => '0',
                                    'Test::CheckDeps' => '0.010',
-                                   'Test::Deep' => '0',
                                    'Test::Fatal' => '0.010',
+                                   'Test::MockModule' => '0',
                                    'Test::More' => '0.98',
-                                   'Test::PostgreSQL' => '0',
-                                   'Test::Refcount' => '0.07',
-                                   'feature' => '0',
-                                   'perl' => '5.006'
-                                 },
-                   'suggests' => {
-                                   'Test::PostgreSQL' => '1.26'
+                                   'Test::Refcount' => '0.07'
                                  }
                  }
      };

@@ -1,3 +1,6 @@
+0.2.19	2020-12-02
+	- Fix: periodically db saving cancels part of backuped files.
+	- Fix: dirs in path to backuped files doesn't counts in backup counters.
 0.2.18	2020-12-01
 	- Fix: non-ascii files masks.
 	- Save DB every 10 min.

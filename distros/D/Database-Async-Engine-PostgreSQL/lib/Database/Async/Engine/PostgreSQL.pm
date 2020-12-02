@@ -4,7 +4,7 @@ package Database::Async::Engine::PostgreSQL;
 use strict;
 use warnings;
 
-our $VERSION = '0.008';
+our $VERSION = '0.009';
 
 use parent qw(Database::Async::Engine);
 
@@ -13,6 +13,35 @@ use parent qw(Database::Async::Engine);
 Database::Async::Engine::PostgreSQL - support for PostgreSQL databases in L<Database::Async>
 
 =head1 DESCRIPTION
+
+Provide a C<postgresql://> URI when instantiating L<Database::Async> to use this engine.
+
+ $loop->add(
+  my $dbh = Database::Async->new(
+   uri => 'postgresql://localhost'
+  )
+ );
+
+Connection can also be made using a service definition, as described in L<https://www.postgresql.org/docs/current/libpq-pgservice.html>.
+
+ $loop->add(
+  my $dbh = Database::Async->new(
+   type => 'postgresql',
+   engine => {
+    service => 'example',
+   }
+  )
+ );
+
+If neither URI nor service are provided, the C<PGSERVICE> environment variable is attempted, and will fall back
+to localhost (similar to C<psql -h localhost> behaviour).
+
+ $loop->add(
+  my $dbh = Database::Async->new(
+   type => 'postgresql',
+  )
+ );
+
 
 =cut
 
@@ -25,6 +54,8 @@ use URI::postgres;
 use URI::QueryParam;
 use Future::AsyncAwait;
 use Database::Async::Query;
+use File::HomeDir;
+use Config::Tiny;
 
 use Protocol::Database::PostgreSQL::Client qw(0.008);
 use Protocol::Database::PostgreSQL::Constants qw(:v1);
@@ -111,8 +142,10 @@ async sub connect {
     # Initial connection is made directly through the URI
     # parameters. Eventually we also want to support UNIX
     # socket and other types.
+    $self->{uri} ||= $self->uri_for_service($self->service) if $self->service;
     my $uri = $self->uri;
     die 'bad URI' unless ref $uri;
+    $log->tracef('URI for connection is %s', "$uri");
     my $endpoint = join ':', $uri->host, $uri->port;
     $log->tracef('Will connect to %s', $endpoint);
     $self->{ssl} = do {
@@ -170,6 +203,37 @@ async sub connect {
     );
     return $stream;
 }
+
+=head2 service_conf_path
+
+Return the expected location for the pg_service.conf file.
+
+=cut
+
+sub service_conf_path {
+    my ($class) = @_;
+    return $ENV{PGSERVICEFILE} if exists $ENV{PGSERVICEFILE};
+    return $ENV{PGSYSCONFDIR} . '/pg_service.conf' if exists $ENV{PGSYSCONFDIR};
+    my $path = File::HomeDir->my_home . '/.pg_service.conf';
+    return $path if -r $path;
+    return '/etc/pg_service.conf';
+}
+
+sub service_parse {
+    my ($class, $path) = @_;
+    return Config::Tiny->read($path, 'encoding(UTF-8)');
+}
+
+sub find_service {
+    my ($class, $srv) = @_;
+    my $data = $class->service_parse(
+        $class->service_conf_path
+    );
+    die 'service ' . $srv . ' not found in config' unless $data->{$srv};
+    return $data->{$srv};
+}
+
+sub service { shift->{service} //= $ENV{PGSERVICE} }
 
 sub database_name {
     my $uri = shift->uri;
@@ -249,6 +313,23 @@ sub uri_for_dsn {
     my %args = split /[=;]/, $dsn;
     my $uri = URI->new('postgresql://postgres@localhost/postgres');
     $uri->$_(delete $args{$_}) for grep exists $args{$_}, qw(host port user password dbname);
+    $uri
+}
+
+sub uri_for_service {
+    my ($class, $service) = @_;
+    my $cfg = $class->find_service($service);
+    my $uri = URI->new('postgresql://postgres@localhost/postgres');
+    $uri->$_(delete $cfg->{$_}) for grep exists $cfg->{$_}, qw(host port user password dbname);
+    $uri->host(delete $cfg->{hostaddr}) if exists $cfg->{hostaddr};
+    $uri->query_param($_ => delete $cfg->{$_}) for grep exists $cfg->{$_}, qw(
+        application_name
+        fallback_application_name
+        keepalives
+        options
+        sslmode
+        replication
+    );
     $uri
 }
 
@@ -396,7 +477,7 @@ sub protocol {
     my ($self) = @_;
     $self->{protocol} //= do {
         my $pg = Protocol::Database::PostgreSQL::Client->new(
-            database => ($self->uri->dbname // 'postgres'),
+            database => $self->database_name,
             outgoing => $self->outgoing,
         );
         $self->incoming
@@ -438,7 +519,7 @@ sub protocol {
                         return;
                     };
                     $log->tracef('Completed query %s with result %s', $query, $msg->result);
-                    $query->done
+                    $query->done unless $query->completed->is_ready;
                 }),
                 no_data => $self->$curry::weak(sub {
                     my ($self, $msg) = @_;
@@ -534,6 +615,12 @@ sub protocol {
                 copy_done => $self->$curry::weak(sub {
                     my ($self, $msg) = @_;
                     $log->tracef('Copy done - %s', $msg);
+                }),
+                notification_response => $self->$curry::weak(sub {
+                    my ($self, $msg) = @_;
+                    my ($chan, $data) = @{$msg}{qw(channel data)};
+                    $log->tracef('Notification on channel %s containing %s', $chan, $data);
+                    $self->db->notification($self, $chan, $data);
                 }),
                 sub { $log->errorf('Unknown message %s (type %s)', $_, $_->type) }
             );
@@ -671,7 +758,6 @@ sub query {
     return $src;
 }
 
-
 sub active_query { shift->{active_query} }
 
 1;
@@ -740,5 +826,5 @@ Tom Molesworth C<< <TEAM@cpan.org> >>
 
 =head1 LICENSE
 
-Copyright Tom Molesworth 2011-2019. Licensed under the same terms as Perl itself.
+Copyright Tom Molesworth 2011-2020. Licensed under the same terms as Perl itself.
 

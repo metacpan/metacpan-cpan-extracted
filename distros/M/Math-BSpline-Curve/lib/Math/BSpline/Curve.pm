@@ -1,5 +1,5 @@
 package Math::BSpline::Curve;
-$Math::BSpline::Curve::VERSION = '0.001';
+$Math::BSpline::Curve::VERSION = '0.002';
 use 5.014;
 use warnings;
 
@@ -7,11 +7,10 @@ use warnings;
 
 use Moo 2.002005;
 use List::Util 1.26 ('min');
-use Ref::Util 0.010 (
-    'is_plain_arrayref',
-);
+use Ref::Util 0.010 ('is_plain_arrayref');
+use Log::Any 1.044 ('$logger');
 use Math::BSpline::Basis 0.001;
-use Math::Matrix::Banded 0.004;
+
 
 
 has '_degree' => (
@@ -186,6 +185,8 @@ sub derivative {
     );
 }
 
+with ('Math::BSpline::Curve::Role::Approximation');
+
 
 1;
 
@@ -201,7 +202,7 @@ Math::BSpline::Curve - B-spline curves
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 
@@ -289,6 +290,29 @@ type.
 
 =back
 
+=head3 fit
+
+    $curve = Math::BSpline::Curve->fit(
+        degree => 3,
+        points => [
+            [0.000, 0.000],
+            [0.789, 0.503],
+            [1.579, -0.012],
+            [2.368, -1.534],
+            [3.158, -2.857],
+            [3.947, -2.474],
+            [4.737, 0.105],
+            [5.526, 3.635],
+            [6.316, 5.712],
+            [7.105, 4.376],
+            [7.895, -0.291],
+            [8.684, -5.800],
+        ],
+        n_control_points => 6,
+    );
+
+See L<APPROXIMATION|APPROXIMATION> below.
+
 =head1 ATTRIBUTES
 
 =head3 degree
@@ -345,6 +369,33 @@ knot u_i of multiplicity p then the derivative is discontinuous at
 u_i. In this case, the derivative method will not fail, but return a
 continuous B-spline curve, which is B<not> the correct
 derivative. This behavior might change in a future release.
+
+=head1 APPROXIMATION
+
+WARNING: This feature is pre-alpha. I have done some plausibility
+testing and the results make sense, but to verify that they are
+really correct is not so simple.
+
+The L<fit|fit> constructor accepts a list of points and fits a
+B-spline with the given number of control points to it such that
+the sum of squared distances is minimized for each component.
+
+Background remark: Thism eans that e.g. in 3 dimensions the x, y,
+and z components of the control points are fitted separately thereby
+minimizing the squared distance of the x components of the given
+point to the B-spline curve in x and the same for y and z.
+The result is not necessarily the same as minimizing the sum of the
+squared Euclidean distances in space of the points from the curve.
+
+=head1 LOGGING
+
+This distribution uses L<Log::Any|Log::Any> for logging. Some
+methods just return C<undef> on error and log the error. If you just
+want to print the messages include
+
+    use Log::Any::Adapter ('Sterr');
+
+in your application. See L<Log::Any|Log::Any> for more options.
 
 =head1 ACKNOWLEDGEMENTS
 

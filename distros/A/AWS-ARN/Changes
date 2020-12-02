@@ -1,0 +1,14 @@
+Revision history for AWS::ARN
+
+0.004
+          - Add link to the ARN format documentation
+
+0.003
+          - Loosen Type::Tiny requirements
+
+0.002
+          - Edit POD slightly
+
+0.001
+          - Initial release to an unsuspecting world
+

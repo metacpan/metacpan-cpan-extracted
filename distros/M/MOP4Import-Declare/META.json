@@ -4,7 +4,7 @@
       "KOBAYASHI, Hiroaki <hkoba@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4229",
+   "generated_by" : "Module::Build version 0.4231",
    "license" : [
       "perl_5"
    ],
@@ -70,7 +70,7 @@
       },
       "MOP4Import::Declare" : {
          "file" : "Declare.pm",
-         "version" : "0.052"
+         "version" : "0.053"
       },
       "MOP4Import::Declare::Type" : {
          "file" : "Declare/Type.pm"
@@ -133,6 +133,6 @@
          "url" : "https://github.com/hkoba/perl-mop4import-declare"
       }
    },
-   "version" : "0.052",
-   "x_serialization_backend" : "JSON::PP version 4.02"
+   "version" : "0.053",
+   "x_serialization_backend" : "JSON::PP version 4.04"
 }

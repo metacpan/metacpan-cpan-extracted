@@ -1,5 +1,9 @@
 Revision history for Perl extension App-optex-msdoc
 
+0.05 2020-12-02T01:14:36Z
+
+    - Add notice to use App::optex::textconv.
+
 0.04 2018-07-02T08:52:29Z
 
     - requires 'App::Greple::msdoc', '1.01';

@@ -1,5 +1,18 @@
 Revision history for Database-Async
 
+0.013     2020-12-03 00:13:37+08:00 Asia/Kuala_Lumpur
+    New features:
+
+    - support for `type` configuration parameter, allowing connection to databases
+    without needing to pass a specific URI
+    - notification channel support (currently undocumented, since the interface
+    may change slightly to make it compatible with non-PostgreSQL databases)
+
+    Bugs fixed:
+
+    - single-row queries via `->single` generated superfluous log messages (thanks to Mehdi
+    Zarei for helping test this)
+
 0.012     2020-10-24 22:28:00+08:00 Asia/Kuala_Lumpur
     No new features.
 

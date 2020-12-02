@@ -5,6 +5,37 @@ NAME
 
 DESCRIPTION
 
+    Provide a postgresql:// URI when instantiating Database::Async to use
+    this engine.
+
+     $loop->add(
+      my $dbh = Database::Async->new(
+       uri => 'postgresql://localhost'
+      )
+     );
+
+    Connection can also be made using a service definition, as described in
+    https://www.postgresql.org/docs/current/libpq-pgservice.html.
+
+     $loop->add(
+      my $dbh = Database::Async->new(
+       type => 'postgresql',
+       engine => {
+        service => 'example',
+       }
+      )
+     );
+
+    If neither URI nor service are provided, the PGSERVICE environment
+    variable is attempted, and will fall back to localhost (similar to psql
+    -h localhost behaviour).
+
+     $loop->add(
+      my $dbh = Database::Async->new(
+       type => 'postgresql',
+      )
+     );
+
 METHODS
 
  connection
@@ -42,6 +73,10 @@ METHODS
     Establish a connection to the server.
 
     Returns a Future which resolves to the IO::Async::Stream once ready.
+
+ service_conf_path
+
+    Return the expected location for the pg_service.conf file.
 
  negotiate_ssl
 
@@ -152,6 +187,6 @@ AUTHOR
 
 LICENSE
 
-    Copyright Tom Molesworth 2011-2019. Licensed under the same terms as
+    Copyright Tom Molesworth 2011-2020. Licensed under the same terms as
     Perl itself.
 

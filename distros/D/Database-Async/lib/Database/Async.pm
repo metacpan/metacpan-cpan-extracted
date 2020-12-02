@@ -3,7 +3,7 @@ package Database::Async;
 use strict;
 use warnings;
 
-our $VERSION = '0.012';
+our $VERSION = '0.013';
 
 use parent qw(Database::Async::DB IO::Async::Notifier);
 
@@ -65,7 +65,7 @@ Other queries will be queued.
 Set up a pool of connections to provide better parallelism:
 
     my $dbh = Database::Async->new(
-        uri  => 'postgres://write@maindb/dbname?sslmode=require',
+        uri  => 'postgresql://write@maindb/dbname?sslmode=require',
         pool => {
             max => 4,
         },
@@ -327,6 +327,9 @@ sub configure {
     if(exists $args{engine}) {
         $self->{engine_parameters} = delete $args{engine};
     }
+    if(exists $args{type}) {
+        $self->{type} = delete $args{type};
+    }
     if(my $pool = delete $args{pool}) {
         if(blessed $pool) {
             $self->{pool} = $pool;
@@ -407,16 +410,17 @@ Loads the appropriate engine class and attaches to the loop.
 
 sub engine_instance {
     my ($self) = @_;
-    my $uri = $self->uri or die 'need a URI for database connection';
-    die 'unknown database type ' . $uri->scheme
-        unless my $engine_class = $Database::Async::Engine::ENGINE_MAP{$uri->scheme};
+    my $uri = $self->uri;
+    my $type = $self->{type} // $uri->scheme;
+    die 'unknown database type ' . $type
+        unless my $engine_class = $Database::Async::Engine::ENGINE_MAP{$type};
     Module::Load::load($engine_class) unless $engine_class->can('new');
     $log->tracef('Instantiating new %s', $engine_class);
     $self->add_child(
         my $engine = $engine_class->new(
             %{$self->{engine_parameters} || {}},
             db => $self,
-            uri => $uri
+            (defined($uri) ? (uri => $uri) : ())
         )
     );
     $engine;
@@ -452,6 +456,17 @@ async sub queue_query {
 
 sub diagnostics {
     my ($self) = @_;
+}
+
+sub notification {
+    my ($self, $engine, $channel, $data) = @_;
+    $log->tracef('Database notifies us via %s of %s', $channel, $data);
+    $self->notification_source($channel)->emit($data);
+}
+
+sub notification_source {
+    my ($self, $name) = @_;
+    $self->{notification_source}{$name} //= $self->new_source;
 }
 
 1;

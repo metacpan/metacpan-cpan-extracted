@@ -12,3 +12,6 @@
 
 2020-05-19 - 0.005
     + fix test from PAUSE
+
+2020-12-02 - 0.006
+    + fix the to_json misprototype issue

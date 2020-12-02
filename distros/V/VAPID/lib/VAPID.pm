@@ -1,5 +1,5 @@
 package VAPID;
-use 5.006; use strict; use warnings; our $VERSION = '1.00';
+use 5.006; use strict; use warnings; our $VERSION = '1.01';
 use Crypt::JWT qw(encode_jwt); use Crypt::PK::ECC; use URI;
 use MIME::Base64 qw/encode_base64url decode_base64url/;
 use base 'Import::Export';
@@ -190,7 +190,7 @@ VAPID - Voluntary Application Server Identification
 
 =head1 VERSION
 
-Version 1.00
+Version 1.01
 
 =cut
 
@@ -206,7 +206,7 @@ Version 1.00
 
 	...
 
-	my $header = generate_vapid_header(
+	my $auth_headers = generate_vapid_header(
 		'https://updates.push.services.mozilla.com',
 		'mailto:email@lnation.org',
 		$public,
@@ -326,6 +326,8 @@ The following is pseudo code but it should get you started.
 
 =head2 STEP 4 - manifest.json
 
+Required for Chrome; Firefox works even without this file:
+
 	{
 		"short_name" : "Push",
 		"name" : "Push Dashboard",
@@ -346,7 +348,7 @@ The following is pseudo code but it should get you started.
 =head2 STEP 5 - generate headers
 
 	my $notificaiton_host = URI->new($subscription_url)->host;
-	my $header = generate_vapid_header(
+	my $auth_headers = generate_vapid_header(
 		"https://$notification_host",
 		'mailto:email@lnation.org',
 		$public,
@@ -354,9 +356,29 @@ The following is pseudo code but it should get you started.
 		time + 60
 	);
 
-=head2 STEP 6 - curl // UA code
+=head2 STEP 6 - POST the push message
 
-	curl "{SUBSCRIBE_URL}" --request POST --header "TTL: 60" --header "Content-Length: 0" --header "Authorization: {AUTHORIZATION_HEADER}" --header "Crypto-Key: {CRYPTO_KEY_HEADER}"
+Curl from the command line:
+
+	curl "{SUBSCRIPTION_URL}" --request POST --header "TTL: 60" --header "Content-Length: 0" --header "Authorization: {AUTHORIZATION_HEADER}" --header "Crypto-Key: {CRYPTO_KEY_HEADER}"
+
+or Perl with LWP:
+
+	use LWP::UserAgent;
+
+	my $req = HTTP::Request->new(POST => $subscription_url);
+	$req->header(TTL => 60);
+	$req->header('Authorization' => $auth_headers->{Authorization});
+	$req->header('Crypto-Key' => $auth_headers->{'Crypto-Key'});
+
+	my $ua = LWP::UserAgent->new;
+	my $resp = $ua->request($req);
+
+	if ($resp->is_success) {
+		print "Push message sent out successfully.\n";
+	} else {
+		print "Push message did not get through:\n", $resp->as_string, "\n";
+	}
 
 =head1 AUTHOR
 

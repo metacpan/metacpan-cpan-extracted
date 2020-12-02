@@ -4,11 +4,13 @@
 # Andy Wardley <abw@wardley.org>
 #
 
+use 5.008001;
 use strict;
 use warnings;
 use Test::More tests => 29;
-use lib qw( lib ../lib );
 use Class::Singleton;
+
+## no critic (Modules::RequireFilenameMatchesPackage)
 
 # the final test is run by a destructor which is called after Test::Builder
 # would normally print the test summary, so we disable that

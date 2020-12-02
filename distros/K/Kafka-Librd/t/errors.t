@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 use Test::More;
-use Scalar::Util qw(looks_like_number); 
+use Scalar::Util qw(looks_like_number);
 use Kafka::Librd qw();
 
 my $errors = Kafka::Librd::Error::rd_kafka_get_err_descs();
@@ -14,7 +14,7 @@ for my $error_name (keys %$errors) {
     is &{"Kafka::Librd::RD_KAFKA_RESP_ERR_${error_name}"}, $val, "generated subroutine for $error_name returns expected value";
     ok Kafka::Librd::Error::to_string($val), "successful to_string call for code=$val";
     if ($error_name !~ /^(_BEGIN|_END)$/) { # these errors look special and don't roundtrip correctly
-	is Kafka::Librd::Error::to_name($val), $error_name, "to_name returns error name";
+        is Kafka::Librd::Error::to_name($val), $error_name, "to_name returns error name";
     }
 }
 

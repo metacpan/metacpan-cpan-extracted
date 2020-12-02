@@ -5,7 +5,7 @@ use warnings;
 
 use parent qw(Ryu::Node);
 
-our $VERSION = '2.003'; # VERSION
+our $VERSION = '2.004'; # VERSION
 our $AUTHORITY = 'cpan:TEAM'; # AUTHORITY
 
 =head1 NAME
@@ -49,6 +49,7 @@ Once you have a source, you'll need two things:
 
 For the first, call L</emit>:
 
+ use Future::AsyncAwait;
  # 1s drifting periodic timer
  while(1) {
   await $loop->delay_future(after => 1);
@@ -226,12 +227,26 @@ Creates a new source from things.
 The precise details of what this method supports may be somewhat ill-defined at this point in time.
 It is expected that the interface and internals of this method will vary greatly in versions to come.
 
+At the moment, the following inputs are supported:
+
+=over 4
+
+=item * arrayref - when called as C<< ->from([1,2,3]) >> this will emit the values from the arrayref,
+deferring until the source is started
+
+=item * L<Future> - given a L<Future> instance, will emit the results when that L<Future> is marked as done
+
+=item * file handle - if provided a filehandle, such as C<< ->from(\*STDIN) >>, this will read bytes and
+emit those until EOF
+
+=back
+
 =cut
 
 sub from {
     my $class = shift;
     my $src = (ref $class) ? $class : $class->new;
-    if(my $from_class = blessed($_[0])) {
+    if(my $from_class = Scalar::Util::blessed($_[0])) {
         if($from_class->isa('Future')) {
             $_[0]->on_ready(sub {
                 my ($f) = @_;

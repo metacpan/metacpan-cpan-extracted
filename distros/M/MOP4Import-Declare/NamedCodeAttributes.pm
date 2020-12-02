@@ -10,6 +10,7 @@ use attributes ();
 use Exporter qw/import/;
 our @EXPORT = qw(
                   MODIFY_CODE_ATTRIBUTES
+                  FETCH_CODE_ATTRIBUTES
                   m4i_CODE_ATTR_get
               );
 
@@ -21,6 +22,12 @@ sub MODIFY_CODE_ATTRIBUTES {
   my $pack = shift;
   my $caller = [caller(1)];
   m4i_CODE_ATTR_dispatch($pack, $caller, @_);
+}
+
+sub FETCH_CODE_ATTRIBUTES {
+  my ($pack, $code) = @_;
+  my $atts = m4i_CODE_ATTR_dict($pack, $code);
+  $atts;
 }
 
 sub m4i_CODE_ATTR_dispatch {
@@ -47,7 +54,6 @@ sub m4i_CODE_ATTR_dispatch {
         $pack,
         $attName, $code,
         scalar($sub->($pack, $code, $value, $attName)),
-        $filename, $lineno
       );
     } else {
       print STDERR "# No CODE_ATTR handler for $attName in $pack: $attStr\n"
@@ -59,8 +65,13 @@ sub m4i_CODE_ATTR_dispatch {
 }
 
 sub m4i_CODE_ATTR_add {
-  my ($_pack, $attName, $code, $value, $filename, $lineno) = @_;
-  $named_code_attributes{$attName}{$code} = [$value, $filename, $lineno];
+  my ($_pack, $attName, $code, $value) = @_;
+  $named_code_attributes{$code}{$attName} = $value;
+}
+
+sub m4i_CODE_ATTR_dict {
+  my ($_pack, $code) = @_;
+  $named_code_attributes{$code};
 }
 
 sub m4i_CODE_ATTR_get {
@@ -68,9 +79,7 @@ sub m4i_CODE_ATTR_get {
   unless (defined $code and ref $code eq 'CODE') {
     Carp::croak "Invalid type argument: ".MOP4Import::Util::terse_dump($code);
   }
-  my $entry = $named_code_attributes{$attName}{$code}
-    or return;
-  wantarray ? @$entry : $entry->[0];
+  $named_code_attributes{$code}{$attName};
 }
 
 sub _strip_quotes {

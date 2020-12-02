@@ -19,17 +19,17 @@ requires 'Ryu::Async', '>= 0.016';
 requires 'Module::Load', 0;
 requires 'YAML::XS', 0;
 requires 'JSON::MaybeUTF8', 0;
+requires 'Template', '>= 3.000';
 requires 'URI', 0;
 requires 'URI::db', '>= 0.19';
 
 on 'test' => sub {
-	requires 'Test::More', '>= 0.98';
-	requires 'Test::Fatal', '>= 0.010';
-	requires 'Test::Refcount', '>= 0.07';
+    requires 'Test::More', '>= 0.98';
+    requires 'Test::Fatal', '>= 0.010';
+    requires 'Test::Refcount', '>= 0.07';
     requires 'Test::CheckDeps', 0;
-	requires 'Test::CPANfile', 0;
 };
 
 on 'develop' => sub {
-	requires 'Test::CPANfile', '>= 0.02';
+    requires 'Test::CPANfile', '>= 0.02';
 };

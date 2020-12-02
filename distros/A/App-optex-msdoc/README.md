@@ -1,14 +1,20 @@
+[![Build Status](https://travis-ci.org/kaz-utashiro/optex-msdoc.svg?branch=master)](https://travis-ci.org/kaz-utashiro/optex-msdoc)
 # NAME
 
 msdoc - module to replace MS document by its text contents
 
 # VERSION
 
-Version 0.04
+Version 0.05
 
 # SYNOPSIS
 
 optex command -Mmsdoc
+
+# NOTICE
+
+There is more general successor version of this module.
+Use [https://github.com/kaz-utashiro/optex-textconv](https://github.com/kaz-utashiro/optex-textconv).
 
 # DESCRIPTION
 
@@ -53,9 +59,11 @@ It is possible to use other data conversion program, like [pandoc](https://metac
 ["Apache Tika"](#apache-tika).  Feel to free to modify this module.  I'm reluctant to
 use them, because they work quite leisurely.
 
+[https://github.com/kaz-utashiro/optex-textconv](https://github.com/kaz-utashiro/optex-textconv)
+
 # LICENSE
 
-Copyright (C) Kazumasa Utashiro.
+Copyright 2020 Kazumasa Utashiro.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

@@ -96,10 +96,13 @@ my $ktopic = $kafka->topic( $topic, {} );
 
 while (<>) {
     chomp;
-    break if $_ eq '.';
+    last if $_ eq '.';
     my ( $msg, $key ) = split /\t/, $_, 2;
-    my $err = $ktopic->produce( -1, 0, $msg, $key );
-    $err and die "Couldn't produce: ", Kafka::Librd::Error::to_string($err);
+    my $status = $ktopic->produce( -1, 0, $msg, $key );
+    if ($status == -1){
+        my $err = Kafka::Librd::Error::last_error();
+        say "Couldn't produce: ", Kafka::Librd::Error::to_string($err);
+    }
 }
 
 sleep 1 while $kafka->outq_len;

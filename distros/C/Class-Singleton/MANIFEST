@@ -1,7 +1,17 @@
-Changes
-MANIFEST
-Makefile.PL
-README
-lib/Class/Singleton.pm
-t/singleton.t
-META.yml                                 Module meta-data (added by MakeMaker)
+Artistic                                 The "Artistic License"
+Changes                                  Differences from previous version
+Copying                                  The GNU General Public License
+INSTALL                                  Detailed installation instructions
+lib/Class/Singleton.pm                   Class::Singleton Perl module
+LICENCE                                  The Licence
+Makefile.PL                              Makefile writer
+MANIFEST                                 This list of files
+MANIFEST.SKIP                            Manifest skip specs
+README                                   The Instructions
+t/changes.t                              See if Changes file format is OK
+t/critic.t                               See if coding style is OK
+t/pod.t                                  See if POD is OK
+t/pod_coverage.t                         See if POD coverage is OK
+t/singleton.t                            Test script
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

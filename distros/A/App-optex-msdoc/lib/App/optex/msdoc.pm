@@ -4,7 +4,7 @@ use 5.014;
 use strict;
 use warnings;
 
-our $VERSION = "0.04";
+our $VERSION = "0.05";
 
 =encoding utf-8
 
@@ -14,11 +14,16 @@ msdoc - module to replace MS document by its text contents
 
 =head1 VERSION
 
-Version 0.04
+Version 0.05
 
 =head1 SYNOPSIS
 
 optex command -Mmsdoc
+
+=head1 NOTICE
+
+There is more general successor version of this module.
+Use L<https://github.com/kaz-utashiro/optex-textconv>.
 
 =head1 DESCRIPTION
 
@@ -63,9 +68,11 @@ It is possible to use other data conversion program, like L<pandoc> or
 L<Apache Tika>.  Feel to free to modify this module.  I'm reluctant to
 use them, because they work quite leisurely.
 
+L<https://github.com/kaz-utashiro/optex-textconv>
+
 =head1 LICENSE
 
-Copyright (C) Kazumasa Utashiro.
+Copyright 2020 Kazumasa Utashiro.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

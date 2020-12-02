@@ -8,10 +8,10 @@ package UTF8::R2;
 # Copyright (c) 2019, 2020 INABA Hitoshi <ina@cpan.org> in a CPAN
 ######################################################################
 
-use 5.00503;    # Galapagos Consensus 1998 for primetools
+use 5.00503;    # Universal Consensus 1998 for primetools
 # use 5.008001; # Lancaster Consensus 2013 for toolchains
 
-$VERSION = '0.07';
+$VERSION = '0.09';
 $VERSION = $VERSION;
 
 use strict;
@@ -23,16 +23,16 @@ my %utf8_codepoint = (
 
     # beautiful concept in young days
     # https://www.ietf.org/rfc/rfc2279.txt
-    'RFC2279' => qr{(?>
+    'RFC2279' => qr{(?>@{[join('', qw(
         [\x00-\x7F\x80-\xBF\xC0-\xC1\xF5-\xFF]       |
         [\xC2-\xDF][\x80-\xBF]                       |
         [\xE0-\xEF][\x80-\xBF][\x80-\xBF]            |
         [\xF0-\xF4][\x80-\xBF][\x80-\xBF][\x80-\xBF] |
         [\x00-\xFF]
-    )}x,
+    ))]})}x,
 
     # https://tools.ietf.org/rfc/rfc3629.txt
-    'RFC3629' => qr{(?>
+    'RFC3629' => qr{(?>@{[join('', qw(
         [\x00-\x7F\x80-\xBF\xC0-\xC1\xF5-\xFF]       |
         [\xC2-\xDF][\x80-\xBF]                       |
         [\xE0-\xE0][\xA0-\xBF][\x80-\xBF]            |
@@ -43,10 +43,22 @@ my %utf8_codepoint = (
         [\xF1-\xF3][\x80-\xBF][\x80-\xBF][\x80-\xBF] |
         [\xF4-\xF4][\x80-\x8F][\x80-\xBF][\x80-\xBF] |
         [\x00-\xFF]
-    )}x,
+    ))]})}x,
+
+    # http://simonsapin.github.io/wtf-8/
+    'WTF8' => qr{(?>@{[join('', qw(
+        [\x00-\x7F\x80-\xBF\xC0-\xC1\xF5-\xFF]       |
+        [\xC2-\xDF][\x80-\xBF]                       |
+        [\xE0-\xE0][\xA0-\xBF][\x80-\xBF]            |
+        [\xE1-\xEF][\x80-\xBF][\x80-\xBF]            |
+        [\xF0-\xF0][\x90-\xBF][\x80-\xBF][\x80-\xBF] |
+        [\xF1-\xF3][\x80-\xBF][\x80-\xBF][\x80-\xBF] |
+        [\xF4-\xF4][\x80-\x8F][\x80-\xBF][\x80-\xBF] |
+        [\x00-\xFF]
+    ))]})}x,
 
     # optimized RFC3629 for ja_JP
-    'RFC3629.ja_JP' => qr{(?>
+    'RFC3629.ja_JP' => qr{(?>@{[join('', qw(
         [\x00-\x7F\x80-\xBF\xC0-\xC1\xF5-\xFF]       |
         [\xE1-\xEC][\x80-\xBF][\x80-\xBF]            |
         [\xC2-\xDF][\x80-\xBF]                       |
@@ -57,7 +69,19 @@ my %utf8_codepoint = (
         [\xF1-\xF3][\x80-\xBF][\x80-\xBF][\x80-\xBF] |
         [\xF4-\xF4][\x80-\x8F][\x80-\xBF][\x80-\xBF] |
         [\x00-\xFF]
-    )}x,
+    ))]})}x,
+
+    # optimized WTF-8 for ja_JP
+    'WTF8.ja_JP' => qr{(?>@{[join('', qw(
+        [\x00-\x7F\x80-\xBF\xC0-\xC1\xF5-\xFF]       |
+        [\xE1-\xEF][\x80-\xBF][\x80-\xBF]            |
+        [\xC2-\xDF][\x80-\xBF]                       |
+        [\xE0-\xE0][\xA0-\xBF][\x80-\xBF]            |
+        [\xF0-\xF0][\x90-\xBF][\x80-\xBF][\x80-\xBF] |
+        [\xF1-\xF3][\x80-\xBF][\x80-\xBF][\x80-\xBF] |
+        [\xF4-\xF4][\x80-\x8F][\x80-\xBF][\x80-\xBF] |
+        [\x00-\xFF]
+    ))]})}x,
 );
 
 # supports /./
@@ -213,6 +237,157 @@ sub UTF8::R2::ord (;$) {
     return $ord;
 }
 
+#---------------------------------------------------------------------
+# qr/ \x{Unicode} / for UTF-8 codepoint string
+sub _unicode_hex {
+    my($codepoint) = @_;
+
+    # \x{unicode_hex}
+    if ((my($unicode_by_hex) = $codepoint =~ /\A \\x \{ ([01234567890ABCDEFabcdef]+) \} \z/x)) {
+        my $unicode = hex $unicode_by_hex;
+        if (0) { }
+        elsif ($unicode <     0x80) { return pack('U0C*',                                                                   $unicode          ) }
+        elsif ($unicode <    0x800) { return pack('U0C*',                                            $unicode>>6     |0xC0, $unicode&0x3F|0x80) }
+        elsif ($unicode <  0x10000) { return pack('U0C*',                    $unicode>>12     |0xE0, $unicode>>6&0x3F|0x80, $unicode&0x3F|0x80) }
+        elsif ($unicode < 0x110000) { return pack('U0C*', $unicode>>18|0xF0, $unicode>>12&0x3F|0x80, $unicode>>6&0x3F|0x80, $unicode&0x3F|0x80) }
+        else { Carp::confess qq{@{[__FILE__]}: \\x{$unicode_by_hex} is out of Unicode (0 to 0x10FFFF)}; }
+    }
+    else {
+        return $codepoint;
+    }
+}
+
+#---------------------------------------------------------------------
+# qr/ [A-Z] / for UTF-8 codepoint string
+sub _list_all_by_hyphen {
+    my($a,$b) = map { _unicode_hex($_) } @_;
+
+    my @a = (undef, unpack 'C*', $a);
+    my @b = (undef, unpack 'C*', $b);
+
+    if (0) { }
+    elsif (CORE::length($a) == 1) {
+        if (0) { }
+        elsif (CORE::length($b) == 1) {
+            return (
+$a[1]<=$b[1] ?  sprintf(join('', qw( [\x%02x-\x%02x]                                         )), $a[1],
+                                                                                                 $b[1]) : (),
+            );
+        }
+        elsif (CORE::length($b) == 2) {
+            return (
+                sprintf(join('', qw(       \x%02x  [\x80-\x%02x]                             )), $b[1], $b[2]),
+0xC2 < $b[1] ?  sprintf(join('', qw( [\xC2-\x%02x] [\x80-\xBF  ]                             )), $b[1]-1     ) : (),
+                sprintf(join('', qw( [\x%02x-\x7F]                                           )), $a[1]       ),
+            );
+        }
+        elsif (CORE::length($b) == 3) {
+            return (
+                sprintf(join('', qw(       \x%02x        \x%02x  [\x80-\x%02x]               )), $b[1], $b[2], $b[3]),
+0x80 < $b[2] ?  sprintf(join('', qw(       \x%02x  [\x80-\x%02x] [\x80-\xBF  ]               )), $b[1], $b[2]-1     ) : (),
+0xE0 < $b[1] ?  sprintf(join('', qw( [\xE0-\x%02x] [\x80-\xBF  ] [\x80-\xBF  ]               )), $b[1]-1            ) : (),
+                sprintf(join('', qw( [\xC2-\xDF  ] [\x80-\xBF  ]                             )),                    ),
+                sprintf(join('', qw( [\x%02x-\x7F]                                           )), $a[1]              ),
+            );
+        }
+        elsif (CORE::length($b) == 4) {
+            return (
+                sprintf(join('', qw(       \x%02x        \x%02x        \x%02x  [\x80-\x%02x] )), $b[1], $b[2], $b[3], $b[4]),
+0x80 < $b[3] ?  sprintf(join('', qw(       \x%02x        \x%02x  [\x80-\x%02x] [\x80-\xBF  ] )), $b[1], $b[2], $b[3]-1     ) : (),
+0x80 < $b[2] ?  sprintf(join('', qw(       \x%02x  [\x80-\x%02x] [\x80-\xBF  ] [\x80-\xBF  ] )), $b[1], $b[2]-1            ) : (),
+0xF0 < $b[1] ?  sprintf(join('', qw( [\xF0-\x%02x] [\x80-\xBF  ] [\x80-\xBF  ] [\x80-\xBF  ] )), $b[1]-1                   ) : (),
+                sprintf(join('', qw( [\xE0-\xEF  ] [\x80-\xBF  ] [\x80-\xBF  ]               )),                           ),
+                sprintf(join('', qw( [\xC2-\xDF  ] [\x80-\xBF  ]                             )),                           ),
+                sprintf(join('', qw( [\x%02x-\x7F]                                           )), $a[1]                     ),
+            );
+        }
+    }
+    elsif (CORE::length($a) == 2) {
+        if (0) { }
+        elsif (CORE::length($b) == 2) {
+            my $lower_limit = join('|',
+$a[1] < 0xDF ?  sprintf(join('', qw( [\x%02x-\xDF] [\x80-\xBF  ]                             )), $a[1]+1     ) : (),
+                sprintf(join('', qw(  \x%02x       [\x%02x-\xBF]                             )), $a[1], $a[2]),
+            );
+            my $upper_limit = join('|',
+                sprintf(join('', qw(       \x%02x  [\x80-\x%02x]                             )), $b[1], $b[2]),
+0xC2 < $b[1] ?  sprintf(join('', qw( [\xC2-\x%02x] [\x80-\xBF  ]                             )), $b[1]-1     ) : (),
+            );
+            return qq{(?=$lower_limit)(?=$upper_limit)};
+        }
+        elsif (CORE::length($b) == 3) {
+            return (
+                sprintf(join('', qw(       \x%02x        \x%02x  [\x80-\x%02x]               )), $b[1], $b[2], $b[3] ),
+0x80 < $b[2] ?  sprintf(join('', qw(       \x%02x  [\x80-\x%02x] [\x80-\xBF  ]               )), $b[1], $b[2]-1      ) : (),
+0xE0 < $b[1] ?  sprintf(join('', qw( [\xE0-\x%02x] [\x80-\xBF  ] [\x80-\xBF  ]               )), $b[1]-1             ) : (),
+$a[1] < 0xDF ?  sprintf(join('', qw( [\x%02x-\xDF] [\x80-\xBF  ]                             )), $a[1]+1             ) : (),
+                sprintf(join('', qw(  \x%02x       [\x%02x-\xBF]                             )), $a[1], $a[2]        ),
+            );
+        }
+        elsif (CORE::length($b) == 4) {
+            return (
+                sprintf(join('', qw(       \x%02x        \x%02x        \x%02x  [\x80-\x%02x] )), $b[1], $b[2], $b[3], $b[4]),
+0x80 < $b[3] ?  sprintf(join('', qw(       \x%02x        \x%02x  [\x80-\x%02x] [\x80-\xBF  ] )), $b[1], $b[2], $b[3]-1     ) : (),
+0x80 < $b[2] ?  sprintf(join('', qw(       \x%02x  [\x80-\x%02x] [\x80-\xBF  ] [\x80-\xBF  ] )), $b[1], $b[2]-1            ) : (),
+0xF0 < $b[1] ?  sprintf(join('', qw( [\xF0-\x%02x] [\x80-\xBF  ] [\x80-\xBF  ] [\x80-\xBF  ] )), $b[1]-1                   ) : (),
+                sprintf(join('', qw( [\xE0-\xEF  ] [\x80-\xBF  ] [\x80-\xBF  ]               )),                           ),
+$a[1] < 0xDF ?  sprintf(join('', qw( [\x%02x-\xDF] [\x80-\xBF  ]                             )), $a[1]+1                   ) : (),
+                sprintf(join('', qw(  \x%02x       [\x%02x-\xBF]                             )), $a[1], $a[2]              ),
+            );
+        }
+    }
+    elsif (CORE::length($a) == 3) {
+        if (0) { }
+        elsif (CORE::length($b) == 3) {
+            my $lower_limit = join('|',
+$a[1] < 0xEF ?  sprintf(join('', qw( [\x%02x-\xEF] [\x80-\xBF  ] [\x80-\xBF  ]               )), $a[1]+1            ) : (),
+$a[2] < 0xBF ?  sprintf(join('', qw(  \x%02x       [\x%02x-\xBF] [\x80-\xBF  ]               )), $a[1], $a[2]+1     ) : (),
+                sprintf(join('', qw(  \x%02x        \x%02x       [\x%02x-\xBF]               )), $a[1], $a[2], $a[3]),
+            );
+            my $upper_limit = join('|',
+                sprintf(join('', qw(       \x%02x        \x%02x  [\x80-\x%02x]               )), $b[1], $b[2], $b[3]),
+0x80 < $b[2] ?  sprintf(join('', qw(       \x%02x  [\x80-\x%02x] [\x80-\xBF  ]               )), $b[1], $b[2]-1     ) : (),
+0xE0 < $b[1] ?  sprintf(join('', qw( [\xE0-\x%02x] [\x80-\xBF  ] [\x80-\xBF  ]               )), $b[1]-1            ) : (),
+            );
+            return qq{(?=$lower_limit)(?=$upper_limit)};
+        }
+        elsif (CORE::length($b) == 4) {
+            return (
+                sprintf(join('', qw(       \x%02x        \x%02x        \x%02x  [\x80-\x%02x] )), $b[1], $b[2], $b[3], $b[4]),
+0x80 < $b[3] ?  sprintf(join('', qw(       \x%02x        \x%02x  [\x80-\x%02x] [\x80-\xBF  ] )), $b[1], $b[2], $b[3]-1     ) : (),
+0x80 < $b[2] ?  sprintf(join('', qw(       \x%02x  [\x80-\x%02x] [\x80-\xBF  ] [\x80-\xBF  ] )), $b[1], $b[2]-1            ) : (),
+0xF0 < $b[1] ?  sprintf(join('', qw( [\xF0-\x%02x] [\x80-\xBF  ] [\x80-\xBF  ] [\x80-\xBF  ] )), $b[1]-1                   ) : (),
+$a[1] < 0xEF ?  sprintf(join('', qw( [\x%02x-\xEF] [\x80-\xBF  ] [\x80-\xBF  ]               )), $a[1]+1                   ) : (),
+$a[2] < 0xBF ?  sprintf(join('', qw(  \x%02x       [\x%02x-\xBF] [\x80-\xBF  ]               )), $a[1], $a[2]+1            ) : (),
+                sprintf(join('', qw(  \x%02x        \x%02x       [\x%02x-\xBF]               )), $a[1], $a[2], $a[3]       ),
+            );
+        }
+    }
+    elsif (CORE::length($a) == 4) {
+        if (0) { }
+        elsif (CORE::length($b) == 4) {
+            my $lower_limit = join('|',
+$a[1] < 0xF4 ?  sprintf(join('', qw( [\x%02x-\xF4] [\x80-\xBF  ] [\x80-\xBF  ] [\x80-\xBF  ] )), $a[1]+1                   ) : (),
+$a[2] < 0xBF ?  sprintf(join('', qw(  \x%02x       [\x%02x-\xBF] [\x80-\xBF  ] [\x80-\xBF  ] )), $a[1], $a[2]+1            ) : (),
+$a[3] < 0xBF ?  sprintf(join('', qw(  \x%02x        \x%02x       [\x%02x-\xBF] [\x80-\xBF  ] )), $a[1], $a[2], $a[3]+1     ) : (),
+                sprintf(join('', qw(  \x%02x        \x%02x        \x%02x       [\x%02x-\xBF] )), $a[1], $a[2], $a[3], $a[4]),
+            );
+            my $upper_limit = join('|',
+                sprintf(join('', qw(       \x%02x        \x%02x        \x%02x  [\x80-\x%02x] )), $b[1], $b[2], $b[3], $b[4]),
+0x80 < $b[3] ?  sprintf(join('', qw(       \x%02x        \x%02x  [\x80-\x%02x] [\x80-\xBF  ] )), $b[1], $b[2], $b[3]-1     ) : (),
+0x80 < $b[2] ?  sprintf(join('', qw(       \x%02x  [\x80-\x%02x] [\x80-\xBF  ] [\x80-\xBF  ] )), $b[1], $b[2]-1            ) : (),
+0xF0 < $b[1] ?  sprintf(join('', qw( [\xF0-\x%02x] [\x80-\xBF  ] [\x80-\xBF  ] [\x80-\xBF  ] )), $b[1]-1                   ) : (),
+            );
+            return qq{(?=$lower_limit)(?=$upper_limit)};
+        }
+    }
+
+    # over range of codepoint
+    Carp::confess sprintf(qq{@{[__FILE__]}: codepoint class [$_[0]-$_[1]] is not 1 to 4 octets (%d-%d)}, CORE::length($a), CORE::length($b));
+}
+
+#---------------------------------------------------------------------
+# qr// for UTF-8 codepoint string
 sub UTF8::R2::qr ($) {
     my $before_regex = $_[0];
     my($package,$filename,$line) = caller;
@@ -234,35 +409,37 @@ sub UTF8::R2::qr ($) {
             my @before_subclass = $before_class =~ /\G (?: (?>\\x\{[01234567890ABCDEFabcdef]+\}) | (?>\\$x) | $x ) /xg;
             my @sbcs = ();
             my @mbcs = ();
-            for my $before_subclass (@before_subclass) {
 
-                # \x{unicode_hex}
-                if (($] =~ /\A5\.006/) and (my($unicode_by_hex) = $before_subclass =~ /\A \\x \{ ([01234567890ABCDEFabcdef]+) \} \z/x)) {
-                    my $unicode = hex $unicode_by_hex;
-                    if (0) { }
-                    elsif ($unicode <     0x80) { push @sbcs, pack('U0C*',                                                                   $unicode          ) }
-                    elsif ($unicode <    0x800) { push @mbcs, pack('U0C*',                                            $unicode>>6     |0xC0, $unicode&0x3F|0x80) }
-                    elsif ($unicode <  0x10000) { push @mbcs, pack('U0C*',                    $unicode>>12     |0xE0, $unicode>>6&0x3F|0x80, $unicode&0x3F|0x80) }
-                    elsif ($unicode < 0x110000) { push @mbcs, pack('U0C*', $unicode>>18|0xF0, $unicode>>12&0x3F|0x80, $unicode>>6&0x3F|0x80, $unicode&0x3F|0x80) }
-                    else { Carp::confess qq{@{[__FILE__]}: \\x{$unicode_by_hex} is out of Unicode (0 to 0x10FFFF)}; }
+            for (my $i=0; $i <= $#before_subclass; ) {
+                my $before_subclass = $before_subclass[$i];
+
+                # hyphen of [A-Z] or [^A-Z]
+                if (($i < $#before_subclass) and ($before_subclass[$i+1] eq '-')) {
+                    push @mbcs, _list_all_by_hyphen($before_subclass[$i], $before_subclass[$i+2]);
+                    $i += 3;
                 }
 
                 # \any
-                elsif ($before_subclass eq '\D')          { push @mbcs, "(?:(?![$bare_d])$x)"  }
-                elsif ($before_subclass eq '\H')          { push @mbcs, "(?:(?![$bare_h])$x)"  }
-#               elsif ($before_subclass eq '\N')          { push @mbcs, "(?:(?!\\n)$x)"        } # \N in a character class must be a named character: \N{...} in regex
-#               elsif ($before_subclass eq '\R')          { push @mbcs, "(?>\\r\\n|[$bare_v])" } # Unrecognized escape \R in character class passed through in regex
-                elsif ($before_subclass eq '\S')          { push @mbcs, "(?:(?![$bare_s])$x)"  }
-                elsif ($before_subclass eq '\V')          { push @mbcs, "(?:(?![$bare_v])$x)"  }
-                elsif ($before_subclass eq '\W')          { push @mbcs, "(?:(?![$bare_w])$x)"  }
-                elsif ($before_subclass eq '\b')          { push @sbcs, $bare_b                }
-                elsif ($before_subclass eq '\d')          { push @sbcs, $bare_d                }
-                elsif ($before_subclass eq '\h')          { push @sbcs, $bare_h                }
-                elsif ($before_subclass eq '\s')          { push @sbcs, $bare_s                }
-                elsif ($before_subclass eq '\v')          { push @sbcs, $bare_v                }
-                elsif ($before_subclass eq '\w')          { push @sbcs, $bare_w                }
-                elsif (CORE::length($before_subclass)==1) { push @sbcs, $before_subclass       }
-                else                                      { push @mbcs, $before_subclass       }
+                else {
+                    $before_subclass = _unicode_hex($before_subclass);
+                    if (0) { }
+                    elsif ($before_subclass eq '\D')          { push @mbcs, "(?:(?![$bare_d])$x)"  }
+                    elsif ($before_subclass eq '\H')          { push @mbcs, "(?:(?![$bare_h])$x)"  }
+#                   elsif ($before_subclass eq '\N')          { push @mbcs, "(?:(?!\\n)$x)"        } # \N in a character class must be a named character: \N{...} in regex
+#                   elsif ($before_subclass eq '\R')          { push @mbcs, "(?>\\r\\n|[$bare_v])" } # Unrecognized escape \R in character class passed through in regex
+                    elsif ($before_subclass eq '\S')          { push @mbcs, "(?:(?![$bare_s])$x)"  }
+                    elsif ($before_subclass eq '\V')          { push @mbcs, "(?:(?![$bare_v])$x)"  }
+                    elsif ($before_subclass eq '\W')          { push @mbcs, "(?:(?![$bare_w])$x)"  }
+                    elsif ($before_subclass eq '\b')          { push @sbcs, $bare_b                }
+                    elsif ($before_subclass eq '\d')          { push @sbcs, $bare_d                }
+                    elsif ($before_subclass eq '\h')          { push @sbcs, $bare_h                }
+                    elsif ($before_subclass eq '\s')          { push @sbcs, $bare_s                }
+                    elsif ($before_subclass eq '\v')          { push @sbcs, $bare_v                }
+                    elsif ($before_subclass eq '\w')          { push @sbcs, $bare_w                }
+                    elsif (CORE::length($before_subclass)==1) { push @sbcs, $before_subclass       }
+                    else                                      { push @mbcs, $before_subclass       }
+                    $i += 1;
+                }
             }
 
             # [^...]
@@ -274,25 +451,23 @@ sub UTF8::R2::qr ($) {
                     '';
             }
 
+            # [...] on Perl 5.006
+            elsif ($] =~ /\A5\.006/) {
+                push @after_subregex,
+                    ( @sbcs and  @mbcs) ? '(?:'    . join('|', @mbcs, '['.join('',@sbcs).']') .    ')' :
+                    (!@sbcs and  @mbcs) ? '(?:'    . join('|', @mbcs                        ) .    ')' :
+                    ( @sbcs and !@mbcs) ?                             '['.join('',@sbcs).']'           :
+                    '';
+            }
+
             # [...]
             else {
                 push @after_subregex,
-                    ( @sbcs and  @mbcs) ? '(?:'    . join('|', @mbcs, '['.join('',@sbcs).']') . ')' :
-                    (!@sbcs and  @mbcs) ? '(?:'    . join('|', @mbcs                        ) . ')' :
-                    ( @sbcs and !@mbcs) ?                             '['.join('',@sbcs).']'        :
+                    ( @sbcs and  @mbcs) ? '(?:(?=' . join('|', @mbcs, '['.join('',@sbcs).']') . ")$x)" :
+                    (!@sbcs and  @mbcs) ? '(?:(?=' . join('|', @mbcs                        ) . ")$x)" :
+                    ( @sbcs and !@mbcs) ?                             '['.join('',@sbcs).']'           :
                     '';
             }
-        }
-
-        # \x{unicode_hex}
-        elsif (($] =~ /\A5\.006/) and (my($unicode_by_hex) = $before_subregex =~ /\A \\x \{ ([01234567890ABCDEFabcdef]+) \} \z/x)) {
-            my $unicode = hex $unicode_by_hex;
-            if (0) { }
-            elsif ($unicode <     0x80) { push @after_subregex, pack('U0C*',                                                                   $unicode          ) }
-            elsif ($unicode <    0x800) { push @after_subregex, pack('U0C*',                                            $unicode>>6     |0xC0, $unicode&0x3F|0x80) }
-            elsif ($unicode <  0x10000) { push @after_subregex, pack('U0C*',                    $unicode>>12     |0xE0, $unicode>>6&0x3F|0x80, $unicode&0x3F|0x80) }
-            elsif ($unicode < 0x110000) { push @after_subregex, pack('U0C*', $unicode>>18|0xF0, $unicode>>12&0x3F|0x80, $unicode>>6&0x3F|0x80, $unicode&0x3F|0x80) }
-            else { Carp::confess qq{@{[__FILE__]}: \\x{$unicode_by_hex} is out of Unicode (0 to 0x10FFFF)}; }
         }
 
         # \any or /./
@@ -326,7 +501,7 @@ sub UTF8::R2::qr ($) {
         }
 
         # else
-        else { push @after_subregex, $before_subregex }
+        else { push @after_subregex, _unicode_hex($before_subregex) }
     }
 
     my $after_regex = join '', @after_subregex;
@@ -452,11 +627,44 @@ sub UTF8::R2::substr ($$;$$) %s {
 END
 
 #---------------------------------------------------------------------
+# tr/A-C/1-3/ for UTF-8 codepoint
+sub _list_all_ASCII_by_hyphen {
+    my @hyphened = @_;
+    my @list_all = ();
+    for (my $i=0; $i <= $#hyphened; ) {
+        if (
+            ($i+1 < $#hyphened)      and
+            ($hyphened[$i+1] eq '-') and
+        1) {
+            if (0) { }
+            elsif ($hyphened[$i+0] !~ m/\A [\x00-\x7F] \z/oxms) {
+                Carp::confess sprintf(qq{@{[__FILE__]}: "$hyphened[$i+0]-$hyphened[$i+2]" in tr/// is not ASCII});
+            }
+            elsif ($hyphened[$i+2] !~ m/\A [\x00-\x7F] \z/oxms) {
+                Carp::confess sprintf(qq{@{[__FILE__]}: "$hyphened[$i+0]-$hyphened[$i+2]" in tr/// is not ASCII});
+            }
+            elsif ($hyphened[$i+0] gt $hyphened[$i+2]) {
+                Carp::confess sprintf(qq{@{[__FILE__]}: "$hyphened[$i+0]-$hyphened[$i+2]" in tr/// is not "$hyphened[$i+0]" le "$hyphened[$i+2]"});
+            }
+            else {
+                push @list_all, ($hyphened[$i+0] .. $hyphened[$i+2]);
+                $i += 3;
+            }
+        }
+        else {
+            push @list_all, $hyphened[$i];
+            $i++;
+        }
+    }
+    return @list_all;
+}
+
+#---------------------------------------------------------------------
 # tr/// for UTF-8 codepoint string
 sub UTF8::R2::tr ($$$;$) {
     my @x           = $_[0] =~ /\G$x/g;
-    my @search      = $_[1] =~ /\G$x/g;
-    my @replacement = $_[2] =~ /\G$x/g;
+    my @search      = _list_all_ASCII_by_hyphen($_[1] =~ /\G$x/g);
+    my @replacement = _list_all_ASCII_by_hyphen($_[2] =~ /\G$x/g);
     my %modifier    = (defined $_[3]) ? (map { $_ => 1 } CORE::split //, $_[3]) : ();
 
     my %tr = ();
@@ -676,7 +884,7 @@ UTF8::R2 - makes UTF-8 scripting easy for enterprise use or LTS
     $result = UTF8::R2::rindex($_, 'ABC', 5)
     @result = UTF8::R2::split(qr/$utf8regex/, $_, 3)
     $result = UTF8::R2::substr($_, 0, 5)
-    $result = UTF8::R2::tr($_, 'ABC', 'XYZ', 'cdsr')
+    $result = UTF8::R2::tr($_, 'A-C', 'X-Z', 'cdsr')
     $result = UTF8::R2::uc($_)
     $result = UTF8::R2::ucfirst($_)
 
@@ -708,15 +916,14 @@ UTF-8 codepoint semantics is provided by the new subroutine name.
   length                  UTF8::R2::length($_)                       length() is compatible and usually useful
   ------------------------------------------------------------------------------------------------------------------------------------------
   // or m// or qr//       UTF8::R2::qr(qr/$utf8regex/imsxogc)        not supports metasymbol \X that match grapheme
-                            or                                       not support range of codepoint(like an "[A-Z]")
-                          use UTF8::R2 qw(%mb);                      not supports POSIX character class (like an [:alpha:])
-                          $mb{qr/$utf8regex/imsxogc}                 not supports named character (such as \N{GREEK SMALL LETTER EPSILON}, \N{greek:epsilon}, or \N{epsilon})
-                                                                     not supports character properties (like \p{PROP} and \P{PROP})
+                            or                                       not supports POSIX character class (like an [:alpha:])
+                          use UTF8::R2 qw(%mb);                      not supports named character (such as \N{GREEK SMALL LETTER EPSILON}, \N{greek:epsilon}, or \N{epsilon})
+                          $mb{qr/$utf8regex/imsxogc}                 not supports character properties (like \p{PROP} and \P{PROP})
 
                           Special Escapes in Regex                   Support Perl Version
                           --------------------------------------------------------------------------------------------------
                           $mb{qr/ \x{Unicode} /}                     since perl 5.006
-                          $mb{qr/ [^ ... ] /}                        since perl 5.008  ** CAUTION ** perl 5.006 cannot this
+                          $mb{qr/ [^ ... ] /}                        ** CAUTION ** perl 5.006 cannot this
                           $mb{qr/ \h /}                              since perl 5.010
                           $mb{qr/ \v /}                              since perl 5.010
                           $mb{qr/ \H /}                              since perl 5.010
@@ -747,7 +954,7 @@ UTF-8 codepoint semantics is provided by the new subroutine name.
   substr                  UTF8::R2::substr($_, 0, 5)                 substr() is compatible and usually useful
                                                                      :lvalue feature needs perl 5.014 or later
   ------------------------------------------------------------------------------------------------------------------------------------------
-  tr/// or y///           UTF8::R2::tr($_, 'ABC', 'XYZ', 'cdsr')     not support range of codepoint(like a "tr/A-Z/a-z/")
+  tr/// or y///           UTF8::R2::tr($_, 'A-C', 'X-Z', 'cdsr')     range of codepoint by hyphen supports ASCII only
   ------------------------------------------------------------------------------------------------------------------------------------------
   uc                      UTF8::R2::uc($_)                           works as tr/a-z/A-Z/, universally
   ------------------------------------------------------------------------------------------------------------------------------------------

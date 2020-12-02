@@ -53,12 +53,12 @@ METHODS
   unsubscribe
         $err = $kafka->unsubscribe
 
-    unsubscribe from the current subsctiption set
+    unsubscribe from the current subscription set
 
   subscription
         $tplist = $kafka->subscription
 
-    return current subscription. Subscription returned as a reference to
+    return current subscriptions. Subscription returned as a reference to
     array of hashes with the following fields: "topic", "partition",
     "offset", "metadata".
 
@@ -90,7 +90,7 @@ METHODS
     @topic_partition_list is missing or undef, then current partition
     assignment is used instead. If $async is 1, then method returns
     immediately, if it is 0 or missing then method blocks until offsets are
-    commited.
+    committed.
 
   commit_message
         $err = $kafka->commit_message($msg, $async)
@@ -101,7 +101,7 @@ METHODS
   committed
         $tplist = $kafka->committed(\@tplist, $timeout_ms)
 
-    retrieve commited offsets for topics and partitions specified in
+    retrieve committed offsets for topics and partitions specified in
     @tplist, which is an array of hashes with "topic" and "partition"
     fields. Returned $tplist contains a copy of the input list with added
     "offset" fields.
@@ -122,8 +122,11 @@ METHODS
   topic
         $topic = $kafka->topic($name, \%config)
 
-    return a "Kafka::Librd::Topic"topic object, that can be used to produce
-    messages
+    Return a topic object, that can be used to produce messages.
+
+    If an error occurs during creation of the topic, "undef" is returned. In
+    such case use "Kafka::Librd::Error::last_error" to obtain the
+    corresponding error code!
 
   outq_len
         $len = $kafka->outq_len
@@ -151,12 +154,16 @@ Kafka::Librd::Topic
     Kafka::Librd object. It provides the following method:
 
   produce
-        $err = $topic->produce($partition, $msgflags, $payload, $key)
+        $status = $topic->produce($partition, $msgflags, $payload, $key)
 
     produce a message for the topic. *$msgflags* can be RD_KAFKA_MSG_F_BLOCK
     in the future, but currently it should be set to 0, RD_KAFKA_MSG_F_COPY
     and RD_KAFKA_MSG_F_FREE must not be used, internally RD_KAFKA_MSG_F_COPY
     is always set.
+
+    The returned status is -1 in case of an error, otherwise 0. The error
+    code can be retrieved using the "Kafka::Librd::Error::last_error"
+    function.
 
   destroy
         $topic->destroy
@@ -193,9 +200,26 @@ Kafka::Librd::Message
     The $tstype argument is optional, and if present, it should be a scalar
     reference. It will be filled with one of the following values:
 
-    Kafka::Librd::RD_KAFKA_TIMESTAMP_NOT_AVAILABLE
-    Kafka::Librd::RD_KAFKA_TIMESTAMP_CREATE_TIME
-    Kafka::Librd::RD_KAFKA_TIMESTAMP_LOG_APPEND_TIME
+    *   "Kafka::Librd::RD_KAFKA_TIMESTAMP_NOT_AVAILABLE"
+
+    *   "Kafka::Librd::RD_KAFKA_TIMESTAMP_CREATE_TIME"
+
+    *   "Kafka::Librd::RD_KAFKA_TIMESTAMP_LOG_APPEND_TIME"
+
+Kafka::Librd::Error
+  Kafka::Librd::Error::to_string
+       my $error_message =  Kafka::Librd::Error::to_string($err)
+
+    Convert an error code into a human-readable error description. Use this
+    for error codes returned by "Kafka::Librd::Error::last_error" and
+    Kafka::Librd::Message::err.
+
+  Kafka::Librd::Error::last_error
+        my $err = Kafka::Librd::Error::last_error
+
+    Retrieve the last error state set by function calls "topic" and
+    "produce". This function should be called immediately after those
+    functions, since they store error information globally.
 
 CAVEATS
     Message offset is truncated to 32 bit if perl compiled without support

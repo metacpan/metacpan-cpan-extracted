@@ -3,25 +3,20 @@ abstract: 'PostgreSQL support for Database::Async'
 author:
   - 'Tom Molesworth <TEAM@cpan.org>'
 build_requires:
-  Database::Async: '0.008'
   ExtUtils::MakeMaker: '0'
   File::Spec: '0'
-  IO::Async::Loop: '0'
+  File::Temp: '0'
   IO::Handle: '0'
   IPC::Open3: '0'
-  Log::Any::Adapter: '0'
   Test::CheckDeps: '0.010'
-  Test::Deep: '0'
   Test::Fatal: '0.010'
+  Test::MockModule: '0'
   Test::More: '0.98'
-  Test::PostgreSQL: '0'
   Test::Refcount: '0.07'
-  feature: '0'
-  perl: '5.006'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.017, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -37,41 +32,34 @@ no_index:
 provides:
   Database::Async::Engine::PostgreSQL:
     file: lib/Database/Async/Engine/PostgreSQL.pm
-    version: '0.008'
+    version: '0.009'
   Database::Async::Engine::PostgreSQL::DDL:
     file: lib/Database/Async/Engine/PostgreSQL/DDL.pm
-    version: '0.008'
+    version: '0.009'
 requires:
-  Database::Async: '0.008'
-  Database::Async::Engine: '0'
-  Database::Async::Query: '0'
-  Future: '0.40'
+  Config::Tiny: '0'
+  Database::Async: '0.013'
+  File::HomeDir: '0'
+  Future: '0.46'
   Future::AsyncAwait: '0.28'
-  IO::Async::SSL: '0'
-  IO::Socket::SSL: '0'
   Log::Any: '1.050'
+  Path::Tiny: '0'
   Protocol::Database::PostgreSQL: '1.005'
-  Protocol::Database::PostgreSQL::Client: '0'
-  Protocol::Database::PostgreSQL::Constants: '0'
-  Ryu::Async: '0.014'
-  Ryu::Observable: '0'
-  Scalar::Util: '0'
+  Ryu::Async: '0.017'
   Template: '2.28'
   URI::QueryParam: '0'
   URI::postgres: '0'
   curry: '1.001'
   indirect: '0'
-  overload: '0'
   parent: '0'
-  strict: '0'
-  warnings: '0'
 resources:
   bugtracker: https://github.com/team-at-cpan/Database-Async-Engine-PostgreSQL/issues
   homepage: https://github.com/team-at-cpan/Database-Async-Engine-PostgreSQL
   repository: https://github.com/team-at-cpan/Database-Async-Engine-PostgreSQL.git
-version: '0.008'
+version: '0.009'
 x_authority: cpan:TEAM
 x_contributors:
   - 'Tom M <tom@audioboundary.com>'
-x_generated_by_perl: v5.28.1
+x_generated_by_perl: v5.32.0
 x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

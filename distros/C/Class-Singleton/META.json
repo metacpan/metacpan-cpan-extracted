@@ -1,0 +1,101 @@
+{
+   "abstract" : "Implementation of a \"Singleton\" class ",
+   "author" : [
+      "Andy Wardley <abw@wardley.org>, Steve Hay <shay@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Class-Singleton",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "optional_features" : {
+      "changestest" : {
+         "description" : "Changes testing",
+         "prereqs" : {
+            "test" : {
+               "requires" : {
+                  "Test::CPAN::Changes" : "0"
+               }
+            }
+         }
+      },
+      "critictest" : {
+         "description" : "Perl::Critic testing",
+         "prereqs" : {
+            "test" : {
+               "requires" : {
+                  "Test::Perl::Critic" : "0"
+               }
+            }
+         }
+      },
+      "podcoveragetest" : {
+         "description" : "POD coverage testing",
+         "prereqs" : {
+            "test" : {
+               "requires" : {
+                  "Test::Pod::Coverage" : "0.08"
+               }
+            }
+         }
+      },
+      "podtest" : {
+         "description" : "POD testing",
+         "prereqs" : {
+            "test" : {
+               "requires" : {
+                  "Test::Pod" : "1.00"
+               }
+            }
+         }
+      }
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.64",
+            "perl" : "5.008001",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "perl" : "5.008001",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0",
+            "base" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "web" : "https://github.com/steve-m-hay/Class-Singleton"
+      }
+   },
+   "version" : 1.6,
+   "x_serialization_backend" : "JSON::PP version 4.02"
+}

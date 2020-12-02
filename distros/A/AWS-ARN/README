@@ -1,0 +1,84 @@
+NAME
+
+    AWS::ARN - module to parse and generate ARNs
+
+VERSION
+
+    0.004
+
+DESCRIPTION
+
+    Parse, modify and generate AWS ARNs (Amazon Resource Names)
+
+CONSTRUCTOR
+
+ new( $arn );
+
+    Return a new AWS::ARN object
+
+ new( partition => $part, service => $svc, region => $rgn, account_id =>
+ $acct, resource_id => $res );
+
+    Returns a new AWS::ARN object, build from the provided attributes
+
+ATTRIBUTES
+
+ partition
+
+    The partition in which the resource is located. A partition is a group
+    of AWS Regions. Each AWS account is scoped to one partition.
+
+    The following are the supported partitions:
+
+      * aws - AWS Regions
+
+      * aws-cn - China Regions
+
+      * aws-us-gov - AWS GovCloud (US) Regions
+
+    Defaults to "aws"
+
+ service
+
+    The service namespace that identifies the AWS product. For example, s3
+    for Amazon S3 resources.
+
+ region
+
+    The Region. For example, us-east-2 for US East (Ohio).
+
+ account_id
+
+    The ID of the AWS account that owns the resource, without the hyphens.
+    For example, 123456789012.
+
+ resource_id
+
+    The resource identifier. This part of the ARN can be the name or ID of
+    the resource or a resource path. For example, user/Bob for an IAM user
+    or instance/i-1234567890abcdef0 for an EC2 instance. Some resource
+    identifiers include a parent resource
+    (sub-resource-type/parent-resource/sub-resource) or a qualifier such as
+    a version (resource-type:resource-name:qualifier).
+
+NOTES
+
+      * Needs tests
+
+      * Needs more validation
+
+AUTHOR
+
+    James Wright <jwright@cpan.org>
+
+SEE ALSO
+
+      * AWS Resource Names 
+
+COPYRIGHT AND LICENSE
+
+    This software is copyright (c) 2020 by James Wright.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

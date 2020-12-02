@@ -1,5 +1,13 @@
 Revision history for Ryu
 
+2.004     2020-12-03 00:38:42+08:00 Asia/Kuala_Lumpur
+    No new features.
+
+    Bugs fixed:
+
+    - the `->from` method on a source was trying to call `blessed()` without importing
+    it (thanks to KARJALA for raising this one)
+
 2.003     2020-08-04 11:50:48+08:00 Asia/Kuala_Lumpur
     No new features.
 

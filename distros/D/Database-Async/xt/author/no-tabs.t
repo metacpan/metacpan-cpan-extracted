@@ -36,6 +36,7 @@ my @files = (
     't/00-report-prereqs.t',
     't/new.t',
     't/pool.t',
+    'xt/author/distmeta.t',
     'xt/author/minimum-version.t',
     'xt/author/mojibake.t',
     'xt/author/no-tabs.t',
@@ -44,8 +45,7 @@ my @files = (
     'xt/author/test-version.t',
     'xt/cpanfile.t',
     'xt/release/common_spelling.t',
-    'xt/release/cpan-changes.t',
-    'xt/release/distmeta.t'
+    'xt/release/cpan-changes.t'
 );
 
 notabs_ok($_) foreach @files;

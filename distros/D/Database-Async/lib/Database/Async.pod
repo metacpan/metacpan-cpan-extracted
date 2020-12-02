@@ -1,7 +1,6 @@
 =encoding utf8
 
 =for comment POD_DERIVED_INDEX_GENERATED
-
 The following documentation is automatically generated.  Please do not edit
 this file, but rather the original, inline with Database::Async
 at lib/Database/Async.pm
@@ -69,7 +68,7 @@ Other queries will be queued.
 Set up a pool of connections to provide better parallelism:
 
     my $dbh = Database::Async->new(
-        uri  => 'postgres://write@maindb/dbname?sslmode=require',
+        uri  => 'postgresql://write@maindb/dbname?sslmode=require',
         pool => {
             max => 4,
         },

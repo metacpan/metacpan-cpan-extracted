@@ -2,7 +2,7 @@ package DBIx::QuickDB::Watcher;
 use strict;
 use warnings;
 
-our $VERSION = '0.000019';
+our $VERSION = '0.000020';
 
 use POSIX();
 use Carp qw/croak/;
@@ -59,7 +59,7 @@ sub start {
     setpgrp(0, 0);
     $pid = fork;
     die "Could not fork: $!" unless defined $pid;
-    exit 0 if $pid;
+    POSIX::_exit(0) if $pid;
 
     $wh->autoflush(1);
     print $wh "$$\n";
@@ -110,8 +110,8 @@ sub watch {
 
     $0 = 'db-quick-watcher';
 
-    local $SIG{TERM} = sub { $self->_do_eliminate(); exit 0 };
-    local $SIG{INT}  = sub { $self->_do_stop();      exit 0 };
+    local $SIG{TERM} = sub { $self->_do_eliminate(); POSIX::_exit(0) };
+    local $SIG{INT}  = sub { $self->_do_stop();      POSIX::_exit(0) };
     local $SIG{HUP}  = sub { $self->{+DETACHED} = 1 };
 
     my $pid = $self->spawn();
@@ -123,10 +123,10 @@ sub watch {
         next if kill(0, $self->{+MASTER_PID});
 
         $self->_do_eliminate();
-        exit 0;
+        POSIX::_exit(0);
     }
 
-    exit 0 if $self->{+DETACHED};
+    POSIX::_exit(0) if $self->{+DETACHED};
     die "Scope Leak";
 }
 

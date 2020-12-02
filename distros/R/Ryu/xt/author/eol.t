@@ -61,6 +61,7 @@ my @files = (
     't/source/switch_str.t',
     't/source/take.t',
     't/source/with_index.t',
+    'xt/author/distmeta.t',
     'xt/author/eol.t',
     'xt/author/minimum-version.t',
     'xt/author/mojibake.t',
@@ -69,8 +70,7 @@ my @files = (
     'xt/author/portability.t',
     'xt/author/test-version.t',
     'xt/release/common_spelling.t',
-    'xt/release/cpan-changes.t',
-    'xt/release/distmeta.t'
+    'xt/release/cpan-changes.t'
 );
 
 eol_unix_ok($_, { trailing_whitespace => 1 }) foreach @files;

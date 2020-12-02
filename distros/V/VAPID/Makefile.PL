@@ -28,6 +28,9 @@ my %WriteMakefileArgs = (
     clean => { FILES => 'VAPID-*' },
     META_MERGE => {
         'meta-spec' => { version => 2 },
+        x_contributors => [
+            "Jan Kasprzak (YENYA) <kas\@informatics.muni.cz>"
+        ],
         dynamic_config => 0,
         resources => {
             repository => {

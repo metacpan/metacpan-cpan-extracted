@@ -1,0 +1,166 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+use LogicMonitor::REST::Signature;
+use Getopt::Long;
+
+sub version{
+	print "lm-auth-helper v. 0.0.1\n";
+}
+
+sub help{
+	print '
+
+--verb <HTTP verb>  The HTTP verb in question. Either GET or PUT.
+--path <API path>   The API resource path. Such as /device/devices
+--data <data file>  If doing a put, this is a path to a file containing the data that the put contains.
+-n                  Print a newline character at the end.
+-c                  Print "Authorizion: " with the string for curl.
+-q                  Print it quoted. May not work reliably depending on the shell.
+--version           Show the version info.
+--help              Print this message.
+';
+
+}
+
+my $required_args = {
+	'Logicmonitor_accessKey' => 1,
+	'Logicmonitor_accessID'  => 1,
+	};
+
+foreach my $key ( keys %{$required_args} ) {
+	if (!defined( $ENV{$key} )) {
+		die( 'The enviromental variable "'.$key.'" is not set' );
+	}
+}
+
+# initiate the helper
+my $lmsig_helper=LogicMonitor::REST::Signature->new({
+													 accessKey=>$ENV{Logicmonitor_accessKey},
+													 accessID=>$ENV{Logicmonitor_accessID},
+													 });
+
+# read the options in questions
+my $verb = 'GET';
+my $file;;
+my $data='';
+my $path;
+my $version;
+my $help;
+my $newline;
+my $quoted;
+my $curl;
+GetOptions(
+	'verb=s'  => \$verb,
+	'data=s'  => \$file,
+	'path=s'  => \$path,
+	'version' => \$version,
+	'help'    => \$help,
+	'n'       => \$newline,
+	'q'       => \$quoted,
+	'c'       => \$curl,
+);
+
+# print the version or help info if requested
+if ( $version ){
+        &version;
+        exit;
+}
+if ( $help ){
+        &version;
+        &help;
+        exit;
+}
+
+# read the file contaning the data if specified
+if ($file) {
+	my $fh;
+	open( $fh,'<', $file ) or die $!;
+	while (readline($fh)) {
+		$data=$data.$_;
+	}
+	close( $fh );
+}
+
+# add the quotes if '-q' is given
+if ($quoted) {
+	print "'";
+}
+
+if ($curl) {
+	print "Authorization: ";
+}
+
+# create the auth header data with the sig included
+print $lmsig_helper->auth_header({
+								  HTTPverb=>$verb,
+								  data=>$data,
+								  path=>$path,
+								  });
+
+# add the quotes if '-q' is given
+if ($quoted) {
+	print "'";
+}
+
+# print a new line if asked to
+if ( $newline ){
+	print "\n";
+}
+
+=head1 NAME
+
+lm-auth-helper - Builds LMv1 token header info for Logicmonitor.
+
+=head1 SYNOPSIS
+
+lm-auth-helper B<--path> <path> [B<--verb> <HTTP verb>] [B<--data> <file>] [B<-c>] [B<-q>]
+
+=head1 DESCRIPTION
+
+This puts together the auth token header for Logicmonitor.
+
+This requires the following enviromentalvalues to be set.
+
+    Logicmonitor_accessKey
+    Logicmonitor_accessID
+
+Those are respectively the access key and access ID for the REST API.
+
+=head1 SWITCHES
+
+=head2 --verb <HTTP verb> 
+
+The HTTP verb in question. Either GET or PUT.
+
+=head2 --path <API path>
+
+The API resource path. Such as /device/devices
+
+=head2 --data <data file>
+
+If doing a put, this is a path to a file containing the data that the put contains.
+
+=head2 -n
+
+Print a newline character at the end.
+
+=head2 -c
+
+Print "Authorizion: " with the string for curl.
+
+=head2 -q
+
+Print it quoted. This may not always work reliably.
+
+=head2 --version
+
+Show the version info.
+
+=head2 --help
+
+Print this message.
+
+=cut
+

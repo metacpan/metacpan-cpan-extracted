@@ -2,7 +2,7 @@
 #
 # 1028_qr3_r2.t
 #
-# Copyright (c) 2019 INABA Hitoshi <ina@cpan.org> in a CPAN
+# Copyright (c) 2019, 2020 INABA Hitoshi <ina@cpan.org> in a CPAN
 ######################################################################
 
 # This file is encoded in UTF-8.
@@ -20,15 +20,15 @@ tie my %r2, 'UTF8::R2';
 BEGIN {
     $SIG{__WARN__} = sub {
         local($_) = @_;
-        /\A"\\c\)" is more clearly written simply as "i" at /   ? return :
-        /\A"\\c\}" is more clearly written simply as "\\=" at / ? return :
-        /\AIllegal hex digit ignored at /                       ? return :
-        /\AUnrecognized escape \\H passed through at /          ? return :
-        /\AUnrecognized escape \\R passed through at /          ? return :
-        /\AUnrecognized escape \\V passed through at /          ? return :
-        /\AUnrecognized escape \\h passed through at /          ? return :
-        /\AUnrecognized escape \\v passed through at /          ? return :
-        /\A\\C is deprecated in regex; marked by <-- HERE in /  ? return :
+        /\A"\\c\)" is more clearly written simply as "i" /     ? return :
+        /\A"\\c\}" is more clearly written simply as "\\=" /   ? return :
+        /\AIllegal hex digit ignored at /                      ? return :
+        /\AUnrecognized escape \\H passed through at /         ? return :
+        /\AUnrecognized escape \\R passed through at /         ? return :
+        /\AUnrecognized escape \\V passed through at /         ? return :
+        /\AUnrecognized escape \\h passed through at /         ? return :
+        /\AUnrecognized escape \\v passed through at /         ? return :
+        /\A\\C is deprecated in regex; marked by <-- HERE in / ? return :
         warn $_[0];
     };
 }

@@ -3,7 +3,7 @@ package MOP4Import::Declare;
 use 5.010;
 use strict;
 use warnings qw(FATAL all NONFATAL misc);
-our $VERSION = '0.052';
+our $VERSION = '0.053';
 use Carp;
 use mro qw/c3/;
 
@@ -23,7 +23,11 @@ use MOP4Import::Opts
     /;
 use MOP4Import::Util;
 use MOP4Import::FieldSpec;
-use MOP4Import::NamedCodeAttributes qw(MODIFY_CODE_ATTRIBUTES /^m4i_CODE_ATTR_/);
+use MOP4Import::NamedCodeAttributes
+  qw(MODIFY_CODE_ATTRIBUTES
+     FETCH_CODE_ATTRIBUTES
+     /^m4i_CODE_ATTR_/
+  );
 
 #========================================
 

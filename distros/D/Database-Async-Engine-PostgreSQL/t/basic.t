@@ -14,21 +14,15 @@ use Database::Async::Engine::PostgreSQL;
 use Log::Any::Adapter qw(TAP);
 use Log::Any qw($log);
 
-my $pg = eval {
-    require Test::PostgreSQL;
-    Test::PostgreSQL->new;
-} or plan skip_all => $@;
-
-my $uri = URI->new($pg->uri);
+plan skip_all => 'set DATABASE_ASYNC_PG_TEST env var to test, but be prepared for it to *delete any and all data* in that database' unless exists $ENV{DATABASE_ASYNC_PG_TEST};
 
 my $loop = IO::Async::Loop->new;
 
 my $db;
 is(exception {
-    $uri->query_param(sslmode => 'prefer');
     $loop->add(
         $db = Database::Async->new(
-            uri => $uri,
+            type => 'postgresql',
         )
     );
 }, undef, 'can safely add to the loop');

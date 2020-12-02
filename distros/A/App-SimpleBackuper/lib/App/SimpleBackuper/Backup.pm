@@ -169,22 +169,14 @@ sub Backup {
 		}
 		
 		if(time - $last_db_save > $SAVE_DB_PERIOD) {
-			print "Saving database\n" if $options->{verbose};
-			_save_db($options, $state, \%dirs2upd);
+			App::SimpleBackuper::BackupDB($options, $state);
 			$last_db_save = time;
 		}
 	}
 	
-	_save_db($options, $state, \%dirs2upd);
-	
-	_print_progress($state) if ! $options->{quiet};
-}
-
-sub _save_db {
-	my($options, $state, $dirs2upd) = @_;
-	while(my($full_path, $dir2upd) = each %$dirs2upd) {
+	while(my($full_path, $dir2upd) = each %dirs2upd) {
 		print "Updating dir $full_path..." if $options->{verbose};
-		my $file = $state->{db}->{files}->find_by_parent_id_name($dir2upd->{parent_id}, $dir2upd->{filename});
+		my $file = $files->find_by_parent_id_name($dir2upd->{parent_id}, $dir2upd->{filename});
 		my @stat = lstat($full_path);
 		next if ! @stat;
 		my($uid, $gid) =_proc_uid_gid($stat[4], $stat[5], $state->{db}->{uids_gids});
@@ -215,11 +207,19 @@ sub _save_db {
 				parts			=> [],
 			}
 		}
-		$state->{db}->{files}->upsert({ id => $file->{id}, parent_id => $file->{parent_id} }, $file);
+		$files->upsert({ id => $file->{id}, parent_id => $file->{parent_id} }, $file);
+		
+		my $backup = $backups->find_row({ id => $state->{last_backup_id} });
+		$backup->{files_cnt}++;
+		$backup->{max_files_cnt}++;
+		$backups->upsert({ id => $backup->{id} }, $backup );
+		
 		print "OK\n" if $options->{verbose};
 	}
 	
 	App::SimpleBackuper::BackupDB($options, $state);
+	
+	_print_progress($state) if ! $options->{quiet};
 }
 
 sub _print_progress {
