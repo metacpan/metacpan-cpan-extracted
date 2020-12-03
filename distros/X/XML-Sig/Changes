@@ -1,5 +1,51 @@
 Changes
 
+Version 0.32
+
+    Release Version of 0.31-TRIAL
+    Updates to Changes and verion number
+
+Version 0.31-TRIAL
+
+This release fixes a number of issues.  The biggest changes are related to
+signing and verifying with DSA key.  Previously DSA signing and verifying
+worked previously only with XML::Sig signed xml and verfication only worked
+with XML::Sig.  Now it is able to sign and verify xml interchangably with
+xmlsec1 and others.
+
+In addition, in signing xml XML::Sig now looks at the SignedInfo for the
+CanonicalMethod to ensure that it matches.
+
+    8d1ad9c Update Changes and Version
+    c317d09 Merge pull request #14 from perl-net-saml2/sign-dsa
+    4393a05 Update some of the documentation
+    d833f54 Remove unused _set_key_info function
+    e2fe47a Remove unused _find_prefixlist function
+    168beb5 Remove unused function
+    2bf5a02 Update saml request tests for DSA and xmlsec1 signed files
+    988888c Update linux.yml
+    b718a9f Merge pull request #13 from perl-net-saml2/sign-dsa
+    6c0168a Fixes #10 - Can now sign and validate DSA signed XML
+        that can be verified by xmlsec1 and other xmlsec verifiers
+    4843b7c Merge pull request #12 from perl-net-saml2/issue11
+    e14aec3 Fixes #11 - use CanonicalMethod from SignedInfo to sign
+    3df1cff Remove spaces on EOL
+
+Known Issues:
+    #6 - Cannot sign xml with multiple ID references
+
+Version 0.30-TRIAL
+
+    Fixes an issue with the calculation of the digest.  It should be
+    based on the Transforms not the CanonicalMethod
+
+Version 0.29-TRIAL
+
+    Rewrite the sign and verify to fix issues validating some valid
+    documents
+    Change to XML::LibXML
+    Add support for more modern Canonicalization Methods
+
 Version 0.28
     Release version bump version
 

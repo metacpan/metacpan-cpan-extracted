@@ -19,7 +19,9 @@ sub search_lib {
     }
     my $libbase = 'lib' . substr($lib, 2) . $Config{lib_ext};
     my $libbase_so = 'lib' . substr($lib, 2) . "." . $Config{so};
-    for my $path (split(' ', $Config{libpth})) {
+    my @paths = split(' ', $Config{libpth});
+    push @paths, $ENV{PERL_LIBPATH} if exists $ENV{PERL_LIBPATH};
+    for my $path (@paths) {
         if (-f $path . '/' . $libbase) {
             print "$path/$libbase\n";
             print "Found '$path/$libbase'.\n";

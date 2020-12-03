@@ -7,7 +7,7 @@
 package Perl::Tidy::Logger;
 use strict;
 use warnings;
-our $VERSION = '20201001';
+our $VERSION = '20201202';
 
 sub AUTOLOAD {
 
@@ -15,11 +15,13 @@ sub AUTOLOAD {
     # some diagnostic information.  This sub should never be called
     # except for a programming error.
     our $AUTOLOAD;
-    return if ( $AUTOLOAD eq 'DESTROY' );
+    return if ( $AUTOLOAD =~ /\bDESTROY$/ );
     my ( $pkg, $fname, $lno ) = caller();
+    my $my_package = __PACKAGE__;
     print STDERR <<EOM;
 ======================================================================
-Unexpected call to Autoload looking for sub $AUTOLOAD
+Error detected in package '$my_package', version $VERSION
+Received unexpected AUTOLOAD call for sub '$AUTOLOAD'
 Called from package: '$pkg'  
 Called from File '$fname'  at line '$lno'
 This error is probably due to a recent programming change
@@ -165,7 +167,6 @@ sub black_box {
     $self->{_wrote_line_information_string} = 0;
 
     my $last_input_line_written = $self->{_last_input_line_written};
-    my $rOpts                   = $self->{_rOpts};
     if (
         (
             ( $input_line_number - $last_input_line_written ) >=
@@ -232,7 +233,6 @@ sub make_line_information_string {
         my $square_bracket_depth = $line_of_tokens->{_square_bracket_depth};
         my $guessed_indentation_level =
           $line_of_tokens->{_guessed_indentation_level};
-        ##my $rtoken_array = $line_of_tokens->{_rtoken_array};
 
         my $structural_indentation_level = $line_of_tokens->{_level_0};
 
@@ -505,6 +505,24 @@ EOM
         }
     }
     return;
+}
+
+sub get_save_logfile {
+
+    # To be called after tokenizer has finished to make formatting more
+    # efficient.  This is not precisely the same as the check used below
+    # because we don't yet have the syntax check result, but since syntax
+    # checking is off by default it will be the same except in debug runs with
+    # syntax checking activated.  In that case it will tell the formatter to
+    # save the logfile even if it may actually be deleted based on the syntax
+    # check.
+    my $self         = shift;
+    my $saw_code_bug = $self->{_saw_code_bug};
+    my $rOpts        = $self->{_rOpts};
+    return
+         $saw_code_bug == 1
+      || $rOpts->{'logfile'}
+      || $rOpts->{'check-syntax'};
 }
 
 sub finish {

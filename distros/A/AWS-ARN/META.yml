@@ -16,12 +16,12 @@ name: AWS-ARN
 provides:
   AWS::ARN:
     file: lib/AWS/ARN.pm
-    version: '0.004'
+    version: '0.005'
 requires:
   Moo: '2.0'
   Try::Tiny: '0'
   Type::Utils: '0'
   Types::Standard: '0'
-version: '0.004'
+version: '0.005'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

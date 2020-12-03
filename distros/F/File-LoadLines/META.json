@@ -4,7 +4,7 @@
       "Johan Vromans <jv@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.46, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -33,7 +33,8 @@
       "runtime" : {
          "requires" : {
             "ExtUtils::MakeMaker" : "6.46",
-            "Test::More" : "0",
+            "Test::Exception" : "0.43",
+            "Test::More" : "1.3",
             "perl" : "5.010001"
          }
       }
@@ -46,6 +47,6 @@
          "web" : "https://github.com/sciurius/perl-File-LoadLines"
       }
    },
-   "version" : "0.02",
-   "x_serialization_backend" : "JSON::PP version 2.94"
+   "version" : "1.00",
+   "x_serialization_backend" : "JSON::PP version 4.04"
 }

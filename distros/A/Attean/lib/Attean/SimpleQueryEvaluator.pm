@@ -7,7 +7,7 @@ Attean::SimpleQueryEvaluator - Simple query evaluator
 
 =head1 VERSION
 
-This document describes Attean::SimpleQueryEvaluator version 0.027
+This document describes Attean::SimpleQueryEvaluator version 0.028
 
 =head1 SYNOPSIS
 
@@ -34,7 +34,7 @@ model, and returns a query result.
 use Attean::Algebra;
 use Attean::Expression;
 
-package Attean::SimpleQueryEvaluator 0.027 {
+package Attean::SimpleQueryEvaluator 0.028 {
 	use Moo;
 	use Encode qw(encode);
 	use Attean::RDF;
@@ -529,7 +529,7 @@ supplied C<< $active_graph >>.
 	}
 }
 
-package Attean::SimpleQueryEvaluator::ExpressionEvaluator 0.027 {
+package Attean::SimpleQueryEvaluator::ExpressionEvaluator 0.028 {
 	use Moo;
 	use Attean::RDF;
 	use Scalar::Util qw(blessed);
@@ -538,7 +538,7 @@ package Attean::SimpleQueryEvaluator::ExpressionEvaluator 0.027 {
 	use Encode qw(encode);
 	use POSIX qw(ceil floor);
 	use Digest;
-	use Data::UUID;
+	use UUID::Tiny ':std';
 	use List::MoreUtils qw(zip);
 	use DateTime::Format::W3CDTF;
 	use I18N::LangTags;
@@ -875,9 +875,8 @@ package Attean::SimpleQueryEvaluator::ExpressionEvaluator 0.027 {
 					my $value	= DateTime::Format::W3CDTF->new->format_datetime( DateTime->now );
 					return Attean::Literal->new( value => $value, datatype => 'http://www.w3.org/2001/XMLSchema#dateTime' );
 				} elsif ($func =~ /^(?:STR)?UUID$/) {
-					my $u		= Data::UUID->new();
-					return Attean::Literal->new($u->to_string( $u->create() )) if ($func eq 'STRUUID');
-					return Attean::IRI->new('urn:uuid:' . $u->to_string( $u->create() ));
+					return Attean::Literal->new(uc(uuid_to_string(create_uuid()))) if ($func eq 'STRUUID');
+					return Attean::IRI->new('urn:uuid:' . uc(uuid_to_string(create_uuid())));
 				} elsif ($func =~ /^(MD5|SHA1|SHA256|SHA384|SHA512)$/) {
 					my $hash	= $func =~ s/SHA/SHA-/r;
 					my $digest	= eval { Digest->new($hash)->add(encode('UTF-8', $operands[0]->value, Encode::FB_CROAK))->hexdigest };

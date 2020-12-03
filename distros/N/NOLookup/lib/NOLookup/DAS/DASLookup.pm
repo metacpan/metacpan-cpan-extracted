@@ -2,7 +2,7 @@ package NOLookup::DAS::DASLookup;
 
 use strict;
 use warnings;
-use IO::Socket;
+use IO::Socket::INET6;
 use Encode;
 
 use vars qw(@ISA @EXPORT_OK);
@@ -70,7 +70,7 @@ sub lookup {
 
     my ($line, $text);
 
-    my $sock = IO::Socket::INET->new (
+    my $sock = IO::Socket::INET6->new (
 	PeerAddr => $das_server,
 	PeerPort => $das_port,
 	Proto    => 'tcp',

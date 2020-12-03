@@ -79,6 +79,9 @@ use Perl::Tidy::Tokenizer;
 use Perl::Tidy::VerticalAligner;
 local $| = 1;
 
+# this can be turned on for extra checking during development
+use constant DEVEL_MODE => 0;
+
 use vars qw{
   $VERSION
   @ISA
@@ -107,7 +110,7 @@ BEGIN {
     # Release version must be bumped, and it is probably past time for a
     # release anyway.
 
-    $VERSION = '20201001';
+    $VERSION = '20201202';
 }
 
 sub DESTROY {
@@ -121,7 +124,7 @@ sub AUTOLOAD {
     # some diagnostic information.  This sub should never be called
     # except for a programming error.
     our $AUTOLOAD;
-    return if ( $AUTOLOAD eq 'DESTROY' );
+    return if ( $AUTOLOAD =~ /\bDESTROY$/ );
     my ( $pkg, $fname, $lno ) = caller();
     print STDERR <<EOM;
 ======================================================================
@@ -906,6 +909,18 @@ EOM
                 next;
             }
 
+            # And avoid formatting extremely large files. Since perltidy reads
+            # files into memory, trying to process an extremely large file
+            # could cause system problems.
+            my $size_in_mb = ( -s $input_file ) / ( 1024 * 1024 );
+            if ( $size_in_mb > $rOpts->{'maximum-file-size-mb'} ) {
+                $size_in_mb = sprintf( "%0.1f", $size_in_mb );
+                Warn(
+"skipping file: $input_file: size $size_in_mb MB exceeds limit $rOpts->{'maximum-file-size-mb'}; use -mfs=i to change\n"
+                );
+                next;
+            }
+
             unless ( ( -T $input_file ) || $rOpts->{'force-read-binary'} ) {
                 Warn(
                     "skipping file: $input_file: Non-text (override with -f)\n"
@@ -1301,6 +1316,7 @@ EOM
         my $debugger_object_final = $debugger_object;
         my $logger_object_final   = $logger_object;
         my $fh_tee_final          = $fh_tee;
+        my $iteration_of_formatter_convergence;
 
         foreach my $iter ( 1 .. $max_iterations ) {
 
@@ -1360,6 +1376,7 @@ EOM
                     diagnostics_object => $diagnostics_object,
                     sink_object        => $sink_object,
                     length_function    => $length_function,
+                    is_encoded_data    => $is_encoded_data,
                     fh_tee             => $fh_tee,
                 );
             }
@@ -1381,6 +1398,7 @@ EOM
                 debugger_object    => $debugger_object,
                 diagnostics_object => $diagnostics_object,
                 tabsize            => $tabsize,
+                rOpts              => $rOpts,
 
                 starting_level      => $rOpts->{'starting-indentation-level'},
                 indent_columns      => $rOpts->{'indent-columns'},
@@ -1405,6 +1423,16 @@ EOM
             #---------------------------------------------------------------
             $source_object->close_input_file();
 
+            # see if the formatter is converged
+            if (   $max_iterations > 1
+                && !defined($iteration_of_formatter_convergence)
+                && $formatter->can('get_convergence_check') )
+            {
+                if ( $formatter->get_convergence_check() ) {
+                    $iteration_of_formatter_convergence = $iter;
+                }
+            }
+
             # line source for next iteration (if any) comes from the current
             # temporary output buffer
             if ( $iter < $max_iterations ) {
@@ -1419,12 +1447,16 @@ EOM
                 # stop iterations if errors or converged
                 my $stop_now = $tokenizer->report_tokenization_errors();
                 $stop_now ||= $tokenizer->get_unexpected_error_count();
+                my $stopping_on_error = $stop_now;
                 if ($stop_now) {
                     $convergence_log_message = <<EOM;
 Stopping iterations because of severe errors.                       
 EOM
                 }
                 elsif ($do_convergence_test) {
+
+                    # stop if the formatter has converged
+                    $stop_now ||= defined($iteration_of_formatter_convergence);
 
                     my $digest = $md5_hex->($sink_buffer);
                     if ( !defined( $saw_md5{$digest} ) ) {
@@ -1441,8 +1473,12 @@ EOM
                             # end states.  This has happened in the past
                             # but at present there are no known instances.
                             $convergence_log_message = <<EOM;
-Blinking. Output for iteration $iter same as for $saw_md5{$digest}. 
+BLINKER. Output for iteration $iter same as for $saw_md5{$digest}. 
 EOM
+                            $stopping_on_error ||= $convergence_log_message;
+                            if (DEVEL_MODE) {
+                                print STDERR $convergence_log_message;
+                            }
                             $diagnostics_object->write_diagnostics(
                                 $convergence_log_message)
                               if $diagnostics_object;
@@ -1463,6 +1499,26 @@ EOM
                 } ## end if ($do_convergence_test)
 
                 if ($stop_now) {
+
+                    if (DEVEL_MODE) {
+
+                        if ( defined($iteration_of_formatter_convergence) ) {
+
+                            # This message cannot appear unless the formatter
+                            # convergence test above is temporarily skipped for
+                            # testing.
+                            if ( $iteration_of_formatter_convergence <
+                                $iter - 1 )
+                            {
+                                print STDERR
+"STRANGE Early conv in $display_name: Stopping on it=$iter, converged in formatter on $iteration_of_formatter_convergence\n";
+                            }
+                        }
+                        elsif ( !$stopping_on_error ) {
+                            print STDERR
+"STRANGE no conv in $display_name: stopping on it=$iter, but not converged in formatter\n";
+                        }
+                    }
 
                     # we are stopping the iterations early;
                     # copy the output stream to its final destination
@@ -1516,6 +1572,7 @@ EOM
                     $logger_object->interrupt_logfile();
                     $logger_object->warning( $diff_msg . "\n" );
                     $logger_object->resume_logfile();
+                    $Warn_count ||= 1;   # insure correct exit if -q flag is set
                 }
             }
             if ( $rOpts->{'assert-untidy'} ) {
@@ -1524,6 +1581,7 @@ EOM
                     $logger_object->warning(
 "assertion failure: '--assert-untidy' is set but output equals input\n"
                     );
+                    $Warn_count ||= 1;   # insure correct exit if -q flag is set
                 }
             }
 
@@ -2168,6 +2226,7 @@ sub generate_options {
     $category = 2;    # Code indentation control
     ########################################
     $add_option->( 'continuation-indentation',           'ci',   '=i' );
+    $add_option->( 'extended-continuation-indentation',  'xci',  '!' );
     $add_option->( 'line-up-parentheses',                'lp',   '!' );
     $add_option->( 'outdent-keyword-list',               'okwl', '=s' );
     $add_option->( 'outdent-keywords',                   'okw',  '!' );
@@ -2264,12 +2323,12 @@ sub generate_options {
     $add_option->( 'paren-vertical-tightness',                'pvt',   '=i' );
     $add_option->( 'paren-vertical-tightness-closing',        'pvtc',  '=i' );
     $add_option->( 'weld-nested-containers',                  'wn',    '!' );
+    $add_option->( 'weld-nested-exclusion-list',              'wnxl',  '=s' );
     $add_option->( 'space-backslash-quote',                   'sbq',   '=i' );
     $add_option->( 'stack-closing-block-brace',               'scbb',  '!' );
     $add_option->( 'stack-closing-hash-brace',                'schb',  '!' );
     $add_option->( 'stack-closing-paren',                     'scp',   '!' );
     $add_option->( 'stack-closing-square-bracket',            'scsb',  '!' );
-    $add_option->( 'stack-opening-block-brace',               'sobb',  '!' );
     $add_option->( 'stack-opening-hash-brace',                'sohb',  '!' );
     $add_option->( 'stack-opening-paren',                     'sop',   '!' );
     $add_option->( 'stack-opening-square-bracket',            'sosb',  '!' );
@@ -2305,6 +2364,8 @@ sub generate_options {
     $add_option->( 'break-at-old-semicolon-breakpoints', 'bos', '!' );
     $add_option->( 'break-at-old-ternary-breakpoints',   'bot', '!' );
     $add_option->( 'break-at-old-attribute-breakpoints', 'boa', '!' );
+    $add_option->( 'keep-old-breakpoints-before',        'kbb', '=s' );
+    $add_option->( 'keep-old-breakpoints-after',         'kba', '=s' );
     $add_option->( 'ignore-old-breakpoints',             'iob', '!' );
 
     ########################################
@@ -2350,24 +2411,27 @@ sub generate_options {
     $category = 13;    # Debugging
     ########################################
 ##  $add_option->( 'DIAGNOSTICS',                     'I',    '!' );
-    $add_option->( 'DEBUG',                           'D',    '!' );
-    $add_option->( 'dump-cuddled-block-list',         'dcbl', '!' );
-    $add_option->( 'dump-defaults',                   'ddf',  '!' );
-    $add_option->( 'dump-long-names',                 'dln',  '!' );
-    $add_option->( 'dump-options',                    'dop',  '!' );
-    $add_option->( 'dump-profile',                    'dpro', '!' );
-    $add_option->( 'dump-short-names',                'dsn',  '!' );
-    $add_option->( 'dump-token-types',                'dtt',  '!' );
-    $add_option->( 'dump-want-left-space',            'dwls', '!' );
-    $add_option->( 'dump-want-right-space',           'dwrs', '!' );
-    $add_option->( 'fuzzy-line-length',               'fll',  '!' );
-    $add_option->( 'help',                            'h',    '' );
-    $add_option->( 'short-concatenation-item-length', 'scl',  '=i' );
-    $add_option->( 'show-options',                    'opt',  '!' );
-    $add_option->( 'timestamp',                       'ts',   '!' );
-    $add_option->( 'version',                         'v',    '' );
-    $add_option->( 'memoize',                         'mem',  '!' );
-    $add_option->( 'file-size-order',                 'fso',  '!' );
+    $add_option->( 'DEBUG',                           'D',     '!' );
+    $add_option->( 'dump-cuddled-block-list',         'dcbl',  '!' );
+    $add_option->( 'dump-defaults',                   'ddf',   '!' );
+    $add_option->( 'dump-long-names',                 'dln',   '!' );
+    $add_option->( 'dump-options',                    'dop',   '!' );
+    $add_option->( 'dump-profile',                    'dpro',  '!' );
+    $add_option->( 'dump-short-names',                'dsn',   '!' );
+    $add_option->( 'dump-token-types',                'dtt',   '!' );
+    $add_option->( 'dump-want-left-space',            'dwls',  '!' );
+    $add_option->( 'dump-want-right-space',           'dwrs',  '!' );
+    $add_option->( 'fuzzy-line-length',               'fll',   '!' );
+    $add_option->( 'help',                            'h',     '' );
+    $add_option->( 'short-concatenation-item-length', 'scl',   '=i' );
+    $add_option->( 'show-options',                    'opt',   '!' );
+    $add_option->( 'timestamp',                       'ts',    '!' );
+    $add_option->( 'version',                         'v',     '' );
+    $add_option->( 'memoize',                         'mem',   '!' );
+    $add_option->( 'file-size-order',                 'fso',   '!' );
+    $add_option->( 'maximum-file-size-mb',            'maxfs', '=i' );
+    $add_option->( 'maximum-level-errors',            'maxle', '=i' );
+    $add_option->( 'maximum-unexpected-errors',       'maxue', '=i' );
 
     #---------------------------------------------------------------------
 
@@ -2491,6 +2555,7 @@ sub generate_options {
       closing-brace-indentation=0
       closing-square-bracket-indentation=0
       continuation-indentation=2
+      noextended-continuation-indentation
       cuddled-break-option=1
       delete-old-newlines
       delete-semicolons
@@ -2509,6 +2574,9 @@ sub generate_options {
       maximum-consecutive-blank-lines=1
       maximum-fields-per-table=0
       maximum-line-length=80
+      maximum-file-size-mb=10
+      maximum-level-errors=1
+      maximum-unexpected-errors=0
       memoize
       minimum-space-to-comment=4
       nobrace-left-and-indent
@@ -2574,6 +2642,7 @@ sub generate_options {
         'outdent-long-lines' => [qw(outdent-long-quotes outdent-long-comments)],
         'nooutdent-long-lines' =>
           [qw(nooutdent-long-quotes nooutdent-long-comments)],
+        'oll'                 => [qw(outdent-long-lines)],
         'noll'                => [qw(nooutdent-long-lines)],
         'io'                  => [qw(indent-only)],
         'delete-all-comments' =>

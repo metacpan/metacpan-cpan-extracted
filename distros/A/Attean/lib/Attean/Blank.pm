@@ -7,7 +7,7 @@ Attean::Blank - RDF blank nodes
 
 =head1 VERSION
 
-This document describes Attean::Blank version 0.027
+This document describes Attean::Blank version 0.028
 
 =head1 SYNOPSIS
 
@@ -33,10 +33,10 @@ This role consumes L<Attean::API::Blank>, which provides the following methods:
 
 =cut
 
-package Attean::Blank 0.027 {
+package Attean::Blank 0.028 {
 	use Moo;
 	use Types::Standard qw(Str);
-	use Data::UUID;
+	use UUID::Tiny ':std';
 	use namespace::clean;
 	
 	has 'value' => (is => 'ro', isa => Str, required => 1);
@@ -49,8 +49,8 @@ package Attean::Blank 0.027 {
 		my $class	= shift;
 		
 		if (scalar(@_) == 0) {
-			my $uuid	= Data::UUID->new->create_hex;
-			return $class->$orig(value => $uuid);
+			my $uuid	= unpack('H*', create_uuid());
+			return $class->$orig(value => 'b' . $uuid);
 		} elsif (scalar(@_) == 1) {
 			my $value	= shift // '';
 			return $class->$orig(value => $value);

@@ -39,6 +39,8 @@ my @files = (
     't/release-trailing-space.t',
     't/rsa.cert.pem',
     't/rsa.private.key',
+    't/saml_request-xmlsec1-dsa-signed.xml',
+    't/saml_request-xmlsec1-rsa-signed.xml',
     't/saml_request.xml',
     't/saml_response.xml',
     't/sso.cert.pem'

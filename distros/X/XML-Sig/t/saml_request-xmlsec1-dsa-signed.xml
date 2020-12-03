@@ -1,0 +1,44 @@
+<?xml version="1.0"?>
+<samlp:ArtifactResolve xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol" xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion" ID="_cce4ee769ed970b501d680f697989d14" IssueInstant="2010-09-18T17:33:01Z" Version="2.0">
+  <!-- this is a comment - we can still sign and verify -->
+  <saml:Issuer>http://dev/cgi-bin/zxidhlo.pl?o=B</saml:Issuer>
+  <samlp:Artifact>AAQAALN+k3vq4G80Xko1XPLwwxsvPbU/JPFWdERp73EBAjuV4yT7ce9UMDQ=</samlp:Artifact>
+<dsig:Signature xmlns:dsig="http://www.w3.org/2000/09/xmldsig#">
+            <dsig:SignedInfo xmlns:xenc="http://www.w3.org/2001/04/xmlenc#">
+                <dsig:CanonicalizationMethod Algorithm="http://www.w3.org/TR/2001/REC-xml-c14n-20010315#WithComments"/>
+                <dsig:SignatureMethod Algorithm="http://www.w3.org/2000/09/xmldsig#dsa-sha1"/>
+                <dsig:Reference URI="#_cce4ee769ed970b501d680f697989d14">
+                        <dsig:Transforms>
+                            <dsig:Transform Algorithm="http://www.w3.org/2000/09/xmldsig#enveloped-signature"/>
+                            <dsig:Transform Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#"/>
+                        </dsig:Transforms>
+                        <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1"/>
+                        <dsig:DigestValue>k6gGihHGVnQZp9UDE91kH27tnq8=</dsig:DigestValue>
+                    </dsig:Reference>
+            </dsig:SignedInfo>
+            <dsig:SignatureValue>Z4e1cwfEgXMC7l5a1Pf3eruB/zoP16c1fhzpbFeZHd1DQAym9VdkPw==</dsig:SignatureValue>
+            <dsig:KeyInfo>
+                             <dsig:KeyValue>
+<dsig:DSAKeyValue>
+<dsig:P>
+3F1cWxyKaQ3LvrmNQ3VhC8V1V6D8kG0BTaNDcBCOvv6QCs+C47dwl2XQYTFFFj2h
+4JDh9Lb0iN/7SeyX6TDm+lZzC+NaDzsM3MkEFDjGRD1Nmv7U9qKXlt926XAmnaJa
+h+7TEMZnQpfp7sw3gx9ySg2wOrxcsJron2M9BaXNZqE=
+</dsig:P>
+<dsig:Q>
+rV9QMZEZe+gHIYZ0bkmCtFTwKyc=
+</dsig:Q>
+<dsig:G>
+p//HjldAAFBB4ZQJuoLIw62OZoLrZCJaTmcH+btMxz7y2GpagNemN6IAHfFiZ6eU
+5fSI+BZX2dnOTnG4rp4ZR2HSUQxk4SFTDduwidVx74KnOgGc6uC5h7sFI0EyGN5N
+h0Sy8qVA2A4MGcYcN/mIRvzcNvpRDDzyw19EREK4tFg=
+</dsig:G>
+<dsig:Y>
+Ncpnjk0HvI1GuGrgGS3WegzXVZw3eY/WHuopfkEams5n1GF/y0pewgiZBcQkLOcL
+riwMWeg1NS87UNk0IWo9Md9OvYFL0Ss0cK6f8IPNDBFDX4QpRf/D8n10v78PWGjr
+xlV5NRm2EVrEMSrFaUGlUlEuoxi0UrDLE/8yz7QXJZU=
+</dsig:Y>
+</dsig:DSAKeyValue>
+</dsig:KeyValue>
+                            </dsig:KeyInfo>
+        </dsig:Signature></samlp:ArtifactResolve>

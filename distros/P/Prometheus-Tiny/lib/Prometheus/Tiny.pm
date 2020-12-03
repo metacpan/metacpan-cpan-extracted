@@ -1,5 +1,5 @@
 package Prometheus::Tiny;
-$Prometheus::Tiny::VERSION = '0.004';
+$Prometheus::Tiny::VERSION = '0.005';
 # ABSTRACT: A tiny Prometheus client
 
 use warnings;
@@ -23,7 +23,12 @@ sub new {
 
 sub _format_labels {
   my ($self, $labels) = @_;
-  join ',', map { qq{$_="$labels->{$_}"} } sort keys %$labels;
+  join ',', map {
+    my $lv = $labels->{$_};
+    $lv =~ s/(["\\])/\\$1/sg;
+    $lv =~ s/\n/\\n/sg;
+    qq{$_="$lv"}
+  } sort keys %$labels;
 }
 
 sub set {
@@ -281,6 +286,10 @@ Rob N ★ <robn@robn.io>
 =item *
 
 ben hengst <ben.hengst@dreamhost.com>
+
+=item *
+
+Danijel Tasov <data@consol.de>
 
 =back
 

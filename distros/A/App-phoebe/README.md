@@ -32,7 +32,6 @@ To take a look for yourself, check out the test wiki via the
 - [Troubleshooting](#troubleshooting)
 - [Wiki Directory](#wiki-directory)
 - [Options](#options)
-- [Running Phoebe as a Daemon](#running-phoebe-as-a-daemon)
 - [Using systemd](#using-systemd)
 - [Security](#security)
 - [Privacy](#privacy)
@@ -134,32 +133,24 @@ Manual install:
 
 Perl libraries you need to install if you want to run Phoebe:
 
-- [Algorithm::Diff](https://metacpan.org/pod/Algorithm%3A%3ADiff)
-- [File::ReadBackwards](https://metacpan.org/pod/File%3A%3AReadBackwards)
-- [File::Slurper](https://metacpan.org/pod/File%3A%3ASlurper)
-- [IO::Socket::INET6](https://metacpan.org/pod/IO%3A%3ASocket%3A%3AINET6)
-- [IO::Socket::SSL](https://metacpan.org/pod/IO%3A%3ASocket%3A%3ASSL)
-- [Modern::Perl](https://metacpan.org/pod/Modern%3A%3APerl)
-- [Net::Server](https://metacpan.org/pod/Net%3A%3AServer)
-- [URI::Escape](https://metacpan.org/pod/URI%3A%3AEscape)
+- [Algorithm::Diff](https://metacpan.org/pod/Algorithm%3A%3ADiff), or `libalgorithm-diff-xs-perl`
+- [File::ReadBackwards](https://metacpan.org/pod/File%3A%3AReadBackwards), or `libfile-readbackwards-perl`
+- [File::Slurper](https://metacpan.org/pod/File%3A%3ASlurper), or `libfile-slurper-perl`
+- [Mojolicious](https://metacpan.org/pod/Mojolicious), or `libmojolicious-perl`
+- [IO::Socket::SSL](https://metacpan.org/pod/IO%3A%3ASocket%3A%3ASSL), or `libio-socket-ssl-perl`
+- [Modern::Perl](https://metacpan.org/pod/Modern%3A%3APerl), or `libmodern-perl-perl`
+- [URI::Escape](https://metacpan.org/pod/URI%3A%3AEscape), or `liburi-escape-xs-perl`
 
 I'm going to be using `curl` and `openssl` in the ["Quickstart"](#quickstart) instructions,
 so you'll need those tools as well. And finally, when people download their
-data, the code calls `tar`.
+data, the code calls `tar` (available from package with the same name on Debian
+derived systems).
 
-On Debian:
+The `update-readme.pl` script I use to generate `README.md` also requires some
+libraries:
 
-    sudo apt install \
-      libalgorithm-diff-xs-perl \
-      libfile-readbackwards-perl \
-      libfile-slurper-perl \
-      libmodern-perl-perl \
-      libnet-server-perl \
-      liburi-escape-xs-perl \
-      curl openssl tar
-
-The `update-readme.pl` script I use to generate `README.md` also requires
-[Pod::Markdown](https://metacpan.org/pod/Pod%3A%3AMarkdown) and [Text::Slugify](https://metacpan.org/pod/Text%3A%3ASlugify).
+- [Pod::Markdown](https://metacpan.org/pod/Pod%3A%3AMarkdown), or `libpod-markdown-perl`
+- [Text::Slugify](https://metacpan.org/pod/Text%3A%3ASlugify), which has no Debian package, apparently 😭
 
 ## Quickstart
 
@@ -295,12 +286,6 @@ Now you can upload about 10MB…
 
 ## Troubleshooting
 
-🔥 **Cannot connect to SSL port 1965 on 127.0.0.1 \[No such file or directory\]**
-🔥 Perhaps your [Net::Server::Proto::SSL](https://metacpan.org/pod/Net%3A%3AServer%3A%3AProto%3A%3ASSL) module is too old? Phoebe comes with
-a separate `lib` directory which contains a patched version of the module. Move
-this directory into your working directory where you want to run Phoebe and try
-again.
-
 🔥 **SSL\_cert\_file cert.pem can't be used: No such file or directory** 🔥 Perhaps
 you're missing the certificate (`cert.pem`) or key file (`key.pem`). The git
 repo has the necessary files which you can use to do a quick test. Copy them
@@ -364,10 +349,6 @@ it, you'll find a few more files:
 
 ## Options
 
-Phoebe has a bunch of options, and it uses [Net::Server](https://metacpan.org/pod/Net%3A%3AServer) in the background,
-which has even more options. Let's try to focus on the options you might want to
-use right away.
-
 Here's an example:
 
     perl phoebe \
@@ -412,27 +393,15 @@ Here's the documentation for the most useful options:
       `cert.pem`
 - `--key_file` is the private key PEM file to use; the default is
       `key.pem`
-- `--log_level` is the log level to use, 0 is quiet, 1 is errors, 2 is
-      warnings, 3 is info, and 4 is debug; the default is 2
-
-## Running Phoebe as a Daemon
-
-If you want to start Phoebe as a daemon, the following options come in
-handy:
-
-- `--setsid` makes sure Phoebe runs as a daemon in the background
-- `--pid_file` is the file where the process id (pid) gets written once the
-      server starts up; this is useful if you run the server in the background
-      and you need to kill it
-- `--log_file` is the file to write logs into; the default is to write log
-      output to the standard error (stderr)
-- `--user` and `--group` might come in handy if you start Phoebe
-      using a different user
+- `--log_level` is the log level to use (`fatal`, `error`, `warn`,
+      `info`, `debug`); the default is `warn`
+- `--log_file` is the log file to use; the default is undefined, which
+      means that STDERR is used
 
 ## Using systemd
 
-In this case, we don't want to daemonize the process. Systemd is going to handle
-that for us. There's more documentation [available
+Systemd is going to handle daemonisation for us. There's more documentation
+[available
 online](https://www.freedesktop.org/software/systemd/man/systemd.service.html).
 
 Basically, this is the template for our service:
@@ -543,20 +512,20 @@ always work.
 Here's my suggestion:
 
     User-agent: *
-    Disallow: raw/*
-    Disallow: html/*
-    Disallow: diff/*
-    Disallow: history/*
-    Disallow: do/changes*
-    Disallow: do/all/changes*
-    Disallow: do/all/latest/changes*
-    Disallow: do/rss
-    Disallow: do/atom
-    Disallow: do/all/atom
-    Disallow: do/new
-    Disallow: do/more/*
-    Disallow: do/match
-    Disallow: do/search
+    Disallow: /raw/*
+    Disallow: /html/*
+    Disallow: /diff/*
+    Disallow: /history/*
+    Disallow: /do/changes*
+    Disallow: /do/all/changes*
+    Disallow: /do/all/latest/changes*
+    Disallow: /do/rss
+    Disallow: /do/atom
+    Disallow: /do/all/atom
+    Disallow: /do/new
+    Disallow: /do/more/*
+    Disallow: /do/match
+    Disallow: /do/search
     # allowing do/index!
     Crawl-delay: 10
 
@@ -612,24 +581,23 @@ signal, if you know the pid, or if you have a pid file:
 
 Here are the ways you can hook into Phoebe code:
 
-- `@init` is a list of code references allowing you to change the
-      configuration of the server; it gets executed as the server starts, after
-      regular configuration
 - `@extensions` is a list of code references allowing you to handle
       additional URLs; return 1 if you handle a URL; each code reference gets
-      called with $self, the first line of the request (a Gemini URL, a Gopher
-      selector, a finger user, a HTTP request line), and a hash reference for
-      the headers (in the case of HTTP requests)
+      called with $stream ([Mojo::IOLoop::Stream](https://metacpan.org/pod/Mojo%3A%3AIOLoop%3A%3AStream)), the first line of the
+      request (a Gemini URL, a Gopher selector, a finger user, a HTTP request
+      line), a hash reference for the headers (in the case of HTTP requests),
+      and a buffer of bytes (e.g. for Titan or HTTP PUT or POST requests)
 - `@main_menu` adds more lines to the main menu, possibly links that aren't
       simply links to existing pages
 - `@footer` is a list of code references allowing you to add things like
       licenses or contact information to every page; each code reference gets
-      called with $self, $host, $space, $id, $revision, and $format ('gemini' or
-      'html') used to serve the page; return a gemtext string to append at the
-      end; the alternative is to overwrite the `footer` or `html_footer` subs
-      – the default implementation for Gemini adds History, Raw text and HTML
-      link, and `@footer` to the bottom of every page; the default
-      implementatino for HTTP just adds `@footer` to the bottom of every page
+      called with $stream ([Mojo::IOLoop::Stream](https://metacpan.org/pod/Mojo%3A%3AIOLoop%3A%3AStream)), $host, $space, $id,
+      $revision, and $format ('gemini' or 'html') used to serve the page; return
+      a gemtext string to append at the end; the alternative is to overwrite the
+      `footer` or `html_footer` subs – the default implementation for Gemini
+      adds History, Raw text and HTML link, and `@footer` to the bottom of
+      every page; the default implementation for HTTP just adds `@footer` to
+      the bottom of every page
 
 A very simple example to add a contact mail at the bottom of every page; this
 works for both Gemini and the web:
@@ -665,14 +633,14 @@ for it:
     push(@main_menu, "=> gemini://localhost/do/test Test");
     push(@extensions, \&serve_test);
     sub serve_test {
-      my $self = shift;
+      my $stream = shift;
       my $url = shift;
       my $headers = shift;
-      my $host = $self->host_regex();
-      my $port = $self->port();
+      my $host = $host_regex();
+      my $port = port($stream);
       if ($url =~ m!^gemini://($host)(?::$port)?/do/test$!) {
-        say "20 text/plain\r";
-        say "Test";
+        $stream->write("20 text/plain\r\n");
+        $stream->write("Test\n");
         return 1;
       }
       return;
@@ -699,16 +667,12 @@ Per default, there is simply one set of tokens which allows the editing of the
 wiki, and all the wiki spaces you defined. If you want to give users a token
 just for their space, you can do that, too. Doing this is starting to strain the
 command line interface, however, and therefore the following illustrates how to
-do more advanced configuration using `@init` in the config file:
+do more advanced configuration using the config file:
 
     package App::Phoebe;
     use Modern::Perl;
-    our (@init);
-    push(@init, \&init_tokens);
-    sub init_tokens {
-      my $self = shift;
-      $self->{server}->{wiki_space_token}->{alex} = ["*secret*"];
-    };
+    our ($server);
+    $server->{wiki_space_token}->{alex} = ["*secret*"];
 
 The code above sets up the `wiki_space_token` property. It's a hash reference
 where keys are existing wiki spaces and values are array references listing the
@@ -721,58 +685,45 @@ even if these properties are set via the command line.
 
     package App::Phoebe;
     use Modern::Perl;
-    our (@init);
-    push(@init, \&init_tokens);
-    sub init_tokens {
-      my $self = shift;
-      $self->{server}->{wiki_token} = [];
-    };
+    our ($server);
+    $server->{wiki_token} = [];
 
 This code simply deactivates the token list. No more tokens!
 
 ## Client Certificates
 
-Phoebe serves a public wiki by default. In theory, limiting editing to
-known users (that is, known client certificates) is possible. I say "in theory"
-because this requires a small change to [Net::Server::Proto::SSL](https://metacpan.org/pod/Net%3A%3AServer%3A%3AProto%3A%3ASSL). For your
-convenience, this repository comes with a patched version (based on
-[Net::Server](https://metacpan.org/pod/Net%3A%3AServer) 2.009). All this does is add `SSL_verify_callback` to the list of
-options for [IO::Socket::SSL](https://metacpan.org/pod/IO%3A%3ASocket%3A%3ASSL). Phoebe includes the local `lib` directory
-in its library search path, so if you have the `lib/Net/Server/Proto/SSL.pm`
-file in the current directory where you start `phoebe`, it should simply
-work.
-
-Here's a config file using client certificates to limit writing to a single,
-known fingerprint:
+Phoebe serves a public wiki by default. Limiting editing to known users (that
+is, known client certificates) is possible. Here's a config file using client
+certificates to limit writing to a single, known fingerprint:
 
     package App::Phoebe;
     use Modern::Perl;
-    our (@init, @extensions);
+    our ($server, @extensions, $log);
     my @fingerprints = ('sha256$e4b871adf0d74d9ab61fbf0b6773d75a152594090916834278d416a769712570');
     push(@extensions, \&protected_wiki);
     sub protected_wiki {
-      my $self = shift;
+      my $stream = shift;
       my $url = shift;
-      my $host_regex = $self->host_regex();
-      my $port = $self->port();
-      my $spaces = $self->space_regex();
-      my $fingerprint = $self->{server}->{client}->get_fingerprint();
+      my $host_regex = host_regex();
+      my $port = port($stream);
+      my $spaces = space_regex($stream);
+      my $fingerprint = $server->{client}->get_fingerprint();
       if (my ($host, $path) = $url =~ m!^titan://($host_regex)(?::$port)?([^?#]*)!) {
         my ($space, $resource) = $path =~ m!^(?:/($spaces))?(?:/raw)?/([^/;=&]+(?:;\w+=[^;=&]+)+)!;
         if (not $resource) {
-          $self->log(4, "The Titan URL is malformed: $path $spaces");
-          say "59 The Titan URL is malformed\r";
+          $log->debug("The Titan URL is malformed: $path $spaces");
+          $stream->write("59 The Titan URL is malformed\r\n");
         } elsif ($fingerprint and grep { $_ eq $fingerprint} @fingerprints) {
-          $self->log(3, "Successfully identified client certificate");
+          $log->info("Successfully identified client certificate");
           my ($id, @params) = split(/[;=&]/, $resource);
-          $self->write_page($host, $self->space($host, $space), decode_utf8(uri_unescape($id)),
+          save_page($stream, $host, space($stream, $host, $space), decode_utf8(uri_unescape($id)),
                             {map {decode_utf8(uri_unescape($_))} @params});
         } elsif ($fingerprint) {
-          $self->log(3, "Unknown client certificate $fingerprint");
-          say "61 Your client certificate is not authorized for editing\r";
+          $log->info("Unknown client certificate $fingerprint");
+          $stream->write("61 Your client certificate is not authorized for editing\r\n");
         } else {
-          $self->log(3, "Requested client certificate");
-          say "60 You need a client certificate to edit this wiki\r";
+          $log->info("Requested client certificate");
+          $stream->write("60 You need a client certificate to edit this wiki\r\n");
         }
         return 1;
       }
@@ -874,13 +825,13 @@ header makes sure browsers don't keep trying to revalidate the CSS more than
 once a day.
 
     sub serve_css_via_http {
-      my $self = shift;
-      $self->log(3, "Serving CSS via HTTP");
-      say "HTTP/1.1 200 OK\r";
-      say "Content-Type: text/css\r";
-      say "Cache-Control: public, max-age=86400, immutable\r"; # 24h
-      say "\r";
-      say <<'EOT';
+      my $stream = shift;
+      $log->info("Serving CSS via HTTP");
+      $stream->write("HTTP/1.1 200 OK\r\n");
+      $stream->write("Content-Type: text/css\r\n");
+      $stream->write("Cache-Control: public, max-age=86400, immutable\r\n"); # 24h
+      $stream->write("\r\n");
+      $stream->write(<<'EOT');
     html { max-width: 70ch; padding: 2ch; margin: auto; }
     body { color: #111111; background-color: #fffff8; }
     a:link { color: #0000ee }
@@ -906,23 +857,23 @@ Let me know if you need this and you are stuck.
     push(@extensions, \&favicon);
 
     sub favicon {
-      my $self = shift;
+      my $stream = shift;
       my $url = shift;
       if ($url =~ m!^GET /favicon.ico HTTP/1\.[01]$!) {
-        $self->serve_favicon_via_http();
+        serve_favicon_via_http($stream);
         return 1;
       }
       return 0;
     }
 
     sub serve_favicon_via_http {
-      my $self = shift;
-      $self->log(3, "Serving favicon via HTTP");
-      say "HTTP/1.1 200 OK\r";
-      say "Content-Type: image/svg+xml\r";
-      say "Cache-Control: public, max-age=86400, immutable\r"; # 24h
-      say "\r";
-      say <<'EOT';
+      my $stream = shift;
+      $log->info("Serving favicon via HTTP");
+      $stream->write("HTTP/1.1 200 OK\r\n");
+      $stream->write("Content-Type: image/svg+xml\r\n");
+      $stream->write("Cache-Control: public, max-age=86400, immutable\r\n"); # 24h
+      $stream->write("\r\n");
+      $stream->write(<<'EOT');
     <?xml version="1.0" encoding="UTF-8" standalone="no"?>
     <svg xmlns="http://www.w3.org/2000/svg" width="100" height="100">
     <circle cx="50" cy="50" r="45" fill="white" stroke="black" stroke-width="5"/>

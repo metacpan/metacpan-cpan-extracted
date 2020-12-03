@@ -1,5 +1,10 @@
 Revision history for Perl extension NOLookup
 
+1.22 2020-12-03
+     - Use IO::Socket::INET6 to support also ipv6 only services for
+       whois and das lookups.
+     - Also support server and port args for no_das.pl
+
 1.21 2020-08-07
      - bin/no_rdap.pl: adjust -f option to force either ipv4 or ipv6,
        nice if some dns/connect problem should occur.

@@ -8,7 +8,7 @@
 package Perl::Tidy::IndentationItem;
 use strict;
 use warnings;
-our $VERSION = '20201001';
+our $VERSION = '20201202';
 
 BEGIN {
 
@@ -39,11 +39,13 @@ sub AUTOLOAD {
     # some diagnostic information.  This sub should never be called
     # except for a programming error.
     our $AUTOLOAD;
-    return if ( $AUTOLOAD eq 'DESTROY' );
+    return if ( $AUTOLOAD =~ /\bDESTROY$/ );
     my ( $pkg, $fname, $lno ) = caller();
+    my $my_package = __PACKAGE__;
     print STDERR <<EOM;
 ======================================================================
-Unexpected call to Autoload looking for sub $AUTOLOAD
+Error detected in package '$my_package', version $VERSION
+Received unexpected AUTOLOAD call for sub '$AUTOLOAD'
 Called from package: '$pkg'  
 Called from File '$fname'  at line '$lno'
 This error is probably due to a recent programming change
@@ -62,23 +64,6 @@ sub new {
     # Create an 'indentation_item' which describes one level of leading
     # whitespace when the '-lp' indentation is used.
     my ( $class, %input_hash ) = @_;
-
-    my $spaces              = $input_hash{spaces};
-    my $level               = $input_hash{level};
-    my $ci_level            = $input_hash{ci_level};
-    my $available_spaces    = $input_hash{available_spaces};
-    my $index               = $input_hash{index};
-    my $gnu_sequence_number = $input_hash{gnu_sequence_number};
-    my $align_paren         = $input_hash{align_paren};
-    my $stack_depth         = $input_hash{stack_depth};
-    my $starting_index_K    = $input_hash{starting_index_K};
-
-    my $closed            = -1;
-    my $arrow_count       = 0;
-    my $comma_count       = 0;
-    my $have_child        = 0;
-    my $want_right_spaces = 0;
-    my $marked            = 0;
 
     # DEFINITIONS:
     # spaces             =>  # total leading white spaces
@@ -102,21 +87,21 @@ sub new {
     # arrow_count        =>  # how many =>'s
 
     my $self = [];
-    $self->[_spaces_]             = $spaces;
-    $self->[_level_]              = $level;
-    $self->[_ci_level_]           = $ci_level;
-    $self->[_available_spaces_]   = $available_spaces;
-    $self->[_closed_]             = $closed;
-    $self->[_comma_count_]        = $comma_count;
-    $self->[_sequence_number_]    = $gnu_sequence_number;
-    $self->[_index_]              = $index;
-    $self->[_have_child_]         = $have_child;
-    $self->[_recoverable_spaces_] = $want_right_spaces;
-    $self->[_align_paren_]        = $align_paren;
-    $self->[_marked_]             = $marked;
-    $self->[_stack_depth_]        = $stack_depth;
-    $self->[_starting_index_K_]   = $starting_index_K;
-    $self->[_arrow_count_]        = $arrow_count;
+    $self->[_spaces_]             = $input_hash{spaces};
+    $self->[_level_]              = $input_hash{level};
+    $self->[_ci_level_]           = $input_hash{ci_level};
+    $self->[_available_spaces_]   = $input_hash{available_spaces};
+    $self->[_closed_]             = -1;
+    $self->[_comma_count_]        = 0;
+    $self->[_sequence_number_]    = $input_hash{gnu_sequence_number};
+    $self->[_index_]              = $input_hash{index};
+    $self->[_have_child_]         = 0;
+    $self->[_recoverable_spaces_] = 0;
+    $self->[_align_paren_]        = $input_hash{align_paren};
+    $self->[_marked_]             = 0;
+    $self->[_stack_depth_]        = $input_hash{stack_depth};
+    $self->[_starting_index_K_]   = $input_hash{starting_index_K};
+    $self->[_arrow_count_]        = 0;
 
     bless $self, $class;
     return $self;
@@ -160,18 +145,15 @@ sub tentatively_decrease_available_spaces {
 }
 
 sub get_stack_depth {
-    my $self = shift;
-    return $self->[_stack_depth_];
+    return $_[0]->[_stack_depth_];
 }
 
 sub get_spaces {
-    my $self = shift;
-    return $self->[_spaces_];
+    return $_[0]->[_spaces_];
 }
 
 sub get_marked {
-    my $self = shift;
-    return $self->[_marked_];
+    return $_[0]->[_marked_];
 }
 
 sub set_marked {
@@ -183,8 +165,7 @@ sub set_marked {
 }
 
 sub get_available_spaces {
-    my $self = shift;
-    return $self->[_available_spaces_];
+    return $_[0]->[_available_spaces_];
 }
 
 sub decrease_SPACES {
@@ -204,13 +185,11 @@ sub decrease_available_spaces {
 }
 
 sub get_align_paren {
-    my $self = shift;
-    return $self->[_align_paren_];
+    return $_[0]->[_align_paren_];
 }
 
 sub get_recoverable_spaces {
-    my $self = shift;
-    return $self->[_recoverable_spaces_];
+    return $_[0]->[_recoverable_spaces_];
 }
 
 sub set_recoverable_spaces {
@@ -230,28 +209,23 @@ sub increase_recoverable_spaces {
 }
 
 sub get_ci_level {
-    my $self = shift;
-    return $self->[_ci_level_];
+    return $_[0]->[_ci_level_];
 }
 
 sub get_level {
-    my $self = shift;
-    return $self->[_level_];
+    return $_[0]->[_level_];
 }
 
 sub get_sequence_number {
-    my $self = shift;
-    return $self->[_sequence_number_];
+    return $_[0]->[_sequence_number_];
 }
 
 sub get_index {
-    my $self = shift;
-    return $self->[_index_];
+    return $_[0]->[_index_];
 }
 
 sub get_starting_index_K {
-    my $self = shift;
-    return $self->[_starting_index_K_];
+    return $_[0]->[_starting_index_K_];
 }
 
 sub set_have_child {
@@ -263,8 +237,7 @@ sub set_have_child {
 }
 
 sub get_have_child {
-    my $self = shift;
-    return $self->[_have_child_];
+    return $_[0]->[_have_child_];
 }
 
 sub set_arrow_count {
@@ -276,8 +249,7 @@ sub set_arrow_count {
 }
 
 sub get_arrow_count {
-    my $self = shift;
-    return $self->[_arrow_count_];
+    return $_[0]->[_arrow_count_];
 }
 
 sub set_comma_count {
@@ -289,8 +261,7 @@ sub set_comma_count {
 }
 
 sub get_comma_count {
-    my $self = shift;
-    return $self->[_comma_count_];
+    return $_[0]->[_comma_count_];
 }
 
 sub set_closed {
@@ -302,7 +273,6 @@ sub set_closed {
 }
 
 sub get_closed {
-    my $self = shift;
-    return $self->[_closed_];
+    return $_[0]->[_closed_];
 }
 1;

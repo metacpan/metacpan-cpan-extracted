@@ -1,5 +1,8 @@
 Revision history for AWS::ARN
 
+0.005
+          - Fix where condition for AWS ARN regex
+
 0.004
           - Add link to the ARN format documentation
 

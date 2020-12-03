@@ -1,0 +1,37 @@
+bin/attean_dbi
+Changes
+inc/Module/Install.pm
+inc/Module/Install/AuthorTests.pm
+inc/Module/Install/Base.pm
+inc/Module/Install/Can.pm
+inc/Module/Install/DOAPChangeSets.pm
+inc/Module/Install/Fetch.pm
+inc/Module/Install/Makefile.pm
+inc/Module/Install/Metadata.pm
+inc/Module/Install/Scripts.pm
+inc/Module/Install/Share.pm
+inc/Module/Install/Win32.pm
+inc/Module/Install/WriteAll.pm
+lib/AtteanX/Store/DBI.pm
+lib/Test/AtteanX/Store/DBI.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+meta/changes.ttl
+README.md
+share/database-schema/mysql-create.sql
+share/database-schema/mysql-drop.sql
+share/database-schema/postgresql-create.sql
+share/database-schema/postgresql-drop.sql
+share/database-schema/sqlite-create.sql
+share/database-schema/sqlite-drop.sql
+t/store-dbi-mysql.t
+t/store-dbi-postgresql.t
+t/store-dbi-sqlite.t
+xt/dawg11-mysql.t
+xt/dawg11-postgresql.t
+xt/dawg11-sqlite.t
+xt/pod-coverage.t
+xt/pod.t
+SIGNATURE                                Public-key signature (added by MakeMaker)

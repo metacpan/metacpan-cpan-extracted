@@ -11,12 +11,11 @@ package UTF8::R2;
 use 5.00503;    # Universal Consensus 1998 for primetools
 # use 5.008001; # Lancaster Consensus 2013 for toolchains
 
-$VERSION = '0.09';
+$VERSION = '0.10';
 $VERSION = $VERSION;
 
 use strict;
 BEGIN { $INC{'warnings.pm'} = '' if $] < 5.006 }; use warnings; local $^W=1;
-use Carp ();
 use Symbol ();
 
 my %utf8_codepoint = (
@@ -125,6 +124,21 @@ sub import {
 # shortcut of omitted $_
 sub _ {
     @_ ? $_[0] : $_
+}
+
+#---------------------------------------------------------------------
+# confess() for this module
+sub confess {
+    my $i = 0;
+    my @confess = ();
+    while (my($package,$filename,$line,$subroutine) = caller($i)) {
+        push @confess, "[$i] $filename($line) $package::$subroutine\n";
+        $i++;
+    }
+    print STDERR CORE::reverse @confess;
+    print STDERR "\n";
+    print STDERR @_;
+    die "\n";
 }
 
 #---------------------------------------------------------------------
@@ -250,7 +264,7 @@ sub _unicode_hex {
         elsif ($unicode <    0x800) { return pack('U0C*',                                            $unicode>>6     |0xC0, $unicode&0x3F|0x80) }
         elsif ($unicode <  0x10000) { return pack('U0C*',                    $unicode>>12     |0xE0, $unicode>>6&0x3F|0x80, $unicode&0x3F|0x80) }
         elsif ($unicode < 0x110000) { return pack('U0C*', $unicode>>18|0xF0, $unicode>>12&0x3F|0x80, $unicode>>6&0x3F|0x80, $unicode&0x3F|0x80) }
-        else { Carp::confess qq{@{[__FILE__]}: \\x{$unicode_by_hex} is out of Unicode (0 to 0x10FFFF)}; }
+        else { confess qq{@{[__FILE__]}: \\x{$unicode_by_hex} is out of Unicode (0 to 0x10FFFF)}; }
     }
     else {
         return $codepoint;
@@ -383,7 +397,7 @@ $a[3] < 0xBF ?  sprintf(join('', qw(  \x%02x        \x%02x       [\x%02x-\xBF] [
     }
 
     # over range of codepoint
-    Carp::confess sprintf(qq{@{[__FILE__]}: codepoint class [$_[0]-$_[1]] is not 1 to 4 octets (%d-%d)}, CORE::length($a), CORE::length($b));
+    confess sprintf(qq{@{[__FILE__]}: codepoint class [$_[0]-$_[1]] is not 1 to 4 octets (%d-%d)}, CORE::length($a), CORE::length($b));
 }
 
 #---------------------------------------------------------------------
@@ -638,13 +652,13 @@ sub _list_all_ASCII_by_hyphen {
         1) {
             if (0) { }
             elsif ($hyphened[$i+0] !~ m/\A [\x00-\x7F] \z/oxms) {
-                Carp::confess sprintf(qq{@{[__FILE__]}: "$hyphened[$i+0]-$hyphened[$i+2]" in tr/// is not ASCII});
+                confess sprintf(qq{@{[__FILE__]}: "$hyphened[$i+0]-$hyphened[$i+2]" in tr/// is not ASCII});
             }
             elsif ($hyphened[$i+2] !~ m/\A [\x00-\x7F] \z/oxms) {
-                Carp::confess sprintf(qq{@{[__FILE__]}: "$hyphened[$i+0]-$hyphened[$i+2]" in tr/// is not ASCII});
+                confess sprintf(qq{@{[__FILE__]}: "$hyphened[$i+0]-$hyphened[$i+2]" in tr/// is not ASCII});
             }
             elsif ($hyphened[$i+0] gt $hyphened[$i+2]) {
-                Carp::confess sprintf(qq{@{[__FILE__]}: "$hyphened[$i+0]-$hyphened[$i+2]" in tr/// is not "$hyphened[$i+0]" le "$hyphened[$i+2]"});
+                confess sprintf(qq{@{[__FILE__]}: "$hyphened[$i+0]-$hyphened[$i+2]" in tr/// is not "$hyphened[$i+0]" le "$hyphened[$i+2]"});
             }
             else {
                 push @list_all, ($hyphened[$i+0] .. $hyphened[$i+2]);
@@ -866,7 +880,9 @@ UTF8::R2 - makes UTF-8 scripting easy for enterprise use or LTS
   use UTF8::R2 ver.sion;            # match or die
   use UTF8::R2 qw( RFC3629 );       # m/./ matches RFC3629 codepoint (default)
   use UTF8::R2 qw( RFC2279 );       # m/./ matches RFC2279 codepoint
+  use UTF8::R2 qw( WTF8 );          # m/./ matches WTF-8 codepoint
   use UTF8::R2 qw( RFC3629.ja_JP ); # optimized RFC3629 for ja_JP
+  use UTF8::R2 qw( WTF8.ja_JP );    # optimized WTF-8 for ja_JP
   use UTF8::R2 qw( %mb );           # multibyte regex by %mb
 
     $result = UTF8::R2::chop(@_)

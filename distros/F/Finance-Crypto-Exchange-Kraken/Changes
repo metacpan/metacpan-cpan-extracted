@@ -1,0 +1,9 @@
+Revision history for Finance-Crypto-Exchange-Kraken
+
+0.002     2020-12-03 04:59:16Z
+
+    * Fix hmac signing bug
+
+0.001     2020-12-03 00:54:27Z
+
+    * Initial release

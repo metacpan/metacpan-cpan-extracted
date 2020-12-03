@@ -2,7 +2,7 @@ package NOLookup::Whois::WhoisLookup;
 
 use strict;
 use warnings;
-use IO::Socket;
+use IO::Socket::INET6;
 
 use vars qw(@ISA @EXPORT_OK);
 @ISA    = qw( Exporter );
@@ -79,7 +79,7 @@ sub lookup {
 
     #$client_ip = undef;
     
-    my $sock = IO::Socket::INET->new (
+    my $sock = IO::Socket::INET6->new (
 	PeerAddr => $whois_server,
 	PeerPort => $whois_port,
 	Proto    => 'tcp',
@@ -88,7 +88,6 @@ sub lookup {
 
     unless($sock) {
 	$self->{errno} = $WHOIS_LOOKUP_ERR_NO_CONN;
-	#print STDERR "SOCK ERR: $!\n";
 	return $self;
     }
 

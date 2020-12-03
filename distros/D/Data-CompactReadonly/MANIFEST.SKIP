@@ -1,0 +1,8 @@
+.DS_Store
+^\.git
+.envrc
+.travis.yml
+.appveyor.yml
+.cirrus.yml
+cover_db/
+TODO

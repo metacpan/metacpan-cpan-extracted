@@ -7,6 +7,7 @@ use strict;
 use base 'Exporter';
 our @EXPORT = qw( loadlines );
 use Encode;
+use Carp;
 
 =head1 NAME
 
@@ -14,7 +15,7 @@ File::LoadLines - Load lines from file
 
 =cut
 
-our $VERSION = '0.02';
+our $VERSION = '1.00';
 
 =head1 SYNOPSIS
 
@@ -84,6 +85,9 @@ resultant lines.
 
 sub loadlines {
     my ( $filename, $options ) = @_;
+    croak("Missing filename.\n") unless defined $filename;
+    croak("Invalid options.\n")  if (defined $options && (ref($options) ne "HASH"));
+
     $options->{split} //= 1;
     $options->{chomp} //= 1;
 
@@ -186,8 +190,8 @@ sub loadlines {
 There are currently no other modules that handle BOM detection and
 line splitting.
 
-I have a faint hope that Perl6 will deal with this transparently, but
-I fear the worst.
+I have a faint hope that future versions of Perl and Raku will deal
+with this transparently, but I fear the worst.
 
 =head1 AUTHOR
 
@@ -207,7 +211,7 @@ GitHub.
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright 2018 Johan Vromans, all rights reserved.
+Copyright 2018,2020 Johan Vromans, all rights reserved.
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

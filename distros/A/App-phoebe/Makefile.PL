@@ -14,17 +14,18 @@ WriteMakefile(
     'script/gemini',
     'script/titan',
   ],
-  PREREQ_PM        => {
-    'strict'   => 0,
+  PREREQ_PM => {
+    'strict' => 0,
     'warnings' => 0,
     'Algorithm::Diff' => 0,
     'File::ReadBackwards' => 0,
-    'IO::Socket::INET6' => 0,
-    'IO::Socket::SSL' => 0,
+    'Mojolicious' => 8.12, # Mojo::IOLoop, also adds IO::Socket::IP
+    'IO::Socket::SSL' => 0, # optional for Mojo::IOLoop
     'File::Slurper' => 0,
-    'Net::Server' => 0,
     'Modern::Perl' => 1.20180701, # for '2018'
+    'Mojo::IOLoop' => 0,
     'URI::Escape' => 0,
+    'Mojo::Log' => 0,
   },
   META_MERGE => {
     'meta-spec' => { version => 2 },

@@ -7,7 +7,9 @@
 package Perl::Tidy::FileWriter;
 use strict;
 use warnings;
-our $VERSION = '20201001';
+our $VERSION = '20201202';
+
+use constant DEVEL_MODE => 0;
 
 sub AUTOLOAD {
 
@@ -15,11 +17,13 @@ sub AUTOLOAD {
     # some diagnostic information.  This sub should never be called
     # except for a programming error.
     our $AUTOLOAD;
-    return if ( $AUTOLOAD eq 'DESTROY' );
+    return if ( $AUTOLOAD =~ /\bDESTROY$/ );
     my ( $pkg, $fname, $lno ) = caller();
+    my $my_package = __PACKAGE__;
     print STDERR <<EOM;
 ======================================================================
-Unexpected call to Autoload looking for sub $AUTOLOAD
+Error detected in package '$my_package', version $VERSION
+Received unexpected AUTOLOAD call for sub '$AUTOLOAD'
 Called from package: '$pkg'  
 Called from File '$fname'  at line '$lno'
 This error is probably due to a recent programming change
@@ -32,6 +36,8 @@ sub DESTROY {
 
     # required to avoid call to AUTOLOAD in some versions of perl
 }
+
+my $input_stream_name = "";
 
 # Maximum number of little messages; probably need not be changed.
 my $MAX_NAG_MESSAGES = 6;
@@ -56,7 +62,18 @@ BEGIN {
         _line_length_error_count_    => $i++,
         _max_output_line_length_     => $i++,
         _max_output_line_length_at_  => $i++,
+        _rK_checklist_               => $i++,
+        _K_arrival_order_matches_    => $i++,
+        _K_sequence_error_msg_       => $i++,
+        _K_last_arrival_             => $i++,
     };
+}
+
+sub warning {
+    my ( $self, $msg ) = @_;
+    my $logger_object = $self->[_logger_object_];
+    if ($logger_object) { $logger_object->warning($msg); }
+    return;
 }
 
 sub write_logfile_entry {
@@ -87,29 +104,67 @@ sub new {
     $self->[_line_length_error_count_]    = 0;
     $self->[_max_output_line_length_]     = 0;
     $self->[_max_output_line_length_at_]  = 0;
+    $self->[_rK_checklist_]               = [];
+    $self->[_K_arrival_order_matches_]    = 0;
+    $self->[_K_sequence_error_msg_]       = "";
+    $self->[_K_last_arrival_]             = -1;
+
+    # save input stream name for local error messages
+    $input_stream_name = "";
+    if ($logger_object) {
+        $input_stream_name = $logger_object->get_input_stream_name();
+    }
+
     bless $self, $class;
     return $self;
 }
 
+sub setup_convergence_test {
+    my ( $self, $rlist ) = @_;
+    if ( @{$rlist} ) {
+
+        # We are going to destroy the list, so make a copy
+        # and put in reverse order so we can pop values
+        my @list = @{$rlist};
+        if ( $list[0] < $list[-1] ) {
+            @list = reverse @list;
+        }
+        $self->[_rK_checklist_] = \@list;
+    }
+    $self->[_K_arrival_order_matches_] = 1;
+    $self->[_K_sequence_error_msg_]    = "";
+    $self->[_K_last_arrival_]          = -1;
+    return;
+}
+
+sub get_convergence_check {
+    my ($self) = @_;
+    my $rlist = $self->[_rK_checklist_];
+
+    # converged if all K arrived and in correct order
+    return $self->[_K_arrival_order_matches_] && !@{$rlist};
+}
+
+sub get_K_sequence_error_msg {
+    my ($self) = @_;
+    return $self->[_K_sequence_error_msg_];
+}
+
 sub get_output_line_number {
-    my $self = shift;
-    return $self->[_output_line_number_];
+    return $_[0]->[_output_line_number_];
 }
 
 sub decrement_output_line_number {
-    my $self = shift;
-    $self->[_output_line_number_]--;
+    $_[0]->[_output_line_number_]--;
     return;
 }
 
 sub get_consecutive_nonblank_lines {
-    my $self = shift;
-    return $self->[_consecutive_nonblank_lines_];
+    return $_[0]->[_consecutive_nonblank_lines_];
 }
 
 sub reset_consecutive_blank_lines {
-    my $self = shift;
-    $self->[_consecutive_blank_lines_] = 0;
+    $_[0]->[_consecutive_blank_lines_] = 0;
     return;
 }
 
@@ -151,44 +206,85 @@ sub write_blank_code_line {
 }
 
 sub write_code_line {
-    my $self = shift;
-    my $a    = shift;
+    my ( $self, $str, $K ) = @_;
 
-    if ( $a =~ /^\s*$/ ) {
-        my $rOpts = $self->[_rOpts_];
-        return
-          if ( $self->[_consecutive_blank_lines_] >=
-            $rOpts->{'maximum-consecutive-blank-lines'} );
-        $self->[_consecutive_blank_lines_]++;
-        $self->[_consecutive_nonblank_lines_] = 0;
+    $self->[_consecutive_blank_lines_] = 0;
+    $self->[_consecutive_nonblank_lines_]++;
+    $self->write_line($str);
+
+    #----------------------------
+    # Convergence and error check
+    #----------------------------
+    if ( defined($K) ) {
+
+        # Convergence check: we are checking if all defined K values arrive in
+        # the order which was defined by the caller.  Quit checking if any
+        # unexpected K value arrives.
+        if ( $self->[_K_arrival_order_matches_] ) {
+            my $Kt = pop @{ $self->[_rK_checklist_] };
+            if ( !defined($Kt) || $Kt != $K ) {
+                $self->[_K_arrival_order_matches_] = 0;
+            }
+        }
+
+        # Check for out-of-order arrivals of index K. The K values are the
+        # token indexes of the last token of code lines, and they should come
+        # out in increasing order.  Otherwise something is seriously wrong.
+        # Most likely a recent programming change to VerticalAligner.pm has
+        # caused lines to go out in the wrong order.  This could happen if
+        # either the cache or buffer that it uses are emptied in the wrong
+        # order.
+        if ( !$self->[_K_sequence_error_msg_] ) {
+            my $K_prev = $self->[_K_last_arrival_];
+            if ( $K < $K_prev ) {
+                chomp $str;
+                if ( length($str) > 80 ) {
+                    $str = substr( $str, 0, 80 ) . "...";
+                }
+
+                my $msg = <<EOM;
+While operating on input stream with name: '$input_stream_name'
+Lines have arrived out of order in sub 'write_code_line'
+as detected by token index K=$K arriving after index K=$K_prev in the following line:
+$str
+This is probably due to a recent programming change and needs to be fixed.
+EOM
+
+                # FIXME: it would be best to set a 'severe_error' flag here and
+                # tell caller to output the original file
+                $self->warning($msg);
+
+                # Only issue this warning once
+                $self->[_K_sequence_error_msg_] = $msg;
+
+                # stop here in DEVEL mode so this issue doesn't get missed
+                DEVEL_MODE && Perl::Tidy::Die($msg);
+            }
+        }
+        $self->[_K_last_arrival_] = $K;
     }
-    else {
-        $self->[_consecutive_blank_lines_] = 0;
-        $self->[_consecutive_nonblank_lines_]++;
-    }
-    $self->write_line($a);
     return;
 }
 
 sub write_line {
-    my ( $self, $a ) = @_;
+    my ( $self, $str ) = @_;
 
-    # TODO: go through and see if the test is necessary here
-    if ( $a =~ /\n$/ ) { $self->[_output_line_number_]++; }
+    $self->[_line_sink_object_]->write_line($str);
 
-    $self->[_line_sink_object_]->write_line($a);
+    if ( chomp $str ) { $self->[_output_line_number_]++; }
 
     # This calculation of excess line length ignores any internal tabs
-    my $rOpts  = $self->[_rOpts_];
-    my $exceed = length($a) - $rOpts->{'maximum-line-length'} - 1;
-    if ( $a =~ /^\t+/g ) {
-        $exceed += pos($a) * ( $rOpts->{'indent-columns'} - 1 );
+    my $rOpts   = $self->[_rOpts_];
+    my $len_str = length($str);
+    my $exceed  = $len_str - $rOpts->{'maximum-line-length'};
+    if ( $str && substr( $str, 0, 1 ) eq "\t" && $str =~ /^\t+/g ) {
+        $exceed += pos($str) * $rOpts->{'indent-columns'};
     }
 
     # Note that we just incremented output line number to future value
     # so we must subtract 1 for current line number
-    if ( length($a) > 1 + $self->[_max_output_line_length_] ) {
-        $self->[_max_output_line_length_] = length($a) - 1;
+    if ( $len_str > $self->[_max_output_line_length_] ) {
+        $self->[_max_output_line_length_] = $len_str;
         $self->[_max_output_line_length_at_] =
           $self->[_output_line_number_] - 1;
     }
@@ -263,4 +359,3 @@ sub report_line_length_errors {
     return;
 }
 1;
-

@@ -1,10 +1,15 @@
 Revision history for File-LoadLines
 
-0.02
+1.00	2020-12-03
+
+	Fix Carp and Test::Exception dependencies.
+	Assume mature.
+
+0.02	2018-11-06
 
 	Mostly documentation enhancements.
 
-0.01    2018-11-26
+0.01    2018-10-26
 
 	First version, released on an unsuspecting world.
 

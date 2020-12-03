@@ -6,7 +6,7 @@ use Moo;
 use Types::Standard qw/Str/;
 use Type::Utils;
 
-our $VERSION = '0.004';
+our $VERSION = '0.005';
 
 use overload '""' => sub {
 	shift->arn;
@@ -39,7 +39,7 @@ my $ArnService = declare(
 );
 my $ArnAccountID = declare(
 	as Str,
-	where => { m{^$account_idRe$} }, 
+	where { m{^$account_idRe$} }, 
 	message { "$_ is not a valid AWS Account ID" }
 );
 my $ArnResourceID = declare(
@@ -177,7 +177,7 @@ AWS::ARN -  module to parse and generate ARNs
 
 =head1 VERSION
 
-0.004
+0.005
 
 =head1 DESCRIPTION
 

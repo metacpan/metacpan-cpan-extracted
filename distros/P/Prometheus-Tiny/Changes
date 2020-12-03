@@ -1,5 +1,8 @@
 Revision history for Prometheus-Tiny
 
+0.005     2020-12-03 21:41:43+11:00 Australia/Melbourne
+- Escape special chars in label values (thanks, Danijel Tasov!)
+
 0.004     2019-12-22 12:17:34+11:00 Australia/Melbourne
 - Fix bug where metrics named "help" or "type" with timestamps would break
 

@@ -94,7 +94,7 @@ sub length { return length($_[0]) }    # side comment
                              # hanging side comment
                              # very longgggggggggggggggggggggggggggggggggggggggggggggggggggg hanging side comment
 
-# side comments following open brace are not currently treated as hanging side comments
+# a blank will be inserted to prevent forming a hanging side comment
 sub macro_get_names { #
 # 
 # %name = macro_get_names();  (key=macrohandle, value=macroname)
@@ -103,7 +103,7 @@ sub macro_get_names { #
    local(%name)=();  ## a static side comment to test -ssc
 
  # a spaced block comment to test -isbc
-   for (0..$                                          #mac_ver) {
+   for (0..$#mac_ver) {
       # a very long comment for testing the parameter --nooutdent-long-comments (or -nolc)
       $name{$_} = $mac_ext[$idx{$mac_exti[$_]}];
       $vmsfile =~ s/;[\d\-]*$//; # very long side comment; Clip off version number; we can use a newer version as well
@@ -247,6 +247,37 @@ sub t022 (
 my $subref = sub ( $cat, $id = do { state $auto_id = 0; $auto_id++ } ) {
     ...;
 };
+
+# signature and prototype and attribute
+sub foo1 ( $x, $y ) : prototype ( $$ ) : shared { }
+
+sub foo11 ( $thing, % ) { print $thing }
+
+sub animal4 ( $cat, $ = ) {   } # second argument is optional
+
+*share = sub 
+( \[$@%] ) { };
+
+# extruded test
+sub foo2
+  (
+  $
+  first
+  ,
+  $
+  ,
+  $
+  third
+  )
+  {
+  return
+  "first=$first, third=$third"
+  ;
+  }
+
+# valid attributes
+sub fnord (&\%) : switch(10,foo(7,3)) : expensive;
+sub plugh () : Ugly('\(") : Bad;
 ----------
 
         'ternary4' => <<'----------',
@@ -315,8 +346,9 @@ sub length { return length( $_[0] ) }  # side comment
 # hanging side comment
 # very longgggggggggggggggggggggggggggggggggggggggggggggggggggg hanging side comment
 
-# side comments following open brace are not currently treated as hanging side comments
+# a blank will be inserted to prevent forming a hanging side comment
 sub macro_get_names {                  #
+
 #
 # %name = macro_get_names();  (key=macrohandle, value=macroname)
 #
@@ -469,8 +501,9 @@ sub length { return length( $_[0] ) }    # side comment
                                          # hanging side comment
  # very longgggggggggggggggggggggggggggggggggggggggggggggggggggg hanging side comment
 
-# side comments following open brace are not currently treated as hanging side comments
+# a blank will be inserted to prevent forming a hanging side comment
 sub macro_get_names {    #
+
 #
 # %name = macro_get_names();  (key=macrohandle, value=macroname)
 #
@@ -561,8 +594,9 @@ sub length { return length( $_[0] ) }    # side comment
                                          # hanging side comment
  # very longgggggggggggggggggggggggggggggggggggggggggggggggggggg hanging side comment
 
-# side comments following open brace are not currently treated as hanging side comments
+# a blank will be inserted to prevent forming a hanging side comment
 sub macro_get_names {    #
+
     #
     # %name = macro_get_names();  (key=macrohandle, value=macroname)
     #
@@ -662,8 +696,9 @@ sub length { return length( $_[0] ) }    # side comment
                                          # hanging side comment
  # very longgggggggggggggggggggggggggggggggggggggggggggggggggggg hanging side comment
 
-# side comments following open brace are not currently treated as hanging side comments
+# a blank will be inserted to prevent forming a hanging side comment
 sub macro_get_names {    #
+
     #
     # %name = macro_get_names();  (key=macrohandle, value=macroname)
     #
@@ -926,7 +961,7 @@ $i++;
 $1 = 2;
 
 sub f {
-    
+
 }
 
 
@@ -951,14 +986,30 @@ sub foo ( $x, $y = do { {} }, $z = 42, $w = do { "abcd" } ) {
 }
 
 # This signature should get put back on one line
-sub t022 ( $p = do { $z += 10; 222 }, $a = do { $z++; 333 } ) {
-    "$p/$a";
-}
+sub t022 ( $p = do { $z += 10; 222 }, $a = do { $z++; 333 } ) { "$p/$a" }
 
 # anonymous sub with signature
 my $subref = sub ( $cat, $id = do { state $auto_id = 0; $auto_id++ } ) {
     ...;
 };
+
+# signature and prototype and attribute
+sub foo1 ( $x, $y ) : prototype ( $$ ) : shared { }
+
+sub foo11 ( $thing, % ) { print $thing }
+
+sub animal4 ( $cat, $ = ) { }    # second argument is optional
+
+*share = sub ( \[$@%] ) { };
+
+# extruded test
+sub foo2 ( $first, $, $third ) {
+    return "first=$first, third=$third";
+}
+
+# valid attributes
+sub fnord (&\%) : switch(10,foo(7,3)) : expensive;
+sub plugh () : Ugly('\(") : Bad;
 #17...........
         },
 

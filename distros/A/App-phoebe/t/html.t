@@ -38,27 +38,27 @@ write_text("$dir/meta/alex.jpg", "content-type: image/jpeg");
 
 # html
 
-my $page = query_gemini("GET /robots.txt HTTP/1.0\r\nhost: $host:$port\r\n");
-for (qw(raw/* html/* diff/* history/* do/changes* do/all/changes* do/rss do/atom do/new do/more do/match do/search)) {
+my $page = query_web("GET /robots.txt HTTP/1.0\r\nhost: $host:$port");
+for (qw(/raw/* /html/* /diff/* /history/* /do/changes* /do/all/changes* /do/rss /do/atom /do/new /do/more /do/match /do/search)) {
   my $url = quotemeta;
   like($page, qr/^Disallow: $url/m, "Robots are disallowed from $url");
 }
 
-$page = query_gemini("GET / HTTP/1.0\r\nhost: $host:$port\r\n");
+$page = query_web("GET / HTTP/1.0\r\nhost: $host:$port");
 like($page, qr!<a href="https://$host:$port/page/Alex">Alex</a>!, "main menu contains Alex");
 
-$page = query_gemini("GET /page/Alex HTTP/1.0\r\nhost: $host:$port\r\n");
+$page = query_web("GET /page/Alex HTTP/1.0\r\nhost: $host:$port");
 like($page, qr!<p>Alex Schroeder!, "Alex content");
 like($page, qr!<a href="/page/Berta">Berta</a>!, "Alex contains Berta link");
 
-$page = query_gemini("GET /page/Berta HTTP/1.0\r\nhost: $host:$port\r\n");
+$page = query_web("GET /page/Berta HTTP/1.0\r\nhost: $host:$port");
 like($page, qr!<pre class="default">\nHello\!\nYo\!\n</pre>!, "Berta contains pre block");
 
-$page = query_gemini("GET /page/Chris HTTP/1.0\r\nhost: $host:$port\r\n");
+$page = query_web("GET /page/Chris HTTP/1.0\r\nhost: $host:$port");
 like($page, qr!<a href="Alex">Alex</a>!, "Chris contains Alex link");
 
 write_text("$dir/page/Berta.gmi", "```type=poetry\nHello!\nYo!\n```\n");
-$page = query_gemini("GET /page/Berta HTTP/1.0\r\nhost: $host:$port\r\n");
+$page = query_web("GET /page/Berta HTTP/1.0\r\nhost: $host:$port");
 like($page, qr!<pre class="poetry">\nHello\!\nYo\!\n</pre>!, "Class got passed");
 
 done_testing();

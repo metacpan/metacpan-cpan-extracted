@@ -1,0 +1,34 @@
+---
+abstract: unknown
+author:
+  - unknown
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Data-CompactReadonly
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Data::IEEE754: '0'
+  Devel::StackTrace: '0'
+  File::Temp: '0'
+  Scalar::Util: '0'
+  String::Binary::Interpolation: '0'
+  Test::Differences: '0'
+  Test::Exception: '0'
+  Test::More: '0.96'
+  Try::Tiny: '0'
+resources:
+  bugtracker: https://github.com/DrHyde/perl-modules-Data-CompactReadonly/issues
+  repository: https://github.com/DrHyde/perl-modules-Data-CompactReadonly
+version: v0.0.1
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

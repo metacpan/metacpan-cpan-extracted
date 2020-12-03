@@ -7,7 +7,7 @@ Attean::API::Model - RDF Model
 
 =head1 VERSION
 
-This document describes Attean::API::Model version 0.027
+This document describes Attean::API::Model version 0.028
 
 =head1 DESCRIPTION
 
@@ -101,11 +101,19 @@ Returns an L<Attean::API::Iterator> of L<Attean::API::Term> objects of all
 subjects of quads matching the supplied pattern (using the same matching
 semantics as C<< get_quads >>).
 
+The objects returned will not necessarily be unique. It will instead be
+equivalent to calling C<< get_quads >> and accessing C<< $quad->subject >>
+for each C<< $quad >> value returned by the iterator. For an iterator of unique
+subjects, use C<< $model->subjects->uniq >>.
+
 =item C<< predicates( $subject, $object, $graph ) >>
 
 Returns an L<Attean::API::Iterator> of L<Attean::API::Term> objects of all
 predicates of quads matching the supplied pattern (using the same matching
 semantics as C<< get_quads >> with an C<< undef >> predicate).
+
+The objects returned will not necessarily be unique
+(see the note for C<< subjects >> above).
 
 =item C<< objects( $subject, $predicate, $graph ) >>
 
@@ -113,11 +121,17 @@ Returns an L<Attean::API::Iterator> of L<Attean::API::Term> objects of all
 objects of quads matching the supplied pattern (using the same matching
 semantics as C<< get_quads >> with an C<< undef >> object).
 
+The objects returned will not necessarily be unique
+(see the note for C<< subjects >> above).
+
 =item C<< graphs( $subject, $predicate, $object ) >>
 
 Returns an L<Attean::API::Iterator> of L<Attean::API::Term> objects of all
 graphs of quads matching the supplied pattern (using the same matching
 semantics as C<< get_quads >> with an C<< undef >> graph).
+
+The objects returned will not necessarily be unique
+(see the note for C<< subjects >> above).
 
 =item C<< graph_nodes( $graph ) >>
 
@@ -152,7 +166,7 @@ in the model.
 
 use Attean::API::Binding;
 
-package Attean::API::Model 0.027 {
+package Attean::API::Model 0.028 {
 	use Sub::Install;
 	use Sub::Util qw(set_subname);
 	use URI::Namespace;
@@ -331,7 +345,7 @@ package Attean::API::Model 0.027 {
 }
 
 
-package Attean::API::MutableModel 0.027 {
+package Attean::API::MutableModel 0.028 {
 	use Attean::RDF;
 	use LWP::UserAgent;
 	use Encode qw(encode);
@@ -424,21 +438,21 @@ package Attean::API::MutableModel 0.027 {
 }
 
 
-package Attean::API::ETagCacheableModel 0.027 {
+package Attean::API::ETagCacheableModel 0.028 {
 	use Moo::Role;
 	
 	requires 'etag_value_for_quads';
 }
 
 
-package Attean::API::TimeCacheableModel 0.027 {
+package Attean::API::TimeCacheableModel 0.028 {
 	use Moo::Role;
 	
 	requires 'mtime_for_quads';
 }
 
 
-package Attean::API::BulkUpdatableModel 0.027 {
+package Attean::API::BulkUpdatableModel 0.028 {
 	use Moo::Role;
 	
 	with 'Attean::API::MutableModel';

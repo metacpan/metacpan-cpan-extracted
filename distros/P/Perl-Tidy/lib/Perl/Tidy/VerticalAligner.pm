@@ -1,7 +1,7 @@
 package Perl::Tidy::VerticalAligner;
 use strict;
 use warnings;
-our $VERSION = '20201001';
+our $VERSION = '20201202';
 
 use Perl::Tidy::VerticalAligner::Alignment;
 use Perl::Tidy::VerticalAligner::Line;
@@ -50,7 +50,9 @@ use Perl::Tidy::VerticalAligner::Line;
 # CODE SECTION 10: Summary
 #                 sub report_anything_unusual
 
+##################################################################
 # CODE SECTION 1: Preliminary code, global definitions and sub new
+##################################################################
 
 sub AUTOLOAD {
 
@@ -58,11 +60,13 @@ sub AUTOLOAD {
     # some diagnostic information.  This sub should never be called
     # except for a programming error.
     our $AUTOLOAD;
-    return if ( $AUTOLOAD eq 'DESTROY' );
+    return if ( $AUTOLOAD =~ /\bDESTROY$/ );
     my ( $pkg, $fname, $lno ) = caller();
+    my $my_package = __PACKAGE__;
     print STDERR <<EOM;
 ======================================================================
-Unexpected call to Autoload looking for sub $AUTOLOAD
+Error detected in package '$my_package', version $VERSION
+Received unexpected AUTOLOAD call for sub '$AUTOLOAD'
 Called from package: '$pkg'  
 Called from File '$fname'  at line '$lno'
 This error is probably due to a recent programming change
@@ -122,14 +126,14 @@ BEGIN {
     # produce a lot of output It should be 0 except when debugging small
     # scripts.
 
-    use constant VALIGN_DEBUG_FLAG_TABS => 0;
+    use constant DEBUG_TABS => 0;
 
     my $debug_warning = sub {
         print STDOUT "VALIGN_DEBUGGING with key $_[0]\n";
         return;
     };
 
-    VALIGN_DEBUG_FLAG_TABS && $debug_warning->('TABS');
+    DEBUG_TABS && $debug_warning->('TABS');
 
 }
 
@@ -204,7 +208,9 @@ sub new {
     return $self;
 }
 
+#################################
 # CODE SECTION 2: Basic Utilities
+#################################
 
 sub flush {
 
@@ -240,9 +246,7 @@ sub initialize_for_new_group {
 }
 
 sub group_line_count {
-    my $self   = shift;
-    my $nlines = @{ $self->[_rgroup_lines_] };
-    return $nlines;
+    return +@{ $_[0]->[_rgroup_lines_] };
 }
 
 # interface to Perl::Tidy::Diagnostics routines
@@ -307,15 +311,6 @@ sub get_recoverable_spaces {
     return ref($indentation) ? $indentation->get_recoverable_spaces() : 0;
 }
 
-sub make_alignment {
-    my ($col) = @_;
-
-    # make one new alignment at column $col
-    my $alignment =
-      Perl::Tidy::VerticalAligner::Alignment->new( column => $col, );
-    return $alignment;
-}
-
 sub maximum_line_length_for_level {
 
     # return maximum line length for line starting with a given level
@@ -328,7 +323,9 @@ sub maximum_line_length_for_level {
     return $maximum_line_length;
 }
 
+######################################################
 # CODE SECTION 3: Code to accept input and form groups
+######################################################
 
 sub push_group_line {
 
@@ -337,6 +334,8 @@ sub push_group_line {
     push @{$rgroup_lines}, $new_line;
     return;
 }
+
+use constant DEBUG_VALIGN => 0;
 
 sub valign_input {
 
@@ -401,7 +400,6 @@ sub valign_input {
     my $outdent_long_lines        = $rline_hash->{outdent_long_lines};
     my $is_terminal_ternary       = $rline_hash->{is_terminal_ternary};
     my $is_terminal_statement     = $rline_hash->{is_terminal_statement};
-    my $do_not_pad                = $rline_hash->{do_not_pad};
     my $rvertical_tightness_flags = $rline_hash->{rvertical_tightness_flags};
     my $level_jump                = $rline_hash->{level_jump};
     my $rfields                   = $rline_hash->{rfields};
@@ -410,6 +408,12 @@ sub valign_input {
     my $rfield_lengths            = $rline_hash->{rfield_lengths};
     my $terminal_block_type       = $rline_hash->{terminal_block_type};
     my $batch_count               = $rline_hash->{batch_count};
+    my $break_alignment_before    = $rline_hash->{break_alignment_before};
+    my $break_alignment_after     = $rline_hash->{break_alignment_after};
+    my $Kend                      = $rline_hash->{Kend};
+
+    # The index '$Kend' is a value which passed along with the line text to sub
+    # 'write_code_line' for a convergence check.
 
     # number of fields is $jmax
     # number of tokens between fields is $jmax-1
@@ -432,7 +436,7 @@ sub valign_input {
     $is_outdented = 0 if $is_hanging_side_comment;
 
     # Identify a block comment.
-    my $is_block_comment = ( $jmax == 0 && $rfields->[0] =~ /^#/ );
+    my $is_block_comment = $jmax == 0 && substr( $rfields->[0], 0, 1 ) eq '#';
 
     # Block comment .. update count
     if ($is_block_comment) {
@@ -458,7 +462,7 @@ sub valign_input {
 
     my $group_level = $self->[_group_level_];
 
-    0 && do {
+    DEBUG_VALIGN && do {
         my $nlines = $self->group_line_count();
         print STDOUT
 "Entering valign_input: lines=$nlines new #fields= $jmax, leading_count=$leading_space_count force=$is_forced_break, level_jump=$level_jump, level=$level, group_level=$group_level, level_jump=$level_jump\n";
@@ -469,32 +473,30 @@ sub valign_input {
     # token with the closing token to follow, then we will mark both
     # cached flags as valid.
     my $cached_line_type = get_cached_line_type();
-    my $cached_line_flag = get_cached_line_flag();
-    my $cached_seqno     = get_cached_seqno();
-    if ($rvertical_tightness_flags) {
-        if (   $self->group_line_count() <= 1
-            && $cached_line_type
-            && $cached_seqno
-            && $rvertical_tightness_flags->[2]
-            && $rvertical_tightness_flags->[2] == $cached_seqno )
+    if ($cached_line_type) {
+        my $cached_line_flag = get_cached_line_flag();
+        if ($rvertical_tightness_flags) {
+            my $cached_seqno = get_cached_seqno();
+            if (   $cached_seqno
+                && $self->group_line_count() <= 1
+                && $rvertical_tightness_flags->[2]
+                && $rvertical_tightness_flags->[2] == $cached_seqno )
+            {
+                $rvertical_tightness_flags->[3] ||= 1;
+                set_cached_line_valid(1);
+            }
+        }
+
+        # do not join an opening block brace with an unbalanced line
+        # unless requested with a flag value of 2
+        if (   $cached_line_type == 3
+            && !$self->group_line_count()
+            && $cached_line_flag < 2
+            && $level_jump != 0 )
         {
-            $rvertical_tightness_flags->[3] ||= 1;
-            set_cached_line_valid(1);
+            set_cached_line_valid(0);
         }
     }
-
-    # do not join an opening block brace with an unbalanced line
-    # unless requested with a flag value of 2
-    if (   $cached_line_type == 3
-        && !$self->group_line_count()
-        && $cached_line_flag < 2
-        && $level_jump != 0 )
-    {
-        set_cached_line_valid(0);
-    }
-
-    # caller might request no alignment in special cases
-    if ($do_not_pad) { $self->_flush_group_lines() }
 
     # shouldn't happen:
     if ( $level < 0 ) { $level = 0 }
@@ -546,7 +548,8 @@ sub valign_input {
 
             # Note that for a comment group we are not storing a line
             # but rather just the text and its length.
-            $self->push_group_line( [ $rfields->[0], $rfield_lengths->[0] ] );
+            $self->push_group_line(
+                [ $rfields->[0], $rfield_lengths->[0], $Kend ] );
             return;
         }
         else {
@@ -554,13 +557,17 @@ sub valign_input {
         }
     }
 
+    my $rgroup_lines = $self->[_rgroup_lines_];
+    if ( $break_alignment_before && @{$rgroup_lines} ) {
+        $rgroup_lines->[-1]->set_end_group(1);
+    }
+
     # --------------------------------------------------------------------
     # add dummy fields for terminal ternary
     # --------------------------------------------------------------------
     my $j_terminal_match;
 
-    my $rgroup_lines = $self->[_rgroup_lines_];
-    if ( $is_terminal_ternary && $self->group_line_count() ) {
+    if ( $is_terminal_ternary && @{$rgroup_lines} ) {
         $j_terminal_match =
           fix_terminal_ternary( $rgroup_lines->[-1], $rfields, $rtokens,
             $rpatterns, $rfield_lengths, $group_level, );
@@ -571,8 +578,11 @@ sub valign_input {
     # add dummy fields for else statement
     # --------------------------------------------------------------------
 
-    if (   $rfields->[0] =~ /^else\s*$/
-        && $self->group_line_count()
+    # Note the trailing space after 'else' here. If there were no space between
+    # the else and the next '{' then we would not be able to do vertical
+    # alignment of the '{'.
+    if (   $rfields->[0] eq 'else '
+        && @{$rgroup_lines}
         && $level_jump == 0 )
     {
 
@@ -588,7 +598,7 @@ sub valign_input {
     if ( $jmax <= 0 ) {
         $self->[_zero_count_]++;
 
-        if ( $self->group_line_count()
+        if ( @{$rgroup_lines}
             && !get_recoverable_spaces( $rgroup_lines->[0]->get_indentation() )
           )
         {
@@ -609,7 +619,8 @@ sub valign_input {
         {
             $self->[_group_type_]                  = 'COMMENT';
             $self->[_comment_leading_space_count_] = $leading_space_count;
-            $self->push_group_line( [ $rfields->[0], $rfield_lengths->[0] ] );
+            $self->push_group_line(
+                [ $rfields->[0], $rfield_lengths->[0], $Kend ] );
             return;
         }
 
@@ -620,13 +631,16 @@ sub valign_input {
         {
 
             $self->valign_output_step_B(
-                leading_space_count       => $leading_space_count,
-                line                      => $rfields->[0],
-                line_length               => $rfield_lengths->[0],
-                side_comment_length       => 0,
-                outdent_long_lines        => $outdent_long_lines,
-                rvertical_tightness_flags => $rvertical_tightness_flags,
-                level                     => $level
+                {
+                    leading_space_count       => $leading_space_count,
+                    line                      => $rfields->[0],
+                    line_length               => $rfield_lengths->[0],
+                    side_comment_length       => 0,
+                    outdent_long_lines        => $outdent_long_lines,
+                    rvertical_tightness_flags => $rvertical_tightness_flags,
+                    level                     => $level,
+                    Kend                      => $Kend,
+                }
             );
 
             return;
@@ -637,45 +651,58 @@ sub valign_input {
     }
 
     # programming check: (shouldn't happen)
-    # an error here implies an incorrect call was made
+    # The number of tokens which separate the fields must always be
+    # one less than the number of fields. If this is not true then
+    # an error has been made by the Formatter in defining these
+    # quantities.  See Formatter.pm/sub make_alignment_patterns.
     if ( @{$rfields} && ( @{$rtokens} != ( @{$rfields} - 1 ) ) ) {
-        my $nt = @{$rtokens};
-        my $nf = @{$rfields};
-        $self->warning(
+        my $nt  = @{$rtokens};
+        my $nf  = @{$rfields};
+        my $msg = <<EOM;
 "Program bug in Perl::Tidy::VerticalAligner - number of tokens = $nt should be one less than number of fields: $nf)\n"
-        );
+EOM
+        $self->warning($msg);
         $self->report_definite_bug();
+
+        # TODO: this has never happened, but we should probably call Die here.
+        # Needs some testing
+        # Perl::Tidy::Die($msg);
     }
     my $maximum_line_length_for_level =
       $self->maximum_line_length_for_level($level);
 
     # --------------------------------------------------------------------
-    # create an object to hold this line
-    # --------------------------------------------------------------------
-    my $new_line = Perl::Tidy::VerticalAligner::Line->new(
-        jmax                      => $jmax,
-        jmax_original_line        => $jmax,
-        rtokens                   => $rtokens,
-        rfields                   => $rfields,
-        rpatterns                 => $rpatterns,
-        rfield_lengths            => $rfield_lengths,
-        indentation               => $indentation,
-        leading_space_count       => $leading_space_count,
-        outdent_long_lines        => $outdent_long_lines,
-        list_type                 => "",
-        is_hanging_side_comment   => $is_hanging_side_comment,
-        maximum_line_length       => $maximum_line_length_for_level,
-        rvertical_tightness_flags => $rvertical_tightness_flags,
-        is_terminal_ternary       => $is_terminal_ternary,
-        j_terminal_match          => $j_terminal_match,
-        is_forced_break           => $is_forced_break,
-    );
-
-    # --------------------------------------------------------------------
     # It simplifies things to create a zero length side comment
     # if none exists.
     # --------------------------------------------------------------------
-    $self->make_side_comment( $new_line, $level_end );
+    $self->make_side_comment( $rtokens, $rfields, $rpatterns, $rfield_lengths,
+        $level_end );
+    $jmax = @{$rfields} - 1;
+
+    # --------------------------------------------------------------------
+    # create an object to hold this line
+    # --------------------------------------------------------------------
+    my $new_line = Perl::Tidy::VerticalAligner::Line->new(
+        {
+            jmax                      => $jmax,
+            rtokens                   => $rtokens,
+            rfields                   => $rfields,
+            rpatterns                 => $rpatterns,
+            rfield_lengths            => $rfield_lengths,
+            indentation               => $indentation,
+            leading_space_count       => $leading_space_count,
+            outdent_long_lines        => $outdent_long_lines,
+            list_type                 => "",
+            is_hanging_side_comment   => $is_hanging_side_comment,
+            maximum_line_length       => $maximum_line_length_for_level,
+            rvertical_tightness_flags => $rvertical_tightness_flags,
+            is_terminal_ternary       => $is_terminal_ternary,
+            j_terminal_match          => $j_terminal_match,
+            is_forced_break           => $is_forced_break,
+            end_group                 => $break_alignment_after,
+            Kend                      => $Kend,
+        }
+    );
 
     # --------------------------------------------------------------------
     # Decide if this is a simple list of items.
@@ -705,7 +732,7 @@ sub valign_input {
     # --------------------------------------------------------------------
     # Some old debugging stuff
     # --------------------------------------------------------------------
-    0 && do {
+    DEBUG_VALIGN && do {
         print STDOUT "exiting valign_input fields:";
         dump_array( @{$rfields} );
         print STDOUT "exiting valign_input tokens:";
@@ -766,23 +793,18 @@ sub make_side_comment {
 
     # create an empty side comment if none exists
 
-    my ( $self, $new_line, $level_end ) = @_;
+    my ( $self, $rtokens, $rfields, $rpatterns, $rfield_lengths, $level_end ) =
+      @_;
 
-    my $jmax    = $new_line->get_jmax();
-    my $rtokens = $new_line->get_rtokens();
+    my $jmax = @{$rfields} - 1;
 
     # if line does not have a side comment...
     if ( ( $jmax == 0 ) || ( $rtokens->[ $jmax - 1 ] ne '#' ) ) {
-        my $rfields        = $new_line->get_rfields();
-        my $rfield_lengths = $new_line->get_rfield_lengths();
-        my $rpatterns      = $new_line->get_rpatterns();
         $jmax += 1;
         $rtokens->[ $jmax - 1 ]  = '#';
         $rfields->[$jmax]        = '';
         $rfield_lengths->[$jmax] = 0;
         $rpatterns->[$jmax]      = '#';
-        $new_line->set_jmax($jmax);
-        $new_line->set_jmax_original_line($jmax);
     }
 
     # line has a side comment..
@@ -790,7 +812,6 @@ sub make_side_comment {
 
         # don't remember old side comment location for very long
         my $line_number = $self->get_output_line_number();
-        my $rfields     = $new_line->get_rfields();
         if (
             $line_number - $self->[_last_side_comment_line_number_] > 12
 
@@ -1093,8 +1114,9 @@ sub check_match {
     my ( $self, $new_line, $old_line ) = @_;
 
     # returns a flag and a value as follows:
-    #    return (1, $imax_align)     if the line matches and fits
-    #    return (0, $imax_align)     if the line does not match or fit
+    #    return (0, $imax_align)     if the line does not match
+    #    return (1, $imax_align)     if the line matches but does not fit
+    #    return (2, $imax_align)     if the line matches and fits
 
     # Variable $imax_align will be set to indicate the maximum token index to
     # be matched in the subsequent left-to-right sweep, in the case that this
@@ -1270,13 +1292,13 @@ sub check_match {
 
         EXPLAIN_CHECK_MATCH
           && print "match and fit, imax_align=$imax_align, jmax=$jmax\n";
-        return ( 1, $jlimit );
+        return ( 2, $jlimit );
     }
     else {
 
         EXPLAIN_CHECK_MATCH
           && print "match but no fit, imax_align=$imax_align, jmax=$jmax\n";
-        return ( 0, $jlimit );
+        return ( 1, $jlimit );
     }
 
   NO_MATCH:
@@ -1293,8 +1315,8 @@ sub check_fit {
     my ( $self, $new_line, $old_line ) = @_;
 
     # The new line has alignments identical to the current group. Now we have
-    # to fit the new line into the group without causing a field
-    # to exceed the line length limit.
+    # to fit the new line into the group without causing a field to exceed the
+    # line length limit.
     #   return true if successful
     #   return false if not successful
 
@@ -1304,8 +1326,10 @@ sub check_fit {
     my $padding_available   = $old_line->get_available_space_on_right();
     my $jmax_old            = $old_line->get_jmax();
 
-    # safety check ... only lines with equal array lengths should arrive here
-    # from sub check_match
+    # Safety check ... only lines with equal array sizes should arrive here
+    # from sub check_match.  So if this error occurs, look at recent changes in
+    # sub check_match.  It is only supposed to check the fit of lines with
+    # identical numbers of alignment tokens.
     if ( $jmax_old ne $jmax ) {
 
         $self->warning(<<EOM);
@@ -1372,7 +1396,8 @@ sub install_new_alignments {
         $col += $rfield_lengths->[$j];
 
         # create initial alignments for the new group
-        my $alignment = make_alignment($col);    ##, $token );
+        my $alignment =
+          Perl::Tidy::VerticalAligner::Alignment->new( { column => $col } );
         $new_line->set_alignment( $j, $alignment );
     }
     return;
@@ -1410,19 +1435,21 @@ sub level_change {
     return $level;
 }
 
+###############################################
 # CODE SECTION 4: Code to process comment lines
+###############################################
 
 sub _flush_comment_lines {
 
     # Output a group consisting of COMMENT lines
 
     my ($self) = @_;
-    return unless ( $self->group_line_count() );
+    my $rgroup_lines = $self->[_rgroup_lines_];
+    return unless ( @{$rgroup_lines} );
     my $group_level         = $self->[_group_level_];
     my $leading_space_count = $self->[_comment_leading_space_count_];
     my $leading_string =
       $self->get_leading_string( $leading_space_count, $group_level );
-    my $rgroup_lines = $self->[_rgroup_lines_];
 
     # look for excessively long lines
     my $max_excess = 0;
@@ -1449,7 +1476,7 @@ sub _flush_comment_lines {
         unless ($outdented_line_count) {
             $self->[_first_outdented_line_at_] = $last_outdented_line_at;
         }
-        my $nlines = $self->group_line_count();
+        my $nlines = @{$rgroup_lines};
         $outdented_line_count += $nlines;
         $self->[_outdented_line_count_] = $outdented_line_count;
     }
@@ -1458,15 +1485,18 @@ sub _flush_comment_lines {
     my $outdent_long_lines = 0;
 
     foreach my $item ( @{$rgroup_lines} ) {
-        my ( $line, $line_len ) = @{$item};
+        my ( $line, $line_len, $Kend ) = @{$item};
         $self->valign_output_step_B(
-            leading_space_count       => $leading_space_count,
-            line                      => $line,
-            line_length               => $line_len,
-            side_comment_length       => 0,
-            outdent_long_lines        => $outdent_long_lines,
-            rvertical_tightness_flags => "",
-            level                     => $group_level,
+            {
+                leading_space_count       => $leading_space_count,
+                line                      => $line,
+                line_length               => $line_len,
+                side_comment_length       => 0,
+                outdent_long_lines        => $outdent_long_lines,
+                rvertical_tightness_flags => "",
+                level                     => $group_level,
+                Kend                      => $Kend,
+            }
         );
     }
 
@@ -1474,23 +1504,25 @@ sub _flush_comment_lines {
     return;
 }
 
+######################################################
 # CODE SECTION 5: Code to process groups of code lines
+######################################################
 
 sub _flush_group_lines {
 
     # This is the vertical aligner internal flush, which leaves the cache
     # intact
     my ($self) = @_;
-    return unless ( $self->group_line_count() );
 
     my $rgroup_lines = $self->[_rgroup_lines_];
-    my $group_type   = $self->[_group_type_];
-    my $group_level  = $self->[_group_level_];
+    return unless ( @{$rgroup_lines} );
+    my $group_type  = $self->[_group_type_];
+    my $group_level = $self->[_group_level_];
 
     # Debug
     0 && do {
         my ( $a, $b, $c ) = caller();
-        my $nlines = $self->group_line_count();
+        my $nlines = @{$rgroup_lines};
         print STDOUT
 "APPEND0: _flush_group_lines called from $a $b $c lines=$nlines, type=$group_type \n";
     };
@@ -1544,12 +1576,14 @@ sub _flush_group_lines {
 
     foreach my $line ( @{$rgroup_lines} ) {
         $self->valign_output_step_A(
-            line                 => $line,
-            min_ci_gap           => 0,
-            do_not_align         => 0,
-            group_leader_length  => $group_leader_length,
-            extra_leading_spaces => $extra_leading_spaces,
-            level                => $group_level,
+            {
+                line                 => $line,
+                min_ci_gap           => 0,
+                do_not_align         => 0,
+                group_leader_length  => $group_leader_length,
+                extra_leading_spaces => $extra_leading_spaces,
+                level                => $group_level,
+            }
         );
     }
 
@@ -1734,10 +1768,11 @@ EOM
 
             # See if the new line matches and fits the current group,
             # if it still exists. Flush the current group if not.
+            my $match_code;
             if ($group_line_count) {
-                my ( $is_match, $imax_align ) =
+                ( $match_code, my $imax_align ) =
                   $self->check_match( $new_line, $base_line );
-                if ( !$is_match ) { end_rgroup($imax_align) }
+                if ( $match_code != 2 ) { end_rgroup($imax_align) }
             }
 
             # Store the new line
@@ -1745,11 +1780,27 @@ EOM
 
             if ( defined($j_terminal_match) ) {
 
-                # if there is only one line in the group (maybe due to failure
-                # to match perfectly with previous lines), then align the ? or
-                # { of this terminal line with the previous one unless that
-                # would make the line too long
+                # Decide if we should fix a terminal match. We can either:
+                # 1. fix it and prevent the sweep from changing it, or
+                # 2. leave it alone and let sweep try to fix it.
+
+                # The current logic is to fix it if:
+                # -it has not joined to previous lines,
+                # -and either the previous subgroup has just 1 line, or
+                # -this line matched but did not fit (so sweep won't work)
+                my $fixit;
                 if ( $group_line_count == 1 ) {
+                    $fixit ||= $match_code;
+                    if ( !$fixit ) {
+                        if ( @{$rgroups} > 1 ) {
+                            my ( $jbegx, $jendx ) = @{ $rgroups->[-2] };
+                            my $nlines = $jendx - $jbegx + 1;
+                            $fixit ||= $nlines <= 1;
+                        }
+                    }
+                }
+
+                if ($fixit) {
                     $base_line = $new_line;
                     my $col_now = $base_line->get_column($j_terminal_match);
 
@@ -1874,13 +1925,14 @@ sub sweep_left_to_right {
         }
 
         # Special treatment of two one-line groups isolated from other lines,
-        # unless they form a simple list.  The alignment in this case can look
-        # strange in some cases.
+        # unless they form a simple list or a terminal match.  Otherwise the
+        # alignment can look strange in some cases.
         if (   $jend == $jbeg
             && $jend_m == $jbeg_m
             && !$rlines->[$jbeg]->get_list_type()
             && ( $ng == 1 || $istop_mm < 0 )
-            && ( $ng == $ng_max || $istop < 0 ) )
+            && ( $ng == $ng_max || $istop < 0 )
+            && !$line->get_j_terminal_match() )
         {
 
             # We will just align a leading equals
@@ -2394,7 +2446,8 @@ EOM
             return ( $max_lev_diff, $saw_side_comment );
         }
 
-        my $has_terminal_match = $rlines->[-1]->get_j_terminal_match();
+        my $has_terminal_match  = $rlines->[-1]->get_j_terminal_match();
+        my $is_terminal_ternary = $rlines->[-1]->get_is_terminal_ternary();
 
         # ignore hanging side comments in these operations
         my @filtered   = grep { !$_->get_is_hanging_side_comment() } @{$rlines};
@@ -2428,7 +2481,7 @@ EOM
                 my ( $raw_tok, $lev, $tag, $tok_count ) =
                   decode_alignment_token($tok);
 
-                if ( $tok !~ /^[#]$/ ) {
+                if ( $tok ne '#' ) {
                     if ( !defined($lev_min) ) {
                         $lev_min = $lev;
                         $lev_max = $lev;
@@ -2540,36 +2593,70 @@ EOM
             }
         }
 
-        # Loop to process each subgroups
+        # Loop to process each subgroup
         foreach my $item (@subgroups) {
             my ( $jbeg, $jend ) = @{$item};
 
-            # look for complete ternary or if/elsif/else blocks
             my $nlines = $jend - $jbeg + 1;
+
+            ####################################################
+            # Look for complete if/elsif/else and ternary blocks
+            ####################################################
+
+            # We are looking for a common '$dividing_token' like these:
+
+            #    if    ( $b and $s ) { $p->{'type'} = 'a'; }
+            #    elsif ($b)          { $p->{'type'} = 'b'; }
+            #    elsif ($s)          { $p->{'type'} = 's'; }
+            #    else                { $p->{'type'} = ''; }
+            #                        ^----------- dividing_token
+
+            #   my $severity =
+            #      !$routine                     ? '[PFX]'
+            #     : $routine =~ /warn.*_d\z/     ? '[DS]'
+            #     : $routine =~ /ck_warn/        ? 'W'
+            #     : $routine =~ /ckWARN\d*reg_d/ ? 'S'
+            #     : $routine =~ /ckWARN\d*reg/   ? 'W'
+            #     : $routine =~ /vWARN\d/        ? '[WDS]'
+            #     :                                '[PFX]';
+            #                                    ^----------- dividing_token
+
+            # Only look for groups which are more than 2 lines long.  Two lines
+            # can get messed up doing this, probably due to the various
+            # two-line rules.
+
+            my $dividing_token;
             my %token_line_count;
-            for ( my $jj = $jbeg ; $jj <= $jend ; $jj++ ) {
-                my %seen;
-                my $line    = $rnew_lines->[$jj];
-                my $rtokens = $line->get_rtokens();
-                foreach my $tok ( @{$rtokens} ) {
-                    if ( !$seen{$tok} ) {
-                        $seen{$tok}++;
-                        $token_line_count{$tok}++;
+            if ( $nlines > 2 ) {
+
+                for ( my $jj = $jbeg ; $jj <= $jend ; $jj++ ) {
+                    my %seen;
+                    my $line    = $rnew_lines->[$jj];
+                    my $rtokens = $line->get_rtokens();
+                    foreach my $tok ( @{$rtokens} ) {
+                        if ( !$seen{$tok} ) {
+                            $seen{$tok}++;
+                            $token_line_count{$tok}++;
+                        }
+                    }
+                }
+
+                foreach my $tok ( keys %token_line_count ) {
+                    if ( $token_line_count{$tok} == $nlines ) {
+                        if (   substr( $tok, 0, 1 ) eq '?'
+                            || substr( $tok, 0, 1 ) eq '{'
+                            && $tok =~ /^\{\d+if/ )
+                        {
+                            $dividing_token = $tok;
+                            last;
+                        }
                     }
                 }
             }
 
-            # Look for if/else/elsif and ternary blocks
-            my $is_full_block;
-            foreach my $tok ( keys %token_line_count ) {
-                if ( $token_line_count{$tok} == $nlines ) {
-                    if ( $tok =~ /^\?/ || $tok =~ /^\{\d+if/ ) {
-                        $is_full_block = 1;
-                    }
-                }
-            }
-
+            #####################################################
             # Loop over lines to remove unwanted alignment tokens
+            #####################################################
             for ( my $jj = $jbeg ; $jj <= $jend ; $jj++ ) {
                 my $line    = $rnew_lines->[$jj];
                 my $rtokens = $line->get_rtokens();
@@ -2579,6 +2666,8 @@ EOM
                 my $imax = @{$rtokens} - 2;
                 my $delete_above_level;
                 my $deleted_assignment_token;
+
+                my $saw_dividing_token = "";
 
                 # Loop over all alignment tokens
                 for ( my $i = 0 ; $i <= $imax ; $i++ ) {
@@ -2595,17 +2684,31 @@ EOM
 
                     # But now we modify this with exceptions...
 
-                    # If this is a complete ternary or if/elsif/else block,
-                    # remove all alignments which are not also in every line
-                    $delete_me ||=
-                      ( $is_full_block && $token_line_count{$tok} < $nlines );
+                    # EXCEPTION 1: If we are in a complete ternary or
+                    # if/elsif/else group, and this token is not on every line
+                    # of the group, should we delete it to preserve overall
+                    # alignment?
+                    if ($dividing_token) {
+                        if ( $token_line_count{$tok} >= $nlines ) {
+                            $saw_dividing_token ||= $tok eq $dividing_token;
+                        }
+                        else {
 
-                    # Remove all tokens above a certain level following a
-                    # previous deletion.  For example, we have to remove tagged
-                    # higher level alignment tokens following a => deletion
-                    # because the tags of higher level tokens will now be
-                    # incorrect. For example, this will prevent aligning commas
-                    # as follows after deleting the second =>
+                            # For shorter runs, delete toks to save alignment.
+                            # For longer runs, keep toks after the '{' or '?'
+                            # to allow sub-alignments within braces.  The
+                            # number 5 lines is arbitrary but seems to work ok.
+                            $delete_me ||=
+                              ( $nlines < 5 || !$saw_dividing_token );
+                        }
+                    }
+
+                    # EXCEPTION 2: Remove all tokens above a certain level
+                    # following a previous deletion.  For example, we have to
+                    # remove tagged higher level alignment tokens following a
+                    # '=>' deletion because the tags of higher level tokens
+                    # will now be incorrect. For example, this will prevent
+                    # aligning commas as follows after deleting the second '=>'
                     #    $w->insert(
                     #	ListBox => origin => [ 270, 160 ],
                     #	size    => [ 200,           55 ],
@@ -2617,7 +2720,8 @@ EOM
                         else { $delete_above_level = undef }
                     }
 
-                    # Remove all but certain tokens after an assignment deletion
+                    # EXCEPTION 3: Remove all but certain tokens after an
+                    # assignment deletion.
                     if (
                         $deleted_assignment_token
                         && ( $lev > $group_level
@@ -2627,11 +2731,9 @@ EOM
                         $delete_me ||= 1;
                     }
 
-                    # Turn off deletion in some special cases..
-
-                    # Do not touch the first line of a terminal
-                    # match, such as below, because j_terminal has already
-                    # been set.
+                    # EXCEPTION 4: Do not touch the first line of a 2 line
+                    # terminal match, such as below, because j_terminal has
+                    # already been set.
                     #    if ($tag) { $tago = "<$tag>"; $tagc = "</$tag>"; }
                     #    else      { $tago = $tagc = ''; }
                     # But see snippets 'else1.t' and 'else2.t'
@@ -2640,6 +2742,7 @@ EOM
                         && $has_terminal_match
                         && $nlines == 2 );
 
+                    # EXCEPTION 5: misc additional rules for commas and equals
                     if ($delete_me) {
 
                         # okay to delete second and higher copies of a token
@@ -3726,7 +3829,9 @@ sub adjust_side_comments {
     return;
 }
 
+###############################
 # CODE SECTION 6: Output Step A
+###############################
 
 sub valign_output_step_A {
 
@@ -3736,14 +3841,14 @@ sub valign_output_step_A {
     # been found. Then it is shipped to the next step.
     ###############################################################
 
-    my ( $self, %input_hash ) = @_;
+    my ( $self, $rinput_hash ) = @_;
 
-    my $line                 = $input_hash{line};
-    my $min_ci_gap           = $input_hash{min_ci_gap};
-    my $do_not_align         = $input_hash{do_not_align};
-    my $group_leader_length  = $input_hash{group_leader_length};
-    my $extra_leading_spaces = $input_hash{extra_leading_spaces};
-    my $level                = $input_hash{level};
+    my $line                 = $rinput_hash->{line};
+    my $min_ci_gap           = $rinput_hash->{min_ci_gap};
+    my $do_not_align         = $rinput_hash->{do_not_align};
+    my $group_leader_length  = $rinput_hash->{group_leader_length};
+    my $extra_leading_spaces = $rinput_hash->{extra_leading_spaces};
+    my $level                = $rinput_hash->{level};
 
     my $rfields                   = $line->get_rfields();
     my $rfield_lengths            = $line->get_rfield_lengths();
@@ -3751,6 +3856,7 @@ sub valign_output_step_A {
     my $outdent_long_lines        = $line->get_outdent_long_lines();
     my $maximum_field_index       = $line->get_jmax();
     my $rvertical_tightness_flags = $line->get_rvertical_tightness_flags();
+    my $Kend                      = $line->get_Kend();
 
     # add any extra spaces
     if ( $leading_space_count > $group_leader_length ) {
@@ -3815,13 +3921,16 @@ sub valign_output_step_A {
 
     # ship this line off
     $self->valign_output_step_B(
-        leading_space_count => $leading_space_count + $extra_leading_spaces,
-        line                => $str,
-        line_length         => $str_len,
-        side_comment_length => $side_comment_length,
-        outdent_long_lines  => $outdent_long_lines,
-        rvertical_tightness_flags => $rvertical_tightness_flags,
-        level                     => $level,
+        {
+            leading_space_count => $leading_space_count + $extra_leading_spaces,
+            line                => $str,
+            line_length         => $str_len,
+            side_comment_length => $side_comment_length,
+            outdent_long_lines  => $outdent_long_lines,
+            rvertical_tightness_flags => $rvertical_tightness_flags,
+            level                     => $level,
+            Kend                      => $Kend,
+        }
     );
     return;
 }
@@ -3867,15 +3976,16 @@ sub combine_fields {
 
 sub get_output_line_number {
 
-    # the output line number reported to a caller is the number of items
-    # written plus the number of items in the buffer
-    my $self               = shift;
-    my $nlines             = $self->group_line_count();
-    my $file_writer_object = $self->[_file_writer_object_];
-    return $nlines + $file_writer_object->get_output_line_number();
+    # The output line number reported to a caller =
+    # the number of items still in the buffer +
+    # the number of items written.
+    return $_[0]->group_line_count() +
+      $_[0]->[_file_writer_object_]->get_output_line_number();
 }
 
+###############################
 # CODE SECTION 7: Output Step B
+###############################
 
 {    ## closure for sub valign_output_step_B
 
@@ -3888,6 +3998,7 @@ sub get_output_line_number {
     my $cached_line_valid;
     my $cached_line_leading_space_count;
     my $cached_seqno_string;
+    my $cached_line_Kend;
     my $seqno_string;
     my $last_nonblank_seqno_string;
 
@@ -3938,6 +4049,7 @@ sub get_output_line_number {
         $cached_line_valid               = 0;
         $cached_line_leading_space_count = 0;
         $cached_seqno_string             = "";
+        $cached_line_Kend                = undef;
 
         # These vars hold a string of sequence numbers joined together used by
         # the cache
@@ -3953,12 +4065,14 @@ sub get_output_line_number {
             $self->valign_output_step_C(
                 $cached_line_text,
                 $cached_line_leading_space_count,
-                $self->[_last_level_written_]
+                $self->[_last_level_written_],
+                $cached_line_Kend,
             );
             $cached_line_type        = 0;
             $cached_line_text        = "";
             $cached_line_text_length = 0;
             $cached_seqno_string     = "";
+            $cached_line_Kend        = undef;
         }
         return;
     }
@@ -3972,15 +4086,16 @@ sub get_output_line_number {
         # and closing tokens.
         ###############################################################
 
-        my ( $self, %input_hash ) = @_;
+        my ( $self, $rinput ) = @_;
 
-        my $leading_space_count       = $input_hash{leading_space_count};
-        my $str                       = $input_hash{line};
-        my $str_length                = $input_hash{line_length};
-        my $side_comment_length       = $input_hash{side_comment_length};
-        my $outdent_long_lines        = $input_hash{outdent_long_lines};
-        my $rvertical_tightness_flags = $input_hash{rvertical_tightness_flags};
-        my $level                     = $input_hash{level};
+        my $leading_space_count       = $rinput->{leading_space_count};
+        my $str                       = $rinput->{line};
+        my $str_length                = $rinput->{line_length};
+        my $side_comment_length       = $rinput->{side_comment_length};
+        my $outdent_long_lines        = $rinput->{outdent_long_lines};
+        my $rvertical_tightness_flags = $rinput->{rvertical_tightness_flags};
+        my $level                     = $rinput->{level};
+        my $Kend                      = $rinput->{Kend};
 
         my $last_level_written = $self->[_last_level_written_];
 
@@ -4049,9 +4164,10 @@ sub get_output_line_number {
 
             # Dump an invalid cached line
             if ( !$cached_line_valid ) {
-                $self->valign_output_step_C( $cached_line_text,
-                    $cached_line_leading_space_count,
-                    $last_level_written );
+                $self->valign_output_step_C(
+                    $cached_line_text,   $cached_line_leading_space_count,
+                    $last_level_written, $cached_line_Kend
+                );
             }
 
             # Handle cached line ending in OPENING tokens
@@ -4074,9 +4190,10 @@ sub get_output_line_number {
                     $level        = $last_level_written;
                 }
                 else {
-                    $self->valign_output_step_C( $cached_line_text,
-                        $cached_line_leading_space_count,
-                        $last_level_written );
+                    $self->valign_output_step_C(
+                        $cached_line_text,   $cached_line_leading_space_count,
+                        $last_level_written, $cached_line_Kend
+                    );
                 }
             }
 
@@ -4219,15 +4336,17 @@ sub get_output_line_number {
                     $level                 = $last_level_written;
                 }
                 else {
-                    $self->valign_output_step_C( $cached_line_text,
-                        $cached_line_leading_space_count,
-                        $last_level_written );
+                    $self->valign_output_step_C(
+                        $cached_line_text,   $cached_line_leading_space_count,
+                        $last_level_written, $cached_line_Kend
+                    );
                 }
             }
         }
         $cached_line_type        = 0;
         $cached_line_text        = "";
         $cached_line_text_length = 0;
+        $cached_line_Kend        = undef;
 
         # make the line to be written
         my $line        = $leading_string . $str;
@@ -4247,7 +4366,8 @@ sub get_output_line_number {
 
         # write or cache this line
         if ( !$open_or_close || $side_comment_length > 0 ) {
-            $self->valign_output_step_C( $line, $leading_space_count, $level );
+            $self->valign_output_step_C( $line, $leading_space_count, $level,
+                $Kend );
         }
         else {
             $cached_line_text                = $line;
@@ -4258,6 +4378,7 @@ sub get_output_line_number {
             $cached_line_valid               = $valid;
             $cached_line_leading_space_count = $leading_space_count;
             $cached_seqno_string             = $seqno_string;
+            $cached_line_Kend                = $Kend;
         }
 
         $self->[_last_level_written_]       = $level;
@@ -4267,7 +4388,9 @@ sub get_output_line_number {
     }
 }
 
+###############################
 # CODE SECTION 8: Output Step C
+###############################
 
 {    ## closure for sub valign_output_step_C
 
@@ -4299,7 +4422,7 @@ sub get_output_line_number {
         if ( $valign_buffer_filling && $diff ) {
             my $max_valign_buffer = @valign_buffer;
             foreach my $i ( 0 .. $max_valign_buffer - 1 ) {
-                my ( $line, $leading_space_count, $level ) =
+                my ( $line, $leading_space_count, $level, $Kend ) =
                   @{ $valign_buffer[$i] };
                 my $ws = substr( $line, 0, $diff );
                 if ( ( length($ws) == $diff ) && $ws =~ /^\s+$/ ) {
@@ -4311,7 +4434,8 @@ sub get_output_line_number {
                       $self->level_change( $leading_space_count, $diff,
                         $level );
                 }
-                $valign_buffer[$i] = [ $line, $leading_space_count, $level ];
+                $valign_buffer[$i] =
+                  [ $line, $leading_space_count, $level, $Kend ];
             }
         }
         return;
@@ -4389,7 +4513,9 @@ sub get_output_line_number {
     }
 }
 
+###############################
 # CODE SECTION 9: Output Step D
+###############################
 
 sub valign_output_step_D {
 
@@ -4399,7 +4525,7 @@ sub valign_output_step_D {
     # Write one vertically aligned line of code to the output object.
     ###############################################################
 
-    my ( $self, $line, $leading_space_count, $level ) = @_;
+    my ( $self, $line, $leading_space_count, $level, $Kend ) = @_;
 
     # The line is currently correct if there is no tabbing (recommended!)
     # We may have to lop off some leading spaces and replace with tabs.
@@ -4443,7 +4569,7 @@ sub valign_output_step_D {
 
                 # shouldn't happen - program error counting whitespace
                 # - skip entabbing
-                VALIGN_DEBUG_FLAG_TABS
+                DEBUG_TABS
                   && $self->warning(
 "Error entabbing in valign_output_step_D: expected count=$leading_space_count\n"
                   );
@@ -4461,7 +4587,7 @@ sub valign_output_step_D {
 
                 # But it could be an outdented comment
                 if ( $line !~ /^\s*#/ ) {
-                    VALIGN_DEBUG_FLAG_TABS
+                    DEBUG_TABS
                       && $self->warning(
 "Error entabbing in valign_output_step_D: for level=$level count=$leading_space_count\n"
                       );
@@ -4478,7 +4604,7 @@ sub valign_output_step_D {
 
                 # shouldn't happen - program error counting whitespace
                 # we'll skip entabbing
-                VALIGN_DEBUG_FLAG_TABS
+                DEBUG_TABS
                   && $self->warning(
 "Error entabbing in valign_output_step_D: expected count=$leading_space_count\n"
                   );
@@ -4486,7 +4612,8 @@ sub valign_output_step_D {
         }
     }
     my $file_writer_object = $self->[_file_writer_object_];
-    $file_writer_object->write_code_line( $line . "\n" );
+    $file_writer_object->write_code_line( $line . "\n", $Kend );
+
     return;
 }
 
@@ -4547,7 +4674,7 @@ sub valign_output_step_D {
 
             # shouldn't happen:
             if ( $space_count < 0 ) {
-                VALIGN_DEBUG_FLAG_TABS
+                DEBUG_TABS
                   && $self->warning(
 "Error in get_leading_string: for level=$group_level count=$leading_whitespace_count\n"
                   );
@@ -4564,7 +4691,9 @@ sub valign_output_step_D {
     }
 }    # end get_leading_string
 
+##########################
 # CODE SECTION 10: Summary
+##########################
 
 sub report_anything_unusual {
     my $self = shift;

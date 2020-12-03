@@ -118,8 +118,12 @@ like($page, qr/^=> $base\/alex\/ alex/m, "Space alex found");
 
 # add a special token to the alex space via config file
 
-open(my $config, ">>", "$dir/config");
-say $config 'push(@init, sub{ my $self = shift; $self->{server}->{wiki_token} = []; $self->{server}->{wiki_space_token}->{alex} = ["*secret*"]});';
+open(my $config, ">", "$dir/config"); # overwrite
+say $config 'package App::Phoebe;';
+say $config 'use Modern::Perl;';
+say $config 'our ($server);';
+say $config '$server->{wiki_space_token}->{alex} = ["*secret*"];';
+say $config '$server->{wiki_token} = [];';
 close($config);
 is(kill('HUP', $pid), 1, "Restarted server");
 sleep 1;

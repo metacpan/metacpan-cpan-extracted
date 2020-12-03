@@ -16,7 +16,7 @@ configure_requires:
   ExtUtils::MakeMaker: 6.59
 distribution_type: module
 dynamic_config: 1
-generated_by: 'Module::Install version 1.17'
+generated_by: 'Module::Install version 1.19'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -29,7 +29,6 @@ no_index:
     - xt
 requires:
   Algorithm::Combinatorics: 0
-  Data::UUID: 0
   DateTime::Format::W3CDTF: 0
   Exporter::Tiny: 1
   File::Slurp: 0
@@ -56,6 +55,7 @@ requires:
   Type::Tiny: 0
   URI::Escape: 1.36
   URI::NamespaceMap: 0.12
+  UUID::Tiny: 0
   XML::SAX: 0
   namespace::clean: 0
   perl: 5.14.0
@@ -65,4 +65,4 @@ resources:
   homepage: https://metacpan.org/release/Attean
   license: http://dev.perl.org/licenses/
   repository: https://github.com/kasei/attean/
-version: '0.027'
+version: '0.028'

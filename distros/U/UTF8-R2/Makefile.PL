@@ -4,10 +4,9 @@ use ExtUtils::MakeMaker;
 
 WriteMakefile(
     'NAME'      => q{UTF8::R2},
-    'VERSION'   => q{0.09},
+    'VERSION'   => q{0.10},
     'ABSTRACT'  => q{makes UTF-8 scripting easy for enterprise use or LTS},
     'PREREQ_PM' => {
-        'Carp' => '0',
         'ExtUtils::MakeMaker' => '5.4302',
         'File::Basename' => '2.6',
         'File::Copy' => '2.02',

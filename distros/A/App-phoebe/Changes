@@ -1,3 +1,28 @@
+2.00
+
+- This is a .00 release. I expect things to break. That said, I run my
+  sites with it. :)
+
+- Change the framework underneath, from Net::Server to Mojo::IOLoop;
+  this is a breaking change and you should carefully review the way
+  your extensions are written!
+
+- Phoebe no longer uses STDIN and STDOUT to serve requests but a
+  Mojo::IOLoop::Stream object. Phoebe is no longer a class so the
+  $self parameter of many calls either fell away or got replaced with
+  a $stream object to which you $stream->write.
+
+- Phoebe lost many options and capabilities for daemonisation. Using
+  systemd is now the recommended way to run Phoebe (using a
+  traditional setup is still possible, but there are no longer any
+  options to set a PID file, to background the process, and so on).
+
+- The huge config file of mine I mined for code examples got split
+  into smaller files, and where you previously had one big config file
+  you can now also have a conf.d/ directory with even more config
+  files. All the files in the contrib/ directory of this distribution
+  are lifted straight from my setup.
+
 1.20
 
 - Add conf.d directory next to the config file for easier code sharing

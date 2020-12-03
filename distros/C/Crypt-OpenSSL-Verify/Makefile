@@ -1,7 +1,7 @@
 # This Makefile is for the Crypt::OpenSSL::Verify extension to perl.
 #
 # It was generated automatically by MakeMaker version
-# 7.38 (Revision: 73800) from the contents of
+# 7.34 (Revision: 73400) from the contents of
 # Makefile.PL. Don't edit this file, edit Makefile.PL instead.
 #
 #       ANY CHANGES MADE HERE WILL BE LOST!
@@ -25,7 +25,7 @@
 #     OPTIMIZE => q[-O3 -Wall -Werror -DOPENSSL_API_COMPAT=0x10100000L]
 #     PREREQ_PM => { Crypt::OpenSSL::X509=>q[1.807], ExtUtils::MakeMaker=>q[6.59], File::Slurp=>q[0], Test::Exception=>q[0], Test::More=>q[0.88] }
 #     TEST_REQUIRES => {  }
-#     VERSION => q[0.22]
+#     VERSION => q[0.23]
 #     VERSION_FROM => q[Verify.pm]
 #     dist => {  }
 #     realclean => { FILES=>q[MYMETA.yml] }
@@ -35,30 +35,30 @@
 
 # --- MakeMaker const_config section:
 
-# These definitions are from config.sh (via /usr/lib/perl5/core_perl/Config.pm).
+# These definitions are from config.sh (via /usr/lib/x86_64-linux-gnu/perl/5.30/Config.pm).
 # They may have been overridden via Makefile.PL or on the command line.
 AR = ar
-CC = cc
+CC = x86_64-linux-gnu-gcc
 CCCDLFLAGS = -fPIC
-CCDLFLAGS = -rdynamic -Wl,-rpath,/usr/lib/perl5/core_perl/CORE
+CCDLFLAGS = -Wl,-E
 DLEXT = so
 DLSRC = dl_dlopen.xs
 EXE_EXT = 
 FULL_AR = /usr/bin/ar
-LD = cc
-LDDLFLAGS = -shared -Os -fomit-frame-pointer -L/usr/local/lib -fstack-protector-strong
+LD = x86_64-linux-gnu-gcc
+LDDLFLAGS = -shared -L/usr/local/lib -fstack-protector-strong
 LDFLAGS =  -fstack-protector-strong -L/usr/local/lib
-LIBC = /usr/lib/libc.a
+LIBC = libc-2.31.so
 LIB_EXT = .a
 OBJ_EXT = .o
 OSNAME = linux
-OSVERS = 4.14.89-0-vanilla
+OSVERS = 4.19.0
 RANLIB = :
-SITELIBEXP = /usr/local/share/perl5/site_perl
-SITEARCHEXP = /usr/local/lib/perl5/site_perl
+SITELIBEXP = /usr/local/share/perl/5.30.0
+SITEARCHEXP = /usr/local/lib/x86_64-linux-gnu/perl/5.30.0
 SO = so
-VENDORARCHEXP = /usr/lib/perl5/vendor_perl
-VENDORLIBEXP = /usr/share/perl5/vendor_perl
+VENDORARCHEXP = /usr/lib/x86_64-linux-gnu/perl5/5.30
+VENDORLIBEXP = /usr/share/perl5
 
 
 # --- MakeMaker constants section:
@@ -67,11 +67,11 @@ DIRFILESEP = /
 DFSEP = $(DIRFILESEP)
 NAME = Crypt::OpenSSL::Verify
 NAME_SYM = Crypt_OpenSSL_Verify
-VERSION = 0.22
+VERSION = 0.23
 VERSION_MACRO = VERSION
-VERSION_SYM = 0_22
+VERSION_SYM = 0_23
 DEFINE_VERSION = -D$(VERSION_MACRO)=\"$(VERSION)\"
-XS_VERSION = 0.22
+XS_VERSION = 0.23
 XS_VERSION_MACRO = XS_VERSION
 XS_DEFINE_VERSION = -D$(XS_VERSION_MACRO)=\"$(XS_VERSION)\"
 INST_ARCHLIB = blib/arch
@@ -80,27 +80,25 @@ INST_BIN = blib/bin
 INST_LIB = blib/lib
 INST_MAN1DIR = blib/man1
 INST_MAN3DIR = blib/man3
-MAN1EXT = 1
+MAN1EXT = 1p
 MAN3EXT = 3pm
-MAN1SECTION = 1
-MAN3SECTION = 3
 INSTALLDIRS = site
 DESTDIR = 
 PREFIX = $(SITEPREFIX)
 PERLPREFIX = /usr
 SITEPREFIX = /usr/local
 VENDORPREFIX = /usr
-INSTALLPRIVLIB = /usr/share/perl5/core_perl
+INSTALLPRIVLIB = /usr/share/perl/5.30
 DESTINSTALLPRIVLIB = $(DESTDIR)$(INSTALLPRIVLIB)
-INSTALLSITELIB = /usr/local/share/perl5/site_perl
+INSTALLSITELIB = /usr/local/share/perl/5.30.0
 DESTINSTALLSITELIB = $(DESTDIR)$(INSTALLSITELIB)
-INSTALLVENDORLIB = /usr/share/perl5/vendor_perl
+INSTALLVENDORLIB = /usr/share/perl5
 DESTINSTALLVENDORLIB = $(DESTDIR)$(INSTALLVENDORLIB)
-INSTALLARCHLIB = /usr/lib/perl5/core_perl
+INSTALLARCHLIB = /usr/lib/x86_64-linux-gnu/perl/5.30
 DESTINSTALLARCHLIB = $(DESTDIR)$(INSTALLARCHLIB)
-INSTALLSITEARCH = /usr/local/lib/perl5/site_perl
+INSTALLSITEARCH = /usr/local/lib/x86_64-linux-gnu/perl/5.30.0
 DESTINSTALLSITEARCH = $(DESTDIR)$(INSTALLSITEARCH)
-INSTALLVENDORARCH = /usr/lib/perl5/vendor_perl
+INSTALLVENDORARCH = /usr/lib/x86_64-linux-gnu/perl5/5.30
 DESTINSTALLVENDORARCH = $(DESTDIR)$(INSTALLVENDORARCH)
 INSTALLBIN = /usr/bin
 DESTINSTALLBIN = $(DESTDIR)$(INSTALLBIN)
@@ -116,26 +114,26 @@ INSTALLVENDORSCRIPT = /usr/bin
 DESTINSTALLVENDORSCRIPT = $(DESTDIR)$(INSTALLVENDORSCRIPT)
 INSTALLMAN1DIR = /usr/share/man/man1
 DESTINSTALLMAN1DIR = $(DESTDIR)$(INSTALLMAN1DIR)
-INSTALLSITEMAN1DIR = /usr/local/share/man/man1
+INSTALLSITEMAN1DIR = /usr/local/man/man1
 DESTINSTALLSITEMAN1DIR = $(DESTDIR)$(INSTALLSITEMAN1DIR)
 INSTALLVENDORMAN1DIR = /usr/share/man/man1
 DESTINSTALLVENDORMAN1DIR = $(DESTDIR)$(INSTALLVENDORMAN1DIR)
 INSTALLMAN3DIR = /usr/share/man/man3
 DESTINSTALLMAN3DIR = $(DESTDIR)$(INSTALLMAN3DIR)
-INSTALLSITEMAN3DIR = /usr/local/share/man/man3
+INSTALLSITEMAN3DIR = /usr/local/man/man3
 DESTINSTALLSITEMAN3DIR = $(DESTDIR)$(INSTALLSITEMAN3DIR)
 INSTALLVENDORMAN3DIR = /usr/share/man/man3
 DESTINSTALLVENDORMAN3DIR = $(DESTDIR)$(INSTALLVENDORMAN3DIR)
 PERL_LIB =
-PERL_ARCHLIB = /usr/lib/perl5/core_perl
-PERL_ARCHLIBDEP = /usr/lib/perl5/core_perl
+PERL_ARCHLIB = /usr/lib/x86_64-linux-gnu/perl/5.30
+PERL_ARCHLIBDEP = /usr/lib/x86_64-linux-gnu/perl/5.30
 LIBPERL_A = libperl.a
 FIRST_MAKEFILE = Makefile
 MAKEFILE_OLD = Makefile.old
 MAKE_APERL_FILE = Makefile.aperl
 PERLMAINCC = $(CC)
-PERL_INC = /usr/lib/perl5/core_perl/CORE
-PERL_INCDEP = /usr/lib/perl5/core_perl/CORE
+PERL_INC = /usr/lib/x86_64-linux-gnu/perl/5.30/CORE
+PERL_INCDEP = /usr/lib/x86_64-linux-gnu/perl/5.30/CORE
 PERL = "/usr/bin/perl" "-Iinc"
 FULLPERL = "/usr/bin/perl" "-Iinc"
 ABSPERL = $(PERL)
@@ -150,9 +148,9 @@ PERM_DIR = 755
 PERM_RW = 644
 PERM_RWX = 755
 
-MAKEMAKER   = /usr/share/perl5/vendor_perl/ExtUtils/MakeMaker.pm
-MM_VERSION  = 7.38
-MM_REVISION = 73800
+MAKEMAKER   = /usr/share/perl/5.30/ExtUtils/MakeMaker.pm
+MM_VERSION  = 7.34
+MM_REVISION = 73400
 
 # FULLEXT = Pathname for extension directory (eg Foo/Bar/Oracle).
 # BASEEXT = Basename part of FULLEXT. May be just equal FULLEXT. (eg Oracle)
@@ -203,7 +201,7 @@ TO_INST_PM = Verify.pm
 
 
 # --- MakeMaker platform_constants section:
-MM_Unix_VERSION = 7.38
+MM_Unix_VERSION = 7.34
 PERL_MALLOC_DEF = -DPERL_EXTMALLOC_DEF -Dmalloc=Perl_malloc -Dfree=Perl_mfree -Drealloc=Perl_realloc -Dcalloc=Perl_calloc
 
 
@@ -215,12 +213,12 @@ AUTOSPLITFILE = $(ABSPERLRUN)  -e 'use AutoSplit;  autosplit($$$$ARGV[0], $$$$AR
 
 # --- MakeMaker tool_xsubpp section:
 
-XSUBPPDIR = /usr/share/perl5/core_perl/ExtUtils
+XSUBPPDIR = /usr/share/perl/5.30/ExtUtils
 XSUBPP = "$(XSUBPPDIR)$(DFSEP)xsubpp"
 XSUBPPRUN = $(PERLRUN) $(XSUBPP)
 XSPROTOARG = 
-XSUBPPDEPS = /usr/share/perl5/core_perl/ExtUtils/typemap typemap /usr/share/perl5/core_perl/ExtUtils$(DFSEP)xsubpp
-XSUBPPARGS = -typemap '/usr/share/perl5/core_perl/ExtUtils/typemap' -typemap '/home/tim/perl-Crypt-OpenSSL-Verify/typemap'
+XSUBPPDEPS = /usr/share/perl/5.30/ExtUtils/typemap typemap /usr/share/perl/5.30/ExtUtils$(DFSEP)xsubpp
+XSUBPPARGS = -typemap '/usr/share/perl/5.30/ExtUtils/typemap' -typemap '/home/tim/perl-Crypt-OpenSSL-Verify/typemap'
 XSUBPP_EXTRA_ARGS =
 
 
@@ -277,7 +275,7 @@ RCS_LABEL = rcs -Nv$(VERSION_SYM): -q
 DIST_CP = best
 DIST_DEFAULT = tardist
 DISTNAME = Crypt-OpenSSL-Verify
-DISTVNAME = Crypt-OpenSSL-Verify-0.22
+DISTVNAME = Crypt-OpenSSL-Verify-0.23
 
 
 # --- MakeMaker macro section:
@@ -288,7 +286,7 @@ DISTVNAME = Crypt-OpenSSL-Verify-0.22
 
 # --- MakeMaker cflags section:
 
-CCFLAGS = -D_REENTRANT -D_GNU_SOURCE -D_GNU_SOURCE -fwrapv -fno-strict-aliasing -pipe -fstack-protector-strong -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64
+CCFLAGS = -D_REENTRANT -D_GNU_SOURCE -DDEBIAN -fwrapv -fno-strict-aliasing -pipe -I/usr/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64
 OPTIMIZE = -O3 -Wall -Werror -DOPENSSL_API_COMPAT=0x10100000L
 PERLTYPE = 
 MPOLLUTE = 
@@ -302,7 +300,6 @@ MPOLLUTE =
 EXTRALIBS = -lcrypto
 LDLOADLIBS = -lcrypto
 BSLOADLIBS = 
-LD_RUN_PATH = /usr/lib
 
 
 # --- MakeMaker const_cccmd section:
@@ -319,6 +316,7 @@ CCCMD = $(CC) -c $(PASTHRU_INC) $(INC) \
 PASTHRU = LIBPERL_A="$(LIBPERL_A)"\
 	LINKTYPE="$(LINKTYPE)"\
 	OPTIMIZE="$(OPTIMIZE)"\
+	LD="$(LD)"\
 	PREFIX="$(PREFIX)"\
 	PASTHRU_DEFINE='$(DEFINE) $(PASTHRU_DEFINE)'\
 	PASTHRU_INC='-I/usr/include/openssl $(PASTHRU_INC)'
@@ -334,7 +332,7 @@ PASTHRU = LIBPERL_A="$(LIBPERL_A)"\
 # --- MakeMaker c_o section:
 
 .c.i:
-	cc  -E -c $(PASTHRU_INC) $(INC) \
+	x86_64-linux-gnu-gcc  -E -c $(PASTHRU_INC) $(INC) \
 	$(CCFLAGS) $(OPTIMIZE) \
 	$(PERLTYPE) $(MPOLLUTE) $(DEFINE_VERSION) \
 	$(XS_DEFINE_VERSION) $(CCCDLFLAGS) "-I$(PERL_INC)" $(PASTHRU_DEFINE) $(DEFINE) $*.c > $*.i
@@ -487,7 +485,7 @@ INST_DYNAMIC_FIX =
 
 $(INST_DYNAMIC) : $(OBJECT) $(MYEXTLIB) $(INST_ARCHAUTODIR)$(DFSEP).exists $(EXPORT_LIST) $(PERL_ARCHIVEDEP) $(PERL_ARCHIVE_AFTER) $(INST_DYNAMIC_DEP) 
 	$(RM_F) $@
-	LD_RUN_PATH="$(LD_RUN_PATH)" $(LD)  $(LDDLFLAGS)  $(LDFROM) $(OTHERLDFLAGS) -o $@ $(MYEXTLIB) \
+	$(LD)  $(LDDLFLAGS)  $(LDFROM) $(OTHERLDFLAGS) -o $@ $(MYEXTLIB) \
 	  $(PERL_ARCHIVE) $(LDLOADLIBS) $(PERL_ARCHIVE_AFTER) $(EXPORT_LIST) \
 	  $(INST_DYNAMIC_FIX)
 	$(CHMOD) $(PERM_RWX) $@
@@ -518,7 +516,7 @@ POD2MAN = $(POD2MAN_EXE)
 
 manifypods : pure_all config  \
 	Verify.pm
-	$(NOECHO) $(POD2MAN) --section=$(MAN3SECTION) --perm_rw=$(PERM_RW) -u \
+	$(NOECHO) $(POD2MAN) --section=$(MAN3EXT) --perm_rw=$(PERM_RW) -u \
 	  Verify.pm $(INST_MAN3DIR)/Crypt::OpenSSL::Verify.$(MAN3EXT) 
 
 
@@ -731,9 +729,7 @@ doc__install : doc_site_install
 	$(NOECHO) $(ECHO) INSTALLDIRS not defined, defaulting to INSTALLDIRS=site
 
 pure_perl_install :: all
-	$(NOECHO) $(MOD_INSTALL) \
-		read "$(PERL_ARCHLIB)/auto/$(FULLEXT)/.packlist" \
-		write "$(DESTINSTALLARCHLIB)/auto/$(FULLEXT)/.packlist" \
+	$(NOECHO) umask 022; $(MOD_INSTALL) \
 		"$(INST_LIB)" "$(DESTINSTALLPRIVLIB)" \
 		"$(INST_ARCHLIB)" "$(DESTINSTALLARCHLIB)" \
 		"$(INST_BIN)" "$(DESTINSTALLBIN)" \
@@ -745,7 +741,7 @@ pure_perl_install :: all
 
 
 pure_site_install :: all
-	$(NOECHO) $(MOD_INSTALL) \
+	$(NOECHO) umask 02; $(MOD_INSTALL) \
 		read "$(SITEARCHEXP)/auto/$(FULLEXT)/.packlist" \
 		write "$(DESTINSTALLSITEARCH)/auto/$(FULLEXT)/.packlist" \
 		"$(INST_LIB)" "$(DESTINSTALLSITELIB)" \
@@ -758,9 +754,7 @@ pure_site_install :: all
 		"$(PERL_ARCHLIB)/auto/$(FULLEXT)"
 
 pure_vendor_install :: all
-	$(NOECHO) $(MOD_INSTALL) \
-		read "$(VENDORARCHEXP)/auto/$(FULLEXT)/.packlist" \
-		write "$(DESTINSTALLVENDORARCH)/auto/$(FULLEXT)/.packlist" \
+	$(NOECHO) umask 022; $(MOD_INSTALL) \
 		"$(INST_LIB)" "$(DESTINSTALLVENDORLIB)" \
 		"$(INST_ARCHLIB)" "$(DESTINSTALLVENDORARCH)" \
 		"$(INST_BIN)" "$(DESTINSTALLVENDORBIN)" \
@@ -770,50 +764,30 @@ pure_vendor_install :: all
 
 
 doc_perl_install :: all
-	$(NOECHO) $(ECHO) Appending installation info to "$(DESTINSTALLARCHLIB)/perllocal.pod"
-	-$(NOECHO) $(MKPATH) "$(DESTINSTALLARCHLIB)"
-	-$(NOECHO) $(DOC_INSTALL) \
-		"Module" "$(NAME)" \
-		"installed into" "$(INSTALLPRIVLIB)" \
-		LINKTYPE "$(LINKTYPE)" \
-		VERSION "$(VERSION)" \
-		EXE_FILES "$(EXE_FILES)" \
-		>> "$(DESTINSTALLARCHLIB)/perllocal.pod"
 
 doc_site_install :: all
-	$(NOECHO) $(ECHO) Appending installation info to "$(DESTINSTALLARCHLIB)/perllocal.pod"
-	-$(NOECHO) $(MKPATH) "$(DESTINSTALLARCHLIB)"
-	-$(NOECHO) $(DOC_INSTALL) \
+	$(NOECHO) $(ECHO) Appending installation info to "$(DESTINSTALLSITEARCH)/perllocal.pod"
+	-$(NOECHO) umask 02; $(MKPATH) "$(DESTINSTALLSITEARCH)"
+	-$(NOECHO) umask 02; $(DOC_INSTALL) \
 		"Module" "$(NAME)" \
 		"installed into" "$(INSTALLSITELIB)" \
 		LINKTYPE "$(LINKTYPE)" \
 		VERSION "$(VERSION)" \
 		EXE_FILES "$(EXE_FILES)" \
-		>> "$(DESTINSTALLARCHLIB)/perllocal.pod"
+		>> "$(DESTINSTALLSITEARCH)/perllocal.pod"
 
 doc_vendor_install :: all
-	$(NOECHO) $(ECHO) Appending installation info to "$(DESTINSTALLARCHLIB)/perllocal.pod"
-	-$(NOECHO) $(MKPATH) "$(DESTINSTALLARCHLIB)"
-	-$(NOECHO) $(DOC_INSTALL) \
-		"Module" "$(NAME)" \
-		"installed into" "$(INSTALLVENDORLIB)" \
-		LINKTYPE "$(LINKTYPE)" \
-		VERSION "$(VERSION)" \
-		EXE_FILES "$(EXE_FILES)" \
-		>> "$(DESTINSTALLARCHLIB)/perllocal.pod"
 
 
 uninstall :: uninstall_from_$(INSTALLDIRS)dirs
 	$(NOECHO) $(NOOP)
 
 uninstall_from_perldirs ::
-	$(NOECHO) $(UNINSTALL) "$(PERL_ARCHLIB)/auto/$(FULLEXT)/.packlist"
 
 uninstall_from_sitedirs ::
 	$(NOECHO) $(UNINSTALL) "$(SITEARCHEXP)/auto/$(FULLEXT)/.packlist"
 
 uninstall_from_vendordirs ::
-	$(NOECHO) $(UNINSTALL) "$(VENDORARCHEXP)/auto/$(FULLEXT)/.packlist"
 
 
 # --- MakeMaker force section:
@@ -868,6 +842,7 @@ PERL_HDRS = \
         $(PERL_INCDEP)/overload.h            \
         $(PERL_INCDEP)/pad.h            \
         $(PERL_INCDEP)/parser.h            \
+        $(PERL_INCDEP)/patchlevel-debian.h            \
         $(PERL_INCDEP)/patchlevel.h            \
         $(PERL_INCDEP)/perl.h            \
         $(PERL_INCDEP)/perl_inc_macro.h            \
@@ -934,7 +909,7 @@ $(FIRST_MAKEFILE) : Makefile.PL $(CONFIGDEP)
 # --- MakeMaker makeaperl section ---
 MAP_TARGET    = perl
 FULLPERL      = "/usr/bin/perl"
-MAP_PERLINC   = "-Iblib/arch" "-Iblib/lib" "-I/usr/lib/perl5/core_perl" "-I/usr/share/perl5/core_perl"
+MAP_PERLINC   = "-Iblib/arch" "-Iblib/lib" "-I/usr/lib/x86_64-linux-gnu/perl/5.30" "-I/usr/share/perl/5.30"
 
 $(MAP_TARGET) :: $(MAKE_APERL_FILE)
 	$(MAKE) $(USEMAKEFILE) $(MAKE_APERL_FILE) $@
@@ -985,13 +960,13 @@ testdb_static :: static pure_all $(MAP_TARGET)
 # --- MakeMaker ppd section:
 # Creates a PPD (Perl Package Description) for a binary distribution.
 ppd :
-	$(NOECHO) $(ECHO) '<SOFTPKG NAME="Crypt-OpenSSL-Verify" VERSION="0.22">' > Crypt-OpenSSL-Verify.ppd
+	$(NOECHO) $(ECHO) '<SOFTPKG NAME="Crypt-OpenSSL-Verify" VERSION="0.23">' > Crypt-OpenSSL-Verify.ppd
 	$(NOECHO) $(ECHO) '    <ABSTRACT>OpenSSL Verify certificate verification in XS.</ABSTRACT>' >> Crypt-OpenSSL-Verify.ppd
 	$(NOECHO) $(ECHO) '    <AUTHOR>=over</AUTHOR>' >> Crypt-OpenSSL-Verify.ppd
 	$(NOECHO) $(ECHO) '    <IMPLEMENTATION>' >> Crypt-OpenSSL-Verify.ppd
 	$(NOECHO) $(ECHO) '        <PERLCORE VERSION="5,010,0,0" />' >> Crypt-OpenSSL-Verify.ppd
 	$(NOECHO) $(ECHO) '        <REQUIRE NAME="Crypt::OpenSSL::X509" VERSION="1.807" />' >> Crypt-OpenSSL-Verify.ppd
-	$(NOECHO) $(ECHO) '        <ARCHITECTURE NAME="x86_64-linux-thread-multi-5.30" />' >> Crypt-OpenSSL-Verify.ppd
+	$(NOECHO) $(ECHO) '        <ARCHITECTURE NAME="x86_64-linux-gnu-thread-multi-5.30" />' >> Crypt-OpenSSL-Verify.ppd
 	$(NOECHO) $(ECHO) '        <CODEBASE HREF="" />' >> Crypt-OpenSSL-Verify.ppd
 	$(NOECHO) $(ECHO) '    </IMPLEMENTATION>' >> Crypt-OpenSSL-Verify.ppd
 	$(NOECHO) $(ECHO) '</SOFTPKG>' >> Crypt-OpenSSL-Verify.ppd

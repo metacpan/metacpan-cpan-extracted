@@ -1,0 +1,172 @@
+=encoding UTF-8
+
+=head1 NAME
+
+Data::CompactReadonly::V0::Format - a description of CompactReadonly data format, version 0.
+
+=head1 NOTATION
+
+Bytes with values that are printable ASCII will be shown as a single ASCII character.
+Otherwise bytes will be shown either in hexadecimal - C<0xAB> - or binary - C<0b01010101>.
+
+When appropriate bit-fields will be shown in binary C<0b100>.
+
+Bytes will be separated by spaces, bit-fields within a byte by hyphens - C<0b11-0000-00>.
+
+=head1 ENDIANNESS
+
+All internal structures are big-endian.
+
+=head1 FILE HEADER
+
+The file header is five bytes long. The first four serve to identify the file type:
+
+    C R O D
+
+The fifth is a bit-field that encodes in the most significant five bits the file
+format version number, and in the least significant three bits encodes the pointer
+length that is used in the file. Values from 0 to 7 correspond to pointer lengths
+from 1 to 8 bytes.
+
+The five byte header is immediately followed by the root node.
+
+Version number 31 (0b11111-XXX) is reserved for future use.
+
+=head1 NODES
+
+Data is encoded in B<nodes>, which can be of several types. The types fall into
+two categories:
+
+=over
+
+=item Scalar types
+
+Scalars encode a simple value. That can be a number or the NULL value. The five
+integer numeric types are also available as NegativeByte, NegativeMedium and so on.
+
+=over
+
+=item Byte - 8 bit integer
+
+=item Short - 16 bit integer
+
+=item Medium - 24 bit integer
+
+=item Long - 32 bit integer
+
+=item Huge - 64 bit integer
+
+=item Float - 64 bit IEEE754
+
+=item Null
+
+=back
+
+=item Collection types
+
+Collections encode multiple values.
+
+=over
+
+=item Text
+
+Encodes a list of characters - that is, a string.
+
+=item Array
+
+Encodes a list of nodes, which can themselves be of any type.
+
+=item Dictionary
+
+Encodes a list of key-value pairs, the keys being strings or numbers and the
+values being nodes of any type. The keys B<must> be stored in ASCIIbetical
+order.
+
+=back
+
+=back
+
+Each node is encoded as a I<type header> occupying from 1 to 9 bytes, followed
+by data if necessary
+
+=head2 NODE TYPE HEADERS
+
+The type header consists of a I<type specifier> followed by up to 8 bytes
+telling us how much data is in the node. The type specifier is a bit field.
+The first two bits will tell us whether the node is a collection or not.
+
+    0b00 - Text node
+
+    0b01 - Array node
+    
+    0b10 - Dictionary node
+
+    0b11 - it's not a collection, it's a scalar node
+
+The next four bits tell us, for scalar nodes, the type, or for collection nodes
+some of them tell us what type is used to encode the collection's length. Only
+Byte, Short, Medium, and Long are valid for lengths.
+
+    0b0000 - Byte (valid as a length)        0b0001 - NegativeByte
+
+    0b0010 - Short (valid as a length)       0b0011 - NegativeShort
+
+    0b0100 - Medium (valid as a length)      0b0101 - NegativeMedium
+
+    0b0110 - Long (valid as a length)        0b0111 - NegativeLong
+
+    0b1000 - Huge                            0b1001 - NegativeHuge
+
+    0b1010 - Null
+
+    0b1011 - Float
+
+    0b1100 to 0b1111 - Reserved
+
+Finally the last two bits are Reserved.
+
+=head2 NODE DATA
+
+=head3 NUMERIC NODES
+
+The header is followed by the appropriate number of bytes of data.
+
+=head3 NULL NODES
+
+These are just a header.
+
+=head3 TEXT NODES
+
+The header is followed by the appropriate number of bytes to encode the text's
+length, followed by that many bytes of text. Note that text lengths are stored
+in B<bytes> but text is actually encoded in UTF-8. So the 3 character string
+"北京市" is stored as the 9 bytes:
+
+    北: 0xE5 0x8C 0x97    京: 0xE4 0xBA 0xAC    市: 0xE5 0xB8 0x82
+
+and the entire node would be the 11 bytes:
+
+    0b00-0000-00:  this is a Text node, with the length stored in a Byte
+    0x09:          the length of the text
+    0xE5 ... 0x82: nine bytes of text
+
+
+=head3 ARRAY NODES
+
+The header is followed by the appropriate number of bytes to encode the number
+of elements in the array, C<N>. Zero obviously means an empty array. That is
+immediately followed by C<N> pointers of the size specified in the database
+header. Each pointer is the location in the file of another node, which can
+be of any type.
+
+=head3 DICTIIONARY NODES
+
+The hader is followed by the appropriate number of bytes to encode the number
+of elements in thedictionary, C<N>. Zero means an empty dictionary. That is
+immediately followed by C<N> pairs of pointers of the size specifed in the
+database header. The first pointer in each pair must point to a Text or numeric
+node which will be used as a key for looking up values. The second pointer in
+each pair points to the value, which can be any type of node. The pointers to
+keys must list them in ASCIIbetical order. If they are out of order some elements
+may not be able to be found.
+

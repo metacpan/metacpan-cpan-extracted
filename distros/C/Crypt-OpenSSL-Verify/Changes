@@ -1,5 +1,9 @@
 Version History
 
+0.23 03-Dec-2020
+
+    2243383 Respect PERL_LIBPATH if set
+
 0.22 03-Jul-2020
 
     Increment version for official release

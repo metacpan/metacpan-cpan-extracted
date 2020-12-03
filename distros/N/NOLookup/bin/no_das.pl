@@ -4,14 +4,14 @@ use strict;
 use warnings;
 use NOLookup::DAS::DASLookup;
 use Encode;
-use vars qw($opt_q $opt_v $opt_h);
+use vars qw($opt_q $opt_v $opt_h $opt_s $opt_p);
 use Getopt::Std;
 use Pod::Usage;
 
 use Data::Dumper;
 $Data::Dumper::Indent=1;
 
-&getopts('hvq:');    # q:query, v=verbose dump
+&getopts('hvq:s:p:');    # q:query, v=verbose dump
 
 if ($opt_h) {
     pod2usage();
@@ -23,8 +23,8 @@ unless ($opt_q) {
 
 my $q = decode('UTF-8', $opt_q);
 
-my $SERVER = 'finger.norid.no';
-my $PORT   = 79;
+my $SERVER = $opt_s || 'finger.norid.no';
+my $PORT   = $opt_p || 79;
 
 my $das = NOLookup::DAS::DASLookup->new($q, $SERVER, $PORT);
 

@@ -1,0 +1,59 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.81.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 3c5d8728a9fa01aac53b2c564d7fcafae7e2a11a Changes
+SHA1 349e3c3f8e1bb1bd4d3335b2ffe8e5e3539b020b LICENSE
+SHA1 16d76d83d4907fadf4a8b83e40b7899f32ce75e6 MANIFEST
+SHA1 14a1b7a45bc44764f3005458bf6c81e8afd29620 META.yml
+SHA1 3e5762956aecad9288774eaffd3070bc6102af7e Makefile.PL
+SHA1 05411a9b4c484a973260a56aacdaad48e4be6914 README.md
+SHA1 0195dc3a3cae16a81231087f5e8b6e52364de6d5 bin/attean_dbi
+SHA1 c3f8f9f2a209f80b7ca3c8af3a6b1b7b408ad620 inc/Module/Install.pm
+SHA1 d001b4b9a48395a8c4134b234a0e1789138427c5 inc/Module/Install/AuthorTests.pm
+SHA1 de30b539a326675c42e6ad360fddb05902d621be inc/Module/Install/Base.pm
+SHA1 81fffeca82bcd7100d8435b139f0780fcc5cdf9c inc/Module/Install/Can.pm
+SHA1 470809a1dbe03e197e74dde79c6af40b5f7f9b26 inc/Module/Install/DOAPChangeSets.pm
+SHA1 b4dd9cb3cf0cb60390c575bd3405e2297d4a0b1a inc/Module/Install/Fetch.pm
+SHA1 b84cf97b12f8e5ef37bea54e33ddce32dff804d1 inc/Module/Install/Makefile.pm
+SHA1 0d9fd69718198fcd1560214c4f23fcaa44f8395e inc/Module/Install/Metadata.pm
+SHA1 78f307119470d0c85d7d6496e76fc95cb939b462 inc/Module/Install/Scripts.pm
+SHA1 a4ed3f5a3e2f117b8f453771b9e52e8c0f5fcfbc inc/Module/Install/Share.pm
+SHA1 99b8179fbd9e05422b161cf91abe198744188064 inc/Module/Install/Win32.pm
+SHA1 6a91e14bbecc64e9c8e2261dfa4b360641d152e4 inc/Module/Install/WriteAll.pm
+SHA1 a3224eec57be64b02d871edb2498db655d4dd331 lib/AtteanX/Store/DBI.pm
+SHA1 19894ead40e6a0c6c527a133dacdeeac7d56f4af lib/Test/AtteanX/Store/DBI.pm
+SHA1 71a9f55c4f6c74ce872d5407b38b546e69295440 meta/changes.ttl
+SHA1 d1003e1dc2641a248f2b923c19fd2925968e1f40 share/database-schema/mysql-create.sql
+SHA1 af09f59eb466d0f248d22c5536222d29279211f6 share/database-schema/mysql-drop.sql
+SHA1 b95f5a6d45b5cb15b667aee3d32d68fee33e4d80 share/database-schema/postgresql-create.sql
+SHA1 456f4864d61d51a7fe4fa507ce644d5404861949 share/database-schema/postgresql-drop.sql
+SHA1 313ad5717ff2de8118df7560789dbc803edd66d4 share/database-schema/sqlite-create.sql
+SHA1 af09f59eb466d0f248d22c5536222d29279211f6 share/database-schema/sqlite-drop.sql
+SHA1 316dba855401e75fb790031321c4637f1da37f8e t/store-dbi-mysql.t
+SHA1 924bbcf89dc2c1475e144a6686e6e5ace10364ca t/store-dbi-postgresql.t
+SHA1 b9c9e0a7cacd4fa6f6a11cfefd00c0b74e2cc17f t/store-dbi-sqlite.t
+SHA1 8260840c52125be2050b6993fd5d957acc1b18b7 xt/dawg11-mysql.t
+SHA1 6d7a1fee15d71e3e93fb8e873eb193e6f4bdb840 xt/dawg11-postgresql.t
+SHA1 dde9e19ac0a5c64168cbcc4ea03aa9ed0c7ba548 xt/dawg11-sqlite.t
+SHA1 61bf86179ce63f1148d1fb8c7a4c57bee395f7fc xt/pod-coverage.t
+SHA1 6387af7a5fde0747be5bc9ad2ec15ca9759bd95a xt/pod.t
+-----BEGIN PGP SIGNATURE-----
+Comment: GPGTools - http://gpgtools.org
+
+iEYEARECAAYFAl/IE5EACgkQhPK6VMqoyC3KrACeOceWyrDGYhOpcfPA+rY06vNY
+13UAoLWu301o5nqy1gkHvdMvN5Hy5wOK
+=HRDH
+-----END PGP SIGNATURE-----

@@ -7,7 +7,7 @@ Attean::Variable - Pattern matching variables
 
 =head1 VERSION
 
-This document describes Attean::Variable version 0.027
+This document describes Attean::Variable version 0.028
 
 =head1 SYNOPSIS
 
@@ -33,10 +33,10 @@ It conforms to the L<Attean::API::TermOrVariable|Attean::API> role.
 
 =cut
 
-package Attean::Variable 0.027 {
+package Attean::Variable 0.028 {
 	use Moo;
 	use Types::Standard qw(Str);
-	use Data::UUID;
+	use UUID::Tiny ':std';
 	use namespace::clean;
 	
 	has 'value' => (is => 'ro', isa => Str, required => 1);
@@ -49,8 +49,8 @@ package Attean::Variable 0.027 {
 		my $orig 	= shift;
 		my $class	= shift;
 		if (scalar(@_) == 0) {
-			my $uuid	= Data::UUID->new->create_hex;
-			return $class->$orig(value => $uuid);
+			my $uuid	= unpack('H*', create_uuid());
+			return $class->$orig(value => 'v' . $uuid);
 		} elsif (scalar(@_) == 1) {
 			return $class->$orig(value => shift);
 		}

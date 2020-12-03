@@ -1,4 +1,14 @@
 Changes
+contrib/block-fediverse.pl
+contrib/debug-ip-numbers.pl
+contrib/favicon.pl
+contrib/galleries.pl
+contrib/moku-pona.pl
+contrib/oddmuse.pl
+contrib/README.md
+contrib/toki-pona.pl
+contrib/web-edit.pl
+contrib/wikipedia.pl
 CONTRIBUTING.md
 lib/App/phoebe.pm
 LICENSE

@@ -5,21 +5,37 @@ NAME
 SYNOPSIS
 
   use UTF8::R2;
-  use UTF8::R2 ver.sion;      # match or die
-  use UTF8::R2 qw( RFC3629 ); # m/./ matches RFC3629 codepoint (default)
-  use UTF8::R2 qw( RFC2279 ); # m/./ matches RFC2279 codepoint
-  use UTF8::R2 qw( %mb );     # multibyte regex by %mb
+  use UTF8::R2 ver.sion;            # match or die
+  use UTF8::R2 qw( RFC3629 );       # m/./ matches RFC3629 codepoint (default)
+  use UTF8::R2 qw( RFC2279 );       # m/./ matches RFC2279 codepoint
+  use UTF8::R2 qw( WTF8 );          # m/./ matches WTF-8 codepoint
+  use UTF8::R2 qw( RFC3629.ja_JP ); # optimized RFC3629 for ja_JP
+  use UTF8::R2 qw( WTF8.ja_JP );    # optimized WTF-8 for ja_JP
+  use UTF8::R2 qw( %mb );           # multibyte regex by %mb
 
 DESCRIPTION
 
   UTF8::R2 module provides minimal UTF-8 subroutines for stable scripting
   environment, using no utf8 pragma, no UTF-8 flag.
 
+    # on use UTF8::R2 qw( RFC2279 );
+    # m/./ means
+    # beautiful concept in young days
+    # https://www.ietf.org/rfc/rfc2279.txt
+    'RFC2279' => qr{(?>@{[join('', qw(
+        [\x00-\x7F\x80-\xBF\xC0-\xC1\xF5-\xFF]       |
+        [\xC2-\xDF][\x80-\xBF]                       |
+        [\xE0-\xEF][\x80-\xBF][\x80-\xBF]            |
+        [\xF0-\xF4][\x80-\xBF][\x80-\xBF][\x80-\xBF] |
+        [\x00-\xFF]
+    ))]})}x,
+
     # on use UTF8::R2;
     # or use UTF8::R2 qw( RFC3629 );
     # m/./ means
-    qr{(?>
-        [\x00-\x7F\xC0-\xC1\xF5-\xFF]                |
+    # https://tools.ietf.org/rfc/rfc3629.txt
+    'RFC3629' => qr{(?>@{[join('', qw(
+        [\x00-\x7F\x80-\xBF\xC0-\xC1\xF5-\xFF]       |
         [\xC2-\xDF][\x80-\xBF]                       |
         [\xE0-\xE0][\xA0-\xBF][\x80-\xBF]            |
         [\xE1-\xEC][\x80-\xBF][\x80-\xBF]            |
@@ -29,17 +45,51 @@ DESCRIPTION
         [\xF1-\xF3][\x80-\xBF][\x80-\xBF][\x80-\xBF] |
         [\xF4-\xF4][\x80-\x8F][\x80-\xBF][\x80-\xBF] |
         [\x00-\xFF]
-    )}x;
+    ))]})}x,
 
-    # on use UTF8::R2 qw( RFC2279 );
+    # or use UTF8::R2 qw( WTF8 );
     # m/./ means
-    qr{(?>
-        [\x00-\x7F\xC0-\xC1\xF5-\xFF]                |
+    # http://simonsapin.github.io/wtf-8/
+    'WTF8' => qr{(?>@{[join('', qw(
+        [\x00-\x7F\x80-\xBF\xC0-\xC1\xF5-\xFF]       |
         [\xC2-\xDF][\x80-\xBF]                       |
-        [\xE0-\xEF][\x80-\xBF][\x80-\xBF]            |
-        [\xF0-\xF4][\x80-\xBF][\x80-\xBF][\x80-\xBF] |
+        [\xE0-\xE0][\xA0-\xBF][\x80-\xBF]            |
+        [\xE1-\xEF][\x80-\xBF][\x80-\xBF]            |
+        [\xF0-\xF0][\x90-\xBF][\x80-\xBF][\x80-\xBF] |
+        [\xF1-\xF3][\x80-\xBF][\x80-\xBF][\x80-\xBF] |
+        [\xF4-\xF4][\x80-\x8F][\x80-\xBF][\x80-\xBF] |
         [\x00-\xFF]
-    )}x;
+    ))]})}x,
+
+    # or use UTF8::R2 qw( RFC3629.ja_JP );
+    # m/./ means
+    # optimized RFC3629 for ja_JP
+    'RFC3629.ja_JP' => qr{(?>@{[join('', qw(
+        [\x00-\x7F\x80-\xBF\xC0-\xC1\xF5-\xFF]       |
+        [\xE1-\xEC][\x80-\xBF][\x80-\xBF]            |
+        [\xC2-\xDF][\x80-\xBF]                       |
+        [\xEE-\xEF][\x80-\xBF][\x80-\xBF]            |
+        [\xF0-\xF0][\x90-\xBF][\x80-\xBF][\x80-\xBF] |
+        [\xE0-\xE0][\xA0-\xBF][\x80-\xBF]            |
+        [\xED-\xED][\x80-\x9F][\x80-\xBF]            |
+        [\xF1-\xF3][\x80-\xBF][\x80-\xBF][\x80-\xBF] |
+        [\xF4-\xF4][\x80-\x8F][\x80-\xBF][\x80-\xBF] |
+        [\x00-\xFF]
+    ))]})}x,
+
+    # or use UTF8::R2 qw( WTF8.ja_JP );
+    # m/./ means
+    # optimized WTF-8 for ja_JP
+    'WTF8.ja_JP' => qr{(?>@{[join('', qw(
+        [\x00-\x7F\x80-\xBF\xC0-\xC1\xF5-\xFF]       |
+        [\xE1-\xEF][\x80-\xBF][\x80-\xBF]            |
+        [\xC2-\xDF][\x80-\xBF]                       |
+        [\xE0-\xE0][\xA0-\xBF][\x80-\xBF]            |
+        [\xF0-\xF0][\x90-\xBF][\x80-\xBF][\x80-\xBF] |
+        [\xF1-\xF3][\x80-\xBF][\x80-\xBF][\x80-\xBF] |
+        [\xF4-\xF4][\x80-\x8F][\x80-\xBF][\x80-\xBF] |
+        [\x00-\xFF]
+    ))]})}x,
 
 SUBROUTINES
 

@@ -78,6 +78,42 @@ sub message {
 $myfun = sub {
     print("Hello, World\n");
 };
+
+eval {
+    my $app = App::perlbrew->new( "install-patchperl", "-q" );
+    $app->run();
+} or do {
+    $error          = $@;
+    $produced_error = 1;
+};
+
+Mojo::IOLoop->next_tick(
+    sub {
+        $ua->get(
+            '/' => sub {
+                push @kept_alive, pop->kept_alive;
+                Mojo::IOLoop->next_tick( sub { Mojo::IOLoop->stop } );
+            }
+        );
+    }
+);
+
+$r = do {
+    sswitch( $words[ rand @words ] ) {
+        case $words[0]:
+        case $words[1]:
+        case $words[2]:
+        case $words[3]: { 'ok' }
+      default: { 'wtf' }
+    }
+};
+
+try {
+    die;
+}
+catch {
+    die;
+};
 ----------
 
         'comments' => <<'----------',
@@ -87,7 +123,7 @@ sub length { return length($_[0]) }    # side comment
                              # hanging side comment
                              # very longgggggggggggggggggggggggggggggggggggggggggggggggggggg hanging side comment
 
-# side comments following open brace are not currently treated as hanging side comments
+# a blank will be inserted to prevent forming a hanging side comment
 sub macro_get_names { #
 # 
 # %name = macro_get_names();  (key=macrohandle, value=macroname)
@@ -96,7 +132,7 @@ sub macro_get_names { #
    local(%name)=();  ## a static side comment to test -ssc
 
  # a spaced block comment to test -isbc
-   for (0..$                                          #mac_ver) {
+   for (0..$#mac_ver) {
       # a very long comment for testing the parameter --nooutdent-long-comments (or -nolc)
       $name{$_} = $mac_ext[$idx{$mac_exti[$_]}];
       $vmsfile =~ s/;[\d\-]*$//; # very long side comment; Clip off version number; we can use a newer version as well
@@ -323,7 +359,7 @@ my ( $a, $b, $c ) = @_;    # test -nsak="my for"
 # an initial hash bang line cannot be deleted with -dp
 sub length { return length( $_[0] ) }
 
-# side comments following open brace are not currently treated as hanging side comments
+# a blank will be inserted to prevent forming a hanging side comment
 sub macro_get_names {
     #
     # %name = macro_get_names();  (key=macrohandle, value=macroname)
@@ -351,7 +387,7 @@ sub macro_get_names {
 
 {
     my $IGNORE = 0;
-    
+
     # A blank line interrupts the hsc's; this is a block comment
 
 }
@@ -420,6 +456,49 @@ $myfun = sub
 {
     print("Hello, World\n");
 };
+
+eval {
+    my $app = App::perlbrew->new( "install-patchperl", "-q" );
+    $app->run();
+} or do
+{
+    $error          = $@;
+    $produced_error = 1;
+};
+
+Mojo::IOLoop->next_tick(
+    sub
+    {
+        $ua->get(
+            '/' => sub
+            {
+                push @kept_alive, pop->kept_alive;
+                Mojo::IOLoop->next_tick( sub { Mojo::IOLoop->stop } );
+            }
+        );
+    }
+);
+
+$r = do
+{
+    sswitch( $words[ rand @words ] )
+    {
+        case $words[0]:
+        case $words[1]:
+        case $words[2]:
+        case $words[3]: { 'ok' }
+      default: { 'wtf' }
+    }
+};
+
+try
+{
+    die;
+}
+catch
+{
+    die;
+};
 #5...........
         },
 
@@ -440,6 +519,42 @@ sub message
 $myfun = sub {
     print("Hello, World\n");
 };
+
+eval {
+    my $app = App::perlbrew->new( "install-patchperl", "-q" );
+    $app->run();
+} or do {
+    $error          = $@;
+    $produced_error = 1;
+};
+
+Mojo::IOLoop->next_tick(
+    sub {
+        $ua->get(
+            '/' => sub {
+                push @kept_alive, pop->kept_alive;
+                Mojo::IOLoop->next_tick( sub { Mojo::IOLoop->stop } );
+            }
+        );
+    }
+);
+
+$r = do {
+    sswitch( $words[ rand @words ] ) {
+        case $words[0]:
+        case $words[1]:
+        case $words[2]:
+        case $words[3]: { 'ok' }
+      default: { 'wtf' }
+    }
+};
+
+try {
+    die;
+}
+catch {
+    die;
+};
 #6...........
         },
 
@@ -459,6 +574,45 @@ sub message
 $myfun = sub {
     print("Hello, World\n");
 };
+
+eval {
+    my $app = App::perlbrew->new( "install-patchperl", "-q" );
+    $app->run();
+} or do
+  { $error          = $@;
+    $produced_error = 1;
+  };
+
+Mojo::IOLoop->next_tick(
+    sub {
+        $ua->get(
+            '/' => sub {
+                push @kept_alive, pop->kept_alive;
+                Mojo::IOLoop->next_tick( sub { Mojo::IOLoop->stop } );
+            }
+        );
+    }
+);
+
+$r = do
+  { sswitch( $words[ rand @words ] )
+    {
+        case $words[0]:
+        case $words[1]:
+        case $words[2]:
+        case $words[3]: { 'ok' }
+      default: { 'wtf' }
+    }
+  };
+
+try
+{
+    die;
+}
+catch
+{
+    die;
+};
 #7...........
         },
 
@@ -477,6 +631,42 @@ sub message {
 
 $myfun = sub {
     print("Hello, World\n");
+};
+
+eval {
+    my $app = App::perlbrew->new( "install-patchperl", "-q" );
+    $app->run();
+} or do {
+    $error          = $@;
+    $produced_error = 1;
+};
+
+Mojo::IOLoop->next_tick(
+    sub {
+        $ua->get(
+            '/' => sub {
+                push @kept_alive, pop->kept_alive;
+                Mojo::IOLoop->next_tick( sub { Mojo::IOLoop->stop } );
+            }
+        );
+    }
+);
+
+$r = do {
+    sswitch( $words[ rand @words ] ) {
+        case $words[0]:
+        case $words[1]:
+        case $words[2]:
+        case $words[3]: { 'ok' }
+      default: { 'wtf' }
+    }
+};
+
+try {
+    die;
+}
+catch {
+    die;
 };
 #8...........
         },

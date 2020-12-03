@@ -1,0 +1,11 @@
+AtteanX::Store::DBI
+===================
+
+Created:      2016-03-14
+Home page:    <https://metacpan.org/release/AtteanX-Store-DBI/>
+Bug tracker:  <https://github.com/kasei/atteanx-store-dbi/issues>
+
+0.001  2020-12-02
+
+ - (Addition) Initial release.
+

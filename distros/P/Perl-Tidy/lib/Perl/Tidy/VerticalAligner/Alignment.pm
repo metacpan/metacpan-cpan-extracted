@@ -7,105 +7,71 @@
 package Perl::Tidy::VerticalAligner::Alignment;
 use strict;
 use warnings;
-our $VERSION = '20201001';
 
-{
+{ #<<< A non-indenting brace
 
-    #    _column          # the current column number
-    #    _starting_column # column number when created
-    #    _saved_column    # a place for temporary storage
+our $VERSION = '20201202';
 
-    my %default_data = (
-        column          => undef,
-        starting_column => undef,
-        saved_column    => undef,
-    );
+#    _column_          # the current column number
+#    _saved_column_    # a place for temporary storage
+my $i = 0;
+use constant {
+    _column_       => $i++,
+    _saved_column_ => $i++,
+};
 
-    # class population count
-    {
-        my $_count = 0;
-        sub get_count        { return $_count }
-        sub _increment_count { return ++$_count }
-        sub _decrement_count { return --$_count }
-    }
-
-    # constructor
-    sub new {
-        my ( $caller, %arg ) = @_;
-        my $caller_is_obj = ref($caller);
-        my $class         = $caller_is_obj || $caller;
-        my $self          = bless {}, $class;
-
-        foreach my $key ( keys %default_data ) {
-            my $_key = '_' . $key;
-            if    ( exists $arg{$key} ) { $self->{$_key} = $arg{$key} }
-            elsif ($caller_is_obj)      { $self->{$_key} = $caller->{$_key} }
-            else { $self->{$_key} = $default_data{$_key} }
-        }
-        if ( !defined( $self->{_starting_column} ) ) {
-            $self->{_starting_column} = $self->{_column};
-        }
-        $self->_increment_count();
-        return $self;
-    }
-
-    sub AUTOLOAD {
-
-        # Catch any undefined sub calls so that we are sure to get
-        # some diagnostic information.  This sub should never be called
-        # except for a programming error.
-        our $AUTOLOAD;
-        return if ( $AUTOLOAD eq 'DESTROY' );
-        my ( $pkg, $fname, $lno ) = caller();
-        print STDERR <<EOM;
-    ======================================================================
-    Unexpected call to Autoload looking for sub $AUTOLOAD
-    Called from package: '$pkg'  
-    Called from File '$fname'  at line '$lno'
-    This error is probably due to a recent programming change
-    ======================================================================
-EOM
-        exit 1;
-    }
-
-    sub DESTROY {
-        my $self = shift;
-        $self->_decrement_count();
-        return;
-    }
-
-    sub get_column { my $self = shift; return $self->{_column} }
-
-    sub get_starting_column {
-        my $self = shift;
-        return $self->{_starting_column};
-    }
-
-    sub set_column { my ( $self, $val ) = @_; $self->{_column} = $val; return }
-
-    sub set_starting_column {
-        my ( $self, $val ) = @_;
-        $self->{_starting_column} = $val;
-        return;
-    }
-
-    sub increment_column {
-        my ( $self, $val ) = @_;
-        $self->{_column} += $val;
-        return;
-    }
-
-    sub save_column {
-        my $self = shift;
-        $self->{_saved_column} = $self->{_column};
-        return;
-    }
-
-    sub restore_column {
-        my $self = shift;
-        $self->{_column} = $self->{_saved_column};
-        return;
-    }
+sub new {
+    my ( $class, $rarg ) = @_;
+    my $self = bless [], $class;
+    $self->[_column_]       = $rarg->{column};
+    $self->[_saved_column_] = $rarg->{saved_column};
+    return $self;
 }
 
+sub AUTOLOAD {
+
+    # Catch any undefined sub calls so that we are sure to get
+    # some diagnostic information.  This sub should never be called
+    # except for a programming error.
+    our $AUTOLOAD;
+    return if ( $AUTOLOAD =~ /\bDESTROY$/ );
+    my ( $pkg, $fname, $lno ) = caller();
+    my $my_package = __PACKAGE__;
+    print STDERR <<EOM;
+======================================================================
+Error detected in package '$my_package', version $VERSION
+Received unexpected AUTOLOAD call for sub '$AUTOLOAD'
+Called from package: '$pkg'  
+Called from File '$fname'  at line '$lno'
+This error is probably due to a recent programming change
+======================================================================
+EOM
+    exit 1;
+}
+
+sub DESTROY {
+
+    # required to avoid call to AUTOLOAD in some versions of perl
+}
+
+sub get_column {
+    return $_[0]->[_column_];
+}
+
+sub increment_column {
+    $_[0]->[_column_] += $_[1];
+    return;
+}
+
+sub save_column {
+    $_[0]->[_saved_column_] = $_[0]->[_column_];
+    return;
+}
+
+sub restore_column {
+    $_[0]->[_column_] = $_[0]->[_saved_column_];
+    return;
+}
+} ## end of package VerticalAligner::Alignment
 1;
+

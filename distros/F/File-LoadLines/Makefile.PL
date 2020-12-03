@@ -12,7 +12,8 @@ WriteMakefile(
     MIN_PERL_VERSION	=> '5.010001',
     PREREQ_PM => {
         'ExtUtils::MakeMaker' => 6.46,
-        'Test::More' => 0,
+        'Test::More'          => 1.30,
+        'Test::Exception'     => 0.43,
     },
     META_MERGE => {
       resources    => {
