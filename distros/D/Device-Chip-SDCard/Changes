@@ -1,5 +1,9 @@
 Revision history for Device-Chip-SDCard
 
+0.03    2020-12-06
+        [CHANGES]
+         * Updated to use Object::Pad + Future::AsyncAwait
+
 0.02    2018-02-26 00:41:16
         [CHANGES]
          * Declare correct dependency on version of Test::D:C:A

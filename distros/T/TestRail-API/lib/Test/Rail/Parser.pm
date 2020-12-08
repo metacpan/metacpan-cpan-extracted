@@ -2,7 +2,7 @@
 # PODNAME: Test::Rail::Parser
 
 package Test::Rail::Parser;
-$Test::Rail::Parser::VERSION = '0.046';
+$Test::Rail::Parser::VERSION = '0.047';
 use strict;
 use warnings;
 use utf8;
@@ -43,6 +43,7 @@ sub new {
         'project_id'   => delete $opts->{'project_id'},
         'step_results' => delete $opts->{'step_results'},
         'plan'         => delete $opts->{'plan'},
+        'plan_id'      => delete $opts->{'plan_id'},
         'configs'      => delete $opts->{'configs'} // [],
         'testsuite_id' => delete $opts->{'testsuite_id'},
         'testsuite'    => delete $opts->{'testsuite'},
@@ -181,8 +182,13 @@ sub new {
     if ( $tropts->{'plan'} ) {
 
         #Attempt to find run, filtered by configurations
-        $plan =
-          $tr->getPlanByName( $tropts->{'project_id'}, $tropts->{'plan'} );
+        if ( $tropts->{'plan_id'} ) {
+            $plan = $tr->getPlanByID( $tropts->{'plan_id'} );
+        }
+        else {
+            $plan =
+              $tr->getPlanByName( $tropts->{'project_id'}, $tropts->{'plan'} );
+        }
         confess(
             "Test plan provided is completed, and spawning was not indicated")
           if ( ref $plan eq 'HASH' )
@@ -745,7 +751,7 @@ Test::Rail::Parser - Upload your TAP results to TestRail
 
 =head1 VERSION
 
-version 0.046
+version 0.047
 
 =head1 DESCRIPTION
 

@@ -38,15 +38,15 @@ SKIP: {
   ok( !$error, 'got snmp session for live tests' );
   isa_ok( $session, 'Net::SNMP' );
   ok(
-    $session->can('map_vlan_static_ids2names'),
-    'can $session->map_vlan_static_ids2names'
+    $session->can('map_vlan_id2name'),
+    'can $session->map_vlan_id2name'
   );
   ok(
-    $session->can('map_vlan_static_ids2ports'),
-    'can $session->map_vlan_static_ids2ports'
+    $session->can('map_vlan_id2if_idx'),
+    'can $session->map_vlan_id2if_idx'
   );
-  ok( $session->can('map_vlan_static_ports2ids'),
-    'can $session->map_vlan_static_ports2ids' );
+  ok( $session->can('map_if_idx2vlan_id'),
+    'can $session->map_if_idx2vlan_id' );
 
   eval { $session->init_mixins };
   ok( !$@, 'init_mixins without error' );
@@ -65,16 +65,16 @@ SKIP: {
 
 
   my $ids2names;
-  eval { $ids2names = $session->map_vlan_static_ids2names };
-  ok( !$@, 'map_vlan_static_ids2names' );
+  eval { $ids2names = $session->map_vlan_id2name };
+  ok( !$@, 'map_vlan_id2name' );
 
   my $ids2ports;
-  eval { $ids2ports = $session->map_vlan_static_ids2ports };
-  ok( !$@, 'map_vlan_static_ids2ports' );
+  eval { $ids2ports = $session->map_vlan_id2if_idx };
+  ok( !$@, 'map_vlan_id2if_idx' );
 
   my $ports2ids;
-  eval { $ports2ids = $session->map_vlan_static_ports2ids };
-  ok( !$@, 'map_vlan_static_ports2ids' );
+  eval { $ports2ids = $session->map_if_idx2vlan_id };
+  ok( !$@, 'map_if_idx2vlan_id' );
 }
 
 # vim: ft=perl sw=2

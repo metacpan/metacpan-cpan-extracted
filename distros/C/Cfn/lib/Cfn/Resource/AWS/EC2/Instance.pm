@@ -1,4 +1,4 @@
-# AWS::EC2::Instance generated from spec 11.1.0
+# AWS::EC2::Instance generated from spec 18.4.0
 use Moose::Util::TypeConstraints;
 
 coerce 'Cfn::Resource::Properties::AWS::EC2::Instance',
@@ -14,7 +14,7 @@ package Cfn::Resource::AWS::EC2::Instance {
     [ 'AvailabilityZone','PrivateDnsName','PrivateIp','PublicDnsName','PublicIp' ]
   }
   sub supported_regions {
-    [ 'ap-east-1','ap-northeast-1','ap-northeast-2','ap-northeast-3','ap-south-1','ap-southeast-1','ap-southeast-2','ca-central-1','cn-north-1','cn-northwest-1','eu-central-1','eu-north-1','eu-west-1','eu-west-2','eu-west-3','me-south-1','sa-east-1','us-east-1','us-east-2','us-gov-east-1','us-gov-west-1','us-west-1','us-west-2' ]
+    [ 'af-south-1','ap-east-1','ap-northeast-1','ap-northeast-2','ap-northeast-3','ap-south-1','ap-southeast-1','ap-southeast-2','ca-central-1','cn-north-1','cn-northwest-1','eu-central-1','eu-north-1','eu-south-1','eu-west-1','eu-west-2','eu-west-3','me-south-1','sa-east-1','us-east-1','us-east-2','us-gov-east-1','us-gov-west-1','us-west-1','us-west-2' ]
   }
 }
 
@@ -51,11 +51,11 @@ coerce 'Cfn::Resource::Properties::AWS::EC2::Instance::PrivateIpAddressSpecifica
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::EC2::Instance::PrivateIpAddressSpecificationValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::EC2::Instance::PrivateIpAddressSpecification->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::EC2::Instance::PrivateIpAddressSpecificationValue {
+package Cfn::Resource::Properties::Object::AWS::EC2::Instance::PrivateIpAddressSpecification {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -73,11 +73,11 @@ coerce 'Cfn::Resource::Properties::AWS::EC2::Instance::NoDevice',
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::EC2::Instance::NoDeviceValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::EC2::Instance::NoDevice->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::EC2::Instance::NoDeviceValue {
+package Cfn::Resource::Properties::Object::AWS::EC2::Instance::NoDevice {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -115,11 +115,11 @@ coerce 'Cfn::Resource::Properties::AWS::EC2::Instance::InstanceIpv6Address',
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::EC2::Instance::InstanceIpv6AddressValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::EC2::Instance::InstanceIpv6Address->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::EC2::Instance::InstanceIpv6AddressValue {
+package Cfn::Resource::Properties::Object::AWS::EC2::Instance::InstanceIpv6Address {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -136,11 +136,11 @@ coerce 'Cfn::Resource::Properties::AWS::EC2::Instance::Ebs',
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::EC2::Instance::EbsValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::EC2::Instance::Ebs->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::EC2::Instance::EbsValue {
+package Cfn::Resource::Properties::Object::AWS::EC2::Instance::Ebs {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -185,11 +185,11 @@ coerce 'Cfn::Resource::Properties::AWS::EC2::Instance::AssociationParameter',
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::EC2::Instance::AssociationParameterValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::EC2::Instance::AssociationParameter->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::EC2::Instance::AssociationParameterValue {
+package Cfn::Resource::Properties::Object::AWS::EC2::Instance::AssociationParameter {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -229,11 +229,11 @@ coerce 'Cfn::Resource::Properties::AWS::EC2::Instance::Volume',
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::EC2::Instance::VolumeValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::EC2::Instance::Volume->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::EC2::Instance::VolumeValue {
+package Cfn::Resource::Properties::Object::AWS::EC2::Instance::Volume {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -273,11 +273,11 @@ coerce 'Cfn::Resource::Properties::AWS::EC2::Instance::SsmAssociation',
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::EC2::Instance::SsmAssociationValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::EC2::Instance::SsmAssociation->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::EC2::Instance::SsmAssociationValue {
+package Cfn::Resource::Properties::Object::AWS::EC2::Instance::SsmAssociation {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -317,11 +317,11 @@ coerce 'Cfn::Resource::Properties::AWS::EC2::Instance::NetworkInterface',
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::EC2::Instance::NetworkInterfaceValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::EC2::Instance::NetworkInterface->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::EC2::Instance::NetworkInterfaceValue {
+package Cfn::Resource::Properties::Object::AWS::EC2::Instance::NetworkInterface {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -371,11 +371,11 @@ coerce 'Cfn::Resource::Properties::AWS::EC2::Instance::LicenseSpecification',
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::EC2::Instance::LicenseSpecificationValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::EC2::Instance::LicenseSpecification->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::EC2::Instance::LicenseSpecificationValue {
+package Cfn::Resource::Properties::Object::AWS::EC2::Instance::LicenseSpecification {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -392,11 +392,11 @@ coerce 'Cfn::Resource::Properties::AWS::EC2::Instance::LaunchTemplateSpecificati
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::EC2::Instance::LaunchTemplateSpecificationValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::EC2::Instance::LaunchTemplateSpecification->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::EC2::Instance::LaunchTemplateSpecificationValue {
+package Cfn::Resource::Properties::Object::AWS::EC2::Instance::LaunchTemplateSpecification {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -415,11 +415,11 @@ coerce 'Cfn::Resource::Properties::AWS::EC2::Instance::HibernationOptions',
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::EC2::Instance::HibernationOptionsValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::EC2::Instance::HibernationOptions->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::EC2::Instance::HibernationOptionsValue {
+package Cfn::Resource::Properties::Object::AWS::EC2::Instance::HibernationOptions {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -458,11 +458,11 @@ coerce 'Cfn::Resource::Properties::AWS::EC2::Instance::ElasticInferenceAccelerat
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::EC2::Instance::ElasticInferenceAcceleratorValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::EC2::Instance::ElasticInferenceAccelerator->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::EC2::Instance::ElasticInferenceAcceleratorValue {
+package Cfn::Resource::Properties::Object::AWS::EC2::Instance::ElasticInferenceAccelerator {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -502,11 +502,11 @@ coerce 'Cfn::Resource::Properties::AWS::EC2::Instance::ElasticGpuSpecification',
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::EC2::Instance::ElasticGpuSpecificationValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::EC2::Instance::ElasticGpuSpecification->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::EC2::Instance::ElasticGpuSpecificationValue {
+package Cfn::Resource::Properties::Object::AWS::EC2::Instance::ElasticGpuSpecification {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -523,11 +523,11 @@ coerce 'Cfn::Resource::Properties::AWS::EC2::Instance::CreditSpecification',
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::EC2::Instance::CreditSpecificationValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::EC2::Instance::CreditSpecification->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::EC2::Instance::CreditSpecificationValue {
+package Cfn::Resource::Properties::Object::AWS::EC2::Instance::CreditSpecification {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -544,11 +544,11 @@ coerce 'Cfn::Resource::Properties::AWS::EC2::Instance::CpuOptions',
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::EC2::Instance::CpuOptionsValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::EC2::Instance::CpuOptions->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::EC2::Instance::CpuOptionsValue {
+package Cfn::Resource::Properties::Object::AWS::EC2::Instance::CpuOptions {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -588,11 +588,11 @@ coerce 'Cfn::Resource::Properties::AWS::EC2::Instance::BlockDeviceMapping',
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::EC2::Instance::BlockDeviceMappingValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::EC2::Instance::BlockDeviceMapping->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::EC2::Instance::BlockDeviceMappingValue {
+package Cfn::Resource::Properties::Object::AWS::EC2::Instance::BlockDeviceMapping {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -648,3 +648,30 @@ package Cfn::Resource::Properties::AWS::EC2::Instance {
 }
 
 1;
+### main pod documentation begin ###
+
+=encoding UTF-8
+
+=head1 NAME
+
+Cfn::Resource::AWS::EC2::Instance - Cfn resource for AWS::EC2::Instance
+
+=head1 DESCRIPTION
+
+This module implements a Perl module that represents the CloudFormation object AWS::EC2::Instance.
+
+See L<Cfn> for more information on how to use it.
+
+=head1 AUTHOR
+
+    Jose Luis Martinez
+    CAPSiDE
+    jlmartinez@capside.com
+
+=head1 COPYRIGHT and LICENSE
+
+Copyright (c) 2013 by CAPSiDE
+This code is distributed under the Apache 2 License. The full text of the 
+license can be found in the LICENSE file included with this module.
+
+=cut

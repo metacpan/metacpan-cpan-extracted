@@ -4,13 +4,13 @@
       "Paul Evans <leonerd@leonerd.org.uk>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4211",
+   "generated_by" : "Module::Build version 0.4231",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Device-Chip-MCP23x17",
    "prereqs" : {
@@ -22,18 +22,25 @@
       },
       "runtime" : {
          "requires" : {
-            "Device::Chip" : "0.03"
+            "Device::Chip" : "0.03",
+            "Future::AsyncAwait" : "0.47",
+            "Object::Pad" : "0.19",
+            "perl" : "5.026"
          }
       }
    },
    "provides" : {
       "Device::Chip::MCP23S17" : {
          "file" : "lib/Device/Chip/MCP23S17.pm",
-         "version" : "0.01"
+         "version" : "0.02"
       },
       "Device::Chip::MCP23x17" : {
          "file" : "lib/Device/Chip/MCP23x17.pm",
-         "version" : "0.01"
+         "version" : "0.02"
+      },
+      "Device::Chip::MCP23x17::Adapter" : {
+         "file" : "lib/Device/Chip/MCP23x17/Adapter.pm",
+         "version" : "0.02"
       }
    },
    "release_status" : "stable",
@@ -42,5 +49,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.01"
+   "version" : "0.02",
+   "x_serialization_backend" : "JSON::PP version 4.04"
 }

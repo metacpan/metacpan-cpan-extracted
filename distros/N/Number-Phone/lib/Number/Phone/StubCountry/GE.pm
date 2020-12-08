@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20200904144532;
+our $VERSION = 1.20201204215956;
 
 my $formatters = [
                 {
@@ -135,81 +135,81 @@ my $validators = {
                 'voip' => '70[67]\\d{6}'
               };
 my %areanames = ();
-$areanames{en}->{99532} = "Tbilisi";
-$areanames{en}->{995341} = "Rustavi";
-$areanames{en}->{995342} = "Akhalgori";
-$areanames{en}->{995344} = "Tskhinvali";
-$areanames{en}->{995345} = "Stefanstminda\/Kazbegi";
-$areanames{en}->{995346} = "Dusheti";
-$areanames{en}->{995347} = "Djava";
-$areanames{en}->{995348} = "Tianeti";
-$areanames{en}->{995349} = "Akhmeta";
-$areanames{en}->{995350} = "Telavi";
-$areanames{en}->{995351} = "Sagaredjo";
-$areanames{en}->{995352} = "Kvareli";
-$areanames{en}->{995353} = "Gurdjaani";
-$areanames{en}->{995354} = "Lagodekhi";
-$areanames{en}->{995355} = "Signagi";
-$areanames{en}->{995356} = "DedoplisTskaro";
-$areanames{en}->{995357} = "Marneuli";
-$areanames{en}->{995358} = "Bolnisi";
-$areanames{en}->{995359} = "TetriTskaro";
-$areanames{en}->{995360} = "Dmanisi";
-$areanames{en}->{995361} = "Ninotsminda";
-$areanames{en}->{995362} = "Akhalkalaki";
-$areanames{en}->{995363} = "Tsalka";
-$areanames{en}->{995364} = "Aspindza";
-$areanames{en}->{995365} = "Akhaltsikhe";
-$areanames{en}->{995366} = "Adigeni";
-$areanames{en}->{995367} = "Bordjomi";
-$areanames{en}->{995368} = "Khashuri";
-$areanames{en}->{995369} = "Kareli";
-$areanames{en}->{995370} = "Gori";
-$areanames{en}->{995371} = "Kaspi";
-$areanames{en}->{995372} = "Gardabani";
-$areanames{en}->{995373} = "Mtskheta";
-$areanames{en}->{995374} = "Tigvi";
-$areanames{en}->{995410} = "Mestia";
-$areanames{en}->{995411} = "Samtredia";
-$areanames{en}->{995412} = "Abasha";
-$areanames{en}->{995413} = "Senaki";
-$areanames{en}->{995414} = "Xobi";
-$areanames{en}->{995415} = "Zugdidi";
-$areanames{en}->{995416} = "Tsalendjikha";
-$areanames{en}->{995417} = "Chkhorotskhu";
-$areanames{en}->{995418} = "Martvili";
-$areanames{en}->{995419} = "Choxatauri";
-$areanames{en}->{995422} = "Batumi";
-$areanames{en}->{995423} = "Xulo";
-$areanames{en}->{995424} = "Shuaxevi";
-$areanames{en}->{995425} = "Qeda";
-$areanames{en}->{995426} = "Kobuleti";
-$areanames{en}->{995427} = "Xelvachauri";
-$areanames{en}->{995431} = "Kutaisi";
-$areanames{en}->{995432} = "Vani";
-$areanames{en}->{995433} = "Kharagauli";
-$areanames{en}->{995434} = "Bagdati";
-$areanames{en}->{995435} = "Sachkhere";
-$areanames{en}->{995436} = "Tskaltubo";
-$areanames{en}->{995437} = "Lentekhi";
-$areanames{en}->{995439} = "Ambrolauri";
-$areanames{en}->{995442} = "Sukhumi";
-$areanames{en}->{995443} = "Gagra";
-$areanames{en}->{995444} = "Gudauta";
-$areanames{en}->{995445} = "Ochamchire";
-$areanames{en}->{995446} = "Tkvarcheli";
-$areanames{en}->{995447} = "Gali";
-$areanames{en}->{995448} = "Gulripshi";
-$areanames{en}->{995472} = "Tsageri";
-$areanames{en}->{995473} = "Oni";
-$areanames{en}->{995479} = "Chiatura";
-$areanames{en}->{995491} = "Terdjola";
-$areanames{en}->{995492} = "Zestafoni";
-$areanames{en}->{995493} = "Poti";
-$areanames{en}->{995494} = "lanchxuti";
-$areanames{en}->{995495} = "Khoni";
-$areanames{en}->{995496} = "Ozurgeti";
-$areanames{en}->{995497} = "Tkibuli";
+$areanames{en} = {"995493", "Poti",
+"995356", "DedoplisTskaro",
+"995427", "Xelvachauri",
+"995370", "Gori",
+"995426", "Kobuleti",
+"995410", "Mestia",
+"995345", "Stefanstminda\/Kazbegi",
+"995344", "Tskhinvali",
+"995368", "Khashuri",
+"995357", "Marneuli",
+"995443", "Gagra",
+"995354", "Lagodekhi",
+"995355", "Signagi",
+"995347", "Djava",
+"995472", "Tsageri",
+"995479", "Chiatura",
+"995346", "Dusheti",
+"995424", "Shuaxevi",
+"995418", "Martvili",
+"995425", "Qeda",
+"995360", "Dmanisi",
+"995411", "Samtredia",
+"995439", "Ambrolauri",
+"995362", "Akhalkalaki",
+"995444", "Gudauta",
+"995445", "Ochamchire",
+"995495", "Khoni",
+"995494", "lanchxuti",
+"995371", "Kaspi",
+"995432", "Vani",
+"995369", "Kareli",
+"995423", "Xulo",
+"995497", "Tkibuli",
+"995412", "Abasha",
+"995446", "Tkvarcheli",
+"995361", "Ninotsminda",
+"995372", "Gardabani",
+"995431", "Kutaisi",
+"995496", "Ozurgeti",
+"995419", "Choxatauri",
+"995447", "Gali",
+"995353", "Gurdjaani",
+"995341", "Rustavi",
+"995413", "Senaki",
+"995359", "TetriTskaro",
+"995422", "Batumi",
+"995352", "Kvareli",
+"995373", "Mtskheta",
+"995363", "Tsalka",
+"995342", "Akhalgori",
+"995448", "Gulripshi",
+"995351", "Sagaredjo",
+"995349", "Akhmeta",
+"995433", "Kharagauli",
+"995367", "Bordjomi",
+"995473", "Oni",
+"995491", "Terdjola",
+"995436", "Tskaltubo",
+"995358", "Bolnisi",
+"995374", "Tigvi",
+"995415", "Zugdidi",
+"995414", "Xobi",
+"995366", "Adigeni",
+"995437", "Lentekhi",
+"995434", "Bagdati",
+"995350", "Telavi",
+"995435", "Sachkhere",
+"995417", "Chkhorotskhu",
+"995492", "Zestafoni",
+"995348", "Tianeti",
+"995442", "Sukhumi",
+"995416", "Tsalendjikha",
+"99532", "Tbilisi",
+"995365", "Akhaltsikhe",
+"995364", "Aspindza",};
 
     sub new {
       my $class = shift;

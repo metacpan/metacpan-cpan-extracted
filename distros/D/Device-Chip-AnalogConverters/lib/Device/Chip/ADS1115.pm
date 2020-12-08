@@ -6,7 +6,7 @@
 use 5.026;
 use Object::Pad 0.19;
 
-package Device::Chip::ADS1115 0.10;
+package Device::Chip::ADS1115 0.11;
 class Device::Chip::ADS1115
    extends Device::Chip::Base::RegisteredI2C;
 
@@ -25,14 +25,15 @@ C<Device::Chip::ADS1115> - chip driver for F<ADS1115>
 =head1 SYNOPSIS
 
    use Device::Chip::ADS1115;
+   use Future::AsyncAwait;
 
    my $chip = Device::Chip::ADS1115->new;
-   $chip->mount( Device::Chip::Adapter::...->new )->get;
+   await $chip->mount( Device::Chip::Adapter::...->new );
 
-   $chip->change_config( MUX => "0" )->get;
-   $chip->trigger->get;
+   await $chip->change_config( MUX => "0" );
+   await $chip->trigger;
 
-   printf "The voltage is %.2fV\n", $chip->read_adc_voltage->get;
+   printf "The voltage is %.2fV\n", await $chip->read_adc_voltage;
 
 =head1 DESCRIPTION
 
@@ -63,14 +64,14 @@ sub I2C_options
 
 =head1 METHODS
 
-The following methods documented with a trailing call to C<< ->get >> return
-L<Future> instances.
+The following methods documented in an C<await> expression return L<Future>
+instances.
 
 =cut
 
 =head2 read_config
 
-   $config = $chip->read_config->get
+   $config = await $chip->read_config;
 
 Returns a C<HASH> reference containing the chip's current configuration.
 
@@ -111,7 +112,7 @@ async method read_config ()
 
 =head2 change_config
 
-   $chip->change_config( %changes )->get
+   await $chip->change_config( %changes );
 
 Changes the configuration. Any field names not mentioned will be preserved at
 their existing values.
@@ -131,7 +132,7 @@ async method change_config ( %changes )
 
 =head2 trigger
 
-   $chip->trigger->get
+   await $chip->trigger;
 
 Set the C<OS> bit configuration bit, which will cause the chip to take a new
 reading of the currently-selected input channel when in single-shot mode.
@@ -148,7 +149,7 @@ async method trigger ()
 
 =head2 read_adc
 
-   $value = $chip->read_adc->get
+   $value = await $chip->read_adc;
 
 Reads the most recent reading from the result register on the chip. This
 method should be called after a suitable delay after the L</trigger> method
@@ -176,7 +177,7 @@ async method _fullscale ()
 
 =head2 read_adc_voltage
 
-   $voltage = $chip->read_adc_voltage->get
+   $voltage = await $chip->read_adc_voltage;
 
 Reads the most recent reading as per L</read_adc> and converts it into a
 voltage level by taking into account the current setting of the C<PGA>

@@ -1,4 +1,4 @@
-# AWS::Cognito::UserPool generated from spec 11.1.0
+# AWS::Cognito::UserPool generated from spec 18.4.0
 use Moose::Util::TypeConstraints;
 
 coerce 'Cfn::Resource::Properties::AWS::Cognito::UserPool',
@@ -29,11 +29,11 @@ coerce 'Cfn::Resource::Properties::AWS::Cognito::UserPool::StringAttributeConstr
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::Cognito::UserPool::StringAttributeConstraintsValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::Cognito::UserPool::StringAttributeConstraints->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::Cognito::UserPool::StringAttributeConstraintsValue {
+package Cfn::Resource::Properties::Object::AWS::Cognito::UserPool::StringAttributeConstraints {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -73,11 +73,11 @@ coerce 'Cfn::Resource::Properties::AWS::Cognito::UserPool::RecoveryOption',
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::Cognito::UserPool::RecoveryOptionValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::Cognito::UserPool::RecoveryOption->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::Cognito::UserPool::RecoveryOptionValue {
+package Cfn::Resource::Properties::Object::AWS::Cognito::UserPool::RecoveryOption {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -95,11 +95,11 @@ coerce 'Cfn::Resource::Properties::AWS::Cognito::UserPool::PasswordPolicy',
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::Cognito::UserPool::PasswordPolicyValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::Cognito::UserPool::PasswordPolicy->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::Cognito::UserPool::PasswordPolicyValue {
+package Cfn::Resource::Properties::Object::AWS::Cognito::UserPool::PasswordPolicy {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -121,11 +121,11 @@ coerce 'Cfn::Resource::Properties::AWS::Cognito::UserPool::NumberAttributeConstr
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::Cognito::UserPool::NumberAttributeConstraintsValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::Cognito::UserPool::NumberAttributeConstraints->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::Cognito::UserPool::NumberAttributeConstraintsValue {
+package Cfn::Resource::Properties::Object::AWS::Cognito::UserPool::NumberAttributeConstraints {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -143,11 +143,11 @@ coerce 'Cfn::Resource::Properties::AWS::Cognito::UserPool::InviteMessageTemplate
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::Cognito::UserPool::InviteMessageTemplateValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::Cognito::UserPool::InviteMessageTemplate->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::Cognito::UserPool::InviteMessageTemplateValue {
+package Cfn::Resource::Properties::Object::AWS::Cognito::UserPool::InviteMessageTemplate {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -166,11 +166,11 @@ coerce 'Cfn::Resource::Properties::AWS::Cognito::UserPool::VerificationMessageTe
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::Cognito::UserPool::VerificationMessageTemplateValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::Cognito::UserPool::VerificationMessageTemplate->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::Cognito::UserPool::VerificationMessageTemplateValue {
+package Cfn::Resource::Properties::Object::AWS::Cognito::UserPool::VerificationMessageTemplate {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -192,11 +192,11 @@ coerce 'Cfn::Resource::Properties::AWS::Cognito::UserPool::UsernameConfiguration
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::Cognito::UserPool::UsernameConfigurationValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::Cognito::UserPool::UsernameConfiguration->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::Cognito::UserPool::UsernameConfigurationValue {
+package Cfn::Resource::Properties::Object::AWS::Cognito::UserPool::UsernameConfiguration {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -213,11 +213,11 @@ coerce 'Cfn::Resource::Properties::AWS::Cognito::UserPool::UserPoolAddOns',
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::Cognito::UserPool::UserPoolAddOnsValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::Cognito::UserPool::UserPoolAddOns->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::Cognito::UserPool::UserPoolAddOnsValue {
+package Cfn::Resource::Properties::Object::AWS::Cognito::UserPool::UserPoolAddOns {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -234,11 +234,11 @@ coerce 'Cfn::Resource::Properties::AWS::Cognito::UserPool::SmsConfiguration',
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::Cognito::UserPool::SmsConfigurationValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::Cognito::UserPool::SmsConfiguration->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::Cognito::UserPool::SmsConfigurationValue {
+package Cfn::Resource::Properties::Object::AWS::Cognito::UserPool::SmsConfiguration {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -278,11 +278,11 @@ coerce 'Cfn::Resource::Properties::AWS::Cognito::UserPool::SchemaAttribute',
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::Cognito::UserPool::SchemaAttributeValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::Cognito::UserPool::SchemaAttribute->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::Cognito::UserPool::SchemaAttributeValue {
+package Cfn::Resource::Properties::Object::AWS::Cognito::UserPool::SchemaAttribute {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -305,11 +305,11 @@ coerce 'Cfn::Resource::Properties::AWS::Cognito::UserPool::Policies',
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::Cognito::UserPool::PoliciesValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::Cognito::UserPool::Policies->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::Cognito::UserPool::PoliciesValue {
+package Cfn::Resource::Properties::Object::AWS::Cognito::UserPool::Policies {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -326,11 +326,11 @@ coerce 'Cfn::Resource::Properties::AWS::Cognito::UserPool::LambdaConfig',
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::Cognito::UserPool::LambdaConfigValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::Cognito::UserPool::LambdaConfig->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::Cognito::UserPool::LambdaConfigValue {
+package Cfn::Resource::Properties::Object::AWS::Cognito::UserPool::LambdaConfig {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -356,11 +356,11 @@ coerce 'Cfn::Resource::Properties::AWS::Cognito::UserPool::EmailConfiguration',
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::Cognito::UserPool::EmailConfigurationValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::Cognito::UserPool::EmailConfiguration->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::Cognito::UserPool::EmailConfigurationValue {
+package Cfn::Resource::Properties::Object::AWS::Cognito::UserPool::EmailConfiguration {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -381,11 +381,11 @@ coerce 'Cfn::Resource::Properties::AWS::Cognito::UserPool::DeviceConfiguration',
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::Cognito::UserPool::DeviceConfigurationValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::Cognito::UserPool::DeviceConfiguration->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::Cognito::UserPool::DeviceConfigurationValue {
+package Cfn::Resource::Properties::Object::AWS::Cognito::UserPool::DeviceConfiguration {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -403,11 +403,11 @@ coerce 'Cfn::Resource::Properties::AWS::Cognito::UserPool::AdminCreateUserConfig
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::Cognito::UserPool::AdminCreateUserConfigValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::Cognito::UserPool::AdminCreateUserConfig->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::Cognito::UserPool::AdminCreateUserConfigValue {
+package Cfn::Resource::Properties::Object::AWS::Cognito::UserPool::AdminCreateUserConfig {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -426,11 +426,11 @@ coerce 'Cfn::Resource::Properties::AWS::Cognito::UserPool::AccountRecoverySettin
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::Cognito::UserPool::AccountRecoverySettingValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::Cognito::UserPool::AccountRecoverySetting->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::Cognito::UserPool::AccountRecoverySettingValue {
+package Cfn::Resource::Properties::Object::AWS::Cognito::UserPool::AccountRecoverySetting {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -468,3 +468,30 @@ package Cfn::Resource::Properties::AWS::Cognito::UserPool {
 }
 
 1;
+### main pod documentation begin ###
+
+=encoding UTF-8
+
+=head1 NAME
+
+Cfn::Resource::AWS::Cognito::UserPool - Cfn resource for AWS::Cognito::UserPool
+
+=head1 DESCRIPTION
+
+This module implements a Perl module that represents the CloudFormation object AWS::Cognito::UserPool.
+
+See L<Cfn> for more information on how to use it.
+
+=head1 AUTHOR
+
+    Jose Luis Martinez
+    CAPSiDE
+    jlmartinez@capside.com
+
+=head1 COPYRIGHT and LICENSE
+
+Copyright (c) 2013 by CAPSiDE
+This code is distributed under the Apache 2 License. The full text of the 
+license can be found in the LICENSE file included with this module.
+
+=cut

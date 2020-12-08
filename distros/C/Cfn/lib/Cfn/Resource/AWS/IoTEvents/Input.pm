@@ -1,4 +1,4 @@
-# AWS::IoTEvents::Input generated from spec 7.4.0
+# AWS::IoTEvents::Input generated from spec 18.4.0
 use Moose::Util::TypeConstraints;
 
 coerce 'Cfn::Resource::Properties::AWS::IoTEvents::Input',
@@ -51,11 +51,11 @@ coerce 'Cfn::Resource::Properties::AWS::IoTEvents::Input::Attribute',
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::IoTEvents::Input::AttributeValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::IoTEvents::Input::Attribute->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::IoTEvents::Input::AttributeValue {
+package Cfn::Resource::Properties::Object::AWS::IoTEvents::Input::Attribute {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -72,11 +72,11 @@ coerce 'Cfn::Resource::Properties::AWS::IoTEvents::Input::InputDefinition',
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::IoTEvents::Input::InputDefinitionValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::IoTEvents::Input::InputDefinition->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::IoTEvents::Input::InputDefinitionValue {
+package Cfn::Resource::Properties::Object::AWS::IoTEvents::Input::InputDefinition {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -96,3 +96,30 @@ package Cfn::Resource::Properties::AWS::IoTEvents::Input {
 }
 
 1;
+### main pod documentation begin ###
+
+=encoding UTF-8
+
+=head1 NAME
+
+Cfn::Resource::AWS::IoTEvents::Input - Cfn resource for AWS::IoTEvents::Input
+
+=head1 DESCRIPTION
+
+This module implements a Perl module that represents the CloudFormation object AWS::IoTEvents::Input.
+
+See L<Cfn> for more information on how to use it.
+
+=head1 AUTHOR
+
+    Jose Luis Martinez
+    CAPSiDE
+    jlmartinez@capside.com
+
+=head1 COPYRIGHT and LICENSE
+
+Copyright (c) 2013 by CAPSiDE
+This code is distributed under the Apache 2 License. The full text of the 
+license can be found in the LICENSE file included with this module.
+
+=cut

@@ -6,25 +6,29 @@ use warnings;
 use Device::Chip::SDCard;
 use Device::Chip::Adapter;
 
+use Future::AsyncAwait;
 use Getopt::Long;
 use Time::HiRes qw( sleep );
 
 GetOptions(
-   'adapter|A=s' => \( my $ADAPTER = "FTDI" ),
+   'adapter|A=s' => \my $ADAPTER,
+   'count|c=s' => \my $COUNT,
 ) or exit 1;
 
 my $card = Device::Chip::SDCard->new;
-$card->mount(
+await $card->mount(
    Device::Chip::Adapter->new_from_description( $ADAPTER )
-)->get;
+);
 
-$card->initialise->get;
+await $card->initialise;
 print STDERR "Card initialised\n";
 
-my $sectors = $card->size->get / 512;
+my $sectors = ( await $card->size ) / 512;
+
+$sectors = $COUNT if defined $COUNT and $COUNT < $sectors;
 
 foreach my $lba ( 0 .. $sectors ) {
-   my $bytes = $card->read_block( $lba )->get;
+   my $bytes = await $card->read_block( $lba );
    printf STDERR "BLOCK LBA %d of %d\n", $lba, $sectors;
    print $bytes;
 }

@@ -1,4 +1,4 @@
-# AWS::DMS::Endpoint generated from spec 5.3.0
+# AWS::DMS::Endpoint generated from spec 18.4.0
 use Moose::Util::TypeConstraints;
 
 coerce 'Cfn::Resource::Properties::AWS::DMS::Endpoint',
@@ -29,11 +29,11 @@ coerce 'Cfn::Resource::Properties::AWS::DMS::Endpoint::S3Settings',
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::DMS::Endpoint::S3SettingsValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::DMS::Endpoint::S3Settings->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::DMS::Endpoint::S3SettingsValue {
+package Cfn::Resource::Properties::Object::AWS::DMS::Endpoint::S3Settings {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -47,6 +47,33 @@ package Cfn::Resource::Properties::AWS::DMS::Endpoint::S3SettingsValue {
   has ServiceAccessRoleArn => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
 }
 
+subtype 'Cfn::Resource::Properties::AWS::DMS::Endpoint::NeptuneSettings',
+     as 'Cfn::Value';
+
+coerce 'Cfn::Resource::Properties::AWS::DMS::Endpoint::NeptuneSettings',
+  from 'HashRef',
+   via {
+     if (my $f = Cfn::TypeLibrary::try_function($_)) {
+       return $f
+     } else {
+       return Cfn::Resource::Properties::Object::AWS::DMS::Endpoint::NeptuneSettings->new( %$_ );
+     }
+   };
+
+package Cfn::Resource::Properties::Object::AWS::DMS::Endpoint::NeptuneSettings {
+  use Moose;
+  use MooseX::StrictConstructor;
+  extends 'Cfn::Value::TypedValue';
+  
+  has ErrorRetryDuration => (isa => 'Cfn::Value::Integer', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has IamAuthEnabled => (isa => 'Cfn::Value::Boolean', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has MaxFileSize => (isa => 'Cfn::Value::Integer', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has MaxRetryCount => (isa => 'Cfn::Value::Integer', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has S3BucketFolder => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has S3BucketName => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has ServiceAccessRoleArn => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+}
+
 subtype 'Cfn::Resource::Properties::AWS::DMS::Endpoint::MongoDbSettings',
      as 'Cfn::Value';
 
@@ -56,11 +83,11 @@ coerce 'Cfn::Resource::Properties::AWS::DMS::Endpoint::MongoDbSettings',
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::DMS::Endpoint::MongoDbSettingsValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::DMS::Endpoint::MongoDbSettings->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::DMS::Endpoint::MongoDbSettingsValue {
+package Cfn::Resource::Properties::Object::AWS::DMS::Endpoint::MongoDbSettings {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -87,11 +114,11 @@ coerce 'Cfn::Resource::Properties::AWS::DMS::Endpoint::KinesisSettings',
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::DMS::Endpoint::KinesisSettingsValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::DMS::Endpoint::KinesisSettings->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::DMS::Endpoint::KinesisSettingsValue {
+package Cfn::Resource::Properties::Object::AWS::DMS::Endpoint::KinesisSettings {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -99,6 +126,28 @@ package Cfn::Resource::Properties::AWS::DMS::Endpoint::KinesisSettingsValue {
   has MessageFormat => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has ServiceAccessRoleArn => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has StreamArn => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+}
+
+subtype 'Cfn::Resource::Properties::AWS::DMS::Endpoint::KafkaSettings',
+     as 'Cfn::Value';
+
+coerce 'Cfn::Resource::Properties::AWS::DMS::Endpoint::KafkaSettings',
+  from 'HashRef',
+   via {
+     if (my $f = Cfn::TypeLibrary::try_function($_)) {
+       return $f
+     } else {
+       return Cfn::Resource::Properties::Object::AWS::DMS::Endpoint::KafkaSettings->new( %$_ );
+     }
+   };
+
+package Cfn::Resource::Properties::Object::AWS::DMS::Endpoint::KafkaSettings {
+  use Moose;
+  use MooseX::StrictConstructor;
+  extends 'Cfn::Value::TypedValue';
+  
+  has Broker => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has Topic => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
 }
 
 subtype 'Cfn::Resource::Properties::AWS::DMS::Endpoint::ElasticsearchSettings',
@@ -110,11 +159,11 @@ coerce 'Cfn::Resource::Properties::AWS::DMS::Endpoint::ElasticsearchSettings',
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::DMS::Endpoint::ElasticsearchSettingsValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::DMS::Endpoint::ElasticsearchSettings->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::DMS::Endpoint::ElasticsearchSettingsValue {
+package Cfn::Resource::Properties::Object::AWS::DMS::Endpoint::ElasticsearchSettings {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -134,11 +183,11 @@ coerce 'Cfn::Resource::Properties::AWS::DMS::Endpoint::DynamoDbSettings',
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::DMS::Endpoint::DynamoDbSettingsValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::DMS::Endpoint::DynamoDbSettings->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::DMS::Endpoint::DynamoDbSettingsValue {
+package Cfn::Resource::Properties::Object::AWS::DMS::Endpoint::DynamoDbSettings {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -159,9 +208,11 @@ package Cfn::Resource::Properties::AWS::DMS::Endpoint {
   has EndpointType => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has EngineName => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has ExtraConnectionAttributes => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has KafkaSettings => (isa => 'Cfn::Resource::Properties::AWS::DMS::Endpoint::KafkaSettings', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has KinesisSettings => (isa => 'Cfn::Resource::Properties::AWS::DMS::Endpoint::KinesisSettings', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has KmsKeyId => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
   has MongoDbSettings => (isa => 'Cfn::Resource::Properties::AWS::DMS::Endpoint::MongoDbSettings', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has NeptuneSettings => (isa => 'Cfn::Resource::Properties::AWS::DMS::Endpoint::NeptuneSettings', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has Password => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has Port => (isa => 'Cfn::Value::Integer', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has S3Settings => (isa => 'Cfn::Resource::Properties::AWS::DMS::Endpoint::S3Settings', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
@@ -172,3 +223,30 @@ package Cfn::Resource::Properties::AWS::DMS::Endpoint {
 }
 
 1;
+### main pod documentation begin ###
+
+=encoding UTF-8
+
+=head1 NAME
+
+Cfn::Resource::AWS::DMS::Endpoint - Cfn resource for AWS::DMS::Endpoint
+
+=head1 DESCRIPTION
+
+This module implements a Perl module that represents the CloudFormation object AWS::DMS::Endpoint.
+
+See L<Cfn> for more information on how to use it.
+
+=head1 AUTHOR
+
+    Jose Luis Martinez
+    CAPSiDE
+    jlmartinez@capside.com
+
+=head1 COPYRIGHT and LICENSE
+
+Copyright (c) 2013 by CAPSiDE
+This code is distributed under the Apache 2 License. The full text of the 
+license can be found in the LICENSE file included with this module.
+
+=cut

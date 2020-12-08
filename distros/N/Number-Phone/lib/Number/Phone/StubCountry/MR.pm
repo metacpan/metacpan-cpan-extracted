@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20200904144534;
+our $VERSION = 1.20201204215957;
 
 my $formatters = [
                 {
@@ -55,30 +55,19 @@ my $validators = {
                 'voip' => ''
               };
 my %areanames = ();
-$areanames{en}->{22245} = "Nouakchott";
-$areanames{en}->{2224513} = "Néma";
-$areanames{en}->{2224515} = "Aioun";
-$areanames{en}->{2224533} = "Kaédi";
-$areanames{en}->{2224534} = "Sélibaby";
-$areanames{en}->{2224537} = "Aleg";
-$areanames{en}->{2224544} = "Zouérat";
-$areanames{en}->{2224546} = "Atar";
-$areanames{en}->{2224550} = "Boghé";
-$areanames{en}->{2224563} = "Kiffa";
-$areanames{en}->{2224569} = "Rosso\/Tidjikja";
-$areanames{en}->{2224574} = "Nouadhibou";
-$areanames{fr}->{22245} = "Nouakchott";
-$areanames{fr}->{2224513} = "Néma";
-$areanames{fr}->{2224515} = "Aîoun";
-$areanames{fr}->{2224533} = "Kaédi";
-$areanames{fr}->{2224534} = "Sélibaby";
-$areanames{fr}->{2224537} = "Aleg";
-$areanames{fr}->{2224544} = "Zouérat";
-$areanames{fr}->{2224546} = "Atar";
-$areanames{fr}->{2224550} = "Boghé";
-$areanames{fr}->{2224563} = "Kiffa";
-$areanames{fr}->{2224569} = "Rosso\/Tidjikja";
-$areanames{fr}->{2224574} = "Nouadhibou";
+$areanames{en} = {"2224550", "Boghé",
+"2224544", "Zouérat",
+"2224537", "Aleg",
+"2224533", "Kaédi",
+"2224513", "Néma",
+"22245", "Nouakchott",
+"2224569", "Rosso\/Tidjikja",
+"2224515", "Aioun",
+"2224534", "Sélibaby",
+"2224563", "Kiffa",
+"2224574", "Nouadhibou",
+"2224546", "Atar",};
+$areanames{fr} = {"2224515", "Aîoun",};
 
     sub new {
       my $class = shift;

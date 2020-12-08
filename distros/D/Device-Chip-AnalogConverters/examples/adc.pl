@@ -1,10 +1,11 @@
 #!/usr/bin/perl
 
-use strict;
+use v5.26;
 use warnings;
 
 use Device::Chip::Adapter;
 
+use Future::AsyncAwait;
 use Getopt::Long;
 use Time::HiRes qw( sleep );
 
@@ -27,12 +28,12 @@ my $chip = do {
    $chipclass->new;
 };
 
-$chip->mount_from_paramstr(
+await $chip->mount_from_paramstr(
    Device::Chip::Adapter->new_from_description( $ADAPTER ),
    $MOUNTPARAMS,
-)->get;
+);
 
-$chip->protocol->power(1)->get;
+await $chip->protocol->power(1);
 END { $chip->protocol->power(0)->get if $chip }
 
 $SIG{INT} = $SIG{TERM} = sub { exit 1; };
@@ -43,31 +44,31 @@ my $HAVE_READ_ADC_RATIO   = $chip->can( 'read_adc_ratio' );
 
 if( @ARGV ) {
    my %changes = map { ( $_ =~ m/^(.*?)=(.*)/ ) } @ARGV;
-   $chip->change_config( %changes )->get;
+   await $chip->change_config( %changes );
 
    sleep 0.1; # Allow chip to settle from any config changes
 }
 
 if( $chip->can( "init" ) ) {
-   $chip->init->get;
+   await $chip->init;
 }
 
 if( $PRINT_CONFIG ) {
-   my $config = $chip->read_config->get;
+   my $config = await $chip->read_config;
    printf "%20s: %s\n", $_, $config->{$_} for sort keys %$config;
 }
 
 while( 1 ) {
-   $chip->trigger->get, sleep 0.05 if $HAVE_TRIGGER;
+   ( await $chip->trigger ), sleep 0.05 if $HAVE_TRIGGER;
 
    if( $HAVE_READ_ADC_VOLTAGE ) {
-      printf "ADC voltage %fV\n", $chip->read_adc_voltage->get;
+      printf "ADC voltage %fV\n", await $chip->read_adc_voltage;
    }
    elsif( $HAVE_READ_ADC_RATIO and defined $REFERENCE ) {
-      printf "ADC voltage %fV\n", $chip->read_adc_ratio->get * $REFERENCE;
+      printf "ADC voltage %fV\n", ( await $chip->read_adc_ratio ) * $REFERENCE;
    }
    else {
-      printf "ADC raw value: %X\n", $chip->read_adc->get;
+      printf "ADC raw value: %X\n", await $chip->read_adc;
    }
 
    sleep $INTERVAL;

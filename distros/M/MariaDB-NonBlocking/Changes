@@ -1,5 +1,15 @@
 Revision history for MariaDB-NonBlocking
 
+0.30    2020-12-07
+        * An attempt at solving the hanging SSL issue; we no
+          longer try to optimize the number of IO watchers,
+          and now always run a watcher for both reads and writes.
+        * Some build systems (not cpanm) differentiate betweem
+          CONFIGURE_REQUIRES and BUILD_REQUIRES; a module may
+          be present in the CONFIGURE stage, but not available
+          during BUILD; so make sure that Alien::libmariadbclient
+          is around when we need it.
+
 0.29    2020-11-30
         * Support systems that provide libmariadb.so but no
           libmariadbclient.a (e.g. alpine's apk)

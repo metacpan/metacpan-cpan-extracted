@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20200904144532;
+our $VERSION = 1.20201204215956;
 
 my $formatters = [
                 {
@@ -64,66 +64,66 @@ my $validators = {
                 'voip' => ''
               };
 my %areanames = ();
-$areanames{en}->{2410140} = "Kango";
-$areanames{en}->{24101420} = "Ntoum";
-$areanames{en}->{24101424} = "Cocobeach";
-$areanames{en}->{2410144} = "Libreville";
-$areanames{en}->{2410145} = "Libreville";
-$areanames{en}->{2410146} = "Libreville";
-$areanames{en}->{2410147} = "Libreville";
-$areanames{en}->{2410148} = "Libreville";
-$areanames{en}->{2410150} = "Gamba";
-$areanames{en}->{2410154} = "Omboué";
-$areanames{en}->{2410155} = "Port\-Gentil";
-$areanames{en}->{2410156} = "Port\-Gentil";
-$areanames{en}->{2410158} = "Lambaréné";
-$areanames{en}->{2410159} = "Ndjolé";
-$areanames{en}->{2410160} = "Ngouoni";
-$areanames{en}->{2410162} = "Mounana";
-$areanames{en}->{2410164} = "Lastoursville";
-$areanames{en}->{2410165} = "Koulamoutou";
-$areanames{en}->{2410166} = "Moanda";
-$areanames{en}->{2410167} = "Franceville";
-$areanames{en}->{2410169} = "Léconi\/Akiéni\/Okondja";
-$areanames{en}->{241017} = "Libreville";
-$areanames{en}->{2410182} = "Tchibanga";
-$areanames{en}->{2410183} = "Mayumba";
-$areanames{en}->{2410186} = "Mouila";
-$areanames{en}->{2410190} = "Makokou";
-$areanames{en}->{2410192} = "Mékambo";
-$areanames{en}->{2410193} = "Booué";
-$areanames{en}->{2410196} = "Bitam";
-$areanames{en}->{2410198} = "Oyem";
-$areanames{en}->{2411140} = "Kango";
-$areanames{en}->{24111420} = "Ntoum";
-$areanames{en}->{24111424} = "Cocobeach";
-$areanames{en}->{2411144} = "Libreville";
-$areanames{en}->{2411145} = "Libreville";
-$areanames{en}->{2411146} = "Libreville";
-$areanames{en}->{2411147} = "Libreville";
-$areanames{en}->{2411148} = "Libreville";
-$areanames{en}->{2411150} = "Gamba";
-$areanames{en}->{2411154} = "Omboué";
-$areanames{en}->{2411155} = "Port\-Gentil";
-$areanames{en}->{2411156} = "Port\-Gentil";
-$areanames{en}->{2411158} = "Lambaréné";
-$areanames{en}->{2411159} = "Ndjolé";
-$areanames{en}->{2411160} = "Ngouoni";
-$areanames{en}->{2411162} = "Mounana";
-$areanames{en}->{2411164} = "Lastoursville";
-$areanames{en}->{2411165} = "Koulamoutou";
-$areanames{en}->{2411166} = "Moanda";
-$areanames{en}->{2411167} = "Franceville";
-$areanames{en}->{2411169} = "Léconi\/Akiéni\/Okondja";
-$areanames{en}->{241117} = "Libreville";
-$areanames{en}->{2411182} = "Tchibanga";
-$areanames{en}->{2411183} = "Mayumba";
-$areanames{en}->{2411186} = "Mouila";
-$areanames{en}->{2411190} = "Makokou";
-$areanames{en}->{2411192} = "Mékambo";
-$areanames{en}->{2411193} = "Booué";
-$areanames{en}->{2411196} = "Bitam";
-$areanames{en}->{2411198} = "Oyem";
+$areanames{en} = {"2411156", "Port\-Gentil",
+"2411146", "Libreville",
+"2410156", "Port\-Gentil",
+"2410146", "Libreville",
+"2410169", "Léconi\/Akiéni\/Okondja",
+"2411169", "Léconi\/Akiéni\/Okondja",
+"2410166", "Moanda",
+"2410183", "Mayumba",
+"2411183", "Mayumba",
+"2411166", "Moanda",
+"2411159", "Ndjolé",
+"2410159", "Ndjolé",
+"2410154", "Omboué",
+"2410144", "Libreville",
+"2411160", "Ngouoni",
+"2411154", "Omboué",
+"2411144", "Libreville",
+"2410160", "Ngouoni",
+"2410150", "Gamba",
+"2410162", "Mounana",
+"2411164", "Lastoursville",
+"2410140", "Kango",
+"2411150", "Gamba",
+"2411162", "Mounana",
+"2410164", "Lastoursville",
+"2411140", "Kango",
+"2411158", "Lambaréné",
+"2411148", "Libreville",
+"2410193", "Booué",
+"2410158", "Lambaréné",
+"2411193", "Booué",
+"2410148", "Libreville",
+"2410145", "Libreville",
+"2410155", "Port\-Gentil",
+"2411145", "Libreville",
+"2411155", "Port\-Gentil",
+"2411167", "Franceville",
+"2410167", "Franceville",
+"2411165", "Koulamoutou",
+"2410182", "Tchibanga",
+"2411182", "Tchibanga",
+"2410165", "Koulamoutou",
+"2410196", "Bitam",
+"2411196", "Bitam",
+"2410147", "Libreville",
+"2411147", "Libreville",
+"2411190", "Makokou",
+"2410190", "Makokou",
+"2410198", "Oyem",
+"2411198", "Oyem",
+"241117", "Libreville",
+"241017", "Libreville",
+"2410192", "Mékambo",
+"2411192", "Mékambo",
+"2410186", "Mouila",
+"2411186", "Mouila",
+"24111420", "Ntoum",
+"24111424", "Cocobeach",
+"24101420", "Ntoum",
+"24101424", "Cocobeach",};
 
     sub new {
       my $class = shift;

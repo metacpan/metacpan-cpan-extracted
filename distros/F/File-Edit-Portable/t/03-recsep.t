@@ -46,8 +46,8 @@ my $rw = File::Edit::Portable->new;
     my @os = qw(win mac nix unknown unknown);
 
     for ("\r\n", "\r", "\n"){
-
         my $fname = $rw->_temp_filename;
+
         $rw->write(file => $fname, contents => [qw(abc)], recsep => $_);
 
         my $os = $rw->recsep($fname, 'type');
@@ -57,6 +57,8 @@ my $rw = File::Edit::Portable->new;
         my $os_name = shift @os;
 
         is ($m[0], $os_name, "$m[0] recsep matches type");
+
+        is unlink($fname), 1, "temp file unlinked ok";
     }
 }
 

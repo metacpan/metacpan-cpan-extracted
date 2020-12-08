@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20200904144528;
+our $VERSION = 1.20201204215954;
 
 my $formatters = [
                 {
@@ -45,7 +45,20 @@ my $formatters = [
 my $validators = {
                 'fixed_line' => '222[1-589]\\d{5}',
                 'geographic' => '222[1-589]\\d{5}',
-                'mobile' => '0[14-6]\\d{7}',
+                'mobile' => '
+          026(?:
+            1[0-5]|
+            6[6-9]
+          )\\d{4}|
+          0(?:
+            [14-6]\\d\\d|
+            2(?:
+              40|
+              5[5-8]|
+              6[07-9]
+            )
+          )\\d{5}
+        ',
                 'pager' => '',
                 'personal_number' => '',
                 'specialrate' => '(
@@ -58,20 +71,14 @@ my $validators = {
                 'voip' => ''
               };
 my %areanames = ();
-$areanames{en}->{2422221} = "Cuvette";
-$areanames{en}->{2422222} = "Likouala\/Sangha";
-$areanames{en}->{2422223} = "Pool";
-$areanames{en}->{2422224} = "Plateaux";
-$areanames{en}->{2422225} = "Bouenza\/Lekoumou\/Niari";
-$areanames{en}->{2422228} = "Brazzaville";
-$areanames{en}->{2422229} = "Pointe\-Noire";
-$areanames{fr}->{2422221} = "Cuvette";
-$areanames{fr}->{2422222} = "Likouala\/Sangha";
-$areanames{fr}->{2422223} = "Pool";
-$areanames{fr}->{2422224} = "Plateaux";
-$areanames{fr}->{2422225} = "Bouenza\/Lekoumou\/Niari";
-$areanames{fr}->{2422228} = "Brazzaville";
-$areanames{fr}->{2422229} = "Pointe\-Noire";
+$areanames{fr} = {};
+$areanames{en} = {"2422223", "Pool",
+"2422228", "Brazzaville",
+"2422229", "Pointe\-Noire",
+"2422221", "Cuvette",
+"2422222", "Likouala\/Sangha",
+"2422224", "Plateaux",
+"2422225", "Bouenza\/Lekoumou\/Niari",};
 
     sub new {
       my $class = shift;

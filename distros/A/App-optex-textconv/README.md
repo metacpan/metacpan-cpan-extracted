@@ -5,13 +5,15 @@ textconv - optex module to replace document file by its text contents
 
 # VERSION
 
-Version 0.10
+Version 0.11
 
 # SYNOPSIS
 
 optex command -Mtextconv
 
 optex command -Mtc (alias module)
+
+optex command -Mtextconv::load=pandoc
 
 # DESCRIPTION
 
@@ -33,6 +35,22 @@ Next command simply produces the same result.
 
     $ diff OLD.docx NEW.docx
 
+# MICROSOFT DOCUMENTS
+
+Microsoft office document in XML format (.docx, .pptx, .xlsx) is
+converted to plain text by original code implemented in
+`App::optex::textconv::msdoc` module.  Algorithm used in this module
+is extremely simple, and consequently runs fast.
+
+Two module are included in this distribution to use other external
+converter program, **pandoc** and **tika**, those implement much more
+serious algorithm.  They can be invoked by calling **load** function
+with module declaration like:
+
+    optex -Mtextconv::load=pandoc
+
+    optex -Mtextconv::load=tika
+
 # INSTALL
 
 ## CPANM
@@ -43,7 +61,7 @@ Next command simply produces the same result.
 
 ## GIT
 
-Those are sample configurations using [App::optex::textconv](https://metacpan.org/pod/App::optex::textconv) in git
+These are sample configurations using [App::optex::textconv](https://metacpan.org/pod/App::optex::textconv) in git
 environment.
 
         ~/.gitconfig
@@ -61,6 +79,9 @@ environment.
                 *.pdf    diff=pdf
                 *.jpg    diff=jpg
 
+About other GIT related setting, see
+[https://github.com/kaz-utashiro/sdif-tools](https://github.com/kaz-utashiro/sdif-tools).
+
 # SEE ALSO
 
 [https://github.com/kaz-utashiro/optex](https://github.com/kaz-utashiro/optex)
@@ -68,6 +89,8 @@ environment.
 [https://github.com/kaz-utashiro/optex-textconv](https://github.com/kaz-utashiro/optex-textconv)
 
 [https://qiita.com/kaz-utashiro/items/23fd825bd325240592c2](https://qiita.com/kaz-utashiro/items/23fd825bd325240592c2)
+
+[https://github.com/kaz-utashiro/sdif-tools](https://github.com/kaz-utashiro/sdif-tools)
 
 # AUTHOR
 

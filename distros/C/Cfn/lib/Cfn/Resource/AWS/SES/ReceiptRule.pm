@@ -1,4 +1,4 @@
-# AWS::SES::ReceiptRule generated from spec 2.25.0
+# AWS::SES::ReceiptRule generated from spec 18.4.0
 use Moose::Util::TypeConstraints;
 
 coerce 'Cfn::Resource::Properties::AWS::SES::ReceiptRule',
@@ -29,11 +29,11 @@ coerce 'Cfn::Resource::Properties::AWS::SES::ReceiptRule::WorkmailAction',
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::SES::ReceiptRule::WorkmailActionValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::SES::ReceiptRule::WorkmailAction->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::SES::ReceiptRule::WorkmailActionValue {
+package Cfn::Resource::Properties::Object::AWS::SES::ReceiptRule::WorkmailAction {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -51,11 +51,11 @@ coerce 'Cfn::Resource::Properties::AWS::SES::ReceiptRule::StopAction',
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::SES::ReceiptRule::StopActionValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::SES::ReceiptRule::StopAction->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::SES::ReceiptRule::StopActionValue {
+package Cfn::Resource::Properties::Object::AWS::SES::ReceiptRule::StopAction {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -73,11 +73,11 @@ coerce 'Cfn::Resource::Properties::AWS::SES::ReceiptRule::SNSAction',
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::SES::ReceiptRule::SNSActionValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::SES::ReceiptRule::SNSAction->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::SES::ReceiptRule::SNSActionValue {
+package Cfn::Resource::Properties::Object::AWS::SES::ReceiptRule::SNSAction {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -95,11 +95,11 @@ coerce 'Cfn::Resource::Properties::AWS::SES::ReceiptRule::S3Action',
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::SES::ReceiptRule::S3ActionValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::SES::ReceiptRule::S3Action->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::SES::ReceiptRule::S3ActionValue {
+package Cfn::Resource::Properties::Object::AWS::SES::ReceiptRule::S3Action {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -119,11 +119,11 @@ coerce 'Cfn::Resource::Properties::AWS::SES::ReceiptRule::LambdaAction',
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::SES::ReceiptRule::LambdaActionValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::SES::ReceiptRule::LambdaAction->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::SES::ReceiptRule::LambdaActionValue {
+package Cfn::Resource::Properties::Object::AWS::SES::ReceiptRule::LambdaAction {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -142,11 +142,11 @@ coerce 'Cfn::Resource::Properties::AWS::SES::ReceiptRule::BounceAction',
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::SES::ReceiptRule::BounceActionValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::SES::ReceiptRule::BounceAction->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::SES::ReceiptRule::BounceActionValue {
+package Cfn::Resource::Properties::Object::AWS::SES::ReceiptRule::BounceAction {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -167,11 +167,11 @@ coerce 'Cfn::Resource::Properties::AWS::SES::ReceiptRule::AddHeaderAction',
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::SES::ReceiptRule::AddHeaderActionValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::SES::ReceiptRule::AddHeaderAction->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::SES::ReceiptRule::AddHeaderActionValue {
+package Cfn::Resource::Properties::Object::AWS::SES::ReceiptRule::AddHeaderAction {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -211,11 +211,11 @@ coerce 'Cfn::Resource::Properties::AWS::SES::ReceiptRule::Action',
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::SES::ReceiptRule::ActionValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::SES::ReceiptRule::Action->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::SES::ReceiptRule::ActionValue {
+package Cfn::Resource::Properties::Object::AWS::SES::ReceiptRule::Action {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -238,11 +238,11 @@ coerce 'Cfn::Resource::Properties::AWS::SES::ReceiptRule::Rule',
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::SES::ReceiptRule::RuleValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::SES::ReceiptRule::Rule->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::SES::ReceiptRule::RuleValue {
+package Cfn::Resource::Properties::Object::AWS::SES::ReceiptRule::Rule {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -266,3 +266,30 @@ package Cfn::Resource::Properties::AWS::SES::ReceiptRule {
 }
 
 1;
+### main pod documentation begin ###
+
+=encoding UTF-8
+
+=head1 NAME
+
+Cfn::Resource::AWS::SES::ReceiptRule - Cfn resource for AWS::SES::ReceiptRule
+
+=head1 DESCRIPTION
+
+This module implements a Perl module that represents the CloudFormation object AWS::SES::ReceiptRule.
+
+See L<Cfn> for more information on how to use it.
+
+=head1 AUTHOR
+
+    Jose Luis Martinez
+    CAPSiDE
+    jlmartinez@capside.com
+
+=head1 COPYRIGHT and LICENSE
+
+Copyright (c) 2013 by CAPSiDE
+This code is distributed under the Apache 2 License. The full text of the 
+license can be found in the LICENSE file included with this module.
+
+=cut

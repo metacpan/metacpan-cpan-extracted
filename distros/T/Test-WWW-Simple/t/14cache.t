@@ -1,59 +1,55 @@
-use Test::More;
+#!/usr/bin/env perl
+use strict;
+use warnings;
 
-eval "require HTTP::Daemon";
-if( $@ ) {
-    plan skip_all => 'HTTP::Daemon unavailable';
-}
-elsif ( $^O eq 'MSWin32') {
-    plan skip_all => 'Piped open not available';
-}
-else {
-    plan tests => 9;
-}
+use Test2::V0;
+use Test2::Mock;
+
+plan tests => 9;
 
 use Test::WWW::Simple;
 
-$SIG{PIPE} = sub {};
+my @values = qw(aaaaa bbbbb ccccc ddddd STOPPER);
+my $current;
+my $caching = 1;
+my $resp;
+my $mock = Test2::Mock->new(
+  class => 'WWW::Mechanize',
+  override => [
+    get => sub {
+      my $value = $_[1] =~ /perl/ ? 'perl' : shift @values;
+      $resp = HTTP::Response->new(200, '200 OK', undef, $value);
+      return $resp;
+    },
+    success => sub {1},
+    content => sub {
+      return $resp->content;
+    },
+    response => sub {
+      return $resp;
+    },
+  ],
+);
+my $mock2 = Test2::Mock->new(
+  class => 'HTTP::Response',
+  override => [
+    status_line => sub { "200 OK" },
+  ],
+);
 
-my $pid = open($child, "-|");
-if ($pid == 0) {
-  my @values = qw(aaaaa bbbbb ccccc ddddd eeeee fffff ggggg);
-  my $index = 0;
-  diag "Starting test webserver";
-  $daemon = HTTP::Daemon->new(LocalAddr => '127.0.0.1');
-  print STDOUT $daemon->url;
-  close STDOUT;
-DAEMON: 
-  while (my $connection = $daemon->accept) {
-    while (my $request = $connection->get_request) {
-      last DAEMON if ($request->uri->as_string =~ /stop/); 
-      $connection->send_response($values[$index]);
-      $index++;
-    }
-    $connection ->close;
-    undef $connection;
-  }
-  diag "daemon stopped";
-}
-else {
-  chomp(my $url = <$child>);
-  diag "Webserver up on $url";
-  # actual tests go here
-  no_cache;
-  page_like($url, qr/aaaaa/, 'initial value as expected');
-  page_like($url, qr/bbbbb/, 'reaccessed as expected');
-  cache;
-  page_like('http://perl.org', qr/perl/i,   'intervening page');
-  page_like($url, qr/bbbbb/, 'cached from last get');
-  page_like($url, qr/bbbbb/, 'remains cached');
-  no_cache "turned off again";
-  page_like($url, qr/ccccc/, 'reaccessed again as expected');
-  page_like('http://perl.org', qr/perl/i,   'intervening page');
-  cache "back on again";
-  page_like($url, qr/ccccc/, 'return to last cached value');
-  no_cache;
-  page_like($url, qr/ddddd/, 'now a new value');
-  
-  diag "Shutting down test webserver";
-  mech->get($url . "/stop");
-}
+ # actual tests go here
+ no_cache "start without cache";
+ my $url = 'http://is.mocked.com';
+ page_like($url, qr/aaaaa/, 'initial value as expected');
+ page_like($url, qr/bbbbb/, 'reaccessed as expected');
+ cache "turn cache on";
+ page_like('http://perl.org', qr/perl/i,   'intervening page');
+ page_like($url, qr/bbbbb/, 'cached from last get');
+ page_like($url, qr/bbbbb/, 'remains cached');
+ no_cache "turn back off";
+ page_like($url, qr/ccccc/, 'reaccessed again as expected');
+ page_like('http://perl.org', qr/perl/i,   'intervening page');
+ cache "turn back on";
+ page_like($url, qr/ccccc/, 'return to last cached value');
+ no_cache "turn back off";
+ page_like($url, qr/ddddd/, 'now a new value');

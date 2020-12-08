@@ -7,7 +7,6 @@ lib/Device/Chip/PCF8574.pm
 lib/Device/Chip/PCF8575.pm
 lib/Device/Chip/PCF857x.pm
 LICENSE
-Makefile.PL
 MANIFEST			This list of files
 META.json
 META.yml

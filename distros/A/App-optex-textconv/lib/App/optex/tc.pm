@@ -5,6 +5,9 @@ use warnings;
 
 use App::optex::textconv;
 
-*initialize = \&App::optex::textconv::initialize;
+for my $sub (qw(initialize finalize load)) {
+    no strict 'refs';
+    *{$sub} = \&{"App::optex::textconv::$sub"};
+}
 
 1;

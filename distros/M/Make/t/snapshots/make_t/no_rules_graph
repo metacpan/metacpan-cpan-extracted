@@ -1,0 +1,34 @@
+[
+  {
+    'all' => {},
+    'bar' => {},
+    'sany' => {}
+  },
+  {
+    'all' => {
+      'bar' => {
+        '0' => {
+          'recipe' => [],
+          'recipe_raw' => []
+        }
+      },
+      'sany' => {
+        '0' => $VAR1->[1]{'all'}{'bar'}{'0'}
+      }
+    },
+    'sany' => {
+      'sany' => {
+        '0' => {
+          'recipe' => [
+            'cd subdir && $(MK)',
+            'say hi'
+          ],
+          'recipe_raw' => [
+            'cd subdir && $(MK)',
+            'say hi'
+          ]
+        }
+      }
+    }
+  }
+]

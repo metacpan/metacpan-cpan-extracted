@@ -1,0 +1,12 @@
+Revision history for Perl extension RogueCurses.
+
+0.0.3 Mon Dec 7
+	- finished partial speed grep, lib Lubina responds to it
+
+0.0.2 Sun Dec 6
+	- start on lib Lubina, sample and strategy library
+
+0.0.1  Sun Dec  6 23:57:17 2020
+	- original version; created by h2xs 1.23 with options
+		-X -n RogueCurses
+

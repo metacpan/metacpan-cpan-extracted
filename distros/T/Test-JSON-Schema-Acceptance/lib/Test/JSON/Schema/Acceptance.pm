@@ -1,10 +1,10 @@
 use strict;
 use warnings;
-package Test::JSON::Schema::Acceptance; # git description: v1.001-8-gf2f5951
+package Test::JSON::Schema::Acceptance; # git description: v1.002-6-g278f665
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Acceptance testing for JSON-Schema based validators like JSON::Schema
 
-our $VERSION = '1.002';
+our $VERSION = '1.003';
 
 use 5.014;
 no if "$]" >= 5.031009, feature => 'indirect';
@@ -208,7 +208,6 @@ sub _run_test {
 
   Test2::API::run_subtest($test_name,
     sub {
-      my $ctx = Test2::API::context;
       my ($result, $schema_before, $data_before, $schema_after, $data_after);
       try {
         {
@@ -229,15 +228,17 @@ sub _run_test {
             $test_group->{schema}, $test->{data};
         }
 
+        my $ctx = Test2::API::context;
+
         # skip the ugly matrix comparison
+        my $expected = $test->{valid} ? 'true' : 'false';
         if ($result xor $test->{valid}) {
           my $got = $result ? 'true' : 'false';
-          my $expected = $test->{valid} ? 'true' : 'false';
           $ctx->fail('test failed', 'expected '.$expected.'; got '.$got);
           $pass = 0;
         }
         else {
-          $ctx->ok(1, 'test passes');
+          $ctx->ok(1, 'test passes: data is valid: '.$expected);
           $pass = 1;
         }
 
@@ -245,13 +246,15 @@ sub _run_test {
           if $data_before ne $data_after;
         $pass &&= Test2::Tools::Compare::is($schema_after, $schema_before, 'evaluator did not mutate schema')
           if $schema_before ne $schema_after;
+
+        $ctx->release;
       }
       catch {
         chomp(my $exception = $_);
+        my $ctx = Test2::API::context;
         $ctx->fail('died: '.$exception);
+        $ctx->release;
       };
-
-      $ctx->release;
     },
     { buffered => 1, inherit_trace => 1 },
   );
@@ -335,7 +338,7 @@ Test::JSON::Schema::Acceptance - Acceptance testing for JSON-Schema based valida
 
 =head1 VERSION
 
-version 1.002
+version 1.003
 
 =head1 SYNOPSIS
 

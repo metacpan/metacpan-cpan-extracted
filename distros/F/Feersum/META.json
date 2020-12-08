@@ -4,7 +4,7 @@
       "Jeremy Stashewsky <stash@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.143240",
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -27,7 +27,10 @@
             "AnyEvent" : "5.261",
             "Guard" : "1.012",
             "Test::Fatal" : "0.003",
-            "Test::More" : "0.94"
+            "Test::LeakTrace" : "0.13",
+            "Test::More" : "0.94",
+            "Test::SharedFork" : "0.25",
+            "Test::TCP" : "1.12"
          }
       },
       "configure" : {
@@ -38,14 +41,12 @@
       },
       "runtime" : {
          "recommends" : {
-            "JSON::XS" : "2",
-            "Plack" : "0.995",
-            "Test::LeakTrace" : "0.13",
-            "Test::TCP" : "1.12"
+            "JSON::XS" : "2"
          },
          "requires" : {
             "EV" : "4",
             "HTTP::Entity::Parser" : "0.20",
+            "Plack" : "0.995",
             "Scalar::Util" : "1.19"
          }
       }
@@ -60,5 +61,6 @@
          "url" : "git://github.com/stash/Feersum.git"
       }
    },
-   "version" : "1.407"
+   "version" : "1.410",
+   "x_serialization_backend" : "JSON::PP version 2.97001"
 }

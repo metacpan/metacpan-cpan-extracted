@@ -72,7 +72,7 @@ sub get_content {
 
         GET_DATA: while ( 1 ) {
             my ( $aoa, $open_mode );
-            if ( ! $skip_to ) {
+            if ( ! $skip_to || $skip_to eq 'GET_DATA' ) {
                 delete $sf->{i}{ct}{default_table_name};
                 #$sf->{i}{gc}{previous_file_fs} = $sf->{i}{gc}{file_fs} // ''; # DBBrowser.pm 635
                 my $ok;
@@ -87,6 +87,7 @@ sub get_content {
                 }
                 if ( ! $ok ) {
                     return if $data_source_choice < 3;
+                    $skip_to = '';
                     next MENU;
                 }
             }
@@ -130,6 +131,7 @@ sub get_content {
                             }
                         }
                         if ( ! $parse_ok ) {
+                            $skip_to = '';
                             next GET_DATA;
                         }
                         if ( ! @{$sql->{insert_into_args}} ) {
@@ -138,6 +140,7 @@ sub get_content {
                                 { prompt => 'Press ENTER' }
                             );
                             close $fh;
+                            $skip_to = '';
                             next GET_DATA;
                         }
                     }

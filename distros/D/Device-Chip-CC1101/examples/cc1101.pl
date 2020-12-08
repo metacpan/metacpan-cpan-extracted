@@ -1,10 +1,12 @@
 #!/usr/bin/perl
 
-use strict;
+use v5.26;
 use warnings;
 
 use Device::Chip::CC1101;
 use Device::Chip::Adapter;
+
+use Future::AsyncAwait;
 
 use Getopt::Long qw( :config no_ignore_case );
 use Time::HiRes qw( sleep );
@@ -36,11 +38,11 @@ GetOptions(
 defined $ROLE or die "Need a --role\n";
 
 my $chip = Device::Chip::CC1101->new;
-$chip->mount(
+await $chip->mount(
    Device::Chip::Adapter->new_from_description( $ADAPTER )
-)->get;
+);
 
-$chip->power(1)->get;
+await $chip->power(1);
 sleep 0.05;
 
 $SIG{INT} = $SIG{TERM} = sub { exit };
@@ -48,9 +50,9 @@ END {
    $chip->power(0)->get if $chip;
 }
 
-$chip->reset->get;
+await $chip->reset;
 
-$chip->change_config(
+await $chip->change_config(
    band => $BAND,
    mode => $MODE,
 
@@ -62,26 +64,26 @@ $chip->change_config(
    ) : (),
 
    %MORECONFIG,
-)->get;
+);
 
 if( $PRINT_CONFIG ) {
-   my %config = $chip->read_config->get;
+   my %config = await $chip->read_config;
    printf "%-20s: %s\n", $_, $config{$_} for sort keys %config;
 }
 
-$chip->flush_fifos()->get;
+await $chip->flush_fifos;
 
 if( $ROLE eq "idle" ) {
-   $chip->idle->get;
+   await $chip->idle;
    exit;
 }
 elsif( $ROLE eq "rx" ) {
    # Arrange for GDO0 to assert at end of packet
-   $chip->change_config(
+   await $chip->change_config(
       GDO0_CFG => "rx-fifo-or-eop",
-   )->get;
+   );
 
-   $chip->start_rx()->get;
+   await $chip->start_rx;
 
    print "Receiving...\n";
 
@@ -89,9 +91,9 @@ elsif( $ROLE eq "rx" ) {
       # Wait for GDO0 to indicate pkt received
       # TODO: Ideally it'd be nice to do this by a Device::Chip "wait for GPIO"
       #   ability and getting the user to connect GDO0 to one of the GPIO lines.
-      sleep 0.05 and redo until $chip->read_pktstatus->get->{GDO0};
+      sleep 0.05 and redo until ( await $chip->read_pktstatus )->{GDO0};
 
-      my $packet = $chip->receive->get;
+      my $packet = await $chip->receive;
       next unless $packet->{CRC_OK};
 
       printf "RX: %*v02X\n", ' ', $packet->{data};
@@ -117,7 +119,7 @@ elsif( $ROLE eq "rx" ) {
 }
 elsif( $ROLE eq "tx" ) {
    while( $COUNT eq "inf" or $COUNT-- ) {
-      $chip->transmit( $ARGV[0] // "\x01\x23\x45\x67\x89\xab\xcd\xef" )->get;
+      await $chip->transmit( $ARGV[0] // "\x01\x23\x45\x67\x89\xab\xcd\xef" );
       print "Transmitted\n";
 
       sleep $INTERVAL if $COUNT;

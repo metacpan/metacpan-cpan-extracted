@@ -31,8 +31,8 @@ commonly called Shift_JIS:
 x-sjis-cp932.xml
 x-sjis-jdk117.xml
 x-sjis-jisx0221.xml
-x-sjis-unicode.xml	(This is the same encoding as the shift_jis.xml that
-			 was distributed with this module in version 1.00)
+x-sjis-unicode.xml      (This is the same encoding as the shift_jis.xml that
+                         was distributed with this module in version 1.00)
 
 Please read his message (Japanese_Encodings.msg) about why these are here
 and why I've removed the shift_jis.xml encoding.

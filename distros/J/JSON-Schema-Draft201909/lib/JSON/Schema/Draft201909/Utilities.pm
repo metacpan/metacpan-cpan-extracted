@@ -4,7 +4,7 @@ package JSON::Schema::Draft201909::Utilities;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Internal utilities for JSON::Schema::Draft201909
 
-our $VERSION = '0.017';
+our $VERSION = '0.018';
 
 use 5.016;
 no if "$]" >= 5.031009, feature => 'indirect';
@@ -253,7 +253,7 @@ JSON::Schema::Draft201909::Utilities - Internal utilities for JSON::Schema::Draf
 
 =head1 VERSION
 
-version 0.017
+version 0.018
 
 =head1 SYNOPSIS
 

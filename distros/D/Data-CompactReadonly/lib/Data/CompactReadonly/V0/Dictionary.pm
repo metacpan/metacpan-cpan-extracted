@@ -1,5 +1,5 @@
 package Data::CompactReadonly::V0::Dictionary;
-our $VERSION = '0.0.1';
+our $VERSION = '0.0.2';
 
 use warnings;
 use strict;
@@ -48,10 +48,9 @@ sub _create {
 
         # write the pointer to the key, and the key if needed. Then write the
         # pointer to the value, and the value if needed. The value can be any
-        # type. Keys are already coerced to valid types (Text or numeric) by
-        # perl before we see them by dint of being hash keys.
+        # type. Keys are coerced Text to avoid floating point problems.
         foreach my $item (
-            { data => $this_key,   ptr_offset => 0               },
+            { data => $this_key,   ptr_offset => 0, coerce_to_text => 1 },
             { data => $this_value, ptr_offset => $args{ptr_size} }
         ) {
             $class->_seek(%args, pointer => $item->{ptr_offset} + $table_start_ptr + 2 * $index * $args{ptr_size});
@@ -60,7 +59,14 @@ sub _create {
             } else {
                 print $fh $class->_encode_ptr(%args, pointer => $next_free_ptr);
                 $class->_seek(%args, pointer => $next_free_ptr);
-                Data::CompactReadonly::V0::Node->_create(%args, data => $item->{data});
+
+                my $node_class = 'Data::CompactReadonly::V0::Node';
+                if($item->{coerce_to_text}) {
+                    $node_class = 'Data::CompactReadonly::V0::'.$class->_text_type_for_data($item->{data});
+                    eval "use $node_class";
+                }
+                $node_class->_create(%args, data => $item->{data});
+
                 $next_free_ptr = tell($fh);
             }
         }

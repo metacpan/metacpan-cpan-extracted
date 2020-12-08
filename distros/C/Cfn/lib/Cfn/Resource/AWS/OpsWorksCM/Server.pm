@@ -1,4 +1,4 @@
-# AWS::OpsWorksCM::Server generated from spec 11.1.0
+# AWS::OpsWorksCM::Server generated from spec 18.4.0
 use Moose::Util::TypeConstraints;
 
 coerce 'Cfn::Resource::Properties::AWS::OpsWorksCM::Server',
@@ -11,7 +11,7 @@ package Cfn::Resource::AWS::OpsWorksCM::Server {
   has Properties => (isa => 'Cfn::Resource::Properties::AWS::OpsWorksCM::Server', is => 'rw', coerce => 1);
   
   sub AttributeList {
-    [ 'Arn','Endpoint' ]
+    [ 'Arn','Endpoint','Id' ]
   }
   sub supported_regions {
     [ 'ap-northeast-1','ap-southeast-1','ap-southeast-2','eu-central-1','eu-west-1','us-east-1','us-east-2','us-west-1','us-west-2' ]
@@ -51,11 +51,11 @@ coerce 'Cfn::Resource::Properties::AWS::OpsWorksCM::Server::EngineAttribute',
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::OpsWorksCM::Server::EngineAttributeValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::OpsWorksCM::Server::EngineAttribute->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::OpsWorksCM::Server::EngineAttributeValue {
+package Cfn::Resource::Properties::Object::AWS::OpsWorksCM::Server::EngineAttribute {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -93,3 +93,30 @@ package Cfn::Resource::Properties::AWS::OpsWorksCM::Server {
 }
 
 1;
+### main pod documentation begin ###
+
+=encoding UTF-8
+
+=head1 NAME
+
+Cfn::Resource::AWS::OpsWorksCM::Server - Cfn resource for AWS::OpsWorksCM::Server
+
+=head1 DESCRIPTION
+
+This module implements a Perl module that represents the CloudFormation object AWS::OpsWorksCM::Server.
+
+See L<Cfn> for more information on how to use it.
+
+=head1 AUTHOR
+
+    Jose Luis Martinez
+    CAPSiDE
+    jlmartinez@capside.com
+
+=head1 COPYRIGHT and LICENSE
+
+Copyright (c) 2013 by CAPSiDE
+This code is distributed under the Apache 2 License. The full text of the 
+license can be found in the LICENSE file included with this module.
+
+=cut

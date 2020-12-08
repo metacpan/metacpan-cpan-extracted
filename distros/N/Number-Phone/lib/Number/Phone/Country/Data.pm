@@ -2,7 +2,7 @@
     # automatically generated file, don't edit
 
     package Number::Phone::Country::Data;
-    $VERSION = '2.20200904144215';
+    $VERSION = '2.20201204215925';
         %Number::Phone::Country::idd_codes = (
     20 => 'EG',
 211 => 'SS',
@@ -309,7 +309,7 @@
 'HR' => ['385', '00', '0', qr/\A 00 /xms],
 'HT' => ['509', '00', undef, qr/\A 00 /xms],
 'HU' => ['36', '00', '06', qr/\A 00 /xms],
-'ID' => ['62', '001', '0', qr/\A 00[189] /xms],
+'ID' => ['62', '008', '0', qr/\A 00[89] /xms],
 'IE' => ['353', '00', '0', qr/\A 00 /xms],
 'IL' => ['972', '00', '0', qr/\A 0(?:0|1[2-9]) /xms],
 'IM' => ['44', '00', '0', qr/\A 00 /xms],
@@ -482,6 +482,7 @@ $Number::Phone::Country::idd_codes{447839} = 'GG';
 $Number::Phone::Country::idd_codes{447911} = 'GG';
 $Number::Phone::Country::idd_codes{441624} = 'IM';
 $Number::Phone::Country::idd_codes{447457} = 'IM';
+$Number::Phone::Country::idd_codes{4474576} = 'IM';
 $Number::Phone::Country::idd_codes{447524} = 'IM';
 $Number::Phone::Country::idd_codes{447624} = 'IM';
 $Number::Phone::Country::idd_codes{447924} = 'IM';
@@ -502,14 +503,10 @@ $Number::Phone::Country::idd_codes{67214} = 'AQ';
 $Number::Phone::Country::idd_codes{6723} = 'NF';
 $Number::Phone::Country::idd_codes{76} = 'KZ';
 $Number::Phone::Country::idd_codes{77} = 'KZ';
-$Number::Phone::Country::idd_codes{37744} = 'XK';
-$Number::Phone::Country::idd_codes{37745} = 'XK';
 $Number::Phone::Country::idd_codes{38128} = 'XK';
 $Number::Phone::Country::idd_codes{38129} = 'XK';
 $Number::Phone::Country::idd_codes{38138} = 'XK';
 $Number::Phone::Country::idd_codes{38139} = 'XK';
-$Number::Phone::Country::idd_codes{38643} = 'XK';
-$Number::Phone::Country::idd_codes{38649} = 'XK';
 $Number::Phone::Country::idd_codes{800} = 'InternationalFreephone';
 $Number::Phone::Country::idd_codes{808} = 'SharedCostServices';
 $Number::Phone::Country::idd_codes{870} = 'Inmarsat';

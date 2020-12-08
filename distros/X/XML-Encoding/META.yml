@@ -5,16 +5,13 @@ author:
 build_requires:
   ExtUtils::MakeMaker: '0'
   Test::More: '0'
-  perl: '5.008001'
-  strict: '0'
-  warnings: '0'
 configure_requires:
   ExtUtils::MakeMaker: '6.64'
   perl: '5.008001'
   strict: '0'
   warnings: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.140640'
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -24,13 +21,23 @@ no_index:
   directory:
     - t
     - inc
+optional_features:
+  changestest:
+    description: 'Changes testing'
+  critictest:
+    description: 'Perl::Critic testing'
+  podcoveragetest:
+    description: 'POD coverage testing'
+  podtest:
+    description: 'POD testing'
 requires:
   XML::Parser: '2.18'
   fields: '0'
   integer: '0'
   perl: '5.008001'
   strict: '0'
-  vars: '0'
+  warnings: '0'
 resources:
-  repository: https://github.com/steve-m-hay/XML-Encoding.git
-version: '2.09'
+  repository: https://github.com/steve-m-hay/XML-Encoding
+version: '2.11'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

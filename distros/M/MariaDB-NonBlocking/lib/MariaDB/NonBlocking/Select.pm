@@ -29,8 +29,10 @@ sub _set_io_watcher {
         my $rin = '';
         my $win = '';
 
-        vec($rin, $fd, 1) = 1 if $wait_for & MYSQL_WAIT_READ;
-        vec($win, $fd, 1) = 1 if $wait_for & MYSQL_WAIT_WRITE;
+        # Always do both, regardless of what the connector says,
+        # otherwise we might hang on SSL:
+        vec($rin, $fd, 1) = 1; # if $wait_for & MYSQL_WAIT_READ;
+        vec($win, $fd, 1) = 1; # if $wait_for & MYSQL_WAIT_WRITE;
 
         my $per_operation_timeout = $maria->{per_operation_timeout};
         my $found = select(my $rout = $rin, my $wout = $win, undef, $per_operation_timeout);

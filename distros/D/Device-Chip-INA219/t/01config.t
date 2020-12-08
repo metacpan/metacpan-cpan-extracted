@@ -1,25 +1,27 @@
 #!/usr/bin/perl
 
-use strict;
+use v5.26;
 use warnings;
 
 use Test::More;
 use Test::Device::Chip::Adapter;
 
+use Future::AsyncAwait;
+
 use Device::Chip::INA219;
 
 my $chip = Device::Chip::INA219->new;
 
-$chip->mount(
+await $chip->mount(
    my $adapter = Test::Device::Chip::Adapter->new,
-)->get;
+);
 
 # ->read_config
 {
    $adapter->expect_write_then_read( "\x00", 2 )
       ->returns( "\x39\x9F" );
 
-   is_deeply( $chip->read_config->get,
+   is_deeply( await $chip->read_config,
       {
          RST  => '',
          BRNG => "32V",
@@ -39,10 +41,10 @@ $chip->mount(
 {
    $adapter->expect_write( "\x00\x3D\x57" );
 
-   $chip->change_config(
+   await $chip->change_config(
       BADC => 4,
       SADC => 4,
-   )->get;
+   );
 
    $adapter->check_and_clear( '$chip->change_config' );
 }

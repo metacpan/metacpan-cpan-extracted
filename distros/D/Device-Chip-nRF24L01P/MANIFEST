@@ -4,7 +4,6 @@ examples/nRF24L01+_CONTWAVE.pl
 examples/nRF24L01+_pollRPD.pl
 examples/nRF24L01+_PRX.pl
 examples/nRF24L01+_PTX.pl
-lib/Device/BusPirate/Chip/nRF24L01P.pm
 lib/Device/Chip/nRF24L01P.pm
 LICENSE
 Makefile.PL

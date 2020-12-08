@@ -32,10 +32,10 @@ no_index:
 provides:
   Database::Async::Engine::PostgreSQL:
     file: lib/Database/Async/Engine/PostgreSQL.pm
-    version: '0.009'
+    version: '0.010'
   Database::Async::Engine::PostgreSQL::DDL:
     file: lib/Database/Async/Engine/PostgreSQL/DDL.pm
-    version: '0.009'
+    version: '0.010'
 requires:
   Config::Tiny: '0'
   Database::Async: '0.013'
@@ -56,7 +56,7 @@ resources:
   bugtracker: https://github.com/team-at-cpan/Database-Async-Engine-PostgreSQL/issues
   homepage: https://github.com/team-at-cpan/Database-Async-Engine-PostgreSQL
   repository: https://github.com/team-at-cpan/Database-Async-Engine-PostgreSQL.git
-version: '0.009'
+version: '0.010'
 x_authority: cpan:TEAM
 x_contributors:
   - 'Tom M <tom@audioboundary.com>'

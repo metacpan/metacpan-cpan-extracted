@@ -1,0 +1,56 @@
+{
+   "abstract" : "Perl interface to Sidef's mathematical library.",
+   "author" : [
+      "Daniel Șuteu <trizen@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4231",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Math-Sidef",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Math::AnyNum" : "0.36",
+            "Sidef" : "3.96",
+            "perl" : "v5.16.0"
+         }
+      }
+   },
+   "provides" : {
+      "Math::Sidef" : {
+         "file" : "lib/Math/Sidef.pm",
+         "version" : "0.01"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/trizen/Math-Sidef/issues"
+      },
+      "homepage" : "https://github.com/trizen/Math-Sidef",
+      "license" : [
+         "http://www.perlfoundation.org/artistic_license_2_0"
+      ],
+      "repository" : {
+         "url" : "https://github.com/trizen/Math-Sidef"
+      }
+   },
+   "version" : "0.01",
+   "x_serialization_backend" : "JSON::PP version 4.05"
+}

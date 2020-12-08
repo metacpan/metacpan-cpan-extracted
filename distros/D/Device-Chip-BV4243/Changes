@@ -1,4 +1,8 @@
 Revision history for Device-Chip-BV4243
 
+0.02    2020-12-06
+        [CHANGES]
+         * Updated to Object::Pad + Future::AsyncAwait
+
 0.01    2015/11/14 18:45:11
         First version, released on an unsuspecting world.

@@ -7,7 +7,7 @@ use warnings;
 # First four bytes of stream are always OggS
 use constant OGGHEADERFLAG => 'OggS';
 
-our $VERSION = '1.04';
+our $VERSION = '1.05';
 
 sub new {
 	my $class = shift;
@@ -478,7 +478,11 @@ sub _calculate_track_length {
 
 	if ($granule_position && $data->{'INFO'}{'rate'}) {
 		$data->{'INFO'}{'length'}          = int($granule_position / $data->{'INFO'}{'rate'});
-		$data->{'INFO'}{'bitrate_average'} = sprintf( "%d", ( $data->{'filesize'} * 8 ) / $data->{'INFO'}{'length'} );
+                if ($data->{'INFO'}{'length'}) {
+			$data->{'INFO'}{'bitrate_average'} = sprintf( "%d", ( $data->{'filesize'} * 8 ) / $data->{'INFO'}{'length'} );
+		} else {
+			$data->{'INFO'}{'bitrate_average'} = 0;
+		}
 	} else {
 		$data->{'INFO'}{'length'} = 0;
 	}

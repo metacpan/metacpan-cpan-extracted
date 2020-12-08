@@ -3,10 +3,11 @@
 #
 #  (C) Paul Evans, 2016-2020 -- leonerd@leonerd.org.uk
 
-use 5.026;
+use v5.26;
 use Object::Pad 0.19;
 
-class Device::Chip::HTU21D 0.05
+package Device::Chip::HTU21D 0.06;
+class Device::Chip::HTU21D
    extends Device::Chip;
 
 use Carp;
@@ -14,7 +15,7 @@ use Carp;
 use Data::Bitfield 0.02 qw( bitfield boolfield );
 use List::Util qw( first );
 
-use Future::AsyncAwait;
+use Future::AsyncAwait 0.38; # async method
 
 use constant PROTOCOL => "I2C";
 
@@ -27,12 +28,13 @@ C<Device::Chip::HTU21D> - chip driver for F<HTU21D>
 =head1 SYNOPSIS
 
    use Device::Chip::HTU21D;
+   use Future::AsyncAwait;
 
    my $chip = Device::Chip::HTU21D->new;
-   $chip->mount( Device::Chip::Adapter::...->new )->get;
+   await $chip->mount( Device::Chip::Adapter::...->new );
 
    printf "Current temperature is is %.2f C\n",
-      $chip->read_temperature->get;
+      await $chip->read_temperature;
 
 =head1 DESCRIPTION
 
@@ -57,8 +59,8 @@ sub I2C_options
 
 =head1 ACCESSORS
 
-The following methods documented with a trailing call to C<< ->get >> return
-L<Future> instances.
+The following methods documented in an C<await> expression return L<Future>
+instances.
 
 =cut
 
@@ -82,7 +84,7 @@ bitfield { format => "bytes-LE" }, REG_USER =>
 
 =head2 read_config
 
-   $config = $chip->read_config->get
+   $config = await $chip->read_config;
 
 Returns a C<HASH> reference of the contents of the user register.
 
@@ -93,7 +95,7 @@ Returns a C<HASH> reference of the contents of the user register.
 
 =head2 change_config
 
-   $chip->change_config( %changes )->get
+   await $chip->change_config( %changes );
 
 Writes updates to the user register.
 
@@ -159,7 +161,7 @@ async method _trigger_nohold ( $cmd )
 
 =head2 read_temperature
 
-   $temperature = $chip->read_temperature->get
+   $temperature = await $chip->read_temperature;
 
 Triggers a reading of the temperature sensor, returning a number in degrees C.
 
@@ -174,7 +176,7 @@ async method read_temperature ()
 
 =head2 read_humidity
 
-   $humidity = $chip->read_humidity->get
+   $humidity = await $chip->read_humidity;
 
 Triggers a reading of the humidity sensor, returning a number in % RH.
 

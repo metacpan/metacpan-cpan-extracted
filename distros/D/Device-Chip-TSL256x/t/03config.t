@@ -1,25 +1,27 @@
 #!/usr/bin/perl
 
-use strict;
+use v5.26;
 use warnings;
 
 use Test::More;
 use Test::Device::Chip::Adapter;
 
+use Future::AsyncAwait;
+
 use Device::Chip::TSL256x;
 
 my $chip = Device::Chip::TSL256x->new;
 
-$chip->mount(
+await $chip->mount(
    my $adapter = Test::Device::Chip::Adapter->new,
-)->get;
+);
 
 # ->read_config
 {
    $adapter->expect_write_then_read( "\x81", 1 )
       ->returns( "\x02" );
 
-   is_deeply( $chip->read_config->get,
+   is_deeply( await $chip->read_config,
       {
          GAIN => 1,
          INTEG => "402ms",
@@ -28,12 +30,12 @@ $chip->mount(
    );
 
    # subsequent read does not talk to chip a second time
-   $chip->read_config->get;
+   await $chip->read_config;
 
    $adapter->check_and_clear( '$chip->read_config' );
 
    # gut-wrench to clear test data
-   undef $chip->{TIMINGbytes};
+   undef $chip->META->get_slot( '$_TIMINGbytes' )->value( $chip );
 }
 
 # ->change_config
@@ -42,10 +44,10 @@ $chip->mount(
       ->returns( "\x02" );
    $adapter->expect_write( "\x81\x12" );
 
-   $chip->change_config( GAIN => 16 )->get;
+   await $chip->change_config( GAIN => 16 );
 
    # subsequent read does not talk to chip a second time but yields new values
-   is_deeply( $chip->read_config->get,
+   is_deeply( await $chip->read_config,
       {
          GAIN  => 16,
          INTEG => "402ms",

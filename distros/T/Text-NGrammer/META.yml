@@ -1,6 +1,6 @@
 --- #YAML:1.0
 name:               Text-NGrammer
-version:            0.03
+version:            0.06
 abstract:           ~
 author:  []
 license:            perl

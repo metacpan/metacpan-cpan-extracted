@@ -12,7 +12,7 @@ WriteMakefile(
     PREREQ_PM => {
         'Test::More' => 0,
         'version'    => 0,
-	'Test::Exception' => 0,
+        'Test::Exception' => 0,
     },
     dist                => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean               => { FILES => 'Symbol-Glob-*' },

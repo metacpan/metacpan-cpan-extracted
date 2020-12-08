@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20200904144535;
+our $VERSION = 1.20201204215957;
 
 my $formatters = [
                 {
@@ -69,21 +69,21 @@ my $validators = {
                 'voip' => ''
               };
 my %areanames = ();
-$areanames{en}->{970222} = "Jericho\/Hebron";
-$areanames{en}->{970223} = "Jerusalem";
-$areanames{en}->{970227} = "Bethlehem";
-$areanames{en}->{970229} = "Ramallah\/Al\-Bireh";
-$areanames{en}->{970424} = "Jenin";
-$areanames{en}->{970820} = "Khan\ Yunis";
-$areanames{en}->{970821} = "Rafah";
-$areanames{en}->{970824} = "North\ Gaza";
-$areanames{en}->{970825} = "Deir\ al\-Balah";
-$areanames{en}->{970826} = "Gaza";
-$areanames{en}->{970828} = "Gaza";
-$areanames{en}->{970923} = "Nablus";
-$areanames{en}->{970925} = "Tubas";
-$areanames{en}->{970926} = "Tulkarm";
-$areanames{en}->{970929} = "Qalqilya\/Salfit";
+$areanames{en} = {"970923", "Nablus",
+"970826", "Gaza",
+"970828", "Gaza",
+"970229", "Ramallah\/Al\-Bireh",
+"970222", "Jericho\/Hebron",
+"970925", "Tubas",
+"970227", "Bethlehem",
+"970825", "Deir\ al\-Balah",
+"970824", "North\ Gaza",
+"970820", "Khan\ Yunis",
+"970424", "Jenin",
+"970929", "Qalqilya\/Salfit",
+"970926", "Tulkarm",
+"970821", "Rafah",
+"970223", "Jerusalem",};
 
     sub new {
       my $class = shift;

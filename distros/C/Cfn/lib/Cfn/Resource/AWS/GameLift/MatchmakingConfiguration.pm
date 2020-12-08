@@ -1,4 +1,4 @@
-# AWS::GameLift::MatchmakingConfiguration generated from spec 9.1.0
+# AWS::GameLift::MatchmakingConfiguration generated from spec 20.1.0
 use Moose::Util::TypeConstraints;
 
 coerce 'Cfn::Resource::Properties::AWS::GameLift::MatchmakingConfiguration',
@@ -51,11 +51,11 @@ coerce 'Cfn::Resource::Properties::AWS::GameLift::MatchmakingConfiguration::Game
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::GameLift::MatchmakingConfiguration::GamePropertyValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::GameLift::MatchmakingConfiguration::GameProperty->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::GameLift::MatchmakingConfiguration::GamePropertyValue {
+package Cfn::Resource::Properties::Object::AWS::GameLift::MatchmakingConfiguration::GameProperty {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -75,9 +75,10 @@ package Cfn::Resource::Properties::AWS::GameLift::MatchmakingConfiguration {
   has BackfillMode => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has CustomEventData => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has Description => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has FlexMatchMode => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has GameProperties => (isa => 'ArrayOfCfn::Resource::Properties::AWS::GameLift::MatchmakingConfiguration::GameProperty', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has GameSessionData => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
-  has GameSessionQueueArns => (isa => 'Cfn::Value::Array|Cfn::Value::Function|Cfn::DynamicValue', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has GameSessionQueueArns => (isa => 'Cfn::Value::Array|Cfn::Value::Function|Cfn::DynamicValue', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has Name => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
   has NotificationTarget => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has RequestTimeoutSeconds => (isa => 'Cfn::Value::Integer', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
@@ -85,3 +86,30 @@ package Cfn::Resource::Properties::AWS::GameLift::MatchmakingConfiguration {
 }
 
 1;
+### main pod documentation begin ###
+
+=encoding UTF-8
+
+=head1 NAME
+
+Cfn::Resource::AWS::GameLift::MatchmakingConfiguration - Cfn resource for AWS::GameLift::MatchmakingConfiguration
+
+=head1 DESCRIPTION
+
+This module implements a Perl module that represents the CloudFormation object AWS::GameLift::MatchmakingConfiguration.
+
+See L<Cfn> for more information on how to use it.
+
+=head1 AUTHOR
+
+    Jose Luis Martinez
+    CAPSiDE
+    jlmartinez@capside.com
+
+=head1 COPYRIGHT and LICENSE
+
+Copyright (c) 2013 by CAPSiDE
+This code is distributed under the Apache 2 License. The full text of the 
+license can be found in the LICENSE file included with this module.
+
+=cut

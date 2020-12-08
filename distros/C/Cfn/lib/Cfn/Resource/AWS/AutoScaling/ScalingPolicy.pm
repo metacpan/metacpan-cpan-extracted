@@ -1,4 +1,4 @@
-# AWS::AutoScaling::ScalingPolicy generated from spec 5.3.0
+# AWS::AutoScaling::ScalingPolicy generated from spec 18.4.0
 use Moose::Util::TypeConstraints;
 
 coerce 'Cfn::Resource::Properties::AWS::AutoScaling::ScalingPolicy',
@@ -14,7 +14,7 @@ package Cfn::Resource::AWS::AutoScaling::ScalingPolicy {
     [  ]
   }
   sub supported_regions {
-    [ 'ap-east-1','ap-northeast-1','ap-northeast-2','ap-northeast-3','ap-south-1','ap-southeast-1','ap-southeast-2','ca-central-1','cn-north-1','cn-northwest-1','eu-central-1','eu-north-1','eu-west-1','eu-west-2','eu-west-3','me-south-1','sa-east-1','us-east-1','us-east-2','us-gov-east-1','us-gov-west-1','us-west-1','us-west-2' ]
+    [ 'af-south-1','ap-east-1','ap-northeast-1','ap-northeast-2','ap-northeast-3','ap-south-1','ap-southeast-1','ap-southeast-2','ca-central-1','cn-north-1','cn-northwest-1','eu-central-1','eu-north-1','eu-south-1','eu-west-1','eu-west-2','eu-west-3','me-south-1','sa-east-1','us-east-1','us-east-2','us-gov-east-1','us-gov-west-1','us-west-1','us-west-2' ]
   }
 }
 
@@ -51,11 +51,11 @@ coerce 'Cfn::Resource::Properties::AWS::AutoScaling::ScalingPolicy::MetricDimens
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::AutoScaling::ScalingPolicy::MetricDimensionValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::AutoScaling::ScalingPolicy::MetricDimension->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::AutoScaling::ScalingPolicy::MetricDimensionValue {
+package Cfn::Resource::Properties::Object::AWS::AutoScaling::ScalingPolicy::MetricDimension {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -73,11 +73,11 @@ coerce 'Cfn::Resource::Properties::AWS::AutoScaling::ScalingPolicy::PredefinedMe
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::AutoScaling::ScalingPolicy::PredefinedMetricSpecificationValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::AutoScaling::ScalingPolicy::PredefinedMetricSpecification->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::AutoScaling::ScalingPolicy::PredefinedMetricSpecificationValue {
+package Cfn::Resource::Properties::Object::AWS::AutoScaling::ScalingPolicy::PredefinedMetricSpecification {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -95,11 +95,11 @@ coerce 'Cfn::Resource::Properties::AWS::AutoScaling::ScalingPolicy::CustomizedMe
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::AutoScaling::ScalingPolicy::CustomizedMetricSpecificationValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::AutoScaling::ScalingPolicy::CustomizedMetricSpecification->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::AutoScaling::ScalingPolicy::CustomizedMetricSpecificationValue {
+package Cfn::Resource::Properties::Object::AWS::AutoScaling::ScalingPolicy::CustomizedMetricSpecification {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -120,11 +120,11 @@ coerce 'Cfn::Resource::Properties::AWS::AutoScaling::ScalingPolicy::TargetTracki
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::AutoScaling::ScalingPolicy::TargetTrackingConfigurationValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::AutoScaling::ScalingPolicy::TargetTrackingConfiguration->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::AutoScaling::ScalingPolicy::TargetTrackingConfigurationValue {
+package Cfn::Resource::Properties::Object::AWS::AutoScaling::ScalingPolicy::TargetTrackingConfiguration {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -166,11 +166,11 @@ coerce 'Cfn::Resource::Properties::AWS::AutoScaling::ScalingPolicy::StepAdjustme
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::AutoScaling::ScalingPolicy::StepAdjustmentValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::AutoScaling::ScalingPolicy::StepAdjustment->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::AutoScaling::ScalingPolicy::StepAdjustmentValue {
+package Cfn::Resource::Properties::Object::AWS::AutoScaling::ScalingPolicy::StepAdjustment {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -198,3 +198,30 @@ package Cfn::Resource::Properties::AWS::AutoScaling::ScalingPolicy {
 }
 
 1;
+### main pod documentation begin ###
+
+=encoding UTF-8
+
+=head1 NAME
+
+Cfn::Resource::AWS::AutoScaling::ScalingPolicy - Cfn resource for AWS::AutoScaling::ScalingPolicy
+
+=head1 DESCRIPTION
+
+This module implements a Perl module that represents the CloudFormation object AWS::AutoScaling::ScalingPolicy.
+
+See L<Cfn> for more information on how to use it.
+
+=head1 AUTHOR
+
+    Jose Luis Martinez
+    CAPSiDE
+    jlmartinez@capside.com
+
+=head1 COPYRIGHT and LICENSE
+
+Copyright (c) 2013 by CAPSiDE
+This code is distributed under the Apache 2 License. The full text of the 
+license can be found in the LICENSE file included with this module.
+
+=cut

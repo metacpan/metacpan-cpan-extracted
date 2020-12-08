@@ -6,6 +6,7 @@ build_requires:
   YAML: '0'
 configure_requires:
   Module::Build: '0.42'
+  YAML: '0'
 dynamic_config: 1
 generated_by: 'Module::Build version 0.4231, CPAN::Meta::Converter version 2.150010'
 license: perl
@@ -18,13 +19,14 @@ provides:
     file: lib/AudioFile/Info/Build.pm
   AudioFile::Info::MP3::ID3Lib:
     file: lib/AudioFile/Info/MP3/ID3Lib.pm
-    version: v1.7.4
+    version: v1.8.0
 requires:
   AudioFile::Info: '0'
   MP3::ID3Lib: '0'
   perl: v5.6.0
 resources:
+  bugtracker: https://github.com/davorg/audiofile-info-mp3-id3lib/issues
   license: http://dev.perl.org/licenses/
   repository: https://github.com/davorg/audiofile-info-mp3-id3lib.git
-version: v1.7.4
+version: v1.8.0
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

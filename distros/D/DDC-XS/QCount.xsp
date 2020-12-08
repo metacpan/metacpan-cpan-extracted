@@ -150,7 +150,6 @@
 
 	%name{keys} CQCountKeyExprList& m_keys %get; //%set;
 	void setKeys(CQCountKeyExprList* val) %code %{ ddcxs_obj_set(m_keys,val); %};
-
   public:
         %name{new} CQCount(CQuery* dtr_=NULL, CQCountKeyExprList* keys_=NULL, size_t sample_=DDCDefaultCountSampleSize, HitSortEnum sort_=NoSort, string lo="", string hi="");
   public:
@@ -173,4 +172,3 @@
         %name{new} CQKeys(CQCount *qCount=NULL, size_t CountLimit=DDCDefaultCountSampleSize, vector_string IndexNames=vector_string());
 	%name{SetMatchId} BYTE SetMatchId(BYTE matchId);
 };
-

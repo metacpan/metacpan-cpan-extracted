@@ -3,6 +3,7 @@ abstract: 'Nonblocking connections to MySQL using libmariadbclient'
 author:
   - 'Brian Fraser <fraserbn@gmail.com>'
 build_requires:
+  Alien::libmariadbclient: '0.01'
   Test::More: '0'
 configure_requires:
   Alien::libmariadbclient: '0.01'
@@ -19,10 +20,11 @@ no_index:
     - t
     - inc
 requires:
+  Alien::libmariadbclient: '0.01'
   AnyEvent: '0'
   AnyEvent::XSPromises: '0'
   Ref::Util: '0'
   Sub::StrictDecl: '0'
   perl: '5.006'
-version: '0.29'
+version: '0.30'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

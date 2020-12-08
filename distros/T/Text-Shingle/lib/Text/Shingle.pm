@@ -11,7 +11,7 @@ use Unicode::Normalize;
 use Text::NGrammer;
 
 use vars qw($VERSION);
-$VERSION = '0.03';
+$VERSION = '0.07';
 
 sub new {
   my $class = shift;
@@ -24,7 +24,7 @@ sub new {
 
   for my $opt (keys %param) {
     croak "option $opt unsupported by version $VERSION of Text::Shingle" unless exists $config{$opt};
-    croak "window size cannot be negative or zero" if $opt eq 'w' && $_{w} < 1;
+    croak "window size cannot be negative or zero" if $opt eq 'w' && $param{w} < 1;
     $config{$opt} = $param{$opt};
   }
   $config{version} = $VERSION;
@@ -143,6 +143,22 @@ Fixed dependencies
 =item 0.03
 
 Fixed dependencies in Makefile.PL
+
+=item 0.04
+
+Fixed bug in constructor
+
+=item 0.05
+
+Fixed test
+
+=item 0.06
+
+Updated dependency on L<Text::NGrammer> to 0.06
+
+=item 0.07
+
+Fixed test
 
 =back
 

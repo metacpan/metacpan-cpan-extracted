@@ -1,12 +1,14 @@
 package WordList::BEW::Betawi;
 
-our $DATE = '2016-06-21'; # DATE
-our $VERSION = '0.001'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-09-14'; # DATE
+our $DIST = 'WordList-BEW-Betawi'; # DIST
+our $VERSION = '0.002'; # VERSION
 
 use WordList;
 our @ISA = qw(WordList);
 
-our %STATS = ("longest_word_len",9,"shortest_word_len",2,"num_words_contains_unicode",0,"num_words_contains_nonword_chars",0,"num_words_contains_whitespace",0,"num_words",82,"avg_word_len",5.04878048780488); # STATS
+our %STATS = ("num_words_contains_whitespace",0,"num_words_contain_whitespace",0,"longest_word_len",9,"num_words_contains_nonword_chars",0,"num_words_contain_nonword_chars",0,"shortest_word_len",2,"avg_word_len",5.04878048780488,"num_words_contains_unicode",0,"num_words",82,"num_words_contain_unicode",0); # STATS
 
 1;
 # ABSTRACT: Betawi words from several sources
@@ -21,7 +23,7 @@ WordList::BEW::Betawi - Betawi words from several sources
 
 =head1 VERSION
 
-This document describes version 0.001 of WordList::BEW::Betawi (from Perl distribution WordList-BEW-Betawi), released on 2016-06-21.
+This document describes version 0.002 of WordList::BEW::Betawi (from Perl distribution WordList-BEW-Betawi), released on 2020-09-14.
 
 =head1 SYNOPSIS
 
@@ -39,10 +41,14 @@ This document describes version 0.001 of WordList::BEW::Betawi (from Perl distri
  # Call a callback for each word
  $wl->each_word(sub { my $word = shift; ... });
 
+ # Iterate
+ my $first_word = $wl->first_word;
+ while (defined(my $word = $wl->next_word)) { ... }
+
  # Get all the words
  my @all_words = $wl->all_words;
 
-=head1 STATISTICS
+=head1 WORDLIST STATISTICS
 
  +----------------------------------+------------------+
  | key                              | value            |
@@ -50,6 +56,9 @@ This document describes version 0.001 of WordList::BEW::Betawi (from Perl distri
  | avg_word_len                     | 5.04878048780488 |
  | longest_word_len                 | 9                |
  | num_words                        | 82               |
+ | num_words_contain_nonword_chars  | 0                |
+ | num_words_contain_unicode        | 0                |
+ | num_words_contain_whitespace     | 0                |
  | num_words_contains_nonword_chars | 0                |
  | num_words_contains_unicode       | 0                |
  | num_words_contains_whitespace    | 0                |
@@ -88,7 +97,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2016 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
@@ -114,12 +123,12 @@ bale
 bawe
 bego
 beken
+belepotan
 berabe
 berape
-belepotan
 bontot
-bupet
 bujubune
+bupet
 butut
 cawan
 centeng

@@ -22,12 +22,13 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20200904144536;
+our $VERSION = 1.20201204215957;
 
 my $formatters = [
                 {
                   'format' => '$1 $2',
                   'leading_digits' => '
+            405|
             8|
             90
           ',
@@ -44,6 +45,12 @@ my $formatters = [
                   'format' => '$1 $2',
                   'leading_digits' => '[24]',
                   'pattern' => '(\\d{4})(\\d{4})'
+                },
+                {
+                  'format' => '$1 $2 $3',
+                  'leading_digits' => '4',
+                  'national_rule' => '0$1',
+                  'pattern' => '(\\d{3})(\\d{3})(\\d{4})'
                 }
               ];
 
@@ -64,29 +71,43 @@ my $validators = {
                 'pager' => '',
                 'personal_number' => '',
                 'specialrate' => '(90[0-8]\\d{4})',
-                'toll_free' => '80[05]\\d{4}',
+                'toll_free' => '
+          (?:
+            4\\d{5}|
+            80[05]
+          )\\d{4}|
+          405\\d{4}
+        ',
                 'voip' => ''
               };
 my %areanames = ();
-$areanames{en}->{5982} = "Montevideo";
-$areanames{en}->{59842} = "San\ Carlos";
-$areanames{en}->{598433} = "Canelones";
-$areanames{en}->{598434} = "San\ Jose\ de\ Mayo";
-$areanames{en}->{598435} = "Florida";
-$areanames{en}->{598436} = "Durazno";
-$areanames{en}->{5984364} = "Trinidad\/Flores";
-$areanames{en}->{598444} = "Minas\/Lavalleja";
-$areanames{en}->{598445} = "Treinta\ y\ Tres";
-$areanames{en}->{598447} = "Rocha";
-$areanames{en}->{598452} = "Colonia\ del\ Scaramento";
-$areanames{en}->{598453} = "Mercedes\/Soriano";
-$areanames{en}->{598456} = "Fray\ Bentos\/Rio\ Negro";
-$areanames{en}->{598462} = "Rivera";
-$areanames{en}->{598463} = "Tacuarembo";
-$areanames{en}->{598464} = "Melo\/Cerro\ Largo";
-$areanames{en}->{598472} = "Paysandu";
-$areanames{en}->{598473} = "Salto";
-$areanames{en}->{598477} = "Artigas";
+$areanames{en} = {"598433", "Canelones",
+"5984367", "Durazno",
+"5984369", "Durazno",
+"598464", "Melo\/Cerro\ Largo",
+"598472", "Paysandu",
+"598477", "Artigas",
+"598453", "Mercedes\/Soriano",
+"59842", "San\ Carlos",
+"5982", "Montevideo",
+"5984365", "Durazno",
+"598462", "Rivera",
+"5984366", "Durazno",
+"598463", "Tacuarembo",
+"598447", "Rocha",
+"5984360", "Durazno",
+"598435", "Florida",
+"598434", "San\ Jose\ de\ Mayo",
+"5984368", "Durazno",
+"5984364", "Trinidad\/Flores",
+"5984362", "Durazno",
+"598456", "Fray\ Bentos\/Rio\ Negro",
+"5984361", "Durazno",
+"598452", "Colonia\ del\ Scaramento",
+"598473", "Salto",
+"598445", "Treinta\ y\ Tres",
+"598444", "Minas\/Lavalleja",
+"5984363", "Durazno",};
 
     sub new {
       my $class = shift;

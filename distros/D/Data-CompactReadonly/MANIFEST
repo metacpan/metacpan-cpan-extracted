@@ -52,5 +52,6 @@ lib/Data/CompactReadonly.pm
 t/tie.t
 lib/Data/CompactReadonly/V0/TiedArray.pm
 lib/Data/CompactReadonly/V0/TiedDictionary.pm
+t/lib/TestFloat.pm
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

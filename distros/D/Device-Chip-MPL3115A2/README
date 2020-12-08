@@ -5,12 +5,13 @@ NAME
 SYNOPSIS
 
        use Device::Chip::MPL3115A2;
+       use Future::AsyncAwait;
     
        my $chip = Device::Chip::MPL3115A2->new;
-       $chip->mount( Device::Chip::Adapter::...->new )->get;
+       await $chip->mount( Device::Chip::Adapter::...->new );
     
        printf "Current pressure is %.2f kPa\n",
-          $chip->read_pressure->get;
+          await $chip->read_pressure;
 
 DESCRIPTION
 
@@ -25,12 +26,12 @@ DESCRIPTION
 
 ACCESSORS
 
-    The following methods documented with a trailing call to ->get return
-    Future instances.
+    The following methods documented in an await expression return Future
+    instances.
 
  read_config
 
-       $config = $chip->read_config->get
+       $config = await $chip->read_config;
 
     Returns a HASH reference of the contents of control registers CTRL_REG1
     to CTRL_REG3, using fields named from the data sheet.
@@ -53,7 +54,7 @@ ACCESSORS
 
  change_config
 
-       $chip->change_config( %changes )->get
+       await $chip->change_config( %changes );
 
     Writes updates to the control registers CTRL_REG1 to CTRL_REG3. This
     will be performed as a read-modify-write operation, so any fields not
@@ -67,9 +68,9 @@ ACCESSORS
 
  set_sealevel_pressure
 
-       $pressure = $chip->get_sealevel_pressure->get
+       $pressure = await $chip->get_sealevel_pressure;
     
-       $chip->set_sealevel_pressure->get( $pressure )
+       await $chip->set_sealevel_pressure( $pressure );
 
     Read or write the barometric pressure calibration register which is
     used to convert pressure to altitude when the chip is in altimeter
@@ -77,7 +78,7 @@ ACCESSORS
 
  read_pressure
 
-       $pressure = $chip->read_pressure->get
+       $pressure = await $chip->read_pressure;
 
     Returns the value of the OUT_P_* registers, suitably converted into
     Pascals. (The chip must be in barometer mode and must not be in RAW
@@ -85,7 +86,7 @@ ACCESSORS
 
  read_altitude
 
-       $altitude = $chip->read_altitude->get
+       $altitude = await $chip->read_altitude;
 
     Returns the value of the OUT_P_* registers, suitably converted into
     metres. (The chip must be in altimeter mode and must not be in RAW mode
@@ -93,7 +94,7 @@ ACCESSORS
 
  read_temperature
 
-       $temperature = $chip->read_temperature->get
+       $temperature = await $chip->read_temperature;
 
     Returns the value of the OUT_T_* registers, suitable converted into
     degrees C. (The chip must not be in RAW mode for the conversion to
@@ -103,9 +104,9 @@ ACCESSORS
 
  read_max_pressure
 
-       $pressure = $chip->read_min_pressure->get
+       $pressure = await $chip->read_min_pressure;
     
-       $pressure = $chip->read_max_pressure->get
+       $pressure = await $chip->read_max_pressure;
 
     Returns the values of the P_MIN and P_MAX registers, suitably converted
     into Pascals.
@@ -114,9 +115,9 @@ ACCESSORS
 
  clear_max_pressure
 
-       $chip->clear_min_pressure->get
+       await $chip->clear_min_pressure;
     
-       $chip->clear_max_pressure->get
+       await $chip->clear_max_pressure;
 
     Clear the P_MIN or P_MAX registers, resetting them to start again from
     the next measurement.
@@ -125,9 +126,9 @@ ACCESSORS
 
  read_max_altitude
 
-       $altitude = $chip->read_min_altitude->get
+       $altitude = await $chip->read_min_altitude;
     
-       $altitude = $chip->read_max_altitude->get
+       $altitude = await $chip->read_max_altitude;
 
     Returns the values of the P_MIN and P_MAX registers, suitably converted
     into metres.
@@ -136,9 +137,9 @@ ACCESSORS
 
  clear_max_altitude
 
-       $chip->clear_min_altitude->get
+       await $chip->clear_min_altitude;
     
-       $chip->clear_max_altitude->get
+       await $chip->clear_max_altitude;
 
     Clear the P_MIN or P_MAX registers, resetting them to start again from
     the next measurement.
@@ -147,9 +148,9 @@ ACCESSORS
 
  read_max_temperature
 
-       $temperature = $chip->read_min_temperature->get
+       $temperature = await $chip->read_min_temperature;
     
-       $temperature = $chip->read_max_temperature->get
+       $temperature = await $chip->read_max_temperature;
 
     Returns the values of the T_MIN and T_MAX registers, suitably converted
     into metres.
@@ -158,9 +159,9 @@ ACCESSORS
 
  clear_max_temperature
 
-       $chip->clear_min_temperature->get
+       await $chip->clear_min_temperature;
     
-       $chip->clear_max_temperature->get
+       await $chip->clear_max_temperature;
 
     Clear the T_MIN or T_MAX registers, resetting them to start again from
     the next measurement.
@@ -169,14 +170,14 @@ METHODS
 
  check_id
 
-       $chip->check_id->get
+       await $chip->check_id;
 
     Reads the WHO_AM_I register and checks for a valid ID result. The
     returned future fails if the expected result is not received.
 
  start_oneshot
 
-       $chip->start_oneshot->get
+       await $chip->start_oneshot;
 
     Sets the OST bit of CTRL_REG1 to start a one-shot measurement when in
     standby mode. After calling this method you will need to use
@@ -185,13 +186,13 @@ METHODS
 
  busywait_oneshot
 
-       $chip->busywait_oneshot->get
+       await $chip->busywait_oneshot;
 
     Repeatedly reads the OST bit of CTRL_REG1 until it becomes clear.
 
  oneshot
 
-       $chip->oneshot->get
+       await $chip->oneshot;
 
     A convenient wrapper around start_oneshot and busywait_oneshot.
 

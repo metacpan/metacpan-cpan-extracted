@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20200904144527;
+our $VERSION = 1.20201204215954;
 
 my $formatters = [
                 {
@@ -89,30 +89,30 @@ my $validators = {
                 'voip' => ''
               };
 my %areanames = ();
-$areanames{en}->{226204} = "Kaya";
-$areanames{en}->{2262052} = "Dédougou";
-$areanames{en}->{2262053} = "Boromo\/Djibasso\/Nouna";
-$areanames{en}->{2262090} = "Gaoua";
-$areanames{en}->{2262091} = "Banfora";
-$areanames{en}->{2262096} = "Orodara";
-$areanames{en}->{2262097} = "Bobo\-Dioulasso";
-$areanames{en}->{2262098} = "Bobo\-Dioulasso";
-$areanames{en}->{2262099} = "Béréba\/Fo\/Houndé";
-$areanames{en}->{2262445} = "Kaya";
-$areanames{en}->{2262446} = "Falagountou\/Dori";
-$areanames{en}->{2262449} = "Falagountou\/Dori";
-$areanames{en}->{2262454} = "Yako";
-$areanames{en}->{2262455} = "Ouahigouya";
-$areanames{en}->{2262456} = "Djibo";
-$areanames{en}->{2262470} = "Pouytenga\/Koupéla";
-$areanames{en}->{2262471} = "Tenkodogo";
-$areanames{en}->{2262477} = "Fada\/Diabo";
-$areanames{en}->{2262479} = "Kantchari";
-$areanames{en}->{226253} = "Ouagadougou";
-$areanames{en}->{226254} = "Ouagadougou";
-$areanames{en}->{2262540} = "Pô\/Kombissiri\/Koubri";
-$areanames{en}->{2262541} = "Léo\/Sapouy";
-$areanames{en}->{2262544} = "Koudougou";
+$areanames{en} = {"2262449", "Falagountou\/Dori",
+"2262097", "Bobo\-Dioulasso",
+"226253", "Ouagadougou",
+"2262099", "Béréba\/Fo\/Houndé",
+"2262477", "Fada\/Diabo",
+"2262479", "Kantchari",
+"2262445", "Kaya",
+"2262455", "Ouahigouya",
+"2262456", "Djibo",
+"2262446", "Falagountou\/Dori",
+"2262096", "Orodara",
+"2262090", "Gaoua",
+"2262052", "Dédougou",
+"226254", "Ouagadougou",
+"2262053", "Boromo\/Djibasso\/Nouna",
+"2262098", "Bobo\-Dioulasso",
+"2262541", "Léo\/Sapouy",
+"2262544", "Koudougou",
+"2262471", "Tenkodogo",
+"226204", "Kaya",
+"2262091", "Banfora",
+"2262454", "Yako",
+"2262470", "Pouytenga\/Koupéla",
+"2262540", "Pô\/Kombissiri\/Koubri",};
 
     sub new {
       my $class = shift;

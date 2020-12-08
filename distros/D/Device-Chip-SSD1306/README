@@ -76,8 +76,8 @@ CONSTRUCTOR
 
 METHODS
 
-    The following methods documented with a trailing call to ->get return
-    Future instances.
+    The following methods documented in an await expression return Future
+    instances.
 
  rows
 
@@ -92,31 +92,31 @@ METHODS
 
  init
 
-       $chip->init->get
+       await $chip->init;
 
     Initialise the display after reset to some sensible defaults.
 
  display
 
-       $chip->display( $on )->get
+       await $chip->display( $on );
 
     Turn on or off the display.
 
  display_lamptest
 
-       $chip->display_lamptest( $enable )->get
+       await $chip->display_lamptest( $enable );
 
     Turn on or off the all-pixels-lit lamptest mode.
 
  display_invert
 
-       $chip->display_invert( $enable )->get
+       await $chip->display_invert( $enable );
 
     Turn on or off the inverted output mode.
 
  send_display
 
-       $chip->send_display( $pixels )->get
+       await $chip->send_display( $pixels );
 
     Sends an entire screen-worth of pixel data. The $pixels should be in a
     packed binary string containing one byte per 8 pixels.
@@ -180,7 +180,7 @@ DRAWING METHODS
 
  refresh
 
-       $chip->refresh->get
+       await $chip->refresh;
 
     Sends the framebuffer to the display chip.
 

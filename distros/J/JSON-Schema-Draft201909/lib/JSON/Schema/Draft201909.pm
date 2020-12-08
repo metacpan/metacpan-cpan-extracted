@@ -1,11 +1,11 @@
 use strict;
 use warnings;
-package JSON::Schema::Draft201909; # git description: v0.016-14-g84840e8
+package JSON::Schema::Draft201909; # git description: v0.017-17-gd4ed775
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Validate data against a schema
 # KEYWORDS: JSON Schema data validation structure specification
 
-our $VERSION = '0.017';
+our $VERSION = '0.018';
 
 use 5.016;  # for fc, unicode_strings features
 no if "$]" >= 5.031009, feature => 'indirect';
@@ -25,7 +25,7 @@ use Moo;
 use strictures 2;
 use MooX::TypeTiny 0.002002;
 use MooX::HandlesVia;
-use Types::Standard 1.010002 qw(Bool Int Str HasMethods Enum InstanceOf HashRef Dict CodeRef);
+use Types::Standard 1.010002 qw(Bool Int Str HasMethods Enum InstanceOf HashRef Dict CodeRef Optional slurpy);
 use JSON::Schema::Draft201909::Error;
 use JSON::Schema::Draft201909::Result;
 use JSON::Schema::Draft201909::Document;
@@ -60,33 +60,22 @@ has validate_formats => (
 has collect_annotations => (
   is => 'ro',
   isa => Bool,
-  default => 0,
+  predicate => '_has_collect_annotations',
 );
 
-sub BUILD {
-  my ($self, $args) = @_;
-
-  if (exists $args->{format_validations}) {
-    croak 'format_validations must be a hashref'
-      if not is_plain_hashref($args->{format_validations});
-
-    foreach my $format (keys %{$args->{format_validations}}) {
-      if (my $existing = $self->_get_format_validation($format)) {
-        croak 'overrides to existing format_validations must be coderefs'
-          if not is_plain_coderef($args->{format_validations}{$format});
-        $self->_set_format_validation($format,
-          +{ type => $existing->{type}, sub => $args->{format_validations}{$format} });
-      }
-      else {
-        my $type = Dict[type => Enum[qw(null object array boolean string number integer)], sub => CodeRef];
-        croak $type->get_message($args->{format_validations}{$format})
-          if not $type->check($args->{format_validations}{$format});
-
-        $self->_set_format_validation($format => $args->{format_validations}{$format});
-      }
-    }
-  }
-}
+has format_validations => (
+  is => 'bare',
+  isa => Dict[
+    (map +($_ => Optional[CodeRef]), qw(date-time date time duration email idn-email hostname idn-hostname ipv4 ipv6 uri uri-reference iri iri-reference uuid uri-template json-pointer relative-json-pointer regex)),
+    slurpy HashRef[Dict[type => Enum[qw(null object array boolean string number integer)], sub => CodeRef]],
+  ],
+  handles_via => 'Hash',
+  handles => {
+    format_validations => 'elements',
+  },
+  lazy => 1,
+  default => sub { {} },
+);
 
 sub add_schema {
   my $self = shift;
@@ -191,6 +180,7 @@ sub traverse {
       $self,  # for discontinued keywords defined in the base schema
     ],
     identifiers => [],
+    configs => {},
     callbacks => $config_override->{callbacks} // {},
   };
 
@@ -216,9 +206,6 @@ sub evaluate {
   my $base_uri = Mojo::URL->new;  # TODO: will be set by a global attribute
 
   my $state = {
-    short_circuit => $config_override->{short_circuit} // $self->short_circuit,
-    collect_annotations => $config_override->{collect_annotations} // $self->collect_annotations,
-    validate_formats => $config_override->{validate_formats} // $self->validate_formats,
     depth => 0,
     data_path => '',
     traversed_schema_path => '',        # the accumulated path up to the last $ref traversal
@@ -255,6 +242,15 @@ sub evaluate {
 
     abort($state, 'unable to find resource %s', $schema_reference) if not defined $schema;
 
+    $state = +{
+      %{$document->evaluator_configs},
+      (map {
+        my $val = $config_override->{$_} // $self->$_;
+        defined $val ? ( $_ => $val ) : ()
+      } qw(short_circuit collect_annotations validate_formats)),
+      %$state,
+    };
+
     @$state{qw(canonical_schema_uri document document_path)} = ($canonical_uri, $document, $document_path);
 
     $result = $self->_eval($data, $schema, $state);
@@ -277,7 +273,9 @@ sub evaluate {
     output_format => $self->output_format,
     result => $result,
     $result
-      ? ($state->{collect_annotations} ? (annotations => $state->{annotations}) : ())
+      # strip annotations from result if user didn't explicitly ask for them
+      ? ($config_override->{collect_annotations} // $self->collect_annotations
+          ? (annotations => $state->{annotations}) : ())
       : (errors => $state->{errors}),
   );
 }
@@ -364,109 +362,6 @@ sub _eval {
   @{$state->{annotations}} = @parent_annotations if not $result;
   return $result;
 }
-
-# it's a bit gross keeping this here rather than with the Format vocabulary,
-# but it would be messier passing the data over when we instantiate the vocabulary
-# during evaluation.
-has _format_validations => (
-  is => 'bare',
-  isa => HashRef[Dict[
-      type => Enum[qw(null object array boolean string number integer)],
-      sub => CodeRef,
-    ]],
-  handles_via => 'Hash',
-  handles => {
-    _get_format_validation => 'get',
-    _set_format_validation => 'set',
-  },
-  lazy => 1,
-  default => sub {
-    my $is_datetime = sub {
-      eval { require Time::Moment; 1 } or return 1;
-      eval { Time::Moment->from_string($_[0]) } ? 1 : 0,
-    };
-    my $is_email = sub {
-      eval { require Email::Address::XS; Email::Address::XS->VERSION(1.01); 1 } or return 1;
-      Email::Address::XS->parse($_[0])->is_valid;
-    };
-    my $is_hostname = sub {
-      eval { require Data::Validate::Domain; 1 } or return 1;
-      Data::Validate::Domain::is_domain($_[0]);
-    };
-    my $idn_decode = sub {
-      eval { require Net::IDN::Encode; 1 } or return $_[0];
-      try { return Net::IDN::Encode::domain_to_ascii($_[0]) } catch { return $_[0]; }
-    };
-    my $is_ipv4 = sub {
-      my @o = split(/\./, $_[0], 5);
-      @o == 4 && (grep /^[0-9]{1,3}$/, @o) == 4 && (grep $_ < 256, @o) == 4;
-    };
-    # https://tools.ietf.org/html/rfc3339#appendix-A with some additions for the 2000 version
-    # as defined in https://en.wikipedia.org/wiki/ISO_8601#Durations
-    my $duration_re = do {
-      my $num = qr{[0-9]+(?:[.,][0-9]+)?};
-      my $second = qr{${num}S};
-      my $minute = qr{${num}M};
-      my $hour = qr{${num}H};
-      my $time = qr{T(?=[0-9])(?:$hour)?(?:$minute)?(?:$second)?};
-      my $day = qr{${num}D};
-      my $month = qr{${num}M};
-      my $year = qr{${num}Y};
-      my $week = qr{${num}W};
-      my $date = qr{(?=[0-9])(?:$year)?(?:$month)?(?:$day)?};
-      qr{^P(?:(?=.)(?:$date)?(?:$time)?|$week)$};
-    };
-
-    +{
-      'date-time' => { type => 'string', sub => $is_datetime },
-      date => { type => 'string', sub => sub { $is_datetime->($_[0].'T00:00:00Z') } },
-      time => { type => 'string', sub => sub { $is_datetime->('2000-01-01T'.$_[0]) } },
-      duration => { type => 'string', sub => sub {
-        $_[0] =~ $duration_re && $_[0] !~ m{[.,][0-9]+[A-Z].};
-      } },
-      email => { type => 'string', sub => sub { $is_email->($_[0]) && $_[0] !~ /[^[:ascii:]]/ } },
-      'idn-email' => { type => 'string', sub => $is_email },
-      hostname => { type => 'string', sub => $is_hostname },
-      'idn-hostname' => { type => 'string', sub => sub { $is_hostname->($idn_decode->($_[0])) } },
-      ipv4 => { type => 'string', sub => $is_ipv4 },
-      ipv6 => { type => 'string', sub => sub {
-        ($_[0] =~ /^(?:[[:xdigit:]]{0,4}:){0,7}[[:xdigit:]]{0,4}$/
-          || $_[0] =~ /^(?:[[:xdigit:]]{0,4}:){1,6}((?:[0-9]{1,3}\.){3}[0-9]{1,3})$/
-              && $is_ipv4->($1))
-          && $_[0] !~ /:::/
-          && $_[0] !~ /^:[^:]/
-          && $_[0] !~ /[^:]:$/
-          && do {
-            my $double_colons = ()= ($_[0] =~ /::/g);
-            my $colon_components = grep length, split(/:+/, $_[0], -1);
-            $double_colons < 2 && ($double_colons > 0
-              || ($colon_components == 8 && !defined $1)
-              || ($colon_components == 7 && defined $1))
-          };
-      } },
-      uri => { type => 'string', sub => sub {
-        my $uri = Mojo::URL->new($_[0]);
-        fc($uri->to_unsafe_string) eq fc($_[0]) && $uri->is_abs && $_[0] !~ /[^[:ascii:]]/;
-      } },
-      'uri-reference' => { type => 'string', sub => sub {
-        fc(Mojo::URL->new($_[0])->to_unsafe_string) eq fc($_[0]) && $_[0] !~ /[^[:ascii:]]/;
-      } },
-      iri => { type => 'string', sub => sub { Mojo::URL->new($_[0])->is_abs } },
-      'iri-reference' => { type => 'string', sub => sub { 1 } },
-      uuid => { type => 'string', sub => sub {
-        $_[0] =~ /^[[:xdigit:]]{8}-(?:[[:xdigit:]]{4}-){3}[[:xdigit:]]{12}$/;
-      } },
-      'uri-template' => { type => 'string', sub => sub { 1 } },
-      'json-pointer' => { type => 'string', sub => sub {
-        (!length($_[0]) || $_[0] =~ m{^/}) && $_[0] !~ m{~(?![01])};
-      } },
-      'relative-json-pointer' => { type => 'string', sub => sub {
-        $_[0] =~ m{^[0-9]+(?:#$|$|/)} && $_[0] !~ m{~(?![01])};
-      } },
-      regex => { type => 'string', sub => sub { eval { qr/$_[0]/; 1 } ? 1 : 0 } },
-    }
-  },
-);
 
 sub keywords { qw(definitions dependencies) }
 
@@ -635,7 +530,7 @@ JSON::Schema::Draft201909 - Validate data against a schema
 
 =head1 VERSION
 
-version 0.017
+version 0.018
 
 =head1 SYNOPSIS
 

@@ -6,7 +6,7 @@
 ##    Author: Bryan Jurish <moocow@cpan.org>
 ##
 ## Description: Yapp parser specification for DDC queries
-##  + last updated for ddc v2.1.15
+##  + last updated for ddc v2.2.8
 ##
 ################################################################
 
@@ -21,7 +21,6 @@
 ##    Author: Bryan Jurish <moocow@cpan.org>
 ##
 ## Description: Yapp parser for DDC queries
-##  + OBSOLETE: needs update for ddc-2.x syntax
 ##
 ################################################################
 
@@ -103,8 +102,8 @@ sub show_hint {
 ##-------------------------------------------------------------
 ## query (q*): Top Level (Query Root)
 query:
-	  query_conditions	{ $_[0]->SetQuery($_[1]) }
-  	| count_query	 	{ $_[0]->SetQuery($_[1]) }
+	  query_conditions q_directives	{ $_[0]->SetQuery($_[1]) }
+  	| count_query      q_directives	{ $_[0]->SetQuery($_[1]) }
   	;
 
 ##-------------------------------------------------------------
@@ -188,8 +187,7 @@ q_comment:
 	;
 
 q_flag:
-		':' qf_subcorpora 	{ undef }
-  	|	CNTXT integer 		{ $_[0]->qopts->{ContextSentencesCount} = $_[2]; undef }
+  		CNTXT integer 		{ $_[0]->qopts->{ContextSentencesCount} = $_[2]; undef }
 	|	CNTXT '[' integer ']'	{ $_[0]->qopts->{ContextSentencesCount} = $_[3]; undef }
 	|	WITHIN s_breakname	{ push(@{$_[0]->qopts->{Within}}, $_[2]); undef }
 	|	SEPARATE_HITS		{ $_[0]->qopts->{SeparateHits} = 1; undef }
@@ -201,12 +199,6 @@ q_flag:
 	;
 
 
-qf_subcorpora:
-						{ undef } ##-- empty
-	|	s_subcorpus			{ push(@{$_[0]->qopts->{Subcorpora}}, $_[1]); undef }
-	|	qf_subcorpora ',' s_subcorpus	{ push(@{$_[0]->qopts->{Subcorpora}}, $_[3]); undef }
-	;
-
 q_filter:
 		qf_has_field	{ $_[1]; }
 	|	qf_rank_sort	{ $_[1]; }
@@ -214,7 +206,8 @@ q_filter:
 	|	qf_size_sort	{ $_[1]; }
 	|	qf_date_sort	{ $_[1]; }
 	|	qf_bibl_sort	{ $_[1]; }
-	|	qf_random_sort	{ $_[1]; }
+  	|	qf_random_sort	{ $_[1]; }
+  	|	qf_prune_sort   { $_[1]; }
 	;
 
 qf_has_field:
@@ -266,6 +259,11 @@ qf_bibl_sort:
 	|	LESS_BY    '[' s_biblname qfb_bibl ']'	{ $_[0]->newf('CQFBiblSort', DDC::PP::LessByFreeBiblField, $_[3], @{$_[4]}) }
 	|	GREATER_BY '[' s_biblname qfb_bibl ']'	{ $_[0]->newf('CQFBiblSort', DDC::PP::LessByFreeBiblField, $_[3], @{$_[4]}) }
 	;
+
+qf_prune_sort:
+		PRUNE_ASC  '[' int_str l_prunekeys ']'	{ $_[0]->newf('CQFPrune', DDC::PP::LessByPruneKey,    $_[3], $_[4]); }
+	|	PRUNE_DESC '[' int_str l_prunekeys ']'	{ $_[0]->newf('CQFPrune', DDC::PP::GreaterByPruneKey, $_[3], $_[4]); }
+  	;
 
 ##-------------------------------------------------------------
 ## (qfb*): Filter Bounds
@@ -333,6 +331,19 @@ qfbc_offset:
 	|	integer		{  $_[1] }
 	|	'+' integer	{  $_[2] }
 	|	'-' integer	{ -$_[2] }
+	;
+
+
+##-------------------------------------------------------------
+## q_directives: global server directives
+
+q_directives:
+						{ undef }  ##-- empty: ignore
+	|	q_directives qd_subcorpora	{ undef }
+	;
+
+qd_subcorpora:
+		':' { @{$_[0]->qopts->{Subcorpora}}=qw(); }  l_subcorpora { undef }
 	;
 
 
@@ -593,26 +604,58 @@ l_countkeys:
 	|	l_countkeys ',' count_key	{ $_[1]->PushKey($_[3]); $_[1] }
 	;
 
+##-- l_prunekeys: CQCountKeyExprList
+l_prunekeys:
+						{ $_[0]->newq('CQCountKeyExprList') }
+	|	prune_key			{ $_[0]->newq('CQCountKeyExprList', Exprs=>[$_[1]]) }
+	|	l_prunekeys ',' prune_key	{ $_[1]->PushKey($_[3]); $_[1] }
+	;
+
 l_indextuple:
 								{ [] }
 	|	s_indextuple_item				{ [$_[1]] }
 	|	l_indextuple ',' s_indextuple_item		{ push(@{$_[1]},$_[3]); $_[1] }
 	;
 
+l_subcorpora:
+						{ undef } ##-- empty
+	|	s_subcorpus			{ push(@{$_[0]->qopts->{Subcorpora}}, $_[1]); undef }
+	|	l_subcorpora ',' s_subcorpus	{ push(@{$_[0]->qopts->{Subcorpora}}, $_[3]); undef }
+	;
+
 ##-------------------------------------------------------------
-## count_key: count-key expressions
+## count_key, prune_key: count- and prune-key expressions
 
 count_key:
+		count_key_const			{ $_[1] }
+	|	count_key_meta			{ $_[1] }
+	|	count_key_token			{ $_[1] }
+ 	|	count_key '~' replace_regex	{ $_[0]->newq('CQCountKeyExprRegex', $_[1],@{$_[3]}) }
+	|	'(' count_key ')'		{ $_[2] }
+  	;
+
+prune_key:
+		count_key_const			{ $_[1] }
+	|	count_key_meta			{ $_[1] }
+ 	|	prune_key '~' replace_regex	{ $_[0]->newq('CQCountKeyExprRegex', $_[1],@{$_[3]}) }
+	|	'(' prune_key ')'		{ $_[2] }
+	;
+
+count_key_const:
 		'*'				{ $_[0]->newq('CQCountKeyExprConstant', "*") }
 	|	'@' symbol			{ $_[0]->newq('CQCountKeyExprConstant', $_[2]) }
-	|	KW_FILEID			{ $_[0]->newq('CQCountKeyExprFileId', $_[1]) }
+  	;
+
+count_key_meta:
+		KW_FILEID			{ $_[0]->newq('CQCountKeyExprFileId', $_[1]) }
 	|	KW_FILENAME			{ $_[0]->newq('CQCountKeyExprFileName', $_[1]) }
 	|	KW_DATE				{ $_[0]->newq('CQCountKeyExprDate', $_[1]) }
     	|	KW_DATE '/' integer		{ $_[0]->newq('CQCountKeyExprDateSlice', $_[1],$_[3]) }
 	|	s_biblname			{ $_[0]->newq('CQCountKeyExprBibl', $_[1]) }
-	|	s_index ck_matchid ck_offset	{ $_[0]->newq('CQCountKeyExprToken', $_[1],$_[2],$_[3]) }
- 	|	count_key '~' replace_regex	{ $_[0]->newq('CQCountKeyExprRegex', $_[1],@{$_[3]}) }
-	|	'(' count_key ')'		{ $_[2]; }
+	;
+
+count_key_token:
+  		s_index ck_matchid ck_offset	{ $_[0]->newq('CQCountKeyExprToken', $_[1],$_[2],$_[3]) }
 	;
 
 ck_matchid:

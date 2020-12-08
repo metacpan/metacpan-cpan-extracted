@@ -3,7 +3,7 @@ package Net::Async::Redis::Commands;
 use strict;
 use warnings;
 
-our $VERSION = '3.005'; # VERSION
+our $VERSION = '3.006'; # VERSION
 
 =head1 NAME
 
@@ -932,6 +932,31 @@ sub select : method {
 }
 
 =head1 METHODS - Generic
+
+=head2 copy
+
+Copy a key.
+
+=over 4
+
+=item * source
+
+=item * destination
+
+=item * [DB destination-db]
+
+=item * [REPLACE]
+
+=back
+
+L<https://redis.io/commands/copy>
+
+=cut
+
+sub copy : method {
+    my ($self, @args) = @_;
+    $self->execute_command(qw(COPY) => @args)
+}
 
 =head2 del
 
@@ -4689,7 +4714,11 @@ Appends a new entry to a stream.
 
 =item * key
 
-=item * ID
+=item * [MAXLEN [=|~] length]
+
+=item * [NOMKSTREAM]
+
+=item * *|ID
 
 =item * field value [field value ...]
 
@@ -4768,9 +4797,9 @@ Create, destroy, and manage consumer groups.
 
 =over 4
 
-=item * [CREATE key groupname id-or-$]
+=item * [CREATE key groupname ID|$ [MKSTREAM]]
 
-=item * [SETID key groupname id-or-$]
+=item * [SETID key groupname ID|$]
 
 =item * [DESTROY key groupname]
 
@@ -4843,9 +4872,7 @@ Return information and entries from a stream consumer group pending entries list
 
 =item * group
 
-=item * [start end count]
-
-=item * [consumer]
+=item * [[IDLE min-idle-time] start end count [consumer]]
 
 =back
 
@@ -4897,7 +4924,7 @@ Return never seen elements in multiple streams, with IDs greater than the ones r
 
 =item * key [key ...]
 
-=item * id [id ...]
+=item * ID [ID ...]
 
 =back
 
@@ -4976,9 +5003,7 @@ Trims the stream to (approximately if '~' is passed) a certain size.
 
 =item * MAXLEN
 
-=item * [~]
-
-=item * count
+=item * [=|~] length
 
 =back
 

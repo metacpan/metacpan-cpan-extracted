@@ -72,6 +72,7 @@ CQFHasFieldPrefix*	O_DDCXS_OBJECT
 CQFHasFieldSuffix*	O_DDCXS_OBJECT
 CQFHasFieldInfix*	O_DDCXS_OBJECT
 CQFHasFieldSet*	O_DDCXS_OBJECT
+CQFPrune*	O_DDCXS_OBJECT    
 
 ##-- object types: QueryOptions.xsp
 CQueryOptions*	O_DDCXS_OBJECT

@@ -49,10 +49,10 @@ sub new {
     } else {
         $api_client = AsposeCellsCloud::ApiClient->new(@_);
     }
-
-    my $access_token  =  $api_client->o_auth_post('grant_type' => "client_credentials", 'client_id' => $api_client->{config}->{app_sid}, 'client_secret' =>$api_client->{config}->{app_key})->access_token;
-    $api_client->{config}->{access_token} = $access_token;
-
+    if($api_client->need_auth()){
+        my $access_token  =  $api_client->o_auth_post('grant_type' => "client_credentials", 'client_id' => $api_client->{config}->{app_sid}, 'client_secret' =>$api_client->{config}->{app_key})->access_token;
+        $api_client->{config}->{access_token} = $access_token;
+    }
     bless { api_client => $api_client }, $class;
 
 }
@@ -33713,8 +33713,7 @@ sub upload_file {
         my $_base_variable = "{" . "path" . "}";
         my $_base_value = $self->{api_client}->to_path_value($args{'path'});
         $_resource_path =~ s/$_base_variable/$_base_value/g;
-    }
-
+    }    
     $self->{api_client}->check_access_token();
     my $_body_data;
     # body params

@@ -11,7 +11,7 @@ BEGIN {
     use_ok( 'XML::Sig' );
 }
 
-open my $file, 't/logout_response.xml' or die "no test saml logout response";
+open my $file, 't/signed/logout_response.xml' or die "no test saml logout response";
 my $xml;
 {
     local undef $/;

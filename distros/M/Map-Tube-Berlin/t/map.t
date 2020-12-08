@@ -23,3 +23,4 @@ Route 1|Adenauerplatz|Savignyplatz|Adenauerplatz,Wilmersdorfer Str.,Charlottenbu
 Route 2|platz der luftbrücke|möckernbrücke|Platz der Luftbrücke,Mehringdamm,Möckernbrücke
 Route 3|Friedrichstr.|Alexanderplatz|Friedrichstr.,Hackescher Markt,Alexanderplatz
 Route 4|Treptower Park|Warschauer Str.|Treptower Park,Warschauer Str.
+Route 5|Stadtmitte|Rotes Rathaus|Stadtmitte,Unter den Linden,Rotes Rathaus

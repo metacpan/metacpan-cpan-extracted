@@ -6,11 +6,12 @@ NAME
 SYNOPSIS
 
        use Device::Chip::NoritakeGU_D;
+       use Future::AsyncAwait;
     
        my $chip = Device::Chip::NoritakeGU_D->new( interface => "UART" );
-       $chip->mount( Device::Chip::Adapter::...->new )->get;
+       await $chip->mount( Device::Chip::Adapter::...->new );
     
-       $chip->text( "Hello, world!" )->get;
+       await $chip->text( "Hello, world!" );
 
 DESCRIPTION
 
@@ -36,12 +37,12 @@ CONSTRUCTOR
 
 METHODS
 
-    The following methods documented with a trailing call to ->get return
-    Future instances.
+    The following methods documented in an await expression return Future
+    instances.
 
  text
 
-       $chip->text( $str )->get
+       await $chip->text( $str );
 
     Draw text at the cursor position.
 
@@ -51,25 +52,25 @@ METHODS
 
  cursor_home
 
-       $chip->cursor_left->get
-       $chip->cursor_right->get
+       await $chip->cursor_left;
+       await $chip->cursor_right;
     
-       $chip->cursor_linehome->get
+       await $chip->cursor_linehome;
     
-       $chip->cursor_home->get
+       await $chip->cursor_home;
 
     Move the cursor left or right one character position, to the beginning
     of the line, or to the home position (top left corner).
 
  cursor_goto
 
-       $chip->cursor_goto( $x, $y )->get
+       await $chip->cursor_goto( $x, $y );
 
     Moves the cursor to the $x'th column of the $y'th line (zero-indexed).
 
  linefeed
 
-       $chip->linefeed->get
+       await $chip->linefeed;
 
     Move the cursor down to the next line.
 
@@ -81,7 +82,7 @@ METHODS
 
  select_window
 
-       $chip->select_window( $win )->get
+       await $chip->select_window( $win );
 
     Select the main window (when $win is 0), or one of the four numbered
     sub-windows.
@@ -94,26 +95,26 @@ METHODS
 
  set_cursor_visible
 
-       $chip->set_cursor_visible( $bool )->get
+       await $chip->set_cursor_visible( $bool );
 
     Set whether the cursor is visible.
 
  set_brightness
 
-       $chip->set_brightness( $val )->get
+       await $chip->set_brightness( $val );
 
     Set the display brightness, from 1 to 8.
 
  set_reverse
 
-       $chip->set_reverse( $bool )->get
+       await $chip->set_reverse( $bool );
 
     Sets whether subsequent text will be rendered in "reverse video" (clear
     pixels on a set background) effect.
 
  set_write_mixture_display_mode
 
-       $chip->set_write_mixture_display_mode( $mode )->get
+       await $chip->set_write_mixture_display_mode( $mode );
 
     Set the combining mode for newly-added display content. $mode must be
     one of
@@ -122,7 +123,7 @@ METHODS
 
  set_font_size
 
-       $chip->set_font_size( $size )->get
+       await $chip->set_font_size( $size );
 
     Set the font size. $size must be one of
 
@@ -130,7 +131,7 @@ METHODS
 
  set_font_width
 
-       $chip->set_font_width( $width )->get
+       await $chip->set_font_width( $width );
 
     Set the font width. $width must be one of
 
@@ -138,14 +139,14 @@ METHODS
 
  set_font_magnification
 
-       $chip->set_font_magnification( $xscale, $yscale )->get
+       await $chip->set_font_magnification( $xscale, $yscale );
 
     Set the font scaling factor. $xscale must be between 1 to 4, and
     $yscale must be 1 or 2.
 
  realtime_image_display_columns
 
-       $chip->realtime_image_display_columns( @columns )->get
+       await $chip->realtime_image_display_columns( @columns );
 
     Sends a bitmapped image to the display, at the cursor position. The
     cursor is not moved.
@@ -155,26 +156,26 @@ METHODS
 
  set_gpio_direction
 
-       $chip->set_gpio_direction( $dir )->get
+       await $chip->set_gpio_direction( $dir );
 
     Configure the GPIO pins for input or output. $dir is bitmask of four
     bits. Low bits correspond to input, high bits to output.
 
  set_gpio_output
 
-       $chip->set_gpio_output( $value )->get
+       await $chip->set_gpio_output( $value );
 
     Write the value to the GPIO pins.
 
  read_gpio
 
-       $value = $chip->read_gpio->get
+       $value = await $chip->read_gpio;
 
     Returns the current state of the GPIO pins.
 
  read_touchswitches
 
-       $switches = $chip->read_touchswitches->get
+       $switches = await $chip->read_touchswitches;
 
     Reads the status of the panel touch switches. Returns a hash reference
     whose keys are the names of the touch areas (SW1, SW2, ...) and values

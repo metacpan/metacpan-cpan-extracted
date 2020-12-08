@@ -57,11 +57,14 @@ foo #:comment\nbar	foo bar
 
 ##-- subcorpus paths (ddc >= v2.2.0)
  x :foo,bar	x :'foo','bar'
- x :foo:bar	x :'foo','bar'
+# x :foo:bar	x :'foo','bar' #: <= ddc-v2.2.7
+ x :foo:bar	x :'bar' #: >= ddc-v2.2.8
  x :foo/bar,baz	x :'foo/bar','baz'
  x :*/foo,bar/*	x :'*/foo','bar/*'
  x :	x
  x :*	x :'*'
+ x :**/foo,**/bar	x :'**/foo','**/bar' #: >= ddc-v2.2.8
+ x :foo #: uhoh :bar	x :'foo' #: >= ddc-v2.2.8
 
 ##-- negative dates (v2.2.4)
 Plato #has_date[-427]	Plato #has_date['-427']
@@ -74,3 +77,6 @@ Plato #asc_date[-0427-01-01,-0347-12-31]	Plato #asc_date['-0427-01-01','-0347-12
 # implicit date->symbol conversion
 1066	'1066'
 -424	'-424'
+
+##-- prune filters (v2.2.8)
+Haus #prune[42,author]	'Haus' #prune_asc[42,'author']

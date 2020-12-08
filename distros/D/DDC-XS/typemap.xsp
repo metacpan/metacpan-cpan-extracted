@@ -75,6 +75,7 @@
 %typemap{CQFHasFieldSuffix*}{simple};
 %typemap{CQFHasFieldInfix*}{simple};
 %typemap{CQFHasFieldSet*}{simple};
+%typemap{CQFPrune*}{simple};
 
 //-- QueryOptions.h
 %typemap{CQueryOptions*}{simple};

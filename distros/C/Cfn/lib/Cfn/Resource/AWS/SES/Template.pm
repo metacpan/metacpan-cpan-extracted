@@ -1,4 +1,4 @@
-# AWS::SES::Template generated from spec 2.25.0
+# AWS::SES::Template generated from spec 18.4.0
 use Moose::Util::TypeConstraints;
 
 coerce 'Cfn::Resource::Properties::AWS::SES::Template',
@@ -29,11 +29,11 @@ coerce 'Cfn::Resource::Properties::AWS::SES::Template::Template',
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::SES::Template::TemplateValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::SES::Template::Template->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::SES::Template::TemplateValue {
+package Cfn::Resource::Properties::Object::AWS::SES::Template::Template {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -53,3 +53,30 @@ package Cfn::Resource::Properties::AWS::SES::Template {
 }
 
 1;
+### main pod documentation begin ###
+
+=encoding UTF-8
+
+=head1 NAME
+
+Cfn::Resource::AWS::SES::Template - Cfn resource for AWS::SES::Template
+
+=head1 DESCRIPTION
+
+This module implements a Perl module that represents the CloudFormation object AWS::SES::Template.
+
+See L<Cfn> for more information on how to use it.
+
+=head1 AUTHOR
+
+    Jose Luis Martinez
+    CAPSiDE
+    jlmartinez@capside.com
+
+=head1 COPYRIGHT and LICENSE
+
+Copyright (c) 2013 by CAPSiDE
+This code is distributed under the Apache 2 License. The full text of the 
+license can be found in the LICENSE file included with this module.
+
+=cut

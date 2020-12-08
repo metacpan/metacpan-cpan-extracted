@@ -1,4 +1,4 @@
-# Created by create_map_tube_xml.pl 0.03 (part of BBBike)
+# Created by create_map_tube_xml.pl 0.04 (part of BBBike)
 
 --stations
 
@@ -256,6 +256,9 @@ Bayerischer Platz
 Rathaus Schöneberg
 
 # U5
+Bundestag
+Unter den Linden
+Rotes Rathaus
 Schillingstr.
 Strausberger Platz
 Weberwiese
@@ -283,7 +286,6 @@ Paradestr.
 Platz der Luftbrücke
 Mehringdamm
 Kochstr.
-Französische Str.
 Oranienburger Tor
 Naturkundemuseum
 Schwartzkopffstr.
@@ -450,6 +452,7 @@ Schloßstr.
 6|Borsigwerke|Alt-Tegel
 1001|Botanischer Garten|Rathaus Steglitz
 1001,1025,1026,1002|Brandenburger Tor|Friedrichstr.
+5|Brandenburger Tor|Unter den Linden
 3|Breitenbachplatz|Podbielskiallee
 7|Britz-Süd|Parchimer Allee
 1002|Buch|Röntgental
@@ -457,6 +460,7 @@ Schloßstr.
 9|Bundesplatz|Friedrich-Wilhelm-Platz
 1041|Bundesplatz|Heidelberger Platz
 1046|Bundesplatz|Innsbrucker Platz
+5|Bundestag|Brandenburger Tor
 2|Bülowstr.|Nollendorfplatz
 1003|Charlottenburg|Savignyplatz
 1003,1005,1007,1009|Charlottenburg|Westkreuz
@@ -482,7 +486,6 @@ Schloßstr.
 1008,1085|Frankfurter Allee|Storkower Str.
 5|Frankfurter Tor|Samariterstr.
 8|Franz-Neumann-Platz|Residenzstr.
-6|Französische Str.|Friedrichstr.
 1005|Fredersdorf|Neuenhagen
 3|Freie Universität|Oskar-Helene-Heim
 1001|Friedenau|Schöneberg
@@ -522,6 +525,7 @@ Schloßstr.
 9|Hansaplatz|Zoologischer Garten
 7|Haselhorst|Zitadelle
 1003,1005,1007,1009|Hauptbahnhof|Bellevue
+5|Hauptbahnhof|Bundestag
 1003|Hauptbahnhof|Friedrichstr.
 2|Hausvogteiplatz|Stadtmitte
 1009,1003|Heerstr.|Olympiastadion
@@ -676,6 +680,7 @@ Schloßstr.
 7|Rohrdamm|Paulsternstr.
 2|Rosa-Luxemburg-Platz|Alexanderplatz
 8|Rosenthaler Platz|Bernauer Str.
+5|Rotes Rathaus|Alexanderplatz
 7|Rudow|Zwickauer Damm
 1003|Rummelsburg|Ostkreuz
 1002|Röntgental|Zepernick
@@ -713,8 +718,8 @@ Schloßstr.
 1047|Spindlersfeld|Oberspree
 2|Spittelmarkt|Hausvogteiplatz
 1007,1075|Springpfuhl|Friedrichsfelde Ost
-6|Stadtmitte|Französische Str.
 2|Stadtmitte|Mohrenstr.
+6|Stadtmitte|Unter den Linden
 1041|Storkower Str.|Frankfurter Allee
 1008,1085|Storkower Str.|Landsberger Allee
 1005|Strausberg|Petershagen Nord
@@ -742,6 +747,8 @@ Schloßstr.
 1009|Treptower Park|Warschauer Str.
 9|Turmstr.|Hansaplatz
 6|Ullsteinstr.|Kaiserin-Augusta-Str.
+6|Unter den Linden|Friedrichstr.
+5|Unter den Linden|Rotes Rathaus
 4|Viktoria-Luise-Platz|Bayerischer Platz
 2|Vinetastr.|Schönhauser Allee
 8|Voltastr.|Gesundbrunnen

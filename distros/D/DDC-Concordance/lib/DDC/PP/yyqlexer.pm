@@ -125,6 +125,8 @@ sub clear {
   $lex->{state} = 'INITIAL';
   @{$lex->{stack}} = qw();
   @{$lex->{comments}} = qw();
+  $lex->{yyDtrsPos} = 0;
+  $lex->{yyDtrsLen} = 0;
   delete $lex->{_cmtbuf};
   return $lex;
 }
@@ -369,6 +371,8 @@ sub yylex {
 	elsif ($$bufr =~ m/\G\#(?:(?:greater|de?sc)(?:_by)?_(?:count|val(?:ue)?))/pi) { $type = 'GREATER_BY_COUNT'; }
 	elsif ($$bufr =~ m/\G\#(?:less|asc)(?:_by)?/pi)			{ $type = 'LESS_BY'; }
 	elsif ($$bufr =~ m/\G\#(?:greater|de?sc)(?:_by)?/pi)		{ $type = 'GREATER_BY'; }
+	elsif ($$bufr =~ m/\G\#prune(?:_less|_asc)?(?:_by)?/pi)		{ $type = 'PRUNE_ASC'; }
+	elsif ($$bufr =~ m/\G\#prune(?:_greater|_de?sc)(?:_by)?/pi)	{ $type = 'PRUNE_DESC'; }
 	elsif ($$bufr =~ m/\G\#rand(?:om)?/pi)				{ $type = 'RANDOM'; }
 	elsif ($$bufr =~ m/\G\#by/pi)					{ $type = 'BY'; }
 	elsif ($$bufr =~ m/\G\#samp(?:le)?/pi)				{ $type = 'SAMPLE'; }
@@ -395,7 +399,7 @@ sub yylex {
 	elsif ($$bufr =~ m/\G\"/p)				{ $type = ${^MATCH}; } ##-- double-quotes
 
 	##-- subcorpus path-lists
-	elsif ($$bufr =~ m/\G\:/p)				{ $type = ${^MATCH}; $lex->{state}='Q_CORPORA'; }
+	elsif ($$bufr =~ m/\G\:/p)				{ $type = ${^MATCH}; $lex->{yyDtrsPos}=$lex->yypos(); $lex->{state}='Q_CORPORA'; }
 
 	##-- truncated symbols
 	elsif ($$bufr =~ m/\G\*\'($DEF{sq_text})\'\*/po) { $type='INFIX';  $text=$1; }	##-- dual-truncated quoted string (infix symbol)
@@ -457,6 +461,7 @@ sub yylex {
 	else						{ $type='__SKIP__'; $lex->yypopq(); }
 
 	$match = ${^MATCH};
+	$lex->{yyDtrsLen} = $lex->yypos()-$lex->{yyDtrsPos} if ($type ne '__SKIP__');
       }
       ##------------------------
       elsif ($lex->{state} eq 'Q_COMMENT') {

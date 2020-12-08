@@ -1,4 +1,4 @@
-# AWS::FMS::Policy generated from spec 11.1.0
+# AWS::FMS::Policy generated from spec 18.4.0
 use Moose::Util::TypeConstraints;
 
 coerce 'Cfn::Resource::Properties::AWS::FMS::Policy',
@@ -51,11 +51,11 @@ coerce 'Cfn::Resource::Properties::AWS::FMS::Policy::ResourceTag',
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::FMS::Policy::ResourceTagValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::FMS::Policy::ResourceTag->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::FMS::Policy::ResourceTagValue {
+package Cfn::Resource::Properties::Object::AWS::FMS::Policy::ResourceTag {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -95,11 +95,11 @@ coerce 'Cfn::Resource::Properties::AWS::FMS::Policy::PolicyTag',
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::FMS::Policy::PolicyTagValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::FMS::Policy::PolicyTag->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::FMS::Policy::PolicyTagValue {
+package Cfn::Resource::Properties::Object::AWS::FMS::Policy::PolicyTag {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -117,16 +117,17 @@ coerce 'Cfn::Resource::Properties::AWS::FMS::Policy::IEMap',
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::FMS::Policy::IEMapValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::FMS::Policy::IEMap->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::FMS::Policy::IEMapValue {
+package Cfn::Resource::Properties::Object::AWS::FMS::Policy::IEMap {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
   
   has ACCOUNT => (isa => 'Cfn::Value::Array|Cfn::Value::Function|Cfn::DynamicValue', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has ORGUNIT => (isa => 'Cfn::Value::Array|Cfn::Value::Function|Cfn::DynamicValue', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
 }
 
 package Cfn::Resource::Properties::AWS::FMS::Policy {
@@ -148,3 +149,30 @@ package Cfn::Resource::Properties::AWS::FMS::Policy {
 }
 
 1;
+### main pod documentation begin ###
+
+=encoding UTF-8
+
+=head1 NAME
+
+Cfn::Resource::AWS::FMS::Policy - Cfn resource for AWS::FMS::Policy
+
+=head1 DESCRIPTION
+
+This module implements a Perl module that represents the CloudFormation object AWS::FMS::Policy.
+
+See L<Cfn> for more information on how to use it.
+
+=head1 AUTHOR
+
+    Jose Luis Martinez
+    CAPSiDE
+    jlmartinez@capside.com
+
+=head1 COPYRIGHT and LICENSE
+
+Copyright (c) 2013 by CAPSiDE
+This code is distributed under the Apache 2 License. The full text of the 
+license can be found in the LICENSE file included with this module.
+
+=cut

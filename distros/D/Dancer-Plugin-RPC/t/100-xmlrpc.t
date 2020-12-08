@@ -1,8 +1,7 @@
 #! perl -I. -w
 use t::Test::abeltje;
 
-use Dancer qw/:syntax !pass !warning/;
-use Dancer::Plugin::RPC::XMLRPC;
+BEGIN { $ENV{DANCER_APPDIR} = 't' }
 use TestProject;
 use Dancer::Test;
 
@@ -97,6 +96,7 @@ route_doesnt_exist([GET => '/'], "no GET /");
 }
 
 {
+    my $old_log = read_logs(); # clean up for this test
     my $response = dancer_response(
         POST => '/api',
         {
@@ -129,6 +129,40 @@ route_doesnt_exist([GET => '/'], "no GET /");
         {uppercase => 'ALLES GROTE LETTERS'},
         "system.version"
     );
+
+    my @expected_logs = (
+        {
+            level   => 'debug',
+            message => qr{^\Q[handle_xmlrpc_request] Processing:}
+        },
+        {
+            level   => 'debug',
+            message => qr{^\Q[handle_xmlrpc_call(api.uppercase)]}
+        },
+        {
+            level   => 'debug',
+            message => qr{^\Q[uppercase] {'argument' => 'Alles grote letters'}}
+        },
+        {
+            level   => 'debug',
+            message => qr{^\Q[handled_xmlrpc_request(api.uppercase)]}
+        },
+        {
+            level   => 'info',
+            message => qr{^\Q[RPC::XMLRPC]\E request for api.uppercase took 0\.\d+s},
+        },
+        {
+            level   => 'debug',
+            message => qr{^\Q[xmlrpc_response] }
+        },
+    );
+
+    my $read_logs = read_logs();
+    for my $line (@$read_logs) {
+        my $test = shift @expected_logs;
+        is($line->{level}, $test->{level}, "  Level ");
+        like($line->{message}, $test->{message}, "  Message ");
+    }
 }
 
-done_testing();
+abeltje_done_testing();

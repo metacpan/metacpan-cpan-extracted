@@ -2,19 +2,21 @@
 
 use utf8;
 
-use strict;
+use v5.26;
 use warnings;
 
 use Test::More;
 use Test::Device::Chip::Adapter;
 
+use Future::AsyncAwait;
+
 use Device::Chip::BNO055;
 
 my $chip = Device::Chip::BNO055->new;
 
-$chip->mount(
+await $chip->mount(
    my $adapter = Test::Device::Chip::Adapter->new,
-)->get;
+);
 
 # ->read_config
 {
@@ -26,7 +28,7 @@ $chip->mount(
    $adapter->expect_write_then_read( "\x08", 4 )
       ->returns( "\x0D\x0B\x38\x00" );
 
-   is_deeply( $chip->read_config->get,
+   is_deeply( await $chip->read_config,
       {
          # Page 0 config
          ACC_Unit    => "m/s²",
@@ -65,10 +67,10 @@ $chip->mount(
    $adapter->expect_write( "\x07\x00" );
    $adapter->expect_write( "\x42\x03" );
 
-   $chip->change_config(
+   await $chip->change_config(
       X_AXIS_SIGN => "negative",
       Y_AXIS_SIGN => "negative",
-   )->get;
+   );
 
    $adapter->check_and_clear( '->change_config' );
 }
@@ -77,11 +79,11 @@ $chip->mount(
 {
    $adapter->expect_write( "\x3D\x01" );
 
-   $chip->set_opr_mode( "ACCONLY" )->get;
+   await $chip->set_opr_mode( "ACCONLY" );
 
    $adapter->check_and_clear( '->set_opr_mode' );
 
-   is( $chip->read_config->get->{OPR_MODE}, "ACCONLY",
+   is( ( await $chip->read_config )->{OPR_MODE}, "ACCONLY",
       '->read_config now gives OPR_MODE=ACCONLY' );
 
    $adapter->check_and_clear( '->read_config after ->set_opr_mode' );

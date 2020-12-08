@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20200904144527;
+our $VERSION = 1.20201204215954;
 
 my $formatters = [
                 {
@@ -63,78 +63,46 @@ my $validators = {
                 'voip' => '857[58]\\d{4}'
               };
 my %areanames = ();
-$areanames{en}->{2292021} = "Ongala";
-$areanames{en}->{2292022} = "Kandiévé";
-$areanames{en}->{2292024} = "Sèmè";
-$areanames{en}->{2292025} = "Pobè\/Kétou";
-$areanames{en}->{2292026} = "Sakété\/Igolo";
-$areanames{en}->{2292027} = "Adjohoun";
-$areanames{en}->{2292029} = "Ouémé\/Plateau\ departments";
-$areanames{en}->{2292130} = "Cadjehoun";
-$areanames{en}->{2292131} = "Ganhi";
-$areanames{en}->{2292132} = "Jéricho";
-$areanames{en}->{2292133} = "Akpakpa";
-$areanames{en}->{2292134} = "Ouidah";
-$areanames{en}->{2292135} = "Godomey";
-$areanames{en}->{2292136} = "Abomey\-Calaci";
-$areanames{en}->{2292137} = "Allada";
-$areanames{en}->{2292138} = "Kouhounou";
-$areanames{en}->{2292139} = "Littoral\/Atlantique\ departments";
-$areanames{en}->{2292241} = "Lokossa";
-$areanames{en}->{2292243} = "Come";
-$areanames{en}->{2292246} = "Dogbo";
-$areanames{en}->{2292249} = "Mono\/Kouffo\/Zou\/Collines\ departments";
-$areanames{en}->{2292250} = "Abomey";
-$areanames{en}->{2292251} = "Bohicon";
-$areanames{en}->{2292252} = "Covè";
-$areanames{en}->{2292253} = "Dassa\-Zoumé";
-$areanames{en}->{2292254} = "Savalou";
-$areanames{en}->{2292255} = "Savè";
-$areanames{en}->{2292259} = "Mono\/Kouffo\/Zou\/Collines\ departments";
-$areanames{en}->{2292361} = "Parakou";
-$areanames{en}->{2292362} = "Nikki\/Ndali";
-$areanames{en}->{2292363} = "Kandi\/Gogounou\/Ségbana";
-$areanames{en}->{2292365} = "Banikoara";
-$areanames{en}->{2292367} = "Malanville";
-$areanames{en}->{2292380} = "Djougou";
-$areanames{en}->{2292382} = "Natitingou";
-$areanames{en}->{2292383} = "Tanguiéta";
-$areanames{fr}->{2292021} = "Ongala";
-$areanames{fr}->{2292022} = "Kandiévé";
-$areanames{fr}->{2292024} = "Sèmè";
-$areanames{fr}->{2292025} = "Pobè\/Kétou";
-$areanames{fr}->{2292026} = "Sakété\/Igolo";
-$areanames{fr}->{2292027} = "Adjohoun";
-$areanames{fr}->{2292029} = "Départements\ Ouémé\/Plateau";
-$areanames{fr}->{2292130} = "Cadjehoun";
-$areanames{fr}->{2292131} = "Ganhi";
-$areanames{fr}->{2292132} = "Jéricho";
-$areanames{fr}->{2292133} = "Akpakpa";
-$areanames{fr}->{2292134} = "Ouidah";
-$areanames{fr}->{2292135} = "Godomey";
-$areanames{fr}->{2292136} = "Abomey\-Calaci";
-$areanames{fr}->{2292137} = "Allada";
-$areanames{fr}->{2292138} = "Kouhounou";
-$areanames{fr}->{2292139} = "Départements\ Littoral\/Atlantique";
-$areanames{fr}->{2292241} = "Lokossa";
-$areanames{fr}->{2292243} = "Come";
-$areanames{fr}->{2292246} = "Dogbo";
-$areanames{fr}->{2292249} = "Départements\ Mono\/Couffo\/Zou\/Collines";
-$areanames{fr}->{2292250} = "Abomey";
-$areanames{fr}->{2292251} = "Bohicon";
-$areanames{fr}->{2292252} = "Covè";
-$areanames{fr}->{2292253} = "Dassa\-Zoumé";
-$areanames{fr}->{2292254} = "Savalou";
-$areanames{fr}->{2292255} = "Savè";
-$areanames{fr}->{2292259} = "Départements\ Mono\/Couffo\/Zou\/Collines";
-$areanames{fr}->{2292361} = "Parakou";
-$areanames{fr}->{2292362} = "Nikki\/Ndali";
-$areanames{fr}->{2292363} = "Kandi\/Gogounou\/Ségbana";
-$areanames{fr}->{2292365} = "Banikoara";
-$areanames{fr}->{2292367} = "Malanville";
-$areanames{fr}->{2292380} = "Djougou";
-$areanames{fr}->{2292382} = "Natitingou";
-$areanames{fr}->{2292383} = "Tanguiéta";
+$areanames{fr} = {"2292259", "Départements\ Mono\/Couffo\/Zou\/Collines",
+"2292249", "Départements\ Mono\/Couffo\/Zou\/Collines",
+"2292139", "Départements\ Littoral\/Atlantique",
+"2292029", "Départements\ Ouémé\/Plateau",};
+$areanames{en} = {"2292383", "Tanguiéta",
+"2292133", "Akpakpa",
+"2292250", "Abomey",
+"2292025", "Pobè\/Kétou",
+"2292026", "Sakété\/Igolo",
+"2292131", "Ganhi",
+"2292365", "Banikoara",
+"2292134", "Ouidah",
+"2292132", "Jéricho",
+"2292382", "Natitingou",
+"2292251", "Bohicon",
+"2292241", "Lokossa",
+"2292138", "Kouhounou",
+"2292367", "Malanville",
+"2292254", "Savalou",
+"2292252", "Covè",
+"2292253", "Dassa\-Zoumé",
+"2292243", "Come",
+"2292029", "Ouémé\/Plateau\ departments",
+"2292130", "Cadjehoun",
+"2292380", "Djougou",
+"2292027", "Adjohoun",
+"2292021", "Ongala",
+"2292363", "Kandi\/Gogounou\/Ségbana",
+"2292136", "Abomey\-Calaci",
+"2292022", "Kandiévé",
+"2292024", "Sèmè",
+"2292361", "Parakou",
+"2292135", "Godomey",
+"2292362", "Nikki\/Ndali",
+"2292249", "Mono\/Kouffo\/Zou\/Collines\ departments",
+"2292259", "Mono\/Kouffo\/Zou\/Collines\ departments",
+"2292137", "Allada",
+"2292255", "Savè",
+"2292139", "Littoral\/Atlantique\ departments",
+"2292246", "Dogbo",};
 
     sub new {
       my $class = shift;

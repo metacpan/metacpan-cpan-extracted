@@ -30,6 +30,10 @@ using Lupa Pona to temporarily serve a local directory, as one might
 occasionally use a few lines of Python to serve the local directory over the web
 using C<SimpleHTTPServer>.
 
+=head2 Limitations
+
+Currently, all files are served as C<text/gemini; charset=UTF-8>.
+
 =head2 Dependencies
 
 Perl libraries you need to install if you want to run Lupa Pona:
@@ -89,6 +93,11 @@ No trouble, yet!
 These are the options Lupa Pona knows about:
 
 =over
+
+=item C<--host> is the address to use; the default is 0.0.0.0, i.e. accepting
+all connections (use this option if your machine is reachable via multiple
+names, e.g. C<alexschroeder.ch> and C<emacswiki.org> and you just want want to
+serve one of them)
 
 =item C<--port> is the port to use; the default is 1965
 
@@ -169,13 +178,15 @@ use URI::Escape;
 use Pod::Text;
 use utf8;
 
+our $host;
 our $port ||= 1965;
 our $cert_file ||= "cert.pem";
 our $key_file ||= "key.pem";
 our $log_level ||= "warn";  # error, warn, info, debug, trace
 
 my %args = ();
-GetOptions ("port=i"          => \$port,
+GetOptions ("host=s"          => \$host,
+	    "port=i"          => \$port,
 	    "cert_file=s"     => \$cert_file,
 	    "key_file=s"      => \$key_file,
 	    "log_level=s"     => \$log_level)
@@ -209,6 +220,7 @@ if (not -f $key_file or not -f $cert_file) {
 
 Mojo::IOLoop->server(
   {
+    address => $host,
     port => $port,
     tls => 1,
     tls_cert => $cert_file,
@@ -223,8 +235,8 @@ sub serve_gemini {
   return unless $url =~ s/\r\n.*//s; # needs URL and CR LF in one chunk
   my ($scheme, $authority, $path, $query, $fragment) =
       $url =~ m|(?:([^:/?#]+):)?(?://([^/?#]*))?([^?#]*)(?:\?([^#]*))?(?:#(.*))?|;
-  my ($host, $port) = split(/:/, $authority);
-  $port ||= 1965;
+  my ($url_host, $url_port) = split(/:/, $authority);
+  $url_port ||= 1965;
   $log->info("Looking at $url");
   if (not $url) {
     $log->debug("The URL is empty");
@@ -232,6 +244,8 @@ sub serve_gemini {
   } elsif (length($url) > 1024) {
     $log->debug("The URL is too long");
     $stream->write("59 The URL is too long\r\n");
+  } elsif ($authority and $host and $host ne $url_host or $port ne $url_port) {
+    $stream->write("53 Unsupported proxy request for $url; we just serve $host:$port\r\n");
   } elsif (not $path) {
     $stream->write("31 $url/\r\n"); # enforce trailing slash
   } elsif ($path eq "/") {
@@ -253,9 +267,6 @@ sub serve_gemini {
     } else {
       $stream->write("51 File not found: $file\r\n");
     }
-  } elsif ($authority) {
-    $log->info("Unsupported proxy request for $url");
-    $stream->write("53 Unsupported proxy request for $url\r\n");
   } else {
     $log->info("No handler for $url");
     $stream->write("59 Don't know how to handle $url\r\n");

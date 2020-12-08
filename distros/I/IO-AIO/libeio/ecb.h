@@ -1,7 +1,7 @@
 /*
  * libecb - http://software.schmorp.de/pkg/libecb
  *
- * Copyright (©) 2009-2015 Marc Alexander Lehmann <libecb@schmorp.de>
+ * Copyright (©) 2009-2015,2018-2020 Marc Alexander Lehmann <libecb@schmorp.de>
  * Copyright (©) 2011 Emanuele Giaquinta
  * All rights reserved.
  *
@@ -42,15 +42,23 @@
 #define ECB_H
 
 /* 16 bits major, 16 bits minor */
-#define ECB_VERSION 0x00010005
+#define ECB_VERSION 0x00010008
 
-#ifdef _WIN32
+#include <string.h> /* for memcpy */
+
+#if defined (_WIN32) && !defined (__MINGW32__)
   typedef   signed char   int8_t;
   typedef unsigned char  uint8_t;
+  typedef   signed char   int_fast8_t;
+  typedef unsigned char  uint_fast8_t;
   typedef   signed short  int16_t;
   typedef unsigned short uint16_t;
+  typedef   signed int    int_fast16_t;
+  typedef unsigned int   uint_fast16_t;
   typedef   signed int    int32_t;
   typedef unsigned int   uint32_t;
+  typedef   signed int    int_fast32_t;
+  typedef unsigned int   uint_fast32_t;
   #if __GNUC__
     typedef   signed long long int64_t;
     typedef unsigned long long uint64_t;
@@ -58,6 +66,8 @@
     typedef   signed __int64   int64_t;
     typedef unsigned __int64   uint64_t;
   #endif
+  typedef  int64_t  int_fast64_t;
+  typedef uint64_t uint_fast64_t;
   #ifdef _WIN64
     #define ECB_PTRSIZE 8
     typedef uint64_t uintptr_t;
@@ -78,6 +88,14 @@
 
 #define ECB_GCC_AMD64 (__amd64 || __amd64__ || __x86_64 || __x86_64__)
 #define ECB_MSVC_AMD64 (_M_AMD64 || _M_X64)
+
+#ifndef ECB_OPTIMIZE_SIZE
+  #if __OPTIMIZE_SIZE__
+    #define ECB_OPTIMIZE_SIZE 1
+  #else
+    #define ECB_OPTIMIZE_SIZE 0
+  #endif
+#endif
 
 /* work around x32 idiocy by defining proper macros */
 #if ECB_GCC_AMD64 || ECB_MSVC_AMD64
@@ -166,6 +184,7 @@
 
 #ifndef ECB_MEMORY_FENCE
   #if ECB_GCC_VERSION(2,5) || defined __INTEL_COMPILER || (__llvm__ && __GNUC__) || __SUNPRO_C >= 0x5110 || __SUNPRO_CC >= 0x5110
+    #define ECB_MEMORY_FENCE_RELAXED __asm__ __volatile__ ("" : : : "memory")
     #if __i386 || __i386__
       #define ECB_MEMORY_FENCE         __asm__ __volatile__ ("lock; orb $0, -1(%%esp)" : : : "memory")
       #define ECB_MEMORY_FENCE_ACQUIRE __asm__ __volatile__ (""                        : : : "memory")
@@ -225,12 +244,14 @@
     #define ECB_MEMORY_FENCE         __atomic_thread_fence (__ATOMIC_SEQ_CST)
     #define ECB_MEMORY_FENCE_ACQUIRE __atomic_thread_fence (__ATOMIC_ACQUIRE)
     #define ECB_MEMORY_FENCE_RELEASE __atomic_thread_fence (__ATOMIC_RELEASE)
+    #define ECB_MEMORY_FENCE_RELAXED __atomic_thread_fence (__ATOMIC_RELAXED)
 
   #elif ECB_CLANG_EXTENSION(c_atomic)
     /* see comment below (stdatomic.h) about the C11 memory model. */
     #define ECB_MEMORY_FENCE         __c11_atomic_thread_fence (__ATOMIC_SEQ_CST)
     #define ECB_MEMORY_FENCE_ACQUIRE __c11_atomic_thread_fence (__ATOMIC_ACQUIRE)
     #define ECB_MEMORY_FENCE_RELEASE __c11_atomic_thread_fence (__ATOMIC_RELEASE)
+    #define ECB_MEMORY_FENCE_RELAXED __c11_atomic_thread_fence (__ATOMIC_RELAXED)
 
   #elif ECB_GCC_VERSION(4,4) || defined __INTEL_COMPILER || defined __clang__
     #define ECB_MEMORY_FENCE         __sync_synchronize ()
@@ -250,9 +271,10 @@
     #define ECB_MEMORY_FENCE         MemoryBarrier () /* actually just xchg on x86... scary */
   #elif __SUNPRO_C >= 0x5110 || __SUNPRO_CC >= 0x5110
     #include <mbarrier.h>
-    #define ECB_MEMORY_FENCE         __machine_rw_barrier ()
-    #define ECB_MEMORY_FENCE_ACQUIRE __machine_r_barrier  ()
-    #define ECB_MEMORY_FENCE_RELEASE __machine_w_barrier  ()
+    #define ECB_MEMORY_FENCE         __machine_rw_barrier  ()
+    #define ECB_MEMORY_FENCE_ACQUIRE __machine_acq_barrier ()
+    #define ECB_MEMORY_FENCE_RELEASE __machine_rel_barrier ()
+    #define ECB_MEMORY_FENCE_RELAXED __compiler_barrier ()
   #elif __xlC__
     #define ECB_MEMORY_FENCE         __sync ()
   #endif
@@ -263,15 +285,9 @@
     /* we assume that these memory fences work on all variables/all memory accesses, */
     /* not just C11 atomics and atomic accesses */
     #include <stdatomic.h>
-    /* Unfortunately, neither gcc 4.7 nor clang 3.1 generate any instructions for */
-    /* any fence other than seq_cst, which isn't very efficient for us. */
-    /* Why that is, we don't know - either the C11 memory model is quite useless */
-    /* for most usages, or gcc and clang have a bug */
-    /* I *currently* lean towards the latter, and inefficiently implement */
-    /* all three of ecb's fences as a seq_cst fence */
-    /* Update, gcc-4.8 generates mfence for all c++ fences, but nothing */
-    /* for all __atomic_thread_fence's except seq_cst */
     #define ECB_MEMORY_FENCE         atomic_thread_fence (memory_order_seq_cst)
+    #define ECB_MEMORY_FENCE_ACQUIRE atomic_thread_fence (memory_order_acquire)
+    #define ECB_MEMORY_FENCE_RELEASE atomic_thread_fence (memory_order_release)
   #endif
 #endif
 
@@ -299,6 +315,10 @@
 
 #if !defined ECB_MEMORY_FENCE_RELEASE && defined ECB_MEMORY_FENCE
   #define ECB_MEMORY_FENCE_RELEASE ECB_MEMORY_FENCE
+#endif
+
+#if !defined ECB_MEMORY_FENCE_RELAXED && defined ECB_MEMORY_FENCE
+  #define ECB_MEMORY_FENCE_RELAXED ECB_MEMORY_FENCE /* very heavy-handed */
 #endif
 
 /*****************************************************************************/
@@ -592,6 +612,44 @@ ecb_inline ecb_const uint32_t ecb_rotr32 (uint32_t x, unsigned int count) { retu
 ecb_inline ecb_const uint64_t ecb_rotl64 (uint64_t x, unsigned int count) { return (x >> (64 - count)) | (x << count); }
 ecb_inline ecb_const uint64_t ecb_rotr64 (uint64_t x, unsigned int count) { return (x << (64 - count)) | (x >> count); }
 
+#if ECB_CPP
+
+inline uint8_t  ecb_ctz (uint8_t  v) { return ecb_ctz32 (v); }
+inline uint16_t ecb_ctz (uint16_t v) { return ecb_ctz32 (v); }
+inline uint32_t ecb_ctz (uint32_t v) { return ecb_ctz32 (v); }
+inline uint64_t ecb_ctz (uint64_t v) { return ecb_ctz64 (v); }
+
+inline bool ecb_is_pot (uint8_t  v) { return ecb_is_pot32 (v); }
+inline bool ecb_is_pot (uint16_t v) { return ecb_is_pot32 (v); }
+inline bool ecb_is_pot (uint32_t v) { return ecb_is_pot32 (v); }
+inline bool ecb_is_pot (uint64_t v) { return ecb_is_pot64 (v); }
+
+inline int ecb_ld (uint8_t  v) { return ecb_ld32 (v); }
+inline int ecb_ld (uint16_t v) { return ecb_ld32 (v); }
+inline int ecb_ld (uint32_t v) { return ecb_ld32 (v); }
+inline int ecb_ld (uint64_t v) { return ecb_ld64 (v); }
+
+inline int ecb_popcount (uint8_t  v) { return ecb_popcount32 (v); }
+inline int ecb_popcount (uint16_t v) { return ecb_popcount32 (v); }
+inline int ecb_popcount (uint32_t v) { return ecb_popcount32 (v); }
+inline int ecb_popcount (uint64_t v) { return ecb_popcount64 (v); }
+
+inline uint8_t  ecb_bitrev (uint8_t  v) { return ecb_bitrev8  (v); }
+inline uint16_t ecb_bitrev (uint16_t v) { return ecb_bitrev16 (v); }
+inline uint32_t ecb_bitrev (uint32_t v) { return ecb_bitrev32 (v); }
+
+inline uint8_t  ecb_rotl (uint8_t  v, unsigned int count) { return ecb_rotl8  (v, count); }
+inline uint16_t ecb_rotl (uint16_t v, unsigned int count) { return ecb_rotl16 (v, count); }
+inline uint32_t ecb_rotl (uint32_t v, unsigned int count) { return ecb_rotl32 (v, count); }
+inline uint64_t ecb_rotl (uint64_t v, unsigned int count) { return ecb_rotl64 (v, count); }
+
+inline uint8_t  ecb_rotr (uint8_t  v, unsigned int count) { return ecb_rotr8  (v, count); }
+inline uint16_t ecb_rotr (uint16_t v, unsigned int count) { return ecb_rotr16 (v, count); }
+inline uint32_t ecb_rotr (uint32_t v, unsigned int count) { return ecb_rotr32 (v, count); }
+inline uint64_t ecb_rotr (uint64_t v, unsigned int count) { return ecb_rotr64 (v, count); }
+
+#endif
+
 #if ECB_GCC_VERSION(4,3) || (ECB_CLANG_BUILTIN(__builtin_bswap32) && ECB_CLANG_BUILTIN(__builtin_bswap64))
   #if ECB_GCC_VERSION(4,8) || ECB_CLANG_BUILTIN(__builtin_bswap16)
   #define ecb_bswap16(x)  __builtin_bswap16 (x)
@@ -672,7 +730,81 @@ ecb_inline ecb_const ecb_bool ecb_big_endian    (void) { return ecb_byteorder_he
 ecb_inline ecb_const ecb_bool ecb_little_endian (void);
 ecb_inline ecb_const ecb_bool ecb_little_endian (void) { return ecb_byteorder_helper () == 0x44332211; }
 
+/*****************************************************************************/
+/* unaligned load/store */
+
+ecb_inline uint_fast16_t ecb_be_u16_to_host (uint_fast16_t v) { return ecb_little_endian () ? ecb_bswap16 (v) : v; }
+ecb_inline uint_fast32_t ecb_be_u32_to_host (uint_fast32_t v) { return ecb_little_endian () ? ecb_bswap32 (v) : v; }
+ecb_inline uint_fast64_t ecb_be_u64_to_host (uint_fast64_t v) { return ecb_little_endian () ? ecb_bswap64 (v) : v; }
+
+ecb_inline uint_fast16_t ecb_le_u16_to_host (uint_fast16_t v) { return ecb_big_endian    () ? ecb_bswap16 (v) : v; }
+ecb_inline uint_fast32_t ecb_le_u32_to_host (uint_fast32_t v) { return ecb_big_endian    () ? ecb_bswap32 (v) : v; }
+ecb_inline uint_fast64_t ecb_le_u64_to_host (uint_fast64_t v) { return ecb_big_endian    () ? ecb_bswap64 (v) : v; }
+
+ecb_inline uint_fast16_t ecb_peek_u16_u (const void *ptr) { uint16_t v; memcpy (&v, ptr, sizeof (v)); return v; }
+ecb_inline uint_fast32_t ecb_peek_u32_u (const void *ptr) { uint32_t v; memcpy (&v, ptr, sizeof (v)); return v; }
+ecb_inline uint_fast64_t ecb_peek_u64_u (const void *ptr) { uint64_t v; memcpy (&v, ptr, sizeof (v)); return v; }
+
+ecb_inline uint_fast16_t ecb_peek_be_u16_u (const void *ptr) { return ecb_be_u16_to_host (ecb_peek_u16_u (ptr)); }
+ecb_inline uint_fast32_t ecb_peek_be_u32_u (const void *ptr) { return ecb_be_u32_to_host (ecb_peek_u32_u (ptr)); }
+ecb_inline uint_fast64_t ecb_peek_be_u64_u (const void *ptr) { return ecb_be_u64_to_host (ecb_peek_u64_u (ptr)); }
+
+ecb_inline uint_fast16_t ecb_peek_le_u16_u (const void *ptr) { return ecb_le_u16_to_host (ecb_peek_u16_u (ptr)); }
+ecb_inline uint_fast32_t ecb_peek_le_u32_u (const void *ptr) { return ecb_le_u32_to_host (ecb_peek_u32_u (ptr)); }
+ecb_inline uint_fast64_t ecb_peek_le_u64_u (const void *ptr) { return ecb_le_u64_to_host (ecb_peek_u64_u (ptr)); }
+
+ecb_inline uint_fast16_t ecb_host_to_be_u16 (uint_fast16_t v) { return ecb_little_endian () ? ecb_bswap16 (v) : v; }
+ecb_inline uint_fast32_t ecb_host_to_be_u32 (uint_fast32_t v) { return ecb_little_endian () ? ecb_bswap32 (v) : v; }
+ecb_inline uint_fast64_t ecb_host_to_be_u64 (uint_fast64_t v) { return ecb_little_endian () ? ecb_bswap64 (v) : v; }
+
+ecb_inline uint_fast16_t ecb_host_to_le_u16 (uint_fast16_t v) { return ecb_big_endian    () ? ecb_bswap16 (v) : v; }
+ecb_inline uint_fast32_t ecb_host_to_le_u32 (uint_fast32_t v) { return ecb_big_endian    () ? ecb_bswap32 (v) : v; }
+ecb_inline uint_fast64_t ecb_host_to_le_u64 (uint_fast64_t v) { return ecb_big_endian    () ? ecb_bswap64 (v) : v; }
+
+ecb_inline void ecb_poke_u16_u (void *ptr, uint16_t v) { memcpy (ptr, &v, sizeof (v)); }
+ecb_inline void ecb_poke_u32_u (void *ptr, uint32_t v) { memcpy (ptr, &v, sizeof (v)); }
+ecb_inline void ecb_poke_u64_u (void *ptr, uint64_t v) { memcpy (ptr, &v, sizeof (v)); }
+
+ecb_inline void ecb_poke_be_u16_u (void *ptr, uint_fast16_t v) { ecb_poke_u16_u (ptr, ecb_host_to_be_u16 (v)); }
+ecb_inline void ecb_poke_be_u32_u (void *ptr, uint_fast32_t v) { ecb_poke_u32_u (ptr, ecb_host_to_be_u32 (v)); }
+ecb_inline void ecb_poke_be_u64_u (void *ptr, uint_fast64_t v) { ecb_poke_u64_u (ptr, ecb_host_to_be_u64 (v)); }
+                                                                                                
+ecb_inline void ecb_poke_le_u16_u (void *ptr, uint_fast16_t v) { ecb_poke_u16_u (ptr, ecb_host_to_le_u16 (v)); }
+ecb_inline void ecb_poke_le_u32_u (void *ptr, uint_fast32_t v) { ecb_poke_u32_u (ptr, ecb_host_to_le_u32 (v)); }
+ecb_inline void ecb_poke_le_u64_u (void *ptr, uint_fast64_t v) { ecb_poke_u64_u (ptr, ecb_host_to_le_u64 (v)); }
+
+#if ECB_CPP
+
+inline uint8_t  ecb_bswap (uint8_t  v) { return v; }
+inline uint16_t ecb_bswap (uint16_t v) { return ecb_bswap16 (v); }
+inline uint32_t ecb_bswap (uint32_t v) { return ecb_bswap32 (v); }
+inline uint64_t ecb_bswap (uint64_t v) { return ecb_bswap64 (v); }
+
+template<typename T> inline T ecb_be_to_host (T v) { return ecb_little_endian () ? ecb_bswap (v) : v; }
+template<typename T> inline T ecb_le_to_host (T v) { return ecb_big_endian    () ? ecb_bswap (v) : v; }
+template<typename T> inline T ecb_peek       (const void *ptr) { return *(const T *)ptr; }
+template<typename T> inline T ecb_peek_be    (const void *ptr) { return ecb_be_to_host (ecb_peek  <T> (ptr)); }
+template<typename T> inline T ecb_peek_le    (const void *ptr) { return ecb_le_to_host (ecb_peek  <T> (ptr)); }
+template<typename T> inline T ecb_peek_u     (const void *ptr) { T v; memcpy (&v, ptr, sizeof (v)); return v; }
+template<typename T> inline T ecb_peek_be_u  (const void *ptr) { return ecb_be_to_host (ecb_peek_u<T> (ptr)); }
+template<typename T> inline T ecb_peek_le_u  (const void *ptr) { return ecb_le_to_host (ecb_peek_u<T> (ptr)); }
+
+template<typename T> inline T ecb_host_to_be (T v) { return ecb_little_endian () ? ecb_bswap (v) : v; }
+template<typename T> inline T ecb_host_to_le (T v) { return ecb_big_endian    () ? ecb_bswap (v) : v; }
+template<typename T> inline void ecb_poke      (void *ptr, T v) { *(T *)ptr = v; }
+template<typename T> inline void ecb_poke_be   (void *ptr, T v) { return ecb_poke  <T> (ptr, ecb_host_to_be (v)); }
+template<typename T> inline void ecb_poke_le   (void *ptr, T v) { return ecb_poke  <T> (ptr, ecb_host_to_le (v)); }
+template<typename T> inline void ecb_poke_u    (void *ptr, T v) { memcpy (ptr, &v, sizeof (v)); }
+template<typename T> inline void ecb_poke_be_u (void *ptr, T v) { return ecb_poke_u<T> (ptr, ecb_host_to_be (v)); }
+template<typename T> inline void ecb_poke_le_u (void *ptr, T v) { return ecb_poke_u<T> (ptr, ecb_host_to_le (v)); }
+
+#endif
+
+/*****************************************************************************/
+/* division */
+
 #if ECB_GCC_VERSION(3,0) || ECB_C99
+  /* C99 tightened the definition of %, so we can use a more efficient version */
   #define ecb_mod(m,n) ((m) % (n) + ((m) % (n) < 0 ? (n) : 0))
 #else
   #define ecb_mod(m,n) ((m) < 0 ? ((n) - 1 - ((-1 - (m)) % (n))) : ((m) % (n)))
@@ -694,6 +826,9 @@ ecb_inline ecb_const ecb_bool ecb_little_endian (void) { return ecb_byteorder_he
   #define ecb_div_ru(val,div) ((val) < 0 ? - ((-(val)            ) / (div)) : ((val) + (div) - 1) / (div))
 #endif
 
+/*****************************************************************************/
+/* array length */
+
 #if ecb_cplusplus_does_not_suck
   /* does not work for local types (http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2008/n2657.htm) */
   template<typename T, int N>
@@ -704,6 +839,9 @@ ecb_inline ecb_const ecb_bool ecb_little_endian (void) { return ecb_byteorder_he
 #else
   #define ecb_array_length(name) (sizeof (name) / sizeof (name [0]))
 #endif
+
+/*****************************************************************************/
+/* IEEE 754-2008 half float conversions */
 
 ecb_function_ ecb_const uint32_t ecb_binary16_to_binary32 (uint32_t x);
 ecb_function_ ecb_const uint32_t
@@ -822,7 +960,6 @@ ecb_binary32_to_binary16 (uint32_t x)
     || (defined __arm__ && (defined __ARM_EABI__ || defined __EABI__ || defined __VFP_FP__ || defined _WIN32_WCE || defined __ANDROID__)) \
     || defined __aarch64__
   #define ECB_STDFP 1
-  #include <string.h> /* for memcpy */
 #else
   #define ECB_STDFP 0
 #endif

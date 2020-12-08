@@ -1,4 +1,6 @@
-use Test::More tests => 11;
+use strict;
+use warnings;
+use Test::More;
 use Number::Fraction ':constants';
 
 my $f = '1/2';
@@ -16,3 +18,5 @@ ok($f * 2 == 1);
 ok($f * 0.5 == 0.25);
 $f = eval { $f * [] };
 ok($@);
+
+done_testing();

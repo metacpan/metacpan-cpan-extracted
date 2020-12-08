@@ -6,14 +6,21 @@ use Module::Build;
 my $build = Module::Build->new(
    module_name => 'Device::Chip::DS1307',
    requires => {
+      'perl' => '5.026',
+      'Object::Pad' => '0.19',
+      'Future::AsyncAwait' => '0.47', # toplevel await
+
       'Device::Chip::Base::RegisteredI2C' => '0.03',
    },
-   build_requires => {
+   configure_requires => {
+      'Module::Build' => '0.4004', # test_requires
+   },
+   test_requires => {
+      'Test::Device::Chip::Adapter' => 0,
       'Test::More' => '0.88', # done_testing
    },
    auto_configure_requires => 0, # Don't add M::B to configure_requires
    license => 'perl',
-   create_makefile_pl => 'small',
    create_license => 1,
    create_readme  => 1,
 );

@@ -1,11 +1,10 @@
 use strict;
 use warnings;
-use Test::More;
-
-END { done_testing(); }
-
 use lib 't/inc';
-use fatalwarnings;
+use nptestutils;
+
+use Test::More;
+BEGIN { plan skip_all => 'not relevant if building --without_uk' if(building_without_uk()); }
 
 use Number::Phone;
 
@@ -26,3 +25,4 @@ is $num->can('country'), \&Number::Phone::country, 'UK does not override ->count
 # The real aim of this test file
 is($num->country, 'UK', 'A subclass of UK, but still UK');
 
+done_testing();

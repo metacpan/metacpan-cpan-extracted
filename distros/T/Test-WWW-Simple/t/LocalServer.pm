@@ -1,3 +1,4 @@
+#!/usr/bin/env perl
 package LocalServer;
 
 # start a fake webserver, fork, and connect to ourselves
@@ -81,7 +82,7 @@ sub spawn {
   $lhurl->host( "localhost" );
   $self->{_server_url} = $lhurl;
 
-  diag "Started $lhurl";
+  note "Started $lhurl";
 
   $self;
 };

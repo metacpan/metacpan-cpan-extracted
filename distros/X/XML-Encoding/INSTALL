@@ -1,0 +1,30 @@
+PREREQUISITES
+
+    Perl
+
+        Perl version 5.8.1 or later.
+        The latest version of Perl is available from https://www.perl.com/.
+
+    Perl Modules
+
+        The only non-standard Perl module required by this module is
+
+            XML::Parser
+
+        which is available from CPAN (https://www.cpan.org/).
+
+INSTALLATION
+
+    To install this module, cd to the directory that contains this INSTALL file
+    and type the following:
+
+        perl Makefile.PL
+        make
+        make test
+        make install
+
+    Use the appropriate program name instead of "make" in the above commands if
+    your perl was built with a different make program.  To determine which make
+    program was used to build your perl type the following:
+
+        perl -V:make

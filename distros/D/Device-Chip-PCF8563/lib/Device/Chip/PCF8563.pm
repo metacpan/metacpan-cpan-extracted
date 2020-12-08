@@ -3,27 +3,39 @@
 #
 #  (C) Paul Evans, 2016 -- leonerd@leonerd.org.uk
 
-package Device::Chip::PCF8563;
+use v5.26;
+use Object::Pad 0.19;
 
-use strict;
-use warnings;
-use base qw( Device::Chip::Base::RegisteredI2C );
+package Device::Chip::PCF8563 0.02;
+class Device::Chip::PCF8563
+   extends Device::Chip::Base::RegisteredI2C;
 
 use utf8;
 
-our $VERSION = '0.01';
-
 use Carp;
 
-use constant DEFAULT_ADDR => 0xA2 >> 1;
+use Future::AsyncAwait;
 
-use Future;
+use constant DEFAULT_ADDR => 0xA2 >> 1;
 
 =encoding UTF-8
 
 =head1 NAME
 
 C<Device::Chip::PCF8563> - chip driver for a F<PCF8563>
+
+=head1 SYNOPSIS
+
+   use Device::Chip::PCF8563;
+   use Future::AsyncAwait;
+
+   use POSIX qw( mktime strftime );
+
+   my $chip = Device::Chip::PCF8563->new;
+   await $chip->mount( Device::Chip::Adapter::...->new );
+
+   printf "The current time on this chip is ",
+      await strftime( "%Y-%m-%d %H:%M:%S", localtime mktime $chip->read_time );
 
 =head1 DESCRIPTION
 
@@ -32,7 +44,7 @@ F<NXP> F<PCF8563> chip attached to a computer via an I²C adapter.
 
 =cut
 
-sub I2C_options
+method I2C_options
 {
    return (
       addr        => DEFAULT_ADDR,
@@ -46,19 +58,19 @@ use constant {
    REG_VLSECONDS => 0x02,
 };
 
-sub _unpack_bcd { ( $_[0] >> 4 )*10 + ( $_[0] % 16 ) }
-sub _pack_bcd   { int( $_[0] / 10 ) << 4 | ( $_[0] % 10 ) }
+sub _unpack_bcd ( $v ) { ( $v >> 4 )*10 + ( $v % 16 ) }
+sub _pack_bcd   ( $v ) { int( $v / 10 ) << 4 | ( $v % 10 ) }
 
 =head1 METHODS
 
-The following methods documented with a trailing call to C<< ->get >> return
-L<Future> instances.
+The following methods documented in an C<await> expression return L<Future>
+instances.
 
 =cut
 
 =head2 read_time
 
-   @tm = $pcf->read_time->get
+   @tm = await $chip->read_time;
 
 Returns a 7-element C<struct tm>-compatible list of values by reading the
 timekeeping registers, suitable for passing to C<POSIX::mktime>, etc... Note
@@ -76,33 +88,29 @@ individual read methods.
 
 =cut
 
-sub read_time
+async method read_time ()
 {
-   my $self = shift;
+   my ( $bcd_sec, $bcd_min, $bcd_hour, $bcd_mday, $wday, $bcd_mon, $bcd_year ) =
+      unpack "C7", await $self->read_reg( REG_VLSECONDS, 7 );
 
-   $self->read_reg( REG_VLSECONDS, 7 )->then( sub {
-      my ( $bcd_sec, $bcd_min, $bcd_hour,
-           $bcd_mday, $wday, $bcd_mon, $bcd_year ) = unpack "C7", $_[0];
+   die "VL bit is set; time is unreliable" if $bcd_sec & 0x80;
 
-      return Future->fail( "VL bit is set; time is unreliable" ) if $bcd_sec & 0x80;
+   my $century = $bcd_mon & 0x80;
 
-      my $century = $bcd_mon & 0x80;
-
-      Future->done(
-         _unpack_bcd( $bcd_sec ),
-         _unpack_bcd( $bcd_min  & 0x7F ),
-         _unpack_bcd( $bcd_hour & 0x3F ),
-         _unpack_bcd( $bcd_mday & 0x3F ),
-         _unpack_bcd( $bcd_mon  & 0x1F ) - 1,
-         _unpack_bcd( $bcd_year ) + 100 + ( $century ? 100 : 0 ),
-         $wday & 0x07,
-      );
-   });
+   return (
+      _unpack_bcd( $bcd_sec ),
+      _unpack_bcd( $bcd_min  & 0x7F ),
+      _unpack_bcd( $bcd_hour & 0x3F ),
+      _unpack_bcd( $bcd_mday & 0x3F ),
+      _unpack_bcd( $bcd_mon  & 0x1F ) - 1,
+      _unpack_bcd( $bcd_year ) + 100 + ( $century ? 100 : 0 ),
+      $wday & 0x07,
+   );
 }
 
 =head2 write_time
 
-   $pcf->write_time( @tm )->get
+   await $chip->write_time( @tm );
 
 Writes the timekeeping registers from a 7-element C<struct tm>-compatible list
 of values. This method ignores the C<yday> and C<is_dst> fields, if present.
@@ -117,17 +125,14 @@ individual write methods.
 
 =cut
 
-sub write_time
+async method write_time ( $sec, $min, $hour, $mday, $mon, $year, $wday )
 {
-   my $self = shift;
-   my ( $sec, $min, $hour, $mday, $mon, $year, $wday ) = @_;
-
    $year >= 100 and $year <= 299 or croak "Invalid year ($year)";
 
    my $century = $year >= 200;
    $year %= 100;
 
-   $self->write_reg( REG_VLSECONDS, pack "C7",
+   await $self->write_reg( REG_VLSECONDS, pack "C7",
       _pack_bcd( $sec ),
       _pack_bcd( $min ),
       _pack_bcd( $hour ),

@@ -1,46 +1,48 @@
 #!/usr/bin/perl
 
-use strict;
+use v5.26;
 use warnings;
 
 use Device::Chip::nRF24L01P;
 use Device::Chip::Adapter;
 
+use Future::AsyncAwait;
 use Getopt::Long;
 use Data::Dump 'pp';
 
 GetOptions(
-   'adapter|A=s' => \( my $ADAPTER = "BusPirate" ),
+   'adapter|A=s' => \my $ADAPTER,
 
    'C|channel=i' => \(my $CHANNEL = 30),
 ) or exit 1;
 
 my $nrf = Device::Chip::nRF24L01P->new;
-$nrf->mount(
+await $nrf->mount(
    Device::Chip::Adapter->new_from_description( $ADAPTER )
-)->get;
+);
 
-$nrf->power(1)->get;
+await $nrf->power(1);
 print "Power on\n";
 
 # Power-down to reconfigure
-$nrf->pwr_up( 0 )->get;
-$nrf->chip_enable( 0 )->get;
+await $nrf->pwr_up( 0 );
+await $nrf->chip_enable( 0 );
 
-$nrf->change_config(
+await $nrf->change_config(
    PRIM_RX => 0,
    RF_CH => $CHANNEL,
    LOCK_PLL => 1,
    CONT_WAVE => 1,
-)->get;
+);
 
 $nrf->clear_caches;
-printf "Config:\n%s\n%s\n", pp($nrf->read_config->get), pp($nrf->read_rx_config( 0 )->get);
+printf "Config:\n%s\n%s\n",
+   pp(await $nrf->read_config), pp(await $nrf->read_rx_config( 0 ));
 
-$nrf->pwr_up( 1 )->get;
+await $nrf->pwr_up( 1 );
 print "PWR_UP\n";
 
-$nrf->chip_enable( 1 )->get;
+await $nrf->chip_enable( 1 );
 print "CE high - entered PTX mode...\n";
 
 $SIG{INT} = $SIG{TERM} = sub { exit };

@@ -64,6 +64,19 @@ sub recurse {
     return WWW::WTF::UserAgent::WebKit2::Iterator->new( sitemap_uri => $sitemap_uri, ua => $self );
 }
 
+sub set_cookie_policy {
+    my ($self, $policy) = @_;
+
+    #for further expansion
+    die('invalid cookie policy') unless ($policy eq 'accept_all');
+
+    #'hack' to accept third-party cookies
+    $self->ua->view
+        ->get_website_data_manager
+        ->get_cookie_manager
+        ->set_accept_policy('WEBKIT_COOKIE_POLICY_ACCEPT_ALWAYS');
+}
+
 __PACKAGE__->meta->make_immutable;
 
 1;

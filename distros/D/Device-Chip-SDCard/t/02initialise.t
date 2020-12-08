@@ -1,18 +1,20 @@
 #!/usr/bin/perl
 
-use strict;
+use v5.26;
 use warnings;
 
 use Test::More;
 use Test::Device::Chip::Adapter;
 
+use Future::AsyncAwait;
+
 use Device::Chip::SDCard;
 
 my $chip = Device::Chip::SDCard->new;
 
-$chip->mount(
+await $chip->mount(
    my $adapter = Test::Device::Chip::Adapter->new,
-)->get;
+);
 
 {
    # Initalisation first writes >9 bytes of all-high-bits
@@ -30,7 +32,7 @@ $chip->mount(
    $adapter->expect_readwrite( "\x50" . "\0\0\2\0" . "\x95" . "\xFF" x 8 )
       ->returns( "\xFF\xFF\xFF\xFF\xFF\xFF\xFF\xFF" . "\x00" );
 
-   $chip->initialise->get;
+   await $chip->initialise;
 
    $adapter->check_and_clear( '$chip->initialise' );
 }

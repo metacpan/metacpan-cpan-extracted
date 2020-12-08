@@ -1,4 +1,4 @@
-# AWS::AppSync::Resolver generated from spec 11.1.0
+# AWS::AppSync::Resolver generated from spec 20.1.0
 use Moose::Util::TypeConstraints;
 
 coerce 'Cfn::Resource::Properties::AWS::AppSync::Resolver',
@@ -14,7 +14,7 @@ package Cfn::Resource::AWS::AppSync::Resolver {
     [ 'FieldName','ResolverArn','TypeName' ]
   }
   sub supported_regions {
-    [ 'ap-northeast-1','ap-northeast-2','ap-south-1','ap-southeast-1','ap-southeast-2','cn-north-1','eu-central-1','eu-west-1','us-east-1','us-east-2','us-west-2' ]
+    [ 'ap-east-1','ap-northeast-1','ap-northeast-2','ap-south-1','ap-southeast-1','ap-southeast-2','cn-north-1','cn-northwest-1','eu-central-1','eu-west-1','me-south-1','us-east-1','us-east-2','us-west-2' ]
   }
 }
 
@@ -29,11 +29,11 @@ coerce 'Cfn::Resource::Properties::AWS::AppSync::Resolver::LambdaConflictHandler
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::AppSync::Resolver::LambdaConflictHandlerConfigValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::AppSync::Resolver::LambdaConflictHandlerConfig->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::AppSync::Resolver::LambdaConflictHandlerConfigValue {
+package Cfn::Resource::Properties::Object::AWS::AppSync::Resolver::LambdaConflictHandlerConfig {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -50,11 +50,11 @@ coerce 'Cfn::Resource::Properties::AWS::AppSync::Resolver::SyncConfig',
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::AppSync::Resolver::SyncConfigValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::AppSync::Resolver::SyncConfig->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::AppSync::Resolver::SyncConfigValue {
+package Cfn::Resource::Properties::Object::AWS::AppSync::Resolver::SyncConfig {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -73,11 +73,11 @@ coerce 'Cfn::Resource::Properties::AWS::AppSync::Resolver::PipelineConfig',
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::AppSync::Resolver::PipelineConfigValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::AppSync::Resolver::PipelineConfig->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::AppSync::Resolver::PipelineConfigValue {
+package Cfn::Resource::Properties::Object::AWS::AppSync::Resolver::PipelineConfig {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -94,11 +94,11 @@ coerce 'Cfn::Resource::Properties::AWS::AppSync::Resolver::CachingConfig',
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::AppSync::Resolver::CachingConfigValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::AppSync::Resolver::CachingConfig->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::AppSync::Resolver::CachingConfigValue {
+package Cfn::Resource::Properties::Object::AWS::AppSync::Resolver::CachingConfig {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -127,3 +127,30 @@ package Cfn::Resource::Properties::AWS::AppSync::Resolver {
 }
 
 1;
+### main pod documentation begin ###
+
+=encoding UTF-8
+
+=head1 NAME
+
+Cfn::Resource::AWS::AppSync::Resolver - Cfn resource for AWS::AppSync::Resolver
+
+=head1 DESCRIPTION
+
+This module implements a Perl module that represents the CloudFormation object AWS::AppSync::Resolver.
+
+See L<Cfn> for more information on how to use it.
+
+=head1 AUTHOR
+
+    Jose Luis Martinez
+    CAPSiDE
+    jlmartinez@capside.com
+
+=head1 COPYRIGHT and LICENSE
+
+Copyright (c) 2013 by CAPSiDE
+This code is distributed under the Apache 2 License. The full text of the 
+license can be found in the LICENSE file included with this module.
+
+=cut

@@ -36,7 +36,7 @@ use Clone 'clone';
 
 use App::Aphra::File;
 
-our $VERSION = '0.0.5';
+our $VERSION = '0.0.6';
 
 has commands => (
   isa => 'HashRef',
@@ -210,6 +210,7 @@ process input templates and turn them into a web site.
 ENDOFHELP
 }
 
+__PACKAGE__->meta->make_immutable;
 
 1;
 

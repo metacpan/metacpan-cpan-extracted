@@ -34,9 +34,8 @@
          "requires" : {
             "File::Slurper" : "0",
             "IO::Socket::SSL" : "0",
-            "Modern::Perl" : "0",
-            "Mojo::IOLoop" : "0",
-            "Mojo::Log" : "0",
+            "Modern::Perl" : "1.20180701",
+            "Mojolicious" : "8.12",
             "URI::Escape" : "0",
             "perl" : "5.026000",
             "strict" : "0",
@@ -52,6 +51,6 @@
          "web" : "https://alexschroeder.ch/cgit/lupa-pona/about/"
       }
    },
-   "version" : 1.02,
-   "x_serialization_backend" : "JSON::PP version 4.02"
+   "version" : 1.03,
+   "x_serialization_backend" : "JSON::PP version 2.97001"
 }

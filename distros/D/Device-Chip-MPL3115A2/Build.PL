@@ -6,9 +6,12 @@ use Module::Build;
 my $build = Module::Build->new(
    module_name => 'Device::Chip::MPL3115A2',
    requires => {
+      'perl' => '5.026',
+      'Object::Pad' => '0.19', # async method
+      'Future::AsyncAwait' => '0.47', # toplevel await
+
       'Data::Bitfield' => '0.02',
       'Device::Chip::Base::RegisteredI2C' => '0.03',
-      'Future::AsyncAwait' => 0,
    },
    test_requires => {
       'Test::More' => '0.88', # done_testing

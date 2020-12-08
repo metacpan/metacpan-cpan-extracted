@@ -20,7 +20,7 @@ use Carp;
 
 use MP3::Info;
 
-our $VERSION = '1.4.2';
+our $VERSION = '1.5.0';
 
 my %data = (artist => 'ARTIST',
             title  => 'TITLE',

@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20200904144534;
+our $VERSION = 1.20201204215957;
 
 my $formatters = [
                 {
@@ -141,7 +141,10 @@ my $validators = {
               0[2-9]|
               1[0-8]
             )|
-            90[1-9]
+            9(?:
+              0[1-9]|
+              1[235]
+            )
           )\\d{7}
         ',
                 'pager' => '',
@@ -151,79 +154,79 @@ my $validators = {
                 'voip' => ''
               };
 my %areanames = ();
-$areanames{en}->{2341} = "Lagos";
-$areanames{en}->{2342} = "Ibadan";
-$areanames{en}->{23430} = "Ado\ Ekiti";
-$areanames{en}->{23431} = "Ilorin";
-$areanames{en}->{23433} = "New\ Bussa";
-$areanames{en}->{23434} = "Akura";
-$areanames{en}->{23435} = "Oshogbo";
-$areanames{en}->{23436} = "Ile\ Ife";
-$areanames{en}->{23437} = "Ijebu\ Ode";
-$areanames{en}->{23438} = "Oyo";
-$areanames{en}->{23439} = "Abeokuta";
-$areanames{en}->{23441} = "Wukari";
-$areanames{en}->{23442} = "Enugu";
-$areanames{en}->{23443} = "Abakaliki";
-$areanames{en}->{23444} = "Makurdi";
-$areanames{en}->{23445} = "Ogoja";
-$areanames{en}->{23446} = "Onitsha";
-$areanames{en}->{23447} = "Lafia";
-$areanames{en}->{23448} = "Awka";
-$areanames{en}->{23450} = "Ikare";
-$areanames{en}->{23451} = "Owo";
-$areanames{en}->{23452} = "Benin";
-$areanames{en}->{23453} = "Warri";
-$areanames{en}->{23454} = "Sapele";
-$areanames{en}->{23455} = "Agbor";
-$areanames{en}->{23456} = "Asaba";
-$areanames{en}->{23457} = "Auchi";
-$areanames{en}->{23458} = "Lokoja";
-$areanames{en}->{23459} = "Okitipupa";
-$areanames{en}->{23460} = "Sokobo";
-$areanames{en}->{23461} = "Kafanchau";
-$areanames{en}->{23462} = "Kaduna";
-$areanames{en}->{23463} = "Gusau";
-$areanames{en}->{23464} = "Kano";
-$areanames{en}->{23465} = "Katsina";
-$areanames{en}->{23466} = "Minna";
-$areanames{en}->{23467} = "Kontagora";
-$areanames{en}->{23468} = "Birnin\-Kebbi";
-$areanames{en}->{23469} = "Zaria";
-$areanames{en}->{2347020} = "Pank\ Shin";
-$areanames{en}->{23471} = "Azare";
-$areanames{en}->{23472} = "Gombe";
-$areanames{en}->{23473} = "Jos";
-$areanames{en}->{23474} = "Damaturu";
-$areanames{en}->{23475} = "Yola";
-$areanames{en}->{23476} = "Maiduguri";
-$areanames{en}->{23477} = "Bauchi";
-$areanames{en}->{23478} = "Hadejia";
-$areanames{en}->{23479} = "Jalingo";
-$areanames{en}->{23482} = "Aba";
-$areanames{en}->{23483} = "Owerri";
-$areanames{en}->{23484} = "Port\ Harcourt";
-$areanames{en}->{23485} = "Uyo";
-$areanames{en}->{23486} = "Ahoada";
-$areanames{en}->{23487} = "Calabar";
-$areanames{en}->{23488} = "Umuahia";
-$areanames{en}->{23489} = "Yenegoa";
-$areanames{en}->{234903} = "Abuja";
-$areanames{en}->{234904} = "Abuja";
-$areanames{en}->{234905} = "Abuja";
-$areanames{en}->{234906} = "Abuja";
-$areanames{en}->{234907} = "Abuja";
-$areanames{en}->{234908} = "Abuja";
-$areanames{en}->{234909} = "Abuja";
-$areanames{en}->{23491} = "Abuja";
-$areanames{en}->{23492} = "Abuja";
-$areanames{en}->{23493} = "Abuja";
-$areanames{en}->{23494} = "Abuja";
-$areanames{en}->{23495} = "Abuja";
-$areanames{en}->{23496} = "Abuja";
-$areanames{en}->{23497} = "Abuja";
-$areanames{en}->{23498} = "Abuja";
-$areanames{en}->{23499} = "Abuja";
+$areanames{en} = {"23473", "Jos",
+"23461", "Kafanchau",
+"23483", "Owerri",
+"23498", "Abuja",
+"23435", "Oshogbo",
+"23455", "Agbor",
+"23442", "Enugu",
+"2342", "Ibadan",
+"23492", "Abuja",
+"23439", "Abeokuta",
+"23454", "Sapele",
+"23471", "Azare",
+"23459", "Okitipupa",
+"234903", "Abuja",
+"23463", "Gusau",
+"23448", "Awka",
+"23434", "Akura",
+"23460", "Sokobo",
+"23499", "Abuja",
+"23467", "Kontagora",
+"23476", "Maiduguri",
+"23486", "Ahoada",
+"234906", "Abuja",
+"23452", "Benin",
+"23445", "Ogoja",
+"2341", "Lagos",
+"234907", "Abuja",
+"23494", "Abuja",
+"234905", "Abuja",
+"23444", "Makurdi",
+"234904", "Abuja",
+"23438", "Oyo",
+"23495", "Abuja",
+"23487", "Calabar",
+"23477", "Bauchi",
+"23458", "Lokoja",
+"23466", "Minna",
+"23497", "Abuja",
+"23469", "Zaria",
+"23453", "Warri",
+"234908", "Abuja",
+"23446", "Onitsha",
+"23450", "Ikare",
+"23433", "New\ Bussa",
+"23485", "Uyo",
+"23475", "Yola",
+"2347020", "Pank\ Shin",
+"23430", "Ado\ Ekiti",
+"23464", "Kano",
+"23431", "Ilorin",
+"23465", "Katsina",
+"23474", "Damaturu",
+"23484", "Port\ Harcourt",
+"23489", "Yenegoa",
+"23479", "Jalingo",
+"23496", "Abuja",
+"23451", "Owo",
+"23447", "Lafia",
+"23456", "Asaba",
+"23468", "Birnin\-Kebbi",
+"234909", "Abuja",
+"23491", "Abuja",
+"23443", "Abakaliki",
+"23482", "Aba",
+"23436", "Ile\ Ife",
+"23472", "Gombe",
+"23437", "Ijebu\ Ode",
+"23462", "Kaduna",
+"23457", "Auchi",
+"23478", "Hadejia",
+"23493", "Abuja",
+"23488", "Umuahia",
+"23441", "Wukari",};
 
     sub new {
       my $class = shift;

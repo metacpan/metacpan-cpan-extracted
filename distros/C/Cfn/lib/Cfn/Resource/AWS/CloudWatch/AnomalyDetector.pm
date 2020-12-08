@@ -1,4 +1,4 @@
-# AWS::CloudWatch::AnomalyDetector generated from spec 5.3.0
+# AWS::CloudWatch::AnomalyDetector generated from spec 18.4.0
 use Moose::Util::TypeConstraints;
 
 coerce 'Cfn::Resource::Properties::AWS::CloudWatch::AnomalyDetector',
@@ -51,11 +51,11 @@ coerce 'Cfn::Resource::Properties::AWS::CloudWatch::AnomalyDetector::Range',
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::CloudWatch::AnomalyDetector::RangeValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::CloudWatch::AnomalyDetector::Range->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::CloudWatch::AnomalyDetector::RangeValue {
+package Cfn::Resource::Properties::Object::AWS::CloudWatch::AnomalyDetector::Range {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -95,11 +95,11 @@ coerce 'Cfn::Resource::Properties::AWS::CloudWatch::AnomalyDetector::Dimension',
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::CloudWatch::AnomalyDetector::DimensionValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::CloudWatch::AnomalyDetector::Dimension->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::CloudWatch::AnomalyDetector::DimensionValue {
+package Cfn::Resource::Properties::Object::AWS::CloudWatch::AnomalyDetector::Dimension {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -117,11 +117,11 @@ coerce 'Cfn::Resource::Properties::AWS::CloudWatch::AnomalyDetector::Configurati
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::CloudWatch::AnomalyDetector::ConfigurationValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::CloudWatch::AnomalyDetector::Configuration->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::CloudWatch::AnomalyDetector::ConfigurationValue {
+package Cfn::Resource::Properties::Object::AWS::CloudWatch::AnomalyDetector::Configuration {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -143,3 +143,30 @@ package Cfn::Resource::Properties::AWS::CloudWatch::AnomalyDetector {
 }
 
 1;
+### main pod documentation begin ###
+
+=encoding UTF-8
+
+=head1 NAME
+
+Cfn::Resource::AWS::CloudWatch::AnomalyDetector - Cfn resource for AWS::CloudWatch::AnomalyDetector
+
+=head1 DESCRIPTION
+
+This module implements a Perl module that represents the CloudFormation object AWS::CloudWatch::AnomalyDetector.
+
+See L<Cfn> for more information on how to use it.
+
+=head1 AUTHOR
+
+    Jose Luis Martinez
+    CAPSiDE
+    jlmartinez@capside.com
+
+=head1 COPYRIGHT and LICENSE
+
+Copyright (c) 2013 by CAPSiDE
+This code is distributed under the Apache 2 License. The full text of the 
+license can be found in the LICENSE file included with this module.
+
+=cut

@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20200904144532;
+our $VERSION = 1.20201204215956;
 
 my $formatters = [
                 {
@@ -154,83 +154,83 @@ my $validators = {
                 'voip' => ''
               };
 my %areanames = ();
-$areanames{en}->{233302} = "Accra";
-$areanames{en}->{233303} = "Tema";
-$areanames{en}->{2333035} = "Ada";
-$areanames{en}->{233307} = "Greater\ Accra\ Region";
-$areanames{en}->{233308} = "Greater\ Accra\ Region";
-$areanames{en}->{2333120} = "Takoradi";
-$areanames{en}->{2333121} = "Axim";
-$areanames{en}->{2333122} = "Elubo";
-$areanames{en}->{2333123} = "Tarkwa";
-$areanames{en}->{2333124} = "Asankragwa";
-$areanames{en}->{2333125} = "Samreboi";
-$areanames{en}->{2333126} = "Enchi";
-$areanames{en}->{233317} = "Western\ Region";
-$areanames{en}->{233318} = "Western\ Region";
-$areanames{en}->{2333220} = "Kumasi";
-$areanames{en}->{2333221} = "Konongo";
-$areanames{en}->{2333222} = "Ashanti\ Mampong";
-$areanames{en}->{2333223} = "Ejura";
-$areanames{en}->{2333224} = "Bekwai";
-$areanames{en}->{2333225} = "Obuasi";
-$areanames{en}->{233327} = "Ashanti\ Region";
-$areanames{en}->{233328} = "Ashanti\ Region";
-$areanames{en}->{2333320} = "Swedru";
-$areanames{en}->{2333321} = "Cape\ Coast";
-$areanames{en}->{2333322} = "Dunkwa";
-$areanames{en}->{2333323} = "Winneba";
-$areanames{en}->{233337} = "Central\ Region";
-$areanames{en}->{233338} = "Central\ Region";
-$areanames{en}->{2333420} = "Koforidua";
-$areanames{en}->{2333421} = "Nsawam";
-$areanames{en}->{2333423} = "Mpraeso";
-$areanames{en}->{2333424} = "Donkorkrom";
-$areanames{en}->{2333425} = "Suhum";
-$areanames{en}->{2333426} = "Asamankese";
-$areanames{en}->{2333427} = "Akuapim\ Mampong";
-$areanames{en}->{2333428} = "Aburi";
-$areanames{en}->{23334292} = "Akim\ Oda";
-$areanames{en}->{2333430} = "Akosombo";
-$areanames{en}->{2333431} = "Nkawkaw";
-$areanames{en}->{233347} = "Eastern\ Region";
-$areanames{en}->{233348} = "Eastern\ Region";
-$areanames{en}->{2333520} = "Sunyani";
-$areanames{en}->{2333521} = "Bechem";
-$areanames{en}->{2333522} = "Berekum";
-$areanames{en}->{2333523} = "Dormaa\ Ahenkro";
-$areanames{en}->{2333524} = "Wenchi";
-$areanames{en}->{2333525} = "Techiman";
-$areanames{en}->{2333526} = "Atebubu";
-$areanames{en}->{2333527} = "Yeji";
-$areanames{en}->{233357} = "Brong\-Ahafo\ Region";
-$areanames{en}->{233358} = "Brong\-Ahafo\ Region";
-$areanames{en}->{2333620} = "Ho";
-$areanames{en}->{2333621} = "Amedzofe";
-$areanames{en}->{2333622} = "Hohoe";
-$areanames{en}->{2333623} = "Kpandu";
-$areanames{en}->{2333624} = "Kete\-Krachi";
-$areanames{en}->{2333625} = "Denu\/Aflao";
-$areanames{en}->{2333626} = "Keta\/Akatsi";
-$areanames{en}->{233367} = "Volta\ Region";
-$areanames{en}->{233368} = "Volta\ Region";
-$areanames{en}->{2333720} = "Tamale";
-$areanames{en}->{2333721} = "Walewale";
-$areanames{en}->{2333722} = "Buipe";
-$areanames{en}->{2333723} = "Damongo";
-$areanames{en}->{2333724} = "Yendi";
-$areanames{en}->{2333725} = "Bole";
-$areanames{en}->{2333726} = "Salaga";
-$areanames{en}->{233377} = "Northern\ Region";
-$areanames{en}->{233378} = "Northern\ Region";
-$areanames{en}->{2333820} = "Bolgatanga";
-$areanames{en}->{2333821} = "Navrongo";
-$areanames{en}->{2333822} = "Bawku";
-$areanames{en}->{233387} = "Upper\ East\ Region";
-$areanames{en}->{233388} = "Upper\ East\ Region";
-$areanames{en}->{233392} = "Wa";
-$areanames{en}->{233397} = "Upper\ West\ Region";
-$areanames{en}->{233398} = "Upper\ West\ Region";
+$areanames{en} = {"2333625", "Denu\/Aflao",
+"2333420", "Koforidua",
+"233357", "Brong\-Ahafo\ Region",
+"233368", "Volta\ Region",
+"2333521", "Bechem",
+"2333428", "Aburi",
+"2333522", "Berekum",
+"233302", "Accra",
+"2333323", "Winneba",
+"2333524", "Wenchi",
+"233397", "Upper\ West\ Region",
+"2333421", "Nsawam",
+"2333424", "Donkorkrom",
+"2333123", "Tarkwa",
+"2333725", "Bole",
+"233378", "Northern\ Region",
+"233347", "Eastern\ Region",
+"2333520", "Sunyani",
+"233327", "Ashanti\ Region",
+"2333526", "Atebubu",
+"233308", "Greater\ Accra\ Region",
+"23334292", "Akim\ Oda",
+"233338", "Central\ Region",
+"2333820", "Bolgatanga",
+"2333222", "Ashanti\ Mampong",
+"2333224", "Bekwai",
+"2333221", "Konongo",
+"2333623", "Kpandu",
+"233387", "Upper\ East\ Region",
+"2333723", "Damongo",
+"2333125", "Samreboi",
+"2333426", "Asamankese",
+"2333822", "Bawku",
+"2333220", "Kumasi",
+"233318", "Western\ Region",
+"2333821", "Navrongo",
+"2333523", "Dormaa\ Ahenkro",
+"2333322", "Dunkwa",
+"2333321", "Cape\ Coast",
+"2333120", "Takoradi",
+"233337", "Central\ Region",
+"2333225", "Obuasi",
+"233328", "Ashanti\ Region",
+"2333626", "Keta\/Akatsi",
+"233307", "Greater\ Accra\ Region",
+"2333320", "Swedru",
+"2333035", "Ada",
+"233317", "Western\ Region",
+"233392", "Wa",
+"2333726", "Salaga",
+"2333124", "Asankragwa",
+"2333122", "Elubo",
+"2333423", "Mpraeso",
+"233388", "Upper\ East\ Region",
+"2333121", "Axim",
+"2333624", "Kete\-Krachi",
+"2333622", "Hohoe",
+"2333431", "Nkawkaw",
+"2333223", "Ejura",
+"2333621", "Amedzofe",
+"233358", "Brong\-Ahafo\ Region",
+"2333720", "Tamale",
+"233367", "Volta\ Region",
+"2333427", "Akuapim\ Mampong",
+"2333525", "Techiman",
+"233377", "Northern\ Region",
+"2333620", "Ho",
+"2333430", "Akosombo",
+"233348", "Eastern\ Region",
+"2333425", "Suhum",
+"2333527", "Yeji",
+"2333126", "Enchi",
+"2333722", "Buipe",
+"2333724", "Yendi",
+"233303", "Tema",
+"2333721", "Walewale",
+"233398", "Upper\ West\ Region",};
 
     sub new {
       my $class = shift;

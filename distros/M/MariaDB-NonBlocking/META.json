@@ -22,6 +22,7 @@
    "prereqs" : {
       "build" : {
          "requires" : {
+            "Alien::libmariadbclient" : "0.01",
             "Test::More" : "0"
          }
       },
@@ -33,6 +34,7 @@
       },
       "runtime" : {
          "requires" : {
+            "Alien::libmariadbclient" : "0.01",
             "AnyEvent" : "0",
             "AnyEvent::XSPromises" : "0",
             "Ref::Util" : "0",
@@ -42,6 +44,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.29",
-   "x_serialization_backend" : "JSON::PP version 2.97001"
+   "version" : "0.30",
+   "x_serialization_backend" : "JSON::PP version 4.05"
 }

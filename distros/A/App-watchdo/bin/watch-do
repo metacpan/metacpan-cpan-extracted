@@ -19,7 +19,7 @@ use File::stat;
 use Path::Tiny;
 use App::watchdo;
 
-our $VERSION = version->new('0.1.0');
+our $VERSION = version->new('0.1.1');
 my ($name)   = $PROGRAM_NAME =~ m{^.*/(.*?)$}mxs;
 
 my %option = (
@@ -48,6 +48,7 @@ sub main {
         'git|g',
         'exclude|e=s@',
         'sleep|s=i',
+        'pass_files|pass-files|p!',
         'test|t!',
         'verbose|v+',
         'man',
@@ -92,19 +93,20 @@ sub main {
 
 sub run {
     my @changed = @_;
-    my $cmd = join ' ', @ARGV;
+    my @cmd = ( @ARGV, $option{pass_files} ? map { $_->path } @changed : () );
 
     warn "Files changed!\n" if $option{verbose};
 
     if ( !@ARGV ) {
-        print join "\n", map { $_->path } @changed;
+        print join "\n", @cmd;
         print "\n";
-    }
-    elsif ( $option{test} ) {
-        warn $cmd;
-    }
-    else {
-        system $cmd;
+    } else {
+        if ( $option{test} || $option{verbose} ) {
+            warn join ' ', @cmd;
+        }
+        if ( ! $option{test} ) {
+            system @cmd;
+        }
     }
 }
 
@@ -116,7 +118,7 @@ watch-do - Run a command when watched files change
 
 =head1 VERSION
 
-This documentation refers to watch-do version 0.1.0
+This documentation refers to watch-do version 0.1.1
 
 =head1 SYNOPSIS
 

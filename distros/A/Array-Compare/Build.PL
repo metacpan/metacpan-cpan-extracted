@@ -23,6 +23,9 @@ my $build = Module::Build->new(
                 url  => 'https://github.com/davorg/array-compare.git',
                 web  => 'https://github.com/davorg/array-compare',
             },
+            bugtracker => {
+                web  => 'https://github.com/davorg/array-compare/issues',
+            },
         },
     },
     create_makefile_pl => 'traditional',

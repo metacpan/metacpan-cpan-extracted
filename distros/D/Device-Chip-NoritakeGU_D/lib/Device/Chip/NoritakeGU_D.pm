@@ -3,10 +3,10 @@
 #
 #  (C) Paul Evans, 2020 -- leonerd@leonerd.org.uk
 
-use 5.026; # signatures
+use v5.26; # signatures
 use Object::Pad 0.27;
 
-package Device::Chip::NoritakeGU_D 0.02;
+package Device::Chip::NoritakeGU_D 0.03;
 class Device::Chip::NoritakeGU_D
    extends Device::Chip;
 
@@ -24,11 +24,12 @@ C<Device::Chip::NoritakeGU_D> - chip driver for F<Noritake> F<GU-D> display modu
 =head1 SYNOPSIS
 
    use Device::Chip::NoritakeGU_D;
+   use Future::AsyncAwait;
 
    my $chip = Device::Chip::NoritakeGU_D->new( interface => "UART" );
-   $chip->mount( Device::Chip::Adapter::...->new )->get;
+   await $chip->mount( Device::Chip::Adapter::...->new );
 
-   $chip->text( "Hello, world!" )->get;
+   await $chip->text( "Hello, world!" );
 
 =head1 DESCRIPTION
 
@@ -102,14 +103,14 @@ method write_us { $self->write( pack "C*", 0x1F, @_ ) }
 
 =head1 METHODS
 
-The following methods documented with a trailing call to C<< ->get >> return
-L<Future> instances.
+The following methods documented in an C<await> expression return L<Future>
+instances.
 
 =cut
 
 =head2 text
 
-   $chip->text( $str )->get
+   await $chip->text( $str );
 
 Draw text at the cursor position.
 
@@ -172,12 +173,12 @@ sub ENUM_COMMAND ( $name, $values, @bytes )
 
 =head2 cursor_home
 
-   $chip->cursor_left->get
-   $chip->cursor_right->get
+   await $chip->cursor_left;
+   await $chip->cursor_right;
 
-   $chip->cursor_linehome->get
+   await $chip->cursor_linehome;
 
-   $chip->cursor_home->get
+   await $chip->cursor_home;
 
 Move the cursor left or right one character position, to the beginning of the
 line, or to the home position (top left corner).
@@ -191,7 +192,7 @@ method cursor_home     { $self->write( "\x0B" ) }
 
 =head2 cursor_goto
 
-   $chip->cursor_goto( $x, $y )->get
+   await $chip->cursor_goto( $x, $y );
 
 Moves the cursor to the C<$x>'th column of the C<$y>'th line (zero-indexed).
 
@@ -206,7 +207,7 @@ method cursor_goto ( $x, $y )
 
 =head2 linefeed
 
-   $chip->linefeed->get
+   await $chip->linefeed;
 
 Move the cursor down to the next line.
 
@@ -226,7 +227,7 @@ method clear { $self->write( "\x0C" ) }
 
 =head2 select_window
 
-   $chip->select_window( $win )->get
+   await $chip->select_window( $win );
 
 Select the main window (when C<$win> is 0), or one of the four numbered
 sub-windows.
@@ -248,7 +249,7 @@ method initialise { $self->write( "\x1B\x40" ) }
 
 =head2 set_cursor_visible
 
-   $chip->set_cursor_visible( $bool )->get
+   await $chip->set_cursor_visible( $bool );
 
 Set whether the cursor is visible.
 
@@ -259,7 +260,7 @@ BOOL_COMMAND set_cursor_visible =>
 
 =head2 set_brightness
 
-   $chip->set_brightness( $val )->get
+   await $chip->set_brightness( $val );
 
 Set the display brightness, from 1 to 8.
 
@@ -270,7 +271,7 @@ INT_COMMAND set_brightness => 1, 8,
 
 =head2 set_reverse
 
-   $chip->set_reverse( $bool )->get
+   await $chip->set_reverse( $bool );
 
 Sets whether subsequent text will be rendered in "reverse video" (clear pixels
 on a set background) effect.
@@ -282,7 +283,7 @@ BOOL_COMMAND set_reverse =>
 
 =head2 set_write_mixture_display_mode
 
-   $chip->set_write_mixture_display_mode( $mode )->get
+   await $chip->set_write_mixture_display_mode( $mode );
 
 Set the combining mode for newly-added display content. C<$mode> must be one
 of
@@ -296,7 +297,7 @@ ENUM_COMMAND set_write_mixture_display_mode => [qw( set or and xor )],
 
 =head2 set_font_size
 
-   $chip->set_font_size( $size )->get
+   await $chip->set_font_size( $size );
 
 Set the font size. C<$size> must be one of
 
@@ -309,7 +310,7 @@ ENUM_COMMAND set_font_size => [qw( 5x7 8x16 )],
 
 =head2 set_font_width
 
-   $chip->set_font_width( $width )->get
+   await $chip->set_font_width( $width );
 
 Set the font width. C<$width> must be one of
 
@@ -322,7 +323,7 @@ ENUM_COMMAND set_font_width => [qw( fixed fixed2 prop prop2 )],
 
 =head2 set_font_magnification
 
-   $chip->set_font_magnification( $xscale, $yscale )->get
+   await $chip->set_font_magnification( $xscale, $yscale );
 
 Set the font scaling factor. C<$xscale> must be between 1 to 4, and
 C<$yscale> must be 1 or 2.
@@ -346,7 +347,7 @@ method _realtime_image_display ( $width, $height, $bytes )
 
 =head2 realtime_image_display_columns
 
-   $chip->realtime_image_display_columns( @columns )->get
+   await $chip->realtime_image_display_columns( @columns );
 
 Sends a bitmapped image to the display, at the cursor position. The cursor is
 not moved.
@@ -384,7 +385,7 @@ method realtime_image_display_lines ( @lines )
 
 =head2 set_gpio_direction
 
-   $chip->set_gpio_direction( $dir )->get
+   await $chip->set_gpio_direction( $dir );
 
 Configure the GPIO pins for input or output. C<$dir> is bitmask of four bits.
 Low bits correspond to input, high bits to output.
@@ -398,7 +399,7 @@ async method set_gpio_direction ( $dir )
 
 =head2 set_gpio_output
 
-   $chip->set_gpio_output( $value )->get
+   await $chip->set_gpio_output( $value );
 
 Write the value to the GPIO pins.
 
@@ -411,7 +412,7 @@ async method write_gpio ( $value )
 
 =head2 read_gpio
 
-   $value = $chip->read_gpio->get
+   $value = await $chip->read_gpio;
 
 Returns the current state of the GPIO pins.
 
@@ -430,7 +431,7 @@ async method read_gpio
 
 =head2 read_touchswitches
 
-   $switches = $chip->read_touchswitches->get
+   $switches = await $chip->read_touchswitches;
 
 Reads the status of the panel touch switches. Returns a hash reference whose
 keys are the names of the touch areas (C<SW1>, C<SW2>, ...) and values are

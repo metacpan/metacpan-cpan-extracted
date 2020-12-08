@@ -90,7 +90,7 @@ sub last_desperate_search {
     }
 }
 
-my $binary                      = 'firefox';
+my $binary; #                      = 'firefox';
 my $suffix = (( $^O eq 'MSWin32' ) || ( $^O eq 'cygwin' )) ? '.exe' : q[];
 my %known_win32_preferred_names = (
     'Mozilla Firefox'           => 1,
@@ -111,6 +111,7 @@ my %_known_win32_organisations = (
     Basilisk                    => 'Mozilla',
     'Pale Moon'                 => 'Mozilla',
 );
+my $version_regex = qr/(\d+)[.](\d+(?:\w\d+)?)(?:[.](\d+))?/smx;
 my $version_string;
 if ( $^O eq 'MSWin32' ) {
   NAME: foreach my $name (
@@ -200,7 +201,6 @@ elsif ( $^O eq 'cygwin' ) {
                   . $name_for_path_to_exe . q[/]
                   . $version
                   . '/Main/PathToExe' );
-            my $version_regex = qr/(\d+)[.](\d+(?:\w\d+)?)(?:[.](\d+))?/smx;
             if (   ( defined $path ) && (-e $path)
                 && ( $initial_version =~ /^$version_regex$/smx ) )
             {
@@ -217,16 +217,36 @@ if (!defined $binary) {
         foreach my $path ( split /$Config::Config{path_sep}/, defined $ENV{PATH} ? $ENV{PATH} : $ENV{Path} ) {
             if ( -e "$path/$possible$suffix" ) {
                 $binary = "$path/$possible";
+		last POSSIBLE;
             }
         }
     }
 }
-if ( !defined $version_string ) {
+if (( !defined $version_string ) && (defined $binary)) {
+	my $ini_path = $binary;
+	$ini_path =~ s/(firefox|waterfox)(?:[.]exe)?$/application.ini/smx;
+	if (my $ini_handle = open INI_HANDLE, '<', $ini_path) {
+		my $vendor;
+		my $name;
+	    while(my $line = <INI_HANDLE>) {
+		chomp $line;
+		if ($line =~ /^Vendor=(.*)$/smx) {
+			($vendor) = ($1);
+		} elsif ($line =~ /^Name=(.*)$/smx) {
+			($name) = ($1);
+		} elsif ($line =~ /^Version=($version_regex)$/smx) {
+			$version_string = "$vendor $name $1\n";
+			warn "Determining version string from $ini_path\n";
+		 }
+	    }
+	}
+}
+if (( !defined $version_string ) && (defined $binary)) {
     $version_string = `"$binary" -version 2>$dev_null`;
 }
-print $version_string;
 my $major;
 if ($version_string) {
+    print $version_string;
     if ( $version_string =~ /^(?:Mozilla[ ]Firefox|Firefox[ ]Developer[ ]Edition|Nightly)[ ](\d+)[.]\d+(?:a\d+)?([.]\d+)?\s*/smx )
     {
         ($major) = ($1);
@@ -309,6 +329,11 @@ WriteMakefile(
         ? ( 'MIN_PERL_VERSION' => '5.006' )
         : ()
     ),
+    META_MERGE     => {
+        resources  => {
+            repository => 'https://github.com/david-dick/firefox-marionette',
+        },
+    },
     PL_FILES       => {},
     EXE_FILES      => ['ssh-auth-cmd-marionette'],
     BUILD_REQUIRES => {
@@ -345,6 +370,7 @@ WriteMakefile(
         'Socket'              => 0,
         'Time::HiRes'         => 0,
         'URI'                 => 0,
+        'URI::Escape'         => 0,
         (
             $^O eq 'MSWin32'
             ? (

@@ -1,4 +1,4 @@
-# AWS::Glue::Crawler generated from spec 7.4.0
+# AWS::Glue::Crawler generated from spec 21.0.0
 use Moose::Util::TypeConstraints;
 
 coerce 'Cfn::Resource::Properties::AWS::Glue::Crawler',
@@ -14,7 +14,7 @@ package Cfn::Resource::AWS::Glue::Crawler {
     [  ]
   }
   sub supported_regions {
-    [ 'ap-northeast-1','ap-northeast-2','ap-south-1','ap-southeast-1','ap-southeast-2','ca-central-1','eu-central-1','eu-west-1','eu-west-2','eu-west-3','us-east-1','us-east-2','us-west-1','us-west-2' ]
+    [ 'ap-northeast-1','ap-northeast-2','ap-south-1','ap-southeast-1','ap-southeast-2','ca-central-1','cn-northwest-1','eu-central-1','eu-north-1','eu-west-1','eu-west-2','eu-west-3','us-east-1','us-east-2','us-west-1','us-west-2' ]
   }
 }
 
@@ -51,15 +51,16 @@ coerce 'Cfn::Resource::Properties::AWS::Glue::Crawler::S3Target',
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::Glue::Crawler::S3TargetValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::Glue::Crawler::S3Target->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::Glue::Crawler::S3TargetValue {
+package Cfn::Resource::Properties::Object::AWS::Glue::Crawler::S3Target {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
   
+  has ConnectionName => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has Exclusions => (isa => 'Cfn::Value::Array|Cfn::Value::Function|Cfn::DynamicValue', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has Path => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
 }
@@ -95,11 +96,11 @@ coerce 'Cfn::Resource::Properties::AWS::Glue::Crawler::JdbcTarget',
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::Glue::Crawler::JdbcTargetValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::Glue::Crawler::JdbcTarget->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::Glue::Crawler::JdbcTargetValue {
+package Cfn::Resource::Properties::Object::AWS::Glue::Crawler::JdbcTarget {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -140,11 +141,11 @@ coerce 'Cfn::Resource::Properties::AWS::Glue::Crawler::DynamoDBTarget',
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::Glue::Crawler::DynamoDBTargetValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::Glue::Crawler::DynamoDBTarget->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::Glue::Crawler::DynamoDBTargetValue {
+package Cfn::Resource::Properties::Object::AWS::Glue::Crawler::DynamoDBTarget {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -183,11 +184,11 @@ coerce 'Cfn::Resource::Properties::AWS::Glue::Crawler::CatalogTarget',
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::Glue::Crawler::CatalogTargetValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::Glue::Crawler::CatalogTarget->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::Glue::Crawler::CatalogTargetValue {
+package Cfn::Resource::Properties::Object::AWS::Glue::Crawler::CatalogTarget {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -205,11 +206,11 @@ coerce 'Cfn::Resource::Properties::AWS::Glue::Crawler::Targets',
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::Glue::Crawler::TargetsValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::Glue::Crawler::Targets->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::Glue::Crawler::TargetsValue {
+package Cfn::Resource::Properties::Object::AWS::Glue::Crawler::Targets {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -229,11 +230,11 @@ coerce 'Cfn::Resource::Properties::AWS::Glue::Crawler::SchemaChangePolicy',
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::Glue::Crawler::SchemaChangePolicyValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::Glue::Crawler::SchemaChangePolicy->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::Glue::Crawler::SchemaChangePolicyValue {
+package Cfn::Resource::Properties::Object::AWS::Glue::Crawler::SchemaChangePolicy {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -251,11 +252,11 @@ coerce 'Cfn::Resource::Properties::AWS::Glue::Crawler::Schedule',
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::Glue::Crawler::ScheduleValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::Glue::Crawler::Schedule->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::Glue::Crawler::ScheduleValue {
+package Cfn::Resource::Properties::Object::AWS::Glue::Crawler::Schedule {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -283,3 +284,30 @@ package Cfn::Resource::Properties::AWS::Glue::Crawler {
 }
 
 1;
+### main pod documentation begin ###
+
+=encoding UTF-8
+
+=head1 NAME
+
+Cfn::Resource::AWS::Glue::Crawler - Cfn resource for AWS::Glue::Crawler
+
+=head1 DESCRIPTION
+
+This module implements a Perl module that represents the CloudFormation object AWS::Glue::Crawler.
+
+See L<Cfn> for more information on how to use it.
+
+=head1 AUTHOR
+
+    Jose Luis Martinez
+    CAPSiDE
+    jlmartinez@capside.com
+
+=head1 COPYRIGHT and LICENSE
+
+Copyright (c) 2013 by CAPSiDE
+This code is distributed under the Apache 2 License. The full text of the 
+license can be found in the LICENSE file included with this module.
+
+=cut

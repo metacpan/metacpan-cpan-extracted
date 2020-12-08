@@ -15,3 +15,6 @@
 
 2020-12-02 - 0.006
     + fix the to_json misprototype issue
+
+2020-12-02 - 0.007
+    + backwards compatible change (// --> defined ?:)

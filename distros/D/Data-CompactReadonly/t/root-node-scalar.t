@@ -4,6 +4,8 @@ no warnings 'portable';
 
 use Test::More;
 use Test::Exception;
+use lib 't/lib';
+use TestFloat;
 
 use File::Temp qw(tempfile);
 use String::Binary::Interpolation;
@@ -40,15 +42,15 @@ foreach my $negative (0, 1) {
 subtest 'floats' => sub {
     my $float_bytes = pack_double_be(3.1415);
     open(my $fh, '<', \"$header_bytes${b11101100}$float_bytes");
-    is(Data::CompactReadonly->read($fh), 3.1415, "can read a Float");
+    cmp_float(Data::CompactReadonly->read($fh), 3.1415, "can read a Float");
     
     $float_bytes = pack_double_be(2.718e-50);
     open($fh, '<', \"$header_bytes${b11101100}$float_bytes");
-    is(Data::CompactReadonly->read($fh), 2.718e-50, "can read a teeny-tiny Float");
+    cmp_float(Data::CompactReadonly->read($fh), 2.718e-50, "can read a teeny-tiny Float");
     
     $float_bytes = pack_double_be(-1e100/137);
     open($fh, '<', \"$header_bytes${b11101100}$float_bytes");
-    is(Data::CompactReadonly->read($fh), -1e100/137, "can read a hugely negative Float");
+    cmp_float(Data::CompactReadonly->read($fh), -1e100/137, "can read a hugely negative Float");
 };
 
 open(my $fh, '<', \"$header_bytes${b11101000}");

@@ -24,9 +24,19 @@ ok (@dsn >= 2,					"more than one");
 ok ($dbh->disconnect,				"disconnect");
 
 # Try different DSN's
-foreach my $d (qw( . example lib t )) {
+foreach my $d (qw( . examples lib t )) {
     ok (my $dns = Connect ("dbi:CSV:f_dir=$d"),	"use $d as f_dir");
     ok ($dbh->disconnect,			"disconnect");
+    }
+
+if ($DBD::File::VERSION ge "0.45") {
+    my @err;
+    is (eval {
+	local $SIG{__WARN__} = sub { push @err => @_ };
+	local $SIG{__DIE__}  = sub { push @err => @_ };
+	Connect ("dbi:CSV:f_dir=d/non/exist/here");
+	}, undef, "f_dir = nonexting dir");
+    like ("@err", qr{d/non/exist/here}, "Error caught");
     }
 
 done_testing ();

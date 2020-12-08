@@ -4,14 +4,14 @@ package JSON::Schema::Draft201909::Vocabulary;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Base role for JSON Schema vocabulary classes
 
-our $VERSION = '0.017';
+our $VERSION = '0.018';
 
 use 5.016;
 no if "$]" >= 5.031009, feature => 'indirect';
 no if "$]" >= 5.033001, feature => 'multidimensional';
 use Ref::Util 0.100 'is_ref';
 use Storable 'dclone';
-use JSON::Schema::Draft201909::Utilities qw(jsonp A abort assert_keyword_type);
+use JSON::Schema::Draft201909::Utilities qw(jsonp A assert_keyword_type);
 use Moo::Role;
 use strictures 2;
 use Types::Standard 1.010002 'InstanceOf';
@@ -76,7 +76,7 @@ JSON::Schema::Draft201909::Vocabulary - Base role for JSON Schema vocabulary cla
 
 =head1 VERSION
 
-version 0.017
+version 0.018
 
 =head1 SYNOPSIS
 

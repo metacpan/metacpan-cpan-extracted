@@ -1,11 +1,11 @@
 use strict;
 use warnings;
+use lib 't/inc';
+use nptestutils;
 
 use Test::More;
 
 use Number::Phone;
-
-END { done_testing(); }
 
 eval 'use Test::utf8';
 
@@ -17,3 +17,5 @@ SKIP: {
         "Donauwörth area name isflagged as UTF-8"
     );
 };
+
+done_testing();

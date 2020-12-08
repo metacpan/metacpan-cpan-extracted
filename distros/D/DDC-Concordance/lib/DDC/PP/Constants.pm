@@ -5,7 +5,7 @@ package DDC::PP;
 
 ##--------------------------------------------------------------
 ## ddcConfig.h
-sub library_version { return "2.2.4"; }
+sub library_version { return "2.2.8"; }
 
 
 ##--------------------------------------------------------------
@@ -22,6 +22,7 @@ our @HitSortEnum = qw(
 		       RandomSort
 		       LessByCountKey GreaterByCountKey
 		       LessByCountValue GreaterByCountValue
+		       LessByPruneKey GreaterByPruneKey
 		    );
 our @HitSortEnumStrings = qw(
 			      no_sort
@@ -35,6 +36,7 @@ our @HitSortEnumStrings = qw(
 			      random
 			      asc_by_key desc_by_key
 			      asc_by_count desc_by_count
+			      prune_asc prune_desc
 			   );
 
 our %HitSortEnum = ((map {($HitSortEnum[$_]       =>$_)} (0..$#HitSortEnum)),
@@ -107,6 +109,8 @@ DDC::PP::Constants - pure-perl DDC::XS clone: constants
  $i = DDC::PP::GreaterByCountKey();
  $i = DDC::PP::LessByCountValue();
  $i = DDC::PP::GreaterByCountValue();
+ $i = DDC::PP::LessByPruneKey();
+ $i = DDC::PP::GreaterByPruneKey();
  $i = DDC::PP::HitSortsCount();
 
  # enum labels are also available as $DDC::PP::HitSortEnum[DDC::PP::NoSort], etc.

@@ -28,10 +28,13 @@ WriteMakefile(
         url  => 'https://github.com/davorg/app-aphra.git',
         web  => 'https://github.com/davorg/app-aphra',
       },
+      bugtracker => {
+        web  => 'https://github.com/davorg/app-aphra/issues',
+      },
     },
   },
   ($mm_ver >= 6.48
-    ? (MIN_PERL_VERSION => 5.006)
+    ? (MIN_PERL_VERSION => 5.014)
     : ()
   ),
 );

@@ -215,55 +215,55 @@
    "provides" : {
       "JSON::Schema::Draft201909" : {
          "file" : "lib/JSON/Schema/Draft201909.pm",
-         "version" : "0.017"
+         "version" : "0.018"
       },
       "JSON::Schema::Draft201909::Annotation" : {
          "file" : "lib/JSON/Schema/Draft201909/Annotation.pm",
-         "version" : "0.017"
+         "version" : "0.018"
       },
       "JSON::Schema::Draft201909::Document" : {
          "file" : "lib/JSON/Schema/Draft201909/Document.pm",
-         "version" : "0.017"
+         "version" : "0.018"
       },
       "JSON::Schema::Draft201909::Error" : {
          "file" : "lib/JSON/Schema/Draft201909/Error.pm",
-         "version" : "0.017"
+         "version" : "0.018"
       },
       "JSON::Schema::Draft201909::Result" : {
          "file" : "lib/JSON/Schema/Draft201909/Result.pm",
-         "version" : "0.017"
+         "version" : "0.018"
       },
       "JSON::Schema::Draft201909::Utilities" : {
          "file" : "lib/JSON/Schema/Draft201909/Utilities.pm",
-         "version" : "0.017"
+         "version" : "0.018"
       },
       "JSON::Schema::Draft201909::Vocabulary" : {
          "file" : "lib/JSON/Schema/Draft201909/Vocabulary.pm",
-         "version" : "0.017"
+         "version" : "0.018"
       },
       "JSON::Schema::Draft201909::Vocabulary::Applicator" : {
          "file" : "lib/JSON/Schema/Draft201909/Vocabulary/Applicator.pm",
-         "version" : "0.017"
+         "version" : "0.018"
       },
       "JSON::Schema::Draft201909::Vocabulary::Content" : {
          "file" : "lib/JSON/Schema/Draft201909/Vocabulary/Content.pm",
-         "version" : "0.017"
+         "version" : "0.018"
       },
       "JSON::Schema::Draft201909::Vocabulary::Core" : {
          "file" : "lib/JSON/Schema/Draft201909/Vocabulary/Core.pm",
-         "version" : "0.017"
+         "version" : "0.018"
       },
       "JSON::Schema::Draft201909::Vocabulary::Format" : {
          "file" : "lib/JSON/Schema/Draft201909/Vocabulary/Format.pm",
-         "version" : "0.017"
+         "version" : "0.018"
       },
       "JSON::Schema::Draft201909::Vocabulary::MetaData" : {
          "file" : "lib/JSON/Schema/Draft201909/Vocabulary/MetaData.pm",
-         "version" : "0.017"
+         "version" : "0.018"
       },
       "JSON::Schema::Draft201909::Vocabulary::Validation" : {
          "file" : "lib/JSON/Schema/Draft201909/Vocabulary/Validation.pm",
-         "version" : "0.017"
+         "version" : "0.018"
       }
    },
    "release_status" : "stable",
@@ -278,7 +278,7 @@
          "web" : "https://github.com/karenetheridge/JSON-Schema-Draft201909"
       }
    },
-   "version" : "0.017",
+   "version" : "0.018",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.033004"
@@ -1213,7 +1213,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "v0.017",
+                  "tag" : "v0.018",
                   "tag_format" : "v%V",
                   "tag_message" : "v%v%t"
                },

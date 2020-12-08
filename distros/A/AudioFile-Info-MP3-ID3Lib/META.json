@@ -21,7 +21,8 @@
       },
       "configure" : {
          "requires" : {
-            "Module::Build" : "0.42"
+            "Module::Build" : "0.42",
+            "YAML" : "0"
          }
       },
       "runtime" : {
@@ -38,11 +39,14 @@
       },
       "AudioFile::Info::MP3::ID3Lib" : {
          "file" : "lib/AudioFile/Info/MP3/ID3Lib.pm",
-         "version" : "v1.7.4"
+         "version" : "v1.8.0"
       }
    },
    "release_status" : "stable",
    "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/davorg/audiofile-info-mp3-id3lib/issues"
+      },
       "license" : [
          "http://dev.perl.org/licenses/"
       ],
@@ -52,6 +56,6 @@
          "web" : "https://github.com/davorg/audiofile-info-mp3-id3lib"
       }
    },
-   "version" : "v1.7.4",
+   "version" : "v1.8.0",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

@@ -1,16 +1,19 @@
-#!perl -w
+#!perl
 #
 # compile_encoding
 #
-# Version 1.x Copyright 1998 Clark Cooper <coopercc@netheaven.com>
-# Changes in Version 2.00 onwards Copyright (C) 2007 Steve Hay
-# All rights reserved.
+# Copyright (C) 1998 Clark Cooper.  All rights reserved.
+# Copyright (C) 2007-2008, 2014 Steve Hay.  All rights reserved.
 #
-# This program is free software; you may redistribute it and/or
-# modify it under the same terms as Perl itself.
-
+# This script is free software; you can redistribute it and/or modify it under
+# the same terms as Perl itself, i.e. under the terms of either the GNU General
+# Public License or the Artistic License, as specified in the LICENCE file.
+#
 
 use 5.008001;
+
+use strict;
+use warnings;
 
 my $Usage=<<'End_of_Usage;';
 Usage is:
@@ -19,12 +22,12 @@ Usage is:
 Compiles the input XML encmap file into a binary encoding file usable
 by XML::Parser.
 
-  -h			Print this message.
+  -h                    Print this message.
 
-  -o output_file	Put compiled binary into given output file. By
-			default, a file that has the same basename as
-			the input file, but with an extension of .enc
-			is the output.
+  -o output_file        Put compiled binary into given output file. By
+                        default, a file that has the same basename as
+                        the input file, but with an extension of .enc
+                        is the output.
 End_of_Usage;
 
 package Pfxmap;
@@ -32,7 +35,7 @@ use fields qw(min max map explen);
 
 sub new {
   my $class = shift;
-  no strict 'refs';
+  no strict 'refs'; ## no critic (TestingAndDebugging::ProhibitNoStrict)
   my $pfxmap = fields::new($class);
 
   while (@_) {
@@ -47,8 +50,6 @@ package main;
 
 use XML::Encoding;
 use integer;
-
-use strict;
 
 ################################################################
 # See the encoding.h file in the top level XML::Encoding directory
@@ -67,16 +68,20 @@ while (defined($ARGV[0]) and $ARGV[0] =~ /^-/) {
   }
   elsif ($opt eq '-h') {
     print $Usage;
-    exit;
+    exit 1;
   }
   else {
+    $! = 2;
     die "Unrecognized option: $opt\n$Usage";
   }
 }
 
 my $infile = shift;
 
-die "Encmap XML file not provided\n$Usage" unless defined($infile);
+if (not defined($infile)) {
+  $! = 3;
+  die "Encmap XML file not provided\n$Usage";
+}
 
 unless (defined($ofile)) {
   my $base = $infile;
@@ -102,16 +107,19 @@ my $pfxlenref;
 my $currmap = new Pfxmap(min => 255, max => 0, map => \@firstbyte);
 
 my $p = new XML::Encoding(ErrorContext  => 2,
-			  ExpatRequired => 1,
-			  PushPrefixFcn => \&push_prefix,
-			  PopPrefixFcn  => \&pop_prefix,
-			  RangeSetFcn   => \&range_set
-			  );
+                          ExpatRequired => 1,
+                          PushPrefixFcn => \&push_prefix,
+                          PopPrefixFcn  => \&pop_prefix,
+                          RangeSetFcn   => \&range_set
+                          );
 
 my $name = $p->parsefile($infile);
 
-die "Encoding name too long (> $namelength)\n"
-  if length($name) > $namelength;
+
+if (length($name) > $namelength) {
+  $! = 4;
+  die "Encoding name too long (> $namelength)\n";
+}
 
 my @prefixes;
 my $maplen = 0;
@@ -130,7 +138,7 @@ for ($i = 0; $i < 256; $i++) {
     if ($pfxcount) {
       $currmap->{map}->[$i] = $firstbyte[$i];
       $firstbyte[$i] = - ($firstbyte[$i]->{explen} + 1)
-	if ref($firstbyte[$i]);
+        if ref($firstbyte[$i]);
     }
   }
   else {
@@ -138,13 +146,17 @@ for ($i = 0; $i < 256; $i++) {
   }
 }
 
-open(ENC, ">$ofile") or die "Couldn't open $ofile for writing:\n$!\n";
-binmode(ENC);
+my $enc;
+open($enc, '>', $ofile) or do {
+  $! = 5;
+  die "Couldn't open $ofile for writing:\n$!\n";
+};
+binmode($enc);
 
 #Note the use of network order packings
 
-print ENC pack("Na${namelength}nnN256",
-	       $magic, $name, $pflen, $maplen, @firstbyte);
+print $enc pack("Na${namelength}nnN256",
+                $magic, $name, $pflen, $maplen, @firstbyte);
 
 my @map = ();
 my $head = 0;
@@ -165,13 +177,13 @@ while (@prefixes) {
 
     if (defined($entry)) {
       if (ref($entry)) {
-	my $pfxent = $entry;
-	$entry = $head + @prefixes;
-	push(@prefixes, $pfxent);
-	vec($ispfx, $i, 1) = 1;
+        my $pfxent = $entry;
+        $entry = $head + @prefixes;
+        push(@prefixes, $pfxent);
+        vec($ispfx, $i, 1) = 1;
       }
       else {
-	vec($ischar, $i, 1) = 1;
+        vec($ischar, $i, 1) = 1;
       }
     }
     else {
@@ -181,15 +193,17 @@ while (@prefixes) {
     push(@map, $entry);
   }
 
-  print ENC pack('CCn', $pfxmap->{min}, $len, $mapstart), $ispfx, $ischar;
+  print $enc pack('CCn', $pfxmap->{min}, $len, $mapstart), $ispfx, $ischar;
 }
 
 if (@map) {
   my $packlist = 'n' . int(@map);
-  print ENC pack($packlist, @map);
+  print $enc pack($packlist, @map);
 }
 
-close(ENC);
+close($enc);
+
+exit 0;
 
 ################
 ## End main
@@ -203,8 +217,8 @@ sub push_prefix {
 
   return "Different lengths for same first byte"
     if (defined($pfxlenref)
-	and defined($$pfxlenref)
-	and $$pfxlenref < @stack);
+        and defined($$pfxlenref)
+        and $$pfxlenref < @stack);
 
   my $pfxmap = $currmap->{map}->[$byte];
 
@@ -236,7 +250,7 @@ sub push_prefix {
 
   push(@stack, $currmap);
   $currmap = $pfxmap;
-  return undef;
+  return;
 }  # End push_prefix
 
 sub pop_prefix {
@@ -253,7 +267,7 @@ sub pop_prefix {
   $currmap = pop(@stack);
   $pfxlenref = undef
     unless @stack;
-  return undef;
+  return;
 }  # End pop_prefix
 
 sub range_set {
@@ -266,7 +280,7 @@ sub range_set {
   if (defined($pfxlenref)) {
     if (defined($$pfxlenref)) {
       return "Different for same 1st byte"
-	unless $$pfxlenref == @stack;
+        unless $$pfxlenref == @stack;
     }
     else {
       $$pfxlenref = @stack;
@@ -287,7 +301,7 @@ sub range_set {
   $currmap->{max} = $limit - 1
     if $limit >= $currmap->{max};
 
-  return undef;
+  return;
 }  # End range_set
 
 __END__
@@ -298,21 +312,31 @@ compile_encoding - compile XML encmap into a binary encoded file for XML::Parser
 
 =head1 SYNOPSIS
 
-B<compile_encoding> [B<-h>] [B<-o> I<output_file>] I<input_file>
+    compile_encoding [-h] [-o <output_file>] <input_file>
 
 =head1 DESCRIPTION
 
 B<compile_encoding> compiles an input XML encmap file into a binary encoded file
 usable by L<XML::Parser|XML::Parser(3pm)>.
 
+=head1 ARGUMENTS
+
+=over 4
+
+=item E<lt>input_fileE<gt>
+
+The XML encmap file to compile.
+
+=back
+
 =head1 OPTIONS
 
 =over 4
 
-=item B<-o> I<output_file>
+=item B<-o E<lt>output_fileE<gt>>
 
-Put compiled binary into given output file. By default, a file that has the same
-basename as the input file, but with an extension of F<.enc> is output.
+Put compiled binary into given output file.  By default, a file that has the
+same basename as the input file, but with an extension of F<.enc> is output.
 
 =item B<-h>
 
@@ -320,16 +344,59 @@ Print usage information.
 
 =back
 
+=head1 EXIT STATUS
+
+    0   The script exited normally.
+
+    1   The script exited after printing the help.
+
+    2   Invalid command-line arguments.
+
+    >2  An error occurred.
+
+=head1 KNOWN BUGS
+
+I<None>.
+
 =head1 SEE ALSO
 
 L<make_encmap(1)>,
 L<XML::Encoding(3pm)>,
-L<XML::Parser(3pm)>
+L<XML::Parser(3pm)>.
 
-=head1 AUTHORS
+=head1 AUTHOR
 
-This manual page was written by Daniel Leidert E<lt>daniel.leidert@wgdd.deE<gt>
-for the Debian project (but may be used by others).
+Clark Cooper E<lt>L<coopercc@netheaven.com|mailto:coopercc@netheaven.com>E<gt>.
+
+Steve Hay E<lt>L<shay@cpan.org|mailto:shay@cpan.org>E<gt> is now maintaining
+XML::Encoding as of version 2.00.
+
+This manual page was written by Daniel Leidert
+E<lt>L<daniel.leidert@wgdd.de|mailto:daniel.leidert@wgdd.de>E<gt> for the Debian
+project (but may be used by others).
+
+=head1 COPYRIGHT
+
+Copyright (C) 1998 Clark Cooper.  All rights reserved.
+Copyright (C) 2007-2008, 2014 Steve Hay.  All rights reserved.
+
+=head1 LICENCE
+
+This script is free software; you can redistribute it and/or modify it under the
+same terms as Perl itself, i.e. under the terms of either the GNU General Public
+License or the Artistic License, as specified in the F<LICENCE> file.
+
+=head1 VERSION
+
+Version 2.11
+
+=head1 DATE
+
+08 Dec 2020
+
+=head1 HISTORY
+
+See the F<Changes> file.
 
 =cut
 

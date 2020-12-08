@@ -1,5 +1,8 @@
 Revision history for Test-JSON-Schema-Acceptance
 
+1.003     2020-12-05 07:09:12Z
+        - updated test suite to commit 6505944d38c414039cd8f27e3312b9e3831a0a16
+
 1.002     2020-11-24 17:56:27Z
         - include more data in the summary header
         - fix minimum declared version for Path::Tiny

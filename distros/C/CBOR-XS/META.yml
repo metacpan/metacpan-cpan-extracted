@@ -21,4 +21,4 @@ no_index:
 requires:
   Types::Serialiser: '0'
   common::sense: '0'
-version: 1.82
+version: 1.83

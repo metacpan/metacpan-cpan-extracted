@@ -1,34 +1,12 @@
-Revision history for Music-Chord-Note
+# Music-Chord-Note commit log
 
-0.08   Sun Oct 28 04:36:04 JST 2018
-        - Add `madd4` and `dim6`. Thanks, GENE!
+https://github.com/bayashi/Music-Chord-Note/commits/master
 
-0.07   Wed Feb  6 23:29:25 JST 2013
-        - not return 'base': is kind of chord name(for internal)
+## Tags
 
-0.061  Sun Oct 14 18:35:00 JST 2012
-        [NO CODE CHANGES]
-        - fixed for kwalitee
+https://github.com/bayashi/Music-Chord-Note/tags
 
-0.06   Wed Oct 10 07:30:00 JST 2012
-       changed style of version
-       supported Travis-CI on the github
+## Last Release
 
-0.0.6  Tue Mar 10 20:45:00 JST 2009
-       added all_chords_list method and tests.
-
-0.0.5  Tue Dec 16 11:45:00 JST 2008
-       added chord_num method and tests.
-
-0.0.4  Fri Dec 12 09:40:00 JST 2008
-       little fixed
-
-0.0.3  mon Dec 08 16:16:16 JST 2008
-       add scale func & test
-       
-0.0.2  mon Dec 01 12:12:12 JST 2008
-       fixed chord list.
-
-0.0.1  Tue Nov 29 10:10:10 JST 2008
-       Initial release.
-
+Sun Dec  6 00:03:30 GMT 2020
+https://github.com/bayashi/Music-Chord-Note/compare/0.08...0.09

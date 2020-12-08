@@ -1,0 +1,10 @@
+Revision history for CPANfile::Parse::PPI
+=========================================
+
+0.02  2020-12-05  07:15:00
+
+  * removed Data::Printer from test script (thanks to CPANtesters)
+
+0.01  2020-12-04  14:32:00
+
+  * initial release

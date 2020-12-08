@@ -1,10 +1,12 @@
 #!/usr/bin/perl
 
-use strict;
+use v5.26;
 use warnings;
 
 use Test::More;
 use Test::Device::Chip::Adapter;
+
+use Future::AsyncAwait;
 
 use Device::Chip::nRF24L01P;
 
@@ -13,13 +15,13 @@ my $adapter = Test::Device::Chip::Adapter->new;
 
 $adapter->expect_write_gpios( { CE => 0 } );
 
-$chip->mount( $adapter )->get;
+await $chip->mount( $adapter );
 
 # ->read_rx_payload_width
 {
    $adapter->expect_readwrite( "\x60\x00" )->returns( "\x0E\x07" );
 
-   is( $chip->read_rx_payload_width->get, 7, '$chip->read_rx_payload_width' );
+   is( await $chip->read_rx_payload_width, 7, '$chip->read_rx_payload_width' );
 
    $adapter->check_and_clear( '$chip->read_rx_payload_width' );
 }
@@ -28,7 +30,7 @@ $chip->mount( $adapter )->get;
 {
    $adapter->expect_readwrite( "\x61" . "\0"x7 )->returns( "\x0Emessage" );
 
-   is( $chip->read_rx_payload( 7 )->get, "message", '$chip->read_rx_payload' );
+   is( await $chip->read_rx_payload( 7 ), "message", '$chip->read_rx_payload' );
 
    $adapter->check_and_clear( '$chip->read_rx_payload' );
 }

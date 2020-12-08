@@ -6,7 +6,7 @@ use Regexp::Common;
 use WWW::Mechanize;
 use Test::WWW::Simple;
 
-use constant SHEBANG => '#!/usr/bin/env perl';
+use constant SHEBANG => "#!$^X";
 my($generate, $run, $warn);
 
 GetOptions('generate' => \$generate,

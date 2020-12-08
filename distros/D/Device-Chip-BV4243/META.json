@@ -4,31 +4,39 @@
       "Paul Evans <leonerd@leonerd.org.uk>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4214",
+   "generated_by" : "Module::Build version 0.4231",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Device-Chip-BV4243",
    "prereqs" : {
-      "build" : {
+      "configure" : {
          "requires" : {
-            "Test::More" : "0.88"
+            "Module::Build" : "0.4004"
          }
       },
       "runtime" : {
          "requires" : {
-            "Device::Chip" : "0.03"
+            "Device::Chip" : "0.03",
+            "Future::AsyncAwait" : "0.47",
+            "Object::Pad" : "0.19",
+            "perl" : "5.026"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.88"
          }
       }
    },
    "provides" : {
       "Device::Chip::BV4243" : {
          "file" : "lib/Device/Chip/BV4243.pm",
-         "version" : "0.01"
+         "version" : "0.02"
       }
    },
    "release_status" : "stable",
@@ -37,6 +45,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.01",
-   "x_serialization_backend" : "JSON::PP version 2.27203"
+   "version" : "0.02",
+   "x_serialization_backend" : "JSON::PP version 4.04"
 }

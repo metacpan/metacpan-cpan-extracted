@@ -1,7 +1,8 @@
 use strict; use warnings;
-use Test::More tests => 25;
+use Test::More tests => 28;
 
 use Graph;
+use Graph::BitMatrix;
 
 my $g = Graph->new;
 
@@ -43,10 +44,22 @@ is("@{[$m->get_row(qw(b a b c d))]}", "0 0 1 1");
 is("@{[$m->get_row(qw(c a b c d))]}", "0 0 0 0");
 is("@{[$m->get_row(qw(d a b c d))]}", "0 0 0 1");
 
+is $m->stringify, <<'EOF';
+ to:    a    b    c    d
+   a    0    1    0    0
+   b    0    0    1    1
+   c    0    0    0    0
+   d    0    0    0    1
+EOF
+
 is( $m->get(qw(x x)), undef );
 
 is("@{[sort $m->vertices]}", "a b c d");
 
-eval 'Graph::BitMatrix->new($g, nonesuch => 1)';
-like($@, qr/Graph::BitMatrix::new: Unknown option: 'nonesuch' /);
+$m->set_row(qw(b a c));
+is("@{[$m->get_row(qw(b a b c d))]}", "1 0 1 1");
+$m->unset_row(qw(b c d));
+is("@{[$m->get_row(qw(b a b c d))]}", "1 0 0 0");
 
+eval { Graph::BitMatrix->new($g, nonesuch => 1) };
+like($@, qr/Graph::BitMatrix::new: Unknown option: 'nonesuch' /);

@@ -6,7 +6,7 @@
 use 5.026;
 use Object::Pad 0.19;
 
-package Device::Chip::DAC7571 0.10;
+package Device::Chip::DAC7571 0.11;
 class Device::Chip::DAC7571
    extends Device::Chip::DAC75xx;
 
@@ -23,12 +23,13 @@ C<Device::Chip::DAC7571> - chip driver for F<DAC7571>
 =head1 SYNOPSIS
 
    use Device::Chip::DAC7571;
+   use Future::AsyncAwait;
 
    my $chip = Device::Chip::DAC7571->new;
-   $chip->mount( Device::Chip::Adapter::...->new )->get;
+   await $chip->mount( Device::Chip::Adapter::...->new );
 
    # Presuming Vcc = 5V
-   $chip->write_dac_ratio( 1.23 / 5 )->get;
+   await $chip->write_dac_ratio( 1.23 / 5 );
    print "Output is now set to 1.23V\n";
 
 =head1 DESCRIPTION

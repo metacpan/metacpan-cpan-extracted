@@ -1,4 +1,10 @@
-2020-09-14  Dave Cross <dave@perlhack.com>
+2020-12-06  Dave Cross <dave@perlhacks.com>
+
+  * Add YAML to "configure_requires"
+
+  * Add details of bug tracker
+
+2020-09-14  Dave Cross <dave@perlhacks.com>
 
   * Catch up on four years of commits
 

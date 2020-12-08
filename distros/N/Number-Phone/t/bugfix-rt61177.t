@@ -1,14 +1,12 @@
-#!/usr/bin/perl -w
-
 use strict;
+use warnings;
 use lib 't/inc';
-use fatalwarnings;
+use nptestutils;
 
 use lib 't/lib'; # for mocking of the UK
 
 use Test::More;
-
-END { done_testing(); }
+plan skip_all => 'not relevant if building --without_uk' if(building_without_uk());
 
 use Number::Phone;
 use Number::Phone::Country qw(noexport);
@@ -28,3 +26,5 @@ foreach my $prefix ('', '+') {
   is($object->country_code(), '44', "->country_code works");
   is($object->format(), '+44 7979 866975', "->format works");
 }
+
+done_testing();

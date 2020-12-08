@@ -1,6 +1,6 @@
 package IPC::Simple::Message;
 # ABSTRACT: a message received from an IPC::Simple process
-$IPC::Simple::Message::VERSION = '0.07';
+$IPC::Simple::Message::VERSION = '0.09';
 
 use strict;
 use warnings;
@@ -55,7 +55,7 @@ IPC::Simple::Message - a message received from an IPC::Simple process
 
 =head1 VERSION
 
-version 0.07
+version 0.09
 
 =head1 METHODS
 

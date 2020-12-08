@@ -4,7 +4,7 @@
       "Renee Baecker <reneeb@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.017, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
    ],
@@ -40,6 +40,7 @@
             "Path::Class" : "0",
             "Test::Exception" : "0.35",
             "Test::LongString" : "0.15",
+            "Test::Pod::Coverage" : "0",
             "XML::LibXML" : "0",
             "XML::LibXML::PrettyPrint" : "0",
             "perl" : "5.010"
@@ -49,15 +50,15 @@
    "provides" : {
       "OTRS::OPM::Maker::Command::sopm" : {
          "file" : "lib/OTRS/OPM/Maker/Command/sopm.pm",
-         "version" : "1.43"
+         "version" : "1.44"
       },
       "OTRS::OPM::Maker::Utils::OTRS3" : {
          "file" : "lib/OTRS/OPM/Maker/Utils/OTRS3.pm",
-         "version" : "1.43"
+         "version" : "1.44"
       },
       "OTRS::OPM::Maker::Utils::OTRS4" : {
          "file" : "lib/OTRS/OPM/Maker/Utils/OTRS4.pm",
-         "version" : "1.43"
+         "version" : "1.44"
       }
    },
    "release_status" : "stable",
@@ -72,12 +73,14 @@
          "web" : "https://github.com/perlservices/OTRS-OPM-Maker-Command-sopm"
       }
    },
-   "version" : "1.43",
+   "version" : "1.44",
    "x_contributors" : [
       "Gabor Szabo <gabor@szabgab.com>",
       "reneeb <github@renee-baecker.de>",
       "reneeb <info@perl-services.de>"
    ],
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.19"
+   "x_generated_by_perl" : "v5.30.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.25",
+   "x_spdx_expression" : "Artistic-2.0"
 }
 

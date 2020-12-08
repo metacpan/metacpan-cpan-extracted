@@ -1,10 +1,12 @@
 #!/usr/bin/perl
 
-use strict;
+use v5.26;
 use warnings;
 
 use Device::Chip::Adapter;
 use Device::Chip::TCS3472x;
+
+use Future::AsyncAwait;
 
 use Getopt::Long;
 use List::Util qw( min );
@@ -23,34 +25,34 @@ GetOptions(
 ) or exit 1;
 
 my $chip = Device::Chip::TCS3472x->new;
-$chip->mount_from_paramstr(
+await $chip->mount_from_paramstr(
    Device::Chip::Adapter->new_from_description( $ADAPTER ), $MOUNTPARAMS,
-)->get;
+);
 
 # Set LED on/off
-$chip->set_led( $LED )->get if defined $LED;
+await $chip->set_led( $LED ) if defined $LED;
 
-$chip->protocol->power(0)->get;
+await $chip->protocol->power(0);
 
-$chip->protocol->power(1)->get;
-END { $chip and $chip->protocol->power(0)->get }
+await $chip->protocol->power(1);
+END { $chip and $chip->protocol->power(0)->get; }
 
-$chip->read_id->get eq "44" or
+( await $chip->read_id ) eq "44" or
    die "Chip ID does not match TCS34725 signature\n";
 
 # Power up
-$chip->change_config( PON => 1 )->get;
+await $chip->change_config( PON => 1 );
 
 # Enable ADCs
-$chip->change_config( AEN => 1 )->get;
+await $chip->change_config( AEN => 1 );
 
 # Set any other config changes
 while( @ARGV ) {
    my ( $name, $value ) = ( shift @ARGV ) =~ m/^(.*?)=(.*)$/ or next;
-   $chip->change_config( $name => $value )->get;
+   await $chip->change_config( $name => $value );
 }
 
-my $config = $chip->read_config->get;
+my $config = await $chip->read_config;
 if( $PRINT_CONFIG ) {
    printf "%20s: %s\n", $_, $config->{$_} for sort keys %$config;
 }
@@ -62,7 +64,7 @@ while(1) {
    my ( $c, $r, $g, $b );
 
    printf "Clear %5d RGB<%5d %5d %5d>\n",
-      ( $c, $r, $g, $b ) = $chip->read_crgb->get;
+      ( $c, $r, $g, $b ) = await $chip->read_crgb;
 
    if(1) {
       $_ /= $max for $r, $g, $b;

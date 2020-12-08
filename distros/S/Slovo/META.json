@@ -68,6 +68,6 @@
          "web" : "https://github.com/kberov/Slovo"
       }
    },
-   "version" : "v2020.11.22",
-   "x_serialization_backend" : "JSON::PP version 2.97001"
+   "version" : "v2020.12.01",
+   "x_serialization_backend" : "JSON::PP version 4.02"
 }

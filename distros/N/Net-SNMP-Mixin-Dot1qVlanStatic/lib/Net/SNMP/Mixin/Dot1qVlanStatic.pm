@@ -25,11 +25,18 @@ my @mixin_methods;
 BEGIN {
   @mixin_methods = (
     qw/
-      map_vlan_static_ports2ids
-      map_vlan_static_ids2ports
-      map_vlan_static_ids2names
+      map_vlan_id2name
+      map_if_idx2vlan_id
+      map_vlan_id2if_idx
       /
   );
+
+  # DEPRECATED methods, will get deleted in later versions
+  push @mixin_methods, qw/
+    map_vlan_static_ids2names
+    map_vlan_static_ports2ids
+    map_vlan_static_ids2ports
+    /;
 }
 
 use Sub::Exporter -setup => {
@@ -41,7 +48,7 @@ use Sub::Exporter -setup => {
 # SNMP oid constants used in this module
 #
 use constant {
-  DOT1D_BASE_NUM_PORTS => '1.3.6.1.2.1.17.1.2.0',
+  DOT1D_BASE_PORT_IF_INDEX => '1.3.6.1.2.1.17.1.4.1.2',
 
   DOT1Q_VLAN_STATIC_NAME           => '1.3.6.1.2.1.17.7.1.4.3.1.1',
   DOT1Q_VLAN_STATIC_EGRESS_PORTS   => '1.3.6.1.2.1.17.7.1.4.3.1.2',
@@ -55,11 +62,11 @@ Net::SNMP::Mixin::Dot1qVlanStatic - mixin class for 802.1-Q static vlan infos
 
 =head1 VERSION
 
-Version 0.04
+Version 0.05
 
 =cut
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 =head1 SYNOPSIS
 
@@ -73,39 +80,34 @@ our $VERSION = '0.04';
   $session->init_ok();
   die $session->errors if $session->errors;
 
-  my $vlan_ids2names = $session->map_vlan_static_ids2names();
-  foreach my $vlan_id ( keys %{$vlan_ids2names} ) {
+  my $vlan_id2name = $session->map_vlan_id2name();
+  foreach my $vlan_id ( keys %{$vlan_id2name} ) {
     printf "Vlan-Id: %4d  => Vlan-Name: %s\n",
-      $vlan_id, $vlan_ids2names->{$vlan_id};
+      $vlan_id, $vlan_id2name->{$vlan_id};
   }
 
-  # sorted by vlan_id
-  my $vlan_ids2ports = $session->map_vlan_static_ids2ports();
-  foreach my $vlan_id ( keys %{$vlan_ids2ports} ) {
-    printf "Vlan-Id: %4d\n", $vlan_id;
-    printf "\tTagged-Ports:     %s\n",
-      ( join ',', @{ $vlan_ids2ports->{$vlan_id}{tagged} } );
-    printf "\tUntagged-Ports:   %s\n",
-      ( join ',', @{ $vlan_ids2ports->{$vlan_id}{untagged} } );
+  my $vlan_ids2if_idx = $session->map_vlan_id2if_idx();
+  foreach my $id ( keys %{$vlan_ids2if_idx} ) {
+    printf "Vlan-Id: %4d\n", $id;
+    printf "\tTagged-Ports:     %s\n", ( join ',', @{ $vlan_ids2if_idx->{$id}{tagged} } );
+    printf "\tUntagged-Ports:   %s\n", ( join ',', @{ $vlan_ids2if_idx->{$id}{untagged} } );
   }
 
-  # sorted by bridge_port
-  my $vlan_ports2ids = $session->map_vlan_static_ports2ids();
-  foreach my $bridge_port ( keys %{$vlan_ports2ids} ) {
-    printf "Bridge-Port: %4d\n", $bridge_port;
-    printf "\tTagged-Vlans:     %s\n",
-      ( join ',', @{ $vlan_ports2ids->{$bridge_port}{tagged} } );
-    printf "\tUntagged-Vlans:   %s\n",
-      ( join ',', @{ $vlan_ports2ids->{$bridge_port}{untagged} } );
+  # sorted by interface
+  my $ports2ids = $session->map_if_idx2vlan_id();
+  foreach my $if_idx ( keys %{$ports2ids} ) {
+    printf "Interface: %10d\n", $if_idx;
+    printf "\tTagged-Vlans:     %s\n", ( join ',', @{ $ports2ids->{$if_idx}{tagged} } );
+    printf "\tUntagged-Vlans:   %s\n", ( join ',', @{ $ports2ids->{$if_idx}{untagged} } );
   }
 
 =head1 DESCRIPTION
 
-A mixin class for vlan related infos from the dot1qVlanStaticTable within the Q-BRIDGE-MIB. The mixin-module provides methods for mapping between vlan-ids and vlan-names und relations between bridge-ports and vlan-ids, tagged or untagged on these ports.
+A mixin class for vlan related infos from the dot1qVlanStaticTable within the Q-BRIDGE-MIB. The mixin-module provides methods for mapping between vlan-ids and vlan-names und relations between interface indexes and vlan-ids, tagged or untagged on these interfaces.
 
 =head1 MIXIN METHODS
 
-=head2 B<< OBJ->map_vlan_static_ids2names() >>
+=head2 B<< OBJ->map_vlan_id2name() >>
 
 Returns a hash reference with statically configured vlan-ids as keys and the corresponing vlan-names as values:
 
@@ -117,14 +119,14 @@ Returns a hash reference with statically configured vlan-ids as keys and the cor
 
 =cut
 
-sub map_vlan_static_ids2names {
+sub map_vlan_id2name {
   my $session = shift;
   my $agent   = $session->hostname;
 
   Carp::croak "$agent: '$prefix' not initialized,"
     unless $session->init_ok($prefix);
 
-  my @active_vlan_ids  = @{$session->{$prefix}{activeVlanIds}};
+  my @active_vlan_ids = @{ $session->{$prefix}{activeVlanIds} };
 
   my $result = {};
   foreach my $vlan_id (@active_vlan_ids) {
@@ -135,19 +137,14 @@ sub map_vlan_static_ids2names {
   return $result;
 }
 
-=head2 B<< OBJ->map_vlan_static_ids2ports() >>
+=head2 B<< OBJ->map_vlan_id2if_idx() >>
 
-Returns a hash reference with the vlan-ids as keys and tagged and untagged port-lists as values:
+Returns a hash reference with the vlan-ids as keys and tagged and untagged if_idx as values:
 
   {
     vlan_id => {
-      tagged   => [port_list],
-      untagged => [port_list],
-    },
-
-    vlan_id => {
-      tagged   => [port_list],
-      untagged => [port_list],
+      tagged   => [if_idx, ..., ],
+      untagged => [if_idx, ..., ],
     },
 
     ... ,
@@ -155,15 +152,15 @@ Returns a hash reference with the vlan-ids as keys and tagged and untagged port-
     
 =cut
 
-sub map_vlan_static_ids2ports {
+sub map_vlan_id2if_idx {
   my $session = shift;
   my $agent   = $session->hostname;
 
   Carp::croak "$agent: '$prefix' not initialized,"
     unless $session->init_ok($prefix);
 
-  my $num_bridge_ports = $session->{$prefix}{dot1dBaseNumPorts};
-  my @active_vlan_ids  = @{$session->{$prefix}{activeVlanIds}};
+  my @active_vlan_ids    = @{ $session->{$prefix}{activeVlanIds} };
+  my $bridge_port2if_idx = $session->{$prefix}{dot1dBasePortIfIndex};
 
   my $result;
 
@@ -175,56 +172,50 @@ sub map_vlan_static_ids2ports {
     my @untagged_ports;
 
     # loop over all possible bridge-ports
-    foreach my $bridge_port ( 1 .. $num_bridge_ports ) {
+    foreach my $bridge_port ( sort { $a <=> $b } keys %$bridge_port2if_idx ) {
+      my $if_idx = $bridge_port2if_idx->{$bridge_port};
 
-      push @tagged_ports, $bridge_port
+      push @tagged_ports, $if_idx
         if _is_tagged( $session, $bridge_port, $vlan_id );
 
-      push @untagged_ports, $bridge_port
+      push @untagged_ports, $if_idx
         if _is_untagged( $session, $bridge_port, $vlan_id );
     }
 
-    $result->{$vlan_id} =
-      { tagged => \@tagged_ports, untagged => \@untagged_ports };
+    $result->{$vlan_id} = { tagged => \@tagged_ports, untagged => \@untagged_ports };
   }
   return $result;
 }
 
-=head2 B<< OBJ->map_vlan_static_ports2ids() >>
+=head2 B<< OBJ->map_if_idx2vlan_id() >>
 
-Returns a hash reference with the bridge-ports as keys and tagged and untagged vlan-ids as values:
+Returns a hash reference with the interfaces as keys and tagged and untagged vlan-ids as values:
 
   {
-    bridge_port => {
-      tagged   => [vlan_id_list],
-      untagged => [vlan_id_list],
-    },
-
-    bridge_port => {
-      tagged   => [vlan_id_list],
-      untagged => [vlan_id_list],
+    if_idx => {
+      tagged   => [vlan_id, ..., ],
+      untagged => [vlan_id, ..., ],
     },
 
     ... ,
   }
     
-    
 =cut
 
-sub map_vlan_static_ports2ids {
+sub map_if_idx2vlan_id {
   my $session = shift;
   my $agent   = $session->hostname;
 
   Carp::croak "$agent: '$prefix' not initialized,"
     unless $session->init_ok($prefix);
 
-  my $num_bridge_ports = $session->{$prefix}{dot1dBaseNumPorts};
-  my @active_vlan_ids  = @{$session->{$prefix}{activeVlanIds}};
+  my @active_vlan_ids    = @{ $session->{$prefix}{activeVlanIds} };
+  my $bridge_port2if_idx = $session->{$prefix}{dot1dBasePortIfIndex};
 
   my $result = {};
 
   # loop over all possible bridge-ports
-  foreach my $bridge_port ( 1 .. $num_bridge_ports ) {
+  foreach my $bridge_port ( sort { $a <=> $b } keys %$bridge_port2if_idx ) {
 
     my @tagged_vlans;
     my @untagged_vlans;
@@ -239,8 +230,107 @@ sub map_vlan_static_ports2ids {
         if _is_untagged( $session, $bridge_port, $vlan_id );
     }
 
-    $result->{$bridge_port} =
-      { tagged => \@tagged_vlans, untagged => \@untagged_vlans };
+    my $if_idx = $bridge_port2if_idx->{$bridge_port};
+    $result->{$if_idx} = { tagged => \@tagged_vlans, untagged => \@untagged_vlans };
+  }
+  return $result;
+}
+
+=head2 B<< OBJ->map_vlan_static_ids2names() >>
+
+DEPRECATED: C<< map_vlan_static_ids2names >> is DEPRECATED in favor of C<< map_vlan_id2name >>
+
+=cut
+
+sub map_vlan_static_ids2names {
+
+  #Carp::carp('map_vlan_static_ids2names is DEPRECATED in favor of map_vlan_id2name');
+  goto &map_vlan_id2name;
+}
+
+=head2 B<< OBJ->map_vlan_static_ids2ports() >>
+
+DEPRECATED: C<< map_vlan_static_ids2ports >> is DEPRECATED in favor of C<< map_vlan_id2if_idx >>
+
+Returns a hash reference with the vlan-ids as keys and tagged and untagged bridge-port-lists as values:
+
+=cut
+
+sub map_vlan_static_ids2ports {
+
+  #Carp::carp('map_vlan_static_ids2ports is DEPRECATED in favor of map_vlan_id2if_idx');
+
+  my $session = shift;
+  my $agent   = $session->hostname;
+
+  Carp::croak "$agent: '$prefix' not initialized,"
+    unless $session->init_ok($prefix);
+
+  my @active_vlan_ids = @{ $session->{$prefix}{activeVlanIds} };
+
+  my $result;
+
+  # loop over all active vlan ids
+  foreach my $vlan_id (@active_vlan_ids) {
+
+    # tagged/untagged ports for this vlan_id
+    my @tagged_ports;
+    my @untagged_ports;
+
+    # loop over all possible bridge-ports
+    foreach my $bridge_port ( sort { $a <=> $b } keys %{ $session->{$prefix}{dot1dBasePortIfIndex} } ) {
+
+      push @tagged_ports, $bridge_port
+        if _is_tagged( $session, $bridge_port, $vlan_id );
+
+      push @untagged_ports, $bridge_port
+        if _is_untagged( $session, $bridge_port, $vlan_id );
+    }
+
+    $result->{$vlan_id} = { tagged => \@tagged_ports, untagged => \@untagged_ports };
+  }
+  return $result;
+}
+
+=head2 B<< OBJ->map_vlan_static_ports2ids() >>
+
+DEPRECATED: C<< map_vlan_static_ports2ids >> is DEPRECATED in favor of C<< map_if_idx2vlan_id >>
+
+Returns a hash reference with the bridge-ports as keys and tagged and untagged vlan-ids as values:
+
+=cut
+
+sub map_vlan_static_ports2ids {
+
+  #Carp::carp('map_vlan_static_ports2ids is DEPRECATED in favor of map_if_idx2vlan_id');
+
+  my $session = shift;
+  my $agent   = $session->hostname;
+
+  Carp::croak "$agent: '$prefix' not initialized,"
+    unless $session->init_ok($prefix);
+
+  my @active_vlan_ids = @{ $session->{$prefix}{activeVlanIds} };
+
+  my $result = {};
+
+  # loop over all possible bridge-ports
+  foreach my $bridge_port ( sort { $a <=> $b } keys %{ $session->{$prefix}{dot1dBasePortIfIndex} } ) {
+
+    my @tagged_vlans;
+    my @untagged_vlans;
+
+    # loop over all active vlans
+    foreach my $vlan_id (@active_vlan_ids) {
+
+      push @tagged_vlans, $vlan_id
+        if _is_tagged( $session, $bridge_port, $vlan_id );
+
+      push @untagged_vlans, $vlan_id
+        if _is_untagged( $session, $bridge_port, $vlan_id );
+    }
+
+    $result->{$bridge_port} = { tagged => \@tagged_vlans, untagged => \@untagged_vlans };
   }
   return $result;
 }
@@ -265,14 +355,15 @@ sub _init {
 
   die "$agent: $prefix already initialized and reload not forced.\n"
     if exists get_init_slot($session)->{$prefix}
-      && get_init_slot($session)->{$prefix} == 0
-      && not $reload;
+    && get_init_slot($session)->{$prefix} == 0
+    && not $reload;
 
   # set number of async init jobs for proper initialization
   get_init_slot($session)->{$prefix} = THIS_INIT_JOBS;
 
-  # initialize the object for forwarding databases infos
-  _fetch_dot1d_base_num_ports($session);
+  # bridge port table to count the number of bridge ports
+  _fetch_dot1d_base_ports($session);
+
   return if $session->error;
 
   # initialize the object for current vlan tag infos
@@ -286,45 +377,43 @@ sub _init {
 
 Only for developers or maintainers.
 
-=head2 B<< _fetch_dot1d_base_num_ports($session) >>
-
-Fetch dot1dBaseNumPorts from the dot1dBase group once during object initialization.
-
 =cut
 
-sub _fetch_dot1d_base_num_ports {
+sub _fetch_dot1d_base_ports {
   my $session = shift;
   my $result;
 
-  # fetch the dot1dBaseNumPorts group
-  $result = $session->get_request(
-    -varbindlist => [ DOT1D_BASE_NUM_PORTS, ],
+  # fetch the dot1dBasePorts, in blocking or nonblocking mode
+  $result = $session->get_entries(
+    -columns => [ DOT1D_BASE_PORT_IF_INDEX, ],
 
     # define callback if in nonblocking mode
-    $session->nonblocking ? ( -callback => \&_dot1d_base_num_ports_cb ) : (),
+    $session->nonblocking ? ( -callback => \&_dot1d_base_ports_cb ) : (),
   );
 
   return unless defined $result;
   return 1 if $session->nonblocking;
 
-  # call the callback function in blocking mode by hand
-  _dot1d_base_num_ports_cb($session);
+  # call the callback funktion in blocking mode by hand
+  _dot1d_base_ports_cb($session);
 
 }
 
-=head2 B<< _dot1d_base_num_ports_cb($session) >>
+=head2 B<< _dot1d_base_ports_cb($session) >>
 
-The callback for _fetch_dot1d_base_num_ports.
+The callback for _fetch_dot1d_base_ports.
 
 =cut
 
-sub _dot1d_base_num_ports_cb {
+sub _dot1d_base_ports_cb {
   my $session = shift;
   my $vbl     = $session->var_bind_list;
 
   return unless defined $vbl;
 
-  $session->{$prefix}{dot1dBaseNumPorts} = $vbl->{ DOT1D_BASE_NUM_PORTS() };
+  # mangle result table to get plain idx->value
+
+  $session->{$prefix}{dot1dBasePortIfIndex} = idx2val( $vbl, DOT1D_BASE_PORT_IF_INDEX );
 
   # this init job is finished
   get_init_slot($session)->{$prefix}--;
@@ -471,8 +560,7 @@ sub _is_untagged {
 
   # it's a bitstring, see the subroutine _calc_tagged_untagged_ports
   # substr() counts from 0, bridge_ports from 1
-  my $is_untagged = substr( $session->{$prefix}{UntaggedPorts}{$vlan_id},
-    $bridge_port - 1, 1 );
+  my $is_untagged = substr( $session->{$prefix}{UntaggedPorts}{$vlan_id}, $bridge_port - 1, 1 );
 
   return 1 if $is_untagged;
   return;
@@ -500,7 +588,7 @@ Karl Gaissmaier <karl.gaissmaier at uni-ulm.de>
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright 2008-2016 Karl Gaissmaier, all rights reserved.
+Copyright 2008-2020 Karl Gaissmaier, all rights reserved.
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

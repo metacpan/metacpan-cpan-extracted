@@ -15,5 +15,9 @@ my $parsefile = $0;
 $parsefile =~ s/\.t$/.dat/;
 ok(-e $parsefile, "expectations file exists - $parsefile");
 
-qtestfile(sub { DDC::XS->parse($_[0]) }, $parsefile);
+qtestfile(sub {
+            my $rc = eval { DDC::XS->parse($_[0]) };
+            warn("$0: parse error for '$_[0]': $@") if ($@);
+            return $rc;
+          }, $parsefile);
 done_testing();

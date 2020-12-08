@@ -94,7 +94,7 @@ DESCRIPTION
 SUBROUTINES
 
   VERY USEFUL UTF-8 CODEPOINT FEATURE
-    UTF8::R2::qr(qr/ utf8_regex_here . \D \H \N \R \S \V \W \b \d \h \s \v \w \x{Unicode} [ \D \H \S \V \W \b \d \h \s \v \w \x{Unicode} ] ? + * {n} {n,} {n,m} /imsxogc)
+    UTF8::R2::qr(qr/ utf8_regex_here . \D \H \N \R \S \V \W \b \d \h \s \v \w \x{Unicode} [ \D \H \S \V \W \b \d \h \s \v \w \x{Unicode} [:POSIX:] [:^POSIX:] ] ? + * {n} {n,} {n,m} /imsxogc)
     UTF8::R2::split(qr/$utf8regex/imsxo, $_, 3)
     UTF8::R2::tr($_, 'ABC', 'XYZ', 'cdsr')
     use UTF8::R2 qw(%mb);

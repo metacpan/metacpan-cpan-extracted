@@ -1,5 +1,13 @@
 Revision history for App-watchdo
 
+0.1.1   2020-12-07
+        Updating for release of version 0.1.1
+        Adding Module::Build to config deps (Ivan Wills)
+        Updated date (Ivan Wills)
+        Fixing up travis build versions (Ivan Wills)
+        Adding some logic so that watched files can be passed to the supplied script (Ivan Wills)
+        Adding wait (Ivan Wills)
+
 0.1.0   2018-05-21
         Updating for release of version 0.1.0
         Updating for release of version 0.1.0 (Ivan Wills)

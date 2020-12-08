@@ -115,6 +115,11 @@ sub create_table {
         }
         $skip_to = '';
         my $count_table_name_loop = 0;
+        my $sheet_count = 0;
+        my $file_fs = $sf->{i}{gc}{file_fs};
+        if ( exists $sf->{i}{S_R}{$file_fs}{sheet_count} ) {
+            $sheet_count = $sf->{i}{S_R}{$file_fs}{sheet_count};
+        }
 
         TABLE_NAME: while ( 1 ) {
             my $no_default_table_name;
@@ -123,7 +128,15 @@ sub create_table {
             }
             my $ok_table_name = $sf->__set_table_name( $sql, $no_default_table_name ); # first time print_sql
             if ( ! $ok_table_name ) {
-                $skip_to = 'FILTER';
+                if ( $sf->{o}{insert}{enable_input_filter} ) {
+                    $skip_to = 'FILTER';
+                }
+                elsif ( $sheet_count > 1 ) {
+                    $skip_to = 'PARSE';
+                }
+                else {
+                    $skip_to = 'GET_DATA';
+                }
                 next CREATE_TABLE;
             }
 
@@ -164,12 +177,7 @@ sub create_table {
                         next SET_COLUMNS;
                     }
                 }
-                my $file_fs = $sf->{i}{gc}{file_fs};
-                my $sheet_count;
-                if ( exists $sf->{i}{S_R}{$file_fs}{sheet_count} ) {
-                    $sheet_count = $sf->{i}{S_R}{$file_fs}{sheet_count};
-                }
-                if ( defined $sheet_count && $sheet_count > 1 ) {
+                if ( $sheet_count > 1 ) {
                     $skip_to = 'PARSE';
                     next CREATE_TABLE;
                 }

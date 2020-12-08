@@ -17,14 +17,14 @@ name: Device-Chip-BNO055
 provides:
   Device::Chip::BNO055:
     file: lib/Device/Chip/BNO055.pm
-    version: '0.01'
+    version: '0.02'
 requires:
   Data::Bitfield: '0.03'
   Device::Chip::Base::RegisteredI2C: '0.12'
-  Future::AsyncAwait: '0'
+  Future::AsyncAwait: '0.47'
   Object::Pad: '0.19'
   perl: '5.026'
 resources:
   license: http://dev.perl.org/licenses/
-version: '0.01'
+version: '0.02'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

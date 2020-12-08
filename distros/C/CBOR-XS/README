@@ -639,6 +639,11 @@ MAPPING
     CBOR::XS::as_bytes $value
         Forces the value to be encoded as a (binary) string value.
 
+        Example: encode a perl string as binary even though "text_strings"
+        is in effect.
+
+           CBOR::XS->new->text_strings->encode ([4, "text", CBOR::XS::bytes "bytevalue"]);
+
     CBOR::XS::as_bool $value
         Converts a Perl boolean (which can be any kind of scalar) into a
         CBOR boolean. Strictly the same, but shorter to write, than:
@@ -654,18 +659,25 @@ MAPPING
     CBOR::XS::as_float64 $value
         Forces double-float (IEEE 754 binary64) encoding of the given value.
 
-        =item, CBOR::XS::as_cbor $cbor_text
-
-        Bot a type cast per-se, this type cast forces the argument to eb
+    CBOR::XS::as_cbor $cbor_text
+        Not a type cast per-se, this type cast forces the argument to eb
         encoded as-is. This can be used to embed pre-encoded CBOR data.
 
         Note that no checking on the validity of the $cbor_text is done -
         it's the callers responsibility to correctly encode values.
 
-    Example: encode a perl string as binary even though "text_strings" is in
-    effect.
+    CBOR::XS::as_map [key => value...]
+        Treat the array reference as key value pairs and output a CBOR map.
+        This allows you to generate CBOR maps with arbitrary key types (or,
+        if you don't care about semantics, duplicate keys or prairs in a
+        custom order), which is otherwise hard to do with Perl.
 
-       CBOR::XS->new->text_strings->encode ([4, "text", CBOR::XS::bytes "bytevalue"]);
+        The single argument must be an array reference with an even number
+        of elements.
+
+        Example: encode a CBOR map with a string and an integer as keys.
+
+           encode_cbor CBOR::XS::as_map [string => "value", 5 => "value"]
 
   OBJECT SERIALISATION
     This module implements both a CBOR-specific and the generic

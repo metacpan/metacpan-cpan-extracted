@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20200904144528;
+our $VERSION = 1.20201204215954;
 
 my $formatters = [
                 {
@@ -113,7 +113,7 @@ my $validators = {
                   0\\d|
                   1[0-35-9]|
                   2[1-9]|
-                  3[0-2]|
+                  3[0-29]|
                   40
                 )
               )
@@ -170,128 +170,74 @@ my $validators = {
                 'voip' => '44\\d{7}'
               };
 my %areanames = ();
-$areanames{en}->{56211} = "Santiago\,\ Metropolitan\ Region";
-$areanames{en}->{562198} = "Santiago\,\ Metropolitan\ Region";
-$areanames{en}->{5622} = "Santiago\,\ Metropolitan\ Region";
-$areanames{en}->{5623} = "Santiago\,\ Metropolitan\ Region";
-$areanames{en}->{5632} = "Valparaíso";
-$areanames{en}->{5633} = "Quillota\,\ Valparaíso";
-$areanames{en}->{5634} = "San\ Felipe\,\ Valparaíso";
-$areanames{en}->{5635} = "San\ Antonio\,\ Valparaíso";
-$areanames{en}->{5641} = "Concepción\,\ Biobío";
-$areanames{en}->{5642} = "Chillán\,\ Biobío";
-$areanames{en}->{5643} = "Los\ Angeles\,\ Biobío";
-$areanames{en}->{5645} = "Temuco\,\ Araucanía";
-$areanames{en}->{5651} = "La\ Serena\,\ Coquimbo";
-$areanames{en}->{5652} = "Copiapó\,\ Atacama";
-$areanames{en}->{56530} = "Ovalle\,\ Coquimbo";
-$areanames{en}->{56531} = "Ovalle\,\ Coquimbo";
-$areanames{en}->{565320} = "Ovalle\,\ Coquimbo";
-$areanames{en}->{565321} = "Ovalle\,\ Coquimbo";
-$areanames{en}->{565322} = "Ovalle\,\ Coquimbo";
-$areanames{en}->{565323} = "Ovalle\,\ Coquimbo";
-$areanames{en}->{5653240} = "Ovalle\,\ Coquimbo";
-$areanames{en}->{5653241} = "Ovalle\,\ Coquimbo";
-$areanames{en}->{5653242} = "Ovalle\,\ Coquimbo";
-$areanames{en}->{5653243} = "Ovalle\,\ Coquimbo";
-$areanames{en}->{5653244} = "Ovalle\,\ Coquimbo";
-$areanames{en}->{56532452} = "Ovalle\,\ Coquimbo";
-$areanames{en}->{56532453} = "Ovalle\,\ Coquimbo";
-$areanames{en}->{56532454} = "Ovalle\,\ Coquimbo";
-$areanames{en}->{56532455} = "Ovalle\,\ Coquimbo";
-$areanames{en}->{56532456} = "Ovalle\,\ Coquimbo";
-$areanames{en}->{56532457} = "Ovalle\,\ Coquimbo";
-$areanames{en}->{56532458} = "Ovalle\,\ Coquimbo";
-$areanames{en}->{56532459} = "Ovalle\,\ Coquimbo";
-$areanames{en}->{5653246} = "Ovalle\,\ Coquimbo";
-$areanames{en}->{5653247} = "Ovalle\,\ Coquimbo";
-$areanames{en}->{5653248} = "Ovalle\,\ Coquimbo";
-$areanames{en}->{5653249} = "Ovalle\,\ Coquimbo";
-$areanames{en}->{565325} = "Ovalle\,\ Coquimbo";
-$areanames{en}->{565326} = "Ovalle\,\ Coquimbo";
-$areanames{en}->{565327} = "Ovalle\,\ Coquimbo";
-$areanames{en}->{565328} = "Ovalle\,\ Coquimbo";
-$areanames{en}->{565329} = "Ovalle\,\ Coquimbo";
-$areanames{en}->{56533} = "Ovalle\,\ Coquimbo";
-$areanames{en}->{56534} = "Ovalle\,\ Coquimbo";
-$areanames{en}->{56535} = "Ovalle\,\ Coquimbo";
-$areanames{en}->{56536} = "Ovalle\,\ Coquimbo";
-$areanames{en}->{56537} = "Ovalle\,\ Coquimbo";
-$areanames{en}->{56538} = "Ovalle\,\ Coquimbo";
-$areanames{en}->{56539} = "Ovalle\,\ Coquimbo";
-$areanames{en}->{5655} = "Antofagasta";
-$areanames{en}->{5657} = "Iquique\,\ Tarapacá";
-$areanames{en}->{5658} = "Arica\,\ Arica\ and\ Parinacota";
-$areanames{en}->{5661} = "Punta\ Arenas\,\ Magallanes\ and\ Antártica\ Chilena";
-$areanames{en}->{5663} = "Valdivia\,\ Los\ Ríos";
-$areanames{en}->{5664} = "Osorno\,\ Los\ Lagos";
-$areanames{en}->{5665} = "Puerto\ Montt\,\ Los\ Lagos";
-$areanames{en}->{5667} = "Coyhaique\,\ Aisén";
-$areanames{en}->{5671} = "Talca\,\ Maule";
-$areanames{en}->{5672} = "Rancagua\,\ O\'Higgins";
-$areanames{en}->{5673} = "Linares\,\ Maule";
-$areanames{en}->{5675} = "Curicó\,\ Maule";
-$areanames{es}->{56211} = "Santiago\,\ Región\ Metropolitana";
-$areanames{es}->{562198} = "Santiago\,\ Región\ Metropolitana";
-$areanames{es}->{5622} = "Santiago\,\ Región\ Metropolitana";
-$areanames{es}->{5623} = "Santiago\,\ Región\ Metropolitana";
-$areanames{es}->{5632} = "Valparaíso";
-$areanames{es}->{5633} = "Quillota\,\ Valparaíso";
-$areanames{es}->{5634} = "San\ Felipe\,\ Valparaíso";
-$areanames{es}->{5635} = "San\ Antonio\,\ Valparaíso";
-$areanames{es}->{5641} = "Concepción\,\ Biobío";
-$areanames{es}->{5642} = "Chillán\,\ Biobío";
-$areanames{es}->{5643} = "Los\ Angeles\,\ Biobío";
-$areanames{es}->{5645} = "Temuco\,\ Araucanía";
-$areanames{es}->{5651} = "La\ Serena\,\ Coquimbo";
-$areanames{es}->{5652} = "Copiapó\,\ Atacama";
-$areanames{es}->{56530} = "Ovalle\,\ Coquimbo";
-$areanames{es}->{56531} = "Ovalle\,\ Coquimbo";
-$areanames{es}->{565320} = "Ovalle\,\ Coquimbo";
-$areanames{es}->{565321} = "Ovalle\,\ Coquimbo";
-$areanames{es}->{565322} = "Ovalle\,\ Coquimbo";
-$areanames{es}->{565323} = "Ovalle\,\ Coquimbo";
-$areanames{es}->{5653240} = "Ovalle\,\ Coquimbo";
-$areanames{es}->{5653241} = "Ovalle\,\ Coquimbo";
-$areanames{es}->{5653242} = "Ovalle\,\ Coquimbo";
-$areanames{es}->{5653243} = "Ovalle\,\ Coquimbo";
-$areanames{es}->{5653244} = "Ovalle\,\ Coquimbo";
-$areanames{es}->{56532452} = "Ovalle\,\ Coquimbo";
-$areanames{es}->{56532453} = "Ovalle\,\ Coquimbo";
-$areanames{es}->{56532454} = "Ovalle\,\ Coquimbo";
-$areanames{es}->{56532455} = "Ovalle\,\ Coquimbo";
-$areanames{es}->{56532456} = "Ovalle\,\ Coquimbo";
-$areanames{es}->{56532457} = "Ovalle\,\ Coquimbo";
-$areanames{es}->{56532458} = "Ovalle\,\ Coquimbo";
-$areanames{es}->{56532459} = "Ovalle\,\ Coquimbo";
-$areanames{es}->{5653246} = "Ovalle\,\ Coquimbo";
-$areanames{es}->{5653247} = "Ovalle\,\ Coquimbo";
-$areanames{es}->{5653248} = "Ovalle\,\ Coquimbo";
-$areanames{es}->{5653249} = "Ovalle\,\ Coquimbo";
-$areanames{es}->{565325} = "Ovalle\,\ Coquimbo";
-$areanames{es}->{565326} = "Ovalle\,\ Coquimbo";
-$areanames{es}->{565327} = "Ovalle\,\ Coquimbo";
-$areanames{es}->{565328} = "Ovalle\,\ Coquimbo";
-$areanames{es}->{565329} = "Ovalle\,\ Coquimbo";
-$areanames{es}->{56533} = "Ovalle\,\ Coquimbo";
-$areanames{es}->{56534} = "Ovalle\,\ Coquimbo";
-$areanames{es}->{56535} = "Ovalle\,\ Coquimbo";
-$areanames{es}->{56536} = "Ovalle\,\ Coquimbo";
-$areanames{es}->{56537} = "Ovalle\,\ Coquimbo";
-$areanames{es}->{56538} = "Ovalle\,\ Coquimbo";
-$areanames{es}->{56539} = "Ovalle\,\ Coquimbo";
-$areanames{es}->{5655} = "Antofagasta";
-$areanames{es}->{5657} = "Iquique\,\ Tarapacá";
-$areanames{es}->{5658} = "Arica\,\ Arica\ y\ Parinacota";
-$areanames{es}->{5661} = "Punta\ Arenas\,\ Magallanes";
-$areanames{es}->{5663} = "Valdivia\,\ Los\ Ríos";
-$areanames{es}->{5664} = "Osorno\,\ Los\ Lagos";
-$areanames{es}->{5665} = "Puerto\ Montt\,\ Los\ Lagos";
-$areanames{es}->{5667} = "Coihaique\,\ Aysén";
-$areanames{es}->{5671} = "Talca\,\ Maule";
-$areanames{es}->{5672} = "Rancagua\,\ O\'Higgins";
-$areanames{es}->{5673} = "Linares\,\ Maule";
-$areanames{es}->{5675} = "Curicó\,\ Maule";
+$areanames{es} = {"56211", "Santiago\,\ Región\ Metropolitana",
+"5667", "Coihaique\,\ Aysén",
+"5661", "Punta\ Arenas\,\ Magallanes",
+"5622", "Santiago\,\ Región\ Metropolitana",
+"5658", "Arica\,\ Arica\ y\ Parinacota",
+"562198", "Santiago\,\ Región\ Metropolitana",
+"5623", "Santiago\,\ Región\ Metropolitana",};
+$areanames{en} = {"565323", "Ovalle\,\ Coquimbo",
+"5642", "Chillán\,\ Biobío",
+"5661", "Punta\ Arenas\,\ Magallanes\ and\ Antártica\ Chilena",
+"56532459", "Ovalle\,\ Coquimbo",
+"5635", "San\ Antonio\,\ Valparaíso",
+"56530", "Ovalle\,\ Coquimbo",
+"56532452", "Ovalle\,\ Coquimbo",
+"56533", "Ovalle\,\ Coquimbo",
+"5633", "Quillota\,\ Valparaíso",
+"5655", "Antofagasta",
+"5622", "Santiago\,\ Metropolitan\ Region",
+"56531", "Ovalle\,\ Coquimbo",
+"5653247", "Ovalle\,\ Coquimbo",
+"5671", "Talca\,\ Maule",
+"56532456", "Ovalle\,\ Coquimbo",
+"5634", "San\ Felipe\,\ Valparaíso",
+"56211", "Santiago\,\ Metropolitan\ Region",
+"5672", "Rancagua\,\ O\'Higgins",
+"565325", "Ovalle\,\ Coquimbo",
+"56536", "Ovalle\,\ Coquimbo",
+"5653243", "Ovalle\,\ Coquimbo",
+"565327", "Ovalle\,\ Coquimbo",
+"56537", "Ovalle\,\ Coquimbo",
+"565326", "Ovalle\,\ Coquimbo",
+"5667", "Coyhaique\,\ Aisén",
+"5641", "Concepción\,\ Biobío",
+"5632", "Valparaíso",
+"56535", "Ovalle\,\ Coquimbo",
+"5645", "Temuco\,\ Araucanía",
+"565320", "Ovalle\,\ Coquimbo",
+"5643", "Los\ Angeles\,\ Biobío",
+"56532455", "Ovalle\,\ Coquimbo",
+"56532453", "Ovalle\,\ Coquimbo",
+"5653246", "Ovalle\,\ Coquimbo",
+"5658", "Arica\,\ Arica\ and\ Parinacota",
+"5657", "Iquique\,\ Tarapacá",
+"56539", "Ovalle\,\ Coquimbo",
+"5652", "Copiapó\,\ Atacama",
+"5664", "Osorno\,\ Los\ Lagos",
+"56534", "Ovalle\,\ Coquimbo",
+"56532454", "Ovalle\,\ Coquimbo",
+"5653249", "Ovalle\,\ Coquimbo",
+"565328", "Ovalle\,\ Coquimbo",
+"5623", "Santiago\,\ Metropolitan\ Region",
+"562198", "Santiago\,\ Metropolitan\ Region",
+"565321", "Ovalle\,\ Coquimbo",
+"5653244", "Ovalle\,\ Coquimbo",
+"5653242", "Ovalle\,\ Coquimbo",
+"5675", "Curicó\,\ Maule",
+"5653241", "Ovalle\,\ Coquimbo",
+"56532457", "Ovalle\,\ Coquimbo",
+"5651", "La\ Serena\,\ Coquimbo",
+"5673", "Linares\,\ Maule",
+"56532458", "Ovalle\,\ Coquimbo",
+"5653240", "Ovalle\,\ Coquimbo",
+"565322", "Ovalle\,\ Coquimbo",
+"56538", "Ovalle\,\ Coquimbo",
+"5663", "Valdivia\,\ Los\ Ríos",
+"565329", "Ovalle\,\ Coquimbo",
+"5653248", "Ovalle\,\ Coquimbo",
+"5665", "Puerto\ Montt\,\ Los\ Lagos",};
 
     sub new {
       my $class = shift;

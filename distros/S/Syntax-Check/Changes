@@ -1,0 +1,27 @@
+Revision history for Syntax-Check
+
+1.04    2020-12-07
+        - Removed prereq of Module::Installed::Tiny, as the dependency chain
+          is significant for test prerequisites
+
+1.03    2020-12-07
+        - Added Capture::Tiny to test prereqs (CPAN installs were failing)
+
+1.02    2020-12-06
+        - Cleaned up POD, and added POD in the binary file
+        - Update tests to cover case where loaded module is skipped
+        - Added tests for -h|--help
+        - Removed erroneous exit() in binary
+        - Added 'Module::Installed::Tiny' to more accurately ignore installed
+          modules
+
+1.01    2020-12-06
+        - Fix broken POD link
+        - Remove debugging statements
+
+1.00    2020-12-06
+        - Modifications to error output
+
+0.01    2020-12-06
+        First version, released on an unsuspecting world.
+

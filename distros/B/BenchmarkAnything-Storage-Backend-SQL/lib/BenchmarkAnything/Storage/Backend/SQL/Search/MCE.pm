@@ -1,7 +1,7 @@
 package BenchmarkAnything::Storage::Backend::SQL::Search::MCE;
 our $AUTHORITY = 'cpan:TAPPER';
 # ABSTRACT: searchengine support functions using MCE
-$BenchmarkAnything::Storage::Backend::SQL::Search::MCE::VERSION = '0.026';
+$BenchmarkAnything::Storage::Backend::SQL::Search::MCE::VERSION = '0.028';
 use MCE::Flow;
 
 
@@ -18,7 +18,7 @@ sub sync_search_engine_mce
                      bounds_only => 1);
     mce_flow_s sub {
         BenchmarkAnything::Storage::Backend::SQL::Search::_sync_search_engine_process_chunk ($or_sql, $b_force, $_->[0], $_->[1]);
-    }, 1, $i_count_datapoints;
+    }, $i_start, $i_count_datapoints;
 }
 
 1;
@@ -68,7 +68,7 @@ Roberto Schaefer <schaefr@amazon.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2019 by Amazon.com, Inc. or its affiliates.
+This software is Copyright (c) 2020 by Amazon.com, Inc. or its affiliates.
 
 This is free software, licensed under:
 

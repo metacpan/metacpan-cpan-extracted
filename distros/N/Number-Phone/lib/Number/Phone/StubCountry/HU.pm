@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20200904144532;
+our $VERSION = 1.20201204215956;
 
 my $formatters = [
                 {
@@ -96,114 +96,87 @@ my $validators = {
                 'voip' => '21\\d{7}'
               };
 my %areanames = ();
-$areanames{en}->{361} = "Budapest";
-$areanames{en}->{3622} = "Székesfehérvár";
-$areanames{en}->{3623} = "Biatorbágy";
-$areanames{en}->{3624} = "Szigetszentmiklós";
-$areanames{en}->{3625} = "Dunaujvaros";
-$areanames{en}->{3626} = "Szentendre";
-$areanames{en}->{3627} = "Vac";
-$areanames{en}->{3628} = "Godollo";
-$areanames{en}->{3629} = "Monor";
-$areanames{en}->{3632} = "Salgotarjan";
-$areanames{en}->{3633} = "Esztergom";
-$areanames{en}->{3634} = "Tatabanya";
-$areanames{en}->{3635} = "Balassagyarmat";
-$areanames{en}->{3636} = "Eger";
-$areanames{en}->{3637} = "Gyongyos";
-$areanames{en}->{3642} = "Nyiregyhaza";
-$areanames{en}->{3644} = "Mátészalka";
-$areanames{en}->{3645} = "Kisvarda";
-$areanames{en}->{3646} = "Miskolc";
-$areanames{en}->{3647} = "Szerencs";
-$areanames{en}->{3648} = "Ozd";
-$areanames{en}->{3649} = "Mezokovesd";
-$areanames{en}->{3652} = "Debrecen";
-$areanames{en}->{3653} = "Cegled";
-$areanames{en}->{3654} = "Berettyoujfalu";
-$areanames{en}->{3656} = "Szolnok";
-$areanames{en}->{3657} = "Jaszbereny";
-$areanames{en}->{3659} = "Karcag";
-$areanames{en}->{3662} = "Szeged";
-$areanames{en}->{3663} = "Szentes";
-$areanames{en}->{3666} = "Bekescsaba";
-$areanames{en}->{3668} = "Oroshaza";
-$areanames{en}->{3669} = "Mohacs";
-$areanames{en}->{3672} = "Pecs";
-$areanames{en}->{3673} = "Szigetvar";
-$areanames{en}->{3674} = "Szekszard";
-$areanames{en}->{3675} = "Paks";
-$areanames{en}->{3676} = "Kecskemet";
-$areanames{en}->{3677} = "Kiskunhalas";
-$areanames{en}->{3678} = "Kiskoros";
-$areanames{en}->{3679} = "Baja";
-$areanames{en}->{3682} = "Kaposvar";
-$areanames{en}->{3683} = "Keszthely";
-$areanames{en}->{3684} = "Siofok";
-$areanames{en}->{3685} = "Marcali";
-$areanames{en}->{3687} = "Tapolca";
-$areanames{en}->{3688} = "Veszprem";
-$areanames{en}->{3689} = "Papa";
-$areanames{en}->{3692} = "Zalaegerszeg";
-$areanames{en}->{3693} = "Nagykanizsa";
-$areanames{en}->{3694} = "Szombathely";
-$areanames{en}->{3695} = "Sarvar";
-$areanames{en}->{3696} = "Gyor";
-$areanames{en}->{3699} = "Sopron";
-$areanames{hu}->{361} = "Budapest";
-$areanames{hu}->{3622} = "Székesfehérvár";
-$areanames{hu}->{3623} = "Biatorbágy";
-$areanames{hu}->{3624} = "Szigetszentmiklós";
-$areanames{hu}->{3625} = "Dunaújváros";
-$areanames{hu}->{3626} = "Szentendre";
-$areanames{hu}->{3627} = "Vác";
-$areanames{hu}->{3628} = "Gödöllő";
-$areanames{hu}->{3629} = "Monor";
-$areanames{hu}->{3632} = "Salgótarján";
-$areanames{hu}->{3633} = "Esztergom";
-$areanames{hu}->{3634} = "Tatabánya";
-$areanames{hu}->{3635} = "Balassagyarmat";
-$areanames{hu}->{3636} = "Eger";
-$areanames{hu}->{3637} = "Gyöngyös";
-$areanames{hu}->{3642} = "Nyíregyháza";
-$areanames{hu}->{3644} = "Mátészalka";
-$areanames{hu}->{3645} = "Kisvárda";
-$areanames{hu}->{3646} = "Miskolc";
-$areanames{hu}->{3647} = "Szerencs";
-$areanames{hu}->{3648} = "Ózd";
-$areanames{hu}->{3649} = "Mezőkövesd";
-$areanames{hu}->{3652} = "Debrecen";
-$areanames{hu}->{3653} = "Cegléd";
-$areanames{hu}->{3654} = "Berettyóújfalu";
-$areanames{hu}->{3656} = "Szolnok";
-$areanames{hu}->{3657} = "Jászberény";
-$areanames{hu}->{3659} = "Karcag";
-$areanames{hu}->{3662} = "Szeged";
-$areanames{hu}->{3663} = "Szentes";
-$areanames{hu}->{3666} = "Békéscsaba";
-$areanames{hu}->{3668} = "Orosháza";
-$areanames{hu}->{3669} = "Mohács";
-$areanames{hu}->{3672} = "Pécs";
-$areanames{hu}->{3673} = "Szigetvár";
-$areanames{hu}->{3674} = "Szekszárd";
-$areanames{hu}->{3675} = "Paks";
-$areanames{hu}->{3676} = "Kecskemét";
-$areanames{hu}->{3677} = "Kiskunhalas";
-$areanames{hu}->{3678} = "Kiskőrös";
-$areanames{hu}->{3679} = "Baja";
-$areanames{hu}->{3682} = "Kaposvár";
-$areanames{hu}->{3683} = "Keszthely";
-$areanames{hu}->{3684} = "Siófok";
-$areanames{hu}->{3685} = "Marcali";
-$areanames{hu}->{3687} = "Tapolca";
-$areanames{hu}->{3688} = "Veszprém";
-$areanames{hu}->{3689} = "Pápa";
-$areanames{hu}->{3692} = "Zalaegerszeg";
-$areanames{hu}->{3693} = "Nagykanizsa";
-$areanames{hu}->{3694} = "Szombathely";
-$areanames{hu}->{3695} = "Sárvár";
-$areanames{hu}->{3696} = "Győr";
-$areanames{hu}->{3699} = "Sopron";
+$areanames{hu} = {"3676", "Kecskemét",
+"3668", "Orosháza",
+"3654", "Berettyóújfalu",
+"3678", "Kiskőrös",
+"3634", "Tatabánya",
+"3666", "Békéscsaba",
+"3672", "Pécs",
+"3653", "Cegléd",
+"3684", "Siófok",
+"3627", "Vác",
+"3628", "Gödöllő",
+"3695", "Sárvár",
+"3642", "Nyíregyháza",
+"3689", "Pápa",
+"3648", "Ózd",
+"3688", "Veszprém",
+"3682", "Kaposvár",
+"3649", "Mezőkövesd",
+"3673", "Szigetvár",
+"3657", "Jászberény",
+"3625", "Dunaújváros",
+"3696", "Győr",
+"3632", "Salgótarján",
+"3669", "Mohács",
+"3674", "Szekszárd",
+"3645", "Kisvárda",
+"3637", "Gyöngyös",};
+$areanames{en} = {"3648", "Ozd",
+"3693", "Nagykanizsa",
+"3647", "Szerencs",
+"3635", "Balassagyarmat",
+"3689", "Papa",
+"3642", "Nyiregyhaza",
+"3695", "Sarvar",
+"3626", "Szentendre",
+"3633", "Esztergom",
+"3628", "Godollo",
+"3627", "Vac",
+"3622", "Székesfehérvár",
+"3646", "Miskolc",
+"3684", "Siofok",
+"3653", "Cegled",
+"3672", "Pecs",
+"3666", "Bekescsaba",
+"3677", "Kiskunhalas",
+"3634", "Tatabanya",
+"3678", "Kiskoros",
+"3659", "Karcag",
+"3694", "Szombathely",
+"3699", "Sopron",
+"3654", "Berettyoujfalu",
+"3683", "Keszthely",
+"361", "Budapest",
+"3668", "Oroshaza",
+"3685", "Marcali",
+"3662", "Szeged",
+"3676", "Kecskemet",
+"3645", "Kisvarda",
+"3674", "Szekszard",
+"3637", "Gyongyos",
+"3669", "Mohacs",
+"3632", "Salgotarjan",
+"3656", "Szolnok",
+"3692", "Zalaegerszeg",
+"3625", "Dunaujvaros",
+"3696", "Gyor",
+"3652", "Debrecen",
+"3657", "Jaszbereny",
+"3623", "Biatorbágy",
+"3636", "Eger",
+"3679", "Baja",
+"3675", "Paks",
+"3644", "Mátészalka",
+"3629", "Monor",
+"3673", "Szigetvar",
+"3663", "Szentes",
+"3624", "Szigetszentmiklós",
+"3649", "Mezokovesd",
+"3682", "Kaposvar",
+"3688", "Veszprem",
+"3687", "Tapolca",};
 
     sub new {
       my $class = shift;

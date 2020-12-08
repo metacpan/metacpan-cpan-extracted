@@ -6,7 +6,11 @@ examples/hello-world.pl
 examples/sinewave.pl
 examples/touchswitches.pl
 lib/Device/Chip/NoritakeGU_D.pm
+LICENSE
 MANIFEST			This list of files
+META.json
+META.yml
+README
 t/00use.t
 t/01uart.t
 t/02spi.t
@@ -16,7 +20,3 @@ t/11bit-image.t
 t/20gpio.t
 t/21touchswitches.t
 t/99pod.t
-README
-LICENSE
-META.yml
-META.json

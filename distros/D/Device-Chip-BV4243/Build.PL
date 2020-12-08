@@ -6,14 +6,20 @@ use Module::Build;
 my $build = Module::Build->new(
    module_name => 'Device::Chip::BV4243',
    requires => {
+      'perl' => '5.026',
+      'Future::AsyncAwait' => '0.47', # toplevel await
+      'Object::Pad' => '0.19',
+
       'Device::Chip' => '0.03',
    },
-   build_requires => {
+   configure_requires => {
+      'Module::Build' => '0.4004', # test_requires
+   },
+   test_requires => {
       'Test::More' => '0.88', # done_testing
    },
    auto_configure_requires => 0, # Don't add M::B to configure_requires
    license => 'perl',
-   create_makefile_pl => 'small',
    create_license => 1,
    create_readme  => 1,
 );

@@ -1,9 +1,9 @@
 package BenchmarkAnything::Storage::Search::Elasticsearch;
-# git description: v0.003-1-g92e43ff
+# git description: v0.004-2-gcd52c72
 
 our $AUTHORITY = 'cpan:SCHWIGON';
 # ABSTRACT: Utility functions to use Elasticsearch with BenchmarkAnything storage
-$BenchmarkAnything::Storage::Search::Elasticsearch::VERSION = '0.004';
+$BenchmarkAnything::Storage::Search::Elasticsearch::VERSION = '0.005';
 use 5.008;
 use strict;
 use warnings;
@@ -24,7 +24,7 @@ sub get_elasticsearch_client {
 
     # Elasticsearch
     my %es_cfg =
-     (client => ($cfg->{client}               ||  "5_0::Direct"),
+     (client => ($cfg->{elasticsearch}{client} ||  "5_0::Direct"),
       nodes  => ($cfg->{elasticsearch}{nodes} || ["localhost:9200"]),
       $opt->{ownjson} ? (serializer => "+BenchmarkAnything::Storage::Search::Elasticsearch::Serializer::JSON::DontTouchMyUTF8") : (),
      );
@@ -75,7 +75,7 @@ sub get_elasticsearch_query
                           {
                               my $k         =    $_->[0];
                               my $direction = lc($_->[1]) || 'asc';
-                              my $options   =    $_->[2]; # (eg. numeric=>1) - IGNORED! We let Elasticsearch figure out.
+                              my $options   =    $_->[2]; # (eg. numeric=>1) - IGNORED! We let Elasticsearch figure out. XXX: use different field: typed_field_VALUE_long if {numeric} == 1
                               @e = ({ $k => { order => $direction } });
                           }
                           elsif (defined($_)) # STRING
@@ -247,7 +247,7 @@ Steffen Schwigon <ss5@renormalist.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by Steffen Schwigon.
+This software is copyright (c) 2020 by Steffen Schwigon.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

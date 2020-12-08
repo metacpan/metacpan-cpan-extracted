@@ -4,7 +4,7 @@
 #  (C) Paul Evans, 2018-2020 -- leonerd@leonerd.org.uk
 
 package Device::Chip::AnalogConverters;
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 
 =head1 NAME
 
@@ -51,13 +51,13 @@ L<Device::Chip::MAX1166x>
 
 =head3 trigger
 
-   $chip->trigger( %args )->get
+   await $chip->trigger( %args );
 
 Optional. This method asks the chip to begin taking a reading.
 
 =head3 read_adc
 
-   $value = $chip->read_adc->get
+   $value = await $chip->read_adc;
 
 Obtains the most recent reading performed by the chip, as a plain integer
 value. This may be signed or unsigned, scaled to whatever precision the chip
@@ -65,7 +65,7 @@ works at.
 
 =head3 read_adc_voltage
 
-   $voltage = $chip->read_adc_voltage->get
+   $voltage = await $chip->read_adc_voltage;
 
 If the chip contains an internal reference, or in some other way the scale is
 known by the driver, this method should be provided that converts the result
@@ -73,7 +73,7 @@ of L</read_adc> into an actual signed voltage.
 
 =head3 read_adc_ratio
 
-   $ratio = $chip->read_adc_ratio->get
+   $ratio = await $chip->read_adc_ratio;
 
 If the chip (driver) does not have a reference to scale convert the output
 directly to a voltage level, then this method should be provided instead that
@@ -109,14 +109,14 @@ L<Device::Chip::MCP4725>
 
 =head3 write_dac
 
-   $chip->write_dac( $value )->get
+   await $chip->write_dac( $value );
 
 Sets the value of the DAC's output as a plain integer value. This may be
 signed or unsigned, scaled to whatever precision the chip works at.
 
 =head3 write_dac_voltage
 
-   $chip->write_dac_voltage( $voltage )->get
+   await $chip->write_dac_voltage( $voltage );
 
 If the chip contains an internal reference, or in some other way the scale is
 known by the driver, this method should be provided that converts the given
@@ -124,7 +124,7 @@ voltage into a raw value to invoke L</write_dac> with.
 
 =head3 write_dac_ratio
 
-   $chip->write_dac_ratio( $ratio )->get
+   await $chip->write_dac_ratio( $ratio );
 
 If the chip (driver) does not have a reference to scale convert a given
 voltage to a DAC code value, then this method should be provided instead that

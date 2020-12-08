@@ -1,7 +1,9 @@
 #!/usr/bin/perl
 
-use strict;
+use v5.26;
 use warnings;
+
+use Future::AsyncAwait;
 
 use Device::Chip::INA219;
 use Device::Chip::Adapter;
@@ -11,24 +13,24 @@ use Tickit::Widgets qw( HBox VBox Static SegmentDisplay );
 Tickit::Widget::SegmentDisplay->VERSION( '0.03' ); # seven-dp, symbols
 
 GetOptions(
-   'adapter|A=s' => \( my $ADAPTER = "BusPirate" ),
-   'mount|M=s'   => \( my $MOUNTPARAMS ),
+   'adapter|A=s' => \my $ADAPTER,
+   'mount|M=s'   => \my $MOUNTPARAMS,
 ) or exit 1;
 
 my $ina = Device::Chip::INA219->new;
 
-$ina->mount_from_paramstr(
+await $ina->mount_from_paramstr(
    Device::Chip::Adapter->new_from_description( $ADAPTER ),
    $MOUNTPARAMS,
-)->get;
+);
 
-$ina->protocol->power(1)->get;
+await $ina->protocol->power(1);
 
-$ina->change_config(
+await $ina->change_config(
    BADC => 4,
    SADC => 4,
    PG   => "80mV",
-)->get;
+);
 
 $SIG{TERM} = $SIG{INT} = sub { exit };
 

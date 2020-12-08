@@ -23,7 +23,7 @@
          "requires" : {
             "Data::Bitfield" : "0.02",
             "Device::Chip" : "0.03",
-            "Future::AsyncAwait" : "0",
+            "Future::AsyncAwait" : "0.47",
             "Object::Pad" : "0.19",
             "perl" : "5.026"
          }
@@ -38,7 +38,7 @@
    "provides" : {
       "Device::Chip::HTU21D" : {
          "file" : "lib/Device/Chip/HTU21D.pm",
-         "version" : "0.05"
+         "version" : "0.06"
       }
    },
    "release_status" : "stable",
@@ -47,6 +47,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.05",
-   "x_serialization_backend" : "JSON::PP version 4.02"
+   "version" : "0.06",
+   "x_serialization_backend" : "JSON::PP version 4.04"
 }

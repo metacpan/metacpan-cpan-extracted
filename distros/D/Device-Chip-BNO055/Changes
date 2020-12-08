@@ -1,4 +1,8 @@
 Revision history for Device-Chip-BNO055
 
+0.02    2020-12-06
+        [CHANGES]
+         * Use toplevel 'await' syntax from Future::AsyncAwait 0.47
+
 0.01    2020-05-02
         First version, released on an unsuspecting world.

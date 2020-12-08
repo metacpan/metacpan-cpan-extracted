@@ -1,24 +1,26 @@
 #!/usr/bin/perl
 
-use strict;
+use v5.26;
 use warnings;
 
 use Test::More;
 use Test::Device::Chip::Adapter;
 
+use Future::AsyncAwait;
+
 use Device::Chip::AD5691R;
 
 my $chip = Device::Chip::AD5691R->new;
 
-$chip->mount(
+await $chip->mount(
    my $adapter = Test::Device::Chip::Adapter->new,
-)->get;
+);
 
 # ->read_config
 {
    # initial ->read_config uses in-memory state
 
-   is_deeply( $chip->read_config->get,
+   is_deeply( await $chip->read_config,
       {
          GAIN => 1,
          PD   => "normal",
@@ -34,9 +36,9 @@ $chip->mount(
 {
    $adapter->expect_write( "\x40\x08\x00" );
 
-   $chip->change_config(
+   await $chip->change_config(
       GAIN => 2,
-   )->get;
+   );
 
    $adapter->check_and_clear( '$chip->change_config' );
 }
@@ -45,7 +47,7 @@ $chip->mount(
 {
    $adapter->expect_write( "\x10\x4D\x20" );
 
-   $chip->write_dac( 1234 )->get;
+   await $chip->write_dac( 1234 );
 
    $adapter->check_and_clear( '$chip->write_dac' );
 }
@@ -54,7 +56,7 @@ $chip->mount(
 {
    $adapter->expect_write( "\x30\x3E\xF0" );
 
-   $chip->write_dac_voltage( 1.23 )->get;
+   await $chip->write_dac_voltage( 1.23 );
 
    $adapter->check_and_clear( '$chip->write_dac_voltage' );
 }

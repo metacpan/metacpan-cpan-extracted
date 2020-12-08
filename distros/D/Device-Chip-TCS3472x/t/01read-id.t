@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 
-use strict;
+use v5.26;
 use warnings;
 
 use Test::More;
@@ -8,18 +8,20 @@ use Test::Device::Chip::Adapter;
 
 use Device::Chip::TCS3472x;
 
+use Future::AsyncAwait;
+
 my $chip = Device::Chip::TCS3472x->new;
 
-$chip->mount(
+await $chip->mount(
    my $adapter = Test::Device::Chip::Adapter->new,
-)->get;
+);
 
 # ->read_ids
 {
    $adapter->expect_write_then_read( "\xB2", 1 )
       ->returns( "\x44" );
 
-   is( $chip->read_id->get, "44",
+   is( await $chip->read_id, "44",
       '->read_ids yields correct chip ID' );
 
    $adapter->check_and_clear( '->read_ids' );

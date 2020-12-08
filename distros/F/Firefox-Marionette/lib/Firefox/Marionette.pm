@@ -14,6 +14,7 @@ use Firefox::Marionette::Proxy();
 use Firefox::Marionette::Exception();
 use Firefox::Marionette::Exception::Response();
 use Compress::Zlib();
+use Config::INI::Reader();
 use Archive::Zip();
 use Symbol();
 use JSON();
@@ -25,6 +26,7 @@ use File::Find();
 use File::Path();
 use File::Spec();
 use URI();
+use URI::Escape();
 use Time::HiRes();
 use File::Temp();
 use File::stat();
@@ -47,7 +49,7 @@ our @EXPORT_OK =
   qw(BY_XPATH BY_ID BY_NAME BY_TAG BY_CLASS BY_SELECTOR BY_LINK BY_PARTIAL);
 our %EXPORT_TAGS = ( all => \@EXPORT_OK );
 
-our $VERSION = '0.99';
+our $VERSION = '1.00';
 
 sub _ANYPROCESS                     { return -1 }
 sub _COMMAND                        { return 0 }
@@ -1328,6 +1330,9 @@ sub execute {
         return $return_code;
     }
     else {
+        if ( $self->_debug() ) {
+            warn q[** ] . ( join q[ ], $binary, @arguments ) . "\n";
+        }
         my ( $writer, $reader, $error );
         my $pid;
         eval {
@@ -1392,6 +1397,25 @@ sub _execute_via_ssh {
     return $output;
 }
 
+sub _search_for_version_in_application_ini {
+    my ( $self, $binary ) = @_;
+    if ( File::Spec->file_name_is_absolute($binary) ) {
+        my ( $volume, $directories ) = File::Spec->splitpath($binary);
+        my $application_ini_path =
+          File::Spec->catfile( $volume, $directories, 'application.ini' );
+        my $application_ini_handle =
+          FileHandle->new( $application_ini_path, Fcntl::O_RDONLY() );
+        if ($application_ini_handle) {
+            my $config =
+              Config::INI::Reader->read_handle($application_ini_handle);
+            if ( my $app = $config->{App} ) {
+                return join q[ ], $app->{Vendor}, $app->{Name}, $app->{Version};
+            }
+        }
+    }
+    return;
+}
+
 sub _initialise_version {
     my ($self) = @_;
     if ( defined $self->{_initial_version} ) {
@@ -1428,8 +1452,14 @@ sub _initialise_version {
                 $version_string =~ s/\r?\n$//smx;
             }
             else {
-                $version_string = $self->execute( $binary, '--version' );
-                $version_string =~ s/\r?\n$//smx;
+                if ( $version_string =
+                    $self->_search_for_version_in_application_ini($binary) )
+                {
+                }
+                else {
+                    $version_string = $self->execute( $binary, '--version' );
+                    $version_string =~ s/\r?\n$//smx;
+                }
             }
             my $browser_regex = join q[|],
               qr/Mozilla[ ]Firefox[ ]/smx,
@@ -4374,6 +4404,154 @@ sub add_cookie {
     return $self;
 }
 
+sub add_header {
+    my ( $self, %headers ) = @_;
+    while ( ( my $name, my $value ) = each %headers ) {
+        $self->{_headers}->{$name} ||= [];
+        push @{ $self->{_headers}->{$name} }, { value => $value, merge => 1 };
+    }
+    $self->_set_headers();
+    return $self;
+}
+
+sub add_site_header {
+    my ( $self, $host, %headers ) = @_;
+    while ( ( my $name, my $value ) = each %headers ) {
+        $self->{_site_headers}->{$host}->{$name} ||= [];
+        push @{ $self->{_site_headers}->{$host}->{$name} },
+          { value => $value, merge => 1 };
+    }
+    $self->_set_headers();
+    return $self;
+}
+
+sub delete_header {
+    my ( $self, @names ) = @_;
+    foreach my $name (@names) {
+        $self->{_headers}->{$name}         = [ { value => q[], merge => 0 } ];
+        $self->{_deleted_headers}->{$name} = 1;
+    }
+    $self->_set_headers();
+    return $self;
+}
+
+sub delete_site_header {
+    my ( $self, $host, @names ) = @_;
+    foreach my $name (@names) {
+        $self->{_site_headers}->{$host}->{$name} =
+          [ { value => q[], merge => 0 } ];
+        $self->{_deleted_site_headers}->{$host}->{$name} = 1;
+    }
+    $self->_set_headers();
+    return $self;
+}
+
+sub _validate_request_header_merge {
+    my ( $self, $merge ) = @_;
+    if ($merge) {
+        return 'true';
+    }
+    else {
+        return 'false';
+    }
+
+}
+
+sub _set_headers {
+    my ($self) = @_;
+    $self->context('chrome');
+    my $script = <<'_JS_';
+if (typeof PerlFirefoxMarionette == "undefined" ) {
+    PerlFirefoxMarionette = {};
+} else {
+    PerlFirefoxMarionette.headers.unregister();
+}
+PerlFirefoxMarionette.headers =
+{ 
+  observe: function(subject, topic, data) {
+    this.onHeaderChanged(subject.QueryInterface(Components.interfaces.nsIHttpChannel), topic, data);
+  },
+
+  register: function() {
+    var observerService = Components.classes["@mozilla.org/observer-service;1"].getService(Components.interfaces.nsIObserverService);
+    observerService.addObserver(this, "http-on-modify-request", false);
+  },
+
+  unregister: function() {
+    var observerService = Components.classes["@mozilla.org/observer-service;1"].getService(Components.interfaces.nsIObserverService);
+    observerService.removeObserver(this, "http-on-modify-request");
+  },
+
+  onHeaderChanged: function(channel, topic, data) {
+    var host = channel.URI.host;
+_JS_
+    foreach my $name ( sort { $a cmp $b } keys %{ $self->{_headers} } ) {
+        my @headers      = @{ $self->{_headers}->{$name} };
+        my $first        = shift @headers;
+        my $encoded_name = URI::Escape::uri_escape($name);
+        if ( defined $first ) {
+            my $value         = $first->{value};
+            my $encoded_value = URI::Escape::uri_escape($value);
+            my $validated_merge =
+              $self->_validate_request_header_merge( $first->{merge} );
+            $script .= <<"_JS_";
+    channel.setRequestHeader(decodeURIComponent("$encoded_name"), decodeURIComponent("$encoded_value"), $validated_merge);
+_JS_
+        }
+        foreach my $value (@headers) {
+            my $encoded_value = URI::Escape::uri_escape( $value->{value} );
+            my $validated_merge =
+              $self->_validate_request_header_merge( $value->{merge} );
+            $script .= <<"_JS_";
+    channel.setRequestHeader(decodeURIComponent("$encoded_name"), decodeURIComponent("$encoded_value"), $validated_merge);
+_JS_
+        }
+    }
+    foreach my $host ( sort { $a cmp $b } keys %{ $self->{_site_headers} } ) {
+        my $encoded_host = URI::Escape::uri_escape($host);
+        foreach my $name (
+            sort { $a cmp $b }
+            keys %{ $self->{_site_headers}->{$host} }
+          )
+        {
+            my @headers      = @{ $self->{_site_headers}->{$host}->{$name} };
+            my $first        = shift @headers;
+            my $encoded_name = URI::Escape::uri_escape($name);
+            if ( defined $first ) {
+                my $encoded_value = URI::Escape::uri_escape( $first->{value} );
+                my $validated_merge =
+                  $self->_validate_request_header_merge( $first->{merge} );
+                $script .= <<"_JS_";
+    if (host === decodeURIComponent("$encoded_host")) {
+      channel.setRequestHeader(decodeURIComponent("$encoded_name"), decodeURIComponent("$encoded_value"), $validated_merge);
+    }
+_JS_
+            }
+            foreach my $value (@headers) {
+                my $encoded_value = URI::Escape::uri_escape( $value->{value} );
+                my $validated_merge =
+                  $self->_validate_request_header_merge( $value->{merge} );
+                $script .= <<"_JS_";
+    if (host === decodeURIComponent("$encoded_host")) {
+      channel.setRequestHeader(decodeURIComponent("$encoded_name"), decodeURIComponent("$encoded_value"), $validated_merge);
+    }
+_JS_
+            }
+        }
+    }
+    $script .= <<'_JS_';
+  }
+};
+
+PerlFirefoxMarionette.headers.register();
+_JS_
+    $script =~ s/[\r\n\t]+/ /smxg;
+    $script =~ s/[ ]+/ /smxg;
+    $self->script($script);
+    $self->context('content');
+    return;
+}
+
 sub is_selected {
     my ( $self, $element ) = @_;
     if (
@@ -5711,6 +5889,7 @@ sub quit {
     elsif ( $self->_socket() ) {
         if ( $self->_session_id() ) {
             $self->_quit_over_marionette($flags);
+            delete $self->{session_id};
         }
         $self->_terminate_process();
     }
@@ -6835,7 +7014,7 @@ Firefox::Marionette - Automate the Firefox browser with the Marionette protocol
 
 =head1 VERSION
 
-Version 0.99
+Version 1.00
 
 =head1 SYNOPSIS
 
@@ -6879,6 +7058,46 @@ returns the active element of the current browsing context's document element, i
 =head2 add_cookie
 
 accepts a single L<cookie|Firefox::Marionette::Cookie> object as the first parameter and adds it to the current cookie jar.  This method returns L<itself|Firefox::Marionette> to aid in chaining methods.
+
+=head2 add_header
+
+accepts a hash of HTTP headers to include in every future HTTP Request.
+
+    use Firefox::Marionette();
+    use UUID();
+
+    my $firefox = Firefox::Marionette->new();
+    my $uuid = UUID::uuid();
+    $firefox->add_header( 'Track-my-automated-tests' => $uuid );
+    $firefox->go('https://metacpan.org/');
+
+these headers are added to any existing headers.  To clear headers, see the L<delete_header|Firefox::Marionette#delete_headers> method
+
+    use Firefox::Marionette();
+
+    my $firefox = Firefox::Marionette->new()->delete_header( 'Accept' )->add_header( 'Accept' => 'text/perl' )->go('https://metacpan.org/');
+
+will only send out an L<Accept|https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Accept> header that looks like C<Accept: text/perl>.
+
+    use Firefox::Marionette();
+
+    my $firefox = Firefox::Marionette->new()->add_header( 'Accept' => 'text/perl' )->go('https://metacpan.org/');
+
+by itself, will send out an L<Accept|https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Accept> header that may resemble C<Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8, text/perl>. This method returns L<itself|Firefox::Marionette> to aid in chaining methods.
+
+=head2 add_site_header
+
+accepts a host name and a hash of HTTP headers to include in every future HTTP Request that is being sent to that particular host.
+
+    use Firefox::Marionette();
+    use UUID();
+
+    my $firefox = Firefox::Marionette->new();
+    my $uuid = UUID::uuid();
+    $firefox->add_site_header( 'metacpan.org', 'Track-my-automated-tests' => $uuid );
+    $firefox->go('https://metacpan.org/');
+
+these headers are added to any existing headers going to the metacpan.org site, but no other site.  To clear site headers, see the L<delete_site_header|Firefox::Marionette#delete_site_headers> method
 
 =head2 addons
 
@@ -6994,7 +7213,15 @@ closes the current window/tab.  It returns a list of still available window/tab 
 
 =head2 context
 
-returns the context type that is Marionette's current target for browsing context scoped commands.
+accepts a string as the first parameter, which may be either 'content' or 'chrome'.  It returns the context type that is Marionette's current target for browsing context scoped commands.
+
+    use Firefox::Marionette();
+    use v5.10;
+
+    my $firefox = Firefox::Marionette->new();
+    my $old_context = $firefox->context('chrome');
+    $firefox->script(...); # running script in chrome context
+    $firefox->context($old_context);
 
 =head2 cookies
 
@@ -7039,9 +7266,35 @@ deletes a single cookie by name.  Accepts a scalar containing the cookie name as
 
 here be cookie monsters! This method returns L<itself|Firefox::Marionette> to aid in chaining methods.
 
+=head2 delete_header
+
+accepts a list of HTTP header names to delete from future HTTP Requests.
+
+    use Firefox::Marionette();
+
+    my $firefox = Firefox::Marionette->new();
+    $firefox->delete_header( 'User-Agent', 'Accept', 'Accept-Encoding' );
+
+will remove the L<User-Agent|https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/User-Agent>, L<Accept|https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Accept> and L<Accept-Encoding|https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Accept-Encoding> headers from all future requests
+
+This method returns L<itself|Firefox::Marionette> to aid in chaining methods.
+
 =head2 delete_session
 
 deletes the current WebDriver session.
+
+=head2 delete_site_header
+
+accepts a host name and a list of HTTP headers names to delete from future HTTP Requests.
+
+    use Firefox::Marionette();
+
+    my $firefox = Firefox::Marionette->new();
+    $firefox->delete_header( 'metacpan.org', 'User-Agent', 'Accept', 'Accept-Encoding' );
+
+will remove the L<User-Agent|https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/User-Agent>, L<Accept|https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Accept> and L<Accept-Encoding|https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Accept-Encoding> headers from all future requests to metacpan.org.
+
+This method returns L<itself|Firefox::Marionette> to aid in chaining methods.
 
 =head2 developer
 

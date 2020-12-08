@@ -1,4 +1,4 @@
-# AWS::EMR::InstanceFleetConfig generated from spec 5.3.0
+# AWS::EMR::InstanceFleetConfig generated from spec 20.1.0
 use Moose::Util::TypeConstraints;
 
 coerce 'Cfn::Resource::Properties::AWS::EMR::InstanceFleetConfig',
@@ -14,7 +14,7 @@ package Cfn::Resource::AWS::EMR::InstanceFleetConfig {
     [  ]
   }
   sub supported_regions {
-    [ 'ap-east-1','ap-northeast-1','ap-northeast-2','ap-northeast-3','ap-south-1','ap-southeast-1','ap-southeast-2','ca-central-1','cn-north-1','cn-northwest-1','eu-central-1','eu-north-1','eu-west-1','eu-west-2','eu-west-3','me-south-1','sa-east-1','us-east-1','us-east-2','us-gov-east-1','us-gov-west-1','us-west-1','us-west-2' ]
+    [ 'af-south-1','ap-east-1','ap-northeast-1','ap-northeast-2','ap-northeast-3','ap-south-1','ap-southeast-1','ap-southeast-2','ca-central-1','cn-north-1','cn-northwest-1','eu-central-1','eu-north-1','eu-south-1','eu-west-1','eu-west-2','eu-west-3','me-south-1','sa-east-1','us-east-1','us-east-2','us-gov-east-1','us-gov-west-1','us-west-1','us-west-2' ]
   }
 }
 
@@ -29,11 +29,11 @@ coerce 'Cfn::Resource::Properties::AWS::EMR::InstanceFleetConfig::VolumeSpecific
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::EMR::InstanceFleetConfig::VolumeSpecificationValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::EMR::InstanceFleetConfig::VolumeSpecification->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::EMR::InstanceFleetConfig::VolumeSpecificationValue {
+package Cfn::Resource::Properties::Object::AWS::EMR::InstanceFleetConfig::VolumeSpecification {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -74,11 +74,11 @@ coerce 'Cfn::Resource::Properties::AWS::EMR::InstanceFleetConfig::EbsBlockDevice
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::EMR::InstanceFleetConfig::EbsBlockDeviceConfigValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::EMR::InstanceFleetConfig::EbsBlockDeviceConfig->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::EMR::InstanceFleetConfig::EbsBlockDeviceConfigValue {
+package Cfn::Resource::Properties::Object::AWS::EMR::InstanceFleetConfig::EbsBlockDeviceConfig {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -96,18 +96,40 @@ coerce 'Cfn::Resource::Properties::AWS::EMR::InstanceFleetConfig::SpotProvisioni
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::EMR::InstanceFleetConfig::SpotProvisioningSpecificationValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::EMR::InstanceFleetConfig::SpotProvisioningSpecification->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::EMR::InstanceFleetConfig::SpotProvisioningSpecificationValue {
+package Cfn::Resource::Properties::Object::AWS::EMR::InstanceFleetConfig::SpotProvisioningSpecification {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
   
+  has AllocationStrategy => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has BlockDurationMinutes => (isa => 'Cfn::Value::Integer', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has TimeoutAction => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has TimeoutDurationMinutes => (isa => 'Cfn::Value::Integer', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+}
+
+subtype 'Cfn::Resource::Properties::AWS::EMR::InstanceFleetConfig::OnDemandProvisioningSpecification',
+     as 'Cfn::Value';
+
+coerce 'Cfn::Resource::Properties::AWS::EMR::InstanceFleetConfig::OnDemandProvisioningSpecification',
+  from 'HashRef',
+   via {
+     if (my $f = Cfn::TypeLibrary::try_function($_)) {
+       return $f
+     } else {
+       return Cfn::Resource::Properties::Object::AWS::EMR::InstanceFleetConfig::OnDemandProvisioningSpecification->new( %$_ );
+     }
+   };
+
+package Cfn::Resource::Properties::Object::AWS::EMR::InstanceFleetConfig::OnDemandProvisioningSpecification {
+  use Moose;
+  use MooseX::StrictConstructor;
+  extends 'Cfn::Value::TypedValue';
+  
+  has AllocationStrategy => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
 }
 
 subtype 'Cfn::Resource::Properties::AWS::EMR::InstanceFleetConfig::EbsConfiguration',
@@ -119,11 +141,11 @@ coerce 'Cfn::Resource::Properties::AWS::EMR::InstanceFleetConfig::EbsConfigurati
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::EMR::InstanceFleetConfig::EbsConfigurationValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::EMR::InstanceFleetConfig::EbsConfiguration->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::EMR::InstanceFleetConfig::EbsConfigurationValue {
+package Cfn::Resource::Properties::Object::AWS::EMR::InstanceFleetConfig::EbsConfiguration {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -163,11 +185,11 @@ coerce 'Cfn::Resource::Properties::AWS::EMR::InstanceFleetConfig::Configuration'
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::EMR::InstanceFleetConfig::ConfigurationValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::EMR::InstanceFleetConfig::Configuration->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::EMR::InstanceFleetConfig::ConfigurationValue {
+package Cfn::Resource::Properties::Object::AWS::EMR::InstanceFleetConfig::Configuration {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -208,11 +230,11 @@ coerce 'Cfn::Resource::Properties::AWS::EMR::InstanceFleetConfig::InstanceTypeCo
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::EMR::InstanceFleetConfig::InstanceTypeConfigValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::EMR::InstanceFleetConfig::InstanceTypeConfig->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::EMR::InstanceFleetConfig::InstanceTypeConfigValue {
+package Cfn::Resource::Properties::Object::AWS::EMR::InstanceFleetConfig::InstanceTypeConfig {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -234,16 +256,17 @@ coerce 'Cfn::Resource::Properties::AWS::EMR::InstanceFleetConfig::InstanceFleetP
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::EMR::InstanceFleetConfig::InstanceFleetProvisioningSpecificationsValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::EMR::InstanceFleetConfig::InstanceFleetProvisioningSpecifications->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::EMR::InstanceFleetConfig::InstanceFleetProvisioningSpecificationsValue {
+package Cfn::Resource::Properties::Object::AWS::EMR::InstanceFleetConfig::InstanceFleetProvisioningSpecifications {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
   
-  has SpotSpecification => (isa => 'Cfn::Resource::Properties::AWS::EMR::InstanceFleetConfig::SpotProvisioningSpecification', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has OnDemandSpecification => (isa => 'Cfn::Resource::Properties::AWS::EMR::InstanceFleetConfig::OnDemandProvisioningSpecification', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has SpotSpecification => (isa => 'Cfn::Resource::Properties::AWS::EMR::InstanceFleetConfig::SpotProvisioningSpecification', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
 }
 
 package Cfn::Resource::Properties::AWS::EMR::InstanceFleetConfig {
@@ -261,3 +284,30 @@ package Cfn::Resource::Properties::AWS::EMR::InstanceFleetConfig {
 }
 
 1;
+### main pod documentation begin ###
+
+=encoding UTF-8
+
+=head1 NAME
+
+Cfn::Resource::AWS::EMR::InstanceFleetConfig - Cfn resource for AWS::EMR::InstanceFleetConfig
+
+=head1 DESCRIPTION
+
+This module implements a Perl module that represents the CloudFormation object AWS::EMR::InstanceFleetConfig.
+
+See L<Cfn> for more information on how to use it.
+
+=head1 AUTHOR
+
+    Jose Luis Martinez
+    CAPSiDE
+    jlmartinez@capside.com
+
+=head1 COPYRIGHT and LICENSE
+
+Copyright (c) 2013 by CAPSiDE
+This code is distributed under the Apache 2 License. The full text of the 
+license can be found in the LICENSE file included with this module.
+
+=cut

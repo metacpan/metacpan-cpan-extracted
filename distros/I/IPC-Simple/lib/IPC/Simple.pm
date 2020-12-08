@@ -1,6 +1,6 @@
 package IPC::Simple;
 # ABSTRACT: simple, non-blocking IPC
-$IPC::Simple::VERSION = '0.07';
+$IPC::Simple::VERSION = '0.09';
 
 use strict;
 use warnings;
@@ -360,7 +360,7 @@ IPC::Simple - simple, non-blocking IPC
 
 =head1 VERSION
 
-version 0.07
+version 0.09
 
 =head1 SYNOPSIS
 

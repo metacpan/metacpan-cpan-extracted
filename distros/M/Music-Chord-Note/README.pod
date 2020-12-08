@@ -5,7 +5,7 @@ This is Perl module B<Music::Chord::Note>.
 
 =begin html
 
-<a href="http://travis-ci.org/bayashi/Music-Chord-Note"><img src="https://secure.travis-ci.org/bayashi/Music-Chord-Note.png"/></a> <a href="https://coveralls.io/r/bayashi/Music-Chord-Note"><img src="https://coveralls.io/repos/bayashi/Music-Chord-Note/badge.png?branch=master"/></a>
+<a href="https://github.com/bayashi/Music-Chord-Note/blob/main/LICENSE"><img src="https://img.shields.io/badge/LICENSE-Artistic%202.0-GREEN.png"></a> <a href="https://github.com/bayashi/Music-Chord-Note/actions"><img src="https://github.com/bayashi/Music-Chord-Note/workflows/main/badge.svg"/></a> <a href="https://coveralls.io/r/bayashi/Music-Chord-Note"><img src="https://coveralls.io/repos/bayashi/Music-Chord-Note/badge.png?branch=main"/></a>
 
 =end html
 

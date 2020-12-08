@@ -1,3 +1,11 @@
-0.001   2017-12-24 (PERLANCAR)
+0.002   2020-09-14  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - [doc] Rebuild with Pod::Weaver::Plugin::WordList 0.062 to rename
+          generated POD section Statistics to WordList Statistics.
+
+
+0.001   2017-12-24  Released-By: PERLANCAR
 
         - First release.

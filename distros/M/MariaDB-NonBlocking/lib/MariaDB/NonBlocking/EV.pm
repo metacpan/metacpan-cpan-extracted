@@ -22,13 +22,6 @@ sub new {
     return $self;
 }
 
-sub _mysql_watchers_to_ev_watchers {
-    my $wait_on = 0;
-    $wait_on |= EV::READ  if $_[0] & MYSQL_WAIT_READ;
-    $wait_on |= EV::WRITE if $_[0] & MYSQL_WAIT_WRITE;
-    return $wait_on;
-}
-
 sub _ev_event_to_mysql_event {
     return MYSQL_WAIT_TIMEOUT
         if $_[0] & EV::TIMER;
@@ -117,7 +110,9 @@ sub _set_io_watcher {
     # If we are using EV, reuse a watcher if we can.
     my $existing_watcher = $storage->{io} ||= pop @{ $WATCHER_POOL{io} //= [] };
 
-    my $ev_mask = _mysql_watchers_to_ev_watchers($wait_for);
+    # Always do both read and write, regardless of what the
+    # connector says; otherwise we might hang on SSL connections.
+    my $ev_mask = EV::READ | EV::WRITE;
 
     if ( !$existing_watcher ) {
         # No pre-existing watcher for us to use;

@@ -1,10 +1,12 @@
 #!/usr/bin/perl
 
-use strict;
+use v5.26;
 use warnings;
 
 use Device::Chip::HTU21D;
 use Device::Chip::Adapter;
+
+use Future::AsyncAwait;
 
 use Getopt::Long;
 
@@ -16,11 +18,11 @@ GetOptions(
 ) or exit 1;
 
 my $chip = Device::Chip::HTU21D->new;
-$chip->mount(
+await $chip->mount(
    Device::Chip::Adapter->new_from_description( $ADAPTER )
-)->get;
+);
 
-$chip->protocol->power(1)->get;
+await $chip->protocol->power(1);
 
 $SIG{INT} = $SIG{TERM} = sub { exit 1; };
 
@@ -29,15 +31,15 @@ END {
 }
 
 if( $PRINT_CONFIG ) {
-   my $config = $chip->read_config->get;
+   my $config = await $chip->read_config;
    printf "%20s: %s\n", $_, $config->{$_} for sort keys %$config;
 }
 
 while(1) {
-   my $temp = $chip->read_temperature->get;
+   my $temp = await $chip->read_temperature;
    printf "Temperature: %.2fC\n", $temp;
 
-   my $humid = $chip->read_humidity->get;
+   my $humid = await $chip->read_humidity;
    printf "Humidity:    %.1f%%\n", $humid;
 
    sleep $INTERVAL;

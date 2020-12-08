@@ -1,5 +1,9 @@
 Revision history for Device-Chip-HTU21D
 
+0.06    2020-12-06
+        [CHANGES]
+         * Use new toplevel 'await' syntax from Future::AsyncAwait 0.47
+
 0.05    2020-05-07
         [CHANGES]
          * Use Object::Pad for class implementation

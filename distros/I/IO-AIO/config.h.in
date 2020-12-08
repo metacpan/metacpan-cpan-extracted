@@ -1,5 +1,8 @@
 /* config.h.in.  Generated from configure.ac by autoheader.  */
 
+/* accept4(2) is available */
+#undef HAVE_ACCEPT4
+
 /* copy_file_range(2) is available */
 #undef HAVE_COPY_FILE_RANGE
 

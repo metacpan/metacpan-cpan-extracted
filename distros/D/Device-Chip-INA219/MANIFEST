@@ -2,13 +2,13 @@ Build.PL
 Changes
 examples/ina291-tickit-ui.pl
 lib/Device/Chip/INA219.pm
-LICENSE
-Makefile.PL
 MANIFEST			This list of files
-META.json
-META.yml
-README
 t/00use.t
 t/01config.t
 t/02read.t
 t/99pod.t
+Makefile.PL
+README
+LICENSE
+META.yml
+META.json

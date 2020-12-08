@@ -7,7 +7,7 @@
 #   Test script to check crypt_file() function (and decryption filter).
 #
 # COPYRIGHT
-#   Copyright (C) 2004-2006, 2009, 2014 Steve Hay.  All rights reserved.
+#   Copyright (C) 2004-2006, 2009, 2014, 2020 Steve Hay.  All rights reserved.
 #
 # LICENCE
 #   This script is free software; you can redistribute it and/or modify it under
@@ -23,6 +23,7 @@ use strict;
 use warnings;
 
 use Cwd qw(abs_path);
+use File::Path qw(mkpath rmtree);
 use File::Spec::Functions qw(canonpath catdir catfile updir);
 use FindBin qw($Bin);
 use Test::More;
@@ -70,15 +71,17 @@ BEGIN {
 #===============================================================================
 
 MAIN: {
-    my $script = 'foo.pl';
-    my $module = 'Foo.pm';
-    my $str    = 'Hello, world.';
-    my $prog   = qq[print "$str\\n";\n];
-    my $scrsrc = qq[use Carp;\nuse Foo;\nFoo::foo();\n];
-    my $modsrc = qq[package Foo;\nsub foo() { print "$str\\n" }\n1;\n];
-    my $head   = 'use Filter::Crypto::Decrypt;';
-    my $qrhead = qr/^\Q$head\E/o;
-    my $buf    = '';
+    my $script  = 'foo.pl';
+    my $modroot = 'Filter';
+    my $moddir  = catdir($modroot, 'Crypto');
+    my $module  = catfile($moddir, 'Foo.pm');
+    my $str     = 'Hello, world.';
+    my $prog    = qq[print "$str\\n";\n];
+    my $scrsrc  = qq[use Carp;\nuse Filter::Crypto::Foo;\nFilter::Crypto::Foo::foo();\n];
+    my $modsrc  = qq[package Filter::Crypto::Foo;\nsub foo() { print "$str\\n" }\n1;\n];
+    my $head    = 'use Filter::Crypto::Decrypt;';
+    my $qrhead  = qr/^\Q$head\E/o;
+    my $buf     = '';
 
     my $perl_exe = $^X =~ / /o ? qq["$^X"] : $^X;
     my $perl = qq[$perl_exe -Mblib];
@@ -768,6 +771,7 @@ MAIN: {
         print $fh $scrsrc;
         close $fh;
     
+        eval { mkpath($moddir) } or die "Can't create directory '$moddir': $@\n";
         open $fh, '>', $module or die "Can't create file '$module': $!\n";
         print $fh $modsrc;
         close $fh;
@@ -782,12 +786,13 @@ MAIN: {
     
         SKIP: {
             skip 'Decrypt component not built', 1 unless $have_decrypt;
-            chomp($line = qx{$perl $script});
+            chomp($line = qx{$perl -I. $script});
             is($line, $str, '... and encrypted module runs OK with Carp loaded');
         }
 
         unlink $script;
         unlink $module;
+        rmtree($modroot, 0, 1);
     }
 }
 

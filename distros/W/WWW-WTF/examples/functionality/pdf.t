@@ -16,8 +16,10 @@ $test->run_test(sub {
 
         my @pdf_uris = $http_resource->get_links({
             filter => {
-                href_regex => qr/.pdf$/,
-            }
+                attributes => {
+                    href => qr/.pdf$/,
+                },
+            },
         });
 
         if (scalar @pdf_uris) {
@@ -26,7 +28,7 @@ $test->run_test(sub {
 
                 foreach my $pdf_uri (@pdf_uris) {
 
-                    my $pdf_resource = $self->ua_lwp->get($self->uri_for("/$pdf_uri"));
+                    my $pdf_resource = $self->ua_lwp->get($pdf_uri->uri);
 
                     my @images = $pdf_resource->get_images;
 

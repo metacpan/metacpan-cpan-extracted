@@ -1,10 +1,18 @@
+0.56	- 2020-12-05, H.Merijn Brand
+    * Fix Changes (add missing 0.54)
+    * Bugtrackter => github issues
+    * f_dir should exist (CVE fix in DBI-1.644 / DBD::File-0.45)
+    * TODO tests better skipped if failing
+
 0.55	- 2020-07-27, H.Merijn Brand
-    * Free unref scalar test fixed in Text::CSV_XS 1.35
     * It's 2019
     * Provide cpanfile
     * Doc enhancements
     * It's 2020
     * Make csv_ & f_ aliasses more consistently available (issue #7)
+
+0.54	- 2018-10-29, H.Merijn Brand
+    * Free unref scalar test fixed in Text::CSV_XS 1.35
 
 0.53	- 2018-05-20, H.Merijn Brand
     * No folder scanning during automated tests

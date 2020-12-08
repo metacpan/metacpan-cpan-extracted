@@ -1,4 +1,4 @@
-# AWS::CodeCommit::Repository generated from spec 5.3.0
+# AWS::CodeCommit::Repository generated from spec 18.4.0
 use Moose::Util::TypeConstraints;
 
 coerce 'Cfn::Resource::Properties::AWS::CodeCommit::Repository',
@@ -29,11 +29,11 @@ coerce 'Cfn::Resource::Properties::AWS::CodeCommit::Repository::S3',
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::CodeCommit::Repository::S3Value->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::CodeCommit::Repository::S3->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::CodeCommit::Repository::S3Value {
+package Cfn::Resource::Properties::Object::AWS::CodeCommit::Repository::S3 {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -74,11 +74,11 @@ coerce 'Cfn::Resource::Properties::AWS::CodeCommit::Repository::RepositoryTrigge
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::CodeCommit::Repository::RepositoryTriggerValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::CodeCommit::Repository::RepositoryTrigger->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::CodeCommit::Repository::RepositoryTriggerValue {
+package Cfn::Resource::Properties::Object::AWS::CodeCommit::Repository::RepositoryTrigger {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -99,15 +99,16 @@ coerce 'Cfn::Resource::Properties::AWS::CodeCommit::Repository::Code',
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::CodeCommit::Repository::CodeValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::CodeCommit::Repository::Code->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::CodeCommit::Repository::CodeValue {
+package Cfn::Resource::Properties::Object::AWS::CodeCommit::Repository::Code {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
   
+  has BranchName => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
   has S3 => (isa => 'Cfn::Resource::Properties::AWS::CodeCommit::Repository::S3', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
 }
 
@@ -124,3 +125,30 @@ package Cfn::Resource::Properties::AWS::CodeCommit::Repository {
 }
 
 1;
+### main pod documentation begin ###
+
+=encoding UTF-8
+
+=head1 NAME
+
+Cfn::Resource::AWS::CodeCommit::Repository - Cfn resource for AWS::CodeCommit::Repository
+
+=head1 DESCRIPTION
+
+This module implements a Perl module that represents the CloudFormation object AWS::CodeCommit::Repository.
+
+See L<Cfn> for more information on how to use it.
+
+=head1 AUTHOR
+
+    Jose Luis Martinez
+    CAPSiDE
+    jlmartinez@capside.com
+
+=head1 COPYRIGHT and LICENSE
+
+Copyright (c) 2013 by CAPSiDE
+This code is distributed under the Apache 2 License. The full text of the 
+license can be found in the LICENSE file included with this module.
+
+=cut

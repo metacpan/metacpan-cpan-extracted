@@ -1,4 +1,4 @@
-# AWS::Config::OrganizationConformancePack generated from spec 11.1.0
+# AWS::Config::OrganizationConformancePack generated from spec 20.1.0
 use Moose::Util::TypeConstraints;
 
 coerce 'Cfn::Resource::Properties::AWS::Config::OrganizationConformancePack',
@@ -51,11 +51,11 @@ coerce 'Cfn::Resource::Properties::AWS::Config::OrganizationConformancePack::Con
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::Config::OrganizationConformancePack::ConformancePackInputParameterValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::Config::OrganizationConformancePack::ConformancePackInputParameter->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::Config::OrganizationConformancePack::ConformancePackInputParameterValue {
+package Cfn::Resource::Properties::Object::AWS::Config::OrganizationConformancePack::ConformancePackInputParameter {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -70,7 +70,7 @@ package Cfn::Resource::Properties::AWS::Config::OrganizationConformancePack {
   extends 'Cfn::Resource::Properties';
   
   has ConformancePackInputParameters => (isa => 'ArrayOfCfn::Resource::Properties::AWS::Config::OrganizationConformancePack::ConformancePackInputParameter', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
-  has DeliveryS3Bucket => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has DeliveryS3Bucket => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has DeliveryS3KeyPrefix => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has ExcludedAccounts => (isa => 'Cfn::Value::Array|Cfn::Value::Function|Cfn::DynamicValue', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has OrganizationConformancePackName => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
@@ -79,3 +79,30 @@ package Cfn::Resource::Properties::AWS::Config::OrganizationConformancePack {
 }
 
 1;
+### main pod documentation begin ###
+
+=encoding UTF-8
+
+=head1 NAME
+
+Cfn::Resource::AWS::Config::OrganizationConformancePack - Cfn resource for AWS::Config::OrganizationConformancePack
+
+=head1 DESCRIPTION
+
+This module implements a Perl module that represents the CloudFormation object AWS::Config::OrganizationConformancePack.
+
+See L<Cfn> for more information on how to use it.
+
+=head1 AUTHOR
+
+    Jose Luis Martinez
+    CAPSiDE
+    jlmartinez@capside.com
+
+=head1 COPYRIGHT and LICENSE
+
+Copyright (c) 2013 by CAPSiDE
+This code is distributed under the Apache 2 License. The full text of the 
+license can be found in the LICENSE file included with this module.
+
+=cut

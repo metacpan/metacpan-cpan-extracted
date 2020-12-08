@@ -1,63 +1,116 @@
-Revision history for Perl extension XML::Encoding.
+Revision history for Perl distribution XML-Encoding
 
-2.09 30 May 2014
-        - Uploaded source code to GitHub and included repository URLs in
-          metadata.
-        - Included META.json file in addition to META.yml.
-        - Set minimum required ExtUtils::MakeMaker version to 6.64 to ensure
-          that all parameters used are supported, to save jumping through hoops
-          to support earlier versions.  (This should not be a problem since
-          ExtUtils::MakeMaker 6.64 is easily installed into Perl 5.8.1 and
-          above, that being the whole point of the new choice of minimum
-          supported Perl version.)
-        - Set minimum required Perl version to 5.8.1.  This is in line with the
-          minimum requirement of the "Perl Toolchain".
-2.08 20 Sep 2010
-        - Changed test script to use Test::More, renamed it to test.t and moved
-          it into the t/ folder. (Fixes [cpan #61369].)
-        - Moved the perl module into the lib/ folder.
-2.07 29 Jan 2009
-        - Minor correction to POD from Daniel Leidert <daniel.leidert@wgdd.de>.
-2.06 20 Jan 2009
-        - Fixed make_encmap to avoid spurious output when there is an error with
-          the input file. (Fixes [cpan #41854].)
-2.05 11 Sep 2008
-        - Changed the shebang line in the two scripts to be less specific. Thanks
-          to Daniel Leidert <daniel.leidert@wgdd.de> for the suggestion.
-2.04 06 Sep 2008
-        - Incorporated a patch from Daniel Leidert <daniel.leidert@wgdd.de> which
-          updates the maps iso-8859-2.xml to iso-8859-9.xml and adds the maps
-          iso-8859-1.xml, iso-8859-10.xml, iso-8859-11.xml, iso-8859-13.xml to
-          iso-8859-16.xml and windows-1251.xml.
-        - Updated the map windows-1250.xml and added the maps windows-1252.xml to
-          windows-1258.xml using data from ftp://ftp.unicode.org/Public/MAPPINGS.
-2.03 08 Jul 2008
-        - Improved POD formatting of compile_encoding and make_encmap manual pages,
-          courtesy of a patch from Daniel Leidert <daniel.leidert@wgdd.de>.
-2.02 29 Jun 2008
-        - Added manual pages supplied by Daniel Leidert <daniel.leidert@wgdd.de>
-          for compile_encoding and make_encmap.
-2.01 24 Jul 2007
-        - Fixed crash at end of test script when using perl-5.6.x. (The crash
-          was actually due to a bug in perl that is fixed as of perl-5.8.0 at
-          least, so the test script is simply modified to not tickle that bug.)
-        - Clarified the copyright notices. Only the *changes* in version 2.x are
-          my copyright.
-2.00 18 Jul 2007
-        - Fixed bin/compile_encoding to run with perl-5.9.x by using restricted
-          hashes instead of pseudo-hashes (which have been removed from
-          perl-5.9.x)
-        - Fixed accidental variable interpolation in Encoding.pm
-        - Fixed case of $ExtUtils::MakeMaker::VERSION in Makefile.PL so that
-          ABSTRACT_FROM and AUTHOR get set when intended
-        - Added LICENSE to Makefile.PL
-1.01
-        - Added PREREQ_PM to Makefile.PL
-        - Added x-euc-jp-jisx0221 and x-euc-jp-unicode from
-          Yoshida Masato <yoshidam@inse.co.jp> to maps
-        - With the advice of MURATA Makoto <murata@apsdc.ksp.fujixerox.co.jp>,
-          removed the Shift_JIS encoding and replaced it with 4 variations
-          he provided. He also provided an explanatory message.
-1.00  Sun Dec 13 13:43:31 EST 1998
-        - original version; created by h2xs 1.18
+2.11 2020-12-08
 
+    - Fill in release dates in scripts.
+
+2.10 2020-12-07
+
+    - Added optional Changes testing (skipped unless AUTHOR_TESTING).
+
+    - Reformatted Changes file as per CPAN::Changes::Spec.
+
+    - Made Perl Critic, Pod and Pod Coverage tests skip unless AUTHOR_TESTING.
+
+    - Added optional POD coverage testing.
+
+    - Added optional POD testing.
+
+    - Added optional Perl::Critic testing.
+
+    - Made code Perl::Critic clean.
+
+    - Simplified Makefile.PL requirements.
+
+2.09 2014-05-30
+
+    - Uploaded source code to GitHub and included repository URLs in metadata.
+
+    - Included META.json file in addition to META.yml.
+
+    - Set minimum required ExtUtils::MakeMaker version to 6.64 to ensure that
+      all parameters used are supported, to save jumping through hoops to
+      support earlier versions.  (This should not be a problem since
+      ExtUtils::MakeMaker 6.64 is easily installed into Perl 5.8.1 and above,
+      that being the whole point of the new choice of minimum supported Perl
+      version.)
+
+    - Set minimum required Perl version to 5.8.1.  This is in line with the
+      minimum requirement of the "Perl Toolchain".
+
+2.08 2010-09-20
+
+    - Changed test script to use Test::More, renamed it to test.t and moved it
+      into the t/ folder.  [CPAN RT#61369]
+
+    - Moved the perl module into the lib/ folder.
+
+2.07 2009-01-29
+
+    - Minor correction to POD.  [Daniel Leidert <daniel.leidert@wgdd.de>]
+
+2.06 2009-01-20
+
+    - Fixed make_encmap to avoid spurious output when there is an error with
+      the input file.  [CPAN RT#41854]
+
+2.05 2008-09-11
+
+    - Changed the shebang line in the two scripts to be less specific.  [Daniel
+      Leidert <daniel.leidert@wgdd.de>]
+
+2.04 2008-09-06
+
+    - Updated the maps iso-8859-2.xml through iso-8859-9.xml and added the maps
+      iso-8859-1.xml, iso-8859-10.xml, iso-8859-11.xml, iso-8859-13.xml through
+      iso-8859-16.xml, and windows-1251.xml.  [Daniel Leidert
+      <daniel.leidert@wgdd.de>]
+
+    - Updated the map windows-1250.xml and added the maps windows-1252.xml
+      through windows-1258.xml using data from
+      ftp://ftp.unicode.org/Public/MAPPINGS.
+
+2.03 2008-07-08
+
+    - Improved POD formatting of compile_encoding and make_encmap manual pages.
+      [Daniel Leidert <daniel.leidert@wgdd.de>]
+
+2.02 2008-06-29
+
+    - Added manual pages for compile_encoding and make_encmap.  [Daniel Leidert
+      <daniel.leidert@wgdd.de>]
+
+2.01 2007-07-24
+
+    - Fixed crash at end of test script when using Perl 5.6.x.  (The crash was
+      actually due to a bug in perl that is fixed as of Perl 5.8.0 at least, so
+      the test script is simply modified to not tickle that bug.)
+
+    - Clarified the copyright notices.  Only the *changes* in version 2.x are my
+      copyright.
+
+2.00 2007-07-18
+
+    - Fixed bin/compile_encoding to run with Perl 5.9.x by using restricted
+      hashes instead of pseudo-hashes (which have been removed from Perl 5.9.x).
+
+    - Fixed accidental variable interpolation in Encoding.pm.
+
+    - Fixed case of $ExtUtils::MakeMaker::VERSION in Makefile.PL so that
+      ABSTRACT_FROM and AUTHOR get set when intended.
+
+    - Added LICENSE to Makefile.PL.
+
+1.01 1998-12-26
+
+    - Added PREREQ_PM to Makefile.PL.
+
+    - Added x-euc-jp-jisx0221 and x-euc-jp-unicode to maps.  [Yoshida Masato
+      <yoshidam@inse.co.jp>]
+
+    - Removed the Shift_JIS encoding and replaced it with four variations and an
+      explanatory message.  [MURATA Makoto <murata@apsdc.ksp.fujixerox.co.jp>]
+
+1.00 1998-12-13 13:43:31-05:00
+
+    - Original version; created by h2xs 1.18.

@@ -4,22 +4,23 @@ NAME
 
 SYNOPSIS
 
-     use Device::Chip::MAX7219;
+       use Device::Chip::MAX7219;
+       use Future::AsyncAwait;
     
-     my $chip = Device::Chip::MAX7219->new;
-     $chip->mount( Device::Chip::Adapter::...->new )->get;
+       my $chip = Device::Chip::MAX7219->new;
+       await $chip->mount( Device::Chip::Adapter::...->new );
     
-     $chip->power(1)->get;
+       await $chip->power(1);
     
-     $chip->intensity( 2 )->get;
-     $chip->limit( 8 )->get;
+       await $chip->intensity( 2 );
+       await $chip->limit( 8 );
     
-     $chip->displaytest( 1 )->get;
-     $chip->shutdown( 0 )->get;
+       await $chip->displaytest( 1 );
+       await $chip->shutdown( 0 );
     
-     sleep 3;
+       sleep 3;
     
-     $chip->displaytest( 0 )->get;
+       await $chip->displaytest( 0 );
 
 DESCRIPTION
 
@@ -35,9 +36,12 @@ DESCRIPTION
 
 METHODS
 
+    The following methods documented in an await expression return Future
+    instances.
+
  write_bcd
 
-       $chip->write_bcd( $digit, $val )->get
+       await $chip->write_bcd( $digit, $val );
 
     Writes the value at the given digit, setting it to BCD mode if not
     already so. $val should be a single digit number or string, or one of
@@ -49,7 +53,7 @@ METHODS
 
  write_raw
 
-       $chip->write_raw( $digit, $bits )->get
+       await $chip->write_raw( $digit, $bits );
 
     Writes the value at the given digit, setting the raw column lines to
     the 8-bit value given.
@@ -58,7 +62,7 @@ METHODS
 
  write_hex
 
-       $chip->write_hex( $digit, $val )->get
+       await $chip->write_hex( $digit, $val );
 
     Similar to write_bcd, but uses a segment decoder written in code rather
     than on the chip itself, to turn values into sets of segments to
@@ -67,7 +71,7 @@ METHODS
 
  set_decode
 
-       $chip->set_decode( $bits )->get
+       await $chip->set_decode( $bits );
 
     Directly sets the decode mode of all the digits at once. This is more
     efficient for initialising digits into BCD or raw mode, than individual
@@ -75,14 +79,14 @@ METHODS
 
  intensity
 
-       $chip->intensity( $value )->get
+       await $chip->intensity( $value );
 
     Sets the intensity register. $value must be between 0 and 15, with
     higher values giving a more intense output.
 
  limit
 
-       $chip->limit( $columns )->get
+       await $chip->limit( $columns );
 
     Sets the scan limit register. $value must be between 1 and 8, to set
     between 1 and 8 digits. This should only be used to adjust for the
@@ -93,7 +97,7 @@ METHODS
 
  shutdown
 
-       $chip->shutdown( $off )->get
+       await $chip->shutdown( $off );
 
     Sets the shutdown register, entirely blanking the display and turning
     off all output if set to a true value, or restoring the display to its
@@ -104,7 +108,7 @@ METHODS
 
  displaytest
 
-       $chip->displaytest( $on )->get
+       await $chip->displaytest( $on );
 
     Sets the display test register, overriding the output control and
     turning on every LED if set to a true value, or restoring normal

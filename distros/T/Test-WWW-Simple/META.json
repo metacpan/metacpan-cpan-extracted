@@ -4,13 +4,13 @@
       "Joe McMahon <mcmahon@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "unknown"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Test-WWW-Simple",
    "no_index" : {
@@ -33,9 +33,9 @@
       "runtime" : {
          "requires" : {
             "HTML::Tree" : "0",
-            "LWP::Protocol::https" : "0",
-            "Mojolicious::Lite" : "0",
+            "Mojolicious" : "0",
             "Regexp::Common" : "0",
+            "Test2::V0" : "0",
             "Test::Builder" : "0",
             "Test::LongString" : "0",
             "Test::Tester" : "0",
@@ -45,6 +45,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.39",
-   "x_serialization_backend" : "JSON::PP version 2.27400_02"
+   "version" : "0.40",
+   "x_serialization_backend" : "JSON::PP version 4.05"
 }

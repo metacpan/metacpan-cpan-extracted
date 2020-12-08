@@ -1,4 +1,4 @@
-# AWS::ManagedBlockchain::Member generated from spec 5.3.0
+# AWS::ManagedBlockchain::Member generated from spec 18.4.0
 use Moose::Util::TypeConstraints;
 
 coerce 'Cfn::Resource::Properties::AWS::ManagedBlockchain::Member',
@@ -14,7 +14,7 @@ package Cfn::Resource::AWS::ManagedBlockchain::Member {
     [ 'MemberId','NetworkId' ]
   }
   sub supported_regions {
-    [ 'us-east-1' ]
+    [ 'ap-northeast-1','ap-northeast-2','ap-southeast-1','eu-central-1','eu-west-1','eu-west-2','us-east-1','us-east-2','us-west-2' ]
   }
 }
 
@@ -29,11 +29,11 @@ coerce 'Cfn::Resource::Properties::AWS::ManagedBlockchain::Member::NetworkFabric
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::ManagedBlockchain::Member::NetworkFabricConfigurationValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::ManagedBlockchain::Member::NetworkFabricConfiguration->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::ManagedBlockchain::Member::NetworkFabricConfigurationValue {
+package Cfn::Resource::Properties::Object::AWS::ManagedBlockchain::Member::NetworkFabricConfiguration {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -50,11 +50,11 @@ coerce 'Cfn::Resource::Properties::AWS::ManagedBlockchain::Member::MemberFabricC
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::ManagedBlockchain::Member::MemberFabricConfigurationValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::ManagedBlockchain::Member::MemberFabricConfiguration->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::ManagedBlockchain::Member::MemberFabricConfigurationValue {
+package Cfn::Resource::Properties::Object::AWS::ManagedBlockchain::Member::MemberFabricConfiguration {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -72,11 +72,11 @@ coerce 'Cfn::Resource::Properties::AWS::ManagedBlockchain::Member::ApprovalThres
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::ManagedBlockchain::Member::ApprovalThresholdPolicyValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::ManagedBlockchain::Member::ApprovalThresholdPolicy->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::ManagedBlockchain::Member::ApprovalThresholdPolicyValue {
+package Cfn::Resource::Properties::Object::AWS::ManagedBlockchain::Member::ApprovalThresholdPolicy {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -95,11 +95,11 @@ coerce 'Cfn::Resource::Properties::AWS::ManagedBlockchain::Member::VotingPolicy'
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::ManagedBlockchain::Member::VotingPolicyValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::ManagedBlockchain::Member::VotingPolicy->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::ManagedBlockchain::Member::VotingPolicyValue {
+package Cfn::Resource::Properties::Object::AWS::ManagedBlockchain::Member::VotingPolicy {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -116,11 +116,11 @@ coerce 'Cfn::Resource::Properties::AWS::ManagedBlockchain::Member::NetworkFramew
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::ManagedBlockchain::Member::NetworkFrameworkConfigurationValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::ManagedBlockchain::Member::NetworkFrameworkConfiguration->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::ManagedBlockchain::Member::NetworkFrameworkConfigurationValue {
+package Cfn::Resource::Properties::Object::AWS::ManagedBlockchain::Member::NetworkFrameworkConfiguration {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -137,11 +137,11 @@ coerce 'Cfn::Resource::Properties::AWS::ManagedBlockchain::Member::MemberFramewo
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::ManagedBlockchain::Member::MemberFrameworkConfigurationValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::ManagedBlockchain::Member::MemberFrameworkConfiguration->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::ManagedBlockchain::Member::MemberFrameworkConfigurationValue {
+package Cfn::Resource::Properties::Object::AWS::ManagedBlockchain::Member::MemberFrameworkConfiguration {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -158,11 +158,11 @@ coerce 'Cfn::Resource::Properties::AWS::ManagedBlockchain::Member::NetworkConfig
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::ManagedBlockchain::Member::NetworkConfigurationValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::ManagedBlockchain::Member::NetworkConfiguration->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::ManagedBlockchain::Member::NetworkConfigurationValue {
+package Cfn::Resource::Properties::Object::AWS::ManagedBlockchain::Member::NetworkConfiguration {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -184,11 +184,11 @@ coerce 'Cfn::Resource::Properties::AWS::ManagedBlockchain::Member::MemberConfigu
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::ManagedBlockchain::Member::MemberConfigurationValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::ManagedBlockchain::Member::MemberConfiguration->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::ManagedBlockchain::Member::MemberConfigurationValue {
+package Cfn::Resource::Properties::Object::AWS::ManagedBlockchain::Member::MemberConfiguration {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -210,3 +210,30 @@ package Cfn::Resource::Properties::AWS::ManagedBlockchain::Member {
 }
 
 1;
+### main pod documentation begin ###
+
+=encoding UTF-8
+
+=head1 NAME
+
+Cfn::Resource::AWS::ManagedBlockchain::Member - Cfn resource for AWS::ManagedBlockchain::Member
+
+=head1 DESCRIPTION
+
+This module implements a Perl module that represents the CloudFormation object AWS::ManagedBlockchain::Member.
+
+See L<Cfn> for more information on how to use it.
+
+=head1 AUTHOR
+
+    Jose Luis Martinez
+    CAPSiDE
+    jlmartinez@capside.com
+
+=head1 COPYRIGHT and LICENSE
+
+Copyright (c) 2013 by CAPSiDE
+This code is distributed under the Apache 2 License. The full text of the 
+license can be found in the LICENSE file included with this module.
+
+=cut

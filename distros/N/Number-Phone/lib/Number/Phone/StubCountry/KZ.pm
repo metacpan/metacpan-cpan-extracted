@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20200904144533;
+our $VERSION = 1.20201204215956;
 
 my $formatters = [];
 
@@ -245,765 +245,765 @@ my $validators = {
                 'voip' => '751\\d{7}'
               };
 my %areanames = ();
-$areanames{en}->{7301} = "Republic\ of\ Buryatia";
-$areanames{en}->{7302} = "Chita";
-$areanames{en}->{733} = "Baikonur";
-$areanames{en}->{7341} = "Udmurtian\ Republic";
-$areanames{en}->{7342} = "Perm";
-$areanames{en}->{7343} = "Ekaterinburg";
-$areanames{en}->{7345} = "Tyumen";
-$areanames{en}->{7346} = "Surgut";
-$areanames{en}->{7347} = "Republic\ of\ Bashkortostan";
-$areanames{en}->{7349} = "Yamalo\-Nenets\ Autonomous\ District";
-$areanames{en}->{7351} = "Chelyabinsk";
-$areanames{en}->{7352} = "Kurgan";
-$areanames{en}->{7353} = "Orenburg";
-$areanames{en}->{736} = "Simferopol";
-$areanames{en}->{7381} = "Omsk";
-$areanames{en}->{7382} = "Tomsk";
-$areanames{en}->{7383} = "Novosibirsk";
-$areanames{en}->{7384} = "Kemerovo";
-$areanames{en}->{7385} = "Altai\ Territory";
-$areanames{en}->{7388} = "Republic\ of\ Altai";
-$areanames{en}->{7390} = "Republic\ of\ Khakassia";
-$areanames{en}->{7391} = "Krasnoyarsk\ Territory";
-$areanames{en}->{7394} = "Republic\ of\ Tuva";
-$areanames{en}->{7395} = "Irkutsk";
-$areanames{en}->{740} = "Kaliningrad";
-$areanames{en}->{7411} = "Republic\ of\ Sakha";
-$areanames{en}->{7413} = "Magadan";
-$areanames{en}->{7415} = "Kamchatka\ Region";
-$areanames{en}->{7416} = "Amur\ Region";
-$areanames{en}->{7421} = "Khabarovsk\ Territory";
-$areanames{en}->{7423} = "Primorie\ territory";
-$areanames{en}->{7424} = "Sakhalin\ Region";
-$areanames{en}->{7426} = "Jewish\ Autonomous\ Region";
-$areanames{en}->{7427} = "Chukotka\ Autonomous\ District";
-$areanames{en}->{7471} = "Kursk";
-$areanames{en}->{7472} = "Belgorod";
-$areanames{en}->{7473} = "Voronezh";
-$areanames{en}->{7474} = "Lipetsk";
-$areanames{en}->{7475} = "Tambov";
-$areanames{en}->{7481} = "Smolensk";
-$areanames{en}->{7482} = "Tver";
-$areanames{en}->{7483} = "Bryansk";
-$areanames{en}->{7484} = "Kaluga";
-$areanames{en}->{7485} = "Yaroslavl";
-$areanames{en}->{7486} = "Orel";
-$areanames{en}->{7487} = "Tula";
-$areanames{en}->{7491} = "Ryazan";
-$areanames{en}->{7492} = "Vladimir";
-$areanames{en}->{7494} = "Kostroma";
-$areanames{en}->{7495} = "Moscow";
-$areanames{en}->{7496} = "Moscow";
-$areanames{en}->{7498} = "Moscow";
-$areanames{en}->{7499} = "Moscow";
-$areanames{en}->{77102} = "Zhezkazgan";
-$areanames{en}->{771030} = "Atasu";
-$areanames{en}->{771031} = "Aksu\-Ayuly";
-$areanames{en}->{771032} = "Karazhal";
-$areanames{en}->{771033} = "Agadyr";
-$areanames{en}->{771034} = "Zhezdy";
-$areanames{en}->{771035} = "Ulytau";
-$areanames{en}->{771036} = "Balkhash";
-$areanames{en}->{771037} = "Aktogai";
-$areanames{en}->{771038} = "Shashubai";
-$areanames{en}->{771039} = "Priozersk";
-$areanames{en}->{771040} = "Zhairem\ \(GOK\)";
-$areanames{en}->{771041} = "Aktau\,\ Zhezkazgan";
-$areanames{en}->{771042} = "Zharyk";
-$areanames{en}->{771043} = "Zhairem";
-$areanames{en}->{77106} = "Satpaev";
-$areanames{en}->{77112} = "Uralsk";
-$areanames{en}->{771130} = "Peremetnoye";
-$areanames{en}->{771131} = "Darinskoye";
-$areanames{en}->{771132} = "Fyodorovka";
-$areanames{en}->{771133} = "Aksai";
-$areanames{en}->{771134} = "Zhympity";
-$areanames{en}->{771135} = "Zhanibek";
-$areanames{en}->{771136} = "Chapayev";
-$areanames{en}->{771137} = "Chingirlau";
-$areanames{en}->{771138} = "Zhalpaktal";
-$areanames{en}->{771139} = "Taskala";
-$areanames{en}->{771140} = "Saikhin";
-$areanames{en}->{771141} = "Zhangala";
-$areanames{en}->{771142} = "Taipak";
-$areanames{en}->{771143} = "Akzhaik";
-$areanames{en}->{771144} = "Kaztalovka";
-$areanames{en}->{771145} = "Karatobe\ District";
-$areanames{en}->{771146} = "Akzhaiksky\ District";
-$areanames{en}->{771147} = "Akzhaiksky\ District";
-$areanames{en}->{771149} = "Zelenovsky\ District";
-$areanames{en}->{77122} = "Atyrau";
-$areanames{en}->{771230} = "Atyrau\ Region";
-$areanames{en}->{7712302} = "Tengizshevroil";
-$areanames{en}->{7712303} = "Tengizs";
-$areanames{en}->{771231} = "Akkystau";
-$areanames{en}->{771232} = "Atyrau\ Region";
-$areanames{en}->{771233} = "Ganyushkino";
-$areanames{en}->{771234} = "Indernborski";
-$areanames{en}->{771235} = "Dossor";
-$areanames{en}->{771236} = "Makhambet";
-$areanames{en}->{771237} = "Kulsary";
-$areanames{en}->{771238} = "Miyaly";
-$areanames{en}->{771239} = "Makat";
-$areanames{en}->{77125} = "Atyrau\ Region";
-$areanames{en}->{77132} = "Aktobe\/Kargalinskoye";
-$areanames{en}->{771330} = "Khromtau\ District";
-$areanames{en}->{771331} = "Martuk";
-$areanames{en}->{771332} = "Uil";
-$areanames{en}->{771333} = "Kandyagash";
-$areanames{en}->{771334} = "Emba";
-$areanames{en}->{771335} = "Shalkar";
-$areanames{en}->{771336} = "Khromtau";
-$areanames{en}->{771337} = "Alga";
-$areanames{en}->{771339} = "Komsomolskoye";
-$areanames{en}->{771340} = "Khobdinsky\ District";
-$areanames{en}->{771341} = "Khobda";
-$areanames{en}->{771342} = "Badamsha";
-$areanames{en}->{771343} = "Irgiz";
-$areanames{en}->{771345} = "Karauylkeldy";
-$areanames{en}->{771346} = "Shubarkuduk";
-$areanames{en}->{771347} = "Aitekebisky\ District";
-$areanames{en}->{771348} = "Shalkarsky\ District";
-$areanames{en}->{771349} = "Shalkarsky\ District";
-$areanames{en}->{77135} = "Aktobe\ Region";
-$areanames{en}->{77142} = "Kostanai";
-$areanames{en}->{771430} = "Arkalyk";
-$areanames{en}->{771431} = "Rudny";
-$areanames{en}->{771433} = "Lisakovsk";
-$areanames{en}->{771434} = "Denisovka";
-$areanames{en}->{771435} = "Zhitikara";
-$areanames{en}->{771436} = "Taranovskoye";
-$areanames{en}->{771437} = "Kamysty";
-$areanames{en}->{771438} = "Amangeldy";
-$areanames{en}->{771439} = "Torgai";
-$areanames{en}->{771440} = "Amangeldy";
-$areanames{en}->{771441} = "Karabalyk";
-$areanames{en}->{771442} = "Fyodorovka";
-$areanames{en}->{771443} = "Borovskoi";
-$areanames{en}->{771444} = "Uzunkol";
-$areanames{en}->{771445} = "Ubaganskoye";
-$areanames{en}->{771446} = "Uzunkolsky\ District";
-$areanames{en}->{771447} = "Karabalyksky\ District";
-$areanames{en}->{771448} = "Oktyabrskoye";
-$areanames{en}->{771449} = "Taranovskoye";
-$areanames{en}->{771451} = "Sarykol";
-$areanames{en}->{771452} = "Karasu";
-$areanames{en}->{771453} = "Auliekol";
-$areanames{en}->{771454} = "Karamendy";
-$areanames{en}->{771455} = "Zatobolsk";
-$areanames{en}->{771456} = "Kachar";
-$areanames{en}->{771457} = "Dzhangildinsky\ District";
-$areanames{en}->{771458} = "Kostanai\ Region";
-$areanames{en}->{77145834} = "Krasnogorsk";
-$areanames{en}->{771459} = "Kostanai\ Region";
-$areanames{en}->{77152} = "Petropavlovsk";
-$areanames{en}->{771531} = "Bulayevo";
-$areanames{en}->{771532} = "Smirnovo";
-$areanames{en}->{771533} = "Saumalkol";
-$areanames{en}->{771534} = "Sergeyevka";
-$areanames{en}->{771535} = "Novoishimski";
-$areanames{en}->{771536} = "Taiynsha";
-$areanames{en}->{771537} = "Timiryazevo";
-$areanames{en}->{771538} = "Beskol";
-$areanames{en}->{771539} = "Beskol";
-$areanames{en}->{771540} = "Kishkenekol";
-$areanames{en}->{771541} = "Mamlutka";
-$areanames{en}->{771542} = "Kishkenekol";
-$areanames{en}->{771543} = "Yavlenka";
-$areanames{en}->{771544} = "Presnovka";
-$areanames{en}->{771545} = "Zhambylsky\ District";
-$areanames{en}->{771546} = "Talshik";
-$areanames{en}->{771547} = "Zhambylsky\ District";
-$areanames{en}->{77162} = "Kokshetau\/Krasni\ Yar";
-$areanames{en}->{771630} = "Burabay";
-$areanames{en}->{771631} = "Shortandy";
-$areanames{en}->{771632} = "Zerenda";
-$areanames{en}->{771633} = "Ereimentau";
-$areanames{en}->{771635} = "Zhaksy";
-$areanames{en}->{771636} = "Shuchinsk";
-$areanames{en}->{771637} = "Korgalzhyn";
-$areanames{en}->{771638} = "Akkol";
-$areanames{en}->{771639} = "Stepnyak";
-$areanames{en}->{771640} = "Balkashino";
-$areanames{en}->{771641} = "Astrakhanka";
-$areanames{en}->{771642} = "Egendykol";
-$areanames{en}->{771643} = "Atbasar";
-$areanames{en}->{771644} = "Arshaly";
-$areanames{en}->{771645} = "Stepnogorsk";
-$areanames{en}->{771646} = "Makinsk";
-$areanames{en}->{771647} = "Esil";
-$areanames{en}->{771648} = "Derzhavinsk";
-$areanames{en}->{771649} = "Zhaksynsky\ District";
-$areanames{en}->{771651} = "Kabanbai\ Batyr";
-$areanames{en}->{7717} = "Astana";
-$areanames{en}->{77182} = "Pavlodar";
-$areanames{en}->{771831} = "Zhelezinka";
-$areanames{en}->{771832} = "Irtyshsk";
-$areanames{en}->{771833} = "Terenkol";
-$areanames{en}->{771834} = "Uspenka";
-$areanames{en}->{771836} = "Sharbakty";
-$areanames{en}->{771837} = "Aksu";
-$areanames{en}->{771838} = "Koktobe";
-$areanames{en}->{771839} = "Akku";
-$areanames{en}->{771840} = "Bayanaul";
-$areanames{en}->{771841} = "Aktogai";
-$areanames{en}->{771842} = "Aktogaisky\ District";
-$areanames{en}->{771843} = "Maisky\ District";
-$areanames{en}->{771844} = "Irtyshsky\ District";
-$areanames{en}->{771845} = "Pavlodar\ Area";
-$areanames{en}->{77187} = "Ekibastuz";
-$areanames{en}->{77212} = "Karaganda";
-$areanames{en}->{77213} = "Aktau\/Temirtau";
-$areanames{en}->{772131} = "Abai";
-$areanames{en}->{772132} = "Nurinsky\ District";
-$areanames{en}->{772137} = "Saran";
-$areanames{en}->{772138} = "Gabidena\ Mustafina";
-$areanames{en}->{772144} = "Kiyevka";
-$areanames{en}->{772146} = "Karkaralinsk";
-$areanames{en}->{772147} = "Egindybulak";
-$areanames{en}->{772148} = "Molodezhnoye";
-$areanames{en}->{772149} = "Osakarovka";
-$areanames{en}->{772153} = "Topar";
-$areanames{en}->{772154} = "Botakara";
-$areanames{en}->{772156} = "Shakhtinsk";
-$areanames{en}->{772159} = "Karaganda\ Region";
-$areanames{en}->{77222} = "Semey";
-$areanames{en}->{772230} = "Urdzhar";
-$areanames{en}->{772236} = "Beskaragai";
-$areanames{en}->{772237} = "Ayagoz";
-$areanames{en}->{772239} = "Makanchi";
-$areanames{en}->{77224} = "Barshatas";
-$areanames{en}->{772251} = "Kurchatov";
-$areanames{en}->{772252} = "Karaul";
-$areanames{en}->{772256} = "Kainar";
-$areanames{en}->{772257} = "Shulbinsk";
-$areanames{en}->{77232} = "Ust\-Kamenogorsk";
-$areanames{en}->{772330} = "Zyryanovsky\ District";
-$areanames{en}->{772331} = "Glubokoye";
-$areanames{en}->{772332} = "Shemonaikha";
-$areanames{en}->{772333} = "Samarskoye";
-$areanames{en}->{772334} = "Tavricheskoye";
-$areanames{en}->{772335} = "Zyryanovsk";
-$areanames{en}->{772336} = "Ridder";
-$areanames{en}->{772337} = "Serebryansk";
-$areanames{en}->{772338} = "Bozanbai\/Molodezhnyi";
-$areanames{en}->{772339} = "Kurchum";
-$areanames{en}->{772340} = "Zaisan";
-$areanames{en}->{772341} = "Ulken\ Naryn";
-$areanames{en}->{772342} = "Katon\-Karagai";
-$areanames{en}->{772343} = "Terekty";
-$areanames{en}->{772344} = "Akzhar";
-$areanames{en}->{772345} = "Shar";
-$areanames{en}->{772346} = "Aksuat";
-$areanames{en}->{772347} = "Kalbatau";
-$areanames{en}->{772348} = "Kokpekty";
-$areanames{en}->{772351} = "Borodulikha";
-$areanames{en}->{772353} = "Novaya\ Shulba";
-$areanames{en}->{77242} = "Kyzylorda";
-$areanames{en}->{772431} = "Zhalagash";
-$areanames{en}->{772432} = "Shiyeli";
-$areanames{en}->{772433} = "Aralsk";
-$areanames{en}->{772435} = "Zhanakorgan";
-$areanames{en}->{772436} = "Terenozek";
-$areanames{en}->{772437} = "Zhosaly";
-$areanames{en}->{772438} = "Aiteke\ bi";
-$areanames{en}->{772439} = "Aralsky\ District";
-$areanames{en}->{77245} = "Kyzylorda\ Region";
-$areanames{en}->{77252} = "Shymkent";
-$areanames{en}->{772530} = "Temirlanovka";
-$areanames{en}->{772531} = "Aksukent";
-$areanames{en}->{772532} = "Abai";
-$areanames{en}->{772533} = "Turkestan";
-$areanames{en}->{772534} = "Zhetysai";
-$areanames{en}->{772535} = "Shardara";
-$areanames{en}->{772536} = "Kentau";
-$areanames{en}->{772537} = "Saryagash";
-$areanames{en}->{772538} = "Turara\ Ryskulova";
-$areanames{en}->{772539} = "Kazygurt";
-$areanames{en}->{772540} = "Arys";
-$areanames{en}->{772541} = "Myrzakent";
-$areanames{en}->{772542} = "Asykata";
-$areanames{en}->{772544} = "Shaulder";
-$areanames{en}->{772546} = "Sholakkorgan";
-$areanames{en}->{772547} = "Lenger";
-$areanames{en}->{772548} = "Shayan";
-$areanames{en}->{77262} = "Taraz";
-$areanames{en}->{772631} = "Kulan";
-$areanames{en}->{772632} = "Merke";
-$areanames{en}->{772633} = "Asa";
-$areanames{en}->{772634} = "Zhanatas";
-$areanames{en}->{772635} = "Bauyrzhan\ Mamyshuly";
-$areanames{en}->{772636} = "Kordai";
-$areanames{en}->{772637} = "Sarykemer";
-$areanames{en}->{772638} = "Tole\ bi";
-$areanames{en}->{772639} = "Saudakent";
-$areanames{en}->{772640} = "Moiynkumsky\ District";
-$areanames{en}->{772641} = "Akkol";
-$areanames{en}->{772642} = "Moiynkum";
-$areanames{en}->{772643} = "Shu";
-$areanames{en}->{772644} = "Karatau";
-$areanames{en}->{77272} = "Almaty";
-$areanames{en}->{772725} = "Otegen\ Batyra";
-$areanames{en}->{77272956} = "Talgar";
-$areanames{en}->{77272983} = "Kaskelen";
-$areanames{en}->{77273} = "Almaty";
-$areanames{en}->{77274} = "Karassaisky\ District";
-$areanames{en}->{772752} = "Otegen\ Batyra";
-$areanames{en}->{772757} = "Akshi";
-$areanames{en}->{772759} = "Almaty\ Region";
-$areanames{en}->{772770} = "Uzynagash";
-$areanames{en}->{772771} = "Kaskelen";
-$areanames{en}->{772772} = "Kapchagai";
-$areanames{en}->{772773} = "Bakanas";
-$areanames{en}->{772774} = "Talgar";
-$areanames{en}->{772775} = "Esik";
-$areanames{en}->{772776} = "Shelek";
-$areanames{en}->{772777} = "Kegen";
-$areanames{en}->{772778} = "Chundzha";
-$areanames{en}->{772779} = "Narynkol";
-$areanames{en}->{77279} = "Almaty";
-$areanames{en}->{77282} = "Taldykorgan";
-$areanames{en}->{772830} = "Alakolsky\ District";
-$areanames{en}->{772831} = "Zharkent";
-$areanames{en}->{772832} = "Zhansugurov";
-$areanames{en}->{772833} = "Usharal";
-$areanames{en}->{772834} = "Ushtobe";
-$areanames{en}->{772835} = "Tekeli";
-$areanames{en}->{772836} = "Karabulak";
-$areanames{en}->{772837} = "Kabanbai";
-$areanames{en}->{772838} = "Balpyk\ bi";
-$areanames{en}->{772839} = "Sarkand";
-$areanames{en}->{772840} = "Saryozek";
-$areanames{en}->{772841} = "Kapal";
-$areanames{en}->{772842} = "Kogaly";
-$areanames{en}->{772843} = "Lepsy";
-$areanames{en}->{77292} = "Aktau";
-$areanames{en}->{772931} = "Shetpe";
-$areanames{en}->{772932} = "Beineu";
-$areanames{en}->{772934} = "Zhanaozen";
-$areanames{en}->{772935} = "Zhetybai";
-$areanames{en}->{772937} = "Kuryk";
-$areanames{en}->{772938} = "Fort\ Shevchenko";
-$areanames{en}->{7811} = "Pskov";
-$areanames{en}->{7812} = "St\ Petersburg";
-$areanames{en}->{7813} = "Leningrad\ region";
-$areanames{en}->{7814} = "Republic\ of\ Karelia";
-$areanames{en}->{7815} = "Murmansk";
-$areanames{en}->{7816} = "Veliky\ Novgorod";
-$areanames{en}->{7817} = "Vologda";
-$areanames{en}->{7818} = "Arkhangelsk";
-$areanames{en}->{7820} = "Cherepovets";
-$areanames{en}->{7821} = "Komi\ Republic";
-$areanames{en}->{7831} = "Nizhni\ Novgorod";
-$areanames{en}->{7833} = "Kirov";
-$areanames{en}->{7834} = "Republic\ of\ Mordovia";
-$areanames{en}->{7835} = "Chuvashi\ Republic";
-$areanames{en}->{7836} = "Republic\ of\ Marij\ El";
-$areanames{en}->{7841} = "Penza";
-$areanames{en}->{7842} = "Ulyanovsk";
-$areanames{en}->{7843} = "Republic\ of\ Tatarstan";
-$areanames{en}->{7844} = "Volgograd";
-$areanames{en}->{7845} = "Saratov";
-$areanames{en}->{7846} = "Samara";
-$areanames{en}->{7847} = "Republic\ of\ Kalmykia";
-$areanames{en}->{7848} = "Tolyatti";
-$areanames{en}->{7851} = "Astrakhan";
-$areanames{en}->{7855} = "Naberezhnye\ Chelny";
-$areanames{en}->{7861} = "Krasnodar\ Territory";
-$areanames{en}->{7862} = "Sochi";
-$areanames{en}->{7863} = "Rostov";
-$areanames{en}->{7865} = "Stavropol\ territory";
-$areanames{en}->{7866} = "Kabardino\-Balkarian\ Republic";
-$areanames{en}->{7867} = "Republic\ of\ North\ Ossetia";
-$areanames{en}->{7869} = "Sevastopol";
-$areanames{en}->{7871} = "Chechen\ Republic";
-$areanames{en}->{7872} = "Republic\ of\ Daghestan";
-$areanames{en}->{7873} = "Ingushi\ Republic";
-$areanames{en}->{7877} = "Republic\ of\ Adygeya";
-$areanames{en}->{7878} = "Karachayevo\-Cherkessian\ Republic";
-$areanames{en}->{7879} = "Mineranye\ Vody";
-$areanames{ru}->{7301} = "Республика\ Бурятия";
-$areanames{ru}->{7302} = "Забайкальский\ край";
-$areanames{ru}->{733} = "Байконыр";
-$areanames{ru}->{7341} = "Республика\ Удмуртская";
-$areanames{ru}->{7342} = "Пермский\ край";
-$areanames{ru}->{7343} = "Свердловская\ обл";
-$areanames{ru}->{7345} = "Тюменская\ обл\.";
-$areanames{ru}->{7346} = "Ханты\ \-\ Мансийский\ \-\ Югра\ АО";
-$areanames{ru}->{7347} = "Республика\ Башкортостан";
-$areanames{ru}->{7349} = "Ямало\-Ненецкий\ АО";
-$areanames{ru}->{7351} = "Челябинская\ обл\.";
-$areanames{ru}->{7352} = "Курганская\ обл\.";
-$areanames{ru}->{7353} = "Оренбургская\ обл\.";
-$areanames{ru}->{736} = "Республика\ Крым";
-$areanames{ru}->{7381} = "Омская\ обл\.";
-$areanames{ru}->{7382} = "Томская\ обл\.";
-$areanames{ru}->{7383} = "Новосибирская\ обл\.";
-$areanames{ru}->{7384} = "Кемеровская\ обл\.";
-$areanames{ru}->{7385} = "Алтайский\ край";
-$areanames{ru}->{7388} = "Республика\ Алтай";
-$areanames{ru}->{7390} = "Республика\ Хакасия";
-$areanames{ru}->{7391} = "Красноярский\ край";
-$areanames{ru}->{7394} = "Республика\ Тыва";
-$areanames{ru}->{7395} = "Иркутская\ обл\.";
-$areanames{ru}->{740} = "Калининградская\ обл\.";
-$areanames{ru}->{7411} = "Республика\ Саха\ \/Якутия\/";
-$areanames{ru}->{7413} = "Магаданская\ обл\.";
-$areanames{ru}->{7415} = "Камчатский\ край";
-$areanames{ru}->{7416} = "Амурская\ обл\.";
-$areanames{ru}->{7421} = "Хабаровский\ край";
-$areanames{ru}->{7423} = "Приморский\ край";
-$areanames{ru}->{7424} = "Сахалинская\ обл\.";
-$areanames{ru}->{7426} = "Еврейская\ автономная\ обл\.";
-$areanames{ru}->{7427} = "Чукотский\ АО";
-$areanames{ru}->{7471} = "Курская\ обл\.";
-$areanames{ru}->{7472} = "Белгородская\ обл\.";
-$areanames{ru}->{7473} = "Воронежская\ обл\.";
-$areanames{ru}->{7474} = "Липецкая\ обл\.";
-$areanames{ru}->{7475} = "Тамбовская\ обл\.";
-$areanames{ru}->{7481} = "Смоленская\ обл\.";
-$areanames{ru}->{7482} = "Тверская\ обл\.";
-$areanames{ru}->{7483} = "Брянская\ обл\.";
-$areanames{ru}->{7484} = "Калужская\ обл\.";
-$areanames{ru}->{7485} = "Ярославская\ обл\.";
-$areanames{ru}->{7486} = "Орловская\ обл\.";
-$areanames{ru}->{7487} = "Тульская\ обл\.";
-$areanames{ru}->{7491} = "Рязанская\ обл\.";
-$areanames{ru}->{7492} = "Владимирская\ обл\.";
-$areanames{ru}->{7493} = "Ивановская\ обл\.";
-$areanames{ru}->{7494} = "Костромская\ обл\.";
-$areanames{ru}->{7495} = "Московская\ обл\.";
-$areanames{ru}->{7496} = "г\.\ Москва";
-$areanames{ru}->{7498} = "Московская\ обл\.";
-$areanames{ru}->{7499} = "г\.\ Москва";
-$areanames{ru}->{77102} = "Жезказган";
-$areanames{ru}->{771030} = "Жана\-Аркинский\ р\-н";
-$areanames{ru}->{771031} = "Шетский\ р\-н";
-$areanames{ru}->{771032} = "Каражал";
-$areanames{ru}->{771033} = "Шетский\ р\-н";
-$areanames{ru}->{771034} = "Улытауский\ р\-н";
-$areanames{ru}->{771035} = "Улытауский\ р\-н";
-$areanames{ru}->{771036} = "Балхаш";
-$areanames{ru}->{771037} = "Актогайский\ р\-н";
-$areanames{ru}->{771038} = "Сыры\-Шаган";
-$areanames{ru}->{771039} = "Приозерск";
-$areanames{ru}->{771040} = "Жайрем\ \(ГОК\)";
-$areanames{ru}->{771041} = "Актау\,\ Жезказган";
-$areanames{ru}->{771042} = "Акой";
-$areanames{ru}->{771043} = "Жайрем\ \(поселок\)";
-$areanames{ru}->{77106} = "Сатпаев";
-$areanames{ru}->{77112} = "Уральск";
-$areanames{ru}->{771130} = "Зеленовский\ р\-н";
-$areanames{ru}->{771131} = "Зеленовский\ р\-н";
-$areanames{ru}->{771132} = "Теректинский\ р\-н";
-$areanames{ru}->{771133} = "Бурлинский\ р\-н";
-$areanames{ru}->{771134} = "Сырымский\ р\-н";
-$areanames{ru}->{771135} = "Жанибекский\ р\-н";
-$areanames{ru}->{771136} = "Акжаикский\ р\-н";
-$areanames{ru}->{771137} = "Чингирлауский\ р\-н";
-$areanames{ru}->{771138} = "Казталовский\ р\-н";
-$areanames{ru}->{771139} = "Таскалинский\ р\-н";
-$areanames{ru}->{771140} = "Бокейординский\ р\-н";
-$areanames{ru}->{771141} = "Жангалинский\ р\-н";
-$areanames{ru}->{771142} = "Акжаикский\ р\-н";
-$areanames{ru}->{771143} = "Теректинский\ р\-н";
-$areanames{ru}->{771144} = "Казталовский\ р\-н";
-$areanames{ru}->{771145} = "Каратобинский\ р\-н";
-$areanames{ru}->{771146} = "Акжаикский\ р\-н";
-$areanames{ru}->{771147} = "Акжаикский\ р\-н";
-$areanames{ru}->{771149} = "Акжаикский\ р\-н";
-$areanames{ru}->{77122} = "Атырау";
-$areanames{ru}->{771230} = "Атырауская\ область";
-$areanames{ru}->{7712302} = "Тенгизшевройл";
-$areanames{ru}->{7712303} = "Тензиз";
-$areanames{ru}->{771231} = "Исатайский\ р\-н";
-$areanames{ru}->{771232} = "Атырауская\ область";
-$areanames{ru}->{771233} = "Курмангазинский\ р\-н";
-$areanames{ru}->{771234} = "Индерский\ р\-н";
-$areanames{ru}->{771235} = "Макатский\ р\-н";
-$areanames{ru}->{771236} = "Махамбетский\ р\-н";
-$areanames{ru}->{771237} = "Жылыойский\ р\-н";
-$areanames{ru}->{771238} = "Кзылкогинский\ р\-н";
-$areanames{ru}->{771239} = "Макатский\ р\-н";
-$areanames{ru}->{77125} = "Атырауская\ область";
-$areanames{ru}->{77132} = "Актобе\/Актюбинск";
-$areanames{ru}->{771330} = "Хромтауский\ р\-н";
-$areanames{ru}->{771331} = "Мартукский\ р\-н";
-$areanames{ru}->{771332} = "Уилский\ р\-н";
-$areanames{ru}->{771333} = "Мугалжарский\ р\-н";
-$areanames{ru}->{771334} = "Мугалжарский\ р\-н";
-$areanames{ru}->{771335} = "Шалкарский\ р\-н";
-$areanames{ru}->{771336} = "Хромтауский\ р\-н";
-$areanames{ru}->{771337} = "Алгинский\ р\-н";
-$areanames{ru}->{771339} = "Айтекебийский\ р\-н";
-$areanames{ru}->{771340} = "Хобдинский\ р\-н";
-$areanames{ru}->{771341} = "Хобдинский\ р\-н";
-$areanames{ru}->{771342} = "Каргалинский\ р\-н";
-$areanames{ru}->{771343} = "Иргизский\ р\-н";
-$areanames{ru}->{771345} = "Байганинский\ р\-н";
-$areanames{ru}->{771346} = "Темирский\ р\-н";
-$areanames{ru}->{771347} = "Айтекебийский\ р\-н";
-$areanames{ru}->{771348} = "Шалкарский\ р\-н";
-$areanames{ru}->{771349} = "Шалкарский\ р\-н";
-$areanames{ru}->{77135} = "Актюбинская\ область";
-$areanames{ru}->{77142} = "Костанай";
-$areanames{ru}->{771430} = "Аркалык";
-$areanames{ru}->{771431} = "Рудный";
-$areanames{ru}->{771433} = "Лисаковск";
-$areanames{ru}->{771434} = "Денисовский\ р\-н";
-$areanames{ru}->{771435} = "Житикаринский\ р\-н";
-$areanames{ru}->{771436} = "Тарановский\ р\-н";
-$areanames{ru}->{771437} = "Камыстинский\ р\-н";
-$areanames{ru}->{771438} = "Амангельдинский\ р\-н";
-$areanames{ru}->{771439} = "Джангильдинский\ р\-н";
-$areanames{ru}->{771440} = "Амангельдинский\ р\-н";
-$areanames{ru}->{771441} = "Карабалыкский\ р\-н";
-$areanames{ru}->{771442} = "Федоровский\ р\-н";
-$areanames{ru}->{771443} = "Мендыкаринский\ р\-н";
-$areanames{ru}->{771444} = "Узункольский\ р\-н";
-$areanames{ru}->{771445} = "Алтынсаринский\ р\-н";
-$areanames{ru}->{771446} = "Узункольский\ р\-н";
-$areanames{ru}->{771447} = "Карабалыкский\ р\-н";
-$areanames{ru}->{771448} = "Карасуский\ р\-н";
-$areanames{ru}->{771449} = "Тарановский\ р\-н";
-$areanames{ru}->{771451} = "Сарыкольский\ р\-н";
-$areanames{ru}->{771452} = "Карасуский\ р\-н";
-$areanames{ru}->{771453} = "Аулиекольский\ р\-н";
-$areanames{ru}->{771454} = "Наурзумский\ р\-н";
-$areanames{ru}->{771455} = "Костанайский\ р\-н";
-$areanames{ru}->{771456} = "Качар";
-$areanames{ru}->{771457} = "Джангильдинский\ р\-н";
-$areanames{ru}->{771458} = "Костанайская\ область";
-$areanames{ru}->{77145834} = "Красногорск";
-$areanames{ru}->{771459} = "Костанайская\ область";
-$areanames{ru}->{77152} = "Петропавловск";
-$areanames{ru}->{771531} = "Магжана\ Жумабаева\ р\-н";
-$areanames{ru}->{771532} = "Аккайынский\ р\-н";
-$areanames{ru}->{771533} = "Айыртауский\ р\-н";
-$areanames{ru}->{771534} = "Шал\ Акына\ р\-н";
-$areanames{ru}->{771535} = "Габита\ Мусрепова\ р\-н";
-$areanames{ru}->{771536} = "Тайыншинский\ р\-н";
-$areanames{ru}->{771537} = "Тимирязевский\ р\-н";
-$areanames{ru}->{771538} = "Кызылжарский\ р\-н";
-$areanames{ru}->{771539} = "Кызылжарский\ р\-н";
-$areanames{ru}->{771540} = "Уалихановский\ р\-н";
-$areanames{ru}->{771541} = "Мамлютский\ р\-н";
-$areanames{ru}->{771542} = "Уалихановский\ р\-н";
-$areanames{ru}->{771543} = "Есильский\ р\-н";
-$areanames{ru}->{771544} = "Жамбылский\ р\-н";
-$areanames{ru}->{771545} = "Жамбылский\ р\-н";
-$areanames{ru}->{771546} = "Акжарский\ р\-н";
-$areanames{ru}->{771547} = "Жамбылский\ р\-н";
-$areanames{ru}->{77162} = "Кокшетау";
-$areanames{ru}->{771630} = "Боровое";
-$areanames{ru}->{771631} = "Шортандинский\ р\-н";
-$areanames{ru}->{771632} = "Зерендинский\ р\-н";
-$areanames{ru}->{771633} = "Ерейментауский\ р\-н";
-$areanames{ru}->{771635} = "Жаксынский\ р\-н";
-$areanames{ru}->{771636} = "Щучинский\ р\-н";
-$areanames{ru}->{771637} = "Коргалжынский\ р\-н";
-$areanames{ru}->{771638} = "Аккольский\ р\-н";
-$areanames{ru}->{771639} = "Енбекшилдерский\ р\-н";
-$areanames{ru}->{771640} = "Сандыктауский\ р\-н";
-$areanames{ru}->{771641} = "Астраханский\ р\-н";
-$areanames{ru}->{771642} = "Егиндыкольский\ р\-н";
-$areanames{ru}->{771643} = "Атбасарский\ р\-н";
-$areanames{ru}->{771644} = "Аршалынский\ р\-н";
-$areanames{ru}->{771645} = "Степногорск";
-$areanames{ru}->{771646} = "Буландинский\ р\-н";
-$areanames{ru}->{771647} = "Есильский\ р\-н";
-$areanames{ru}->{771648} = "Жаркаинский\ р\-н";
-$areanames{ru}->{771649} = "Жаксынский\ р\-н";
-$areanames{ru}->{771651} = "Целиноградский\ р\-н";
-$areanames{ru}->{7717} = "Астана";
-$areanames{ru}->{77182} = "Павлодар";
-$areanames{ru}->{771831} = "Железинский\ р\-н";
-$areanames{ru}->{771832} = "Иртышский\ р\-н";
-$areanames{ru}->{771833} = "Качирский\ р\-н";
-$areanames{ru}->{771834} = "Успенский\ р\-н";
-$areanames{ru}->{771836} = "Щербактинский\ р\-н";
-$areanames{ru}->{771837} = "Аксуский\ р\-н";
-$areanames{ru}->{771838} = "Майский\ р\-он";
-$areanames{ru}->{771839} = "Лебяжинский\ р\-н";
-$areanames{ru}->{771840} = "Баянаульский\ р\-н";
-$areanames{ru}->{771841} = "Актогайский\ р\-н";
-$areanames{ru}->{771842} = "Актогайский\ р\-н";
-$areanames{ru}->{771843} = "Майский\ р\-н";
-$areanames{ru}->{771844} = "Иртышский\ р\-н";
-$areanames{ru}->{771845} = "Павлодар";
-$areanames{ru}->{77187} = "Экибастуз";
-$areanames{ru}->{77212} = "Караганда";
-$areanames{ru}->{77213} = "Темиртау";
-$areanames{ru}->{772131} = "Абайский\ р\-н";
-$areanames{ru}->{772132} = "Нуринский\ р\-н";
-$areanames{ru}->{772137} = "Сарань";
-$areanames{ru}->{772138} = "Бухар\-Жырауский\ р\-н";
-$areanames{ru}->{772144} = "Нуринский\ р\-н";
-$areanames{ru}->{772146} = "Каркаралинск";
-$areanames{ru}->{772147} = "Каркаралинский\ р\-н";
-$areanames{ru}->{772148} = "Осакаровский\ р\-н";
-$areanames{ru}->{772149} = "Осакаровский\ р\-н";
-$areanames{ru}->{772153} = "Абайский\ р\-н";
-$areanames{ru}->{772154} = "Бухар\-Жырауский\ р\-н";
-$areanames{ru}->{772156} = "Шахтинск";
-$areanames{ru}->{772159} = "Карагандинская\ область";
-$areanames{ru}->{77222} = "Семипалатинск";
-$areanames{ru}->{772230} = "Урджарский\ р\-н";
-$areanames{ru}->{772236} = "Бескарагайский\ р\-н";
-$areanames{ru}->{772237} = "Аязог";
-$areanames{ru}->{772239} = "Урджарский\ р\-н";
-$areanames{ru}->{77224} = "Эмельтау";
-$areanames{ru}->{772251} = "Курчатов";
-$areanames{ru}->{772252} = "Абайский\ р\-н";
-$areanames{ru}->{772256} = "Алгабас";
-$areanames{ru}->{772257} = "Шульбинск";
-$areanames{ru}->{77232} = "Усть\-Каменогорск";
-$areanames{ru}->{772330} = "Зыряновский\ р\-н";
-$areanames{ru}->{772331} = "Глубоковский\ р\-н";
-$areanames{ru}->{772332} = "Шемонаихинский\ р\-н";
-$areanames{ru}->{772333} = "Кокпектинский\ р\-н";
-$areanames{ru}->{772334} = "Уланский\ р\-н";
-$areanames{ru}->{772335} = "Зыряновск";
-$areanames{ru}->{772336} = "Риддер";
-$areanames{ru}->{772337} = "Серебрянск";
-$areanames{ru}->{772338} = "Уланский\ р\-н";
-$areanames{ru}->{772339} = "Курчумский\ р\-н";
-$areanames{ru}->{772340} = "Зайсанский\ р\-н";
-$areanames{ru}->{772341} = "Катон\-Карагайский\ р\-н";
-$areanames{ru}->{772342} = "Катон\-Карагайский\ р\-н";
-$areanames{ru}->{772343} = "Курчумский\ р\-н";
-$areanames{ru}->{772344} = "Тарбагатайский\ р\-н";
-$areanames{ru}->{772345} = "Жарминский\ р\-н";
-$areanames{ru}->{772346} = "Тарбагатайский\ р\-н";
-$areanames{ru}->{772347} = "Жарминский\ р\-н";
-$areanames{ru}->{772348} = "Кокпектинский\ р\-н";
-$areanames{ru}->{772351} = "Бородулихинский\ р\-н";
-$areanames{ru}->{772353} = "Бородулихинский\ р\-н";
-$areanames{ru}->{77242} = "Кызылорда";
-$areanames{ru}->{772431} = "Жалагашский\ р\-н";
-$areanames{ru}->{772432} = "Шиелийский\ р\-н";
-$areanames{ru}->{772433} = "Аральский\ р\-н";
-$areanames{ru}->{772435} = "Жанакорганский\ р\-н";
-$areanames{ru}->{772436} = "Сырдарьинский\ р\-н";
-$areanames{ru}->{772437} = "Кармакшинский\ р\-н";
-$areanames{ru}->{772438} = "Казалинский\ р\-н";
-$areanames{ru}->{772439} = "Аральский\ р\-н";
-$areanames{ru}->{77245} = "Кызылординская\ область";
-$areanames{ru}->{77252} = "Шымкент";
-$areanames{ru}->{772530} = "Темирлановка";
-$areanames{ru}->{772531} = "Аксукент";
-$areanames{ru}->{772532} = "Абая";
-$areanames{ru}->{772533} = "Туркестан";
-$areanames{ru}->{772534} = "Жетысай";
-$areanames{ru}->{772535} = "Шардара";
-$areanames{ru}->{772536} = "Кентау";
-$areanames{ru}->{772537} = "Сарыагаш";
-$areanames{ru}->{772538} = "имени\ Турара\ Рыскулова";
-$areanames{ru}->{772539} = "Казыгурт";
-$areanames{ru}->{772540} = "Арыс";
-$areanames{ru}->{772541} = "Мырзакент";
-$areanames{ru}->{772542} = "Асыката";
-$areanames{ru}->{772544} = "Шаульдер";
-$areanames{ru}->{772546} = "Шолаккорган";
-$areanames{ru}->{772547} = "Ленгер";
-$areanames{ru}->{772548} = "Шаян";
-$areanames{ru}->{77262} = "Тараз";
-$areanames{ru}->{772631} = "Турара\ Рыскулова\ р\-н";
-$areanames{ru}->{772632} = "Меркенский\ р\-н";
-$areanames{ru}->{772633} = "Жамбылский\ р\-н";
-$areanames{ru}->{772634} = "Жанатас";
-$areanames{ru}->{772635} = "Жуалынский\ р\-н";
-$areanames{ru}->{772636} = "Кордай";
-$areanames{ru}->{772637} = "Байзакский\ р\-н";
-$areanames{ru}->{772638} = "Шуский\ р\-н";
-$areanames{ru}->{772639} = "Сарысуский\ р\-н";
-$areanames{ru}->{772640} = "Мойынкумский\ р\-н";
-$areanames{ru}->{772641} = "Таласский\ р\-н";
-$areanames{ru}->{772642} = "Мойынкумский\ р\-н";
-$areanames{ru}->{772643} = "Шуский\ р\-н";
-$areanames{ru}->{772644} = "Таласский\ р\-н";
-$areanames{ru}->{77272} = "Алма\-Ата";
-$areanames{ru}->{772725} = "Отеген\-Батыр";
-$areanames{ru}->{77272956} = "Талгар";
-$areanames{ru}->{77272983} = "Каскелен";
-$areanames{ru}->{77273} = "Алма\-Ата";
-$areanames{ru}->{77274} = "Карасайский\ р\-н";
-$areanames{ru}->{772752} = "Илийский\ р\-н";
-$areanames{ru}->{772757} = "Акший";
-$areanames{ru}->{772759} = "Алматинская\ область";
-$areanames{ru}->{772770} = "Жамбылский\ р\-н";
-$areanames{ru}->{772771} = "Карасайский\ р\-н";
-$areanames{ru}->{772772} = "Капчагай";
-$areanames{ru}->{772773} = "Балхашский\ р\-н";
-$areanames{ru}->{772774} = "Талгарский\ р\-н";
-$areanames{ru}->{772775} = "Енбекшиказахский\ р\-н";
-$areanames{ru}->{772776} = "Енбекшиказахский\ р\-н";
-$areanames{ru}->{772777} = "Райымбекский\ р\-н";
-$areanames{ru}->{772778} = "Уйгурский\ р\-н";
-$areanames{ru}->{772779} = "Райымбекский\ р\-н";
-$areanames{ru}->{77279} = "Алматы";
-$areanames{ru}->{77282} = "Талдыкорган";
-$areanames{ru}->{772830} = "Алакольский\ р\-н";
-$areanames{ru}->{772831} = "Панфиловский\ р\-н";
-$areanames{ru}->{772832} = "Аксуский\ р\-н";
-$areanames{ru}->{772833} = "Алакольский\ р\-н";
-$areanames{ru}->{772834} = "Каратальский\ р\-н";
-$areanames{ru}->{772835} = "Текели";
-$areanames{ru}->{772836} = "Ескельдинский\ р\-н";
-$areanames{ru}->{772837} = "Алакольский\ р\-н";
-$areanames{ru}->{772838} = "Коксуский\ р\-н";
-$areanames{ru}->{772839} = "Саркандский\ р\-н";
-$areanames{ru}->{772840} = "Кербулакский\ р\-н";
-$areanames{ru}->{772841} = "Аксуский\ р\-н";
-$areanames{ru}->{772842} = "Кербулакский\ р\-н";
-$areanames{ru}->{772843} = "Лепсы";
-$areanames{ru}->{77292} = "Актау";
-$areanames{ru}->{772931} = "Мангистауский\ р\-н";
-$areanames{ru}->{772932} = "Бейнеуский\ р\-н";
-$areanames{ru}->{772934} = "Жанаозен";
-$areanames{ru}->{772935} = "Каракиянский\ р\-н";
-$areanames{ru}->{772937} = "Каракиянский\ р\-н";
-$areanames{ru}->{772938} = "Тупкараганский\ р\-н";
-$areanames{ru}->{7811} = "Псковская\ обл\.";
-$areanames{ru}->{7812} = "г\.\ Санкт\-Петербург";
-$areanames{ru}->{7813} = "Ленинградская\ обл\.";
-$areanames{ru}->{7814} = "Республика\ Карелия";
-$areanames{ru}->{7815} = "Мурманская\ обл\.";
-$areanames{ru}->{7816} = "Новгородская\ обл\.";
-$areanames{ru}->{7817} = "Вологодская\ обл\.";
-$areanames{ru}->{7818} = "Архангельская\ обл\.";
-$areanames{ru}->{7820} = "Вологодская\ обл\.";
-$areanames{ru}->{7821} = "Республика\ Коми";
-$areanames{ru}->{7831} = "Нижегородская\ обл\.";
-$areanames{ru}->{7833} = "Кировская\ обл\.";
-$areanames{ru}->{7834} = "Республика\ Мордовия";
-$areanames{ru}->{7835} = "Чувашская\ Республика\ \-\ Чувашия";
-$areanames{ru}->{7836} = "Республика\ Марий\ Эл";
-$areanames{ru}->{7841} = "Пензенская\ обл\.";
-$areanames{ru}->{7842} = "Ульяновская\ обл\.";
-$areanames{ru}->{7843} = "Республика\ Татарстан";
-$areanames{ru}->{7844} = "Волгоградская\ обл\.";
-$areanames{ru}->{7845} = "Саратовская\ обл\.";
-$areanames{ru}->{7846} = "Самарская\ обл\.";
-$areanames{ru}->{7847} = "Республика\ Калмыкия";
-$areanames{ru}->{7848} = "Самарская\ обл\.";
-$areanames{ru}->{7851} = "Астраханская\ обл\.";
-$areanames{ru}->{7855} = "Республика\ Татарстан";
-$areanames{ru}->{7861} = "Краснодарский\ край";
-$areanames{ru}->{7862} = "Краснодарский\ край";
-$areanames{ru}->{7863} = "Ростовская\ обл\.";
-$areanames{ru}->{7865} = "Ставропольский\ край";
-$areanames{ru}->{7866} = "Республика\ Кабардино\-Балкарская";
-$areanames{ru}->{7867} = "Республика\ Северная\ Осетия\ \-\ Алания";
-$areanames{ru}->{7869} = "г\.\ Севастополь";
-$areanames{ru}->{7871} = "Республика\ Чеченская";
-$areanames{ru}->{7872} = "Республика\ Дагестан";
-$areanames{ru}->{7873} = "Республика\ Ингушетия";
-$areanames{ru}->{7877} = "Республика\ Адыгея";
-$areanames{ru}->{7878} = "Республика\ Карачаево\-Черкесская";
-$areanames{ru}->{7879} = "Ставропольский\ край";
+$areanames{ru} = {"7347", "Республика\ Башкортостан",
+"772643", "Шуский\ р\-н",
+"772937", "Каракиянский\ р\-н",
+"7342", "Пермский\ край",
+"771630", "Боровое",
+"772638", "Шуский\ р\-н",
+"771032", "Каражал",
+"7486", "Орловская\ обл\.",
+"7813", "Ленинградская\ обл\.",
+"771643", "Атбасарский\ р\-н",
+"771638", "Аккольский\ р\-н",
+"7815", "Мурманская\ обл\.",
+"77292", "Актау",
+"7341", "Республика\ Удмуртская",
+"771439", "Джангильдинский\ р\-н",
+"772431", "Жалагашский\ р\-н",
+"771149", "Акжаикский\ р\-н",
+"772439", "Аральский\ р\-н",
+"771141", "Жангалинский\ р\-н",
+"772149", "Осакаровский\ р\-н",
+"7848", "Самарская\ обл\.",
+"772774", "Талгарский\ р\-н",
+"771431", "Рудный",
+"771836", "Щербактинский\ р\-н",
+"771544", "Жамбылский\ р\-н",
+"771332", "Уилский\ р\-н",
+"771635", "Жаксынский\ р\-н",
+"771532", "Аккайынский\ р\-н",
+"772544", "Шаульдер",
+"772332", "Шемонаихинский\ р\-н",
+"7820", "Вологодская\ обл\.",
+"771453", "Аулиекольский\ р\-н",
+"772836", "Ескельдинский\ р\-н",
+"772344", "Тарбагатайский\ р\-н",
+"772532", "Абая",
+"77224", "Эмельтау",
+"772635", "Жуалынский\ р\-н",
+"77274", "Карасайский\ р\-н",
+"771031", "Шетский\ р\-н",
+"771838", "Майский\ р\-он",
+"772156", "Шахтинск",
+"772830", "Алакольский\ р\-н",
+"736", "Республика\ Крым",
+"772725", "Отеген\-Батыр",
+"771843", "Майский\ р\-н",
+"772838", "Коксуский\ р\-н",
+"7869", "г\.\ Севастополь",
+"771039", "Приозерск",
+"772843", "Лепсы",
+"771647", "Есильский\ р\-н",
+"7831", "Нижегородская\ обл\.",
+"7814", "Республика\ Карелия",
+"772256", "Алгабас",
+"7499", "г\.\ Москва",
+"771142", "Акжаикский\ р\-н",
+"7846", "Самарская\ обл\.",
+"771444", "Узункольский\ р\-н",
+"771457", "Джангильдинский\ р\-н",
+"7871", "Республика\ Чеченская",
+"772353", "Бородулихинский\ р\-н",
+"771134", "Сырымский\ р\-н",
+"7352", "Курганская\ обл\.",
+"772432", "Шиелийский\ р\-н",
+"771539", "Кызылжарский\ р\-н",
+"772835", "Текели",
+"772331", "Глубоковский\ р\-н",
+"771339", "Айтекебийский\ р\-н",
+"7351", "Челябинская\ обл\.",
+"772531", "Аксукент",
+"7416", "Амурская\ обл\.",
+"772636", "Кордай",
+"771331", "Мартукский\ р\-н",
+"77279", "Алматы",
+"772539", "Казыгурт",
+"771234", "Индерский\ р\-н",
+"7426", "Еврейская\ автономная\ обл\.",
+"771531", "Магжана\ Жумабаева\ р\-н",
+"7872", "Республика\ Дагестан",
+"771636", "Щучинский\ р\-н",
+"7877", "Республика\ Адыгея",
+"772339", "Курчумский\ р\-н",
+"771436", "Тарановский\ р\-н",
+"7424", "Сахалинская\ обл\.",
+"771146", "Акжаикский\ р\-н",
+"772436", "Сырдарьинский\ р\-н",
+"772146", "Каркаралинск",
+"772632", "Меркенский\ р\-н",
+"771839", "Лебяжинский\ р\-н",
+"772535", "Шардара",
+"771030", "Жана\-Аркинский\ р\-н",
+"7717", "Астана",
+"772644", "Таласский\ р\-н",
+"7394", "Республика\ Тыва",
+"772831", "Панфиловский\ р\-н",
+"772335", "Зыряновск",
+"771535", "Габита\ Мусрепова\ р\-н",
+"771632", "Зерендинский\ р\-н",
+"772839", "Саркандский\ р\-н",
+"771043", "Жайрем\ \(поселок\)",
+"771335", "Шалкарский\ р\-н",
+"771831", "Железинский\ р\-н",
+"771038", "Сыры\-Шаган",
+"7844", "Волгоградская\ обл\.",
+"771644", "Аршалынский\ р\-н",
+"772137", "Сарань",
+"771538", "Кызылжарский\ р\-н",
+"77272", "Алма\-Ата",
+"772530", "Темирлановка",
+"7483", "Брянская\ обл\.",
+"7381", "Омская\ обл\.",
+"7816", "Новгородская\ обл\.",
+"77222", "Семипалатинск",
+"771343", "Иргизский\ р\-н",
+"771035", "Улытауский\ р\-н",
+"7485", "Ярославская\ обл\.",
+"772330", "Зыряновский\ р\-н",
+"7855", "Республика\ Татарстан",
+"771543", "Есильский\ р\-н",
+"7472", "Белгородская\ обл\.",
+"772343", "Курчумский\ р\-н",
+"77122", "Атырау",
+"771137", "Чингирлауский\ р\-н",
+"772538", "имени\ Турара\ Рыскулова",
+"771330", "Хромтауский\ р\-н",
+"771454", "Наурзумский\ р\-н",
+"771447", "Карабалыкский\ р\-н",
+"772338", "Уланский\ р\-н",
+"771237", "Жылыойский\ р\-н",
+"7471", "Курская\ обл\.",
+"77112", "Уральск",
+"772252", "Абайский\ р\-н",
+"772752", "Илийский\ р\-н",
+"772773", "Балхашский\ р\-н",
+"7382", "Томская\ обл\.",
+"77212", "Караганда",
+"7349", "Ямало\-Ненецкий\ АО",
+"772237", "Аязог",
+"772435", "Жанакорганский\ р\-н",
+"7491", "Рязанская\ обл\.",
+"77187", "Экибастуз",
+"7879", "Ставропольский\ край",
+"7395", "Иркутская\ обл\.",
+"7712303", "Тензиз",
+"7843", "Республика\ Татарстан",
+"771435", "Житикаринский\ р\-н",
+"7845", "Саратовская\ обл\.",
+"772934", "Жанаозен",
+"771145", "Каратобинский\ р\-н",
+"771631", "Шортандинский\ р\-н",
+"771536", "Тайыншинский\ р\-н",
+"771844", "Иртышский\ р\-н",
+"7423", "Приморский\ край",
+"771336", "Хромтауский\ р\-н",
+"771832", "Иртышский\ р\-н",
+"772639", "Сарысуский\ р\-н",
+"772631", "Турара\ Рыскулова\ р\-н",
+"7415", "Камчатский\ край",
+"772536", "Кентау",
+"772832", "Аксуский\ р\-н",
+"771639", "Енбекшилдерский\ р\-н",
+"7413", "Магаданская\ обл\.",
+"772336", "Риддер",
+"7492", "Владимирская\ обл\.",
+"772777", "Райымбекский\ р\-н",
+"772159", "Карагандинская\ область",
+"77272983", "Каскелен",
+"771036", "Балхаш",
+"7861", "Краснодарский\ край",
+"771233", "Курмангазинский\ р\-н",
+"7818", "Архангельская\ обл\.",
+"771133", "Бурлинский\ р\-н",
+"7867", "Республика\ Северная\ Осетия\ \-\ Алания",
+"771438", "Амангельдинский\ р\-н",
+"772251", "Курчатов",
+"7862", "Краснодарский\ край",
+"772347", "Жарминский\ р\-н",
+"771443", "Мендыкаринский\ р\-н",
+"7484", "Калужская\ обл\.",
+"772547", "Ленгер",
+"772438", "Казалинский\ р\-н",
+"7390", "Республика\ Хакасия",
+"771347", "Айтекебийский\ р\-н",
+"77125", "Атырауская\ область",
+"771430", "Аркалык",
+"772148", "Осакаровский\ р\-н",
+"772759", "Алматинская\ область",
+"771547", "Жамбылский\ р\-н",
+"733", "Байконыр",
+"771140", "Бокейординский\ р\-н",
+"7836", "Республика\ Марий\ Эл",
+"771147", "Акжаикский\ р\-н",
+"772548", "Шаян",
+"771540", "Уалихановский\ р\-н",
+"771452", "Карасуский\ р\-н",
+"772333", "Кокпектинский\ р\-н",
+"771437", "Камыстинский\ р\-н",
+"772348", "Кокпектинский\ р\-н",
+"771340", "Хобдинский\ р\-н",
+"772533", "Туркестан",
+"772540", "Арыс",
+"772154", "Бухар\-Жырауский\ р\-н",
+"771333", "Мугалжарский\ р\-н",
+"772147", "Каркаралинский\ р\-н",
+"772340", "Зайсанский\ р\-н",
+"7384", "Кемеровская\ обл\.",
+"771533", "Айыртауский\ р\-н",
+"772437", "Кармакшинский\ р\-н",
+"771348", "Шалкарский\ р\-н",
+"7865", "Ставропольский\ край",
+"77242", "Кызылорда",
+"7863", "Ростовская\ обл\.",
+"772351", "Бородулихинский\ р\-н",
+"772778", "Уйгурский\ р\-н",
+"7474", "Липецкая\ обл\.",
+"77142", "Костанай",
+"77135", "Актюбинская\ область",
+"772770", "Жамбылский\ р\-н",
+"7411", "Республика\ Саха\ \/Якутия\/",
+"771446", "Узункольский\ р\-н",
+"772931", "Мангистауский\ р\-н",
+"771136", "Акжаикский\ р\-н",
+"7847", "Республика\ Калмыкия",
+"7421", "Хабаровский\ край",
+"772775", "Енбекшиказахский\ р\-н",
+"7842", "Ульяновская\ обл\.",
+"7841", "Пензенская\ обл\.",
+"771642", "Егиндыкольский\ р\-н",
+"7427", "Чукотский\ АО",
+"771033", "Шетский\ р\-н",
+"771236", "Махамбетский\ р\-н",
+"771545", "Жамбылский\ р\-н",
+"771841", "Актогайский\ р\-н",
+"771345", "Байганинский\ р\-н",
+"7493", "Ивановская\ обл\.",
+"7391", "Красноярский\ край",
+"772236", "Бескарагайский\ р\-н",
+"772642", "Мойынкумский\ р\-н",
+"7495", "Московская\ обл\.",
+"772841", "Аксуский\ р\-н",
+"772345", "Жарминский\ р\-н",
+"771040", "Жайрем\ \(ГОК\)",
+"772634", "Жанатас",
+"77252", "Шымкент",
+"77245", "Кызылординская\ область",
+"772230", "Урджарский\ р\-н",
+"771238", "Кзылкогинский\ р\-н",
+"77232", "Усть\-Каменогорск",
+"771459", "Костанайская\ область",
+"7482", "Тверская\ обл\.",
+"7487", "Тульская\ обл\.",
+"771451", "Сарыкольский\ р\-н",
+"77152", "Петропавловск",
+"7475", "Тамбовская\ обл\.",
+"771230", "Атырауская\ область",
+"7346", "Ханты\ \-\ Мансийский\ \-\ Югра\ АО",
+"77132", "Актобе\/Актюбинск",
+"7473", "Воронежская\ обл\.",
+"771440", "Амангельдинский\ р\-н",
+"771337", "Алгинский\ р\-н",
+"772433", "Аральский\ р\-н",
+"771130", "Зеленовский\ р\-н",
+"772138", "Бухар\-Жырауский\ р\-н",
+"771537", "Тимирязевский\ р\-н",
+"771448", "Карасуский\ р\-н",
+"772337", "Серебрянск",
+"7851", "Астраханская\ обл\.",
+"771143", "Теректинский\ р\-н",
+"7481", "Смоленская\ обл\.",
+"7383", "Новосибирская\ обл\.",
+"771138", "Казталовский\ р\-н",
+"772537", "Сарыагаш",
+"771433", "Лисаковск",
+"7385", "Алтайский\ край",
+"772932", "Бейнеуский\ р\-н",
+"771445", "Алтынсаринский\ р\-н",
+"771135", "Жанибекский\ р\-н",
+"772776", "Енбекшиказахский\ р\-н",
+"771037", "Актогайский\ р\-н",
+"7712302", "Тенгизшевройл",
+"7494", "Костромская\ обл\.",
+"772641", "Таласский\ р\-н",
+"772546", "Шолаккорган",
+"772834", "Каратальский\ р\-н",
+"772346", "Тарбагатайский\ р\-н",
+"77102", "Жезказган",
+"772842", "Кербулакский\ р\-н",
+"771649", "Жаксынский\ р\-н",
+"771834", "Успенский\ р\-н",
+"771641", "Астраханский\ р\-н",
+"77145834", "Красногорск",
+"771235", "Макатский\ р\-н",
+"771546", "Акжарский\ р\-н",
+"771842", "Актогайский\ р\-н",
+"7878", "Республика\ Карачаево\-Черкесская",
+"771346", "Темирский\ р\-н",
+"772772", "Капчагай",
+"771131", "Зеленовский\ р\-н",
+"771441", "Карабалыкский\ р\-н",
+"77213", "Темиртау",
+"771449", "Тарановский\ р\-н",
+"772131", "Абайский\ р\-н",
+"771139", "Таскалинский\ р\-н",
+"7353", "Оренбургская\ обл\.",
+"7496", "г\.\ Москва",
+"772534", "Жетысай",
+"771239", "Макатский\ р\-н",
+"772342", "Катон\-Карагайский\ р\-н",
+"77106", "Сатпаев",
+"77273", "Алма\-Ата",
+"771458", "Костанайская\ область",
+"772334", "Уланский\ р\-н",
+"772542", "Асыката",
+"771534", "Шал\ Акына\ р\-н",
+"771342", "Каргалинский\ р\-н",
+"772239", "Урджарский\ р\-н",
+"7873", "Республика\ Ингушетия",
+"771334", "Мугалжарский\ р\-н",
+"771542", "Уалихановский\ р\-н",
+"772153", "Абайский\ р\-н",
+"771645", "Степногорск",
+"771231", "Исатайский\ р\-н",
+"77282", "Талдыкорган",
+"771042", "Акой",
+"771633", "Ерейментауский\ р\-н",
+"771034", "Улытауский\ р\-н",
+"772640", "Мойынкумский\ р\-н",
+"771648", "Жаркаинский\ р\-н",
+"7833", "Кировская\ обл\.",
+"77182", "Павлодар",
+"772633", "Жамбылский\ р\-н",
+"771455", "Костанайский\ р\-н",
+"7835", "Чувашская\ Республика\ \-\ Чувашия",
+"740", "Калининградская\ обл\.",
+"771640", "Сандыктауский\ р\-н",
+"77272956", "Талгар",
+"771837", "Аксуский\ р\-н",
+"771651", "Целиноградский\ р\-н",
+"7866", "Республика\ Кабардино\-Балкарская",
+"772837", "Алакольский\ р\-н",
+"7388", "Республика\ Алтай",
+"772132", "Нуринский\ р\-н",
+"772144", "Нуринский\ р\-н",
+"772779", "Райымбекский\ р\-н",
+"7302", "Забайкальский\ край",
+"772771", "Карасайский\ р\-н",
+"771434", "Денисовский\ р\-н",
+"771132", "Теректинский\ р\-н",
+"772935", "Каракиянский\ р\-н",
+"771442", "Федоровский\ р\-н",
+"771144", "Казталовский\ р\-н",
+"771341", "Хобдинский\ р\-н",
+"771845", "Павлодар",
+"771232", "Атырауская\ область",
+"771541", "Мамлютский\ р\-н",
+"7301", "Республика\ Бурятия",
+"771646", "Буландинский\ р\-н",
+"772341", "Катон\-Карагайский\ р\-н",
+"772257", "Шульбинск",
+"772757", "Акший",
+"7498", "Московская\ обл\.",
+"772541", "Мырзакент",
+"771349", "Шалкарский\ р\-н",
+"7345", "Тюменская\ обл\.",
+"771840", "Баянаульский\ р\-н",
+"771456", "Качар",
+"7343", "Свердловская\ обл",
+"77162", "Кокшетау",
+"772833", "Алакольский\ р\-н",
+"772840", "Кербулакский\ р\-н",
+"771041", "Актау\,\ Жезказган",
+"7812", "г\.\ Санкт\-Петербург",
+"77262", "Тараз",
+"771833", "Качирский\ р\-н",
+"7817", "Вологодская\ обл\.",
+"772637", "Байзакский\ р\-н",
+"7811", "Псковская\ обл\.",
+"772938", "Тупкараганский\ р\-н",
+"7821", "Республика\ Коми",
+"771637", "Коргалжынский\ р\-н",
+"7834", "Республика\ Мордовия",};
+$areanames{en} = {"772144", "Kiyevka",
+"772779", "Narynkol",
+"772132", "Nurinsky\ District",
+"771144", "Kaztalovka",
+"771442", "Fyodorovka",
+"772935", "Zhetybai",
+"7302", "Chita",
+"771434", "Denisovka",
+"771132", "Fyodorovka",
+"772771", "Kaskelen",
+"771232", "Atyrau\ Region",
+"771646", "Makinsk",
+"7301", "Republic\ of\ Buryatia",
+"771541", "Mamlutka",
+"771341", "Khobda",
+"771845", "Pavlodar\ Area",
+"772541", "Myrzakent",
+"7498", "Moscow",
+"771349", "Shalkarsky\ District",
+"772257", "Shulbinsk",
+"772341", "Ulken\ Naryn",
+"772757", "Akshi",
+"7343", "Ekaterinburg",
+"771456", "Kachar",
+"772833", "Usharal",
+"77162", "Kokshetau\/Krasni\ Yar",
+"7345", "Tyumen",
+"771840", "Bayanaul",
+"771833", "Terenkol",
+"7812", "St\ Petersburg",
+"77262", "Taraz",
+"7817", "Vologda",
+"772840", "Saryozek",
+"771041", "Aktau\,\ Zhezkazgan",
+"772938", "Fort\ Shevchenko",
+"772637", "Sarykemer",
+"7811", "Pskov",
+"7834", "Republic\ of\ Mordovia",
+"7821", "Komi\ Republic",
+"771637", "Korgalzhyn",
+"771441", "Karabalyk",
+"771131", "Darinskoye",
+"772772", "Kapchagai",
+"771139", "Taskala",
+"7353", "Orenburg",
+"771449", "Taranovskoye",
+"77213", "Aktau\/Temirtau",
+"772131", "Abai",
+"771458", "Kostanai\ Region",
+"77273", "Almaty",
+"772542", "Asykata",
+"772334", "Tavricheskoye",
+"7496", "Moscow",
+"77106", "Satpaev",
+"772342", "Katon\-Karagai",
+"771239", "Makat",
+"772534", "Zhetysai",
+"772153", "Topar",
+"771542", "Kishkenekol",
+"771334", "Emba",
+"771231", "Akkystau",
+"771645", "Stepnogorsk",
+"771342", "Badamsha",
+"772239", "Makanchi",
+"771534", "Sergeyevka",
+"7873", "Ingushi\ Republic",
+"772640", "Moiynkumsky\ District",
+"771034", "Zhezdy",
+"771648", "Derzhavinsk",
+"771633", "Ereimentau",
+"771042", "Zharyk",
+"77282", "Taldykorgan",
+"771455", "Zatobolsk",
+"7835", "Chuvashi\ Republic",
+"740", "Kaliningrad",
+"771640", "Balkashino",
+"7833", "Kirov",
+"772633", "Asa",
+"77182", "Pavlodar",
+"77272956", "Talgar",
+"771837", "Aksu",
+"771651", "Kabanbai\ Batyr",
+"772837", "Kabanbai",
+"7866", "Kabardino\-Balkarian\ Republic",
+"7388", "Republic\ of\ Altai",
+"7482", "Tver",
+"771459", "Kostanai\ Region",
+"77232", "Ust\-Kamenogorsk",
+"7487", "Tula",
+"772230", "Urdzhar",
+"77245", "Kyzylorda\ Region",
+"77252", "Shymkent",
+"771238", "Miyaly",
+"7346", "Surgut",
+"7473", "Voronezh",
+"77132", "Aktobe\/Kargalinskoye",
+"771451", "Sarykol",
+"771230", "Atyrau\ Region",
+"7475", "Tambov",
+"77152", "Petropavlovsk",
+"771130", "Peremetnoye",
+"772433", "Aralsk",
+"771537", "Timiryazevo",
+"772138", "Gabidena\ Mustafina",
+"771440", "Amangeldy",
+"771337", "Alga",
+"772537", "Saryagash",
+"771138", "Zhalpaktal",
+"7385", "Altai\ Territory",
+"771433", "Lisakovsk",
+"772337", "Serebryansk",
+"771448", "Oktyabrskoye",
+"7383", "Novosibirsk",
+"7481", "Smolensk",
+"771143", "Akzhaik",
+"7851", "Astrakhan",
+"771135", "Zhanibek",
+"772776", "Shelek",
+"771445", "Ubaganskoye",
+"772932", "Beineu",
+"7494", "Kostroma",
+"7712302", "Tengizshevroil",
+"771037", "Aktogai",
+"772346", "Aksuat",
+"771649", "Zhaksynsky\ District",
+"772842", "Kogaly",
+"77102", "Zhezkazgan",
+"772546", "Sholakkorgan",
+"772641", "Akkol",
+"772834", "Ushtobe",
+"771842", "Aktogaisky\ District",
+"771346", "Shubarkuduk",
+"7878", "Karachayevo\-Cherkessian\ Republic",
+"771834", "Uspenka",
+"771546", "Talshik",
+"771235", "Dossor",
+"77145834", "Krasnogorsk",
+"771641", "Astrakhanka",
+"772348", "Kokpekty",
+"771437", "Kamysty",
+"772533", "Turkestan",
+"771340", "Khobdinsky\ District",
+"772548", "Shayan",
+"771147", "Akzhaiksky\ District",
+"7836", "Republic\ of\ Marij\ El",
+"772333", "Samarskoye",
+"771452", "Karasu",
+"771540", "Kishkenekol",
+"771533", "Saumalkol",
+"772340", "Zaisan",
+"7384", "Kemerovo",
+"771348", "Shalkarsky\ District",
+"772437", "Zhosaly",
+"771333", "Kandyagash",
+"772154", "Botakara",
+"772540", "Arys",
+"772147", "Egindybulak",
+"772351", "Borodulikha",
+"7863", "Rostov",
+"772778", "Chundzha",
+"7865", "Stavropol\ territory",
+"77242", "Kyzylorda",
+"77135", "Aktobe\ Region",
+"772770", "Uzynagash",
+"77142", "Kostanai",
+"7474", "Lipetsk",
+"7411", "Republic\ of\ Sakha",
+"7421", "Khabarovsk\ Territory",
+"7847", "Republic\ of\ Kalmykia",
+"771136", "Chapayev",
+"7842", "Ulyanovsk",
+"772775", "Esik",
+"771446", "Uzunkolsky\ District",
+"772931", "Shetpe",
+"771841", "Aktogai",
+"771345", "Karauylkeldy",
+"7427", "Chukotka\ Autonomous\ District",
+"771033", "Agadyr",
+"771642", "Egendykol",
+"7841", "Penza",
+"771236", "Makhambet",
+"771545", "Zhambylsky\ District",
+"772841", "Kapal",
+"772345", "Shar",
+"7495", "Moscow",
+"772634", "Zhanatas",
+"771040", "Zhairem\ \(GOK\)",
+"7391", "Krasnoyarsk\ Territory",
+"772236", "Beskaragai",
+"772642", "Moiynkum",
+"7395", "Irkutsk",
+"7491", "Ryazan",
+"772435", "Zhanakorgan",
+"7879", "Mineranye\ Vody",
+"77187", "Ekibastuz",
+"7845", "Saratov",
+"771145", "Karatobe\ District",
+"772934", "Zhanaozen",
+"7843", "Republic\ of\ Tatarstan",
+"7712303", "Tengizs",
+"771435", "Zhitikara",
+"771336", "Khromtau",
+"7423", "Primorie\ territory",
+"772639", "Saudakent",
+"771832", "Irtyshsk",
+"771536", "Taiynsha",
+"771631", "Shortandy",
+"771844", "Irtyshsky\ District",
+"771639", "Stepnyak",
+"772832", "Zhansugurov",
+"7492", "Vladimir",
+"772336", "Ridder",
+"7413", "Magadan",
+"772536", "Kentau",
+"7415", "Kamchatka\ Region",
+"772631", "Kulan",
+"772159", "Karaganda\ Region",
+"772777", "Kegen",
+"77272983", "Kaskelen",
+"7861", "Krasnodar\ Territory",
+"771036", "Balkhash",
+"7818", "Arkhangelsk",
+"771233", "Ganyushkino",
+"7484", "Kaluga",
+"771443", "Borovskoi",
+"772547", "Lenger",
+"7867", "Republic\ of\ North\ Ossetia",
+"771133", "Aksai",
+"772347", "Kalbatau",
+"7862", "Sochi",
+"771438", "Amangeldy",
+"772251", "Kurchatov",
+"771547", "Zhambylsky\ District",
+"772759", "Almaty\ Region",
+"772148", "Molodezhnoye",
+"771140", "Saikhin",
+"733", "Baikonur",
+"771347", "Aitekebisky\ District",
+"7390", "Republic\ of\ Khakassia",
+"772438", "Aiteke\ bi",
+"771430", "Arkalyk",
+"77125", "Atyrau\ Region",
+"771146", "Akzhaiksky\ District",
+"7424", "Sakhalin\ Region",
+"771436", "Taranovskoye",
+"772146", "Karkaralinsk",
+"772436", "Terenozek",
+"772644", "Karatau",
+"771030", "Atasu",
+"7717", "Astana",
+"772831", "Zharkent",
+"772335", "Zyryanovsk",
+"7394", "Republic\ of\ Tuva",
+"771839", "Akku",
+"772632", "Merke",
+"772535", "Shardara",
+"771038", "Shashubai",
+"771831", "Zhelezinka",
+"771335", "Shalkar",
+"7844", "Volgograd",
+"771644", "Arshaly",
+"771535", "Novoishimski",
+"771043", "Zhairem",
+"772839", "Sarkand",
+"771632", "Zerenda",
+"771035", "Ulytau",
+"771543", "Yavlenka",
+"7855", "Naberezhnye\ Chelny",
+"772330", "Zyryanovsky\ District",
+"7485", "Yaroslavl",
+"77272", "Almaty",
+"771538", "Beskol",
+"772137", "Saran",
+"7816", "Veliky\ Novgorod",
+"771343", "Irgiz",
+"77222", "Semey",
+"7381", "Omsk",
+"7483", "Bryansk",
+"772530", "Temirlanovka",
+"771330", "Khromtau\ District",
+"771454", "Karamendy",
+"772338", "Bozanbai\/Molodezhnyi",
+"771447", "Karabalyksky\ District",
+"77122", "Atyrau",
+"772343", "Terekty",
+"7472", "Belgorod",
+"772538", "Turara\ Ryskulova",
+"771137", "Chingirlau",
+"771237", "Kulsary",
+"77112", "Uralsk",
+"7471", "Kursk",
+"7349", "Yamalo\-Nenets\ Autonomous\ District",
+"77212", "Karaganda",
+"7382", "Tomsk",
+"772237", "Ayagoz",
+"772252", "Karaul",
+"772773", "Bakanas",
+"772752", "Otegen\ Batyra",
+"771843", "Maisky\ District",
+"772725", "Otegen\ Batyra",
+"772156", "Shakhtinsk",
+"771838", "Koktobe",
+"771031", "Aksu\-Ayuly",
+"736", "Simferopol",
+"772830", "Alakolsky\ District",
+"772843", "Lepsy",
+"771039", "Priozersk",
+"7869", "Sevastopol",
+"772838", "Balpyk\ bi",
+"7831", "Nizhni\ Novgorod",
+"771647", "Esil",
+"7814", "Republic\ of\ Karelia",
+"772256", "Kainar",
+"771134", "Zhympity",
+"772353", "Novaya\ Shulba",
+"771142", "Taipak",
+"7846", "Samara",
+"771444", "Uzunkol",
+"7499", "Moscow",
+"7871", "Chechen\ Republic",
+"771457", "Dzhangildinsky\ District",
+"772432", "Shiyeli",
+"7352", "Kurgan",
+"771339", "Komsomolskoye",
+"772636", "Kordai",
+"772531", "Aksukent",
+"7351", "Chelyabinsk",
+"7416", "Amur\ Region",
+"771539", "Beskol",
+"772331", "Glubokoye",
+"772835", "Tekeli",
+"771636", "Shuchinsk",
+"7872", "Republic\ of\ Daghestan",
+"771531", "Bulayevo",
+"7426", "Jewish\ Autonomous\ Region",
+"772339", "Kurchum",
+"7877", "Republic\ of\ Adygeya",
+"77279", "Almaty",
+"771331", "Martuk",
+"771234", "Indernborski",
+"772539", "Kazygurt",
+"771630", "Burabay",
+"772638", "Tole\ bi",
+"772937", "Kuryk",
+"772643", "Shu",
+"7347", "Republic\ of\ Bashkortostan",
+"7342", "Perm",
+"771638", "Akkol",
+"7815", "Murmansk",
+"771643", "Atbasar",
+"7813", "Leningrad\ region",
+"771032", "Karazhal",
+"7486", "Orel",
+"7341", "Udmurtian\ Republic",
+"77292", "Aktau",
+"772431", "Zhalagash",
+"771149", "Zelenovsky\ District",
+"771439", "Torgai",
+"7848", "Tolyatti",
+"772149", "Osakarovka",
+"771431", "Rudny",
+"772774", "Talgar",
+"772439", "Aralsky\ District",
+"771141", "Zhangala",
+"771635", "Zhaksy",
+"771532", "Smirnovo",
+"771836", "Sharbakty",
+"771332", "Uil",
+"771544", "Presnovka",
+"77224", "Barshatas",
+"772532", "Abai",
+"772344", "Akzhar",
+"77274", "Karassaisky\ District",
+"772635", "Bauyrzhan\ Mamyshuly",
+"771453", "Auliekol",
+"7820", "Cherepovets",
+"772332", "Shemonaikha",
+"772544", "Shaulder",
+"772836", "Karabulak",};
 
     sub new {
       my $class = shift;

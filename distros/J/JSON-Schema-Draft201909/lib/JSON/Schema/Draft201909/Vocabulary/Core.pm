@@ -2,13 +2,14 @@ use strict;
 use warnings;
 package JSON::Schema::Draft201909::Vocabulary::Core;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
+# ABSTRACT: Implementation of the JSON Schema Draft 2019-09 Core vocabulary
 
-our $VERSION = '0.017';
+our $VERSION = '0.018';
 
 use 5.016;
 no if "$]" >= 5.031009, feature => 'indirect';
 no if "$]" >= 5.033001, feature => 'multidimensional';
-use JSON::Schema::Draft201909::Utilities qw(is_type jsonp abort assert_keyword_type canonical_schema_uri E);
+use JSON::Schema::Draft201909::Utilities qw(is_type abort assert_keyword_type canonical_schema_uri E);
 use Moo;
 use strictures 2;
 use namespace::clean;
@@ -68,8 +69,8 @@ sub _traverse_keyword_schema {
 
   return if not assert_keyword_type($state, $schema, 'string');
 
-  my $uri = canonical_schema_uri($state);
-  return E($state, '$schema can only appear at the schema resource root') if length($uri->fragment);
+  return E($state, '$schema can only appear at the schema resource root')
+    if length(canonical_schema_uri($state)->fragment);
 
   return E($state, 'custom $schema references are not yet supported')
     if $schema->{'$schema'} ne 'https://json-schema.org/draft/2019-09/schema';
@@ -110,8 +111,8 @@ sub _traverse_keyword_recursiveAnchor {
 
   return if not $schema->{'$recursiveAnchor'};
 
-  my $uri = canonical_schema_uri($state);
-  return E($state, '"$recursiveAnchor" keyword used without "$id"') if length $uri->fragment;
+  return E($state, '"$recursiveAnchor" keyword used without "$id"')
+    if length canonical_schema_uri($state)->fragment;
 }
 
 sub _eval_keyword_recursiveAnchor {
@@ -138,7 +139,9 @@ sub _eval_keyword_ref {
   abort($state, 'unable to find resource %s', $uri) if not defined $subschema;
 
   return $self->evaluator->_eval($data, $subschema,
-    +{ %$state,
+    +{
+      %{$document->evaluator_configs},
+      %$state,
       traversed_schema_path => $state->{traversed_schema_path}.$state->{schema_path}.'/$ref',
       canonical_schema_uri => $canonical_uri, # note: maybe not canonical yet until $id is processed
       document => $document,
@@ -167,7 +170,9 @@ sub _eval_keyword_recursiveRef {
   }
 
   return $self->evaluator->_eval($data, $subschema,
-    +{ %$state,
+    +{
+      %{$document->evaluator_configs},
+      %$state,
       traversed_schema_path => $state->{traversed_schema_path}.$state->{schema_path}.'/$recursiveRef',
       canonical_schema_uri => $canonical_uri, # note: maybe not canonical yet until $id is processed
       document => $document,
@@ -184,6 +189,9 @@ sub _traverse_keyword_vocabulary {
     E($state, '$vocabulary/'.$property.' value is not a boolean')
       if not is_type('boolean', $schema->{'$vocabulary'}{$property});
   }
+
+  return E($state, '$vocabulary can only appear at the schema resource root')
+    if length(canonical_schema_uri($state)->fragment);
 }
 
 # we do nothing with $vocabulary yet at evaluation time. When we know we are in a metaschema,
@@ -213,19 +221,19 @@ __END__
 
 =head1 NAME
 
-JSON::Schema::Draft201909::Vocabulary::Core
+JSON::Schema::Draft201909::Vocabulary::Core - Implementation of the JSON Schema Draft 2019-09 Core vocabulary
 
 =head1 VERSION
 
-version 0.017
+version 0.018
 
-=head1 SYNOPSIS
+=head1 DESCRIPTION
 
 =for Pod::Coverage vocabulary keywords
 
 =for stopwords metaschema
 
-Implementation of the JSON Schema Draft 2019-09 "content" vocabulary, indicated in metaschemas
+Implementation of the JSON Schema Draft 2019-09 "Core" vocabulary, indicated in metaschemas
 with the URI C<https://json-schema.org/draft/2019-09/vocab/core> and formally specified in
 L<https://json-schema.org/draft/2019-09/json-schema-core.html#rfc.section.8>.
 

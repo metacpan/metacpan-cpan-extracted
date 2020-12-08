@@ -1,5 +1,5 @@
 package Data::CompactReadonly::V0::Node;
-our $VERSION = '0.0.1';
+our $VERSION = '0.0.2';
 
 use warnings;
 use strict;
@@ -74,7 +74,7 @@ sub _bytes_required_for_int {
 }
 
 # given the number of elements in a Collection, figure out what the appropriate
-# class is to represent it. NB that only Byte/Short/Medium/Long are allowes, we
+# class is to represent it. NB that only Byte/Short/Medium/Long are allowed, we
 # don't allow Huge numbers of elements in a Collection
 sub _sub_type_for_collection_of_length {
     my($class, $length) = @_;
@@ -84,6 +84,16 @@ sub _sub_type_for_collection_of_length {
            $bytes == 3 ? 'Medium' :
            $bytes == 4 ? 'Long' :
                          undef;
+}
+
+# given a blob of text, figure out its type
+sub _text_type_for_data {
+    my($class, $data) = @_;
+    return 'Text::'.do {
+        $class->_sub_type_for_collection_of_length(
+            length(Data::CompactReadonly::V0::Text->_text_to_bytes($data))
+        ) || die("$class: Invalid: Text too long");
+    };
 }
 
 # work out what node type is required to represent a piece of data. At least in
@@ -123,12 +133,8 @@ sub _type_map_from_data {
                                'Scalar::Float'
              } :
            !ref($data)
-             ? 'Text::'.do {
-                            $class->_sub_type_for_collection_of_length(
-                                length(Data::CompactReadonly::V0::Text->_text_to_bytes($data))
-                            ) || die("$class: Invalid: Text too long");
-                        } :
-           die("Can't yet create from '$data'\n");
+             ? $class->_text_type_for_data($data)
+             : die("Can't yet create from '$data'\n");
 }
 
 # used by classes when serialising themselves to figure out what their

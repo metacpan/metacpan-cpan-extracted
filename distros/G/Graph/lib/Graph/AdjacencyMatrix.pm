@@ -10,12 +10,13 @@ use base 'Graph::BitMatrix';
 
 use Graph::AdjacencyMap qw(:flags :fields);
 
+sub _AM () { 0 }
+sub _DM () { 1 }
 sub _V () { 2 } # Graph::_V
 sub _E () { 3 } # Graph::_E
 
 sub new {
     my ($class, $g, %opt) = @_;
-    my $n;
     my @V = $g->vertices;
     my $want_distance = delete $opt{distance_matrix};
     my $d = Graph::_defattr();
@@ -25,12 +26,8 @@ sub new {
     }
     my $want_transitive = delete $opt{is_transitive};
     Graph::_opt_unknown(\%opt);
-    if ($want_distance) {
-	$n = Graph::Matrix->new($g);
-	$n->set($_, $_, 0) for @V;
-    }
-    my $m = Graph::BitMatrix->new($g, connect_edges => $want_distance);
-    my $self = bless [ $m, $n, \@V ], $class;
+    my $m = Graph::BitMatrix->new($g);
+    my $self = bless [ $m, undef, \@V ], $class;
     return $self if !$want_distance;
     # for my $u (@V) {
     #     for my $v (@V) {
@@ -40,49 +37,56 @@ sub new {
     #        }
     #     }
     # }
-    my $Vi = $g->[_V]->[_i];
-    my $Ei = $g->[_E]->[_i];
+    my $n = $self->[ _DM ] = Graph::Matrix->new($g);
+    $n->set($_, $_, 0) for @V;
+    my $Vi = $g->[_V][_i];
+    my $Ei = $g->[_E][_i];
     my %V; @V{ @V } = 0 .. $#V;
     my $n0 = $n->[0];
     my $n1 = $n->[1];
     my $undirected = $g->is_undirected;
-    for my $e (keys %{ $Ei }) {
-	my ($i0, $j0) = @{ $Ei->{ $e } };
-	my $i1 = $V{ $Vi->{ $i0 } };
-	my $j1 = $V{ $Vi->{ $j0 } };
+    my $multiedged = $g->multiedged;
+    for (my $e = $#$Ei; $e >= 0; $e--) {
+	next if !defined $Ei->[ $e ];
+	my ($i0, $j0) = @{ $Ei->[ $e ] };
+	my $i1 = $V{ $Vi->[ $i0 ] };
+	my $j1 = $V{ $Vi->[ $j0 ] };
 	my $u = $V[ $i1 ];
 	my $v = $V[ $j1 ];
-	$n0->[ $i1 ]->[ $j1 ] =
-	    $g->get_edge_attribute($u, $v, $d);
-	$n0->[ $j1 ]->[ $i1 ] =
-	    $g->get_edge_attribute($v, $u, $d) if $undirected;
+	$n0->[ $i1 ]->[ $j1 ] = $multiedged
+	    ? _multiedged_distances($g, $u, $v, $d)
+	    : $g->get_edge_attribute($u, $v, $d);
+	$n0->[ $j1 ]->[ $i1 ] = $multiedged
+	    ? _multiedged_distances($g, $v, $u, $d)
+	    : $g->get_edge_attribute($v, $u, $d) if $undirected;
     }
     $self;
 }
 
-sub adjacency_matrix {
-    my $am = shift;
-    $am->[0];
+sub _multiedged_distances {
+    my ($g, $u, $v, $attr) = @_;
+    my %r;
+    for my $id ($g->get_multiedge_ids($u, $v)) {
+	my $w = $g->get_edge_attribute_by_id($u, $v, $id, $attr);
+	$r{$id} = $w if defined $w;
+    }
+    keys %r ? \%r : undef;
 }
 
-sub distance_matrix {
-    my $am = shift;
-    $am->[1];
-}
+sub adjacency_matrix { $_[0]->[ _AM ] }
 
-sub vertices {
-    my $am = shift;
-    @{ $am->[2] };
-}
+sub distance_matrix { $_[0]->[ _DM ] }
+
+sub vertices { @{ $_[0]->[ _V ] } }
 
 sub is_adjacent {
     my ($m, $u, $v) = @_;
-    $m->[0]->get($u, $v) ? 1 : 0;
+    $m->[ _AM ]->get($u, $v) ? 1 : 0;
 }
 
 sub distance {
     my ($m, $u, $v) = @_;
-    defined $m->[1] ? $m->[1]->get($u, $v) : undef;
+    defined $m->[ _DM ] ? $m->[ _DM ]->get($u, $v) : undef;
 }
 
 1;
@@ -112,6 +116,11 @@ Graph::AdjacencyMatrix - create and query the adjacency matrix of graph G
 
     my $am = Graph::AdjacencyMatrix->new($g, ...);
     my @V  = $am->vertices();
+
+    $g = Graph->new(multiedged => 1);
+    $g->add_...(); # build $g
+    $am = Graph::AdjacencyMatrix->new($g, distance_matrix => 1);
+    $am->distance($u, $v) # returns hash-ref of ID => distance
 
 =head1 DESCRIPTION
 
@@ -173,6 +182,11 @@ Return true if the vertex $v is adjacent to vertex $u, or false if not.
 
 Return the distance between the vertices $u and $v, or C<undef> if
 the vertices are not adjacent.
+
+If the underlying graph is multiedged, returns hash-ref of ID mapped
+to distance. If a given edge ID does not have the attribute defined,
+it will not be represented. If no edge IDs have the attribute, C<undef>
+will be returned.
 
 =item adjacency_matrix
 

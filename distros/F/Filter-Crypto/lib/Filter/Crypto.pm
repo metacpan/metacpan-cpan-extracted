@@ -31,7 +31,7 @@ use warnings;
 our($VERSION);
 
 BEGIN {
-    $VERSION = '2.08';
+    $VERSION = '2.09';
 }
 
 1;
@@ -116,7 +116,7 @@ decryption filter.
 
 Some of the points below come from a discussion on the perl5-porters mailing
 list, in the thread starting here:
-L<http://www.xray.mpe.mpg.de/mailing-lists/perl5-porters/2003-10/msg01169.html>;
+L<https://www.nntp.perl.org/group/perl.perl5.porters/2003/10/msg84051.html>;
 others are taken from the L<Filter::decrypt|Filter::decrypt> manpage.
 
 In general, it is hopeless to try to prevent everyone from getting at the source
@@ -225,6 +225,10 @@ ABLE TO DECRYPT FILES ENCRYPTED WITH VERSIONS OF THESE MODULES PRIOR TO VERSION
 2.00 OF THIS DISTRIBUTION, EVEN WHEN BUILT WITH THE SAME CONFIGURATION OPTIONS.
 EXISTING ENCRYPTED FILES WILL NEED TO BE RE-ENCRYPTED.>
 
+=head1 KNOWN BUGS
+
+See L<Filter::Crypto::Decrypt/"KNOWN BUGS">.
+
 =head1 FEEDBACK
 
 Patches, bug reports, suggestions or any other feedback is welcome.
@@ -239,13 +243,13 @@ Currently active requests on the CPAN Request Tracker can be viewed at
 L<https://rt.cpan.org/Public/Dist/Display.html?Status=Active;Queue=Filter-Crypto>.
 
 Please test this distribution.  See CPAN Testers Reports at
-L<http://www.cpantesters.org/> for details of how to get involved.
+L<https://www.cpantesters.org/> for details of how to get involved.
 
 Previous test results on CPAN Testers Reports can be viewed at
-L<http://www.cpantesters.org/distro/F/Filter-Crypto.html>.
+L<https://www.cpantesters.org/distro/F/Filter-Crypto.html>.
 
 Please rate this distribution on CPAN Ratings at
-L<http://cpanratings.perl.org/rate/?distribution=Filter-Crypto>.
+L<https://cpanratings.perl.org/rate/?distribution=Filter-Crypto>.
 
 =head1 SEE ALSO
 
@@ -272,9 +276,9 @@ L<perlmodlib/"CPAN"> for details) at
 
 L<https://metacpan.org/release/Filter-Crypto> or
 
-L<http://www.cpan.org/authors/id/S/SH/SHAY/> or
+L<https://www.cpan.org/authors/id/S/SH/SHAY/> or
 
-L<http://www.cpan.org/modules/by-module/Filter/>.
+L<https://www.cpan.org/modules/by-module/Filter/>.
 
 The latest source code is available from GitHub at
 L<https://github.com/steve-m-hay/Filter-Crypto>.
@@ -289,7 +293,7 @@ Steve Hay E<lt>L<shay@cpan.org|mailto:shay@cpan.org>E<gt>.
 
 =head1 COPYRIGHT
 
-Copyright (C) 2004-2010, 2012-2015, 2017 Steve Hay.  All rights reserved.
+Copyright (C) 2004-2010, 2012-2015, 2017, 2020 Steve Hay.  All rights reserved.
 
 =head1 LICENCE
 
@@ -299,11 +303,11 @@ License or the Artistic License, as specified in the F<LICENCE> file.
 
 =head1 VERSION
 
-Version 2.08
+Version 2.09
 
 =head1 DATE
 
-31 Jul 2018
+08 Dec 2020
 
 =head1 HISTORY
 

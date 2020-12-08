@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20200904144534;
+our $VERSION = 1.20201204215957;
 
 my $formatters = [
                 {
@@ -92,7 +92,7 @@ my $validators = {
             87[15-8]
           )\\d{4}|
           5(?:
-            2[589]|
+            2[5-9]|
             4[3-589]|
             7\\d|
             8[0-689]|
@@ -111,21 +111,17 @@ my $validators = {
         '
               };
 my %areanames = ();
-$areanames{en}->{2302} = "North\ Region";
-$areanames{en}->{2304} = "Central\ Region";
-$areanames{en}->{2306} = "South\ Region";
-$areanames{en}->{23081} = "Agalega";
-$areanames{en}->{23083} = "Rodrigues";
-$areanames{es}->{2302} = "Región\ Norte";
-$areanames{es}->{2304} = "Región\ Central";
-$areanames{es}->{2306} = "Región\ Sur";
-$areanames{es}->{23081} = "Agalega";
-$areanames{es}->{23083} = "Rodrigues";
-$areanames{fr}->{2302} = "Région\ Nord";
-$areanames{fr}->{2304} = "Région\ Centrale";
-$areanames{fr}->{2306} = "Région\ Sud";
-$areanames{fr}->{23081} = "Agalega";
-$areanames{fr}->{23083} = "Rodrigues";
+$areanames{fr} = {"2306", "Région\ Sud",
+"2302", "Région\ Nord",
+"2304", "Région\ Centrale",};
+$areanames{en} = {"2304", "Central\ Region",
+"2302", "North\ Region",
+"23083", "Rodrigues",
+"23081", "Agalega",
+"2306", "South\ Region",};
+$areanames{es} = {"2306", "Región\ Sur",
+"2302", "Región\ Norte",
+"2304", "Región\ Central",};
 
     sub new {
       my $class = shift;

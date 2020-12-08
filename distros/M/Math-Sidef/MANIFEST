@@ -1,0 +1,14 @@
+Build.PL
+Changes
+ignore.txt
+lib/Math/Sidef.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+META.json
+META.yml
+README.md
+t/00-load.t
+t/basic.t
+utils/auto_perltidy.sh
+utils/bak_cleaner.sh

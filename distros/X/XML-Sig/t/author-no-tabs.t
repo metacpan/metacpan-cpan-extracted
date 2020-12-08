@@ -25,6 +25,7 @@ my @files = (
     't/007_verify_saml.t',
     't/008_sign_saml.t',
     't/009_verify_separate_cert.t',
+    't/012_unassociated_signatures.t',
     't/author-critic.t',
     't/author-eof.t',
     't/author-eol.t',
@@ -34,16 +35,18 @@ my @files = (
     't/cacert.pem',
     't/dsa.private.key',
     't/intermediate.pem',
-    't/logout_response.xml',
     't/pkcs8.private.key',
     't/release-trailing-space.t',
     't/rsa.cert.pem',
     't/rsa.private.key',
-    't/saml_request-xmlsec1-dsa-signed.xml',
-    't/saml_request-xmlsec1-rsa-signed.xml',
-    't/saml_request.xml',
-    't/saml_response.xml',
-    't/sso.cert.pem'
+    't/signed/logout_response.xml',
+    't/signed/one-of-three-sigs-unassocated.xml',
+    't/signed/saml_request-xmlsec1-dsa-signed.xml',
+    't/signed/saml_request-xmlsec1-rsa-signed.xml',
+    't/signed/saml_response.xml',
+    't/signed/unassociated-signature-issue.xml',
+    't/sso.cert.pem',
+    't/unsigned/saml_request.xml'
 );
 
 notabs_ok($_) foreach @files;

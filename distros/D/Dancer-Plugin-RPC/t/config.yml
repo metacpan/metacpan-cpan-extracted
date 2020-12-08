@@ -2,8 +2,8 @@ appname: 'TestProject'
 
 charset: 'UTF-8'
 
-logger: 'console'
-log: 'core'
+logger: 'null'
+log: 'debug'
 warnings: 1
 show_errors: 1
 
@@ -21,5 +21,9 @@ plugins:
             'TestProject::SystemCalls':
                 ping:    do_ping
                 version: do_version
+            'TestProject::ApiCalls':
+                uppercase: do_uppercase
+    'RPC::RESTRPC':
+        '/rest/api':
             'TestProject::ApiCalls':
                 uppercase: do_uppercase

@@ -4,13 +4,14 @@ NAME
 
 SYNOPSIS
 
-     use Device::Chip::INA219;
+       use Device::Chip::INA219;
+       use Future::AsyncAwait;
     
-     my $chip = Device::Chip::INA219->new;
-     $chip->mount( Device::Chip::Adapter::...->new )->get;
+       my $chip = Device::Chip::INA219->new;
+       await $chip->mount( Device::Chip::Adapter::...->new );
     
-     printf "Current bus voltage is %d mV, shunt voltage is %d uV\n",
-        $chip->read_bus_voltage->get, $chip->read_shunt_voltage->get;
+       printf "Current bus voltage is %d mV, shunt voltage is %d uV\n",
+          await $chip->read_bus_voltage, await $chip->read_shunt_voltage;
 
 DESCRIPTION
 
@@ -31,33 +32,33 @@ MOUNT PARAMETERS
 
 METHODS
 
-    The following methods documented with a trailing call to ->get return
-    Future instances.
+    The following methods documented in an await expression return Future
+    instances.
 
  read_config
 
-       $config = $chip->read_config->get
+       $config = await $chip->read_config;
 
     Reads and returns the current chip configuration as a HASH reference.
 
  change_config
 
-       $chip->change_config( %config )->get
+       await $chip->change_config( %config );
 
     Changes the configuration. Any field names not mentioned will be
     preserved.
 
  read_shunt_voltage
 
-       $uv = $chip->read_shunt_voltage->get
+       $uv = await $chip->read_shunt_voltage;
 
     Returns the current shunt voltage reading scaled integer in microvolts.
 
  read_bus_voltage
 
-       $mv = $chip->read_bus_voltage->get
+       $mv = await $chip->read_bus_voltage;
     
-       ( $mv, $ovf, $cnvr ) = $chip->read_bus_voltage->get
+       ( $mv, $ovf, $cnvr ) = await $chip->read_bus_voltage;
 
     Returns the current bus voltage reading, as a scaled integer in
     milivolts.

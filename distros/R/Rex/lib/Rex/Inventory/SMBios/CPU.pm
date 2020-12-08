@@ -10,7 +10,7 @@ use 5.010001;
 use strict;
 use warnings;
 
-our $VERSION = '1.13.1'; # VERSION
+our $VERSION = '1.13.2'; # VERSION
 
 use Rex::Inventory::SMBios::Section;
 use Rex::Logger;

@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20200904144531;
+our $VERSION = 1.20201204215956;
 
 my $formatters = [
                 {
@@ -244,10 +244,8 @@ my $formatters = [
 
 my $validators = {
                 'fixed_line' => '
-          (?:
-            32|
-            49[4-6]\\d
-          )\\d{9}|
+          32\\d{9,11}|
+          49[4-6]\\d{10}|
           49[0-7]\\d{3,9}|
           (?:
             [34]0|
@@ -316,10 +314,8 @@ my $validators = {
           )\\d{3,12}
         ',
                 'geographic' => '
-          (?:
-            32|
-            49[4-6]\\d
-          )\\d{9}|
+          32\\d{9,11}|
+          49[4-6]\\d{10}|
           49[0-7]\\d{3,9}|
           (?:
             [34]0|
@@ -425,10410 +421,5258 @@ my $validators = {
                 'voip' => ''
               };
 my %areanames = ();
-$areanames{de}->{49201} = "Essen";
-$areanames{de}->{49202} = "Wuppertal";
-$areanames{de}->{49203} = "Duisburg";
-$areanames{de}->{492041} = "Bottrop";
-$areanames{de}->{492043} = "Gladbeck";
-$areanames{de}->{492045} = "Bottrop\-Kirchhellen";
-$areanames{de}->{492051} = "Velbert";
-$areanames{de}->{492052} = "Velbert\-Langenberg";
-$areanames{de}->{492053} = "Velbert\-Neviges";
-$areanames{de}->{492054} = "Essen\-Kettwig";
-$areanames{de}->{492056} = "Heiligenhaus";
-$areanames{de}->{492058} = "Wülfrath";
-$areanames{de}->{492064} = "Dinslaken";
-$areanames{de}->{492065} = "Duisburg\-Rheinhausen";
-$areanames{de}->{492066} = "Duisburg\-Homberg";
-$areanames{de}->{49208} = "Oberhausen\ Rheinland";
-$areanames{de}->{49209} = "Gelsenkirchen";
-$areanames{de}->{492102} = "Ratingen";
-$areanames{de}->{492103} = "Hilden";
-$areanames{de}->{492104} = "Mettmann";
-$areanames{de}->{49211} = "Düsseldorf";
-$areanames{de}->{49212} = "Solingen";
-$areanames{de}->{492129} = "Haan\ Rheinland";
-$areanames{de}->{492131} = "Neuss";
-$areanames{de}->{492132} = "Meerbusch\-Büderich";
-$areanames{de}->{492133} = "Dormagen";
-$areanames{de}->{492137} = "Neuss\-Norf";
-$areanames{de}->{49214} = "Leverkusen";
-$areanames{de}->{492150} = "Meerbusch\-Lank";
-$areanames{de}->{492151} = "Krefeld";
-$areanames{de}->{492152} = "Kempen";
-$areanames{de}->{492153} = "Nettetal\-Lobberich";
-$areanames{de}->{492154} = "Willich";
-$areanames{de}->{492156} = "Willich\-Anrath";
-$areanames{de}->{492157} = "Nettetal\-Kaldenkirchen";
-$areanames{de}->{492158} = "Grefrath\ bei\ Krefeld";
-$areanames{de}->{492159} = "Meerbusch\-Osterath";
-$areanames{de}->{492161} = "Mönchengladbach";
-$areanames{de}->{492162} = "Viersen";
-$areanames{de}->{492163} = "Schwalmtal\ Niederrhein";
-$areanames{de}->{492164} = "Jüchen\-Otzenrath";
-$areanames{de}->{492165} = "Jüchen";
-$areanames{de}->{492166} = "Mönchengladbach\-Rheydt";
-$areanames{de}->{492171} = "Leverkusen\-Opladen";
-$areanames{de}->{492173} = "Langenfeld\ Rheinland";
-$areanames{de}->{492174} = "Burscheid\ Rheinland";
-$areanames{de}->{492175} = "Leichlingen\ Rheinland";
-$areanames{de}->{492181} = "Grevenbroich";
-$areanames{de}->{492182} = "Grevenbroich\-Kapellen";
-$areanames{de}->{492183} = "Rommerskirchen";
-$areanames{de}->{492191} = "Remscheid";
-$areanames{de}->{492192} = "Hückeswagen";
-$areanames{de}->{492193} = "Dabringhausen";
-$areanames{de}->{492195} = "Radevormwald";
-$areanames{de}->{492196} = "Wermelskirchen";
-$areanames{de}->{492202} = "Bergisch\ Gladbach";
-$areanames{de}->{492203} = "Köln\-Porz";
-$areanames{de}->{492204} = "Bensberg";
-$areanames{de}->{492205} = "Rösrath";
-$areanames{de}->{492206} = "Overath";
-$areanames{de}->{492207} = "Kürten\-Dürscheid";
-$areanames{de}->{492208} = "Niederkassel";
-$areanames{de}->{49221} = "Köln";
-$areanames{de}->{492222} = "Bornheim\ Rheinland";
-$areanames{de}->{492223} = "Königswinter";
-$areanames{de}->{492224} = "Bad\ Honnef";
-$areanames{de}->{492225} = "Meckenheim\ Rheinland";
-$areanames{de}->{492226} = "Rheinbach";
-$areanames{de}->{492227} = "Bornheim\-Merten";
-$areanames{de}->{492228} = "Remagen\-Rolandseck";
-$areanames{de}->{492232} = "Brühl\ Rheinland";
-$areanames{de}->{492233} = "Hürth\ Rheinland";
-$areanames{de}->{492234} = "Frechen";
-$areanames{de}->{492235} = "Erftstadt";
-$areanames{de}->{492236} = "Wesseling\ Rheinland";
-$areanames{de}->{492237} = "Kerpen\ Rheinland\-Türnich";
-$areanames{de}->{492238} = "Pulheim";
-$areanames{de}->{492241} = "Siegburg";
-$areanames{de}->{492242} = "Hennef\ Sieg";
-$areanames{de}->{492243} = "Eitorf";
-$areanames{de}->{492244} = "Königswinter\-Oberpleis";
-$areanames{de}->{492245} = "Much";
-$areanames{de}->{492246} = "Lohmar\ Rheinland";
-$areanames{de}->{492247} = "Neunkirchen\-Seelscheid";
-$areanames{de}->{492248} = "Hennef\-Uckerath";
-$areanames{de}->{492251} = "Euskirchen";
-$areanames{de}->{492252} = "Zülpich";
-$areanames{de}->{492253} = "Bad\ Münstereifel";
-$areanames{de}->{492254} = "Weilerswist";
-$areanames{de}->{492255} = "Euskirchen\-Flamersheim";
-$areanames{de}->{492256} = "Mechernich\-Satzvey";
-$areanames{de}->{492257} = "Reckerscheid";
-$areanames{de}->{492261} = "Gummersbach";
-$areanames{de}->{492262} = "Wiehl";
-$areanames{de}->{492263} = "Engelskirchen";
-$areanames{de}->{492264} = "Marienheide";
-$areanames{de}->{492265} = "Reichshof\-Eckenhagen";
-$areanames{de}->{492266} = "Lindlar";
-$areanames{de}->{492267} = "Wipperfürth";
-$areanames{de}->{492268} = "Kürten";
-$areanames{de}->{492269} = "Kierspe\-Rönsahl";
-$areanames{de}->{492271} = "Bergheim\ Erft";
-$areanames{de}->{492272} = "Bedburg\ Erft";
-$areanames{de}->{492273} = "Kerpen\-Horrem";
-$areanames{de}->{492274} = "Elsdorf\ Rheinland";
-$areanames{de}->{492275} = "Kerpen\-Buir";
-$areanames{de}->{49228} = "Bonn";
-$areanames{de}->{492291} = "Waldbröl";
-$areanames{de}->{492292} = "Windeck\ Sieg";
-$areanames{de}->{492293} = "Nümbrecht";
-$areanames{de}->{492294} = "Morsbach\ Sieg";
-$areanames{de}->{492295} = "Ruppichteroth";
-$areanames{de}->{492296} = "Reichshof\-Brüchermühle";
-$areanames{de}->{492297} = "Wildbergerhütte";
-$areanames{de}->{492301} = "Holzwickede";
-$areanames{de}->{492302} = "Witten";
-$areanames{de}->{492303} = "Unna";
-$areanames{de}->{492304} = "Schwerte";
-$areanames{de}->{492305} = "Castrop\-Rauxel";
-$areanames{de}->{492306} = "Lünen";
-$areanames{de}->{492307} = "Kamen";
-$areanames{de}->{492308} = "Unna\-Hemmerde";
-$areanames{de}->{492309} = "Waltrop";
-$areanames{de}->{49231} = "Dortmund";
-$areanames{de}->{492323} = "Herne";
-$areanames{de}->{492324} = "Hattingen\ Ruhr";
-$areanames{de}->{492325} = "Wanne\-Eickel";
-$areanames{de}->{492327} = "Bochum\-Wattenscheid";
-$areanames{de}->{492330} = "Herdecke";
-$areanames{de}->{492331} = "Hagen\ Westfalen";
-$areanames{de}->{492332} = "Gevelsberg";
-$areanames{de}->{492333} = "Ennepetal";
-$areanames{de}->{492334} = "Hagen\-Hohenlimburg";
-$areanames{de}->{492335} = "Wetter\ Ruhr";
-$areanames{de}->{492336} = "Schwelm";
-$areanames{de}->{492337} = "Hagen\-Dahl";
-$areanames{de}->{492338} = "Breckerfeld";
-$areanames{de}->{492339} = "Sprockhövel\-Haßlinghausen";
-$areanames{de}->{49234} = "Bochum";
-$areanames{de}->{492351} = "Lüdenscheid";
-$areanames{de}->{492352} = "Altena\ Westfalen";
-$areanames{de}->{492353} = "Halver";
-$areanames{de}->{492354} = "Meinerzhagen";
-$areanames{de}->{492355} = "Schalksmühle";
-$areanames{de}->{492357} = "Herscheid\ Westfalen";
-$areanames{de}->{492358} = "Meinerzhagen\-Valbert";
-$areanames{de}->{492359} = "Kierspe";
-$areanames{de}->{492360} = "Haltern\-Lippramsdorf";
-$areanames{de}->{492361} = "Recklinghausen";
-$areanames{de}->{492362} = "Dorsten";
-$areanames{de}->{492363} = "Datteln";
-$areanames{de}->{492364} = "Haltern\ Westfalen";
-$areanames{de}->{492365} = "Marl";
-$areanames{de}->{492366} = "Herten\ Westfalen";
-$areanames{de}->{492367} = "Henrichenburg";
-$areanames{de}->{492368} = "Oer\-Erkenschwick";
-$areanames{de}->{492369} = "Dorsten\-Wulfen";
-$areanames{de}->{492371} = "Iserlohn";
-$areanames{de}->{492372} = "Hemer";
-$areanames{de}->{492373} = "Menden\ Sauerland";
-$areanames{de}->{492374} = "Iserlohn\-Letmathe";
-$areanames{de}->{492375} = "Balve";
-$areanames{de}->{492377} = "Wickede\ Ruhr";
-$areanames{de}->{492378} = "Fröndenberg\-Langschede";
-$areanames{de}->{492379} = "Menden\-Asbeck";
-$areanames{de}->{492381} = "Hamm\ Westfalen";
-$areanames{de}->{492382} = "Ahlen\ Westfalen";
-$areanames{de}->{492383} = "Bönen";
-$areanames{de}->{492384} = "Welver";
-$areanames{de}->{492385} = "Hamm\-Rhynern";
-$areanames{de}->{492387} = "Drensteinfurt\-Walstedde";
-$areanames{de}->{492388} = "Hamm\-Uentrop";
-$areanames{de}->{492389} = "Werne";
-$areanames{de}->{492391} = "Plettenberg";
-$areanames{de}->{492392} = "Werdohl";
-$areanames{de}->{492393} = "Sundern\-Allendorf";
-$areanames{de}->{492394} = "Neuenrade\-Affeln";
-$areanames{de}->{492395} = "Finnentrop\-Rönkhausen";
-$areanames{de}->{492401} = "Baesweiler";
-$areanames{de}->{492402} = "Stolberg\ Rheinland";
-$areanames{de}->{492403} = "Eschweiler\ Rheinland";
-$areanames{de}->{492404} = "Alsdorf\ Rheinland";
-$areanames{de}->{492405} = "Würselen";
-$areanames{de}->{492406} = "Herzogenrath";
-$areanames{de}->{492407} = "Herzogenrath\-Kohlscheid";
-$areanames{de}->{492408} = "Aachen\-Kornelimünster";
-$areanames{de}->{492409} = "Stolberg\-Gressenich";
-$areanames{de}->{49241} = "Aachen";
-$areanames{de}->{492421} = "Düren";
-$areanames{de}->{492422} = "Kreuzau";
-$areanames{de}->{492423} = "Langerwehe";
-$areanames{de}->{492424} = "Vettweiss";
-$areanames{de}->{492425} = "Nideggen\-Embken";
-$areanames{de}->{492426} = "Nörvenich";
-$areanames{de}->{492427} = "Nideggen";
-$areanames{de}->{492428} = "Niederzier";
-$areanames{de}->{492429} = "Hürtgenwald";
-$areanames{de}->{492431} = "Erkelenz";
-$areanames{de}->{492432} = "Wassenberg";
-$areanames{de}->{492433} = "Hückelhoven";
-$areanames{de}->{492434} = "Wegberg";
-$areanames{de}->{492435} = "Erkelenz\-Lövenich";
-$areanames{de}->{492436} = "Wegberg\-Rödgen";
-$areanames{de}->{492440} = "Nettersheim\-Tondorf";
-$areanames{de}->{492441} = "Kall";
-$areanames{de}->{492443} = "Mechernich";
-$areanames{de}->{492444} = "Schleiden\-Gemünd";
-$areanames{de}->{492445} = "Schleiden\ Eifel";
-$areanames{de}->{492446} = "Heimbach\ Eifel";
-$areanames{de}->{492447} = "Dahlem\ bei\ Kall";
-$areanames{de}->{492448} = "Hellenthal\-Rescheid";
-$areanames{de}->{492449} = "Blankenheim\ Ahr";
-$areanames{de}->{492451} = "Geilenkirchen";
-$areanames{de}->{492452} = "Heinsberg\ Rheinland";
-$areanames{de}->{492453} = "Heinsberg\-Randerath";
-$areanames{de}->{492454} = "Gangelt";
-$areanames{de}->{492455} = "Waldfeucht";
-$areanames{de}->{492456} = "Selfkant";
-$areanames{de}->{492461} = "Jülich";
-$areanames{de}->{492462} = "Linnich";
-$areanames{de}->{492463} = "Titz";
-$areanames{de}->{492464} = "Aldenhoven\ bei\ Jülich";
-$areanames{de}->{492465} = "Inden";
-$areanames{de}->{492471} = "Roetgen\ Eifel";
-$areanames{de}->{492472} = "Monschau";
-$areanames{de}->{492473} = "Simmerath";
-$areanames{de}->{492474} = "Nideggen\-Schmidt";
-$areanames{de}->{492482} = "Hellenthal";
-$areanames{de}->{492484} = "Mechernich\-Eiserfey";
-$areanames{de}->{492485} = "Schleiden\-Dreiborn";
-$areanames{de}->{492486} = "Nettersheim";
-$areanames{de}->{492501} = "Münster\-Hiltrup";
-$areanames{de}->{492502} = "Nottuln";
-$areanames{de}->{492504} = "Telgte";
-$areanames{de}->{492505} = "Altenberge\ Westfalen";
-$areanames{de}->{492506} = "Münster\-Wolbeck";
-$areanames{de}->{492507} = "Havixbeck";
-$areanames{de}->{492508} = "Drensteinfurt";
-$areanames{de}->{492509} = "Nottuln\-Appelhülsen";
-$areanames{de}->{49251} = "Münster";
-$areanames{de}->{492520} = "Wadersloh\-Diestedde";
-$areanames{de}->{492521} = "Beckum";
-$areanames{de}->{492522} = "Oelde";
-$areanames{de}->{492523} = "Wadersloh";
-$areanames{de}->{492524} = "Ennigerloh";
-$areanames{de}->{492525} = "Beckum\-Neubeckum";
-$areanames{de}->{492526} = "Sendenhorst";
-$areanames{de}->{492527} = "Lippetal\-Lippborg";
-$areanames{de}->{492528} = "Ennigerloh\-Enniger";
-$areanames{de}->{492529} = "Oelde\-Stromberg";
-$areanames{de}->{492532} = "Ostbevern";
-$areanames{de}->{492533} = "Münster\-Nienberge";
-$areanames{de}->{492534} = "Münster\-Roxel";
-$areanames{de}->{492535} = "Sendenhorst\-Albersloh";
-$areanames{de}->{492536} = "Münster\-Albachten";
-$areanames{de}->{492538} = "Drensteinfurt\-Rinkerode";
-$areanames{de}->{492541} = "Coesfeld";
-$areanames{de}->{492542} = "Gescher";
-$areanames{de}->{492543} = "Billerbeck\ Westfalen";
-$areanames{de}->{492545} = "Rosendahl\-Darfeld";
-$areanames{de}->{492546} = "Coesfeld\-Lette";
-$areanames{de}->{492547} = "Rosendahl\-Osterwick";
-$areanames{de}->{492548} = "Dülmen\-Rorup";
-$areanames{de}->{492551} = "Steinfurt\-Burgsteinfurt";
-$areanames{de}->{492552} = "Steinfurt\-Borghorst";
-$areanames{de}->{492553} = "Ochtrup";
-$areanames{de}->{492554} = "Laer\ Kreis\ Steinfurt";
-$areanames{de}->{492555} = "Schöppingen";
-$areanames{de}->{492556} = "Metelen";
-$areanames{de}->{492557} = "Wettringen\ Kreis\ Steinfurt";
-$areanames{de}->{492558} = "Horstmar";
-$areanames{de}->{492561} = "Ahaus";
-$areanames{de}->{492562} = "Gronau\ Westfalen";
-$areanames{de}->{492563} = "Stadtlohn";
-$areanames{de}->{492564} = "Vreden";
-$areanames{de}->{492565} = "Gronau\-Epe";
-$areanames{de}->{492566} = "Legden";
-$areanames{de}->{492567} = "Ahaus\-Alstätte";
-$areanames{de}->{492568} = "Heek";
-$areanames{de}->{492571} = "Greven\ Westfalen";
-$areanames{de}->{492572} = "Emsdetten";
-$areanames{de}->{492573} = "Nordwalde";
-$areanames{de}->{492574} = "Saerbeck";
-$areanames{de}->{492575} = "Greven\-Reckenfeld";
-$areanames{de}->{492581} = "Warendorf";
-$areanames{de}->{492582} = "Everswinkel";
-$areanames{de}->{492583} = "Sassenberg";
-$areanames{de}->{492584} = "Warendorf\-Milte";
-$areanames{de}->{492585} = "Warendorf\-Hoetmar";
-$areanames{de}->{492586} = "Beelen";
-$areanames{de}->{492587} = "Ennigerloh\-Westkirchen";
-$areanames{de}->{492588} = "Harsewinkel\-Greffen";
-$areanames{de}->{492590} = "Dülmen\-Buldern";
-$areanames{de}->{492591} = "Lüdinghausen";
-$areanames{de}->{492592} = "Selm";
-$areanames{de}->{492593} = "Ascheberg\ Westfalen";
-$areanames{de}->{492594} = "Dülmen";
-$areanames{de}->{492595} = "Olfen";
-$areanames{de}->{492596} = "Nordkirchen";
-$areanames{de}->{492597} = "Senden\ Westfalen";
-$areanames{de}->{492598} = "Senden\-Ottmarsbocholt";
-$areanames{de}->{492599} = "Ascheberg\-Herbern";
-$areanames{de}->{492601} = "Nauort";
-$areanames{de}->{492602} = "Montabaur";
-$areanames{de}->{492603} = "Bad\ Ems";
-$areanames{de}->{492604} = "Nassau\ Lahn";
-$areanames{de}->{492605} = "Löf";
-$areanames{de}->{492606} = "Winningen\ Mosel";
-$areanames{de}->{492607} = "Kobern\-Gondorf";
-$areanames{de}->{492608} = "Welschneudorf";
-$areanames{de}->{49261} = "Koblenz\ am\ Rhein";
-$areanames{de}->{492620} = "Neuhäusel\ Westerwald";
-$areanames{de}->{492621} = "Lahnstein";
-$areanames{de}->{492622} = "Bendorf\ am\ Rhein";
-$areanames{de}->{492623} = "Ransbach\-Baumbach";
-$areanames{de}->{492624} = "Höhr\-Grenzhausen";
-$areanames{de}->{492625} = "Ochtendung";
-$areanames{de}->{492626} = "Selters\ Westferwald";
-$areanames{de}->{492627} = "Braubach";
-$areanames{de}->{492628} = "Rhens";
-$areanames{de}->{492630} = "Mülheim\-Kärlich";
-$areanames{de}->{492631} = "Neuwied";
-$areanames{de}->{492632} = "Andernach";
-$areanames{de}->{492633} = "Brohl\-Lützing";
-$areanames{de}->{492634} = "Rengsdorf";
-$areanames{de}->{492635} = "Rheinbrohl";
-$areanames{de}->{492636} = "Burgbrohl";
-$areanames{de}->{492637} = "Weissenthurm";
-$areanames{de}->{492638} = "Waldbreitbach";
-$areanames{de}->{492639} = "Anhausen\ Kreis\ Neuwied";
-$areanames{de}->{492641} = "Bad\ Neuenahr\-Ahrweiler";
-$areanames{de}->{492642} = "Remagen";
-$areanames{de}->{492643} = "Altenahr";
-$areanames{de}->{492644} = "Linz\ am\ Rhein";
-$areanames{de}->{492645} = "Vettelschoss";
-$areanames{de}->{492646} = "Königsfeld\ Eifel";
-$areanames{de}->{492647} = "Kesseling";
-$areanames{de}->{492651} = "Mayen";
-$areanames{de}->{492652} = "Mendig";
-$areanames{de}->{492653} = "Kaisersesch";
-$areanames{de}->{492654} = "Polch";
-$areanames{de}->{492655} = "Weibern";
-$areanames{de}->{492656} = "Virneburg";
-$areanames{de}->{492657} = "Uersfeld";
-$areanames{de}->{492661} = "Bad\ Marienberg\ Westerwald";
-$areanames{de}->{492662} = "Hachenburg";
-$areanames{de}->{492663} = "Westerburg\ Westerwald";
-$areanames{de}->{492664} = "Rennerod";
-$areanames{de}->{492666} = "Freilingen\ Westerwald";
-$areanames{de}->{492667} = "Stein\-Neukirch";
-$areanames{de}->{492671} = "Cochem";
-$areanames{de}->{492672} = "Treis\-Karden";
-$areanames{de}->{492673} = "Ellenz\-Poltersdorf";
-$areanames{de}->{492674} = "Bad\ Bertrich";
-$areanames{de}->{492675} = "Ediger\-Eller";
-$areanames{de}->{492676} = "Ulmen";
-$areanames{de}->{492677} = "Lutzerath";
-$areanames{de}->{492678} = "Büchel\ bei\ Cochem";
-$areanames{de}->{492680} = "Mündersbach";
-$areanames{de}->{492681} = "Altenkirchen\ Westerwald";
-$areanames{de}->{492682} = "Hamm\ Sieg";
-$areanames{de}->{492683} = "Asbach\ Westerwald";
-$areanames{de}->{492684} = "Puderbach\ Westerwald";
-$areanames{de}->{492685} = "Flammersfeld";
-$areanames{de}->{492686} = "Weyerbusch";
-$areanames{de}->{492687} = "Horhausen\ Westerwald";
-$areanames{de}->{492688} = "Kroppach";
-$areanames{de}->{492689} = "Dierdorf";
-$areanames{de}->{492691} = "Adenau";
-$areanames{de}->{492692} = "Kelberg";
-$areanames{de}->{492693} = "Antweiler";
-$areanames{de}->{492694} = "Wershofen";
-$areanames{de}->{492695} = "Insul";
-$areanames{de}->{492696} = "Nohn\ Eifel";
-$areanames{de}->{492697} = "Blankenheim\-Ahrhütte";
-$areanames{de}->{49271} = "Siegen";
-$areanames{de}->{492721} = "Lennestadt";
-$areanames{de}->{492722} = "Attendorn";
-$areanames{de}->{492723} = "Kirchhundem";
-$areanames{de}->{492724} = "Finnentrop\-Serkenrode";
-$areanames{de}->{492725} = "Lennestadt\-Oedingen";
-$areanames{de}->{492732} = "Kreuztal";
-$areanames{de}->{492733} = "Hilchenbach";
-$areanames{de}->{492734} = "Freudenberg\ Westfalen";
-$areanames{de}->{492735} = "Neunkirchen\ Siegerl";
-$areanames{de}->{492736} = "Burbach\ Siegerl";
-$areanames{de}->{492737} = "Netphen\-Deuz";
-$areanames{de}->{492738} = "Netphen";
-$areanames{de}->{492739} = "Wilnsdorf";
-$areanames{de}->{492741} = "Betzdorf";
-$areanames{de}->{492742} = "Wissen";
-$areanames{de}->{492743} = "Daaden";
-$areanames{de}->{492744} = "Herdorf";
-$areanames{de}->{492745} = "Brachbach\ Sieg";
-$areanames{de}->{492747} = "Molzhain";
-$areanames{de}->{492750} = "Diedenshausen";
-$areanames{de}->{492751} = "Bad\ Berleburg";
-$areanames{de}->{492752} = "Bad\ Laasphe";
-$areanames{de}->{492753} = "Erndtebrück";
-$areanames{de}->{492754} = "Bad\ Laasphe\-Feudingen";
-$areanames{de}->{492755} = "Bad\ Berleburg\-Schwarzenau";
-$areanames{de}->{492758} = "Bad\ Berleburg\-Girkhausen";
-$areanames{de}->{492759} = "Bad\ Berleburg\-Aue";
-$areanames{de}->{492761} = "Olpe\ Biggesee";
-$areanames{de}->{492762} = "Wenden\ Südsauerland";
-$areanames{de}->{492763} = "Drolshagen\-Bleche";
-$areanames{de}->{492764} = "Welschen\ Ennest";
-$areanames{de}->{492770} = "Eschenburg";
-$areanames{de}->{492771} = "Dillenburg";
-$areanames{de}->{492772} = "Herborn\ Hessen";
-$areanames{de}->{492773} = "Haiger";
-$areanames{de}->{492774} = "Dietzhölztal";
-$areanames{de}->{492775} = "Driedorf";
-$areanames{de}->{492776} = "Bad\ Endbach\-Hartenrod";
-$areanames{de}->{492777} = "Breitscheid\ Hessen";
-$areanames{de}->{492778} = "Siegbach";
-$areanames{de}->{492779} = "Greifenstein\-Beilstein";
-$areanames{de}->{492801} = "Xanten";
-$areanames{de}->{492802} = "Alpen";
-$areanames{de}->{492803} = "Wesel\-Büderich";
-$areanames{de}->{492804} = "Xanten\-Marienbaum";
-$areanames{de}->{49281} = "Wesel";
-$areanames{de}->{492821} = "Kleve\ Niederrhein";
-$areanames{de}->{492822} = "Emmerich";
-$areanames{de}->{492823} = "Goch";
-$areanames{de}->{492824} = "Kalkar";
-$areanames{de}->{492825} = "Uedem";
-$areanames{de}->{492826} = "Kranenburg\ Niederrhein";
-$areanames{de}->{492827} = "Goch\-Hassum";
-$areanames{de}->{492828} = "Emmerich\-Elten";
-$areanames{de}->{492831} = "Geldern";
-$areanames{de}->{492832} = "Kevelaer";
-$areanames{de}->{492833} = "Kerken";
-$areanames{de}->{492834} = "Straelen";
-$areanames{de}->{492835} = "Issum";
-$areanames{de}->{492836} = "Wachtendonk";
-$areanames{de}->{492837} = "Weeze";
-$areanames{de}->{492838} = "Sonsbeck";
-$areanames{de}->{492839} = "Straelen\-Herongen";
-$areanames{de}->{492841} = "Moers";
-$areanames{de}->{492842} = "Kamp\-Lintfort";
-$areanames{de}->{492843} = "Rheinberg";
-$areanames{de}->{492844} = "Rheinberg\-Orsoy";
-$areanames{de}->{492845} = "Neukirchen\-Vluyn";
-$areanames{de}->{492850} = "Rees\-Haldern";
-$areanames{de}->{492851} = "Rees";
-$areanames{de}->{492852} = "Hamminkeln";
-$areanames{de}->{492853} = "Schermbeck";
-$areanames{de}->{492855} = "Voerde\ Niederrhein";
-$areanames{de}->{492856} = "Hamminkeln\-Brünen";
-$areanames{de}->{492857} = "Rees\-Mehr";
-$areanames{de}->{492858} = "Hünxe";
-$areanames{de}->{492859} = "Wesel\-Bislich";
-$areanames{de}->{492861} = "Borken\ Westfalen";
-$areanames{de}->{492862} = "Südlohn";
-$areanames{de}->{492863} = "Velen";
-$areanames{de}->{492864} = "Reken";
-$areanames{de}->{492865} = "Raesfeld";
-$areanames{de}->{492866} = "Dorsten\-Rhade";
-$areanames{de}->{492867} = "Heiden\ Kreis\ Borken";
-$areanames{de}->{492871} = "Bocholt";
-$areanames{de}->{492872} = "Rhede\ Westfalen";
-$areanames{de}->{492873} = "Isselburg\-Werth";
-$areanames{de}->{492874} = "Isselburg";
-$areanames{de}->{492902} = "Warstein";
-$areanames{de}->{492903} = "Meschede\-Freienohl";
-$areanames{de}->{492904} = "Bestwig";
-$areanames{de}->{492905} = "Bestwig\-Ramsbeck";
-$areanames{de}->{49291} = "Meschede";
-$areanames{de}->{492921} = "Soest";
-$areanames{de}->{492922} = "Werl";
-$areanames{de}->{492923} = "Lippetal\-Herzfeld";
-$areanames{de}->{492924} = "Möhnesee";
-$areanames{de}->{492925} = "Warstein\-Allagen";
-$areanames{de}->{492927} = "Neuengeseke";
-$areanames{de}->{492928} = "Soest\-Ostönnen";
-$areanames{de}->{492931} = "Arnsberg";
-$areanames{de}->{492932} = "Neheim\-Hüsten";
-$areanames{de}->{492933} = "Sundern\ Sauerland";
-$areanames{de}->{492934} = "Sundern\-Altenhellefeld";
-$areanames{de}->{492935} = "Sundern\-Hachen";
-$areanames{de}->{492937} = "Arnsberg\-Oeventrop";
-$areanames{de}->{492938} = "Ense";
-$areanames{de}->{492941} = "Lippstadt";
-$areanames{de}->{492942} = "Geseke";
-$areanames{de}->{492943} = "Erwitte";
-$areanames{de}->{492944} = "Rietberg\-Mastholte";
-$areanames{de}->{492945} = "Lippstadt\-Benninghausen";
-$areanames{de}->{492947} = "Anröchte";
-$areanames{de}->{492948} = "Lippstadt\-Rebbeke";
-$areanames{de}->{492951} = "Büren";
-$areanames{de}->{492952} = "Rüthen";
-$areanames{de}->{492953} = "Wünnenberg";
-$areanames{de}->{492954} = "Rüthen\-Oestereiden";
-$areanames{de}->{492955} = "Büren\-Wewelsburg";
-$areanames{de}->{492957} = "Wünnenberg\-Haaren";
-$areanames{de}->{492958} = "Büren\-Harth";
-$areanames{de}->{492961} = "Brilon";
-$areanames{de}->{492962} = "Olsberg";
-$areanames{de}->{492963} = "Brilon\-Messinghausen";
-$areanames{de}->{492964} = "Brilon\-Alme";
-$areanames{de}->{492971} = "Schmallenberg\-Dorlar";
-$areanames{de}->{492972} = "Schmallenberg";
-$areanames{de}->{492973} = "Eslohe\ Sauerland";
-$areanames{de}->{492974} = "Schmallenberg\-Fredeburg";
-$areanames{de}->{492975} = "Schmallenberg\-Oberkirchen";
-$areanames{de}->{492977} = "Schmallenberg\-Bödefeld";
-$areanames{de}->{492981} = "Winterberg\ Westfalen";
-$areanames{de}->{492982} = "Medebach";
-$areanames{de}->{492983} = "Winterberg\-Siedlinghausen";
-$areanames{de}->{492984} = "Hallenberg";
-$areanames{de}->{492985} = "Winterberg\-Niedersfeld";
-$areanames{de}->{492991} = "Marsberg\-Bredelar";
-$areanames{de}->{492992} = "Marsberg";
-$areanames{de}->{492993} = "Marsberg\-Canstein";
-$areanames{de}->{492994} = "Marsberg\-Westheim";
-$areanames{de}->{4930} = "Berlin";
-$areanames{de}->{493301} = "Oranienburg";
-$areanames{de}->{493302} = "Hennigsdorf";
-$areanames{de}->{493303} = "Birkenwerder";
-$areanames{de}->{493304} = "Velten";
-$areanames{de}->{4933051} = "Nassenheide";
-$areanames{de}->{4933052} = "Leegebruch";
-$areanames{de}->{4933053} = "Zehlendorf\ Kreis\ Oberhavel";
-$areanames{de}->{4933054} = "Liebenwalde";
-$areanames{de}->{4933055} = "Kremmen";
-$areanames{de}->{4933056} = "Mühlenbeck\ Kreis\ Oberhavel";
-$areanames{de}->{493306} = "Gransee";
-$areanames{de}->{493307} = "Zehdenick";
-$areanames{de}->{4933080} = "Marienthal\ Kreis\ Oberhavel";
-$areanames{de}->{4933082} = "Menz\ Kreis\ Oberhavel";
-$areanames{de}->{4933083} = "Schulzendorf\ Kreis\ Oberhavel";
-$areanames{de}->{4933084} = "Gutengermendorf";
-$areanames{de}->{4933085} = "Seilershof";
-$areanames{de}->{4933086} = "Grieben\ Kreis\ Oberhavel";
-$areanames{de}->{4933087} = "Bredereiche";
-$areanames{de}->{4933088} = "Falkenthal";
-$areanames{de}->{4933089} = "Himmelpfort";
-$areanames{de}->{4933093} = "Fürstenberg\ Havel";
-$areanames{de}->{4933094} = "Löwenberg";
-$areanames{de}->{49331} = "Potsdam";
-$areanames{de}->{4933200} = "Bergholz\-Rehbrücke";
-$areanames{de}->{4933201} = "Gross\ Glienicke";
-$areanames{de}->{4933202} = "Töplitz";
-$areanames{de}->{4933203} = "Kleinmachnow";
-$areanames{de}->{4933204} = "Beelitz\ Mark";
-$areanames{de}->{4933205} = "Michendorf";
-$areanames{de}->{4933206} = "Fichtenwalde";
-$areanames{de}->{4933207} = "Gross\ Kreutz";
-$areanames{de}->{4933208} = "Fahrland";
-$areanames{de}->{4933209} = "Caputh";
-$areanames{de}->{493321} = "Nauen\ Brandenburg";
-$areanames{de}->{493322} = "Falkensee";
-$areanames{de}->{4933230} = "Börnicke\ Kreis\ Havelland";
-$areanames{de}->{4933231} = "Pausin";
-$areanames{de}->{4933232} = "Brieselang";
-$areanames{de}->{4933233} = "Ketzin";
-$areanames{de}->{4933234} = "Wustermark";
-$areanames{de}->{4933235} = "Friesack";
-$areanames{de}->{4933237} = "Paulinenaue";
-$areanames{de}->{4933238} = "Senzke";
-$areanames{de}->{4933239} = "Gross\ Behnitz";
-$areanames{de}->{493327} = "Werder\ Havel";
-$areanames{de}->{493328} = "Teltow";
-$areanames{de}->{493329} = "Stahnsdorf";
-$areanames{de}->{493331} = "Angermünde";
-$areanames{de}->{493332} = "Schwedt\/Oder";
-$areanames{de}->{4933331} = "Casekow";
-$areanames{de}->{4933332} = "Gartz\ Oder";
-$areanames{de}->{4933333} = "Tantow";
-$areanames{de}->{4933334} = "Greiffenberg";
-$areanames{de}->{4933335} = "Pinnow\ Kreis\ Uckermark";
-$areanames{de}->{4933336} = "Passow\ Kreis\ Uckermark";
-$areanames{de}->{4933337} = "Altkünkendorf";
-$areanames{de}->{4933338} = "Stolpe\/Oder";
-$areanames{de}->{493334} = "Eberswalde";
-$areanames{de}->{493335} = "Finowfurt";
-$areanames{de}->{4933361} = "Joachimsthal";
-$areanames{de}->{4933362} = "Liepe\ Kreis\ Barnim";
-$areanames{de}->{4933363} = "Altenhof\ Kreis\ Barnim";
-$areanames{de}->{4933364} = "Gross\ Ziethen\ Kreis\ Barnim";
-$areanames{de}->{4933365} = "Lüdersdorf\ Kreis\ Barnim";
-$areanames{de}->{4933366} = "Chorin";
-$areanames{de}->{4933367} = "Friedrichswalde\ Brandenburg";
-$areanames{de}->{4933368} = "Hohensaaten";
-$areanames{de}->{4933369} = "Oderberg";
-$areanames{de}->{493337} = "Biesenthal\ Brandenburg";
-$areanames{de}->{493338} = "Bernau\ Brandenburg";
-$areanames{de}->{4933393} = "Gross\ Schönebeck\ Kreis\ Barnim";
-$areanames{de}->{4933394} = "Blumberg\ Kreis\ Barnim";
-$areanames{de}->{4933395} = "Zerpenschleuse";
-$areanames{de}->{4933396} = "Klosterfelde";
-$areanames{de}->{4933397} = "Wandlitz";
-$areanames{de}->{4933398} = "Werneuchen";
-$areanames{de}->{493341} = "Strausberg";
-$areanames{de}->{493342} = "Neuenhagen\ bei\ Berlin";
-$areanames{de}->{4933432} = "Müncheberg";
-$areanames{de}->{4933433} = "Buckow\ Märkische\ Schweiz";
-$areanames{de}->{4933434} = "Herzfelde\ bei\ Strausberg";
-$areanames{de}->{4933435} = "Rehfelde";
-$areanames{de}->{4933436} = "Prötzel";
-$areanames{de}->{4933437} = "Reichenberg\ bei\ Strausberg";
-$areanames{de}->{4933438} = "Altlandsberg";
-$areanames{de}->{4933439} = "Fredersdorf\-Vogelsdorf";
-$areanames{de}->{493344} = "Bad\ Freienwalde";
-$areanames{de}->{4933451} = "Heckelberg";
-$areanames{de}->{4933452} = "Neulewin";
-$areanames{de}->{4933454} = "Wölsickendorf\/Wollenberg";
-$areanames{de}->{4933456} = "Wriezen";
-$areanames{de}->{4933457} = "Altreetz";
-$areanames{de}->{4933458} = "Falkenberg\ Mark";
-$areanames{de}->{493346} = "Seelow";
-$areanames{de}->{4933470} = "Lietzen";
-$areanames{de}->{4933472} = "Golzow\ bei\ Seelow";
-$areanames{de}->{4933473} = "Zechin";
-$areanames{de}->{4933474} = "Neutrebbin";
-$areanames{de}->{4933475} = "Letschin";
-$areanames{de}->{4933476} = "Neuhardenberg";
-$areanames{de}->{4933477} = "Trebnitz\ bei\ Müncheberg";
-$areanames{de}->{4933478} = "Gross\ Neuendorf";
-$areanames{de}->{4933479} = "Küstrin\-Kietz";
-$areanames{de}->{49335} = "Frankfurt\ \(Oder\)";
-$areanames{de}->{4933601} = "Podelzig";
-$areanames{de}->{4933602} = "Alt\ Zeschdorf";
-$areanames{de}->{4933603} = "Falkenhagen\ bei\ Seelow";
-$areanames{de}->{4933604} = "Lebus";
-$areanames{de}->{4933605} = "Boossen";
-$areanames{de}->{4933606} = "Müllrose";
-$areanames{de}->{4933607} = "Briesen\ Mark";
-$areanames{de}->{4933608} = "Jacobsdorf\ Mark";
-$areanames{de}->{4933609} = "Brieskow\-Finkenheerd";
-$areanames{de}->{493361} = "Fürstenwalde\ Spree";
-$areanames{de}->{493362} = "Erkner";
-$areanames{de}->{4933631} = "Bad\ Saarow\-Pieskow";
-$areanames{de}->{4933632} = "Hangelsberg";
-$areanames{de}->{4933633} = "Spreenhagen";
-$areanames{de}->{4933634} = "Berkenbrück\ Kreis\ Oder\-Spree";
-$areanames{de}->{4933635} = "Arensdorf\ Kreis\ Oder\-Spree";
-$areanames{de}->{4933636} = "Steinhöfel\ Kreis\ Oder\-Spree";
-$areanames{de}->{4933637} = "Beerfelde";
-$areanames{de}->{4933638} = "Rüdersdorf\ bei\ Berlin";
-$areanames{de}->{493364} = "Eisenhüttenstadt";
-$areanames{de}->{4933652} = "Neuzelle";
-$areanames{de}->{4933653} = "Ziltendorf";
-$areanames{de}->{4933654} = "Fünfeichen";
-$areanames{de}->{4933655} = "Grunow\ Kreis\ Oder\-Spree";
-$areanames{de}->{4933656} = "Bahro";
-$areanames{de}->{4933657} = "Steinsdorf\ Brandenburg";
-$areanames{de}->{493366} = "Beeskow";
-$areanames{de}->{4933671} = "Lieberose";
-$areanames{de}->{4933672} = "Pfaffendorfb\ Beeskow";
-$areanames{de}->{4933673} = "Weichensdorf";
-$areanames{de}->{4933674} = "Trebatsch";
-$areanames{de}->{4933675} = "Tauche";
-$areanames{de}->{4933676} = "Friedland\ bei\ Beeskow";
-$areanames{de}->{4933677} = "Glienicke\ bei\ Beeskow";
-$areanames{de}->{4933678} = "Storkow\ Mark";
-$areanames{de}->{4933679} = "Wendisch\ Rietz";
-$areanames{de}->{4933701} = "Grossbeeren";
-$areanames{de}->{4933702} = "Wünsdorf";
-$areanames{de}->{4933703} = "Sperenberg";
-$areanames{de}->{4933704} = "Baruth\ Mark";
-$areanames{de}->{4933708} = "Rangsdorf";
-$areanames{de}->{493371} = "Luckenwalde";
-$areanames{de}->{493372} = "Jüterbog";
-$areanames{de}->{4933731} = "Trebbin";
-$areanames{de}->{4933732} = "Hennickendorf\ bei\ Luckenwalde";
-$areanames{de}->{4933733} = "Stülpe";
-$areanames{de}->{4933734} = "Felgentreu";
-$areanames{de}->{4933741} = "Niedergörsdorf";
-$areanames{de}->{4933742} = "Oehna\ Brandenburg";
-$areanames{de}->{4933743} = "Blönsdorf";
-$areanames{de}->{4933744} = "Hohenseefeld";
-$areanames{de}->{4933745} = "Petkus";
-$areanames{de}->{4933746} = "Werbig\ bei\ Jüterbog";
-$areanames{de}->{4933747} = "Marzahna";
-$areanames{de}->{4933748} = "Treuenbrietzen";
-$areanames{de}->{493375} = "Königs\ Wusterhausen";
-$areanames{de}->{4933760} = "Münchehofe\ Kreis\ Dahme\-Spreewald";
-$areanames{de}->{4933762} = "Zeuthen";
-$areanames{de}->{4933763} = "Bestensee";
-$areanames{de}->{4933764} = "Mittenwalde\ Mark";
-$areanames{de}->{4933765} = "Märkisch\ Buchholz";
-$areanames{de}->{4933766} = "Teupitz";
-$areanames{de}->{4933767} = "Friedersdorf\ bei\ Berlin";
-$areanames{de}->{4933768} = "Prieros";
-$areanames{de}->{4933769} = "Töpchin";
-$areanames{de}->{493377} = "Zossen\ Brandenburg";
-$areanames{de}->{493378} = "Ludwigsfelde";
-$areanames{de}->{493379} = "Mahlow";
-$areanames{de}->{493381} = "Brandenburg\ an\ der\ Havel";
-$areanames{de}->{493382} = "Lehnin";
-$areanames{de}->{4933830} = "Ziesar";
-$areanames{de}->{4933831} = "Weseram";
-$areanames{de}->{4933832} = "Rogäsen";
-$areanames{de}->{4933833} = "Wollin\ bei\ Brandenburg";
-$areanames{de}->{4933834} = "Pritzerbe";
-$areanames{de}->{4933835} = "Golzow\ bei\ Brandenburg";
-$areanames{de}->{4933836} = "Butzow\ bei\ Brandenburg";
-$areanames{de}->{4933837} = "Brielow";
-$areanames{de}->{4933838} = "Päwesin";
-$areanames{de}->{4933839} = "Wusterwitz";
-$areanames{de}->{4933841} = "Belzig";
-$areanames{de}->{4933843} = "Niemegk";
-$areanames{de}->{4933844} = "Brück\ Brandenburg";
-$areanames{de}->{4933845} = "Borkheide";
-$areanames{de}->{4933846} = "Dippmannsdorf";
-$areanames{de}->{4933847} = "Görzke";
-$areanames{de}->{4933848} = "Raben";
-$areanames{de}->{4933849} = "Wiesenburg\ Mark";
-$areanames{de}->{493385} = "Rathenow";
-$areanames{de}->{493386} = "Premnitz";
-$areanames{de}->{4933870} = "Zollchow\ bei\ Rathenow";
-$areanames{de}->{4933872} = "Hohennauen";
-$areanames{de}->{4933873} = "Grosswudicke";
-$areanames{de}->{4933874} = "Stechow\ Brandenburg";
-$areanames{de}->{4933875} = "Rhinow";
-$areanames{de}->{4933876} = "Buschow";
-$areanames{de}->{4933877} = "Nitzahn";
-$areanames{de}->{4933878} = "Nennhausen";
-$areanames{de}->{493391} = "Neuruppin";
-$areanames{de}->{4933920} = "Walsleben\ bei\ Neuruppin";
-$areanames{de}->{4933921} = "Zechlinerhütte";
-$areanames{de}->{4933922} = "Karwesee";
-$areanames{de}->{4933923} = "Flecken\ Zechlin";
-$areanames{de}->{4933924} = "Rägelin";
-$areanames{de}->{4933925} = "Wustrau\-Altfriesack";
-$areanames{de}->{4933926} = "Herzberg\ Mark";
-$areanames{de}->{4933927} = "Linum";
-$areanames{de}->{4933928} = "Wildberg\ Brandenburg";
-$areanames{de}->{4933929} = "Gühlen\-Glienicke";
-$areanames{de}->{4933931} = "Rheinsberg\ Mark";
-$areanames{de}->{4933932} = "Fehrbellin";
-$areanames{de}->{4933933} = "Lindow\ Mark";
-$areanames{de}->{493394} = "Wittstock\ Dosse";
-$areanames{de}->{493395} = "Pritzwalk";
-$areanames{de}->{4933962} = "Heiligengrabe";
-$areanames{de}->{4933963} = "Wulfersdorf\ bei\ Wittstock";
-$areanames{de}->{4933964} = "Fretzdorf";
-$areanames{de}->{4933965} = "Herzsprung\ bei\ Wittstock";
-$areanames{de}->{4933966} = "Dranse";
-$areanames{de}->{4933967} = "Freyenstein";
-$areanames{de}->{4933968} = "Meyenburg\ Kreis\ Prignitz";
-$areanames{de}->{4933969} = "Stepenitz";
-$areanames{de}->{4933970} = "Neustadt\ Dosse";
-$areanames{de}->{4933971} = "Kyritz\ Brandenburg";
-$areanames{de}->{4933972} = "Breddin";
-$areanames{de}->{4933973} = "Zernitz\ bei\ Neustadt\ Dosse";
-$areanames{de}->{4933974} = "Dessow";
-$areanames{de}->{4933975} = "Dannenwalde\ Kreis\ Prignitz";
-$areanames{de}->{4933976} = "Wutike";
-$areanames{de}->{4933977} = "Gumtow";
-$areanames{de}->{4933978} = "Segeletz";
-$areanames{de}->{4933979} = "Wusterhausen\ Dosse";
-$areanames{de}->{4933981} = "Putlitz";
-$areanames{de}->{4933982} = "Hoppenrade\ Kreis\ Prignitz";
-$areanames{de}->{4933983} = "Gross\ Pankow\ Kreis\ Prignitz";
-$areanames{de}->{4933984} = "Blumenthal\ bei\ Pritzwalk";
-$areanames{de}->{4933986} = "Falkenhagen\ Kreis\ Prignitz";
-$areanames{de}->{4933989} = "Sadenbeck";
-$areanames{de}->{49340} = "Dessau\ Anh";
-$areanames{de}->{49341} = "Leipzig";
-$areanames{de}->{4934202} = "Delitzsch";
-$areanames{de}->{4934203} = "Zwenkau";
-$areanames{de}->{4934204} = "Schkeuditz";
-$areanames{de}->{4934205} = "Markranstädt";
-$areanames{de}->{4934206} = "Rötha";
-$areanames{de}->{4934207} = "Zwochau";
-$areanames{de}->{4934208} = "Löbnitz\ bei\ Delitzsch";
-$areanames{de}->{493421} = "Torgau";
-$areanames{de}->{4934221} = "Schildau\ Gneisenaustadt";
-$areanames{de}->{4934222} = "Arzberg\ bei\ Torgau";
-$areanames{de}->{4934223} = "Dommitzsch";
-$areanames{de}->{4934224} = "Belgern\ Sachsen";
-$areanames{de}->{493423} = "Eilenburg";
-$areanames{de}->{4934241} = "Jesewitz";
-$areanames{de}->{4934242} = "Hohenpriessnitz";
-$areanames{de}->{4934243} = "Bad\ Düben";
-$areanames{de}->{4934244} = "Mockrehna";
-$areanames{de}->{493425} = "Wurzen";
-$areanames{de}->{4934261} = "Kühren\ bei\ Wurzen";
-$areanames{de}->{4934262} = "Falkenhain\ bei\ Wurzen";
-$areanames{de}->{4934263} = "Hohburg";
-$areanames{de}->{4934291} = "Borsdorf";
-$areanames{de}->{4934292} = "Brandis\ bei\ Wurzen";
-$areanames{de}->{4934293} = "Naunhof\ bei\ Grimma";
-$areanames{de}->{4934294} = "Rackwitz";
-$areanames{de}->{4934295} = "Krensitz";
-$areanames{de}->{4934296} = "Groitzsch\ bei\ Pegau";
-$areanames{de}->{4934297} = "Liebertwolkwitz";
-$areanames{de}->{4934298} = "Taucha\ bei\ Leipzig";
-$areanames{de}->{4934299} = "Gaschwitz";
-$areanames{de}->{493431} = "Döbeln";
-$areanames{de}->{4934321} = "Leisnig";
-$areanames{de}->{4934322} = "Rosswein";
-$areanames{de}->{4934324} = "Ostrau\ Sachsen";
-$areanames{de}->{4934325} = "Mochau\-Lüttewitz";
-$areanames{de}->{4934327} = "Waldheim\ Sachsen";
-$areanames{de}->{4934328} = "Hartha\ bei\ Döbeln";
-$areanames{de}->{493433} = "Borna\ Stadt";
-$areanames{de}->{4934341} = "Geithain";
-$areanames{de}->{4934342} = "Neukieritzsch";
-$areanames{de}->{4934343} = "Regis\-Breitingen";
-$areanames{de}->{4934344} = "Kohren\-Sahlis";
-$areanames{de}->{4934345} = "Bad\ Lausick";
-$areanames{de}->{4934346} = "Narsdorf";
-$areanames{de}->{4934347} = "Oelzschau\ bei\ Borna";
-$areanames{de}->{4934348} = "Frohburg";
-$areanames{de}->{493435} = "Oschatz";
-$areanames{de}->{4934361} = "Dahlen\ Sachsen";
-$areanames{de}->{4934362} = "Mügeln\ bei\ Oschatz";
-$areanames{de}->{4934363} = "Cavertitz";
-$areanames{de}->{4934364} = "Wermsdorf";
-$areanames{de}->{493437} = "Grimma";
-$areanames{de}->{4934381} = "Colditz";
-$areanames{de}->{4934382} = "Nerchau";
-$areanames{de}->{4934383} = "Trebsen\ Mulde";
-$areanames{de}->{4934384} = "Grossbothen";
-$areanames{de}->{4934385} = "Mutzschen";
-$areanames{de}->{4934386} = "Dürrweitzschen\ bei\ Grimma";
-$areanames{de}->{493441} = "Zeitz";
-$areanames{de}->{4934422} = "Osterfeld";
-$areanames{de}->{4934423} = "Heuckewalde";
-$areanames{de}->{4934424} = "Reuden\ bei\ Zeitz";
-$areanames{de}->{4934425} = "Droyssig";
-$areanames{de}->{4934426} = "Kayna";
-$areanames{de}->{493443} = "Weissenfels\ Sachsen\-Anhalt";
-$areanames{de}->{4934441} = "Hohenmölsen";
-$areanames{de}->{4934443} = "Teuchern";
-$areanames{de}->{4934444} = "Lützen";
-$areanames{de}->{4934445} = "Stößen";
-$areanames{de}->{4934446} = "Grosskorbetha";
-$areanames{de}->{493445} = "Naumburg\ Saale";
-$areanames{de}->{4934461} = "Nebra\ Unstrut";
-$areanames{de}->{4934462} = "Laucha\ Unstrut";
-$areanames{de}->{4934463} = "Bad\ Kösen";
-$areanames{de}->{4934464} = "Freyburg\ Unstrut";
-$areanames{de}->{4934465} = "Bad\ Bibra";
-$areanames{de}->{4934466} = "Janisroda";
-$areanames{de}->{4934467} = "Eckartsberga";
-$areanames{de}->{493447} = "Altenburg\ Thüringen";
-$areanames{de}->{493448} = "Meuselwitz\ Thüringen";
-$areanames{de}->{4934491} = "Schmölln\ Thüringen";
-$areanames{de}->{4934492} = "Lucka";
-$areanames{de}->{4934493} = "Gößnitz\ Thüringen";
-$areanames{de}->{4934494} = "Ehrenhain";
-$areanames{de}->{4934495} = "Dobitschen";
-$areanames{de}->{4934496} = "Nöbdenitz";
-$areanames{de}->{4934497} = "Langenleuba\-Niederhain";
-$areanames{de}->{4934498} = "Rositz";
-$areanames{de}->{49345} = "Halle\ Saale";
-$areanames{de}->{4934600} = "Ostrau\ Saalkreis";
-$areanames{de}->{4934601} = "Teutschenthal";
-$areanames{de}->{4934602} = "Landsberg\ Sachsen\-Anhalt";
-$areanames{de}->{4934603} = "Nauendorf\ Sachsen\-Anhalt";
-$areanames{de}->{4934604} = "Niemberg";
-$areanames{de}->{4934605} = "Gröbers";
-$areanames{de}->{4934606} = "Teicha\ Sachsen\-Anhalt";
-$areanames{de}->{4934607} = "Wettin";
-$areanames{de}->{4934609} = "Salzmünde";
-$areanames{de}->{493461} = "Merseburg\ Saale";
-$areanames{de}->{493462} = "Bad\ Dürrenberg";
-$areanames{de}->{4934632} = "Mücheln\ Geiseltal";
-$areanames{de}->{4934633} = "Braunsbedra";
-$areanames{de}->{4934635} = "Bad\ Lauchstädt";
-$areanames{de}->{4934636} = "Schafstädt";
-$areanames{de}->{4934637} = "Frankleben";
-$areanames{de}->{4934638} = "Zöschen";
-$areanames{de}->{4934639} = "Wallendorf\ Luppe";
-$areanames{de}->{493464} = "Sangerhausen";
-$areanames{de}->{4934651} = "Rossla";
-$areanames{de}->{4934652} = "Allstedt";
-$areanames{de}->{4934653} = "Rottleberode";
-$areanames{de}->{4934654} = "Stolberg\ Harz";
-$areanames{de}->{4934656} = "Wallhausen\ Sachsen\-Anhalt";
-$areanames{de}->{4934658} = "Hayn\ Harz";
-$areanames{de}->{4934659} = "Blankenheim\ bei\ Sangerhausen";
-$areanames{de}->{493466} = "Artern\ Unstrut";
-$areanames{de}->{4934671} = "Bad\ Frankenhausen\ Kyffhäuser";
-$areanames{de}->{4934672} = "Rossleben";
-$areanames{de}->{4934673} = "Heldrungen";
-$areanames{de}->{4934691} = "Könnern";
-$areanames{de}->{4934692} = "Alsleben\ Saale";
-$areanames{de}->{493471} = "Bernburg\ Saale";
-$areanames{de}->{4934721} = "Nienburg\ Saale";
-$areanames{de}->{4934722} = "Preusslitz";
-$areanames{de}->{493473} = "Aschersleben\ Sachsen\-Anhalt";
-$areanames{de}->{4934741} = "Frose";
-$areanames{de}->{4934742} = "Sylda";
-$areanames{de}->{4934743} = "Ermsleben";
-$areanames{de}->{4934745} = "Winningen\ Sachsen\-Anhalt";
-$areanames{de}->{4934746} = "Giersleben";
-$areanames{de}->{493475} = "Lutherstadt\ Eisleben";
-$areanames{de}->{493476} = "Hettstedt\ Sachsen\-Anhalt";
-$areanames{de}->{4934771} = "Querfurt";
-$areanames{de}->{4934772} = "Helbra";
-$areanames{de}->{4934773} = "Schwittersdorf";
-$areanames{de}->{4934774} = "Röblingen\ am\ See";
-$areanames{de}->{4934775} = "Wippra";
-$areanames{de}->{4934776} = "Rothenschirmbach";
-$areanames{de}->{4934779} = "Abberode";
-$areanames{de}->{4934781} = "Greifenhagen";
-$areanames{de}->{4934782} = "Mansfeld\ Südharz";
-$areanames{de}->{4934783} = "Gerbstedt";
-$areanames{de}->{4934785} = "Sandersleben";
-$areanames{de}->{4934901} = "Roßlau\ Elbe";
-$areanames{de}->{4934903} = "Coswig\ Anhalt";
-$areanames{de}->{4934904} = "Oranienbaum";
-$areanames{de}->{4934905} = "Wörlitz";
-$areanames{de}->{4934906} = "Raguhn";
-$areanames{de}->{4934907} = "Jeber\-Bergfrieden";
-$areanames{de}->{4934909} = "Aken\ Elbe";
-$areanames{de}->{493491} = "Lutherstadt\ Wittenberg";
-$areanames{de}->{4934920} = "Kropstädt";
-$areanames{de}->{4934921} = "Kemberg";
-$areanames{de}->{4934922} = "Mühlanger";
-$areanames{de}->{4934923} = "Cobbelsdorf";
-$areanames{de}->{4934924} = "Zahna";
-$areanames{de}->{4934925} = "Bad\ Schmiedeberg";
-$areanames{de}->{4934926} = "Pretzsch\ Elbe";
-$areanames{de}->{4934927} = "Globig\-Bleddin";
-$areanames{de}->{4934928} = "Seegrehna";
-$areanames{de}->{4934929} = "Straach";
-$areanames{de}->{493493} = "Bitterfeld";
-$areanames{de}->{493494} = "Wolfen";
-$areanames{de}->{4934953} = "Gräfenhainichen";
-$areanames{de}->{4934954} = "Roitzsch\ bei\ Bitterfeld";
-$areanames{de}->{4934955} = "Gossa";
-$areanames{de}->{4934956} = "Zörbig";
-$areanames{de}->{493496} = "Köthen\ Anhalt";
-$areanames{de}->{4934973} = "Osternienburg";
-$areanames{de}->{4934975} = "Görzig\ Kreis\ Köthen";
-$areanames{de}->{4934976} = "Gröbzig";
-$areanames{de}->{4934977} = "Quellendorf";
-$areanames{de}->{4934978} = "Radegast\ Kreis\ Köthen";
-$areanames{de}->{4934979} = "Wulfen\ Sachsen\-Anhalt";
-$areanames{de}->{493501} = "Pirna";
-$areanames{de}->{4935020} = "Struppen";
-$areanames{de}->{4935021} = "Königstein\ Sächsische\ Schweiz";
-$areanames{de}->{4935022} = "Bad\ Schandau";
-$areanames{de}->{4935023} = "Bad\ Gottleuba";
-$areanames{de}->{4935024} = "Stadt\ Wehlen";
-$areanames{de}->{4935025} = "Liebstadt";
-$areanames{de}->{4935026} = "Dürrröhrsdorf\-Dittersbach";
-$areanames{de}->{4935027} = "Weesenstein";
-$areanames{de}->{4935028} = "Krippen";
-$areanames{de}->{4935032} = "Langenhennersdorf";
-$areanames{de}->{4935033} = "Rosenthal\ Sächsische\ Schweiz";
-$areanames{de}->{493504} = "Dippoldiswalde";
-$areanames{de}->{4935052} = "Kipsdorf\ Kurort";
-$areanames{de}->{4935053} = "Glashütte\ Sachsen";
-$areanames{de}->{4935054} = "Lauenstein\ Sachsen";
-$areanames{de}->{4935055} = "Höckendorf\ bei\ Dippoldiswalde";
-$areanames{de}->{4935056} = "Altenberg\ Sachsen";
-$areanames{de}->{4935057} = "Hermsdorf\ Erzgebirge";
-$areanames{de}->{4935058} = "Pretzschendorf";
-$areanames{de}->{49351} = "Dresden";
-$areanames{de}->{4935200} = "Arnsdorf\ bei\ Dresden";
-$areanames{de}->{4935201} = "Langebrück";
-$areanames{de}->{4935202} = "Klingenberg\ Sachsen";
-$areanames{de}->{4935203} = "Tharandt";
-$areanames{de}->{4935204} = "Wilsdruff";
-$areanames{de}->{4935205} = "Ottendorf\-Okrilla";
-$areanames{de}->{4935206} = "Kreischa\ bei\ Dresden";
-$areanames{de}->{4935207} = "Moritzburg";
-$areanames{de}->{4935208} = "Radeburg";
-$areanames{de}->{4935209} = "Mohorn";
-$areanames{de}->{493521} = "Meissen";
-$areanames{de}->{493522} = "Grossenhain\ Sachsen";
-$areanames{de}->{493523} = "Coswig\ bei\ Dresden";
-$areanames{de}->{4935240} = "Tauscha\ bei\ Großenhain";
-$areanames{de}->{4935241} = "Lommatzsch";
-$areanames{de}->{4935242} = "Nossen";
-$areanames{de}->{4935243} = "Weinböhla";
-$areanames{de}->{4935244} = "Krögis";
-$areanames{de}->{4935245} = "Burkhardswalde\-Munzig";
-$areanames{de}->{4935246} = "Ziegenhain\ Sachsen";
-$areanames{de}->{4935247} = "Zehren\ Sachsen";
-$areanames{de}->{4935248} = "Schönfeld\ bei\ Großenhain";
-$areanames{de}->{4935249} = "Basslitz";
-$areanames{de}->{493525} = "Riesa";
-$areanames{de}->{4935263} = "Gröditz\ bei\ Riesa";
-$areanames{de}->{4935264} = "Strehla";
-$areanames{de}->{4935265} = "Glaubitz";
-$areanames{de}->{4935266} = "Heyda\ bei\ Riesa";
-$areanames{de}->{4935267} = "Diesbar\-Seusslitz";
-$areanames{de}->{4935268} = "Stauchitz";
-$areanames{de}->{493528} = "Radeberg";
-$areanames{de}->{493529} = "Heidenau\ Sachsen";
-$areanames{de}->{493531} = "Finsterwalde";
-$areanames{de}->{4935322} = "Doberlug\-Kirchhain";
-$areanames{de}->{4935323} = "Sonnewalde";
-$areanames{de}->{4935324} = "Crinitz";
-$areanames{de}->{4935325} = "Rückersdorf\ bei\ Finsterwalde";
-$areanames{de}->{4935326} = "Schönborn\ Kreis\ Elbe\-Elster";
-$areanames{de}->{4935327} = "Priessen";
-$areanames{de}->{4935329} = "Dollenchen";
-$areanames{de}->{493533} = "Elsterwerda";
-$areanames{de}->{4935341} = "Bad\ Liebenwerda";
-$areanames{de}->{4935342} = "Mühlberg\ Elbe";
-$areanames{de}->{4935343} = "Hirschfeld\ bei\ Elsterwerda";
-$areanames{de}->{493535} = "Herzberg\ Elster";
-$areanames{de}->{4935361} = "Schlieben";
-$areanames{de}->{4935362} = "Schönewalde\ bei\ Herzberg";
-$areanames{de}->{4935363} = "Fermerswalde";
-$areanames{de}->{4935364} = "Lebusa";
-$areanames{de}->{4935365} = "Falkenberg\ Elster";
-$areanames{de}->{493537} = "Jessen\ Elster";
-$areanames{de}->{4935383} = "Elster\ Elbe";
-$areanames{de}->{4935384} = "Steinsdorf\ bei\ Jessen";
-$areanames{de}->{4935385} = "Annaburg";
-$areanames{de}->{4935386} = "Prettin";
-$areanames{de}->{4935387} = "Seyda";
-$areanames{de}->{4935388} = "Klöden";
-$areanames{de}->{4935389} = "Holzdorf\ Elster";
-$areanames{de}->{493541} = "Calau";
-$areanames{de}->{493542} = "Lübbenau\ Spreewald";
-$areanames{de}->{4935433} = "Vetschau";
-$areanames{de}->{4935434} = "Altdöbern";
-$areanames{de}->{4935435} = "Gollmitz\ bei\ Calau";
-$areanames{de}->{4935436} = "Laasow\ bei\ Calau";
-$areanames{de}->{4935439} = "Zinnitz";
-$areanames{de}->{493544} = "Luckau\ Brandenburg";
-$areanames{de}->{4935451} = "Dahme\ Brandenburg";
-$areanames{de}->{4935452} = "Golssen";
-$areanames{de}->{4935453} = "Drahnsdorf";
-$areanames{de}->{4935454} = "Uckro";
-$areanames{de}->{4935455} = "Walddrehna";
-$areanames{de}->{4935456} = "Terpt";
-$areanames{de}->{493546} = "Lübben\ Spreewald";
-$areanames{de}->{4935471} = "Birkenhainchen";
-$areanames{de}->{4935472} = "Schlepzig";
-$areanames{de}->{4935473} = "Neu\ Lübbenau";
-$areanames{de}->{4935474} = "Schönwalde\ bei\ Lübben";
-$areanames{de}->{4935475} = "Straupitz";
-$areanames{de}->{4935476} = "Wittmannsdorf\-Bückchen";
-$areanames{de}->{4935477} = "Rietzneuendorf\-Friedrichshof";
-$areanames{de}->{4935478} = "Goyatz";
-$areanames{de}->{49355} = "Cottbus";
-$areanames{de}->{4935600} = "Döbern\ NL";
-$areanames{de}->{4935601} = "Peitz";
-$areanames{de}->{4935602} = "Drebkau";
-$areanames{de}->{4935603} = "Burg\ Spreewald";
-$areanames{de}->{4935604} = "Krieschow";
-$areanames{de}->{4935605} = "Komptendorf";
-$areanames{de}->{4935606} = "Briesen\ bei\ Cottbus";
-$areanames{de}->{4935607} = "Jänschwalde";
-$areanames{de}->{4935608} = "Gross\ Ossnig";
-$areanames{de}->{4935609} = "Drachhausen";
-$areanames{de}->{493561} = "Guben";
-$areanames{de}->{493562} = "Forst\ Lausitz";
-$areanames{de}->{493563} = "Spremberg";
-$areanames{de}->{493564} = "Schwarze\ Pumpe";
-$areanames{de}->{4935691} = "Bärenklau\ NL";
-$areanames{de}->{4935692} = "Kerkwitz";
-$areanames{de}->{4935693} = "Lauschütz";
-$areanames{de}->{4935694} = "Gosda\ bei\ Klinge";
-$areanames{de}->{4935695} = "Simmersdorf";
-$areanames{de}->{4935696} = "Briesnig";
-$areanames{de}->{4935697} = "Bagenz";
-$areanames{de}->{4935698} = "Hornow";
-$areanames{de}->{493571} = "Hoyerswerda";
-$areanames{de}->{4935722} = "Lauta\ bei\ Hoyerswerda";
-$areanames{de}->{4935723} = "Bernsdorf\ OL";
-$areanames{de}->{4935724} = "Lohsa";
-$areanames{de}->{4935725} = "Wittichenau";
-$areanames{de}->{4935726} = "Groß\ Särchen";
-$areanames{de}->{4935727} = "Burghammer";
-$areanames{de}->{4935728} = "Uhyst\ Spree";
-$areanames{de}->{493573} = "Senftenberg";
-$areanames{de}->{493574} = "Lauchhammer";
-$areanames{de}->{4935751} = "Welzow";
-$areanames{de}->{4935752} = "Ruhland";
-$areanames{de}->{4935753} = "Großräschen";
-$areanames{de}->{4935754} = "Klettwitz";
-$areanames{de}->{4935755} = "Ortrand";
-$areanames{de}->{4935756} = "Hosena";
-$areanames{de}->{493576} = "Weisswasser";
-$areanames{de}->{4935771} = "Bad\ Muskau";
-$areanames{de}->{4935772} = "Rietschen";
-$areanames{de}->{4935773} = "Schleife";
-$areanames{de}->{4935774} = "Boxberg\ Sachsen";
-$areanames{de}->{4935775} = "Pechern";
-$areanames{de}->{493578} = "Kamenz";
-$areanames{de}->{4935792} = "Ossling";
-$areanames{de}->{4935793} = "Elstra";
-$areanames{de}->{4935795} = "Königsbrück";
-$areanames{de}->{4935796} = "Panschwitz\-Kuckau";
-$areanames{de}->{4935797} = "Schwepnitz";
-$areanames{de}->{493581} = "Görlitz";
-$areanames{de}->{4935820} = "Zodel";
-$areanames{de}->{4935822} = "Hagenwerder";
-$areanames{de}->{4935823} = "Ostritz";
-$areanames{de}->{4935825} = "Kodersdorf";
-$areanames{de}->{4935826} = "Königshain\ bei\ Görlitz";
-$areanames{de}->{4935827} = "Nieder\-Seifersdorf";
-$areanames{de}->{4935828} = "Reichenbach\ OL";
-$areanames{de}->{4935829} = "Gersdorf\ bei\ Görlitz";
-$areanames{de}->{493583} = "Zittau";
-$areanames{de}->{4935841} = "Großschönau\ Sachsen";
-$areanames{de}->{4935842} = "Oderwitz";
-$areanames{de}->{4935843} = "Hirschfelde\ bei\ Zittau";
-$areanames{de}->{4935844} = "Oybin\ Kurort";
-$areanames{de}->{493585} = "Löbau";
-$areanames{de}->{493586} = "Neugersdorf\ Sachsen";
-$areanames{de}->{4935872} = "Neusalza\-Spremberg";
-$areanames{de}->{4935873} = "Herrnhut";
-$areanames{de}->{4935874} = "Bernstadt\ an\ der\ Eigen";
-$areanames{de}->{4935875} = "Obercunnersdorf\ bei\ Löbau";
-$areanames{de}->{4935876} = "Weissenberg\ Sachsen";
-$areanames{de}->{4935877} = "Cunewalde";
-$areanames{de}->{493588} = "Niesky";
-$areanames{de}->{4935891} = "Rothenburg\ OL";
-$areanames{de}->{4935892} = "Horka\ OL";
-$areanames{de}->{4935893} = "Mücka";
-$areanames{de}->{4935894} = "Hähnichen";
-$areanames{de}->{4935895} = "Klitten";
-$areanames{de}->{493591} = "Bautzen";
-$areanames{de}->{493592} = "Kirschau";
-$areanames{de}->{4935930} = "Seitschen";
-$areanames{de}->{4935931} = "Königswartha";
-$areanames{de}->{4935932} = "Guttau";
-$areanames{de}->{4935933} = "Neschwitz";
-$areanames{de}->{4935934} = "Grossdubrau";
-$areanames{de}->{4935935} = "Kleinwelka";
-$areanames{de}->{4935936} = "Sohland\ Spree";
-$areanames{de}->{4935937} = "Prischwitz";
-$areanames{de}->{4935938} = "Großpostwitz\ OL";
-$areanames{de}->{4935939} = "Hochkirch";
-$areanames{de}->{493594} = "Bischofswerda";
-$areanames{de}->{4935951} = "Neukirch\ Lausitz";
-$areanames{de}->{4935952} = "Großröhrsdorf\ OL";
-$areanames{de}->{4935953} = "Burkau";
-$areanames{de}->{4935954} = "Grossharthau";
-$areanames{de}->{4935955} = "Pulsnitz";
-$areanames{de}->{493596} = "Neustadt\ in\ Sachsen";
-$areanames{de}->{4935971} = "Sebnitz";
-$areanames{de}->{4935973} = "Stolpen";
-$areanames{de}->{4935974} = "Hinterhermsdorf";
-$areanames{de}->{4935975} = "Hohnstein";
-$areanames{de}->{493601} = "Mühlhausen\ Thüringen";
-$areanames{de}->{4936020} = "Ebeleben";
-$areanames{de}->{4936021} = "Schlotheim";
-$areanames{de}->{4936022} = "Grossengottern";
-$areanames{de}->{4936023} = "Horsmar";
-$areanames{de}->{4936024} = "Diedorf\ bei\ Mühlhausen";
-$areanames{de}->{4936025} = "Körner";
-$areanames{de}->{4936026} = "Struth\ bei\ Mühlhausen";
-$areanames{de}->{4936027} = "Lengenfeld\ Unterm\ Stein";
-$areanames{de}->{4936028} = "Kammerforst\ Thüringen";
-$areanames{de}->{4936029} = "Menteroda";
-$areanames{de}->{493603} = "Bad\ Langensalza";
-$areanames{de}->{4936041} = "Bad\ Tennstedt";
-$areanames{de}->{4936042} = "Tonna";
-$areanames{de}->{4936043} = "Kirchheilingen";
-$areanames{de}->{493605} = "Leinefelde";
-$areanames{de}->{493606} = "Heiligenstadt\ Heilbad";
-$areanames{de}->{4936071} = "Teistungen";
-$areanames{de}->{4936072} = "Weißenborn\-Lüderode";
-$areanames{de}->{4936074} = "Worbis";
-$areanames{de}->{4936075} = "Dingelstädt\ Eichsfeld";
-$areanames{de}->{4936076} = "Niederorschel";
-$areanames{de}->{4936077} = "Grossbodungen";
-$areanames{de}->{4936081} = "Arenshausen";
-$areanames{de}->{4936082} = "Ershausen";
-$areanames{de}->{4936083} = "Uder";
-$areanames{de}->{4936084} = "Heuthen";
-$areanames{de}->{4936085} = "Reinholterode";
-$areanames{de}->{4936087} = "Wüstheuterode";
-$areanames{de}->{49361} = "Erfurt";
-$areanames{de}->{4936200} = "Elxleben\ bei\ Arnstadt";
-$areanames{de}->{4936201} = "Walschleben";
-$areanames{de}->{4936202} = "Neudietendorf";
-$areanames{de}->{4936203} = "Vieselbach";
-$areanames{de}->{4936204} = "Stotternheim";
-$areanames{de}->{4936205} = "Gräfenroda";
-$areanames{de}->{4936206} = "Grossfahner";
-$areanames{de}->{4936207} = "Plaue\ Thüringen";
-$areanames{de}->{4936208} = "Ermstedt";
-$areanames{de}->{4936209} = "Klettbach";
-$areanames{de}->{493621} = "Gotha\ Thüringen";
-$areanames{de}->{493622} = "Waltershausen\ Thüringen";
-$areanames{de}->{493623} = "Friedrichroda";
-$areanames{de}->{493624} = "Ohrdruf";
-$areanames{de}->{4936252} = "Tambach\-Dietharz";
-$areanames{de}->{4936253} = "Georgenthal\ Thüringer\ Wald";
-$areanames{de}->{4936254} = "Friedrichswerth";
-$areanames{de}->{4936255} = "Goldbach\ bei\ Gotha";
-$areanames{de}->{4936256} = "Wechmar";
-$areanames{de}->{4936257} = "Luisenthal\ Thüringen";
-$areanames{de}->{4936258} = "Friemar";
-$areanames{de}->{4936259} = "Tabarz\ Thüringer\ Wald";
-$areanames{de}->{493628} = "Arnstadt";
-$areanames{de}->{493629} = "Stadtilm";
-$areanames{de}->{493631} = "Nordhausen\ Thüringen";
-$areanames{de}->{493632} = "Sondershausen";
-$areanames{de}->{4936330} = "Grossberndten";
-$areanames{de}->{4936331} = "Ilfeld";
-$areanames{de}->{4936332} = "Ellrich";
-$areanames{de}->{4936333} = "Heringen\ Helme";
-$areanames{de}->{4936334} = "Wolkramshausen";
-$areanames{de}->{4936335} = "Grosswechsungen";
-$areanames{de}->{4936336} = "Klettenberg";
-$areanames{de}->{4936337} = "Schiedungen";
-$areanames{de}->{4936338} = "Bleicherode";
-$areanames{de}->{493634} = "Sömmerda";
-$areanames{de}->{493635} = "Kölleda";
-$areanames{de}->{493636} = "Greussen";
-$areanames{de}->{4936370} = "Grossenehrich";
-$areanames{de}->{4936371} = "Schlossvippach";
-$areanames{de}->{4936372} = "Kleinneuhausen";
-$areanames{de}->{4936373} = "Buttstädt";
-$areanames{de}->{4936374} = "Weissensee";
-$areanames{de}->{4936375} = "Kindelbrück";
-$areanames{de}->{4936376} = "Straussfurt";
-$areanames{de}->{4936377} = "Rastenberg";
-$areanames{de}->{4936378} = "Ostramondra";
-$areanames{de}->{4936379} = "Holzengel";
-$areanames{de}->{493641} = "Jena";
-$areanames{de}->{4936421} = "Camburg";
-$areanames{de}->{4936422} = "Reinstädt\ Thüringen";
-$areanames{de}->{4936423} = "Orlamünde";
-$areanames{de}->{4936424} = "Kahla\ Thüringen";
-$areanames{de}->{4936425} = "Isserstedt";
-$areanames{de}->{4936426} = "Ottendorf\ bei\ Stadtroda";
-$areanames{de}->{4936427} = "Dornburg\ Saale";
-$areanames{de}->{4936428} = "Stadtroda";
-$areanames{de}->{493643} = "Weimar\ Thüringen";
-$areanames{de}->{493644} = "Apolda";
-$areanames{de}->{4936450} = "Kranichfeld";
-$areanames{de}->{4936451} = "Buttelstedt";
-$areanames{de}->{4936452} = "Berlstedt";
-$areanames{de}->{4936453} = "Mellingen";
-$areanames{de}->{4936454} = "Magdala";
-$areanames{de}->{4936458} = "Bad\ Berka";
-$areanames{de}->{4936459} = "Blankenhain\ Thüringen";
-$areanames{de}->{4936461} = "Bad\ Sulza";
-$areanames{de}->{4936462} = "Ossmannstedt";
-$areanames{de}->{4936463} = "Gebstedt";
-$areanames{de}->{4936464} = "Wormstedt";
-$areanames{de}->{4936465} = "Oberndorf\ bei\ Apolda";
-$areanames{de}->{493647} = "Pößneck";
-$areanames{de}->{4936481} = "Neustadt\ an\ der\ Orla";
-$areanames{de}->{4936482} = "Triptis";
-$areanames{de}->{4936483} = "Ziegenrück";
-$areanames{de}->{4936484} = "Knau\ bei\ Pößneck";
-$areanames{de}->{49365} = "Gera";
-$areanames{de}->{4936601} = "Hermsdorf\ Thüringen";
-$areanames{de}->{4936602} = "Ronneburg\ Thüringen";
-$areanames{de}->{4936603} = "Weida";
-$areanames{de}->{4936604} = "Münchenbernsdorf";
-$areanames{de}->{4936605} = "Bad\ Köstritz";
-$areanames{de}->{4936606} = "Kraftsdorf";
-$areanames{de}->{4936607} = "Niederpöllnitz";
-$areanames{de}->{4936608} = "Seelingstädt\ bei\ Gera";
-$areanames{de}->{493661} = "Greiz";
-$areanames{de}->{4936621} = "Elsterberg\ bei\ Plauen";
-$areanames{de}->{4936622} = "Triebes";
-$areanames{de}->{4936623} = "Berga\ Elster";
-$areanames{de}->{4936624} = "Teichwolframsdorf";
-$areanames{de}->{4936625} = "Langenwetzendorf";
-$areanames{de}->{4936626} = "Auma";
-$areanames{de}->{4936628} = "Zeulenroda";
-$areanames{de}->{493663} = "Schleiz";
-$areanames{de}->{4936640} = "Remptendorf";
-$areanames{de}->{4936642} = "Harra";
-$areanames{de}->{4936643} = "Thimmendorf";
-$areanames{de}->{4936644} = "Hirschberg\ Saale";
-$areanames{de}->{4936645} = "Mühltroff";
-$areanames{de}->{4936646} = "Tanna\ bei\ Schleiz";
-$areanames{de}->{4936647} = "Saalburg\ Thüringen";
-$areanames{de}->{4936648} = "Dittersdorf\ bei\ Schleiz";
-$areanames{de}->{4936649} = "Gefell\ bei\ Schleiz";
-$areanames{de}->{4936651} = "Lobenstein";
-$areanames{de}->{4936652} = "Wurzbach";
-$areanames{de}->{4936653} = "Lehesten\ Thüringer\ Wald";
-$areanames{de}->{4936691} = "Eisenberg\ Thüringen";
-$areanames{de}->{4936692} = "Bürgel";
-$areanames{de}->{4936693} = "Crossen\ an\ der\ Elster";
-$areanames{de}->{4936694} = "Schkölen\ Thüringen";
-$areanames{de}->{4936695} = "Söllmnitz";
-$areanames{de}->{4936701} = "Lichte";
-$areanames{de}->{4936702} = "Lauscha";
-$areanames{de}->{4936703} = "Gräfenthal";
-$areanames{de}->{4936704} = "Steinheid";
-$areanames{de}->{4936705} = "Oberweißbach\ Thüringer\ Wald";
-$areanames{de}->{493671} = "Saalfeld\ Saale";
-$areanames{de}->{493672} = "Rudolstadt";
-$areanames{de}->{4936730} = "Sitzendorf";
-$areanames{de}->{4936731} = "Unterloquitz";
-$areanames{de}->{4936732} = "Könitz";
-$areanames{de}->{4936733} = "Kaulsdorf";
-$areanames{de}->{4936734} = "Leutenberg";
-$areanames{de}->{4936735} = "Probstzella";
-$areanames{de}->{4936736} = "Arnsgereuth";
-$areanames{de}->{4936737} = "Drognitz";
-$areanames{de}->{4936738} = "Königsee";
-$areanames{de}->{4936739} = "Rottenbach";
-$areanames{de}->{4936741} = "Bad\ Blankenburg";
-$areanames{de}->{4936742} = "Uhlstädt";
-$areanames{de}->{4936743} = "Teichel";
-$areanames{de}->{4936744} = "Remda";
-$areanames{de}->{493675} = "Sonneberg\ Thüringen";
-$areanames{de}->{4936761} = "Heubisch";
-$areanames{de}->{4936762} = "Steinach\ Thüringen";
-$areanames{de}->{4936764} = "Neuhaus\-Schierschnitz";
-$areanames{de}->{4936766} = "Schalkau";
-$areanames{de}->{493677} = "Ilmenau\ Thüringen";
-$areanames{de}->{4936781} = "Grossbreitenbach";
-$areanames{de}->{4936782} = "Schmiedefeld\ am\ Rennsteig";
-$areanames{de}->{4936783} = "Gehren\ Thüringen";
-$areanames{de}->{4936784} = "Stützerbach";
-$areanames{de}->{4936785} = "Gräfinau\-Angstedt";
-$areanames{de}->{493679} = "Neuhaus\ am\ Rennweg";
-$areanames{de}->{493681} = "Suhl";
-$areanames{de}->{493682} = "Zella\-Mehlis";
-$areanames{de}->{493683} = "Schmalkalden";
-$areanames{de}->{4936840} = "Trusetal";
-$areanames{de}->{4936841} = "Schleusingen";
-$areanames{de}->{4936842} = "Oberhof\ Thüringen";
-$areanames{de}->{4936843} = "Benshausen";
-$areanames{de}->{4936844} = "Rohr\ Thüringen";
-$areanames{de}->{4936845} = "Gehlberg";
-$areanames{de}->{4936846} = "Suhl\-Dietzhausen";
-$areanames{de}->{4936847} = "Steinbach\-Hallenberg";
-$areanames{de}->{4936848} = "Wernshausen";
-$areanames{de}->{4936849} = "Kleinschmalkalden";
-$areanames{de}->{493685} = "Hildburghausen";
-$areanames{de}->{493686} = "Eisfeld";
-$areanames{de}->{4936870} = "Masserberg";
-$areanames{de}->{4936871} = "Bad\ Colberg\-Heldburg";
-$areanames{de}->{4936873} = "Themar";
-$areanames{de}->{4936874} = "Schönbrunn\ bei\ Hildburghaus";
-$areanames{de}->{4936875} = "Straufhain\-Streufdorf";
-$areanames{de}->{4936878} = "Oberland";
-$areanames{de}->{493691} = "Eisenach\ Thüringen";
-$areanames{de}->{4936920} = "Grossenlupnitz";
-$areanames{de}->{4936921} = "Wutha\-Farnroda";
-$areanames{de}->{4936922} = "Gerstungen";
-$areanames{de}->{4936923} = "Treffurt";
-$areanames{de}->{4936924} = "Mihla";
-$areanames{de}->{4936925} = "Marksuhl";
-$areanames{de}->{4936926} = "Creuzburg";
-$areanames{de}->{4936927} = "Unterellen";
-$areanames{de}->{4936928} = "Neuenhof\ Thüringen";
-$areanames{de}->{4936929} = "Ruhla";
-$areanames{de}->{493693} = "Meiningen";
-$areanames{de}->{4936940} = "Oepfershausen";
-$areanames{de}->{4936941} = "Wasungen";
-$areanames{de}->{4936943} = "Bettenhausen\ Thüringen";
-$areanames{de}->{4936944} = "Rentwertshausen";
-$areanames{de}->{4936945} = "Henneberg";
-$areanames{de}->{4936946} = "Erbenhausen\ Thüringen";
-$areanames{de}->{4936947} = "Jüchsen";
-$areanames{de}->{4936948} = "Römhild";
-$areanames{de}->{4936949} = "Obermaßfeld\-Grimmenthal";
-$areanames{de}->{493695} = "Bad\ Salzungen";
-$areanames{de}->{4936961} = "Bad\ Liebenstein";
-$areanames{de}->{4936962} = "Vacha";
-$areanames{de}->{4936963} = "Dorndorf\ Rhön";
-$areanames{de}->{4936964} = "Dermbach\ Rhön";
-$areanames{de}->{4936965} = "Stadtlengsfeld";
-$areanames{de}->{4936966} = "Kaltennordheim";
-$areanames{de}->{4936967} = "Geisa";
-$areanames{de}->{4936968} = "Rossdorf\ Rhön";
-$areanames{de}->{4936969} = "Merkers";
-$areanames{de}->{49371} = "Chemnitz\ Sachsen";
-$areanames{de}->{4937200} = "Wittgensdorf\ bei\ Chemnitz";
-$areanames{de}->{4937202} = "Claussnitz\ bei\ Chemnitz";
-$areanames{de}->{4937203} = "Gersdorf\ bei\ Chemnitz";
-$areanames{de}->{4937204} = "Lichtenstein\ Sachsen";
-$areanames{de}->{4937206} = "Frankenberg\ Sachsen";
-$areanames{de}->{4937207} = "Hainichen\ Sachsen";
-$areanames{de}->{4937208} = "Auerswalde";
-$areanames{de}->{4937209} = "Einsiedel\ bei\ Chemnitz";
-$areanames{de}->{493721} = "Meinersdorf";
-$areanames{de}->{493722} = "Limbach\-Oberfrohna";
-$areanames{de}->{493723} = "Hohenstein\-Ernstthal";
-$areanames{de}->{493724} = "Burgstädt";
-$areanames{de}->{493725} = "Zschopau";
-$areanames{de}->{493726} = "Flöha";
-$areanames{de}->{493727} = "Mittweida";
-$areanames{de}->{4937291} = "Augustusburg";
-$areanames{de}->{4937292} = "Oederan";
-$areanames{de}->{4937293} = "Eppendorf\ Sachsen";
-$areanames{de}->{4937294} = "Grünhainichen";
-$areanames{de}->{4937295} = "Lugau\ Erzgebirge";
-$areanames{de}->{4937296} = "Stollberg\ Erzgebirge";
-$areanames{de}->{4937297} = "Thum\ Sachsen";
-$areanames{de}->{4937298} = "Oelsnitz\ Erzgebirge";
-$areanames{de}->{493731} = "Freiberg\ Sachsen";
-$areanames{de}->{4937320} = "Mulda\ Sachsen";
-$areanames{de}->{4937321} = "Frankenstein\ Sachsen";
-$areanames{de}->{4937322} = "Brand\-Erbisdorf";
-$areanames{de}->{4937323} = "Lichtenberg\ Erzgebirge";
-$areanames{de}->{4937324} = "Reinsberg\ Sachsen";
-$areanames{de}->{4937325} = "Niederbobritzsch";
-$areanames{de}->{4937326} = "Frauenstein\ Sachsen";
-$areanames{de}->{4937327} = "Rechenberg\-Bienenmühle";
-$areanames{de}->{4937328} = "Grossschirma";
-$areanames{de}->{4937329} = "Grosshartmannsdorf";
-$areanames{de}->{493733} = "Annaberg\-Buchholz";
-$areanames{de}->{4937341} = "Ehrenfriedersdorf";
-$areanames{de}->{4937342} = "Cranzahl";
-$areanames{de}->{4937343} = "Jöhstadt";
-$areanames{de}->{4937344} = "Crottendorf\ Sachsen";
-$areanames{de}->{4937346} = "Geyer";
-$areanames{de}->{4937347} = "Bärenstein\ Kreis\ Annaberg";
-$areanames{de}->{4937348} = "Oberwiesenthal\ Kurort";
-$areanames{de}->{4937349} = "Scheibenberg";
-$areanames{de}->{493735} = "Marienberg\ Sachsen";
-$areanames{de}->{4937360} = "Olbernhau";
-$areanames{de}->{4937361} = "Neuhausen\ Erzgebirge";
-$areanames{de}->{4937362} = "Seiffen\ Erzgebirge";
-$areanames{de}->{4937363} = "Zöblitz";
-$areanames{de}->{4937364} = "Reitzenhain\ Erzgebirge";
-$areanames{de}->{4937365} = "Sayda";
-$areanames{de}->{4937366} = "Rübenau";
-$areanames{de}->{4937367} = "Lengefeld\ Erzgebirge";
-$areanames{de}->{4937368} = "Deutschneudorf";
-$areanames{de}->{4937369} = "Wolkenstein";
-$areanames{de}->{493737} = "Rochlitz";
-$areanames{de}->{4937381} = "Penig";
-$areanames{de}->{4937382} = "Geringswalde";
-$areanames{de}->{4937383} = "Lunzenau";
-$areanames{de}->{4937384} = "Wechselburg";
-$areanames{de}->{493741} = "Plauen";
-$areanames{de}->{4937421} = "Oelsnitz\ Vogtland";
-$areanames{de}->{4937422} = "Markneukirchen";
-$areanames{de}->{4937423} = "Adorf\ Vogtland";
-$areanames{de}->{4937430} = "Eichigt";
-$areanames{de}->{4937431} = "Mehltheuer\ Vogtland";
-$areanames{de}->{4937432} = "Pausa\ Vogtland";
-$areanames{de}->{4937433} = "Gutenfürst";
-$areanames{de}->{4937434} = "Bobenneukirchen";
-$areanames{de}->{4937435} = "Reuth\ bei\ Plauen";
-$areanames{de}->{4937436} = "Weischlitz";
-$areanames{de}->{4937437} = "Bad\ Elster";
-$areanames{de}->{4937438} = "Bad\ Brambach";
-$areanames{de}->{4937439} = "Jocketa";
-$areanames{de}->{493744} = "Auerbach\ Vogtland";
-$areanames{de}->{493745} = "Falkenstein\ Vogtland";
-$areanames{de}->{4937462} = "Rothenkirchen\ Vogtland";
-$areanames{de}->{4937463} = "Bergen\ Vogtland";
-$areanames{de}->{4937464} = "Schöneck\ Vogtland";
-$areanames{de}->{4937465} = "Tannenbergsthal\ Vogtland";
-$areanames{de}->{4937467} = "Klingenthal\ Sachsen";
-$areanames{de}->{4937468} = "Treuen\ Vogtland";
-$areanames{de}->{49375} = "Zwickau";
-$areanames{de}->{4937600} = "Neumark\ Sachsen";
-$areanames{de}->{4937601} = "Mülsen\ Skt\ Jacob";
-$areanames{de}->{4937602} = "Kirchberg\ Sachsen";
-$areanames{de}->{4937603} = "Wildenfels";
-$areanames{de}->{4937604} = "Mosel";
-$areanames{de}->{4937605} = "Hartenstein\ Sachsen";
-$areanames{de}->{4937606} = "Lengenfeld\ Vogtland";
-$areanames{de}->{4937607} = "Ebersbrunn\ Sachsen";
-$areanames{de}->{4937608} = "Waldenburg\ Sachsen";
-$areanames{de}->{4937609} = "Wolkenburg\ Mulde";
-$areanames{de}->{493761} = "Werdau\ Sachsen";
-$areanames{de}->{493762} = "Crimmitschau";
-$areanames{de}->{493763} = "Glauchau";
-$areanames{de}->{493764} = "Meerane";
-$areanames{de}->{493765} = "Reichenbach\ Vogtland";
-$areanames{de}->{493771} = "Aue\ Sachsen";
-$areanames{de}->{493772} = "Schneeberg\ Erzgebirge";
-$areanames{de}->{493773} = "Johanngeorgenstadt";
-$areanames{de}->{493774} = "Schwarzenberg";
-$areanames{de}->{4937752} = "Eibenstock";
-$areanames{de}->{4937754} = "Zwönitz";
-$areanames{de}->{4937755} = "Schönheide\ Erzgebirge";
-$areanames{de}->{4937756} = "Breitenbrunn\ Erzgebirge";
-$areanames{de}->{4937757} = "Rittersgrün";
-$areanames{de}->{49381} = "Rostock";
-$areanames{de}->{4938201} = "Gelbensande";
-$areanames{de}->{4938202} = "Volkenshagen";
-$areanames{de}->{4938203} = "Bad\ Doberan";
-$areanames{de}->{4938204} = "Broderstorf";
-$areanames{de}->{4938205} = "Tessin\ bei\ Rostock";
-$areanames{de}->{4938206} = "Graal\-Müritz\ Seeheilbad";
-$areanames{de}->{4938207} = "Stäbelow";
-$areanames{de}->{4938208} = "Kavelstorf";
-$areanames{de}->{4938209} = "Sanitz\ bei\ Rostock";
-$areanames{de}->{493821} = "Ribnitz\-Damgarten";
-$areanames{de}->{4938220} = "Wustrow\ Ostseebad";
-$areanames{de}->{4938221} = "Marlow";
-$areanames{de}->{4938222} = "Semlow";
-$areanames{de}->{4938223} = "Saal\ Vorpom";
-$areanames{de}->{4938224} = "Gresenhorst";
-$areanames{de}->{4938225} = "Trinwillershagen";
-$areanames{de}->{4938226} = "Dierhagen\ Ostseebad";
-$areanames{de}->{4938227} = "Lüdershagen\ bei\ Barth";
-$areanames{de}->{4938228} = "Dettmannsdorf\-Kölzow";
-$areanames{de}->{4938229} = "Bad\ Sülze";
-$areanames{de}->{4938231} = "Barth";
-$areanames{de}->{4938232} = "Zingst\ Ostseebad";
-$areanames{de}->{4938233} = "Prerow\ Ostseebad";
-$areanames{de}->{4938234} = "Born\ Darß";
-$areanames{de}->{4938292} = "Kröpelin";
-$areanames{de}->{4938293} = "Kühlungsborn\ Ostseebad";
-$areanames{de}->{4938294} = "Neubukow";
-$areanames{de}->{4938295} = "Satow\ bei\ Bad\ Doberan";
-$areanames{de}->{4938296} = "Rerik\ Ostseebad";
-$areanames{de}->{4938297} = "Moitin";
-$areanames{de}->{4938300} = "Insel\ Hiddensee";
-$areanames{de}->{4938301} = "Putbus";
-$areanames{de}->{4938302} = "Sagard";
-$areanames{de}->{4938303} = "Sellin\ Ostseebad";
-$areanames{de}->{4938304} = "Garz\ Rügen";
-$areanames{de}->{4938305} = "Gingst";
-$areanames{de}->{4938306} = "Samtens";
-$areanames{de}->{4938307} = "Poseritz";
-$areanames{de}->{4938308} = "Göhren\ Rügen";
-$areanames{de}->{4938309} = "Trent";
-$areanames{de}->{493831} = "Stralsund";
-$areanames{de}->{4938320} = "Tribsees";
-$areanames{de}->{4938321} = "Martensdorf\ bei\ Stralsund";
-$areanames{de}->{4938322} = "Richtenberg";
-$areanames{de}->{4938323} = "Prohn";
-$areanames{de}->{4938324} = "Velgast";
-$areanames{de}->{4938325} = "Rolofshagen";
-$areanames{de}->{4938326} = "Grimmen";
-$areanames{de}->{4938327} = "Elmenhorst\ Vorpom";
-$areanames{de}->{4938328} = "Miltzow";
-$areanames{de}->{4938331} = "Rakow\ Vorpom";
-$areanames{de}->{4938332} = "Gross\ Bisdorf";
-$areanames{de}->{4938333} = "Horst\ bei\ Grimmen";
-$areanames{de}->{4938334} = "Grammendorf";
-$areanames{de}->{493834} = "Greifswald";
-$areanames{de}->{4938351} = "Mesekenhagen";
-$areanames{de}->{4938352} = "Kemnitz\ bei\ Greifswald";
-$areanames{de}->{4938353} = "Gützkow\ bei\ Greifswald";
-$areanames{de}->{4938354} = "Wusterhusen";
-$areanames{de}->{4938355} = "Züssow";
-$areanames{de}->{4938356} = "Behrenhoff";
-$areanames{de}->{493836} = "Wolgast";
-$areanames{de}->{4938370} = "Kröslin";
-$areanames{de}->{4938371} = "Karlshagen";
-$areanames{de}->{4938372} = "Usedom";
-$areanames{de}->{4938373} = "Katzow";
-$areanames{de}->{4938374} = "Lassan\ bei\ Wolgast";
-$areanames{de}->{4938375} = "Koserow";
-$areanames{de}->{4938376} = "Zirchow";
-$areanames{de}->{4938377} = "Zinnowitz";
-$areanames{de}->{4938378} = "Heringsdorf\ Seebad";
-$areanames{de}->{4938379} = "Benz\ Usedom";
-$areanames{de}->{493838} = "Bergen\ auf\ Rügen";
-$areanames{de}->{4938391} = "Altenkirchen\ Rügen";
-$areanames{de}->{4938392} = "Sassnitz";
-$areanames{de}->{4938393} = "Binz\ Ostseebad";
-$areanames{de}->{493841} = "Wismar";
-$areanames{de}->{4938422} = "Neukloster";
-$areanames{de}->{4938423} = "Bad\ Kleinen";
-$areanames{de}->{4938424} = "Bobitz";
-$areanames{de}->{4938425} = "Kirchdorf\ Poel";
-$areanames{de}->{4938426} = "Neuburg\-Steinhausen";
-$areanames{de}->{4938427} = "Blowatz";
-$areanames{de}->{4938428} = "Hohenkirchen\ bei\ Wismar";
-$areanames{de}->{4938429} = "Glasin";
-$areanames{de}->{493843} = "Güstrow";
-$areanames{de}->{493844} = "Schwaan";
-$areanames{de}->{4938450} = "Tarnow\ bei\ Bützow";
-$areanames{de}->{4938451} = "Hoppenrade\ bei\ Güstrow";
-$areanames{de}->{4938452} = "Lalendorf";
-$areanames{de}->{4938453} = "Mistorf";
-$areanames{de}->{4938454} = "Kritzkow";
-$areanames{de}->{4938455} = "Plaaz";
-$areanames{de}->{4938456} = "Langhagen\ bei\ Güstrow";
-$areanames{de}->{4938457} = "Krakow\ am\ See";
-$areanames{de}->{4938458} = "Zehna";
-$areanames{de}->{4938459} = "Laage";
-$areanames{de}->{4938461} = "Bützow";
-$areanames{de}->{4938462} = "Baumgarten";
-$areanames{de}->{4938464} = "Bernitt";
-$areanames{de}->{4938466} = "Jürgenshagen";
-$areanames{de}->{493847} = "Sternberg";
-$areanames{de}->{4938481} = "Witzin";
-$areanames{de}->{4938482} = "Warin";
-$areanames{de}->{4938483} = "Brüel";
-$areanames{de}->{4938484} = "Ventschow";
-$areanames{de}->{4938485} = "Dabel";
-$areanames{de}->{4938486} = "Gustävel";
-$areanames{de}->{4938488} = "Demen";
-$areanames{de}->{49385} = "Schwerin";
-$areanames{de}->{493860} = "Raben\ Steinfeld";
-$areanames{de}->{493861} = "Plate";
-$areanames{de}->{493863} = "Crivitz";
-$areanames{de}->{493865} = "Holthusen";
-$areanames{de}->{493866} = "Cambs";
-$areanames{de}->{493867} = "Lübstorf";
-$areanames{de}->{493868} = "Rastow";
-$areanames{de}->{493869} = "Dümmer";
-$areanames{de}->{493871} = "Parchim";
-$areanames{de}->{4938720} = "Grebbin";
-$areanames{de}->{4938721} = "Ziegendorf";
-$areanames{de}->{4938722} = "Raduhn";
-$areanames{de}->{4938723} = "Kladrum";
-$areanames{de}->{4938724} = "Siggelkow";
-$areanames{de}->{4938725} = "Gross\ Godems";
-$areanames{de}->{4938726} = "Spornitz";
-$areanames{de}->{4938727} = "Mestlin";
-$areanames{de}->{4938728} = "Domsühl";
-$areanames{de}->{4938729} = "Marnitz";
-$areanames{de}->{4938731} = "Lübz";
-$areanames{de}->{4938732} = "Gallin\ bei\ Lübz";
-$areanames{de}->{4938733} = "Karbow\-Vietlübbe";
-$areanames{de}->{4938735} = "Plau\ am\ See";
-$areanames{de}->{4938736} = "Goldberg";
-$areanames{de}->{4938737} = "Ganzlin";
-$areanames{de}->{4938738} = "Karow\ bei\ Lübz";
-$areanames{de}->{493874} = "Ludwigslust";
-$areanames{de}->{4938750} = "Malliss";
-$areanames{de}->{4938751} = "Picher";
-$areanames{de}->{4938752} = "Zierzow\ bei\ Ludwigslust";
-$areanames{de}->{4938753} = "Wöbbelin";
-$areanames{de}->{4938754} = "Leussow\ bei\ Ludwigslust";
-$areanames{de}->{4938755} = "Eldena";
-$areanames{de}->{4938756} = "Grabow";
-$areanames{de}->{4938757} = "Neustadt\-Glewe";
-$areanames{de}->{4938758} = "Dömitz";
-$areanames{de}->{4938759} = "Tewswoos";
-$areanames{de}->{493876} = "Perleberg";
-$areanames{de}->{493877} = "Wittenberge";
-$areanames{de}->{4938780} = "Lanz\ Brandenburg";
-$areanames{de}->{4938781} = "Mellen";
-$areanames{de}->{4938782} = "Reetz\ bei\ Perleberg";
-$areanames{de}->{4938783} = "Dallmin";
-$areanames{de}->{4938784} = "Kleinow\ Kreis\ Prignitz";
-$areanames{de}->{4938785} = "Berge\ bei\ Perleberg";
-$areanames{de}->{4938787} = "Glöwen";
-$areanames{de}->{4938788} = "Gross\ Warnow";
-$areanames{de}->{4938789} = "Wolfshagen\ bei\ Perleberg";
-$areanames{de}->{4938791} = "Bad\ Wilsnack";
-$areanames{de}->{4938792} = "Lenzen\ \(Elbe\)";
-$areanames{de}->{4938793} = "Dergenthin";
-$areanames{de}->{4938794} = "Cumlosen";
-$areanames{de}->{4938796} = "Viesecke";
-$areanames{de}->{4938797} = "Karstädt\ Kreis\ Prignitz";
-$areanames{de}->{493881} = "Grevesmühlen";
-$areanames{de}->{4938821} = "Lüdersdorf";
-$areanames{de}->{4938822} = "Diedrichshagen\ bei\ Grevesmühlen";
-$areanames{de}->{4938823} = "Selmsdorf";
-$areanames{de}->{4938824} = "Mallentin";
-$areanames{de}->{4938825} = "Klütz";
-$areanames{de}->{4938826} = "Dassow";
-$areanames{de}->{4938827} = "Kalkhorst";
-$areanames{de}->{4938828} = "Schönberg";
-$areanames{de}->{493883} = "Hagenow";
-$areanames{de}->{4938841} = "Neuhaus\ Elbe";
-$areanames{de}->{4938842} = "Lüttenmark";
-$areanames{de}->{4938843} = "Bennin";
-$areanames{de}->{4938844} = "Gülze";
-$areanames{de}->{4938845} = "Kaarssen";
-$areanames{de}->{4938847} = "Boizenburg\ Elbe";
-$areanames{de}->{4938848} = "Vellahn";
-$areanames{de}->{4938850} = "Gammelin";
-$areanames{de}->{4938851} = "Zarrentin";
-$areanames{de}->{4938852} = "Wittenburg";
-$areanames{de}->{4938853} = "Drönnewitz\ bei\ Hagenow";
-$areanames{de}->{4938854} = "Redefin";
-$areanames{de}->{4938855} = "Lübtheen";
-$areanames{de}->{4938856} = "Pritzier\ bei\ Hagenow";
-$areanames{de}->{4938858} = "Lassahn";
-$areanames{de}->{4938859} = "Alt\ Zachun";
-$areanames{de}->{493886} = "Gadebusch";
-$areanames{de}->{4938871} = "Mühlen\ Eichsen";
-$areanames{de}->{4938872} = "Rehna";
-$areanames{de}->{4938873} = "Carlow";
-$areanames{de}->{4938874} = "Lützow";
-$areanames{de}->{4938875} = "Schlagsdorf\ bei\ Gadebusch";
-$areanames{de}->{4938876} = "Roggendorf";
-$areanames{de}->{4939000} = "Beetzendorf";
-$areanames{de}->{4939001} = "Apenburg";
-$areanames{de}->{4939002} = "Oebisfelde";
-$areanames{de}->{4939003} = "Jübar";
-$areanames{de}->{4939004} = "Köckte\ bei\ Gardelegen";
-$areanames{de}->{4939005} = "Kusey";
-$areanames{de}->{4939006} = "Miesterhorst";
-$areanames{de}->{4939007} = "Tangeln";
-$areanames{de}->{4939008} = "Kunrau";
-$areanames{de}->{4939009} = "Badel";
-$areanames{de}->{493901} = "Salzwedel";
-$areanames{de}->{493902} = "Diesdorf\ Altm";
-$areanames{de}->{4939030} = "Brunau";
-$areanames{de}->{4939031} = "Dähre";
-$areanames{de}->{4939032} = "Mahlsdorf\ bei\ Salzwedel";
-$areanames{de}->{4939033} = "Wallstawe";
-$areanames{de}->{4939034} = "Fleetmark";
-$areanames{de}->{4939035} = "Kuhfelde";
-$areanames{de}->{4939036} = "Binde";
-$areanames{de}->{4939037} = "Pretzier";
-$areanames{de}->{4939038} = "Henningen";
-$areanames{de}->{4939039} = "Bonese";
-$areanames{de}->{493904} = "Haldensleben";
-$areanames{de}->{4939050} = "Bartensleben";
-$areanames{de}->{4939051} = "Calvörde";
-$areanames{de}->{4939052} = "Erxleben\ bei\ Haldensleben";
-$areanames{de}->{4939053} = "Süplingen";
-$areanames{de}->{4939054} = "Flechtingen";
-$areanames{de}->{4939055} = "Hörsingen";
-$areanames{de}->{4939056} = "Klüden";
-$areanames{de}->{4939057} = "Rätzlingen\ Sachsen\-Anhalt";
-$areanames{de}->{4939058} = "Uthmöden";
-$areanames{de}->{4939059} = "Wegenstedt";
-$areanames{de}->{4939061} = "Weferlingen";
-$areanames{de}->{4939062} = "Bebertal";
-$areanames{de}->{493907} = "Gardelegen";
-$areanames{de}->{4939080} = "Kalbe\ Milde";
-$areanames{de}->{4939081} = "Kakerbeck\ Sachsen\-Anhalt";
-$areanames{de}->{4939082} = "Mieste";
-$areanames{de}->{4939083} = "Messdorf";
-$areanames{de}->{4939084} = "Lindstedt";
-$areanames{de}->{4939085} = "Zichtau";
-$areanames{de}->{4939086} = "Jävenitz";
-$areanames{de}->{4939087} = "Jerchel\ Altmark";
-$areanames{de}->{4939088} = "Letzlingen";
-$areanames{de}->{4939089} = "Bismark\ Altmark";
-$areanames{de}->{493909} = "Klötze\ Altmark";
-$areanames{de}->{49391} = "Magdeburg";
-$areanames{de}->{4939200} = "Gommern";
-$areanames{de}->{4939201} = "Wolmirstedt";
-$areanames{de}->{4939202} = "Gross\ Ammensleben";
-$areanames{de}->{4939203} = "Barleben";
-$areanames{de}->{4939204} = "Niederndodeleben";
-$areanames{de}->{4939205} = "Langenweddingen";
-$areanames{de}->{4939206} = "Eichenbarleben";
-$areanames{de}->{4939207} = "Colbitz";
-$areanames{de}->{4939208} = "Loitsche";
-$areanames{de}->{4939209} = "Wanzleben";
-$areanames{de}->{493921} = "Burg\ bei\ Magdeburg";
-$areanames{de}->{4939221} = "Möckern\ bei\ Magdeburg";
-$areanames{de}->{4939222} = "Möser";
-$areanames{de}->{4939223} = "Theessen";
-$areanames{de}->{4939224} = "Büden";
-$areanames{de}->{4939225} = "Altengrabow";
-$areanames{de}->{4939226} = "Hohenziatz";
-$areanames{de}->{493923} = "Zerbst";
-$areanames{de}->{4939241} = "Leitzkau";
-$areanames{de}->{4939242} = "Prödel";
-$areanames{de}->{4939243} = "Nedlitz\ bei\ Zerbst";
-$areanames{de}->{4939244} = "Steutz";
-$areanames{de}->{4939245} = "Loburg";
-$areanames{de}->{4939246} = "Lindau\ Anh";
-$areanames{de}->{4939247} = "Güterglück";
-$areanames{de}->{4939248} = "Dobritz";
-$areanames{de}->{493925} = "Stassfurt";
-$areanames{de}->{4939262} = "Güsten\ Anh";
-$areanames{de}->{4939263} = "Unseburg";
-$areanames{de}->{4939264} = "Kroppenstedt";
-$areanames{de}->{4939265} = "Löderburg";
-$areanames{de}->{4939266} = "Förderstedt";
-$areanames{de}->{4939267} = "Schneidlingen";
-$areanames{de}->{4939268} = "Egeln";
-$areanames{de}->{493928} = "Schönebeck\ Elbe";
-$areanames{de}->{4939291} = "Calbe\ Saale";
-$areanames{de}->{4939292} = "Biederitz";
-$areanames{de}->{4939293} = "Dreileben";
-$areanames{de}->{4939294} = "Gross\ Rosenburg";
-$areanames{de}->{4939295} = "Zuchau";
-$areanames{de}->{4939296} = "Welsleben";
-$areanames{de}->{4939297} = "Eickendorf\ Kreis\ Schönebeck";
-$areanames{de}->{4939298} = "Barby\ Elbe";
-$areanames{de}->{493931} = "Stendal";
-$areanames{de}->{4939320} = "Schinne";
-$areanames{de}->{4939321} = "Arneburg";
-$areanames{de}->{4939322} = "Tangermünde";
-$areanames{de}->{4939323} = "Schönhausen\ Elbe";
-$areanames{de}->{4939324} = "Kläden\ bei\ Stendal";
-$areanames{de}->{4939325} = "Vinzelberg";
-$areanames{de}->{4939327} = "Klietz";
-$areanames{de}->{4939328} = "Rochau";
-$areanames{de}->{4939329} = "Möringen";
-$areanames{de}->{493933} = "Genthin";
-$areanames{de}->{4939341} = "Redekin";
-$areanames{de}->{4939342} = "Gladau";
-$areanames{de}->{4939343} = "Jerichow";
-$areanames{de}->{4939344} = "Güsen";
-$areanames{de}->{4939345} = "Parchen";
-$areanames{de}->{4939346} = "Tucheim";
-$areanames{de}->{4939347} = "Kade";
-$areanames{de}->{4939348} = "Klitsche";
-$areanames{de}->{4939349} = "Parey\ Elbe";
-$areanames{de}->{493935} = "Tangerhütte";
-$areanames{de}->{4939361} = "Lüderitz";
-$areanames{de}->{4939362} = "Grieben\ bei\ Tangerhütte";
-$areanames{de}->{4939363} = "Angern";
-$areanames{de}->{4939364} = "Dolle";
-$areanames{de}->{4939365} = "Bellingen\ bei\ Stendal";
-$areanames{de}->{4939366} = "Kehnert";
-$areanames{de}->{493937} = "Osterburg\ Altmark";
-$areanames{de}->{4939382} = "Kamern";
-$areanames{de}->{4939383} = "Sandau\ Elbe";
-$areanames{de}->{4939384} = "Arendsee\ Altmark";
-$areanames{de}->{4939386} = "Seehausen\ Altmark";
-$areanames{de}->{4939387} = "Havelberg";
-$areanames{de}->{4939388} = "Goldbeck\ Altm";
-$areanames{de}->{4939389} = "Schollene";
-$areanames{de}->{4939390} = "Iden";
-$areanames{de}->{4939391} = "Lückstedt";
-$areanames{de}->{4939392} = "Rönnebeck\ Sachsen\-Anhalt";
-$areanames{de}->{4939393} = "Werben\ Elbe";
-$areanames{de}->{4939394} = "Hohenberg\-Krusemark";
-$areanames{de}->{4939395} = "Wanzer";
-$areanames{de}->{4939396} = "Neukirchen\ Altmark";
-$areanames{de}->{4939397} = "Geestgottberg";
-$areanames{de}->{4939398} = "Gross\ Garz";
-$areanames{de}->{4939399} = "Kleinau";
-$areanames{de}->{4939400} = "Wefensleben";
-$areanames{de}->{4939401} = "Neuwegersleben";
-$areanames{de}->{4939402} = "Völpke";
-$areanames{de}->{4939403} = "Gröningen\ Sachsen\-Anhalt";
-$areanames{de}->{4939404} = "Ausleben";
-$areanames{de}->{4939405} = "Hötensleben";
-$areanames{de}->{4939406} = "Harbke";
-$areanames{de}->{4939407} = "Seehausen\ Börde";
-$areanames{de}->{4939408} = "Hadmersleben";
-$areanames{de}->{4939409} = "Eilsleben";
-$areanames{de}->{493941} = "Halberstadt";
-$areanames{de}->{4939421} = "Osterwieck";
-$areanames{de}->{4939422} = "Badersleben";
-$areanames{de}->{4939423} = "Wegeleben";
-$areanames{de}->{4939424} = "Schwanebeck\ Sachsen\-Anhalt";
-$areanames{de}->{4939425} = "Dingelstedt\ am\ Huy";
-$areanames{de}->{4939426} = "Hessen";
-$areanames{de}->{4939427} = "Ströbeck";
-$areanames{de}->{4939428} = "Pabstorf";
-$areanames{de}->{493943} = "Wernigerode";
-$areanames{de}->{493944} = "Blankenburg\ Harz";
-$areanames{de}->{4939451} = "Wasserleben";
-$areanames{de}->{4939452} = "Ilsenburg";
-$areanames{de}->{4939453} = "Derenburg";
-$areanames{de}->{4939454} = "Elbingerode\ Harz";
-$areanames{de}->{4939455} = "Schierke";
-$areanames{de}->{4939456} = "Altenbrak";
-$areanames{de}->{4939457} = "Benneckenstein\ Harz";
-$areanames{de}->{4939458} = "Heudeber";
-$areanames{de}->{4939459} = "Hasselfelde";
-$areanames{de}->{493946} = "Quedlinburg";
-$areanames{de}->{493947} = "Thale";
-$areanames{de}->{4939481} = "Hedersleben\ bei\ Aschersleben";
-$areanames{de}->{4939482} = "Gatersleben";
-$areanames{de}->{4939483} = "Ballenstedt";
-$areanames{de}->{4939484} = "Harzgerode";
-$areanames{de}->{4939485} = "Gernrode\ Harz";
-$areanames{de}->{4939487} = "Friedrichsbrunn";
-$areanames{de}->{4939488} = "Güntersberge";
-$areanames{de}->{4939489} = "Strassberg\ Harz";
-$areanames{de}->{493949} = "Oschersleben\ Bode";
-$areanames{de}->{49395} = "Neubrandenburg";
-$areanames{de}->{4939600} = "Zwiedorf";
-$areanames{de}->{4939601} = "Friedland";
-$areanames{de}->{4939602} = "Kleeth";
-$areanames{de}->{4939603} = "Burg\ Stargard";
-$areanames{de}->{4939604} = "Wildberg\ bei\ Altentreptow";
-$areanames{de}->{4939605} = "Gross\ Nemerow";
-$areanames{de}->{4939606} = "Glienke";
-$areanames{de}->{4939607} = "Kotelow";
-$areanames{de}->{4939608} = "Staven";
-$areanames{de}->{493961} = "Altentreptow";
-$areanames{de}->{493962} = "Penzlin\ bei\ Waren";
-$areanames{de}->{493963} = "Woldegk";
-$areanames{de}->{493964} = "Bredenfelde\ bei\ Strasburg";
-$areanames{de}->{493965} = "Burow\ bei\ Altentreptow";
-$areanames{de}->{493966} = "Cölpin";
-$areanames{de}->{493967} = "Oertzenhof\ bei\ Strasburg";
-$areanames{de}->{493968} = "Schönbeck";
-$areanames{de}->{493969} = "Siedenbollentin";
-$areanames{de}->{493971} = "Anklam";
-$areanames{de}->{4939721} = "Liepen\ bei\ Anklam";
-$areanames{de}->{4939722} = "Sarnow\ bei\ Anklam";
-$areanames{de}->{4939723} = "Krien";
-$areanames{de}->{4939724} = "Klein\ Bünzow";
-$areanames{de}->{4939726} = "Ducherow";
-$areanames{de}->{4939727} = "Spantekow";
-$areanames{de}->{4939728} = "Medow\ bei\ Anklam";
-$areanames{de}->{493973} = "Pasewalk";
-$areanames{de}->{4939740} = "Nechlin";
-$areanames{de}->{4939741} = "Jatznick";
-$areanames{de}->{4939742} = "Brüssow\ bei\ Pasewalk";
-$areanames{de}->{4939743} = "Zerrenthin";
-$areanames{de}->{4939744} = "Rothenklempenow";
-$areanames{de}->{4939745} = "Hetzdorf\ bei\ Strasburg";
-$areanames{de}->{4939746} = "Krackow";
-$areanames{de}->{4939747} = "Züsedom";
-$areanames{de}->{4939748} = "Viereck";
-$areanames{de}->{4939749} = "Grambow\ bei\ Pasewalk";
-$areanames{de}->{4939751} = "Penkun";
-$areanames{de}->{4939752} = "Blumenhagen\ bei\ Strasburg";
-$areanames{de}->{4939753} = "Strasburg";
-$areanames{de}->{4939754} = "Löcknitz\ Vorpom";
-$areanames{de}->{493976} = "Torgelow\ bei\ Ueckermünde";
-$areanames{de}->{4939771} = "Ueckermünde";
-$areanames{de}->{4939772} = "Rothemühl";
-$areanames{de}->{4939773} = "Altwarp";
-$areanames{de}->{4939774} = "Mönkebude";
-$areanames{de}->{4939775} = "Ahlbeck\ bei\ Torgelow";
-$areanames{de}->{4939776} = "Hintersee";
-$areanames{de}->{4939777} = "Borkenfriede";
-$areanames{de}->{4939778} = "Ferdinandshof\ bei\ Torgelow";
-$areanames{de}->{4939779} = "Eggesin";
-$areanames{de}->{493981} = "Neustrelitz";
-$areanames{de}->{4939820} = "Triepkendorf";
-$areanames{de}->{4939821} = "Carpin";
-$areanames{de}->{4939822} = "Kratzeburg";
-$areanames{de}->{4939823} = "Rechlin";
-$areanames{de}->{4939824} = "Hohenzieritz";
-$areanames{de}->{4939825} = "Wokuhl";
-$areanames{de}->{4939826} = "Blankensee\ bei\ Neustrelitz";
-$areanames{de}->{4939827} = "Schwarz\ bei\ Neustrelitz";
-$areanames{de}->{4939828} = "Wustrow\ Kreis\ Mecklenburg\-Strelitz";
-$areanames{de}->{4939829} = "Blankenförde";
-$areanames{de}->{4939831} = "Feldberg";
-$areanames{de}->{4939832} = "Wesenberg";
-$areanames{de}->{4939833} = "Mirow\ Kreis\ Neustrelitz";
-$areanames{de}->{493984} = "Prenzlau";
-$areanames{de}->{4939851} = "Göritz\ bei\ Prenzlau";
-$areanames{de}->{4939852} = "Schönermark\ bei\ Prenzlau";
-$areanames{de}->{4939853} = "Holzendorf\ bei\ Prenzlau";
-$areanames{de}->{4939854} = "Kleptow";
-$areanames{de}->{4939855} = "Parmen\-Weggun";
-$areanames{de}->{4939856} = "Beenz\ bei\ Prenzlau";
-$areanames{de}->{4939857} = "Drense";
-$areanames{de}->{4939858} = "Bietikow";
-$areanames{de}->{4939859} = "Fürstenwerder";
-$areanames{de}->{4939861} = "Gramzow\ bei\ Prenzlau";
-$areanames{de}->{4939862} = "Schmölln\ bei\ Prenzlau";
-$areanames{de}->{4939863} = "Seehausen\ bei\ Prenzlau";
-$areanames{de}->{493987} = "Templin";
-$areanames{de}->{4939881} = "Ringenwalde\ bei\ Templin";
-$areanames{de}->{4939882} = "Gollin";
-$areanames{de}->{4939883} = "Groß\ Dölln";
-$areanames{de}->{4939884} = "Hassleben\ bei\ Prenzlau";
-$areanames{de}->{4939885} = "Jakobshagen";
-$areanames{de}->{4939886} = "Milmersdorf";
-$areanames{de}->{4939887} = "Gerswalde";
-$areanames{de}->{4939888} = "Lychen";
-$areanames{de}->{4939889} = "Boitzenburg";
-$areanames{de}->{493991} = "Waren\ Müritz";
-$areanames{de}->{4939921} = "Ankershagen";
-$areanames{de}->{4939922} = "Dambeck\ bei\ Röbel";
-$areanames{de}->{4939923} = "Priborn";
-$areanames{de}->{4939924} = "Stuer";
-$areanames{de}->{4939925} = "Wredenhagen";
-$areanames{de}->{4939926} = "Grabowhöfe";
-$areanames{de}->{4939927} = "Nossentiner\ Hütte";
-$areanames{de}->{4939928} = "Möllenhagen";
-$areanames{de}->{4939929} = "Jabel\ bei\ Waren";
-$areanames{de}->{4939931} = "Röbel\ Müritz";
-$areanames{de}->{4939932} = "Malchow\ bei\ Waren";
-$areanames{de}->{4939933} = "Vollrathsruhe";
-$areanames{de}->{4939934} = "Groß\ Plasten";
-$areanames{de}->{493994} = "Malchin";
-$areanames{de}->{4939951} = "Faulenrost";
-$areanames{de}->{4939952} = "Grammentin";
-$areanames{de}->{4939953} = "Schwinkendorf";
-$areanames{de}->{4939954} = "Stavenhagen\ Reuterstadt";
-$areanames{de}->{4939955} = "Jürgenstorf";
-$areanames{de}->{4939956} = "Neukalen";
-$areanames{de}->{4939957} = "Gielow";
-$areanames{de}->{4939959} = "Dargun";
-$areanames{de}->{493996} = "Teterow";
-$areanames{de}->{4939971} = "Gnoien";
-$areanames{de}->{4939972} = "Walkendorf";
-$areanames{de}->{4939973} = "Altkalen";
-$areanames{de}->{4939975} = "Thürkow";
-$areanames{de}->{4939976} = "Groß\ Bützin";
-$areanames{de}->{4939977} = "Jördenstorf";
-$areanames{de}->{4939978} = "Gross\ Roge";
-$areanames{de}->{493998} = "Demmin";
-$areanames{de}->{4939991} = "Daberkow";
-$areanames{de}->{4939992} = "Görmin";
-$areanames{de}->{4939993} = "Hohenmocker";
-$areanames{de}->{4939994} = "Metschow";
-$areanames{de}->{4939995} = "Nossendorf";
-$areanames{de}->{4939996} = "Törpin";
-$areanames{de}->{4939997} = "Jarmen";
-$areanames{de}->{4939998} = "Loitz\ bei\ Demmin";
-$areanames{de}->{4939999} = "Tutow";
-$areanames{de}->{4940} = "Hamburg";
-$areanames{de}->{494101} = "Pinneberg";
-$areanames{de}->{494102} = "Ahrensburg";
-$areanames{de}->{494103} = "Wedel";
-$areanames{de}->{494104} = "Aumühle\ bei\ Hamburg";
-$areanames{de}->{494105} = "Seevetal";
-$areanames{de}->{494106} = "Quickborn\ Kreis\ Pinneberg";
-$areanames{de}->{494107} = "Siek\ Kreis\ Stormarn";
-$areanames{de}->{494108} = "Rosengarten\ Kreis\ Harburg";
-$areanames{de}->{494109} = "Tangstedt\ Bz\ Hamburg";
-$areanames{de}->{494120} = "Ellerhoop";
-$areanames{de}->{494121} = "Elmshorn";
-$areanames{de}->{494122} = "Uetersen";
-$areanames{de}->{494123} = "Barmstedt";
-$areanames{de}->{494124} = "Glückstadt";
-$areanames{de}->{494125} = "Seestermühe";
-$areanames{de}->{494126} = "Horst\ Holstein";
-$areanames{de}->{494127} = "Westerhorn";
-$areanames{de}->{494128} = "Kollmar";
-$areanames{de}->{494129} = "Haseldorf";
-$areanames{de}->{494131} = "Lüneburg";
-$areanames{de}->{494132} = "Amelinghausen";
-$areanames{de}->{494133} = "Wittorf\ Kreis\ Lüneburg";
-$areanames{de}->{494134} = "Embsen\ Kreis\ Lüneburg";
-$areanames{de}->{494135} = "Kirchgellersen";
-$areanames{de}->{494136} = "Scharnebeck";
-$areanames{de}->{494137} = "Barendorf";
-$areanames{de}->{494138} = "Betzendorf\ Kreis\ Lüneburg";
-$areanames{de}->{494139} = "Hohnstorf\ Elbe";
-$areanames{de}->{494140} = "Estorf\ Kreis\ Stade";
-$areanames{de}->{494141} = "Stade";
-$areanames{de}->{494142} = "Steinkirchen\ Kreis\ Stade";
-$areanames{de}->{494143} = "Drochtersen";
-$areanames{de}->{494144} = "Himmelpforten";
-$areanames{de}->{494146} = "Stade\-Bützfleth";
-$areanames{de}->{494148} = "Drochtersen\-Assel";
-$areanames{de}->{494149} = "Fredenbeck";
-$areanames{de}->{494151} = "Schwarzenbek";
-$areanames{de}->{494152} = "Geesthacht";
-$areanames{de}->{494153} = "Lauenburg\ Elbe";
-$areanames{de}->{494154} = "Trittau";
-$areanames{de}->{494155} = "Büchen";
-$areanames{de}->{494156} = "Talkau";
-$areanames{de}->{494158} = "Roseburg";
-$areanames{de}->{494159} = "Basthorst";
-$areanames{de}->{494161} = "Buxtehude";
-$areanames{de}->{494162} = "Jork";
-$areanames{de}->{494163} = "Horneburg\ Niederelbe";
-$areanames{de}->{494164} = "Harsefeld";
-$areanames{de}->{494165} = "Hollenstedt\ Nordheide";
-$areanames{de}->{494166} = "Ahlerstedt";
-$areanames{de}->{494167} = "Apensen";
-$areanames{de}->{494168} = "Neu\ Wulmstorf\-Elstorf";
-$areanames{de}->{494169} = "Sauensiek";
-$areanames{de}->{494171} = "Winsen\ Luhe";
-$areanames{de}->{494172} = "Salzhausen";
-$areanames{de}->{494173} = "Wulfsen";
-$areanames{de}->{494174} = "Stelle\ Kreis\ Harburg";
-$areanames{de}->{494175} = "Egestorf\ Nordheide";
-$areanames{de}->{494176} = "Marschacht";
-$areanames{de}->{494177} = "Drage\ Elbe";
-$areanames{de}->{494178} = "Radbruch";
-$areanames{de}->{494179} = "Winsen\-Tönnhausen";
-$areanames{de}->{494180} = "Königsmoor";
-$areanames{de}->{494181} = "Buchholz\ in\ der\ Nordheide";
-$areanames{de}->{494182} = "Tostedt";
-$areanames{de}->{494183} = "Jesteburg";
-$areanames{de}->{494184} = "Hanstedt\ Nordheide";
-$areanames{de}->{494185} = "Marxen\ Auetal";
-$areanames{de}->{494186} = "Buchholz\-Trelde";
-$areanames{de}->{494187} = "Holm\-Seppensen";
-$areanames{de}->{494188} = "Welle\ Nordheide";
-$areanames{de}->{494189} = "Undeloh";
-$areanames{de}->{494191} = "Kaltenkirchen\ Holstein";
-$areanames{de}->{494192} = "Bad\ Bramstedt";
-$areanames{de}->{494193} = "Henstedt\-Ulzburg";
-$areanames{de}->{494194} = "Sievershütten";
-$areanames{de}->{494195} = "Hartenholm";
-$areanames{de}->{494202} = "Achim\ bei\ Bremen";
-$areanames{de}->{494203} = "Weyhe\ bei\ Bremen";
-$areanames{de}->{494204} = "Thedinghausen";
-$areanames{de}->{494205} = "Ottersberg";
-$areanames{de}->{494206} = "Stuhr\-Heiligenrode";
-$areanames{de}->{494207} = "Oyten";
-$areanames{de}->{494208} = "Grasberg";
-$areanames{de}->{494209} = "Schwanewede";
-$areanames{de}->{49421} = "Bremen";
-$areanames{de}->{494221} = "Delmenhorst";
-$areanames{de}->{494222} = "Ganderkesee";
-$areanames{de}->{494223} = "Ganderkesee\-Bookholzberg";
-$areanames{de}->{494224} = "Gross\ Ippener";
-$areanames{de}->{494230} = "Verden\-Walle";
-$areanames{de}->{494231} = "Verden\ Aller";
-$areanames{de}->{494232} = "Langwedel\ Kreis\ Verden";
-$areanames{de}->{494233} = "Blender";
-$areanames{de}->{494234} = "Dörverden";
-$areanames{de}->{494235} = "Langwedel\-Etelsen";
-$areanames{de}->{494236} = "Kirchlinteln";
-$areanames{de}->{494237} = "Bendingbostel";
-$areanames{de}->{494238} = "Neddenaverbergen";
-$areanames{de}->{494239} = "Dörverden\-Westen";
-$areanames{de}->{494240} = "Syke\-Heiligenfelde";
-$areanames{de}->{494241} = "Bassum";
-$areanames{de}->{494242} = "Syke";
-$areanames{de}->{494243} = "Twistringen";
-$areanames{de}->{494244} = "Harpstedt";
-$areanames{de}->{494245} = "Neuenkirchen\ bei\ Bassum";
-$areanames{de}->{494246} = "Twistringen\-Heiligenloh";
-$areanames{de}->{494247} = "Affinghausen";
-$areanames{de}->{494248} = "Bassum\-Neubruchhausen";
-$areanames{de}->{494249} = "Bassum\-Nordwohlde";
-$areanames{de}->{494251} = "Hoya";
-$areanames{de}->{494252} = "Bruchhausen\-Vilsen";
-$areanames{de}->{494253} = "Asendorf\ Kreis\ Diepholz";
-$areanames{de}->{494254} = "Eystrup";
-$areanames{de}->{494255} = "Martfeld";
-$areanames{de}->{494256} = "Hilgermissen";
-$areanames{de}->{494257} = "Schweringen";
-$areanames{de}->{494258} = "Schwarme";
-$areanames{de}->{494260} = "Visselhövede\-Wittorf";
-$areanames{de}->{494261} = "Rotenburg\ Wümme";
-$areanames{de}->{494262} = "Visselhövede";
-$areanames{de}->{494263} = "Scheessel";
-$areanames{de}->{494264} = "Sottrum\ Kreis\ Rotenburg";
-$areanames{de}->{494265} = "Fintel";
-$areanames{de}->{494266} = "Brockel";
-$areanames{de}->{494267} = "Lauenbrück";
-$areanames{de}->{494268} = "Bötersen";
-$areanames{de}->{494269} = "Ahausen\-Kirchwalsede";
-$areanames{de}->{494271} = "Sulingen";
-$areanames{de}->{494272} = "Siedenburg";
-$areanames{de}->{494273} = "Kirchdorf\ bei\ Sulingen";
-$areanames{de}->{494274} = "Varrel\ bei\ Sulingen";
-$areanames{de}->{494275} = "Ehrenburg";
-$areanames{de}->{494276} = "Borstel\ bei\ Sulingen";
-$areanames{de}->{494277} = "Schwaförden";
-$areanames{de}->{494281} = "Zeven";
-$areanames{de}->{494282} = "Sittensen";
-$areanames{de}->{494283} = "Tarmstedt";
-$areanames{de}->{494284} = "Selsingen";
-$areanames{de}->{494285} = "Rhade\ bei\ Zeven";
-$areanames{de}->{494286} = "Gyhum";
-$areanames{de}->{494287} = "Heeslingen\-Boitzen";
-$areanames{de}->{494288} = "Horstedt\ Kreis\ Rotenburg";
-$areanames{de}->{494289} = "Kirchtimke";
-$areanames{de}->{494292} = "Ritterhude";
-$areanames{de}->{494293} = "Ottersberg\-Fischerhude";
-$areanames{de}->{494294} = "Riede\ Kreis\ Verden";
-$areanames{de}->{494295} = "Emtinghausen";
-$areanames{de}->{494296} = "Schwanewede\-Aschwarden";
-$areanames{de}->{494297} = "Ottersberg\-Posthausen";
-$areanames{de}->{494298} = "Lilienthal";
-$areanames{de}->{494302} = "Kirchbarkau";
-$areanames{de}->{494303} = "Schlesen";
-$areanames{de}->{494305} = "Westensee";
-$areanames{de}->{494307} = "Raisdorf";
-$areanames{de}->{494308} = "Schwedeneck";
-$areanames{de}->{49431} = "Kiel";
-$areanames{de}->{494320} = "Heidmühlen";
-$areanames{de}->{494321} = "Neumünster";
-$areanames{de}->{494322} = "Bordesholm";
-$areanames{de}->{494323} = "Bornhöved";
-$areanames{de}->{494324} = "Brokstedt";
-$areanames{de}->{494326} = "Wankendorf";
-$areanames{de}->{494327} = "Grossenaspe";
-$areanames{de}->{494328} = "Rickling";
-$areanames{de}->{494329} = "Langwedel\ Holstein";
-$areanames{de}->{494330} = "Emkendorf";
-$areanames{de}->{494331} = "Rendsburg";
-$areanames{de}->{494332} = "Hamdorf\ bei\ Rendsburg";
-$areanames{de}->{494333} = "Erfde";
-$areanames{de}->{494334} = "Bredenbek\ bei\ Rendsburg";
-$areanames{de}->{494335} = "Hohn\ bei\ Rendsburg";
-$areanames{de}->{494336} = "Owschlag";
-$areanames{de}->{494337} = "Jevenstedt";
-$areanames{de}->{494338} = "Alt\ Duvenstedt";
-$areanames{de}->{494339} = "Christiansholm";
-$areanames{de}->{494340} = "Achterwehr";
-$areanames{de}->{494342} = "Preetz\ Kreis\ Plön";
-$areanames{de}->{494343} = "Laboe";
-$areanames{de}->{494344} = "Schönberg\ Holstein";
-$areanames{de}->{494346} = "Gettorf";
-$areanames{de}->{494347} = "Flintbek";
-$areanames{de}->{494348} = "Schönkirchen";
-$areanames{de}->{494349} = "Dänischenhagen";
-$areanames{de}->{494351} = "Eckernförde";
-$areanames{de}->{494352} = "Damp";
-$areanames{de}->{494353} = "Ascheffel";
-$areanames{de}->{494354} = "Fleckeby";
-$areanames{de}->{494355} = "Rieseby";
-$areanames{de}->{494356} = "Gross\ Wittensee";
-$areanames{de}->{494357} = "Sehestedt\ Eider";
-$areanames{de}->{494358} = "Loose\ bei\ Eckernförde";
-$areanames{de}->{494361} = "Oldenburg\ in\ Holstein";
-$areanames{de}->{494362} = "Heiligenhafen";
-$areanames{de}->{494363} = "Lensahn";
-$areanames{de}->{494364} = "Dahme\ Kreis\ Ostholstein";
-$areanames{de}->{494365} = "Heringsdorf\ Holstein";
-$areanames{de}->{494366} = "Grömitz\-Cismar";
-$areanames{de}->{494367} = "Grossenbrode";
-$areanames{de}->{494371} = "Burg\ auf\ Fehmarn";
-$areanames{de}->{494372} = "Westfehmarn";
-$areanames{de}->{494381} = "Lütjenburg";
-$areanames{de}->{494382} = "Wangels";
-$areanames{de}->{494383} = "Grebin";
-$areanames{de}->{494384} = "Selent";
-$areanames{de}->{494385} = "Hohenfelde\ bei\ Kiel";
-$areanames{de}->{494392} = "Nortorf\ bei\ Neumünster";
-$areanames{de}->{494393} = "Boostedt";
-$areanames{de}->{494394} = "Bokhorst";
-$areanames{de}->{494401} = "Brake\ Unterweser";
-$areanames{de}->{494402} = "Rastede";
-$areanames{de}->{494403} = "Bad\ Zwischenahn";
-$areanames{de}->{494404} = "Elsfleth";
-$areanames{de}->{494405} = "Edewecht";
-$areanames{de}->{494406} = "Berne";
-$areanames{de}->{494407} = "Wardenburg";
-$areanames{de}->{494408} = "Hude\ Oldenburg";
-$areanames{de}->{494409} = "Westerstede\-Ocholt";
-$areanames{de}->{49441} = "Oldenburg";
-$areanames{de}->{494421} = "Wilhelmshaven";
-$areanames{de}->{494422} = "Sande\ Kreis\ Friesl";
-$areanames{de}->{494423} = "Fedderwarden";
-$areanames{de}->{494425} = "Wangerland\-Hooksiel";
-$areanames{de}->{494426} = "Wangerland\-Horumersiel";
-$areanames{de}->{494431} = "Wildeshausen";
-$areanames{de}->{494432} = "Dötlingen\-Brettorf";
-$areanames{de}->{494433} = "Dötlingen";
-$areanames{de}->{494434} = "Colnrade";
-$areanames{de}->{494435} = "Grossenkneten";
-$areanames{de}->{494441} = "Vechta";
-$areanames{de}->{494442} = "Lohne\ Oldenburg";
-$areanames{de}->{494443} = "Dinklage";
-$areanames{de}->{494444} = "Goldenstedt";
-$areanames{de}->{494445} = "Visbek\ Kreis\ Vechta";
-$areanames{de}->{494446} = "Bakum\ Kreis\ Vechta";
-$areanames{de}->{494447} = "Vechta\-Langförden";
-$areanames{de}->{494451} = "Varel\ Jadebusen";
-$areanames{de}->{494452} = "Zetel\-Neuenburg";
-$areanames{de}->{494453} = "Zetel";
-$areanames{de}->{494454} = "Jade";
-$areanames{de}->{494455} = "Jade\-Schweiburg";
-$areanames{de}->{494456} = "Varel\-Altjührden";
-$areanames{de}->{494458} = "Wiefelstede\-Spohle";
-$areanames{de}->{494461} = "Jever";
-$areanames{de}->{494462} = "Wittmund";
-$areanames{de}->{494463} = "Wangerland";
-$areanames{de}->{494464} = "Wittmund\-Carolinensiel";
-$areanames{de}->{494465} = "Friedeburg\ Ostfriesland";
-$areanames{de}->{494466} = "Wittmund\-Ardorf";
-$areanames{de}->{494467} = "Wittmund\-Funnix";
-$areanames{de}->{494468} = "Friedeburg\-Reepsholt";
-$areanames{de}->{494469} = "Wangerooge";
-$areanames{de}->{494471} = "Cloppenburg";
-$areanames{de}->{494472} = "Lastrup";
-$areanames{de}->{494473} = "Emstek";
-$areanames{de}->{494474} = "Garrel";
-$areanames{de}->{494475} = "Molbergen";
-$areanames{de}->{494477} = "Lastrup\-Hemmelte";
-$areanames{de}->{494478} = "Cappeln\ Oldenburg";
-$areanames{de}->{494479} = "Molbergen\-Peheim";
-$areanames{de}->{494480} = "Ovelgönne\-Strückhausen";
-$areanames{de}->{494481} = "Hatten\-Sandkrug";
-$areanames{de}->{494482} = "Hatten";
-$areanames{de}->{494483} = "Ovelgönne\-Großenmeer";
-$areanames{de}->{494484} = "Hude\-Wüsting";
-$areanames{de}->{494485} = "Elsfleth\-Huntorf";
-$areanames{de}->{494486} = "Edewecht\-Friedrichsfehn";
-$areanames{de}->{494487} = "Grossenkneten\-Huntlosen";
-$areanames{de}->{494488} = "Westerstede";
-$areanames{de}->{494489} = "Apen";
-$areanames{de}->{494491} = "Friesoythe";
-$areanames{de}->{494492} = "Saterland";
-$areanames{de}->{494493} = "Friesoythe\-Gehlenberg";
-$areanames{de}->{494494} = "Bösel\ Oldenburg";
-$areanames{de}->{494495} = "Friesoythe\-Thüle";
-$areanames{de}->{494496} = "Friesoythe\-Markhausen";
-$areanames{de}->{494497} = "Barßel\-Harkebrügge";
-$areanames{de}->{494498} = "Saterland\-Ramsloh";
-$areanames{de}->{494499} = "Barssel";
-$areanames{de}->{494501} = "Kastorf\ Holstein";
-$areanames{de}->{494502} = "Lübeck\-Travemünde";
-$areanames{de}->{494503} = "Timmendorfer\ Strand";
-$areanames{de}->{494504} = "Ratekau";
-$areanames{de}->{494505} = "Stockelsdorf\-Curau";
-$areanames{de}->{494506} = "Stockelsdorf\-Krumbeck";
-$areanames{de}->{494508} = "Krummesse";
-$areanames{de}->{494509} = "Groß\ Grönau";
-$areanames{de}->{49451} = "Lübeck";
-$areanames{de}->{494521} = "Eutin";
-$areanames{de}->{494522} = "Plön";
-$areanames{de}->{494523} = "Malente";
-$areanames{de}->{494524} = "Scharbeutz\-Pönitz";
-$areanames{de}->{494525} = "Ahrensbök";
-$areanames{de}->{494526} = "Ascheberg\ Holstein";
-$areanames{de}->{494527} = "Bosau";
-$areanames{de}->{494528} = "Schönwalde\ am\ Bungsberg";
-$areanames{de}->{494529} = "Süsel\-Bujendorf";
-$areanames{de}->{494531} = "Bad\ Oldesloe";
-$areanames{de}->{494532} = "Bargteheide";
-$areanames{de}->{494533} = "Reinfeld\ Holstein";
-$areanames{de}->{494534} = "Steinburg\ Kreis\ Storman";
-$areanames{de}->{494535} = "Nahe";
-$areanames{de}->{494536} = "Steinhorst\ Lauenburg";
-$areanames{de}->{494537} = "Sülfeld\ Holstein";
-$areanames{de}->{494539} = "Westerau";
-$areanames{de}->{494541} = "Ratzeburg";
-$areanames{de}->{494542} = "Mölln\ Lauenburg";
-$areanames{de}->{494543} = "Nusse";
-$areanames{de}->{494544} = "Berkenthin";
-$areanames{de}->{494545} = "Seedorf\ Lauenburg";
-$areanames{de}->{494546} = "Mustin\ Lauenburg";
-$areanames{de}->{494547} = "Gudow\ Lauenburg";
-$areanames{de}->{494550} = "Bühnsdorf";
-$areanames{de}->{494551} = "Bad\ Segeberg";
-$areanames{de}->{494552} = "Leezen";
-$areanames{de}->{494553} = "Geschendorf";
-$areanames{de}->{494554} = "Wahlstedt";
-$areanames{de}->{494555} = "Seedorf\ bei\ Bad\ Segeberg";
-$areanames{de}->{494556} = "Ahrensbök\-Gnissau";
-$areanames{de}->{494557} = "Blunk";
-$areanames{de}->{494558} = "Todesfelde";
-$areanames{de}->{494559} = "Wensin";
-$areanames{de}->{494561} = "Neustadt\ in\ Holstein";
-$areanames{de}->{494562} = "Grömitz";
-$areanames{de}->{494563} = "Scharbeutz\-Haffkrug";
-$areanames{de}->{494564} = "Schashagen";
-$areanames{de}->{494602} = "Freienwill";
-$areanames{de}->{494603} = "Havetoft";
-$areanames{de}->{494604} = "Grossenwiehe";
-$areanames{de}->{494605} = "Medelby";
-$areanames{de}->{494606} = "Wanderup";
-$areanames{de}->{494607} = "Janneby";
-$areanames{de}->{494608} = "Handewitt";
-$areanames{de}->{494609} = "Eggebek";
-$areanames{de}->{49461} = "Flensburg";
-$areanames{de}->{494621} = "Schleswig";
-$areanames{de}->{494622} = "Taarstedt";
-$areanames{de}->{494623} = "Böklund";
-$areanames{de}->{494624} = "Kropp";
-$areanames{de}->{494625} = "Jübek";
-$areanames{de}->{494626} = "Treia";
-$areanames{de}->{494627} = "Dörpstedt";
-$areanames{de}->{494630} = "Barderup";
-$areanames{de}->{494631} = "Glücksburg\ Ostsee";
-$areanames{de}->{494632} = "Steinbergkirche";
-$areanames{de}->{494633} = "Satrup";
-$areanames{de}->{494634} = "Husby";
-$areanames{de}->{494635} = "Sörup";
-$areanames{de}->{494636} = "Langballig";
-$areanames{de}->{494637} = "Sterup";
-$areanames{de}->{494638} = "Tarp";
-$areanames{de}->{494639} = "Schafflund";
-$areanames{de}->{494641} = "Süderbrarup";
-$areanames{de}->{494642} = "Kappeln\ Schlei";
-$areanames{de}->{494643} = "Gelting\ Angeln";
-$areanames{de}->{494644} = "Karby";
-$areanames{de}->{494646} = "Mohrkirch";
-$areanames{de}->{49465} = "Sylt";
-$areanames{de}->{494661} = "Niebüll";
-$areanames{de}->{494662} = "Leck";
-$areanames{de}->{494663} = "Süderlügum";
-$areanames{de}->{494664} = "Neukirchen\ bei\ Niebüll";
-$areanames{de}->{494665} = "Emmelsbüll\-Horsbüll";
-$areanames{de}->{494666} = "Ladelund";
-$areanames{de}->{494667} = "Dagebüll";
-$areanames{de}->{494668} = "Klanxbüll";
-$areanames{de}->{494671} = "Bredstedt";
-$areanames{de}->{494672} = "Langenhorn";
-$areanames{de}->{494673} = "Joldelund";
-$areanames{de}->{494674} = "Ockholm";
-$areanames{de}->{494681} = "Wyk\ auf\ Föhr";
-$areanames{de}->{494682} = "Amrum";
-$areanames{de}->{494683} = "Oldsum";
-$areanames{de}->{494684} = "Langeneß\ Hallig";
-$areanames{de}->{494702} = "Sandstedt";
-$areanames{de}->{494703} = "Loxstedt\-Donnern";
-$areanames{de}->{494704} = "Drangstedt";
-$areanames{de}->{494705} = "Wremen";
-$areanames{de}->{494706} = "Schiffdorf";
-$areanames{de}->{494707} = "Langen\-Neuenwalde";
-$areanames{de}->{494708} = "Ringstedt";
-$areanames{de}->{49471} = "Bremerhaven";
-$areanames{de}->{494721} = "Cuxhaven";
-$areanames{de}->{494722} = "Cuxhaven\-Altenbruch";
-$areanames{de}->{494723} = "Cuxhaven\-Altenwalde";
-$areanames{de}->{494724} = "Cuxhaven\-Lüdingworth";
-$areanames{de}->{494725} = "Helgoland";
-$areanames{de}->{494731} = "Nordenham";
-$areanames{de}->{494732} = "Stadland\-Rodenkirchen";
-$areanames{de}->{494733} = "Butjadingen\-Burhave";
-$areanames{de}->{494734} = "Stadland\-Seefeld";
-$areanames{de}->{494735} = "Butjadingen\-Stollhamm";
-$areanames{de}->{494736} = "Butjadingen\-Tossens";
-$areanames{de}->{494737} = "Stadland\-Schwei";
-$areanames{de}->{494740} = "Loxstedt\-Dedesdorf";
-$areanames{de}->{494741} = "Nordholz\ bei\ Bremerhaven";
-$areanames{de}->{494742} = "Dorum";
-$areanames{de}->{494743} = "Langen\ bei\ Bremerhaven";
-$areanames{de}->{494744} = "Loxstedt";
-$areanames{de}->{494745} = "Bad\ Bederkesa";
-$areanames{de}->{494746} = "Hagen\ bei\ Bremerhaven";
-$areanames{de}->{494747} = "Beverstedt";
-$areanames{de}->{494748} = "Stubben\ bei\ Bremerhaven";
-$areanames{de}->{494749} = "Schiffdorf\-Geestenseth";
-$areanames{de}->{494751} = "Otterndorf";
-$areanames{de}->{494752} = "Neuhaus\ Oste";
-$areanames{de}->{494753} = "Balje";
-$areanames{de}->{494754} = "Bülkau";
-$areanames{de}->{494755} = "Ihlienworth";
-$areanames{de}->{494756} = "Odisheim";
-$areanames{de}->{494757} = "Wanna";
-$areanames{de}->{494758} = "Nordleda";
-$areanames{de}->{494761} = "Bremervörde";
-$areanames{de}->{494762} = "Kutenholz";
-$areanames{de}->{494763} = "Gnarrenburg";
-$areanames{de}->{494764} = "Gnarrenburg\-Klenkendorf";
-$areanames{de}->{494765} = "Ebersdorf\ bei\ Bremervörde";
-$areanames{de}->{494766} = "Basdahl";
-$areanames{de}->{494767} = "Bremervörde\-Bevern";
-$areanames{de}->{494768} = "Hipstedt";
-$areanames{de}->{494769} = "Bremervörde\-Iselersheim";
-$areanames{de}->{494770} = "Wischhafen";
-$areanames{de}->{494771} = "Hemmoor";
-$areanames{de}->{494772} = "Oberndorf\ Oste";
-$areanames{de}->{494773} = "Lamstedt";
-$areanames{de}->{494774} = "Hechthausen";
-$areanames{de}->{494775} = "Grossenwörden";
-$areanames{de}->{494776} = "Osten\-Altendorf";
-$areanames{de}->{494777} = "Cadenberge";
-$areanames{de}->{494778} = "Wingst";
-$areanames{de}->{494779} = "Freiburg\ Elbe";
-$areanames{de}->{494791} = "Osterholz\-Scharmbeck";
-$areanames{de}->{494792} = "Worpswede";
-$areanames{de}->{494793} = "Hambergen";
-$areanames{de}->{494794} = "Worpswede\-Ostersode";
-$areanames{de}->{494795} = "Garlstedt";
-$areanames{de}->{494796} = "Teufelsmoor";
-$areanames{de}->{494802} = "Wrohm";
-$areanames{de}->{494803} = "Pahlen";
-$areanames{de}->{494804} = "Nordhastedt";
-$areanames{de}->{494805} = "Schafstedt";
-$areanames{de}->{494806} = "Sarzbüttel";
-$areanames{de}->{49481} = "Heide\ Holstein";
-$areanames{de}->{494821} = "Itzehoe";
-$areanames{de}->{494822} = "Kellinghusen";
-$areanames{de}->{494823} = "Wilster";
-$areanames{de}->{494824} = "Krempe";
-$areanames{de}->{494825} = "Burg\ Dithmarschen";
-$areanames{de}->{494826} = "Hohenlockstedt";
-$areanames{de}->{494827} = "Wacken";
-$areanames{de}->{494828} = "Lägerdorf";
-$areanames{de}->{494829} = "Wewelsfleth";
-$areanames{de}->{494830} = "Süderhastedt";
-$areanames{de}->{494832} = "Meldorf";
-$areanames{de}->{494833} = "Wesselburen";
-$areanames{de}->{494834} = "Büsum";
-$areanames{de}->{494835} = "Albersdorf\ Holstein";
-$areanames{de}->{494836} = "Hennstedt\ Dithmarschen";
-$areanames{de}->{494837} = "Neuenkirchen\ Dithmarschen";
-$areanames{de}->{494838} = "Tellingstedt";
-$areanames{de}->{494839} = "Wöhrden\ Dithmarschen";
-$areanames{de}->{494841} = "Husum\ Nordsee";
-$areanames{de}->{494842} = "Nordstrand";
-$areanames{de}->{494843} = "Viöl";
-$areanames{de}->{494844} = "Pellworm";
-$areanames{de}->{494845} = "Ostenfeld\ Husum";
-$areanames{de}->{494846} = "Hattstedt";
-$areanames{de}->{494847} = "Oster\-Ohrstedt";
-$areanames{de}->{494848} = "Rantrum";
-$areanames{de}->{494849} = "Hooge";
-$areanames{de}->{494851} = "Marne";
-$areanames{de}->{494852} = "Brunsbüttel";
-$areanames{de}->{494853} = "Sankt\ Michaelisdonn";
-$areanames{de}->{494854} = "Friedrichskoog";
-$areanames{de}->{494855} = "Eddelak";
-$areanames{de}->{494856} = "Kronprinzenkoog";
-$areanames{de}->{494857} = "Barlt";
-$areanames{de}->{494858} = "Sankt\ Margarethen\ Holstein";
-$areanames{de}->{494859} = "Windbergen";
-$areanames{de}->{494861} = "Tönning";
-$areanames{de}->{494862} = "Garding";
-$areanames{de}->{494863} = "Sankt\ Peter\-Ording";
-$areanames{de}->{494864} = "Oldenswort";
-$areanames{de}->{494865} = "Osterhever";
-$areanames{de}->{494871} = "Hohenwestedt";
-$areanames{de}->{494872} = "Hanerau\-Hademarschen";
-$areanames{de}->{494873} = "Aukrug";
-$areanames{de}->{494874} = "Todenbüttel";
-$areanames{de}->{494875} = "Stafstedt";
-$areanames{de}->{494876} = "Reher\ Holstein";
-$areanames{de}->{494877} = "Hennstedt\ bei\ Itzehoe";
-$areanames{de}->{494881} = "Friedrichstadt";
-$areanames{de}->{494882} = "Lunden";
-$areanames{de}->{494883} = "Süderstapel";
-$areanames{de}->{494884} = "Schwabstedt";
-$areanames{de}->{494885} = "Bergenhusen";
-$areanames{de}->{494892} = "Schenefeld\ Mittelholstein";
-$areanames{de}->{494893} = "Hohenaspe";
-$areanames{de}->{494902} = "Jemgum\-Ditzum";
-$areanames{de}->{494903} = "Wymeer";
-$areanames{de}->{49491} = "Leer\ Ostfriesland";
-$areanames{de}->{494920} = "Wirdum";
-$areanames{de}->{494921} = "Emden\ Stadt";
-$areanames{de}->{494922} = "Borkum";
-$areanames{de}->{494923} = "Krummhörn\-Pewsum";
-$areanames{de}->{494924} = "Moormerland\-Oldersum";
-$areanames{de}->{494925} = "Hinte";
-$areanames{de}->{494926} = "Krummhörn\-Greetsiel";
-$areanames{de}->{494927} = "Krummhörn\-Loquard";
-$areanames{de}->{494928} = "Ihlow\-Riepe";
-$areanames{de}->{494929} = "Ihlow\ Kreis\ Aurich";
-$areanames{de}->{494931} = "Norden";
-$areanames{de}->{494932} = "Norderney";
-$areanames{de}->{494933} = "Dornum\ Ostfriesland";
-$areanames{de}->{494934} = "Marienhafe";
-$areanames{de}->{494935} = "Juist";
-$areanames{de}->{494936} = "Grossheide";
-$areanames{de}->{494938} = "Hagermarsch";
-$areanames{de}->{494939} = "Baltrum";
-$areanames{de}->{494941} = "Aurich";
-$areanames{de}->{494942} = "Südbrookmerland";
-$areanames{de}->{494943} = "Grossefehn";
-$areanames{de}->{494944} = "Wiesmoor";
-$areanames{de}->{494945} = "Grossefehn\-Timmel";
-$areanames{de}->{494946} = "Grossefehn\-Bagband";
-$areanames{de}->{494947} = "Aurich\-Ogenbargen";
-$areanames{de}->{494948} = "Wiesmoor\-Marcardsmoor";
-$areanames{de}->{494950} = "Holtland";
-$areanames{de}->{494951} = "Weener";
-$areanames{de}->{494952} = "Rhauderfehn";
-$areanames{de}->{494953} = "Bunde";
-$areanames{de}->{494954} = "Moormerland";
-$areanames{de}->{494955} = "Westoverledingen";
-$areanames{de}->{494956} = "Uplengen";
-$areanames{de}->{494957} = "Detern";
-$areanames{de}->{494958} = "Jemgum";
-$areanames{de}->{494959} = "Dollart";
-$areanames{de}->{494961} = "Papenburg";
-$areanames{de}->{494962} = "Papenburg\-Aschendorf";
-$areanames{de}->{494963} = "Dörpen";
-$areanames{de}->{494964} = "Rhede\ Ems";
-$areanames{de}->{494965} = "Surwold";
-$areanames{de}->{494966} = "Neubörger";
-$areanames{de}->{494967} = "Rhauderfehn\-Burlage";
-$areanames{de}->{494968} = "Neulehe";
-$areanames{de}->{494971} = "Esens";
-$areanames{de}->{494972} = "Langeoog";
-$areanames{de}->{494973} = "Wittmund\-Burhafe";
-$areanames{de}->{494974} = "Neuharlingersiel";
-$areanames{de}->{494975} = "Westerholt\ Ostfriesland";
-$areanames{de}->{494976} = "Spiekeroog";
-$areanames{de}->{494977} = "Blomberg\ Ostfriesland";
-$areanames{de}->{495021} = "Nienburg\ Weser";
-$areanames{de}->{495022} = "Wietzen";
-$areanames{de}->{495023} = "Liebenau\ Kreis\ Nieburg\ Weser";
-$areanames{de}->{495024} = "Rohrsen\ Kreis\ Nienburg\ Weser";
-$areanames{de}->{495025} = "Estorf\ Weser";
-$areanames{de}->{495026} = "Steimbke";
-$areanames{de}->{495027} = "Linsburg";
-$areanames{de}->{495028} = "Pennigsehl";
-$areanames{de}->{495031} = "Wunstorf";
-$areanames{de}->{495032} = "Neustadt\ am\ Rübenberge";
-$areanames{de}->{495033} = "Wunstorf\-Grossenheidorn";
-$areanames{de}->{495034} = "Neustadt\-Hagen";
-$areanames{de}->{495035} = "Gross\ Munzel";
-$areanames{de}->{495036} = "Neustadt\-Schneeren";
-$areanames{de}->{495037} = "Bad\ Rehburg";
-$areanames{de}->{495041} = "Springe\ Deister";
-$areanames{de}->{495042} = "Bad\ Münder\ am\ Deister";
-$areanames{de}->{495043} = "Lauenau";
-$areanames{de}->{495044} = "Springe\-Eldagsen";
-$areanames{de}->{495045} = "Springe\-Bennigsen";
-$areanames{de}->{495051} = "Bergen\ Kreis\ Celle";
-$areanames{de}->{495052} = "Hermannsburg";
-$areanames{de}->{495053} = "Faßberg\-Müden";
-$areanames{de}->{495054} = "Bergen\-Sülze";
-$areanames{de}->{495055} = "Fassberg";
-$areanames{de}->{495056} = "Winsen\-Meissendorf";
-$areanames{de}->{495060} = "Bodenburg";
-$areanames{de}->{495062} = "Holle\ bei\ Hildesheim";
-$areanames{de}->{495063} = "Bad\ Salzdetfurth";
-$areanames{de}->{495064} = "Groß\ Düngen";
-$areanames{de}->{495065} = "Sibbesse";
-$areanames{de}->{495066} = "Sarstedt";
-$areanames{de}->{495067} = "Bockenem";
-$areanames{de}->{495068} = "Elze\ Leine";
-$areanames{de}->{495069} = "Nordstemmen";
-$areanames{de}->{495071} = "Schwarmstedt";
-$areanames{de}->{495072} = "Neustadt\-Mandelsloh";
-$areanames{de}->{495073} = "Neustadt\-Esperke";
-$areanames{de}->{495074} = "Rodewald";
-$areanames{de}->{495082} = "Langlingen";
-$areanames{de}->{495083} = "Hohne\ bei\ Celle";
-$areanames{de}->{495084} = "Hambühren";
-$areanames{de}->{495085} = "Burgdorf\-Ehlershausen";
-$areanames{de}->{495086} = "Celle\-Scheuen";
-$areanames{de}->{495101} = "Pattensen";
-$areanames{de}->{495102} = "Laatzen";
-$areanames{de}->{495103} = "Wennigsen\ Deister";
-$areanames{de}->{495105} = "Barsinghausen";
-$areanames{de}->{495108} = "Gehrden\ Han";
-$areanames{de}->{495109} = "Ronnenberg";
-$areanames{de}->{49511} = "Hannover";
-$areanames{de}->{495121} = "Hildesheim";
-$areanames{de}->{495123} = "Schellerten";
-$areanames{de}->{495126} = "Algermissen";
-$areanames{de}->{495127} = "Harsum";
-$areanames{de}->{495128} = "Hohenhameln";
-$areanames{de}->{495129} = "Söhlde";
-$areanames{de}->{495130} = "Wedemark";
-$areanames{de}->{495131} = "Garbsen";
-$areanames{de}->{495132} = "Lehrte";
-$areanames{de}->{495135} = "Burgwedel\-Fuhrberg";
-$areanames{de}->{495136} = "Burgdorf\ Kreis\ Hannover";
-$areanames{de}->{495137} = "Seelze";
-$areanames{de}->{495138} = "Sehnde";
-$areanames{de}->{495139} = "Burgwedel";
-$areanames{de}->{495141} = "Celle";
-$areanames{de}->{495142} = "Eschede";
-$areanames{de}->{495143} = "Winsen\ Aller";
-$areanames{de}->{495144} = "Wathlingen";
-$areanames{de}->{495145} = "Beedenbostel";
-$areanames{de}->{495146} = "Wietze";
-$areanames{de}->{495147} = "Uetze\-Hänigsen";
-$areanames{de}->{495148} = "Steinhorst\ Niedersachsen";
-$areanames{de}->{495149} = "Wienhausen";
-$areanames{de}->{495151} = "Hameln";
-$areanames{de}->{495152} = "Hessisch\ Oldendorf";
-$areanames{de}->{495153} = "Salzhemmendorf";
-$areanames{de}->{495154} = "Aerzen";
-$areanames{de}->{495155} = "Emmerthal";
-$areanames{de}->{495156} = "Coppenbrügge";
-$areanames{de}->{495157} = "Emmerthal\-Börry";
-$areanames{de}->{495158} = "Hemeringen";
-$areanames{de}->{495159} = "Coppenbrügge\-Bisperode";
-$areanames{de}->{495161} = "Walsrode";
-$areanames{de}->{495162} = "Fallingbostel";
-$areanames{de}->{495163} = "Fallingbostel\-Dorfmark";
-$areanames{de}->{495164} = "Hodenhagen";
-$areanames{de}->{495165} = "Rethem\ Aller";
-$areanames{de}->{495166} = "Walsrode\-Kirchboitzen";
-$areanames{de}->{495167} = "Walsrode\-Westenholz";
-$areanames{de}->{495168} = "Walsrode\-Stellichte";
-$areanames{de}->{495171} = "Peine";
-$areanames{de}->{495172} = "Ilsede";
-$areanames{de}->{495173} = "Uetze";
-$areanames{de}->{495174} = "Lahstedt";
-$areanames{de}->{495175} = "Lehrte\-Arpke";
-$areanames{de}->{495176} = "Edemissen";
-$areanames{de}->{495177} = "Edemissen\-Abbensen";
-$areanames{de}->{495181} = "Alfeld\ Leine";
-$areanames{de}->{495182} = "Gronau\ Leine";
-$areanames{de}->{495183} = "Lamspringe";
-$areanames{de}->{495184} = "Freden\ Leine";
-$areanames{de}->{495185} = "Duingen";
-$areanames{de}->{495186} = "Salzhemmendorf\-Wallensen";
-$areanames{de}->{495187} = "Delligsen";
-$areanames{de}->{495190} = "Soltau\-Emmingen";
-$areanames{de}->{495191} = "Soltau";
-$areanames{de}->{495192} = "Munster";
-$areanames{de}->{495193} = "Schneverdingen";
-$areanames{de}->{495194} = "Bispingen";
-$areanames{de}->{495195} = "Neuenkirchen\ bei\ Soltau";
-$areanames{de}->{495196} = "Wietzendorf";
-$areanames{de}->{495197} = "Soltau\-Frielingen";
-$areanames{de}->{495198} = "Schneverdingen\-Wintermoor";
-$areanames{de}->{495199} = "Schneverdingen\-Heber";
-$areanames{de}->{495201} = "Halle\ Westfalen";
-$areanames{de}->{495202} = "Oerlinghausen";
-$areanames{de}->{495203} = "Werther\ Westfalen";
-$areanames{de}->{495204} = "Steinhagen\ Westfalen";
-$areanames{de}->{495205} = "Bielefeld\-Sennestadt";
-$areanames{de}->{495206} = "Bielefeld\-Jöllenbeck";
-$areanames{de}->{495207} = "Schloss\ Holte\-Stukenbrock";
-$areanames{de}->{495208} = "Leopoldshöhe";
-$areanames{de}->{495209} = "Gütersloh\-Friedrichsdorf";
-$areanames{de}->{49521} = "Bielefeld";
-$areanames{de}->{495221} = "Herford";
-$areanames{de}->{495222} = "Bad\ Salzuflen";
-$areanames{de}->{495223} = "Bünde";
-$areanames{de}->{495224} = "Enger\ Westfalen";
-$areanames{de}->{495225} = "Spenge";
-$areanames{de}->{495226} = "Bruchmühlen\ Westfalen";
-$areanames{de}->{495228} = "Vlotho\-Exter";
-$areanames{de}->{495231} = "Detmold";
-$areanames{de}->{495232} = "Lage\ Lippe";
-$areanames{de}->{495233} = "Steinheim\ Westfalen";
-$areanames{de}->{495234} = "Horn\-Bad\ Meinberg";
-$areanames{de}->{495235} = "Blomberg\ Lippe";
-$areanames{de}->{495236} = "Blomberg\-Grossenmarpe";
-$areanames{de}->{495237} = "Augustdorf";
-$areanames{de}->{495238} = "Nieheim\-Himmighausen";
-$areanames{de}->{495241} = "Gütersloh";
-$areanames{de}->{495242} = "Rheda\-Wiedenbrück";
-$areanames{de}->{495244} = "Rietberg";
-$areanames{de}->{495245} = "Herzebrock\-Clarholz";
-$areanames{de}->{495246} = "Verl";
-$areanames{de}->{495247} = "Harsewinkel";
-$areanames{de}->{495248} = "Langenberg\ Kreis\ Gütersloh";
-$areanames{de}->{495250} = "Delbrück\ Westfalen";
-$areanames{de}->{495251} = "Paderborn";
-$areanames{de}->{495252} = "Bad\ Lippspringe";
-$areanames{de}->{495253} = "Bad\ Driburg";
-$areanames{de}->{495254} = "Paderborn\-Schloss\ Neuhaus";
-$areanames{de}->{495255} = "Altenbeken";
-$areanames{de}->{495257} = "Hövelhof";
-$areanames{de}->{495258} = "Salzkotten";
-$areanames{de}->{495259} = "Bad\ Driburg\-Neuenheerse";
-$areanames{de}->{495261} = "Lemgo";
-$areanames{de}->{495262} = "Extertal";
-$areanames{de}->{495263} = "Barntrup";
-$areanames{de}->{495264} = "Kalletal";
-$areanames{de}->{495265} = "Dörentrup";
-$areanames{de}->{495266} = "Lemgo\-Kirchheide";
-$areanames{de}->{495271} = "Höxter";
-$areanames{de}->{495272} = "Brakel\ Westfalen";
-$areanames{de}->{495273} = "Beverungen";
-$areanames{de}->{495274} = "Nieheim";
-$areanames{de}->{495275} = "Höxter\-Ottbergen";
-$areanames{de}->{495276} = "Marienmünster";
-$areanames{de}->{495277} = "Höxter\-Fürstenau";
-$areanames{de}->{495278} = "Höxter\-Ovenhausen";
-$areanames{de}->{495281} = "Bad\ Pyrmont";
-$areanames{de}->{495282} = "Schieder\-Schwalenberg";
-$areanames{de}->{495283} = "Lügde\-Rischenau";
-$areanames{de}->{495284} = "Schwalenberg";
-$areanames{de}->{495285} = "Bad\ Pyrmont\-Kleinenberg";
-$areanames{de}->{495286} = "Ottenstein\ Niedersachsen";
-$areanames{de}->{495292} = "Lichtenau\-Atteln";
-$areanames{de}->{495293} = "Paderborn\-Dahl";
-$areanames{de}->{495294} = "Hövelhof\-Espeln";
-$areanames{de}->{495295} = "Lichtenau\ Westfalen";
-$areanames{de}->{495300} = "Salzgitter\-Üfingen";
-$areanames{de}->{495301} = "Lehre\-Essenrode";
-$areanames{de}->{495302} = "Vechelde";
-$areanames{de}->{495303} = "Wendeburg";
-$areanames{de}->{495304} = "Meine";
-$areanames{de}->{495305} = "Sickte";
-$areanames{de}->{495306} = "Cremlingen";
-$areanames{de}->{495307} = "Braunschweig\-Wenden";
-$areanames{de}->{495308} = "Lehre";
-$areanames{de}->{495309} = "Lehre\-Wendhausen";
-$areanames{de}->{49531} = "Braunschweig";
-$areanames{de}->{495320} = "Torfhaus";
-$areanames{de}->{495321} = "Goslar";
-$areanames{de}->{495322} = "Bad\ Harzburg";
-$areanames{de}->{495323} = "Clausthal\-Zellerfeld";
-$areanames{de}->{495324} = "Vienenburg";
-$areanames{de}->{495325} = "Goslar\-Hahnenklee";
-$areanames{de}->{495326} = "Langelsheim";
-$areanames{de}->{495327} = "Bad\ Grund\ Harz";
-$areanames{de}->{495328} = "Altenau\ Harz";
-$areanames{de}->{495329} = "Schulenberg\ im\ Oberharz";
-$areanames{de}->{495331} = "Wolfenbüttel";
-$areanames{de}->{495332} = "Schöppenstedt";
-$areanames{de}->{495333} = "Dettum";
-$areanames{de}->{495334} = "Hornburg\ Kreis\ Wolfenbüttel";
-$areanames{de}->{495335} = "Schladen";
-$areanames{de}->{495336} = "Semmenstedt";
-$areanames{de}->{495337} = "Kissenbrück";
-$areanames{de}->{495339} = "Gielde";
-$areanames{de}->{495341} = "Salzgitter";
-$areanames{de}->{495344} = "Lengede";
-$areanames{de}->{495345} = "Baddeckenstedt";
-$areanames{de}->{495346} = "Liebenburg";
-$areanames{de}->{495347} = "Burgdorf\ bei\ Salzgitter";
-$areanames{de}->{495351} = "Helmstedt";
-$areanames{de}->{495352} = "Schöningen";
-$areanames{de}->{495353} = "Königslutter\ am\ Elm";
-$areanames{de}->{495354} = "Jerxheim";
-$areanames{de}->{495355} = "Frellstedt";
-$areanames{de}->{495356} = "Helmstedt\-Barmke";
-$areanames{de}->{495357} = "Grasleben";
-$areanames{de}->{495358} = "Bahrdorf\-Mackendorf";
-$areanames{de}->{495361} = "Wolfsburg";
-$areanames{de}->{495362} = "Wolfsburg\-Fallersleben";
-$areanames{de}->{495363} = "Wolfsburg\-Vorsfelde";
-$areanames{de}->{495364} = "Velpke";
-$areanames{de}->{495365} = "Wolfsburg\-Neindorf";
-$areanames{de}->{495366} = "Jembke";
-$areanames{de}->{495367} = "Rühen";
-$areanames{de}->{495368} = "Parsau";
-$areanames{de}->{495371} = "Gifhorn";
-$areanames{de}->{495372} = "Meinersen";
-$areanames{de}->{495373} = "Hillerse\ Kreis\ Gifhorn";
-$areanames{de}->{495374} = "Isenbüttel";
-$areanames{de}->{495375} = "Müden\ Aller";
-$areanames{de}->{495376} = "Wesendorf\ Kreis\ Gifhorn";
-$areanames{de}->{495377} = "Ehra\-Lessien";
-$areanames{de}->{495378} = "Sassenburg\-Platendorf";
-$areanames{de}->{495379} = "Sassenburg\-Grussendorf";
-$areanames{de}->{495381} = "Seesen";
-$areanames{de}->{495382} = "Bad\ Gandersheim";
-$areanames{de}->{495383} = "Lutter\ am\ Barenberge";
-$areanames{de}->{495384} = "Seesen\-Groß\ Rhüden";
-$areanames{de}->{495401} = "Georgsmarienhütte";
-$areanames{de}->{495402} = "Bissendorf\ Kreis\ Osnabrück";
-$areanames{de}->{495403} = "Bad\ Iburg";
-$areanames{de}->{495404} = "Westerkappeln";
-$areanames{de}->{495405} = "Hasbergen\ Kreis\ Osnabrück";
-$areanames{de}->{495406} = "Belm";
-$areanames{de}->{495407} = "Wallenhorst";
-$areanames{de}->{495409} = "Hilter\ am\ Teutoburger\ Wald";
-$areanames{de}->{49541} = "Osnabrück";
-$areanames{de}->{495421} = "Dissen\ am\ Teutoburger\ Wald";
-$areanames{de}->{495422} = "Melle";
-$areanames{de}->{495423} = "Versmold";
-$areanames{de}->{495424} = "Bad\ Rothenfelde";
-$areanames{de}->{495425} = "Borgholzhausen";
-$areanames{de}->{495426} = "Glandorf";
-$areanames{de}->{495427} = "Melle\-Buer";
-$areanames{de}->{495428} = "Melle\-Neuenkirchen";
-$areanames{de}->{495429} = "Melle\-Wellingholzhausen";
-$areanames{de}->{495431} = "Quakenbrück";
-$areanames{de}->{495432} = "Löningen";
-$areanames{de}->{495433} = "Badbergen";
-$areanames{de}->{495434} = "Essen\ Oldenburg";
-$areanames{de}->{495435} = "Berge\ bei\ Quakenbrück";
-$areanames{de}->{495436} = "Nortrup";
-$areanames{de}->{495437} = "Menslage";
-$areanames{de}->{495438} = "Bakum\-Lüsche";
-$areanames{de}->{495439} = "Bersenbrück";
-$areanames{de}->{495441} = "Diepholz";
-$areanames{de}->{495442} = "Barnstorf\ Kreis\ Diepholz";
-$areanames{de}->{495443} = "Lemförde";
-$areanames{de}->{495444} = "Wagenfeld";
-$areanames{de}->{495445} = "Drebber";
-$areanames{de}->{495446} = "Rehden";
-$areanames{de}->{495447} = "Lembruch";
-$areanames{de}->{495448} = "Barver";
-$areanames{de}->{495451} = "Ibbenbüren";
-$areanames{de}->{495452} = "Mettingen\ Westfalen";
-$areanames{de}->{495453} = "Recke";
-$areanames{de}->{495454} = "Hörstel\-Riesenbeck";
-$areanames{de}->{495455} = "Tecklenburg\-Brochterbeck";
-$areanames{de}->{495456} = "Westerkappeln\-Velpe";
-$areanames{de}->{495457} = "Hopsten\-Schale";
-$areanames{de}->{495458} = "Hopsten";
-$areanames{de}->{495459} = "Hörstel";
-$areanames{de}->{495461} = "Bramsche\ Hase";
-$areanames{de}->{495462} = "Ankum";
-$areanames{de}->{495464} = "Alfhausen";
-$areanames{de}->{495465} = "Neuenkirchen\ bei\ Bramsche";
-$areanames{de}->{495466} = "Merzen";
-$areanames{de}->{495467} = "Voltlage";
-$areanames{de}->{495468} = "Bramsche\-Engter";
-$areanames{de}->{495471} = "Bohmte";
-$areanames{de}->{495472} = "Bad\ Essen";
-$areanames{de}->{495473} = "Ostercappeln";
-$areanames{de}->{495474} = "Stemwede\-Dielingen";
-$areanames{de}->{495475} = "Bohmte\-Hunteburg";
-$areanames{de}->{495476} = "Ostercappeln\-Venne";
-$areanames{de}->{495481} = "Lengerich\ Westfalen";
-$areanames{de}->{495482} = "Tecklenburg";
-$areanames{de}->{495483} = "Lienen";
-$areanames{de}->{495484} = "Lienen\-Kattenvenne";
-$areanames{de}->{495485} = "Ladbergen";
-$areanames{de}->{495491} = "Damme\ Dümmer";
-$areanames{de}->{495492} = "Steinfeld\ Oldenburg";
-$areanames{de}->{495493} = "Neuenkirchen\ Kreis\ Vechta";
-$areanames{de}->{495494} = "Holdorf\ Niedersachsen";
-$areanames{de}->{495495} = "Vörden\ Kreis\ Vechta";
-$areanames{de}->{495502} = "Dransfeld";
-$areanames{de}->{495503} = "Nörten\-Hardenberg";
-$areanames{de}->{495504} = "Friedland\ Kreis\ Göttingen";
-$areanames{de}->{495505} = "Hardegsen";
-$areanames{de}->{495506} = "Adelebsen";
-$areanames{de}->{495507} = "Ebergötzen";
-$areanames{de}->{495508} = "Gleichen\-Rittmarshausen";
-$areanames{de}->{495509} = "Rosdorf\ Kreis\ Göttingen";
-$areanames{de}->{49551} = "Göttingen";
-$areanames{de}->{495520} = "Braunlage";
-$areanames{de}->{495521} = "Herzberg\ am\ Harz";
-$areanames{de}->{495522} = "Osterode\ am\ Harz";
-$areanames{de}->{495523} = "Bad\ Sachsa";
-$areanames{de}->{495524} = "Bad\ Lauterberg\ im\ Harz";
-$areanames{de}->{495525} = "Walkenried";
-$areanames{de}->{495527} = "Duderstadt";
-$areanames{de}->{495528} = "Gieboldehausen";
-$areanames{de}->{495529} = "Rhumspringe";
-$areanames{de}->{495531} = "Holzminden";
-$areanames{de}->{495532} = "Stadtoldendorf";
-$areanames{de}->{495533} = "Bodenwerder";
-$areanames{de}->{495534} = "Eschershausen\ an\ der\ Lenne";
-$areanames{de}->{495535} = "Polle";
-$areanames{de}->{495536} = "Holzminden\-Neuhaus";
-$areanames{de}->{495541} = "Hann\.\ Münden";
-$areanames{de}->{495542} = "Witzenhausen";
-$areanames{de}->{495543} = "Staufenberg\ Niedersachsen";
-$areanames{de}->{495544} = "Reinhardshagen";
-$areanames{de}->{495545} = "Hedemünden";
-$areanames{de}->{495546} = "Scheden";
-$areanames{de}->{495551} = "Northeim";
-$areanames{de}->{495552} = "Katlenburg";
-$areanames{de}->{495553} = "Kalefeld";
-$areanames{de}->{495554} = "Moringen";
-$areanames{de}->{495555} = "Moringen\-Fredelsloh";
-$areanames{de}->{495556} = "Lindau\ Harz";
-$areanames{de}->{495561} = "Einbeck";
-$areanames{de}->{495562} = "Dassel\-Markoldendorf";
-$areanames{de}->{495563} = "Kreiensen";
-$areanames{de}->{495564} = "Dassel";
-$areanames{de}->{495565} = "Einbeck\-Wenzen";
-$areanames{de}->{495571} = "Uslar";
-$areanames{de}->{495572} = "Bodenfelde";
-$areanames{de}->{495573} = "Uslar\-Volpriehausen";
-$areanames{de}->{495574} = "Oberweser";
-$areanames{de}->{495582} = "Sankt\ Andreasberg";
-$areanames{de}->{495583} = "Braunlage\-Hohegeiss";
-$areanames{de}->{495584} = "Hattorf\ am\ Harz";
-$areanames{de}->{495585} = "Herzberg\-Sieber";
-$areanames{de}->{495586} = "Wieda";
-$areanames{de}->{495592} = "Gleichen\-Bremke";
-$areanames{de}->{495593} = "Bovenden\-Lenglern";
-$areanames{de}->{495594} = "Bovenden\-Reyershausen";
-$areanames{de}->{495601} = "Schauenburg";
-$areanames{de}->{495602} = "Hessisch\ Lichtenau";
-$areanames{de}->{495603} = "Gudensberg";
-$areanames{de}->{495604} = "Grossalmerode";
-$areanames{de}->{495605} = "Kaufungen\ Hessen";
-$areanames{de}->{495606} = "Zierenberg";
-$areanames{de}->{495607} = "Fuldatal";
-$areanames{de}->{495608} = "Söhrewald";
-$areanames{de}->{495609} = "Ahnatal";
-$areanames{de}->{49561} = "Kassel";
-$areanames{de}->{495621} = "Bad\ Wildungen";
-$areanames{de}->{495622} = "Fritzlar";
-$areanames{de}->{495623} = "Edertal";
-$areanames{de}->{495624} = "Bad\ Emstal";
-$areanames{de}->{495625} = "Naumburg\ Hessen";
-$areanames{de}->{495626} = "Bad\ Zwesten";
-$areanames{de}->{495631} = "Korbach";
-$areanames{de}->{495632} = "Willingen\ Upland";
-$areanames{de}->{495633} = "Diemelsee";
-$areanames{de}->{495634} = "Waldeck\-Sachsenhausen";
-$areanames{de}->{495635} = "Vöhl";
-$areanames{de}->{495636} = "Lichtenfels\-Goddelsheim";
-$areanames{de}->{495641} = "Warburg";
-$areanames{de}->{495642} = "Warburg\-Scherfede";
-$areanames{de}->{495643} = "Borgentreich";
-$areanames{de}->{495644} = "Willebadessen\-Peckelsheim";
-$areanames{de}->{495645} = "Borgentreich\-Borgholz";
-$areanames{de}->{495646} = "Willebadessen";
-$areanames{de}->{495647} = "Lichtenau\-Kleinenberg";
-$areanames{de}->{495648} = "Brakel\-Gehrden";
-$areanames{de}->{495650} = "Cornberg";
-$areanames{de}->{495651} = "Eschwege";
-$areanames{de}->{495652} = "Bad\ Sooden\-Allendorf";
-$areanames{de}->{495653} = "Sontra";
-$areanames{de}->{495654} = "Herleshausen";
-$areanames{de}->{495655} = "Wanfried";
-$areanames{de}->{495656} = "Waldkappel";
-$areanames{de}->{495657} = "Meissner";
-$areanames{de}->{495658} = "Wehretal";
-$areanames{de}->{495659} = "Ringgau";
-$areanames{de}->{495661} = "Melsungen";
-$areanames{de}->{495662} = "Felsberg\ Hessen";
-$areanames{de}->{495663} = "Spangenberg";
-$areanames{de}->{495664} = "Morschen";
-$areanames{de}->{495665} = "Guxhagen";
-$areanames{de}->{495671} = "Hofgeismar";
-$areanames{de}->{495672} = "Bad\ Karlshafen";
-$areanames{de}->{495673} = "Immenhausen\ Hessen";
-$areanames{de}->{495674} = "Grebenstein";
-$areanames{de}->{495675} = "Trendelburg";
-$areanames{de}->{495676} = "Liebenau\ Hessen";
-$areanames{de}->{495677} = "Calden\-Westuffeln";
-$areanames{de}->{495681} = "Homberg\ Efze";
-$areanames{de}->{495682} = "Borken\ Hessen";
-$areanames{de}->{495683} = "Wabern\ Hessen";
-$areanames{de}->{495684} = "Frielendorf";
-$areanames{de}->{495685} = "Knüllwald";
-$areanames{de}->{495686} = "Schwarzenborn\ Knüll";
-$areanames{de}->{495691} = "Bad\ Arolsen";
-$areanames{de}->{495692} = "Wolfhagen";
-$areanames{de}->{495693} = "Volkmarsen";
-$areanames{de}->{495694} = "Diemelstadt";
-$areanames{de}->{495695} = "Twistetal";
-$areanames{de}->{495696} = "Bad\ Arolsen\-Landau";
-$areanames{de}->{495702} = "Petershagen\-Lahde";
-$areanames{de}->{495703} = "Hille";
-$areanames{de}->{495704} = "Petershagen\-Friedewalde";
-$areanames{de}->{495705} = "Petershagen\-Windheim";
-$areanames{de}->{495706} = "Porta\ Westfalica";
-$areanames{de}->{495707} = "Petershagen\ Weser";
-$areanames{de}->{49571} = "Minden\ Westfalen";
-$areanames{de}->{495721} = "Stadthagen";
-$areanames{de}->{495722} = "Bückeburg";
-$areanames{de}->{495723} = "Bad\ Nenndorf";
-$areanames{de}->{495724} = "Obernkirchen";
-$areanames{de}->{495725} = "Lindhorst\ bei\ Stadthagen";
-$areanames{de}->{495726} = "Wiedensahl";
-$areanames{de}->{495731} = "Bad\ Oeynhausen";
-$areanames{de}->{495732} = "Löhne";
-$areanames{de}->{495733} = "Vlotho";
-$areanames{de}->{495734} = "Bergkirchen\ Westfalen";
-$areanames{de}->{495741} = "Lübbecke";
-$areanames{de}->{495742} = "Preussisch\ Oldendorf";
-$areanames{de}->{495743} = "Espelkamp\-Gestringen";
-$areanames{de}->{495744} = "Hüllhorst";
-$areanames{de}->{495745} = "Stemwede\-Levern";
-$areanames{de}->{495746} = "Rödinghausen";
-$areanames{de}->{495751} = "Rinteln";
-$areanames{de}->{495752} = "Auetal\-Hattendorf";
-$areanames{de}->{495753} = "Auetal\-Bernsen";
-$areanames{de}->{495754} = "Extertal\-Bremke";
-$areanames{de}->{495755} = "Kalletal\-Varenholz";
-$areanames{de}->{495761} = "Stolzenau";
-$areanames{de}->{495763} = "Uchte";
-$areanames{de}->{495764} = "Steyerberg";
-$areanames{de}->{495765} = "Raddestorf";
-$areanames{de}->{495766} = "Rehburg\-Loccum";
-$areanames{de}->{495767} = "Warmsen";
-$areanames{de}->{495768} = "Petershagen\-Heimsen";
-$areanames{de}->{495769} = "Steyerberg\-Voigtei";
-$areanames{de}->{495771} = "Rahden\ Westfalen";
-$areanames{de}->{495772} = "Espelkamp";
-$areanames{de}->{495773} = "Stemwede\-Wehdem";
-$areanames{de}->{495774} = "Wagenfeld\-Ströhen";
-$areanames{de}->{495775} = "Diepenau";
-$areanames{de}->{495776} = "Preussisch\ Ströhen";
-$areanames{de}->{495777} = "Diepenau\-Essern";
-$areanames{de}->{495802} = "Wrestedt";
-$areanames{de}->{495803} = "Rosche";
-$areanames{de}->{495804} = "Rätzlingen\ Kreis\ Uelzen";
-$areanames{de}->{495805} = "Oetzen";
-$areanames{de}->{495806} = "Barum\ bei\ Bad\ Bevensen";
-$areanames{de}->{495807} = "Altenmedingen";
-$areanames{de}->{495808} = "Gerdau";
-$areanames{de}->{49581} = "Uelzen";
-$areanames{de}->{495820} = "Suhlendorf";
-$areanames{de}->{495821} = "Bad\ Bevensen";
-$areanames{de}->{495822} = "Ebstorf";
-$areanames{de}->{495823} = "Bienenbüttel";
-$areanames{de}->{495824} = "Bad\ Bodenteich";
-$areanames{de}->{495825} = "Wieren";
-$areanames{de}->{495826} = "Suderburg";
-$areanames{de}->{495827} = "Unterlüß";
-$areanames{de}->{495828} = "Himbergen";
-$areanames{de}->{495829} = "Wriedel";
-$areanames{de}->{495831} = "Wittingen";
-$areanames{de}->{495832} = "Hankensbüttel";
-$areanames{de}->{495833} = "Brome";
-$areanames{de}->{495834} = "Wittingen\-Knesebeck";
-$areanames{de}->{495835} = "Wahrenholz";
-$areanames{de}->{495836} = "Wittingen\-Radenbeck";
-$areanames{de}->{495837} = "Sprakensehl";
-$areanames{de}->{495838} = "Gross\ Oesingen";
-$areanames{de}->{495839} = "Wittingen\-Ohrdorf";
-$areanames{de}->{495840} = "Schnackenburg";
-$areanames{de}->{495841} = "Lüchow\ Wendland";
-$areanames{de}->{495842} = "Schnega";
-$areanames{de}->{495843} = "Wustrow\ Wendland";
-$areanames{de}->{495844} = "Clenze";
-$areanames{de}->{495845} = "Bergen\ Dumme";
-$areanames{de}->{495846} = "Gartow\ Niedersachsen";
-$areanames{de}->{495848} = "Trebel";
-$areanames{de}->{495849} = "Waddeweitz";
-$areanames{de}->{495850} = "Neetze";
-$areanames{de}->{495851} = "Dahlenburg";
-$areanames{de}->{495852} = "Bleckede";
-$areanames{de}->{495853} = "Neu\ Darchau";
-$areanames{de}->{495854} = "Bleckede\-Barskamp";
-$areanames{de}->{495855} = "Nahrendorf";
-$areanames{de}->{495857} = "Bleckede\-Brackede";
-$areanames{de}->{495858} = "Hitzacker\-Wietzetze";
-$areanames{de}->{495859} = "Thomasburg";
-$areanames{de}->{495861} = "Dannenberg\ Elbe";
-$areanames{de}->{495862} = "Hitzacker\ Elbe";
-$areanames{de}->{495863} = "Zernien";
-$areanames{de}->{495864} = "Jameln";
-$areanames{de}->{495865} = "Gusborn";
-$areanames{de}->{495872} = "Stoetze";
-$areanames{de}->{495873} = "Eimke";
-$areanames{de}->{495874} = "Soltendieck";
-$areanames{de}->{495875} = "Emmendorf";
-$areanames{de}->{495882} = "Gorleben";
-$areanames{de}->{495883} = "Lemgow";
-$areanames{de}->{495901} = "Fürstenau\ bei\ Bramsche";
-$areanames{de}->{495902} = "Freren";
-$areanames{de}->{495903} = "Emsbüren";
-$areanames{de}->{495904} = "Lengerich\ Emsl";
-$areanames{de}->{495905} = "Beesten";
-$areanames{de}->{495906} = "Lünne";
-$areanames{de}->{495907} = "Geeste";
-$areanames{de}->{495908} = "Wietmarschen\-Lohne";
-$areanames{de}->{495909} = "Wettrup";
-$areanames{de}->{49591} = "Lingen\ \(Ems\)";
-$areanames{de}->{495921} = "Nordhorn";
-$areanames{de}->{495922} = "Bad\ Bentheim";
-$areanames{de}->{495923} = "Schüttorf";
-$areanames{de}->{495924} = "Bad\ Bentheim\-Gildehaus";
-$areanames{de}->{495925} = "Wietmarschen";
-$areanames{de}->{495926} = "Engden";
-$areanames{de}->{495931} = "Meppen";
-$areanames{de}->{495932} = "Haren\ Ems";
-$areanames{de}->{495933} = "Lathen";
-$areanames{de}->{495934} = "Haren\-Rütenbrock";
-$areanames{de}->{495935} = "Twist\-Schöninghsdorf";
-$areanames{de}->{495936} = "Twist";
-$areanames{de}->{495937} = "Geeste\-Gross\ Hesepe";
-$areanames{de}->{495939} = "Sustrum";
-$areanames{de}->{495941} = "Neuenhaus\ Dinkel";
-$areanames{de}->{495942} = "Uelsen";
-$areanames{de}->{495943} = "Emlichheim";
-$areanames{de}->{495944} = "Hoogstede";
-$areanames{de}->{495945} = "Wilsum";
-$areanames{de}->{495946} = "Georgsdorf";
-$areanames{de}->{495947} = "Laar\ Vechte";
-$areanames{de}->{495948} = "Itterbeck";
-$areanames{de}->{495951} = "Werlte";
-$areanames{de}->{495952} = "Sögel";
-$areanames{de}->{495953} = "Börger";
-$areanames{de}->{495954} = "Lorup";
-$areanames{de}->{495955} = "Esterwegen";
-$areanames{de}->{495956} = "Rastdorf";
-$areanames{de}->{495957} = "Lindern\ Oldenburg";
-$areanames{de}->{495961} = "Haselünne";
-$areanames{de}->{495962} = "Herzlake";
-$areanames{de}->{495963} = "Bawinkel";
-$areanames{de}->{495964} = "Lähden";
-$areanames{de}->{495965} = "Klein\ Berssen";
-$areanames{de}->{495966} = "Meppen\-Apeldorn";
-$areanames{de}->{495971} = "Rheine";
-$areanames{de}->{495973} = "Neuenkirchen\ Kreis\ Steinfurt";
-$areanames{de}->{495975} = "Rheine\-Mesum";
-$areanames{de}->{495976} = "Salzbergen";
-$areanames{de}->{495977} = "Spelle";
-$areanames{de}->{495978} = "Hörstel\-Dreierwalde";
-$areanames{de}->{496002} = "Ober\-Mörlen";
-$areanames{de}->{496003} = "Rosbach\ von\ der\ Höhe";
-$areanames{de}->{496004} = "Lich\-Eberstadt";
-$areanames{de}->{496007} = "Rosbach\-Rodheim";
-$areanames{de}->{496008} = "Echzell";
-$areanames{de}->{496020} = "Heigenbrücken";
-$areanames{de}->{496021} = "Aschaffenburg";
-$areanames{de}->{496022} = "Obernburg\ am\ Main";
-$areanames{de}->{496023} = "Alzenau\ in\ Unterfranken";
-$areanames{de}->{496024} = "Schöllkrippen";
-$areanames{de}->{496026} = "Grossostheim";
-$areanames{de}->{496027} = "Stockstadt\ am\ Main";
-$areanames{de}->{496028} = "Sulzbach\ am\ Main";
-$areanames{de}->{496029} = "Mömbris";
-$areanames{de}->{496031} = "Friedberg\ Hessen";
-$areanames{de}->{496032} = "Bad\ Nauheim";
-$areanames{de}->{496033} = "Butzbach";
-$areanames{de}->{496034} = "Wöllstadt";
-$areanames{de}->{496035} = "Reichelsheim\ Wetterau";
-$areanames{de}->{496036} = "Wölfersheim";
-$areanames{de}->{496039} = "Karben";
-$areanames{de}->{496041} = "Glauburg";
-$areanames{de}->{496042} = "Büdingen\ Hessen";
-$areanames{de}->{496043} = "Nidda";
-$areanames{de}->{496044} = "Schotten\ Hessen";
-$areanames{de}->{496045} = "Gedern";
-$areanames{de}->{496046} = "Ortenberg\ Hessen";
-$areanames{de}->{496047} = "Altenstadt\ Hessen";
-$areanames{de}->{496048} = "Büdingen\-Eckartshausen";
-$areanames{de}->{496049} = "Kefenrod";
-$areanames{de}->{496050} = "Biebergemünd";
-$areanames{de}->{496051} = "Gelnhausen";
-$areanames{de}->{496052} = "Bad\ Orb";
-$areanames{de}->{496053} = "Wächtersbach";
-$areanames{de}->{496054} = "Birstein";
-$areanames{de}->{496055} = "Freigericht";
-$areanames{de}->{496056} = "Bad\ Soden\-Salmünster";
-$areanames{de}->{496057} = "Flörsbachtal";
-$areanames{de}->{496058} = "Gründau";
-$areanames{de}->{496059} = "Jossgrund";
-$areanames{de}->{496061} = "Michelstadt";
-$areanames{de}->{496062} = "Erbach\ Odenwald";
-$areanames{de}->{496063} = "Bad\ König";
-$areanames{de}->{496066} = "Michelstadt\-Vielbrunn";
-$areanames{de}->{496068} = "Beerfelden";
-$areanames{de}->{496071} = "Dieburg";
-$areanames{de}->{496073} = "Babenhausen\ Hessen";
-$areanames{de}->{496074} = "Rödermark";
-$areanames{de}->{496078} = "Gross\-Umstadt";
-$areanames{de}->{496081} = "Usingen";
-$areanames{de}->{496082} = "Niederreifenberg";
-$areanames{de}->{496083} = "Weilrod";
-$areanames{de}->{496084} = "Schmitten\ Taunus";
-$areanames{de}->{496085} = "Waldsolms";
-$areanames{de}->{496086} = "Grävenwiesbach";
-$areanames{de}->{496087} = "Waldems";
-$areanames{de}->{496092} = "Heimbuchenthal";
-$areanames{de}->{496093} = "Laufach";
-$areanames{de}->{496094} = "Weibersbrunn";
-$areanames{de}->{496095} = "Bessenbach";
-$areanames{de}->{496096} = "Wiesen\ Unterfranken";
-$areanames{de}->{496101} = "Bad\ Vilbel";
-$areanames{de}->{496102} = "Neu\-Isenburg";
-$areanames{de}->{496103} = "Langen\ Hessen";
-$areanames{de}->{496104} = "Heusenstamm";
-$areanames{de}->{496105} = "Mörfelden\-Walldorf";
-$areanames{de}->{496106} = "Rodgau";
-$areanames{de}->{496107} = "Kelsterbach";
-$areanames{de}->{496108} = "Mühlheim\ am\ Main";
-$areanames{de}->{496109} = "Frankfurt\-Bergen\-Enkheim";
-$areanames{de}->{49611} = "Wiesbaden";
-$areanames{de}->{496120} = "Aarbergen";
-$areanames{de}->{496122} = "Hofheim\-Wallau";
-$areanames{de}->{496123} = "Eltville\ am\ Rhein";
-$areanames{de}->{496124} = "Bad\ Schwalbach";
-$areanames{de}->{496126} = "Idstein";
-$areanames{de}->{496127} = "Niedernhausen\ Taunus";
-$areanames{de}->{496128} = "Taunusstein";
-$areanames{de}->{496129} = "Schlangenbad";
-$areanames{de}->{496130} = "Schwabenheim\ an\ der\ Selz";
-$areanames{de}->{496131} = "Mainz";
-$areanames{de}->{496132} = "Ingelheim\ am\ Rhein";
-$areanames{de}->{496133} = "Oppenheim";
-$areanames{de}->{496134} = "Mainz\-Kastel";
-$areanames{de}->{496135} = "Bodenheim\ Rhein";
-$areanames{de}->{496136} = "Nieder\-Olm";
-$areanames{de}->{496138} = "Mommenheim";
-$areanames{de}->{496139} = "Budenheim";
-$areanames{de}->{496142} = "Rüsselsheim";
-$areanames{de}->{496144} = "Bischofsheim\ bei\ Rüsselsheim";
-$areanames{de}->{496145} = "Flörsheim\ am\ Main";
-$areanames{de}->{496146} = "Hochheim\ am\ Main";
-$areanames{de}->{496147} = "Trebur";
-$areanames{de}->{496150} = "Weiterstadt";
-$areanames{de}->{496151} = "Darmstadt";
-$areanames{de}->{496152} = "Gross\-Gerau";
-$areanames{de}->{496154} = "Ober\-Ramstadt";
-$areanames{de}->{496155} = "Griesheim\ Hessen";
-$areanames{de}->{496157} = "Pfungstadt";
-$areanames{de}->{496158} = "Riedstadt";
-$areanames{de}->{496159} = "Messel";
-$areanames{de}->{496161} = "Brensbach";
-$areanames{de}->{496162} = "Reinheim\ Odenwald";
-$areanames{de}->{496163} = "Höchst\ im\ Odenwald";
-$areanames{de}->{496164} = "Reichelsheim\ Odenwald";
-$areanames{de}->{496165} = "Breuberg";
-$areanames{de}->{496166} = "Fischbachtal";
-$areanames{de}->{496167} = "Modautal";
-$areanames{de}->{496171} = "Oberursel\ Taunus";
-$areanames{de}->{496172} = "Bad\ Homburg\ von\ der\ Höhe";
-$areanames{de}->{496173} = "Kronberg\ im\ Taunus";
-$areanames{de}->{496174} = "Königstein\ im\ Taunus";
-$areanames{de}->{496175} = "Friedrichsdorf\ Taunus";
-$areanames{de}->{496181} = "Hanau";
-$areanames{de}->{496182} = "Seligenstadt";
-$areanames{de}->{496183} = "Erlensee";
-$areanames{de}->{496184} = "Langenselbold";
-$areanames{de}->{496185} = "Hammersbach\ Hessen";
-$areanames{de}->{496186} = "Grosskrotzenburg";
-$areanames{de}->{496187} = "Schöneck";
-$areanames{de}->{496188} = "Kahl\ am\ Main";
-$areanames{de}->{496190} = "Hattersheim\ am\ Main";
-$areanames{de}->{496192} = "Hofheim\ am\ Taunus";
-$areanames{de}->{496195} = "Kelkheim\ Taunus";
-$areanames{de}->{496196} = "Bad\ Soden\ am\ Taunus";
-$areanames{de}->{496198} = "Eppstein";
-$areanames{de}->{496201} = "Weinheim\ Bergstr";
-$areanames{de}->{496202} = "Schwetzingen";
-$areanames{de}->{496203} = "Ladenburg";
-$areanames{de}->{496204} = "Viernheim";
-$areanames{de}->{496205} = "Hockenheim";
-$areanames{de}->{496206} = "Lampertheim";
-$areanames{de}->{496207} = "Wald\-Michelbach";
-$areanames{de}->{496209} = "Mörlenbach";
-$areanames{de}->{49621} = "Mannheim";
-$areanames{de}->{496220} = "Wilhelmsfeld";
-$areanames{de}->{496221} = "Heidelberg";
-$areanames{de}->{496222} = "Wiesloch";
-$areanames{de}->{496223} = "Neckargemünd";
-$areanames{de}->{496224} = "Sandhausen\ Baden";
-$areanames{de}->{496226} = "Meckesheim";
-$areanames{de}->{496227} = "Walldorf\ Baden";
-$areanames{de}->{496228} = "Schönau\ Odenwald";
-$areanames{de}->{496229} = "Neckarsteinach";
-$areanames{de}->{496231} = "Hochdorf\-Assenheim";
-$areanames{de}->{496232} = "Speyer";
-$areanames{de}->{496233} = "Frankenthal\ Pfalz";
-$areanames{de}->{496234} = "Mutterstadt";
-$areanames{de}->{496235} = "Schifferstadt";
-$areanames{de}->{496236} = "Neuhofen\ Pfalz";
-$areanames{de}->{496237} = "Maxdorf";
-$areanames{de}->{496238} = "Dirmstein";
-$areanames{de}->{496239} = "Bobenheim\-Roxheim";
-$areanames{de}->{496241} = "Worms";
-$areanames{de}->{496242} = "Osthofen";
-$areanames{de}->{496243} = "Monsheim";
-$areanames{de}->{496244} = "Westhofen\ Rheinhessenen";
-$areanames{de}->{496245} = "Biblis";
-$areanames{de}->{496246} = "Eich\ Rheinhessen";
-$areanames{de}->{496247} = "Worms\-Pfeddersheim";
-$areanames{de}->{496249} = "Guntersblum";
-$areanames{de}->{496251} = "Bensheim";
-$areanames{de}->{496252} = "Heppenheim\ Bergstraße";
-$areanames{de}->{496253} = "Fürth\ Odenwald";
-$areanames{de}->{496254} = "Lautertal\ Odenwald";
-$areanames{de}->{496255} = "Lindenfels";
-$areanames{de}->{496256} = "Lampertheim\-Hüttenfeld";
-$areanames{de}->{496257} = "Seeheim\-Jugenheim";
-$areanames{de}->{496258} = "Gernsheim";
-$areanames{de}->{496261} = "Mosbach\ Baden";
-$areanames{de}->{496262} = "Aglasterhausen";
-$areanames{de}->{496263} = "Neckargerach";
-$areanames{de}->{496264} = "Neudenau";
-$areanames{de}->{496265} = "Billigheim\ Baden";
-$areanames{de}->{496266} = "Hassmersheim";
-$areanames{de}->{496267} = "Fahrenbach\ Baden";
-$areanames{de}->{496268} = "Hüffenhardt";
-$areanames{de}->{496269} = "Gundelsheim\ Württemberg";
-$areanames{de}->{496271} = "Eberbach\ Baden";
-$areanames{de}->{496272} = "Hirschhorn\ Neckar";
-$areanames{de}->{496274} = "Waldbrunn\ Odenwald";
-$areanames{de}->{496275} = "Rothenberg\ Odenwald";
-$areanames{de}->{496276} = "Hesseneck";
-$areanames{de}->{496281} = "Buchen\ Odenwald";
-$areanames{de}->{496282} = "Walldürn";
-$areanames{de}->{496283} = "Hardheim\ Odenwald";
-$areanames{de}->{496284} = "Mudau";
-$areanames{de}->{496285} = "Walldürn\-Altheim";
-$areanames{de}->{496286} = "Walldürn\-Rippberg";
-$areanames{de}->{496287} = "Limbach\ Baden";
-$areanames{de}->{496291} = "Adelsheim";
-$areanames{de}->{496292} = "Seckach";
-$areanames{de}->{496293} = "Schefflenz";
-$areanames{de}->{496294} = "Krautheim\ Jagst";
-$areanames{de}->{496295} = "Rosenberg\ Baden";
-$areanames{de}->{496296} = "Ahorn\ Baden";
-$areanames{de}->{496297} = "Ravenstein\ Baden";
-$areanames{de}->{496298} = "Möckmühl";
-$areanames{de}->{496301} = "Otterbach\ Pfalz";
-$areanames{de}->{496302} = "Winnweiler";
-$areanames{de}->{496303} = "Enkenbach\-Alsenborn";
-$areanames{de}->{496304} = "Wolfstein\ Pfalz";
-$areanames{de}->{496305} = "Hochspeyer";
-$areanames{de}->{496306} = "Trippstadt";
-$areanames{de}->{496307} = "Schopp";
-$areanames{de}->{496308} = "Olsbrücken";
-$areanames{de}->{49631} = "Kaiserslautern";
-$areanames{de}->{496321} = "Neustadt\ an\ der\ Weinstraße";
-$areanames{de}->{496322} = "Bad\ Dürkheim";
-$areanames{de}->{496323} = "Edenkoben";
-$areanames{de}->{496324} = "Hassloch";
-$areanames{de}->{496325} = "Lambrecht\ Pfalz";
-$areanames{de}->{496326} = "Deidesheim";
-$areanames{de}->{496327} = "Neustadt\-Lachen";
-$areanames{de}->{496328} = "Elmstein";
-$areanames{de}->{496329} = "Weidenthal\ Pfalz";
-$areanames{de}->{496331} = "Pirmasens";
-$areanames{de}->{496332} = "Zweibrücken";
-$areanames{de}->{496333} = "Waldfischbach\-Burgalben";
-$areanames{de}->{496334} = "Thaleischweiler\-Fröschen";
-$areanames{de}->{496335} = "Trulben";
-$areanames{de}->{496336} = "Dellfeld";
-$areanames{de}->{496337} = "Grossbundenbach";
-$areanames{de}->{496338} = "Hornbach\ Pfalz";
-$areanames{de}->{496339} = "Grosssteinhausen";
-$areanames{de}->{496340} = "Wörth\-Schaidt";
-$areanames{de}->{496341} = "Landau\ in\ der\ Pfalz";
-$areanames{de}->{496342} = "Schweigen\-Rechtenbach";
-$areanames{de}->{496343} = "Bad\ Bergzabern";
-$areanames{de}->{496344} = "Schwegenheim";
-$areanames{de}->{496345} = "Albersweiler";
-$areanames{de}->{496346} = "Annweiler\ am\ Trifels";
-$areanames{de}->{496347} = "Hochstadt\ Pfalz";
-$areanames{de}->{496348} = "Offenbach\ an\ der\ Queich";
-$areanames{de}->{496349} = "Billigheim\-Ingenheim";
-$areanames{de}->{496351} = "Eisenberg\ Pfalz";
-$areanames{de}->{496352} = "Kirchheimbolanden";
-$areanames{de}->{496353} = "Freinsheim";
-$areanames{de}->{496355} = "Albisheim\ Pfrimm";
-$areanames{de}->{496356} = "Carlsberg\ Pfalz";
-$areanames{de}->{496357} = "Standenbühl";
-$areanames{de}->{496358} = "Kriegsfeld";
-$areanames{de}->{496359} = "Grünstadt";
-$areanames{de}->{496361} = "Rockenhausen";
-$areanames{de}->{496362} = "Alsenz";
-$areanames{de}->{496363} = "Niederkirchen";
-$areanames{de}->{496364} = "Nußbach\ Pfalz";
-$areanames{de}->{496371} = "Landstuhl";
-$areanames{de}->{496372} = "Bruchmühlbach\-Miesau";
-$areanames{de}->{496373} = "Schönenberg\-Kübelberg";
-$areanames{de}->{496374} = "Weilerbach";
-$areanames{de}->{496375} = "Wallhalben";
-$areanames{de}->{496381} = "Kusel";
-$areanames{de}->{496382} = "Lauterecken";
-$areanames{de}->{496383} = "Glan\-Münchweiler";
-$areanames{de}->{496384} = "Konken";
-$areanames{de}->{496385} = "Reichenbach\-Steegen";
-$areanames{de}->{496386} = "Altenkirchen\ Pfalz";
-$areanames{de}->{496387} = "Sankt\ Julian";
-$areanames{de}->{496391} = "Dahn";
-$areanames{de}->{496392} = "Hauenstein\ Pfalz";
-$areanames{de}->{496393} = "Fischbach\ bei\ Dahn";
-$areanames{de}->{496394} = "Bundenthal";
-$areanames{de}->{496395} = "Münchweiler\ an\ der\ Rodalb";
-$areanames{de}->{496396} = "Hinterweidenthal";
-$areanames{de}->{496397} = "Leimen\ Pfalz";
-$areanames{de}->{496398} = "Vorderweidenthal";
-$areanames{de}->{496400} = "Mücke";
-$areanames{de}->{496401} = "Grünberg\ Hessen";
-$areanames{de}->{496402} = "Hungen";
-$areanames{de}->{496403} = "Linden\ Hessen";
-$areanames{de}->{496404} = "Lich\ Hessen";
-$areanames{de}->{496405} = "Laubach\ Hessen";
-$areanames{de}->{496406} = "Lollar";
-$areanames{de}->{496407} = "Rabenau\ Hessen";
-$areanames{de}->{496408} = "Buseck";
-$areanames{de}->{496409} = "Biebertal";
-$areanames{de}->{49641} = "Giessen";
-$areanames{de}->{496420} = "Lahntal";
-$areanames{de}->{496421} = "Marburg";
-$areanames{de}->{496422} = "Kirchhain";
-$areanames{de}->{496423} = "Wetter\ Hessen";
-$areanames{de}->{496424} = "Ebsdorfergrund";
-$areanames{de}->{496425} = "Rauschenberg\ Hessen";
-$areanames{de}->{496426} = "Fronhausen";
-$areanames{de}->{496427} = "Cölbe\-Schönstadt";
-$areanames{de}->{496428} = "Stadtallendorf";
-$areanames{de}->{496429} = "Schweinsberg\ Hessen";
-$areanames{de}->{496430} = "Hahnstätten";
-$areanames{de}->{496431} = "Limburg\ an\ der\ Lahn";
-$areanames{de}->{496432} = "Diez";
-$areanames{de}->{496433} = "Hadamar";
-$areanames{de}->{496434} = "Bad\ Camberg";
-$areanames{de}->{496435} = "Wallmerod";
-$areanames{de}->{496436} = "Dornburg\ Hessen";
-$areanames{de}->{496438} = "Hünfelden";
-$areanames{de}->{496439} = "Holzappel";
-$areanames{de}->{496440} = "Kölschhausen";
-$areanames{de}->{496441} = "Wetzlar";
-$areanames{de}->{496442} = "Braunfels";
-$areanames{de}->{496443} = "Ehringshausen\ Dill";
-$areanames{de}->{496444} = "Bischoffen";
-$areanames{de}->{496445} = "Schöffengrund";
-$areanames{de}->{496446} = "Hohenahr";
-$areanames{de}->{496447} = "Langgöns\-Niederkleen";
-$areanames{de}->{496449} = "Ehringshausen\-Katzenfurt";
-$areanames{de}->{496451} = "Frankenberg\ Eder";
-$areanames{de}->{496452} = "Battenberg\ Eder";
-$areanames{de}->{496453} = "Gemünden\ Wohra";
-$areanames{de}->{496454} = "Lichtenfels\-Sachsenberg";
-$areanames{de}->{496455} = "Frankenau\ Hessen";
-$areanames{de}->{496456} = "Haina\ Kloster";
-$areanames{de}->{496457} = "Burgwald\ Eder";
-$areanames{de}->{496458} = "Rosenthal\ Hessen";
-$areanames{de}->{496461} = "Biedenkopf";
-$areanames{de}->{496462} = "Gladenbach";
-$areanames{de}->{496464} = "Angelburg";
-$areanames{de}->{496465} = "Breidenbach\ bei\ Biedenkopf";
-$areanames{de}->{496466} = "Dautphetal\-Friedensdorf";
-$areanames{de}->{496467} = "Hatzfeld\ Eder";
-$areanames{de}->{496468} = "Dautphetal\-Mornshausen";
-$areanames{de}->{496471} = "Weilburg";
-$areanames{de}->{496472} = "Weilmünster";
-$areanames{de}->{496473} = "Leun";
-$areanames{de}->{496474} = "Villmar\-Aumenau";
-$areanames{de}->{496475} = "Weilmünster\-Wolfenhausen";
-$areanames{de}->{496476} = "Mengerskirchen";
-$areanames{de}->{496477} = "Greifenstein\-Nenderoth";
-$areanames{de}->{496478} = "Greifenstein\-Ulm";
-$areanames{de}->{496479} = "Waldbrunn\ Westerwald";
-$areanames{de}->{496482} = "Runkel";
-$areanames{de}->{496483} = "Selters\ Taunus";
-$areanames{de}->{496484} = "Beselich";
-$areanames{de}->{496485} = "Nentershausen\ Westerwald";
-$areanames{de}->{496486} = "Katzenelnbogen";
-$areanames{de}->{496500} = "Waldrach";
-$areanames{de}->{496501} = "Konz";
-$areanames{de}->{496502} = "Schweich";
-$areanames{de}->{496503} = "Hermeskeil";
-$areanames{de}->{496504} = "Thalfang";
-$areanames{de}->{496505} = "Kordel";
-$areanames{de}->{496506} = "Welschbillig";
-$areanames{de}->{496507} = "Neumagen\-Dhron";
-$areanames{de}->{496508} = "Hetzerath\ Mosel";
-$areanames{de}->{496509} = "Büdlich";
-$areanames{de}->{49651} = "Trier";
-$areanames{de}->{496522} = "Mettendorf";
-$areanames{de}->{496523} = "Holsthum";
-$areanames{de}->{496524} = "Rodershausen";
-$areanames{de}->{496525} = "Irrel";
-$areanames{de}->{496526} = "Bollendorf";
-$areanames{de}->{496527} = "Oberweis";
-$areanames{de}->{496531} = "Bernkastel\-Kues";
-$areanames{de}->{496532} = "Zeltingen\-Rachtig";
-$areanames{de}->{496533} = "Morbach\ Hunsrück";
-$areanames{de}->{496534} = "Mülheim\ Mosel";
-$areanames{de}->{496535} = "Osann\-Monzel";
-$areanames{de}->{496536} = "Kleinich";
-$areanames{de}->{496541} = "Traben\-Trarbach";
-$areanames{de}->{496542} = "Bullay";
-$areanames{de}->{496543} = "Büchenbeuren";
-$areanames{de}->{496544} = "Rhaunen";
-$areanames{de}->{496545} = "Blankenrath";
-$areanames{de}->{496550} = "Irrhausen";
-$areanames{de}->{496551} = "Prüm";
-$areanames{de}->{496552} = "Olzheim";
-$areanames{de}->{496553} = "Schönecken";
-$areanames{de}->{496554} = "Waxweiler";
-$areanames{de}->{496555} = "Bleialf";
-$areanames{de}->{496556} = "Pronsfeld";
-$areanames{de}->{496557} = "Hallschlag";
-$areanames{de}->{496558} = "Büdesheim\ Eifel";
-$areanames{de}->{496559} = "Leidenborn";
-$areanames{de}->{496561} = "Bitburg";
-$areanames{de}->{496562} = "Speicher";
-$areanames{de}->{496563} = "Kyllburg";
-$areanames{de}->{496564} = "Neuerburg\ Eifel";
-$areanames{de}->{496565} = "Dudeldorf";
-$areanames{de}->{496566} = "Körperich";
-$areanames{de}->{496567} = "Oberkail";
-$areanames{de}->{496568} = "Wolsfeld";
-$areanames{de}->{496569} = "Bickendorf";
-$areanames{de}->{496571} = "Wittlich";
-$areanames{de}->{496572} = "Manderscheid\ Eifel";
-$areanames{de}->{496573} = "Gillenfeld";
-$areanames{de}->{496574} = "Hasborn";
-$areanames{de}->{496575} = "Landscheid";
-$areanames{de}->{496578} = "Salmtal";
-$areanames{de}->{496580} = "Zemmer";
-$areanames{de}->{496581} = "Saarburg";
-$areanames{de}->{496582} = "Freudenburg";
-$areanames{de}->{496583} = "Palzem";
-$areanames{de}->{496584} = "Wellen\ Mosel";
-$areanames{de}->{496585} = "Ralingen";
-$areanames{de}->{496586} = "Beuren\ Hochwald";
-$areanames{de}->{496587} = "Zerf";
-$areanames{de}->{496588} = "Pluwig";
-$areanames{de}->{496589} = "Kell\ am\ See";
-$areanames{de}->{496591} = "Gerolstein";
-$areanames{de}->{496592} = "Daun";
-$areanames{de}->{496593} = "Hillesheim\ Eifel";
-$areanames{de}->{496594} = "Birresborn";
-$areanames{de}->{496595} = "Dockweiler";
-$areanames{de}->{496596} = "Üdersdorf";
-$areanames{de}->{496597} = "Jünkerath";
-$areanames{de}->{496599} = "Weidenbach\ bei\ Gerolstein";
-$areanames{de}->{49661} = "Fulda";
-$areanames{de}->{496620} = "Philippsthal\ Werra";
-$areanames{de}->{496621} = "Bad\ Hersfeld";
-$areanames{de}->{496622} = "Bebra";
-$areanames{de}->{496623} = "Rotenburg\ an\ der\ Fulda";
-$areanames{de}->{496624} = "Heringen\ Werra";
-$areanames{de}->{496625} = "Niederaula";
-$areanames{de}->{496626} = "Wildeck\-Obersuhl";
-$areanames{de}->{496627} = "Nentershausen\ Hessen";
-$areanames{de}->{496628} = "Oberaula";
-$areanames{de}->{496629} = "Schenklengsfeld";
-$areanames{de}->{496630} = "Schwalmtal\-Storndorf";
-$areanames{de}->{496631} = "Alsfeld";
-$areanames{de}->{496633} = "Homberg\ Ohm";
-$areanames{de}->{496634} = "Gemünden\ Felda";
-$areanames{de}->{496635} = "Kirtorf";
-$areanames{de}->{496636} = "Romrod";
-$areanames{de}->{496637} = "Feldatal";
-$areanames{de}->{496638} = "Schwalmtal\-Renzendorf";
-$areanames{de}->{496639} = "Ottrau";
-$areanames{de}->{496641} = "Lauterbach\ Hessen";
-$areanames{de}->{496642} = "Schlitz";
-$areanames{de}->{496643} = "Herbstein";
-$areanames{de}->{496644} = "Grebenhain";
-$areanames{de}->{496645} = "Ulrichstein";
-$areanames{de}->{496646} = "Grebenau";
-$areanames{de}->{496647} = "Herbstein\-Stockhausen";
-$areanames{de}->{496648} = "Bad\ Salzschlirf";
-$areanames{de}->{496650} = "Hosenfeld";
-$areanames{de}->{496651} = "Rasdorf";
-$areanames{de}->{496652} = "Hünfeld";
-$areanames{de}->{496653} = "Burghaun";
-$areanames{de}->{496654} = "Gersfeld\ Rhön";
-$areanames{de}->{496655} = "Neuhof\ Kreis\ Fulda";
-$areanames{de}->{496656} = "Ebersburg";
-$areanames{de}->{496657} = "Hofbieber";
-$areanames{de}->{496658} = "Poppenhausen\ Wasserkuppe";
-$areanames{de}->{496659} = "Eichenzell";
-$areanames{de}->{496660} = "Steinau\-Marjoss";
-$areanames{de}->{496661} = "Schlüchtern";
-$areanames{de}->{496663} = "Steinau\ an\ der\ Straße";
-$areanames{de}->{496664} = "Sinntal\-Sterbfritz";
-$areanames{de}->{496665} = "Sinntal\-Altengronau";
-$areanames{de}->{496666} = "Freiensteinau";
-$areanames{de}->{496667} = "Steinau\-Ulmbach";
-$areanames{de}->{496668} = "Birstein\-Lichenroth";
-$areanames{de}->{496669} = "Neuhof\-Hauswurz";
-$areanames{de}->{496670} = "Ludwigsau\ Hessen";
-$areanames{de}->{496672} = "Eiterfeld";
-$areanames{de}->{496673} = "Haunetal";
-$areanames{de}->{496674} = "Friedewald\ Hessen";
-$areanames{de}->{496675} = "Breitenbach\ am\ Herzberg";
-$areanames{de}->{496676} = "Hohenroda\ Hessen";
-$areanames{de}->{496677} = "Neuenstein\ Hessen";
-$areanames{de}->{496678} = "Wildeck\-Hönebach";
-$areanames{de}->{496681} = "Hilders";
-$areanames{de}->{496682} = "Tann\ Rhön";
-$areanames{de}->{496683} = "Ehrenberg\ Rhön";
-$areanames{de}->{496684} = "Hofbieber\-Schwarzbach";
-$areanames{de}->{496691} = "Schwalmstadt";
-$areanames{de}->{496692} = "Neustadt\ Hessen";
-$areanames{de}->{496693} = "Neuental";
-$areanames{de}->{496694} = "Neukirchen\ Knüll";
-$areanames{de}->{496695} = "Jesberg";
-$areanames{de}->{496696} = "Gilserberg";
-$areanames{de}->{496697} = "Willingshausen";
-$areanames{de}->{496698} = "Schrecksbach";
-$areanames{de}->{496701} = "Sprendlingen\ Rheinhessen";
-$areanames{de}->{496703} = "Wöllstein\ Rheinhessen";
-$areanames{de}->{496704} = "Langenlonsheim";
-$areanames{de}->{496706} = "Wallhausen\ Nahe";
-$areanames{de}->{496707} = "Windesheim";
-$areanames{de}->{496708} = "Bad\ Münster\ am\ Stein\-Ebernburg";
-$areanames{de}->{496709} = "Fürfeld\ Kreis\ Bad\ Kreuznach";
-$areanames{de}->{49671} = "Bad\ Kreuznach";
-$areanames{de}->{496721} = "Bingen\ am\ Rhein";
-$areanames{de}->{496722} = "Rüdesheim\ am\ Rhein";
-$areanames{de}->{496723} = "Oestrich\-Winkel";
-$areanames{de}->{496724} = "Stromberg\ Hunsrück";
-$areanames{de}->{496725} = "Gau\-Algesheim";
-$areanames{de}->{496726} = "Lorch\ Rheingau";
-$areanames{de}->{496727} = "Gensingen";
-$areanames{de}->{496728} = "Ober\-Hilbersheim";
-$areanames{de}->{496731} = "Alzey";
-$areanames{de}->{496732} = "Wörrstadt";
-$areanames{de}->{496733} = "Gau\-Odernheim";
-$areanames{de}->{496734} = "Flonheim";
-$areanames{de}->{496735} = "Eppelsheim";
-$areanames{de}->{496736} = "Bechenheim";
-$areanames{de}->{496737} = "Köngernheim";
-$areanames{de}->{496741} = "St\ Goar";
-$areanames{de}->{496742} = "Boppard";
-$areanames{de}->{496743} = "Bacharach";
-$areanames{de}->{496744} = "Oberwesel";
-$areanames{de}->{496745} = "Gondershausen";
-$areanames{de}->{496746} = "Pfalzfeld";
-$areanames{de}->{496747} = "Emmelshausen";
-$areanames{de}->{496751} = "Bad\ Sobernheim";
-$areanames{de}->{496752} = "Kirn\ Nahe";
-$areanames{de}->{496753} = "Meisenheim";
-$areanames{de}->{496754} = "Martinstein";
-$areanames{de}->{496755} = "Odernheim\ am\ Glan";
-$areanames{de}->{496756} = "Winterbach\ Soonwald";
-$areanames{de}->{496757} = "Becherbach\ bei\ Kirn";
-$areanames{de}->{496758} = "Waldböckelheim";
-$areanames{de}->{496761} = "Simmern\ Hunsrück";
-$areanames{de}->{496762} = "Kastellaun";
-$areanames{de}->{496763} = "Kirchberg\ Hunsrück";
-$areanames{de}->{496764} = "Rheinböllen";
-$areanames{de}->{496765} = "Gemünden\ Hunsrück";
-$areanames{de}->{496766} = "Kisselbach";
-$areanames{de}->{496771} = "St\ Goarshausen";
-$areanames{de}->{496772} = "Nastätten";
-$areanames{de}->{496773} = "Kamp\-Bornhofen";
-$areanames{de}->{496774} = "Kaub";
-$areanames{de}->{496775} = "Strüth\ Taunus";
-$areanames{de}->{496776} = "Dachsenhausen";
-$areanames{de}->{496781} = "Idar\-Oberstein";
-$areanames{de}->{496782} = "Birkenfeld\ Nahe";
-$areanames{de}->{496783} = "Baumholder";
-$areanames{de}->{496784} = "Weierbach";
-$areanames{de}->{496785} = "Herrstein";
-$areanames{de}->{496786} = "Kempfeld";
-$areanames{de}->{496787} = "Niederbrombach";
-$areanames{de}->{496788} = "Sien";
-$areanames{de}->{496789} = "Heimbach\ Nahe";
-$areanames{de}->{496802} = "Völklingen\-Lauterbach";
-$areanames{de}->{496803} = "Mandelbachtal\-Ommersheim";
-$areanames{de}->{496804} = "Mandelbachtal";
-$areanames{de}->{496805} = "Kleinblittersdorf";
-$areanames{de}->{496806} = "Heusweiler";
-$areanames{de}->{496809} = "Grossrosseln";
-$areanames{de}->{49681} = "Saarbrücken";
-$areanames{de}->{496821} = "Neunkirchen\ Saar";
-$areanames{de}->{496824} = "Ottweiler";
-$areanames{de}->{496825} = "Illingen\ Saar";
-$areanames{de}->{496826} = "Bexbach";
-$areanames{de}->{496827} = "Eppelborn";
-$areanames{de}->{496831} = "Saarlouis";
-$areanames{de}->{496832} = "Beckingen\-Reimsbach";
-$areanames{de}->{496833} = "Rehlingen\-Siersburg";
-$areanames{de}->{496834} = "Bous";
-$areanames{de}->{496835} = "Beckingen";
-$areanames{de}->{496836} = "Überherrn";
-$areanames{de}->{496837} = "Wallerfangen";
-$areanames{de}->{496838} = "Saarwellingen";
-$areanames{de}->{496841} = "Homburg\ Saar";
-$areanames{de}->{496842} = "Blieskastel";
-$areanames{de}->{496843} = "Gersheim";
-$areanames{de}->{496844} = "Blieskastel\-Altheim";
-$areanames{de}->{496848} = "Homburg\-Einöd";
-$areanames{de}->{496849} = "Kirkel";
-$areanames{de}->{496851} = "St\ Wendel";
-$areanames{de}->{496852} = "Nohfelden";
-$areanames{de}->{496853} = "Marpingen";
-$areanames{de}->{496854} = "Oberthal\ Saar";
-$areanames{de}->{496855} = "Freisen";
-$areanames{de}->{496856} = "St\ Wendel\-Niederkirchen";
-$areanames{de}->{496857} = "Namborn";
-$areanames{de}->{496858} = "Ottweiler\-Fürth";
-$areanames{de}->{496861} = "Merzig";
-$areanames{de}->{496864} = "Mettlach";
-$areanames{de}->{496865} = "Mettlach\-Orscholz";
-$areanames{de}->{496866} = "Perl\-Nennig";
-$areanames{de}->{496867} = "Perl";
-$areanames{de}->{496868} = "Mettlach\-Tünsdorf";
-$areanames{de}->{496869} = "Merzig\-Silwingen";
-$areanames{de}->{496871} = "Wadern";
-$areanames{de}->{496872} = "Losheim\ am\ See";
-$areanames{de}->{496873} = "Nonnweiler";
-$areanames{de}->{496874} = "Wadern\-Nunkirchen";
-$areanames{de}->{496875} = "Nonnweiler\-Primstal";
-$areanames{de}->{496876} = "Weiskirchen\ Saar";
-$areanames{de}->{496881} = "Lebach";
-$areanames{de}->{496887} = "Schmelz\ Saar";
-$areanames{de}->{496888} = "Lebach\-Steinbach";
-$areanames{de}->{496893} = "Saarbrücken\-Ensheim";
-$areanames{de}->{496894} = "St\ Ingbert";
-$areanames{de}->{496897} = "Sulzbach\ Saar";
-$areanames{de}->{496898} = "Völklingen";
-$areanames{de}->{4969} = "Frankfurt\ am\ Main";
-$areanames{de}->{497021} = "Kirchheim\ unter\ Teck";
-$areanames{de}->{497022} = "Nürtingen";
-$areanames{de}->{497023} = "Weilheim\ an\ der\ Teck";
-$areanames{de}->{497024} = "Wendlingen\ am\ Neckar";
-$areanames{de}->{497025} = "Neuffen";
-$areanames{de}->{497026} = "Lenningen";
-$areanames{de}->{497031} = "Böblingen";
-$areanames{de}->{497032} = "Herrenberg";
-$areanames{de}->{497033} = "Weil\ Der\ Stadt";
-$areanames{de}->{497034} = "Ehningen";
-$areanames{de}->{497041} = "Mühlacker";
-$areanames{de}->{497042} = "Vaihingen\ an\ der\ Enz";
-$areanames{de}->{497043} = "Maulbronn";
-$areanames{de}->{497044} = "Mönsheim";
-$areanames{de}->{497045} = "Oberderdingen";
-$areanames{de}->{497046} = "Zaberfeld";
-$areanames{de}->{497051} = "Calw";
-$areanames{de}->{497052} = "Bad\ Liebenzell";
-$areanames{de}->{497053} = "Bad\ Teinach\-Zavelstein";
-$areanames{de}->{497054} = "Wildberg\ Württemberg";
-$areanames{de}->{497055} = "Neuweiler\ Kreis\ Calw";
-$areanames{de}->{497056} = "Gechingen";
-$areanames{de}->{497062} = "Beilstein\ Württemberg";
-$areanames{de}->{497063} = "Bad\ Wimpfen";
-$areanames{de}->{497066} = "Bad\ Rappenau\-Bonfeld";
-$areanames{de}->{497071} = "Tübingen";
-$areanames{de}->{497072} = "Gomaringen";
-$areanames{de}->{497073} = "Ammerbuch";
-$areanames{de}->{497081} = "Bad\ Wildbad";
-$areanames{de}->{497082} = "Neuenbürg\ Württemberg";
-$areanames{de}->{497083} = "Bad\ Herrenalb";
-$areanames{de}->{497084} = "Schömberg\ bei\ Neuenbürg";
-$areanames{de}->{497085} = "Enzklösterle";
-$areanames{de}->{49711} = "Stuttgart";
-$areanames{de}->{497121} = "Reutlingen";
-$areanames{de}->{497122} = "St\ Johann\ Württemberg";
-$areanames{de}->{497123} = "Metzingen\ Württemberg";
-$areanames{de}->{497124} = "Trochtelfingen\ Hohenz";
-$areanames{de}->{497125} = "Bad\ Urach";
-$areanames{de}->{497126} = "Burladingen\-Melchingen";
-$areanames{de}->{497127} = "Neckartenzlingen";
-$areanames{de}->{497128} = "Sonnenbühl";
-$areanames{de}->{497129} = "Lichtenstein\ Württemberg";
-$areanames{de}->{497130} = "Löwenstein\ Württemberg";
-$areanames{de}->{497131} = "Heilbronn\ Neckar";
-$areanames{de}->{497132} = "Neckarsulm";
-$areanames{de}->{497133} = "Lauffen\ am\ Neckar";
-$areanames{de}->{497134} = "Weinsberg";
-$areanames{de}->{497135} = "Brackenheim";
-$areanames{de}->{497136} = "Bad\ Friedrichshall";
-$areanames{de}->{497138} = "Schwaigern";
-$areanames{de}->{497139} = "Neuenstadt\ am\ Kocher";
-$areanames{de}->{497141} = "Ludwigsburg\ Württemberg";
-$areanames{de}->{497142} = "Bietigheim\-Bissingen";
-$areanames{de}->{497143} = "Besigheim";
-$areanames{de}->{497144} = "Marbach\ am\ Neckar";
-$areanames{de}->{497145} = "Markgröningen";
-$areanames{de}->{497146} = "Remseck\ am\ Neckar";
-$areanames{de}->{497147} = "Sachsenheim\ Württemberg";
-$areanames{de}->{497148} = "Grossbottwar";
-$areanames{de}->{497150} = "Korntal\-Münchingen";
-$areanames{de}->{497151} = "Waiblingen";
-$areanames{de}->{497152} = "Leonberg\ Württemberg";
-$areanames{de}->{497153} = "Plochingen";
-$areanames{de}->{497154} = "Kornwestheim";
-$areanames{de}->{497156} = "Ditzingen";
-$areanames{de}->{497157} = "Waldenbuch";
-$areanames{de}->{497158} = "Neuhausen\ auf\ den\ Fildern";
-$areanames{de}->{497159} = "Renningen";
-$areanames{de}->{497161} = "Göppingen";
-$areanames{de}->{497162} = "Süßen";
-$areanames{de}->{497163} = "Ebersbach\ an\ der\ Fils";
-$areanames{de}->{497164} = "Boll\ Kreis\ Göppingen";
-$areanames{de}->{497165} = "Göppingen\-Hohenstaufen";
-$areanames{de}->{497166} = "Adelberg";
-$areanames{de}->{497171} = "Schwäbisch\ Gmünd";
-$areanames{de}->{497172} = "Lorch\ Württemberg";
-$areanames{de}->{497173} = "Heubach";
-$areanames{de}->{497174} = "Mögglingen";
-$areanames{de}->{497175} = "Leinzell";
-$areanames{de}->{497176} = "Spraitbach";
-$areanames{de}->{497181} = "Schorndorf\ Württemberg";
-$areanames{de}->{497182} = "Welzheim";
-$areanames{de}->{497183} = "Rudersberg\ Württemberg";
-$areanames{de}->{497184} = "Kaisersbach";
-$areanames{de}->{497191} = "Backnang";
-$areanames{de}->{497192} = "Murrhardt";
-$areanames{de}->{497193} = "Sulzbach\ an\ der\ Murr";
-$areanames{de}->{497194} = "Spiegelberg";
-$areanames{de}->{497195} = "Winnenden";
-$areanames{de}->{497202} = "Karlsbad";
-$areanames{de}->{497203} = "Walzbachtal";
-$areanames{de}->{497204} = "Malsch\-Völkersbach";
-$areanames{de}->{49721} = "Karlsruhe";
-$areanames{de}->{497220} = "Forbach\-Hundsbach";
-$areanames{de}->{497221} = "Baden\-Baden";
-$areanames{de}->{497222} = "Rastatt";
-$areanames{de}->{497223} = "Bühl\ Baden";
-$areanames{de}->{497224} = "Gernsbach";
-$areanames{de}->{497225} = "Gaggenau";
-$areanames{de}->{497226} = "Bühl\-Sand";
-$areanames{de}->{497227} = "Lichtenau\ Baden";
-$areanames{de}->{497228} = "Forbach";
-$areanames{de}->{497229} = "Iffezheim";
-$areanames{de}->{497231} = "Pforzheim";
-$areanames{de}->{497232} = "Königsbach\-Stein";
-$areanames{de}->{497233} = "Niefern\-Öschelbronn";
-$areanames{de}->{497234} = "Tiefenbronn";
-$areanames{de}->{497235} = "Unterreichenbach\ Kreis\ Calw";
-$areanames{de}->{497236} = "Keltern";
-$areanames{de}->{497237} = "Neulingen\ Enzkreis";
-$areanames{de}->{497240} = "Pfinztal";
-$areanames{de}->{497242} = "Rheinstetten";
-$areanames{de}->{497243} = "Ettlingen";
-$areanames{de}->{497244} = "Weingarten\ Baden";
-$areanames{de}->{497245} = "Durmersheim";
-$areanames{de}->{497246} = "Malsch\ Kreis\ Karlsruhe";
-$areanames{de}->{497247} = "Linkenheim\-Hochstetten";
-$areanames{de}->{497248} = "Marxzell";
-$areanames{de}->{497249} = "Stutensee";
-$areanames{de}->{497250} = "Kraichtal";
-$areanames{de}->{497251} = "Bruchsal";
-$areanames{de}->{497252} = "Bretten";
-$areanames{de}->{497253} = "Bad\ Schönborn";
-$areanames{de}->{497254} = "Waghäusel";
-$areanames{de}->{497255} = "Graben\-Neudorf";
-$areanames{de}->{497256} = "Philippsburg";
-$areanames{de}->{497257} = "Bruchsal\-Untergrombach";
-$areanames{de}->{497258} = "Oberderdingen\-Flehingen";
-$areanames{de}->{497259} = "Östringen\-Odenheim";
-$areanames{de}->{497260} = "Sinsheim\-Hilsbach";
-$areanames{de}->{497261} = "Sinsheim";
-$areanames{de}->{497262} = "Eppingen";
-$areanames{de}->{497263} = "Waibstadt";
-$areanames{de}->{497264} = "Bad\ Rappenau";
-$areanames{de}->{497265} = "Angelbachtal";
-$areanames{de}->{497266} = "Kirchardt";
-$areanames{de}->{497267} = "Gemmingen";
-$areanames{de}->{497268} = "Bad\ Rappenau\-Obergimpern";
-$areanames{de}->{497269} = "Sulzfeld\ Baden";
-$areanames{de}->{497271} = "Wörth\ am\ Rhein";
-$areanames{de}->{497272} = "Rülzheim";
-$areanames{de}->{497273} = "Hagenbach\ Pfalz";
-$areanames{de}->{497274} = "Germersheim";
-$areanames{de}->{497275} = "Kandel";
-$areanames{de}->{497276} = "Herxheim\ bei\ Landau\ Pfalz";
-$areanames{de}->{497277} = "Wörth\-Büchelberg";
-$areanames{de}->{497300} = "Roggenburg";
-$areanames{de}->{497302} = "Pfaffenhofen\ an\ der\ Roth";
-$areanames{de}->{497303} = "Illertissen";
-$areanames{de}->{497304} = "Blaustein\ Württemberg";
-$areanames{de}->{497305} = "Erbach\ Donau";
-$areanames{de}->{497306} = "Vöhringen\ Iller";
-$areanames{de}->{497307} = "Senden\ Iller";
-$areanames{de}->{497308} = "Nersingen";
-$areanames{de}->{497309} = "Weissenhorn";
-$areanames{de}->{49731} = "Ulm\ Donau";
-$areanames{de}->{497321} = "Heidenheim\ an\ der\ Brenz";
-$areanames{de}->{497322} = "Giengen\ an\ der\ Brenz";
-$areanames{de}->{497323} = "Gerstetten";
-$areanames{de}->{497324} = "Herbrechtingen";
-$areanames{de}->{497325} = "Sontheim\ an\ der\ Brenz";
-$areanames{de}->{497326} = "Neresheim";
-$areanames{de}->{497327} = "Dischingen";
-$areanames{de}->{497328} = "Königsbronn";
-$areanames{de}->{497329} = "Steinheim\ am\ Albuch";
-$areanames{de}->{497331} = "Geislingen\ an\ der\ Steige";
-$areanames{de}->{497332} = "Lauterstein";
-$areanames{de}->{497333} = "Laichingen";
-$areanames{de}->{497334} = "Deggingen";
-$areanames{de}->{497335} = "Wiesensteig";
-$areanames{de}->{497336} = "Lonsee";
-$areanames{de}->{497337} = "Nellingen\ Alb";
-$areanames{de}->{497340} = "Neenstetten";
-$areanames{de}->{497343} = "Buch\ bei\ Illertissen";
-$areanames{de}->{497344} = "Blaubeuren";
-$areanames{de}->{497345} = "Langenau\ Württemberg";
-$areanames{de}->{497346} = "Illerkirchberg";
-$areanames{de}->{497347} = "Dietenheim";
-$areanames{de}->{497348} = "Beimerstetten";
-$areanames{de}->{497351} = "Biberach\ an\ der\ Riß";
-$areanames{de}->{497352} = "Ochsenhausen";
-$areanames{de}->{497353} = "Schwendi";
-$areanames{de}->{497354} = "Erolzheim";
-$areanames{de}->{497355} = "Hochdorf\ Riß";
-$areanames{de}->{497356} = "Schemmerhofen";
-$areanames{de}->{497357} = "Attenweiler";
-$areanames{de}->{497358} = "Eberhardzell\-Füramoos";
-$areanames{de}->{497361} = "Aalen";
-$areanames{de}->{497362} = "Bopfingen";
-$areanames{de}->{497363} = "Lauchheim";
-$areanames{de}->{497364} = "Oberkochen";
-$areanames{de}->{497365} = "Essingen\ Württemberg";
-$areanames{de}->{497366} = "Abtsgmünd";
-$areanames{de}->{497367} = "Aalen\-Ebnat";
-$areanames{de}->{497371} = "Riedlingen\ Württemberg";
-$areanames{de}->{497373} = "Zwiefalten";
-$areanames{de}->{497374} = "Uttenweiler";
-$areanames{de}->{497375} = "Obermarchtal";
-$areanames{de}->{497376} = "Langenenslingen";
-$areanames{de}->{497381} = "Münsingen";
-$areanames{de}->{497382} = "Römerstein";
-$areanames{de}->{497383} = "Münsingen\-Buttenhausen";
-$areanames{de}->{497384} = "Schelklingen\-Hütten";
-$areanames{de}->{497385} = "Gomadingen";
-$areanames{de}->{497386} = "Hayingen";
-$areanames{de}->{497387} = "Hohenstein\ Württemberg";
-$areanames{de}->{497388} = "Pfronstetten";
-$areanames{de}->{497389} = "Heroldstatt";
-$areanames{de}->{497391} = "Ehingen\ Donau";
-$areanames{de}->{497392} = "Laupheim";
-$areanames{de}->{497393} = "Munderkingen";
-$areanames{de}->{497394} = "Schelklingen";
-$areanames{de}->{497395} = "Ehingen\-Dächingen";
-$areanames{de}->{497402} = "Fluorn\-Winzeln";
-$areanames{de}->{497403} = "Dunningen";
-$areanames{de}->{497404} = "Epfendorf";
-$areanames{de}->{49741} = "Rottweil";
-$areanames{de}->{497420} = "Deisslingen";
-$areanames{de}->{497422} = "Schramberg";
-$areanames{de}->{497423} = "Oberndorf\ am\ Neckar";
-$areanames{de}->{497424} = "Spaichingen";
-$areanames{de}->{497425} = "Trossingen";
-$areanames{de}->{497426} = "Gosheim";
-$areanames{de}->{497427} = "Schömberg\ bei\ Balingen";
-$areanames{de}->{497428} = "Rosenfeld";
-$areanames{de}->{497429} = "Egesheim";
-$areanames{de}->{497431} = "Albstadt\-Ebingen";
-$areanames{de}->{497432} = "Albstadt\-Tailfingen";
-$areanames{de}->{497433} = "Balingen";
-$areanames{de}->{497434} = "Winterlingen";
-$areanames{de}->{497435} = "Albstadt\-Laufen";
-$areanames{de}->{497436} = "Messstetten\-Oberdigisheim";
-$areanames{de}->{497440} = "Bad\ Rippoldsau";
-$areanames{de}->{497441} = "Freudenstadt";
-$areanames{de}->{497442} = "Baiersbronn";
-$areanames{de}->{497443} = "Dornstetten";
-$areanames{de}->{497444} = "Alpirsbach";
-$areanames{de}->{497445} = "Pfalzgrafenweiler";
-$areanames{de}->{497446} = "Lossburg";
-$areanames{de}->{497447} = "Baiersbronn\-Schwarzenberg";
-$areanames{de}->{497448} = "Seewald";
-$areanames{de}->{497449} = "Baiersbronn\-Obertal";
-$areanames{de}->{497451} = "Horb\ am\ Neckar";
-$areanames{de}->{497452} = "Nagold";
-$areanames{de}->{497453} = "Altensteig\ Württemberg";
-$areanames{de}->{497454} = "Sulz\ am\ Neckar";
-$areanames{de}->{497455} = "Dornhan";
-$areanames{de}->{497456} = "Haiterbach";
-$areanames{de}->{497457} = "Rottenburg\-Ergenzingen";
-$areanames{de}->{497458} = "Ebhausen";
-$areanames{de}->{497459} = "Nagold\-Hochdorf";
-$areanames{de}->{497461} = "Tuttlingen";
-$areanames{de}->{497462} = "Immendingen";
-$areanames{de}->{497463} = "Mühlheim\ an\ der\ Donau";
-$areanames{de}->{497464} = "Talheim\ Kreis\ Tuttlingen";
-$areanames{de}->{497465} = "Emmingen\-Liptingen";
-$areanames{de}->{497466} = "Beuron";
-$areanames{de}->{497467} = "Neuhausen\ ob\ Eck";
-$areanames{de}->{497471} = "Hechingen";
-$areanames{de}->{497472} = "Rottenburg\ am\ Neckar";
-$areanames{de}->{497473} = "Mössingen";
-$areanames{de}->{497474} = "Haigerloch";
-$areanames{de}->{497475} = "Burladingen";
-$areanames{de}->{497476} = "Bisingen";
-$areanames{de}->{497477} = "Jungingen\ bei\ Hechingen";
-$areanames{de}->{497478} = "Hirrlingen";
-$areanames{de}->{497482} = "Horb\-Dettingen";
-$areanames{de}->{497483} = "Horb\-Mühringen";
-$areanames{de}->{497484} = "Simmersfeld";
-$areanames{de}->{497485} = "Empfingen";
-$areanames{de}->{497486} = "Horb\-Altheim";
-$areanames{de}->{497502} = "Wolpertswende";
-$areanames{de}->{497503} = "Wilhelmsdorf\ Württemberg";
-$areanames{de}->{497504} = "Horgenzell";
-$areanames{de}->{497505} = "Fronreute";
-$areanames{de}->{497506} = "Wangen\-Leupolz";
-$areanames{de}->{49751} = "Ravensburg";
-$areanames{de}->{497520} = "Bodnegg";
-$areanames{de}->{497522} = "Wangen\ im\ Allgäu";
-$areanames{de}->{497524} = "Bad\ Waldsee";
-$areanames{de}->{497525} = "Aulendorf";
-$areanames{de}->{497527} = "Wolfegg";
-$areanames{de}->{497528} = "Neukirch\ bei\ Tettnang";
-$areanames{de}->{497529} = "Waldburg\ Württemberg";
-$areanames{de}->{497531} = "Konstanz";
-$areanames{de}->{497532} = "Meersburg";
-$areanames{de}->{497533} = "Allensbach";
-$areanames{de}->{497534} = "Reichenau\ Baden";
-$areanames{de}->{497541} = "Friedrichshafen";
-$areanames{de}->{497542} = "Tettnang";
-$areanames{de}->{497543} = "Kressbronn\ am\ Bodensee";
-$areanames{de}->{497544} = "Markdorf";
-$areanames{de}->{497545} = "Immenstaad\ am\ Bodensee";
-$areanames{de}->{497546} = "Oberteuringen";
-$areanames{de}->{497551} = "Überlingen\ Bodensee";
-$areanames{de}->{497552} = "Pfullendorf";
-$areanames{de}->{497553} = "Salem\ Baden";
-$areanames{de}->{497554} = "Heiligenberg\ Baden";
-$areanames{de}->{497555} = "Deggenhausertal";
-$areanames{de}->{497556} = "Uhldingen\-Mühlhofen";
-$areanames{de}->{497557} = "Herdwangen\-Schönach";
-$areanames{de}->{497558} = "Illmensee";
-$areanames{de}->{497561} = "Leutkirch\ im\ Allgäu";
-$areanames{de}->{497562} = "Isny\ im\ Allgäu";
-$areanames{de}->{497563} = "Kisslegg";
-$areanames{de}->{497564} = "Bad\ Wurzach";
-$areanames{de}->{497565} = "Aichstetten\ Kreis\ Ravensburg";
-$areanames{de}->{497566} = "Argenbühl";
-$areanames{de}->{497567} = "Leutkirch\-Friesenhofen";
-$areanames{de}->{497568} = "Bad\ Wurzach\-Hauerz";
-$areanames{de}->{497569} = "Isny\-Eisenbach";
-$areanames{de}->{497570} = "Sigmaringen\-Gutenstein";
-$areanames{de}->{497571} = "Sigmaringen";
-$areanames{de}->{497572} = "Mengen\ Württemberg";
-$areanames{de}->{497573} = "Stetten\ am\ kalten\ Markt";
-$areanames{de}->{497574} = "Gammertingen";
-$areanames{de}->{497575} = "Messkirch";
-$areanames{de}->{497576} = "Krauchenwies";
-$areanames{de}->{497577} = "Veringenstadt";
-$areanames{de}->{497578} = "Wald\ Hohenz";
-$areanames{de}->{497579} = "Schwenningen\ Baden";
-$areanames{de}->{497581} = "Saulgau";
-$areanames{de}->{497582} = "Bad\ Buchau";
-$areanames{de}->{497583} = "Bad\ Schussenried";
-$areanames{de}->{497584} = "Altshausen";
-$areanames{de}->{497585} = "Ostrach";
-$areanames{de}->{497586} = "Herbertingen";
-$areanames{de}->{497587} = "Hosskirch";
-$areanames{de}->{49760} = "Oberried\ Breisgau";
-$areanames{de}->{49761} = "Freiburg\ im\ Breisgau";
-$areanames{de}->{497620} = "Schopfheim\-Gersbach";
-$areanames{de}->{497621} = "Lörrach";
-$areanames{de}->{497622} = "Schopfheim";
-$areanames{de}->{497623} = "Rheinfelden\ Baden";
-$areanames{de}->{497624} = "Grenzach\-Wyhlen";
-$areanames{de}->{497625} = "Zell\ im\ Wiesental";
-$areanames{de}->{497626} = "Kandern";
-$areanames{de}->{497627} = "Steinen\ Kreis\ Lörrach";
-$areanames{de}->{497628} = "Efringen\-Kirchen";
-$areanames{de}->{497629} = "Tegernau\ Baden";
-$areanames{de}->{497631} = "Müllheim\ Baden";
-$areanames{de}->{497632} = "Badenweiler";
-$areanames{de}->{497633} = "Staufen\ im\ Breisgau";
-$areanames{de}->{497634} = "Sulzburg";
-$areanames{de}->{497635} = "Schliengen";
-$areanames{de}->{497636} = "Münstertal\ Schwarzwald";
-$areanames{de}->{497641} = "Emmendingen";
-$areanames{de}->{497642} = "Endingen\ Kaiserstuhl";
-$areanames{de}->{497643} = "Herbolzheim\ Breisgau";
-$areanames{de}->{497644} = "Kenzingen";
-$areanames{de}->{497645} = "Freiamt";
-$areanames{de}->{497646} = "Weisweil\ Breisgau";
-$areanames{de}->{497651} = "Titisee\-Neustadt";
-$areanames{de}->{497652} = "Hinterzarten";
-$areanames{de}->{497653} = "Lenzkirch";
-$areanames{de}->{497654} = "Löffingen";
-$areanames{de}->{497655} = "Feldberg\-Altglashütten";
-$areanames{de}->{497656} = "Schluchsee";
-$areanames{de}->{497657} = "Eisenbach\ Hochschwarzwald";
-$areanames{de}->{497660} = "St\ Peter\ Schwarzwald";
-$areanames{de}->{497661} = "Kirchzarten";
-$areanames{de}->{497662} = "Vogtsburg\ im\ Kaiserstuhl";
-$areanames{de}->{497663} = "Eichstetten";
-$areanames{de}->{497664} = "Freiburg\-Tiengen";
-$areanames{de}->{497665} = "March\ Breisgau";
-$areanames{de}->{497666} = "Denzlingen";
-$areanames{de}->{497667} = "Breisach\ am\ Rhein";
-$areanames{de}->{497668} = "Ihringen";
-$areanames{de}->{497669} = "St\ Märgen";
-$areanames{de}->{497671} = "Todtnau";
-$areanames{de}->{497672} = "St\ Blasien";
-$areanames{de}->{497673} = "Schönau\ im\ Schwarzwald";
-$areanames{de}->{497674} = "Todtmoos";
-$areanames{de}->{497675} = "Bernau\ Baden";
-$areanames{de}->{497676} = "Feldberg\ Schwarzwald";
-$areanames{de}->{497681} = "Waldkirch\ Breisgau";
-$areanames{de}->{497682} = "Elzach";
-$areanames{de}->{497683} = "Simonswald";
-$areanames{de}->{497684} = "Glottertal";
-$areanames{de}->{497685} = "Gutach\-Bleibach";
-$areanames{de}->{497702} = "Blumberg\ Baden";
-$areanames{de}->{497703} = "Bonndorf\ im\ Schwarzwald";
-$areanames{de}->{497704} = "Geisingen\ Baden";
-$areanames{de}->{497705} = "Wolterdingen\ Schwarzw";
-$areanames{de}->{497706} = "Oberbaldingen";
-$areanames{de}->{497707} = "Bräunlingen";
-$areanames{de}->{497708} = "Geisingen\-Leipferdingen";
-$areanames{de}->{497709} = "Wutach";
-$areanames{de}->{49771} = "Donaueschingen";
-$areanames{de}->{497720} = "Schwenningen\ am\ Neckar";
-$areanames{de}->{497721} = "Villingen\ im\ Schwarzwald";
-$areanames{de}->{497722} = "Triberg\ im\ Schwarzwald";
-$areanames{de}->{497723} = "Furtwangen\ im\ Schwarzwald";
-$areanames{de}->{497724} = "St\ Georgen\ im\ Schwarzwald";
-$areanames{de}->{497725} = "Königsfeld\ im\ Schwarzwald";
-$areanames{de}->{497726} = "Bad\ Dürrheim";
-$areanames{de}->{497727} = "Vöhrenbach";
-$areanames{de}->{497728} = "Niedereschach";
-$areanames{de}->{497729} = "Tennenbronn";
-$areanames{de}->{497731} = "Singen\ Hohentwiel";
-$areanames{de}->{497732} = "Radolfzell\ am\ Bodensee";
-$areanames{de}->{497733} = "Engen\ Hegau";
-$areanames{de}->{497734} = "Gailingen";
-$areanames{de}->{497735} = "Öhningen";
-$areanames{de}->{497736} = "Tengen";
-$areanames{de}->{497738} = "Steisslingen";
-$areanames{de}->{497739} = "Hilzingen";
-$areanames{de}->{497741} = "Tiengen\ Hochrhein";
-$areanames{de}->{497742} = "Klettgau";
-$areanames{de}->{497743} = "Ühlingen\-Birkendorf";
-$areanames{de}->{497744} = "Stühlingen";
-$areanames{de}->{497745} = "Jestetten";
-$areanames{de}->{497746} = "Wutöschingen";
-$areanames{de}->{497747} = "Berau";
-$areanames{de}->{497748} = "Grafenhausen\ Hochschwarzwald";
-$areanames{de}->{497751} = "Waldshut";
-$areanames{de}->{497753} = "Albbruck";
-$areanames{de}->{497754} = "Görwihl";
-$areanames{de}->{497755} = "Weilheim\ Kreis\ Waldshut";
-$areanames{de}->{497761} = "Bad\ Säckingen";
-$areanames{de}->{497762} = "Wehr\ Baden";
-$areanames{de}->{497763} = "Murg";
-$areanames{de}->{497764} = "Herrischried";
-$areanames{de}->{497765} = "Rickenbach\ Hotzenwald";
-$areanames{de}->{497771} = "Stockach";
-$areanames{de}->{497773} = "Bodman\-Ludwigshafen";
-$areanames{de}->{497774} = "Eigeltingen";
-$areanames{de}->{497775} = "Mühlingen";
-$areanames{de}->{497777} = "Sauldorf";
-$areanames{de}->{497802} = "Oberkirch\ Baden";
-$areanames{de}->{497803} = "Gengenbach";
-$areanames{de}->{497804} = "Oppenau";
-$areanames{de}->{497805} = "Appenweier";
-$areanames{de}->{497806} = "Bad\ Peterstal\-Griesbach";
-$areanames{de}->{497807} = "Neuried\ Ortenaukreis";
-$areanames{de}->{497808} = "Hohberg\ bei\ Offenburg";
-$areanames{de}->{49781} = "Offenburg";
-$areanames{de}->{497821} = "Lahr\ Schwarzwald";
-$areanames{de}->{497822} = "Ettenheim";
-$areanames{de}->{497823} = "Seelbach\ Schutter";
-$areanames{de}->{497824} = "Schwanau";
-$areanames{de}->{497825} = "Kippenheim";
-$areanames{de}->{497826} = "Schuttertal";
-$areanames{de}->{497831} = "Hausach";
-$areanames{de}->{497832} = "Haslach\ im\ Kinzigtal";
-$areanames{de}->{497833} = "Hornberg\ Schwarzwaldbahn";
-$areanames{de}->{497834} = "Wolfach";
-$areanames{de}->{497835} = "Zell\ am\ Harmersbach";
-$areanames{de}->{497836} = "Schiltach";
-$areanames{de}->{497837} = "Oberharmersbach";
-$areanames{de}->{497838} = "Nordrach";
-$areanames{de}->{497839} = "Schapbach";
-$areanames{de}->{497841} = "Achern";
-$areanames{de}->{497842} = "Kappelrodeck";
-$areanames{de}->{497843} = "Renchen";
-$areanames{de}->{497844} = "Rheinau";
-$areanames{de}->{497851} = "Kehl";
-$areanames{de}->{497852} = "Willstätt";
-$areanames{de}->{497853} = "Kehl\-Bodersweier";
-$areanames{de}->{497854} = "Kehl\-Goldscheuer";
-$areanames{de}->{497903} = "Mainhardt";
-$areanames{de}->{497904} = "Ilshofen";
-$areanames{de}->{497905} = "Langenburg";
-$areanames{de}->{497906} = "Braunsbach";
-$areanames{de}->{497907} = "Schwäbisch\ Hall\-Sulzdorf";
-$areanames{de}->{49791} = "Schwäbisch\ Hall";
-$areanames{de}->{497930} = "Boxberg\ Baden";
-$areanames{de}->{497931} = "Bad\ Mergentheim";
-$areanames{de}->{497932} = "Niederstetten\ Württemberg";
-$areanames{de}->{497933} = "Creglingen";
-$areanames{de}->{497934} = "Weikersheim";
-$areanames{de}->{497935} = "Schrozberg";
-$areanames{de}->{497936} = "Schrozberg\-Bartenstein";
-$areanames{de}->{497937} = "Dörzbach";
-$areanames{de}->{497938} = "Mulfingen\ Jagst";
-$areanames{de}->{497939} = "Schrozberg\-Spielbach";
-$areanames{de}->{497940} = "Künzelsau";
-$areanames{de}->{497941} = "Öhringen";
-$areanames{de}->{497942} = "Neuenstein\ Württemberg";
-$areanames{de}->{497943} = "Schöntal\ Jagst";
-$areanames{de}->{497944} = "Kupferzell";
-$areanames{de}->{497945} = "Wüstenrot";
-$areanames{de}->{497946} = "Bretzfeld";
-$areanames{de}->{497947} = "Forchtenberg";
-$areanames{de}->{497948} = "Öhringen\-Ohrnberg";
-$areanames{de}->{497949} = "Pfedelbach\-Untersteinbach";
-$areanames{de}->{497950} = "Schnelldorf";
-$areanames{de}->{497951} = "Crailsheim";
-$areanames{de}->{497952} = "Gerabronn";
-$areanames{de}->{497953} = "Blaufelden";
-$areanames{de}->{497954} = "Kirchberg\ an\ der\ Jagst";
-$areanames{de}->{497955} = "Wallhausen\ Württemberg";
-$areanames{de}->{497957} = "Kressberg";
-$areanames{de}->{497958} = "Rot\ Am\ See\-Brettheim";
-$areanames{de}->{497959} = "Frankenhardt";
-$areanames{de}->{497961} = "Ellwangen\ Jagst";
-$areanames{de}->{497962} = "Fichtenau";
-$areanames{de}->{497963} = "Adelmannsfelden";
-$areanames{de}->{497964} = "Stödtlen";
-$areanames{de}->{497965} = "Ellwangen\-Röhlingen";
-$areanames{de}->{497966} = "Unterschneidheim";
-$areanames{de}->{497967} = "Jagstzell";
-$areanames{de}->{497971} = "Gaildorf";
-$areanames{de}->{497972} = "Gschwend\ bei\ Gaildorf";
-$areanames{de}->{497973} = "Obersontheim";
-$areanames{de}->{497974} = "Bühlerzell";
-$areanames{de}->{497975} = "Untergröningen";
-$areanames{de}->{497976} = "Sulzbach\-Laufen";
-$areanames{de}->{497977} = "Oberrot\ bei\ Gaildorf";
-$areanames{de}->{498020} = "Weyarn";
-$areanames{de}->{498021} = "Waakirchen";
-$areanames{de}->{498022} = "Tegernsee";
-$areanames{de}->{498023} = "Bayrischzell";
-$areanames{de}->{498024} = "Holzkirchen";
-$areanames{de}->{498025} = "Miesbach";
-$areanames{de}->{498026} = "Hausham";
-$areanames{de}->{498027} = "Dietramszell";
-$areanames{de}->{498028} = "Fischbachau";
-$areanames{de}->{498029} = "Kreuth\ bei\ Tegernsee";
-$areanames{de}->{498031} = "Rosenheim\ Oberbayern";
-$areanames{de}->{498032} = "Rohrdorf\ Kreis\ Rosenheim";
-$areanames{de}->{498033} = "Oberaudorf";
-$areanames{de}->{498034} = "Brannenburg";
-$areanames{de}->{498035} = "Raubling";
-$areanames{de}->{498036} = "Stephanskirchen\ Simssee";
-$areanames{de}->{498038} = "Vogtareuth";
-$areanames{de}->{498039} = "Rott\ am\ Inn";
-$areanames{de}->{498041} = "Bad\ Tölz";
-$areanames{de}->{498042} = "Lenggries";
-$areanames{de}->{498043} = "Jachenau";
-$areanames{de}->{498045} = "Lenggries\-Fall";
-$areanames{de}->{498046} = "Bad\ Heilbrunn";
-$areanames{de}->{498051} = "Prien\ am\ Chiemsee";
-$areanames{de}->{498052} = "Aschau\ im\ Chiemgau";
-$areanames{de}->{498053} = "Bad\ Endorf";
-$areanames{de}->{498054} = "Breitbrunn\ am\ Chiemsee";
-$areanames{de}->{498055} = "Halfing";
-$areanames{de}->{498056} = "Eggstätt";
-$areanames{de}->{498057} = "Aschau\-Sachrang";
-$areanames{de}->{498061} = "Bad\ Aibling";
-$areanames{de}->{498062} = "Bruckmühl\ Mangfall";
-$areanames{de}->{498063} = "Feldkirchen\-Westerham";
-$areanames{de}->{498064} = "Au\ bei\ Bad\ Aibling";
-$areanames{de}->{498065} = "Tuntenhausen\-Schönau";
-$areanames{de}->{498066} = "Bad\ Feilnbach";
-$areanames{de}->{498067} = "Tuntenhausen";
-$areanames{de}->{498071} = "Wasserburg\ am\ Inn";
-$areanames{de}->{498072} = "Haag\ in\ Oberbayern";
-$areanames{de}->{498073} = "Gars\ am\ Inn";
-$areanames{de}->{498074} = "Schnaitsee";
-$areanames{de}->{498075} = "Amerang";
-$areanames{de}->{498076} = "Pfaffing";
-$areanames{de}->{498081} = "Dorfen\ Stadt";
-$areanames{de}->{498082} = "Schwindegg";
-$areanames{de}->{498083} = "Isen";
-$areanames{de}->{498084} = "Taufkirchen\ Vils";
-$areanames{de}->{498085} = "Sankt\ Wolfgang";
-$areanames{de}->{498086} = "Buchbach\ Oberbayern";
-$areanames{de}->{498091} = "Kirchseeon";
-$areanames{de}->{498092} = "Grafing\ bei\ München";
-$areanames{de}->{498093} = "Glonn\ Kreis\ Ebersberg";
-$areanames{de}->{498094} = "Steinhöring";
-$areanames{de}->{498095} = "Aying";
-$areanames{de}->{498102} = "Höhenkirchen\-Siegertsbrunn";
-$areanames{de}->{498104} = "Sauerlach";
-$areanames{de}->{498105} = "Gilching";
-$areanames{de}->{498106} = "Vaterstetten";
-$areanames{de}->{49811} = "Hallbergmoos";
-$areanames{de}->{498121} = "Markt\ Schwaben";
-$areanames{de}->{498122} = "Erding";
-$areanames{de}->{498123} = "Moosinning";
-$areanames{de}->{498124} = "Forstern\ Oberbayern";
-$areanames{de}->{498131} = "Dachau";
-$areanames{de}->{498133} = "Haimhausen\ Oberbayern";
-$areanames{de}->{498134} = "Odelzhausen";
-$areanames{de}->{498135} = "Sulzemoos";
-$areanames{de}->{498136} = "Markt\ Indersdorf";
-$areanames{de}->{498137} = "Petershausen";
-$areanames{de}->{498138} = "Schwabhausen\ bei\ Dachau";
-$areanames{de}->{498139} = "Röhrmoos";
-$areanames{de}->{498141} = "Fürstenfeldbruck";
-$areanames{de}->{498142} = "Olching";
-$areanames{de}->{498143} = "Inning\ am\ Ammersee";
-$areanames{de}->{498144} = "Grafrath";
-$areanames{de}->{498145} = "Mammendorf";
-$areanames{de}->{498146} = "Moorenweis";
-$areanames{de}->{498151} = "Starnberg";
-$areanames{de}->{498152} = "Herrsching\ am\ Ammersee";
-$areanames{de}->{498153} = "Wessling";
-$areanames{de}->{498157} = "Feldafing";
-$areanames{de}->{498158} = "Tutzing";
-$areanames{de}->{498161} = "Freising";
-$areanames{de}->{498165} = "Neufahrn\ bei\ Freising";
-$areanames{de}->{498166} = "Allershausen\ Oberbayern";
-$areanames{de}->{498167} = "Zolling";
-$areanames{de}->{498168} = "Attenkirchen";
-$areanames{de}->{498170} = "Straßlach\-Dingharting";
-$areanames{de}->{498171} = "Wolfratshausen";
-$areanames{de}->{498176} = "Egling\ bei\ Wolfratshausen";
-$areanames{de}->{498177} = "Münsing\ Starnberger\ See";
-$areanames{de}->{498178} = "Icking";
-$areanames{de}->{498179} = "Eurasburg\ an\ der\ Loisach";
-$areanames{de}->{498191} = "Landsberg\ am\ Lech";
-$areanames{de}->{498192} = "Schondorf\ am\ Ammersee";
-$areanames{de}->{498193} = "Geltendorf";
-$areanames{de}->{498194} = "Vilgertshofen";
-$areanames{de}->{498195} = "Weil\ Kreis\ Landsberg\ am\ Lech";
-$areanames{de}->{498196} = "Pürgen";
-$areanames{de}->{498202} = "Althegnenberg";
-$areanames{de}->{498203} = "Grossaitingen";
-$areanames{de}->{498204} = "Mickhausen";
-$areanames{de}->{498205} = "Dasing";
-$areanames{de}->{498206} = "Egling\ an\ der\ Paar";
-$areanames{de}->{498207} = "Affing";
-$areanames{de}->{498208} = "Eurasburg\ bei\ Augsburg";
-$areanames{de}->{49821} = "Augsburg";
-$areanames{de}->{498221} = "Günzburg";
-$areanames{de}->{498222} = "Burgau\ Schwaben";
-$areanames{de}->{498223} = "Ichenhausen";
-$areanames{de}->{498224} = "Offingen\ Donau";
-$areanames{de}->{498225} = "Jettingen\-Scheppach";
-$areanames{de}->{498226} = "Bibertal";
-$areanames{de}->{498230} = "Gablingen";
-$areanames{de}->{498231} = "Königsbrunn\ bei\ Augsburg";
-$areanames{de}->{498232} = "Schwabmünchen";
-$areanames{de}->{498233} = "Kissing";
-$areanames{de}->{498234} = "Bobingen";
-$areanames{de}->{498236} = "Fischach";
-$areanames{de}->{498237} = "Aindling";
-$areanames{de}->{498238} = "Gessertshausen";
-$areanames{de}->{498239} = "Langenneufnach";
-$areanames{de}->{498241} = "Buchloe";
-$areanames{de}->{498243} = "Fuchstal";
-$areanames{de}->{498245} = "Türkheim\ Wertach";
-$areanames{de}->{498246} = "Waal";
-$areanames{de}->{498247} = "Bad\ Wörishofen";
-$areanames{de}->{498248} = "Lamerdingen";
-$areanames{de}->{498249} = "Ettringen\ Wertach";
-$areanames{de}->{498250} = "Hilgertshausen\-Tandern";
-$areanames{de}->{498251} = "Aichach";
-$areanames{de}->{498252} = "Schrobenhausen";
-$areanames{de}->{498253} = "Pöttmes";
-$areanames{de}->{498254} = "Altomünster";
-$areanames{de}->{498257} = "Inchenhofen";
-$areanames{de}->{498258} = "Sielenbach";
-$areanames{de}->{498259} = "Schiltberg";
-$areanames{de}->{498261} = "Mindelheim";
-$areanames{de}->{498262} = "Mittelneufnach";
-$areanames{de}->{498263} = "Breitenbrunn\ Schwaben";
-$areanames{de}->{498265} = "Pfaffenhausen\ Schwaben";
-$areanames{de}->{498266} = "Kirchheim\ in\ Schwaben";
-$areanames{de}->{498267} = "Dirlewang";
-$areanames{de}->{498268} = "Tussenhausen";
-$areanames{de}->{498269} = "Unteregg\ bei\ Mindelheim";
-$areanames{de}->{498271} = "Meitingen";
-$areanames{de}->{498272} = "Wertingen";
-$areanames{de}->{498273} = "Nordendorf";
-$areanames{de}->{498274} = "Buttenwiesen";
-$areanames{de}->{498276} = "Baar\ Schwaben";
-$areanames{de}->{498281} = "Thannhausen\ Schwaben";
-$areanames{de}->{498282} = "Krumbach\ Schwaben";
-$areanames{de}->{498283} = "Neuburg\ an\ der\ Kammel";
-$areanames{de}->{498284} = "Ziemetshausen";
-$areanames{de}->{498285} = "Burtenbach";
-$areanames{de}->{498291} = "Zusmarshausen";
-$areanames{de}->{498292} = "Dinkelscherben";
-$areanames{de}->{498293} = "Welden\ bei\ Augsburg";
-$areanames{de}->{498294} = "Horgau";
-$areanames{de}->{498295} = "Altenmünster\ Schwaben";
-$areanames{de}->{498296} = "Villenbach";
-$areanames{de}->{498302} = "Görisried";
-$areanames{de}->{498303} = "Waltenhofen";
-$areanames{de}->{498304} = "Wildpoldsried";
-$areanames{de}->{498306} = "Ronsberg";
-$areanames{de}->{49831} = "Kempten\ Allgäu";
-$areanames{de}->{498320} = "Missen\-Wilhams";
-$areanames{de}->{498321} = "Sonthofen";
-$areanames{de}->{498322} = "Oberstdorf";
-$areanames{de}->{498323} = "Immenstadt\ im\ Allgäu";
-$areanames{de}->{498324} = "Hindelang";
-$areanames{de}->{498325} = "Oberstaufen\-Thalkirchdorf";
-$areanames{de}->{498326} = "Fischen\ im\ Allgäu";
-$areanames{de}->{498327} = "Rettenberg";
-$areanames{de}->{498328} = "Balderschwang";
-$areanames{de}->{498330} = "Legau";
-$areanames{de}->{498331} = "Memmingen";
-$areanames{de}->{498332} = "Ottobeuren";
-$areanames{de}->{498333} = "Babenhausen\ Schwaben";
-$areanames{de}->{498334} = "Bad\ Grönenbach";
-$areanames{de}->{498335} = "Fellheim";
-$areanames{de}->{498336} = "Erkheim";
-$areanames{de}->{498337} = "Altenstadt\ Iller";
-$areanames{de}->{498338} = "Böhen";
-$areanames{de}->{498340} = "Baisweil";
-$areanames{de}->{498341} = "Kaufbeuren";
-$areanames{de}->{498342} = "Marktoberdorf";
-$areanames{de}->{498343} = "Aitrang";
-$areanames{de}->{498344} = "Westendorf\ bei\ Kaufbeuren";
-$areanames{de}->{498345} = "Stöttwang";
-$areanames{de}->{498346} = "Pforzen";
-$areanames{de}->{498347} = "Friesenried";
-$areanames{de}->{498348} = "Bidingen";
-$areanames{de}->{498349} = "Stötten\ am\ Auerberg";
-$areanames{de}->{498361} = "Nesselwang";
-$areanames{de}->{498362} = "Füssen";
-$areanames{de}->{498363} = "Pfronten";
-$areanames{de}->{498364} = "Seeg";
-$areanames{de}->{498365} = "Wertach";
-$areanames{de}->{498366} = "Oy\-Mittelberg";
-$areanames{de}->{498367} = "Roßhaupten\ Forggensee";
-$areanames{de}->{498368} = "Halblech";
-$areanames{de}->{498369} = "Rückholz";
-$areanames{de}->{498370} = "Wiggensbach";
-$areanames{de}->{498372} = "Obergünzburg";
-$areanames{de}->{498373} = "Altusried";
-$areanames{de}->{498374} = "Dietmannsried";
-$areanames{de}->{498375} = "Weitnau";
-$areanames{de}->{498376} = "Sulzberg\ Allgäu";
-$areanames{de}->{498377} = "Unterthingau";
-$areanames{de}->{498378} = "Buchenberg\ bei\ Kempten";
-$areanames{de}->{498379} = "Waltenhofen\-Oberdorf";
-$areanames{de}->{498380} = "Achberg";
-$areanames{de}->{498381} = "Lindenberg\ im\ Allgäu";
-$areanames{de}->{498382} = "Lindau\ Bodensee";
-$areanames{de}->{498383} = "Grünenbach\ Allgäu";
-$areanames{de}->{498384} = "Röthenbach\ Allgäu";
-$areanames{de}->{498385} = "Hergatz";
-$areanames{de}->{498386} = "Oberstaufen";
-$areanames{de}->{498387} = "Weiler\-Simmerberg";
-$areanames{de}->{498388} = "Hergensweiler";
-$areanames{de}->{498389} = "Weissensberg";
-$areanames{de}->{498392} = "Markt\ Rettenbach";
-$areanames{de}->{498393} = "Holzgünz";
-$areanames{de}->{498394} = "Lautrach";
-$areanames{de}->{498395} = "Tannheim\ Württemberg";
-$areanames{de}->{498402} = "Münchsmünster";
-$areanames{de}->{498403} = "Pförring";
-$areanames{de}->{498404} = "Oberdolling";
-$areanames{de}->{498405} = "Stammham\ bei\ Ingolstadt";
-$areanames{de}->{498406} = "Böhmfeld";
-$areanames{de}->{498407} = "Grossmehring";
-$areanames{de}->{49841} = "Ingolstadt\ Donau";
-$areanames{de}->{498421} = "Eichstätt\ Bayern";
-$areanames{de}->{498422} = "Dollnstein";
-$areanames{de}->{498423} = "Titting";
-$areanames{de}->{498424} = "Nassenfels";
-$areanames{de}->{498426} = "Walting\ Kreis\ Eichstätt";
-$areanames{de}->{498427} = "Wellheim";
-$areanames{de}->{498431} = "Neuburg\ an\ der\ Donau";
-$areanames{de}->{498432} = "Burgheim";
-$areanames{de}->{498433} = "Königsmoos";
-$areanames{de}->{498434} = "Rennertshofen";
-$areanames{de}->{498435} = "Ehekirchen";
-$areanames{de}->{498441} = "Pfaffenhofen\ an\ der\ Ilm";
-$areanames{de}->{498442} = "Wolnzach";
-$areanames{de}->{498443} = "Hohenwart\ Paar";
-$areanames{de}->{498444} = "Schweitenkirchen";
-$areanames{de}->{498445} = "Gerolsbach";
-$areanames{de}->{498446} = "Pörnbach";
-$areanames{de}->{498450} = "Ingolstadt\-Zuchering";
-$areanames{de}->{498452} = "Geisenfeld";
-$areanames{de}->{498453} = "Reichertshofen\ Oberbayern";
-$areanames{de}->{498454} = "Karlshuld";
-$areanames{de}->{498456} = "Lenting";
-$areanames{de}->{498457} = "Vohburg\ an\ der\ Donau";
-$areanames{de}->{498458} = "Gaimersheim";
-$areanames{de}->{498459} = "Manching";
-$areanames{de}->{498460} = "Berching\-Holnstein";
-$areanames{de}->{498461} = "Beilngries";
-$areanames{de}->{498462} = "Berching";
-$areanames{de}->{498463} = "Greding";
-$areanames{de}->{498464} = "Dietfurt\ an\ der\ Altmühl";
-$areanames{de}->{498465} = "Kipfenberg";
-$areanames{de}->{498466} = "Denkendorf\ Oberbayern";
-$areanames{de}->{498467} = "Kinding";
-$areanames{de}->{498468} = "Altmannstein\-Pondorf";
-$areanames{de}->{498469} = "Freystadt\-Burggriesbach";
-$areanames{de}->{498501} = "Thyrnau";
-$areanames{de}->{498502} = "Fürstenzell";
-$areanames{de}->{498503} = "Neuhaus\ am\ Inn";
-$areanames{de}->{498504} = "Tittling";
-$areanames{de}->{498505} = "Hutthurm";
-$areanames{de}->{498506} = "Bad\ Höhenstadt";
-$areanames{de}->{498507} = "Neuburg\ am\ Inn";
-$areanames{de}->{498509} = "Ruderting";
-$areanames{de}->{49851} = "Passau";
-$areanames{de}->{498531} = "Pocking";
-$areanames{de}->{498532} = "Griesbach\ im\ Rottal";
-$areanames{de}->{498533} = "Rotthalmünster";
-$areanames{de}->{498534} = "Tettenweis";
-$areanames{de}->{498535} = "Haarbach";
-$areanames{de}->{498536} = "Kößlarn";
-$areanames{de}->{498537} = "Bad\ Füssing\-Aigen";
-$areanames{de}->{498538} = "Pocking\-Hartkirchen";
-$areanames{de}->{498541} = "Vilshofen\ Niederbayern";
-$areanames{de}->{498542} = "Ortenburg";
-$areanames{de}->{498543} = "Aidenbach";
-$areanames{de}->{498544} = "Eging\ am\ See";
-$areanames{de}->{498545} = "Hofkirchen\ Bayern";
-$areanames{de}->{498546} = "Windorf\-Otterskirchen";
-$areanames{de}->{498547} = "Osterhofen\-Gergweis";
-$areanames{de}->{498548} = "Vilshofen\-Sandbach";
-$areanames{de}->{498549} = "Vilshofen\-Pleinting";
-$areanames{de}->{498550} = "Philippsreut";
-$areanames{de}->{498551} = "Freyung";
-$areanames{de}->{498552} = "Grafenau\ Niederbayern";
-$areanames{de}->{498553} = "Spiegelau";
-$areanames{de}->{498554} = "Schönberg\ Niederbayern";
-$areanames{de}->{498555} = "Perlesreut";
-$areanames{de}->{498556} = "Haidmühle";
-$areanames{de}->{498557} = "Mauth";
-$areanames{de}->{498558} = "Hohenau\ Niederbayern";
-$areanames{de}->{498561} = "Pfarrkirchen\ Niederbayern";
-$areanames{de}->{498562} = "Triftern";
-$areanames{de}->{498563} = "Bad\ Birnbach\ Rottal";
-$areanames{de}->{498564} = "Johanniskirchen";
-$areanames{de}->{498565} = "Dietersburg\-Baumgarten";
-$areanames{de}->{498571} = "Simbach\ am\ Inn";
-$areanames{de}->{498572} = "Tann\ Niederbayern";
-$areanames{de}->{498573} = "Ering";
-$areanames{de}->{498574} = "Wittibreut";
-$areanames{de}->{498581} = "Waldkirchen\ Niederbayern";
-$areanames{de}->{498582} = "Röhrnbach";
-$areanames{de}->{498583} = "Neureichenau";
-$areanames{de}->{498584} = "Breitenberg\ Niederbayern";
-$areanames{de}->{498585} = "Grainet";
-$areanames{de}->{498586} = "Hauzenberg";
-$areanames{de}->{498591} = "Obernzell";
-$areanames{de}->{498592} = "Wegscheid\ Niederbayern";
-$areanames{de}->{498593} = "Untergriesbach";
-$areanames{de}->{49861} = "Traunstein";
-$areanames{de}->{498621} = "Trostberg";
-$areanames{de}->{498622} = "Tacherting\-Peterskirchen";
-$areanames{de}->{498623} = "Kirchweidach";
-$areanames{de}->{498624} = "Obing";
-$areanames{de}->{498628} = "Kienberg\ Oberbayern";
-$areanames{de}->{498629} = "Palling";
-$areanames{de}->{498630} = "Oberneukirchen";
-$areanames{de}->{498631} = "Mühldorf\ am\ Inn";
-$areanames{de}->{498633} = "Tüßling";
-$areanames{de}->{498634} = "Garching\ an\ der\ Alz";
-$areanames{de}->{498635} = "Pleiskirchen";
-$areanames{de}->{498636} = "Ampfing";
-$areanames{de}->{498637} = "Lohkirchen";
-$areanames{de}->{498638} = "Waldkraiburg";
-$areanames{de}->{498639} = "Neumarkt\-Sankt\ Veit";
-$areanames{de}->{498640} = "Reit\ Im\ Winkl";
-$areanames{de}->{498641} = "Grassau\ Kreis\ Traunstein";
-$areanames{de}->{498642} = "Übersee";
-$areanames{de}->{498649} = "Schleching";
-$areanames{de}->{498650} = "Marktschellenberg";
-$areanames{de}->{498651} = "Bad\ Reichenhall";
-$areanames{de}->{498652} = "Berchtesgaden";
-$areanames{de}->{498654} = "Freilassing";
-$areanames{de}->{498656} = "Anger";
-$areanames{de}->{498657} = "Ramsau\ bei\ Berchtesgaden";
-$areanames{de}->{498661} = "Grabenstätt\ Chiemsee";
-$areanames{de}->{498662} = "Siegsdorf\ Kreis\ Traunstein";
-$areanames{de}->{498663} = "Ruhpolding";
-$areanames{de}->{498664} = "Chieming";
-$areanames{de}->{498665} = "Inzell";
-$areanames{de}->{498666} = "Teisendorf";
-$areanames{de}->{498667} = "Seeon\-Seebruck";
-$areanames{de}->{498669} = "Traunreut";
-$areanames{de}->{498670} = "Reischach\ Kreis\ Altötting";
-$areanames{de}->{498671} = "Altötting";
-$areanames{de}->{498677} = "Burghausen\ Salzach";
-$areanames{de}->{498678} = "Marktl";
-$areanames{de}->{498679} = "Burgkirchen\ an\ der\ Alz";
-$areanames{de}->{498681} = "Waging\ am\ See";
-$areanames{de}->{498682} = "Laufen\ Salzach";
-$areanames{de}->{498683} = "Tittmoning";
-$areanames{de}->{498684} = "Fridolfing";
-$areanames{de}->{498685} = "Kirchanschöring";
-$areanames{de}->{498686} = "Petting";
-$areanames{de}->{498687} = "Taching\-Tengling";
-$areanames{de}->{498702} = "Wörth\ an\ der\ Isar";
-$areanames{de}->{498703} = "Essenbach";
-$areanames{de}->{498704} = "Altdorf\-Pfettrach";
-$areanames{de}->{498705} = "Altfraunhofen";
-$areanames{de}->{498706} = "Vilsheim";
-$areanames{de}->{498707} = "Adlkofen";
-$areanames{de}->{498708} = "Weihmichl\-Unterneuhausen";
-$areanames{de}->{498709} = "Eching\ Niederbayern";
-$areanames{de}->{49871} = "Landshut";
-$areanames{de}->{498721} = "Eggenfelden";
-$areanames{de}->{498722} = "Gangkofen";
-$areanames{de}->{498723} = "Arnstorf";
-$areanames{de}->{498724} = "Massing";
-$areanames{de}->{498725} = "Wurmannsquick";
-$areanames{de}->{498726} = "Schönau\ Niederbayern";
-$areanames{de}->{498727} = "Falkenberg\ Niederbayern";
-$areanames{de}->{498728} = "Geratskirchen";
-$areanames{de}->{498731} = "Dingolfing";
-$areanames{de}->{498732} = "Frontenhausen";
-$areanames{de}->{498733} = "Mengkofen";
-$areanames{de}->{498734} = "Reisbach\ Niederbayern";
-$areanames{de}->{498735} = "Gangkofen\-Kollbach";
-$areanames{de}->{498741} = "Vilsbiburg";
-$areanames{de}->{498742} = "Velden\ Vils";
-$areanames{de}->{498743} = "Geisenhausen";
-$areanames{de}->{498744} = "Gerzen";
-$areanames{de}->{498745} = "Bodenkirchen";
-$areanames{de}->{498751} = "Mainburg";
-$areanames{de}->{498752} = "Au\ in\ der\ Hallertau";
-$areanames{de}->{498753} = "Elsendorf\ Niederbayern";
-$areanames{de}->{498754} = "Volkenschwand";
-$areanames{de}->{498756} = "Nandlstadt";
-$areanames{de}->{498761} = "Moosburg\ an\ der\ Isar";
-$areanames{de}->{498762} = "Wartenberg\ Oberbayern";
-$areanames{de}->{498764} = "Mauern\ Kreis\ Freising";
-$areanames{de}->{498765} = "Bruckberg\ Niederbayern";
-$areanames{de}->{498766} = "Gammelsdorf";
-$areanames{de}->{498771} = "Ergoldsbach";
-$areanames{de}->{498772} = "Mallersdorf\-Pfaffenberg";
-$areanames{de}->{498773} = "Neufahrn\ in\ Niederbayern";
-$areanames{de}->{498774} = "Bayerbach\ bei\ Ergoldsbach";
-$areanames{de}->{498781} = "Rottenburg\ an\ der\ Laaber";
-$areanames{de}->{498782} = "Pfeffenhausen";
-$areanames{de}->{498783} = "Rohr\ in\ Niederbayern";
-$areanames{de}->{498784} = "Hohenthann";
-$areanames{de}->{498785} = "Rottenburg\-Oberroning";
-$areanames{de}->{498801} = "Seeshaupt";
-$areanames{de}->{498802} = "Huglfing";
-$areanames{de}->{498803} = "Peissenberg";
-$areanames{de}->{498805} = "Hohenpeissenberg";
-$areanames{de}->{498806} = "Utting\ am\ Ammersee";
-$areanames{de}->{498807} = "Dießen\ am\ Ammersee";
-$areanames{de}->{498808} = "Pähl";
-$areanames{de}->{498809} = "Wessobrunn";
-$areanames{de}->{49881} = "Weilheim\ in\ Oberbayern";
-$areanames{de}->{498821} = "Garmisch\-Partenkirchen";
-$areanames{de}->{498822} = "Oberammergau";
-$areanames{de}->{498823} = "Mittenwald";
-$areanames{de}->{498824} = "Oberau\ Loisach";
-$areanames{de}->{498825} = "Krün";
-$areanames{de}->{498841} = "Murnau\ am\ Staffelsee";
-$areanames{de}->{498845} = "Bad\ Kohlgrub";
-$areanames{de}->{498846} = "Uffing\ am\ Staffelsee";
-$areanames{de}->{498847} = "Obersöchering";
-$areanames{de}->{498851} = "Kochel\ am\ See";
-$areanames{de}->{498856} = "Penzberg";
-$areanames{de}->{498857} = "Benediktbeuern";
-$areanames{de}->{498858} = "Kochel\-Walchensee";
-$areanames{de}->{498860} = "Bernbeuren";
-$areanames{de}->{498861} = "Schongau";
-$areanames{de}->{498862} = "Steingaden\ Oberbayern";
-$areanames{de}->{498867} = "Rottenbuch\ Oberbayern";
-$areanames{de}->{498868} = "Schwabsoien";
-$areanames{de}->{498869} = "Kinsau";
-$areanames{de}->{4989} = "München";
-$areanames{de}->{49906} = "Donauwörth";
-$areanames{de}->{499070} = "Tapfheim";
-$areanames{de}->{499071} = "Dillingen\ an\ der\ Donau";
-$areanames{de}->{499072} = "Lauingen\ Donau";
-$areanames{de}->{499073} = "Gundelfingen\ an\ der\ Donau";
-$areanames{de}->{499074} = "Höchstädt\ an\ der\ Donau";
-$areanames{de}->{499075} = "Glött";
-$areanames{de}->{499076} = "Wittislingen";
-$areanames{de}->{499077} = "Bachhagel";
-$areanames{de}->{499078} = "Mertingen";
-$areanames{de}->{499080} = "Harburg\ Schwaben";
-$areanames{de}->{499081} = "Nördlingen";
-$areanames{de}->{499082} = "Oettingen\ in\ Bayern";
-$areanames{de}->{499083} = "Möttingen";
-$areanames{de}->{499084} = "Bissingen\ Schwaben";
-$areanames{de}->{499085} = "Alerheim";
-$areanames{de}->{499086} = "Fremdingen";
-$areanames{de}->{499087} = "Marktoffingen";
-$areanames{de}->{499088} = "Mönchsdeggingen";
-$areanames{de}->{499089} = "Bissingen\-Unterringingen";
-$areanames{de}->{499090} = "Rain\ Lech";
-$areanames{de}->{499091} = "Monheim\ Schwaben";
-$areanames{de}->{499092} = "Wemding";
-$areanames{de}->{499093} = "Polsingen";
-$areanames{de}->{499094} = "Tagmersheim";
-$areanames{de}->{499097} = "Marxheim";
-$areanames{de}->{499099} = "Kaisheim";
-$areanames{de}->{499101} = "Langenzenn";
-$areanames{de}->{499102} = "Wilhermsdorf";
-$areanames{de}->{499103} = "Cadolzburg";
-$areanames{de}->{499104} = "Emskirchen";
-$areanames{de}->{499105} = "Grosshabersdorf";
-$areanames{de}->{499106} = "Markt\ Erlbach";
-$areanames{de}->{499107} = "Trautskirchen";
-$areanames{de}->{49911} = "Nürnberg";
-$areanames{de}->{499120} = "Leinburg";
-$areanames{de}->{499122} = "Schwabach";
-$areanames{de}->{499123} = "Lauf\ an\ der\ Pegnitz";
-$areanames{de}->{499126} = "Eckental";
-$areanames{de}->{499127} = "Rosstal\ Mittelfrankenanken";
-$areanames{de}->{499128} = "Feucht";
-$areanames{de}->{499129} = "Wendelstein";
-$areanames{de}->{499131} = "Erlangen";
-$areanames{de}->{499132} = "Herzogenaurach";
-$areanames{de}->{499133} = "Baiersdorf\ Mittelfrankenanken";
-$areanames{de}->{499134} = "Neunkirchen\ am\ Brand";
-$areanames{de}->{499135} = "Heßdorf\ Mittelfrankenanken";
-$areanames{de}->{499141} = "Weißenburg\ in\ Bayern";
-$areanames{de}->{499142} = "Treuchtlingen";
-$areanames{de}->{499143} = "Pappenheim\ Mittelfranken";
-$areanames{de}->{499144} = "Pleinfeld";
-$areanames{de}->{499145} = "Solnhofen";
-$areanames{de}->{499146} = "Markt\ Berolzheim";
-$areanames{de}->{499147} = "Nennslingen";
-$areanames{de}->{499148} = "Ettenstatt";
-$areanames{de}->{499149} = "Weissenburg\-Suffersheim";
-$areanames{de}->{499151} = "Hersbruck";
-$areanames{de}->{499152} = "Hartenstein\ Mittelfranken";
-$areanames{de}->{499153} = "Schnaittach";
-$areanames{de}->{499154} = "Pommelsbrunn";
-$areanames{de}->{499155} = "Simmelsdorf";
-$areanames{de}->{499156} = "Neuhaus\ an\ der\ Pegnitz";
-$areanames{de}->{499157} = "Alfeld\ Mittelfranken";
-$areanames{de}->{499158} = "Offenhausen\ Mittelfranken";
-$areanames{de}->{499161} = "Neustadt\ an\ der\ Aisch";
-$areanames{de}->{499162} = "Scheinfeld";
-$areanames{de}->{499163} = "Dachsbach";
-$areanames{de}->{499164} = "Langenfeld\ Mittelfranken";
-$areanames{de}->{499165} = "Sugenheim";
-$areanames{de}->{499166} = "Münchsteinach";
-$areanames{de}->{499167} = "Oberscheinfeld";
-$areanames{de}->{499170} = "Schwanstetten";
-$areanames{de}->{499171} = "Roth\ Mittelfranken";
-$areanames{de}->{499172} = "Georgensgmünd";
-$areanames{de}->{499173} = "Thalmässing";
-$areanames{de}->{499174} = "Hilpoltstein";
-$areanames{de}->{499175} = "Spalt";
-$areanames{de}->{499176} = "Allersberg";
-$areanames{de}->{499177} = "Heideck";
-$areanames{de}->{499178} = "Abenberg\ Mittelfranken";
-$areanames{de}->{499179} = "Freystadt";
-$areanames{de}->{499180} = "Pyrbaum";
-$areanames{de}->{499181} = "Neumarkt\ in\ der\ Oberpfalz";
-$areanames{de}->{499182} = "Velburg";
-$areanames{de}->{499183} = "Burgthann";
-$areanames{de}->{499184} = "Deining\ Oberpfalz";
-$areanames{de}->{499185} = "Mühlhausen\ Oberpfalz";
-$areanames{de}->{499186} = "Lauterhofen\ Oberpfalz";
-$areanames{de}->{499187} = "Altdorf\ bei\ Nürnberg";
-$areanames{de}->{499188} = "Postbauer\-Heng";
-$areanames{de}->{499189} = "Berg\ bei\ Neumarkt\ in\ der\ Oberpfalz";
-$areanames{de}->{499190} = "Heroldsbach";
-$areanames{de}->{499191} = "Forchheim\ Oberfranken";
-$areanames{de}->{499192} = "Gräfenberg";
-$areanames{de}->{499193} = "Höchstadt\ an\ der\ Aisch";
-$areanames{de}->{499194} = "Ebermannstadt";
-$areanames{de}->{499195} = "Adelsdorf\ Mittelfranken";
-$areanames{de}->{499196} = "Wiesenttal";
-$areanames{de}->{499197} = "Egloffstein";
-$areanames{de}->{499198} = "Heiligenstadt\ in\ Oberfranken";
-$areanames{de}->{499199} = "Kunreuth";
-$areanames{de}->{499201} = "Gesees";
-$areanames{de}->{499202} = "Waischenfeld";
-$areanames{de}->{499203} = "Neudrossenfeld";
-$areanames{de}->{499204} = "Plankenfels";
-$areanames{de}->{499205} = "Vorbach";
-$areanames{de}->{499206} = "Mistelgau\-Obernsees";
-$areanames{de}->{499207} = "Königsfeld\ Oberfranken";
-$areanames{de}->{499208} = "Bindlach";
-$areanames{de}->{499209} = "Emtmannsberg";
-$areanames{de}->{49921} = "Bayreuth";
-$areanames{de}->{499220} = "Kasendorf\-Azendorf";
-$areanames{de}->{499221} = "Kulmbach";
-$areanames{de}->{499222} = "Presseck";
-$areanames{de}->{499223} = "Rugendorf";
-$areanames{de}->{499225} = "Stadtsteinach";
-$areanames{de}->{499227} = "Neuenmarkt";
-$areanames{de}->{499228} = "Thurnau";
-$areanames{de}->{499229} = "Mainleus";
-$areanames{de}->{499231} = "Marktredwitz";
-$areanames{de}->{499232} = "Wunsiedel";
-$areanames{de}->{499233} = "Arzberg\ Oberfranken";
-$areanames{de}->{499234} = "Neusorg";
-$areanames{de}->{499235} = "Thierstein";
-$areanames{de}->{499236} = "Nagel";
-$areanames{de}->{499238} = "Röslau";
-$areanames{de}->{499241} = "Pegnitz";
-$areanames{de}->{499242} = "Gößweinstein";
-$areanames{de}->{499243} = "Pottenstein";
-$areanames{de}->{499244} = "Betzenstein";
-$areanames{de}->{499245} = "Obertrubach";
-$areanames{de}->{499246} = "Pegnitz\-Trockau";
-$areanames{de}->{499251} = "Münchberg";
-$areanames{de}->{499252} = "Helmbrechts";
-$areanames{de}->{499253} = "Weissenstadt";
-$areanames{de}->{499254} = "Gefrees";
-$areanames{de}->{499255} = "Marktleugast";
-$areanames{de}->{499256} = "Stammbach";
-$areanames{de}->{499257} = "Zell\ Oberfranken";
-$areanames{de}->{499260} = "Wilhelmsthal\ Oberfranken";
-$areanames{de}->{499261} = "Kronach";
-$areanames{de}->{499262} = "Wallenfels";
-$areanames{de}->{499263} = "Ludwigsstadt";
-$areanames{de}->{499264} = "Küps";
-$areanames{de}->{499265} = "Pressig";
-$areanames{de}->{499266} = "Mitwitz";
-$areanames{de}->{499267} = "Nordhalben";
-$areanames{de}->{499268} = "Teuschnitz";
-$areanames{de}->{499269} = "Tettau\ Kreis\ Kronach";
-$areanames{de}->{499270} = "Creussen";
-$areanames{de}->{499271} = "Thurnau\-Alladorf";
-$areanames{de}->{499272} = "Fichtelberg";
-$areanames{de}->{499273} = "Bad\ Berneck\ im\ Fichtelgebirge";
-$areanames{de}->{499274} = "Hollfeld";
-$areanames{de}->{499275} = "Speichersdorf";
-$areanames{de}->{499276} = "Bischofsgrün";
-$areanames{de}->{499277} = "Warmensteinach";
-$areanames{de}->{499278} = "Weidenberg";
-$areanames{de}->{499279} = "Mistelgau";
-$areanames{de}->{499280} = "Selbitz\ Oberfranken";
-$areanames{de}->{499281} = "Hof\ Saale";
-$areanames{de}->{499282} = "Naila";
-$areanames{de}->{499283} = "Rehau";
-$areanames{de}->{499284} = "Schwarzenbach\ an\ der\ Saale";
-$areanames{de}->{499285} = "Kirchenlamitz";
-$areanames{de}->{499286} = "Oberkotzau";
-$areanames{de}->{499287} = "Selb";
-$areanames{de}->{499288} = "Bad\ Steben";
-$areanames{de}->{499289} = "Schwarzenbach\ am\ Wald";
-$areanames{de}->{499292} = "Konradsreuth";
-$areanames{de}->{499293} = "Berg\ Oberfranken";
-$areanames{de}->{499294} = "Regnitzlosau";
-$areanames{de}->{499295} = "Töpen";
-$areanames{de}->{499302} = "Rottendorf\ Unterfranken";
-$areanames{de}->{499303} = "Eibelstadt";
-$areanames{de}->{499305} = "Estenfeld";
-$areanames{de}->{499306} = "Kist";
-$areanames{de}->{499307} = "Altertheim";
-$areanames{de}->{49931} = "Würzburg";
-$areanames{de}->{499321} = "Kitzingen";
-$areanames{de}->{499323} = "Iphofen";
-$areanames{de}->{499324} = "Dettelbach";
-$areanames{de}->{499325} = "Kleinlangheim";
-$areanames{de}->{499326} = "Markt\ Einersheim";
-$areanames{de}->{499331} = "Ochsenfurt";
-$areanames{de}->{499332} = "Marktbreit";
-$areanames{de}->{499333} = "Sommerhausen";
-$areanames{de}->{499334} = "Giebelstadt";
-$areanames{de}->{499335} = "Aub\ Kreis\ Würzburg";
-$areanames{de}->{499336} = "Bütthard";
-$areanames{de}->{499337} = "Gaukönigshofen";
-$areanames{de}->{499338} = "Röttingen\ Unterfranken";
-$areanames{de}->{499339} = "Ippesheim";
-$areanames{de}->{499340} = "Königheim\-Brehmen";
-$areanames{de}->{499341} = "Tauberbischofsheim";
-$areanames{de}->{499342} = "Wertheim";
-$areanames{de}->{499343} = "Lauda\-Königshofen";
-$areanames{de}->{499344} = "Gerchsheim";
-$areanames{de}->{499345} = "Külsheim\ Baden";
-$areanames{de}->{499346} = "Grünsfeld";
-$areanames{de}->{499347} = "Wittighausen";
-$areanames{de}->{499348} = "Werbach\-Gamburg";
-$areanames{de}->{499349} = "Werbach\-Wenkheim";
-$areanames{de}->{499350} = "Eussenheim\-Hundsbach";
-$areanames{de}->{499351} = "Gemünden\ am\ Main";
-$areanames{de}->{499352} = "Lohr\ am\ Main";
-$areanames{de}->{499353} = "Karlstadt";
-$areanames{de}->{499354} = "Rieneck";
-$areanames{de}->{499355} = "Frammersbach";
-$areanames{de}->{499356} = "Burgsinn";
-$areanames{de}->{499357} = "Gräfendorf\ Bayern";
-$areanames{de}->{499358} = "Gössenheim";
-$areanames{de}->{499359} = "Karlstadt\-Wiesenfeld";
-$areanames{de}->{499360} = "Thüngen";
-$areanames{de}->{499363} = "Arnstein\ Unterfranken";
-$areanames{de}->{499364} = "Zellingen";
-$areanames{de}->{499365} = "Rimpar";
-$areanames{de}->{499366} = "Geroldshausen\ Unterfranken";
-$areanames{de}->{499367} = "Unterpleichfeld";
-$areanames{de}->{499369} = "Uettingen";
-$areanames{de}->{499371} = "Miltenberg";
-$areanames{de}->{499372} = "Klingenberg\ am\ Main";
-$areanames{de}->{499373} = "Amorbach";
-$areanames{de}->{499374} = "Eschau";
-$areanames{de}->{499375} = "Freudenberg\ Baden";
-$areanames{de}->{499376} = "Collenberg";
-$areanames{de}->{499377} = "Freudenberg\-Boxtal";
-$areanames{de}->{499378} = "Eichenbühl\-Riedern";
-$areanames{de}->{499381} = "Volkach";
-$areanames{de}->{499382} = "Gerolzhofen";
-$areanames{de}->{499383} = "Wiesentheid";
-$areanames{de}->{499384} = "Schwanfeld";
-$areanames{de}->{499385} = "Kolitzheim";
-$areanames{de}->{499386} = "Prosselsheim";
-$areanames{de}->{499391} = "Marktheidenfeld";
-$areanames{de}->{499392} = "Faulbach\ Unterfranken";
-$areanames{de}->{499393} = "Rothenfels\ Unterfranken";
-$areanames{de}->{499394} = "Esselbach";
-$areanames{de}->{499395} = "Triefenstein";
-$areanames{de}->{499396} = "Urspringen\ bei\ Lohr";
-$areanames{de}->{499397} = "Wertheim\-Dertingen";
-$areanames{de}->{499398} = "Birkenfeld\ bei\ Würzburg";
-$areanames{de}->{499401} = "Neutraubling";
-$areanames{de}->{499402} = "Regenstauf";
-$areanames{de}->{499403} = "Donaustauf";
-$areanames{de}->{499404} = "Nittendorf";
-$areanames{de}->{499405} = "Bad\ Abbach";
-$areanames{de}->{499406} = "Mintraching";
-$areanames{de}->{499407} = "Wenzenbach";
-$areanames{de}->{499408} = "Altenthann";
-$areanames{de}->{499409} = "Pielenhofen";
-$areanames{de}->{49941} = "Regensburg";
-$areanames{de}->{499420} = "Feldkirchen\ Niederbayern";
-$areanames{de}->{499421} = "Straubing";
-$areanames{de}->{499422} = "Bogen\ Niederbayern";
-$areanames{de}->{499423} = "Geiselhöring";
-$areanames{de}->{499424} = "Strasskirchen";
-$areanames{de}->{499426} = "Oberschneiding";
-$areanames{de}->{499427} = "Leiblfing";
-$areanames{de}->{499428} = "Kirchroth";
-$areanames{de}->{499429} = "Rain\ Niederbayern";
-$areanames{de}->{499431} = "Schwandorf";
-$areanames{de}->{499433} = "Nabburg";
-$areanames{de}->{499434} = "Bodenwöhr";
-$areanames{de}->{499435} = "Schwarzenfeld";
-$areanames{de}->{499436} = "Nittenau";
-$areanames{de}->{499438} = "Fensterbach";
-$areanames{de}->{499439} = "Neunburg\-Kemnath";
-$areanames{de}->{499441} = "Kelheim";
-$areanames{de}->{499442} = "Riedenburg";
-$areanames{de}->{499443} = "Abensberg";
-$areanames{de}->{499444} = "Siegenburg";
-$areanames{de}->{499445} = "Neustadt\ an\ der\ Donau";
-$areanames{de}->{499446} = "Altmannstein";
-$areanames{de}->{499447} = "Essing";
-$areanames{de}->{499448} = "Hausen\ Niederbayern";
-$areanames{de}->{499451} = "Schierling";
-$areanames{de}->{499452} = "Langquaid";
-$areanames{de}->{499453} = "Thalmassing";
-$areanames{de}->{499454} = "Aufhausen\ Oberpfalz";
-$areanames{de}->{499461} = "Roding";
-$areanames{de}->{499462} = "Falkenstein\ Oberpfalz";
-$areanames{de}->{499463} = "Wald\ Oberpfalz";
-$areanames{de}->{499464} = "Walderbach";
-$areanames{de}->{499465} = "Neukirchen\-Balbini";
-$areanames{de}->{499466} = "Stamsried";
-$areanames{de}->{499467} = "Michelsneukirchen";
-$areanames{de}->{499468} = "Zell\ Oberpfalz";
-$areanames{de}->{499469} = "Roding\-Neubäu";
-$areanames{de}->{499471} = "Burglengenfeld";
-$areanames{de}->{499472} = "Hohenfels\ Oberpfalz";
-$areanames{de}->{499473} = "Kallmünz";
-$areanames{de}->{499474} = "Schmidmühlen";
-$areanames{de}->{499480} = "Sünching";
-$areanames{de}->{499481} = "Pfatter";
-$areanames{de}->{499482} = "Wörth\ an\ der\ Donau";
-$areanames{de}->{499484} = "Brennberg";
-$areanames{de}->{499491} = "Hemau";
-$areanames{de}->{499492} = "Parsberg";
-$areanames{de}->{499493} = "Beratzhausen";
-$areanames{de}->{499495} = "Breitenbrunn\ Oberpfalz";
-$areanames{de}->{499497} = "Seubersdorf\ in\ der\ Oberpfalz";
-$areanames{de}->{499498} = "Laaber";
-$areanames{de}->{499499} = "Painten";
-$areanames{de}->{499502} = "Frensdorf";
-$areanames{de}->{499503} = "Oberhaid\ Oberfranken";
-$areanames{de}->{499504} = "Stadelhofen";
-$areanames{de}->{499505} = "Litzendorf";
-$areanames{de}->{49951} = "Bamberg";
-$areanames{de}->{499521} = "Hassfurt";
-$areanames{de}->{499522} = "Eltmann";
-$areanames{de}->{499523} = "Hofheim\ in\ Unterfranken";
-$areanames{de}->{499524} = "Zeil\ am\ Main";
-$areanames{de}->{499525} = "Königsberg\ in\ Bayern";
-$areanames{de}->{499526} = "Riedbach";
-$areanames{de}->{499527} = "Knetzgau";
-$areanames{de}->{499528} = "Donnersdorf";
-$areanames{de}->{499529} = "Oberaurach";
-$areanames{de}->{499531} = "Ebern";
-$areanames{de}->{499532} = "Maroldsweisach";
-$areanames{de}->{499533} = "Untermerzbach";
-$areanames{de}->{499534} = "Burgpreppach";
-$areanames{de}->{499535} = "Pfarrweisach";
-$areanames{de}->{499536} = "Kirchlauter";
-$areanames{de}->{499542} = "Schesslitz";
-$areanames{de}->{499543} = "Hirschaid";
-$areanames{de}->{499544} = "Baunach";
-$areanames{de}->{499545} = "Buttenheim";
-$areanames{de}->{499546} = "Burgebrach";
-$areanames{de}->{499547} = "Zapfendorf";
-$areanames{de}->{499548} = "Mühlhausen\ Mittelfranken";
-$areanames{de}->{499549} = "Lisberg";
-$areanames{de}->{499551} = "Burgwindheim";
-$areanames{de}->{499552} = "Burghaslach";
-$areanames{de}->{499553} = "Ebrach\ Oberfranken";
-$areanames{de}->{499554} = "Untersteinbach\ Unterfranken";
-$areanames{de}->{499555} = "Schlüsselfeld\-Aschbach";
-$areanames{de}->{499556} = "Geiselwind";
-$areanames{de}->{499560} = "Grub\ am\ Forst";
-$areanames{de}->{499561} = "Coburg";
-$areanames{de}->{499562} = "Sonnefeld";
-$areanames{de}->{499563} = "Rödental";
-$areanames{de}->{499564} = "Bad\ Rodach";
-$areanames{de}->{499565} = "Untersiemau";
-$areanames{de}->{499566} = "Meeder";
-$areanames{de}->{499567} = "Seßlach\-Gemünda";
-$areanames{de}->{499568} = "Neustadt\ bei\ Coburg";
-$areanames{de}->{499569} = "Sesslach";
-$areanames{de}->{499571} = "Lichtenfels\ Bayern";
-$areanames{de}->{499572} = "Burgkunstadt";
-$areanames{de}->{499573} = "Staffelstein\ Oberfranken";
-$areanames{de}->{499574} = "Marktzeuln";
-$areanames{de}->{499575} = "Weismain";
-$areanames{de}->{499576} = "Lichtenfels\-Isling";
-$areanames{de}->{499602} = "Neustadt\ an\ der\ Waldnaab";
-$areanames{de}->{499603} = "Floss";
-$areanames{de}->{499604} = "Wernberg\-Köblitz";
-$areanames{de}->{499605} = "Weiherhammer";
-$areanames{de}->{499606} = "Pfreimd";
-$areanames{de}->{499607} = "Luhe\-Wildenau";
-$areanames{de}->{499608} = "Kohlberg\ Oberpfalz";
-$areanames{de}->{49961} = "Weiden\ in\ der\ Oberpfalz";
-$areanames{de}->{499621} = "Amberg\ Oberpfalz";
-$areanames{de}->{499622} = "Hirschau\ Oberpfalz";
-$areanames{de}->{499624} = "Ensdorf\ Oberpfalz";
-$areanames{de}->{499625} = "Kastl\ bei\ Amberg";
-$areanames{de}->{499626} = "Hohenburg";
-$areanames{de}->{499627} = "Freudenberg\ Oberpfalz";
-$areanames{de}->{499628} = "Ursensollen";
-$areanames{de}->{499631} = "Tirschenreuth";
-$areanames{de}->{499632} = "Waldsassen";
-$areanames{de}->{499633} = "Mitterteich";
-$areanames{de}->{499634} = "Wiesau";
-$areanames{de}->{499635} = "Bärnau";
-$areanames{de}->{499636} = "Plößberg";
-$areanames{de}->{499637} = "Falkenberg\ Oberpfalz";
-$areanames{de}->{499638} = "Neualbenreuth";
-$areanames{de}->{499639} = "Mähring";
-$areanames{de}->{499641} = "Grafenwöhr";
-$areanames{de}->{499642} = "Kemnath\ Stadt";
-$areanames{de}->{499643} = "Auerbach\ in\ der\ Oberpfalz";
-$areanames{de}->{499644} = "Pressath";
-$areanames{de}->{499645} = "Eschenbach\ in\ der\ Oberpfalz";
-$areanames{de}->{499646} = "Freihung";
-$areanames{de}->{499647} = "Kirchenthumbach";
-$areanames{de}->{499648} = "Neustadt\ am\ Kulm";
-$areanames{de}->{499651} = "Vohenstrauss";
-$areanames{de}->{499652} = "Waidhaus";
-$areanames{de}->{499653} = "Eslarn";
-$areanames{de}->{499654} = "Pleystein";
-$areanames{de}->{499655} = "Tännesberg";
-$areanames{de}->{499656} = "Moosbach\ bei\ Vohenstrauß";
-$areanames{de}->{499657} = "Waldthurn";
-$areanames{de}->{499658} = "Georgenberg";
-$areanames{de}->{499659} = "Leuchtenberg";
-$areanames{de}->{499661} = "Sulzbach\-Rosenberg";
-$areanames{de}->{499662} = "Vilseck";
-$areanames{de}->{499663} = "Neukirchen\ bei\ Sulzbach\-Rosenberg";
-$areanames{de}->{499664} = "Hahnbach";
-$areanames{de}->{499665} = "Königstein\ Oberpfalz";
-$areanames{de}->{499666} = "Illschwang";
-$areanames{de}->{499671} = "Oberviechtach";
-$areanames{de}->{499672} = "Neunburg\ vorm\ Wald";
-$areanames{de}->{499673} = "Tiefenbach\ Oberpfalz";
-$areanames{de}->{499674} = "Schönsee";
-$areanames{de}->{499675} = "Altendorf\ am\ Nabburg";
-$areanames{de}->{499676} = "Winklarn";
-$areanames{de}->{499677} = "Oberviechtach\-Pullenried";
-$areanames{de}->{499681} = "Windischeschenbach";
-$areanames{de}->{499682} = "Erbendorf";
-$areanames{de}->{499683} = "Friedenfels";
-$areanames{de}->{499701} = "Sandberg\ Unterfranken";
-$areanames{de}->{499704} = "Euerdorf";
-$areanames{de}->{499708} = "Bad\ Bocklet";
-$areanames{de}->{49971} = "Bad\ Kissingen";
-$areanames{de}->{499720} = "Üchtelhausen";
-$areanames{de}->{499721} = "Schweinfurt";
-$areanames{de}->{499722} = "Werneck";
-$areanames{de}->{499723} = "Röthlein";
-$areanames{de}->{499724} = "Stadtlauringen";
-$areanames{de}->{499725} = "Poppenhausen\ Unterfranken";
-$areanames{de}->{499726} = "Euerbach";
-$areanames{de}->{499727} = "Schonungen\-Marktsteinach";
-$areanames{de}->{499728} = "Wülfershausen\ Unterfranken";
-$areanames{de}->{499729} = "Grettstadt";
-$areanames{de}->{499732} = "Hammelburg";
-$areanames{de}->{499733} = "Münnerstadt";
-$areanames{de}->{499734} = "Burkardroth";
-$areanames{de}->{499735} = "Massbach";
-$areanames{de}->{499736} = "Oberthulba";
-$areanames{de}->{499737} = "Wartmannsroth";
-$areanames{de}->{499738} = "Rottershausen";
-$areanames{de}->{499741} = "Bad\ Brückenau";
-$areanames{de}->{499742} = "Kalbach\ Rhön";
-$areanames{de}->{499744} = "Zeitlofs\-Detter";
-$areanames{de}->{499745} = "Wildflecken";
-$areanames{de}->{499746} = "Zeitlofs";
-$areanames{de}->{499747} = "Geroda\ Bayern";
-$areanames{de}->{499748} = "Motten";
-$areanames{de}->{499749} = "Oberbach\ Unterfranken";
-$areanames{de}->{499761} = "Bad\ Königshofen\ im\ Grabfeld";
-$areanames{de}->{499762} = "Saal\ an\ der\ Saale";
-$areanames{de}->{499763} = "Sulzdorf\ an\ der\ Lederhecke";
-$areanames{de}->{499764} = "Höchheim";
-$areanames{de}->{499765} = "Trappstadt";
-$areanames{de}->{499766} = "Grosswenkheim";
-$areanames{de}->{499771} = "Bad\ Neustadt\ an\ der\ Saale";
-$areanames{de}->{499772} = "Bischofsheim\ an\ der\ Rhön";
-$areanames{de}->{499773} = "Unsleben";
-$areanames{de}->{499774} = "Oberelsbach";
-$areanames{de}->{499775} = "Schönau\ an\ der\ Brend";
-$areanames{de}->{499776} = "Mellrichstadt";
-$areanames{de}->{499777} = "Ostheim\ von\ der\ Rhön";
-$areanames{de}->{499778} = "Fladungen";
-$areanames{de}->{499779} = "Nordheim\ von\ der\ Rhön";
-$areanames{de}->{499802} = "Ansbach\-Katterbach";
-$areanames{de}->{499803} = "Colmberg";
-$areanames{de}->{499804} = "Aurach";
-$areanames{de}->{499805} = "Burgoberbach";
-$areanames{de}->{49981} = "Ansbach";
-$areanames{de}->{499820} = "Lehrberg";
-$areanames{de}->{499822} = "Bechhofen\ an\ der\ Heide";
-$areanames{de}->{499823} = "Leutershausen";
-$areanames{de}->{499824} = "Dietenhofen";
-$areanames{de}->{499825} = "Herrieden";
-$areanames{de}->{499826} = "Weidenbach\ Mittelfranken";
-$areanames{de}->{499827} = "Lichtenau\ Mittelfranken";
-$areanames{de}->{499828} = "Rügland";
-$areanames{de}->{499829} = "Flachslanden";
-$areanames{de}->{499831} = "Gunzenhausen";
-$areanames{de}->{499832} = "Wassertrüdingen";
-$areanames{de}->{499833} = "Heidenheim\ Mittelfranken";
-$areanames{de}->{499834} = "Theilenhofen";
-$areanames{de}->{499835} = "Ehingen\ Mittelfranken";
-$areanames{de}->{499836} = "Gunzenhausen\-Cronheim";
-$areanames{de}->{499837} = "Haundorf";
-$areanames{de}->{499841} = "Bad\ Windsheim";
-$areanames{de}->{499842} = "Uffenheim";
-$areanames{de}->{499843} = "Burgbernheim";
-$areanames{de}->{499844} = "Obernzenn";
-$areanames{de}->{499845} = "Oberdachstetten";
-$areanames{de}->{499846} = "Ipsheim";
-$areanames{de}->{499847} = "Ergersheim";
-$areanames{de}->{499848} = "Simmershofen";
-$areanames{de}->{499851} = "Dinkelsbühl";
-$areanames{de}->{499852} = "Feuchtwangen";
-$areanames{de}->{499853} = "Wilburgstetten";
-$areanames{de}->{499854} = "Wittelshofen";
-$areanames{de}->{499855} = "Dentlein\ am\ Forst";
-$areanames{de}->{499856} = "Dürrwangen";
-$areanames{de}->{499857} = "Schopfloch\ Mittelfranken";
-$areanames{de}->{499861} = "Rothenburg\ ob\ der\ Tauber";
-$areanames{de}->{499865} = "Adelshofen\ Mittelfranken";
-$areanames{de}->{499867} = "Geslau";
-$areanames{de}->{499868} = "Schillingsfürst";
-$areanames{de}->{499869} = "Wettringen\ Mittelfranken";
-$areanames{de}->{499871} = "Windsbach";
-$areanames{de}->{499872} = "Heilsbronn";
-$areanames{de}->{499873} = "Abenberg\-Wassermungenau";
-$areanames{de}->{499874} = "Neuendettelsau";
-$areanames{de}->{499875} = "Wolframs\-Eschenbach";
-$areanames{de}->{499876} = "Rohr\ Mittelfranken";
-$areanames{de}->{499901} = "Hengersberg\ Bayern";
-$areanames{de}->{499903} = "Schöllnach";
-$areanames{de}->{499904} = "Lalling";
-$areanames{de}->{499905} = "Bernried\ Niederbayern";
-$areanames{de}->{499906} = "Mariaposching";
-$areanames{de}->{499907} = "Zenting";
-$areanames{de}->{499908} = "Schöfweg";
-$areanames{de}->{49991} = "Deggendorf";
-$areanames{de}->{499920} = "Bischofsmais";
-$areanames{de}->{499921} = "Regen";
-$areanames{de}->{499922} = "Zwiesel";
-$areanames{de}->{499923} = "Teisnach";
-$areanames{de}->{499924} = "Bodenmais";
-$areanames{de}->{499925} = "Bayerisch\ Eisenstein";
-$areanames{de}->{499926} = "Frauenau";
-$areanames{de}->{499927} = "Kirchberg\ Wald";
-$areanames{de}->{499928} = "Kirchdorf\ im\ Wald";
-$areanames{de}->{499929} = "Ruhmannsfelden";
-$areanames{de}->{499931} = "Plattling";
-$areanames{de}->{499932} = "Osterhofen";
-$areanames{de}->{499933} = "Wallersdorf";
-$areanames{de}->{499935} = "Stephansposching";
-$areanames{de}->{499936} = "Wallerfing";
-$areanames{de}->{499937} = "Oberpöring";
-$areanames{de}->{499938} = "Moos\ Niederbayern";
-$areanames{de}->{499941} = "Kötzting";
-$areanames{de}->{499942} = "Viechtach";
-$areanames{de}->{499943} = "Lam\ Oberpfalz";
-$areanames{de}->{499944} = "Miltach";
-$areanames{de}->{499945} = "Arnbruck";
-$areanames{de}->{499946} = "Hohenwarth\ bei\ Kötzing";
-$areanames{de}->{499947} = "Neukirchen\ bei\ Hl\ Blut";
-$areanames{de}->{499948} = "Eschlkam";
-$areanames{de}->{499951} = "Landau\ an\ der\ Isar";
-$areanames{de}->{499952} = "Eichendorf";
-$areanames{de}->{499953} = "Pilsting";
-$areanames{de}->{499954} = "Simbach\ Niederbayern";
-$areanames{de}->{499955} = "Mamming";
-$areanames{de}->{499956} = "Eichendorf\-Aufhausen";
-$areanames{de}->{499961} = "Mitterfels";
-$areanames{de}->{499962} = "Schwarzach\ Niederbayern";
-$areanames{de}->{499963} = "Konzell";
-$areanames{de}->{499964} = "Stallwang";
-$areanames{de}->{499965} = "Sankt\ Englmar";
-$areanames{de}->{499966} = "Wiesenfelden";
-$areanames{de}->{499971} = "Cham";
-$areanames{de}->{499972} = "Waldmünchen";
-$areanames{de}->{499973} = "Furth\ im\ Wald";
-$areanames{de}->{499974} = "Traitsching";
-$areanames{de}->{499975} = "Waldmünchen\-Geigant";
-$areanames{de}->{499976} = "Rötz";
-$areanames{de}->{499977} = "Arnschwang";
-$areanames{de}->{499978} = "Schönthal\ Oberpfalz";
-$areanames{en}->{49201} = "Essen";
-$areanames{en}->{49202} = "Wuppertal";
-$areanames{en}->{49203} = "Duisburg";
-$areanames{en}->{492041} = "Bottrop";
-$areanames{en}->{492043} = "Gladbeck";
-$areanames{en}->{492045} = "Bottrop\-Kirchhellen";
-$areanames{en}->{492051} = "Velbert";
-$areanames{en}->{492052} = "Velbert\-Langenberg";
-$areanames{en}->{492053} = "Velbert\-Neviges";
-$areanames{en}->{492054} = "Essen\-Kettwig";
-$areanames{en}->{492056} = "Heiligenhaus";
-$areanames{en}->{492058} = "Wülfrath";
-$areanames{en}->{492064} = "Dinslaken";
-$areanames{en}->{492065} = "Duisburg\-Rheinhausen";
-$areanames{en}->{492066} = "Duisburg\-Homberg";
-$areanames{en}->{49208} = "Oberhausen\ Rheinland";
-$areanames{en}->{49209} = "Gelsenkirchen";
-$areanames{en}->{492102} = "Ratingen";
-$areanames{en}->{492103} = "Hilden";
-$areanames{en}->{492104} = "Mettmann";
-$areanames{en}->{49211} = "Düsseldorf";
-$areanames{en}->{49212} = "Solingen";
-$areanames{en}->{492129} = "Haan\ Rheinland";
-$areanames{en}->{492131} = "Neuss";
-$areanames{en}->{492132} = "Meerbusch\-Büderich";
-$areanames{en}->{492133} = "Dormagen";
-$areanames{en}->{492137} = "Neuss\-Norf";
-$areanames{en}->{49214} = "Leverkusen";
-$areanames{en}->{492150} = "Meerbusch\-Lank";
-$areanames{en}->{492151} = "Krefeld";
-$areanames{en}->{492152} = "Kempen";
-$areanames{en}->{492153} = "Nettetal\-Lobberich";
-$areanames{en}->{492154} = "Willich";
-$areanames{en}->{492156} = "Willich\-Anrath";
-$areanames{en}->{492157} = "Nettetal\-Kaldenkirchen";
-$areanames{en}->{492158} = "Grefrath\ bei\ Krefeld";
-$areanames{en}->{492159} = "Meerbusch\-Osterath";
-$areanames{en}->{492161} = "Mönchengladbach";
-$areanames{en}->{492162} = "Viersen";
-$areanames{en}->{492163} = "Schwalmtal\ Niederrhein";
-$areanames{en}->{492164} = "Jüchen\-Otzenrath";
-$areanames{en}->{492165} = "Jüchen";
-$areanames{en}->{492166} = "Mönchengladbach\-Rheydt";
-$areanames{en}->{492171} = "Leverkusen\-Opladen";
-$areanames{en}->{492173} = "Langenfeld\ Rheinland";
-$areanames{en}->{492174} = "Burscheid\ Rheinland";
-$areanames{en}->{492175} = "Leichlingen\ Rheinland";
-$areanames{en}->{492181} = "Grevenbroich";
-$areanames{en}->{492182} = "Grevenbroich\-Kapellen";
-$areanames{en}->{492183} = "Rommerskirchen";
-$areanames{en}->{492191} = "Remscheid";
-$areanames{en}->{492192} = "Hückeswagen";
-$areanames{en}->{492193} = "Dabringhausen";
-$areanames{en}->{492195} = "Radevormwald";
-$areanames{en}->{492196} = "Wermelskirchen";
-$areanames{en}->{492202} = "Bergisch\ Gladbach";
-$areanames{en}->{492203} = "Cologne\-Porz";
-$areanames{en}->{492204} = "Bensberg";
-$areanames{en}->{492205} = "Rösrath";
-$areanames{en}->{492206} = "Overath";
-$areanames{en}->{492207} = "Kürten\-Dürscheid";
-$areanames{en}->{492208} = "Niederkassel";
-$areanames{en}->{49221} = "Cologne";
-$areanames{en}->{492222} = "Bornheim\ Rheinland";
-$areanames{en}->{492223} = "Königswinter";
-$areanames{en}->{492224} = "Bad\ Honnef";
-$areanames{en}->{492225} = "Meckenheim\ Rheinland";
-$areanames{en}->{492226} = "Rheinbach";
-$areanames{en}->{492227} = "Bornheim\-Merten";
-$areanames{en}->{492228} = "Remagen\-Rolandseck";
-$areanames{en}->{492232} = "Brühl\ Rheinland";
-$areanames{en}->{492233} = "Hürth\ Rheinland";
-$areanames{en}->{492234} = "Frechen";
-$areanames{en}->{492235} = "Erftstadt";
-$areanames{en}->{492236} = "Wesseling\ Rheinland";
-$areanames{en}->{492237} = "Kerpen\ Rheinland\-Türnich";
-$areanames{en}->{492238} = "Pulheim";
-$areanames{en}->{492241} = "Siegburg";
-$areanames{en}->{492242} = "Hennef\ Sieg";
-$areanames{en}->{492243} = "Eitorf";
-$areanames{en}->{492244} = "Königswinter\-Oberpleis";
-$areanames{en}->{492245} = "Much";
-$areanames{en}->{492246} = "Lohmar\ Rheinland";
-$areanames{en}->{492247} = "Neunkirchen\-Seelscheid";
-$areanames{en}->{492248} = "Hennef\-Uckerath";
-$areanames{en}->{492251} = "Euskirchen";
-$areanames{en}->{492252} = "Zülpich";
-$areanames{en}->{492253} = "Bad\ Münstereifel";
-$areanames{en}->{492254} = "Weilerswist";
-$areanames{en}->{492255} = "Euskirchen\-Flamersheim";
-$areanames{en}->{492256} = "Mechernich\-Satzvey";
-$areanames{en}->{492257} = "Reckerscheid";
-$areanames{en}->{492261} = "Gummersbach";
-$areanames{en}->{492262} = "Wiehl";
-$areanames{en}->{492263} = "Engelskirchen";
-$areanames{en}->{492264} = "Marienheide";
-$areanames{en}->{492265} = "Reichshof\-Eckenhagen";
-$areanames{en}->{492266} = "Lindlar";
-$areanames{en}->{492267} = "Wipperfürth";
-$areanames{en}->{492268} = "Kürten";
-$areanames{en}->{492269} = "Kierspe\-Rönsahl";
-$areanames{en}->{492271} = "Bergheim\ Erft";
-$areanames{en}->{492272} = "Bedburg\ Erft";
-$areanames{en}->{492273} = "Kerpen\-Horrem";
-$areanames{en}->{492274} = "Elsdorf\ Rheinland";
-$areanames{en}->{492275} = "Kerpen\-Buir";
-$areanames{en}->{49228} = "Bonn";
-$areanames{en}->{492291} = "Waldbröl";
-$areanames{en}->{492292} = "Windeck\ Sieg";
-$areanames{en}->{492293} = "Nümbrecht";
-$areanames{en}->{492294} = "Morsbach\ Sieg";
-$areanames{en}->{492295} = "Ruppichteroth";
-$areanames{en}->{492296} = "Reichshof\-Brüchermühle";
-$areanames{en}->{492297} = "Wildbergerhütte";
-$areanames{en}->{492301} = "Holzwickede";
-$areanames{en}->{492302} = "Witten";
-$areanames{en}->{492303} = "Unna";
-$areanames{en}->{492304} = "Schwerte";
-$areanames{en}->{492305} = "Castrop\-Rauxel";
-$areanames{en}->{492306} = "Lünen";
-$areanames{en}->{492307} = "Kamen";
-$areanames{en}->{492308} = "Unna\-Hemmerde";
-$areanames{en}->{492309} = "Waltrop";
-$areanames{en}->{49231} = "Dortmund";
-$areanames{en}->{492323} = "Herne";
-$areanames{en}->{492324} = "Hattingen\ Ruhr";
-$areanames{en}->{492325} = "Wanne\-Eickel";
-$areanames{en}->{492327} = "Bochum\-Wattenscheid";
-$areanames{en}->{492330} = "Herdecke";
-$areanames{en}->{492331} = "Hagen\ Westfalen";
-$areanames{en}->{492332} = "Gevelsberg";
-$areanames{en}->{492333} = "Ennepetal";
-$areanames{en}->{492334} = "Hagen\-Hohenlimburg";
-$areanames{en}->{492335} = "Wetter\ Ruhr";
-$areanames{en}->{492336} = "Schwelm";
-$areanames{en}->{492337} = "Hagen\-Dahl";
-$areanames{en}->{492338} = "Breckerfeld";
-$areanames{en}->{492339} = "Sprockhövel\-Hasslinghausen";
-$areanames{en}->{49234} = "Bochum";
-$areanames{en}->{492351} = "Lüdenscheid";
-$areanames{en}->{492352} = "Altena\ Westfalen";
-$areanames{en}->{492353} = "Halver";
-$areanames{en}->{492354} = "Meinerzhagen";
-$areanames{en}->{492355} = "Schalksmühle";
-$areanames{en}->{492357} = "Herscheid\ Westfalen";
-$areanames{en}->{492358} = "Meinerzhagen\-Valbert";
-$areanames{en}->{492359} = "Kierspe";
-$areanames{en}->{492360} = "Haltern\-Lippramsdorf";
-$areanames{en}->{492361} = "Recklinghausen";
-$areanames{en}->{492362} = "Dorsten";
-$areanames{en}->{492363} = "Datteln";
-$areanames{en}->{492364} = "Haltern\ Westfalen";
-$areanames{en}->{492365} = "Marl";
-$areanames{en}->{492366} = "Herten\ Westfalen";
-$areanames{en}->{492367} = "Henrichenburg";
-$areanames{en}->{492368} = "Oer\-Erkenschwick";
-$areanames{en}->{492369} = "Dorsten\-Wulfen";
-$areanames{en}->{492371} = "Iserlohn";
-$areanames{en}->{492372} = "Hemer";
-$areanames{en}->{492373} = "Menden\ Sauerland";
-$areanames{en}->{492374} = "Iserlohn\-Letmathe";
-$areanames{en}->{492375} = "Balve";
-$areanames{en}->{492377} = "Wickede\ Ruhr";
-$areanames{en}->{492378} = "Fröndenberg\-Langschede";
-$areanames{en}->{492379} = "Menden\-Asbeck";
-$areanames{en}->{492381} = "Hamm\ Westfalen";
-$areanames{en}->{492382} = "Ahlen\ Westfalen";
-$areanames{en}->{492383} = "Bönen";
-$areanames{en}->{492384} = "Welver";
-$areanames{en}->{492385} = "Hamm\-Rhynern";
-$areanames{en}->{492387} = "Drensteinfurt\-Walstedde";
-$areanames{en}->{492388} = "Hamm\-Uentrop";
-$areanames{en}->{492389} = "Werne";
-$areanames{en}->{492391} = "Plettenberg";
-$areanames{en}->{492392} = "Werdohl";
-$areanames{en}->{492393} = "Sundern\-Allendorf";
-$areanames{en}->{492394} = "Neuenrade\-Affeln";
-$areanames{en}->{492395} = "Finnentrop\-Rönkhausen";
-$areanames{en}->{492401} = "Baesweiler";
-$areanames{en}->{492402} = "Stolberg\ Rheinland";
-$areanames{en}->{492403} = "Eschweiler\ Rheinland";
-$areanames{en}->{492404} = "Alsdorf\ Rheinland";
-$areanames{en}->{492405} = "Würselen";
-$areanames{en}->{492406} = "Herzogenrath";
-$areanames{en}->{492407} = "Herzogenrath\-Kohlscheid";
-$areanames{en}->{492408} = "Aachen\-Kornelimünster";
-$areanames{en}->{492409} = "Stolberg\-Gressenich";
-$areanames{en}->{49241} = "Aachen";
-$areanames{en}->{492421} = "Düren";
-$areanames{en}->{492422} = "Kreuzau";
-$areanames{en}->{492423} = "Langerwehe";
-$areanames{en}->{492424} = "Vettweiss";
-$areanames{en}->{492425} = "Nideggen\-Embken";
-$areanames{en}->{492426} = "Nörvenich";
-$areanames{en}->{492427} = "Nideggen";
-$areanames{en}->{492428} = "Niederzier";
-$areanames{en}->{492429} = "Hürtgenwald";
-$areanames{en}->{492431} = "Erkelenz";
-$areanames{en}->{492432} = "Wassenberg";
-$areanames{en}->{492433} = "Hückelhoven";
-$areanames{en}->{492434} = "Wegberg";
-$areanames{en}->{492435} = "Erkelenz\-Lövenich";
-$areanames{en}->{492436} = "Wegberg\-Rödgen";
-$areanames{en}->{492440} = "Nettersheim\-Tondorf";
-$areanames{en}->{492441} = "Kall";
-$areanames{en}->{492443} = "Mechernich";
-$areanames{en}->{492444} = "Schleiden\-Gemünd";
-$areanames{en}->{492445} = "Schleiden\ Eifel";
-$areanames{en}->{492446} = "Heimbach\ Eifel";
-$areanames{en}->{492447} = "Dahlem\ bei\ Kall";
-$areanames{en}->{492448} = "Hellenthal\-Rescheid";
-$areanames{en}->{492449} = "Blankenheim\ Ahr";
-$areanames{en}->{492451} = "Geilenkirchen";
-$areanames{en}->{492452} = "Heinsberg\ Rheinland";
-$areanames{en}->{492453} = "Heinsberg\-Randerath";
-$areanames{en}->{492454} = "Gangelt";
-$areanames{en}->{492455} = "Waldfeucht";
-$areanames{en}->{492456} = "Selfkant";
-$areanames{en}->{492461} = "Jülich";
-$areanames{en}->{492462} = "Linnich";
-$areanames{en}->{492463} = "Titz";
-$areanames{en}->{492464} = "Aldenhoven\ bei\ Jülich";
-$areanames{en}->{492465} = "Inden";
-$areanames{en}->{492471} = "Roetgen\ Eifel";
-$areanames{en}->{492472} = "Monschau";
-$areanames{en}->{492473} = "Simmerath";
-$areanames{en}->{492474} = "Nideggen\-Schmidt";
-$areanames{en}->{492482} = "Hellenthal";
-$areanames{en}->{492484} = "Mechernich\-Eiserfey";
-$areanames{en}->{492485} = "Schleiden\-Dreiborn";
-$areanames{en}->{492486} = "Nettersheim";
-$areanames{en}->{492501} = "Münster\-Hiltrup";
-$areanames{en}->{492502} = "Nottuln";
-$areanames{en}->{492504} = "Telgte";
-$areanames{en}->{492505} = "Altenberge\ Westfalen";
-$areanames{en}->{492506} = "Münster\-Wolbeck";
-$areanames{en}->{492507} = "Havixbeck";
-$areanames{en}->{492508} = "Drensteinfurt";
-$areanames{en}->{492509} = "Nottuln\-Appelhülsen";
-$areanames{en}->{49251} = "Münster";
-$areanames{en}->{492520} = "Wadersloh\-Diestedde";
-$areanames{en}->{492521} = "Beckum";
-$areanames{en}->{492522} = "Oelde";
-$areanames{en}->{492523} = "Wadersloh";
-$areanames{en}->{492524} = "Ennigerloh";
-$areanames{en}->{492525} = "Beckum\-Neubeckum";
-$areanames{en}->{492526} = "Sendenhorst";
-$areanames{en}->{492527} = "Lippetal\-Lippborg";
-$areanames{en}->{492528} = "Ennigerloh\-Enniger";
-$areanames{en}->{492529} = "Oelde\-Stromberg";
-$areanames{en}->{492532} = "Ostbevern";
-$areanames{en}->{492533} = "Münster\-Nienberge";
-$areanames{en}->{492534} = "Münster\-Roxel";
-$areanames{en}->{492535} = "Sendenhorst\-Albersloh";
-$areanames{en}->{492536} = "Münster\-Albachten";
-$areanames{en}->{492538} = "Drensteinfurt\-Rinkerode";
-$areanames{en}->{492541} = "Coesfeld";
-$areanames{en}->{492542} = "Gescher";
-$areanames{en}->{492543} = "Billerbeck\ Westfalen";
-$areanames{en}->{492545} = "Rosendahl\-Darfeld";
-$areanames{en}->{492546} = "Coesfeld\-Lette";
-$areanames{en}->{492547} = "Rosendahl\-Osterwick";
-$areanames{en}->{492548} = "Dülmen\-Rorup";
-$areanames{en}->{492551} = "Steinfurt\-Burgsteinfurt";
-$areanames{en}->{492552} = "Steinfurt\-Borghorst";
-$areanames{en}->{492553} = "Ochtrup";
-$areanames{en}->{492554} = "Laer\ Kreis\ Steinfurt";
-$areanames{en}->{492555} = "Schöppingen";
-$areanames{en}->{492556} = "Metelen";
-$areanames{en}->{492557} = "Wettringen\ Kreis\ Steinfurt";
-$areanames{en}->{492558} = "Horstmar";
-$areanames{en}->{492561} = "Ahaus";
-$areanames{en}->{492562} = "Gronau\ Westfalen";
-$areanames{en}->{492563} = "Stadtlohn";
-$areanames{en}->{492564} = "Vreden";
-$areanames{en}->{492565} = "Gronau\-Epe";
-$areanames{en}->{492566} = "Legden";
-$areanames{en}->{492567} = "Ahaus\-Alstätte";
-$areanames{en}->{492568} = "Heek";
-$areanames{en}->{492571} = "Greven\ Westfalen";
-$areanames{en}->{492572} = "Emsdetten";
-$areanames{en}->{492573} = "Nordwalde";
-$areanames{en}->{492574} = "Saerbeck";
-$areanames{en}->{492575} = "Greven\-Reckenfeld";
-$areanames{en}->{492581} = "Warendorf";
-$areanames{en}->{492582} = "Everswinkel";
-$areanames{en}->{492583} = "Sassenberg";
-$areanames{en}->{492584} = "Warendorf\-Milte";
-$areanames{en}->{492585} = "Warendorf\-Hoetmar";
-$areanames{en}->{492586} = "Beelen";
-$areanames{en}->{492587} = "Ennigerloh\-Westkirchen";
-$areanames{en}->{492588} = "Harsewinkel\-Greffen";
-$areanames{en}->{492590} = "Dülmen\-Buldern";
-$areanames{en}->{492591} = "Lüdinghausen";
-$areanames{en}->{492592} = "Selm";
-$areanames{en}->{492593} = "Ascheberg\ Westfalen";
-$areanames{en}->{492594} = "Dülmen";
-$areanames{en}->{492595} = "Olfen";
-$areanames{en}->{492596} = "Nordkirchen";
-$areanames{en}->{492597} = "Senden\ Westfalen";
-$areanames{en}->{492598} = "Senden\-Ottmarsbocholt";
-$areanames{en}->{492599} = "Ascheberg\-Herbern";
-$areanames{en}->{492601} = "Nauort";
-$areanames{en}->{492602} = "Montabaur";
-$areanames{en}->{492603} = "Bad\ Ems";
-$areanames{en}->{492604} = "Nassau\ Lahn";
-$areanames{en}->{492605} = "Löf";
-$areanames{en}->{492606} = "Winningen\ Mosel";
-$areanames{en}->{492607} = "Kobern\-Gondorf";
-$areanames{en}->{492608} = "Welschneudorf";
-$areanames{en}->{49261} = "Koblenz\ am\ Rhein";
-$areanames{en}->{492620} = "Neuhäusel\ Westerwald";
-$areanames{en}->{492621} = "Lahnstein";
-$areanames{en}->{492622} = "Bendorf\ am\ Rhein";
-$areanames{en}->{492623} = "Ransbach\-Baumbach";
-$areanames{en}->{492624} = "Höhr\-Grenzhausen";
-$areanames{en}->{492625} = "Ochtendung";
-$areanames{en}->{492626} = "Selters\ Westferwald";
-$areanames{en}->{492627} = "Braubach";
-$areanames{en}->{492628} = "Rhens";
-$areanames{en}->{492630} = "Mülheim\-Kärlich";
-$areanames{en}->{492631} = "Neuwied";
-$areanames{en}->{492632} = "Andernach";
-$areanames{en}->{492633} = "Brohl\-Lützing";
-$areanames{en}->{492634} = "Rengsdorf";
-$areanames{en}->{492635} = "Rheinbrohl";
-$areanames{en}->{492636} = "Burgbrohl";
-$areanames{en}->{492637} = "Weissenthurm";
-$areanames{en}->{492638} = "Waldbreitbach";
-$areanames{en}->{492639} = "Anhausen\ Kreis\ Neuwied";
-$areanames{en}->{492641} = "Bad\ Neuenahr\-Ahrweiler";
-$areanames{en}->{492642} = "Remagen";
-$areanames{en}->{492643} = "Altenahr";
-$areanames{en}->{492644} = "Linz\ am\ Rhein";
-$areanames{en}->{492645} = "Vettelschoss";
-$areanames{en}->{492646} = "Königsfeld\ Eifel";
-$areanames{en}->{492647} = "Kesseling";
-$areanames{en}->{492651} = "Mayen";
-$areanames{en}->{492652} = "Mendig";
-$areanames{en}->{492653} = "Kaisersesch";
-$areanames{en}->{492654} = "Polch";
-$areanames{en}->{492655} = "Weibern";
-$areanames{en}->{492656} = "Virneburg";
-$areanames{en}->{492657} = "Uersfeld";
-$areanames{en}->{492661} = "Bad\ Marienberg\ Westerwald";
-$areanames{en}->{492662} = "Hachenburg";
-$areanames{en}->{492663} = "Westerburg\ Westerwald";
-$areanames{en}->{492664} = "Rennerod";
-$areanames{en}->{492666} = "Freilingen\ Westerwald";
-$areanames{en}->{492667} = "Stein\-Neukirch";
-$areanames{en}->{492671} = "Cochem";
-$areanames{en}->{492672} = "Treis\-Karden";
-$areanames{en}->{492673} = "Ellenz\-Poltersdorf";
-$areanames{en}->{492674} = "Bad\ Bertrich";
-$areanames{en}->{492675} = "Ediger\-Eller";
-$areanames{en}->{492676} = "Ulmen";
-$areanames{en}->{492677} = "Lutzerath";
-$areanames{en}->{492678} = "Büchel\ bei\ Cochem";
-$areanames{en}->{492680} = "Mündersbach";
-$areanames{en}->{492681} = "Altenkirchen\ Westerwald";
-$areanames{en}->{492682} = "Hamm\ Sieg";
-$areanames{en}->{492683} = "Asbach\ Westerwald";
-$areanames{en}->{492684} = "Puderbach\ Westerwald";
-$areanames{en}->{492685} = "Flammersfeld";
-$areanames{en}->{492686} = "Weyerbusch";
-$areanames{en}->{492687} = "Horhausen\ Westerwald";
-$areanames{en}->{492688} = "Kroppach";
-$areanames{en}->{492689} = "Dierdorf";
-$areanames{en}->{492691} = "Adenau";
-$areanames{en}->{492692} = "Kelberg";
-$areanames{en}->{492693} = "Antweiler";
-$areanames{en}->{492694} = "Wershofen";
-$areanames{en}->{492695} = "Insul";
-$areanames{en}->{492696} = "Nohn\ Eifel";
-$areanames{en}->{492697} = "Blankenheim\-Ahrhütte";
-$areanames{en}->{49271} = "Siegen";
-$areanames{en}->{492721} = "Lennestadt";
-$areanames{en}->{492722} = "Attendorn";
-$areanames{en}->{492723} = "Kirchhundem";
-$areanames{en}->{492724} = "Finnentrop\-Serkenrode";
-$areanames{en}->{492725} = "Lennestadt\-Oedingen";
-$areanames{en}->{492732} = "Kreuztal";
-$areanames{en}->{492733} = "Hilchenbach";
-$areanames{en}->{492734} = "Freudenberg\ Westfalen";
-$areanames{en}->{492735} = "Neunkirchen\ Siegerl";
-$areanames{en}->{492736} = "Burbach\ Siegerl";
-$areanames{en}->{492737} = "Netphen\-Deuz";
-$areanames{en}->{492738} = "Netphen";
-$areanames{en}->{492739} = "Wilnsdorf";
-$areanames{en}->{492741} = "Betzdorf";
-$areanames{en}->{492742} = "Wissen";
-$areanames{en}->{492743} = "Daaden";
-$areanames{en}->{492744} = "Herdorf";
-$areanames{en}->{492745} = "Brachbach\ Sieg";
-$areanames{en}->{492747} = "Molzhain";
-$areanames{en}->{492750} = "Diedenshausen";
-$areanames{en}->{492751} = "Bad\ Berleburg";
-$areanames{en}->{492752} = "Bad\ Laasphe";
-$areanames{en}->{492753} = "Erndtebrück";
-$areanames{en}->{492754} = "Bad\ Laasphe\-Feudingen";
-$areanames{en}->{492755} = "Bad\ Berleburg\-Schwarzenau";
-$areanames{en}->{492758} = "Bad\ Berleburg\-Girkhausen";
-$areanames{en}->{492759} = "Bad\ Berleburg\-Aue";
-$areanames{en}->{492761} = "Olpe\ Biggesee";
-$areanames{en}->{492762} = "Wenden\ Südsauerland";
-$areanames{en}->{492763} = "Drolshagen\-Bleche";
-$areanames{en}->{492764} = "Welschen\ Ennest";
-$areanames{en}->{492770} = "Eschenburg";
-$areanames{en}->{492771} = "Dillenburg";
-$areanames{en}->{492772} = "Herborn\ Hessen";
-$areanames{en}->{492773} = "Haiger";
-$areanames{en}->{492774} = "Dietzhölztal";
-$areanames{en}->{492775} = "Driedorf";
-$areanames{en}->{492776} = "Bad\ Endbach\-Hartenrod";
-$areanames{en}->{492777} = "Breitscheid\ Hessen";
-$areanames{en}->{492778} = "Siegbach";
-$areanames{en}->{492779} = "Greifenstein\-Beilstein";
-$areanames{en}->{492801} = "Xanten";
-$areanames{en}->{492802} = "Alpen";
-$areanames{en}->{492803} = "Wesel\-Büderich";
-$areanames{en}->{492804} = "Xanten\-Marienbaum";
-$areanames{en}->{49281} = "Wesel";
-$areanames{en}->{492821} = "Kleve\ Niederrhein";
-$areanames{en}->{492822} = "Emmerich";
-$areanames{en}->{492823} = "Goch";
-$areanames{en}->{492824} = "Kalkar";
-$areanames{en}->{492825} = "Uedem";
-$areanames{en}->{492826} = "Kranenburg\ Niederrhein";
-$areanames{en}->{492827} = "Goch\-Hassum";
-$areanames{en}->{492828} = "Emmerich\-Elten";
-$areanames{en}->{492831} = "Geldern";
-$areanames{en}->{492832} = "Kevelaer";
-$areanames{en}->{492833} = "Kerken";
-$areanames{en}->{492834} = "Straelen";
-$areanames{en}->{492835} = "Issum";
-$areanames{en}->{492836} = "Wachtendonk";
-$areanames{en}->{492837} = "Weeze";
-$areanames{en}->{492838} = "Sonsbeck";
-$areanames{en}->{492839} = "Straelen\-Herongen";
-$areanames{en}->{492841} = "Moers";
-$areanames{en}->{492842} = "Kamp\-Lintfort";
-$areanames{en}->{492843} = "Rheinberg";
-$areanames{en}->{492844} = "Rheinberg\-Orsoy";
-$areanames{en}->{492845} = "Neukirchen\-Vluyn";
-$areanames{en}->{492850} = "Rees\-Haldern";
-$areanames{en}->{492851} = "Rees";
-$areanames{en}->{492852} = "Hamminkeln";
-$areanames{en}->{492853} = "Schermbeck";
-$areanames{en}->{492855} = "Voerde\ Niederrhein";
-$areanames{en}->{492856} = "Hamminkeln\-Brünen";
-$areanames{en}->{492857} = "Rees\-Mehr";
-$areanames{en}->{492858} = "Hünxe";
-$areanames{en}->{492859} = "Wesel\-Bislich";
-$areanames{en}->{492861} = "Borken\ Westfalen";
-$areanames{en}->{492862} = "Südlohn";
-$areanames{en}->{492863} = "Velen";
-$areanames{en}->{492864} = "Reken";
-$areanames{en}->{492865} = "Raesfeld";
-$areanames{en}->{492866} = "Dorsten\-Rhade";
-$areanames{en}->{492867} = "Heiden\ Kreis\ Borken";
-$areanames{en}->{492871} = "Bocholt";
-$areanames{en}->{492872} = "Rhede\ Westfalen";
-$areanames{en}->{492873} = "Isselburg\-Werth";
-$areanames{en}->{492874} = "Isselburg";
-$areanames{en}->{492902} = "Warstein";
-$areanames{en}->{492903} = "Meschede\-Freienohl";
-$areanames{en}->{492904} = "Bestwig";
-$areanames{en}->{492905} = "Bestwig\-Ramsbeck";
-$areanames{en}->{49291} = "Meschede";
-$areanames{en}->{492921} = "Soest";
-$areanames{en}->{492922} = "Werl";
-$areanames{en}->{492923} = "Lippetal\-Herzfeld";
-$areanames{en}->{492924} = "Möhnesee";
-$areanames{en}->{492925} = "Warstein\-Allagen";
-$areanames{en}->{492927} = "Neuengeseke";
-$areanames{en}->{492928} = "Soest\-Ostönnen";
-$areanames{en}->{492931} = "Arnsberg";
-$areanames{en}->{492932} = "Neheim\-Hüsten";
-$areanames{en}->{492933} = "Sundern\ Sauerland";
-$areanames{en}->{492934} = "Sundern\-Altenhellefeld";
-$areanames{en}->{492935} = "Sundern\-Hachen";
-$areanames{en}->{492937} = "Arnsberg\-Oeventrop";
-$areanames{en}->{492938} = "Ense";
-$areanames{en}->{492941} = "Lippstadt";
-$areanames{en}->{492942} = "Geseke";
-$areanames{en}->{492943} = "Erwitte";
-$areanames{en}->{492944} = "Rietberg\-Mastholte";
-$areanames{en}->{492945} = "Lippstadt\-Benninghausen";
-$areanames{en}->{492947} = "Anröchte";
-$areanames{en}->{492948} = "Lippstadt\-Rebbeke";
-$areanames{en}->{492951} = "Büren";
-$areanames{en}->{492952} = "Rüthen";
-$areanames{en}->{492953} = "Wünnenberg";
-$areanames{en}->{492954} = "Rüthen\-Oestereiden";
-$areanames{en}->{492955} = "Büren\-Wewelsburg";
-$areanames{en}->{492957} = "Wünnenberg\-Haaren";
-$areanames{en}->{492958} = "Büren\-Harth";
-$areanames{en}->{492961} = "Brilon";
-$areanames{en}->{492962} = "Olsberg";
-$areanames{en}->{492963} = "Brilon\-Messinghausen";
-$areanames{en}->{492964} = "Brilon\-Alme";
-$areanames{en}->{492971} = "Schmallenberg\-Dorlar";
-$areanames{en}->{492972} = "Schmallenberg";
-$areanames{en}->{492973} = "Eslohe\ Sauerland";
-$areanames{en}->{492974} = "Schmallenberg\-Fredeburg";
-$areanames{en}->{492975} = "Schmallenberg\-Oberkirchen";
-$areanames{en}->{492977} = "Schmallenberg\-Bödefeld";
-$areanames{en}->{492981} = "Winterberg\ Westfalen";
-$areanames{en}->{492982} = "Medebach";
-$areanames{en}->{492983} = "Winterberg\-Siedlinghausen";
-$areanames{en}->{492984} = "Hallenberg";
-$areanames{en}->{492985} = "Winterberg\-Niedersfeld";
-$areanames{en}->{492991} = "Marsberg\-Bredelar";
-$areanames{en}->{492992} = "Marsberg";
-$areanames{en}->{492993} = "Marsberg\-Canstein";
-$areanames{en}->{492994} = "Marsberg\-Westheim";
-$areanames{en}->{4930} = "Berlin";
-$areanames{en}->{493301} = "Oranienburg";
-$areanames{en}->{493302} = "Hennigsdorf";
-$areanames{en}->{493303} = "Birkenwerder";
-$areanames{en}->{493304} = "Velten";
-$areanames{en}->{4933051} = "Nassenheide";
-$areanames{en}->{4933052} = "Leegebruch";
-$areanames{en}->{4933053} = "Zehlendorf\ Kreis\ Oberhavel";
-$areanames{en}->{4933054} = "Liebenwalde";
-$areanames{en}->{4933055} = "Kremmen";
-$areanames{en}->{4933056} = "Mühlenbeck\ Kreis\ Oberhavel";
-$areanames{en}->{493306} = "Gransee";
-$areanames{en}->{493307} = "Zehdenick";
-$areanames{en}->{4933080} = "Marienthal\ Kreis\ Oberhavel";
-$areanames{en}->{4933082} = "Menz\ Kreis\ Oberhavel";
-$areanames{en}->{4933083} = "Schulzendorf\ Kreis\ Oberhavel";
-$areanames{en}->{4933084} = "Gutengermendorf";
-$areanames{en}->{4933085} = "Seilershof";
-$areanames{en}->{4933086} = "Grieben\ Kreis\ Oberhavel";
-$areanames{en}->{4933087} = "Bredereiche";
-$areanames{en}->{4933088} = "Falkenthal";
-$areanames{en}->{4933089} = "Himmelpfort";
-$areanames{en}->{4933093} = "Fürstenberg\ Havel";
-$areanames{en}->{4933094} = "Löwenberg";
-$areanames{en}->{49331} = "Potsdam";
-$areanames{en}->{4933200} = "Bergholz\-Rehbrücke";
-$areanames{en}->{4933201} = "Gross\ Glienicke";
-$areanames{en}->{4933202} = "Töplitz";
-$areanames{en}->{4933203} = "Kleinmachnow";
-$areanames{en}->{4933204} = "Beelitz\ Mark";
-$areanames{en}->{4933205} = "Michendorf";
-$areanames{en}->{4933206} = "Fichtenwalde";
-$areanames{en}->{4933207} = "Gross\ Kreutz";
-$areanames{en}->{4933208} = "Fahrland";
-$areanames{en}->{4933209} = "Caputh";
-$areanames{en}->{493321} = "Nauen\ Brandenburg";
-$areanames{en}->{493322} = "Falkensee";
-$areanames{en}->{4933230} = "Börnicke\ Kreis\ Havelland";
-$areanames{en}->{4933231} = "Pausin";
-$areanames{en}->{4933232} = "Brieselang";
-$areanames{en}->{4933233} = "Ketzin";
-$areanames{en}->{4933234} = "Wustermark";
-$areanames{en}->{4933235} = "Friesack";
-$areanames{en}->{4933237} = "Paulinenaue";
-$areanames{en}->{4933238} = "Senzke";
-$areanames{en}->{4933239} = "Gross\ Behnitz";
-$areanames{en}->{493327} = "Werder\ Havel";
-$areanames{en}->{493328} = "Teltow";
-$areanames{en}->{493329} = "Stahnsdorf";
-$areanames{en}->{493331} = "Angermünde";
-$areanames{en}->{493332} = "Schwedt\/Oder";
-$areanames{en}->{4933331} = "Casekow";
-$areanames{en}->{4933332} = "Gartz\ Oder";
-$areanames{en}->{4933333} = "Tantow";
-$areanames{en}->{4933334} = "Greiffenberg";
-$areanames{en}->{4933335} = "Pinnow\ Kreis\ Uckermark";
-$areanames{en}->{4933336} = "Passow\ Kreis\ Uckermark";
-$areanames{en}->{4933337} = "Altkünkendorf";
-$areanames{en}->{4933338} = "Stolpe\/Oder";
-$areanames{en}->{493334} = "Eberswalde";
-$areanames{en}->{493335} = "Finowfurt";
-$areanames{en}->{4933361} = "Joachimsthal";
-$areanames{en}->{4933362} = "Liepe\ Kreis\ Barnim";
-$areanames{en}->{4933363} = "Altenhof\ Kreis\ Barnim";
-$areanames{en}->{4933364} = "Gross\ Ziethen\ Kreis\ Barnim";
-$areanames{en}->{4933365} = "Lüdersdorf\ Kreis\ Barnim";
-$areanames{en}->{4933366} = "Chorin";
-$areanames{en}->{4933367} = "Friedrichswalde\ Brandenburg";
-$areanames{en}->{4933368} = "Hohensaaten";
-$areanames{en}->{4933369} = "Oderberg";
-$areanames{en}->{493337} = "Biesenthal\ Brandenburg";
-$areanames{en}->{493338} = "Bernau\ Brandenburg";
-$areanames{en}->{4933393} = "Gross\ Schönebeck\ Kreis\ Barnim";
-$areanames{en}->{4933394} = "Blumberg\ Kreis\ Barnim";
-$areanames{en}->{4933395} = "Zerpenschleuse";
-$areanames{en}->{4933396} = "Klosterfelde";
-$areanames{en}->{4933397} = "Wandlitz";
-$areanames{en}->{4933398} = "Werneuchen";
-$areanames{en}->{493341} = "Strausberg";
-$areanames{en}->{493342} = "Neuenhagen\ bei\ Berlin";
-$areanames{en}->{4933432} = "Müncheberg";
-$areanames{en}->{4933433} = "Buckow\ Märkische\ Schweiz";
-$areanames{en}->{4933434} = "Herzfelde\ bei\ Strausberg";
-$areanames{en}->{4933435} = "Rehfelde";
-$areanames{en}->{4933436} = "Prötzel";
-$areanames{en}->{4933437} = "Reichenberg\ bei\ Strausberg";
-$areanames{en}->{4933438} = "Altlandsberg";
-$areanames{en}->{4933439} = "Fredersdorf\-Vogelsdorf";
-$areanames{en}->{493344} = "Bad\ Freienwalde";
-$areanames{en}->{4933451} = "Heckelberg";
-$areanames{en}->{4933452} = "Neulewin";
-$areanames{en}->{4933454} = "Wölsickendorf\/Wollenberg";
-$areanames{en}->{4933456} = "Wriezen";
-$areanames{en}->{4933457} = "Altreetz";
-$areanames{en}->{4933458} = "Falkenberg\ Mark";
-$areanames{en}->{493346} = "Seelow";
-$areanames{en}->{4933470} = "Lietzen";
-$areanames{en}->{4933472} = "Golzow\ bei\ Seelow";
-$areanames{en}->{4933473} = "Zechin";
-$areanames{en}->{4933474} = "Neutrebbin";
-$areanames{en}->{4933475} = "Letschin";
-$areanames{en}->{4933476} = "Neuhardenberg";
-$areanames{en}->{4933477} = "Trebnitz\ bei\ Müncheberg";
-$areanames{en}->{4933478} = "Gross\ Neuendorf";
-$areanames{en}->{4933479} = "Küstrin\-Kietz";
-$areanames{en}->{49335} = "Frankfurt\ \(Oder\)";
-$areanames{en}->{4933601} = "Podelzig";
-$areanames{en}->{4933602} = "Alt\ Zeschdorf";
-$areanames{en}->{4933603} = "Falkenhagen\ bei\ Seelow";
-$areanames{en}->{4933604} = "Lebus";
-$areanames{en}->{4933605} = "Boossen";
-$areanames{en}->{4933606} = "Müllrose";
-$areanames{en}->{4933607} = "Briesen\ Mark";
-$areanames{en}->{4933608} = "Jacobsdorf\ Mark";
-$areanames{en}->{4933609} = "Brieskow\-Finkenheerd";
-$areanames{en}->{493361} = "Fürstenwalde\ Spree";
-$areanames{en}->{493362} = "Erkner";
-$areanames{en}->{4933631} = "Bad\ Saarow\-Pieskow";
-$areanames{en}->{4933632} = "Hangelsberg";
-$areanames{en}->{4933633} = "Spreenhagen";
-$areanames{en}->{4933634} = "Berkenbrück\ Kreis\ Oder\-Spree";
-$areanames{en}->{4933635} = "Arensdorf\ Kreis\ Oder\-Spree";
-$areanames{en}->{4933636} = "Steinhöfel\ Kreis\ Oder\-Spree";
-$areanames{en}->{4933637} = "Beerfelde";
-$areanames{en}->{4933638} = "Rüdersdorf\ bei\ Berlin";
-$areanames{en}->{493364} = "Eisenhüttenstadt";
-$areanames{en}->{4933652} = "Neuzelle";
-$areanames{en}->{4933653} = "Ziltendorf";
-$areanames{en}->{4933654} = "Fünfeichen";
-$areanames{en}->{4933655} = "Grunow\ Kreis\ Oder\-Spree";
-$areanames{en}->{4933656} = "Bahro";
-$areanames{en}->{4933657} = "Steinsdorf\ Brandenburg";
-$areanames{en}->{493366} = "Beeskow";
-$areanames{en}->{4933671} = "Lieberose";
-$areanames{en}->{4933672} = "Pfaffendorfb\ Beeskow";
-$areanames{en}->{4933673} = "Weichensdorf";
-$areanames{en}->{4933674} = "Trebatsch";
-$areanames{en}->{4933675} = "Tauche";
-$areanames{en}->{4933676} = "Friedland\ bei\ Beeskow";
-$areanames{en}->{4933677} = "Glienicke\ bei\ Beeskow";
-$areanames{en}->{4933678} = "Storkow\ Mark";
-$areanames{en}->{4933679} = "Wendisch\ Rietz";
-$areanames{en}->{4933701} = "Grossbeeren";
-$areanames{en}->{4933702} = "Wünsdorf";
-$areanames{en}->{4933703} = "Sperenberg";
-$areanames{en}->{4933704} = "Baruth\ Mark";
-$areanames{en}->{4933708} = "Rangsdorf";
-$areanames{en}->{493371} = "Luckenwalde";
-$areanames{en}->{493372} = "Jüterbog";
-$areanames{en}->{4933731} = "Trebbin";
-$areanames{en}->{4933732} = "Hennickendorf\ bei\ Luckenwalde";
-$areanames{en}->{4933733} = "Stülpe";
-$areanames{en}->{4933734} = "Felgentreu";
-$areanames{en}->{4933741} = "Niedergörsdorf";
-$areanames{en}->{4933742} = "Oehna\ Brandenburg";
-$areanames{en}->{4933743} = "Blönsdorf";
-$areanames{en}->{4933744} = "Hohenseefeld";
-$areanames{en}->{4933745} = "Petkus";
-$areanames{en}->{4933746} = "Werbig\ bei\ Jüterbog";
-$areanames{en}->{4933747} = "Marzahna";
-$areanames{en}->{4933748} = "Treuenbrietzen";
-$areanames{en}->{493375} = "Königs\ Wusterhausen";
-$areanames{en}->{4933760} = "Münchehofe\ Kreis\ Dahme\-Spreewald";
-$areanames{en}->{4933762} = "Zeuthen";
-$areanames{en}->{4933763} = "Bestensee";
-$areanames{en}->{4933764} = "Mittenwalde\ Mark";
-$areanames{en}->{4933765} = "Märkisch\ Buchholz";
-$areanames{en}->{4933766} = "Teupitz";
-$areanames{en}->{4933767} = "Friedersdorf\ bei\ Berlin";
-$areanames{en}->{4933768} = "Prieros";
-$areanames{en}->{4933769} = "Töpchin";
-$areanames{en}->{493377} = "Zossen\ Brandenburg";
-$areanames{en}->{493378} = "Ludwigsfelde";
-$areanames{en}->{493379} = "Mahlow";
-$areanames{en}->{493381} = "Brandenburg\ an\ der\ Havel";
-$areanames{en}->{493382} = "Lehnin";
-$areanames{en}->{4933830} = "Ziesar";
-$areanames{en}->{4933831} = "Weseram";
-$areanames{en}->{4933832} = "Rogäsen";
-$areanames{en}->{4933833} = "Wollin\ bei\ Brandenburg";
-$areanames{en}->{4933834} = "Pritzerbe";
-$areanames{en}->{4933835} = "Golzow\ bei\ Brandenburg";
-$areanames{en}->{4933836} = "Butzow\ bei\ Brandenburg";
-$areanames{en}->{4933837} = "Brielow";
-$areanames{en}->{4933838} = "Päwesin";
-$areanames{en}->{4933839} = "Wusterwitz";
-$areanames{en}->{4933841} = "Belzig";
-$areanames{en}->{4933843} = "Niemegk";
-$areanames{en}->{4933844} = "Brück\ Brandenburg";
-$areanames{en}->{4933845} = "Borkheide";
-$areanames{en}->{4933846} = "Dippmannsdorf";
-$areanames{en}->{4933847} = "Görzke";
-$areanames{en}->{4933848} = "Raben";
-$areanames{en}->{4933849} = "Wiesenburg\ Mark";
-$areanames{en}->{493385} = "Rathenow";
-$areanames{en}->{493386} = "Premnitz";
-$areanames{en}->{4933870} = "Zollchow\ bei\ Rathenow";
-$areanames{en}->{4933872} = "Hohennauen";
-$areanames{en}->{4933873} = "Grosswudicke";
-$areanames{en}->{4933874} = "Stechow\ Brandenburg";
-$areanames{en}->{4933875} = "Rhinow";
-$areanames{en}->{4933876} = "Buschow";
-$areanames{en}->{4933877} = "Nitzahn";
-$areanames{en}->{4933878} = "Nennhausen";
-$areanames{en}->{493391} = "Neuruppin";
-$areanames{en}->{4933920} = "Walsleben\ bei\ Neuruppin";
-$areanames{en}->{4933921} = "Zechlinerhütte";
-$areanames{en}->{4933922} = "Karwesee";
-$areanames{en}->{4933923} = "Flecken\ Zechlin";
-$areanames{en}->{4933924} = "Rägelin";
-$areanames{en}->{4933925} = "Wustrau\-Altfriesack";
-$areanames{en}->{4933926} = "Herzberg\ Mark";
-$areanames{en}->{4933927} = "Linum";
-$areanames{en}->{4933928} = "Wildberg\ Brandenburg";
-$areanames{en}->{4933929} = "Gühlen\-Glienicke";
-$areanames{en}->{4933931} = "Rheinsberg\ Mark";
-$areanames{en}->{4933932} = "Fehrbellin";
-$areanames{en}->{4933933} = "Lindow\ Mark";
-$areanames{en}->{493394} = "Wittstock\ Dosse";
-$areanames{en}->{493395} = "Pritzwalk";
-$areanames{en}->{4933962} = "Heiligengrabe";
-$areanames{en}->{4933963} = "Wulfersdorf\ bei\ Wittstock";
-$areanames{en}->{4933964} = "Fretzdorf";
-$areanames{en}->{4933965} = "Herzsprung\ bei\ Wittstock";
-$areanames{en}->{4933966} = "Dranse";
-$areanames{en}->{4933967} = "Freyenstein";
-$areanames{en}->{4933968} = "Meyenburg\ Kreis\ Prignitz";
-$areanames{en}->{4933969} = "Stepenitz";
-$areanames{en}->{4933970} = "Neustadt\ Dosse";
-$areanames{en}->{4933971} = "Kyritz\ Brandenburg";
-$areanames{en}->{4933972} = "Breddin";
-$areanames{en}->{4933973} = "Zernitz\ bei\ Neustadt\ Dosse";
-$areanames{en}->{4933974} = "Dessow";
-$areanames{en}->{4933975} = "Dannenwalde\ Kreis\ Prignitz";
-$areanames{en}->{4933976} = "Wutike";
-$areanames{en}->{4933977} = "Gumtow";
-$areanames{en}->{4933978} = "Segeletz";
-$areanames{en}->{4933979} = "Wusterhausen\ Dosse";
-$areanames{en}->{4933981} = "Putlitz";
-$areanames{en}->{4933982} = "Hoppenrade\ Kreis\ Prignitz";
-$areanames{en}->{4933983} = "Gross\ Pankow\ Kreis\ Prignitz";
-$areanames{en}->{4933984} = "Blumenthal\ bei\ Pritzwalk";
-$areanames{en}->{4933986} = "Falkenhagen\ Kreis\ Prignitz";
-$areanames{en}->{4933989} = "Sadenbeck";
-$areanames{en}->{49340} = "Dessau\ Anh";
-$areanames{en}->{49341} = "Leipzig";
-$areanames{en}->{4934202} = "Delitzsch";
-$areanames{en}->{4934203} = "Zwenkau";
-$areanames{en}->{4934204} = "Schkeuditz";
-$areanames{en}->{4934205} = "Markranstädt";
-$areanames{en}->{4934206} = "Rötha";
-$areanames{en}->{4934207} = "Zwochau";
-$areanames{en}->{4934208} = "Löbnitz\ bei\ Delitzsch";
-$areanames{en}->{493421} = "Torgau";
-$areanames{en}->{4934221} = "Schildau\ Gneisenaustadt";
-$areanames{en}->{4934222} = "Arzberg\ bei\ Torgau";
-$areanames{en}->{4934223} = "Dommitzsch";
-$areanames{en}->{4934224} = "Belgern\ Sachsen";
-$areanames{en}->{493423} = "Eilenburg";
-$areanames{en}->{4934241} = "Jesewitz";
-$areanames{en}->{4934242} = "Hohenpriessnitz";
-$areanames{en}->{4934243} = "Bad\ Düben";
-$areanames{en}->{4934244} = "Mockrehna";
-$areanames{en}->{493425} = "Wurzen";
-$areanames{en}->{4934261} = "Kühren\ bei\ Wurzen";
-$areanames{en}->{4934262} = "Falkenhain\ bei\ Wurzen";
-$areanames{en}->{4934263} = "Hohburg";
-$areanames{en}->{4934291} = "Borsdorf";
-$areanames{en}->{4934292} = "Brandis\ bei\ Wurzen";
-$areanames{en}->{4934293} = "Naunhof\ bei\ Grimma";
-$areanames{en}->{4934294} = "Rackwitz";
-$areanames{en}->{4934295} = "Krensitz";
-$areanames{en}->{4934296} = "Groitzsch\ bei\ Pegau";
-$areanames{en}->{4934297} = "Liebertwolkwitz";
-$areanames{en}->{4934298} = "Taucha\ bei\ Leipzig";
-$areanames{en}->{4934299} = "Gaschwitz";
-$areanames{en}->{493431} = "Döbeln";
-$areanames{en}->{4934321} = "Leisnig";
-$areanames{en}->{4934322} = "Rosswein";
-$areanames{en}->{4934324} = "Ostrau\ Sachsen";
-$areanames{en}->{4934325} = "Mochau\-Lüttewitz";
-$areanames{en}->{4934327} = "Waldheim\ Sachsen";
-$areanames{en}->{4934328} = "Hartha\ bei\ Döbeln";
-$areanames{en}->{493433} = "Borna\ Stadt";
-$areanames{en}->{4934341} = "Geithain";
-$areanames{en}->{4934342} = "Neukieritzsch";
-$areanames{en}->{4934343} = "Regis\-Breitingen";
-$areanames{en}->{4934344} = "Kohren\-Sahlis";
-$areanames{en}->{4934345} = "Bad\ Lausick";
-$areanames{en}->{4934346} = "Narsdorf";
-$areanames{en}->{4934347} = "Oelzschau\ bei\ Borna";
-$areanames{en}->{4934348} = "Frohburg";
-$areanames{en}->{493435} = "Oschatz";
-$areanames{en}->{4934361} = "Dahlen\ Sachsen";
-$areanames{en}->{4934362} = "Mügeln\ bei\ Oschatz";
-$areanames{en}->{4934363} = "Cavertitz";
-$areanames{en}->{4934364} = "Wermsdorf";
-$areanames{en}->{493437} = "Grimma";
-$areanames{en}->{4934381} = "Colditz";
-$areanames{en}->{4934382} = "Nerchau";
-$areanames{en}->{4934383} = "Trebsen\ Mulde";
-$areanames{en}->{4934384} = "Grossbothen";
-$areanames{en}->{4934385} = "Mutzschen";
-$areanames{en}->{4934386} = "Dürrweitzschen\ bei\ Grimma";
-$areanames{en}->{493441} = "Zeitz";
-$areanames{en}->{4934422} = "Osterfeld";
-$areanames{en}->{4934423} = "Heuckewalde";
-$areanames{en}->{4934424} = "Reuden\ bei\ Zeitz";
-$areanames{en}->{4934425} = "Droyssig";
-$areanames{en}->{4934426} = "Kayna";
-$areanames{en}->{493443} = "Weissenfels\ Sachsen\-Anhalt";
-$areanames{en}->{4934441} = "Hohenmölsen";
-$areanames{en}->{4934443} = "Teuchern";
-$areanames{en}->{4934444} = "Lützen";
-$areanames{en}->{4934445} = "Stössen";
-$areanames{en}->{4934446} = "Grosskorbetha";
-$areanames{en}->{493445} = "Naumburg\ Saale";
-$areanames{en}->{4934461} = "Nebra\ Unstrut";
-$areanames{en}->{4934462} = "Laucha\ Unstrut";
-$areanames{en}->{4934463} = "Bad\ Kösen";
-$areanames{en}->{4934464} = "Freyburg\ Unstrut";
-$areanames{en}->{4934465} = "Bad\ Bibra";
-$areanames{en}->{4934466} = "Janisroda";
-$areanames{en}->{4934467} = "Eckartsberga";
-$areanames{en}->{493447} = "Altenburg\ Thüringen";
-$areanames{en}->{493448} = "Meuselwitz\ Thüringen";
-$areanames{en}->{4934491} = "Schmölln\ Thüringen";
-$areanames{en}->{4934492} = "Lucka";
-$areanames{en}->{4934493} = "Gössnitz\ Thüringen";
-$areanames{en}->{4934494} = "Ehrenhain";
-$areanames{en}->{4934495} = "Dobitschen";
-$areanames{en}->{4934496} = "Nöbdenitz";
-$areanames{en}->{4934497} = "Langenleuba\-Niederhain";
-$areanames{en}->{4934498} = "Rositz";
-$areanames{en}->{49345} = "Halle\ Saale";
-$areanames{en}->{4934600} = "Ostrau\ Saalkreis";
-$areanames{en}->{4934601} = "Teutschenthal";
-$areanames{en}->{4934602} = "Landsberg\ Sachsen\-Anhalt";
-$areanames{en}->{4934603} = "Nauendorf\ Sachsen\-Anhalt";
-$areanames{en}->{4934604} = "Niemberg";
-$areanames{en}->{4934605} = "Gröbers";
-$areanames{en}->{4934606} = "Teicha\ Sachsen\-Anhalt";
-$areanames{en}->{4934607} = "Wettin";
-$areanames{en}->{4934609} = "Salzmünde";
-$areanames{en}->{493461} = "Merseburg\ Saale";
-$areanames{en}->{493462} = "Bad\ Dürrenberg";
-$areanames{en}->{4934632} = "Mücheln\ Geiseltal";
-$areanames{en}->{4934633} = "Braunsbedra";
-$areanames{en}->{4934635} = "Bad\ Lauchstädt";
-$areanames{en}->{4934636} = "Schafstädt";
-$areanames{en}->{4934637} = "Frankleben";
-$areanames{en}->{4934638} = "Zöschen";
-$areanames{en}->{4934639} = "Wallendorf\ Luppe";
-$areanames{en}->{493464} = "Sangerhausen";
-$areanames{en}->{4934651} = "Rossla";
-$areanames{en}->{4934652} = "Allstedt";
-$areanames{en}->{4934653} = "Rottleberode";
-$areanames{en}->{4934654} = "Stolberg\ Harz";
-$areanames{en}->{4934656} = "Wallhausen\ Sachsen\-Anhalt";
-$areanames{en}->{4934658} = "Hayn\ Harz";
-$areanames{en}->{4934659} = "Blankenheim\ bei\ Sangerhausen";
-$areanames{en}->{493466} = "Artern\ Unstrut";
-$areanames{en}->{4934671} = "Bad\ Frankenhausen\ Kyffhäuser";
-$areanames{en}->{4934672} = "Rossleben";
-$areanames{en}->{4934673} = "Heldrungen";
-$areanames{en}->{4934691} = "Könnern";
-$areanames{en}->{4934692} = "Alsleben\ Saale";
-$areanames{en}->{493471} = "Bernburg\ Saale";
-$areanames{en}->{4934721} = "Nienburg\ Saale";
-$areanames{en}->{4934722} = "Preusslitz";
-$areanames{en}->{493473} = "Aschersleben\ Sachsen\-Anhalt";
-$areanames{en}->{4934741} = "Frose";
-$areanames{en}->{4934742} = "Sylda";
-$areanames{en}->{4934743} = "Ermsleben";
-$areanames{en}->{4934745} = "Winningen\ Sachsen\-Anhalt";
-$areanames{en}->{4934746} = "Giersleben";
-$areanames{en}->{493475} = "Lutherstadt\ Eisleben";
-$areanames{en}->{493476} = "Hettstedt\ Sachsen\-Anhalt";
-$areanames{en}->{4934771} = "Querfurt";
-$areanames{en}->{4934772} = "Helbra";
-$areanames{en}->{4934773} = "Schwittersdorf";
-$areanames{en}->{4934774} = "Röblingen\ am\ See";
-$areanames{en}->{4934775} = "Wippra";
-$areanames{en}->{4934776} = "Rothenschirmbach";
-$areanames{en}->{4934779} = "Abberode";
-$areanames{en}->{4934781} = "Greifenhagen";
-$areanames{en}->{4934782} = "Mansfeld\ Südharz";
-$areanames{en}->{4934783} = "Gerbstedt";
-$areanames{en}->{4934785} = "Sandersleben";
-$areanames{en}->{4934901} = "Rosslau\ Elbe";
-$areanames{en}->{4934903} = "Coswig\ Anhalt";
-$areanames{en}->{4934904} = "Oranienbaum";
-$areanames{en}->{4934905} = "Wörlitz";
-$areanames{en}->{4934906} = "Raguhn";
-$areanames{en}->{4934907} = "Jeber\-Bergfrieden";
-$areanames{en}->{4934909} = "Aken\ Elbe";
-$areanames{en}->{493491} = "Lutherstadt\ Wittenberg";
-$areanames{en}->{4934920} = "Kropstädt";
-$areanames{en}->{4934921} = "Kemberg";
-$areanames{en}->{4934922} = "Mühlanger";
-$areanames{en}->{4934923} = "Cobbelsdorf";
-$areanames{en}->{4934924} = "Zahna";
-$areanames{en}->{4934925} = "Bad\ Schmiedeberg";
-$areanames{en}->{4934926} = "Pretzsch\ Elbe";
-$areanames{en}->{4934927} = "Globig\-Bleddin";
-$areanames{en}->{4934928} = "Seegrehna";
-$areanames{en}->{4934929} = "Straach";
-$areanames{en}->{493493} = "Bitterfeld";
-$areanames{en}->{493494} = "Wolfen";
-$areanames{en}->{4934953} = "Gräfenhainichen";
-$areanames{en}->{4934954} = "Roitzsch\ bei\ Bitterfeld";
-$areanames{en}->{4934955} = "Gossa";
-$areanames{en}->{4934956} = "Zörbig";
-$areanames{en}->{493496} = "Köthen\ Anhalt";
-$areanames{en}->{4934973} = "Osternienburg";
-$areanames{en}->{4934975} = "Görzig\ Kreis\ Köthen";
-$areanames{en}->{4934976} = "Gröbzig";
-$areanames{en}->{4934977} = "Quellendorf";
-$areanames{en}->{4934978} = "Radegast\ Kreis\ Köthen";
-$areanames{en}->{4934979} = "Wulfen\ Sachsen\-Anhalt";
-$areanames{en}->{493501} = "Pirna";
-$areanames{en}->{4935020} = "Struppen";
-$areanames{en}->{4935021} = "Königstein\ Sächsische\ Schweiz";
-$areanames{en}->{4935022} = "Bad\ Schandau";
-$areanames{en}->{4935023} = "Bad\ Gottleuba";
-$areanames{en}->{4935024} = "Stadt\ Wehlen";
-$areanames{en}->{4935025} = "Liebstadt";
-$areanames{en}->{4935026} = "Dürrröhrsdorf\-Dittersbach";
-$areanames{en}->{4935027} = "Weesenstein";
-$areanames{en}->{4935028} = "Krippen";
-$areanames{en}->{4935032} = "Langenhennersdorf";
-$areanames{en}->{4935033} = "Rosenthal\ Sächsische\ Schweiz";
-$areanames{en}->{493504} = "Dippoldiswalde";
-$areanames{en}->{4935052} = "Kipsdorf\ Kurort";
-$areanames{en}->{4935053} = "Glashütte\ Sachsen";
-$areanames{en}->{4935054} = "Lauenstein\ Sachsen";
-$areanames{en}->{4935055} = "Höckendorf\ bei\ Dippoldiswalde";
-$areanames{en}->{4935056} = "Altenberg\ Sachsen";
-$areanames{en}->{4935057} = "Hermsdorf\ Erzgebirge";
-$areanames{en}->{4935058} = "Pretzschendorf";
-$areanames{en}->{49351} = "Dresden";
-$areanames{en}->{4935200} = "Arnsdorf\ bei\ Dresden";
-$areanames{en}->{4935201} = "Langebrück";
-$areanames{en}->{4935202} = "Klingenberg\ Sachsen";
-$areanames{en}->{4935203} = "Tharandt";
-$areanames{en}->{4935204} = "Wilsdruff";
-$areanames{en}->{4935205} = "Ottendorf\-Okrilla";
-$areanames{en}->{4935206} = "Kreischa\ bei\ Dresden";
-$areanames{en}->{4935207} = "Moritzburg";
-$areanames{en}->{4935208} = "Radeburg";
-$areanames{en}->{4935209} = "Mohorn";
-$areanames{en}->{493521} = "Meissen";
-$areanames{en}->{493522} = "Grossenhain\ Sachsen";
-$areanames{en}->{493523} = "Coswig\ bei\ Dresden";
-$areanames{en}->{4935240} = "Tauscha\ bei\ Grossenhain";
-$areanames{en}->{4935241} = "Lommatzsch";
-$areanames{en}->{4935242} = "Nossen";
-$areanames{en}->{4935243} = "Weinböhla";
-$areanames{en}->{4935244} = "Krögis";
-$areanames{en}->{4935245} = "Burkhardswalde\-Munzig";
-$areanames{en}->{4935246} = "Ziegenhain\ Sachsen";
-$areanames{en}->{4935247} = "Zehren\ Sachsen";
-$areanames{en}->{4935248} = "Schönfeld\ bei\ Grossenhain";
-$areanames{en}->{4935249} = "Basslitz";
-$areanames{en}->{493525} = "Riesa";
-$areanames{en}->{4935263} = "Gröditz\ bei\ Riesa";
-$areanames{en}->{4935264} = "Strehla";
-$areanames{en}->{4935265} = "Glaubitz";
-$areanames{en}->{4935266} = "Heyda\ bei\ Riesa";
-$areanames{en}->{4935267} = "Diesbar\-Seusslitz";
-$areanames{en}->{4935268} = "Stauchitz";
-$areanames{en}->{493528} = "Radeberg";
-$areanames{en}->{493529} = "Heidenau\ Sachsen";
-$areanames{en}->{493531} = "Finsterwalde";
-$areanames{en}->{4935322} = "Doberlug\-Kirchhain";
-$areanames{en}->{4935323} = "Sonnewalde";
-$areanames{en}->{4935324} = "Crinitz";
-$areanames{en}->{4935325} = "Rückersdorf\ bei\ Finsterwalde";
-$areanames{en}->{4935326} = "Schönborn\ Kreis\ Elbe\-Elster";
-$areanames{en}->{4935327} = "Priessen";
-$areanames{en}->{4935329} = "Dollenchen";
-$areanames{en}->{493533} = "Elsterwerda";
-$areanames{en}->{4935341} = "Bad\ Liebenwerda";
-$areanames{en}->{4935342} = "Mühlberg\ Elbe";
-$areanames{en}->{4935343} = "Hirschfeld\ bei\ Elsterwerda";
-$areanames{en}->{493535} = "Herzberg\ Elster";
-$areanames{en}->{4935361} = "Schlieben";
-$areanames{en}->{4935362} = "Schönewalde\ bei\ Herzberg";
-$areanames{en}->{4935363} = "Fermerswalde";
-$areanames{en}->{4935364} = "Lebusa";
-$areanames{en}->{4935365} = "Falkenberg\ Elster";
-$areanames{en}->{493537} = "Jessen\ Elster";
-$areanames{en}->{4935383} = "Elster\ Elbe";
-$areanames{en}->{4935384} = "Steinsdorf\ bei\ Jessen";
-$areanames{en}->{4935385} = "Annaburg";
-$areanames{en}->{4935386} = "Prettin";
-$areanames{en}->{4935387} = "Seyda";
-$areanames{en}->{4935388} = "Klöden";
-$areanames{en}->{4935389} = "Holzdorf\ Elster";
-$areanames{en}->{493541} = "Calau";
-$areanames{en}->{493542} = "Lübbenau\ Spreewald";
-$areanames{en}->{4935433} = "Vetschau";
-$areanames{en}->{4935434} = "Altdöbern";
-$areanames{en}->{4935435} = "Gollmitz\ bei\ Calau";
-$areanames{en}->{4935436} = "Laasow\ bei\ Calau";
-$areanames{en}->{4935439} = "Zinnitz";
-$areanames{en}->{493544} = "Luckau\ Brandenburg";
-$areanames{en}->{4935451} = "Dahme\ Brandenburg";
-$areanames{en}->{4935452} = "Golssen";
-$areanames{en}->{4935453} = "Drahnsdorf";
-$areanames{en}->{4935454} = "Uckro";
-$areanames{en}->{4935455} = "Walddrehna";
-$areanames{en}->{4935456} = "Terpt";
-$areanames{en}->{493546} = "Lübben\ Spreewald";
-$areanames{en}->{4935471} = "Birkenhainchen";
-$areanames{en}->{4935472} = "Schlepzig";
-$areanames{en}->{4935473} = "Neu\ Lübbenau";
-$areanames{en}->{4935474} = "Schönwalde\ bei\ Lübben";
-$areanames{en}->{4935475} = "Straupitz";
-$areanames{en}->{4935476} = "Wittmannsdorf\-Bückchen";
-$areanames{en}->{4935477} = "Rietzneuendorf\-Friedrichshof";
-$areanames{en}->{4935478} = "Goyatz";
-$areanames{en}->{49355} = "Cottbus";
-$areanames{en}->{4935600} = "Döbern\ NL";
-$areanames{en}->{4935601} = "Peitz";
-$areanames{en}->{4935602} = "Drebkau";
-$areanames{en}->{4935603} = "Burg\ Spreewald";
-$areanames{en}->{4935604} = "Krieschow";
-$areanames{en}->{4935605} = "Komptendorf";
-$areanames{en}->{4935606} = "Briesen\ bei\ Cottbus";
-$areanames{en}->{4935607} = "Jänschwalde";
-$areanames{en}->{4935608} = "Gross\ Ossnig";
-$areanames{en}->{4935609} = "Drachhausen";
-$areanames{en}->{493561} = "Guben";
-$areanames{en}->{493562} = "Forst\ Lausitz";
-$areanames{en}->{493563} = "Spremberg";
-$areanames{en}->{493564} = "Schwarze\ Pumpe";
-$areanames{en}->{4935691} = "Bärenklau\ NL";
-$areanames{en}->{4935692} = "Kerkwitz";
-$areanames{en}->{4935693} = "Lauschütz";
-$areanames{en}->{4935694} = "Gosda\ bei\ Klinge";
-$areanames{en}->{4935695} = "Simmersdorf";
-$areanames{en}->{4935696} = "Briesnig";
-$areanames{en}->{4935697} = "Bagenz";
-$areanames{en}->{4935698} = "Hornow";
-$areanames{en}->{493571} = "Hoyerswerda";
-$areanames{en}->{4935722} = "Lauta\ bei\ Hoyerswerda";
-$areanames{en}->{4935723} = "Bernsdorf\ OL";
-$areanames{en}->{4935724} = "Lohsa";
-$areanames{en}->{4935725} = "Wittichenau";
-$areanames{en}->{4935726} = "Gross\ Särchen";
-$areanames{en}->{4935727} = "Burghammer";
-$areanames{en}->{4935728} = "Uhyst\ Spree";
-$areanames{en}->{493573} = "Senftenberg";
-$areanames{en}->{493574} = "Lauchhammer";
-$areanames{en}->{4935751} = "Welzow";
-$areanames{en}->{4935752} = "Ruhland";
-$areanames{en}->{4935753} = "Grossräschen";
-$areanames{en}->{4935754} = "Klettwitz";
-$areanames{en}->{4935755} = "Ortrand";
-$areanames{en}->{4935756} = "Hosena";
-$areanames{en}->{493576} = "Weisswasser";
-$areanames{en}->{4935771} = "Bad\ Muskau";
-$areanames{en}->{4935772} = "Rietschen";
-$areanames{en}->{4935773} = "Schleife";
-$areanames{en}->{4935774} = "Boxberg\ Sachsen";
-$areanames{en}->{4935775} = "Pechern";
-$areanames{en}->{493578} = "Kamenz";
-$areanames{en}->{4935792} = "Ossling";
-$areanames{en}->{4935793} = "Elstra";
-$areanames{en}->{4935795} = "Königsbrück";
-$areanames{en}->{4935796} = "Panschwitz\-Kuckau";
-$areanames{en}->{4935797} = "Schwepnitz";
-$areanames{en}->{493581} = "Görlitz";
-$areanames{en}->{4935820} = "Zodel";
-$areanames{en}->{4935822} = "Hagenwerder";
-$areanames{en}->{4935823} = "Ostritz";
-$areanames{en}->{4935825} = "Kodersdorf";
-$areanames{en}->{4935826} = "Königshain\ bei\ Görlitz";
-$areanames{en}->{4935827} = "Nieder\-Seifersdorf";
-$areanames{en}->{4935828} = "Reichenbach\ OL";
-$areanames{en}->{4935829} = "Gersdorf\ bei\ Görlitz";
-$areanames{en}->{493583} = "Zittau";
-$areanames{en}->{4935841} = "Grossschönau\ Sachsen";
-$areanames{en}->{4935842} = "Oderwitz";
-$areanames{en}->{4935843} = "Hirschfelde\ bei\ Zittau";
-$areanames{en}->{4935844} = "Oybin\ Kurort";
-$areanames{en}->{493585} = "Löbau";
-$areanames{en}->{493586} = "Neugersdorf\ Sachsen";
-$areanames{en}->{4935872} = "Neusalza\-Spremberg";
-$areanames{en}->{4935873} = "Herrnhut";
-$areanames{en}->{4935874} = "Bernstadt\ an\ der\ Eigen";
-$areanames{en}->{4935875} = "Obercunnersdorf\ bei\ Löbau";
-$areanames{en}->{4935876} = "Weissenberg\ Sachsen";
-$areanames{en}->{4935877} = "Cunewalde";
-$areanames{en}->{493588} = "Niesky";
-$areanames{en}->{4935891} = "Rothenburg\ OL";
-$areanames{en}->{4935892} = "Horka\ OL";
-$areanames{en}->{4935893} = "Mücka";
-$areanames{en}->{4935894} = "Hähnichen";
-$areanames{en}->{4935895} = "Klitten";
-$areanames{en}->{493591} = "Bautzen";
-$areanames{en}->{493592} = "Kirschau";
-$areanames{en}->{4935930} = "Seitschen";
-$areanames{en}->{4935931} = "Königswartha";
-$areanames{en}->{4935932} = "Guttau";
-$areanames{en}->{4935933} = "Neschwitz";
-$areanames{en}->{4935934} = "Grossdubrau";
-$areanames{en}->{4935935} = "Kleinwelka";
-$areanames{en}->{4935936} = "Sohland\ Spree";
-$areanames{en}->{4935937} = "Prischwitz";
-$areanames{en}->{4935938} = "Grosspostwitz\ OL";
-$areanames{en}->{4935939} = "Hochkirch";
-$areanames{en}->{493594} = "Bischofswerda";
-$areanames{en}->{4935951} = "Neukirch\ Lausitz";
-$areanames{en}->{4935952} = "Grossröhrsdorf\ OL";
-$areanames{en}->{4935953} = "Burkau";
-$areanames{en}->{4935954} = "Grossharthau";
-$areanames{en}->{4935955} = "Pulsnitz";
-$areanames{en}->{493596} = "Neustadt\ in\ Sachsen";
-$areanames{en}->{4935971} = "Sebnitz";
-$areanames{en}->{4935973} = "Stolpen";
-$areanames{en}->{4935974} = "Hinterhermsdorf";
-$areanames{en}->{4935975} = "Hohnstein";
-$areanames{en}->{493601} = "Mühlhausen\ Thüringen";
-$areanames{en}->{4936020} = "Ebeleben";
-$areanames{en}->{4936021} = "Schlotheim";
-$areanames{en}->{4936022} = "Grossengottern";
-$areanames{en}->{4936023} = "Horsmar";
-$areanames{en}->{4936024} = "Diedorf\ bei\ Mühlhausen";
-$areanames{en}->{4936025} = "Körner";
-$areanames{en}->{4936026} = "Struth\ bei\ Mühlhausen";
-$areanames{en}->{4936027} = "Lengenfeld\ Unterm\ Stein";
-$areanames{en}->{4936028} = "Kammerforst\ Thüringen";
-$areanames{en}->{4936029} = "Menteroda";
-$areanames{en}->{493603} = "Bad\ Langensalza";
-$areanames{en}->{4936041} = "Bad\ Tennstedt";
-$areanames{en}->{4936042} = "Tonna";
-$areanames{en}->{4936043} = "Kirchheilingen";
-$areanames{en}->{493605} = "Leinefelde";
-$areanames{en}->{493606} = "Heiligenstadt\ Heilbad";
-$areanames{en}->{4936071} = "Teistungen";
-$areanames{en}->{4936072} = "Weissenborn\-Lüderode";
-$areanames{en}->{4936074} = "Worbis";
-$areanames{en}->{4936075} = "Dingelstädt\ Eichsfeld";
-$areanames{en}->{4936076} = "Niederorschel";
-$areanames{en}->{4936077} = "Grossbodungen";
-$areanames{en}->{4936081} = "Arenshausen";
-$areanames{en}->{4936082} = "Ershausen";
-$areanames{en}->{4936083} = "Uder";
-$areanames{en}->{4936084} = "Heuthen";
-$areanames{en}->{4936085} = "Reinholterode";
-$areanames{en}->{4936087} = "Wüstheuterode";
-$areanames{en}->{49361} = "Erfurt";
-$areanames{en}->{4936200} = "Elxleben\ bei\ Arnstadt";
-$areanames{en}->{4936201} = "Walschleben";
-$areanames{en}->{4936202} = "Neudietendorf";
-$areanames{en}->{4936203} = "Vieselbach";
-$areanames{en}->{4936204} = "Stotternheim";
-$areanames{en}->{4936205} = "Gräfenroda";
-$areanames{en}->{4936206} = "Grossfahner";
-$areanames{en}->{4936207} = "Plaue\ Thüringen";
-$areanames{en}->{4936208} = "Ermstedt";
-$areanames{en}->{4936209} = "Klettbach";
-$areanames{en}->{493621} = "Gotha\ Thüringen";
-$areanames{en}->{493622} = "Waltershausen\ Thüringen";
-$areanames{en}->{493623} = "Friedrichroda";
-$areanames{en}->{493624} = "Ohrdruf";
-$areanames{en}->{4936252} = "Tambach\-Dietharz";
-$areanames{en}->{4936253} = "Georgenthal\ Thüringer\ Wald";
-$areanames{en}->{4936254} = "Friedrichswerth";
-$areanames{en}->{4936255} = "Goldbach\ bei\ Gotha";
-$areanames{en}->{4936256} = "Wechmar";
-$areanames{en}->{4936257} = "Luisenthal\ Thüringen";
-$areanames{en}->{4936258} = "Friemar";
-$areanames{en}->{4936259} = "Tabarz\ Thüringer\ Wald";
-$areanames{en}->{493628} = "Arnstadt";
-$areanames{en}->{493629} = "Stadtilm";
-$areanames{en}->{493631} = "Nordhausen\ Thüringen";
-$areanames{en}->{493632} = "Sondershausen";
-$areanames{en}->{4936330} = "Grossberndten";
-$areanames{en}->{4936331} = "Ilfeld";
-$areanames{en}->{4936332} = "Ellrich";
-$areanames{en}->{4936333} = "Heringen\ Helme";
-$areanames{en}->{4936334} = "Wolkramshausen";
-$areanames{en}->{4936335} = "Grosswechsungen";
-$areanames{en}->{4936336} = "Klettenberg";
-$areanames{en}->{4936337} = "Schiedungen";
-$areanames{en}->{4936338} = "Bleicherode";
-$areanames{en}->{493634} = "Sömmerda";
-$areanames{en}->{493635} = "Kölleda";
-$areanames{en}->{493636} = "Greussen";
-$areanames{en}->{4936370} = "Grossenehrich";
-$areanames{en}->{4936371} = "Schlossvippach";
-$areanames{en}->{4936372} = "Kleinneuhausen";
-$areanames{en}->{4936373} = "Buttstädt";
-$areanames{en}->{4936374} = "Weissensee";
-$areanames{en}->{4936375} = "Kindelbrück";
-$areanames{en}->{4936376} = "Straussfurt";
-$areanames{en}->{4936377} = "Rastenberg";
-$areanames{en}->{4936378} = "Ostramondra";
-$areanames{en}->{4936379} = "Holzengel";
-$areanames{en}->{493641} = "Jena";
-$areanames{en}->{4936421} = "Camburg";
-$areanames{en}->{4936422} = "Reinstädt\ Thüringen";
-$areanames{en}->{4936423} = "Orlamünde";
-$areanames{en}->{4936424} = "Kahla\ Thüringen";
-$areanames{en}->{4936425} = "Isserstedt";
-$areanames{en}->{4936426} = "Ottendorf\ bei\ Stadtroda";
-$areanames{en}->{4936427} = "Dornburg\ Saale";
-$areanames{en}->{4936428} = "Stadtroda";
-$areanames{en}->{493643} = "Weimar\ Thüringen";
-$areanames{en}->{493644} = "Apolda";
-$areanames{en}->{4936450} = "Kranichfeld";
-$areanames{en}->{4936451} = "Buttelstedt";
-$areanames{en}->{4936452} = "Berlstedt";
-$areanames{en}->{4936453} = "Mellingen";
-$areanames{en}->{4936454} = "Magdala";
-$areanames{en}->{4936458} = "Bad\ Berka";
-$areanames{en}->{4936459} = "Blankenhain\ Thüringen";
-$areanames{en}->{4936461} = "Bad\ Sulza";
-$areanames{en}->{4936462} = "Ossmannstedt";
-$areanames{en}->{4936463} = "Gebstedt";
-$areanames{en}->{4936464} = "Wormstedt";
-$areanames{en}->{4936465} = "Oberndorf\ bei\ Apolda";
-$areanames{en}->{493647} = "Pössneck";
-$areanames{en}->{4936481} = "Neustadt\ an\ der\ Orla";
-$areanames{en}->{4936482} = "Triptis";
-$areanames{en}->{4936483} = "Ziegenrück";
-$areanames{en}->{4936484} = "Knau\ bei\ Pössneck";
-$areanames{en}->{49365} = "Gera";
-$areanames{en}->{4936601} = "Hermsdorf\ Thüringen";
-$areanames{en}->{4936602} = "Ronneburg\ Thüringen";
-$areanames{en}->{4936603} = "Weida";
-$areanames{en}->{4936604} = "Münchenbernsdorf";
-$areanames{en}->{4936605} = "Bad\ Köstritz";
-$areanames{en}->{4936606} = "Kraftsdorf";
-$areanames{en}->{4936607} = "Niederpöllnitz";
-$areanames{en}->{4936608} = "Seelingstädt\ bei\ Gera";
-$areanames{en}->{493661} = "Greiz";
-$areanames{en}->{4936621} = "Elsterberg\ bei\ Plauen";
-$areanames{en}->{4936622} = "Triebes";
-$areanames{en}->{4936623} = "Berga\ Elster";
-$areanames{en}->{4936624} = "Teichwolframsdorf";
-$areanames{en}->{4936625} = "Langenwetzendorf";
-$areanames{en}->{4936626} = "Auma";
-$areanames{en}->{4936628} = "Zeulenroda";
-$areanames{en}->{493663} = "Schleiz";
-$areanames{en}->{4936640} = "Remptendorf";
-$areanames{en}->{4936642} = "Harra";
-$areanames{en}->{4936643} = "Thimmendorf";
-$areanames{en}->{4936644} = "Hirschberg\ Saale";
-$areanames{en}->{4936645} = "Mühltroff";
-$areanames{en}->{4936646} = "Tanna\ bei\ Schleiz";
-$areanames{en}->{4936647} = "Saalburg\ Thüringen";
-$areanames{en}->{4936648} = "Dittersdorf\ bei\ Schleiz";
-$areanames{en}->{4936649} = "Gefell\ bei\ Schleiz";
-$areanames{en}->{4936651} = "Lobenstein";
-$areanames{en}->{4936652} = "Wurzbach";
-$areanames{en}->{4936653} = "Lehesten\ Thüringer\ Wald";
-$areanames{en}->{4936691} = "Eisenberg\ Thüringen";
-$areanames{en}->{4936692} = "Bürgel";
-$areanames{en}->{4936693} = "Crossen\ an\ der\ Elster";
-$areanames{en}->{4936694} = "Schkölen\ Thüringen";
-$areanames{en}->{4936695} = "Söllmnitz";
-$areanames{en}->{4936701} = "Lichte";
-$areanames{en}->{4936702} = "Lauscha";
-$areanames{en}->{4936703} = "Gräfenthal";
-$areanames{en}->{4936704} = "Steinheid";
-$areanames{en}->{4936705} = "Oberweissbach\ Thüringer\ Wald";
-$areanames{en}->{493671} = "Saalfeld\ Saale";
-$areanames{en}->{493672} = "Rudolstadt";
-$areanames{en}->{4936730} = "Sitzendorf";
-$areanames{en}->{4936731} = "Unterloquitz";
-$areanames{en}->{4936732} = "Könitz";
-$areanames{en}->{4936733} = "Kaulsdorf";
-$areanames{en}->{4936734} = "Leutenberg";
-$areanames{en}->{4936735} = "Probstzella";
-$areanames{en}->{4936736} = "Arnsgereuth";
-$areanames{en}->{4936737} = "Drognitz";
-$areanames{en}->{4936738} = "Königsee";
-$areanames{en}->{4936739} = "Rottenbach";
-$areanames{en}->{4936741} = "Bad\ Blankenburg";
-$areanames{en}->{4936742} = "Uhlstädt";
-$areanames{en}->{4936743} = "Teichel";
-$areanames{en}->{4936744} = "Remda";
-$areanames{en}->{493675} = "Sonneberg\ Thüringen";
-$areanames{en}->{4936761} = "Heubisch";
-$areanames{en}->{4936762} = "Steinach\ Thüringen";
-$areanames{en}->{4936764} = "Neuhaus\-Schierschnitz";
-$areanames{en}->{4936766} = "Schalkau";
-$areanames{en}->{493677} = "Ilmenau\ Thüringen";
-$areanames{en}->{4936781} = "Grossbreitenbach";
-$areanames{en}->{4936782} = "Schmiedefeld\ am\ Rennsteig";
-$areanames{en}->{4936783} = "Gehren\ Thüringen";
-$areanames{en}->{4936784} = "Stützerbach";
-$areanames{en}->{4936785} = "Gräfinau\-Angstedt";
-$areanames{en}->{493679} = "Neuhaus\ am\ Rennweg";
-$areanames{en}->{493681} = "Suhl";
-$areanames{en}->{493682} = "Zella\-Mehlis";
-$areanames{en}->{493683} = "Schmalkalden";
-$areanames{en}->{4936840} = "Trusetal";
-$areanames{en}->{4936841} = "Schleusingen";
-$areanames{en}->{4936842} = "Oberhof\ Thüringen";
-$areanames{en}->{4936843} = "Benshausen";
-$areanames{en}->{4936844} = "Rohr\ Thüringen";
-$areanames{en}->{4936845} = "Gehlberg";
-$areanames{en}->{4936846} = "Suhl\-Dietzhausen";
-$areanames{en}->{4936847} = "Steinbach\-Hallenberg";
-$areanames{en}->{4936848} = "Wernshausen";
-$areanames{en}->{4936849} = "Kleinschmalkalden";
-$areanames{en}->{493685} = "Hildburghausen";
-$areanames{en}->{493686} = "Eisfeld";
-$areanames{en}->{4936870} = "Masserberg";
-$areanames{en}->{4936871} = "Bad\ Colberg\-Heldburg";
-$areanames{en}->{4936873} = "Themar";
-$areanames{en}->{4936874} = "Schönbrunn\ bei\ Hildburghaus";
-$areanames{en}->{4936875} = "Straufhain\-Streufdorf";
-$areanames{en}->{4936878} = "Oberland";
-$areanames{en}->{493691} = "Eisenach\ Thüringen";
-$areanames{en}->{4936920} = "Grossenlupnitz";
-$areanames{en}->{4936921} = "Wutha\-Farnroda";
-$areanames{en}->{4936922} = "Gerstungen";
-$areanames{en}->{4936923} = "Treffurt";
-$areanames{en}->{4936924} = "Mihla";
-$areanames{en}->{4936925} = "Marksuhl";
-$areanames{en}->{4936926} = "Creuzburg";
-$areanames{en}->{4936927} = "Unterellen";
-$areanames{en}->{4936928} = "Neuenhof\ Thüringen";
-$areanames{en}->{4936929} = "Ruhla";
-$areanames{en}->{493693} = "Meiningen";
-$areanames{en}->{4936940} = "Oepfershausen";
-$areanames{en}->{4936941} = "Wasungen";
-$areanames{en}->{4936943} = "Bettenhausen\ Thüringen";
-$areanames{en}->{4936944} = "Rentwertshausen";
-$areanames{en}->{4936945} = "Henneberg";
-$areanames{en}->{4936946} = "Erbenhausen\ Thüringen";
-$areanames{en}->{4936947} = "Jüchsen";
-$areanames{en}->{4936948} = "Römhild";
-$areanames{en}->{4936949} = "Obermassfeld\-Grimmenthal";
-$areanames{en}->{493695} = "Bad\ Salzungen";
-$areanames{en}->{4936961} = "Bad\ Liebenstein";
-$areanames{en}->{4936962} = "Vacha";
-$areanames{en}->{4936963} = "Dorndorf\ Rhön";
-$areanames{en}->{4936964} = "Dermbach\ Rhön";
-$areanames{en}->{4936965} = "Stadtlengsfeld";
-$areanames{en}->{4936966} = "Kaltennordheim";
-$areanames{en}->{4936967} = "Geisa";
-$areanames{en}->{4936968} = "Rossdorf\ Rhön";
-$areanames{en}->{4936969} = "Merkers";
-$areanames{en}->{49371} = "Chemnitz\ Sachsen";
-$areanames{en}->{4937200} = "Wittgensdorf\ bei\ Chemnitz";
-$areanames{en}->{4937202} = "Claussnitz\ bei\ Chemnitz";
-$areanames{en}->{4937203} = "Gersdorf\ bei\ Chemnitz";
-$areanames{en}->{4937204} = "Lichtenstein\ Sachsen";
-$areanames{en}->{4937206} = "Frankenberg\ Sachsen";
-$areanames{en}->{4937207} = "Hainichen\ Sachsen";
-$areanames{en}->{4937208} = "Auerswalde";
-$areanames{en}->{4937209} = "Einsiedel\ bei\ Chemnitz";
-$areanames{en}->{493721} = "Meinersdorf";
-$areanames{en}->{493722} = "Limbach\-Oberfrohna";
-$areanames{en}->{493723} = "Hohenstein\-Ernstthal";
-$areanames{en}->{493724} = "Burgstädt";
-$areanames{en}->{493725} = "Zschopau";
-$areanames{en}->{493726} = "Flöha";
-$areanames{en}->{493727} = "Mittweida";
-$areanames{en}->{4937291} = "Augustusburg";
-$areanames{en}->{4937292} = "Oederan";
-$areanames{en}->{4937293} = "Eppendorf\ Sachsen";
-$areanames{en}->{4937294} = "Grünhainichen";
-$areanames{en}->{4937295} = "Lugau\ Erzgebirge";
-$areanames{en}->{4937296} = "Stollberg\ Erzgebirge";
-$areanames{en}->{4937297} = "Thum\ Sachsen";
-$areanames{en}->{4937298} = "Oelsnitz\ Erzgebirge";
-$areanames{en}->{493731} = "Freiberg\ Sachsen";
-$areanames{en}->{4937320} = "Mulda\ Sachsen";
-$areanames{en}->{4937321} = "Frankenstein\ Sachsen";
-$areanames{en}->{4937322} = "Brand\-Erbisdorf";
-$areanames{en}->{4937323} = "Lichtenberg\ Erzgebirge";
-$areanames{en}->{4937324} = "Reinsberg\ Sachsen";
-$areanames{en}->{4937325} = "Niederbobritzsch";
-$areanames{en}->{4937326} = "Frauenstein\ Sachsen";
-$areanames{en}->{4937327} = "Rechenberg\-Bienenmühle";
-$areanames{en}->{4937328} = "Grossschirma";
-$areanames{en}->{4937329} = "Grosshartmannsdorf";
-$areanames{en}->{493733} = "Annaberg\-Buchholz";
-$areanames{en}->{4937341} = "Ehrenfriedersdorf";
-$areanames{en}->{4937342} = "Cranzahl";
-$areanames{en}->{4937343} = "Jöhstadt";
-$areanames{en}->{4937344} = "Crottendorf\ Sachsen";
-$areanames{en}->{4937346} = "Geyer";
-$areanames{en}->{4937347} = "Bärenstein\ Kreis\ Annaberg";
-$areanames{en}->{4937348} = "Oberwiesenthal\ Kurort";
-$areanames{en}->{4937349} = "Scheibenberg";
-$areanames{en}->{493735} = "Marienberg\ Sachsen";
-$areanames{en}->{4937360} = "Olbernhau";
-$areanames{en}->{4937361} = "Neuhausen\ Erzgebirge";
-$areanames{en}->{4937362} = "Seiffen\ Erzgebirge";
-$areanames{en}->{4937363} = "Zöblitz";
-$areanames{en}->{4937364} = "Reitzenhain\ Erzgebirge";
-$areanames{en}->{4937365} = "Sayda";
-$areanames{en}->{4937366} = "Rübenau";
-$areanames{en}->{4937367} = "Lengefeld\ Erzgebirge";
-$areanames{en}->{4937368} = "Deutschneudorf";
-$areanames{en}->{4937369} = "Wolkenstein";
-$areanames{en}->{493737} = "Rochlitz";
-$areanames{en}->{4937381} = "Penig";
-$areanames{en}->{4937382} = "Geringswalde";
-$areanames{en}->{4937383} = "Lunzenau";
-$areanames{en}->{4937384} = "Wechselburg";
-$areanames{en}->{493741} = "Plauen";
-$areanames{en}->{4937421} = "Oelsnitz\ Vogtland";
-$areanames{en}->{4937422} = "Markneukirchen";
-$areanames{en}->{4937423} = "Adorf\ Vogtland";
-$areanames{en}->{4937430} = "Eichigt";
-$areanames{en}->{4937431} = "Mehltheuer\ Vogtland";
-$areanames{en}->{4937432} = "Pausa\ Vogtland";
-$areanames{en}->{4937433} = "Gutenfürst";
-$areanames{en}->{4937434} = "Bobenneukirchen";
-$areanames{en}->{4937435} = "Reuth\ bei\ Plauen";
-$areanames{en}->{4937436} = "Weischlitz";
-$areanames{en}->{4937437} = "Bad\ Elster";
-$areanames{en}->{4937438} = "Bad\ Brambach";
-$areanames{en}->{4937439} = "Jocketa";
-$areanames{en}->{493744} = "Auerbach\ Vogtland";
-$areanames{en}->{493745} = "Falkenstein\ Vogtland";
-$areanames{en}->{4937462} = "Rothenkirchen\ Vogtland";
-$areanames{en}->{4937463} = "Bergen\ Vogtland";
-$areanames{en}->{4937464} = "Schöneck\ Vogtland";
-$areanames{en}->{4937465} = "Tannenbergsthal\ Vogtland";
-$areanames{en}->{4937467} = "Klingenthal\ Sachsen";
-$areanames{en}->{4937468} = "Treuen\ Vogtland";
-$areanames{en}->{49375} = "Zwickau";
-$areanames{en}->{4937600} = "Neumark\ Sachsen";
-$areanames{en}->{4937601} = "Mülsen\ Skt\ Jacob";
-$areanames{en}->{4937602} = "Kirchberg\ Sachsen";
-$areanames{en}->{4937603} = "Wildenfels";
-$areanames{en}->{4937604} = "Mosel";
-$areanames{en}->{4937605} = "Hartenstein\ Sachsen";
-$areanames{en}->{4937606} = "Lengenfeld\ Vogtland";
-$areanames{en}->{4937607} = "Ebersbrunn\ Sachsen";
-$areanames{en}->{4937608} = "Waldenburg\ Sachsen";
-$areanames{en}->{4937609} = "Wolkenburg\ Mulde";
-$areanames{en}->{493761} = "Werdau\ Sachsen";
-$areanames{en}->{493762} = "Crimmitschau";
-$areanames{en}->{493763} = "Glauchau";
-$areanames{en}->{493764} = "Meerane";
-$areanames{en}->{493765} = "Reichenbach\ Vogtland";
-$areanames{en}->{493771} = "Aue\ Sachsen";
-$areanames{en}->{493772} = "Schneeberg\ Erzgebirge";
-$areanames{en}->{493773} = "Johanngeorgenstadt";
-$areanames{en}->{493774} = "Schwarzenberg";
-$areanames{en}->{4937752} = "Eibenstock";
-$areanames{en}->{4937754} = "Zwönitz";
-$areanames{en}->{4937755} = "Schönheide\ Erzgebirge";
-$areanames{en}->{4937756} = "Breitenbrunn\ Erzgebirge";
-$areanames{en}->{4937757} = "Rittersgrün";
-$areanames{en}->{49381} = "Rostock";
-$areanames{en}->{4938201} = "Gelbensande";
-$areanames{en}->{4938202} = "Volkenshagen";
-$areanames{en}->{4938203} = "Bad\ Doberan";
-$areanames{en}->{4938204} = "Broderstorf";
-$areanames{en}->{4938205} = "Tessin\ bei\ Rostock";
-$areanames{en}->{4938206} = "Graal\-Müritz\ Seeheilbad";
-$areanames{en}->{4938207} = "Stäbelow";
-$areanames{en}->{4938208} = "Kavelstorf";
-$areanames{en}->{4938209} = "Sanitz\ bei\ Rostock";
-$areanames{en}->{493821} = "Ribnitz\-Damgarten";
-$areanames{en}->{4938220} = "Wustrow\ Ostseebad";
-$areanames{en}->{4938221} = "Marlow";
-$areanames{en}->{4938222} = "Semlow";
-$areanames{en}->{4938223} = "Saal\ Vorpom";
-$areanames{en}->{4938224} = "Gresenhorst";
-$areanames{en}->{4938225} = "Trinwillershagen";
-$areanames{en}->{4938226} = "Dierhagen\ Ostseebad";
-$areanames{en}->{4938227} = "Lüdershagen\ bei\ Barth";
-$areanames{en}->{4938228} = "Dettmannsdorf\-Kölzow";
-$areanames{en}->{4938229} = "Bad\ Sülze";
-$areanames{en}->{4938231} = "Barth";
-$areanames{en}->{4938232} = "Zingst\ Ostseebad";
-$areanames{en}->{4938233} = "Prerow\ Ostseebad";
-$areanames{en}->{4938234} = "Born\ Darss";
-$areanames{en}->{4938292} = "Kröpelin";
-$areanames{en}->{4938293} = "Kühlungsborn\ Ostseebad";
-$areanames{en}->{4938294} = "Neubukow";
-$areanames{en}->{4938295} = "Satow\ bei\ Bad\ Doberan";
-$areanames{en}->{4938296} = "Rerik\ Ostseebad";
-$areanames{en}->{4938297} = "Moitin";
-$areanames{en}->{4938300} = "Insel\ Hiddensee";
-$areanames{en}->{4938301} = "Putbus";
-$areanames{en}->{4938302} = "Sagard";
-$areanames{en}->{4938303} = "Sellin\ Ostseebad";
-$areanames{en}->{4938304} = "Garz\ Rügen";
-$areanames{en}->{4938305} = "Gingst";
-$areanames{en}->{4938306} = "Samtens";
-$areanames{en}->{4938307} = "Poseritz";
-$areanames{en}->{4938308} = "Göhren\ Rügen";
-$areanames{en}->{4938309} = "Trent";
-$areanames{en}->{493831} = "Stralsund";
-$areanames{en}->{4938320} = "Tribsees";
-$areanames{en}->{4938321} = "Martensdorf\ bei\ Stralsund";
-$areanames{en}->{4938322} = "Richtenberg";
-$areanames{en}->{4938323} = "Prohn";
-$areanames{en}->{4938324} = "Velgast";
-$areanames{en}->{4938325} = "Rolofshagen";
-$areanames{en}->{4938326} = "Grimmen";
-$areanames{en}->{4938327} = "Elmenhorst\ Vorpom";
-$areanames{en}->{4938328} = "Miltzow";
-$areanames{en}->{4938331} = "Rakow\ Vorpom";
-$areanames{en}->{4938332} = "Gross\ Bisdorf";
-$areanames{en}->{4938333} = "Horst\ bei\ Grimmen";
-$areanames{en}->{4938334} = "Grammendorf";
-$areanames{en}->{493834} = "Greifswald";
-$areanames{en}->{4938351} = "Mesekenhagen";
-$areanames{en}->{4938352} = "Kemnitz\ bei\ Greifswald";
-$areanames{en}->{4938353} = "Gützkow\ bei\ Greifswald";
-$areanames{en}->{4938354} = "Wusterhusen";
-$areanames{en}->{4938355} = "Züssow";
-$areanames{en}->{4938356} = "Behrenhoff";
-$areanames{en}->{493836} = "Wolgast";
-$areanames{en}->{4938370} = "Kröslin";
-$areanames{en}->{4938371} = "Karlshagen";
-$areanames{en}->{4938372} = "Usedom";
-$areanames{en}->{4938373} = "Katzow";
-$areanames{en}->{4938374} = "Lassan\ bei\ Wolgast";
-$areanames{en}->{4938375} = "Koserow";
-$areanames{en}->{4938376} = "Zirchow";
-$areanames{en}->{4938377} = "Zinnowitz";
-$areanames{en}->{4938378} = "Heringsdorf\ Seebad";
-$areanames{en}->{4938379} = "Benz\ Usedom";
-$areanames{en}->{493838} = "Bergen\ auf\ Rügen";
-$areanames{en}->{4938391} = "Altenkirchen\ Rügen";
-$areanames{en}->{4938392} = "Sassnitz";
-$areanames{en}->{4938393} = "Binz\ Ostseebad";
-$areanames{en}->{493841} = "Wismar";
-$areanames{en}->{4938422} = "Neukloster";
-$areanames{en}->{4938423} = "Bad\ Kleinen";
-$areanames{en}->{4938424} = "Bobitz";
-$areanames{en}->{4938425} = "Kirchdorf\ Poel";
-$areanames{en}->{4938426} = "Neuburg\-Steinhausen";
-$areanames{en}->{4938427} = "Blowatz";
-$areanames{en}->{4938428} = "Hohenkirchen\ bei\ Wismar";
-$areanames{en}->{4938429} = "Glasin";
-$areanames{en}->{493843} = "Güstrow";
-$areanames{en}->{493844} = "Schwaan";
-$areanames{en}->{4938450} = "Tarnow\ bei\ Bützow";
-$areanames{en}->{4938451} = "Hoppenrade\ bei\ Güstrow";
-$areanames{en}->{4938452} = "Lalendorf";
-$areanames{en}->{4938453} = "Mistorf";
-$areanames{en}->{4938454} = "Kritzkow";
-$areanames{en}->{4938455} = "Plaaz";
-$areanames{en}->{4938456} = "Langhagen\ bei\ Güstrow";
-$areanames{en}->{4938457} = "Krakow\ am\ See";
-$areanames{en}->{4938458} = "Zehna";
-$areanames{en}->{4938459} = "Laage";
-$areanames{en}->{4938461} = "Bützow";
-$areanames{en}->{4938462} = "Baumgarten";
-$areanames{en}->{4938464} = "Bernitt";
-$areanames{en}->{4938466} = "Jürgenshagen";
-$areanames{en}->{493847} = "Sternberg";
-$areanames{en}->{4938481} = "Witzin";
-$areanames{en}->{4938482} = "Warin";
-$areanames{en}->{4938483} = "Brüel";
-$areanames{en}->{4938484} = "Ventschow";
-$areanames{en}->{4938485} = "Dabel";
-$areanames{en}->{4938486} = "Gustävel";
-$areanames{en}->{4938488} = "Demen";
-$areanames{en}->{49385} = "Schwerin";
-$areanames{en}->{493860} = "Raben\ Steinfeld";
-$areanames{en}->{493861} = "Plate";
-$areanames{en}->{493863} = "Crivitz";
-$areanames{en}->{493865} = "Holthusen";
-$areanames{en}->{493866} = "Cambs";
-$areanames{en}->{493867} = "Lübstorf";
-$areanames{en}->{493868} = "Rastow";
-$areanames{en}->{493869} = "Dümmer";
-$areanames{en}->{493871} = "Parchim";
-$areanames{en}->{4938720} = "Grebbin";
-$areanames{en}->{4938721} = "Ziegendorf";
-$areanames{en}->{4938722} = "Raduhn";
-$areanames{en}->{4938723} = "Kladrum";
-$areanames{en}->{4938724} = "Siggelkow";
-$areanames{en}->{4938725} = "Gross\ Godems";
-$areanames{en}->{4938726} = "Spornitz";
-$areanames{en}->{4938727} = "Mestlin";
-$areanames{en}->{4938728} = "Domsühl";
-$areanames{en}->{4938729} = "Marnitz";
-$areanames{en}->{4938731} = "Lübz";
-$areanames{en}->{4938732} = "Gallin\ bei\ Lübz";
-$areanames{en}->{4938733} = "Karbow\-Vietlübbe";
-$areanames{en}->{4938735} = "Plau\ am\ See";
-$areanames{en}->{4938736} = "Goldberg";
-$areanames{en}->{4938737} = "Ganzlin";
-$areanames{en}->{4938738} = "Karow\ bei\ Lübz";
-$areanames{en}->{493874} = "Ludwigslust";
-$areanames{en}->{4938750} = "Malliss";
-$areanames{en}->{4938751} = "Picher";
-$areanames{en}->{4938752} = "Zierzow\ bei\ Ludwigslust";
-$areanames{en}->{4938753} = "Wöbbelin";
-$areanames{en}->{4938754} = "Leussow\ bei\ Ludwigslust";
-$areanames{en}->{4938755} = "Eldena";
-$areanames{en}->{4938756} = "Grabow";
-$areanames{en}->{4938757} = "Neustadt\-Glewe";
-$areanames{en}->{4938758} = "Dömitz";
-$areanames{en}->{4938759} = "Tewswoos";
-$areanames{en}->{493876} = "Perleberg";
-$areanames{en}->{493877} = "Wittenberge";
-$areanames{en}->{4938780} = "Lanz\ Brandenburg";
-$areanames{en}->{4938781} = "Mellen";
-$areanames{en}->{4938782} = "Reetz\ bei\ Perleberg";
-$areanames{en}->{4938783} = "Dallmin";
-$areanames{en}->{4938784} = "Kleinow\ Kreis\ Prignitz";
-$areanames{en}->{4938785} = "Berge\ bei\ Perleberg";
-$areanames{en}->{4938787} = "Glöwen";
-$areanames{en}->{4938788} = "Gross\ Warnow";
-$areanames{en}->{4938789} = "Wolfshagen\ bei\ Perleberg";
-$areanames{en}->{4938791} = "Bad\ Wilsnack";
-$areanames{en}->{4938792} = "Lenzen\ \(Elbe\)";
-$areanames{en}->{4938793} = "Dergenthin";
-$areanames{en}->{4938794} = "Cumlosen";
-$areanames{en}->{4938796} = "Viesecke";
-$areanames{en}->{4938797} = "Karstädt\ Kreis\ Prignitz";
-$areanames{en}->{493881} = "Grevesmühlen";
-$areanames{en}->{4938821} = "Lüdersdorf";
-$areanames{en}->{4938822} = "Diedrichshagen\ bei\ Grevesmühlen";
-$areanames{en}->{4938823} = "Selmsdorf";
-$areanames{en}->{4938824} = "Mallentin";
-$areanames{en}->{4938825} = "Klütz";
-$areanames{en}->{4938826} = "Dassow";
-$areanames{en}->{4938827} = "Kalkhorst";
-$areanames{en}->{4938828} = "Schönberg";
-$areanames{en}->{493883} = "Hagenow";
-$areanames{en}->{4938841} = "Neuhaus\ Elbe";
-$areanames{en}->{4938842} = "Lüttenmark";
-$areanames{en}->{4938843} = "Bennin";
-$areanames{en}->{4938844} = "Gülze";
-$areanames{en}->{4938845} = "Kaarssen";
-$areanames{en}->{4938847} = "Boizenburg\ Elbe";
-$areanames{en}->{4938848} = "Vellahn";
-$areanames{en}->{4938850} = "Gammelin";
-$areanames{en}->{4938851} = "Zarrentin";
-$areanames{en}->{4938852} = "Wittenburg";
-$areanames{en}->{4938853} = "Drönnewitz\ bei\ Hagenow";
-$areanames{en}->{4938854} = "Redefin";
-$areanames{en}->{4938855} = "Lübtheen";
-$areanames{en}->{4938856} = "Pritzier\ bei\ Hagenow";
-$areanames{en}->{4938858} = "Lassahn";
-$areanames{en}->{4938859} = "Alt\ Zachun";
-$areanames{en}->{493886} = "Gadebusch";
-$areanames{en}->{4938871} = "Mühlen\ Eichsen";
-$areanames{en}->{4938872} = "Rehna";
-$areanames{en}->{4938873} = "Carlow";
-$areanames{en}->{4938874} = "Lützow";
-$areanames{en}->{4938875} = "Schlagsdorf\ bei\ Gadebusch";
-$areanames{en}->{4938876} = "Roggendorf";
-$areanames{en}->{4939000} = "Beetzendorf";
-$areanames{en}->{4939001} = "Apenburg";
-$areanames{en}->{4939002} = "Oebisfelde";
-$areanames{en}->{4939003} = "Jübar";
-$areanames{en}->{4939004} = "Köckte\ bei\ Gardelegen";
-$areanames{en}->{4939005} = "Kusey";
-$areanames{en}->{4939006} = "Miesterhorst";
-$areanames{en}->{4939007} = "Tangeln";
-$areanames{en}->{4939008} = "Kunrau";
-$areanames{en}->{4939009} = "Badel";
-$areanames{en}->{493901} = "Salzwedel";
-$areanames{en}->{493902} = "Diesdorf\ Altm";
-$areanames{en}->{4939030} = "Brunau";
-$areanames{en}->{4939031} = "Dähre";
-$areanames{en}->{4939032} = "Mahlsdorf\ bei\ Salzwedel";
-$areanames{en}->{4939033} = "Wallstawe";
-$areanames{en}->{4939034} = "Fleetmark";
-$areanames{en}->{4939035} = "Kuhfelde";
-$areanames{en}->{4939036} = "Binde";
-$areanames{en}->{4939037} = "Pretzier";
-$areanames{en}->{4939038} = "Henningen";
-$areanames{en}->{4939039} = "Bonese";
-$areanames{en}->{493904} = "Haldensleben";
-$areanames{en}->{4939050} = "Bartensleben";
-$areanames{en}->{4939051} = "Calvörde";
-$areanames{en}->{4939052} = "Erxleben\ bei\ Haldensleben";
-$areanames{en}->{4939053} = "Süplingen";
-$areanames{en}->{4939054} = "Flechtingen";
-$areanames{en}->{4939055} = "Hörsingen";
-$areanames{en}->{4939056} = "Klüden";
-$areanames{en}->{4939057} = "Rätzlingen\ Sachsen\-Anhalt";
-$areanames{en}->{4939058} = "Uthmöden";
-$areanames{en}->{4939059} = "Wegenstedt";
-$areanames{en}->{4939061} = "Weferlingen";
-$areanames{en}->{4939062} = "Bebertal";
-$areanames{en}->{493907} = "Gardelegen";
-$areanames{en}->{4939080} = "Kalbe\ Milde";
-$areanames{en}->{4939081} = "Kakerbeck\ Sachsen\-Anhalt";
-$areanames{en}->{4939082} = "Mieste";
-$areanames{en}->{4939083} = "Messdorf";
-$areanames{en}->{4939084} = "Lindstedt";
-$areanames{en}->{4939085} = "Zichtau";
-$areanames{en}->{4939086} = "Jävenitz";
-$areanames{en}->{4939087} = "Jerchel\ Altmark";
-$areanames{en}->{4939088} = "Letzlingen";
-$areanames{en}->{4939089} = "Bismark\ Altmark";
-$areanames{en}->{493909} = "Klötze\ Altmark";
-$areanames{en}->{49391} = "Magdeburg";
-$areanames{en}->{4939200} = "Gommern";
-$areanames{en}->{4939201} = "Wolmirstedt";
-$areanames{en}->{4939202} = "Gross\ Ammensleben";
-$areanames{en}->{4939203} = "Barleben";
-$areanames{en}->{4939204} = "Niederndodeleben";
-$areanames{en}->{4939205} = "Langenweddingen";
-$areanames{en}->{4939206} = "Eichenbarleben";
-$areanames{en}->{4939207} = "Colbitz";
-$areanames{en}->{4939208} = "Loitsche";
-$areanames{en}->{4939209} = "Wanzleben";
-$areanames{en}->{493921} = "Burg\ bei\ Magdeburg";
-$areanames{en}->{4939221} = "Möckern\ bei\ Magdeburg";
-$areanames{en}->{4939222} = "Möser";
-$areanames{en}->{4939223} = "Theessen";
-$areanames{en}->{4939224} = "Büden";
-$areanames{en}->{4939225} = "Altengrabow";
-$areanames{en}->{4939226} = "Hohenziatz";
-$areanames{en}->{493923} = "Zerbst";
-$areanames{en}->{4939241} = "Leitzkau";
-$areanames{en}->{4939242} = "Prödel";
-$areanames{en}->{4939243} = "Nedlitz\ bei\ Zerbst";
-$areanames{en}->{4939244} = "Steutz";
-$areanames{en}->{4939245} = "Loburg";
-$areanames{en}->{4939246} = "Lindau\ Anh";
-$areanames{en}->{4939247} = "Güterglück";
-$areanames{en}->{4939248} = "Dobritz";
-$areanames{en}->{493925} = "Stassfurt";
-$areanames{en}->{4939262} = "Güsten\ Anh";
-$areanames{en}->{4939263} = "Unseburg";
-$areanames{en}->{4939264} = "Kroppenstedt";
-$areanames{en}->{4939265} = "Löderburg";
-$areanames{en}->{4939266} = "Förderstedt";
-$areanames{en}->{4939267} = "Schneidlingen";
-$areanames{en}->{4939268} = "Egeln";
-$areanames{en}->{493928} = "Schönebeck\ Elbe";
-$areanames{en}->{4939291} = "Calbe\ Saale";
-$areanames{en}->{4939292} = "Biederitz";
-$areanames{en}->{4939293} = "Dreileben";
-$areanames{en}->{4939294} = "Gross\ Rosenburg";
-$areanames{en}->{4939295} = "Zuchau";
-$areanames{en}->{4939296} = "Welsleben";
-$areanames{en}->{4939297} = "Eickendorf\ Kreis\ Schönebeck";
-$areanames{en}->{4939298} = "Barby\ Elbe";
-$areanames{en}->{493931} = "Stendal";
-$areanames{en}->{4939320} = "Schinne";
-$areanames{en}->{4939321} = "Arneburg";
-$areanames{en}->{4939322} = "Tangermünde";
-$areanames{en}->{4939323} = "Schönhausen\ Elbe";
-$areanames{en}->{4939324} = "Kläden\ bei\ Stendal";
-$areanames{en}->{4939325} = "Vinzelberg";
-$areanames{en}->{4939327} = "Klietz";
-$areanames{en}->{4939328} = "Rochau";
-$areanames{en}->{4939329} = "Möringen";
-$areanames{en}->{493933} = "Genthin";
-$areanames{en}->{4939341} = "Redekin";
-$areanames{en}->{4939342} = "Gladau";
-$areanames{en}->{4939343} = "Jerichow";
-$areanames{en}->{4939344} = "Güsen";
-$areanames{en}->{4939345} = "Parchen";
-$areanames{en}->{4939346} = "Tucheim";
-$areanames{en}->{4939347} = "Kade";
-$areanames{en}->{4939348} = "Klitsche";
-$areanames{en}->{4939349} = "Parey\ Elbe";
-$areanames{en}->{493935} = "Tangerhütte";
-$areanames{en}->{4939361} = "Lüderitz";
-$areanames{en}->{4939362} = "Grieben\ bei\ Tangerhütte";
-$areanames{en}->{4939363} = "Angern";
-$areanames{en}->{4939364} = "Dolle";
-$areanames{en}->{4939365} = "Bellingen\ bei\ Stendal";
-$areanames{en}->{4939366} = "Kehnert";
-$areanames{en}->{493937} = "Osterburg\ Altmark";
-$areanames{en}->{4939382} = "Kamern";
-$areanames{en}->{4939383} = "Sandau\ Elbe";
-$areanames{en}->{4939384} = "Arendsee\ Altmark";
-$areanames{en}->{4939386} = "Seehausen\ Altmark";
-$areanames{en}->{4939387} = "Havelberg";
-$areanames{en}->{4939388} = "Goldbeck\ Altm";
-$areanames{en}->{4939389} = "Schollene";
-$areanames{en}->{4939390} = "Iden";
-$areanames{en}->{4939391} = "Lückstedt";
-$areanames{en}->{4939392} = "Rönnebeck\ Sachsen\-Anhalt";
-$areanames{en}->{4939393} = "Werben\ Elbe";
-$areanames{en}->{4939394} = "Hohenberg\-Krusemark";
-$areanames{en}->{4939395} = "Wanzer";
-$areanames{en}->{4939396} = "Neukirchen\ Altmark";
-$areanames{en}->{4939397} = "Geestgottberg";
-$areanames{en}->{4939398} = "Gross\ Garz";
-$areanames{en}->{4939399} = "Kleinau";
-$areanames{en}->{4939400} = "Wefensleben";
-$areanames{en}->{4939401} = "Neuwegersleben";
-$areanames{en}->{4939402} = "Völpke";
-$areanames{en}->{4939403} = "Gröningen\ Sachsen\-Anhalt";
-$areanames{en}->{4939404} = "Ausleben";
-$areanames{en}->{4939405} = "Hötensleben";
-$areanames{en}->{4939406} = "Harbke";
-$areanames{en}->{4939407} = "Seehausen\ Börde";
-$areanames{en}->{4939408} = "Hadmersleben";
-$areanames{en}->{4939409} = "Eilsleben";
-$areanames{en}->{493941} = "Halberstadt";
-$areanames{en}->{4939421} = "Osterwieck";
-$areanames{en}->{4939422} = "Badersleben";
-$areanames{en}->{4939423} = "Wegeleben";
-$areanames{en}->{4939424} = "Schwanebeck\ Sachsen\-Anhalt";
-$areanames{en}->{4939425} = "Dingelstedt\ am\ Huy";
-$areanames{en}->{4939426} = "Hessen";
-$areanames{en}->{4939427} = "Ströbeck";
-$areanames{en}->{4939428} = "Pabstorf";
-$areanames{en}->{493943} = "Wernigerode";
-$areanames{en}->{493944} = "Blankenburg\ Harz";
-$areanames{en}->{4939451} = "Wasserleben";
-$areanames{en}->{4939452} = "Ilsenburg";
-$areanames{en}->{4939453} = "Derenburg";
-$areanames{en}->{4939454} = "Elbingerode\ Harz";
-$areanames{en}->{4939455} = "Schierke";
-$areanames{en}->{4939456} = "Altenbrak";
-$areanames{en}->{4939457} = "Benneckenstein\ Harz";
-$areanames{en}->{4939458} = "Heudeber";
-$areanames{en}->{4939459} = "Hasselfelde";
-$areanames{en}->{493946} = "Quedlinburg";
-$areanames{en}->{493947} = "Thale";
-$areanames{en}->{4939481} = "Hedersleben\ bei\ Aschersleben";
-$areanames{en}->{4939482} = "Gatersleben";
-$areanames{en}->{4939483} = "Ballenstedt";
-$areanames{en}->{4939484} = "Harzgerode";
-$areanames{en}->{4939485} = "Gernrode\ Harz";
-$areanames{en}->{4939487} = "Friedrichsbrunn";
-$areanames{en}->{4939488} = "Güntersberge";
-$areanames{en}->{4939489} = "Strassberg\ Harz";
-$areanames{en}->{493949} = "Oschersleben\ Bode";
-$areanames{en}->{49395} = "Neubrandenburg";
-$areanames{en}->{4939600} = "Zwiedorf";
-$areanames{en}->{4939601} = "Friedland";
-$areanames{en}->{4939602} = "Kleeth";
-$areanames{en}->{4939603} = "Burg\ Stargard";
-$areanames{en}->{4939604} = "Wildberg\ bei\ Altentreptow";
-$areanames{en}->{4939605} = "Gross\ Nemerow";
-$areanames{en}->{4939606} = "Glienke";
-$areanames{en}->{4939607} = "Kotelow";
-$areanames{en}->{4939608} = "Staven";
-$areanames{en}->{493961} = "Altentreptow";
-$areanames{en}->{493962} = "Penzlin\ bei\ Waren";
-$areanames{en}->{493963} = "Woldegk";
-$areanames{en}->{493964} = "Bredenfelde\ bei\ Strasburg";
-$areanames{en}->{493965} = "Burow\ bei\ Altentreptow";
-$areanames{en}->{493966} = "Cölpin";
-$areanames{en}->{493967} = "Oertzenhof\ bei\ Strasburg";
-$areanames{en}->{493968} = "Schönbeck";
-$areanames{en}->{493969} = "Siedenbollentin";
-$areanames{en}->{493971} = "Anklam";
-$areanames{en}->{4939721} = "Liepen\ bei\ Anklam";
-$areanames{en}->{4939722} = "Sarnow\ bei\ Anklam";
-$areanames{en}->{4939723} = "Krien";
-$areanames{en}->{4939724} = "Klein\ Bünzow";
-$areanames{en}->{4939726} = "Ducherow";
-$areanames{en}->{4939727} = "Spantekow";
-$areanames{en}->{4939728} = "Medow\ bei\ Anklam";
-$areanames{en}->{493973} = "Pasewalk";
-$areanames{en}->{4939740} = "Nechlin";
-$areanames{en}->{4939741} = "Jatznick";
-$areanames{en}->{4939742} = "Brüssow\ bei\ Pasewalk";
-$areanames{en}->{4939743} = "Zerrenthin";
-$areanames{en}->{4939744} = "Rothenklempenow";
-$areanames{en}->{4939745} = "Hetzdorf\ bei\ Strasburg";
-$areanames{en}->{4939746} = "Krackow";
-$areanames{en}->{4939747} = "Züsedom";
-$areanames{en}->{4939748} = "Viereck";
-$areanames{en}->{4939749} = "Grambow\ bei\ Pasewalk";
-$areanames{en}->{4939751} = "Penkun";
-$areanames{en}->{4939752} = "Blumenhagen\ bei\ Strasburg";
-$areanames{en}->{4939753} = "Strasburg";
-$areanames{en}->{4939754} = "Löcknitz\ Vorpom";
-$areanames{en}->{493976} = "Torgelow\ bei\ Ueckermünde";
-$areanames{en}->{4939771} = "Ueckermünde";
-$areanames{en}->{4939772} = "Rothemühl";
-$areanames{en}->{4939773} = "Altwarp";
-$areanames{en}->{4939774} = "Mönkebude";
-$areanames{en}->{4939775} = "Ahlbeck\ bei\ Torgelow";
-$areanames{en}->{4939776} = "Hintersee";
-$areanames{en}->{4939777} = "Borkenfriede";
-$areanames{en}->{4939778} = "Ferdinandshof\ bei\ Torgelow";
-$areanames{en}->{4939779} = "Eggesin";
-$areanames{en}->{493981} = "Neustrelitz";
-$areanames{en}->{4939820} = "Triepkendorf";
-$areanames{en}->{4939821} = "Carpin";
-$areanames{en}->{4939822} = "Kratzeburg";
-$areanames{en}->{4939823} = "Rechlin";
-$areanames{en}->{4939824} = "Hohenzieritz";
-$areanames{en}->{4939825} = "Wokuhl";
-$areanames{en}->{4939826} = "Blankensee\ bei\ Neustrelitz";
-$areanames{en}->{4939827} = "Schwarz\ bei\ Neustrelitz";
-$areanames{en}->{4939828} = "Wustrow\ Kreis\ Mecklenburg\-Strelitz";
-$areanames{en}->{4939829} = "Blankenförde";
-$areanames{en}->{4939831} = "Feldberg";
-$areanames{en}->{4939832} = "Wesenberg";
-$areanames{en}->{4939833} = "Mirow\ Kreis\ Neustrelitz";
-$areanames{en}->{493984} = "Prenzlau";
-$areanames{en}->{4939851} = "Göritz\ bei\ Prenzlau";
-$areanames{en}->{4939852} = "Schönermark\ bei\ Prenzlau";
-$areanames{en}->{4939853} = "Holzendorf\ bei\ Prenzlau";
-$areanames{en}->{4939854} = "Kleptow";
-$areanames{en}->{4939855} = "Parmen\-Weggun";
-$areanames{en}->{4939856} = "Beenz\ bei\ Prenzlau";
-$areanames{en}->{4939857} = "Drense";
-$areanames{en}->{4939858} = "Bietikow";
-$areanames{en}->{4939859} = "Fürstenwerder";
-$areanames{en}->{4939861} = "Gramzow\ bei\ Prenzlau";
-$areanames{en}->{4939862} = "Schmölln\ bei\ Prenzlau";
-$areanames{en}->{4939863} = "Seehausen\ bei\ Prenzlau";
-$areanames{en}->{493987} = "Templin";
-$areanames{en}->{4939881} = "Ringenwalde\ bei\ Templin";
-$areanames{en}->{4939882} = "Gollin";
-$areanames{en}->{4939883} = "Gross\ Dölln";
-$areanames{en}->{4939884} = "Hassleben\ bei\ Prenzlau";
-$areanames{en}->{4939885} = "Jakobshagen";
-$areanames{en}->{4939886} = "Milmersdorf";
-$areanames{en}->{4939887} = "Gerswalde";
-$areanames{en}->{4939888} = "Lychen";
-$areanames{en}->{4939889} = "Boitzenburg";
-$areanames{en}->{493991} = "Waren\ Müritz";
-$areanames{en}->{4939921} = "Ankershagen";
-$areanames{en}->{4939922} = "Dambeck\ bei\ Röbel";
-$areanames{en}->{4939923} = "Priborn";
-$areanames{en}->{4939924} = "Stuer";
-$areanames{en}->{4939925} = "Wredenhagen";
-$areanames{en}->{4939926} = "Grabowhöfe";
-$areanames{en}->{4939927} = "Nossentiner\ Hütte";
-$areanames{en}->{4939928} = "Möllenhagen";
-$areanames{en}->{4939929} = "Jabel\ bei\ Waren";
-$areanames{en}->{4939931} = "Röbel\ Müritz";
-$areanames{en}->{4939932} = "Malchow\ bei\ Waren";
-$areanames{en}->{4939933} = "Vollrathsruhe";
-$areanames{en}->{4939934} = "Gross\ Plasten";
-$areanames{en}->{493994} = "Malchin";
-$areanames{en}->{4939951} = "Faulenrost";
-$areanames{en}->{4939952} = "Grammentin";
-$areanames{en}->{4939953} = "Schwinkendorf";
-$areanames{en}->{4939954} = "Stavenhagen\ Reuterstadt";
-$areanames{en}->{4939955} = "Jürgenstorf";
-$areanames{en}->{4939956} = "Neukalen";
-$areanames{en}->{4939957} = "Gielow";
-$areanames{en}->{4939959} = "Dargun";
-$areanames{en}->{493996} = "Teterow";
-$areanames{en}->{4939971} = "Gnoien";
-$areanames{en}->{4939972} = "Walkendorf";
-$areanames{en}->{4939973} = "Altkalen";
-$areanames{en}->{4939975} = "Thürkow";
-$areanames{en}->{4939976} = "Gross\ Bützin";
-$areanames{en}->{4939977} = "Jördenstorf";
-$areanames{en}->{4939978} = "Gross\ Roge";
-$areanames{en}->{493998} = "Demmin";
-$areanames{en}->{4939991} = "Daberkow";
-$areanames{en}->{4939992} = "Görmin";
-$areanames{en}->{4939993} = "Hohenmocker";
-$areanames{en}->{4939994} = "Metschow";
-$areanames{en}->{4939995} = "Nossendorf";
-$areanames{en}->{4939996} = "Törpin";
-$areanames{en}->{4939997} = "Jarmen";
-$areanames{en}->{4939998} = "Loitz\ bei\ Demmin";
-$areanames{en}->{4939999} = "Tutow";
-$areanames{en}->{4940} = "Hamburg";
-$areanames{en}->{494101} = "Pinneberg";
-$areanames{en}->{494102} = "Ahrensburg";
-$areanames{en}->{494103} = "Wedel";
-$areanames{en}->{494104} = "Aumühle\ bei\ Hamburg";
-$areanames{en}->{494105} = "Seevetal";
-$areanames{en}->{494106} = "Quickborn\ Kreis\ Pinneberg";
-$areanames{en}->{494107} = "Siek\ Kreis\ Stormarn";
-$areanames{en}->{494108} = "Rosengarten\ Kreis\ Harburg";
-$areanames{en}->{494109} = "Tangstedt\ Bz\ Hamburg";
-$areanames{en}->{494120} = "Ellerhoop";
-$areanames{en}->{494121} = "Elmshorn";
-$areanames{en}->{494122} = "Uetersen";
-$areanames{en}->{494123} = "Barmstedt";
-$areanames{en}->{494124} = "Glückstadt";
-$areanames{en}->{494125} = "Seestermühe";
-$areanames{en}->{494126} = "Horst\ Holstein";
-$areanames{en}->{494127} = "Westerhorn";
-$areanames{en}->{494128} = "Kollmar";
-$areanames{en}->{494129} = "Haseldorf";
-$areanames{en}->{494131} = "Lüneburg";
-$areanames{en}->{494132} = "Amelinghausen";
-$areanames{en}->{494133} = "Wittorf\ Kreis\ Lüneburg";
-$areanames{en}->{494134} = "Embsen\ Kreis\ Lüneburg";
-$areanames{en}->{494135} = "Kirchgellersen";
-$areanames{en}->{494136} = "Scharnebeck";
-$areanames{en}->{494137} = "Barendorf";
-$areanames{en}->{494138} = "Betzendorf\ Kreis\ Lüneburg";
-$areanames{en}->{494139} = "Hohnstorf\ Elbe";
-$areanames{en}->{494140} = "Estorf\ Kreis\ Stade";
-$areanames{en}->{494141} = "Stade";
-$areanames{en}->{494142} = "Steinkirchen\ Kreis\ Stade";
-$areanames{en}->{494143} = "Drochtersen";
-$areanames{en}->{494144} = "Himmelpforten";
-$areanames{en}->{494146} = "Stade\-Bützfleth";
-$areanames{en}->{494148} = "Drochtersen\-Assel";
-$areanames{en}->{494149} = "Fredenbeck";
-$areanames{en}->{494151} = "Schwarzenbek";
-$areanames{en}->{494152} = "Geesthacht";
-$areanames{en}->{494153} = "Lauenburg\ Elbe";
-$areanames{en}->{494154} = "Trittau";
-$areanames{en}->{494155} = "Büchen";
-$areanames{en}->{494156} = "Talkau";
-$areanames{en}->{494158} = "Roseburg";
-$areanames{en}->{494159} = "Basthorst";
-$areanames{en}->{494161} = "Buxtehude";
-$areanames{en}->{494162} = "Jork";
-$areanames{en}->{494163} = "Horneburg\ Niederelbe";
-$areanames{en}->{494164} = "Harsefeld";
-$areanames{en}->{494165} = "Hollenstedt\ Nordheide";
-$areanames{en}->{494166} = "Ahlerstedt";
-$areanames{en}->{494167} = "Apensen";
-$areanames{en}->{494168} = "Neu\ Wulmstorf\-Elstorf";
-$areanames{en}->{494169} = "Sauensiek";
-$areanames{en}->{494171} = "Winsen\ Luhe";
-$areanames{en}->{494172} = "Salzhausen";
-$areanames{en}->{494173} = "Wulfsen";
-$areanames{en}->{494174} = "Stelle\ Kreis\ Harburg";
-$areanames{en}->{494175} = "Egestorf\ Nordheide";
-$areanames{en}->{494176} = "Marschacht";
-$areanames{en}->{494177} = "Drage\ Elbe";
-$areanames{en}->{494178} = "Radbruch";
-$areanames{en}->{494179} = "Winsen\-Tönnhausen";
-$areanames{en}->{494180} = "Königsmoor";
-$areanames{en}->{494181} = "Buchholz\ in\ der\ Nordheide";
-$areanames{en}->{494182} = "Tostedt";
-$areanames{en}->{494183} = "Jesteburg";
-$areanames{en}->{494184} = "Hanstedt\ Nordheide";
-$areanames{en}->{494185} = "Marxen\ Auetal";
-$areanames{en}->{494186} = "Buchholz\-Trelde";
-$areanames{en}->{494187} = "Holm\-Seppensen";
-$areanames{en}->{494188} = "Welle\ Nordheide";
-$areanames{en}->{494189} = "Undeloh";
-$areanames{en}->{494191} = "Kaltenkirchen\ Holstein";
-$areanames{en}->{494192} = "Bad\ Bramstedt";
-$areanames{en}->{494193} = "Henstedt\-Ulzburg";
-$areanames{en}->{494194} = "Sievershütten";
-$areanames{en}->{494195} = "Hartenholm";
-$areanames{en}->{494202} = "Achim\ bei\ Bremen";
-$areanames{en}->{494203} = "Weyhe\ bei\ Bremen";
-$areanames{en}->{494204} = "Thedinghausen";
-$areanames{en}->{494205} = "Ottersberg";
-$areanames{en}->{494206} = "Stuhr\-Heiligenrode";
-$areanames{en}->{494207} = "Oyten";
-$areanames{en}->{494208} = "Grasberg";
-$areanames{en}->{494209} = "Schwanewede";
-$areanames{en}->{49421} = "Bremen";
-$areanames{en}->{494221} = "Delmenhorst";
-$areanames{en}->{494222} = "Ganderkesee";
-$areanames{en}->{494223} = "Ganderkesee\-Bookholzberg";
-$areanames{en}->{494224} = "Gross\ Ippener";
-$areanames{en}->{494230} = "Verden\-Walle";
-$areanames{en}->{494231} = "Verden\ Aller";
-$areanames{en}->{494232} = "Langwedel\ Kreis\ Verden";
-$areanames{en}->{494233} = "Blender";
-$areanames{en}->{494234} = "Dörverden";
-$areanames{en}->{494235} = "Langwedel\-Etelsen";
-$areanames{en}->{494236} = "Kirchlinteln";
-$areanames{en}->{494237} = "Bendingbostel";
-$areanames{en}->{494238} = "Neddenaverbergen";
-$areanames{en}->{494239} = "Dörverden\-Westen";
-$areanames{en}->{494240} = "Syke\-Heiligenfelde";
-$areanames{en}->{494241} = "Bassum";
-$areanames{en}->{494242} = "Syke";
-$areanames{en}->{494243} = "Twistringen";
-$areanames{en}->{494244} = "Harpstedt";
-$areanames{en}->{494245} = "Neuenkirchen\ bei\ Bassum";
-$areanames{en}->{494246} = "Twistringen\-Heiligenloh";
-$areanames{en}->{494247} = "Affinghausen";
-$areanames{en}->{494248} = "Bassum\-Neubruchhausen";
-$areanames{en}->{494249} = "Bassum\-Nordwohlde";
-$areanames{en}->{494251} = "Hoya";
-$areanames{en}->{494252} = "Bruchhausen\-Vilsen";
-$areanames{en}->{494253} = "Asendorf\ Kreis\ Diepholz";
-$areanames{en}->{494254} = "Eystrup";
-$areanames{en}->{494255} = "Martfeld";
-$areanames{en}->{494256} = "Hilgermissen";
-$areanames{en}->{494257} = "Schweringen";
-$areanames{en}->{494258} = "Schwarme";
-$areanames{en}->{494260} = "Visselhövede\-Wittorf";
-$areanames{en}->{494261} = "Rotenburg\ Wümme";
-$areanames{en}->{494262} = "Visselhövede";
-$areanames{en}->{494263} = "Scheessel";
-$areanames{en}->{494264} = "Sottrum\ Kreis\ Rotenburg";
-$areanames{en}->{494265} = "Fintel";
-$areanames{en}->{494266} = "Brockel";
-$areanames{en}->{494267} = "Lauenbrück";
-$areanames{en}->{494268} = "Bötersen";
-$areanames{en}->{494269} = "Ahausen\-Kirchwalsede";
-$areanames{en}->{494271} = "Sulingen";
-$areanames{en}->{494272} = "Siedenburg";
-$areanames{en}->{494273} = "Kirchdorf\ bei\ Sulingen";
-$areanames{en}->{494274} = "Varrel\ bei\ Sulingen";
-$areanames{en}->{494275} = "Ehrenburg";
-$areanames{en}->{494276} = "Borstel\ bei\ Sulingen";
-$areanames{en}->{494277} = "Schwaförden";
-$areanames{en}->{494281} = "Zeven";
-$areanames{en}->{494282} = "Sittensen";
-$areanames{en}->{494283} = "Tarmstedt";
-$areanames{en}->{494284} = "Selsingen";
-$areanames{en}->{494285} = "Rhade\ bei\ Zeven";
-$areanames{en}->{494286} = "Gyhum";
-$areanames{en}->{494287} = "Heeslingen\-Boitzen";
-$areanames{en}->{494288} = "Horstedt\ Kreis\ Rotenburg";
-$areanames{en}->{494289} = "Kirchtimke";
-$areanames{en}->{494292} = "Ritterhude";
-$areanames{en}->{494293} = "Ottersberg\-Fischerhude";
-$areanames{en}->{494294} = "Riede\ Kreis\ Verden";
-$areanames{en}->{494295} = "Emtinghausen";
-$areanames{en}->{494296} = "Schwanewede\-Aschwarden";
-$areanames{en}->{494297} = "Ottersberg\-Posthausen";
-$areanames{en}->{494298} = "Lilienthal";
-$areanames{en}->{494302} = "Kirchbarkau";
-$areanames{en}->{494303} = "Schlesen";
-$areanames{en}->{494305} = "Westensee";
-$areanames{en}->{494307} = "Raisdorf";
-$areanames{en}->{494308} = "Schwedeneck";
-$areanames{en}->{49431} = "Kiel";
-$areanames{en}->{494320} = "Heidmühlen";
-$areanames{en}->{494321} = "Neumünster";
-$areanames{en}->{494322} = "Bordesholm";
-$areanames{en}->{494323} = "Bornhöved";
-$areanames{en}->{494324} = "Brokstedt";
-$areanames{en}->{494326} = "Wankendorf";
-$areanames{en}->{494327} = "Grossenaspe";
-$areanames{en}->{494328} = "Rickling";
-$areanames{en}->{494329} = "Langwedel\ Holstein";
-$areanames{en}->{494330} = "Emkendorf";
-$areanames{en}->{494331} = "Rendsburg";
-$areanames{en}->{494332} = "Hamdorf\ bei\ Rendsburg";
-$areanames{en}->{494333} = "Erfde";
-$areanames{en}->{494334} = "Bredenbek\ bei\ Rendsburg";
-$areanames{en}->{494335} = "Hohn\ bei\ Rendsburg";
-$areanames{en}->{494336} = "Owschlag";
-$areanames{en}->{494337} = "Jevenstedt";
-$areanames{en}->{494338} = "Alt\ Duvenstedt";
-$areanames{en}->{494339} = "Christiansholm";
-$areanames{en}->{494340} = "Achterwehr";
-$areanames{en}->{494342} = "Preetz\ Kreis\ Plön";
-$areanames{en}->{494343} = "Laboe";
-$areanames{en}->{494344} = "Schönberg\ Holstein";
-$areanames{en}->{494346} = "Gettorf";
-$areanames{en}->{494347} = "Flintbek";
-$areanames{en}->{494348} = "Schönkirchen";
-$areanames{en}->{494349} = "Dänischenhagen";
-$areanames{en}->{494351} = "Eckernförde";
-$areanames{en}->{494352} = "Damp";
-$areanames{en}->{494353} = "Ascheffel";
-$areanames{en}->{494354} = "Fleckeby";
-$areanames{en}->{494355} = "Rieseby";
-$areanames{en}->{494356} = "Gross\ Wittensee";
-$areanames{en}->{494357} = "Sehestedt\ Eider";
-$areanames{en}->{494358} = "Loose\ bei\ Eckernförde";
-$areanames{en}->{494361} = "Oldenburg\ in\ Holstein";
-$areanames{en}->{494362} = "Heiligenhafen";
-$areanames{en}->{494363} = "Lensahn";
-$areanames{en}->{494364} = "Dahme\ Kreis\ Ostholstein";
-$areanames{en}->{494365} = "Heringsdorf\ Holstein";
-$areanames{en}->{494366} = "Grömitz\-Cismar";
-$areanames{en}->{494367} = "Grossenbrode";
-$areanames{en}->{494371} = "Burg\ auf\ Fehmarn";
-$areanames{en}->{494372} = "Westfehmarn";
-$areanames{en}->{494381} = "Lütjenburg";
-$areanames{en}->{494382} = "Wangels";
-$areanames{en}->{494383} = "Grebin";
-$areanames{en}->{494384} = "Selent";
-$areanames{en}->{494385} = "Hohenfelde\ bei\ Kiel";
-$areanames{en}->{494392} = "Nortorf\ bei\ Neumünster";
-$areanames{en}->{494393} = "Boostedt";
-$areanames{en}->{494394} = "Bokhorst";
-$areanames{en}->{494401} = "Brake\ Unterweser";
-$areanames{en}->{494402} = "Rastede";
-$areanames{en}->{494403} = "Bad\ Zwischenahn";
-$areanames{en}->{494404} = "Elsfleth";
-$areanames{en}->{494405} = "Edewecht";
-$areanames{en}->{494406} = "Berne";
-$areanames{en}->{494407} = "Wardenburg";
-$areanames{en}->{494408} = "Hude\ Oldenburg";
-$areanames{en}->{494409} = "Westerstede\-Ocholt";
-$areanames{en}->{49441} = "Oldenburg";
-$areanames{en}->{494421} = "Wilhelmshaven";
-$areanames{en}->{494422} = "Sande\ Kreis\ Friesl";
-$areanames{en}->{494423} = "Fedderwarden";
-$areanames{en}->{494425} = "Wangerland\-Hooksiel";
-$areanames{en}->{494426} = "Wangerland\-Horumersiel";
-$areanames{en}->{494431} = "Wildeshausen";
-$areanames{en}->{494432} = "Dötlingen\-Brettorf";
-$areanames{en}->{494433} = "Dötlingen";
-$areanames{en}->{494434} = "Colnrade";
-$areanames{en}->{494435} = "Grossenkneten";
-$areanames{en}->{494441} = "Vechta";
-$areanames{en}->{494442} = "Lohne\ Oldenburg";
-$areanames{en}->{494443} = "Dinklage";
-$areanames{en}->{494444} = "Goldenstedt";
-$areanames{en}->{494445} = "Visbek\ Kreis\ Vechta";
-$areanames{en}->{494446} = "Bakum\ Kreis\ Vechta";
-$areanames{en}->{494447} = "Vechta\-Langförden";
-$areanames{en}->{494451} = "Varel\ Jadebusen";
-$areanames{en}->{494452} = "Zetel\-Neuenburg";
-$areanames{en}->{494453} = "Zetel";
-$areanames{en}->{494454} = "Jade";
-$areanames{en}->{494455} = "Jade\-Schweiburg";
-$areanames{en}->{494456} = "Varel\-Altjührden";
-$areanames{en}->{494458} = "Wiefelstede\-Spohle";
-$areanames{en}->{494461} = "Jever";
-$areanames{en}->{494462} = "Wittmund";
-$areanames{en}->{494463} = "Wangerland";
-$areanames{en}->{494464} = "Wittmund\-Carolinensiel";
-$areanames{en}->{494465} = "Friedeburg\ Ostfriesland";
-$areanames{en}->{494466} = "Wittmund\-Ardorf";
-$areanames{en}->{494467} = "Wittmund\-Funnix";
-$areanames{en}->{494468} = "Friedeburg\-Reepsholt";
-$areanames{en}->{494469} = "Wangerooge";
-$areanames{en}->{494471} = "Cloppenburg";
-$areanames{en}->{494472} = "Lastrup";
-$areanames{en}->{494473} = "Emstek";
-$areanames{en}->{494474} = "Garrel";
-$areanames{en}->{494475} = "Molbergen";
-$areanames{en}->{494477} = "Lastrup\-Hemmelte";
-$areanames{en}->{494478} = "Cappeln\ Oldenburg";
-$areanames{en}->{494479} = "Molbergen\-Peheim";
-$areanames{en}->{494480} = "Ovelgönne\-Strückhausen";
-$areanames{en}->{494481} = "Hatten\-Sandkrug";
-$areanames{en}->{494482} = "Hatten";
-$areanames{en}->{494483} = "Ovelgönne\-Grossenmeer";
-$areanames{en}->{494484} = "Hude\-Wüsting";
-$areanames{en}->{494485} = "Elsfleth\-Huntorf";
-$areanames{en}->{494486} = "Edewecht\-Friedrichsfehn";
-$areanames{en}->{494487} = "Grossenkneten\-Huntlosen";
-$areanames{en}->{494488} = "Westerstede";
-$areanames{en}->{494489} = "Apen";
-$areanames{en}->{494491} = "Friesoythe";
-$areanames{en}->{494492} = "Saterland";
-$areanames{en}->{494493} = "Friesoythe\-Gehlenberg";
-$areanames{en}->{494494} = "Bösel\ Oldenburg";
-$areanames{en}->{494495} = "Friesoythe\-Thüle";
-$areanames{en}->{494496} = "Friesoythe\-Markhausen";
-$areanames{en}->{494497} = "Barssel\-Harkebrügge";
-$areanames{en}->{494498} = "Saterland\-Ramsloh";
-$areanames{en}->{494499} = "Barssel";
-$areanames{en}->{494501} = "Kastorf\ Holstein";
-$areanames{en}->{494502} = "Lübeck\-Travemünde";
-$areanames{en}->{494503} = "Timmendorfer\ Strand";
-$areanames{en}->{494504} = "Ratekau";
-$areanames{en}->{494505} = "Stockelsdorf\-Curau";
-$areanames{en}->{494506} = "Stockelsdorf\-Krumbeck";
-$areanames{en}->{494508} = "Krummesse";
-$areanames{en}->{494509} = "Gross\ Grönau";
-$areanames{en}->{49451} = "Lübeck";
-$areanames{en}->{494521} = "Eutin";
-$areanames{en}->{494522} = "Plön";
-$areanames{en}->{494523} = "Malente";
-$areanames{en}->{494524} = "Scharbeutz\-Pönitz";
-$areanames{en}->{494525} = "Ahrensbök";
-$areanames{en}->{494526} = "Ascheberg\ Holstein";
-$areanames{en}->{494527} = "Bosau";
-$areanames{en}->{494528} = "Schönwalde\ am\ Bungsberg";
-$areanames{en}->{494529} = "Süsel\-Bujendorf";
-$areanames{en}->{494531} = "Bad\ Oldesloe";
-$areanames{en}->{494532} = "Bargteheide";
-$areanames{en}->{494533} = "Reinfeld\ Holstein";
-$areanames{en}->{494534} = "Steinburg\ Kreis\ Storman";
-$areanames{en}->{494535} = "Nahe";
-$areanames{en}->{494536} = "Steinhorst\ Lauenburg";
-$areanames{en}->{494537} = "Sülfeld\ Holstein";
-$areanames{en}->{494539} = "Westerau";
-$areanames{en}->{494541} = "Ratzeburg";
-$areanames{en}->{494542} = "Mölln\ Lauenburg";
-$areanames{en}->{494543} = "Nusse";
-$areanames{en}->{494544} = "Berkenthin";
-$areanames{en}->{494545} = "Seedorf\ Lauenburg";
-$areanames{en}->{494546} = "Mustin\ Lauenburg";
-$areanames{en}->{494547} = "Gudow\ Lauenburg";
-$areanames{en}->{494550} = "Bühnsdorf";
-$areanames{en}->{494551} = "Bad\ Segeberg";
-$areanames{en}->{494552} = "Leezen";
-$areanames{en}->{494553} = "Geschendorf";
-$areanames{en}->{494554} = "Wahlstedt";
-$areanames{en}->{494555} = "Seedorf\ bei\ Bad\ Segeberg";
-$areanames{en}->{494556} = "Ahrensbök\-Gnissau";
-$areanames{en}->{494557} = "Blunk";
-$areanames{en}->{494558} = "Todesfelde";
-$areanames{en}->{494559} = "Wensin";
-$areanames{en}->{494561} = "Neustadt\ in\ Holstein";
-$areanames{en}->{494562} = "Grömitz";
-$areanames{en}->{494563} = "Scharbeutz\-Haffkrug";
-$areanames{en}->{494564} = "Schashagen";
-$areanames{en}->{494602} = "Freienwill";
-$areanames{en}->{494603} = "Havetoft";
-$areanames{en}->{494604} = "Grossenwiehe";
-$areanames{en}->{494605} = "Medelby";
-$areanames{en}->{494606} = "Wanderup";
-$areanames{en}->{494607} = "Janneby";
-$areanames{en}->{494608} = "Handewitt";
-$areanames{en}->{494609} = "Eggebek";
-$areanames{en}->{49461} = "Flensburg";
-$areanames{en}->{494621} = "Schleswig";
-$areanames{en}->{494622} = "Taarstedt";
-$areanames{en}->{494623} = "Böklund";
-$areanames{en}->{494624} = "Kropp";
-$areanames{en}->{494625} = "Jübek";
-$areanames{en}->{494626} = "Treia";
-$areanames{en}->{494627} = "Dörpstedt";
-$areanames{en}->{494630} = "Barderup";
-$areanames{en}->{494631} = "Glücksburg\ Ostsee";
-$areanames{en}->{494632} = "Steinbergkirche";
-$areanames{en}->{494633} = "Satrup";
-$areanames{en}->{494634} = "Husby";
-$areanames{en}->{494635} = "Sörup";
-$areanames{en}->{494636} = "Langballig";
-$areanames{en}->{494637} = "Sterup";
-$areanames{en}->{494638} = "Tarp";
-$areanames{en}->{494639} = "Schafflund";
-$areanames{en}->{494641} = "Süderbrarup";
-$areanames{en}->{494642} = "Kappeln\ Schlei";
-$areanames{en}->{494643} = "Gelting\ Angeln";
-$areanames{en}->{494644} = "Karby";
-$areanames{en}->{494646} = "Mohrkirch";
-$areanames{en}->{49465} = "Sylt";
-$areanames{en}->{494661} = "Niebüll";
-$areanames{en}->{494662} = "Leck";
-$areanames{en}->{494663} = "Süderlügum";
-$areanames{en}->{494664} = "Neukirchen\ bei\ Niebüll";
-$areanames{en}->{494665} = "Emmelsbüll\-Horsbüll";
-$areanames{en}->{494666} = "Ladelund";
-$areanames{en}->{494667} = "Dagebüll";
-$areanames{en}->{494668} = "Klanxbüll";
-$areanames{en}->{494671} = "Bredstedt";
-$areanames{en}->{494672} = "Langenhorn";
-$areanames{en}->{494673} = "Joldelund";
-$areanames{en}->{494674} = "Ockholm";
-$areanames{en}->{494681} = "Wyk\ auf\ Föhr";
-$areanames{en}->{494682} = "Amrum";
-$areanames{en}->{494683} = "Oldsum";
-$areanames{en}->{494684} = "Langeness\ Hallig";
-$areanames{en}->{494702} = "Sandstedt";
-$areanames{en}->{494703} = "Loxstedt\-Donnern";
-$areanames{en}->{494704} = "Drangstedt";
-$areanames{en}->{494705} = "Wremen";
-$areanames{en}->{494706} = "Schiffdorf";
-$areanames{en}->{494707} = "Langen\-Neuenwalde";
-$areanames{en}->{494708} = "Ringstedt";
-$areanames{en}->{49471} = "Bremerhaven";
-$areanames{en}->{494721} = "Cuxhaven";
-$areanames{en}->{494722} = "Cuxhaven\-Altenbruch";
-$areanames{en}->{494723} = "Cuxhaven\-Altenwalde";
-$areanames{en}->{494724} = "Cuxhaven\-Lüdingworth";
-$areanames{en}->{494725} = "Helgoland";
-$areanames{en}->{494731} = "Nordenham";
-$areanames{en}->{494732} = "Stadland\-Rodenkirchen";
-$areanames{en}->{494733} = "Butjadingen\-Burhave";
-$areanames{en}->{494734} = "Stadland\-Seefeld";
-$areanames{en}->{494735} = "Butjadingen\-Stollhamm";
-$areanames{en}->{494736} = "Butjadingen\-Tossens";
-$areanames{en}->{494737} = "Stadland\-Schwei";
-$areanames{en}->{494740} = "Loxstedt\-Dedesdorf";
-$areanames{en}->{494741} = "Nordholz\ bei\ Bremerhaven";
-$areanames{en}->{494742} = "Dorum";
-$areanames{en}->{494743} = "Langen\ bei\ Bremerhaven";
-$areanames{en}->{494744} = "Loxstedt";
-$areanames{en}->{494745} = "Bad\ Bederkesa";
-$areanames{en}->{494746} = "Hagen\ bei\ Bremerhaven";
-$areanames{en}->{494747} = "Beverstedt";
-$areanames{en}->{494748} = "Stubben\ bei\ Bremerhaven";
-$areanames{en}->{494749} = "Schiffdorf\-Geestenseth";
-$areanames{en}->{494751} = "Otterndorf";
-$areanames{en}->{494752} = "Neuhaus\ Oste";
-$areanames{en}->{494753} = "Balje";
-$areanames{en}->{494754} = "Bülkau";
-$areanames{en}->{494755} = "Ihlienworth";
-$areanames{en}->{494756} = "Odisheim";
-$areanames{en}->{494757} = "Wanna";
-$areanames{en}->{494758} = "Nordleda";
-$areanames{en}->{494761} = "Bremervörde";
-$areanames{en}->{494762} = "Kutenholz";
-$areanames{en}->{494763} = "Gnarrenburg";
-$areanames{en}->{494764} = "Gnarrenburg\-Klenkendorf";
-$areanames{en}->{494765} = "Ebersdorf\ bei\ Bremervörde";
-$areanames{en}->{494766} = "Basdahl";
-$areanames{en}->{494767} = "Bremervörde\-Bevern";
-$areanames{en}->{494768} = "Hipstedt";
-$areanames{en}->{494769} = "Bremervörde\-Iselersheim";
-$areanames{en}->{494770} = "Wischhafen";
-$areanames{en}->{494771} = "Hemmoor";
-$areanames{en}->{494772} = "Oberndorf\ Oste";
-$areanames{en}->{494773} = "Lamstedt";
-$areanames{en}->{494774} = "Hechthausen";
-$areanames{en}->{494775} = "Grossenwörden";
-$areanames{en}->{494776} = "Osten\-Altendorf";
-$areanames{en}->{494777} = "Cadenberge";
-$areanames{en}->{494778} = "Wingst";
-$areanames{en}->{494779} = "Freiburg\ Elbe";
-$areanames{en}->{494791} = "Osterholz\-Scharmbeck";
-$areanames{en}->{494792} = "Worpswede";
-$areanames{en}->{494793} = "Hambergen";
-$areanames{en}->{494794} = "Worpswede\-Ostersode";
-$areanames{en}->{494795} = "Garlstedt";
-$areanames{en}->{494796} = "Teufelsmoor";
-$areanames{en}->{494802} = "Wrohm";
-$areanames{en}->{494803} = "Pahlen";
-$areanames{en}->{494804} = "Nordhastedt";
-$areanames{en}->{494805} = "Schafstedt";
-$areanames{en}->{494806} = "Sarzbüttel";
-$areanames{en}->{49481} = "Heide\ Holstein";
-$areanames{en}->{494821} = "Itzehoe";
-$areanames{en}->{494822} = "Kellinghusen";
-$areanames{en}->{494823} = "Wilster";
-$areanames{en}->{494824} = "Krempe";
-$areanames{en}->{494825} = "Burg\ Dithmarschen";
-$areanames{en}->{494826} = "Hohenlockstedt";
-$areanames{en}->{494827} = "Wacken";
-$areanames{en}->{494828} = "Lägerdorf";
-$areanames{en}->{494829} = "Wewelsfleth";
-$areanames{en}->{494830} = "Süderhastedt";
-$areanames{en}->{494832} = "Meldorf";
-$areanames{en}->{494833} = "Wesselburen";
-$areanames{en}->{494834} = "Büsum";
-$areanames{en}->{494835} = "Albersdorf\ Holstein";
-$areanames{en}->{494836} = "Hennstedt\ Dithmarschen";
-$areanames{en}->{494837} = "Neuenkirchen\ Dithmarschen";
-$areanames{en}->{494838} = "Tellingstedt";
-$areanames{en}->{494839} = "Wöhrden\ Dithmarschen";
-$areanames{en}->{494841} = "Husum\ Nordsee";
-$areanames{en}->{494842} = "Nordstrand";
-$areanames{en}->{494843} = "Viöl";
-$areanames{en}->{494844} = "Pellworm";
-$areanames{en}->{494845} = "Ostenfeld\ Husum";
-$areanames{en}->{494846} = "Hattstedt";
-$areanames{en}->{494847} = "Oster\-Ohrstedt";
-$areanames{en}->{494848} = "Rantrum";
-$areanames{en}->{494849} = "Hooge";
-$areanames{en}->{494851} = "Marne";
-$areanames{en}->{494852} = "Brunsbüttel";
-$areanames{en}->{494853} = "Sankt\ Michaelisdonn";
-$areanames{en}->{494854} = "Friedrichskoog";
-$areanames{en}->{494855} = "Eddelak";
-$areanames{en}->{494856} = "Kronprinzenkoog";
-$areanames{en}->{494857} = "Barlt";
-$areanames{en}->{494858} = "Sankt\ Margarethen\ Holstein";
-$areanames{en}->{494859} = "Windbergen";
-$areanames{en}->{494861} = "Tönning";
-$areanames{en}->{494862} = "Garding";
-$areanames{en}->{494863} = "Sankt\ Peter\-Ording";
-$areanames{en}->{494864} = "Oldenswort";
-$areanames{en}->{494865} = "Osterhever";
-$areanames{en}->{494871} = "Hohenwestedt";
-$areanames{en}->{494872} = "Hanerau\-Hademarschen";
-$areanames{en}->{494873} = "Aukrug";
-$areanames{en}->{494874} = "Todenbüttel";
-$areanames{en}->{494875} = "Stafstedt";
-$areanames{en}->{494876} = "Reher\ Holstein";
-$areanames{en}->{494877} = "Hennstedt\ bei\ Itzehoe";
-$areanames{en}->{494881} = "Friedrichstadt";
-$areanames{en}->{494882} = "Lunden";
-$areanames{en}->{494883} = "Süderstapel";
-$areanames{en}->{494884} = "Schwabstedt";
-$areanames{en}->{494885} = "Bergenhusen";
-$areanames{en}->{494892} = "Schenefeld\ Mittelholstein";
-$areanames{en}->{494893} = "Hohenaspe";
-$areanames{en}->{494902} = "Jemgum\-Ditzum";
-$areanames{en}->{494903} = "Wymeer";
-$areanames{en}->{49491} = "Leer\ Ostfriesland";
-$areanames{en}->{494920} = "Wirdum";
-$areanames{en}->{494921} = "Emden\ Stadt";
-$areanames{en}->{494922} = "Borkum";
-$areanames{en}->{494923} = "Krummhörn\-Pewsum";
-$areanames{en}->{494924} = "Moormerland\-Oldersum";
-$areanames{en}->{494925} = "Hinte";
-$areanames{en}->{494926} = "Krummhörn\-Greetsiel";
-$areanames{en}->{494927} = "Krummhörn\-Loquard";
-$areanames{en}->{494928} = "Ihlow\-Riepe";
-$areanames{en}->{494929} = "Ihlow\ Kreis\ Aurich";
-$areanames{en}->{494931} = "Norden";
-$areanames{en}->{494932} = "Norderney";
-$areanames{en}->{494933} = "Dornum\ Ostfriesland";
-$areanames{en}->{494934} = "Marienhafe";
-$areanames{en}->{494935} = "Juist";
-$areanames{en}->{494936} = "Grossheide";
-$areanames{en}->{494938} = "Hagermarsch";
-$areanames{en}->{494939} = "Baltrum";
-$areanames{en}->{494941} = "Aurich";
-$areanames{en}->{494942} = "Südbrookmerland";
-$areanames{en}->{494943} = "Grossefehn";
-$areanames{en}->{494944} = "Wiesmoor";
-$areanames{en}->{494945} = "Grossefehn\-Timmel";
-$areanames{en}->{494946} = "Grossefehn\-Bagband";
-$areanames{en}->{494947} = "Aurich\-Ogenbargen";
-$areanames{en}->{494948} = "Wiesmoor\-Marcardsmoor";
-$areanames{en}->{494950} = "Holtland";
-$areanames{en}->{494951} = "Weener";
-$areanames{en}->{494952} = "Rhauderfehn";
-$areanames{en}->{494953} = "Bunde";
-$areanames{en}->{494954} = "Moormerland";
-$areanames{en}->{494955} = "Westoverledingen";
-$areanames{en}->{494956} = "Uplengen";
-$areanames{en}->{494957} = "Detern";
-$areanames{en}->{494958} = "Jemgum";
-$areanames{en}->{494959} = "Dollart";
-$areanames{en}->{494961} = "Papenburg";
-$areanames{en}->{494962} = "Papenburg\-Aschendorf";
-$areanames{en}->{494963} = "Dörpen";
-$areanames{en}->{494964} = "Rhede\ Ems";
-$areanames{en}->{494965} = "Surwold";
-$areanames{en}->{494966} = "Neubörger";
-$areanames{en}->{494967} = "Rhauderfehn\-Burlage";
-$areanames{en}->{494968} = "Neulehe";
-$areanames{en}->{494971} = "Esens";
-$areanames{en}->{494972} = "Langeoog";
-$areanames{en}->{494973} = "Wittmund\-Burhafe";
-$areanames{en}->{494974} = "Neuharlingersiel";
-$areanames{en}->{494975} = "Westerholt\ Ostfriesland";
-$areanames{en}->{494976} = "Spiekeroog";
-$areanames{en}->{494977} = "Blomberg\ Ostfriesland";
-$areanames{en}->{495021} = "Nienburg\ Weser";
-$areanames{en}->{495022} = "Wietzen";
-$areanames{en}->{495023} = "Liebenau\ Kreis\ Nieburg\ Weser";
-$areanames{en}->{495024} = "Rohrsen\ Kreis\ Nienburg\ Weser";
-$areanames{en}->{495025} = "Estorf\ Weser";
-$areanames{en}->{495026} = "Steimbke";
-$areanames{en}->{495027} = "Linsburg";
-$areanames{en}->{495028} = "Pennigsehl";
-$areanames{en}->{495031} = "Wunstorf";
-$areanames{en}->{495032} = "Neustadt\ am\ Rübenberge";
-$areanames{en}->{495033} = "Wunstorf\-Grossenheidorn";
-$areanames{en}->{495034} = "Neustadt\-Hagen";
-$areanames{en}->{495035} = "Gross\ Munzel";
-$areanames{en}->{495036} = "Neustadt\-Schneeren";
-$areanames{en}->{495037} = "Bad\ Rehburg";
-$areanames{en}->{495041} = "Springe\ Deister";
-$areanames{en}->{495042} = "Bad\ Münder\ am\ Deister";
-$areanames{en}->{495043} = "Lauenau";
-$areanames{en}->{495044} = "Springe\-Eldagsen";
-$areanames{en}->{495045} = "Springe\-Bennigsen";
-$areanames{en}->{495051} = "Bergen\ Kreis\ Celle";
-$areanames{en}->{495052} = "Hermannsburg";
-$areanames{en}->{495053} = "Fassberg\-Müden";
-$areanames{en}->{495054} = "Bergen\-Sülze";
-$areanames{en}->{495055} = "Fassberg";
-$areanames{en}->{495056} = "Winsen\-Meissendorf";
-$areanames{en}->{495060} = "Bodenburg";
-$areanames{en}->{495062} = "Holle\ bei\ Hildesheim";
-$areanames{en}->{495063} = "Bad\ Salzdetfurth";
-$areanames{en}->{495064} = "Gross\ Düngen";
-$areanames{en}->{495065} = "Sibbesse";
-$areanames{en}->{495066} = "Sarstedt";
-$areanames{en}->{495067} = "Bockenem";
-$areanames{en}->{495068} = "Elze\ Leine";
-$areanames{en}->{495069} = "Nordstemmen";
-$areanames{en}->{495071} = "Schwarmstedt";
-$areanames{en}->{495072} = "Neustadt\-Mandelsloh";
-$areanames{en}->{495073} = "Neustadt\-Esperke";
-$areanames{en}->{495074} = "Rodewald";
-$areanames{en}->{495082} = "Langlingen";
-$areanames{en}->{495083} = "Hohne\ bei\ Celle";
-$areanames{en}->{495084} = "Hambühren";
-$areanames{en}->{495085} = "Burgdorf\-Ehlershausen";
-$areanames{en}->{495086} = "Celle\-Scheuen";
-$areanames{en}->{495101} = "Pattensen";
-$areanames{en}->{495102} = "Laatzen";
-$areanames{en}->{495103} = "Wennigsen\ Deister";
-$areanames{en}->{495105} = "Barsinghausen";
-$areanames{en}->{495108} = "Gehrden\ Han";
-$areanames{en}->{495109} = "Ronnenberg";
-$areanames{en}->{49511} = "Hannover";
-$areanames{en}->{495121} = "Hildesheim";
-$areanames{en}->{495123} = "Schellerten";
-$areanames{en}->{495126} = "Algermissen";
-$areanames{en}->{495127} = "Harsum";
-$areanames{en}->{495128} = "Hohenhameln";
-$areanames{en}->{495129} = "Söhlde";
-$areanames{en}->{495130} = "Wedemark";
-$areanames{en}->{495131} = "Garbsen";
-$areanames{en}->{495132} = "Lehrte";
-$areanames{en}->{495135} = "Burgwedel\-Fuhrberg";
-$areanames{en}->{495136} = "Burgdorf\ Kreis\ Hannover";
-$areanames{en}->{495137} = "Seelze";
-$areanames{en}->{495138} = "Sehnde";
-$areanames{en}->{495139} = "Burgwedel";
-$areanames{en}->{495141} = "Celle";
-$areanames{en}->{495142} = "Eschede";
-$areanames{en}->{495143} = "Winsen\ Aller";
-$areanames{en}->{495144} = "Wathlingen";
-$areanames{en}->{495145} = "Beedenbostel";
-$areanames{en}->{495146} = "Wietze";
-$areanames{en}->{495147} = "Uetze\-Hänigsen";
-$areanames{en}->{495148} = "Steinhorst\ Niedersachsen";
-$areanames{en}->{495149} = "Wienhausen";
-$areanames{en}->{495151} = "Hameln";
-$areanames{en}->{495152} = "Hessisch\ Oldendorf";
-$areanames{en}->{495153} = "Salzhemmendorf";
-$areanames{en}->{495154} = "Aerzen";
-$areanames{en}->{495155} = "Emmerthal";
-$areanames{en}->{495156} = "Coppenbrügge";
-$areanames{en}->{495157} = "Emmerthal\-Börry";
-$areanames{en}->{495158} = "Hemeringen";
-$areanames{en}->{495159} = "Coppenbrügge\-Bisperode";
-$areanames{en}->{495161} = "Walsrode";
-$areanames{en}->{495162} = "Fallingbostel";
-$areanames{en}->{495163} = "Fallingbostel\-Dorfmark";
-$areanames{en}->{495164} = "Hodenhagen";
-$areanames{en}->{495165} = "Rethem\ Aller";
-$areanames{en}->{495166} = "Walsrode\-Kirchboitzen";
-$areanames{en}->{495167} = "Walsrode\-Westenholz";
-$areanames{en}->{495168} = "Walsrode\-Stellichte";
-$areanames{en}->{495171} = "Peine";
-$areanames{en}->{495172} = "Ilsede";
-$areanames{en}->{495173} = "Uetze";
-$areanames{en}->{495174} = "Lahstedt";
-$areanames{en}->{495175} = "Lehrte\-Arpke";
-$areanames{en}->{495176} = "Edemissen";
-$areanames{en}->{495177} = "Edemissen\-Abbensen";
-$areanames{en}->{495181} = "Alfeld\ Leine";
-$areanames{en}->{495182} = "Gronau\ Leine";
-$areanames{en}->{495183} = "Lamspringe";
-$areanames{en}->{495184} = "Freden\ Leine";
-$areanames{en}->{495185} = "Duingen";
-$areanames{en}->{495186} = "Salzhemmendorf\-Wallensen";
-$areanames{en}->{495187} = "Delligsen";
-$areanames{en}->{495190} = "Soltau\-Emmingen";
-$areanames{en}->{495191} = "Soltau";
-$areanames{en}->{495192} = "Munster";
-$areanames{en}->{495193} = "Schneverdingen";
-$areanames{en}->{495194} = "Bispingen";
-$areanames{en}->{495195} = "Neuenkirchen\ bei\ Soltau";
-$areanames{en}->{495196} = "Wietzendorf";
-$areanames{en}->{495197} = "Soltau\-Frielingen";
-$areanames{en}->{495198} = "Schneverdingen\-Wintermoor";
-$areanames{en}->{495199} = "Schneverdingen\-Heber";
-$areanames{en}->{495201} = "Halle\ Westfalen";
-$areanames{en}->{495202} = "Oerlinghausen";
-$areanames{en}->{495203} = "Werther\ Westfalen";
-$areanames{en}->{495204} = "Steinhagen\ Westfalen";
-$areanames{en}->{495205} = "Bielefeld\-Sennestadt";
-$areanames{en}->{495206} = "Bielefeld\-Jöllenbeck";
-$areanames{en}->{495207} = "Schloss\ Holte\-Stukenbrock";
-$areanames{en}->{495208} = "Leopoldshöhe";
-$areanames{en}->{495209} = "Gütersloh\-Friedrichsdorf";
-$areanames{en}->{49521} = "Bielefeld";
-$areanames{en}->{495221} = "Herford";
-$areanames{en}->{495222} = "Bad\ Salzuflen";
-$areanames{en}->{495223} = "Bünde";
-$areanames{en}->{495224} = "Enger\ Westfalen";
-$areanames{en}->{495225} = "Spenge";
-$areanames{en}->{495226} = "Bruchmühlen\ Westfalen";
-$areanames{en}->{495228} = "Vlotho\-Exter";
-$areanames{en}->{495231} = "Detmold";
-$areanames{en}->{495232} = "Lage\ Lippe";
-$areanames{en}->{495233} = "Steinheim\ Westfalen";
-$areanames{en}->{495234} = "Horn\-Bad\ Meinberg";
-$areanames{en}->{495235} = "Blomberg\ Lippe";
-$areanames{en}->{495236} = "Blomberg\-Grossenmarpe";
-$areanames{en}->{495237} = "Augustdorf";
-$areanames{en}->{495238} = "Nieheim\-Himmighausen";
-$areanames{en}->{495241} = "Gütersloh";
-$areanames{en}->{495242} = "Rheda\-Wiedenbrück";
-$areanames{en}->{495244} = "Rietberg";
-$areanames{en}->{495245} = "Herzebrock\-Clarholz";
-$areanames{en}->{495246} = "Verl";
-$areanames{en}->{495247} = "Harsewinkel";
-$areanames{en}->{495248} = "Langenberg\ Kreis\ Gütersloh";
-$areanames{en}->{495250} = "Delbrück\ Westfalen";
-$areanames{en}->{495251} = "Paderborn";
-$areanames{en}->{495252} = "Bad\ Lippspringe";
-$areanames{en}->{495253} = "Bad\ Driburg";
-$areanames{en}->{495254} = "Paderborn\-Schloss\ Neuhaus";
-$areanames{en}->{495255} = "Altenbeken";
-$areanames{en}->{495257} = "Hövelhof";
-$areanames{en}->{495258} = "Salzkotten";
-$areanames{en}->{495259} = "Bad\ Driburg\-Neuenheerse";
-$areanames{en}->{495261} = "Lemgo";
-$areanames{en}->{495262} = "Extertal";
-$areanames{en}->{495263} = "Barntrup";
-$areanames{en}->{495264} = "Kalletal";
-$areanames{en}->{495265} = "Dörentrup";
-$areanames{en}->{495266} = "Lemgo\-Kirchheide";
-$areanames{en}->{495271} = "Höxter";
-$areanames{en}->{495272} = "Brakel\ Westfalen";
-$areanames{en}->{495273} = "Beverungen";
-$areanames{en}->{495274} = "Nieheim";
-$areanames{en}->{495275} = "Höxter\-Ottbergen";
-$areanames{en}->{495276} = "Marienmünster";
-$areanames{en}->{495277} = "Höxter\-Fürstenau";
-$areanames{en}->{495278} = "Höxter\-Ovenhausen";
-$areanames{en}->{495281} = "Bad\ Pyrmont";
-$areanames{en}->{495282} = "Schieder\-Schwalenberg";
-$areanames{en}->{495283} = "Lügde\-Rischenau";
-$areanames{en}->{495284} = "Schwalenberg";
-$areanames{en}->{495285} = "Bad\ Pyrmont\-Kleinenberg";
-$areanames{en}->{495286} = "Ottenstein\ Niedersachsen";
-$areanames{en}->{495292} = "Lichtenau\-Atteln";
-$areanames{en}->{495293} = "Paderborn\-Dahl";
-$areanames{en}->{495294} = "Hövelhof\-Espeln";
-$areanames{en}->{495295} = "Lichtenau\ Westfalen";
-$areanames{en}->{495300} = "Salzgitter\-Üfingen";
-$areanames{en}->{495301} = "Lehre\-Essenrode";
-$areanames{en}->{495302} = "Vechelde";
-$areanames{en}->{495303} = "Wendeburg";
-$areanames{en}->{495304} = "Meine";
-$areanames{en}->{495305} = "Sickte";
-$areanames{en}->{495306} = "Cremlingen";
-$areanames{en}->{495307} = "Braunschweig\-Wenden";
-$areanames{en}->{495308} = "Lehre";
-$areanames{en}->{495309} = "Lehre\-Wendhausen";
-$areanames{en}->{49531} = "Braunschweig";
-$areanames{en}->{495320} = "Torfhaus";
-$areanames{en}->{495321} = "Goslar";
-$areanames{en}->{495322} = "Bad\ Harzburg";
-$areanames{en}->{495323} = "Clausthal\-Zellerfeld";
-$areanames{en}->{495324} = "Vienenburg";
-$areanames{en}->{495325} = "Goslar\-Hahnenklee";
-$areanames{en}->{495326} = "Langelsheim";
-$areanames{en}->{495327} = "Bad\ Grund\ Harz";
-$areanames{en}->{495328} = "Altenau\ Harz";
-$areanames{en}->{495329} = "Schulenberg\ im\ Oberharz";
-$areanames{en}->{495331} = "Wolfenbüttel";
-$areanames{en}->{495332} = "Schöppenstedt";
-$areanames{en}->{495333} = "Dettum";
-$areanames{en}->{495334} = "Hornburg\ Kreis\ Wolfenbüttel";
-$areanames{en}->{495335} = "Schladen";
-$areanames{en}->{495336} = "Semmenstedt";
-$areanames{en}->{495337} = "Kissenbrück";
-$areanames{en}->{495339} = "Gielde";
-$areanames{en}->{495341} = "Salzgitter";
-$areanames{en}->{495344} = "Lengede";
-$areanames{en}->{495345} = "Baddeckenstedt";
-$areanames{en}->{495346} = "Liebenburg";
-$areanames{en}->{495347} = "Burgdorf\ bei\ Salzgitter";
-$areanames{en}->{495351} = "Helmstedt";
-$areanames{en}->{495352} = "Schöningen";
-$areanames{en}->{495353} = "Königslutter\ am\ Elm";
-$areanames{en}->{495354} = "Jerxheim";
-$areanames{en}->{495355} = "Frellstedt";
-$areanames{en}->{495356} = "Helmstedt\-Barmke";
-$areanames{en}->{495357} = "Grasleben";
-$areanames{en}->{495358} = "Bahrdorf\-Mackendorf";
-$areanames{en}->{495361} = "Wolfsburg";
-$areanames{en}->{495362} = "Wolfsburg\-Fallersleben";
-$areanames{en}->{495363} = "Wolfsburg\-Vorsfelde";
-$areanames{en}->{495364} = "Velpke";
-$areanames{en}->{495365} = "Wolfsburg\-Neindorf";
-$areanames{en}->{495366} = "Jembke";
-$areanames{en}->{495367} = "Rühen";
-$areanames{en}->{495368} = "Parsau";
-$areanames{en}->{495371} = "Gifhorn";
-$areanames{en}->{495372} = "Meinersen";
-$areanames{en}->{495373} = "Hillerse\ Kreis\ Gifhorn";
-$areanames{en}->{495374} = "Isenbüttel";
-$areanames{en}->{495375} = "Müden\ Aller";
-$areanames{en}->{495376} = "Wesendorf\ Kreis\ Gifhorn";
-$areanames{en}->{495377} = "Ehra\-Lessien";
-$areanames{en}->{495378} = "Sassenburg\-Platendorf";
-$areanames{en}->{495379} = "Sassenburg\-Grussendorf";
-$areanames{en}->{495381} = "Seesen";
-$areanames{en}->{495382} = "Bad\ Gandersheim";
-$areanames{en}->{495383} = "Lutter\ am\ Barenberge";
-$areanames{en}->{495384} = "Seesen\-Gross\ Rhüden";
-$areanames{en}->{495401} = "Georgsmarienhütte";
-$areanames{en}->{495402} = "Bissendorf\ Kreis\ Osnabrück";
-$areanames{en}->{495403} = "Bad\ Iburg";
-$areanames{en}->{495404} = "Westerkappeln";
-$areanames{en}->{495405} = "Hasbergen\ Kreis\ Osnabrück";
-$areanames{en}->{495406} = "Belm";
-$areanames{en}->{495407} = "Wallenhorst";
-$areanames{en}->{495409} = "Hilter\ am\ Teutoburger\ Wald";
-$areanames{en}->{49541} = "Osnabrück";
-$areanames{en}->{495421} = "Dissen\ am\ Teutoburger\ Wald";
-$areanames{en}->{495422} = "Melle";
-$areanames{en}->{495423} = "Versmold";
-$areanames{en}->{495424} = "Bad\ Rothenfelde";
-$areanames{en}->{495425} = "Borgholzhausen";
-$areanames{en}->{495426} = "Glandorf";
-$areanames{en}->{495427} = "Melle\-Buer";
-$areanames{en}->{495428} = "Melle\-Neuenkirchen";
-$areanames{en}->{495429} = "Melle\-Wellingholzhausen";
-$areanames{en}->{495431} = "Quakenbrück";
-$areanames{en}->{495432} = "Löningen";
-$areanames{en}->{495433} = "Badbergen";
-$areanames{en}->{495434} = "Essen\ Oldenburg";
-$areanames{en}->{495435} = "Berge\ bei\ Quakenbrück";
-$areanames{en}->{495436} = "Nortrup";
-$areanames{en}->{495437} = "Menslage";
-$areanames{en}->{495438} = "Bakum\-Lüsche";
-$areanames{en}->{495439} = "Bersenbrück";
-$areanames{en}->{495441} = "Diepholz";
-$areanames{en}->{495442} = "Barnstorf\ Kreis\ Diepholz";
-$areanames{en}->{495443} = "Lemförde";
-$areanames{en}->{495444} = "Wagenfeld";
-$areanames{en}->{495445} = "Drebber";
-$areanames{en}->{495446} = "Rehden";
-$areanames{en}->{495447} = "Lembruch";
-$areanames{en}->{495448} = "Barver";
-$areanames{en}->{495451} = "Ibbenbüren";
-$areanames{en}->{495452} = "Mettingen\ Westfalen";
-$areanames{en}->{495453} = "Recke";
-$areanames{en}->{495454} = "Hörstel\-Riesenbeck";
-$areanames{en}->{495455} = "Tecklenburg\-Brochterbeck";
-$areanames{en}->{495456} = "Westerkappeln\-Velpe";
-$areanames{en}->{495457} = "Hopsten\-Schale";
-$areanames{en}->{495458} = "Hopsten";
-$areanames{en}->{495459} = "Hörstel";
-$areanames{en}->{495461} = "Bramsche\ Hase";
-$areanames{en}->{495462} = "Ankum";
-$areanames{en}->{495464} = "Alfhausen";
-$areanames{en}->{495465} = "Neuenkirchen\ bei\ Bramsche";
-$areanames{en}->{495466} = "Merzen";
-$areanames{en}->{495467} = "Voltlage";
-$areanames{en}->{495468} = "Bramsche\-Engter";
-$areanames{en}->{495471} = "Bohmte";
-$areanames{en}->{495472} = "Bad\ Essen";
-$areanames{en}->{495473} = "Ostercappeln";
-$areanames{en}->{495474} = "Stemwede\-Dielingen";
-$areanames{en}->{495475} = "Bohmte\-Hunteburg";
-$areanames{en}->{495476} = "Ostercappeln\-Venne";
-$areanames{en}->{495481} = "Lengerich\ Westfalen";
-$areanames{en}->{495482} = "Tecklenburg";
-$areanames{en}->{495483} = "Lienen";
-$areanames{en}->{495484} = "Lienen\-Kattenvenne";
-$areanames{en}->{495485} = "Ladbergen";
-$areanames{en}->{495491} = "Damme\ Dümmer";
-$areanames{en}->{495492} = "Steinfeld\ Oldenburg";
-$areanames{en}->{495493} = "Neuenkirchen\ Kreis\ Vechta";
-$areanames{en}->{495494} = "Holdorf\ Niedersachsen";
-$areanames{en}->{495495} = "Vörden\ Kreis\ Vechta";
-$areanames{en}->{495502} = "Dransfeld";
-$areanames{en}->{495503} = "Nörten\-Hardenberg";
-$areanames{en}->{495504} = "Friedland\ Kreis\ Göttingen";
-$areanames{en}->{495505} = "Hardegsen";
-$areanames{en}->{495506} = "Adelebsen";
-$areanames{en}->{495507} = "Ebergötzen";
-$areanames{en}->{495508} = "Gleichen\-Rittmarshausen";
-$areanames{en}->{495509} = "Rosdorf\ Kreis\ Göttingen";
-$areanames{en}->{49551} = "Göttingen";
-$areanames{en}->{495520} = "Braunlage";
-$areanames{en}->{495521} = "Herzberg\ am\ Harz";
-$areanames{en}->{495522} = "Osterode\ am\ Harz";
-$areanames{en}->{495523} = "Bad\ Sachsa";
-$areanames{en}->{495524} = "Bad\ Lauterberg\ im\ Harz";
-$areanames{en}->{495525} = "Walkenried";
-$areanames{en}->{495527} = "Duderstadt";
-$areanames{en}->{495528} = "Gieboldehausen";
-$areanames{en}->{495529} = "Rhumspringe";
-$areanames{en}->{495531} = "Holzminden";
-$areanames{en}->{495532} = "Stadtoldendorf";
-$areanames{en}->{495533} = "Bodenwerder";
-$areanames{en}->{495534} = "Eschershausen\ an\ der\ Lenne";
-$areanames{en}->{495535} = "Polle";
-$areanames{en}->{495536} = "Holzminden\-Neuhaus";
-$areanames{en}->{495541} = "Hann\.\ Münden";
-$areanames{en}->{495542} = "Witzenhausen";
-$areanames{en}->{495543} = "Staufenberg\ Niedersachsen";
-$areanames{en}->{495544} = "Reinhardshagen";
-$areanames{en}->{495545} = "Hedemünden";
-$areanames{en}->{495546} = "Scheden";
-$areanames{en}->{495551} = "Northeim";
-$areanames{en}->{495552} = "Katlenburg";
-$areanames{en}->{495553} = "Kalefeld";
-$areanames{en}->{495554} = "Moringen";
-$areanames{en}->{495555} = "Moringen\-Fredelsloh";
-$areanames{en}->{495556} = "Lindau\ Harz";
-$areanames{en}->{495561} = "Einbeck";
-$areanames{en}->{495562} = "Dassel\-Markoldendorf";
-$areanames{en}->{495563} = "Kreiensen";
-$areanames{en}->{495564} = "Dassel";
-$areanames{en}->{495565} = "Einbeck\-Wenzen";
-$areanames{en}->{495571} = "Uslar";
-$areanames{en}->{495572} = "Bodenfelde";
-$areanames{en}->{495573} = "Uslar\-Volpriehausen";
-$areanames{en}->{495574} = "Oberweser";
-$areanames{en}->{495582} = "Sankt\ Andreasberg";
-$areanames{en}->{495583} = "Braunlage\-Hohegeiss";
-$areanames{en}->{495584} = "Hattorf\ am\ Harz";
-$areanames{en}->{495585} = "Herzberg\-Sieber";
-$areanames{en}->{495586} = "Wieda";
-$areanames{en}->{495592} = "Gleichen\-Bremke";
-$areanames{en}->{495593} = "Bovenden\-Lenglern";
-$areanames{en}->{495594} = "Bovenden\-Reyershausen";
-$areanames{en}->{495601} = "Schauenburg";
-$areanames{en}->{495602} = "Hessisch\ Lichtenau";
-$areanames{en}->{495603} = "Gudensberg";
-$areanames{en}->{495604} = "Grossalmerode";
-$areanames{en}->{495605} = "Kaufungen\ Hessen";
-$areanames{en}->{495606} = "Zierenberg";
-$areanames{en}->{495607} = "Fuldatal";
-$areanames{en}->{495608} = "Söhrewald";
-$areanames{en}->{495609} = "Ahnatal";
-$areanames{en}->{49561} = "Kassel";
-$areanames{en}->{495621} = "Bad\ Wildungen";
-$areanames{en}->{495622} = "Fritzlar";
-$areanames{en}->{495623} = "Edertal";
-$areanames{en}->{495624} = "Bad\ Emstal";
-$areanames{en}->{495625} = "Naumburg\ Hessen";
-$areanames{en}->{495626} = "Bad\ Zwesten";
-$areanames{en}->{495631} = "Korbach";
-$areanames{en}->{495632} = "Willingen\ Upland";
-$areanames{en}->{495633} = "Diemelsee";
-$areanames{en}->{495634} = "Waldeck\-Sachsenhausen";
-$areanames{en}->{495635} = "Vöhl";
-$areanames{en}->{495636} = "Lichtenfels\-Goddelsheim";
-$areanames{en}->{495641} = "Warburg";
-$areanames{en}->{495642} = "Warburg\-Scherfede";
-$areanames{en}->{495643} = "Borgentreich";
-$areanames{en}->{495644} = "Willebadessen\-Peckelsheim";
-$areanames{en}->{495645} = "Borgentreich\-Borgholz";
-$areanames{en}->{495646} = "Willebadessen";
-$areanames{en}->{495647} = "Lichtenau\-Kleinenberg";
-$areanames{en}->{495648} = "Brakel\-Gehrden";
-$areanames{en}->{495650} = "Cornberg";
-$areanames{en}->{495651} = "Eschwege";
-$areanames{en}->{495652} = "Bad\ Sooden\-Allendorf";
-$areanames{en}->{495653} = "Sontra";
-$areanames{en}->{495654} = "Herleshausen";
-$areanames{en}->{495655} = "Wanfried";
-$areanames{en}->{495656} = "Waldkappel";
-$areanames{en}->{495657} = "Meissner";
-$areanames{en}->{495658} = "Wehretal";
-$areanames{en}->{495659} = "Ringgau";
-$areanames{en}->{495661} = "Melsungen";
-$areanames{en}->{495662} = "Felsberg\ Hessen";
-$areanames{en}->{495663} = "Spangenberg";
-$areanames{en}->{495664} = "Morschen";
-$areanames{en}->{495665} = "Guxhagen";
-$areanames{en}->{495671} = "Hofgeismar";
-$areanames{en}->{495672} = "Bad\ Karlshafen";
-$areanames{en}->{495673} = "Immenhausen\ Hessen";
-$areanames{en}->{495674} = "Grebenstein";
-$areanames{en}->{495675} = "Trendelburg";
-$areanames{en}->{495676} = "Liebenau\ Hessen";
-$areanames{en}->{495677} = "Calden\-Westuffeln";
-$areanames{en}->{495681} = "Homberg\ Efze";
-$areanames{en}->{495682} = "Borken\ Hessen";
-$areanames{en}->{495683} = "Wabern\ Hessen";
-$areanames{en}->{495684} = "Frielendorf";
-$areanames{en}->{495685} = "Knüllwald";
-$areanames{en}->{495686} = "Schwarzenborn\ Knüll";
-$areanames{en}->{495691} = "Bad\ Arolsen";
-$areanames{en}->{495692} = "Wolfhagen";
-$areanames{en}->{495693} = "Volkmarsen";
-$areanames{en}->{495694} = "Diemelstadt";
-$areanames{en}->{495695} = "Twistetal";
-$areanames{en}->{495696} = "Bad\ Arolsen\-Landau";
-$areanames{en}->{495702} = "Petershagen\-Lahde";
-$areanames{en}->{495703} = "Hille";
-$areanames{en}->{495704} = "Petershagen\-Friedewalde";
-$areanames{en}->{495705} = "Petershagen\-Windheim";
-$areanames{en}->{495706} = "Porta\ Westfalica";
-$areanames{en}->{495707} = "Petershagen\ Weser";
-$areanames{en}->{49571} = "Minden\ Westfalen";
-$areanames{en}->{495721} = "Stadthagen";
-$areanames{en}->{495722} = "Bückeburg";
-$areanames{en}->{495723} = "Bad\ Nenndorf";
-$areanames{en}->{495724} = "Obernkirchen";
-$areanames{en}->{495725} = "Lindhorst\ bei\ Stadthagen";
-$areanames{en}->{495726} = "Wiedensahl";
-$areanames{en}->{495731} = "Bad\ Oeynhausen";
-$areanames{en}->{495732} = "Löhne";
-$areanames{en}->{495733} = "Vlotho";
-$areanames{en}->{495734} = "Bergkirchen\ Westfalen";
-$areanames{en}->{495741} = "Lübbecke";
-$areanames{en}->{495742} = "Preussisch\ Oldendorf";
-$areanames{en}->{495743} = "Espelkamp\-Gestringen";
-$areanames{en}->{495744} = "Hüllhorst";
-$areanames{en}->{495745} = "Stemwede\-Levern";
-$areanames{en}->{495746} = "Rödinghausen";
-$areanames{en}->{495751} = "Rinteln";
-$areanames{en}->{495752} = "Auetal\-Hattendorf";
-$areanames{en}->{495753} = "Auetal\-Bernsen";
-$areanames{en}->{495754} = "Extertal\-Bremke";
-$areanames{en}->{495755} = "Kalletal\-Varenholz";
-$areanames{en}->{495761} = "Stolzenau";
-$areanames{en}->{495763} = "Uchte";
-$areanames{en}->{495764} = "Steyerberg";
-$areanames{en}->{495765} = "Raddestorf";
-$areanames{en}->{495766} = "Rehburg\-Loccum";
-$areanames{en}->{495767} = "Warmsen";
-$areanames{en}->{495768} = "Petershagen\-Heimsen";
-$areanames{en}->{495769} = "Steyerberg\-Voigtei";
-$areanames{en}->{495771} = "Rahden\ Westfalen";
-$areanames{en}->{495772} = "Espelkamp";
-$areanames{en}->{495773} = "Stemwede\-Wehdem";
-$areanames{en}->{495774} = "Wagenfeld\-Ströhen";
-$areanames{en}->{495775} = "Diepenau";
-$areanames{en}->{495776} = "Preussisch\ Ströhen";
-$areanames{en}->{495777} = "Diepenau\-Essern";
-$areanames{en}->{495802} = "Wrestedt";
-$areanames{en}->{495803} = "Rosche";
-$areanames{en}->{495804} = "Rätzlingen\ Kreis\ Uelzen";
-$areanames{en}->{495805} = "Oetzen";
-$areanames{en}->{495806} = "Barum\ bei\ Bad\ Bevensen";
-$areanames{en}->{495807} = "Altenmedingen";
-$areanames{en}->{495808} = "Gerdau";
-$areanames{en}->{49581} = "Uelzen";
-$areanames{en}->{495820} = "Suhlendorf";
-$areanames{en}->{495821} = "Bad\ Bevensen";
-$areanames{en}->{495822} = "Ebstorf";
-$areanames{en}->{495823} = "Bienenbüttel";
-$areanames{en}->{495824} = "Bad\ Bodenteich";
-$areanames{en}->{495825} = "Wieren";
-$areanames{en}->{495826} = "Suderburg";
-$areanames{en}->{495827} = "Unterlüss";
-$areanames{en}->{495828} = "Himbergen";
-$areanames{en}->{495829} = "Wriedel";
-$areanames{en}->{495831} = "Wittingen";
-$areanames{en}->{495832} = "Hankensbüttel";
-$areanames{en}->{495833} = "Brome";
-$areanames{en}->{495834} = "Wittingen\-Knesebeck";
-$areanames{en}->{495835} = "Wahrenholz";
-$areanames{en}->{495836} = "Wittingen\-Radenbeck";
-$areanames{en}->{495837} = "Sprakensehl";
-$areanames{en}->{495838} = "Gross\ Oesingen";
-$areanames{en}->{495839} = "Wittingen\-Ohrdorf";
-$areanames{en}->{495840} = "Schnackenburg";
-$areanames{en}->{495841} = "Lüchow\ Wendland";
-$areanames{en}->{495842} = "Schnega";
-$areanames{en}->{495843} = "Wustrow\ Wendland";
-$areanames{en}->{495844} = "Clenze";
-$areanames{en}->{495845} = "Bergen\ Dumme";
-$areanames{en}->{495846} = "Gartow\ Niedersachsen";
-$areanames{en}->{495848} = "Trebel";
-$areanames{en}->{495849} = "Waddeweitz";
-$areanames{en}->{495850} = "Neetze";
-$areanames{en}->{495851} = "Dahlenburg";
-$areanames{en}->{495852} = "Bleckede";
-$areanames{en}->{495853} = "Neu\ Darchau";
-$areanames{en}->{495854} = "Bleckede\-Barskamp";
-$areanames{en}->{495855} = "Nahrendorf";
-$areanames{en}->{495857} = "Bleckede\-Brackede";
-$areanames{en}->{495858} = "Hitzacker\-Wietzetze";
-$areanames{en}->{495859} = "Thomasburg";
-$areanames{en}->{495861} = "Dannenberg\ Elbe";
-$areanames{en}->{495862} = "Hitzacker\ Elbe";
-$areanames{en}->{495863} = "Zernien";
-$areanames{en}->{495864} = "Jameln";
-$areanames{en}->{495865} = "Gusborn";
-$areanames{en}->{495872} = "Stoetze";
-$areanames{en}->{495873} = "Eimke";
-$areanames{en}->{495874} = "Soltendieck";
-$areanames{en}->{495875} = "Emmendorf";
-$areanames{en}->{495882} = "Gorleben";
-$areanames{en}->{495883} = "Lemgow";
-$areanames{en}->{495901} = "Fürstenau\ bei\ Bramsche";
-$areanames{en}->{495902} = "Freren";
-$areanames{en}->{495903} = "Emsbüren";
-$areanames{en}->{495904} = "Lengerich\ Emsl";
-$areanames{en}->{495905} = "Beesten";
-$areanames{en}->{495906} = "Lünne";
-$areanames{en}->{495907} = "Geeste";
-$areanames{en}->{495908} = "Wietmarschen\-Lohne";
-$areanames{en}->{495909} = "Wettrup";
-$areanames{en}->{49591} = "Lingen\ \(Ems\)";
-$areanames{en}->{495921} = "Nordhorn";
-$areanames{en}->{495922} = "Bad\ Bentheim";
-$areanames{en}->{495923} = "Schüttorf";
-$areanames{en}->{495924} = "Bad\ Bentheim\-Gildehaus";
-$areanames{en}->{495925} = "Wietmarschen";
-$areanames{en}->{495926} = "Engden";
-$areanames{en}->{495931} = "Meppen";
-$areanames{en}->{495932} = "Haren\ Ems";
-$areanames{en}->{495933} = "Lathen";
-$areanames{en}->{495934} = "Haren\-Rütenbrock";
-$areanames{en}->{495935} = "Twist\-Schöninghsdorf";
-$areanames{en}->{495936} = "Twist";
-$areanames{en}->{495937} = "Geeste\-Gross\ Hesepe";
-$areanames{en}->{495939} = "Sustrum";
-$areanames{en}->{495941} = "Neuenhaus\ Dinkel";
-$areanames{en}->{495942} = "Uelsen";
-$areanames{en}->{495943} = "Emlichheim";
-$areanames{en}->{495944} = "Hoogstede";
-$areanames{en}->{495945} = "Wilsum";
-$areanames{en}->{495946} = "Georgsdorf";
-$areanames{en}->{495947} = "Laar\ Vechte";
-$areanames{en}->{495948} = "Itterbeck";
-$areanames{en}->{495951} = "Werlte";
-$areanames{en}->{495952} = "Sögel";
-$areanames{en}->{495953} = "Börger";
-$areanames{en}->{495954} = "Lorup";
-$areanames{en}->{495955} = "Esterwegen";
-$areanames{en}->{495956} = "Rastdorf";
-$areanames{en}->{495957} = "Lindern\ Oldenburg";
-$areanames{en}->{495961} = "Haselünne";
-$areanames{en}->{495962} = "Herzlake";
-$areanames{en}->{495963} = "Bawinkel";
-$areanames{en}->{495964} = "Lähden";
-$areanames{en}->{495965} = "Klein\ Berssen";
-$areanames{en}->{495966} = "Meppen\-Apeldorn";
-$areanames{en}->{495971} = "Rheine";
-$areanames{en}->{495973} = "Neuenkirchen\ Kreis\ Steinfurt";
-$areanames{en}->{495975} = "Rheine\-Mesum";
-$areanames{en}->{495976} = "Salzbergen";
-$areanames{en}->{495977} = "Spelle";
-$areanames{en}->{495978} = "Hörstel\-Dreierwalde";
-$areanames{en}->{496002} = "Ober\-Mörlen";
-$areanames{en}->{496003} = "Rosbach\ von\ der\ Höhe";
-$areanames{en}->{496004} = "Lich\-Eberstadt";
-$areanames{en}->{496007} = "Rosbach\-Rodheim";
-$areanames{en}->{496008} = "Echzell";
-$areanames{en}->{496020} = "Heigenbrücken";
-$areanames{en}->{496021} = "Aschaffenburg";
-$areanames{en}->{496022} = "Obernburg\ am\ Main";
-$areanames{en}->{496023} = "Alzenau\ in\ Unterfranken";
-$areanames{en}->{496024} = "Schöllkrippen";
-$areanames{en}->{496026} = "Grossostheim";
-$areanames{en}->{496027} = "Stockstadt\ am\ Main";
-$areanames{en}->{496028} = "Sulzbach\ am\ Main";
-$areanames{en}->{496029} = "Mömbris";
-$areanames{en}->{496031} = "Friedberg\ Hessen";
-$areanames{en}->{496032} = "Bad\ Nauheim";
-$areanames{en}->{496033} = "Butzbach";
-$areanames{en}->{496034} = "Wöllstadt";
-$areanames{en}->{496035} = "Reichelsheim\ Wetterau";
-$areanames{en}->{496036} = "Wölfersheim";
-$areanames{en}->{496039} = "Karben";
-$areanames{en}->{496041} = "Glauburg";
-$areanames{en}->{496042} = "Büdingen\ Hessen";
-$areanames{en}->{496043} = "Nidda";
-$areanames{en}->{496044} = "Schotten\ Hessen";
-$areanames{en}->{496045} = "Gedern";
-$areanames{en}->{496046} = "Ortenberg\ Hessen";
-$areanames{en}->{496047} = "Altenstadt\ Hessen";
-$areanames{en}->{496048} = "Büdingen\-Eckartshausen";
-$areanames{en}->{496049} = "Kefenrod";
-$areanames{en}->{496050} = "Biebergemünd";
-$areanames{en}->{496051} = "Gelnhausen";
-$areanames{en}->{496052} = "Bad\ Orb";
-$areanames{en}->{496053} = "Wächtersbach";
-$areanames{en}->{496054} = "Birstein";
-$areanames{en}->{496055} = "Freigericht";
-$areanames{en}->{496056} = "Bad\ Soden\-Salmünster";
-$areanames{en}->{496057} = "Flörsbachtal";
-$areanames{en}->{496058} = "Gründau";
-$areanames{en}->{496059} = "Jossgrund";
-$areanames{en}->{496061} = "Michelstadt";
-$areanames{en}->{496062} = "Erbach\ Odenwald";
-$areanames{en}->{496063} = "Bad\ König";
-$areanames{en}->{496066} = "Michelstadt\-Vielbrunn";
-$areanames{en}->{496068} = "Beerfelden";
-$areanames{en}->{496071} = "Dieburg";
-$areanames{en}->{496073} = "Babenhausen\ Hessen";
-$areanames{en}->{496074} = "Rödermark";
-$areanames{en}->{496078} = "Gross\-Umstadt";
-$areanames{en}->{496081} = "Usingen";
-$areanames{en}->{496082} = "Niederreifenberg";
-$areanames{en}->{496083} = "Weilrod";
-$areanames{en}->{496084} = "Schmitten\ Taunus";
-$areanames{en}->{496085} = "Waldsolms";
-$areanames{en}->{496086} = "Grävenwiesbach";
-$areanames{en}->{496087} = "Waldems";
-$areanames{en}->{496092} = "Heimbuchenthal";
-$areanames{en}->{496093} = "Laufach";
-$areanames{en}->{496094} = "Weibersbrunn";
-$areanames{en}->{496095} = "Bessenbach";
-$areanames{en}->{496096} = "Wiesen\ Unterfranken";
-$areanames{en}->{496101} = "Bad\ Vilbel";
-$areanames{en}->{496102} = "Neu\-Isenburg";
-$areanames{en}->{496103} = "Langen\ Hessen";
-$areanames{en}->{496104} = "Heusenstamm";
-$areanames{en}->{496105} = "Mörfelden\-Walldorf";
-$areanames{en}->{496106} = "Rodgau";
-$areanames{en}->{496107} = "Kelsterbach";
-$areanames{en}->{496108} = "Mühlheim\ am\ Main";
-$areanames{en}->{496109} = "Frankfurt\-Bergen\-Enkheim";
-$areanames{en}->{49611} = "Wiesbaden";
-$areanames{en}->{496120} = "Aarbergen";
-$areanames{en}->{496122} = "Hofheim\-Wallau";
-$areanames{en}->{496123} = "Eltville\ am\ Rhein";
-$areanames{en}->{496124} = "Bad\ Schwalbach";
-$areanames{en}->{496126} = "Idstein";
-$areanames{en}->{496127} = "Niedernhausen\ Taunus";
-$areanames{en}->{496128} = "Taunusstein";
-$areanames{en}->{496129} = "Schlangenbad";
-$areanames{en}->{496130} = "Schwabenheim\ an\ der\ Selz";
-$areanames{en}->{496131} = "Mainz";
-$areanames{en}->{496132} = "Ingelheim\ am\ Rhein";
-$areanames{en}->{496133} = "Oppenheim";
-$areanames{en}->{496134} = "Mainz\-Kastel";
-$areanames{en}->{496135} = "Bodenheim\ Rhein";
-$areanames{en}->{496136} = "Nieder\-Olm";
-$areanames{en}->{496138} = "Mommenheim";
-$areanames{en}->{496139} = "Budenheim";
-$areanames{en}->{496142} = "Rüsselsheim";
-$areanames{en}->{496144} = "Bischofsheim\ bei\ Rüsselsheim";
-$areanames{en}->{496145} = "Flörsheim\ am\ Main";
-$areanames{en}->{496146} = "Hochheim\ am\ Main";
-$areanames{en}->{496147} = "Trebur";
-$areanames{en}->{496150} = "Weiterstadt";
-$areanames{en}->{496151} = "Darmstadt";
-$areanames{en}->{496152} = "Gross\-Gerau";
-$areanames{en}->{496154} = "Ober\-Ramstadt";
-$areanames{en}->{496155} = "Griesheim\ Hessen";
-$areanames{en}->{496157} = "Pfungstadt";
-$areanames{en}->{496158} = "Riedstadt";
-$areanames{en}->{496159} = "Messel";
-$areanames{en}->{496161} = "Brensbach";
-$areanames{en}->{496162} = "Reinheim\ Odenwald";
-$areanames{en}->{496163} = "Höchst\ im\ Odenwald";
-$areanames{en}->{496164} = "Reichelsheim\ Odenwald";
-$areanames{en}->{496165} = "Breuberg";
-$areanames{en}->{496166} = "Fischbachtal";
-$areanames{en}->{496167} = "Modautal";
-$areanames{en}->{496171} = "Oberursel\ Taunus";
-$areanames{en}->{496172} = "Bad\ Homburg\ von\ der\ Höhe";
-$areanames{en}->{496173} = "Kronberg\ im\ Taunus";
-$areanames{en}->{496174} = "Königstein\ im\ Taunus";
-$areanames{en}->{496175} = "Friedrichsdorf\ Taunus";
-$areanames{en}->{496181} = "Hanau";
-$areanames{en}->{496182} = "Seligenstadt";
-$areanames{en}->{496183} = "Erlensee";
-$areanames{en}->{496184} = "Langenselbold";
-$areanames{en}->{496185} = "Hammersbach\ Hessen";
-$areanames{en}->{496186} = "Grosskrotzenburg";
-$areanames{en}->{496187} = "Schöneck";
-$areanames{en}->{496188} = "Kahl\ am\ Main";
-$areanames{en}->{496190} = "Hattersheim\ am\ Main";
-$areanames{en}->{496192} = "Hofheim\ am\ Taunus";
-$areanames{en}->{496195} = "Kelkheim\ Taunus";
-$areanames{en}->{496196} = "Bad\ Soden\ am\ Taunus";
-$areanames{en}->{496198} = "Eppstein";
-$areanames{en}->{496201} = "Weinheim\ Bergstr";
-$areanames{en}->{496202} = "Schwetzingen";
-$areanames{en}->{496203} = "Ladenburg";
-$areanames{en}->{496204} = "Viernheim";
-$areanames{en}->{496205} = "Hockenheim";
-$areanames{en}->{496206} = "Lampertheim";
-$areanames{en}->{496207} = "Wald\-Michelbach";
-$areanames{en}->{496209} = "Mörlenbach";
-$areanames{en}->{49621} = "Mannheim";
-$areanames{en}->{496220} = "Wilhelmsfeld";
-$areanames{en}->{496221} = "Heidelberg";
-$areanames{en}->{496222} = "Wiesloch";
-$areanames{en}->{496223} = "Neckargemünd";
-$areanames{en}->{496224} = "Sandhausen\ Baden";
-$areanames{en}->{496226} = "Meckesheim";
-$areanames{en}->{496227} = "Walldorf\ Baden";
-$areanames{en}->{496228} = "Schönau\ Odenwald";
-$areanames{en}->{496229} = "Neckarsteinach";
-$areanames{en}->{496231} = "Hochdorf\-Assenheim";
-$areanames{en}->{496232} = "Speyer";
-$areanames{en}->{496233} = "Frankenthal\ Pfalz";
-$areanames{en}->{496234} = "Mutterstadt";
-$areanames{en}->{496235} = "Schifferstadt";
-$areanames{en}->{496236} = "Neuhofen\ Pfalz";
-$areanames{en}->{496237} = "Maxdorf";
-$areanames{en}->{496238} = "Dirmstein";
-$areanames{en}->{496239} = "Bobenheim\-Roxheim";
-$areanames{en}->{496241} = "Worms";
-$areanames{en}->{496242} = "Osthofen";
-$areanames{en}->{496243} = "Monsheim";
-$areanames{en}->{496244} = "Westhofen\ Rheinhessenen";
-$areanames{en}->{496245} = "Biblis";
-$areanames{en}->{496246} = "Eich\ Rheinhessen";
-$areanames{en}->{496247} = "Worms\-Pfeddersheim";
-$areanames{en}->{496249} = "Guntersblum";
-$areanames{en}->{496251} = "Bensheim";
-$areanames{en}->{496252} = "Heppenheim\ Bergstrasse";
-$areanames{en}->{496253} = "Fürth\ Odenwald";
-$areanames{en}->{496254} = "Lautertal\ Odenwald";
-$areanames{en}->{496255} = "Lindenfels";
-$areanames{en}->{496256} = "Lampertheim\-Hüttenfeld";
-$areanames{en}->{496257} = "Seeheim\-Jugenheim";
-$areanames{en}->{496258} = "Gernsheim";
-$areanames{en}->{496261} = "Mosbach\ Baden";
-$areanames{en}->{496262} = "Aglasterhausen";
-$areanames{en}->{496263} = "Neckargerach";
-$areanames{en}->{496264} = "Neudenau";
-$areanames{en}->{496265} = "Billigheim\ Baden";
-$areanames{en}->{496266} = "Hassmersheim";
-$areanames{en}->{496267} = "Fahrenbach\ Baden";
-$areanames{en}->{496268} = "Hüffenhardt";
-$areanames{en}->{496269} = "Gundelsheim\ Württemberg";
-$areanames{en}->{496271} = "Eberbach\ Baden";
-$areanames{en}->{496272} = "Hirschhorn\ Neckar";
-$areanames{en}->{496274} = "Waldbrunn\ Odenwald";
-$areanames{en}->{496275} = "Rothenberg\ Odenwald";
-$areanames{en}->{496276} = "Hesseneck";
-$areanames{en}->{496281} = "Buchen\ Odenwald";
-$areanames{en}->{496282} = "Walldürn";
-$areanames{en}->{496283} = "Hardheim\ Odenwald";
-$areanames{en}->{496284} = "Mudau";
-$areanames{en}->{496285} = "Walldürn\-Altheim";
-$areanames{en}->{496286} = "Walldürn\-Rippberg";
-$areanames{en}->{496287} = "Limbach\ Baden";
-$areanames{en}->{496291} = "Adelsheim";
-$areanames{en}->{496292} = "Seckach";
-$areanames{en}->{496293} = "Schefflenz";
-$areanames{en}->{496294} = "Krautheim\ Jagst";
-$areanames{en}->{496295} = "Rosenberg\ Baden";
-$areanames{en}->{496296} = "Ahorn\ Baden";
-$areanames{en}->{496297} = "Ravenstein\ Baden";
-$areanames{en}->{496298} = "Möckmühl";
-$areanames{en}->{496301} = "Otterbach\ Pfalz";
-$areanames{en}->{496302} = "Winnweiler";
-$areanames{en}->{496303} = "Enkenbach\-Alsenborn";
-$areanames{en}->{496304} = "Wolfstein\ Pfalz";
-$areanames{en}->{496305} = "Hochspeyer";
-$areanames{en}->{496306} = "Trippstadt";
-$areanames{en}->{496307} = "Schopp";
-$areanames{en}->{496308} = "Olsbrücken";
-$areanames{en}->{49631} = "Kaiserslautern";
-$areanames{en}->{496321} = "Neustadt\ an\ der\ Weinstrasse";
-$areanames{en}->{496322} = "Bad\ Dürkheim";
-$areanames{en}->{496323} = "Edenkoben";
-$areanames{en}->{496324} = "Hassloch";
-$areanames{en}->{496325} = "Lambrecht\ Pfalz";
-$areanames{en}->{496326} = "Deidesheim";
-$areanames{en}->{496327} = "Neustadt\-Lachen";
-$areanames{en}->{496328} = "Elmstein";
-$areanames{en}->{496329} = "Weidenthal\ Pfalz";
-$areanames{en}->{496331} = "Pirmasens";
-$areanames{en}->{496332} = "Zweibrücken";
-$areanames{en}->{496333} = "Waldfischbach\-Burgalben";
-$areanames{en}->{496334} = "Thaleischweiler\-Fröschen";
-$areanames{en}->{496335} = "Trulben";
-$areanames{en}->{496336} = "Dellfeld";
-$areanames{en}->{496337} = "Grossbundenbach";
-$areanames{en}->{496338} = "Hornbach\ Pfalz";
-$areanames{en}->{496339} = "Grosssteinhausen";
-$areanames{en}->{496340} = "Wörth\-Schaidt";
-$areanames{en}->{496341} = "Landau\ in\ der\ Pfalz";
-$areanames{en}->{496342} = "Schweigen\-Rechtenbach";
-$areanames{en}->{496343} = "Bad\ Bergzabern";
-$areanames{en}->{496344} = "Schwegenheim";
-$areanames{en}->{496345} = "Albersweiler";
-$areanames{en}->{496346} = "Annweiler\ am\ Trifels";
-$areanames{en}->{496347} = "Hochstadt\ Pfalz";
-$areanames{en}->{496348} = "Offenbach\ an\ der\ Queich";
-$areanames{en}->{496349} = "Billigheim\-Ingenheim";
-$areanames{en}->{496351} = "Eisenberg\ Pfalz";
-$areanames{en}->{496352} = "Kirchheimbolanden";
-$areanames{en}->{496353} = "Freinsheim";
-$areanames{en}->{496355} = "Albisheim\ Pfrimm";
-$areanames{en}->{496356} = "Carlsberg\ Pfalz";
-$areanames{en}->{496357} = "Standenbühl";
-$areanames{en}->{496358} = "Kriegsfeld";
-$areanames{en}->{496359} = "Grünstadt";
-$areanames{en}->{496361} = "Rockenhausen";
-$areanames{en}->{496362} = "Alsenz";
-$areanames{en}->{496363} = "Niederkirchen";
-$areanames{en}->{496364} = "Nussbach\ Pfalz";
-$areanames{en}->{496371} = "Landstuhl";
-$areanames{en}->{496372} = "Bruchmühlbach\-Miesau";
-$areanames{en}->{496373} = "Schönenberg\-Kübelberg";
-$areanames{en}->{496374} = "Weilerbach";
-$areanames{en}->{496375} = "Wallhalben";
-$areanames{en}->{496381} = "Kusel";
-$areanames{en}->{496382} = "Lauterecken";
-$areanames{en}->{496383} = "Glan\-Münchweiler";
-$areanames{en}->{496384} = "Konken";
-$areanames{en}->{496385} = "Reichenbach\-Steegen";
-$areanames{en}->{496386} = "Altenkirchen\ Pfalz";
-$areanames{en}->{496387} = "Sankt\ Julian";
-$areanames{en}->{496391} = "Dahn";
-$areanames{en}->{496392} = "Hauenstein\ Pfalz";
-$areanames{en}->{496393} = "Fischbach\ bei\ Dahn";
-$areanames{en}->{496394} = "Bundenthal";
-$areanames{en}->{496395} = "Münchweiler\ an\ der\ Rodalb";
-$areanames{en}->{496396} = "Hinterweidenthal";
-$areanames{en}->{496397} = "Leimen\ Pfalz";
-$areanames{en}->{496398} = "Vorderweidenthal";
-$areanames{en}->{496400} = "Mücke";
-$areanames{en}->{496401} = "Grünberg\ Hessen";
-$areanames{en}->{496402} = "Hungen";
-$areanames{en}->{496403} = "Linden\ Hessen";
-$areanames{en}->{496404} = "Lich\ Hessen";
-$areanames{en}->{496405} = "Laubach\ Hessen";
-$areanames{en}->{496406} = "Lollar";
-$areanames{en}->{496407} = "Rabenau\ Hessen";
-$areanames{en}->{496408} = "Buseck";
-$areanames{en}->{496409} = "Biebertal";
-$areanames{en}->{49641} = "Giessen";
-$areanames{en}->{496420} = "Lahntal";
-$areanames{en}->{496421} = "Marburg";
-$areanames{en}->{496422} = "Kirchhain";
-$areanames{en}->{496423} = "Wetter\ Hessen";
-$areanames{en}->{496424} = "Ebsdorfergrund";
-$areanames{en}->{496425} = "Rauschenberg\ Hessen";
-$areanames{en}->{496426} = "Fronhausen";
-$areanames{en}->{496427} = "Cölbe\-Schönstadt";
-$areanames{en}->{496428} = "Stadtallendorf";
-$areanames{en}->{496429} = "Schweinsberg\ Hessen";
-$areanames{en}->{496430} = "Hahnstätten";
-$areanames{en}->{496431} = "Limburg\ an\ der\ Lahn";
-$areanames{en}->{496432} = "Diez";
-$areanames{en}->{496433} = "Hadamar";
-$areanames{en}->{496434} = "Bad\ Camberg";
-$areanames{en}->{496435} = "Wallmerod";
-$areanames{en}->{496436} = "Dornburg\ Hessen";
-$areanames{en}->{496438} = "Hünfelden";
-$areanames{en}->{496439} = "Holzappel";
-$areanames{en}->{496440} = "Kölschhausen";
-$areanames{en}->{496441} = "Wetzlar";
-$areanames{en}->{496442} = "Braunfels";
-$areanames{en}->{496443} = "Ehringshausen\ Dill";
-$areanames{en}->{496444} = "Bischoffen";
-$areanames{en}->{496445} = "Schöffengrund";
-$areanames{en}->{496446} = "Hohenahr";
-$areanames{en}->{496447} = "Langgöns\-Niederkleen";
-$areanames{en}->{496449} = "Ehringshausen\-Katzenfurt";
-$areanames{en}->{496451} = "Frankenberg\ Eder";
-$areanames{en}->{496452} = "Battenberg\ Eder";
-$areanames{en}->{496453} = "Gemünden\ Wohra";
-$areanames{en}->{496454} = "Lichtenfels\-Sachsenberg";
-$areanames{en}->{496455} = "Frankenau\ Hessen";
-$areanames{en}->{496456} = "Haina\ Kloster";
-$areanames{en}->{496457} = "Burgwald\ Eder";
-$areanames{en}->{496458} = "Rosenthal\ Hessen";
-$areanames{en}->{496461} = "Biedenkopf";
-$areanames{en}->{496462} = "Gladenbach";
-$areanames{en}->{496464} = "Angelburg";
-$areanames{en}->{496465} = "Breidenbach\ bei\ Biedenkopf";
-$areanames{en}->{496466} = "Dautphetal\-Friedensdorf";
-$areanames{en}->{496467} = "Hatzfeld\ Eder";
-$areanames{en}->{496468} = "Dautphetal\-Mornshausen";
-$areanames{en}->{496471} = "Weilburg";
-$areanames{en}->{496472} = "Weilmünster";
-$areanames{en}->{496473} = "Leun";
-$areanames{en}->{496474} = "Villmar\-Aumenau";
-$areanames{en}->{496475} = "Weilmünster\-Wolfenhausen";
-$areanames{en}->{496476} = "Mengerskirchen";
-$areanames{en}->{496477} = "Greifenstein\-Nenderoth";
-$areanames{en}->{496478} = "Greifenstein\-Ulm";
-$areanames{en}->{496479} = "Waldbrunn\ Westerwald";
-$areanames{en}->{496482} = "Runkel";
-$areanames{en}->{496483} = "Selters\ Taunus";
-$areanames{en}->{496484} = "Beselich";
-$areanames{en}->{496485} = "Nentershausen\ Westerwald";
-$areanames{en}->{496486} = "Katzenelnbogen";
-$areanames{en}->{496500} = "Waldrach";
-$areanames{en}->{496501} = "Konz";
-$areanames{en}->{496502} = "Schweich";
-$areanames{en}->{496503} = "Hermeskeil";
-$areanames{en}->{496504} = "Thalfang";
-$areanames{en}->{496505} = "Kordel";
-$areanames{en}->{496506} = "Welschbillig";
-$areanames{en}->{496507} = "Neumagen\-Dhron";
-$areanames{en}->{496508} = "Hetzerath\ Mosel";
-$areanames{en}->{496509} = "Büdlich";
-$areanames{en}->{49651} = "Trier";
-$areanames{en}->{496522} = "Mettendorf";
-$areanames{en}->{496523} = "Holsthum";
-$areanames{en}->{496524} = "Rodershausen";
-$areanames{en}->{496525} = "Irrel";
-$areanames{en}->{496526} = "Bollendorf";
-$areanames{en}->{496527} = "Oberweis";
-$areanames{en}->{496531} = "Bernkastel\-Kues";
-$areanames{en}->{496532} = "Zeltingen\-Rachtig";
-$areanames{en}->{496533} = "Morbach\ Hunsrück";
-$areanames{en}->{496534} = "Mülheim\ Mosel";
-$areanames{en}->{496535} = "Osann\-Monzel";
-$areanames{en}->{496536} = "Kleinich";
-$areanames{en}->{496541} = "Traben\-Trarbach";
-$areanames{en}->{496542} = "Bullay";
-$areanames{en}->{496543} = "Büchenbeuren";
-$areanames{en}->{496544} = "Rhaunen";
-$areanames{en}->{496545} = "Blankenrath";
-$areanames{en}->{496550} = "Irrhausen";
-$areanames{en}->{496551} = "Prüm";
-$areanames{en}->{496552} = "Olzheim";
-$areanames{en}->{496553} = "Schönecken";
-$areanames{en}->{496554} = "Waxweiler";
-$areanames{en}->{496555} = "Bleialf";
-$areanames{en}->{496556} = "Pronsfeld";
-$areanames{en}->{496557} = "Hallschlag";
-$areanames{en}->{496558} = "Büdesheim\ Eifel";
-$areanames{en}->{496559} = "Leidenborn";
-$areanames{en}->{496561} = "Bitburg";
-$areanames{en}->{496562} = "Speicher";
-$areanames{en}->{496563} = "Kyllburg";
-$areanames{en}->{496564} = "Neuerburg\ Eifel";
-$areanames{en}->{496565} = "Dudeldorf";
-$areanames{en}->{496566} = "Körperich";
-$areanames{en}->{496567} = "Oberkail";
-$areanames{en}->{496568} = "Wolsfeld";
-$areanames{en}->{496569} = "Bickendorf";
-$areanames{en}->{496571} = "Wittlich";
-$areanames{en}->{496572} = "Manderscheid\ Eifel";
-$areanames{en}->{496573} = "Gillenfeld";
-$areanames{en}->{496574} = "Hasborn";
-$areanames{en}->{496575} = "Landscheid";
-$areanames{en}->{496578} = "Salmtal";
-$areanames{en}->{496580} = "Zemmer";
-$areanames{en}->{496581} = "Saarburg";
-$areanames{en}->{496582} = "Freudenburg";
-$areanames{en}->{496583} = "Palzem";
-$areanames{en}->{496584} = "Wellen\ Mosel";
-$areanames{en}->{496585} = "Ralingen";
-$areanames{en}->{496586} = "Beuren\ Hochwald";
-$areanames{en}->{496587} = "Zerf";
-$areanames{en}->{496588} = "Pluwig";
-$areanames{en}->{496589} = "Kell\ am\ See";
-$areanames{en}->{496591} = "Gerolstein";
-$areanames{en}->{496592} = "Daun";
-$areanames{en}->{496593} = "Hillesheim\ Eifel";
-$areanames{en}->{496594} = "Birresborn";
-$areanames{en}->{496595} = "Dockweiler";
-$areanames{en}->{496596} = "Üdersdorf";
-$areanames{en}->{496597} = "Jünkerath";
-$areanames{en}->{496599} = "Weidenbach\ bei\ Gerolstein";
-$areanames{en}->{49661} = "Fulda";
-$areanames{en}->{496620} = "Philippsthal\ Werra";
-$areanames{en}->{496621} = "Bad\ Hersfeld";
-$areanames{en}->{496622} = "Bebra";
-$areanames{en}->{496623} = "Rotenburg\ an\ der\ Fulda";
-$areanames{en}->{496624} = "Heringen\ Werra";
-$areanames{en}->{496625} = "Niederaula";
-$areanames{en}->{496626} = "Wildeck\-Obersuhl";
-$areanames{en}->{496627} = "Nentershausen\ Hessen";
-$areanames{en}->{496628} = "Oberaula";
-$areanames{en}->{496629} = "Schenklengsfeld";
-$areanames{en}->{496630} = "Schwalmtal\-Storndorf";
-$areanames{en}->{496631} = "Alsfeld";
-$areanames{en}->{496633} = "Homberg\ Ohm";
-$areanames{en}->{496634} = "Gemünden\ Felda";
-$areanames{en}->{496635} = "Kirtorf";
-$areanames{en}->{496636} = "Romrod";
-$areanames{en}->{496637} = "Feldatal";
-$areanames{en}->{496638} = "Schwalmtal\-Renzendorf";
-$areanames{en}->{496639} = "Ottrau";
-$areanames{en}->{496641} = "Lauterbach\ Hessen";
-$areanames{en}->{496642} = "Schlitz";
-$areanames{en}->{496643} = "Herbstein";
-$areanames{en}->{496644} = "Grebenhain";
-$areanames{en}->{496645} = "Ulrichstein";
-$areanames{en}->{496646} = "Grebenau";
-$areanames{en}->{496647} = "Herbstein\-Stockhausen";
-$areanames{en}->{496648} = "Bad\ Salzschlirf";
-$areanames{en}->{496650} = "Hosenfeld";
-$areanames{en}->{496651} = "Rasdorf";
-$areanames{en}->{496652} = "Hünfeld";
-$areanames{en}->{496653} = "Burghaun";
-$areanames{en}->{496654} = "Gersfeld\ Rhön";
-$areanames{en}->{496655} = "Neuhof\ Kreis\ Fulda";
-$areanames{en}->{496656} = "Ebersburg";
-$areanames{en}->{496657} = "Hofbieber";
-$areanames{en}->{496658} = "Poppenhausen\ Wasserkuppe";
-$areanames{en}->{496659} = "Eichenzell";
-$areanames{en}->{496660} = "Steinau\-Marjoss";
-$areanames{en}->{496661} = "Schlüchtern";
-$areanames{en}->{496663} = "Steinau\ an\ der\ Strasse";
-$areanames{en}->{496664} = "Sinntal\-Sterbfritz";
-$areanames{en}->{496665} = "Sinntal\-Altengronau";
-$areanames{en}->{496666} = "Freiensteinau";
-$areanames{en}->{496667} = "Steinau\-Ulmbach";
-$areanames{en}->{496668} = "Birstein\-Lichenroth";
-$areanames{en}->{496669} = "Neuhof\-Hauswurz";
-$areanames{en}->{496670} = "Ludwigsau\ Hessen";
-$areanames{en}->{496672} = "Eiterfeld";
-$areanames{en}->{496673} = "Haunetal";
-$areanames{en}->{496674} = "Friedewald\ Hessen";
-$areanames{en}->{496675} = "Breitenbach\ am\ Herzberg";
-$areanames{en}->{496676} = "Hohenroda\ Hessen";
-$areanames{en}->{496677} = "Neuenstein\ Hessen";
-$areanames{en}->{496678} = "Wildeck\-Hönebach";
-$areanames{en}->{496681} = "Hilders";
-$areanames{en}->{496682} = "Tann\ Rhön";
-$areanames{en}->{496683} = "Ehrenberg\ Rhön";
-$areanames{en}->{496684} = "Hofbieber\-Schwarzbach";
-$areanames{en}->{496691} = "Schwalmstadt";
-$areanames{en}->{496692} = "Neustadt\ Hessen";
-$areanames{en}->{496693} = "Neuental";
-$areanames{en}->{496694} = "Neukirchen\ Knüll";
-$areanames{en}->{496695} = "Jesberg";
-$areanames{en}->{496696} = "Gilserberg";
-$areanames{en}->{496697} = "Willingshausen";
-$areanames{en}->{496698} = "Schrecksbach";
-$areanames{en}->{496701} = "Sprendlingen\ Rheinhessen";
-$areanames{en}->{496703} = "Wöllstein\ Rheinhessen";
-$areanames{en}->{496704} = "Langenlonsheim";
-$areanames{en}->{496706} = "Wallhausen\ Nahe";
-$areanames{en}->{496707} = "Windesheim";
-$areanames{en}->{496708} = "Bad\ Münster\ am\ Stein\-Ebernburg";
-$areanames{en}->{496709} = "Fürfeld\ Kreis\ Bad\ Kreuznach";
-$areanames{en}->{49671} = "Bad\ Kreuznach";
-$areanames{en}->{496721} = "Bingen\ am\ Rhein";
-$areanames{en}->{496722} = "Rüdesheim\ am\ Rhein";
-$areanames{en}->{496723} = "Oestrich\-Winkel";
-$areanames{en}->{496724} = "Stromberg\ Hunsrück";
-$areanames{en}->{496725} = "Gau\-Algesheim";
-$areanames{en}->{496726} = "Lorch\ Rheingau";
-$areanames{en}->{496727} = "Gensingen";
-$areanames{en}->{496728} = "Ober\-Hilbersheim";
-$areanames{en}->{496731} = "Alzey";
-$areanames{en}->{496732} = "Wörrstadt";
-$areanames{en}->{496733} = "Gau\-Odernheim";
-$areanames{en}->{496734} = "Flonheim";
-$areanames{en}->{496735} = "Eppelsheim";
-$areanames{en}->{496736} = "Bechenheim";
-$areanames{en}->{496737} = "Köngernheim";
-$areanames{en}->{496741} = "St\ Goar";
-$areanames{en}->{496742} = "Boppard";
-$areanames{en}->{496743} = "Bacharach";
-$areanames{en}->{496744} = "Oberwesel";
-$areanames{en}->{496745} = "Gondershausen";
-$areanames{en}->{496746} = "Pfalzfeld";
-$areanames{en}->{496747} = "Emmelshausen";
-$areanames{en}->{496751} = "Bad\ Sobernheim";
-$areanames{en}->{496752} = "Kirn\ Nahe";
-$areanames{en}->{496753} = "Meisenheim";
-$areanames{en}->{496754} = "Martinstein";
-$areanames{en}->{496755} = "Odernheim\ am\ Glan";
-$areanames{en}->{496756} = "Winterbach\ Soonwald";
-$areanames{en}->{496757} = "Becherbach\ bei\ Kirn";
-$areanames{en}->{496758} = "Waldböckelheim";
-$areanames{en}->{496761} = "Simmern\ Hunsrück";
-$areanames{en}->{496762} = "Kastellaun";
-$areanames{en}->{496763} = "Kirchberg\ Hunsrück";
-$areanames{en}->{496764} = "Rheinböllen";
-$areanames{en}->{496765} = "Gemünden\ Hunsrück";
-$areanames{en}->{496766} = "Kisselbach";
-$areanames{en}->{496771} = "St\ Goarshausen";
-$areanames{en}->{496772} = "Nastätten";
-$areanames{en}->{496773} = "Kamp\-Bornhofen";
-$areanames{en}->{496774} = "Kaub";
-$areanames{en}->{496775} = "Strüth\ Taunus";
-$areanames{en}->{496776} = "Dachsenhausen";
-$areanames{en}->{496781} = "Idar\-Oberstein";
-$areanames{en}->{496782} = "Birkenfeld\ Nahe";
-$areanames{en}->{496783} = "Baumholder";
-$areanames{en}->{496784} = "Weierbach";
-$areanames{en}->{496785} = "Herrstein";
-$areanames{en}->{496786} = "Kempfeld";
-$areanames{en}->{496787} = "Niederbrombach";
-$areanames{en}->{496788} = "Sien";
-$areanames{en}->{496789} = "Heimbach\ Nahe";
-$areanames{en}->{496802} = "Völklingen\-Lauterbach";
-$areanames{en}->{496803} = "Mandelbachtal\-Ommersheim";
-$areanames{en}->{496804} = "Mandelbachtal";
-$areanames{en}->{496805} = "Kleinblittersdorf";
-$areanames{en}->{496806} = "Heusweiler";
-$areanames{en}->{496809} = "Grossrosseln";
-$areanames{en}->{49681} = "Saarbrücken";
-$areanames{en}->{496821} = "Neunkirchen\ Saar";
-$areanames{en}->{496824} = "Ottweiler";
-$areanames{en}->{496825} = "Illingen\ Saar";
-$areanames{en}->{496826} = "Bexbach";
-$areanames{en}->{496827} = "Eppelborn";
-$areanames{en}->{496831} = "Saarlouis";
-$areanames{en}->{496832} = "Beckingen\-Reimsbach";
-$areanames{en}->{496833} = "Rehlingen\-Siersburg";
-$areanames{en}->{496834} = "Bous";
-$areanames{en}->{496835} = "Beckingen";
-$areanames{en}->{496836} = "Überherrn";
-$areanames{en}->{496837} = "Wallerfangen";
-$areanames{en}->{496838} = "Saarwellingen";
-$areanames{en}->{496841} = "Homburg\ Saar";
-$areanames{en}->{496842} = "Blieskastel";
-$areanames{en}->{496843} = "Gersheim";
-$areanames{en}->{496844} = "Blieskastel\-Altheim";
-$areanames{en}->{496848} = "Homburg\-Einöd";
-$areanames{en}->{496849} = "Kirkel";
-$areanames{en}->{496851} = "St\ Wendel";
-$areanames{en}->{496852} = "Nohfelden";
-$areanames{en}->{496853} = "Marpingen";
-$areanames{en}->{496854} = "Oberthal\ Saar";
-$areanames{en}->{496855} = "Freisen";
-$areanames{en}->{496856} = "St\ Wendel\-Niederkirchen";
-$areanames{en}->{496857} = "Namborn";
-$areanames{en}->{496858} = "Ottweiler\-Fürth";
-$areanames{en}->{496861} = "Merzig";
-$areanames{en}->{496864} = "Mettlach";
-$areanames{en}->{496865} = "Mettlach\-Orscholz";
-$areanames{en}->{496866} = "Perl\-Nennig";
-$areanames{en}->{496867} = "Perl";
-$areanames{en}->{496868} = "Mettlach\-Tünsdorf";
-$areanames{en}->{496869} = "Merzig\-Silwingen";
-$areanames{en}->{496871} = "Wadern";
-$areanames{en}->{496872} = "Losheim\ am\ See";
-$areanames{en}->{496873} = "Nonnweiler";
-$areanames{en}->{496874} = "Wadern\-Nunkirchen";
-$areanames{en}->{496875} = "Nonnweiler\-Primstal";
-$areanames{en}->{496876} = "Weiskirchen\ Saar";
-$areanames{en}->{496881} = "Lebach";
-$areanames{en}->{496887} = "Schmelz\ Saar";
-$areanames{en}->{496888} = "Lebach\-Steinbach";
-$areanames{en}->{496893} = "Saarbrücken\-Ensheim";
-$areanames{en}->{496894} = "St\ Ingbert";
-$areanames{en}->{496897} = "Sulzbach\ Saar";
-$areanames{en}->{496898} = "Völklingen";
-$areanames{en}->{4969} = "Frankfurt\ am\ Main";
-$areanames{en}->{497021} = "Kirchheim\ unter\ Teck";
-$areanames{en}->{497022} = "Nürtingen";
-$areanames{en}->{497023} = "Weilheim\ an\ der\ Teck";
-$areanames{en}->{497024} = "Wendlingen\ am\ Neckar";
-$areanames{en}->{497025} = "Neuffen";
-$areanames{en}->{497026} = "Lenningen";
-$areanames{en}->{497031} = "Böblingen";
-$areanames{en}->{497032} = "Herrenberg";
-$areanames{en}->{497033} = "Weil\ Der\ Stadt";
-$areanames{en}->{497034} = "Ehningen";
-$areanames{en}->{497041} = "Mühlacker";
-$areanames{en}->{497042} = "Vaihingen\ an\ der\ Enz";
-$areanames{en}->{497043} = "Maulbronn";
-$areanames{en}->{497044} = "Mönsheim";
-$areanames{en}->{497045} = "Oberderdingen";
-$areanames{en}->{497046} = "Zaberfeld";
-$areanames{en}->{497051} = "Calw";
-$areanames{en}->{497052} = "Bad\ Liebenzell";
-$areanames{en}->{497053} = "Bad\ Teinach\-Zavelstein";
-$areanames{en}->{497054} = "Wildberg\ Württemberg";
-$areanames{en}->{497055} = "Neuweiler\ Kreis\ Calw";
-$areanames{en}->{497056} = "Gechingen";
-$areanames{en}->{497062} = "Beilstein\ Württemberg";
-$areanames{en}->{497063} = "Bad\ Wimpfen";
-$areanames{en}->{497066} = "Bad\ Rappenau\-Bonfeld";
-$areanames{en}->{497071} = "Tübingen";
-$areanames{en}->{497072} = "Gomaringen";
-$areanames{en}->{497073} = "Ammerbuch";
-$areanames{en}->{497081} = "Bad\ Wildbad";
-$areanames{en}->{497082} = "Neuenbürg\ Württemberg";
-$areanames{en}->{497083} = "Bad\ Herrenalb";
-$areanames{en}->{497084} = "Schömberg\ bei\ Neuenbürg";
-$areanames{en}->{497085} = "Enzklösterle";
-$areanames{en}->{49711} = "Stuttgart";
-$areanames{en}->{497121} = "Reutlingen";
-$areanames{en}->{497122} = "St\ Johann\ Württemberg";
-$areanames{en}->{497123} = "Metzingen\ Württemberg";
-$areanames{en}->{497124} = "Trochtelfingen\ Hohenz";
-$areanames{en}->{497125} = "Bad\ Urach";
-$areanames{en}->{497126} = "Burladingen\-Melchingen";
-$areanames{en}->{497127} = "Neckartenzlingen";
-$areanames{en}->{497128} = "Sonnenbühl";
-$areanames{en}->{497129} = "Lichtenstein\ Württemberg";
-$areanames{en}->{497130} = "Löwenstein\ Württemberg";
-$areanames{en}->{497131} = "Heilbronn\ Neckar";
-$areanames{en}->{497132} = "Neckarsulm";
-$areanames{en}->{497133} = "Lauffen\ am\ Neckar";
-$areanames{en}->{497134} = "Weinsberg";
-$areanames{en}->{497135} = "Brackenheim";
-$areanames{en}->{497136} = "Bad\ Friedrichshall";
-$areanames{en}->{497138} = "Schwaigern";
-$areanames{en}->{497139} = "Neuenstadt\ am\ Kocher";
-$areanames{en}->{497141} = "Ludwigsburg\ Württemberg";
-$areanames{en}->{497142} = "Bietigheim\-Bissingen";
-$areanames{en}->{497143} = "Besigheim";
-$areanames{en}->{497144} = "Marbach\ am\ Neckar";
-$areanames{en}->{497145} = "Markgröningen";
-$areanames{en}->{497146} = "Remseck\ am\ Neckar";
-$areanames{en}->{497147} = "Sachsenheim\ Württemberg";
-$areanames{en}->{497148} = "Grossbottwar";
-$areanames{en}->{497150} = "Korntal\-Münchingen";
-$areanames{en}->{497151} = "Waiblingen";
-$areanames{en}->{497152} = "Leonberg\ Württemberg";
-$areanames{en}->{497153} = "Plochingen";
-$areanames{en}->{497154} = "Kornwestheim";
-$areanames{en}->{497156} = "Ditzingen";
-$areanames{en}->{497157} = "Waldenbuch";
-$areanames{en}->{497158} = "Neuhausen\ auf\ den\ Fildern";
-$areanames{en}->{497159} = "Renningen";
-$areanames{en}->{497161} = "Göppingen";
-$areanames{en}->{497162} = "Süssen";
-$areanames{en}->{497163} = "Ebersbach\ an\ der\ Fils";
-$areanames{en}->{497164} = "Boll\ Kreis\ Göppingen";
-$areanames{en}->{497165} = "Göppingen\-Hohenstaufen";
-$areanames{en}->{497166} = "Adelberg";
-$areanames{en}->{497171} = "Schwäbisch\ Gmünd";
-$areanames{en}->{497172} = "Lorch\ Württemberg";
-$areanames{en}->{497173} = "Heubach";
-$areanames{en}->{497174} = "Mögglingen";
-$areanames{en}->{497175} = "Leinzell";
-$areanames{en}->{497176} = "Spraitbach";
-$areanames{en}->{497181} = "Schorndorf\ Württemberg";
-$areanames{en}->{497182} = "Welzheim";
-$areanames{en}->{497183} = "Rudersberg\ Württemberg";
-$areanames{en}->{497184} = "Kaisersbach";
-$areanames{en}->{497191} = "Backnang";
-$areanames{en}->{497192} = "Murrhardt";
-$areanames{en}->{497193} = "Sulzbach\ an\ der\ Murr";
-$areanames{en}->{497194} = "Spiegelberg";
-$areanames{en}->{497195} = "Winnenden";
-$areanames{en}->{497202} = "Karlsbad";
-$areanames{en}->{497203} = "Walzbachtal";
-$areanames{en}->{497204} = "Malsch\-Völkersbach";
-$areanames{en}->{49721} = "Karlsruhe";
-$areanames{en}->{497220} = "Forbach\-Hundsbach";
-$areanames{en}->{497221} = "Baden\-Baden";
-$areanames{en}->{497222} = "Rastatt";
-$areanames{en}->{497223} = "Bühl\ Baden";
-$areanames{en}->{497224} = "Gernsbach";
-$areanames{en}->{497225} = "Gaggenau";
-$areanames{en}->{497226} = "Bühl\-Sand";
-$areanames{en}->{497227} = "Lichtenau\ Baden";
-$areanames{en}->{497228} = "Forbach";
-$areanames{en}->{497229} = "Iffezheim";
-$areanames{en}->{497231} = "Pforzheim";
-$areanames{en}->{497232} = "Königsbach\-Stein";
-$areanames{en}->{497233} = "Niefern\-Öschelbronn";
-$areanames{en}->{497234} = "Tiefenbronn";
-$areanames{en}->{497235} = "Unterreichenbach\ Kreis\ Calw";
-$areanames{en}->{497236} = "Keltern";
-$areanames{en}->{497237} = "Neulingen\ Enzkreis";
-$areanames{en}->{497240} = "Pfinztal";
-$areanames{en}->{497242} = "Rheinstetten";
-$areanames{en}->{497243} = "Ettlingen";
-$areanames{en}->{497244} = "Weingarten\ Baden";
-$areanames{en}->{497245} = "Durmersheim";
-$areanames{en}->{497246} = "Malsch\ Kreis\ Karlsruhe";
-$areanames{en}->{497247} = "Linkenheim\-Hochstetten";
-$areanames{en}->{497248} = "Marxzell";
-$areanames{en}->{497249} = "Stutensee";
-$areanames{en}->{497250} = "Kraichtal";
-$areanames{en}->{497251} = "Bruchsal";
-$areanames{en}->{497252} = "Bretten";
-$areanames{en}->{497253} = "Bad\ Schönborn";
-$areanames{en}->{497254} = "Waghäusel";
-$areanames{en}->{497255} = "Graben\-Neudorf";
-$areanames{en}->{497256} = "Philippsburg";
-$areanames{en}->{497257} = "Bruchsal\-Untergrombach";
-$areanames{en}->{497258} = "Oberderdingen\-Flehingen";
-$areanames{en}->{497259} = "Östringen\-Odenheim";
-$areanames{en}->{497260} = "Sinsheim\-Hilsbach";
-$areanames{en}->{497261} = "Sinsheim";
-$areanames{en}->{497262} = "Eppingen";
-$areanames{en}->{497263} = "Waibstadt";
-$areanames{en}->{497264} = "Bad\ Rappenau";
-$areanames{en}->{497265} = "Angelbachtal";
-$areanames{en}->{497266} = "Kirchardt";
-$areanames{en}->{497267} = "Gemmingen";
-$areanames{en}->{497268} = "Bad\ Rappenau\-Obergimpern";
-$areanames{en}->{497269} = "Sulzfeld\ Baden";
-$areanames{en}->{497271} = "Wörth\ am\ Rhein";
-$areanames{en}->{497272} = "Rülzheim";
-$areanames{en}->{497273} = "Hagenbach\ Pfalz";
-$areanames{en}->{497274} = "Germersheim";
-$areanames{en}->{497275} = "Kandel";
-$areanames{en}->{497276} = "Herxheim\ bei\ Landau\ Pfalz";
-$areanames{en}->{497277} = "Wörth\-Büchelberg";
-$areanames{en}->{497300} = "Roggenburg";
-$areanames{en}->{497302} = "Pfaffenhofen\ an\ der\ Roth";
-$areanames{en}->{497303} = "Illertissen";
-$areanames{en}->{497304} = "Blaustein\ Württemberg";
-$areanames{en}->{497305} = "Erbach\ Donau";
-$areanames{en}->{497306} = "Vöhringen\ Iller";
-$areanames{en}->{497307} = "Senden\ Iller";
-$areanames{en}->{497308} = "Nersingen";
-$areanames{en}->{497309} = "Weissenhorn";
-$areanames{en}->{49731} = "Ulm\ Donau";
-$areanames{en}->{497321} = "Heidenheim\ an\ der\ Brenz";
-$areanames{en}->{497322} = "Giengen\ an\ der\ Brenz";
-$areanames{en}->{497323} = "Gerstetten";
-$areanames{en}->{497324} = "Herbrechtingen";
-$areanames{en}->{497325} = "Sontheim\ an\ der\ Brenz";
-$areanames{en}->{497326} = "Neresheim";
-$areanames{en}->{497327} = "Dischingen";
-$areanames{en}->{497328} = "Königsbronn";
-$areanames{en}->{497329} = "Steinheim\ am\ Albuch";
-$areanames{en}->{497331} = "Geislingen\ an\ der\ Steige";
-$areanames{en}->{497332} = "Lauterstein";
-$areanames{en}->{497333} = "Laichingen";
-$areanames{en}->{497334} = "Deggingen";
-$areanames{en}->{497335} = "Wiesensteig";
-$areanames{en}->{497336} = "Lonsee";
-$areanames{en}->{497337} = "Nellingen\ Alb";
-$areanames{en}->{497340} = "Neenstetten";
-$areanames{en}->{497343} = "Buch\ bei\ Illertissen";
-$areanames{en}->{497344} = "Blaubeuren";
-$areanames{en}->{497345} = "Langenau\ Württemberg";
-$areanames{en}->{497346} = "Illerkirchberg";
-$areanames{en}->{497347} = "Dietenheim";
-$areanames{en}->{497348} = "Beimerstetten";
-$areanames{en}->{497351} = "Biberach\ an\ der\ Riss";
-$areanames{en}->{497352} = "Ochsenhausen";
-$areanames{en}->{497353} = "Schwendi";
-$areanames{en}->{497354} = "Erolzheim";
-$areanames{en}->{497355} = "Hochdorf\ Riss";
-$areanames{en}->{497356} = "Schemmerhofen";
-$areanames{en}->{497357} = "Attenweiler";
-$areanames{en}->{497358} = "Eberhardzell\-Füramoos";
-$areanames{en}->{497361} = "Aalen";
-$areanames{en}->{497362} = "Bopfingen";
-$areanames{en}->{497363} = "Lauchheim";
-$areanames{en}->{497364} = "Oberkochen";
-$areanames{en}->{497365} = "Essingen\ Württemberg";
-$areanames{en}->{497366} = "Abtsgmünd";
-$areanames{en}->{497367} = "Aalen\-Ebnat";
-$areanames{en}->{497371} = "Riedlingen\ Württemberg";
-$areanames{en}->{497373} = "Zwiefalten";
-$areanames{en}->{497374} = "Uttenweiler";
-$areanames{en}->{497375} = "Obermarchtal";
-$areanames{en}->{497376} = "Langenenslingen";
-$areanames{en}->{497381} = "Münsingen";
-$areanames{en}->{497382} = "Römerstein";
-$areanames{en}->{497383} = "Münsingen\-Buttenhausen";
-$areanames{en}->{497384} = "Schelklingen\-Hütten";
-$areanames{en}->{497385} = "Gomadingen";
-$areanames{en}->{497386} = "Hayingen";
-$areanames{en}->{497387} = "Hohenstein\ Württemberg";
-$areanames{en}->{497388} = "Pfronstetten";
-$areanames{en}->{497389} = "Heroldstatt";
-$areanames{en}->{497391} = "Ehingen\ Donau";
-$areanames{en}->{497392} = "Laupheim";
-$areanames{en}->{497393} = "Munderkingen";
-$areanames{en}->{497394} = "Schelklingen";
-$areanames{en}->{497395} = "Ehingen\-Dächingen";
-$areanames{en}->{497402} = "Fluorn\-Winzeln";
-$areanames{en}->{497403} = "Dunningen";
-$areanames{en}->{497404} = "Epfendorf";
-$areanames{en}->{49741} = "Rottweil";
-$areanames{en}->{497420} = "Deisslingen";
-$areanames{en}->{497422} = "Schramberg";
-$areanames{en}->{497423} = "Oberndorf\ am\ Neckar";
-$areanames{en}->{497424} = "Spaichingen";
-$areanames{en}->{497425} = "Trossingen";
-$areanames{en}->{497426} = "Gosheim";
-$areanames{en}->{497427} = "Schömberg\ bei\ Balingen";
-$areanames{en}->{497428} = "Rosenfeld";
-$areanames{en}->{497429} = "Egesheim";
-$areanames{en}->{497431} = "Albstadt\-Ebingen";
-$areanames{en}->{497432} = "Albstadt\-Tailfingen";
-$areanames{en}->{497433} = "Balingen";
-$areanames{en}->{497434} = "Winterlingen";
-$areanames{en}->{497435} = "Albstadt\-Laufen";
-$areanames{en}->{497436} = "Messstetten\-Oberdigisheim";
-$areanames{en}->{497440} = "Bad\ Rippoldsau";
-$areanames{en}->{497441} = "Freudenstadt";
-$areanames{en}->{497442} = "Baiersbronn";
-$areanames{en}->{497443} = "Dornstetten";
-$areanames{en}->{497444} = "Alpirsbach";
-$areanames{en}->{497445} = "Pfalzgrafenweiler";
-$areanames{en}->{497446} = "Lossburg";
-$areanames{en}->{497447} = "Baiersbronn\-Schwarzenberg";
-$areanames{en}->{497448} = "Seewald";
-$areanames{en}->{497449} = "Baiersbronn\-Obertal";
-$areanames{en}->{497451} = "Horb\ am\ Neckar";
-$areanames{en}->{497452} = "Nagold";
-$areanames{en}->{497453} = "Altensteig\ Württemberg";
-$areanames{en}->{497454} = "Sulz\ am\ Neckar";
-$areanames{en}->{497455} = "Dornhan";
-$areanames{en}->{497456} = "Haiterbach";
-$areanames{en}->{497457} = "Rottenburg\-Ergenzingen";
-$areanames{en}->{497458} = "Ebhausen";
-$areanames{en}->{497459} = "Nagold\-Hochdorf";
-$areanames{en}->{497461} = "Tuttlingen";
-$areanames{en}->{497462} = "Immendingen";
-$areanames{en}->{497463} = "Mühlheim\ an\ der\ Donau";
-$areanames{en}->{497464} = "Talheim\ Kreis\ Tuttlingen";
-$areanames{en}->{497465} = "Emmingen\-Liptingen";
-$areanames{en}->{497466} = "Beuron";
-$areanames{en}->{497467} = "Neuhausen\ ob\ Eck";
-$areanames{en}->{497471} = "Hechingen";
-$areanames{en}->{497472} = "Rottenburg\ am\ Neckar";
-$areanames{en}->{497473} = "Mössingen";
-$areanames{en}->{497474} = "Haigerloch";
-$areanames{en}->{497475} = "Burladingen";
-$areanames{en}->{497476} = "Bisingen";
-$areanames{en}->{497477} = "Jungingen\ bei\ Hechingen";
-$areanames{en}->{497478} = "Hirrlingen";
-$areanames{en}->{497482} = "Horb\-Dettingen";
-$areanames{en}->{497483} = "Horb\-Mühringen";
-$areanames{en}->{497484} = "Simmersfeld";
-$areanames{en}->{497485} = "Empfingen";
-$areanames{en}->{497486} = "Horb\-Altheim";
-$areanames{en}->{497502} = "Wolpertswende";
-$areanames{en}->{497503} = "Wilhelmsdorf\ Württemberg";
-$areanames{en}->{497504} = "Horgenzell";
-$areanames{en}->{497505} = "Fronreute";
-$areanames{en}->{497506} = "Wangen\-Leupolz";
-$areanames{en}->{49751} = "Ravensburg";
-$areanames{en}->{497520} = "Bodnegg";
-$areanames{en}->{497522} = "Wangen\ im\ Allgäu";
-$areanames{en}->{497524} = "Bad\ Waldsee";
-$areanames{en}->{497525} = "Aulendorf";
-$areanames{en}->{497527} = "Wolfegg";
-$areanames{en}->{497528} = "Neukirch\ bei\ Tettnang";
-$areanames{en}->{497529} = "Waldburg\ Württemberg";
-$areanames{en}->{497531} = "Konstanz";
-$areanames{en}->{497532} = "Meersburg";
-$areanames{en}->{497533} = "Allensbach";
-$areanames{en}->{497534} = "Reichenau\ Baden";
-$areanames{en}->{497541} = "Friedrichshafen";
-$areanames{en}->{497542} = "Tettnang";
-$areanames{en}->{497543} = "Kressbronn\ am\ Bodensee";
-$areanames{en}->{497544} = "Markdorf";
-$areanames{en}->{497545} = "Immenstaad\ am\ Bodensee";
-$areanames{en}->{497546} = "Oberteuringen";
-$areanames{en}->{497551} = "Überlingen\ Bodensee";
-$areanames{en}->{497552} = "Pfullendorf";
-$areanames{en}->{497553} = "Salem\ Baden";
-$areanames{en}->{497554} = "Heiligenberg\ Baden";
-$areanames{en}->{497555} = "Deggenhausertal";
-$areanames{en}->{497556} = "Uhldingen\-Mühlhofen";
-$areanames{en}->{497557} = "Herdwangen\-Schönach";
-$areanames{en}->{497558} = "Illmensee";
-$areanames{en}->{497561} = "Leutkirch\ im\ Allgäu";
-$areanames{en}->{497562} = "Isny\ im\ Allgäu";
-$areanames{en}->{497563} = "Kisslegg";
-$areanames{en}->{497564} = "Bad\ Wurzach";
-$areanames{en}->{497565} = "Aichstetten\ Kreis\ Ravensburg";
-$areanames{en}->{497566} = "Argenbühl";
-$areanames{en}->{497567} = "Leutkirch\-Friesenhofen";
-$areanames{en}->{497568} = "Bad\ Wurzach\-Hauerz";
-$areanames{en}->{497569} = "Isny\-Eisenbach";
-$areanames{en}->{497570} = "Sigmaringen\-Gutenstein";
-$areanames{en}->{497571} = "Sigmaringen";
-$areanames{en}->{497572} = "Mengen\ Württemberg";
-$areanames{en}->{497573} = "Stetten\ am\ kalten\ Markt";
-$areanames{en}->{497574} = "Gammertingen";
-$areanames{en}->{497575} = "Messkirch";
-$areanames{en}->{497576} = "Krauchenwies";
-$areanames{en}->{497577} = "Veringenstadt";
-$areanames{en}->{497578} = "Wald\ Hohenz";
-$areanames{en}->{497579} = "Schwenningen\ Baden";
-$areanames{en}->{497581} = "Saulgau";
-$areanames{en}->{497582} = "Bad\ Buchau";
-$areanames{en}->{497583} = "Bad\ Schussenried";
-$areanames{en}->{497584} = "Altshausen";
-$areanames{en}->{497585} = "Ostrach";
-$areanames{en}->{497586} = "Herbertingen";
-$areanames{en}->{497587} = "Hosskirch";
-$areanames{en}->{49760} = "Oberried\ Breisgau";
-$areanames{en}->{49761} = "Freiburg\ im\ Breisgau";
-$areanames{en}->{497620} = "Schopfheim\-Gersbach";
-$areanames{en}->{497621} = "Lörrach";
-$areanames{en}->{497622} = "Schopfheim";
-$areanames{en}->{497623} = "Rheinfelden\ Baden";
-$areanames{en}->{497624} = "Grenzach\-Wyhlen";
-$areanames{en}->{497625} = "Zell\ im\ Wiesental";
-$areanames{en}->{497626} = "Kandern";
-$areanames{en}->{497627} = "Steinen\ Kreis\ Lörrach";
-$areanames{en}->{497628} = "Efringen\-Kirchen";
-$areanames{en}->{497629} = "Tegernau\ Baden";
-$areanames{en}->{497631} = "Müllheim\ Baden";
-$areanames{en}->{497632} = "Badenweiler";
-$areanames{en}->{497633} = "Staufen\ im\ Breisgau";
-$areanames{en}->{497634} = "Sulzburg";
-$areanames{en}->{497635} = "Schliengen";
-$areanames{en}->{497636} = "Münstertal\ Schwarzwald";
-$areanames{en}->{497641} = "Emmendingen";
-$areanames{en}->{497642} = "Endingen\ Kaiserstuhl";
-$areanames{en}->{497643} = "Herbolzheim\ Breisgau";
-$areanames{en}->{497644} = "Kenzingen";
-$areanames{en}->{497645} = "Freiamt";
-$areanames{en}->{497646} = "Weisweil\ Breisgau";
-$areanames{en}->{497651} = "Titisee\-Neustadt";
-$areanames{en}->{497652} = "Hinterzarten";
-$areanames{en}->{497653} = "Lenzkirch";
-$areanames{en}->{497654} = "Löffingen";
-$areanames{en}->{497655} = "Feldberg\-Altglashütten";
-$areanames{en}->{497656} = "Schluchsee";
-$areanames{en}->{497657} = "Eisenbach\ Hochschwarzwald";
-$areanames{en}->{497660} = "St\ Peter\ Schwarzwald";
-$areanames{en}->{497661} = "Kirchzarten";
-$areanames{en}->{497662} = "Vogtsburg\ im\ Kaiserstuhl";
-$areanames{en}->{497663} = "Eichstetten";
-$areanames{en}->{497664} = "Freiburg\-Tiengen";
-$areanames{en}->{497665} = "March\ Breisgau";
-$areanames{en}->{497666} = "Denzlingen";
-$areanames{en}->{497667} = "Breisach\ am\ Rhein";
-$areanames{en}->{497668} = "Ihringen";
-$areanames{en}->{497669} = "St\ Märgen";
-$areanames{en}->{497671} = "Todtnau";
-$areanames{en}->{497672} = "St\ Blasien";
-$areanames{en}->{497673} = "Schönau\ im\ Schwarzwald";
-$areanames{en}->{497674} = "Todtmoos";
-$areanames{en}->{497675} = "Bernau\ Baden";
-$areanames{en}->{497676} = "Feldberg\ Schwarzwald";
-$areanames{en}->{497681} = "Waldkirch\ Breisgau";
-$areanames{en}->{497682} = "Elzach";
-$areanames{en}->{497683} = "Simonswald";
-$areanames{en}->{497684} = "Glottertal";
-$areanames{en}->{497685} = "Gutach\-Bleibach";
-$areanames{en}->{497702} = "Blumberg\ Baden";
-$areanames{en}->{497703} = "Bonndorf\ im\ Schwarzwald";
-$areanames{en}->{497704} = "Geisingen\ Baden";
-$areanames{en}->{497705} = "Wolterdingen\ Schwarzw";
-$areanames{en}->{497706} = "Oberbaldingen";
-$areanames{en}->{497707} = "Bräunlingen";
-$areanames{en}->{497708} = "Geisingen\-Leipferdingen";
-$areanames{en}->{497709} = "Wutach";
-$areanames{en}->{49771} = "Donaueschingen";
-$areanames{en}->{497720} = "Schwenningen\ am\ Neckar";
-$areanames{en}->{497721} = "Villingen\ im\ Schwarzwald";
-$areanames{en}->{497722} = "Triberg\ im\ Schwarzwald";
-$areanames{en}->{497723} = "Furtwangen\ im\ Schwarzwald";
-$areanames{en}->{497724} = "St\ Georgen\ im\ Schwarzwald";
-$areanames{en}->{497725} = "Königsfeld\ im\ Schwarzwald";
-$areanames{en}->{497726} = "Bad\ Dürrheim";
-$areanames{en}->{497727} = "Vöhrenbach";
-$areanames{en}->{497728} = "Niedereschach";
-$areanames{en}->{497729} = "Tennenbronn";
-$areanames{en}->{497731} = "Singen\ Hohentwiel";
-$areanames{en}->{497732} = "Radolfzell\ am\ Bodensee";
-$areanames{en}->{497733} = "Engen\ Hegau";
-$areanames{en}->{497734} = "Gailingen";
-$areanames{en}->{497735} = "Öhningen";
-$areanames{en}->{497736} = "Tengen";
-$areanames{en}->{497738} = "Steisslingen";
-$areanames{en}->{497739} = "Hilzingen";
-$areanames{en}->{497741} = "Tiengen\ Hochrhein";
-$areanames{en}->{497742} = "Klettgau";
-$areanames{en}->{497743} = "Ühlingen\-Birkendorf";
-$areanames{en}->{497744} = "Stühlingen";
-$areanames{en}->{497745} = "Jestetten";
-$areanames{en}->{497746} = "Wutöschingen";
-$areanames{en}->{497747} = "Berau";
-$areanames{en}->{497748} = "Grafenhausen\ Hochschwarzwald";
-$areanames{en}->{497751} = "Waldshut";
-$areanames{en}->{497753} = "Albbruck";
-$areanames{en}->{497754} = "Görwihl";
-$areanames{en}->{497755} = "Weilheim\ Kreis\ Waldshut";
-$areanames{en}->{497761} = "Bad\ Säckingen";
-$areanames{en}->{497762} = "Wehr\ Baden";
-$areanames{en}->{497763} = "Murg";
-$areanames{en}->{497764} = "Herrischried";
-$areanames{en}->{497765} = "Rickenbach\ Hotzenwald";
-$areanames{en}->{497771} = "Stockach";
-$areanames{en}->{497773} = "Bodman\-Ludwigshafen";
-$areanames{en}->{497774} = "Eigeltingen";
-$areanames{en}->{497775} = "Mühlingen";
-$areanames{en}->{497777} = "Sauldorf";
-$areanames{en}->{497802} = "Oberkirch\ Baden";
-$areanames{en}->{497803} = "Gengenbach";
-$areanames{en}->{497804} = "Oppenau";
-$areanames{en}->{497805} = "Appenweier";
-$areanames{en}->{497806} = "Bad\ Peterstal\-Griesbach";
-$areanames{en}->{497807} = "Neuried\ Ortenaukreis";
-$areanames{en}->{497808} = "Hohberg\ bei\ Offenburg";
-$areanames{en}->{49781} = "Offenburg";
-$areanames{en}->{497821} = "Lahr\ Schwarzwald";
-$areanames{en}->{497822} = "Ettenheim";
-$areanames{en}->{497823} = "Seelbach\ Schutter";
-$areanames{en}->{497824} = "Schwanau";
-$areanames{en}->{497825} = "Kippenheim";
-$areanames{en}->{497826} = "Schuttertal";
-$areanames{en}->{497831} = "Hausach";
-$areanames{en}->{497832} = "Haslach\ im\ Kinzigtal";
-$areanames{en}->{497833} = "Hornberg\ Schwarzwaldbahn";
-$areanames{en}->{497834} = "Wolfach";
-$areanames{en}->{497835} = "Zell\ am\ Harmersbach";
-$areanames{en}->{497836} = "Schiltach";
-$areanames{en}->{497837} = "Oberharmersbach";
-$areanames{en}->{497838} = "Nordrach";
-$areanames{en}->{497839} = "Schapbach";
-$areanames{en}->{497841} = "Achern";
-$areanames{en}->{497842} = "Kappelrodeck";
-$areanames{en}->{497843} = "Renchen";
-$areanames{en}->{497844} = "Rheinau";
-$areanames{en}->{497851} = "Kehl";
-$areanames{en}->{497852} = "Willstätt";
-$areanames{en}->{497853} = "Kehl\-Bodersweier";
-$areanames{en}->{497854} = "Kehl\-Goldscheuer";
-$areanames{en}->{497903} = "Mainhardt";
-$areanames{en}->{497904} = "Ilshofen";
-$areanames{en}->{497905} = "Langenburg";
-$areanames{en}->{497906} = "Braunsbach";
-$areanames{en}->{497907} = "Schwäbisch\ Hall\-Sulzdorf";
-$areanames{en}->{49791} = "Schwäbisch\ Hall";
-$areanames{en}->{497930} = "Boxberg\ Baden";
-$areanames{en}->{497931} = "Bad\ Mergentheim";
-$areanames{en}->{497932} = "Niederstetten\ Württemberg";
-$areanames{en}->{497933} = "Creglingen";
-$areanames{en}->{497934} = "Weikersheim";
-$areanames{en}->{497935} = "Schrozberg";
-$areanames{en}->{497936} = "Schrozberg\-Bartenstein";
-$areanames{en}->{497937} = "Dörzbach";
-$areanames{en}->{497938} = "Mulfingen\ Jagst";
-$areanames{en}->{497939} = "Schrozberg\-Spielbach";
-$areanames{en}->{497940} = "Künzelsau";
-$areanames{en}->{497941} = "Öhringen";
-$areanames{en}->{497942} = "Neuenstein\ Württemberg";
-$areanames{en}->{497943} = "Schöntal\ Jagst";
-$areanames{en}->{497944} = "Kupferzell";
-$areanames{en}->{497945} = "Wüstenrot";
-$areanames{en}->{497946} = "Bretzfeld";
-$areanames{en}->{497947} = "Forchtenberg";
-$areanames{en}->{497948} = "Öhringen\-Ohrnberg";
-$areanames{en}->{497949} = "Pfedelbach\-Untersteinbach";
-$areanames{en}->{497950} = "Schnelldorf";
-$areanames{en}->{497951} = "Crailsheim";
-$areanames{en}->{497952} = "Gerabronn";
-$areanames{en}->{497953} = "Blaufelden";
-$areanames{en}->{497954} = "Kirchberg\ an\ der\ Jagst";
-$areanames{en}->{497955} = "Wallhausen\ Württemberg";
-$areanames{en}->{497957} = "Kressberg";
-$areanames{en}->{497958} = "Rot\ Am\ See\-Brettheim";
-$areanames{en}->{497959} = "Frankenhardt";
-$areanames{en}->{497961} = "Ellwangen\ Jagst";
-$areanames{en}->{497962} = "Fichtenau";
-$areanames{en}->{497963} = "Adelmannsfelden";
-$areanames{en}->{497964} = "Stödtlen";
-$areanames{en}->{497965} = "Ellwangen\-Röhlingen";
-$areanames{en}->{497966} = "Unterschneidheim";
-$areanames{en}->{497967} = "Jagstzell";
-$areanames{en}->{497971} = "Gaildorf";
-$areanames{en}->{497972} = "Gschwend\ bei\ Gaildorf";
-$areanames{en}->{497973} = "Obersontheim";
-$areanames{en}->{497974} = "Bühlerzell";
-$areanames{en}->{497975} = "Untergröningen";
-$areanames{en}->{497976} = "Sulzbach\-Laufen";
-$areanames{en}->{497977} = "Oberrot\ bei\ Gaildorf";
-$areanames{en}->{498020} = "Weyarn";
-$areanames{en}->{498021} = "Waakirchen";
-$areanames{en}->{498022} = "Tegernsee";
-$areanames{en}->{498023} = "Bayrischzell";
-$areanames{en}->{498024} = "Holzkirchen";
-$areanames{en}->{498025} = "Miesbach";
-$areanames{en}->{498026} = "Hausham";
-$areanames{en}->{498027} = "Dietramszell";
-$areanames{en}->{498028} = "Fischbachau";
-$areanames{en}->{498029} = "Kreuth\ bei\ Tegernsee";
-$areanames{en}->{498031} = "Rosenheim\ Oberbayern";
-$areanames{en}->{498032} = "Rohrdorf\ Kreis\ Rosenheim";
-$areanames{en}->{498033} = "Oberaudorf";
-$areanames{en}->{498034} = "Brannenburg";
-$areanames{en}->{498035} = "Raubling";
-$areanames{en}->{498036} = "Stephanskirchen\ Simssee";
-$areanames{en}->{498038} = "Vogtareuth";
-$areanames{en}->{498039} = "Rott\ am\ Inn";
-$areanames{en}->{498041} = "Bad\ Tölz";
-$areanames{en}->{498042} = "Lenggries";
-$areanames{en}->{498043} = "Jachenau";
-$areanames{en}->{498045} = "Lenggries\-Fall";
-$areanames{en}->{498046} = "Bad\ Heilbrunn";
-$areanames{en}->{498051} = "Prien\ am\ Chiemsee";
-$areanames{en}->{498052} = "Aschau\ im\ Chiemgau";
-$areanames{en}->{498053} = "Bad\ Endorf";
-$areanames{en}->{498054} = "Breitbrunn\ am\ Chiemsee";
-$areanames{en}->{498055} = "Halfing";
-$areanames{en}->{498056} = "Eggstätt";
-$areanames{en}->{498057} = "Aschau\-Sachrang";
-$areanames{en}->{498061} = "Bad\ Aibling";
-$areanames{en}->{498062} = "Bruckmühl\ Mangfall";
-$areanames{en}->{498063} = "Feldkirchen\-Westerham";
-$areanames{en}->{498064} = "Au\ bei\ Bad\ Aibling";
-$areanames{en}->{498065} = "Tuntenhausen\-Schönau";
-$areanames{en}->{498066} = "Bad\ Feilnbach";
-$areanames{en}->{498067} = "Tuntenhausen";
-$areanames{en}->{498071} = "Wasserburg\ am\ Inn";
-$areanames{en}->{498072} = "Haag\ in\ Oberbayern";
-$areanames{en}->{498073} = "Gars\ am\ Inn";
-$areanames{en}->{498074} = "Schnaitsee";
-$areanames{en}->{498075} = "Amerang";
-$areanames{en}->{498076} = "Pfaffing";
-$areanames{en}->{498081} = "Dorfen\ Stadt";
-$areanames{en}->{498082} = "Schwindegg";
-$areanames{en}->{498083} = "Isen";
-$areanames{en}->{498084} = "Taufkirchen\ Vils";
-$areanames{en}->{498085} = "Sankt\ Wolfgang";
-$areanames{en}->{498086} = "Buchbach\ Oberbayern";
-$areanames{en}->{498091} = "Kirchseeon";
-$areanames{en}->{498092} = "Grafing\ bei\ München";
-$areanames{en}->{498093} = "Glonn\ Kreis\ Ebersberg";
-$areanames{en}->{498094} = "Steinhöring";
-$areanames{en}->{498095} = "Aying";
-$areanames{en}->{498102} = "Höhenkirchen\-Siegertsbrunn";
-$areanames{en}->{498104} = "Sauerlach";
-$areanames{en}->{498105} = "Gilching";
-$areanames{en}->{498106} = "Vaterstetten";
-$areanames{en}->{49811} = "Hallbergmoos";
-$areanames{en}->{498121} = "Markt\ Schwaben";
-$areanames{en}->{498122} = "Erding";
-$areanames{en}->{498123} = "Moosinning";
-$areanames{en}->{498124} = "Forstern\ Oberbayern";
-$areanames{en}->{498131} = "Dachau";
-$areanames{en}->{498133} = "Haimhausen\ Oberbayern";
-$areanames{en}->{498134} = "Odelzhausen";
-$areanames{en}->{498135} = "Sulzemoos";
-$areanames{en}->{498136} = "Markt\ Indersdorf";
-$areanames{en}->{498137} = "Petershausen";
-$areanames{en}->{498138} = "Schwabhausen\ bei\ Dachau";
-$areanames{en}->{498139} = "Röhrmoos";
-$areanames{en}->{498141} = "Fürstenfeldbruck";
-$areanames{en}->{498142} = "Olching";
-$areanames{en}->{498143} = "Inning\ am\ Ammersee";
-$areanames{en}->{498144} = "Grafrath";
-$areanames{en}->{498145} = "Mammendorf";
-$areanames{en}->{498146} = "Moorenweis";
-$areanames{en}->{498151} = "Starnberg";
-$areanames{en}->{498152} = "Herrsching\ am\ Ammersee";
-$areanames{en}->{498153} = "Wessling";
-$areanames{en}->{498157} = "Feldafing";
-$areanames{en}->{498158} = "Tutzing";
-$areanames{en}->{498161} = "Freising";
-$areanames{en}->{498165} = "Neufahrn\ bei\ Freising";
-$areanames{en}->{498166} = "Allershausen\ Oberbayern";
-$areanames{en}->{498167} = "Zolling";
-$areanames{en}->{498168} = "Attenkirchen";
-$areanames{en}->{498170} = "Strasslach\-Dingharting";
-$areanames{en}->{498171} = "Wolfratshausen";
-$areanames{en}->{498176} = "Egling\ bei\ Wolfratshausen";
-$areanames{en}->{498177} = "Münsing\ Starnberger\ See";
-$areanames{en}->{498178} = "Icking";
-$areanames{en}->{498179} = "Eurasburg\ an\ der\ Loisach";
-$areanames{en}->{498191} = "Landsberg\ am\ Lech";
-$areanames{en}->{498192} = "Schondorf\ am\ Ammersee";
-$areanames{en}->{498193} = "Geltendorf";
-$areanames{en}->{498194} = "Vilgertshofen";
-$areanames{en}->{498195} = "Weil\ Kreis\ Landsberg\ am\ Lech";
-$areanames{en}->{498196} = "Pürgen";
-$areanames{en}->{498202} = "Althegnenberg";
-$areanames{en}->{498203} = "Grossaitingen";
-$areanames{en}->{498204} = "Mickhausen";
-$areanames{en}->{498205} = "Dasing";
-$areanames{en}->{498206} = "Egling\ an\ der\ Paar";
-$areanames{en}->{498207} = "Affing";
-$areanames{en}->{498208} = "Eurasburg\ bei\ Augsburg";
-$areanames{en}->{49821} = "Augsburg";
-$areanames{en}->{498221} = "Günzburg";
-$areanames{en}->{498222} = "Burgau\ Schwaben";
-$areanames{en}->{498223} = "Ichenhausen";
-$areanames{en}->{498224} = "Offingen\ Donau";
-$areanames{en}->{498225} = "Jettingen\-Scheppach";
-$areanames{en}->{498226} = "Bibertal";
-$areanames{en}->{498230} = "Gablingen";
-$areanames{en}->{498231} = "Königsbrunn\ bei\ Augsburg";
-$areanames{en}->{498232} = "Schwabmünchen";
-$areanames{en}->{498233} = "Kissing";
-$areanames{en}->{498234} = "Bobingen";
-$areanames{en}->{498236} = "Fischach";
-$areanames{en}->{498237} = "Aindling";
-$areanames{en}->{498238} = "Gessertshausen";
-$areanames{en}->{498239} = "Langenneufnach";
-$areanames{en}->{498241} = "Buchloe";
-$areanames{en}->{498243} = "Fuchstal";
-$areanames{en}->{498245} = "Türkheim\ Wertach";
-$areanames{en}->{498246} = "Waal";
-$areanames{en}->{498247} = "Bad\ Wörishofen";
-$areanames{en}->{498248} = "Lamerdingen";
-$areanames{en}->{498249} = "Ettringen\ Wertach";
-$areanames{en}->{498250} = "Hilgertshausen\-Tandern";
-$areanames{en}->{498251} = "Aichach";
-$areanames{en}->{498252} = "Schrobenhausen";
-$areanames{en}->{498253} = "Pöttmes";
-$areanames{en}->{498254} = "Altomünster";
-$areanames{en}->{498257} = "Inchenhofen";
-$areanames{en}->{498258} = "Sielenbach";
-$areanames{en}->{498259} = "Schiltberg";
-$areanames{en}->{498261} = "Mindelheim";
-$areanames{en}->{498262} = "Mittelneufnach";
-$areanames{en}->{498263} = "Breitenbrunn\ Schwaben";
-$areanames{en}->{498265} = "Pfaffenhausen\ Schwaben";
-$areanames{en}->{498266} = "Kirchheim\ in\ Schwaben";
-$areanames{en}->{498267} = "Dirlewang";
-$areanames{en}->{498268} = "Tussenhausen";
-$areanames{en}->{498269} = "Unteregg\ bei\ Mindelheim";
-$areanames{en}->{498271} = "Meitingen";
-$areanames{en}->{498272} = "Wertingen";
-$areanames{en}->{498273} = "Nordendorf";
-$areanames{en}->{498274} = "Buttenwiesen";
-$areanames{en}->{498276} = "Baar\ Schwaben";
-$areanames{en}->{498281} = "Thannhausen\ Schwaben";
-$areanames{en}->{498282} = "Krumbach\ Schwaben";
-$areanames{en}->{498283} = "Neuburg\ an\ der\ Kammel";
-$areanames{en}->{498284} = "Ziemetshausen";
-$areanames{en}->{498285} = "Burtenbach";
-$areanames{en}->{498291} = "Zusmarshausen";
-$areanames{en}->{498292} = "Dinkelscherben";
-$areanames{en}->{498293} = "Welden\ bei\ Augsburg";
-$areanames{en}->{498294} = "Horgau";
-$areanames{en}->{498295} = "Altenmünster\ Schwaben";
-$areanames{en}->{498296} = "Villenbach";
-$areanames{en}->{498302} = "Görisried";
-$areanames{en}->{498303} = "Waltenhofen";
-$areanames{en}->{498304} = "Wildpoldsried";
-$areanames{en}->{498306} = "Ronsberg";
-$areanames{en}->{49831} = "Kempten\ Allgäu";
-$areanames{en}->{498320} = "Missen\-Wilhams";
-$areanames{en}->{498321} = "Sonthofen";
-$areanames{en}->{498322} = "Oberstdorf";
-$areanames{en}->{498323} = "Immenstadt\ im\ Allgäu";
-$areanames{en}->{498324} = "Hindelang";
-$areanames{en}->{498325} = "Oberstaufen\-Thalkirchdorf";
-$areanames{en}->{498326} = "Fischen\ im\ Allgäu";
-$areanames{en}->{498327} = "Rettenberg";
-$areanames{en}->{498328} = "Balderschwang";
-$areanames{en}->{498330} = "Legau";
-$areanames{en}->{498331} = "Memmingen";
-$areanames{en}->{498332} = "Ottobeuren";
-$areanames{en}->{498333} = "Babenhausen\ Schwaben";
-$areanames{en}->{498334} = "Bad\ Grönenbach";
-$areanames{en}->{498335} = "Fellheim";
-$areanames{en}->{498336} = "Erkheim";
-$areanames{en}->{498337} = "Altenstadt\ Iller";
-$areanames{en}->{498338} = "Böhen";
-$areanames{en}->{498340} = "Baisweil";
-$areanames{en}->{498341} = "Kaufbeuren";
-$areanames{en}->{498342} = "Marktoberdorf";
-$areanames{en}->{498343} = "Aitrang";
-$areanames{en}->{498344} = "Westendorf\ bei\ Kaufbeuren";
-$areanames{en}->{498345} = "Stöttwang";
-$areanames{en}->{498346} = "Pforzen";
-$areanames{en}->{498347} = "Friesenried";
-$areanames{en}->{498348} = "Bidingen";
-$areanames{en}->{498349} = "Stötten\ am\ Auerberg";
-$areanames{en}->{498361} = "Nesselwang";
-$areanames{en}->{498362} = "Füssen";
-$areanames{en}->{498363} = "Pfronten";
-$areanames{en}->{498364} = "Seeg";
-$areanames{en}->{498365} = "Wertach";
-$areanames{en}->{498366} = "Oy\-Mittelberg";
-$areanames{en}->{498367} = "Rosshaupten\ Forggensee";
-$areanames{en}->{498368} = "Halblech";
-$areanames{en}->{498369} = "Rückholz";
-$areanames{en}->{498370} = "Wiggensbach";
-$areanames{en}->{498372} = "Obergünzburg";
-$areanames{en}->{498373} = "Altusried";
-$areanames{en}->{498374} = "Dietmannsried";
-$areanames{en}->{498375} = "Weitnau";
-$areanames{en}->{498376} = "Sulzberg\ Allgäu";
-$areanames{en}->{498377} = "Unterthingau";
-$areanames{en}->{498378} = "Buchenberg\ bei\ Kempten";
-$areanames{en}->{498379} = "Waltenhofen\-Oberdorf";
-$areanames{en}->{498380} = "Achberg";
-$areanames{en}->{498381} = "Lindenberg\ im\ Allgäu";
-$areanames{en}->{498382} = "Lindau\ Bodensee";
-$areanames{en}->{498383} = "Grünenbach\ Allgäu";
-$areanames{en}->{498384} = "Röthenbach\ Allgäu";
-$areanames{en}->{498385} = "Hergatz";
-$areanames{en}->{498386} = "Oberstaufen";
-$areanames{en}->{498387} = "Weiler\-Simmerberg";
-$areanames{en}->{498388} = "Hergensweiler";
-$areanames{en}->{498389} = "Weissensberg";
-$areanames{en}->{498392} = "Markt\ Rettenbach";
-$areanames{en}->{498393} = "Holzgünz";
-$areanames{en}->{498394} = "Lautrach";
-$areanames{en}->{498395} = "Tannheim\ Württemberg";
-$areanames{en}->{498402} = "Münchsmünster";
-$areanames{en}->{498403} = "Pförring";
-$areanames{en}->{498404} = "Oberdolling";
-$areanames{en}->{498405} = "Stammham\ bei\ Ingolstadt";
-$areanames{en}->{498406} = "Böhmfeld";
-$areanames{en}->{498407} = "Grossmehring";
-$areanames{en}->{49841} = "Ingolstadt\ Donau";
-$areanames{en}->{498421} = "Eichstätt\ Bayern";
-$areanames{en}->{498422} = "Dollnstein";
-$areanames{en}->{498423} = "Titting";
-$areanames{en}->{498424} = "Nassenfels";
-$areanames{en}->{498426} = "Walting\ Kreis\ Eichstätt";
-$areanames{en}->{498427} = "Wellheim";
-$areanames{en}->{498431} = "Neuburg\ an\ der\ Donau";
-$areanames{en}->{498432} = "Burgheim";
-$areanames{en}->{498433} = "Königsmoos";
-$areanames{en}->{498434} = "Rennertshofen";
-$areanames{en}->{498435} = "Ehekirchen";
-$areanames{en}->{498441} = "Pfaffenhofen\ an\ der\ Ilm";
-$areanames{en}->{498442} = "Wolnzach";
-$areanames{en}->{498443} = "Hohenwart\ Paar";
-$areanames{en}->{498444} = "Schweitenkirchen";
-$areanames{en}->{498445} = "Gerolsbach";
-$areanames{en}->{498446} = "Pörnbach";
-$areanames{en}->{498450} = "Ingolstadt\-Zuchering";
-$areanames{en}->{498452} = "Geisenfeld";
-$areanames{en}->{498453} = "Reichertshofen\ Oberbayern";
-$areanames{en}->{498454} = "Karlshuld";
-$areanames{en}->{498456} = "Lenting";
-$areanames{en}->{498457} = "Vohburg\ an\ der\ Donau";
-$areanames{en}->{498458} = "Gaimersheim";
-$areanames{en}->{498459} = "Manching";
-$areanames{en}->{498460} = "Berching\-Holnstein";
-$areanames{en}->{498461} = "Beilngries";
-$areanames{en}->{498462} = "Berching";
-$areanames{en}->{498463} = "Greding";
-$areanames{en}->{498464} = "Dietfurt\ an\ der\ Altmühl";
-$areanames{en}->{498465} = "Kipfenberg";
-$areanames{en}->{498466} = "Denkendorf\ Oberbayern";
-$areanames{en}->{498467} = "Kinding";
-$areanames{en}->{498468} = "Altmannstein\-Pondorf";
-$areanames{en}->{498469} = "Freystadt\-Burggriesbach";
-$areanames{en}->{498501} = "Thyrnau";
-$areanames{en}->{498502} = "Fürstenzell";
-$areanames{en}->{498503} = "Neuhaus\ am\ Inn";
-$areanames{en}->{498504} = "Tittling";
-$areanames{en}->{498505} = "Hutthurm";
-$areanames{en}->{498506} = "Bad\ Höhenstadt";
-$areanames{en}->{498507} = "Neuburg\ am\ Inn";
-$areanames{en}->{498509} = "Ruderting";
-$areanames{en}->{49851} = "Passau";
-$areanames{en}->{498531} = "Pocking";
-$areanames{en}->{498532} = "Griesbach\ im\ Rottal";
-$areanames{en}->{498533} = "Rotthalmünster";
-$areanames{en}->{498534} = "Tettenweis";
-$areanames{en}->{498535} = "Haarbach";
-$areanames{en}->{498536} = "Kösslarn";
-$areanames{en}->{498537} = "Bad\ Füssing\-Aigen";
-$areanames{en}->{498538} = "Pocking\-Hartkirchen";
-$areanames{en}->{498541} = "Vilshofen\ Niederbayern";
-$areanames{en}->{498542} = "Ortenburg";
-$areanames{en}->{498543} = "Aidenbach";
-$areanames{en}->{498544} = "Eging\ am\ See";
-$areanames{en}->{498545} = "Hofkirchen\ Bayern";
-$areanames{en}->{498546} = "Windorf\-Otterskirchen";
-$areanames{en}->{498547} = "Osterhofen\-Gergweis";
-$areanames{en}->{498548} = "Vilshofen\-Sandbach";
-$areanames{en}->{498549} = "Vilshofen\-Pleinting";
-$areanames{en}->{498550} = "Philippsreut";
-$areanames{en}->{498551} = "Freyung";
-$areanames{en}->{498552} = "Grafenau\ Niederbayern";
-$areanames{en}->{498553} = "Spiegelau";
-$areanames{en}->{498554} = "Schönberg\ Niederbayern";
-$areanames{en}->{498555} = "Perlesreut";
-$areanames{en}->{498556} = "Haidmühle";
-$areanames{en}->{498557} = "Mauth";
-$areanames{en}->{498558} = "Hohenau\ Niederbayern";
-$areanames{en}->{498561} = "Pfarrkirchen\ Niederbayern";
-$areanames{en}->{498562} = "Triftern";
-$areanames{en}->{498563} = "Bad\ Birnbach\ Rottal";
-$areanames{en}->{498564} = "Johanniskirchen";
-$areanames{en}->{498565} = "Dietersburg\-Baumgarten";
-$areanames{en}->{498571} = "Simbach\ am\ Inn";
-$areanames{en}->{498572} = "Tann\ Niederbayern";
-$areanames{en}->{498573} = "Ering";
-$areanames{en}->{498574} = "Wittibreut";
-$areanames{en}->{498581} = "Waldkirchen\ Niederbayern";
-$areanames{en}->{498582} = "Röhrnbach";
-$areanames{en}->{498583} = "Neureichenau";
-$areanames{en}->{498584} = "Breitenberg\ Niederbayern";
-$areanames{en}->{498585} = "Grainet";
-$areanames{en}->{498586} = "Hauzenberg";
-$areanames{en}->{498591} = "Obernzell";
-$areanames{en}->{498592} = "Wegscheid\ Niederbayern";
-$areanames{en}->{498593} = "Untergriesbach";
-$areanames{en}->{49861} = "Traunstein";
-$areanames{en}->{498621} = "Trostberg";
-$areanames{en}->{498622} = "Tacherting\-Peterskirchen";
-$areanames{en}->{498623} = "Kirchweidach";
-$areanames{en}->{498624} = "Obing";
-$areanames{en}->{498628} = "Kienberg\ Oberbayern";
-$areanames{en}->{498629} = "Palling";
-$areanames{en}->{498630} = "Oberneukirchen";
-$areanames{en}->{498631} = "Mühldorf\ am\ Inn";
-$areanames{en}->{498633} = "Tüssling";
-$areanames{en}->{498634} = "Garching\ an\ der\ Alz";
-$areanames{en}->{498635} = "Pleiskirchen";
-$areanames{en}->{498636} = "Ampfing";
-$areanames{en}->{498637} = "Lohkirchen";
-$areanames{en}->{498638} = "Waldkraiburg";
-$areanames{en}->{498639} = "Neumarkt\-Sankt\ Veit";
-$areanames{en}->{498640} = "Reit\ Im\ Winkl";
-$areanames{en}->{498641} = "Grassau\ Kreis\ Traunstein";
-$areanames{en}->{498642} = "Übersee";
-$areanames{en}->{498649} = "Schleching";
-$areanames{en}->{498650} = "Marktschellenberg";
-$areanames{en}->{498651} = "Bad\ Reichenhall";
-$areanames{en}->{498652} = "Berchtesgaden";
-$areanames{en}->{498654} = "Freilassing";
-$areanames{en}->{498656} = "Anger";
-$areanames{en}->{498657} = "Ramsau\ bei\ Berchtesgaden";
-$areanames{en}->{498661} = "Grabenstätt\ Chiemsee";
-$areanames{en}->{498662} = "Siegsdorf\ Kreis\ Traunstein";
-$areanames{en}->{498663} = "Ruhpolding";
-$areanames{en}->{498664} = "Chieming";
-$areanames{en}->{498665} = "Inzell";
-$areanames{en}->{498666} = "Teisendorf";
-$areanames{en}->{498667} = "Seeon\-Seebruck";
-$areanames{en}->{498669} = "Traunreut";
-$areanames{en}->{498670} = "Reischach\ Kreis\ Altötting";
-$areanames{en}->{498671} = "Altötting";
-$areanames{en}->{498677} = "Burghausen\ Salzach";
-$areanames{en}->{498678} = "Marktl";
-$areanames{en}->{498679} = "Burgkirchen\ an\ der\ Alz";
-$areanames{en}->{498681} = "Waging\ am\ See";
-$areanames{en}->{498682} = "Laufen\ Salzach";
-$areanames{en}->{498683} = "Tittmoning";
-$areanames{en}->{498684} = "Fridolfing";
-$areanames{en}->{498685} = "Kirchanschöring";
-$areanames{en}->{498686} = "Petting";
-$areanames{en}->{498687} = "Taching\-Tengling";
-$areanames{en}->{498702} = "Wörth\ an\ der\ Isar";
-$areanames{en}->{498703} = "Essenbach";
-$areanames{en}->{498704} = "Altdorf\-Pfettrach";
-$areanames{en}->{498705} = "Altfraunhofen";
-$areanames{en}->{498706} = "Vilsheim";
-$areanames{en}->{498707} = "Adlkofen";
-$areanames{en}->{498708} = "Weihmichl\-Unterneuhausen";
-$areanames{en}->{498709} = "Eching\ Niederbayern";
-$areanames{en}->{49871} = "Landshut";
-$areanames{en}->{498721} = "Eggenfelden";
-$areanames{en}->{498722} = "Gangkofen";
-$areanames{en}->{498723} = "Arnstorf";
-$areanames{en}->{498724} = "Massing";
-$areanames{en}->{498725} = "Wurmannsquick";
-$areanames{en}->{498726} = "Schönau\ Niederbayern";
-$areanames{en}->{498727} = "Falkenberg\ Niederbayern";
-$areanames{en}->{498728} = "Geratskirchen";
-$areanames{en}->{498731} = "Dingolfing";
-$areanames{en}->{498732} = "Frontenhausen";
-$areanames{en}->{498733} = "Mengkofen";
-$areanames{en}->{498734} = "Reisbach\ Niederbayern";
-$areanames{en}->{498735} = "Gangkofen\-Kollbach";
-$areanames{en}->{498741} = "Vilsbiburg";
-$areanames{en}->{498742} = "Velden\ Vils";
-$areanames{en}->{498743} = "Geisenhausen";
-$areanames{en}->{498744} = "Gerzen";
-$areanames{en}->{498745} = "Bodenkirchen";
-$areanames{en}->{498751} = "Mainburg";
-$areanames{en}->{498752} = "Au\ in\ der\ Hallertau";
-$areanames{en}->{498753} = "Elsendorf\ Niederbayern";
-$areanames{en}->{498754} = "Volkenschwand";
-$areanames{en}->{498756} = "Nandlstadt";
-$areanames{en}->{498761} = "Moosburg\ an\ der\ Isar";
-$areanames{en}->{498762} = "Wartenberg\ Oberbayern";
-$areanames{en}->{498764} = "Mauern\ Kreis\ Freising";
-$areanames{en}->{498765} = "Bruckberg\ Niederbayern";
-$areanames{en}->{498766} = "Gammelsdorf";
-$areanames{en}->{498771} = "Ergoldsbach";
-$areanames{en}->{498772} = "Mallersdorf\-Pfaffenberg";
-$areanames{en}->{498773} = "Neufahrn\ in\ Niederbayern";
-$areanames{en}->{498774} = "Bayerbach\ bei\ Ergoldsbach";
-$areanames{en}->{498781} = "Rottenburg\ an\ der\ Laaber";
-$areanames{en}->{498782} = "Pfeffenhausen";
-$areanames{en}->{498783} = "Rohr\ in\ Niederbayern";
-$areanames{en}->{498784} = "Hohenthann";
-$areanames{en}->{498785} = "Rottenburg\-Oberroning";
-$areanames{en}->{498801} = "Seeshaupt";
-$areanames{en}->{498802} = "Huglfing";
-$areanames{en}->{498803} = "Peissenberg";
-$areanames{en}->{498805} = "Hohenpeissenberg";
-$areanames{en}->{498806} = "Utting\ am\ Ammersee";
-$areanames{en}->{498807} = "Diessen\ am\ Ammersee";
-$areanames{en}->{498808} = "Pähl";
-$areanames{en}->{498809} = "Wessobrunn";
-$areanames{en}->{49881} = "Weilheim\ in\ Oberbayern";
-$areanames{en}->{498821} = "Garmisch\-Partenkirchen";
-$areanames{en}->{498822} = "Oberammergau";
-$areanames{en}->{498823} = "Mittenwald";
-$areanames{en}->{498824} = "Oberau\ Loisach";
-$areanames{en}->{498825} = "Krün";
-$areanames{en}->{498841} = "Murnau\ am\ Staffelsee";
-$areanames{en}->{498845} = "Bad\ Kohlgrub";
-$areanames{en}->{498846} = "Uffing\ am\ Staffelsee";
-$areanames{en}->{498847} = "Obersöchering";
-$areanames{en}->{498851} = "Kochel\ am\ See";
-$areanames{en}->{498856} = "Penzberg";
-$areanames{en}->{498857} = "Benediktbeuern";
-$areanames{en}->{498858} = "Kochel\-Walchensee";
-$areanames{en}->{498860} = "Bernbeuren";
-$areanames{en}->{498861} = "Schongau";
-$areanames{en}->{498862} = "Steingaden\ Oberbayern";
-$areanames{en}->{498867} = "Rottenbuch\ Oberbayern";
-$areanames{en}->{498868} = "Schwabsoien";
-$areanames{en}->{498869} = "Kinsau";
-$areanames{en}->{4989} = "Munich";
-$areanames{en}->{49906} = "Donauwörth";
-$areanames{en}->{499070} = "Tapfheim";
-$areanames{en}->{499071} = "Dillingen\ an\ der\ Donau";
-$areanames{en}->{499072} = "Lauingen\ Donau";
-$areanames{en}->{499073} = "Gundelfingen\ an\ der\ Donau";
-$areanames{en}->{499074} = "Höchstädt\ an\ der\ Donau";
-$areanames{en}->{499075} = "Glött";
-$areanames{en}->{499076} = "Wittislingen";
-$areanames{en}->{499077} = "Bachhagel";
-$areanames{en}->{499078} = "Mertingen";
-$areanames{en}->{499080} = "Harburg\ Schwaben";
-$areanames{en}->{499081} = "Nördlingen";
-$areanames{en}->{499082} = "Oettingen\ in\ Bayern";
-$areanames{en}->{499083} = "Möttingen";
-$areanames{en}->{499084} = "Bissingen\ Schwaben";
-$areanames{en}->{499085} = "Alerheim";
-$areanames{en}->{499086} = "Fremdingen";
-$areanames{en}->{499087} = "Marktoffingen";
-$areanames{en}->{499088} = "Mönchsdeggingen";
-$areanames{en}->{499089} = "Bissingen\-Unterringingen";
-$areanames{en}->{499090} = "Rain\ Lech";
-$areanames{en}->{499091} = "Monheim\ Schwaben";
-$areanames{en}->{499092} = "Wemding";
-$areanames{en}->{499093} = "Polsingen";
-$areanames{en}->{499094} = "Tagmersheim";
-$areanames{en}->{499097} = "Marxheim";
-$areanames{en}->{499099} = "Kaisheim";
-$areanames{en}->{499101} = "Langenzenn";
-$areanames{en}->{499102} = "Wilhermsdorf";
-$areanames{en}->{499103} = "Cadolzburg";
-$areanames{en}->{499104} = "Emskirchen";
-$areanames{en}->{499105} = "Grosshabersdorf";
-$areanames{en}->{499106} = "Markt\ Erlbach";
-$areanames{en}->{499107} = "Trautskirchen";
-$areanames{en}->{49911} = "Nuremberg";
-$areanames{en}->{499120} = "Leinburg";
-$areanames{en}->{499122} = "Schwabach";
-$areanames{en}->{499123} = "Lauf\ an\ der\ Pegnitz";
-$areanames{en}->{499126} = "Eckental";
-$areanames{en}->{499127} = "Rosstal\ Mittelfrankenanken";
-$areanames{en}->{499128} = "Feucht";
-$areanames{en}->{499129} = "Wendelstein";
-$areanames{en}->{499131} = "Erlangen";
-$areanames{en}->{499132} = "Herzogenaurach";
-$areanames{en}->{499133} = "Baiersdorf\ Mittelfrankenanken";
-$areanames{en}->{499134} = "Neunkirchen\ am\ Brand";
-$areanames{en}->{499135} = "Hessdorf\ Mittelfrankenanken";
-$areanames{en}->{499141} = "Weissenburg\ in\ Bayern";
-$areanames{en}->{499142} = "Treuchtlingen";
-$areanames{en}->{499143} = "Pappenheim\ Mittelfranken";
-$areanames{en}->{499144} = "Pleinfeld";
-$areanames{en}->{499145} = "Solnhofen";
-$areanames{en}->{499146} = "Markt\ Berolzheim";
-$areanames{en}->{499147} = "Nennslingen";
-$areanames{en}->{499148} = "Ettenstatt";
-$areanames{en}->{499149} = "Weissenburg\-Suffersheim";
-$areanames{en}->{499151} = "Hersbruck";
-$areanames{en}->{499152} = "Hartenstein\ Mittelfranken";
-$areanames{en}->{499153} = "Schnaittach";
-$areanames{en}->{499154} = "Pommelsbrunn";
-$areanames{en}->{499155} = "Simmelsdorf";
-$areanames{en}->{499156} = "Neuhaus\ an\ der\ Pegnitz";
-$areanames{en}->{499157} = "Alfeld\ Mittelfranken";
-$areanames{en}->{499158} = "Offenhausen\ Mittelfranken";
-$areanames{en}->{499161} = "Neustadt\ an\ der\ Aisch";
-$areanames{en}->{499162} = "Scheinfeld";
-$areanames{en}->{499163} = "Dachsbach";
-$areanames{en}->{499164} = "Langenfeld\ Mittelfranken";
-$areanames{en}->{499165} = "Sugenheim";
-$areanames{en}->{499166} = "Münchsteinach";
-$areanames{en}->{499167} = "Oberscheinfeld";
-$areanames{en}->{499170} = "Schwanstetten";
-$areanames{en}->{499171} = "Roth\ Mittelfranken";
-$areanames{en}->{499172} = "Georgensgmünd";
-$areanames{en}->{499173} = "Thalmässing";
-$areanames{en}->{499174} = "Hilpoltstein";
-$areanames{en}->{499175} = "Spalt";
-$areanames{en}->{499176} = "Allersberg";
-$areanames{en}->{499177} = "Heideck";
-$areanames{en}->{499178} = "Abenberg\ Mittelfranken";
-$areanames{en}->{499179} = "Freystadt";
-$areanames{en}->{499180} = "Pyrbaum";
-$areanames{en}->{499181} = "Neumarkt\ in\ der\ Oberpfalz";
-$areanames{en}->{499182} = "Velburg";
-$areanames{en}->{499183} = "Burgthann";
-$areanames{en}->{499184} = "Deining\ Oberpfalz";
-$areanames{en}->{499185} = "Mühlhausen\ Oberpfalz";
-$areanames{en}->{499186} = "Lauterhofen\ Oberpfalz";
-$areanames{en}->{499187} = "Altdorf\ bei\ Nürnberg";
-$areanames{en}->{499188} = "Postbauer\-Heng";
-$areanames{en}->{499189} = "Berg\ bei\ Neumarkt\ in\ der\ Oberpfalz";
-$areanames{en}->{499190} = "Heroldsbach";
-$areanames{en}->{499191} = "Forchheim\ Oberfranken";
-$areanames{en}->{499192} = "Gräfenberg";
-$areanames{en}->{499193} = "Höchstadt\ an\ der\ Aisch";
-$areanames{en}->{499194} = "Ebermannstadt";
-$areanames{en}->{499195} = "Adelsdorf\ Mittelfranken";
-$areanames{en}->{499196} = "Wiesenttal";
-$areanames{en}->{499197} = "Egloffstein";
-$areanames{en}->{499198} = "Heiligenstadt\ in\ Oberfranken";
-$areanames{en}->{499199} = "Kunreuth";
-$areanames{en}->{499201} = "Gesees";
-$areanames{en}->{499202} = "Waischenfeld";
-$areanames{en}->{499203} = "Neudrossenfeld";
-$areanames{en}->{499204} = "Plankenfels";
-$areanames{en}->{499205} = "Vorbach";
-$areanames{en}->{499206} = "Mistelgau\-Obernsees";
-$areanames{en}->{499207} = "Königsfeld\ Oberfranken";
-$areanames{en}->{499208} = "Bindlach";
-$areanames{en}->{499209} = "Emtmannsberg";
-$areanames{en}->{49921} = "Bayreuth";
-$areanames{en}->{499220} = "Kasendorf\-Azendorf";
-$areanames{en}->{499221} = "Kulmbach";
-$areanames{en}->{499222} = "Presseck";
-$areanames{en}->{499223} = "Rugendorf";
-$areanames{en}->{499225} = "Stadtsteinach";
-$areanames{en}->{499227} = "Neuenmarkt";
-$areanames{en}->{499228} = "Thurnau";
-$areanames{en}->{499229} = "Mainleus";
-$areanames{en}->{499231} = "Marktredwitz";
-$areanames{en}->{499232} = "Wunsiedel";
-$areanames{en}->{499233} = "Arzberg\ Oberfranken";
-$areanames{en}->{499234} = "Neusorg";
-$areanames{en}->{499235} = "Thierstein";
-$areanames{en}->{499236} = "Nagel";
-$areanames{en}->{499238} = "Röslau";
-$areanames{en}->{499241} = "Pegnitz";
-$areanames{en}->{499242} = "Gössweinstein";
-$areanames{en}->{499243} = "Pottenstein";
-$areanames{en}->{499244} = "Betzenstein";
-$areanames{en}->{499245} = "Obertrubach";
-$areanames{en}->{499246} = "Pegnitz\-Trockau";
-$areanames{en}->{499251} = "Münchberg";
-$areanames{en}->{499252} = "Helmbrechts";
-$areanames{en}->{499253} = "Weissenstadt";
-$areanames{en}->{499254} = "Gefrees";
-$areanames{en}->{499255} = "Marktleugast";
-$areanames{en}->{499256} = "Stammbach";
-$areanames{en}->{499257} = "Zell\ Oberfranken";
-$areanames{en}->{499260} = "Wilhelmsthal\ Oberfranken";
-$areanames{en}->{499261} = "Kronach";
-$areanames{en}->{499262} = "Wallenfels";
-$areanames{en}->{499263} = "Ludwigsstadt";
-$areanames{en}->{499264} = "Küps";
-$areanames{en}->{499265} = "Pressig";
-$areanames{en}->{499266} = "Mitwitz";
-$areanames{en}->{499267} = "Nordhalben";
-$areanames{en}->{499268} = "Teuschnitz";
-$areanames{en}->{499269} = "Tettau\ Kreis\ Kronach";
-$areanames{en}->{499270} = "Creussen";
-$areanames{en}->{499271} = "Thurnau\-Alladorf";
-$areanames{en}->{499272} = "Fichtelberg";
-$areanames{en}->{499273} = "Bad\ Berneck\ im\ Fichtelgebirge";
-$areanames{en}->{499274} = "Hollfeld";
-$areanames{en}->{499275} = "Speichersdorf";
-$areanames{en}->{499276} = "Bischofsgrün";
-$areanames{en}->{499277} = "Warmensteinach";
-$areanames{en}->{499278} = "Weidenberg";
-$areanames{en}->{499279} = "Mistelgau";
-$areanames{en}->{499280} = "Selbitz\ Oberfranken";
-$areanames{en}->{499281} = "Hof\ Saale";
-$areanames{en}->{499282} = "Naila";
-$areanames{en}->{499283} = "Rehau";
-$areanames{en}->{499284} = "Schwarzenbach\ an\ der\ Saale";
-$areanames{en}->{499285} = "Kirchenlamitz";
-$areanames{en}->{499286} = "Oberkotzau";
-$areanames{en}->{499287} = "Selb";
-$areanames{en}->{499288} = "Bad\ Steben";
-$areanames{en}->{499289} = "Schwarzenbach\ am\ Wald";
-$areanames{en}->{499292} = "Konradsreuth";
-$areanames{en}->{499293} = "Berg\ Oberfranken";
-$areanames{en}->{499294} = "Regnitzlosau";
-$areanames{en}->{499295} = "Töpen";
-$areanames{en}->{499302} = "Rottendorf\ Unterfranken";
-$areanames{en}->{499303} = "Eibelstadt";
-$areanames{en}->{499305} = "Estenfeld";
-$areanames{en}->{499306} = "Kist";
-$areanames{en}->{499307} = "Altertheim";
-$areanames{en}->{49931} = "Würzburg";
-$areanames{en}->{499321} = "Kitzingen";
-$areanames{en}->{499323} = "Iphofen";
-$areanames{en}->{499324} = "Dettelbach";
-$areanames{en}->{499325} = "Kleinlangheim";
-$areanames{en}->{499326} = "Markt\ Einersheim";
-$areanames{en}->{499331} = "Ochsenfurt";
-$areanames{en}->{499332} = "Marktbreit";
-$areanames{en}->{499333} = "Sommerhausen";
-$areanames{en}->{499334} = "Giebelstadt";
-$areanames{en}->{499335} = "Aub\ Kreis\ Würzburg";
-$areanames{en}->{499336} = "Bütthard";
-$areanames{en}->{499337} = "Gaukönigshofen";
-$areanames{en}->{499338} = "Röttingen\ Unterfranken";
-$areanames{en}->{499339} = "Ippesheim";
-$areanames{en}->{499340} = "Königheim\-Brehmen";
-$areanames{en}->{499341} = "Tauberbischofsheim";
-$areanames{en}->{499342} = "Wertheim";
-$areanames{en}->{499343} = "Lauda\-Königshofen";
-$areanames{en}->{499344} = "Gerchsheim";
-$areanames{en}->{499345} = "Külsheim\ Baden";
-$areanames{en}->{499346} = "Grünsfeld";
-$areanames{en}->{499347} = "Wittighausen";
-$areanames{en}->{499348} = "Werbach\-Gamburg";
-$areanames{en}->{499349} = "Werbach\-Wenkheim";
-$areanames{en}->{499350} = "Eussenheim\-Hundsbach";
-$areanames{en}->{499351} = "Gemünden\ am\ Main";
-$areanames{en}->{499352} = "Lohr\ am\ Main";
-$areanames{en}->{499353} = "Karlstadt";
-$areanames{en}->{499354} = "Rieneck";
-$areanames{en}->{499355} = "Frammersbach";
-$areanames{en}->{499356} = "Burgsinn";
-$areanames{en}->{499357} = "Gräfendorf\ Bayern";
-$areanames{en}->{499358} = "Gössenheim";
-$areanames{en}->{499359} = "Karlstadt\-Wiesenfeld";
-$areanames{en}->{499360} = "Thüngen";
-$areanames{en}->{499363} = "Arnstein\ Unterfranken";
-$areanames{en}->{499364} = "Zellingen";
-$areanames{en}->{499365} = "Rimpar";
-$areanames{en}->{499366} = "Geroldshausen\ Unterfranken";
-$areanames{en}->{499367} = "Unterpleichfeld";
-$areanames{en}->{499369} = "Uettingen";
-$areanames{en}->{499371} = "Miltenberg";
-$areanames{en}->{499372} = "Klingenberg\ am\ Main";
-$areanames{en}->{499373} = "Amorbach";
-$areanames{en}->{499374} = "Eschau";
-$areanames{en}->{499375} = "Freudenberg\ Baden";
-$areanames{en}->{499376} = "Collenberg";
-$areanames{en}->{499377} = "Freudenberg\-Boxtal";
-$areanames{en}->{499378} = "Eichenbühl\-Riedern";
-$areanames{en}->{499381} = "Volkach";
-$areanames{en}->{499382} = "Gerolzhofen";
-$areanames{en}->{499383} = "Wiesentheid";
-$areanames{en}->{499384} = "Schwanfeld";
-$areanames{en}->{499385} = "Kolitzheim";
-$areanames{en}->{499386} = "Prosselsheim";
-$areanames{en}->{499391} = "Marktheidenfeld";
-$areanames{en}->{499392} = "Faulbach\ Unterfranken";
-$areanames{en}->{499393} = "Rothenfels\ Unterfranken";
-$areanames{en}->{499394} = "Esselbach";
-$areanames{en}->{499395} = "Triefenstein";
-$areanames{en}->{499396} = "Urspringen\ bei\ Lohr";
-$areanames{en}->{499397} = "Wertheim\-Dertingen";
-$areanames{en}->{499398} = "Birkenfeld\ bei\ Würzburg";
-$areanames{en}->{499401} = "Neutraubling";
-$areanames{en}->{499402} = "Regenstauf";
-$areanames{en}->{499403} = "Donaustauf";
-$areanames{en}->{499404} = "Nittendorf";
-$areanames{en}->{499405} = "Bad\ Abbach";
-$areanames{en}->{499406} = "Mintraching";
-$areanames{en}->{499407} = "Wenzenbach";
-$areanames{en}->{499408} = "Altenthann";
-$areanames{en}->{499409} = "Pielenhofen";
-$areanames{en}->{49941} = "Regensburg";
-$areanames{en}->{499420} = "Feldkirchen\ Niederbayern";
-$areanames{en}->{499421} = "Straubing";
-$areanames{en}->{499422} = "Bogen\ Niederbayern";
-$areanames{en}->{499423} = "Geiselhöring";
-$areanames{en}->{499424} = "Strasskirchen";
-$areanames{en}->{499426} = "Oberschneiding";
-$areanames{en}->{499427} = "Leiblfing";
-$areanames{en}->{499428} = "Kirchroth";
-$areanames{en}->{499429} = "Rain\ Niederbayern";
-$areanames{en}->{499431} = "Schwandorf";
-$areanames{en}->{499433} = "Nabburg";
-$areanames{en}->{499434} = "Bodenwöhr";
-$areanames{en}->{499435} = "Schwarzenfeld";
-$areanames{en}->{499436} = "Nittenau";
-$areanames{en}->{499438} = "Fensterbach";
-$areanames{en}->{499439} = "Neunburg\-Kemnath";
-$areanames{en}->{499441} = "Kelheim";
-$areanames{en}->{499442} = "Riedenburg";
-$areanames{en}->{499443} = "Abensberg";
-$areanames{en}->{499444} = "Siegenburg";
-$areanames{en}->{499445} = "Neustadt\ an\ der\ Donau";
-$areanames{en}->{499446} = "Altmannstein";
-$areanames{en}->{499447} = "Essing";
-$areanames{en}->{499448} = "Hausen\ Niederbayern";
-$areanames{en}->{499451} = "Schierling";
-$areanames{en}->{499452} = "Langquaid";
-$areanames{en}->{499453} = "Thalmassing";
-$areanames{en}->{499454} = "Aufhausen\ Oberpfalz";
-$areanames{en}->{499461} = "Roding";
-$areanames{en}->{499462} = "Falkenstein\ Oberpfalz";
-$areanames{en}->{499463} = "Wald\ Oberpfalz";
-$areanames{en}->{499464} = "Walderbach";
-$areanames{en}->{499465} = "Neukirchen\-Balbini";
-$areanames{en}->{499466} = "Stamsried";
-$areanames{en}->{499467} = "Michelsneukirchen";
-$areanames{en}->{499468} = "Zell\ Oberpfalz";
-$areanames{en}->{499469} = "Roding\-Neubäu";
-$areanames{en}->{499471} = "Burglengenfeld";
-$areanames{en}->{499472} = "Hohenfels\ Oberpfalz";
-$areanames{en}->{499473} = "Kallmünz";
-$areanames{en}->{499474} = "Schmidmühlen";
-$areanames{en}->{499480} = "Sünching";
-$areanames{en}->{499481} = "Pfatter";
-$areanames{en}->{499482} = "Wörth\ an\ der\ Donau";
-$areanames{en}->{499484} = "Brennberg";
-$areanames{en}->{499491} = "Hemau";
-$areanames{en}->{499492} = "Parsberg";
-$areanames{en}->{499493} = "Beratzhausen";
-$areanames{en}->{499495} = "Breitenbrunn\ Oberpfalz";
-$areanames{en}->{499497} = "Seubersdorf\ in\ der\ Oberpfalz";
-$areanames{en}->{499498} = "Laaber";
-$areanames{en}->{499499} = "Painten";
-$areanames{en}->{499502} = "Frensdorf";
-$areanames{en}->{499503} = "Oberhaid\ Oberfranken";
-$areanames{en}->{499504} = "Stadelhofen";
-$areanames{en}->{499505} = "Litzendorf";
-$areanames{en}->{49951} = "Bamberg";
-$areanames{en}->{499521} = "Hassfurt";
-$areanames{en}->{499522} = "Eltmann";
-$areanames{en}->{499523} = "Hofheim\ in\ Unterfranken";
-$areanames{en}->{499524} = "Zeil\ am\ Main";
-$areanames{en}->{499525} = "Königsberg\ in\ Bayern";
-$areanames{en}->{499526} = "Riedbach";
-$areanames{en}->{499527} = "Knetzgau";
-$areanames{en}->{499528} = "Donnersdorf";
-$areanames{en}->{499529} = "Oberaurach";
-$areanames{en}->{499531} = "Ebern";
-$areanames{en}->{499532} = "Maroldsweisach";
-$areanames{en}->{499533} = "Untermerzbach";
-$areanames{en}->{499534} = "Burgpreppach";
-$areanames{en}->{499535} = "Pfarrweisach";
-$areanames{en}->{499536} = "Kirchlauter";
-$areanames{en}->{499542} = "Schesslitz";
-$areanames{en}->{499543} = "Hirschaid";
-$areanames{en}->{499544} = "Baunach";
-$areanames{en}->{499545} = "Buttenheim";
-$areanames{en}->{499546} = "Burgebrach";
-$areanames{en}->{499547} = "Zapfendorf";
-$areanames{en}->{499548} = "Mühlhausen\ Mittelfranken";
-$areanames{en}->{499549} = "Lisberg";
-$areanames{en}->{499551} = "Burgwindheim";
-$areanames{en}->{499552} = "Burghaslach";
-$areanames{en}->{499553} = "Ebrach\ Oberfranken";
-$areanames{en}->{499554} = "Untersteinbach\ Unterfranken";
-$areanames{en}->{499555} = "Schlüsselfeld\-Aschbach";
-$areanames{en}->{499556} = "Geiselwind";
-$areanames{en}->{499560} = "Grub\ am\ Forst";
-$areanames{en}->{499561} = "Coburg";
-$areanames{en}->{499562} = "Sonnefeld";
-$areanames{en}->{499563} = "Rödental";
-$areanames{en}->{499564} = "Bad\ Rodach";
-$areanames{en}->{499565} = "Untersiemau";
-$areanames{en}->{499566} = "Meeder";
-$areanames{en}->{499567} = "Sesslach\-Gemünda";
-$areanames{en}->{499568} = "Neustadt\ bei\ Coburg";
-$areanames{en}->{499569} = "Sesslach";
-$areanames{en}->{499571} = "Lichtenfels\ Bayern";
-$areanames{en}->{499572} = "Burgkunstadt";
-$areanames{en}->{499573} = "Staffelstein\ Oberfranken";
-$areanames{en}->{499574} = "Marktzeuln";
-$areanames{en}->{499575} = "Weismain";
-$areanames{en}->{499576} = "Lichtenfels\-Isling";
-$areanames{en}->{499602} = "Neustadt\ an\ der\ Waldnaab";
-$areanames{en}->{499603} = "Floss";
-$areanames{en}->{499604} = "Wernberg\-Köblitz";
-$areanames{en}->{499605} = "Weiherhammer";
-$areanames{en}->{499606} = "Pfreimd";
-$areanames{en}->{499607} = "Luhe\-Wildenau";
-$areanames{en}->{499608} = "Kohlberg\ Oberpfalz";
-$areanames{en}->{49961} = "Weiden\ in\ der\ Oberpfalz";
-$areanames{en}->{499621} = "Amberg\ Oberpfalz";
-$areanames{en}->{499622} = "Hirschau\ Oberpfalz";
-$areanames{en}->{499624} = "Ensdorf\ Oberpfalz";
-$areanames{en}->{499625} = "Kastl\ bei\ Amberg";
-$areanames{en}->{499626} = "Hohenburg";
-$areanames{en}->{499627} = "Freudenberg\ Oberpfalz";
-$areanames{en}->{499628} = "Ursensollen";
-$areanames{en}->{499631} = "Tirschenreuth";
-$areanames{en}->{499632} = "Waldsassen";
-$areanames{en}->{499633} = "Mitterteich";
-$areanames{en}->{499634} = "Wiesau";
-$areanames{en}->{499635} = "Bärnau";
-$areanames{en}->{499636} = "Plössberg";
-$areanames{en}->{499637} = "Falkenberg\ Oberpfalz";
-$areanames{en}->{499638} = "Neualbenreuth";
-$areanames{en}->{499639} = "Mähring";
-$areanames{en}->{499641} = "Grafenwöhr";
-$areanames{en}->{499642} = "Kemnath\ Stadt";
-$areanames{en}->{499643} = "Auerbach\ in\ der\ Oberpfalz";
-$areanames{en}->{499644} = "Pressath";
-$areanames{en}->{499645} = "Eschenbach\ in\ der\ Oberpfalz";
-$areanames{en}->{499646} = "Freihung";
-$areanames{en}->{499647} = "Kirchenthumbach";
-$areanames{en}->{499648} = "Neustadt\ am\ Kulm";
-$areanames{en}->{499651} = "Vohenstrauss";
-$areanames{en}->{499652} = "Waidhaus";
-$areanames{en}->{499653} = "Eslarn";
-$areanames{en}->{499654} = "Pleystein";
-$areanames{en}->{499655} = "Tännesberg";
-$areanames{en}->{499656} = "Moosbach\ bei\ Vohenstrauss";
-$areanames{en}->{499657} = "Waldthurn";
-$areanames{en}->{499658} = "Georgenberg";
-$areanames{en}->{499659} = "Leuchtenberg";
-$areanames{en}->{499661} = "Sulzbach\-Rosenberg";
-$areanames{en}->{499662} = "Vilseck";
-$areanames{en}->{499663} = "Neukirchen\ bei\ Sulzbach\-Rosenberg";
-$areanames{en}->{499664} = "Hahnbach";
-$areanames{en}->{499665} = "Königstein\ Oberpfalz";
-$areanames{en}->{499666} = "Illschwang";
-$areanames{en}->{499671} = "Oberviechtach";
-$areanames{en}->{499672} = "Neunburg\ vorm\ Wald";
-$areanames{en}->{499673} = "Tiefenbach\ Oberpfalz";
-$areanames{en}->{499674} = "Schönsee";
-$areanames{en}->{499675} = "Altendorf\ am\ Nabburg";
-$areanames{en}->{499676} = "Winklarn";
-$areanames{en}->{499677} = "Oberviechtach\-Pullenried";
-$areanames{en}->{499681} = "Windischeschenbach";
-$areanames{en}->{499682} = "Erbendorf";
-$areanames{en}->{499683} = "Friedenfels";
-$areanames{en}->{499701} = "Sandberg\ Unterfranken";
-$areanames{en}->{499704} = "Euerdorf";
-$areanames{en}->{499708} = "Bad\ Bocklet";
-$areanames{en}->{49971} = "Bad\ Kissingen";
-$areanames{en}->{499720} = "Üchtelhausen";
-$areanames{en}->{499721} = "Schweinfurt";
-$areanames{en}->{499722} = "Werneck";
-$areanames{en}->{499723} = "Röthlein";
-$areanames{en}->{499724} = "Stadtlauringen";
-$areanames{en}->{499725} = "Poppenhausen\ Unterfranken";
-$areanames{en}->{499726} = "Euerbach";
-$areanames{en}->{499727} = "Schonungen\-Marktsteinach";
-$areanames{en}->{499728} = "Wülfershausen\ Unterfranken";
-$areanames{en}->{499729} = "Grettstadt";
-$areanames{en}->{499732} = "Hammelburg";
-$areanames{en}->{499733} = "Münnerstadt";
-$areanames{en}->{499734} = "Burkardroth";
-$areanames{en}->{499735} = "Massbach";
-$areanames{en}->{499736} = "Oberthulba";
-$areanames{en}->{499737} = "Wartmannsroth";
-$areanames{en}->{499738} = "Rottershausen";
-$areanames{en}->{499741} = "Bad\ Brückenau";
-$areanames{en}->{499742} = "Kalbach\ Rhön";
-$areanames{en}->{499744} = "Zeitlofs\-Detter";
-$areanames{en}->{499745} = "Wildflecken";
-$areanames{en}->{499746} = "Zeitlofs";
-$areanames{en}->{499747} = "Geroda\ Bayern";
-$areanames{en}->{499748} = "Motten";
-$areanames{en}->{499749} = "Oberbach\ Unterfranken";
-$areanames{en}->{499761} = "Bad\ Königshofen\ im\ Grabfeld";
-$areanames{en}->{499762} = "Saal\ an\ der\ Saale";
-$areanames{en}->{499763} = "Sulzdorf\ an\ der\ Lederhecke";
-$areanames{en}->{499764} = "Höchheim";
-$areanames{en}->{499765} = "Trappstadt";
-$areanames{en}->{499766} = "Grosswenkheim";
-$areanames{en}->{499771} = "Bad\ Neustadt\ an\ der\ Saale";
-$areanames{en}->{499772} = "Bischofsheim\ an\ der\ Rhön";
-$areanames{en}->{499773} = "Unsleben";
-$areanames{en}->{499774} = "Oberelsbach";
-$areanames{en}->{499775} = "Schönau\ an\ der\ Brend";
-$areanames{en}->{499776} = "Mellrichstadt";
-$areanames{en}->{499777} = "Ostheim\ von\ der\ Rhön";
-$areanames{en}->{499778} = "Fladungen";
-$areanames{en}->{499779} = "Nordheim\ von\ der\ Rhön";
-$areanames{en}->{499802} = "Ansbach\-Katterbach";
-$areanames{en}->{499803} = "Colmberg";
-$areanames{en}->{499804} = "Aurach";
-$areanames{en}->{499805} = "Burgoberbach";
-$areanames{en}->{49981} = "Ansbach";
-$areanames{en}->{499820} = "Lehrberg";
-$areanames{en}->{499822} = "Bechhofen\ an\ der\ Heide";
-$areanames{en}->{499823} = "Leutershausen";
-$areanames{en}->{499824} = "Dietenhofen";
-$areanames{en}->{499825} = "Herrieden";
-$areanames{en}->{499826} = "Weidenbach\ Mittelfranken";
-$areanames{en}->{499827} = "Lichtenau\ Mittelfranken";
-$areanames{en}->{499828} = "Rügland";
-$areanames{en}->{499829} = "Flachslanden";
-$areanames{en}->{499831} = "Gunzenhausen";
-$areanames{en}->{499832} = "Wassertrüdingen";
-$areanames{en}->{499833} = "Heidenheim\ Mittelfranken";
-$areanames{en}->{499834} = "Theilenhofen";
-$areanames{en}->{499835} = "Ehingen\ Mittelfranken";
-$areanames{en}->{499836} = "Gunzenhausen\-Cronheim";
-$areanames{en}->{499837} = "Haundorf";
-$areanames{en}->{499841} = "Bad\ Windsheim";
-$areanames{en}->{499842} = "Uffenheim";
-$areanames{en}->{499843} = "Burgbernheim";
-$areanames{en}->{499844} = "Obernzenn";
-$areanames{en}->{499845} = "Oberdachstetten";
-$areanames{en}->{499846} = "Ipsheim";
-$areanames{en}->{499847} = "Ergersheim";
-$areanames{en}->{499848} = "Simmershofen";
-$areanames{en}->{499851} = "Dinkelsbühl";
-$areanames{en}->{499852} = "Feuchtwangen";
-$areanames{en}->{499853} = "Wilburgstetten";
-$areanames{en}->{499854} = "Wittelshofen";
-$areanames{en}->{499855} = "Dentlein\ am\ Forst";
-$areanames{en}->{499856} = "Dürrwangen";
-$areanames{en}->{499857} = "Schopfloch\ Mittelfranken";
-$areanames{en}->{499861} = "Rothenburg\ ob\ der\ Tauber";
-$areanames{en}->{499865} = "Adelshofen\ Mittelfranken";
-$areanames{en}->{499867} = "Geslau";
-$areanames{en}->{499868} = "Schillingsfürst";
-$areanames{en}->{499869} = "Wettringen\ Mittelfranken";
-$areanames{en}->{499871} = "Windsbach";
-$areanames{en}->{499872} = "Heilsbronn";
-$areanames{en}->{499873} = "Abenberg\-Wassermungenau";
-$areanames{en}->{499874} = "Neuendettelsau";
-$areanames{en}->{499875} = "Wolframs\-Eschenbach";
-$areanames{en}->{499876} = "Rohr\ Mittelfranken";
-$areanames{en}->{499901} = "Hengersberg\ Bayern";
-$areanames{en}->{499903} = "Schöllnach";
-$areanames{en}->{499904} = "Lalling";
-$areanames{en}->{499905} = "Bernried\ Niederbayern";
-$areanames{en}->{499906} = "Mariaposching";
-$areanames{en}->{499907} = "Zenting";
-$areanames{en}->{499908} = "Schöfweg";
-$areanames{en}->{49991} = "Deggendorf";
-$areanames{en}->{499920} = "Bischofsmais";
-$areanames{en}->{499921} = "Regen";
-$areanames{en}->{499922} = "Zwiesel";
-$areanames{en}->{499923} = "Teisnach";
-$areanames{en}->{499924} = "Bodenmais";
-$areanames{en}->{499925} = "Bayerisch\ Eisenstein";
-$areanames{en}->{499926} = "Frauenau";
-$areanames{en}->{499927} = "Kirchberg\ Wald";
-$areanames{en}->{499928} = "Kirchdorf\ im\ Wald";
-$areanames{en}->{499929} = "Ruhmannsfelden";
-$areanames{en}->{499931} = "Plattling";
-$areanames{en}->{499932} = "Osterhofen";
-$areanames{en}->{499933} = "Wallersdorf";
-$areanames{en}->{499935} = "Stephansposching";
-$areanames{en}->{499936} = "Wallerfing";
-$areanames{en}->{499937} = "Oberpöring";
-$areanames{en}->{499938} = "Moos\ Niederbayern";
-$areanames{en}->{499941} = "Kötzting";
-$areanames{en}->{499942} = "Viechtach";
-$areanames{en}->{499943} = "Lam\ Oberpfalz";
-$areanames{en}->{499944} = "Miltach";
-$areanames{en}->{499945} = "Arnbruck";
-$areanames{en}->{499946} = "Hohenwarth\ bei\ Kötzing";
-$areanames{en}->{499947} = "Neukirchen\ bei\ Hl\ Blut";
-$areanames{en}->{499948} = "Eschlkam";
-$areanames{en}->{499951} = "Landau\ an\ der\ Isar";
-$areanames{en}->{499952} = "Eichendorf";
-$areanames{en}->{499953} = "Pilsting";
-$areanames{en}->{499954} = "Simbach\ Niederbayern";
-$areanames{en}->{499955} = "Mamming";
-$areanames{en}->{499956} = "Eichendorf\-Aufhausen";
-$areanames{en}->{499961} = "Mitterfels";
-$areanames{en}->{499962} = "Schwarzach\ Niederbayern";
-$areanames{en}->{499963} = "Konzell";
-$areanames{en}->{499964} = "Stallwang";
-$areanames{en}->{499965} = "Sankt\ Englmar";
-$areanames{en}->{499966} = "Wiesenfelden";
-$areanames{en}->{499971} = "Cham";
-$areanames{en}->{499972} = "Waldmünchen";
-$areanames{en}->{499973} = "Furth\ im\ Wald";
-$areanames{en}->{499974} = "Traitsching";
-$areanames{en}->{499975} = "Waldmünchen\-Geigant";
-$areanames{en}->{499976} = "Rötz";
-$areanames{en}->{499977} = "Arnschwang";
-$areanames{en}->{499978} = "Schönthal\ Oberpfalz";
+$areanames{de} = {"4936484", "Knau\ bei\ Pößneck",
+"4989", "München",
+"496321", "Neustadt\ an\ der\ Weinstraße",
+"495384", "Seesen\-Groß\ Rhüden",
+"4939883", "Groß\ Dölln",
+"498367", "Roßhaupten\ Forggensee",
+"492203", "Köln\-Porz",
+"4935240", "Tauscha\ bei\ Großenhain",
+"4936949", "Obermaßfeld\-Grimmenthal",
+"4939976", "Groß\ Bützin",
+"498807", "Dießen\ am\ Ammersee",
+"494509", "Groß\ Grönau",
+"499135", "Heßdorf\ Mittelfrankenanken",
+"4935952", "Großröhrsdorf\ OL",
+"499656", "Moosbach\ bei\ Vohenstrauß",
+"4935753", "Großräschen",
+"497355", "Hochdorf\ Riß",
+"4934445", "Stößen",
+"499242", "Gößweinstein",
+"493647", "Pößneck",
+"49221", "Köln",
+"499567", "Seßlach\-Gemünda",
+"4934901", "Roßlau\ Elbe",
+"497351", "Biberach\ an\ der\ Riß",
+"4935726", "Groß\ Särchen",
+"4936705", "Oberweißbach\ Thüringer\ Wald",
+"498633", "Tüßling",
+"496364", "Nußbach\ Pfalz",
+"49911", "Nürnberg",
+"4936072", "Weißenborn\-Lüderode",
+"496252", "Heppenheim\ Bergstraße",
+"4935248", "Schönfeld\ bei\ Großenhain",
+"495064", "Groß\ Düngen",
+"494497", "Barßel\-Harkebrügge",
+"492339", "Sprockhövel\-Haßlinghausen",
+"4934493", "Gößnitz\ Thüringen",
+"499636", "Plößberg",
+"494483", "Ovelgönne\-Großenmeer",
+"498170", "Straßlach\-Dingharting",
+"4935841", "Großschönau\ Sachsen",
+"494684", "Langeneß\ Hallig",
+"498536", "Kößlarn",
+"4935938", "Großpostwitz\ OL",
+"495053", "Faßberg\-Müden",
+"4939934", "Groß\ Plasten",
+"495827", "Unterlüß",
+"4938234", "Born\ Darß",
+"497162", "Süßen",
+"499141", "Weißenburg\ in\ Bayern",
+"496663", "Steinau\ an\ der\ Straße",};
+$areanames{en} = {"4938720", "Grebbin",
+"495191", "Soltau",
+"496349", "Billigheim\-Ingenheim",
+"496392", "Hauenstein\ Pfalz",
+"492435", "Erkelenz\-Lövenich",
+"497573", "Stetten\ am\ kalten\ Markt",
+"495423", "Versmold",
+"494608", "Handewitt",
+"496732", "Wörrstadt",
+"497448", "Seewald",
+"492054", "Essen\-Kettwig",
+"495457", "Hopsten\-Schale",
+"499545", "Buttenheim",
+"495531", "Holzminden",
+"4938856", "Pritzier\ bei\ Hagenow",
+"4937600", "Neumark\ Sachsen",
+"499642", "Kemnath\ Stadt",
+"4935935", "Kleinwelka",
+"495606", "Zierenberg",
+"494921", "Emden\ Stadt",
+"498330", "Legau",
+"4939426", "Hessen",
+"4939996", "Törpin",
+"496442", "Braunfels",
+"496144", "Bischofsheim\ bei\ Rüsselsheim",
+"497738", "Steisslingen",
+"495805", "Oetzen",
+"4934383", "Trebsen\ Mulde",
+"492694", "Wershofen",
+"495704", "Petershagen\-Friedewalde",
+"495064", "Gross\ Düngen",
+"4936021", "Schlotheim",
+"4933087", "Bredereiche",
+"4933204", "Beelitz\ Mark",
+"492336", "Schwelm",
+"492844", "Rheinberg\-Orsoy",
+"492745", "Brachbach\ Sieg",
+"495509", "Rosdorf\ Kreis\ Göttingen",
+"497021", "Kirchheim\ unter\ Teck",
+"499473", "Kallmünz",
+"4935248", "Schönfeld\ bei\ Grossenhain",
+"499293", "Berg\ Oberfranken",
+"498505", "Hutthurm",
+"493529", "Heidenau\ Sachsen",
+"497395", "Ehingen\-Dächingen",
+"4939747", "Züsedom",
+"493869", "Dümmer",
+"496673", "Haunetal",
+"499548", "Mühlhausen\ Mittelfranken",
+"4935476", "Wittmannsdorf\-Bückchen",
+"498024", "Holzkirchen",
+"4937298", "Oelsnitz\ Erzgebirge",
+"497346", "Illerkirchberg",
+"4933839", "Wusterwitz",
+"493724", "Burgstädt",
+"498809", "Wessobrunn",
+"4936742", "Uhlstädt",
+"497735", "Öhningen",
+"494141", "Stade",
+"497834", "Wolfach",
+"495808", "Gerdau",
+"493537", "Jessen\ Elster",
+"49971", "Bad\ Kissingen",
+"494605", "Medelby",
+"4934673", "Heldrungen",
+"4933363", "Altenhof\ Kreis\ Barnim",
+"494502", "Lübeck\-Travemünde",
+"494357", "Sehestedt\ Eider",
+"4933978", "Segeletz",
+"497445", "Pfalzgrafenweiler",
+"496387", "Sankt\ Julian",
+"494806", "Sarzbüttel",
+"498463", "Greding",
+"4935602", "Drebkau",
+"497276", "Herxheim\ bei\ Landau\ Pfalz",
+"494323", "Bornhöved",
+"49251", "Münster",
+"4936943", "Bettenhausen\ Thüringen",
+"4938202", "Volkenshagen",
+"498347", "Friesenried",
+"4935477", "Rietzneuendorf\-Friedrichshof",
+"492941", "Lippstadt",
+"4939341", "Redekin",
+"492872", "Rhede\ Westfalen",
+"49721", "Karlsruhe",
+"499267", "Nordhalben",
+"494769", "Bremervörde\-Iselersheim",
+"499923", "Teisnach",
+"4933433", "Buckow\ Märkische\ Schweiz",
+"499658", "Georgenberg",
+"494488", "Westerstede",
+"4938872", "Rehna",
+"495371", "Gifhorn",
+"494725", "Helgoland",
+"4933056", "Mühlenbeck\ Kreis\ Oberhavel",
+"4939265", "Löderburg",
+"494824", "Krempe",
+"499674", "Schönsee",
+"4934424", "Reuden\ bei\ Zeitz",
+"496474", "Villmar\-Aumenau",
+"496172", "Bad\ Homburg\ von\ der\ Höhe",
+"4939746", "Krackow",
+"496294", "Krautheim\ Jagst",
+"494564", "Schashagen",
+"496458", "Rosenthal\ Hessen",
+"499776", "Mellrichstadt",
+"4935385", "Annaburg",
+"4936940", "Oepfershausen",
+"4937324", "Reinsberg\ Sachsen",
+"4933638", "Rüdersdorf\ bei\ Berlin",
+"497661", "Kirchzarten",
+"497154", "Kornwestheim",
+"497452", "Nagold",
+"498766", "Gammelsdorf",
+"495241", "Gütersloh",
+"499235", "Thierstein",
+"498722", "Gangkofen",
+"499560", "Grub\ am\ Forst",
+"497333", "Laichingen",
+"498664", "Chieming",
+"4933924", "Rägelin",
+"498151", "Starnberg",
+"499820", "Lehrberg",
+"499238", "Röslau",
+"495973", "Neuenkirchen\ Kreis\ Steinfurt",
+"4939009", "Badel",
+"497181", "Schorndorf\ Württemberg",
+"493377", "Zossen\ Brandenburg",
+"496356", "Carlsberg\ Pfalz",
+"495726", "Wiedensahl",
+"4933874", "Stechow\ Brandenburg",
+"497175", "Leinzell",
+"495624", "Bad\ Emstal",
+"4938723", "Kladrum",
+"499321", "Kitzingen",
+"4935452", "Golssen",
+"499655", "Tännesberg",
+"494485", "Elsfleth\-Huntorf",
+"498389", "Weissensberg",
+"496821", "Neunkirchen\ Saar",
+"4936422", "Reinstädt\ Thüringen",
+"4939244", "Steutz",
+"499307", "Altertheim",
+"499552", "Burghaslach",
+"4933086", "Grieben\ Kreis\ Oberhavel",
+"4939862", "Schmölln\ bei\ Prenzlau",
+"494471", "Cloppenburg",
+"499856", "Dürrwangen",
+"497931", "Bad\ Mergentheim",
+"496561", "Bitburg",
+"496455", "Frankenau\ Hessen",
+"499143", "Pappenheim\ Mittelfranken",
+"493683", "Schmalkalden",
+"4937603", "Wildenfels",
+"492273", "Kerpen\-Horrem",
+"492752", "Bad\ Laasphe",
+"49355", "Cottbus",
+"496034", "Wöllstadt",
+"4939427", "Ströbeck",
+"4936734", "Leutenberg",
+"4939997", "Jarmen",
+"495203", "Werther\ Westfalen",
+"492261", "Gummersbach",
+"493562", "Forst\ Lausitz",
+"497732", "Radolfzell\ am\ Bodensee",
+"499947", "Neukirchen\ bei\ Hl\ Blut",
+"498323", "Immenstadt\ im\ Allgäu",
+"499648", "Neustadt\ am\ Kulm",
+"493866", "Cambs",
+"4934909", "Aken\ Elbe",
+"494463", "Wangerland",
+"492951", "Büren",
+"4933334", "Greiffenberg",
+"497392", "Laupheim",
+"496573", "Gillenfeld",
+"498806", "Utting\ am\ Ammersee",
+"498502", "Fürstenzell",
+"493629", "Stadtilm",
+"4936081", "Arenshausen",
+"49261", "Koblenz\ am\ Rhein",
+"4933393", "Gross\ Schönebeck\ Kreis\ Barnim",
+"496398", "Vorderweidenthal",
+"498141", "Fürstenfeldbruck",
+"495251", "Paderborn",
+"4936602", "Ronneburg\ Thüringen",
+"4938780", "Lanz\ Brandenburg",
+"4937423", "Adorf\ Vogtland",
+"497442", "Baiersbronn",
+"497144", "Marbach\ am\ Neckar",
+"4939607", "Kotelow",
+"495177", "Edemissen\-Abbensen",
+"494505", "Stockelsdorf\-Curau",
+"495961", "Haselünne",
+"492903", "Meschede\-Freienohl",
+"494602", "Freienwill",
+"492353", "Halver",
+"499101", "Langenzenn",
+"496735", "Eppelsheim",
+"493935", "Tangerhütte",
+"496834", "Bous",
+"496346", "Annweiler\ am\ Trifels",
+"494508", "Krummesse",
+"4934604", "Niemberg",
+"492327", "Bochum\-Wattenscheid",
+"497673", "Schönau\ im\ Schwarzwald",
+"494330", "Emkendorf",
+"496395", "Münchweiler\ an\ der\ Rodalb",
+"495284", "Schwalenberg",
+"492432", "Wassenberg",
+"4939405", "Hötensleben",
+"4938750", "Malliss",
+"496021", "Aschaffenburg",
+"4938332", "Gross\ Bisdorf",
+"496007", "Rosbach\-Rodheim",
+"495609", "Ahnatal",
+"492742", "Wissen",
+"496276", "Hesseneck",
+"492301", "Holzwickede",
+"4935021", "Königstein\ Sächsische\ Schweiz",
+"499153", "Schnaittach",
+"495363", "Wolfsburg\-Vorsfelde",
+"492984", "Hallenberg",
+"4939033", "Wallstawe",
+"495802", "Wrestedt",
+"499846", "Ipsheim",
+"4939456", "Altenbrak",
+"496445", "Schöffengrund",
+"497387", "Hohenstein\ Württemberg",
+"492339", "Sprockhövel\-Hasslinghausen",
+"492594", "Dülmen",
+"499645", "Eschenbach\ in\ der\ Oberpfalz",
+"493967", "Oertzenhof\ bei\ Strasburg",
+"495631", "Korbach",
+"4933231", "Pausin",
+"499127", "Rosstal\ Mittelfrankenanken",
+"499334", "Giebelstadt",
+"4938826", "Dassow",
+"499542", "Schesslitz",
+"495506", "Adelebsen",
+"497458", "Ebhausen",
+"4938753", "Wöbbelin",
+"495524", "Bad\ Lauterberg\ im\ Harz",
+"495447", "Lembruch",
+"494934", "Marienhafe",
+"497474", "Haigerloch",
+"497172", "Lorch\ Württemberg",
+"4937384", "Wechselburg",
+"495864", "Jameln",
+"495765", "Raddestorf",
+"499092", "Wemding",
+"4935325", "Rückersdorf\ bei\ Finsterwalde",
+"4935793", "Elstra",
+"496359", "Grünstadt",
+"498291", "Zusmarshausen",
+"4933984", "Blumenthal\ bei\ Pritzwalk",
+"49621", "Mannheim",
+"499180", "Pyrbaum",
+"498728", "Geratskirchen",
+"499833", "Heidenheim\ Mittelfranken",
+"492755", "Bad\ Berleburg\-Schwarzenau",
+"4939457", "Benneckenstein\ Harz",
+"498386", "Oberstaufen",
+"496333", "Waldfischbach\-Burgalben",
+"4936962", "Vacha",
+"49365", "Gera",
+"4938827", "Kalkhorst",
+"493583", "Zittau",
+"4939030", "Brunau",
+"496154", "Ober\-Ramstadt",
+"496452", "Battenberg\ Eder",
+"4936701", "Lichte",
+"4938462", "Baumgarten",
+"497906", "Braunsbach",
+"496661", "Schlüchtern",
+"4936452", "Berlstedt",
+"499555", "Schlüsselfeld\-Aschbach",
+"499461", "Roding",
+"494482", "Hatten",
+"499652", "Waidhaus",
+"494184", "Hanstedt\ Nordheide",
+"494151", "Schwarzenbek",
+"497807", "Neuried\ Ortenaukreis",
+"498670", "Reischach\ Kreis\ Altötting",
+"495382", "Bad\ Gandersheim",
+"493441", "Zeitz",
+"494664", "Neukirchen\ bei\ Niebüll",
+"496175", "Friedrichsdorf\ Taunus",
+"494722", "Cuxhaven\-Altenbruch",
+"4936482", "Triptis",
+"496181", "Hanau",
+"494766", "Basdahl",
+"499574", "Marktzeuln",
+"497356", "Schemmerhofen",
+"4939487", "Friedrichsbrunn",
+"492758", "Bad\ Berleburg\-Girkhausen",
+"492774", "Dietzhölztal",
+"4939295", "Zuchau",
+"492676", "Ulmen",
+"494277", "Schwaförden",
+"494497", "Barssel\-Harkebrügge",
+"499779", "Nordheim\ von\ der\ Rhön",
+"498564", "Johanniskirchen",
+"4939606", "Glienke",
+"497034", "Ehningen",
+"493391", "Neuruppin",
+"498725", "Wurmannsquick",
+"494103", "Wedel",
+"498824", "Oberau\ Loisach",
+"499087", "Marktoffingen",
+"499232", "Wunsiedel",
+"4938783", "Dallmin",
+"498031", "Rosenheim\ Oberbayern",
+"497561", "Leutkirch\ im\ Allgäu",
+"497455", "Dornhan",
+"493731", "Freiberg\ Sachsen",
+"497821", "Lahr\ Schwarzwald",
+"495768", "Petershagen\-Heimsen",
+"493504", "Dippoldiswalde",
+"494347", "Flintbek",
+"4933674", "Trebatsch",
+"4934364", "Wermsdorf",
+"494322", "Bordesholm",
+"495944", "Hoogstede",
+"497977", "Oberrot\ bei\ Gaildorf",
+"494366", "Grömitz\-Cismar",
+"4934920", "Kropstädt",
+"497161", "Göppingen",
+"497654", "Löffingen",
+"492905", "Bestwig\-Ramsbeck",
+"4936841", "Schleusingen",
+"4938377", "Zinnowitz",
+"494503", "Timmendorfer\ Strand",
+"492358", "Meinerzhagen\-Valbert",
+"498462", "Berching",
+"492374", "Iserlohn\-Letmathe",
+"498651", "Bad\ Reichenhall",
+"498426", "Walting\ Kreis\ Eichstätt",
+"498325", "Oberstaufen\-Thalkirchdorf",
+"4939975", "Thürkow",
+"498091", "Kirchseeon",
+"495205", "Bielefeld\-Sennestadt",
+"493663", "Schleiz",
+"4935875", "Obercunnersdorf\ bei\ Löbau",
+"4938485", "Dabel",
+"4937464", "Schöneck\ Vogtland",
+"495368", "Parsau",
+"499158", "Offenhausen\ Mittelfranken",
+"494747", "Beverstedt",
+"499472", "Hohenfels\ Oberpfalz",
+"499174", "Hilpoltstein",
+"499292", "Konradsreuth",
+"4938297", "Moitin",
+"4939083", "Messdorf",
+"496581", "Saarburg",
+"496672", "Eiterfeld",
+"498369", "Rückholz",
+"494465", "Friedeburg\ Ostfriesland",
+"494551", "Bad\ Segeberg",
+"4939222", "Möser",
+"4935697", "Bagenz",
+"496575", "Landscheid",
+"493331", "Angermünde",
+"492244", "Königswinter\-Oberpleis",
+"499155", "Simmelsdorf",
+"4933979", "Wusterhausen\ Dosse",
+"495365", "Wolfsburg\-Neindorf",
+"4938455", "Plaaz",
+"4939053", "Süplingen",
+"498450", "Ingolstadt\-Zuchering",
+"496554", "Waxweiler",
+"494468", "Friedeburg\-Reepsholt",
+"4936465", "Oberndorf\ bei\ Apolda",
+"4939825", "Wokuhl",
+"4933743", "Blönsdorf",
+"498231", "Königsbrunn\ bei\ Augsburg",
+"496578", "Salmtal",
+"498328", "Balderschwang",
+"497720", "Schwenningen\ am\ Neckar",
+"499643", "Auerbach\ in\ der\ Oberpfalz",
+"4934203", "Zwenkau",
+"499287", "Selb",
+"492621", "Lahnstein",
+"492456", "Selfkant",
+"495329", "Schulenberg\ im\ Oberharz",
+"495208", "Leopoldshöhe",
+"497234", "Tiefenbronn",
+"496443", "Ehringshausen\ Dill",
+"498684", "Fridolfing",
+"4935249", "Basslitz",
+"492355", "Schalksmühle",
+"494206", "Stuhr\-Heiligenrode",
+"493933", "Genthin",
+"4934261", "Kühren\ bei\ Wurzen",
+"492607", "Kobern\-Gondorf",
+"496733", "Gau\-Odernheim",
+"4934345", "Bad\ Lausick",
+"497681", "Waldkirch\ Breisgau",
+"4933838", "Päwesin",
+"4938352", "Kemnitz\ bei\ Greifswald",
+"4937342", "Cranzahl",
+"495422", "Melle",
+"497675", "Bernau\ Baden",
+"497572", "Mengen\ Württemberg",
+"495466", "Merzen",
+"496393", "Fischbach\ bei\ Dahn",
+"495337", "Kissenbrück",
+"493946", "Quedlinburg",
+"499527", "Knetzgau",
+"496746", "Pfalzfeld",
+"493682", "Zella\-Mehlis",
+"499444", "Siegenburg",
+"499199", "Kunreuth",
+"499142", "Treuchtlingen",
+"493585", "Löbau",
+"496644", "Grebenhain",
+"492753", "Erndtebrück",
+"499867", "Geslau",
+"4935754", "Klettwitz",
+"49781", "Offenburg",
+"492272", "Bedburg\ Erft",
+"493571", "Hoyerswerda",
+"492449", "Blankenheim\ Ahr",
+"496335", "Trulben",
+"499553", "Ebrach\ Oberfranken",
+"4938848", "Vellahn",
+"494224", "Gross\ Ippener",
+"495051", "Bergen\ Kreis\ Celle",
+"4939050", "Bartensleben",
+"496894", "St\ Ingbert",
+"4938794", "Cumlosen",
+"495763", "Uchte",
+"495691", "Bad\ Arolsen",
+"4936335", "Grosswechsungen",
+"499394", "Esselbach",
+"4938733", "Karbow\-Vietlübbe",
+"492534", "Münster\-Roxel",
+"494108", "Rosengarten\ Kreis\ Harburg",
+"496436", "Dornburg\ Hessen",
+"4939366", "Kehnert",
+"495841", "Lüchow\ Wendland",
+"499835", "Ehingen\ Mittelfranken",
+"499734", "Burkardroth",
+"499220", "Kasendorf\-Azendorf",
+"492739", "Wilnsdorf",
+"499636", "Plössberg",
+"494105", "Seevetal",
+"498723", "Arnstorf",
+"4938376", "Zirchow",
+"497427", "Schömberg\ bei\ Balingen",
+"497332", "Lauterstein",
+"497544", "Markdorf",
+"4934923", "Cobbelsdorf",
+"497453", "Altensteig\ Württemberg",
+"4934493", "Gössnitz\ Thüringen",
+"496207", "Wald\-Michelbach",
+"4935205", "Ottendorf\-Okrilla",
+"498541", "Vilshofen\ Niederbayern",
+"4938296", "Rerik\ Ostseebad",
+"496500", "Waldrach",
+"498404", "Oberdolling",
+"498102", "Höhenkirchen\-Siegertsbrunn",
+"496221", "Heidelberg",
+"4939080", "Kalbe\ Milde",
+"495084", "Hambühren",
+"4935696", "Briesnig",
+"496173", "Kronberg\ im\ Taunus",
+"493998", "Demmin",
+"499256", "Stammbach",
+"493588", "Niesky",
+"4934722", "Preusslitz",
+"493847", "Sternberg",
+"4939008", "Kunrau",
+"494641", "Süderbrarup",
+"493464", "Sangerhausen",
+"4935343", "Hirschfeld\ bei\ Elsterwerda",
+"499922", "Zwiesel",
+"492873", "Isselburg\-Werth",
+"496338", "Hornbach\ Pfalz",
+"499966", "Wiesenfelden",
+"492861", "Borken\ Westfalen",
+"495803", "Rosche",
+"4936925", "Marksuhl",
+"49760", "Oberried\ Breisgau",
+"499543", "Hirschaid",
+"4935955", "Pulsnitz",
+"495041", "Springe\ Deister",
+"492521", "Beckum",
+"498206", "Egling\ an\ der\ Paar",
+"492743", "Daaden",
+"496654", "Gersfeld\ Rhön",
+"499721", "Schweinfurt",
+"496161", "Brensbach",
+"4939855", "Parmen\-Weggun",
+"496678", "Wildeck\-Hönebach",
+"495326", "Langelsheim",
+"496756", "Winterbach\ Soonwald",
+"4934776", "Rothenschirmbach",
+"499454", "Aufhausen\ Oberpfalz",
+"494684", "Langeness\ Hallig",
+"499152", "Hartenstein\ Mittelfranken",
+"495362", "Wolfsburg\-Fallersleben",
+"4938425", "Kirchdorf\ Poel",
+"497575", "Messkirch",
+"492433", "Hückelhoven",
+"496094", "Weibersbrunn",
+"495425", "Borgholzhausen",
+"4939397", "Geestgottberg",
+"497672", "St\ Blasien",
+"4935362", "Schönewalde\ bei\ Herzberg",
+"4938322", "Richtenberg",
+"497581", "Saulgau",
+"494209", "Schwanewede",
+"494328", "Rickling",
+"4934291", "Borsdorf",
+"495851", "Dahlenburg",
+"4933603", "Falkenhagen\ bei\ Seelow",
+"494231", "Verden\ Aller",
+"498468", "Altmannstein\-Pondorf",
+"492507", "Havixbeck",
+"492352", "Altena\ Westfalen",
+"4934651", "Rossla",
+"498584", "Breitenberg\ Niederbayern",
+"4933847", "Görzke",
+"496234", "Mutterstadt",
+"497443", "Dornstetten",
+"4937433", "Gutenfürst",
+"498551", "Freyung",
+"498465", "Kipfenberg",
+"4935841", "Grossschönau\ Sachsen",
+"494603", "Havetoft",
+"492902", "Warstein",
+"49491", "Leer\ Ostfriesland",
+"497578", "Wald\ Hohenz",
+"497554", "Heiligenberg\ Baden",
+"499376", "Collenberg",
+"495428", "Melle\-Neuenkirchen",
+"495771", "Rahden\ Westfalen",
+"498170", "Strasslach\-Dingharting",
+"493306", "Gransee",
+"496572", "Manderscheid\ Eifel",
+"499481", "Pfatter",
+"497393", "Munderkingen",
+"494426", "Wangerland\-Horumersiel",
+"492360", "Haltern\-Lippramsdorf",
+"4939885", "Jakobshagen",
+"496675", "Breitenbach\ am\ Herzberg",
+"494462", "Wittmund",
+"494164", "Harsefeld",
+"4936875", "Straufhain\-Streufdorf",
+"499295", "Töpen",
+"496681", "Hilders",
+"498503", "Neuhaus\ am\ Inn",
+"496876", "Weiskirchen\ Saar",
+"497733", "Engen\ Hegau",
+"493563", "Spremberg",
+"499246", "Pegnitz\-Trockau",
+"4939728", "Medow\ bei\ Anklam",
+"4937360", "Olbernhau",
+"495202", "Oerlinghausen",
+"498366", "Oy\-Mittelberg",
+"4936257", "Luisenthal\ Thüringen",
+"498322", "Oberstdorf",
+"49211", "Düsseldorf",
+"498641", "Grassau\ Kreis\ Traunstein",
+"4934953", "Gräfenhainichen",
+"4936205", "Gräfenroda",
+"495264", "Kalletal",
+"49681", "Saarbrücken",
+"497335", "Wiesensteig",
+"495677", "Calden\-Westuffeln",
+"4933762", "Zeuthen",
+"497644", "Kenzingen",
+"495978", "Hörstel\-Dreierwalde",
+"499233", "Arzberg\ Oberfranken",
+"4934463", "Bad\ Kösen",
+"4937430", "Eichigt",
+"494102", "Ahrensburg",
+"497746", "Wutöschingen",
+"494404", "Elsfleth",
+"495954", "Lorup",
+"494541", "Ratzeburg",
+"493987", "Templin",
+"496787", "Niederbrombach",
+"492254", "Weilerswist",
+"4936784", "Stützerbach",
+"499925", "Bayerisch\ Eisenstein",
+"499148", "Ettenstatt",
+"4937363", "Zöblitz",
+"4939774", "Mönkebude",
+"49931", "Würzburg",
+"4936256", "Wechmar",
+"494976", "Spiekeroog",
+"497367", "Aalen\-Ebnat",
+"4937755", "Schönheide\ Erzgebirge",
+"497436", "Messstetten\-Oberdigisheim",
+"494757", "Wanna",
+"495383", "Lutter\ am\ Barenberge",
+"492964", "Brilon\-Alme",
+"4933963", "Wulfersdorf\ bei\ Wittstock",
+"498105", "Gilching",
+"494723", "Cuxhaven\-Altenwalde",
+"493949", "Oschersleben\ Bode",
+"496453", "Gemünden\ Wohra",
+"495109", "Ronnenberg",
+"499196", "Wiesenttal",
+"499653", "Eslarn",
+"494483", "Ovelgönne\-Grossenmeer",
+"492446", "Heimbach\ Eifel",
+"492275", "Kerpen\-Buir",
+"4935724", "Lohsa",
+"496332", "Zweibrücken",
+"496544", "Rhaunen",
+"499928", "Kirchdorf\ im\ Wald",
+"493886", "Gadebusch",
+"496427", "Cölbe\-Schönstadt",
+"493671", "Saalfeld\ Saale",
+"499627", "Freudenberg\ Oberpfalz",
+"494877", "Hennstedt\ bei\ Itzehoe",
+"499145", "Solnhofen",
+"4934782", "Mansfeld\ Südharz",
+"495131", "Garbsen",
+"493685", "Hildburghausen",
+"495304", "Meine",
+"499536", "Kirchlauter",
+"4933846", "Dippmannsdorf",
+"499832", "Wassertrüdingen",
+"495975", "Rheine\-Mesum",
+"496401", "Grünberg\ Hessen",
+"498224", "Offingen\ Donau",
+"497173", "Heubach",
+"496439", "Holzappel",
+"4939396", "Neukirchen\ Altmark",
+"492634", "Rengsdorf",
+"499093", "Polsingen",
+"492736", "Burbach\ Siegerl",
+"4937204", "Lichtenstein\ Sachsen",
+"497221", "Baden\-Baden",
+"499639", "Mähring",
+"496223", "Neckargemünd",
+"499468", "Zell\ Oberpfalz",
+"4933366", "Chorin",
+"496185", "Hammersbach\ Hessen",
+"4935209", "Mohorn",
+"498067", "Tuntenhausen",
+"495372", "Meinersen",
+"494155", "Büchen",
+"496668", "Birstein\-Lichenroth",
+"494893", "Hohenaspe",
+"493445", "Naumburg\ Saale",
+"496171", "Oberursel\ Taunus",
+"496257", "Seeheim\-Jugenheim",
+"493496", "Köthen\ Anhalt",
+"497403", "Dunningen",
+"498707", "Adlkofen",
+"494643", "Gelting\ Angeln",
+"4936946", "Erbenhausen\ Thüringen",
+"494287", "Heeslingen\-Boitzen",
+"492942", "Geseke",
+"492686", "Weyerbusch",
+"492871", "Bocholt",
+"498721", "Eggenfelden",
+"497529", "Waldburg\ Württemberg",
+"499206", "Mistelgau\-Obernsees",
+"4939740", "Nechlin",
+"495242", "Rheda\-Wiedenbrück",
+"498454", "Karlshuld",
+"496550", "Irrhausen",
+"498152", "Herrsching\ am\ Ammersee",
+"499077", "Bachhagel",
+"4933703", "Sperenberg",
+"493395", "Pritzwalk",
+"497825", "Kippenheim",
+"493346", "Seelow",
+"497724", "St\ Georgen\ im\ Schwarzwald",
+"4935473", "Neu\ Lübbenau",
+"4934243", "Bad\ Düben",
+"4933437", "Reichenberg\ bei\ Strausberg",
+"498035", "Raubling",
+"497565", "Aichstetten\ Kreis\ Ravensburg",
+"497626", "Kandern",
+"497451", "Horb\ am\ Neckar",
+"493735", "Marienberg\ Sachsen",
+"498543", "Aidenbach",
+"493834", "Greifswald",
+"497662", "Vogtsburg\ im\ Kaiserstuhl",
+"4938853", "Drönnewitz\ bei\ Hagenow",
+"498246", "Waal",
+"496637", "Feldatal",
+"495693", "Volkmarsen",
+"495761", "Stolzenau",
+"497484", "Simmersfeld",
+"497182", "Welzheim",
+"4939423", "Wegeleben",
+"4939993", "Hohenmocker",
+"497568", "Bad\ Wurzach\-Hauerz",
+"498038", "Vogtareuth",
+"4934386", "Dürrweitzschen\ bei\ Grimma",
+"4937607", "Ebersbrunn\ Sachsen",
+"499366", "Geroldshausen\ Unterfranken",
+"495156", "Coppenbrügge",
+"4935893", "Mücka",
+"499170", "Schwanstetten",
+"4933635", "Arensdorf\ Kreis\ Oder\-Spree",
+"495843", "Wustrow\ Wendland",
+"4933080", "Marienthal\ Kreis\ Oberhavel",
+"499503", "Oberhaid\ Oberfranken",
+"4935388", "Klöden",
+"498295", "Altenmünster\ Schwaben",
+"4934781", "Greifenhagen",
+"498376", "Sulzberg\ Allgäu",
+"492424", "Vettweiss",
+"492166", "Mönchengladbach\-Rheydt",
+"495027", "Linsburg",
+"496629", "Schenklengsfeld",
+"492547", "Rosendahl\-Osterwick",
+"4939268", "Egeln",
+"4938727", "Mestlin",
+"492751", "Bad\ Berleburg",
+"499429", "Rain\ Niederbayern",
+"493573", "Senftenberg",
+"499551", "Burgwindheim",
+"499465", "Neukirchen\-Balbini",
+"495053", "Fassberg\-Müden",
+"496866", "Perl\-Nennig",
+"496188", "Kahl\ am\ Main",
+"496562", "Speicher",
+"494158", "Roseburg",
+"494174", "Stelle\ Kreis\ Harburg",
+"499747", "Geroda\ Bayern",
+"494472", "Lastrup",
+"494249", "Bassum\-Nordwohlde",
+"494292", "Ritterhude",
+"497932", "Niederstetten\ Württemberg",
+"493448", "Meuselwitz\ Thüringen",
+"4939934", "Gross\ Plasten",
+"496665", "Sinntal\-Altengronau",
+"496526", "Bollendorf",
+"496504", "Thalfang",
+"4933083", "Schulzendorf\ Kreis\ Oberhavel",
+"499105", "Grosshabersdorf",
+"496731", "Alzey",
+"494838", "Tellingstedt",
+"493931", "Stendal",
+"497683", "Simonswald",
+"4939829", "Blankenförde",
+"493909", "Klötze\ Altmark",
+"495258", "Salzkotten",
+"496709", "Fürfeld\ Kreis\ Bad\ Kreuznach",
+"495494", "Holdorf\ Niedersachsen",
+"495192", "Munster",
+"495149", "Wienhausen",
+"495274", "Nieheim",
+"497247", "Linkenheim\-Hochstetten",
+"4938459", "Laage",
+"4935032", "Langenhennersdorf",
+"498259", "Schiltberg",
+"4933975", "Dannenwalde\ Kreis\ Prignitz",
+"4937606", "Lengenfeld\ Vogtland",
+"492406", "Herzogenrath",
+"496391", "Dahn",
+"49831", "Kempten\ Allgäu",
+"4938850", "Gammelin",
+"492305", "Castrop\-Rauxel",
+"4935361", "Schlieben",
+"492657", "Uersfeld",
+"494256", "Hilgermissen",
+"492958", "Büren\-Harth",
+"496286", "Walldürn\-Rippberg",
+"4934292", "Brandis\ bei\ Wurzen",
+"4938321", "Martensdorf\ bei\ Stralsund",
+"498233", "Kissing",
+"4937295", "Lugau\ Erzgebirge",
+"492974", "Schmallenberg\-Fredeburg",
+"495635", "Vöhl",
+"499641", "Grafenwöhr",
+"4934652", "Allstedt",
+"494922", "Borkum",
+"495344", "Lengede",
+"492623", "Ransbach\-Baumbach",
+"495532", "Stadtoldendorf",
+"494966", "Neubörger",
+"492268", "Kürten",
+"495836", "Wittingen\-Radenbeck",
+"4935245", "Burkhardswalde\-Munzig",
+"496441", "Wetzlar",
+"4938726", "Spornitz",
+"4938224", "Gresenhorst",
+"498093", "Glonn\ Kreis\ Ebersberg",
+"494527", "Bosau",
+"492265", "Reichshof\-Eckenhagen",
+"498639", "Neumarkt\-Sankt\ Veit",
+"4936947", "Jüchsen",
+"4935842", "Oderwitz",
+"495937", "Geeste\-Gross\ Hesepe",
+"497706", "Oberbaldingen",
+"4935264", "Strehla",
+"493661", "Greiz",
+"494444", "Goldenstedt",
+"494142", "Steinkirchen\ Kreis\ Stade",
+"497066", "Bad\ Rappenau\-Bonfeld",
+"498536", "Kösslarn",
+"492308", "Unna\-Hemmerde",
+"497022", "Nürtingen",
+"4933367", "Friedrichswalde\ Brandenburg",
+"496583", "Palzem",
+"494553", "Geschendorf",
+"4935938", "Grosspostwitz\ OL",
+"492955", "Büren\-Wewelsburg",
+"495255", "Altenbeken",
+"496028", "Sulzbach\ am\ Main",
+"497163", "Ebersbach\ an\ der\ Fils",
+"494539", "Westerau",
+"4933436", "Prötzel",
+"494394", "Bokhorst",
+"498145", "Mammendorf",
+"494501", "Kastorf\ Holstein",
+"4936374", "Weissensee",
+"495965", "Klein\ Berssen",
+"498196", "Pürgen",
+"495187", "Delligsen",
+"492237", "Kerpen\ Rheinland\-Türnich",
+"4933053", "Zehlendorf\ Kreis\ Oberhavel",
+"494636", "Langballig",
+"4939743", "Zerrenthin",
+"494835", "Albersdorf\ Holstein",
+"4939384", "Arendsee\ Altmark",
+"494734", "Stadland\-Seefeld",
+"498292", "Dinkelscherben",
+"498249", "Ettringen\ Wertach",
+"495036", "Neustadt\-Schneeren",
+"499603", "Floss",
+"492364", "Haltern\ Westfalen",
+"498158", "Tutzing",
+"495248", "Langenberg\ Kreis\ Gütersloh",
+"497257", "Bruchsal\-Untergrombach",
+"499369", "Uettingen",
+"496403", "Linden\ Hessen",
+"4939036", "Binde",
+"495159", "Coppenbrügge\-Bisperode",
+"497668", "Ihringen",
+"497171", "Schwäbisch\ Gmünd",
+"4939453", "Derenburg",
+"499325", "Kleinlangheim",
+"495593", "Bovenden\-Lenglern",
+"49991", "Deggendorf",
+"497967", "Jagstzell",
+"4938823", "Selmsdorf",
+"497223", "Bühl\ Baden",
+"499091", "Monheim\ Schwaben",
+"494475", "Molbergen",
+"498379", "Waltenhofen\-Oberdorf",
+"494295", "Emtinghausen",
+"497935", "Schrozberg",
+"496626", "Wildeck\-Obersuhl",
+"4935797", "Schwepnitz",
+"496565", "Dudeldorf",
+"496451", "Frankenberg\ Eder",
+"495378", "Sassenburg\-Platendorf",
+"4939298", "Barby\ Elbe",
+"499426", "Oberschneiding",
+"499651", "Vohenstrauss",
+"494481", "Hatten\-Sandkrug",
+"496825", "Illingen\ Saar",
+"499462", "Falkenstein\ Oberpfalz",
+"496724", "Stromberg\ Hunsrück",
+"499164", "Langenfeld\ Mittelfranken",
+"495354", "Jerxheim",
+"492948", "Lippstadt\-Rebbeke",
+"496869", "Merzig\-Silwingen",
+"4938757", "Neustadt\-Glewe",
+"494246", "Twistringen\-Heiligenloh",
+"492647", "Kesseling",
+"492945", "Lippstadt\-Benninghausen",
+"4933396", "Klosterfelde",
+"494543", "Nusse",
+"4938787", "Glöwen",
+"492586", "Beelen",
+"495381", "Seesen",
+"497938", "Mulfingen\ Jagst",
+"494298", "Lilienthal",
+"494478", "Cappeln\ Oldenburg",
+"494454", "Jade",
+"494152", "Geesthacht",
+"496568", "Wolsfeld",
+"495904", "Lengerich\ Emsl",
+"496182", "Seligenstadt",
+"496484", "Beselich",
+"495375", "Müden\ Aller",
+"494721", "Cuxhaven",
+"492689", "Dierdorf",
+"4936209", "Klettbach",
+"4939600", "Zwiedorf",
+"497665", "March\ Breisgau",
+"499209", "Emtmannsberg",
+"498032", "Rohrdorf\ Kreis\ Rosenheim",
+"494707", "Langen\-Neuenwalde",
+"497562", "Isny\ im\ Allgäu",
+"495476", "Ostercappeln\-Venne",
+"4939483", "Ballenstedt",
+"497822", "Ettenheim",
+"492204", "Bensberg",
+"496650", "Hosenfeld",
+"4934721", "Nienburg\ Saale",
+"499231", "Marktredwitz",
+"495245", "Herzebrock\-Clarholz",
+"497629", "Tegernau\ Baden",
+"4939603", "Burg\ Stargard",
+"497391", "Ehingen\ Donau",
+"498734", "Reisbach\ Niederbayern",
+"495300", "Salzgitter\-Üfingen",
+"492952", "Rüthen",
+"497025", "Neuffen",
+"498636", "Ampfing",
+"496247", "Worms\-Pfeddersheim",
+"496683", "Ehrenberg\ Rhön",
+"498501", "Thyrnau",
+"497709", "Wutach",
+"494627", "Dörpstedt",
+"497731", "Singen\ Hohentwiel",
+"498394", "Lautrach",
+"4936624", "Teichwolframsdorf",
+"492226", "Rheinbach",
+"4936842", "Oberhof\ Thüringen",
+"4933397", "Wandlitz",
+"492630", "Mülheim\-Kärlich",
+"493561", "Guben",
+"492262", "Wiehl",
+"49541", "Osnabrück",
+"493821", "Ribnitz\-Damgarten",
+"494928", "Ihlow\-Riepe",
+"497504", "Horgenzell",
+"497441", "Freudenstadt",
+"494832", "Meldorf",
+"498553", "Spiegelau",
+"4939408", "Hadmersleben",
+"495926", "Engden",
+"495962", "Herzlake",
+"494536", "Steinhorst\ Lauenburg",
+"498444", "Schweitenkirchen",
+"498142", "Olching",
+"4934327", "Waldheim\ Sachsen",
+"494639", "Schafflund",
+"495773", "Stemwede\-Wehdem",
+"495198", "Schneverdingen\-Wintermoor",
+"495252", "Bad\ Lippspringe",
+"4939221", "Möckern\ bei\ Magdeburg",
+"4939889", "Boitzenburg",
+"498867", "Rottenbuch\ Oberbayern",
+"4934441", "Hohenmölsen",
+"492431", "Erkelenz",
+"4938429", "Glasin",
+"496022", "Obernburg\ am\ Main",
+"495195", "Neuenkirchen\ bei\ Soltau",
+"497583", "Bad\ Schussenried",
+"495853", "Neu\ Darchau",
+"4939859", "Fürstenwerder",
+"496066", "Michelstadt\-Vielbrunn",
+"494233", "Blender",
+"4939324", "Kläden\ bei\ Stendal",
+"496706", "Wallhausen\ Nahe",
+"4936929", "Ruhla",
+"495146", "Wietze",
+"499404", "Nittendorf",
+"499102", "Wilhermsdorf",
+"4939037", "Pretzier",
+"492409", "Stolberg\-Gressenich",
+"495827", "Unterlüss",
+"494148", "Drochtersen\-Assel",
+"4938756", "Grabow",
+"49431", "Kiel",
+"499976", "Rötz",
+"492863", "Velen",
+"4936766", "Schalkau",
+"495535", "Polle",
+"4934262", "Falkenhain\ bei\ Wurzen",
+"495632", "Willingen\ Upland",
+"492523", "Wadersloh",
+"495043", "Lauenau",
+"494925", "Hinte",
+"4938351", "Mesekenhagen",
+"4935796", "Panschwitz\-Kuckau",
+"492741", "Betzdorf",
+"4937341", "Ehrenfriedersdorf",
+"496163", "Höchst\ im\ Odenwald",
+"499723", "Röthlein",
+"495839", "Wittingen\-Ohrdorf",
+"492557", "Wettringen\ Kreis\ Steinfurt",
+"492302", "Witten",
+"495052", "Hermannsburg",
+"492157", "Nettetal\-Kaldenkirchen",
+"497933", "Creglingen",
+"4939924", "Stuer",
+"494473", "Emstek",
+"494293", "Ottersberg\-Fischerhude",
+"4939005", "Kusey",
+"496563", "Kyllburg",
+"499141", "Weissenburg\ in\ Bayern",
+"495135", "Burgwedel\-Fuhrberg",
+"493681", "Suhl",
+"493876", "Perleberg",
+"496857", "Namborn",
+"492271", "Bergheim\ Erft",
+"496306", "Trippstadt",
+"493675", "Sonneberg\ Thüringen",
+"4938737", "Ganzlin",
+"495842", "Schnega",
+"4936961", "Bad\ Liebenstein",
+"495971", "Rheine",
+"4935208", "Radeburg",
+"496405", "Laubach\ Hessen",
+"4939056", "Klüden",
+"49471", "Bremerhaven",
+"499605", "Weiherhammer",
+"4933746", "Werbig\ bei\ Jüterbog",
+"499502", "Frensdorf",
+"499357", "Gräfendorf\ Bayern",
+"495167", "Walsrode\-Westenholz",
+"497269", "Sulzfeld\ Baden",
+"495546", "Scheden",
+"498020", "Weyarn",
+"497183", "Rudersberg\ Württemberg",
+"4934206", "Rötha",
+"496047", "Altenstadt\ Hessen",
+"4938461", "Bützow",
+"497225", "Gaggenau",
+"495692", "Wolfhagen",
+"4936702", "Lauscha",
+"499323", "Iphofen",
+"4936451", "Buttelstedt",
+"497959", "Frankenhardt",
+"497228", "Forbach",
+"497309", "Weissenhorn",
+"498846", "Uffing\ am\ Staffelsee",
+"498334", "Bad\ Grönenbach",
+"497663", "Eichstetten",
+"498542", "Ortenburg",
+"4936481", "Neustadt\ an\ der\ Orla",
+"495060", "Bodenburg",
+"494136", "Scharnebeck",
+"4939086", "Jävenitz",
+"499907", "Zenting",
+"496408", "Buseck",
+"497331", "Geislingen\ an\ der\ Steige",
+"499608", "Kohlberg\ Oberpfalz",
+"4936076", "Niederorschel",
+"4936338", "Bleicherode",
+"498153", "Wessling",
+"495138", "Sehnde",
+"497402", "Fluorn\-Winzeln",
+"498056", "Eggstätt",
+"498139", "Röhrmoos",
+"494545", "Seedorf\ Lauenburg",
+"492943", "Erwitte",
+"494642", "Kappeln\ Schlei",
+"499921", "Regen",
+"4934927", "Globig\-Bleddin",
+"4934497", "Langenleuba\-Niederhain",
+"4938845", "Kaarssen",
+"495373", "Hillerse\ Kreis\ Gifhorn",
+"496266", "Hassmersheim",
+"4935974", "Hinterhermsdorf",
+"496222", "Wiesloch",
+"4938370", "Kröslin",
+"494849", "Hooge",
+"494892", "Schenefeld\ Mittelholstein",
+"4935389", "Holzdorf\ Elster",
+"4939087", "Jerchel\ Altmark",
+"4938293", "Kühlungsborn\ Ostseebad",
+"4939204", "Niederndodeleben",
+"494238", "Neddenaverbergen",
+"498652", "Berchtesgaden",
+"4935693", "Lauschütz",
+"4933835", "Golzow\ bei\ Brandenburg",
+"4936077", "Grossbodungen",
+"4934348", "Frohburg",
+"498555", "Perlesreut",
+"498461", "Beilngries",
+"495775", "Diepenau",
+"495874", "Soltendieck",
+"495858", "Hitzacker\-Wietzetze",
+"499386", "Prosselsheim",
+"494321", "Neumünster",
+"497126", "Burladingen\-Melchingen",
+"4936082", "Ershausen",
+"497162", "Süssen",
+"497464", "Talheim\ Kreis\ Tuttlingen",
+"4940", "Hamburg",
+"499471", "Burglengenfeld",
+"494856", "Kronprinzenkoog",
+"497023", "Weilheim\ an\ der\ Teck",
+"496582", "Freudenburg",
+"4938373", "Katzow",
+"4936601", "Hermsdorf\ Thüringen",
+"493332", "Schwedt\/Oder",
+"493544", "Luckau\ Brandenburg",
+"494552", "Leezen",
+"494307", "Raisdorf",
+"499728", "Wülfershausen\ Unterfranken",
+"492528", "Ennigerloh\-Enniger",
+"4939828", "Wustrow\ Kreis\ Mecklenburg\-Strelitz",
+"4938234", "Born\ Darss",
+"4934926", "Pretzsch\ Elbe",
+"4934496", "Nöbdenitz",
+"494143", "Drochtersen",
+"4938458", "Zehna",
+"495236", "Blomberg\-Grossenmarpe",
+"498092", "Grafing\ bei\ München",
+"492622", "Bendorf\ am\ Rhein",
+"496597", "Jünkerath",
+"495533", "Bodenwerder",
+"494267", "Lauenbrück",
+"494923", "Krummhörn\-Pewsum",
+"496129", "Schlangenbad",
+"495045", "Springe\-Bennigsen",
+"492666", "Freilingen\ Westerwald",
+"492525", "Beckum\-Neubeckum",
+"4938736", "Goldberg",
+"492865", "Raesfeld",
+"497150", "Korntal\-Münchingen",
+"4938488", "Demen",
+"492764", "Welschen\ Ennest",
+"4939363", "Angern",
+"494957", "Detern",
+"499564", "Bad\ Rodach",
+"4939978", "Gross\ Roge",
+"495407", "Wallenhorst",
+"494776", "Osten\-Altendorf",
+"4938331", "Rakow\ Vorpom",
+"498232", "Schwabmünchen",
+"499725", "Poppenhausen\ Unterfranken",
+"496165", "Breuberg",
+"499824", "Dietenhofen",
+"494674", "Ockholm",
+"495193", "Schneverdingen",
+"4934207", "Zwochau",
+"497585", "Ostrach",
+"495754", "Extertal\-Bremke",
+"497946", "Bretzfeld",
+"496324", "Hassloch",
+"497682", "Elzach",
+"495855", "Nahrendorf",
+"497571", "Sigmaringen",
+"49381", "Rostock",
+"495656", "Waldkappel",
+"495421", "Dissen\ am\ Teutoburger\ Wald",
+"4935022", "Bad\ Schandau",
+"4939057", "Rätzlingen\ Sachsen\-Anhalt",
+"492837", "Weeze",
+"498574", "Wittibreut",
+"494235", "Langwedel\-Etelsen",
+"4935939", "Hochkirch",
+"4933747", "Marzahna",
+"498558", "Hohenau\ Niederbayern",
+"4933232", "Brieselang",
+"497306", "Vöhringen\ Iller",
+"494101", "Pinneberg",
+"4939342", "Gladau",
+"495848", "Trebel",
+"4933967", "Freyenstein",
+"498642", "Übersee",
+"497563", "Kisslegg",
+"498033", "Oberaudorf",
+"4933457", "Altreetz",
+"496086", "Grävenwiesbach",
+"494139", "Hohnstorf\ Elbe",
+"498545", "Hofkirchen\ Bayern",
+"492590", "Dülmen\-Buldern",
+"4938871", "Mühlen\ Eichsen",
+"493733", "Annaberg\-Buchholz",
+"497823", "Seelbach\ Schutter",
+"4937367", "Lengefeld\ Erzgebirge",
+"494153", "Lauenburg\ Elbe",
+"494794", "Worpswede\-Ostersode",
+"4937436", "Weischlitz",
+"493443", "Weissenfels\ Sachsen\-Anhalt",
+"498136", "Markt\ Indersdorf",
+"495074", "Rodewald",
+"4934467", "Eckartsberga",
+"496183", "Erlensee",
+"492297", "Wildbergerhütte",
+"496269", "Gundelsheim\ Württemberg",
+"494127", "Westerhorn",
+"494334", "Bredenbek\ bei\ Rendsburg",
+"494542", "Mölln\ Lauenburg",
+"493578", "Kamenz",
+"494846", "Hattstedt",
+"493672", "Rudolstadt",
+"496331", "Pirmasens",
+"4936642", "Harra",
+"4939390", "Iden",
+"495434", "Essen\ Oldenburg",
+"493581", "Görlitz",
+"494947", "Aurich\-Ogenbargen",
+"495132", "Lehrte",
+"4935329", "Dollenchen",
+"4933606", "Müllrose",
+"49871", "Landshut",
+"4939954", "Stavenhagen\ Reuterstadt",
+"496663", "Steinau\ an\ der\ Strasse",
+"493991", "Waren\ Müritz",
+"496228", "Schönau\ Odenwald",
+"499463", "Wald\ Oberpfalz",
+"495055", "Fassberg",
+"4936421", "Camburg",
+"4939861", "Gramzow\ bei\ Prenzlau",
+"4935451", "Dahme\ Brandenburg",
+"498548", "Vilshofen\-Sandbach",
+"492804", "Xanten\-Marienbaum",
+"497222", "Rastatt",
+"495695", "Twistetal",
+"497266", "Kirchardt",
+"495592", "Gleichen\-Bremke",
+"499505", "Litzendorf",
+"499602", "Neustadt\ an\ der\ Waldnaab",
+"492065", "Duisburg\-Rheinhausen",
+"498293", "Welden\ bei\ Augsburg",
+"4933472", "Golzow\ bei\ Seelow",
+"495646", "Willebadessen",
+"496402", "Hungen",
+"496104", "Heusenstamm",
+"4936208", "Ermstedt",
+"4934773", "Schwittersdorf",
+"499831", "Gunzenhausen",
+"497777", "Sauldorf",
+"495845", "Bergen\ Dumme",
+"495744", "Hüllhorst",
+"4933655", "Grunow\ Kreis\ Oder\-Spree",
+"496464", "Angelburg",
+"499722", "Werneck",
+"496162", "Reinheim\ Odenwald",
+"4939409", "Eilsleben",
+"494558", "Todesfelde",
+"499766", "Grosswenkheim",
+"493338", "Bernau\ Brandenburg",
+"496126", "Idstein",
+"4933607", "Briesen\ Mark",
+"499151", "Hersbruck",
+"4933843", "Niemegk",
+"495361", "Wolfsburg",
+"492303", "Unna",
+"496588", "Pluwig",
+"499664", "Hahnbach",
+"492862", "Südlohn",
+"4939393", "Werben\ Elbe",
+"492826", "Kranenburg\ Niederrhein",
+"4936878", "Oberland",
+"499277", "Warmensteinach",
+"494779", "Freiburg\ Elbe",
+"499497", "Seubersdorf\ in\ der\ Oberpfalz",
+"4938304", "Garz\ Rügen",
+"4934632", "Mücheln\ Geiseltal",
+"495042", "Bad\ Münder\ am\ Deister",
+"496697", "Willingshausen",
+"495633", "Diemelsee",
+"4939888", "Lychen",
+"492522", "Oelde",
+"492566", "Legden",
+"492625", "Ochtendung",
+"499103", "Cadolzburg",
+"492351", "Lüdenscheid",
+"497949", "Pfedelbach\-Untersteinbach",
+"494232", "Langwedel\ Kreis\ Verden",
+"495659", "Ringgau",
+"496057", "Flörsbachtal",
+"4935052", "Kipsdorf\ Kurort",
+"497671", "Todtnau",
+"492770", "Eschenburg",
+"495556", "Lindau\ Harz",
+"4936022", "Grossengottern",
+"499347", "Wittighausen",
+"498267", "Dirlewang",
+"497685", "Gutach\-Bleibach",
+"495852", "Bleckede",
+"496023", "Alzenau\ in\ Unterfranken",
+"497582", "Bad\ Buchau",
+"497165", "Göppingen\-Hohenstaufen",
+"492850", "Rees\-Haldern",
+"4933456", "Wriezen",
+"498143", "Inning\ am\ Ammersee",
+"4937366", "Rübenau",
+"4934905", "Wörlitz",
+"495253", "Bad\ Driburg",
+"4936253", "Georgenthal\ Thüringer\ Wald",
+"495772", "Espelkamp",
+"498552", "Grafenau\ Niederbayern",
+"496150", "Weiterstadt",
+"4936693", "Crossen\ an\ der\ Elster",
+"4936741", "Bad\ Blankenburg",
+"494833", "Wesselburen",
+"4933966", "Dranse",
+"497129", "Lichtenstein\ Württemberg",
+"495963", "Bawinkel",
+"498856", "Penzberg",
+"492384", "Welver",
+"494180", "Königsmoor",
+"4938428", "Hohenkirchen\ bei\ Wismar",
+"492263", "Engelskirchen",
+"492927", "Neuengeseke",
+"494859", "Windbergen",
+"498095", "Aying",
+"495520", "Braunlage",
+"495201", "Halle\ Westfalen",
+"4934956", "Zörbig",
+"4969", "Frankfurt\ am\ Main",
+"4933094", "Löwenberg",
+"4939858", "Bietikow",
+"498321", "Sonthofen",
+"492628", "Rhens",
+"492953", "Wünnenberg",
+"4935601", "Peitz",
+"4937437", "Bad\ Elster",
+"493644", "Apolda",
+"494461", "Jever",
+"494555", "Seedorf\ bei\ Bad\ Segeberg",
+"4935775", "Pechern",
+"496571", "Wittlich",
+"498238", "Gessertshausen",
+"493335", "Finowfurt",
+"4936928", "Neuenhof\ Thüringen",
+"499482", "Wörth\ an\ der\ Donau",
+"499184", "Deining\ Oberpfalz",
+"4934466", "Janisroda",
+"497324", "Herbrechtingen",
+"496682", "Tann\ Rhön",
+"4938201", "Gelbensande",
+"498046", "Bad\ Heilbrunn",
+"496585", "Ralingen",
+"492627", "Braubach",
+"496592", "Daun",
+"497373", "Zwiefalten",
+"499281", "Hof\ Saale",
+"496695", "Jesberg",
+"494630", "Barderup",
+"494262", "Visselhövede",
+"4933760", "Münchehofe\ Kreis\ Dahme\-Spreewald",
+"4937432", "Pausa\ Vogtland",
+"499275", "Speichersdorf",
+"499495", "Breitenbrunn\ Oberpfalz",
+"492928", "Soest\-Ostönnen",
+"4935828", "Reichenbach\ OL",
+"496744", "Oberwesel",
+"492653", "Kaisersesch",
+"497138", "Schwaigern",
+"493944", "Blankenburg\ Harz",
+"499446", "Altmannstein",
+"494952", "Rhauderfehn",
+"495402", "Bissendorf\ Kreis\ Osnabrück",
+"4939928", "Möllenhagen",
+"498237", "Aindling",
+"496646", "Grebenau",
+"498082", "Schwindegg",
+"492196", "Wermelskirchen",
+"496434", "Bad\ Camberg",
+"496132", "Ingelheim\ am\ Rhein",
+"4939346", "Tucheim",
+"497243", "Ettlingen",
+"499736", "Oberthulba",
+"498265", "Pfaffenhausen\ Schwaben",
+"492639", "Anhausen\ Kreis\ Neuwied",
+"499345", "Külsheim\ Baden",
+"495331", "Wolfenbüttel",
+"499634", "Wiesau",
+"492832", "Kevelaer",
+"496055", "Freigericht",
+"4939741", "Jatznick",
+"499396", "Urspringen\ bei\ Lohr",
+"495228", "Vlotho\-Exter",
+"495309", "Lehre\-Wendhausen",
+"492601", "Nauort",
+"495663", "Spangenberg",
+"4935204", "Wilsdruff",
+"4933051", "Nassenheide",
+"492536", "Münster\-Albachten",
+"492233", "Hürth\ Rheinland",
+"495183", "Lamspringe",
+"496058", "Gründau",
+"495225", "Spenge",
+"496074", "Rödermark",
+"4936334", "Wolkramshausen",
+"498657", "Ramsau\ bei\ Berchtesgaden",
+"4935057", "Hermsdorf\ Erzgebirge",
+"494409", "Westerstede\-Ocholt",
+"493329", "Stahnsdorf",
+"4936027", "Lengenfeld\ Unterm\ Stein",
+"497971", "Gaildorf",
+"494431", "Wildeshausen",
+"497842", "Kappelrodeck",
+"498268", "Tussenhausen",
+"498623", "Kirchweidach",
+"49911", "Nuremberg",
+"4933476", "Neuhardenberg",
+"499348", "Werbach\-Gamburg",
+"497546", "Oberteuringen",
+"4936646", "Tanna\ bei\ Schleiz",
+"497135", "Brackenheim",
+"496587", "Zerf",
+"496848", "Homburg\-Einöd",
+"4934637", "Frankleben",
+"494741", "Nordholz\ bei\ Bremerhaven",
+"4938323", "Prohn",
+"493337", "Biesenthal\ Brandenburg",
+"493466", "Artern\ Unstrut",
+"4935363", "Fermerswalde",
+"499964", "Stallwang",
+"494557", "Blunk",
+"494302", "Kirchbarkau",
+"4935755", "Ortrand",
+"498406", "Böhmfeld",
+"497052", "Bad\ Liebenzell",
+"49231", "Dortmund",
+"496698", "Schrecksbach",
+"494863", "Sankt\ Peter\-Ording",
+"4934976", "Gröbzig",
+"499498", "Laaber",
+"499278", "Weidenberg",
+"495933", "Lathen",
+"495086", "Celle\-Scheuen",
+"499254", "Gefrees",
+"4933602", "Alt\ Zeschdorf",
+"494523", "Malente",
+"492925", "Warstein\-Allagen",
+"4939421", "Osterwieck",
+"4939991", "Daberkow",
+"498751", "Mainburg",
+"4935433", "Vetschau",
+"498166", "Allershausen\ Oberbayern",
+"4938851", "Zarrentin",
+"498547", "Osterhofen\-Gergweis",
+"496201", "Weinheim\ Bergstr",
+"498424", "Nassenfels",
+"4933477", "Trebnitz\ bei\ Müncheberg",
+"498122", "Erding",
+"4934344", "Kohren\-Sahlis",
+"495585", "Herzberg\-Sieber",
+"497193", "Sulzbach\ an\ der\ Murr",
+"496239", "Bobenheim\-Roxheim",
+"498370", "Wiggensbach",
+"494364", "Dahme\ Kreis\ Ostholstein",
+"495682", "Borken\ Hessen",
+"4934783", "Gerbstedt",
+"495946", "Georgsdorf",
+"497754", "Görwihl",
+"4936026", "Struth\ bei\ Mühlhausen",
+"4935891", "Rothenburg\ OL",
+"4939208", "Loitsche",
+"495571", "Uslar",
+"4935056", "Altenberg\ Sachsen",
+"499073", "Gundelfingen\ an\ der\ Donau",
+"497656", "Schluchsee",
+"493841", "Wismar",
+"4938454", "Kritzkow",
+"494948", "Wiesmoor\-Marcardsmoor",
+"496772", "Nastätten",
+"496253", "Fürth\ Odenwald",
+"499176", "Allersberg",
+"4936464", "Wormstedt",
+"494283", "Tarmstedt",
+"4939824", "Hohenzieritz",
+"498703", "Essenbach",
+"4934977", "Quellendorf",
+"494125", "Seestermühe",
+"492246", "Lohmar\ Rheinland",
+"497533", "Allensbach",
+"492295", "Ruppichteroth",
+"498063", "Feldkirchen\-Westerham",
+"494169", "Sauensiek",
+"493691", "Eisenach\ Thüringen",
+"496227", "Walldorf\ Baden",
+"4934636", "Schafstädt",
+"497045", "Oberderdingen",
+"493763", "Glauchau",
+"4936647", "Saalburg\ Thüringen",
+"4938320", "Tribsees",
+"499360", "Thüngen",
+"496659", "Eichenzell",
+"492152", "Kempen",
+"492454", "Gangelt",
+"4939389", "Schollene",
+"497620", "Schopfheim\-Gersbach",
+"4936379", "Holzengel",
+"492721", "Lennestadt",
+"497236", "Keltern",
+"4935874", "Bernstadt\ an\ der\ Eigen",
+"4938484", "Ventschow",
+"494945", "Grossefehn\-Timmel",
+"495023", "Liebenau\ Kreis\ Nieburg\ Weser",
+"4937465", "Tannenbergsthal\ Vogtland",
+"492543", "Billerbeck\ Westfalen",
+"4934462", "Laucha\ Unstrut",
+"496852", "Nohfelden",
+"499521", "Hassfurt",
+"494882", "Lunden",
+"4933763", "Bestensee",
+"496556", "Pronsfeld",
+"499861", "Rothenburg\ ob\ der\ Tauber",
+"494128", "Kollmar",
+"4933675", "Tauche",
+"497775", "Mühlingen",
+"4933701", "Grossbeeren",
+"4937362", "Seiffen\ Erzgebirge",
+"496361", "Rockenhausen",
+"4933452", "Neulewin",
+"495126", "Algermissen",
+"492680", "Mündersbach",
+"499352", "Lohr\ am\ Main",
+"495162", "Fallingbostel",
+"495464", "Alfhausen",
+"498686", "Petting",
+"496633", "Homberg\ Ohm",
+"4933962", "Heiligengrabe",
+"496042", "Büdingen\ Hessen",
+"49335", "Frankfurt\ \(Oder\)",
+"4939347", "Kade",
+"499433", "Nabburg",
+"498784", "Hohenthann",
+"4935471", "Birkenhainchen",
+"4938229", "Bad\ Sülze",
+"4934241", "Jesewitz",
+"494204", "Thedinghausen",
+"497646", "Weisweil\ Breisgau",
+"4933742", "Oehna\ Brandenburg",
+"4933237", "Paulinenaue",
+"4939052", "Erxleben\ bei\ Haldensleben",
+"493362", "Erkner",
+"4934443", "Teuchern",
+"494406", "Berne",
+"497744", "Stühlingen",
+"495956", "Rastdorf",
+"495777", "Diepenau\-Essern",
+"496138", "Mommenheim",
+"498557", "Mauth",
+"498302", "Görisried",
+"4935027", "Weesenstein",
+"495222", "Bad\ Salzuflen",
+"4934202", "Delitzsch",
+"495266", "Lemgo\-Kirchheide",
+"496373", "Schönenberg\-Kübelberg",
+"498741", "Vilsbiburg",
+"492838", "Sonsbeck",
+"492922", "Werl",
+"494623", "Böklund",
+"499873", "Abenberg\-Wassermungenau",
+"498250", "Hilgertshausen\-Tandern",
+"494268", "Bötersen",
+"497055", "Neuweiler\ Kreis\ Calw",
+"498431", "Neuburg\ an\ der\ Donau",
+"494305", "Westensee",
+"4935725", "Wittichenau",
+"493425", "Wurzen",
+"492256", "Mechernich\-Satzvey",
+"4938353", "Gützkow\ bei\ Greifswald",
+"494958", "Jemgum",
+"4937343", "Jöhstadt",
+"497132", "Neckarsulm",
+"497434", "Winterlingen",
+"494974", "Neuharlingersiel",
+"496243", "Monsheim",
+"498085", "Sankt\ Wolfgang",
+"499727", "Schonungen\-Marktsteinach",
+"496167", "Modautal",
+"494308", "Schwedeneck",
+"4936785", "Gräfinau\-Angstedt",
+"492553", "Ochtrup",
+"4939601", "Friedland",
+"494955", "Westoverledingen",
+"498071", "Wasserburg\ am\ Inn",
+"495405", "Hasbergen\ Kreis\ Osnabrück",
+"4939775", "Ahlbeck\ bei\ Torgelow",
+"496842", "Blieskastel",
+"493771", "Aue\ Sachsen",
+"4937754", "Zwönitz",
+"492867", "Heiden\ Kreis\ Borken",
+"499272", "Fichtelberg",
+"499492", "Parsberg",
+"499194", "Ebermannstadt",
+"496692", "Neustadt\ Hessen",
+"492527", "Lippetal\-Lippborg",
+"494265", "Fintel",
+"496595", "Dockweiler",
+"492444", "Schleiden\-Gemünd",
+"492501", "Münster\-Hiltrup",
+"4936087", "Wüstheuterode",
+"495563", "Kreiensen",
+"4936204", "Stotternheim",
+"494237", "Bendingbostel",
+"492636", "Burgbrohl",
+"495823", "Bienenbüttel",
+"496052", "Bad\ Orb",
+"492835", "Issum",
+"492734", "Freudenberg\ Westfalen",
+"499534", "Burgpreppach",
+"499342", "Wertheim",
+"4939223", "Theessen",
+"4936072", "Weissenborn\-Lüderode",
+"495306", "Cremlingen",
+"495857", "Bleckede\-Brackede",
+"498630", "Oberneukirchen",
+"498262", "Mittelneufnach",
+"499701", "Sandberg\ Unterfranken",
+"4939082", "Mieste",
+"496135", "Bodenheim\ Rhein",
+"497587", "Hosskirch",
+"498226", "Bibertal",
+"492394", "Neuenrade\-Affeln",
+"498204", "Mickhausen",
+"496656", "Ebersburg",
+"493677", "Ilmenau\ Thüringen",
+"496421", "Marburg",
+"4939884", "Hassleben\ bei\ Prenzlau",
+"494885", "Bergenhusen",
+"4936874", "Schönbrunn\ bei\ Hildburghaus",
+"4938308", "Göhren\ Rügen",
+"496855", "Freisen",
+"492643", "Altenahr",
+"495324", "Vienenburg",
+"496754", "Martinstein",
+"494942", "Südbrookmerland",
+"495137", "Seelze",
+"499621", "Amberg\ Oberpfalz",
+"494871", "Hohenwestedt",
+"497520", "Bodnegg",
+"4934922", "Mühlanger",
+"4934492", "Lucka",
+"496559", "Leidenborn",
+"497963", "Adelmannsfelden",
+"497227", "Lichtenau\ Baden",
+"495129", "Söhlde",
+"496045", "Gedern",
+"498586", "Hauzenberg",
+"496533", "Morbach\ Hunsrück",
+"4933734", "Felgentreu",
+"4939481", "Hedersleben\ bei\ Aschersleben",
+"499355", "Frammersbach",
+"495165", "Rethem\ Aller",
+"4935342", "Mühlberg\ Elbe",
+"496096", "Wiesen\ Unterfranken",
+"499607", "Luhe\-Wildenau",
+"497253", "Bad\ Schönborn",
+"496407", "Rabenau\ Hessen",
+"499908", "Schöfweg",
+"495168", "Walsrode\-Stellichte",
+"4935026", "Dürrröhrsdorf\-Dittersbach",
+"499358", "Gössenheim",
+"495671", "Hofgeismar",
+"499374", "Eschau",
+"497556", "Uhldingen\-Mühlhofen",
+"499905", "Bernried\ Niederbayern",
+"497852", "Willstätt",
+"495685", "Knüllwald",
+"492379", "Menden\-Asbeck",
+"495582", "Sankt\ Andreasberg",
+"494240", "Syke\-Heiligenfelde",
+"494703", "Loxstedt\-Donnern",
+"496236", "Neuhofen\ Pfalz",
+"496620", "Philippsthal\ Werra",
+"498283", "Neuburg\ an\ der\ Kammel",
+"4938821", "Lüdersdorf",
+"496048", "Büdingen\-Eckartshausen",
+"499420", "Feldkirchen\ Niederbayern",
+"4939451", "Wasserleben",
+"4938732", "Gallin\ bei\ Lübz",
+"499179", "Freystadt",
+"499244", "Betzenstein",
+"4936924", "Mihla",
+"498364", "Seeg",
+"497633", "Staufen\ im\ Breisgau",
+"4939329", "Möringen",
+"497042", "Vaihingen\ an\ der\ Enz",
+"492158", "Grefrath\ bei\ Krefeld",
+"492472", "Monschau",
+"492174", "Burscheid\ Rheinland",
+"4935954", "Grossharthau",
+"492292", "Windeck\ Sieg",
+"493591", "Bautzen",
+"494122", "Uetersen",
+"493304", "Velten",
+"494166", "Ahlerstedt",
+"496781", "Idar\-Oberstein",
+"494547", "Gudow\ Lauenburg",
+"493981", "Neustrelitz",
+"4939854", "Kleptow",
+"494751", "Otterndorf",
+"497361", "Aalen",
+"496858", "Ottweiler\-Fürth",
+"496874", "Wadern\-Nunkirchen",
+"4938424", "Bobitz",
+"496775", "Strüth\ Taunus",
+"494862", "Garding",
+"4939245", "Loburg",
+"494826", "Hohenlockstedt",
+"499676", "Winklarn",
+"497053", "Bad\ Teinach\-Zavelstein",
+"492779", "Greifenstein\-Beilstein",
+"496476", "Mengerskirchen",
+"496296", "Ahorn\ Baden",
+"494522", "Plön",
+"495932", "Haren\ Ems",
+"499774", "Oberelsbach",
+"494625", "Jübek",
+"499875", "Wolframs\-Eschenbach",
+"492558", "Horstmar",
+"4938333", "Horst\ bei\ Grimmen",
+"496245", "Biblis",
+"492574", "Saerbeck",
+"497940", "Künzelsau",
+"493423", "Eilenburg",
+"494303", "Schlesen",
+"4939361", "Lüderitz",
+"4936735", "Probstzella",
+"495650", "Cornberg",
+"4939032", "Mahlsdorf\ bei\ Salzwedel",
+"498764", "Mauern\ Kreis\ Freising",
+"497843", "Renchen",
+"494770", "Wischhafen",
+"4935829", "Gersdorf\ bei\ Görlitz",
+"498666", "Teisendorf",
+"4936450", "Kranichfeld",
+"498622", "Tacherting\-Peterskirchen",
+"495828", "Himbergen",
+"493606", "Heiligenstadt\ Heilbad",
+"497761", "Bad\ Säckingen",
+"494351", "Eckernförde",
+"4939929", "Jabel\ bei\ Waren",
+"496375", "Wallhalben",
+"495182", "Gronau\ Leine",
+"495484", "Lienen\-Kattenvenne",
+"493531", "Finsterwalde",
+"492232", "Brühl\ Rheinland",
+"4933875", "Rhinow",
+"497156", "Ditzingen",
+"496381", "Kusel",
+"495724", "Obernkirchen",
+"4935691", "Bärenklau\ NL",
+"495825", "Wieren",
+"4935384", "Steinsdorf\ bei\ Jessen",
+"492833", "Kerken",
+"4937325", "Niederbobritzsch",
+"495451", "Ibbenbüren",
+"495626", "Bad\ Zwesten",
+"495565", "Einbeck\-Wenzen",
+"495662", "Felsberg\ Hessen",
+"494384", "Selent",
+"4934322", "Rosswein",
+"495529", "Rhumspringe",
+"498868", "Schwabsoien",
+"497242", "Rheinstetten",
+"495197", "Soltau\-Frielingen",
+"496133", "Oppenheim",
+"494939", "Baltrum",
+"4933925", "Wustrau\-Altfriesack",
+"494953", "Bunde",
+"496159", "Messel",
+"4936603", "Weida",
+"495403", "Bad\ Iburg",
+"492555", "Schöppingen",
+"492461", "Jülich",
+"492652", "Mendig",
+"498083", "Isen",
+"494189", "Undeloh",
+"496036", "Wölfersheim",
+"4938371", "Karlshagen",
+"4936847", "Steinbach\-Hallenberg",
+"494263", "Scheessel",
+"492859", "Wesel\-Bislich",
+"494927", "Krummhörn\-Loquard",
+"496593", "Hillesheim\ Eifel",
+"4939264", "Kroppenstedt",
+"4934425", "Droyssig",
+"499854", "Wittelshofen",
+"4937422", "Markneukirchen",
+"496043", "Nidda",
+"497965", "Ellwangen\-Röhlingen",
+"493371", "Luckenwalde",
+"496535", "Osann\-Monzel",
+"4936483", "Ziegenrück",
+"494708", "Ringstedt",
+"492056", "Heiligenhaus",
+"499134", "Neunkirchen\ am\ Brand",
+"493385", "Rathenow",
+"497255", "Graben\-Neudorf",
+"499353", "Karlstadt",
+"495163", "Fallingbostel\-Dorfmark",
+"492645", "Vettelschoss",
+"495066", "Sarstedt",
+"496853", "Marpingen",
+"492334", "Hagen\-Hohenlimburg",
+"492542", "Gescher",
+"492599", "Ascheberg\-Herbern",
+"496195", "Kelkheim\ Taunus",
+"495022", "Wietzen",
+"494883", "Süderstapel",
+"499339", "Ippesheim",
+"492153", "Nettetal\-Lobberich",
+"496827", "Eppelborn",
+"495604", "Grossalmerode",
+"496567", "Oberkail",
+"4936846", "Suhl\-Dietzhausen",
+"496146", "Hochheim\ am\ Main",
+"497937", "Dörzbach",
+"495706", "Porta\ Westfalica",
+"492696", "Nohn\ Eifel",
+"4938782", "Reetz\ bei\ Perleberg",
+"499742", "Kalbach\ Rhön",
+"494477", "Lastrup\-Hemmelte",
+"4939209", "Wanzleben",
+"494297", "Ottersberg\-Posthausen",
+"498026", "Hausham",
+"493762", "Crimmitschau",
+"497635", "Schliengen",
+"493726", "Flöha",
+"498062", "Bruckmühl\ Mangfall",
+"495377", "Ehra\-Lessien",
+"4936762", "Steinach\ Thüringen",
+"497532", "Meersburg",
+"497344", "Blaubeuren",
+"4935934", "Grossdubrau",
+"497836", "Schiltach",
+"499951", "Landau\ an\ der\ Isar",
+"4934745", "Winningen\ Sachsen\-Anhalt",
+"493624", "Ohrdruf",
+"4938752", "Zierzow\ bei\ Ludwigslust",
+"4935268", "Stauchitz",
+"496252", "Heppenheim\ Bergstrasse",
+"496198", "Eppstein",
+"4933205", "Michendorf",
+"496773", "Kamp\-Bornhofen",
+"498341", "Kaufbeuren",
+"493973", "Pasewalk",
+"499261", "Kronach",
+"498702", "Wörth\ an\ der\ Isar",
+"4935792", "Ossling",
+"4938228", "Dettmannsdorf\-Kölzow",
+"494282", "Sittensen",
+"492947", "Anröchte",
+"497258", "Oberderdingen\-Flehingen",
+"499903", "Schöllnach",
+"4939388", "Goldbeck\ Altm",
+"495683", "Wabern\ Hessen",
+"495247", "Harsewinkel",
+"497274", "Germersheim",
+"497192", "Murrhardt",
+"4936963", "Dorndorf\ Rhön",
+"498157", "Feldafing",
+"499072", "Lauingen\ Donau",
+"4936378", "Ostramondra",
+"498271", "Meitingen",
+"4936453", "Mellingen",
+"49641", "Giessen",
+"494804", "Nordhastedt",
+"49961", "Weiden\ in\ der\ Oberpfalz",
+"498123", "Moosinning",
+"494705", "Wremen",
+"497667", "Breisach\ am\ Rhein",
+"498285", "Burtenbach",
+"498628", "Kienberg\ Oberbayern",
+"499343", "Lauda\-Königshofen",
+"497245", "Durmersheim",
+"496027", "Stockstadt\ am\ Main",
+"498263", "Breitenbrunn\ Schwaben",
+"495665", "Guxhagen",
+"499107", "Trautskirchen",
+"497476", "Bisingen",
+"495562", "Dassel\-Markoldendorf",
+"494936", "Grossheide",
+"492238", "Pulheim",
+"4936691", "Eisenberg\ Thüringen",
+"4936743", "Teichel",
+"496053", "Wächtersbach",
+"495822", "Ebstorf",
+"499273", "Bad\ Berneck\ im\ Fichtelgebirge",
+"499493", "Beratzhausen",
+"497381", "Münsingen",
+"494528", "Schönwalde\ am\ Bungsberg",
+"497904", "Ilshofen",
+"497375", "Obermarchtal",
+"4934672", "Rossleben",
+"494186", "Buchholz\-Trelde",
+"496761", "Simmern\ Hunsrück",
+"496039", "Karben",
+"496693", "Neuental",
+"493961", "Altentreptow",
+"4933362", "Liepe\ Kreis\ Barnim",
+"498384", "Röthenbach\ Allgäu",
+"492856", "Hamminkeln\-Brünen",
+"4938203", "Bad\ Doberan",
+"4939294", "Gross\ Rosenburg",
+"496843", "Gersheim",
+"4935603", "Burg\ Spreewald",
+"492655", "Weibern",
+"49375", "Zwickau",
+"492552", "Steinfurt\-Borghorst",
+"492307", "Kamen",
+"4933841", "Belzig",
+"494829", "Wewelsfleth",
+"492957", "Wünnenberg\-Haaren",
+"492776", "Bad\ Endbach\-Hartenrod",
+"496479", "Waldbrunn\ Westerwald",
+"496242", "Osthofen",
+"497133", "Lauffen\ am\ Neckar",
+"492674", "Bad\ Bertrich",
+"495935", "Twist\-Schöninghsdorf",
+"499941", "Kötzting",
+"4934297", "Liebertwolkwitz",
+"494622", "Taarstedt",
+"499872", "Heilsbronn",
+"492267", "Wipperfürth",
+"492923", "Lippetal\-Herzfeld",
+"494525", "Ahrensbök",
+"494666", "Ladelund",
+"4939391", "Lückstedt",
+"499576", "Lichtenfels\-Isling",
+"497354", "Erolzheim",
+"494865", "Osterhever",
+"494764", "Gnarrenburg\-Klenkendorf",
+"4934382", "Nerchau",
+"495171", "Peine",
+"494837", "Neuenkirchen\ Dithmarschen",
+"498303", "Waltenhofen",
+"496372", "Bruchmühlbach\-Miesau",
+"495185", "Duingen",
+"4935324", "Crinitz",
+"492235", "Erftstadt",
+"498669", "Traunreut",
+"495223", "Bünde",
+"4939959", "Dargun",
+"493631", "Nordhausen\ Thüringen",
+"49202", "Wuppertal",
+"496120", "Aarbergen",
+"497248", "Marxzell",
+"497159", "Renningen",
+"498862", "Steingaden\ Oberbayern",
+"495257", "Hövelhof",
+"498029", "Kreuth\ bei\ Tegernsee",
+"494285", "Rhade\ bei\ Zeven",
+"4934296", "Groitzsch\ bei\ Pegau",
+"494123", "Barmstedt",
+"498705", "Altfraunhofen",
+"494271", "Sulingen",
+"495028", "Pennigsehl",
+"497839", "Schapbach",
+"494491", "Friesoythe",
+"492548", "Dülmen\-Rorup",
+"497950", "Schnelldorf",
+"4936628", "Zeulenroda",
+"496255", "Lindenfels",
+"499748", "Motten",
+"493447", "Altenburg\ Thüringen",
+"4938722", "Raduhn",
+"498065", "Tuntenhausen\-Schönau",
+"492473", "Simmerath",
+"492293", "Nümbrecht",
+"496187", "Schöneck",
+"497260", "Sinsheim\-Hilsbach",
+"497043", "Maulbronn",
+"493765", "Reichenbach\ Vogtland",
+"4934656", "Wallhausen\ Sachsen\-Anhalt",
+"497632", "Badenweiler",
+"499438", "Fensterbach",
+"493737", "Rochlitz",
+"49951", "Bamberg",
+"498282", "Krumbach\ Schwaben",
+"497567", "Leutkirch\-Friesenhofen",
+"497146", "Remseck\ am\ Neckar",
+"494702", "Sandstedt",
+"4936423", "Orlamünde",
+"4939863", "Seehausen\ bei\ Prenzlau",
+"4938309", "Trent",
+"496638", "Schwalmtal\-Renzendorf",
+"4935453", "Drahnsdorf",
+"4934605", "Gröbers",
+"4934771", "Querfurt",
+"499075", "Glött",
+"4937602", "Kirchberg\ Sachsen",
+"49271", "Siegen",
+"495583", "Braunlage\-Hohegeiss",
+"497195", "Winnenden",
+"4939404", "Ausleben",
+"499081", "Nördlingen",
+"497853", "Kehl\-Bodersweier",
+"4933432", "Müncheberg",
+"495286", "Ottenstein\ Niedersachsen",
+"499078", "Mertingen",
+"497773", "Bodman\-Ludwigshafen",
+"4939328", "Rochau",
+"497252", "Bretten",
+"495441", "Diepholz",
+"499435", "Schwarzenfeld",
+"493382", "Lehnin",
+"496836", "Überherrn",
+"496532", "Zeltingen\-Rachtig",
+"496344", "Schwegenheim",
+"497962", "Fichtenau",
+"4938873", "Carlow",
+"496635", "Kirtorf",
+"499844", "Obernzenn",
+"496667", "Steinau\-Ulmbach",
+"499745", "Wildflecken",
+"495731", "Bad\ Oeynhausen",
+"495069", "Nordstemmen",
+"492596", "Nordkirchen",
+"4935600", "Döbern\ NL",
+"49741", "Rottweil",
+"499467", "Michelsneukirchen",
+"495504", "Friedland\ Kreis\ Göttingen",
+"499336", "Bütthard",
+"494288", "Horstedt\ Kreis\ Rotenburg",
+"498708", "Weihmichl\-Unterneuhausen",
+"4933335", "Pinnow\ Kreis\ Uckermark",
+"497300", "Roggenburg",
+"492545", "Rosendahl\-Darfeld",
+"496274", "Waldbrunn\ Odenwald",
+"496192", "Hofheim\ am\ Taunus",
+"494943", "Grossefehn",
+"495025", "Estorf\ Weser",
+"492642", "Remagen",
+"496258", "Gernsheim",
+"4936643", "Thimmendorf",
+"499901", "Hengersberg\ Bayern",
+"495681", "Homberg\ Efze",
+"4938326", "Grimmen",
+"499384", "Schwanfeld",
+"495675", "Trendelburg",
+"497124", "Trochtelfingen\ Hohenz",
+"497422", "Schramberg",
+"497337", "Nellingen\ Alb",
+"4933209", "Caputh",
+"497466", "Beuron",
+"492389", "Werne",
+"495572", "Bodenfelde",
+"498752", "Au\ in\ der\ Hallertau",
+"492934", "Sundern\-Altenhellefeld",
+"498273", "Nordendorf",
+"4938721", "Ziegendorf",
+"496202", "Schwetzingen",
+"498121", "Markt\ Schwaben",
+"4934973", "Osternienburg",
+"4933678", "Storkow\ Mark",
+"499189", "Berg\ bei\ Neumarkt\ in\ der\ Oberpfalz",
+"4936020", "Ebeleben",
+"499953", "Pilsting",
+"497329", "Steinheim\ am\ Albuch",
+"4937468", "Treuen\ Vogtland",
+"492482", "Hellenthal",
+"495234", "Horn\-Bad\ Meinberg",
+"494755", "Ihlienworth",
+"4937601", "Mülsen\ Skt\ Jacob",
+"497365", "Essingen\ Württemberg",
+"494854", "Friedrichskoog",
+"493971", "Anklam",
+"4939754", "Löcknitz\ Vorpom",
+"499628", "Ursensollen",
+"4934772", "Helbra",
+"498343", "Aitrang",
+"496771", "St\ Goarshausen",
+"496428", "Stadtallendorf",
+"499263", "Ludwigsstadt",
+"499927", "Kirchberg\ Wald",
+"493546", "Lübben\ Spreewald",
+"4933473", "Zechin",
+"496785", "Herrstein",
+"496851", "St\ Wendel",
+"4939343", "Jerichow",
+"494758", "Nordleda",
+"499522", "Eltmann",
+"499147", "Nennslingen",
+"494774", "Hechthausen",
+"499566", "Meeder",
+"499625", "Kastl\ bei\ Amberg",
+"494875", "Stafstedt",
+"496425", "Rauschenberg\ Hessen",
+"499826", "Weidenbach\ Mittelfranken",
+"494881", "Friedrichstadt",
+"496788", "Sien",
+"492151", "Krefeld",
+"499303", "Eibelstadt",
+"492664", "Rennerod",
+"492722", "Attendorn",
+"496041", "Glauburg",
+"4939205", "Langenweddingen",
+"496803", "Mandelbachtal\-Ommersheim",
+"4933834", "Pritzerbe",
+"4933767", "Friedersdorf\ bei\ Berlin",
+"498679", "Burgkirchen\ an\ der\ Alz",
+"496362", "Alsenz",
+"495977", "Spelle",
+"496326", "Deidesheim",
+"497944", "Kupferzell",
+"492103", "Hilden",
+"499351", "Gemünden\ am\ Main",
+"495161", "Walsrode",
+"495654", "Herleshausen",
+"492463", "Titz",
+"4933929", "Gühlen\-Glienicke",
+"494951", "Weener",
+"495401", "Georgsmarienhütte",
+"498075", "Amerang",
+"493874", "Ludwigslust",
+"4936252", "Tambach\-Dietharz",
+"498081", "Dorfen\ Stadt",
+"496304", "Wolfstein\ Pfalz",
+"4938844", "Gülze",
+"4937329", "Grosshartmannsdorf",
+"4935975", "Hohnstein",
+"494261", "Rotenburg\ Wümme",
+"496591", "Gerolstein",
+"499282", "Naila",
+"49851", "Passau",
+"497084", "Schömberg\ bei\ Neuenbürg",
+"495439", "Bersenbrück",
+"4936692", "Bürgel",
+"492831", "Geldern",
+"497340", "Neenstetten",
+"492505", "Altenberge\ Westfalen",
+"4934671", "Bad\ Frankenhausen\ Kyffhäuser",
+"496109", "Frankfurt\-Bergen\-Enkheim",
+"494903", "Wymeer",
+"4933361", "Joachimsthal",
+"495453", "Recke",
+"492602", "Montabaur",
+"499804", "Aurach",
+"49461", "Flensburg",
+"4936941", "Wasungen",
+"496131", "Mainz",
+"4933766", "Teupitz",
+"495427", "Melle\-Buer",
+"495544", "Reinhardshagen",
+"495332", "Schöppenstedt",
+"497577", "Veringenstadt",
+"499708", "Bad\ Bocklet",
+"494327", "Grossenaspe",
+"497972", "Gschwend\ bei\ Gaildorf",
+"492330", "Herdecke",
+"4936739", "Rottenbach",
+"494432", "Dötlingen\-Brettorf",
+"497841", "Achern",
+"494134", "Embsen\ Kreis\ Lüneburg",
+"494353", "Ascheffel",
+"4938327", "Elmenhorst\ Vorpom",
+"497763", "Murg",
+"493533", "Elsterwerda",
+"4934633", "Braunsbedra",
+"498745", "Bodenkirchen",
+"498467", "Kinding",
+"498336", "Erkheim",
+"492508", "Drensteinfurt",
+"496383", "Glan\-Münchweiler",
+"4939392", "Rönnebeck\ Sachsen\-Anhalt",
+"4936640", "Remptendorf",
+"496264", "Neudenau",
+"4934381", "Colditz",
+"4933470", "Lietzen",
+"497051", "Calw",
+"494339", "Christiansholm",
+"498435", "Ehekirchen",
+"4935436", "Laasow\ bei\ Calau",
+"4939925", "Wredenhagen",
+"4939004", "Köckte\ bei\ Gardelegen",
+"4935825", "Kodersdorf",
+"494742", "Dorum",
+"498054", "Breitbrunn\ am\ Chiemsee",
+"4936023", "Horsmar",
+"493421", "Torgau",
+"496677", "Neuenstein\ Hessen",
+"4935053", "Glashütte\ Sachsen",
+"49581", "Uelzen",
+"495733", "Vlotho",
+"492725", "Lennestadt\-Oedingen",
+"497202", "Karlsbad",
+"492824", "Kalkar",
+"499569", "Sesslach",
+"492564", "Vreden",
+"499829", "Flachslanden",
+"496337", "Grossbundenbach",
+"496466", "Dautphetal\-Friedensdorf",
+"4935774", "Boxberg\ Sachsen",
+"499865", "Adelshofen\ Mittelfranken",
+"4939226", "Hohenziatz",
+"499764", "Höchheim",
+"496422", "Kirchhain",
+"496124", "Bad\ Schwalbach",
+"494941", "Aurich",
+"499622", "Hirschau\ Oberpfalz",
+"494872", "Hanerau\-Hademarschen",
+"499666", "Illschwang",
+"499525", "Königsberg\ in\ Bayern",
+"497428", "Rosenfeld",
+"495554", "Moringen",
+"499837", "Haundorf",
+"497771", "Stockach",
+"4934904", "Oranienbaum",
+"495443", "Lemförde",
+"496329", "Weidenthal\ Pfalz",
+"4938781", "Mellen",
+"498774", "Bayerbach\ bei\ Ergoldsbach",
+"4936761", "Heubisch",
+"496205", "Hockenheim",
+"4938751", "Picher",
+"494343", "Laboe",
+"498380", "Achberg",
+"495672", "Bad\ Karlshafen",
+"497425", "Trossingen",
+"4938356", "Behrenhoff",
+"4937346", "Geyer",
+"494107", "Siek\ Kreis\ Stormarn",
+"497851", "Kehl",
+"499083", "Möttingen",
+"499936", "Wallerfing",
+"496782", "Birkenfeld\ Nahe",
+"494121", "Elmshorn",
+"499186", "Lauterhofen\ Oberpfalz",
+"499868", "Schillingsfürst",
+"4939724", "Klein\ Bünzow",
+"493744", "Auerbach\ Vogtland",
+"4934446", "Grosskorbetha",
+"494273", "Kirchdorf\ bei\ Sulingen",
+"494493", "Friesoythe\-Gehlenberg",
+"497326", "Neresheim",
+"4934609", "Salzmünde",
+"499528", "Donnersdorf",
+"494752", "Neuhaus\ Oste",
+"4933230", "Börnicke\ Kreis\ Havelland",
+"497362", "Bopfingen",
+"492485", "Schleiden\-Dreiborn",
+"497803", "Gengenbach",
+"4938305", "Gingst",
+"492471", "Roetgen\ Eifel",
+"493592", "Kirschau",
+"492291", "Waldbröl",
+"4936703", "Gräfenthal",
+"493695", "Bad\ Salzungen",
+"497041", "Mühlacker",
+"4935020", "Struppen",
+"492608", "Welschneudorf",
+"495173", "Uetze",
+"496084", "Schmitten\ Taunus",
+"498742", "Velden\ Vils",
+"495221", "Herford",
+"4937347", "Bärenstein\ Kreis\ Annaberg",
+"497304", "Blaustein\ Württemberg",
+"497975", "Untergröningen",
+"494435", "Grossenkneten",
+"493361", "Fürstenwalde\ Spree",
+"4933654", "Fünfeichen",
+"4939362", "Grieben\ bei\ Tangerhütte",
+"4935023", "Bad\ Gottleuba",
+"494467", "Wittmund\-Funnix",
+"494336", "Owschlag",
+"4934224", "Belgern\ Sachsen",
+"4939031", "Dähre",
+"497131", "Heilbronn\ Neckar",
+"494844", "Pellworm",
+"494745", "Bad\ Bederkesa",
+"4933989", "Sadenbeck",
+"4933233", "Ketzin",
+"499943", "Lam\ Oberpfalz",
+"4939778", "Ferdinandshof\ bei\ Torgelow",
+"4939955", "Jürgenstorf",
+"495207", "Schloss\ Holte\-Stukenbrock",
+"494796", "Teufelsmoor",
+"492921", "Soest",
+"499288", "Bad\ Steben",
+"498134", "Odelzhausen",
+"498432", "Burgheim",
+"496340", "Wörth\-Schaidt",
+"498327", "Rettenberg",
+"499271", "Thurnau\-Alladorf",
+"497383", "Münsingen\-Buttenhausen",
+"499491", "Hemau",
+"4935692", "Kerkwitz",
+"499285", "Kirchenlamitz",
+"4934321", "Leisnig",
+"4938292", "Kröpelin",
+"496691", "Schwalmstadt",
+"493963", "Woldegk",
+"49861", "Traunstein",
+"4935728", "Uhyst\ Spree",
+"496763", "Kirchberg\ Hunsrück",
+"499123", "Lauf\ an\ der\ Pegnitz",
+"496003", "Rosbach\ von\ der\ Höhe",
+"4936083", "Uder",
+"494748", "Stubben\ bei\ Bremerhaven",
+"496841", "Homburg\ Saar",
+"493772", "Schneeberg\ Erzgebirge",
+"495436", "Nortrup",
+"499157", "Alfeld\ Mittelfranken",
+"498072", "Haag\ in\ Oberbayern",
+"495367", "Rühen",
+"4937208", "Auerswalde",
+"499341", "Tauberbischofsheim",
+"495335", "Schladen",
+"492323", "Herne",
+"495644", "Willebadessen\-Peckelsheim",
+"496106", "Rodgau",
+"4938372", "Usedom",
+"49451", "Lübeck",
+"497954", "Kirchberg\ an\ der\ Jagst",
+"495746", "Rödinghausen",
+"498261", "Mindelheim",
+"492605", "Löf",
+"492502", "Nottuln",
+"492357", "Herscheid\ Westfalen",
+"496051", "Gelnhausen",
+"4937421", "Oelsnitz\ Vogtland",
+"497264", "Bad\ Rappenau",
+"493860", "Raben\ Steinfeld",
+"4936606", "Kraftsdorf",
+"496363", "Niederkirchen",
+"499409", "Pielenhofen",
+"499088", "Mönchsdeggingen",
+"4936840", "Trusetal",
+"495276", "Marienmünster",
+"492404", "Alsdorf\ Rheinland",
+"492102", "Ratingen",
+"493372", "Jüterbog",
+"496506", "Welschbillig",
+"4936375", "Kindelbrück",
+"4934921", "Kemberg",
+"4934491", "Schmölln\ Thüringen",
+"494348", "Schönkirchen",
+"495767", "Warmsen",
+"496631", "Alsfeld",
+"499431", "Schwandorf",
+"495445", "Drebber",
+"496802", "Völklingen\-Lauterbach",
+"4938225", "Trinwillershagen",
+"494964", "Rhede\ Ems",
+"499302", "Rottendorf\ Unterfranken",
+"495346", "Liebenburg",
+"495834", "Wittingen\-Knesebeck",
+"4939482", "Gatersleben",
+"499741", "Bad\ Brückenau",
+"4933208", "Fahrland",
+"497808", "Hohberg\ bei\ Offenburg",
+"4935265", "Glaubitz",
+"492723", "Kirchhundem",
+"492541", "Coesfeld",
+"4935341", "Bad\ Liebenwerda",
+"494498", "Saterland\-Ramsloh",
+"495021", "Nienburg\ Weser",
+"494254", "Eystrup",
+"499523", "Hofheim\ in\ Unterfranken",
+"496284", "Mudau",
+"4933679", "Wendisch\ Rietz",
+"498534", "Tettenweis",
+"496430", "Hahnstätten",
+"493843", "Güstrow",
+"494275", "Ehrenburg",
+"494495", "Friesoythe\-Thüle",
+"498342", "Marktoberdorf",
+"496251", "Bensheim",
+"49395", "Neubrandenburg",
+"494281", "Zeven",
+"4937294", "Grünhainichen",
+"499262", "Wallenfels",
+"4938822", "Diedrichshagen\ bei\ Grevesmühlen",
+"498061", "Bad\ Aibling",
+"497531", "Konstanz",
+"493761", "Werdau\ Sachsen",
+"493693", "Meiningen",
+"4939452", "Ilsenburg",
+"494446", "Bakum\ Kreis\ Vechta",
+"497704", "Geisingen\ Baden",
+"4935244", "Krögis",
+"4936967", "Geisa",
+"499952", "Eichendorf",
+"497805", "Appenweier",
+"498272", "Wertingen",
+"4938731", "Lübz",
+"498194", "Vilgertshofen",
+"494634", "Husby",
+"498753", "Elsendorf\ Niederbayern",
+"495448", "Barver",
+"497457", "Rottenburg\-Ergenzingen",
+"494736", "Butjadingen\-Tossens",
+"496203", "Ladenburg",
+"497191", "Backnang",
+"499085", "Alerheim",
+"498727", "Falkenberg\ Niederbayern",
+"495573", "Uslar\-Volpriehausen",
+"4933974", "Dessow",
+"497423", "Oberndorf\ am\ Neckar",
+"499071", "Dillingen\ an\ der\ Donau",
+"494743", "Langen\ bei\ Bremerhaven",
+"493494", "Wolfen",
+"4933741", "Niedergörsdorf",
+"495909", "Wettrup",
+"496008", "Echzell",
+"4936966", "Kaltennordheim",
+"492684", "Puderbach\ Westerwald",
+"4939051", "Calvörde",
+"493968", "Schönbeck",
+"494861", "Tönning",
+"499128", "Feucht",
+"497388", "Pfronstetten",
+"499945", "Arnbruck",
+"495931", "Meppen",
+"4938466", "Jürgenshagen",
+"494521", "Eutin",
+"497726", "Bad\ Dürrheim",
+"495181", "Alfeld\ Leine",
+"493344", "Bad\ Freienwalde",
+"497762", "Wehr\ Baden",
+"494352", "Damp",
+"4934263", "Hohburg",
+"493635", "Kölleda",
+"4933928", "Wildberg\ Brandenburg",
+"497624", "Grenzach\-Wyhlen",
+"495175", "Lehrte\-Arpke",
+"496382", "Lauterecken",
+"493836", "Wolgast",
+"494433", "Dötlingen",
+"497973", "Obersontheim",
+"4933634", "Berkenbrück\ Kreis\ Oder\-Spree",
+"499204", "Plankenfels",
+"4937328", "Grossschirma",
+"498621", "Trostberg",
+"498456", "Lenting",
+"49291", "Meschede",
+"4933878", "Nennhausen",
+"496397", "Leimen\ Pfalz",
+"495333", "Dettum",
+"4939602", "Kleeth",
+"492325", "Wanne\-Eickel",
+"498179", "Eurasburg\ an\ der\ Loisach",
+"492369", "Dorsten\-Wulfen",
+"497486", "Horb\-Altheim",
+"4936607", "Niederpöllnitz",
+"493937", "Osterburg\ Altmark",
+"495661", "Melsungen",
+"4936843", "Benshausen",
+"492603", "Bad\ Ems",
+"496737", "Köngernheim",
+"494902", "Jemgum\-Ditzum",
+"499364", "Zellingen",
+"495154", "Aerzen",
+"495452", "Mettingen\ Westfalen",
+"497371", "Riedlingen\ Württemberg",
+"499283", "Rehau",
+"4936738", "Königsee",
+"496765", "Gemünden\ Hunsrück",
+"493965", "Burow\ bei\ Altentreptow",
+"499647", "Kirchenthumbach",
+"496864", "Mettlach",
+"499948", "Eschlkam",
+"497385", "Gomadingen",
+"496447", "Langgöns\-Niederkleen",
+"496524", "Rodershausen",
+"494176", "Marschacht",
+"498374", "Dietmannsried",
+"4936071", "Teistungen",
+"492426", "Nörvenich",
+"492651", "Mayen",
+"492462", "Linnich",
+"492164", "Jüchen\-Otzenrath",
+"49521", "Bielefeld",
+"4939248", "Dobritz",
+"4939081", "Kakerbeck\ Sachsen\-Anhalt",
+"492224", "Bad\ Honnef",
+"499955", "Mamming",
+"497802", "Oberkirch\ Baden",
+"4939992", "Görmin",
+"4939422", "Badersleben",
+"4933338", "Stolpe\/Oder",
+"497631", "Müllheim\ Baden",
+"499229", "Mainleus",
+"4938852", "Wittenburg",
+"497506", "Wangen\-Leupolz",
+"499265", "Pressig",
+"496783", "Baumholder",
+"497363", "Lauchheim",
+"498634", "Garching\ an\ der\ Alz",
+"494753", "Balje",
+"494272", "Siedenburg",
+"494194", "Sievershütten",
+"498345", "Stöttwang",
+"494492", "Saterland",
+"4936427", "Dornburg\ Saale",
+"4935892", "Horka\ OL",
+"495673", "Immenhausen\ Hessen",
+"498446", "Pörnbach",
+"499082", "Oettingen\ in\ Bayern",
+"4939325", "Vinzelberg",
+"499190", "Heroldsbach",
+"498281", "Thannhausen\ Schwaben",
+"495924", "Bad\ Bentheim\-Gildehaus",
+"494534", "Steinburg\ Kreis\ Storman",
+"494342", "Preetz\ Kreis\ Plön",
+"493378", "Ludwigsfelde",
+"492440", "Nettersheim\-Tondorf",
+"496704", "Langenlonsheim",
+"493904", "Haldensleben",
+"496805", "Kleinblittersdorf",
+"499406", "Mintraching",
+"495442", "Barnstorf\ Kreis\ Diepholz",
+"495144", "Wathlingen",
+"493381", "Brandenburg\ an\ der\ Havel",
+"499097", "Marxheim",
+"498254", "Altomünster",
+"497961", "Ellwangen\ Jagst",
+"493375", "Königs\ Wusterhausen",
+"496531", "Bernkastel\-Kues",
+"4934461", "Nebra\ Unstrut",
+"496509", "Büdlich",
+"4938206", "Graal\-Müritz\ Seeheilbad",
+"4935606", "Briesen\ bei\ Cottbus",
+"497251", "Bruchsal",
+"4937361", "Neuhausen\ Erzgebirge",
+"499268", "Teuschnitz",
+"496423", "Wetter\ Hessen",
+"4933702", "Wünsdorf",
+"492641", "Bad\ Neuenahr\-Ahrweiler",
+"4933451", "Heckelberg",
+"494873", "Aukrug",
+"49811", "Hallbergmoos",
+"498348", "Bidingen",
+"493476", "Hettstedt\ Sachsen\-Anhalt",
+"496457", "Burgwald\ Eder",
+"497203", "Walzbachtal",
+"4936625", "Langenwetzendorf",
+"495732", "Löhne",
+"499974", "Traitsching",
+"499305", "Estenfeld",
+"4934242", "Hohenpriessnitz",
+"494487", "Grossenkneten\-Huntlosen",
+"499657", "Waldthurn",
+"4935472", "Schlepzig",
+"4935843", "Hirschfelde\ bei\ Zittau",
+"495561", "Einbeck",
+"495455", "Tecklenburg\-Brochterbeck",
+"4938207", "Stäbelow",
+"494358", "Loose\ bei\ Eckernförde",
+"495821", "Bad\ Bevensen",
+"4937431", "Mehltheuer\ Vogtland",
+"4935607", "Jänschwalde",
+"49341", "Leipzig",
+"495034", "Neustadt\-Hagen",
+"4939779", "Eggesin",
+"498176", "Egling\ bei\ Wolfratshausen",
+"492366", "Herten\ Westfalen",
+"492747", "Molzhain",
+"496002", "Ober\-Mörlen",
+"498073", "Gars\ am\ Inn",
+"492465", "Inden",
+"492551", "Steinfurt\-Burgsteinfurt",
+"493773", "Johanngeorgenstadt",
+"494179", "Winsen\-Tönnhausen",
+"494244", "Harpstedt",
+"495807", "Altenmedingen",
+"492429", "Hürtgenwald",
+"496624", "Heringen\ Werra",
+"4939742", "Brüssow\ bei\ Pasewalk",
+"497382", "Römerstein",
+"4933052", "Leegebruch",
+"499424", "Strasskirchen",
+"496762", "Kastellaun",
+"499122", "Schwabach",
+"493962", "Penzlin\ bei\ Waren",
+"496726", "Lorch\ Rheingau",
+"499166", "Münchsteinach",
+"495356", "Helmstedt\-Barmke",
+"4938876", "Roggendorf",
+"499547", "Zapfendorf",
+"4937209", "Einsiedel\ bei\ Chemnitz",
+"499942", "Viechtach",
+"494456", "Varel\-Altjührden",
+"494621", "Schleswig",
+"495906", "Lünne",
+"499871", "Windsbach",
+"4936426", "Ottendorf\ bei\ Stadtroda",
+"4933082", "Menz\ Kreis\ Oberhavel",
+"496486", "Katzenelnbogen",
+"498433", "Königsmoos",
+"4935456", "Terpt",
+"492994", "Marsberg\-Westheim",
+"492584", "Warendorf\-Milte",
+"4935033", "Rosenthal\ Sächsische\ Schweiz",
+"498507", "Neuburg\ am\ Inn",
+"496241", "Worms",
+"497729", "Tennenbronn",
+"4934293", "Naunhof\ bei\ Grimma",
+"498861", "Schongau",
+"495320", "Torfhaus",
+"497524", "Bad\ Waldsee",
+"495458", "Hopsten",
+"495294", "Hövelhof\-Espeln",
+"495474", "Stemwede\-Dielingen",
+"495172", "Ilsede",
+"496385", "Reichenbach\-Steegen",
+"497447", "Baiersbronn\-Schwarzenberg",
+"497765", "Rickenbach\ Hotzenwald",
+"4933601", "Podelzig",
+"494355", "Rieseby",
+"498459", "Manching",
+"493632", "Sondershausen",
+"498743", "Geisenhausen",
+"496371", "Landstuhl",
+"492206", "Overath",
+"493535", "Herzberg\ Elster",
+"494607", "Janneby",
+"4934653", "Rottleberode",
+"4933933", "Lindow\ Mark",
+"497352", "Ochsenhausen",
+"494762", "Kutenholz",
+"49201", "Essen",
+"4934638", "Zöschen",
+"492991", "Marsberg\-Bredelar",
+"4939882", "Gollin",
+"499775", "Schönau\ an\ der\ Brend",
+"499874", "Neuendettelsau",
+"494624", "Kropp",
+"492672", "Treis\-Karden",
+"496244", "Westhofen\ Rheinhessenen",
+"494973", "Wittmund\-Burhafe",
+"4934924", "Zahna",
+"4934494", "Ehrenhain",
+"497433", "Balingen",
+"492575", "Greven\-Reckenfeld",
+"492581", "Warendorf",
+"497459", "Nagold\-Hochdorf",
+"499236", "Nagel",
+"498765", "Bruckberg\ Niederbayern",
+"497743", "Ühlingen\-Birkendorf",
+"4936028", "Kammerforst\ Thüringen",
+"496420", "Lahntal",
+"4939206", "Eichenbarleben",
+"4936849", "Kleinschmalkalden",
+"4935058", "Pretzschendorf",
+"4933732", "Hennickendorf\ bei\ Luckenwalde",
+"496358", "Kriegsfeld",
+"496374", "Weilerbach",
+"495485", "Ladbergen",
+"495471", "Bohmte",
+"495725", "Lindhorst\ bei\ Stadthagen",
+"496355", "Albisheim\ Pfrimm",
+"495824", "Bad\ Bodenteich",
+"4935753", "Grossräschen",
+"492733", "Hilchenbach",
+"4935365", "Falkenberg\ Elster",
+"494371", "Burg\ auf\ Fehmarn",
+"495564", "Dassel",
+"499407", "Wenzenbach",
+"497176", "Spraitbach",
+"4937291", "Augustusburg",
+"4938325", "Rolofshagen",
+"494385", "Hohenfelde\ bei\ Kiel",
+"4938793", "Dergenthin",
+"492393", "Sundern\-Allendorf",
+"495031", "Wunstorf",
+"495769", "Steyerberg\-Voigtei",
+"4935241", "Lommatzsch",
+"499533", "Untermerzbach",
+"492554", "Laer\ Kreis\ Steinfurt",
+"494241", "Bassum",
+"4935827", "Nieder\-Seifersdorf",
+"4936922", "Gerstungen",
+"498382", "Lindau\ Bodensee",
+"493883", "Hagenow",
+"4935952", "Grossröhrsdorf\ OL",
+"494486", "Edewecht\-Friedrichsfehn",
+"499656", "Moosbach\ bei\ Vohenstrauss",
+"499421", "Straubing",
+"4939927", "Nossentiner\ Hütte",
+"497073", "Ammerbuch",
+"492759", "Bad\ Berleburg\-Aue",
+"4939852", "Schönermark\ bei\ Prenzlau",
+"492443", "Mechernich",
+"499855", "Dentlein\ am\ Forst",
+"496456", "Haina\ Kloster",
+"496621", "Bad\ Hersfeld",
+"4933971", "Kyritz\ Brandenburg",
+"4938422", "Neukloster",
+"499193", "Höchstadt\ an\ der\ Aisch",
+"499778", "Fladungen",
+"498251", "Aichach",
+"497964", "Stödtlen",
+"4933744", "Hohenseefeld",
+"496342", "Schweigen\-Rechtenbach",
+"496534", "Mülheim\ Mosel",
+"496701", "Sprendlingen\ Rheinhessen",
+"4939054", "Flechtingen",
+"493901", "Salzwedel",
+"499135", "Hessdorf\ Mittelfrankenanken",
+"495141", "Celle",
+"4939348", "Klitsche",
+"497254", "Waghäusel",
+"496061", "Michelstadt",
+"492436", "Wegberg\-Rödgen",
+"4934204", "Schkeuditz",
+"492367", "Henrichenburg",
+"498177", "Münsing\ Starnberger\ See",
+"496753", "Meisenheim",
+"495323", "Clausthal\-Zellerfeld",
+"492644", "Linz\ am\ Rhein",
+"492335", "Wetter\ Ruhr",
+"496449", "Ehringshausen\-Katzenfurt",
+"496272", "Hirschhorn\ Neckar",
+"4939926", "Grabowhöfe",
+"498203", "Grossaitingen",
+"4935435", "Gollmitz\ bei\ Calau",
+"495502", "Dransfeld",
+"495357", "Grasleben",
+"496727", "Gensingen",
+"499167", "Oberscheinfeld",
+"499546", "Burgebrach",
+"4933631", "Bad\ Saarow\-Pieskow",
+"495605", "Kaufungen\ Hessen",
+"497348", "Beimerstetten",
+"49711", "Stuttgart",
+"4934785", "Sandersleben",
+"499842", "Uffenheim",
+"4935826", "Königshain\ bei\ Görlitz",
+"493628", "Arnstadt",
+"499971", "Cham",
+"495806", "Barum\ bei\ Bad\ Bevensen",
+"497634", "Sulzburg",
+"498363", "Pfronten",
+"495608", "Söhrewald",
+"497345", "Langenau\ Württemberg",
+"492173", "Langenfeld\ Rheinland",
+"493522", "Grossenhain\ Sachsen",
+"497736", "Tengen",
+"495907", "Geeste",
+"4934978", "Radegast\ Kreis\ Köthen",
+"499243", "Pottenstein",
+"4934363", "Cavertitz",
+"4937752", "Eibenstock",
+"4933673", "Weichensdorf",
+"498631", "Mühldorf\ am\ Inn",
+"4936648", "Dittersdorf\ bei\ Schleiz",
+"494191", "Kaltenkirchen\ Holstein",
+"496873", "Nonnweiler",
+"492338", "Breckerfeld",
+"498506", "Bad\ Höhenstadt",
+"498802", "Huglfing",
+"493303", "Birkenwerder",
+"494423", "Fedderwarden",
+"4936202", "Neudietendorf",
+"497275", "Kandel",
+"4933478", "Gross\ Neuendorf",
+"494509", "Gross\ Grönau",
+"499373", "Amorbach",
+"492207", "Kürten\-Dürscheid",
+"494606", "Wanderup",
+"495921", "Nordhorn",
+"4936074", "Worbis",
+"494531", "Bad\ Oldesloe",
+"4933765", "Märkisch\ Buchholz",
+"494805", "Schafstedt",
+"4939084", "Lindstedt",
+"497446", "Lossburg",
+"494704", "Drangstedt",
+"4937463", "Bergen\ Vogtland",
+"4939207", "Colbitz",
+"498284", "Ziemetshausen",
+"499099", "Kaisheim",
+"499633", "Mitterteich",
+"497244", "Weingarten\ Baden",
+"4934659", "Blankenheim\ bei\ Sangerhausen",
+"495277", "Höxter\-Fürstenau",
+"496433", "Hadamar",
+"494382", "Wangels",
+"495664", "Morschen",
+"4934342", "Neukieritzsch",
+"4934299", "Gaschwitz",
+"495151", "Hameln",
+"4938355", "Züssow",
+"495766", "Rehburg\-Loccum",
+"498241", "Buchloe",
+"495722", "Bückeburg",
+"496507", "Neumagen\-Dhron",
+"496352", "Kirchheimbolanden",
+"4935723", "Bernsdorf\ OL",
+"4938452", "Lalendorf",
+"4934445", "Stössen",
+"499852", "Feuchtwangen",
+"497905", "Langenburg",
+"4939822", "Kratzeburg",
+"497374", "Uttenweiler",
+"499556", "Geiselwind",
+"495347", "Burgdorf\ bei\ Salzgitter",
+"4936462", "Ossmannstedt",
+"4939957", "Gielow",
+"494768", "Hipstedt",
+"497358", "Eberhardzell\-Füramoos",
+"496861", "Merzig",
+"4937203", "Gersdorf\ bei\ Chemnitz",
+"499659", "Leuchtenberg",
+"498385", "Hergatz",
+"494489", "Apen",
+"492977", "Schmallenberg\-Bödefeld",
+"497420", "Deisslingen",
+"493943", "Wernigerode",
+"4938306", "Samtens",
+"492654", "Polch",
+"496743", "Bacharach",
+"495103", "Wennigsen\ Deister",
+"492678", "Büchel\ bei\ Cochem",
+"49385", "Schwerin",
+"492161", "Mönchengladbach",
+"498388", "Hergensweiler",
+"492681", "Altenkirchen\ Westerwald",
+"499227", "Neuenmarkt",
+"499963", "Konzell",
+"4939972", "Walkendorf",
+"493491", "Lutherstadt\ Wittenberg",
+"4934954", "Roitzsch\ bei\ Bitterfeld",
+"492572", "Emsdetten",
+"492675", "Ediger\-Eller",
+"499772", "Bischofsheim\ an\ der\ Rhön",
+"495934", "Haren\-Rütenbrock",
+"494447", "Vechta\-Langförden",
+"4935872", "Neusalza\-Spremberg",
+"4938482", "Warin",
+"494524", "Scharbeutz\-Pönitz",
+"4934464", "Freyburg\ Unstrut",
+"499253", "Weissenstadt",
+"4939225", "Altengrabow",
+"494864", "Oldenswort",
+"497355", "Hochdorf\ Riss",
+"494765", "Ebersdorf\ bei\ Bremervörde",
+"4933238", "Senzke",
+"494737", "Stadland\-Schwei",
+"497621", "Lörrach",
+"497456", "Haiterbach",
+"49906", "Donauwörth",
+"4939773", "Altwarp",
+"4937364", "Reitzenhain\ Erzgebirge",
+"4936783", "Gehren\ Thüringen",
+"493341", "Strausberg",
+"4933454", "Wölsickendorf\/Wollenberg",
+"495184", "Freden\ Leine",
+"495482", "Tecklenburg",
+"492234", "Frechen",
+"496073", "Babenhausen\ Hessen",
+"4935028", "Krippen",
+"498624", "Obing",
+"4933964", "Fretzdorf",
+"498726", "Schönau\ Niederbayern",
+"498762", "Wartenberg\ Oberbayern",
+"499201", "Gesees",
+"494284", "Selsingen",
+"498805", "Hohenpeissenberg",
+"498704", "Altdorf\-Pfettrach",
+"498531", "Pocking",
+"497739", "Hilzingen",
+"4937434", "Bobenneukirchen",
+"496254", "Lautertal\ Odenwald",
+"493622", "Waltershausen\ Thüringen",
+"499848", "Simmershofen",
+"493525", "Riesa",
+"498509", "Ruderting",
+"498064", "Au\ bei\ Bad\ Aibling",
+"497534", "Reichenau\ Baden",
+"493764", "Meerane",
+"493865", "Holthusen",
+"495508", "Gleichen\-Rittmarshausen",
+"494802", "Wrohm",
+"498423", "Titting",
+"498191", "Landsberg\ am\ Lech",
+"496348", "Offenbach\ an\ der\ Queich",
+"499280", "Selbitz\ Oberfranken",
+"49611", "Wiesbaden",
+"494506", "Stockelsdorf\-Krumbeck",
+"494631", "Glücksburg\ Ostsee",
+"497727", "Vöhrenbach",
+"494609", "Eggebek",
+"499074", "Höchstädt\ an\ der\ Donau",
+"498457", "Vohburg\ an\ der\ Donau",
+"497194", "Spiegelberg",
+"497449", "Baiersbronn\-Obertal",
+"497272", "Rülzheim",
+"49281", "Wesel",
+"497753", "Albbruck",
+"4935202", "Klingenberg\ Sachsen",
+"494363", "Lensahn",
+"496396", "Hinterweidenthal",
+"4936332", "Ellrich",
+"492401", "Baesweiler",
+"494740", "Loxstedt\-Dedesdorf",
+"498783", "Rohr\ in\ Niederbayern",
+"499132", "Herzogenaurach",
+"499434", "Bodenwöhr",
+"494203", "Weyhe\ bei\ Bremen",
+"496736", "Bechenheim",
+"496345", "Albersweiler",
+"496634", "Gemünden\ Felda",
+"495831", "Wittingen",
+"499845", "Oberdachstetten",
+"499744", "Zeitlofs\-Detter",
+"494177", "Drage\ Elbe",
+"496446", "Hohenahr",
+"493528", "Radeberg",
+"495602", "Hessisch\ Lichtenau",
+"499646", "Freihung",
+"495505", "Hardegsen",
+"493868", "Rastow",
+"494961", "Papenburg",
+"4938307", "Poseritz",
+"4937200", "Wittgensdorf\ bei\ Chemnitz",
+"492453", "Heinsberg\-Randerath",
+"496281", "Buchen\ Odenwald",
+"499549", "Lisberg",
+"498808", "Pähl",
+"492332", "Gevelsberg",
+"495024", "Rohrsen\ Kreis\ Nienburg\ Weser",
+"496275", "Rothenberg\ Odenwald",
+"4939956", "Neukalen",
+"494251", "Hoya",
+"492427", "Nideggen",
+"4933604", "Lebus",
+"494340", "Achterwehr",
+"497072", "Gomaringen",
+"496694", "Neukirchen\ Knüll",
+"499149", "Weissenburg\-Suffersheim",
+"499192", "Gräfenberg",
+"499274", "Hollfeld",
+"4936848", "Wernshausen",
+"497903", "Mainhardt",
+"4936029", "Menteroda",
+"493996", "Teterow",
+"4938724", "Siggelkow",
+"496745", "Gondershausen",
+"496844", "Blieskastel\-Altheim",
+"493586", "Neugersdorf\ Sachsen",
+"49761", "Freiburg\ im\ Breisgau",
+"499080", "Harburg\ Schwaben",
+"495105", "Barsinghausen",
+"4933873", "Grosswudicke",
+"498383", "Grünenbach\ Allgäu",
+"496336", "Dellfeld",
+"496467", "Hatzfeld\ Eder",
+"4934639", "Wallendorf\ Luppe",
+"496435", "Wallmerod",
+"492392", "Werdohl",
+"4933200", "Bergholz\-Rehbrücke",
+"497951", "Crailsheim",
+"499836", "Gunzenhausen\-Cronheim",
+"499344", "Gerchsheim",
+"499532", "Maroldsweisach",
+"4939243", "Nedlitz\ bei\ Zerbst",
+"499635", "Bärnau",
+"495641", "Warburg",
+"496054", "Birstein",
+"4936733", "Kaulsdorf",
+"492732", "Kreuztal",
+"4939751", "Penkun",
+"4937604", "Mosel",
+"497261", "Sinsheim",
+"496078", "Gross\-Umstadt",
+"4939402", "Völpke",
+"498677", "Burghausen\ Salzach",
+"4933434", "Herzfelde\ bei\ Strausberg",
+"492387", "Drensteinfurt\-Walstedde",
+"495224", "Enger\ Westfalen",
+"498304", "Wildpoldsried",
+"4936605", "Bad\ Köstritz",
+"496081", "Usingen",
+"49651", "Trier",
+"494106", "Quickborn\ Kreis\ Pinneberg",
+"497742", "Klettgau",
+"496438", "Hünfelden",
+"498591", "Obernzell",
+"4939386", "Seehausen\ Altmark",
+"499937", "Oberpöring",
+"493364", "Eisenhüttenstadt",
+"4934423", "Heuckewalde",
+"499638", "Neualbenreuth",
+"4936376", "Straussfurt",
+"497134", "Weinsberg",
+"497432", "Albstadt\-Tailfingen",
+"494841", "Husum\ Nordsee",
+"4935266", "Heyda\ bei\ Riesa",
+"494972", "Langeoog",
+"492673", "Ellenz\-Poltersdorf",
+"495108", "Gehrden\ Han",
+"497327", "Dischingen",
+"4937323", "Lichtenberg\ Erzgebirge",
+"499187", "Altdorf\ bei\ Nürnberg",
+"4933831", "Weseram",
+"493647", "Pössneck",
+"499965", "Sankt\ Englmar",
+"4938226", "Dierhagen\ Ostseebad",
+"498131", "Dachau",
+"499929", "Ruhmannsfelden",
+"494763", "Gnarrenburg",
+"4933923", "Flecken\ Zechlin",
+"497353", "Schwendi",
+"499255", "Marktleugast",
+"492924", "Möhnesee",
+"499120", "Leinburg",
+"4939387", "Havelberg",
+"498851", "Kochel\ am\ See",
+"4936377", "Rastenberg",
+"4938841", "Neuhaus\ Elbe",
+"494208", "Grasberg",
+"494329", "Langwedel\ Holstein",
+"495584", "Hattorf\ am\ Harz",
+"493431", "Döbeln",
+"497854", "Kehl\-Goldscheuer",
+"498469", "Freystadt\-Burggriesbach",
+"494365", "Heringsdorf\ Holstein",
+"497755", "Weilheim\ Kreis\ Waldshut",
+"499372", "Klingenberg\ am\ Main",
+"495468", "Bramsche\-Engter",
+"496872", "Losheim\ am\ See",
+"493741", "Plauen",
+"498041", "Bad\ Tölz",
+"494466", "Wittmund\-Ardorf",
+"4933920", "Walsleben\ bei\ Neuruppin",
+"494337", "Jevenstedt",
+"494422", "Sande\ Kreis\ Friesl",
+"494124", "Glückstadt",
+"4933364", "Gross\ Ziethen\ Kreis\ Barnim",
+"498803", "Peissenberg",
+"493302", "Hennigsdorf",
+"492294", "Morsbach\ Sieg",
+"498326", "Fischen\ im\ Allgäu",
+"492474", "Nideggen\-Schmidt",
+"4939349", "Parey\ Elbe",
+"4939292", "Biederitz",
+"493863", "Crivitz",
+"498362", "Füssen",
+"4936944", "Rentwertshausen",
+"4935267", "Diesbar\-Seusslitz",
+"497044", "Mönsheim",
+"495206", "Bielefeld\-Jöllenbeck",
+"4937320", "Mulda\ Sachsen",
+"4938227", "Lüdershagen\ bei\ Barth",
+"499242", "Gössweinstein",
+"493523", "Coswig\ bei\ Dresden",
+"492455", "Waldfeucht",
+"492561", "Ahaus",
+"495503", "Nörten\-Hardenberg",
+"4936965", "Stadtlengsfeld",
+"4933870", "Zollchow\ bei\ Rathenow",
+"499843", "Burgbernheim",
+"4933479", "Küstrin\-Kietz",
+"492821", "Kleve\ Niederrhein",
+"494944", "Wiesmoor",
+"495437", "Menslage",
+"495366", "Jembke",
+"499156", "Neuhaus\ an\ der\ Pegnitz",
+"496752", "Kirn\ Nahe",
+"495322", "Bad\ Harzburg",
+"499761", "Bad\ Königshofen\ im\ Grabfeld",
+"498202", "Althegnenberg",
+"4934384", "Grossbothen",
+"497774", "Eigeltingen",
+"4934743", "Ermsleben",
+"4934691", "Könnern",
+"496107", "Kelsterbach",
+"4935322", "Doberlug\-Kirchhain",
+"497676", "Feldberg\ Schwarzwald",
+"4939001", "Apenburg",
+"495465", "Neuenkirchen\ bei\ Bramsche",
+"495551", "Northeim",
+"4936730", "Sitzendorf",
+"4934979", "Wulfen\ Sachsen\-Anhalt",
+"498771", "Ergoldsbach",
+"496343", "Bad\ Bergzabern",
+"497579", "Schwenningen\ Baden",
+"4936649", "Gefell\ bei\ Schleiz",
+"495429", "Melle\-Wellingholzhausen",
+"4933203", "Kleinmachnow",
+"498785", "Rottenburg\-Oberroning",
+"494205", "Ottersberg",
+"497336", "Lonsee",
+"497467", "Neuhausen\ ob\ Eck",
+"49941", "Regensburg",
+"49661", "Fulda",
+"497745", "Jestetten",
+"497844", "Rheinau",
+"494131", "Lüneburg",
+"494109", "Tangstedt\ Bz\ Hamburg",
+"4935771", "Bad\ Muskau",
+"4935605", "Komptendorf",
+"4938205", "Tessin\ bei\ Rostock",
+"498841", "Murnau\ am\ Staffelsee",
+"492738", "Netphen",
+"495483", "Lienen",
+"499252", "Helmbrechts",
+"499773", "Unsleben",
+"499198", "Heiligenstadt\ in\ Oberfranken",
+"496261", "Mosbach\ Baden",
+"497054", "Wildberg\ Württemberg",
+"498106", "Vaterstetten",
+"4934901", "Rosslau\ Elbe",
+"492448", "Hellenthal\-Rescheid",
+"4934658", "Hayn\ Harz",
+"499962", "Schwarzach\ Niederbayern",
+"499926", "Frauenau",
+"4934298", "Taucha\ bei\ Leipzig",
+"497435", "Albstadt\-Laufen",
+"492573", "Nordwalde",
+"4936626", "Auma",
+"498051", "Prien\ am\ Chiemsee",
+"494975", "Westerholt\ Ostfriesland",
+"4938784", "Kleinow\ Kreis\ Prignitz",
+"4934600", "Ostrau\ Saalkreis",
+"498084", "Taufkirchen\ Vils",
+"499827", "Lichtenau\ Mittelfranken",
+"496301", "Otterbach\ Pfalz",
+"4935932", "Guttau",
+"4933239", "Gross\ Behnitz",
+"4936764", "Neuhaus\-Schierschnitz",
+"4937383", "Lunzenau",
+"499146", "Markt\ Berolzheim",
+"495404", "Westerkappeln",
+"495102", "Laatzen",
+"494954", "Moormerland",
+"499567", "Sesslach\-Gemünda",
+"4938754", "Leussow\ bei\ Ludwigslust",
+"49751", "Ravensburg",
+"493871", "Parchim",
+"496742", "Boppard",
+"493686", "Eisfeld",
+"499853", "Wilburgstetten",
+"497081", "Bad\ Wildbad",
+"499195", "Adelsdorf\ Mittelfranken",
+"4933983", "Gross\ Pankow\ Kreis\ Prignitz",
+"494264", "Sottrum\ Kreis\ Rotenburg",
+"496594", "Birresborn",
+"496339", "Grosssteinhausen",
+"4939832", "Wesenberg",
+"492445", "Schleiden\ Eifel",
+"494383", "Grebin",
+"495723", "Bad\ Nenndorf",
+"496353", "Freinsheim",
+"492834", "Straelen",
+"492735", "Neunkirchen\ Siegerl",
+"4939721", "Liepen\ bei\ Anklam",
+"499632", "Waldsassen",
+"499260", "Wilhelmsthal\ Oberfranken",
+"495541", "Hann\.\ Münden",
+"499535", "Pfarrweisach",
+"495976", "Salzbergen",
+"496327", "Neustadt\-Lachen",
+"498340", "Baisweil",
+"496134", "Mainz\-Kastel",
+"496432", "Diez",
+"492395", "Finnentrop\-Rönkhausen",
+"497748", "Grafenhausen\ Hochschwarzwald",
+"4935455", "Walddrehna",
+"498205", "Dasing",
+"494884", "Schwabstedt",
+"4936425", "Isserstedt",
+"49591", "Lingen\ \(Ems\)",
+"496854", "Oberthal\ Saar",
+"496755", "Odernheim\ am\ Glan",
+"495325", "Goslar\-Hahnenklee",
+"494771", "Hemmoor",
+"492333", "Ennepetal",
+"492154", "Willich",
+"492452", "Heinsberg\ Rheinland",
+"498368", "Halblech",
+"492661", "Bad\ Marienberg\ Westerwald",
+"4934603", "Nauendorf\ Sachsen\-Anhalt",
+"495603", "Gudensberg",
+"4939034", "Fleetmark",
+"4934221", "Schildau\ Gneisenaustadt",
+"494202", "Achim\ bei\ Bremen",
+"499133", "Baiersdorf\ Mittelfrankenanken",
+"4938392", "Sassnitz",
+"498782", "Pfeffenhausen",
+"4939327", "Klietz",
+"496044", "Schotten\ Hessen",
+"495462", "Ankum",
+"495164", "Hodenhagen",
+"499354", "Rieneck",
+"497576", "Krauchenwies",
+"499378", "Eichenbühl\-Riedern",
+"495651", "Eschwege",
+"495426", "Glandorf",
+"492359", "Kierspe",
+"49221", "Cologne",
+"497941", "Öhringen",
+"497121", "Reutlingen",
+"499375", "Freudenberg\ Baden",
+"495684", "Frielendorf",
+"499904", "Lalling",
+"494362", "Heiligenhafen",
+"499381", "Volkach",
+"494326", "Wankendorf",
+"4934324", "Ostrau\ Sachsen",
+"497273", "Hagenbach\ Pfalz",
+"498124", "Forstern\ Oberbayern",
+"498422", "Dollnstein",
+"494803", "Pahlen",
+"498466", "Denkendorf\ Oberbayern",
+"498337", "Altenstadt\ Iller",
+"4933333", "Tantow",
+"492931", "Arnsberg",
+"499245", "Obertrubach",
+"495231", "Detmold",
+"492181", "Grevenbroich",
+"493623", "Friedrichroda",
+"498365", "Wertach",
+"494469", "Wangerooge",
+"497343", "Buch\ bei\ Illertissen",
+"4933394", "Blumberg\ Kreis\ Barnim",
+"492175", "Leichlingen\ Rheinland",
+"498208", "Eurasburg\ bei\ Augsburg",
+"494425", "Wangerland\-Hooksiel",
+"4938875", "Schlagsdorf\ bei\ Gadebusch",
+"4939262", "Güsten\ Anh",
+"496676", "Hohenroda\ Hessen",
+"496881", "Lebach",
+"495209", "Gütersloh\-Friedrichsdorf",
+"495328", "Altenau\ Harz",
+"496758", "Waldböckelheim",
+"494851", "Marne",
+"496875", "Nonnweiler\-Primstal",
+"496774", "Kaub",
+"4936459", "Blankenhain\ Thüringen",
+"497130", "Löwenstein\ Württemberg",
+"496062", "Erbach\ Odenwald",
+"4935820", "Zodel",
+"496026", "Grossostheim",
+"4933768", "Prieros",
+"495553", "Kalefeld",
+"492405", "Würselen",
+"496341", "Landau\ in\ der\ Pfalz",
+"498773", "Neufahrn\ in\ Niederbayern",
+"4933475", "Letschin",
+"498252", "Schrobenhausen",
+"494638", "Tarp",
+"497477", "Jungingen\ bei\ Hechingen",
+"499106", "Markt\ Erlbach",
+"495199", "Schneverdingen\-Heber",
+"495444", "Wagenfeld",
+"495142", "Eschede",
+"4936969", "Merkers",
+"495527", "Duderstadt",
+"4939364", "Dolle",
+"4933652", "Neuzelle",
+"493902", "Diesdorf\ Altm",
+"494187", "Holm\-Seppensen",
+"4935756", "Hosena",
+"495636", "Lichtenfels\-Goddelsheim",
+"4938391", "Altenkirchen\ Rügen",
+"4934222", "Arzberg\ bei\ Torgau",
+"494965", "Surwold",
+"492563", "Stadtlohn",
+"495835", "Wahrenholz",
+"499841", "Bad\ Windsheim",
+"499972", "Waldmünchen",
+"495734", "Bergkirchen\ Westfalen",
+"496157", "Pfungstadt",
+"492823", "Goch",
+"4936645", "Mühltroff",
+"497708", "Geisingen\-Leipferdingen",
+"49841", "Ingolstadt\ Donau",
+"4938796", "Viesecke",
+"498538", "Pocking\-Hartkirchen",
+"496271", "Eberbach\ Baden",
+"492306", "Lünen",
+"4934975", "Görzig\ Kreis\ Köthen",
+"494255", "Martfeld",
+"496285", "Walldürn\-Altheim",
+"499763", "Sulzdorf\ an\ der\ Lederhecke",
+"496123", "Eltville\ am\ Rhein",
+"492857", "Rees\-Mehr",
+"494929", "Ihlow\ Kreis\ Aurich",
+"494192", "Bad\ Bramstedt",
+"494494", "Bösel\ Oldenburg",
+"494149", "Fredenbeck",
+"498535", "Haarbach",
+"494274", "Varrel\ bei\ Sulingen",
+"4935694", "Gosda\ bei\ Klinge",
+"494258", "Schwarme",
+"498043", "Jachenau",
+"499340", "Königheim\-Brehmen",
+"492777", "Breitscheid\ Hessen",
+"4939203", "Barleben",
+"4937467", "Klingenthal\ Sachsen",
+"498801", "Seeshaupt",
+"4938294", "Neubukow",
+"496050", "Biebergemünd",
+"493861", "Plate",
+"494968", "Neulehe",
+"492266", "Lindlar",
+"494667", "Dagebüll",
+"495838", "Gross\ Oesingen",
+"493521", "Meissen",
+"497705", "Wolterdingen\ Schwarzw",
+"492222", "Bornheim\ Rheinland",
+"497804", "Oppenau",
+"494344", "Schönberg\ Holstein",
+"498195", "Weil\ Kreis\ Landsberg\ am\ Lech",
+"494532", "Bargteheide",
+"495966", "Meppen\-Apeldorn",
+"494635", "Sörup",
+"495922", "Bad\ Bentheim",
+"4938374", "Lassan\ bei\ Wolgast",
+"499270", "Creussen",
+"494836", "Hennstedt\ Dithmarschen",
+"4939345", "Parchen",
+"493433", "Borna\ Stadt",
+"499084", "Bissingen\ Schwaben",
+"4938233", "Prerow\ Ostseebad",
+"4933677", "Glienicke\ bei\ Beeskow",
+"498146", "Moorenweis",
+"492408", "Aachen\-Kornelimünster",
+"498378", "Buchenberg\ bei\ Kempten",
+"494843", "Viöl",
+"492671", "Cochem",
+"492582", "Everswinkel",
+"495379", "Sassenburg\-Grussendorf",
+"492685", "Flammersfeld",
+"498133", "Haimhausen\ Oberbayern",
+"4935772", "Rietschen",
+"492992", "Marsberg",
+"497351", "Biberach\ an\ der\ Riss",
+"4939200", "Gommern",
+"496868", "Mettlach\-Tünsdorf",
+"496186", "Grosskrotzenburg",
+"494761", "Bremervörde",
+"499944", "Miltach",
+"494156", "Talkau",
+"498248", "Lamerdingen",
+"497826", "Schuttertal",
+"493634", "Sömmerda",
+"495472", "Bad\ Essen",
+"495174", "Lahstedt",
+"497566", "Argenbühl",
+"497625", "Zell\ im\ Wiesental",
+"495292", "Lichtenau\-Atteln",
+"498036", "Stephanskirchen\ Simssee",
+"497147", "Sachsenheim\ Württemberg",
+"497522", "Wangen\ im\ Allgäu",
+"496083", "Weilrod",
+"4933676", "Friedland\ bei\ Beeskow",
+"495158", "Hemeringen",
+"498593", "Untergriesbach",
+"497669", "St\ Märgen",
+"4938328", "Miltzow",
+"499205", "Vorbach",
+"497303", "Illertissen",
+"4935973", "Stolpen",
+"4935931", "Königswartha",
+"499208", "Bindlach",
+"4939923", "Priborn",
+"497953", "Blaufelden",
+"492137", "Neuss\-Norf",
+"494120", "Ellerhoop",
+"495032", "Neustadt\ am\ Rübenberge",
+"498296", "Villenbach",
+"492324", "Hattingen\ Ruhr",
+"495643", "Borgentreich",
+"4935055", "Höckendorf\ bei\ Dippoldiswalde",
+"498245", "Türkheim\ Wertach",
+"494372", "Westfehmarn",
+"497263", "Waibstadt",
+"4936025", "Körner",
+"496837", "Wallerfangen",
+"497628", "Efringen\-Kirchen",
+"4939831", "Feldberg",
+"495155", "Emmerthal",
+"4935823", "Ostritz",
+"499365", "Rimpar",
+"499466", "Stamsried",
+"499337", "Gaukönigshofen",
+"499422", "Bogen\ Niederbayern",
+"496764", "Rheinböllen",
+"4938797", "Karstädt\ Kreis\ Prignitz",
+"496865", "Mettlach\-Orscholz",
+"493964", "Bredenfelde\ bei\ Strasburg",
+"492597", "Senden\ Westfalen",
+"496622", "Bebra",
+"497384", "Schelklingen\-Hütten",
+"4939722", "Sarnow\ bei\ Anklam",
+"496666", "Freiensteinau",
+"496525", "Irrel",
+"492129", "Haan\ Rheinland",
+"497939", "Schrozberg\-Spielbach",
+"494242", "Syke",
+"494479", "Molbergen\-Peheim",
+"498375", "Weitnau",
+"496569", "Bickendorf",
+"492165", "Jüchen",
+"498381", "Lindenberg\ im\ Allgäu",
+"4934635", "Bad\ Lauchstädt",
+"496004", "Lich\-Eberstadt",
+"492688", "Kroppach",
+"497702", "Blumberg\ Baden",
+"492225", "Meckenheim\ Rheinland",
+"494146", "Stade\-Bützfleth",
+"499954", "Simbach\ Niederbayern",
+"4939776", "Hintersee",
+"499978", "Schönthal\ Oberpfalz",
+"496297", "Ravenstein\ Baden",
+"495233", "Steinheim\ Westfalen",
+"492183", "Rommerskirchen",
+"493621", "Gotha\ Thüringen",
+"496477", "Greifenstein\-Nenderoth",
+"4936254", "Friedrichswerth",
+"499677", "Oberviechtach\-Pullenried",
+"494827", "Wacken",
+"4938842", "Lüttenmark",
+"499264", "Küps",
+"494853", "Sankt\ Michaelisdonn",
+"498635", "Pleiskirchen",
+"492269", "Kierspe\-Rönsahl",
+"49203", "Duisburg",
+"497026", "Lenningen",
+"498344", "Westendorf\ bei\ Kaufbeuren",
+"494195", "Hartenholm",
+"4936694", "Schkölen\ Thüringen",
+"496130", "Schwabenheim\ an\ der\ Selz",
+"498532", "Griesbach\ im\ Rottal",
+"497062", "Beilstein\ Württemberg",
+"497123", "Metzingen\ Württemberg",
+"498667", "Seeon\-Seebruck",
+"4933093", "Fürstenberg\ Havel",
+"494950", "Holtland",
+"496068", "Beerfelden",
+"494839", "Wöhrden\ Dithmarschen",
+"499383", "Wiesentheid",
+"497271", "Wörth\ am\ Rhein",
+"4939291", "Calbe\ Saale",
+"497157", "Waldenbuch",
+"495259", "Bad\ Driburg\-Neuenheerse",
+"496708", "Bad\ Münster\ am\ Stein\-Ebernburg",
+"495148", "Steinhorst\ Niedersachsen",
+"49531", "Braunschweig",
+"494632", "Steinbergkirche",
+"498258", "Sielenbach",
+"495925", "Wietmarschen",
+"494260", "Visselhövede\-Wittorf",
+"498192", "Schondorf\ am\ Ammersee",
+"498274", "Buttenwiesen",
+"494535", "Nahe",
+"492933", "Sundern\ Sauerland",
+"496804", "Mandelbachtal",
+"4933844", "Brück\ Brandenburg",
+"499131", "Erlangen",
+"495145", "Beedenbostel",
+"496029", "Mömbris",
+"49441", "Oldenburg",
+"4937206", "Frankenberg\ Sachsen",
+"492104", "Mettmann",
+"492402", "Stolberg\ Rheinland",
+"4936705", "Oberweissbach\ Thüringer\ Wald",
+"495653", "Sontra",
+"4938303", "Sellin\ Ostseebad",
+"495196", "Wietzendorf",
+"497943", "Schöntal\ Jagst",
+"4939394", "Hohenberg\-Krusemark",
+"4934692", "Alsleben\ Saale",
+"496282", "Walldürn",
+"4939002", "Oebisfelde",
+"494252", "Bruchhausen\-Vilsen",
+"498638", "Waldkraiburg",
+"492331", "Hagen\ Westfalen",
+"494773", "Lamstedt",
+"492309", "Waltrop",
+"492228", "Remagen\-Rolandseck",
+"495832", "Hankensbüttel",
+"499975", "Waldmünchen\-Geigant",
+"494962", "Papenburg\-Aschendorf",
+"495536", "Holzminden\-Neuhaus",
+"494926", "Krummhörn\-Greetsiel",
+"495601", "Schauenburg",
+"4935726", "Gross\ Särchen",
+"492663", "Westerburg\ Westerwald",
+"495454", "Hörstel\-Riesenbeck",
+"495152", "Hessisch\ Oldendorf",
+"497528", "Neukirch\ bei\ Tettnang",
+"494381", "Lütjenburg",
+"499326", "Markt\ Einersheim",
+"4938300", "Insel\ Hiddensee",
+"4937207", "Hainichen\ Sachsen",
+"495721", "Stadthagen",
+"496351", "Eisenberg\ Pfalz",
+"4935025", "Liebstadt",
+"495035", "Gross\ Munzel",
+"495543", "Staufenberg\ Niedersachsen",
+"499803", "Colmberg",
+"4939953", "Schwinkendorf",
+"4933235", "Friesack",
+"499469", "Roding\-Neubäu",
+"496303", "Enkenbach\-Alsenborn",
+"492588", "Harsewinkel\-Greffen",
+"4935727", "Burghammer",
+"492464", "Aldenhoven\ bei\ Jülich",
+"492162", "Viersen",
+"496669", "Neuhof\-Hauswurz",
+"494245", "Neuenkirchen\ bei\ Bassum",
+"498372", "Obergünzburg",
+"495067", "Bockenem",
+"496522", "Mettendorf",
+"497083", "Bad\ Herrenalb",
+"497936", "Schrozberg\-Bartenstein",
+"492697", "Blankenheim\-Ahrhütte",
+"495707", "Petershagen\ Weser",
+"494296", "Schwanewede\-Aschwarden",
+"499851", "Dinkelsbühl",
+"496566", "Körperich",
+"496625", "Niederaula",
+"4934774", "Röblingen\ am\ See",
+"496147", "Trebur",
+"4939752", "Blumenhagen\ bei\ Strasburg",
+"4939401", "Neuwegersleben",
+"496826", "Bexbach",
+"499771", "Bad\ Neustadt\ an\ der\ Saale",
+"497837", "Oberharmersbach",
+"496628", "Oberaula",
+"4938209", "Sanitz\ bei\ Rostock",
+"495376", "Wesendorf\ Kreis\ Gifhorn",
+"493727", "Mittweida",
+"496263", "Neckargerach",
+"499428", "Kirchroth",
+"49214", "Leverkusen",
+"4935609", "Drachhausen",
+"498027", "Dietramszell",
+"492682", "Hamm\ Sieg",
+"4939777", "Borkenfriede",
+"499350", "Eussenheim\-Hundsbach",
+"492585", "Warendorf\-Hoetmar",
+"494159", "Basthorst",
+"498053", "Bad\ Endorf",
+"494248", "Bassum\-Neubruchhausen",
+"492571", "Greven\ Westfalen",
+"495246", "Verl",
+"497569", "Isny\-Eisenbach",
+"498761", "Moosburg\ an\ der\ Isar",
+"4937348", "Oberwiesenthal\ Kurort",
+"498039", "Rott\ am\ Inn",
+"499202", "Waischenfeld",
+"494133", "Wittorf\ Kreis\ Lüneburg",
+"4933832", "Rogäsen",
+"497666", "Denzlingen",
+"497525", "Aulendorf",
+"495475", "Bohmte\-Hunteburg",
+"495295", "Lichtenau\ Westfalen",
+"497622", "Schopfheim",
+"496384", "Konken",
+"4936085", "Reinholterode",
+"497764", "Herrischried",
+"492150", "Meerbusch\-Lank",
+"494354", "Fleckeby",
+"493342", "Neuenhagen\ bei\ Berlin",
+"495481", "Lengerich\ Westfalen",
+"495957", "Lindern\ Oldenburg",
+"494407", "Wardenburg",
+"4936653", "Lehesten\ Thüringer\ Wald",
+"4935263", "Gröditz\ bei\ Riesa",
+"493327", "Werder\ Havel",
+"495776", "Preussisch\ Ströhen",
+"499385", "Kolitzheim",
+"497948", "Öhringen\-Ohrnberg",
+"4937326", "Frauenstein\ Sachsen",
+"497125", "Bad\ Urach",
+"495674", "Grebenstein",
+"495658", "Wehretal",
+"4938223", "Saal\ Vorpom",
+"499371", "Miltenberg",
+"495923", "Schüttorf",
+"492935", "Sundern\-Hachen",
+"494533", "Reinfeld\ Holstein",
+"4933926", "Herzberg\ Mark",
+"498556", "Haidmühle",
+"498361", "Nesselwang",
+"494559", "Wensin",
+"495820", "Suhlendorf",
+"493594", "Bischofswerda",
+"492171", "Leverkusen\-Opladen",
+"4936458", "Bad\ Berka",
+"492223", "Königswinter",
+"496589", "Kell\ am\ See",
+"4933769", "Töpchin",
+"499241", "Pegnitz",
+"495235", "Blomberg\ Lippe",
+"494754", "Bülkau",
+"498042", "Lenggries",
+"498633", "Tüssling",
+"494855", "Eddelak",
+"4939383", "Sandau\ Elbe",
+"497364", "Oberkochen",
+"496871", "Wadern",
+"4939744", "Rothenklempenow",
+"494193", "Henstedt\-Ulzburg",
+"494778", "Wingst",
+"4934426", "Kayna",
+"494421", "Wilhelmshaven",
+"4936968", "Rossdorf\ Rhön",
+"4933054", "Liebenwalde",
+"4935201", "Langebrück",
+"493301", "Oranienburg",
+"492257", "Reckerscheid",
+"496784", "Weierbach",
+"493984", "Prenzlau",
+"4936373", "Buttstädt",
+"498860", "Bernbeuren",
+"494858", "Sankt\ Margarethen\ Holstein",
+"496751", "Bad\ Sobernheim",
+"495321", "Goslar",
+"4936331", "Ilfeld",
+"494775", "Grossenwörden",
+"494874", "Todenbüttel",
+"499624", "Ensdorf\ Oberpfalz",
+"4933084", "Gutengermendorf",
+"499762", "Saal\ an\ der\ Saale",
+"496424", "Ebsdorfergrund",
+"496122", "Hofheim\-Wallau",
+"4939246", "Lindau\ Anh",
+"496888", "Lebach\-Steinbach",
+"4933207", "Gross\ Kreutz",
+"496166", "Fischbachtal",
+"499726", "Euerbach",
+"4936736", "Arnsgereuth",
+"492562", "Gronau\ Westfalen",
+"492526", "Sendenhorst",
+"498239", "Langenneufnach",
+"497204", "Malsch\-Völkersbach",
+"492822", "Emmerich",
+"495238", "Nieheim\-Himmighausen",
+"499973", "Furth\ im\ Wald",
+"492866", "Dorsten\-Rhade",
+"498253", "Pöttmes",
+"498772", "Mallersdorf\-Pfaffenberg",
+"492938", "Ense",
+"494236", "Kirchlinteln",
+"492637", "Weissenthurm",
+"496703", "Wöllstein\ Rheinhessen",
+"495143", "Winsen\ Aller",
+"497586", "Herbertingen",
+"49361", "Erfurt",
+"4935439", "Zinnitz",
+"496063", "Bad\ König",
+"497945", "Wüstenrot",
+"4933876", "Buschow",
+"497128", "Sonnenbühl",
+"495552", "Katlenburg",
+"495307", "Braunschweig\-Wenden",
+"495655", "Wanfried",
+"495136", "Burgdorf\ Kreis\ Hannover",
+"498074", "Schnaitsee",
+"4934746", "Giersleben",
+"494243", "Twistringen",
+"4939424", "Schwanebeck\ Sachsen\-Anhalt",
+"4939994", "Metschow",
+"4936737", "Drognitz",
+"493774", "Schwarzenberg",
+"496305", "Hochspeyer",
+"496657", "Hofbieber",
+"493881", "Grevesmühlen",
+"4938854", "Redefin",
+"497071", "Tübingen",
+"496268", "Hüffenhardt",
+"499423", "Geiselhöring",
+"4934341", "Geithain",
+"492441", "Kall",
+"497085", "Enzklösterle",
+"4933206", "Fichtenwalde",
+"4935894", "Hähnichen",
+"499191", "Forchheim\ Oberfranken",
+"4939247", "Güterglück",
+"496623", "Rotenburg\ an\ der\ Fulda",
+"4933877", "Nitzahn",
+"497262", "Eppingen",
+"497226", "Bühl\-Sand",
+"4938451", "Hoppenrade\ bei\ Güstrow",
+"492504", "Telgte",
+"4939821", "Carpin",
+"4936461", "Bad\ Sulza",
+"495849", "Waddeweitz",
+"4936608", "Seelingstädt\ bei\ Gera",
+"499805", "Burgoberbach",
+"4939933", "Vollrathsruhe",
+"497952", "Gerabronn",
+"499704", "Euerdorf",
+"494138", "Betzendorf\ Kreis\ Lüneburg",
+"492391", "Plettenberg",
+"496406", "Lollar",
+"495642", "Warburg\-Scherfede",
+"499606", "Pfreimd",
+"495033", "Wunstorf\-Grossenheidorn",
+"495545", "Hedemünden",
+"499531", "Ebern",
+"4933927", "Linum",
+"49209", "Gelsenkirchen",
+"497741", "Tiengen\ Hochrhein",
+"498592", "Wegscheid\ Niederbayern",
+"498549", "Vilshofen\-Pleinting",
+"496190", "Hattersheim\ am\ Main",
+"494135", "Kirchgellersen",
+"497302", "Pfaffenhofen\ an\ der\ Roth",
+"497557", "Herdwangen\-Schönach",
+"4939971", "Gnoien",
+"4937327", "Rechenberg\-Bienenmühle",
+"4938220", "Wustrow\ Ostseebad",
+"498845", "Bad\ Kohlgrub",
+"4938481", "Witzin",
+"498744", "Gerzen",
+"496082", "Niederreifenberg",
+"495473", "Ostercappeln",
+"495293", "Paderborn\-Dahl",
+"496237", "Maxdorf",
+"4936370", "Grossenehrich",
+"496265", "Billigheim\ Baden",
+"492993", "Marsberg\-Canstein",
+"4933704", "Baruth\ Mark",
+"498434", "Rennertshofen",
+"497250", "Kraichtal",
+"494842", "Nordstrand",
+"497431", "Albstadt\-Ebingen",
+"498055", "Halfing",
+"4936845", "Gehlberg",
+"494971", "Esens",
+"496308", "Olsbrücken",
+"496229", "Neckarsteinach",
+"494167", "Apensen",
+"494546", "Mustin\ Lauenburg",
+"4934244", "Mockrehna",
+"4935474", "Schönwalde\ bei\ Lübben",
+"49571", "Minden\ Westfalen",
+"492583", "Sassenberg",
+"495833", "Brome",
+"496897", "Sulzbach\ Saar",
+"492724", "Finnentrop\-Serkenrode",
+"492825", "Uedem",
+"492662", "Hachenburg",
+"492451", "Geilenkirchen",
+"492565", "Gronau\-Epe",
+"492626", "Selters\ Westferwald",
+"494963", "Dörpen",
+"499729", "Grettstadt",
+"496283", "Hardheim\ Odenwald",
+"492529", "Oelde\-Stromberg",
+"496647", "Herbstein\-Stockhausen",
+"498236", "Fischach",
+"499765", "Trappstadt",
+"494772", "Oberndorf\ Oste",
+"499447", "Essing",
+"4939323", "Schönhausen\ Elbe",
+"499524", "Zeil\ am\ Main",
+"494253", "Asendorf\ Kreis\ Diepholz",
+"495652", "Bad\ Sooden\-Allendorf",
+"492403", "Eschweiler\ Rheinland",
+"495555", "Moringen\-Fredelsloh",
+"495461", "Bramsche\ Hase",
+"499737", "Wartmannsroth",
+"49351", "Dresden",
+"494239", "Dörverden\-Westen",
+"4934607", "Wettin",
+"497942", "Neuenstein\ Württemberg",
+"496364", "Nussbach\ Pfalz",
+"498781", "Rottenburg\ an\ der\ Laaber",
+"495859", "Thomasburg",
+"4933632", "Hangelsberg",
+"4933986", "Falkenhagen\ Kreis\ Prignitz",
+"499397", "Wertheim\-Dertingen",
+"498858", "Kochel\-Walchensee",
+"498421", "Eichstätt\ Bayern",
+"498656", "Anger",
+"496204", "Viernheim",
+"492932", "Neheim\-Hüsten",
+"498193", "Geltendorf",
+"498754", "Volkenschwand",
+"494633", "Satrup",
+"4939604", "Wildberg\ bei\ Altentreptow",
+"495574", "Oberweser",
+"497166", "Adelberg",
+"497122", "St\ Johann\ Württemberg",
+"497424", "Spaichingen",
+"499382", "Gerolzhofen",
+"493435", "Oschatz",
+"494361", "Oldenburg\ in\ Holstein",
+"4936623", "Berga\ Elster",
+"497751", "Waldshut",
+"494556", "Ahrensbök\-Gnissau",
+"4936201", "Walschleben",
+"496128", "Taunusstein",
+"497240", "Pfinztal",
+"497063", "Bad\ Wimpfen",
+"493745", "Falkenstein\ Vogtland",
+"498533", "Rotthalmünster",
+"493844", "Schwaan",
+"496586", "Beuren\ Hochwald",
+"498045", "Lenggries\-Fall",
+"4933337", "Altkünkendorf",
+"494852", "Brunsbüttel",
+"492182", "Grevenbroich\-Kapellen",
+"495232", "Lage\ Lippe",
+"492484", "Mechernich\-Eiserfey",
+"492828", "Emmerich\-Elten",
+"497703", "Bonndorf\ im\ Schwarzwald",
+"4936428", "Stadtroda",
+"498407", "Grossmehring",
+"492568", "Heek",
+"492377", "Wickede\ Ruhr",
+"4939881", "Ringenwalde\ bei\ Templin",
+"497623", "Rheinfelden\ Baden",
+"498167", "Zolling",
+"498546", "Windorf\-Otterskirchen",
+"496085", "Waldsolms",
+"496071", "Dieburg",
+"4936871", "Bad\ Colberg\-Heldburg",
+"497268", "Bad\ Rappenau\-Obergimpern",
+"497657", "Eisenbach\ Hochschwarzwald",
+"497305", "Erbach\ Donau",
+"495648", "Brakel\-Gehrden",
+"497974", "Bühlerzell",
+"494434", "Colnrade",
+"495947", "Laar\ Vechte",
+"494132", "Amelinghausen",
+"499203", "Neudrossenfeld",
+"497958", "Rot\ Am\ See\-Brettheim",
+"498649", "Schleching",
+"492247", "Neunkirchen\-Seelscheid",
+"494646", "Mohrkirch",
+"4936043", "Kirchheilingen",
+"499961", "Mitterfels",
+"492683", "Asbach\ Westerwald",
+"4933731", "Trebbin",
+"493493", "Bitterfeld",
+"494845", "Ostenfeld\ Husum",
+"4939484", "Harzgerode",
+"498052", "Aschau\ im\ Chiemgau",
+"494744", "Loxstedt",
+"499177", "Heideck",
+"499251", "Münchberg",
+"496226", "Meckesheim",
+"4933336", "Passow\ Kreis\ Uckermark",
+"498135", "Sulzemoos",
+"496262", "Aglasterhausen",
+"496630", "Schwalmtal\-Storndorf",
+"495139", "Burgwedel",
+"4939320", "Schinne",
+"497237", "Neulingen\ Enzkreis",
+"496523", "Holsthum",
+"497082", "Neuenbürg\ Württemberg",
+"498138", "Schwabhausen\ bei\ Dachau",
+"4934295", "Krensitz",
+"499284", "Schwarzenbach\ an\ der\ Saale",
+"495056", "Winsen\-Meissendorf",
+"493679", "Neuhaus\ am\ Rennweg",
+"4937292", "Oederan",
+"4937349", "Scheibenberg",
+"4938824", "Mallentin",
+"499070", "Tapfheim",
+"496557", "Hallschlag",
+"493576", "Weisswasser",
+"496302", "Winnweiler",
+"498373", "Altusried",
+"496741", "St\ Goar",
+"494848", "Rantrum",
+"4939454", "Elbingerode\ Harz",
+"493941", "Halberstadt",
+"492163", "Schwalmtal\ Niederrhein",
+"495101", "Pattensen",
+"4935242", "Nossen",
+"495334", "Hornburg\ Kreis\ Wolfenbüttel",
+"495542", "Witzenhausen",
+"4938208", "Kavelstorf",
+"499631", "Tirschenreuth",
+"495645", "Borgentreich\-Borgholz",
+"497308", "Nersingen",
+"497229", "Iffezheim",
+"492066", "Duisburg\-Homberg",
+"495127", "Harsum",
+"496431", "Limburg\ an\ der\ Lahn",
+"4935608", "Gross\ Ossnig",
+"4935951", "Neukirch\ Lausitz",
+"499802", "Ansbach\-Katterbach",
+"497955", "Wallhausen\ Württemberg",
+"495846", "Gartow\ Niedersachsen",
+"4936921", "Wutha\-Farnroda",
+"492604", "Nassau\ Lahn",
+"4939851", "Göritz\ bei\ Prenzlau",
+"495153", "Salzhemmendorf",
+"496409", "Biebertal",
+"499363", "Arnstein\ Unterfranken",
+"495696", "Bad\ Arolsen\-Landau",
+"498243", "Fuchstal",
+"4933972", "Breddin",
+"497265", "Angelbachtal",
+"4934606", "Teicha\ Sachsen\-Anhalt",
+"498687", "Taching\-Tengling",
+"4933977", "Gumtow",
+"4934385", "Mutzschen",
+"495586", "Wieda",
+"4937382", "Geringswalde",
+"499931", "Plattling",
+"495945", "Wilsum",
+"4935933", "Neschwitz",
+"497552", "Pfullendorf",
+"497307", "Senden\ Iller",
+"495128", "Hohenhameln",
+"497655", "Feldberg\-Altglashütten",
+"495882", "Gorleben",
+"4939921", "Ankershagen",
+"492904", "Bestwig",
+"4939833", "Mirow\ Kreis\ Neustrelitz",
+"492381", "Hamm\ Westfalen",
+"4933982", "Hoppenrade\ Kreis\ Prignitz",
+"496087", "Waldems",
+"4933636", "Steinhöfel\ Kreis\ Oder\-Spree",
+"498165", "Neufahrn\ bei\ Freising",
+"496232", "Speyer",
+"497143", "Besigheim",
+"496660", "Steinau\-Marjoss",
+"492375", "Balve",
+"498324", "Hindelang",
+"492296", "Reichshof\-Brüchermühle",
+"4935247", "Zehren\ Sachsen",
+"498137", "Petershausen",
+"497046", "Zaberfeld",
+"4936964", "Dermbach\ Rhön",
+"495204", "Steinhagen\ Westfalen",
+"4939748", "Viereck",
+"497321", "Heidenheim\ an\ der\ Brenz",
+"4938464", "Bernitt",
+"499175", "Spalt",
+"4937297", "Thum\ Sachsen",
+"494847", "Oster\-Ohrstedt",
+"496558", "Büdesheim\ Eifel",
+"494162", "Jork",
+"494464", "Wittmund\-Carolinensiel",
+"4936454", "Magdala",
+"493641", "Jena",
+"496574", "Hasborn",
+"499181", "Neumarkt\ in\ der\ Oberpfalz",
+"494126", "Horst\ Holstein",
+"492245", "Much",
+"495364", "Velpke",
+"494682", "Amrum",
+"499452", "Langquaid",
+"499154", "Pommelsbrunn",
+"494946", "Grossefehn\-Bagband",
+"499661", "Sulzbach\-Rosenberg",
+"499178", "Abenberg\ Mittelfranken",
+"492983", "Winterberg\-Siedlinghausen",
+"4936484", "Knau\ bei\ Pössneck",
+"496555", "Bleialf",
+"496461", "Biedenkopf",
+"492159", "Meerbusch\-Osterath",
+"4933365", "Lüdersdorf\ Kreis\ Barnim",
+"496652", "Hünfeld",
+"492248", "Hennef\-Uckerath",
+"4938379", "Benz\ Usedom",
+"4936945", "Henneberg",
+"4933088", "Falkenthal",
+"499333", "Sommerhausen",
+"49345", "Halle\ Saale",
+"492593", "Ascheberg\ Westfalen",
+"497235", "Unterreichenbach\ Kreis\ Calw",
+"498685", "Kirchanschöring",
+"499359", "Karlstadt\-Wiesenfeld",
+"49208", "Oberhausen\ Rheinland",
+"497267", "Gemmingen",
+"498582", "Röhrnbach",
+"49921", "Bayreuth",
+"498168", "Attenkirchen",
+"498671", "Altötting",
+"492354", "Meinerzhagen",
+"496833", "Rehlingen\-Siersburg",
+"492378", "Fröndenberg\-Langschede",
+"497957", "Kressberg",
+"4935971", "Sebnitz",
+"495948", "Itterbeck",
+"497674", "Todtmoos",
+"496092", "Heimbuchenthal",
+"496049", "Kefenrod",
+"495647", "Lichtenau\-Kleinenberg",
+"492133", "Dormagen",
+"495283", "Lügde\-Rischenau",
+"495250", "Delbrück\ Westfalen",
+"4939201", "Wolmirstedt",
+"495431", "Quakenbrück",
+"499445", "Neustadt\ an\ der\ Donau",
+"492853", "Schermbeck",
+"496127", "Niedernhausen\ Taunus",
+"494269", "Ahausen\-Kirchwalsede",
+"4935383", "Elster\ Elbe",
+"496645", "Ulrichstein",
+"492195", "Radevormwald",
+"496542", "Bullay",
+"496599", "Weidenbach\ bei\ Gerolstein",
+"496334", "Thaleischweiler\-Fröschen",
+"49771", "Donaueschingen",
+"4938858", "Lassahn",
+"492567", "Ahaus\-Alstätte",
+"494183", "Jesteburg",
+"4933332", "Gartz\ Oder",
+"496696", "Gilserberg",
+"4939998", "Loitz\ bei\ Demmin",
+"495409", "Hilter\ am\ Teutoburger\ Wald",
+"4939428", "Pabstorf",
+"492827", "Goch\-Hassum",
+"494959", "Dollart",
+"499276", "Bischofsgrün",
+"493994", "Malchin",
+"494830", "Süderhastedt",
+"492801", "Xanten",
+"4933435", "Rehfelde",
+"496056", "Bad\ Soden\-Salmünster",
+"495863", "Zernien",
+"499395", "Triefenstein",
+"492632", "Andernach",
+"495523", "Bad\ Sachsa",
+"492043", "Gladbeck",
+"492535", "Sendenhorst\-Albersloh",
+"497473", "Mössingen",
+"4936604", "Münchenbernsdorf",
+"496139", "Budenheim",
+"494933", "Dornum\ Ostfriesland",
+"498222", "Burgau\ Schwaben",
+"4938231", "Barth",
+"496101", "Bad\ Vilbel",
+"499834", "Theilenhofen",
+"498266", "Kirchheim\ in\ Schwaben",
+"499735", "Massbach",
+"495741", "Lübbecke",
+"495302", "Vechelde",
+"4939263", "Unseburg",
+"499346", "Grünsfeld",
+"492839", "Straelen\-Herongen",
+"493322", "Falkensee",
+"498823", "Mittenwald",
+"495952", "Sögel",
+"494402", "Rastede",
+"494104", "Aumühle\ bei\ Hamburg",
+"499738", "Rottershausen",
+"493366", "Beeskow",
+"493437", "Grimma",
+"497033", "Weil\ Der\ Stadt",
+"498563", "Bad\ Birnbach\ Rottal",
+"497642", "Endingen\ Kaiserstuhl",
+"4933637", "Beerfelde",
+"497545", "Immenstaad\ am\ Bodensee",
+"498857", "Benediktbeuern",
+"495262", "Extertal",
+"4934602", "Landsberg\ Sachsen\-Anhalt",
+"499398", "Birkenfeld\ bei\ Würzburg",
+"4937605", "Hartenstein\ Sachsen",
+"4933976", "Wutike",
+"4935930", "Seitschen",
+"495226", "Bruchmühlen\ Westfalen",
+"49241", "Aachen",
+"4938334", "Grammendorf",
+"492538", "Drensteinfurt\-Rinkerode",
+"498306", "Ronsberg",
+"4937296", "Stollberg\ Erzgebirge",
+"4935478", "Goyatz",
+"498405", "Stammham\ bei\ Ingolstadt",
+"495071", "Schwarmstedt",
+"499573", "Staffelstein\ Oberfranken",
+"495085", "Burgdorf\-Ehlershausen",
+"492962", "Olsberg",
+"4938393", "Binz\ Ostseebad",
+"494791", "Osterholz\-Scharmbeck",
+"496898", "Völklingen",
+"494663", "Süderlügum",
+"4938725", "Gross\ Godems",
+"49212", "Solingen",
+"4935246", "Ziegenhain\ Sachsen",
+"497136", "Bad\ Friedrichshall",
+"496020", "Heigenbrücken",
+"499448", "Hausen\ Niederbayern",
+"496648", "Bad\ Salzschlirf",
+"492252", "Zülpich",
+"4933708", "Rangsdorf",
+"494331", "Rendsburg",
+"492773", "Haiger",
+"497232", "Königsbach\-Stein",
+"497660", "St\ Peter\ Schwarzwald",
+"492693", "Antweiler",
+"495703", "Hille",
+"492761", "Olpe\ Biggesee",
+"492156", "Willich\-Anrath",
+"4933395", "Zerpenschleuse",
+"496655", "Neuhof\ Kreis\ Fulda",
+"4938874", "Lützow",
+"492843", "Rheinberg",
+"494168", "Neu\ Wulmstorf\-Elstorf",
+"496307", "Schopp",
+"496552", "Olzheim",
+"494671", "Bredstedt",
+"493877", "Wittenberge",
+"496856", "St\ Wendel\-Niederkirchen",
+"4934422", "Osterfeld",
+"495063", "Bad\ Salzdetfurth",
+"499561", "Coburg",
+"495166", "Walsrode\-Kirchboitzen",
+"497574", "Gammertingen",
+"499356", "Burgsinn",
+"4989", "Munich",
+"495424", "Bad\ Rothenfelde",
+"496095", "Bessenbach",
+"497558", "Illmensee",
+"4937322", "Brand\-Erbisdorf",
+"496321", "Neustadt\ an\ der\ Weinstrasse",
+"4934325", "Mochau\-Lüttewitz",
+"495751", "Rinteln",
+"492053", "Velbert\-Neviges",
+"496238", "Dirmstein",
+"498571", "Simbach\ am\ Inn",
+"498585", "Grainet",
+"496046", "Ortenberg\ Hessen",
+"4933922", "Karwesee",
+"498682", "Laufen\ Salzach",
+"4936259", "Tabarz\ Thüringer\ Wald",
+"4939035", "Kuhfelde",
+"496235", "Schifferstadt",
+"497930", "Boxberg\ Baden",
+"492372", "Hemer",
+"498464", "Dietfurt\ an\ der\ Altmühl",
+"498847", "Obersöchering",
+"497652", "Hinterzarten",
+"4939608", "Staven",
+"4939951", "Faulenrost",
+"497461", "Tuttlingen",
+"497555", "Deggenhausertal",
+"494137", "Barendorf",
+"495942", "Uelsen",
+"495686", "Schwarzenborn\ Knüll",
+"4933872", "Hohennauen",
+"499906", "Mariaposching",
+"494324", "Brokstedt",
+"492242", "Hennef\ Sieg",
+"493541", "Calau",
+"4935454", "Uckro",
+"496658", "Poppenhausen\ Wasserkuppe",
+"496674", "Friedewald\ Hessen",
+"4939399", "Kleinau",
+"4939242", "Prödel",
+"494165", "Hollenstedt\ Nordheide",
+"4936424", "Kahla\ Thüringen",
+"499294", "Regnitzlosau",
+"498057", "Aschau\-Sachrang",
+"499474", "Schmidmühlen",
+"499172", "Georgensgmünd",
+"496776", "Dachsenhausen",
+"493976", "Torgelow\ bei\ Ueckermünde",
+"497833", "Hornberg\ Schwarzwaldbahn",
+"4939403", "Gröningen\ Sachsen\-Anhalt",
+"498023", "Bayrischzell",
+"4936732", "Könitz",
+"4933849", "Wiesenburg\ Mark",
+"493723", "Hohenstein\-Ernstthal",
+"494129", "Haseldorf",
+"496267", "Fahrenbach\ Baden",
+"498331", "Memmingen",
+"497153", "Plochingen",
+"492638", "Waldbreitbach",
+"493603", "Bad\ Langensalza",
+"492937", "Arnsberg\-Oeventrop",
+"4934779", "Abberode",
+"495265", "Dörentrup",
+"494920", "Wirdum",
+"49391", "Magdeburg",
+"4938301", "Putbus",
+"497542", "Tettnang",
+"498663", "Ruhpolding",
+"49671", "Bad\ Kreuznach",
+"497334", "Deggingen",
+"497127", "Neckartenzlingen",
+"497645", "Freiamt",
+"495308", "Lehre",
+"4939062", "Bebertal",
+"495955", "Esterwegen",
+"494405", "Edewecht",
+"496887", "Schmelz\ Saar",
+"4935323", "Sonnewalde",
+"492255", "Euskirchen\-Flamersheim",
+"493462", "Bad\ Dürrenberg",
+"499924", "Bodenmais",
+"4934742", "Sylda",
+"495190", "Soltau\-Emmingen",
+"4939400", "Wefensleben",
+"494857", "Barlt",
+"4938755", "Eldena",
+"495237", "Augustdorf",
+"496293", "Schefflenz",
+"496473", "Leun",
+"497139", "Neuenstadt\ am\ Kocher",
+"495082", "Langlingen",
+"4933202", "Töplitz",
+"494563", "Scharbeutz\-Haffkrug",
+"4939488", "Güntersberge",
+"499673", "Tiefenbach\ Oberpfalz",
+"494823", "Wilster",
+"4935795", "Königsbrück",
+"497056", "Gechingen",
+"498402", "Münchsmünster",
+"498104", "Sauerlach",
+"496849", "Kirkel",
+"4939458", "Heudeber",
+"494266", "Brockel",
+"492667", "Stein\-Neukirch",
+"494222", "Ganderkesee",
+"4938828", "Schönberg",
+"496596", "Üdersdorf",
+"492192", "Hückeswagen",
+"492274", "Elsdorf\ Rheinland",
+"496545", "Blankenrath",
+"498086", "Buchbach\ Oberbayern",
+"496033", "Butzbach",
+"4936744", "Remda",
+"496642", "Schlitz",
+"495406", "Belm",
+"494956", "Uplengen",
+"494777", "Cadenberge",
+"499499", "Painten",
+"499442", "Riedenburg",
+"499144", "Pleinfeld",
+"499279", "Mistelgau",
+"4938785", "Berge\ bei\ Perleberg",
+"495657", "Meissner",
+"496059", "Jossgrund",
+"495305", "Sickte",
+"497947", "Forchtenberg",
+"499732", "Hammelburg",
+"494408", "Hude\ Oldenburg",
+"498225", "Jettingen\-Scheppach",
+"496136", "Nieder\-Olm",
+"493328", "Teltow",
+"495623", "Edertal",
+"492532", "Ostbevern",
+"494140", "Estorf\ Kreis\ Stade",
+"492635", "Rheinbrohl",
+"498269", "Unteregg\ bei\ Mindelheim",
+"4935604", "Krieschow",
+"4939293", "Dreileben",
+"499392", "Faulbach\ Unterfranken",
+"499349", "Werbach\-Wenkheim",
+"4938204", "Broderstorf",
+"492836", "Wachtendonk",
+"499439", "Neunburg\-Kemnath",
+"497256", "Philippsburg",
+"4939973", "Altkalen",
+"492132", "Meerbusch\-Büderich",
+"495282", "Schieder\-Schwalenberg",
+"492434", "Wegberg",
+"496639", "Ottrau",
+"4939749", "Grambow\ bei\ Pasewalk",
+"495037", "Bad\ Rehburg",
+"496093", "Laufach",
+"497966", "Unterschneidheim",
+"498583", "Neureichenau",
+"4933837", "Brielow",
+"4936075", "Dingelstädt\ Eichsfeld",
+"496536", "Kleinich",
+"4933764", "Mittenwalde\ Mark",
+"4939085", "Zichtau",
+"496832", "Beckingen\-Reimsbach",
+"493386", "Premnitz",
+"499401", "Neutraubling",
+"4935873", "Herrnhut",
+"4938483", "Brüel",
+"498028", "Fischbachau",
+"499544", "Baunach",
+"499332", "Marktbreit",
+"4936782", "Schmiedefeld\ am\ Rennsteig",
+"499427", "Leiblfing",
+"496145", "Flörsheim\ am\ Main",
+"497838", "Nordrach",
+"4939772", "Rothemühl",
+"492592", "Selm",
+"496627", "Nentershausen\ Hessen",
+"493471", "Bernburg\ Saale",
+"498640", "Reit\ Im\ Winkl",
+"495804", "Rätzlingen\ Kreis\ Uelzen",
+"4935200", "Arnsdorf\ bei\ Dresden",
+"495705", "Petershagen\-Windheim",
+"492695", "Insul",
+"492982", "Medebach",
+"494247", "Affinghausen",
+"499749", "Oberbach\ Unterfranken",
+"495065", "Sibbesse",
+"492646", "Königsfeld\ Eifel",
+"496196", "Bad\ Soden\ am\ Taunus",
+"494683", "Oldsum",
+"499453", "Thalmassing",
+"492845", "Neukirchen\-Vluyn",
+"496653", "Burghaun",
+"492744", "Herdorf",
+"495068", "Elze\ Leine",
+"4939006", "Miesterhorst",
+"498504", "Tittling",
+"496400", "Mücke",
+"4935434", "Altdöbern",
+"497394", "Schelklingen",
+"492587", "Ennigerloh\-Westkirchen",
+"498731", "Dingolfing",
+"494163", "Horneburg\ Niederelbe",
+"494289", "Kirchtimke",
+"497636", "Münstertal\ Schwarzwald",
+"4935722", "Lauta\ bei\ Hoyerswerda",
+"498025", "Miesbach",
+"498709", "Eching\ Niederbayern",
+"4936330", "Grossberndten",
+"497220", "Forbach\-Hundsbach",
+"493725", "Zschopau",
+"49631", "Kaiserslautern",
+"497734", "Gailingen",
+"497835", "Zell\ am\ Harmersbach",
+"4935698", "Hornow",
+"4934343", "Regis\-Breitingen",
+"493564", "Schwarze\ Pumpe",
+"494604", "Grossenwiehe",
+"49981", "Ansbach",
+"4933745", "Petkus",
+"4939823", "Rechlin",
+"4936463", "Gebstedt",
+"494706", "Schiffdorf",
+"497444", "Alpirsbach",
+"497142", "Bietigheim\-Bissingen",
+"492058", "Wülfrath",
+"4939055", "Hörsingen",
+"496233", "Frankenthal\ Pfalz",
+"4938453", "Mistorf",
+"497527", "Wolfegg",
+"495130", "Wedemark",
+"4933089", "Himmelpfort",
+"4938378", "Heringsdorf\ Seebad",
+"4939931", "Röbel\ Müritz",
+"498441", "Pfaffenhofen\ an\ der\ Ilm",
+"495883", "Lemgow",
+"4934205", "Markranstädt",
+"4937202", "Claussnitz\ bei\ Chemnitz",
+"497553", "Salem\ Baden",
+"495939", "Sustrum",
+"494529", "Süsel\-Bujendorf",
+"498637", "Lohkirchen",
+"496246", "Eich\ Rheinhessen",
+"495850", "Neetze",
+"4938735", "Plau\ am\ See",
+"492772", "Herborn\ Hessen",
+"4936333", "Heringen\ Helme",
+"492253", "Bad\ Münstereifel",
+"499572", "Burgkunstadt",
+"4939007", "Tangeln",
+"494724", "Cuxhaven\-Lüdingworth",
+"499675", "Altendorf\ am\ Nabburg",
+"494825", "Burg\ Dithmarschen",
+"494662", "Leck",
+"495384", "Seesen\-Gross\ Rhüden",
+"496295", "Rosenberg\ Baden",
+"496475", "Weilmünster\-Wolfenhausen",
+"494230", "Verden\-Walle",
+"495901", "Fürstenau\ bei\ Bramsche",
+"499876", "Rohr\ Mittelfranken",
+"494626", "Treia",
+"499681", "Windischeschenbach",
+"494451", "Varel\ Jadebusen",
+"492227", "Bornheim\-Merten",
+"492963", "Brilon\-Messinghausen",
+"498629", "Palling",
+"493605", "Leinefelde",
+"494537", "Sülfeld\ Holstein",
+"495263", "Barntrup",
+"4935364", "Lebusa",
+"492520", "Wadersloh\-Diestedde",
+"4938324", "Velgast",
+"4938450", "Tarnow\ bei\ Bützow",
+"499234", "Neusorg",
+"495953", "Börger",
+"4938859", "Alt\ Zachun",
+"494403", "Bad\ Zwischenahn",
+"498822", "Oberammergau",
+"498665", "Inzell",
+"4939820", "Triepkendorf",
+"4939999", "Tutow",
+"499720", "Üchtelhausen",
+"498562", "Triftern",
+"497643", "Herbolzheim\ Breisgau",
+"497032", "Herrenberg",
+"4933836", "Butzow\ bei\ Brandenburg",
+"4938221", "Marlow",
+"498223", "Ichenhausen",
+"498171", "Wolfratshausen",
+"4936651", "Lobenstein",
+"499480", "Sünching",
+"492361", "Recklinghausen",
+"495303", "Wendeburg",
+"495826", "Suderburg",
+"495862", "Hitzacker\ Elbe",
+"499094", "Tagmersheim",
+"498257", "Inchenhofen",
+"495147", "Uetze\-Hänigsen",
+"494932", "Norderney",
+"495625", "Naumburg\ Hessen",
+"497249", "Stutensee",
+"497472", "Rottenburg\ am\ Neckar",
+"497174", "Mögglingen",
+"497158", "Neuhausen\ auf\ den\ Fildern",
+"493907", "Gardelegen",
+"496707", "Windesheim",
+"492633", "Brohl\-Lützing",
+"495522", "Osterode\ am\ Harz",
+"499654", "Pleystein",
+"494484", "Hude\-Wüsting",
+"494182", "Tostedt",
+"494828", "Lägerdorf",
+"493921", "Burg\ bei\ Magdeburg",
+"495351", "Helmstedt",
+"499161", "Neustadt\ an\ der\ Aisch",
+"496721", "Bingen\ am\ Rhein",
+"496478", "Greifenstein\-Ulm",
+"496298", "Möckmühl",
+"499977", "Arnschwang",
+"498550", "Philippsreut",
+"496152", "Gross\-Gerau",
+"496454", "Lichtenfels\-Sachsenberg",
+"492556", "Metelen",
+"4935203", "Tharandt",
+"4934925", "Bad\ Schmiedeberg",
+"4938847", "Boizenburg\ Elbe",
+"4934495", "Dobitschen",
+"4936371", "Schlossvippach",
+"496543", "Büchenbeuren",
+"492852", "Hamminkeln",
+"496035", "Reichelsheim\ Wetterau",
+"492598", "Senden\-Ottmarsbocholt",
+"497832", "Haslach\ im\ Kinzigtal",
+"494441", "Vechta",
+"498066", "Bad\ Feilnbach",
+"493722", "Limbach\-Oberfrohna",
+"499338", "Röttingen\ Unterfranken",
+"498022", "Tegernsee",
+"4935752", "Ruhland",
+"494286", "Gyhum",
+"499221", "Kulmbach",
+"4939727", "Spantekow",
+"492687", "Horhausen\ Westerwald",
+"492243", "Eitorf",
+"498706", "Vilsheim",
+"4936258", "Friemar",
+"4938792", "Lenzen\ \(Elbe\)",
+"495840", "Schnackenburg",
+"496256", "Lampertheim\-Hüttenfeld",
+"4933605", "Boossen",
+"499173", "Thalmässing",
+"4935953", "Burkau",
+"499076", "Wittislingen",
+"4936923", "Treffurt",
+"497653", "Lenzkirch",
+"499207", "Königsfeld\ Oberfranken",
+"495943", "Emlichheim",
+"4933656", "Bahro",
+"4938423", "Bad\ Kleinen",
+"497145", "Markgröningen",
+"496838", "Saarwellingen",
+"492373", "Menden\ Sauerland",
+"494731", "Nordenham",
+"497627", "Steinen\ Kreis\ Lörrach",
+"494504", "Ratekau",
+"4939853", "Holzendorf\ bei\ Prenzlau",
+"497259", "Östringen\-Odenheim",
+"499436", "Nittenau",
+"495157", "Emmerthal\-Börry",
+"4939398", "Gross\ Garz",
+"499367", "Unterpleichfeld",
+"496734", "Flonheim",
+"49731", "Ulm\ Donau",
+"4936873", "Themar",
+"496835", "Beckingen",
+"492052", "Velbert\-Langenberg",
+"497148", "Grossbottwar",
+"4939883", "Gross\ Dölln",
+"496220", "Wilhelmsfeld",
+"498683", "Tittmoning",
+"496501", "Konz",
+"498247", "Bad\ Wörishofen",
+"496636", "Romrod",
+"4933932", "Fehrbellin",
+"4934907", "Jeber\-Bergfrieden",
+"495123", "Schellerten",
+"496394", "Bundenthal",
+"495285", "Bad\ Pyrmont\-Kleinenberg",
+"4933848", "Raben",
+"495271", "Höxter",
+"495491", "Damme\ Dümmer",
+"4933733", "Stülpe",
+"496553", "Schönecken",
+"49465", "Sylt",
+"492842", "Kamp\-Lintfort",
+"492971", "Schmallenberg\-Dorlar",
+"495026", "Steimbke",
+"4937435", "Reuth\ bei\ Plauen",
+"492546", "Coesfeld\-Lette",
+"492985", "Winterberg\-Niedersfeld",
+"498377", "Unterthingau",
+"495062", "Holle\ bei\ Hildesheim",
+"4936041", "Bad\ Tennstedt",
+"499746", "Zeitlofs",
+"496527", "Oberweis",
+"492692", "Kelberg",
+"495702", "Petershagen\-Lahde",
+"4936200", "Elxleben\ bei\ Arnstadt",
+"496444", "Bischoffen",
+"496142", "Rüsselsheim",
+"492595", "Olfen",
+"497233", "Niefern\-Öschelbronn",
+"496867", "Perl",
+"499644", "Pressath",
+"499335", "Aub\ Kreis\ Würzburg",
+"495341", "Salzgitter",
+"4934362", "Mügeln\ bei\ Oschatz",
+"492045", "Bottrop\-Kirchhellen",
+"495525", "Walkenried",
+"4933672", "Pfaffendorfb\ Beeskow",
+"4934906", "Raguhn",
+"494935", "Juist",
+"495622", "Fritzlar",
+"4937365", "Sayda",
+"497475", "Burladingen",
+"492533", "Münster\-Nienberge",
+"495865", "Gusborn",
+"495764", "Steyerberg",
+"499393", "Rothenfels\ Unterfranken",
+"495829", "Wriedel",
+"492407", "Herzogenrath\-Kohlscheid",
+"4939489", "Strassberg\ Harz",
+"494550", "Bühnsdorf",
+"4936621", "Elsterberg\ bei\ Plauen",
+"4933965", "Herzsprung\ bei\ Wittstock",
+"4936870", "Masserberg",
+"497246", "Malsch\ Kreis\ Karlsruhe",
+"499733", "Münnerstadt",
+"496580", "Zemmer",
+"492754", "Bad\ Laasphe\-Feudingen",
+"496643", "Herbstein",
+"496032", "Bad\ Nauheim",
+"492855", "Voerde\ Niederrhein",
+"496287", "Limbach\ Baden",
+"492193", "Dabringhausen",
+"492778", "Siegbach",
+"492656", "Virneburg",
+"492421", "Düren",
+"4936203", "Vieselbach",
+"4934955", "Gossa",
+"494257", "Schweringen",
+"499443", "Abensberg",
+"4937462", "Rothenkirchen\ Vogtland",
+"496155", "Griesheim\ Hessen",
+"494171", "Winsen\ Luhe",
+"498650", "Marktschellenberg",
+"494668", "Klanxbüll",
+"496893", "Saarbrücken\-Ensheim",
+"495837", "Sprakensehl",
+"4934465", "Bad\ Bibra",
+"4939224", "Büden",
+"494223", "Ganderkesee\-Bookholzberg",
+"494967", "Rhauderfehn\-Burlage",
+"499554", "Untersteinbach\ Unterfranken",
+"497376", "Langenenslingen",
+"494185", "Marxen\ Auetal",
+"496158", "Riedstadt",
+"494562", "Grömitz",
+"495083", "Hohne\ bei\ Celle",
+"497707", "Bräunlingen",
+"495936", "Twist",
+"494665", "Emmelsbüll\-Horsbüll",
+"494526", "Ascheberg\ Holstein",
+"4934444", "Lützen",
+"4939726", "Ducherow",
+"496292", "Seckach",
+"496249", "Guntersblum",
+"496174", "Königstein\ im\ Taunus",
+"496472", "Weilmünster",
+"498403", "Pförring",
+"499672", "Neunburg\ vorm\ Wald",
+"494822", "Kellinghusen",
+"494188", "Welle\ Nordheide",
+"499575", "Weismain",
+"492858", "Hünxe",
+"4939321", "Arneburg",
+"492775", "Driedorf",
+"492874", "Isselburg",
+"49228", "Bonn",
+"498537", "Bad\ Füssing\-Aigen",
+"498565", "Dietersburg\-Baumgarten",
+"4939459", "Hasselfelde",
+"497543", "Kressbronn\ am\ Bodensee",
+"498662", "Siegsdorf\ Kreis\ Traunstein",
+"498230", "Gablingen",
+"4933657", "Steinsdorf\ Brandenburg",
+"498724", "Massing",
+"498825", "Krün",
+"495528", "Gieboldehausen",
+"498869", "Kinsau",
+"497454", "Sulz\ am\ Neckar",
+"497152", "Leonberg\ Württemberg",
+"4937344", "Crottendorf\ Sachsen",
+"497478", "Hirrlingen",
+"494938", "Hagermarsch",
+"4938354", "Wusterhusen",
+"493831", "Stralsund",
+"4936920", "Grossenlupnitz",
+"492236", "Wesseling\ Rheinland",
+"495186", "Salzhemmendorf\-Wallensen",
+"494637", "Sterup",
+"497721", "Villingen\ im\ Schwarzwald",
+"492620", "Neuhäusel\ Westerwald",
+"495353", "Königslutter\ am\ Elm",
+"4934361", "Dahlen\ Sachsen",
+"499163", "Dachsbach",
+"496723", "Oestrich\-Winkel",
+"493923", "Zerbst",
+"4933671", "Lieberose",
+"497440", "Bad\ Rippoldsau",
+"4939267", "Schneidlingen",
+"4938728", "Domsühl",
+"4936622", "Triebes",
+"498076", "Pfaffing",
+"495432", "Löningen",
+"496757", "Becherbach\ bei\ Kirn",
+"495327", "Bad\ Grund\ Harz",
+"4936844", "Rohr\ Thüringen",
+"499289", "Schwarzenbach\ am\ Wald",
+"496541", "Traben\-Trarbach",
+"498207", "Affing",
+"4935475", "Straupitz",
+"495742", "Preussisch\ Oldendorf",
+"498221", "Günzburg",
+"496404", "Lich\ Hessen",
+"496102", "Neu\-Isenburg",
+"499604", "Wernberg\-Köblitz",
+"4937608", "Waldenburg\ Sachsen",
+"49481", "Heide\ Holstein",
+"495301", "Lehre\-Essenrode",
+"4934929", "Straach",
+"492363", "Datteln",
+"495339", "Gielde",
+"495594", "Bovenden\-Reyershausen",
+"492802", "Alpen",
+"497224", "Gernsbach",
+"498338", "Böhen",
+"492506", "Münster\-Wolbeck",
+"492631", "Neuwied",
+"4935387", "Seyda",
+"492203", "Cologne\-Porz",
+"495261", "Lemgo",
+"498335", "Fellheim",
+"4935240", "Tauscha\ bei\ Grossenhain",
+"4939322", "Tangermünde",
+"493321", "Nauen\ Brandenburg",
+"495951", "Werlte",
+"494401", "Brake\ Unterweser",
+"499377", "Freudenberg\-Boxtal",
+"4930", "Berlin",
+"4933438", "Altlandsberg",
+"497641", "Emmendingen",
+"49561", "Kassel",
+"4939995", "Nossendorf",
+"4939425", "Dingelstedt\ am\ Huy",
+"494544", "Berkenthin",
+"494332", "Hamdorf\ bei\ Rendsburg",
+"4935936", "Sohland\ Spree",
+"4933970", "Neustadt\ Dosse",
+"493307", "Zehdenick",
+"492251", "Euskirchen",
+"4938855", "Lübtheen",
+"496483", "Selters\ Taunus",
+"495072", "Neustadt\-Mandelsloh",
+"498367", "Rosshaupten\ Forggensee",
+"494792", "Worpswede",
+"494749", "Schiffdorf\-Geestenseth",
+"4933633", "Spreenhagen",
+"492961", "Brilon",
+"4935895", "Klitten",
+"495903", "Emsbüren",
+"494453", "Zetel",
+"499683", "Friedenfels",
+"492382", "Ahlen\ Westfalen",
+"494480", "Ovelgönne\-Strückhausen",
+"4937293", "Eppendorf\ Sachsen",
+"497429", "Egesheim",
+"496231", "Hochdorf\-Assenheim",
+"4935751", "Welzow",
+"498554", "Schönberg\ Niederbayern",
+"499932", "Osterhofen",
+"495774", "Wagenfeld\-Ströhen",
+"497747", "Berau",
+"495875", "Emmendorf",
+"4935243", "Weinböhla",
+"496209", "Mörlenbach",
+"496328", "Elmstein",
+"498443", "Hohenwart\ Paar",
+"495676", "Liebenau\ Hessen",
+"4938791", "Bad\ Wilsnack",
+"497465", "Emmingen\-Liptingen",
+"497551", "Überlingen\ Bodensee",
+"497366", "Abtsgmünd",
+"494977", "Blomberg\ Ostfriesland",
+"494756", "Odisheim",
+"497322", "Giengen\ an\ der\ Brenz",
+"499568", "Neustadt\ bei\ Coburg",
+"496684", "Hofbieber\-Schwarzbach",
+"498733", "Mengkofen",
+"4933085", "Seilershof",
+"499182", "Velburg",
+"499484", "Brennberg",
+"4936948", "Römhild",
+"499828", "Rügland",
+"494161", "Buxtehude",
+"496786", "Kempfeld",
+"4939059", "Wegenstedt",
+"4933368", "Hohensaaten",
+"497503", "Wilhelmsdorf\ Württemberg",
+"4933973", "Zernitz\ bei\ Neustadt\ Dosse",
+"493596", "Neustadt\ in\ Sachsen",
+"499090", "Rain\ Lech",
+"498393", "Holzgünz",
+"4935937", "Prischwitz",
+"492447", "Dahlem\ bei\ Kall",
+"4939089", "Bismark\ Altmark",
+"495044", "Springe\-Eldagsen",
+"499869", "Wettringen\ Mittelfranken",
+"492524", "Ennigerloh",
+"4933931", "Rheinsberg\ Mark",
+"493473", "Aschersleben\ Sachsen\-Anhalt",
+"499197", "Egloffstein",
+"499529", "Oberaurach",
+"492864", "Reken",
+"499662", "Vilseck",
+"4939745", "Hetzdorf\ bei\ Strasburg",
+"494876", "Reher\ Holstein",
+"494681", "Wyk\ auf\ Föhr",
+"499626", "Hohenburg",
+"499565", "Untersiemau",
+"499451", "Schierling",
+"496426", "Fronhausen",
+"496651", "Rasdorf",
+"4939266", "Förderstedt",
+"4933055", "Kremmen",
+"496462", "Gladenbach",
+"499724", "Stadtlauringen",
+"496164", "Reichelsheim\ Odenwald",
+"499825", "Herrieden",
+"497584", "Altshausen",
+"496325", "Lambrecht\ Pfalz",
+"495755", "Kalletal\-Varenholz",
+"495854", "Bleckede\-Barskamp",
+"4936042", "Tonna",
+"49371", "Chemnitz\ Sachsen",
+"4935386", "Prettin",
+"492737", "Netphen\-Deuz",
+"498581", "Waldkirchen\ Niederbayern",
+"494234", "Dörverden",
+"499403", "Donaustauf",
+"498453", "Reichertshofen\ Oberbayern",
+"497541", "Friedrichshafen",
+"496108", "Mühlheim\ am\ Main",
+"497976", "Sulzbach\-Laufen",
+"494367", "Grossenbrode",
+"498427", "Wellheim",
+"4935327", "Priessen",
+"498544", "Eging\ am\ See",
+"496440", "Kölschhausen",
+"4939406", "Harbke",
+"498332", "Ottobeuren",
+"497723", "Furtwangen\ im\ Schwarzwald",
+"4938788", "Gross\ Warnow",
+"494795", "Garlstedt",
+"4934294", "Rackwitz",
+"496224", "Sandhausen\ Baden",
+"494644", "Karby",
+"493461", "Merseburg\ Saale",
+"4934654", "Stolberg\ Harz",
+"4938825", "Klütz",
+"494335", "Hohn\ bei\ Rendsburg",
+"497404", "Epfendorf",
+"494746", "Hagen\ bei\ Bremerhaven",
+"4939455", "Schierke",
+"495438", "Bakum\-Lüsche",
+"49551", "Göttingen",
+"496641", "Lauterbach\ Hessen",
+"4938222", "Semlow",
+"492191", "Remscheid",
+"493574", "Lauchhammer",
+"494338", "Alt\ Duvenstedt",
+"4939485", "Gernrode\ Harz",
+"492423", "Langerwehe",
+"4936652", "Wurzbach",
+"4933969", "Stepenitz",
+"499441", "Kelheim",
+"4939297", "Eickendorf\ Kreis\ Schönebeck",
+"495435", "Berge\ bei\ Quakenbrück",
+"4935844", "Oybin\ Kurort",
+"4938758", "Dömitz",
+"494173", "Wulfsen",
+"49881", "Weilheim\ in\ Oberbayern",
+"499286", "Oberkotzau",
+"494221", "Delmenhorst",
+"4937369", "Wolkenstein",
+"495054", "Bergen\-Sülze",
+"494207", "Oyten",
+"492606", "Winningen\ Mosel",
+"495694", "Diemelstadt",
+"499391", "Marktheidenfeld",
+"497483", "Horb\-Mühringen",
+"495467", "Voltlage",
+"499504", "Stadelhofen",
+"4936372", "Kleinneuhausen",
+"495336", "Semmenstedt",
+"492064", "Dinslaken",
+"496105", "Mörfelden\-Walldorf",
+"492509", "Nottuln\-Appelhülsen",
+"495844", "Clenze",
+"495745", "Stemwede\-Levern",
+"4939382", "Kamern",
+"496465", "Breidenbach\ bei\ Biedenkopf",
+"496551", "Prüm",
+"494672", "Langenhorn",
+"499822", "Bechhofen\ an\ der\ Heide",
+"492973", "Eslohe\ Sauerland",
+"499188", "Postbauer\-Heng",
+"498234", "Bobingen",
+"499562", "Sonnefeld",
+"497328", "Königsbronn",
+"499526", "Riedbach",
+"499665", "Königstein\ Oberpfalz",
+"493947", "Thale",
+"496747", "Emmelshausen",
+"492762", "Wenden\ Südsauerland",
+"497231", "Pforzheim",
+"496429", "Schweinsberg\ Hessen",
+"4939296", "Welsleben",
+"492624", "Höhr\-Grenzhausen",
+"4936781", "Grossbreitenbach",
+"498572", "Tann\ Niederbayern",
+"496503", "Hermeskeil",
+"498681", "Waging\ am\ See",
+"4939771", "Ueckermünde",
+"4939605", "Gross\ Nemerow",
+"492388", "Hamm\-Uentrop",
+"4937439", "Jocketa",
+"495121", "Hildesheim",
+"499637", "Falkenberg\ Oberpfalz",
+"496322", "Bad\ Dürkheim",
+"495752", "Auetal\-Hattendorf",
+"497684", "Glottertal",
+"499938", "Moos\ Niederbayern",
+"495273", "Beverungen",
+"495493", "Neuenkirchen\ Kreis\ Vechta",
+"4939038", "Henningen",
+"492750", "Diedenshausen",
+"497164", "Boll\ Kreis\ Göppingen",
+"497462", "Immendingen",
+"4939407", "Seehausen\ Börde",
+"497426", "Gosheim",
+"497651", "Titisee\-Neustadt",
+"4933609", "Brieskow\-Finkenheerd",
+"494393", "Boostedt",
+"4935326", "Schönborn\ Kreis\ Elbe\-Elster",
+"495941", "Neuenhaus\ Dinkel",
+"499935", "Stephansposching",
+"495872", "Stoetze",
+"498678", "Marktl",
+"498161", "Freising",
+"4934328", "Hartha\ bei\ Döbeln",
+"494733", "Butjadingen\-Burhave",
+"498654", "Freilassing",
+"496206", "Lampertheim",
+"492371", "Iserlohn",
+"492385", "Hamm\-Rhynern",
+"498756", "Nandlstadt",
+"492486", "Nettersheim",
+"498094", "Steinhöring",
+"499257", "Zell\ Oberfranken",
+"494443", "Dinklage",
+"496789", "Heimbach\ Nahe",
+"499223", "Rugendorf",
+"496468", "Dautphetal\-Mornshausen",
+"4933398", "Werneuchen",
+"494554", "Wahlstedt",
+"49791", "Schwäbisch\ Hall",
+"493542", "Lübbenau\ Spreewald",
+"499185", "Mühlhausen\ Oberpfalz",
+"492241", "Siegburg",
+"493334", "Eberswalde",
+"497325", "Sontheim\ an\ der\ Brenz",
+"4939932", "Malchow\ bei\ Waren",
+"499171", "Roth\ Mittelfranken",
+"496584", "Wellen\ Mosel",
+"493867", "Lübstorf",
+"495073", "Neustadt\-Esperke",
+"496482", "Runkel",
+"496184", "Langenselbold",
+"4939826", "Blankensee\ bei\ Neustrelitz",
+"499571", "Lichtenfels\ Bayern",
+"4934498", "Rositz",
+"495902", "Freren",
+"4934928", "Seegrehna",
+"494452", "Zetel\-Neuenburg",
+"499682", "Erbendorf",
+"494154", "Trittau",
+"499946", "Hohenwarth\ bei\ Kötzing",
+"4938456", "Langhagen\ bei\ Güstrow",
+"494661", "Niebüll",
+"494178", "Radbruch",
+"494793", "Hambergen",
+"4937609", "Wolkenburg\ Mulde",
+"492428", "Niederzier",
+"4938302", "Sagard",
+"498807", "Diessen\ am\ Ammersee",
+"492771", "Dillenburg",
+"4939061", "Weferlingen",
+"494333", "Erfde",
+"498821", "Garmisch\-Partenkirchen",
+"4939003", "Jübar",
+"498561", "Pfarrkirchen\ Niederbayern",
+"497031", "Böblingen",
+"4938729", "Marnitz",
+"49421", "Bremen",
+"493394", "Wittstock\ Dosse",
+"4934741", "Frose",
+"497824", "Schwanau",
+"4933201", "Gross\ Glienicke",
+"497725", "Königsfeld\ im\ Schwarzwald",
+"492202", "Bergisch\ Gladbach",
+"4935054", "Lauenstein\ Sachsen",
+"493501", "Pirna",
+"493636", "Greussen",
+"4936024", "Diedorf\ bei\ Mühlhausen",
+"498034", "Brannenburg",
+"495176", "Edemissen",
+"497564", "Bad\ Wurzach",
+"4936337", "Schiedungen",
+"4934346", "Narsdorf",
+"49234", "Bochum",
+"497728", "Niedereschach",
+"4938843", "Bennin",
+"495861", "Dannenberg\ Elbe",
+"498320", "Missen\-Wilhams",
+"492803", "Wesel\-Büderich",
+"496347", "Hochstadt\ Pfalz",
+"497485", "Empfingen",
+"4935207", "Moritzburg",
+"492041", "Bottrop",
+"495521", "Herzberg\ am\ Harz",
+"493838", "Bergen\ auf\ Rügen",
+"494931", "Norden",
+"497471", "Hechingen",
+"495459", "Hörstel",
+"496103", "Langen\ Hessen",
+"495743", "Espelkamp\-Gestringen",
+"492362", "Dorsten",
+"498458", "Gaimersheim",
+"498294", "Horgau",
+"492425", "Nideggen\-Embken",
+"495433", "Badbergen",
+"4939976", "Gross\ Bützin",
+"492851", "Rees",
+"495507", "Ebergötzen",
+"495352", "Schöningen",
+"499162", "Scheinfeld",
+"499464", "Walderbach",
+"496722", "Rüdesheim\ am\ Rhein",
+"493966", "Cölpin",
+"499126", "Eckental",
+"496766", "Kisselbach",
+"494181", "Buchholz\ in\ der\ Nordheide",
+"4938738", "Karow\ bei\ Lübz",
+"497386", "Hayingen",
+"496151", "Darmstadt",
+"4933439", "Fredersdorf\-Vogelsdorf",
+"494175", "Egestorf\ Nordheide",
+"4933830", "Ziesar",
+"496664", "Sinntal\-Sterbfritz",
+"4935876", "Weissenberg\ Sachsen",
+"499847", "Ergersheim",
+"4938486", "Gustävel",
+"496505", "Kordel",
+"4934208", "Löbnitz\ bei\ Delitzsch",
+"495446", "Rehden",
+"4938375", "Koserow",
+"499104", "Emskirchen",
+"499402", "Regenstauf",
+"4936949", "Obermassfeld\-Grimmenthal",
+"496831", "Saarlouis",
+"4939344", "Güsen",
+"496809", "Grossrosseln",
+"49340", "Dessau\ Anh",
+"4935206", "Kreischa\ bei\ Dresden",
+"495275", "Höxter\-Ottbergen",
+"4939058", "Uthmöden",
+"496024", "Schöllkrippen",
+"495495", "Vörden\ Kreis\ Vechta",
+"4933369", "Oderberg",
+"4933748", "Treuenbrietzen",
+"495281", "Bad\ Pyrmont",
+"492131", "Neuss",
+"493379", "Mahlow",
+"492304", "Schwerte",
+"4933833", "Wollin\ bei\ Brandenburg",
+"492981", "Winterberg\ Westfalen",
+"4935695", "Simmersdorf",
+"499663", "Neukirchen\ bei\ Sulzbach\-Rosenberg",
+"4935877", "Cunewalde",
+"499228", "Thurnau",
+"4938295", "Satow\ bei\ Bad\ Doberan",
+"498387", "Weiler\-Simmerberg",
+"4937321", "Frankenstein\ Sachsen",
+"492975", "Schmallenberg\-Oberkirchen",
+"495634", "Waldeck\-Sachsenhausen",
+"4939977", "Jördenstorf",
+"499331", "Ochsenfurt",
+"495345", "Baddeckenstedt",
+"497907", "Schwäbisch\ Hall\-Sulzdorf",
+"492591", "Lüdinghausen",
+"4933921", "Zechlinerhütte",
+"494767", "Bremervörde\-Bevern",
+"499269", "Tettau\ Kreis\ Kronach",
+"497357", "Attenweiler",
+"497502", "Wolpertswende",
+"49511", "Hannover",
+"492264", "Marienheide",
+"497806", "Bad\ Peterstal\-Griesbach",
+"498349", "Stötten\ am\ Auerberg",
+"498392", "Markt\ Rettenbach",
+"4936644", "Hirschberg\ Saale",
+"494445", "Visbek\ Kreis\ Vechta",
+"492677", "Lutzerath",
+"4939827", "Schwarz\ bei\ Neustrelitz",
+"497323", "Gerstetten",
+"494496", "Friesoythe\-Markhausen",
+"494276", "Borstel\ bei\ Sulingen",
+"4939952", "Grammentin",
+"499225", "Stadtsteinach",
+"493643", "Weimar\ Thüringen",
+"492954", "Rüthen\-Oestereiden",
+"4938457", "Krakow\ am\ See",
+"499183", "Burgthann",
+"498732", "Frontenhausen",
+"495254", "Paderborn\-Schloss\ Neuhaus",
+"4939241", "Leitzkau",
+"4939088", "Letzlingen",
+"495278", "Höxter\-Ovenhausen",
+"499933", "Wallersdorf",
+"499086", "Fremdingen",
+"4934347", "Oelzschau\ bei\ Borna",
+"4936336", "Klettenberg",
+"498442", "Wolnzach",
+"498144", "Grafrath",
+"495964", "Lähden",
+"496508", "Hetzerath\ Mosel",
+"494346", "Gettorf",
+"4933474", "Neutrebbin",
+"492383", "Bönen",
+"4936731", "Unterloquitz",
+"4939000", "Beetzendorf",
+"4939753", "Strasburg",
+"497141", "Ludwigsburg\ Württemberg",
+"494834", "Büsum",
+"4939365", "Bellingen\ bei\ Stendal",
+"494735", "Butjadingen\-Stollhamm",
+"496670", "Ludwigsau\ Hessen",
+"4938789", "Wolfshagen\ bei\ Perleberg",
+"492365", "Marl",
+"4939202", "Gross\ Ammensleben",
+"495456", "Westerkappeln\-Velpe",
+"495621", "Bad\ Wildungen",
+"4933331", "Casekow",
+"499324", "Dettelbach",
+"497482", "Horb\-Dettingen",
+"497184", "Kaisersbach",
+"4936084", "Heuthen",
+"492208", "Niederkassel",
+"4936207", "Plaue\ Thüringen",
+"494294", "Riede\ Kreis\ Verden",
+"49331", "Potsdam",
+"494474", "Garrel",
+"494172", "Salzhausen",
+"497934", "Weikersheim",
+"494458", "Wiefelstede\-Spohle",
+"495908", "Wietmarschen\-Lohne",
+"498460", "Berching\-Holnstein",
+"496564", "Neuerburg\ Eifel",
+"4939886", "Milmersdorf",
+"495607", "Fuldatal",
+"493925", "Stassfurt",
+"496824", "Ottweiler",
+"495355", "Frellstedt",
+"499165", "Sugenheim",
+"496725", "Gau\-Algesheim",
+"4938232", "Zingst\ Ostseebad",
+"493969", "Siedenbollentin",
+"499129", "Wendelstein",
+"4937757", "Rittersgrün",
+"496031", "Friedberg\ Hessen",
+"497389", "Heroldstatt",
+"492337", "Hagen\-Dahl",
+"492422", "Kreuzau",
+"494320", "Heidmühlen",
+"492944", "Rietberg\-Mastholte",
+"497570", "Sigmaringen\-Gutenstein",
+"4936926", "Creuzburg",
+"4938426", "Neuburg\-Steinhausen",
+"49821", "Augsburg",
+"4933653", "Ziltendorf",
+"496291", "Adelsheim",
+"496471", "Weilburg",
+"4934775", "Wippra",
+"495905", "Beesten",
+"494455", "Jade\-Schweiburg",
+"494561", "Neustadt\ in\ Holstein",
+"4934601", "Teutschenthal",
+"497347", "Dietenheim",
+"496485", "Nentershausen\ Westerwald",
+"4939856", "Beenz\ bei\ Prenzlau",
+"495374", "Isenbüttel",
+"496728", "Ober\-Hilbersheim",
+"495358", "Bahrdorf\-Mackendorf",
+"499671", "Oberviechtach",
+"494821", "Itzehoe",
+"493928", "Schönebeck\ Elbe",
+"497664", "Freiburg\-Tiengen",
+"498333", "Babenhausen\ Schwaben",
+"496386", "Altenkirchen\ Pfalz",
+"497151", "Waiblingen",
+"4933968", "Meyenburg\ Kreis\ Prignitz",
+"4934223", "Dommitzsch",
+"494356", "Gross\ Wittensee",
+"493601", "Mühlhausen\ Thüringen",
+"497722", "Triberg\ im\ Schwarzwald",
+"492205", "Rösrath",
+"4935024", "Stadt\ Wehlen",
+"498661", "Grabenstätt\ Chiemsee",
+"498178", "Icking",
+"4933458", "Falkenberg\ Mark",
+"498452", "Geisenfeld",
+"492368", "Oer\-Erkenschwick",
+"4938759", "Tewswoos",
+"4937368", "Deutschneudorf",
+"497277", "Wörth\-Büchelberg",
+"495244", "Rietberg",
+"4933234", "Wustermark",
+"4937381", "Penig",
+"499266", "Mitwitz",
+"498735", "Gangkofen\-Kollbach",
+"499222", "Presseck",
+"4938427", "Blowatz",
+"497024", "Wendlingen\ am\ Neckar",
+"4939922", "Dambeck\ bei\ Röbel",
+"4939857", "Drense",
+"498346", "Pforzen",
+"4935822", "Hagenwerder",
+"4933981", "Putlitz",
+"4936927", "Unterellen",
+"499956", "Eichendorf\-Aufhausen",
+"497831", "Hausach",
+"499777", "Ostheim\ von\ der\ Rhön",
+"498395", "Tannheim\ Württemberg",
+"494499", "Barssel",
+"494442", "Lohne\ Oldenburg",
+"494144", "Himmelpforten",
+"4937438", "Bad\ Brambach",
+"4939039", "Bonese",
+"498021", "Waakirchen",
+"493721", "Meinersdorf",
+"497505", "Fronreute",
+"494732", "Stadland\-Rodenkirchen",
+"499408", "Altenthann",
+"4939723", "Krien",
+"499089", "Bissingen\-Unterringingen",
+"4933845", "Borkheide",
+"498276", "Baar\ Schwaben",
+"498445", "Gerolsbach",
+"494392", "Nortorf\ bei\ Neumünster",
+"494349", "Dänischenhagen",
+"4936704", "Steinheid",
+"497463", "Mühlheim\ an\ der\ Donau",
+"495873", "Eimke",
+"4939395", "Wanzer",
+"499920", "Bischofsmais",
+"495272", "Brakel\ Westfalen",
+"495492", "Steinfeld\ Oldenburg",
+"495194", "Bispingen",
+"4936206", "Grossfahner",
+"496323", "Edenkoben",
+"495753", "Auetal\-Bernsen",
+"496806", "Heusweiler",
+"498573", "Ering",
+"492051", "Velbert",
+"499405", "Bad\ Abbach",
+"4935773", "Schleife",
+"496357", "Standenbühl",
+"496502", "Schweich",
+"4937756", "Breitenbrunn\ Erzgebirge",
+"4933608", "Jacobsdorf\ Mark",
+"493475", "Lutherstadt\ Eisleben",
+"4936255", "Goldbach\ bei\ Gotha",
+"499857", "Schopfloch\ Mittelfranken",
+"492763", "Drolshagen\-Bleche",
+"4934903", "Coswig\ Anhalt",
+"492691", "Adenau",
+"495534", "Eschershausen\ an\ der\ Lenne",
+"499306", "Kist",
+"494924", "Moormerland\-Oldersum",
+"492841", "Moers",
+"492972", "Schmallenberg",
+"494673", "Joldelund",
+"499823", "Leutershausen",
+"4936695", "Söllmnitz",
+"4939887", "Gerswalde",
+"499563", "Rödental",};
 
     sub new {
       my $class = shift;

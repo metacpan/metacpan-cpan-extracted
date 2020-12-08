@@ -1,17 +1,17 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2014-2016 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2014-2020 -- leonerd@leonerd.org.uk
 
-package Device::Chip::MAX7219;
+use v5.26;
+use Object::Pad 0.19;
 
-use strict;
-use warnings;
-use base qw( Device::Chip );
-
-our $VERSION = '0.04';
+package Device::Chip::MAX7219 0.05;
+class Device::Chip::MAX7219
+   extends Device::Chip;
 
 use Carp;
+use Future::AsyncAwait;
 
 use constant PROTOCOL => 'SPI';
 
@@ -21,22 +21,23 @@ C<Device::Chip::MAX7219> - chip driver for a F<MAX7219>
 
 =head1 SYNOPSIS
 
- use Device::Chip::MAX7219;
+   use Device::Chip::MAX7219;
+   use Future::AsyncAwait;
 
- my $chip = Device::Chip::MAX7219->new;
- $chip->mount( Device::Chip::Adapter::...->new )->get;
+   my $chip = Device::Chip::MAX7219->new;
+   await $chip->mount( Device::Chip::Adapter::...->new );
 
- $chip->power(1)->get;
+   await $chip->power(1);
 
- $chip->intensity( 2 )->get;
- $chip->limit( 8 )->get;
+   await $chip->intensity( 2 );
+   await $chip->limit( 8 );
 
- $chip->displaytest( 1 )->get;
- $chip->shutdown( 0 )->get;
+   await $chip->displaytest( 1 );
+   await $chip->shutdown( 0 );
 
- sleep 3;
+   sleep 3;
 
- $chip->displaytest( 0 )->get;
+   await $chip->displaytest( 0 );
 
 =head1 DESCRIPTION
 
@@ -51,17 +52,9 @@ concepts or features, only the use of this module to access them.
 
 =cut
 
-sub new
-{
-   my $class = shift;
-   my $self = $class->SUPER::new( @_ );
+has $_decode = 0;
 
-   $self->{decode} = 0;
-
-   return $self;
-}
-
-sub SPI_options
+method SPI_options
 {
    return (
       mode        => 0,
@@ -79,21 +72,21 @@ use constant {
    REG_DTEST     => 0x0F,
 };
 
-sub _writereg
+async method _writereg ( $reg, $value )
 {
-   my $self = shift;
-   my ( $reg, $value ) = @_;
-
-   $self->protocol->write( chr( $reg ) . chr( $value ) );
+   await $self->protocol->write( chr( $reg ) . chr( $value ) );
 }
 
 =head1 METHODS
+
+The following methods documented in an C<await> expression return L<Future>
+instances.
 
 =cut
 
 =head2 write_bcd
 
-   $chip->write_bcd( $digit, $val )->get
+   await $chip->write_bcd( $digit, $val );
 
 Writes the value at the given digit, setting it to BCD mode if not already so.
 C<$val> should be a single digit number or string, or one of the special
@@ -105,11 +98,8 @@ Switches the digit into BCD mode if not already so.
 
 =cut
 
-sub write_bcd
+async method write_bcd ( $digit, $val )
 {
-   my $self = shift;
-   my ( $digit, $val ) = @_;
-
    $digit >= 0 and $digit <= 7 or
       croak "Digit must be 0 to 7";
 
@@ -121,17 +111,15 @@ sub write_bcd
 
    my $decodemask = 1 << $digit;
 
-   ( ( $self->{decode} & $decodemask ) ?
-      Future->done :
-      $self->set_decode( $self->{decode} | $decodemask )
-   )->then( sub {
-      $self->_writereg( REG_DIGIT+$digit, $val + ( $dp ? 0x80 : 0 ) );
-   });
+   $_decode & $decodemask or
+      await $self->set_decode( $_decode | $decodemask );
+
+   await $self->_writereg( REG_DIGIT+$digit, $val + ( $dp ? 0x80 : 0 ) );
 }
 
 =head2 write_raw
 
-   $chip->write_raw( $digit, $bits )->get
+   await $chip->write_raw( $digit, $bits );
 
 Writes the value at the given digit, setting the raw column lines to the 8-bit
 value given.
@@ -140,27 +128,22 @@ Switches the digit into undecoded raw mode if not already so.
 
 =cut
 
-sub write_raw
+async method write_raw ( $digit, $bits )
 {
-   my $self = shift;
-   my ( $digit, $bits ) = @_;
-
    $digit >= 0 and $digit <= 7 or
       croak "Digit must be 0 to 7";
 
    my $decodemask = 1 << $digit;
 
-   ( ( $self->{decode} & $decodemask ) ?
-      $self->set_decode( $self->{decode} & ~$decodemask ) :
-      Future->done
-   )->then( sub {
-      $self->_writereg( REG_DIGIT+$digit, $bits );
-   });
+   $_decode & $decodemask and
+      await $self->set_decode( $_decode & ~$decodemask );
+
+   await $self->_writereg( REG_DIGIT+$digit, $bits );
 }
 
 =head2 write_hex
 
-   $chip->write_hex( $digit, $val )->get
+   await $chip->write_hex( $digit, $val );
 
 Similar to C<write_bcd>, but uses a segment decoder written in code rather
 than on the chip itself, to turn values into sets of segments to display. This
@@ -171,18 +154,17 @@ numbers, C<-> and space.
 
 my %hex2bits;
 
-sub write_hex
+async method write_hex ( $digit, $val )
 {
-   my $self = shift;
-   my ( $digit, $val ) = @_;
    my $dp = ( $val =~ s/\.$// );
    my $bits = $hex2bits{$val} // croak "Unrecognised hex value $val";
-   $self->write_raw( $digit, $bits + ( $dp ? 0x80 : 0 ) );
+
+   await $self->write_raw( $digit, $bits + ( $dp ? 0x80 : 0 ) );
 }
 
 =head2 set_decode
 
-   $chip->set_decode( $bits )->get
+   await $chip->set_decode( $bits );
 
 Directly sets the decode mode of all the digits at once. This is more
 efficient for initialising digits into BCD or raw mode, than individual calls
@@ -190,31 +172,28 @@ to C<write_bcd> or C<write_raw> for each digit individually.
 
 =cut
 
-sub set_decode
+async method set_decode ( $bits )
 {
-   my $self = shift;
-   my ( $bits ) = @_;
-   $self->_writereg( REG_DECODE, $self->{decode} = $bits );
+   await $self->_writereg( REG_DECODE, $_decode = $bits );
 }
 
 =head2 intensity
 
-   $chip->intensity( $value )->get
+   await $chip->intensity( $value );
 
 Sets the intensity register. C<$value> must be between 0 and 15, with higher
 values giving a more intense output.
 
 =cut
 
-sub intensity
+async method intensity ( $value )
 {
-   my $self = shift;
-   $self->_writereg( REG_INTENSITY, @_ );
+   await $self->_writereg( REG_INTENSITY, $value );
 }
 
 =head2 limit
 
-   $chip->limit( $columns )->get
+   await $chip->limit( $columns );
 
 Sets the scan limit register. C<$value> must be between 1 and 8, to set
 between 1 and 8 digits. This should only be used to adjust for the number of
@@ -225,19 +204,17 @@ I<Note> that this is not directly the value written to the C<LIMIT> register.
 
 =cut
 
-sub limit
+async method limit ( $columns )
 {
-   my $self = shift;
-   my ( $columns ) = @_;
    $columns >= 1 and $columns <= 8 or
       croak "->limit columns must be between 1 and 8";
 
-   $self->_writereg( REG_LIMIT, $columns - 1 );
+   await $self->_writereg( REG_LIMIT, $columns - 1 );
 }
 
 =head2 shutdown
 
-   $chip->shutdown( $off )->get
+   await $chip->shutdown( $off );
 
 Sets the shutdown register, entirely blanking the display and turning off all
 output if set to a true value, or restoring the display to its previous
@@ -248,16 +225,14 @@ register.
 
 =cut
 
-sub shutdown
+async method shutdown ( $off )
 {
-   my $self = shift;
-   my ( $off ) = @_;
-   $self->_writereg( REG_SHUTDOWN, !$off );
+   await $self->_writereg( REG_SHUTDOWN, !$off );
 }
 
 =head2 displaytest
 
-   $chip->displaytest( $on )->get
+   await $chip->displaytest( $on );
 
 Sets the display test register, overriding the output control and turning on
 every LED if set to a true value, or restoring normal operation if set to
@@ -265,11 +240,9 @@ false.
 
 =cut
 
-sub displaytest
+async method displaytest ( $on )
 {
-   my $self = shift;
-   my ( $on ) = @_;
-   $self->_writereg( REG_DTEST, $on );
+   await $self->_writereg( REG_DTEST, $on );
 }
 
 =head1 AUTHOR
@@ -278,7 +251,7 @@ Paul Evans <leonerd@leonerd.org.uk>
 
 =cut
 
-while( <DATA> ) {
+while( readline DATA ) {
    my ( $hex, $segments ) = split m/=/;
    my $bits = 0;
    substr( $segments, $_, 1 ) eq "." and $bits += 1 << $_ for 0 .. 6;

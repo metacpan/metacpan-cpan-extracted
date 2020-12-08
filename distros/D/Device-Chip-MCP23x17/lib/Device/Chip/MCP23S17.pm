@@ -1,15 +1,16 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2015 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2015-2020 -- leonerd@leonerd.org.uk
 
-package Device::Chip::MCP23S17;
+use v5.26;
+use Object::Pad 0.19;
 
-use strict;
-use warnings;
-use base qw( Device::Chip::MCP23x17 );
+package Device::Chip::MCP23S17 0.02;
+class Device::Chip::MCP23S17
+   extends Device::Chip::MCP23x17;
 
-our $VERSION = '0.01';
+use Future::AsyncAwait;
 
 =head1 NAME
 
@@ -25,7 +26,7 @@ of the F<MCP23x17> family.
 
 use constant PROTOCOL => "SPI";
 
-sub SPI_options
+method SPI_options
 {
    return (
       mode => 0,
@@ -33,21 +34,15 @@ sub SPI_options
    );
 }
 
-sub write_reg
+async method write_reg ( $reg, $data )
 {
-   my $self = shift;
-   my ( $reg, $data ) = @_;
-
-   $self->protocol->write( pack "C C a*", ( 0x20 << 1 ), $reg, $data );
+   await $self->protocol->write( pack "C C a*", ( 0x20 << 1 ), $reg, $data );
 }
 
-sub read_reg
+async method read_reg ( $reg, $len )
 {
-   my $self = shift;
-   my ( $reg, $len ) = @_;
-
-   $self->protocol->readwrite( pack "C C a*", ( 0x20 << 1 ) | 1, $reg, "\x00" x $len )
-      ->transform( done => sub { substr $_[0], 2 } );
+   my $buf = await $self->protocol->readwrite( pack "C C a*", ( 0x20 << 1 ) | 1, $reg, "\x00" x $len );
+   return substr $buf, 2;
 }
 
 =head1 AUTHOR

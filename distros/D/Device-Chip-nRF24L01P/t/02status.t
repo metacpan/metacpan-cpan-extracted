@@ -1,10 +1,12 @@
 #!/usr/bin/perl
 
-use strict;
+use v5.26;
 use warnings;
 
 use Test::More;
 use Test::Device::Chip::Adapter;
+
+use Future::AsyncAwait;
 
 use Device::Chip::nRF24L01P;
 
@@ -13,14 +15,14 @@ my $adapter = Test::Device::Chip::Adapter->new;
 
 $adapter->expect_write_gpios( { CE => 0 } );
 
-$chip->mount( $adapter )->get;
+await $chip->mount( $adapter );
 
 # ->observe_tx_counts
 {
    # OBSERVE_TX
    $adapter->expect_readwrite( "\x08\x00" )->returns( "\x0E\x12" );
 
-   is_deeply( $chip->observe_tx_counts->get,
+   is_deeply( await $chip->observe_tx_counts,
       {
          ARC_CNT  => 2,
          PLOS_CNT => 1,
@@ -36,7 +38,7 @@ $chip->mount( $adapter )->get;
    # RPD
    $adapter->expect_readwrite( "\x09\x00" )->returns( "\x0E\x01" );
 
-   is( $chip->rpd->get, 1, '$chip->rpd' );
+   is( await $chip->rpd, 1, '$chip->rpd' );
 
    $adapter->check_and_clear( '$chip->rpd' );
 }
@@ -46,7 +48,7 @@ $chip->mount( $adapter )->get;
    # FIFO_STATUS
    $adapter->expect_readwrite( "\x17\x00" )->returns( "\x0E\x11" );
 
-   is_deeply( $chip->fifo_status->get,
+   is_deeply( await $chip->fifo_status,
       {
          RX_EMPTY => 1,
          RX_FULL  => !!0,

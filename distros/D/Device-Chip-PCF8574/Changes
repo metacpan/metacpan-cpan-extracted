@@ -1,5 +1,9 @@
 Revision history for Device-Chip-PCF8574
 
+0.03    2020-12-06
+        [CHANGES]
+         * Updated to use Object::Pad + Future::AsyncAwait
+
 0.02    2017/02/18 23:07:02
         [CHANGES]
          * Additionally support PCF8575, the 16-bit version of PCF8574

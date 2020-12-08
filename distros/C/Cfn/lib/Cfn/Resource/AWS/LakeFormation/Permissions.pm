@@ -1,4 +1,4 @@
-# AWS::LakeFormation::Permissions generated from spec 5.3.0
+# AWS::LakeFormation::Permissions generated from spec 18.4.0
 use Moose::Util::TypeConstraints;
 
 coerce 'Cfn::Resource::Properties::AWS::LakeFormation::Permissions',
@@ -20,6 +20,72 @@ package Cfn::Resource::AWS::LakeFormation::Permissions {
 
 
 
+subtype 'Cfn::Resource::Properties::AWS::LakeFormation::Permissions::TableWildcard',
+     as 'Cfn::Value';
+
+coerce 'Cfn::Resource::Properties::AWS::LakeFormation::Permissions::TableWildcard',
+  from 'HashRef',
+   via {
+     if (my $f = Cfn::TypeLibrary::try_function($_)) {
+       return $f
+     } else {
+       return Cfn::Resource::Properties::Object::AWS::LakeFormation::Permissions::TableWildcard->new( %$_ );
+     }
+   };
+
+package Cfn::Resource::Properties::Object::AWS::LakeFormation::Permissions::TableWildcard {
+  use Moose;
+  use MooseX::StrictConstructor;
+  extends 'Cfn::Value::TypedValue';
+  
+}
+
+subtype 'Cfn::Resource::Properties::AWS::LakeFormation::Permissions::ColumnWildcard',
+     as 'Cfn::Value';
+
+coerce 'Cfn::Resource::Properties::AWS::LakeFormation::Permissions::ColumnWildcard',
+  from 'HashRef',
+   via {
+     if (my $f = Cfn::TypeLibrary::try_function($_)) {
+       return $f
+     } else {
+       return Cfn::Resource::Properties::Object::AWS::LakeFormation::Permissions::ColumnWildcard->new( %$_ );
+     }
+   };
+
+package Cfn::Resource::Properties::Object::AWS::LakeFormation::Permissions::ColumnWildcard {
+  use Moose;
+  use MooseX::StrictConstructor;
+  extends 'Cfn::Value::TypedValue';
+  
+  has ExcludedColumnNames => (isa => 'Cfn::Value::Array|Cfn::Value::Function|Cfn::DynamicValue', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+}
+
+subtype 'Cfn::Resource::Properties::AWS::LakeFormation::Permissions::TableWithColumnsResource',
+     as 'Cfn::Value';
+
+coerce 'Cfn::Resource::Properties::AWS::LakeFormation::Permissions::TableWithColumnsResource',
+  from 'HashRef',
+   via {
+     if (my $f = Cfn::TypeLibrary::try_function($_)) {
+       return $f
+     } else {
+       return Cfn::Resource::Properties::Object::AWS::LakeFormation::Permissions::TableWithColumnsResource->new( %$_ );
+     }
+   };
+
+package Cfn::Resource::Properties::Object::AWS::LakeFormation::Permissions::TableWithColumnsResource {
+  use Moose;
+  use MooseX::StrictConstructor;
+  extends 'Cfn::Value::TypedValue';
+  
+  has CatalogId => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has ColumnNames => (isa => 'Cfn::Value::Array|Cfn::Value::Function|Cfn::DynamicValue', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has ColumnWildcard => (isa => 'Cfn::Resource::Properties::AWS::LakeFormation::Permissions::ColumnWildcard', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has DatabaseName => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has Name => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+}
+
 subtype 'Cfn::Resource::Properties::AWS::LakeFormation::Permissions::TableResource',
      as 'Cfn::Value';
 
@@ -29,17 +95,19 @@ coerce 'Cfn::Resource::Properties::AWS::LakeFormation::Permissions::TableResourc
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::LakeFormation::Permissions::TableResourceValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::LakeFormation::Permissions::TableResource->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::LakeFormation::Permissions::TableResourceValue {
+package Cfn::Resource::Properties::Object::AWS::LakeFormation::Permissions::TableResource {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
   
+  has CatalogId => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has DatabaseName => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has Name => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has TableWildcard => (isa => 'Cfn::Resource::Properties::AWS::LakeFormation::Permissions::TableWildcard', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
 }
 
 subtype 'Cfn::Resource::Properties::AWS::LakeFormation::Permissions::DatabaseResource',
@@ -51,16 +119,39 @@ coerce 'Cfn::Resource::Properties::AWS::LakeFormation::Permissions::DatabaseReso
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::LakeFormation::Permissions::DatabaseResourceValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::LakeFormation::Permissions::DatabaseResource->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::LakeFormation::Permissions::DatabaseResourceValue {
+package Cfn::Resource::Properties::Object::AWS::LakeFormation::Permissions::DatabaseResource {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
   
+  has CatalogId => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has Name => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+}
+
+subtype 'Cfn::Resource::Properties::AWS::LakeFormation::Permissions::DataLocationResource',
+     as 'Cfn::Value';
+
+coerce 'Cfn::Resource::Properties::AWS::LakeFormation::Permissions::DataLocationResource',
+  from 'HashRef',
+   via {
+     if (my $f = Cfn::TypeLibrary::try_function($_)) {
+       return $f
+     } else {
+       return Cfn::Resource::Properties::Object::AWS::LakeFormation::Permissions::DataLocationResource->new( %$_ );
+     }
+   };
+
+package Cfn::Resource::Properties::Object::AWS::LakeFormation::Permissions::DataLocationResource {
+  use Moose;
+  use MooseX::StrictConstructor;
+  extends 'Cfn::Value::TypedValue';
+  
+  has CatalogId => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has S3Resource => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
 }
 
 subtype 'Cfn::Resource::Properties::AWS::LakeFormation::Permissions::Resource',
@@ -72,17 +163,19 @@ coerce 'Cfn::Resource::Properties::AWS::LakeFormation::Permissions::Resource',
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::LakeFormation::Permissions::ResourceValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::LakeFormation::Permissions::Resource->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::LakeFormation::Permissions::ResourceValue {
+package Cfn::Resource::Properties::Object::AWS::LakeFormation::Permissions::Resource {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
   
   has DatabaseResource => (isa => 'Cfn::Resource::Properties::AWS::LakeFormation::Permissions::DatabaseResource', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has DataLocationResource => (isa => 'Cfn::Resource::Properties::AWS::LakeFormation::Permissions::DataLocationResource', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has TableResource => (isa => 'Cfn::Resource::Properties::AWS::LakeFormation::Permissions::TableResource', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has TableWithColumnsResource => (isa => 'Cfn::Resource::Properties::AWS::LakeFormation::Permissions::TableWithColumnsResource', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
 }
 
 subtype 'Cfn::Resource::Properties::AWS::LakeFormation::Permissions::DataLakePrincipal',
@@ -94,11 +187,11 @@ coerce 'Cfn::Resource::Properties::AWS::LakeFormation::Permissions::DataLakePrin
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::LakeFormation::Permissions::DataLakePrincipalValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::LakeFormation::Permissions::DataLakePrincipal->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::LakeFormation::Permissions::DataLakePrincipalValue {
+package Cfn::Resource::Properties::Object::AWS::LakeFormation::Permissions::DataLakePrincipal {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -118,3 +211,30 @@ package Cfn::Resource::Properties::AWS::LakeFormation::Permissions {
 }
 
 1;
+### main pod documentation begin ###
+
+=encoding UTF-8
+
+=head1 NAME
+
+Cfn::Resource::AWS::LakeFormation::Permissions - Cfn resource for AWS::LakeFormation::Permissions
+
+=head1 DESCRIPTION
+
+This module implements a Perl module that represents the CloudFormation object AWS::LakeFormation::Permissions.
+
+See L<Cfn> for more information on how to use it.
+
+=head1 AUTHOR
+
+    Jose Luis Martinez
+    CAPSiDE
+    jlmartinez@capside.com
+
+=head1 COPYRIGHT and LICENSE
+
+Copyright (c) 2013 by CAPSiDE
+This code is distributed under the Apache 2 License. The full text of the 
+license can be found in the LICENSE file included with this module.
+
+=cut

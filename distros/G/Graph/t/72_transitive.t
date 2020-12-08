@@ -1,5 +1,5 @@
 use strict; use warnings;
-use Test::More tests => 255;
+use Test::More tests => 292;
 
 use Graph::Directed;
 use Graph::Undirected;
@@ -12,7 +12,7 @@ $g0->add_edge(qw(c d));
 
 ok(!$g0->is_transitive);
 
-my $t0 = Graph::TransitiveClosure->new($g0);
+my $t0 = Graph::TransitiveClosure->new($g0->deep_copy);
 
 ok( $t0->has_edge(qw(a a)));
 ok( $t0->has_edge(qw(a b)));
@@ -33,11 +33,14 @@ ok( $t0->has_edge(qw(d d)));
 
 ok( $t0->is_transitive);
 
-my $r0 = Graph::TransitiveClosure->new($g0, reflexive => 0);
+my $r0 = Graph::TransitiveClosure->new($g0->deep_copy, reflexive => 0);
 
 ok(!$r0->has_edge(qw(a a)));
 ok( $r0->has_edge(qw(a b)));
 ok( $r0->has_edge(qw(a c)));
+ok !$r0->transitive_closure_matrix->is_transitive(qw(a a)), 'r0 !is_transitive a a';
+ok $r0->transitive_closure_matrix->is_transitive(qw(a c)), 'r0 is_transitive a c';
+ok !$r0->transitive_closure_matrix->is_transitive(qw(d a)), 'r0 !is_transitive d a';
 ok(!$r0->has_edge(qw(d c)));
 ok(!$r0->has_edge(qw(b a)));
 ok(!$r0->has_edge(qw(b b)));
@@ -54,11 +57,14 @@ ok(!$r0->has_edge(qw(d d)));
 
 ok( $r0->is_transitive);
 
-my $r1 = Graph::TransitiveClosure->new($g0, reflexive => 1);
+my $r1 = Graph::TransitiveClosure->new($g0->deep_copy, reflexive => 1);
 
 ok( $r1->has_edge(qw(a a)));
 ok( $r1->has_edge(qw(a b)));
 ok( $r1->has_edge(qw(a c)));
+ok $r1->transitive_closure_matrix->is_transitive(qw(a a)), 'r1 is_transitive a a';
+ok $r1->transitive_closure_matrix->is_transitive(qw(a c)), 'r1 is_transitive a c';
+ok !$r1->transitive_closure_matrix->is_transitive(qw(d a)), 'r1 !is_transitive d a';
 ok(!$r1->has_edge(qw(d c)));
 ok(!$r1->has_edge(qw(b a)));
 ok( $r1->has_edge(qw(b b)));
@@ -83,24 +89,15 @@ $g1->add_edge(qw(c d));
 
 ok(!$g1->is_transitive);
 
-my $t1 = Graph::TransitiveClosure->new($g1);
+my $t1 = Graph::TransitiveClosure->new($g1->deep_copy);
 
-ok( $t1->has_edge(qw(a a)));
-ok( $t1->has_edge(qw(a b)));
-ok( $t1->has_edge(qw(a c)));
-ok( $t1->has_edge(qw(d c)));
-ok( $t1->has_edge(qw(b a)));
-ok( $t1->has_edge(qw(b b)));
-ok( $t1->has_edge(qw(b c)));
-ok( $t1->has_edge(qw(b d)));
-ok( $t1->has_edge(qw(c a)));
-ok( $t1->has_edge(qw(c b)));
-ok( $t1->has_edge(qw(c c)));
-ok( $t1->has_edge(qw(c d)));
-ok( $t1->has_edge(qw(d a)));
-ok( $t1->has_edge(qw(d b)));
-ok( $t1->has_edge(qw(d c)));
-ok( $t1->has_edge(qw(d d)));
+ok $t1->has_edge(@$_) for (
+    [qw(a a)], [qw(a b)], [qw(a c)], [qw(d c)], [qw(b a)], [qw(b b)],
+    [qw(b c)], [qw(b d)], [qw(c a)], [qw(c b)], [qw(c c)], [qw(c d)],
+    [qw(d a)], [qw(d b)], [qw(d c)], [qw(d d)],
+);
+is("@{[$t1->path_vertices(qw(a d))]}", "a c d");
+is($t1->path_length(qw(a b)), 1);
 
 ok( $t1->is_transitive);
 
@@ -110,7 +107,7 @@ $g2->add_weighted_edge(qw(b c 1));
 
 ok(!$g2->is_transitive);
 
-my $t2 = Graph::TransitiveClosure->new($g2, path => 1);
+my $t2 = Graph::TransitiveClosure->new($g2->deep_copy, path => 1);
 
 is($t2->path_length(qw(a a)), 0);
 is($t2->path_length(qw(a b)), 3);
@@ -138,9 +135,9 @@ my $g3 = Graph->new;
 $g3->add_edge(qw(a b));
 $g3->add_edge(qw(b c));
 
-ok(!$g3->is_transitive);
+ok(!$g3->deep_copy->is_transitive);
 
-my $t3 = Graph::TransitiveClosure->new($g3, path => 1);
+my $t3 = Graph::TransitiveClosure->new($g3->deep_copy, path => 1);
 
 is($t3->path_length(qw(a a)), 0);
 is($t3->path_length(qw(a b)), 1);
@@ -312,11 +309,11 @@ is($g3->path_predecessor(qw(c c)), undef);
 
 # TransitiveClosure_Floyd_Warshall is just an alias for TransitiveClosure.
 
-my $t0tcfw = Graph->TransitiveClosure_Floyd_Warshall($g0);
+my $t0tcfw = Graph->TransitiveClosure_Floyd_Warshall($g0->deep_copy);
 
 is($t0, $t0tcfw);
 
-my $t3apspfw = $g3->APSP_Floyd_Warshall;
+my $t3apspfw = $g3->deep_copy->APSP_Floyd_Warshall;
 
 is($t3, $t3apspfw);
 
@@ -366,13 +363,22 @@ is($t3apspfw->path_predecessor(qw(c c)), undef);
     $g->add_edges( qw( a b b c ) );
     $g->add_vertex( 'd' );
 
-    my $t0 = $g->TransitiveClosure_Floyd_Warshall(reflexive => 0);
+    my $t0 = $g->deep_copy->TransitiveClosure_Floyd_Warshall(reflexive => 0);
     ok( $t0->has_vertex( 'a' ) );
     ok(!$t0->has_vertex( 'd' ) );
 
-    my $t1 = $g->TransitiveClosure_Floyd_Warshall(reflexive => 1);
+    my $t1 = $g->deep_copy->TransitiveClosure_Floyd_Warshall(reflexive => 1);
     ok( $t1->has_vertex( 'a' ) );
     ok( $t1->has_vertex( 'd' ) );
+
+    # test caching of TCM
+    my $t0c = $g->TransitiveClosure_Floyd_Warshall(reflexive => 0);
+    ok( $t0c->has_vertex( 'a' ) );
+    ok(!$t0c->has_vertex( 'd' ) );
+
+    my $t1c = $g->TransitiveClosure_Floyd_Warshall(reflexive => 1);
+    ok( $t1c->has_vertex( 'a' ) );
+    ok( $t1c->has_vertex( 'd' ) );
 }
 
 {
@@ -389,13 +395,13 @@ is($t3apspfw->path_predecessor(qw(c c)), undef);
     $graph->add_weighted_edge(0,1,1);
     $graph->add_weighted_edge(1,2,1);
 
-    my $tc1=new Graph::TransitiveClosure($graph);
+    my $tc1=new Graph::TransitiveClosure($graph->deep_copy);
 
     is ("@{[sort $tc1->path_vertices(0,1)]}", "0 1");
     is ("@{[sort $tc1->path_vertices(0,2)]}", "0 1 2");
     is ("@{[sort $tc1->path_vertices(1,2)]}", "1 2");
 
-    my $tc2=new Graph::TransitiveClosure($graph,path_length=>1,path_vertices=>1);
+    my $tc2=new Graph::TransitiveClosure($graph->deep_copy,path_length=>1,path_vertices=>1);
 
     is ("@{[sort $tc2->path_vertices(0,1)]}", "0 1");
     is ("@{[sort $tc2->path_vertices(0,2)]}", "0 1 2");
@@ -456,10 +462,18 @@ is($t3apspfw->path_predecessor(qw(c c)), undef);
     my @example = ( [ 1, 2 ],
                     [ 1, 3 ],
                     [ 1, 4 ], # direct link to two away
+                    [ 1, 1 ], # self-loop
                     [ 3, 4 ] );
     my $g = Graph::Directed->new;
     $g->add_edge(@$_) for @example;
     my $tcg = $g->transitive_closure;
+    is $tcg->transitive_closure_matrix->[1]->stringify, <<'EOF';
+ to:    1    2    3    4
+   1    0    1    1    1
+   2         0          
+   3              0    1
+   4                   0
+EOF
     my @paths = (
 	[ 1, 2, [[1,2]] ],
 	[ 1, 3, [[1,3]] ],
@@ -478,5 +492,38 @@ is($t3apspfw->path_predecessor(qw(c c)), undef);
         my ($u, $v, $paths) = @$t;
         my $got = [ sort { $a->[1] <=> $b->[1] } $g->all_paths($u, $v) ];
         is_deeply $got, $paths, "paths $u $v" or diag explain $got;
+    }
+}
+
+{
+    my @example = ( [ 1, 2, [[qw(a weight 1)], [qw(b weight 2)]] ],
+		    [ 1, 3, [[qw(c other 1)], [qw(b weight 2)]] ],
+		    [ 1, 4, [[qw(d weight 4)], [qw(b weight 5)]] ], # direct link to two away
+		    [ 3, 4, [[qw(d weight 3)], [qw(3 weight 2)]] ] );
+    my $g = Graph::Directed->new(multiedged => 1);
+    for my $t (@example) {
+	my ($u, $v, $e) = @$t;
+	$g->set_edge_attribute_by_id($u, $v, @$_) for @$e;
+    }
+    my $tcg = $g->transitive_closure;
+    my @paths = (
+	[ 1, 2, 1, [[1,2]] ],
+	[ 1, 3, 2, [[1,3]] ],
+	[ 1, 4, 4, [[1,3,4], [1,4]] ],
+	[ 2, 1, undef, [] ],
+	[ 2, 3, undef, [] ],
+	[ 2, 4, undef, [] ],
+	[ 3, 1, undef, [] ],
+	[ 3, 2, undef, [] ],
+	[ 3, 4, 2, [[3,4]] ],
+	[ 4, 1, undef, [] ],
+	[ 4, 2, undef, [] ],
+	[ 4, 3, undef, [] ],
+    );
+    foreach my $t (@paths) {
+	my ($u, $v, $dist, $paths) = @$t;
+	my $got = [ sort { $a->[1] <=> $b->[1] } $g->all_paths($u, $v) ];
+	is_deeply $got, $paths, "paths $u $v" or diag explain $got;
+	is $tcg->path_length($u, $v), $dist, "dist $u $v";
     }
 }

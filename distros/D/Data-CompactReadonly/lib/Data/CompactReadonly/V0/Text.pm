@@ -1,5 +1,5 @@
 package Data::CompactReadonly::V0::Text;
-our $VERSION = '0.0.1';
+our $VERSION = '0.0.2';
 
 use warnings;
 use strict;

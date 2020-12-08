@@ -1,7 +1,9 @@
 package Pod::Weaver::Plugin::Regexp::Pattern;
 
-our $DATE = '2020-05-31'; # DATE
-our $VERSION = '0.007'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-09-14'; # DATE
+our $DIST = 'Pod-Weaver-Plugin-Regexp-Pattern'; # DIST
+our $VERSION = '0.008'; # VERSION
 
 use 5.010001;
 use Moose;
@@ -163,7 +165,7 @@ sub _process_module {
         push @pod, "=back\n\n";
 
         $self->add_text_to_section(
-            $document, join("", @pod), 'PATTERNS',
+            $document, join("", @pod), 'REGEXP PATTERNS',
             {
                 after_section => ['DESCRIPTION'],
             });
@@ -217,7 +219,7 @@ Pod::Weaver::Plugin::Regexp::Pattern - Plugin to use when building Regexp::Patte
 
 =head1 VERSION
 
-This document describes version 0.007 of Pod::Weaver::Plugin::Regexp::Pattern (from Perl distribution Pod-Weaver-Plugin-Regexp-Pattern), released on 2020-05-31.
+This document describes version 0.008 of Pod::Weaver::Plugin::Regexp::Pattern (from Perl distribution Pod-Weaver-Plugin-Regexp-Pattern), released on 2020-09-14.
 
 =head1 SYNOPSIS
 
@@ -236,7 +238,7 @@ Currently it does the following:
 
 =item * Add a description about Regexp::Pattern in the Description section
 
-=item * Add a Patterns section containing list of patterns contained in the module
+=item * Add a Regexp Patterns section containing list of patterns contained in the module
 
 =item * Mention some modules in the See Also section, including Regexp::Pattern
 

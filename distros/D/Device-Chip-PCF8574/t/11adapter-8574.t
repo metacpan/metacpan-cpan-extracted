@@ -1,20 +1,22 @@
 #!/usr/bin/perl
 
-use strict;
+use v5.26;
 use warnings;
 
 use Test::More;
 use Test::Device::Chip::Adapter 0.08;  # ->read
 
+use Future::AsyncAwait;
+
 use Device::Chip::PCF8574;
 
 my $chip = Device::Chip::PCF8574->new;
 
-$chip->mount(
+await $chip->mount(
    my $adapter = Test::Device::Chip::Adapter->new,
-)->get;
+);
 
-my $gpios = $chip->as_adapter->make_protocol( "GPIO" )->get;
+my $gpios = await $chip->as_adapter->make_protocol( "GPIO" );
 
 # list
 {
@@ -30,7 +32,7 @@ my $gpios = $chip->as_adapter->make_protocol( "GPIO" )->get;
    $adapter->expect_read( 1 )->returns( "\x00" );
 
    is_deeply(
-      $gpios->read_gpios( [ 'P0' ] )->get,
+      await $gpios->read_gpios( [ 'P0' ] ),
       { P0 => !!0 },
       '$gpios->read_gpios returns value'
    );
@@ -42,7 +44,7 @@ my $gpios = $chip->as_adapter->make_protocol( "GPIO" )->get;
 {
    $adapter->expect_write( "\xFD" );
 
-   $gpios->write_gpios( { P1 => 0 } )->get;
+   await $gpios->write_gpios( { P1 => 0 } );
 
    $adapter->check_and_clear( '$gpios->write_gpios' );
 }

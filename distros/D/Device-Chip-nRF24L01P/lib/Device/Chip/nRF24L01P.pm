@@ -1,19 +1,19 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2014-2016 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2014-2020 -- leonerd@leonerd.org.uk
 
-package Device::Chip::nRF24L01P;
+use v5.26;
+use Object::Pad 0.19;
 
-use strict;
-use warnings;
-use 5.010;
-use base qw( Device::Chip );
-
-our $VERSION = '0.03';
+package Device::Chip::nRF24L01P 0.04;
+class Device::Chip::nRF24L01P
+   extends Device::Chip;
 
 use Carp;
 use Data::Bitfield qw( bitfield boolfield enumfield intfield );
+
+use Future::AsyncAwait;
 
 use constant PROTOCOL => "SPI";
 
@@ -33,18 +33,6 @@ concepts or features, only the use of this module to access them.
 
 =cut
 
-sub new
-{
-   my $class = shift;
-   my ( $bp, %opts ) = @_;
-
-   my $self = $class->SUPER::new( @_ );
-
-   $self->{registers} = []; # cache of the values we write to config registers
-
-   return $self;
-}
-
 =head1 MOUNT PARAMETERS
 
 =head2 ce
@@ -61,22 +49,22 @@ my %DEFAULT_CE = (
    'Device::Chip::Adapter::FTDI'      => "D4",
 );
 
-sub mount
-{
-   my $self = shift;
-   my ( $adapter, %params ) = @_;
+has $_gpio_ce;
 
+async method mount ( $adapter, %params )
+{
    my $ce_pin = $params{ce} // $DEFAULT_CE{ref $adapter} // "CE";
 
-   $self->{gpio_ce} = $ce_pin;
+   $_gpio_ce = $ce_pin;
 
-   $self->SUPER::mount( @_ )
-      ->then( sub {
-         $self->protocol->write_gpios( { $ce_pin => 0 } )
-      });
+   await $self->SUPER::mount( $adapter, %params );
+
+   await $self->protocol->write_gpios( { $ce_pin => 0 } );
+
+   return $self;
 }
 
-sub SPI_options
+method SPI_options
 {
    return (
       mode        => 0,
@@ -86,9 +74,12 @@ sub SPI_options
 
 =head1 METHODS
 
+The following methods documented in an C<await> expression return L<Future>
+instances.
+
 =cut
 
-sub power { shift->protocol->power( @_ ) }
+async method power ( $on ) { await $self->protocol->power( $on ) }
 
 # Commands
 use constant {
@@ -193,10 +184,11 @@ This should not normally be necessary, other than for debugging.
 
 =cut
 
-sub clear_caches
+has @_registers;
+
+method clear_caches ()
 {
-   my $self = shift;
-   undef @{ $self->{registers} };
+   undef @_registers;
 }
 
 =head2 latest_status
@@ -216,125 +208,106 @@ to 5) or undef.
 
 =cut
 
-sub latest_status
+has $_latest_status;
+
+method latest_status ()
 {
-   my $self = shift;
-   return { unpack_STATUS( $self->{latest_status} ) };
+   return { unpack_STATUS( $_latest_status ) };
 }
 
 =head2 reset_interrupt
 
-   $nrf->reset_interrupt->get
+   await $nrf->reset_interrupt;
 
 Clears the interrupt flags in the C<STATUS> register.
 
 =cut
 
-sub reset_interrupt
+async method reset_interrupt ()
 {
-   my $self = shift;
-
-   $self->_write_register_volatile( REG_STATUS, chr pack_STATUS(
+   await $self->_write_register_volatile( REG_STATUS, chr pack_STATUS(
          RX_DR  => 1,
          TX_DS  => 1,
          MAX_RT => 1
    ) );
 }
 
-sub _do_command
+async method _do_command ( $cmd, $data = "" )
 {
-   my $self = shift;
-   my ( $cmd, $data ) = @_;
-   $data //= "";
+   my $buf = await $self->protocol->readwrite( chr( $cmd ) . $data );
 
-   $self->protocol->readwrite( chr( $cmd ) . $data )->then( sub {
-      my ( $buf ) = @_;
-      $self->{latest_status} = ord substr $buf, 0, 1, "";
-      Future->done( $buf );
-   });
+   $_latest_status = ord substr $buf, 0, 1, "";
+
+   return $buf;
 }
 
 =head2 read_status
 
-   $status = $nrf->read_status->get
+   $status = await $nrf->read_status;
 
 Reads and returns the current content of the status register as a HASH
 reference as per C<latest_status>.
 
 =cut
 
-sub read_status
+async method read_status ()
 {
-   my $self = shift;
-   $self->_do_command( CMD_NOP )->then( sub {
-      Future->done( $self->latest_status )
-   });
+   await $self->_do_command( CMD_NOP );
+
+   return $self->latest_status;
 }
 
 # Always performs an SPI operation
-sub _read_register_volatile
+async method _read_register_volatile ( $reg )
 {
-   my $self = shift;
-   my ( $reg ) = @_;
-
    my ( $regnum, $len ) = @$reg;
 
-   $self->_do_command( CMD_R_REGISTER | $regnum, ( "\0" x $len ) )
-      ->on_done( sub {
-         $self->{registers}[$regnum] = $_[0];
-      });
+   my $val = await $self->_do_command( CMD_R_REGISTER | $regnum, ( "\0" x $len ) );
+
+   $_registers[$regnum] = $val;
+   return $val;
 }
 
 # Returns the cached value if present
-sub _read_register
+async method _read_register ( $reg )
 {
-   my $self = shift;
-   my ( $reg ) = @_;
-
    my ( $regnum ) = @$reg;
 
-   defined $self->{registers}[$regnum] ?
-      Future->done( $self->{registers}[$regnum] ) :
-      $self->_read_register_volatile( $reg );
+   defined $_registers[$regnum] ?
+      return $_registers[$regnum] :
+      return await $self->_read_register_volatile( $reg );
 }
 
 # Always performs an SPI operation
-sub _write_register_volatile
+async method _write_register_volatile ( $reg, $data )
 {
-   my $self = shift;
-   my ( $reg, $data ) = @_;
-
    my ( $regnum, $len ) = @$reg;
    $len == length $data or croak "Attempted to write the wrong length";
 
-   $self->_do_command( CMD_W_REGISTER | $regnum, $data )
-      ->then( sub {
-         $self->{registers}[$regnum] = $data;
-         Future->done()
-      });
+   await $self->_do_command( CMD_W_REGISTER | $regnum, $data );
+
+   $_registers[$regnum] = $data;
+   return;
 }
 
 # Doesn't bother if no change
-sub _write_register
+async method _write_register ( $reg, $data )
 {
-   my $self = shift;
-   my ( $reg, $data ) = @_;
-
    my ( $regnum ) = @$reg;
 
-   return Future->done() if
-      defined $self->{registers}[$regnum] and $self->{registers}[$regnum] eq $data;
+   return if
+      defined $_registers[$regnum] and $_registers[$regnum] eq $data;
 
-   return $self->_write_register_volatile( $reg, $data );
+   await $self->_write_register_volatile( $reg, $data );
 }
 
 =head2 read_config
 
-   $config = $nrf->read_config->get
+   $config = await $nrf->read_config;
 
 =head2 change_config
 
-   $nrf->change_config( %config )->get
+   await $nrf->change_config( %config );
 
 Reads or writes the chip-wide configuration. This is an amalgamation of all
 the non-pipe-specific configuration registers; C<CONFIG>, C<SETUP_AW>,
@@ -385,22 +358,18 @@ will be written.
 
 =cut
 
-sub _unpack_addr
+sub _unpack_addr ( $addr )
 {
-   my ( $addr ) = @_;
    return join ":", map { sprintf "%02X", ord } split //, $addr;
 }
 
-sub _pack_addr
+sub _pack_addr ( $addr )
 {
-   my ( $addr ) = @_;
    return join "", map { chr hex } split m/:/, $addr;
 }
 
-sub _unpack_config
+sub _unpack_config ( %regs )
 {
-   my %regs = @_;
-
    my %config = (
       unpack_CONFIG    ( $regs{config} ),
       unpack_SETUP_AW  ( $regs{setup_aw} ),
@@ -418,10 +387,8 @@ sub _unpack_config
    return %config;
 }
 
-sub _pack_config
+sub _pack_config ( %config )
 {
-   my %config = @_;
-
    # RF_DR is split across two discontiguous bits - currently Data::Bitmask
    # can't support this
    for( delete $config{RF_DR} ) {
@@ -441,49 +408,43 @@ sub _pack_config
       feature    => pack_FEATURE   ( %config ),
 }
 
-sub read_config
+async method read_config ()
 {
-   my $self = shift;
-
-   Future->needs_all(
+   my @vals = await Future->needs_all(
       map { $self->_read_register( $_ ) }
          REG_CONFIG, REG_SETUP_AW, REG_SETUP_RETR, REG_RF_CH, REG_RF_SETUP, REG_TX_ADDR, REG_FEATURE,
-   )->then( sub {
-      $_ = ord $_ for @_[0,1,2,3,4,6]; # [5] is TX_ADDR
-      my %regs;
-      @regs{qw( config setup_aw setup_retr rf_ch rf_setup tx_addr feature )} = @_;
+   );
 
-      Future->done( { _unpack_config %regs } );
-   });
+   $_ = ord $_ for @vals[0,1,2,3,4,6]; # [5] is TX_ADDR
+   my %regs;
+   @regs{qw( config setup_aw setup_retr rf_ch rf_setup tx_addr feature )} = @vals;
+
+   return { _unpack_config %regs };
 }
 
-sub change_config
+async method change_config ( %changes )
 {
-   my $self = shift;
-   my %changes = @_;
+   my $config = await $self->read_config;
 
-   $self->read_config
-   ->then( sub {
-      my ( $config ) = @_;
-      my %new_registers = _pack_config %$config, %changes;
+   my %new_registers = _pack_config %$config, %changes;
 
-      my @f;
-      foreach (qw( config setup_aw setup_retr rf_ch rf_setup feature )) {
-         push @f, $self->_write_register( $self->${\"REG_\U$_"}, chr $new_registers{$_} );
-      }
-      push @f, $self->_write_register( REG_TX_ADDR, $new_registers{tx_addr} );
+   my @f;
+   foreach (qw( config setup_aw setup_retr rf_ch rf_setup feature )) {
+      push @f, $self->_write_register( $self->${\"REG_\U$_"}, chr $new_registers{$_} );
+   }
+   push @f, $self->_write_register( REG_TX_ADDR, $new_registers{tx_addr} );
 
-      Future->needs_all( @f )
-   })->then_done();
+   await Future->needs_all( @f );
+   return;
 }
 
 =head2 read_rx_config
 
-   $config = $nrf->read_rx_config( $pipeno )->get
+   $config = await $nrf->read_rx_config( $pipeno );
 
 =head2 change_rx_config
 
-   $nrf->change_rx_config( $pipeno, %config )->get
+   await $nrf->change_rx_config( $pipeno, %config );
 
 Reads or writes the per-pipe RX configuration. This is composed of the
 per-pipe bits of the C<EN_AA> and C<EN_RXADDR> registers and its
@@ -498,173 +459,154 @@ pipes, all but the final byte is ignored.
 
 =cut
 
-sub read_rx_config
+async method read_rx_config ( $pipeno )
 {
-   my $self = shift;
-   my ( $pipeno ) = @_;
-
    $pipeno >= 0 and $pipeno < 6 or croak "Invalid pipe number $pipeno";
    my $mask = 1 << $pipeno;
 
-   Future->needs_all(
-      map { $self->_read_register( $_ ) }
-         REG_EN_AA, REG_EN_RXADDR, REG_DYNPD, # bitwise
-         $self->${\"REG_RX_PW_P$pipeno"}, $self->${\"REG_RX_ADDR_P$pipeno"},
-         # Pipes 2 to 5 share the first 4 octects of PIPE1's address
-         ( $pipeno >= 2 ? REG_RX_ADDR_P1 : () ),
-   )->then( sub {
-      my ( $en_aa, $en_rxaddr, $dynpd, $width, $addr, $p1addr ) = @_;
-      $_ = ord $_ for $en_aa, $en_rxaddr, $dynpd, $width;
+   my ( $en_aa, $en_rxaddr, $dynpd, $width, $addr, $p1addr ) =
+      await Future->needs_all(
+         map { $self->_read_register( $_ ) }
+            REG_EN_AA, REG_EN_RXADDR, REG_DYNPD, # bitwise
+            $self->${\"REG_RX_PW_P$pipeno"}, $self->${\"REG_RX_ADDR_P$pipeno"},
+            # Pipes 2 to 5 share the first 4 octects of PIPE1's address
+            ( $pipeno >= 2 ? REG_RX_ADDR_P1 : () ),
+      );
 
-      $addr = substr( $p1addr, 0, 4 ) . $addr if $pipeno >= 2;
+   $_ = ord $_ for $en_aa, $en_rxaddr, $dynpd, $width;
 
-      Future->done( {
-         EN_AA     => !!( $en_aa     & $mask ),
-         EN_RXADDR => !!( $en_rxaddr & $mask ),
-         DYNPD     => !!( $dynpd     & $mask ),
-         RX_PW     => $width,
-         RX_ADDR   => _unpack_addr $addr,
-      } );
-   });
+   $addr = substr( $p1addr, 0, 4 ) . $addr if $pipeno >= 2;
+
+   return {
+      EN_AA     => !!( $en_aa     & $mask ),
+      EN_RXADDR => !!( $en_rxaddr & $mask ),
+      DYNPD     => !!( $dynpd     & $mask ),
+      RX_PW     => $width,
+      RX_ADDR   => _unpack_addr $addr,
+   };
 }
 
-sub change_rx_config
+async method change_rx_config ( $pipeno, %changes )
 {
-   my $self = shift;
-   my ( $pipeno, %changes ) = @_;
-
    $pipeno >= 0 and $pipeno < 6 or croak "Invalid pipe number $pipeno";
    my $mask = 1 << $pipeno;
 
    my $REG_RX_PW_Pn   = $self->${\"REG_RX_PW_P$pipeno"};
    my $REG_RX_ADDR_Pn = $self->${\"REG_RX_ADDR_P$pipeno"};
 
-   Future->needs_all(
-      map { $self->_read_register( $_ ) }
-         REG_EN_AA, REG_EN_RXADDR, REG_DYNPD, $REG_RX_PW_Pn, $REG_RX_ADDR_Pn
-   )->then( sub {
-      my ( $en_aa, $en_rxaddr, $dynpd, $width, $addr ) = @_;
-      $_ = ord $_ for $en_aa, $en_rxaddr, $dynpd, $width;
-
-      if( exists $changes{EN_AA} ) {
-         $en_aa &= ~$mask;
-         $en_aa |=  $mask if $changes{EN_AA};
-      }
-      if( exists $changes{EN_RXADDR} ) {
-         $en_rxaddr &= ~$mask;
-         $en_rxaddr |=  $mask if $changes{EN_RXADDR};
-      }
-      if( exists $changes{DYNPD} ) {
-         $dynpd &= ~$mask;
-         $dynpd |=  $mask if $changes{DYNPD};
-      }
-      if( exists $changes{RX_PW} ) {
-         $width = $changes{RX_PW};
-      }
-      if( exists $changes{RX_ADDR} ) {
-         $addr = _pack_addr $changes{RX_ADDR};
-         $addr = substr( $addr, -1 ) if $pipeno >= 2;
-      }
-
-      Future->needs_all(
-         $self->_write_register( REG_EN_AA,     chr $en_aa ),
-         $self->_write_register( REG_EN_RXADDR, chr $en_rxaddr ),
-         $self->_write_register( REG_DYNPD,     chr $dynpd ),
-         $self->_write_register( $REG_RX_PW_Pn, chr $width ),
-         $self->_write_register( $REG_RX_ADDR_Pn, $addr ),
+   my ( $en_aa, $en_rxaddr, $dynpd, $width, $addr ) =
+      await Future->needs_all(
+         map { $self->_read_register( $_ ) }
+            REG_EN_AA, REG_EN_RXADDR, REG_DYNPD, $REG_RX_PW_Pn, $REG_RX_ADDR_Pn
       );
-   })->then_done();
+
+   $_ = ord $_ for $en_aa, $en_rxaddr, $dynpd, $width;
+
+   if( exists $changes{EN_AA} ) {
+      $en_aa &= ~$mask;
+      $en_aa |=  $mask if $changes{EN_AA};
+   }
+   if( exists $changes{EN_RXADDR} ) {
+      $en_rxaddr &= ~$mask;
+      $en_rxaddr |=  $mask if $changes{EN_RXADDR};
+   }
+   if( exists $changes{DYNPD} ) {
+      $dynpd &= ~$mask;
+      $dynpd |=  $mask if $changes{DYNPD};
+   }
+   if( exists $changes{RX_PW} ) {
+      $width = $changes{RX_PW};
+   }
+   if( exists $changes{RX_ADDR} ) {
+      $addr = _pack_addr $changes{RX_ADDR};
+      $addr = substr( $addr, -1 ) if $pipeno >= 2;
+   }
+
+  await Future->needs_all(
+      $self->_write_register( REG_EN_AA,     chr $en_aa ),
+      $self->_write_register( REG_EN_RXADDR, chr $en_rxaddr ),
+      $self->_write_register( REG_DYNPD,     chr $dynpd ),
+      $self->_write_register( $REG_RX_PW_Pn, chr $width ),
+      $self->_write_register( $REG_RX_ADDR_Pn, $addr ),
+   );
+
+   return;
 }
 
 =head2 observe_tx_counts
 
-   $counts = $nrf->observe_tx_counts->get
+   $counts = await $nrf->observe_tx_counts;
 
 Reads the C<OBSERVE_TX> register and returns the two counts from it.
 
 =cut
 
-sub observe_tx_counts
+async method observe_tx_counts ()
 {
-   my $self = shift;
+   my $buf = await $self->_read_register_volatile( REG_OBSERVE_TX );
 
-   $self->_read_register_volatile( REG_OBSERVE_TX )->then( sub {
-      my ( $buf ) = @_;
-      Future->done( { unpack_OBSERVE_TX( ord $buf ) } );
-   });
+   return { unpack_OBSERVE_TX( ord $buf ) };
 }
 
 =head2 rpd
 
-   $rpd = $nrf->rpd->get
+   $rpd = await $nrf->rpd;
 
 Reads the C<RPD> register
 
 =cut
 
-sub rpd
+async method rpd ()
 {
-   my $self = shift;
+   my $buf = await $self->_read_register_volatile( REG_RPD );
 
-   $self->_read_register_volatile( REG_RPD )->then( sub {
-      my ( $buf ) = @_;
-      $buf = ord $buf;
-
-      Future->done( $buf & 1 );
-   });
+   return ( ord $buf ) & 1;
 }
 
 =head2 fifo_status
 
-   $status = $nrf->fifo_status->get
+   $status = await $nrf->fifo_status;
 
 Reads the C<FIFO_STATUS> register and returns the five bit fields from it.
 
 =cut
 
-sub fifo_status
+async method fifo_status ()
 {
-   my $self = shift;
+   my $buf = await $self->_read_register_volatile( REG_FIFO_STATUS );
 
-   $self->_read_register_volatile( REG_FIFO_STATUS )->then( sub {
-      my ( $buf ) = @_;
-      Future->done( { unpack_FIFO_STATUS( ord $buf ) } );
-   });
+   return { unpack_FIFO_STATUS( ord $buf ) };
 }
 
 =head2 pwr_up
 
-   $nrf->pwr_up( $pwr )->get
+   await $nrf->pwr_up( $pwr );
 
 A convenient shortcut to setting the C<PWR_UP> configuration bit.
 
 =cut
 
-sub pwr_up
+async method pwr_up ( $pwr )
 {
-   my $self = shift;
-   $self->change_config( PWR_UP => shift );
+   await $self->change_config( PWR_UP => $pwr );
 }
 
 =head2 chip_enable
 
-   $nrf->chip_enable( $ce )->get
+   await $nrf->chip_enable( $ce );
 
 Controls the Chip Enable (CE) pin of the chip.
 
 =cut
 
-sub chip_enable
+async method chip_enable ( $ce )
 {
-   my $self = shift;
-   my ( $ce ) = @_;
-
-   $self->protocol->write_gpios( { $self->{gpio_ce} => $ce } );
+   await $self->protocol->write_gpios( { $_gpio_ce => $ce } );
 }
 
 =head2 read_rx_payload_width
 
-   $len = $nrf->read_rx_payload_width->get
+   $len = await $nrf->read_rx_payload_width;
 
 Returns the width of the most recently received payload, when in C<DPL> mode.
 Remember that C<DPL> needs to be enabled (using C<EN_DPL>) on both the
@@ -672,37 +614,29 @@ transmitter and receiver before this will work.
 
 =cut
 
-sub read_rx_payload_width
+async method read_rx_payload_width ()
 {
-   my $self = shift;
-
-   $self->_do_command( CMD_R_RX_PL_WID, "\0" )->then( sub {
-      my ( $buf ) = @_;
-      Future->done( ord $buf );
-   });
+   return ord await $self->_do_command( CMD_R_RX_PL_WID, "\0" );
 }
 
 =head2 read_rx_payload
 
-   $data = $nrf->read_rx_payload( $len )->get
+   $data = await $nrf->read_rx_payload( $len );
 
 Reads the most recently received RX FIFO payload buffer.
 
 =cut
 
-sub read_rx_payload
+async method read_rx_payload ( $len )
 {
-   my $self = shift;
-   my ( $len ) = @_;
-
    $len > 0 and $len <= 32 or croak "Invalid RX payload length $len";
 
-   $self->_do_command( CMD_R_RX_PAYLOAD, "\0" x $len )
+   return await $self->_do_command( CMD_R_RX_PAYLOAD, "\0" x $len )
 }
 
 =head2 write_tx_payload
 
-   $nrf->write_tx_payload( $data, %opts )->get
+   await $nrf->write_tx_payload( $data, %opts );
 
 Writes the next TX FIFO payload buffer. Takes the following options:
 
@@ -717,46 +651,39 @@ does not requre auto-ACK.
 
 =cut
 
-sub write_tx_payload
+async method write_tx_payload ( $data, %opts )
 {
-   my $self = shift;
-   my ( $data, %opts ) = @_;
-
    my $len = length $data;
    $len > 0 and $len <= 32 or croak "Invalid TX payload length $len";
 
    my $cmd = $opts{no_ack} ? CMD_W_TX_PAYLOAD_NO_ACK : CMD_W_TX_PAYLOAD;
 
-   $self->_do_command( $cmd, $data )
-      ->then_done();
+   await $self->_do_command( $cmd, $data );
+   return;
 }
 
 =head2 flush_rx_fifo
 
-   $nrf->flush_rx_fifo->get
+   await $nrf->flush_rx_fifo;
 
 =head2 flush_tx_fifo
 
-   $nrf->flush_tx_fifo->get
+   await $nrf->flush_tx_fifo;
 
 Flush the RX or TX FIFOs, discarding all their contents.
 
 =cut
 
-sub flush_rx_fifo
+async method flush_rx_fifo ()
 {
-   my $self = shift;
-
-   $self->_do_command( CMD_FLUSH_RX )
-      ->then_done();
+   await $self->_do_command( CMD_FLUSH_RX );
+   return;
 }
 
-sub flush_tx_fifo
+async method flush_tx_fifo ()
 {
-   my $self = shift;
-
-   $self->_do_command( CMD_FLUSH_TX )
-      ->then_done();
+   await $self->_do_command( CMD_FLUSH_TX );
+   return;
 }
 
 =head1 AUTHOR

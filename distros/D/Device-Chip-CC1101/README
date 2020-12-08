@@ -35,12 +35,12 @@ CONSTRUCTOR
 
 METHODS
 
-    The following methods documented with a trailing call to ->get return
-    Future instances.
+    The following methods documented in an await expression return Future
+    instances.
 
  read_register
 
-       $value = $chip->read_register( $addr )->get
+       $value = await $chip->read_register( $addr );
 
     Reads a single byte register and returns its numerical value.
 
@@ -48,7 +48,7 @@ METHODS
 
  read_config
 
-       $config = $chip->read_config->get
+       $config = await $chip->read_config;
 
     Reads and returns the current chip configuration as a HASH reference.
 
@@ -75,7 +75,7 @@ METHODS
 
  change_config
 
-       $chip->change_config( %changes )->get
+       await $chip->change_config( %changes );
 
     Writes the configuration registers to apply the given changes. Any
     fields not specified will retain their current values. The value of
@@ -106,7 +106,7 @@ METHODS
 
  read_marcstate
 
-       $state = $chip->read_marcstate->get
+       $state = await $chip->read_marcstate;
 
     Reads the MARCSTATE register and returns the state name.
 
@@ -114,9 +114,9 @@ METHODS
 
  read_chipstatus_tx
 
-       $status = $chip->read_chipstatus_rx->get
+       $status = await $chip->read_chipstatus_rx;
     
-       $status = $chip->read_chipstatus_tx->get
+       $status = await $chip->read_chipstatus_tx;
 
     Reads the chip status word and returns a reference to a hash containing
     the following:
@@ -126,7 +126,7 @@ METHODS
 
  read_pktstatus
 
-       $status = $chip->read_pktstatus->get
+       $status = await $chip->read_pktstatus;
 
     Reads the PKTSTATUS register and returns a reference to a hash
     containing boolean fields of the following names:
@@ -135,49 +135,49 @@ METHODS
 
  reset
 
-       $chip->reset->get
+       await $chip->reset;
 
     Command the chip to perform a software reset.
 
  flush_fifos
 
-       $chip->flush_fifos->get
+       await $chip->flush_fifos;
 
     Command the chip to flush the RX and TX FIFOs.
 
  start_rx
 
-       $chip->start_rx->get
+       await $chip->start_rx;
 
     Command the chip to enter RX mode.
 
  start_tx
 
-       $chip->start_tx->get
+       await $chip->start_tx;
 
     Command the chip to enter TX mode.
 
  idle
 
-       $chip->idle->get
+       await $chip->idle;
 
     Command the chip to enter IDLE mode.
 
  read_rxfifo
 
-       $bytes = $chip->read_rxfifo( $len )->get
+       $bytes = await $chip->read_rxfifo( $len );
 
     Reads the given number of bytes from the RX FIFO.
 
  write_txfifo
 
-       $chip->write_txfifo( $bytes )->get
+       await $chip->write_txfifo( $bytes );
 
     Writes the given bytes into the TX FIFO.
 
  receive
 
-       $packet = $chip->receive->get
+       $packet = await $chip->receive;
 
     Retrieves a packet from the RX FIFO, returning a HASH reference.
 
@@ -202,7 +202,7 @@ METHODS
 
  transmit
 
-       $chip->transmit( $bytes )->get
+       await $chip->transmit( $bytes );
 
     Enters TX mode and sends a packet containing the given bytes.
 

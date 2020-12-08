@@ -173,7 +173,7 @@ use common::sense;
 use base 'Exporter';
 
 BEGIN {
-   our $VERSION = 4.72;
+   our $VERSION = 4.73;
 
    our @AIO_REQ = qw(aio_sendfile aio_seek aio_read aio_write aio_open aio_close
                      aio_stat aio_lstat aio_unlink aio_rmdir aio_readdir aio_readdirx
@@ -282,8 +282,8 @@ documentation.
    IO::AIO::npending
    IO::AIO::reinit
 
-   $nfd = IO::AIO::get_fdlimit [EXPERIMENTAL]
-   IO::AIO::min_fdlimit $nfd [EXPERIMENTAL]
+   $nfd = IO::AIO::get_fdlimit
+   IO::AIO::min_fdlimit $nfd
 
    IO::AIO::sendfile $ofh, $ifh, $offset, $count
    IO::AIO::fadvise $fh, $offset, $len, $advice
@@ -305,6 +305,7 @@ documentation.
    ($atime, $mtime, $ctime, $btime, ...) = IO::AIO::st_xtimensec
 
    # very much unportable syscalls
+   IO::AIO::accept4 $r_fh, $sockaddr, $sockaddr_len, $flags
    IO::AIO::splice $r_fh, $r_off, $w_fh, $w_off, $length, $flags
    IO::AIO::tee $r_fh, $w_fh, $length, $flags
    $actual_size = IO::AIO::pipesize $r_fh[, $new_size]
@@ -1310,13 +1311,17 @@ So in general, you should only use these calls for things that do
 other processes), although if you are careful and know what you are doing,
 you still can.
 
-The following constants are available (missing ones are, as usual C<0>):
+The following constants are available and can be used for normal C<ioctl>
+and C<fcntl> as well (missing ones are, as usual C<0>):
 
 C<F_DUPFD_CLOEXEC>,
 
 C<F_OFD_GETLK>, C<F_OFD_SETLK>, C<F_OFD_GETLKW>,
 
 C<FIFREEZE>, C<FITHAW>, C<FITRIM>, C<FICLONE>, C<FICLONERANGE>, C<FIDEDUPERANGE>.
+
+C<F_ADD_SEALS>, C<F_GET_SEALS>, C<F_SEAL_SEAL>, C<F_SEAL_SHRINK>, C<F_SEAL_GROW> and
+C<F_SEAL_WRITE>.
 
 C<FS_IOC_GETFLAGS>, C<FS_IOC_SETFLAGS>, C<FS_IOC_GETVERSION>, C<FS_IOC_SETVERSION>,
 C<FS_IOC_FIEMAP>.
@@ -1676,7 +1681,7 @@ expected way.
 
 =item IO::AIO::CWD
 
-This is a compiletime constant (object) that represents the process
+This is a compile time constant (object) that represents the process
 current working directory.
 
 Specifying this object as working directory object for a pathname is as if
@@ -2217,15 +2222,11 @@ counterpart.
 
 =item $numfd = IO::AIO::get_fdlimit
 
-This function is I<EXPERIMENTAL> and subject to change.
-
 Tries to find the current file descriptor limit and returns it, or
 C<undef> and sets C<$!> in case of an error. The limit is one larger than
 the highest valid file descriptor number.
 
 =item IO::AIO::min_fdlimit [$numfd]
-
-This function is I<EXPERIMENTAL> and subject to change.
 
 Try to increase the current file descriptor limit(s) to at least C<$numfd>
 by changing the soft or hard file descriptor resource limit. If C<$numfd>
@@ -2394,6 +2395,27 @@ Calls the C<munlockall> function.
 
 On systems that do not implement C<munlockall>, this function returns
 ENOSYS, otherwise the return value of C<munlockall>.
+
+=item $fh = IO::AIO::accept4 $r_fh, $sockaddr, $sockaddr_maxlen, $flags
+
+Uses the GNU/Linux C<accept4(2)> syscall, if available, to accept a socket
+and return the new file handle on success, or sets C<$!> and returns
+C<undef> on error.
+
+The remote name of the new socket will be stored in C<$sockaddr>, which
+will be extended to allow for at least C<$sockaddr_maxlen> octets. If the
+socket name does not fit into C<$sockaddr_maxlen> octets, this is signaled
+by returning a longer string in C<$sockaddr>, which might or might not be
+truncated.
+
+To accept name-less sockets, use C<undef> for C<$sockaddr> and C<0> for
+C<$sockaddr_maxlen>.
+
+The main reasons to use this syscall rather than portable C«accept(2)>
+are that you can specify C<SOCK_NONBLOCK> and/or C<SOCK_CLOEXEC>
+flags and you can accept name-less sockets by specifying C<0> for
+C<$sockaddr_maxlen>, which is sadly not possible with perl's interface to
+C<accept>.
 
 =item IO::AIO::splice $r_fh, $r_off, $w_fh, $w_off, $length, $flags
 
@@ -2666,7 +2688,7 @@ known issue, rather than a bug.
 =head1 SEE ALSO
 
 L<AnyEvent::AIO> for easy integration into event loops, L<Coro::AIO> for a
-more natural syntax.
+more natural syntax and L<IO::FDPass> for file descriptor passing.
 
 =head1 AUTHOR
 

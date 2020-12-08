@@ -11,6 +11,9 @@ my $b = AudioFile::Info::Build->new(
         AudioFile::Info => 0,
         MP3::ID3Lib     => 0,
     },
+    configure_requires => {
+        YAML            => 0,
+    },
     build_requires => {
         YAML            => 0,
     },
@@ -26,6 +29,9 @@ my $b = AudioFile::Info::Build->new(
                 type => 'git',
                 url  => 'https://github.com/davorg/audiofile-info-mp3-id3lib.git',
                 web  => 'https://github.com/davorg/audiofile-info-mp3-id3lib',
+            },
+            bugtracker => {
+                web  => 'https://github.com/davorg/audiofile-info-mp3-id3lib/issues',
             },
         },
     },

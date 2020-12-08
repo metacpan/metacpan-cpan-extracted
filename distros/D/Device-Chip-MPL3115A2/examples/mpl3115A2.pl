@@ -1,10 +1,12 @@
 #!/usr/bin/perl
 
-use strict;
+use v5.26;
 use warnings;
 
 use Device::Chip::MPL3115A2;
 use Device::Chip::Adapter;
+
+use Future::AsyncAwait;
 
 use Getopt::Long;
 
@@ -13,15 +15,15 @@ GetOptions(
    'p|print-config' => \my $PRINT_CONFIG,
    'm|minmax'       => \my $MINMAX,
 
-   'adapter|A=s' => \( my $ADAPTER = "BusPirate" ),
+   'adapter|A=s' => \my $ADAPTER,
 ) or exit 1;
 
 my $chip = Device::Chip::MPL3115A2->new;
-$chip->mount(
+await $chip->mount(
    Device::Chip::Adapter->new_from_description( $ADAPTER )
-)->get;
+);
 
-$chip->protocol->power(1)->get;
+await $chip->protocol->power(1);
 
 $SIG{INT} = $SIG{TERM} = sub { exit 1; };
 
@@ -29,28 +31,28 @@ END {
 #   $chip and $chip->protocol->power(0)->get;
 }
 
-$chip->check_id->get;
+await $chip->check_id;
 
-$chip->change_config(
+await $chip->change_config(
    OS   => 16,
-)->get;
+);
 
 if( $PRINT_CONFIG ) {
-   my $config = $chip->read_config->get;
+   my $config = await $chip->read_config;
    printf "%20s: %s\n", $_, $config->{$_} for sort keys %$config;
 }
 
 while(1) {
-   $chip->oneshot->get;
+   await $chip->oneshot;
 
    printf "Pressure: %.2f kPa   Temperature: %.2f C\n",
-      $chip->read_pressure->get / 1000, $chip->read_temperature->get;
+      ( await $chip->read_pressure ) / 1000, await $chip->read_temperature;
 
    if( $MINMAX ) {
       printf " (min %.2f, max %.2f kPa)\n",
-         $chip->read_min_pressure->get / 1000, $chip->read_max_pressure->get / 1000;
+         ( await $chip->read_min_pressure ) / 1000, ( await $chip->read_max_pressure ) / 1000;
       printf " (min %.2f, max %.2f C)\n",
-         $chip->read_min_temperature->get, $chip->read_max_temperature->get;
+         await $chip->read_min_temperature, await $chip->read_max_temperature;
    }
 
    sleep $INTERVAL;

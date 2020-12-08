@@ -1,4 +1,4 @@
-# AWS::Config::RemediationConfiguration generated from spec 6.1.0
+# AWS::Config::RemediationConfiguration generated from spec 18.4.0
 use Moose::Util::TypeConstraints;
 
 coerce 'Cfn::Resource::Properties::AWS::Config::RemediationConfiguration',
@@ -29,11 +29,11 @@ coerce 'Cfn::Resource::Properties::AWS::Config::RemediationConfiguration::Static
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::Config::RemediationConfiguration::StaticValueValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::Config::RemediationConfiguration::StaticValue->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::Config::RemediationConfiguration::StaticValueValue {
+package Cfn::Resource::Properties::Object::AWS::Config::RemediationConfiguration::StaticValue {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -50,11 +50,11 @@ coerce 'Cfn::Resource::Properties::AWS::Config::RemediationConfiguration::SsmCon
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::Config::RemediationConfiguration::SsmControlsValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::Config::RemediationConfiguration::SsmControls->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::Config::RemediationConfiguration::SsmControlsValue {
+package Cfn::Resource::Properties::Object::AWS::Config::RemediationConfiguration::SsmControls {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -72,11 +72,11 @@ coerce 'Cfn::Resource::Properties::AWS::Config::RemediationConfiguration::Resour
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::Config::RemediationConfiguration::ResourceValueValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::Config::RemediationConfiguration::ResourceValue->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::Config::RemediationConfiguration::ResourceValueValue {
+package Cfn::Resource::Properties::Object::AWS::Config::RemediationConfiguration::ResourceValue {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -93,11 +93,11 @@ coerce 'Cfn::Resource::Properties::AWS::Config::RemediationConfiguration::Remedi
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::Config::RemediationConfiguration::RemediationParameterValueValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::Config::RemediationConfiguration::RemediationParameterValue->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::Config::RemediationConfiguration::RemediationParameterValueValue {
+package Cfn::Resource::Properties::Object::AWS::Config::RemediationConfiguration::RemediationParameterValue {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -115,11 +115,11 @@ coerce 'Cfn::Resource::Properties::AWS::Config::RemediationConfiguration::Execut
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::Config::RemediationConfiguration::ExecutionControlsValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::Config::RemediationConfiguration::ExecutionControls->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::Config::RemediationConfiguration::ExecutionControlsValue {
+package Cfn::Resource::Properties::Object::AWS::Config::RemediationConfiguration::ExecutionControls {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -145,3 +145,30 @@ package Cfn::Resource::Properties::AWS::Config::RemediationConfiguration {
 }
 
 1;
+### main pod documentation begin ###
+
+=encoding UTF-8
+
+=head1 NAME
+
+Cfn::Resource::AWS::Config::RemediationConfiguration - Cfn resource for AWS::Config::RemediationConfiguration
+
+=head1 DESCRIPTION
+
+This module implements a Perl module that represents the CloudFormation object AWS::Config::RemediationConfiguration.
+
+See L<Cfn> for more information on how to use it.
+
+=head1 AUTHOR
+
+    Jose Luis Martinez
+    CAPSiDE
+    jlmartinez@capside.com
+
+=head1 COPYRIGHT and LICENSE
+
+Copyright (c) 2013 by CAPSiDE
+This code is distributed under the Apache 2 License. The full text of the 
+license can be found in the LICENSE file included with this module.
+
+=cut

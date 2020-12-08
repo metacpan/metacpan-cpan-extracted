@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20200904144536;
+our $VERSION = 1.20201204215957;
 
 my $formatters = [
                 {
@@ -86,25 +86,25 @@ my $validators = {
                 'voip' => ''
               };
 my %areanames = ();
-$areanames{en}->{96311} = "Damascus\ and\ rural\ areas";
-$areanames{en}->{96312} = "Al\-Nebek";
-$areanames{en}->{96313} = "Al\-Zabadani";
-$areanames{en}->{96314} = "Al\-Quneitra";
-$areanames{en}->{96315} = "Dara";
-$areanames{en}->{96316} = "Al\-Swedaa";
-$areanames{en}->{96321} = "Aleppo";
-$areanames{en}->{96322} = "Al\-Rakkah";
-$areanames{en}->{96323} = "Edleb";
-$areanames{en}->{96325} = "Menbej";
-$areanames{en}->{96331} = "Homs";
-$areanames{en}->{96333} = "Hamah";
-$areanames{en}->{96334} = "Palmyra";
-$areanames{en}->{96341} = "Lattakia";
-$areanames{en}->{96343} = "Tartous";
-$areanames{en}->{96344} = "Hamah";
-$areanames{en}->{96351} = "Deir\ Ezzour";
-$areanames{en}->{96352} = "Alhasakah";
-$areanames{en}->{96353} = "Al\-Kameshli";
+$areanames{en} = {"96351", "Deir\ Ezzour",
+"96313", "Al\-Zabadani",
+"96316", "Al\-Swedaa",
+"96334", "Palmyra",
+"96321", "Aleppo",
+"96341", "Lattakia",
+"96312", "Al\-Nebek",
+"96331", "Homs",
+"96344", "Hamah",
+"96315", "Dara",
+"96333", "Hamah",
+"96325", "Menbej",
+"96352", "Alhasakah",
+"96322", "Al\-Rakkah",
+"96314", "Al\-Quneitra",
+"96353", "Al\-Kameshli",
+"96311", "Damascus\ and\ rural\ areas",
+"96323", "Edleb",
+"96343", "Tartous",};
 
     sub new {
       my $class = shift;

@@ -3,7 +3,7 @@ package Make;
 use strict;
 use warnings;
 
-our $VERSION = '2.009';
+our $VERSION = '2.010';
 
 use Carp qw(confess croak);
 use Config;
@@ -598,7 +598,6 @@ sub _rmf_search_rule {
 
 sub find_recursive_makes {
     my ($self) = @_;
-    my $g = $self->as_graph;
     my @found;
     my $rmfs = $self->{RecursiveMakeFinders};
     for my $target ( sort $self->targets ) {
@@ -615,7 +614,7 @@ sub as_graph {
     my ( $self,     %options )        = @_;
     my ( $no_rules, $recursive_make ) = @options{qw(no_rules recursive_make)};
     require Graph;
-    my $g = Graph->new;
+    my $g = Graph->new( $no_rules ? ( multiedged => 1 ) : () );
     my ( %recipe_cache, %seen );
     my $rmfs      = $self->{RecursiveMakeFinders};
     my $fsmap     = $self->fsmap;
@@ -633,7 +632,8 @@ sub as_graph {
         my $target_obj = $self->target($target);
         for my $rule ( @{ $target_obj->rules } ) {
             $rule_no++;
-            my $recipe = $rule->recipe;
+            my $recipe      = $rule->recipe;
+            my $recipe_hash = { recipe => $recipe, recipe_raw => $rule->recipe_raw };
             my $from_id;
             if ($no_rules) {
                 $from_id = $node_name;
@@ -641,19 +641,21 @@ sub as_graph {
             else {
                 $from_id = $recipe_cache{$recipe}
                     || ( $recipe_cache{$recipe} = name_encode( [ 'rule', $target, $rule_no ] ) );
-                $g->set_vertex_attributes(
-                    $from_id,
-                    {
-                        recipe     => $recipe,
-                        recipe_raw => $rule->recipe_raw,
-                    }
-                );
+                $g->set_vertex_attributes( $from_id, $recipe_hash );
                 $g->add_edge( $node_name, $from_id );
             }
-            for my $dep ( @{ $rule->prereqs } ) {
+            my $prereqs  = $rule->prereqs;
+            my @to_nodes = ( $no_rules && !@$prereqs ) ? $node_name : @$prereqs;
+            for my $dep (@to_nodes) {
                 my $dep_node = $no_rules ? $dep : name_encode( [ 'target', $dep ] );
                 $g->add_vertex($dep_node);
-                $g->add_edge( $from_id, $dep_node );
+                if ($no_rules) {
+                    my @edge = ( $from_id, $dep_node, $rule_no );
+                    $g->set_edge_attributes_by_id( @edge, $recipe_hash );
+                }
+                else {
+                    $g->add_edge( $from_id, $dep_node );
+                }
             }
             next if !$recursive_make;
             for my $t ( _rmf_search_rule( $rule, $target_obj, $target, $rule_no, $rmfs ) ) {
@@ -983,7 +985,11 @@ them, with an edge created to the relevant target.
 
 =head3 no_rules
 
-If true, the graph will only have target vertices.
+If true, the graph will only have target vertices, but will be
+"multiedged". The edges will have an ID of the zero-based index of the
+rule on the predecessor target, and will have attributes C<recipe>
+and C<recipe_raw>. Rules with no prerequisites will be indicated with
+an edge back to the same target.
 
 If false (the default), the vertices are named either C<target:name>
 (representing L<Make::Target>s) or C<rule:name:rule_index> (representing

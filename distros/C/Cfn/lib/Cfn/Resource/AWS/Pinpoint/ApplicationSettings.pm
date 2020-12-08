@@ -1,4 +1,4 @@
-# AWS::Pinpoint::ApplicationSettings generated from spec 3.4.0
+# AWS::Pinpoint::ApplicationSettings generated from spec 18.4.0
 use Moose::Util::TypeConstraints;
 
 coerce 'Cfn::Resource::Properties::AWS::Pinpoint::ApplicationSettings',
@@ -29,11 +29,11 @@ coerce 'Cfn::Resource::Properties::AWS::Pinpoint::ApplicationSettings::QuietTime
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::Pinpoint::ApplicationSettings::QuietTimeValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::Pinpoint::ApplicationSettings::QuietTime->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::Pinpoint::ApplicationSettings::QuietTimeValue {
+package Cfn::Resource::Properties::Object::AWS::Pinpoint::ApplicationSettings::QuietTime {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -51,11 +51,11 @@ coerce 'Cfn::Resource::Properties::AWS::Pinpoint::ApplicationSettings::Limits',
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::Pinpoint::ApplicationSettings::LimitsValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::Pinpoint::ApplicationSettings::Limits->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::Pinpoint::ApplicationSettings::LimitsValue {
+package Cfn::Resource::Properties::Object::AWS::Pinpoint::ApplicationSettings::Limits {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -75,11 +75,11 @@ coerce 'Cfn::Resource::Properties::AWS::Pinpoint::ApplicationSettings::CampaignH
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::Pinpoint::ApplicationSettings::CampaignHookValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::Pinpoint::ApplicationSettings::CampaignHook->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::Pinpoint::ApplicationSettings::CampaignHookValue {
+package Cfn::Resource::Properties::Object::AWS::Pinpoint::ApplicationSettings::CampaignHook {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -102,3 +102,30 @@ package Cfn::Resource::Properties::AWS::Pinpoint::ApplicationSettings {
 }
 
 1;
+### main pod documentation begin ###
+
+=encoding UTF-8
+
+=head1 NAME
+
+Cfn::Resource::AWS::Pinpoint::ApplicationSettings - Cfn resource for AWS::Pinpoint::ApplicationSettings
+
+=head1 DESCRIPTION
+
+This module implements a Perl module that represents the CloudFormation object AWS::Pinpoint::ApplicationSettings.
+
+See L<Cfn> for more information on how to use it.
+
+=head1 AUTHOR
+
+    Jose Luis Martinez
+    CAPSiDE
+    jlmartinez@capside.com
+
+=head1 COPYRIGHT and LICENSE
+
+Copyright (c) 2013 by CAPSiDE
+This code is distributed under the Apache 2 License. The full text of the 
+license can be found in the LICENSE file included with this module.
+
+=cut

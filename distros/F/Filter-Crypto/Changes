@@ -1,5 +1,17 @@
 Revision history for Perl distribution Filter-Crypto
 
+2.09 2020-12-08
+
+    - Fix build on ARM-based Debian Linux.  [Alexander Zangerl, CPAN RT#132267]
+
+    - Fix build when using an OpenSSL path with spaces in it.  [RobertCElliott,
+      PR#2]
+
+    - Fix occasional failures in t/02_function.t and t/03_script.t.  [Slaven
+      Rezic, CPAN RT#131973]
+
+    - Fix build when using OpenSSL 1.1.0 or later on Windows 7 or later.
+
 2.08 2018-07-31
 
     - Dropped use of RAND_screen() on Windows for OpenSSL 1.1.0 onwards since it

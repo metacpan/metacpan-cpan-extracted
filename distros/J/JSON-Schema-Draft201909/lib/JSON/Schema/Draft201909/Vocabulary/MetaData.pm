@@ -2,8 +2,9 @@ use strict;
 use warnings;
 package JSON::Schema::Draft201909::Vocabulary::MetaData;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
+# ABSTRACT: Implementation of the JSON Schema Draft 2019-09 Meta-Data vocabulary
 
-our $VERSION = '0.017';
+our $VERSION = '0.018';
 
 use 5.016;
 no if "$]" >= 5.031009, feature => 'indirect';
@@ -66,19 +67,19 @@ __END__
 
 =head1 NAME
 
-JSON::Schema::Draft201909::Vocabulary::MetaData
+JSON::Schema::Draft201909::Vocabulary::MetaData - Implementation of the JSON Schema Draft 2019-09 Meta-Data vocabulary
 
 =head1 VERSION
 
-version 0.017
+version 0.018
 
-=head1 SYNOPSIS
+=head1 DESCRIPTION
 
 =for Pod::Coverage vocabulary keywords
 
 =for stopwords metaschema
 
-Implementation of the JSON Schema Draft 2019-09 "meta-data" vocabulary, indicated in metaschemas
+Implementation of the JSON Schema Draft 2019-09 "Meta-Data" vocabulary, indicated in metaschemas
 with the URI C<https://json-schema.org/draft/2019-09/vocab/meta-data> and formally specified in
 L<https://json-schema.org/draft/2019-09/json-schema-validation.html#rfc.section.9>.
 

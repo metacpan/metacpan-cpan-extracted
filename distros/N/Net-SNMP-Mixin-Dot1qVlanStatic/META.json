@@ -4,7 +4,7 @@
       "Karl Gaissmaier <karl.gaissmaier (at) uni-ulm.de>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4218",
+   "generated_by" : "Module::Build version 0.4231",
    "license" : [
       "perl_5"
    ],
@@ -28,7 +28,7 @@
       "runtime" : {
          "requires" : {
             "Net::SNMP" : "0",
-            "Net::SNMP::Mixin" : "0.13",
+            "Net::SNMP::Mixin" : "0.14",
             "Sub::Exporter" : "0.978",
             "perl" : "v5.6.0"
          }
@@ -37,7 +37,7 @@
    "provides" : {
       "Net::SNMP::Mixin::Dot1qVlanStatic" : {
          "file" : "lib/Net/SNMP/Mixin/Dot1qVlanStatic.pm",
-         "version" : "0.04"
+         "version" : "0.05"
       }
    },
    "release_status" : "stable",
@@ -46,6 +46,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.04",
-   "x_serialization_backend" : "JSON::PP version 2.27400"
+   "version" : "0.05",
+   "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20200904144534;
+our $VERSION = 1.20201204215957;
 
 my $formatters = [
                 {
@@ -126,674 +126,674 @@ my $validators = {
         '
               };
 my %areanames = ();
-$areanames{en}->{97611} = "Ulaanbaatar";
-$areanames{en}->{976121} = "Baganuur";
-$areanames{en}->{976122} = "Bagakhangai";
-$areanames{en}->{976123} = "Nalaikh";
-$areanames{en}->{9761272} = "Zuunmod\ city\,\ Tuv";
-$areanames{en}->{97612741} = "Altaanbulag\,\ Tuv";
-$areanames{en}->{97612742} = "Argalant\,\ Tuv";
-$areanames{en}->{97612743} = "Arhust\,\ Tuv";
-$areanames{en}->{97612744} = "Batsumber\,\ Tuv";
-$areanames{en}->{97612745} = "Bayan\,\ Tuv";
-$areanames{en}->{97612746} = "Bayandelger\,\ Tuv";
-$areanames{en}->{97612747} = "Bayanjargal\,\ Tuv";
-$areanames{en}->{97612748} = "Bayan\-Unjuul\,\ Tuv";
-$areanames{en}->{97612749} = "Bayankhangai\,\ Tuv";
-$areanames{en}->{97612751} = "Bayantsagaan\,\ Tuv";
-$areanames{en}->{97612752} = "Bayantsogt\,\ Tuv";
-$areanames{en}->{97612753} = "Bayanchandmani\,\ Tuv";
-$areanames{en}->{97612754} = "Bornuur\,\ Tuv";
-$areanames{en}->{97612755} = "Buren\,\ Tuv";
-$areanames{en}->{97612756} = "Delgerkhaan\,\ Tuv";
-$areanames{en}->{97612757} = "Jargalant\,\ Tuv";
-$areanames{en}->{97612758} = "Zaamar\,\ Tuv";
-$areanames{en}->{97612759} = "Lun\,\ Tuv";
-$areanames{en}->{97612761} = "Mungunmorit\,\ Tuv";
-$areanames{en}->{97612762} = "Undurshereet\,\ Tuv";
-$areanames{en}->{97612763} = "Sumber\,\ Tuv";
-$areanames{en}->{97612764} = "Sergelen\,\ Tuv";
-$areanames{en}->{97612765} = "Ugtaal\,\ Tuv";
-$areanames{en}->{97612766} = "Tseel\,\ Tuv";
-$areanames{en}->{97612767} = "Erdene\,\ Tuv";
-$areanames{en}->{97612768} = "Erdenesant\,\ Tuv";
-$areanames{en}->{9761322} = "Arvaikheer\ city\,\ Uvurkhangai";
-$areanames{en}->{97613241} = "Baruun\ Bayan\-Ulaan\,\ Uvurkhangai";
-$areanames{en}->{97613242} = "Bat\-Ulzii\,\ Uvurkhangai";
-$areanames{en}->{97613243} = "Bayangol\,\ Uvurkhangai";
-$areanames{en}->{97613244} = "Bayan\-Undur\,\ Uvurkhangai";
-$areanames{en}->{97613245} = "Bogd\,\ Uvurkhangai";
-$areanames{en}->{97613246} = "Burd\,\ Uvurkhangai";
-$areanames{en}->{97613247} = "Guchin\-Us\,\ Uvurkhangai";
-$areanames{en}->{97613248} = "Zuil\,\ Uvurkhangai";
-$areanames{en}->{97613249} = "Zuunbayan\-Ulaan\,\ Uvurkhangai";
-$areanames{en}->{97613251} = "Naariinteel\,\ Uvurkhangai";
-$areanames{en}->{97613252} = "Ulziit\,\ Uvurkhangai";
-$areanames{en}->{97613253} = "Sant\,\ Uvurkhangai";
-$areanames{en}->{97613254} = "Taragt\,\ Uvurkhangai";
-$areanames{en}->{97613255} = "Tugrug\,\ Uvurkhangai";
-$areanames{en}->{97613256} = "Uyanga\,\ Uvurkhangai";
-$areanames{en}->{97613257} = "Hairkhandulaan\,\ Uvurkhangai";
-$areanames{en}->{97613258} = "Kharkhorin\,\ Uvurkhangai";
-$areanames{en}->{97613259} = "Khujirt\,\ Uvurkhangai";
-$areanames{en}->{9761332} = "Tsetserleg\ city\,\ Arkhangai";
-$areanames{en}->{97613341} = "Battsengel\,\ Arkhangai";
-$areanames{en}->{97613342} = "Bulgan\,\ Arkhangai";
-$areanames{en}->{97613343} = "Jargalant\,\ Arkhangai";
-$areanames{en}->{97613344} = "Ikh\-Tamir\,\ Arkhangai";
-$areanames{en}->{97613345} = "Ugii\-Nuur\,\ Arkhangai";
-$areanames{en}->{97613346} = "Ulziit\,\ Arkhangai";
-$areanames{en}->{97613347} = "Undur\-Ulaan\,\ Arkhangai";
-$areanames{en}->{97613348} = "Tariat\,\ Arkhangai";
-$areanames{en}->{97613349} = "Tuvshruulekh\,\ Arkhangai";
-$areanames{en}->{97613351} = "Khairkhan\,\ Arkhangai";
-$areanames{en}->{97613352} = "Khahgai\,\ Arkhangai";
-$areanames{en}->{97613353} = "Khashaat\,\ Arkhangai";
-$areanames{en}->{97613354} = "Khotont\,\ Arkhangai";
-$areanames{en}->{97613355} = "Tsakhirt\,\ Arkhangai";
-$areanames{en}->{97613356} = "Tsenkher\,\ Arkhangai";
-$areanames{en}->{97613357} = "Tsetserleg\,\ Arkhangai";
-$areanames{en}->{97613358} = "Chuluut\,\ Arkhangai";
-$areanames{en}->{97613359} = "Erdenemandal\,\ Arkhangai";
-$areanames{en}->{9761342} = "Bulgan\ city\,\ Bulgan";
-$areanames{en}->{97613441} = "Bayanagt\,\ Bulgan";
-$areanames{en}->{97613442} = "Bayannuur\,\ Bulgan";
-$areanames{en}->{97613443} = "Bugat\,\ Bulgan";
-$areanames{en}->{97613444} = "Buregkhangai\,\ Bulgan";
-$areanames{en}->{97613445} = "Gurvanbulag\,\ Bulgan";
-$areanames{en}->{97613446} = "Dashinchilen\,\ Bulgan";
-$areanames{en}->{97613447} = "Mogod\,\ Bulgan";
-$areanames{en}->{97613448} = "Orkhon\,\ Bulgan";
-$areanames{en}->{97613449} = "Rashaant\,\ Bulgan";
-$areanames{en}->{97613451} = "Saikhan\,\ Bulgan";
-$areanames{en}->{97613452} = "Selenge\,\ Bulgan";
-$areanames{en}->{97613453} = "Teshig\,\ Bulgan";
-$areanames{en}->{97613454} = "Khangal\,\ Bulgan";
-$areanames{en}->{97613455} = "Khishig\-Undur\,\ Bulgan";
-$areanames{en}->{97613456} = "Khutag\-Undur\,\ Bulgan";
-$areanames{en}->{9761352} = "Erdenet\ city\,\ Orkhon";
-$areanames{en}->{97613541} = "Jargalant\,\ Orkhon";
-$areanames{en}->{9761362} = "Sukhbaatar\ city\,\ Selenge";
-$areanames{en}->{97613641} = "Altanbulag\,\ Selenge";
-$areanames{en}->{97613642} = "Baruunburen\,\ Selenge";
-$areanames{en}->{97613643} = "Bayangol\,\ Selenge";
-$areanames{en}->{97613644} = "Yereu\,\ Selenge";
-$areanames{en}->{97613645} = "Javkhlant\,\ Selenge";
-$areanames{en}->{97613646} = "Zuunburen\,\ Selenge";
-$areanames{en}->{97613647} = "Mandal\,\ Selenge";
-$areanames{en}->{97613648} = "Orkhon\,\ Selenge";
-$areanames{en}->{97613649} = "Orkhontuul\,\ Selenge";
-$areanames{en}->{97613651} = "Saikhan\,\ Selenge";
-$areanames{en}->{97613652} = "Sant\,\ Selenge";
-$areanames{en}->{97613653} = "Tushig\,\ Selenge";
-$areanames{en}->{97613654} = "Khuder\,\ Selenge";
-$areanames{en}->{97613655} = "Hushaat\,\ Selenge";
-$areanames{en}->{97613656} = "Tsagaannuur\,\ Selenge";
-$areanames{en}->{97613657} = "Shaamar\,\ Selenge";
-$areanames{en}->{9761372} = "Darkhan\ city\,\ Darkhan\-Uul";
-$areanames{en}->{97613741} = "Orkhon\,\ Darkhan\-Uul";
-$areanames{en}->{97613742} = "Khongor\,\ Darkhan\-Uul";
-$areanames{en}->{97613743} = "Sharingol\,\ Darkhan\-Uul";
-$areanames{en}->{9761382} = "Murun\ city\,\ Khuvsgul";
-$areanames{en}->{97613841} = "Alag\-Erdene\,\ Khuvsgul";
-$areanames{en}->{97613842} = "Arbulag\,\ Khuvsgul";
-$areanames{en}->{97613843} = "Bayanzurkh\,\ Khuvsgul";
-$areanames{en}->{97613844} = "Burentogtokh\,\ Khuvsgul";
-$areanames{en}->{97613845} = "Galt\,\ Khuvsgul";
-$areanames{en}->{97613846} = "Jargalant\,\ Khuvsgul";
-$areanames{en}->{97613847} = "Ikh\-Uul\,\ Khuvsgul";
-$areanames{en}->{97613848} = "Rashaant\,\ Khuvsgul";
-$areanames{en}->{97613849} = "Renchinlkhumbe\,\ Khuvsgul";
-$areanames{en}->{97613851} = "Tarialan\,\ Khuvsgul";
-$areanames{en}->{97613852} = "Tosontsengel\,\ Khuvsgul";
-$areanames{en}->{97613853} = "Tumurbulag\,\ Khuvsgul";
-$areanames{en}->{97613854} = "Tunel\,\ Khuvsgul";
-$areanames{en}->{97613855} = "Ulaan\-Uul\,\ Khuvsgul";
-$areanames{en}->{97613856} = "Khankh\,\ Khuvsgul";
-$areanames{en}->{97613857} = "Khatgal\,\ Khuvsgul";
-$areanames{en}->{97613858} = "Tsagaannuur\,\ Khuvsgul";
-$areanames{en}->{97613859} = "Tsagaan\-Uul\,\ Khuvsgul";
-$areanames{en}->{97613861} = "Tsagaan\-Uur\,\ Khuvsgul";
-$areanames{en}->{97613862} = "Tsetserleg\,\ Khuvsgul";
-$areanames{en}->{97613863} = "Chaandmani\-Undur\,\ Khuvsgul";
-$areanames{en}->{97613864} = "Shine\-Ider\,\ Khuvsgul";
-$areanames{en}->{97613865} = "Erdenebulgan\,\ Khuvsgul";
-$areanames{en}->{9761422} = "Ulgii\,\ Bayan\-Ulgii";
-$areanames{en}->{97614241} = "Altai\,\ Bayan\-Ulgii";
-$areanames{en}->{97614242} = "Altantsugts\,\ Bayan\-Ulgii";
-$areanames{en}->{97614243} = "Bayannuur\,\ Bayan\-Ulgii";
-$areanames{en}->{97614244} = "Bugat\,\ Bayan\-Ulgii";
-$areanames{en}->{97614245} = "Bulgan\,\ Bayan\-Ulgii";
-$areanames{en}->{97614246} = "Buyant\,\ Bayan\-Ulgii";
-$areanames{en}->{97614247} = "Deluun\,\ Bayan\-Ulgii";
-$areanames{en}->{97614248} = "Nogoonnnuur\,\ Bayan\-Ulgii";
-$areanames{en}->{97614249} = "Sagsai\,\ Bayan\-Ulgii";
-$areanames{en}->{97614251} = "Tolbo\,\ Bayan\-Ulgii";
-$areanames{en}->{97614252} = "Ulaankhus\,\ Bayan\-Ulgii";
-$areanames{en}->{97614253} = "Tsengel\,\ Bayan\-Ulgii";
-$areanames{en}->{9761432} = "Khovd\ city\,\ Khovd";
-$areanames{en}->{97614341} = "Altai\,\ Khovd";
-$areanames{en}->{97614342} = "Bulgan\,\ Khovd";
-$areanames{en}->{97614343} = "Buyant\,\ Khovd";
-$areanames{en}->{97614344} = "Darvi\,\ Khovd";
-$areanames{en}->{97614345} = "Durgun\,\ Khovd";
-$areanames{en}->{97614346} = "Duut\,\ Khovd";
-$areanames{en}->{97614347} = "Zereg\,\ Khovd";
-$areanames{en}->{97614348} = "Mankhan\,\ Khovd";
-$areanames{en}->{97614349} = "Munkhkhairkhan\,\ Khovd";
-$areanames{en}->{97614351} = "Must\,\ Khovd";
-$areanames{en}->{97614352} = "Myangad\,\ Khovd";
-$areanames{en}->{97614353} = "Uench\,\ Khovd";
-$areanames{en}->{97614354} = "Khovd\,\ Khovd";
-$areanames{en}->{97614355} = "Tsetseg\,\ Khovd";
-$areanames{en}->{97614356} = "Chandmani\,\ Khovd";
-$areanames{en}->{97614357} = "Erdeneburen\,\ Khovd";
-$areanames{en}->{9761442} = "Bayankhongor\ city\,\ Bayankhongor";
-$areanames{en}->{97614441} = "Baatsagaan\,\ Bayankhongor";
-$areanames{en}->{97614442} = "Bayanbulag\,\ Bayankhongor";
-$areanames{en}->{97614443} = "Bayangovi\,\ Bayankhongor";
-$areanames{en}->{97614444} = "Bayanlig\,\ Bayankhongor";
-$areanames{en}->{97614445} = "Bayan\-Ovoo\,\ Bayankhongor";
-$areanames{en}->{97614446} = "Bayan\-Undur\,\ Bayankhongor";
-$areanames{en}->{97614447} = "Bayantsagaan\,\ Bayankhongor";
-$areanames{en}->{97614448} = "Bogd\,\ Bayankhongor";
-$areanames{en}->{97614449} = "Bumbugur\,\ Bayankhongor";
-$areanames{en}->{97614451} = "Buutsagaan\,\ Bayankhongor";
-$areanames{en}->{97614452} = "Galuut\,\ Bayankhongor";
-$areanames{en}->{97614453} = "Gurvanbulag\,\ Bayankhongor";
-$areanames{en}->{97614454} = "Jargalant\,\ Bayankhongor";
-$areanames{en}->{97614455} = "Jinst\,\ Bayankhongor";
-$areanames{en}->{97614456} = "Zag\,\ Bayankhongor";
-$areanames{en}->{97614457} = "Ulziit\,\ Bayankhongor";
-$areanames{en}->{97614458} = "Khureemaral\,\ Bayankhongor";
-$areanames{en}->{97614459} = "Shjnejinst\,\ Bayankhongor";
-$areanames{en}->{97614461} = "Erdenetsogt\,\ Bayankhongor";
-$areanames{en}->{9761452} = "Ulaangom\ city\,\ Uvs";
-$areanames{en}->{97614541} = "Baruunturuun\,\ Uvs";
-$areanames{en}->{97614542} = "Bukhmurun\,\ Uvs";
-$areanames{en}->{97614543} = "Davst\,\ Uvs";
-$areanames{en}->{97614544} = "Zavkhan\,\ Uvs";
-$areanames{en}->{97614545} = "Zuungovi\,\ Uvs";
-$areanames{en}->{97614546} = "Zuunkhangai\,\ Uvs";
-$areanames{en}->{97614547} = "Malchin\,\ Uvs";
-$areanames{en}->{97614548} = "Naranbulag\,\ Uvs";
-$areanames{en}->{97614549} = "Ulgii\,\ Uvs";
-$areanames{en}->{97614551} = "Umnugovi\,\ Uvs";
-$areanames{en}->{97614552} = "Undurkhangai\,\ Uvs";
-$areanames{en}->{97614553} = "Sagili\,\ Uvs";
-$areanames{en}->{97614554} = "Tarialan\,\ Uvs";
-$areanames{en}->{97614555} = "Turgen\,\ Uvs";
-$areanames{en}->{97614556} = "Tes\,\ Uvs";
-$areanames{en}->{97614557} = "Khovd\,\ Uvs";
-$areanames{en}->{97614558} = "Khyargas\,\ Uvs";
-$areanames{en}->{97614559} = "Tsagaankhairkhan\,\ Uvs";
-$areanames{en}->{9761462} = "Uliastal\ city\,\ Zavkhan";
-$areanames{en}->{97614641} = "Aldarkhaan\,\ Zavkhan";
-$areanames{en}->{97614642} = "Asgat\,\ Zavkhan";
-$areanames{en}->{97614643} = "Bayantest\,\ Zavkhan";
-$areanames{en}->{97614644} = "Bayankhairkhan\,\ Zavkhan";
-$areanames{en}->{97614645} = "Bulnai\,\ Zavkhan";
-$areanames{en}->{97614646} = "Durvuljin\,\ Zavkhan";
-$areanames{en}->{97614647} = "Zavkhanmandal\,\ Zavkhan";
-$areanames{en}->{97614648} = "Ider\,\ Zavkhan";
-$areanames{en}->{97614649} = "Ikh\-Uul\,\ Zavkhan";
-$areanames{en}->{97614651} = "Numrug\,\ Zavkhan";
-$areanames{en}->{97614652} = "Otgon\,\ Zavkhan";
-$areanames{en}->{97614653} = "Santmargad\,\ Zavkhan";
-$areanames{en}->{97614654} = "Songino\,\ Zavkhan";
-$areanames{en}->{97614655} = "Tudevtei\,\ Zavkhan";
-$areanames{en}->{97614656} = "Telmen\,\ Zavkhan";
-$areanames{en}->{97614657} = "Tes\,\ Zavkhan";
-$areanames{en}->{97614658} = "Urgamal\,\ Zavkhan";
-$areanames{en}->{97614659} = "Tsegeenkhairkhan\,\ Zavkhan";
-$areanames{en}->{97614661} = "Tsagaanchuluut\,\ Zavkhan";
-$areanames{en}->{97614662} = "Tsetsen\-Uul\,\ Zavkhan";
-$areanames{en}->{97614663} = "Shiluustei\,\ Zavkhan";
-$areanames{en}->{97614664} = "Erdenekhaijkhan\,\ Zavkhan";
-$areanames{en}->{97614665} = "Yaruu\,\ Zavkhan";
-$areanames{en}->{9761482} = "Altai\ city\,\ Govi\-Altai";
-$areanames{en}->{97614841} = "Altai\,\ Govi\-Altai";
-$areanames{en}->{97614842} = "Bayan\-Uul\,\ Govi\-Altai";
-$areanames{en}->{97614843} = "Biger\,\ Govi\-Altai";
-$areanames{en}->{97614844} = "Bugant\,\ Govi\-Altai";
-$areanames{en}->{97614845} = "Darvi\,\ Govi\-Altai";
-$areanames{en}->{97614846} = "Delger\,\ Govi\-Altai";
-$areanames{en}->{97614847} = "Jargalan\,\ Govi\-Altai";
-$areanames{en}->{97614848} = "Taishir\,\ Govi\-Altai";
-$areanames{en}->{97614849} = "Tonkhil\,\ Govi\-Altai";
-$areanames{en}->{97614851} = "Tugrug\,\ Govi\-Altai";
-$areanames{en}->{97614852} = "Khaluun\,\ Govi\-Altai";
-$areanames{en}->{97614853} = "Khukhmorit\,\ Govi\-Altai";
-$areanames{en}->{97614854} = "Tsogt\,\ Govi\-Altai";
-$areanames{en}->{97614855} = "Tseel\,\ Govi\-Altai";
-$areanames{en}->{97614856} = "Chandmani\,\ Govi\-Altai";
-$areanames{en}->{97614857} = "Sharga\,\ Govi\-Altai";
-$areanames{en}->{97614858} = "Erdene\,\ Govi\-Altai";
-$areanames{en}->{9761512} = "Baruun\-Urt\ city\,\ Sukhbaatar";
-$areanames{en}->{97615141} = "Asgat\,\ Sukhbaatar";
-$areanames{en}->{97615142} = "Bayandelger\,\ Sukhbaatar";
-$areanames{en}->{97615143} = "Dariganga\,\ Sukhbaatar";
-$areanames{en}->{97615144} = "Munkhkhaan\,\ Sukhbaatar";
-$areanames{en}->{97615145} = "Naran\,\ Sukhbaatar";
-$areanames{en}->{97615146} = "Ongon\,\ Sukhbaatar";
-$areanames{en}->{97615147} = "Sukhbaatar\,\ Sukhbaatar";
-$areanames{en}->{97615148} = "Tuvshin\-Shiree\,\ Sukhbaatar";
-$areanames{en}->{97615149} = "Tumentsogt\,\ Sukhbaatar";
-$areanames{en}->{97615151} = "Uulbayan\,\ Sukhbaatar";
-$areanames{en}->{97615152} = "Halzan\,\ Sukhbaatar";
-$areanames{en}->{97615153} = "Erdenetsagaan\,\ Sukhbaatar";
-$areanames{en}->{9761522} = "Sainshand\ city\,\ Dornogovi";
-$areanames{en}->{97615241} = "Airag\,\ Dornogovi";
-$areanames{en}->{97615242} = "Altanshiree\,\ Dornogovi";
-$areanames{en}->{97615243} = "Dalanjargalan\,\ Dornogovi";
-$areanames{en}->{97615244} = "Delgerekh\,\ Dornogovi";
-$areanames{en}->{97615245} = "Zamiin\-Uud\,\ Dornogovi";
-$areanames{en}->{97615246} = "Ikh\-Khet\,\ Dornogovi";
-$areanames{en}->{97615247} = "Mandakh\,\ Dornogovi";
-$areanames{en}->{97615248} = "Urgun\,\ Dornogovi";
-$areanames{en}->{97615249} = "Saikhandulaan\,\ Dornogovi";
-$areanames{en}->{97615251} = "Ulaanbadrakh\,\ Dornogovi";
-$areanames{en}->{97615252} = "Khatanbulag\,\ Dornogovi";
-$areanames{en}->{97615253} = "Huvsgul\,\ Dornogovi";
-$areanames{en}->{97615254} = "Erdene\,\ Dornogovi";
-$areanames{en}->{9761532} = "Dalanzadgad\,\ Umnugovi";
-$areanames{en}->{97615341} = "Bayandalai\,\ Umnugovi";
-$areanames{en}->{97615342} = "Bayan\-Ovoo\,\ Umnugovi";
-$areanames{en}->{97615343} = "Bulgan\,\ Umnugovi";
-$areanames{en}->{97615344} = "Gurvan\ tes\,\ Umnugovi";
-$areanames{en}->{97615345} = "Mandal\-Ovoo\,\ Umnugovi";
-$areanames{en}->{97615346} = "Manlai\,\ Umnugovi";
-$areanames{en}->{97615347} = "Noyon\,\ Umnugovi";
-$areanames{en}->{97615348} = "Nomgon\,\ Umnugovi";
-$areanames{en}->{97615349} = "Savrai\,\ Umnugovi";
-$areanames{en}->{97615351} = "Khanbogd\,\ Umnugovi";
-$areanames{en}->{97615352} = "Khankhongor\,\ Umnugovi";
-$areanames{en}->{97615353} = "Khurmen\,\ Umnugovi";
-$areanames{en}->{97615354} = "Tsogt\-Ovoo\,\ Umnugovi";
-$areanames{en}->{97615355} = "Tsogttsetsii\,\ Umnugovi";
-$areanames{en}->{9761542} = "Choir\,\ Govisumber";
-$areanames{en}->{97615441} = "Bayantal\,\ Govisumber";
-$areanames{en}->{97615442} = "Shivee\-Govi\,\ Govisumber";
-$areanames{en}->{9761562} = "Undurkhaan\ city\,\ Khentii";
-$areanames{en}->{97615641} = "Batnorov\,\ Khentii";
-$areanames{en}->{97615642} = "Batshireet\,\ Khentii";
-$areanames{en}->{97615643} = "Bayan\-Adraga\,\ Khentii";
-$areanames{en}->{97615644} = "Bayanmunkh\,\ Khentii";
-$areanames{en}->{97615645} = "Bayan\-Ovoo\,\ Khentii";
-$areanames{en}->{97615646} = "Bayankhutagt\,\ Khentii";
-$areanames{en}->{97615647} = "Binder\,\ Khentii";
-$areanames{en}->{97615648} = "Galshir\,\ Khentii";
-$areanames{en}->{97615649} = "Dadal\,\ Khentii";
-$areanames{en}->{97615651} = "Darkhan\,\ Khentii";
-$areanames{en}->{97615652} = "Delgerkhaan\,\ Khentii";
-$areanames{en}->{97615653} = "Jargaltkhaan\,\ Khentii";
-$areanames{en}->{97615654} = "Murun\,\ Khentii";
-$areanames{en}->{97615655} = "Norovlin\,\ Khentii";
-$areanames{en}->{97615656} = "Umnudelger\,\ Khentii";
-$areanames{en}->{97615657} = "Tsenkhermandal\,\ Khentii";
-$areanames{en}->{9761582} = "Choibalsan\ city\,\ Dornod";
-$areanames{en}->{97615841} = "Bayandun\,\ Dornod";
-$areanames{en}->{97615842} = "Bayantumen\,\ Dornod";
-$areanames{en}->{97615843} = "Bayan\-Uul\,\ Dornod";
-$areanames{en}->{97615844} = "Bulgan\,\ Dornod";
-$areanames{en}->{97615845} = "Gurvanzagal\,\ Dornod";
-$areanames{en}->{97615846} = "Dashbalbar\,\ Dornod";
-$areanames{en}->{97615847} = "Matad\,\ Dornod";
-$areanames{en}->{97615848} = "Sereglen\,\ Dornod";
-$areanames{en}->{97615849} = "Khalkh\,\ Dornod";
-$areanames{en}->{97615851} = "Khulunbuyir\,\ Dornod";
-$areanames{en}->{97615852} = "Tsagaan\-Ovoo\,\ Dornod";
-$areanames{en}->{97615853} = "Choibalsan\,\ Dornod";
-$areanames{en}->{97615854} = "Chuluunkhoroot\,\ Dornod";
-$areanames{en}->{9761592} = "Mandalgovi\ city\,\ Dundgovi";
-$areanames{en}->{97615941} = "Adaatsag\,\ Dundgovi";
-$areanames{en}->{97615942} = "Bayanjargalan\,\ Dundgovi";
-$areanames{en}->{97615943} = "Govi\-Ugtaal\,\ Dundgovi";
-$areanames{en}->{97615944} = "Gurvansaikhan\,\ Dundgovi";
-$areanames{en}->{97615945} = "Delgerkhangai\,\ Dundgovi";
-$areanames{en}->{97615946} = "Delgertsogt\,\ Dundgovi";
-$areanames{en}->{97615947} = "Deren\,\ Dundgovi";
-$areanames{en}->{97615948} = "Luus\,\ Dundgovi";
-$areanames{en}->{97615949} = "Ulziit\,\ Dundgovi";
-$areanames{en}->{97615951} = "Undurshil\,\ Dundgovi";
-$areanames{en}->{97615952} = "Saikhan\-Ovoo\,\ Dundgovi";
-$areanames{en}->{97615953} = "Khuld\,\ Dundgovi";
-$areanames{en}->{97615954} = "Tsagaandelger\,\ Dundgovi";
-$areanames{en}->{97615955} = "Erdenedalai\,\ Dundgovi";
-$areanames{en}->{97621} = "Ulaanbaatar";
-$areanames{en}->{976221} = "Baganuur";
-$areanames{en}->{976222} = "Bagakhangai";
-$areanames{en}->{976223} = "Nalaikh";
-$areanames{en}->{9762272} = "Zuunmod\ city\,\ Tuv";
-$areanames{en}->{97622741} = "Altaanbulag\,\ Tuv";
-$areanames{en}->{97622742} = "Argalant\,\ Tuv";
-$areanames{en}->{97622743} = "Arhust\,\ Tuv";
-$areanames{en}->{97622744} = "Batsumber\,\ Tuv";
-$areanames{en}->{97622745} = "Bayan\,\ Tuv";
-$areanames{en}->{97622746} = "Bayandelger\,\ Tuv";
-$areanames{en}->{97622747} = "Bayanjargal\,\ Tuv";
-$areanames{en}->{97622748} = "Bayan\-Unjuul\,\ Tuv";
-$areanames{en}->{97622749} = "Bayankhangai\,\ Tuv";
-$areanames{en}->{97622751} = "Bayantsagaan\,\ Tuv";
-$areanames{en}->{97622752} = "Bayantsogt\,\ Tuv";
-$areanames{en}->{97622753} = "Bayanchandmani\,\ Tuv";
-$areanames{en}->{97622754} = "Bornuur\,\ Tuv";
-$areanames{en}->{97622755} = "Buren\,\ Tuv";
-$areanames{en}->{97622756} = "Delgerkhaan\,\ Tuv";
-$areanames{en}->{97622757} = "Jargalant\,\ Tuv";
-$areanames{en}->{97622758} = "Zaamar\,\ Tuv";
-$areanames{en}->{97622759} = "Lun\,\ Tuv";
-$areanames{en}->{97622761} = "Mungunmorit\,\ Tuv";
-$areanames{en}->{97622762} = "Undurshereet\,\ Tuv";
-$areanames{en}->{97622763} = "Sumber\,\ Tuv";
-$areanames{en}->{97622764} = "Sergelen\,\ Tuv";
-$areanames{en}->{97622765} = "Ugtaal\,\ Tuv";
-$areanames{en}->{97622766} = "Tseel\,\ Tuv";
-$areanames{en}->{97622767} = "Erdene\,\ Tuv";
-$areanames{en}->{97622768} = "Erdenesant\,\ Tuv";
-$areanames{en}->{9762322} = "Arvaikheer\ city\,\ Uvurkhangai";
-$areanames{en}->{97623241} = "Baruun\ Bayan\-Ulaan\,\ Uvurkhangai";
-$areanames{en}->{97623242} = "Batulzii\,\ Uvurkhangai";
-$areanames{en}->{97623243} = "Bayangol\,\ Uvurkhangai";
-$areanames{en}->{97623244} = "Bayan\-Undur\,\ Uvurkhangai";
-$areanames{en}->{97623245} = "Bogd\,\ Uvurkhangai";
-$areanames{en}->{97623246} = "Burd\,\ Uvurkhangai";
-$areanames{en}->{97623247} = "Guchin\-Us\,\ Uvurkhangai";
-$areanames{en}->{97623248} = "Zuil\,\ Uvurkhangai";
-$areanames{en}->{97623249} = "Zuunbayan\-Ulaan\,\ Uvurkhangai";
-$areanames{en}->{97623251} = "Naariinteel\,\ Uvurkhangai";
-$areanames{en}->{97623252} = "Ulziit\,\ Uvurkhangai";
-$areanames{en}->{97623253} = "Sant\,\ Uvurkhangai";
-$areanames{en}->{97623254} = "Taragt\,\ Uvurkhangai";
-$areanames{en}->{97623255} = "Tugrug\,\ Uvurkhangai";
-$areanames{en}->{97623256} = "Uyanga\,\ Uvurkhangai";
-$areanames{en}->{97623257} = "Hairkhandulaan\,\ Uvurkhangai";
-$areanames{en}->{97623258} = "Kharkhorin\,\ Uvurkhangai";
-$areanames{en}->{97623259} = "Khujirt\,\ Uvurkhangai";
-$areanames{en}->{9762332} = "Tsetserleg\ city\,\ Arkhangai";
-$areanames{en}->{97623341} = "Battsengel\,\ Arkhangai";
-$areanames{en}->{97623342} = "Bulgan\,\ Arkhangai";
-$areanames{en}->{97623343} = "Jargalant\,\ Arkhangai";
-$areanames{en}->{97623344} = "Ikh\-Tamir\,\ Arkhangai";
-$areanames{en}->{97623345} = "Ugii\-Nuur\,\ Arkhangai";
-$areanames{en}->{97623346} = "Ulziit\,\ Arkhangai";
-$areanames{en}->{97623347} = "Undur\-Ulaan\,\ Arkhangai";
-$areanames{en}->{97623348} = "Tariat\,\ Arkhangai";
-$areanames{en}->{97623349} = "Tuvshruulekh\,\ Arkhangai";
-$areanames{en}->{97623351} = "Khairkhan\,\ Arkhangai";
-$areanames{en}->{97623352} = "Khahgai\,\ Arkhangai";
-$areanames{en}->{97623353} = "Khashaat\,\ Arkhangai";
-$areanames{en}->{97623354} = "Khotont\,\ Arkhangai";
-$areanames{en}->{97623355} = "Tsakhirt\,\ Arkhangai";
-$areanames{en}->{97623356} = "Tsenkher\,\ Arkhangai";
-$areanames{en}->{97623357} = "Tsetserleg\,\ Arkhangai";
-$areanames{en}->{97623358} = "Chuluut\,\ Arkhangai";
-$areanames{en}->{97623359} = "Erdenemandal\,\ Arkhangai";
-$areanames{en}->{9762342} = "Bulgan\ city\,\ Bulgan";
-$areanames{en}->{97623441} = "Bayanagt\,\ Bulgan";
-$areanames{en}->{97623442} = "Bayannuur\,\ Bulgan";
-$areanames{en}->{97623443} = "Bugat\,\ Bulgan";
-$areanames{en}->{97623444} = "Buregkhangai\,\ Bulgan";
-$areanames{en}->{97623445} = "Gurvanbulag\,\ Bulgan";
-$areanames{en}->{97623446} = "Dashinchilen\,\ Bulgan";
-$areanames{en}->{97623447} = "Mogod\,\ Bulgan";
-$areanames{en}->{97623448} = "Orkhon\,\ Bulgan";
-$areanames{en}->{97623449} = "Rashaant\,\ Bulgan";
-$areanames{en}->{97623451} = "Saikhan\,\ Bulgan";
-$areanames{en}->{97623452} = "Selenge\,\ Bulgan";
-$areanames{en}->{97623453} = "Teshig\,\ Bulgan";
-$areanames{en}->{97623454} = "Khangal\,\ Bulgan";
-$areanames{en}->{97623455} = "Khishig\-Undur\,\ Bulgan";
-$areanames{en}->{97623456} = "Khutag\-Undur\,\ Bulgan";
-$areanames{en}->{9762352} = "Erdenet\ city\,\ Orkhon";
-$areanames{en}->{97623541} = "Jargalant\,\ Orkhon";
-$areanames{en}->{9762362} = "Sukhbaatar\ city\,\ Selenge";
-$areanames{en}->{97623641} = "Altanbulag\,\ Selenge";
-$areanames{en}->{97623642} = "Baruunburen\,\ Selenge";
-$areanames{en}->{97623643} = "Bayangol\,\ Selenge";
-$areanames{en}->{97623644} = "Yereu\,\ Selenge";
-$areanames{en}->{97623645} = "Javkhlant\,\ Selenge";
-$areanames{en}->{97623646} = "Zuunburen\,\ Selenge";
-$areanames{en}->{97623647} = "Mandal\,\ Selenge";
-$areanames{en}->{97623648} = "Orkhon\,\ Selenge";
-$areanames{en}->{97623649} = "Orkhontuul\,\ Selenge";
-$areanames{en}->{97623651} = "Saikhan\,\ Selenge";
-$areanames{en}->{97623652} = "Sant\,\ Selenge";
-$areanames{en}->{97623653} = "Tushig\,\ Selenge";
-$areanames{en}->{97623654} = "Khuder\,\ Selenge";
-$areanames{en}->{97623655} = "Hushaat\,\ Selenge";
-$areanames{en}->{97623656} = "Tsagaannuur\,\ Selenge";
-$areanames{en}->{97623657} = "Shaamar\,\ Selenge";
-$areanames{en}->{9762372} = "Darkhan\ city\,\ Darkhan\-Uul";
-$areanames{en}->{97623741} = "Orkhon\,\ Darkhan\-Uul";
-$areanames{en}->{97623742} = "Khongor\,\ Darkhan\-Uul";
-$areanames{en}->{97623743} = "Sharingol\,\ Darkhan\-Uul";
-$areanames{en}->{9762382} = "Murun\ city\,\ Khuvsgul";
-$areanames{en}->{97623841} = "Alag\-Erdene\,\ Khuvsgul";
-$areanames{en}->{97623842} = "Arbulag\,\ Khuvsgul";
-$areanames{en}->{97623843} = "Bayanzurkh\,\ Khuvsgul";
-$areanames{en}->{97623844} = "Burentogtokh\,\ Khuvsgul";
-$areanames{en}->{97623845} = "Galt\,\ Khuvsgul";
-$areanames{en}->{97623846} = "Jargalant\,\ Khuvsgul";
-$areanames{en}->{97623847} = "Ikh\-Uul\,\ Khuvsgul";
-$areanames{en}->{97623848} = "Rashaant\,\ Khuvsgul";
-$areanames{en}->{97623849} = "Renchinlkhumbe\,\ Khuvsgul";
-$areanames{en}->{97623851} = "Tarialan\,\ Khuvsgul";
-$areanames{en}->{97623852} = "Tosontsengel\,\ Khuvsgul";
-$areanames{en}->{97623853} = "Tumurbulag\,\ Khuvsgul";
-$areanames{en}->{97623854} = "Tunel\,\ Khuvsgul";
-$areanames{en}->{97623855} = "Ulaan\-Uul\,\ Khuvsgul";
-$areanames{en}->{97623856} = "Khankh\,\ Khuvsgul";
-$areanames{en}->{97623857} = "Khatgal\,\ Khuvsgul";
-$areanames{en}->{97623858} = "Tsagaannuur\,\ Khuvsgul";
-$areanames{en}->{97623859} = "Tsagaan\-Uul\,\ Khuvsgul";
-$areanames{en}->{97623861} = "Tsagaan\-Uur\,\ Khuvsgul";
-$areanames{en}->{97623862} = "Tsetserleg\,\ Khuvsgul";
-$areanames{en}->{97623863} = "Chaandmani\-Undur\,\ Khuvsgul";
-$areanames{en}->{97623864} = "Shine\-Ider\,\ Khuvsgul";
-$areanames{en}->{97623865} = "Erdenebulgan\,\ Khuvsgul";
-$areanames{en}->{9762422} = "Ulgii\,\ Bayan\-Ulgii";
-$areanames{en}->{97624241} = "Altai\,\ Bayan\-Ulgii";
-$areanames{en}->{97624242} = "Altantsugts\,\ Bayan\-Ulgii";
-$areanames{en}->{97624243} = "Bayannuur\,\ Bayan\-Ulgii";
-$areanames{en}->{97624244} = "Bugat\,\ Bayan\-Ulgii";
-$areanames{en}->{97624245} = "Bulgan\,\ Bayan\-Ulgii";
-$areanames{en}->{97624246} = "Buyant\,\ Bayan\-Ulgii";
-$areanames{en}->{97624247} = "Deluun\,\ Bayan\-Ulgii";
-$areanames{en}->{97624248} = "Nogoonnnuur\,\ Bayan\-Ulgii";
-$areanames{en}->{97624249} = "Sagsai\,\ Bayan\-Ulgii";
-$areanames{en}->{97624251} = "Tolbo\,\ Bayan\-Ulgii";
-$areanames{en}->{97624252} = "Ulaankhus\,\ Bayan\-Ulgii";
-$areanames{en}->{97624253} = "Tsengel\,\ Bayan\-Ulgii";
-$areanames{en}->{9762432} = "Khovd\ city\,\ Khovd";
-$areanames{en}->{97624341} = "Altai\,\ Khovd";
-$areanames{en}->{97624342} = "Bulgan\,\ Khovd";
-$areanames{en}->{97624343} = "Buyant\,\ Khovd";
-$areanames{en}->{97624344} = "Darvi\,\ Khovd";
-$areanames{en}->{97624345} = "Durgun\,\ Khovd";
-$areanames{en}->{97624346} = "Duut\,\ Khovd";
-$areanames{en}->{97624347} = "Zereg\,\ Khovd";
-$areanames{en}->{97624348} = "Mankhan\,\ Khovd";
-$areanames{en}->{97624349} = "Munkhkhairkhan\,\ Khovd";
-$areanames{en}->{97624351} = "Must\,\ Khovd";
-$areanames{en}->{97624352} = "Myangad\,\ Khovd";
-$areanames{en}->{97624353} = "Uench\,\ Khovd";
-$areanames{en}->{97624354} = "Khovd\,\ Khovd";
-$areanames{en}->{97624355} = "Tsetseg\,\ Khovd";
-$areanames{en}->{97624356} = "Chandmani\,\ Khovd";
-$areanames{en}->{97624357} = "Erdeneburen\,\ Khovd";
-$areanames{en}->{9762442} = "Bayankhongor\ city\,\ Bayankhongor";
-$areanames{en}->{97624441} = "Baatsagaan\,\ Bayankhongor";
-$areanames{en}->{97624442} = "Bayanbulag\,\ Bayankhongor";
-$areanames{en}->{97624443} = "Bayangovi\,\ Bayankhongor";
-$areanames{en}->{97624444} = "Bayanlig\,\ Bayankhongor";
-$areanames{en}->{97624445} = "Bayan\-Ovoo\,\ Bayankhongor";
-$areanames{en}->{97624446} = "Bayan\-Undur\,\ Bayankhongor";
-$areanames{en}->{97624447} = "Bayantsagaan\,\ Bayankhongor";
-$areanames{en}->{97624448} = "Bogd\,\ Bayankhongor";
-$areanames{en}->{97624449} = "Bumbugur\,\ Bayankhongor";
-$areanames{en}->{97624451} = "Buutsagaan\,\ Bayankhongor";
-$areanames{en}->{97624452} = "Galuut\,\ Bayankhongor";
-$areanames{en}->{97624453} = "Gurvanbulag\,\ Bayankhongor";
-$areanames{en}->{97624454} = "Jargalant\,\ Bayankhongor";
-$areanames{en}->{97624455} = "Jinst\,\ Bayankhongor";
-$areanames{en}->{97624456} = "Zag\,\ Bayankhongor";
-$areanames{en}->{97624457} = "Ulziit\,\ Bayankhongor";
-$areanames{en}->{97624458} = "Khureemaral\,\ Bayankhongor";
-$areanames{en}->{97624459} = "Shjnejinst\,\ Bayankhongor";
-$areanames{en}->{97624461} = "Erdenetsogt\,\ Bayankhongor";
-$areanames{en}->{9762452} = "Ulaangom\ city\,\ Uvs";
-$areanames{en}->{97624541} = "Baruunturuun\,\ Uvs";
-$areanames{en}->{97624542} = "Bukhmurun\,\ Uvs";
-$areanames{en}->{97624543} = "Davst\,\ Uvs";
-$areanames{en}->{97624544} = "Zavkhan\,\ Uvs";
-$areanames{en}->{97624545} = "Zuungovi\,\ Uvs";
-$areanames{en}->{97624546} = "Zuunkhangai\,\ Uvs";
-$areanames{en}->{97624547} = "Malchin\,\ Uvs";
-$areanames{en}->{97624548} = "Naranbulag\,\ Uvs";
-$areanames{en}->{97624549} = "Ulgii\,\ Uvs";
-$areanames{en}->{97624551} = "Umnugovi\,\ Uvs";
-$areanames{en}->{97624552} = "Undurkhangai\,\ Uvs";
-$areanames{en}->{97624553} = "Sagili\,\ Uvs";
-$areanames{en}->{97624554} = "Tarialan\,\ Uvs";
-$areanames{en}->{97624555} = "Turgen\,\ Uvs";
-$areanames{en}->{97624556} = "Tes\,\ Uvs";
-$areanames{en}->{97624557} = "Khovd\,\ Uvs";
-$areanames{en}->{97624558} = "Khyargas\,\ Uvs";
-$areanames{en}->{97624559} = "Tsagaankhairkhan\,\ Uvs";
-$areanames{en}->{9762462} = "Uliastal\ city\,\ Zavkhan";
-$areanames{en}->{97624641} = "Aldarkhaan\,\ Zavkhan";
-$areanames{en}->{97624642} = "Asgat\,\ Zavkhan";
-$areanames{en}->{97624643} = "Bayantest\,\ Zavkhan";
-$areanames{en}->{97624644} = "Bayankhairkhan\,\ Zavkhan";
-$areanames{en}->{97624645} = "Bulnai\,\ Zavkhan";
-$areanames{en}->{97624646} = "Durvuljin\,\ Zavkhan";
-$areanames{en}->{97624647} = "Zavkhanmandal\,\ Zavkhan";
-$areanames{en}->{97624648} = "Ider\,\ Zavkhan";
-$areanames{en}->{97624649} = "Ikh\-Uul\,\ Zavkhan";
-$areanames{en}->{97624651} = "Numrug\,\ Zavkhan";
-$areanames{en}->{97624652} = "Otgon\,\ Zavkhan";
-$areanames{en}->{97624653} = "Santmargad\,\ Zavkhan";
-$areanames{en}->{97624654} = "Songino\,\ Zavkhan";
-$areanames{en}->{97624655} = "Tudevtei\,\ Zavkhan";
-$areanames{en}->{97624656} = "Telmen\,\ Zavkhan";
-$areanames{en}->{97624657} = "Tes\,\ Zavkhan";
-$areanames{en}->{97624658} = "Urgamal\,\ Zavkhan";
-$areanames{en}->{97624659} = "Tsegeenkhairkhan\,\ Zavkhan";
-$areanames{en}->{97624661} = "Tsagaanchuluut\,\ Zavkhan";
-$areanames{en}->{97624662} = "Tsetsen\-Uul\,\ Zavkhan";
-$areanames{en}->{97624663} = "Shiluustei\,\ Zavkhan";
-$areanames{en}->{97624664} = "Erdenekhaijkhan\,\ Zavkhan";
-$areanames{en}->{97624665} = "Yaruu\,\ Zavkhan";
-$areanames{en}->{9762482} = "Altai\ city\,\ Govi\-Altai";
-$areanames{en}->{97624841} = "Altai\,\ Govi\-Altai";
-$areanames{en}->{97624842} = "Bayan\-Uul\,\ Govi\-Altai";
-$areanames{en}->{97624843} = "Biger\,\ Govi\-Altai";
-$areanames{en}->{97624844} = "Bugant\,\ Govi\-Altai";
-$areanames{en}->{97624845} = "Darvi\,\ Govi\-Altai";
-$areanames{en}->{97624846} = "Delger\,\ Govi\-Altai";
-$areanames{en}->{97624847} = "Jargalan\,\ Govi\-Altai";
-$areanames{en}->{97624848} = "Taishir\,\ Govi\-Altai";
-$areanames{en}->{97624849} = "Tonkhil\,\ Govi\-Altai";
-$areanames{en}->{97624851} = "Tugrug\,\ Govi\-Altai";
-$areanames{en}->{97624852} = "Khaluun\,\ Govi\-Altai";
-$areanames{en}->{97624853} = "Khukhmorit\,\ Govi\-Altai";
-$areanames{en}->{97624854} = "Tsogt\,\ Govi\-Altai";
-$areanames{en}->{97624855} = "Tseel\,\ Govi\-Altai";
-$areanames{en}->{97624856} = "Chandmani\,\ Govi\-Altai";
-$areanames{en}->{97624857} = "Sharga\,\ Govi\-Altai";
-$areanames{en}->{97624858} = "Erdene\,\ Govi\-Altai";
-$areanames{en}->{9762512} = "Baruun\-Urt\ city\,\ Sukhbaatar";
-$areanames{en}->{97625141} = "Asgat\,\ Sukhbaatar";
-$areanames{en}->{97625142} = "Bayandelger\,\ Sukhbaatar";
-$areanames{en}->{97625143} = "Dariganga\,\ Sukhbaatar";
-$areanames{en}->{97625144} = "Munkhkhaan\,\ Sukhbaatar";
-$areanames{en}->{97625145} = "Naran\,\ Sukhbaatar";
-$areanames{en}->{97625146} = "Ongon\,\ Sukhbaatar";
-$areanames{en}->{97625147} = "Sukhbaatar\,\ Sukhbaatar";
-$areanames{en}->{97625148} = "Tuvshin\-Shiree\,\ Sukhbaatar";
-$areanames{en}->{97625149} = "Tumentsogt\,\ Sukhbaatar";
-$areanames{en}->{97625151} = "Uulbayan\,\ Sukhbaatar";
-$areanames{en}->{97625152} = "Halzan\,\ Sukhbaatar";
-$areanames{en}->{97625153} = "Erdenetsagaan\,\ Sukhbaatar";
-$areanames{en}->{9762522} = "Sainshand\ city\,\ Dornogovi";
-$areanames{en}->{97625241} = "Airag\,\ Dornogovi";
-$areanames{en}->{97625242} = "Altanshiree\,\ Dornogovi";
-$areanames{en}->{97625243} = "Dalanjargalan\,\ Dornogovi";
-$areanames{en}->{97625244} = "Delgerekh\,\ Dornogovi";
-$areanames{en}->{97625245} = "Zamiin\-Uud\,\ Dornogovi";
-$areanames{en}->{97625246} = "Ikh\-Khet\,\ Dornogovi";
-$areanames{en}->{97625247} = "Mandakh\,\ Dornogovi";
-$areanames{en}->{97625248} = "Urgun\,\ Dornogovi";
-$areanames{en}->{97625249} = "Saikhandulaan\,\ Dornogovi";
-$areanames{en}->{97625251} = "Ulaanbadrakh\,\ Dornogovi";
-$areanames{en}->{97625252} = "Khatanbulag\,\ Dornogovi";
-$areanames{en}->{97625253} = "Huvsgul\,\ Dornogovi";
-$areanames{en}->{97625254} = "Erdene\,\ Dornogovi";
-$areanames{en}->{9762532} = "Dalanzadgad\,\ Umnugovi";
-$areanames{en}->{97625341} = "Bayandalai\,\ Umnugovi";
-$areanames{en}->{97625342} = "Bayan\-Ovoo\,\ Umnugovi";
-$areanames{en}->{97625343} = "Bulgan\,\ Umnugovi";
-$areanames{en}->{97625344} = "Gurvan\ tes\,\ Umnugovi";
-$areanames{en}->{97625345} = "Mandal\-Ovoo\,\ Umnugovi";
-$areanames{en}->{97625346} = "Manlai\,\ Umnugovi";
-$areanames{en}->{97625347} = "Noyon\,\ Umnugovi";
-$areanames{en}->{97625348} = "Nomgon\,\ Umnugovi";
-$areanames{en}->{97625349} = "Savrai\,\ Umnugovi";
-$areanames{en}->{97625351} = "Khanbogd\,\ Umnugovi";
-$areanames{en}->{97625352} = "Khankhongor\,\ Umnugovi";
-$areanames{en}->{97625353} = "Khurmen\,\ Umnugovi";
-$areanames{en}->{97625354} = "Tsogt\-Ovoo\,\ Umnugovi";
-$areanames{en}->{97625355} = "Tsogt\-Tsetsii\,\ Umnugovi";
-$areanames{en}->{9762542} = "Choir\,\ Govisumber";
-$areanames{en}->{97625441} = "Bayantal\,\ Govisumber";
-$areanames{en}->{97625442} = "Shivee\-Govi\,\ Govisumber";
-$areanames{en}->{9762562} = "Undurkhaan\ city\,\ Khentii";
-$areanames{en}->{97625641} = "Batnorov\,\ Khentii";
-$areanames{en}->{97625642} = "Batshireet\,\ Khentii";
-$areanames{en}->{97625643} = "Bayan\-Adarga\,\ Khentii";
-$areanames{en}->{97625644} = "Bayanmunkh\,\ Khentii";
-$areanames{en}->{97625645} = "Bayan\-Ovoo\,\ Khentii";
-$areanames{en}->{97625646} = "Bayankhutagt\,\ Khentii";
-$areanames{en}->{97625647} = "Binder\,\ Khentii";
-$areanames{en}->{97625648} = "Galshir\,\ Khentii";
-$areanames{en}->{97625649} = "Dadal\,\ Khentii";
-$areanames{en}->{97625651} = "Darkhan\,\ Khentii";
-$areanames{en}->{97625652} = "Delgerkhaan\,\ Khentii";
-$areanames{en}->{97625653} = "Jargaltkhaan\,\ Khentii";
-$areanames{en}->{97625654} = "Murun\,\ Khentii";
-$areanames{en}->{97625655} = "Norovlin\,\ Khentii";
-$areanames{en}->{97625656} = "Umnudelger\,\ Khentii";
-$areanames{en}->{97625657} = "Tsenkhermandal\,\ Khentii";
-$areanames{en}->{9762582} = "Choibalsan\ city\,\ Dornod";
-$areanames{en}->{97625841} = "Bayandun\,\ Dornod";
-$areanames{en}->{97625842} = "Bayantumen\,\ Dornod";
-$areanames{en}->{97625843} = "Bayan\-Uul\,\ Dornod";
-$areanames{en}->{97625844} = "Bulgan\,\ Dornod";
-$areanames{en}->{97625845} = "Gurvanzagal\,\ Dornod";
-$areanames{en}->{97625846} = "Dashbalbar\,\ Dornod";
-$areanames{en}->{97625847} = "Matad\,\ Dornod";
-$areanames{en}->{97625848} = "Sereglen\,\ Dornod";
-$areanames{en}->{97625849} = "Khalkhgol\,\ Dornod";
-$areanames{en}->{97625851} = "Khulunbuyir\,\ Dornod";
-$areanames{en}->{97625852} = "Tsagaan\-Ovoo\,\ Dornod";
-$areanames{en}->{97625853} = "Choibalsan\,\ Dornod";
-$areanames{en}->{97625854} = "Chuluunkhoroot\,\ Dornod";
-$areanames{en}->{9762592} = "Mandalgovi\ city\,\ Dundgovi";
-$areanames{en}->{97625941} = "Adaatsag\,\ Dundgovi";
-$areanames{en}->{97625942} = "Bayanjargalan\,\ Dundgovi";
-$areanames{en}->{97625943} = "Govi\-Ugtaal\,\ Dundgovi";
-$areanames{en}->{97625944} = "Gurvansaikhan\,\ Dundgovi";
-$areanames{en}->{97625945} = "Delgerkhangai\,\ Dundgovi";
-$areanames{en}->{97625946} = "Delgertsogt\,\ Dundgovi";
-$areanames{en}->{97625947} = "Deren\,\ Dundgovi";
-$areanames{en}->{97625948} = "Luus\,\ Dundgovi";
-$areanames{en}->{97625949} = "Ulziit\,\ Dundgovi";
-$areanames{en}->{97625951} = "Undurshil\,\ Dundgovi";
-$areanames{en}->{97625952} = "Saikhan\-Ovoo\,\ Dundgovi";
-$areanames{en}->{97625953} = "Khuld\,\ Dundgovi";
-$areanames{en}->{97625954} = "Tsagaandelger\,\ Dundgovi";
-$areanames{en}->{97625955} = "Erdenedalai\,\ Dundgovi";
+$areanames{en} = {"97614547", "Malchin\,\ Uvs",
+"97614552", "Undurkhangai\,\ Uvs",
+"97624356", "Chandmani\,\ Khovd",
+"9762342", "Bulgan\ city\,\ Bulgan",
+"97613845", "Galt\,\ Khuvsgul",
+"97623244", "Bayan\-Undur\,\ Uvurkhangai",
+"9762422", "Ulgii\,\ Bayan\-Ulgii",
+"97623861", "Tsagaan\-Uur\,\ Khuvsgul",
+"97615648", "Galshir\,\ Khentii",
+"97614664", "Erdenekhaijkhan\,\ Zavkhan",
+"97624444", "Bayanlig\,\ Bayankhongor",
+"97614345", "Durgun\,\ Khovd",
+"97612767", "Erdene\,\ Tuv",
+"97614559", "Tsagaankhairkhan\,\ Uvs",
+"97623856", "Khankh\,\ Khuvsgul",
+"97613453", "Teshig\,\ Bulgan",
+"97615254", "Erdene\,\ Dornogovi",
+"97614253", "Tsengel\,\ Bayan\-Ulgii",
+"97615846", "Dashbalbar\,\ Dornod",
+"97625846", "Dashbalbar\,\ Dornod",
+"97624253", "Tsengel\,\ Bayan\-Ulgii",
+"97625254", "Erdene\,\ Dornogovi",
+"97623453", "Teshig\,\ Bulgan",
+"97614444", "Bayanlig\,\ Bayankhongor",
+"97613861", "Tsagaan\-Uur\,\ Khuvsgul",
+"97625648", "Galshir\,\ Khentii",
+"97624664", "Erdenekhaijkhan\,\ Zavkhan",
+"97624559", "Tsagaankhairkhan\,\ Uvs",
+"97613856", "Khankh\,\ Khuvsgul",
+"97624345", "Durgun\,\ Khovd",
+"97622767", "Erdene\,\ Tuv",
+"9761422", "Ulgii\,\ Bayan\-Ulgii",
+"97613244", "Bayan\-Undur\,\ Uvurkhangai",
+"97624552", "Undurkhangai\,\ Uvs",
+"97624547", "Malchin\,\ Uvs",
+"9761342", "Bulgan\ city\,\ Bulgan",
+"97623845", "Galt\,\ Khuvsgul",
+"97614356", "Chandmani\,\ Khovd",
+"97612742", "Argalant\,\ Tuv",
+"97612757", "Jargalant\,\ Tuv",
+"97623352", "Khahgai\,\ Arkhangai",
+"97623851", "Tarialan\,\ Khuvsgul",
+"97623347", "Undur\-Ulaan\,\ Arkhangai",
+"97614654", "Songino\,\ Zavkhan",
+"97615952", "Saikhan\-Ovoo\,\ Dundgovi",
+"97615947", "Deren\,\ Dundgovi",
+"97623359", "Erdenemandal\,\ Arkhangai",
+"97624847", "Jargalan\,\ Govi\-Altai",
+"97624852", "Khaluun\,\ Govi\-Altai",
+"97624351", "Must\,\ Khovd",
+"97612749", "Bayankhangai\,\ Tuv",
+"97615653", "Jargaltkhaan\,\ Khentii",
+"97615841", "Bayandun\,\ Dornod",
+"97615342", "Bayan\-Ovoo\,\ Umnugovi",
+"97613448", "Orkhon\,\ Bulgan",
+"97615147", "Sukhbaatar\,\ Sukhbaatar",
+"97615152", "Halzan\,\ Sukhbaatar",
+"97614248", "Nogoonnnuur\,\ Bayan\-Ulgii",
+"97623643", "Bayangol\,\ Selenge",
+"9762562", "Undurkhaan\ city\,\ Khentii",
+"97615349", "Savrai\,\ Umnugovi",
+"97613643", "Bayangol\,\ Selenge",
+"97625349", "Savrai\,\ Umnugovi",
+"9761562", "Undurkhaan\ city\,\ Khentii",
+"97624248", "Nogoonnnuur\,\ Bayan\-Ulgii",
+"97623448", "Orkhon\,\ Bulgan",
+"97625342", "Bayan\-Ovoo\,\ Umnugovi",
+"97625841", "Bayandun\,\ Dornod",
+"97625152", "Halzan\,\ Sukhbaatar",
+"97625147", "Sukhbaatar\,\ Sukhbaatar",
+"97613359", "Erdenemandal\,\ Arkhangai",
+"97625653", "Jargaltkhaan\,\ Khentii",
+"97622749", "Bayankhangai\,\ Tuv",
+"97614847", "Jargalan\,\ Govi\-Altai",
+"97614351", "Must\,\ Khovd",
+"97614852", "Khaluun\,\ Govi\-Altai",
+"97625947", "Deren\,\ Dundgovi",
+"97625952", "Saikhan\-Ovoo\,\ Dundgovi",
+"97622757", "Jargalant\,\ Tuv",
+"97622742", "Argalant\,\ Tuv",
+"97624654", "Songino\,\ Zavkhan",
+"97613352", "Khahgai\,\ Arkhangai",
+"97613851", "Tarialan\,\ Khuvsgul",
+"97613347", "Undur\-Ulaan\,\ Arkhangai",
+"97615344", "Gurvan\ tes\,\ Umnugovi",
+"97613843", "Bayanzurkh\,\ Khuvsgul",
+"9761582", "Choibalsan\ city\,\ Dornod",
+"97614343", "Buyant\,\ Khovd",
+"97625641", "Batnorov\,\ Khentii",
+"97613455", "Khishig\-Undur\,\ Bulgan",
+"97612744", "Batsumber\,\ Tuv",
+"97625853", "Choibalsan\,\ Dornod",
+"97614652", "Otgon\,\ Zavkhan",
+"97623354", "Khotont\,\ Arkhangai",
+"97614647", "Zavkhanmandal\,\ Zavkhan",
+"97624246", "Buyant\,\ Bayan\-Ulgii",
+"97615954", "Tsagaandelger\,\ Dundgovi",
+"97614659", "Tsegeenkhairkhan\,\ Zavkhan",
+"97623446", "Dashinchilen\,\ Bulgan",
+"97624854", "Tsogt\,\ Govi\-Altai",
+"97613651", "Saikhan\,\ Selenge",
+"97613446", "Dashinchilen\,\ Bulgan",
+"97624659", "Tsegeenkhairkhan\,\ Zavkhan",
+"97614854", "Tsogt\,\ Govi\-Altai",
+"97623651", "Saikhan\,\ Selenge",
+"97625954", "Tsagaandelger\,\ Dundgovi",
+"97614246", "Buyant\,\ Bayan\-Ulgii",
+"97622744", "Batsumber\,\ Tuv",
+"97623455", "Khishig\-Undur\,\ Bulgan",
+"97624652", "Otgon\,\ Zavkhan",
+"97624647", "Zavkhanmandal\,\ Zavkhan",
+"97613354", "Khotont\,\ Arkhangai",
+"97615853", "Choibalsan\,\ Dornod",
+"97615641", "Batnorov\,\ Khentii",
+"97624343", "Buyant\,\ Khovd",
+"97623843", "Bayanzurkh\,\ Khuvsgul",
+"97625344", "Gurvan\ tes\,\ Umnugovi",
+"9762582", "Choibalsan\ city\,\ Dornod",
+"97625646", "Bayankhutagt\,\ Khentii",
+"97613858", "Tsagaannuur\,\ Khuvsgul",
+"97615247", "Mandakh\,\ Dornogovi",
+"97615252", "Khatanbulag\,\ Dornogovi",
+"97615655", "Norovlin\,\ Khentii",
+"97623441", "Bayanagt\,\ Bulgan",
+"97614554", "Tarialan\,\ Uvs",
+"97625848", "Sereglen\,\ Dornod",
+"97624449", "Bumbugur\,\ Bayankhongor",
+"97613656", "Tsagaannuur\,\ Selenge",
+"97623257", "Hairkhandulaan\,\ Uvurkhangai",
+"97623242", "Batulzii\,\ Uvurkhangai",
+"97624241", "Altai\,\ Bayan\-Ulgii",
+"97623249", "Zuunbayan\-Ulaan\,\ Uvurkhangai",
+"97614662", "Tsetsen\-Uul\,\ Zavkhan",
+"97624442", "Bayanbulag\,\ Bayankhongor",
+"97624457", "Ulziit\,\ Bayankhongor",
+"97623645", "Javkhlant\,\ Selenge",
+"97614442", "Bayanbulag\,\ Bayankhongor",
+"97614457", "Ulziit\,\ Bayankhongor",
+"97624662", "Tsetsen\-Uul\,\ Zavkhan",
+"97613645", "Javkhlant\,\ Selenge",
+"97614241", "Altai\,\ Bayan\-Ulgii",
+"97613249", "Zuunbayan\-Ulaan\,\ Uvurkhangai",
+"97613242", "Bat\-Ulzii\,\ Uvurkhangai",
+"97613257", "Hairkhandulaan\,\ Uvurkhangai",
+"97615848", "Sereglen\,\ Dornod",
+"97624554", "Tarialan\,\ Uvs",
+"97613441", "Bayanagt\,\ Bulgan",
+"97623656", "Tsagaannuur\,\ Selenge",
+"97614449", "Bumbugur\,\ Bayankhongor",
+"97625655", "Norovlin\,\ Khentii",
+"97625252", "Khatanbulag\,\ Dornogovi",
+"97625247", "Mandakh\,\ Dornogovi",
+"97615646", "Bayankhutagt\,\ Khentii",
+"97623858", "Tsagaannuur\,\ Khuvsgul",
+"97614548", "Naranbulag\,\ Uvs",
+"97623353", "Khashaat\,\ Arkhangai",
+"9762512", "Baruun\-Urt\ city\,\ Sukhbaatar",
+"97625854", "Chuluunkhoroot\,\ Dornod",
+"97612743", "Arhust\,\ Tuv",
+"97615647", "Binder\,\ Khentii",
+"97615652", "Delgerkhaan\,\ Khentii",
+"97624853", "Khukhmorit\,\ Govi\-Altai",
+"97612768", "Erdenesant\,\ Tuv",
+"97625246", "Ikh\-Khet\,\ Dornogovi",
+"97615953", "Khuld\,\ Dundgovi",
+"97623245", "Bogd\,\ Uvurkhangai",
+"97623649", "Orkhontuul\,\ Selenge",
+"97615153", "Erdenetsagaan\,\ Sukhbaatar",
+"97614456", "Zag\,\ Bayankhongor",
+"9761332", "Tsetserleg\ city\,\ Arkhangai",
+"97613844", "Burentogtokh\,\ Khuvsgul",
+"97624641", "Aldarkhaan\,\ Zavkhan",
+"97614461", "Erdenetsogt\,\ Bayankhongor",
+"97615343", "Bulgan\,\ Umnugovi",
+"9761482", "Altai\ city\,\ Govi\-Altai",
+"97624445", "Bayan\-Ovoo\,\ Bayankhongor",
+"97614665", "Yaruu\,\ Zavkhan",
+"97623657", "Shaamar\,\ Selenge",
+"97614344", "Darvi\,\ Khovd",
+"97623642", "Baruunburen\,\ Selenge",
+"97613256", "Uyanga\,\ Uvurkhangai",
+"9762592", "Mandalgovi\ city\,\ Dundgovi",
+"97623256", "Uyanga\,\ Uvurkhangai",
+"9761592", "Mandalgovi\ city\,\ Dundgovi",
+"97624665", "Yaruu\,\ Zavkhan",
+"97614445", "Bayan\-Ovoo\,\ Bayankhongor",
+"9762482", "Altai\ city\,\ Govi\-Altai",
+"97624344", "Darvi\,\ Khovd",
+"97613657", "Shaamar\,\ Selenge",
+"97613642", "Baruunburen\,\ Selenge",
+"9762332", "Tsetserleg\ city\,\ Arkhangai",
+"97624456", "Zag\,\ Bayankhongor",
+"97625153", "Erdenetsagaan\,\ Sukhbaatar",
+"97613649", "Orkhontuul\,\ Selenge",
+"97624461", "Erdenetsogt\,\ Bayankhongor",
+"97625343", "Bulgan\,\ Umnugovi",
+"97623844", "Burentogtokh\,\ Khuvsgul",
+"97614641", "Aldarkhaan\,\ Zavkhan",
+"97613245", "Bogd\,\ Uvurkhangai",
+"97625953", "Khuld\,\ Dundgovi",
+"97615246", "Ikh\-Khet\,\ Dornogovi",
+"97614853", "Khukhmorit\,\ Govi\-Altai",
+"97625652", "Delgerkhaan\,\ Khentii",
+"97625647", "Binder\,\ Khentii",
+"97622768", "Erdenesant\,\ Tuv",
+"97615854", "Chuluunkhoroot\,\ Dornod",
+"9761512", "Baruun\-Urt\ city\,\ Sukhbaatar",
+"97624548", "Naranbulag\,\ Uvs",
+"97613353", "Khashaat\,\ Arkhangai",
+"97622743", "Arhust\,\ Tuv",
+"976122", "Bagakhangai",
+"97625241", "Airag\,\ Dornogovi",
+"97612758", "Zaamar\,\ Tuv",
+"97625442", "Shivee\-Govi\,\ Govisumber",
+"97623348", "Tariat\,\ Arkhangai",
+"97614553", "Sagili\,\ Uvs",
+"97624848", "Taishir\,\ Govi\-Altai",
+"97615948", "Luus\,\ Dundgovi",
+"97623741", "Orkhon\,\ Darkhan\-Uul",
+"97613251", "Naariinteel\,\ Uvurkhangai",
+"97613447", "Mogod\,\ Bulgan",
+"97613452", "Selenge\,\ Bulgan",
+"97614655", "Tudevtei\,\ Zavkhan",
+"9762452", "Ulaangom\ city\,\ Uvs",
+"97615148", "Tuvshin\-Shiree\,\ Sukhbaatar",
+"97614451", "Buutsagaan\,\ Bayankhongor",
+"97624646", "Durvuljin\,\ Zavkhan",
+"97614247", "Deluun\,\ Bayan\-Ulgii",
+"97614252", "Ulaankhus\,\ Bayan\-Ulgii",
+"97624247", "Deluun\,\ Bayan\-Ulgii",
+"97624252", "Ulaankhus\,\ Bayan\-Ulgii",
+"97624451", "Buutsagaan\,\ Bayankhongor",
+"97614646", "Durvuljin\,\ Zavkhan",
+"97623447", "Mogod\,\ Bulgan",
+"97623452", "Selenge\,\ Bulgan",
+"97625148", "Tuvshin\-Shiree\,\ Sukhbaatar",
+"9761452", "Ulaangom\ city\,\ Uvs",
+"97624655", "Tudevtei\,\ Zavkhan",
+"97623251", "Naariinteel\,\ Uvurkhangai",
+"97625948", "Luus\,\ Dundgovi",
+"97613741", "Orkhon\,\ Darkhan\-Uul",
+"97614848", "Taishir\,\ Govi\-Altai",
+"97622758", "Zaamar\,\ Tuv",
+"97624553", "Sagili\,\ Uvs",
+"97613348", "Tariat\,\ Arkhangai",
+"97615442", "Shivee\-Govi\,\ Govisumber",
+"97615241", "Airag\,\ Dornogovi",
+"976222", "Bagakhangai",
+"97615253", "Huvsgul\,\ Dornogovi",
+"97625946", "Delgertsogt\,\ Dundgovi",
+"97612745", "Bayan\,\ Tuv",
+"97613454", "Khangal\,\ Bulgan",
+"97624541", "Baruunturuun\,\ Uvs",
+"97623355", "Tsakhirt\,\ Arkhangai",
+"97614846", "Delger\,\ Govi\-Altai",
+"97622756", "Delgerkhaan\,\ Tuv",
+"97613346", "Ulziit\,\ Arkhangai",
+"97624855", "Tseel\,\ Govi\-Altai",
+"97622761", "Mungunmorit\,\ Tuv",
+"97615955", "Erdenedalai\,\ Dundgovi",
+"9762522", "Sainshand\ city\,\ Dornogovi",
+"97623243", "Bayangol\,\ Uvurkhangai",
+"97615345", "Mandal\-Ovoo\,\ Umnugovi",
+"97614648", "Ider\,\ Zavkhan",
+"97625146", "Ongon\,\ Sukhbaatar",
+"97624443", "Bayangovi\,\ Bayankhongor",
+"97614663", "Shiluustei\,\ Zavkhan",
+"9762372", "Darkhan\ city\,\ Darkhan\-Uul",
+"9761372", "Darkhan\ city\,\ Darkhan\-Uul",
+"97624663", "Shiluustei\,\ Zavkhan",
+"97614443", "Bayangovi\,\ Bayankhongor",
+"97615146", "Ongon\,\ Sukhbaatar",
+"97625345", "Mandal\-Ovoo\,\ Umnugovi",
+"97624648", "Ider\,\ Zavkhan",
+"9761522", "Sainshand\ city\,\ Dornogovi",
+"97613243", "Bayangol\,\ Uvurkhangai",
+"97625955", "Erdenedalai\,\ Dundgovi",
+"97612756", "Delgerkhaan\,\ Tuv",
+"97614855", "Tseel\,\ Govi\-Altai",
+"97612761", "Mungunmorit\,\ Tuv",
+"97623346", "Ulziit\,\ Arkhangai",
+"97623454", "Khangal\,\ Bulgan",
+"97614541", "Baruunturuun\,\ Uvs",
+"97622745", "Bayan\,\ Tuv",
+"97624846", "Delger\,\ Govi\-Altai",
+"97613355", "Tsakhirt\,\ Arkhangai",
+"97615946", "Delgertsogt\,\ Dundgovi",
+"97625253", "Huvsgul\,\ Dornogovi",
+"97615248", "Urgun\,\ Dornogovi",
+"97622751", "Bayantsagaan\,\ Tuv",
+"97614349", "Munkhkhairkhan\,\ Khovd",
+"9762462", "Uliastal\ city\,\ Zavkhan",
+"97614555", "Turgen\,\ Uvs",
+"97613842", "Arbulag\,\ Khuvsgul",
+"97613857", "Khatgal\,\ Khuvsgul",
+"97613341", "Battsengel\,\ Arkhangai",
+"97622766", "Tseel\,\ Tuv",
+"97613849", "Renchinlkhumbe\,\ Khuvsgul",
+"97624546", "Zuunkhangai\,\ Uvs",
+"97623644", "Yereu\,\ Selenge",
+"97614342", "Bulgan\,\ Khovd",
+"97614841", "Altai\,\ Govi\-Altai",
+"97614357", "Erdeneburen\,\ Khovd",
+"97625941", "Adaatsag\,\ Dundgovi",
+"97623258", "Kharkhorin\,\ Uvurkhangai",
+"97614653", "Santmargad\,\ Zavkhan",
+"97625847", "Matad\,\ Dornod",
+"97625852", "Tsagaan\-Ovoo\,\ Dornod",
+"97625351", "Khanbogd\,\ Umnugovi",
+"97625141", "Asgat\,\ Sukhbaatar",
+"976121", "Baganuur",
+"97615654", "Murun\,\ Khentii",
+"97624458", "Khureemaral\,\ Bayankhongor",
+"97614458", "Khureemaral\,\ Bayankhongor",
+"97625654", "Murun\,\ Khentii",
+"97615847", "Matad\,\ Dornod",
+"97615351", "Khanbogd\,\ Umnugovi",
+"97615852", "Tsagaan\-Ovoo\,\ Dornod",
+"97624653", "Santmargad\,\ Zavkhan",
+"976221", "Baganuur",
+"97615141", "Asgat\,\ Sukhbaatar",
+"97613258", "Kharkhorin\,\ Uvurkhangai",
+"97615941", "Adaatsag\,\ Dundgovi",
+"97623849", "Renchinlkhumbe\,\ Khuvsgul",
+"97614546", "Zuunkhangai\,\ Uvs",
+"97624841", "Altai\,\ Govi\-Altai",
+"97624357", "Erdeneburen\,\ Khovd",
+"97624342", "Bulgan\,\ Khovd",
+"97613644", "Yereu\,\ Selenge",
+"97624555", "Turgen\,\ Uvs",
+"9761462", "Uliastal\ city\,\ Zavkhan",
+"97612751", "Bayantsagaan\,\ Tuv",
+"97624349", "Munkhkhairkhan\,\ Khovd",
+"97612766", "Tseel\,\ Tuv",
+"97623842", "Arbulag\,\ Khuvsgul",
+"97623857", "Khatgal\,\ Khuvsgul",
+"97623341", "Battsengel\,\ Arkhangai",
+"97625248", "Urgun\,\ Dornogovi",
+"97614447", "Bayantsagaan\,\ Bayankhongor",
+"97614452", "Galuut\,\ Bayankhongor",
+"97613655", "Hushaat\,\ Selenge",
+"9762352", "Erdenet\ city\,\ Orkhon",
+"97622764", "Sergelen\,\ Tuv",
+"97614251", "Tolbo\,\ Bayan\-Ulgii",
+"97613259", "Khujirt\,\ Uvurkhangai",
+"97613247", "Guchin\-Us\,\ Uvurkhangai",
+"97613252", "Ulziit\,\ Uvurkhangai",
+"97613451", "Saikhan\,\ Bulgan",
+"97624544", "Zavkhan\,\ Uvs",
+"97623646", "Zuunburen\,\ Selenge",
+"97614459", "Shjnejinst\,\ Bayankhongor",
+"97625645", "Bayan\-Ovoo\,\ Khentii",
+"97623863", "Chaandmani\-Undur\,\ Khuvsgul",
+"97624348", "Mankhan\,\ Khovd",
+"97625249", "Saikhandulaan\,\ Dornogovi",
+"97623742", "Khongor\,\ Darkhan\-Uul",
+"97625242", "Altanshiree\,\ Dornogovi",
+"97615656", "Umnudelger\,\ Khentii",
+"97623848", "Rashaant\,\ Khuvsgul",
+"97625441", "Bayantal\,\ Govisumber",
+"97625656", "Umnudelger\,\ Khentii",
+"97615441", "Bayantal\,\ Govisumber",
+"97613848", "Rashaant\,\ Khuvsgul",
+"97615242", "Altanshiree\,\ Dornogovi",
+"97615249", "Saikhandulaan\,\ Dornogovi",
+"97613742", "Khongor\,\ Darkhan\-Uul",
+"97615645", "Bayan\-Ovoo\,\ Khentii",
+"97614348", "Mankhan\,\ Khovd",
+"97613863", "Chaandmani\-Undur\,\ Khuvsgul",
+"97614544", "Zavkhan\,\ Uvs",
+"97623451", "Saikhan\,\ Bulgan",
+"97613646", "Zuunburen\,\ Selenge",
+"97624459", "Shjnejinst\,\ Bayankhongor",
+"97623247", "Guchin\-Us\,\ Uvurkhangai",
+"97623252", "Ulziit\,\ Uvurkhangai",
+"97624251", "Tolbo\,\ Bayan\-Ulgii",
+"97623259", "Khujirt\,\ Uvurkhangai",
+"97624452", "Galuut\,\ Bayankhongor",
+"97624447", "Bayantsagaan\,\ Bayankhongor",
+"97623655", "Hushaat\,\ Selenge",
+"97612764", "Sergelen\,\ Tuv",
+"9761352", "Erdenet\ city\,\ Orkhon",
+"97613456", "Khutag\-Undur\,\ Bulgan",
+"97624649", "Ikh\-Uul\,\ Zavkhan",
+"9761432", "Khovd\ city\,\ Khovd",
+"97623641", "Altanbulag\,\ Selenge",
+"97614844", "Bugant\,\ Govi\-Altai",
+"97625944", "Gurvansaikhan\,\ Dundgovi",
+"97624245", "Bulgan\,\ Bayan\-Ulgii",
+"97623445", "Gurvanbulag\,\ Bulgan",
+"9761382", "Murun\ city\,\ Khuvsgul",
+"97622754", "Bornuur\,\ Tuv",
+"97615843", "Bayan\-Uul\,\ Dornod",
+"97624657", "Tes\,\ Zavkhan",
+"97624642", "Asgat\,\ Zavkhan",
+"97613344", "Ikh\-Tamir\,\ Arkhangai",
+"97624353", "Uench\,\ Khovd",
+"97615651", "Darkhan\,\ Khentii",
+"97625354", "Tsogt\-Ovoo\,\ Umnugovi",
+"97623853", "Tumurbulag\,\ Khuvsgul",
+"97625144", "Munkhkhaan\,\ Sukhbaatar",
+"97613853", "Tumurbulag\,\ Khuvsgul",
+"97615354", "Tsogt\-Ovoo\,\ Umnugovi",
+"97615144", "Munkhkhaan\,\ Sukhbaatar",
+"97625651", "Darkhan\,\ Khentii",
+"97614353", "Uench\,\ Khovd",
+"97612754", "Bornuur\,\ Tuv",
+"9762382", "Murun\ city\,\ Khuvsgul",
+"97613445", "Gurvanbulag\,\ Bulgan",
+"97614642", "Asgat\,\ Zavkhan",
+"97623344", "Ikh\-Tamir\,\ Arkhangai",
+"97614657", "Tes\,\ Zavkhan",
+"97625843", "Bayan\-Uul\,\ Dornod",
+"97614245", "Bulgan\,\ Bayan\-Ulgii",
+"97615944", "Gurvansaikhan\,\ Dundgovi",
+"9762432", "Khovd\ city\,\ Khovd",
+"97623456", "Khutag\-Undur\,\ Bulgan",
+"97614649", "Ikh\-Uul\,\ Zavkhan",
+"97624844", "Bugant\,\ Govi\-Altai",
+"97613641", "Altanbulag\,\ Selenge",
+"97625149", "Tumentsogt\,\ Sukhbaatar",
+"97613653", "Tushig\,\ Selenge",
+"97625851", "Khulunbuyir\,\ Dornod",
+"97625352", "Khankhongor\,\ Umnugovi",
+"97625347", "Noyon\,\ Umnugovi",
+"97625142", "Bayandelger\,\ Sukhbaatar",
+"97613349", "Tuvshruulekh\,\ Arkhangai",
+"97623865", "Erdenebulgan\,\ Khuvsgul",
+"9762362", "Sukhbaatar\ city\,\ Selenge",
+"97614857", "Sharga\,\ Govi\-Altai",
+"97622759", "Lun\,\ Tuv",
+"97614842", "Bayan\-Uul\,\ Govi\-Altai",
+"97614341", "Altai\,\ Khovd",
+"97625643", "Bayan\-Adarga\,\ Khentii",
+"97625942", "Bayanjargalan\,\ Dundgovi",
+"97625949", "Ulziit\,\ Dundgovi",
+"97614849", "Tonkhil\,\ Govi\-Altai",
+"97622752", "Bayantsogt\,\ Tuv",
+"97622747", "Bayanjargal\,\ Tuv",
+"97624644", "Bayankhairkhan\,\ Zavkhan",
+"97621", "Ulaanbaatar",
+"97613342", "Bulgan\,\ Arkhangai",
+"97613357", "Tsetserleg\,\ Arkhangai",
+"97613841", "Alag\-Erdene\,\ Khuvsgul",
+"97624849", "Tonkhil\,\ Govi\-Altai",
+"97612747", "Bayanjargal\,\ Tuv",
+"97612752", "Bayantsogt\,\ Tuv",
+"97623841", "Alag\-Erdene\,\ Khuvsgul",
+"97623342", "Bulgan\,\ Arkhangai",
+"97623357", "Tsetserleg\,\ Arkhangai",
+"97611", "Ulaanbaatar",
+"97614644", "Bayankhairkhan\,\ Zavkhan",
+"97615949", "Ulziit\,\ Dundgovi",
+"97615942", "Bayanjargalan\,\ Dundgovi",
+"9761362", "Sukhbaatar\ city\,\ Selenge",
+"97613865", "Erdenebulgan\,\ Khuvsgul",
+"97623349", "Tuvshruulekh\,\ Arkhangai",
+"97615643", "Bayan\-Adraga\,\ Khentii",
+"97624857", "Sharga\,\ Govi\-Altai",
+"97612759", "Lun\,\ Tuv",
+"97624842", "Bayan\-Uul\,\ Govi\-Altai",
+"97624341", "Altai\,\ Khovd",
+"97615851", "Khulunbuyir\,\ Dornod",
+"97615352", "Khankhongor\,\ Umnugovi",
+"97615347", "Noyon\,\ Umnugovi",
+"97615142", "Bayandelger\,\ Sukhbaatar",
+"97615149", "Tumentsogt\,\ Sukhbaatar",
+"97623653", "Tushig\,\ Selenge",
+"97613648", "Orkhon\,\ Selenge",
+"97624243", "Bayannuur\,\ Bayan\-Ulgii",
+"97625244", "Delgerekh\,\ Dornogovi",
+"9762542", "Choir\,\ Govisumber",
+"97615845", "Gurvanzagal\,\ Dornod",
+"97623443", "Bugat\,\ Bulgan",
+"97614454", "Jargalant\,\ Bayankhongor",
+"97623541", "Jargalant\,\ Orkhon",
+"97622762", "Undurshereet\,\ Tuv",
+"97624355", "Tsetseg\,\ Khovd",
+"97624549", "Ulgii\,\ Uvs",
+"97613846", "Jargalant\,\ Khuvsgul",
+"97613254", "Taragt\,\ Uvurkhangai",
+"97624542", "Bukhmurun\,\ Uvs",
+"97624557", "Khovd\,\ Uvs",
+"97614346", "Duut\,\ Khovd",
+"97623855", "Ulaan\-Uul\,\ Khuvsgul",
+"97614542", "Bukhmurun\,\ Uvs",
+"97614557", "Khovd\,\ Uvs",
+"97613855", "Ulaan\-Uul\,\ Khuvsgul",
+"97624346", "Duut\,\ Khovd",
+"97623254", "Taragt\,\ Uvurkhangai",
+"97613541", "Jargalant\,\ Orkhon",
+"97624454", "Jargalant\,\ Bayankhongor",
+"97623846", "Jargalant\,\ Khuvsgul",
+"97614549", "Ulgii\,\ Uvs",
+"97614355", "Tsetseg\,\ Khovd",
+"97612762", "Undurshereet\,\ Tuv",
+"97625845", "Gurvanzagal\,\ Dornod",
+"9761542", "Choir\,\ Govisumber",
+"97613443", "Bugat\,\ Bulgan",
+"97615244", "Delgerekh\,\ Dornogovi",
+"97614243", "Bayannuur\,\ Bayan\-Ulgii",
+"97623648", "Orkhon\,\ Selenge",
+"97625644", "Bayanmunkh\,\ Khentii",
+"97614448", "Bogd\,\ Bayankhongor",
+"97615849", "Khalkh\,\ Dornod",
+"97624643", "Bayantest\,\ Zavkhan",
+"97615341", "Bayandalai\,\ Umnugovi",
+"976223", "Nalaikh",
+"97615842", "Bayantumen\,\ Dornod",
+"97615151", "Uulbayan\,\ Sukhbaatar",
+"97613248", "Zuil\,\ Uvurkhangai",
+"97615951", "Undurshil\,\ Dundgovi",
+"97614556", "Tes\,\ Uvs",
+"97623859", "Tsagaan\-Uul\,\ Khuvsgul",
+"97624352", "Myangad\,\ Khovd",
+"97624851", "Tugrug\,\ Govi\-Altai",
+"97613654", "Khuder\,\ Selenge",
+"97624347", "Zereg\,\ Khovd",
+"97622765", "Ugtaal\,\ Tuv",
+"97612741", "Altaanbulag\,\ Tuv",
+"97624545", "Zuungovi\,\ Uvs",
+"97623847", "Ikh\-Uul\,\ Khuvsgul",
+"97623852", "Tosontsengel\,\ Khuvsgul",
+"97623351", "Khairkhan\,\ Arkhangai",
+"97614545", "Zuungovi\,\ Uvs",
+"97622741", "Altaanbulag\,\ Tuv",
+"97613852", "Tosontsengel\,\ Khuvsgul",
+"97613351", "Khairkhan\,\ Arkhangai",
+"97613847", "Ikh\-Uul\,\ Khuvsgul",
+"97613859", "Tsagaan\-Uul\,\ Khuvsgul",
+"97624556", "Tes\,\ Uvs",
+"97614347", "Zereg\,\ Khovd",
+"97623654", "Khuder\,\ Selenge",
+"97614851", "Tugrug\,\ Govi\-Altai",
+"97614352", "Myangad\,\ Khovd",
+"97612765", "Ugtaal\,\ Tuv",
+"97625951", "Undurshil\,\ Dundgovi",
+"97623248", "Zuil\,\ Uvurkhangai",
+"97625341", "Bayandalai\,\ Umnugovi",
+"97625842", "Bayantumen\,\ Dornod",
+"976123", "Nalaikh",
+"97614643", "Bayantest\,\ Zavkhan",
+"97625151", "Uulbayan\,\ Sukhbaatar",
+"97624448", "Bogd\,\ Bayankhongor",
+"97615644", "Bayanmunkh\,\ Khentii",
+"97625849", "Khalkhgol\,\ Dornod",
+"97615346", "Manlai\,\ Umnugovi",
+"97614453", "Gurvanbulag\,\ Bayankhongor",
+"97625355", "Tsogt\-Tsetsii\,\ Umnugovi",
+"97625145", "Naran\,\ Sukhbaatar",
+"97624658", "Urgamal\,\ Zavkhan",
+"97613253", "Sant\,\ Uvurkhangai",
+"97624244", "Bugat\,\ Bayan\-Ulgii",
+"97623743", "Sharingol\,\ Darkhan\-Uul",
+"97625945", "Delgerkhangai\,\ Dundgovi",
+"97612746", "Bayandelger\,\ Tuv",
+"97623862", "Tsetserleg\,\ Khuvsgul",
+"97623356", "Tsenkher\,\ Arkhangai",
+"97614845", "Darvi\,\ Govi\-Altai",
+"9762442", "Bayankhongor\ city\,\ Bayankhongor",
+"97622755", "Buren\,\ Tuv",
+"97623444", "Buregkhangai\,\ Bulgan",
+"97614551", "Umnugovi\,\ Uvs",
+"97613345", "Ugii\-Nuur\,\ Arkhangai",
+"97624856", "Chandmani\,\ Govi\-Altai",
+"97625243", "Dalanjargalan\,\ Dornogovi",
+"9762322", "Arvaikheer\ city\,\ Uvurkhangai",
+"97615243", "Dalanjargalan\,\ Dornogovi",
+"9761322", "Arvaikheer\ city\,\ Uvurkhangai",
+"97624551", "Umnugovi\,\ Uvs",
+"97613444", "Buregkhangai\,\ Bulgan",
+"97612755", "Buren\,\ Tuv",
+"97614856", "Chandmani\,\ Govi\-Altai",
+"97623345", "Ugii\-Nuur\,\ Arkhangai",
+"97613862", "Tsetserleg\,\ Khuvsgul",
+"97622746", "Bayandelger\,\ Tuv",
+"97624845", "Darvi\,\ Govi\-Altai",
+"9761442", "Bayankhongor\ city\,\ Bayankhongor",
+"97613356", "Tsenkher\,\ Arkhangai",
+"97615945", "Delgerkhangai\,\ Dundgovi",
+"97613743", "Sharingol\,\ Darkhan\-Uul",
+"97614244", "Bugat\,\ Bayan\-Ulgii",
+"97623253", "Sant\,\ Uvurkhangai",
+"97615355", "Tsogttsetsii\,\ Umnugovi",
+"97614658", "Urgamal\,\ Zavkhan",
+"97615145", "Naran\,\ Sukhbaatar",
+"97625346", "Manlai\,\ Umnugovi",
+"97624453", "Gurvanbulag\,\ Bayankhongor",
+"97624242", "Altantsugts\,\ Bayan\-Ulgii",
+"97624441", "Baatsagaan\,\ Bayankhongor",
+"97623864", "Shine\-Ider\,\ Khuvsgul",
+"97614661", "Tsagaanchuluut\,\ Zavkhan",
+"97623449", "Rashaant\,\ Bulgan",
+"97614656", "Telmen\,\ Zavkhan",
+"97625348", "Nomgon\,\ Umnugovi",
+"97623442", "Bayannuur\,\ Bulgan",
+"97624645", "Bulnai\,\ Zavkhan",
+"97623241", "Baruun\ Bayan\-Ulaan\,\ Uvurkhangai",
+"97624249", "Sagsai\,\ Bayan\-Ulgii",
+"97622763", "Sumber\,\ Tuv",
+"97614858", "Erdene\,\ Govi\-Altai",
+"97622748", "Bayan\-Unjuul\,\ Tuv",
+"97624543", "Davst\,\ Uvs",
+"97613358", "Chuluut\,\ Arkhangai",
+"97615251", "Ulaanbadrakh\,\ Dornogovi",
+"97625251", "Ulaanbadrakh\,\ Dornogovi",
+"97612748", "Bayan\-Unjuul\,\ Tuv",
+"97623358", "Chuluut\,\ Arkhangai",
+"97614543", "Davst\,\ Uvs",
+"97612763", "Sumber\,\ Tuv",
+"97624858", "Erdene\,\ Govi\-Altai",
+"97613241", "Baruun\ Bayan\-Ulaan\,\ Uvurkhangai",
+"97614249", "Sagsai\,\ Bayan\-Ulgii",
+"97613442", "Bayannuur\,\ Bulgan",
+"97615348", "Nomgon\,\ Umnugovi",
+"97614645", "Bulnai\,\ Zavkhan",
+"97624661", "Tsagaanchuluut\,\ Zavkhan",
+"97613864", "Shine\-Ider\,\ Khuvsgul",
+"97614441", "Baatsagaan\,\ Bayankhongor",
+"97624656", "Telmen\,\ Zavkhan",
+"97613449", "Rashaant\,\ Bulgan",
+"97614242", "Altantsugts\,\ Bayan\-Ulgii",
+"97623246", "Burd\,\ Uvurkhangai",
+"97614455", "Jinst\,\ Bayankhongor",
+"97624354", "Khovd\,\ Khovd",
+"97613652", "Sant\,\ Selenge",
+"97613647", "Mandal\,\ Selenge",
+"97624446", "Bayan\-Undur\,\ Bayankhongor",
+"97625143", "Dariganga\,\ Sukhbaatar",
+"97623854", "Tunel\,\ Khuvsgul",
+"97614651", "Numrug\,\ Zavkhan",
+"97625353", "Khurmen\,\ Umnugovi",
+"9761272", "Zuunmod\ city\,\ Tuv",
+"97613255", "Tugrug\,\ Uvurkhangai",
+"97625943", "Govi\-Ugtaal\,\ Dundgovi",
+"97625642", "Batshireet\,\ Khentii",
+"97625657", "Tsenkhermandal\,\ Khentii",
+"97614843", "Biger\,\ Govi\-Altai",
+"97613343", "Jargalant\,\ Arkhangai",
+"97624558", "Khyargas\,\ Uvs",
+"97615844", "Bulgan\,\ Dornod",
+"97622753", "Bayanchandmani\,\ Tuv",
+"9761532", "Dalanzadgad\,\ Umnugovi",
+"97625649", "Dadal\,\ Khentii",
+"97625245", "Zamiin\-Uud\,\ Dornogovi",
+"97615245", "Zamiin\-Uud\,\ Dornogovi",
+"97625844", "Bulgan\,\ Dornod",
+"97623343", "Jargalant\,\ Arkhangai",
+"97614558", "Khyargas\,\ Uvs",
+"97615649", "Dadal\,\ Khentii",
+"9762532", "Dalanzadgad\,\ Umnugovi",
+"97612753", "Bayanchandmani\,\ Tuv",
+"97624843", "Biger\,\ Govi\-Altai",
+"97615657", "Tsenkhermandal\,\ Khentii",
+"97615642", "Batshireet\,\ Khentii",
+"97615943", "Govi\-Ugtaal\,\ Dundgovi",
+"97623255", "Tugrug\,\ Uvurkhangai",
+"97615143", "Dariganga\,\ Sukhbaatar",
+"97614446", "Bayan\-Undur\,\ Bayankhongor",
+"9762272", "Zuunmod\ city\,\ Tuv",
+"97615353", "Khurmen\,\ Umnugovi",
+"97624651", "Numrug\,\ Zavkhan",
+"97613854", "Tunel\,\ Khuvsgul",
+"97624455", "Jinst\,\ Bayankhongor",
+"97623652", "Sant\,\ Selenge",
+"97623647", "Mandal\,\ Selenge",
+"97614354", "Khovd\,\ Khovd",
+"97613246", "Burd\,\ Uvurkhangai",};
 
     sub new {
       my $class = shift;

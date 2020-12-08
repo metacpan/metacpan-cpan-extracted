@@ -1,4 +1,4 @@
-# AWS::Greengrass::ResourceDefinition generated from spec 6.3.0
+# AWS::Greengrass::ResourceDefinition generated from spec 18.4.0
 use Moose::Util::TypeConstraints;
 
 coerce 'Cfn::Resource::Properties::AWS::Greengrass::ResourceDefinition',
@@ -20,6 +20,28 @@ package Cfn::Resource::AWS::Greengrass::ResourceDefinition {
 
 
 
+subtype 'Cfn::Resource::Properties::AWS::Greengrass::ResourceDefinition::ResourceDownloadOwnerSetting',
+     as 'Cfn::Value';
+
+coerce 'Cfn::Resource::Properties::AWS::Greengrass::ResourceDefinition::ResourceDownloadOwnerSetting',
+  from 'HashRef',
+   via {
+     if (my $f = Cfn::TypeLibrary::try_function($_)) {
+       return $f
+     } else {
+       return Cfn::Resource::Properties::Object::AWS::Greengrass::ResourceDefinition::ResourceDownloadOwnerSetting->new( %$_ );
+     }
+   };
+
+package Cfn::Resource::Properties::Object::AWS::Greengrass::ResourceDefinition::ResourceDownloadOwnerSetting {
+  use Moose;
+  use MooseX::StrictConstructor;
+  extends 'Cfn::Value::TypedValue';
+  
+  has GroupOwner => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
+  has GroupPermission => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
+}
+
 subtype 'Cfn::Resource::Properties::AWS::Greengrass::ResourceDefinition::GroupOwnerSetting',
      as 'Cfn::Value';
 
@@ -29,11 +51,11 @@ coerce 'Cfn::Resource::Properties::AWS::Greengrass::ResourceDefinition::GroupOwn
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::Greengrass::ResourceDefinition::GroupOwnerSettingValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::Greengrass::ResourceDefinition::GroupOwnerSetting->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::Greengrass::ResourceDefinition::GroupOwnerSettingValue {
+package Cfn::Resource::Properties::Object::AWS::Greengrass::ResourceDefinition::GroupOwnerSetting {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -51,11 +73,11 @@ coerce 'Cfn::Resource::Properties::AWS::Greengrass::ResourceDefinition::SecretsM
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::Greengrass::ResourceDefinition::SecretsManagerSecretResourceDataValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::Greengrass::ResourceDefinition::SecretsManagerSecretResourceData->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::Greengrass::ResourceDefinition::SecretsManagerSecretResourceDataValue {
+package Cfn::Resource::Properties::Object::AWS::Greengrass::ResourceDefinition::SecretsManagerSecretResourceData {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -73,16 +95,17 @@ coerce 'Cfn::Resource::Properties::AWS::Greengrass::ResourceDefinition::SageMake
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::Greengrass::ResourceDefinition::SageMakerMachineLearningModelResourceDataValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::Greengrass::ResourceDefinition::SageMakerMachineLearningModelResourceData->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::Greengrass::ResourceDefinition::SageMakerMachineLearningModelResourceDataValue {
+package Cfn::Resource::Properties::Object::AWS::Greengrass::ResourceDefinition::SageMakerMachineLearningModelResourceData {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
   
   has DestinationPath => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
+  has OwnerSetting => (isa => 'Cfn::Resource::Properties::AWS::Greengrass::ResourceDefinition::ResourceDownloadOwnerSetting', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
   has SageMakerJobArn => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
 }
 
@@ -95,16 +118,17 @@ coerce 'Cfn::Resource::Properties::AWS::Greengrass::ResourceDefinition::S3Machin
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::Greengrass::ResourceDefinition::S3MachineLearningModelResourceDataValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::Greengrass::ResourceDefinition::S3MachineLearningModelResourceData->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::Greengrass::ResourceDefinition::S3MachineLearningModelResourceDataValue {
+package Cfn::Resource::Properties::Object::AWS::Greengrass::ResourceDefinition::S3MachineLearningModelResourceData {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
   
   has DestinationPath => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
+  has OwnerSetting => (isa => 'Cfn::Resource::Properties::AWS::Greengrass::ResourceDefinition::ResourceDownloadOwnerSetting', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
   has S3Uri => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
 }
 
@@ -117,11 +141,11 @@ coerce 'Cfn::Resource::Properties::AWS::Greengrass::ResourceDefinition::LocalVol
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::Greengrass::ResourceDefinition::LocalVolumeResourceDataValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::Greengrass::ResourceDefinition::LocalVolumeResourceData->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::Greengrass::ResourceDefinition::LocalVolumeResourceDataValue {
+package Cfn::Resource::Properties::Object::AWS::Greengrass::ResourceDefinition::LocalVolumeResourceData {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -140,11 +164,11 @@ coerce 'Cfn::Resource::Properties::AWS::Greengrass::ResourceDefinition::LocalDev
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::Greengrass::ResourceDefinition::LocalDeviceResourceDataValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::Greengrass::ResourceDefinition::LocalDeviceResourceData->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::Greengrass::ResourceDefinition::LocalDeviceResourceDataValue {
+package Cfn::Resource::Properties::Object::AWS::Greengrass::ResourceDefinition::LocalDeviceResourceData {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -162,11 +186,11 @@ coerce 'Cfn::Resource::Properties::AWS::Greengrass::ResourceDefinition::Resource
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::Greengrass::ResourceDefinition::ResourceDataContainerValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::Greengrass::ResourceDefinition::ResourceDataContainer->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::Greengrass::ResourceDefinition::ResourceDataContainerValue {
+package Cfn::Resource::Properties::Object::AWS::Greengrass::ResourceDefinition::ResourceDataContainer {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -209,11 +233,11 @@ coerce 'Cfn::Resource::Properties::AWS::Greengrass::ResourceDefinition::Resource
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::Greengrass::ResourceDefinition::ResourceInstanceValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::Greengrass::ResourceDefinition::ResourceInstance->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::Greengrass::ResourceDefinition::ResourceInstanceValue {
+package Cfn::Resource::Properties::Object::AWS::Greengrass::ResourceDefinition::ResourceInstance {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -232,11 +256,11 @@ coerce 'Cfn::Resource::Properties::AWS::Greengrass::ResourceDefinition::Resource
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::Greengrass::ResourceDefinition::ResourceDefinitionVersionValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::Greengrass::ResourceDefinition::ResourceDefinitionVersion->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::Greengrass::ResourceDefinition::ResourceDefinitionVersionValue {
+package Cfn::Resource::Properties::Object::AWS::Greengrass::ResourceDefinition::ResourceDefinitionVersion {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -255,3 +279,30 @@ package Cfn::Resource::Properties::AWS::Greengrass::ResourceDefinition {
 }
 
 1;
+### main pod documentation begin ###
+
+=encoding UTF-8
+
+=head1 NAME
+
+Cfn::Resource::AWS::Greengrass::ResourceDefinition - Cfn resource for AWS::Greengrass::ResourceDefinition
+
+=head1 DESCRIPTION
+
+This module implements a Perl module that represents the CloudFormation object AWS::Greengrass::ResourceDefinition.
+
+See L<Cfn> for more information on how to use it.
+
+=head1 AUTHOR
+
+    Jose Luis Martinez
+    CAPSiDE
+    jlmartinez@capside.com
+
+=head1 COPYRIGHT and LICENSE
+
+Copyright (c) 2013 by CAPSiDE
+This code is distributed under the Apache 2 License. The full text of the 
+license can be found in the LICENSE file included with this module.
+
+=cut

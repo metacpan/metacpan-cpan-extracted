@@ -6,6 +6,10 @@ use Module::Build;
 my $build = Module::Build->new(
    module_name => 'Device::Chip::INA219',
    requires => {
+      'perl' => '5.026',
+      'Object::Pad' => '0.19',
+      'Future::AsyncAwait' => '0.47', # toplevel await
+
       'Data::Bitfield' => 0,
       'Device::Chip' => '0.04',
       'Device::Chip::Base::RegisteredI2C' => '0.10',

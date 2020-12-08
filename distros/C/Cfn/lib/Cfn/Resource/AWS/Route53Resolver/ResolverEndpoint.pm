@@ -1,4 +1,4 @@
-# AWS::Route53Resolver::ResolverEndpoint generated from spec 10.2.0
+# AWS::Route53Resolver::ResolverEndpoint generated from spec 18.4.0
 use Moose::Util::TypeConstraints;
 
 coerce 'Cfn::Resource::Properties::AWS::Route53Resolver::ResolverEndpoint',
@@ -14,7 +14,7 @@ package Cfn::Resource::AWS::Route53Resolver::ResolverEndpoint {
     [ 'Arn','Direction','HostVPCId','IpAddressCount','Name','ResolverEndpointId' ]
   }
   sub supported_regions {
-    [ 'ap-east-1','ap-northeast-1','ap-southeast-1','eu-north-1','eu-west-1','us-east-1','us-east-2','us-gov-east-1','us-gov-west-1','us-west-2' ]
+    [ 'ap-east-1','ap-northeast-1','ap-southeast-1','ap-southeast-2','eu-north-1','eu-west-1','me-south-1','sa-east-1','us-east-1','us-east-2','us-gov-east-1','us-gov-west-1','us-west-2' ]
   }
 }
 
@@ -51,11 +51,11 @@ coerce 'Cfn::Resource::Properties::AWS::Route53Resolver::ResolverEndpoint::IpAdd
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::Route53Resolver::ResolverEndpoint::IpAddressRequestValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::Route53Resolver::ResolverEndpoint::IpAddressRequest->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::Route53Resolver::ResolverEndpoint::IpAddressRequestValue {
+package Cfn::Resource::Properties::Object::AWS::Route53Resolver::ResolverEndpoint::IpAddressRequest {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -77,3 +77,30 @@ package Cfn::Resource::Properties::AWS::Route53Resolver::ResolverEndpoint {
 }
 
 1;
+### main pod documentation begin ###
+
+=encoding UTF-8
+
+=head1 NAME
+
+Cfn::Resource::AWS::Route53Resolver::ResolverEndpoint - Cfn resource for AWS::Route53Resolver::ResolverEndpoint
+
+=head1 DESCRIPTION
+
+This module implements a Perl module that represents the CloudFormation object AWS::Route53Resolver::ResolverEndpoint.
+
+See L<Cfn> for more information on how to use it.
+
+=head1 AUTHOR
+
+    Jose Luis Martinez
+    CAPSiDE
+    jlmartinez@capside.com
+
+=head1 COPYRIGHT and LICENSE
+
+Copyright (c) 2013 by CAPSiDE
+This code is distributed under the Apache 2 License. The full text of the 
+license can be found in the LICENSE file included with this module.
+
+=cut

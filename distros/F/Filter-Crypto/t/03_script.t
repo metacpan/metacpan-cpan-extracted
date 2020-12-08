@@ -7,7 +7,7 @@
 #   Test script to check crypt_file script (and decryption filter).
 #
 # COPYRIGHT
-#   Copyright (C) 2004-2007, 2009, 2014 Steve Hay.  All rights reserved.
+#   Copyright (C) 2004-2007, 2009, 2014, 2020 Steve Hay.  All rights reserved.
 #
 # LICENCE
 #   This script is free software; you can redistribute it and/or modify it under
@@ -24,6 +24,7 @@ use warnings;
 
 use Cwd qw(abs_path cwd);
 use File::Copy qw(copy);
+use File::Path qw(mkpath rmtree);
 use File::Spec::Functions qw(canonpath catdir catfile devnull rel2abs updir);
 use File::Temp qw(tempfile);
 use FindBin qw($Bin);
@@ -62,28 +63,30 @@ BEGIN {
 #===============================================================================
 
 MAIN: {
-    my $ifile  = 'test.pl';
+    my $ifile   = 'test.pl';
     my $iofile = $ifile;
-    my $script = 'foo.pl';
-    my $module = 'Foo.pm';
-    my $bfile  = "$ifile.bak";
-    my $lfile  = 'test.lst';
-    my $dir1   = 'testdir1';
-    my $dir2   = 'testdir2';
-    my $cat    = 'cat.pl';
-    my $str    = 'Hello, world.';
-    my $prog   = qq[print "$str\\n";\n];
-    my $scrsrc = qq[use Foo;\nFoo::foo();\n];
-    my $modsrc = qq[package Foo;\nsub foo() { print "$str\\n" }\n1;\n];
-    my $head   = 'use Filter::Crypto::Decrypt;';
-    my $qrhead = qr/^\Q$head\E/o;
-    my $q      = $^O eq 'MSWin32' ? '' : "'";
-    my $null   = devnull();
+    my $script  = 'foo.pl';
+    my $modroot = 'Filter';
+    my $moddir  = catdir($modroot, 'Crypto');
+    my $module  = catfile($moddir, 'Foo.pm');
+    my $bfile   = "$ifile.bak";
+    my $lfile   = 'test.lst';
+    my $dir1    = 'testdir1';
+    my $dir2    = 'testdir2';
+    my $cat     = 'cat.pl';
+    my $str     = 'Hello, world.';
+    my $prog    = qq[print "$str\\n";\n];
+    my $scrsrc  = qq[use Filter::Crypto::Foo;\nFilter::Crypto::Foo::foo();\n];
+    my $modsrc  = qq[package Filter::Crypto::Foo;\nsub foo() { print "$str\\n" }\n1;\n];
+    my $head    = 'use Filter::Crypto::Decrypt;';
+    my $qrhead  = qr/^\Q$head\E/o;
+    my $q       = $^O eq 'MSWin32' ? '' : "'";
+    my $null    = devnull();
 
     my $perl_exe = $^X =~ / /o ? qq["$^X"] : $^X;
     my $perl = qq[$perl_exe -Mblib];
 
-    my $have_decrypt   = -f catfile($lib_dir, 'Decrypt.pm');
+    my $have_decrypt = -f catfile($lib_dir, 'Decrypt.pm');
 
     my $crypt_file = catfile($top_dir, 'blib', 'script', 'crypt_file');
 
@@ -105,6 +108,7 @@ MAIN: {
     print $fh $scrsrc;
     close $fh;
 
+    eval { mkpath($moddir) } or die "Can't create directory '$moddir': $@\n";
     open $fh, '>', $module or die "Can't create file '$module': $!\n";
     print $fh $modsrc;
     close $fh;
@@ -439,7 +443,7 @@ MAIN: {
 
         SKIP: {
             skip 'Decrypt component not built', 1 unless $have_decrypt;
-            chomp($line = qx{$perl $script});
+            chomp($line = qx{$perl -I. $script});
             is($line, $str, '... and encrypted script + unencrypted module run OK');
         }
 
@@ -453,7 +457,7 @@ MAIN: {
 
         SKIP: {
             skip 'Decrypt component not built', 1 unless $have_decrypt;
-            chomp($line = qx{$perl $script});
+            chomp($line = qx{$perl -I. $script});
             is($line, $str, '... and encrypted script + encrypted module run OK');
         }
 
@@ -467,12 +471,13 @@ MAIN: {
 
         SKIP: {
             skip 'Decrypt component not built', 1 unless $have_decrypt;
-            chomp($line = qx{$perl $script});
+            chomp($line = qx{$perl -I. $script});
             is($line, $str, '... and unencrypted script + encrypted module run OK');
         }
 
         unlink $script;
         unlink $module;
+        rmtree($modroot, 0, 1);
     }
 
     {

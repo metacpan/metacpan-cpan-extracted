@@ -1,4 +1,4 @@
-# AWS::ECS::Service generated from spec 9.1.0
+# AWS::ECS::Service generated from spec 20.1.0
 use Moose::Util::TypeConstraints;
 
 coerce 'Cfn::Resource::Properties::AWS::ECS::Service',
@@ -14,7 +14,7 @@ package Cfn::Resource::AWS::ECS::Service {
     [ 'Name' ]
   }
   sub supported_regions {
-    [ 'ap-east-1','ap-northeast-1','ap-northeast-2','ap-northeast-3','ap-south-1','ap-southeast-1','ap-southeast-2','ca-central-1','cn-north-1','cn-northwest-1','eu-central-1','eu-north-1','eu-west-1','eu-west-2','eu-west-3','me-south-1','sa-east-1','us-east-1','us-east-2','us-gov-east-1','us-gov-west-1','us-west-1','us-west-2' ]
+    [ 'af-south-1','ap-east-1','ap-northeast-1','ap-northeast-2','ap-northeast-3','ap-south-1','ap-southeast-1','ap-southeast-2','ca-central-1','cn-north-1','cn-northwest-1','eu-central-1','eu-north-1','eu-south-1','eu-west-1','eu-west-2','eu-west-3','me-south-1','sa-east-1','us-east-1','us-east-2','us-gov-east-1','us-gov-west-1','us-west-1','us-west-2' ]
   }
 }
 
@@ -29,18 +29,18 @@ coerce 'Cfn::Resource::Properties::AWS::ECS::Service::AwsVpcConfiguration',
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::ECS::Service::AwsVpcConfigurationValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::ECS::Service::AwsVpcConfiguration->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::ECS::Service::AwsVpcConfigurationValue {
+package Cfn::Resource::Properties::Object::AWS::ECS::Service::AwsVpcConfiguration {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
   
   has AssignPublicIp => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has SecurityGroups => (isa => 'Cfn::Value::Array|Cfn::Value::Function|Cfn::DynamicValue', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
-  has Subnets => (isa => 'Cfn::Value::Array|Cfn::Value::Function|Cfn::DynamicValue', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has Subnets => (isa => 'Cfn::Value::Array|Cfn::Value::Function|Cfn::DynamicValue', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
 }
 subtype 'ArrayOfCfn::Resource::Properties::AWS::ECS::Service::ServiceRegistry',
      as 'Cfn::Value',
@@ -74,11 +74,11 @@ coerce 'Cfn::Resource::Properties::AWS::ECS::Service::ServiceRegistry',
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::ECS::Service::ServiceRegistryValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::ECS::Service::ServiceRegistry->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::ECS::Service::ServiceRegistryValue {
+package Cfn::Resource::Properties::Object::AWS::ECS::Service::ServiceRegistry {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -120,11 +120,11 @@ coerce 'Cfn::Resource::Properties::AWS::ECS::Service::PlacementStrategy',
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::ECS::Service::PlacementStrategyValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::ECS::Service::PlacementStrategy->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::ECS::Service::PlacementStrategyValue {
+package Cfn::Resource::Properties::Object::AWS::ECS::Service::PlacementStrategy {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -164,11 +164,11 @@ coerce 'Cfn::Resource::Properties::AWS::ECS::Service::PlacementConstraint',
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::ECS::Service::PlacementConstraintValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::ECS::Service::PlacementConstraint->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::ECS::Service::PlacementConstraintValue {
+package Cfn::Resource::Properties::Object::AWS::ECS::Service::PlacementConstraint {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -186,11 +186,11 @@ coerce 'Cfn::Resource::Properties::AWS::ECS::Service::NetworkConfiguration',
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::ECS::Service::NetworkConfigurationValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::ECS::Service::NetworkConfiguration->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::ECS::Service::NetworkConfigurationValue {
+package Cfn::Resource::Properties::Object::AWS::ECS::Service::NetworkConfiguration {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -229,17 +229,17 @@ coerce 'Cfn::Resource::Properties::AWS::ECS::Service::LoadBalancer',
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::ECS::Service::LoadBalancerValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::ECS::Service::LoadBalancer->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::ECS::Service::LoadBalancerValue {
+package Cfn::Resource::Properties::Object::AWS::ECS::Service::LoadBalancer {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
   
   has ContainerName => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
-  has ContainerPort => (isa => 'Cfn::Value::Integer', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
+  has ContainerPort => (isa => 'Cfn::Value::Integer', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
   has LoadBalancerName => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
   has TargetGroupArn => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
 }
@@ -253,11 +253,11 @@ coerce 'Cfn::Resource::Properties::AWS::ECS::Service::DeploymentController',
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::ECS::Service::DeploymentControllerValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::ECS::Service::DeploymentController->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::ECS::Service::DeploymentControllerValue {
+package Cfn::Resource::Properties::Object::AWS::ECS::Service::DeploymentController {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -274,11 +274,11 @@ coerce 'Cfn::Resource::Properties::AWS::ECS::Service::DeploymentConfiguration',
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::ECS::Service::DeploymentConfigurationValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::ECS::Service::DeploymentConfiguration->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::ECS::Service::DeploymentConfigurationValue {
+package Cfn::Resource::Properties::Object::AWS::ECS::Service::DeploymentConfiguration {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -286,12 +286,58 @@ package Cfn::Resource::Properties::AWS::ECS::Service::DeploymentConfigurationVal
   has MaximumPercent => (isa => 'Cfn::Value::Integer', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has MinimumHealthyPercent => (isa => 'Cfn::Value::Integer', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
 }
+subtype 'ArrayOfCfn::Resource::Properties::AWS::ECS::Service::CapacityProviderStrategyItem',
+     as 'Cfn::Value',
+  where { $_->isa('Cfn::Value::Array') or $_->isa('Cfn::Value::Function') },
+message { "$_ is not a Cfn::Value or a Cfn::Value::Function" };
+
+coerce 'ArrayOfCfn::Resource::Properties::AWS::ECS::Service::CapacityProviderStrategyItem',
+  from 'HashRef',
+   via {
+     if (my $f = Cfn::TypeLibrary::try_function($_)) {
+       return $f
+     } else {
+       die 'Only accepts functions'; 
+     }
+   },
+  from 'ArrayRef',
+   via {
+     Cfn::Value::Array->new(Value => [
+       map { 
+         Moose::Util::TypeConstraints::find_type_constraint('Cfn::Resource::Properties::AWS::ECS::Service::CapacityProviderStrategyItem')->coerce($_)
+       } @$_
+     ]);
+   };
+
+subtype 'Cfn::Resource::Properties::AWS::ECS::Service::CapacityProviderStrategyItem',
+     as 'Cfn::Value';
+
+coerce 'Cfn::Resource::Properties::AWS::ECS::Service::CapacityProviderStrategyItem',
+  from 'HashRef',
+   via {
+     if (my $f = Cfn::TypeLibrary::try_function($_)) {
+       return $f
+     } else {
+       return Cfn::Resource::Properties::Object::AWS::ECS::Service::CapacityProviderStrategyItem->new( %$_ );
+     }
+   };
+
+package Cfn::Resource::Properties::Object::AWS::ECS::Service::CapacityProviderStrategyItem {
+  use Moose;
+  use MooseX::StrictConstructor;
+  extends 'Cfn::Value::TypedValue';
+  
+  has Base => (isa => 'Cfn::Value::Integer', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has CapacityProvider => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has Weight => (isa => 'Cfn::Value::Integer', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+}
 
 package Cfn::Resource::Properties::AWS::ECS::Service {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Resource::Properties';
   
+  has CapacityProviderStrategy => (isa => 'ArrayOfCfn::Resource::Properties::AWS::ECS::Service::CapacityProviderStrategyItem', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has Cluster => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
   has DeploymentConfiguration => (isa => 'Cfn::Resource::Properties::AWS::ECS::Service::DeploymentConfiguration', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has DeploymentController => (isa => 'Cfn::Resource::Properties::AWS::ECS::Service::DeploymentController', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
@@ -307,6 +353,7 @@ package Cfn::Resource::Properties::AWS::ECS::Service {
   has PropagateTags => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
   has Role => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
   has SchedulingStrategy => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
+  has ServiceArn => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has ServiceName => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
   has ServiceRegistries => (isa => 'ArrayOfCfn::Resource::Properties::AWS::ECS::Service::ServiceRegistry', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
   has Tags => (isa => 'ArrayOfCfn::Resource::Properties::TagType', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
@@ -314,3 +361,30 @@ package Cfn::Resource::Properties::AWS::ECS::Service {
 }
 
 1;
+### main pod documentation begin ###
+
+=encoding UTF-8
+
+=head1 NAME
+
+Cfn::Resource::AWS::ECS::Service - Cfn resource for AWS::ECS::Service
+
+=head1 DESCRIPTION
+
+This module implements a Perl module that represents the CloudFormation object AWS::ECS::Service.
+
+See L<Cfn> for more information on how to use it.
+
+=head1 AUTHOR
+
+    Jose Luis Martinez
+    CAPSiDE
+    jlmartinez@capside.com
+
+=head1 COPYRIGHT and LICENSE
+
+Copyright (c) 2013 by CAPSiDE
+This code is distributed under the Apache 2 License. The full text of the 
+license can be found in the LICENSE file included with this module.
+
+=cut

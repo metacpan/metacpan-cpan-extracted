@@ -1,4 +1,4 @@
-# AWS::FSx::FileSystem generated from spec 11.1.0
+# AWS::FSx::FileSystem generated from spec 18.4.0
 use Moose::Util::TypeConstraints;
 
 coerce 'Cfn::Resource::Properties::AWS::FSx::FileSystem',
@@ -11,7 +11,7 @@ package Cfn::Resource::AWS::FSx::FileSystem {
   has Properties => (isa => 'Cfn::Resource::Properties::AWS::FSx::FileSystem', is => 'rw', coerce => 1);
   
   sub AttributeList {
-    [  ]
+    [ 'LustreMountName' ]
   }
   sub supported_regions {
     [ 'ap-northeast-1','ap-southeast-2','eu-central-1','eu-north-1','eu-west-1','eu-west-2','us-east-1','us-east-2','us-west-1','us-west-2' ]
@@ -29,11 +29,11 @@ coerce 'Cfn::Resource::Properties::AWS::FSx::FileSystem::SelfManagedActiveDirect
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::FSx::FileSystem::SelfManagedActiveDirectoryConfigurationValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::FSx::FileSystem::SelfManagedActiveDirectoryConfiguration->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::FSx::FileSystem::SelfManagedActiveDirectoryConfigurationValue {
+package Cfn::Resource::Properties::Object::AWS::FSx::FileSystem::SelfManagedActiveDirectoryConfiguration {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -55,11 +55,11 @@ coerce 'Cfn::Resource::Properties::AWS::FSx::FileSystem::WindowsConfiguration',
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::FSx::FileSystem::WindowsConfigurationValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::FSx::FileSystem::WindowsConfiguration->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::FSx::FileSystem::WindowsConfigurationValue {
+package Cfn::Resource::Properties::Object::AWS::FSx::FileSystem::WindowsConfiguration {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -71,7 +71,7 @@ package Cfn::Resource::Properties::AWS::FSx::FileSystem::WindowsConfigurationVal
   has DeploymentType => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
   has PreferredSubnetId => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
   has SelfManagedActiveDirectoryConfiguration => (isa => 'Cfn::Resource::Properties::AWS::FSx::FileSystem::SelfManagedActiveDirectoryConfiguration', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
-  has ThroughputCapacity => (isa => 'Cfn::Value::Integer', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
+  has ThroughputCapacity => (isa => 'Cfn::Value::Integer', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has WeeklyMaintenanceStartTime => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
 }
 
@@ -84,16 +84,21 @@ coerce 'Cfn::Resource::Properties::AWS::FSx::FileSystem::LustreConfiguration',
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::FSx::FileSystem::LustreConfigurationValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::FSx::FileSystem::LustreConfiguration->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::FSx::FileSystem::LustreConfigurationValue {
+package Cfn::Resource::Properties::Object::AWS::FSx::FileSystem::LustreConfiguration {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
   
+  has AutoImportPolicy => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has AutomaticBackupRetentionDays => (isa => 'Cfn::Value::Integer', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has CopyTagsToBackups => (isa => 'Cfn::Value::Boolean', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
+  has DailyAutomaticBackupStartTime => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has DeploymentType => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
+  has DriveCacheType => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
   has ExportPath => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
   has ImportedFileChunkSize => (isa => 'Cfn::Value::Integer', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
   has ImportPath => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
@@ -111,10 +116,38 @@ package Cfn::Resource::Properties::AWS::FSx::FileSystem {
   has KmsKeyId => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
   has LustreConfiguration => (isa => 'Cfn::Resource::Properties::AWS::FSx::FileSystem::LustreConfiguration', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has SecurityGroupIds => (isa => 'Cfn::Value::Array|Cfn::Value::Function|Cfn::DynamicValue', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
-  has StorageCapacity => (isa => 'Cfn::Value::Integer', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
+  has StorageCapacity => (isa => 'Cfn::Value::Integer', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has StorageType => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
   has SubnetIds => (isa => 'Cfn::Value::Array|Cfn::Value::Function|Cfn::DynamicValue', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
   has Tags => (isa => 'ArrayOfCfn::Resource::Properties::TagType', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has WindowsConfiguration => (isa => 'Cfn::Resource::Properties::AWS::FSx::FileSystem::WindowsConfiguration', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
 }
 
 1;
+### main pod documentation begin ###
+
+=encoding UTF-8
+
+=head1 NAME
+
+Cfn::Resource::AWS::FSx::FileSystem - Cfn resource for AWS::FSx::FileSystem
+
+=head1 DESCRIPTION
+
+This module implements a Perl module that represents the CloudFormation object AWS::FSx::FileSystem.
+
+See L<Cfn> for more information on how to use it.
+
+=head1 AUTHOR
+
+    Jose Luis Martinez
+    CAPSiDE
+    jlmartinez@capside.com
+
+=head1 COPYRIGHT and LICENSE
+
+Copyright (c) 2013 by CAPSiDE
+This code is distributed under the Apache 2 License. The full text of the 
+license can be found in the LICENSE file included with this module.
+
+=cut

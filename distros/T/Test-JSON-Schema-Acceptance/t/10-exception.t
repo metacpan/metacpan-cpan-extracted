@@ -49,7 +49,7 @@ cmp_deeply(
       pass => 1,
       children => [
         superhashof({
-          details => 'test passes',
+          details => 'test passes: data is valid: true',
           pass => 1,
         }),
       ],

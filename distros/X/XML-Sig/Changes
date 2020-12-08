@@ -1,5 +1,25 @@
 Changes
 
+Version 0.33
+
+This release is mostly clean up but does inclued one important fix.
+
+Commit 885ca9f65031dba617aac061370c8def6a3b70b8 introduced a bug related to verifying
+signed XML that include a Signature that is unassociated with any nodes in the XML.
+The XML::Sig will ignore that unassociated signature and verify all other signatures.
+In the event that there are no other signatures the previous version would incorrectly
+consider the XML Signatures valid.  This would only occur with a single unassociated
+Signature.
+
+    3adc579 XML Containing Single Unassociated Signature should fail
+    89f722f Merge pull request #17 from perl-net-saml2/test-cleanup
+    ff00501 008_sign_saml move xml to signed and unsigned
+    95615b1 Move logout_response.xml to signed
+    6fc5c67 Move saml_response.xml to signed
+    46c97e1 Add signature back so it can be validated for ancestor node signatures
+    1a3a8be Fixes Issue #15 - Remove dependency on Crypt::OpenSSL::DSA::Signature
+    cf7b734 Version 0.32 release
+
 Version 0.32
 
     Release Version of 0.31-TRIAL

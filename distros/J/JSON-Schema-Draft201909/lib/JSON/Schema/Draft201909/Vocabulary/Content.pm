@@ -2,13 +2,13 @@ use strict;
 use warnings;
 package JSON::Schema::Draft201909::Vocabulary::Content;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
+# ABSTRACT: Implementation of the JSON Schema Draft 2019-09 Content vocabulary
 
-our $VERSION = '0.017';
+our $VERSION = '0.018';
 
 use 5.016;
 no if "$]" >= 5.031009, feature => 'indirect';
 no if "$]" >= 5.033001, feature => 'multidimensional';
-use List::Util 'any';
 use Storable 'dclone';
 use JSON::Schema::Draft201909::Utilities qw(is_type A assert_keyword_type);
 use Moo;
@@ -69,19 +69,19 @@ __END__
 
 =head1 NAME
 
-JSON::Schema::Draft201909::Vocabulary::Content
+JSON::Schema::Draft201909::Vocabulary::Content - Implementation of the JSON Schema Draft 2019-09 Content vocabulary
 
 =head1 VERSION
 
-version 0.017
+version 0.018
 
-=head1 SYNOPSIS
+=head1 DESCRIPTION
 
 =for Pod::Coverage vocabulary keywords
 
 =for stopwords metaschema
 
-Implementation of the JSON Schema Draft 2019-09 "content" vocabulary, indicated in metaschemas
+Implementation of the JSON Schema Draft 2019-09 "Content" vocabulary, indicated in metaschemas
 with the URI C<https://json-schema.org/draft/2019-09/vocab/content> and formally specified in
 L<https://json-schema.org/draft/2019-09/json-schema-validation.html>.
 

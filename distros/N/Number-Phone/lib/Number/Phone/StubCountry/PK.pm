@@ -22,14 +22,14 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20200904144535;
+our $VERSION = 1.20201204215957;
 
 my $formatters = [
                 {
                   'format' => '$1 $2 $3',
                   'leading_digits' => '[89]0',
                   'national_rule' => '0$1',
-                  'pattern' => '(\\d{3})(\\d{3})(\\d{2})'
+                  'pattern' => '(\\d{3})(\\d{3})(\\d{2,7})'
                 },
                 {
                   'format' => '$1 $2',
@@ -258,754 +258,758 @@ my $validators = {
             )
           )111\\d{6}
         )',
-                'toll_free' => '800\\d{5}',
+                'toll_free' => '
+          800\\d{5}(?:
+            \\d{3}
+          )?
+        ',
                 'voip' => ''
               };
 my %areanames = ();
-$areanames{en}->{92212} = "Karachi";
-$areanames{en}->{92213} = "Karachi";
-$areanames{en}->{92214} = "Karachi";
-$areanames{en}->{92215} = "Karachi";
-$areanames{en}->{92216} = "Karachi";
-$areanames{en}->{92217} = "Karachi";
-$areanames{en}->{92218} = "Karachi";
-$areanames{en}->{92219} = "Karachi";
-$areanames{en}->{92222} = "Hyderabad";
-$areanames{en}->{92223} = "Hyderabad";
-$areanames{en}->{92224} = "Hyderabad";
-$areanames{en}->{92225} = "Hyderabad";
-$areanames{en}->{92226} = "Hyderabad";
-$areanames{en}->{92227} = "Hyderabad";
-$areanames{en}->{92228} = "Hyderabad";
-$areanames{en}->{92229} = "Hyderabad";
-$areanames{en}->{922322} = "Tharparkar";
-$areanames{en}->{922323} = "Tharparkar";
-$areanames{en}->{922324} = "Tharparkar";
-$areanames{en}->{922325} = "Tharparkar";
-$areanames{en}->{922326} = "Tharparkar";
-$areanames{en}->{922327} = "Tharparkar";
-$areanames{en}->{922328} = "Tharparkar";
-$areanames{en}->{922329} = "Tharparkar";
-$areanames{en}->{922332} = "Mirpur\ Khas";
-$areanames{en}->{922333} = "Mirpur\ Khas";
-$areanames{en}->{922334} = "Mirpur\ Khas";
-$areanames{en}->{922335} = "Mirpur\ Khas";
-$areanames{en}->{922336} = "Mirpur\ Khas";
-$areanames{en}->{922337} = "Mirpur\ Khas";
-$areanames{en}->{922338} = "Mirpur\ Khas";
-$areanames{en}->{922339} = "Mirpur\ Khas";
-$areanames{en}->{922352} = "Sanghar";
-$areanames{en}->{922353} = "Sanghar";
-$areanames{en}->{922354} = "Sanghar";
-$areanames{en}->{922355} = "Sanghar";
-$areanames{en}->{922356} = "Sanghar";
-$areanames{en}->{922357} = "Sanghar";
-$areanames{en}->{922358} = "Sanghar";
-$areanames{en}->{922359} = "Sanghar";
-$areanames{en}->{922382} = "Umerkot";
-$areanames{en}->{922383} = "Umerkot";
-$areanames{en}->{922384} = "Umerkot";
-$areanames{en}->{922385} = "Umerkot";
-$areanames{en}->{922386} = "Umerkot";
-$areanames{en}->{922387} = "Umerkot";
-$areanames{en}->{922388} = "Umerkot";
-$areanames{en}->{922389} = "Umerkot";
-$areanames{en}->{922422} = "Naushero\ Feroze";
-$areanames{en}->{922423} = "Naushero\ Feroze";
-$areanames{en}->{922424} = "Naushero\ Feroze";
-$areanames{en}->{922425} = "Naushero\ Feroze";
-$areanames{en}->{922426} = "Naushero\ Feroze";
-$areanames{en}->{922427} = "Naushero\ Feroze";
-$areanames{en}->{922428} = "Naushero\ Feroze";
-$areanames{en}->{922429} = "Naushero\ Feroze";
-$areanames{en}->{922432} = "Khairpur";
-$areanames{en}->{922433} = "Khairpur";
-$areanames{en}->{922434} = "Khairpur";
-$areanames{en}->{922435} = "Khairpur";
-$areanames{en}->{922436} = "Khairpur";
-$areanames{en}->{922437} = "Khairpur";
-$areanames{en}->{922438} = "Khairpur";
-$areanames{en}->{922439} = "Khairpur";
-$areanames{en}->{922442} = "Nawabshah";
-$areanames{en}->{922443} = "Nawabshah";
-$areanames{en}->{922444} = "Nawabshah";
-$areanames{en}->{922445} = "Nawabshah";
-$areanames{en}->{922446} = "Nawabshah";
-$areanames{en}->{922447} = "Nawabshah";
-$areanames{en}->{922448} = "Nawabshah";
-$areanames{en}->{922449} = "Nawabshah";
-$areanames{en}->{92252} = "Dadu";
-$areanames{en}->{92253} = "Dadu";
-$areanames{en}->{92254} = "Dadu";
-$areanames{en}->{92255} = "Dadu";
-$areanames{en}->{92256} = "Dadu";
-$areanames{en}->{92257} = "Dadu";
-$areanames{en}->{92258} = "Dadu";
-$areanames{en}->{92259} = "Dadu";
-$areanames{en}->{922972} = "Badin";
-$areanames{en}->{922973} = "Badin";
-$areanames{en}->{922974} = "Badin";
-$areanames{en}->{922975} = "Badin";
-$areanames{en}->{922976} = "Badin";
-$areanames{en}->{922977} = "Badin";
-$areanames{en}->{922978} = "Badin";
-$areanames{en}->{922979} = "Badin";
-$areanames{en}->{922982} = "Thatta";
-$areanames{en}->{922983} = "Thatta";
-$areanames{en}->{922984} = "Thatta";
-$areanames{en}->{922985} = "Thatta";
-$areanames{en}->{922986} = "Thatta";
-$areanames{en}->{922987} = "Thatta";
-$areanames{en}->{922988} = "Thatta";
-$areanames{en}->{922989} = "Thatta";
-$areanames{en}->{92402} = "Sahiwal";
-$areanames{en}->{92403} = "Sahiwal";
-$areanames{en}->{92404} = "Sahiwal";
-$areanames{en}->{92405} = "Sahiwal";
-$areanames{en}->{92406} = "Sahiwal";
-$areanames{en}->{92407} = "Sahiwal";
-$areanames{en}->{92408} = "Sahiwal";
-$areanames{en}->{92409} = "Sahiwal";
-$areanames{en}->{92412} = "Faisalabad";
-$areanames{en}->{92413} = "Faisalabad";
-$areanames{en}->{92414} = "Faisalabad";
-$areanames{en}->{92415} = "Faisalabad";
-$areanames{en}->{92416} = "Faisalabad";
-$areanames{en}->{92417} = "Faisalabad";
-$areanames{en}->{92418} = "Faisalabad";
-$areanames{en}->{92419} = "Faisalabad";
-$areanames{en}->{92422} = "Lahore";
-$areanames{en}->{92423} = "Lahore";
-$areanames{en}->{92424} = "Lahore";
-$areanames{en}->{92425} = "Lahore";
-$areanames{en}->{92426} = "Lahore";
-$areanames{en}->{92427} = "Lahore";
-$areanames{en}->{92428} = "Lahore";
-$areanames{en}->{92429} = "Lahore";
-$areanames{en}->{92442} = "Okara";
-$areanames{en}->{92443} = "Okara";
-$areanames{en}->{92444} = "Okara";
-$areanames{en}->{92445} = "Okara";
-$areanames{en}->{92446} = "Okara";
-$areanames{en}->{92447} = "Okara";
-$areanames{en}->{92448} = "Okara";
-$areanames{en}->{92449} = "Okara";
-$areanames{en}->{924532} = "Bhakkar";
-$areanames{en}->{924533} = "Bhakkar";
-$areanames{en}->{924534} = "Bhakkar";
-$areanames{en}->{924535} = "Bhakkar";
-$areanames{en}->{924536} = "Bhakkar";
-$areanames{en}->{924537} = "Bhakkar";
-$areanames{en}->{924538} = "Bhakkar";
-$areanames{en}->{924539} = "Bhakkar";
-$areanames{en}->{924542} = "Khushab";
-$areanames{en}->{924543} = "Khushab";
-$areanames{en}->{924544} = "Khushab";
-$areanames{en}->{924545} = "Khushab";
-$areanames{en}->{924546} = "Khushab";
-$areanames{en}->{924547} = "Khushab";
-$areanames{en}->{924548} = "Khushab";
-$areanames{en}->{924549} = "Khushab";
-$areanames{en}->{924572} = "Pakpattan";
-$areanames{en}->{924573} = "Pakpattan";
-$areanames{en}->{924574} = "Pakpattan";
-$areanames{en}->{924575} = "Pakpattan";
-$areanames{en}->{924576} = "Pakpattan";
-$areanames{en}->{924577} = "Pakpattan";
-$areanames{en}->{924578} = "Pakpattan";
-$areanames{en}->{924579} = "Pakpattan";
-$areanames{en}->{924592} = "Mianwali";
-$areanames{en}->{924593} = "Mianwali";
-$areanames{en}->{924594} = "Mianwali";
-$areanames{en}->{924595} = "Mianwali";
-$areanames{en}->{924596} = "Mianwali";
-$areanames{en}->{924597} = "Mianwali";
-$areanames{en}->{924598} = "Mianwali";
-$areanames{en}->{924599} = "Mianwali";
-$areanames{en}->{92462} = "Toba\ Tek\ Singh";
-$areanames{en}->{92463} = "Toba\ Tek\ Singh";
-$areanames{en}->{92464} = "Toba\ Tek\ Singh";
-$areanames{en}->{92465} = "Toba\ Tek\ Singh";
-$areanames{en}->{92466} = "Toba\ Tek\ Singh";
-$areanames{en}->{92467} = "Toba\ Tek\ Singh";
-$areanames{en}->{92468} = "Toba\ Tek\ Singh";
-$areanames{en}->{92469} = "Toba\ Tek\ Singh";
-$areanames{en}->{92472} = "Jhang";
-$areanames{en}->{92473} = "Jhang";
-$areanames{en}->{92474} = "Jhang";
-$areanames{en}->{92475} = "Jhang";
-$areanames{en}->{92476} = "Jhang";
-$areanames{en}->{92477} = "Jhang";
-$areanames{en}->{92478} = "Jhang";
-$areanames{en}->{92479} = "Jhang";
-$areanames{en}->{92482} = "Sargodha";
-$areanames{en}->{92483} = "Sargodha";
-$areanames{en}->{92484} = "Sargodha";
-$areanames{en}->{92485} = "Sargodha";
-$areanames{en}->{92486} = "Sargodha";
-$areanames{en}->{92487} = "Sargodha";
-$areanames{en}->{92488} = "Sargodha";
-$areanames{en}->{92489} = "Sargodha";
-$areanames{en}->{92492} = "Kasur";
-$areanames{en}->{92493} = "Kasur";
-$areanames{en}->{92494} = "Kasur";
-$areanames{en}->{92495} = "Kasur";
-$areanames{en}->{92496} = "Kasur";
-$areanames{en}->{92497} = "Kasur";
-$areanames{en}->{92498} = "Kasur";
-$areanames{en}->{92499} = "Kasur";
-$areanames{en}->{92512} = "Islamabad\/Rawalpindi";
-$areanames{en}->{92513} = "Islamabad\/Rawalpindi";
-$areanames{en}->{92514} = "Islamabad\/Rawalpindi";
-$areanames{en}->{92515} = "Islamabad\/Rawalpindi";
-$areanames{en}->{92516} = "Islamabad\/Rawalpindi";
-$areanames{en}->{92517} = "Islamabad\/Rawalpindi";
-$areanames{en}->{92518} = "Islamabad\/Rawalpindi";
-$areanames{en}->{92519} = "Islamabad\/Rawalpindi";
-$areanames{en}->{92522} = "Sialkot";
-$areanames{en}->{92523} = "Sialkot";
-$areanames{en}->{92524} = "Sialkot";
-$areanames{en}->{92525} = "Sialkot";
-$areanames{en}->{92526} = "Sialkot";
-$areanames{en}->{92527} = "Sialkot";
-$areanames{en}->{92528} = "Sialkot";
-$areanames{en}->{92529} = "Sialkot";
-$areanames{en}->{92532} = "Gujrat";
-$areanames{en}->{92533} = "Gujrat";
-$areanames{en}->{92534} = "Gujrat";
-$areanames{en}->{92535} = "Gujrat";
-$areanames{en}->{92536} = "Gujrat";
-$areanames{en}->{92537} = "Gujrat";
-$areanames{en}->{92538} = "Gujrat";
-$areanames{en}->{92539} = "Gujrat";
-$areanames{en}->{925422} = "Narowal";
-$areanames{en}->{925423} = "Narowal";
-$areanames{en}->{925424} = "Narowal";
-$areanames{en}->{925425} = "Narowal";
-$areanames{en}->{925426} = "Narowal";
-$areanames{en}->{925427} = "Narowal";
-$areanames{en}->{925428} = "Narowal";
-$areanames{en}->{925429} = "Narowal";
-$areanames{en}->{925432} = "Chakwal";
-$areanames{en}->{925433} = "Chakwal";
-$areanames{en}->{925434} = "Chakwal";
-$areanames{en}->{925435} = "Chakwal";
-$areanames{en}->{925436} = "Chakwal";
-$areanames{en}->{925437} = "Chakwal";
-$areanames{en}->{925438} = "Chakwal";
-$areanames{en}->{925439} = "Chakwal";
-$areanames{en}->{925442} = "Jhelum";
-$areanames{en}->{925443} = "Jhelum";
-$areanames{en}->{925444} = "Jhelum";
-$areanames{en}->{925445} = "Jhelum";
-$areanames{en}->{925446} = "Jhelum";
-$areanames{en}->{925447} = "Jhelum";
-$areanames{en}->{925448} = "Jhelum";
-$areanames{en}->{925449} = "Jhelum";
-$areanames{en}->{925462} = "Mandi\ Bahauddin";
-$areanames{en}->{925463} = "Mandi\ Bahauddin";
-$areanames{en}->{925464} = "Mandi\ Bahauddin";
-$areanames{en}->{925465} = "Mandi\ Bahauddin";
-$areanames{en}->{925466} = "Mandi\ Bahauddin";
-$areanames{en}->{925467} = "Mandi\ Bahauddin";
-$areanames{en}->{925468} = "Mandi\ Bahauddin";
-$areanames{en}->{925469} = "Mandi\ Bahauddin";
-$areanames{en}->{925472} = "Hafizabad";
-$areanames{en}->{925473} = "Hafizabad";
-$areanames{en}->{925474} = "Hafizabad";
-$areanames{en}->{925475} = "Hafizabad";
-$areanames{en}->{925476} = "Hafizabad";
-$areanames{en}->{925477} = "Hafizabad";
-$areanames{en}->{925478} = "Hafizabad";
-$areanames{en}->{925479} = "Hafizabad";
-$areanames{en}->{92552} = "Gujranwala";
-$areanames{en}->{92553} = "Gujranwala";
-$areanames{en}->{92554} = "Gujranwala";
-$areanames{en}->{92555} = "Gujranwala";
-$areanames{en}->{92556} = "Gujranwala";
-$areanames{en}->{92557} = "Gujranwala";
-$areanames{en}->{92558} = "Gujranwala";
-$areanames{en}->{92559} = "Gujranwala";
-$areanames{en}->{92562} = "Sheikhupura";
-$areanames{en}->{92563} = "Sheikhupura";
-$areanames{en}->{92564} = "Sheikhupura";
-$areanames{en}->{92565} = "Sheikhupura";
-$areanames{en}->{92566} = "Sheikhupura";
-$areanames{en}->{92567} = "Sheikhupura";
-$areanames{en}->{92568} = "Sheikhupura";
-$areanames{en}->{92569} = "Sheikhupura";
-$areanames{en}->{92572} = "Attock";
-$areanames{en}->{92573} = "Attock";
-$areanames{en}->{92574} = "Attock";
-$areanames{en}->{92575} = "Attock";
-$areanames{en}->{92576} = "Attock";
-$areanames{en}->{92577} = "Attock";
-$areanames{en}->{92578} = "Attock";
-$areanames{en}->{92579} = "Attock";
-$areanames{en}->{9258} = "AJK\/FATA";
-$areanames{en}->{926042} = "Rajanpur";
-$areanames{en}->{926043} = "Rajanpur";
-$areanames{en}->{926044} = "Rajanpur";
-$areanames{en}->{926045} = "Rajanpur";
-$areanames{en}->{926046} = "Rajanpur";
-$areanames{en}->{926047} = "Rajanpur";
-$areanames{en}->{926048} = "Rajanpur";
-$areanames{en}->{926049} = "Rajanpur";
-$areanames{en}->{926062} = "Layyah";
-$areanames{en}->{926063} = "Layyah";
-$areanames{en}->{926064} = "Layyah";
-$areanames{en}->{926065} = "Layyah";
-$areanames{en}->{926066} = "Layyah";
-$areanames{en}->{926067} = "Layyah";
-$areanames{en}->{926068} = "Layyah";
-$areanames{en}->{926069} = "Layyah";
-$areanames{en}->{926082} = "Lodhran";
-$areanames{en}->{926083} = "Lodhran";
-$areanames{en}->{926084} = "Lodhran";
-$areanames{en}->{926085} = "Lodhran";
-$areanames{en}->{926086} = "Lodhran";
-$areanames{en}->{926087} = "Lodhran";
-$areanames{en}->{926088} = "Lodhran";
-$areanames{en}->{926089} = "Lodhran";
-$areanames{en}->{92612} = "Multan";
-$areanames{en}->{92613} = "Multan";
-$areanames{en}->{92614} = "Multan";
-$areanames{en}->{92615} = "Multan";
-$areanames{en}->{92616} = "Multan";
-$areanames{en}->{92617} = "Multan";
-$areanames{en}->{92618} = "Multan";
-$areanames{en}->{92619} = "Multan";
-$areanames{en}->{92622} = "Bahawalpur";
-$areanames{en}->{92623} = "Bahawalpur";
-$areanames{en}->{92624} = "Bahawalpur";
-$areanames{en}->{92625} = "Bahawalpur";
-$areanames{en}->{92626} = "Bahawalpur";
-$areanames{en}->{92627} = "Bahawalpur";
-$areanames{en}->{92628} = "Bahawalpur";
-$areanames{en}->{92629} = "Bahawalpur";
-$areanames{en}->{92632} = "Bahawalnagar";
-$areanames{en}->{92633} = "Bahawalnagar";
-$areanames{en}->{92634} = "Bahawalnagar";
-$areanames{en}->{92635} = "Bahawalnagar";
-$areanames{en}->{92636} = "Bahawalnagar";
-$areanames{en}->{92637} = "Bahawalnagar";
-$areanames{en}->{92638} = "Bahawalnagar";
-$areanames{en}->{92639} = "Bahawalnagar";
-$areanames{en}->{92642} = "Dera\ Ghazi\ Khan";
-$areanames{en}->{92643} = "Dera\ Ghazi\ Khan";
-$areanames{en}->{92644} = "Dera\ Ghazi\ Khan";
-$areanames{en}->{92645} = "Dera\ Ghazi\ Khan";
-$areanames{en}->{92646} = "Dera\ Ghazi\ Khan";
-$areanames{en}->{92647} = "Dera\ Ghazi\ Khan";
-$areanames{en}->{92648} = "Dera\ Ghazi\ Khan";
-$areanames{en}->{92649} = "Dera\ Ghazi\ Khan";
-$areanames{en}->{92652} = "Khanewal";
-$areanames{en}->{92653} = "Khanewal";
-$areanames{en}->{92654} = "Khanewal";
-$areanames{en}->{92655} = "Khanewal";
-$areanames{en}->{92656} = "Khanewal";
-$areanames{en}->{92657} = "Khanewal";
-$areanames{en}->{92658} = "Khanewal";
-$areanames{en}->{92659} = "Khanewal";
-$areanames{en}->{92662} = "Muzaffargarh";
-$areanames{en}->{92663} = "Muzaffargarh";
-$areanames{en}->{92664} = "Muzaffargarh";
-$areanames{en}->{92665} = "Muzaffargarh";
-$areanames{en}->{92666} = "Muzaffargarh";
-$areanames{en}->{92667} = "Muzaffargarh";
-$areanames{en}->{92668} = "Muzaffargarh";
-$areanames{en}->{92669} = "Muzaffargarh";
-$areanames{en}->{92672} = "Vehari";
-$areanames{en}->{92673} = "Vehari";
-$areanames{en}->{92674} = "Vehari";
-$areanames{en}->{92675} = "Vehari";
-$areanames{en}->{92676} = "Vehari";
-$areanames{en}->{92677} = "Vehari";
-$areanames{en}->{92678} = "Vehari";
-$areanames{en}->{92679} = "Vehari";
-$areanames{en}->{92682} = "Rahim\ Yar\ Khan";
-$areanames{en}->{92683} = "Rahim\ Yar\ Khan";
-$areanames{en}->{92684} = "Rahim\ Yar\ Khan";
-$areanames{en}->{92685} = "Rahim\ Yar\ Khan";
-$areanames{en}->{92686} = "Rahim\ Yar\ Khan";
-$areanames{en}->{92687} = "Rahim\ Yar\ Khan";
-$areanames{en}->{92688} = "Rahim\ Yar\ Khan";
-$areanames{en}->{92689} = "Rahim\ Yar\ Khan";
-$areanames{en}->{92712} = "Sukkur";
-$areanames{en}->{92713} = "Sukkur";
-$areanames{en}->{92714} = "Sukkur";
-$areanames{en}->{92715} = "Sukkur";
-$areanames{en}->{92716} = "Sukkur";
-$areanames{en}->{92717} = "Sukkur";
-$areanames{en}->{92718} = "Sukkur";
-$areanames{en}->{92719} = "Sukkur";
-$areanames{en}->{927222} = "Jacobabad";
-$areanames{en}->{927223} = "Jacobabad";
-$areanames{en}->{927224} = "Jacobabad";
-$areanames{en}->{927225} = "Jacobabad";
-$areanames{en}->{927226} = "Jacobabad";
-$areanames{en}->{927227} = "Jacobabad";
-$areanames{en}->{927228} = "Jacobabad";
-$areanames{en}->{927229} = "Jacobabad";
-$areanames{en}->{927232} = "Ghotki";
-$areanames{en}->{927233} = "Ghotki";
-$areanames{en}->{927234} = "Ghotki";
-$areanames{en}->{927235} = "Ghotki";
-$areanames{en}->{927236} = "Ghotki";
-$areanames{en}->{927237} = "Ghotki";
-$areanames{en}->{927238} = "Ghotki";
-$areanames{en}->{927239} = "Ghotki";
-$areanames{en}->{927262} = "Shikarpur";
-$areanames{en}->{927263} = "Shikarpur";
-$areanames{en}->{927264} = "Shikarpur";
-$areanames{en}->{927265} = "Shikarpur";
-$areanames{en}->{927266} = "Shikarpur";
-$areanames{en}->{927267} = "Shikarpur";
-$areanames{en}->{927268} = "Shikarpur";
-$areanames{en}->{927269} = "Shikarpur";
-$areanames{en}->{92742} = "Larkana";
-$areanames{en}->{92743} = "Larkana";
-$areanames{en}->{92744} = "Larkana";
-$areanames{en}->{92745} = "Larkana";
-$areanames{en}->{92746} = "Larkana";
-$areanames{en}->{92747} = "Larkana";
-$areanames{en}->{92748} = "Larkana";
-$areanames{en}->{92749} = "Larkana";
-$areanames{en}->{92812} = "Quetta";
-$areanames{en}->{92813} = "Quetta";
-$areanames{en}->{92814} = "Quetta";
-$areanames{en}->{92815} = "Quetta";
-$areanames{en}->{92816} = "Quetta";
-$areanames{en}->{92817} = "Quetta";
-$areanames{en}->{92818} = "Quetta";
-$areanames{en}->{92819} = "Quetta";
-$areanames{en}->{928222} = "Zhob";
-$areanames{en}->{928223} = "Zhob";
-$areanames{en}->{928224} = "Zhob";
-$areanames{en}->{928225} = "Zhob";
-$areanames{en}->{928226} = "Zhob";
-$areanames{en}->{928227} = "Zhob";
-$areanames{en}->{928228} = "Zhob";
-$areanames{en}->{928229} = "Zhob";
-$areanames{en}->{928232} = "Killa\ Saifullah";
-$areanames{en}->{928233} = "Killa\ Saifullah";
-$areanames{en}->{928234} = "Killa\ Saifullah";
-$areanames{en}->{928235} = "Killa\ Saifullah";
-$areanames{en}->{928236} = "Killa\ Saifullah";
-$areanames{en}->{928237} = "Killa\ Saifullah";
-$areanames{en}->{928238} = "Killa\ Saifullah";
-$areanames{en}->{928239} = "Killa\ Saifullah";
-$areanames{en}->{928242} = "Loralai";
-$areanames{en}->{928243} = "Loralai";
-$areanames{en}->{928244} = "Loralai";
-$areanames{en}->{928245} = "Loralai";
-$areanames{en}->{928246} = "Loralai";
-$areanames{en}->{928247} = "Loralai";
-$areanames{en}->{928248} = "Loralai";
-$areanames{en}->{928249} = "Loralai";
-$areanames{en}->{928252} = "Chagai";
-$areanames{en}->{928253} = "Chagai";
-$areanames{en}->{928254} = "Chagai";
-$areanames{en}->{928255} = "Chagai";
-$areanames{en}->{928256} = "Chagai";
-$areanames{en}->{928257} = "Chagai";
-$areanames{en}->{928258} = "Chagai";
-$areanames{en}->{928259} = "Chagai";
-$areanames{en}->{928262} = "K\.Abdullah\/Pishin";
-$areanames{en}->{928263} = "K\.Abdullah\/Pishin";
-$areanames{en}->{928264} = "K\.Abdullah\/Pishin";
-$areanames{en}->{928265} = "K\.Abdullah\/Pishin";
-$areanames{en}->{928266} = "K\.Abdullah\/Pishin";
-$areanames{en}->{928267} = "K\.Abdullah\/Pishin";
-$areanames{en}->{928268} = "K\.Abdullah\/Pishin";
-$areanames{en}->{928269} = "K\.Abdullah\/Pishin";
-$areanames{en}->{928282} = "Musakhel";
-$areanames{en}->{928283} = "Musakhel";
-$areanames{en}->{928284} = "Musakhel";
-$areanames{en}->{928285} = "Musakhel";
-$areanames{en}->{928286} = "Musakhel";
-$areanames{en}->{928287} = "Musakhel";
-$areanames{en}->{928288} = "Musakhel";
-$areanames{en}->{928289} = "Musakhel";
-$areanames{en}->{928292} = "Barkhan\/Kohlu";
-$areanames{en}->{928293} = "Barkhan\/Kohlu";
-$areanames{en}->{928294} = "Barkhan\/Kohlu";
-$areanames{en}->{928295} = "Barkhan\/Kohlu";
-$areanames{en}->{928296} = "Barkhan\/Kohlu";
-$areanames{en}->{928297} = "Barkhan\/Kohlu";
-$areanames{en}->{928298} = "Barkhan\/Kohlu";
-$areanames{en}->{928299} = "Barkhan\/Kohlu";
-$areanames{en}->{928322} = "Bolan";
-$areanames{en}->{928323} = "Bolan";
-$areanames{en}->{928324} = "Bolan";
-$areanames{en}->{928325} = "Bolan";
-$areanames{en}->{928326} = "Bolan";
-$areanames{en}->{928327} = "Bolan";
-$areanames{en}->{928328} = "Bolan";
-$areanames{en}->{928329} = "Bolan";
-$areanames{en}->{928332} = "Sibi\/Ziarat";
-$areanames{en}->{928333} = "Sibi\/Ziarat";
-$areanames{en}->{928334} = "Sibi\/Ziarat";
-$areanames{en}->{928335} = "Sibi\/Ziarat";
-$areanames{en}->{928336} = "Sibi\/Ziarat";
-$areanames{en}->{928337} = "Sibi\/Ziarat";
-$areanames{en}->{928338} = "Sibi\/Ziarat";
-$areanames{en}->{928339} = "Sibi\/Ziarat";
-$areanames{en}->{928352} = "Dera\ Bugti";
-$areanames{en}->{928353} = "Dera\ Bugti";
-$areanames{en}->{928354} = "Dera\ Bugti";
-$areanames{en}->{928355} = "Dera\ Bugti";
-$areanames{en}->{928356} = "Dera\ Bugti";
-$areanames{en}->{928357} = "Dera\ Bugti";
-$areanames{en}->{928358} = "Dera\ Bugti";
-$areanames{en}->{928359} = "Dera\ Bugti";
-$areanames{en}->{928372} = "Jhal\ Magsi";
-$areanames{en}->{928373} = "Jhal\ Magsi";
-$areanames{en}->{928374} = "Jhal\ Magsi";
-$areanames{en}->{928375} = "Jhal\ Magsi";
-$areanames{en}->{928376} = "Jhal\ Magsi";
-$areanames{en}->{928377} = "Jhal\ Magsi";
-$areanames{en}->{928378} = "Jhal\ Magsi";
-$areanames{en}->{928379} = "Jhal\ Magsi";
-$areanames{en}->{928382} = "Jaffarabad\/Nasirabad";
-$areanames{en}->{928383} = "Jaffarabad\/Nasirabad";
-$areanames{en}->{928384} = "Jaffarabad\/Nasirabad";
-$areanames{en}->{928385} = "Jaffarabad\/Nasirabad";
-$areanames{en}->{928386} = "Jaffarabad\/Nasirabad";
-$areanames{en}->{928387} = "Jaffarabad\/Nasirabad";
-$areanames{en}->{928388} = "Jaffarabad\/Nasirabad";
-$areanames{en}->{928389} = "Jaffarabad\/Nasirabad";
-$areanames{en}->{928432} = "Mastung";
-$areanames{en}->{928433} = "Mastung";
-$areanames{en}->{928434} = "Mastung";
-$areanames{en}->{928435} = "Mastung";
-$areanames{en}->{928436} = "Mastung";
-$areanames{en}->{928437} = "Mastung";
-$areanames{en}->{928438} = "Mastung";
-$areanames{en}->{928439} = "Mastung";
-$areanames{en}->{928442} = "Kalat";
-$areanames{en}->{928443} = "Kalat";
-$areanames{en}->{928444} = "Kalat";
-$areanames{en}->{928445} = "Kalat";
-$areanames{en}->{928446} = "Kalat";
-$areanames{en}->{928447} = "Kalat";
-$areanames{en}->{928448} = "Kalat";
-$areanames{en}->{928449} = "Kalat";
-$areanames{en}->{928472} = "Kharan";
-$areanames{en}->{928473} = "Kharan";
-$areanames{en}->{928474} = "Kharan";
-$areanames{en}->{928475} = "Kharan";
-$areanames{en}->{928476} = "Kharan";
-$areanames{en}->{928477} = "Kharan";
-$areanames{en}->{928478} = "Kharan";
-$areanames{en}->{928479} = "Kharan";
-$areanames{en}->{928482} = "Khuzdar";
-$areanames{en}->{928483} = "Khuzdar";
-$areanames{en}->{928484} = "Khuzdar";
-$areanames{en}->{928485} = "Khuzdar";
-$areanames{en}->{928486} = "Khuzdar";
-$areanames{en}->{928487} = "Khuzdar";
-$areanames{en}->{928488} = "Khuzdar";
-$areanames{en}->{928489} = "Khuzdar";
-$areanames{en}->{928522} = "Kech";
-$areanames{en}->{928523} = "Kech";
-$areanames{en}->{928524} = "Kech";
-$areanames{en}->{928525} = "Kech";
-$areanames{en}->{928526} = "Kech";
-$areanames{en}->{928527} = "Kech";
-$areanames{en}->{928528} = "Kech";
-$areanames{en}->{928529} = "Kech";
-$areanames{en}->{928532} = "Lasbela";
-$areanames{en}->{928533} = "Lasbela";
-$areanames{en}->{928534} = "Lasbela";
-$areanames{en}->{928535} = "Lasbela";
-$areanames{en}->{928536} = "Lasbela";
-$areanames{en}->{928537} = "Lasbela";
-$areanames{en}->{928538} = "Lasbela";
-$areanames{en}->{928539} = "Lasbela";
-$areanames{en}->{928552} = "Panjgur";
-$areanames{en}->{928553} = "Panjgur";
-$areanames{en}->{928554} = "Panjgur";
-$areanames{en}->{928555} = "Panjgur";
-$areanames{en}->{928556} = "Panjgur";
-$areanames{en}->{928557} = "Panjgur";
-$areanames{en}->{928558} = "Panjgur";
-$areanames{en}->{928559} = "Panjgur";
-$areanames{en}->{928562} = "Awaran";
-$areanames{en}->{928563} = "Awaran";
-$areanames{en}->{928564} = "Awaran";
-$areanames{en}->{928565} = "Awaran";
-$areanames{en}->{928566} = "Awaran";
-$areanames{en}->{928567} = "Awaran";
-$areanames{en}->{928568} = "Awaran";
-$areanames{en}->{928569} = "Awaran";
-$areanames{en}->{92862} = "Gwadar";
-$areanames{en}->{92863} = "Gwadar";
-$areanames{en}->{92864} = "Gwadar";
-$areanames{en}->{92865} = "Gwadar";
-$areanames{en}->{92866} = "Gwadar";
-$areanames{en}->{92867} = "Gwadar";
-$areanames{en}->{92868} = "Gwadar";
-$areanames{en}->{92869} = "Gwadar";
-$areanames{en}->{92912} = "Peshawar\/Charsadda";
-$areanames{en}->{92913} = "Peshawar\/Charsadda";
-$areanames{en}->{92914} = "Peshawar\/Charsadda";
-$areanames{en}->{92915} = "Peshawar\/Charsadda";
-$areanames{en}->{92916} = "Peshawar\/Charsadda";
-$areanames{en}->{92917} = "Peshawar\/Charsadda";
-$areanames{en}->{92918} = "Peshawar\/Charsadda";
-$areanames{en}->{92919} = "Peshawar\/Charsadda";
-$areanames{en}->{929222} = "Kohat";
-$areanames{en}->{929223} = "Kohat";
-$areanames{en}->{929224} = "Kohat";
-$areanames{en}->{929225} = "Kohat";
-$areanames{en}->{929226} = "Kohat";
-$areanames{en}->{929227} = "Kohat";
-$areanames{en}->{929228} = "Kohat";
-$areanames{en}->{929229} = "Kohat";
-$areanames{en}->{92923} = "Nowshera";
-$areanames{en}->{92924} = "Khyber\/Mohmand\ Agy";
-$areanames{en}->{92925} = "Hangu\/Orakzai\ Agy";
-$areanames{en}->{92926} = "Kurram\ Agency";
-$areanames{en}->{92927} = "Karak";
-$areanames{en}->{92928} = "Bannu\/N\.\ Waziristan";
-$areanames{en}->{929322} = "Malakand";
-$areanames{en}->{929323} = "Malakand";
-$areanames{en}->{929324} = "Malakand";
-$areanames{en}->{929325} = "Malakand";
-$areanames{en}->{929326} = "Malakand";
-$areanames{en}->{929327} = "Malakand";
-$areanames{en}->{929328} = "Malakand";
-$areanames{en}->{929329} = "Malakand";
-$areanames{en}->{929372} = "Mardan";
-$areanames{en}->{929373} = "Mardan";
-$areanames{en}->{929374} = "Mardan";
-$areanames{en}->{929375} = "Mardan";
-$areanames{en}->{929376} = "Mardan";
-$areanames{en}->{929377} = "Mardan";
-$areanames{en}->{929378} = "Mardan";
-$areanames{en}->{929379} = "Mardan";
-$areanames{en}->{929382} = "Swabi";
-$areanames{en}->{929383} = "Swabi";
-$areanames{en}->{929384} = "Swabi";
-$areanames{en}->{929385} = "Swabi";
-$areanames{en}->{929386} = "Swabi";
-$areanames{en}->{929387} = "Swabi";
-$areanames{en}->{929388} = "Swabi";
-$areanames{en}->{929389} = "Swabi";
-$areanames{en}->{929392} = "Buner";
-$areanames{en}->{929393} = "Buner";
-$areanames{en}->{929394} = "Buner";
-$areanames{en}->{929395} = "Buner";
-$areanames{en}->{929396} = "Buner";
-$areanames{en}->{929397} = "Buner";
-$areanames{en}->{929398} = "Buner";
-$areanames{en}->{929399} = "Buner";
-$areanames{en}->{929422} = "Bajaur\ Agency";
-$areanames{en}->{929423} = "Bajaur\ Agency";
-$areanames{en}->{929424} = "Bajaur\ Agency";
-$areanames{en}->{929425} = "Bajaur\ Agency";
-$areanames{en}->{929426} = "Bajaur\ Agency";
-$areanames{en}->{929427} = "Bajaur\ Agency";
-$areanames{en}->{929428} = "Bajaur\ Agency";
-$areanames{en}->{929429} = "Bajaur\ Agency";
-$areanames{en}->{929432} = "Chitral";
-$areanames{en}->{929433} = "Chitral";
-$areanames{en}->{929434} = "Chitral";
-$areanames{en}->{929435} = "Chitral";
-$areanames{en}->{929436} = "Chitral";
-$areanames{en}->{929437} = "Chitral";
-$areanames{en}->{929438} = "Chitral";
-$areanames{en}->{929439} = "Chitral";
-$areanames{en}->{929442} = "Upper\ Dir";
-$areanames{en}->{929443} = "Upper\ Dir";
-$areanames{en}->{929444} = "Upper\ Dir";
-$areanames{en}->{929445} = "Upper\ Dir";
-$areanames{en}->{929446} = "Upper\ Dir";
-$areanames{en}->{929447} = "Upper\ Dir";
-$areanames{en}->{929448} = "Upper\ Dir";
-$areanames{en}->{929449} = "Upper\ Dir";
-$areanames{en}->{929452} = "Lower\ Dir";
-$areanames{en}->{929453} = "Lower\ Dir";
-$areanames{en}->{929454} = "Lower\ Dir";
-$areanames{en}->{929455} = "Lower\ Dir";
-$areanames{en}->{929456} = "Lower\ Dir";
-$areanames{en}->{929457} = "Lower\ Dir";
-$areanames{en}->{929458} = "Lower\ Dir";
-$areanames{en}->{929459} = "Lower\ Dir";
-$areanames{en}->{929462} = "Swat";
-$areanames{en}->{929463} = "Swat";
-$areanames{en}->{929464} = "Swat";
-$areanames{en}->{929465} = "Swat";
-$areanames{en}->{929466} = "Swat";
-$areanames{en}->{929467} = "Swat";
-$areanames{en}->{929468} = "Swat";
-$areanames{en}->{929469} = "Swat";
-$areanames{en}->{929632} = "Tank";
-$areanames{en}->{929633} = "Tank";
-$areanames{en}->{929634} = "Tank";
-$areanames{en}->{929635} = "Tank";
-$areanames{en}->{929636} = "Tank";
-$areanames{en}->{929637} = "Tank";
-$areanames{en}->{929638} = "Tank";
-$areanames{en}->{929639} = "Tank";
-$areanames{en}->{929652} = "South\ Waziristan";
-$areanames{en}->{929653} = "South\ Waziristan";
-$areanames{en}->{929654} = "South\ Waziristan";
-$areanames{en}->{929655} = "South\ Waziristan";
-$areanames{en}->{929656} = "South\ Waziristan";
-$areanames{en}->{929657} = "South\ Waziristan";
-$areanames{en}->{929658} = "South\ Waziristan";
-$areanames{en}->{929659} = "South\ Waziristan";
-$areanames{en}->{929662} = "D\.I\.\ Khan";
-$areanames{en}->{929663} = "D\.I\.\ Khan";
-$areanames{en}->{929664} = "D\.I\.\ Khan";
-$areanames{en}->{929665} = "D\.I\.\ Khan";
-$areanames{en}->{929666} = "D\.I\.\ Khan";
-$areanames{en}->{929667} = "D\.I\.\ Khan";
-$areanames{en}->{929668} = "D\.I\.\ Khan";
-$areanames{en}->{929669} = "D\.I\.\ Khan";
-$areanames{en}->{929692} = "Lakki\ Marwat";
-$areanames{en}->{929693} = "Lakki\ Marwat";
-$areanames{en}->{929694} = "Lakki\ Marwat";
-$areanames{en}->{929695} = "Lakki\ Marwat";
-$areanames{en}->{929696} = "Lakki\ Marwat";
-$areanames{en}->{929697} = "Lakki\ Marwat";
-$areanames{en}->{929698} = "Lakki\ Marwat";
-$areanames{en}->{929699} = "Lakki\ Marwat";
-$areanames{en}->{929922} = "Abottabad";
-$areanames{en}->{929923} = "Abottabad";
-$areanames{en}->{929924} = "Abottabad";
-$areanames{en}->{929925} = "Abottabad";
-$areanames{en}->{929926} = "Abottabad";
-$areanames{en}->{929927} = "Abottabad";
-$areanames{en}->{929928} = "Abottabad";
-$areanames{en}->{929929} = "Abottabad";
-$areanames{en}->{929952} = "Haripur";
-$areanames{en}->{929953} = "Haripur";
-$areanames{en}->{929954} = "Haripur";
-$areanames{en}->{929955} = "Haripur";
-$areanames{en}->{929956} = "Haripur";
-$areanames{en}->{929957} = "Haripur";
-$areanames{en}->{929958} = "Haripur";
-$areanames{en}->{929959} = "Haripur";
-$areanames{en}->{929962} = "Shangla";
-$areanames{en}->{929963} = "Shangla";
-$areanames{en}->{929964} = "Shangla";
-$areanames{en}->{929965} = "Shangla";
-$areanames{en}->{929966} = "Shangla";
-$areanames{en}->{929967} = "Shangla";
-$areanames{en}->{929968} = "Shangla";
-$areanames{en}->{929969} = "Shangla";
-$areanames{en}->{929972} = "Mansehra\/Batagram";
-$areanames{en}->{929973} = "Mansehra\/Batagram";
-$areanames{en}->{929974} = "Mansehra\/Batagram";
-$areanames{en}->{929975} = "Mansehra\/Batagram";
-$areanames{en}->{929976} = "Mansehra\/Batagram";
-$areanames{en}->{929977} = "Mansehra\/Batagram";
-$areanames{en}->{929978} = "Mansehra\/Batagram";
-$areanames{en}->{929979} = "Mansehra\/Batagram";
-$areanames{en}->{92998} = "Kohistan";
+$areanames{en} = {"92748", "Larkana",
+"92477", "Jhang",
+"929393", "Buner",
+"92449", "Okara",
+"922333", "Mirpur\ Khas",
+"92427", "Lahore",
+"92864", "Gwadar",
+"928484", "Khuzdar",
+"928568", "Awaran",
+"926044", "Rajanpur",
+"929443", "Upper\ Dir",
+"929438", "Chitral",
+"928282", "Musakhel",
+"929925", "Abottabad",
+"922359", "Sanghar",
+"929969", "Shangla",
+"92565", "Sheikhupura",
+"925462", "Mandi\ Bahauddin",
+"92417", "Faisalabad",
+"929378", "Mardan",
+"925426", "Narowal",
+"929653", "South\ Waziristan",
+"922446", "Nawabshah",
+"928477", "Kharan",
+"928297", "Barkhan\/Kohlu",
+"92712", "Sukkur",
+"929375", "Mardan",
+"92513", "Islamabad\/Rawalpindi",
+"92228", "Hyderabad",
+"92404", "Sahiwal",
+"928537", "Lasbela",
+"929435", "Chitral",
+"929928", "Abottabad",
+"928337", "Sibi\/Ziarat",
+"929467", "Swat",
+"928224", "Zhob",
+"92218", "Karachi",
+"928565", "Awaran",
+"92523", "Sialkot",
+"92573", "Attock",
+"928529", "Kech",
+"92485", "Sargodha",
+"92559", "Gujranwala",
+"922986", "Thatta",
+"929639", "Tank",
+"92688", "Rahim\ Yar\ Khan",
+"928329", "Bolan",
+"92539", "Gujrat",
+"929694", "Lakki\ Marwat",
+"92252", "Dadu",
+"92413", "Faisalabad",
+"92869", "Gwadar",
+"928263", "K\.Abdullah\/Pishin",
+"92444", "Okara",
+"929454", "Lower\ Dir",
+"922988", "Thatta",
+"92616", "Multan",
+"92912", "Peshawar\/Charsadda",
+"92676", "Vehari",
+"928289", "Musakhel",
+"922448", "Nawabshah",
+"92626", "Bahawalpur",
+"922433", "Khairpur",
+"925425", "Narowal",
+"925469", "Mandi\ Bahauddin",
+"929962", "Shangla",
+"92473", "Jhang",
+"928384", "Jaffarabad\/Nasirabad",
+"92498", "Kasur",
+"929926", "Abottabad",
+"92423", "Lahore",
+"922352", "Sanghar",
+"928247", "Loralai",
+"929436", "Chitral",
+"92527", "Sialkot",
+"922445", "Nawabshah",
+"92577", "Attock",
+"92409", "Sahiwal",
+"929376", "Mardan",
+"925428", "Narowal",
+"92668", "Muzaffargarh",
+"922985", "Thatta",
+"928377", "Jhal\ Magsi",
+"92465", "Toba\ Tek\ Singh",
+"92517", "Islamabad\/Rawalpindi",
+"928437", "Mastung",
+"92534", "Gujrat",
+"928322", "Bolan",
+"929632", "Tank",
+"92554", "Gujranwala",
+"928566", "Awaran",
+"928522", "Kech",
+"927233", "Ghotki",
+"929327", "Malakand",
+"928288", "Musakhel",
+"922449", "Nawabshah",
+"929432", "Chitral",
+"926043", "Rajanpur",
+"929444", "Upper\ Dir",
+"92445", "Okara",
+"929372", "Mardan",
+"925468", "Mandi\ Bahauddin",
+"92648", "Dera\ Ghazi\ Khan",
+"924537", "Bhakkar",
+"922334", "Mirpur\ Khas",
+"92569", "Sheikhupura",
+"929394", "Buner",
+"928526", "Kech",
+"928562", "Awaran",
+"929636", "Tank",
+"922989", "Thatta",
+"928326", "Bolan",
+"928483", "Khuzdar",
+"92817", "Quetta",
+"926067", "Layyah",
+"92256", "Dadu",
+"928223", "Zhob",
+"92612", "Multan",
+"92926", "Kurram\ Agency",
+"929693", "Lakki\ Marwat",
+"925437", "Chakwal",
+"928257", "Chagai",
+"92555", "Gujranwala",
+"929977", "Mansehra\/Batagram",
+"92489", "Sargodha",
+"925465", "Mandi\ Bahauddin",
+"92916", "Peshawar\/Charsadda",
+"92672", "Vehari",
+"92535", "Gujrat",
+"929654", "South\ Waziristan",
+"92622", "Bahawalpur",
+"922356", "Sanghar",
+"929922", "Abottabad",
+"929966", "Shangla",
+"928285", "Musakhel",
+"92464", "Toba\ Tek\ Singh",
+"925429", "Narowal",
+"922434", "Khairpur",
+"92716", "Sukkur",
+"929439", "Chitral",
+"922442", "Nawabshah",
+"92865", "Gwadar",
+"922358", "Sanghar",
+"924577", "Pakpattan",
+"928383", "Jaffarabad\/Nasirabad",
+"929968", "Shangla",
+"929667", "D\.I\.\ Khan",
+"929379", "Mardan",
+"928525", "Kech",
+"92564", "Sheikhupura",
+"929635", "Tank",
+"928325", "Bolan",
+"929427", "Bajaur\ Agency",
+"928264", "K\.Abdullah\/Pishin",
+"92638", "Bahawalnagar",
+"922982", "Thatta",
+"92658", "Khanewal",
+"928569", "Awaran",
+"929453", "Lower\ Dir",
+"922387", "Umerkot",
+"92405", "Sahiwal",
+"928528", "Kech",
+"927234", "Ghotki",
+"929638", "Tank",
+"928328", "Bolan",
+"925477", "Hafizabad",
+"922355", "Sanghar",
+"928286", "Musakhel",
+"929965", "Shangla",
+"92484", "Sargodha",
+"925422", "Narowal",
+"925466", "Mandi\ Bahauddin",
+"92469", "Toba\ Tek\ Singh",
+"92813", "Quetta",
+"929929", "Abottabad",
+"92487", "Sargodha",
+"927239", "Ghotki",
+"929456", "Lower\ Dir",
+"929698", "Lakki\ Marwat",
+"92642", "Dera\ Ghazi\ Khan",
+"925447", "Jhelum",
+"929387", "Swabi",
+"928228", "Zhob",
+"928485", "Khuzdar",
+"927227", "Jacobabad",
+"926045", "Rajanpur",
+"92463", "Toba\ Tek\ Singh",
+"92819", "Quetta",
+"928386", "Jaffarabad\/Nasirabad",
+"929924", "Abottabad",
+"929652", "South\ Waziristan",
+"92666", "Muzaffargarh",
+"92618", "Multan",
+"925463", "Mandi\ Bahauddin",
+"92567", "Sheikhupura",
+"929374", "Mardan",
+"92415", "Faisalabad",
+"926048", "Rajanpur",
+"922439", "Khairpur",
+"929442", "Upper\ Dir",
+"929434", "Chitral",
+"928283", "Musakhel",
+"92496", "Kasur",
+"928488", "Khuzdar",
+"928225", "Zhob",
+"928564", "Awaran",
+"922332", "Mirpur\ Khas",
+"92425", "Lahore",
+"929392", "Buner",
+"92475", "Jhang",
+"922427", "Naushero\ Feroze",
+"92678", "Vehari",
+"928269", "K\.Abdullah\/Pishin",
+"92628", "Bahawalpur",
+"929695", "Lakki\ Marwat",
+"924547", "Khushab",
+"928323", "Bolan",
+"928486", "Khuzdar",
+"928523", "Kech",
+"927232", "Ghotki",
+"92226", "Hyderabad",
+"929633", "Tank",
+"928357", "Dera\ Bugti",
+"929455", "Lower\ Dir",
+"928557", "Panjgur",
+"92467", "Toba\ Tek\ Singh",
+"92515", "Islamabad\/Rawalpindi",
+"92686", "Rahim\ Yar\ Khan",
+"92575", "Attock",
+"92632", "Bahawalnagar",
+"92525", "Sialkot",
+"92814", "Quetta",
+"92652", "Khanewal",
+"925424", "Narowal",
+"92216", "Karachi",
+"926046", "Rajanpur",
+"928385", "Jaffarabad\/Nasirabad",
+"929659", "South\ Waziristan",
+"922977", "Badin",
+"92483", "Sargodha",
+"922353", "Sanghar",
+"928388", "Jaffarabad\/Nasirabad",
+"929227", "Kohat",
+"929963", "Shangla",
+"922444", "Nawabshah",
+"922327", "Tharparkar",
+"92746", "Larkana",
+"929449", "Upper\ Dir",
+"922432", "Khairpur",
+"922984", "Thatta",
+"929458", "Lower\ Dir",
+"929696", "Lakki\ Marwat",
+"924597", "Mianwali",
+"928262", "K\.Abdullah\/Pishin",
+"92563", "Sheikhupura",
+"928226", "Zhob",
+"929399", "Buner",
+"922339", "Mirpur\ Khas",
+"92514", "Islamabad\/Rawalpindi",
+"92403", "Sahiwal",
+"929923", "Abottabad",
+"929445", "Upper\ Dir",
+"92742", "Larkana",
+"922436", "Khairpur",
+"92557", "Gujranwala",
+"929957", "Haripur",
+"929658", "South\ Waziristan",
+"92537", "Gujrat",
+"929692", "Lakki\ Marwat",
+"922335", "Mirpur\ Khas",
+"929395", "Buner",
+"92815", "Quetta",
+"928222", "Zhob",
+"92574", "Attock",
+"92524", "Sialkot",
+"928266", "K\.Abdullah\/Pishin",
+"928563", "Awaran",
+"929459", "Lower\ Dir",
+"927236", "Ghotki",
+"92222", "Hyderabad",
+"928482", "Khuzdar",
+"92419", "Faisalabad",
+"929398", "Buner",
+"922338", "Mirpur\ Khas",
+"92718", "Sukkur",
+"92863", "Gwadar",
+"92656", "Khanewal",
+"92479", "Jhang",
+"929373", "Mardan",
+"92429", "Lahore",
+"925464", "Mandi\ Bahauddin",
+"92447", "Okara",
+"92636", "Bahawalnagar",
+"928389", "Jaffarabad\/Nasirabad",
+"929655", "South\ Waziristan",
+"92682", "Rahim\ Yar\ Khan",
+"929433", "Chitral",
+"928284", "Musakhel",
+"92212", "Karachi",
+"929448", "Upper\ Dir",
+"926042", "Rajanpur",
+"922435", "Khairpur",
+"925423", "Narowal",
+"92928", "Bannu\/N\.\ Waziristan",
+"92519", "Islamabad\/Rawalpindi",
+"928237", "Killa\ Saifullah",
+"926087", "Lodhran",
+"92258", "Dadu",
+"929446", "Upper\ Dir",
+"928524", "Kech",
+"928447", "Kalat",
+"929634", "Tank",
+"92533", "Gujrat",
+"927238", "Ghotki",
+"92492", "Kasur",
+"928324", "Bolan",
+"929699", "Lakki\ Marwat",
+"928265", "K\.Abdullah\/Pishin",
+"92553", "Gujranwala",
+"92918", "Peshawar\/Charsadda",
+"92529", "Sialkot",
+"92579", "Attock",
+"928229", "Zhob",
+"92407", "Sahiwal",
+"929396", "Buner",
+"922336", "Mirpur\ Khas",
+"928489", "Khuzdar",
+"92646", "Dera\ Ghazi\ Khan",
+"929452", "Lower\ Dir",
+"922983", "Thatta",
+"92414", "Faisalabad",
+"927235", "Ghotki",
+"92443", "Okara",
+"928268", "K\.Abdullah\/Pishin",
+"922354", "Sanghar",
+"928382", "Jaffarabad\/Nasirabad",
+"929964", "Shangla",
+"92867", "Gwadar",
+"92424", "Lahore",
+"927267", "Shikarpur",
+"92474", "Jhang",
+"926049", "Rajanpur",
+"922438", "Khairpur",
+"92662", "Muzaffargarh",
+"929656", "South\ Waziristan",
+"922443", "Nawabshah",
+"929664", "D\.I\.\ Khan",
+"927268", "Shikarpur",
+"92536", "Gujrat",
+"92915", "Peshawar\/Charsadda",
+"929222", "Kohat",
+"92556", "Gujranwala",
+"928235", "Killa\ Saifullah",
+"924574", "Pakpattan",
+"926085", "Lodhran",
+"929956", "Haripur",
+"922322", "Tharparkar",
+"922437", "Khairpur",
+"92255", "Dadu",
+"928267", "K\.Abdullah\/Pishin",
+"929424", "Bajaur\ Agency",
+"924592", "Mianwali",
+"924549", "Khushab",
+"92925", "Hangu\/Orakzai\ Agy",
+"928445", "Kalat",
+"922429", "Naushero\ Feroze",
+"925449", "Jhelum",
+"928433", "Mastung",
+"92462", "Toba\ Tek\ Singh",
+"928448", "Kalat",
+"927237", "Ghotki",
+"928373", "Jhal\ Magsi",
+"92624", "Bahawalpur",
+"928352", "Dera\ Bugti",
+"922384", "Umerkot",
+"92674", "Vehari",
+"928552", "Panjgur",
+"929389", "Swabi",
+"92643", "Dera\ Ghazi\ Khan",
+"927229", "Jacobabad",
+"92614", "Multan",
+"928243", "Loralai",
+"92637", "Bahawalnagar",
+"927265", "Shikarpur",
+"9258", "AJK\/FATA",
+"92657", "Khanewal",
+"922972", "Badin",
+"926088", "Lodhran",
+"925474", "Hafizabad",
+"928238", "Killa\ Saifullah",
+"92446", "Okara",
+"929229", "Kohat",
+"92818", "Quetta",
+"929955", "Haripur",
+"929447", "Upper\ Dir",
+"922329", "Tharparkar",
+"926086", "Lodhran",
+"928236", "Killa\ Saifullah",
+"92562", "Sheikhupura",
+"929324", "Malakand",
+"92406", "Sahiwal",
+"928446", "Kalat",
+"929397", "Buner",
+"922337", "Mirpur\ Khas",
+"924534", "Bhakkar",
+"922422", "Naushero\ Feroze",
+"924542", "Khushab",
+"924599", "Mianwali",
+"928254", "Chagai",
+"92653", "Khanewal",
+"925434", "Chakwal",
+"92633", "Bahawalnagar",
+"925442", "Jhelum",
+"92482", "Sargodha",
+"929463", "Swat",
+"929382", "Swabi",
+"928559", "Panjgur",
+"926064", "Layyah",
+"92679", "Vehari",
+"92647", "Dera\ Ghazi\ Khan",
+"928359", "Dera\ Bugti",
+"92629", "Bahawalpur",
+"92619", "Multan",
+"927222", "Jacobabad",
+"928533", "Lasbela",
+"927266", "Shikarpur",
+"92715", "Sukkur",
+"928333", "Sibi\/Ziarat",
+"922979", "Badin",
+"929657", "South\ Waziristan",
+"929958", "Haripur",
+"929974", "Mansehra\/Batagram",
+"928473", "Kharan",
+"92866", "Gwadar",
+"928293", "Barkhan\/Kohlu",
+"925446", "Jhelum",
+"92683", "Rahim\ Yar\ Khan",
+"928555", "Panjgur",
+"929457", "Lower\ Dir",
+"928355", "Dera\ Bugti",
+"92213", "Karachi",
+"92528", "Sialkot",
+"92919", "Peshawar\/Charsadda",
+"92578", "Attock",
+"92486", "Sargodha",
+"929423", "Bajaur\ Agency",
+"924598", "Mianwali",
+"929386", "Swabi",
+"92667", "Muzaffargarh",
+"929228", "Kohat",
+"924573", "Pakpattan",
+"928387", "Jaffarabad\/Nasirabad",
+"922975", "Badin",
+"927262", "Shikarpur",
+"927226", "Jacobabad",
+"92223", "Hyderabad",
+"92518", "Islamabad\/Rawalpindi",
+"929663", "D\.I\.\ Khan",
+"92259", "Dadu",
+"922328", "Tharparkar",
+"92862", "Gwadar",
+"922325", "Tharparkar",
+"929225", "Kohat",
+"928232", "Killa\ Saifullah",
+"926082", "Lodhran",
+"922978", "Badin",
+"925473", "Hafizabad",
+"92566", "Sheikhupura",
+"929959", "Haripur",
+"928244", "Loralai",
+"928442", "Kalat",
+"92402", "Sahiwal",
+"924595", "Mianwali",
+"928434", "Mastung",
+"924546", "Khushab",
+"92714", "Sukkur",
+"928558", "Panjgur",
+"92497", "Kasur",
+"92743", "Larkana",
+"928374", "Jhal\ Magsi",
+"922426", "Naushero\ Feroze",
+"928358", "Dera\ Bugti",
+"922383", "Umerkot",
+"92466", "Toba\ Tek\ Singh",
+"928487", "Khuzdar",
+"929385", "Swabi",
+"924548", "Khushab",
+"925445", "Jhelum",
+"928556", "Panjgur",
+"92227", "Hyderabad",
+"92663", "Muzaffargarh",
+"922428", "Naushero\ Feroze",
+"92914", "Peshawar\/Charsadda",
+"928356", "Dera\ Bugti",
+"924533", "Bhakkar",
+"92924", "Khyber\/Mohmand\ Agy",
+"927269", "Shikarpur",
+"92217", "Karachi",
+"922976", "Badin",
+"929323", "Malakand",
+"92442", "Okara",
+"92687", "Rahim\ Yar\ Khan",
+"926047", "Rajanpur",
+"92254", "Dadu",
+"927225", "Jacobabad",
+"92747", "Larkana",
+"928334", "Sibi\/Ziarat",
+"92478", "Jhang",
+"92493", "Kasur",
+"929226", "Kohat",
+"92552", "Gujranwala",
+"92428", "Lahore",
+"928534", "Lasbela",
+"92625", "Bahawalpur",
+"92532", "Gujrat",
+"927228", "Jacobabad",
+"92675", "Vehari",
+"928294", "Barkhan\/Kohlu",
+"922326", "Tharparkar",
+"929973", "Mansehra\/Batagram",
+"928474", "Kharan",
+"929952", "Haripur",
+"926089", "Lodhran",
+"928239", "Killa\ Saifullah",
+"929697", "Lakki\ Marwat",
+"925448", "Jhelum",
+"924545", "Khushab",
+"922425", "Naushero\ Feroze",
+"928449", "Kalat",
+"928253", "Chagai",
+"925433", "Chakwal",
+"92615", "Multan",
+"92418", "Faisalabad",
+"928227", "Zhob",
+"929464", "Swat",
+"926063", "Layyah",
+"92719", "Sukkur",
+"924596", "Mianwali",
+"929388", "Swabi",
+"92522", "Sialkot",
+"929665", "D\.I\.\ Khan",
+"928299", "Barkhan\/Kohlu",
+"928242", "Loralai",
+"92635", "Bahawalnagar",
+"92572", "Attock",
+"928479", "Kharan",
+"929326", "Malakand",
+"922973", "Badin",
+"92655", "Khanewal",
+"926084", "Lodhran",
+"928234", "Killa\ Saifullah",
+"925478", "Hafizabad",
+"924575", "Pakpattan",
+"928339", "Sibi\/Ziarat",
+"92499", "Kasur",
+"928539", "Lasbela",
+"928353", "Dera\ Bugti",
+"92868", "Gwadar",
+"924536", "Bhakkar",
+"928372", "Jhal\ Magsi",
+"92713", "Sukkur",
+"922388", "Umerkot",
+"929469", "Swat",
+"928553", "Panjgur",
+"92744", "Larkana",
+"929425", "Bajaur\ Agency",
+"928432", "Mastung",
+"928327", "Bolan",
+"929637", "Tank",
+"928444", "Kalat",
+"928527", "Kech",
+"92512", "Islamabad\/Rawalpindi",
+"92669", "Muzaffargarh",
+"929428", "Bajaur\ Agency",
+"924593", "Mianwali",
+"92214", "Karachi",
+"926066", "Layyah",
+"92927", "Karak",
+"92257", "Dadu",
+"928256", "Chagai",
+"922385", "Umerkot",
+"92684", "Rahim\ Yar\ Khan",
+"925436", "Chakwal",
+"92816", "Quetta",
+"929976", "Mansehra\/Batagram",
+"922323", "Tharparkar",
+"92917", "Peshawar\/Charsadda",
+"927264", "Shikarpur",
+"929668", "D\.I\.\ Khan",
+"92224", "Hyderabad",
+"929223", "Kohat",
+"929967", "Shangla",
+"92408", "Sahiwal",
+"925475", "Hafizabad",
+"924578", "Pakpattan",
+"922357", "Sanghar",
+"928472", "Kharan",
+"928292", "Barkhan\/Kohlu",
+"928249", "Loralai",
+"929954", "Haripur",
+"929978", "Mansehra\/Batagram",
+"928532", "Lasbela",
+"927223", "Jacobabad",
+"92494", "Kasur",
+"929666", "D\.I\.\ Khan",
+"924576", "Pakpattan",
+"92717", "Sukkur",
+"928332", "Sibi\/Ziarat",
+"929325", "Malakand",
+"92749", "Larkana",
+"929426", "Bajaur\ Agency",
+"92448", "Okara",
+"926068", "Layyah",
+"929383", "Swabi",
+"929462", "Swat",
+"928379", "Jhal\ Magsi",
+"92645", "Dera\ Ghazi\ Khan",
+"928258", "Chagai",
+"925438", "Chakwal",
+"924535", "Bhakkar",
+"925443", "Jhelum",
+"928439", "Mastung",
+"928255", "Chagai",
+"922423", "Naushero\ Feroze",
+"925435", "Chakwal",
+"924538", "Bhakkar",
+"922386", "Umerkot",
+"92913", "Peshawar\/Charsadda",
+"924543", "Khushab",
+"92219", "Karachi",
+"92664", "Muzaffargarh",
+"92472", "Jhang",
+"926065", "Layyah",
+"92422", "Lahore",
+"92558", "Gujranwala",
+"92689", "Rahim\ Yar\ Khan",
+"92538", "Gujrat",
+"928287", "Musakhel",
+"92412", "Faisalabad",
+"92253", "Dadu",
+"929328", "Malakand",
+"925476", "Hafizabad",
+"92998", "Kohistan",
+"92923", "Nowshera",
+"92229", "Hyderabad",
+"925467", "Mandi\ Bahauddin",
+"929975", "Mansehra\/Batagram",
+"92673", "Vehari",
+"926069", "Layyah",
+"92623", "Bahawalpur",
+"928554", "Panjgur",
+"922382", "Umerkot",
+"928378", "Jhal\ Magsi",
+"92495", "Kasur",
+"928354", "Dera\ Bugti",
+"928443", "Kalat",
+"928259", "Chagai",
+"92639", "Bahawalnagar",
+"925439", "Chakwal",
+"92476", "Jhang",
+"92659", "Khanewal",
+"92426", "Lahore",
+"928438", "Mastung",
+"925472", "Hafizabad",
+"92416", "Faisalabad",
+"928233", "Killa\ Saifullah",
+"926083", "Lodhran",
+"922974", "Badin",
+"928248", "Loralai",
+"929979", "Mansehra\/Batagram",
+"92644", "Dera\ Ghazi\ Khan",
+"925427", "Narowal",
+"92613", "Multan",
+"928296", "Barkhan\/Kohlu",
+"922324", "Tharparkar",
+"928476", "Kharan",
+"922447", "Nawabshah",
+"929329", "Malakand",
+"929224", "Kohat",
+"928336", "Sibi\/Ziarat",
+"924572", "Pakpattan",
+"92665", "Muzaffargarh",
+"929662", "D\.I\.\ Khan",
+"92468", "Toba\ Tek\ Singh",
+"928536", "Lasbela",
+"928245", "Loralai",
+"927263", "Shikarpur",
+"924539", "Bhakkar",
+"929466", "Swat",
+"929422", "Bajaur\ Agency",
+"928435", "Mastung",
+"924594", "Mianwali",
+"922987", "Thatta",
+"928375", "Jhal\ Magsi",
+"92617", "Multan",
+"922389", "Umerkot",
+"929468", "Swat",
+"926062", "Layyah",
+"929384", "Swabi",
+"92568", "Sheikhupura",
+"925444", "Jhelum",
+"92654", "Khanewal",
+"92812", "Quetta",
+"925432", "Chakwal",
+"928252", "Chagai",
+"92634", "Bahawalnagar",
+"929953", "Haripur",
+"929972", "Mansehra\/Batagram",
+"928298", "Barkhan\/Kohlu",
+"928478", "Kharan",
+"925479", "Hafizabad",
+"929927", "Abottabad",
+"928338", "Sibi\/Ziarat",
+"92745", "Larkana",
+"92677", "Vehari",
+"928538", "Lasbela",
+"92627", "Bahawalpur",
+"92649", "Dera\ Ghazi\ Khan",
+"927224", "Jacobabad",
+"928335", "Sibi\/Ziarat",
+"92488", "Sargodha",
+"929322", "Malakand",
+"929437", "Chitral",
+"928535", "Lasbela",
+"92526", "Sialkot",
+"928246", "Loralai",
+"92576", "Attock",
+"92685", "Rahim\ Yar\ Khan",
+"929377", "Mardan",
+"928475", "Kharan",
+"928295", "Barkhan\/Kohlu",
+"929669", "D\.I\.\ Khan",
+"924579", "Pakpattan",
+"92215", "Karachi",
+"924544", "Khushab",
+"92225", "Hyderabad",
+"929429", "Bajaur\ Agency",
+"928376", "Jhal\ Magsi",
+"924532", "Bhakkar",
+"922424", "Naushero\ Feroze",
+"92516", "Islamabad\/Rawalpindi",
+"928567", "Awaran",
+"929465", "Swat",
+"928436", "Mastung",};
 
     sub new {
       my $class = shift;

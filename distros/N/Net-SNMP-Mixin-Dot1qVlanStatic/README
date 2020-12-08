@@ -3,7 +3,7 @@ NAME
     infos
 
 VERSION
-    Version 0.04
+    Version 0.05
 
 SYNOPSIS
       use Net::SNMP;
@@ -16,40 +16,35 @@ SYNOPSIS
       $session->init_ok();
       die $session->errors if $session->errors;
 
-      my $vlan_ids2names = $session->map_vlan_static_ids2names();
-      foreach my $vlan_id ( keys %{$vlan_ids2names} ) {
+      my $vlan_id2name = $session->map_vlan_id2name();
+      foreach my $vlan_id ( keys %{$vlan_id2name} ) {
         printf "Vlan-Id: %4d  => Vlan-Name: %s\n",
-          $vlan_id, $vlan_ids2names->{$vlan_id};
+          $vlan_id, $vlan_id2name->{$vlan_id};
       }
 
-      # sorted by vlan_id
-      my $vlan_ids2ports = $session->map_vlan_static_ids2ports();
-      foreach my $vlan_id ( keys %{$vlan_ids2ports} ) {
-        printf "Vlan-Id: %4d\n", $vlan_id;
-        printf "\tTagged-Ports:     %s\n",
-          ( join ',', @{ $vlan_ids2ports->{$vlan_id}{tagged} } );
-        printf "\tUntagged-Ports:   %s\n",
-          ( join ',', @{ $vlan_ids2ports->{$vlan_id}{untagged} } );
+      my $vlan_ids2if_idx = $session->map_vlan_id2if_idx();
+      foreach my $id ( keys %{$vlan_ids2if_idx} ) {
+        printf "Vlan-Id: %4d\n", $id;
+        printf "\tTagged-Ports:     %s\n", ( join ',', @{ $vlan_ids2if_idx->{$id}{tagged} } );
+        printf "\tUntagged-Ports:   %s\n", ( join ',', @{ $vlan_ids2if_idx->{$id}{untagged} } );
       }
 
-      # sorted by bridge_port
-      my $vlan_ports2ids = $session->map_vlan_static_ports2ids();
-      foreach my $bridge_port ( keys %{$vlan_ports2ids} ) {
-        printf "Bridge-Port: %4d\n", $bridge_port;
-        printf "\tTagged-Vlans:     %s\n",
-          ( join ',', @{ $vlan_ports2ids->{$bridge_port}{tagged} } );
-        printf "\tUntagged-Vlans:   %s\n",
-          ( join ',', @{ $vlan_ports2ids->{$bridge_port}{untagged} } );
+      # sorted by interface
+      my $ports2ids = $session->map_if_idx2vlan_id();
+      foreach my $if_idx ( keys %{$ports2ids} ) {
+        printf "Interface: %10d\n", $if_idx;
+        printf "\tTagged-Vlans:     %s\n", ( join ',', @{ $ports2ids->{$if_idx}{tagged} } );
+        printf "\tUntagged-Vlans:   %s\n", ( join ',', @{ $ports2ids->{$if_idx}{untagged} } );
       }
 
 DESCRIPTION
     A mixin class for vlan related infos from the dot1qVlanStaticTable
     within the Q-BRIDGE-MIB. The mixin-module provides methods for mapping
-    between vlan-ids and vlan-names und relations between bridge-ports and
-    vlan-ids, tagged or untagged on these ports.
+    between vlan-ids and vlan-names und relations between interface indexes
+    and vlan-ids, tagged or untagged on these interfaces.
 
 MIXIN METHODS
-  OBJ->map_vlan_static_ids2names()
+  OBJ->map_vlan_id2name()
     Returns a hash reference with statically configured vlan-ids as keys and
     the corresponing vlan-names as values:
 
@@ -59,41 +54,49 @@ MIXIN METHODS
         ... ,
       }
 
-  OBJ->map_vlan_static_ids2ports()
+  OBJ->map_vlan_id2if_idx()
     Returns a hash reference with the vlan-ids as keys and tagged and
-    untagged port-lists as values:
+    untagged if_idx as values:
 
       {
         vlan_id => {
-          tagged   => [port_list],
-          untagged => [port_list],
-        },
-
-        vlan_id => {
-          tagged   => [port_list],
-          untagged => [port_list],
+          tagged   => [if_idx, ..., ],
+          untagged => [if_idx, ..., ],
         },
 
         ... ,
       }
 
-  OBJ->map_vlan_static_ports2ids()
-    Returns a hash reference with the bridge-ports as keys and tagged and
+  OBJ->map_if_idx2vlan_id()
+    Returns a hash reference with the interfaces as keys and tagged and
     untagged vlan-ids as values:
 
       {
-        bridge_port => {
-          tagged   => [vlan_id_list],
-          untagged => [vlan_id_list],
-        },
-
-        bridge_port => {
-          tagged   => [vlan_id_list],
-          untagged => [vlan_id_list],
+        if_idx => {
+          tagged   => [vlan_id, ..., ],
+          untagged => [vlan_id, ..., ],
         },
 
         ... ,
       }
+
+  OBJ->map_vlan_static_ids2names()
+    DEPRECATED: "map_vlan_static_ids2names" is DEPRECATED in favor of
+    "map_vlan_id2name"
+
+  OBJ->map_vlan_static_ids2ports()
+    DEPRECATED: "map_vlan_static_ids2ports" is DEPRECATED in favor of
+    "map_vlan_id2if_idx"
+
+    Returns a hash reference with the vlan-ids as keys and tagged and
+    untagged bridge-port-lists as values:
+
+  OBJ->map_vlan_static_ports2ids()
+    DEPRECATED: "map_vlan_static_ports2ids" is DEPRECATED in favor of
+    "map_if_idx2vlan_id"
+
+    Returns a hash reference with the bridge-ports as keys and tagged and
+    untagged vlan-ids as values:
 
 INITIALIZATION
   OBJ->_init($reload)
@@ -103,12 +106,8 @@ INITIALIZATION
 PRIVATE METHODS
     Only for developers or maintainers.
 
-  _fetch_dot1d_base_num_ports($session)
-    Fetch dot1dBaseNumPorts from the dot1dBase group once during object
-    initialization.
-
-  _dot1d_base_num_ports_cb($session)
-    The callback for _fetch_dot1d_base_num_ports.
+  _dot1d_base_ports_cb($session)
+    The callback for _fetch_dot1d_base_ports.
 
   _fetch_dot1q_vlan_static_tbl_entries()
     Fetch the vlan tag info for current vlans.
@@ -140,7 +139,7 @@ AUTHOR
     Karl Gaissmaier <karl.gaissmaier at uni-ulm.de>
 
 COPYRIGHT & LICENSE
-    Copyright 2008-2016 Karl Gaissmaier, all rights reserved.
+    Copyright 2008-2020 Karl Gaissmaier, all rights reserved.
 
     This program is free software; you can redistribute it and/or modify it
     under the same terms as Perl itself.

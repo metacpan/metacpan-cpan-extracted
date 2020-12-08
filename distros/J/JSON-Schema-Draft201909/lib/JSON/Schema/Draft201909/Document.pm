@@ -4,7 +4,7 @@ package JSON::Schema::Draft201909::Document;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: One JSON Schema document
 
-our $VERSION = '0.017';
+our $VERSION = '0.018';
 
 use 5.016;
 no if "$]" >= 5.031009, feature => 'indirect';
@@ -96,6 +96,12 @@ has errors => (
   default => sub { [] },
 );
 
+has evaluator_configs => (
+  is => 'rwp',
+  isa => HashRef,
+  default => sub { {} },
+);
+
 around _add_resources => sub {
   my $orig = shift;
   my $self = shift;
@@ -126,13 +132,13 @@ sub BUILD {
   croak 'canonical_uri cannot contain a fragment' if defined $self->canonical_uri->fragment;
 
   my $original_uri = $self->canonical_uri->clone;
-  my $traversed_state = $self->_evaluator->traverse($self->schema,
+  my $state = $self->_evaluator->traverse($self->schema,
     { canonical_schema_uri => $self->canonical_uri->clone });
 
-  $self->_set_canonical_uri($traversed_state->{canonical_schema_uri});
+  $self->_set_canonical_uri($state->{canonical_schema_uri});
 
-  if (@{$traversed_state->{errors}}) {
-    $self->_set_errors($traversed_state->{errors});
+  if (@{$state->{errors}}) {
+    $self->_set_errors($state->{errors});
     return;
   }
 
@@ -141,7 +147,10 @@ sub BUILD {
     if (not "$original_uri" and $original_uri eq $self->canonical_uri)
       or "$original_uri";
 
-  $self->_add_resources(@{$traversed_state->{identifiers}});
+  $self->_add_resources(@{$state->{identifiers}});
+
+  # overlay the resulting configs with those that were provided by the caller
+  $self->_set_evaluator_configs(+{ %{$state->{configs}}, %{$self->evaluator_configs} });
 }
 
 1;
@@ -160,7 +169,7 @@ JSON::Schema::Draft201909::Document - One JSON Schema document
 
 =head1 VERSION
 
-version 0.017
+version 0.018
 
 =head1 SYNOPSIS
 
@@ -211,6 +220,14 @@ L</resource_index> and is constructed as that is built up.
 A list of L<JSON::Schema::Draft201909::Error> objects that resulted when the schema document was
 originally parsed. (If a syntax error occurred, usually there will be just one error, as parse
 errors halt the parsing process.) Documents with errors cannot be evaluated.
+
+=head2 evaluator_configs
+
+An optional hashref of configuration values that will be provided to the evaluator during
+evaluation of this document. See the third parameter of L<JSON::Schema::Draft201909/evaluate>.
+This should never need to be set explicitly. This is sometimes populated automatically after
+creating a document object, depending on the keywords found in the schema, but they will never
+override anything you have already explicitly set.
 
 =head1 METHODS
 

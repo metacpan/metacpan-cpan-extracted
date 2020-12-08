@@ -1,4 +1,4 @@
-# AWS::KinesisAnalytics::ApplicationOutput generated from spec 3.2.0
+# AWS::KinesisAnalytics::ApplicationOutput generated from spec 18.4.0
 use Moose::Util::TypeConstraints;
 
 coerce 'Cfn::Resource::Properties::AWS::KinesisAnalytics::ApplicationOutput',
@@ -29,11 +29,11 @@ coerce 'Cfn::Resource::Properties::AWS::KinesisAnalytics::ApplicationOutput::Lam
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::KinesisAnalytics::ApplicationOutput::LambdaOutputValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::KinesisAnalytics::ApplicationOutput::LambdaOutput->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::KinesisAnalytics::ApplicationOutput::LambdaOutputValue {
+package Cfn::Resource::Properties::Object::AWS::KinesisAnalytics::ApplicationOutput::LambdaOutput {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -51,11 +51,11 @@ coerce 'Cfn::Resource::Properties::AWS::KinesisAnalytics::ApplicationOutput::Kin
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::KinesisAnalytics::ApplicationOutput::KinesisStreamsOutputValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::KinesisAnalytics::ApplicationOutput::KinesisStreamsOutput->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::KinesisAnalytics::ApplicationOutput::KinesisStreamsOutputValue {
+package Cfn::Resource::Properties::Object::AWS::KinesisAnalytics::ApplicationOutput::KinesisStreamsOutput {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -73,11 +73,11 @@ coerce 'Cfn::Resource::Properties::AWS::KinesisAnalytics::ApplicationOutput::Kin
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::KinesisAnalytics::ApplicationOutput::KinesisFirehoseOutputValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::KinesisAnalytics::ApplicationOutput::KinesisFirehoseOutput->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::KinesisAnalytics::ApplicationOutput::KinesisFirehoseOutputValue {
+package Cfn::Resource::Properties::Object::AWS::KinesisAnalytics::ApplicationOutput::KinesisFirehoseOutput {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -95,11 +95,11 @@ coerce 'Cfn::Resource::Properties::AWS::KinesisAnalytics::ApplicationOutput::Des
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::KinesisAnalytics::ApplicationOutput::DestinationSchemaValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::KinesisAnalytics::ApplicationOutput::DestinationSchema->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::KinesisAnalytics::ApplicationOutput::DestinationSchemaValue {
+package Cfn::Resource::Properties::Object::AWS::KinesisAnalytics::ApplicationOutput::DestinationSchema {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -116,11 +116,11 @@ coerce 'Cfn::Resource::Properties::AWS::KinesisAnalytics::ApplicationOutput::Out
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::KinesisAnalytics::ApplicationOutput::OutputValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::KinesisAnalytics::ApplicationOutput::Output->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::KinesisAnalytics::ApplicationOutput::OutputValue {
+package Cfn::Resource::Properties::Object::AWS::KinesisAnalytics::ApplicationOutput::Output {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -142,3 +142,30 @@ package Cfn::Resource::Properties::AWS::KinesisAnalytics::ApplicationOutput {
 }
 
 1;
+### main pod documentation begin ###
+
+=encoding UTF-8
+
+=head1 NAME
+
+Cfn::Resource::AWS::KinesisAnalytics::ApplicationOutput - Cfn resource for AWS::KinesisAnalytics::ApplicationOutput
+
+=head1 DESCRIPTION
+
+This module implements a Perl module that represents the CloudFormation object AWS::KinesisAnalytics::ApplicationOutput.
+
+See L<Cfn> for more information on how to use it.
+
+=head1 AUTHOR
+
+    Jose Luis Martinez
+    CAPSiDE
+    jlmartinez@capside.com
+
+=head1 COPYRIGHT and LICENSE
+
+Copyright (c) 2013 by CAPSiDE
+This code is distributed under the Apache 2 License. The full text of the 
+license can be found in the LICENSE file included with this module.
+
+=cut

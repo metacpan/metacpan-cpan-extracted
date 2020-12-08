@@ -1,8 +1,9 @@
 Revision history for Perl module Ogg::Vorbis::Header::PurePerl.
 
-1.04 2020-09-06 DAVECROSS
+1.05 2020-12-06 DAVECROSS
 
-    - Improve test coverage
+    - Fix division by zero error (RT #88374)
+    - Add bugtracker info
 
 1.03 2020-07-20 DAVECROSS
 

@@ -5,7 +5,7 @@ package OTRS::OPM::Maker::Utils::OTRS3;
 use strict;
 use warnings;
 
-our $VERSION = 1.43;
+our $VERSION = 1.44;
 
 sub packagesetup {
     my ($class, $type, $version, $function, $runtype, $package) = @_;
@@ -75,7 +75,7 @@ OTRS::OPM::Maker::Utils::OTRS3 - Provide helper functions for OTRS <= 3
 
 =head1 VERSION
 
-version 1.43
+version 1.44
 
 =head1 METHODS
 

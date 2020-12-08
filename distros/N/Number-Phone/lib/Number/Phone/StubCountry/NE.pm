@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20200904144534;
+our $VERSION = 1.20201204215957;
 
 my $formatters = [
                 {
@@ -94,24 +94,24 @@ my $validators = {
                 'voip' => ''
               };
 my %areanames = ();
-$areanames{en}->{227202} = "Niamey";
-$areanames{en}->{227203} = "Niamey";
-$areanames{en}->{2272041} = "Maradi";
-$areanames{en}->{2272044} = "Agadez";
-$areanames{en}->{2272045} = "Arlit";
-$areanames{en}->{2272051} = "Zinder";
-$areanames{en}->{2272054} = "Diffa";
-$areanames{en}->{2272061} = "Tahoua";
-$areanames{en}->{2272064} = "Konni";
-$areanames{en}->{2272065} = "Dosso";
-$areanames{en}->{2272068} = "Gaya";
-$areanames{en}->{2272071} = "Tillabéry";
-$areanames{en}->{2272072} = "Niamey";
-$areanames{en}->{2272073} = "Niamey";
-$areanames{en}->{2272074} = "Niamey";
-$areanames{en}->{2272075} = "Niamey";
-$areanames{en}->{2272077} = "Filingué";
-$areanames{en}->{2272078} = "Say";
+$areanames{en} = {"2272071", "Tillabéry",
+"2272072", "Niamey",
+"2272075", "Niamey",
+"2272074", "Niamey",
+"2272073", "Niamey",
+"2272064", "Konni",
+"2272065", "Dosso",
+"2272061", "Tahoua",
+"227202", "Niamey",
+"2272068", "Gaya",
+"2272044", "Agadez",
+"2272054", "Diffa",
+"2272078", "Say",
+"2272045", "Arlit",
+"227203", "Niamey",
+"2272077", "Filingué",
+"2272041", "Maradi",
+"2272051", "Zinder",};
 
     sub new {
       my $class = shift;

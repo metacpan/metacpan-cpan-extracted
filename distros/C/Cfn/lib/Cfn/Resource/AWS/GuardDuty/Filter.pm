@@ -1,4 +1,4 @@
-# AWS::GuardDuty::Filter generated from spec 10.0.0
+# AWS::GuardDuty::Filter generated from spec 18.4.0
 use Moose::Util::TypeConstraints;
 
 coerce 'Cfn::Resource::Properties::AWS::GuardDuty::Filter',
@@ -29,11 +29,11 @@ coerce 'Cfn::Resource::Properties::AWS::GuardDuty::Filter::Condition',
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::GuardDuty::Filter::ConditionValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::GuardDuty::Filter::Condition->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::GuardDuty::Filter::ConditionValue {
+package Cfn::Resource::Properties::Object::AWS::GuardDuty::Filter::Condition {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -54,11 +54,11 @@ coerce 'Cfn::Resource::Properties::AWS::GuardDuty::Filter::FindingCriteria',
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::GuardDuty::Filter::FindingCriteriaValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::GuardDuty::Filter::FindingCriteria->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::GuardDuty::Filter::FindingCriteriaValue {
+package Cfn::Resource::Properties::Object::AWS::GuardDuty::Filter::FindingCriteria {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -81,3 +81,30 @@ package Cfn::Resource::Properties::AWS::GuardDuty::Filter {
 }
 
 1;
+### main pod documentation begin ###
+
+=encoding UTF-8
+
+=head1 NAME
+
+Cfn::Resource::AWS::GuardDuty::Filter - Cfn resource for AWS::GuardDuty::Filter
+
+=head1 DESCRIPTION
+
+This module implements a Perl module that represents the CloudFormation object AWS::GuardDuty::Filter.
+
+See L<Cfn> for more information on how to use it.
+
+=head1 AUTHOR
+
+    Jose Luis Martinez
+    CAPSiDE
+    jlmartinez@capside.com
+
+=head1 COPYRIGHT and LICENSE
+
+Copyright (c) 2013 by CAPSiDE
+This code is distributed under the Apache 2 License. The full text of the 
+license can be found in the LICENSE file included with this module.
+
+=cut

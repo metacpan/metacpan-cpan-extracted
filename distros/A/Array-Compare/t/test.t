@@ -53,6 +53,8 @@ ok($@);
 eval { print $comp->compare(\@A) };
 ok($@);
 
+is($comp->full_compare([undef, 2, undef], [1, undef, undef]), 2);
+
 # Switch to full comparison
 $comp->DefFull(1);
 ok($comp->DefFull);

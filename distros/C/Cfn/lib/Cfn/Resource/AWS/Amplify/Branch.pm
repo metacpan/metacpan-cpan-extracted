@@ -1,4 +1,4 @@
-# AWS::Amplify::Branch generated from spec 7.4.0
+# AWS::Amplify::Branch generated from spec 20.1.0
 use Moose::Util::TypeConstraints;
 
 coerce 'Cfn::Resource::Properties::AWS::Amplify::Branch',
@@ -51,11 +51,11 @@ coerce 'Cfn::Resource::Properties::AWS::Amplify::Branch::EnvironmentVariable',
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::Amplify::Branch::EnvironmentVariableValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::Amplify::Branch::EnvironmentVariable->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::Amplify::Branch::EnvironmentVariableValue {
+package Cfn::Resource::Properties::Object::AWS::Amplify::Branch::EnvironmentVariable {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -73,11 +73,11 @@ coerce 'Cfn::Resource::Properties::AWS::Amplify::Branch::BasicAuthConfig',
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::Amplify::Branch::BasicAuthConfigValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::Amplify::Branch::BasicAuthConfig->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::Amplify::Branch::BasicAuthConfigValue {
+package Cfn::Resource::Properties::Object::AWS::Amplify::Branch::BasicAuthConfig {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -98,6 +98,7 @@ package Cfn::Resource::Properties::AWS::Amplify::Branch {
   has BuildSpec => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has Description => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has EnableAutoBuild => (isa => 'Cfn::Value::Boolean', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has EnablePerformanceMode => (isa => 'Cfn::Value::Boolean', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has EnablePullRequestPreview => (isa => 'Cfn::Value::Boolean', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has EnvironmentVariables => (isa => 'ArrayOfCfn::Resource::Properties::AWS::Amplify::Branch::EnvironmentVariable', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has PullRequestEnvironmentName => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
@@ -106,3 +107,30 @@ package Cfn::Resource::Properties::AWS::Amplify::Branch {
 }
 
 1;
+### main pod documentation begin ###
+
+=encoding UTF-8
+
+=head1 NAME
+
+Cfn::Resource::AWS::Amplify::Branch - Cfn resource for AWS::Amplify::Branch
+
+=head1 DESCRIPTION
+
+This module implements a Perl module that represents the CloudFormation object AWS::Amplify::Branch.
+
+See L<Cfn> for more information on how to use it.
+
+=head1 AUTHOR
+
+    Jose Luis Martinez
+    CAPSiDE
+    jlmartinez@capside.com
+
+=head1 COPYRIGHT and LICENSE
+
+Copyright (c) 2013 by CAPSiDE
+This code is distributed under the Apache 2 License. The full text of the 
+license can be found in the LICENSE file included with this module.
+
+=cut

@@ -1,10 +1,12 @@
 #!/usr/bin/perl
 
-use strict;
+use v5.26;
 use warnings;
 
 use Test::More;
 use Test::Device::Chip::Adapter;
+
+use Future::AsyncAwait;
 
 use Device::Chip::nRF24L01P;
 
@@ -13,13 +15,13 @@ my $adapter = Test::Device::Chip::Adapter->new;
 
 $adapter->expect_write_gpios( { CE => 0 } );
 
-$chip->mount( $adapter )->get;
+await $chip->mount( $adapter );
 
 # ->write_tx_payload
 {
    $adapter->expect_readwrite( "\xA0hello" )->returns( "\x0E\0\0\0\0\0" );
 
-   $chip->write_tx_payload( "hello" )->get;
+   await $chip->write_tx_payload( "hello" );
 
    $adapter->check_and_clear( '$chip->write_tx_payload' );
 }
@@ -28,7 +30,7 @@ $chip->mount( $adapter )->get;
 {
    $adapter->expect_readwrite( "\xB0hello" )->returns( "\x0E\0\0\0\0\0" );
 
-   $chip->write_tx_payload( "hello", no_ack => 1 )->get;
+   await $chip->write_tx_payload( "hello", no_ack => 1 );
 
    $adapter->check_and_clear( '$chip->write_tx_payload +no_ack' );
 }

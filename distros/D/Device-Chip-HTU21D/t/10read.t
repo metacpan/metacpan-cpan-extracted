@@ -1,18 +1,20 @@
 #!/usr/bin/perl
 
-use strict;
+use v5.26;
 use warnings;
 
 use Test::More;
 use Test::Device::Chip::Adapter;
 
+use Future::AsyncAwait;
+
 use Device::Chip::HTU21D;
 
 my $chip = Device::Chip::HTU21D->new;
 
-$chip->mount(
+await $chip->mount(
    my $adapter = Test::Device::Chip::Adapter->new,
-)->get;
+);
 
 # ->read_temperature - replies immediately
 {
@@ -20,7 +22,7 @@ $chip->mount(
    $adapter->expect_read( 2 )
       ->returns( "\x5A\x2C" );
 
-   is( int( $chip->read_temperature->get ), 15,
+   is( int( await $chip->read_temperature ), 15,
        '$chip->read_temperature' );
 
    $adapter->check_and_clear( '$chip->read_temperature' );
@@ -35,7 +37,7 @@ $chip->mount(
    $adapter->expect_read( 2 )
       ->returns( "\x5D\x20" );
 
-   is( int( $chip->read_temperature->get ), 17,
+   is( int( await $chip->read_temperature ), 17,
        '$chip->read_temperature delayed' );
 
    $adapter->check_and_clear( '$chip->read_temperature delayed' );
@@ -47,7 +49,7 @@ $chip->mount(
    $adapter->expect_read( 2 )
       ->returns( "\x5A\x2C" );
 
-   is( int( $chip->read_humidity->get ), 38,
+   is( int( await $chip->read_humidity ), 38,
        '$chip->read_humidity' );
 
    $adapter->check_and_clear( '$chip->read_humidity' );

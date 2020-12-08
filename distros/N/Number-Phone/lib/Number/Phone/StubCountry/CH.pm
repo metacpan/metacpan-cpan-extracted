@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20200904144528;
+our $VERSION = 1.20201204215954;
 
 my $formatters = [
                 {
@@ -80,86 +80,51 @@ my $validators = {
                 'voip' => ''
               };
 my %areanames = ();
-$areanames{de}->{4121} = "Lausanne";
-$areanames{de}->{4122} = "Genf";
-$areanames{de}->{4124} = "Yverdon\/Aigle";
-$areanames{de}->{4126} = "Freiburg";
-$areanames{de}->{4127} = "Sitten";
-$areanames{de}->{4131} = "Bern";
-$areanames{de}->{4132} = "Biel\/Neuenburg\/Solothurn\/Jura";
-$areanames{de}->{4133} = "Thun";
-$areanames{de}->{4134} = "Burgdorf\/Langnau\ i\.E\.";
-$areanames{de}->{4141} = "Luzern";
-$areanames{de}->{4143} = "Zürich";
-$areanames{de}->{4144} = "Zürich";
-$areanames{de}->{4152} = "Winterthur";
-$areanames{de}->{4155} = "Rapperswil";
-$areanames{de}->{4156} = "Baden";
-$areanames{de}->{4161} = "Basel";
-$areanames{de}->{4162} = "Olten";
-$areanames{de}->{4171} = "St\.\ Gallen";
-$areanames{de}->{4181} = "Chur";
-$areanames{de}->{4191} = "Bellinzona";
-$areanames{en}->{4121} = "Lausanne";
-$areanames{en}->{4122} = "Geneva";
-$areanames{en}->{4124} = "Yverdon\/Aigle";
-$areanames{en}->{4126} = "Fribourg";
-$areanames{en}->{4127} = "Sion";
-$areanames{en}->{4131} = "Berne";
-$areanames{en}->{4132} = "Bienne\/Neuchâtel\/Soleure\/Jura";
-$areanames{en}->{4133} = "Thun";
-$areanames{en}->{4134} = "Burgdorf\/Langnau\ i\.E\.";
-$areanames{en}->{4141} = "Lucerne";
-$areanames{en}->{4143} = "Zurich";
-$areanames{en}->{4144} = "Zurich";
-$areanames{en}->{4152} = "Winterthur";
-$areanames{en}->{4155} = "Rapperswil";
-$areanames{en}->{4156} = "Baden";
-$areanames{en}->{4161} = "Basel";
-$areanames{en}->{4162} = "Olten";
-$areanames{en}->{4171} = "St\.\ Gallen";
-$areanames{en}->{4181} = "Chur";
-$areanames{en}->{4191} = "Bellinzona";
-$areanames{fr}->{4121} = "Lausanne";
-$areanames{fr}->{4122} = "Genève";
-$areanames{fr}->{4124} = "Yverdon\/Aigle";
-$areanames{fr}->{4126} = "Fribourg";
-$areanames{fr}->{4127} = "Sion";
-$areanames{fr}->{4131} = "Berne";
-$areanames{fr}->{4132} = "Bienne\/Neuchâtel\/Soleure\/Jura";
-$areanames{fr}->{4133} = "Thoune";
-$areanames{fr}->{4134} = "Burgdorf\/Langnau\ i\.E\.";
-$areanames{fr}->{4141} = "Lucerne";
-$areanames{fr}->{4143} = "Zurich";
-$areanames{fr}->{4144} = "Zurich";
-$areanames{fr}->{4152} = "Winterthour";
-$areanames{fr}->{4155} = "Rapperswil";
-$areanames{fr}->{4156} = "Baden";
-$areanames{fr}->{4161} = "Bâle";
-$areanames{fr}->{4162} = "Olten";
-$areanames{fr}->{4171} = "St\.\ Gall";
-$areanames{fr}->{4181} = "Coire";
-$areanames{fr}->{4191} = "Bellinzona";
-$areanames{it}->{4121} = "Losanna";
-$areanames{it}->{4122} = "Ginevra";
-$areanames{it}->{4124} = "Yverdon\/Aigle";
-$areanames{it}->{4126} = "Friburgo";
-$areanames{it}->{4127} = "Sion";
-$areanames{it}->{4131} = "Berna";
-$areanames{it}->{4132} = "Bienne\/Neuchâtel\/Soletta\/Giura";
-$areanames{it}->{4133} = "Thun";
-$areanames{it}->{4134} = "Burgdorf\/Langnau\ i\.E\.";
-$areanames{it}->{4141} = "Lucerna";
-$areanames{it}->{4143} = "Zurigo";
-$areanames{it}->{4144} = "Zurigo";
-$areanames{it}->{4152} = "Winterthur";
-$areanames{it}->{4155} = "Rapperswil";
-$areanames{it}->{4156} = "Baden";
-$areanames{it}->{4161} = "Basilea";
-$areanames{it}->{4162} = "Olten";
-$areanames{it}->{4171} = "San\ Gallo";
-$areanames{it}->{4181} = "Coira";
-$areanames{it}->{4191} = "Bellinzona";
+$areanames{de} = {"4132", "Biel\/Neuenburg\/Solothurn\/Jura",
+"4144", "Zürich",
+"4126", "Freiburg",
+"4143", "Zürich",
+"4127", "Sitten",
+"4122", "Genf",
+"4131", "Bern",
+"4141", "Luzern",};
+$areanames{fr} = {"4171", "St\.\ Gall",
+"4152", "Winterthour",
+"4122", "Genève",
+"4133", "Thoune",
+"4161", "Bâle",
+"4181", "Coire",};
+$areanames{en} = {"4156", "Baden",
+"4143", "Zurich",
+"4126", "Fribourg",
+"4121", "Lausanne",
+"4133", "Thun",
+"4132", "Bienne\/Neuchâtel\/Soleure\/Jura",
+"4134", "Burgdorf\/Langnau\ i\.E\.",
+"4181", "Chur",
+"4144", "Zurich",
+"4161", "Basel",
+"4162", "Olten",
+"4171", "St\.\ Gallen",
+"4131", "Berne",
+"4141", "Lucerne",
+"4155", "Rapperswil",
+"4124", "Yverdon\/Aigle",
+"4122", "Geneva",
+"4191", "Bellinzona",
+"4127", "Sion",
+"4152", "Winterthur",};
+$areanames{it} = {"4126", "Friburgo",
+"4143", "Zurigo",
+"4121", "Losanna",
+"4132", "Bienne\/Neuchâtel\/Soletta\/Giura",
+"4144", "Zurigo",
+"4181", "Coira",
+"4161", "Basilea",
+"4171", "San\ Gallo",
+"4131", "Berna",
+"4141", "Lucerna",
+"4122", "Ginevra",};
 
     sub new {
       my $class = shift;

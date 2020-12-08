@@ -10,10 +10,11 @@ use Cwd qw(abs_path);
 use Scalar::Util 'blessed';
 
 use Number::Phone::Country qw(noexport);
+use Number::Phone::Data;
 use Number::Phone::StubCountry;
 
 # MUST be in format N.NNNN, see https://github.com/DrHyde/perl-modules-Number-Phone/issues/58
-our $VERSION = '3.6006';
+our $VERSION = '3.7000';
 
 my $NOSTUBS = 0;
 sub import {
@@ -62,7 +63,7 @@ foreach my $method (
     @is_methods, qw(
         country_code regulator areacode areaname
         subscriber operator operator_ported translates_to
-        format location
+        format location data_source
     )
 ) {
     no strict 'refs';
@@ -87,17 +88,20 @@ sub dial_to {
 
   if($from->country_code() != $to->country_code()) {
     return Number::Phone::Country::idd_code($from->country()).
-           $to->country_code().
-           ($to->areacode() ? $to->areacode() : '').
-           $to->subscriber();
+        $to->country_code().
+        ($to->isa('Number::Phone::StubCountry')
+          ? $to->raw_number()
+          : (
+              ($to->areacode() ? $to->areacode() : '').
+              $to->subscriber()
+            )
+        );
   }
-
-  # if we get here it's a domestic call
 
   # do we know how to do this?
   my $intra_country_dial_to = eval '$from->intra_country_dial_to($to)';
   return undef if($@); # no
-  return $intra_country_dial_to if($intra_country_dial_to); # yes, and here's how
+  return $intra_country_dial_to if(defined($intra_country_dial_to)); # yes, and here's how
 
   # if we get here, then we can use the default implementation ...
 
@@ -251,34 +255,41 @@ sub new {
     if ($number =~ /^\+1/) {
         $country = "NANP";
     } elsif ($country =~ /^(?:GB|GG|JE|IM)$/) {
+        # for hysterical raisins
         $country = 'UK';
     }
     eval "use Number::Phone::$country";
     if($@ || !"Number::Phone::$country"->isa('Number::Phone')) {
+        if($@ =~ /--without_uk/) {
+            # a test unexpectedly tried to load Number::Phone::UK, argh!
+            die $@
+        }
+        # undo the above transformation, it's GB in stub-land
+        $country = 'GB' if($country eq 'UK');
         return $class->_make_stub_object($number, $country)
     }
     return "Number::Phone::$country"->new($number);
 }
 
 sub _make_stub_object {
- my ($class, $number, $country_name) = @_;
-  die("no module available for $country_name, and nostubs turned on\n") if($NOSTUBS);
-  my $stub_class = "Number::Phone::StubCountry::$country_name";
-  eval "use $stub_class";
-  # die("Can't find $stub_class: $@\n") if($@);
-  if($@) {
-      my (undef, $country_idd) = Number::Phone::Country::phone2country_and_idd($number);
-      # an instance of this class is the ultimate fallback
-      (my $local_number = $number) =~ s/(^\+$country_idd|\D)//;
-      if($local_number eq '') { return undef; }
-      return bless({
-          country_code => $country_idd,
-          country      => $country_name,
-          is_valid     => undef,
-          number       => $local_number,
-      }, 'Number::Phone::StubCountry');
-  }
-  $stub_class->new($number);
+    my ($class, $number, $country_name) = @_;
+    die("no module available for $country_name, and nostubs turned on\n") if($NOSTUBS);
+    my $stub_class = "Number::Phone::StubCountry::$country_name";
+    eval "use $stub_class";
+    # die("Can't find $stub_class: $@\n") if($@);
+    if($@) {
+        my (undef, $country_idd) = Number::Phone::Country::phone2country_and_idd($number);
+        # an instance of this class is the ultimate fallback
+        (my $local_number = $number) =~ s/(^\+$country_idd|\D)//;
+        if($local_number eq '') { return undef; }
+        return bless({
+            country_code => $country_idd,
+            country      => $country_name,
+            is_valid     => undef,
+            number       => $local_number,
+        }, 'Number::Phone::StubCountry');
+    }
+    $stub_class->new($number);
 }
 
 =head1 METHODS
@@ -544,6 +555,28 @@ The superclass implementation returns undef.
 
 =back
 
+=head2 DATA SOURCES
+
+=over
+
+=item data_source
+
+Class method, return some hopefully useful text about the source of the data
+(if any) that drives a country-specific module. The implementation in the base
+class returns undef as the base class itself has no data source.
+
+=item libphonenumber_tag
+
+Class method which you should not over-ride, implemented in the base class.
+Returns the version of libphonenumber whose metadata was used for this release
+of Number::Phone. NB that this is derived from their most recent git tag, so
+may occasionally be a little ahead of the most recent libphonenumber release as
+the tag gets created before their release is built.
+
+The current version of this is also documented in L<Number::Phone::Data>.
+
+=back
+
 =head2 HOW TO DIAL FROM ONE NUMBER TO ANOTHER
 
 =over
@@ -585,8 +618,8 @@ follows:
 =item international call
 
 Append together the source country's international dialling prefix
-(usually 00), then the destination country's code code, area code,
-and subscriber number.
+(usually 00), then the destination country's country code, area code
+(if the country has such a thing), and subscriber number.
 
 =item domestic call, different area code
 
@@ -643,8 +676,10 @@ the phone number is passed to its constructor unchanged.
 If only one parameter is passed, then we try to figure out which is the right
 country subclass to use by pre-pending a + sign to the number if
 there isn't one, and looking the country up using
-Number::Phone::Country.  That gives us a two letter country code that
-is used to try to load the right module.
+Number::Phone::Country. That gives us a two letter country code that
+is used to try to load the right module. We then pass the number through to
+that module's constructor and return whatever it says (which may be undef
+if you pass in an invalid number - see SUBCLASSING below).
 
 The constructor returns undef if it can not figure out what country
 you're talking about, or an object based on Google's libphonenumber

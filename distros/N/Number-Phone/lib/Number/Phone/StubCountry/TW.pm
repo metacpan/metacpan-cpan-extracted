@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20200904144536;
+our $VERSION = 1.20201204215957;
 
 my $formatters = [
                 {
@@ -290,129 +290,113 @@ my $validators = {
         '
               };
 my %areanames = ();
-$areanames{en}->{8862} = "Taipei";
-$areanames{en}->{8863} = "Taoyuan\/Hsinchu\/Yilan\/Hualien";
-$areanames{en}->{88637} = "Miaoli";
-$areanames{en}->{8864001} = "Taichung\/Changhua";
-$areanames{en}->{8864002} = "Taichung\/Changhua";
-$areanames{en}->{8864003} = "Taichung\/Changhua";
-$areanames{en}->{8864004} = "Taichung\/Changhua";
-$areanames{en}->{8864005} = "Taichung\/Changhua";
-$areanames{en}->{8864006} = "Taichung\/Changhua";
-$areanames{en}->{8864007} = "Taichung\/Changhua";
-$areanames{en}->{8864008} = "Taichung\/Changhua";
-$areanames{en}->{8864009} = "Taichung\/Changhua";
-$areanames{en}->{886402} = "Taichung\/Changhua";
-$areanames{en}->{886403} = "Taichung\/Changhua";
-$areanames{en}->{886404} = "Taichung\/Changhua";
-$areanames{en}->{886408} = "Taichung\/Changhua";
-$areanames{en}->{88641} = "Taichung\/Changhua";
-$areanames{en}->{88642} = "Taichung\/Changhua";
-$areanames{en}->{88643} = "Taichung\/Changhua";
-$areanames{en}->{88644} = "Taichung\/Changhua";
-$areanames{en}->{88647} = "Taichung\/Changhua";
-$areanames{en}->{88648} = "Taichung\/Changhua";
-$areanames{en}->{88649} = "Nantou";
-$areanames{en}->{88652} = "Chiayi\/Yunlin";
-$areanames{en}->{88653} = "Chiayi\/Yunlin";
-$areanames{en}->{88654} = "Chiayi\/Yunlin";
-$areanames{en}->{88655} = "Chiayi\/Yunlin";
-$areanames{en}->{88656} = "Chiayi\/Yunlin";
-$areanames{en}->{88657} = "Chiayi\/Yunlin";
-$areanames{en}->{88658} = "Chiayi\/Yunlin";
-$areanames{en}->{8866} = "Tainan\/Penghu";
-$areanames{en}->{88671} = "Kaohsiung";
-$areanames{en}->{88672} = "Kaohsiung";
-$areanames{en}->{88673} = "Kaohsiung";
-$areanames{en}->{88674} = "Kaohsiung";
-$areanames{en}->{88675} = "Kaohsiung";
-$areanames{en}->{88676} = "Kaohsiung";
-$areanames{en}->{88677} = "Kaohsiung";
-$areanames{en}->{88678} = "Kaohsiung";
-$areanames{en}->{88679} = "Kaohsiung";
-$areanames{en}->{88680} = "Pingtung";
-$areanames{en}->{886823} = "Kinmen";
-$areanames{en}->{886824} = "Kinmen";
-$areanames{en}->{886825} = "Kinmen";
-$areanames{en}->{886826} = "Wuqiu";
-$areanames{en}->{886827} = "Kinmen";
-$areanames{en}->{886828} = "Kinmen";
-$areanames{en}->{88683} = "Matsu";
-$areanames{en}->{88684} = "Pingtung";
-$areanames{en}->{88687} = "Pingtung";
-$areanames{en}->{88688} = "Pingtung";
-$areanames{en}->{88689} = "Taitung";
-$areanames{zh}->{8862} = "台北";
-$areanames{zh}->{8863} = "桃园\、新竹\、花莲\、宜兰";
-$areanames{zh}->{88637} = "苗栗";
-$areanames{zh}->{8864001} = "台中\、彰化";
-$areanames{zh}->{8864002} = "台中\、彰化";
-$areanames{zh}->{8864003} = "台中\、彰化";
-$areanames{zh}->{8864004} = "台中\、彰化";
-$areanames{zh}->{8864005} = "台中\、彰化";
-$areanames{zh}->{8864006} = "台中\、彰化";
-$areanames{zh}->{8864007} = "台中\、彰化";
-$areanames{zh}->{8864008} = "台中\、彰化";
-$areanames{zh}->{8864009} = "台中\、彰化";
-$areanames{zh}->{886402} = "台中\、彰化";
-$areanames{zh}->{886403} = "台中\、彰化";
-$areanames{zh}->{886404} = "台中\、彰化";
-$areanames{zh}->{886408} = "台中\、彰化";
-$areanames{zh}->{88641} = "台中\、彰化";
-$areanames{zh}->{88642} = "台中\、彰化";
-$areanames{zh}->{88643} = "台中\、彰化";
-$areanames{zh}->{88644} = "台中\、彰化";
-$areanames{zh}->{88647} = "台中\、彰化";
-$areanames{zh}->{88648} = "台中\、彰化";
-$areanames{zh}->{88649} = "南投";
-$areanames{zh}->{88652} = "嘉义\、云林";
-$areanames{zh}->{88653} = "嘉义\、云林";
-$areanames{zh}->{88654} = "嘉义\、云林";
-$areanames{zh}->{88655} = "嘉义\、云林";
-$areanames{zh}->{88656} = "嘉义\、云林";
-$areanames{zh}->{88657} = "嘉义\、云林";
-$areanames{zh}->{88658} = "嘉义\、云林";
-$areanames{zh}->{8866} = "台南\、澎湖";
-$areanames{zh}->{88671} = "高雄";
-$areanames{zh}->{88672} = "高雄";
-$areanames{zh}->{88673} = "高雄";
-$areanames{zh}->{88674} = "高雄";
-$areanames{zh}->{88675} = "高雄";
-$areanames{zh}->{88676} = "高雄";
-$areanames{zh}->{88677} = "高雄";
-$areanames{zh}->{88678} = "高雄";
-$areanames{zh}->{88679} = "高雄";
-$areanames{zh}->{88680} = "屏东";
-$areanames{zh}->{886823} = "金门";
-$areanames{zh}->{8868230} = "屏东";
-$areanames{zh}->{886824} = "金门";
-$areanames{zh}->{886825} = "金门";
-$areanames{zh}->{886826} = "乌丘";
-$areanames{zh}->{886827} = "金门";
-$areanames{zh}->{886828} = "金门";
-$areanames{zh}->{88683} = "马祖";
-$areanames{zh}->{88684} = "屏东";
-$areanames{zh}->{88687} = "屏东";
-$areanames{zh}->{88688} = "屏东";
-$areanames{zh}->{88689} = "台东";
-$areanames{zh}->{8862} = "臺北";
-$areanames{zh}->{8863} = "桃園\、新竹\、花蓮\、宜蘭";
-$areanames{zh}->{88637} = "苗栗";
-$areanames{zh}->{88642} = "臺中\、彰化";
-$areanames{zh}->{88643} = "臺中\、彰化";
-$areanames{zh}->{88647} = "臺中\、彰化";
-$areanames{zh}->{88648} = "臺中\、彰化";
-$areanames{zh}->{88649} = "南投";
-$areanames{zh}->{8865} = "嘉義\、雲林";
-$areanames{zh}->{8866} = "臺南\、澎湖";
-$areanames{zh}->{8867} = "高雄";
-$areanames{zh}->{88680} = "屏東";
-$areanames{zh}->{886823} = "金門";
-$areanames{zh}->{886826} = "烏坵";
-$areanames{zh}->{88683} = "馬祖";
-$areanames{zh}->{88687} = "屏東";
-$areanames{zh}->{88688} = "屏東";
-$areanames{zh}->{88689} = "臺東";
+$areanames{en} = {"88683", "Matsu",
+"88673", "Kaohsiung",
+"8864001", "Taichung\/Changhua",
+"88680", "Pingtung",
+"8864004", "Taichung\/Changhua",
+"886403", "Taichung\/Changhua",
+"8864002", "Taichung\/Changhua",
+"88642", "Taichung\/Changhua",
+"8866", "Tainan\/Penghu",
+"886823", "Kinmen",
+"88655", "Chiayi\/Yunlin",
+"8862", "Taipei",
+"88654", "Chiayi\/Yunlin",
+"88671", "Kaohsiung",
+"8864008", "Taichung\/Changhua",
+"88648", "Taichung\/Changhua",
+"88676", "Kaohsiung",
+"886825", "Kinmen",
+"886824", "Kinmen",
+"8864006", "Taichung\/Changhua",
+"88652", "Chiayi\/Yunlin",
+"886404", "Taichung\/Changhua",
+"88644", "Taichung\/Changhua",
+"886826", "Wuqiu",
+"88658", "Chiayi\/Yunlin",
+"88677", "Kaohsiung",
+"886827", "Kinmen",
+"88687", "Pingtung",
+"88649", "Nantou",
+"8864009", "Taichung\/Changhua",
+"88653", "Chiayi\/Yunlin",
+"8864003", "Taichung\/Changhua",
+"88675", "Kaohsiung",
+"88684", "Pingtung",
+"88674", "Kaohsiung",
+"886828", "Kinmen",
+"88679", "Kaohsiung",
+"88689", "Taitung",
+"88647", "Taichung\/Changhua",
+"8863", "Taoyuan\/Hsinchu\/Yilan\/Hualien",
+"886408", "Taichung\/Changhua",
+"88656", "Chiayi\/Yunlin",
+"8864005", "Taichung\/Changhua",
+"88643", "Taichung\/Changhua",
+"88672", "Kaohsiung",
+"886402", "Taichung\/Changhua",
+"88637", "Miaoli",
+"88688", "Pingtung",
+"88678", "Kaohsiung",
+"88657", "Chiayi\/Yunlin",
+"8864007", "Taichung\/Changhua",
+"88641", "Taichung\/Changhua",};
+$areanames{zh} = {"88689", "臺東",
+"88679", "高雄",
+"886408", "台中\、彰化",
+"88647", "臺中\、彰化",
+"8863", "桃園\、新竹\、花蓮\、宜蘭",
+"886828", "金门",
+"88674", "高雄",
+"8868230", "屏东",
+"88684", "屏东",
+"8865", "嘉義\、雲林",
+"8864003", "台中\、彰化",
+"88675", "高雄",
+"88653", "嘉义\、云林",
+"88657", "嘉义\、云林",
+"88678", "高雄",
+"88688", "屏東",
+"88641", "台中\、彰化",
+"8864007", "台中\、彰化",
+"88637", "苗栗",
+"886402", "台中\、彰化",
+"88672", "高雄",
+"88656", "嘉义\、云林",
+"88643", "臺中\、彰化",
+"8864005", "台中\、彰化",
+"88671", "高雄",
+"8864008", "台中\、彰化",
+"88648", "臺中\、彰化",
+"8862", "臺北",
+"8867", "高雄",
+"88654", "嘉义\、云林",
+"886823", "金門",
+"88655", "嘉义\、云林",
+"8866", "臺南\、澎湖",
+"88642", "臺中\、彰化",
+"8864001", "台中\、彰化",
+"88673", "高雄",
+"88683", "馬祖",
+"8864002", "台中\、彰化",
+"886403", "台中\、彰化",
+"8864004", "台中\、彰化",
+"88680", "屏東",
+"88687", "屏東",
+"886827", "金门",
+"88658", "嘉义\、云林",
+"88677", "高雄",
+"8864009", "台中\、彰化",
+"88649", "南投",
+"88644", "台中\、彰化",
+"886826", "烏坵",
+"88652", "嘉义\、云林",
+"8864006", "台中\、彰化",
+"886404", "台中\、彰化",
+"88676", "高雄",
+"886824", "金门",
+"886825", "金门",};
 
     sub new {
       my $class = shift;

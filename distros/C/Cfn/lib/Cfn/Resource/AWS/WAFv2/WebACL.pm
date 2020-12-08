@@ -1,4 +1,4 @@
-# AWS::WAFv2::WebACL generated from spec 11.1.0
+# AWS::WAFv2::WebACL generated from spec 20.1.0
 use Moose::Util::TypeConstraints;
 
 coerce 'Cfn::Resource::Properties::AWS::WAFv2::WebACL',
@@ -14,7 +14,7 @@ package Cfn::Resource::AWS::WAFv2::WebACL {
     [ 'Arn','Capacity','Id' ]
   }
   sub supported_regions {
-    [ 'ap-northeast-1','ap-northeast-2','ap-south-1','ap-southeast-1','ap-southeast-2','ca-central-1','eu-central-1','eu-north-1','eu-west-1','eu-west-2','eu-west-3','sa-east-1','us-east-1','us-east-2','us-gov-west-1','us-west-1','us-west-2' ]
+    [ 'af-south-1','ap-east-1','ap-northeast-1','ap-northeast-2','ap-south-1','ap-southeast-1','ap-southeast-2','ca-central-1','eu-central-1','eu-north-1','eu-south-1','eu-west-1','eu-west-2','eu-west-3','me-south-1','sa-east-1','us-east-1','us-east-2','us-gov-west-1','us-west-1','us-west-2' ]
   }
 }
 
@@ -51,17 +51,62 @@ coerce 'Cfn::Resource::Properties::AWS::WAFv2::WebACL::TextTransformation',
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::WAFv2::WebACL::TextTransformationValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::WAFv2::WebACL::TextTransformation->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::WAFv2::WebACL::TextTransformationValue {
+package Cfn::Resource::Properties::Object::AWS::WAFv2::WebACL::TextTransformation {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
   
   has Priority => (isa => 'Cfn::Value::Integer', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has Type => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+}
+
+subtype 'Cfn::Resource::Properties::AWS::WAFv2::WebACL::IPSetForwardedIPConfiguration',
+     as 'Cfn::Value';
+
+coerce 'Cfn::Resource::Properties::AWS::WAFv2::WebACL::IPSetForwardedIPConfiguration',
+  from 'HashRef',
+   via {
+     if (my $f = Cfn::TypeLibrary::try_function($_)) {
+       return $f
+     } else {
+       return Cfn::Resource::Properties::Object::AWS::WAFv2::WebACL::IPSetForwardedIPConfiguration->new( %$_ );
+     }
+   };
+
+package Cfn::Resource::Properties::Object::AWS::WAFv2::WebACL::IPSetForwardedIPConfiguration {
+  use Moose;
+  use MooseX::StrictConstructor;
+  extends 'Cfn::Value::TypedValue';
+  
+  has FallbackBehavior => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has HeaderName => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has Position => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+}
+
+subtype 'Cfn::Resource::Properties::AWS::WAFv2::WebACL::ForwardedIPConfiguration',
+     as 'Cfn::Value';
+
+coerce 'Cfn::Resource::Properties::AWS::WAFv2::WebACL::ForwardedIPConfiguration',
+  from 'HashRef',
+   via {
+     if (my $f = Cfn::TypeLibrary::try_function($_)) {
+       return $f
+     } else {
+       return Cfn::Resource::Properties::Object::AWS::WAFv2::WebACL::ForwardedIPConfiguration->new( %$_ );
+     }
+   };
+
+package Cfn::Resource::Properties::Object::AWS::WAFv2::WebACL::ForwardedIPConfiguration {
+  use Moose;
+  use MooseX::StrictConstructor;
+  extends 'Cfn::Value::TypedValue';
+  
+  has FallbackBehavior => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has HeaderName => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
 }
 
 subtype 'Cfn::Resource::Properties::AWS::WAFv2::WebACL::FieldToMatch',
@@ -73,11 +118,11 @@ coerce 'Cfn::Resource::Properties::AWS::WAFv2::WebACL::FieldToMatch',
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::WAFv2::WebACL::FieldToMatchValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::WAFv2::WebACL::FieldToMatch->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::WAFv2::WebACL::FieldToMatchValue {
+package Cfn::Resource::Properties::Object::AWS::WAFv2::WebACL::FieldToMatch {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -122,11 +167,11 @@ coerce 'Cfn::Resource::Properties::AWS::WAFv2::WebACL::ExcludedRule',
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::WAFv2::WebACL::ExcludedRuleValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::WAFv2::WebACL::ExcludedRule->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::WAFv2::WebACL::ExcludedRuleValue {
+package Cfn::Resource::Properties::Object::AWS::WAFv2::WebACL::ExcludedRule {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -143,11 +188,11 @@ coerce 'Cfn::Resource::Properties::AWS::WAFv2::WebACL::XssMatchStatement',
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::WAFv2::WebACL::XssMatchStatementValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::WAFv2::WebACL::XssMatchStatement->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::WAFv2::WebACL::XssMatchStatementValue {
+package Cfn::Resource::Properties::Object::AWS::WAFv2::WebACL::XssMatchStatement {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -165,11 +210,11 @@ coerce 'Cfn::Resource::Properties::AWS::WAFv2::WebACL::SqliMatchStatement',
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::WAFv2::WebACL::SqliMatchStatementValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::WAFv2::WebACL::SqliMatchStatement->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::WAFv2::WebACL::SqliMatchStatementValue {
+package Cfn::Resource::Properties::Object::AWS::WAFv2::WebACL::SqliMatchStatement {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -187,11 +232,11 @@ coerce 'Cfn::Resource::Properties::AWS::WAFv2::WebACL::SizeConstraintStatement',
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::WAFv2::WebACL::SizeConstraintStatementValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::WAFv2::WebACL::SizeConstraintStatement->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::WAFv2::WebACL::SizeConstraintStatementValue {
+package Cfn::Resource::Properties::Object::AWS::WAFv2::WebACL::SizeConstraintStatement {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -211,11 +256,11 @@ coerce 'Cfn::Resource::Properties::AWS::WAFv2::WebACL::RuleGroupReferenceStateme
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::WAFv2::WebACL::RuleGroupReferenceStatementValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::WAFv2::WebACL::RuleGroupReferenceStatement->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::WAFv2::WebACL::RuleGroupReferenceStatementValue {
+package Cfn::Resource::Properties::Object::AWS::WAFv2::WebACL::RuleGroupReferenceStatement {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -233,11 +278,11 @@ coerce 'Cfn::Resource::Properties::AWS::WAFv2::WebACL::RegexPatternSetReferenceS
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::WAFv2::WebACL::RegexPatternSetReferenceStatementValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::WAFv2::WebACL::RegexPatternSetReferenceStatement->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::WAFv2::WebACL::RegexPatternSetReferenceStatementValue {
+package Cfn::Resource::Properties::Object::AWS::WAFv2::WebACL::RegexPatternSetReferenceStatement {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -256,11 +301,11 @@ coerce 'Cfn::Resource::Properties::AWS::WAFv2::WebACL::ManagedRuleGroupStatement
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::WAFv2::WebACL::ManagedRuleGroupStatementValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::WAFv2::WebACL::ManagedRuleGroupStatement->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::WAFv2::WebACL::ManagedRuleGroupStatementValue {
+package Cfn::Resource::Properties::Object::AWS::WAFv2::WebACL::ManagedRuleGroupStatement {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -279,16 +324,17 @@ coerce 'Cfn::Resource::Properties::AWS::WAFv2::WebACL::IPSetReferenceStatement',
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::WAFv2::WebACL::IPSetReferenceStatementValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::WAFv2::WebACL::IPSetReferenceStatement->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::WAFv2::WebACL::IPSetReferenceStatementValue {
+package Cfn::Resource::Properties::Object::AWS::WAFv2::WebACL::IPSetReferenceStatement {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
   
   has Arn => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has IPSetForwardedIPConfig => (isa => 'Cfn::Resource::Properties::AWS::WAFv2::WebACL::IPSetForwardedIPConfiguration', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
 }
 
 subtype 'Cfn::Resource::Properties::AWS::WAFv2::WebACL::GeoMatchStatement',
@@ -300,16 +346,17 @@ coerce 'Cfn::Resource::Properties::AWS::WAFv2::WebACL::GeoMatchStatement',
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::WAFv2::WebACL::GeoMatchStatementValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::WAFv2::WebACL::GeoMatchStatement->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::WAFv2::WebACL::GeoMatchStatementValue {
+package Cfn::Resource::Properties::Object::AWS::WAFv2::WebACL::GeoMatchStatement {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
   
   has CountryCodes => (isa => 'Cfn::Value::Array|Cfn::Value::Function|Cfn::DynamicValue', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has ForwardedIPConfig => (isa => 'Cfn::Resource::Properties::AWS::WAFv2::WebACL::ForwardedIPConfiguration', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
 }
 
 subtype 'Cfn::Resource::Properties::AWS::WAFv2::WebACL::ByteMatchStatement',
@@ -321,18 +368,18 @@ coerce 'Cfn::Resource::Properties::AWS::WAFv2::WebACL::ByteMatchStatement',
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::WAFv2::WebACL::ByteMatchStatementValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::WAFv2::WebACL::ByteMatchStatement->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::WAFv2::WebACL::ByteMatchStatementValue {
+package Cfn::Resource::Properties::Object::AWS::WAFv2::WebACL::ByteMatchStatement {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
   
   has FieldToMatch => (isa => 'Cfn::Resource::Properties::AWS::WAFv2::WebACL::FieldToMatch', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has PositionalConstraint => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
-  has SearchString => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has SearchString => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has SearchStringBase64 => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has TextTransformations => (isa => 'ArrayOfCfn::Resource::Properties::AWS::WAFv2::WebACL::TextTransformation', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
 }
@@ -368,11 +415,11 @@ coerce 'Cfn::Resource::Properties::AWS::WAFv2::WebACL::StatementThree',
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::WAFv2::WebACL::StatementThreeValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::WAFv2::WebACL::StatementThree->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::WAFv2::WebACL::StatementThreeValue {
+package Cfn::Resource::Properties::Object::AWS::WAFv2::WebACL::StatementThree {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -397,16 +444,17 @@ coerce 'Cfn::Resource::Properties::AWS::WAFv2::WebACL::RateBasedStatementTwo',
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::WAFv2::WebACL::RateBasedStatementTwoValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::WAFv2::WebACL::RateBasedStatementTwo->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::WAFv2::WebACL::RateBasedStatementTwoValue {
+package Cfn::Resource::Properties::Object::AWS::WAFv2::WebACL::RateBasedStatementTwo {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
   
   has AggregateKeyType => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has ForwardedIPConfig => (isa => 'Cfn::Resource::Properties::AWS::WAFv2::WebACL::ForwardedIPConfiguration', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has Limit => (isa => 'Cfn::Value::Integer', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has ScopeDownStatement => (isa => 'Cfn::Resource::Properties::AWS::WAFv2::WebACL::StatementThree', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
 }
@@ -420,11 +468,11 @@ coerce 'Cfn::Resource::Properties::AWS::WAFv2::WebACL::OrStatementTwo',
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::WAFv2::WebACL::OrStatementTwoValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::WAFv2::WebACL::OrStatementTwo->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::WAFv2::WebACL::OrStatementTwoValue {
+package Cfn::Resource::Properties::Object::AWS::WAFv2::WebACL::OrStatementTwo {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -441,11 +489,11 @@ coerce 'Cfn::Resource::Properties::AWS::WAFv2::WebACL::NotStatementTwo',
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::WAFv2::WebACL::NotStatementTwoValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::WAFv2::WebACL::NotStatementTwo->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::WAFv2::WebACL::NotStatementTwoValue {
+package Cfn::Resource::Properties::Object::AWS::WAFv2::WebACL::NotStatementTwo {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -462,11 +510,11 @@ coerce 'Cfn::Resource::Properties::AWS::WAFv2::WebACL::AndStatementTwo',
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::WAFv2::WebACL::AndStatementTwoValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::WAFv2::WebACL::AndStatementTwo->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::WAFv2::WebACL::AndStatementTwoValue {
+package Cfn::Resource::Properties::Object::AWS::WAFv2::WebACL::AndStatementTwo {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -505,11 +553,11 @@ coerce 'Cfn::Resource::Properties::AWS::WAFv2::WebACL::StatementTwo',
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::WAFv2::WebACL::StatementTwoValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::WAFv2::WebACL::StatementTwo->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::WAFv2::WebACL::StatementTwoValue {
+package Cfn::Resource::Properties::Object::AWS::WAFv2::WebACL::StatementTwo {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -538,16 +586,17 @@ coerce 'Cfn::Resource::Properties::AWS::WAFv2::WebACL::RateBasedStatementOne',
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::WAFv2::WebACL::RateBasedStatementOneValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::WAFv2::WebACL::RateBasedStatementOne->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::WAFv2::WebACL::RateBasedStatementOneValue {
+package Cfn::Resource::Properties::Object::AWS::WAFv2::WebACL::RateBasedStatementOne {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
   
   has AggregateKeyType => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has ForwardedIPConfig => (isa => 'Cfn::Resource::Properties::AWS::WAFv2::WebACL::ForwardedIPConfiguration', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has Limit => (isa => 'Cfn::Value::Integer', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has ScopeDownStatement => (isa => 'Cfn::Resource::Properties::AWS::WAFv2::WebACL::StatementTwo', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
 }
@@ -561,11 +610,11 @@ coerce 'Cfn::Resource::Properties::AWS::WAFv2::WebACL::OrStatementOne',
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::WAFv2::WebACL::OrStatementOneValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::WAFv2::WebACL::OrStatementOne->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::WAFv2::WebACL::OrStatementOneValue {
+package Cfn::Resource::Properties::Object::AWS::WAFv2::WebACL::OrStatementOne {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -582,11 +631,11 @@ coerce 'Cfn::Resource::Properties::AWS::WAFv2::WebACL::NotStatementOne',
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::WAFv2::WebACL::NotStatementOneValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::WAFv2::WebACL::NotStatementOne->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::WAFv2::WebACL::NotStatementOneValue {
+package Cfn::Resource::Properties::Object::AWS::WAFv2::WebACL::NotStatementOne {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -603,11 +652,11 @@ coerce 'Cfn::Resource::Properties::AWS::WAFv2::WebACL::AndStatementOne',
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::WAFv2::WebACL::AndStatementOneValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::WAFv2::WebACL::AndStatementOne->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::WAFv2::WebACL::AndStatementOneValue {
+package Cfn::Resource::Properties::Object::AWS::WAFv2::WebACL::AndStatementOne {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -624,11 +673,11 @@ coerce 'Cfn::Resource::Properties::AWS::WAFv2::WebACL::VisibilityConfig',
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::WAFv2::WebACL::VisibilityConfigValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::WAFv2::WebACL::VisibilityConfig->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::WAFv2::WebACL::VisibilityConfigValue {
+package Cfn::Resource::Properties::Object::AWS::WAFv2::WebACL::VisibilityConfig {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -647,11 +696,11 @@ coerce 'Cfn::Resource::Properties::AWS::WAFv2::WebACL::StatementOne',
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::WAFv2::WebACL::StatementOneValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::WAFv2::WebACL::StatementOne->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::WAFv2::WebACL::StatementOneValue {
+package Cfn::Resource::Properties::Object::AWS::WAFv2::WebACL::StatementOne {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -680,11 +729,11 @@ coerce 'Cfn::Resource::Properties::AWS::WAFv2::WebACL::RuleAction',
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::WAFv2::WebACL::RuleActionValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::WAFv2::WebACL::RuleAction->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::WAFv2::WebACL::RuleActionValue {
+package Cfn::Resource::Properties::Object::AWS::WAFv2::WebACL::RuleAction {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -703,11 +752,11 @@ coerce 'Cfn::Resource::Properties::AWS::WAFv2::WebACL::OverrideAction',
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::WAFv2::WebACL::OverrideActionValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::WAFv2::WebACL::OverrideAction->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::WAFv2::WebACL::OverrideActionValue {
+package Cfn::Resource::Properties::Object::AWS::WAFv2::WebACL::OverrideAction {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -747,11 +796,11 @@ coerce 'Cfn::Resource::Properties::AWS::WAFv2::WebACL::Rule',
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::WAFv2::WebACL::RuleValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::WAFv2::WebACL::Rule->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::WAFv2::WebACL::RuleValue {
+package Cfn::Resource::Properties::Object::AWS::WAFv2::WebACL::Rule {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -773,11 +822,11 @@ coerce 'Cfn::Resource::Properties::AWS::WAFv2::WebACL::DefaultAction',
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::WAFv2::WebACL::DefaultActionValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::WAFv2::WebACL::DefaultAction->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::WAFv2::WebACL::DefaultActionValue {
+package Cfn::Resource::Properties::Object::AWS::WAFv2::WebACL::DefaultAction {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -801,3 +850,30 @@ package Cfn::Resource::Properties::AWS::WAFv2::WebACL {
 }
 
 1;
+### main pod documentation begin ###
+
+=encoding UTF-8
+
+=head1 NAME
+
+Cfn::Resource::AWS::WAFv2::WebACL - Cfn resource for AWS::WAFv2::WebACL
+
+=head1 DESCRIPTION
+
+This module implements a Perl module that represents the CloudFormation object AWS::WAFv2::WebACL.
+
+See L<Cfn> for more information on how to use it.
+
+=head1 AUTHOR
+
+    Jose Luis Martinez
+    CAPSiDE
+    jlmartinez@capside.com
+
+=head1 COPYRIGHT and LICENSE
+
+Copyright (c) 2013 by CAPSiDE
+This code is distributed under the Apache 2 License. The full text of the 
+license can be found in the LICENSE file included with this module.
+
+=cut

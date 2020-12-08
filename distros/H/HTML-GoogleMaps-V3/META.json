@@ -45,6 +45,9 @@
    },
    "release_status" : "stable",
    "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/Humanstate/html-googlemaps-v3/issues"
+      },
       "homepage" : "https://metacpan.org/module/HTML/GoogleMaps/V3",
       "license" : [
          "http://dev.perl.org/licenses/"
@@ -55,6 +58,6 @@
          "web" : "https://github.com/Humanstate/html-googlemaps-v3"
       }
    },
-   "version" : "0.15",
+   "version" : "0.16",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

@@ -2,7 +2,7 @@
 # PODNAME: App::Prove::Plugin::TestRail
 
 package App::Prove::Plugin::TestRail;
-$App::Prove::Plugin::TestRail::VERSION = '0.046';
+$App::Prove::Plugin::TestRail::VERSION = '0.047';
 use strict;
 use warnings;
 use utf8;
@@ -47,6 +47,7 @@ sub load {
     $ENV{'TESTRAIL_PROJ'}      = $params->{project};
     $ENV{'TESTRAIL_RUN'}       = $params->{run};
     $ENV{'TESTRAIL_PLAN'}      = $params->{plan};
+    $ENV{'TESTRAIL_PLAN_ID'}   = $params->{plan_id};
     $ENV{'TESTRAIL_CONFIGS'}   = $params->{configs};
     $ENV{'TESTRAIL_VERSION'}   = $params->{version};
     $ENV{'TESTRAIL_STEPS'}     = $params->{step_results};
@@ -75,7 +76,7 @@ App::Prove::Plugin::TestRail - Upload your TAP results to TestRail in realtime
 
 =head1 VERSION
 
-version 0.046
+version 0.047
 
 =head1 SYNOPSIS
 

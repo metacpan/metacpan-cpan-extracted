@@ -1,25 +1,27 @@
 #!/usr/bin/perl
 
-use strict;
+use v5.26;
 use warnings;
 
 use Test::More;
 use Test::Device::Chip::Adapter;
 
+use Future::AsyncAwait;
+
 use Device::Chip::ADS1115;
 
 my $chip = Device::Chip::ADS1115->new;
 
-$chip->mount(
+await $chip->mount(
    my $adapter = Test::Device::Chip::Adapter->new,
-)->get;
+);
 
 # ->read_config
 {
    $adapter->expect_write_then_read( "\x01", 2 )
       ->returns( "\x85\x83" );
 
-   is_deeply( $chip->read_config->get,
+   is_deeply( await $chip->read_config,
       {
          COMP_LAT  => '',
          COMP_MODE => "TRAD",
@@ -41,9 +43,9 @@ $chip->mount(
 {
    $adapter->expect_write( "\x01\x87\x83" );
 
-   $chip->change_config(
+   await $chip->change_config(
       PGA => "1.024V",
-   )->get;
+   );
 
    $adapter->check_and_clear( '$chip->change_config' );
 }
@@ -54,8 +56,8 @@ $chip->mount(
    $adapter->expect_write_then_read( "\x00", 2 )
       ->returns( "\x12\x34" );
 
-   $chip->trigger->get;
-   is( scalar $chip->read_adc->get, 0x1234,
+   await $chip->trigger;
+   is( scalar await $chip->read_adc, 0x1234,
       '$chip->read_adc returns result' );
 
    $adapter->check_and_clear( '$chip->trigger and ->read_adc' );
@@ -66,7 +68,7 @@ $chip->mount(
    $adapter->expect_write_then_read( "\x00", 2 )
       ->returns( "\x7d\x00" );
 
-   is( scalar $chip->read_adc_voltage->get, 1.000,
+   is( scalar await $chip->read_adc_voltage, 1.000,
       '$chip->read_adc_voltage returns result' );
 
    $adapter->check_and_clear( '$chip->read_adc_voltage' );

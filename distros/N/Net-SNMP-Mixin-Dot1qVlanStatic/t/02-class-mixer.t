@@ -13,10 +13,22 @@ plan skip_all =>
   "Net::SNMP::Mixin required for testing Net::SNMP::Mixin module"
   if $@;
 
-plan tests => 14;
+plan tests => 23;
 
 is( Net::SNMP->mixer('Net::SNMP::Mixin::Dot1qVlanStatic'),
   'Net::SNMP', 'mixer returns the class name' );
+ok(
+  Net::SNMP->can('map_vlan_id2name'),
+  'map_vlan_id2name() is now a class method'
+);
+ok(
+  Net::SNMP->can('map_if_idx2vlan_id'),
+  'map_if_idx2vlan_id() is now a class method'
+);
+ok(
+  Net::SNMP->can('map_vlan_id2if_idx'),
+  'map_vlan_id2if_idx() is now a class method'
+);
 ok(
   Net::SNMP->can('map_vlan_static_ids2names'),
   'map_vlan_static_ids2names() is now a class method'
@@ -42,9 +54,21 @@ isa_ok( $session, 'Net::SNMP' );
 eval {$session->mixer("Net::SNMP::Mixin::Dot1qVlanStatic")};
 like( $@, qr/already mixed into/, 'mixed in twice is an error' );
 
+ok( $session->can('map_vlan_id2name'), '$session can map_vlan_id2name' );
+ok( $session->can('map_if_idx2vlan_id'), '$session can map_if_idx2vlan_id' );
+ok( $session->can('map_vlan_id2if_idx'), '$session can map_vlan_id2if_idx' );
 ok( $session->can('map_vlan_static_ids2names'), '$session can map_vlan_static_ids2names' );
 ok( $session->can('map_vlan_static_ids2ports'), '$session can map_vlan_static_ids2ports' );
 ok( $session->can('map_vlan_static_ports2ids'), '$session can map_vlan_static_ports2ids' );
+
+eval {$session->map_vlan_id2name};
+like( $@, qr/not initialized/i, 'not initialized' );
+
+eval {$session->map_if_idx2vlan_id};
+like( $@, qr/not initialized/i, 'not initialized' );
+
+eval {$session->map_vlan_id2if_idx};
+like( $@, qr/not initialized/i, 'not initialized' );
 
 eval {$session->map_vlan_static_ids2names};
 like( $@, qr/not initialized/i, 'not initialized' );

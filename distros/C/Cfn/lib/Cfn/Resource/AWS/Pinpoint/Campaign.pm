@@ -1,4 +1,4 @@
-# AWS::Pinpoint::Campaign generated from spec 6.3.0
+# AWS::Pinpoint::Campaign generated from spec 18.4.0
 use Moose::Util::TypeConstraints;
 
 coerce 'Cfn::Resource::Properties::AWS::Pinpoint::Campaign',
@@ -29,11 +29,11 @@ coerce 'Cfn::Resource::Properties::AWS::Pinpoint::Campaign::SetDimension',
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::Pinpoint::Campaign::SetDimensionValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::Pinpoint::Campaign::SetDimension->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::Pinpoint::Campaign::SetDimensionValue {
+package Cfn::Resource::Properties::Object::AWS::Pinpoint::Campaign::SetDimension {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -51,11 +51,11 @@ coerce 'Cfn::Resource::Properties::AWS::Pinpoint::Campaign::EventDimensions',
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::Pinpoint::Campaign::EventDimensionsValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::Pinpoint::Campaign::EventDimensions->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::Pinpoint::Campaign::EventDimensionsValue {
+package Cfn::Resource::Properties::Object::AWS::Pinpoint::Campaign::EventDimensions {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -74,11 +74,11 @@ coerce 'Cfn::Resource::Properties::AWS::Pinpoint::Campaign::QuietTime',
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::Pinpoint::Campaign::QuietTimeValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::Pinpoint::Campaign::QuietTime->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::Pinpoint::Campaign::QuietTimeValue {
+package Cfn::Resource::Properties::Object::AWS::Pinpoint::Campaign::QuietTime {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -96,11 +96,11 @@ coerce 'Cfn::Resource::Properties::AWS::Pinpoint::Campaign::Message',
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::Pinpoint::Campaign::MessageValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::Pinpoint::Campaign::Message->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::Pinpoint::Campaign::MessageValue {
+package Cfn::Resource::Properties::Object::AWS::Pinpoint::Campaign::Message {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -128,11 +128,11 @@ coerce 'Cfn::Resource::Properties::AWS::Pinpoint::Campaign::CampaignSmsMessage',
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::Pinpoint::Campaign::CampaignSmsMessageValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::Pinpoint::Campaign::CampaignSmsMessage->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::Pinpoint::Campaign::CampaignSmsMessageValue {
+package Cfn::Resource::Properties::Object::AWS::Pinpoint::Campaign::CampaignSmsMessage {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -151,11 +151,11 @@ coerce 'Cfn::Resource::Properties::AWS::Pinpoint::Campaign::CampaignEventFilter'
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::Pinpoint::Campaign::CampaignEventFilterValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::Pinpoint::Campaign::CampaignEventFilter->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::Pinpoint::Campaign::CampaignEventFilterValue {
+package Cfn::Resource::Properties::Object::AWS::Pinpoint::Campaign::CampaignEventFilter {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -173,11 +173,11 @@ coerce 'Cfn::Resource::Properties::AWS::Pinpoint::Campaign::CampaignEmailMessage
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::Pinpoint::Campaign::CampaignEmailMessageValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::Pinpoint::Campaign::CampaignEmailMessage->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::Pinpoint::Campaign::CampaignEmailMessageValue {
+package Cfn::Resource::Properties::Object::AWS::Pinpoint::Campaign::CampaignEmailMessage {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -197,11 +197,11 @@ coerce 'Cfn::Resource::Properties::AWS::Pinpoint::Campaign::Schedule',
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::Pinpoint::Campaign::ScheduleValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::Pinpoint::Campaign::Schedule->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::Pinpoint::Campaign::ScheduleValue {
+package Cfn::Resource::Properties::Object::AWS::Pinpoint::Campaign::Schedule {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -224,11 +224,11 @@ coerce 'Cfn::Resource::Properties::AWS::Pinpoint::Campaign::MessageConfiguration
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::Pinpoint::Campaign::MessageConfigurationValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::Pinpoint::Campaign::MessageConfiguration->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::Pinpoint::Campaign::MessageConfigurationValue {
+package Cfn::Resource::Properties::Object::AWS::Pinpoint::Campaign::MessageConfiguration {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -273,11 +273,11 @@ coerce 'Cfn::Resource::Properties::AWS::Pinpoint::Campaign::WriteTreatmentResour
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::Pinpoint::Campaign::WriteTreatmentResourceValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::Pinpoint::Campaign::WriteTreatmentResource->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::Pinpoint::Campaign::WriteTreatmentResourceValue {
+package Cfn::Resource::Properties::Object::AWS::Pinpoint::Campaign::WriteTreatmentResource {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -298,11 +298,11 @@ coerce 'Cfn::Resource::Properties::AWS::Pinpoint::Campaign::MetricDimension',
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::Pinpoint::Campaign::MetricDimensionValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::Pinpoint::Campaign::MetricDimension->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::Pinpoint::Campaign::MetricDimensionValue {
+package Cfn::Resource::Properties::Object::AWS::Pinpoint::Campaign::MetricDimension {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -320,11 +320,11 @@ coerce 'Cfn::Resource::Properties::AWS::Pinpoint::Campaign::Limits',
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::Pinpoint::Campaign::LimitsValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::Pinpoint::Campaign::Limits->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::Pinpoint::Campaign::LimitsValue {
+package Cfn::Resource::Properties::Object::AWS::Pinpoint::Campaign::Limits {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -344,11 +344,11 @@ coerce 'Cfn::Resource::Properties::AWS::Pinpoint::Campaign::CampaignHook',
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::Pinpoint::Campaign::CampaignHookValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::Pinpoint::Campaign::CampaignHook->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::Pinpoint::Campaign::CampaignHookValue {
+package Cfn::Resource::Properties::Object::AWS::Pinpoint::Campaign::CampaignHook {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -367,11 +367,11 @@ coerce 'Cfn::Resource::Properties::AWS::Pinpoint::Campaign::AttributeDimension',
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::Pinpoint::Campaign::AttributeDimensionValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::Pinpoint::Campaign::AttributeDimension->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::Pinpoint::Campaign::AttributeDimensionValue {
+package Cfn::Resource::Properties::Object::AWS::Pinpoint::Campaign::AttributeDimension {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -403,3 +403,30 @@ package Cfn::Resource::Properties::AWS::Pinpoint::Campaign {
 }
 
 1;
+### main pod documentation begin ###
+
+=encoding UTF-8
+
+=head1 NAME
+
+Cfn::Resource::AWS::Pinpoint::Campaign - Cfn resource for AWS::Pinpoint::Campaign
+
+=head1 DESCRIPTION
+
+This module implements a Perl module that represents the CloudFormation object AWS::Pinpoint::Campaign.
+
+See L<Cfn> for more information on how to use it.
+
+=head1 AUTHOR
+
+    Jose Luis Martinez
+    CAPSiDE
+    jlmartinez@capside.com
+
+=head1 COPYRIGHT and LICENSE
+
+Copyright (c) 2013 by CAPSiDE
+This code is distributed under the Apache 2 License. The full text of the 
+license can be found in the LICENSE file included with this module.
+
+=cut

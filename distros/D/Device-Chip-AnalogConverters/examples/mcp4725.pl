@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 
-use strict;
+use v5.26;
 use warnings;
 
 use Device::Chip::MCP4725;
@@ -17,12 +17,12 @@ GetOptions(
 ) or exit 1;
 
 my $chip = Device::Chip::MCP4725->new;
-$chip->mount_from_paramstr(
+await $chip->mount_from_paramstr(
    Device::Chip::Adapter->new_from_description( $ADAPTER ),
    $MOUNTPARAMS,
-)->get;
+);
 
-$chip->protocol->power(1)->get;
+await $chip->protocol->power(1);
 
 $SIG{INT} = $SIG{TERM} = sub { exit 1; };
 
@@ -31,14 +31,14 @@ END {
 }
 
 if( defined $EEPROM ) {
-   $chip->write_dac_and_eeprom( $EEPROM )->get;
+   await $chip->write_dac_and_eeprom( $EEPROM );
 }
 
 if( $PRINT_CONFIG ) {
-   my $config = $chip->read_config->get;
+   my $config = await $chip->read_config;
    printf "%20s: %s\n", $_, $config->{$_} for sort keys %$config;
 }
 
 foreach my $code ( 0 .. 4095 ) {
-   $chip->write_dac( $code )->get;
+   await $chip->write_dac( $code );
 }

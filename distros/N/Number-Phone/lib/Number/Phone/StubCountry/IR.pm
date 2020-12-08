@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20200904144533;
+our $VERSION = 1.20201204215956;
 
 my $formatters = [
                 {
@@ -132,37 +132,33 @@ my $validators = {
           )\\d{4}
         ',
                 'mobile' => '
+          99(?:
+            5[15]0|
+            888|
+            9(?:
+              0[013]|
+              21|
+              77|
+              88
+            )
+          )\\d{5}|
           9(?:
+            0(?:
+              [1-35]\\d|
+              4[4-6]
+            )|
             (?:
-              0(?:
-                [1-35]\\d|
-                4[4-6]
-              )|
-              (?:
-                [13]\\d|
-                2[0-2]
-              )\\d
+              [13]\\d|
+              2[0-3]
             )\\d|
             9(?:
-              (?:
-                [0-2]\\d|
-                3[01]|
-                4[45]
-              )\\d|
-              5[15]0|
-              8(?:
-                1\\d|
-                88
-              )|
-              9(?:
-                0[013]|
-                1\\d|
-                21|
-                77|
-                9[6-9]
-              )
+              [0-2]\\d|
+              3[01]|
+              4[45]|
+              81|
+              9[19]
             )
-          )\\d{5}
+          )\\d{6}
         ',
                 'pager' => '',
                 'personal_number' => '',
@@ -190,68 +186,68 @@ my $validators = {
                 'voip' => '993[2-9]\\d{6}'
               };
 my %areanames = ();
-$areanames{en}->{9811} = "Mazandaran";
-$areanames{en}->{9813} = "Gilan";
-$areanames{en}->{9817} = "Golestan";
-$areanames{en}->{9821} = "Tehran\ province";
-$areanames{en}->{9823} = "Semnan\ province";
-$areanames{en}->{9824} = "Zanjan\ province";
-$areanames{en}->{9825} = "Qom\ province";
-$areanames{en}->{9826} = "Alborz";
-$areanames{en}->{9828} = "Qazvin\ province";
-$areanames{en}->{9831} = "Isfahan\ province";
-$areanames{en}->{9834} = "Kerman\ province";
-$areanames{en}->{9835} = "Yazd\ province";
-$areanames{en}->{9838} = "Chahar\-mahal\ and\ Bakhtiari";
-$areanames{en}->{9841} = "East\ Azarbaijan";
-$areanames{en}->{9844} = "West\ Azarbaijan";
-$areanames{en}->{9845} = "Ardabil\ province";
-$areanames{en}->{9851} = "Razavi\ Khorasan";
-$areanames{en}->{9854} = "Sistan\ and\ Baluchestan";
-$areanames{en}->{9856} = "South\ Khorasan";
-$areanames{en}->{9858} = "North\ Khorasan";
-$areanames{en}->{9861} = "Khuzestan";
-$areanames{en}->{9866} = "Lorestan";
-$areanames{en}->{9871} = "Fars";
-$areanames{en}->{9874} = "Kohgiluyeh\ and\ Boyer\-Ahmad";
-$areanames{en}->{9876} = "Hormozgan";
-$areanames{en}->{9877} = "Bushehr\ province";
-$areanames{en}->{9881} = "Hamadan\ province";
-$areanames{en}->{9883} = "Kermanshah\ province";
-$areanames{en}->{9884} = "Ilam\ province";
-$areanames{en}->{9886} = "Markazi";
-$areanames{en}->{9887} = "Kurdistan";
-$areanames{fa}->{9811} = "مازندران";
-$areanames{fa}->{9813} = "گیلان";
-$areanames{fa}->{9817} = "گلستان";
-$areanames{fa}->{9821} = "استان\ تهران";
-$areanames{fa}->{9823} = "استان\ سمنان";
-$areanames{fa}->{9824} = "استان\ زنجان";
-$areanames{fa}->{9825} = "استان\ قم";
-$areanames{fa}->{9826} = "البرز";
-$areanames{fa}->{9828} = "استان\ قزوین";
-$areanames{fa}->{9831} = "استان\ اصفهان";
-$areanames{fa}->{9834} = "استان\ کرمان";
-$areanames{fa}->{9835} = "استان\ یزد";
-$areanames{fa}->{9838} = "چهارمحال\ و\ بختیاری";
-$areanames{fa}->{9841} = "آذربایجان\ شرقی";
-$areanames{fa}->{9844} = "آذربایجان\ غربی";
-$areanames{fa}->{9845} = "استان\ اردبیل";
-$areanames{fa}->{9851} = "خراسان\ رضوی";
-$areanames{fa}->{9854} = "سیستان\ و\ بلوچستان";
-$areanames{fa}->{9856} = "خراسان\ جنوبی";
-$areanames{fa}->{9858} = "خراسان\ شمالی";
-$areanames{fa}->{9861} = "خوزستان";
-$areanames{fa}->{9866} = "لرستان";
-$areanames{fa}->{9871} = "فارس";
-$areanames{fa}->{9874} = "کهگیلویه\ و\ بویراحمد";
-$areanames{fa}->{9876} = "هرمزگان";
-$areanames{fa}->{9877} = "استان\ بوشهر";
-$areanames{fa}->{9881} = "استان\ همدان";
-$areanames{fa}->{9883} = "استان\ کرمانشاه";
-$areanames{fa}->{9884} = "استان\ ایلام";
-$areanames{fa}->{9886} = "مرکزی";
-$areanames{fa}->{9887} = "کردستان";
+$areanames{fa} = {"9887", "کردستان",
+"9876", "هرمزگان",
+"9811", "مازندران",
+"9841", "آذربایجان\ شرقی",
+"9831", "استان\ اصفهان",
+"9824", "استان\ زنجان",
+"9883", "استان\ کرمانشاه",
+"9854", "سیستان\ و\ بلوچستان",
+"9851", "خراسان\ رضوی",
+"9821", "استان\ تهران",
+"9844", "آذربایجان\ غربی",
+"9886", "مرکزی",
+"9834", "استان\ کرمان",
+"9877", "استان\ بوشهر",
+"9866", "لرستان",
+"9871", "فارس",
+"9884", "استان\ ایلام",
+"9823", "استان\ سمنان",
+"9858", "خراسان\ شمالی",
+"9828", "استان\ قزوین",
+"9825", "استان\ قم",
+"9856", "خراسان\ جنوبی",
+"9813", "گیلان",
+"9826", "البرز",
+"9817", "گلستان",
+"9881", "استان\ همدان",
+"9838", "چهارمحال\ و\ بختیاری",
+"9835", "استان\ یزد",
+"9861", "خوزستان",
+"9845", "استان\ اردبیل",
+"9874", "کهگیلویه\ و\ بویراحمد",};
+$areanames{en} = {"9823", "Semnan\ province",
+"9884", "Ilam\ province",
+"9871", "Fars",
+"9825", "Qom\ province",
+"9828", "Qazvin\ province",
+"9858", "North\ Khorasan",
+"9826", "Alborz",
+"9856", "South\ Khorasan",
+"9813", "Gilan",
+"9861", "Khuzestan",
+"9845", "Ardabil\ province",
+"9874", "Kohgiluyeh\ and\ Boyer\-Ahmad",
+"9835", "Yazd\ province",
+"9838", "Chahar\-mahal\ and\ Bakhtiari",
+"9817", "Golestan",
+"9881", "Hamadan\ province",
+"9831", "Isfahan\ province",
+"9841", "East\ Azarbaijan",
+"9887", "Kurdistan",
+"9811", "Mazandaran",
+"9876", "Hormozgan",
+"9854", "Sistan\ and\ Baluchestan",
+"9883", "Kermanshah\ province",
+"9824", "Zanjan\ province",
+"9821", "Tehran\ province",
+"9851", "Razavi\ Khorasan",
+"9866", "Lorestan",
+"9886", "Markazi",
+"9834", "Kerman\ province",
+"9877", "Bushehr\ province",
+"9844", "West\ Azarbaijan",};
 
     sub new {
       my $class = shift;

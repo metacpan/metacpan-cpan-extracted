@@ -6,11 +6,9 @@
 use strict;
 
 use lib 't/inc';
-use fatalwarnings;
+use nptestutils;
 
 use Test::More;
-
-END { done_testing(); }
 
 use Number::Phone::Country qw(noexport);
 
@@ -49,6 +47,8 @@ while (<DATA>) {
     is Number::Phone::Country::ndd_code($country), $ndd,
        "$country ndd prefix";
 }
+
+done_testing();
 
 __END__
 # data format is:
@@ -152,7 +152,7 @@ HN:504:00:
 HR:385:00:0
 HT:509:00:
 HU:36:00:06
-ID:62:001;008;009:0
+ID:62:008;009:0
 IE:353:00:0
 IL:972:00;012;013;014:0
 IN:91:00:0

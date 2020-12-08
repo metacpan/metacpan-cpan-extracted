@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20200904144536;
+our $VERSION = 1.20201204215957;
 
 my $formatters = [
                 {
@@ -51,8 +51,8 @@ my $validators = {
                 'mobile' => '
           77[2-9]\\d{6}|
           (?:
-            6[2-9]|
-            7[13-689]
+            6[1-9]|
+            7[1-689]
           )\\d{7}
         ',
                 'pager' => '',
@@ -67,13 +67,13 @@ my $validators = {
                 'voip' => '41\\d{7}'
               };
 my %areanames = ();
-$areanames{en}->{25522} = "Dar\-Es\-Salaam";
-$areanames{en}->{25523} = "Coast\/Morogoro\/Lindi\/Mtwara";
-$areanames{en}->{25524} = "Zanzibar";
-$areanames{en}->{25525} = "Mbeya\/Songwe\/Ruvuma\/Katavi\/Rukwa";
-$areanames{en}->{25526} = "Dodoma\/Iringa\/Njombe\/Singida\/Tabora";
-$areanames{en}->{25527} = "Arusha\/Manyara\/Kilimanjaro\/Tanga";
-$areanames{en}->{25528} = "Mwanza\/Shinyanga\/Mara\/Geita\/Simiyu\/Kagera\/Kigoma";
+$areanames{en} = {"25527", "Arusha\/Manyara\/Kilimanjaro\/Tanga",
+"25522", "Dar\-Es\-Salaam",
+"25528", "Mwanza\/Shinyanga\/Mara\/Geita\/Simiyu\/Kagera\/Kigoma",
+"25525", "Mbeya\/Songwe\/Ruvuma\/Katavi\/Rukwa",
+"25523", "Coast\/Morogoro\/Lindi\/Mtwara",
+"25526", "Dodoma\/Iringa\/Njombe\/Singida\/Tabora",
+"25524", "Zanzibar",};
 
     sub new {
       my $class = shift;

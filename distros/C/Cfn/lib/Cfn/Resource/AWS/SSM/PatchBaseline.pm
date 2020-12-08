@@ -1,4 +1,4 @@
-# AWS::SSM::PatchBaseline generated from spec 2.28.0
+# AWS::SSM::PatchBaseline generated from spec 20.1.0
 use Moose::Util::TypeConstraints;
 
 coerce 'Cfn::Resource::Properties::AWS::SSM::PatchBaseline',
@@ -14,7 +14,7 @@ package Cfn::Resource::AWS::SSM::PatchBaseline {
     [  ]
   }
   sub supported_regions {
-    [ 'ap-northeast-1','ap-northeast-2','ap-south-1','ap-southeast-1','ap-southeast-2','ca-central-1','eu-central-1','eu-west-1','eu-west-2','sa-east-1','us-east-1','us-east-2','us-west-1','us-west-2' ]
+    [ 'ap-northeast-1','ap-northeast-2','ap-northeast-3','ap-south-1','ap-southeast-1','ap-southeast-2','ca-central-1','eu-central-1','eu-west-1','eu-west-2','sa-east-1','us-east-1','us-east-2','us-west-1','us-west-2' ]
   }
 }
 
@@ -51,17 +51,37 @@ coerce 'Cfn::Resource::Properties::AWS::SSM::PatchBaseline::PatchFilter',
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::SSM::PatchBaseline::PatchFilterValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::SSM::PatchBaseline::PatchFilter->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::SSM::PatchBaseline::PatchFilterValue {
+package Cfn::Resource::Properties::Object::AWS::SSM::PatchBaseline::PatchFilter {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
   
   has Key => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has Values => (isa => 'Cfn::Value::Array|Cfn::Value::Function|Cfn::DynamicValue', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+}
+
+subtype 'Cfn::Resource::Properties::AWS::SSM::PatchBaseline::PatchStringDate',
+     as 'Cfn::Value';
+
+coerce 'Cfn::Resource::Properties::AWS::SSM::PatchBaseline::PatchStringDate',
+  from 'HashRef',
+   via {
+     if (my $f = Cfn::TypeLibrary::try_function($_)) {
+       return $f
+     } else {
+       return Cfn::Resource::Properties::Object::AWS::SSM::PatchBaseline::PatchStringDate->new( %$_ );
+     }
+   };
+
+package Cfn::Resource::Properties::Object::AWS::SSM::PatchBaseline::PatchStringDate {
+  use Moose;
+  use MooseX::StrictConstructor;
+  extends 'Cfn::Value::TypedValue';
+  
 }
 
 subtype 'Cfn::Resource::Properties::AWS::SSM::PatchBaseline::PatchFilterGroup',
@@ -73,11 +93,11 @@ coerce 'Cfn::Resource::Properties::AWS::SSM::PatchBaseline::PatchFilterGroup',
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::SSM::PatchBaseline::PatchFilterGroupValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::SSM::PatchBaseline::PatchFilterGroup->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::SSM::PatchBaseline::PatchFilterGroupValue {
+package Cfn::Resource::Properties::Object::AWS::SSM::PatchBaseline::PatchFilterGroup {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -116,16 +136,17 @@ coerce 'Cfn::Resource::Properties::AWS::SSM::PatchBaseline::Rule',
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::SSM::PatchBaseline::RuleValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::SSM::PatchBaseline::Rule->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::SSM::PatchBaseline::RuleValue {
+package Cfn::Resource::Properties::Object::AWS::SSM::PatchBaseline::Rule {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
   
   has ApproveAfterDays => (isa => 'Cfn::Value::Integer', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has ApproveUntilDate => (isa => 'Cfn::Resource::Properties::AWS::SSM::PatchBaseline::PatchStringDate', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has ComplianceLevel => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has EnableNonSecurity => (isa => 'Cfn::Value::Boolean', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has PatchFilterGroup => (isa => 'Cfn::Resource::Properties::AWS::SSM::PatchBaseline::PatchFilterGroup', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
@@ -140,11 +161,11 @@ coerce 'Cfn::Resource::Properties::AWS::SSM::PatchBaseline::RuleGroup',
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::SSM::PatchBaseline::RuleGroupValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::SSM::PatchBaseline::RuleGroup->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::SSM::PatchBaseline::RuleGroupValue {
+package Cfn::Resource::Properties::Object::AWS::SSM::PatchBaseline::RuleGroup {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -183,11 +204,11 @@ coerce 'Cfn::Resource::Properties::AWS::SSM::PatchBaseline::PatchSource',
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::SSM::PatchBaseline::PatchSourceValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::SSM::PatchBaseline::PatchSource->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::SSM::PatchBaseline::PatchSourceValue {
+package Cfn::Resource::Properties::Object::AWS::SSM::PatchBaseline::PatchSource {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -218,3 +239,30 @@ package Cfn::Resource::Properties::AWS::SSM::PatchBaseline {
 }
 
 1;
+### main pod documentation begin ###
+
+=encoding UTF-8
+
+=head1 NAME
+
+Cfn::Resource::AWS::SSM::PatchBaseline - Cfn resource for AWS::SSM::PatchBaseline
+
+=head1 DESCRIPTION
+
+This module implements a Perl module that represents the CloudFormation object AWS::SSM::PatchBaseline.
+
+See L<Cfn> for more information on how to use it.
+
+=head1 AUTHOR
+
+    Jose Luis Martinez
+    CAPSiDE
+    jlmartinez@capside.com
+
+=head1 COPYRIGHT and LICENSE
+
+Copyright (c) 2013 by CAPSiDE
+This code is distributed under the Apache 2 License. The full text of the 
+license can be found in the LICENSE file included with this module.
+
+=cut

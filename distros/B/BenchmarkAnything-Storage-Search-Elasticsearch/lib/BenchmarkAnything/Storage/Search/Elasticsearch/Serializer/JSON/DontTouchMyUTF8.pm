@@ -1,7 +1,7 @@
 package BenchmarkAnything::Storage::Search::Elasticsearch::Serializer::JSON::DontTouchMyUTF8;
 our $AUTHORITY = 'cpan:SCHWIGON';
 # ABSTRACT: Pass through known-utf8 data untouched to Elasticsearch.
-$BenchmarkAnything::Storage::Search::Elasticsearch::Serializer::JSON::DontTouchMyUTF8::VERSION = '0.004';
+$BenchmarkAnything::Storage::Search::Elasticsearch::Serializer::JSON::DontTouchMyUTF8::VERSION = '0.005';
 # As seen in
 #   https://github.com/elastic/elasticsearch-perl/issues/57
 # (Kudos to Celogeek - you are not alone!)
@@ -37,7 +37,7 @@ Steffen Schwigon <ss5@renormalist.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by Steffen Schwigon.
+This software is copyright (c) 2020 by Steffen Schwigon.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

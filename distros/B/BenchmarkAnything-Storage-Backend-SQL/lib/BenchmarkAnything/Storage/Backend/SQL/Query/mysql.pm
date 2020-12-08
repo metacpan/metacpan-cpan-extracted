@@ -1,7 +1,7 @@
 package BenchmarkAnything::Storage::Backend::SQL::Query::mysql;
 our $AUTHORITY = 'cpan:TAPPER';
 # ABSTRACT: BenchmarkAnything::Storage::Backend::SQL - querying - MySQL backend
-$BenchmarkAnything::Storage::Backend::SQL::Query::mysql::VERSION = '0.026';
+$BenchmarkAnything::Storage::Backend::SQL::Query::mysql::VERSION = '0.028';
 use strict;
 use warnings;
 use base 'BenchmarkAnything::Storage::Backend::SQL::Query::common';
@@ -449,7 +449,7 @@ Roberto Schaefer <schaefr@amazon.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2019 by Amazon.com, Inc. or its affiliates.
+This software is Copyright (c) 2020 by Amazon.com, Inc. or its affiliates.
 
 This is free software, licensed under:
 

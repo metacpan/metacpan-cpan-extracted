@@ -1,0 +1,76 @@
+[
+  {
+    '/top/level' => {},
+    'all' => {},
+    'bar' => {},
+    'first' => {},
+    'sany' => {},
+    'subdir/all' => {},
+    'subdir/sbar' => {},
+    'subdir/sfoo' => {},
+    'subdir/subsubdir/all' => {}
+  },
+  {
+    'all' => {
+      'bar' => {
+        '0' => {
+          'recipe' => [],
+          'recipe_raw' => []
+        }
+      },
+      'sany' => {
+        '0' => $VAR1->[1]{'all'}{'bar'}{'0'}
+      }
+    },
+    'sany' => {
+      'sany' => {
+        '0' => {
+          'recipe' => [
+            'cd subdir && $(MK)',
+            'say hi'
+          ],
+          'recipe_raw' => [
+            'cd subdir && $(MK)',
+            'say hi'
+          ]
+        }
+      },
+      'subdir/all' => {
+        '0' => {}
+      }
+    },
+    'subdir/all' => {
+      'first' => {
+        '0' => {
+          'recipe' => [
+            'cd subsubdir && make'
+          ],
+          'recipe_raw' => [
+            'cd subsubdir && make'
+          ]
+        }
+      },
+      'subdir/sbar' => {
+        '0' => $VAR1->[1]{'subdir/all'}{'first'}{'0'}
+      },
+      'subdir/sfoo' => {
+        '0' => $VAR1->[1]{'subdir/all'}{'first'}{'0'}
+      },
+      'subdir/subsubdir/all' => {
+        '0' => {}
+      }
+    },
+    'subdir/subsubdir/all' => {
+      '/top/level' => {
+        '0' => {
+          'recipe' => [
+            'echo L3'
+          ],
+          'recipe_raw' => [
+            'echo L3'
+          ]
+        }
+      }
+    }
+  }
+]

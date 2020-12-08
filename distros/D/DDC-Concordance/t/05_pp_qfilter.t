@@ -1,5 +1,5 @@
 # -*- Mode: CPerl -*-
-use Test::More tests=>12;
+use Test::More tests=>14;
 use DDC::PP;
 
 ##-- 1..2: rank
@@ -26,6 +26,10 @@ like($f->toString, qr{^\#HAS(?:_FIELD)?\['?author'?,/kant/\]$}i, "hasregex:str")
 ##-- 11..12: hasset
 ok(($f=DDC::PP::CQFHasFieldSet->new('author',[qw(kant hegel)],0)), "hasset:new");
 like($f->toString, qr(^\#HAS(?:_FIELD)?\['?author'?,\{'?kant'?,'?hegel'?\}\]$)i, "hasset:str");
+
+##-- 13..14: prune (v2.2.8)
+ok(($f=DDC::PP::CQFPrune->new(DDC::PP::LessByPruneKey, 42, undef)), "prune:new");
+like($f->toString, qr(^\#PRUNE(?:_ASC)?\[42\]$)i, "prune:str");
 
 print "\n";
 

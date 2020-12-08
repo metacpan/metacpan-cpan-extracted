@@ -35,6 +35,7 @@ DROLSKY's
 Daisuke
 Dan
 DateTime
+DateTimeX
 DateTimes
 Dave
 David
@@ -80,6 +81,7 @@ Mark
 McIntosh
 Measham
 Measham's
+MetaCPAN
 Michael
 Mohammad
 Nick
@@ -93,6 +95,7 @@ PPExtra
 Paul
 PayPal
 Philippe
+Postgres
 Precious
 QQQ
 QQQQ
@@ -149,6 +152,7 @@ durations
 eee
 eeee
 eeeee
+env
 ether
 fallback
 fglock

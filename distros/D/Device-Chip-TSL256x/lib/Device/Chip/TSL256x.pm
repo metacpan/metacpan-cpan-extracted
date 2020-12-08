@@ -1,15 +1,14 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2016-2019 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2016-2020 -- leonerd@leonerd.org.uk
 
-package Device::Chip::TSL256x;
+use v5.26;
+use Object::Pad 0.19;
 
-use strict;
-use warnings;
-use base qw( Device::Chip );
-
-our $VERSION = '0.02';
+package Device::Chip::TSL256x 0.03;
+class Device::Chip::TSL256x
+   extends Device::Chip;
 
 use Data::Bitfield qw( bitfield enumfield );
 use Future;
@@ -26,16 +25,17 @@ C<Device::Chip::TSL256x> - chip driver for F<TSL256x>
 =head1 SYNOPSIS
 
    use Device::Chip::TSL256x;
+   use Future::AsyncAwait;
 
    my $chip = Device::Chip::TSL256x->new;
-   $chip->mount( Device::Chip::Adapter::...->new )->get;
+   await $chip->mount( Device::Chip::Adapter::...->new );
 
-   $chip->power(1)->get;
+   await $chip->power(1);
 
    sleep 1; # Wait for one integration cycle
 
    printf "Current ambient light level is %.2f lux\n",
-      scalar $chip->read_lux->get;
+      scalar await $chip->read_lux;
 
 =head1 DESCRIPTION
 
@@ -48,12 +48,10 @@ concepts or features, only the use of this module to access them.
 
 =cut
 
-sub I2C_options
+method I2C_options
 {
-   my $self = shift;
-
    return (
-      addr        => $self->{addr} // 0x39,
+      addr        => 0x39,
       max_bitrate => 100E3,
    );
 }
@@ -77,40 +75,34 @@ use constant {
    REG_DATA1      => 0x0E, # 16bit
 };
 
-bitfield TIMING =>
+bitfield { format => "bytes-LE" }, TIMING =>
    GAIN  => enumfield( 4, qw( 1 16 )),
    INTEG => enumfield( 0, qw( 13ms 101ms 402ms ));
 
-sub _read
+async method _read ( $addr, $len )
 {
-   my $self = shift;
-   my ( $addr, $len ) = @_;
-
-   $self->protocol->write_then_read(
+   return await $self->protocol->write_then_read(
       ( pack "C", CMD_MASK | ( $addr & 0x0f ) ), $len
    );
 }
 
-sub _write
+async method _write ( $addr, $data )
 {
-   my $self = shift;
-   my ( $addr, $data ) = @_;
-
-   $self->protocol->write(
+   await $self->protocol->write(
       pack "C a*", CMD_MASK | ( $addr & 0x0f ), $data
    );
 }
 
 =head1 ACCESSORS
 
-The following methods documented with a trailing call to C<< ->get >> return
-L<Future> instances.
+The following methods documented in an C<await> expression return L<Future>
+instances.
 
 =cut
 
 =head2 read_config
 
-   $config = $chip->read_config->get
+   $config = await $chip->read_config;
 
 Returns a C<HASH> reference of the contents of timing control register, using
 fields named from the data sheet.
@@ -120,7 +112,7 @@ fields named from the data sheet.
 
 =head2 change_config
 
-   $chip->change_config( %changes )->get
+   await $chip->change_config( %changes );
 
 Writes updates to the timing control register.
 
@@ -130,51 +122,39 @@ subsequent modifications more efficient. This cache will not respect the
 
 =cut
 
-sub _cached_read_TIMING
+has $_TIMINGbytes;
+
+async method _cached_read_TIMING ()
 {
-   my $self = shift;
-   defined $self->{TIMINGbytes}
-      ? return Future->done( $self->{TIMINGbytes} )
-      : return $self->_read( REG_TIMING, 1 )
-            ->on_done( sub { $self->{TIMINGbytes} = $_[0] } );
+   return $_TIMINGbytes //= await $self->_read( REG_TIMING, 1 );
 }
 
-async sub read_config
+async method read_config ()
 {
-   my $self = shift;
-
-   return {
-      unpack_TIMING( unpack "C", await $self->_cached_read_TIMING )
-   };
+   return { unpack_TIMING( await $self->_cached_read_TIMING ) };
 }
 
-async sub change_config
+async method change_config ( %changes )
 {
-   my $self = shift;
-   my %changes = @_;
-
    my $config = await $self->read_config;
 
    $config->{$_} = $changes{$_} for keys %changes;
 
-   my $TIMING = $self->{TIMINGbytes} =
-      pack "C", pack_TIMING( %$config );
+   my $TIMING = $_TIMINGbytes = pack_TIMING( %$config );
 
    await $self->_write( REG_TIMING, $TIMING );
 }
 
 =head2 read_id
 
-   $id = $chip->read_id->get
+   $id = await $chip->read_id;
 
 Returns the chip's ID register value.
 
 =cut
 
-async sub read_id
+async method read_id ()
 {
-   my $self = shift;
-
    return unpack "C", await $self->_read( REG_ID, 1 );
 }
 
@@ -182,40 +162,34 @@ async sub read_id
 
 =head2 read_data1
 
-   $data0 = $chip->read_data0->get
+   $data0 = await $chip->read_data0;
 
-   $data1 = $chip->read_data1->get
+   $data1 = await $chip->read_data1;
 
 Reads the current values of the ADC channels.
 
 =cut
 
-async sub read_data0
+async method read_data0 ()
 {
-   my $self = shift;
-
    return unpack "S<", await $self->_read( REG_DATA0, 2 );
 }
 
-async sub read_data1
+async method read_data1 ()
 {
-   my $self = shift;
-
    return unpack "S<", await $self->_read( REG_DATA1, 2 );
 }
 
 =head2 read_data
 
-   ( $data0, $data1 ) = $chip->read_data->get
+   ( $data0, $data1 ) = await $chip->read_data;
 
 Read the current values of both ADC channels in a single I²C transaction.
 
 =cut
 
-async sub read_data
+async method read_data ()
 {
-   my $self = shift;
-
    return unpack "S< S<", await $self->_read( REG_DATA0, 4 );
 }
 
@@ -225,25 +199,22 @@ async sub read_data
 
 =head2 power
 
-   $chip->power( $on )->get
+   await $chip->power( $on );
 
 Enables or disables the main power control bits in the C<CONTROL> register.
 
 =cut
 
-sub power
+async method power ( $on )
 {
-   my $self = shift;
-   my ( $on ) = @_;
-
-   $self->_write( REG_CONTROL, $on ? "\x03" : "\x00" );
+   await $self->_write( REG_CONTROL, $on ? "\x03" : "\x00" );
 }
 
 =head2 read_lux
 
-   $lux = $chip->read_lux->get
+   $lux = await $chip->read_lux;
 
-   ( $lux, $data0, $data1 ) = $chip->read_lux->get
+   ( $lux, $data0, $data1 ) = await $chip->read_lux;
 
 Reads the two data registers then performs the appropriate scaling
 calculations to return a floating-point number that approximates the light
@@ -263,10 +234,8 @@ my %INTEG_to_msec = (
    '402ms' => 402,
 );
 
-async sub read_lux
+async method read_lux ()
 {
-   my $self = shift;
-
    my ( $data0, $data1, $config ) = await Future->needs_all(
       $self->read_data,
       $self->read_config,

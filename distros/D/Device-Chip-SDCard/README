@@ -4,18 +4,19 @@ NAME
 
 SYNOPSIS
 
-     use Device::Chip::SDCard;
+       use Device::Chip::SDCard;
+       use Future::AsyncAwait;
     
-     my $card = Device::Chip::SDCard->new;
+       my $card = Device::Chip::SDCard->new;
     
-     $card->mount( Device::Chip::Adapter::...->new )->get;
+       await $card->mount( Device::Chip::Adapter::...->new );
     
-     $card->initialise->get;
+       await $card->initialise;
     
-     my $bytes = $card->read_block( 0 )->get;
+       my $bytes = await $card->read_block( 0 );
     
-     print "Read block zero:\n";
-     printf "%v02X\n", $bytes;
+       print "Read block zero:\n";
+       printf "%v02X\n", $bytes;
 
 DESCRIPTION
 
@@ -27,25 +28,25 @@ DESCRIPTION
 
 METHODS
 
-    The following methods documented with a trailing call to ->get return
-    Future instances.
+    The following methods documented in an await expression return Future
+    instances.
 
  initialise
 
-       $card->initialise->get
+       await $card->initialise;
 
     Checks that an SD card is present, switches it into SPI mode and waits
     for its initialisation process to complete.
 
  size
 
-       $n_bytes = $card->size->get
+       $n_bytes = await $card->size;
 
     Returns the size of the media card in bytes.
 
  read_csd
 
-       $data = $card->read_csd->get;
+       $data = await $card->read_csd;
 
     Returns a HASH reference containing decoded fields from the SD card's
     CSD ("card-specific data") register.
@@ -88,7 +89,7 @@ METHODS
 
  read_ocr
 
-       $fields = $card->read_ocr->get
+       $fields = await $card->read_ocr;
 
     Returns a HASH reference containing decoded fields from the card's OCR
     ("operating conditions register").
@@ -103,7 +104,7 @@ METHODS
 
  read_block
 
-       $bytes = $card->read_block( $lba )->get
+       $bytes = await $card->read_block( $lba );
 
     Returns a 512-byte bytestring containing data read from the given
     sector of the card.

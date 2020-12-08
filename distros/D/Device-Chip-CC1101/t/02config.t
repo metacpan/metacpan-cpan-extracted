@@ -1,18 +1,20 @@
 #!/usr/bin/perl
 
-use strict;
+use v5.26;
 use warnings;
 
 use Test::More;
 use Test::Device::Chip::Adapter;
 
+use Future::AsyncAwait;
+
 use Device::Chip::CC1101;
 
 my $chip = Device::Chip::CC1101->new;
 
-$chip->mount(
+await $chip->mount(
    my $adapter = Test::Device::Chip::Adapter->new,
-)->get;
+);
 
 # ->read_config
 {
@@ -24,10 +26,8 @@ $chip->mount(
    $adapter->expect_write_then_read( "\xFE", 8 )
       ->returns( "\xC6\x00\x00\x00\x00\x00\x00\x00" );
 
-   my %config = $chip->read_config->get;
-
    is_deeply(
-      { $chip->read_config->get },
+      { await $chip->read_config },
       {
          # IOCFG2
          GDO2_INV              => '',
@@ -163,10 +163,10 @@ $chip->mount(
 {
    $adapter->expect_write( "\x46" . "\x08\x04\x44" );
 
-   $chip->change_config(
+   await $chip->change_config(
       PACKET_LENGTH => 8,
       LENGTH_CONFIG => "fixed",
-   )->get;
+   );
 
    $adapter->check_and_clear( '->change_config' );
 }
@@ -175,9 +175,9 @@ $chip->mount(
 {
    $adapter->expect_write( "\x7E" . "\x03\x0F\x1E\x27\x50\x81\xCB\xC2" );
 
-   $chip->change_config(
+   await $chip->change_config(
       PATABLE => "03.0F.1E.27.50.81.CB.C2",
-   )->get;
+   );
 
    $adapter->check_and_clear( '->change_config on PATABLE' );
 }
@@ -188,9 +188,9 @@ $chip->mount(
       "\x08\x00\x21\x65\x6A\x5B\xF8\x13\xA0\xF8\x47\x07\x0C\x18\x1D\x1C\xC7\x00\xB2\x87\x6B\xF8\xB6\x17\xEA\x0A\x00\x11"
    );
 
-   $chip->change_config(
+   await $chip->change_config(
       mode => "GFSK-100kb",
-   )->get;
+   );
 
    $adapter->check_and_clear( '->change_config preset mode' );
 }
@@ -202,9 +202,9 @@ $chip->mount(
    # PATABLE
    $adapter->expect_write( "\x7E" . "\x12\x0E\x1D\x34\x60\x84\xC8\xC0" );
 
-   $chip->change_config(
+   await $chip->change_config(
       band => "433MHz",
-   )->get;
+   );
 
    $adapter->check_and_clear( '->change_config band' );
 }

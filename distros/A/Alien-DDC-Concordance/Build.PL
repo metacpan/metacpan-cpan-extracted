@@ -6,6 +6,9 @@ use Alien::Base::ModuleBuild;
 ##-- we don't expect this package to build anywhere but linux (RT #124451)
 die("cowardly refusing to build on non-linux system; edit Build.PL and try again!") if ($^O !~ /linux/i);
 
+##-- minimum installed ddc version (for 'alien_version_check')
+my $min_ddc_version = "2.2.8";
+
 ##======================================================================
 my $class = Alien::Base::ModuleBuild->subclass
     (
@@ -53,6 +56,7 @@ my $builder = $class->new
 			location => 'projects/ddc-concordance/files/latest/',
 			exact_filename => 'download',
 		       },
+   alien_version_check => "%{pkg_config} --atleast-version ${min_ddc_version} %n && %{pkg_config} --modversion %n",
    alien_build_commands => [
 			    ##-- RT #129101: jemalloc causes segfaults on fedora 28?
 			    '%c --prefix=%s --enable-shared --enable-static --disable-jemalloc',

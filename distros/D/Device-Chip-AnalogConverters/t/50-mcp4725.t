@@ -1,25 +1,27 @@
 #!/usr/bin/perl
 
-use strict;
+use v5.26;
 use warnings;
 
 use Test::More;
 use Test::Device::Chip::Adapter;
 
+use Future::AsyncAwait;
+
 use Device::Chip::MCP4725;
 
 my $chip = Device::Chip::MCP4725->new;
 
-$chip->mount(
+await $chip->mount(
    my $adapter = Test::Device::Chip::Adapter->new,
-)->get;
+);
 
 # ->read_config
 {
    $adapter->expect_read( 5 )
       ->returns( "\xC0\x80\x00\x08\x00" );
 
-   is_deeply( $chip->read_config->get,
+   is_deeply( await $chip->read_config,
       {
          RDY        => 1,
          POR        => 1,
@@ -38,7 +40,7 @@ $chip->mount(
 {
    $adapter->expect_write( "\x04\x00" );
 
-   $chip->write_dac( 1024 )->get;
+   await $chip->write_dac( 1024 );
 
    $adapter->check_and_clear( '$chip->write_dac' );
 }
@@ -47,7 +49,7 @@ $chip->mount(
 {
    $adapter->expect_write( "\x24\x00" );
 
-   $chip->write_dac( 1024, "100k" )->get;
+   await $chip->write_dac( 1024, "100k" );
 
    $adapter->check_and_clear( '$chip->write_dac with powerdown' );
 }
@@ -56,7 +58,7 @@ $chip->mount(
 {
    $adapter->expect_write( "\x60\x80\x00" );
 
-   $chip->write_dac_and_eeprom( 2048 )->get;
+   await $chip->write_dac_and_eeprom( 2048 );
 
    $adapter->check_and_clear( '$chip->write_dac_and_eeprom' );
 }

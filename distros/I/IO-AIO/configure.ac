@@ -234,5 +234,17 @@ int main (void)
 ]])],ac_cv_statx=yes,ac_cv_statx=no)])
 test $ac_cv_statx = yes && AC_DEFINE(HAVE_STATX, 1, statx(2) is available)
 
+AC_CACHE_CHECK(for accept4, ac_cv_accept4, [AC_LINK_IFELSE([AC_LANG_SOURCE([[
+#include <sys/types.h>
+#include <sys/socket.h>
+int main (void)
+{
+   int res;
+   res = accept4 (1, (struct sockaddr *)0, (socklen_t)0, SOCK_NONBLOCK | SOCK_CLOEXEC);
+   return 0;
+}
+]])],ac_cv_accept4=yes,ac_cv_accept4=no)])
+test $ac_cv_accept4 = yes && AC_DEFINE(HAVE_ACCEPT4, 1, accept4(2) is available)
+
 AC_OUTPUT
 

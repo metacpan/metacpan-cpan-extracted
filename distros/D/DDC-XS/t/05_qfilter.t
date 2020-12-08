@@ -31,5 +31,9 @@ like($f->toString, qr{^\#HAS(?:_FIELD)?\['author',/kant/\]$}i, "hasregex:str");
 ok(($f=DDC::XS::CQFHasFieldSet->new('author',[qw(kant hegel)],0)), "hasset:new");
 like($f->toString, qr(^\#HAS(?:_FIELD)?\['author',\{'hegel','kant'\}\]$)i, "hasregex:str");
 
+##-- prune (v2.2.8)
+ok(($f=DDC::XS::CQFPrune->new(DDC::XS::LessByPruneKey, 42, undef)), "prune:new");
+like($f->toString, qr(^\#PRUNE(?:_ASC)?\[42\]$)i, "prune:str");
+
 print "\n";
 done_testing();

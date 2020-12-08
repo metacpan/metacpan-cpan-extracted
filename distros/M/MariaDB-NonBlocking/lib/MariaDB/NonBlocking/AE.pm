@@ -49,16 +49,18 @@ sub _set_io_watcher {
     # amusingly, this is broken in libuv, since
     # you cannot have two watchers on the same fd;
     DEBUG && TELL "Started new io watcher ($wait_for)";
+
+    # We MUST watch on both, otherwise we might hang on SSL
     $storage->{io_r} = AE::io(
         $fd,
         0,
         sub { $cb->(MYSQL_WAIT_READ) },
-    ) if $wait_for & MYSQL_WAIT_READ;
+    );
     $storage->{io_w} = AE::io(
         $fd,
         1,
         sub { $cb->(MYSQL_WAIT_WRITE) },
-    ) if $wait_for & MYSQL_WAIT_WRITE;
+    );
     return;
 }
 

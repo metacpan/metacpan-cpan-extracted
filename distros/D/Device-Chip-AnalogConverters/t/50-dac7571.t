@@ -1,24 +1,26 @@
 #!/usr/bin/perl
 
-use strict;
+use v5.26;
 use warnings;
 
 use Test::More;
 use Test::Device::Chip::Adapter;
 
+use Future::AsyncAwait;
+
 use Device::Chip::DAC7571;
 
 my $chip = Device::Chip::DAC7571->new;
 
-$chip->mount(
+await $chip->mount(
    my $adapter = Test::Device::Chip::Adapter->new,
-)->get;
+);
 
 # ->write_dac
 {
    $adapter->expect_write( "\x04\x00" );
 
-   $chip->write_dac( 1024 )->get;
+   await $chip->write_dac( 1024 );
 
    $adapter->check_and_clear( '$chip->write_dac' );
 }
@@ -27,7 +29,7 @@ $chip->mount(
 {
    $adapter->expect_write( "\x24\x00" );
 
-   $chip->write_dac( 1024, "100k" )->get;
+   await $chip->write_dac( 1024, "100k" );
 
    $adapter->check_and_clear( '$chip->write_dac with powerdown' );
 }
@@ -36,7 +38,7 @@ $chip->mount(
 {
    $adapter->expect_write( "\x08\x00" );
 
-   $chip->write_dac_ratio( 0.5 )->get;
+   await $chip->write_dac_ratio( 0.5 );
 
    $adapter->check_and_clear( '$chip->write_dac_ratio' );
 }

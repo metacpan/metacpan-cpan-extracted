@@ -1,5 +1,10 @@
 Revision history for Device-Chip-INA219
 
+0.06    2020-12-06
+        [CHANGES]
+         * Updated to Object::Pad + Future::AsyncAwait
+         * Make better use of Data::Bitfield
+
 0.05    2017/07/27 22:12:59
         [CHANGES]
          * Use Device::Chip::Base::RegisteredI2C to reduce common code

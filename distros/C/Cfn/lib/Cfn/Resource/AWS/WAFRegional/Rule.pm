@@ -1,4 +1,4 @@
-# AWS::WAFRegional::Rule generated from spec 5.0.0
+# AWS::WAFRegional::Rule generated from spec 18.4.0
 use Moose::Util::TypeConstraints;
 
 coerce 'Cfn::Resource::Properties::AWS::WAFRegional::Rule',
@@ -51,11 +51,11 @@ coerce 'Cfn::Resource::Properties::AWS::WAFRegional::Rule::Predicate',
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::WAFRegional::Rule::PredicateValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::WAFRegional::Rule::Predicate->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::WAFRegional::Rule::PredicateValue {
+package Cfn::Resource::Properties::Object::AWS::WAFRegional::Rule::Predicate {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -76,3 +76,30 @@ package Cfn::Resource::Properties::AWS::WAFRegional::Rule {
 }
 
 1;
+### main pod documentation begin ###
+
+=encoding UTF-8
+
+=head1 NAME
+
+Cfn::Resource::AWS::WAFRegional::Rule - Cfn resource for AWS::WAFRegional::Rule
+
+=head1 DESCRIPTION
+
+This module implements a Perl module that represents the CloudFormation object AWS::WAFRegional::Rule.
+
+See L<Cfn> for more information on how to use it.
+
+=head1 AUTHOR
+
+    Jose Luis Martinez
+    CAPSiDE
+    jlmartinez@capside.com
+
+=head1 COPYRIGHT and LICENSE
+
+Copyright (c) 2013 by CAPSiDE
+This code is distributed under the Apache 2 License. The full text of the 
+license can be found in the LICENSE file included with this module.
+
+=cut

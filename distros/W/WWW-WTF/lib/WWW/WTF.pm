@@ -6,7 +6,7 @@ use v5.12;
 
 use Moose;
 
-our $VERSION = 0.6;
+our $VERSION = 0.7;
 
 __PACKAGE__->meta->make_immutable;
 

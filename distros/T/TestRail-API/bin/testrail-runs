@@ -3,7 +3,7 @@
 # PODNAME: TestRail::Bin::Runs
 
 package TestRail::Bin::Runs;
-$TestRail::Bin::Runs::VERSION = '0.046';
+$TestRail::Bin::Runs::VERSION = '0.047';
 use strict;
 use warnings;
 use utf8;
@@ -55,7 +55,7 @@ sub run {
     my $runs = TestRail::Utils::Find::findRuns( $opts, $tr );
 
     @$runs = map { $_->{name} } @$runs;
-    return ( join( "\n", @$runs ) . "\n", 0 ) if scalar(@$runs);
+    return ( join( "\n", @$runs ) . "\n",                0 ) if scalar(@$runs);
     return ( "No runs found matching your criterion.\n", 255 );
 }
 
@@ -71,7 +71,7 @@ TestRail::Bin::Runs - List runs in a TestRail project matching the provided filt
 
 =head1 VERSION
 
-version 0.046
+version 0.047
 
 =head1 SYNOPSIS
 

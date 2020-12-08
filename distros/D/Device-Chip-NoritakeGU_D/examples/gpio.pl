@@ -1,10 +1,12 @@
 #!/usr/bin/perl
 
-use strict;
+use v5.26;
 use warnings;
 
 use Device::Chip::NoritakeGU_D;
 use Device::Chip::Adapter;
+
+use Future::AsyncAwait;
 use Getopt::Long qw( :config no_ignore_case );
 use Time::HiRes qw( sleep );
 
@@ -16,26 +18,26 @@ GetOptions(
 
 my $chip = Device::Chip::NoritakeGU_D->new( interface => $INTERFACE );
 
-$chip->mount_from_paramstr(
+await $chip->mount_from_paramstr(
    Device::Chip::Adapter->new_from_description( $ADAPTER ),
    $MOUNTPARAMS,
-)->get;
+);
 
-$chip->power(1)->get;
+await $chip->power(1);
 
-$chip->initialise->get;
+await $chip->initialise;
 
 use constant CHAR_PER_LINE => 12;
 
 # Count on bottom three bits, read the top one
 
-$chip->set_gpio_direction( 0x7 )->get;
+await $chip->set_gpio_direction( 0x7 );
 
 my $x = 0;
 while(1) {
-   $chip->write_gpio( $x++ )->get;
+   await $chip->write_gpio( $x++ );
    sleep 0.05;
 
-   my $in = $chip->read_gpio->get;
+   my $in = await $chip->read_gpio;
    print "P03 ", $in & 0x8 ? "HIGH" : "low", "\n";
 }

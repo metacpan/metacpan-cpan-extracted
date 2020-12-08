@@ -31,7 +31,9 @@
             "Test::Fatal" : "0.010",
             "Test::More" : "0.88",
             "Test::Warnings" : "0.030",
+            "Time::HiRes" : "1.9719",
             "Types::Standard" : "1.00",
+            "YAML" : "1.21",
             "namespace::autoclean" : "0"
          }
       },
@@ -47,7 +49,9 @@
             "Params::Validate" : "1.08",
             "Params::ValidationCompiler" : "0.24",
             "RPC::XML" : "0.56",
+            "Time::HiRes" : "1.9719",
             "Types::Standard" : "1.00",
+            "YAML" : "1.21",
             "perl" : "5.010001"
          }
       }
@@ -61,5 +65,5 @@
          "web" : "https://github.com/abeltje/Dancer-Plugin-RPC"
       }
    },
-   "version" : "1.09"
+   "version" : "1.10"
 }

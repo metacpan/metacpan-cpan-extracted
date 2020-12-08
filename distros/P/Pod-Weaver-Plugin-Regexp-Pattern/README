@@ -3,9 +3,9 @@ NAME
     Regexp::Pattern::* distribution
 
 VERSION
-    This document describes version 0.007 of
+    This document describes version 0.008 of
     Pod::Weaver::Plugin::Regexp::Pattern (from Perl distribution
-    Pod-Weaver-Plugin-Regexp-Pattern), released on 2020-05-31.
+    Pod-Weaver-Plugin-Regexp-Pattern), released on 2020-09-14.
 
 SYNOPSIS
     In your weaver.ini:
@@ -21,8 +21,8 @@ DESCRIPTION
 
     *   Add a description about Regexp::Pattern in the Description section
 
-    *   Add a Patterns section containing list of patterns contained in the
-        module
+    *   Add a Regexp Patterns section containing list of patterns contained
+        in the module
 
     *   Mention some modules in the See Also section, including
         Regexp::Pattern

@@ -6,8 +6,11 @@ use Module::Build;
 my $build = Module::Build->new(
    module_name => 'Device::Chip::SSD1306',
    requires => {
+      'perl' => '5.026',
+      'Future::AsyncAwait' => '0.39', # async method
+      'Object::Pad' => '0.19',
+
       'Device::Chip' => 0,
-      'Future::AsyncAwait' => '0.19', # non-scalar pad lexicals bugfix (RT128176)
    },
    test_requires => {
       'Test::Device::Chip::Adapter' => 0,

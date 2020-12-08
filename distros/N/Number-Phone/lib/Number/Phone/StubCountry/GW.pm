@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20200904144532;
+our $VERSION = 1.20201204215956;
 
 my $formatters = [
                 {
@@ -54,47 +54,47 @@ my $validators = {
                 'voip' => '40\\d{5}'
               };
 my %areanames = ();
-$areanames{en}->{24544320} = "Bissau";
-$areanames{en}->{24544321} = "Bissau";
-$areanames{en}->{24544322} = "St\.\ Luzia";
-$areanames{en}->{24544325} = "Brá";
-$areanames{en}->{24544331} = "Mansôa";
-$areanames{en}->{24544332} = "Bissora";
-$areanames{en}->{24544334} = "Mansaba";
-$areanames{en}->{24544335} = "Farim";
-$areanames{en}->{24544341} = "Bafatá";
-$areanames{en}->{24544342} = "Bambadinca";
-$areanames{en}->{24544351} = "Gabu";
-$areanames{en}->{24544352} = "Sonaco";
-$areanames{en}->{24544353} = "Pirada";
-$areanames{en}->{24544354} = "Pitche";
-$areanames{en}->{24544370} = "Buba";
-$areanames{en}->{24544391} = "Canchungo";
-$areanames{en}->{24544392} = "Cacheu";
-$areanames{en}->{24544393} = "S\.\ Domingos";
-$areanames{en}->{24544394} = "Bula";
-$areanames{en}->{24544396} = "Ingoré";
-$areanames{en}->{24544397} = "Bigene";
-$areanames{pt}->{245320} = "Bissau";
-$areanames{pt}->{245321} = "Bissau";
-$areanames{pt}->{245322} = "Sta\.\ Luzia";
-$areanames{pt}->{245325} = "Brá";
-$areanames{pt}->{245331} = "Mansôa";
-$areanames{pt}->{245332} = "Bigene\/Bissorã";
-$areanames{pt}->{245334} = "Mansaba";
-$areanames{pt}->{245335} = "Farim";
-$areanames{pt}->{245341} = "Bafatá";
-$areanames{pt}->{245342} = "Bambadinca";
-$areanames{pt}->{245351} = "Gabú";
-$areanames{pt}->{245352} = "Sonaco";
-$areanames{pt}->{245353} = "Pirada";
-$areanames{pt}->{245354} = "Pitche";
-$areanames{pt}->{245370} = "Buba";
-$areanames{pt}->{245391} = "Canchungo";
-$areanames{pt}->{245392} = "Cacheu";
-$areanames{pt}->{245393} = "S\.\ Domingos";
-$areanames{pt}->{245394} = "Bula";
-$areanames{pt}->{245396} = "Ingoré";
+$areanames{pt} = {"245322", "Sta\.\ Luzia",
+"245393", "S\.\ Domingos",
+"245391", "Canchungo",
+"245352", "Sonaco",
+"245332", "Bigene\/Bissorã",
+"245341", "Bafatá",
+"245394", "Bula",
+"245370", "Buba",
+"245353", "Pirada",
+"245392", "Cacheu",
+"245351", "Gabú",
+"245335", "Farim",
+"245334", "Mansaba",
+"245321", "Bissau",
+"245354", "Pitche",
+"245396", "Ingoré",
+"245342", "Bambadinca",
+"245331", "Mansôa",
+"245325", "Brá",
+"245320", "Bissau",};
+$areanames{en} = {"24544354", "Pitche",
+"24544320", "Bissau",
+"24544331", "Mansôa",
+"24544341", "Bafatá",
+"24544351", "Gabu",
+"24544392", "Cacheu",
+"24544321", "Bissau",
+"24544397", "Bigene",
+"24544393", "S\.\ Domingos",
+"24544334", "Mansaba",
+"24544352", "Sonaco",
+"24544342", "Bambadinca",
+"24544322", "St\.\ Luzia",
+"24544391", "Canchungo",
+"24544325", "Brá",
+"24544353", "Pirada",
+"24544370", "Buba",
+"24544335", "Farim",
+"24544394", "Bula",
+"24544332", "Bissora",
+"24544396", "Ingoré",};
 
     sub new {
       my $class = shift;

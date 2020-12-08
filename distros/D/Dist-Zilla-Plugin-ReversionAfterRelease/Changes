@@ -1,5 +1,8 @@
 Revision history for Dist-Zilla-Plugin-ReversionAfterRelease
 
+0.3  2020-12-07 14:48:42 GMT
+        - Add missing dependency
+
 0.2  2018-12-11 15:05:40 GMT
         - Fix documentation example
         - Remove unused dependency

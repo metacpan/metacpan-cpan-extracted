@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20200904144534;
+our $VERSION = 1.20201204215957;
 
 my $formatters = [
                 {
@@ -94,16 +94,16 @@ my $validators = {
                 'voip' => '78[1-49]\\d{5}'
               };
 my %areanames = ();
-$areanames{en}->{3822} = "Danilovgad\/Kolasin\/Podgorica";
-$areanames{en}->{38230} = "Bar\/Ulcinj";
-$areanames{en}->{38231} = "Herceg\ Novi";
-$areanames{en}->{38232} = "Kotor\/Tivat";
-$areanames{en}->{38233} = "Budva";
-$areanames{en}->{38240} = "Niksic\/Pluzine\/Savnik";
-$areanames{en}->{38241} = "Cetinje";
-$areanames{en}->{38250} = "Bijelo\ Polje\/Mojkovac";
-$areanames{en}->{38251} = "Andrijevica\/Berane\/Blue\/Gusinje\/Petnitsa\/Rožaje";
-$areanames{en}->{38252} = "Pljevlja\/Zabljak";
+$areanames{en} = {"38230", "Bar\/Ulcinj",
+"38241", "Cetinje",
+"38233", "Budva",
+"38251", "Andrijevica\/Berane\/Blue\/Gusinje\/Petnitsa\/Rožaje",
+"38252", "Pljevlja\/Zabljak",
+"38250", "Bijelo\ Polje\/Mojkovac",
+"38231", "Herceg\ Novi",
+"38232", "Kotor\/Tivat",
+"38240", "Niksic\/Pluzine\/Savnik",
+"3822", "Danilovgad\/Kolasin\/Podgorica",};
 
     sub new {
       my $class = shift;

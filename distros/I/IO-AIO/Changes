@@ -19,12 +19,12 @@ TODO: extra socket/tcp constants &c?
 TODO: name_to_handle_At + open_by_handle_at = clone fds
 TODO: lchown
 TODO: mount/umount2/MS_* flags
+TODO: fsmount/fsconfig et al. https://lwn.net/Articles/759499/
 
 TODO: rewrite rmtree et al. to support working directories (also speed them up)
 TODO: maybe IO::AIO leaks fds when requests are cancelled? maybe initialise result to -1?
 TODO: aio_wd should use O_PATH on linux, due to lacking O_SEARCH (http://comments.gmane.org/gmane.linux.file-systems/33611)
       http://www.openwall.com/lists/musl/2013/02/23/4
-TODO: copy_file_range, copy_file_range
 TODO: FIDEDUPERANGE, file_ioctl.c
 TODO: mincore
 TODO: SOCK_CLOEXEc etc.
@@ -37,6 +37,25 @@ TODO: dup3, pipe2, accept4
 TODO: dump config.log when automated testign and configure fails
 TODO: ns time resolution in utime
 TODO: statx
+TODO: pidfd_open/pidfd_send_signal (open/poll /proc?)
+TODO: aio_fchdir/chdir? emulate chdirat?
+TODO: rt-4.0.18-20109-1573826674-1229.126277-5-0@rt.cpan.org
+TODO: aio_splice, aio_tee
+TODO: copy_file_range
+TODO: write more abpout the thread model, maybe bump some defaults?
+TODO: io_uring, but it's so broken  :/
+TODO: allow import of fds as aio_wd
+
+4.73 Fri Dec  4 02:08:37 CET 2020
+	- def0.h was not uptodate, running into musl problems
+          (reported by B Fraser).
+	- IO::AIO::splice and IO::AIO::tee didn't properly return
+          64 bit values.
+	- added IO::AIO::accept4.
+	- add various F_SEAL related fcntl constants.
+        - removed experimental marker for fdlimit functions.
+        - fiemap now includes the last segment even if it overflows
+          the end offset, which is arguably the correct behaviour.
 
 4.72 Wed Apr  3 04:56:03 CEST 2019
         - (libeio) if fd 0 is available do not use it for aio_wd, as it

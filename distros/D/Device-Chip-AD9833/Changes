@@ -1,5 +1,12 @@
 Revision history for Device-Chip-AD9833
 
+0.02    2020-12-06
+        [CHANGES]
+         * Use new toplevel 'await' syntax from Future::AsyncAwait 0.47
+
+        [BUGFIXES]
+         * Declare required version of Future::AsyncAwait (RT133639)
+
 0.01    2020-10-30
         First version, released on an unsuspecting world.
 

@@ -1,3 +1,6 @@
+[![Build Status](https://travis-ci.org/davorg/app-aphra.svg?branch=master)](https://travis-ci.org/davorg/app-aphra)
+[![Coverage Status](https://coveralls.io/repos/github/davorg/app-aphra/badge.svg?branch=master)](https://coveralls.io/github/davorg/app-aphra?branch=master)
+
 > Aphra Behn (/ˈæfrə bɛn/; 14 December 1640? – 16 April 1689) was a British
 > playwright, poet, translator and fiction writer from the Restoration era. As
 > one of the first English women to earn her living by her writing, she broke

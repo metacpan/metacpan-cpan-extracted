@@ -1,4 +1,6 @@
-use Test::More tests => 5;
+use strict;
+use warnings;
+use Test::More;
 use Number::Fraction ':constants';
 
 my $f = '1/2';
@@ -14,3 +16,4 @@ use Number::Fraction ':something';
 $f = '1/2';
 ok(!ref $f, 'Still fail to create from string');
 
+done_testing();

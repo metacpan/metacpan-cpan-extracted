@@ -23,8 +23,9 @@ requires:
   Template: '2'
   perl: '5.005'
 resources:
+  bugtracker: https://github.com/Humanstate/html-googlemaps-v3/issues
   homepage: https://metacpan.org/module/HTML/GoogleMaps/V3
   license: http://dev.perl.org/licenses/
   repository: https://github.com/Humanstate/html-googlemaps-v3.git
-version: '0.15'
+version: '0.16'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

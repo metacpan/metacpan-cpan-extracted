@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20200904144534;
+our $VERSION = 1.20201204215957;
 
 my $formatters = [
                 {
@@ -122,44 +122,44 @@ my $validators = {
                 'voip' => ''
               };
 my %areanames = ();
-$areanames{en}->{3892} = "Skopje";
-$areanames{en}->{38931} = "Kumanovo\/Kriva\ Palanka\/Kratovo";
-$areanames{en}->{38932} = "Stip\/Probistip\/Sveti\ Nikole\/Radovis";
-$areanames{en}->{38933} = "Kocani\/Berovo\/Delcevo\/Vinica";
-$areanames{en}->{38934} = "Gevgelija\/Valandovo\/Strumica\/Dojran";
-$areanames{en}->{38942} = "Gostivar";
-$areanames{en}->{38943} = "Veles\/Kavadarci\/Negotino";
-$areanames{en}->{38944} = "Tetovo";
-$areanames{en}->{38945} = "Kicevo\/Makedonski\ Brod";
-$areanames{en}->{38946} = "Ohrid\/Struga\/Debar";
-$areanames{en}->{389472} = "Bitola\/Demir\ Hisar\/Resen";
-$areanames{en}->{389474} = "Bitola\/Demir\ Hisar\/Resen";
-$areanames{en}->{389475} = "Bitola\/Demir\ Hisar\/Resen";
-$areanames{en}->{38947600} = "Bitola\/Demir\ Hisar\/Resen";
-$areanames{en}->{38947608} = "Bitola\/Demir\ Hisar\/Resen";
-$areanames{en}->{38947609} = "Bitola\/Demir\ Hisar\/Resen";
-$areanames{en}->{3894761} = "Bitola\/Demir\ Hisar\/Resen";
-$areanames{en}->{3894762} = "Bitola\/Demir\ Hisar\/Resen";
-$areanames{en}->{3894763} = "Bitola\/Demir\ Hisar\/Resen";
-$areanames{en}->{3894764} = "Bitola\/Demir\ Hisar\/Resen";
-$areanames{en}->{3894765} = "Bitola\/Demir\ Hisar\/Resen";
-$areanames{en}->{3894766} = "Bitola\/Demir\ Hisar\/Resen";
-$areanames{en}->{3894767} = "Bitola\/Demir\ Hisar\/Resen";
-$areanames{en}->{3894768} = "Bitola\/Demir\ Hisar\/Resen";
-$areanames{en}->{3894769} = "Bitola\/Demir\ Hisar\/Resen";
-$areanames{en}->{389478} = "Bitola\/Demir\ Hisar\/Resen";
-$areanames{en}->{389484} = "Prilep\/Krusevo";
-$areanames{en}->{389485} = "Prilep\/Krusevo";
-$areanames{en}->{3894861} = "Prilep\/Krusevo";
-$areanames{en}->{3894862} = "Prilep\/Krusevo";
-$areanames{en}->{3894863} = "Prilep\/Krusevo";
-$areanames{en}->{3894864} = "Prilep\/Krusevo";
-$areanames{en}->{3894865} = "Prilep\/Krusevo";
-$areanames{en}->{3894866} = "Prilep\/Krusevo";
-$areanames{en}->{3894867} = "Prilep\/Krusevo";
-$areanames{en}->{3894868} = "Prilep\/Krusevo";
-$areanames{en}->{3894869} = "Prilep\/Krusevo";
-$areanames{en}->{389488} = "Prilep\/Krusevo";
+$areanames{en} = {"389488", "Prilep\/Krusevo",
+"38932", "Stip\/Probistip\/Sveti\ Nikole\/Radovis",
+"389478", "Bitola\/Demir\ Hisar\/Resen",
+"3894766", "Bitola\/Demir\ Hisar\/Resen",
+"38943", "Veles\/Kavadarci\/Negotino",
+"3894866", "Prilep\/Krusevo",
+"3894865", "Prilep\/Krusevo",
+"3894765", "Bitola\/Demir\ Hisar\/Resen",
+"38945", "Kicevo\/Makedonski\ Brod",
+"3894867", "Prilep\/Krusevo",
+"38944", "Tetovo",
+"3894769", "Bitola\/Demir\ Hisar\/Resen",
+"3894869", "Prilep\/Krusevo",
+"3894767", "Bitola\/Demir\ Hisar\/Resen",
+"38947608", "Bitola\/Demir\ Hisar\/Resen",
+"38947600", "Bitola\/Demir\ Hisar\/Resen",
+"38946", "Ohrid\/Struga\/Debar",
+"3894763", "Bitola\/Demir\ Hisar\/Resen",
+"3894863", "Prilep\/Krusevo",
+"3894864", "Prilep\/Krusevo",
+"3894762", "Bitola\/Demir\ Hisar\/Resen",
+"3894862", "Prilep\/Krusevo",
+"3894764", "Bitola\/Demir\ Hisar\/Resen",
+"38933", "Kocani\/Berovo\/Delcevo\/Vinica",
+"3894761", "Bitola\/Demir\ Hisar\/Resen",
+"389472", "Bitola\/Demir\ Hisar\/Resen",
+"38942", "Gostivar",
+"3894861", "Prilep\/Krusevo",
+"389474", "Bitola\/Demir\ Hisar\/Resen",
+"389475", "Bitola\/Demir\ Hisar\/Resen",
+"3892", "Skopje",
+"389485", "Prilep\/Krusevo",
+"38931", "Kumanovo\/Kriva\ Palanka\/Kratovo",
+"389484", "Prilep\/Krusevo",
+"3894768", "Bitola\/Demir\ Hisar\/Resen",
+"3894868", "Prilep\/Krusevo",
+"38947609", "Bitola\/Demir\ Hisar\/Resen",
+"38934", "Gevgelija\/Valandovo\/Strumica\/Dojran",};
 
     sub new {
       my $class = shift;

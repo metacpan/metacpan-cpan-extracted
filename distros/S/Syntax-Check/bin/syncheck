@@ -1,0 +1,83 @@
+#!/usr/bin/env perl
+
+use warnings;
+use strict;
+use feature 'say';
+
+use Getopt::Long;
+use Syntax::Check;
+
+my $keep    = 0;
+my $verbose = 0;
+my $help    = 0;
+
+GetOptions (
+    "keep"      => \$keep,
+    "verbose"   => \$verbose,
+    "help"      => \$help,
+);
+
+if ($help) {
+    say "\nUSAGE: ./syncheck [-v|--verbose] [-k|--keep] perl_filename.ext\n";
+    exit;
+}
+
+if (! @ARGV || ! -f $ARGV[0]) {
+    die "Program needs a file name as its last argument...\n";
+}
+
+Syntax::Check->new(
+    file    => $ARGV[0],
+    verbose => $verbose,
+    keep    => $keep
+)->check;
+
+__END__
+
+=head1 NAME
+
+syncheck - Wraps 'perl -c' so it works even if modules are unavailable
+
+=for html
+<a href="http://travis-ci.org/stevieb9/mock-sub"><img src="https://secure.travis-ci.org/stevieb9/syntax-check.png"/>
+<a href='https://coveralls.io/github/stevieb9/syntax-check?branch=master'><img src='https://coveralls.io/repos/stevieb9/syntax-check/badge.svg?branch=master&service=github' alt='Coverage Status' /></a>
+
+=head1 DESCRIPTION
+
+This binary is a consumer of L<Syntax::Check>
+
+=head1 SYNOPSIS
+
+Binary:
+
+    syncheck [--verbose] [--keep] perl_filename.ext
+
+=head1 ARGUMENTS
+
+=head2 --keep|-k
+
+If supplied, we will keep the temporary library directory structure in your
+temp dir. By default we delete this directory upon program completion.
+
+=head2 --verbose|-v
+
+Supply this argument to get verbose output.
+
+=head2 perl_file.ext
+
+This argument is mandatory and must follow all others. It's the name of the
+Perl file to do syntax checking on.
+
+=head1 AUTHOR
+
+Steve Bertrand, C<< <steveb at cpan.org> >>
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright 2020 Steve Bertrand.
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of the the Artistic License (2.0). You may obtain a
+copy of the full license at:
+
+L<http://www.perlfoundation.org/artistic_license_2_0>

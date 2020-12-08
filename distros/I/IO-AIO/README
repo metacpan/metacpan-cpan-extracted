@@ -225,8 +225,8 @@ FUNCTIONS
        IO::AIO::npending
        IO::AIO::reinit
 
-       $nfd = IO::AIO::get_fdlimit [EXPERIMENTAL]
-       IO::AIO::min_fdlimit $nfd [EXPERIMENTAL]
+       $nfd = IO::AIO::get_fdlimit
+       IO::AIO::min_fdlimit $nfd
 
        IO::AIO::sendfile $ofh, $ifh, $offset, $count
        IO::AIO::fadvise $fh, $offset, $len, $advice
@@ -248,6 +248,7 @@ FUNCTIONS
        ($atime, $mtime, $ctime, $btime, ...) = IO::AIO::st_xtimensec
 
        # very much unportable syscalls
+       IO::AIO::accept4 $r_fh, $sockaddr, $sockaddr_len, $flags
        IO::AIO::splice $r_fh, $r_off, $w_fh, $w_off, $length, $flags
        IO::AIO::tee $r_fh, $w_fh, $length, $flags
        $actual_size = IO::AIO::pipesize $r_fh[, $new_size]
@@ -911,8 +912,8 @@ FUNCTIONS
         (network, other processes), although if you are careful and know
         what you are doing, you still can.
 
-        The following constants are available (missing ones are, as usual
-        0):
+        The following constants are available and can be used for normal
+        "ioctl" and "fcntl" as well (missing ones are, as usual 0):
 
         "F_DUPFD_CLOEXEC",
 
@@ -920,6 +921,9 @@ FUNCTIONS
 
         "FIFREEZE", "FITHAW", "FITRIM", "FICLONE", "FICLONERANGE",
         "FIDEDUPERANGE".
+
+        "F_ADD_SEALS", "F_GET_SEALS", "F_SEAL_SEAL", "F_SEAL_SHRINK",
+        "F_SEAL_GROW" and "F_SEAL_WRITE".
 
         "FS_IOC_GETFLAGS", "FS_IOC_SETFLAGS", "FS_IOC_GETVERSION",
         "FS_IOC_SETVERSION", "FS_IOC_FIEMAP".
@@ -1245,7 +1249,7 @@ FUNCTIONS
         value will fail in the expected way.
 
     IO::AIO::CWD
-        This is a compiletime constant (object) that represents the process
+        This is a compile time constant (object) that represents the process
         current working directory.
 
         Specifying this object as working directory object for a pathname is
@@ -1725,15 +1729,11 @@ FUNCTIONS
     counterpart.
 
     $numfd = IO::AIO::get_fdlimit
-        This function is *EXPERIMENTAL* and subject to change.
-
         Tries to find the current file descriptor limit and returns it, or
         "undef" and sets $! in case of an error. The limit is one larger
         than the highest valid file descriptor number.
 
     IO::AIO::min_fdlimit [$numfd]
-        This function is *EXPERIMENTAL* and subject to change.
-
         Try to increase the current file descriptor limit(s) to at least
         $numfd by changing the soft or hard file descriptor resource limit.
         If $numfd is missing, it will try to set a very high limit, although
@@ -1891,6 +1891,26 @@ FUNCTIONS
 
         On systems that do not implement "munlockall", this function returns
         ENOSYS, otherwise the return value of "munlockall".
+
+    $fh = IO::AIO::accept4 $r_fh, $sockaddr, $sockaddr_maxlen, $flags
+        Uses the GNU/Linux accept4(2) syscall, if available, to accept a
+        socket and return the new file handle on success, or sets $! and
+        returns "undef" on error.
+
+        The remote name of the new socket will be stored in $sockaddr, which
+        will be extended to allow for at least $sockaddr_maxlen octets. If
+        the socket name does not fit into $sockaddr_maxlen octets, this is
+        signaled by returning a longer string in $sockaddr, which might or
+        might not be truncated.
+
+        To accept name-less sockets, use "undef" for $sockaddr and 0 for
+        $sockaddr_maxlen.
+
+        The main reasons to use this syscall rather than portable
+        C«accept(2)> are that you can specify "SOCK_NONBLOCK" and/or
+        "SOCK_CLOEXEC" flags and you can accept name-less sockets by
+        specifying 0 for $sockaddr_maxlen, which is sadly not possible with
+        perl's interface to "accept".
 
     IO::AIO::splice $r_fh, $r_off, $w_fh, $w_off, $length, $flags
         Calls the GNU/Linux splice(2) syscall, if available. If $r_off or
@@ -2139,7 +2159,7 @@ KNOWN ISSUES
 
 SEE ALSO
     AnyEvent::AIO for easy integration into event loops, Coro::AIO for a
-    more natural syntax.
+    more natural syntax and IO::FDPass for file descriptor passing.
 
 AUTHOR
      Marc Lehmann <schmorp@schmorp.de>

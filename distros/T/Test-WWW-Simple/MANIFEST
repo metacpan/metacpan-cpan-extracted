@@ -42,4 +42,6 @@ examples/ss_garbage1.in
 examples/ss_garbage2.in
 examples/ss_user_agent.in
 lib/Test/WWW/Simple.pm
-META.json                                Module JSON meta-data (added by MakeMaker)
+xt/pod.t
+xt/pod_coverage.t
+META.json

@@ -6,7 +6,7 @@
 use 5.026;
 use Object::Pad 0.19;
 
-package Device::Chip::DAC75xx 0.10;
+package Device::Chip::DAC75xx 0.11;
 class Device::Chip::DAC75xx
    extends Device::Chip;
 
@@ -32,8 +32,8 @@ concepts or features, only the use of this module to access them.
 
 =head1 METHODS
 
-The following methods documented with a trailing call to C<< ->get >> return
-L<Future> instances.
+The following methods documented in an C<await> expression return L<Future>
+instances.
 
 =cut
 
@@ -50,7 +50,7 @@ async method change_config (%) { }
 
 =head2 write_dac
 
-   $chip->write_dac( $dac, $powerdown )->get
+   await $chip->write_dac( $dac, $powerdown );
 
 Writes a new value for the DAC output and powerdown state.
 
@@ -74,7 +74,7 @@ async method write_dac ( $dac, $powerdown = undef )
 
 =head2 write_dac_ratio
 
-   $chip->write_dac_ratio( $ratio )->get
+   await $chip->write_dac_ratio( $ratio );
 
 Writes a new value for the DAC output as a scaled ratio between 0.0 and 1.0.
 

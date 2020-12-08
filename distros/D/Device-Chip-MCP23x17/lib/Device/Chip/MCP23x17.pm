@@ -1,15 +1,16 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2015 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2015-2020 -- leonerd@leonerd.org.uk
 
-package Device::Chip::MCP23x17;
+use v5.26;
+use Object::Pad 0.19;
 
-use strict;
-use warnings;
-use base qw( Device::Chip );
+package Device::Chip::MCP23x17 0.02;
+class Device::Chip::MCP23x17
+   extends Device::Chip;
 
-our $VERSION = '0.01';
+use Future::AsyncAwait;
 
 =head1 NAME
 
@@ -17,18 +18,19 @@ C<Device::Chip::MCP23x17> - chip driver for the F<MCP23x17> family
 
 =head1 SYNOPSIS
 
- use Device::Chip::MCP23S17;
+   use Device::Chip::MCP23S17;
+   use Future::AsyncAwait;
 
- use constant { HIGH => 0xFFFF, LOW => 0 };
+   use constant { HIGH => 0xFFFF, LOW => 0 };
 
- my $chip = Device::Chip::MCP23S17->new;
- $chip->mount( Device::Chip::Adapter::...->new )->get;
+   my $chip = Device::Chip::MCP23S17->new;
+   await $chip->mount( Device::Chip::Adapter::...->new );
 
- foreach my $bit ( 0 .. 15 ) {
-    $chip->write_gpio( HIGH, 1 << $bit )->get;
-    sleep 1;
-    $chip->write_gpio( LOW, 1 << $bit )->get;
- }
+   foreach my $bit ( 0 .. 15 ) {
+      await $chip->write_gpio( HIGH, 1 << $bit );
+      sleep 1;
+      await $chip->write_gpio( LOW, 1 << $bit );
+   }
 
 =head1 DESCRIPTION
 
@@ -52,14 +54,9 @@ configuration.
 
 =cut
 
-sub new
+BUILD
 {
-   my $class = shift;
-   my $self = $class->SUPER::new( @_ );
-
    $self->reset;
-
-   return $self;
 }
 
 =head1 MOUNT PARAMETERS
@@ -71,14 +68,13 @@ pin of the chip, if there is one. This will be used by the L</reset> method.
 
 =cut
 
-sub mount
+has $_resetpin;
+
+async method mount ( $adapter, %params )
 {
-   my $self = shift;
-   my ( $adapter, %params ) = @_;
+   $_resetpin = delete $params{reset};
 
-   $self->{reset} = delete $params{reset};
-
-   return $self->SUPER::mount( @_ );
+   return await $self->SUPER::mount( @_ );
 }
 
 use constant {
@@ -97,34 +93,33 @@ use constant {
    REG_OLAT    => 0x14,
 };
 
-sub _cached_maskedwrite_u16
+has %_regcache;
+
+async method _cached_maskedwrite_u16 ( $name, $val, $mask )
 {
-   my $self = shift;
-   my ( $name, $val, $mask ) = @_;
+   my $want = ( $_regcache{$name} & ~$mask ) | ( $val & $mask );
 
-   my $want = ( $self->{$name} & ~$mask ) | ( $val & $mask );
-
-   return Future->done if ( my $got = $self->{$name} ) == $want;
-   $self->{$name} = $want;
+   return if ( my $got = $_regcache{$name} ) == $want;
+   $_regcache{$name} = $want;
 
    my $reg = __PACKAGE__->can( "REG_\U$name" )->();
 
    if( ( $got & 0xFF00 ) == ( $want & 0xFF00 ) ) {
       # low-byte write
-      $self->write_reg( $reg, pack "C", $want & 0x00FF );
+      await $self->write_reg( $reg, pack "C", $want & 0x00FF );
    }
    elsif( ( $got & 0x00FF ) == ( $want & 0x00FF ) ) {
-      $self->write_reg( $reg+1, pack "C", ( $want & 0xFF00 ) >> 8 );
+      await $self->write_reg( $reg+1, pack "C", ( $want & 0xFF00 ) >> 8 );
    }
    else {
-      $self->write_reg( $reg, pack "S<", $want );
+      await $self->write_reg( $reg, pack "S<", $want );
    }
 }
 
 =head1 METHODS
 
-The following methods documented with a trailing call to C<< ->get >> return
-L<Future> instances.
+The following methods documented in an C<await> expression return L<Future>
+instances.
 
 Each method that takes a C<$mask> parameter uses it to select which IO pins
 are affected. The mask is a 16-bit integer; selecting only those pins for
@@ -135,7 +130,7 @@ to the C<GPB> pins. Pins that are not selected by the mask remain unaffected.
 
 =head2 reset
 
-   $chip->reset->get;
+   await $chip->reset;
 
 Resets the cached register values back to their power-up defaults.
 
@@ -144,89 +139,70 @@ pin of the chip.
 
 =cut
 
-sub reset
+async method reset
 {
-   my $self = shift;
-
    # Default registers
-   $self->{iodir} = 0xffff;
-   $self->{olat}  = 0x0000;
-   $self->{ipol}  = 0x0000;
-   $self->{gppu}  = 0x0000;
+   $_regcache{iodir} = 0xffff;
+   $_regcache{olat}  = 0x0000;
+   $_regcache{ipol}  = 0x0000;
+   $_regcache{gppu}  = 0x0000;
 
-   if( defined( my $reset = $self->{reset} ) ) {
-      $self->protocol->write_gpios( { $reset => 0 } )->then( sub {
-         $self->protocol->write_gpios( { $reset => 1 } );
-      });
-   }
-   else {
-      Future->done;
+   if( defined( my $reset = $_resetpin ) ) {
+      await $self->protocol->write_gpios( { $reset => 0 } );
+      await $self->protocol->write_gpios( { $reset => 1 } );
    }
 }
 
 =head2 write_gpio
 
-   $chip->write_gpio( $val, $mask )->get
+   await $chip->write_gpio( $val, $mask );
 
 Sets the pins named in the C<$mask> to be outputs, and sets their values from
 the bits in C<$val>. Both values are 16-bit integers.
 
 =cut
 
-sub write_gpio
+async method write_gpio ( $val, $mask )
 {
-   my $self = shift;
-   my ( $val, $mask ) = @_;
-
-   Future->needs_all(
-      # Write the values before the direction, so as not to cause glitches
-      $self->_cached_maskedwrite_u16( olat  => $val,   $mask ),
-      $self->_cached_maskedwrite_u16( iodir => 0x0000, $mask ),
-   );
+   # Write the values before the direction, so as not to cause glitches
+   await $self->_cached_maskedwrite_u16( olat  => $val,   $mask ),
+   await $self->_cached_maskedwrite_u16( iodir => 0x0000, $mask ),
 }
 
 =head2 read_gpio
 
-   $val = $chip->read_gpio( $mask )->get
+   $val = await $chip->read_gpio( $mask );
 
 Sets the pins named in the C<$mask> to be inputs, and reads the current pin
 values of them. The mask and the return value are 16-bit integers.
 
 =cut
 
-sub read_gpio
+async method read_gpio ( $mask )
 {
-   my $self = shift;
-   my ( $mask ) = @_;
+   await $self->tris_gpio( $mask );
 
-   $self->tris_gpio( $mask )->then( sub {
-      $self->read_reg( REG_GPIO, 2 )
-   })->transform( done => sub {
-      my $val = unpack "S<", $_[0];
-      $val & $mask;
-   });
+   my $val = unpack "S<", await $self->read_reg( REG_GPIO, 2 );
+   return $val & $mask;
 }
 
 =head2 tris_gpio
 
-   $chip->tris_gpio( $mask )
+   await $chip->tris_gpio( $mask );
 
 Sets the pins named in the C<$mask> to be inputs ("tristate"). The mask is a
 16-bit integer.
 
 =cut
 
-sub tris_gpio
+async method tris_gpio ( $mask )
 {
-   my $self = shift;
-   my ( $mask ) = @_;
-
-   $self->_cached_maskedwrite_u16( iodir => 0xFFFF, $mask );
+   await $self->_cached_maskedwrite_u16( iodir => 0xFFFF, $mask );
 }
 
 =head2 set_input_polarity
 
-   $chip->set_input_polarity( $pol, $mask )
+   await $chip->set_input_polarity( $pol, $mask );
 
 Sets the input polarity of the pins given by C<$mask> to be the values given
 in C<$pol>. Pins associated with bits set in C<$pol> will read with an
@@ -234,29 +210,39 @@ inverted sense. Both values are 16-bit integers.
 
 =cut
 
-sub set_input_polarity
+async method set_input_polarity ( $pol, $mask )
 {
-   my $self = shift;
-   my ( $pol, $mask ) = @_;
-
-   $self->_cached_maskedwrite_u16( ipol => $pol, $mask );
+   await $self->_cached_maskedwrite_u16( ipol => $pol, $mask );
 }
 
 =head2 set_input_pullup
 
-   $chip->set_input_pullup( $pullup, $mask )
+   await $chip->set_input_pullup( $pullup, $mask );
 
 Enables or disables the input pullup resistors on the pins given by C<$mask>
 as per the values given by C<$pullup>. Both values are 16-bit integers.
 
 =cut
 
-sub set_input_pullup
+async method set_input_pullup ( $pullup, $mask )
 {
-   my $self = shift;
-   my ( $pullup, $mask ) = @_;
+   await $self->_cached_maskedwrite_u16( gppu => $pullup, $mask );
+}
 
-   $self->_cached_maskedwrite_u16( gppu => $pullup, $mask );
+=head2 as_adapter
+
+   $adapter = $chip->as_adapter;
+
+Returns an instance implementing the L<Device::Chip::Adapter> interface,
+allowing access to the GPIO pins via the standard adapter API. See also
+L<Device::Chip::MCP23x17::Adapter>.
+
+=cut
+
+method as_adapter
+{
+   require Device::Chip::MCP23x17::Adapter;
+   return Device::Chip::MCP23x17::Adapter->new( $self );
 }
 
 =head1 TODO
@@ -278,11 +264,6 @@ C<HAEN>.
 
 Consider how easy/hard or indeed how useful it might be to support
 C<IOCON.BANK=1> configuration.
-
-=item *
-
-Create a L<Device::Chip::Adapter> instance to represent the GPIO pins as a
-standard adapter.
 
 =back
 

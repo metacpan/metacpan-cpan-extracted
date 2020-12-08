@@ -3,15 +3,16 @@ require 5.006000;
 use ExtUtils::MakeMaker;
 WriteMakefile
 (
-  'EXE_FILES' => [],
-  'PREREQ_PM' => {
-                   'Module::Build' => 0,
-                   'MP3::Info' => 0,
-                   'AudioFile::Info' => 0
-                 },
+  'NAME' => 'AudioFile::Info::MP3::Info',
   'VERSION_FROM' => 'lib/AudioFile/Info/MP3/Info.pm',
-  'PL_FILES' => {},
+  'PREREQ_PM' => {
+                   'AudioFile::Info' => 0,
+                   'MP3::Info' => 0,
+                   'Module::Build' => 0,
+                   'YAML' => 0
+                 },
   'INSTALLDIRS' => 'site',
-  'NAME' => 'AudioFile::Info::MP3::Info'
+  'EXE_FILES' => [],
+  'PL_FILES' => {}
 )
 ;

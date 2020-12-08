@@ -5,7 +5,7 @@
 
 use Object::Pad 0.19;
 
-package Device::Chip::MCP4725 0.10;
+package Device::Chip::MCP4725 0.11;
 class Device::Chip::MCP4725
    extends Device::Chip;
 
@@ -23,12 +23,13 @@ C<Device::Chip::MCP4725> - chip driver for F<MCP4725>
 =head1 SYNOPSIS
 
    use Device::Chip::MCP4725;
+   use Future::AsyncAwait;
 
    my $chip = Device::Chip::MCP4725->new;
-   $chip->mount( Device::Chip::Adapter::...->new )->get;
+   await $chip->mount( Device::Chip::Adapter::...->new );
 
    # Presuming Vcc = 5V
-   $chip->write_dac_ratio( 1.23 / 5 )->get;
+   await $chip->write_dac_ratio( 1.23 / 5 );
    print "Output is now set to 1.23V\n";
 
 =head1 DESCRIPTION
@@ -64,8 +65,8 @@ sub I2C_options ( $, %params )
 
 =head1 ACCESSORS
 
-The following methods documented with a trailing call to C<< ->get >> return
-L<Future> instances.
+The following methods documented in an C<await> expression return L<Future>
+instances.
 
 =cut
 
@@ -74,7 +75,7 @@ my %NAME_TO_POWERDOWN = map { $POWERDOWN_TO_NAME[$_] => $_ } 0 .. $#POWERDOWN_TO
 
 =head2 read_config
 
-   $config = $chip->read_config->get
+   $config = await $chip->read_config;
 
 Returns a C<HASH> reference containing the chip's current configuration
 
@@ -112,7 +113,7 @@ async method read_config ()
 
 =head2 write_dac
 
-   $chip->write_dac( $dac, $powerdown )->get
+   await $chip->write_dac( $dac, $powerdown );
 
 Writes a new value for the DAC output and powerdown state in "fast" mode.
 
@@ -133,7 +134,7 @@ async method write_dac ( $dac, $powerdown = undef )
 
 =head2 write_dac_ratio
 
-   $chip->write_dac_ratio( $ratio )->get
+   await $chip->write_dac_ratio( $ratio );
 
 Writes a new value for the DAC output, setting it to normal output for a given
 ratio between 0 and 1.

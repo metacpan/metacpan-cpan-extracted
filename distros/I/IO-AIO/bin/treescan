@@ -18,7 +18,7 @@ treescan - scan directory trees, list dirs/files, stat, sync, grep
       -f, --files    only list files
       -p, --progress regularly print progress to stderr
           --sync     open/fsync/close every entry
-      -g, --grep=RE  only list files that match the gibven perl RegEx
+      -g, --grep=RE  only list files that match the given perl RegEx
 
 =head1 DESCRIPTION
 

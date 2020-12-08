@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use namespace::autoclean;
 
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 
 use CPAN::Meta;
 use Carp;
@@ -53,7 +53,7 @@ option github_user => (
     format  => 's',
     lazy    => 1,
     builder => '_build_github_user',
-    doc =>
+    doc     =>
         'The GitHub user to use. Will default to github.user in your git config if available.'
         . ' Otherwise it will look at the remote URL and try to guess.',
 );
@@ -64,7 +64,7 @@ option github_token => (
     format  => 's',
     lazy    => 1,
     builder => '_build_github_token',
-    doc =>
+    doc     =>
         'The GitHub token to use. Will default to github.token in your git config if available.',
 );
 
@@ -74,7 +74,7 @@ option repo => (
     format  => 's',
     lazy    => 1,
     builder => '_build_repo',
-    doc =>
+    doc     =>
         'The GitHub repo to operate against. By default this will be determined'
         . ' by looking at URL for the origin remote.',
 );
@@ -85,7 +85,7 @@ option pause_id => (
     format  => 's',
     lazy    => 1,
     builder => '_build_pause_id',
-    doc =>
+    doc     =>
         'Your PAUSE ID. This will be found by looking at ~/.pause if that file exists.',
 );
 
@@ -95,7 +95,7 @@ option pause_password => (
     format  => 's',
     lazy    => 1,
     builder => '_build_pause_password',
-    doc =>
+    doc     =>
         'Your PAUSE password. This will be found by looking at ~/.pause if that file exists.',
 );
 
@@ -105,7 +105,7 @@ option dist => (
     format  => 's',
     lazy    => 1,
     builder => '_build_dist',
-    doc =>
+    doc     =>
         'The distribution name as seen on RT. By default this will be determined by'
         . ' looking at [MY]META.* files in the working directory, a dist.ini, or the repo name.',
 );
@@ -124,7 +124,7 @@ option resolve => (
     negativable => 1,
     lazy        => 1,
     default     => sub { $_[0]->test ? 0 : 1 },
-    doc =>
+    doc         =>
         'Set this to false to to disable resolving RT tickets as they are converted.',
 );
 
@@ -141,7 +141,7 @@ option test => (
     isa     => t('Bool'),
     lazy    => 1,
     default => 0,
-    doc =>
+    doc     =>
         'Run in test mode. This is equivalent to setting --no-resolve and --force.'
         . ' It also changes how GitHub tickets are formatted to avoid including'
         . ' @mentions of other people so they do not get a flood of email while you test.',
@@ -511,7 +511,7 @@ sub _extract_ticket_data {
     }
 
     my $create = $ticket->transactions( type => 'Create' )->get_iterator->();
-    my $from = $self->_transaction_from($create);
+    my $from   = $self->_transaction_from($create);
     $body .= sprintf( "\n%s\n\n%s\n\n", $from, $create->content );
 
     my @comments;
@@ -656,7 +656,7 @@ sub _make_github_issue {
         );
         unless ( $c_result->success ) {
             say "Error adding a comment to issue #$gh_id:" or die $!;
-            say Dumper( $c_result->content ) or die $!;
+            say Dumper( $c_result->content )               or die $!;
             return;
         }
     }
@@ -776,7 +776,7 @@ RTx::ToGitHub - Convert rt.cpan.org tickets to GitHub issues
 
 =head1 VERSION
 
-version 0.08
+version 0.09
 
 =head1 SYNOPSIS
 
@@ -803,7 +803,7 @@ converted to C<@username> mentions on GitHub. The conversion is based on a
 one-time data dump made by pulling author data from MetaCPAN to make an email
 address to GitHub username map. Patches to this map are welcome.
 
-Only tickets with the "new", "open", or "stalled" status are
+Only tickets with the "new", "open", "patched", or "stalled" status are
 converted. Stalled tickets are given a "stalled" label on GitHub.
 
 =item 3. Close the RT ticket
@@ -848,12 +848,13 @@ without a username. So pass "Net-Foo", not "username/Net-Foo".
 
 =head2 --pause-id
 
-Your PAUSE ID. If you have a F<~/.pause> file this will be parsed your username.
+Your PAUSE ID. If you have a F<~/.pause> file this will be parsed for your
+username.
 
 =head2 --pause-password
 
-Your PAUSE password. If you have a F<~/.pause> file this will be parsed your
-username.
+Your PAUSE password. If you have a F<~/.pause> file this will be parsed for
+your password.
 
 =head2 --dist
 
@@ -882,9 +883,13 @@ script at L<https://github.com/dagolden/zzz-rt-to-github>.
 
 =head1 SUPPORT
 
-Bugs may be submitted through L<https://github.com/houseabsolute/RTx-ToGitHub/issues>.
+Bugs may be submitted at L<https://github.com/houseabsolute/RTx-ToGitHub/issues>.
 
 I am also usually active on IRC as 'autarch' on C<irc://irc.perl.org>.
+
+=head1 SOURCE
+
+The source code repository for RTx-ToGitHub can be found at L<https://github.com/houseabsolute/RTx-ToGitHub>.
 
 =head1 DONATIONS
 
@@ -901,7 +906,7 @@ software much more, unless I get so many donations that I can consider working
 on free software full time (let's all have a chuckle at that together).
 
 To donate, log into PayPal and send money to autarch@urth.org, or use the
-button at L<http://www.urth.org/~autarch/fs-donation.html>.
+button at L<https://www.urth.org/fs-donation.html>.
 
 =head1 AUTHOR
 
@@ -925,11 +930,14 @@ Michiel Beijen <michiel.beijen@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2016 by David Golden and Dave Rolsky.
+This software is Copyright (c) 2020 by David Golden and Dave Rolsky.
 
 This is free software, licensed under:
 
   The Apache License, Version 2.0, January 2004
+
+The full text of the license can be found in the
+F<LICENSE> file included with this distribution.
 
 =cut
 

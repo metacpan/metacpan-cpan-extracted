@@ -29,6 +29,10 @@ sub import_extra {
 
     require lib;
     lib->import('t/lib');
+
+    if ($Devel::Cover::VERSION) { # don't run_end_test when Devel::Cover
+        Test::Warnings->import(':no_end_test');
+    }
 }
 
 *abeltje_done_testing = \&Test::More::done_testing;

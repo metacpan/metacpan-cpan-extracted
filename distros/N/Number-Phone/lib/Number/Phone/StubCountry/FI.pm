@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20200904144531;
+our $VERSION = 1.20201204215956;
 
 my $formatters = [
                 {
@@ -126,147 +126,102 @@ my $validators = {
                 'voip' => ''
               };
 my %areanames = ();
-$areanames{en}->{35813} = "North\ Karelia";
-$areanames{en}->{35814} = "Central\ Finland";
-$areanames{en}->{35815} = "Mikkeli";
-$areanames{en}->{35816} = "Lapland";
-$areanames{en}->{35817} = "Kuopio";
-$areanames{en}->{35819} = "Uusimaa";
-$areanames{en}->{35821} = "Turku\/Pori";
-$areanames{en}->{35822} = "Turku\/Pori";
-$areanames{en}->{35823} = "Turku\/Pori";
-$areanames{en}->{35824} = "Turku\/Pori";
-$areanames{en}->{35825} = "Turku\/Pori";
-$areanames{en}->{35826} = "Turku\/Pori";
-$areanames{en}->{35827} = "Turku\/Pori";
-$areanames{en}->{35828} = "Turku\/Pori";
-$areanames{en}->{35831} = "Häme";
-$areanames{en}->{35832} = "Häme";
-$areanames{en}->{35833} = "Häme";
-$areanames{en}->{35834} = "Häme";
-$areanames{en}->{35835} = "Häme";
-$areanames{en}->{35836} = "Häme";
-$areanames{en}->{35837} = "Häme";
-$areanames{en}->{35838} = "Häme";
-$areanames{en}->{35851} = "Kymi";
-$areanames{en}->{35852} = "Kymi";
-$areanames{en}->{35853} = "Kymi";
-$areanames{en}->{35854} = "Kymi";
-$areanames{en}->{35855} = "Kymi";
-$areanames{en}->{35856} = "Kymi";
-$areanames{en}->{35857} = "Kymi";
-$areanames{en}->{35858} = "Kymi";
-$areanames{en}->{35861} = "Vaasa";
-$areanames{en}->{35862} = "Vaasa";
-$areanames{en}->{35863} = "Vaasa";
-$areanames{en}->{35864} = "Vaasa";
-$areanames{en}->{35865} = "Vaasa";
-$areanames{en}->{35866} = "Vaasa";
-$areanames{en}->{35867} = "Vaasa";
-$areanames{en}->{35868} = "Vaasa";
-$areanames{en}->{35881} = "Oulu";
-$areanames{en}->{35882} = "Oulu";
-$areanames{en}->{35883} = "Oulu";
-$areanames{en}->{35884} = "Oulu";
-$areanames{en}->{35885} = "Oulu";
-$areanames{en}->{35886} = "Oulu";
-$areanames{en}->{35887} = "Oulu";
-$areanames{en}->{35888} = "Oulu";
-$areanames{en}->{3589} = "Helsinki";
-$areanames{fi}->{35813} = "Pohjois\-Karjala";
-$areanames{fi}->{35814} = "Keski\-Suomi";
-$areanames{fi}->{35815} = "Mikkeli";
-$areanames{fi}->{35816} = "Lappi";
-$areanames{fi}->{35817} = "Kuopio";
-$areanames{fi}->{35819} = "Uusimaa";
-$areanames{fi}->{35821} = "Turku\/Pori";
-$areanames{fi}->{35822} = "Turku\/Pori";
-$areanames{fi}->{35823} = "Turku\/Pori";
-$areanames{fi}->{35824} = "Turku\/Pori";
-$areanames{fi}->{35825} = "Turku\/Pori";
-$areanames{fi}->{35826} = "Turku\/Pori";
-$areanames{fi}->{35827} = "Turku\/Pori";
-$areanames{fi}->{35828} = "Turku\/Pori";
-$areanames{fi}->{35831} = "Häme";
-$areanames{fi}->{35832} = "Häme";
-$areanames{fi}->{35833} = "Häme";
-$areanames{fi}->{35834} = "Häme";
-$areanames{fi}->{35835} = "Häme";
-$areanames{fi}->{35836} = "Häme";
-$areanames{fi}->{35837} = "Häme";
-$areanames{fi}->{35838} = "Häme";
-$areanames{fi}->{35851} = "Kymi";
-$areanames{fi}->{35852} = "Kymi";
-$areanames{fi}->{35853} = "Kymi";
-$areanames{fi}->{35854} = "Kymi";
-$areanames{fi}->{35855} = "Kymi";
-$areanames{fi}->{35856} = "Kymi";
-$areanames{fi}->{35857} = "Kymi";
-$areanames{fi}->{35858} = "Kymi";
-$areanames{fi}->{35861} = "Vaasa";
-$areanames{fi}->{35862} = "Vaasa";
-$areanames{fi}->{35863} = "Vaasa";
-$areanames{fi}->{35864} = "Vaasa";
-$areanames{fi}->{35865} = "Vaasa";
-$areanames{fi}->{35866} = "Vaasa";
-$areanames{fi}->{35867} = "Vaasa";
-$areanames{fi}->{35868} = "Vaasa";
-$areanames{fi}->{35881} = "Oulu";
-$areanames{fi}->{35882} = "Oulu";
-$areanames{fi}->{35883} = "Oulu";
-$areanames{fi}->{35884} = "Oulu";
-$areanames{fi}->{35885} = "Oulu";
-$areanames{fi}->{35886} = "Oulu";
-$areanames{fi}->{35887} = "Oulu";
-$areanames{fi}->{35888} = "Oulu";
-$areanames{fi}->{3589} = "Helsinki";
-$areanames{sv}->{35813} = "Norra\ Karelen";
-$areanames{sv}->{35814} = "Mellersta\ Finland";
-$areanames{sv}->{35815} = "St\ Michel";
-$areanames{sv}->{35816} = "Lappland";
-$areanames{sv}->{35817} = "Kuopio";
-$areanames{sv}->{35819} = "Nyland";
-$areanames{sv}->{35821} = "Åbo\/Björneborg";
-$areanames{sv}->{35822} = "Åbo\/Björneborg";
-$areanames{sv}->{35823} = "Åbo\/Björneborg";
-$areanames{sv}->{35824} = "Åbo\/Björneborg";
-$areanames{sv}->{35825} = "Åbo\/Björneborg";
-$areanames{sv}->{35826} = "Åbo\/Björneborg";
-$areanames{sv}->{35827} = "Åbo\/Björneborg";
-$areanames{sv}->{35828} = "Åbo\/Björneborg";
-$areanames{sv}->{35831} = "Tavastland";
-$areanames{sv}->{35832} = "Tavastland";
-$areanames{sv}->{35833} = "Tavastland";
-$areanames{sv}->{35834} = "Tavastland";
-$areanames{sv}->{35835} = "Tavastland";
-$areanames{sv}->{35836} = "Tavastland";
-$areanames{sv}->{35837} = "Tavastland";
-$areanames{sv}->{35838} = "Tavastland";
-$areanames{sv}->{35851} = "Kymmene";
-$areanames{sv}->{35852} = "Kymmene";
-$areanames{sv}->{35853} = "Kymmene";
-$areanames{sv}->{35854} = "Kymmene";
-$areanames{sv}->{35855} = "Kymmene";
-$areanames{sv}->{35856} = "Kymmene";
-$areanames{sv}->{35857} = "Kymmene";
-$areanames{sv}->{35858} = "Kymmene";
-$areanames{sv}->{35861} = "Vasa";
-$areanames{sv}->{35862} = "Vasa";
-$areanames{sv}->{35863} = "Vasa";
-$areanames{sv}->{35864} = "Vasa";
-$areanames{sv}->{35865} = "Vasa";
-$areanames{sv}->{35866} = "Vasa";
-$areanames{sv}->{35867} = "Vasa";
-$areanames{sv}->{35868} = "Vasa";
-$areanames{sv}->{35881} = "Uleåborg";
-$areanames{sv}->{35882} = "Uleåborg";
-$areanames{sv}->{35883} = "Uleåborg";
-$areanames{sv}->{35884} = "Uleåborg";
-$areanames{sv}->{35885} = "Uleåborg";
-$areanames{sv}->{35886} = "Uleåborg";
-$areanames{sv}->{35887} = "Uleåborg";
-$areanames{sv}->{35888} = "Uleåborg";
-$areanames{sv}->{3589} = "Helsingfors";
+$areanames{sv} = {"35832", "Tavastland",
+"35867", "Vasa",
+"35886", "Uleåborg",
+"35826", "Åbo\/Björneborg",
+"35852", "Kymmene",
+"35838", "Tavastland",
+"35887", "Uleåborg",
+"35813", "Norra\ Karelen",
+"35866", "Vasa",
+"35858", "Kymmene",
+"35827", "Åbo\/Björneborg",
+"35883", "Uleåborg",
+"35861", "Vasa",
+"35835", "Tavastland",
+"35823", "Åbo\/Björneborg",
+"35855", "Kymmene",
+"35854", "Kymmene",
+"35816", "Lappland",
+"35881", "Uleåborg",
+"35863", "Vasa",
+"35821", "Åbo\/Björneborg",
+"35834", "Tavastland",
+"35868", "Vasa",
+"35856", "Kymmene",
+"35819", "Nyland",
+"35882", "Uleåborg",
+"35836", "Tavastland",
+"35814", "Mellersta\ Finland",
+"3589", "Helsingfors",
+"35822", "Åbo\/Björneborg",
+"35837", "Tavastland",
+"35862", "Vasa",
+"35815", "St\ Michel",
+"35857", "Kymmene",
+"35888", "Uleåborg",
+"35828", "Åbo\/Björneborg",
+"35853", "Kymmene",
+"35833", "Tavastland",
+"35825", "Åbo\/Björneborg",
+"35885", "Uleåborg",
+"35864", "Vasa",
+"35824", "Åbo\/Björneborg",
+"35831", "Tavastland",
+"35865", "Vasa",
+"35884", "Uleåborg",
+"35851", "Kymmene",};
+$areanames{fi} = {"35813", "Pohjois\-Karjala",
+"35816", "Lappi",
+"35814", "Keski\-Suomi",};
+$areanames{en} = {"35885", "Oulu",
+"35864", "Vaasa",
+"35825", "Turku\/Pori",
+"35833", "Häme",
+"35853", "Kymi",
+"35851", "Kymi",
+"35865", "Vaasa",
+"35884", "Oulu",
+"35824", "Turku\/Pori",
+"35831", "Häme",
+"35814", "Central\ Finland",
+"35822", "Turku\/Pori",
+"3589", "Helsinki",
+"35882", "Oulu",
+"35836", "Häme",
+"35868", "Vaasa",
+"35856", "Kymi",
+"35819", "Uusimaa",
+"35828", "Turku\/Pori",
+"35857", "Kymi",
+"35888", "Oulu",
+"35815", "Mikkeli",
+"35837", "Häme",
+"35862", "Vaasa",
+"35855", "Kymi",
+"35835", "Häme",
+"35823", "Turku\/Pori",
+"35861", "Vaasa",
+"35883", "Oulu",
+"35817", "Kuopio",
+"35821", "Turku\/Pori",
+"35834", "Häme",
+"35816", "Lapland",
+"35881", "Oulu",
+"35863", "Vaasa",
+"35854", "Kymi",
+"35852", "Kymi",
+"35826", "Turku\/Pori",
+"35832", "Häme",
+"35867", "Vaasa",
+"35886", "Oulu",
+"35827", "Turku\/Pori",
+"35887", "Oulu",
+"35813", "North\ Karelia",
+"35866", "Vaasa",
+"35858", "Kymi",
+"35838", "Häme",};
 
     sub new {
       my $class = shift;

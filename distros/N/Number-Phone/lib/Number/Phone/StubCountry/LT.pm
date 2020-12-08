@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20200904144534;
+our $VERSION = 1.20201204215957;
 
 my $formatters = [
                 {
@@ -85,60 +85,60 @@ my $validators = {
                 'voip' => '[89]01\\d{5}'
               };
 my %areanames = ();
-$areanames{en}->{370310} = "Varėna";
-$areanames{en}->{370313} = "Druskininkai";
-$areanames{en}->{370315} = "Alytus";
-$areanames{en}->{370318} = "Lazdijai";
-$areanames{en}->{370319} = "Birštonas\/Prienai";
-$areanames{en}->{370340} = "Ukmergė";
-$areanames{en}->{370342} = "Vilkaviškis";
-$areanames{en}->{370343} = "Marijampolė";
-$areanames{en}->{370345} = "Šakiai";
-$areanames{en}->{370346} = "Kaišiadorys";
-$areanames{en}->{370347} = "Kėdainiai";
-$areanames{en}->{370349} = "Jonava";
-$areanames{en}->{37037} = "Kaunas";
-$areanames{en}->{370380} = "Šalčininkai";
-$areanames{en}->{370381} = "Anykščiai";
-$areanames{en}->{370382} = "Širvintos";
-$areanames{en}->{370383} = "Molėtai";
-$areanames{en}->{370385} = "Zarasai";
-$areanames{en}->{370386} = "Ignalina\/Visaginas";
-$areanames{en}->{370387} = "Švenčionys";
-$areanames{en}->{370389} = "Utena";
-$areanames{en}->{37041} = "Šiauliai";
-$areanames{en}->{370421} = "Pakruojis";
-$areanames{en}->{370422} = "Radviliškis";
-$areanames{en}->{370425} = "Akmenė";
-$areanames{en}->{370426} = "Joniškis";
-$areanames{en}->{370427} = "Kelmė";
-$areanames{en}->{370428} = "Raseiniai";
-$areanames{en}->{370440} = "Skuodas";
-$areanames{en}->{370441} = "Šilutė";
-$areanames{en}->{370443} = "Mažeikiai";
-$areanames{en}->{370444} = "Telšiai";
-$areanames{en}->{370445} = "Kretinga";
-$areanames{en}->{370446} = "Tauragė";
-$areanames{en}->{370447} = "Jurbarkas";
-$areanames{en}->{370448} = "Plungė";
-$areanames{en}->{370449} = "Šilalė";
-$areanames{en}->{37045} = "Panevėžys";
-$areanames{en}->{370450} = "Biržai";
-$areanames{en}->{370451} = "Pasvalys";
-$areanames{en}->{370458} = "Rokiškis";
-$areanames{en}->{370459} = "Kupiškis";
-$areanames{en}->{37046} = "Klaipėda";
-$areanames{en}->{370460} = "Palanga";
-$areanames{en}->{370469} = "Neringa";
-$areanames{en}->{370520} = "Vilnius";
-$areanames{en}->{370521} = "Vilnius";
-$areanames{en}->{370522} = "Vilnius";
-$areanames{en}->{370523} = "Vilnius";
-$areanames{en}->{370524} = "Vilnius";
-$areanames{en}->{370525} = "Vilnius";
-$areanames{en}->{370526} = "Vilnius";
-$areanames{en}->{370527} = "Vilnius";
-$areanames{en}->{370528} = "Trakai";
+$areanames{en} = {"370440", "Skuodas",
+"370380", "Šalčininkai",
+"370422", "Radviliškis",
+"370315", "Alytus",
+"370458", "Rokiškis",
+"370528", "Trakai",
+"370421", "Pakruojis",
+"370448", "Plungė",
+"370342", "Vilkaviškis",
+"370349", "Jonava",
+"370520", "Vilnius",
+"370450", "Biržai",
+"370522", "Vilnius",
+"370428", "Raseiniai",
+"370340", "Ukmergė",
+"370459", "Kupiškis",
+"370313", "Druskininkai",
+"370441", "Šilutė",
+"370381", "Anykščiai",
+"37045", "Panevėžys",
+"370389", "Utena",
+"370521", "Vilnius",
+"370451", "Pasvalys",
+"370449", "Šilalė",
+"370382", "Širvintos",
+"370469", "Neringa",
+"370427", "Kelmė",
+"370426", "Joniškis",
+"370345", "Šakiai",
+"370383", "Molėtai",
+"370443", "Mažeikiai",
+"370347", "Kėdainiai",
+"370319", "Birštonas\/Prienai",
+"370523", "Vilnius",
+"370346", "Kaišiadorys",
+"370425", "Akmenė",
+"37046", "Klaipėda",
+"370343", "Marijampolė",
+"370527", "Vilnius",
+"370444", "Telšiai",
+"370445", "Kretinga",
+"370310", "Varėna",
+"37041", "Šiauliai",
+"370385", "Zarasai",
+"37037", "Kaunas",
+"370526", "Vilnius",
+"370460", "Palanga",
+"370318", "Lazdijai",
+"370386", "Ignalina\/Visaginas",
+"370446", "Tauragė",
+"370387", "Švenčionys",
+"370447", "Jurbarkas",
+"370525", "Vilnius",
+"370524", "Vilnius",};
 
     sub new {
       my $class = shift;

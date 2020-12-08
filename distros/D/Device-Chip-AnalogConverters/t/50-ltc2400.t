@@ -1,25 +1,27 @@
 #!/usr/bin/perl
 
-use strict;
+use v5.26;
 use warnings;
 
 use Test::More;
 use Test::Device::Chip::Adapter;
 
+use Future::AsyncAwait;
+
 use Device::Chip::LTC2400;
 
 my $chip = Device::Chip::LTC2400->new;
 
-$chip->mount(
+await $chip->mount(
    my $adapter = Test::Device::Chip::Adapter->new,
-)->get;
+);
 
 # ->read_adc
 {
    $adapter->expect_readwrite( "\x00\x00\x00\x00" )
       ->returns( "\x20\x12\x34\x50" );
 
-   is_deeply( $chip->read_adc->get,
+   is_deeply( await $chip->read_adc,
       {
          EOC => 1,
          EXR => '',

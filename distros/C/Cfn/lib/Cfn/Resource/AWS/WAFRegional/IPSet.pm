@@ -1,4 +1,4 @@
-# AWS::WAFRegional::IPSet generated from spec 5.0.0
+# AWS::WAFRegional::IPSet generated from spec 18.4.0
 use Moose::Util::TypeConstraints;
 
 coerce 'Cfn::Resource::Properties::AWS::WAFRegional::IPSet',
@@ -51,11 +51,11 @@ coerce 'Cfn::Resource::Properties::AWS::WAFRegional::IPSet::IPSetDescriptor',
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::WAFRegional::IPSet::IPSetDescriptorValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::WAFRegional::IPSet::IPSetDescriptor->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::WAFRegional::IPSet::IPSetDescriptorValue {
+package Cfn::Resource::Properties::Object::AWS::WAFRegional::IPSet::IPSetDescriptor {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -74,3 +74,30 @@ package Cfn::Resource::Properties::AWS::WAFRegional::IPSet {
 }
 
 1;
+### main pod documentation begin ###
+
+=encoding UTF-8
+
+=head1 NAME
+
+Cfn::Resource::AWS::WAFRegional::IPSet - Cfn resource for AWS::WAFRegional::IPSet
+
+=head1 DESCRIPTION
+
+This module implements a Perl module that represents the CloudFormation object AWS::WAFRegional::IPSet.
+
+See L<Cfn> for more information on how to use it.
+
+=head1 AUTHOR
+
+    Jose Luis Martinez
+    CAPSiDE
+    jlmartinez@capside.com
+
+=head1 COPYRIGHT and LICENSE
+
+Copyright (c) 2013 by CAPSiDE
+This code is distributed under the Apache 2 License. The full text of the 
+license can be found in the LICENSE file included with this module.
+
+=cut

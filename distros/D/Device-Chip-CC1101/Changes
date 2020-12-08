@@ -1,5 +1,9 @@
 Revision history for Device-Chip-CC1101
 
+0.05    2020-12-06
+        [CHANGES]
+         * Use toplevel 'await' syntax from Future::AsyncAwait 0.47
+
 0.04    2020-06-13
         [CHANGES]
          * Update to Object::Pad 0.27

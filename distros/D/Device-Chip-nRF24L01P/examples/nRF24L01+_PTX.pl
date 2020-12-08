@@ -1,16 +1,17 @@
 #!/usr/bin/perl
 
-use strict;
+use v5.26;
 use warnings;
 
 use Device::Chip::nRF24L01P;
 use Device::Chip::Adapter;
 
+use Future::AsyncAwait;
 use Getopt::Long;
 use Data::Dump 'pp';
 
 GetOptions(
-   'adapter|A=s' => \( my $ADAPTER = "BusPirate" ),
+   'adapter|A=s' => \my $ADAPTER,
 
    'a|address=s' => \my $ADDRESS,
    'C|channel=i' => \(my $CHANNEL = 30),
@@ -27,18 +28,18 @@ $RATE =~ s/M$/000000/i;
 $RATE =~ s/k$/000/i;
 
 my $nrf = Device::Chip::nRF24L01P->new;
-$nrf->mount(
+await $nrf->mount(
    Device::Chip::Adapter->new_from_description( $ADAPTER )
-)->get;
+);
 
-$nrf->power(1)->get;
+await $nrf->power(1);
 print "Power on\n";
 
 # Power-down to reconfigure
-$nrf->pwr_up( 0 )->get;
-$nrf->chip_enable( 0 )->get;
+await $nrf->pwr_up( 0 );
+await $nrf->chip_enable( 0 );
 
-$nrf->change_config(
+await $nrf->change_config(
    PRIM_RX => 0,
    RF_DR   => $RATE,
    RF_CH   => $CHANNEL,
@@ -47,51 +48,52 @@ $nrf->change_config(
    AW      => $AW,
    TX_ADDR => $ADDRESS,
    EN_DPL  => $DPL,
-)->get;
+);
 
 # We need to set pipe 0's RX ADDR to equal TX ADDR so we receive the auto-ack
-$nrf->change_rx_config( 0,
+await $nrf->change_rx_config( 0,
    RX_ADDR => $ADDRESS,
    ( $DPL ?
       ( DYNPD   => 1 ) :
       () ),
-)->get;
+);
 
 $nrf->clear_caches;
-printf "PTX config:\n%s\n%s\n", pp($nrf->read_config->get), pp($nrf->read_rx_config( 0 )->get);
+printf "PTX config:\n%s\n%s\n",
+   pp(await $nrf->read_config), pp(await $nrf->read_rx_config( 0 ));
 
 printf "Transmitting on channel %d address %s\n",
-   @{ $nrf->read_config->get }{qw( RF_CH TX_ADDR )};
+   @{ await $nrf->read_config }{qw( RF_CH TX_ADDR )};
 
-$nrf->flush_tx_fifo->get;
+await $nrf->flush_tx_fifo;
 
-$nrf->reset_interrupt->get;
+await $nrf->reset_interrupt;
 
-$nrf->pwr_up( 1 )->get;
+await $nrf->pwr_up( 1 );
 print "PWR_UP\n";
 
 $SIG{INT} = $SIG{TERM} = sub { exit };
 
 while( $COUNT == -1 or ( $COUNT--) > 0 ) {
-   $nrf->write_tx_payload( "X" )->get;
-   $nrf->chip_enable( 1 )->get;
+   await $nrf->write_tx_payload( "X" );
+   await $nrf->chip_enable( 1 );
    print "CE high - entered PTX mode...\n";
 
    my $status;
-   1 while $status = $nrf->read_status->get and
+   1 while $status = await $nrf->read_status and
       not ( $status->{TX_DS} || $status->{MAX_RT} );
 
-   $nrf->chip_enable( 0 )->get;
+   await $nrf->chip_enable( 0 );
 
    if( $status->{MAX_RT} ) {
       print STDERR "MAX_RT exceeded; packet lost\n";
-      printf "Observe TX: %s\n", pp($nrf->observe_tx_counts->get);
+      printf "Observe TX: %s\n", pp(await $nrf->observe_tx_counts);
    }
    else {
       print "Packet sent\n";
    }
 
-   $nrf->reset_interrupt->get;
+   await $nrf->reset_interrupt;
 
    sleep 1;
 }

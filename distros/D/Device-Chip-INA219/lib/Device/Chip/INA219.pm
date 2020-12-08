@@ -3,21 +3,20 @@
 #
 #  (C) Paul Evans, 2014-2016 -- leonerd@leonerd.org.uk
 
-package Device::Chip::INA219;
+use v5.26;
+use Object::Pad 0.19;
 
-use strict;
-use warnings;
-use 5.010;
-use base qw( Device::Chip::Base::RegisteredI2C );
-Device::Chip::Base::RegisteredI2C->VERSION( '0.10' );
+package Device::Chip::INA219 0.06;
+class Device::Chip::INA219
+   extends Device::Chip::Base::RegisteredI2C 0.10;
 
 use constant REG_DATA_SIZE => 16;
 
 use utf8;
 
-our $VERSION = '0.05';
-
 use Carp;
+use Future::AsyncAwait;
+
 use Data::Bitfield qw( bitfield boolfield enumfield );
 
 =encoding UTF-8
@@ -28,13 +27,14 @@ C<Device::Chip::INA219> - chip driver for an F<INA219>
 
 =head1 SYNOPSIS
 
- use Device::Chip::INA219;
+   use Device::Chip::INA219;
+   use Future::AsyncAwait;
 
- my $chip = Device::Chip::INA219->new;
- $chip->mount( Device::Chip::Adapter::...->new )->get;
+   my $chip = Device::Chip::INA219->new;
+   await $chip->mount( Device::Chip::Adapter::...->new );
 
- printf "Current bus voltage is %d mV, shunt voltage is %d uV\n",
-    $chip->read_bus_voltage->get, $chip->read_shunt_voltage->get;
+   printf "Current bus voltage is %d mV, shunt voltage is %d uV\n",
+      await $chip->read_bus_voltage, await $chip->read_shunt_voltage;
 
 =head1 DESCRIPTION
 
@@ -56,11 +56,8 @@ leading C<0> or C<0x> prefixes.
 
 =cut
 
-sub I2C_options
+method I2C_options ( %params )
 {
-   my $self = shift;
-   my %params = @_;
-
    my $addr = delete $params{addr} // 0x40;
    $addr = oct $addr if $addr =~ m/^0/;
 
@@ -72,8 +69,8 @@ sub I2C_options
 
 =head1 METHODS
 
-The following methods documented with a trailing call to C<< ->get >> return
-L<Future> instances.
+The following methods documented in an C<await> expression return L<Future>
+instances.
 
 =cut
 
@@ -88,7 +85,9 @@ use constant {
 
 my @ADCs = qw( 9b 10b 11b 12b . . . .  1 2 4 8 16 32 64 128 );
 
-bitfield CONFIG =>
+# We'll use integer encoding and pack/unpack it ourselves because the BADC
+# field spans a byte boundary the wrong way
+bitfield { format => "integer" }, CONFIG =>
    RST        => boolfield(15),
    BRNG       => enumfield(13, qw( 16V 32V )),
    PG         => enumfield(11, qw( 40mV 80mV 160mV 320mV )),
@@ -100,69 +99,61 @@ bitfield CONFIG =>
 
 =head2 read_config
 
-   $config = $chip->read_config->get
+   $config = await $chip->read_config;
 
 Reads and returns the current chip configuration as a C<HASH> reference.
 
 =cut
 
-sub read_config
-{
-   my $self = shift;
+has $_config;
 
-   $self->cached_read_reg( REG_CONFIG, 1 )->then( sub {
-      my ( $bytes ) = @_;
-      Future->done( $self->{config} = { unpack_CONFIG( unpack "S>", $bytes ) } );
-   });
+async method read_config ()
+{
+   my $bytes = await $self->cached_read_reg( REG_CONFIG, 1 );
+
+   return $_config = { unpack_CONFIG( unpack "S>", $bytes ) };
 }
 
 =head2 change_config
 
-   $chip->change_config( %config )->get
+   await $chip->change_config( %config );
 
 Changes the configuration. Any field names not mentioned will be preserved.
 
 =cut
 
-sub change_config
+async method change_config ( %changes )
 {
-   my $self = shift;
-   my %changes = @_;
+   defined $_config or await $self->read_config;
 
-   ( defined $self->{config} ? Future->done( $self->{config} ) :
-         $self->read_config )->then( sub {
-      my %config = ( %{ $_[0] }, %changes );
+   my %config = ( %{ $_config }, %changes );
 
-      undef $self->{config}; # invalidate the cache
-      $self->write_reg( REG_CONFIG, pack "S>", pack_CONFIG( %config ) );
-   });
+   undef $_config; # invalidate the cache
+
+   await $self->write_reg( REG_CONFIG, pack "S>", pack_CONFIG( %config ) );
 }
 
 =head2 read_shunt_voltage
 
-   $uv = $chip->read_shunt_voltage->get
+   $uv = await $chip->read_shunt_voltage;
 
 Returns the current shunt voltage reading scaled integer in microvolts.
 
 =cut
 
-sub read_shunt_voltage
+async method read_shunt_voltage ()
 {
-   my $self = shift;
+   my $vraw = unpack "s>", await $self->read_reg( REG_VSHUNT, 1 );
 
-   $self->read_reg( REG_VSHUNT, 1 )->then( sub {
-      my ( $vraw ) = unpack "s>", $_[0];
-
-      # Each $vraw graduation is 10uV
-      Future->done( $vraw * 10 );
-   });
+   # Each $vraw graduation is 10uV
+   return $vraw * 10;
 }
 
 =head2 read_bus_voltage
 
-   $mv = $chip->read_bus_voltage->get
+   $mv = await $chip->read_bus_voltage;
 
-   ( $mv, $ovf, $cnvr ) = $chip->read_bus_voltage->get
+   ( $mv, $ovf, $cnvr ) = await $chip->read_bus_voltage;
 
 Returns the current bus voltage reading, as a scaled integer in milivolts.
 
@@ -170,19 +161,16 @@ The returned L<Future> also yields the OVF and CNVR flags.
 
 =cut
 
-sub read_bus_voltage
+async method read_bus_voltage ()
 {
-   my $self = shift;
+   my $value = unpack "s>", await $self->read_reg( REG_VBUS, 1 );
 
-   $self->read_reg( REG_VBUS, 1 )->then( sub {
-      my ( $value ) = unpack "s>", $_[0];
-      my $ovf  = ( $value & 1<<0 );
-      my $cnvr = ( $value & 1<<1 );
-      my $vraw = $value >> 3;
+   my $ovf  = ( $value & 1<<0 );
+   my $cnvr = ( $value & 1<<1 );
+   my $vraw = $value >> 3;
 
-      # Each $vraw graduation is 4mV
-      Future->done( $vraw * 4, $cnvr, $ovf );
-   });
+   # Each $vraw graduation is 4mV
+   return $vraw * 4, $cnvr, $ovf;;
 }
 
 =head1 AUTHOR

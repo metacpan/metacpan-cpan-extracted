@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20200904144536;
+our $VERSION = 1.20201204215957;
 
 my $formatters = [
                 {
@@ -119,1240 +119,1240 @@ my $validators = {
                 'voip' => '89[1-579]\\d{6}'
               };
 my %areanames = ();
-$areanames{en}->{38031} = "Zakarpattia";
-$areanames{en}->{380312} = "Uzhgorod\/Chop\,\ Zakarpattia";
-$areanames{en}->{3803122} = "Uzhhorod\,\ Zakarpattia";
-$areanames{en}->{3803131} = "Mukacheve\,\ Zakarpattia";
-$areanames{en}->{3803132} = "Rakhiv\,\ Zakarpattia";
-$areanames{en}->{3803133} = "Svalyava\,\ Zakarpattia";
-$areanames{en}->{3803134} = "Solotvyno\/Tyachiv\,\ Zakarpattia";
-$areanames{en}->{3803135} = "Great\ Berezny\,\ Zakarpattia";
-$areanames{en}->{3803136} = "Volovets\,\ Zakarpattia";
-$areanames{en}->{3803141} = "Berehove\,\ Zakarpattia";
-$areanames{en}->{3803142} = "Hust\,\ Zakarpattia";
-$areanames{en}->{3803143} = "Vinogradov\,\ Zakarpattia";
-$areanames{en}->{3803144} = "Irshava\,\ Zakarpattia";
-$areanames{en}->{3803145} = "Perechyn\,\ Zakarpattia";
-$areanames{en}->{3803146} = "Mizhhirya\,\ Zakarpattia";
-$areanames{en}->{380320} = "Lviv";
-$areanames{en}->{380321} = "Lviv";
-$areanames{en}->{380322} = "Bryukhovichi\/Lviv\,\ Lviv";
-$areanames{en}->{3803230} = "Pustomyty\,\ Lviv";
-$areanames{en}->{3803231} = "Gorodok\,\ Lviv";
-$areanames{en}->{3803232} = "Lviv";
-$areanames{en}->{3803233} = "Lviv";
-$areanames{en}->{3803234} = "Mostyska\,\ Lviv";
-$areanames{en}->{3803235} = "Lviv";
-$areanames{en}->{3803236} = "Sambir\,\ Lviv";
-$areanames{en}->{3803237} = "Lviv";
-$areanames{en}->{3803238} = "Old\ Sambir\,\ Lviv";
-$areanames{en}->{3803239} = "Zhidachiv\,\ Lviv";
-$areanames{en}->{3803240} = "Lviv";
-$areanames{en}->{3803241} = "Nikolaev\,\ Lviv";
-$areanames{en}->{3803242} = "Lviv";
-$areanames{en}->{3803243} = "Lviv";
-$areanames{en}->{3803244} = "Drogobych\,\ Lviv";
-$areanames{en}->{3803245} = "Stryi\,\ Lviv";
-$areanames{en}->{3803246} = "Lviv";
-$areanames{en}->{3803247} = "Truskavets\,\ Lviv";
-$areanames{en}->{3803248} = "Boryslav\/Skhidnytsya\,\ Lviv";
-$areanames{en}->{3803249} = "Chervonograd\,\ Lviv";
-$areanames{en}->{3803250} = "Lviv";
-$areanames{en}->{3803251} = "Skole\/Slavske\,\ Lviv";
-$areanames{en}->{3803252} = "Zhovkva\,\ Lviv";
-$areanames{en}->{3803253} = "Lviv";
-$areanames{en}->{3803254} = "Kamyanka\-Buzka\,\ Lviv";
-$areanames{en}->{3803255} = "Radehiv\,\ Lviv";
-$areanames{en}->{3803256} = "Novoyavorivsk\,\ Lviv";
-$areanames{en}->{3803257} = "Sokal\,\ Lviv";
-$areanames{en}->{3803258} = "Lviv";
-$areanames{en}->{3803259} = "Yavoriv\,\ Lviv";
-$areanames{en}->{3803260} = "Morshin\,\ Lviv";
-$areanames{en}->{3803261} = "Novy\ Rozdol\,\ Lviv";
-$areanames{en}->{3803262} = "Lviv";
-$areanames{en}->{3803263} = "Peremyshlyany\,\ Lviv";
-$areanames{en}->{3803264} = "Busk\,\ Lviv";
-$areanames{en}->{3803265} = "Zolochiv\,\ Lviv";
-$areanames{en}->{3803266} = "Brody\,\ Lviv";
-$areanames{en}->{3803267} = "Lviv";
-$areanames{en}->{3803268} = "Lviv";
-$areanames{en}->{3803269} = "Turka\,\ Lviv";
-$areanames{en}->{380327} = "Lviv";
-$areanames{en}->{380328} = "Lviv";
-$areanames{en}->{380329} = "Lviv";
-$areanames{en}->{38033} = "Volyn";
-$areanames{en}->{380332} = "Lutsk\,\ Volyn";
-$areanames{en}->{3803342} = "Volodymyr\-Volynsky\,\ Volyn";
-$areanames{en}->{3803344} = "Novovolynsk\,\ Volyn";
-$areanames{en}->{3803346} = "Old\ Vyzhivka\,\ Volyn";
-$areanames{en}->{3803352} = "Kovel\,\ Volyn";
-$areanames{en}->{3803355} = "Shatsk\,\ Volyn";
-$areanames{en}->{3803357} = "Kamin\-Kashirsky\,\ Volyn";
-$areanames{en}->{3803362} = "Lubeshiv\,\ Volyn";
-$areanames{en}->{3803363} = "Turiysk\,\ Volyn";
-$areanames{en}->{3803365} = "Kivertsi\/Tsuman\,\ Volyn";
-$areanames{en}->{3803366} = "Ratne\,\ Volyn";
-$areanames{en}->{3803368} = "Rozhysche\,\ Volyn";
-$areanames{en}->{3803372} = "Ivanychi\,\ Volyn";
-$areanames{en}->{3803374} = "Lokachi\,\ Volyn";
-$areanames{en}->{3803376} = "Manevichi\,\ Volyn";
-$areanames{en}->{3803377} = "Lyuboml\,\ Volyn";
-$areanames{en}->{3803379} = "Gorokhov\,\ Volyn";
-$areanames{en}->{38034} = "Ivano\-Frankivsk";
-$areanames{en}->{3803430} = "Gorodenka\,\ Ivano\-Frankivsk";
-$areanames{en}->{3803431} = "Halych\,\ Ivano\-Frankivsk";
-$areanames{en}->{3803432} = "Verkhovyna\,\ Ivano\-Frankivsk";
-$areanames{en}->{3803433} = "Kolomyia\,\ Ivano\-Frankivsk";
-$areanames{en}->{3803434} = "Vorokhta\/Yaremche\,\ Ivano\-Frankivsk";
-$areanames{en}->{3803435} = "Rohatyn\,\ Ivano\-Frankivsk";
-$areanames{en}->{3803436} = "Tysmenytsia\,\ Ivano\-Frankivsk";
-$areanames{en}->{3803437} = "Bolechov\,\ Ivano\-Frankivsk";
-$areanames{en}->{3803438} = "Burshtyn\,\ Ivano\-Frankivsk";
-$areanames{en}->{3803471} = "Bogorodchany\,\ Ivano\-Frankivsk";
-$areanames{en}->{3803472} = "Kalush\,\ Ivano\-Frankivsk";
-$areanames{en}->{3803474} = "Rozhnyatov\,\ Ivano\-Frankivsk";
-$areanames{en}->{3803475} = "Delyatin\/Nadvirna\,\ Ivano\-Frankivsk";
-$areanames{en}->{3803476} = "Zabolotov\/Sniatyn\,\ Ivano\-Frankivsk";
-$areanames{en}->{3803477} = "Valley\,\ Ivano\-Frankivsk";
-$areanames{en}->{3803478} = "Kosiv\,\ Ivano\-Frankivsk";
-$areanames{en}->{3803479} = "Tlumach\,\ Ivano\-Frankivsk";
-$areanames{en}->{38035} = "Ternopil";
-$areanames{en}->{3803540} = "Meeting\,\ Ternopil";
-$areanames{en}->{3803541} = "Borschiv\,\ Ternopil";
-$areanames{en}->{3803542} = "Pidhaytsi\,\ Ternopil";
-$areanames{en}->{3803543} = "Podvolochisk\,\ Ternopil";
-$areanames{en}->{3803544} = "Buchach\,\ Ternopil";
-$areanames{en}->{3803546} = "Kremenets\/Pochayiv\,\ Ternopil";
-$areanames{en}->{3803547} = "Kozlov\/Kozova\,\ Ternopil";
-$areanames{en}->{3803548} = "Berezhany\,\ Ternopil";
-$areanames{en}->{3803549} = "Lanovtsi\,\ Ternopil";
-$areanames{en}->{3803550} = "Zbarazh\,\ Ternopil";
-$areanames{en}->{3803551} = "Terebovlya\,\ Ternopil";
-$areanames{en}->{3803552} = "Chortkiv\,\ Ternopil";
-$areanames{en}->{3803554} = "Zalishchiki\,\ Ternopil";
-$areanames{en}->{3803555} = "Monastery\,\ Ternopil";
-$areanames{en}->{3803557} = "Gusyatin\,\ Ternopil";
-$areanames{en}->{3803558} = "Shumsk\,\ Ternopil";
-$areanames{en}->{38036} = "Rivne";
-$areanames{en}->{3803632} = "Zarechnaya\,\ Rivne";
-$areanames{en}->{3803633} = "Radivilov\,\ Rivne";
-$areanames{en}->{3803634} = "Volodymyrets\,\ Rivne";
-$areanames{en}->{3803635} = "Rokitne\,\ Rivne";
-$areanames{en}->{3803636} = "Kuznetsovsk\,\ Rivne";
-$areanames{en}->{3803637} = "Demidivka\,\ Rivne";
-$areanames{en}->{3803650} = "Goshcha\,\ Rivne";
-$areanames{en}->{3803651} = "Korets\,\ Rivne";
-$areanames{en}->{3803652} = "Zdolbunov\,\ Rivne";
-$areanames{en}->{3803653} = "Berezne\,\ Rivne";
-$areanames{en}->{3803654} = "Ostrog\,\ Rivne";
-$areanames{en}->{3803655} = "Sarny\,\ Rivne";
-$areanames{en}->{3803656} = "Dubno\,\ Rivne";
-$areanames{en}->{3803657} = "Kostopil\,\ Rivne";
-$areanames{en}->{3803658} = "Dubrovitsa\,\ Rivne";
-$areanames{en}->{3803659} = "Mlyniv\,\ Rivne";
-$areanames{en}->{38037} = "Chernivtsi";
-$areanames{en}->{3803730} = "Vyzhnytsia\,\ Chernivtsi";
-$areanames{en}->{38037312} = "Khotin\,\ Chernivtsi";
-$areanames{en}->{3803732} = "Kelmentsi\,\ Chernivtsi";
-$areanames{en}->{3803733} = "Novoselytsia\,\ Chernivtsi";
-$areanames{en}->{3803734} = "Deep\,\ Chernivtsi";
-$areanames{en}->{3803735} = "Storozhynets\,\ Chernivtsi";
-$areanames{en}->{3803736} = "Kitsman\,\ Chernivtsi";
-$areanames{en}->{3803737} = "Zastavna\,\ Chernivtsi";
-$areanames{en}->{3803738} = "Putila\,\ Chernivtsi";
-$areanames{en}->{3803739} = "Sokyryany\,\ Chernivtsi";
-$areanames{en}->{3803740} = "Hertz\,\ Chernivtsi";
-$areanames{en}->{3803741} = "Novodnistrovsk\,\ Chernivtsi";
-$areanames{en}->{38038} = "Khmelnytskyi";
-$areanames{en}->{3803840} = "Shepetovka\,\ Khmelnytskyi";
-$areanames{en}->{3803841} = "Belogorsk\,\ Khmelnytskyi";
-$areanames{en}->{3803842} = "Netishyn\/Slavuta\,\ Khmelnytskyi";
-$areanames{en}->{3803843} = "Polonne\,\ Khmelnytskyi";
-$areanames{en}->{3803844} = "Theophyll\,\ Khmelnytskyi";
-$areanames{en}->{3803845} = "Volochysk\,\ Khmelnytskyi";
-$areanames{en}->{3803846} = "Vinkivtsi\,\ Khmelnytskyi";
-$areanames{en}->{3803847} = "New\ Ushitsa\,\ Khmelnytskyi";
-$areanames{en}->{3803849} = "Kamyanets\-Podilskyi\,\ Khmelnytskyi";
-$areanames{en}->{3803850} = "Old\ Sinyava\,\ Khmelnytskyi";
-$areanames{en}->{3803851} = "Gorodok\/Sataniv\,\ Khmelnytskyi";
-$areanames{en}->{3803852} = "Iziaslav\,\ Khmelnytskyi";
-$areanames{en}->{3803853} = "Yarmolintsy\,\ Khmelnytskyi";
-$areanames{en}->{3803854} = "Starokostiantyniv\,\ Khmelnytskyi";
-$areanames{en}->{3803855} = "Krasilov\,\ Khmelnytskyi";
-$areanames{en}->{3803856} = "Derazhnya\,\ Khmelnytskyi";
-$areanames{en}->{3803857} = "Letychiv\/Medzhybizh\,\ Khmelnytskyi";
-$areanames{en}->{3803858} = "Dunaevtsi\,\ Khmelnytskyi";
-$areanames{en}->{3803859} = "Chemerivtsi\,\ Khmelnytskyi";
-$areanames{en}->{38041} = "Zhytomyr";
-$areanames{en}->{3804130} = "Korostyshiv\,\ Zhytomyr";
-$areanames{en}->{3804131} = "Chervonoarmiysk\,\ Zhytomyr";
-$areanames{en}->{3804132} = "Radomyshl\,\ Zhytomyr";
-$areanames{en}->{3804133} = "Malin\,\ Zhytomyr";
-$areanames{en}->{3804134} = "Chernyakhov\,\ Zhytomyr";
-$areanames{en}->{3804135} = "Olevsk\,\ Zhytomyr";
-$areanames{en}->{3804136} = "Andrushivka\,\ Zhytomyr";
-$areanames{en}->{3804137} = "Popilnya\,\ Zhytomyr";
-$areanames{en}->{3804138} = "Ruzhin\,\ Zhytomyr";
-$areanames{en}->{3804139} = "Chudniv\,\ Zhytomyr";
-$areanames{en}->{3804140} = "Natives\,\ Zhytomyr";
-$areanames{en}->{3804141} = "Novograd\-Volynsky\,\ Zhytomyr";
-$areanames{en}->{3804142} = "Korosten\,\ Zhytomyr";
-$areanames{en}->{3804143} = "Berdychiv\,\ Zhytomyr";
-$areanames{en}->{3804144} = "Baranivka\,\ Zhytomyr";
-$areanames{en}->{3804145} = "Volodarsk\-Volynsky\,\ Zhytomyr";
-$areanames{en}->{3804146} = "Dzerzhinsk\,\ Zhytomyr";
-$areanames{en}->{3804147} = "Lyubar\,\ Zhytomyr";
-$areanames{en}->{3804148} = "Ovruch\,\ Zhytomyr";
-$areanames{en}->{3804149} = "Emilchine\,\ Zhytomyr";
-$areanames{en}->{3804161} = "Luginy\,\ Zhytomyr";
-$areanames{en}->{3804162} = "Brusilov\,\ Zhytomyr";
-$areanames{en}->{38043} = "Vinnytsia";
-$areanames{en}->{3804330} = "Oratov\,\ Vinnytsia";
-$areanames{en}->{3804331} = "Bratslav\/Nemyriv\,\ Vinnytsia";
-$areanames{en}->{3804332} = "Brailiv\/Zhmerinka\,\ Vinnytsia";
-$areanames{en}->{3804333} = "Kalinovka\,\ Vinnytsia";
-$areanames{en}->{3804334} = "Haysin\,\ Vinnytsia";
-$areanames{en}->{3804335} = "Tulchin\,\ Vinnytsia";
-$areanames{en}->{3804336} = "Yampil\,\ Vinnytsia";
-$areanames{en}->{3804337} = "Mogilev\-Podolsky\,\ Vinnytsia";
-$areanames{en}->{3804338} = "Khmilnyk\,\ Vinnytsia";
-$areanames{en}->{3804340} = "Kryzhopil\,\ Vinnytsia";
-$areanames{en}->{3804341} = "Bar\,\ Vinnytsia";
-$areanames{en}->{3804342} = "Kozatin\,\ Vinnytsia";
-$areanames{en}->{3804343} = "Ladyzhin\/Trostyanets\,\ Vinnytsia";
-$areanames{en}->{3804344} = "Shargorod\,\ Vinnytsia";
-$areanames{en}->{3804345} = "Illintsi\,\ Vinnytsia";
-$areanames{en}->{3804346} = "Pogrebishche\,\ Vinnytsia";
-$areanames{en}->{3804347} = "Litin\,\ Vinnytsia";
-$areanames{en}->{3804348} = "Tomashpil\,\ Vinnytsia";
-$areanames{en}->{3804349} = "Pishchanka\,\ Vinnytsia";
-$areanames{en}->{3804350} = "Vapnarka\,\ Vinnytsia";
-$areanames{en}->{3804351} = "Chechelnyk\,\ Vinnytsia";
-$areanames{en}->{3804352} = "Bershad\,\ Vinnytsia";
-$areanames{en}->{3804353} = "Teplik\,\ Vinnytsia";
-$areanames{en}->{3804355} = "Hnivan\/Tyvriv\,\ Vinnytsia";
-$areanames{en}->{3804356} = "Murovani\ Kurylivtsi\,\ Vinnytsia";
-$areanames{en}->{3804358} = "Lipovets\,\ Vinnytsia";
-$areanames{en}->{38044} = "Kyiv\ city";
-$areanames{en}->{38045} = "Kyiv";
-$areanames{en}->{3804560} = "Tetiev\,\ Kyiv";
-$areanames{en}->{3804561} = "Boguslav\,\ Kyiv";
-$areanames{en}->{3804562} = "Rokitne\,\ Kyiv";
-$areanames{en}->{3804563} = "Belaya\ Tserkov\/Uzin\,\ Kyiv";
-$areanames{en}->{3804564} = "Stavyshche\,\ Kyiv";
-$areanames{en}->{3804565} = "Fastov\,\ Kyiv";
-$areanames{en}->{3804566} = "Tarashcha\,\ Kyiv";
-$areanames{en}->{3804567} = "Pereyaslav\-Khmelnitsky\,\ Kyiv";
-$areanames{en}->{3804568} = "Skvyra\,\ Kyiv";
-$areanames{en}->{3804569} = "Volodarka\,\ Kyiv";
-$areanames{en}->{3804570} = "Zgurovka\,\ Kyiv";
-$areanames{en}->{3804571} = "Vasilkov\/Glevaha\/Grebinky\/Kalinovka\,\ Kyiv";
-$areanames{en}->{3804572} = "Kozin\/Obukhiv\/Ukrainka\,\ Kyiv";
-$areanames{en}->{3804573} = "Kagarlyk\/Rzhyshchiv\,\ Kyiv";
-$areanames{en}->{3804574} = "Myronivka\,\ Kyiv";
-$areanames{en}->{3804575} = "Yagotin\,\ Kyiv";
-$areanames{en}->{3804576} = "Baryshevka\/Berezan\,\ Kyiv";
-$areanames{en}->{3804577} = "Borodyanka\/Klavdievo\-Tarasovo\/Nemishaive\,\ Kyiv";
-$areanames{en}->{3804578} = "Makarov\,\ Kyiv";
-$areanames{en}->{3804579} = "Slavutych\,\ Kyiv";
-$areanames{en}->{3804591} = "Ivankiv\,\ Kyiv";
-$areanames{en}->{3804594} = "Brovary\/Kalita\,\ Kyiv";
-$areanames{en}->{3804595} = "Borispol\,\ Kyiv";
-$areanames{en}->{3804596} = "Vyshgorod\/Dimer\/Pirnove\,\ Kyiv";
-$areanames{en}->{3804597} = "Bucha\/Vorzel\/Gostomel\/Irpen\/Kotsyubinskoe\,\ Kyiv";
-$areanames{en}->{3804598} = "Boyarka\/Vishnevoe\,\ Kyiv";
-$areanames{en}->{38046} = "Chernihiv";
-$areanames{en}->{3804631} = "Nizhyn\,\ Chernihiv";
-$areanames{en}->{3804632} = "Bobrovitsa\,\ Chernihiv";
-$areanames{en}->{3804633} = "Ichnya\,\ Chernihiv";
-$areanames{en}->{3804634} = "Talalayevka\,\ Chernihiv";
-$areanames{en}->{3804635} = "Baturin\/Bahmach\,\ Chernihiv";
-$areanames{en}->{3804636} = "Varva\,\ Chernihiv";
-$areanames{en}->{3804637} = "Priluki\,\ Chernihiv";
-$areanames{en}->{3804639} = "Silver\,\ Chernihiv";
-$areanames{en}->{3804641} = "Rivers\,\ Chernihiv";
-$areanames{en}->{3804642} = "Sedimentary\,\ Chernihiv";
-$areanames{en}->{3804643} = "Kulikivka\,\ Chernihiv";
-$areanames{en}->{3804644} = "Mena\,\ Chernihiv";
-$areanames{en}->{3804645} = "Gorodnya\,\ Chernihiv";
-$areanames{en}->{3804646} = "Desna\/Kozelets\/Oster\,\ Chernihiv";
-$areanames{en}->{3804653} = "Borzna\,\ Chernihiv";
-$areanames{en}->{3804654} = "Shchors\,\ Chernihiv";
-$areanames{en}->{3804655} = "Sosnitsa\,\ Chernihiv";
-$areanames{en}->{3804656} = "Carp\,\ Chernihiv";
-$areanames{en}->{3804657} = "Koryukivka\,\ Chernihiv";
-$areanames{en}->{3804658} = "Novgorod\-Seversky\,\ Chernihiv";
-$areanames{en}->{3804659} = "Semenivka\,\ Chernihiv";
-$areanames{en}->{38047} = "Cherkasy";
-$areanames{en}->{3804730} = "Chigirin\,\ Cherkasy";
-$areanames{en}->{3804731} = "Talne\,\ Cherkasy";
-$areanames{en}->{3804732} = "Kamyanets\,\ Cherkasy";
-$areanames{en}->{3804733} = "Smila\,\ Cherkasy";
-$areanames{en}->{3804734} = "Chernigov\ region";
-$areanames{en}->{3804735} = "Korsun\-Shevchenkivsky\,\ Cherkasy";
-$areanames{en}->{3804736} = "Kaniv\,\ Cherkasy";
-$areanames{en}->{3804737} = "Zolotonosha\,\ Cherkasy";
-$areanames{en}->{3804738} = "Drabiv\,\ Cherkasy";
-$areanames{en}->{3804739} = "Chernobyl\,\ Cherkasy";
-$areanames{en}->{3804740} = "Vatutina\/Zvenigorodka\,\ Cherkasy";
-$areanames{en}->{3804741} = "Shpola\,\ Cherkasy";
-$areanames{en}->{3804742} = "Katerinopil\,\ Cherkasy";
-$areanames{en}->{3804744} = "Uman\,\ Cherkasy";
-$areanames{en}->{3804745} = "Khrystynivka\,\ Cherkasy";
-$areanames{en}->{3804746} = "Monastyrysche\,\ Cherkasy";
-$areanames{en}->{3804747} = "Zhashkiv\,\ Cherkasy";
-$areanames{en}->{3804748} = "Mankivka\,\ Cherkasy";
-$areanames{en}->{3804749} = "Lysyanka\,\ Cherkasy";
-$areanames{en}->{38048} = "Odesa";
-$areanames{en}->{3804840} = "Reni\,\ Odesa";
-$areanames{en}->{3804841} = "Izmail\,\ Odesa";
-$areanames{en}->{3804843} = "Wilkow\/Kielia\,\ Odesa";
-$areanames{en}->{3804844} = "Tatarbunary\,\ Odesa";
-$areanames{en}->{3804845} = "Artsis\,\ Odesa";
-$areanames{en}->{3804846} = "Bolgrad\,\ Odesa";
-$areanames{en}->{3804847} = "Tarutino\,\ Odesa";
-$areanames{en}->{3804848} = "Saratov\,\ Odesa";
-$areanames{en}->{3804849} = "Belgorod\-Dniester\/Zatoka\/Sergievka\,\ Odesa";
-$areanames{en}->{3804850} = "Teplodar\,\ Odesa";
-$areanames{en}->{3804851} = "Ovidiopol\,\ Odesa";
-$areanames{en}->{3804852} = "Belyaevka\,\ Odesa";
-$areanames{en}->{3804853} = "Limanske\/Rozdilna\,\ Odesa";
-$areanames{en}->{3804854} = "Ivanivka\,\ Odesa";
-$areanames{en}->{3804855} = "Kominternovskoe\,\ Odesa";
-$areanames{en}->{3804856} = "Berezivka\,\ Odesa";
-$areanames{en}->{3804857} = "Nikolaevka\,\ Odesa";
-$areanames{en}->{3804858} = "Shiryaevoe\,\ Odesa";
-$areanames{en}->{3804859} = "Velikaya\ Mikhailovka\,\ Odesa";
-$areanames{en}->{3804860} = "Frunzivka\,\ Odesa";
-$areanames{en}->{3804861} = "Red\ Windows\,\ Odesa";
-$areanames{en}->{3804862} = "Kotovsk\,\ Odesa";
-$areanames{en}->{3804863} = "Ananev\,\ Odesa";
-$areanames{en}->{3804864} = "Lyubashevka\,\ Odesa";
-$areanames{en}->{3804865} = "Savran\,\ Odesa";
-$areanames{en}->{3804866} = "Balta\,\ Odesa";
-$areanames{en}->{3804867} = "Kodima\,\ Odesa";
-$areanames{en}->{3804868} = "Illichivsk\,\ Odesa";
-$areanames{en}->{38051} = "Mykolayiv";
-$areanames{en}->{3805131} = "Bratsk\,\ Mykolayiv";
-$areanames{en}->{3805132} = "Arbuzinka\,\ Mykolayiv";
-$areanames{en}->{3805133} = "Creve\ Lake\,\ Mykolayiv";
-$areanames{en}->{3805134} = "Voznesensk\,\ Mykolayiv";
-$areanames{en}->{3805135} = "Vradievka\,\ Mykolayiv";
-$areanames{en}->{3805136} = "Yuzhnoukrainsk\,\ Mykolayiv";
-$areanames{en}->{3805151} = "Novy\ Buh\,\ Mykolayiv";
-$areanames{en}->{3805152} = "Domanivka\,\ Mykolayiv";
-$areanames{en}->{3805153} = "Berezanka\,\ Mykolayiv";
-$areanames{en}->{3805154} = "Ochakiv\,\ Mykolayiv";
-$areanames{en}->{3805158} = "Bashtanka\,\ Mykolayiv";
-$areanames{en}->{3805159} = "Elanets\,\ Mykolayiv";
-$areanames{en}->{3805161} = "Pervomaysk\,\ Mykolayiv";
-$areanames{en}->{3805162} = "Snigurovka\,\ Mykolayiv";
-$areanames{en}->{3805163} = "Veselinove\,\ Mykolayiv";
-$areanames{en}->{3805164} = "Kazanka\,\ Mykolayiv";
-$areanames{en}->{3805167} = "New\ Odesa\,\ Mykolayiv";
-$areanames{en}->{3805168} = "Bereznegovate\,\ Mykolayiv";
-$areanames{en}->{38052} = "Kirovohrad";
-$areanames{en}->{380522} = "Kropyvnytskyi\,\ Kirovohrad";
-$areanames{en}->{3805233} = "Znamenka\,\ Kirovohrad";
-$areanames{en}->{3805234} = "Dolinska\,\ Kirovohrad";
-$areanames{en}->{3805235} = "Alexandria\,\ Kirovohrad";
-$areanames{en}->{3805236} = "Svetlovodsk\,\ Kirovohrad";
-$areanames{en}->{3805237} = "Petrov\,\ Kirovohrad";
-$areanames{en}->{3805238} = "Onufryevka\,\ Kirovohrad";
-$areanames{en}->{3805239} = "Ustinovka\,\ Kirovohrad";
-$areanames{en}->{3805240} = "Kompaniyivka\,\ Kirovohrad";
-$areanames{en}->{3805241} = "Novgorodka\,\ Kirovohrad";
-$areanames{en}->{3805242} = "Aleksandrovka\,\ Kirovohrad";
-$areanames{en}->{3805250} = "Vilshanka\,\ Kirovohrad";
-$areanames{en}->{3805251} = "Novoukrainka\,\ Kirovohrad";
-$areanames{en}->{3805252} = "Golovanovsk\,\ Kirovohrad";
-$areanames{en}->{3805253} = "Dobrovelichkovka\,\ Kirovohrad";
-$areanames{en}->{3805254} = "Haivoron\,\ Kirovohrad";
-$areanames{en}->{3805255} = "Novorangels\'k\,\ Kirovohrad";
-$areanames{en}->{3805256} = "Novomirgorod\,\ Kirovohrad";
-$areanames{en}->{3805257} = "Bobrinets\,\ Kirovohrad";
-$areanames{en}->{3805258} = "Malaya\ Vyska\,\ Kirovohrad";
-$areanames{en}->{3805259} = "Ulyanovka\,\ Kirovohrad";
-$areanames{en}->{38053} = "Poltava";
-$areanames{en}->{3805340} = "Chornukhi\,\ Poltava";
-$areanames{en}->{3805341} = "Semenivka\,\ Poltava";
-$areanames{en}->{3805342} = "Kozelshchina\,\ Poltava";
-$areanames{en}->{3805343} = "Kobelyaky\,\ Poltava";
-$areanames{en}->{3805344} = "New\ Sanzhary\,\ Poltava";
-$areanames{en}->{3805345} = "Big\ Bagachka\,\ Poltava";
-$areanames{en}->{3805346} = "Karlovka\,\ Poltava";
-$areanames{en}->{3805347} = "Chutovoye\,\ Poltava";
-$areanames{en}->{3805348} = "Komsomolsk\,\ Poltava";
-$areanames{en}->{3805350} = "Kotelva\,\ Poltava";
-$areanames{en}->{3805351} = "Dikanka\,\ Poltava";
-$areanames{en}->{3805352} = "Shishaki\,\ Poltava";
-$areanames{en}->{3805353} = "Zinkiv\,\ Poltava";
-$areanames{en}->{3805354} = "Gadyach\,\ Poltava";
-$areanames{en}->{3805355} = "Mirgorod\,\ Poltava";
-$areanames{en}->{3805356} = "Lokhvytsia\,\ Poltava";
-$areanames{en}->{3805357} = "Orzhitsa\,\ Poltava";
-$areanames{en}->{3805358} = "Pyriatyn\,\ Poltava";
-$areanames{en}->{3805359} = "Hrebinka\,\ Poltava";
-$areanames{en}->{3805360} = "Kremenchug\,\ Poltava";
-$areanames{en}->{3805361} = "Lubny\,\ Poltava";
-$areanames{en}->{3805362} = "Khorol\,\ Poltava";
-$areanames{en}->{3805363} = "Reshetilivka\,\ Poltava";
-$areanames{en}->{3805364} = "Mashivka\,\ Poltava";
-$areanames{en}->{3805365} = "Globin\,\ Poltava";
-$areanames{en}->{3805366} = "Kremenchug\,\ Poltava";
-$areanames{en}->{3805367} = "Kremenchug\,\ Poltava";
-$areanames{en}->{3805368} = "Kremenchug\,\ Poltava";
-$areanames{en}->{3805369} = "Kremenchug\,\ Poltava";
-$areanames{en}->{38054} = "Sumy";
-$areanames{en}->{3805442} = "Putivl\,\ Sumy";
-$areanames{en}->{3805443} = "Belopoly\,\ Sumy";
-$areanames{en}->{3805444} = "Glukhov\,\ Sumy";
-$areanames{en}->{3805445} = "Lebedin\,\ Sumy";
-$areanames{en}->{3805446} = "Tomatoes\,\ Sumy";
-$areanames{en}->{3805447} = "Konotop\,\ Sumy";
-$areanames{en}->{3805448} = "Romny\,\ Sumy";
-$areanames{en}->{3805449} = "Shostka\,\ Sumy";
-$areanames{en}->{3805451} = "Mid\-Buda\,\ Sumy";
-$areanames{en}->{3805452} = "Lipova\ Dolina\,\ Sumy";
-$areanames{en}->{3805453} = "Krolevets\,\ Sumy";
-$areanames{en}->{3805454} = "Burin\,\ Sumy";
-$areanames{en}->{3805455} = "Nedrigailov\,\ Sumy";
-$areanames{en}->{3805456} = "Yampil\,\ Sumy";
-$areanames{en}->{3805457} = "Great\ Pisarivka\,\ Sumy";
-$areanames{en}->{3805458} = "Trostyanets\,\ Sumy";
-$areanames{en}->{3805459} = "Krasnopolye\,\ Sumy";
-$areanames{en}->{38055} = "Kherson";
-$areanames{en}->{3805530} = "Kalanchak\,\ Kherson";
-$areanames{en}->{3805531} = "Ivanivka\,\ Kherson";
-$areanames{en}->{3805532} = "Great\ Aleksandrovka\,\ Kherson";
-$areanames{en}->{3805533} = "Novovorontsovka\,\ Kherson";
-$areanames{en}->{3805534} = "Genichesk\,\ Kherson";
-$areanames{en}->{3805535} = "Vysokoplylya\,\ Kherson";
-$areanames{en}->{3805536} = "Kakhovka\,\ Kherson";
-$areanames{en}->{3805537} = "Lazurne\/Skadovsk\,\ Kherson";
-$areanames{en}->{3805538} = "Askania\-Nova\/Chaplinka\,\ Kherson";
-$areanames{en}->{3805539} = "Gola\ Prystan\,\ Kherson";
-$areanames{en}->{3805540} = "Lower\ Sirogozy\,\ Kherson";
-$areanames{en}->{3805542} = "Tsyurupinsk\,\ Kherson";
-$areanames{en}->{3805543} = "Great\ Lipetyha\,\ Kherson";
-$areanames{en}->{3805544} = "Gornostaevka\,\ Kherson";
-$areanames{en}->{3805545} = "Upper\ Rogachik\,\ Kherson";
-$areanames{en}->{3805546} = "Berislav\,\ Kherson";
-$areanames{en}->{3805547} = "Belozerka\,\ Kherson";
-$areanames{en}->{3805548} = "Novotroitsk\,\ Kherson";
-$areanames{en}->{3805549} = "New\ Kakhovka\,\ Kherson";
-$areanames{en}->{380560} = "Dnipropetrovsk\/Dnipro";
-$areanames{en}->{380561} = "Dnipropetrovsk\/Dnipro";
-$areanames{en}->{380562} = "Dnipropetrovsk\/Dnipro";
-$areanames{en}->{3805630} = "Mezhova\,\ Dnipro";
-$areanames{en}->{3805631} = "Petropavlovka\,\ Dnipro";
-$areanames{en}->{3805632} = "Pavlograd\,\ Dnipro";
-$areanames{en}->{3805633} = "Pershotravensk\,\ Dnipro";
-$areanames{en}->{3805634} = "Petrykivka\,\ Dnipro";
-$areanames{en}->{3805635} = "Yurievka\,\ Dnipro";
-$areanames{en}->{3805636} = "Ternivka\,\ Dnipro";
-$areanames{en}->{3805637} = "Pavlograd\,\ Dnipro";
-$areanames{en}->{3805638} = "Pokrovskoe\,\ Dnipro";
-$areanames{en}->{3805639} = "Vasylkivka\,\ Dnipro";
-$areanames{en}->{380564} = "Krivoy\ Rog\,\ Dnipro";
-$areanames{en}->{3805650} = "Sofiyivka\,\ Dnipro";
-$areanames{en}->{3805651} = "Dnipropetrovsk\/Dnipro";
-$areanames{en}->{3805652} = "Yellow\ Waters\,\ Dnipro";
-$areanames{en}->{3805653} = "Volnogirsk\,\ Dnipro";
-$areanames{en}->{3805654} = "Krynychky\,\ Dnipro";
-$areanames{en}->{3805655} = "Dnipropetrovsk\/Dnipro";
-$areanames{en}->{3805656} = "Apostolove\,\ Dnipro";
-$areanames{en}->{3805657} = "Broad\,\ Dnipro";
-$areanames{en}->{3805658} = "Verhnedneprovsk\,\ Dnipro";
-$areanames{en}->{3805659} = "Dnipropetrovsk\/Dnipro";
-$areanames{en}->{3805660} = "Nikopol\,\ Dnipro";
-$areanames{en}->{3805661} = "Nikopol\,\ Dnipro";
-$areanames{en}->{3805662} = "Nikopol\,\ Dnipro";
-$areanames{en}->{3805663} = "Sinelnikovo\,\ Dnipro";
-$areanames{en}->{3805664} = "Nikopol\,\ Dnipro";
-$areanames{en}->{3805665} = "Manganese\,\ Dnipro";
-$areanames{en}->{3805666} = "Nikopol\,\ Dnipro";
-$areanames{en}->{3805667} = "Ordzhonikidze\,\ Dnipro";
-$areanames{en}->{3805668} = "Tomakivka\,\ Dnipro";
-$areanames{en}->{3805669} = "Salt\,\ Dnipro";
-$areanames{en}->{380567} = "Dnipropetrovsk\/Dnipro";
-$areanames{en}->{380568} = "Dnipropetrovsk\/Dnipro";
-$areanames{en}->{380569} = "Dneprodzerzhinsk\/Novomoskovsk\,\ Dnipro";
-$areanames{en}->{3805690} = "Tsarichanka\,\ Dnipro";
-$areanames{en}->{3805691} = "Magdalenivka\,\ Dnipro";
-$areanames{en}->{3805692} = "Dneprodzerzhinsk\,\ Dnipro";
-$areanames{en}->{3805693} = "Novomoskovsk\,\ Dnipro";
-$areanames{en}->{38057} = "Kharkiv";
-$areanames{en}->{380572} = "Merefa\/Kharkiv\,\ Kharkiv";
-$areanames{en}->{3805740} = "New\ Waterlog\,\ Kharkiv";
-$areanames{en}->{3805741} = "Vovchansk\,\ Kharkiv";
-$areanames{en}->{3805742} = "Kupyansk\,\ Kharkiv";
-$areanames{en}->{3805743} = "Izyum\,\ Kharkiv";
-$areanames{en}->{3805744} = "Krasnograd\,\ Kharkiv";
-$areanames{en}->{3805745} = "Lozova\,\ Kharkiv";
-$areanames{en}->{3805746} = "Chuguev\,\ Kharkiv";
-$areanames{en}->{3805747} = "Snakes\,\ Kharkiv";
-$areanames{en}->{3805748} = "Pervomaysk\,\ Kharkiv";
-$areanames{en}->{3805749} = "Balaklia\,\ Kharkiv";
-$areanames{en}->{3805750} = "Two\ years\ old\,\ Kharkiv";
-$areanames{en}->{3805751} = "Shevchenkovo\,\ Kharkiv";
-$areanames{en}->{3805752} = "Great\ Burluk\,\ Kharkiv";
-$areanames{en}->{3805753} = "Valki\,\ Kharkiv";
-$areanames{en}->{3805754} = "Gemini\,\ Kharkiv";
-$areanames{en}->{3805755} = "Kegichivka\,\ Kharkiv";
-$areanames{en}->{3805756} = "Krasnokutsk\,\ Kharkiv";
-$areanames{en}->{3805757} = "Barvinkov\,\ Kharkiv";
-$areanames{en}->{3805758} = "Bogodukhiv\,\ Kharkiv";
-$areanames{en}->{3805759} = "Borova\,\ Kharkiv";
-$areanames{en}->{3805761} = "Zachepilivka\,\ Kharkiv";
-$areanames{en}->{3805762} = "Sakhnovshchyna\,\ Kharkiv";
-$areanames{en}->{3805763} = "Carriers\,\ Kharkiv";
-$areanames{en}->{3805764} = "Zolochiv\,\ Kharkiv";
-$areanames{en}->{3805765} = "Pechenegi\,\ Kharkiv";
-$areanames{en}->{3805766} = "Kolomak\,\ Kharkiv";
-$areanames{en}->{38061} = "Zaporizhzhia";
-$areanames{en}->{380612} = "Zaporozhye\,\ Zaporizhzhia";
-$areanames{en}->{3806131} = "Yakimivka\,\ Zaporizhzhia";
-$areanames{en}->{3806132} = "Mikhailivka\,\ Zaporizhzhia";
-$areanames{en}->{3806133} = "Priazovskoe\,\ Zaporizhzhia";
-$areanames{en}->{3806136} = "Веселе\,\ Zaporizhzhia";
-$areanames{en}->{3806137} = "Primorsk\,\ Zaporizhzhia";
-$areanames{en}->{3806138} = "Kamyanets\'\-Dniprovs\'ka\,\ Zaporizhzhia";
-$areanames{en}->{3806139} = "Energodar\,\ Zaporizhzhia";
-$areanames{en}->{3806140} = "Chernigovka\,\ Zaporizhzhia";
-$areanames{en}->{3806141} = "Orychiv\,\ Zaporizhzhia";
-$areanames{en}->{3806143} = "Vilnyansk\,\ Zaporizhzhia";
-$areanames{en}->{3806144} = "Novomikolaevka\,\ Zaporizhzhia";
-$areanames{en}->{3806145} = "Gulyaypole\,\ Zaporizhzhia";
-$areanames{en}->{3806147} = "Kuybyshev\,\ Zaporizhzhia";
-$areanames{en}->{3806153} = "Berdyansk\,\ Zaporizhzhia";
-$areanames{en}->{3806156} = "Big\ Belozerka\,\ Zaporizhzhia";
-$areanames{en}->{3806162} = "Rozvku\,\ Zaporizhzhia";
-$areanames{en}->{3806165} = "Childbirth\,\ Zaporizhzhia";
-$areanames{en}->{3806175} = "Vasilivka\/Dneprorudne\,\ Zaporizhzhia";
-$areanames{en}->{3806178} = "Tokmak\,\ Zaporizhzhia";
-$areanames{en}->{380619} = "Melitopol\,\ Zaporizhzhia";
-$areanames{en}->{380620} = "Donetsk";
-$areanames{en}->{380621} = "Donetsk";
-$areanames{en}->{380622} = "Donetsk";
-$areanames{en}->{380623} = "Krasnoarmeysk\/Makeyevka\,\ Donetsk";
-$areanames{en}->{3806232} = "Makeevka\,\ Donetsk";
-$areanames{en}->{3806236} = "Yasinovata\,\ Donetsk";
-$areanames{en}->{3806237} = "Selidus\,\ Donetsk";
-$areanames{en}->{3806239} = "Krasnoarmeysk\,\ Donetsk";
-$areanames{en}->{3806240} = "Gorlovka\,\ Donetsk";
-$areanames{en}->{3806241} = "Gorlovka\,\ Donetsk";
-$areanames{en}->{3806242} = "Gorlovka\,\ Donetsk";
-$areanames{en}->{3806243} = "Great\ Novosilka\,\ Donetsk";
-$areanames{en}->{3806244} = "Volnovaha\,\ Donetsk";
-$areanames{en}->{3806245} = "Gorlovka\,\ Donetsk";
-$areanames{en}->{3806246} = "Volodarske\,\ Donetsk";
-$areanames{en}->{3806247} = "Dzerzhinsk\,\ Donetsk";
-$areanames{en}->{3806248} = "Gorlovka\,\ Donetsk";
-$areanames{en}->{3806249} = "Debaltsevo\,\ Donetsk";
-$areanames{en}->{3806250} = "Kirovske\,\ Donetsk";
-$areanames{en}->{3806251} = "Donetsk";
-$areanames{en}->{3806252} = "Yenakievo\,\ Donetsk";
-$areanames{en}->{3806253} = "Starobesheve\,\ Donetsk";
-$areanames{en}->{3806254} = "Torez\,\ Donetsk";
-$areanames{en}->{3806255} = "Shakhtarsk\,\ Donetsk";
-$areanames{en}->{3806256} = "Snizhne\,\ Donetsk";
-$areanames{en}->{3806257} = "Ilovajsk\/Khartsyzsk\,\ Donetsk";
-$areanames{en}->{3806258} = "Donetsk";
-$areanames{en}->{3806259} = "Amvrosievka\,\ Donetsk";
-$areanames{en}->{3806260} = "Kramatorsk\/Slavyansk\,\ Donetsk";
-$areanames{en}->{3806261} = "Krasny\ Liman\,\ Donetsk";
-$areanames{en}->{3806262} = "Svyatogorsk\/Slavyansk\,\ Donetsk";
-$areanames{en}->{3806263} = "Kramatorsk\/Slavyansk\,\ Donetsk";
-$areanames{en}->{3806264} = "Kramatorsk\,\ Donetsk";
-$areanames{en}->{3806265} = "Kramatorsk\/Slavyansk\,\ Donetsk";
-$areanames{en}->{3806266} = "Kramatorsk\/Slavyansk\,\ Donetsk";
-$areanames{en}->{3806267} = "Druzhkovka\,\ Donetsk";
-$areanames{en}->{3806268} = "Kramatorsk\/Slavyansk\,\ Donetsk";
-$areanames{en}->{3806269} = "Aleksandrovka\,\ Donetsk";
-$areanames{en}->{3806270} = "Artemivsk\,\ Donetsk";
-$areanames{en}->{3806271} = "Artemivsk\,\ Donetsk";
-$areanames{en}->{3806272} = "Kostiantynivka\,\ Donetsk";
-$areanames{en}->{3806273} = "Vugledar\,\ Donetsk";
-$areanames{en}->{3806274} = "Artemivsk\/Siversk\,\ Donetsk";
-$areanames{en}->{3806275} = "Dokuchaevsk\,\ Donetsk";
-$areanames{en}->{3806276} = "Artemivsk\,\ Donetsk";
-$areanames{en}->{3806277} = "Dobropolia\,\ Donetsk";
-$areanames{en}->{3806278} = "Marinka\,\ Donetsk";
-$areanames{en}->{3806279} = "Telmanov\,\ Donetsk";
-$areanames{en}->{380628} = "Donetsk";
-$areanames{en}->{380629} = "Mariupol\,\ Donetsk";
-$areanames{en}->{3806296} = "Novoazovsk\,\ Donetsk";
-$areanames{en}->{3806297} = "Mangosh\/Yalta\,\ Donetsk";
-$areanames{en}->{380640} = "Luhansk";
-$areanames{en}->{380641} = "Luhansk";
-$areanames{en}->{380642} = "Luhansk\/Oleksandrivsk\,\ Luhansk";
-$areanames{en}->{3806430} = "Luhansk";
-$areanames{en}->{3806431} = "Anthracite\,\ Luhansk";
-$areanames{en}->{3806432} = "Krasnyi\ Luch\,\ Luhansk";
-$areanames{en}->{3806433} = "Rovenky\,\ Luhansk";
-$areanames{en}->{3806434} = "Sverdlovsk\,\ Luhansk";
-$areanames{en}->{3806435} = "Krasnodon\,\ Luhansk";
-$areanames{en}->{3806436} = "Lutugin\,\ Luhansk";
-$areanames{en}->{3806437} = "Luhansk";
-$areanames{en}->{3806438} = "Luhansk";
-$areanames{en}->{3806439} = "Luhansk";
-$areanames{en}->{3806440} = "Luhansk";
-$areanames{en}->{3806441} = "Perevalsk\,\ Luhansk";
-$areanames{en}->{3806442} = "Alchevsk\,\ Luhansk";
-$areanames{en}->{3806443} = "Bryanka\,\ Luhansk";
-$areanames{en}->{3806444} = "Stakhanov\,\ Luhansk";
-$areanames{en}->{3806445} = "Novoyadar\,\ Luhansk";
-$areanames{en}->{3806446} = "Kirovsk\,\ Luhansk";
-$areanames{en}->{3806447} = "Luhansk";
-$areanames{en}->{3806448} = "Luhansk";
-$areanames{en}->{3806449} = "Luhansk";
-$areanames{en}->{3806450} = "Luhansk";
-$areanames{en}->{3806451} = "Lisichansk\,\ Luhansk";
-$areanames{en}->{3806452} = "Severodonetsk\,\ Luhansk";
-$areanames{en}->{3806453} = "Rubizhne\,\ Luhansk";
-$areanames{en}->{3806454} = "Kremenna\,\ Luhansk";
-$areanames{en}->{3806455} = "Pervomaisk\,\ Luhansk";
-$areanames{en}->{3806456} = "Trinity\ Church\,\ Luhansk";
-$areanames{en}->{3806457} = "Luhansk";
-$areanames{en}->{3806458} = "Luhansk";
-$areanames{en}->{3806459} = "Luhansk";
-$areanames{en}->{3806460} = "Luhansk";
-$areanames{en}->{3806461} = "Starobilsk\,\ Luhansk";
-$areanames{en}->{3806462} = "Belokurakine\,\ Luhansk";
-$areanames{en}->{3806463} = "Novopskov\,\ Luhansk";
-$areanames{en}->{3806464} = "Markovka\,\ Luhansk";
-$areanames{en}->{3806465} = "Milow\,\ Luhansk";
-$areanames{en}->{3806466} = "Belovodsk\,\ Luhansk";
-$areanames{en}->{3806467} = "Luhansk";
-$areanames{en}->{3806468} = "Luhansk";
-$areanames{en}->{3806469} = "Luhansk";
-$areanames{en}->{380647} = "Luhansk";
-$areanames{en}->{3806471} = "Swatov\,\ Luhansk";
-$areanames{en}->{3806472} = "Stanitsa\ Luhansk\,\ Luhansk";
-$areanames{en}->{3806473} = "Slavyanoserbsk\,\ Luhansk";
-$areanames{en}->{3806474} = "Popasna\,\ Luhansk";
-$areanames{en}->{380648} = "Luhansk";
-$areanames{en}->{380649} = "Luhansk";
-$areanames{en}->{38065} = "Crimea";
-$areanames{en}->{38069} = "Sevastopol\ city";
-$areanames{uk}->{38031} = "Закарпатська";
-$areanames{uk}->{380312} = "Ужгород\/Чоп\,\ Закарпатська";
-$areanames{uk}->{3803122} = "Ужгород\,\ Закарпатська";
-$areanames{uk}->{3803131} = "Мукачеве\,\ Закарпатська";
-$areanames{uk}->{3803132} = "Рахів\,\ Закарпатська";
-$areanames{uk}->{3803133} = "Свалява\,\ Закарпатська";
-$areanames{uk}->{3803134} = "Солотвино\/Тячів\,\ Закарпатська";
-$areanames{uk}->{3803135} = "Великий\ Березний\,\ Закарпатська";
-$areanames{uk}->{3803136} = "Воловець\,\ Закарпатська";
-$areanames{uk}->{3803141} = "Берегове\,\ Закарпатська";
-$areanames{uk}->{3803142} = "Хуст\,\ Закарпатська";
-$areanames{uk}->{3803143} = "Виноградів\,\ Закарпатська";
-$areanames{uk}->{3803144} = "Іршава\,\ Закарпатська";
-$areanames{uk}->{3803145} = "Перечин\,\ Закарпатська";
-$areanames{uk}->{3803146} = "Міжгірʼя\,\ Закарпатська";
-$areanames{uk}->{380320} = "Львів\/Львівська";
-$areanames{uk}->{380321} = "Львів\/Львівська";
-$areanames{uk}->{380322} = "Брюховичі\/Львів\,\ Львівська";
-$areanames{uk}->{3803230} = "Пустомити\,\ Львівська";
-$areanames{uk}->{3803231} = "Городок\,\ Львівська";
-$areanames{uk}->{3803232} = "Львів\/Львівська";
-$areanames{uk}->{3803233} = "Львів\/Львівська";
-$areanames{uk}->{3803234} = "Мостиська\,\ Львівська";
-$areanames{uk}->{3803235} = "Львів\/Львівська";
-$areanames{uk}->{3803236} = "Самбір\,\ Львівська";
-$areanames{uk}->{3803237} = "Львів\/Львівська";
-$areanames{uk}->{3803238} = "Старий\ Самбір\,\ Львівська";
-$areanames{uk}->{3803239} = "Жидачів\,\ Львівська";
-$areanames{uk}->{3803240} = "Львів\/Львівська";
-$areanames{uk}->{3803241} = "Миколаїв\,\ Львівська";
-$areanames{uk}->{3803242} = "Львів\/Львівська";
-$areanames{uk}->{3803243} = "Львів\/Львівська";
-$areanames{uk}->{3803244} = "Дрогобич\,\ Львівська";
-$areanames{uk}->{3803245} = "Стрий\,\ Львівська";
-$areanames{uk}->{3803246} = "Львів\/Львівська";
-$areanames{uk}->{3803247} = "Трускавець\,\ Львівська";
-$areanames{uk}->{3803248} = "Борислав\/Східниця\,\ Львівська";
-$areanames{uk}->{3803249} = "Червоноград\,\ Львівська";
-$areanames{uk}->{3803250} = "Львів\/Львівська";
-$areanames{uk}->{3803251} = "Сколе\/Славське\,\ Львівська";
-$areanames{uk}->{3803252} = "Жовква\,\ Львівська";
-$areanames{uk}->{3803253} = "Львів\/Львівська";
-$areanames{uk}->{3803254} = "Камʼянка\-Бузька\,\ Львівська";
-$areanames{uk}->{3803255} = "Радехів\,\ Львівська";
-$areanames{uk}->{3803256} = "Новояворівськ\,\ Львівська";
-$areanames{uk}->{3803257} = "Сокаль\,\ Львівська";
-$areanames{uk}->{3803258} = "Львів\/Львівська";
-$areanames{uk}->{3803259} = "Яворів\,\ Львівська";
-$areanames{uk}->{3803260} = "Моршин\,\ Львівська";
-$areanames{uk}->{3803261} = "Новий\ Роздол\,\ Львівська";
-$areanames{uk}->{3803262} = "Львів\/Львівська";
-$areanames{uk}->{3803263} = "Перемишляни\,\ Львівська";
-$areanames{uk}->{3803264} = "Буськ\,\ Львівська";
-$areanames{uk}->{3803265} = "Золочів\,\ Львівська";
-$areanames{uk}->{3803266} = "Броди\,\ Львівська";
-$areanames{uk}->{3803267} = "Львів\/Львівська";
-$areanames{uk}->{3803268} = "Львів\/Львівська";
-$areanames{uk}->{3803269} = "Турка\,\ Львівська";
-$areanames{uk}->{380327} = "Львів\/Львівська";
-$areanames{uk}->{380328} = "Львів\/Львівська";
-$areanames{uk}->{380329} = "Львів\/Львівська";
-$areanames{uk}->{38033} = "Волинська";
-$areanames{uk}->{380332} = "Луцьк\,\ Волинська";
-$areanames{uk}->{3803342} = "Володимир\-Волинський\,\ Волинська";
-$areanames{uk}->{3803344} = "Нововолинськ\,\ Волинська";
-$areanames{uk}->{3803346} = "Стара\ Вижівка\,\ Волинська";
-$areanames{uk}->{3803352} = "Ковель\,\ Волинська";
-$areanames{uk}->{3803355} = "Шацьк\,\ Волинська";
-$areanames{uk}->{3803357} = "Камінь\-Каширський\,\ Волинська";
-$areanames{uk}->{3803362} = "Любешів\,\ Волинська";
-$areanames{uk}->{3803363} = "Турійськ\,\ Волинська";
-$areanames{uk}->{3803365} = "Ківерці\/Цумань\,\ Волинська";
-$areanames{uk}->{3803366} = "Ратне\,\ Волинська";
-$areanames{uk}->{3803368} = "Рожище\,\ Волинська";
-$areanames{uk}->{3803372} = "Іваничі\,\ Волинська";
-$areanames{uk}->{3803374} = "Локачі\,\ Волинська";
-$areanames{uk}->{3803376} = "Маневичі\,\ Волинська";
-$areanames{uk}->{3803377} = "Любомль\,\ Волинська";
-$areanames{uk}->{3803379} = "Горохів\,\ Волинська";
-$areanames{uk}->{38034} = "Івано\-Франківська";
-$areanames{uk}->{3803430} = "Городенка\,\ Івано\-Франківська";
-$areanames{uk}->{3803431} = "Галич\,\ Івано\-Франківська";
-$areanames{uk}->{3803432} = "Верховина\,\ Івано\-Франківська";
-$areanames{uk}->{3803433} = "Коломия\,\ Івано\-Франківська";
-$areanames{uk}->{3803434} = "Ворохта\/Яремче\,\ Івано\-Франківська";
-$areanames{uk}->{3803435} = "Рогатин\,\ Івано\-Франківська";
-$areanames{uk}->{3803436} = "Тисмениця\,\ Івано\-Франківська";
-$areanames{uk}->{3803437} = "Болехів\,\ Івано\-Франківська";
-$areanames{uk}->{3803438} = "Бурштин\,\ Івано\-Франківська";
-$areanames{uk}->{3803471} = "Богородчани\,\ Івано\-Франківська";
-$areanames{uk}->{3803472} = "Калуш\,\ Івано\-Франківська";
-$areanames{uk}->{3803474} = "Рожнятів\,\ Івано\-Франківська";
-$areanames{uk}->{3803475} = "Делятин\/Надвірна\,\ Івано\-Франківська";
-$areanames{uk}->{3803476} = "Заболотів\/Снятин\,\ Івано\-Франківська";
-$areanames{uk}->{3803477} = "Долина\,\ Івано\-Франківська";
-$areanames{uk}->{3803478} = "Косів\,\ Івано\-Франківська";
-$areanames{uk}->{3803479} = "Тлумач\,\ Івано\-Франківська";
-$areanames{uk}->{38035} = "Тернопіль";
-$areanames{uk}->{3803540} = "Зборів\,\ Тернопіль";
-$areanames{uk}->{3803541} = "Борщів\,\ Тернопіль";
-$areanames{uk}->{3803542} = "Підгайці\,\ Тернопіль";
-$areanames{uk}->{3803543} = "Підволочиськ\,\ Тернопіль";
-$areanames{uk}->{3803544} = "Бучач\,\ Тернопіль";
-$areanames{uk}->{3803546} = "Кременець\/Почаїв\,\ Тернопіль";
-$areanames{uk}->{3803547} = "Козлів\/Козова\,\ Тернопіль";
-$areanames{uk}->{3803548} = "Бережани\,\ Тернопіль";
-$areanames{uk}->{3803549} = "Ланівці\,\ Тернопіль";
-$areanames{uk}->{3803550} = "Збараж\,\ Тернопіль";
-$areanames{uk}->{3803551} = "Теребовля\,\ Тернопіль";
-$areanames{uk}->{3803552} = "Чортків\,\ Тернопіль";
-$areanames{uk}->{3803554} = "Заліщики\,\ Тернопіль";
-$areanames{uk}->{3803555} = "Монастириська\,\ Тернопіль";
-$areanames{uk}->{3803557} = "Гусятин\,\ Тернопіль";
-$areanames{uk}->{3803558} = "Шумське\,\ Тернопіль";
-$areanames{uk}->{38036} = "Рівне";
-$areanames{uk}->{3803632} = "Зарічне\,\ Рівне";
-$areanames{uk}->{3803633} = "Радивилів\,\ Рівне";
-$areanames{uk}->{3803634} = "Володимирець\,\ Рівне";
-$areanames{uk}->{3803635} = "Рокитне\,\ Рівне";
-$areanames{uk}->{3803636} = "Кузнецовськ\,\ Рівне";
-$areanames{uk}->{3803637} = "Демидівка\,\ Рівне";
-$areanames{uk}->{3803650} = "Гоща\,\ Рівне";
-$areanames{uk}->{3803651} = "Корець\,\ Рівне";
-$areanames{uk}->{3803652} = "Здолбунів\,\ Рівне";
-$areanames{uk}->{3803653} = "Березне\,\ Рівне";
-$areanames{uk}->{3803654} = "Острог\,\ Рівне";
-$areanames{uk}->{3803655} = "Сарни\,\ Рівне";
-$areanames{uk}->{3803656} = "Дубно\,\ Рівне";
-$areanames{uk}->{3803657} = "Костопіль\,\ Рівне";
-$areanames{uk}->{3803658} = "Дубровиця\,\ Рівне";
-$areanames{uk}->{3803659} = "Млинів\,\ Рівне";
-$areanames{uk}->{38037} = "Чернівці";
-$areanames{uk}->{3803730} = "Вижниця\,\ Чернівці";
-$areanames{uk}->{38037312} = "Хотин\,\ Чернівці";
-$areanames{uk}->{3803732} = "Кельменці\,\ Чернівці";
-$areanames{uk}->{3803733} = "Новоселиця\,\ Чернівці";
-$areanames{uk}->{3803734} = "Глибока\,\ Чернівці";
-$areanames{uk}->{3803735} = "Сторожинець\,\ Чернівці";
-$areanames{uk}->{3803736} = "Кіцмань\,\ Чернівці";
-$areanames{uk}->{3803737} = "Заставна\,\ Чернівці";
-$areanames{uk}->{3803738} = "Путила\,\ Чернівці";
-$areanames{uk}->{3803739} = "Сокиряни\,\ Чернівці";
-$areanames{uk}->{3803740} = "Герца\,\ Чернівці";
-$areanames{uk}->{3803741} = "Новодністровськ\,\ Чернівці";
-$areanames{uk}->{38038} = "Хмельницький";
-$areanames{uk}->{3803840} = "Шепетівка\,\ Хмельницький";
-$areanames{uk}->{3803841} = "Білогірʼя\,\ Хмельницький";
-$areanames{uk}->{3803842} = "Нетішин\/Славута\,\ Хмельницький";
-$areanames{uk}->{3803843} = "Полонне\,\ Хмельницький";
-$areanames{uk}->{3803844} = "Теофіполь\,\ Хмельницький";
-$areanames{uk}->{3803845} = "Волочиськ\,\ Хмельницький";
-$areanames{uk}->{3803846} = "Віньківці\,\ Хмельницький";
-$areanames{uk}->{3803847} = "Нова\ Ушиця\,\ Хмельницький";
-$areanames{uk}->{3803849} = "Камʼянець\-Подільський\,\ Хмельницький";
-$areanames{uk}->{3803850} = "Стара\ Синява\,\ Хмельницький";
-$areanames{uk}->{3803851} = "Городок\/Сатанів\,\ Хмельницький";
-$areanames{uk}->{3803852} = "Ізяслав\,\ Хмельницький";
-$areanames{uk}->{3803853} = "Ярмолинці\,\ Хмельницький";
-$areanames{uk}->{3803854} = "Старокостянтинів\,\ Хмельницький";
-$areanames{uk}->{3803855} = "Красилів\,\ Хмельницький";
-$areanames{uk}->{3803856} = "Деражня\,\ Хмельницький";
-$areanames{uk}->{3803857} = "Летичів\/Меджибіж\,\ Хмельницький";
-$areanames{uk}->{3803858} = "Дунаївці\,\ Хмельницький";
-$areanames{uk}->{3803859} = "Чемерівці\,\ Хмельницький";
-$areanames{uk}->{38041} = "Житомир";
-$areanames{uk}->{3804130} = "Коростишів\,\ Житомир";
-$areanames{uk}->{3804131} = "Червоноармійськ\,\ Житомир";
-$areanames{uk}->{3804132} = "Радомишль\,\ Житомир";
-$areanames{uk}->{3804133} = "Малин\,\ Житомир";
-$areanames{uk}->{3804134} = "Черняхів\,\ Житомир";
-$areanames{uk}->{3804135} = "Олевськ\,\ Житомир";
-$areanames{uk}->{3804136} = "Андрушівка\,\ Житомир";
-$areanames{uk}->{3804137} = "Попільня\,\ Житомир";
-$areanames{uk}->{3804138} = "Ружин\,\ Житомир";
-$areanames{uk}->{3804139} = "Чуднів\,\ Житомир";
-$areanames{uk}->{3804140} = "Народичі\,\ Житомир";
-$areanames{uk}->{3804141} = "Новоград\-Волинський\,\ Житомир";
-$areanames{uk}->{3804142} = "Коростень\,\ Житомир";
-$areanames{uk}->{3804143} = "Бердичів\,\ Житомир";
-$areanames{uk}->{3804144} = "Баранівка\,\ Житомир";
-$areanames{uk}->{3804145} = "Володарськ\-Волинський\,\ Житомир";
-$areanames{uk}->{3804146} = "Дзержинськ\,\ Житомир";
-$areanames{uk}->{3804147} = "Любар\,\ Житомир";
-$areanames{uk}->{3804148} = "Овруч\,\ Житомир";
-$areanames{uk}->{3804149} = "Ємільчине\,\ Житомир";
-$areanames{uk}->{3804161} = "Лугини\,\ Житомир";
-$areanames{uk}->{3804162} = "Брусилів\,\ Житомир";
-$areanames{uk}->{38043} = "Вінниця";
-$areanames{uk}->{3804330} = "Оратів\,\ Вінниця";
-$areanames{uk}->{3804331} = "Брацлав\/Немирів\,\ Вінниця";
-$areanames{uk}->{3804332} = "Браїлів\/Жмеринка\,\ Вінниця";
-$areanames{uk}->{3804333} = "Калинівка\,\ Вінниця";
-$areanames{uk}->{3804334} = "Гайсин\,\ Вінниця";
-$areanames{uk}->{3804335} = "Тульчин\,\ Вінниця";
-$areanames{uk}->{3804336} = "Ямпіль\,\ Вінниця";
-$areanames{uk}->{3804337} = "Могилів\-Подільський\,\ Вінниця";
-$areanames{uk}->{3804338} = "Хмільник\,\ Вінниця";
-$areanames{uk}->{3804340} = "Крижопіль\,\ Вінниця";
-$areanames{uk}->{3804341} = "Бар\,\ Вінниця";
-$areanames{uk}->{3804342} = "Козятин\,\ Вінниця";
-$areanames{uk}->{3804343} = "Ладижин\/Тростянець\,\ Вінниця";
-$areanames{uk}->{3804344} = "Шаргород\,\ Вінниця";
-$areanames{uk}->{3804345} = "Іллінці\,\ Вінниця";
-$areanames{uk}->{3804346} = "Погребище\,\ Вінниця";
-$areanames{uk}->{3804347} = "Літин\,\ Вінниця";
-$areanames{uk}->{3804348} = "Томашпіль\,\ Вінниця";
-$areanames{uk}->{3804349} = "Піщанка\,\ Вінниця";
-$areanames{uk}->{3804350} = "Вапнярка\,\ Вінниця";
-$areanames{uk}->{3804351} = "Чечельник\,\ Вінниця";
-$areanames{uk}->{3804352} = "Бершадь\,\ Вінниця";
-$areanames{uk}->{3804353} = "Теплик\,\ Вінниця";
-$areanames{uk}->{3804355} = "Гнівань\/Тиврів\,\ Вінниця";
-$areanames{uk}->{3804356} = "Муровані\ Курилівці\,\ Вінниця";
-$areanames{uk}->{3804358} = "Липовець\,\ Вінниця";
-$areanames{uk}->{38044} = "м\.\ Київ";
-$areanames{uk}->{38045} = "Київ";
-$areanames{uk}->{3804560} = "Тетіїв\,\ Київ";
-$areanames{uk}->{3804561} = "Богуслав\,\ Київ";
-$areanames{uk}->{3804562} = "Рокитне\,\ Київ";
-$areanames{uk}->{3804563} = "Біла\ Церква\/Узин\,\ Київ";
-$areanames{uk}->{3804564} = "Ставище\,\ Київ";
-$areanames{uk}->{3804565} = "Фастів\,\ Київ";
-$areanames{uk}->{3804566} = "Тараща\,\ Київ";
-$areanames{uk}->{3804567} = "Переяслав\-Хмельницький\,\ Київ";
-$areanames{uk}->{3804568} = "Сквира\,\ Київ";
-$areanames{uk}->{3804569} = "Володарка\,\ Київ";
-$areanames{uk}->{3804570} = "Згурівка\,\ Київ";
-$areanames{uk}->{3804571} = "Васильків\/Глеваха\/Гребінки\/Калинівка\,\ Київ";
-$areanames{uk}->{3804572} = "Козин\/Обухів\/Українка\,\ Київ";
-$areanames{uk}->{3804573} = "Кагарлик\/Ржищів\,\ Київ";
-$areanames{uk}->{3804574} = "Миронівка\,\ Київ";
-$areanames{uk}->{3804575} = "Яготин\,\ Київ";
-$areanames{uk}->{3804576} = "Баришівка\/Березань\,\ Київ";
-$areanames{uk}->{3804577} = "Бородянка\/Клавдієво\-Тарасове\/Немішаєве\,\ Київ";
-$areanames{uk}->{3804578} = "Макарів\,\ Київ";
-$areanames{uk}->{3804579} = "Славутич\,\ Київ";
-$areanames{uk}->{3804591} = "Іванків\,\ Київ";
-$areanames{uk}->{3804594} = "Бровари\/Калита\,\ Київ";
-$areanames{uk}->{3804595} = "Бориспіль\,\ Київ";
-$areanames{uk}->{3804596} = "Вишгород\/Димер\/Пірнове\,\ Київ";
-$areanames{uk}->{3804597} = "Буча\/Ворзель\/Гостомель\/Ірпінь\/Коцюбинське\,\ Київ";
-$areanames{uk}->{3804598} = "Боярка\/Вишневе\,\ Київ";
-$areanames{uk}->{38046} = "Чернігів";
-$areanames{uk}->{3804631} = "Ніжин\,\ Чернігів";
-$areanames{uk}->{3804632} = "Бобровиця\,\ Чернігів";
-$areanames{uk}->{3804633} = "Ічня\,\ Чернігів";
-$areanames{uk}->{3804634} = "Талалаївка\,\ Чернігів";
-$areanames{uk}->{3804635} = "Батурин\/Бахмач\,\ Чернігів";
-$areanames{uk}->{3804636} = "Варва\,\ Чернігів";
-$areanames{uk}->{3804637} = "Прилуки\,\ Чернігів";
-$areanames{uk}->{3804639} = "Срібне\,\ Чернігів";
-$areanames{uk}->{3804641} = "Ріпки\,\ Чернігів";
-$areanames{uk}->{3804642} = "Носівка\,\ Чернігів";
-$areanames{uk}->{3804643} = "Куликівка\,\ Чернігів";
-$areanames{uk}->{3804644} = "Мена\,\ Чернігів";
-$areanames{uk}->{3804645} = "Городня\,\ Чернігів";
-$areanames{uk}->{3804646} = "Десна\/Козелець\/Остер\,\ Чернігів";
-$areanames{uk}->{3804653} = "Борзна\,\ Чернігів";
-$areanames{uk}->{3804654} = "Щорс\,\ Чернігів";
-$areanames{uk}->{3804655} = "Сосниця\,\ Чернігів";
-$areanames{uk}->{3804656} = "Короп\,\ Чернігів";
-$areanames{uk}->{3804657} = "Корюківка\,\ Чернігів";
-$areanames{uk}->{3804658} = "Новгород\-Сіверський\,\ Чернігів";
-$areanames{uk}->{3804659} = "Семенівка\,\ Чернігів";
-$areanames{uk}->{38047} = "Черкаси";
-$areanames{uk}->{3804730} = "Чигирин\,\ Черкаси";
-$areanames{uk}->{3804731} = "Тальне\,\ Черкаси";
-$areanames{uk}->{3804732} = "Камʼянка\,\ Черкаси";
-$areanames{uk}->{3804733} = "Сміла\,\ Черкаси";
-$areanames{uk}->{3804734} = "Городище\,\ Черкаси";
-$areanames{uk}->{3804735} = "Корсунь\-Шевченківський\,\ Черкаси";
-$areanames{uk}->{3804736} = "Канів\,\ Черкаси";
-$areanames{uk}->{3804737} = "Золотоноша\,\ Черкаси";
-$areanames{uk}->{3804738} = "Драбів\,\ Черкаси";
-$areanames{uk}->{3804739} = "Чорнобай\,\ Черкаси";
-$areanames{uk}->{3804740} = "Ватутіне\/Звенигородка\,\ Черкаси";
-$areanames{uk}->{3804741} = "Шпола\,\ Черкаси";
-$areanames{uk}->{3804742} = "Катеринопіль\,\ Черкаси";
-$areanames{uk}->{3804744} = "Умань\,\ Черкаси";
-$areanames{uk}->{3804745} = "Христинівка\,\ Черкаси";
-$areanames{uk}->{3804746} = "Монастирище\,\ Черкаси";
-$areanames{uk}->{3804747} = "Жашків\,\ Черкаси";
-$areanames{uk}->{3804748} = "Маньківка\,\ Черкаси";
-$areanames{uk}->{3804749} = "Лисянка\,\ Черкаси";
-$areanames{uk}->{38048} = "Одеса";
-$areanames{uk}->{3804840} = "Рені\,\ Одеса";
-$areanames{uk}->{3804841} = "Ізмаїл\,\ Одеса";
-$areanames{uk}->{3804843} = "Вилкове\/Кілія\,\ Одеса";
-$areanames{uk}->{3804844} = "Татарбунари\,\ Одеса";
-$areanames{uk}->{3804845} = "Арциз\,\ Одеса";
-$areanames{uk}->{3804846} = "Болград\,\ Одеса";
-$areanames{uk}->{3804847} = "Тарутине\,\ Одеса";
-$areanames{uk}->{3804848} = "Сарата\,\ Одеса";
-$areanames{uk}->{3804849} = "Білгород\-Дністровський\/Затока\/Сергіївка\,\ Одеса";
-$areanames{uk}->{3804850} = "Теплодар\,\ Одеса";
-$areanames{uk}->{3804851} = "Овідіополь\,\ Одеса";
-$areanames{uk}->{3804852} = "Біляївка\,\ Одеса";
-$areanames{uk}->{3804853} = "Лиманське\/Роздільна\,\ Одеса";
-$areanames{uk}->{3804854} = "Іванівка\,\ Одеса";
-$areanames{uk}->{3804855} = "Комінтернівське\,\ Одеса";
-$areanames{uk}->{3804856} = "Березівка\,\ Одеса";
-$areanames{uk}->{3804857} = "Миколаївка\,\ Одеса";
-$areanames{uk}->{3804858} = "Ширяєве\,\ Одеса";
-$areanames{uk}->{3804859} = "Велика\ Михайлівка\,\ Одеса";
-$areanames{uk}->{3804860} = "Фрунзівка\,\ Одеса";
-$areanames{uk}->{3804861} = "Красні\ Окни\,\ Одеса";
-$areanames{uk}->{3804862} = "Котовськ\,\ Одеса";
-$areanames{uk}->{3804863} = "Ананьїв\,\ Одеса";
-$areanames{uk}->{3804864} = "Любашівка\,\ Одеса";
-$areanames{uk}->{3804865} = "Саврань\,\ Одеса";
-$areanames{uk}->{3804866} = "Балта\,\ Одеса";
-$areanames{uk}->{3804867} = "Кодима\,\ Одеса";
-$areanames{uk}->{3804868} = "Іллічівськ\,\ Одеса";
-$areanames{uk}->{38051} = "Миколаїв";
-$areanames{uk}->{3805131} = "Братське\,\ Миколаїв";
-$areanames{uk}->{3805132} = "Арбузинка\,\ Миколаїв";
-$areanames{uk}->{3805133} = "Криве\ Озеро\,\ Миколаїв";
-$areanames{uk}->{3805134} = "Вознесенськ\,\ Миколаїв";
-$areanames{uk}->{3805135} = "Врадіївка\,\ Миколаїв";
-$areanames{uk}->{3805136} = "Південноукраїнськ\,\ Миколаїв";
-$areanames{uk}->{3805151} = "Новий\ Буг\,\ Миколаїв";
-$areanames{uk}->{3805152} = "Доманівка\,\ Миколаїв";
-$areanames{uk}->{3805153} = "Березанка\,\ Миколаїв";
-$areanames{uk}->{3805154} = "Очаків\,\ Миколаїв";
-$areanames{uk}->{3805158} = "Баштанка\,\ Миколаїв";
-$areanames{uk}->{3805159} = "Єланець\,\ Миколаїв";
-$areanames{uk}->{3805161} = "Первомайськ\,\ Миколаїв";
-$areanames{uk}->{3805162} = "Снігурівка\,\ Миколаїв";
-$areanames{uk}->{3805163} = "Веселинове\,\ Миколаїв";
-$areanames{uk}->{3805164} = "Казанка\,\ Миколаїв";
-$areanames{uk}->{3805167} = "Нова\ Одеса\,\ Миколаїв";
-$areanames{uk}->{3805168} = "Березнегувате\,\ Миколаїв";
-$areanames{uk}->{38052} = "Кіровоград";
-$areanames{uk}->{380522} = "Кропивницький\,\ Кіровоград";
-$areanames{uk}->{3805233} = "Знамʼянка\,\ Кіровоград";
-$areanames{uk}->{3805234} = "Долинська\,\ Кіровоград";
-$areanames{uk}->{3805235} = "Олександрія\,\ Кіровоград";
-$areanames{uk}->{3805236} = "Світловодськ\,\ Кіровоград";
-$areanames{uk}->{3805237} = "Петрове\,\ Кіровоград";
-$areanames{uk}->{3805238} = "Онуфріївка\,\ Кіровоград";
-$areanames{uk}->{3805239} = "Устинівка\,\ Кіровоград";
-$areanames{uk}->{3805240} = "Компаніївка\,\ Кіровоград";
-$areanames{uk}->{3805241} = "Новгородка\,\ Кіровоград";
-$areanames{uk}->{3805242} = "Олександрівка\,\ Кіровоград";
-$areanames{uk}->{3805250} = "Вільшанка\,\ Кіровоград";
-$areanames{uk}->{3805251} = "Новоукраїнка\,\ Кіровоград";
-$areanames{uk}->{3805252} = "Голованівськ\,\ Кіровоград";
-$areanames{uk}->{3805253} = "Добровеличківка\,\ Кіровоград";
-$areanames{uk}->{3805254} = "Гайворон\,\ Кіровоград";
-$areanames{uk}->{3805255} = "Новоархангельськ\,\ Кіровоград";
-$areanames{uk}->{3805256} = "Новомиргород\,\ Кіровоград";
-$areanames{uk}->{3805257} = "Бобринець\,\ Кіровоград";
-$areanames{uk}->{3805258} = "Мала\ Виска\,\ Кіровоград";
-$areanames{uk}->{3805259} = "Ульянівка\,\ Кіровоград";
-$areanames{uk}->{38053} = "Полтава";
-$areanames{uk}->{3805340} = "Чорнухи\,\ Полтава";
-$areanames{uk}->{3805341} = "Семенівка\,\ Полтава";
-$areanames{uk}->{3805342} = "Козельщина\,\ Полтава";
-$areanames{uk}->{3805343} = "Кобеляки\,\ Полтава";
-$areanames{uk}->{3805344} = "Нові\ Санжари\,\ Полтава";
-$areanames{uk}->{3805345} = "Велика\ Багачка\,\ Полтава";
-$areanames{uk}->{3805346} = "Карлівка\,\ Полтава";
-$areanames{uk}->{3805347} = "Чутове\,\ Полтава";
-$areanames{uk}->{3805348} = "Комсомольськ\,\ Полтава";
-$areanames{uk}->{3805350} = "Котельва\,\ Полтава";
-$areanames{uk}->{3805351} = "Диканька\,\ Полтава";
-$areanames{uk}->{3805352} = "Шишаки\,\ Полтава";
-$areanames{uk}->{3805353} = "Зіньків\,\ Полтава";
-$areanames{uk}->{3805354} = "Гадяч\,\ Полтава";
-$areanames{uk}->{3805355} = "Миргород\,\ Полтава";
-$areanames{uk}->{3805356} = "Лохвиця\,\ Полтава";
-$areanames{uk}->{3805357} = "Оржиця\,\ Полтава";
-$areanames{uk}->{3805358} = "Пирятин\,\ Полтава";
-$areanames{uk}->{3805359} = "Гребінка\,\ Полтава";
-$areanames{uk}->{3805360} = "Кременчук\,\ Полтава";
-$areanames{uk}->{3805361} = "Лубни\,\ Полтава";
-$areanames{uk}->{3805362} = "Хорол\,\ Полтава";
-$areanames{uk}->{3805363} = "Решетилівка\,\ Полтава";
-$areanames{uk}->{3805364} = "Машівка\,\ Полтава";
-$areanames{uk}->{3805365} = "Глобине\,\ Полтава";
-$areanames{uk}->{3805366} = "Кременчук\,\ Полтава";
-$areanames{uk}->{3805367} = "Кременчук\,\ Полтава";
-$areanames{uk}->{3805368} = "Кременчук\,\ Полтава";
-$areanames{uk}->{3805369} = "Кременчук\,\ Полтава";
-$areanames{uk}->{38054} = "Суми";
-$areanames{uk}->{3805442} = "Путивль\,\ Суми";
-$areanames{uk}->{3805443} = "Білопілля\,\ Суми";
-$areanames{uk}->{3805444} = "Глухів\,\ Суми";
-$areanames{uk}->{3805445} = "Лебедин\,\ Суми";
-$areanames{uk}->{3805446} = "Охтирка\,\ Суми";
-$areanames{uk}->{3805447} = "Конотоп\,\ Суми";
-$areanames{uk}->{3805448} = "Ромни\,\ Суми";
-$areanames{uk}->{3805449} = "Шостка\,\ Суми";
-$areanames{uk}->{3805451} = "Середина\-Буда\,\ Суми";
-$areanames{uk}->{3805452} = "Липова\ Долина\,\ Суми";
-$areanames{uk}->{3805453} = "Кролевець\,\ Суми";
-$areanames{uk}->{3805454} = "Буринь\,\ Суми";
-$areanames{uk}->{3805455} = "Недригайлів\,\ Суми";
-$areanames{uk}->{3805456} = "Ямпіль\,\ Суми";
-$areanames{uk}->{3805457} = "Велика\ Писарівка\,\ Суми";
-$areanames{uk}->{3805458} = "Тростянець\,\ Суми";
-$areanames{uk}->{3805459} = "Краснопілля\,\ Суми";
-$areanames{uk}->{38055} = "Херсон";
-$areanames{uk}->{3805530} = "Каланчак\,\ Херсон";
-$areanames{uk}->{3805531} = "Іванівка\,\ Херсон";
-$areanames{uk}->{3805532} = "Велика\ Олександрівка\,\ Херсон";
-$areanames{uk}->{3805533} = "Нововоронцовка\,\ Херсон";
-$areanames{uk}->{3805534} = "Генічеськ\,\ Херсон";
-$areanames{uk}->{3805535} = "Високопілля\,\ Херсон";
-$areanames{uk}->{3805536} = "Каховка\,\ Херсон";
-$areanames{uk}->{3805537} = "Лазурне\/Скадовськ\,\ Херсон";
-$areanames{uk}->{3805538} = "Асканія\-Нова\/Чаплинка\,\ Херсон";
-$areanames{uk}->{3805539} = "Гола\ Пристань\,\ Херсон";
-$areanames{uk}->{3805540} = "Нижні\ Сірогози\,\ Херсон";
-$areanames{uk}->{3805542} = "Цюрупинськ\,\ Херсон";
-$areanames{uk}->{3805543} = "Велика\ Лепетиха\,\ Херсон";
-$areanames{uk}->{3805544} = "Горностаївка\,\ Херсон";
-$areanames{uk}->{3805545} = "Верхній\ Рогачик\,\ Херсон";
-$areanames{uk}->{3805546} = "Берислав\,\ Херсон";
-$areanames{uk}->{3805547} = "Білозерка\,\ Херсон";
-$areanames{uk}->{3805548} = "Новотроїцьке\,\ Херсон";
-$areanames{uk}->{3805549} = "Нова\ Каховка\,\ Херсон";
-$areanames{uk}->{380560} = "Дніпропетро́вськ\/Дніпро";
-$areanames{uk}->{380561} = "Дніпропетро́вськ\/Дніпро";
-$areanames{uk}->{380562} = "Дніпропетровськ\,\ Дніпро";
-$areanames{uk}->{3805630} = "Межова\,\ Дніпро";
-$areanames{uk}->{3805631} = "Петропавлівка\,\ Дніпро";
-$areanames{uk}->{3805632} = "Павлоград\,\ Дніпро";
-$areanames{uk}->{3805633} = "Першотравенськ\,\ Дніпро";
-$areanames{uk}->{3805634} = "Петриківка\,\ Дніпро";
-$areanames{uk}->{3805635} = "Юрʼївка\,\ Дніпро";
-$areanames{uk}->{3805636} = "Тернівка\,\ Дніпро";
-$areanames{uk}->{3805637} = "Павлоград\,\ Дніпро";
-$areanames{uk}->{3805638} = "Покровське\,\ Дніпро";
-$areanames{uk}->{3805639} = "Васильківка\,\ Дніпро";
-$areanames{uk}->{380564} = "Кривий\ Ріг\,\ Дніпро";
-$areanames{uk}->{3805650} = "Софіївка\,\ Дніпро";
-$areanames{uk}->{3805651} = "Дніпропетро́вськ\/Дніпро";
-$areanames{uk}->{3805652} = "Жовті\ Води\,\ Дніпро";
-$areanames{uk}->{3805653} = "Вільногірськ\,\ Дніпро";
-$areanames{uk}->{3805654} = "Кринички\,\ Дніпро";
-$areanames{uk}->{3805655} = "Дніпропетро́вськ\/Дніпро";
-$areanames{uk}->{3805656} = "Апостолове\,\ Дніпро";
-$areanames{uk}->{3805657} = "Широке\,\ Дніпро";
-$areanames{uk}->{3805658} = "Верхньодніпровськ\,\ Дніпро";
-$areanames{uk}->{3805659} = "Дніпропетро́вськ\/Дніпро";
-$areanames{uk}->{3805660} = "Нікополь\,\ Дніпро";
-$areanames{uk}->{3805661} = "Нікополь\,\ Дніпро";
-$areanames{uk}->{3805662} = "Нікополь\,\ Дніпро";
-$areanames{uk}->{3805663} = "Синельникове\,\ Дніпро";
-$areanames{uk}->{3805664} = "Нікополь\,\ Дніпро";
-$areanames{uk}->{3805665} = "Марганець\,\ Дніпро";
-$areanames{uk}->{3805666} = "Нікополь\,\ Дніпро";
-$areanames{uk}->{3805667} = "Орджонікідзе\,\ Дніпро";
-$areanames{uk}->{3805668} = "Томаківка\,\ Дніпро";
-$areanames{uk}->{3805669} = "Солоне\,\ Дніпро";
-$areanames{uk}->{380567} = "Дніпропетро́вськ\/Дніпро";
-$areanames{uk}->{380568} = "Дніпропетро́вськ\/Дніпро";
-$areanames{uk}->{380569} = "Дніпродзержинськ\/Новомосковськ\,\ Дніпро";
-$areanames{uk}->{3805690} = "Царичанка\,\ Дніпро";
-$areanames{uk}->{3805691} = "Магдалинівка\,\ Дніпро";
-$areanames{uk}->{3805692} = "Дніпродзержинськ\,\ Дніпро";
-$areanames{uk}->{3805693} = "Новомосковськ\,\ Дніпро";
-$areanames{uk}->{38057} = "Харків";
-$areanames{uk}->{380572} = "Мерефа\/Харків\,\ Харків";
-$areanames{uk}->{3805740} = "Нова\ Водолага\,\ Харків";
-$areanames{uk}->{3805741} = "Вовчанськ\,\ Харків";
-$areanames{uk}->{3805742} = "Купʼянськ\,\ Харків";
-$areanames{uk}->{3805743} = "Ізюм\,\ Харків";
-$areanames{uk}->{3805744} = "Красноград\,\ Харків";
-$areanames{uk}->{3805745} = "Лозова\,\ Харків";
-$areanames{uk}->{3805746} = "Чугуїв\,\ Харків";
-$areanames{uk}->{3805747} = "Зміїв\,\ Харків";
-$areanames{uk}->{3805748} = "Первомайський\,\ Харків";
-$areanames{uk}->{3805749} = "Балаклія\,\ Харків";
-$areanames{uk}->{3805750} = "Дворічна\,\ Харків";
-$areanames{uk}->{3805751} = "Шевченкове\,\ Харків";
-$areanames{uk}->{3805752} = "Великий\ Бурлук\,\ Харків";
-$areanames{uk}->{3805753} = "Валки\,\ Харків";
-$areanames{uk}->{3805754} = "Близнюки\,\ Харків";
-$areanames{uk}->{3805755} = "Кегичівка\,\ Харків";
-$areanames{uk}->{3805756} = "Краснокутськ\,\ Харків";
-$areanames{uk}->{3805757} = "Барвінкове\,\ Харків";
-$areanames{uk}->{3805758} = "Богодухів\,\ Харків";
-$areanames{uk}->{3805759} = "Борова\,\ Харків";
-$areanames{uk}->{3805761} = "Зачепилівка\,\ Харків";
-$areanames{uk}->{3805762} = "Сахновщина\,\ Харків";
-$areanames{uk}->{3805763} = "Дергачі\,\ Харків";
-$areanames{uk}->{3805764} = "Золочів\,\ Харків";
-$areanames{uk}->{3805765} = "Печеніги\,\ Харків";
-$areanames{uk}->{3805766} = "Коломак\,\ Харків";
-$areanames{uk}->{38061} = "Запоріжжя\/Запорізька";
-$areanames{uk}->{380612} = "Запоріжжя\,\ Запорізька";
-$areanames{uk}->{3806131} = "Якимівка\,\ Запорізька";
-$areanames{uk}->{3806132} = "Михайлівка\,\ Запорізька";
-$areanames{uk}->{3806133} = "Приазовське\,\ Запорізька";
-$areanames{uk}->{3806136} = "Веселе\,\ Запорізька";
-$areanames{uk}->{3806137} = "Приморськ\,\ Запорізька";
-$areanames{uk}->{3806138} = "Камʼянка\-Дніпровська\,\ Запорізька";
-$areanames{uk}->{3806139} = "Енергодар\,\ Запорізька";
-$areanames{uk}->{3806140} = "Чернігівка\,\ Запорізька";
-$areanames{uk}->{3806141} = "Оріхів\,\ Запорізька";
-$areanames{uk}->{3806143} = "Вільнянськ\,\ Запорізька";
-$areanames{uk}->{3806144} = "Новомиколаївка\,\ Запорізька";
-$areanames{uk}->{3806145} = "Гуляйполе\,\ Запорізька";
-$areanames{uk}->{3806147} = "Куйбишеве\,\ Запорізька";
-$areanames{uk}->{3806153} = "Бердянськ\,\ Запорізька";
-$areanames{uk}->{3806156} = "Велика\ Білозерка\,\ Запорізька";
-$areanames{uk}->{3806162} = "Розівка\,\ Запорізька";
-$areanames{uk}->{3806165} = "Пологи\,\ Запорізька";
-$areanames{uk}->{3806175} = "Василівка\/Дніпрорудне\,\ Запорізька";
-$areanames{uk}->{3806178} = "Токмак\,\ Запорізька";
-$areanames{uk}->{380619} = "Мелітополь\,\ Запорізька";
-$areanames{uk}->{380620} = "Донецьк";
-$areanames{uk}->{380621} = "Донецьк";
-$areanames{uk}->{380622} = "Донецьк";
-$areanames{uk}->{380623} = "Красноармійськ\/Макіївка\,\ Донецьк";
-$areanames{uk}->{3806232} = "Макіївка\,\ Донецьк";
-$areanames{uk}->{3806236} = "Ясинувата\,\ Донецьк";
-$areanames{uk}->{3806237} = "Селидове\,\ Донецьк";
-$areanames{uk}->{3806239} = "Красноармійськ\,\ Донецьк";
-$areanames{uk}->{3806240} = "Горлівка\,\ Донецьк";
-$areanames{uk}->{3806241} = "Горлівка\,\ Донецьк";
-$areanames{uk}->{3806242} = "Горлівка\,\ Донецьк";
-$areanames{uk}->{3806243} = "Велика\ Новосілка\,\ Донецьк";
-$areanames{uk}->{3806244} = "Волноваха\,\ Донецьк";
-$areanames{uk}->{3806245} = "Горлівка\,\ Донецьк";
-$areanames{uk}->{3806246} = "Володарське\,\ Донецьк";
-$areanames{uk}->{3806247} = "Дзержинськ\,\ Донецьк";
-$areanames{uk}->{3806248} = "Горлівка\,\ Донецьк";
-$areanames{uk}->{3806249} = "Дебальцеве\,\ Донецьк";
-$areanames{uk}->{3806250} = "Кіровське\,\ Донецьк";
-$areanames{uk}->{3806251} = "Донецьк";
-$areanames{uk}->{3806252} = "Єнакієве\,\ Донецьк";
-$areanames{uk}->{3806253} = "Старобешеве\,\ Донецьк";
-$areanames{uk}->{3806254} = "Торез\,\ Донецьк";
-$areanames{uk}->{3806255} = "Шахтарськ\,\ Донецьк";
-$areanames{uk}->{3806256} = "Сніжне\,\ Донецьк";
-$areanames{uk}->{3806257} = "Іловайськ\/Харцизьк\,\ Донецьк";
-$areanames{uk}->{3806258} = "Донецьк";
-$areanames{uk}->{3806259} = "Амвросіївка\,\ Донецьк";
-$areanames{uk}->{3806260} = "Краматорськ\/Словʼянськ\,\ Донецьк";
-$areanames{uk}->{3806261} = "Красний\ Лиман\,\ Донецьк";
-$areanames{uk}->{3806262} = "Святогірськ\/Словʼянськ\,\ Донецьк";
-$areanames{uk}->{3806263} = "Краматорськ\/Словʼянськ\,\ Донецьк";
-$areanames{uk}->{3806264} = "Краматорськ\,\ Донецьк";
-$areanames{uk}->{3806265} = "Краматорськ\/Словʼянськ\,\ Донецьк";
-$areanames{uk}->{3806266} = "Краматорськ\/Словʼянськ\,\ Донецьк";
-$areanames{uk}->{3806267} = "Дружківка\,\ Донецьк";
-$areanames{uk}->{3806268} = "Краматорськ\/Словʼянськ\,\ Донецьк";
-$areanames{uk}->{3806269} = "Олександрівка\,\ Донецьк";
-$areanames{uk}->{3806270} = "Артемівськ\,\ Донецьк";
-$areanames{uk}->{3806271} = "Артемівськ\,\ Донецьк";
-$areanames{uk}->{3806272} = "Костянтинівка\,\ Донецьк";
-$areanames{uk}->{3806273} = "Вугледар\,\ Донецьк";
-$areanames{uk}->{3806274} = "Артемівськ\/Сіверськ\,\ Донецьк";
-$areanames{uk}->{3806275} = "Докучаєвськ\,\ Донецьк";
-$areanames{uk}->{3806276} = "Артемівськ\,\ Донецьк";
-$areanames{uk}->{3806277} = "Добропілля\,\ Донецьк";
-$areanames{uk}->{3806278} = "Марʼїнка\,\ Донецьк";
-$areanames{uk}->{3806279} = "Тельманове\,\ Донецьк";
-$areanames{uk}->{380628} = "Донецьк";
-$areanames{uk}->{380629} = "Маріуполь\,\ Донецьк";
-$areanames{uk}->{3806296} = "Новоазовськ\,\ Донецьк";
-$areanames{uk}->{3806297} = "Мангуш\/Ялта\,\ Донецьк";
-$areanames{uk}->{380640} = "Луганськ";
-$areanames{uk}->{380641} = "Луганськ";
-$areanames{uk}->{380642} = "Луганськ\/Олександрівськ\,\ Луганськ";
-$areanames{uk}->{3806430} = "Луганськ";
-$areanames{uk}->{3806431} = "Антрацит\,\ Луганськ";
-$areanames{uk}->{3806432} = "Красний\ Луч\,\ Луганськ";
-$areanames{uk}->{3806433} = "Ровеньки\,\ Луганськ";
-$areanames{uk}->{3806434} = "Свердловськ\,\ Луганськ";
-$areanames{uk}->{3806435} = "Краснодон\,\ Луганськ";
-$areanames{uk}->{3806436} = "Лутугине\,\ Луганськ";
-$areanames{uk}->{3806437} = "Луганськ";
-$areanames{uk}->{3806438} = "Луганськ";
-$areanames{uk}->{3806439} = "Луганськ";
-$areanames{uk}->{3806440} = "Луганськ";
-$areanames{uk}->{3806441} = "Перевальськ\,\ Луганськ";
-$areanames{uk}->{3806442} = "Алчевськ\,\ Луганськ";
-$areanames{uk}->{3806443} = "Брянка\,\ Луганськ";
-$areanames{uk}->{3806444} = "Стаханов\,\ Луганськ";
-$areanames{uk}->{3806445} = "Новоайдар\,\ Луганськ";
-$areanames{uk}->{3806446} = "Кіровськ\,\ Луганськ";
-$areanames{uk}->{3806447} = "Луганськ";
-$areanames{uk}->{3806448} = "Луганськ";
-$areanames{uk}->{3806449} = "Луганськ";
-$areanames{uk}->{3806450} = "Луганськ";
-$areanames{uk}->{3806451} = "Лисичанськ\,\ Луганськ";
-$areanames{uk}->{3806452} = "Сєвєродонецьк\,\ Луганськ";
-$areanames{uk}->{3806453} = "Рубіжне\,\ Луганськ";
-$areanames{uk}->{3806454} = "Кремінна\,\ Луганськ";
-$areanames{uk}->{3806455} = "Первомайськ\,\ Луганськ";
-$areanames{uk}->{3806456} = "Троїцьке\,\ Луганськ";
-$areanames{uk}->{3806457} = "Луганськ";
-$areanames{uk}->{3806458} = "Луганськ";
-$areanames{uk}->{3806459} = "Луганськ";
-$areanames{uk}->{3806460} = "Луганськ";
-$areanames{uk}->{3806461} = "Старобільськ\,\ Луганськ";
-$areanames{uk}->{3806462} = "Білокуракине\,\ Луганськ";
-$areanames{uk}->{3806463} = "Новопсков\,\ Луганськ";
-$areanames{uk}->{3806464} = "Марківка\,\ Луганськ";
-$areanames{uk}->{3806465} = "Мілове\,\ Луганськ";
-$areanames{uk}->{3806466} = "Біловодськ\,\ Луганськ";
-$areanames{uk}->{3806467} = "Луганськ";
-$areanames{uk}->{3806468} = "Луганськ";
-$areanames{uk}->{3806469} = "Луганськ";
-$areanames{uk}->{380647} = "Луганськ";
-$areanames{uk}->{3806471} = "Сватове\,\ Луганськ";
-$areanames{uk}->{3806472} = "Станиця\ Луганськ\,\ Луганськ";
-$areanames{uk}->{3806473} = "Словʼяносербськ\,\ Луганськ";
-$areanames{uk}->{3806474} = "Попасна\,\ Луганськ";
-$areanames{uk}->{380648} = "Луганськ";
-$areanames{uk}->{380649} = "Луганськ";
-$areanames{uk}->{38065} = "Крим";
-$areanames{uk}->{38069} = "Севастополь";
+$areanames{uk} = {"38037", "Чернівці",
+"3803741", "Новодністровськ\,\ Чернівці",
+"3804340", "Крижопіль\,\ Вінниця",
+"3805639", "Васильківка\,\ Дніпро",
+"3806242", "Горлівка\,\ Донецьк",
+"3804746", "Монастирище\,\ Черкаси",
+"3805693", "Новомосковськ\,\ Дніпро",
+"3805741", "Вовчанськ\,\ Харків",
+"38057", "Харків",
+"3803557", "Гусятин\,\ Тернопіль",
+"3804348", "Томашпіль\,\ Вінниця",
+"3805754", "Близнюки\,\ Харків",
+"3805748", "Первомайський\,\ Харків",
+"3805253", "Добровеличківка\,\ Кіровоград",
+"3806432", "Красний\ Луч\,\ Луганськ",
+"3803346", "Стара\ Вижівка\,\ Волинська",
+"38043", "Вінниця",
+"3806145", "Гуляйполе\,\ Запорізька",
+"3804341", "Бар\,\ Вінниця",
+"3803740", "Герца\,\ Чернівці",
+"3806456", "Троїцьке\,\ Луганськ",
+"3806274", "Артемівськ\/Сіверськ\,\ Донецьк",
+"3803253", "Львів\/Львівська",
+"3805346", "Карлівка\,\ Полтава",
+"3804162", "Брусилів\,\ Житомир",
+"3805369", "Кременчук\,\ Полтава",
+"3805740", "Нова\ Водолага\,\ Харків",
+"3803136", "Воловець\,\ Закарпатська",
+"3806279", "Тельманове\,\ Донецьк",
+"3805364", "Машівка\,\ Полтава",
+"3804131", "Червоноармійськ\,\ Житомир",
+"3805136", "Південноукраїнськ\,\ Миколаїв",
+"380332", "Луцьк\,\ Волинська",
+"3806297", "Мангуш\/Ялта\,\ Донецьк",
+"3806461", "Старобільськ\,\ Луганськ",
+"3805152", "Доманівка\,\ Миколаїв",
+"3804642", "Носівка\,\ Чернігів",
+"3804130", "Коростишів\,\ Житомир",
+"3805759", "Борова\,\ Харків",
+"3806468", "Луганськ",
+"3803255", "Радехів\,\ Львівська",
+"3803634", "Володимирець\,\ Рівне",
+"3804567", "Переяслав\-Хмельницький\,\ Київ",
+"3806143", "Вільнянськ\,\ Запорізька",
+"3806460", "Луганськ",
+"3803267", "Львів\/Львівська",
+"3805255", "Новоархангельськ\,\ Кіровоград",
+"3805634", "Петриківка\,\ Дніпро",
+"3804138", "Ружин\,\ Житомир",
+"3803133", "Свалява\,\ Закарпатська",
+"3805549", "Нова\ Каховка\,\ Херсон",
+"3803261", "Новий\ Роздол\,\ Львівська",
+"3803852", "Ізяслав\,\ Хмельницький",
+"3804561", "Богуслав\,\ Київ",
+"3803549", "Ланівці\,\ Тернопіль",
+"3805133", "Криве\ Озеро\,\ Миколаїв",
+"3804745", "Христинівка\,\ Черкаси",
+"3803479", "Тлумач\,\ Івано\-Франківська",
+"3804568", "Сквира\,\ Київ",
+"3806467", "Луганськ",
+"3803260", "Моршин\,\ Львівська",
+"3805345", "Велика\ Багачка\,\ Полтава",
+"3804137", "Попільня\,\ Житомир",
+"3806455", "Первомайськ\,\ Луганськ",
+"3803268", "Львів\/Львівська",
+"3804560", "Тетіїв\,\ Київ",
+"380612", "Запоріжжя\,\ Запорізька",
+"3803550", "Збараж\,\ Тернопіль",
+"3805442", "Путивль\,\ Суми",
+"3805135", "Врадіївка\,\ Миколаїв",
+"3804347", "Літин\,\ Вінниця",
+"3803558", "Шумське\,\ Тернопіль",
+"3803135", "Великий\ Березний\,\ Закарпатська",
+"3805256", "Новомиргород\,\ Кіровоград",
+"3803544", "Бучач\,\ Тернопіль",
+"3803551", "Теребовля\,\ Тернопіль",
+"3806453", "Рубіжне\,\ Луганськ",
+"3803474", "Рожнятів\,\ Івано\-Франківська",
+"3805747", "Зміїв\,\ Харків",
+"3803256", "Новояворівськ\,\ Львівська",
+"3805343", "Кобеляки\,\ Полтава",
+"3805544", "Горностаївка\,\ Херсон",
+"3804862", "Котовськ\,\ Одеса",
+"3803232", "Львів\/Львівська",
+"3805131", "Братське\,\ Миколаїв",
+"3804563", "Біла\ Церква\/Узин\,\ Київ",
+"380327", "Львів\/Львівська",
+"3806449", "Луганськ",
+"3806466", "Біловодськ\,\ Луганськ",
+"3803131", "Мукачеве\,\ Закарпатська",
+"3803263", "Перемишляни\,\ Львівська",
+"3806147", "Куйбишеве\,\ Запорізька",
+"3805359", "Гребінка\,\ Полтава",
+"3804136", "Андрушівка\,\ Житомир",
+"3803555", "Монастириська\,\ Тернопіль",
+"3806239", "Красноармійськ\,\ Донецьк",
+"3804634", "Талалаївка\,\ Чернігів",
+"380572", "Мерефа\/Харків\,\ Харків",
+"3805764", "Золочів\,\ Харків",
+"3805746", "Чугуїв\,\ Харків",
+"3804639", "Срібне\,\ Чернігів",
+"3805340", "Чорнухи\,\ Полтава",
+"3806472", "Станиця\ Луганськ\,\ Луганськ",
+"3803265", "Золочів\,\ Львівська",
+"3806458", "Луганськ",
+"3805257", "Бобринець\,\ Кіровоград",
+"3806450", "Луганськ",
+"3805348", "Комсомольськ\,\ Полтава",
+"3803257", "Сокаль\,\ Львівська",
+"3804741", "Шпола\,\ Черкаси",
+"3804565", "Фастів\,\ Київ",
+"38047", "Черкаси",
+"3805341", "Семенівка\,\ Полтава",
+"38053", "Полтава",
+"3805354", "Гадяч\,\ Полтава",
+"3804748", "Маньківка\,\ Черкаси",
+"3804740", "Ватутіне\/Звенигородка\,\ Черкаси",
+"3806444", "Стаханов\,\ Луганськ",
+"38033", "Волинська",
+"3805162", "Снігурівка\,\ Миколаїв",
+"3804346", "Погребище\,\ Вінниця",
+"3806451", "Лисичанськ\,\ Луганськ",
+"3804135", "Олевськ\,\ Житомир",
+"3805743", "Ізюм\,\ Харків",
+"3805691", "Магдалинівка\,\ Дніпро",
+"3804572", "Козин\/Обухів\/Українка\,\ Київ",
+"3805258", "Мала\ Виска\,\ Кіровоград",
+"3806457", "Луганськ",
+"3803434", "Ворохта\/Яремче\,\ Івано\-Франківська",
+"3803250", "Львів\/Львівська",
+"3803258", "Львів\/Львівська",
+"3806465", "Мілове\,\ Луганськ",
+"3805347", "Чутове\,\ Полтава",
+"3805250", "Вільшанка\,\ Кіровоград",
+"3804747", "Жашків\,\ Черкаси",
+"3803251", "Сколе\/Славське\,\ Львівська",
+"3805532", "Велика\ Олександрівка\,\ Херсон",
+"3803244", "Дрогобич\,\ Львівська",
+"3805690", "Царичанка\,\ Дніпро",
+"3805251", "Новоукраїнка\,\ Кіровоград",
+"380564", "Кривий\ Ріг\,\ Дніпро",
+"3804343", "Ладижин\/Тростянець\,\ Вінниця",
+"3804566", "Тараща\,\ Київ",
+"3806140", "Чернігівка\,\ Запорізька",
+"3806463", "Новопсков\,\ Луганськ",
+"3804852", "Біляївка\,\ Одеса",
+"3803266", "Броди\,\ Львівська",
+"3803249", "Червоноград\,\ Львівська",
+"380619", "Мелітополь\,\ Запорізька",
+"380647", "Луганськ",
+"3805745", "Лозова\,\ Харків",
+"3804133", "Малин\,\ Житомир",
+"3804345", "Іллінці\,\ Вінниця",
+"3806141", "Оріхів\,\ Запорізька",
+"38061", "Запоріжжя\/Запорізька",
+"3806296", "Новоазовськ\,\ Донецьк",
+"3805455", "Недригайлів\,\ Суми",
+"3803658", "Дубровиця\,\ Рівне",
+"3806260", "Краматорськ\/Словʼянськ\,\ Донецьк",
+"3805650", "Софіївка\,\ Дніпро",
+"3804591", "Іванків\,\ Київ",
+"3805658", "Верхньодніпровськ\,\ Дніпро",
+"3806268", "Краматорськ\/Словʼянськ\,\ Донецьк",
+"3803146", "Міжгірʼя\,\ Закарпатська",
+"3803843", "Полонне\,\ Хмельницький",
+"3804141", "Новоград\-Волинський\,\ Житомир",
+"38041", "Житомир",
+"3803650", "Гоща\,\ Рівне",
+"3804598", "Боярка\/Вишневе\,\ Київ",
+"3806133", "Приазовське\,\ Запорізька",
+"3806261", "Красний\ Лиман\,\ Донецьк",
+"3805651", "Дніпропетро́вськ\/Дніпро",
+"3804847", "Тарутине\,\ Одеса",
+"3804148", "Овруч\,\ Житомир",
+"3804140", "Народичі\,\ Житомир",
+"3803651", "Корець\,\ Рівне",
+"3804632", "Бобровиця\,\ Чернігів",
+"3804656", "Короп\,\ Чернігів",
+"3805762", "Сахновщина\,\ Харків",
+"3803845", "Волочиськ\,\ Хмельницький",
+"3804338", "Хмільник\,\ Вінниця",
+"3806474", "Попасна\,\ Луганськ",
+"3805666", "Нікополь\,\ Дніпро",
+"3806256", "Сніжне\,\ Донецьк",
+"3804330", "Оратів\,\ Вінниця",
+"3804736", "Канів\,\ Черкаси",
+"3806232", "Макіївка\,\ Донецьк",
+"3805453", "Кролевець\,\ Суми",
+"380312", "Ужгород\/Чоп\,\ Закарпатська",
+"3803738", "Путила\,\ Чернівці",
+"3805352", "Шишаки\,\ Полтава",
+"3806442", "Алчевськ\,\ Луганськ",
+"3803730", "Вижниця\,\ Чернівці",
+"3804331", "Брацлав\/Немирів\,\ Вінниця",
+"3803352", "Ковель\,\ Волинська",
+"3805164", "Казанка\,\ Миколаїв",
+"3803432", "Верховина\,\ Івано\-Франківська",
+"3804337", "Могилів\-Подільський\,\ Вінниця",
+"380567", "Дніпропетро́вськ\/Дніпро",
+"3804574", "Миронівка\,\ Київ",
+"3803145", "Перечин\,\ Закарпатська",
+"3806253", "Старобешеве\,\ Донецьк",
+"3805663", "Синельникове\,\ Дніпро",
+"3804733", "Сміла\,\ Черкаси",
+"3805456", "Ямпіль\,\ Суми",
+"3805534", "Генічеськ\,\ Херсон",
+"3804859", "Велика\ Михайлівка\,\ Одеса",
+"3804655", "Сосниця\,\ Чернігів",
+"3803737", "Заставна\,\ Чернівці",
+"3803242", "Львів\/Львівська",
+"3803377", "Любомль\,\ Волинська",
+"3805242", "Олександрівка\,\ Кіровоград",
+"3804735", "Корсунь\-Шевченківський\,\ Черкаси",
+"3803657", "Костопіль\,\ Рівне",
+"380623", "Красноармійськ\/Макіївка\,\ Донецьк",
+"3805665", "Марганець\,\ Дніпро",
+"3806255", "Шахтарськ\,\ Донецьк",
+"3803143", "Виноградів\,\ Закарпатська",
+"3805539", "Гола\ Пристань\,\ Херсон",
+"3803846", "Віньківці\,\ Хмельницький",
+"3804854", "Іванівка\,\ Одеса",
+"3804841", "Ізмаїл\,\ Одеса",
+"3806267", "Дружківка\,\ Донецьк",
+"3805657", "Широке\,\ Дніпро",
+"38048", "Одеса",
+"3806136", "Веселе\,\ Запорізька",
+"3804147", "Любар\,\ Житомир",
+"3804848", "Сарата\,\ Одеса",
+"3806178", "Токмак\,\ Запорізька",
+"3804597", "Буча\/Ворзель\/Гостомель\/Ірпінь\/Коцюбинське\,\ Київ",
+"3804579", "Славутич\,\ Київ",
+"3804840", "Рені\,\ Одеса",
+"3803122", "Ужгород\,\ Закарпатська",
+"3804653", "Борзна\,\ Чернігів",
+"3806251", "Донецьк",
+"3805661", "Нікополь\,\ Дніпро",
+"3803736", "Кіцмань\,\ Чернівці",
+"3804731", "Тальне\,\ Черкаси",
+"3806244", "Волноваха\,\ Донецьк",
+"3806175", "Василівка\/Дніпрорудне\,\ Запорізька",
+"3804845", "Арциз\,\ Одеса",
+"3805752", "Великий\ Бурлук\,\ Харків",
+"3803376", "Маневичі\,\ Волинська",
+"3804352", "Бершадь\,\ Вінниця",
+"3804730", "Чигирин\,\ Черкаси",
+"3806434", "Свердловськ\,\ Луганськ",
+"3805660", "Нікополь\,\ Дніпро",
+"3806250", "Кіровське\,\ Донецьк",
+"3804336", "Ямпіль\,\ Вінниця",
+"3805159", "Єланець\,\ Миколаїв",
+"3806258", "Донецьк",
+"3805668", "Томаківка\,\ Дніпро",
+"3805457", "Велика\ Писарівка\,\ Суми",
+"3806272", "Костянтинівка\,\ Донецьк",
+"3804738", "Драбів\,\ Черкаси",
+"3804596", "Вишгород\/Димер\/Пірнове\,\ Київ",
+"3803141", "Берегове\,\ Закарпатська",
+"38031", "Закарпатська",
+"3804843", "Вилкове\/Кілія\,\ Одеса",
+"3804146", "Дзержинськ\,\ Житомир",
+"3805362", "Хорол\,\ Полтава",
+"3806137", "Приморськ\,\ Запорізька",
+"3806439", "Луганськ",
+"38051", "Миколаїв",
+"3805154", "Очаків\,\ Миколаїв",
+"3804658", "Новгород\-Сіверський\,\ Чернігів",
+"3803362", "Любешів\,\ Волинська",
+"3803656", "Дубно\,\ Рівне",
+"3804644", "Мена\,\ Чернігів",
+"3803632", "Зарічне\,\ Рівне",
+"3805656", "Апостолове\,\ Дніпро",
+"3806266", "Краматорськ\/Словʼянськ\,\ Донецьк",
+"3803847", "Нова\ Ушиця\,\ Хмельницький",
+"3806249", "Дебальцеве\,\ Донецьк",
+"3805632", "Павлоград\,\ Дніпро",
+"3806138", "Камʼянка\-Дніпровська\,\ Запорізька",
+"3803841", "Білогірʼя\,\ Хмельницький",
+"38038", "Хмельницький",
+"3804846", "Болград\,\ Одеса",
+"3804143", "Бердичів\,\ Житомир",
+"3803854", "Старокостянтинів\,\ Хмельницький",
+"3803239", "Жидачів\,\ Львівська",
+"3804657", "Корюківка\,\ Чернігів",
+"3803735", "Сторожинець\,\ Чернівці",
+"3805239", "Устинівка\,\ Кіровоград",
+"3803653", "Березне\,\ Рівне",
+"3803840", "Шепетівка\,\ Хмельницький",
+"3806131", "Якимівка\,\ Запорізька",
+"3804335", "Тульчин\,\ Вінниця",
+"3806263", "Краматорськ\/Словʼянськ\,\ Донецьк",
+"3805653", "Вільногірськ\,\ Дніпро",
+"3805449", "Шостка\,\ Суми",
+"3805444", "Глухів\,\ Суми",
+"3803733", "Новоселиця\,\ Чернівці",
+"3806162", "Розівка\,\ Запорізька",
+"3805451", "Середина\-Буда\,\ Суми",
+"3804145", "Володарськ\-Волинський\,\ Житомир",
+"3804595", "Бориспіль\,\ Київ",
+"3803542", "Підгайці\,\ Тернопіль",
+"3805655", "Дніпропетро́вськ\/Дніпро",
+"3806265", "Краматорськ\/Словʼянськ\,\ Донецьк",
+"3803472", "Калуш\,\ Івано\-Франківська",
+"3805234", "Долинська\,\ Кіровоград",
+"3804333", "Калинівка\,\ Вінниця",
+"3804864", "Любашівка\,\ Одеса",
+"3805542", "Цюрупинськ\,\ Херсон",
+"3804737", "Золотоноша\,\ Черкаси",
+"3803655", "Сарни\,\ Рівне",
+"3803234", "Мостиська\,\ Львівська",
+"3805667", "Орджонікідзе\,\ Дніпро",
+"3806257", "Іловайськ\/Харцизьк\,\ Донецьк",
+"3805458", "Тростянець\,\ Суми",
+"3803859", "Чемерівці\,\ Хмельницький",
+"3804732", "Камʼянка\,\ Черкаси",
+"3806236", "Ясинувата\,\ Донецьк",
+"3805547", "Білозерка\,\ Херсон",
+"3804350", "Вапнярка\,\ Вінниця",
+"3806252", "Єнакієве\,\ Донецьк",
+"3805662", "Нікополь\,\ Дніпро",
+"3806278", "Марʼїнка\,\ Донецьк",
+"3806270", "Артемівськ\,\ Донецьк",
+"3805751", "Шевченкове\,\ Харків",
+"3803547", "Козлів\/Козова\,\ Тернопіль",
+"3804358", "Липовець\,\ Вінниця",
+"3803433", "Коломия\,\ Івано\-Франківська",
+"3805744", "Красноград\,\ Харків",
+"3803477", "Долина\,\ Івано\-Франківська",
+"3806469", "Луганськ",
+"3805758", "Богодухів\,\ Харків",
+"3804344", "Шаргород\,\ Вінниця",
+"3804351", "Чечельник\,\ Вінниця",
+"3806446", "Кіровськ\,\ Луганськ",
+"3803243", "Львів\/Львівська",
+"3804139", "Чуднів\,\ Житомир",
+"3805356", "Лохвиця\,\ Полтава",
+"3806271", "Артемівськ\,\ Донецьк",
+"3805750", "Дворічна\,\ Харків",
+"3805361", "Лубни\,\ Полтава",
+"3804134", "Черняхів\,\ Житомир",
+"3805638", "Покровське\,\ Дніпро",
+"3803435", "Рогатин\,\ Івано\-Франківська",
+"3803142", "Хуст\,\ Закарпатська",
+"3804349", "Піщанка\,\ Вінниця",
+"3806464", "Марківка\,\ Луганськ",
+"380642", "Луганськ\/Олександрівськ\,\ Луганськ",
+"380620", "Донецьк",
+"3805630", "Межова\,\ Дніпро",
+"38069", "Севастополь",
+"3803368", "Рожище\,\ Волинська",
+"3805766", "Коломак\,\ Харків",
+"3805749", "Балаклія\,\ Харків",
+"3805360", "Кременчук\,\ Полтава",
+"3804636", "Варва\,\ Чернігів",
+"3803245", "Стрий\,\ Львівська",
+"3805368", "Кременчук\,\ Полтава",
+"3805631", "Петропавлівка\,\ Дніпро",
+"3806153", "Бердянськ\,\ Запорізька",
+"380628", "Донецьк",
+"380322", "Брюховичі\/Львів\,\ Львівська",
+"3803264", "Буськ\,\ Львівська",
+"3805637", "Павлоград\,\ Дніпро",
+"3803842", "Нетішин\/Славута\,\ Хмельницький",
+"380522", "Кропивницький\,\ Кіровоград",
+"3803637", "Демидівка\,\ Рівне",
+"3804564", "Ставище\,\ Київ",
+"3805763", "Дергачі\,\ Харків",
+"3805355", "Миргород\,\ Полтава",
+"3804633", "Ічня\,\ Чернігів",
+"3806445", "Новоайдар\,\ Луганськ",
+"3806156", "Велика\ Білозерка\,\ Запорізька",
+"3806132", "Михайлівка\,\ Запорізька",
+"3803355", "Шацьк\,\ Волинська",
+"3805367", "Кременчук\,\ Полтава",
+"3806277", "Добропілля\,\ Донецьк",
+"3805452", "Липова\ Долина\,\ Суми",
+"3803540", "Зборів\,\ Тернопіль",
+"3805548", "Новотроїцьке\,\ Херсон",
+"3803478", "Косів\,\ Івано\-Франківська",
+"3805540", "Нижні\ Сірогози\,\ Херсон",
+"3803548", "Бережани\,\ Тернопіль",
+"3803436", "Тисмениця\,\ Івано\-Франківська",
+"3803471", "Богородчани\,\ Івано\-Франківська",
+"3803554", "Заліщики\,\ Тернопіль",
+"3804569", "Володарка\,\ Київ",
+"38035", "Тернопіль",
+"3803541", "Борщів\,\ Тернопіль",
+"3805757", "Барвінкове\,\ Харків",
+"3806443", "Брянка\,\ Луганськ",
+"3803246", "Львів\/Львівська",
+"3804635", "Батурин\/Бахмач\,\ Чернігів",
+"3805353", "Зіньків\,\ Полтава",
+"3805765", "Печеніги\,\ Харків",
+"38055", "Херсон",
+"3803269", "Турка\,\ Львівська",
+"3803366", "Ратне\,\ Волинська",
+"3806459", "Луганськ",
+"3805134", "Вознесенськ\,\ Миколаїв",
+"3806165", "Пологи\,\ Запорізька",
+"3805366", "Кременчук\,\ Полтава",
+"3804142", "Коростень\,\ Житомир",
+"3803134", "Солотвино\/Тячів\,\ Закарпатська",
+"3805636", "Тернівка\,\ Дніпро",
+"3804749", "Лисянка\,\ Черкаси",
+"3806262", "Святогірськ\/Словʼянськ\,\ Донецьк",
+"3805652", "Жовті\ Води\,\ Дніпро",
+"3803475", "Делятин\/Надвірна\,\ Івано\-Франківська",
+"3803636", "Кузнецовськ\,\ Рівне",
+"3805545", "Верхній\ Рогачик\,\ Херсон",
+"3805761", "Зачепилівка\,\ Харків",
+"3804631", "Ніжин\,\ Чернігів",
+"3803652", "Здолбунів\,\ Рівне",
+"3803372", "Іваничі\,\ Волинська",
+"3805756", "Краснокутськ\,\ Харків",
+"380649", "Луганськ",
+"3805350", "Котельва\,\ Полтава",
+"3806448", "Луганськ",
+"3804744", "Умань\,\ Черкаси",
+"3806440", "Луганськ",
+"3805358", "Пирятин\,\ Полтава",
+"3803732", "Кельменці\,\ Чернівці",
+"380568", "Дніпропетро́вськ\/Дніпро",
+"3803247", "Трускавець\,\ Львівська",
+"3805351", "Диканька\,\ Полтава",
+"3805344", "Нові\ Санжари\,\ Полтава",
+"3805543", "Велика\ Лепетиха\,\ Херсон",
+"3806276", "Артемівськ\,\ Донецьк",
+"380641", "Луганськ",
+"3806454", "Кремінна\,\ Луганськ",
+"3803437", "Болехів\,\ Івано\-Франківська",
+"3804332", "Браїлів\/Жмеринка\,\ Вінниця",
+"380560", "Дніпропетро́вськ\/Дніпро",
+"3804356", "Муровані\ Курилівці\,\ Вінниця",
+"3803344", "Нововолинськ\,\ Волинська",
+"3803543", "Підволочиськ\,\ Тернопіль",
+"3806441", "Перевальськ\,\ Луганськ",
+"3806447", "Луганськ",
+"3805753", "Валки\,\ Харків",
+"3803357", "Камінь\-Каширський\,\ Волинська",
+"3803431", "Галич\,\ Івано\-Франківська",
+"3803240", "Львів\/Львівська",
+"3805365", "Глобине\,\ Полтава",
+"3803248", "Борислав\/Східниця\,\ Львівська",
+"380329", "Львів\/Львівська",
+"3805357", "Оржиця\,\ Полтава",
+"3805240", "Компаніївка\,\ Кіровоград",
+"3803365", "Ківерці\/Цумань\,\ Волинська",
+"3803241", "Миколаїв\,\ Львівська",
+"3803430", "Городенка\,\ Івано\-Франківська",
+"3806237", "Селидове\,\ Донецьк",
+"3805546", "Берислав\,\ Херсон",
+"3806273", "Вугледар\,\ Донецьк",
+"3803635", "Рокитне\,\ Рівне",
+"380321", "Львів\/Львівська",
+"3803254", "Камʼянка\-Бузька\,\ Львівська",
+"3805241", "Новгородка\,\ Кіровоград",
+"38052", "Кіровоград",
+"3803476", "Заболотів\/Снятин\,\ Івано\-Франківська",
+"38045", "Київ",
+"3804353", "Теплик\,\ Вінниця",
+"3803438", "Бурштин\,\ Івано\-Франківська",
+"3803546", "Кременець\/Почаїв\,\ Тернопіль",
+"3805635", "Юрʼївка\,\ Дніпро",
+"3805254", "Гайворон\,\ Кіровоград",
+"3803363", "Турійськ\,\ Волинська",
+"3804637", "Прилуки\,\ Чернігів",
+"3805259", "Ульянівка\,\ Кіровоград",
+"3805363", "Решетилівка\,\ Полтава",
+"3803259", "Яворів\,\ Львівська",
+"3805755", "Кегичівка\,\ Харків",
+"3805633", "Першотравенськ\,\ Дніпро",
+"3804355", "Гнівань\/Тиврів\,\ Вінниця",
+"3806144", "Новомиколаївка\,\ Запорізька",
+"3803633", "Радивилів\,\ Рівне",
+"3806275", "Докучаєвськ\,\ Донецьк",
+"3805445", "Лебедин\,\ Суми",
+"380648", "Луганськ",
+"3805132", "Арбузинка\,\ Миколаїв",
+"3804144", "Баранівка\,\ Житомир",
+"3803853", "Ярмолинці\,\ Хмельницький",
+"3803132", "Рахів\,\ Закарпатська",
+"3804594", "Бровари\/Калита\,\ Київ",
+"380569", "Дніпродзержинськ\/Новомосковськ\,\ Дніпро",
+"380640", "Луганськ",
+"3804857", "Миколаївка\,\ Одеса",
+"380622", "Донецьк",
+"3805235", "Олександрія\,\ Кіровоград",
+"3805654", "Кринички\,\ Дніпро",
+"3806264", "Краматорськ\,\ Донецьк",
+"380561", "Дніпропетро́вськ\/Дніпро",
+"3803739", "Сокиряни\,\ Чернівці",
+"3803379", "Горохів\,\ Волинська",
+"3804865", "Саврань\,\ Одеса",
+"38036", "Рівне",
+"3803235", "Львів\/Львівська",
+"3803654", "Острог\,\ Рівне",
+"3804646", "Десна\/Козелець\/Остер\,\ Чернігів",
+"3806471", "Сватове\,\ Луганськ",
+"3805168", "Березнегувате\,\ Миколаїв",
+"38037312", "Хотин\,\ Чернівці",
+"3803374", "Локачі\,\ Волинська",
+"38065", "Крим",
+"3803855", "Красилів\,\ Хмельницький",
+"3803659", "Млинів\,\ Рівне",
+"3805537", "Лазурне\/Скадовськ\,\ Херсон",
+"3806246", "Володарське\,\ Донецьк",
+"3804742", "Катеринопіль\,\ Черкаси",
+"3803734", "Глибока\,\ Чернівці",
+"3806269", "Олександрівка\,\ Донецьк",
+"3805659", "Дніпропетро́вськ\/Дніпро",
+"3805443", "Білопілля\,\ Суми",
+"3804149", "Ємільчине\,\ Житомир",
+"3803233", "Львів\/Львівська",
+"3804863", "Ананьїв\,\ Одеса",
+"3805342", "Козельщина\,\ Полтава",
+"3804334", "Гайсин\,\ Вінниця",
+"3805161", "Первомайськ\,\ Миколаїв",
+"3804577", "Бородянка\/Клавдієво\-Тарасове\/Немішаєве\,\ Київ",
+"3806452", "Сєвєродонецьк\,\ Луганськ",
+"3805233", "Знамʼянка\,\ Кіровоград",
+"3806436", "Лутугине\,\ Луганськ",
+"3803342", "Володимир\-Волинський\,\ Волинська",
+"3805530", "Каланчак\,\ Херсон",
+"38044", "м\.\ Київ",
+"3805692", "Дніпродзержинськ\,\ Дніпро",
+"3804571", "Васильків\/Глеваха\/Гребінки\/Калинівка\,\ Київ",
+"3805167", "Нова\ Одеса\,\ Миколаїв",
+"3806243", "Велика\ Новосілка\,\ Донецьк",
+"3805446", "Охтирка\,\ Суми",
+"3805538", "Асканія\-Нова\/Чаплинка\,\ Херсон",
+"3804849", "Білгород\-Дністровський\/Затока\/Сергіївка\,\ Одеса",
+"3804645", "Городня\,\ Чернігів",
+"3803236", "Самбір\,\ Львівська",
+"3804570", "Згурівка\,\ Київ",
+"3803252", "Жовква\,\ Львівська",
+"3805531", "Іванівка\,\ Херсон",
+"3804866", "Балта\,\ Одеса",
+"3805236", "Світловодськ\,\ Кіровоград",
+"3805252", "Голованівськ\,\ Кіровоград",
+"3806433", "Ровеньки\,\ Луганськ",
+"3804578", "Макарів\,\ Київ",
+"3805153", "Березанка\,\ Миколаїв",
+"3806245", "Горлівка\,\ Донецьк",
+"3804844", "Татарбунари\,\ Одеса",
+"3803856", "Деражня\,\ Хмельницький",
+"380328", "Львів\/Львівська",
+"3804851", "Овідіополь\,\ Одеса",
+"3806435", "Краснодон\,\ Луганськ",
+"3804858", "Ширяєве\,\ Одеса",
+"3804850", "Теплодар\,\ Одеса",
+"3804643", "Куликівка\,\ Чернігів",
+"380320", "Львів\/Львівська",
+"3806241", "Горлівка\,\ Донецьк",
+"380562", "Дніпропетровськ\,\ Дніпро",
+"3804867", "Кодима\,\ Одеса",
+"3804734", "Городище\,\ Черкаси",
+"3806430", "Луганськ",
+"3803237", "Львів\/Львівська",
+"3806254", "Торез\,\ Донецьк",
+"3805664", "Нікополь\,\ Дніпро",
+"380621", "Донецьк",
+"3804659", "Семенівка\,\ Чернігів",
+"3804855", "Комінтернівське\,\ Одеса",
+"3805237", "Петрове\,\ Кіровоград",
+"3806438", "Луганськ",
+"3805742", "Купʼянськ\,\ Харків",
+"3804573", "Кагарлик\/Ржищів\,\ Київ",
+"3804342", "Козятин\,\ Вінниця",
+"3806431", "Антрацит\,\ Луганськ",
+"3806240", "Горлівка\,\ Донецьк",
+"3806248", "Горлівка\,\ Донецьк",
+"3805447", "Конотоп\,\ Суми",
+"380629", "Маріуполь\,\ Донецьк",
+"3804161", "Лугини\,\ Житомир",
+"3805533", "Нововоронцовка\,\ Херсон",
+"3804132", "Радомишль\,\ Житомир",
+"3804575", "Яготин\,\ Київ",
+"3803144", "Іршава\,\ Закарпатська",
+"3804853", "Лиманське\/Роздільна\,\ Одеса",
+"3806462", "Білокуракине\,\ Луганськ",
+"3805151", "Новий\ Буг\,\ Миколаїв",
+"3805535", "Високопілля\,\ Херсон",
+"3804654", "Щорс\,\ Чернігів",
+"3805158", "Баштанка\,\ Миколаїв",
+"38046", "Чернігів",
+"3804641", "Ріпки\,\ Чернігів",
+"3804739", "Чорнобай\,\ Черкаси",
+"3805669", "Солоне\,\ Дніпро",
+"3806259", "Амвросіївка\,\ Донецьк",
+"3803857", "Летичів\/Меджибіж\,\ Хмельницький",
+"3803851", "Городок\/Сатанів\,\ Хмельницький",
+"3804856", "Березівка\,\ Одеса",
+"3803844", "Теофіполь\,\ Хмельницький",
+"3803262", "Львів\/Львівська",
+"3804562", "Рокитне\,\ Київ",
+"3803850", "Стара\ Синява\,\ Хмельницький",
+"3805459", "Краснопілля\,\ Суми",
+"3803858", "Дунаївці\,\ Хмельницький",
+"3805454", "Буринь\,\ Суми",
+"3803238", "Старий\ Самбір\,\ Львівська",
+"3806139", "Енергодар\,\ Запорізька",
+"3804868", "Іллічівськ\,\ Одеса",
+"38054", "Суми",
+"3804860", "Фрунзівка\,\ Одеса",
+"3806473", "Словʼяносербськ\,\ Луганськ",
+"3806437", "Луганськ",
+"3805238", "Онуфріївка\,\ Кіровоград",
+"3804576", "Баришівка\/Березань\,\ Київ",
+"3803230", "Пустомити\,\ Львівська",
+"38034", "Івано\-Франківська",
+"3803552", "Чортків\,\ Тернопіль",
+"3805163", "Веселинове\,\ Миколаїв",
+"3803231", "Городок\,\ Львівська",
+"3805448", "Ромни\,\ Суми",
+"3806247", "Дзержинськ\,\ Донецьк",
+"3805536", "Каховка\,\ Херсон",
+"3803849", "Камʼянець\-Подільський\,\ Хмельницький",
+"3804861", "Красні\ Окни\,\ Одеса",};
+$areanames{en} = {"3803472", "Kalush\,\ Ivano\-Frankivsk",
+"3806265", "Kramatorsk\/Slavyansk\,\ Donetsk",
+"3805655", "Dnipropetrovsk\/Dnipro",
+"3805234", "Dolinska\,\ Kirovohrad",
+"3804333", "Kalinovka\,\ Vinnytsia",
+"3803542", "Pidhaytsi\,\ Ternopil",
+"3803655", "Sarny\,\ Rivne",
+"3803234", "Mostyska\,\ Lviv",
+"3806257", "Ilovajsk\/Khartsyzsk\,\ Donetsk",
+"3805667", "Ordzhonikidze\,\ Dnipro",
+"3803859", "Chemerivtsi\,\ Khmelnytskyi",
+"3805458", "Trostyanets\,\ Sumy",
+"3805542", "Tsyurupinsk\,\ Kherson",
+"3804864", "Lyubashevka\,\ Odesa",
+"3804737", "Zolotonosha\,\ Cherkasy",
+"3806162", "Rozvku\,\ Zaporizhzhia",
+"3805451", "Mid\-Buda\,\ Sumy",
+"3805444", "Glukhov\,\ Sumy",
+"3803733", "Novoselytsia\,\ Chernivtsi",
+"3804595", "Borispol\,\ Kyiv",
+"3804145", "Volodarsk\-Volynsky\,\ Zhytomyr",
+"3803840", "Shepetovka\,\ Khmelnytskyi",
+"3803653", "Berezne\,\ Rivne",
+"3804335", "Tulchin\,\ Vinnytsia",
+"3806131", "Yakimivka\,\ Zaporizhzhia",
+"3806263", "Kramatorsk\/Slavyansk\,\ Donetsk",
+"3805653", "Volnogirsk\,\ Dnipro",
+"3805449", "Shostka\,\ Sumy",
+"3804846", "Bolgrad\,\ Odesa",
+"3804143", "Berdychiv\,\ Zhytomyr",
+"3803854", "Starokostiantyniv\,\ Khmelnytskyi",
+"3803239", "Zhidachiv\,\ Lviv",
+"3806138", "Kamyanets\'\-Dniprovs\'ka\,\ Zaporizhzhia",
+"3803841", "Belogorsk\,\ Khmelnytskyi",
+"38038", "Khmelnytskyi",
+"3803735", "Storozhynets\,\ Chernivtsi",
+"3805239", "Ustinovka\,\ Kirovohrad",
+"3804657", "Koryukivka\,\ Chernihiv",
+"3803632", "Zarechnaya\,\ Rivne",
+"3803656", "Dubno\,\ Rivne",
+"3804644", "Mena\,\ Chernihiv",
+"3803847", "New\ Ushitsa\,\ Khmelnytskyi",
+"3806249", "Debaltsevo\,\ Donetsk",
+"3805632", "Pavlograd\,\ Dnipro",
+"3806266", "Kramatorsk\/Slavyansk\,\ Donetsk",
+"3805656", "Apostolove\,\ Dnipro",
+"3804843", "Wilkow\/Kielia\,\ Odesa",
+"3804146", "Dzerzhinsk\,\ Zhytomyr",
+"3805362", "Khorol\,\ Poltava",
+"3806137", "Primorsk\,\ Zaporizhzhia",
+"3804596", "Vyshgorod\/Dimer\/Pirnove\,\ Kyiv",
+"3803141", "Berehove\,\ Zakarpattia",
+"38031", "Zakarpattia",
+"3804658", "Novgorod\-Seversky\,\ Chernihiv",
+"3805154", "Ochakiv\,\ Mykolayiv",
+"3803362", "Lubeshiv\,\ Volyn",
+"3806439", "Luhansk",
+"38051", "Mykolayiv",
+"3806250", "Kirovske\,\ Donetsk",
+"3804336", "Yampil\,\ Vinnytsia",
+"3805660", "Nikopol\,\ Dnipro",
+"3805159", "Elanets\,\ Mykolayiv",
+"3804352", "Bershad\,\ Vinnytsia",
+"3804730", "Chigirin\,\ Cherkasy",
+"3806434", "Sverdlovsk\,\ Luhansk",
+"3804738", "Drabiv\,\ Cherkasy",
+"3806258", "Donetsk",
+"3805668", "Tomakivka\,\ Dnipro",
+"3805457", "Great\ Pisarivka\,\ Sumy",
+"3806272", "Kostiantynivka\,\ Donetsk",
+"3804731", "Talne\,\ Cherkasy",
+"3806244", "Volnovaha\,\ Donetsk",
+"3805661", "Nikopol\,\ Dnipro",
+"3806251", "Donetsk",
+"3803736", "Kitsman\,\ Chernivtsi",
+"3805752", "Great\ Burluk\,\ Kharkiv",
+"3803376", "Manevichi\,\ Volyn",
+"3806175", "Vasilivka\/Dneprorudne\,\ Zaporizhzhia",
+"3804845", "Artsis\,\ Odesa",
+"3804848", "Saratov\,\ Odesa",
+"3806178", "Tokmak\,\ Zaporizhzhia",
+"3804597", "Bucha\/Vorzel\/Gostomel\/Irpen\/Kotsyubinskoe\,\ Kyiv",
+"3806136", "Веселе\,\ Zaporizhzhia",
+"3804147", "Lyubar\,\ Zhytomyr",
+"3804653", "Borzna\,\ Chernihiv",
+"3804579", "Slavutych\,\ Kyiv",
+"3804840", "Reni\,\ Odesa",
+"3803122", "Uzhhorod\,\ Zakarpattia",
+"3803657", "Kostopil\,\ Rivne",
+"380623", "Krasnoarmeysk\/Makeyevka\,\ Donetsk",
+"3806255", "Shakhtarsk\,\ Donetsk",
+"3805665", "Manganese\,\ Dnipro",
+"3804735", "Korsun\-Shevchenkivsky\,\ Cherkasy",
+"38048", "Odesa",
+"3806267", "Druzhkovka\,\ Donetsk",
+"3805657", "Broad\,\ Dnipro",
+"3804841", "Izmail\,\ Odesa",
+"3803846", "Vinkivtsi\,\ Khmelnytskyi",
+"3805539", "Gola\ Prystan\,\ Kherson",
+"3804854", "Ivanivka\,\ Odesa",
+"3803143", "Vinogradov\,\ Zakarpattia",
+"3803737", "Zastavna\,\ Chernivtsi",
+"3803242", "Lviv",
+"3804859", "Velikaya\ Mikhailovka\,\ Odesa",
+"3805534", "Genichesk\,\ Kherson",
+"3804655", "Sosnitsa\,\ Chernihiv",
+"3805242", "Aleksandrovka\,\ Kirovohrad",
+"3803377", "Lyuboml\,\ Volyn",
+"3803145", "Perechyn\,\ Zakarpattia",
+"3803432", "Verkhovyna\,\ Ivano\-Frankivsk",
+"3804337", "Mogilev\-Podolsky\,\ Vinnytsia",
+"3804574", "Myronivka\,\ Kyiv",
+"380567", "Dnipropetrovsk\/Dnipro",
+"3804733", "Smila\,\ Cherkasy",
+"3805456", "Yampil\,\ Sumy",
+"3806253", "Starobesheve\,\ Donetsk",
+"3805663", "Sinelnikovo\,\ Dnipro",
+"3805352", "Shishaki\,\ Poltava",
+"380312", "Uzhgorod\/Chop\,\ Zakarpattia",
+"3803738", "Putila\,\ Chernivtsi",
+"3803730", "Vyzhnytsia\,\ Chernivtsi",
+"3804331", "Bratslav\/Nemyriv\,\ Vinnytsia",
+"3803352", "Kovel\,\ Volyn",
+"3805164", "Kazanka\,\ Mykolayiv",
+"3806442", "Alchevsk\,\ Luhansk",
+"3803845", "Volochysk\,\ Khmelnytskyi",
+"3804338", "Khmilnyk\,\ Vinnytsia",
+"3806474", "Popasna\,\ Luhansk",
+"3804736", "Kaniv\,\ Cherkasy",
+"3805453", "Krolevets\,\ Sumy",
+"3806232", "Makeevka\,\ Donetsk",
+"3804330", "Oratov\,\ Vinnytsia",
+"3806256", "Snizhne\,\ Donetsk",
+"3805666", "Nikopol\,\ Dnipro",
+"3804148", "Ovruch\,\ Zhytomyr",
+"3804598", "Boyarka\/Vishnevoe\,\ Kyiv",
+"3806133", "Priazovskoe\,\ Zaporizhzhia",
+"3806261", "Krasny\ Liman\,\ Donetsk",
+"3804847", "Tarutino\,\ Odesa",
+"3805651", "Dnipropetrovsk\/Dnipro",
+"3804656", "Carp\,\ Chernihiv",
+"3805762", "Sakhnovshchyna\,\ Kharkiv",
+"3804140", "Natives\,\ Zhytomyr",
+"3803651", "Korets\,\ Rivne",
+"3804632", "Bobrovitsa\,\ Chernihiv",
+"3805650", "Sofiyivka\,\ Dnipro",
+"3806260", "Kramatorsk\/Slavyansk\,\ Donetsk",
+"3805455", "Nedrigailov\,\ Sumy",
+"3803658", "Dubrovitsa\,\ Rivne",
+"38041", "Zhytomyr",
+"3804141", "Novograd\-Volynsky\,\ Zhytomyr",
+"3803650", "Goshcha\,\ Rivne",
+"3804591", "Ivankiv\,\ Kyiv",
+"3805658", "Verhnedneprovsk\,\ Dnipro",
+"3806268", "Kramatorsk\/Slavyansk\,\ Donetsk",
+"3803843", "Polonne\,\ Khmelnytskyi",
+"3803146", "Mizhhirya\,\ Zakarpattia",
+"3806141", "Orychiv\,\ Zaporizhzhia",
+"38061", "Zaporizhzhia",
+"3804345", "Illintsi\,\ Vinnytsia",
+"3806296", "Novoazovsk\,\ Donetsk",
+"3806140", "Chernigovka\,\ Zaporizhzhia",
+"3806463", "Novopskov\,\ Luhansk",
+"3804566", "Tarashcha\,\ Kyiv",
+"3803249", "Chervonograd\,\ Lviv",
+"380647", "Luhansk",
+"380619", "Melitopol\,\ Zaporizhzhia",
+"3804133", "Malin\,\ Zhytomyr",
+"3805745", "Lozova\,\ Kharkiv",
+"3804852", "Belyaevka\,\ Odesa",
+"3803266", "Brody\,\ Lviv",
+"3803244", "Drogobych\,\ Lviv",
+"3805690", "Tsarichanka\,\ Dnipro",
+"3804747", "Zhashkiv\,\ Cherkasy",
+"3803251", "Skole\/Slavske\,\ Lviv",
+"3805532", "Great\ Aleksandrovka\,\ Kherson",
+"380564", "Krivoy\ Rog\,\ Dnipro",
+"3804343", "Ladyzhin\/Trostyanets\,\ Vinnytsia",
+"3805251", "Novoukrainka\,\ Kirovohrad",
+"3803250", "Lviv",
+"3804135", "Olevsk\,\ Zhytomyr",
+"3805743", "Izyum\,\ Kharkiv",
+"3805691", "Magdalenivka\,\ Dnipro",
+"3804572", "Kozin\/Obukhiv\/Ukrainka\,\ Kyiv",
+"3806457", "Luhansk",
+"3805258", "Malaya\ Vyska\,\ Kirovohrad",
+"3803434", "Vorokhta\/Yaremche\,\ Ivano\-Frankivsk",
+"3805347", "Chutovoye\,\ Poltava",
+"3805250", "Vilshanka\,\ Kirovohrad",
+"3803258", "Lviv",
+"3806465", "Milow\,\ Luhansk",
+"3805354", "Gadyach\,\ Poltava",
+"3804748", "Mankivka\,\ Cherkasy",
+"3805341", "Semenivka\,\ Poltava",
+"38053", "Poltava",
+"3805162", "Snigurovka\,\ Mykolayiv",
+"3804346", "Pogrebishche\,\ Vinnytsia",
+"3806451", "Lisichansk\,\ Luhansk",
+"3804740", "Vatutina\/Zvenigorodka\,\ Cherkasy",
+"3806444", "Stakhanov\,\ Luhansk",
+"38033", "Volyn",
+"3805340", "Chornukhi\,\ Poltava",
+"3806472", "Stanitsa\ Luhansk\,\ Luhansk",
+"3803265", "Zolochiv\,\ Lviv",
+"3806458", "Luhansk",
+"3805257", "Bobrinets\,\ Kirovohrad",
+"3805746", "Chuguev\,\ Kharkiv",
+"3804639", "Silver\,\ Chernihiv",
+"3803257", "Sokal\,\ Lviv",
+"3804565", "Fastov\,\ Kyiv",
+"38047", "Cherkasy",
+"3804741", "Shpola\,\ Cherkasy",
+"3806450", "Luhansk",
+"3805348", "Komsomolsk\,\ Poltava",
+"3806239", "Krasnoarmeysk\,\ Donetsk",
+"3803555", "Monastery\,\ Ternopil",
+"3805764", "Zolochiv\,\ Kharkiv",
+"3804634", "Talalayevka\,\ Chernihiv",
+"380572", "Merefa\/Kharkiv\,\ Kharkiv",
+"3806466", "Belovodsk\,\ Luhansk",
+"3805131", "Bratsk\,\ Mykolayiv",
+"3804563", "Belaya\ Tserkov\/Uzin\,\ Kyiv",
+"380327", "Lviv",
+"3806449", "Luhansk",
+"3806147", "Kuybyshev\,\ Zaporizhzhia",
+"3805359", "Hrebinka\,\ Poltava",
+"3804136", "Andrushivka\,\ Zhytomyr",
+"3803131", "Mukacheve\,\ Zakarpattia",
+"3803263", "Peremyshlyany\,\ Lviv",
+"3803551", "Terebovlya\,\ Ternopil",
+"3806453", "Rubizhne\,\ Luhansk",
+"3805747", "Snakes\,\ Kharkiv",
+"3803474", "Rozhnyatov\,\ Ivano\-Frankivsk",
+"3805256", "Novomirgorod\,\ Kirovohrad",
+"3803544", "Buchach\,\ Ternopil",
+"3803232", "Lviv",
+"3803256", "Novoyavorivsk\,\ Lviv",
+"3805343", "Kobelyaky\,\ Poltava",
+"3804862", "Kotovsk\,\ Odesa",
+"3805544", "Gornostaevka\,\ Kherson",
+"3805135", "Vradievka\,\ Mykolayiv",
+"380612", "Zaporozhye\,\ Zaporizhzhia",
+"3803550", "Zbarazh\,\ Ternopil",
+"3805442", "Putivl\,\ Sumy",
+"3803558", "Shumsk\,\ Ternopil",
+"3803135", "Great\ Berezny\,\ Zakarpattia",
+"3804347", "Litin\,\ Vinnytsia",
+"3803260", "Morshin\,\ Lviv",
+"3805345", "Big\ Bagachka\,\ Poltava",
+"3804568", "Skvyra\,\ Kyiv",
+"3806467", "Luhansk",
+"3804560", "Tetiev\,\ Kyiv",
+"3804137", "Popilnya\,\ Zhytomyr",
+"3806455", "Pervomaisk\,\ Luhansk",
+"3803268", "Lviv",
+"3803852", "Iziaslav\,\ Khmelnytskyi",
+"3803133", "Svalyava\,\ Zakarpattia",
+"3805549", "New\ Kakhovka\,\ Kherson",
+"3803261", "Novy\ Rozdol\,\ Lviv",
+"3803479", "Tlumach\,\ Ivano\-Frankivsk",
+"3805133", "Creve\ Lake\,\ Mykolayiv",
+"3803549", "Lanovtsi\,\ Ternopil",
+"3804745", "Khrystynivka\,\ Cherkasy",
+"3804561", "Boguslav\,\ Kyiv",
+"3805759", "Borova\,\ Kharkiv",
+"3806468", "Luhansk",
+"3803255", "Radehiv\,\ Lviv",
+"3803634", "Volodymyrets\,\ Rivne",
+"3804567", "Pereyaslav\-Khmelnitsky\,\ Kyiv",
+"3804642", "Sedimentary\,\ Chernihiv",
+"3804130", "Korostyshiv\,\ Zhytomyr",
+"3803267", "Lviv",
+"3805255", "Novorangels\'k\,\ Kirovohrad",
+"3805634", "Petrykivka\,\ Dnipro",
+"3804138", "Ruzhin\,\ Zhytomyr",
+"3806143", "Vilnyansk\,\ Zaporizhzhia",
+"3806460", "Luhansk",
+"3805364", "Mashivka\,\ Poltava",
+"3804131", "Chervonoarmiysk\,\ Zhytomyr",
+"3803136", "Volovets\,\ Zakarpattia",
+"3806279", "Telmanov\,\ Donetsk",
+"3806297", "Mangosh\/Yalta\,\ Donetsk",
+"3806461", "Starobilsk\,\ Luhansk",
+"3805152", "Domanivka\,\ Mykolayiv",
+"3805136", "Yuzhnoukrainsk\,\ Mykolayiv",
+"380332", "Lutsk\,\ Volyn",
+"3806145", "Gulyaypole\,\ Zaporizhzhia",
+"3804341", "Bar\,\ Vinnytsia",
+"38043", "Vinnytsia",
+"3803740", "Hertz\,\ Chernivtsi",
+"3806456", "Trinity\ Church\,\ Luhansk",
+"3805748", "Pervomaysk\,\ Kharkiv",
+"3805253", "Dobrovelichkovka\,\ Kirovohrad",
+"3806432", "Krasnyi\ Luch\,\ Luhansk",
+"3803346", "Old\ Vyzhivka\,\ Volyn",
+"3805369", "Kremenchug\,\ Poltava",
+"3805740", "New\ Waterlog\,\ Kharkiv",
+"3806274", "Artemivsk\/Siversk\,\ Donetsk",
+"3803253", "Lviv",
+"3805346", "Karlovka\,\ Poltava",
+"3804162", "Brusilov\,\ Zhytomyr",
+"3806242", "Gorlovka\,\ Donetsk",
+"3805639", "Vasylkivka\,\ Dnipro",
+"3804746", "Monastyrysche\,\ Cherkasy",
+"3803741", "Novodnistrovsk\,\ Chernivtsi",
+"38037", "Chernivtsi",
+"3804340", "Kryzhopil\,\ Vinnytsia",
+"3804348", "Tomashpil\,\ Vinnytsia",
+"3805754", "Gemini\,\ Kharkiv",
+"38057", "Kharkiv",
+"3805741", "Vovchansk\,\ Kharkiv",
+"3805693", "Novomoskovsk\,\ Dnipro",
+"3803557", "Gusyatin\,\ Ternopil",
+"3803552", "Chortkiv\,\ Ternopil",
+"3805163", "Veselinove\,\ Mykolayiv",
+"3805536", "Kakhovka\,\ Kherson",
+"3806247", "Dzerzhinsk\,\ Donetsk",
+"3803849", "Kamyanets\-Podilskyi\,\ Khmelnytskyi",
+"3805448", "Romny\,\ Sumy",
+"3804861", "Red\ Windows\,\ Odesa",
+"3803231", "Gorodok\,\ Lviv",
+"3806139", "Energodar\,\ Zaporizhzhia",
+"38054", "Sumy",
+"3804868", "Illichivsk\,\ Odesa",
+"3805454", "Burin\,\ Sumy",
+"3803238", "Old\ Sambir\,\ Lviv",
+"3803230", "Pustomyty\,\ Lviv",
+"3804576", "Baryshevka\/Berezan\,\ Kyiv",
+"38034", "Ivano\-Frankivsk",
+"3804860", "Frunzivka\,\ Odesa",
+"3806473", "Slavyanoserbsk\,\ Luhansk",
+"3805238", "Onufryevka\,\ Kirovohrad",
+"3806437", "Luhansk",
+"3803850", "Old\ Sinyava\,\ Khmelnytskyi",
+"3805459", "Krasnopolye\,\ Sumy",
+"3803858", "Dunaevtsi\,\ Khmelnytskyi",
+"3804856", "Berezivka\,\ Odesa",
+"3803844", "Theophyll\,\ Khmelnytskyi",
+"3803262", "Lviv",
+"3803851", "Gorodok\/Sataniv\,\ Khmelnytskyi",
+"3804562", "Rokitne\,\ Kyiv",
+"38046", "Chernihiv",
+"3804641", "Rivers\,\ Chernihiv",
+"3805535", "Vysokoplylya\,\ Kherson",
+"3804654", "Shchors\,\ Chernihiv",
+"3805158", "Bashtanka\,\ Mykolayiv",
+"3805669", "Salt\,\ Dnipro",
+"3806259", "Amvrosievka\,\ Donetsk",
+"3803857", "Letychiv\/Medzhybizh\,\ Khmelnytskyi",
+"3804739", "Chernobyl\,\ Cherkasy",
+"3803144", "Irshava\,\ Zakarpattia",
+"3804853", "Limanske\/Rozdilna\,\ Odesa",
+"3804132", "Radomyshl\,\ Zhytomyr",
+"3804575", "Yagotin\,\ Kyiv",
+"3806462", "Belokurakine\,\ Luhansk",
+"3805151", "Novy\ Buh\,\ Mykolayiv",
+"3806431", "Anthracite\,\ Luhansk",
+"3806240", "Gorlovka\,\ Donetsk",
+"3804342", "Kozatin\,\ Vinnytsia",
+"380629", "Mariupol\,\ Donetsk",
+"3805533", "Novovorontsovka\,\ Kherson",
+"3804161", "Luginy\,\ Zhytomyr",
+"3805447", "Konotop\,\ Sumy",
+"3806248", "Gorlovka\,\ Donetsk",
+"3803237", "Lviv",
+"380621", "Donetsk",
+"3806254", "Torez\,\ Donetsk",
+"3805664", "Nikopol\,\ Dnipro",
+"3806241", "Gorlovka\,\ Donetsk",
+"380562", "Dnipropetrovsk\/Dnipro",
+"3804867", "Kodima\,\ Odesa",
+"3806430", "Luhansk",
+"3804734", "Chernigov\ region",
+"3805237", "Petrov\,\ Kirovohrad",
+"3806438", "Luhansk",
+"3804573", "Kagarlyk\/Rzhyshchiv\,\ Kyiv",
+"3805742", "Kupyansk\,\ Kharkiv",
+"3804659", "Semenivka\,\ Chernihiv",
+"3804855", "Kominternovskoe\,\ Odesa",
+"3804858", "Shiryaevoe\,\ Odesa",
+"3806435", "Krasnodon\,\ Luhansk",
+"3804643", "Kulikivka\,\ Chernihiv",
+"380320", "Lviv",
+"3804850", "Teplodar\,\ Odesa",
+"3806245", "Gorlovka\,\ Donetsk",
+"3805153", "Berezanka\,\ Mykolayiv",
+"380328", "Lviv",
+"3804851", "Ovidiopol\,\ Odesa",
+"3803856", "Derazhnya\,\ Khmelnytskyi",
+"3804844", "Tatarbunary\,\ Odesa",
+"3803252", "Zhovkva\,\ Lviv",
+"3805531", "Ivanivka\,\ Kherson",
+"3804866", "Balta\,\ Odesa",
+"3804849", "Belgorod\-Dniester\/Zatoka\/Sergievka\,\ Odesa",
+"3804645", "Gorodnya\,\ Chernihiv",
+"3803236", "Sambir\,\ Lviv",
+"3804570", "Zgurovka\,\ Kyiv",
+"3805252", "Golovanovsk\,\ Kirovohrad",
+"3806433", "Rovenky\,\ Luhansk",
+"3804578", "Makarov\,\ Kyiv",
+"3805236", "Svetlovodsk\,\ Kirovohrad",
+"3805692", "Dneprodzerzhinsk\,\ Dnipro",
+"3804571", "Vasilkov\/Glevaha\/Grebinky\/Kalinovka\,\ Kyiv",
+"3805167", "New\ Odesa\,\ Mykolayiv",
+"3805530", "Kalanchak\,\ Kherson",
+"38044", "Kyiv\ city",
+"3805538", "Askania\-Nova\/Chaplinka\,\ Kherson",
+"3805446", "Tomatoes\,\ Sumy",
+"3806243", "Great\ Novosilka\,\ Donetsk",
+"3804863", "Ananev\,\ Odesa",
+"3805342", "Kozelshchina\,\ Poltava",
+"3804149", "Emilchine\,\ Zhytomyr",
+"3803233", "Lviv",
+"3806436", "Lutugin\,\ Luhansk",
+"3803342", "Volodymyr\-Volynsky\,\ Volyn",
+"3804334", "Haysin\,\ Vinnytsia",
+"3805161", "Pervomaysk\,\ Mykolayiv",
+"3804577", "Borodyanka\/Klavdievo\-Tarasovo\/Nemishaive\,\ Kyiv",
+"3806452", "Severodonetsk\,\ Luhansk",
+"3805233", "Znamenka\,\ Kirovohrad",
+"38065", "Crimea",
+"3803855", "Krasilov\,\ Khmelnytskyi",
+"3803659", "Mlyniv\,\ Rivne",
+"3806471", "Swatov\,\ Luhansk",
+"3805168", "Bereznegovate\,\ Mykolayiv",
+"38037312", "Khotin\,\ Chernivtsi",
+"3803374", "Lokachi\,\ Volyn",
+"3803734", "Deep\,\ Chernivtsi",
+"3806269", "Aleksandrovka\,\ Donetsk",
+"3805443", "Belopoly\,\ Sumy",
+"3805659", "Dnipropetrovsk\/Dnipro",
+"3806246", "Volodarske\,\ Donetsk",
+"3805537", "Lazurne\/Skadovsk\,\ Kherson",
+"3804742", "Katerinopil\,\ Cherkasy",
+"3805235", "Alexandria\,\ Kirovohrad",
+"3806264", "Kramatorsk\,\ Donetsk",
+"3805654", "Krynychky\,\ Dnipro",
+"380561", "Dnipropetrovsk\/Dnipro",
+"3803739", "Sokyryany\,\ Chernivtsi",
+"380640", "Luhansk",
+"3804857", "Nikolaevka\,\ Odesa",
+"380622", "Donetsk",
+"3803235", "Lviv",
+"3804646", "Desna\/Kozelets\/Oster\,\ Chernihiv",
+"3803654", "Ostrog\,\ Rivne",
+"3803379", "Gorokhov\,\ Volyn",
+"3804865", "Savran\,\ Odesa",
+"38036", "Rivne",
+"3805132", "Arbuzinka\,\ Mykolayiv",
+"3805445", "Lebedin\,\ Sumy",
+"380648", "Luhansk",
+"3803132", "Rakhiv\,\ Zakarpattia",
+"3804594", "Brovary\/Kalita\,\ Kyiv",
+"380569", "Dneprodzerzhinsk\/Novomoskovsk\,\ Dnipro",
+"3803853", "Yarmolintsy\,\ Khmelnytskyi",
+"3804144", "Baranivka\,\ Zhytomyr",
+"3806144", "Novomikolaevka\,\ Zaporizhzhia",
+"3805633", "Pershotravensk\,\ Dnipro",
+"3804355", "Hnivan\/Tyvriv\,\ Vinnytsia",
+"3803633", "Radivilov\,\ Rivne",
+"3806275", "Dokuchaevsk\,\ Donetsk",
+"3805259", "Ulyanovka\,\ Kirovohrad",
+"3803363", "Turiysk\,\ Volyn",
+"3804637", "Priluki\,\ Chernihiv",
+"3803259", "Yavoriv\,\ Lviv",
+"3805755", "Kegichivka\,\ Kharkiv",
+"3805363", "Reshetilivka\,\ Poltava",
+"3806237", "Selidus\,\ Donetsk",
+"3805546", "Berislav\,\ Kherson",
+"3803635", "Rokitne\,\ Rivne",
+"3806273", "Vugledar\,\ Donetsk",
+"380321", "Lviv",
+"3803254", "Kamyanka\-Buzka\,\ Lviv",
+"3803241", "Nikolaev\,\ Lviv",
+"3803430", "Gorodenka\,\ Ivano\-Frankivsk",
+"3804353", "Teplik\,\ Vinnytsia",
+"3803438", "Burshtyn\,\ Ivano\-Frankivsk",
+"3803546", "Kremenets\/Pochayiv\,\ Ternopil",
+"3805635", "Yurievka\,\ Dnipro",
+"3805254", "Haivoron\,\ Kirovohrad",
+"3805241", "Novgorodka\,\ Kirovohrad",
+"38052", "Kirovohrad",
+"3803476", "Zabolotov\/Sniatyn\,\ Ivano\-Frankivsk",
+"38045", "Kyiv",
+"3803357", "Kamin\-Kashirsky\,\ Volyn",
+"3803431", "Halych\,\ Ivano\-Frankivsk",
+"3803240", "Lviv",
+"3805365", "Globin\,\ Poltava",
+"3806447", "Luhansk",
+"3805753", "Valki\,\ Kharkiv",
+"3805357", "Orzhitsa\,\ Poltava",
+"380329", "Lviv",
+"3805240", "Kompaniyivka\,\ Kirovohrad",
+"3803365", "Kivertsi\/Tsuman\,\ Volyn",
+"3803248", "Boryslav\/Skhidnytsya\,\ Lviv",
+"3805344", "New\ Sanzhary\,\ Poltava",
+"3805543", "Great\ Lipetyha\,\ Kherson",
+"3806276", "Artemivsk\,\ Donetsk",
+"3805351", "Dikanka\,\ Poltava",
+"380560", "Dnipropetrovsk\/Dnipro",
+"3804356", "Murovani\ Kurylivtsi\,\ Vinnytsia",
+"3803344", "Novovolynsk\,\ Volyn",
+"3803543", "Podvolochisk\,\ Ternopil",
+"3806441", "Perevalsk\,\ Luhansk",
+"3806454", "Kremenna\,\ Luhansk",
+"380641", "Luhansk",
+"3803437", "Bolechov\,\ Ivano\-Frankivsk",
+"3804332", "Brailiv\/Zhmerinka\,\ Vinnytsia",
+"3805350", "Kotelva\,\ Poltava",
+"3806448", "Luhansk",
+"3803372", "Ivanychi\,\ Volyn",
+"3805756", "Krasnokutsk\,\ Kharkiv",
+"380649", "Luhansk",
+"380568", "Dnipropetrovsk\/Dnipro",
+"3803732", "Kelmentsi\,\ Chernivtsi",
+"3803247", "Truskavets\,\ Lviv",
+"3806440", "Luhansk",
+"3804744", "Uman\,\ Cherkasy",
+"3805358", "Pyriatyn\,\ Poltava",
+"3803475", "Delyatin\/Nadvirna\,\ Ivano\-Frankivsk",
+"3806262", "Svyatogorsk\/Slavyansk\,\ Donetsk",
+"3805652", "Yellow\ Waters\,\ Dnipro",
+"3805636", "Ternivka\,\ Dnipro",
+"3804749", "Lysyanka\,\ Cherkasy",
+"3803652", "Zdolbunov\,\ Rivne",
+"3804631", "Nizhyn\,\ Chernihiv",
+"3803636", "Kuznetsovsk\,\ Rivne",
+"3805761", "Zachepilivka\,\ Kharkiv",
+"3805545", "Upper\ Rogachik\,\ Kherson",
+"3805134", "Voznesensk\,\ Mykolayiv",
+"3806165", "Childbirth\,\ Zaporizhzhia",
+"3803366", "Ratne\,\ Volyn",
+"3806459", "Luhansk",
+"3803134", "Solotvyno\/Tyachiv\,\ Zakarpattia",
+"3805366", "Kremenchug\,\ Poltava",
+"3804142", "Korosten\,\ Zhytomyr",
+"38035", "Ternopil",
+"3804569", "Volodarka\,\ Kyiv",
+"3803541", "Borschiv\,\ Ternopil",
+"3805757", "Barvinkov\,\ Kharkiv",
+"3806443", "Bryanka\,\ Luhansk",
+"3803471", "Bogorodchany\,\ Ivano\-Frankivsk",
+"3803554", "Zalishchiki\,\ Ternopil",
+"3805765", "Pechenegi\,\ Kharkiv",
+"38055", "Kherson",
+"3803269", "Turka\,\ Lviv",
+"3803246", "Lviv",
+"3804635", "Baturin\/Bahmach\,\ Chernihiv",
+"3805353", "Zinkiv\,\ Poltava",
+"3805548", "Novotroitsk\,\ Kherson",
+"3806277", "Dobropolia\,\ Donetsk",
+"3805452", "Lipova\ Dolina\,\ Sumy",
+"3803540", "Meeting\,\ Ternopil",
+"3803548", "Berezhany\,\ Ternopil",
+"3803436", "Tysmenytsia\,\ Ivano\-Frankivsk",
+"3803478", "Kosiv\,\ Ivano\-Frankivsk",
+"3805540", "Lower\ Sirogozy\,\ Kherson",
+"3805355", "Mirgorod\,\ Poltava",
+"3804633", "Ichnya\,\ Chernihiv",
+"3805763", "Carriers\,\ Kharkiv",
+"3806132", "Mikhailivka\,\ Zaporizhzhia",
+"3803355", "Shatsk\,\ Volyn",
+"3805367", "Kremenchug\,\ Poltava",
+"3806445", "Novoyadar\,\ Luhansk",
+"3806156", "Big\ Belozerka\,\ Zaporizhzhia",
+"3803264", "Busk\,\ Lviv",
+"3805637", "Pavlograd\,\ Dnipro",
+"3803842", "Netishyn\/Slavuta\,\ Khmelnytskyi",
+"380322", "Bryukhovichi\/Lviv\,\ Lviv",
+"3804564", "Stavyshche\,\ Kyiv",
+"3803637", "Demidivka\,\ Rivne",
+"380522", "Kropyvnytskyi\,\ Kirovohrad",
+"3805749", "Balaklia\,\ Kharkiv",
+"3805360", "Kremenchug\,\ Poltava",
+"3804636", "Varva\,\ Chernihiv",
+"3803245", "Stryi\,\ Lviv",
+"38069", "Sevastopol\ city",
+"3803368", "Rozhysche\,\ Volyn",
+"3805766", "Kolomak\,\ Kharkiv",
+"380628", "Donetsk",
+"3805368", "Kremenchug\,\ Poltava",
+"3805631", "Petropavlovka\,\ Dnipro",
+"3806153", "Berdyansk\,\ Zaporizhzhia",
+"3803142", "Hust\,\ Zakarpattia",
+"3805361", "Lubny\,\ Poltava",
+"3804134", "Chernyakhov\,\ Zhytomyr",
+"3805638", "Pokrovskoe\,\ Dnipro",
+"3803435", "Rohatyn\,\ Ivano\-Frankivsk",
+"380642", "Luhansk\/Oleksandrivsk\,\ Luhansk",
+"3805630", "Mezhova\,\ Dnipro",
+"380620", "Donetsk",
+"3804349", "Pishchanka\,\ Vinnytsia",
+"3806464", "Markovka\,\ Luhansk",
+"3804351", "Chechelnyk\,\ Vinnytsia",
+"3806446", "Kirovsk\,\ Luhansk",
+"3806469", "Luhansk",
+"3805758", "Bogodukhiv\,\ Kharkiv",
+"3804344", "Shargorod\,\ Vinnytsia",
+"3806271", "Artemivsk\,\ Donetsk",
+"3805750", "Two\ years\ old\,\ Kharkiv",
+"3803243", "Lviv",
+"3804139", "Chudniv\,\ Zhytomyr",
+"3805356", "Lokhvytsia\,\ Poltava",
+"3806252", "Yenakievo\,\ Donetsk",
+"3805662", "Nikopol\,\ Dnipro",
+"3806278", "Marinka\,\ Donetsk",
+"3804732", "Kamyanets\,\ Cherkasy",
+"3806236", "Yasinovata\,\ Donetsk",
+"3805547", "Belozerka\,\ Kherson",
+"3804350", "Vapnarka\,\ Vinnytsia",
+"3804358", "Lipovets\,\ Vinnytsia",
+"3803433", "Kolomyia\,\ Ivano\-Frankivsk",
+"3805744", "Krasnograd\,\ Kharkiv",
+"3803477", "Valley\,\ Ivano\-Frankivsk",
+"3806270", "Artemivsk\,\ Donetsk",
+"3805751", "Shevchenkovo\,\ Kharkiv",
+"3803547", "Kozlov\/Kozova\,\ Ternopil",};
 
     sub new {
       my $class = shift;

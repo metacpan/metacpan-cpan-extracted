@@ -20,7 +20,6 @@ my %WriteMakefileArgs = (
     "Class::Accessor" => 0,
     "Crypt::OpenSSL::Bignum" => 0,
     "Crypt::OpenSSL::DSA" => 0,
-    "Crypt::OpenSSL::DSA::Signature" => 0,
     "Crypt::OpenSSL::RSA" => 0,
     "Crypt::OpenSSL::X509" => 0,
     "Digest::SHA" => 0,
@@ -38,7 +37,7 @@ my %WriteMakefileArgs = (
     "Test::Exception" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.32",
+  "VERSION" => "0.33",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -50,7 +49,6 @@ my %FallbackPrereqs = (
   "Class::Accessor" => 0,
   "Crypt::OpenSSL::Bignum" => 0,
   "Crypt::OpenSSL::DSA" => 0,
-  "Crypt::OpenSSL::DSA::Signature" => 0,
   "Crypt::OpenSSL::RSA" => 0,
   "Crypt::OpenSSL::X509" => 0,
   "Digest::SHA" => 0,

@@ -3,7 +3,6 @@ Changes
 examples/dump-sd-card
 lib/Device/Chip/SDCard.pm
 LICENSE
-Makefile.PL
 MANIFEST			This list of files
 META.json
 META.yml

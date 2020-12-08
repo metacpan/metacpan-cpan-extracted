@@ -1,4 +1,4 @@
-# AWS::Cognito::UserPoolRiskConfigurationAttachment generated from spec 6.3.0
+# AWS::Cognito::UserPoolRiskConfigurationAttachment generated from spec 18.4.0
 use Moose::Util::TypeConstraints;
 
 coerce 'Cfn::Resource::Properties::AWS::Cognito::UserPoolRiskConfigurationAttachment',
@@ -29,11 +29,11 @@ coerce 'Cfn::Resource::Properties::AWS::Cognito::UserPoolRiskConfigurationAttach
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::Cognito::UserPoolRiskConfigurationAttachment::NotifyEmailTypeValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::Cognito::UserPoolRiskConfigurationAttachment::NotifyEmailType->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::Cognito::UserPoolRiskConfigurationAttachment::NotifyEmailTypeValue {
+package Cfn::Resource::Properties::Object::AWS::Cognito::UserPoolRiskConfigurationAttachment::NotifyEmailType {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -52,11 +52,11 @@ coerce 'Cfn::Resource::Properties::AWS::Cognito::UserPoolRiskConfigurationAttach
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::Cognito::UserPoolRiskConfigurationAttachment::AccountTakeoverActionTypeValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::Cognito::UserPoolRiskConfigurationAttachment::AccountTakeoverActionType->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::Cognito::UserPoolRiskConfigurationAttachment::AccountTakeoverActionTypeValue {
+package Cfn::Resource::Properties::Object::AWS::Cognito::UserPoolRiskConfigurationAttachment::AccountTakeoverActionType {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -74,11 +74,11 @@ coerce 'Cfn::Resource::Properties::AWS::Cognito::UserPoolRiskConfigurationAttach
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::Cognito::UserPoolRiskConfigurationAttachment::NotifyConfigurationTypeValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::Cognito::UserPoolRiskConfigurationAttachment::NotifyConfigurationType->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::Cognito::UserPoolRiskConfigurationAttachment::NotifyConfigurationTypeValue {
+package Cfn::Resource::Properties::Object::AWS::Cognito::UserPoolRiskConfigurationAttachment::NotifyConfigurationType {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -100,11 +100,11 @@ coerce 'Cfn::Resource::Properties::AWS::Cognito::UserPoolRiskConfigurationAttach
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::Cognito::UserPoolRiskConfigurationAttachment::CompromisedCredentialsActionsTypeValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::Cognito::UserPoolRiskConfigurationAttachment::CompromisedCredentialsActionsType->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::Cognito::UserPoolRiskConfigurationAttachment::CompromisedCredentialsActionsTypeValue {
+package Cfn::Resource::Properties::Object::AWS::Cognito::UserPoolRiskConfigurationAttachment::CompromisedCredentialsActionsType {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -121,11 +121,11 @@ coerce 'Cfn::Resource::Properties::AWS::Cognito::UserPoolRiskConfigurationAttach
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::Cognito::UserPoolRiskConfigurationAttachment::AccountTakeoverActionsTypeValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::Cognito::UserPoolRiskConfigurationAttachment::AccountTakeoverActionsType->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::Cognito::UserPoolRiskConfigurationAttachment::AccountTakeoverActionsTypeValue {
+package Cfn::Resource::Properties::Object::AWS::Cognito::UserPoolRiskConfigurationAttachment::AccountTakeoverActionsType {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -144,11 +144,11 @@ coerce 'Cfn::Resource::Properties::AWS::Cognito::UserPoolRiskConfigurationAttach
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::Cognito::UserPoolRiskConfigurationAttachment::RiskExceptionConfigurationTypeValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::Cognito::UserPoolRiskConfigurationAttachment::RiskExceptionConfigurationType->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::Cognito::UserPoolRiskConfigurationAttachment::RiskExceptionConfigurationTypeValue {
+package Cfn::Resource::Properties::Object::AWS::Cognito::UserPoolRiskConfigurationAttachment::RiskExceptionConfigurationType {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -166,11 +166,11 @@ coerce 'Cfn::Resource::Properties::AWS::Cognito::UserPoolRiskConfigurationAttach
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::Cognito::UserPoolRiskConfigurationAttachment::CompromisedCredentialsRiskConfigurationTypeValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::Cognito::UserPoolRiskConfigurationAttachment::CompromisedCredentialsRiskConfigurationType->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::Cognito::UserPoolRiskConfigurationAttachment::CompromisedCredentialsRiskConfigurationTypeValue {
+package Cfn::Resource::Properties::Object::AWS::Cognito::UserPoolRiskConfigurationAttachment::CompromisedCredentialsRiskConfigurationType {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -188,11 +188,11 @@ coerce 'Cfn::Resource::Properties::AWS::Cognito::UserPoolRiskConfigurationAttach
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::Cognito::UserPoolRiskConfigurationAttachment::AccountTakeoverRiskConfigurationTypeValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::Cognito::UserPoolRiskConfigurationAttachment::AccountTakeoverRiskConfigurationType->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::Cognito::UserPoolRiskConfigurationAttachment::AccountTakeoverRiskConfigurationTypeValue {
+package Cfn::Resource::Properties::Object::AWS::Cognito::UserPoolRiskConfigurationAttachment::AccountTakeoverRiskConfigurationType {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -214,3 +214,30 @@ package Cfn::Resource::Properties::AWS::Cognito::UserPoolRiskConfigurationAttach
 }
 
 1;
+### main pod documentation begin ###
+
+=encoding UTF-8
+
+=head1 NAME
+
+Cfn::Resource::AWS::Cognito::UserPoolRiskConfigurationAttachment - Cfn resource for AWS::Cognito::UserPoolRiskConfigurationAttachment
+
+=head1 DESCRIPTION
+
+This module implements a Perl module that represents the CloudFormation object AWS::Cognito::UserPoolRiskConfigurationAttachment.
+
+See L<Cfn> for more information on how to use it.
+
+=head1 AUTHOR
+
+    Jose Luis Martinez
+    CAPSiDE
+    jlmartinez@capside.com
+
+=head1 COPYRIGHT and LICENSE
+
+Copyright (c) 2013 by CAPSiDE
+This code is distributed under the Apache 2 License. The full text of the 
+license can be found in the LICENSE file included with this module.
+
+=cut

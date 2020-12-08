@@ -1,4 +1,4 @@
-# AWS::StepFunctions::StateMachine generated from spec 10.0.0
+# AWS::StepFunctions::StateMachine generated from spec 20.1.0
 use Moose::Util::TypeConstraints;
 
 coerce 'Cfn::Resource::Properties::AWS::StepFunctions::StateMachine',
@@ -11,10 +11,10 @@ package Cfn::Resource::AWS::StepFunctions::StateMachine {
   has Properties => (isa => 'Cfn::Resource::Properties::AWS::StepFunctions::StateMachine', is => 'rw', coerce => 1);
   
   sub AttributeList {
-    [ 'Name' ]
+    [ 'Arn','Name' ]
   }
   sub supported_regions {
-    [ 'ap-northeast-1','eu-central-1','eu-west-1','us-east-1','us-east-2','us-west-2' ]
+    [ 'af-south-1','ap-east-1','ap-northeast-1','ap-northeast-2','ap-northeast-3','ap-south-1','ap-southeast-1','ap-southeast-2','ca-central-1','cn-north-1','cn-northwest-1','eu-central-1','eu-north-1','eu-south-1','eu-west-1','eu-west-2','eu-west-3','me-south-1','sa-east-1','us-east-1','us-east-2','us-gov-east-1','us-gov-west-1','us-west-1','us-west-2' ]
   }
 }
 
@@ -29,16 +29,16 @@ coerce 'Cfn::Resource::Properties::AWS::StepFunctions::StateMachine::CloudWatchL
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::StepFunctions::StateMachine::CloudWatchLogsLogGroupValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::StepFunctions::StateMachine::CloudWatchLogsLogGroup->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::StepFunctions::StateMachine::CloudWatchLogsLogGroupValue {
+package Cfn::Resource::Properties::Object::AWS::StepFunctions::StateMachine::CloudWatchLogsLogGroup {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
   
-  has LogGroupArn => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has LogGroupArn => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
 }
 subtype 'ArrayOfCfn::Resource::Properties::AWS::StepFunctions::StateMachine::LogDestination',
      as 'Cfn::Value',
@@ -72,16 +72,37 @@ coerce 'Cfn::Resource::Properties::AWS::StepFunctions::StateMachine::LogDestinat
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::StepFunctions::StateMachine::LogDestinationValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::StepFunctions::StateMachine::LogDestination->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::StepFunctions::StateMachine::LogDestinationValue {
+package Cfn::Resource::Properties::Object::AWS::StepFunctions::StateMachine::LogDestination {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
   
   has CloudWatchLogsLogGroup => (isa => 'Cfn::Resource::Properties::AWS::StepFunctions::StateMachine::CloudWatchLogsLogGroup', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+}
+
+subtype 'Cfn::Resource::Properties::AWS::StepFunctions::StateMachine::TracingConfiguration',
+     as 'Cfn::Value';
+
+coerce 'Cfn::Resource::Properties::AWS::StepFunctions::StateMachine::TracingConfiguration',
+  from 'HashRef',
+   via {
+     if (my $f = Cfn::TypeLibrary::try_function($_)) {
+       return $f
+     } else {
+       return Cfn::Resource::Properties::Object::AWS::StepFunctions::StateMachine::TracingConfiguration->new( %$_ );
+     }
+   };
+
+package Cfn::Resource::Properties::Object::AWS::StepFunctions::StateMachine::TracingConfiguration {
+  use Moose;
+  use MooseX::StrictConstructor;
+  extends 'Cfn::Value::TypedValue';
+  
+  has Enabled => (isa => 'Cfn::Value::Boolean', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
 }
 subtype 'ArrayOfCfn::Resource::Properties::AWS::StepFunctions::StateMachine::TagsEntry',
      as 'Cfn::Value',
@@ -115,17 +136,40 @@ coerce 'Cfn::Resource::Properties::AWS::StepFunctions::StateMachine::TagsEntry',
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::StepFunctions::StateMachine::TagsEntryValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::StepFunctions::StateMachine::TagsEntry->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::StepFunctions::StateMachine::TagsEntryValue {
+package Cfn::Resource::Properties::Object::AWS::StepFunctions::StateMachine::TagsEntry {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
   
   has Key => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has Value => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+}
+
+subtype 'Cfn::Resource::Properties::AWS::StepFunctions::StateMachine::S3Location',
+     as 'Cfn::Value';
+
+coerce 'Cfn::Resource::Properties::AWS::StepFunctions::StateMachine::S3Location',
+  from 'HashRef',
+   via {
+     if (my $f = Cfn::TypeLibrary::try_function($_)) {
+       return $f
+     } else {
+       return Cfn::Resource::Properties::Object::AWS::StepFunctions::StateMachine::S3Location->new( %$_ );
+     }
+   };
+
+package Cfn::Resource::Properties::Object::AWS::StepFunctions::StateMachine::S3Location {
+  use Moose;
+  use MooseX::StrictConstructor;
+  extends 'Cfn::Value::TypedValue';
+  
+  has Bucket => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has Key => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has Version => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
 }
 
 subtype 'Cfn::Resource::Properties::AWS::StepFunctions::StateMachine::LoggingConfiguration',
@@ -137,11 +181,11 @@ coerce 'Cfn::Resource::Properties::AWS::StepFunctions::StateMachine::LoggingConf
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::StepFunctions::StateMachine::LoggingConfigurationValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::StepFunctions::StateMachine::LoggingConfiguration->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::StepFunctions::StateMachine::LoggingConfigurationValue {
+package Cfn::Resource::Properties::Object::AWS::StepFunctions::StateMachine::LoggingConfiguration {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -151,17 +195,67 @@ package Cfn::Resource::Properties::AWS::StepFunctions::StateMachine::LoggingConf
   has Level => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
 }
 
+subtype 'Cfn::Resource::Properties::AWS::StepFunctions::StateMachine::DefinitionSubstitutions',
+     as 'Cfn::Value';
+
+coerce 'Cfn::Resource::Properties::AWS::StepFunctions::StateMachine::DefinitionSubstitutions',
+  from 'HashRef',
+   via {
+     if (my $f = Cfn::TypeLibrary::try_function($_)) {
+       return $f
+     } else {
+       return Cfn::Resource::Properties::Object::AWS::StepFunctions::StateMachine::DefinitionSubstitutions->new( %$_ );
+     }
+   };
+
+package Cfn::Resource::Properties::Object::AWS::StepFunctions::StateMachine::DefinitionSubstitutions {
+  use Moose;
+  use MooseX::StrictConstructor;
+  extends 'Cfn::Value::TypedValue';
+  
+}
+
 package Cfn::Resource::Properties::AWS::StepFunctions::StateMachine {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Resource::Properties';
   
-  has DefinitionString => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has DefinitionS3Location => (isa => 'Cfn::Resource::Properties::AWS::StepFunctions::StateMachine::S3Location', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has DefinitionString => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has DefinitionSubstitutions => (isa => 'Cfn::Resource::Properties::AWS::StepFunctions::StateMachine::DefinitionSubstitutions', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has LoggingConfiguration => (isa => 'Cfn::Resource::Properties::AWS::StepFunctions::StateMachine::LoggingConfiguration', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has RoleArn => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has StateMachineName => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
-  has StateMachineType => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
+  has StateMachineType => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has Tags => (isa => 'ArrayOfCfn::Resource::Properties::AWS::StepFunctions::StateMachine::TagsEntry', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has TracingConfiguration => (isa => 'Cfn::Resource::Properties::AWS::StepFunctions::StateMachine::TracingConfiguration', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
 }
 
 1;
+### main pod documentation begin ###
+
+=encoding UTF-8
+
+=head1 NAME
+
+Cfn::Resource::AWS::StepFunctions::StateMachine - Cfn resource for AWS::StepFunctions::StateMachine
+
+=head1 DESCRIPTION
+
+This module implements a Perl module that represents the CloudFormation object AWS::StepFunctions::StateMachine.
+
+See L<Cfn> for more information on how to use it.
+
+=head1 AUTHOR
+
+    Jose Luis Martinez
+    CAPSiDE
+    jlmartinez@capside.com
+
+=head1 COPYRIGHT and LICENSE
+
+Copyright (c) 2013 by CAPSiDE
+This code is distributed under the Apache 2 License. The full text of the 
+license can be found in the LICENSE file included with this module.
+
+=cut

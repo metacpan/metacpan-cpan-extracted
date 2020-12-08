@@ -1,4 +1,4 @@
-# AWS::Greengrass::DeviceDefinitionVersion generated from spec 6.3.0
+# AWS::Greengrass::DeviceDefinitionVersion generated from spec 18.4.0
 use Moose::Util::TypeConstraints;
 
 coerce 'Cfn::Resource::Properties::AWS::Greengrass::DeviceDefinitionVersion',
@@ -51,11 +51,11 @@ coerce 'Cfn::Resource::Properties::AWS::Greengrass::DeviceDefinitionVersion::Dev
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::Greengrass::DeviceDefinitionVersion::DeviceValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::Greengrass::DeviceDefinitionVersion::Device->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::Greengrass::DeviceDefinitionVersion::DeviceValue {
+package Cfn::Resource::Properties::Object::AWS::Greengrass::DeviceDefinitionVersion::Device {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -76,3 +76,30 @@ package Cfn::Resource::Properties::AWS::Greengrass::DeviceDefinitionVersion {
 }
 
 1;
+### main pod documentation begin ###
+
+=encoding UTF-8
+
+=head1 NAME
+
+Cfn::Resource::AWS::Greengrass::DeviceDefinitionVersion - Cfn resource for AWS::Greengrass::DeviceDefinitionVersion
+
+=head1 DESCRIPTION
+
+This module implements a Perl module that represents the CloudFormation object AWS::Greengrass::DeviceDefinitionVersion.
+
+See L<Cfn> for more information on how to use it.
+
+=head1 AUTHOR
+
+    Jose Luis Martinez
+    CAPSiDE
+    jlmartinez@capside.com
+
+=head1 COPYRIGHT and LICENSE
+
+Copyright (c) 2013 by CAPSiDE
+This code is distributed under the Apache 2 License. The full text of the 
+license can be found in the LICENSE file included with this module.
+
+=cut

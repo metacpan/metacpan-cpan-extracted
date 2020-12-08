@@ -6,7 +6,7 @@
 use 5.026;
 use Object::Pad 0.19;
 
-package Device::Chip::AD5691R 0.10;
+package Device::Chip::AD5691R 0.11;
 class Device::Chip::AD5691R
    extends Device::Chip;
 
@@ -26,12 +26,13 @@ C<Device::Chip::AD5691R> - chip driver for F<AD5691R>
 =head1 SYNOPSIS
 
    use Device::Chip::AD5691R;
+   use Future::AsyncAwait;
 
    my $chip = Device::Chip::AD5691R->new;
-   $chip->mount( Device::Chip::Adapter::...->new )->get;
+   await $chip->mount( Device::Chip::Adapter::...->new );
 
    my $voltage = 1.23;
-   $chip->write_dac( 4096 * $voltage / 2.5 )->get;
+   await $chip->write_dac( 4096 * $voltage / 2.5 );
    print "Output is now set to 1.23V\n";
 
 =head1 DESCRIPTION
@@ -74,8 +75,8 @@ sub I2C_options ( $, %params )
 
 =head1 ACCESSORS
 
-The following methods documented with a trailing call to C<< ->get >> return
-L<Future> instances.
+The following methods documented in an C<await> expression return L<Future>
+instances.
 
 =cut
 
@@ -86,7 +87,7 @@ bitfield CONFIG =>
 
 =head2 read_config
 
-   $config = $chip->read_config->get
+   $config = await $chip->read_config;
 
 Returns a C<HASH> reference containing the chip's current configuration
 
@@ -113,7 +114,7 @@ async method read_config ()
 
 =head2 change_config
 
-   $chip->change_config( %changes )->get
+   await $chip->change_config( %changes );
 
 Changes the configuration. Any field names not mentioned will be preserved at
 their existing values.
@@ -136,7 +137,7 @@ async method change_config ( %changes )
 
 =head2 write_dac
 
-   $chip->write_dac( $dac, $update )->get
+   await $chip->write_dac( $dac, $update );
 
 Writes a new value for the DAC output.
 
@@ -155,7 +156,7 @@ async method write_dac ( $value, $update = 0 )
 
 =head2 write_dac_voltage
 
-   $chip->write_dac_voltage( $voltage )->get
+   await $chip->write_dac_voltage( $voltage );
 
 Writes a new value for the DAC output immediately, converting the given
 voltage to the required raw value, taking into account the setting of the

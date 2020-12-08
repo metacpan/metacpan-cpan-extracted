@@ -1,10 +1,11 @@
 #!/usr/bin/perl
 
-use strict;
+use v5.26;
 use warnings;
 
 use Device::Chip::Adapter;
 
+use Future::AsyncAwait;
 use Getopt::Long;
 
 GetOptions(
@@ -25,12 +26,12 @@ my $chip = do {
    $chipclass->new;
 };
 
-$chip->mount_from_paramstr(
+await $chip->mount_from_paramstr(
    Device::Chip::Adapter->new_from_description( $ADAPTER ),
    $MOUNTPARAMS,
-)->get;
+);
 
-$chip->protocol->power(1)->get;
+await $chip->protocol->power(1);
 
 $SIG{INT} = $SIG{TERM} = sub { exit 1; };
 
@@ -40,13 +41,13 @@ END {
 
 if( my @CHANGES = grep { m/.=./ } @ARGV ) {
    my %changes = map { ( $_ =~ m/^(.*?)=(.*)/ ) } @CHANGES;
-   $chip->change_config( %changes )->get;
+   await $chip->change_config( %changes );
 
    @ARGV = grep { !m/.=./ } @ARGV;
 }
 
 if( $PRINT_CONFIG ) {
-   my $config = $chip->read_config->get;
+   my $config = await $chip->read_config;
    printf "%20s: %s\n", $_, $config->{$_} for sort keys %$config;
 }
 
@@ -62,12 +63,12 @@ else {
 }
 
 if( $chip->can( "write_dac_voltage" ) and defined $voltage ) {
-   $chip->write_dac_voltage( $voltage )->get;
+   await $chip->write_dac_voltage( $voltage );
 }
 elsif( defined $voltage ) {
    defined $REFERENCE or die "Need --reference for setting DAC ratio\n";
-   $chip->write_dac_ratio( $voltage / $REFERENCE )->get;
+   await $chip->write_dac_ratio( $voltage / $REFERENCE );
 }
 else {
-   $chip->write_dac( $dac )->get;
+   await $chip->write_dac( $dac );
 }

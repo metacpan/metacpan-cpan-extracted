@@ -1,4 +1,4 @@
-# AWS::AutoScaling::AutoScalingGroup generated from spec 11.1.0
+# AWS::AutoScaling::AutoScalingGroup generated from spec 20.1.0
 use Moose::Util::TypeConstraints;
 
 coerce 'Cfn::Resource::Properties::AWS::AutoScaling::AutoScalingGroup',
@@ -11,10 +11,10 @@ package Cfn::Resource::AWS::AutoScaling::AutoScalingGroup {
   has Properties => (isa => 'Cfn::Resource::Properties::AWS::AutoScaling::AutoScalingGroup', is => 'rw', coerce => 1);
   
   sub AttributeList {
-    [  ]
+    [ 'LaunchConfigurationName','LaunchTemplateSpecification','MixedInstancesPolicy','PlacementGroup','VPCZoneIdentifier' ]
   }
   sub supported_regions {
-    [ 'ap-east-1','ap-northeast-1','ap-northeast-2','ap-northeast-3','ap-south-1','ap-southeast-1','ap-southeast-2','ca-central-1','cn-north-1','cn-northwest-1','eu-central-1','eu-north-1','eu-west-1','eu-west-2','eu-west-3','me-south-1','sa-east-1','us-east-1','us-east-2','us-gov-east-1','us-gov-west-1','us-west-1','us-west-2' ]
+    [ 'af-south-1','ap-east-1','ap-northeast-1','ap-northeast-2','ap-northeast-3','ap-south-1','ap-southeast-1','ap-southeast-2','ca-central-1','cn-north-1','cn-northwest-1','eu-central-1','eu-north-1','eu-south-1','eu-west-1','eu-west-2','eu-west-3','me-south-1','sa-east-1','us-east-1','us-east-2','us-gov-east-1','us-gov-west-1','us-west-1','us-west-2' ]
   }
 }
 
@@ -29,11 +29,11 @@ coerce 'Cfn::Resource::Properties::AWS::AutoScaling::AutoScalingGroup::LaunchTem
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::AutoScaling::AutoScalingGroup::LaunchTemplateSpecificationValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::AutoScaling::AutoScalingGroup::LaunchTemplateSpecification->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::AutoScaling::AutoScalingGroup::LaunchTemplateSpecificationValue {
+package Cfn::Resource::Properties::Object::AWS::AutoScaling::AutoScalingGroup::LaunchTemplateSpecification {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -74,16 +74,17 @@ coerce 'Cfn::Resource::Properties::AWS::AutoScaling::AutoScalingGroup::LaunchTem
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::AutoScaling::AutoScalingGroup::LaunchTemplateOverridesValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::AutoScaling::AutoScalingGroup::LaunchTemplateOverrides->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::AutoScaling::AutoScalingGroup::LaunchTemplateOverridesValue {
+package Cfn::Resource::Properties::Object::AWS::AutoScaling::AutoScalingGroup::LaunchTemplateOverrides {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
   
   has InstanceType => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has LaunchTemplateSpecification => (isa => 'Cfn::Resource::Properties::AWS::AutoScaling::AutoScalingGroup::LaunchTemplateSpecification', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has WeightedCapacity => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
 }
 
@@ -96,11 +97,11 @@ coerce 'Cfn::Resource::Properties::AWS::AutoScaling::AutoScalingGroup::LaunchTem
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::AutoScaling::AutoScalingGroup::LaunchTemplateValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::AutoScaling::AutoScalingGroup::LaunchTemplate->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::AutoScaling::AutoScalingGroup::LaunchTemplateValue {
+package Cfn::Resource::Properties::Object::AWS::AutoScaling::AutoScalingGroup::LaunchTemplate {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -118,11 +119,11 @@ coerce 'Cfn::Resource::Properties::AWS::AutoScaling::AutoScalingGroup::Instances
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::AutoScaling::AutoScalingGroup::InstancesDistributionValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::AutoScaling::AutoScalingGroup::InstancesDistribution->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::AutoScaling::AutoScalingGroup::InstancesDistributionValue {
+package Cfn::Resource::Properties::Object::AWS::AutoScaling::AutoScalingGroup::InstancesDistribution {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -166,11 +167,11 @@ coerce 'Cfn::Resource::Properties::AWS::AutoScaling::AutoScalingGroup::TagProper
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::AutoScaling::AutoScalingGroup::TagPropertyValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::AutoScaling::AutoScalingGroup::TagProperty->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::AutoScaling::AutoScalingGroup::TagPropertyValue {
+package Cfn::Resource::Properties::Object::AWS::AutoScaling::AutoScalingGroup::TagProperty {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -211,11 +212,11 @@ coerce 'Cfn::Resource::Properties::AWS::AutoScaling::AutoScalingGroup::Notificat
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::AutoScaling::AutoScalingGroup::NotificationConfigurationValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::AutoScaling::AutoScalingGroup::NotificationConfiguration->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::AutoScaling::AutoScalingGroup::NotificationConfigurationValue {
+package Cfn::Resource::Properties::Object::AWS::AutoScaling::AutoScalingGroup::NotificationConfiguration {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -233,11 +234,11 @@ coerce 'Cfn::Resource::Properties::AWS::AutoScaling::AutoScalingGroup::MixedInst
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::AutoScaling::AutoScalingGroup::MixedInstancesPolicyValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::AutoScaling::AutoScalingGroup::MixedInstancesPolicy->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::AutoScaling::AutoScalingGroup::MixedInstancesPolicyValue {
+package Cfn::Resource::Properties::Object::AWS::AutoScaling::AutoScalingGroup::MixedInstancesPolicy {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -277,11 +278,11 @@ coerce 'Cfn::Resource::Properties::AWS::AutoScaling::AutoScalingGroup::MetricsCo
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::AutoScaling::AutoScalingGroup::MetricsCollectionValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::AutoScaling::AutoScalingGroup::MetricsCollection->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::AutoScaling::AutoScalingGroup::MetricsCollectionValue {
+package Cfn::Resource::Properties::Object::AWS::AutoScaling::AutoScalingGroup::MetricsCollection {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -321,11 +322,11 @@ coerce 'Cfn::Resource::Properties::AWS::AutoScaling::AutoScalingGroup::Lifecycle
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::AutoScaling::AutoScalingGroup::LifecycleHookSpecificationValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::AutoScaling::AutoScalingGroup::LifecycleHookSpecification->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::AutoScaling::AutoScalingGroup::LifecycleHookSpecificationValue {
+package Cfn::Resource::Properties::Object::AWS::AutoScaling::AutoScalingGroup::LifecycleHookSpecification {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -346,6 +347,7 @@ package Cfn::Resource::Properties::AWS::AutoScaling::AutoScalingGroup {
   
   has AutoScalingGroupName => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
   has AvailabilityZones => (isa => 'Cfn::Value::Array|Cfn::Value::Function|Cfn::DynamicValue', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has CapacityRebalance => (isa => 'Cfn::Value::Boolean', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has Cooldown => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has DesiredCapacity => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has HealthCheckGracePeriod => (isa => 'Cfn::Value::Integer', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
@@ -355,10 +357,12 @@ package Cfn::Resource::Properties::AWS::AutoScaling::AutoScalingGroup {
   has LaunchTemplate => (isa => 'Cfn::Resource::Properties::AWS::AutoScaling::AutoScalingGroup::LaunchTemplateSpecification', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has LifecycleHookSpecificationList => (isa => 'ArrayOfCfn::Resource::Properties::AWS::AutoScaling::AutoScalingGroup::LifecycleHookSpecification', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has LoadBalancerNames => (isa => 'Cfn::Value::Array|Cfn::Value::Function|Cfn::DynamicValue', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has MaxInstanceLifetime => (isa => 'Cfn::Value::Integer', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has MaxSize => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has MetricsCollection => (isa => 'ArrayOfCfn::Resource::Properties::AWS::AutoScaling::AutoScalingGroup::MetricsCollection', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has MinSize => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has MixedInstancesPolicy => (isa => 'Cfn::Resource::Properties::AWS::AutoScaling::AutoScalingGroup::MixedInstancesPolicy', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has NewInstancesProtectedFromScaleIn => (isa => 'Cfn::Value::Boolean', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has NotificationConfigurations => (isa => 'ArrayOfCfn::Resource::Properties::AWS::AutoScaling::AutoScalingGroup::NotificationConfiguration', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has PlacementGroup => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has ServiceLinkedRoleARN => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
@@ -369,3 +373,30 @@ package Cfn::Resource::Properties::AWS::AutoScaling::AutoScalingGroup {
 }
 
 1;
+### main pod documentation begin ###
+
+=encoding UTF-8
+
+=head1 NAME
+
+Cfn::Resource::AWS::AutoScaling::AutoScalingGroup - Cfn resource for AWS::AutoScaling::AutoScalingGroup
+
+=head1 DESCRIPTION
+
+This module implements a Perl module that represents the CloudFormation object AWS::AutoScaling::AutoScalingGroup.
+
+See L<Cfn> for more information on how to use it.
+
+=head1 AUTHOR
+
+    Jose Luis Martinez
+    CAPSiDE
+    jlmartinez@capside.com
+
+=head1 COPYRIGHT and LICENSE
+
+Copyright (c) 2013 by CAPSiDE
+This code is distributed under the Apache 2 License. The full text of the 
+license can be found in the LICENSE file included with this module.
+
+=cut

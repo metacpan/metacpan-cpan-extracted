@@ -158,12 +158,14 @@ WriteMakefile(
     },
     BUILD_REQUIRES => {
         'Test::More' => '0',
+        'Alien::libmariadbclient' => '0.01',
     },
     PREREQ_PM => {
         'AnyEvent'             => '0',
         'Ref::Util'            => '0',
         'Sub::StrictDecl'      => '0',
         'AnyEvent::XSPromises' => '0',
+        'Alien::libmariadbclient' => '0.01',
     },
     LIBS    => $makemaker_libs,
     INC     => $makemaker_inc,

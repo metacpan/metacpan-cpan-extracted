@@ -1,13 +1,16 @@
 #!/usr/bin/env perl
+use strict;
+use warnings;
+
 use Test::More tests=>7;
 use FindBin;
 use File::Temp qw(tempfile);
 
-my (undef, $filename) = tempfile; 
+my (undef, $filename) = tempfile;
 defined $filename or die "Can't open file to save STDERR: $!\n";
 
-@output = `$^X -I$FindBin::Bin/../blib/lib $FindBin::Bin/../examples/simple_scan<examples/ss_fail.in 2>$filename`;
-@expected = map {"$_\n"} split /\n/,<<EOF;
+my @output = `$^X -I$FindBin::Bin/../blib/lib $FindBin::Bin/../examples/simple_scan<examples/ss_fail.in 2>$filename`;
+my @expected = map {"$_\n"} split /\n/,<<EOF;
 1..4
 not ok 1 - No python on perl.org [http://perl.org/] [/python/ should match]
 not ok 2 - No perl on python.org [http://python.org/] [/perl/ should match]
@@ -16,8 +19,8 @@ not ok 4 - Perl on perl.org [http://perl.org/] [/perl/ shouldn't match]
 EOF
 is_deeply(\@output, \@expected, "failed STDOUT as expected");
 
-open PRODUCED_STDERR, "<", $filename;
-@output = <PRODUCED_STDERR>;
+open my $stderr, "<", $filename;
+@output = <$stderr>;
 @expected = map {"$_\n"} split /\n/, <<EOF;
 
 #     Failed test (/home/y/lib/perl5/site_perl/5.6.1/Test/WWW/Simple.pm at line 36)

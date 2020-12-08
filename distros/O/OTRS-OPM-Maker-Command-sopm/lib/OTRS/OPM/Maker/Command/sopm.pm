@@ -13,7 +13,7 @@ use File::Basename;
 use File::Spec;
 use IO::File;
 use JSON;
-use List::Util qw(first);
+use List::Util qw(first max);
 use Path::Class ();
 use XML::LibXML;
 use XML::LibXML::PrettyPrint;
@@ -22,7 +22,7 @@ use OTRS::OPM::Maker -command;
 use OTRS::OPM::Maker::Utils::OTRS3;
 use OTRS::OPM::Maker::Utils::OTRS4;
 
-our $VERSION = 1.43;
+our $VERSION = 1.44;
 
 sub abstract {
     return "build sopm file based on metadata";
@@ -114,20 +114,28 @@ sub execute {
     }
 
     my %utils_versions = (
-        '3' => 'OTRS3',
-        '4' => 'OTRS4',
-        '5' => 'OTRS4',
-        '6' => 'OTRS4',
+        OTRS => {
+            '3' => 'OTRS3',
+            '4' => 'OTRS4',
+            '5' => 'OTRS4',
+            '6' => 'OTRS4',
+        },
+        KIX => {
+            '5' => 'OTRS4',
+        },
+        OTOBO => {
+            '10' => 'OTRS4',
+        },
     );
 
-    my ($max) = sort{ $b <=> $a }keys %major_versions;
+    my ($max) = max keys %major_versions;
 
-    $json->{product} //= 'OTRS';
-    if ( uc $json->{product} eq 'KIX' ) {
+    my $product = uc ( $json->{product} // 'OTRS' );
+    if ( $product eq 'KIX' ) {
         $max = 5;
     }
 
-    my $mod   = $utils_versions{$max} || $utils_versions{3};
+    my $mod   = $utils_versions{$product}->{$max} || $utils_versions{OTRS}->{3};
     my $utils = 'OTRS::OPM::Maker::Utils::' . $mod;
 
     if ( $json->{requires} ) {
@@ -353,20 +361,30 @@ sub execute {
     if ( $opt->{cvs} ) {
         $cvs = sprintf qq~\n    <CVS>\$Id: %s.sopm,v 1.1.1.1 2011/04/15 07:49:58 rb Exp \$</CVS>~, $name;
     }
+
+    my %product_start_tags = (
+        OTRS  => 'otrs_package',
+        KIX   => 'otrs_package',
+        OTOBO => 'otobo_package',
+    );
+
+    my $start_tag = $product_start_tags{$product};
     
     my $xml = sprintf q~<?xml version="1.0" encoding="utf-8" ?>
-<otrs_package version="1.0">
+<%s version="1.0">
     <!-- GENERATED WITH OTRS::OPM::Maker::Command::sopm (%s) -->%s
     <Name>%s</Name>
     <Version>%s</Version>
 %s
-</otrs_package>
+</%s>
 ~, 
+    $start_tag,
     $VERSION,
     $cvs,
     $name,
     $json->{version},
-    join( "\n", @xml_parts );
+    join( "\n", @xml_parts ),
+    $start_tag;
 
     my $fh = IO::File->new( $name . '.sopm', 'w' ) or die $!;
     $fh->print( $xml );
@@ -678,7 +696,7 @@ OTRS::OPM::Maker::Command::sopm - Build .sopm file based on metadata
 
 =head1 VERSION
 
-version 1.43
+version 1.44
 
 =head1 DESCRIPTION
 

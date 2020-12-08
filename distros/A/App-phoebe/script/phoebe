@@ -2940,7 +2940,6 @@ sub newest_first {
 }
 
 sub bogus_hash {
-  my $stream = shift;
   my $str = shift;
   return "0000" unless $str;
   my $num = unpack("L",B::hash($str)); # 32-bit integer

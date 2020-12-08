@@ -1,5 +1,10 @@
 Revision history for Device-Chip-TSL256x
 
+0.03    2020-12-06
+        [CHANGES]
+         * Updated to use Object::Pad
+         * Make better use of Data::Bitfield
+
 0.02    2019-01-21 19:48:00
         [CHANGES]
          * Use Future::AsyncAwait

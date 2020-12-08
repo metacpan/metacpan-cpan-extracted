@@ -3,7 +3,7 @@
 # PODNAME: TestRail::Bin::Tests
 
 package TestRail::Bin::Tests;
-$TestRail::Bin::Tests::VERSION = '0.046';
+$TestRail::Bin::Tests::VERSION = '0.047';
 use strict;
 use warnings;
 use utf8;
@@ -67,7 +67,7 @@ sub run {
     my @tests = TestRail::Utils::Find::findTests( $opts, @$cases );
 
     return ( join( "\n", @tests ) . "\n", 0 ) if scalar(@tests);
-    return ( '', 255 );
+    return ( '',                          255 );
 }
 
 1;
@@ -82,7 +82,7 @@ TestRail::Bin::Tests - List tests in a TestRail run matching the provided filter
 
 =head1 VERSION
 
-version 0.046
+version 0.047
 
 =head1 SYNOPSIS
 

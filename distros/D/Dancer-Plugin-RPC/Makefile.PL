@@ -10,7 +10,9 @@ my $prereq_pm = {
     'Params::Validate'           => '1.08',
     'Params::ValidationCompiler' => '0.24',
     'RPC::XML'                   => '0.56',
+    'Time::HiRes'                => '1.9719',
     'Types::Standard'            => '1.00',
+    'YAML'                       => '1.21',
 };
 
 WriteMakefile(

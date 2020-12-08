@@ -8,6 +8,9 @@ TODO: type cast tests.
 TODO: possibly implement https://peteroupc.github.io/CBOR/extended.html, but NaNs are nonportable. rely on libecb?
 TODO: https://github.com/svaarala/cbor-specs/blob/master/cbor-nonutf8-string-tags.rst, but maybe that is overkill?
 
+1.83 Tue Dec  8 09:27:06 CET 2020
+	- add CBOR::XS::as_map cast function.
+
 1.82 Tue Dec  1 02:47:40 CET 2020
 	- add CBOR::XS::as_bool cast function.
 

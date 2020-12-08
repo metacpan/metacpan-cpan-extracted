@@ -19,6 +19,7 @@ add_stopwords(<DATA>);
 all_pod_files_spelling_ok( qw( bin lib ) );
 __DATA__
 API
+Andy
 Anwar
 App
 Baugh
@@ -28,10 +29,12 @@ Find
 GETTERS
 George
 Harness
+Koston
 Lock
 Matthew
 Mohammad
 Neil
+Nick
 POSTs
 Parser
 Plugin
@@ -138,6 +141,7 @@ matthew
 milesort
 mohammad
 neil
+nick
 parseConfig
 perfile
 pl
@@ -152,6 +156,7 @@ testrail
 testrailrc
 testsuite
 testsuites
+thomas
 toddr
 unknownCallback
 userInput

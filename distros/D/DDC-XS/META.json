@@ -56,6 +56,6 @@
          "web" : "https://sourceforge.net/p/ddc-concordance/code/HEAD/tree/ddc-perl-xs/"
       }
    },
-   "version" : "0.25",
+   "version" : "0.26",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

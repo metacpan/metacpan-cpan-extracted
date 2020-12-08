@@ -6,7 +6,7 @@
 use v5.26;
 use Object::Pad;
 
-package Device::Chip::TCS3472x 0.01;
+package Device::Chip::TCS3472x 0.02;
 class Device::Chip::TCS3472x
    extends Device::Chip;
 
@@ -28,21 +28,22 @@ C<Device::Chip::TCS3472x> - chip driver for F<TCS3472x>-family
 =head1 SYNOPSIS
 
    use Device::Chip::TCS3472x;
+   use Future::AsyncAwait;
 
    my $chip = Device::Chip::TCS3472x->new;
-   $chip->mount( Device::Chip::Adapter::...->new )->get;
+   await $chip->mount( Device::Chip::Adapter::...->new );
 
    # Power on and enable ADCs
-   $chip->change_config(
+   await $chip->change_config(
       PON => 1,
       AEN => 1,
-   )->get;
+   );
 
    # At default config, first sensor reading is available after
    # 620 msec
    sleep 0.620;
 
-   my ( $clear, $red, $green, $blue ) = $chip->read_crgb->get;
+   my ( $clear, $red, $green, $blue ) = await $chip->read_crgb;
    print "Red=$red Green=$green Blue=$blue\n";
 
 =head1 DESCRIPTION

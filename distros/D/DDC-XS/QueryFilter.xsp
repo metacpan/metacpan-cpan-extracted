@@ -167,3 +167,20 @@
 	%name{new} CQFHasFieldSet(string field="", set_string vals=set_string(), bool isNegated=false);
 };
 
+
+
+//======================================================================
+// CQFPrune
+%name{DDC::XS::CQFPrune} class CQFPrune : public %name{DDC::XS::CQFSort} CQFSort
+{
+  %accessors{ %get_style{camelcase}; %set_style{camelcase}; };
+  public:
+	%name{limit} size_t m_limit %get %set;
+
+	//%name{keys} CQCountKeyExprList& m_keys %get; //%set;  //-- weird: works in QCount.xsp, not here (but this is equivalent in XS.c)
+        %name{keys} CQCountKeyExprList* m_keys %get; //%set;
+  	void setKeys(CQCountKeyExprList* val) %code %{ ddcxs_obj_set(m_keys,val); %};
+  public:
+        %name{new} CQFPrune(HitSortEnum ftype=LessByPruneKey, size_t limit_=0, CQCountKeyExprList* keys_=NULL);
+};
+

@@ -1,0 +1,8 @@
+Revision history for Module-Installed
+
+1.01 UNREL
+        - Change ordering of fail situations (Testers were failing)
+
+1.00    2020-12-07
+        First version, released on an unsuspecting world.
+

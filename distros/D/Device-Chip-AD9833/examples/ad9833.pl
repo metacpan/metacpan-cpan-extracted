@@ -6,6 +6,7 @@ use warnings;
 use Device::Chip::AD9833;
 use Device::Chip::Adapter;
 
+use Future::AsyncAwait 0.47;
 use Getopt::Long;
 
 GetOptions(
@@ -16,9 +17,9 @@ GetOptions(
 ) or exit 1;
 
 my $chip = Device::Chip::AD9833->new;
-$chip->mount(
+await $chip->mount(
    Device::Chip::Adapter->new_from_description( $ADAPTER )
-)->get;
+);
 
 $chip->protocol->power(1)->get;
 
@@ -30,10 +31,10 @@ END {
 
 my $REG_FREQ0 = ( $FREQ << 28 ) / 25E6;
 
-$chip->init->get;
+await $chip->init;
 
-$chip->change_config( wave => $WAVE )->get;
-$chip->write_FREQ0( $REG_FREQ0 )->get;
-$chip->write_PHASE0( 0 )->get;
+await $chip->change_config( wave => $WAVE );
+await $chip->write_FREQ0( $REG_FREQ0 );
+await $chip->write_PHASE0( 0 );
 
 print "Done\n";

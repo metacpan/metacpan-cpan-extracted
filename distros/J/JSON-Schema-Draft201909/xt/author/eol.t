@@ -34,6 +34,7 @@ my @files = (
     't/additional-tests/loose-types-const-enum.json',
     't/additional-tests/not-an-anchor.json',
     't/additional-tests/not-an-id.json',
+    't/additional-tests/recursive-dynamic.json',
     't/additional-tests/recursiveRef.json',
     't/additional-tests/ref-and-id.json',
     't/additional-tests/ref.json',

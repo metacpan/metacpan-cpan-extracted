@@ -1,4 +1,4 @@
-# AWS::Lambda::Function generated from spec 5.3.0
+# AWS::Lambda::Function generated from spec 21.0.0
 use Moose::Util::TypeConstraints;
 
 coerce 'Cfn::Resource::Properties::AWS::Lambda::Function',
@@ -14,7 +14,7 @@ package Cfn::Resource::AWS::Lambda::Function {
     [ 'Arn' ]
   }
   sub supported_regions {
-    [ 'ap-east-1','ap-northeast-1','ap-northeast-2','ap-northeast-3','ap-south-1','ap-southeast-1','ap-southeast-2','ca-central-1','cn-north-1','cn-northwest-1','eu-central-1','eu-north-1','eu-west-1','eu-west-2','eu-west-3','me-south-1','sa-east-1','us-east-1','us-east-2','us-gov-east-1','us-gov-west-1','us-west-1','us-west-2' ]
+    [ 'af-south-1','ap-east-1','ap-northeast-1','ap-northeast-2','ap-northeast-3','ap-south-1','ap-southeast-1','ap-southeast-2','ca-central-1','cn-north-1','cn-northwest-1','eu-central-1','eu-north-1','eu-south-1','eu-west-1','eu-west-2','eu-west-3','me-south-1','sa-east-1','us-east-1','us-east-2','us-gov-east-1','us-gov-west-1','us-west-1','us-west-2' ]
   }
 }
 
@@ -29,11 +29,11 @@ coerce 'Cfn::Resource::Properties::AWS::Lambda::Function::VpcConfig',
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::Lambda::Function::VpcConfigValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::Lambda::Function::VpcConfig->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::Lambda::Function::VpcConfigValue {
+package Cfn::Resource::Properties::Object::AWS::Lambda::Function::VpcConfig {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -51,16 +51,60 @@ coerce 'Cfn::Resource::Properties::AWS::Lambda::Function::TracingConfig',
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::Lambda::Function::TracingConfigValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::Lambda::Function::TracingConfig->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::Lambda::Function::TracingConfigValue {
+package Cfn::Resource::Properties::Object::AWS::Lambda::Function::TracingConfig {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
   
   has Mode => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+}
+subtype 'ArrayOfCfn::Resource::Properties::AWS::Lambda::Function::FileSystemConfig',
+     as 'Cfn::Value',
+  where { $_->isa('Cfn::Value::Array') or $_->isa('Cfn::Value::Function') },
+message { "$_ is not a Cfn::Value or a Cfn::Value::Function" };
+
+coerce 'ArrayOfCfn::Resource::Properties::AWS::Lambda::Function::FileSystemConfig',
+  from 'HashRef',
+   via {
+     if (my $f = Cfn::TypeLibrary::try_function($_)) {
+       return $f
+     } else {
+       die 'Only accepts functions'; 
+     }
+   },
+  from 'ArrayRef',
+   via {
+     Cfn::Value::Array->new(Value => [
+       map { 
+         Moose::Util::TypeConstraints::find_type_constraint('Cfn::Resource::Properties::AWS::Lambda::Function::FileSystemConfig')->coerce($_)
+       } @$_
+     ]);
+   };
+
+subtype 'Cfn::Resource::Properties::AWS::Lambda::Function::FileSystemConfig',
+     as 'Cfn::Value';
+
+coerce 'Cfn::Resource::Properties::AWS::Lambda::Function::FileSystemConfig',
+  from 'HashRef',
+   via {
+     if (my $f = Cfn::TypeLibrary::try_function($_)) {
+       return $f
+     } else {
+       return Cfn::Resource::Properties::Object::AWS::Lambda::Function::FileSystemConfig->new( %$_ );
+     }
+   };
+
+package Cfn::Resource::Properties::Object::AWS::Lambda::Function::FileSystemConfig {
+  use Moose;
+  use MooseX::StrictConstructor;
+  extends 'Cfn::Value::TypedValue';
+  
+  has Arn => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has LocalMountPath => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
 }
 
 subtype 'Cfn::Resource::Properties::AWS::Lambda::Function::Environment',
@@ -72,11 +116,11 @@ coerce 'Cfn::Resource::Properties::AWS::Lambda::Function::Environment',
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::Lambda::Function::EnvironmentValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::Lambda::Function::Environment->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::Lambda::Function::EnvironmentValue {
+package Cfn::Resource::Properties::Object::AWS::Lambda::Function::Environment {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -93,11 +137,11 @@ coerce 'Cfn::Resource::Properties::AWS::Lambda::Function::DeadLetterConfig',
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::Lambda::Function::DeadLetterConfigValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::Lambda::Function::DeadLetterConfig->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::Lambda::Function::DeadLetterConfigValue {
+package Cfn::Resource::Properties::Object::AWS::Lambda::Function::DeadLetterConfig {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -114,11 +158,11 @@ coerce 'Cfn::Resource::Properties::AWS::Lambda::Function::Code',
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::Lambda::Function::CodeValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::Lambda::Function::Code->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::Lambda::Function::CodeValue {
+package Cfn::Resource::Properties::Object::AWS::Lambda::Function::Code {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -135,9 +179,11 @@ package Cfn::Resource::Properties::AWS::Lambda::Function {
   extends 'Cfn::Resource::Properties';
   
   has Code => (isa => 'Cfn::Resource::Properties::AWS::Lambda::Function::Code', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has CodeSigningConfigArn => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has DeadLetterConfig => (isa => 'Cfn::Resource::Properties::AWS::Lambda::Function::DeadLetterConfig', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has Description => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has Environment => (isa => 'Cfn::Resource::Properties::AWS::Lambda::Function::Environment', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has FileSystemConfigs => (isa => 'ArrayOfCfn::Resource::Properties::AWS::Lambda::Function::FileSystemConfig', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has FunctionName => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
   has Handler => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has KmsKeyArn => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
@@ -153,3 +199,30 @@ package Cfn::Resource::Properties::AWS::Lambda::Function {
 }
 
 1;
+### main pod documentation begin ###
+
+=encoding UTF-8
+
+=head1 NAME
+
+Cfn::Resource::AWS::Lambda::Function - Cfn resource for AWS::Lambda::Function
+
+=head1 DESCRIPTION
+
+This module implements a Perl module that represents the CloudFormation object AWS::Lambda::Function.
+
+See L<Cfn> for more information on how to use it.
+
+=head1 AUTHOR
+
+    Jose Luis Martinez
+    CAPSiDE
+    jlmartinez@capside.com
+
+=head1 COPYRIGHT and LICENSE
+
+Copyright (c) 2013 by CAPSiDE
+This code is distributed under the Apache 2 License. The full text of the 
+license can be found in the LICENSE file included with this module.
+
+=cut

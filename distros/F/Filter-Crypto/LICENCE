@@ -15,12 +15,12 @@ You should have received a copy of the GNU General Public License along with
 this distribution in the file named "Copying".  If not, write to the Free
 Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
 02110-1301, USA or visit their web page on the internet at
-http://www.gnu.org/copyleft/gpl.html or the Perl web page at
-http://dev.perl.org/licenses/gpl1.html.
+https://www.gnu.org/copyleft/gpl.html or the Perl web page at
+https://dev.perl.org/licenses/gpl1.html.
 
 You should also have received a copy of the Artistic License with this
 distribution, in the file named "Artistic".  If not, visit the Perl web page on
-the internet at http://dev.perl.org/licenses/artistic.html.
+the internet at https://dev.perl.org/licenses/artistic.html.
 ________________________________________________________________________________
 
 Note that this distribution depends on OpenSSL, which is licensed under a
@@ -36,7 +36,7 @@ httpd (version 2.4.9), which is subject to the following terms:
 
                                  Apache License
                            Version 2.0, January 2004
-                        http://www.apache.org/licenses/
+                        https://www.apache.org/licenses/
 
    TERMS AND CONDITIONS FOR USE, REPRODUCTION, AND DISTRIBUTION
 
@@ -228,7 +228,7 @@ httpd (version 2.4.9), which is subject to the following terms:
    you may not use this file except in compliance with the License.
    You may obtain a copy of the License at
 
-       http://www.apache.org/licenses/LICENSE-2.0
+       https://www.apache.org/licenses/LICENSE-2.0
 
    Unless required by applicable law or agreed to in writing, software
    distributed under the License is distributed on an "AS IS" BASIS,

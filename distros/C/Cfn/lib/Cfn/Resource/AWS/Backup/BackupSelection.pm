@@ -1,4 +1,4 @@
-# AWS::Backup::BackupSelection generated from spec 4.1.0
+# AWS::Backup::BackupSelection generated from spec 20.1.0
 use Moose::Util::TypeConstraints;
 
 coerce 'Cfn::Resource::Properties::AWS::Backup::BackupSelection',
@@ -14,7 +14,7 @@ package Cfn::Resource::AWS::Backup::BackupSelection {
     [ 'BackupPlanId','SelectionId' ]
   }
   sub supported_regions {
-    [ 'ap-northeast-1','ap-northeast-2','ap-southeast-1','ap-southeast-2','ca-central-1','eu-central-1','eu-west-1','eu-west-2','us-east-1','us-east-2','us-west-1','us-west-2' ]
+    [ 'af-south-1','ap-northeast-1','ap-northeast-2','ap-southeast-1','ap-southeast-2','ca-central-1','eu-central-1','eu-south-1','eu-west-1','eu-west-2','us-east-1','us-east-2','us-gov-east-1','us-gov-west-1','us-west-1','us-west-2' ]
   }
 }
 
@@ -51,11 +51,11 @@ coerce 'Cfn::Resource::Properties::AWS::Backup::BackupSelection::ConditionResour
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::Backup::BackupSelection::ConditionResourceTypeValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::Backup::BackupSelection::ConditionResourceType->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::Backup::BackupSelection::ConditionResourceTypeValue {
+package Cfn::Resource::Properties::Object::AWS::Backup::BackupSelection::ConditionResourceType {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -74,11 +74,11 @@ coerce 'Cfn::Resource::Properties::AWS::Backup::BackupSelection::BackupSelection
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::Backup::BackupSelection::BackupSelectionResourceTypeValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::Backup::BackupSelection::BackupSelectionResourceType->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::Backup::BackupSelection::BackupSelectionResourceTypeValue {
+package Cfn::Resource::Properties::Object::AWS::Backup::BackupSelection::BackupSelectionResourceType {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -99,3 +99,30 @@ package Cfn::Resource::Properties::AWS::Backup::BackupSelection {
 }
 
 1;
+### main pod documentation begin ###
+
+=encoding UTF-8
+
+=head1 NAME
+
+Cfn::Resource::AWS::Backup::BackupSelection - Cfn resource for AWS::Backup::BackupSelection
+
+=head1 DESCRIPTION
+
+This module implements a Perl module that represents the CloudFormation object AWS::Backup::BackupSelection.
+
+See L<Cfn> for more information on how to use it.
+
+=head1 AUTHOR
+
+    Jose Luis Martinez
+    CAPSiDE
+    jlmartinez@capside.com
+
+=head1 COPYRIGHT and LICENSE
+
+Copyright (c) 2013 by CAPSiDE
+This code is distributed under the Apache 2 License. The full text of the 
+license can be found in the LICENSE file included with this module.
+
+=cut

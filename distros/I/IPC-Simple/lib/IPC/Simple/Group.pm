@@ -1,6 +1,6 @@
 package IPC::Simple::Group;
 # ABSTRACT: work with several processes as a group
-$IPC::Simple::Group::VERSION = '0.07';
+$IPC::Simple::Group::VERSION = '0.09';
 
 use strict;
 use warnings;
@@ -25,9 +25,6 @@ sub add {
   my $self = shift;
 
   for (@_) {
-    croak 'processes must be grouped *before* launching them'
-      unless $_->is_ready;
-
     croak 'processes must be named to be grouped'
       unless $_->name;
 
@@ -42,6 +39,12 @@ sub add {
     $self->{members}{ $_->{name} } = $_;
     $_->{recv_cb} = sub{ $self->{messages}->put( $_[0] ) };
     $_->{term_cb} = sub{ $self->drop( $_[0] ) };
+
+    # If the process has already been launched, move existing messages into the
+    # group queue.
+    unless ($_->is_ready) {
+      $self->{messages}->put( $_->{messages}->clear );
+    }
   }
 }
 
@@ -63,7 +66,10 @@ sub members {
 
 sub launch {
   my $self = shift;
-  $_->launch for $self->members;
+
+  for ($self->members) {
+    $_->launch if $_->is_ready;
+  }
 }
 
 sub terminate {
@@ -73,7 +79,7 @@ sub terminate {
 
 sub signal {
   my ($self, $signal) = @_;
-  $self->signal($signal) for $self->members;
+  $_->signal($signal) for $self->members;
 }
 
 sub join {
@@ -100,7 +106,7 @@ IPC::Simple::Group - work with several processes as a group
 
 =head1 VERSION
 
-version 0.07
+version 0.09
 
 =head1 DESCRIPTION
 
@@ -113,13 +119,14 @@ Also note that processes being added to a group must fit the following criteria:
 
 =over
 
-=item not yet launched
-
 =item no recv_cb
 
 =item no term_cb
 
 =back
+
+Grouping processes that have already been launched may result in messages
+being queued in the process' own queue rather than the group one.
 
 =head1 METHODS
 

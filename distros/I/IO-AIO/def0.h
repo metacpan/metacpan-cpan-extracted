@@ -237,14 +237,32 @@
 #ifndef MREMAP_FIXED
 #define MREMAP_FIXED 0
 #endif
-#ifndef F_DUPFD_CLOEXEC
-#define F_DUPFD_CLOEXEC 0
-#endif
 #ifndef MSG_CMSG_CLOEXEC
 #define MSG_CMSG_CLOEXEC 0
 #endif
 #ifndef SOCK_CLOEXEC
 #define SOCK_CLOEXEC 0
+#endif
+#ifndef F_DUPFD_CLOEXEC
+#define F_DUPFD_CLOEXEC 0
+#endif
+#ifndef F_ADD_SEALS
+#define F_ADD_SEALS 0
+#endif
+#ifndef F_GET_SEALS
+#define F_GET_SEALS 0
+#endif
+#ifndef F_SEAL_SEAL
+#define F_SEAL_SEAL 0
+#endif
+#ifndef F_SEAL_SHRINK
+#define F_SEAL_SHRINK 0
+#endif
+#ifndef F_SEAL_GROW
+#define F_SEAL_GROW 0
+#endif
+#ifndef F_SEAL_WRITE
+#define F_SEAL_WRITE 0
 #endif
 #ifndef F_OFD_GETLK
 #define F_OFD_GETLK 0

@@ -5,6 +5,7 @@ author:
 build_requires:
   ExtUtils::MakeMaker: '0'
   Test::More: '0.82'
+  Test::Snapshot: '0.06'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
@@ -24,7 +25,7 @@ requires:
   Config: '0'
   Cwd: '0'
   File::Spec: '0'
-  Graph: '0.9709'
+  Graph: '0.9712'
   Text::Balanced: '2.03'
   Text::ParseWords: '3.24'
   perl: '5.006'
@@ -35,5 +36,5 @@ resources:
   bugtracker: https://github.com/klp2/Make/issues
   homepage: https://metacpan.org/pod/Make
   repository: https://github.com/klp2/Make.git
-version: '2.009'
+version: '2.010'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

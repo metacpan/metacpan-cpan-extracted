@@ -71,8 +71,8 @@ EOF
 	push @ret, <<'EOF';
 
 show-map-stations-diff:
-	git show HEAD:share/berlin-map.xml | grep '<station ' | perl -pe 's/link=".*?"//; s/other_link=".*?"//' | psort -e '/id="S(\d+)/; $$1' > /tmp/map-tube-berlin.old
-	cat share/berlin-map.xml           | grep '<station ' | perl -pe 's/link=".*?"//; s/other_link=".*?"//' | psort -e '/id="S(\d+)/; $$1' > /tmp/map-tube-berlin.new
+	git show HEAD:share/berlin-map.xml | grep '<station ' | perl -pe 's/ link=".*?"//; s/ other_link=".*?"//; s/ id="S\d+"//;' | psort -e '/name="(.*?)"/; $$1' > /tmp/map-tube-berlin.old
+	cat share/berlin-map.xml           | grep '<station ' | perl -pe 's/ link=".*?"//; s/ other_link=".*?"//; s/ id="S\d+"//;' | psort -e '/name="(.*?)"/; $$1' > /tmp/map-tube-berlin.new
 	diff -u /tmp/map-tube-berlin.old /tmp/map-tube-berlin.new
 
 .include "../../perl.release.mk"

@@ -1,9 +1,9 @@
 package BenchmarkAnything::Storage::Backend::SQL;
-# git description: v0.025-2-g331822e
+# git description: v0.027-2-gae57af0
 
 our $AUTHORITY = 'cpan:TAPPER';
 # ABSTRACT: Autonomous SQL backend to store benchmarks
-$BenchmarkAnything::Storage::Backend::SQL::VERSION = '0.026';
+$BenchmarkAnything::Storage::Backend::SQL::VERSION = '0.028';
 use 5.008;
 use utf8;
 use strict;
@@ -456,13 +456,14 @@ sub process_queued_multi_benchmark {
 
                 # please note, this reorders data points for efficiency,
                 # read the comments there.
-                $or_self->add_multi_benchmark(\@a_data_points, $hr_options);
+                # (maybe this bulk insert is broken - use with care, double check)
+                # $or_self->add_multi_benchmark(\@a_data_points, $hr_options);
 
                 # preserve order by adding each data_point separately,
                 # otherwise add_multi_benchmark() would reorder to optimize insert
-                # foreach my $hr_data_point (@a_data_points) {
-                #     $or_self->add_multi_benchmark([$hr_data_point], $hr_options);
-                # }
+                foreach my $hr_data_point (@a_data_points) {
+                    $or_self->add_multi_benchmark([$hr_data_point], $hr_options);
+                }
             };
             if (!$@) {
                 $or_self->{query}->update_raw_bench_bundle_set_processed3(@a_bench_bundle_ids);
@@ -1814,7 +1815,7 @@ Roberto Schaefer <schaefr@amazon.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2019 by Amazon.com, Inc. or its affiliates.
+This software is Copyright (c) 2020 by Amazon.com, Inc. or its affiliates.
 
 This is free software, licensed under:
 

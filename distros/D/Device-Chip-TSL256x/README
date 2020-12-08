@@ -5,16 +5,17 @@ NAME
 SYNOPSIS
 
        use Device::Chip::TSL256x;
+       use Future::AsyncAwait;
     
        my $chip = Device::Chip::TSL256x->new;
-       $chip->mount( Device::Chip::Adapter::...->new )->get;
+       await $chip->mount( Device::Chip::Adapter::...->new );
     
-       $chip->power(1)->get;
+       await $chip->power(1);
     
        sleep 1; # Wait for one integration cycle
     
        printf "Current ambient light level is %.2f lux\n",
-          scalar $chip->read_lux->get;
+          scalar await $chip->read_lux;
 
 DESCRIPTION
 
@@ -28,12 +29,12 @@ DESCRIPTION
 
 ACCESSORS
 
-    The following methods documented with a trailing call to ->get return
-    Future instances.
+    The following methods documented in an await expression return Future
+    instances.
 
  read_config
 
-       $config = $chip->read_config->get
+       $config = await $chip->read_config;
 
     Returns a HASH reference of the contents of timing control register,
     using fields named from the data sheet.
@@ -43,7 +44,7 @@ ACCESSORS
 
  change_config
 
-       $chip->change_config( %changes )->get
+       await $chip->change_config( %changes );
 
     Writes updates to the timing control register.
 
@@ -53,7 +54,7 @@ ACCESSORS
 
  read_id
 
-       $id = $chip->read_id->get
+       $id = await $chip->read_id;
 
     Returns the chip's ID register value.
 
@@ -61,15 +62,15 @@ ACCESSORS
 
  read_data1
 
-       $data0 = $chip->read_data0->get
+       $data0 = await $chip->read_data0;
     
-       $data1 = $chip->read_data1->get
+       $data1 = await $chip->read_data1;
 
     Reads the current values of the ADC channels.
 
  read_data
 
-       ( $data0, $data1 ) = $chip->read_data->get
+       ( $data0, $data1 ) = await $chip->read_data;
 
     Read the current values of both ADC channels in a single I²C
     transaction.
@@ -78,16 +79,16 @@ METHODS
 
  power
 
-       $chip->power( $on )->get
+       await $chip->power( $on );
 
     Enables or disables the main power control bits in the CONTROL
     register.
 
  read_lux
 
-       $lux = $chip->read_lux->get
+       $lux = await $chip->read_lux;
     
-       ( $lux, $data0, $data1 ) = $chip->read_lux->get
+       ( $lux, $data0, $data1 ) = await $chip->read_lux;
 
     Reads the two data registers then performs the appropriate scaling
     calculations to return a floating-point number that approximates the

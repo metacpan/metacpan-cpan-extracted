@@ -5,8 +5,8 @@ use Test::More qw(no_plan);
 
 use File::Temp qw( tempdir tempfile );
 my $perl  = $^X || 'perl';
-my $inc = join(' -I ', map { qq{"$_"} } @INC) || '';
-$inc = "-I $inc" if $inc;
+require Config;
+my $inc = join($Config::Config{path_sep}, @INC) || '';
 
 {
     my ( $dir, $filename ) = make_raw_badfile();
@@ -50,7 +50,8 @@ sub run_ok {
     die "code containing double quotes is not portable on Win32 in one-liners at $file $line.\n" if $code =~ /"/;
     local $Test::Builder::Level = $Test::Builder::Level + 1;
     my (undef, $outfile) = tempfile();
-    is( `$perl $inc -MTest::EOL -e "$code" > $outfile 2>&1`, '', "test sub program: output redirected" );
+    local $ENV{PERL5LIB} = $inc;
+    is( `$perl -MTest::EOL -e "$code" > $outfile 2>&1`, '', "test sub program: output redirected" );
     is( $? >> 8, 1, "test sub program: exit code is 1" );
     local $/ = undef;
     open my $fh, '<', $outfile or die "Can't open $outfile: $!";

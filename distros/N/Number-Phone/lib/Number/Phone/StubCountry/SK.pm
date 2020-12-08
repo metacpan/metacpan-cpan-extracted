@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20200904144536;
+our $VERSION = 1.20201204215957;
 
 my $formatters = [
                 {
@@ -132,32 +132,32 @@ my $validators = {
         '
               };
 my %areanames = ();
-$areanames{en}->{4212} = "Bratislava";
-$areanames{en}->{42131} = "Dunajska\ Streda";
-$areanames{en}->{42132} = "Trencin";
-$areanames{en}->{42133} = "Trnava";
-$areanames{en}->{42134} = "Senica";
-$areanames{en}->{42135} = "Nove\ Zamky";
-$areanames{en}->{42136} = "Levice";
-$areanames{en}->{42137} = "Nitra";
-$areanames{en}->{42138} = "Topolcany";
-$areanames{en}->{42141} = "Zilina";
-$areanames{en}->{42142} = "Povazska\ Bystrica";
-$areanames{en}->{42143} = "Martin";
-$areanames{en}->{42144} = "Liptovsky\ Mikulas";
-$areanames{en}->{42145} = "Zvolen";
-$areanames{en}->{42146} = "Prievidza";
-$areanames{en}->{42147} = "Lucenec";
-$areanames{en}->{42148} = "Banska\ Bystrica";
-$areanames{en}->{42151} = "Presov";
-$areanames{en}->{42152} = "Poprad";
-$areanames{en}->{42153} = "Spisska\ Nova\ Ves";
-$areanames{en}->{42154} = "Bardejov";
-$areanames{en}->{42155} = "Kosice";
-$areanames{en}->{42156} = "Michalovce";
-$areanames{en}->{42157} = "Humenne";
-$areanames{en}->{42158} = "Roznava";
-$areanames{en}->{421601} = "Roznava";
+$areanames{en} = {"42145", "Zvolen",
+"42136", "Levice",
+"42152", "Poprad",
+"42143", "Martin",
+"42156", "Michalovce",
+"42132", "Trencin",
+"42141", "Zilina",
+"42158", "Roznava",
+"42157", "Humenne",
+"42138", "Topolcany",
+"42144", "Liptovsky\ Mikulas",
+"42137", "Nitra",
+"42142", "Povazska\ Bystrica",
+"42155", "Kosice",
+"42133", "Trnava",
+"42146", "Prievidza",
+"42135", "Nove\ Zamky",
+"42153", "Spisska\ Nova\ Ves",
+"42147", "Lucenec",
+"42134", "Senica",
+"42148", "Banska\ Bystrica",
+"42151", "Presov",
+"421601", "Roznava",
+"42154", "Bardejov",
+"42131", "Dunajska\ Streda",
+"4212", "Bratislava",};
 
     sub new {
       my $class = shift;

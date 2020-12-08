@@ -1,0 +1,89 @@
+NAME
+
+    CPANfile::Parse::PPI - Parse cpanfiles with PPI
+
+VERSION
+
+    version 0.02
+
+SYNOPSIS
+
+        use v5.24;
+        use CPANfile::Parse::PPI;
+        
+        my $path     = '/path/to/cpanfile';
+        my $cpanfile = CPANfile::Parse::PPI->new( $path );
+        
+        # or
+        # my $cpanfile = CPANfile::Parse::PPI->new( \$content );
+        
+        for my $module ( $cpanfile->modules->@* ) {
+            my $stage = "";
+            $stage    = "on $module->{stage}" if $module->{stage};
+            say sprintf "%s is %s", $module->{name}, $module->{type};
+        }
+
+METHODS
+
+ new
+
+        my $path     = '/path/to/cpanfile';
+        my $cpanfile = CPANfile::Parse::PPI->new( $path );
+        
+        # or
+        my $content  = <<'CPANFILE';
+        requires "CPANfile::Parse::PPI" => 3.6;';
+        on build => sub {
+            recommends "Dist::Zilla" => 4.0;
+            requires "Test2" => 2.311;
+        }
+        CPANFILE
+    
+        my $cpanfile = CPANfile::Parse::PPI->new( \$content );
+
+ATTRIBUTES
+
+ modules
+
+    Returns a list of modules mentioned in the cpanfile ("perl" is
+    skipped). Each element is a hashref with these keys:
+
+      * name
+
+      * version
+
+      * type
+
+      * stage
+
+        use CPANfile::Parse::PPI;
+        use Data::Printer;
+    
+        my $required = 'requires "CPANfile::Parse::PPI" => 3.6;';
+        my $cpanfile = CPANfile::Parse::PPI->new( \$required );
+        
+        my $modules = $cpanfile->modules;
+        p $modules;
+        
+        __DATA__
+        [
+            [0] {
+                name      "CPANfile::Parse::PPI",
+                stage     "",
+                type      "requires",
+                version   3.6
+            }
+        ]
+
+AUTHOR
+
+    Renee Baecker <reneeb@cpan.org>
+
+COPYRIGHT AND LICENSE
+
+    This software is Copyright (c) 2020 by Renee Baecker.
+
+    This is free software, licensed under:
+
+      The Artistic License 2.0 (GPL Compatible)
+

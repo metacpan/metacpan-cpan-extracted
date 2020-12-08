@@ -2,7 +2,6 @@ requires "Carp" => "0";
 requires "Class::Accessor" => "0";
 requires "Crypt::OpenSSL::Bignum" => "0";
 requires "Crypt::OpenSSL::DSA" => "0";
-requires "Crypt::OpenSSL::DSA::Signature" => "0";
 requires "Crypt::OpenSSL::RSA" => "0";
 requires "Crypt::OpenSSL::X509" => "0";
 requires "Digest::SHA" => "0";

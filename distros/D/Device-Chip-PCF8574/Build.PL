@@ -6,6 +6,10 @@ use Module::Build;
 my $build = Module::Build->new(
    module_name => 'Device::Chip::PCF8574',
    requires => {
+      'perl' => '5.026',
+      'Future::AsyncAwait' => '0.47', # toplevel await
+      'Object::Pad' => '0.19',
+
       'Device::Chip' => 0,
    },
    test_requires => {
@@ -16,7 +20,6 @@ my $build = Module::Build->new(
       'Module::Build' => '0.4004', # test_requires
    },
    license => 'perl',
-   create_makefile_pl => 'small',
    create_license => 1,
    create_readme  => 1,
 );

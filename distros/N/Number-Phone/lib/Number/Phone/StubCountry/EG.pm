@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20200904144531;
+our $VERSION = 1.20201204215956;
 
 my $formatters = [
                 {
@@ -91,34 +91,34 @@ my $validators = {
                 'voip' => ''
               };
 my %areanames = ();
-$areanames{en}->{2013} = "Banha";
-$areanames{en}->{2015} = "10th\ of\ Ramadan";
-$areanames{en}->{202} = "Cairo\/Giza\/Qalyubia";
-$areanames{en}->{203} = "Alexandria";
-$areanames{en}->{2040} = "Tanta";
-$areanames{en}->{2045} = "Damanhur";
-$areanames{en}->{2046} = "Marsa\ Matruh";
-$areanames{en}->{2047} = "Kafr\ El\-Sheikh";
-$areanames{en}->{2048} = "Monufia";
-$areanames{en}->{2050} = "Mansoura";
-$areanames{en}->{2055} = "Zagazig";
-$areanames{en}->{20554} = "10th\ of\ Ramadan";
-$areanames{en}->{2057} = "Damietta";
-$areanames{en}->{2062} = "Suez";
-$areanames{en}->{2064} = "Ismailia";
-$areanames{en}->{2065} = "Red\ Sea";
-$areanames{en}->{2066} = "Port\ Said";
-$areanames{en}->{2068} = "El\-Arish";
-$areanames{en}->{2069} = "El\-Tor";
-$areanames{en}->{2082} = "Beni\ Suef";
-$areanames{en}->{2084} = "Fayoum";
-$areanames{en}->{2086} = "Minia";
-$areanames{en}->{2088} = "Assiout";
-$areanames{en}->{2092} = "Wadi\ El\-Gedid";
-$areanames{en}->{2093} = "Sohag";
-$areanames{en}->{2095} = "Luxor";
-$areanames{en}->{2096} = "Qena";
-$areanames{en}->{2097} = "Aswan";
+$areanames{en} = {"2015", "10th\ of\ Ramadan",
+"2045", "Damanhur",
+"2093", "Sohag",
+"2048", "Monufia",
+"2069", "El\-Tor",
+"2047", "Kafr\ El\-Sheikh",
+"2013", "Banha",
+"2092", "Wadi\ El\-Gedid",
+"2095", "Luxor",
+"2097", "Aswan",
+"2055", "Zagazig",
+"20554", "10th\ of\ Ramadan",
+"2057", "Damietta",
+"2096", "Qena",
+"2064", "Ismailia",
+"2046", "Marsa\ Matruh",
+"2084", "Fayoum",
+"2086", "Minia",
+"2066", "Port\ Said",
+"2050", "Mansoura",
+"202", "Cairo\/Giza\/Qalyubia",
+"2088", "Assiout",
+"2062", "Suez",
+"203", "Alexandria",
+"2040", "Tanta",
+"2082", "Beni\ Suef",
+"2068", "El\-Arish",
+"2065", "Red\ Sea",};
 
     sub new {
       my $class = shift;

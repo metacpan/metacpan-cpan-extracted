@@ -1,6 +1,9 @@
 .DS_Store
 ^libphonenumber
 ^\.git
+.envrc
+.ofcom-epoch
+.libphonenumber-tag
 ^build-
 S3.xls
 S5.xls

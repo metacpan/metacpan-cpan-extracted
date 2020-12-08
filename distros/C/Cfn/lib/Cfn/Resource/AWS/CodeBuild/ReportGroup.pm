@@ -1,4 +1,4 @@
-# AWS::CodeBuild::ReportGroup generated from spec 10.2.0
+# AWS::CodeBuild::ReportGroup generated from spec 18.4.0
 use Moose::Util::TypeConstraints;
 
 coerce 'Cfn::Resource::Properties::AWS::CodeBuild::ReportGroup',
@@ -29,11 +29,11 @@ coerce 'Cfn::Resource::Properties::AWS::CodeBuild::ReportGroup::S3ReportExportCo
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::CodeBuild::ReportGroup::S3ReportExportConfigValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::CodeBuild::ReportGroup::S3ReportExportConfig->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::CodeBuild::ReportGroup::S3ReportExportConfigValue {
+package Cfn::Resource::Properties::Object::AWS::CodeBuild::ReportGroup::S3ReportExportConfig {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -54,11 +54,11 @@ coerce 'Cfn::Resource::Properties::AWS::CodeBuild::ReportGroup::ReportExportConf
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::CodeBuild::ReportGroup::ReportExportConfigValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::CodeBuild::ReportGroup::ReportExportConfig->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::CodeBuild::ReportGroup::ReportExportConfigValue {
+package Cfn::Resource::Properties::Object::AWS::CodeBuild::ReportGroup::ReportExportConfig {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -72,9 +72,38 @@ package Cfn::Resource::Properties::AWS::CodeBuild::ReportGroup {
   use MooseX::StrictConstructor;
   extends 'Cfn::Resource::Properties';
   
+  has DeleteReports => (isa => 'Cfn::Value::Boolean', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has ExportConfig => (isa => 'Cfn::Resource::Properties::AWS::CodeBuild::ReportGroup::ReportExportConfig', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has Name => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
-  has Type => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has Tags => (isa => 'ArrayOfCfn::Resource::Properties::TagType', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has Type => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
 }
 
 1;
+### main pod documentation begin ###
+
+=encoding UTF-8
+
+=head1 NAME
+
+Cfn::Resource::AWS::CodeBuild::ReportGroup - Cfn resource for AWS::CodeBuild::ReportGroup
+
+=head1 DESCRIPTION
+
+This module implements a Perl module that represents the CloudFormation object AWS::CodeBuild::ReportGroup.
+
+See L<Cfn> for more information on how to use it.
+
+=head1 AUTHOR
+
+    Jose Luis Martinez
+    CAPSiDE
+    jlmartinez@capside.com
+
+=head1 COPYRIGHT and LICENSE
+
+Copyright (c) 2013 by CAPSiDE
+This code is distributed under the Apache 2 License. The full text of the 
+license can be found in the LICENSE file included with this module.
+
+=cut

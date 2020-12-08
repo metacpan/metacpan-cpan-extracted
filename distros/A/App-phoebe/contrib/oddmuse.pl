@@ -110,7 +110,11 @@ sub oddmuse_new_save_page {
 sub oddmuse_new_valid_token {
   my ($stream, $host, $space, $id, $params) = @_;
   my $token = $params->{token}||"";
-  $log->debug("Comparing $token with $oddmuse_wiki_tokens{$host}");
+  if ($oddmuse_wiki_tokens{$host}) {
+    $log->debug("Comparing $token with $oddmuse_wiki_tokens{$host}");
+  } else {
+    $log->debug("There is no specific token for this Oddmuse wiki");
+  }
   return 1 if $oddmuse_wiki_tokens{$host} and $oddmuse_wiki_tokens{$host} eq $token;
   return oddmuse_old_valid_token(@_);
 }

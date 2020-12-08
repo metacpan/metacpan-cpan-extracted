@@ -9,7 +9,7 @@ BEGIN {
     use_ok( 'XML::Sig' );
 }
 
-open my $file, 't/saml_request.xml' or die "no test saml request";
+open my $file, 't/unsigned/saml_request.xml' or die "no test saml request";
 my $xml;
 {
     local undef $/;
@@ -57,7 +57,7 @@ SKIP: {
 }
 
 # Test that XML::Sig can verify a xmlsec1 DSA signed xml
-open $file, 't/saml_request-xmlsec1-dsa-signed.xml' or die "no test saml_request-xmlsec1-dsa-signed.xml";
+open $file, 't/signed/saml_request-xmlsec1-dsa-signed.xml' or die "no test saml_request-xmlsec1-dsa-signed.xml";
 my $xmlsec;
 {
     local undef $/;
@@ -69,7 +69,7 @@ my $xmlsec_ret = $xmlsec1_dsasig->verify($xmlsec);
 ok($xmlsec_ret, "xmlsec1: DSA Verifed Successfully");
 
 # Test that XML::Sig can verify a xmlsec1 RSA signed xml
-open $file, 't/saml_request-xmlsec1-rsa-signed.xml' or die "no test saml_request-xmlsec1-rsa-signed.xml";
+open $file, 't/signed/saml_request-xmlsec1-rsa-signed.xml' or die "no test saml_request-xmlsec1-rsa-signed.xml";
 {
     local undef $/;
     $xmlsec = <$file>;

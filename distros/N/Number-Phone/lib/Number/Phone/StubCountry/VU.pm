@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20200904144537;
+our $VERSION = 1.20201204215957;
 
 my $formatters = [
                 {
@@ -73,19 +73,19 @@ my $validators = {
                 'voip' => '90[1-9]\\d{4}'
               };
 my %areanames = ();
-$areanames{en}->{67822} = "Port\ Vila\,\ Shefa";
-$areanames{en}->{67823} = "Port\ Vila\,\ Shefa";
-$areanames{en}->{67824} = "Port\ Vila\,\ Shefa";
-$areanames{en}->{67825} = "Port\ Vila\,\ Shefa";
-$areanames{en}->{67826} = "Port\ Vila\,\ Shefa";
-$areanames{en}->{67827} = "Port\ Vila\,\ Shefa";
-$areanames{en}->{67828} = "Port\ Vila\,\ Shefa";
-$areanames{en}->{67829} = "Port\ Vila\,\ Shefa";
-$areanames{en}->{67836} = "Sanma";
-$areanames{en}->{67837} = "Luganville";
-$areanames{en}->{67838} = "Penama\/Torba";
-$areanames{en}->{6784} = "Malampa";
-$areanames{en}->{6788} = "Tafea";
+$areanames{en} = {"67826", "Port\ Vila\,\ Shefa",
+"67823", "Port\ Vila\,\ Shefa",
+"67825", "Port\ Vila\,\ Shefa",
+"67836", "Sanma",
+"67822", "Port\ Vila\,\ Shefa",
+"6784", "Malampa",
+"67837", "Luganville",
+"67824", "Port\ Vila\,\ Shefa",
+"67838", "Penama\/Torba",
+"6788", "Tafea",
+"67828", "Port\ Vila\,\ Shefa",
+"67829", "Port\ Vila\,\ Shefa",
+"67827", "Port\ Vila\,\ Shefa",};
 
     sub new {
       my $class = shift;

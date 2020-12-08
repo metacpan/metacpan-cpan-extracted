@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20200904144533;
+our $VERSION = 1.20201204215956;
 
 my $formatters = [
                 {
@@ -80,7 +80,12 @@ my $validators = {
             6[35-7]
           )[2-57]\\d{6}
         ',
-                'mobile' => '7[0-25-8]\\d{7}',
+                'mobile' => '
+          7(?:
+            [0-25-8]\\d|
+            4[01]
+          )\\d{6}
+        ',
                 'pager' => '',
                 'personal_number' => '',
                 'specialrate' => '(1973\\d{5})',
@@ -88,35 +93,35 @@ my $validators = {
                 'voip' => ''
               };
 my %areanames = ();
-$areanames{en}->{9411} = "Colombo";
-$areanames{en}->{9421} = "Jaffna";
-$areanames{en}->{9423} = "Mannar";
-$areanames{en}->{9424} = "Vavuniya";
-$areanames{en}->{9425} = "Anuradhapura";
-$areanames{en}->{9426} = "Trincomalee";
-$areanames{en}->{9427} = "Polonnaruwa";
-$areanames{en}->{9431} = "Negombo\,\ Gampaha";
-$areanames{en}->{9432} = "Chilaw\,\ Puttalam";
-$areanames{en}->{9433} = "Gampaha";
-$areanames{en}->{9434} = "Kalutara";
-$areanames{en}->{9435} = "Kegalle";
-$areanames{en}->{9436} = "Avissawella\,\ Colombo";
-$areanames{en}->{9437} = "Kurunegala";
-$areanames{en}->{9438} = "Panadura\,\ Kalutara";
-$areanames{en}->{9441} = "Matara";
-$areanames{en}->{9445} = "Ratnapura";
-$areanames{en}->{9447} = "Hambantota";
-$areanames{en}->{9451} = "Hatton\,\ Nuwara\ Eliya";
-$areanames{en}->{9452} = "Nuwara\ Eliya";
-$areanames{en}->{9454} = "Nawalapitiya\,\ Kandy";
-$areanames{en}->{9455} = "Badulla";
-$areanames{en}->{9457} = "Bandarawela\,\ Badulla";
-$areanames{en}->{9463} = "Ampara";
-$areanames{en}->{9465} = "Batticaloa";
-$areanames{en}->{9466} = "Matale";
-$areanames{en}->{9467} = "Kalmunai\,\ Ampara";
-$areanames{en}->{9482} = "Kandy";
-$areanames{en}->{9491} = "Galle";
+$areanames{en} = {"9466", "Matale",
+"9434", "Kalutara",
+"9421", "Jaffna",
+"9451", "Hatton\,\ Nuwara\ Eliya",
+"9491", "Galle",
+"9454", "Nawalapitiya\,\ Kandy",
+"9463", "Ampara",
+"9424", "Vavuniya",
+"9467", "Kalmunai\,\ Ampara",
+"9431", "Negombo\,\ Gampaha",
+"9441", "Matara",
+"9465", "Batticaloa",
+"9482", "Kandy",
+"9411", "Colombo",
+"9445", "Ratnapura",
+"9437", "Kurunegala",
+"9435", "Kegalle",
+"9438", "Panadura\,\ Kalutara",
+"9447", "Hambantota",
+"9432", "Chilaw\,\ Puttalam",
+"9426", "Trincomalee",
+"9433", "Gampaha",
+"9425", "Anuradhapura",
+"9427", "Polonnaruwa",
+"9452", "Nuwara\ Eliya",
+"9455", "Badulla",
+"9457", "Bandarawela\,\ Badulla",
+"9423", "Mannar",
+"9436", "Avissawella\,\ Colombo",};
 
     sub new {
       my $class = shift;

@@ -1,16 +1,12 @@
-#!/usr/bin/perl -w
-
 use strict;
-
+use warnings;
 use lib 't/inc';
-use fatalwarnings;
+use nptestutils;
 
 our $CLASS = 'Number::Phone';
 eval "use $CLASS";
 use Test::More;
 use Scalar::Util qw(blessed);
-
-END { done_testing(); }
 
 require 'common-nanp_and_libphonenumber_tests.pl';
 
@@ -95,3 +91,5 @@ sub regulators {
         like($number->format(), qr/\+1 \d{3} \d{3} \d{4}$/, "$country can format numbers");
     }
 }
+
+done_testing();

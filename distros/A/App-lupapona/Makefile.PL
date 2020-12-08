@@ -14,12 +14,11 @@ WriteMakefile(
   PREREQ_PM        => {
     'strict'   => 0,
     'warnings' => 0,
-    'Mojo::IOLoop' => 0,
-    'Mojo::Log' => 0,
+    'Mojolicious' => 8.12, # Mojo::IOLoop, also adds IO::Socket::IP
     # this is an optional dependency for Mojo::IOLoop
     'IO::Socket::SSL' => 0,
     'File::Slurper' => 0,
-    'Modern::Perl' => 0,
+    'Modern::Perl' => 1.20180701, # for '2018'
     'URI::Escape' => 0,
   },
   META_MERGE => {

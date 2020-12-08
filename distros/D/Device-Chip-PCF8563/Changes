@@ -1,4 +1,8 @@
 Revision history for Device-Chip-PCF8563
 
+0.02    2020-12-06
+        [CHANGES]
+         * Updated to use Object::Pad + Future::AsyncAwait
+
 0.01    2016/01/22 01:32:52
         First version, released on an unsuspecting world.

@@ -1,0 +1,33 @@
+Revision history for Statocles-Plugin-AudioTag
+
+0.0204 2020-12-08 02:29:56
+    - Specify the minimum version of Statocles to have.
+
+0.0203 2020-12-07 07:08:41
+    - On second thought, replace the single post-deref with the old syntax.
+
+0.0202 2020-12-07 06:55:12
+    - Add statements to allow post-deref syntax.
+
+0.0201 2020-12-06 07:03:04
+    - Tweak code and POD a bit.
+
+0.0200 2020-12-05 16:52:34
+    - Break-out and test the ->audio_tag method.
+
+0.0106 2020-12-05 15:33:21
+    - Nope. Appears the <audio> is not supported on metacpan.
+
+0.0105 2020-12-05 15:28:53
+    - Try adding an HTML audio element to the POD!
+
+0.0104 2020-12-05 14:16:17
+    - Specify the minimum perl version.
+    - Add a test.
+
+0.0103 2020-12-05 13:38:26
+    - Fix abstract and description.
+
+0.0102 2020-12-05 13:31:00
+    - Mint with Dist::Zilla.
+    - Adapt an example from preaction.

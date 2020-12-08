@@ -1,8 +1,7 @@
 /*****************************************************************
 ** encoding.h
 **
-** Copyright 1998 Clark Cooper
-** All rights reserved.
+** Copyright (C) 1998 Clark Cooper.  All rights reserved.
 **
 ** This program is free software; you can redistribute it and/or
 ** modify it under the same terms as Perl itself.
@@ -11,11 +10,11 @@
 #ifndef ENCODING_H
 #define ENCODING_H 1
 
-#define ENCMAP_MAGIC	0xfeebface
+#define ENCMAP_MAGIC    0xfeebface
 
 typedef struct prefixmap {
-  unsigned char	min;
-  unsigned char len;			/* 0 => 256 */
+  unsigned char min;
+  unsigned char len;                    /* 0 => 256 */
   unsigned short bmap_start;
   unsigned char ispfx[32];
   unsigned char ischar[32];
@@ -23,20 +22,20 @@ typedef struct prefixmap {
 
 typedef struct encinf
 {
-  unsigned short	prefixes_size;
-  unsigned short	bytemap_size;
-  int			firstmap[256];
-  PrefixMap		*prefixes;
-  unsigned short	*bytemap;
+  unsigned short        prefixes_size;
+  unsigned short        bytemap_size;
+  int                   firstmap[256];
+  PrefixMap             *prefixes;
+  unsigned short        *bytemap;
 } Encinfo;
 
 typedef struct encmaphdr
 {
-  unsigned int		magic;
-  char			name[40];
-  unsigned short	pfsize;
-  unsigned short	bmsize;
-  int			map[256];
+  unsigned int          magic;
+  char                  name[40];
+  unsigned short        pfsize;
+  unsigned short        bmsize;
+  int                   map[256];
 } Encmap_Header;
 
 /*================================================================
@@ -48,25 +47,25 @@ typedef struct encmaphdr
 **
 ** The basic structure is:
 **
-**	_______________________
-**	|Header (including map expat needs for 1st byte)
-**	|PrefixMap * pfsize
-**	|   This section isn't included for single-byte encodings.
-**	|   For multiple byte encodings, when a byte represents a prefix
-**	|   then it indexes into this vector instead of mapping to a
-**	|   Unicode character. The PrefixMap type is declared above. The
-**	|   ispfx and ischar fields are bitvectors indicating whether
-**	|   the byte being mapped is a prefix or character respectively.
-**	|   If neither is set, then the character is not mapped to Unicode.
-**	|
-**	|   The min field is the 1st byte mapped for this prefix; the
-**	|   len field is the number of bytes mapped; and bmap_start is
-**	|   the starting index of the map for this prefix in the overall
-**	|   map (next section).
-**	|unsigned short * bmsize
-**	|   This section also is omitted for single-byte encodings.
-**	|   Each short is either a Unicode scalar or an index into the
-**	|   PrefixMap vector.
+**      _______________________
+**      |Header (including map expat needs for 1st byte)
+**      |PrefixMap * pfsize
+**      |   This section isn't included for single-byte encodings.
+**      |   For multiple byte encodings, when a byte represents a prefix
+**      |   then it indexes into this vector instead of mapping to a
+**      |   Unicode character. The PrefixMap type is declared above. The
+**      |   ispfx and ischar fields are bitvectors indicating whether
+**      |   the byte being mapped is a prefix or character respectively.
+**      |   If neither is set, then the character is not mapped to Unicode.
+**      |
+**      |   The min field is the 1st byte mapped for this prefix; the
+**      |   len field is the number of bytes mapped; and bmap_start is
+**      |   the starting index of the map for this prefix in the overall
+**      |   map (next section).
+**      |unsigned short * bmsize
+**      |   This section also is omitted for single-byte encodings.
+**      |   Each short is either a Unicode scalar or an index into the
+**      |   PrefixMap vector.
 **
 ** The header for these files is declared above as the Encmap_Header type.
 ** The magic field is a magic number which should match the ENCMAP_MAGIC

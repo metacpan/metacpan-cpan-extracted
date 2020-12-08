@@ -1,24 +1,26 @@
 #!/usr/bin/perl
 
-use strict;
+use v5.26;
 use warnings;
 
 use Device::Chip::DS1307;
 use Device::Chip::Adapter;
+
+use Future::AsyncAwait;
 use Getopt::Long;
 
 GetOptions(
    's|set-to-now' => \my $SET_TO_NOW,
 
-   'adapter|A=s' => \( my $ADAPTER = "BusPirate" ),
+   'adapter|A=s' => \my $ADAPTER,
 ) or exit 1;
 
 my $chip = Device::Chip::DS1307->new;
-$chip->mount(
+await $chip->mount(
    Device::Chip::Adapter->new_from_description( $ADAPTER )
-)->get;
+);
 
-$chip->protocol->power(1)->get;
+await $chip->protocol->power(1);
 
 $SIG{INT} = $SIG{TERM} = sub { exit 1; };
 
@@ -27,10 +29,10 @@ END {
 }
 
 if( $SET_TO_NOW ) {
-   $chip->write_time( localtime )->get;
+   await $chip->write_time( localtime );
 }
 
 use POSIX qw( mktime );
 print "The time on the DS1307 is ",
-   scalar( localtime mktime $chip->read_time->get ),
+   scalar( localtime mktime await $chip->read_time ),
    "\n";

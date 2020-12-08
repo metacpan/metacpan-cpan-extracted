@@ -22,19 +22,22 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20200904144535;
+our $VERSION = 1.20201204215957;
 
 my $formatters = [
                 {
                   'format' => '$1 $2',
-                  'leading_digits' => '83',
+                  'leading_digits' => '8[1-579]',
                   'national_rule' => '0$1',
                   'pattern' => '(\\d{2})(\\d{3,8})'
                 },
                 {
                   'format' => '$1 $2 $3',
                   'leading_digits' => '
-            50[0367]|
+            50(?:
+              [0367]|
+              88
+            )|
             [89]0
           ',
                   'national_rule' => '0$1',
@@ -120,11 +123,22 @@ my $validators = {
               0[08]|
               30|
               66|
-              77
+              77|
+              88
             )
           )\\d{3}|
           90\\d{6,8}
-        )|(83\\d{3,8})',
+        )|(
+          8(?:
+            1[6-9]|
+            22|
+            3\\d|
+            4[045]|
+            5[459]|
+            7[0-3579]|
+            90
+          )\\d{2,7}
+        )',
                 'toll_free' => '
           508\\d{6,7}|
           80\\d{6,8}
@@ -132,2883 +146,2883 @@ my $validators = {
                 'voip' => ''
               };
 my %areanames = ();
-$areanames{en}->{6424} = "Scott\ Base";
-$areanames{en}->{64320} = "Gore";
-$areanames{en}->{643206} = "Edendale";
-$areanames{en}->{643211} = "Invercargill";
-$areanames{en}->{643212} = "Invercargill";
-$areanames{en}->{643213} = "Invercargill";
-$areanames{en}->{643214} = "Invercargill";
-$areanames{en}->{643215} = "Invercargill";
-$areanames{en}->{643216} = "Invercargill";
-$areanames{en}->{643217} = "Invercargill";
-$areanames{en}->{643218} = "Invercargill";
-$areanames{en}->{643219} = "Invercargill";
-$areanames{en}->{643221} = "Invercargill";
-$areanames{en}->{6432220} = "Dunedin";
-$areanames{en}->{6432221} = "Nelson";
-$areanames{en}->{6432222} = "Christchurch";
-$areanames{en}->{6432223} = "Akaroa";
-$areanames{en}->{6432224} = "Invercargill";
-$areanames{en}->{6432225} = "Greymouth";
-$areanames{en}->{6432226} = "Timaru";
-$areanames{en}->{6432227} = "Queenstown";
-$areanames{en}->{6432228} = "Wanaka";
-$areanames{en}->{6432229} = "Dunedin";
-$areanames{en}->{643224} = "Invercargill";
-$areanames{en}->{643225} = "Otautau";
-$areanames{en}->{643226} = "Otautau";
-$areanames{en}->{643230} = "Invercargill";
-$areanames{en}->{643231} = "Invercargill";
-$areanames{en}->{643234} = "Riverton";
-$areanames{en}->{643235} = "Invercargill";
-$areanames{en}->{643236} = "Winton";
-$areanames{en}->{643239} = "Invercargill";
-$areanames{en}->{6432420} = "Christchurch";
-$areanames{en}->{6432423} = "Dunedin";
-$areanames{en}->{6432424} = "Nelson";
-$areanames{en}->{6432425} = "Invercargill";
-$areanames{en}->{6432426} = "Blenheim";
-$areanames{en}->{6432427} = "Greymouth";
-$areanames{en}->{6432428} = "Queenstown";
-$areanames{en}->{6432429} = "Timaru";
-$areanames{en}->{6432440} = "Christchurch";
-$areanames{en}->{6432441} = "Christchurch";
-$areanames{en}->{6432442} = "Christchurch";
-$areanames{en}->{6432443} = "Christchurch";
-$areanames{en}->{6432444} = "Nelson";
-$areanames{en}->{6432445} = "Greymouth";
-$areanames{en}->{6432446} = "Blenheim";
-$areanames{en}->{6432447} = "Timaru";
-$areanames{en}->{6432448} = "Dunedin";
-$areanames{en}->{6432449} = "Queenstown";
-$areanames{en}->{643246} = "Tokanui";
-$areanames{en}->{643248} = "Lumsden";
-$areanames{en}->{643249} = "Te\ Anau";
-$areanames{en}->{643250} = "Christchurch";
-$areanames{en}->{643260} = "Christchurch";
-$areanames{en}->{6432606} = "Dunedin";
-$areanames{en}->{6432607} = "Dunedin";
-$areanames{en}->{6432608} = "Dunedin";
-$areanames{en}->{6432609} = "Mt\ Cook";
-$areanames{en}->{6432610} = "Darfield";
-$areanames{en}->{6432611} = "Kaikoura";
-$areanames{en}->{6432612} = "Rangiora";
-$areanames{en}->{6432613} = "Waitangi\ \(Chatham\ Is\.\)";
-$areanames{en}->{6432614} = "Akaroa";
-$areanames{en}->{6432615} = "Amberley";
-$areanames{en}->{6432616} = "Ashburton";
-$areanames{en}->{6432617} = "Cheviot";
-$areanames{en}->{6432618} = "Culverden";
-$areanames{en}->{6432619} = "Christchurch";
-$areanames{en}->{6432620} = "Palmerston";
-$areanames{en}->{6432621} = "Oamaru";
-$areanames{en}->{6432622} = "Balclutha";
-$areanames{en}->{6432623} = "Lawrence";
-$areanames{en}->{6432624} = "Milton";
-$areanames{en}->{6432625} = "Twizel";
-$areanames{en}->{6432626} = "Kurow";
-$areanames{en}->{6432627} = "Alexandra";
-$areanames{en}->{6432628} = "Ranfurly";
-$areanames{en}->{6432629} = "Roxburgh";
-$areanames{en}->{6432630} = "Christchurch";
-$areanames{en}->{6432631} = "Gore";
-$areanames{en}->{6432632} = "Lumsden";
-$areanames{en}->{6432633} = "Otautau";
-$areanames{en}->{6432634} = "Invercargill";
-$areanames{en}->{6432635} = "Riverton";
-$areanames{en}->{6432636} = "Te\ Anau";
-$areanames{en}->{6432637} = "Winton";
-$areanames{en}->{6432638} = "Tokanui";
-$areanames{en}->{6432639} = "Edendale";
-$areanames{en}->{6432640} = "Hokitika";
-$areanames{en}->{6432641} = "Franz\ Josef";
-$areanames{en}->{6432642} = "Fox\ Glacier";
-$areanames{en}->{6432643} = "Haast";
-$areanames{en}->{6432644} = "Westport";
-$areanames{en}->{6432645} = "Greymouth";
-$areanames{en}->{6432646} = "Timaru";
-$areanames{en}->{6432647} = "Fairlie";
-$areanames{en}->{6432648} = "Geraldine";
-$areanames{en}->{6432649} = "Waimate";
-$areanames{en}->{6432650} = "Christchurch";
-$areanames{en}->{6432651} = "Queenstown";
-$areanames{en}->{6432652} = "Cromwell";
-$areanames{en}->{6432653} = "Wanaka";
-$areanames{en}->{6432654} = "Blenheim";
-$areanames{en}->{6432655} = "Nelson";
-$areanames{en}->{6432656} = "Nelson";
-$areanames{en}->{6432657} = "Motueka";
-$areanames{en}->{6432658} = "Murchison";
-$areanames{en}->{6432659} = "Takaka";
-$areanames{en}->{6432660} = "Christchurch";
-$areanames{en}->{6432661} = "Christchurch";
-$areanames{en}->{6432662} = "Christchurch";
-$areanames{en}->{6432663} = "Christchurch";
-$areanames{en}->{6432664} = "Christchurch";
-$areanames{en}->{6432668} = "Blenheim";
-$areanames{en}->{6432669} = "Rangiora";
-$areanames{en}->{643270} = "Christchurch";
-$areanames{en}->{6432710} = "Christchurch";
-$areanames{en}->{6432711} = "Akaroa";
-$areanames{en}->{6432712} = "Amberley";
-$areanames{en}->{6432713} = "Ashburton";
-$areanames{en}->{6432714} = "Cheviot";
-$areanames{en}->{6432715} = "Culverden";
-$areanames{en}->{6432716} = "Darfield";
-$areanames{en}->{6432717} = "Kaikoura";
-$areanames{en}->{6432718} = "Rangiora";
-$areanames{en}->{6432719} = "Waitangi\ \(Chatham\ Is\.\)";
-$areanames{en}->{6432720} = "Nelson";
-$areanames{en}->{6432721} = "Motueka";
-$areanames{en}->{6432722} = "Murchison";
-$areanames{en}->{6432723} = "Takaka";
-$areanames{en}->{6432724} = "Greymouth";
-$areanames{en}->{6432725} = "Hokitika";
-$areanames{en}->{6432726} = "Franz\ Josef";
-$areanames{en}->{6432727} = "Fox\ Glacier";
-$areanames{en}->{6432728} = "Haast";
-$areanames{en}->{6432729} = "Westport";
-$areanames{en}->{6432730} = "Blenheim";
-$areanames{en}->{6432731} = "Timaru";
-$areanames{en}->{6432732} = "Fairlie";
-$areanames{en}->{6432733} = "Geraldine";
-$areanames{en}->{6432734} = "Waimate";
-$areanames{en}->{6432735} = "Mt\ Cook";
-$areanames{en}->{6432736} = "Dunedin";
-$areanames{en}->{6432737} = "Palmerston";
-$areanames{en}->{6432738} = "Oamaru";
-$areanames{en}->{6432739} = "Balclutha";
-$areanames{en}->{6432740} = "Lawrence";
-$areanames{en}->{6432741} = "Milton";
-$areanames{en}->{6432742} = "Twizel";
-$areanames{en}->{6432743} = "Kurow";
-$areanames{en}->{6432744} = "Ranfurly";
-$areanames{en}->{6432745} = "Roxburgh";
-$areanames{en}->{6432746} = "Alexandra";
-$areanames{en}->{6432747} = "Queenstown";
-$areanames{en}->{6432748} = "Cromwell";
-$areanames{en}->{6432749} = "Wanaka";
-$areanames{en}->{6432750} = "Invercargill";
-$areanames{en}->{6432751} = "Riverton";
-$areanames{en}->{6432752} = "Te\ Anau";
-$areanames{en}->{6432753} = "Winton";
-$areanames{en}->{6432754} = "Tokanui";
-$areanames{en}->{6432755} = "Edendale";
-$areanames{en}->{6432756} = "Gore";
-$areanames{en}->{6432757} = "Lumsden";
-$areanames{en}->{6432758} = "Otautau";
-$areanames{en}->{6432800} = "Te\ Anau";
-$areanames{en}->{6432801} = "Lumsden";
-$areanames{en}->{6432802} = "Gore";
-$areanames{en}->{6432803} = "Otautau";
-$areanames{en}->{6432804} = "Riverton";
-$areanames{en}->{6432805} = "Winton";
-$areanames{en}->{6432806} = "Edendale";
-$areanames{en}->{6432807} = "Tokanui";
-$areanames{en}->{6432808} = "Westport";
-$areanames{en}->{6432809} = "Hokitika";
-$areanames{en}->{6432810} = "Franz\ Josef";
-$areanames{en}->{6432811} = "Fox\ Glacier";
-$areanames{en}->{6432812} = "Haast";
-$areanames{en}->{6432813} = "Geraldine";
-$areanames{en}->{6432814} = "Mt\ Cook";
-$areanames{en}->{6432815} = "Fairlie";
-$areanames{en}->{6432816} = "Waimate";
-$areanames{en}->{6432817} = "Christchurch";
-$areanames{en}->{6432818} = "Christchurch";
-$areanames{en}->{6432819} = "Christchurch";
-$areanames{en}->{643288} = "Christchurch";
-$areanames{en}->{6432887} = "Nelson";
-$areanames{en}->{6432888} = "Nelson";
-$areanames{en}->{6432889} = "Blenheim";
-$areanames{en}->{6432990} = "Lumsden";
-$areanames{en}->{6432991} = "Milton";
-$areanames{en}->{6432992} = "Gore";
-$areanames{en}->{6432993} = "Balclutha";
-$areanames{en}->{6432994} = "Otautau";
-$areanames{en}->{6432995} = "Winton";
-$areanames{en}->{6432996} = "Riverton";
-$areanames{en}->{6432997} = "Edendale";
-$areanames{en}->{6432998} = "Tokanui";
-$areanames{en}->{6432999} = "Invercargill";
-$areanames{en}->{643300} = "Ashburton\/Akaroa\/Chatham\ Islands";
-$areanames{en}->{643302} = "Ashburton\/Akaroa\/Chatham\ Islands";
-$areanames{en}->{643303} = "Ashburton\/Akaroa\/Chatham\ Islands";
-$areanames{en}->{643304} = "Ashburton\/Akaroa\/Chatham\ Islands";
-$areanames{en}->{643305} = "Ashburton\/Akaroa\/Chatham\ Islands";
-$areanames{en}->{643306} = "Ashburton\/Akaroa\/Chatham\ Islands";
-$areanames{en}->{643307} = "Ashburton\/Akaroa\/Chatham\ Islands";
-$areanames{en}->{643308} = "Ashburton\/Akaroa\/Chatham\ Islands";
-$areanames{en}->{64331} = "Rangiora\/Amberley\/Culverden\/Darfield\/Cheviot\/Kaikoura";
-$areanames{en}->{64332} = "Christchurch";
-$areanames{en}->{643331} = "Christchurch";
-$areanames{en}->{643332} = "Christchurch";
-$areanames{en}->{643334} = "Christchurch";
-$areanames{en}->{643335} = "Christchurch";
-$areanames{en}->{643336} = "Christchurch";
-$areanames{en}->{643337} = "Christchurch";
-$areanames{en}->{643338} = "Christchurch";
-$areanames{en}->{643339} = "Christchurch";
-$areanames{en}->{64334} = "Christchurch";
-$areanames{en}->{64335} = "Christchurch";
-$areanames{en}->{64336} = "Christchurch";
-$areanames{en}->{64337} = "Christchurch";
-$areanames{en}->{64338} = "Christchurch";
-$areanames{en}->{643390} = "Christchurch";
-$areanames{en}->{6433910} = "Nelson";
-$areanames{en}->{6433911} = "Nelson";
-$areanames{en}->{6433912} = "Motueka";
-$areanames{en}->{6433913} = "Murchison";
-$areanames{en}->{6433914} = "Takaka";
-$areanames{en}->{6433915} = "Greymouth";
-$areanames{en}->{6433916} = "Hokitika";
-$areanames{en}->{6433917} = "Franz\ Josef";
-$areanames{en}->{6433918} = "Fox\ Glacier";
-$areanames{en}->{6433919} = "Haast";
-$areanames{en}->{643393} = "Christchurch";
-$areanames{en}->{6433940} = "Westport";
-$areanames{en}->{6433941} = "Blenheim";
-$areanames{en}->{6433942} = "Akaroa";
-$areanames{en}->{6433943} = "Amberley";
-$areanames{en}->{6433944} = "Ashburton";
-$areanames{en}->{6433945} = "Cheviot";
-$areanames{en}->{6433946} = "Culverden";
-$areanames{en}->{6433947} = "Darfield";
-$areanames{en}->{6433948} = "Kaikoura";
-$areanames{en}->{6433949} = "Rangiora";
-$areanames{en}->{6433950} = "Waitangi\ \(Chatham\ Is\.\)";
-$areanames{en}->{6433951} = "Timaru";
-$areanames{en}->{6433952} = "Fairlie";
-$areanames{en}->{6433953} = "Geraldine";
-$areanames{en}->{6433954} = "Lawrence";
-$areanames{en}->{6433955} = "Mt\ Cook";
-$areanames{en}->{6433956} = "Dunedin";
-$areanames{en}->{6433957} = "Palmerston";
-$areanames{en}->{6433958} = "Oamaru";
-$areanames{en}->{6433959} = "Balclutha";
-$areanames{en}->{6433980} = "Milton";
-$areanames{en}->{6433981} = "Twizel";
-$areanames{en}->{6433982} = "Kurow";
-$areanames{en}->{6433983} = "Ranfurly";
-$areanames{en}->{6433984} = "Roxburgh";
-$areanames{en}->{6433985} = "Alexandra";
-$areanames{en}->{6433986} = "Queenstown";
-$areanames{en}->{6433987} = "Cromwell";
-$areanames{en}->{6433988} = "Wanaka";
-$areanames{en}->{6433989} = "Waimate";
-$areanames{en}->{6433991} = "Invercargill";
-$areanames{en}->{6433992} = "Riverton";
-$areanames{en}->{6433993} = "Te\ Anau";
-$areanames{en}->{6433994} = "Winton";
-$areanames{en}->{6433995} = "Tokanui";
-$areanames{en}->{6433996} = "Edendale";
-$areanames{en}->{6433997} = "Gore";
-$areanames{en}->{6433998} = "Lumsden";
-$areanames{en}->{6433999} = "Otautau";
-$areanames{en}->{643409} = "Queenstown";
-$areanames{en}->{643412} = "Balclutha";
-$areanames{en}->{643413} = "Balclutha";
-$areanames{en}->{643415} = "Balclutha";
-$areanames{en}->{643417} = "Milton";
-$areanames{en}->{643418} = "Balclutha";
-$areanames{en}->{643419} = "Balclutha";
-$areanames{en}->{643420} = "Christchurch";
-$areanames{en}->{643421} = "Christchurch";
-$areanames{en}->{6434220} = "Invercargill";
-$areanames{en}->{6434221} = "Invercargill";
-$areanames{en}->{6434222} = "Gore";
-$areanames{en}->{6434223} = "Otautau";
-$areanames{en}->{6434224} = "Te\ Anau";
-$areanames{en}->{6434225} = "Edendale";
-$areanames{en}->{6434226} = "Lumsden";
-$areanames{en}->{6434227} = "Riverton";
-$areanames{en}->{6434228} = "Tokanui";
-$areanames{en}->{6434229} = "Winton";
-$areanames{en}->{6434230} = "Christchurch";
-$areanames{en}->{6434231} = "Christchurch";
-$areanames{en}->{6434232} = "Ashburton";
-$areanames{en}->{6434233} = "Rangiora";
-$areanames{en}->{6434234} = "Darfield";
-$areanames{en}->{6434235} = "Akaroa";
-$areanames{en}->{6434236} = "Amberley";
-$areanames{en}->{6434237} = "Culverden";
-$areanames{en}->{6434238} = "Waitangi\ \(Chatham\ Is\.\)";
-$areanames{en}->{6434239} = "Christchurch";
-$areanames{en}->{6434240} = "Ashburton";
-$areanames{en}->{6434241} = "Rangiora";
-$areanames{en}->{6434242} = "Darfield";
-$areanames{en}->{6434243} = "Akaroa";
-$areanames{en}->{6434244} = "Amberley";
-$areanames{en}->{6434245} = "Culverden";
-$areanames{en}->{6434246} = "Waitangi\ \(Chatham\ Is\.\)";
-$areanames{en}->{6434247} = "Kaikoura";
-$areanames{en}->{6434248} = "Cheviot";
-$areanames{en}->{6434249} = "Kaikoura";
-$areanames{en}->{643425} = "Dunedin";
-$areanames{en}->{6434260} = "Oamaru";
-$areanames{en}->{6434261} = "Balclutha";
-$areanames{en}->{6434262} = "Alexandra";
-$areanames{en}->{6434263} = "Lawrence";
-$areanames{en}->{6434264} = "Kurow";
-$areanames{en}->{6434265} = "Milton";
-$areanames{en}->{6434266} = "Palmerston";
-$areanames{en}->{6434267} = "Ranfurly";
-$areanames{en}->{6434268} = "Roxburgh";
-$areanames{en}->{6434269} = "Twizel";
-$areanames{en}->{6434270} = "Oamaru";
-$areanames{en}->{6434271} = "Balclutha";
-$areanames{en}->{6434272} = "Alexandra";
-$areanames{en}->{6434273} = "Lawrence";
-$areanames{en}->{6434274} = "Kurow";
-$areanames{en}->{6434275} = "Milton";
-$areanames{en}->{6434276} = "Palmerston";
-$areanames{en}->{6434277} = "Ranfurly";
-$areanames{en}->{6434278} = "Roxburgh";
-$areanames{en}->{6434279} = "Twizel";
-$areanames{en}->{6434280} = "Queenstown";
-$areanames{en}->{6434281} = "Queenstown";
-$areanames{en}->{6434282} = "Queenstown";
-$areanames{en}->{6434283} = "Cromwell";
-$areanames{en}->{6434284} = "Wanaka";
-$areanames{en}->{6434285} = "Cheviot";
-$areanames{en}->{6434286} = "Christchurch";
-$areanames{en}->{6434287} = "Queenstown";
-$areanames{en}->{6434288} = "Cromwell";
-$areanames{en}->{6434289} = "Wanaka";
-$areanames{en}->{6434290} = "Greymouth";
-$areanames{en}->{6434291} = "Westport";
-$areanames{en}->{6434292} = "Hokitika";
-$areanames{en}->{6434293} = "Haast";
-$areanames{en}->{6434294} = "Franz\ Josef";
-$areanames{en}->{6434295} = "Fox\ Glacier";
-$areanames{en}->{6434296} = "Greymouth";
-$areanames{en}->{6434297} = "Westport";
-$areanames{en}->{6434298} = "Hokitika";
-$areanames{en}->{6434299} = "Haast";
-$areanames{en}->{643430} = "Mt\ Cook";
-$areanames{en}->{643431} = "Oamaru";
-$areanames{en}->{643432} = "Oamaru";
-$areanames{en}->{643433} = "Oamaru";
-$areanames{en}->{643434} = "Oamaru";
-$areanames{en}->{6434350} = "Twizel";
-$areanames{en}->{6434351} = "Mt\ Cook";
-$areanames{en}->{6434353} = "Twizel";
-$areanames{en}->{6434359} = "Twizel";
-$areanames{en}->{643436} = "Kurow";
-$areanames{en}->{643437} = "Oamaru";
-$areanames{en}->{643438} = "Kurow";
-$areanames{en}->{643439} = "Oamaru";
-$areanames{en}->{6434400} = "Alexandra";
-$areanames{en}->{6434401} = "Cromwell";
-$areanames{en}->{6434402} = "Alexandra";
-$areanames{en}->{6434404} = "Alexandra";
-$areanames{en}->{6434405} = "Alexandra";
-$areanames{en}->{643441} = "Queenstown";
-$areanames{en}->{643442} = "Queenstown";
-$areanames{en}->{643443} = "Wanaka";
-$areanames{en}->{643444} = "Ranfurly";
-$areanames{en}->{643445} = "Cromwell";
-$areanames{en}->{643446} = "Roxburgh";
-$areanames{en}->{643447} = "Alexandra";
-$areanames{en}->{643448} = "Alexandra";
-$areanames{en}->{643449} = "Alexandra";
-$areanames{en}->{643450} = "Queenstown";
-$areanames{en}->{643451} = "Queenstown";
-$areanames{en}->{643452} = "Wanaka";
-$areanames{en}->{643453} = "Dunedin";
-$areanames{en}->{643454} = "Dunedin";
-$areanames{en}->{643455} = "Dunedin";
-$areanames{en}->{643456} = "Dunedin";
-$areanames{en}->{643457} = "Dunedin";
-$areanames{en}->{643463} = "Palmerston";
-$areanames{en}->{643464} = "Dunedin";
-$areanames{en}->{643465} = "Palmerston";
-$areanames{en}->{643466} = "Dunedin";
-$areanames{en}->{643467} = "Dunedin";
-$areanames{en}->{643468} = "Dunedin";
-$areanames{en}->{643469} = "Dunedin";
-$areanames{en}->{64347} = "Dunedin";
-$areanames{en}->{643481} = "Dunedin";
-$areanames{en}->{643482} = "Dunedin";
-$areanames{en}->{643484} = "Dunedin";
-$areanames{en}->{643485} = "Lawrence";
-$areanames{en}->{643486} = "Dunedin";
-$areanames{en}->{643487} = "Dunedin";
-$areanames{en}->{643488} = "Dunedin";
-$areanames{en}->{643489} = "Dunedin";
-$areanames{en}->{6434990} = "Queenstown";
-$areanames{en}->{6434991} = "Cromwell";
-$areanames{en}->{6434992} = "Ranfurly";
-$areanames{en}->{6434993} = "Alexandra";
-$areanames{en}->{6434994} = "Palmerston";
-$areanames{en}->{6434995} = "Te\ Anau";
-$areanames{en}->{6434996} = "Roxburgh";
-$areanames{en}->{6434997} = "Lawrence";
-$areanames{en}->{6434998} = "Dunedin";
-$areanames{en}->{6434999} = "Dunedin";
-$areanames{en}->{643520} = "Blenheim";
-$areanames{en}->{643521} = "Nelson";
-$areanames{en}->{643522} = "Nelson";
-$areanames{en}->{643523} = "Murchison";
-$areanames{en}->{643524} = "Takaka";
-$areanames{en}->{643525} = "Takaka";
-$areanames{en}->{643526} = "Motueka";
-$areanames{en}->{643527} = "Motueka";
-$areanames{en}->{643528} = "Motueka";
-$areanames{en}->{643529} = "Nelson";
-$areanames{en}->{643538} = "Nelson";
-$areanames{en}->{643539} = "Nelson";
-$areanames{en}->{64354} = "Nelson";
-$areanames{en}->{6435500} = "Christchurch";
-$areanames{en}->{6435501} = "Christchurch";
-$areanames{en}->{6435502} = "Christchurch";
-$areanames{en}->{6435503} = "Christchurch";
-$areanames{en}->{6435504} = "Christchurch";
-$areanames{en}->{6435505} = "Akaroa";
-$areanames{en}->{6435506} = "Amberley";
-$areanames{en}->{6435507} = "Ashburton";
-$areanames{en}->{6435508} = "Cheviot";
-$areanames{en}->{6435509} = "Culverden";
-$areanames{en}->{6435510} = "Darfield";
-$areanames{en}->{6435511} = "Kaikoura";
-$areanames{en}->{6435512} = "Rangiora";
-$areanames{en}->{6435513} = "Waitangi\ \(Chatham\ Is\.\)";
-$areanames{en}->{6435514} = "Palmerston";
-$areanames{en}->{6435515} = "Oamaru";
-$areanames{en}->{6435516} = "Balclutha";
-$areanames{en}->{6435517} = "Lawrence";
-$areanames{en}->{6435518} = "Milton";
-$areanames{en}->{6435519} = "Twizel";
-$areanames{en}->{643552} = "Dunedin";
-$areanames{en}->{6435526} = "Kurow";
-$areanames{en}->{6435527} = "Alexandra";
-$areanames{en}->{6435528} = "Ranfurly";
-$areanames{en}->{6435529} = "Roxburgh";
-$areanames{en}->{6435530} = "Nelson";
-$areanames{en}->{6435531} = "Nelson";
-$areanames{en}->{6435532} = "Motueka";
-$areanames{en}->{6435533} = "Murchison";
-$areanames{en}->{6435534} = "Takaka";
-$areanames{en}->{6435535} = "Invercargill";
-$areanames{en}->{6435536} = "Invercargill";
-$areanames{en}->{6435537} = "Winton";
-$areanames{en}->{6435538} = "Lumsden";
-$areanames{en}->{6435539} = "Otautau";
-$areanames{en}->{6435540} = "Edendale";
-$areanames{en}->{6435541} = "Te\ Anau";
-$areanames{en}->{6435542} = "Riverton";
-$areanames{en}->{6435543} = "Tokanui";
-$areanames{en}->{6435544} = "Winton";
-$areanames{en}->{6435545} = "Gore";
-$areanames{en}->{6435546} = "Greymouth";
-$areanames{en}->{6435547} = "Blenheim";
-$areanames{en}->{6435548} = "Westport";
-$areanames{en}->{6435549} = "Hokitika";
-$areanames{en}->{6435550} = "Fox\ Glacier";
-$areanames{en}->{6435551} = "Franz\ Josef";
-$areanames{en}->{6435552} = "Queenstown";
-$areanames{en}->{6435553} = "Wanaka";
-$areanames{en}->{6435554} = "Cromwell";
-$areanames{en}->{6435555} = "Timaru";
-$areanames{en}->{6435556} = "Fairlie";
-$areanames{en}->{6435557} = "Geraldine";
-$areanames{en}->{6435558} = "Waimate";
-$areanames{en}->{6435559} = "Haast";
-$areanames{en}->{6435560} = "Mt\ Cook";
-$areanames{en}->{6435561} = "Dunedin";
-$areanames{en}->{6435562} = "Invercargill";
-$areanames{en}->{6435563} = "Queenstown";
-$areanames{en}->{6435650} = "Greymouth";
-$areanames{en}->{6435660} = "Haast";
-$areanames{en}->{6435661} = "Fairlie";
-$areanames{en}->{6435662} = "Geraldine";
-$areanames{en}->{6435663} = "Twizel";
-$areanames{en}->{6435664} = "Timaru";
-$areanames{en}->{6435665} = "Waimate";
-$areanames{en}->{6435666} = "Oamaru";
-$areanames{en}->{6435667} = "Waitangi\ \(Chatham\ Is\.\)";
-$areanames{en}->{6435668} = "Kurow";
-$areanames{en}->{6435669} = "Wanaka";
-$areanames{en}->{6435670} = "Palmerston";
-$areanames{en}->{6435671} = "Oamaru";
-$areanames{en}->{6435672} = "Balclutha";
-$areanames{en}->{6435673} = "Lawrence";
-$areanames{en}->{6435674} = "Milton";
-$areanames{en}->{6435675} = "Twizel";
-$areanames{en}->{6435676} = "Kurow";
-$areanames{en}->{6435677} = "Ranfurly";
-$areanames{en}->{6435678} = "Roxburgh";
-$areanames{en}->{6435679} = "Alexandra";
-$areanames{en}->{6435680} = "Dunedin";
-$areanames{en}->{6435681} = "Invercargill";
-$areanames{en}->{6435682} = "Riverton";
-$areanames{en}->{6435683} = "Te\ Anau";
-$areanames{en}->{6435684} = "Winton";
-$areanames{en}->{6435685} = "Tokanui";
-$areanames{en}->{6435686} = "Gore";
-$areanames{en}->{6435687} = "Lumsden";
-$areanames{en}->{6435688} = "Queenstown";
-$areanames{en}->{6435689} = "Otautau";
-$areanames{en}->{6435690} = "Motueka";
-$areanames{en}->{6435691} = "Murchison";
-$areanames{en}->{6435692} = "Takaka";
-$areanames{en}->{6435693} = "Nelson";
-$areanames{en}->{6435694} = "Franz\ Josef";
-$areanames{en}->{6435695} = "Fox\ Glacier";
-$areanames{en}->{6435696} = "Haast";
-$areanames{en}->{6435697} = "Westport";
-$areanames{en}->{6435698} = "Hokitika";
-$areanames{en}->{6435699} = "Amberley";
-$areanames{en}->{64357} = "Blenheim";
-$areanames{en}->{643571} = "Nelson";
-$areanames{en}->{643576} = "Nelson";
-$areanames{en}->{6435880} = "Dunedin";
-$areanames{en}->{6435881} = "Dunedin";
-$areanames{en}->{6435882} = "Dunedin";
-$areanames{en}->{6435883} = "Dunedin";
-$areanames{en}->{6435884} = "Dunedin";
-$areanames{en}->{6435885} = "Invercargill";
-$areanames{en}->{6435886} = "Invercargill";
-$areanames{en}->{6435887} = "Invercargill";
-$areanames{en}->{6435888} = "Timaru";
-$areanames{en}->{6435889} = "Timaru";
-$areanames{en}->{643590} = "Christchurch";
-$areanames{en}->{6435950} = "Christchurch";
-$areanames{en}->{6435951} = "Christchurch";
-$areanames{en}->{6435952} = "Christchurch";
-$areanames{en}->{6435953} = "Christchurch";
-$areanames{en}->{6435954} = "Christchurch";
-$areanames{en}->{6435955} = "Christchurch";
-$areanames{en}->{6435956} = "Christchurch";
-$areanames{en}->{6435990} = "Hokitika";
-$areanames{en}->{6435991} = "Franz\ Josef";
-$areanames{en}->{6435992} = "Fox\ Glacier";
-$areanames{en}->{6435993} = "Mt\ Cook";
-$areanames{en}->{6435994} = "Ashburton";
-$areanames{en}->{6435995} = "Darfield";
-$areanames{en}->{6435996} = "Akaroa";
-$areanames{en}->{6435997} = "Amberley";
-$areanames{en}->{6435998} = "Rangiora";
-$areanames{en}->{6435999} = "Christchurch";
-$areanames{en}->{643612} = "Timaru";
-$areanames{en}->{643614} = "Timaru";
-$areanames{en}->{643615} = "Timaru";
-$areanames{en}->{6436500} = "Christchurch";
-$areanames{en}->{6436501} = "Akaroa";
-$areanames{en}->{6436502} = "Amberley";
-$areanames{en}->{6436503} = "Ashburton";
-$areanames{en}->{6436504} = "Cheviot";
-$areanames{en}->{6436505} = "Culverden";
-$areanames{en}->{6436506} = "Darfield";
-$areanames{en}->{6436507} = "Kaikoura";
-$areanames{en}->{6436508} = "Rangiora";
-$areanames{en}->{6436509} = "Waitangi\ \(Chatham\ Is\.\)";
-$areanames{en}->{643651} = "Nelson";
-$areanames{en}->{6436517} = "Motueka";
-$areanames{en}->{6436518} = "Murchison";
-$areanames{en}->{6436519} = "Takaka";
-$areanames{en}->{6436520} = "Greymouth";
-$areanames{en}->{6436521} = "Greymouth";
-$areanames{en}->{6436522} = "Greymouth";
-$areanames{en}->{6436523} = "Hokitika";
-$areanames{en}->{6436524} = "Hokitika";
-$areanames{en}->{6436525} = "Franz\ Josef";
-$areanames{en}->{6436526} = "Fox\ Glacier";
-$areanames{en}->{6436527} = "Haast";
-$areanames{en}->{6436528} = "Westport";
-$areanames{en}->{6436529} = "Westport";
-$areanames{en}->{643653} = "Blenheim";
-$areanames{en}->{643654} = "Timaru";
-$areanames{en}->{6436546} = "Fairlie";
-$areanames{en}->{6436547} = "Geraldine";
-$areanames{en}->{6436548} = "Waimate";
-$areanames{en}->{6436549} = "Mt\ Cook";
-$areanames{en}->{643655} = "Dunedin";
-$areanames{en}->{6436560} = "Palmerston";
-$areanames{en}->{6436561} = "Oamaru";
-$areanames{en}->{6436562} = "Balclutha";
-$areanames{en}->{6436563} = "Lawrence";
-$areanames{en}->{6436564} = "Milton";
-$areanames{en}->{6436565} = "Twizel";
-$areanames{en}->{6436566} = "Kurow";
-$areanames{en}->{6436567} = "Ranfurly";
-$areanames{en}->{6436568} = "Roxburgh";
-$areanames{en}->{6436569} = "Alexandra";
-$areanames{en}->{643657} = "Queenstown";
-$areanames{en}->{6436576} = "Cromwell";
-$areanames{en}->{6436577} = "Cromwell";
-$areanames{en}->{6436578} = "Wanaka";
-$areanames{en}->{6436579} = "Wanaka";
-$areanames{en}->{6436580} = "Invercargill";
-$areanames{en}->{6436581} = "Invercargill";
-$areanames{en}->{6436582} = "Riverton";
-$areanames{en}->{6436583} = "Te\ Anau";
-$areanames{en}->{6436584} = "Winton";
-$areanames{en}->{6436585} = "Tokanui";
-$areanames{en}->{6436586} = "Edendale";
-$areanames{en}->{6436587} = "Gore";
-$areanames{en}->{6436588} = "Lumsden";
-$areanames{en}->{6436589} = "Otautau";
-$areanames{en}->{6436590} = "Nelson";
-$areanames{en}->{6436591} = "Nelson";
-$areanames{en}->{6436592} = "Nelson";
-$areanames{en}->{6436593} = "Nelson";
-$areanames{en}->{6436594} = "Waimate";
-$areanames{en}->{6436595} = "Mt\ Cook";
-$areanames{en}->{6436596} = "Queenstown";
-$areanames{en}->{6436597} = "Cromwell";
-$areanames{en}->{6436598} = "Wanaka";
-$areanames{en}->{6436599} = "Blenheim";
-$areanames{en}->{643660} = "Christchurch";
-$areanames{en}->{6436610} = "Kaikoura";
-$areanames{en}->{6436611} = "Rangiora";
-$areanames{en}->{6436612} = "Akaroa";
-$areanames{en}->{6436613} = "Wanaka";
-$areanames{en}->{6436614} = "Timaru";
-$areanames{en}->{6436615} = "Ashburton";
-$areanames{en}->{6436616} = "Geraldine";
-$areanames{en}->{6436617} = "Cromwell";
-$areanames{en}->{6436618} = "Blenheim";
-$areanames{en}->{6436619} = "Cheviot";
-$areanames{en}->{6436620} = "Kaikoura";
-$areanames{en}->{6436621} = "Culverden";
-$areanames{en}->{6436622} = "Cheviot";
-$areanames{en}->{6436623} = "Amberley";
-$areanames{en}->{6436624} = "Darfield";
-$areanames{en}->{6436625} = "Rangiora";
-$areanames{en}->{6436626} = "Akaroa";
-$areanames{en}->{6436627} = "Waitangi\ \(Chatham\ Is\.\)";
-$areanames{en}->{6436628} = "Ashburton";
-$areanames{en}->{6436629} = "Christchurch";
-$areanames{en}->{6436630} = "Takaka";
-$areanames{en}->{6436631} = "Motueka";
-$areanames{en}->{6436632} = "Murchison";
-$areanames{en}->{6436633} = "Geraldine";
-$areanames{en}->{6436634} = "Mt\ Cook";
-$areanames{en}->{6436635} = "Fairlie";
-$areanames{en}->{6436636} = "Waimate";
-$areanames{en}->{6436637} = "Twizel";
-$areanames{en}->{6436638} = "Kurow";
-$areanames{en}->{6436639} = "Oamaru";
-$areanames{en}->{6436640} = "Palmerston";
-$areanames{en}->{6436641} = "Lawrence";
-$areanames{en}->{6436642} = "Milton";
-$areanames{en}->{6436643} = "Balclutha";
-$areanames{en}->{6436644} = "Alexandra";
-$areanames{en}->{6436645} = "Ranfurly";
-$areanames{en}->{6436646} = "Roxburgh";
-$areanames{en}->{6436647} = "Te\ Anau";
-$areanames{en}->{6436648} = "Lumsden";
-$areanames{en}->{6436649} = "Gore";
-$areanames{en}->{6436650} = "Otautau";
-$areanames{en}->{6436651} = "Riverton";
-$areanames{en}->{6436652} = "Winton";
-$areanames{en}->{6436653} = "Edendale";
-$areanames{en}->{6436654} = "Tokanui";
-$areanames{en}->{6436655} = "Westport";
-$areanames{en}->{6436656} = "Hokitika";
-$areanames{en}->{6436657} = "Franz\ Josef";
-$areanames{en}->{6436658} = "Fox\ Glacier";
-$areanames{en}->{6436659} = "Haast";
-$areanames{en}->{643666} = "Christchurch";
-$areanames{en}->{643667} = "Christchurch";
-$areanames{en}->{6436680} = "Akaroa";
-$areanames{en}->{6436681} = "Dunedin";
-$areanames{en}->{6436682} = "Dunedin";
-$areanames{en}->{6436683} = "Rangiora";
-$areanames{en}->{6436684} = "Dunedin";
-$areanames{en}->{6436685} = "Nelson";
-$areanames{en}->{6436686} = "Invercargill";
-$areanames{en}->{6436687} = "Nelson";
-$areanames{en}->{6436688} = "Waitangi\ \(Chatham\ Is\.\)";
-$areanames{en}->{6436689} = "Christchurch";
-$areanames{en}->{643669} = "Christchurch";
-$areanames{en}->{643680} = "Fairlie";
-$areanames{en}->{643681} = "Timaru";
-$areanames{en}->{643683} = "Timaru";
-$areanames{en}->{643684} = "Timaru";
-$areanames{en}->{643685} = "Fairlie";
-$areanames{en}->{643686} = "Timaru";
-$areanames{en}->{643687} = "Timaru";
-$areanames{en}->{643688} = "Timaru";
-$areanames{en}->{643689} = "Waimate";
-$areanames{en}->{643690} = "Waimate";
-$areanames{en}->{643692} = "Geraldine";
-$areanames{en}->{643693} = "Geraldine";
-$areanames{en}->{643696} = "Geraldine";
-$areanames{en}->{643697} = "Geraldine";
-$areanames{en}->{6436990} = "Cheviot";
-$areanames{en}->{6436991} = "Culverden";
-$areanames{en}->{6436992} = "Greymouth";
-$areanames{en}->{6436993} = "Kaikoura";
-$areanames{en}->{6436994} = "Murchison";
-$areanames{en}->{6436995} = "Westport";
-$areanames{en}->{6436996} = "Takaka";
-$areanames{en}->{6436997} = "Motueka";
-$areanames{en}->{6436998} = "Blenheim";
-$areanames{en}->{6436999} = "Nelson";
-$areanames{en}->{643731} = "Greymouth";
-$areanames{en}->{643732} = "Greymouth";
-$areanames{en}->{643736} = "Greymouth";
-$areanames{en}->{643738} = "Greymouth";
-$areanames{en}->{643740} = "Christchurch";
-$areanames{en}->{643741} = "Christchurch";
-$areanames{en}->{643742} = "Dunedin";
-$areanames{en}->{643743} = "Christchurch";
-$areanames{en}->{6437440} = "Nelson";
-$areanames{en}->{6437441} = "Motueka";
-$areanames{en}->{6437442} = "Murchison";
-$areanames{en}->{6437443} = "Nelson";
-$areanames{en}->{6437444} = "Takaka";
-$areanames{en}->{6437445} = "Fox\ Glacier";
-$areanames{en}->{6437446} = "Franz\ Josef";
-$areanames{en}->{6437447} = "Greymouth";
-$areanames{en}->{6437448} = "Haast";
-$areanames{en}->{6437449} = "Hokitika";
-$areanames{en}->{6437450} = "Westport";
-$areanames{en}->{6437451} = "Blenheim";
-$areanames{en}->{6437452} = "Akaroa";
-$areanames{en}->{6437453} = "Amberley";
-$areanames{en}->{6437454} = "Ashburton";
-$areanames{en}->{6437455} = "Cheviot";
-$areanames{en}->{6437456} = "Culverden";
-$areanames{en}->{6437457} = "Darfield";
-$areanames{en}->{6437458} = "Kaikoura";
-$areanames{en}->{6437459} = "Rangiora";
-$areanames{en}->{6437460} = "Waitangi\ \(Chatham\ Is\.\)";
-$areanames{en}->{6437461} = "Fairlie";
-$areanames{en}->{6437462} = "Geraldine";
-$areanames{en}->{6437463} = "Mt\ Cook";
-$areanames{en}->{6437464} = "Timaru";
-$areanames{en}->{6437465} = "Waimate";
-$areanames{en}->{6437466} = "Cromwell";
-$areanames{en}->{6437467} = "Queenstown";
-$areanames{en}->{6437468} = "Wanaka";
-$areanames{en}->{6437469} = "Alexandra";
-$areanames{en}->{6437470} = "Balclutha";
-$areanames{en}->{6437471} = "Kurow";
-$areanames{en}->{6437472} = "Lawrence";
-$areanames{en}->{6437473} = "Milton";
-$areanames{en}->{6437474} = "Oamaru";
-$areanames{en}->{6437475} = "Palmerston";
-$areanames{en}->{6437476} = "Ranfurly";
-$areanames{en}->{6437477} = "Roxburgh";
-$areanames{en}->{6437478} = "Twizel";
-$areanames{en}->{6437479} = "Edendale";
-$areanames{en}->{6437480} = "Gore";
-$areanames{en}->{6437481} = "Invercargill";
-$areanames{en}->{6437482} = "Lumsden";
-$areanames{en}->{6437483} = "Otautau";
-$areanames{en}->{6437484} = "Riverton";
-$areanames{en}->{6437485} = "Te\ Anau";
-$areanames{en}->{6437486} = "Tokanui";
-$areanames{en}->{6437487} = "Winton";
-$areanames{en}->{643749} = "Christchurch";
-$areanames{en}->{643750} = "Haast";
-$areanames{en}->{643751} = "Fox\ Glacier";
-$areanames{en}->{643752} = "Franz\ Josef";
-$areanames{en}->{643753} = "Hokitika";
-$areanames{en}->{643755} = "Hokitika";
-$areanames{en}->{643756} = "Hokitika";
-$areanames{en}->{643762} = "Greymouth";
-$areanames{en}->{643767} = "Greymouth";
-$areanames{en}->{643768} = "Greymouth";
-$areanames{en}->{643769} = "Greymouth";
-$areanames{en}->{6437770} = "Nelson";
-$areanames{en}->{6437771} = "Blenheim";
-$areanames{en}->{6437772} = "Timaru";
-$areanames{en}->{6437773} = "Dunedin";
-$areanames{en}->{6437774} = "Queenstown";
-$areanames{en}->{6437775} = "Wanaka";
-$areanames{en}->{6437776} = "Cromwell";
-$areanames{en}->{6437777} = "Christchurch";
-$areanames{en}->{6437778} = "Greymouth";
-$areanames{en}->{6437779} = "Invercargill";
-$areanames{en}->{643782} = "Westport";
-$areanames{en}->{643788} = "Westport";
-$areanames{en}->{643789} = "Westport";
-$areanames{en}->{6439000} = "Christchurch";
-$areanames{en}->{6439001} = "Christchurch";
-$areanames{en}->{6439002} = "Rangiora";
-$areanames{en}->{6439003} = "Ashburton";
-$areanames{en}->{6439004} = "Gore";
-$areanames{en}->{6439005} = "Invercargill";
-$areanames{en}->{6439006} = "Nelson";
-$areanames{en}->{6439007} = "Dunedin";
-$areanames{en}->{6439008} = "Timaru";
-$areanames{en}->{6439009} = "Greymouth";
-$areanames{en}->{6439010} = "Queenstown";
-$areanames{en}->{6439011} = "Queenstown";
-$areanames{en}->{6439012} = "Queenstown";
-$areanames{en}->{6439015} = "Wanaka";
-$areanames{en}->{6439016} = "Alexandra";
-$areanames{en}->{6439017} = "Cromwell";
-$areanames{en}->{6439018} = "Ranfurly";
-$areanames{en}->{6439019} = "Roxburgh";
-$areanames{en}->{6439020} = "Gore";
-$areanames{en}->{6439023} = "Te\ Anau";
-$areanames{en}->{6439024} = "Lumsden";
-$areanames{en}->{6439025} = "Otautau";
-$areanames{en}->{6439026} = "Riverton";
-$areanames{en}->{6439027} = "Winton";
-$areanames{en}->{6439028} = "Edendale";
-$areanames{en}->{6439029} = "Tokanui";
-$areanames{en}->{643903} = "Christchurch";
-$areanames{en}->{6439040} = "Balclutha";
-$areanames{en}->{6439042} = "Oamaru";
-$areanames{en}->{6439044} = "Milton";
-$areanames{en}->{6439045} = "Twizel";
-$areanames{en}->{6439046} = "Kurow";
-$areanames{en}->{6439047} = "Alexandra";
-$areanames{en}->{6439048} = "Lawrence";
-$areanames{en}->{6439049} = "Palmerston";
-$areanames{en}->{6439050} = "Geraldine";
-$areanames{en}->{6439052} = "Mt\ Cook";
-$areanames{en}->{6439055} = "Fairlie";
-$areanames{en}->{6439057} = "Waimate";
-$areanames{en}->{6439060} = "Greymouth";
-$areanames{en}->{6439061} = "Greymouth";
-$areanames{en}->{6439063} = "Westport";
-$areanames{en}->{6439066} = "Hokitika";
-$areanames{en}->{6439067} = "Franz\ Josef";
-$areanames{en}->{6439068} = "Fox\ Glacier";
-$areanames{en}->{6439069} = "Haast";
-$areanames{en}->{6439070} = "Motueka";
-$areanames{en}->{6439071} = "Motueka";
-$areanames{en}->{6439073} = "Motueka";
-$areanames{en}->{6439075} = "Takaka";
-$areanames{en}->{6439079} = "Murchison";
-$areanames{en}->{6439080} = "Ashburton";
-$areanames{en}->{6439081} = "Ashburton";
-$areanames{en}->{6439082} = "Culverden";
-$areanames{en}->{6439083} = "Cheviot";
-$areanames{en}->{6439084} = "Amberley";
-$areanames{en}->{6439085} = "Waitangi\ \(Chatham\ Is\.\)";
-$areanames{en}->{6439090} = "Rangiora";
-$areanames{en}->{6439091} = "Rangiora";
-$areanames{en}->{6439092} = "Rangiora";
-$areanames{en}->{6439097} = "Darfield";
-$areanames{en}->{6439098} = "Akaroa";
-$areanames{en}->{6439099} = "Kaikoura";
-$areanames{en}->{643920} = "Rangiora";
-$areanames{en}->{643921} = "Blenheim";
-$areanames{en}->{643922} = "Nelson";
-$areanames{en}->{643923} = "Nelson";
-$areanames{en}->{643924} = "Christchurch";
-$areanames{en}->{643925} = "Christchurch";
-$areanames{en}->{643926} = "Christchurch";
-$areanames{en}->{6439266} = "Dunedin";
-$areanames{en}->{6439267} = "Dunedin";
-$areanames{en}->{6439268} = "Dunedin";
-$areanames{en}->{6439269} = "Dunedin";
-$areanames{en}->{6439270} = "Greymouth";
-$areanames{en}->{6439271} = "Westport";
-$areanames{en}->{6439272} = "Timaru";
-$areanames{en}->{6439273} = "Blenheim";
-$areanames{en}->{6439274} = "Queenstown";
-$areanames{en}->{6439275} = "Nelson";
-$areanames{en}->{6439276} = "Nelson";
-$areanames{en}->{6439277} = "Invercargill";
-$areanames{en}->{6439278} = "Invercargill";
-$areanames{en}->{6439279} = "Christchurch";
-$areanames{en}->{6439280} = "Nelson";
-$areanames{en}->{6439281} = "Christchurch";
-$areanames{en}->{6439282} = "Christchurch";
-$areanames{en}->{6439283} = "Rangiora";
-$areanames{en}->{6439284} = "Blenheim";
-$areanames{en}->{6439285} = "Invercargill";
-$areanames{en}->{6439286} = "Cromwell";
-$areanames{en}->{6439287} = "Oamaru";
-$areanames{en}->{6439288} = "Ashburton";
-$areanames{en}->{6439289} = "Akaroa";
-$areanames{en}->{6439290} = "Christchurch";
-$areanames{en}->{6439291} = "Dunedin";
-$areanames{en}->{6439292} = "Timaru";
-$areanames{en}->{6439293} = "Blenheim";
-$areanames{en}->{6439294} = "Dunedin";
-$areanames{en}->{6439295} = "Nelson";
-$areanames{en}->{6439296} = "Invercargill";
-$areanames{en}->{6439297} = "Takaka";
-$areanames{en}->{6439298} = "Motueka";
-$areanames{en}->{6439299} = "Murchison";
-$areanames{en}->{643930} = "Christchurch";
-$areanames{en}->{6439310} = "Invercargill";
-$areanames{en}->{6439311} = "Invercargill";
-$areanames{en}->{6439312} = "Riverton";
-$areanames{en}->{6439313} = "Te\ Anau";
-$areanames{en}->{6439314} = "Winton";
-$areanames{en}->{6439315} = "Tokanui";
-$areanames{en}->{6439316} = "Edendale";
-$areanames{en}->{6439317} = "Gore";
-$areanames{en}->{6439318} = "Lumsden";
-$areanames{en}->{6439319} = "Otautau";
-$areanames{en}->{6439320} = "Akaroa";
-$areanames{en}->{6439321} = "Amberley";
-$areanames{en}->{6439322} = "Culverden";
-$areanames{en}->{6439323} = "Cheviot";
-$areanames{en}->{6439324} = "Darfield";
-$areanames{en}->{6439325} = "Kaikoura";
-$areanames{en}->{6439326} = "Rangiora";
-$areanames{en}->{6439327} = "Ashburton";
-$areanames{en}->{6439330} = "Westport";
-$areanames{en}->{6439331} = "Greymouth";
-$areanames{en}->{6439332} = "Hokitika";
-$areanames{en}->{6439333} = "Franz\ Josef";
-$areanames{en}->{6439334} = "Fox\ Glacier";
-$areanames{en}->{6439335} = "Haast";
-$areanames{en}->{6439336} = "Cromwell";
-$areanames{en}->{6439337} = "Wanaka";
-$areanames{en}->{6439338} = "Queenstown";
-$areanames{en}->{6439340} = "Mt\ Cook";
-$areanames{en}->{6439341} = "Fairlie";
-$areanames{en}->{6439342} = "Geraldine";
-$areanames{en}->{6439343} = "Waimate";
-$areanames{en}->{6439344} = "Timaru";
-$areanames{en}->{6439345} = "Christchurch";
-$areanames{en}->{6439346} = "Christchurch";
-$areanames{en}->{6439347} = "Christchurch";
-$areanames{en}->{643940} = "Christchurch";
-$areanames{en}->{643941} = "Christchurch";
-$areanames{en}->{643942} = "Christchurch";
-$areanames{en}->{643943} = "Christchurch";
-$areanames{en}->{643944} = "Christchurch";
-$areanames{en}->{6439450} = "Invercargill";
-$areanames{en}->{6439451} = "Invercargill";
-$areanames{en}->{6439452} = "Gore";
-$areanames{en}->{6439453} = "Te\ Anau";
-$areanames{en}->{6439454} = "Lumsden";
-$areanames{en}->{6439455} = "Otautau";
-$areanames{en}->{6439456} = "Riverton";
-$areanames{en}->{6439457} = "Winton";
-$areanames{en}->{6439458} = "Edendale";
-$areanames{en}->{6439459} = "Tokanui";
-$areanames{en}->{643946} = "Invercargill";
-$areanames{en}->{643947} = "Invercargill";
-$areanames{en}->{643948} = "Invercargill";
-$areanames{en}->{643949} = "Dunedin";
-$areanames{en}->{643950} = "Dunedin";
-$areanames{en}->{643951} = "Dunedin";
-$areanames{en}->{6439520} = "Dunedin";
-$areanames{en}->{6439521} = "Dunedin";
-$areanames{en}->{6439522} = "Dunedin";
-$areanames{en}->{6439523} = "Balclutha";
-$areanames{en}->{6439524} = "Oamaru";
-$areanames{en}->{6439525} = "Milton";
-$areanames{en}->{6439526} = "Twizel";
-$areanames{en}->{6439527} = "Kurow";
-$areanames{en}->{6439528} = "Lawrence";
-$areanames{en}->{6439529} = "Palmerston";
-$areanames{en}->{6439530} = "Timaru";
-$areanames{en}->{6439531} = "Timaru";
-$areanames{en}->{6439532} = "Timaru";
-$areanames{en}->{6439533} = "Geraldine";
-$areanames{en}->{6439534} = "Mt\ Cook";
-$areanames{en}->{6439535} = "Fairlie";
-$areanames{en}->{6439536} = "Waimate";
-$areanames{en}->{643955} = "Dunedin";
-$areanames{en}->{643956} = "Timaru";
-$areanames{en}->{643957} = "Timaru";
-$areanames{en}->{643960} = "Christchurch";
-$areanames{en}->{643961} = "Christchurch";
-$areanames{en}->{643962} = "Christchurch";
-$areanames{en}->{643963} = "Christchurch";
-$areanames{en}->{643964} = "Christchurch";
-$areanames{en}->{643965} = "Christchurch";
-$areanames{en}->{643966} = "Christchurch";
-$areanames{en}->{643967} = "Christchurch";
-$areanames{en}->{643968} = "Christchurch";
-$areanames{en}->{6439700} = "Nelson";
-$areanames{en}->{6439701} = "Nelson";
-$areanames{en}->{6439702} = "Nelson";
-$areanames{en}->{6439703} = "Takaka";
-$areanames{en}->{6439704} = "Murchison";
-$areanames{en}->{6439705} = "Motueka";
-$areanames{en}->{6439706} = "Nelson";
-$areanames{en}->{6439707} = "Takaka";
-$areanames{en}->{6439708} = "Murchison";
-$areanames{en}->{6439709} = "Motueka";
-$areanames{en}->{6439710} = "Timaru";
-$areanames{en}->{6439711} = "Geraldine";
-$areanames{en}->{6439712} = "Fairlie";
-$areanames{en}->{6439713} = "Mt\ Cook";
-$areanames{en}->{6439714} = "Waimate";
-$areanames{en}->{6439715} = "Timaru";
-$areanames{en}->{6439716} = "Geraldine";
-$areanames{en}->{6439717} = "Fairlie";
-$areanames{en}->{6439718} = "Mt\ Cook";
-$areanames{en}->{6439719} = "Waimate";
-$areanames{en}->{6439720} = "Blenheim";
-$areanames{en}->{6439721} = "Blenheim";
-$areanames{en}->{6439722} = "Blenheim";
-$areanames{en}->{6439723} = "Blenheim";
-$areanames{en}->{6439724} = "Blenheim";
-$areanames{en}->{6439725} = "Christchurch";
-$areanames{en}->{6439726} = "Timaru";
-$areanames{en}->{6439727} = "Dunedin";
-$areanames{en}->{6439728} = "Franz\ Josef";
-$areanames{en}->{6439729} = "Fox\ Glacier";
-$areanames{en}->{6439730} = "Invercargill";
-$areanames{en}->{6439731} = "Gore";
-$areanames{en}->{6439732} = "Otautau";
-$areanames{en}->{6439733} = "Te\ Anau";
-$areanames{en}->{6439734} = "Edendale";
-$areanames{en}->{6439735} = "Lumsden";
-$areanames{en}->{6439736} = "Riverton";
-$areanames{en}->{6439737} = "Tokanui";
-$areanames{en}->{6439738} = "Winton";
-$areanames{en}->{6439739} = "Invercargill";
-$areanames{en}->{6439740} = "Christchurch";
-$areanames{en}->{6439741} = "Christchurch";
-$areanames{en}->{6439742} = "Christchurch";
-$areanames{en}->{6439743} = "Christchurch";
-$areanames{en}->{6439744} = "Queenstown";
-$areanames{en}->{6439745} = "Greymouth";
-$areanames{en}->{6439746} = "Dunedin";
-$areanames{en}->{6439747} = "Wanaka";
-$areanames{en}->{6439748} = "Dunedin";
-$areanames{en}->{6439749} = "Christchurch";
-$areanames{en}->{6439750} = "Kaikoura";
-$areanames{en}->{6439751} = "Culverden";
-$areanames{en}->{6439752} = "Cheviot";
-$areanames{en}->{6439753} = "Amberley";
-$areanames{en}->{6439754} = "Darfield";
-$areanames{en}->{6439755} = "Rangiora";
-$areanames{en}->{6439756} = "Akaroa";
-$areanames{en}->{6439757} = "Waitangi\ \(Chatham\ Is\.\)";
-$areanames{en}->{6439758} = "Ashburton";
-$areanames{en}->{6439759} = "Cromwell";
-$areanames{en}->{6439760} = "Twizel";
-$areanames{en}->{6439761} = "Kurow";
-$areanames{en}->{6439762} = "Oamaru";
-$areanames{en}->{6439763} = "Palmerston";
-$areanames{en}->{6439764} = "Lawrence";
-$areanames{en}->{6439765} = "Milton";
-$areanames{en}->{6439766} = "Balclutha";
-$areanames{en}->{6439767} = "Alexandra";
-$areanames{en}->{6439768} = "Ranfurly";
-$areanames{en}->{6439769} = "Roxburgh";
-$areanames{en}->{643977} = "Christchurch";
-$areanames{en}->{643978} = "Christchurch";
-$areanames{en}->{643979} = "Christchurch";
-$areanames{en}->{643980} = "Christchurch";
-$areanames{en}->{643981} = "Christchurch";
-$areanames{en}->{643982} = "Christchurch";
-$areanames{en}->{643983} = "Christchurch";
-$areanames{en}->{643984} = "Blenheim";
-$areanames{en}->{6439850} = "Ashburton";
-$areanames{en}->{6439851} = "Culverden";
-$areanames{en}->{6439852} = "Cheviot";
-$areanames{en}->{6439853} = "Amberley";
-$areanames{en}->{6439854} = "Waitangi\ \(Chatham\ Is\.\)";
-$areanames{en}->{6439855} = "Rangiora";
-$areanames{en}->{6439856} = "Darfield";
-$areanames{en}->{6439857} = "Akaroa";
-$areanames{en}->{6439858} = "Kaikoura";
-$areanames{en}->{6439860} = "Nelson";
-$areanames{en}->{6439861} = "Nelson";
-$areanames{en}->{6439862} = "Nelson";
-$areanames{en}->{6439863} = "Motueka";
-$areanames{en}->{6439864} = "Takaka";
-$areanames{en}->{6439865} = "Murchison";
-$areanames{en}->{6439868} = "Blenheim";
-$areanames{en}->{6439869} = "Blenheim";
-$areanames{en}->{6439870} = "Queenstown";
-$areanames{en}->{6439871} = "Queenstown";
-$areanames{en}->{6439872} = "Alexandra";
-$areanames{en}->{6439873} = "Wanaka";
-$areanames{en}->{6439874} = "Cromwell";
-$areanames{en}->{6439875} = "Ranfurly";
-$areanames{en}->{6439876} = "Roxburgh";
-$areanames{en}->{6439880} = "Greymouth";
-$areanames{en}->{6439881} = "Greymouth";
-$areanames{en}->{6439882} = "Westport";
-$areanames{en}->{6439883} = "Hokitika";
-$areanames{en}->{6439884} = "Franz\ Josef";
-$areanames{en}->{6439885} = "Fox\ Glacier";
-$areanames{en}->{6439886} = "Haast";
-$areanames{en}->{643989} = "Nelson";
-$areanames{en}->{644202} = "Wellington";
-$areanames{en}->{644203} = "Wellington";
-$areanames{en}->{644204} = "Wellington";
-$areanames{en}->{644205} = "Wellington";
-$areanames{en}->{644209} = "Wellington";
-$areanames{en}->{644210} = "Wellington";
-$areanames{en}->{644211} = "Wellington";
-$areanames{en}->{644212} = "Wellington";
-$areanames{en}->{6442125} = "Paraparaumu";
-$areanames{en}->{6442127} = "Paraparaumu";
-$areanames{en}->{6442128} = "Paraparaumu";
-$areanames{en}->{6442129} = "Paraparaumu";
-$areanames{en}->{644213} = "Wellington";
-$areanames{en}->{644219} = "Wellington";
-$areanames{en}->{6442197} = "Paraparaumu";
-$areanames{en}->{6442198} = "Paraparaumu";
-$areanames{en}->{6442199} = "Paraparaumu";
-$areanames{en}->{64423} = "Wellington";
-$areanames{en}->{644240} = "Wellington";
-$areanames{en}->{6442420} = "Wellington";
-$areanames{en}->{6442429} = "Paraparaumu";
-$areanames{en}->{644245} = "Wellington";
-$areanames{en}->{644250} = "Wellington";
-$areanames{en}->{644260} = "Wellington";
-$areanames{en}->{6442608} = "Paraparaumu";
-$areanames{en}->{6442609} = "Paraparaumu";
-$areanames{en}->{644280} = "Wellington";
-$areanames{en}->{644281} = "Wellington";
-$areanames{en}->{6442820} = "Wellington";
-$areanames{en}->{6442821} = "Wellington";
-$areanames{en}->{644290} = "Paraparaumu";
-$areanames{en}->{644292} = "Paraparaumu";
-$areanames{en}->{644293} = "Paraparaumu";
-$areanames{en}->{644296} = "Paraparaumu";
-$areanames{en}->{644297} = "Paraparaumu";
-$areanames{en}->{644298} = "Paraparaumu";
-$areanames{en}->{644299} = "Paraparaumu";
-$areanames{en}->{6443330} = "Wellington";
-$areanames{en}->{6443331} = "Wellington";
-$areanames{en}->{6443332} = "Wellington";
-$areanames{en}->{6443333} = "Paraparaumu";
-$areanames{en}->{644370} = "Wellington";
-$areanames{en}->{6443708} = "Paraparaumu";
-$areanames{en}->{6443709} = "Paraparaumu";
-$areanames{en}->{64438} = "Wellington";
-$areanames{en}->{644390} = "Wellington";
-$areanames{en}->{644391} = "Wellington";
-$areanames{en}->{644392} = "Wellington";
-$areanames{en}->{644393} = "Paraparaumu";
-$areanames{en}->{644399} = "Wellington";
-$areanames{en}->{6443990} = "Paraparaumu";
-$areanames{en}->{644436} = "Wellington";
-$areanames{en}->{644437} = "Wellington";
-$areanames{en}->{644439} = "Wellington";
-$areanames{en}->{644460} = "Wellington";
-$areanames{en}->{644461} = "Wellington";
-$areanames{en}->{644462} = "Wellington";
-$areanames{en}->{644463} = "Wellington";
-$areanames{en}->{644464} = "Wellington";
-$areanames{en}->{644465} = "Wellington";
-$areanames{en}->{644466} = "Wellington";
-$areanames{en}->{644467} = "Wellington";
-$areanames{en}->{64447} = "Wellington";
-$areanames{en}->{644488} = "Wellington";
-$areanames{en}->{6444887} = "Paraparaumu";
-$areanames{en}->{6444888} = "Paraparaumu";
-$areanames{en}->{6444889} = "Paraparaumu";
-$areanames{en}->{644493} = "Wellington";
-$areanames{en}->{644494} = "Wellington";
-$areanames{en}->{644495} = "Wellington";
-$areanames{en}->{644496} = "Wellington";
-$areanames{en}->{644497} = "Wellington";
-$areanames{en}->{644498} = "Wellington";
-$areanames{en}->{644499} = "Wellington";
-$areanames{en}->{644524} = "Wellington";
-$areanames{en}->{644525} = "Wellington";
-$areanames{en}->{644526} = "Wellington";
-$areanames{en}->{644527} = "Wellington";
-$areanames{en}->{644528} = "Wellington";
-$areanames{en}->{644529} = "Wellington";
-$areanames{en}->{644550} = "Wellington";
-$areanames{en}->{644551} = "Paraparaumu";
-$areanames{en}->{644555} = "Wellington";
-$areanames{en}->{64456} = "Wellington";
-$areanames{en}->{644570} = "Wellington";
-$areanames{en}->{644571} = "Wellington";
-$areanames{en}->{644572} = "Wellington";
-$areanames{en}->{644576} = "Wellington";
-$areanames{en}->{644577} = "Wellington";
-$areanames{en}->{644586} = "Wellington";
-$areanames{en}->{644587} = "Wellington";
-$areanames{en}->{644589} = "Wellington";
-$areanames{en}->{644590} = "Wellington";
-$areanames{en}->{6445950} = "Wellington";
-$areanames{en}->{6445951} = "Wellington";
-$areanames{en}->{6445952} = "Wellington";
-$areanames{en}->{6445953} = "Wellington";
-$areanames{en}->{6445954} = "Wellington";
-$areanames{en}->{6445955} = "Wellington";
-$areanames{en}->{6445956} = "Wellington";
-$areanames{en}->{644619} = "Wellington";
-$areanames{en}->{644650} = "Wellington";
-$areanames{en}->{6446509} = "Paraparaumu";
-$areanames{en}->{644666} = "Wellington";
-$areanames{en}->{644777} = "Wellington";
-$areanames{en}->{6447770} = "Paraparaumu";
-$areanames{en}->{6447771} = "Paraparaumu";
-$areanames{en}->{644801} = "Wellington";
-$areanames{en}->{644802} = "Wellington";
-$areanames{en}->{644803} = "Wellington";
-$areanames{en}->{644804} = "Wellington";
-$areanames{en}->{644805} = "Wellington";
-$areanames{en}->{644806} = "Wellington";
-$areanames{en}->{644810} = "Wellington";
-$areanames{en}->{644815} = "Wellington";
-$areanames{en}->{644816} = "Wellington";
-$areanames{en}->{644817} = "Wellington";
-$areanames{en}->{644818} = "Wellington";
-$areanames{en}->{644819} = "Wellington";
-$areanames{en}->{64483} = "Wellington";
-$areanames{en}->{644834} = "Paraparaumu";
-$areanames{en}->{644886} = "Wellington";
-$areanames{en}->{644887} = "Wellington";
-$areanames{en}->{644888} = "Wellington";
-$areanames{en}->{6448880} = "Paraparaumu";
-$areanames{en}->{644889} = "Wellington";
-$areanames{en}->{644890} = "Wellington";
-$areanames{en}->{644891} = "Wellington";
-$areanames{en}->{644892} = "Paraparaumu";
-$areanames{en}->{644893} = "Wellington";
-$areanames{en}->{644894} = "Wellington";
-$areanames{en}->{644895} = "Paraparaumu";
-$areanames{en}->{644896} = "Wellington";
-$areanames{en}->{644897} = "Wellington";
-$areanames{en}->{644900} = "Wellington";
-$areanames{en}->{6449008} = "Paraparaumu";
-$areanames{en}->{644901} = "Wellington";
-$areanames{en}->{644902} = "Paraparaumu";
-$areanames{en}->{644903} = "Wellington";
-$areanames{en}->{6449030} = "Paraparaumu";
-$areanames{en}->{6449031} = "Paraparaumu";
-$areanames{en}->{644904} = "Paraparaumu";
-$areanames{en}->{644905} = "Paraparaumu";
-$areanames{en}->{644906} = "Paraparaumu";
-$areanames{en}->{644907} = "Wellington";
-$areanames{en}->{6449080} = "Paraparaumu";
-$areanames{en}->{6449081} = "Paraparaumu";
-$areanames{en}->{6449082} = "Wellington";
-$areanames{en}->{6449083} = "Wellington";
-$areanames{en}->{6449084} = "Wellington";
-$areanames{en}->{644909} = "Wellington";
-$areanames{en}->{644910} = "Wellington";
-$areanames{en}->{6449120} = "Wellington";
-$areanames{en}->{6449121} = "Wellington";
-$areanames{en}->{6449122} = "Wellington";
-$areanames{en}->{6449123} = "Wellington";
-$areanames{en}->{6449124} = "Wellington";
-$areanames{en}->{644913} = "Wellington";
-$areanames{en}->{644914} = "Wellington";
-$areanames{en}->{644915} = "Wellington";
-$areanames{en}->{644916} = "Wellington";
-$areanames{en}->{644917} = "Wellington";
-$areanames{en}->{644918} = "Wellington";
-$areanames{en}->{644920} = "Wellington";
-$areanames{en}->{644922} = "Wellington";
-$areanames{en}->{644924} = "Wellington";
-$areanames{en}->{644928} = "Wellington";
-$areanames{en}->{644931} = "Wellington";
-$areanames{en}->{644934} = "Wellington";
-$areanames{en}->{644938} = "Wellington";
-$areanames{en}->{644939} = "Wellington";
-$areanames{en}->{64497} = "Wellington";
-$areanames{en}->{6449740} = "Paraparaumu";
-$areanames{en}->{6449741} = "Paraparaumu";
-$areanames{en}->{644975} = "Paraparaumu";
-$areanames{en}->{6462100} = "Levin";
-$areanames{en}->{6462101} = "Levin";
-$areanames{en}->{6462102} = "Levin";
-$areanames{en}->{6462103} = "Levin";
-$areanames{en}->{6462104} = "Marton";
-$areanames{en}->{6462105} = "Taihape";
-$areanames{en}->{6462106} = "Pahiatua";
-$areanames{en}->{6462107} = "Dannevirke";
-$areanames{en}->{6462108} = "Ohakune";
-$areanames{en}->{6462109} = "Waiouru";
-$areanames{en}->{646211} = "Napier";
-$areanames{en}->{6462114} = "Waipukurau";
-$areanames{en}->{6462115} = "Wairoa";
-$areanames{en}->{6462118} = "Waipukurau";
-$areanames{en}->{6462119} = "Wairoa";
-$areanames{en}->{6462120} = "Palmerston\ North";
-$areanames{en}->{6462121} = "Palmerston\ North";
-$areanames{en}->{6462122} = "Palmerston\ North";
-$areanames{en}->{6462123} = "Palmerston\ North";
-$areanames{en}->{6462124} = "Marton";
-$areanames{en}->{6462125} = "Taihape";
-$areanames{en}->{6462126} = "Pahiatua";
-$areanames{en}->{6462127} = "Dannevirke";
-$areanames{en}->{6462128} = "Ohakune";
-$areanames{en}->{6462129} = "Waiouru";
-$areanames{en}->{646213} = "Wanganui";
-$areanames{en}->{6462137} = "Palmerston\ North";
-$areanames{en}->{6462138} = "Palmerston\ North";
-$areanames{en}->{6462139} = "Palmerston\ North";
-$areanames{en}->{646214} = "Gisborne";
-$areanames{en}->{6462144} = "Ruatoria";
-$areanames{en}->{6462149} = "Ruatoria";
-$areanames{en}->{6462150} = "New\ Plymouth";
-$areanames{en}->{6462151} = "New\ Plymouth";
-$areanames{en}->{6462152} = "New\ Plymouth";
-$areanames{en}->{6462153} = "New\ Plymouth";
-$areanames{en}->{6462154} = "New\ Plymouth";
-$areanames{en}->{6462155} = "Hawera";
-$areanames{en}->{6462156} = "Hawera";
-$areanames{en}->{6462157} = "Stratford";
-$areanames{en}->{6462158} = "Opunake";
-$areanames{en}->{6462159} = "Mokau";
-$areanames{en}->{6462160} = "Masterton";
-$areanames{en}->{6462161} = "Masterton";
-$areanames{en}->{6462162} = "Masterton";
-$areanames{en}->{6462163} = "New\ Plymouth";
-$areanames{en}->{6462164} = "New\ Plymouth";
-$areanames{en}->{6462165} = "Stratford";
-$areanames{en}->{6462166} = "Opunake";
-$areanames{en}->{6462167} = "Mokau";
-$areanames{en}->{6462168} = "Featherston";
-$areanames{en}->{6462169} = "Featherston";
-$areanames{en}->{6462220} = "New\ Plymouth";
-$areanames{en}->{6462221} = "Gisborne";
-$areanames{en}->{6462222} = "Ohakune";
-$areanames{en}->{6462223} = "Palmerston\ North";
-$areanames{en}->{6462224} = "Masterton";
-$areanames{en}->{6462225} = "Levin";
-$areanames{en}->{6462226} = "Napier";
-$areanames{en}->{6462227} = "Napier";
-$areanames{en}->{6462228} = "Wanganui";
-$areanames{en}->{6462410} = "New\ Plymouth";
-$areanames{en}->{6462411} = "New\ Plymouth";
-$areanames{en}->{6462412} = "Gisborne";
-$areanames{en}->{6462413} = "Gisborne";
-$areanames{en}->{6462414} = "Napier";
-$areanames{en}->{6462415} = "Levin";
-$areanames{en}->{6462416} = "Waipukurau";
-$areanames{en}->{6462417} = "Wanganui";
-$areanames{en}->{6462418} = "Palmerston\ North";
-$areanames{en}->{6462419} = "Masterton";
-$areanames{en}->{6462420} = "Palmerston\ North";
-$areanames{en}->{6462421} = "New\ Plymouth";
-$areanames{en}->{6462422} = "Napier\/Hastings";
-$areanames{en}->{6462423} = "Gisborne";
-$areanames{en}->{6462424} = "Wanganui";
-$areanames{en}->{6462425} = "Masterton";
-$areanames{en}->{6462426} = "Levin";
-$areanames{en}->{6462600} = "Palmerston\ North";
-$areanames{en}->{6462601} = "Palmerston\ North";
-$areanames{en}->{6462602} = "Palmerston\ North";
-$areanames{en}->{6462603} = "Palmerston\ North";
-$areanames{en}->{6462604} = "Ohakune";
-$areanames{en}->{6462605} = "Marton";
-$areanames{en}->{6462606} = "Waiouru";
-$areanames{en}->{6462607} = "Taihape";
-$areanames{en}->{6462608} = "Dannevirke";
-$areanames{en}->{6462609} = "Pahiatua";
-$areanames{en}->{6462610} = "Napier";
-$areanames{en}->{6462611} = "Napier";
-$areanames{en}->{6462613} = "Waipukurau";
-$areanames{en}->{6462614} = "Wairoa";
-$areanames{en}->{6462615} = "Gisborne";
-$areanames{en}->{6462616} = "Ruatoria";
-$areanames{en}->{6462617} = "Masterton";
-$areanames{en}->{6462618} = "Masterton";
-$areanames{en}->{6462619} = "Featherston";
-$areanames{en}->{6462620} = "New\ Plymouth";
-$areanames{en}->{6462621} = "New\ Plymouth";
-$areanames{en}->{6462623} = "Stratford";
-$areanames{en}->{6462624} = "Opunake";
-$areanames{en}->{6462625} = "Hawera";
-$areanames{en}->{6462626} = "Mokau";
-$areanames{en}->{6462627} = "Wanganui";
-$areanames{en}->{6462628} = "Wanganui";
-$areanames{en}->{6462629} = "Levin";
-$areanames{en}->{646272} = "Hawera";
-$areanames{en}->{646273} = "Hawera";
-$areanames{en}->{646274} = "Hawera";
-$areanames{en}->{646278} = "Hawera";
-$areanames{en}->{646279} = "Hawera";
-$areanames{en}->{6462800} = "Palmerston\ North";
-$areanames{en}->{6462801} = "Palmerston\ North";
-$areanames{en}->{6462802} = "Palmerston\ North";
-$areanames{en}->{6462803} = "Palmerston\ North";
-$areanames{en}->{6462804} = "Palmerston\ North";
-$areanames{en}->{6462805} = "Napier\/Hastings";
-$areanames{en}->{6462806} = "Napier\/Hastings";
-$areanames{en}->{6462807} = "Napier\/Hastings";
-$areanames{en}->{6462808} = "Napier\/Hastings";
-$areanames{en}->{6462809} = "Napier\/Hastings";
-$areanames{en}->{6462810} = "Gisborne";
-$areanames{en}->{6462811} = "New\ Plymouth";
-$areanames{en}->{6462812} = "Napier\/Hastings";
-$areanames{en}->{6462813} = "Wanganui";
-$areanames{en}->{6462814} = "Hawera";
-$areanames{en}->{6462815} = "Wairoa";
-$areanames{en}->{6462816} = "Gisborne";
-$areanames{en}->{6462817} = "Napier";
-$areanames{en}->{6462818} = "New\ Plymouth";
-$areanames{en}->{6462819} = "Levin";
-$areanames{en}->{646304} = "Featherston";
-$areanames{en}->{646306} = "Featherston";
-$areanames{en}->{646307} = "Featherston";
-$areanames{en}->{646308} = "Featherston";
-$areanames{en}->{646321} = "Marton";
-$areanames{en}->{646322} = "Marton";
-$areanames{en}->{646323} = "Palmerston\ North";
-$areanames{en}->{646324} = "Palmerston\ North";
-$areanames{en}->{646325} = "Palmerston\ North";
-$areanames{en}->{646326} = "Palmerston\ North";
-$areanames{en}->{646327} = "Marton";
-$areanames{en}->{646328} = "Palmerston\ North";
-$areanames{en}->{646329} = "Palmerston\ North";
-$areanames{en}->{646341} = "Wanganui";
-$areanames{en}->{646342} = "Wanganui";
-$areanames{en}->{646343} = "Wanganui";
-$areanames{en}->{646344} = "Wanganui";
-$areanames{en}->{646345} = "Wanganui";
-$areanames{en}->{646346} = "Wanganui";
-$areanames{en}->{646347} = "Wanganui";
-$areanames{en}->{646348} = "Wanganui";
-$areanames{en}->{646349} = "Wanganui";
-$areanames{en}->{64635} = "Palmerston\ North";
-$areanames{en}->{646362} = "Levin";
-$areanames{en}->{646363} = "Levin";
-$areanames{en}->{646364} = "Levin";
-$areanames{en}->{646365} = "Palmerston\ North";
-$areanames{en}->{646366} = "Levin";
-$areanames{en}->{646367} = "Levin";
-$areanames{en}->{646368} = "Levin";
-$areanames{en}->{646369} = "Levin";
-$areanames{en}->{646370} = "Masterton";
-$areanames{en}->{646372} = "Masterton";
-$areanames{en}->{646373} = "Masterton";
-$areanames{en}->{646374} = "Dannevirke";
-$areanames{en}->{646375} = "Pahiatua";
-$areanames{en}->{646376} = "Pahiatua";
-$areanames{en}->{646377} = "Masterton";
-$areanames{en}->{646378} = "Masterton";
-$areanames{en}->{646379} = "Masterton";
-$areanames{en}->{646382} = "Taihape";
-$areanames{en}->{646385} = "Ohakune";
-$areanames{en}->{646387} = "Waiouru";
-$areanames{en}->{646388} = "Taihape";
-$areanames{en}->{6463900} = "Gisborne";
-$areanames{en}->{6463901} = "Gisborne";
-$areanames{en}->{6463902} = "Gisborne";
-$areanames{en}->{6463903} = "Ruatoria";
-$areanames{en}->{6463904} = "Napier";
-$areanames{en}->{6463905} = "Napier";
-$areanames{en}->{6463906} = "Napier";
-$areanames{en}->{6463907} = "Waipukurau";
-$areanames{en}->{6463908} = "Wairoa";
-$areanames{en}->{6463911} = "New\ Plymouth";
-$areanames{en}->{6463912} = "New\ Plymouth";
-$areanames{en}->{6463913} = "Hawera";
-$areanames{en}->{6463914} = "Stratford";
-$areanames{en}->{6463915} = "Opunake";
-$areanames{en}->{6463916} = "Mokau";
-$areanames{en}->{6463917} = "Wanganui";
-$areanames{en}->{6463918} = "Wanganui";
-$areanames{en}->{6463920} = "Palmerston\ North";
-$areanames{en}->{6463921} = "Palmerston\ North";
-$areanames{en}->{6463922} = "Palmerston\ North";
-$areanames{en}->{6463923} = "Ohakune";
-$areanames{en}->{6463924} = "Marton";
-$areanames{en}->{6463925} = "Waiouru";
-$areanames{en}->{6463926} = "Taihape";
-$areanames{en}->{6463927} = "Dannevirke";
-$areanames{en}->{6463928} = "Pahiatua";
-$areanames{en}->{6463940} = "Levin";
-$areanames{en}->{6463941} = "Masterton";
-$areanames{en}->{6463942} = "Masterton";
-$areanames{en}->{6463943} = "Masterton";
-$areanames{en}->{6463944} = "Featherston";
-$areanames{en}->{6463990} = "Featherston";
-$areanames{en}->{6463991} = "Masterton";
-$areanames{en}->{6463992} = "Levin";
-$areanames{en}->{6463993} = "Pahiatua";
-$areanames{en}->{6463994} = "Dannevirke";
-$areanames{en}->{6463995} = "Marton";
-$areanames{en}->{6463996} = "Palmerston\ North";
-$areanames{en}->{6463997} = "Palmerston\ North";
-$areanames{en}->{6463998} = "Palmerston\ North";
-$areanames{en}->{6463999} = "Palmerston\ North";
-$areanames{en}->{6465600} = "Palmerston\ North";
-$areanames{en}->{6465601} = "Palmerston\ North";
-$areanames{en}->{6465602} = "Palmerston\ North";
-$areanames{en}->{6465603} = "Palmerston\ North";
-$areanames{en}->{6465604} = "Ohakune";
-$areanames{en}->{6465605} = "Marton";
-$areanames{en}->{6465606} = "Waiouru";
-$areanames{en}->{6465607} = "Taihape";
-$areanames{en}->{6465608} = "Dannevirke";
-$areanames{en}->{6465609} = "Pahiatua";
-$areanames{en}->{6465610} = "Napier";
-$areanames{en}->{6465611} = "Napier";
-$areanames{en}->{6465612} = "Waipukurau";
-$areanames{en}->{6465613} = "Wairoa";
-$areanames{en}->{6465614} = "Wanganui";
-$areanames{en}->{6465615} = "Wanganui";
-$areanames{en}->{6465616} = "Hawera";
-$areanames{en}->{6465617} = "Mokau";
-$areanames{en}->{6465618} = "Masterton";
-$areanames{en}->{6465619} = "Masterton";
-$areanames{en}->{6465620} = "New\ Plymouth";
-$areanames{en}->{6465621} = "New\ Plymouth";
-$areanames{en}->{6465622} = "Stratford";
-$areanames{en}->{6465623} = "Opunake";
-$areanames{en}->{6465624} = "Featherston";
-$areanames{en}->{6465625} = "Gisborne";
-$areanames{en}->{6465626} = "Ruatoria";
-$areanames{en}->{6465627} = "Levin";
-$areanames{en}->{646590} = "Palmerston\ North";
-$areanames{en}->{6465950} = "Palmerston\ North";
-$areanames{en}->{6466000} = "Napier";
-$areanames{en}->{6466001} = "Napier";
-$areanames{en}->{6466002} = "Napier";
-$areanames{en}->{6466003} = "Ruatoria";
-$areanames{en}->{6466004} = "Waipukurau";
-$areanames{en}->{6466005} = "Mokau";
-$areanames{en}->{6466006} = "Opunake";
-$areanames{en}->{6466007} = "Stratford";
-$areanames{en}->{6466008} = "Ohakune";
-$areanames{en}->{6466009} = "Waiouru";
-$areanames{en}->{646601} = "Napier";
-$areanames{en}->{6466010} = "Taihape";
-$areanames{en}->{6466011} = "Marton";
-$areanames{en}->{6466012} = "Pahiatua";
-$areanames{en}->{6466013} = "Featherston";
-$areanames{en}->{646650} = "Napier";
-$areanames{en}->{6466508} = "Napier\/Wairoa";
-$areanames{en}->{6466509} = "Napier\/Waipukurau";
-$areanames{en}->{646651} = "Napier";
-$areanames{en}->{6466520} = "Palmerston\ North";
-$areanames{en}->{6466521} = "Palmerston\ North";
-$areanames{en}->{6466522} = "Palmerston\ North";
-$areanames{en}->{6466523} = "Palmerston\ North";
-$areanames{en}->{6466524} = "Ohakune";
-$areanames{en}->{6466525} = "Marton";
-$areanames{en}->{6466526} = "Waiouru";
-$areanames{en}->{6466527} = "Taihape";
-$areanames{en}->{6466528} = "Dannevirke";
-$areanames{en}->{6466529} = "Pahiatua";
-$areanames{en}->{646653} = "Wanganui";
-$areanames{en}->{646654} = "Gisborne";
-$areanames{en}->{6466548} = "Ruatoria";
-$areanames{en}->{6466549} = "Ruatoria";
-$areanames{en}->{6466550} = "New\ Plymouth";
-$areanames{en}->{6466551} = "New\ Plymouth";
-$areanames{en}->{6466552} = "New\ Plymouth";
-$areanames{en}->{6466553} = "New\ Plymouth";
-$areanames{en}->{6466554} = "Hawera";
-$areanames{en}->{6466555} = "Hawera";
-$areanames{en}->{6466556} = "Stratford";
-$areanames{en}->{6466557} = "Stratford";
-$areanames{en}->{6466558} = "Opunake";
-$areanames{en}->{6466559} = "Mokau";
-$areanames{en}->{646656} = "Levin";
-$areanames{en}->{646657} = "Masterton";
-$areanames{en}->{6466579} = "Featherston";
-$areanames{en}->{6466990} = "Mokau";
-$areanames{en}->{6466991} = "Wanganui";
-$areanames{en}->{6466992} = "Hawera";
-$areanames{en}->{6466993} = "Waiouru";
-$areanames{en}->{6466994} = "Ohakune";
-$areanames{en}->{6466995} = "Opunake";
-$areanames{en}->{6466996} = "Stratford";
-$areanames{en}->{6466997} = "New\ Plymouth";
-$areanames{en}->{6466998} = "New\ Plymouth";
-$areanames{en}->{6466999} = "New\ Plymouth";
-$areanames{en}->{646750} = "Mokau";
-$areanames{en}->{646751} = "New\ Plymouth";
-$areanames{en}->{646752} = "New\ Plymouth";
-$areanames{en}->{6467525} = "Mokau";
-$areanames{en}->{6467529} = "Mokau";
-$areanames{en}->{646753} = "New\ Plymouth";
-$areanames{en}->{646754} = "New\ Plymouth";
-$areanames{en}->{6467550} = "New\ Plymouth";
-$areanames{en}->{6467551} = "New\ Plymouth";
-$areanames{en}->{6467552} = "New\ Plymouth";
-$areanames{en}->{6467553} = "New\ Plymouth";
-$areanames{en}->{6467554} = "New\ Plymouth";
-$areanames{en}->{6467555} = "New\ Plymouth";
-$areanames{en}->{6467557} = "New\ Plymouth";
-$areanames{en}->{6467558} = "New\ Plymouth";
-$areanames{en}->{6467559} = "New\ Plymouth";
-$areanames{en}->{646756} = "New\ Plymouth";
-$areanames{en}->{646757} = "New\ Plymouth";
-$areanames{en}->{646758} = "New\ Plymouth";
-$areanames{en}->{646759} = "New\ Plymouth";
-$areanames{en}->{646761} = "Opunake";
-$areanames{en}->{646762} = "Stratford";
-$areanames{en}->{646763} = "Opunake";
-$areanames{en}->{646764} = "Stratford";
-$areanames{en}->{646765} = "Stratford";
-$areanames{en}->{646766} = "New\ Plymouth";
-$areanames{en}->{646768} = "New\ Plymouth";
-$areanames{en}->{646769} = "New\ Plymouth";
-$areanames{en}->{6467770} = "Gisborne";
-$areanames{en}->{6467771} = "New\ Plymouth";
-$areanames{en}->{6467772} = "Hawera";
-$areanames{en}->{6467773} = "Wanganui";
-$areanames{en}->{6467774} = "Dannevirke";
-$areanames{en}->{6467775} = "Palmerston\ North";
-$areanames{en}->{6467776} = "Levin";
-$areanames{en}->{6467777} = "Napier";
-$areanames{en}->{6467778} = "Wairoa";
-$areanames{en}->{6467779} = "Masterton";
-$areanames{en}->{6468241} = "Gisborne";
-$areanames{en}->{6468242} = "Ruatoria";
-$areanames{en}->{6468243} = "Napier";
-$areanames{en}->{6468244} = "Waipukurau";
-$areanames{en}->{6468245} = "Wairoa";
-$areanames{en}->{6468246} = "Hawera";
-$areanames{en}->{6468247} = "Mokau";
-$areanames{en}->{6468248} = "New\ Plymouth";
-$areanames{en}->{6468249} = "Opunake";
-$areanames{en}->{6468250} = "Stratford";
-$areanames{en}->{6468251} = "Wanganui";
-$areanames{en}->{6468252} = "Dannevirke";
-$areanames{en}->{6468253} = "Marton";
-$areanames{en}->{6468254} = "Ohakune";
-$areanames{en}->{6468255} = "Pahiatua";
-$areanames{en}->{6468256} = "Palmerston\ North";
-$areanames{en}->{6468257} = "Taihape";
-$areanames{en}->{6468258} = "Waiouru";
-$areanames{en}->{6468259} = "Levin";
-$areanames{en}->{6468260} = "Featherston";
-$areanames{en}->{6468261} = "Masterton";
-$areanames{en}->{6468262} = "Napier";
-$areanames{en}->{6468263} = "Napier";
-$areanames{en}->{6468264} = "Palmerston\ North";
-$areanames{en}->{6468268} = "New\ Plymouth";
-$areanames{en}->{6468269} = "New\ Plymouth";
-$areanames{en}->{6468300} = "Napier";
-$areanames{en}->{6468301} = "Napier";
-$areanames{en}->{6468302} = "Napier";
-$areanames{en}->{6468303} = "Napier";
-$areanames{en}->{6468308} = "Napier";
-$areanames{en}->{6468309} = "Napier";
-$areanames{en}->{646831} = "Napier\/Hastings";
-$areanames{en}->{646833} = "Napier\/Hastings";
-$areanames{en}->{646834} = "Napier\/Hastings";
-$areanames{en}->{646835} = "Napier\/Hastings";
-$areanames{en}->{646836} = "Napier\/Hastings";
-$areanames{en}->{646837} = "Wairoa";
-$areanames{en}->{646838} = "Wairoa";
-$areanames{en}->{646839} = "Napier\/Hastings";
-$areanames{en}->{646842} = "Napier\/Hastings";
-$areanames{en}->{646843} = "Napier\/Hastings";
-$areanames{en}->{646844} = "Napier\/Hastings";
-$areanames{en}->{646845} = "Napier\/Hastings";
-$areanames{en}->{646847} = "Napier\/Hastings";
-$areanames{en}->{646855} = "Waipukurau";
-$areanames{en}->{646856} = "Waipukurau";
-$areanames{en}->{646857} = "Waipukurau";
-$areanames{en}->{646858} = "Waipukurau";
-$areanames{en}->{646861} = "Gisborne";
-$areanames{en}->{646862} = "Gisborne";
-$areanames{en}->{646863} = "Gisborne";
-$areanames{en}->{646864} = "Ruatoria";
-$areanames{en}->{646865} = "Gisborne";
-$areanames{en}->{646867} = "Gisborne";
-$areanames{en}->{646868} = "Gisborne";
-$areanames{en}->{6468690} = "Gisborne";
-$areanames{en}->{6468691} = "Gisborne";
-$areanames{en}->{6468692} = "Gisborne";
-$areanames{en}->{6468693} = "Gisborne";
-$areanames{en}->{64687} = "Napier\/Hastings";
-$areanames{en}->{6468800} = "Napier\/Hastings";
-$areanames{en}->{6468801} = "Wanganui";
-$areanames{en}->{6468802} = "New\ Plymouth";
-$areanames{en}->{6468803} = "Gisborne";
-$areanames{en}->{6468804} = "Napier";
-$areanames{en}->{6468805} = "Wanganui";
-$areanames{en}->{6468806} = "New\ Plymouth";
-$areanames{en}->{6468807} = "Gisborne";
-$areanames{en}->{6468808} = "Palmerston\ North";
-$areanames{en}->{6468809} = "Masterton";
-$areanames{en}->{6468810} = "Ohakune";
-$areanames{en}->{6468811} = "Marton";
-$areanames{en}->{6468812} = "Waiouru";
-$areanames{en}->{6468813} = "Taihape";
-$areanames{en}->{6468814} = "Dannevirke";
-$areanames{en}->{6468815} = "Pahiatua";
-$areanames{en}->{6468816} = "Hawera";
-$areanames{en}->{6468817} = "Stratford";
-$areanames{en}->{6468818} = "Opunake";
-$areanames{en}->{6468819} = "Mokau";
-$areanames{en}->{6468820} = "Palmerston\ North";
-$areanames{en}->{6468821} = "Featherston";
-$areanames{en}->{6468822} = "Masterton";
-$areanames{en}->{6468823} = "Napier\/Hastings";
-$areanames{en}->{6468824} = "Wanganui";
-$areanames{en}->{6468825} = "Gisborne";
-$areanames{en}->{6468826} = "Levin";
-$areanames{en}->{6468827} = "New\ Plymouth";
-$areanames{en}->{6468880} = "Napier\/Hastings";
-$areanames{en}->{6468881} = "Napier\/Hastings";
-$areanames{en}->{6468882} = "Napier\/Hastings";
-$areanames{en}->{6468883} = "Palmerston\ North";
-$areanames{en}->{6468884} = "Palmerston\ North";
-$areanames{en}->{6468885} = "New\ Plymouth";
-$areanames{en}->{6468886} = "Wanganui";
-$areanames{en}->{6468887} = "Gisborne";
-$areanames{en}->{6468888} = "Masterton";
-$areanames{en}->{6468889} = "Levin";
-$areanames{en}->{6468990} = "Ruatoria";
-$areanames{en}->{6468991} = "Gisborne";
-$areanames{en}->{6468992} = "Wairoa";
-$areanames{en}->{6468993} = "Taihape";
-$areanames{en}->{6468994} = "Waipukurau";
-$areanames{en}->{6468995} = "Napier";
-$areanames{en}->{6468996} = "Napier";
-$areanames{en}->{6468997} = "Napier";
-$areanames{en}->{6468998} = "Napier";
-$areanames{en}->{6468999} = "Napier";
-$areanames{en}->{6469000} = "New\ Plymouth";
-$areanames{en}->{6469001} = "New\ Plymouth";
-$areanames{en}->{6469002} = "Hawera";
-$areanames{en}->{6469003} = "Napier\/Hastings";
-$areanames{en}->{6469004} = "Napier\/Hastings";
-$areanames{en}->{6469005} = "Wanganui";
-$areanames{en}->{6469006} = "Gisborne";
-$areanames{en}->{6469007} = "Masterton";
-$areanames{en}->{6469008} = "Palmerston\ North";
-$areanames{en}->{6469009} = "Palmerston\ North";
-$areanames{en}->{6469010} = "Taihape";
-$areanames{en}->{6469012} = "Waiouru";
-$areanames{en}->{6469014} = "Dannevirke";
-$areanames{en}->{6469016} = "Ohakune";
-$areanames{en}->{6469017} = "Marton";
-$areanames{en}->{6469019} = "Pahiatua";
-$areanames{en}->{6469020} = "Stratford";
-$areanames{en}->{6469022} = "Hawera";
-$areanames{en}->{6469025} = "Mokau";
-$areanames{en}->{6469029} = "Opunake";
-$areanames{en}->{646903} = "Palmerston\ North";
-$areanames{en}->{6469040} = "Wairoa";
-$areanames{en}->{6469045} = "Waipukurau";
-$areanames{en}->{6469200} = "Gisborne";
-$areanames{en}->{6469201} = "Ruatoria";
-$areanames{en}->{6469202} = "Levin";
-$areanames{en}->{6469203} = "New\ Plymouth";
-$areanames{en}->{6469240} = "Gisborne";
-$areanames{en}->{6469241} = "Napier";
-$areanames{en}->{6469242} = "Levin";
-$areanames{en}->{6469243} = "New\ Plymouth";
-$areanames{en}->{6469246} = "Palmerston\ North";
-$areanames{en}->{6469247} = "Wanganui";
-$areanames{en}->{6469249} = "Masterton";
-$areanames{en}->{6469270} = "Marton";
-$areanames{en}->{6469271} = "Pahiatua";
-$areanames{en}->{6469272} = "Featherston";
-$areanames{en}->{6469273} = "New\ Plymouth";
-$areanames{en}->{6469274} = "New\ Plymouth";
-$areanames{en}->{6469275} = "Wanganui";
-$areanames{en}->{6469276} = "Wanganui";
-$areanames{en}->{6469277} = "Gisborne";
-$areanames{en}->{6469278} = "Gisborne";
-$areanames{en}->{6469279} = "Levin";
-$areanames{en}->{6469280} = "Waipukurau";
-$areanames{en}->{6469281} = "Wairoa";
-$areanames{en}->{6469282} = "Mokau";
-$areanames{en}->{6469283} = "Opunake";
-$areanames{en}->{6469284} = "Stratford";
-$areanames{en}->{6469285} = "Hawera";
-$areanames{en}->{6469286} = "Dannevirke";
-$areanames{en}->{6469287} = "Ohakune";
-$areanames{en}->{6469288} = "Waiouru";
-$areanames{en}->{6469289} = "Taihape";
-$areanames{en}->{6469290} = "Napier\/Hastings";
-$areanames{en}->{6469291} = "Gisborne";
-$areanames{en}->{6469292} = "Ruatoria";
-$areanames{en}->{6469293} = "New\ Plymouth";
-$areanames{en}->{6469294} = "Palmerston\ North";
-$areanames{en}->{6469295} = "Wanganui";
-$areanames{en}->{6469296} = "Levin";
-$areanames{en}->{6469297} = "Masterton";
-$areanames{en}->{6469298} = "Masterton";
-$areanames{en}->{6469299} = "Napier\/Hastings";
-$areanames{en}->{6469300} = "Gisborne";
-$areanames{en}->{6469301} = "Ruatoria";
-$areanames{en}->{6469302} = "Napier";
-$areanames{en}->{6469303} = "Waipukurau";
-$areanames{en}->{6469304} = "Wairoa";
-$areanames{en}->{6469305} = "New\ Plymouth";
-$areanames{en}->{6469306} = "Hawera";
-$areanames{en}->{6469307} = "Stratford";
-$areanames{en}->{6469308} = "Opunake";
-$areanames{en}->{6469309} = "Mokau";
-$areanames{en}->{6469310} = "Wanganui";
-$areanames{en}->{6469311} = "Palmerston\ North";
-$areanames{en}->{6469312} = "Ohakune";
-$areanames{en}->{6469313} = "Marton";
-$areanames{en}->{6469314} = "Waiouru";
-$areanames{en}->{6469315} = "Taihape";
-$areanames{en}->{6469316} = "Dannevirke";
-$areanames{en}->{6469317} = "Pahiatua";
-$areanames{en}->{6469318} = "Levin";
-$areanames{en}->{6469319} = "Masterton";
-$areanames{en}->{646946} = "Masterton";
-$areanames{en}->{6469468} = "Featherston";
-$areanames{en}->{646949} = "Levin\ W100";
-$areanames{en}->{646951} = "Palmerston\ North";
-$areanames{en}->{646952} = "Palmerston\ North\ W100";
-$areanames{en}->{646953} = "Palmerston\ North\ W100";
-$areanames{en}->{646954} = "Palmerston\ North\ W100";
-$areanames{en}->{6469570} = "Palmerston\ North";
-$areanames{en}->{6469571} = "Palmerston\ North";
-$areanames{en}->{6469572} = "Palmerston\ North";
-$areanames{en}->{6469573} = "Palmerston\ North";
-$areanames{en}->{6469574} = "Taihape";
-$areanames{en}->{6469575} = "Waiouru";
-$areanames{en}->{6469576} = "Dannevirke";
-$areanames{en}->{6469577} = "Ohakune";
-$areanames{en}->{6469578} = "Marton";
-$areanames{en}->{6469579} = "Pahiatua";
-$areanames{en}->{6469610} = "Wanganui";
-$areanames{en}->{6469611} = "Wanganui";
-$areanames{en}->{6469613} = "Levin";
-$areanames{en}->{6469614} = "Levin";
-$areanames{en}->{6469615} = "Masterton";
-$areanames{en}->{6469616} = "Featherston";
-$areanames{en}->{646964} = "Wanganui";
-$areanames{en}->{646965} = "Wanganui\ W100";
-$areanames{en}->{646967} = "New\ Plymouth";
-$areanames{en}->{646968} = "New\ Plymouth\ W100";
-$areanames{en}->{646969} = "New\ Plymouth";
-$areanames{en}->{6469710} = "New\ Plymouth";
-$areanames{en}->{6469711} = "New\ Plymouth";
-$areanames{en}->{6469712} = "New\ Plymouth";
-$areanames{en}->{6469713} = "Stratford";
-$areanames{en}->{6469714} = "Hawera";
-$areanames{en}->{6469715} = "Mokau";
-$areanames{en}->{6469716} = "Opunake";
-$areanames{en}->{646974} = "Napier";
-$areanames{en}->{646975} = "Napier";
-$areanames{en}->{646976} = "Napier";
-$areanames{en}->{6469850} = "Napier";
-$areanames{en}->{6469851} = "Napier";
-$areanames{en}->{6469852} = "Napier";
-$areanames{en}->{6469853} = "Wairoa";
-$areanames{en}->{6469854} = "Waipukurau";
-$areanames{en}->{646986} = "Gisborne";
-$areanames{en}->{6469869} = "Ruatoria";
-$areanames{en}->{6469890} = "Gisborne";
-$areanames{en}->{6469891} = "Gisborne";
-$areanames{en}->{6469892} = "Gisborne";
-$areanames{en}->{6469893} = "Ruatoria";
-$areanames{en}->{647210} = "Hamilton";
-$areanames{en}->{647211} = "Hamilton";
-$areanames{en}->{6472115} = "Taumarunui";
-$areanames{en}->{6472116} = "Thames";
-$areanames{en}->{6472118} = "Taumarunui";
-$areanames{en}->{6472119} = "Thames";
-$areanames{en}->{6472120} = "Putaruru\/Tokoroa";
-$areanames{en}->{6472121} = "Te\ Kuiti";
-$areanames{en}->{6472122} = "Te\ Awamutu";
-$areanames{en}->{6472123} = "Morrinsville";
-$areanames{en}->{6472124} = "Matamata";
-$areanames{en}->{6472125} = "Huntly";
-$areanames{en}->{6472126} = "Otorohanga";
-$areanames{en}->{6472127} = "Paeroa";
-$areanames{en}->{6472128} = "Waihi";
-$areanames{en}->{6472129} = "Whangamata";
-$areanames{en}->{647213} = "Hamilton";
-$areanames{en}->{6472130} = "Tauranga";
-$areanames{en}->{6472131} = "Rotorua";
-$areanames{en}->{6472132} = "Taupo";
-$areanames{en}->{6472133} = "Taupo";
-$areanames{en}->{6472140} = "Putaruru\/Tokoroa";
-$areanames{en}->{6472141} = "Te\ Kuiti";
-$areanames{en}->{6472142} = "Te\ Awamutu";
-$areanames{en}->{6472143} = "Morrinsville";
-$areanames{en}->{6472144} = "Matamata";
-$areanames{en}->{6472145} = "Huntly";
-$areanames{en}->{6472146} = "Otorohanga";
-$areanames{en}->{6472147} = "Paeroa";
-$areanames{en}->{6472148} = "Waihi";
-$areanames{en}->{6472149} = "Whangamata";
-$areanames{en}->{647215} = "Rotorua";
-$areanames{en}->{647216} = "Rotorua";
-$areanames{en}->{647217} = "Taupo";
-$areanames{en}->{647218} = "Tauranga";
-$areanames{en}->{6472190} = "Whakatane";
-$areanames{en}->{6472191} = "Whakatane";
-$areanames{en}->{6472192} = "Whakatane";
-$areanames{en}->{6472193} = "Whakatane";
-$areanames{en}->{6472194} = "Whakatane";
-$areanames{en}->{6472195} = "Rotorua";
-$areanames{en}->{6472196} = "Taupo";
-$areanames{en}->{6472197} = "Tauranga";
-$areanames{en}->{6472198} = "Opotiki";
-$areanames{en}->{6472199} = "Opotiki";
-$areanames{en}->{647220} = "Tauranga";
-$areanames{en}->{6472220} = "Tauranga";
-$areanames{en}->{6472221} = "Tauranga";
-$areanames{en}->{6472222} = "Hamilton";
-$areanames{en}->{6472223} = "Hamilton";
-$areanames{en}->{6472224} = "Taupo";
-$areanames{en}->{6472225} = "Rotorua";
-$areanames{en}->{6472226} = "Te\ Kuiti";
-$areanames{en}->{6472420} = "Hamilton";
-$areanames{en}->{6472424} = "Tauranga";
-$areanames{en}->{6472427} = "Rotorua";
-$areanames{en}->{6472428} = "Taupo";
-$areanames{en}->{6472429} = "Whakatane";
-$areanames{en}->{647245} = "Hamilton";
-$areanames{en}->{6472457} = "Rotorua";
-$areanames{en}->{6472458} = "Rotorua";
-$areanames{en}->{6472459} = "Rotorua";
-$areanames{en}->{6472600} = "Hamilton";
-$areanames{en}->{6472601} = "Hamilton";
-$areanames{en}->{6472602} = "Hamilton";
-$areanames{en}->{6472603} = "Hamilton";
-$areanames{en}->{6472604} = "Hamilton";
-$areanames{en}->{6472605} = "Thames";
-$areanames{en}->{6472606} = "Huntly";
-$areanames{en}->{6472607} = "Paeroa";
-$areanames{en}->{6472608} = "Waihi";
-$areanames{en}->{6472609} = "Whangamata";
-$areanames{en}->{6472610} = "Morrinsville";
-$areanames{en}->{6472611} = "Matamata";
-$areanames{en}->{6472612} = "Te\ Awamutu";
-$areanames{en}->{6472613} = "Putaruru\/Tokoroa";
-$areanames{en}->{6472614} = "Otorohanga";
-$areanames{en}->{6472615} = "Te\ Kuiti";
-$areanames{en}->{6472616} = "Taumarunui";
-$areanames{en}->{6472620} = "Tauranga";
-$areanames{en}->{6472621} = "Tauranga";
-$areanames{en}->{6472622} = "Tauranga";
-$areanames{en}->{6472623} = "Tauranga";
-$areanames{en}->{6472624} = "Whakatane";
-$areanames{en}->{6472625} = "Opotiki";
-$areanames{en}->{6472626} = "Rotorua";
-$areanames{en}->{6472627} = "Rotorua";
-$areanames{en}->{6472628} = "Taupo";
-$areanames{en}->{6472629} = "Taupo";
-$areanames{en}->{6472800} = "Thames";
-$areanames{en}->{6472801} = "Huntly";
-$areanames{en}->{6472802} = "Paeroa";
-$areanames{en}->{6472803} = "Waihi";
-$areanames{en}->{6472804} = "Whangamata";
-$areanames{en}->{6472805} = "Morrinsville";
-$areanames{en}->{6472806} = "Matamata";
-$areanames{en}->{6472807} = "Te\ Awamutu";
-$areanames{en}->{6472808} = "Putaruru\/Tokoroa";
-$areanames{en}->{6472809} = "Otorohanga";
-$areanames{en}->{6472810} = "Tauranga";
-$areanames{en}->{6472811} = "Tauranga";
-$areanames{en}->{6472812} = "Tauranga";
-$areanames{en}->{6472813} = "Waihi";
-$areanames{en}->{6472814} = "Putaruru\/Tokoroa";
-$areanames{en}->{6472815} = "Whakatane";
-$areanames{en}->{6472816} = "Morrinsville";
-$areanames{en}->{6472817} = "Taupo";
-$areanames{en}->{6472818} = "Rotorua";
-$areanames{en}->{6472819} = "Rotorua";
-$areanames{en}->{6472820} = "Hamilton";
-$areanames{en}->{6472821} = "Hamilton";
-$areanames{en}->{6472822} = "Rotorua";
-$areanames{en}->{6472823} = "Whakatane";
-$areanames{en}->{6472826} = "Matamata";
-$areanames{en}->{6472827} = "Tauranga";
-$areanames{en}->{6472828} = "Tauranga";
-$areanames{en}->{6472829} = "Tauranga";
-$areanames{en}->{647304} = "Whakatane";
-$areanames{en}->{647305} = "Whakatane";
-$areanames{en}->{647306} = "Whakatane";
-$areanames{en}->{647307} = "Whakatane";
-$areanames{en}->{647308} = "Whakatane";
-$areanames{en}->{647309} = "Whakatane";
-$areanames{en}->{647312} = "Whakatane";
-$areanames{en}->{647315} = "Opotiki";
-$areanames{en}->{647322} = "Whakatane";
-$areanames{en}->{647323} = "Whakatane";
-$areanames{en}->{647325} = "Opotiki";
-$areanames{en}->{647332} = "Rotorua";
-$areanames{en}->{6473331} = "Rotorua";
-$areanames{en}->{6473332} = "Rotorua";
-$areanames{en}->{6473337} = "Rotorua";
-$areanames{en}->{6473338} = "Rotorua";
-$areanames{en}->{6473339} = "Taupo";
-$areanames{en}->{647334} = "Rotorua";
-$areanames{en}->{647343} = "Rotorua";
-$areanames{en}->{647345} = "Rotorua";
-$areanames{en}->{647346} = "Rotorua";
-$areanames{en}->{647347} = "Rotorua";
-$areanames{en}->{647348} = "Rotorua";
-$areanames{en}->{647349} = "Rotorua";
-$areanames{en}->{647350} = "Rotorua";
-$areanames{en}->{647351} = "Rotorua";
-$areanames{en}->{647357} = "Rotorua";
-$areanames{en}->{647362} = "Rotorua";
-$areanames{en}->{647366} = "Rotorua";
-$areanames{en}->{647372} = "Taupo";
-$areanames{en}->{647374} = "Taupo";
-$areanames{en}->{647376} = "Taupo";
-$areanames{en}->{647377} = "Taupo";
-$areanames{en}->{647378} = "Taupo";
-$areanames{en}->{6473841} = "Taupo";
-$areanames{en}->{6473842} = "Taupo";
-$areanames{en}->{6473843} = "Taupo";
-$areanames{en}->{6473847} = "Taupo";
-$areanames{en}->{647386} = "Taupo";
-$areanames{en}->{647390} = "Hamilton";
-$areanames{en}->{647391} = "Hamilton";
-$areanames{en}->{6473920} = "Huntly";
-$areanames{en}->{6473921} = "Matamata";
-$areanames{en}->{6473922} = "Morrinsville";
-$areanames{en}->{6473923} = "Otorohanga";
-$areanames{en}->{6473924} = "Paeroa";
-$areanames{en}->{6473925} = "Putaruru\/Tokoroa";
-$areanames{en}->{6473926} = "Taumarunui";
-$areanames{en}->{6473927} = "Te\ Kuiti";
-$areanames{en}->{6473928} = "Te\ Awamutu";
-$areanames{en}->{6473929} = "Thames";
-$areanames{en}->{6473930} = "Waihi";
-$areanames{en}->{6473931} = "Whangamata";
-$areanames{en}->{6473932} = "Rotorua";
-$areanames{en}->{6473933} = "Rotorua";
-$areanames{en}->{6473934} = "Rotorua";
-$areanames{en}->{6473935} = "Rotorua";
-$areanames{en}->{6473944} = "Tauranga";
-$areanames{en}->{6473945} = "Tauranga";
-$areanames{en}->{6473946} = "Taupo";
-$areanames{en}->{6473947} = "Whakatane";
-$areanames{en}->{6473948} = "Opotiki";
-$areanames{en}->{6473949} = "Taupo";
-$areanames{en}->{6473990} = "Te\ Awamutu";
-$areanames{en}->{6473991} = "Whakatane";
-$areanames{en}->{6473992} = "Opotiki";
-$areanames{en}->{6473993} = "Te\ Awamutu";
-$areanames{en}->{6473994} = "Rotorua";
-$areanames{en}->{6473995} = "Putaruru\/Tokoroa";
-$areanames{en}->{6473996} = "Otorohanga";
-$areanames{en}->{6473997} = "Te\ Kuiti";
-$areanames{en}->{6473998} = "Taumarunui";
-$areanames{en}->{6473999} = "Taupo";
-$areanames{en}->{6474440} = "Paeroa";
-$areanames{en}->{6474441} = "Waihi";
-$areanames{en}->{6474442} = "Morrinsville";
-$areanames{en}->{6474443} = "Matamata";
-$areanames{en}->{6474444} = "Hamilton";
-$areanames{en}->{6474445} = "Hamilton";
-$areanames{en}->{6474446} = "Otorohanga";
-$areanames{en}->{6474447} = "Te\ Kuiti";
-$areanames{en}->{6474448} = "Taumarunui";
-$areanames{en}->{6474449} = "Opotiki";
-$areanames{en}->{647460} = "Rotorua";
-$areanames{en}->{647462} = "Taupo";
-$areanames{en}->{647463} = "Whakatane";
-$areanames{en}->{6474637} = "Opotiki";
-$areanames{en}->{6474638} = "Opotiki";
-$areanames{en}->{6474639} = "Opotiki";
-$areanames{en}->{647464} = "Hamilton";
-$areanames{en}->{6474648} = "Huntly";
-$areanames{en}->{6474649} = "Matamata";
-$areanames{en}->{6474650} = "Morrinsville";
-$areanames{en}->{6474651} = "Otorohanga";
-$areanames{en}->{6474652} = "Paeroa";
-$areanames{en}->{6474653} = "Putaruru\/Tokoroa";
-$areanames{en}->{6474654} = "Taumarunui";
-$areanames{en}->{6474655} = "Te\ Kuiti";
-$areanames{en}->{6474656} = "Te\ Awamutu";
-$areanames{en}->{6474657} = "Thames";
-$areanames{en}->{6474658} = "Waihi";
-$areanames{en}->{6474659} = "Whangamata";
-$areanames{en}->{647466} = "Tauranga";
-$areanames{en}->{647533} = "Tauranga";
-$areanames{en}->{647541} = "Tauranga";
-$areanames{en}->{647542} = "Tauranga";
-$areanames{en}->{647543} = "Tauranga";
-$areanames{en}->{647544} = "Tauranga";
-$areanames{en}->{647546} = "Tauranga";
-$areanames{en}->{647547} = "Tauranga";
-$areanames{en}->{6475480} = "Tauranga";
-$areanames{en}->{6475481} = "Tauranga";
-$areanames{en}->{6475482} = "Tauranga";
-$areanames{en}->{6475483} = "Tauranga";
-$areanames{en}->{647549} = "Tauranga";
-$areanames{en}->{647551} = "Tauranga";
-$areanames{en}->{647552} = "Tauranga";
-$areanames{en}->{647557} = "Tauranga";
-$areanames{en}->{6475600} = "Hamilton";
-$areanames{en}->{6475601} = "Hamilton";
-$areanames{en}->{6475602} = "Hamilton";
-$areanames{en}->{6475603} = "Hamilton";
-$areanames{en}->{6475604} = "Hamilton";
-$areanames{en}->{6475605} = "Huntly";
-$areanames{en}->{6475606} = "Matamata";
-$areanames{en}->{6475607} = "Morrinsville";
-$areanames{en}->{6475608} = "Otorohanga";
-$areanames{en}->{6475609} = "Paeroa";
-$areanames{en}->{6475610} = "Putaruru\/Tokoroa";
-$areanames{en}->{6475611} = "Taumarunui";
-$areanames{en}->{6475612} = "Te\ Kuiti";
-$areanames{en}->{6475613} = "Te\ Awamutu";
-$areanames{en}->{6475614} = "Thames";
-$areanames{en}->{6475615} = "Waihi";
-$areanames{en}->{6475616} = "Whangamata";
-$areanames{en}->{6475617} = "Whakatane";
-$areanames{en}->{6475618} = "Opotiki";
-$areanames{en}->{6475619} = "Hamilton";
-$areanames{en}->{6475620} = "Tauranga";
-$areanames{en}->{6475621} = "Tauranga";
-$areanames{en}->{6475622} = "Tauranga";
-$areanames{en}->{6475623} = "Tauranga";
-$areanames{en}->{6475624} = "Rotorua";
-$areanames{en}->{6475625} = "Rotorua";
-$areanames{en}->{6475626} = "Taupo";
-$areanames{en}->{6475627} = "Taupo";
-$areanames{en}->{6475628} = "Tauranga";
-$areanames{en}->{64757} = "Tauranga";
-$areanames{en}->{6475820} = "Hamilton";
-$areanames{en}->{6475821} = "Hamilton";
-$areanames{en}->{6475823} = "Hamilton";
-$areanames{en}->{6475824} = "Hamilton";
-$areanames{en}->{6475825} = "Hamilton";
-$areanames{en}->{6475826} = "Hamilton";
-$areanames{en}->{6475827} = "Hamilton";
-$areanames{en}->{6475828} = "Hamilton";
-$areanames{en}->{6475829} = "Hamilton";
-$areanames{en}->{647589} = "Hamilton";
-$areanames{en}->{647590} = "Hamilton";
-$areanames{en}->{6475950} = "Hamilton";
-$areanames{en}->{6475958} = "Taupo";
-$areanames{en}->{6477770} = "Tauranga";
-$areanames{en}->{6477771} = "Whakatane";
-$areanames{en}->{6477772} = "Rotorua";
-$areanames{en}->{6477773} = "Taupo";
-$areanames{en}->{6477774} = "Thames";
-$areanames{en}->{6477775} = "Huntly";
-$areanames{en}->{6477776} = "Whangamata";
-$areanames{en}->{6477777} = "Hamilton";
-$areanames{en}->{6477778} = "Te\ Awamutu";
-$areanames{en}->{6477779} = "Putaruru\/Tokoroa";
-$areanames{en}->{6477880} = "Hamilton";
-$areanames{en}->{6477881} = "Hamilton";
-$areanames{en}->{6477882} = "Hamilton";
-$areanames{en}->{6477883} = "Hamilton";
-$areanames{en}->{6477884} = "Tauranga";
-$areanames{en}->{6477885} = "Tauranga";
-$areanames{en}->{6477886} = "Rotorua";
-$areanames{en}->{6477887} = "Te\ Awamutu";
-$areanames{en}->{6477888} = "Taupo";
-$areanames{en}->{6477889} = "Whakatane";
-$areanames{en}->{6478070} = "Morrinsville";
-$areanames{en}->{6478071} = "Otorohanga";
-$areanames{en}->{6478072} = "Paeroa";
-$areanames{en}->{6478073} = "Tokoroa\/Putaruru";
-$areanames{en}->{6478074} = "Taumarunui";
-$areanames{en}->{6478075} = "Te\ Kuiti";
-$areanames{en}->{6478076} = "Te\ Awamutu";
-$areanames{en}->{6478077} = "Waihi";
-$areanames{en}->{6478078} = "Whangamata";
-$areanames{en}->{6478079} = "Hamilton";
-$areanames{en}->{6478080} = "Hamilton";
-$areanames{en}->{6478081} = "Rotorua";
-$areanames{en}->{6478082} = "Tauranga";
-$areanames{en}->{6478083} = "Hamilton";
-$areanames{en}->{6478084} = "Hamilton";
-$areanames{en}->{6478085} = "Tauranga";
-$areanames{en}->{6478086} = "Hamilton";
-$areanames{en}->{6478090} = "Thames";
-$areanames{en}->{6478091} = "Matamata";
-$areanames{en}->{6478092} = "Huntly";
-$areanames{en}->{6478093} = "Rotorua";
-$areanames{en}->{6478094} = "Tauranga";
-$areanames{en}->{6478095} = "Taupo";
-$areanames{en}->{6478097} = "Whakatane";
-$areanames{en}->{647812} = "Hamilton";
-$areanames{en}->{6478128} = "Huntly";
-$areanames{en}->{6478129} = "Matamata";
-$areanames{en}->{6478130} = "Morrinsville";
-$areanames{en}->{6478131} = "Otorohanga";
-$areanames{en}->{6478132} = "Paeroa";
-$areanames{en}->{6478133} = "Putaruru\/Tokoroa";
-$areanames{en}->{6478134} = "Taumarunui";
-$areanames{en}->{6478135} = "Te\ Kuiti";
-$areanames{en}->{6478136} = "Te\ Awamutu";
-$areanames{en}->{6478137} = "Thames";
-$areanames{en}->{6478138} = "Waihi";
-$areanames{en}->{6478139} = "Whangamata";
-$areanames{en}->{6478140} = "Rotorua";
-$areanames{en}->{6478141} = "Taupo";
-$areanames{en}->{6478142} = "Whakatane";
-$areanames{en}->{6478143} = "Opotiki";
-$areanames{en}->{6478144} = "Tauranga";
-$areanames{en}->{647823} = "Hamilton";
-$areanames{en}->{647824} = "Hamilton";
-$areanames{en}->{647825} = "Hamilton";
-$areanames{en}->{647826} = "Huntly";
-$areanames{en}->{647827} = "Hamilton";
-$areanames{en}->{647828} = "Huntly";
-$areanames{en}->{647829} = "Hamilton";
-$areanames{en}->{647832} = "Hamilton";
-$areanames{en}->{647833} = "Hamilton";
-$areanames{en}->{647834} = "Hamilton";
-$areanames{en}->{647836} = "Hamilton";
-$areanames{en}->{647837} = "Hamilton";
-$areanames{en}->{647838} = "Hamilton";
-$areanames{en}->{647839} = "Hamilton";
-$areanames{en}->{647843} = "Hamilton";
-$areanames{en}->{6478450} = "Hamilton";
-$areanames{en}->{6478451} = "Hamilton";
-$areanames{en}->{647846} = "Hamilton";
-$areanames{en}->{647847} = "Hamilton";
-$areanames{en}->{647848} = "Hamilton";
-$areanames{en}->{647849} = "Hamilton";
-$areanames{en}->{647850} = "Hamilton";
-$areanames{en}->{647851} = "Hamilton";
-$areanames{en}->{647852} = "Hamilton";
-$areanames{en}->{647853} = "Hamilton";
-$areanames{en}->{647854} = "Hamilton";
-$areanames{en}->{647855} = "Hamilton";
-$areanames{en}->{647856} = "Hamilton";
-$areanames{en}->{647857} = "Hamilton";
-$areanames{en}->{647858} = "Hamilton";
-$areanames{en}->{6478590} = "Hamilton";
-$areanames{en}->{6478591} = "Hamilton";
-$areanames{en}->{6478592} = "Hamilton";
-$areanames{en}->{6478593} = "Hamilton";
-$areanames{en}->{6478594} = "Hamilton";
-$areanames{en}->{6478595} = "Hamilton";
-$areanames{en}->{6478597} = "Hamilton";
-$areanames{en}->{6478598} = "Hamilton";
-$areanames{en}->{6478599} = "Hamilton";
-$areanames{en}->{647862} = "Paeroa";
-$areanames{en}->{647863} = "Waihi";
-$areanames{en}->{647864} = "Thames";
-$areanames{en}->{647865} = "Whangamata";
-$areanames{en}->{647866} = "Thames";
-$areanames{en}->{647867} = "Thames";
-$areanames{en}->{647868} = "Thames";
-$areanames{en}->{647869} = "Thames";
-$areanames{en}->{647870} = "Te\ Awamutu";
-$areanames{en}->{647871} = "Te\ Awamutu";
-$areanames{en}->{647872} = "Te\ Awamutu";
-$areanames{en}->{647873} = "Otorohanga";
-$areanames{en}->{647876} = "Te\ Kuiti";
-$areanames{en}->{647877} = "Te\ Kuiti";
-$areanames{en}->{647878} = "Te\ Kuiti";
-$areanames{en}->{647880} = "Matamata";
-$areanames{en}->{647881} = "Matamata";
-$areanames{en}->{647882} = "Putaruru\/Tokoroa";
-$areanames{en}->{647883} = "Putaruru\/Tokoroa";
-$areanames{en}->{647884} = "Morrinsville";
-$areanames{en}->{647885} = "Putaruru\/Tokoroa";
-$areanames{en}->{647886} = "Putaruru\/Tokoroa";
-$areanames{en}->{647887} = "Morrinsville";
-$areanames{en}->{647888} = "Matamata";
-$areanames{en}->{647889} = "Morrinsville";
-$areanames{en}->{647892} = "Taumarunui";
-$areanames{en}->{647893} = "Taumarunui";
-$areanames{en}->{647894} = "Taumarunui";
-$areanames{en}->{647895} = "Taumarunui";
-$areanames{en}->{647896} = "Taumarunui";
-$areanames{en}->{6478990} = "Thames";
-$areanames{en}->{6478991} = "Whangamata";
-$areanames{en}->{6478992} = "Paeroa";
-$areanames{en}->{6478993} = "Waihi";
-$areanames{en}->{6478994} = "Tauranga";
-$areanames{en}->{6478995} = "Matamata";
-$areanames{en}->{6478996} = "Huntly";
-$areanames{en}->{6478997} = "Morrinsville";
-$areanames{en}->{6478998} = "Hamilton";
-$areanames{en}->{6478999} = "Hamilton";
-$areanames{en}->{6479000} = "Hamilton";
-$areanames{en}->{6479001} = "Hamilton";
-$areanames{en}->{6479002} = "Matamata";
-$areanames{en}->{6479003} = "Thames";
-$areanames{en}->{6479004} = "Te\ Awamutu";
-$areanames{en}->{6479005} = "Tauranga";
-$areanames{en}->{6479006} = "Taupo";
-$areanames{en}->{6479007} = "Whakatane";
-$areanames{en}->{6479008} = "Rotorua";
-$areanames{en}->{6479009} = "Hamilton";
-$areanames{en}->{6479010} = "Thames";
-$areanames{en}->{6479014} = "Matamata";
-$areanames{en}->{6479018} = "Putaruru\/Tokoroa";
-$areanames{en}->{6479019} = "Whangamata";
-$areanames{en}->{6479020} = "Te\ Awamutu";
-$areanames{en}->{6479021} = "Te\ Awamutu";
-$areanames{en}->{6479022} = "Morrinsville";
-$areanames{en}->{6479025} = "Huntly";
-$areanames{en}->{6479026} = "Paeroa";
-$areanames{en}->{6479027} = "Paeroa";
-$areanames{en}->{6479029} = "Waihi";
-$areanames{en}->{647903} = "Hamilton";
-$areanames{en}->{6479040} = "Otorohanga";
-$areanames{en}->{6479045} = "Taumarunui";
-$areanames{en}->{6479049} = "Te\ Kuiti";
-$areanames{en}->{647905} = "Taupo";
-$areanames{en}->{647906} = "Taupo";
-$areanames{en}->{6479090} = "Taupo";
-$areanames{en}->{6479091} = "Taupo";
-$areanames{en}->{6479100} = "Rotorua";
-$areanames{en}->{6479101} = "Rotorua";
-$areanames{en}->{6479102} = "Rotorua";
-$areanames{en}->{6479107} = "Whakatane";
-$areanames{en}->{6479108} = "Whakatane";
-$areanames{en}->{6479109} = "Opotiki";
-$areanames{en}->{647920} = "Rotorua";
-$areanames{en}->{647921} = "Rotorua";
-$areanames{en}->{647922} = "Whakatane";
-$areanames{en}->{6479229} = "Opotiki";
-$areanames{en}->{647923} = "Whakatane";
-$areanames{en}->{6479230} = "Opotiki";
-$areanames{en}->{6479240} = "Taupo";
-$areanames{en}->{6479241} = "Whakatane";
-$areanames{en}->{6479242} = "Rotorua";
-$areanames{en}->{6479244} = "Tauranga";
-$areanames{en}->{6479245} = "Matamata";
-$areanames{en}->{6479246} = "Thames";
-$areanames{en}->{6479247} = "Hamilton";
-$areanames{en}->{6479249} = "Huntly";
-$areanames{en}->{647925} = "Tauranga";
-$areanames{en}->{647926} = "Tauranga";
-$areanames{en}->{647927} = "Tauranga";
-$areanames{en}->{647928} = "Tauranga";
-$areanames{en}->{6479290} = "Hamilton";
-$areanames{en}->{6479291} = "Hamilton";
-$areanames{en}->{6479292} = "Hamilton";
-$areanames{en}->{6479293} = "Hamilton";
-$areanames{en}->{6479294} = "Hamilton";
-$areanames{en}->{6479295} = "Whakatane";
-$areanames{en}->{6479296} = "Tauranga";
-$areanames{en}->{6479297} = "Tauranga";
-$areanames{en}->{6479298} = "Taupo";
-$areanames{en}->{6479299} = "Rotorua";
-$areanames{en}->{6479420} = "Tauranga";
-$areanames{en}->{6479421} = "Tauranga";
-$areanames{en}->{6479422} = "Tauranga";
-$areanames{en}->{647949} = "Hamilton";
-$areanames{en}->{6479500} = "Whakatane";
-$areanames{en}->{6479501} = "Opotiki";
-$areanames{en}->{647957} = "Hamilton";
-$areanames{en}->{647958} = "Hamilton";
-$areanames{en}->{647959} = "Hamilton";
-$areanames{en}->{647960} = "Hamilton";
-$areanames{en}->{647961} = "Hamilton";
-$areanames{en}->{647968} = "Hamilton";
-$areanames{en}->{647970} = "Hamilton";
-$areanames{en}->{6479708} = "Thames";
-$areanames{en}->{6479709} = "Matamata";
-$areanames{en}->{6479710} = "Putaruru\/Tokoroa";
-$areanames{en}->{6479711} = "Whangamata";
-$areanames{en}->{6479712} = "Te\ Awamutu";
-$areanames{en}->{6479713} = "Morrinsville";
-$areanames{en}->{6479714} = "Huntly";
-$areanames{en}->{6479715} = "Paeroa";
-$areanames{en}->{6479716} = "Waihi";
-$areanames{en}->{6479717} = "Otorohanga";
-$areanames{en}->{6479718} = "Taumarunui";
-$areanames{en}->{6479719} = "Te\ Kuiti";
-$areanames{en}->{647974} = "Hamilton";
-$areanames{en}->{6479746} = "Opotiki";
-$areanames{en}->{6479747} = "Te\ Kuiti";
-$areanames{en}->{6479748} = "Taumarunui";
-$areanames{en}->{6479750} = "Tauranga";
-$areanames{en}->{6479751} = "Tauranga";
-$areanames{en}->{6479752} = "Rotorua";
-$areanames{en}->{6479753} = "Taupo";
-$areanames{en}->{6479754} = "Tauranga";
-$areanames{en}->{647980} = "Hamilton";
-$areanames{en}->{647981} = "Hamilton";
-$areanames{en}->{647982} = "Hamilton";
-$areanames{en}->{647983} = "Hamilton";
-$areanames{en}->{6479841} = "Huntly";
-$areanames{en}->{6479842} = "Matamata";
-$areanames{en}->{6479843} = "Morrinsville";
-$areanames{en}->{6479844} = "Otorohanga";
-$areanames{en}->{6479845} = "Paeroa";
-$areanames{en}->{6479846} = "Taumarunui";
-$areanames{en}->{6479847} = "Te\ Awamutu";
-$areanames{en}->{6479848} = "Te\ Kuiti";
-$areanames{en}->{6479849} = "Thames";
-$areanames{en}->{6479850} = "Tokoroa";
-$areanames{en}->{6479851} = "Waihi";
-$areanames{en}->{6479852} = "Whangamata";
-$areanames{en}->{6479853} = "Putaruru";
-$areanames{en}->{6479854} = "Rotorua";
-$areanames{en}->{6479855} = "Taupo";
-$areanames{en}->{6479856} = "Tauranga";
-$areanames{en}->{6479857} = "Opotiki";
-$areanames{en}->{6479858} = "Whakatane";
-$areanames{en}->{6479859} = "Tauranga";
-$areanames{en}->{647986} = "Hamilton";
-$areanames{en}->{647987} = "Tauranga";
-$areanames{en}->{647988} = "Rotorua";
-$areanames{en}->{647989} = "Taupo";
-$areanames{en}->{649200} = "Auckland";
-$areanames{en}->{6492006} = "Helensville";
-$areanames{en}->{6492007} = "Warkworth";
-$areanames{en}->{6492008} = "Hibiscus\ Coast";
-$areanames{en}->{6492009} = "Pukekohe";
-$areanames{en}->{649210} = "Auckland";
-$areanames{en}->{649211} = "Auckland";
-$areanames{en}->{649212} = "Auckland";
-$areanames{en}->{649213} = "Auckland";
-$areanames{en}->{649214} = "Auckland";
-$areanames{en}->{649215} = "Auckland";
-$areanames{en}->{649216} = "Auckland";
-$areanames{en}->{649218} = "Auckland";
-$areanames{en}->{649220} = "Auckland";
-$areanames{en}->{6492220} = "Auckland";
-$areanames{en}->{6492221} = "Auckland";
-$areanames{en}->{6492222} = "Auckland";
-$areanames{en}->{6492223} = "Auckland";
-$areanames{en}->{6492224} = "Auckland";
-$areanames{en}->{6492225} = "Pukekohe";
-$areanames{en}->{6492226} = "Helensville";
-$areanames{en}->{6492227} = "Whangarei";
-$areanames{en}->{6492228} = "Warkworth";
-$areanames{en}->{6492229} = "Hibiscus\ Coast";
-$areanames{en}->{649230} = "Pukekohe";
-$areanames{en}->{649232} = "Pukekohe";
-$areanames{en}->{649233} = "Pukekohe";
-$areanames{en}->{649235} = "Pukekohe";
-$areanames{en}->{649236} = "Pukekohe";
-$areanames{en}->{649237} = "Pukekohe";
-$areanames{en}->{649238} = "Pukekohe";
-$areanames{en}->{649239} = "Pukekohe";
-$areanames{en}->{6492420} = "Auckland";
-$areanames{en}->{6492426} = "Whangarei";
-$areanames{en}->{6492427} = "Warkworth";
-$areanames{en}->{6492428} = "Hibiscus\ Coast";
-$areanames{en}->{6492429} = "Pukekohe";
-$areanames{en}->{649248} = "Auckland";
-$areanames{en}->{649249} = "Auckland";
-$areanames{en}->{64925} = "Auckland";
-$areanames{en}->{64926} = "Auckland";
-$areanames{en}->{64927} = "Auckland";
-$areanames{en}->{649280} = "Auckland";
-$areanames{en}->{6492807} = "Helensville";
-$areanames{en}->{6492808} = "Great\ Barrier\ Island";
-$areanames{en}->{6492809} = "Maungaturoto";
-$areanames{en}->{649281} = "Auckland";
-$areanames{en}->{649282} = "Auckland";
-$areanames{en}->{6492830} = "Auckland";
-$areanames{en}->{6492831} = "Maungaturoto";
-$areanames{en}->{6492832} = "Dargaville";
-$areanames{en}->{6492833} = "Warkworth";
-$areanames{en}->{6492834} = "Kawakawa";
-$areanames{en}->{6492835} = "Kaikohe";
-$areanames{en}->{6492836} = "Kaitaia";
-$areanames{en}->{6492837} = "Hibiscus\ Coast";
-$areanames{en}->{6492838} = "Pukekohe";
-$areanames{en}->{6492839} = "Whangarei";
-$areanames{en}->{649291} = "Auckland";
-$areanames{en}->{649292} = "Auckland";
-$areanames{en}->{649294} = "Auckland";
-$areanames{en}->{649295} = "Auckland";
-$areanames{en}->{649296} = "Auckland";
-$areanames{en}->{649297} = "Auckland";
-$areanames{en}->{649298} = "Auckland";
-$areanames{en}->{649299} = "Auckland";
-$areanames{en}->{64930} = "Auckland";
-$areanames{en}->{649320} = "Auckland";
-$areanames{en}->{6493206} = "Pukekohe";
-$areanames{en}->{6493207} = "Hibiscus\ Coast";
-$areanames{en}->{6493208} = "Helensville";
-$areanames{en}->{6493209} = "Great\ Barrier\ Island";
-$areanames{en}->{64933} = "Auckland";
-$areanames{en}->{649347} = "Auckland";
-$areanames{en}->{649348} = "Auckland";
-$areanames{en}->{649349} = "Auckland";
-$areanames{en}->{64935} = "Auckland";
-$areanames{en}->{64936} = "Auckland";
-$areanames{en}->{64937} = "Auckland";
-$areanames{en}->{649390} = "Auckland";
-$areanames{en}->{649391} = "Auckland";
-$areanames{en}->{649392} = "Auckland";
-$areanames{en}->{6493930} = "Whangarei";
-$areanames{en}->{6493931} = "Whangarei";
-$areanames{en}->{6493932} = "Dargaville";
-$areanames{en}->{6493933} = "Kaikohe";
-$areanames{en}->{6493934} = "Kaitaia";
-$areanames{en}->{6493935} = "Kawakawa";
-$areanames{en}->{6493936} = "Maungaturoto";
-$areanames{en}->{6493937} = "Warkworth";
-$areanames{en}->{6493938} = "Auckland";
-$areanames{en}->{6493939} = "Auckland";
-$areanames{en}->{649394} = "Auckland";
-$areanames{en}->{6493942} = "Great\ Barrier\ Island";
-$areanames{en}->{6493943} = "Helensville";
-$areanames{en}->{6493944} = "Hibiscus\ Coast";
-$areanames{en}->{649399} = "Auckland";
-$areanames{en}->{6493990} = "Great\ Barrier\ Island";
-$areanames{en}->{6493991} = "Pukekohe";
-$areanames{en}->{649400} = "Kaikohe";
-$areanames{en}->{649401} = "Kaikohe";
-$areanames{en}->{649402} = "Kawakawa";
-$areanames{en}->{649403} = "Kawakawa";
-$areanames{en}->{649404} = "Kawakawa";
-$areanames{en}->{649405} = "Kaikohe";
-$areanames{en}->{649406} = "Kaitaia";
-$areanames{en}->{649407} = "Kaikohe";
-$areanames{en}->{649408} = "Kaitaia";
-$areanames{en}->{649409} = "Kaitaia";
-$areanames{en}->{64941} = "Auckland";
-$areanames{en}->{649420} = "Helensville";
-$areanames{en}->{649421} = "Hibiscus\ Coast";
-$areanames{en}->{649422} = "Warkworth";
-$areanames{en}->{649423} = "Warkworth";
-$areanames{en}->{649424} = "Hibiscus\ Coast";
-$areanames{en}->{649425} = "Warkworth";
-$areanames{en}->{649426} = "Hibiscus\ Coast";
-$areanames{en}->{649427} = "Hibiscus\ Coast";
-$areanames{en}->{649428} = "Hibiscus\ Coast";
-$areanames{en}->{649429} = "Great\ Barrier\ Island";
-$areanames{en}->{64943} = "Whangarei";
-$areanames{en}->{649431} = "Maungaturoto";
-$areanames{en}->{6494312} = "Warkworth";
-$areanames{en}->{6494313} = "Warkworth";
-$areanames{en}->{6494314} = "Warkworth";
-$areanames{en}->{6494315} = "Warkworth";
-$areanames{en}->{649439} = "Dargaville";
-$areanames{en}->{64944} = "Auckland";
-$areanames{en}->{649451} = "Auckland";
-$areanames{en}->{649452} = "Auckland";
-$areanames{en}->{649458} = "Dargaville";
-$areanames{en}->{649459} = "Whangarei";
-$areanames{en}->{6494700} = "Whangarei";
-$areanames{en}->{6494701} = "Whangarei";
-$areanames{en}->{6494702} = "Whangarei";
-$areanames{en}->{6494703} = "Whangarei";
-$areanames{en}->{6494704} = "Whangarei";
-$areanames{en}->{6494705} = "Whangarei";
-$areanames{en}->{6494706} = "Whangarei";
-$areanames{en}->{649473} = "Auckland";
-$areanames{en}->{649475} = "Auckland";
-$areanames{en}->{649476} = "Auckland";
-$areanames{en}->{649477} = "Auckland";
-$areanames{en}->{649478} = "Auckland";
-$areanames{en}->{649479} = "Auckland";
-$areanames{en}->{64948} = "Auckland";
-$areanames{en}->{64952} = "Auckland";
-$areanames{en}->{64953} = "Auckland";
-$areanames{en}->{649550} = "Auckland";
-$areanames{en}->{649551} = "Auckland";
-$areanames{en}->{649552} = "Pukekohe";
-$areanames{en}->{6495530} = "Great\ Barrier\ Island";
-$areanames{en}->{6495531} = "Helensville";
-$areanames{en}->{6495532} = "Warkworth";
-$areanames{en}->{6495533} = "Whangarei";
-$areanames{en}->{6495538} = "Auckland";
-$areanames{en}->{6495539} = "Auckland";
-$areanames{en}->{649554} = "Hibiscus\ Coast";
-$areanames{en}->{649555} = "Auckland";
-$areanames{en}->{6495560} = "Whangarei";
-$areanames{en}->{6495561} = "Whangarei";
-$areanames{en}->{6495562} = "Whangarei";
-$areanames{en}->{6495563} = "Whangarei";
-$areanames{en}->{6495564} = "Whangarei";
-$areanames{en}->{6495565} = "Dargaville";
-$areanames{en}->{6495566} = "Kaikohe";
-$areanames{en}->{6495567} = "Kaitaia";
-$areanames{en}->{6495568} = "Kawakawa";
-$areanames{en}->{6495569} = "Maungaturoto";
-$areanames{en}->{649557} = "Auckland";
-$areanames{en}->{649558} = "Auckland";
-$areanames{en}->{6495588} = "Hibiscus\ Coast";
-$areanames{en}->{6495589} = "Pukekohe";
-$areanames{en}->{64957} = "Auckland";
-$areanames{en}->{649580} = "Auckland";
-$areanames{en}->{649581} = "Auckland";
-$areanames{en}->{649582} = "Auckland";
-$areanames{en}->{649583} = "Auckland";
-$areanames{en}->{649585} = "Auckland";
-$areanames{en}->{649588} = "Auckland";
-$areanames{en}->{649589} = "Auckland";
-$areanames{en}->{649590} = "Auckland";
-$areanames{en}->{649600} = "Auckland";
-$areanames{en}->{6496007} = "Helensville";
-$areanames{en}->{6496008} = "Hibiscus\ Coast";
-$areanames{en}->{6496009} = "Pukekohe";
-$areanames{en}->{6496010} = "Kaitaia";
-$areanames{en}->{6496011} = "Kaikohe";
-$areanames{en}->{6496012} = "Kawakawa";
-$areanames{en}->{6496013} = "Whangarei";
-$areanames{en}->{6496014} = "Dargaville";
-$areanames{en}->{6496015} = "Maungaturoto";
-$areanames{en}->{6496016} = "Warkworth";
-$areanames{en}->{6496017} = "Great\ Barrier\ Island";
-$areanames{en}->{6496018} = "Auckland";
-$areanames{en}->{6496019} = "Auckland";
-$areanames{en}->{6496100} = "Pukekohe";
-$areanames{en}->{64962} = "Auckland";
-$areanames{en}->{649630} = "Auckland";
-$areanames{en}->{649631} = "Auckland";
-$areanames{en}->{649632} = "Auckland";
-$areanames{en}->{649633} = "Auckland";
-$areanames{en}->{649634} = "Auckland";
-$areanames{en}->{649635} = "Auckland";
-$areanames{en}->{649636} = "Auckland";
-$areanames{en}->{649638} = "Auckland";
-$areanames{en}->{649639} = "Auckland";
-$areanames{en}->{649640} = "Auckland";
-$areanames{en}->{649650} = "Auckland";
-$areanames{en}->{6496507} = "Helensville";
-$areanames{en}->{6496508} = "Hibiscus\ Coast";
-$areanames{en}->{6496509} = "Pukekohe";
-$areanames{en}->{6496510} = "Whangarei";
-$areanames{en}->{6496511} = "Whangarei";
-$areanames{en}->{6496512} = "Whangarei";
-$areanames{en}->{6496513} = "Whangarei";
-$areanames{en}->{6496514} = "Whangarei";
-$areanames{en}->{6496515} = "Dargaville";
-$areanames{en}->{6496516} = "Kaikohe";
-$areanames{en}->{6496517} = "Kaitaia";
-$areanames{en}->{6496518} = "Kawakawa";
-$areanames{en}->{6496519} = "Maungaturoto";
-$areanames{en}->{649652} = "Warkworth";
-$areanames{en}->{649666} = "Auckland";
-$areanames{en}->{6496880} = "Auckland";
-$areanames{en}->{6496881} = "Auckland";
-$areanames{en}->{6496882} = "Auckland";
-$areanames{en}->{6496883} = "Auckland";
-$areanames{en}->{6496884} = "Auckland";
-$areanames{en}->{6496990} = "Kaitaia";
-$areanames{en}->{6496991} = "Kaikohe";
-$areanames{en}->{6496992} = "Kawakawa";
-$areanames{en}->{6496993} = "Whangarei";
-$areanames{en}->{6496994} = "Dargaville";
-$areanames{en}->{6496995} = "Maungaturoto";
-$areanames{en}->{6496996} = "Warkworth";
-$areanames{en}->{6496997} = "Hibiscus\ Coast";
-$areanames{en}->{6496998} = "Helensville";
-$areanames{en}->{6496999} = "Auckland";
-$areanames{en}->{6497770} = "Whangarei";
-$areanames{en}->{6497771} = "Kaikohe";
-$areanames{en}->{6497772} = "Kaitaia";
-$areanames{en}->{6497773} = "Dargaville";
-$areanames{en}->{6497774} = "Warkworth";
-$areanames{en}->{6497775} = "Helensville";
-$areanames{en}->{6497776} = "Hibiscus\ Coast";
-$areanames{en}->{6497777} = "Auckland";
-$areanames{en}->{6497778} = "Pukekohe";
-$areanames{en}->{6497779} = "Great\ Barrier\ Island";
-$areanames{en}->{649801} = "Auckland";
-$areanames{en}->{6498016} = "Hibiscus\ Coast";
-$areanames{en}->{6498017} = "Hibiscus\ Coast";
-$areanames{en}->{6498018} = "Whangarei";
-$areanames{en}->{6498019} = "Pukekohe";
-$areanames{en}->{649810} = "Auckland";
-$areanames{en}->{649811} = "Auckland";
-$areanames{en}->{649812} = "Auckland";
-$areanames{en}->{649813} = "Auckland";
-$areanames{en}->{649814} = "Auckland";
-$areanames{en}->{649815} = "Auckland";
-$areanames{en}->{649816} = "Auckland";
-$areanames{en}->{649817} = "Auckland";
-$areanames{en}->{649818} = "Auckland";
-$areanames{en}->{649820} = "Auckland";
-$areanames{en}->{649822} = "Auckland";
-$areanames{en}->{649825} = "Auckland";
-$areanames{en}->{649826} = "Auckland";
-$areanames{en}->{649827} = "Auckland";
-$areanames{en}->{649828} = "Auckland";
-$areanames{en}->{649829} = "Auckland";
-$areanames{en}->{64983} = "Auckland";
-$areanames{en}->{649840} = "Auckland";
-$areanames{en}->{649845} = "Auckland";
-$areanames{en}->{649846} = "Auckland";
-$areanames{en}->{649847} = "Auckland";
-$areanames{en}->{649849} = "Auckland";
-$areanames{en}->{649869} = "Auckland";
-$areanames{en}->{6498690} = "Kawakawa";
-$areanames{en}->{6498691} = "Maungaturoto";
-$areanames{en}->{649880} = "Auckland";
-$areanames{en}->{649881} = "Auckland";
-$areanames{en}->{6498814} = "Pukekohe";
-$areanames{en}->{6498815} = "Helensville";
-$areanames{en}->{6498816} = "Great\ Barrier\ Island";
-$areanames{en}->{6498817} = "Hibiscus\ Coast";
-$areanames{en}->{6498820} = "Whangarei";
-$areanames{en}->{6498821} = "Dargaville";
-$areanames{en}->{6498822} = "Kaikohe";
-$areanames{en}->{6498823} = "Kaitaia";
-$areanames{en}->{6498824} = "Kawakawa";
-$areanames{en}->{6498825} = "Maungaturoto";
-$areanames{en}->{6498826} = "Warkworth";
-$areanames{en}->{649883} = "Auckland";
-$areanames{en}->{649884} = "Auckland";
-$areanames{en}->{6498850} = "Great\ Barrier\ Island";
-$areanames{en}->{6498851} = "Pukekohe";
-$areanames{en}->{6498852} = "Warkworth";
-$areanames{en}->{6498853} = "Whangarei";
-$areanames{en}->{6498854} = "Hibiscus\ Coast";
-$areanames{en}->{6498855} = "Kawakawa";
-$areanames{en}->{6498856} = "Maungaturoto";
-$areanames{en}->{6498857} = "Dargaville";
-$areanames{en}->{6498858} = "Kaikohe";
-$areanames{en}->{6498859} = "Kaitaia";
-$areanames{en}->{649886} = "Auckland";
-$areanames{en}->{649887} = "Auckland";
-$areanames{en}->{649888} = "Auckland";
-$areanames{en}->{6498880} = "Helensville";
-$areanames{en}->{6498881} = "Hibiscus\ Coast";
-$areanames{en}->{6498882} = "Whangarei";
-$areanames{en}->{6498883} = "Whangarei";
-$areanames{en}->{649889} = "Auckland";
-$areanames{en}->{649890} = "Auckland";
-$areanames{en}->{6498900} = "Pukekohe";
-$areanames{en}->{6498901} = "Pukekohe";
-$areanames{en}->{649892} = "Auckland";
-$areanames{en}->{6499000} = "Auckland";
-$areanames{en}->{6499001} = "Auckland";
-$areanames{en}->{6499002} = "Auckland";
-$areanames{en}->{6499003} = "Warkworth";
-$areanames{en}->{6499004} = "Hibiscus\ Coast";
-$areanames{en}->{6499005} = "Auckland";
-$areanames{en}->{6499006} = "Whangarei";
-$areanames{en}->{6499007} = "Kaikohe";
-$areanames{en}->{6499008} = "Pukekohe";
-$areanames{en}->{6499009} = "Auckland";
-$areanames{en}->{6499010} = "Kaitaia";
-$areanames{en}->{6499011} = "Kaitaia";
-$areanames{en}->{6499012} = "Kawakawa";
-$areanames{en}->{6499013} = "Kawakawa";
-$areanames{en}->{6499014} = "Dargaville";
-$areanames{en}->{6499015} = "Dargaville";
-$areanames{en}->{6499016} = "Kaikohe";
-$areanames{en}->{6499017} = "Kaikohe";
-$areanames{en}->{6499018} = "Maungaturoto";
-$areanames{en}->{6499019} = "Maungaturoto";
-$areanames{en}->{649902} = "Warkworth";
-$areanames{en}->{649903} = "Auckland";
-$areanames{en}->{6499040} = "Helensville";
-$areanames{en}->{6499041} = "Helensville";
-$areanames{en}->{6499042} = "Hibiscus\ Coast";
-$areanames{en}->{6499043} = "Hibiscus\ Coast";
-$areanames{en}->{6499044} = "Hibiscus\ Coast";
-$areanames{en}->{6499045} = "Hibiscus\ Coast";
-$areanames{en}->{6499046} = "Pukekohe";
-$areanames{en}->{6499047} = "Pukekohe";
-$areanames{en}->{6499048} = "Pukekohe";
-$areanames{en}->{6499049} = "Great\ Barrier\ Island";
-$areanames{en}->{649905} = "Auckland";
-$areanames{en}->{6499061} = "Hibiscus\ Coast";
-$areanames{en}->{6499062} = "Hibiscus\ Coast";
-$areanames{en}->{6499063} = "Hibiscus\ Coast";
-$areanames{en}->{6499064} = "Helensville";
-$areanames{en}->{6499065} = "Helensville";
-$areanames{en}->{6499066} = "Helensville";
-$areanames{en}->{6499067} = "Pukekohe";
-$areanames{en}->{6499068} = "Pukekohe";
-$areanames{en}->{6499069} = "Pukekohe";
-$areanames{en}->{649908} = "Auckland";
-$areanames{en}->{649909} = "Auckland";
-$areanames{en}->{6499100} = "Pukekohe";
-$areanames{en}->{6499101} = "Pukekohe";
-$areanames{en}->{649912} = "Auckland";
-$areanames{en}->{649913} = "Auckland";
-$areanames{en}->{649914} = "Auckland";
-$areanames{en}->{649915} = "Auckland";
-$areanames{en}->{649916} = "Auckland";
-$areanames{en}->{649917} = "Auckland";
-$areanames{en}->{649918} = "Auckland";
-$areanames{en}->{649919} = "Auckland";
-$areanames{en}->{64992} = "Auckland";
-$areanames{en}->{6499295} = "Kaikohe";
-$areanames{en}->{6499296} = "Kaitaia";
-$areanames{en}->{6499297} = "Hibiscus\ Coast";
-$areanames{en}->{6499298} = "Pukekohe";
-$areanames{en}->{6499299} = "Whangarei";
-$areanames{en}->{649930} = "Auckland";
-$areanames{en}->{649940} = "Auckland";
-$areanames{en}->{649941} = "Auckland";
-$areanames{en}->{6499420} = "Pukekohe";
-$areanames{en}->{6499421} = "Hibiscus\ Coast";
-$areanames{en}->{6499422} = "Helensville";
-$areanames{en}->{6499423} = "Great\ Barrier\ Island";
-$areanames{en}->{6499424} = "Auckland";
-$areanames{en}->{6499425} = "Auckland";
-$areanames{en}->{6499426} = "Auckland";
-$areanames{en}->{6499428} = "Warkworth";
-$areanames{en}->{6499450} = "Warkworth";
-$areanames{en}->{6499451} = "Warkworth";
-$areanames{en}->{6499452} = "Warkworth";
-$areanames{en}->{6499453} = "Warkworth";
-$areanames{en}->{6499454} = "Whangarei";
-$areanames{en}->{6499455} = "Dargaville";
-$areanames{en}->{6499456} = "Kaikohe";
-$areanames{en}->{6499457} = "Kaitaia";
-$areanames{en}->{6499458} = "Kawakawa";
-$areanames{en}->{6499459} = "Maungaturoto";
-$areanames{en}->{6499460} = "Whangarei";
-$areanames{en}->{6499461} = "Whangarei";
-$areanames{en}->{6499462} = "Whangarei";
-$areanames{en}->{6499463} = "Whangarei";
-$areanames{en}->{6499464} = "Whangarei";
-$areanames{en}->{6499465} = "Dargaville";
-$areanames{en}->{6499466} = "Kaikohe";
-$areanames{en}->{6499467} = "Kaitaia";
-$areanames{en}->{6499468} = "Kawakawa";
-$areanames{en}->{6499469} = "Maungaturoto";
-$areanames{en}->{6499470} = "Hibiscus\ Coast";
-$areanames{en}->{6499471} = "Hibiscus\ Coast";
-$areanames{en}->{6499472} = "Great\ Barrier\ Island";
-$areanames{en}->{6499473} = "Helensville";
-$areanames{en}->{6499474} = "Helensville";
-$areanames{en}->{6499475} = "Hibiscus\ Coast";
-$areanames{en}->{6499476} = "Auckland";
-$areanames{en}->{6499477} = "Pukekohe";
-$areanames{en}->{6499478} = "Pukekohe";
-$areanames{en}->{6499479} = "Pukekohe";
-$areanames{en}->{649948} = "Auckland";
-$areanames{en}->{649949} = "Auckland";
-$areanames{en}->{649950} = "Auckland";
-$areanames{en}->{649951} = "Auckland";
-$areanames{en}->{649952} = "Auckland";
-$areanames{en}->{649953} = "Auckland";
-$areanames{en}->{649954} = "Auckland";
-$areanames{en}->{6499551} = "Whangarei";
-$areanames{en}->{6499552} = "Dargaville";
-$areanames{en}->{6499553} = "Kaikohe";
-$areanames{en}->{6499554} = "Kaitaia";
-$areanames{en}->{6499555} = "Kawakawa";
-$areanames{en}->{6499556} = "Maungaturoto";
-$areanames{en}->{6499557} = "Warkworth";
-$areanames{en}->{6499558} = "Great\ Barrier\ Island";
-$areanames{en}->{6499559} = "Whangarei";
-$areanames{en}->{649956} = "Auckland";
-$areanames{en}->{649957} = "Pukekohe";
-$areanames{en}->{649958} = "Helensville";
-$areanames{en}->{649959} = "Hibiscus\ Coast";
-$areanames{en}->{649962} = "Auckland";
-$areanames{en}->{649963} = "Auckland";
-$areanames{en}->{6499630} = "Pukekohe";
-$areanames{en}->{6499631} = "Pukekohe";
-$areanames{en}->{649964} = "Auckland";
-$areanames{en}->{649965} = "Auckland";
-$areanames{en}->{649966} = "Auckland";
-$areanames{en}->{649967} = "Auckland";
-$areanames{en}->{649968} = "Auckland";
-$areanames{en}->{649969} = "Auckland";
-$areanames{en}->{64997} = "Auckland";
-$areanames{en}->{6499716} = "Helensville";
-$areanames{en}->{6499717} = "Whangarei";
-$areanames{en}->{6499718} = "Whangarei";
-$areanames{en}->{6499719} = "Whangarei";
-$areanames{en}->{6499725} = "Hibiscus\ Coast";
-$areanames{en}->{6499726} = "Kawakawa";
-$areanames{en}->{6499727} = "Whangarei";
-$areanames{en}->{6499728} = "Dargaville";
-$areanames{en}->{6499733} = "Warkworth";
-$areanames{en}->{6499746} = "Kawakawa";
-$areanames{en}->{6499747} = "Dargaville";
-$areanames{en}->{6499748} = "Whangarei";
-$areanames{en}->{649980} = "Auckland";
-$areanames{en}->{6499810} = "Hibiscus\ Coast";
-$areanames{en}->{6499811} = "Hibiscus\ Coast";
-$areanames{en}->{6499818} = "Great\ Barrier\ Island";
-$areanames{en}->{6499819} = "Helensville";
-$areanames{en}->{649982} = "Whangarei";
-$areanames{en}->{649983} = "Whangarei";
-$areanames{en}->{649984} = "Auckland";
-$areanames{en}->{649985} = "Auckland";
-$areanames{en}->{649986} = "Whangarei";
-$areanames{en}->{6499870} = "Whangarei";
-$areanames{en}->{6499871} = "Whangarei";
-$areanames{en}->{6499872} = "Whangarei";
-$areanames{en}->{6499873} = "Kaitaia";
-$areanames{en}->{6499874} = "Kawakawa";
-$areanames{en}->{6499875} = "Dargaville";
-$areanames{en}->{6499876} = "Kaikohe";
-$areanames{en}->{6499877} = "Maungaturoto";
-$areanames{en}->{6499878} = "Warkworth";
-$areanames{en}->{6499879} = "Warkworth";
-$areanames{en}->{649988} = "Whangarei";
+$areanames{en} = {"6439318", "Lumsden",
+"6469303", "Waipukurau",
+"6434279", "Twizel",
+"6475603", "Hamilton",
+"6479294", "Hamilton",
+"647961", "Hamilton",
+"6466523", "Palmerston\ North",
+"6463918", "Wanganui",
+"6462604", "Ohakune",
+"6469890", "Gisborne",
+"6432751", "Riverton",
+"6439098", "Akaroa",
+"6432811", "Fox\ Glacier",
+"649406", "Kaitaia",
+"6434242", "Darfield",
+"6472126", "Otorohanga",
+"6436586", "Edendale",
+"6436625", "Rangiora",
+"649958", "Helensville",
+"6474649", "Matamata",
+"6475480", "Tauranga",
+"6436618", "Blenheim",
+"643248", "Lumsden",
+"6439734", "Edendale",
+"6436997", "Motueka",
+"6462105", "Taihape",
+"643983", "Christchurch",
+"6435526", "Kurow",
+"6478136", "Te\ Awamutu",
+"6496995", "Maungaturoto",
+"6435685", "Tokanui",
+"6434290", "Greymouth",
+"6462156", "Hawera",
+"644399", "Wellington",
+"6439325", "Kaikoura",
+"6496507", "Helensville",
+"6437470", "Balclutha",
+"649237", "Pukekohe",
+"6474657", "Thames",
+"6436505", "Culverden",
+"6463925", "Waiouru",
+"6435510", "Darfield",
+"6473841", "Taupo",
+"6478137", "Thames",
+"649589", "Auckland",
+"6435527", "Alexandra",
+"6432652", "Cromwell",
+"6434234", "Darfield",
+"6436996", "Takaka",
+"6498814", "Pukekohe",
+"6467552", "New\ Plymouth",
+"6465615", "Wanganui",
+"6433958", "Oamaru",
+"6474656", "Te\ Awamutu",
+"647864", "Thames",
+"643260", "Christchurch",
+"6435513", "Waitangi\ \(Chatham\ Is\.\)",
+"6437473", "Milton",
+"646385", "Ohakune",
+"646750", "Mokau",
+"6479107", "Whakatane",
+"643950", "Dunedin",
+"6462157", "Stratford",
+"6434293", "Haast",
+"6436549", "Mt\ Cook",
+"6472424", "Tauranga",
+"6469893", "Ruatoria",
+"6467779", "Masterton",
+"643300", "Ashburton\/Akaroa\/Chatham\ Islands",
+"6468804", "Napier",
+"6466520", "Palmerston\ North",
+"6433988", "Wanaka",
+"643538", "Nelson",
+"6499042", "Hibiscus\ Coast",
+"6475600", "Hamilton",
+"644905", "Paraparaumu",
+"6469300", "Gisborne",
+"646388", "Taihape",
+"6479230", "Opotiki",
+"643962", "Christchurch",
+"6475483", "Tauranga",
+"649424", "Hibiscus\ Coast",
+"646762", "Stratford",
+"643926", "Christchurch",
+"649888", "Auckland",
+"6468812", "Waiouru",
+"64925", "Auckland",
+"6472821", "Hamilton",
+"6439742", "Christchurch",
+"6434400", "Alexandra",
+"6462149", "Ruatoria",
+"6436587", "Gore",
+"6472127", "Paeroa",
+"6439452", "Gore",
+"649952", "Auckland",
+"6436685", "Nelson",
+"6499063", "Hibiscus\ Coast",
+"6463906", "Napier",
+"6436526", "Fox\ Glacier",
+"6439701", "Nelson",
+"643693", "Geraldine",
+"6435556", "Fairlie",
+"6472604", "Hamilton",
+"644281", "Wellington",
+"6469294", "Palmerston\ North",
+"6475829", "Hamilton",
+"649630", "Auckland",
+"6478593", "Hamilton",
+"6465603", "Palmerston\ North",
+"644495", "Wellington",
+"6435997", "Amberley",
+"644817", "Wellington",
+"6434260", "Oamaru",
+"6435505", "Akaroa",
+"6472612", "Te\ Awamutu",
+"643940", "Christchurch",
+"6468261", "Masterton",
+"6469573", "Palmerston\ North",
+"6439763", "Palmerston",
+"6462126", "Pahiatua",
+"6479245", "Matamata",
+"6499001", "Auckland",
+"649431", "Maungaturoto",
+"6479842", "Matamata",
+"6432721", "Motueka",
+"6466553", "New\ Plymouth",
+"64937", "Auckland",
+"6437469", "Alexandra",
+"644916", "Wellington",
+"6466990", "Mokau",
+"6447770", "Paraparaumu",
+"6439068", "Fox\ Glacier",
+"646363", "Levin",
+"6469271", "Pahiatua",
+"649409", "Kaitaia",
+"6473925", "Putaruru\/Tokoroa",
+"644498", "Wellington",
+"64687", "Napier\/Hastings",
+"6433991", "Invercargill",
+"6499475", "Hibiscus\ Coast",
+"6436655", "Westport",
+"649557", "Auckland",
+"6475615", "Waihi",
+"6469315", "Taihape",
+"644902", "Paraparaumu",
+"6466993", "Waiouru",
+"6468309", "Napier",
+"6466550", "New\ Plymouth",
+"6433915", "Greymouth",
+"6435549", "Hokitika",
+"6468258", "Waiouru",
+"6439081", "Ashburton",
+"6496518", "Kawakawa",
+"64497", "Wellington",
+"649948", "Auckland",
+"6478075", "Te\ Kuiti",
+"643965", "Christchurch",
+"646864", "Ruatoria",
+"646765", "Stratford",
+"643667", "Christchurch",
+"6478590", "Hamilton",
+"6439522", "Dunedin",
+"6465600", "Palmerston\ North",
+"6435996", "Akaroa",
+"646768", "New\ Plymouth",
+"643968", "Christchurch",
+"6477779", "Putaruru\/Tokoroa",
+"6432622", "Balclutha",
+"6435557", "Geraldine",
+"6462424", "Wanganui",
+"647870", "Te\ Awamutu",
+"6434998", "Dunedin",
+"6463907", "Waipukurau",
+"6436527", "Haast",
+"64953", "Auckland",
+"6499811", "Hibiscus\ Coast",
+"6475628", "Tauranga",
+"6472149", "Whangamata",
+"6469570", "Palmerston\ North",
+"6439760", "Twizel",
+"6462127", "Dannevirke",
+"646382", "Taihape",
+"6432441", "Christchurch",
+"6434263", "Lawrence",
+"6466508", "Napier\/Wairoa",
+"643434", "Oamaru",
+"646368", "Levin",
+"647851", "Hamilton",
+"6474648", "Huntly",
+"6433946", "Culverden",
+"6439335", "Haast",
+"6434278", "Roxburgh",
+"6439319", "Otautau",
+"6435536", "Invercargill",
+"644493", "Wellington",
+"6439724", "Blenheim",
+"647362", "Rotorua",
+"6474443", "Matamata",
+"6472621", "Tauranga",
+"6499466", "Kaikohe",
+"6495562", "Whangarei",
+"6439099", "Kaikoura",
+"643982", "Christchurch",
+"649666", "Auckland",
+"6466013", "Featherston",
+"644576", "Wellington",
+"649829", "Auckland",
+"6432712", "Amberley",
+"6436635", "Fairlie",
+"6439070", "Motueka",
+"6436619", "Cheviot",
+"647350", "Rotorua",
+"646329", "Palmerston\ North",
+"6445951", "Wellington",
+"646365", "Palmerston\ North",
+"6469022", "Hawera",
+"647884", "Morrinsville",
+"6469283", "Opunake",
+"6439073", "Motueka",
+"6433959", "Balclutha",
+"6435885", "Invercargill",
+"6473992", "Opotiki",
+"647216", "Rotorua",
+"6466010", "Taihape",
+"646763", "Opunake",
+"643963", "Christchurch",
+"6435692", "Takaka",
+"6469280", "Waipukurau",
+"643520", "Blenheim",
+"643239", "Invercargill",
+"6478994", "Tauranga",
+"6479714", "Huntly",
+"6432611", "Kaikoura",
+"6433947", "Darfield",
+"647981", "Hamilton",
+"6479854", "Rotorua",
+"6462804", "Palmerston\ North",
+"647304", "Whakatane",
+"6442125", "Paraparaumu",
+"64635", "Palmerston\ North",
+"6468881", "Napier\/Hastings",
+"64438", "Wellington",
+"649840", "Auckland",
+"6499467", "Kaitaia",
+"6462812", "Napier\/Hastings",
+"6436548", "Waimate",
+"6474440", "Paeroa",
+"6467778", "Wairoa",
+"6435537", "Winton",
+"6433989", "Waimate",
+"6462228", "Wanganui",
+"6434224", "Te\ Anau",
+"644467", "Wellington",
+"6463943", "Masterton",
+"6432644", "Westport",
+"6493930", "Whangarei",
+"6473935", "Rotorua",
+"6468246", "Hawera",
+"649826", "Auckland",
+"6499876", "Kaikohe",
+"643687", "Timaru",
+"6439343", "Waimate",
+"646362", "Levin",
+"6462621", "New\ Plymouth",
+"646326", "Palmerston\ North",
+"6475828", "Hamilton",
+"6494706", "Whangarei",
+"6432731", "Timaru",
+"647466", "Tauranga",
+"6436643", "Balclutha",
+"6474637", "Opotiki",
+"6439286", "Cromwell",
+"6478097", "Whakatane",
+"6437775", "Wanaka",
+"6479022", "Morrinsville",
+"6439754", "Darfield",
+"6492227", "Whangarei",
+"649953", "Auckland",
+"6469468", "Featherston",
+"6437468", "Wanaka",
+"6497777", "Auckland",
+"6439069", "Haast",
+"643692", "Geraldine",
+"6432225", "Greymouth",
+"6496519", "Maungaturoto",
+"6436640", "Palmerston",
+"6468259", "Levin",
+"6437481", "Invercargill",
+"649980", "Auckland",
+"6496015", "Maungaturoto",
+"649590", "Auckland",
+"6463992", "Levin",
+"6462137", "Palmerston\ North",
+"6439012", "Queenstown",
+"643421", "Christchurch",
+"6432632", "Lumsden",
+"6439272", "Timaru",
+"646954", "Palmerston\ North\ W100",
+"6468308", "Napier",
+"649477", "Auckland",
+"649297", "Auckland",
+"6497776", "Hibiscus\ Coast",
+"6439004", "Gore",
+"6439532", "Timaru",
+"6439287", "Oamaru",
+"6492226", "Helensville",
+"649883", "Auckland",
+"6435548", "Westport",
+"6479421", "Tauranga",
+"6499877", "Maungaturoto",
+"6439340", "Mt\ Cook",
+"6468247", "Mokau",
+"6466005", "Mokau",
+"6472148", "Waihi",
+"6434351", "Mt\ Cook",
+"649282", "Auckland",
+"6493933", "Kaikohe",
+"646304", "Featherston",
+"6439875", "Ranfurly",
+"6434284", "Wanaka",
+"6469854", "Waipukurau",
+"6463940", "Levin",
+"6472804", "Whangamata",
+"6466509", "Napier\/Waipukurau",
+"6468994", "Waipukurau",
+"6435662", "Geraldine",
+"646975", "Napier",
+"6469714", "Hawera",
+"644903", "Wellington",
+"643236", "Winton",
+"6477778", "Te\ Awamutu",
+"6468821", "Featherston",
+"6434999", "Dunedin",
+"6472812", "Tauranga",
+"6437451", "Blenheim",
+"647378", "Taupo",
+"6498824", "Kawakawa",
+"6462153", "New\ Plymouth",
+"6465625", "Gisborne",
+"649941", "Auckland",
+"6499454", "Whangarei",
+"6434297", "Westport",
+"6437482", "Lumsden",
+"644666", "Wellington",
+"644525", "Wellington",
+"6432744", "Ranfurly",
+"6463991", "Masterton",
+"6435517", "Lawrence",
+"6442129", "Paraparaumu",
+"647880", "Matamata",
+"6444888", "Paraparaumu",
+"6437477", "Roxburgh",
+"6439011", "Queenstown",
+"6474650", "Morrinsville",
+"6439271", "Westport",
+"6432631", "Gore",
+"647983", "Hamilton",
+"6436990", "Cheviot",
+"6433985", "Alexandra",
+"6439860", "Nelson",
+"646372", "Masterton",
+"6473338", "Rotorua",
+"6478133", "Putaruru\/Tokoroa",
+"6439531", "Timaru",
+"6495539", "Auckland",
+"6479422", "Tauranga",
+"6472123", "Morrinsville",
+"6498690", "Kawakawa",
+"6436583", "Te\ Anau",
+"643740", "Christchurch",
+"647245", "Hamilton",
+"6435661", "Fairlie",
+"6435889", "Timaru",
+"6433955", "Mt\ Cook",
+"646843", "Napier\/Hastings",
+"6465618", "Masterton",
+"643430", "Mt\ Cook",
+"6469306", "Hawera",
+"6475606", "Matamata",
+"6439294", "Dunedin",
+"6466526", "Waiouru",
+"6468822", "Masterton",
+"6492834", "Kawakawa",
+"643961", "Christchurch",
+"646761", "Opunake",
+"6472811", "Tauranga",
+"6437452", "Akaroa",
+"644528", "Wellington",
+"646344", "Wanganui",
+"647926", "Tauranga",
+"6436639", "Oamaru",
+"6463928", "Pahiatua",
+"6436508", "Rangiora",
+"6494314", "Warkworth",
+"646836", "Napier\/Hastings",
+"6436580", "Invercargill",
+"6472120", "Putaruru\/Tokoroa",
+"646274", "Hawera",
+"6435688", "Queenstown",
+"6432424", "Nelson",
+"6432994", "Otautau",
+"6466527", "Taihape",
+"6496998", "Helensville",
+"643489", "Dunedin",
+"6472116", "Thames",
+"6475607", "Morrinsville",
+"6469307", "Stratford",
+"643768", "Greymouth",
+"6462108", "Ohakune",
+"646968", "New\ Plymouth\ W100",
+"6432732", "Fairlie",
+"6436615", "Ashburton",
+"6478084", "Hamilton",
+"6474653", "Putaruru\/Tokoroa",
+"6469614", "Levin",
+"646965", "Wanganui\ W100",
+"6435516", "Balclutha",
+"643447", "Alexandra",
+"6437476", "Ranfurly",
+"643524", "Takaka",
+"647839", "Hamilton",
+"6436628", "Ashburton",
+"6479100", "Rotorua",
+"6462150", "New\ Plymouth",
+"6434296", "Greymouth",
+"643615", "Timaru",
+"647853", "Hamilton",
+"6478130", "Morrinsville",
+"6463915", "Opunake",
+"6479021", "Te\ Awamutu",
+"6439863", "Motueka",
+"6436993", "Kaikoura",
+"647827", "Hamilton",
+"6439315", "Tokanui",
+"644939", "Wellington",
+"6473991", "Whakatane",
+"644901", "Wellington",
+"6466009", "Waiouru",
+"6475625", "Rotorua",
+"6435691", "Murchison",
+"646378", "Masterton",
+"6434995", "Te\ Anau",
+"6466556", "Stratford",
+"647372", "Taupo",
+"6466997", "New\ Plymouth",
+"6432612", "Rangiora",
+"6495588", "Hibiscus\ Coast",
+"6496019", "Auckland",
+"6493206", "Pukekohe",
+"6436517", "Motueka",
+"6434267", "Ranfurly",
+"6478078", "Whangamata",
+"6462414", "Napier",
+"643457", "Dunedin",
+"6435674", "Milton",
+"6439766", "Balclutha",
+"6469576", "Dannevirke",
+"6499424", "Auckland",
+"6496515", "Dargaville",
+"6462123", "Palmerston\ North",
+"6468882", "Napier\/Hastings",
+"649881", "Auckland",
+"6498854", "Hibiscus\ Coast",
+"6468255", "Pahiatua",
+"6449084", "Wellington",
+"6462811", "New\ Plymouth",
+"6499066", "Helensville",
+"6463903", "Ruatoria",
+"6436523", "Hokitika",
+"6433918", "Fox\ Glacier",
+"6435553", "Wanaka",
+"646375", "Pahiatua",
+"6435990", "Hokitika",
+"6469318", "Levin",
+"6465606", "Waiouru",
+"6475618", "Opotiki",
+"647843", "Hamilton",
+"6439767", "Alexandra",
+"6469577", "Ohakune",
+"6462120", "Palmerston\ North",
+"6499478", "Pukekohe",
+"6436658", "Fox\ Glacier",
+"6498900", "Pukekohe",
+"649951", "Auckland",
+"6499554", "Kaitaia",
+"647836", "Hamilton",
+"6473928", "Te\ Awamutu",
+"643762", "Greymouth",
+"6434266", "Palmerston",
+"6493207", "Hibiscus\ Coast",
+"6432669", "Rangiora",
+"644804", "Wellington",
+"6432229", "Dunedin",
+"6435993", "Mt\ Cook",
+"647968", "Hamilton",
+"6465607", "Taihape",
+"6478597", "Hamilton",
+"6499067", "Pukekohe",
+"6437779", "Invercargill",
+"6472622", "Tauranga",
+"6435550", "Fox\ Glacier",
+"6463900", "Gisborne",
+"6436520", "Greymouth",
+"643612", "Timaru",
+"649903", "Auckland",
+"6466549", "Ruatoria",
+"6495561", "Whangarei",
+"643750", "Haast",
+"646839", "Napier\/Hastings",
+"6439044", "Milton",
+"6499631", "Pukekohe",
+"6435508", "Cheviot",
+"644590", "Wellington",
+"6432711", "Akaroa",
+"644297", "Paraparaumu",
+"643486", "Dunedin",
+"6466996", "Stratford",
+"649984", "Auckland",
+"6445952", "Wellington",
+"6436688", "Waitangi\ \(Chatham\ Is\.\)",
+"6466557", "Stratford",
+"6462225", "Levin",
+"6472194", "Whakatane",
+"6473339", "Taupo",
+"6467775", "Palmerston\ North",
+"646842", "Napier\/Hastings",
+"6469286", "Dannevirke",
+"6495538", "Auckland",
+"6439082", "Culverden",
+"647848", "Hamilton",
+"649399", "Auckland",
+"6472133", "Taupo",
+"6442128", "Paraparaumu",
+"64334", "Christchurch",
+"6444889", "Paraparaumu",
+"6439521", "Dunedin",
+"6443333", "Paraparaumu",
+"646373", "Masterton",
+"6435533", "Murchison",
+"6465619", "Masterton",
+"647549", "Tauranga",
+"64936", "Auckland",
+"647896", "Taumarunui",
+"6432621", "Oamaru",
+"6439052", "Mt\ Cook",
+"6474446", "Otorohanga",
+"6499463", "Whangarei",
+"6462164", "New\ Plymouth",
+"647982", "Hamilton",
+"649919", "Auckland",
+"643425", "Dunedin",
+"6436564", "Milton",
+"643788", "Westport",
+"6433943", "Amberley",
+"643469", "Dunedin",
+"6473946", "Taupo",
+"6435888", "Timaru",
+"6432442", "Christchurch",
+"6474447", "Te\ Kuiti",
+"649420", "Helensville",
+"6435689", "Otautau",
+"6439451", "Invercargill",
+"6499460", "Whangarei",
+"6439702", "Nelson",
+"6496999", "Auckland",
+"6462109", "Waiouru",
+"649905", "Auckland",
+"6499014", "Dargaville",
+"647852", "Hamilton",
+"644240", "Wellington",
+"6435530", "Nelson",
+"6443330", "Wellington",
+"6436509", "Waitangi\ \(Chatham\ Is\.\)",
+"646858", "Waipukurau",
+"6436638", "Kurow",
+"6472611", "Matamata",
+"6473947", "Whakatane",
+"6496007", "Helensville",
+"6439714", "Waimate",
+"643304", "Ashburton\/Akaroa\/Chatham\ Islands",
+"644888", "Wellington",
+"6439854", "Waitangi\ \(Chatham\ Is\.\)",
+"643981", "Christchurch",
+"6468262", "Napier",
+"6433940", "Westport",
+"644370", "Wellington",
+"6435954", "Christchurch",
+"6499002", "Auckland",
+"6469004", "Napier\/Hastings",
+"6469287", "Ohakune",
+"644589", "Wellington",
+"6479841", "Huntly",
+"6432722", "Murchison",
+"646754", "New\ Plymouth",
+"646855", "Waipukurau",
+"643978", "Christchurch",
+"646656", "Levin",
+"6469272", "Featherston",
+"6439884", "Franz\ Josef",
+"6434275", "Milton",
+"6439338", "Queenstown",
+"649908", "Auckland",
+"6469012", "Waiouru",
+"643216", "Invercargill",
+"6472130", "Tauranga",
+"6433992", "Riverton",
+"6436629", "Christchurch",
+"6469249", "Masterton",
+"649348", "Auckland",
+"6439283", "Rangiora",
+"6492220", "Auckland",
+"647546", "Tauranga",
+"6479754", "Tauranga",
+"6432651", "Queenstown",
+"6477775", "Huntly",
+"6478090", "Thames",
+"644250", "Wellington",
+"6497770", "Whangarei",
+"6472225", "Rotorua",
+"649916", "Auckland",
+"6467551", "New\ Plymouth",
+"6436594", "Waimate",
+"643466", "Dunedin",
+"643337", "Christchurch",
+"6472145", "Huntly",
+"649964", "Auckland",
+"6466008", "Ohakune",
+"6436646", "Roxburgh",
+"6449120", "Wellington",
+"643782", "Westport",
+"6435545", "Gore",
+"646845", "Napier\/Hastings",
+"643944", "Christchurch",
+"6433919", "Haast",
+"6494703", "Whangarei",
+"649281", "Auckland",
+"6475619", "Hamilton",
+"6499041", "Helensville",
+"6469319", "Masterton",
+"6495589", "Pukekohe",
+"6468811", "Marton",
+"6493937", "Warkworth",
+"649817", "Auckland",
+"6478079", "Hamilton",
+"6439741", "Christchurch",
+"6472822", "Rotorua",
+"6496018", "Auckland",
+"6468243", "Napier",
+"647988", "Rotorua",
+"6499873", "Kaitaia",
+"649634", "Auckland",
+"6496883", "Auckland",
+"6439346", "Christchurch",
+"6432228", "Wanaka",
+"6432668", "Blenheim",
+"6437465", "Waimate",
+"6494700", "Whangarei",
+"649200", "Auckland",
+"644586", "Wellington",
+"6432752", "Te\ Anau",
+"649459", "Whangarei",
+"6437778", "Greymouth",
+"6432812", "Haast",
+"6449123", "Wellington",
+"6466548", "Ruatoria",
+"644204", "Wellington",
+"6496880", "Auckland",
+"6434241", "Rangiora",
+"6499870", "Whangarei",
+"643219", "Invercargill",
+"64335", "Christchurch",
+"6439347", "Christchurch",
+"6499479", "Pukekohe",
+"6436659", "Haast",
+"6493936", "Maungaturoto",
+"6432804", "Riverton",
+"643270", "Christchurch",
+"6473929", "Thames",
+"647858", "Hamilton",
+"6462611", "Napier",
+"6477884", "Tauranga",
+"6475825", "Hamilton",
+"649902", "Warkworth",
+"6497773", "Dargaville",
+"647855", "Hamilton",
+"6478093", "Rotorua",
+"6479004", "Te\ Awamutu",
+"6492223", "Auckland",
+"6436689", "Christchurch",
+"6439280", "Nelson",
+"6479249", "Huntly",
+"64997", "Auckland",
+"644897", "Wellington",
+"647533", "Tauranga",
+"6436647", "Te\ Anau",
+"6435509", "Culverden",
+"6437444", "Takaka",
+"6473842", "Taupo",
+"6473847", "Taupo",
+"6463990", "Featherston",
+"64456", "Wellington",
+"6439010", "Queenstown",
+"6474651", "Otorohanga",
+"6499726", "Kawakawa",
+"6436642", "Milton",
+"6472198", "Opotiki",
+"6434225", "Edendale",
+"6439530", "Timaru",
+"6478995", "Matamata",
+"6479715", "Paeroa",
+"6439026", "Riverton",
+"6479855", "Taupo",
+"6462805", "Napier\/Hastings",
+"6432749", "Wanaka",
+"6499459", "Maungaturoto",
+"6439270", "Greymouth",
+"6432630", "Christchurch",
+"6493944", "Hibiscus\ Coast",
+"6439861", "Nelson",
+"6436991", "Culverden",
+"647823", "Hamilton",
+"6472826", "Matamata",
+"6463942", "Masterton",
+"6462168", "Featherston",
+"6492839", "Whangarei",
+"6435660", "Haast",
+"647857", "Hamilton",
+"6498691", "Maungaturoto",
+"6439299", "Murchison",
+"6439342", "Geraldine",
+"643393", "Christchurch",
+"647306", "Whakatane",
+"6432817", "Christchurch",
+"6435884", "Dunedin",
+"6432757", "Lumsden",
+"6472810", "Tauranga",
+"647920", "Rotorua",
+"6436568", "Roxburgh",
+"644895", "Paraparaumu",
+"643443", "Wanaka",
+"649818", "Auckland",
+"6472121", "Te\ Kuiti",
+"6499018", "Maungaturoto",
+"647312", "Whakatane",
+"6436581", "Invercargill",
+"643436", "Kurow",
+"6435663", "Twizel",
+"6472827", "Tauranga",
+"6432429", "Timaru",
+"6432999", "Invercargill",
+"6493932", "Dargaville",
+"647987", "Tauranga",
+"646946", "Masterton",
+"644461", "Wellington",
+"644555", "Wellington",
+"643335", "Christchurch",
+"6472813", "Waihi",
+"6439858", "Kaikoura",
+"6432816", "Waimate",
+"6439718", "Mt\ Cook",
+"6436634", "Mt\ Cook",
+"6432756", "Gore",
+"6499727", "Whangarei",
+"643221", "Invercargill",
+"6462151", "New\ Plymouth",
+"6479101", "Rotorua",
+"6439725", "Christchurch",
+"6469008", "Palmerston\ North",
+"646847", "Napier\/Hastings",
+"6463993", "Pahiatua",
+"643338", "Christchurch",
+"647886", "Putaruru\/Tokoroa",
+"649347", "Auckland",
+"6439273", "Blenheim",
+"6432633", "Otautau",
+"6439027", "Winton",
+"649815", "Auckland",
+"6479020", "Te\ Awamutu",
+"6478131", "Otorohanga",
+"6439334", "Fox\ Glacier",
+"647949", "Hamilton",
+"6439533", "Geraldine",
+"6466012", "Pahiatua",
+"646214", "Gisborne",
+"6435690", "Motueka",
+"6433997", "Gore",
+"6439269", "Dunedin",
+"6432713", "Ashburton",
+"6473990", "Te\ Awamutu",
+"6469017", "Marton",
+"647309", "Whakatane",
+"644892", "Paraparaumu",
+"6469277", "Gisborne",
+"6466004", "Waipukurau",
+"6439874", "Cromwell",
+"6434285", "Cheviot",
+"643654", "Timaru",
+"6432727", "Fox\ Glacier",
+"6469282", "Mokau",
+"6472805", "Morrinsville",
+"6436598", "Wanaka",
+"643977", "Christchurch",
+"643756", "Hokitika",
+"6468995", "Napier",
+"6469715", "Mokau",
+"644887", "Wellington",
+"646306", "Featherston",
+"6499007", "Kaikohe",
+"643681", "Timaru",
+"646857", "Waipukurau",
+"6432446", "Blenheim",
+"644293", "Paraparaumu",
+"6439005", "Invercargill",
+"6432609", "Mt\ Cook",
+"64957", "Auckland",
+"643234", "Riverton",
+"6435991", "Franz\ Josef",
+"647959", "Hamilton",
+"6498859", "Kaitaia",
+"6435679", "Alexandra",
+"644211", "Wellington",
+"6462810", "Gisborne",
+"6496014", "Dargaville",
+"6462419", "Masterton",
+"6495563", "Whangarei",
+"6439707", "Takaka",
+"6474442", "Morrinsville",
+"6432447", "Timaru",
+"6437774", "Queenstown",
+"6439755", "Rangiora",
+"6462121", "Palmerston\ North",
+"6499006", "Whangarei",
+"6432664", "Christchurch",
+"6498901", "Pukekohe",
+"6432224", "Invercargill",
+"6436521", "Greymouth",
+"6463901", "Gisborne",
+"6439706", "Nelson",
+"6435551", "Franz\ Josef",
+"6439057", "Waimate",
+"649812", "Auckland",
+"647889", "Morrinsville",
+"6495560", "Whangarei",
+"6499559", "Whangarei",
+"6462813", "Wanganui",
+"6432808", "Westport",
+"646324", "Palmerston\ North",
+"6433996", "Edendale",
+"6499630", "Pukekohe",
+"6473993", "Te\ Awamutu",
+"647464", "Hamilton",
+"6432710", "Christchurch",
+"647847", "Hamilton",
+"6479008", "Rotorua",
+"6469016", "Ohakune",
+"643439", "Oamaru",
+"647315", "Opotiki",
+"6435693", "Nelson",
+"649213", "Auckland",
+"6477888", "Taupo",
+"643749", "Christchurch",
+"6432726", "Franz\ Josef",
+"646949", "Levin\ W100",
+"6437448", "Haast",
+"6469020", "Stratford",
+"643453", "Dunedin",
+"64933", "Auckland",
+"6439049", "Palmerston",
+"6432645", "Greymouth",
+"643332", "Christchurch",
+"6473934", "Rotorua",
+"6469276", "Wanganui",
+"649291", "Auckland",
+"6466552", "New\ Plymouth",
+"6479843", "Morrinsville",
+"644298", "Paraparaumu",
+"643442", "Queenstown",
+"6432748", "Cromwell",
+"64944", "Auckland",
+"6499458", "Kawakawa",
+"646650", "Napier",
+"6468805", "Wanganui",
+"647866", "Thames",
+"6492420", "Auckland",
+"643732", "Greymouth",
+"6472199", "Opotiki",
+"6432620", "Palmerston",
+"6469045", "Waipukurau",
+"6472627", "Rotorua",
+"6499062", "Hibiscus\ Coast",
+"6439453", "Te\ Anau",
+"6436569", "Alexandra",
+"6465602", "Palmerston\ North",
+"6439520", "Dunedin",
+"6478592", "Hamilton",
+"6462169", "Featherston",
+"6472613", "Putaruru\/Tokoroa",
+"6434235", "Akaroa",
+"6492838", "Pukekohe",
+"6432616", "Ashburton",
+"6468886", "Wanganui",
+"649426", "Hibiscus\ Coast",
+"6439298", "Motueka",
+"643924", "Christchurch",
+"6498815", "Helensville",
+"6465614", "Wanganui",
+"6439762", "Oamaru",
+"6469572", "Palmerston\ North",
+"649218", "Auckland",
+"6439324", "Darfield",
+"6439523", "Balclutha",
+"6443331", "Wellington",
+"649404", "Kawakawa",
+"6435531", "Nelson",
+"6439450", "Invercargill",
+"6432623", "Lawrence",
+"6463924", "Marton",
+"6436504", "Cheviot",
+"6439719", "Waimate",
+"6472626", "Rotorua",
+"6499461", "Whangarei",
+"6439735", "Lumsden",
+"6468887", "Gisborne",
+"6499019", "Maungaturoto",
+"6462104", "Marton",
+"6434262", "Alexandra",
+"6496994", "Dargaville",
+"6472610", "Morrinsville",
+"6433941", "Blenheim",
+"6432617", "Cheviot",
+"6432428", "Queenstown",
+"6432998", "Tokanui",
+"6435684", "Winton",
+"6466992", "Hawera",
+"644928", "Wellington",
+"6436624", "Darfield",
+"643455", "Dunedin",
+"6445956", "Wellington",
+"647391", "Hamilton",
+"6479295", "Whakatane",
+"646377", "Masterton",
+"649215", "Auckland",
+"6462605", "Marton",
+"6469009", "Palmerston\ North",
+"6472131", "Rotorua",
+"6497771", "Kaikohe",
+"6467550", "New\ Plymouth",
+"64332", "Christchurch",
+"6492221", "Auckland",
+"6436599", "Blenheim",
+"643738", "Greymouth",
+"6478091", "Matamata",
+"647828", "Huntly",
+"6432650", "Christchurch",
+"643448", "Alexandra",
+"6437486", "Tokanui",
+"644292", "Paraparaumu",
+"649551", "Auckland",
+"649429", "Great\ Barrier\ Island",
+"6439268", "Dunedin",
+"6462425", "Masterton",
+"6498858", "Kaikohe",
+"6432737", "Palmerston",
+"6499428", "Warkworth",
+"6475602", "Hamilton",
+"6499040", "Helensville",
+"6435678", "Roxburgh",
+"6469302", "Napier",
+"6462418", "Palmerston\ North",
+"6478074", "Taumarunui",
+"6449121", "Wellington",
+"6479045", "Taumarunui",
+"6437456", "Culverden",
+"644893", "Wellington",
+"6462627", "Wanganui",
+"643445", "Cromwell",
+"643767", "Greymouth",
+"646967", "New\ Plymouth",
+"6466522", "Palmerston\ North",
+"6468826", "Levin",
+"6475614", "Thames",
+"6469314", "Waiouru",
+"647825", "Hamilton",
+"6434243", "Akaroa",
+"6479747", "Te\ Kuiti",
+"647869", "Thames",
+"6432608", "Dunedin",
+"6462613", "Waipukurau",
+"6468810", "Ohakune",
+"6433914", "Takaka",
+"6434402", "Alexandra",
+"6439740", "Christchurch",
+"6462626", "Mokau",
+"6437457", "Darfield",
+"6469892", "Gisborne",
+"6473924", "Paeroa",
+"6432809", "Hokitika",
+"6468827", "New\ Plymouth",
+"6499558", "Great\ Barrier\ Island",
+"643452", "Wanaka",
+"644527", "Wellington",
+"6432736", "Dunedin",
+"6499474", "Helensville",
+"6499043", "Hibiscus\ Coast",
+"6436654", "Tokanui",
+"649390", "Auckland",
+"6494701", "Whangarei",
+"6439743", "Christchurch",
+"6479746", "Opotiki",
+"6462610", "Napier",
+"6468813", "Taihape",
+"6475482", "Tauranga",
+"649212", "Auckland",
+"6434240", "Ashburton",
+"6496881", "Auckland",
+"6468241", "Gisborne",
+"6499871", "Whangarei",
+"6437449", "Hokitika",
+"6435504", "Christchurch",
+"6432653", "Wanaka",
+"644914", "Wellington",
+"6439281", "Christchurch",
+"6439048", "Lawrence",
+"6467553", "New\ Plymouth",
+"6479244", "Tauranga",
+"649813", "Auckland",
+"6436684", "Dunedin",
+"6437472", "Lawrence",
+"6435512", "Rangiora",
+"644922", "Wellington",
+"647377", "Taupo",
+"6472605", "Thames",
+"6479009", "Hamilton",
+"6434292", "Hokitika",
+"6437487", "Winton",
+"6469295", "Wanganui",
+"6477889", "Whakatane",
+"6499748", "Whangarei",
+"6469891", "Gisborne",
+"6432750", "Invercargill",
+"6472817", "Taupo",
+"6432810", "Franz\ Josef",
+"643920", "Rangiora",
+"6494702", "Whangarei",
+"6472823", "Whakatane",
+"6435667", "Waitangi\ \(Chatham\ Is\.\)",
+"6462609", "Pahiatua",
+"6469005", "Wanganui",
+"6475481", "Tauranga",
+"6439728", "Franz\ Josef",
+"6479299", "Rotorua",
+"649475", "Auckland",
+"649295", "Auckland",
+"6496882", "Auckland",
+"643306", "Ashburton\/Akaroa\/Chatham\ Islands",
+"6499872", "Whangarei",
+"644462", "Wellington",
+"6468242", "Ruatoria",
+"6439885", "Fox\ Glacier",
+"6434274", "Kurow",
+"643956", "Timaru",
+"649298", "Auckland",
+"649478", "Auckland",
+"646756", "New\ Plymouth",
+"6439023", "Te\ Anau",
+"6479026", "Paeroa",
+"6439715", "Timaru",
+"646654", "Gisborne",
+"6439855", "Rangiora",
+"6439282", "Christchurch",
+"6499717", "Whangarei",
+"6435955", "Christchurch",
+"6432637", "Winton",
+"6439277", "Invercargill",
+"6492008", "Hibiscus\ Coast",
+"6439017", "Cromwell",
+"6437471", "Kurow",
+"6435511", "Kaikoura",
+"6463997", "Palmerston\ North",
+"6479010", "Thames",
+"6442420", "Wellington",
+"6499015", "Dargaville",
+"6434291", "Westport",
+"644209", "Wellington",
+"643214", "Invercargill",
+"6439739", "Invercargill",
+"6499716", "Helensville",
+"6497772", "Kaitaia",
+"643685", "Fairlie",
+"6436565", "Twizel",
+"6424", "Scott\ Base",
+"6439276", "Nelson",
+"6432636", "Te\ Anau",
+"6479027", "Paeroa",
+"6492222", "Auckland",
+"643949", "Dunedin",
+"6439020", "Gore",
+"6478092", "Huntly",
+"6439536", "Waimate",
+"649639", "Auckland",
+"6434239", "Christchurch",
+"6473843", "Taupo",
+"6439016", "Alexandra",
+"6462165", "Stratford",
+"6463996", "Palmerston\ North",
+"649233", "Pukekohe",
+"643419", "Balclutha",
+"6469301", "Ruatoria",
+"6462144", "Ruatoria",
+"6475958", "Taupo",
+"6475601", "Hamilton",
+"6472816", "Morrinsville",
+"6449122", "Wellington",
+"6432813", "Geraldine",
+"6462808", "Napier\/Hastings",
+"6479858", "Whakatane",
+"6466521", "Palmerston\ North",
+"647894", "Taumarunui",
+"6479718", "Taumarunui",
+"6478998", "Hamilton",
+"6432753", "Winton",
+"6434228", "Tokanui",
+"649969", "Auckland",
+"6472195", "Rotorua",
+"6462224", "Masterton",
+"649400", "Kaikohe",
+"6435666", "Oamaru",
+"6467774", "Dannevirke",
+"6468809", "Masterton",
+"643688", "Timaru",
+"6434401", "Cromwell",
+"6472820", "Hamilton",
+"6472429", "Whakatane",
+"646759", "New\ Plymouth",
+"643225", "Otautau",
+"6435532", "Motueka",
+"6443332", "Wellington",
+"6432648", "Geraldine",
+"6495566", "Kaikohe",
+"6462817", "Napier",
+"6499462", "Whangarei",
+"6437445", "Fox\ Glacier",
+"6439700", "Nelson",
+"6477885", "Tauranga",
+"647876", "Te\ Kuiti",
+"6499000", "Auckland",
+"6475824", "Hamilton",
+"6469299", "Napier\/Hastings",
+"6432443", "Christchurch",
+"6434261", "Balclutha",
+"6472609", "Whangamata",
+"6479005", "Tauranga",
+"649580", "Auckland",
+"6433942", "Akaroa",
+"6468260", "Featherston",
+"649811", "Auckland",
+"6492807", "Helensville",
+"6466991", "Wanganui",
+"6469270", "Marton",
+"6447771", "Paraparaumu",
+"6432805", "Winton",
+"6432720", "Nelson",
+"644437", "Wellington",
+"644551", "Paraparaumu",
+"644465", "Wellington",
+"6443708", "Paraparaumu",
+"643331", "Christchurch",
+"6435697", "Westport",
+"6437464", "Timaru",
+"6439083", "Cheviot",
+"649292", "Auckland",
+"649249", "Auckland",
+"6439758", "Ashburton",
+"6473997", "Te\ Kuiti",
+"6469010", "Taihape",
+"64347", "Dunedin",
+"6432716", "Darfield",
+"6472132", "Taupo",
+"6432723", "Takaka",
+"6466551", "New\ Plymouth",
+"649914", "Auckland",
+"6479049", "Te\ Kuiti",
+"647332", "Rotorua",
+"647544", "Tauranga",
+"6469273", "New\ Plymouth",
+"6432717", "Kaikoura",
+"6472459", "Rotorua",
+"6433993", "Te\ Anau",
+"6435544", "Winton",
+"643464", "Dunedin",
+"649966", "Auckland",
+"6473996", "Otorohanga",
+"644910", "Wellington",
+"6439008", "Timaru",
+"6435696", "Haast",
+"6439080", "Ashburton",
+"644891", "Wellington",
+"643697", "Geraldine",
+"6439050", "Geraldine",
+"6439703", "Takaka",
+"6495567", "Kaitaia",
+"6468998", "Napier",
+"6436595", "Mt\ Cook",
+"6472808", "Putaruru\/Tokoroa",
+"6462816", "Gisborne",
+"6434288", "Cromwell",
+"6499061", "Hibiscus\ Coast",
+"6478591", "Hamilton",
+"6465601", "Palmerston\ North",
+"644390", "Wellington",
+"643571", "Nelson",
+"6472144", "Matamata",
+"6432887", "Nelson",
+"643946", "Invercargill",
+"6468263", "Napier",
+"649220", "Auckland",
+"644212", "Wellington",
+"649636", "Auckland",
+"646367", "Levin",
+"6432440", "Christchurch",
+"6477774", "Thames",
+"6499003", "Warkworth",
+"6472224", "Taupo",
+"6439761", "Kurow",
+"6469571", "Palmerston\ North",
+"649394", "Auckland",
+"6499810", "Hibiscus\ Coast",
+"6499733", "Warkworth",
+"6472616", "Taumarunui",
+"6439729", "Fox\ Glacier",
+"6462608", "Dannevirke",
+"6432613", "Waitangi\ \(Chatham\ Is\.\)",
+"6463914", "Stratford",
+"6468883", "Palmerston\ North",
+"646346", "Wanganui",
+"6462122", "Palmerston\ North",
+"6479298", "Taupo",
+"6439314", "Winton",
+"646834", "Napier\/Hastings",
+"6435552", "Queenstown",
+"643967", "Christchurch",
+"6472620", "Tauranga",
+"6469615", "Masterton",
+"6463902", "Gisborne",
+"6436522", "Greymouth",
+"649846", "Auckland",
+"6439456", "Riverton",
+"6432627", "Alexandra",
+"6439527", "Kurow",
+"64354", "Nelson",
+"6432425", "Invercargill",
+"6432995", "Winton",
+"6499296", "Kaitaia",
+"6439071", "Motueka",
+"644463", "Wellington",
+"647349", "Rotorua",
+"6492427", "Warkworth",
+"6439738", "Winton",
+"6436614", "Timaru",
+"643526", "Motueka",
+"6478085", "Tauranga",
+"6445950", "Wellington",
+"6479846", "Taumarunui",
+"6494315", "Warkworth",
+"647210", "Hamilton",
+"6492009", "Pukekohe",
+"644497", "Wellington",
+"6492426", "Whangarei",
+"6466011", "Marton",
+"6439295", "Nelson",
+"6492835", "Kaikohe",
+"649558", "Auckland",
+"6434238", "Waitangi\ \(Chatham\ Is\.\)",
+"6499297", "Hibiscus\ Coast",
+"643441", "Queenstown",
+"643731", "Greymouth",
+"6479847", "Te\ Awamutu",
+"6469281", "Wairoa",
+"649232", "Pukekohe",
+"6445953", "Wellington",
+"644570", "Wellington",
+"644815", "Wellington",
+"6433954", "Lawrence",
+"6434229", "Winton",
+"6433984", "Roxburgh",
+"644818", "Wellington",
+"6468880", "Napier\/Hastings",
+"6468808", "Palmerston\ North",
+"6432610", "Darfield",
+"6472428", "Taupo",
+"6442197", "Paraparaumu",
+"644934", "Wellington",
+"649555", "Auckland",
+"6498825", "Maungaturoto",
+"649652", "Warkworth",
+"6435992", "Fox\ Glacier",
+"6465624", "Featherston",
+"6439526", "Twizel",
+"6499455", "Dargaville",
+"647906", "Taupo",
+"6462809", "Napier\/Hastings",
+"6432745", "Roxburgh",
+"6479859", "Tauranga",
+"649930", "Auckland",
+"6479719", "Te\ Kuiti",
+"6432626", "Kurow",
+"6439457", "Winton",
+"6478999", "Hamilton",
+"6474441", "Waihi",
+"6472623", "Tauranga",
+"647834", "Hamilton",
+"643230", "Invercargill",
+"643451", "Queenstown",
+"6434353", "Twizel",
+"649887", "Auckland",
+"6472122", "Te\ Awamutu",
+"6436582", "Riverton",
+"6469298", "Masterton",
+"6434246", "Waitangi\ \(Chatham\ Is\.\)",
+"647346", "Rotorua",
+"6472608", "Waihi",
+"6462616", "Ruatoria",
+"6439747", "Wanaka",
+"649473", "Auckland",
+"6493931", "Whangarei",
+"6468817", "Stratford",
+"6436577", "Cromwell",
+"643529", "Nelson",
+"6499047", "Pukekohe",
+"6432730", "Blenheim",
+"644806", "Wellington",
+"6432649", "Waimate",
+"6439045", "Twizel",
+"646387", "Waiouru",
+"6437453", "Amberley",
+"649211", "Auckland",
+"6468823", "Napier\/Hastings",
+"6462620", "New\ Plymouth",
+"644907", "Wellington",
+"6498016", "Hibiscus\ Coast",
+"6437483", "Otautau",
+"6443709", "Paraparaumu",
+"6462152", "New\ Plymouth",
+"6479102", "Rotorua",
+"646349", "Wanganui",
+"6439759", "Cromwell",
+"6467557", "New\ Plymouth",
+"649849", "Auckland",
+"649892", "Auckland",
+"6499555", "Kawakawa",
+"646279", "Hawera",
+"6432657", "Motueka",
+"6478132", "Paeroa",
+"643484", "Dunedin",
+"649986", "Whangarei",
+"6472458", "Rotorua",
+"6439009", "Greymouth",
+"6474652", "Paeroa",
+"6436641", "Lawrence",
+"6498017", "Hibiscus\ Coast",
+"644213", "Wellington",
+"6437480", "Gore",
+"649238", "Pukekohe",
+"6432656", "Nelson",
+"647460", "Rotorua",
+"6479420", "Tauranga",
+"6462415", "Levin",
+"643683", "Timaru",
+"6435675", "Twizel",
+"6499425", "Auckland",
+"6496514", "Whangarei",
+"649552", "Pukekohe",
+"6439862", "Nelson",
+"6436992", "Greymouth",
+"6468254", "Ohakune",
+"6498855", "Kawakawa",
+"6463941", "Masterton",
+"6439746", "Dunedin",
+"6462617", "Masterton",
+"6434994", "Palmerston",
+"649957", "Pukekohe",
+"644488", "Wellington",
+"6436576", "Cromwell",
+"6468816", "Hawera",
+"6478144", "Tauranga",
+"6439341", "Fairlie",
+"6434247", "Kaikoura",
+"6434350", "Twizel",
+"6462623", "Stratford",
+"6468820", "Palmerston\ North",
+"649820", "Auckland",
+"6468999", "Napier",
+"649235", "Pukekohe",
+"6434289", "Wanaka",
+"6437450", "Westport",
+"6472809", "Otorohanga",
+"6475624", "Rotorua",
+"644619", "Wellington",
+"6499046", "Pukekohe",
+"6432733", "Geraldine",
+"647347", "Rotorua",
+"6439856", "Darfield",
+"6432818", "Christchurch",
+"6439091", "Rangiora",
+"649886", "Auckland",
+"6462803", "Palmerston\ North",
+"6479853", "Putaruru",
+"6479025", "Huntly",
+"6437772", "Timaru",
+"6472629", "Taupo",
+"6439716", "Geraldine",
+"6463911", "New\ Plymouth",
+"649582", "Auckland",
+"6479713", "Morrinsville",
+"6478993", "Waihi",
+"6432758", "Otautau",
+"649949", "Auckland",
+"6436567", "Ranfurly",
+"643653", "Blenheim",
+"6435956", "Christchurch",
+"6439311", "Invercargill",
+"6432662", "Christchurch",
+"6432222", "Christchurch",
+"6462167", "Mokau",
+"64983", "Auckland",
+"6499101", "Pukekohe",
+"6439720", "Blenheim",
+"6466579", "Featherston",
+"646213", "Wanganui",
+"6434223", "Otautau",
+"6499016", "Kaikohe",
+"644906", "Paraparaumu",
+"6436611", "Rangiora",
+"6479018", "Putaruru\/Tokoroa",
+"6469006", "Gisborne",
+"646769", "New\ Plymouth",
+"6439886", "Haast",
+"6473932", "Rotorua",
+"643925", "Christchurch",
+"64331", "Rangiora\/Amberley\/Culverden\/Darfield\/Cheviot\/Kaikoura",
+"6472197", "Tauranga",
+"649405", "Kaikohe",
+"6439028", "Edendale",
+"646323", "Palmerston\ North",
+"6472815", "Whakatane",
+"643246", "Tokanui",
+"6499728", "Dargaville",
+"6466002", "Napier",
+"6472196", "Taupo",
+"6439872", "Alexandra",
+"6469007", "Masterton",
+"643481", "Dunedin",
+"644924", "Wellington",
+"6469284", "Stratford",
+"6433951", "Timaru",
+"6435665", "Waimate",
+"6432635", "Riverton",
+"6439275", "Nelson",
+"6475950", "Hamilton",
+"6436566", "Kurow",
+"644499", "Wellington",
+"6433981", "Twizel",
+"649956", "Auckland",
+"643454", "Dunedin",
+"6478990", "Thames",
+"6439535", "Fairlie",
+"6479710", "Putaruru\/Tokoroa",
+"6439857", "Akaroa",
+"644210", "Wellington",
+"6479850", "Tokoroa",
+"6473944", "Tauranga",
+"6462800", "Palmerston\ North",
+"6439717", "Fairlie",
+"6468889", "Levin",
+"643680", "Fairlie",
+"644392", "Wellington",
+"6499017", "Kaikohe",
+"6434220", "Invercargill",
+"647463", "Whakatane",
+"6465621", "New\ Plymouth",
+"6496012", "Kawakawa",
+"649214", "Auckland",
+"6472828", "Tauranga",
+"6463995", "Marton",
+"6462166", "Opunake",
+"6439015", "Wanaka",
+"6432619", "Christchurch",
+"6474444", "Hamilton",
+"6439723", "Blenheim",
+"649408", "Kaitaia",
+"6432739", "Balclutha",
+"644460", "Wellington",
+"644909", "Wellington",
+"6469713", "Stratford",
+"6439708", "Murchison",
+"6468993", "Taihape",
+"6462629", "Levin",
+"6469025", "Mokau",
+"644931", "Wellington",
+"6472803", "Waihi",
+"6432640", "Hokitika",
+"6469853", "Wairoa",
+"6434283", "Cromwell",
+"6432806", "Edendale",
+"646347", "Wanganui",
+"6493934", "Kaitaia",
+"647386", "Taupo",
+"6499008", "Pukekohe",
+"649588", "Auckland",
+"649847", "Auckland",
+"643922", "Nelson",
+"646766", "New\ Plymouth",
+"643966", "Christchurch",
+"64992", "Auckland",
+"6468268", "New\ Plymouth",
+"647213", "Hamilton",
+"6432715", "Culverden",
+"6436632", "Murchison",
+"6439061", "Greymouth",
+"649889", "Auckland",
+"647812", "Hamilton",
+"6469278", "Gisborne",
+"643527", "Motueka",
+"6436597", "Cromwell",
+"6432728", "Haast",
+"6437446", "Franz\ Josef",
+"649585", "Auckland",
+"643444", "Ranfurly",
+"6495565", "Dargaville",
+"647824", "Hamilton",
+"6477886", "Rotorua",
+"6433998", "Lumsden",
+"6448880", "Paraparaumu",
+"643539", "Nelson",
+"6479006", "Taupo",
+"6439332", "Hokitika",
+"6439003", "Ashburton",
+"6439750", "Kaikoura",
+"6495532", "Warkworth",
+"6462815", "Wairoa",
+"6437447", "Greymouth",
+"6436596", "Queenstown",
+"647323", "Whakatane",
+"644496", "Wellington",
+"649959", "Hibiscus\ Coast",
+"6478450", "Hamilton",
+"6436644", "Alexandra",
+"647357", "Rotorua",
+"6439753", "Amberley",
+"6439000", "Christchurch",
+"6468691", "Gisborne",
+"644834", "Paraparaumu",
+"6479007", "Whakatane",
+"64757", "Tauranga",
+"644918", "Wellington",
+"6493942", "Great\ Barrier\ Island",
+"6442608", "Paraparaumu",
+"6468251", "Wanganui",
+"6477887", "Te\ Awamutu",
+"6449740", "Paraparaumu",
+"6496511", "Whangarei",
+"6437459", "Rangiora",
+"6434280", "Queenstown",
+"6432643", "Haast",
+"6434991", "Cromwell",
+"6469850", "Napier",
+"6463944", "Featherston",
+"644915", "Wellington",
+"6472800", "Thames",
+"6432807", "Tokanui",
+"6468990", "Ruatoria",
+"6469710", "New\ Plymouth",
+"649402", "Kawakawa",
+"646831", "Napier\/Hastings",
+"6439344", "Timaru",
+"6478141", "Taupo",
+"647921", "Rotorua",
+"6465950", "Palmerston\ North",
+"6432448", "Dunedin",
+"643249", "Te\ Anau",
+"6435882", "Dunedin",
+"6473995", "Putaruru\/Tokoroa",
+"6434359", "Twizel",
+"6499818", "Great\ Barrier\ Island",
+"6475621", "Tauranga",
+"6493990", "Great\ Barrier\ Island",
+"6435695", "Fox\ Glacier",
+"6462600", "Palmerston\ North",
+"6468803", "Gisborne",
+"6473922", "Morrinsville",
+"6499295", "Kaikohe",
+"6492837", "Hibiscus\ Coast",
+"6432426", "Blenheim",
+"6432996", "Riverton",
+"6478086", "Hamilton",
+"6439297", "Takaka",
+"6436652", "Winton",
+"6499472", "Great\ Barrier\ Island",
+"6479290", "Hamilton",
+"647215", "Rotorua",
+"6432819", "Christchurch",
+"647877", "Te\ Kuiti",
+"6479845", "Paeroa",
+"6472628", "Taupo",
+"649391", "Auckland",
+"6434271", "Balclutha",
+"643660", "Christchurch",
+"6435502", "Christchurch",
+"649640", "Auckland",
+"6434233", "Rangiora",
+"6472615", "Te\ Kuiti",
+"6479019", "Whangamata",
+"644436", "Wellington",
+"6439730", "Invercargill",
+"649890", "Auckland",
+"6479242", "Rotorua",
+"6442429", "Paraparaumu",
+"647541", "Tauranga",
+"6442820", "Wellington",
+"6439455", "Otautau",
+"6436682", "Dunedin",
+"6437474", "Oamaru",
+"6432747", "Queenstown",
+"6469616", "Featherston",
+"6435514", "Palmerston",
+"647218", "Tauranga",
+"6499457", "Kaitaia",
+"6434294", "Franz\ Josef",
+"649583", "Auckland",
+"644894", "Wellington",
+"643930", "Christchurch",
+"649550", "Auckland",
+"643417", "Milton",
+"6439733", "Te\ Anau",
+"647462", "Taupo",
+"6434230", "Christchurch",
+"644393", "Paraparaumu",
+"6469201", "Ruatoria",
+"647325", "Opotiki",
+"6467525", "Mokau",
+"6499456", "Kaikohe",
+"6439525", "Milton",
+"649967", "Auckland",
+"6498826", "Warkworth",
+"643334", "Christchurch",
+"643696", "Geraldine",
+"643989", "Nelson",
+"6432625", "Twizel",
+"6439029", "Tokanui",
+"6469040", "Wairoa",
+"6432746", "Alexandra",
+"6468888", "Masterton",
+"6439296", "Invercargill",
+"6479293", "Hamilton",
+"6475604", "Hamilton",
+"6469304", "Wairoa",
+"6478072", "Paeroa",
+"6472829", "Tauranga",
+"643947", "Invercargill",
+"6472420", "Hamilton",
+"649822", "Auckland",
+"6432427", "Greymouth",
+"6432997", "Edendale",
+"6468800", "Napier\/Hastings",
+"6462603", "Palmerston\ North",
+"6492836", "Kaitaia",
+"6432618", "Culverden",
+"6466524", "Ohakune",
+"644810", "Wellington",
+"646322", "Marton",
+"6475612", "Te\ Kuiti",
+"6462221", "Gisborne",
+"646366", "Levin",
+"6469312", "Ohakune",
+"644913", "Wellington",
+"6433912", "Motueka",
+"6467771", "New\ Plymouth",
+"649814", "Auckland",
+"6434404", "Alexandra",
+"6499009", "Auckland",
+"6462114", "Waipukurau",
+"6469290", "Napier\/Hastings",
+"6439322", "Culverden",
+"6479500", "Whakatane",
+"6432607", "Dunedin",
+"644439", "Wellington",
+"6462423", "Gisborne",
+"6479748", "Taumarunui",
+"6468269", "New\ Plymouth",
+"6463922", "Palmerston\ North",
+"6436502", "Amberley",
+"6472600", "Hamilton",
+"6432738", "Oamaru",
+"6498857", "Dargaville",
+"6462102", "Levin",
+"6475821", "Hamilton",
+"6435677", "Ranfurly",
+"6462628", "Wanganui",
+"6434264", "Kurow",
+"643655", "Dunedin",
+"6439709", "Motueka",
+"6496992", "Kawakawa",
+"6462417", "Wanganui",
+"643307", "Ashburton\/Akaroa\/Chatham\ Islands",
+"643552", "Dunedin",
+"6435682", "Riverton",
+"6499556", "Maungaturoto",
+"6434245", "Culverden",
+"6469242", "Levin",
+"6466994", "Ohakune",
+"6436622", "Cheviot",
+"6499746", "Kawakawa",
+"646976", "Napier",
+"643957", "Timaru",
+"646757", "New\ Plymouth",
+"6439267", "Dunedin",
+"6433999", "Otautau",
+"6462615", "Gisborne",
+"6469019", "Pahiatua",
+"643923", "Nelson",
+"643235", "Invercargill",
+"6469279", "Levin",
+"6437461", "Fairlie",
+"647390", "Hamilton",
+"6432729", "Westport",
+"6439046", "Kurow",
+"644572", "Wellington",
+"646651", "Napier",
+"6466554", "Hawera",
+"6439266", "Dunedin",
+"6468815", "Pahiatua",
+"649825", "Auckland",
+"649230", "Pukekohe",
+"6439745", "Greymouth",
+"649451", "Auckland",
+"6442609", "Paraparaumu",
+"649869", "Auckland",
+"6499747", "Dargaville",
+"6435541", "Te\ Anau",
+"6479040", "Otorohanga",
+"646369", "Levin",
+"649403", "Kawakawa",
+"6473332", "Rotorua",
+"6439047", "Alexandra",
+"643211", "Invercargill",
+"6468301", "Napier",
+"6499045", "Hibiscus\ Coast",
+"646325", "Palmerston\ North",
+"6472603", "Hamilton",
+"6432606", "Dunedin",
+"6432449", "Queenstown",
+"647551", "Tauranga",
+"6499064", "Helensville",
+"6462420", "Palmerston\ North",
+"646328", "Palmerston\ North",
+"6472141", "Te\ Kuiti",
+"6478594", "Hamilton",
+"6465604", "Ohakune",
+"6499819", "Helensville",
+"6496100", "Pukekohe",
+"649650", "Auckland",
+"6469293", "New\ Plymouth",
+"6462416", "Waipukurau",
+"6437458", "Kaikoura",
+"6499557", "Warkworth",
+"6477771", "Whakatane",
+"6432655", "Nelson",
+"6498856", "Maungaturoto",
+"649828", "Auckland",
+"6499426", "Auckland",
+"6467555", "New\ Plymouth",
+"647366", "Rotorua",
+"6435676", "Kurow",
+"6469574", "Taihape",
+"6439764", "Lawrence",
+"647322", "Whakatane",
+"6465612", "Waipukurau",
+"6472221", "Tauranga",
+"6469003", "Napier\/Hastings",
+"6439018", "Ranfurly",
+"6463998", "Palmerston\ North",
+"6439883", "Hokitika",
+"647925", "Tauranga",
+"6492429", "Pukekohe",
+"6472190", "Whakatane",
+"646835", "Napier\/Hastings",
+"644890", "Wellington",
+"6435542", "Riverton",
+"646867", "Gisborne",
+"643482", "Dunedin",
+"6449030", "Paraparaumu",
+"6473331", "Rotorua",
+"6499718", "Whangarei",
+"6468302", "Napier",
+"6492007", "Warkworth",
+"64948", "Auckland",
+"6439278", "Invercargill",
+"6432638", "Tokanui",
+"6435668", "Kurow",
+"6462160", "Masterton",
+"6439727", "Dunedin",
+"6434226", "Lumsden",
+"6472142", "Te\ Awamutu",
+"6499725", "Hibiscus\ Coast",
+"6499013", "Kawakawa",
+"647832", "Hamilton",
+"6472818", "Rotorua",
+"6479091", "Taupo",
+"647928", "Tauranga",
+"6439853", "Amberley",
+"6462806", "Napier\/Hastings",
+"6479856", "Tauranga",
+"6439713", "Mt\ Cook",
+"6477772", "Rotorua",
+"6479716", "Waihi",
+"6439025", "Otautau",
+"6432629", "Roxburgh",
+"6478996", "Huntly",
+"64423", "Wellington",
+"646838", "Wairoa",
+"6436560", "Palmerston",
+"6435953", "Christchurch",
+"6472222", "Hamilton",
+"6465611", "Napier",
+"644391", "Wellington",
+"6439529", "Palmerston",
+"6467529", "Mokau",
+"6499010", "Kaitaia",
+"6434227", "Riverton",
+"6435534", "Takaka",
+"643463", "Palmerston",
+"6439321", "Amberley",
+"6462163", "New\ Plymouth",
+"649810", "Auckland",
+"6499464", "Whangarei",
+"6442199", "Paraparaumu",
+"6439726", "Timaru",
+"6436501", "Akaroa",
+"6463921", "Palmerston\ North",
+"644526", "Wellington",
+"649581", "Auckland",
+"649913", "Auckland",
+"6435950", "Christchurch",
+"6436563", "Lawrence",
+"644938", "Wellington",
+"6462101", "Levin",
+"6496991", "Kaikohe",
+"6479857", "Opotiki",
+"6462807", "Napier\/Hastings",
+"6439710", "Timaru",
+"6478997", "Morrinsville",
+"6435681", "Invercargill",
+"6439459", "Tokanui",
+"6479717", "Otorohanga",
+"646379", "Masterton",
+"6439850", "Ashburton",
+"6433944", "Ashburton",
+"647543", "Tauranga",
+"6469241", "Napier",
+"644550", "Wellington",
+"6472193", "Whakatane",
+"6439880", "Greymouth",
+"6436621", "Culverden",
+"6469000", "New\ Plymouth",
+"6499299", "Whangarei",
+"647376", "Taupo",
+"649554", "Hibiscus\ Coast",
+"6492006", "Helensville",
+"6437462", "Geraldine",
+"6432755", "Edendale",
+"6479849", "Thames",
+"6432815", "Fairlie",
+"6497774", "Warkworth",
+"6435698", "Hokitika",
+"643488", "Dunedin",
+"647220", "Tauranga",
+"6477883", "Hamilton",
+"649600", "Auckland",
+"643769", "Greymouth",
+"6473998", "Taumarunui",
+"6492224", "Auckland",
+"646969", "New\ Plymouth",
+"6439757", "Waitangi\ \(Chatham\ Is\.\)",
+"6479003", "Thames",
+"6479750", "Tauranga",
+"6478094", "Tauranga",
+"6439006", "Nelson",
+"6432445", "Greymouth",
+"6435560", "Mt\ Cook",
+"6467559", "New\ Plymouth",
+"6469202", "Levin",
+"6492808", "Great\ Barrier\ Island",
+"6432659", "Takaka",
+"6439055", "Fairlie",
+"6437443", "Nelson",
+"6436590", "Nelson",
+"647867", "Thames",
+"6439085", "Waitangi\ \(Chatham\ Is\.\)",
+"649401", "Kaikohe",
+"646601", "Napier",
+"647922", "Whakatane",
+"643213", "Invercargill",
+"6449124", "Wellington",
+"6439749", "Christchurch",
+"6478071", "Otorohanga",
+"649439", "Dargaville",
+"6468819", "Mokau",
+"6436579", "Wanaka",
+"646653", "Wanganui",
+"6499049", "Great\ Barrier\ Island",
+"6469311", "Palmerston\ North",
+"6475611", "Taumarunui",
+"6462222", "Ohakune",
+"6467772", "Hawera",
+"6469716", "Opunake",
+"6433911", "Nelson",
+"6468996", "Napier",
+"647838", "Hamilton",
+"6432647", "Fairlie",
+"6479708", "Thames",
+"6472806", "Matamata",
+"643485", "Lawrence",
+"649427", "Hibiscus\ Coast",
+"6462818", "New\ Plymouth",
+"6434286", "Christchurch",
+"6432803", "Otautau",
+"6462619", "Featherston",
+"6473921", "Matamata",
+"6433995", "Tokanui",
+"644650", "Wellington",
+"6436651", "Riverton",
+"6499471", "Hibiscus\ Coast",
+"6494704", "Whangarei",
+"6434249", "Kaikoura",
+"6432800", "Te\ Anau",
+"6432646", "Timaru",
+"6495568", "Kawakawa",
+"6468997", "Napier",
+"6434287", "Queenstown",
+"6432725", "Hokitika",
+"6472807", "Te\ Awamutu",
+"6496884", "Auckland",
+"6499874", "Kawakawa",
+"6469275", "Wanganui",
+"6434272", "Alexandra",
+"643921", "Blenheim",
+"6468244", "Waipukurau",
+"6432888", "Nelson",
+"6439756", "Akaroa",
+"6479000", "Hamilton",
+"6479753", "Taupo",
+"6435501", "Christchurch",
+"6432718", "Rangiora",
+"6439007", "Dunedin",
+"6439284", "Blenheim",
+"6498019", "Pukekohe",
+"6477880", "Hamilton",
+"64357", "Blenheim",
+"6499005", "Auckland",
+"6479241", "Whakatane",
+"644529", "Wellington",
+"6436681", "Dunedin",
+"6436593", "Nelson",
+"6437440", "Nelson",
+"6439705", "Motueka",
+"647893", "Taumarunui",
+"646376", "Pahiatua",
+"6435563", "Queenstown",
+"6432740", "Lawrence",
+"6495531", "Helensville",
+"643218", "Invercargill",
+"6469613", "Levin",
+"6474654", "Taumarunui",
+"6498820", "Whangarei",
+"6499719", "Whangarei",
+"6432639", "Edendale",
+"644290", "Paraparaumu",
+"6499450", "Warkworth",
+"6439279", "Christchurch",
+"6439019", "Roxburgh",
+"6432615", "Amberley",
+"6468692", "Gisborne",
+"6434236", "Amberley",
+"647833", "Hamilton",
+"649320", "Auckland",
+"6463999", "Palmerston\ North",
+"649294", "Auckland",
+"649458", "Dargaville",
+"6492428", "Hibiscus\ Coast",
+"6498816", "Great\ Barrier\ Island",
+"6496512", "Whangarei",
+"6436994", "Murchison",
+"6468252", "Dannevirke",
+"6439737", "Tokanui",
+"6439864", "Takaka",
+"6468885", "New\ Plymouth",
+"646856", "Waipukurau",
+"6434992", "Ranfurly",
+"6472819", "Rotorua",
+"6494313", "Warkworth",
+"6432628", "Ranfurly",
+"644886", "Wellington",
+"646307", "Featherston",
+"6478142", "Whakatane",
+"6439528", "Lawrence",
+"6435881", "Dunedin",
+"6468806", "New\ Plymouth",
+"6492830", "Auckland",
+"6435669", "Wanaka",
+"64483", "Wellington",
+"6462607", "Taihape",
+"6432993", "Balclutha",
+"6432423", "Dunedin",
+"6479297", "Tauranga",
+"6478083", "Hamilton",
+"646321", "Marton",
+"6475622", "Tauranga",
+"643215", "Invercargill",
+"6439290", "Christchurch",
+"644777", "Wellington",
+"643684", "Timaru",
+"6436584", "Winton",
+"6472124", "Matamata",
+"646986", "Gisborne",
+"649210", "Auckland",
+"6445955", "Wellington",
+"6439458", "Edendale",
+"649392", "Auckland",
+"649349", "Auckland",
+"6439293", "Blenheim",
+"6479296", "Tauranga",
+"643231", "Invercargill",
+"643450", "Queenstown",
+"6478080", "Hamilton",
+"6432420", "Christchurch",
+"6432990", "Lumsden",
+"6468807", "Gisborne",
+"6436631", "Motueka",
+"6442198", "Paraparaumu",
+"6462606", "Waiouru",
+"6492833", "Warkworth",
+"6472427", "Rotorua",
+"6499453", "Warkworth",
+"647846", "Hamilton",
+"647542", "Tauranga",
+"647334", "Rotorua",
+"6462154", "New\ Plymouth",
+"646211", "Napier",
+"6498823", "Kaitaia",
+"649912", "Auckland",
+"6472625", "Opotiki",
+"647989", "Taupo",
+"6479029", "Waihi",
+"644920", "Wellington",
+"6469610", "Wanganui",
+"6479848", "Te\ Kuiti",
+"647895", "Taumarunui",
+"6432743", "Kurow",
+"6439736", "Riverton",
+"6498817", "Hibiscus\ Coast",
+"6434237", "Culverden",
+"6439331", "Greymouth",
+"6499298", "Pukekohe",
+"643651", "Nelson",
+"6478134", "Taumarunui",
+"6492809", "Maungaturoto",
+"6467558", "New\ Plymouth",
+"643224", "Invercargill",
+"644889", "Wellington",
+"6468825", "Gisborne",
+"644571", "Wellington",
+"6432658", "Murchison",
+"643390", "Christchurch",
+"6437455", "Cheviot",
+"649452", "Auckland",
+"6435699", "Amberley",
+"643212", "Invercargill",
+"647957", "Hamilton",
+"6466001", "Napier",
+"6473999", "Taupo",
+"6439871", "Queenstown",
+"646833", "Napier\/Hastings",
+"647923", "Whakatane",
+"6433952", "Fairlie",
+"6498880", "Helensville",
+"649909", "Auckland",
+"6435670", "Palmerston",
+"6499048", "Pukekohe",
+"6499420", "Pukekohe",
+"6498850", "Great\ Barrier\ Island",
+"6433982", "Kurow",
+"6479709", "Matamata",
+"647552", "Tauranga",
+"647307", "Whakatane",
+"6462819", "Levin",
+"647856", "Hamilton",
+"6499553", "Kaikohe",
+"6462410", "New\ Plymouth",
+"644464", "Wellington",
+"6435994", "Ashburton",
+"6437485", "Te\ Anau",
+"6465622", "Stratford",
+"6469297", "Masterton",
+"6449008", "Paraparaumu",
+"6439748", "Dunedin",
+"6449080", "Paraparaumu",
+"643979", "Christchurch",
+"6496011", "Kaikohe",
+"6462426", "Levin",
+"6472607", "Paeroa",
+"6436578", "Wanaka",
+"6468818", "Opunake",
+"6495569", "Maungaturoto",
+"6439092", "Rangiora",
+"6462413", "Gisborne",
+"647849", "Hamilton",
+"647892", "Taumarunui",
+"6463912", "New\ Plymouth",
+"6437771", "Blenheim",
+"649915", "Auckland",
+"6498853", "Whangarei",
+"647986", "Hamilton",
+"6462124", "Marton",
+"6499423", "Great\ Barrier\ Island",
+"6432889", "Blenheim",
+"6432221", "Nelson",
+"6435673", "Lawrence",
+"643437", "Oamaru",
+"6432661", "Christchurch",
+"6439312", "Riverton",
+"6472606", "Huntly",
+"643465", "Palmerston",
+"6435554", "Cromwell",
+"6462618", "Masterton",
+"6436524", "Hokitika",
+"6463904", "Napier",
+"6449083", "Wellington",
+"64447", "Wellington",
+"6469296", "Levin",
+"6434248", "Cheviot",
+"6443990", "Paraparaumu",
+"6439040", "Balclutha",
+"643789", "Westport",
+"6462625", "Hawera",
+"6469029", "Opunake",
+"643468", "Dunedin",
+"647211", "Hamilton",
+"6432735", "Mt\ Cook",
+"6436612", "Akaroa",
+"6472457", "Rotorua",
+"6432719", "Waitangi\ \(Chatham\ Is\.\)",
+"6498883", "Whangarei",
+"647887", "Morrinsville",
+"6498018", "Whangarei",
+"643206", "Edendale",
+"6473931", "Whangamata",
+"649918", "Auckland",
+"6472191", "Whakatane",
+"6436623", "Amberley",
+"6469243", "New\ Plymouth",
+"647888", "Matamata",
+"647547", "Tauranga",
+"6496508", "Hibiscus\ Coast",
+"649917", "Auckland",
+"6433956", "Dunedin",
+"6474658", "Waihi",
+"64338", "Christchurch",
+"6434405", "Alexandra",
+"6439868", "Blenheim",
+"6436998", "Blenheim",
+"6436617", "Cromwell",
+"6475605", "Huntly",
+"6469305", "New\ Plymouth",
+"643467", "Dunedin",
+"6449031", "Paraparaumu",
+"643336", "Christchurch",
+"6466525", "Marton",
+"6465626", "Ruatoria",
+"6439323", "Cheviot",
+"6439524", "Oamaru",
+"6463923", "Ohakune",
+"6436503", "Ashburton",
+"6432624", "Milton",
+"6462422", "Napier\/Hastings",
+"6462161", "Masterton",
+"6433986", "Queenstown",
+"649816", "Auckland",
+"6462103", "Levin",
+"6439317", "Gore",
+"647589", "Hamilton",
+"6465610", "Napier",
+"6436561", "Oamaru",
+"643438", "Kurow",
+"6435683", "Te\ Anau",
+"647871", "Te\ Awamutu",
+"646364", "Levin",
+"6479090", "Taupo",
+"6463917", "Wanganui",
+"6496993", "Whangarei",
+"647885", "Putaruru\/Tokoroa",
+"6439097", "Darfield",
+"644587", "Wellington",
+"6439454", "Lumsden",
+"643941", "Christchurch",
+"6437475", "Palmerston",
+"6433949", "Rangiora",
+"6435515", "Oamaru",
+"6436500", "Christchurch",
+"6463920", "Palmerston\ North",
+"643576", "Nelson",
+"6472602", "Hamilton",
+"6465627", "Levin",
+"6434295", "Fox\ Glacier",
+"6472128", "Waihi",
+"6499011", "Kaitaia",
+"646863", "Gisborne",
+"6469292", "Ruatoria",
+"6436588", "Lumsden",
+"6439320", "Akaroa",
+"6439711", "Geraldine",
+"6463916", "Mokau",
+"6499469", "Maungaturoto",
+"6496990", "Kaitaia",
+"6472614", "Otorohanga",
+"6439851", "Culverden",
+"6435680", "Dunedin",
+"6435951", "Christchurch",
+"6465613", "Wairoa",
+"6439316", "Edendale",
+"6435539", "Otautau",
+"6433987", "Cromwell",
+"6478129", "Matamata",
+"644280", "Wellington",
+"6462100", "Levin",
+"647308", "Whakatane",
+"649631", "Auckland",
+"647974", "Hamilton",
+"647958", "Hamilton",
+"6433957", "Palmerston",
+"6479844", "Otorohanga",
+"647305", "Whakatane",
+"6469001", "New\ Plymouth",
+"6462158", "Opunake",
+"6479108", "Whakatane",
+"6469240", "Gisborne",
+"6439881", "Greymouth",
+"6436620", "Kaikoura",
+"6435650", "Greymouth",
+"6435528", "Ranfurly",
+"6478138", "Waihi",
+"644896", "Wellington",
+"6436616", "Geraldine",
+"643752", "Franz\ Josef",
+"646952", "Palmerston\ North\ W100",
+"6472115", "Taumarunui",
+"6434232", "Ashburton",
+"6432654", "Blenheim",
+"6435503", "Christchurch",
+"6479751", "Tauranga",
+"646370", "Masterton",
+"6468256", "Palmerston\ North",
+"6496516", "Kaikohe",
+"6467554", "New\ Plymouth",
+"646751", "New\ Plymouth",
+"643951", "Dunedin",
+"6439765", "Milton",
+"6469575", "Waiouru",
+"6474639", "Opotiki",
+"647882", "Putaruru\/Tokoroa",
+"6499065", "Helensville",
+"6436683", "Rangiora",
+"6492229", "Hibiscus\ Coast",
+"6436591", "Nelson",
+"643903", "Christchurch",
+"6465605", "Marton",
+"6478595", "Hamilton",
+"6435561", "Dunedin",
+"6497779", "Great\ Barrier\ Island",
+"6439067", "Franz\ Josef",
+"6478070", "Morrinsville",
+"64943", "Whangarei",
+"6473923", "Otorohanga",
+"6468802", "New\ Plymouth",
+"6475626", "Taupo",
+"6499044", "Hibiscus\ Coast",
+"6499473", "Helensville",
+"6436653", "Edendale",
+"643432", "Oamaru",
+"6466555", "Hawera",
+"643984", "Blenheim",
+"6468814", "Dannevirke",
+"6433910", "Nelson",
+"6434996", "Roxburgh",
+"6439744", "Queenstown",
+"643742", "Dunedin",
+"6475610", "Putaruru\/Tokoroa",
+"6469310", "Wanganui",
+"6435998", "Rangiora",
+"643339", "Christchurch",
+"6499879", "Warkworth",
+"6468249", "Opunake",
+"6499470", "Hibiscus\ Coast",
+"6436650", "Otautau",
+"6462128", "Ohakune",
+"647863", "Waihi",
+"6479292", "Hamilton",
+"6475627", "Taupo",
+"647557", "Tauranga",
+"6462602", "Palmerston\ North",
+"6473920", "Huntly",
+"6478073", "Tokoroa\/Putaruru",
+"6434244", "Amberley",
+"646308", "Featherston",
+"6466995", "Opunake",
+"643755", "Hokitika",
+"6469313", "Marton",
+"6475613", "Te\ Awamutu",
+"6432801", "Lumsden",
+"6463908", "Wairoa",
+"6436528", "Westport",
+"6433913", "Murchison",
+"647960", "Hamilton",
+"6434997", "Lawrence",
+"6462614", "Wairoa",
+"6435558", "Waimate",
+"6496517", "Kaitaia",
+"6468257", "Taihape",
+"6477881", "Hamilton",
+"6439732", "Otautau",
+"649423", "Warkworth",
+"6479240", "Taupo",
+"6479001", "Hamilton",
+"6435500", "Christchurch",
+"6434265", "Milton",
+"646657", "Masterton",
+"6462139", "Palmerston\ North",
+"646974", "Napier",
+"6462115", "Wairoa",
+"643217", "Invercargill",
+"6439066", "Hokitika",
+"6439289", "Akaroa",
+"6436680", "Akaroa",
+"6437441", "Motueka",
+"6498821", "Dargaville",
+"6439869", "Blenheim",
+"6436999", "Nelson",
+"643420", "Christchurch",
+"6499451", "Warkworth",
+"6495530", "Great\ Barrier\ Island",
+"6463994", "Dannevirke",
+"6432741", "Milton",
+"6474445", "Hamilton",
+"6439274", "Queenstown",
+"6432634", "Invercargill",
+"6496509", "Pukekohe",
+"6439333", "Franz\ Josef",
+"6439534", "Mt\ Cook",
+"6439002", "Rangiora",
+"6474659", "Whangamata",
+"6473945", "Tauranga",
+"6434277", "Ranfurly",
+"6462226", "Napier",
+"6434282", "Queenstown",
+"6472802", "Paeroa",
+"6469285", "Hawera",
+"6436546", "Fairlie",
+"6469852", "Napier",
+"649954", "Auckland",
+"6469712", "New\ Plymouth",
+"6467776", "Levin",
+"6435664", "Timaru",
+"6468992", "Wairoa",
+"643456", "Dunedin",
+"644260", "Wellington",
+"649216", "Auckland",
+"646590", "Palmerston\ North",
+"644801", "Wellington",
+"6439291", "Dunedin",
+"6436633", "Geraldine",
+"6492831", "Maungaturoto",
+"6435880", "Dunedin",
+"6472814", "Putaruru\/Tokoroa",
+"646953", "Palmerston\ North\ W100",
+"6436547", "Geraldine",
+"643753", "Hokitika",
+"643449", "Alexandra",
+"6499468", "Kawakawa",
+"6432642", "Fox\ Glacier",
+"6467777", "Napier",
+"6434276", "Palmerston",
+"649428", "Hibiscus\ Coast",
+"6478128", "Huntly",
+"6435538", "Lumsden",
+"649884", "Auckland",
+"6462227", "Napier",
+"64927", "Auckland",
+"647837", "Hamilton",
+"6433948", "Kaikoura",
+"647865", "Whangamata",
+"6432991", "Milton",
+"6435883", "Dunedin",
+"64320", "Gore",
+"6439075", "Takaka",
+"6436630", "Takaka",
+"6472129", "Whangamata",
+"6436589", "Otautau",
+"6478081", "Rotorua",
+"647829", "Hamilton",
+"6478139", "Whangamata",
+"6469611", "Wanganui",
+"64336", "Christchurch",
+"6435529", "Roxburgh",
+"6495533", "Whangarei",
+"647868", "Thames",
+"644904", "Paraparaumu",
+"646862", "Gisborne",
+"649425", "Warkworth",
+"643487", "Dunedin",
+"644296", "Paraparaumu",
+"6439752", "Cheviot",
+"6439330", "Westport",
+"6462159", "Mokau",
+"6479109", "Opotiki",
+"644245", "Wellington",
+"6493943", "Helensville",
+"643521", "Nelson",
+"6492228", "Warkworth",
+"6473994", "Rotorua",
+"6435546", "Greymouth",
+"6437467", "Queenstown",
+"643743", "Christchurch",
+"644494", "Wellington",
+"6497778", "Pukekohe",
+"6435694", "Franz\ Josef",
+"6439870", "Queenstown",
+"64935", "Auckland",
+"643433", "Oamaru",
+"6498881", "Hibiscus\ Coast",
+"6439345", "Christchurch",
+"6466000", "Napier",
+"6474638", "Opotiki",
+"6473933", "Rotorua",
+"6477776", "Whangamata",
+"6479712", "Te\ Awamutu",
+"6478992", "Paeroa",
+"6437773", "Dunedin",
+"6462802", "Palmerston\ North",
+"646341", "Wanganui",
+"6462411", "New\ Plymouth",
+"6479852", "Whangamata",
+"6499421", "Hibiscus\ Coast",
+"6432223", "Akaroa",
+"647883", "Putaruru\/Tokoroa",
+"6475827", "Hamilton",
+"6435671", "Oamaru",
+"6432663", "Christchurch",
+"6472226", "Te\ Kuiti",
+"6498851", "Pukekohe",
+"6435999", "Christchurch",
+"647980", "Hamilton",
+"6462814", "Hawera",
+"6496010", "Kaitaia",
+"6449081", "Paraparaumu",
+"6436645", "Ranfurly",
+"6472146", "Otorohanga",
+"647590", "Hamilton",
+"6434222", "Gore",
+"646837", "Wairoa",
+"6475826", "Hamilton",
+"6432660", "Christchurch",
+"647927", "Tauranga",
+"6432220", "Dunedin",
+"6477777", "Hamilton",
+"6499551", "Whangarei",
+"6435559", "Haast",
+"6437770", "Nelson",
+"6436529", "Westport",
+"6468248", "New\ Plymouth",
+"6499878", "Warkworth",
+"644299", "Paraparaumu",
+"6462129", "Waiouru",
+"647850", "Hamilton",
+"6472147", "Paeroa",
+"6439722", "Blenheim",
+"6495564", "Whangarei",
+"646865", "Gisborne",
+"643964", "Christchurch",
+"6496013", "Whangarei",
+"649422", "Warkworth",
+"646764", "Stratford",
+"643446", "Roxburgh",
+"6437466", "Cromwell",
+"646868", "Gisborne",
+"647351", "Rotorua",
+"6439288", "Ashburton",
+"6432714", "Cheviot",
+"6435547", "Blenheim",
+"6473930", "Waihi",
+"6466003", "Ruatoria",
+"643736", "Greymouth",
+"647826", "Huntly",
+"647862", "Paeroa",
+"6439873", "Wanaka",
+"6462138", "Palmerston\ North",
+"6493935", "Kawakawa",
+"6472118", "Taumarunui",
+"6433983", "Ranfurly",
+"6462106", "Pahiatua",
+"6465617", "Mokau",
+"6439310", "Invercargill",
+"6435686", "Gore",
+"6439090", "Rangiora",
+"6499552", "Dargaville",
+"643942", "Christchurch",
+"643686", "Timaru",
+"6496996", "Warkworth",
+"6478135", "Te\ Kuiti",
+"649827", "Auckland",
+"646327", "Marton",
+"649801", "Auckland",
+"6465623", "Opunake",
+"6439326", "Rangiora",
+"649632", "Auckland",
+"6462155", "Hawera",
+"6472624", "Whakatane",
+"6439721", "Blenheim",
+"6436506", "Darfield",
+"6463926", "Taihape",
+"6499100", "Pukekohe",
+"649950", "Auckland",
+"643412", "Balclutha",
+"646903", "Palmerston\ North",
+"6436610", "Kaikoura",
+"6473337", "Rotorua",
+"6439042", "Oamaru",
+"64941", "Auckland",
+"643751", "Fox\ Glacier",
+"646951", "Palmerston\ North",
+"6446509", "Paraparaumu",
+"644975", "Paraparaumu",
+"6436626", "Akaroa",
+"6436585", "Tokanui",
+"6469246", "Palmerston\ North",
+"649962", "Auckland",
+"6472125", "Huntly",
+"6434298", "Hokitika",
+"6433953", "Geraldine",
+"6445954", "Wellington",
+"6439079", "Murchison",
+"6435518", "Milton",
+"6444887", "Paraparaumu",
+"6437478", "Twizel",
+"644803", "Wellington",
+"6469289", "Taihape",
+"6436613", "Wanaka",
+"649296", "Auckland",
+"649476", "Auckland",
+"646758", "New\ Plymouth",
+"643305", "Ashburton\/Akaroa\/Chatham\ Islands",
+"643657", "Queenstown",
+"6498882", "Whangarei",
+"6433950", "Waitangi\ \(Chatham\ Is\.\)",
+"6436627", "Waitangi\ \(Chatham\ Is\.\)",
+"647343", "Rotorua",
+"644900", "Wellington",
+"6479229", "Opotiki",
+"6469247", "Wanganui",
+"6466528", "Dannevirke",
+"6463913", "Hawera",
+"6474449", "Opotiki",
+"6432614", "Akaroa",
+"649983", "Whangarei",
+"6479711", "Whangamata",
+"6478991", "Whangamata",
+"6435687", "Lumsden",
+"6462412", "Gisborne",
+"6462801", "Palmerston\ North",
+"6496997", "Hibiscus\ Coast",
+"649248", "Auckland",
+"6479851", "Waihi",
+"6435672", "Balclutha",
+"6465616", "Hawera",
+"6462107", "Dannevirke",
+"6439313", "Te\ Anau",
+"6469308", "Opunake",
+"643955", "Dunedin",
+"6499422", "Helensville",
+"6475608", "Otorohanga",
+"643308", "Ashburton\/Akaroa\/Chatham\ Islands",
+"6436995", "Westport",
+"6433980", "Milton",
+"6498852", "Warkworth",
+"6468884", "Palmerston\ North",
+"6439865", "Murchison",
+"6496009", "Pukekohe",
+"6473949", "Taupo",
+"6449082", "Wellington",
+"6463927", "Dannevirke",
+"6436507", "Kaikoura",
+"647872", "Te\ Awamutu",
+"6474655", "Te\ Kuiti",
+"6439327", "Ashburton",
+"649880", "Auckland",
+"6465620", "New\ Plymouth",
+"644202", "Wellington",
+"6434221", "Invercargill",
+"649638", "Auckland",
+"6494312", "Warkworth",
+"6432641", "Franz\ Josef",
+"6434993", "Alexandra",
+"6433917", "Franz\ Josef",
+"6475617", "Whakatane",
+"643415", "Balclutha",
+"6462118", "Waipukurau",
+"6469317", "Pahiatua",
+"6478143", "Opotiki",
+"6432992", "Gore",
+"6493939", "Auckland",
+"6473926", "Taumarunui",
+"6478077", "Waihi",
+"6434268", "Roxburgh",
+"6436518", "Murchison",
+"6462624", "Opunake",
+"649965", "Auckland",
+"6475623", "Tauranga",
+"6499476", "Auckland",
+"643948", "Invercargill",
+"6432734", "Waimate",
+"6436656", "Hokitika",
+"6478082", "Tauranga",
+"6435555", "Timaru",
+"644577", "Wellington",
+"649968", "Auckland",
+"6463905", "Napier",
+"6436525", "Franz\ Josef",
+"6436686", "Invercargill",
+"646844", "Napier\/Hastings",
+"6439060", "Greymouth",
+"643689", "Waimate",
+"647903", "Hamilton",
+"6466998", "New\ Plymouth",
+"6439751", "Culverden",
+"643418", "Balclutha",
+"6468693", "Gisborne",
+"644219", "Wellington",
+"6435506", "Amberley",
+"6468253", "Marton",
+"6479246", "Thames",
+"649635", "Auckland",
+"6462125", "Taihape",
+"6496513", "Whangarei",
+"647217", "Taupo",
+"6498822", "Kaikohe",
+"6435995", "Darfield",
+"64926", "Auckland",
+"6437484", "Riverton",
+"6499452", "Warkworth",
+"646273", "Hawera",
+"6439063", "Westport",
+"646752", "New\ Plymouth",
+"6432742", "Twizel",
+"6478451", "Hamilton",
+"643226", "Otautau",
+"6466558", "Opunake",
+"6436687", "Nelson",
+"6479247", "Hamilton",
+"649940", "Auckland",
+"644205", "Wellington",
+"6496510", "Whangarei",
+"646343", "Wanganui",
+"6449741", "Paraparaumu",
+"6468250", "Stratford",
+"6436649", "Gore",
+"647881", "Matamata",
+"6439001", "Christchurch",
+"6468690", "Gisborne",
+"6435507", "Ashburton",
+"6478140", "Rotorua",
+"647878", "Te\ Kuiti",
+"6469316", "Dannevirke",
+"6478598", "Hamilton",
+"643431", "Oamaru",
+"6465608", "Dannevirke",
+"643250", "Christchurch",
+"6475616", "Whangamata",
+"647854", "Hamilton",
+"6472801", "Huntly",
+"6434990", "Queenstown",
+"6469851", "Napier",
+"6434281", "Queenstown",
+"643409", "Queenstown",
+"6499068", "Pukekohe",
+"6469711", "New\ Plymouth",
+"64337", "Christchurch",
+"6433916", "Hokitika",
+"6468991", "Gisborne",
+"643960", "Christchurch",
+"649299", "Auckland",
+"649479", "Auckland",
+"6493991", "Pukekohe",
+"6469578", "Marton",
+"6439768", "Ranfurly",
+"6475620", "Tauranga",
+"643523", "Murchison",
+"6499477", "Pukekohe",
+"6436657", "Franz\ Josef",
+"64930", "Auckland",
+"6439292", "Timaru",
+"6492832", "Dargaville",
+"6468824", "Wanganui",
+"644466", "Wellington",
+"643302", "Ashburton\/Akaroa\/Chatham\ Islands",
+"6493208", "Helensville",
+"643741", "Christchurch",
+"6437454", "Ashburton",
+"6478076", "Te\ Awamutu",
+"6473927", "Te\ Kuiti",
+"644524", "Wellington",
+"6479291", "Hamilton",
+"6436636", "Waimate",
+"6432754", "Tokanui",
+"6462601", "Palmerston\ North",
+"6432814", "Mt\ Cook",
+"649963", "Auckland",
+"6435887", "Invercargill",
+"6472119", "Thames",
+"6462223", "Palmerston\ North",
+"644816", "Wellington",
+"6434270", "Oamaru",
+"643413", "Balclutha",
+"6432802", "Gore",
+"649239", "Pukekohe",
+"6467773", "Wanganui",
+"6477882", "Hamilton",
+"6439731", "Gore",
+"643690", "Waimate",
+"6434299", "Haast",
+"6442821", "Wellington",
+"6435519", "Twizel",
+"6439336", "Cromwell",
+"6442127", "Paraparaumu",
+"6479002", "Matamata",
+"644917", "Wellington",
+"649633", "Auckland",
+"6437479", "Edendale",
+"6433945", "Cheviot",
+"643943", "Christchurch",
+"6435535", "Invercargill",
+"643288", "Christchurch",
+"6469203", "New\ Plymouth",
+"647374", "Taupo",
+"646861", "Gisborne",
+"6499465", "Dargaville",
+"6437442", "Murchison",
+"6479014", "Matamata",
+"647905", "Taupo",
+"646345", "Wanganui",
+"6439337", "Wanaka",
+"6479752", "Rotorua",
+"6439024", "Lumsden",
+"6434231", "Christchurch",
+"644203", "Wellington",
+"647873", "Otorohanga",
+"647970", "Hamilton",
+"6436592", "Nelson",
+"6469288", "Waiouru",
+"649982", "Whangarei",
+"6435562", "Invercargill",
+"6469200", "Gisborne",
+"649845", "Auckland",
+"643528", "Motueka",
+"6473948", "Opotiki",
+"6496008", "Hibiscus\ Coast",
+"646964", "Wanganui",
+"6436637", "Twizel",
+"6435886", "Invercargill",
+"6468801", "Wanganui",
+"643666", "Christchurch",
+"643525", "Takaka",
+"646278", "Hawera",
+"64962", "Auckland",
+"6467770", "Gisborne",
+"6474448", "Taumarunui",
+"6466529", "Pahiatua",
+"643614", "Timaru",
+"649280", "Auckland",
+"6434273", "Lawrence",
+"6475609", "Paeroa",
+"646348", "Wanganui",
+"6462220", "New\ Plymouth",
+"6469309", "Mokau",
+"644802", "Wellington",
+"6493938", "Auckland",
+"643980", "Christchurch",
+"6472601", "Hamilton",
+"6434269", "Twizel",
+"6436519", "Takaka",
+"6496017", "Great\ Barrier\ Island",
+"6439704", "Murchison",
+"6499012", "Kawakawa",
+"6469291", "Gisborne",
+"649407", "Kaikohe",
+"6479501", "Opotiki",
+"6472143", "Morrinsville",
+"643590", "Christchurch",
+"6477773", "Taupo",
+"6439712", "Fairlie",
+"6437776", "Cromwell",
+"649421", "Hibiscus\ Coast",
+"6439285", "Invercargill",
+"6468264", "Palmerston\ North",
+"6439852", "Cheviot",
+"6432226", "Timaru",
+"6435952", "Christchurch",
+"6472223", "Hamilton",
+"6462119", "Wairoa",
+"6499004", "Hibiscus\ Coast",
+"6475820", "Hamilton",
+"6469002", "Hawera",
+"6432724", "Greymouth",
+"6466007", "Stratford",
+"6469274", "New\ Plymouth",
+"6499875", "Dargaville",
+"6439882", "Westport",
+"6468245", "Wairoa",
+"6469014", "Dannevirke",
+"6435543", "Tokanui",
+"6433994", "Winton",
+"644819", "Wellington",
+"646374", "Dannevirke",
+"6437460", "Waitangi\ \(Chatham\ Is\.\)",
+"6494705", "Whangarei",
+"649236", "Pukekohe",
+"6468303", "Napier",
+"6469869", "Ruatoria",
+"6466999", "New\ Plymouth",
+"643303", "Ashburton\/Akaroa\/Chatham\ Islands",
+"6472192", "Whakatane",
+"6466006", "Opunake",
+"6436648", "Lumsden",
+"64952", "Auckland",
+"643669", "Christchurch",
+"643522", "Nelson",
+"647345", "Rotorua",
+"649988", "Whangarei",
+"6439876", "Roxburgh",
+"6439084", "Amberley",
+"644805", "Wellington",
+"6468300", "Napier",
+"6437463", "Mt\ Cook",
+"6435540", "Edendale",
+"6466559", "Mokau",
+"6469579", "Pahiatua",
+"6439769", "Roxburgh",
+"6472140", "Putaruru\/Tokoroa",
+"6462162", "Masterton",
+"646342", "Wanganui",
+"6496016", "Warkworth",
+"6462421", "New\ Plymouth",
+"6493209", "Great\ Barrier\ Island",
+"6497775", "Helensville",
+"6475823", "Hamilton",
+"6432227", "Queenstown",
+"6472220", "Tauranga",
+"6436562", "Balclutha",
+"6465609", "Pahiatua",
+"649985", "Auckland",
+"6478599", "Hamilton",
+"647348", "Rotorua",
+"6437777", "Christchurch",
+"6499069", "Pukekohe",
+"6492225", "Pukekohe",
+"646753", "New\ Plymouth",
+"646272", "Hawera",
+"6432444", "Nelson",
+"6478095", "Taupo",
+"6477770", "Tauranga",};
 
     sub new {
       my $class = shift;

@@ -1,5 +1,5 @@
 package Dist::Zilla::Plugin::ReversionAfterRelease;
-our $VERSION = '0.2';
+our $VERSION = '0.3';
 use Moose;
 extends 'Dist::Zilla::Plugin::ReversionOnRelease';
 with 'Dist::Zilla::Role::AfterRelease';

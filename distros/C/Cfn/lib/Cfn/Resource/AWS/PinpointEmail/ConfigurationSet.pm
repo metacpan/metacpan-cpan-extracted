@@ -1,4 +1,4 @@
-# AWS::PinpointEmail::ConfigurationSet generated from spec 3.3.0
+# AWS::PinpointEmail::ConfigurationSet generated from spec 18.4.0
 use Moose::Util::TypeConstraints;
 
 coerce 'Cfn::Resource::Properties::AWS::PinpointEmail::ConfigurationSet',
@@ -29,11 +29,11 @@ coerce 'Cfn::Resource::Properties::AWS::PinpointEmail::ConfigurationSet::Trackin
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::PinpointEmail::ConfigurationSet::TrackingOptionsValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::PinpointEmail::ConfigurationSet::TrackingOptions->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::PinpointEmail::ConfigurationSet::TrackingOptionsValue {
+package Cfn::Resource::Properties::Object::AWS::PinpointEmail::ConfigurationSet::TrackingOptions {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -72,11 +72,11 @@ coerce 'Cfn::Resource::Properties::AWS::PinpointEmail::ConfigurationSet::Tags',
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::PinpointEmail::ConfigurationSet::TagsValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::PinpointEmail::ConfigurationSet::Tags->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::PinpointEmail::ConfigurationSet::TagsValue {
+package Cfn::Resource::Properties::Object::AWS::PinpointEmail::ConfigurationSet::Tags {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -94,11 +94,11 @@ coerce 'Cfn::Resource::Properties::AWS::PinpointEmail::ConfigurationSet::Sending
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::PinpointEmail::ConfigurationSet::SendingOptionsValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::PinpointEmail::ConfigurationSet::SendingOptions->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::PinpointEmail::ConfigurationSet::SendingOptionsValue {
+package Cfn::Resource::Properties::Object::AWS::PinpointEmail::ConfigurationSet::SendingOptions {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -115,11 +115,11 @@ coerce 'Cfn::Resource::Properties::AWS::PinpointEmail::ConfigurationSet::Reputat
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::PinpointEmail::ConfigurationSet::ReputationOptionsValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::PinpointEmail::ConfigurationSet::ReputationOptions->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::PinpointEmail::ConfigurationSet::ReputationOptionsValue {
+package Cfn::Resource::Properties::Object::AWS::PinpointEmail::ConfigurationSet::ReputationOptions {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -136,11 +136,11 @@ coerce 'Cfn::Resource::Properties::AWS::PinpointEmail::ConfigurationSet::Deliver
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::PinpointEmail::ConfigurationSet::DeliveryOptionsValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::PinpointEmail::ConfigurationSet::DeliveryOptions->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::PinpointEmail::ConfigurationSet::DeliveryOptionsValue {
+package Cfn::Resource::Properties::Object::AWS::PinpointEmail::ConfigurationSet::DeliveryOptions {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -162,3 +162,30 @@ package Cfn::Resource::Properties::AWS::PinpointEmail::ConfigurationSet {
 }
 
 1;
+### main pod documentation begin ###
+
+=encoding UTF-8
+
+=head1 NAME
+
+Cfn::Resource::AWS::PinpointEmail::ConfigurationSet - Cfn resource for AWS::PinpointEmail::ConfigurationSet
+
+=head1 DESCRIPTION
+
+This module implements a Perl module that represents the CloudFormation object AWS::PinpointEmail::ConfigurationSet.
+
+See L<Cfn> for more information on how to use it.
+
+=head1 AUTHOR
+
+    Jose Luis Martinez
+    CAPSiDE
+    jlmartinez@capside.com
+
+=head1 COPYRIGHT and LICENSE
+
+Copyright (c) 2013 by CAPSiDE
+This code is distributed under the Apache 2 License. The full text of the 
+license can be found in the LICENSE file included with this module.
+
+=cut

@@ -35,6 +35,8 @@ restrpc '/rest/system' => {
     arguments => ['TestProject::SystemCalls'],
 };
 
+restrpc '/rest/api' => { publish => 'config' };
+
 true;
 
 __END__
@@ -55,4 +57,4 @@ jsonrpc:
 restrpc:
     /rest/system/ping
     /rest/system/version
-
+    /rest/api/uppercase

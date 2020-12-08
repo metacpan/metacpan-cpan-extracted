@@ -56,7 +56,7 @@ integer numeric types are also available as NegativeByte, NegativeMedium and so 
 
 =item Huge - 64 bit integer
 
-=item Float - 64 bit IEEE754
+=item Float - 64 bit IEEE754 double-precision
 
 =item Null
 
@@ -80,7 +80,9 @@ Encodes a list of nodes, which can themselves be of any type.
 
 Encodes a list of key-value pairs, the keys being strings or numbers and the
 values being nodes of any type. The keys B<must> be stored in ASCIIbetical
-order.
+order. Note that while the use of numeric types is *permitted* for keys it
+is not recommended, as you may run into problems finding floating point keys
+because of the usual floating point imprecision issues.
 
 =back
 

@@ -1,14 +1,10 @@
-#!/usr/bin/perl -w
-
 use strict;
-
+use warnings;
 use lib 't/inc';
-use fatalwarnings;
+use nptestutils;
 
 use Number::Phone::Lib; # need to force it to use stubs in case N::P::BR exists
 use Test::More;
-
-END { done_testing(); }
 
 {
     my $np = Number::Phone::Lib->new('BR', '0 85 2222 2222');
@@ -31,3 +27,5 @@ END { done_testing(); }
     is($np->format, '+55 35 99870 5656', '...its international format is correct');
     is($np->format_using('National'), '(35) 99870-5656', '...as is its national format');
 }
+
+done_testing();

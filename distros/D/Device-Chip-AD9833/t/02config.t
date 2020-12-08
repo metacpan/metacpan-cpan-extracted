@@ -6,19 +6,21 @@ use warnings;
 use Test::More;
 use Test::Device::Chip::Adapter;
 
+use Future::AsyncAwait;
+
 use Device::Chip::AD9833;
 
 my $chip = Device::Chip::AD9833->new;
 
-$chip->mount(
+await $chip->mount(
    my $adapter = Test::Device::Chip::Adapter->new,
-)->get;
+);
 
 # ->read_config
 {
    # Chip can't read back config; we just store this in memory
 
-   is_deeply( $chip->read_config->get,
+   is_deeply( await $chip->read_config,
       {
          B28     => !!0,
          HLB     => !!0,
@@ -43,7 +45,7 @@ $chip->mount(
 {
    $adapter->expect_write( "\x20\x02" ); # B28, MODE
 
-   $chip->change_config( MODE => 1 )->get;
+   await $chip->change_config( MODE => 1 );
 
    $adapter->check_and_clear( '->change_config' );
 }
@@ -52,7 +54,7 @@ $chip->mount(
 {
    $adapter->expect_write( "\x20\x28" ); # B28, OPBITEN, DIV2
 
-   $chip->change_config( wave => "square" )->get;
+   await $chip->change_config( wave => "square" );
 
    $adapter->check_and_clear( '->change_config' );
 }

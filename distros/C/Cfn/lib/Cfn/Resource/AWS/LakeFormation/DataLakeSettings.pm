@@ -1,4 +1,4 @@
-# AWS::LakeFormation::DataLakeSettings generated from spec 5.3.0
+# AWS::LakeFormation::DataLakeSettings generated from spec 20.1.0
 use Moose::Util::TypeConstraints;
 
 coerce 'Cfn::Resource::Properties::AWS::LakeFormation::DataLakeSettings',
@@ -29,11 +29,11 @@ coerce 'Cfn::Resource::Properties::AWS::LakeFormation::DataLakeSettings::DataLak
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::LakeFormation::DataLakeSettings::DataLakePrincipalValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::LakeFormation::DataLakeSettings::DataLakePrincipal->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::LakeFormation::DataLakeSettings::DataLakePrincipalValue {
+package Cfn::Resource::Properties::Object::AWS::LakeFormation::DataLakeSettings::DataLakePrincipal {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -50,11 +50,11 @@ coerce 'Cfn::Resource::Properties::AWS::LakeFormation::DataLakeSettings::Admins'
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::LakeFormation::DataLakeSettings::AdminsValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::LakeFormation::DataLakeSettings::Admins->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::LakeFormation::DataLakeSettings::AdminsValue {
+package Cfn::Resource::Properties::Object::AWS::LakeFormation::DataLakeSettings::Admins {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -67,6 +67,34 @@ package Cfn::Resource::Properties::AWS::LakeFormation::DataLakeSettings {
   extends 'Cfn::Resource::Properties';
   
   has Admins => (isa => 'Cfn::Resource::Properties::AWS::LakeFormation::DataLakeSettings::Admins', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has TrustedResourceOwners => (isa => 'Cfn::Value::Array|Cfn::Value::Function|Cfn::DynamicValue', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
 }
 
 1;
+### main pod documentation begin ###
+
+=encoding UTF-8
+
+=head1 NAME
+
+Cfn::Resource::AWS::LakeFormation::DataLakeSettings - Cfn resource for AWS::LakeFormation::DataLakeSettings
+
+=head1 DESCRIPTION
+
+This module implements a Perl module that represents the CloudFormation object AWS::LakeFormation::DataLakeSettings.
+
+See L<Cfn> for more information on how to use it.
+
+=head1 AUTHOR
+
+    Jose Luis Martinez
+    CAPSiDE
+    jlmartinez@capside.com
+
+=head1 COPYRIGHT and LICENSE
+
+Copyright (c) 2013 by CAPSiDE
+This code is distributed under the Apache 2 License. The full text of the 
+license can be found in the LICENSE file included with this module.
+
+=cut

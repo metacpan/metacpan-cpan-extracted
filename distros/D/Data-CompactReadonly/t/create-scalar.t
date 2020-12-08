@@ -4,6 +4,8 @@ no warnings qw(portable overflow);
 
 use File::Temp qw(tempfile);
 use Test::More;
+use lib 't/lib';
+use TestFloat;
 
 use Data::CompactReadonly;
 
@@ -36,7 +38,7 @@ foreach my $tuple (
 # normal size, practically zero, ginormously -ve
 foreach my $value (5.1413, 81.72e-50, -1.37e100/3) {
     Data::CompactReadonly->create($filename, $value);
-    is($data = Data::CompactReadonly->read($filename), $value, "can create a Float file ($value)");
+    cmp_float($data = Data::CompactReadonly->read($filename), $value, "can create a Float file ($value)");
 }
 
 foreach my $length (1, 1000, 100000, 0x1000000) {
@@ -58,20 +60,24 @@ foreach my $length (1, 1000) {
         is((stat($filename))[7], $filesize, "... file is expected size $filesize");
 }
 
-foreach my $tuple ( # torture tests
+foreach my $test ( # torture tests
     ['007',   10], # Text
     ['000',   10], # Text
     ['00.7',  11], # Text
     ['00.07', 12], # Text
-    ['0.07',  14], # Float
-    ['7.01',  14], # Float
+    ['0.07',  14, 'cmp_float'], # Float
+    ['7.01',  14, 'cmp_float'], # Float
     ['7.0',   10], # Text
     ['7.00',  11], # Text
     ['7.10',  11], # Text
 ) {
-    my($value, $filesize) = @{$tuple};
+    my($value, $filesize, $cmp_float) = @{$test};
     Data::CompactReadonly->create($filename, $value);
-    is($data = Data::CompactReadonly->read($filename), $value, "can create a file with value '$value'");
+    if($cmp_float) {
+        cmp_float($data = Data::CompactReadonly->read($filename), $value, "can create a file with value '$value'");
+    } else {
+        is($data = Data::CompactReadonly->read($filename), $value, "can create a file with value '$value'");
+    }
     is((stat($filename))[7], $filesize, "... file is expected size for data $value") || diag(`hexdump -C $filename`);
 }
 

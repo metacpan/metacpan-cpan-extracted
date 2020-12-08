@@ -74,10 +74,12 @@ MOUNT PARAMETERS
 
 METHODS
 
-    The following methods documented with a trailing call to ->get return
-    Future instances.
+    The following methods documented in an await expression return Future
+    instances.
 
- $chip->start->get
+ start
+
+       await $chip->start;
 
     Powers up the device, reads and checks the signature, ensuring it is a
     recognised chip.
@@ -86,19 +88,27 @@ METHODS
     RESET. Use the power, hv_power or all_power methods to turn these off
     if it is not required again immediately.
 
- $chip->stop->get
+ stop
+
+       await $chip->stop;
 
     Shut down power to the device.
 
- $chip->power( $on )->get
+ power
+
+       await $chip->power( $on );
 
     Controls +5V to the Vcc pin of the ATtiny chip.
 
- $chip->hv_power( $on )->get
+ hv_power
+
+       await $chip->hv_power( $on );
 
     Controls +12V to the RESET pin of the ATtiny chip.
 
- $chip->all_power( $on )->get
+ all_power
+
+       await $chip->all_power( $on );
 
     Controls both +5V and +12V supplies at once. The +12V supply is turned
     on last but off first, ensuring the correct HVSP-RESET sequence is
@@ -149,55 +159,83 @@ METHODS
     Returns a Device::Chip::AVR_HVSP::FuseInfo instance containing
     information on the fuses in the attached device type.
 
- $avr->chip_erase->get
+ chip_erase
+
+       await $avr->chip_erase;
 
     Performs an entire chip erase. This will clear the flash and EEPROM
     memories, before resetting the lock bits. It does not affect the fuses.
 
- $bytes = $avr->read_signature->get
+ read_signature
+
+       $bytes = await $avr->read_signature;
 
     Reads the three device signature bytes and returns them in as a single
     binary string.
 
- $byte = $avr->read_calibration->get
+ read_calibration
+
+       $byte = await $avr->read_calibration;
 
     Reads the calibration byte.
 
- $byte = $avr->read_lock->get
+ read_lock
+
+       $byte = await $avr->read_lock;
 
     Reads the lock byte.
 
- $avr->write_lock( $byte )->get
+ write_lock
+
+       await $avr->write_lock( $byte );
 
     Writes the lock byte.
 
- $int = $avr->read_fuse_byte( $fuse )->get
+ read_fuse_byte
+
+       $int = await $avr->read_fuse_byte( $fuse );
 
     Reads one of the fuse bytes lfuse, hfuse, efuse, returning an integer.
 
- $avr->write_fuse_byte( $fuse, $byte )->get
+ write_fuse_byte
+
+       await $avr->write_fuse_byte( $fuse, $byte );
 
     Writes one of the fuse bytes lfuse, hfuse, efuse from an integer.
 
- $byte = $avr->read_lfuse->get
+ read_lfuse
 
- $byte = $avr->read_hfuse->get
+ read_hfuse
 
- $byte = $avr->read_efuse->get
+ read_efuse
+
+       $byte = await $avr->read_lfuse;
+    
+       $byte = await $avr->read_hfuse;
+    
+       $byte = await $avr->read_efuse;
 
     Convenient shortcuts to reading the low, high and extended fuses
     directly, returning a byte.
 
- $avr->write_lfuse( $byte )->get
+ write_lfuse
 
- $avr->write_hfuse( $byte )->get
+ write_hfuse
 
- $avr->write_efuse( $byte )->get
+ write_efuse
+
+       await $avr->write_lfuse( $byte );
+    
+       await $avr->write_hfuse( $byte );
+    
+       await $avr->write_efuse( $byte );
 
     Convenient shortcuts for writing the low, high and extended fuses
     directly, from a byte.
 
- $bytes = $avr->read_flash( %args )->get
+ read_flash
+
+       $bytes = await $avr->read_flash( %args );
 
     Reads a range of the flash memory and returns it as a binary string.
 
@@ -214,11 +252,15 @@ METHODS
       Alternative to stop; gives the nubmer of bytes (i.e. not words of
       flash) to read.
 
- $avr->write_flash( $bytes )->get
+ write_flash
+
+       await $avr->write_flash( $bytes );
 
     Writes the flash memory from the binary string.
 
- $bytes = $avr->read_eeprom( %args )->get
+ read_eeprom
+
+       $bytes = await $avr->read_eeprom( %args );
 
     Reads a range of the EEPROM memory and returns it as a binary string.
 
@@ -234,7 +276,9 @@ METHODS
 
       Alternative to stop; gives the nubmer of bytes to read.
 
- $avr->write_eeprom( $bytes )->get
+ write_eeprom
+
+       await $avr->write_eeprom( $bytes );
 
     Writes the EEPROM memory from the binary string.
 

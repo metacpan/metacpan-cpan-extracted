@@ -2,8 +2,9 @@ use strict;
 use warnings;
 package JSON::Schema::Draft201909::Vocabulary::Applicator;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
+# ABSTRACT: Implementation of the JSON Schema Draft 2019-09 Applicator vocabulary
 
-our $VERSION = '0.017';
+our $VERSION = '0.018';
 
 use 5.016;
 no if "$]" >= 5.031009, feature => 'indirect';
@@ -274,7 +275,14 @@ sub _eval_keyword_items {
   return A($state, true);
 }
 
-sub _traverse_keyword_unevaluatedItems { shift->traverse_schema(@_) }
+sub _traverse_keyword_unevaluatedItems {
+  my ($self, $schema, $state) = @_;
+
+  $self->traverse_schema($schema, $state);
+
+  # remember that annotations need to be collected in order to evaluate this keyword
+  $state->{configs}{collect_annotations} = 1;
+}
 
 sub _eval_keyword_unevaluatedItems {
   my ($self, $data, $schema, $state) = @_;
@@ -526,7 +534,14 @@ sub _eval_keyword_additionalProperties {
   return @valid_properties ? A($state, \@valid_properties) : 1;
 }
 
-sub _traverse_keyword_unevaluatedProperties { shift->traverse_schema(@_) }
+sub _traverse_keyword_unevaluatedProperties {
+  my ($self, $schema, $state) = @_;
+
+  $self->traverse_schema($schema, $state);
+
+  # remember that annotations need to be collected in order to evaluate this keyword
+  $state->{configs}{collect_annotations} = 1;
+}
 
 sub _eval_keyword_unevaluatedProperties {
   my ($self, $data, $schema, $state) = @_;
@@ -620,19 +635,19 @@ __END__
 
 =head1 NAME
 
-JSON::Schema::Draft201909::Vocabulary::Applicator
+JSON::Schema::Draft201909::Vocabulary::Applicator - Implementation of the JSON Schema Draft 2019-09 Applicator vocabulary
 
 =head1 VERSION
 
-version 0.017
+version 0.018
 
-=head1 SYNOPSIS
+=head1 DESCRIPTION
 
 =for Pod::Coverage vocabulary keywords
 
 =for stopwords metaschema
 
-Implementation of the JSON Schema Draft 2019-09 "applicator" vocabulary, indicated in metaschemas
+Implementation of the JSON Schema Draft 2019-09 "Applicator" vocabulary, indicated in metaschemas
 with the URI C<https://json-schema.org/draft/2019-09/vocab/applicator> and formally specified in
 L<https://json-schema.org/draft/2019-09/json-schema-core.html#rfc.section.9>.
 

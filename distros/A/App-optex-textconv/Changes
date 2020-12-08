@@ -1,5 +1,10 @@
 Revision history for Perl extension App-optex-textconv
 
+0.11 2020-12-07T08:11:35Z
+
+    - Implement -Mtextconv::load= function.
+    - Add pandoc/tika modules.
+
 0.10 2020-09-22T05:11:41Z
 
     - Update to use Archive::Zip module instead of unzip command.

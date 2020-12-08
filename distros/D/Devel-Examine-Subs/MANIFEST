@@ -72,6 +72,9 @@ t/54-add_func_sub_exists.t
 t/55-dir.t
 t/56-post_proc_dump_multi.t
 t/57-heredoc-bug.t
+t/58-tempfile_unlink_bug.t
+t/59-rw.t
+t/60-tempfile.t
 t/__clean.t
 t/manifest.t
 t/orig/inject.data
@@ -92,5 +95,6 @@ t/test/no_subs.pm
 t/test/other.pm
 t/test/sample.pm
 t/win_sample.data
+testrules.yml
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,4 +1,4 @@
-# AWS::WAFRegional::RateBasedRule generated from spec 3.3.0
+# AWS::WAFRegional::RateBasedRule generated from spec 18.4.0
 use Moose::Util::TypeConstraints;
 
 coerce 'Cfn::Resource::Properties::AWS::WAFRegional::RateBasedRule',
@@ -51,11 +51,11 @@ coerce 'Cfn::Resource::Properties::AWS::WAFRegional::RateBasedRule::Predicate',
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::WAFRegional::RateBasedRule::PredicateValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::WAFRegional::RateBasedRule::Predicate->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::WAFRegional::RateBasedRule::PredicateValue {
+package Cfn::Resource::Properties::Object::AWS::WAFRegional::RateBasedRule::Predicate {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -78,3 +78,30 @@ package Cfn::Resource::Properties::AWS::WAFRegional::RateBasedRule {
 }
 
 1;
+### main pod documentation begin ###
+
+=encoding UTF-8
+
+=head1 NAME
+
+Cfn::Resource::AWS::WAFRegional::RateBasedRule - Cfn resource for AWS::WAFRegional::RateBasedRule
+
+=head1 DESCRIPTION
+
+This module implements a Perl module that represents the CloudFormation object AWS::WAFRegional::RateBasedRule.
+
+See L<Cfn> for more information on how to use it.
+
+=head1 AUTHOR
+
+    Jose Luis Martinez
+    CAPSiDE
+    jlmartinez@capside.com
+
+=head1 COPYRIGHT and LICENSE
+
+Copyright (c) 2013 by CAPSiDE
+This code is distributed under the Apache 2 License. The full text of the 
+license can be found in the LICENSE file included with this module.
+
+=cut

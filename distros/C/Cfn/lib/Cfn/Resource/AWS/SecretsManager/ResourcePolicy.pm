@@ -1,4 +1,4 @@
-# AWS::SecretsManager::ResourcePolicy generated from spec 5.3.0
+# AWS::SecretsManager::ResourcePolicy generated from spec 20.1.0
 use Moose::Util::TypeConstraints;
 
 coerce 'Cfn::Resource::Properties::AWS::SecretsManager::ResourcePolicy',
@@ -25,8 +25,36 @@ package Cfn::Resource::Properties::AWS::SecretsManager::ResourcePolicy {
   use MooseX::StrictConstructor;
   extends 'Cfn::Resource::Properties';
   
+  has BlockPublicPolicy => (isa => 'Cfn::Value::Boolean', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has ResourcePolicy => (isa => 'Cfn::Value::Json|Cfn::DynamicValue', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has SecretId => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
 }
 
 1;
+### main pod documentation begin ###
+
+=encoding UTF-8
+
+=head1 NAME
+
+Cfn::Resource::AWS::SecretsManager::ResourcePolicy - Cfn resource for AWS::SecretsManager::ResourcePolicy
+
+=head1 DESCRIPTION
+
+This module implements a Perl module that represents the CloudFormation object AWS::SecretsManager::ResourcePolicy.
+
+See L<Cfn> for more information on how to use it.
+
+=head1 AUTHOR
+
+    Jose Luis Martinez
+    CAPSiDE
+    jlmartinez@capside.com
+
+=head1 COPYRIGHT and LICENSE
+
+Copyright (c) 2013 by CAPSiDE
+This code is distributed under the Apache 2 License. The full text of the 
+license can be found in the LICENSE file included with this module.
+
+=cut

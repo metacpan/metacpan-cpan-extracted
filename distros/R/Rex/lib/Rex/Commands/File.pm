@@ -64,7 +64,7 @@ use strict;
 use warnings;
 use Fcntl;
 
-our $VERSION = '1.13.1'; # VERSION
+our $VERSION = '1.13.2'; # VERSION
 
 require Rex::Exporter;
 use Data::Dumper;
@@ -100,6 +100,10 @@ use vars qw(%file_handles);
 =head2 template($file, @params)
 
 Parse a template and return the content.
+
+By default, it uses L<Rex::Template>. If any of the L<template_ng|Rex#template_ng> or L<1.3|Rex#1.3> (or newer) feature flag is enabled, then L<Rex::Template::NG> is used instead of this module (recommended).
+
+For more advanced functionality, you may use your favorite template engine via the L<set_template_function|Rex::Config#set_template_function> configuration option.
 
 =head3 Embedded templates
 
@@ -375,25 +379,25 @@ This function supports the following L<hooks|Rex::Hook>:
 
 =item before
 
-This gets executed before anything is done. All original parameters are passed to it, including the applied defaults (C<ensure => 'present', resolved path for C<source>).
+This gets executed before anything is done. All original parameters are passed to it, including the applied defaults (C<ensure =E<gt> 'present'>, resolved path for C<source>).
 
 The return value of this hook overwrites the original parameters of the function call.
 
 =item before_change
 
-This gets executed right before the new file is written. All original parameters are passed to it, including the applied defaults (C<ensure => 'present', resolved path for C<source>).
+This gets executed right before the new file is written. All original parameters are passed to it, including the applied defaults (C<ensure =E<gt> 'present'>, resolved path for C<source>).
 
 Only called when the C<content> parameter is used. For the C<source> parameter, the L<upload|Rex::Commands::Upload#upload> hooks are used.
 
 =item after_change
 
-This gets executed right after the file is written. All original parameters, including the applied defaults (C<ensure => 'present', resolved path for C<source>), and any returned results are passed to it.
+This gets executed right after the file is written. All original parameters, including the applied defaults (C<ensure =E<gt> 'present'>, resolved path for C<source>), and any returned results are passed to it.
 
 Only called when the C<content> parameter is used. For the C<source> parameter, the L<upload|Rex::Commands::Upload#upload> hooks are used.
 
 =item after
 
-This gets executed right before the C<file()> function returns. All original parameters, including the applied defaults (C<ensure => 'present', resolved path for C<source>), and any returned results are passed to it.
+This gets executed right before the C<file()> function returns. All original parameters, including the applied defaults (C<ensure =E<gt> 'present'>, resolved path for C<source>), and any returned results are passed to it.
 
 =back
 

@@ -1,4 +1,4 @@
-# AWS::Batch::JobDefinition generated from spec 5.0.0
+# AWS::Batch::JobDefinition generated from spec 20.1.0
 use Moose::Util::TypeConstraints;
 
 coerce 'Cfn::Resource::Properties::AWS::Batch::JobDefinition',
@@ -29,16 +29,105 @@ coerce 'Cfn::Resource::Properties::AWS::Batch::JobDefinition::VolumesHost',
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::Batch::JobDefinition::VolumesHostValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::Batch::JobDefinition::VolumesHost->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::Batch::JobDefinition::VolumesHostValue {
+package Cfn::Resource::Properties::Object::AWS::Batch::JobDefinition::VolumesHost {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
   
   has SourcePath => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+}
+subtype 'ArrayOfCfn::Resource::Properties::AWS::Batch::JobDefinition::Tmpfs',
+     as 'Cfn::Value',
+  where { $_->isa('Cfn::Value::Array') or $_->isa('Cfn::Value::Function') },
+message { "$_ is not a Cfn::Value or a Cfn::Value::Function" };
+
+coerce 'ArrayOfCfn::Resource::Properties::AWS::Batch::JobDefinition::Tmpfs',
+  from 'HashRef',
+   via {
+     if (my $f = Cfn::TypeLibrary::try_function($_)) {
+       return $f
+     } else {
+       die 'Only accepts functions'; 
+     }
+   },
+  from 'ArrayRef',
+   via {
+     Cfn::Value::Array->new(Value => [
+       map { 
+         Moose::Util::TypeConstraints::find_type_constraint('Cfn::Resource::Properties::AWS::Batch::JobDefinition::Tmpfs')->coerce($_)
+       } @$_
+     ]);
+   };
+
+subtype 'Cfn::Resource::Properties::AWS::Batch::JobDefinition::Tmpfs',
+     as 'Cfn::Value';
+
+coerce 'Cfn::Resource::Properties::AWS::Batch::JobDefinition::Tmpfs',
+  from 'HashRef',
+   via {
+     if (my $f = Cfn::TypeLibrary::try_function($_)) {
+       return $f
+     } else {
+       return Cfn::Resource::Properties::Object::AWS::Batch::JobDefinition::Tmpfs->new( %$_ );
+     }
+   };
+
+package Cfn::Resource::Properties::Object::AWS::Batch::JobDefinition::Tmpfs {
+  use Moose;
+  use MooseX::StrictConstructor;
+  extends 'Cfn::Value::TypedValue';
+  
+  has ContainerPath => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has MountOptions => (isa => 'Cfn::Value::Array|Cfn::Value::Function|Cfn::DynamicValue', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has Size => (isa => 'Cfn::Value::Integer', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+}
+subtype 'ArrayOfCfn::Resource::Properties::AWS::Batch::JobDefinition::Secret',
+     as 'Cfn::Value',
+  where { $_->isa('Cfn::Value::Array') or $_->isa('Cfn::Value::Function') },
+message { "$_ is not a Cfn::Value or a Cfn::Value::Function" };
+
+coerce 'ArrayOfCfn::Resource::Properties::AWS::Batch::JobDefinition::Secret',
+  from 'HashRef',
+   via {
+     if (my $f = Cfn::TypeLibrary::try_function($_)) {
+       return $f
+     } else {
+       die 'Only accepts functions'; 
+     }
+   },
+  from 'ArrayRef',
+   via {
+     Cfn::Value::Array->new(Value => [
+       map { 
+         Moose::Util::TypeConstraints::find_type_constraint('Cfn::Resource::Properties::AWS::Batch::JobDefinition::Secret')->coerce($_)
+       } @$_
+     ]);
+   };
+
+subtype 'Cfn::Resource::Properties::AWS::Batch::JobDefinition::Secret',
+     as 'Cfn::Value';
+
+coerce 'Cfn::Resource::Properties::AWS::Batch::JobDefinition::Secret',
+  from 'HashRef',
+   via {
+     if (my $f = Cfn::TypeLibrary::try_function($_)) {
+       return $f
+     } else {
+       return Cfn::Resource::Properties::Object::AWS::Batch::JobDefinition::Secret->new( %$_ );
+     }
+   };
+
+package Cfn::Resource::Properties::Object::AWS::Batch::JobDefinition::Secret {
+  use Moose;
+  use MooseX::StrictConstructor;
+  extends 'Cfn::Value::TypedValue';
+  
+  has Name => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has ValueFrom => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
 }
 subtype 'ArrayOfCfn::Resource::Properties::AWS::Batch::JobDefinition::Device',
      as 'Cfn::Value',
@@ -72,11 +161,11 @@ coerce 'Cfn::Resource::Properties::AWS::Batch::JobDefinition::Device',
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::Batch::JobDefinition::DeviceValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::Batch::JobDefinition::Device->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::Batch::JobDefinition::DeviceValue {
+package Cfn::Resource::Properties::Object::AWS::Batch::JobDefinition::Device {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -117,11 +206,11 @@ coerce 'Cfn::Resource::Properties::AWS::Batch::JobDefinition::Volumes',
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::Batch::JobDefinition::VolumesValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::Batch::JobDefinition::Volumes->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::Batch::JobDefinition::VolumesValue {
+package Cfn::Resource::Properties::Object::AWS::Batch::JobDefinition::Volumes {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -161,11 +250,11 @@ coerce 'Cfn::Resource::Properties::AWS::Batch::JobDefinition::Ulimit',
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::Batch::JobDefinition::UlimitValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::Batch::JobDefinition::Ulimit->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::Batch::JobDefinition::UlimitValue {
+package Cfn::Resource::Properties::Object::AWS::Batch::JobDefinition::Ulimit {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -206,11 +295,11 @@ coerce 'Cfn::Resource::Properties::AWS::Batch::JobDefinition::ResourceRequiremen
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::Batch::JobDefinition::ResourceRequirementValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::Batch::JobDefinition::ResourceRequirement->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::Batch::JobDefinition::ResourceRequirementValue {
+package Cfn::Resource::Properties::Object::AWS::Batch::JobDefinition::ResourceRequirement {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -250,11 +339,11 @@ coerce 'Cfn::Resource::Properties::AWS::Batch::JobDefinition::MountPoints',
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::Batch::JobDefinition::MountPointsValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::Batch::JobDefinition::MountPoints->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::Batch::JobDefinition::MountPointsValue {
+package Cfn::Resource::Properties::Object::AWS::Batch::JobDefinition::MountPoints {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -262,6 +351,29 @@ package Cfn::Resource::Properties::AWS::Batch::JobDefinition::MountPointsValue {
   has ContainerPath => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has ReadOnly => (isa => 'Cfn::Value::Boolean', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has SourceVolume => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+}
+
+subtype 'Cfn::Resource::Properties::AWS::Batch::JobDefinition::LogConfiguration',
+     as 'Cfn::Value';
+
+coerce 'Cfn::Resource::Properties::AWS::Batch::JobDefinition::LogConfiguration',
+  from 'HashRef',
+   via {
+     if (my $f = Cfn::TypeLibrary::try_function($_)) {
+       return $f
+     } else {
+       return Cfn::Resource::Properties::Object::AWS::Batch::JobDefinition::LogConfiguration->new( %$_ );
+     }
+   };
+
+package Cfn::Resource::Properties::Object::AWS::Batch::JobDefinition::LogConfiguration {
+  use Moose;
+  use MooseX::StrictConstructor;
+  extends 'Cfn::Value::TypedValue';
+  
+  has LogDriver => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has Options => (isa => 'Cfn::Value::Json|Cfn::DynamicValue', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has SecretOptions => (isa => 'ArrayOfCfn::Resource::Properties::AWS::Batch::JobDefinition::Secret', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
 }
 
 subtype 'Cfn::Resource::Properties::AWS::Batch::JobDefinition::LinuxParameters',
@@ -273,16 +385,21 @@ coerce 'Cfn::Resource::Properties::AWS::Batch::JobDefinition::LinuxParameters',
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::Batch::JobDefinition::LinuxParametersValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::Batch::JobDefinition::LinuxParameters->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::Batch::JobDefinition::LinuxParametersValue {
+package Cfn::Resource::Properties::Object::AWS::Batch::JobDefinition::LinuxParameters {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
   
   has Devices => (isa => 'ArrayOfCfn::Resource::Properties::AWS::Batch::JobDefinition::Device', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has InitProcessEnabled => (isa => 'Cfn::Value::Boolean', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has MaxSwap => (isa => 'Cfn::Value::Integer', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has SharedMemorySize => (isa => 'Cfn::Value::Integer', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has Swappiness => (isa => 'Cfn::Value::Integer', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has Tmpfs => (isa => 'ArrayOfCfn::Resource::Properties::AWS::Batch::JobDefinition::Tmpfs', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
 }
 subtype 'ArrayOfCfn::Resource::Properties::AWS::Batch::JobDefinition::Environment',
      as 'Cfn::Value',
@@ -316,11 +433,11 @@ coerce 'Cfn::Resource::Properties::AWS::Batch::JobDefinition::Environment',
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::Batch::JobDefinition::EnvironmentValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::Batch::JobDefinition::Environment->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::Batch::JobDefinition::EnvironmentValue {
+package Cfn::Resource::Properties::Object::AWS::Batch::JobDefinition::Environment {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -338,29 +455,32 @@ coerce 'Cfn::Resource::Properties::AWS::Batch::JobDefinition::ContainerPropertie
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::Batch::JobDefinition::ContainerPropertiesValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::Batch::JobDefinition::ContainerProperties->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::Batch::JobDefinition::ContainerPropertiesValue {
+package Cfn::Resource::Properties::Object::AWS::Batch::JobDefinition::ContainerProperties {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
   
   has Command => (isa => 'Cfn::Value::Array|Cfn::Value::Function|Cfn::DynamicValue', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has Environment => (isa => 'ArrayOfCfn::Resource::Properties::AWS::Batch::JobDefinition::Environment', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has ExecutionRoleArn => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has Image => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has InstanceType => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has JobRoleArn => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has LinuxParameters => (isa => 'Cfn::Resource::Properties::AWS::Batch::JobDefinition::LinuxParameters', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
-  has Memory => (isa => 'Cfn::Value::Integer', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has LogConfiguration => (isa => 'Cfn::Resource::Properties::AWS::Batch::JobDefinition::LogConfiguration', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has Memory => (isa => 'Cfn::Value::Integer', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has MountPoints => (isa => 'ArrayOfCfn::Resource::Properties::AWS::Batch::JobDefinition::MountPoints', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has Privileged => (isa => 'Cfn::Value::Boolean', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has ReadonlyRootFilesystem => (isa => 'Cfn::Value::Boolean', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has ResourceRequirements => (isa => 'ArrayOfCfn::Resource::Properties::AWS::Batch::JobDefinition::ResourceRequirement', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has Secrets => (isa => 'ArrayOfCfn::Resource::Properties::AWS::Batch::JobDefinition::Secret', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has Ulimits => (isa => 'ArrayOfCfn::Resource::Properties::AWS::Batch::JobDefinition::Ulimit', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has User => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
-  has Vcpus => (isa => 'Cfn::Value::Integer', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has Vcpus => (isa => 'Cfn::Value::Integer', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has Volumes => (isa => 'ArrayOfCfn::Resource::Properties::AWS::Batch::JobDefinition::Volumes', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
 }
 subtype 'ArrayOfCfn::Resource::Properties::AWS::Batch::JobDefinition::NodeRangeProperty',
@@ -395,17 +515,63 @@ coerce 'Cfn::Resource::Properties::AWS::Batch::JobDefinition::NodeRangeProperty'
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::Batch::JobDefinition::NodeRangePropertyValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::Batch::JobDefinition::NodeRangeProperty->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::Batch::JobDefinition::NodeRangePropertyValue {
+package Cfn::Resource::Properties::Object::AWS::Batch::JobDefinition::NodeRangeProperty {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
   
   has Container => (isa => 'Cfn::Resource::Properties::AWS::Batch::JobDefinition::ContainerProperties', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has TargetNodes => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+}
+subtype 'ArrayOfCfn::Resource::Properties::AWS::Batch::JobDefinition::EvaluateOnExit',
+     as 'Cfn::Value',
+  where { $_->isa('Cfn::Value::Array') or $_->isa('Cfn::Value::Function') },
+message { "$_ is not a Cfn::Value or a Cfn::Value::Function" };
+
+coerce 'ArrayOfCfn::Resource::Properties::AWS::Batch::JobDefinition::EvaluateOnExit',
+  from 'HashRef',
+   via {
+     if (my $f = Cfn::TypeLibrary::try_function($_)) {
+       return $f
+     } else {
+       die 'Only accepts functions'; 
+     }
+   },
+  from 'ArrayRef',
+   via {
+     Cfn::Value::Array->new(Value => [
+       map { 
+         Moose::Util::TypeConstraints::find_type_constraint('Cfn::Resource::Properties::AWS::Batch::JobDefinition::EvaluateOnExit')->coerce($_)
+       } @$_
+     ]);
+   };
+
+subtype 'Cfn::Resource::Properties::AWS::Batch::JobDefinition::EvaluateOnExit',
+     as 'Cfn::Value';
+
+coerce 'Cfn::Resource::Properties::AWS::Batch::JobDefinition::EvaluateOnExit',
+  from 'HashRef',
+   via {
+     if (my $f = Cfn::TypeLibrary::try_function($_)) {
+       return $f
+     } else {
+       return Cfn::Resource::Properties::Object::AWS::Batch::JobDefinition::EvaluateOnExit->new( %$_ );
+     }
+   };
+
+package Cfn::Resource::Properties::Object::AWS::Batch::JobDefinition::EvaluateOnExit {
+  use Moose;
+  use MooseX::StrictConstructor;
+  extends 'Cfn::Value::TypedValue';
+  
+  has Action => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has OnExitCode => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has OnReason => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has OnStatusReason => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
 }
 
 subtype 'Cfn::Resource::Properties::AWS::Batch::JobDefinition::Timeout',
@@ -417,11 +583,11 @@ coerce 'Cfn::Resource::Properties::AWS::Batch::JobDefinition::Timeout',
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::Batch::JobDefinition::TimeoutValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::Batch::JobDefinition::Timeout->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::Batch::JobDefinition::TimeoutValue {
+package Cfn::Resource::Properties::Object::AWS::Batch::JobDefinition::Timeout {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -438,16 +604,17 @@ coerce 'Cfn::Resource::Properties::AWS::Batch::JobDefinition::RetryStrategy',
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::Batch::JobDefinition::RetryStrategyValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::Batch::JobDefinition::RetryStrategy->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::Batch::JobDefinition::RetryStrategyValue {
+package Cfn::Resource::Properties::Object::AWS::Batch::JobDefinition::RetryStrategy {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
   
   has Attempts => (isa => 'Cfn::Value::Integer', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has EvaluateOnExit => (isa => 'ArrayOfCfn::Resource::Properties::AWS::Batch::JobDefinition::EvaluateOnExit', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
 }
 
 subtype 'Cfn::Resource::Properties::AWS::Batch::JobDefinition::NodeProperties',
@@ -459,11 +626,11 @@ coerce 'Cfn::Resource::Properties::AWS::Batch::JobDefinition::NodeProperties',
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::Batch::JobDefinition::NodePropertiesValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::Batch::JobDefinition::NodeProperties->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::Batch::JobDefinition::NodePropertiesValue {
+package Cfn::Resource::Properties::Object::AWS::Batch::JobDefinition::NodeProperties {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -483,8 +650,36 @@ package Cfn::Resource::Properties::AWS::Batch::JobDefinition {
   has NodeProperties => (isa => 'Cfn::Resource::Properties::AWS::Batch::JobDefinition::NodeProperties', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has Parameters => (isa => 'Cfn::Value::Json|Cfn::DynamicValue', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has RetryStrategy => (isa => 'Cfn::Resource::Properties::AWS::Batch::JobDefinition::RetryStrategy', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has Tags => (isa => 'Cfn::Value::Json|Cfn::DynamicValue', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
   has Timeout => (isa => 'Cfn::Resource::Properties::AWS::Batch::JobDefinition::Timeout', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has Type => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
 }
 
 1;
+### main pod documentation begin ###
+
+=encoding UTF-8
+
+=head1 NAME
+
+Cfn::Resource::AWS::Batch::JobDefinition - Cfn resource for AWS::Batch::JobDefinition
+
+=head1 DESCRIPTION
+
+This module implements a Perl module that represents the CloudFormation object AWS::Batch::JobDefinition.
+
+See L<Cfn> for more information on how to use it.
+
+=head1 AUTHOR
+
+    Jose Luis Martinez
+    CAPSiDE
+    jlmartinez@capside.com
+
+=head1 COPYRIGHT and LICENSE
+
+Copyright (c) 2013 by CAPSiDE
+This code is distributed under the Apache 2 License. The full text of the 
+license can be found in the LICENSE file included with this module.
+
+=cut

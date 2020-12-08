@@ -5,14 +5,15 @@ NAME
 SYNOPSIS
 
        use Device::Chip::AD9833;
+       use Future::AsyncAwait;
     
        my $chip = Device::Chip::AD9833->new;
-       $chip->mount( Device::Chip::Adapter::...->new )->get;
+       await $chip->mount( Device::Chip::Adapter::...->new );
     
-       $chip->init->get;
+       await $chip->init;
     
        my $freq = 440; # in Hz
-       $chip->write_FREQ0( ( $freq << 28 ) / 25E6 ); # presuming 25MHz reference
+       await $chip->write_FREQ0( ( $freq << 28 ) / 25E6 ); # presuming 25MHz reference
 
 DESCRIPTION
 
@@ -26,11 +27,12 @@ DESCRIPTION
 
 METHODS
 
-    The following methods documented with as async return Future instances.
+    The following methods documented in an await expression return Future
+    instances.
 
  init
 
-       async method init();
+       await $chip->init;
 
     Resets the chip to a working configuration, including setting the B28
     bit appropriately for the way this module writes the frequency
@@ -41,7 +43,7 @@ METHODS
 
  read_config
 
-       async method read_config();
+       $config = await $chip->read_config;
 
     Returns a HASH reference containing the current chip configuration.
     Note that since the chip does not support querying the configuration,
@@ -67,7 +69,7 @@ METHODS
 
  change_config
 
-       async method change_config(%changes);
+       await $chip->change_config( %changes );
 
     Writes updates to the chip configuration. Takes named arguments of the
     same form as returned by "read_config", including the synthesized wave
@@ -77,8 +79,8 @@ METHODS
 
  write_FREQ1
 
-       async method write_FREQ0($freq);
-       async method write_FREQ1($freq);
+       await $chip->write_FREQ0( $freq );
+       await $chip->write_FREQ1( $freq );
 
     Writes the FREQ0 or FREQ1 frequency control register. $freq should be a
     28bit integer value.
@@ -87,8 +89,8 @@ METHODS
 
  write_PHASE1
 
-       async method write_PHASE0($phase);
-       async method write_PHASE1($phase);
+       await $chip->write_PHASE0( $phase );
+       await $chip->write_PHASE1( $phase );
 
     Writes the PHASE0 or PHASE1 phase control register. $phase should be a
     12bit integer value.

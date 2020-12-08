@@ -43,6 +43,8 @@ t/1037_ord_rfc3629.t
 t/1038_ord_rfc3629ja_jp.t
 t/1039_qr_hyphen.t
 t/1040_tr_hyphen.t
+t/1041_qr_posixclass.t
+t/1042_qr_neg_posixclass.t
 t/2001_podtest.t
 xt/1001_chop.t
 xt/1002_chr.t

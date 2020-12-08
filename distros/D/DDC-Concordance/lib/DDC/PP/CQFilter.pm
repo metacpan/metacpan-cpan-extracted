@@ -296,6 +296,36 @@ sub valueString { return '{' . $_[0]->SetValueString . '}'; }
 sub jsonFieldValue { return $_[0]{Values}; }
 
 
+##======================================================================
+## CQFPrune
+
+package DDC::PP::CQFPrune;
+use strict;
+our @ISA = qw(DDC::PP::CQFSort);
+
+__PACKAGE__->defprop('Limit');
+__PACKAGE__->defprop('Keys');
+sub new {
+  my ($that,$sort,$limit,$keys,%opts) = @_;
+  return $that->SUPER::new($sort,undef,undef,undef,Limit=>($limit//0), Keys=>($keys//[]), %opts);
+}
+
+sub defaultSort { return 'LessByPruneKey'; }
+
+sub toString {
+  my $f = shift;
+  my $s = ('#'.uc($DDC::PP::HitSortEnumStrings[$f->{Type}])
+	   .'['.join(',',
+		    ($f->{Limit}//0),
+		    (UNIVERSAL::can($f->{Keys},'toString') ? $f->{Keys}->toString() : qw()),
+		    )
+	   .']');
+}
+
+sub jsonData {
+  return ('Limit'=>($_[0]{Limit}//0), Keys=>$_[0]{Keys});
+}
+
 
 1; ##-- be happy
 
@@ -328,7 +358,7 @@ Bryan Jurish E<lt>moocow@cpan.orgE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2016 by Bryan Jurish
+Copyright (C) 2016-2020 by Bryan Jurish
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.14.2 or,

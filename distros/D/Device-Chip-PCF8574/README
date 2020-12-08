@@ -1,11 +1,12 @@
 NAME
 
-    Device::Chip::PCF8574 - chip driver for a PCF8574
+    Device::Chip::PCF8574 - chip driver for a PCF8574 or PCA8574
 
 DESCRIPTION
 
     This Device::Chip subclass provides specific communication to a NXP or
     Texas Instruments PCF8574 attached to a computer via an I²C adapter.
+    Due to hardware similarity this can also drive a PCA8574.
 
     The reader is presumed to be familiar with the general operation of
     this chip; the documentation here will not attempt to explain or define
@@ -21,12 +22,12 @@ MOUNT PARAMETERS
 
 METHODS
 
-    The following methods documented with a trailing call to ->get return
-    Future instances.
+    The following methods documented in an await expression return Future
+    instances.
 
  write
 
-       $chip->write( $val )->get
+       await $chip->write( $val );
 
     Sets the value of the GPIO pins, as an 8-bit integer.
 
@@ -36,7 +37,7 @@ METHODS
 
  read
 
-       $val = $chip->read->get
+       $val = await $chip->read;
 
     Reads the current logic levels on the GPIO pins, returned as an 8-bit
     integer. Pins of interest as inputs should have previously been set to
@@ -50,12 +51,12 @@ METHODS
     which allows access to the GPIO pins of the chip as if it was a GPIO
     protocol adapter. The returned instance supports the following methods:
 
-       $protocol = $adapter->make_protocol( 'GPIO' )
+       $protocol = await $adapter->make_protocol( 'GPIO' )
     
        $protocol->list_gpios
-       $protocol->write_gpios
-       $protocol->read_gpios
-       $protocol->tris_gpios
+       await $protocol->write_gpios
+       await $protocol->read_gpios
+       await $protocol->tris_gpios
 
 AUTHOR
 

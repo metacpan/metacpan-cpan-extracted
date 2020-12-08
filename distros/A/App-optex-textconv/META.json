@@ -43,7 +43,9 @@
       "runtime" : {
          "requires" : {
             "App::optex" : "v0.3.0",
+            "App::optex::Tmpfile" : "0",
             "Archive::Zip" : "1.37",
+            "Encode" : "0",
             "List::Util" : "1.45",
             "perl" : "v5.14.0"
          }
@@ -60,7 +62,7 @@
       },
       "App::optex::textconv" : {
          "file" : "lib/App/optex/textconv.pm",
-         "version" : "0.10"
+         "version" : "0.11"
       },
       "App::optex::textconv::Converter" : {
          "file" : "lib/App/optex/textconv/Converter.pm"
@@ -70,11 +72,19 @@
       },
       "App::optex::textconv::msdoc" : {
          "file" : "lib/App/optex/textconv/msdoc.pm",
-         "version" : "0.10"
+         "version" : "0.11"
+      },
+      "App::optex::textconv::pandoc" : {
+         "file" : "lib/App/optex/textconv/pandoc.pm",
+         "version" : "0.11"
       },
       "App::optex::textconv::pdf" : {
          "file" : "lib/App/optex/textconv/pdf.pm",
-         "version" : "0.10"
+         "version" : "0.11"
+      },
+      "App::optex::textconv::tika" : {
+         "file" : "lib/App/optex/textconv/tika.pm",
+         "version" : "0.11"
       }
    },
    "release_status" : "stable",
@@ -88,7 +98,7 @@
          "web" : "https://github.com/kaz-utashiro/optex-textconv"
       }
    },
-   "version" : "0.10",
+   "version" : "0.11",
    "x_authority" : "cpan:UTASHIRO",
    "x_contributors" : [
       "Kazumasa Utashiro <kaz@utashiro.com>"

@@ -3,7 +3,7 @@
 # PODNAME: TestRail::Bin::Replay
 
 package TestRail::Bin::Replay;
-$TestRail::Bin::Replay::VERSION = '0.046';
+$TestRail::Bin::Replay::VERSION = '0.047';
 use strict;
 use warnings;
 
@@ -121,7 +121,7 @@ TestRail::Bin::Replay - List runs in a TestRail project matching the provided fi
 
 =head1 VERSION
 
-version 0.046
+version 0.047
 
 =head1 SYNOPSIS
 

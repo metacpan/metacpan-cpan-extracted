@@ -3,7 +3,7 @@ package Test::WWW::Simple;
 use strict;
 use warnings;
 
-our $VERSION = '0.39';
+our $VERSION = '0.40';
 
 use Test::Builder;
 use Test::LongString;
@@ -11,11 +11,11 @@ use Test::More;
 use WWW::Mechanize::Pluggable;
 
 my $Test = Test::Builder->new;  # The Test:: singleton
-my $Mech = WWW::Mechanize::Pluggable->new(autocheck => 0); 
+my $Mech = WWW::Mechanize::Pluggable->new(autocheck => 0);
                                 # The Mech user agent and support methods
 my $cache_results = 0;          # default to not caching Mech fetches
 our $last_url;                  # last URL fetched successfully by Mech
-my %page_cache;                 # saves pages for %%cache; we probably 
+my %page_cache;                 # saves pages for %%cache; we probably
                                 # will want to change this over to a
                                 # tied hash later to allow for disk caching
                                 # instead of just memory caching.
@@ -42,7 +42,7 @@ sub import {
     $Test->exported_to($caller);
 
     # Check the 'use' arguments to see if we have either
-    # 'agent', 'agent_string', or 'no_agent'.  
+    # 'agent', 'agent_string', or 'no_agent'.
     #
     # If we have none of these, assume 'Windows IE 6'.
     if (defined $args{agent}) {
@@ -80,7 +80,7 @@ sub _clean_text {
 sub text_like($$;$) {
     my($url, $regex, $comment) = @_;
     my ($state, $content, $status_line) = _fetch($url);
-    $state 
+    $state
       ? like_string(_clean_text(), $regex, $comment)
       : fail "Fetch of $url failed: ".$status_line;
 }
@@ -88,15 +88,15 @@ sub text_like($$;$) {
 sub text_unlike($$;$) {
     my($url, $regex, $comment) = @_;
     my ($state, $content, $status_line) = _fetch($url);
-    $state 
-      ? unlike_string(_clean_text(), $regex, $comment) 
+    $state
+      ? unlike_string(_clean_text(), $regex, $comment)
       : fail "Fetch of $url failed: ".$status_line;
 }
 
 sub page_like($$;$) {
     my($url, $regex, $comment) = @_;
     my ($state, $content, $status_line) = _fetch($url);
-    $state 
+    $state
       ? like_string($content, $regex, $comment)
       : fail "Fetch of $url failed: ".$status_line;
 }
@@ -104,15 +104,15 @@ sub page_like($$;$) {
 sub page_unlike($$;$) {
     my($url, $regex, $comment) = @_;
     my ($state, $content, $status_line) = _fetch($url);
-    $state 
-      ? unlike_string($content, $regex, $comment) 
+    $state
+      ? unlike_string($content, $regex, $comment)
       : fail "Fetch of $url failed: ".$status_line;
 }
 
 sub page_like_full($$;$) {
     my($url, $regex, $comment) = @_;
     my ($state, $content, $status_line) = _fetch($url);
-    $state 
+    $state
       ? like($content, $regex, $comment)
       : fail "Fetch of $url failed: ".$status_line;
 }
@@ -120,8 +120,8 @@ sub page_like_full($$;$) {
 sub page_unlike_full($$;$) {
     my($url, $regex, $comment) = @_;
     my ($state, $content, $status_line) = _fetch($url);
-    $state 
-      ? unlike($content, $regex, $comment) 
+    $state
+      ? unlike($content, $regex, $comment)
       : fail "Fetch of $url failed: ".$status_line;
 }
 
@@ -137,14 +137,14 @@ sub _fetch {
     }
     elsif ($last_url eq $url) {
       # "cached" in Mech object
-      @results = (1, 
+      @results = (1,
               $page_cache{$url}   = $Mech->content,
               $status_cache{$url} = $Mech->response->status_line);
     }
     else {
       # not in cache - load and save the page (if any)
       $Mech->get($url);
-      @results = ($Mech->success, 
+      @results = ($Mech->success,
               $page_cache{$url}   = $Mech->content,
               $status_cache{$url} = $Mech->response->status_line);
     }
@@ -162,7 +162,7 @@ sub _fetch {
 
 sub _trimmed_url {
     my $url = shift;
-    length($url) > $Test::WWW::display_length 
+    length($url) > $Test::WWW::display_length
        ? substr($url,0,$Test::WWW::display_length) . "..."
        : $url;
 }
@@ -170,7 +170,7 @@ sub _trimmed_url {
 sub user_agent {
    my $agent = shift || "Windows IE 6";
    $Mech->agent_alias($agent);
-}    
+}
 
 sub mech {
   my ($self) = @_;
@@ -182,17 +182,17 @@ sub last_test {
   return ($Test->details)[-1];
 }
 
-sub cache (;$) { 
+sub cache (;$) {
   my $comment = shift;
-  $Test->diag($comment) if defined $comment;
+  $Test->note($comment) if defined $comment;
   $last_url = "";
   $cache_results = 1;
   1;
 }
 
-sub no_cache (;$) { 
+sub no_cache (;$) {
   my $comment = shift;
-  $Test->diag($comment) if defined $comment;
+  $Test->note($comment) if defined $comment;
   $last_url = "";
   $cache_results = 0;
   1;
@@ -219,8 +219,8 @@ Test::WWW::Simple - Test Web applications using TAP
 
 =head1 DESCRIPTION
 
-C<Test::WWW::Simple> is a very basic class for testing Web applications and 
-Web pages. It uses L<WWW::Mechanize> to fetch pages, and L<Test::Builder> to 
+C<Test::WWW::Simple> is a very basic class for testing Web applications and
+Web pages. It uses L<WWW::Mechanize> to fetch pages, and L<Test::Builder> to
 implement TAP (Test Anything Protocol) for the actual testing.
 
 Since we use L<Test::Builder> for the C<page_like> and C<page_unlike> routines, these
@@ -235,7 +235,7 @@ complex page checking (are all my links good? is this page valid XHTML? etc.),
 but work great for those little things (is my copyright notification on the page?
 did I get all of the "font" tagging off this page? etc.).
 
-The function is deliberately limited to make it easier to remember what you 
+The function is deliberately limited to make it easier to remember what you
 can do.
 
 =head1 SUBROUTINES
@@ -243,25 +243,25 @@ can do.
 =head2 page_like
 
 Does a pattern match vs. the page at the specified URL and succeeds if
-the pattern matches.  Uses C<Test::LongString> for the comparison to get 
+the pattern matches.  Uses C<Test::LongString> for the comparison to get
 short diagnostics in case of a match failure.
 
 =head2 page_unlike
 
 Does a pattern match vs. the page at the specified URL and succeeds if
-the pattern does I<not> match. Uses C<Test::LongString> for the 
+the pattern does I<not> match. Uses C<Test::LongString> for the
 comparison to get short diagnostics in case of a match failure.
 
 =head2 text_like
 
 Does a pattern match vs. the I<visible text> on the page and succeeds if
-the pattern matches.  Uses C<Test::LongString> for the comparison to get 
+the pattern matches.  Uses C<Test::LongString> for the comparison to get
 short diagnostics in case of a match failure.
 
 =head2 text_unlike
 
 Does a pattern match vs. the I<visible text> at the specified URL and succeeds if
-the pattern does I<not> match. Uses C<Test::LongString> for the comparison to get 
+the pattern does I<not> match. Uses C<Test::LongString> for the comparison to get
 short diagnostics in case of a match failure.
 
 =head2 page_like_full
@@ -273,12 +273,12 @@ if the comparison fails.
 =head2 page_unlike_full
 
 Does a pattern match vs. the page at the specified URL and succeeds if
-the pattern does I<not> match. Uses C<Test::More> to get a complete dump 
+the pattern does I<not> match. Uses C<Test::More> to get a complete dump
 of the page if the comparison fails.
 
 =head2 cache
 
-Turns cacheing of URLS on. Subsequent requests for the same URL will 
+Turns cacheing of URLS on. Subsequent requests for the same URL will
 return the page initially fetched. Can greatly speed up execution in
 cases where the pages are essentially identical (or differ in ways that
 you don't care to test) on every access.
@@ -297,18 +297,18 @@ user-agent abbreviations. See C<WWW::Mechanize> for a list.
 =head2 mech
 
 Returns the underlying C<WWW::Mechanize::Pluggable> object to
-allow you to access its other functions. This is here to allow 
+allow you to access its other functions. This is here to allow
 later versions of C<simple_scan> to be able to access them as well.
 
 =head2 last_test
 
-Returns the details of the last test run. Useful if you want to 
+Returns the details of the last test run. Useful if you want to
 selectively execute some more code after a test has run (e.g.,
 print the content if a test has failed).
 
 The details are reference to a hash, containing:
 
-=over 4 
+=over 4
 
 =item * ok - true if test is considered a pass
 
@@ -325,10 +325,10 @@ The details are reference to a hash, containing:
 
 =head1 SEE ALSO
 
-L<WWW::Mechanize> for a description of how the simulated browser works; 
+L<WWW::Mechanize> for a description of how the simulated browser works;
 L<Test::Builder> to see how a test module works.
 
-You may also want to look at L<Test::WWW::Mechanize> if you want to write 
+You may also want to look at L<Test::WWW::Mechanize> if you want to write
 more precise tests ("is the title of this page like the pattern?" or
 "are all the page links ok?").
 
@@ -342,7 +342,7 @@ Joe McMahon, E<lt>mcmahon@yahoo-inc.comE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2005 by Yahoo!, 2018 by Joe McMahon
+Copyright (C) 2005 by Yahoo!
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.6.1 or,

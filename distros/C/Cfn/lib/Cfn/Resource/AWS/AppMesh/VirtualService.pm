@@ -1,4 +1,4 @@
-# AWS::AppMesh::VirtualService generated from spec 4.1.0
+# AWS::AppMesh::VirtualService generated from spec 18.4.0
 use Moose::Util::TypeConstraints;
 
 coerce 'Cfn::Resource::Properties::AWS::AppMesh::VirtualService',
@@ -11,7 +11,7 @@ package Cfn::Resource::AWS::AppMesh::VirtualService {
   has Properties => (isa => 'Cfn::Resource::Properties::AWS::AppMesh::VirtualService', is => 'rw', coerce => 1);
   
   sub AttributeList {
-    [ 'Arn','MeshName','Uid','VirtualServiceName' ]
+    [ 'Arn','MeshName','MeshOwner','ResourceOwner','Uid','VirtualServiceName' ]
   }
   sub supported_regions {
     [ 'ap-northeast-1','ap-northeast-2','ap-south-1','ap-southeast-1','ap-southeast-2','ca-central-1','eu-central-1','eu-west-1','eu-west-2','us-east-1','us-east-2','us-west-1','us-west-2' ]
@@ -29,11 +29,11 @@ coerce 'Cfn::Resource::Properties::AWS::AppMesh::VirtualService::VirtualRouterSe
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::AppMesh::VirtualService::VirtualRouterServiceProviderValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::AppMesh::VirtualService::VirtualRouterServiceProvider->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::AppMesh::VirtualService::VirtualRouterServiceProviderValue {
+package Cfn::Resource::Properties::Object::AWS::AppMesh::VirtualService::VirtualRouterServiceProvider {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -50,11 +50,11 @@ coerce 'Cfn::Resource::Properties::AWS::AppMesh::VirtualService::VirtualNodeServ
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::AppMesh::VirtualService::VirtualNodeServiceProviderValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::AppMesh::VirtualService::VirtualNodeServiceProvider->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::AppMesh::VirtualService::VirtualNodeServiceProviderValue {
+package Cfn::Resource::Properties::Object::AWS::AppMesh::VirtualService::VirtualNodeServiceProvider {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -71,11 +71,11 @@ coerce 'Cfn::Resource::Properties::AWS::AppMesh::VirtualService::VirtualServiceP
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::AppMesh::VirtualService::VirtualServiceProviderValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::AppMesh::VirtualService::VirtualServiceProvider->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::AppMesh::VirtualService::VirtualServiceProviderValue {
+package Cfn::Resource::Properties::Object::AWS::AppMesh::VirtualService::VirtualServiceProvider {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -93,11 +93,11 @@ coerce 'Cfn::Resource::Properties::AWS::AppMesh::VirtualService::VirtualServiceS
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::AppMesh::VirtualService::VirtualServiceSpecValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::AppMesh::VirtualService::VirtualServiceSpec->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::AppMesh::VirtualService::VirtualServiceSpecValue {
+package Cfn::Resource::Properties::Object::AWS::AppMesh::VirtualService::VirtualServiceSpec {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -111,9 +111,37 @@ package Cfn::Resource::Properties::AWS::AppMesh::VirtualService {
   extends 'Cfn::Resource::Properties';
   
   has MeshName => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
+  has MeshOwner => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
   has Spec => (isa => 'Cfn::Resource::Properties::AWS::AppMesh::VirtualService::VirtualServiceSpec', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has Tags => (isa => 'ArrayOfCfn::Resource::Properties::TagType', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has VirtualServiceName => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
 }
 
 1;
+### main pod documentation begin ###
+
+=encoding UTF-8
+
+=head1 NAME
+
+Cfn::Resource::AWS::AppMesh::VirtualService - Cfn resource for AWS::AppMesh::VirtualService
+
+=head1 DESCRIPTION
+
+This module implements a Perl module that represents the CloudFormation object AWS::AppMesh::VirtualService.
+
+See L<Cfn> for more information on how to use it.
+
+=head1 AUTHOR
+
+    Jose Luis Martinez
+    CAPSiDE
+    jlmartinez@capside.com
+
+=head1 COPYRIGHT and LICENSE
+
+Copyright (c) 2013 by CAPSiDE
+This code is distributed under the Apache 2 License. The full text of the 
+license can be found in the LICENSE file included with this module.
+
+=cut

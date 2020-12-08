@@ -29,7 +29,7 @@ use strict;
 use warnings;
 use Rex -base;
 
-our $VERSION = '1.13.1'; # VERSION
+our $VERSION = '1.13.2'; # VERSION
 
 require Exporter;
 use base qw(Exporter);

@@ -1,5 +1,13 @@
 Revision history for Database-Async-Engine-PostgreSQL
 
+0.010     2020-12-07 02:54:29+08:00 Asia/Kuala_Lumpur
+    No new features.
+
+    Bugs fixed:
+
+    - the `service` parameter from `Database::Async->new(engine => { service => 'xxx' })`
+    is now applied and used for connections
+
 0.009     2020-12-03 00:18:17+08:00 Asia/Kuala_Lumpur
     New features:
 

@@ -1,4 +1,4 @@
-# AWS::Greengrass::SubscriptionDefinitionVersion generated from spec 6.3.0
+# AWS::Greengrass::SubscriptionDefinitionVersion generated from spec 18.4.0
 use Moose::Util::TypeConstraints;
 
 coerce 'Cfn::Resource::Properties::AWS::Greengrass::SubscriptionDefinitionVersion',
@@ -51,11 +51,11 @@ coerce 'Cfn::Resource::Properties::AWS::Greengrass::SubscriptionDefinitionVersio
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::Greengrass::SubscriptionDefinitionVersion::SubscriptionValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::Greengrass::SubscriptionDefinitionVersion::Subscription->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::Greengrass::SubscriptionDefinitionVersion::SubscriptionValue {
+package Cfn::Resource::Properties::Object::AWS::Greengrass::SubscriptionDefinitionVersion::Subscription {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -76,3 +76,30 @@ package Cfn::Resource::Properties::AWS::Greengrass::SubscriptionDefinitionVersio
 }
 
 1;
+### main pod documentation begin ###
+
+=encoding UTF-8
+
+=head1 NAME
+
+Cfn::Resource::AWS::Greengrass::SubscriptionDefinitionVersion - Cfn resource for AWS::Greengrass::SubscriptionDefinitionVersion
+
+=head1 DESCRIPTION
+
+This module implements a Perl module that represents the CloudFormation object AWS::Greengrass::SubscriptionDefinitionVersion.
+
+See L<Cfn> for more information on how to use it.
+
+=head1 AUTHOR
+
+    Jose Luis Martinez
+    CAPSiDE
+    jlmartinez@capside.com
+
+=head1 COPYRIGHT and LICENSE
+
+Copyright (c) 2013 by CAPSiDE
+This code is distributed under the Apache 2 License. The full text of the 
+license can be found in the LICENSE file included with this module.
+
+=cut

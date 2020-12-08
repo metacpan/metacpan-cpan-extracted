@@ -20,5 +20,9 @@ t/95-tidyall.t
 t/96-perl-critic.t
 t/97-pod.t
 t/make.t
+t/snapshots/make_t/no_rules_graph
+t/snapshots/make_t/recursive_make_graph
+t/snapshots/make_t/recursive_make_no_rules_graph
+t/snapshots/make_t/shallow_graph
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

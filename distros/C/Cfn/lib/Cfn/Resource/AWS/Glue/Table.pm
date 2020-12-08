@@ -1,4 +1,4 @@
-# AWS::Glue::Table generated from spec 2.25.0
+# AWS::Glue::Table generated from spec 21.0.0
 use Moose::Util::TypeConstraints;
 
 coerce 'Cfn::Resource::Properties::AWS::Glue::Table',
@@ -14,7 +14,7 @@ package Cfn::Resource::AWS::Glue::Table {
     [  ]
   }
   sub supported_regions {
-    [ 'ap-northeast-1','ap-northeast-2','ap-south-1','ap-southeast-1','ap-southeast-2','eu-central-1','eu-west-1','us-east-1','us-east-2','us-west-2' ]
+    [ 'ap-northeast-1','ap-northeast-2','ap-south-1','ap-southeast-1','ap-southeast-2','ca-central-1','cn-northwest-1','eu-central-1','eu-north-1','eu-west-1','eu-west-2','eu-west-3','us-east-1','us-east-2','us-west-1','us-west-2' ]
   }
 }
 
@@ -29,11 +29,11 @@ coerce 'Cfn::Resource::Properties::AWS::Glue::Table::SkewedInfo',
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::Glue::Table::SkewedInfoValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::Glue::Table::SkewedInfo->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::Glue::Table::SkewedInfoValue {
+package Cfn::Resource::Properties::Object::AWS::Glue::Table::SkewedInfo {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -52,11 +52,11 @@ coerce 'Cfn::Resource::Properties::AWS::Glue::Table::SerdeInfo',
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::Glue::Table::SerdeInfoValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::Glue::Table::SerdeInfo->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::Glue::Table::SerdeInfoValue {
+package Cfn::Resource::Properties::Object::AWS::Glue::Table::SerdeInfo {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -97,11 +97,11 @@ coerce 'Cfn::Resource::Properties::AWS::Glue::Table::Order',
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::Glue::Table::OrderValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::Glue::Table::Order->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::Glue::Table::OrderValue {
+package Cfn::Resource::Properties::Object::AWS::Glue::Table::Order {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -141,11 +141,11 @@ coerce 'Cfn::Resource::Properties::AWS::Glue::Table::Column',
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::Glue::Table::ColumnValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::Glue::Table::Column->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::Glue::Table::ColumnValue {
+package Cfn::Resource::Properties::Object::AWS::Glue::Table::Column {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -153,6 +153,29 @@ package Cfn::Resource::Properties::AWS::Glue::Table::ColumnValue {
   has Comment => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has Name => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has Type => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+}
+
+subtype 'Cfn::Resource::Properties::AWS::Glue::Table::TableIdentifier',
+     as 'Cfn::Value';
+
+coerce 'Cfn::Resource::Properties::AWS::Glue::Table::TableIdentifier',
+  from 'HashRef',
+   via {
+     if (my $f = Cfn::TypeLibrary::try_function($_)) {
+       return $f
+     } else {
+       return Cfn::Resource::Properties::Object::AWS::Glue::Table::TableIdentifier->new( %$_ );
+     }
+   };
+
+package Cfn::Resource::Properties::Object::AWS::Glue::Table::TableIdentifier {
+  use Moose;
+  use MooseX::StrictConstructor;
+  extends 'Cfn::Value::TypedValue';
+  
+  has CatalogId => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has DatabaseName => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has Name => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
 }
 
 subtype 'Cfn::Resource::Properties::AWS::Glue::Table::StorageDescriptor',
@@ -164,11 +187,11 @@ coerce 'Cfn::Resource::Properties::AWS::Glue::Table::StorageDescriptor',
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::Glue::Table::StorageDescriptorValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::Glue::Table::StorageDescriptor->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::Glue::Table::StorageDescriptorValue {
+package Cfn::Resource::Properties::Object::AWS::Glue::Table::StorageDescriptor {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -196,11 +219,11 @@ coerce 'Cfn::Resource::Properties::AWS::Glue::Table::TableInput',
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::Glue::Table::TableInputValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::Glue::Table::TableInput->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::Glue::Table::TableInputValue {
+package Cfn::Resource::Properties::Object::AWS::Glue::Table::TableInput {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -213,6 +236,7 @@ package Cfn::Resource::Properties::AWS::Glue::Table::TableInputValue {
   has Retention => (isa => 'Cfn::Value::Integer', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has StorageDescriptor => (isa => 'Cfn::Resource::Properties::AWS::Glue::Table::StorageDescriptor', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has TableType => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has TargetTable => (isa => 'Cfn::Resource::Properties::AWS::Glue::Table::TableIdentifier', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has ViewExpandedText => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has ViewOriginalText => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
 }
@@ -228,3 +252,30 @@ package Cfn::Resource::Properties::AWS::Glue::Table {
 }
 
 1;
+### main pod documentation begin ###
+
+=encoding UTF-8
+
+=head1 NAME
+
+Cfn::Resource::AWS::Glue::Table - Cfn resource for AWS::Glue::Table
+
+=head1 DESCRIPTION
+
+This module implements a Perl module that represents the CloudFormation object AWS::Glue::Table.
+
+See L<Cfn> for more information on how to use it.
+
+=head1 AUTHOR
+
+    Jose Luis Martinez
+    CAPSiDE
+    jlmartinez@capside.com
+
+=head1 COPYRIGHT and LICENSE
+
+Copyright (c) 2013 by CAPSiDE
+This code is distributed under the Apache 2 License. The full text of the 
+license can be found in the LICENSE file included with this module.
+
+=cut

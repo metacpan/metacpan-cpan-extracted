@@ -1,4 +1,4 @@
-# AWS::Elasticsearch::Domain generated from spec 9.1.0
+# AWS::Elasticsearch::Domain generated from spec 20.1.0
 use Moose::Util::TypeConstraints;
 
 coerce 'Cfn::Resource::Properties::AWS::Elasticsearch::Domain',
@@ -14,7 +14,7 @@ package Cfn::Resource::AWS::Elasticsearch::Domain {
     [ 'Arn','DomainArn','DomainEndpoint' ]
   }
   sub supported_regions {
-    [ 'ap-east-1','ap-northeast-1','ap-northeast-2','ap-northeast-3','ap-south-1','ap-southeast-1','ap-southeast-2','ca-central-1','cn-north-1','cn-northwest-1','eu-central-1','eu-north-1','eu-west-1','eu-west-2','eu-west-3','me-south-1','sa-east-1','us-east-1','us-east-2','us-gov-east-1','us-gov-west-1','us-west-1','us-west-2' ]
+    [ 'af-south-1','ap-east-1','ap-northeast-1','ap-northeast-2','ap-northeast-3','ap-south-1','ap-southeast-1','ap-southeast-2','ca-central-1','cn-north-1','cn-northwest-1','eu-central-1','eu-north-1','eu-south-1','eu-west-1','eu-west-2','eu-west-3','me-south-1','sa-east-1','us-east-1','us-east-2','us-gov-east-1','us-gov-west-1','us-west-1','us-west-2' ]
   }
 }
 
@@ -29,16 +29,39 @@ coerce 'Cfn::Resource::Properties::AWS::Elasticsearch::Domain::ZoneAwarenessConf
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::Elasticsearch::Domain::ZoneAwarenessConfigValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::Elasticsearch::Domain::ZoneAwarenessConfig->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::Elasticsearch::Domain::ZoneAwarenessConfigValue {
+package Cfn::Resource::Properties::Object::AWS::Elasticsearch::Domain::ZoneAwarenessConfig {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
   
   has AvailabilityZoneCount => (isa => 'Cfn::Value::Integer', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+}
+
+subtype 'Cfn::Resource::Properties::AWS::Elasticsearch::Domain::MasterUserOptions',
+     as 'Cfn::Value';
+
+coerce 'Cfn::Resource::Properties::AWS::Elasticsearch::Domain::MasterUserOptions',
+  from 'HashRef',
+   via {
+     if (my $f = Cfn::TypeLibrary::try_function($_)) {
+       return $f
+     } else {
+       return Cfn::Resource::Properties::Object::AWS::Elasticsearch::Domain::MasterUserOptions->new( %$_ );
+     }
+   };
+
+package Cfn::Resource::Properties::Object::AWS::Elasticsearch::Domain::MasterUserOptions {
+  use Moose;
+  use MooseX::StrictConstructor;
+  extends 'Cfn::Value::TypedValue';
+  
+  has MasterUserARN => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has MasterUserName => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has MasterUserPassword => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
 }
 
 subtype 'Cfn::Resource::Properties::AWS::Elasticsearch::Domain::VPCOptions',
@@ -50,11 +73,11 @@ coerce 'Cfn::Resource::Properties::AWS::Elasticsearch::Domain::VPCOptions',
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::Elasticsearch::Domain::VPCOptionsValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::Elasticsearch::Domain::VPCOptions->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::Elasticsearch::Domain::VPCOptionsValue {
+package Cfn::Resource::Properties::Object::AWS::Elasticsearch::Domain::VPCOptions {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -72,11 +95,11 @@ coerce 'Cfn::Resource::Properties::AWS::Elasticsearch::Domain::SnapshotOptions',
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::Elasticsearch::Domain::SnapshotOptionsValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::Elasticsearch::Domain::SnapshotOptions->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::Elasticsearch::Domain::SnapshotOptionsValue {
+package Cfn::Resource::Properties::Object::AWS::Elasticsearch::Domain::SnapshotOptions {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -93,11 +116,11 @@ coerce 'Cfn::Resource::Properties::AWS::Elasticsearch::Domain::NodeToNodeEncrypt
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::Elasticsearch::Domain::NodeToNodeEncryptionOptionsValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::Elasticsearch::Domain::NodeToNodeEncryptionOptions->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::Elasticsearch::Domain::NodeToNodeEncryptionOptionsValue {
+package Cfn::Resource::Properties::Object::AWS::Elasticsearch::Domain::NodeToNodeEncryptionOptions {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -132,11 +155,11 @@ coerce 'Cfn::Resource::Properties::AWS::Elasticsearch::Domain::LogPublishingOpti
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::Elasticsearch::Domain::LogPublishingOptionValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::Elasticsearch::Domain::LogPublishingOption->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::Elasticsearch::Domain::LogPublishingOptionValue {
+package Cfn::Resource::Properties::Object::AWS::Elasticsearch::Domain::LogPublishingOption {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -154,11 +177,11 @@ coerce 'Cfn::Resource::Properties::AWS::Elasticsearch::Domain::EncryptionAtRestO
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::Elasticsearch::Domain::EncryptionAtRestOptionsValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::Elasticsearch::Domain::EncryptionAtRestOptions->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::Elasticsearch::Domain::EncryptionAtRestOptionsValue {
+package Cfn::Resource::Properties::Object::AWS::Elasticsearch::Domain::EncryptionAtRestOptions {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -176,11 +199,11 @@ coerce 'Cfn::Resource::Properties::AWS::Elasticsearch::Domain::ElasticsearchClus
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::Elasticsearch::Domain::ElasticsearchClusterConfigValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::Elasticsearch::Domain::ElasticsearchClusterConfig->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::Elasticsearch::Domain::ElasticsearchClusterConfigValue {
+package Cfn::Resource::Properties::Object::AWS::Elasticsearch::Domain::ElasticsearchClusterConfig {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -190,6 +213,9 @@ package Cfn::Resource::Properties::AWS::Elasticsearch::Domain::ElasticsearchClus
   has DedicatedMasterType => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has InstanceCount => (isa => 'Cfn::Value::Integer', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has InstanceType => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has WarmCount => (isa => 'Cfn::Value::Integer', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has WarmEnabled => (isa => 'Cfn::Value::Boolean', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has WarmType => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has ZoneAwarenessConfig => (isa => 'Cfn::Resource::Properties::AWS::Elasticsearch::Domain::ZoneAwarenessConfig', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has ZoneAwarenessEnabled => (isa => 'Cfn::Value::Boolean', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
 }
@@ -203,11 +229,11 @@ coerce 'Cfn::Resource::Properties::AWS::Elasticsearch::Domain::EBSOptions',
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::Elasticsearch::Domain::EBSOptionsValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::Elasticsearch::Domain::EBSOptions->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::Elasticsearch::Domain::EBSOptionsValue {
+package Cfn::Resource::Properties::Object::AWS::Elasticsearch::Domain::EBSOptions {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -216,6 +242,28 @@ package Cfn::Resource::Properties::AWS::Elasticsearch::Domain::EBSOptionsValue {
   has Iops => (isa => 'Cfn::Value::Integer', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has VolumeSize => (isa => 'Cfn::Value::Integer', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has VolumeType => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+}
+
+subtype 'Cfn::Resource::Properties::AWS::Elasticsearch::Domain::DomainEndpointOptions',
+     as 'Cfn::Value';
+
+coerce 'Cfn::Resource::Properties::AWS::Elasticsearch::Domain::DomainEndpointOptions',
+  from 'HashRef',
+   via {
+     if (my $f = Cfn::TypeLibrary::try_function($_)) {
+       return $f
+     } else {
+       return Cfn::Resource::Properties::Object::AWS::Elasticsearch::Domain::DomainEndpointOptions->new( %$_ );
+     }
+   };
+
+package Cfn::Resource::Properties::Object::AWS::Elasticsearch::Domain::DomainEndpointOptions {
+  use Moose;
+  use MooseX::StrictConstructor;
+  extends 'Cfn::Value::TypedValue';
+  
+  has EnforceHTTPS => (isa => 'Cfn::Value::Boolean', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has TLSSecurityPolicy => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
 }
 
 subtype 'Cfn::Resource::Properties::AWS::Elasticsearch::Domain::CognitoOptions',
@@ -227,11 +275,11 @@ coerce 'Cfn::Resource::Properties::AWS::Elasticsearch::Domain::CognitoOptions',
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::Elasticsearch::Domain::CognitoOptionsValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::Elasticsearch::Domain::CognitoOptions->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::Elasticsearch::Domain::CognitoOptionsValue {
+package Cfn::Resource::Properties::Object::AWS::Elasticsearch::Domain::CognitoOptions {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -242,6 +290,29 @@ package Cfn::Resource::Properties::AWS::Elasticsearch::Domain::CognitoOptionsVal
   has UserPoolId => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
 }
 
+subtype 'Cfn::Resource::Properties::AWS::Elasticsearch::Domain::AdvancedSecurityOptionsInput',
+     as 'Cfn::Value';
+
+coerce 'Cfn::Resource::Properties::AWS::Elasticsearch::Domain::AdvancedSecurityOptionsInput',
+  from 'HashRef',
+   via {
+     if (my $f = Cfn::TypeLibrary::try_function($_)) {
+       return $f
+     } else {
+       return Cfn::Resource::Properties::Object::AWS::Elasticsearch::Domain::AdvancedSecurityOptionsInput->new( %$_ );
+     }
+   };
+
+package Cfn::Resource::Properties::Object::AWS::Elasticsearch::Domain::AdvancedSecurityOptionsInput {
+  use Moose;
+  use MooseX::StrictConstructor;
+  extends 'Cfn::Value::TypedValue';
+  
+  has Enabled => (isa => 'Cfn::Value::Boolean', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
+  has InternalUserDatabaseEnabled => (isa => 'Cfn::Value::Boolean', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has MasterUserOptions => (isa => 'Cfn::Resource::Properties::AWS::Elasticsearch::Domain::MasterUserOptions', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+}
+
 package Cfn::Resource::Properties::AWS::Elasticsearch::Domain {
   use Moose;
   use MooseX::StrictConstructor;
@@ -249,7 +320,9 @@ package Cfn::Resource::Properties::AWS::Elasticsearch::Domain {
   
   has AccessPolicies => (isa => 'Cfn::Value::Json|Cfn::DynamicValue', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has AdvancedOptions => (isa => 'Cfn::Value::Hash|Cfn::DynamicValue', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has AdvancedSecurityOptions => (isa => 'Cfn::Resource::Properties::AWS::Elasticsearch::Domain::AdvancedSecurityOptionsInput', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
   has CognitoOptions => (isa => 'Cfn::Resource::Properties::AWS::Elasticsearch::Domain::CognitoOptions', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has DomainEndpointOptions => (isa => 'Cfn::Resource::Properties::AWS::Elasticsearch::Domain::DomainEndpointOptions', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has DomainName => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
   has EBSOptions => (isa => 'Cfn::Resource::Properties::AWS::Elasticsearch::Domain::EBSOptions', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has ElasticsearchClusterConfig => (isa => 'Cfn::Resource::Properties::AWS::Elasticsearch::Domain::ElasticsearchClusterConfig', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
@@ -263,3 +336,30 @@ package Cfn::Resource::Properties::AWS::Elasticsearch::Domain {
 }
 
 1;
+### main pod documentation begin ###
+
+=encoding UTF-8
+
+=head1 NAME
+
+Cfn::Resource::AWS::Elasticsearch::Domain - Cfn resource for AWS::Elasticsearch::Domain
+
+=head1 DESCRIPTION
+
+This module implements a Perl module that represents the CloudFormation object AWS::Elasticsearch::Domain.
+
+See L<Cfn> for more information on how to use it.
+
+=head1 AUTHOR
+
+    Jose Luis Martinez
+    CAPSiDE
+    jlmartinez@capside.com
+
+=head1 COPYRIGHT and LICENSE
+
+Copyright (c) 2013 by CAPSiDE
+This code is distributed under the Apache 2 License. The full text of the 
+license can be found in the LICENSE file included with this module.
+
+=cut

@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20200904144534;
+our $VERSION = 1.20201204215957;
 
 my $formatters = [
                 {
@@ -601,151 +601,151 @@ my $validators = {
         '
               };
 my %areanames = ();
-$areanames{en}->{951422} = "Yangon";
-$areanames{en}->{951423} = "Yangon";
-$areanames{en}->{951424} = "Yangon";
-$areanames{en}->{951426} = "Yangon";
-$areanames{en}->{951429} = "Yangon";
-$areanames{en}->{951439} = "Yangon";
-$areanames{en}->{951446} = "Yangon";
-$areanames{en}->{951462} = "Yangon";
-$areanames{en}->{951465} = "Yangon";
-$areanames{en}->{951470} = "Yangon";
-$areanames{en}->{951471} = "Yangon";
-$areanames{en}->{951472} = "Yangon";
-$areanames{en}->{951473} = "Yangon";
-$areanames{en}->{951483} = "Yangon";
-$areanames{en}->{951550} = "Bahan";
-$areanames{en}->{951551} = "Bahan";
-$areanames{en}->{951552} = "Bahan";
-$areanames{en}->{951553} = "Bahan";
-$areanames{en}->{951680} = "Bayintnaung";
-$areanames{en}->{951681} = "Bayintnaung";
-$areanames{en}->{951682} = "Bayintnaung";
-$areanames{en}->{951683} = "Bayintnaung";
-$areanames{en}->{951684} = "Bayintnaung";
-$areanames{en}->{951685} = "Bayintnaung";
-$areanames{en}->{951686} = "Bayintnaung";
-$areanames{en}->{951687} = "Bayintnaung";
-$areanames{en}->{951688} = "Bayintnaung";
-$areanames{en}->{9522000} = "Mingalar\ Mandalay";
-$areanames{en}->{952422} = "Mandalay";
-$areanames{en}->{952424} = "Mandalay";
-$areanames{en}->{952426} = "Mandalay";
-$areanames{en}->{952439} = "Mandalay";
-$areanames{en}->{952446} = "Mandalay";
-$areanames{en}->{952462} = "Mandalay";
-$areanames{en}->{952470} = "Yangon";
-$areanames{en}->{952471} = "Mandalay";
-$areanames{en}->{952472} = "Mandalay";
-$areanames{en}->{952473} = "Mandalay";
-$areanames{en}->{952483} = "Mandalay";
-$areanames{en}->{95256} = "Amarapura";
-$areanames{en}->{9542480} = "Pathein";
-$areanames{en}->{9542481} = "Pathein";
-$areanames{en}->{9542482} = "Ayeyarwaddy";
-$areanames{en}->{9542483} = "Ayeyarwaddy\/Pathein";
-$areanames{en}->{9543202} = "Rakhine";
-$areanames{en}->{9543470} = "Sittwe";
-$areanames{en}->{9543483} = "Sittwe\/Thandwe";
-$areanames{en}->{954353} = "Buthidaung";
-$areanames{en}->{9543565} = "Palatwa";
-$areanames{en}->{9545470} = "Pyapon";
-$areanames{en}->{95522221} = "Bago";
-$areanames{en}->{95522222} = "Bago";
-$areanames{en}->{95522223} = "Bago";
-$areanames{en}->{95522224} = "Bago";
-$areanames{en}->{95522230} = "Oathar\ Myothit";
-$areanames{en}->{9552470} = "Bago";
-$areanames{en}->{9552472} = "Bago";
-$areanames{en}->{9552473} = "Bago";
-$areanames{en}->{9553472} = "Pyay";
-$areanames{en}->{9553473} = "Pyay";
-$areanames{en}->{9554470} = "Taungoo";
-$areanames{en}->{955620} = "Mandalay";
-$areanames{en}->{955645} = "Tandar";
-$areanames{en}->{9556483} = "Thanlyin";
-$areanames{en}->{9557480} = "Mawlamyine\/Thanbyuzayat";
-$areanames{en}->{9557481} = "Mawlamyine";
-$areanames{en}->{9557482} = "Mon";
-$areanames{en}->{9558470} = "Hpa\-An";
-$areanames{en}->{9558472} = "Hpa\-An";
-$areanames{en}->{955851} = "Myawaddy";
-$areanames{en}->{9559470} = "Dawei";
-$areanames{en}->{9559471} = "Tanintharyi";
-$areanames{en}->{9561200} = "Chauk";
-$areanames{en}->{956124620} = "Chauk";
-$areanames{en}->{956124621} = "Chauk";
-$areanames{en}->{956124622} = "Chauk";
-$areanames{en}->{956124623} = "Chauk";
-$areanames{en}->{956124624} = "Chauk";
-$areanames{en}->{956124640} = "Bagan";
-$areanames{en}->{956124641} = "Bagan";
-$areanames{en}->{956124642} = "Bagan";
-$areanames{en}->{956124643} = "Bagan";
-$areanames{en}->{956124644} = "Bagan";
-$areanames{en}->{9562472} = "Pakokku";
-$areanames{en}->{9562473} = "Magway";
-$areanames{en}->{956260} = "Kanma";
-$areanames{en}->{956320} = "Magway";
-$areanames{en}->{956323} = "Magway";
-$areanames{en}->{956324} = "Magway";
-$areanames{en}->{9563470} = "Magway";
-$areanames{en}->{95642487} = "Shawpin";
-$areanames{en}->{9564472} = "Meiktila";
-$areanames{en}->{9564473} = "Mandalay";
-$areanames{en}->{956525} = "Ngape";
-$areanames{en}->{9567439} = "Naypyidaw";
-$areanames{en}->{9567460} = "Naypyitaw";
-$areanames{en}->{9567470} = "Naypyitaw";
-$areanames{en}->{9567471} = "Naypyitaw";
-$areanames{en}->{9567473} = "Naypyitaw";
-$areanames{en}->{9567550} = "Naypyidaw";
-$areanames{en}->{9569200} = "Aunglan";
-$areanames{en}->{956940} = "Sinpaungwae";
-$areanames{en}->{9570470} = "Hakha";
-$areanames{en}->{95712032} = "Ohbotaung";
-$areanames{en}->{9571470} = "Monywa";
-$areanames{en}->{9571483} = "Monywa";
-$areanames{en}->{9574470} = "Myitkyinar\/Bahmaw";
-$areanames{en}->{9575470} = "Shwebo";
-$areanames{en}->{95812820} = "Moenae";
-$areanames{en}->{95812821} = "Moenae";
-$areanames{en}->{95812822} = "Moenae";
-$areanames{en}->{95812823} = "Moenae";
-$areanames{en}->{95812824} = "Moenae";
-$areanames{en}->{958130} = "Pinlon";
-$areanames{en}->{958131} = "Loilem";
-$areanames{en}->{958141} = "Naungtayar";
-$areanames{en}->{9581470} = "Taunggyi";
-$areanames{en}->{9581471} = "Shan\ \(South\)";
-$areanames{en}->{958149} = "Sesin";
-$areanames{en}->{9582320} = "Manton";
-$areanames{en}->{958238} = "Tantyan";
-$areanames{en}->{9582490} = "Shan\ \(North\)";
-$areanames{en}->{9583470} = "Loikaw";
-$areanames{en}->{958521} = "Pyinoolwin";
-$areanames{en}->{958522} = "Pyinoolwin";
-$areanames{en}->{958523} = "Pyinoolwin";
-$areanames{en}->{958528} = "Pyinoolwin";
-$areanames{en}->{958529} = "Padaythar\ Myothit";
-$areanames{en}->{958540} = "Ohn\ Chaw";
-$areanames{en}->{958541} = "Pyinoolwin";
-$areanames{en}->{958542} = "Pyinoolwin";
-$areanames{en}->{958543} = "Pyinoolwin";
-$areanames{en}->{958544} = "Pyinoolwin";
-$areanames{en}->{958545} = "Pyinoolwin";
-$areanames{en}->{958546} = "Pyinoolwin";
-$areanames{en}->{958547} = "Pyinoolwin";
-$areanames{en}->{958548} = "Pyinoolwin";
-$areanames{en}->{958549} = "Pyinoolwin";
-$areanames{en}->{958551} = "Yangon";
-$areanames{en}->{958620} = "Mogoke";
-$areanames{en}->{958621} = "Mogoke";
-$areanames{en}->{958625} = "Kyatpyin";
-$areanames{en}->{958630} = "Thabeikkyin";
-$areanames{en}->{958635} = "Sintkuu";
-$areanames{en}->{958639} = "Letpanhla";
+$areanames{en} = {"95812821", "Moenae",
+"958621", "Mogoke",
+"955620", "Mandalay",
+"951551", "Bahan",
+"951465", "Yangon",
+"9581471", "Shan\ \(South\)",
+"951683", "Bayintnaung",
+"956124623", "Chauk",
+"9558472", "Hpa\-An",
+"9581470", "Taunggyi",
+"9561200", "Chauk",
+"9552472", "Bago",
+"9564472", "Meiktila",
+"956124622", "Chauk",
+"951429", "Yangon",
+"95812823", "Moenae",
+"951684", "Bayintnaung",
+"951685", "Bayintnaung",
+"952473", "Mandalay",
+"9563470", "Magway",
+"9556483", "Thanlyin",
+"9542482", "Ayeyarwaddy",
+"9575470", "Shwebo",
+"9567473", "Naypyitaw",
+"956124641", "Bagan",
+"95522224", "Bago",
+"958547", "Pyinoolwin",
+"9562473", "Magway",
+"951473", "Yangon",
+"956260", "Kanma",
+"956320", "Magway",
+"958546", "Pyinoolwin",
+"956124644", "Bagan",
+"958529", "Padaythar\ Myothit",
+"951472", "Yangon",
+"951680", "Bayintnaung",
+"956124640", "Bagan",
+"9570470", "Hakha",
+"952426", "Mandalay",
+"958238", "Tantyan",
+"952462", "Mandalay",
+"951688", "Bayintnaung",
+"952472", "Mandalay",
+"956525", "Ngape",
+"9564473", "Mandalay",
+"9569200", "Aunglan",
+"95812822", "Moenae",
+"9552473", "Bago",
+"951462", "Yangon",
+"958521", "Pyinoolwin",
+"955645", "Tandar",
+"956324", "Magway",
+"951426", "Yangon",
+"9582490", "Shan\ \(North\)",
+"952439", "Mandalay",
+"951446", "Yangon",
+"958130", "Pinlon",
+"9542483", "Ayeyarwaddy\/Pathein",
+"958541", "Pyinoolwin",
+"954353", "Buthidaung",
+"952470", "Yangon",
+"9557480", "Mawlamyine\/Thanbyuzayat",
+"9522000", "Mingalar\ Mandalay",
+"9567439", "Naypyidaw",
+"958639", "Letpanhla",
+"951439", "Yangon",
+"952446", "Mandalay",
+"956323", "Magway",
+"9562472", "Pakokku",
+"95256", "Amarapura",
+"9557481", "Mawlamyine",
+"951470", "Yangon",
+"951682", "Bayintnaung",
+"95522230", "Oathar\ Myothit",
+"958549", "Pyinoolwin",
+"9558470", "Hpa\-An",
+"9552470", "Bago",
+"958149", "Sesin",
+"952422", "Mandalay",
+"958543", "Pyinoolwin",
+"95812824", "Moenae",
+"95812820", "Moenae",
+"951422", "Yangon",
+"956124624", "Chauk",
+"951552", "Bahan",
+"956124620", "Chauk",
+"9553473", "Pyay",
+"955851", "Myawaddy",
+"9574470", "Myitkyinar\/Bahmaw",
+"9545470", "Pyapon",
+"958141", "Naungtayar",
+"9543470", "Sittwe",
+"958635", "Sintkuu",
+"95522223", "Bago",
+"958620", "Mogoke",
+"9542481", "Pathein",
+"958544", "Pyinoolwin",
+"9543483", "Sittwe\/Thandwe",
+"958545", "Pyinoolwin",
+"951550", "Bahan",
+"951686", "Bayintnaung",
+"956940", "Sinpaungwae",
+"958523", "Pyinoolwin",
+"9582320", "Manton",
+"95522221", "Bago",
+"9542480", "Pathein",
+"951687", "Bayintnaung",
+"952471", "Mandalay",
+"958630", "Thabeikkyin",
+"956124642", "Bagan",
+"958625", "Kyatpyin",
+"9571470", "Monywa",
+"958131", "Loilem",
+"95642487", "Shawpin",
+"958540", "Ohn\ Chaw",
+"9543202", "Rakhine",
+"951424", "Yangon",
+"958522", "Pyinoolwin",
+"951471", "Yangon",
+"9553472", "Pyay",
+"952424", "Mandalay",
+"95712032", "Ohbotaung",
+"958548", "Pyinoolwin",
+"956124643", "Bagan",
+"958528", "Pyinoolwin",
+"952483", "Mandalay",
+"956124621", "Chauk",
+"9567460", "Naypyitaw",
+"95522222", "Bago",
+"9583470", "Loikaw",
+"9554470", "Taungoo",
+"951553", "Bahan",
+"951423", "Yangon",
+"951681", "Bayintnaung",
+"9567550", "Naypyidaw",
+"9559471", "Tanintharyi",
+"9567470", "Naypyitaw",
+"958542", "Pyinoolwin",
+"951483", "Yangon",
+"9543565", "Palatwa",
+"9571483", "Monywa",
+"9567471", "Naypyitaw",
+"9559470", "Dawei",
+"958551", "Yangon",
+"9557482", "Mon",};
 
     sub new {
       my $class = shift;

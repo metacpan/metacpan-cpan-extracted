@@ -4,47 +4,60 @@
       "Dai Okabayashi <bayashi@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4224",
+   "generated_by" : "Module::Build version 0.4231",
    "license" : [
-      "perl_5"
+      "artistic_2"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Music-Chord-Note",
    "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build::Pluggable::CPANfile" : "0.05"
+         }
+      },
       "configure" : {
          "requires" : {
-            "Module::Build" : "0.42"
+            "Module::Build" : "0.40",
+            "Module::Build::Pluggable" : "0",
+            "Module::Build::Pluggable::CPANfile" : "0.05"
          }
       },
       "runtime" : {
          "requires" : {
             "Carp" : "0",
-            "Test::More" : "0",
-            "perl" : "v5.6.2"
+            "perl" : "5.006002",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.88"
          }
       }
    },
    "provides" : {
       "Music::Chord::Note" : {
          "file" : "lib/Music/Chord/Note.pm",
-         "version" : "0.08"
+         "version" : "0.09"
       }
    },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "http://github.com/bayashi/Music-Cord-Note/issues"
+         "web" : "http://github.com/bayashi/Music-Chord-Note/issues"
       },
       "license" : [
-         "http://dev.perl.org/licenses/"
+         "http://www.perlfoundation.org/artistic_license_2_0"
       ],
       "repository" : {
-         "url" : "http://github.com/bayashi/Music-Cord-Note"
+         "url" : "http://github.com/bayashi/Music-Chord-Note"
       }
    },
-   "version" : "0.08",
-   "x_serialization_backend" : "JSON::PP version 2.27300"
+   "version" : "0.09",
+   "x_serialization_backend" : "JSON::PP version 4.04"
 }

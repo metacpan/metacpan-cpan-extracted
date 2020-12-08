@@ -1,5 +1,8 @@
 Revision history for BenchmarkAnything-Storage-Search-Elasticsearch
 
+0.005     2020-12-07
+        - fix config key pointing to client
+
 0.004     2018-10-05
         - fix missing passthrough of node configuration
 

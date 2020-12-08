@@ -7,7 +7,7 @@ use Data::CompactReadonly::V0::Node;
 
 # Yuck, semver. I give in, the stupid cult that doesn't understand
 # what the *number* bit of *version number* means has won.
-our $VERSION = '0.0.1';
+our $VERSION = '0.0.2';
 
 =head1 NAME
 
@@ -19,6 +19,23 @@ A Compact Read Only Database that consumes very little memory. Once created a
 database can not be practically updated except by re-writing the whole thing.
 The aim is for random-access read performance to be on a par with L<DBM::Deep>
 and for files to be much smaller.
+
+=head1 VERSION 'NUMBERS'
+
+This module uses semantic versioning. That means that the version 'number' isn't
+really a number but has three parts: C<major.minor.patch>.
+
+The C<major> number will increase when the API changes incompatibly;
+
+The C<minor> number will increase when backward-compatible additions are made to the API;
+
+The C<patch> number will increase when bugs are fixed backward-compatibly.
+
+=head1 FILE FORMAT VERSIONS
+
+All versions so far support file format version 0 only.
+
+See L<Data::CompactReadonly::V0::Format> for details of what that means.
 
 =head1 METHODS
 
@@ -46,6 +63,12 @@ it were stored as a number, it would be retrieved as merely 7.1, accurate to onl
 two significant figures. We are happy to spend a little extra storage in the
 interested of correctly storing your data. If you then go on to just treat 7.10
 as a number in perl, and so as equivalent to 7.1 that is of course up to you.
+
+Finally, while the file format permits numeric keys in hashes, this method
+always coerces them to text. This is because if you allow numeric keys,
+numbers that can't be represented in an C<int>, such as 1e100 or 3.14 will
+be subject to floating point imprecision, and so it is unlikely that you
+will ever be able to retrieve them as no exact match is possible.
 
 =head2 read
 

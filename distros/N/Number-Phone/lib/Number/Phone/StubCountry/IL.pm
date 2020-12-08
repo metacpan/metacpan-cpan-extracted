@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20200904144533;
+our $VERSION = 1.20201204215956;
 
 my $formatters = [
                 {
@@ -97,9 +97,9 @@ my $validators = {
               01|
               1[79]|
               2[2-9]|
-              3[23]|
-              44|
-              5[05689]|
+              3[0-3]|
+              4[34]|
+              5[015689]|
               6[6-8]|
               7[0-267]|
               8[7-9]|
@@ -126,11 +126,14 @@ my $validators = {
           )\\d{3}
         ',
                 'voip' => '
-          78(?:
-            33|
-            55|
-            77|
-            81
+          7(?:
+            380|
+            8(?:
+              33|
+              55|
+              77|
+              81
+            )
           )\\d{5}|
           7(?:
             18|
@@ -145,16 +148,16 @@ my $validators = {
         '
               };
 my %areanames = ();
-$areanames{en}->{9722} = "Jerusalem";
-$areanames{en}->{9723} = "Tel\ Aviv";
-$areanames{en}->{9724} = "Haifa\ and\ North\ Regions";
-$areanames{en}->{9728} = "Hashfela\ and\ South\ Regions";
-$areanames{en}->{9729} = "Hasharon";
-$areanames{iw}->{9722} = "ירושלים";
-$areanames{iw}->{9723} = "תל\ אביב\-יפו\ והמרכז";
-$areanames{iw}->{9724} = "חיפה\ והצפון";
-$areanames{iw}->{9728} = "השפלה\ והדרום";
-$areanames{iw}->{9729} = "השרון";
+$areanames{en} = {"9724", "Haifa\ and\ North\ Regions",
+"9722", "Jerusalem",
+"9729", "Hasharon",
+"9723", "Tel\ Aviv",
+"9728", "Hashfela\ and\ South\ Regions",};
+$areanames{iw} = {"9722", "ירושלים",
+"9724", "חיפה\ והצפון",
+"9729", "השרון",
+"9728", "השפלה\ והדרום",
+"9723", "תל\ אביב\-יפו\ והמרכז",};
 
     sub new {
       my $class = shift;

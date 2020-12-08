@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20200904144533;
+our $VERSION = 1.20201204215956;
 
 my $formatters = [
                 {
@@ -82,23 +82,23 @@ my $validators = {
                 'voip' => ''
               };
 my %areanames = ();
-$areanames{en}->{850195} = "Pyongyang";
-$areanames{en}->{85021} = "Pyongyang";
-$areanames{en}->{8502381} = "Pyongyang";
-$areanames{en}->{85027} = "Pyongyang";
-$areanames{en}->{85028} = "Pyongyang";
-$areanames{en}->{85031} = "Pyongyang";
-$areanames{en}->{85039} = "Nampo";
-$areanames{en}->{85041} = "Sariwon";
-$areanames{en}->{85045} = "Haeju";
-$areanames{en}->{85049} = "Kaesong";
-$areanames{en}->{85053} = "Hamhung";
-$areanames{en}->{85057} = "Wonsan";
-$areanames{en}->{85061} = "Sinuiju";
-$areanames{en}->{85067} = "Kanggye";
-$areanames{en}->{85073} = "Chongjin";
-$areanames{en}->{85079} = "Hyesan";
-$areanames{en}->{8508} = "Rason";
+$areanames{en} = {"8508", "Rason",
+"8502381", "Pyongyang",
+"85039", "Nampo",
+"85031", "Pyongyang",
+"85041", "Sariwon",
+"85021", "Pyongyang",
+"85028", "Pyongyang",
+"85027", "Pyongyang",
+"85049", "Kaesong",
+"85057", "Wonsan",
+"85079", "Hyesan",
+"85073", "Chongjin",
+"85067", "Kanggye",
+"85053", "Hamhung",
+"85061", "Sinuiju",
+"850195", "Pyongyang",
+"85045", "Haeju",};
 
     sub new {
       my $class = shift;

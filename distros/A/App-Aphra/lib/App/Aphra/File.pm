@@ -116,4 +116,6 @@ sub debug {
   carp @_ if $ENV{APHRA_DEBUG};
 }
 
+__PACKAGE__->meta->make_immutable;
+
 1;

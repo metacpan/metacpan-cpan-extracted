@@ -4,9 +4,9 @@ use strict;
 use warnings;
 
 $SIG{__WARN__} = sub { confess(shift); };
-our $VERSION = '1.24';
+our $VERSION = '1.25';
 
-use Carp;
+use Carp qw(confess croak);
 use Exporter;
 use Fcntl qw(:flock);
 use File::Find::Rule;
@@ -123,7 +123,6 @@ sub write {
                 confess "\nthe file handle you're passing into write() as ".
                     "the contents param has already been closed\n";
             }
-
         };
 
         while (<$contents>){
@@ -294,10 +293,10 @@ sub platform_recsep {
 
     my $want = shift;
 
-    my $file = $self->_temp_filename;
-
     # for platform_recsep(), we need the file open in ASCII mode,
     # so we can't use _binmode_handle() or File::Temp
+
+    my $file = $self->_temp_filename;
 
     open my $wfh, '>', $file
       or confess
@@ -318,6 +317,8 @@ sub platform_recsep {
 
     close $fh
       or confess "platform_recsep() can't close temp file $file after run: $!";
+
+    unlink $file or confess "Can't unlink temp file '$file': $!";
 
     return $want
         ? $self->_convert_recsep($self->{platform_recsep}, $want)
@@ -449,10 +450,6 @@ sub _temp_filename {
 
     my $temp_fh = File::Temp->new(UNLINK => 1);
     my $filename = $temp_fh->filename;
-
-    close $temp_fh
-     or confess "_temp_filename() can't close the $filename temp file: $!";
-
     return $filename;
 }
 sub _vim_placeholder { return 1; }; # for folding
@@ -719,7 +716,7 @@ Steve Bertrand, C<< <steveb at cpan.org> >>
 =head1 BUGS
 
 Please report any bugs or feature requests to
-L<https://github.com/stevieb9/mock-sub/issues>
+L<https://github.com/stevieb9/file-edit-portable/issues>
 
 =head1 REPOSITORY
 

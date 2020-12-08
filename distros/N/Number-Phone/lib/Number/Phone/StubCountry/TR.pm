@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20200904144536;
+our $VERSION = 1.20201204215957;
 
 my $formatters = [
                 {
@@ -144,172 +144,127 @@ my $validators = {
                 'voip' => '850\\d{7}'
               };
 my %areanames = ();
-$areanames{en}->{90212} = "Istanbul\ \(Europe\)";
-$areanames{en}->{90216} = "Istanbul\ \(Anatolia\)";
-$areanames{en}->{90222} = "Esksehir";
-$areanames{en}->{90224} = "Bursa";
-$areanames{en}->{90226} = "Yalova";
-$areanames{en}->{90228} = "Bilecik";
-$areanames{en}->{90232} = "Izmir";
-$areanames{en}->{90236} = "Manisa";
-$areanames{en}->{90242} = "Antalya";
-$areanames{en}->{90246} = "Isparta";
-$areanames{en}->{90248} = "Burdur";
-$areanames{en}->{90252} = "Mugla";
-$areanames{en}->{90256} = "Aydin";
-$areanames{en}->{90258} = "Denizli";
-$areanames{en}->{90262} = "Kocaeli";
-$areanames{en}->{90264} = "Sakarya";
-$areanames{en}->{90266} = "Balikesir";
-$areanames{en}->{90272} = "Afyon";
-$areanames{en}->{90274} = "Kutahya";
-$areanames{en}->{90276} = "Usak";
-$areanames{en}->{90282} = "Tekirdag";
-$areanames{en}->{90284} = "Edirne";
-$areanames{en}->{90286} = "Canakkale";
-$areanames{en}->{90288} = "Kirklareli";
-$areanames{en}->{90312} = "Ankara";
-$areanames{en}->{90318} = "Kirikkale";
-$areanames{en}->{90322} = "Adana";
-$areanames{en}->{90324} = "Icel";
-$areanames{en}->{90326} = "Hatay";
-$areanames{en}->{90328} = "Osmaniye";
-$areanames{en}->{90332} = "Konya";
-$areanames{en}->{90338} = "Karaman";
-$areanames{en}->{90342} = "Gaziantep";
-$areanames{en}->{90344} = "K\.\ Maras";
-$areanames{en}->{90346} = "Sivas";
-$areanames{en}->{90348} = "Kilis";
-$areanames{en}->{90352} = "Kayseri";
-$areanames{en}->{90354} = "Yozgat";
-$areanames{en}->{90356} = "Tokat";
-$areanames{en}->{90358} = "Amasya";
-$areanames{en}->{90362} = "Samsun";
-$areanames{en}->{90364} = "Corum";
-$areanames{en}->{90366} = "Kastamonu";
-$areanames{en}->{90368} = "Sinop";
-$areanames{en}->{90370} = "Karabuk";
-$areanames{en}->{90372} = "Zongdulak";
-$areanames{en}->{90374} = "Bolu";
-$areanames{en}->{90376} = "Cankiri";
-$areanames{en}->{90378} = "Bartin";
-$areanames{en}->{90380} = "Duzce";
-$areanames{en}->{90382} = "Aksaray";
-$areanames{en}->{90384} = "Nevsehir";
-$areanames{en}->{90386} = "Kirsehir";
-$areanames{en}->{90388} = "Nigde";
-$areanames{en}->{9039} = "Northern\ Cyprus";
-$areanames{en}->{90412} = "Diyarbakir";
-$areanames{en}->{90414} = "Sanliurfa";
-$areanames{en}->{90416} = "Adiyaman";
-$areanames{en}->{90422} = "Malatya";
-$areanames{en}->{90424} = "Elazig";
-$areanames{en}->{90426} = "Bingol";
-$areanames{en}->{90428} = "Tuniceli";
-$areanames{en}->{90432} = "Van";
-$areanames{en}->{90434} = "Bitlis";
-$areanames{en}->{90436} = "Mus";
-$areanames{en}->{90438} = "Hakkari";
-$areanames{en}->{90442} = "Erzurum";
-$areanames{en}->{90446} = "Erzincan";
-$areanames{en}->{90452} = "Ordu";
-$areanames{en}->{90454} = "Giresun";
-$areanames{en}->{90456} = "Gumushane";
-$areanames{en}->{90458} = "Bayburt";
-$areanames{en}->{90462} = "Trabzon";
-$areanames{en}->{90464} = "Rize";
-$areanames{en}->{90466} = "Artvin";
-$areanames{en}->{90472} = "Agri";
-$areanames{en}->{90474} = "Kars";
-$areanames{en}->{90476} = "Igdir";
-$areanames{en}->{90478} = "Ardahan";
-$areanames{en}->{90482} = "Mardin";
-$areanames{en}->{90484} = "Stirt";
-$areanames{en}->{90486} = "Sirnak";
-$areanames{en}->{90488} = "Batman";
-$areanames{tr}->{90212} = "Istanbul\ \(Avrupa\)";
-$areanames{tr}->{90216} = "Istanbul\ \(Anatolia\)";
-$areanames{tr}->{90222} = "Eskisehir";
-$areanames{tr}->{90224} = "Bursa";
-$areanames{tr}->{90226} = "Yalova";
-$areanames{tr}->{90228} = "Bilecik";
-$areanames{tr}->{90232} = "İzmir";
-$areanames{tr}->{90236} = "Manisa";
-$areanames{tr}->{90242} = "Antalya";
-$areanames{tr}->{90246} = "Isparta";
-$areanames{tr}->{90248} = "Burdur";
-$areanames{tr}->{90252} = "Muğla";
-$areanames{tr}->{90256} = "Aydın";
-$areanames{tr}->{90258} = "Denizli";
-$areanames{tr}->{90262} = "Kocaeli\ \(İzmit\)";
-$areanames{tr}->{90264} = "Sakarya\ \(Adapazarı\)";
-$areanames{tr}->{90266} = "Balıkesir";
-$areanames{tr}->{90272} = "Afyon";
-$areanames{tr}->{90274} = "Kütahya";
-$areanames{tr}->{90276} = "Uşak";
-$areanames{tr}->{90282} = "Tekirdağ";
-$areanames{tr}->{90284} = "Edirne";
-$areanames{tr}->{90286} = "Çanakkale";
-$areanames{tr}->{90288} = "Kırklareli";
-$areanames{tr}->{90312} = "Ankara";
-$areanames{tr}->{90318} = "Kırıkkale";
-$areanames{tr}->{90322} = "Adana";
-$areanames{tr}->{90324} = "Mersin";
-$areanames{tr}->{90326} = "Hatay";
-$areanames{tr}->{90328} = "Osmaniye";
-$areanames{tr}->{90332} = "Konya";
-$areanames{tr}->{90338} = "Karaman";
-$areanames{tr}->{90342} = "Gaziantep";
-$areanames{tr}->{90344} = "Kahramanmaraş";
-$areanames{tr}->{90346} = "Sivas";
-$areanames{tr}->{90348} = "Kilis";
-$areanames{tr}->{90352} = "Kayseri";
-$areanames{tr}->{90354} = "Yozgat";
-$areanames{tr}->{90356} = "Tokat";
-$areanames{tr}->{90358} = "Amasya";
-$areanames{tr}->{90362} = "Samsun";
-$areanames{tr}->{90364} = "Çorum";
-$areanames{tr}->{90366} = "Kastamonu";
-$areanames{tr}->{90368} = "Sinop";
-$areanames{tr}->{90370} = "Karabük";
-$areanames{tr}->{90372} = "Zonguldak";
-$areanames{tr}->{90374} = "Bolu";
-$areanames{tr}->{90376} = "Çankırı";
-$areanames{tr}->{90378} = "Bartın";
-$areanames{tr}->{90380} = "Düzce";
-$areanames{tr}->{90382} = "Aksaray";
-$areanames{tr}->{90384} = "Nevşehir";
-$areanames{tr}->{90386} = "Kırşehir";
-$areanames{tr}->{90388} = "Niğde";
-$areanames{tr}->{9039} = "Kuzey\ Kıbrıs";
-$areanames{tr}->{90412} = "Diyarbakır";
-$areanames{tr}->{90414} = "Şanlıurfa";
-$areanames{tr}->{90416} = "Adıyaman";
-$areanames{tr}->{90422} = "Malatya";
-$areanames{tr}->{90424} = "Elazığ";
-$areanames{tr}->{90426} = "Bingöl";
-$areanames{tr}->{90428} = "Tunceli";
-$areanames{tr}->{90432} = "Van";
-$areanames{tr}->{90434} = "Bitlis";
-$areanames{tr}->{90436} = "Muş";
-$areanames{tr}->{90438} = "Hakkari";
-$areanames{tr}->{90442} = "Erzurum";
-$areanames{tr}->{90446} = "Erzincan";
-$areanames{tr}->{90452} = "Ordu";
-$areanames{tr}->{90454} = "Giresun";
-$areanames{tr}->{90456} = "Gümüşhane";
-$areanames{tr}->{90458} = "Bayburt";
-$areanames{tr}->{90462} = "Trabzon";
-$areanames{tr}->{90464} = "Rize";
-$areanames{tr}->{90466} = "Artvin";
-$areanames{tr}->{90472} = "Ağrı";
-$areanames{tr}->{90474} = "Kars";
-$areanames{tr}->{90476} = "Iğdır";
-$areanames{tr}->{90478} = "Ardahan";
-$areanames{tr}->{90482} = "Mardin";
-$areanames{tr}->{90484} = "Siirt";
-$areanames{tr}->{90486} = "Şırnak";
-$areanames{tr}->{90488} = "Batman";
+$areanames{tr} = {"90282", "Tekirdağ",
+"90222", "Eskisehir",
+"90428", "Tunceli",
+"90344", "Kahramanmaraş",
+"90256", "Aydın",
+"90288", "Kırklareli",
+"90472", "Ağrı",
+"90436", "Muş",
+"90414", "Şanlıurfa",
+"90456", "Gümüşhane",
+"90376", "Çankırı",
+"90386", "Kırşehir",
+"90262", "Kocaeli\ \(İzmit\)",
+"90264", "Sakarya\ \(Adapazarı\)",
+"90412", "Diyarbakır",
+"90424", "Elazığ",
+"90484", "Siirt",
+"90212", "Istanbul\ \(Avrupa\)",
+"90370", "Karabük",
+"90274", "Kütahya",
+"90380", "Düzce",
+"90378", "Bartın",
+"90388", "Niğde",
+"90252", "Muğla",
+"90286", "Çanakkale",
+"90276", "Uşak",
+"90232", "İzmir",
+"90266", "Balıkesir",
+"90372", "Zonguldak",
+"9039", "Kuzey\ Kıbrıs",
+"90486", "Şırnak",
+"90476", "Iğdır",
+"90426", "Bingöl",
+"90416", "Adıyaman",
+"90324", "Mersin",
+"90384", "Nevşehir",
+"90364", "Çorum",
+"90318", "Kırıkkale",};
+$areanames{en} = {"90376", "Cankiri",
+"90456", "Gumushane",
+"90332", "Konya",
+"90262", "Kocaeli",
+"90386", "Kirsehir",
+"90326", "Hatay",
+"90436", "Mus",
+"90352", "Kayseri",
+"90472", "Agri",
+"90288", "Kirklareli",
+"90482", "Mardin",
+"90422", "Malatya",
+"90414", "Sanliurfa",
+"90228", "Bilecik",
+"90344", "K\.\ Maras",
+"90256", "Aydin",
+"90338", "Karaman",
+"90462", "Trabzon",
+"90236", "Manisa",
+"90488", "Batman",
+"90272", "Afyon",
+"90478", "Ardahan",
+"90358", "Amasya",
+"90366", "Kastamonu",
+"90282", "Tekirdag",
+"90222", "Esksehir",
+"90428", "Tuniceli",
+"90212", "Istanbul\ \(Europe\)",
+"90224", "Bursa",
+"90284", "Edirne",
+"90370", "Karabuk",
+"90380", "Duzce",
+"90274", "Kutahya",
+"90446", "Erzincan",
+"90464", "Rize",
+"90342", "Gaziantep",
+"90412", "Diyarbakir",
+"90424", "Elazig",
+"90484", "Stirt",
+"90246", "Isparta",
+"90474", "Kars",
+"90354", "Yozgat",
+"90264", "Sakarya",
+"90348", "Kilis",
+"90486", "Sirnak",
+"90432", "Van",
+"90476", "Igdir",
+"90356", "Tokat",
+"90368", "Sinop",
+"90426", "Bingol",
+"90266", "Balikesir",
+"90382", "Aksaray",
+"90258", "Denizli",
+"90372", "Zongdulak",
+"90452", "Ordu",
+"90322", "Adana",
+"9039", "Northern\ Cyprus",
+"90286", "Canakkale",
+"90362", "Samsun",
+"90438", "Hakkari",
+"90232", "Izmir",
+"90276", "Usak",
+"90226", "Yalova",
+"90378", "Bartin",
+"90466", "Artvin",
+"90458", "Bayburt",
+"90252", "Mugla",
+"90388", "Nigde",
+"90328", "Osmaniye",
+"90318", "Kirikkale",
+"90346", "Sivas",
+"90216", "Istanbul\ \(Anatolia\)",
+"90442", "Erzurum",
+"90248", "Burdur",
+"90364", "Corum",
+"90324", "Icel",
+"90312", "Ankara",
+"90454", "Giresun",
+"90374", "Bolu",
+"90384", "Nevsehir",
+"90416", "Adiyaman",
+"90434", "Bitlis",
+"90242", "Antalya",};
 
     sub new {
       my $class = shift;

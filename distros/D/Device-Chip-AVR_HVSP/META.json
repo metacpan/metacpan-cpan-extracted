@@ -4,13 +4,13 @@
       "Paul Evans <leonerd@leonerd.org.uk>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4218",
+   "generated_by" : "Module::Build version 0.4231",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Device-Chip-AVR_HVSP",
    "prereqs" : {
@@ -22,28 +22,28 @@
       "runtime" : {
          "requires" : {
             "Device::Chip" : "0.04",
-            "Struct::Dumb" : "0"
+            "Future::AsyncAwait" : "0.47",
+            "Object::Pad" : "0.19",
+            "Struct::Dumb" : "0",
+            "perl" : "5.026"
          }
       },
       "test" : {
          "requires" : {
             "Test::Device::Chip::Adapter" : "0",
+            "Test::Future::Deferred" : "0",
             "Test::More" : "0.88"
          }
       }
    },
    "provides" : {
-      "Device::BusPirate::Chip::AVR_HVSP" : {
-         "file" : "lib/Device/BusPirate/Chip/AVR_HVSP.pm",
-         "version" : "0.04"
-      },
       "Device::Chip::AVR_HVSP" : {
          "file" : "lib/Device/Chip/AVR_HVSP.pm",
-         "version" : "0.04"
+         "version" : "0.05"
       },
       "Device::Chip::AVR_HVSP::FuseInfo" : {
          "file" : "lib/Device/Chip/AVR_HVSP/FuseInfo.pm",
-         "version" : "0.04"
+         "version" : "0.05"
       }
    },
    "release_status" : "stable",
@@ -52,6 +52,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.04",
-   "x_serialization_backend" : "JSON::PP version 2.27400"
+   "version" : "0.05",
+   "x_serialization_backend" : "JSON::PP version 4.05"
 }

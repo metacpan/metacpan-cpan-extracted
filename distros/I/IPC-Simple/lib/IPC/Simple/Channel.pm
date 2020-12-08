@@ -1,5 +1,5 @@
 package IPC::Simple::Channel;
-$IPC::Simple::Channel::VERSION = '0.07';
+$IPC::Simple::Channel::VERSION = '0.09';
 use strict;
 use warnings;
 
@@ -83,6 +83,15 @@ sub flush {
   }
 }
 
+sub clear {
+  my $self = shift;
+  $self->flush;
+  my @msgs = @{ $self->{buffer} };
+  $self->{buffer} = [];
+  $self->{size} = 0;
+  return @msgs;
+}
+
 1;
 
 __END__
@@ -97,7 +106,7 @@ IPC::Simple::Channel
 
 =head1 VERSION
 
-version 0.07
+version 0.09
 
 =head1 AUTHOR
 

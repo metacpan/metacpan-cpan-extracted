@@ -7,7 +7,7 @@
 #   Top-level makefile creation script.
 #
 # COPYRIGHT
-#   Copyright (C) 2004-2009, 2012, 2014, 2015, 2017 Steve Hay.  All rights
+#   Copyright (C) 2004-2009, 2012, 2014, 2015, 2017, 2020 Steve Hay.  All rights
 #   reserved.
 #
 # LICENCE
@@ -33,8 +33,8 @@ use ExtUtils::MakeMaker qw(WriteMakefile);
 our($VERSION, $YEAR);
 
 BEGIN {
-    $VERSION = '2.08';
-    $YEAR = '2004-2009, 2012, 2014, 2015, 2017';
+    $VERSION = '2.10';
+    $YEAR = '2004-2009, 2012, 2014, 2015, 2017, 2020';
 }
 
 #===============================================================================
@@ -98,7 +98,7 @@ MAIN: {
             resources => {
                 repository => {
                     type => 'git',
-                    url  => 'https://github.com/steve-m-hay/Filter-Crypto.git'
+                    web  => 'https://github.com/steve-m-hay/Filter-Crypto'
                 }
             },
 
@@ -188,6 +188,7 @@ MAIN: {
         },
 
         TEST_REQUIRES => {
+            'File::Path' => '0',
             'FindBin'    => '0',
             'Test::More' => '0',
             'blib'       => '0'
@@ -574,7 +575,18 @@ sub query_build {
 #-------------------------------------------------------------------------------
 
 sub is_win32 {
-    return $^O eq 'MSWin32';
+    return $^O =~ /^MSWin32$/io;
+}
+
+sub quote_str {
+    my($self, $string) = @_;
+
+    if ($string =~ / /o) {
+        my $q = ($^O =~ /^(?:MSWin32|NetWare|VMS)$/io) ? '"' : "'";
+        $string = $q . $string . $q;
+    }
+
+    return $string;
 }
 
 sub prompt_yes_no {
@@ -776,7 +788,8 @@ sub query_prefix_dir {
                 # Find out (if we can) which platform this binary was built for.
                 # This information is normally contained in the output of the
                 # binary's "version -a" command, labelled "platform: ".
-                my $bin_cmd = "$bin_file version -a 2>&1";
+                my $quoted_bin_file = $self->quote_str($bin_file);
+                my $bin_cmd = "$quoted_bin_file version -a 2>&1";
 
                 my $bin_output = `$bin_cmd`;
                 my $bin_rc = $? >> 8;
@@ -891,7 +904,7 @@ sub locate_inc_dir {
 sub set_inc {
     my $self = shift;
 
-    my $inc_dir = $self->inc_dir();
+    my $inc_dir = $self->quote_str($self->inc_dir());
     $self->inc("-I$inc_dir");
 }
 
@@ -1065,7 +1078,8 @@ sub locate_lib_dir_and_file {
     # sub-directories as well, so check in lib64/ etc. first, but only check for
     # 64-bit libraries if we are using a 64-bit perl.  Under Debian Multiarch
     # (e.g. Ubuntu >= 11.04) the libraries are migrated to lib/i386-linux-gnu/
-    # and lib/x86_64-linux-gnu/ sub-directories.
+    # and lib/x86_64-linux-gnu/ sub-directories.  On an ARM-based Debian machine
+    # the libraries may be found in /lib/arm-linux/gnueabihf/.
     # Again, build directories on "native" Windows platforms may have the files
     # in a different sub-directory, in this case out32/, out32dll/, out32.dbg/
     # or out32dll.dbg/ (depending on whether static or dynamic libraries were
@@ -1145,6 +1159,11 @@ sub locate_lib_dir_and_file {
             $lib_dir = $dir;
         }
         elsif (-d ($dir = catdir($prefix_dir, 'lib', 'i386-linux-gnu')) and
+               ($lib_file, $lib_name) = $self->probe_for_lib_file($dir))
+        {
+            $lib_dir = $dir;
+        }
+        elsif (-d ($dir = catdir($prefix_dir, 'lib', 'arm-linux-gnueabihf')) and
                ($lib_file, $lib_name) = $self->probe_for_lib_file($dir))
         {
             $lib_dir = $dir;
@@ -1253,19 +1272,25 @@ sub probe_for_lib_file {
 sub set_libs {
     my $self = shift;
 
-    my $lib_dir  = $self->lib_dir();
+    my $lib_dir  = $self->quote_str($self->lib_dir());
     my $lib_name = $self->lib_name();
+    my $libs = "-L$lib_dir -l$lib_name";
 
-    # The Crypto API library is required for static builds of OpenSSL on Windows
+    # The CryptoAPI library is required for static builds of OpenSSL on Windows
     # from version 1.1.0 onwards (unless the no-capieng build option was used),
     # so include it in the list of libraries just in case it is required. See:
     # https://mta.openssl.org/pipermail/openssl-users/2016-May/003759.html
+    # For Windows 7 onwards BCryptGenRandom is used instead of the legacy
+    # CryptoAPI, although CryptoAPI is still used for Certificate functions too.
+    # See: https://github.com/openssl/openssl/commit/fa64e63373
     if ($self->is_win32()) {
-        $self->libs("-L$lib_dir -l$lib_name -lcrypt32.lib");
+        $libs .= ' -lcrypt32.lib';
+        my @osver = Win32::GetOSVersion();
+        my $osver = 0 + "$osver[1].$osver[2]";
+        $libs .= ' -lbcrypt.lib' if $osver >= 6.1;
     }
-    else {
-        $self->libs("-L$lib_dir -l$lib_name");
-    }
+
+    $self->libs($libs);
 }
 
 sub locate_bin_file {
@@ -1342,7 +1367,7 @@ sub query_cipher_name {
     # "RC2", "BF", "RC5", "CAST" or "AES".  This information is normally
     # contained in the output of the main binary executable's "version -a"
     # command, labelled "compiler: " and not always on a line of its own.
-    my $bin_file = $self->bin_file();
+    my $bin_file = $self->quote_str($self->bin_file());
     my $bin_cmd = "$bin_file version -a 2>&1";
 
     my $bin_output = `$bin_cmd`;
@@ -1850,7 +1875,7 @@ sub generate_rand_octets_hex {
                        map { chr } random_uniform_integer($num_octets, 0, 255);
     }
     elsif (lc $rng eq lc RNG_OPENSSL_RAND) {
-        my $bin_file = $self->bin_file();
+        my $bin_file = $self->quote_str($self->bin_file());
         my $out_filename = 'rand.out';
 
         my $bin_cmd = "$bin_file rand -out $out_filename $num_octets 2>&1";
@@ -2980,7 +3005,7 @@ Steve Hay E<lt>L<shay@cpan.org|mailto:shay@cpan.org>E<gt>.
 
 =head1 COPYRIGHT
 
-Copyright (C) 2004-2009, 2012, 2014, 2015, 2017 Steve Hay.  All rights reserved.
+Copyright (C) 2004-2009, 2012, 2014, 2015, 2017, 2020 Steve Hay.  All rights reserved.
 
 =head1 LICENCE
 
@@ -2990,11 +3015,11 @@ License or the Artistic License, as specified in the F<LICENCE> file.
 
 =head1 VERSION
 
-Version 2.08
+Version 2.10
 
 =head1 DATE
 
-31 Jul 2018
+08 Dec 2020
 
 =head1 HISTORY
 

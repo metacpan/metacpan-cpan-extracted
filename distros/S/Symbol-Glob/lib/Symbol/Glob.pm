@@ -1,6 +1,6 @@
 package Symbol::Glob;
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 use warnings;
 use strict;
@@ -36,7 +36,7 @@ use Scalar::Util qw(reftype);
       my $self = {};
       bless $self, $class;
       $self->BUILD($arg_ref);
-      return $self; 
+      return $self;
   }
 
   sub BUILD {
@@ -153,15 +153,15 @@ use Scalar::Util qw(reftype);
       no warnings 'redefine';
       *{$dest} = $value;
     }
-    
+
     return $slot_of_ref->{$self};
   }
 
   sub delete {
     my ($self, $slot_to_delete) = @_;
-    my $storage_ref; 
+    my $storage_ref;
 
-    # delete the slot in the object, and 
+    # delete the slot in the object, and
     # then copy the object back into the
     # glob again as we do duing BUILD.
     if (defined $slot_to_delete) {
@@ -170,7 +170,7 @@ use Scalar::Util qw(reftype);
 
       delete $storage_ref->{$self};
     }
- 
+
     # Delete the glob so it can be reconstituted.
     my $dest = $name_of{$self};
     my ($package, $symbol) = ($dest =~ /(.*::)*(.*)/);
@@ -196,10 +196,10 @@ use Scalar::Util qw(reftype);
       {
         no warnings 'redefine';
         no strict 'refs';
-      
+
         $globref->{$symbol} = $value
           if defined $storage_ref->{$self};
-      } 
+      }
     }
   }
 }
@@ -235,13 +235,13 @@ This document describes Symbol::Glob version 0.01
 =head1 DESCRIPTION
 
 C<Symbol::Glob> provides a simple interface to manipulate Perl's symbol
-table. You can define and undefine symbol table entries for scalars, 
+table. You can define and undefine symbol table entries for scalars,
 arrays, hashes, and subs via simple method calls.
 
 This module does not (currently) attempt to mess with filehandles,
 dirhandles, or formats.
 
-=head1 INTERFACE 
+=head1 INTERFACE
 
 =head2 new
 
@@ -257,7 +257,7 @@ as per C<Class::Std> interface standards.
 
 =item * name
 
-The name of the glob you wish to manipulate. In this release, 
+The name of the glob you wish to manipulate. In this release,
 we suggest you fully qualify the name of the glob. The use of
 C<__PACKAGE__> is handy for this purpose.
 
@@ -268,7 +268,7 @@ variable associated with this glob.
 
 =item * array
 
-An anonymous array or array reference whose contents are placed 
+An anonymous array or array reference whose contents are placed
 into the array associated with this glob.
 
 =item * hash
@@ -276,7 +276,7 @@ into the array associated with this glob.
 An anonymous hash or hash reference whose contents are placed
 into the hash associated with this glob.
 
-=item * sub 
+=item * sub
 
 An anonymous sub or subroutine reference to be associated with
 the subroutine name defined by this glob.
@@ -295,7 +295,7 @@ to the given value. As a side effect, the scalar variable associated
 with this typeglob name comes into being if it did not already exist,
 and is assigned the same value.
 
-When supplied no value, the value of the scalar associated with 
+When supplied no value, the value of the scalar associated with
 this slot (if any) is returned.
 
 =head2 hash
@@ -304,7 +304,7 @@ When supplied a hash value, sets the hash entry in this typeglob
 to the given value. As a side effect, the hash variable associated
 with this typeglob name comes into being if it did not already exist.
 
-When supplied no value, a reference to the hash associated with 
+When supplied no value, a reference to the hash associated with
 this slot (if any) is returned in scalar context; the contents are
 returned in list context.
 
@@ -314,7 +314,7 @@ When supplied a array value, sets the array entry in this typeglob
 to the given value. As a side effect, the array variable associated
 with this typeglob name comes into being if it did not already exist.
 
-When supplied no value, a reference to the array associated with 
+When supplied no value, a reference to the array associated with
 this slot (if any) is returned in scalar context; the array contents
 are returned in list context.
 
@@ -324,7 +324,7 @@ When supplied a code reference, sets the sub entry in this typeglob
 to the given value. As a side effect, the subroutine associated
 with this typeglob name comes into being if it did not already exist.
 
-When supplied no value, a reference to the sub associated with 
+When supplied no value, a reference to the sub associated with
 this slot (if any) is returned in either scalar or list context.
 
 =head2 delete

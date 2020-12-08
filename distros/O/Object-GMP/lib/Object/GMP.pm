@@ -1,5 +1,5 @@
 package Object::GMP;
-$Object::GMP::VERSION = '0.006';
+$Object::GMP::VERSION = '0.007';
 =head1 NAME
 
 Object::GMP - Moo Role for any object has GMP field
@@ -74,7 +74,7 @@ sub copy {
     my %new_me = ();
 
     while (my ($key, $val) = each %$self) {
-        $new_me{$key} = $args{$key} // $val;
+        $new_me{$key} = defined $args{$key} ? $args{$key} : $val;
 
         if ($GMP_FIELDS{$key} && defined $new_me{$key}) {
             $new_me{$key} = $new_me{$key}->copy;
@@ -89,7 +89,7 @@ sub hashref {
 
     my %hash;
 
-    my %keep = map { $_ => 1 } @{$options{keep} // []};
+    my %keep = map { $_ => 1 } @{defined $options{keep} ? $options{keep} : []};
 
     while (my ($key, $val) = each %$self) {
         if ($GMP_FIELDS{$key}) {

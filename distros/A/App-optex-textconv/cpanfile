@@ -1,9 +1,14 @@
-requires 'perl', '5.014';
-
-requires 'App::optex', 'v0.3';
-requires 'List::Util', '1.45';
+requires 'App::optex', 'v0.3.0';
+requires 'App::optex::Tmpfile';
 requires 'Archive::Zip', '1.37';
+requires 'Encode';
+requires 'List::Util', '1.45';
+requires 'perl', 'v5.14.0';
 
-on 'test' => sub {
+on configure => sub {
+    requires 'Module::Build::Tiny', '0.035';
+};
+
+on test => sub {
     requires 'Test::More', '0.98';
 };

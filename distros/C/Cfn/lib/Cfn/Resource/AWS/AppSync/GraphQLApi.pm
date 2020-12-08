@@ -1,4 +1,4 @@
-# AWS::AppSync::GraphQLApi generated from spec 11.1.0
+# AWS::AppSync::GraphQLApi generated from spec 20.1.0
 use Moose::Util::TypeConstraints;
 
 coerce 'Cfn::Resource::Properties::AWS::AppSync::GraphQLApi',
@@ -14,7 +14,7 @@ package Cfn::Resource::AWS::AppSync::GraphQLApi {
     [ 'ApiId','Arn','GraphQLUrl' ]
   }
   sub supported_regions {
-    [ 'ap-northeast-1','ap-northeast-2','ap-south-1','ap-southeast-1','ap-southeast-2','cn-north-1','eu-central-1','eu-west-1','eu-west-2','us-east-1','us-east-2','us-west-2' ]
+    [ 'ap-east-1','ap-northeast-1','ap-northeast-2','ap-south-1','ap-southeast-1','ap-southeast-2','cn-north-1','cn-northwest-1','eu-central-1','eu-west-1','eu-west-2','me-south-1','us-east-1','us-east-2','us-west-2' ]
   }
 }
 
@@ -29,11 +29,11 @@ coerce 'Cfn::Resource::Properties::AWS::AppSync::GraphQLApi::OpenIDConnectConfig
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::AppSync::GraphQLApi::OpenIDConnectConfigValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::AppSync::GraphQLApi::OpenIDConnectConfig->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::AppSync::GraphQLApi::OpenIDConnectConfigValue {
+package Cfn::Resource::Properties::Object::AWS::AppSync::GraphQLApi::OpenIDConnectConfig {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -53,11 +53,11 @@ coerce 'Cfn::Resource::Properties::AWS::AppSync::GraphQLApi::CognitoUserPoolConf
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::AppSync::GraphQLApi::CognitoUserPoolConfigValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::AppSync::GraphQLApi::CognitoUserPoolConfig->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::AppSync::GraphQLApi::CognitoUserPoolConfigValue {
+package Cfn::Resource::Properties::Object::AWS::AppSync::GraphQLApi::CognitoUserPoolConfig {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -76,11 +76,11 @@ coerce 'Cfn::Resource::Properties::AWS::AppSync::GraphQLApi::UserPoolConfig',
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::AppSync::GraphQLApi::UserPoolConfigValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::AppSync::GraphQLApi::UserPoolConfig->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::AppSync::GraphQLApi::UserPoolConfigValue {
+package Cfn::Resource::Properties::Object::AWS::AppSync::GraphQLApi::UserPoolConfig {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -100,11 +100,11 @@ coerce 'Cfn::Resource::Properties::AWS::AppSync::GraphQLApi::Tags',
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::AppSync::GraphQLApi::TagsValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::AppSync::GraphQLApi::Tags->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::AppSync::GraphQLApi::TagsValue {
+package Cfn::Resource::Properties::Object::AWS::AppSync::GraphQLApi::Tags {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -120,11 +120,11 @@ coerce 'Cfn::Resource::Properties::AWS::AppSync::GraphQLApi::LogConfig',
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::AppSync::GraphQLApi::LogConfigValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::AppSync::GraphQLApi::LogConfig->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::AppSync::GraphQLApi::LogConfigValue {
+package Cfn::Resource::Properties::Object::AWS::AppSync::GraphQLApi::LogConfig {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -143,11 +143,11 @@ coerce 'Cfn::Resource::Properties::AWS::AppSync::GraphQLApi::AdditionalAuthentic
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::AppSync::GraphQLApi::AdditionalAuthenticationProvidersValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::AppSync::GraphQLApi::AdditionalAuthenticationProviders->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::AppSync::GraphQLApi::AdditionalAuthenticationProvidersValue {
+package Cfn::Resource::Properties::Object::AWS::AppSync::GraphQLApi::AdditionalAuthenticationProviders {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -163,11 +163,11 @@ coerce 'Cfn::Resource::Properties::AWS::AppSync::GraphQLApi::AdditionalAuthentic
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::AppSync::GraphQLApi::AdditionalAuthenticationProviderValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::AppSync::GraphQLApi::AdditionalAuthenticationProvider->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::AppSync::GraphQLApi::AdditionalAuthenticationProviderValue {
+package Cfn::Resource::Properties::Object::AWS::AppSync::GraphQLApi::AdditionalAuthenticationProvider {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -193,3 +193,30 @@ package Cfn::Resource::Properties::AWS::AppSync::GraphQLApi {
 }
 
 1;
+### main pod documentation begin ###
+
+=encoding UTF-8
+
+=head1 NAME
+
+Cfn::Resource::AWS::AppSync::GraphQLApi - Cfn resource for AWS::AppSync::GraphQLApi
+
+=head1 DESCRIPTION
+
+This module implements a Perl module that represents the CloudFormation object AWS::AppSync::GraphQLApi.
+
+See L<Cfn> for more information on how to use it.
+
+=head1 AUTHOR
+
+    Jose Luis Martinez
+    CAPSiDE
+    jlmartinez@capside.com
+
+=head1 COPYRIGHT and LICENSE
+
+Copyright (c) 2013 by CAPSiDE
+This code is distributed under the Apache 2 License. The full text of the 
+license can be found in the LICENSE file included with this module.
+
+=cut

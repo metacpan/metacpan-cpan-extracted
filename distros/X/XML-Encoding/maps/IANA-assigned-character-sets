@@ -26,14 +26,14 @@ ISO/IEC 10646 coded character sets together with a specification of a
 (set of) sub-repetoires that may occur.  The third region (>1999) is
 intended for vendor specific coded character sets.
 
-	Assigned MIB enum Numbers
-	-------------------------
-	0		Reserved
-	1		Reserved
-	3-106		Set By Standards Organizations
-	1000-1010	Unicode / 10646
-	2000-2088	Vendor
-	2250-2258	Vendor
+        Assigned MIB enum Numbers
+        -------------------------
+        0               Reserved
+        1               Reserved
+        3-106           Set By Standards Organizations
+        1000-1010       Unicode / 10646
+        2000-2088       Vendor
+        2250-2258       Vendor
 
 The aliases that start with "cs" have been added for use with the
 Printer MIB (see RFC 1759) and contain the standard numbers along with
@@ -1484,7 +1484,7 @@ Alias:
 
 Name: TIS-620
 MIBenum: 2259
-Source: Thai Industrial Standards Institute (TISI)	     [Tantsetthi]
+Source: Thai Industrial Standards Institute (TISI)           [Tantsetthi]
 
 Name: HZ-GB-2312
 MIBenum: 2085
@@ -1556,8 +1556,8 @@ REFERENCES
            Stanford University, August 1995.
 
 [RFC2152]  Goldsmith, D., M. Davis, "UTF-7: A Mail-Safe Transformation
-	   Format of Unicode", RFC 2152, Apple Computer, Inc.,
-	   Taligent Inc., May 1997.
+           Format of Unicode", RFC 2152, Apple Computer, Inc.,
+           Taligent Inc., May 1997.
 
 [RFC2279]  Yergeau, F., "UTF-8, A Transformation Format of ISO 10646",
            RFC 2279, Alis Technologies, January, 1998.

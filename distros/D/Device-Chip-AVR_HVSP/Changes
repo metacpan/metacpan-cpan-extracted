@@ -1,5 +1,11 @@
 Revision history for Device-Chip-AVR_HVSP
 
+0.05    2020-12-06
+        [CHANGES]
+         * Add unit tests
+         * Update to Object::Pad and Future::AsyncAwait
+         * Remove long-dead Device::BusPirate::Chip::AVR_HVSP
+
 0.04    2016/07/02 00:56:25
         [CHANGES]
          * Renamed from Device::BusPirate::Chip::AVR_HVSP

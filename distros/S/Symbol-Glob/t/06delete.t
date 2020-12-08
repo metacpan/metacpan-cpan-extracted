@@ -21,7 +21,7 @@ ok !defined $foo, "\$foo undefined";
 
 ok defined $bar_capture->array(), "\@bar caught";
 $bar_capture->delete('array');
-ok !defined @bar, "\@bar undefined";
+ok !@bar, "\@bar undefined";
 
 ok defined $baz_capture->hash(), "%baz caught";
 $baz_capture->delete('hash');
@@ -41,7 +41,7 @@ $foo_capture = Symbol::Glob->new({name=>'main::foo'});
 
 $foo_capture->delete('scalar');
 ok !defined $foo, "\$foo undefined";
-ok defined @foo, "\@foo defined";
+ok @foo, "\@foo defined";
 ok keys %foo, "%foo defined";
 ok defined &foo, "&foo defined";
 
@@ -56,7 +56,7 @@ $foo_capture = Symbol::Glob->new({name=>'main::foo'});
 
 $foo_capture->delete('array');
 ok defined $foo, "\$foo defined";
-ok !defined @foo, "\@foo undefined";
+ok !@foo, "\@foo undefined";
 ok keys %foo, "%foo defined";
 ok defined &foo, "&foo defined";
 
@@ -71,7 +71,7 @@ $foo_capture = Symbol::Glob->new({name=>'main::foo'});
 
 $foo_capture->delete('hash');
 ok defined $foo, "\$foo defined";
-ok defined @foo, "\@foo defined";
+ok @foo, "\@foo defined";
 ok !keys %foo, "%foo undefined";
 ok defined &foo, "&foo defined";
 
@@ -86,6 +86,6 @@ $foo_capture = Symbol::Glob->new({name=>'main::foo'});
 
 $foo_capture->delete('sub');
 ok defined $foo, "\$foo defined";
-ok defined @foo, "\@foo defined";
+ok @foo, "\@foo defined";
 ok keys %foo, "%foo defined";
 ok !defined &foo, "&foo undefined";

@@ -1,5 +1,18 @@
 Revision history for Net-SNMP-Mixin-Dot1qVlanStatic
 
+0.05	Wed, 22 Jun 2016 14:18:13 +0200
+	use the BRIDGE-MIB::dot1dBasePortTable to count and enumerate the bridge ports
+
+	new methods, use if_idx as index instead of bridge-port:
+	    map_vlan_id2name
+	    map_if_idx2vlan_id
+	    map_vlan_id2if_idx
+
+	prepare deprecation of:
+	    map_vlan_static_ids2names
+	    map_vlan_static_ports2ids
+	    map_vlan_static_ids2ports
+
 0.04	Wed, 22 Jun 2016 14:18:13 +0200
 	use new method init_ok(), check for partial initialization
 	bump version

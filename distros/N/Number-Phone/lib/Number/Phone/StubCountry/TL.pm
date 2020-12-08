@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20200904144536;
+our $VERSION = 1.20201204215957;
 
 my $formatters = [
                 {
@@ -63,22 +63,22 @@ my $validators = {
                 'voip' => ''
               };
 my %areanames = ();
-$areanames{en}->{67021} = "Manufahi";
-$areanames{en}->{67022} = "Cova\ Lima";
-$areanames{en}->{67023} = "Bobonaro";
-$areanames{en}->{67024} = "Ainaro";
-$areanames{en}->{67025} = "Dekuse";
-$areanames{en}->{67031} = "Dili";
-$areanames{en}->{67032} = "Dili";
-$areanames{en}->{67033} = "Dili";
-$areanames{en}->{67036} = "Liquica";
-$areanames{en}->{67037} = "Aileu";
-$areanames{en}->{67038} = "Ermera";
-$areanames{en}->{67039} = "Oekusi";
-$areanames{en}->{67041} = "Baucau";
-$areanames{en}->{67042} = "Manatuto";
-$areanames{en}->{67043} = "Viqueque";
-$areanames{en}->{67044} = "Lautem";
+$areanames{en} = {"67041", "Baucau",
+"67021", "Manufahi",
+"67037", "Aileu",
+"67024", "Ainaro",
+"67044", "Lautem",
+"67039", "Oekusi",
+"67031", "Dili",
+"67038", "Ermera",
+"67033", "Dili",
+"67036", "Liquica",
+"67025", "Dekuse",
+"67042", "Manatuto",
+"67022", "Cova\ Lima",
+"67032", "Dili",
+"67043", "Viqueque",
+"67023", "Bobonaro",};
 
     sub new {
       my $class = shift;

@@ -7,7 +7,7 @@ use Number::Phone::UK::Data;
 
 use base 'Number::Phone';
 
-our $VERSION = '1.69';
+our $VERSION = '1.70';
 
 my $cache = {};
 
@@ -64,6 +64,14 @@ The following methods from Number::Phone are overridden:
 
 The constructor, you should never have to call this yourself. To create an
 object the canonical incantation is C<< Number::Phone->new('+44 ...') >>.
+
+=item data_source
+
+Returns a string telling where and when the data that drives this class was last updated, looking something like:
+
+    "OFCOM at Wed Sep 30 10:37:39 2020 UTC"
+
+The current value of this is also documented in L<Number::Phone::Data>.
 
 =item is_valid
 
@@ -123,6 +131,9 @@ sub is_valid {
 
     # quickly check length
     return $cache->{$number}->{is_valid} = 0 if(length($cleaned_number) < 7 || length($cleaned_number) > 10);
+
+    # 04 and 06 are invalid, only 05[56] are valid
+    return $cache->{$number}->{is_valid} = 0 if($cleaned_number =~ /^(4|5[01234789]|6)/);
 
     # slightly more rigourous length check for some unallocated geographic numbers
     # 07, 02x and 011x are always ten digits
@@ -416,8 +427,8 @@ sub format {
 
 Within the UK numbering plan you can *always* dial 0xxxx xxxxxx
 for intra-country calls. In most places the leading 0$areacode is
-optional but in some it is required (see
-L<http://consumers.ofcom.org.uk/dial-the-code/>) and over time this
+optional but in some it is required (see eg
+L<https://www.ofcom.org.uk/__data/assets/pdf_file/0017/19160/aberdeen_local_dialling_release.pdf>) and over time this
 will apply to more areas.
 
 =cut
@@ -426,6 +437,7 @@ sub intra_country_dial_to {
   my $from = shift;
   my $to   = shift;
 
+  die if(!$to->is_allocated());
   return '0'.($to->areacode() ? $to->areacode() : '').$to->subscriber();
 }
 

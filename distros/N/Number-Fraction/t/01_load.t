@@ -1,2 +1,7 @@
-use Test::More tests => 1;
+use strict;
+use warnings;
+use Test::More;
+
 use_ok 'Number::Fraction';
+
+done_testing();

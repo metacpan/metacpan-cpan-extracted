@@ -1,24 +1,25 @@
---- #YAML:1.0
-name:               Symbol-Glob
-version:            0.03
-abstract:           remove items from the symbol table, painlessly
+---
+abstract: 'remove items from the symbol table, painlessly'
 author:
-    - Joe McMahon <mcmahon@yahoo-inc.com >
-license:            unknown
-distribution_type:  module
-configure_requires:
-    ExtUtils::MakeMaker:  0
+  - 'Joe McMahon <mcmahon@yahoo-inc.com >'
 build_requires:
-    ExtUtils::MakeMaker:  0
-requires:
-    Test::Exception:  0
-    Test::More:       0
-    version:          0
-no_index:
-    directory:
-        - t
-        - inc
-generated_by:       ExtUtils::MakeMaker version 6.56
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
+license: unknown
 meta-spec:
-    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
-    version:  1.4
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Symbol-Glob
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Test::Exception: '0'
+  Test::More: '0'
+  version: '0'
+version: '0.04'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

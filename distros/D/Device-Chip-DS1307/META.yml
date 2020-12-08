@@ -3,9 +3,12 @@ abstract: 'chip driver for a F<DS1307>'
 author:
   - 'Paul Evans <leonerd@leonerd.org.uk>'
 build_requires:
+  Test::Device::Chip::Adapter: '0'
   Test::More: '0.88'
+configure_requires:
+  Module::Build: '0.4004'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4218, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Module::Build version 0.4231, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -14,10 +17,13 @@ name: Device-Chip-DS1307
 provides:
   Device::Chip::DS1307:
     file: lib/Device/Chip/DS1307.pm
-    version: '0.03'
+    version: '0.04'
 requires:
   Device::Chip::Base::RegisteredI2C: '0.03'
+  Future::AsyncAwait: '0.47'
+  Object::Pad: '0.19'
+  perl: '5.026'
 resources:
   license: http://dev.perl.org/licenses/
-version: '0.03'
+version: '0.04'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

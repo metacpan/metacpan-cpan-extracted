@@ -1,4 +1,4 @@
-# AWS::EC2::EC2Fleet generated from spec 6.3.0
+# AWS::EC2::EC2Fleet generated from spec 18.4.0
 use Moose::Util::TypeConstraints;
 
 coerce 'Cfn::Resource::Properties::AWS::EC2::EC2Fleet',
@@ -19,49 +19,33 @@ package Cfn::Resource::AWS::EC2::EC2Fleet {
 }
 
 
-subtype 'ArrayOfCfn::Resource::Properties::AWS::EC2::EC2Fleet::TagRequest',
-     as 'Cfn::Value',
-  where { $_->isa('Cfn::Value::Array') or $_->isa('Cfn::Value::Function') },
-message { "$_ is not a Cfn::Value or a Cfn::Value::Function" };
 
-coerce 'ArrayOfCfn::Resource::Properties::AWS::EC2::EC2Fleet::TagRequest',
-  from 'HashRef',
-   via {
-     if (my $f = Cfn::TypeLibrary::try_function($_)) {
-       return $f
-     } else {
-       die 'Only accepts functions'; 
-     }
-   },
-  from 'ArrayRef',
-   via {
-     Cfn::Value::Array->new(Value => [
-       map { 
-         Moose::Util::TypeConstraints::find_type_constraint('Cfn::Resource::Properties::AWS::EC2::EC2Fleet::TagRequest')->coerce($_)
-       } @$_
-     ]);
-   };
-
-subtype 'Cfn::Resource::Properties::AWS::EC2::EC2Fleet::TagRequest',
+subtype 'Cfn::Resource::Properties::AWS::EC2::EC2Fleet::Placement',
      as 'Cfn::Value';
 
-coerce 'Cfn::Resource::Properties::AWS::EC2::EC2Fleet::TagRequest',
+coerce 'Cfn::Resource::Properties::AWS::EC2::EC2Fleet::Placement',
   from 'HashRef',
    via {
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::EC2::EC2Fleet::TagRequestValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::EC2::EC2Fleet::Placement->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::EC2::EC2Fleet::TagRequestValue {
+package Cfn::Resource::Properties::Object::AWS::EC2::EC2Fleet::Placement {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
   
-  has Key => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
-  has Value => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has Affinity => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
+  has AvailabilityZone => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
+  has GroupName => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
+  has HostId => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
+  has HostResourceGroupArn => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
+  has PartitionNumber => (isa => 'Cfn::Value::Integer', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
+  has SpreadDomain => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
+  has Tenancy => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
 }
 
 subtype 'Cfn::Resource::Properties::AWS::EC2::EC2Fleet::FleetLaunchTemplateSpecificationRequest',
@@ -73,18 +57,18 @@ coerce 'Cfn::Resource::Properties::AWS::EC2::EC2Fleet::FleetLaunchTemplateSpecif
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::EC2::EC2Fleet::FleetLaunchTemplateSpecificationRequestValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::EC2::EC2Fleet::FleetLaunchTemplateSpecificationRequest->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::EC2::EC2Fleet::FleetLaunchTemplateSpecificationRequestValue {
+package Cfn::Resource::Properties::Object::AWS::EC2::EC2Fleet::FleetLaunchTemplateSpecificationRequest {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
   
-  has LaunchTemplateId => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
-  has LaunchTemplateName => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
-  has Version => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has LaunchTemplateId => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
+  has LaunchTemplateName => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
+  has Version => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
 }
 subtype 'ArrayOfCfn::Resource::Properties::AWS::EC2::EC2Fleet::FleetLaunchTemplateOverridesRequest',
      as 'Cfn::Value',
@@ -118,21 +102,43 @@ coerce 'Cfn::Resource::Properties::AWS::EC2::EC2Fleet::FleetLaunchTemplateOverri
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::EC2::EC2Fleet::FleetLaunchTemplateOverridesRequestValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::EC2::EC2Fleet::FleetLaunchTemplateOverridesRequest->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::EC2::EC2Fleet::FleetLaunchTemplateOverridesRequestValue {
+package Cfn::Resource::Properties::Object::AWS::EC2::EC2Fleet::FleetLaunchTemplateOverridesRequest {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
   
-  has AvailabilityZone => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
-  has InstanceType => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
-  has MaxPrice => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
-  has Priority => (isa => 'Cfn::Value::Double', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
-  has SubnetId => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
-  has WeightedCapacity => (isa => 'Cfn::Value::Double', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has AvailabilityZone => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
+  has InstanceType => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
+  has MaxPrice => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
+  has Placement => (isa => 'Cfn::Resource::Properties::AWS::EC2::EC2Fleet::Placement', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
+  has Priority => (isa => 'Cfn::Value::Double', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
+  has SubnetId => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
+  has WeightedCapacity => (isa => 'Cfn::Value::Double', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
+}
+
+subtype 'Cfn::Resource::Properties::AWS::EC2::EC2Fleet::CapacityReservationOptionsRequest',
+     as 'Cfn::Value';
+
+coerce 'Cfn::Resource::Properties::AWS::EC2::EC2Fleet::CapacityReservationOptionsRequest',
+  from 'HashRef',
+   via {
+     if (my $f = Cfn::TypeLibrary::try_function($_)) {
+       return $f
+     } else {
+       return Cfn::Resource::Properties::Object::AWS::EC2::EC2Fleet::CapacityReservationOptionsRequest->new( %$_ );
+     }
+   };
+
+package Cfn::Resource::Properties::Object::AWS::EC2::EC2Fleet::CapacityReservationOptionsRequest {
+  use Moose;
+  use MooseX::StrictConstructor;
+  extends 'Cfn::Value::TypedValue';
+  
+  has UsageStrategy => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
 }
 
 subtype 'Cfn::Resource::Properties::AWS::EC2::EC2Fleet::TargetCapacitySpecificationRequest',
@@ -144,11 +150,11 @@ coerce 'Cfn::Resource::Properties::AWS::EC2::EC2Fleet::TargetCapacitySpecificati
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::EC2::EC2Fleet::TargetCapacitySpecificationRequestValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::EC2::EC2Fleet::TargetCapacitySpecificationRequest->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::EC2::EC2Fleet::TargetCapacitySpecificationRequestValue {
+package Cfn::Resource::Properties::Object::AWS::EC2::EC2Fleet::TargetCapacitySpecificationRequest {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -190,17 +196,17 @@ coerce 'Cfn::Resource::Properties::AWS::EC2::EC2Fleet::TagSpecification',
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::EC2::EC2Fleet::TagSpecificationValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::EC2::EC2Fleet::TagSpecification->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::EC2::EC2Fleet::TagSpecificationValue {
+package Cfn::Resource::Properties::Object::AWS::EC2::EC2Fleet::TagSpecification {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
   
-  has ResourceType => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
-  has Tags => (isa => 'ArrayOfCfn::Resource::Properties::AWS::EC2::EC2Fleet::TagRequest', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has ResourceType => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
+  has Tags => (isa => 'ArrayOfCfn::Resource::Properties::TagType', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
 }
 
 subtype 'Cfn::Resource::Properties::AWS::EC2::EC2Fleet::SpotOptionsRequest',
@@ -212,18 +218,22 @@ coerce 'Cfn::Resource::Properties::AWS::EC2::EC2Fleet::SpotOptionsRequest',
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::EC2::EC2Fleet::SpotOptionsRequestValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::EC2::EC2Fleet::SpotOptionsRequest->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::EC2::EC2Fleet::SpotOptionsRequestValue {
+package Cfn::Resource::Properties::Object::AWS::EC2::EC2Fleet::SpotOptionsRequest {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
   
-  has AllocationStrategy => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
-  has InstanceInterruptionBehavior => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
-  has InstancePoolsToUseCount => (isa => 'Cfn::Value::Integer', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has AllocationStrategy => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
+  has InstanceInterruptionBehavior => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
+  has InstancePoolsToUseCount => (isa => 'Cfn::Value::Integer', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
+  has MaxTotalPrice => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
+  has MinTargetCapacity => (isa => 'Cfn::Value::Integer', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
+  has SingleAvailabilityZone => (isa => 'Cfn::Value::Boolean', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
+  has SingleInstanceType => (isa => 'Cfn::Value::Boolean', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
 }
 
 subtype 'Cfn::Resource::Properties::AWS::EC2::EC2Fleet::OnDemandOptionsRequest',
@@ -235,16 +245,21 @@ coerce 'Cfn::Resource::Properties::AWS::EC2::EC2Fleet::OnDemandOptionsRequest',
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::EC2::EC2Fleet::OnDemandOptionsRequestValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::EC2::EC2Fleet::OnDemandOptionsRequest->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::EC2::EC2Fleet::OnDemandOptionsRequestValue {
+package Cfn::Resource::Properties::Object::AWS::EC2::EC2Fleet::OnDemandOptionsRequest {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
   
-  has AllocationStrategy => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has AllocationStrategy => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
+  has CapacityReservationOptions => (isa => 'Cfn::Resource::Properties::AWS::EC2::EC2Fleet::CapacityReservationOptionsRequest', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
+  has MaxTotalPrice => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
+  has MinTargetCapacity => (isa => 'Cfn::Value::Integer', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
+  has SingleAvailabilityZone => (isa => 'Cfn::Value::Boolean', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
+  has SingleInstanceType => (isa => 'Cfn::Value::Boolean', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
 }
 subtype 'ArrayOfCfn::Resource::Properties::AWS::EC2::EC2Fleet::FleetLaunchTemplateConfigRequest',
      as 'Cfn::Value',
@@ -278,17 +293,17 @@ coerce 'Cfn::Resource::Properties::AWS::EC2::EC2Fleet::FleetLaunchTemplateConfig
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::EC2::EC2Fleet::FleetLaunchTemplateConfigRequestValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::EC2::EC2Fleet::FleetLaunchTemplateConfigRequest->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::EC2::EC2Fleet::FleetLaunchTemplateConfigRequestValue {
+package Cfn::Resource::Properties::Object::AWS::EC2::EC2Fleet::FleetLaunchTemplateConfigRequest {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
   
-  has LaunchTemplateSpecification => (isa => 'Cfn::Resource::Properties::AWS::EC2::EC2Fleet::FleetLaunchTemplateSpecificationRequest', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
-  has Overrides => (isa => 'ArrayOfCfn::Resource::Properties::AWS::EC2::EC2Fleet::FleetLaunchTemplateOverridesRequest', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has LaunchTemplateSpecification => (isa => 'Cfn::Resource::Properties::AWS::EC2::EC2Fleet::FleetLaunchTemplateSpecificationRequest', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
+  has Overrides => (isa => 'ArrayOfCfn::Resource::Properties::AWS::EC2::EC2Fleet::FleetLaunchTemplateOverridesRequest', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
 }
 
 package Cfn::Resource::Properties::AWS::EC2::EC2Fleet {
@@ -310,3 +325,30 @@ package Cfn::Resource::Properties::AWS::EC2::EC2Fleet {
 }
 
 1;
+### main pod documentation begin ###
+
+=encoding UTF-8
+
+=head1 NAME
+
+Cfn::Resource::AWS::EC2::EC2Fleet - Cfn resource for AWS::EC2::EC2Fleet
+
+=head1 DESCRIPTION
+
+This module implements a Perl module that represents the CloudFormation object AWS::EC2::EC2Fleet.
+
+See L<Cfn> for more information on how to use it.
+
+=head1 AUTHOR
+
+    Jose Luis Martinez
+    CAPSiDE
+    jlmartinez@capside.com
+
+=head1 COPYRIGHT and LICENSE
+
+Copyright (c) 2013 by CAPSiDE
+This code is distributed under the Apache 2 License. The full text of the 
+license can be found in the LICENSE file included with this module.
+
+=cut

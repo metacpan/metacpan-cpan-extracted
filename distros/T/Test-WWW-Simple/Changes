@@ -1,31 +1,49 @@
 Revision history for Perl extension Test::WWW::Simple.
+0.40   Mon Dec  7 12:;47:47 PST 2020
+    - Fix cache test to pass with no HTTP server in the test
+      Some CPAN testers were failing because the test HTTP
+      server couldn't be spun up. Replaced with a mocked
+      WWW::Mechanize->get to validate that the process works.
+
 0.39   Sun Jun 18 22:20:35 PDT 2018
     - Change t/15ss_cache.t test to fix a hang on Windows.
+
 0.38   Fri Jun 15 21:46:34 PDT 2018
     - ONE MORE backticked string invoking a Perl script.
+
 0.37   Fri Jun 15 00:14:35 PST 2018
     - Fix a few more tests that used backticks to execute a Perl
       script without `$^X`.
     - Remove a redundant POD coverage test.
+
 0.36   Thu Jun 14 17:04:23 PST 2018
     - Remove references to `perl` in the tests; replace with `$^X`.
-0.35   Thu Jun 14 11:30:00 PST 2018
-    - Add prereq for LWP::Protocol::https to reflect shift to primarily
-      https connections for sites.
-    - Rework tests to pass after Mojolicious PI changes.
+
+0.35   Thu Jan 31 16:14:22 PST 2019
+    - clean up spacing in Changes
+    - Module::Build support
+    - Explicit versioning of Mojolicious due to breaking change
+    - remove references to use.perl.org in tests
+    - Move dev-only tests to xt/
+    - Add POD syntax check to dev tests
+    - Fix references to `perl` to use `$^X` where appropriate.
+    - Change `diag` to `note` for most messages.
+
 0.34   Fri Jan 25 19:11:49 PST 2013
     - update Mojolicious::Lite invocation to match current Mojolicious.
     - proper Meta.yml for CPANTS
+
 0.33   Mon Jul 11 12:53:17 PDT 2011
     - added Makefile.PL check for installations with bad HTML/Parser.so
+
 0.32   Sun Jul  3 13:30:16 PDT 2011
 	- Fix regex-to-regex matches that are inconsistent across Perl versions
 
 0.31   Wed Mar  9 17:36:31 PST 2011
-       - added explicit prereq of WWW::Mechanize::Pluggable
+  - added explicit prereq of WWW::Mechanize::Pluggable
 
 0.30   Wed Mar  9 00:15:58 PST 2011
-       - Added DNSAdvantage test exceptions for CPAN testers on Comcast.
+  - Added DNSAdvantage test exceptions for CPAN testers on Comcast.
 
 0.29   Fri May 21 17:03:55 PDT 2010
 	- Fix numerous failing tests.
@@ -39,12 +57,12 @@ Revision history for Perl extension Test::WWW::Simple.
 	- Remember that the changelog wasn't updated, sigh.
 
 0.26   Fri Sep 21 12:05:21 PDT 2007
-	- Fix the test that fails on Windows because of a 
+	- Fix the test that fails on Windows because of a
 	  piped open.
 
 0.25   Mon Jun 12 15:57:45 PDT 2006
-	- on some platforms, the cache test faile because
-	  HTTP::Daemon constructs a URI composed of the 
+	- on some platforms, the cache test failed because
+	  HTTP::Daemon constructs a URI composed of the
 	  hex representation of the IP address. Caught by
 	  Dave Santo (dhsanto at wildblue dot net). Fixed
 	  to always go to localhost.
@@ -84,18 +102,18 @@ Revision history for Perl extension Test::WWW::Simple.
 0.19  Tue Nov 22 14:03:20 2005
 	- Actually export last_test!
 
-0.18  Wed Nov 16 15:10:16 2005 
+0.18  Wed Nov 16 15:10:16 2005
 	- Changed page_like and page_unlike to actually fail
 	  instead of just issuing a diag when a fetch fails
 	- added page_like_full and page_unlike_full for folks
-	  who actually want to see the entire page source as 
+	  who actually want to see the entire page source as
 	  a diag when a test fails
 
-0.17  Wed Nov  9 15:33:01 2005 
+0.17  Wed Nov  9 15:33:01 2005
 	- added last_test, to allow simple_scan plugins to
 	  check the status of the last test.
 
-0.16  Wed Sep 28 15:25:22 2005 
+0.16  Wed Sep 28 15:25:22 2005
 	- Switched underlying Mech object to Mech::Pluggable.
 	- Added mech(), for plugin support in future
 	  versions of simple_scan
@@ -104,7 +122,7 @@ Revision history for Perl extension Test::WWW::Simple.
 0.15  Fri Sep 23 17:38:13 2005
 	- Added alternate bracketing: <xx> and >xx<
 	  now both work
-	- Added tests to verify that a bug causing 
+	- Added tests to verify that a bug causing
 	  multiple copies of lines with no substitutions
 	  to be emitted when an "xx" pragma was in force
 
@@ -118,59 +136,59 @@ Revision history for Perl extension Test::WWW::Simple.
 0.13  Wed Aug 31 16:44:02 2005
 	- added pod tests
 
-0.12  Tue Aug 23 15:58:44 2005 
+0.12  Tue Aug 23 15:58:44 2005
 	- --warn option added (print warnings if any;
 	  off by default)
 
-0.11  Mon Apr 18 10:29:33 2005 
-        - added %cache/%nocache pragmas to simple_scan
-        - added tests for cache/nocache in simple_scan
-        - added pause to webserver-based tests to allow it to spin up
-        - refactored page_like/page_unlike shared code
-        - added tests for cache/no_cache import
-        - reworked output check in 06ss_fails.t
-        - updated README to mention simple_scan and caching, and to
-          actually include an accurate version number
+0.11  Mon Apr 18 10:29:33 2005
+  - added %cache/%nocache pragmas to simple_scan
+  - added tests for cache/nocache in simple_scan
+  - added pause to webserver-based tests to allow it to spin up
+  - refactored page_like/page_unlike shared code
+  - added tests for cache/no_cache import
+  - reworked output check in 06ss_fails.t
+  - updated README to mention simple_scan and caching, and to
+    actually include an accurate version number
 
 0.10  Mon Mar 28 13:52:35 2005
 	- cache/no_cache routines
 
 0.09  Tue Feb  2 10:03:56 2005
-        - minor changes to example simple_scan input
+  - minor changes to example simple_scan input
 
 0.08  Mon Feb  1 19:04:34 2005
-        - Further updates to simple_scan
-          -- expanded %%xx pragma support
-          -- automatic embed of source URL in test output
-        - 100% test coverage!
+  - Further updates to simple_scan
+    -- expanded %%xx pragma support
+    -- automatic embed of source URL in test output
+  - 100% test coverage!
 
 0.07  Fri Jan 28 11:53:07 2005
-        - Updates for simple_scan
-          -- comments now supported (# in column 1)
-          -- blank lines now supported (d'oh!)
-          -- garbage lines now silently discarded
-        - Modified logic in page_like/page_unlike to 
-          play properly with Test::Harness; now does
-          either a fail() or the test, depending on whether
-          WWW::Mechanize->get() fails or not.
+  - Updates for simple_scan
+    -- comments now supported (# in column 1)
+    -- blank lines now supported (d'oh!)
+    -- garbage lines now silently discarded
+  - Modified logic in page_like/page_unlike to
+    play properly with Test::Harness; now does
+    either a fail() or the test, depending on whether
+    WWW::Mechanize->get() fails or not.
 
 0.06  Thu Jan 27 15:30:45 2005
-        - documented pragmas (but didn't update Changes!)
+  - documented pragmas (but didn't update Changes!)
 
 0.05  Wed Jan 26 15:30:02 2005
-        - added %%xx: and %%agent pragmas for simple_scan
-        - added tests for these items
-        - changed default user agent to 'Windows IE 6'
+  - added %%xx: and %%agent pragmas for simple_scan
+  - added tests for these items
+  - changed default user agent to 'Windows IE 6'
 
 0.04  Tue Jan 25 09:36:21 2005
-        - added tests for simple_scan examples
+  - added tests for simple_scan examples
 
 0.03  Fri Jan 21 17:04:00 2005
-        - added examples/ to MANIFEST (oops)
+  - added examples/ to MANIFEST (oops)
 
 0.02  Fri Jan 21 14:11:23 2005
-        - updated exaples/simple_scan to use Regexp::Common to 
-          parse URLs and regexes out of input
+  - updated exaples/simple_scan to use Regexp::Common to
+    parse URLs and regexes out of input
 
 0.01  Fri Jan 14 14:31:55 2005
 	- original version; created by h2xs 1.23 with options

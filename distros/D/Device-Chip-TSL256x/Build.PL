@@ -6,9 +6,12 @@ use Module::Build;
 my $build = Module::Build->new(
    module_name => 'Device::Chip::TSL256x',
    requires => {
+      'perl' => '5.026',
+      'Future::AsyncAwait' => '0.47', # toplevel await
+      'Object::Pad' => '0.31', # META->get_slot
+
       'Data::Bitfield' => 0,
       'Device::Chip' => '0.03',
-      'Future::AsyncAwait' => 0,
    },
    build_requires => {
       'Test::Device::Chip::Adapter' => 0,

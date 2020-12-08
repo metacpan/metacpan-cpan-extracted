@@ -2,6 +2,9 @@
 ##
 ## Change log for perl distribution Alien::DDC::Concordance
 
+v0.007 Tue, 08 Dec 2020 13:47:18 +0100 moocow
+	+ added alien_version_check for minimum DDC version ($min_ddc_version='2.2.8')
+
 v0.006 Mon, 13 Jul 2020 12:37:58 +0200 moocow
 	+ added dependency Net::SSLeay >= v1.49 as required by current Alien::Base::ModuleBuild for https downloads
 

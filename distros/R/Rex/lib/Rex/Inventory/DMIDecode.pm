@@ -11,7 +11,7 @@ use strict;
 use warnings;
 use Data::Dumper;
 
-our $VERSION = '1.13.1'; # VERSION
+our $VERSION = '1.13.2'; # VERSION
 
 use Rex::Inventory::DMIDecode::BaseBoard;
 use Rex::Inventory::DMIDecode::Bios;

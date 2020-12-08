@@ -1,6 +1,6 @@
 package App::optex::textconv;
 
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 
 use v5.14;
 use warnings;
@@ -14,13 +14,15 @@ textconv - optex module to replace document file by its text contents
 
 =head1 VERSION
 
-Version 0.10
+Version 0.11
 
 =head1 SYNOPSIS
 
 optex command -Mtextconv
 
 optex command -Mtc (alias module)
+
+optex command -Mtextconv::load=pandoc
 
 =head1 DESCRIPTION
 
@@ -42,6 +44,22 @@ Next command simply produces the same result.
 
     $ diff OLD.docx NEW.docx
 
+=head1 MICROSOFT DOCUMENTS
+
+Microsoft office document in XML format (.docx, .pptx, .xlsx) is
+converted to plain text by original code implemented in
+C<App::optex::textconv::msdoc> module.  Algorithm used in this module
+is extremely simple, and consequently runs fast.
+
+Two module are included in this distribution to use other external
+converter program, B<pandoc> and B<tika>, those implement much more
+serious algorithm.  They can be invoked by calling B<load> function
+with module declaration like:
+
+    optex -Mtextconv::load=pandoc
+
+    optex -Mtextconv::load=tika
+
 =head1 INSTALL
 
 =head2 CPANM
@@ -52,7 +70,7 @@ Next command simply produces the same result.
 
 =head2 GIT
 
-Those are sample configurations using L<App::optex::textconv> in git
+These are sample configurations using L<App::optex::textconv> in git
 environment.
 
 	~/.gitconfig
@@ -70,6 +88,9 @@ environment.
 		*.pdf    diff=pdf
 		*.jpg    diff=jpg
 
+About other GIT related setting, see
+L<https://github.com/kaz-utashiro/sdif-tools>.
+
 =head1 SEE ALSO
 
 L<https://github.com/kaz-utashiro/optex>
@@ -77,6 +98,8 @@ L<https://github.com/kaz-utashiro/optex>
 L<https://github.com/kaz-utashiro/optex-textconv>
 
 L<https://qiita.com/kaz-utashiro/items/23fd825bd325240592c2>
+
+L<https://github.com/kaz-utashiro/sdif-tools>
 
 =head1 AUTHOR
 
@@ -91,7 +114,8 @@ it under the same terms as Perl itself.
 
 =cut
 
-use List::Util qw(first);
+use Data::Dumper;
+use List::Util 1.45 qw(first);
 
 our @CONVERTER;
 use App::optex::textconv::default;
@@ -100,6 +124,9 @@ use App::optex::textconv::msdoc;
 my($mod, $argv);
 sub initialize {
     ($mod, $argv) = @_;
+}
+
+sub finalize {
     textconv();
 }
 
@@ -132,7 +159,7 @@ sub exec_command {
     qx($exec);
 }
 
-sub load {
+sub load_module {
     my $name = shift;
     my $module = __PACKAGE__ . "::$name";
     eval "use $module";
@@ -141,6 +168,12 @@ sub load {
 	return 0;
     }
     $module;
+}
+
+sub load {
+    while (my($mod, $val) = splice(@_, 0, 2)) {
+	load_module $mod if $val;
+    }
 }
 
 my @persist;
@@ -170,7 +203,7 @@ sub textconv {
 		    my $to_text = join '::', __PACKAGE__, $suffix, 'to_text';
 		    if (not defined $$state) {
 			$$state = 0;
-			load $suffix or next;
+			load_module $suffix or next;
 			$$state = 1 if defined &{$to_text};
 			redo;
 		    } elsif ($$state) {
@@ -198,3 +231,7 @@ sub textconv {
 }
 
 1;
+
+__DATA__
+
+#  LocalWords:  docx pptx xlsx pandoc tika

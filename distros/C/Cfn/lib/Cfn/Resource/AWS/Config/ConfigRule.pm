@@ -1,4 +1,4 @@
-# AWS::Config::ConfigRule generated from spec 5.3.0
+# AWS::Config::ConfigRule generated from spec 18.4.0
 use Moose::Util::TypeConstraints;
 
 coerce 'Cfn::Resource::Properties::AWS::Config::ConfigRule',
@@ -14,7 +14,7 @@ package Cfn::Resource::AWS::Config::ConfigRule {
     [ 'Arn','Compliance.Type','ConfigRuleId' ]
   }
   sub supported_regions {
-    [ 'ap-east-1','ap-northeast-1','ap-northeast-2','ap-northeast-3','ap-south-1','ap-southeast-1','ap-southeast-2','ca-central-1','cn-north-1','cn-northwest-1','eu-central-1','eu-north-1','eu-west-1','eu-west-2','eu-west-3','me-south-1','sa-east-1','us-east-1','us-east-2','us-gov-east-1','us-gov-west-1','us-west-1','us-west-2' ]
+    [ 'af-south-1','ap-east-1','ap-northeast-1','ap-northeast-2','ap-northeast-3','ap-south-1','ap-southeast-1','ap-southeast-2','ca-central-1','cn-north-1','cn-northwest-1','eu-central-1','eu-north-1','eu-south-1','eu-west-1','eu-west-2','eu-west-3','me-south-1','sa-east-1','us-east-1','us-east-2','us-gov-east-1','us-gov-west-1','us-west-1','us-west-2' ]
   }
 }
 
@@ -51,11 +51,11 @@ coerce 'Cfn::Resource::Properties::AWS::Config::ConfigRule::SourceDetail',
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::Config::ConfigRule::SourceDetailValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::Config::ConfigRule::SourceDetail->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::Config::ConfigRule::SourceDetailValue {
+package Cfn::Resource::Properties::Object::AWS::Config::ConfigRule::SourceDetail {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -74,11 +74,11 @@ coerce 'Cfn::Resource::Properties::AWS::Config::ConfigRule::Source',
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::Config::ConfigRule::SourceValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::Config::ConfigRule::Source->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::Config::ConfigRule::SourceValue {
+package Cfn::Resource::Properties::Object::AWS::Config::ConfigRule::Source {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -97,11 +97,11 @@ coerce 'Cfn::Resource::Properties::AWS::Config::ConfigRule::Scope',
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::Config::ConfigRule::ScopeValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::Config::ConfigRule::Scope->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::Config::ConfigRule::ScopeValue {
+package Cfn::Resource::Properties::Object::AWS::Config::ConfigRule::Scope {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -126,3 +126,30 @@ package Cfn::Resource::Properties::AWS::Config::ConfigRule {
 }
 
 1;
+### main pod documentation begin ###
+
+=encoding UTF-8
+
+=head1 NAME
+
+Cfn::Resource::AWS::Config::ConfigRule - Cfn resource for AWS::Config::ConfigRule
+
+=head1 DESCRIPTION
+
+This module implements a Perl module that represents the CloudFormation object AWS::Config::ConfigRule.
+
+See L<Cfn> for more information on how to use it.
+
+=head1 AUTHOR
+
+    Jose Luis Martinez
+    CAPSiDE
+    jlmartinez@capside.com
+
+=head1 COPYRIGHT and LICENSE
+
+Copyright (c) 2013 by CAPSiDE
+This code is distributed under the Apache 2 License. The full text of the 
+license can be found in the LICENSE file included with this module.
+
+=cut

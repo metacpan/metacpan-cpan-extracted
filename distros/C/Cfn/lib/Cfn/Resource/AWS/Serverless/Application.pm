@@ -15,7 +15,7 @@ package Cfn::Resource::AWS::Serverless::Application {
   }
 
   sub AttributeList {
-    []
+    ['Outputs.ApplicationOutputName']
   }
 }
 

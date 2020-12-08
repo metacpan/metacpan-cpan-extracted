@@ -1,5 +1,9 @@
 Revision history for Perl module TestRail::API
 
+0.047 2020-04-12 TEODESIAN
+    - Fix getUsers now requiring project ID
+    - Allow passing TESTRAIL_PLAN_ID env in A::P::P::T
+
 0.046 2020-05-8 TEODESIAN
     - Hide password entry in bin/ utilities.
     - Add bin/testrail-replay to re-play the results of runs and plans.

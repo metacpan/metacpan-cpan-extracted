@@ -18,6 +18,9 @@ my $builder = Module::Build->new(
         'VCS::Which'                => '0.6.1',
         'version'                   => '0.9912',
     },
+    configure_requires => {
+        'Module::Build' => 0.38,
+    },
     build_requires => {
         'Test::More'     => '0.88',
         'Test::Warnings' => '0.026',

@@ -18,12 +18,12 @@ name: Alien-DDC-Concordance
 provides:
   Alien::DDC::Concordance:
     file: lib/Alien/DDC/Concordance.pm
-    version: '0.006'
+    version: '0.007'
 requires:
   Alien::Base: '0.005'
   Net::SSLeay: '1.49'
   perl: v5.8.9
 resources:
   license: http://dev.perl.org/licenses/
-version: '0.006'
+version: '0.007'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

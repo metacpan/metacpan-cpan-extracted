@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 
-use strict;
+use v5.26;
 use warnings;
 
 use Test::More;
@@ -8,11 +8,13 @@ use Test::Device::Chip::Adapter;
 
 use Device::Chip::TCS3472x;
 
+use Future::AsyncAwait;
+
 my $chip = Device::Chip::TCS3472x->new;
 
-$chip->mount(
+await $chip->mount(
    my $adapter = Test::Device::Chip::Adapter->new,
-)->get;
+);
 
 # ->read_config
 {
@@ -26,7 +28,7 @@ $chip->mount(
    $adapter->expect_write_then_read( "\xAF", 1 )
       ->returns( "\x00" );
 
-   is_deeply( $chip->read_config->get,
+   is_deeply( await $chip->read_config,
       {
          AEN   => '',
          AIEN  => '',
@@ -55,10 +57,10 @@ $chip->mount(
    $adapter->expect_write( "\xA0\x01" );
    $adapter->expect_write( "\xAF\x01" );
 
-   $chip->change_config(
+   await $chip->change_config(
       PON   => 1,
       AGAIN => 4,
-   )->get;
+   );
 
    $adapter->check_and_clear( '->change_config' );
 }

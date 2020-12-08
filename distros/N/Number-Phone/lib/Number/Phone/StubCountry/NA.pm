@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20200904144534;
+our $VERSION = 1.20201204215957;
 
 my $formatters = [
                 {
@@ -228,1028 +228,1028 @@ my $validators = {
         '
               };
 my %areanames = ();
-$areanames{en}->{26461} = "Windhoek";
-$areanames{en}->{264621730} = "Babi\-Babi";
-$areanames{en}->{264621732} = "Buitepos";
-$areanames{en}->{264621734} = "Drimiopsis";
-$areanames{en}->{264621735} = "Eland";
-$areanames{en}->{264621737} = "Friedental";
-$areanames{en}->{264621738} = "Gobabis";
-$areanames{en}->{264621739} = "Gobabis";
-$areanames{en}->{264621740} = "Gobabis";
-$areanames{en}->{264621741} = "Groot\–Aub";
-$areanames{en}->{264621743} = "Hochland";
-$areanames{en}->{264621746} = "Many\ Hills";
-$areanames{en}->{264621747} = "Namib\ Grens";
-$areanames{en}->{264621748} = "Nina";
-$areanames{en}->{264621750} = "Okahandja";
-$areanames{en}->{264621751} = "Okahandja";
-$areanames{en}->{264621752} = "Okahandja";
-$areanames{en}->{264621754} = "Ombotozu";
-$areanames{en}->{264621755} = "Omitara";
-$areanames{en}->{264621756} = "Otjihase";
-$areanames{en}->{264621759} = "Otjozondu";
-$areanames{en}->{264621760} = "Plessisplaas";
-$areanames{en}->{264621761} = "Rehoboth";
-$areanames{en}->{264621762} = "Rehoboth";
-$areanames{en}->{264621763} = "Rehoboth";
-$areanames{en}->{264621766} = "Sandveld";
-$areanames{en}->{264621767} = "Seeis";
-$areanames{en}->{264621768} = "Spatzenfeld";
-$areanames{en}->{264621769} = "Steinhausen";
-$areanames{en}->{264621770} = "Summerdown";
-$areanames{en}->{264621771} = "Hosea\ Kutako\ INT\ Airport";
-$areanames{en}->{264621772} = "Witvlei";
-$areanames{en}->{26462500} = "Okahandja";
-$areanames{en}->{26462501} = "Okahandja";
-$areanames{en}->{26462502} = "Okahandja";
-$areanames{en}->{26462503} = "Okahandja\/Ovitoto\/Wilhelmstal";
-$areanames{en}->{26462504} = "Okahandja";
-$areanames{en}->{26462505} = "Okahandja";
-$areanames{en}->{264625180} = "Otjozondu";
-$areanames{en}->{264625181} = "Otjozondu";
-$areanames{en}->{264625183} = "Ombotozu";
-$areanames{en}->{264625184} = "Ombotozu";
-$areanames{en}->{26462519} = "Okandjatu";
-$areanames{en}->{26462522} = "Rehoboth";
-$areanames{en}->{26462523} = "Rehoboth";
-$areanames{en}->{26462524} = "Rehoboth";
-$areanames{en}->{26462525} = "Rehoboth";
-$areanames{en}->{264625390} = "Klein\ Aub";
-$areanames{en}->{264625391} = "Klein\ Aub";
-$areanames{en}->{264625392} = "Rietoog";
-$areanames{en}->{264625393} = "Rietoog";
-$areanames{en}->{26462540} = "Neudamm\/Hosea\ Kutako\ INT\ Airport";
-$areanames{en}->{264625410} = "Otjihase";
-$areanames{en}->{264625411} = "Otjihase";
-$areanames{en}->{264625420} = "Groot\–Aub";
-$areanames{en}->{264625421} = "Groot\–Aub";
-$areanames{en}->{264625430} = "Hosea\ Kutako\ INT\ Airport";
-$areanames{en}->{264625434} = "Hosea\ Kutako\ INT\ Airport";
-$areanames{en}->{264625435} = "Hosea\ Kutako\ INT\ Airport";
-$areanames{en}->{26462549} = "Hochfeld";
-$areanames{en}->{264625600} = "Seeis";
-$areanames{en}->{264625601} = "Seeis";
-$areanames{en}->{264625602} = "Omitara";
-$areanames{en}->{264625603} = "Omitara";
-$areanames{en}->{264625604} = "Buitepos";
-$areanames{en}->{264625605} = "Otjiwa";
-$areanames{en}->{264625606} = "Otjiwa";
-$areanames{en}->{264625607} = "Otjiwa";
-$areanames{en}->{264625608} = "Otjiwa";
-$areanames{en}->{264625609} = "Otjiwa";
-$areanames{en}->{264625610} = "Otjiwa";
-$areanames{en}->{264625611} = "Otjiwa";
-$areanames{en}->{264625612} = "Otjiwa";
-$areanames{en}->{264625613} = "Otjiwa";
-$areanames{en}->{264625614} = "Steinhausen";
-$areanames{en}->{264625615} = "Steinhausen";
-$areanames{en}->{264625616} = "Summerdown";
-$areanames{en}->{264625617} = "Summerdown";
-$areanames{en}->{264625618} = "Summerdown";
-$areanames{en}->{26462562} = "Gobabis";
-$areanames{en}->{26462563} = "Gobabis";
-$areanames{en}->{26462564} = "Gobabis";
-$areanames{en}->{26462565} = "Gobabis";
-$areanames{en}->{26462566} = "Gobabis";
-$areanames{en}->{264625672} = "Epukiro";
-$areanames{en}->{264625673} = "Epukiro";
-$areanames{en}->{264625674} = "Epukiro";
-$areanames{en}->{264625675} = "Otjinene";
-$areanames{en}->{264625676} = "Otjinene";
-$areanames{en}->{264625677} = "Otjinene";
-$areanames{en}->{264625678} = "Otjinene";
-$areanames{en}->{264625679} = "Otjinene";
-$areanames{en}->{264625680} = "Drimiopsis";
-$areanames{en}->{264625681} = "Drimiopsis";
-$areanames{en}->{264625682} = "Plessisplaas";
-$areanames{en}->{264625683} = "Plessisplaas";
-$areanames{en}->{264625684} = "Sandveld";
-$areanames{en}->{264625685} = "Sandveld";
-$areanames{en}->{264625686} = "Epukiro";
-$areanames{en}->{264625687} = "Epukiro";
-$areanames{en}->{264625688} = "Epukiro";
-$areanames{en}->{264625689} = "Babi\-Babi";
-$areanames{en}->{264625690} = "Babi\-Babi";
-$areanames{en}->{264625691} = "Leonardville";
-$areanames{en}->{264625692} = "Leonardville";
-$areanames{en}->{264625693} = "Leonardville";
-$areanames{en}->{264625694} = "Leonardville";
-$areanames{en}->{264625695} = "Leonardville";
-$areanames{en}->{264625696} = "Leonardville";
-$areanames{en}->{264625697} = "Blumfelde";
-$areanames{en}->{264625698} = "Blumfelde";
-$areanames{en}->{264625700} = "Witvlei";
-$areanames{en}->{264625701} = "Witvlei";
-$areanames{en}->{264625702} = "Witvlei";
-$areanames{en}->{264625703} = "Witvlei";
-$areanames{en}->{264625704} = "Witvlei";
-$areanames{en}->{264625709} = "Witvlei";
-$areanames{en}->{264625715} = "Eland";
-$areanames{en}->{264625716} = "Eland";
-$areanames{en}->{264625717} = "Spatzenfeld";
-$areanames{en}->{264625718} = "Spatzenfeld";
-$areanames{en}->{264625720} = "Namib\ Grens";
-$areanames{en}->{264625721} = "Friedental";
-$areanames{en}->{264625722} = "Hochland";
-$areanames{en}->{264625723} = "Many\ Hills";
-$areanames{en}->{26462573} = "Dordabis";
-$areanames{en}->{264625731} = "Nina";
-$areanames{en}->{264625733} = "Nouas";
-$areanames{en}->{26462577} = "Gobabis";
-$areanames{en}->{264625800} = "Epukiro";
-$areanames{en}->{264625801} = "Epukiro";
-$areanames{en}->{264625802} = "Epukiro";
-$areanames{en}->{264625803} = "Epukiro";
-$areanames{en}->{264625804} = "Eland";
-$areanames{en}->{264625805} = "Drimiopsis";
-$areanames{en}->{264625806} = "Summerdown";
-$areanames{en}->{264625807} = "Plessisplaas";
-$areanames{en}->{264625808} = "Otjinene";
-$areanames{en}->{264625809} = "Otjiwa";
-$areanames{en}->{264625810} = "Leonardville";
-$areanames{en}->{264625811} = "Leonardville";
-$areanames{en}->{264625812} = "Blumfelde";
-$areanames{en}->{264625813} = "Blumfelde";
-$areanames{en}->{264625814} = "Nouas";
-$areanames{en}->{264625815} = "Nouas";
-$areanames{en}->{264625816} = "Nina";
-$areanames{en}->{264625817} = "Nina";
-$areanames{en}->{264625818} = "Dordabis";
-$areanames{en}->{264625819} = "Dordabis";
-$areanames{en}->{26462692} = "Central";
-$areanames{en}->{264627024} = "Hosea\ Kutako\ INT\ Airport";
-$areanames{en}->{264627025} = "Hosea\ Kutako\ INT\ Airport";
-$areanames{en}->{264631701} = "Aminuis";
-$areanames{en}->{264631702} = "Aminuis";
-$areanames{en}->{264631703} = "Aranos";
-$areanames{en}->{264631704} = "Ariamsvlei";
-$areanames{en}->{264631706} = "Asab";
-$areanames{en}->{264631709} = "Bethanie";
-$areanames{en}->{264631710} = "Bethanie";
-$areanames{en}->{264631711} = "Bralano";
-$areanames{en}->{264631712} = "Bulwana";
-$areanames{en}->{264631713} = "Dawiab";
-$areanames{en}->{264631714} = "Deurstamp";
-$areanames{en}->{264631715} = "Feldschuhorn";
-$areanames{en}->{264631717} = "Gibeon";
-$areanames{en}->{264631718} = "Goageb";
-$areanames{en}->{264631719} = "Gochas";
-$areanames{en}->{264631720} = "Grenslyn";
-$areanames{en}->{264631722} = "Guibis";
-$areanames{en}->{264631723} = "Hamab";
-$areanames{en}->{264631724} = "Helmeringhausen";
-$areanames{en}->{264631725} = "Hoachanas";
-$areanames{en}->{264631727} = "Kalahariplaas";
-$areanames{en}->{264631728} = "Kalkrand";
-$areanames{en}->{264631729} = "Kalkrand";
-$areanames{en}->{264631730} = "Karasburg";
-$areanames{en}->{264631731} = "Karasburg";
-$areanames{en}->{264631732} = "Karasburg";
-$areanames{en}->{264631733} = "Karasburg";
-$areanames{en}->{264631734} = "Karasburg";
-$areanames{en}->{264631735} = "Keetmanshoop";
-$areanames{en}->{264631736} = "Keetmanshoop";
-$areanames{en}->{264631737} = "Keetmanshoop";
-$areanames{en}->{264631738} = "Keetmanshoop";
-$areanames{en}->{264631739} = "Keetmanshoop";
-$areanames{en}->{264631740} = "Klein\ Karas";
-$areanames{en}->{264631743} = "Lorelei";
-$areanames{en}->{264631744} = "Luderitz";
-$areanames{en}->{264631745} = "Luderitz";
-$areanames{en}->{264631746} = "Luderitz";
-$areanames{en}->{264631747} = "Luderitz";
-$areanames{en}->{264631748} = "Luderitz";
-$areanames{en}->{264631749} = "Maltahohe";
-$areanames{en}->{264631750} = "Maltahohe";
-$areanames{en}->{264631751} = "Mariental";
-$areanames{en}->{264631752} = "Mariental";
-$areanames{en}->{264631753} = "Mariental";
-$areanames{en}->{264631754} = "Mariental";
-$areanames{en}->{264631755} = "Mariental";
-$areanames{en}->{264631759} = "Noordoewer";
-$areanames{en}->{264631760} = "Noordoewer";
-$areanames{en}->{264631762} = "Oamseb";
-$areanames{en}->{264631763} = "Oranjemund";
-$areanames{en}->{264631764} = "Oranjemund";
-$areanames{en}->{264631765} = "Oranjemund";
-$areanames{en}->{264631766} = "Oranjemund";
-$areanames{en}->{264631767} = "Oranjemund";
-$areanames{en}->{264631769} = "Rosh\ Pinah";
-$areanames{en}->{264631770} = "Rosh\ Pinah";
-$areanames{en}->{264631771} = "Schilp";
-$areanames{en}->{264631772} = "Seeheim";
-$areanames{en}->{264631774} = "Stampriet";
-$areanames{en}->{264631775} = "Stinkdoring";
-$areanames{en}->{264631776} = "Tses";
-$areanames{en}->{264631777} = "Tsumispark";
-$areanames{en}->{264631778} = "Uhabis";
-$areanames{en}->{264631779} = "Warmbad";
-$areanames{en}->{26463200} = "Luderitz";
-$areanames{en}->{26463201} = "Luderitz";
-$areanames{en}->{26463202} = "Luderitz";
-$areanames{en}->{26463203} = "Luderitz";
-$areanames{en}->{26463204} = "Luderitz";
-$areanames{en}->{26463207} = "Luderitz";
-$areanames{en}->{26463210} = "Luderitz";
-$areanames{en}->{26463220} = "Keetmanshoop";
-$areanames{en}->{26463221} = "Keetmanshoop";
-$areanames{en}->{26463222} = "Keetmanshoop";
-$areanames{en}->{26463223} = "Keetmanshoop";
-$areanames{en}->{26463224} = "Keetmanshoop";
-$areanames{en}->{264632260} = "Keetmanshoop";
-$areanames{en}->{264632261} = "Keetmanshoop";
-$areanames{en}->{264632264} = "Deurstamp";
-$areanames{en}->{264632267} = "Feldschuhorn";
-$areanames{en}->{26463227} = "Keetmanshoop";
-$areanames{en}->{26463228} = "Keetmanshoop";
-$areanames{en}->{26463229} = "Keetmanshoop";
-$areanames{en}->{264632300} = "Oranjemund";
-$areanames{en}->{264632307} = "Oranjemund";
-$areanames{en}->{264632308} = "Oranjemund";
-$areanames{en}->{264632309} = "Oranjemund";
-$areanames{en}->{26463232} = "Oranjemund";
-$areanames{en}->{26463233} = "Oranjemund";
-$areanames{en}->{26463234} = "Oranjemund";
-$areanames{en}->{26463235} = "Oranjemund";
-$areanames{en}->{26463236} = "Oranjemund";
-$areanames{en}->{26463237} = "Oranjemund";
-$areanames{en}->{264632380} = "Oranjemund";
-$areanames{en}->{264632381} = "Oranjemund";
-$areanames{en}->{264632382} = "Luderitz";
-$areanames{en}->{264632383} = "Luderitz";
-$areanames{en}->{264632384} = "Oranjemund";
-$areanames{en}->{264632385} = "Oranjemund";
-$areanames{en}->{264632386} = "Oranjemund";
-$areanames{en}->{264632387} = "Oranjemund";
-$areanames{en}->{264632389} = "Luderitz\ \-\ Elizabeth\ Bay";
-$areanames{en}->{26463239} = "Oranjemund";
-$areanames{en}->{264632403} = "Mariental";
-$areanames{en}->{264632404} = "Mariental";
-$areanames{en}->{264632405} = "Mariental";
-$areanames{en}->{264632406} = "Mariental";
-$areanames{en}->{264632407} = "Mariental";
-$areanames{en}->{264632408} = "Mariental";
-$areanames{en}->{264632409} = "Mariental";
-$areanames{en}->{26463241} = "Mariental";
-$areanames{en}->{26463242} = "Mariental";
-$areanames{en}->{26463243} = "Mariental";
-$areanames{en}->{26463244} = "Mariental";
-$areanames{en}->{26463246} = "Mariental";
-$areanames{en}->{26463247} = "Mariental";
-$areanames{en}->{26463248} = "Mariental";
-$areanames{en}->{264632492} = "Mariental";
-$areanames{en}->{264632500} = "Gochas";
-$areanames{en}->{264632501} = "Gochas";
-$areanames{en}->{264632502} = "Gochas";
-$areanames{en}->{264632505} = "Seeheim";
-$areanames{en}->{264632507} = "Narubis";
-$areanames{en}->{26463251} = "Gibeon";
-$areanames{en}->{264632520} = "Grenslyn";
-$areanames{en}->{264632522} = "Asab";
-$areanames{en}->{264632523} = "Asab";
-$areanames{en}->{264632524} = "Bulwana";
-$areanames{en}->{26463257} = "Tses";
-$areanames{en}->{264632580} = "Aus";
-$areanames{en}->{264632581} = "Aus";
-$areanames{en}->{264632583} = "Guibis";
-$areanames{en}->{264632589} = "Aus";
-$areanames{en}->{26463260} = "Stampriet";
-$areanames{en}->{264632610} = "Oamseb";
-$areanames{en}->{264632611} = "Oamseb";
-$areanames{en}->{26463262} = "Grunau";
-$areanames{en}->{26463264} = "Kalkrand";
-$areanames{en}->{264632650} = "Schilp";
-$areanames{en}->{264632651} = "Schilp";
-$areanames{en}->{264632653} = "Hoachanas";
-$areanames{en}->{264632654} = "Hoachanas";
-$areanames{en}->{264632655} = "Tsumispark";
-$areanames{en}->{264632656} = "Tsumispark";
-$areanames{en}->{264632657} = "Tsumispark";
-$areanames{en}->{264632660} = "Klein\ Karas";
-$areanames{en}->{264632690} = "Warmbad";
-$areanames{en}->{264632691} = "Warmbad";
-$areanames{en}->{264632693} = "Hamab";
-$areanames{en}->{264632696} = "Stinkdoring";
-$areanames{en}->{264632699} = "Uhabis";
-$areanames{en}->{26463270} = "Karasburg";
-$areanames{en}->{264632711} = "Karasburg";
-$areanames{en}->{264632712} = "Karasburg";
-$areanames{en}->{264632714} = "Karasburg";
-$areanames{en}->{264632718} = "Karasburg";
-$areanames{en}->{264632719} = "Karasburg";
-$areanames{en}->{26463272} = "Aranos";
-$areanames{en}->{264632730} = "Aminuis";
-$areanames{en}->{264632731} = "Aminuis";
-$areanames{en}->{264632732} = "Aminuis";
-$areanames{en}->{264632733} = "Aminuis";
-$areanames{en}->{26463274} = "Rosh\ Pinah";
-$areanames{en}->{264632750} = "Kalahariplaas";
-$areanames{en}->{264632752} = "Bralano";
-$areanames{en}->{264632753} = "Bralano";
-$areanames{en}->{264632754} = "Bralano";
-$areanames{en}->{264632768} = "Aranos";
-$areanames{en}->{264632769} = "Aranos";
-$areanames{en}->{264632800} = "Ariamsvlei";
-$areanames{en}->{264632801} = "Ariamsvlei";
-$areanames{en}->{264632803} = "Dawiab";
-$areanames{en}->{264632805} = "Aroab";
-$areanames{en}->{264632806} = "Aroab";
-$areanames{en}->{264632807} = "Aroab";
-$areanames{en}->{264632808} = "Kais";
-$areanames{en}->{264632809} = "Ariamsvlei";
-$areanames{en}->{264632810} = "Köes";
-$areanames{en}->{264632811} = "Gaibis";
-$areanames{en}->{264632812} = "Deurstamp";
-$areanames{en}->{264632830} = "Bethanie";
-$areanames{en}->{264632831} = "Bethanie";
-$areanames{en}->{264632833} = "Helmeringhausen";
-$areanames{en}->{264632835} = "Goageb";
-$areanames{en}->{264632837} = "Lorelei";
-$areanames{en}->{264632839} = "Bethanie";
-$areanames{en}->{264632849} = "Bethanie";
-$areanames{en}->{264632900} = "Rosh\ Pinah";
-$areanames{en}->{264632901} = "Rosh\ Pinah";
-$areanames{en}->{264632902} = "Rosh\ Pinah";
-$areanames{en}->{26463293} = "Maltahohe\/Solitaire";
-$areanames{en}->{264632942} = "Kumakams";
-$areanames{en}->{264632950} = "Namgorab";
-$areanames{en}->{26463297} = "Noordoewer";
-$areanames{en}->{26463345} = "Mariental";
-$areanames{en}->{26463626} = "Helmeringhausen";
-$areanames{en}->{26463683} = "Keetmanshoop";
-$areanames{en}->{26463693} = "South";
-$areanames{en}->{264637034} = "Keetmanshoop";
-$areanames{en}->{264637035} = "Luderitz";
-$areanames{en}->{264637100} = "Keetmanshoop";
-$areanames{en}->{264637130} = "Keetmanshoop";
-$areanames{en}->{264637180} = "Keetmanshoop";
-$areanames{en}->{264637181} = "Keetmanshoop";
-$areanames{en}->{264637182} = "Keetmanshoop";
-$areanames{en}->{264637183} = "Keetmanshoop";
-$areanames{en}->{264637184} = "Keetmanshoop";
-$areanames{en}->{264637185} = "Keetmanshoop";
-$areanames{en}->{264637190} = "Keetmanshoop";
-$areanames{en}->{264637191} = "Keetmanshoop";
-$areanames{en}->{264637192} = "Keetmanshoop";
-$areanames{en}->{26463811} = "Keetmanshoop";
-$areanames{en}->{264641700} = "Arandis";
-$areanames{en}->{264641701} = "Arandis";
-$areanames{en}->{264641702} = "Henties\ Bay";
-$areanames{en}->{264641703} = "Henties\ Bay";
-$areanames{en}->{264641704} = "Henties\ Bay";
-$areanames{en}->{264641705} = "Henties\ Bay";
-$areanames{en}->{264641706} = "Henties\ Bay";
-$areanames{en}->{264641707} = "Karibib";
-$areanames{en}->{264641708} = "Karibib";
-$areanames{en}->{264641709} = "Langstrand";
-$areanames{en}->{264641710} = "Langstrand";
-$areanames{en}->{264641711} = "Langstrand";
-$areanames{en}->{264641712} = "Leoburn";
-$areanames{en}->{264641713} = "Omaruru";
-$areanames{en}->{264641714} = "Omaruru";
-$areanames{en}->{264641715} = "Omaruru";
-$areanames{en}->{264641716} = "Omaruru";
-$areanames{en}->{264641717} = "Omaruru";
-$areanames{en}->{264641718} = "Omaruru";
-$areanames{en}->{264641721} = "Rössing\ Mine";
-$areanames{en}->{264641722} = "Rössing\ Mine";
-$areanames{en}->{264641723} = "Swakopmund";
-$areanames{en}->{264641724} = "Swakopmund";
-$areanames{en}->{264641725} = "Swakopmund";
-$areanames{en}->{264641726} = "Swakopmund";
-$areanames{en}->{264641727} = "Swakopmund";
-$areanames{en}->{264641728} = "Swakopmund";
-$areanames{en}->{264641729} = "Swakopmund";
-$areanames{en}->{26464173} = "Swakopmund";
-$areanames{en}->{264641741} = "Swakopmund";
-$areanames{en}->{264641742} = "Swakopmund";
-$areanames{en}->{264641743} = "Tsaobis";
-$areanames{en}->{264641746} = "Usakos";
-$areanames{en}->{264641747} = "Usakos";
-$areanames{en}->{264641748} = "Usakos";
-$areanames{en}->{264641749} = "Usakos";
-$areanames{en}->{26464175} = "Walvis\ Bay";
-$areanames{en}->{26464176} = "Walvis\ Bay";
-$areanames{en}->{2646420} = "Walvis\ Bay";
-$areanames{en}->{26464210} = "Walvis\ Bay";
-$areanames{en}->{264642110} = "Langstrand";
-$areanames{en}->{264642111} = "Langstrand";
-$areanames{en}->{264642112} = "Langstrand";
-$areanames{en}->{264642118} = "Walvis\ Bay";
-$areanames{en}->{264642119} = "Walvis\ Bay";
-$areanames{en}->{26464219} = "Walvis\ Bay";
-$areanames{en}->{26464220} = "Walvis\ Bay";
-$areanames{en}->{26464221} = "Walvis\ Bay";
-$areanames{en}->{26464270} = "Walvis\ Bay";
-$areanames{en}->{26464271} = "Walvis\ Bay";
-$areanames{en}->{26464272} = "Walvis\ Bay";
-$areanames{en}->{26464273} = "Walvis\ Bay";
-$areanames{en}->{26464274} = "Walvis\ Bay";
-$areanames{en}->{26464275} = "Walvis\ Bay";
-$areanames{en}->{26464276} = "Walvis\ Bay";
-$areanames{en}->{26464400} = "Swakopmund";
-$areanames{en}->{26464401} = "Swakopmund";
-$areanames{en}->{26464402} = "Swakopmund";
-$areanames{en}->{26464403} = "Swakopmund";
-$areanames{en}->{26464404} = "Swakopmund";
-$areanames{en}->{26464405} = "Swakopmund";
-$areanames{en}->{26464406} = "Swakopmund";
-$areanames{en}->{26464407} = "Swakopmund";
-$areanames{en}->{2646441} = "Swakopmund";
-$areanames{en}->{26464461} = "Swakopmund";
-$areanames{en}->{26464462} = "Swakopmund";
-$areanames{en}->{26464463} = "Swakopmund";
-$areanames{en}->{26464464} = "Swakopmund";
-$areanames{en}->{264644650} = "Swakopmund";
-$areanames{en}->{26464500} = "Henties\ Bay";
-$areanames{en}->{26464501} = "Henties\ Bay";
-$areanames{en}->{26464502} = "Henties\ Bay";
-$areanames{en}->{26464504} = "Uis";
-$areanames{en}->{26464510} = "Arandis";
-$areanames{en}->{26464511} = "Arandis";
-$areanames{en}->{26464512} = "Arandis";
-$areanames{en}->{26464520} = "Rössing\ Mine";
-$areanames{en}->{264645212} = "Rössing\ Mine";
-$areanames{en}->{264645213} = "Rössing\ Mine";
-$areanames{en}->{264645214} = "Rössing\ Mine";
-$areanames{en}->{264645219} = "Rössing\ Mine";
-$areanames{en}->{264645220} = "Rössing\ Mine";
-$areanames{en}->{264645221} = "Rössing\ Mine";
-$areanames{en}->{26464530} = "Usakos";
-$areanames{en}->{264645315} = "Usakos";
-$areanames{en}->{264645316} = "Usakos";
-$areanames{en}->{264645317} = "Usakos";
-$areanames{en}->{264645318} = "Usakos";
-$areanames{en}->{264645319} = "Usakos";
-$areanames{en}->{26464550} = "Karibib";
-$areanames{en}->{264645508} = "Tsaobis\/Karibib";
-$areanames{en}->{26464551} = "Otjimbingwe";
-$areanames{en}->{264645520} = "Karibib";
-$areanames{en}->{264645521} = "Karibib";
-$areanames{en}->{264645537} = "Karibib";
-$areanames{en}->{264645539} = "Karibib";
-$areanames{en}->{26464570} = "Omaruru";
-$areanames{en}->{264645710} = "Omaruru";
-$areanames{en}->{264645711} = "Omaruru";
-$areanames{en}->{264645712} = "Omaruru";
-$areanames{en}->{264645713} = "Omaruru";
-$areanames{en}->{264645714} = "Omaruru";
-$areanames{en}->{26464572} = "Omaruru";
-$areanames{en}->{26464573} = "Omaruru";
-$areanames{en}->{26464694} = "Central";
-$areanames{en}->{264647026} = "Walvis\ Bay";
-$areanames{en}->{264647027} = "Walvis\ Bay";
-$areanames{en}->{264647028} = "Swakopmund";
-$areanames{en}->{264647100} = "Walvis\ Bay";
-$areanames{en}->{264647130} = "Walvis\ Bay";
-$areanames{en}->{264647162} = "Swakopmund";
-$areanames{en}->{264647165} = "Walvis\ Bay";
-$areanames{en}->{264647172} = "Swakopmund";
-$areanames{en}->{264651701} = "Anamulenge";
-$areanames{en}->{264651702} = "Blue\ Sodalite\ Mine";
-$areanames{en}->{264651703} = "Edundja";
-$areanames{en}->{264651704} = "Edundja";
-$areanames{en}->{264651705} = "Eenhana";
-$areanames{en}->{264651706} = "Eenhana";
-$areanames{en}->{264651707} = "Ehomba";
-$areanames{en}->{264651708} = "Elim";
-$areanames{en}->{264651709} = "Elim";
-$areanames{en}->{264651710} = "Endola";
-$areanames{en}->{264651711} = "Etanga";
-$areanames{en}->{264651712} = "Etunda";
-$areanames{en}->{264651713} = "Etunda";
-$areanames{en}->{264651714} = "Haiyandja";
-$areanames{en}->{264651715} = "Kaoko\ Otavi";
-$areanames{en}->{264651716} = "Kunene\ River\ Lodge";
-$areanames{en}->{264651717} = "Mahenene";
-$areanames{en}->{264651719} = "Ombombo";
-$areanames{en}->{264651720} = "Odibo";
-$areanames{en}->{264651721} = "Ogongo";
-$areanames{en}->{264651722} = "Ohandungu";
-$areanames{en}->{264651723} = "Ohangwena";
-$areanames{en}->{264651724} = "Ohangwena";
-$areanames{en}->{264651725} = "Ohangwena";
-$areanames{en}->{264651726} = "Ohangwena";
-$areanames{en}->{264651727} = "Okahao";
-$areanames{en}->{264651728} = "Okalongo";
-$areanames{en}->{264651729} = "Okangwati";
-$areanames{en}->{264651730} = "Okatope";
-$areanames{en}->{264651731} = "Okorosave";
-$areanames{en}->{264651732} = "Oluno";
-$areanames{en}->{264651733} = "Oluno";
-$areanames{en}->{264651734} = "Oluno";
-$areanames{en}->{264651735} = "Omafu";
-$areanames{en}->{264651736} = "Ombalantu";
-$areanames{en}->{264651737} = "Ombalantu";
-$areanames{en}->{264651738} = "Ombalantu";
-$areanames{en}->{264651739} = "Omungwelume";
-$areanames{en}->{264651740} = "Omutsewonime";
-$areanames{en}->{264651741} = "Onandjokwe";
-$areanames{en}->{264651742} = "Onathinge";
-$areanames{en}->{264651743} = "Ondangwa";
-$areanames{en}->{264651744} = "Ondangwa";
-$areanames{en}->{264651745} = "Ondangwa";
-$areanames{en}->{264651746} = "Ondangwa";
-$areanames{en}->{264651747} = "Ondangwa";
-$areanames{en}->{264651748} = "Ondobe";
-$areanames{en}->{264651749} = "Onuno";
-$areanames{en}->{264651751} = "Onesi";
-$areanames{en}->{264651752} = "Ongenga";
-$areanames{en}->{264651753} = "Ongha";
-$areanames{en}->{264651754} = "Ongha";
-$areanames{en}->{264651756} = "Ongwediva";
-$areanames{en}->{264651757} = "Ongwediva";
-$areanames{en}->{264651759} = "Ondundu";
-$areanames{en}->{264651760} = "Opuwo";
-$areanames{en}->{264651761} = "Opuwo";
-$areanames{en}->{264651762} = "Orumana";
-$areanames{en}->{264651763} = "Oshakati";
-$areanames{en}->{264651764} = "Oshakati";
-$areanames{en}->{264651765} = "Oshakati";
-$areanames{en}->{264651766} = "Oshakati";
-$areanames{en}->{264651767} = "Oshakati";
-$areanames{en}->{264651768} = "Oshifo";
-$areanames{en}->{264651769} = "Oshigambo";
-$areanames{en}->{264651770} = "Oshikango";
-$areanames{en}->{264651771} = "Oshikuku";
-$areanames{en}->{264651772} = "Oshitayi";
-$areanames{en}->{264651773} = "Otjondeka";
-$areanames{en}->{264651774} = "Otwani";
-$areanames{en}->{264651775} = "Panosa";
-$areanames{en}->{264651776} = "Ruacana";
-$areanames{en}->{264651777} = "Ruacana";
-$areanames{en}->{264651778} = "Sesfontein";
-$areanames{en}->{264651781} = "Tsandi";
-$areanames{en}->{264651782} = "Tsandi";
-$areanames{en}->{264651783} = "Warmquelle";
-$areanames{en}->{2646520} = "Oshakati";
-$areanames{en}->{26465200} = "Ombalantu";
-$areanames{en}->{26465220} = "Oshakati";
-$areanames{en}->{26465221} = "Oshakati";
-$areanames{en}->{26465222} = "Oshakati";
-$areanames{en}->{26465223} = "Oshakati";
-$areanames{en}->{26465224} = "Oshakati";
-$areanames{en}->{26465225} = "Oshakati";
-$areanames{en}->{26465226} = "Oshakati";
-$areanames{en}->{26465227} = "Oshakati";
-$areanames{en}->{264652290} = "Oshakati";
-$areanames{en}->{26465230} = "Ongwediva";
-$areanames{en}->{26465231} = "Ongwediva";
-$areanames{en}->{264652320} = "Ongwediva";
-$areanames{en}->{264652321} = "Ongwediva";
-$areanames{en}->{264652324} = "Ongwediva";
-$areanames{en}->{264652325} = "Ongwediva";
-$areanames{en}->{264652327} = "Ongwediva";
-$areanames{en}->{264652328} = "Ongwediva";
-$areanames{en}->{264652329} = "Ongwediva";
-$areanames{en}->{26465233} = "Ongwediva";
-$areanames{en}->{26465234} = "Ongwediva";
-$areanames{en}->{26465240} = "Ondangwa";
-$areanames{en}->{26465241} = "Ondangwa";
-$areanames{en}->{26465242} = "Ondangwa";
-$areanames{en}->{26465243} = "Ondangwa";
-$areanames{en}->{264652440} = "Omuthiya";
-$areanames{en}->{264652441} = "Omuthiya";
-$areanames{en}->{264652446} = "Omuthiya";
-$areanames{en}->{264652447} = "Omuthiya";
-$areanames{en}->{264652448} = "Omuthiya";
-$areanames{en}->{264652449} = "Omuthiya";
-$areanames{en}->{264652450} = "Oshitayi";
-$areanames{en}->{264652451} = "Oshitayi";
-$areanames{en}->{264652452} = "Haiyandja";
-$areanames{en}->{264652453} = "Haiyandja";
-$areanames{en}->{264652454} = "Ongha";
-$areanames{en}->{264652455} = "Ongha";
-$areanames{en}->{264652456} = "Oluno";
-$areanames{en}->{264652457} = "Oluno";
-$areanames{en}->{264652458} = "Oluno";
-$areanames{en}->{264652459} = "Oluno";
-$areanames{en}->{264652460} = "Oluno";
-$areanames{en}->{264652461} = "Oluno";
-$areanames{en}->{264652462} = "Oluno";
-$areanames{en}->{264652463} = "Oluno";
-$areanames{en}->{264652464} = "Oluno";
-$areanames{en}->{264652481} = "Onandjokwe";
-$areanames{en}->{264652482} = "Onandjokwe";
-$areanames{en}->{264652483} = "Onandjokwe";
-$areanames{en}->{264652488} = "Onathinge";
-$areanames{en}->{264652489} = "Onathinge";
-$areanames{en}->{264652490} = "Onathinge";
-$areanames{en}->{264652491} = "Onathinge";
-$areanames{en}->{264652492} = "Onathinge";
-$areanames{en}->{264652493} = "Onathinge";
-$areanames{en}->{264652494} = "Onathinge";
-$areanames{en}->{264652503} = "Anamulenge";
-$areanames{en}->{264652504} = "Anamulenge";
-$areanames{en}->{264652507} = "Ombalantu";
-$areanames{en}->{264652508} = "Ombalantu";
-$areanames{en}->{264652509} = "Ombalantu";
-$areanames{en}->{26465251} = "Ombalantu";
-$areanames{en}->{264652520} = "Okahao";
-$areanames{en}->{264652521} = "Okahao";
-$areanames{en}->{264652522} = "Okahao";
-$areanames{en}->{264652523} = "Okahao";
-$areanames{en}->{264652524} = "Okahao";
-$areanames{en}->{264652525} = "Okahao";
-$areanames{en}->{264652526} = "Okahao";
-$areanames{en}->{264652531} = "Okahao";
-$areanames{en}->{264652532} = "Okahao";
-$areanames{en}->{264652535} = "Okalongo";
-$areanames{en}->{264652536} = "Okalongo";
-$areanames{en}->{264652537} = "Okalongo";
-$areanames{en}->{264652545} = "Oshikuku";
-$areanames{en}->{264652546} = "Oshikuku";
-$areanames{en}->{264652547} = "Oshikuku";
-$areanames{en}->{264652560} = "Etilyasa";
-$areanames{en}->{264652562} = "Onaanda";
-$areanames{en}->{264652565} = "Elim";
-$areanames{en}->{264652566} = "Elim";
-$areanames{en}->{264652567} = "Elim";
-$areanames{en}->{264652570} = "Ogongo";
-$areanames{en}->{264652571} = "Ogongo";
-$areanames{en}->{264652572} = "Ogongo";
-$areanames{en}->{264652580} = "Tsandi";
-$areanames{en}->{264652581} = "Tsandi";
-$areanames{en}->{264652582} = "Tsandi";
-$areanames{en}->{264652587} = "Onesi";
-$areanames{en}->{264652588} = "Onesi";
-$areanames{en}->{264652589} = "Onesi";
-$areanames{en}->{264652590} = "Mahenene";
-$areanames{en}->{264652591} = "Mahenene";
-$areanames{en}->{264652595} = "Etunda";
-$areanames{en}->{264652596} = "Etunda";
-$areanames{en}->{264652598} = "Eunda";
-$areanames{en}->{264652600} = "Ohangwena";
-$areanames{en}->{264652601} = "Ohangwena";
-$areanames{en}->{264652620} = "Onuno";
-$areanames{en}->{264652621} = "Onuno";
-$areanames{en}->{264652622} = "Okatope";
-$areanames{en}->{264652623} = "Okatope";
-$areanames{en}->{264652624} = "Ondobe";
-$areanames{en}->{264652625} = "Ondobe";
-$areanames{en}->{264652628} = "Ongha";
-$areanames{en}->{264652629} = "Ongha";
-$areanames{en}->{264652630} = "Eenhana";
-$areanames{en}->{264652631} = "Eenhana";
-$areanames{en}->{264652632} = "Eenhana";
-$areanames{en}->{264652633} = "Eenhana";
-$areanames{en}->{264652634} = "Eenhana";
-$areanames{en}->{264652635} = "Eenhana";
-$areanames{en}->{264652636} = "Eenhana";
-$areanames{en}->{264652640} = "Eenhana";
-$areanames{en}->{264652641} = "Eenhana";
-$areanames{en}->{264652642} = "Eenhana";
-$areanames{en}->{264652643} = "Eenhana";
-$areanames{en}->{264652644} = "Oshigambo";
-$areanames{en}->{264652645} = "Oshigambo";
-$areanames{en}->{264652646} = "Oshikango";
-$areanames{en}->{264652647} = "Oshikango";
-$areanames{en}->{264652648} = "Oshikango";
-$areanames{en}->{264652649} = "Oshikango";
-$areanames{en}->{264652650} = "Oshikango";
-$areanames{en}->{264652651} = "Oshikango";
-$areanames{en}->{264652652} = "Oshikango";
-$areanames{en}->{264652653} = "Oshikango";
-$areanames{en}->{264652654} = "Oshikango";
-$areanames{en}->{264652655} = "Oshikango";
-$areanames{en}->{264652657} = "Oshikango";
-$areanames{en}->{264652663} = "Oshikango";
-$areanames{en}->{264652664} = "Oshikango";
-$areanames{en}->{264652665} = "Oshikango";
-$areanames{en}->{264652666} = "Omafu";
-$areanames{en}->{264652667} = "Omafu";
-$areanames{en}->{264652675} = "Omafu";
-$areanames{en}->{264652676} = "Odibo";
-$areanames{en}->{264652677} = "Odibo";
-$areanames{en}->{264652681} = "Edundja";
-$areanames{en}->{264652682} = "Edundja";
-$areanames{en}->{264652683} = "Ongenga";
-$areanames{en}->{264652688} = "Endola";
-$areanames{en}->{264652689} = "Endola";
-$areanames{en}->{264652690} = "Omungwelume";
-$areanames{en}->{264652691} = "Omungwelume";
-$areanames{en}->{264652692} = "Omungwelume";
-$areanames{en}->{264652700} = "Ruacana";
-$areanames{en}->{264652701} = "Ruacana";
-$areanames{en}->{264652702} = "Ruacana";
-$areanames{en}->{264652710} = "Etoto";
-$areanames{en}->{264652714} = "Ruacana";
-$areanames{en}->{264652715} = "Ruacana";
-$areanames{en}->{264652716} = "Ruacana";
-$areanames{en}->{264652717} = "Ruacana";
-$areanames{en}->{264652718} = "Ruacana";
-$areanames{en}->{264652719} = "Ruacana";
-$areanames{en}->{264652720} = "Oshifo";
-$areanames{en}->{264652721} = "Oshifo";
-$areanames{en}->{264652725} = "Oshifo";
-$areanames{en}->{264652728} = "Opuwo";
-$areanames{en}->{264652729} = "Opuwo";
-$areanames{en}->{26465273} = "Opuwo";
-$areanames{en}->{264652736} = "Otjerunda";
-$areanames{en}->{264652740} = "Ehomba";
-$areanames{en}->{264652741} = "Sodalite";
-$areanames{en}->{264652742} = "Panosa";
-$areanames{en}->{264652743} = "Kunene\ River\ Lodge";
-$areanames{en}->{264652744} = "Etanga";
-$areanames{en}->{264652745} = "Okangwati";
-$areanames{en}->{264652746} = "Ohandungu";
-$areanames{en}->{264652747} = "Kaoko\ Otavi";
-$areanames{en}->{264652748} = "Okorosave";
-$areanames{en}->{264652749} = "Orumana";
-$areanames{en}->{264652750} = "Otwani";
-$areanames{en}->{264652751} = "Otjondeka";
-$areanames{en}->{264652752} = "Ombombo";
-$areanames{en}->{264652753} = "Warmquelle";
-$areanames{en}->{264652755} = "Sesfontein";
-$areanames{en}->{264652762} = "Kowares";
-$areanames{en}->{264652764} = "Otjitjekwa";
-$areanames{en}->{264652766} = "Oruvandjai";
-$areanames{en}->{264652800} = "Ondangwa";
-$areanames{en}->{264652801} = "Ondangwa";
-$areanames{en}->{264652822} = "Ondangwa";
-$areanames{en}->{264652850} = "Omutsewonime";
-$areanames{en}->{264652853} = "Okashana";
-$areanames{en}->{264652856} = "Onyaanya";
-$areanames{en}->{264652860} = "Okapuku";
-$areanames{en}->{264652863} = "Onankali";
-$areanames{en}->{264652866} = "Okatope";
-$areanames{en}->{264652870} = "Oniingo";
-$areanames{en}->{264652880} = "Omundaungilo";
-$areanames{en}->{264652882} = "Oshuli";
-$areanames{en}->{264652884} = "Okongo";
-$areanames{en}->{264652885} = "Okongo";
-$areanames{en}->{264652886} = "Ekoka";
-$areanames{en}->{264652888} = "Epembe";
-$areanames{en}->{264652890} = "Okankolo";
-$areanames{en}->{264652892} = "Omuntele";
-$areanames{en}->{264652894} = "Oshikunde";
-$areanames{en}->{264652896} = "Onyuulaye";
-$areanames{en}->{26465290} = "Eenhana";
-$areanames{en}->{26465695} = "North";
-$areanames{en}->{264657031} = "Ondangwa";
-$areanames{en}->{264657032} = "Oshakati";
-$areanames{en}->{264657100} = "Oshakati";
-$areanames{en}->{264657130} = "Oshakati";
-$areanames{en}->{264657142} = "Oshakati";
-$areanames{en}->{264657145} = "Oshakati";
-$areanames{en}->{264657152} = "Oshakati";
-$areanames{en}->{264657165} = "Oshakati";
-$areanames{en}->{264661701} = "Bagani";
-$areanames{en}->{264661702} = "Bagani";
-$areanames{en}->{264661703} = "Bukalo";
-$areanames{en}->{264661704} = "Bunia";
-$areanames{en}->{264661705} = "Hakasembe";
-$areanames{en}->{264661706} = "K\.\ Murangi";
-$areanames{en}->{264661707} = "Kahenge";
-$areanames{en}->{264661708} = "Katima\-Mulilo";
-$areanames{en}->{264661709} = "Katima\-Mulilo";
-$areanames{en}->{264661710} = "Katima\-Mulilo";
-$areanames{en}->{264661711} = "Kongola";
-$areanames{en}->{264661712} = "Mpacha";
-$areanames{en}->{264661713} = "Marangi";
-$areanames{en}->{264661714} = "Mashare";
-$areanames{en}->{264661715} = "Matava";
-$areanames{en}->{264661716} = "Muveke";
-$areanames{en}->{264661717} = "Nkurenkuru";
-$areanames{en}->{264661718} = "Nakayale\/Nkurenkuru";
-$areanames{en}->{264661719} = "Nzinze";
-$areanames{en}->{264661720} = "Omega";
-$areanames{en}->{264661721} = "Rundu";
-$areanames{en}->{264661722} = "Rundu";
-$areanames{en}->{264661723} = "Rundu";
-$areanames{en}->{264661724} = "Rundu";
-$areanames{en}->{264661725} = "Rupara";
-$areanames{en}->{264661726} = "Ruuga";
-$areanames{en}->{264661727} = "Sikono";
-$areanames{en}->{264661728} = "Nyangana";
-$areanames{en}->{264662500} = "Nakayale\/Omega";
-$areanames{en}->{264662501} = "Nakayale";
-$areanames{en}->{264662502} = "Mpacha\/Ngoma";
-$areanames{en}->{264662504} = "Kongola";
-$areanames{en}->{264662506} = "Ngoma";
-$areanames{en}->{264662508} = "Ngoma";
-$areanames{en}->{26466251} = "Katima\-Mulilo";
-$areanames{en}->{26466252} = "Katima\-Mulilo";
-$areanames{en}->{26466253} = "Katima\-Mulilo";
-$areanames{en}->{26466254} = "Katima\-Mulilo";
-$areanames{en}->{26466255} = "Rundu";
-$areanames{en}->{26466256} = "Rundu";
-$areanames{en}->{264662570} = "Sikono";
-$areanames{en}->{264662571} = "Ruuga";
-$areanames{en}->{264662572} = "Hakasembe";
-$areanames{en}->{264662573} = "Bunia";
-$areanames{en}->{264662574} = "Matava";
-$areanames{en}->{264662575} = "Nzinze";
-$areanames{en}->{264662576} = "Rupara";
-$areanames{en}->{264662577} = "Muveke";
-$areanames{en}->{264662578} = "Marangi";
-$areanames{en}->{264662579} = "Kahenge";
-$areanames{en}->{264662580} = "Nkurenkuru";
-$areanames{en}->{264662581} = "Nkurenkuru";
-$areanames{en}->{264662582} = "Nyangana";
-$areanames{en}->{264662586} = "Mashare";
-$areanames{en}->{264662587} = "Mashare";
-$areanames{en}->{264662588} = "Nyangana";
-$areanames{en}->{264662589} = "Rundu";
-$areanames{en}->{264662590} = "Bagani";
-$areanames{en}->{264662591} = "Bagani";
-$areanames{en}->{264662592} = "Bagani";
-$areanames{en}->{264662593} = "Bagani";
-$areanames{en}->{264662596} = "Sambyu";
-$areanames{en}->{264662597} = "Sambyu";
-$areanames{en}->{264662599} = "Muhembo";
-$areanames{en}->{264662600} = "Mpungu";
-$areanames{en}->{26466261} = "Katima\-Mulilo";
-$areanames{en}->{264662627} = "Katima\-Mulilo";
-$areanames{en}->{26466263} = "Katima\-Mulilo";
-$areanames{en}->{264662640} = "Nyangana";
-$areanames{en}->{26466265} = "Rundu";
-$areanames{en}->{26466266} = "Rundu";
-$areanames{en}->{264662670} = "Rundu";
-$areanames{en}->{264662671} = "Rundu";
-$areanames{en}->{264662672} = "Rundu";
-$areanames{en}->{264662673} = "Rundu";
-$areanames{en}->{264662674} = "Rundu";
-$areanames{en}->{26466268} = "Katima\-Mulilo";
-$areanames{en}->{26466269} = "Rundu";
-$areanames{en}->{26466381} = "Maltahohe";
-$areanames{en}->{26466385} = "Namgorab";
-$areanames{en}->{26466423} = "Kalahariplaas";
-$areanames{en}->{26466696} = "North\ East";
-$areanames{en}->{264667030} = "Rundu";
-$areanames{en}->{264667143} = "Rundu";
-$areanames{en}->{264667145} = "Katima\-Mulilo";
-$areanames{en}->{264667153} = "Rundu";
-$areanames{en}->{264671700} = "Andara";
-$areanames{en}->{264671740} = "Abenab";
-$areanames{en}->{264671741} = "Anker";
-$areanames{en}->{264671742} = "Sorris\-Sorris";
-$areanames{en}->{264671743} = "Biermanskool";
-$areanames{en}->{264671745} = "Halali";
-$areanames{en}->{264671746} = "Horabe";
-$areanames{en}->{264671747} = "Kalkfeld";
-$areanames{en}->{264671748} = "Kamanjab";
-$areanames{en}->{264671749} = "Khorixas";
-$areanames{en}->{264671751} = "Khorixas";
-$areanames{en}->{264671753} = "Kombat";
-$areanames{en}->{264671754} = "Lindequest";
-$areanames{en}->{264671756} = "Maroelaboom";
-$areanames{en}->{264671757} = "Etosha\ Rurtel";
-$areanames{en}->{264671759} = "Okakarara";
-$areanames{en}->{264671760} = "Okakarara";
-$areanames{en}->{264671762} = "Okaputa";
-$areanames{en}->{264671763} = "Okaukuejo";
-$areanames{en}->{264671764} = "Okorusu";
-$areanames{en}->{264671765} = "Omatjene";
-$areanames{en}->{264671766} = "Etosha\ Rurtel";
-$areanames{en}->{264671767} = "Etosha\ Rurtel";
-$areanames{en}->{264671768} = "Etosha\ Rurtel";
-$areanames{en}->{264671770} = "Otavi";
-$areanames{en}->{264671771} = "Otavi";
-$areanames{en}->{264671773} = "Otjiwarongo";
-$areanames{en}->{264671774} = "Otjiwarongo";
-$areanames{en}->{264671775} = "Otjiwarongo";
-$areanames{en}->{264671776} = "Otjiwarongo";
-$areanames{en}->{264671777} = "Otjiwarongo";
-$areanames{en}->{264671778} = "Outjo";
-$areanames{en}->{264671779} = "Outjo";
-$areanames{en}->{264671782} = "Toshari";
-$areanames{en}->{264671783} = "Tsumeb";
-$areanames{en}->{264671784} = "Tsumeb";
-$areanames{en}->{264671785} = "Tsumeb";
-$areanames{en}->{264671786} = "Tsumeb";
-$areanames{en}->{264671787} = "Tsumeb";
-$areanames{en}->{264671789} = "Uchab";
-$areanames{en}->{264671790} = "Uib";
-$areanames{en}->{264671791} = "Waterberg\ Plateau\ Park";
-$areanames{en}->{264671792} = "Waterberg\ Plateau\ Park";
-$areanames{en}->{264671793} = "Waterberg\ Plateau\ Park";
-$areanames{en}->{264671794} = "Epupa";
-$areanames{en}->{264671797} = "Grootfontein";
-$areanames{en}->{264671798} = "Grootfontein";
-$areanames{en}->{264671799} = "Grootfontein";
-$areanames{en}->{26467220} = "Tsumeb";
-$areanames{en}->{26467221} = "Tsumeb";
-$areanames{en}->{26467222} = "Tsumeb";
-$areanames{en}->{26467223} = "Tsumeb";
-$areanames{en}->{26467224} = "Tsumeb";
-$areanames{en}->{264672290} = "Etosha\ Rurtel";
-$areanames{en}->{264672291} = "Etosha\ Rurtel";
-$areanames{en}->{264672292} = "Etosha\ Rurtel\/Lindequest";
-$areanames{en}->{264672293} = "Etosha\ Rurtel\/Namutoni";
-$areanames{en}->{264672294} = "Etosha\ Rurtel\/Halali";
-$areanames{en}->{264672295} = "Etosha\ Rurtel\/Ombika";
-$areanames{en}->{264672296} = "Etosha\ Rurtel\/Ongava";
-$areanames{en}->{264672297} = "Etosha\ Rurtel";
-$areanames{en}->{264672298} = "Etosha\ Rurtel\/Okaukuejo";
-$areanames{en}->{264672299} = "Mokuti";
-$areanames{en}->{26467230} = "Oshivello";
-$areanames{en}->{264672310} = "Kombat";
-$areanames{en}->{264672311} = "Kombat";
-$areanames{en}->{264672312} = "Kombat";
-$areanames{en}->{264672315} = "Rietfontein";
-$areanames{en}->{264672316} = "Rietfontein";
-$areanames{en}->{264672320} = "Abenab";
-$areanames{en}->{264672323} = "Horabe";
-$areanames{en}->{264672326} = "Maroelaboom";
-$areanames{en}->{264672327} = "Maroelaboom";
-$areanames{en}->{264672329} = "Coblenz";
-$areanames{en}->{26467234} = "Otavi";
-$areanames{en}->{264672350} = "Uib";
-$areanames{en}->{264672357} = "Otavi";
-$areanames{en}->{264672358} = "Otavi";
-$areanames{en}->{264672359} = "Otavi";
-$areanames{en}->{26467240} = "Grootfontein";
-$areanames{en}->{26467241} = "Grootfontein";
-$areanames{en}->{26467242} = "Grootfontein";
-$areanames{en}->{26467243} = "Grootfontein";
-$areanames{en}->{264672440} = "Tsumkwe";
-$areanames{en}->{264672441} = "Tsumkwe";
-$areanames{en}->{264672450} = "Mangetti\ duin";
-$areanames{en}->{264672455} = "Gam";
-$areanames{en}->{26467248} = "Grootfontein";
-$areanames{en}->{264672491} = "Grootfontein";
-$areanames{en}->{264672492} = "Grootfontein";
-$areanames{en}->{264672493} = "Grootfontein";
-$areanames{en}->{264672494} = "Grootfontein";
-$areanames{en}->{264672583} = "Andara";
-$areanames{en}->{264672584} = "Andara";
-$areanames{en}->{264672615} = "Uchab";
-$areanames{en}->{264672616} = "Uchab";
-$areanames{en}->{264672617} = "Uchab";
-$areanames{en}->{264672900} = "Kalkfeld";
-$areanames{en}->{264672901} = "Kalkfeld";
-$areanames{en}->{264672902} = "Kalkfeld";
-$areanames{en}->{264672903} = "Epupa";
-$areanames{en}->{264672982} = "Tsumeb";
-$areanames{en}->{26467300} = "Otjiwarongo";
-$areanames{en}->{26467301} = "Otjiwarongo";
-$areanames{en}->{26467302} = "Otjiwarongo";
-$areanames{en}->{26467303} = "Otjiwarongo";
-$areanames{en}->{26467304} = "Otjiwarongo";
-$areanames{en}->{264673050} = "Waterberg\ Plateau\ Park";
-$areanames{en}->{264673051} = "Waterberg\ Plateau\ Park";
-$areanames{en}->{264673052} = "Otjiwarongo";
-$areanames{en}->{264673053} = "Otjiwarongo";
-$areanames{en}->{264673054} = "Okorusu";
-$areanames{en}->{264673055} = "Okorusu";
-$areanames{en}->{264673060} = "Otjiwarongo";
-$areanames{en}->{264673061} = "Otjiwarongo";
-$areanames{en}->{264673062} = "Klein\ Waterberg";
-$areanames{en}->{264673063} = "Klein\ Waterberg";
-$areanames{en}->{264673064} = "Klein\ Waterberg";
-$areanames{en}->{264673065} = "Klein\ Waterberg";
-$areanames{en}->{264673066} = "Klein\ Waterberg";
-$areanames{en}->{264673067} = "Klein\ Waterberg";
-$areanames{en}->{264673068} = "Omatjene";
-$areanames{en}->{26467307} = "Otjiwarongo";
-$areanames{en}->{26467308} = "Otjiwarongo";
-$areanames{en}->{264673090} = "Okaputa";
-$areanames{en}->{264673091} = "Okaputa";
-$areanames{en}->{26467312} = "Outjo";
-$areanames{en}->{26467313} = "Outjo";
-$areanames{en}->{264673167} = "Okakarara";
-$areanames{en}->{264673168} = "Okakarara";
-$areanames{en}->{264673169} = "Okakarara";
-$areanames{en}->{26467317} = "Okakarara";
-$areanames{en}->{264673180} = "Okamatapati";
-$areanames{en}->{264673181} = "Okamatapati";
-$areanames{en}->{26467330} = "Kamanjab";
-$areanames{en}->{26467331} = "Kamanjab\/Khorixas";
-$areanames{en}->{264673320} = "Khorixas";
-$areanames{en}->{264673321} = "Khorixas";
-$areanames{en}->{264673322} = "Sorris\-Sorris";
-$areanames{en}->{264673323} = "Sorris\-Sorris";
-$areanames{en}->{264673324} = "Sorris\-Sorris";
-$areanames{en}->{264673325} = "Sorris\-Sorris";
-$areanames{en}->{264673326} = "Kamanjab";
-$areanames{en}->{264673327} = "Kamanjab";
-$areanames{en}->{264673328} = "Kamanjab";
-$areanames{en}->{264673329} = "Kamanjab";
-$areanames{en}->{264673330} = "Anker";
-$areanames{en}->{264673331} = "Kamanjab";
-$areanames{en}->{264673332} = "Biermanskool";
-$areanames{en}->{264673333} = "Biermanskool";
-$areanames{en}->{264673334} = "Toshari";
-$areanames{en}->{264673335} = "Toshari";
-$areanames{en}->{264673336} = "Kamanjab";
-$areanames{en}->{264673337} = "Kamanjab";
-$areanames{en}->{264673338} = "Kamanjab";
-$areanames{en}->{264673339} = "Kamanjab";
-$areanames{en}->{26467334} = "Kamanjab";
-$areanames{en}->{26467335} = "Kamanjab\/Khorixas";
-$areanames{en}->{26467697} = "North";
-$areanames{en}->{264677029} = "Grootfontein";
-$areanames{en}->{264677140} = "Grootfontein";
-$areanames{en}->{264677141} = "Grootfontein";
-$areanames{en}->{264677145} = "Grootfontein";
-$areanames{en}->{264677150} = "Grootfontein";
-$areanames{en}->{264677151} = "Grootfontein";
-$areanames{en}->{264677163} = "Otjiwarongo";
-$areanames{en}->{264677165} = "Anker\/Braunfels\/Fransfontein";
-$areanames{en}->{264677166} = "Kamanjab\/Otavi";
-$areanames{en}->{264677173} = "Otjiwarongo";
+$areanames{en} = {"264632753", "Bralano",
+"26463293", "Maltahohe\/Solitaire",
+"264657031", "Ondangwa",
+"264667143", "Rundu",
+"264632831", "Bethanie",
+"264631733", "Karasburg",
+"264652870", "Oniingo",
+"264631740", "Klein\ Karas",
+"26463224", "Keetmanshoop",
+"264651765", "Oshakati",
+"264652885", "Okongo",
+"264671742", "Sorris\-Sorris",
+"264652565", "Elim",
+"264631774", "Stampriet",
+"264642110", "Langstrand",
+"264661710", "Katima\-Mulilo",
+"264625702", "Witvlei",
+"264652456", "Oluno",
+"264652440", "Omuthiya",
+"264652683", "Ongenga",
+"264625817", "Nina",
+"26462564", "Gobabis",
+"264652744", "Etanga",
+"26464573", "Omaruru",
+"264631722", "Guibis",
+"264621770", "Summerdown",
+"264652624", "Ondobe",
+"264652666", "Omafu",
+"26462519", "Okandjatu",
+"264641700", "Arandis",
+"26467222", "Tsumeb",
+"264632522", "Asab",
+"264672320", "Abenab",
+"264652728", "Opuwo",
+"264671778", "Outjo",
+"264625430", "Hosea\ Kutako\ INT\ Airport",
+"264652648", "Oshikango",
+"264625802", "Epukiro",
+"264662673", "Rundu",
+"264625717", "Spatzenfeld",
+"264625680", "Drimiopsis",
+"264652451", "Oshitayi",
+"264632731", "Aminuis",
+"26465240", "Ondangwa",
+"264651715", "Kaoko\ Otavi",
+"264625675", "Otjinene",
+"264625600", "Seeis",
+"264652492", "Onathinge",
+"264673063", "Klein\ Waterberg",
+"26464220", "Walvis\ Bay",
+"264657142", "Oshakati",
+"264625819", "Dordabis",
+"26466269", "Rundu",
+"264637181", "Keetmanshoop",
+"264677165", "Anker\/Braunfels\/Fransfontein",
+"264632655", "Tsumispark",
+"264671790", "Uib",
+"264631751", "Mariental",
+"264645711", "Omaruru",
+"264652748", "Okorosave",
+"264652628", "Ongha",
+"26465273", "Opuwo",
+"26464461", "Swakopmund",
+"264645315", "Usakos",
+"264651777", "Ruacana",
+"264625617", "Summerdown",
+"264651763", "Oshakati",
+"264652766", "Oruvandjai",
+"264651781", "Tsandi",
+"264671774", "Otjiwarongo",
+"264662576", "Rupara",
+"264652644", "Oshigambo",
+"264661709", "Katima\-Mulilo",
+"264652581", "Tsandi",
+"26467224", "Tsumeb",
+"264621766", "Sandveld",
+"264671756", "Maroelaboom",
+"264662589", "Rundu",
+"264671740", "Abenab",
+"264642112", "Langstrand",
+"264651701", "Anamulenge",
+"264632699", "Uhabis",
+"264667145", "Katima\-Mulilo",
+"264641717", "Omaruru",
+"26467335", "Kamanjab\/Khorixas",
+"264621748", "Nina",
+"26463200", "Luderitz",
+"264631735", "Keetmanshoop",
+"264625700", "Witvlei",
+"264661712", "Mpacha",
+"26464400", "Swakopmund",
+"264651706", "Eenhana",
+"264625673", "Epukiro",
+"264651713", "Etunda",
+"264671751", "Khorixas",
+"264621761", "Rehoboth",
+"264632520", "Grenslyn",
+"264641702", "Henties\ Bay",
+"264631720", "Grenslyn",
+"264632849", "Bethanie",
+"264621772", "Witvlei",
+"264661707", "Kahenge",
+"26467230", "Oshivello",
+"264625682", "Plessisplaas",
+"264632653", "Hoachanas",
+"264677163", "Otjiwarongo",
+"264632267", "Feldschuhorn",
+"264673065", "Klein\ Waterberg",
+"264652716", "Ruacana",
+"264625800", "Epukiro",
+"264645221", "Rössing\ Mine",
+"264632406", "Mariental",
+"264652490", "Onathinge",
+"264625602", "Omitara",
+"264672903", "Epupa",
+"264631778", "Uhabis",
+"264662587", "Mashare",
+"26462562", "Gobabis",
+"264625180", "Otjozondu",
+"26463222", "Keetmanshoop",
+"264645214", "Rössing\ Mine",
+"264662571", "Ruuga",
+"264652866", "Okatope",
+"264671792", "Waterberg\ Plateau\ Park",
+"264652894", "Oshikunde",
+"26467313", "Outjo",
+"26463229", "Keetmanshoop",
+"264662600", "Mpungu",
+"264625715", "Eland",
+"264637180", "Keetmanshoop",
+"26463811", "Keetmanshoop",
+"26464175", "Walvis\ Bay",
+"264652762", "Kowares",
+"264645710", "Omaruru",
+"264631750", "Maltahohe",
+"264671791", "Waterberg\ Plateau\ Park",
+"264631746", "Luderitz",
+"264662572", "Hakasembe",
+"26462503", "Okahandja\/Ovitoto\/Wilhelmstal",
+"264632693", "Hamab",
+"264667153", "Rundu",
+"264632730", "Aminuis",
+"26464273", "Walvis\ Bay",
+"264625601", "Seeis",
+"264661703", "Bukalo",
+"264632657", "Tsumispark",
+"264677173", "Otjiwarongo",
+"264661716", "Muveke",
+"26462565", "Gobabis",
+"264625681", "Drimiopsis",
+"264632808", "Kais",
+"264652446", "Omuthiya",
+"26464520", "Rössing\ Mine",
+"264652450", "Oshitayi",
+"264621771", "Hosea\ Kutako\ INT\ Airport",
+"264651769", "Oshigambo",
+"264637100", "Keetmanshoop",
+"264651717", "Mahenene",
+"264625677", "Otjinene",
+"264621762", "Rehoboth",
+"264641701", "Arandis",
+"264651734", "Oluno",
+"264661711", "Kongola",
+"264672326", "Maroelaboom",
+"264652441", "Omuthiya",
+"26466423", "Kalahariplaas",
+"264625686", "Epukiro",
+"264631718", "Goageb",
+"264641713", "Omaruru",
+"264641706", "Henties\ Bay",
+"264651702", "Blue\ Sodalite\ Mine",
+"264642111", "Langstrand",
+"264657152", "Oshakati",
+"264673334", "Toshari",
+"264625815", "Nouas",
+"264652582", "Tsandi",
+"264671764", "Okorusu",
+"264621754", "Ombotozu",
+"264652290", "Oshakati",
+"264651782", "Tsandi",
+"264661724", "Rundu",
+"26464502", "Henties\ Bay",
+"26466253", "Katima\-Mulilo",
+"264652567", "Elim",
+"26463242", "Mariental",
+"264651767", "Oshakati",
+"264625613", "Otjiwa",
+"264625606", "Otjiwa",
+"264651773", "Otjondeka",
+"26467304", "Otjiwarongo",
+"264651719", "Ombombo",
+"264632830", "Bethanie",
+"264625679", "Otjinene",
+"264651738", "Ombalantu",
+"264652689", "Endola",
+"264652654", "Oshikango",
+"264625181", "Otjozondu",
+"264662570", "Sikono",
+"264673067", "Klein\ Waterberg",
+"264645712", "Omaruru",
+"264631752", "Mariental",
+"264661705", "Hakasembe",
+"264637182", "Keetmanshoop",
+"264632732", "Aminuis",
+"264631714", "Deurstamp",
+"264672350", "Uib",
+"264652491", "Onathinge",
+"264645319", "Usakos",
+"264673338", "Kamanjab",
+"26467334", "Kamanjab",
+"264652452", "Haiyandja",
+"26465234", "Ongwediva",
+"264671768", "Etosha\ Rurtel",
+"26463244", "Mariental",
+"264661728", "Nyangana",
+"26467302", "Otjiwarongo",
+"264631739", "Keetmanshoop",
+"264645220", "Rössing\ Mine",
+"264625801", "Epukiro",
+"264652676", "Odibo",
+"264671746", "Horabe",
+"264621760", "Plessisplaas",
+"26466265", "Rundu",
+"26464504", "Uis",
+"26463693", "South",
+"264647027", "Walvis\ Bay",
+"264625701", "Witvlei",
+"264625813", "Blumfelde",
+"264625806", "Summerdown",
+"264652710", "Etoto",
+"26467242", "Grootfontein",
+"264645317", "Usakos",
+"264671741", "Anker",
+"264651775", "Panosa",
+"264625615", "Steinhausen",
+"264631764", "Oranjemund",
+"264652860", "Okapuku",
+"264631737", "Keetmanshoop",
+"26465220", "Oshakati",
+"264652580", "Tsandi",
+"264641715", "Omaruru",
+"264657032", "Oshakati",
+"264652464", "Oluno",
+"264641718", "Omaruru",
+"264652590", "Mahenene",
+"264672296", "Etosha\ Rurtel\/Ongava",
+"264651720", "Odibo",
+"264652520", "Okahao",
+"264631779", "Warmbad",
+"264631713", "Dawiab",
+"264657165", "Oshakati",
+"264631706", "Asab",
+"264632811", "Gaibis",
+"264652636", "Eenhana",
+"264632386", "Oranjemund",
+"264625721", "Friedental",
+"264621747", "Namib\ Grens",
+"264672492", "Grootfontein",
+"26467240", "Grootfontein",
+"264652653", "Oshikango",
+"26464511", "Arandis",
+"264652320", "Ongwediva",
+"264625618", "Summerdown",
+"264673320", "Khorixas",
+"264651778", "Sesfontein",
+"264652747", "Kaoko\ Otavi",
+"26467248", "Grootfontein",
+"2646420", "Walvis\ Bay",
+"26465222", "Oshakati",
+"264672315", "Rietfontein",
+"264641741", "Swakopmund",
+"264631763", "Oranjemund",
+"264662588", "Nyangana",
+"264631777", "Tsumispark",
+"264625410", "Otjihase",
+"264672440", "Tsumkwe",
+"26467308", "Otjiwarongo",
+"26464550", "Karibib",
+"264673051", "Waterberg\ Plateau\ Park",
+"264625393", "Rietoog",
+"264671765", "Omatjene",
+"264621755", "Omitara",
+"264632581", "Aus",
+"264625814", "Nouas",
+"264673335", "Toshari",
+"264641746", "Usakos",
+"264651742", "Onathinge",
+"264661725", "Rupara",
+"26464530", "Usakos",
+"264672291", "Etosha\ Rurtel",
+"264652755", "Sesfontein",
+"264652749", "Orumana",
+"264652463", "Oluno",
+"264637192", "Keetmanshoop",
+"264647100", "Walvis\ Bay",
+"264652629", "Ongha",
+"264632501", "Gochas",
+"264631701", "Aminuis",
+"264677029", "Grootfontein",
+"264652631", "Eenhana",
+"264662508", "Ngoma",
+"264632711", "Karasburg",
+"264651735", "Omafu",
+"264632803", "Dawiab",
+"264661708", "Katima\-Mulilo",
+"26465200", "Ombalantu",
+"26467300", "Otjiwarongo",
+"264652535", "Okalongo",
+"26463235", "Oranjemund",
+"264652481", "Onandjokwe",
+"264632381", "Oranjemund",
+"264672616", "Uchab",
+"264652522", "Okahao",
+"264671786", "Tsumeb",
+"26462523", "Rehoboth",
+"264641726", "Swakopmund",
+"264677140", "Grootfontein",
+"264651722", "Ohandungu",
+"26463248", "Mariental",
+"264625818", "Dordabis",
+"26464463", "Swakopmund",
+"264632492", "Mariental",
+"264632611", "Oamseb",
+"264625696", "Leonardville",
+"26467330", "Kamanjab",
+"264631715", "Feldschuhorn",
+"26465230", "Ongwediva",
+"26464405", "Swakopmund",
+"264652853", "Okashana",
+"264673322", "Sorris\-Sorris",
+"264671779", "Outjo",
+"264632264", "Deurstamp",
+"264652729", "Opuwo",
+"264651751", "Onesi",
+"264652655", "Oshikango",
+"264652649", "Oshikango",
+"264662504", "Kongola",
+"264661704", "Bunia",
+"26464500", "Henties\ Bay",
+"264625691", "Leonardville",
+"264652736", "Otjerunda",
+"26463345", "Mariental",
+"264641714", "Omaruru",
+"264652753", "Warmquelle",
+"264645520", "Karibib",
+"264651756", "Ongwediva",
+"264645219", "Rössing\ Mine",
+"264651740", "Omutsewonime",
+"26467697", "North",
+"264651733", "Oluno",
+"264632805", "Aroab",
+"264651774", "Otwani",
+"264625614", "Steinhausen",
+"26462692", "Central",
+"264631765", "Oranjemund",
+"26465224", "Oshakati",
+"264677151", "Grootfontein",
+"264641721", "Rössing\ Mine",
+"264637190", "Keetmanshoop",
+"264625718", "Spatzenfeld",
+"264661723", "Rundu",
+"264662593", "Bagani",
+"264673090", "Okaputa",
+"264671777", "Otjiwarongo",
+"264671763", "Okaukuejo",
+"264673333", "Biermanskool",
+"264652647", "Oshikango",
+"264662597", "Sambyu",
+"264652630", "Eenhana",
+"264661727", "Sikono",
+"26464271", "Walvis\ Bay",
+"26462501", "Okahandja",
+"264652643", "Eenhana",
+"264673337", "Kamanjab",
+"264671767", "Etosha\ Rurtel",
+"264671773", "Otjiwarongo",
+"264632380", "Oranjemund",
+"264651764", "Oshakati",
+"26463228", "Keetmanshoop",
+"264651726", "Ohangwena",
+"264672290", "Etosha\ Rurtel",
+"264652596", "Etunda",
+"264652884", "Okongo",
+"264632500", "Gochas",
+"264641722", "Rössing\ Mine",
+"264671782", "Toshari",
+"264652526", "Okahao",
+"264631775", "Stinkdoring",
+"264632580", "Aus",
+"26466256", "Rundu",
+"26463220", "Keetmanshoop",
+"264652537", "Okalongo",
+"264651737", "Ombalantu",
+"264673068", "Omatjene",
+"264673326", "Kamanjab",
+"264625692", "Leonardville",
+"264625411", "Otjihase",
+"264632300", "Oranjemund",
+"264672441", "Tsumkwe",
+"264673050", "Waterberg\ Plateau\ Park",
+"264673339", "Kamanjab",
+"264621759", "Otjozondu",
+"264651752", "Ongenga",
+"264662599", "Muhembo",
+"264632654", "Hoachanas",
+"264631738", "Keetmanshoop",
+"26464276", "Walvis\ Bay",
+"264673321", "Khorixas",
+"264652321", "Ongwediva",
+"264672450", "Mangetti\ duin",
+"26467317", "Okakarara",
+"264651714", "Haiyandja",
+"264625674", "Epukiro",
+"264652688", "Endola",
+"264647028", "Swakopmund",
+"264651739", "Omungwelume",
+"264632810", "Köes",
+"26463202", "Luderitz",
+"26463234", "Oranjemund",
+"264645213", "Rössing\ Mine",
+"264625720", "Namib\ Grens",
+"26464402", "Swakopmund",
+"264621732", "Buitepos",
+"26466251", "Katima\-Mulilo",
+"264652625", "Ondobe",
+"264652745", "Okangwati",
+"264651721", "Ogongo",
+"264652591", "Mahenene",
+"264652521", "Okahao",
+"26466385", "Namgorab",
+"264645318", "Usakos",
+"264632807", "Aroab",
+"264632382", "Luderitz",
+"264652482", "Onandjokwe",
+"264673091", "Okaputa",
+"264652632", "Eenhana",
+"264631734", "Karasburg",
+"264632712", "Karasburg",
+"264631702", "Aminuis",
+"264647165", "Walvis\ Bay",
+"264672292", "Etosha\ Rurtel\/Lindequest",
+"264632754", "Bralano",
+"26466268", "Katima\-Mulilo",
+"264637191", "Keetmanshoop",
+"264625678", "Otjinene",
+"264677150", "Grootfontein",
+"26467220", "Tsumeb",
+"264632660", "Klein\ Karas",
+"264632502", "Gochas",
+"2646520", "Oshakati",
+"264671700", "Andara",
+"264652645", "Oshigambo",
+"264652725", "Oshifo",
+"264671775", "Otjiwarongo",
+"264651741", "Onandjokwe",
+"264645539", "Karibib",
+"26463297", "Noordoewer",
+"264625733", "Nouas",
+"264631719", "Gochas",
+"264625690", "Babi\-Babi",
+"26463239", "Oranjemund",
+"264673052", "Otjiwarongo",
+"264631767", "Oranjemund",
+"26463204", "Luderitz",
+"26465242", "Ondangwa",
+"26463232", "Oranjemund",
+"26464404", "Swakopmund",
+"264645521", "Karibib",
+"264651746", "Ondangwa",
+"264641742", "Swakopmund",
+"264632809", "Ariamsvlei",
+"264662674", "Rundu",
+"264652546", "Oshikuku",
+"264652888", "Epembe",
+"26467234", "Otavi",
+"264651768", "Oshifo",
+"264632610", "Oamseb",
+"264652623", "Okatope",
+"264652743", "Kunene\ River\ Lodge",
+"264625722", "Hochland",
+"264645537", "Karibib",
+"26463683", "Keetmanshoop",
+"264672491", "Grootfontein",
+"264621730", "Babi\-Babi",
+"264632812", "Deurstamp",
+"264652657", "Oshikango",
+"264673064", "Klein\ Waterberg",
+"264621743", "Hochland",
+"264677141", "Grootfontein",
+"264662640", "Nyangana",
+"264631717", "Gibeon",
+"264657100", "Oshakati",
+"26465225", "Oshakati",
+"264631769", "Rosh\ Pinah",
+"264651766", "Oshakati",
+"264651724", "Ohangwena",
+"264672901", "Kalkfeld",
+"264625607", "Otjiwa",
+"264652886", "Ekoka",
+"264652566", "Elim",
+"26463260", "Stampriet",
+"264652524", "Okahao",
+"264662582", "Nyangana",
+"264642119", "Walvis\ Bay",
+"264667030", "Rundu",
+"264661719", "Nzinze",
+"264651748", "Ondobe",
+"264671797", "Grootfontein",
+"264662573", "Bunia",
+"264652449", "Omuthiya",
+"264652455", "Ongha",
+"264673324", "Sorris\-Sorris",
+"264641707", "Karibib",
+"264652324", "Ongwediva",
+"26464219", "Walvis\ Bay",
+"264671753", "Kombat",
+"264621763", "Rehoboth",
+"264651711", "Etanga",
+"26463243", "Mariental",
+"264652701", "Ruacana",
+"26465233", "Ongwediva",
+"264637185", "Keetmanshoop",
+"264661702", "Bagani",
+"264625687", "Epukiro",
+"26466252", "Katima\-Mulilo",
+"26466696", "North\ East",
+"26464401", "Swakopmund",
+"264672327", "Maroelaboom",
+"264631749", "Maltahohe",
+"264631755", "Mariental",
+"264632651", "Schilp",
+"26463201", "Luderitz",
+"264662502", "Mpacha\/Ngoma",
+"264652503", "Anamulenge",
+"264651716", "Kunene\ River\ Lodge",
+"264625676", "Otjinene",
+"264651703", "Edundja",
+"264632835", "Goageb",
+"264625609", "Otjiwa",
+"264641712", "Leoburn",
+"26462502", "Okahandja",
+"264652447", "Omuthiya",
+"26465290", "Eenhana",
+"264625810", "Leonardville",
+"264652801", "Ondangwa",
+"264632656", "Tsumispark",
+"264677166", "Kamanjab\/Otavi",
+"264661717", "Nkurenkuru",
+"26464272", "Walvis\ Bay",
+"264671799", "Grootfontein",
+"264625421", "Groot\–Aub",
+"264652572", "Ogongo",
+"264651761", "Opuwo",
+"264652665", "Oshikango",
+"264632403", "Mariental",
+"264651772", "Oshitayi",
+"264625612", "Otjiwa",
+"264641709", "Langstrand",
+"264672329", "Coblenz",
+"264631747", "Luderitz",
+"264673181", "Okamatapati",
+"264625689", "Babi\-Babi",
+"26464406", "Swakopmund",
+"264652863", "Onankali",
+"264651783", "Warmquelle",
+"264662580", "Nkurenkuru",
+"264671749", "Khorixas",
+"26462504", "Okahandja",
+"264632690", "Warmbad",
+"264632733", "Aminuis",
+"26467243", "Grootfontein",
+"26464274", "Walvis\ Bay",
+"264631753", "Mariental",
+"264645713", "Omaruru",
+"264672494", "Grootfontein",
+"264637183", "Keetmanshoop",
+"264625709", "Witvlei",
+"264631736", "Keetmanshoop",
+"264673061", "Otjiwarongo",
+"26463210", "Luderitz",
+"264631727", "Kalahariplaas",
+"264645316", "Usakos",
+"26463236", "Oranjemund",
+"264662575", "Nzinze",
+"264632260", "Keetmanshoop",
+"264652453", "Haiyandja",
+"264662500", "Nakayale\/Omega",
+"264647026", "Walvis\ Bay",
+"264625807", "Plessisplaas",
+"264662671", "Rundu",
+"264632901", "Rosh\ Pinah",
+"264632405", "Mariental",
+"264641710", "Langstrand",
+"264652598", "Eunda",
+"264651728", "Okalongo",
+"264671747", "Kalkfeld",
+"264652663", "Oshikango",
+"264652677", "Odibo",
+"26463251", "Gibeon",
+"264652681", "Edundja",
+"264651744", "Ondangwa",
+"26465227", "Oshakati",
+"264625812", "Blumfelde",
+"26463270", "Karasburg",
+"26465241", "Ondangwa",
+"264651705", "Eenhana",
+"264632833", "Helmeringhausen",
+"264625610", "Otjiwa",
+"264652328", "Ongwediva",
+"264673328", "Kamanjab",
+"26466254", "Katima\-Mulilo",
+"264652601", "Ohangwena",
+"264651770", "Oshikango",
+"264631729", "Kalkrand",
+"264652570", "Ogongo",
+"26467303", "Otjiwarongo",
+"264647130", "Walvis\ Bay",
+"26464221", "Walvis\ Bay",
+"264673066", "Klein\ Waterberg",
+"264631731", "Karasburg",
+"264652715", "Ruacana",
+"264625809", "Otjiwa",
+"264652634", "Eenhana",
+"264631732", "Karasburg",
+"26464572", "Omaruru",
+"264661715", "Matava",
+"264632714", "Karasburg",
+"26467223", "Tsumeb",
+"264673180", "Okamatapati",
+"264632384", "Oranjemund",
+"264652459", "Oluno",
+"264652880", "Omundaungilo",
+"264672294", "Etosha\ Rurtel\/Halali",
+"264625420", "Groot\–Aub",
+"264632752", "Bralano",
+"264651760", "Opuwo",
+"264632837", "Lorelei",
+"264631704", "Ariamsvlei",
+"264652560", "Etilyasa",
+"264652800", "Ondangwa",
+"264621738", "Gobabis",
+"264625716", "Eland",
+"264625703", "Witvlei",
+"264625811", "Leonardville",
+"264652682", "Edundja",
+"26465226", "Oshakati",
+"264631759", "Noordoewer",
+"264631745", "Luderitz",
+"264652667", "Omafu",
+"26466263", "Katima\-Mulilo",
+"264673054", "Okorusu",
+"264671743", "Biermanskool",
+"264662672", "Rundu",
+"264625803", "Epukiro",
+"264625816", "Nina",
+"264652700", "Ruacana",
+"264652457", "Oluno",
+"264632902", "Rosh\ Pinah",
+"264644650", "Swakopmund",
+"264632650", "Schilp",
+"264631723", "Hamab",
+"26463237", "Oranjemund",
+"264632523", "Asab",
+"264625605", "Otjiwa",
+"264641728", "Swakopmund",
+"264632839", "Bethanie",
+"264651710", "Endola",
+"26465221", "Oshakati",
+"264625435", "Hosea\ Kutako\ INT\ Airport",
+"264673062", "Klein\ Waterberg",
+"264657130", "Oshakati",
+"264625183", "Ombotozu",
+"264625685", "Sandveld",
+"2646441", "Swakopmund",
+"264625698", "Blumfelde",
+"264672900", "Kalkfeld",
+"26463257", "Tses",
+"264652493", "Onathinge",
+"26464512", "Arandis",
+"264641705", "Henties\ Bay",
+"26462573", "Dordabis",
+"264631743", "Lorelei",
+"264652587", "Onesi",
+"26463207", "Luderitz",
+"264632768", "Aranos",
+"26464173", "Swakopmund",
+"264641748", "Usakos",
+"264631730", "Karasburg",
+"26464407", "Swakopmund",
+"26462540", "Neudamm\/Hosea\ Kutako\ INT\ Airport",
+"264673167", "Okakarara",
+"264652675", "Omafu",
+"264632696", "Stinkdoring",
+"26462505", "Okahandja",
+"264652600", "Ohangwena",
+"264652562", "Onaanda",
+"264671784", "Tsumeb",
+"264671759", "Okakarara",
+"264671745", "Halali",
+"264621769", "Steinhausen",
+"264651771", "Oshikuku",
+"264625611", "Otjiwa",
+"264662586", "Mashare",
+"264651762", "Orumana",
+"264632750", "Kalahariplaas",
+"264652571", "Ogongo",
+"264672584", "Andara",
+"264652882", "Oshuli",
+"264641724", "Swakopmund",
+"264632407", "Mariental",
+"26464275", "Walvis\ Bay",
+"264652717", "Ruacana",
+"264662506", "Ngoma",
+"264662579", "Kahenge",
+"26462563", "Gobabis",
+"264627025", "Hosea\ Kutako\ INT\ Airport",
+"264661713", "Marangi",
+"264661706", "K\.\ Murangi",
+"264625694", "Leonardville",
+"264652507", "Ombalantu",
+"264637034", "Keetmanshoop",
+"26463223", "Keetmanshoop",
+"264672359", "Otavi",
+"264641711", "Langstrand",
+"26467312", "Outjo",
+"264651707", "Ehomba",
+"264632261", "Keetmanshoop",
+"264651754", "Ongha",
+"264632718", "Karasburg",
+"264625683", "Plessisplaas",
+"264662501", "Nakayale",
+"264652702", "Ruacana",
+"264657145", "Oshakati",
+"264661701", "Bagani",
+"264662670", "Rundu",
+"264672982", "Tsumeb",
+"264652589", "Onesi",
+"264672323", "Horabe",
+"264652488", "Onathinge",
+"264632900", "Rosh\ Pinah",
+"264641703", "Henties\ Bay",
+"264672298", "Etosha\ Rurtel\/Okaukuejo",
+"264641716", "Omaruru",
+"264651712", "Etunda",
+"264632409", "Mariental",
+"264625672", "Epukiro",
+"264673169", "Okakarara",
+"264671757", "Etosha\ Rurtel",
+"264621767", "Seeis",
+"264671793", "Waterberg\ Plateau\ Park",
+"26466381", "Maltahohe",
+"264621734", "Drimiopsis",
+"264652719", "Ruacana",
+"264625805", "Drimiopsis",
+"264673060", "Otjiwarongo",
+"264662577", "Muveke",
+"264651776", "Ruacana",
+"264625603", "Omitara",
+"264625616", "Summerdown",
+"264662581", "Nkurenkuru",
+"26466255", "Rundu",
+"264651709", "Elim",
+"264632691", "Warmbad",
+"264652509", "Ombalantu",
+"264632308", "Oranjemund",
+"264631725", "Hoachanas",
+"264672902", "Kalkfeld",
+"264672357", "Otavi",
+"26465251", "Ombalantu",
+"264641723", "Swakopmund",
+"264673329", "Kamanjab",
+"264672583", "Andara",
+"264652329", "Ongwediva",
+"26462525", "Rehoboth",
+"264631728", "Kalkrand",
+"264671783", "Tsumeb",
+"264673055", "Okorusu",
+"264673331", "Kamanjab",
+"264621751", "Okahandja",
+"26463227", "Keetmanshoop",
+"264662591", "Bagani",
+"264631744", "Luderitz",
+"264661721", "Rundu",
+"264625808", "Otjinene",
+"264672316", "Rietfontein",
+"264652642", "Eenhana",
+"26463203", "Luderitz",
+"264632505", "Seeheim",
+"264672295", "Etosha\ Rurtel\/Ombika",
+"264652751", "Otjondeka",
+"264651729", "Okangwati",
+"264652856", "Onyaanya",
+"264631770", "Rosh\ Pinah",
+"26464403", "Swakopmund",
+"264647162", "Swakopmund",
+"26467331", "Kamanjab\/Khorixas",
+"26463626", "Helmeringhausen",
+"26463241", "Mariental",
+"26465231", "Ongwediva",
+"264625693", "Leonardville",
+"264651731", "Okorosave",
+"264661714", "Mashare",
+"264652635", "Eenhana",
+"26464501", "Henties\ Bay",
+"264632385", "Oranjemund",
+"264652531", "Okahao",
+"264652740", "Ehomba",
+"264632942", "Kumakams",
+"264652620", "Onuno",
+"264652690", "Omungwelume",
+"264673327", "Kamanjab",
+"26462549", "Hochfeld",
+"264652327", "Ongwediva",
+"264641704", "Henties\ Bay",
+"264625434", "Hosea\ Kutako\ INT\ Airport",
+"264651736", "Ombalantu",
+"264652536", "Okalongo",
+"264625684", "Sandveld",
+"264651753", "Ongha",
+"264672615", "Uchab",
+"26463246", "Mariental",
+"264671748", "Kamanjab",
+"264651727", "Okahao",
+"264672455", "Gam",
+"264625604", "Buitepos",
+"264652892", "Omuntele",
+"264671766", "Etosha\ Rurtel",
+"264621756", "Otjihase",
+"264621740", "Gobabis",
+"264673336", "Kamanjab",
+"264672311", "Kombat",
+"264662596", "Sambyu",
+"264645212", "Rössing\ Mine",
+"264652822", "Ondangwa",
+"264661726", "Ruuga",
+"264671794", "Epupa",
+"264631703", "Aranos",
+"264625695", "Leonardville",
+"264637035", "Luderitz",
+"264652461", "Oluno",
+"264641708", "Karibib",
+"264672293", "Etosha\ Rurtel\/Namutoni",
+"264652483", "Onandjokwe",
+"264671770", "Otavi",
+"264652720", "Oshifo",
+"264632383", "Luderitz",
+"26467241", "Grootfontein",
+"264652640", "Eenhana",
+"264632801", "Ariamsvlei",
+"264625688", "Epukiro",
+"264652633", "Eenhana",
+"264627024", "Hosea\ Kutako\ INT\ Airport",
+"264671785", "Tsumeb",
+"264625391", "Klein\ Aub",
+"264673053", "Otjiwarongo",
+"264631772", "Seeheim",
+"26464510", "Arandis",
+"264641725", "Swakopmund",
+"264625608", "Otjiwa",
+"264652547", "Oshikuku",
+"264625704", "Witvlei",
+"264671798", "Grootfontein",
+"264632583", "Guibis",
+"264651747", "Ondangwa",
+"264652692", "Omungwelume",
+"264632524", "Bulwana",
+"26464551", "Otjimbingwe",
+"264652742", "Panosa",
+"264631724", "Helmeringhausen",
+"264631766", "Oranjemund",
+"264652622", "Okatope",
+"264641743", "Tsaobis",
+"264621735", "Eland",
+"26464570", "Omaruru",
+"264631748", "Luderitz",
+"26462577", "Gobabis",
+"264625804", "Eland",
+"264631711", "Bralano",
+"264652494", "Onathinge",
+"264642118", "Walvis\ Bay",
+"264661718", "Nakayale\/Nkurenkuru",
+"26467301", "Otjiwarongo",
+"264652651", "Oshikango",
+"264625184", "Ombotozu",
+"264651749", "Onuno",
+"264625723", "Many\ Hills",
+"264652890", "Okankolo",
+"264652448", "Omuthiya",
+"264632806", "Aroab",
+"26463233", "Oranjemund",
+"26465243", "Ondangwa",
+"26464464", "Swakopmund",
+"264621741", "Groot\–Aub",
+"264632589", "Aus",
+"264672617", "Uchab",
+"264637184", "Keetmanshoop",
+"26464694", "Central",
+"26463264", "Kalkrand",
+"264672310", "Kombat",
+"264652652", "Oshikango",
+"264652718", "Ruacana",
+"264672493", "Grootfontein",
+"26463272", "Aranos",
+"264645714", "Omaruru",
+"264631754", "Mariental",
+"264673325", "Sorris\-Sorris",
+"26462524", "Rehoboth",
+"264652325", "Ongwediva",
+"264651708", "Elim",
+"26467221", "Tsumeb",
+"264632309", "Oranjemund",
+"264652508", "Ombalantu",
+"264631712", "Bulwana",
+"26466261", "Katima\-Mulilo",
+"264641747", "Usakos",
+"264632719", "Karasburg",
+"264632389", "Luderitz\ \-\ Elizabeth\ Bay",
+"264652489", "Onathinge",
+"264652454", "Ongha",
+"264652588", "Onesi",
+"264652850", "Omutsewonime",
+"264651725", "Ohangwena",
+"264652741", "Sodalite",
+"264672299", "Mokuti",
+"264652595", "Etunda",
+"264632408", "Mariental",
+"264652621", "Onuno",
+"264652691", "Omungwelume",
+"264631709", "Bethanie",
+"264673168", "Okakarara",
+"264652525", "Okahao",
+"26461", "Windhoek",
+"264631776", "Tses",
+"264662627", "Katima\-Mulilo",
+"264651730", "Okatope",
+"264662578", "Marangi",
+"264651743", "Ondangwa",
+"26467307", "Otjiwarongo",
+"264632307", "Oranjemund",
+"264652664", "Oshikango",
+"264672358", "Otavi",
+"264652746", "Ohandungu",
+"264652750", "Otwani",
+"264631762", "Oamseb",
+"264625392", "Rietoog",
+"264631771", "Schilp",
+"264625731", "Nina",
+"264673330", "Anker",
+"264621746", "Many\ Hills",
+"264632387", "Oranjemund",
+"264621750", "Okahandja",
+"264671760", "Okakarara",
+"264661720", "Omega",
+"264662590", "Bagani",
+"264632769", "Aranos",
+"26466266", "Rundu",
+"264641749", "Usakos",
+"264652462", "Oluno",
+"264621768", "Spatzenfeld",
+"264672297", "Etosha\ Rurtel",
+"26465223", "Oshakati",
+"264632507", "Narubis",
+"264652650", "Oshikango",
+"26462500", "Okahandja",
+"264672312", "Kombat",
+"264652646", "Oshikango",
+"264652764", "Otjitjekwa",
+"264671776", "Otjiwarongo",
+"264662574", "Matava",
+"26465695", "North",
+"26464270", "Walvis\ Bay",
+"264621737", "Friedental",
+"264631710", "Bethanie",
+"26463247", "Mariental",
+"264652523", "Okahao",
+"264651723", "Ohangwena",
+"264637130", "Keetmanshoop",
+"264651757", "Ongwediva",
+"26463221", "Keetmanshoop",
+"264671789", "Uchab",
+"264671754", "Lindequest",
+"264673323", "Sorris\-Sorris",
+"264677145", "Grootfontein",
+"264641729", "Swakopmund",
+"26462522", "Rehoboth",
+"264652532", "Okahao",
+"264621739", "Gobabis",
+"264652714", "Ruacana",
+"264651732", "Oluno",
+"26464462", "Swakopmund",
+"264625390", "Klein\ Aub",
+"264651704", "Edundja",
+"264652504", "Anamulenge",
+"26463262", "Grunau",
+"264625697", "Blumfelde",
+"264632950", "Namgorab",
+"26464176", "Walvis\ Bay",
+"264652752", "Ombombo",
+"264631760", "Noordoewer",
+"264645508", "Tsaobis\/Karibib",
+"26463274", "Rosh\ Pinah",
+"264647172", "Swakopmund",
+"264652721", "Oshifo",
+"264671771", "Otavi",
+"264651759", "Ondundu",
+"264651745", "Ondangwa",
+"264662592", "Bagani",
+"264661722", "Rundu",
+"264652641", "Eenhana",
+"264673332", "Biermanskool",
+"264632800", "Ariamsvlei",
+"264652545", "Oshikuku",
+"264671762", "Okaputa",
+"264652896", "Onyuulaye",
+"264621752", "Okahandja",
+"264652458", "Oluno",
+"26464210", "Walvis\ Bay",
+"264632404", "Mariental",
+"264641727", "Swakopmund",
+"26462566", "Gobabis",
+"264671787", "Tsumeb",
+"264652460", "Oluno",};
 
     sub new {
       my $class = shift;

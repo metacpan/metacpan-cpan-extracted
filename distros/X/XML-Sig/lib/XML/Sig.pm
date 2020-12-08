@@ -7,7 +7,7 @@ use warnings;
 use vars qw($VERSION @EXPORT_OK %EXPORT_TAGS $DEBUG);
 
 $DEBUG = 0;
-$VERSION = '0.32';
+$VERSION = '0.33';
 
 use base qw(Class::Accessor);
 XML::Sig->mk_accessors(qw(key));
@@ -172,6 +172,9 @@ sub verify {
 
     my $signature_nodeset = $self->{ parser }->findnodes('//dsig:Signature');
 
+    my $numsigs = $signature_nodeset->size();
+    print ("NodeSet Size: $numsigs\n") if $DEBUG;
+
     # Loop through each Signature in the document checking each
     my $i;
     while (my $signature_node = $signature_nodeset->shift()) {
@@ -194,7 +197,12 @@ sub verify {
         # won't accidentally validate
         if (! $self->{ parser }->findvalue('//*[@ID=\''. $reference . '\']')) {
             print ("   Signature reference $reference is not signing anything in this xml\n") if $DEBUG;
-            next;
+            if ($numsigs <= 1) {
+                return 0;
+            }
+            else {
+                next;
+            }
         }
 
         # Get SignedInfo DigestMethod Algorithim
@@ -289,6 +297,8 @@ sub verify {
 
         # Obtain the Canonical form of the XML
         my $canonical = $self->_transform($signed_xml, $signature_node);
+
+        $signed_xml->addChild( $signature_node );
 
         # Obtain the DigestValue of the Canonical XML
         my $digest = $self->{digest_method}->($canonical);
@@ -461,7 +471,6 @@ sub _verify_dsa {
 
     eval {
         require Crypt::OpenSSL::DSA;
-        require Crypt::OpenSSL::DSA::Signature;
     };
 
     # Generate Public Key from XML
@@ -822,7 +831,7 @@ XML::Sig
 
 =head1 VERSION
 
-version 0.32
+version 0.33
 
 =head1 SYNOPSIS
 
@@ -959,8 +968,6 @@ Now, let's insert a signature:
 =item L<Crypt::OpenSSL::RSA>
 
 =item L<Crypt::OpenSSL::DSA>
-
-=item L<Crypt::OpenSSL::DSA::Signature>
 
 =item L<Crypt::OpenSSL::X509>
 

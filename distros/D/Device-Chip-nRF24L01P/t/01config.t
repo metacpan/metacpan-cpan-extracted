@@ -1,10 +1,12 @@
 #!/usr/bin/perl
 
-use strict;
+use v5.26;
 use warnings;
 
 use Test::More;
 use Test::Device::Chip::Adapter;
+
+use Future::AsyncAwait;
 
 use Device::Chip::nRF24L01P;
 
@@ -13,7 +15,7 @@ my $adapter = Test::Device::Chip::Adapter->new;
 
 $adapter->expect_write_gpios( { CE => 0 } );
 
-$chip->mount( $adapter )->get;
+await $chip->mount( $adapter );
 
 # ->read_config
 {
@@ -32,7 +34,7 @@ $chip->mount( $adapter )->get;
    # FEATURE - EN_DPL=0, EN_ACK_PAY=0, EN_DYN_ACK=0
    $adapter->expect_readwrite( "\x1D\x00" )->returns( "\x0E\x00" );
 
-   is_deeply( $chip->read_config->get,
+   is_deeply( await $chip->read_config,
       {
          ARC         => 3,
          ARD         => 250,
@@ -80,9 +82,9 @@ $chip->mount( $adapter )->get;
    # RF_CH
    $adapter->expect_readwrite( "\x25\x0F" )->returns( "\x0E\x00" );
 
-   $chip->change_config(
+   await $chip->change_config(
       RF_CH => 15,
-   )->get;
+   );
 
    $adapter->check_and_clear( '$chip->change_config' );
 }
@@ -100,7 +102,7 @@ $chip->mount( $adapter )->get;
    # RX_ADDR_P0
    $adapter->expect_readwrite( "\x0A" . "\x00"x5 )->returns( "\x0E" . "\xC2"x5 );
 
-   is_deeply( $chip->read_rx_config( 0 )->get,
+   is_deeply( await $chip->read_rx_config( 0 ),
       {
          DYNPD     => !!0,
          EN_AA     => 1,
@@ -120,9 +122,9 @@ $chip->mount( $adapter )->get;
 
    $adapter->expect_readwrite( "\x31\x04" )->returns( "\x0E\x00" );
 
-   $chip->change_rx_config( 0,
+   await $chip->change_rx_config( 0,
       RX_PW => 4,
-   )->get;
+   );
 
    $adapter->check_and_clear( '$chip->change_rx_config' );
 }

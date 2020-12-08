@@ -1,13 +1,11 @@
-#!/usr/bin/perl -w
-
 use strict;
+use warnings;
 
 use lib 't/inc';
-use fatalwarnings;
+use nptestutils;
 
 use Test::More;
-
-END { done_testing(); }
+plan skip_all => 'not relevant if building --without_uk' if(building_without_uk());
 
 use Number::Phone;
 
@@ -19,3 +17,5 @@ is($phone->format(), "+44 20 8771 2924", "and it's got the right data");
 
 eval { Number::Phone->new(44, '02087712924', 'apples!') };
 ok($@ =~ /too many params/, "dies OK on too many params");
+
+done_testing();

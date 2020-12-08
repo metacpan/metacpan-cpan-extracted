@@ -25,11 +25,11 @@ DBI 1.643
 
 Text::CSV_XS 1.44
 
-SQL::Statement 1.412
+SQL::Statement 1.414
 
 DBD::File 0.44
 
-DBD::CSV 0.55
+DBD::CSV 0.56
 
 =head1 DESCRIPTION
 

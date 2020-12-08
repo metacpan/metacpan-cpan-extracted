@@ -12,7 +12,7 @@ plan skip_all =>
   "Net::SNMP::Mixin required for testing Net::SNMP::Mixin module"
   if $@;
 
-plan tests => 14;
+plan tests => 17;
 #plan 'no_plan';
 
 my ( $session, $error ) =
@@ -23,6 +23,18 @@ isa_ok( $session, 'Net::SNMP' );
 
 eval { $session->mixer("Net::SNMP::Mixin::Dot1qVlanStatic") };
 is( $@, '', 'Net::SNMP::Mixin::Dot1qVlanStatic mixed in successful' );
+ok(
+  $session->can('map_vlan_id2name'),
+  '$session can map_vlan_id2name'
+);
+ok(
+  $session->can('map_if_idx2vlan_id'),
+  '$session can map_if_idx2vlan_id'
+);
+ok(
+  $session->can('map_vlan_id2if_idx'),
+  '$session can map_vlan_id2if_idx'
+);
 ok(
   $session->can('map_vlan_static_ids2names'),
   '$session can map_vlan_static_ids2names'

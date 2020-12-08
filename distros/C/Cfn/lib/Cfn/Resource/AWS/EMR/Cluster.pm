@@ -1,4 +1,4 @@
-# AWS::EMR::Cluster generated from spec 5.3.0
+# AWS::EMR::Cluster generated from spec 20.1.0
 use Moose::Util::TypeConstraints;
 
 coerce 'Cfn::Resource::Properties::AWS::EMR::Cluster',
@@ -14,7 +14,7 @@ package Cfn::Resource::AWS::EMR::Cluster {
     [ 'MasterPublicDNS' ]
   }
   sub supported_regions {
-    [ 'ap-east-1','ap-northeast-1','ap-northeast-2','ap-northeast-3','ap-south-1','ap-southeast-1','ap-southeast-2','ca-central-1','cn-north-1','cn-northwest-1','eu-central-1','eu-north-1','eu-west-1','eu-west-2','eu-west-3','me-south-1','sa-east-1','us-east-1','us-east-2','us-gov-east-1','us-gov-west-1','us-west-1','us-west-2' ]
+    [ 'af-south-1','ap-east-1','ap-northeast-1','ap-northeast-2','ap-northeast-3','ap-south-1','ap-southeast-1','ap-southeast-2','ca-central-1','cn-north-1','cn-northwest-1','eu-central-1','eu-north-1','eu-south-1','eu-west-1','eu-west-2','eu-west-3','me-south-1','sa-east-1','us-east-1','us-east-2','us-gov-east-1','us-gov-west-1','us-west-1','us-west-2' ]
   }
 }
 
@@ -51,11 +51,11 @@ coerce 'Cfn::Resource::Properties::AWS::EMR::Cluster::MetricDimension',
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::EMR::Cluster::MetricDimensionValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::EMR::Cluster::MetricDimension->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::EMR::Cluster::MetricDimensionValue {
+package Cfn::Resource::Properties::Object::AWS::EMR::Cluster::MetricDimension {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -73,11 +73,11 @@ coerce 'Cfn::Resource::Properties::AWS::EMR::Cluster::VolumeSpecification',
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::EMR::Cluster::VolumeSpecificationValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::EMR::Cluster::VolumeSpecification->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::EMR::Cluster::VolumeSpecificationValue {
+package Cfn::Resource::Properties::Object::AWS::EMR::Cluster::VolumeSpecification {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -96,11 +96,11 @@ coerce 'Cfn::Resource::Properties::AWS::EMR::Cluster::SimpleScalingPolicyConfigu
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::EMR::Cluster::SimpleScalingPolicyConfigurationValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::EMR::Cluster::SimpleScalingPolicyConfiguration->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::EMR::Cluster::SimpleScalingPolicyConfigurationValue {
+package Cfn::Resource::Properties::Object::AWS::EMR::Cluster::SimpleScalingPolicyConfiguration {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -119,11 +119,11 @@ coerce 'Cfn::Resource::Properties::AWS::EMR::Cluster::CloudWatchAlarmDefinition'
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::EMR::Cluster::CloudWatchAlarmDefinitionValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::EMR::Cluster::CloudWatchAlarmDefinition->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::EMR::Cluster::CloudWatchAlarmDefinitionValue {
+package Cfn::Resource::Properties::Object::AWS::EMR::Cluster::CloudWatchAlarmDefinition {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -148,11 +148,11 @@ coerce 'Cfn::Resource::Properties::AWS::EMR::Cluster::ScalingTrigger',
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::EMR::Cluster::ScalingTriggerValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::EMR::Cluster::ScalingTrigger->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::EMR::Cluster::ScalingTriggerValue {
+package Cfn::Resource::Properties::Object::AWS::EMR::Cluster::ScalingTrigger {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -169,11 +169,11 @@ coerce 'Cfn::Resource::Properties::AWS::EMR::Cluster::ScalingAction',
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::EMR::Cluster::ScalingActionValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::EMR::Cluster::ScalingAction->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::EMR::Cluster::ScalingActionValue {
+package Cfn::Resource::Properties::Object::AWS::EMR::Cluster::ScalingAction {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -213,11 +213,11 @@ coerce 'Cfn::Resource::Properties::AWS::EMR::Cluster::EbsBlockDeviceConfig',
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::EMR::Cluster::EbsBlockDeviceConfigValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::EMR::Cluster::EbsBlockDeviceConfig->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::EMR::Cluster::EbsBlockDeviceConfigValue {
+package Cfn::Resource::Properties::Object::AWS::EMR::Cluster::EbsBlockDeviceConfig {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -235,15 +235,16 @@ coerce 'Cfn::Resource::Properties::AWS::EMR::Cluster::SpotProvisioningSpecificat
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::EMR::Cluster::SpotProvisioningSpecificationValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::EMR::Cluster::SpotProvisioningSpecification->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::EMR::Cluster::SpotProvisioningSpecificationValue {
+package Cfn::Resource::Properties::Object::AWS::EMR::Cluster::SpotProvisioningSpecification {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
   
+  has AllocationStrategy => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has BlockDurationMinutes => (isa => 'Cfn::Value::Integer', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has TimeoutAction => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has TimeoutDurationMinutes => (isa => 'Cfn::Value::Integer', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
@@ -280,11 +281,11 @@ coerce 'Cfn::Resource::Properties::AWS::EMR::Cluster::ScalingRule',
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::EMR::Cluster::ScalingRuleValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::EMR::Cluster::ScalingRule->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::EMR::Cluster::ScalingRuleValue {
+package Cfn::Resource::Properties::Object::AWS::EMR::Cluster::ScalingRule {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -304,17 +305,38 @@ coerce 'Cfn::Resource::Properties::AWS::EMR::Cluster::ScalingConstraints',
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::EMR::Cluster::ScalingConstraintsValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::EMR::Cluster::ScalingConstraints->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::EMR::Cluster::ScalingConstraintsValue {
+package Cfn::Resource::Properties::Object::AWS::EMR::Cluster::ScalingConstraints {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
   
   has MaxCapacity => (isa => 'Cfn::Value::Integer', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has MinCapacity => (isa => 'Cfn::Value::Integer', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+}
+
+subtype 'Cfn::Resource::Properties::AWS::EMR::Cluster::OnDemandProvisioningSpecification',
+     as 'Cfn::Value';
+
+coerce 'Cfn::Resource::Properties::AWS::EMR::Cluster::OnDemandProvisioningSpecification',
+  from 'HashRef',
+   via {
+     if (my $f = Cfn::TypeLibrary::try_function($_)) {
+       return $f
+     } else {
+       return Cfn::Resource::Properties::Object::AWS::EMR::Cluster::OnDemandProvisioningSpecification->new( %$_ );
+     }
+   };
+
+package Cfn::Resource::Properties::Object::AWS::EMR::Cluster::OnDemandProvisioningSpecification {
+  use Moose;
+  use MooseX::StrictConstructor;
+  extends 'Cfn::Value::TypedValue';
+  
+  has AllocationStrategy => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
 }
 
 subtype 'Cfn::Resource::Properties::AWS::EMR::Cluster::EbsConfiguration',
@@ -326,11 +348,11 @@ coerce 'Cfn::Resource::Properties::AWS::EMR::Cluster::EbsConfiguration',
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::EMR::Cluster::EbsConfigurationValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::EMR::Cluster::EbsConfiguration->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::EMR::Cluster::EbsConfigurationValue {
+package Cfn::Resource::Properties::Object::AWS::EMR::Cluster::EbsConfiguration {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -370,11 +392,11 @@ coerce 'Cfn::Resource::Properties::AWS::EMR::Cluster::Configuration',
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::EMR::Cluster::ConfigurationValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::EMR::Cluster::Configuration->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::EMR::Cluster::ConfigurationValue {
+package Cfn::Resource::Properties::Object::AWS::EMR::Cluster::Configuration {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -415,11 +437,11 @@ coerce 'Cfn::Resource::Properties::AWS::EMR::Cluster::KeyValue',
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::EMR::Cluster::KeyValueValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::EMR::Cluster::KeyValue->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::EMR::Cluster::KeyValueValue {
+package Cfn::Resource::Properties::Object::AWS::EMR::Cluster::KeyValue {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -459,11 +481,11 @@ coerce 'Cfn::Resource::Properties::AWS::EMR::Cluster::InstanceTypeConfig',
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::EMR::Cluster::InstanceTypeConfigValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::EMR::Cluster::InstanceTypeConfig->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::EMR::Cluster::InstanceTypeConfigValue {
+package Cfn::Resource::Properties::Object::AWS::EMR::Cluster::InstanceTypeConfig {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -485,16 +507,17 @@ coerce 'Cfn::Resource::Properties::AWS::EMR::Cluster::InstanceFleetProvisioningS
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::EMR::Cluster::InstanceFleetProvisioningSpecificationsValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::EMR::Cluster::InstanceFleetProvisioningSpecifications->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::EMR::Cluster::InstanceFleetProvisioningSpecificationsValue {
+package Cfn::Resource::Properties::Object::AWS::EMR::Cluster::InstanceFleetProvisioningSpecifications {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
   
-  has SpotSpecification => (isa => 'Cfn::Resource::Properties::AWS::EMR::Cluster::SpotProvisioningSpecification', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has OnDemandSpecification => (isa => 'Cfn::Resource::Properties::AWS::EMR::Cluster::OnDemandProvisioningSpecification', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has SpotSpecification => (isa => 'Cfn::Resource::Properties::AWS::EMR::Cluster::SpotProvisioningSpecification', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
 }
 
 subtype 'Cfn::Resource::Properties::AWS::EMR::Cluster::AutoScalingPolicy',
@@ -506,11 +529,11 @@ coerce 'Cfn::Resource::Properties::AWS::EMR::Cluster::AutoScalingPolicy',
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::EMR::Cluster::AutoScalingPolicyValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::EMR::Cluster::AutoScalingPolicy->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::EMR::Cluster::AutoScalingPolicyValue {
+package Cfn::Resource::Properties::Object::AWS::EMR::Cluster::AutoScalingPolicy {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -528,11 +551,11 @@ coerce 'Cfn::Resource::Properties::AWS::EMR::Cluster::ScriptBootstrapActionConfi
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::EMR::Cluster::ScriptBootstrapActionConfigValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::EMR::Cluster::ScriptBootstrapActionConfig->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::EMR::Cluster::ScriptBootstrapActionConfigValue {
+package Cfn::Resource::Properties::Object::AWS::EMR::Cluster::ScriptBootstrapActionConfig {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -550,11 +573,11 @@ coerce 'Cfn::Resource::Properties::AWS::EMR::Cluster::PlacementType',
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::EMR::Cluster::PlacementTypeValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::EMR::Cluster::PlacementType->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::EMR::Cluster::PlacementTypeValue {
+package Cfn::Resource::Properties::Object::AWS::EMR::Cluster::PlacementType {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -571,11 +594,11 @@ coerce 'Cfn::Resource::Properties::AWS::EMR::Cluster::InstanceGroupConfig',
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::EMR::Cluster::InstanceGroupConfigValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::EMR::Cluster::InstanceGroupConfig->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::EMR::Cluster::InstanceGroupConfigValue {
+package Cfn::Resource::Properties::Object::AWS::EMR::Cluster::InstanceGroupConfig {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -599,11 +622,11 @@ coerce 'Cfn::Resource::Properties::AWS::EMR::Cluster::InstanceFleetConfig',
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::EMR::Cluster::InstanceFleetConfigValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::EMR::Cluster::InstanceFleetConfig->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::EMR::Cluster::InstanceFleetConfigValue {
+package Cfn::Resource::Properties::Object::AWS::EMR::Cluster::InstanceFleetConfig {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -624,11 +647,11 @@ coerce 'Cfn::Resource::Properties::AWS::EMR::Cluster::HadoopJarStepConfig',
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::EMR::Cluster::HadoopJarStepConfigValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::EMR::Cluster::HadoopJarStepConfig->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::EMR::Cluster::HadoopJarStepConfigValue {
+package Cfn::Resource::Properties::Object::AWS::EMR::Cluster::HadoopJarStepConfig {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -637,6 +660,31 @@ package Cfn::Resource::Properties::AWS::EMR::Cluster::HadoopJarStepConfigValue {
   has Jar => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has MainClass => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has StepProperties => (isa => 'ArrayOfCfn::Resource::Properties::AWS::EMR::Cluster::KeyValue', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+}
+
+subtype 'Cfn::Resource::Properties::AWS::EMR::Cluster::ComputeLimits',
+     as 'Cfn::Value';
+
+coerce 'Cfn::Resource::Properties::AWS::EMR::Cluster::ComputeLimits',
+  from 'HashRef',
+   via {
+     if (my $f = Cfn::TypeLibrary::try_function($_)) {
+       return $f
+     } else {
+       return Cfn::Resource::Properties::Object::AWS::EMR::Cluster::ComputeLimits->new( %$_ );
+     }
+   };
+
+package Cfn::Resource::Properties::Object::AWS::EMR::Cluster::ComputeLimits {
+  use Moose;
+  use MooseX::StrictConstructor;
+  extends 'Cfn::Value::TypedValue';
+  
+  has MaximumCapacityUnits => (isa => 'Cfn::Value::Integer', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has MaximumCoreCapacityUnits => (isa => 'Cfn::Value::Integer', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has MaximumOnDemandCapacityUnits => (isa => 'Cfn::Value::Integer', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has MinimumCapacityUnits => (isa => 'Cfn::Value::Integer', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has UnitType => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
 }
 subtype 'ArrayOfCfn::Resource::Properties::AWS::EMR::Cluster::StepConfig',
      as 'Cfn::Value',
@@ -670,11 +718,11 @@ coerce 'Cfn::Resource::Properties::AWS::EMR::Cluster::StepConfig',
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::EMR::Cluster::StepConfigValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::EMR::Cluster::StepConfig->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::EMR::Cluster::StepConfigValue {
+package Cfn::Resource::Properties::Object::AWS::EMR::Cluster::StepConfig {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -682,6 +730,27 @@ package Cfn::Resource::Properties::AWS::EMR::Cluster::StepConfigValue {
   has ActionOnFailure => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has HadoopJarStep => (isa => 'Cfn::Resource::Properties::AWS::EMR::Cluster::HadoopJarStepConfig', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has Name => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+}
+
+subtype 'Cfn::Resource::Properties::AWS::EMR::Cluster::ManagedScalingPolicy',
+     as 'Cfn::Value';
+
+coerce 'Cfn::Resource::Properties::AWS::EMR::Cluster::ManagedScalingPolicy',
+  from 'HashRef',
+   via {
+     if (my $f = Cfn::TypeLibrary::try_function($_)) {
+       return $f
+     } else {
+       return Cfn::Resource::Properties::Object::AWS::EMR::Cluster::ManagedScalingPolicy->new( %$_ );
+     }
+   };
+
+package Cfn::Resource::Properties::Object::AWS::EMR::Cluster::ManagedScalingPolicy {
+  use Moose;
+  use MooseX::StrictConstructor;
+  extends 'Cfn::Value::TypedValue';
+  
+  has ComputeLimits => (isa => 'Cfn::Resource::Properties::AWS::EMR::Cluster::ComputeLimits', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
 }
 
 subtype 'Cfn::Resource::Properties::AWS::EMR::Cluster::KerberosAttributes',
@@ -693,11 +762,11 @@ coerce 'Cfn::Resource::Properties::AWS::EMR::Cluster::KerberosAttributes',
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::EMR::Cluster::KerberosAttributesValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::EMR::Cluster::KerberosAttributes->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::EMR::Cluster::KerberosAttributesValue {
+package Cfn::Resource::Properties::Object::AWS::EMR::Cluster::KerberosAttributes {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -718,11 +787,11 @@ coerce 'Cfn::Resource::Properties::AWS::EMR::Cluster::JobFlowInstancesConfig',
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::EMR::Cluster::JobFlowInstancesConfigValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::EMR::Cluster::JobFlowInstancesConfig->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::EMR::Cluster::JobFlowInstancesConfigValue {
+package Cfn::Resource::Properties::Object::AWS::EMR::Cluster::JobFlowInstancesConfig {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -776,11 +845,11 @@ coerce 'Cfn::Resource::Properties::AWS::EMR::Cluster::BootstrapActionConfig',
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::EMR::Cluster::BootstrapActionConfigValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::EMR::Cluster::BootstrapActionConfig->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::EMR::Cluster::BootstrapActionConfigValue {
+package Cfn::Resource::Properties::Object::AWS::EMR::Cluster::BootstrapActionConfig {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -820,11 +889,11 @@ coerce 'Cfn::Resource::Properties::AWS::EMR::Cluster::Application',
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::EMR::Cluster::ApplicationValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::EMR::Cluster::Application->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::EMR::Cluster::ApplicationValue {
+package Cfn::Resource::Properties::Object::AWS::EMR::Cluster::Application {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -850,15 +919,45 @@ package Cfn::Resource::Properties::AWS::EMR::Cluster {
   has Instances => (isa => 'Cfn::Resource::Properties::AWS::EMR::Cluster::JobFlowInstancesConfig', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Conditional');
   has JobFlowRole => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
   has KerberosAttributes => (isa => 'Cfn::Resource::Properties::AWS::EMR::Cluster::KerberosAttributes', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
+  has LogEncryptionKmsKeyId => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
   has LogUri => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
+  has ManagedScalingPolicy => (isa => 'Cfn::Resource::Properties::AWS::EMR::Cluster::ManagedScalingPolicy', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has Name => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
   has ReleaseLabel => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
   has ScaleDownBehavior => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
   has SecurityConfiguration => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
   has ServiceRole => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
+  has StepConcurrencyLevel => (isa => 'Cfn::Value::Integer', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has Steps => (isa => 'ArrayOfCfn::Resource::Properties::AWS::EMR::Cluster::StepConfig', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
   has Tags => (isa => 'ArrayOfCfn::Resource::Properties::TagType', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has VisibleToAllUsers => (isa => 'Cfn::Value::Boolean', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
 }
 
 1;
+### main pod documentation begin ###
+
+=encoding UTF-8
+
+=head1 NAME
+
+Cfn::Resource::AWS::EMR::Cluster - Cfn resource for AWS::EMR::Cluster
+
+=head1 DESCRIPTION
+
+This module implements a Perl module that represents the CloudFormation object AWS::EMR::Cluster.
+
+See L<Cfn> for more information on how to use it.
+
+=head1 AUTHOR
+
+    Jose Luis Martinez
+    CAPSiDE
+    jlmartinez@capside.com
+
+=head1 COPYRIGHT and LICENSE
+
+Copyright (c) 2013 by CAPSiDE
+This code is distributed under the Apache 2 License. The full text of the 
+license can be found in the LICENSE file included with this module.
+
+=cut

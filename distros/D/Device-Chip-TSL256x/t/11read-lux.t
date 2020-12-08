@@ -1,10 +1,12 @@
 #!/usr/bin/perl
 
-use strict;
+use v5.26;
 use warnings;
 
 use Test::More;
 use Test::Device::Chip::Adapter;
+
+use Future::AsyncAwait;
 
 use Device::Chip::TSL256x;
 
@@ -19,9 +21,9 @@ sub is_approx
 
 my $chip = Device::Chip::TSL256x->new;
 
-$chip->mount(
+await $chip->mount(
    my $adapter = Test::Device::Chip::Adapter->new,
-)->get;
+);
 
 # ->read_lux
 {
@@ -31,15 +33,15 @@ $chip->mount(
       ->returns( "\x00\x04\x00\x02" );
 
    # read_config first just to cache the GAIN/INTEG settings
-   $chip->read_config->get;
+   await $chip->read_config;
 
-   is_approx( scalar $chip->read_lux->get, 113.15,
+   is_approx( scalar await $chip->read_lux, 113.15,
       '->read_lux converts lux level' );
 
    $adapter->check_and_clear( '$chip->read_lux' );
 
    # gut-wrench to clear test data
-   undef $chip->{TIMINGbytes};
+   undef $chip->META->get_slot( '$_TIMINGbytes' )->value( $chip );
 }
 
 # ->read_lux respects GAIN
@@ -50,15 +52,15 @@ $chip->mount(
       ->returns( "\x00\x40\x00\x20" );
 
    # read_config first just to cache the GAIN/INTEG settings
-   $chip->read_config->get;
+   await $chip->read_config;
 
-   is_approx( scalar $chip->read_lux->get, 113.15,
+   is_approx( scalar await $chip->read_lux, 113.15,
       '->read_lux converts lux level at GAIN=16' );
 
    $adapter->check_and_clear( '$chip->read_lux at GAIN=16' );
 
    # gut-wrench to clear test data
-   undef $chip->{TIMINGbytes};
+   undef $chip->META->get_slot( '$_TIMINGbytes' )->value( $chip );
 }
 
 # ->read_lux respects INTEG
@@ -69,15 +71,15 @@ $chip->mount(
       ->returns( "\x00\x10\x00\x08" );
 
    # read_config first just to cache the GAIN/INTEG settings
-   $chip->read_config->get;
+   await $chip->read_config;
 
-   is_approx( scalar $chip->read_lux->get, 112.59,
+   is_approx( scalar await $chip->read_lux, 112.59,
       '->read_lux converts lux level at INTEG=101ms' );
 
    $adapter->check_and_clear( '$chip->read_lux at INTEG=101ms' );
 
    # gut-wrench to clear test data
-   undef $chip->{TIMINGbytes};
+   undef $chip->META->get_slot( '$_TIMINGbytes' )->value( $chip );
 }
 
 # ->read_lux also returns DATA0/DATA1
@@ -88,16 +90,16 @@ $chip->mount(
       ->returns( "\x00\x04\x00\x02" );
 
    # read_config first just to cache the GAIN/INTEG settings
-   $chip->read_config->get;
+   await $chip->read_config;
 
-   is_deeply( [ ( $chip->read_lux->get )[1,2] ],
+   is_deeply( [ ( await $chip->read_lux )[1,2] ],
       [ 1024, 512 ],
       '->read_lux returns DATA0/DATA1 in list context' );
 
    $adapter->check_and_clear( '$chip->read_lux list context' );
 
    # gut-wrench to clear test data
-   undef $chip->{TIMINGbytes};
+   undef $chip->META->get_slot( '$_TIMINGbytes' )->value( $chip );
 }
 
 done_testing;

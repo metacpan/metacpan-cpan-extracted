@@ -7,11 +7,13 @@
 #   Makefile creation script.
 #
 # COPYRIGHT
-#   Copyright (C) 2014 Steve Hay.  All rights reserved.
+#   Copyright (C) 2014-2015, 2020 Steve Hay.  All rights reserved.
 #
 # LICENCE
-#   You may distribute under the terms of either the GNU General Public License
-#   or the Artistic License, as specified in the LICENCE file.
+#   This script is free software; you can redistribute it and/or modify it under
+#   the same terms as Perl itself, i.e. under the terms of either the GNU
+#   General Public License or the Artistic License, as specified in the LICENCE
+#   file.
 #
 #===============================================================================
 
@@ -43,7 +45,53 @@ MAIN: {
             resources => {
                 repository => {
                     type => 'git',
-                    url  => 'https://github.com/steve-m-hay/XML-Encoding.git'
+                    web  => 'https://github.com/steve-m-hay/XML-Encoding'
+                }
+            },
+
+            optional_features => {
+                changestest => {
+                    description => 'Changes testing',
+                    prereqs => {
+                        test => {
+                            requires => {
+                                'Test::CPAN::Changes' => '0'
+                            }
+                        }
+                    }
+                },
+
+                critictest => {
+                    description => 'Perl::Critic testing',
+                    prereqs => {
+                        test => {
+                            requires => {
+                                'Test::Perl::Critic' => '0'
+                            }
+                        }
+                    }
+                },
+
+                podtest => {
+                    description => 'POD testing',
+                    prereqs => {
+                        test => {
+                            requires => {
+                                'Test::Pod' => '1.00'
+                            }
+                        }
+                    }
+                },
+
+                podcoveragetest => {
+                    description => 'POD coverage testing',
+                    prereqs => {
+                        test => {
+                            requires => {
+                                'Test::Pod::Coverage' => '0.08'
+                            }
+                        }
+                    }
                 }
             }
         },
@@ -58,19 +106,15 @@ MAIN: {
         },
 
         TEST_REQUIRES => {
-            'Test::More' => '0',
-            'perl'       => '5.008001',
-            'strict'     => '0',
-            'warnings'   => '0'
+            'Test::More' => '0'
         },
 
         PREREQ_PM => {
             'XML::Parser' => '2.18',
             'fields'      => '0',
             'integer'     => '0',
-            'perl'        => '5.008001',
             'strict'      => '0',
-            'vars'        => '0'
+            'warnings'    => '0'
         },
 
         EXE_FILES => [qw(

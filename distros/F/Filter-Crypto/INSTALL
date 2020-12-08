@@ -13,12 +13,12 @@ PREREQUISITES
     OpenSSL
 
         OpenSSL version 0.9.6k or 0.9.7c or later.
-        The latest version of OpenSSL is available from http://www.openssl.org/.
+        The latest version of OpenSSL is available from https://www.openssl.org/.
 
     Perl
 
         Perl version 5.8.1 or later.
-        The latest version of Perl is available from http://www.perl.com/.
+        The latest version of Perl is available from https://www.perl.com/.
 
     Perl Modules
 
@@ -29,7 +29,7 @@ PREREQUISITES
             PAR::Filter
 
         which is part of the PAR::Packer distribution, available from CPAN
-        (http://www.cpan.org/).
+        (https://www.cpan.org/).
 
 INSTALLATION
 

@@ -66,7 +66,7 @@ package CBOR::XS;
 
 use common::sense;
 
-our $VERSION = 1.82;
+our $VERSION = 1.83;
 our @ISA = qw(Exporter);
 
 our @EXPORT = qw(encode_cbor decode_cbor);
@@ -731,6 +731,11 @@ Forces the value to be encoded as (UTF-8) text values.
 
 Forces the value to be encoded as a (binary) string value.
 
+Example: encode a perl string as binary even though C<text_strings> is in
+effect.
+
+   CBOR::XS->new->text_strings->encode ([4, "text", CBOR::XS::bytes "bytevalue"]);
+
 =item CBOR::XS::as_bool $value
 
 Converts a Perl boolean (which can be any kind of scalar) into a CBOR
@@ -750,20 +755,29 @@ Forces single-float (IEEE 754 binary32) encoding of the given value.
 
 Forces double-float (IEEE 754 binary64) encoding of the given value.
 
-=item, CBOR::XS::as_cbor $cbor_text
+=item CBOR::XS::as_cbor $cbor_text
 
-Bot a type cast per-se, this type cast forces the argument to eb encoded
+Not a type cast per-se, this type cast forces the argument to eb encoded
 as-is. This can be used to embed pre-encoded CBOR data.
 
 Note that no checking on the validity of the C<$cbor_text> is done - it's
 the callers responsibility to correctly encode values.
 
+=item CBOR::XS::as_map [key => value...]
+
+Treat the array reference as key value pairs and output a CBOR map. This
+allows you to generate CBOR maps with arbitrary key types (or, if you
+don't care about semantics, duplicate keys or prairs in a custom order),
+which is otherwise hard to do with Perl.
+
+The single argument must be an array reference with an even number of
+elements.
+
+Example: encode a CBOR map with a string and an integer as keys.
+
+   encode_cbor CBOR::XS::as_map [string => "value", 5 => "value"]
+
 =back
-
-Example: encode a perl string as binary even though C<text_strings> is in
-effect.
-
-   CBOR::XS->new->text_strings->encode ([4, "text", CBOR::XS::bytes "bytevalue"]);
 
 =cut
 
@@ -776,6 +790,14 @@ sub CBOR::XS::as_float32 ($) { bless [$_[0], 5, undef], CBOR::XS::Tagged:: }
 sub CBOR::XS::as_float64 ($) { bless [$_[0], 6, undef], CBOR::XS::Tagged:: }
 
 sub CBOR::XS::as_bool    ($) { $_[0] ? $Types::Serialiser::true : $Types::Serialiser::false }
+
+sub CBOR::XS::as_map ($) {
+   ARRAY:: eq ref $_[0]
+      and $#{ $_[0] } & 1
+      or do { require Carp; Carp::croak ("CBOR::XS::as_map only acepts array references with an even number of elements, caught") };
+
+   bless [$_[0], 7, undef], CBOR::XS::Tagged::
+}
 
 =head2 OBJECT SERIALISATION
 

@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20200904144535;
+our $VERSION = 1.20201204215957;
 
 my $formatters = [
                 {
@@ -98,74 +98,74 @@ my $validators = {
                 'voip' => ''
               };
 my %areanames = ();
-$areanames{en}->{38110} = "Pirot";
-$areanames{en}->{38111} = "Belgrade";
-$areanames{en}->{38112} = "Pozarevac";
-$areanames{en}->{38113} = "Pancevo";
-$areanames{en}->{38114} = "Valjevo";
-$areanames{en}->{38115} = "Sabac";
-$areanames{en}->{38116} = "Leskovac";
-$areanames{en}->{38117} = "Vranje";
-$areanames{en}->{38118} = "Nis";
-$areanames{en}->{38119} = "Zajecar";
-$areanames{en}->{38120} = "Novi\ Pazar";
-$areanames{en}->{38121} = "Novi\ Sad";
-$areanames{en}->{38122} = "Sremska\ Mitrovica";
-$areanames{en}->{38123} = "Zrenjanin";
-$areanames{en}->{381230} = "Kikinda";
-$areanames{en}->{38124} = "Subotica";
-$areanames{en}->{38125} = "Sombor";
-$areanames{en}->{38126} = "Smederevo";
-$areanames{en}->{38127} = "Prokuplje";
-$areanames{en}->{38128} = "Kosovska\ Mitrovica";
-$areanames{en}->{381280} = "Gnjilane";
-$areanames{en}->{38129} = "Prizren";
-$areanames{en}->{381290} = "Urosevac";
-$areanames{en}->{38130} = "Bor";
-$areanames{en}->{38131} = "Uzice";
-$areanames{en}->{38132} = "Cacak";
-$areanames{en}->{38133} = "Prijepolje";
-$areanames{en}->{38134} = "Kragujevac";
-$areanames{en}->{38135} = "Jagodina";
-$areanames{en}->{38136} = "Kraljevo";
-$areanames{en}->{38137} = "Krusevac";
-$areanames{en}->{38138} = "Pristina";
-$areanames{en}->{38139} = "Pec";
-$areanames{en}->{381390} = "Dakovica";
-$areanames{sr}->{38110} = "Пирот";
-$areanames{sr}->{38111} = "Београд";
-$areanames{sr}->{38112} = "Пожаревац";
-$areanames{sr}->{38113} = "Панчево";
-$areanames{sr}->{38114} = "Ваљево";
-$areanames{sr}->{38115} = "Шабац";
-$areanames{sr}->{38116} = "Лесковац";
-$areanames{sr}->{38117} = "Врање";
-$areanames{sr}->{38118} = "Ниш";
-$areanames{sr}->{38119} = "Зајечар";
-$areanames{sr}->{38120} = "Нови\ Пазар";
-$areanames{sr}->{38121} = "Нови\ Сад";
-$areanames{sr}->{38122} = "Сремска\ Митровица";
-$areanames{sr}->{38123} = "Зрењанин";
-$areanames{sr}->{381230} = "Кикинда";
-$areanames{sr}->{38124} = "Суботица";
-$areanames{sr}->{38125} = "Сомбор";
-$areanames{sr}->{38126} = "Смедерево";
-$areanames{sr}->{38127} = "Прокупље";
-$areanames{sr}->{38128} = "Косовска\ Митровица";
-$areanames{sr}->{381280} = "Гњилане";
-$areanames{sr}->{38129} = "Призрен";
-$areanames{sr}->{381290} = "Урошевац";
-$areanames{sr}->{38130} = "Бор";
-$areanames{sr}->{38131} = "Ужице";
-$areanames{sr}->{38132} = "Чачак";
-$areanames{sr}->{38133} = "Пријепоље";
-$areanames{sr}->{38134} = "Крагујевац";
-$areanames{sr}->{38135} = "Јагодина";
-$areanames{sr}->{38136} = "Краљево";
-$areanames{sr}->{38137} = "Крушевац";
-$areanames{sr}->{38138} = "Приштина";
-$areanames{sr}->{38139} = "Пећ";
-$areanames{sr}->{381390} = "Ђаковица";
+$areanames{en} = {"38115", "Sabac",
+"38138", "Pristina",
+"381290", "Urosevac",
+"38137", "Krusevac",
+"381390", "Dakovica",
+"38127", "Prokuplje",
+"38128", "Kosovska\ Mitrovica",
+"38110", "Pirot",
+"38113", "Pancevo",
+"38126", "Smederevo",
+"38119", "Zajecar",
+"38132", "Cacak",
+"38111", "Belgrade",
+"38122", "Sremska\ Mitrovica",
+"38114", "Valjevo",
+"38136", "Kraljevo",
+"381230", "Kikinda",
+"381280", "Gnjilane",
+"38112", "Pozarevac",
+"38131", "Uzice",
+"38139", "Pec",
+"38124", "Subotica",
+"38134", "Kragujevac",
+"38129", "Prizren",
+"38121", "Novi\ Sad",
+"38116", "Leskovac",
+"38123", "Zrenjanin",
+"38135", "Jagodina",
+"38117", "Vranje",
+"38120", "Novi\ Pazar",
+"38118", "Nis",
+"38130", "Bor",
+"38133", "Prijepolje",
+"38125", "Sombor",};
+$areanames{sr} = {"38122", "Сремска\ Митровица",
+"38114", "Ваљево",
+"38136", "Краљево",
+"381230", "Кикинда",
+"38126", "Смедерево",
+"38119", "Зајечар",
+"38132", "Чачак",
+"38111", "Београд",
+"381390", "Ђаковица",
+"38127", "Прокупље",
+"38128", "Косовска\ Митровица",
+"38110", "Пирот",
+"38113", "Панчево",
+"38115", "Шабац",
+"38138", "Приштина",
+"381290", "Урошевац",
+"38137", "Крушевац",
+"38130", "Бор",
+"38133", "Пријепоље",
+"38125", "Сомбор",
+"38135", "Јагодина",
+"38123", "Зрењанин",
+"38117", "Врање",
+"38120", "Нови\ Пазар",
+"38118", "Ниш",
+"38134", "Крагујевац",
+"38129", "Призрен",
+"38121", "Нови\ Сад",
+"38116", "Лесковац",
+"38112", "Пожаревац",
+"381280", "Гњилане",
+"38131", "Ужице",
+"38139", "Пећ",
+"38124", "Суботица",};
 
     sub new {
       my $class = shift;

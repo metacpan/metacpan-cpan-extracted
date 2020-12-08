@@ -25,13 +25,13 @@ ADCs
 
   trigger
 
-       $chip->trigger( %args )->get
+       await $chip->trigger( %args );
 
     Optional. This method asks the chip to begin taking a reading.
 
   read_adc
 
-       $value = $chip->read_adc->get
+       $value = await $chip->read_adc;
 
     Obtains the most recent reading performed by the chip, as a plain
     integer value. This may be signed or unsigned, scaled to whatever
@@ -39,7 +39,7 @@ ADCs
 
   read_adc_voltage
 
-       $voltage = $chip->read_adc_voltage->get
+       $voltage = await $chip->read_adc_voltage;
 
     If the chip contains an internal reference, or in some other way the
     scale is known by the driver, this method should be provided that
@@ -47,7 +47,7 @@ ADCs
 
   read_adc_ratio
 
-       $ratio = $chip->read_adc_ratio->get
+       $ratio = await $chip->read_adc_ratio;
 
     If the chip (driver) does not have a reference to scale convert the
     output directly to a voltage level, then this method should be provided
@@ -70,14 +70,14 @@ DACs
 
   write_dac
 
-       $chip->write_dac( $value )->get
+       await $chip->write_dac( $value );
 
     Sets the value of the DAC's output as a plain integer value. This may
     be signed or unsigned, scaled to whatever precision the chip works at.
 
   write_dac_voltage
 
-       $chip->write_dac_voltage( $voltage )->get
+       await $chip->write_dac_voltage( $voltage );
 
     If the chip contains an internal reference, or in some other way the
     scale is known by the driver, this method should be provided that
@@ -85,7 +85,7 @@ DACs
 
   write_dac_ratio
 
-       $chip->write_dac_ratio( $ratio )->get
+       await $chip->write_dac_ratio( $ratio );
 
     If the chip (driver) does not have a reference to scale convert a given
     voltage to a DAC code value, then this method should be provided

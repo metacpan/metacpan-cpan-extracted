@@ -5,12 +5,13 @@ NAME
 SYNOPSIS
 
        use Device::Chip::HTU21D;
+       use Future::AsyncAwait;
     
        my $chip = Device::Chip::HTU21D->new;
-       $chip->mount( Device::Chip::Adapter::...->new )->get;
+       await $chip->mount( Device::Chip::Adapter::...->new );
     
        printf "Current temperature is is %.2f C\n",
-          $chip->read_temperature->get;
+          await $chip->read_temperature;
 
 DESCRIPTION
 
@@ -24,12 +25,12 @@ DESCRIPTION
 
 ACCESSORS
 
-    The following methods documented with a trailing call to ->get return
-    Future instances.
+    The following methods documented in an await expression return Future
+    instances.
 
  read_config
 
-       $config = $chip->read_config->get
+       $config = await $chip->read_config;
 
     Returns a HASH reference of the contents of the user register.
 
@@ -40,7 +41,7 @@ ACCESSORS
 
  change_config
 
-       $chip->change_config( %changes )->get
+       await $chip->change_config( %changes );
 
     Writes updates to the user register.
 
@@ -48,14 +49,14 @@ METHODS
 
  read_temperature
 
-       $temperature = $chip->read_temperature->get
+       $temperature = await $chip->read_temperature;
 
     Triggers a reading of the temperature sensor, returning a number in
     degrees C.
 
  read_humidity
 
-       $humidity = $chip->read_humidity->get
+       $humidity = await $chip->read_humidity;
 
     Triggers a reading of the humidity sensor, returning a number in % RH.
 

@@ -1,25 +1,27 @@
 #!/usr/bin/perl
 
-use strict;
+use v5.26;
 use warnings;
 
 use Test::More;
 use Test::Device::Chip::Adapter 0.14;
 
+use Future::AsyncAwait;
+
 use Device::Chip::MAX1166x;
 
 my $chip = Device::Chip::MAX1166x->new;
 
-$chip->mount(
+await $chip->mount(
    my $adapter = Test::Device::Chip::Adapter->new,
-)->get;
+);
 
 # ->read_adc
 {
    $adapter->expect_read(2)
       ->returns( "\x04\x8C" );
 
-   is( $chip->read_adc->get, 0x048C,
+   is( await $chip->read_adc, 0x048C,
       '$chip->read_adc'
    );
 
@@ -31,7 +33,7 @@ $chip->mount(
    $adapter->expect_read(2)
       ->returns( "\x0A\x00" );
 
-   is( $chip->read_adc_ratio->get, 0.15625,
+   is( await $chip->read_adc_ratio, 0.15625,
       '$chip->read_adc_ratio'
    );
 

@@ -1,4 +1,4 @@
-# AWS::ElasticLoadBalancing::LoadBalancer generated from spec 5.3.0
+# AWS::ElasticLoadBalancing::LoadBalancer generated from spec 18.4.0
 use Moose::Util::TypeConstraints;
 
 coerce 'Cfn::Resource::Properties::AWS::ElasticLoadBalancing::LoadBalancer',
@@ -14,7 +14,7 @@ package Cfn::Resource::AWS::ElasticLoadBalancing::LoadBalancer {
     [ 'CanonicalHostedZoneName','CanonicalHostedZoneNameID','DNSName','SourceSecurityGroup.GroupName','SourceSecurityGroup.OwnerAlias' ]
   }
   sub supported_regions {
-    [ 'ap-east-1','ap-northeast-1','ap-northeast-2','ap-northeast-3','ap-south-1','ap-southeast-1','ap-southeast-2','ca-central-1','cn-north-1','cn-northwest-1','eu-central-1','eu-north-1','eu-west-1','eu-west-2','eu-west-3','me-south-1','sa-east-1','us-east-1','us-east-2','us-gov-east-1','us-gov-west-1','us-west-1','us-west-2' ]
+    [ 'af-south-1','ap-east-1','ap-northeast-1','ap-northeast-2','ap-northeast-3','ap-south-1','ap-southeast-1','ap-southeast-2','ca-central-1','cn-north-1','cn-northwest-1','eu-central-1','eu-north-1','eu-south-1','eu-west-1','eu-west-2','eu-west-3','me-south-1','sa-east-1','us-east-1','us-east-2','us-gov-east-1','us-gov-west-1','us-west-1','us-west-2' ]
   }
 }
 
@@ -51,11 +51,11 @@ coerce 'Cfn::Resource::Properties::AWS::ElasticLoadBalancing::LoadBalancer::Poli
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::ElasticLoadBalancing::LoadBalancer::PoliciesValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::ElasticLoadBalancing::LoadBalancer::Policies->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::ElasticLoadBalancing::LoadBalancer::PoliciesValue {
+package Cfn::Resource::Properties::Object::AWS::ElasticLoadBalancing::LoadBalancer::Policies {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -98,11 +98,11 @@ coerce 'Cfn::Resource::Properties::AWS::ElasticLoadBalancing::LoadBalancer::List
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::ElasticLoadBalancing::LoadBalancer::ListenersValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::ElasticLoadBalancing::LoadBalancer::Listeners->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::ElasticLoadBalancing::LoadBalancer::ListenersValue {
+package Cfn::Resource::Properties::Object::AWS::ElasticLoadBalancing::LoadBalancer::Listeners {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -146,11 +146,11 @@ coerce 'Cfn::Resource::Properties::AWS::ElasticLoadBalancing::LoadBalancer::LBCo
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::ElasticLoadBalancing::LoadBalancer::LBCookieStickinessPolicyValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::ElasticLoadBalancing::LoadBalancer::LBCookieStickinessPolicy->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::ElasticLoadBalancing::LoadBalancer::LBCookieStickinessPolicyValue {
+package Cfn::Resource::Properties::Object::AWS::ElasticLoadBalancing::LoadBalancer::LBCookieStickinessPolicy {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -168,11 +168,11 @@ coerce 'Cfn::Resource::Properties::AWS::ElasticLoadBalancing::LoadBalancer::Heal
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::ElasticLoadBalancing::LoadBalancer::HealthCheckValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::ElasticLoadBalancing::LoadBalancer::HealthCheck->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::ElasticLoadBalancing::LoadBalancer::HealthCheckValue {
+package Cfn::Resource::Properties::Object::AWS::ElasticLoadBalancing::LoadBalancer::HealthCheck {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -193,11 +193,11 @@ coerce 'Cfn::Resource::Properties::AWS::ElasticLoadBalancing::LoadBalancer::Conn
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::ElasticLoadBalancing::LoadBalancer::ConnectionSettingsValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::ElasticLoadBalancing::LoadBalancer::ConnectionSettings->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::ElasticLoadBalancing::LoadBalancer::ConnectionSettingsValue {
+package Cfn::Resource::Properties::Object::AWS::ElasticLoadBalancing::LoadBalancer::ConnectionSettings {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -214,11 +214,11 @@ coerce 'Cfn::Resource::Properties::AWS::ElasticLoadBalancing::LoadBalancer::Conn
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::ElasticLoadBalancing::LoadBalancer::ConnectionDrainingPolicyValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::ElasticLoadBalancing::LoadBalancer::ConnectionDrainingPolicy->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::ElasticLoadBalancing::LoadBalancer::ConnectionDrainingPolicyValue {
+package Cfn::Resource::Properties::Object::AWS::ElasticLoadBalancing::LoadBalancer::ConnectionDrainingPolicy {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -258,11 +258,11 @@ coerce 'Cfn::Resource::Properties::AWS::ElasticLoadBalancing::LoadBalancer::AppC
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::ElasticLoadBalancing::LoadBalancer::AppCookieStickinessPolicyValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::ElasticLoadBalancing::LoadBalancer::AppCookieStickinessPolicy->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::ElasticLoadBalancing::LoadBalancer::AppCookieStickinessPolicyValue {
+package Cfn::Resource::Properties::Object::AWS::ElasticLoadBalancing::LoadBalancer::AppCookieStickinessPolicy {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -280,11 +280,11 @@ coerce 'Cfn::Resource::Properties::AWS::ElasticLoadBalancing::LoadBalancer::Acce
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::ElasticLoadBalancing::LoadBalancer::AccessLoggingPolicyValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::ElasticLoadBalancing::LoadBalancer::AccessLoggingPolicy->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::ElasticLoadBalancing::LoadBalancer::AccessLoggingPolicyValue {
+package Cfn::Resource::Properties::Object::AWS::ElasticLoadBalancing::LoadBalancer::AccessLoggingPolicy {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -319,3 +319,30 @@ package Cfn::Resource::Properties::AWS::ElasticLoadBalancing::LoadBalancer {
 }
 
 1;
+### main pod documentation begin ###
+
+=encoding UTF-8
+
+=head1 NAME
+
+Cfn::Resource::AWS::ElasticLoadBalancing::LoadBalancer - Cfn resource for AWS::ElasticLoadBalancing::LoadBalancer
+
+=head1 DESCRIPTION
+
+This module implements a Perl module that represents the CloudFormation object AWS::ElasticLoadBalancing::LoadBalancer.
+
+See L<Cfn> for more information on how to use it.
+
+=head1 AUTHOR
+
+    Jose Luis Martinez
+    CAPSiDE
+    jlmartinez@capside.com
+
+=head1 COPYRIGHT and LICENSE
+
+Copyright (c) 2013 by CAPSiDE
+This code is distributed under the Apache 2 License. The full text of the 
+license can be found in the LICENSE file included with this module.
+
+=cut

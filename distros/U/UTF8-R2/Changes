@@ -1,5 +1,10 @@
 Revision history for this software.
 
+0.11  2020-12-06 00:00:00
+  - supports [[:POSIX:]] and [[:^POSIX:]] codepoint class
+  - avoid: Useless use of '\'; doesn't escape metacharacter '{'
+  - created by INABA Hitoshi
+
 0.10  2020-12-04 00:00:00
   - supports WTF8, by use UTF8::R2 qw(WTF8)
   - supports WTF8.ja_JP, by use UTF8::R2 qw(WTF8.ja_JP)

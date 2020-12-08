@@ -34,5 +34,6 @@ t/orig/unix.txt
 t/pod-coverage.t
 t/pod.t
 xt/boilerplate.t
+rhel_vendor_manifest_test.list
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

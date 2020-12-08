@@ -1,3 +1,6 @@
+use strict;
+use warnings;
+use Test::More;
 use Test::More tests => 48;
 use Number::Fraction ':constants';
 
@@ -59,3 +62,5 @@ ok('1/2' lt '1/4');
 ok('1/2' le '1/4');
 ok('1/2' ne '1/4');
 ok(!('1/2' eq '1/4'));
+
+done_testing();

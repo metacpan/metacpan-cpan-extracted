@@ -1,15 +1,11 @@
-#!/usr/bin/perl -w
-
 use strict;
-
+use warnings;
 use lib 't/inc';
-use fatalwarnings;
+use nptestutils;
 
 our $CLASS = 'Number::Phone';
 eval "use $CLASS";
 use Test::More;
-
-END { done_testing(); }
 
 use Number::Phone::Country::Data;
 
@@ -58,3 +54,5 @@ require 'common-stub_and_libphonenumber_tests.pl';
 }
 
 require 'uk_tests.pl';
+
+done_testing();

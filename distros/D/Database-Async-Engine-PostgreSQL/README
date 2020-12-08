@@ -38,6 +38,8 @@ DESCRIPTION
 
 METHODS
 
+ configure
+
  connection
 
     Returns a Future representing the database connection, and will attempt

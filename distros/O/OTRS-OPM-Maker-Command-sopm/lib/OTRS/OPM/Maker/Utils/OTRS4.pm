@@ -8,7 +8,7 @@ use warnings;
 use List::Util qw(first);
 use Carp;
 
-our $VERSION = 1.43;
+our $VERSION = 1.44;
 
 sub packagesetup {
     my ($class, $type, $version, $function, $runtype, $package) = @_;
@@ -53,7 +53,7 @@ OTRS::OPM::Maker::Utils::OTRS4 - helper functions for OTRS >= 4
 
 =head1 VERSION
 
-version 1.43
+version 1.44
 
 =head1 METHODS
 

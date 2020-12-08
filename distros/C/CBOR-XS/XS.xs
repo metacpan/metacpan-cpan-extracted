@@ -111,6 +111,7 @@ enum
   AS_FLOAT16 = 4,
   AS_FLOAT32 = 5,
   AS_FLOAT64 = 6,
+  AS_MAP     = 7,
   // possibly future enhancements: (generic) float, (generic) string
 };
 
@@ -240,6 +241,8 @@ need (enc_t *enc, STRLEN len)
       enc->end = SvPVX (enc->sv) + SvLEN (enc->sv) - 1;
     }
 }
+
+static void encode_sv (enc_t *enc, SV *sv);
 
 ecb_inline void
 encode_ch (enc_t *enc, char ch)
@@ -425,6 +428,38 @@ encode_bool (enc_t *enc, int istrue)
   encode_ch (enc, istrue ? MAJOR_MISC | SIMPLE_TRUE : MAJOR_MISC | SIMPLE_FALSE);
 }
 
+// encodes an arrayref containing key-value pairs as CBOR map
+ecb_inline void
+encode_array_as_map (enc_t *enc, SV *sv)
+{
+  if (enc->depth >= enc->cbor.max_depth)
+    croak (ERR_NESTING_EXCEEDED);
+
+  ++enc->depth;
+
+  // as_map does error checking for us, but we re-check in case
+  // things have changed.
+
+  if (!SvROK (sv) || SvTYPE (SvRV (sv)) != SVt_PVAV)
+    croak ("CBOR::XS::as_map requires an array reference (did you change the array after calling as_map?)");
+
+  AV *av = (AV *)SvRV (sv);
+  int i, len = av_len (av);
+
+  if (!(len & 1))
+    croak ("CBOR::XS::as_map requires an even number of elements (did you change the array after calling as_map?)");
+
+  encode_uint (enc, MAJOR_MAP, (len + 1) >> 1);
+
+  for (i = 0; i <= len; ++i)
+    {
+      SV **svp = av_fetch (av, i, 0);
+      encode_sv (enc, svp ? *svp : &PL_sv_undef);
+    }
+
+  --enc->depth;
+}
+
 ecb_inline void
 encode_forced (enc_t *enc, UV type, SV *sv)
 {
@@ -463,12 +498,12 @@ encode_forced (enc_t *enc, UV type, SV *sv)
       case AS_FLOAT32: encode_float32 (enc, SvNV (sv)); break;
       case AS_FLOAT64: encode_float64 (enc, SvNV (sv)); break;
 
+      case AS_MAP: encode_array_as_map (enc, sv); break;
+
       default:
         croak ("encountered malformed CBOR::XS::Tagged object");
     }
 }
-
-static void encode_sv (enc_t *enc, SV *sv);
 
 static void
 encode_av (enc_t *enc, AV *av)

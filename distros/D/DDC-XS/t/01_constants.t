@@ -7,7 +7,7 @@ my @hse =
   (
    qw(NoSort RandomSort),
    (map {("LessBy$_","GreaterBy$_")}
-    qw(Date Size FreeBiblField Rank MiddleContext LeftContext RightContext CountKey CountValue)),
+    qw(Date Size FreeBiblField Rank MiddleContext LeftContext RightContext CountKey CountValue PruneKey)),
   );
 
 my @constants =

@@ -1,24 +1,22 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2015 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2015-2020 -- leonerd@leonerd.org.uk
 
-package Device::Chip::DS1307;
+use v5.26;
+use Object::Pad 0.19;
 
-use strict;
-use warnings;
-use 5.010;
-use base qw( Device::Chip::Base::RegisteredI2C );
+package Device::Chip::DS1307 0.04;
+class Device::Chip::DS1307
+   extends Device::Chip::Base::RegisteredI2C;
 
 use utf8;
 
-our $VERSION = '0.03';
-
 use Carp;
 
-use constant DEFAULT_ADDR => 0x68;
+use Future::AsyncAwait;
 
-use Future;
+use constant DEFAULT_ADDR => 0x68;
 
 =encoding UTF-8
 
@@ -33,26 +31,17 @@ F<Maxim Integrated> F<DS1307> chip attached to a computer via an I²C adapter.
 
 =cut
 
-sub new
+has $_address;
+
+BUILD ( %params )
 {
-   my $class = shift;
-   my %opts = @_;
-
-   my $self = $class->SUPER::new( @_ );
-
-   $self->{$_} = $opts{$_} for qw( address );
-
-   $self->{address} //= DEFAULT_ADDR;
-
-   return $self;
+   $_address = $params{address} // DEFAULT_ADDR;
 }
 
-sub I2C_options
+method I2C_options
 {
-   my $self = shift;
-
    return (
-      addr        => $self->{address},
+      addr        => $_address,
       max_bitrate => 100E3,
    );
 }
@@ -82,54 +71,48 @@ use constant {
    MASK_RS        => 3<<0,
 };
 
-sub read_reg_u8
+async method read_reg_u8 ( $reg )
 {
-   my $self = shift;
-   my ( $reg ) = @_;
-   $self->read_reg( $reg )
-      ->transform( done => sub { unpack "C", $_[0] } );
+   return unpack "C", await $self->read_reg( $reg );
 }
 
-sub write_reg_u8
+async method write_reg_u8 ( $reg, $value )
 {
-   my $self = shift;
-   my ( $reg, $value ) = @_;
-   $self->write_reg( $reg, pack "C", $value );
+   await $self->write_reg( $reg, pack "C", $value );
 }
 
 sub _unpack_bcd { ( $_[0] >> 4 )*10 + ( $_[0] % 16 ) }
 sub _pack_bcd   { int( $_[0] / 10 ) << 4 | ( $_[0] % 10 ) }
 
-sub read_reg_bcd
+async method read_reg_bcd ( $reg )
 {
-   my $self = shift;
-   my ( $reg ) = @_;
-   $self->read_reg( $reg )
-      ->transform( done => sub { _unpack_bcd unpack "C", $_[0] } );
+   return _unpack_bcd unpack "C", await $self->read_reg( $reg );
 }
 
-sub write_reg_bcd
+async method write_reg_bcd ( $reg, $value )
 {
-   my $self = shift;
-   my ( $reg, $value ) = @_;
-   $self->write_reg( $reg, pack "C", _pack_bcd( $value ) );
+   await $self->write_reg( $reg, pack "C", _pack_bcd( $value ) );
 }
 
 =head1 METHODS
 
-The following methods documented with a trailing call to C<< ->get >> return
-L<Future> instances.
+The following methods documented in an C<await> expression return L<Future>
+instances.
 
 =cut
 
 =head2 read_FIELD
 
-   $v = $ds->read_I<FIELD>->get
+   $sec  = await $ds->read_seconds;
+   $min  = await $ds->read_minutes;
+   $hr   = await $ds->read_hours;
+   $wday = await $ds->read_wday;
+   $mday = await $ds->read_mday;
+   $mon  = await $ds->read_month;
+   $year = await $ds->read_year;
 
 Reads a timekeeping field and returns a decimal integer. The following fields
 are recognised:
-
- seconds minutes hours wday mday month year
 
 The C<hours> field is always returned in 24-hour mode, even if the chip is in
 12-hour ("AM/PM") mode.
@@ -137,60 +120,62 @@ The C<hours> field is always returned in 24-hour mode, even if the chip is in
 =cut
 
 # REG_SECONDS also contains the CLOCK HALTED flag
-sub read_seconds {
-   shift->read_reg_u8( REG_SECONDS )->then( sub {
-      my ( $v ) = @_;
-      $v &= ~MASK_CLOCKHALT;
-      Future->done( _unpack_bcd $v );
-   });
+async method read_seconds ()
+{
+   my $v = await $self->read_reg_u8( REG_SECONDS );
+   $v &= ~MASK_CLOCKHALT;
+   return _unpack_bcd $v;
 }
 
-sub read_minutes { shift->read_reg_bcd( REG_MINUTES ) }
+async method read_minutes () { return await $self->read_reg_bcd( REG_MINUTES ); }
 
 # REG_HOURS is either in 12 or 24-hour mode.
-sub read_hours   {
-   shift->read_reg_u8( REG_HOURS )->then( sub {
-      my ( $v ) = @_;
-      if( $v & MASK_12H ) {
-         my $pm = $v & MASK_PM;
-         $v &= ~(MASK_12H|MASK_PM);
-         Future->done( _unpack_bcd( $v ) + 12*$pm );
-      }
-      else {
-         Future->done( _unpack_bcd $v );
-      }
-   });
+async method read_hours ()
+{
+   my $v = await $self->read_reg_u8( REG_HOURS );
+   if( $v & MASK_12H ) {
+      my $pm = $v & MASK_PM;
+      $v &= ~(MASK_12H|MASK_PM);
+      return _unpack_bcd( $v ) + 12*$pm;
+   }
+   else {
+      return _unpack_bcd $v;
+   }
 }
 
-sub read_wday    { shift->read_reg_u8 ( REG_WDAY ) }
-sub read_mday    { shift->read_reg_bcd( REG_MDAY ) }
-sub read_month   { shift->read_reg_bcd( REG_MONTH ) }
-sub read_year    { shift->read_reg_bcd( REG_YEAR ) }
+async method read_wday  () { return await $self->read_reg_u8 ( REG_WDAY  ); }
+async method read_mday  () { return await $self->read_reg_bcd( REG_MDAY  ); }
+async method read_month () { return await $self->read_reg_bcd( REG_MONTH ); }
+async method read_year  () { return await $self->read_reg_bcd( REG_YEAR  ); }
 
 =head2 write_FIELD
 
-   $ds->write_I<FIELD>->get
+   await $ds->write_seconds( $sec  );
+   await $ds->write_minutes( $min  );
+   await $ds->write_hours  ( $hr   );
+   await $ds->write_wday   ( $wday );
+   await $ds->write_mday   ( $mday );
+   await $ds->write_month  ( $mon  );
+   await $ds->write_year   ( $year );
 
 Writes a timekeeping field as a decimal integer. The following fields are
 recognised:
-
- seconds minutes hours wday mday month year
 
 The C<hours> field is always written back in 24-hour mode.
 
 =cut
 
-sub write_seconds { $_[0]->write_reg_bcd( REG_SECONDS, $_[1] ) }
-sub write_minutes { $_[0]->write_reg_bcd( REG_MINUTES, $_[1] ) }
-sub write_hours   { $_[0]->write_reg_bcd( REG_HOURS,   $_[1] ) }
-sub write_wday    { $_[0]->write_reg_u8 ( REG_WDAY,    $_[1] ) }
-sub write_mday    { $_[0]->write_reg_bcd( REG_MDAY,    $_[1] ) }
-sub write_month   { $_[0]->write_reg_bcd( REG_MONTH,   $_[1] ) }
-sub write_year    { $_[0]->write_reg_bcd( REG_YEAR,    $_[1] ) }
+async method write_seconds () { await $self->write_reg_bcd( REG_SECONDS, $_[1] ); }
+async method write_minutes () { await $self->write_reg_bcd( REG_MINUTES, $_[1] ); }
+async method write_hours   () { await $self->write_reg_bcd( REG_HOURS,   $_[1] ); }
+async method write_wday    () { await $self->write_reg_u8 ( REG_WDAY,    $_[1] ); }
+async method write_mday    () { await $self->write_reg_bcd( REG_MDAY,    $_[1] ); }
+async method write_month   () { await $self->write_reg_bcd( REG_MONTH,   $_[1] ); }
+async method write_year    () { await $self->write_reg_bcd( REG_YEAR,    $_[1] ); }
 
 =head2 read_time
 
-   @tm = $ds->read_time->get
+   @tm = await $ds->read_time;
 
 Returns a 7-element C<struct tm>-compatible list of values by reading the
 timekeeping registers, suitable for passing to C<POSIX::mktime>, etc... Note
@@ -203,34 +188,30 @@ This method presumes C<POSIX>-compatible semantics for the C<wday> field
 stored on the chip; i.e. that 0 is Sunday.
 
 This method performs an atomic reading of all the timekeeping registers as a
-single I2C transaction, so is preferrable to invoking multiple calls to
+single I²C transaction, so is preferrable to invoking multiple calls to
 individual read methods.
 
 =cut
 
-sub read_time
+async method read_time
 {
-   my $self = shift;
+   my ( $bcd_sec, $bcd_min, $bcd_hour, $wday, $bcd_mday, $bcd_mon, $bcd_year ) = 
+      unpack "C7", await $self->read_reg( REG_SECONDS, 7 );
 
-   $self->read_reg( REG_SECONDS, 7 )->then( sub {
-      my ( $bcd_sec, $bcd_min, $bcd_hour,
-           $wday, $bcd_mday, $bcd_mon, $bcd_year ) = unpack "C7", $_[0];
-
-      Future->done(
-         _unpack_bcd( $bcd_sec ),
-         _unpack_bcd( $bcd_min ),
-         _unpack_bcd( $bcd_hour ),
-         _unpack_bcd( $bcd_mday ),
-         _unpack_bcd( $bcd_mon ) - 1,
-         _unpack_bcd( $bcd_year ) + 100,
-         $wday,
-      );
-   });
+   return (
+      _unpack_bcd( $bcd_sec ),
+      _unpack_bcd( $bcd_min ),
+      _unpack_bcd( $bcd_hour ),
+      _unpack_bcd( $bcd_mday ),
+      _unpack_bcd( $bcd_mon ) - 1,
+      _unpack_bcd( $bcd_year ) + 100,
+      $wday,
+   );
 }
 
 =head2 write_time
 
-   $ds->write_time( @tm )->get
+   await $ds->write_time( @tm );
 
 Writes the timekeeping registers from a 7-element C<struct tm>-compatible list
 of values. This method ignores the C<yday> and C<is_dst> fields, if present.
@@ -239,19 +220,18 @@ Because the F<DS1307> only stores a 2-digit year number, the year must be in
 the range C<2000>-C<2099> (i.e. numerical values of C<100> to C<199>).
 
 This method performs an atomic writing of all the timekeeping registers as a
-single I2C transaction, so is preferrable to invoking multiple calls to
+single I²C transaction, so is preferrable to invoking multiple calls to
 individual write methods.
 
 =cut
 
-sub write_time
+async method write_time
 {
-   my $self = shift;
    my ( $sec, $min, $hour, $mday, $mon, $year, $wday ) = @_;
 
    $year >= 100 and $year <= 199 or croak "Invalid year ($year)";
 
-   $self->write_reg( REG_SECONDS, pack "C7",
+   await $self->write_reg( REG_SECONDS, pack "C7",
       _pack_bcd( $sec ),
       _pack_bcd( $min ),
       _pack_bcd( $hour ),

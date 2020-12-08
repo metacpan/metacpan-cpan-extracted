@@ -24,6 +24,7 @@ requires:
   strict: '0'
   warnings: '0'
 resources:
+  bugtracker: https://github.com/davorg/perl-ogg-vorbis-header-pureperl/issues
   repository: https://github.com/davorg/perl-ogg-vorbis-header-pureperl.git
-version: '1.04'
+version: '1.05'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

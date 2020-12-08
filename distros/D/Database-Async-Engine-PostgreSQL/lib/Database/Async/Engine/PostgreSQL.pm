@@ -4,7 +4,7 @@ package Database::Async::Engine::PostgreSQL;
 use strict;
 use warnings;
 
-our $VERSION = '0.009';
+our $VERSION = '0.010';
 
 use parent qw(Database::Async::Engine);
 
@@ -72,6 +72,18 @@ Database::Async::Engine->register_class(
 );
 
 =head1 METHODS
+
+=head2 configure
+
+=cut
+
+sub configure {
+    my ($self, %args) = @_;
+    for (qw(service)) {
+        $self->{$_} = delete $args{$_} if exists $args{$_};
+    }
+    return $self->next::method(%args);
+}
 
 =head2 connection
 

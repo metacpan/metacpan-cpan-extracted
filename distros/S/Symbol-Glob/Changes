@@ -1,5 +1,10 @@
 Revision history for Symbol-Glob
 
+0.04  Mon Dec  7 11:25:02 PST 2020
+  - Change "defined @array" tests to just "@array".
+    Previously legal, but no longer so, and works the
+    same in older cases anyway.
+
 0.03  Thu Mar 10 17:41:24 PST 2011
 	- Add hard requirement for Test::Exception.
 

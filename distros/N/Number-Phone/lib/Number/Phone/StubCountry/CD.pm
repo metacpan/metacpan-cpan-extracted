@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20200904144528;
+our $VERSION = 1.20201204215954;
 
 my $formatters = [
                 {
@@ -74,18 +74,14 @@ my $validators = {
                 'voip' => ''
               };
 my %areanames = ();
-$areanames{en}->{2431} = "Kinshasa";
-$areanames{en}->{2432} = "Katanga";
-$areanames{en}->{2433} = "Bas\-Congo\/Bandundu";
-$areanames{en}->{2434} = "Kasai\-Oriental\/Kasai\-Occidental";
-$areanames{en}->{2435} = "Oriental\ Province\ \(Kisanga\/Mbandaka\)";
-$areanames{en}->{2436} = "North\ Kivu\/South\ Kivu\/Maniema";
-$areanames{fr}->{2431} = "Kinshasa";
-$areanames{fr}->{2432} = "Katanga";
-$areanames{fr}->{2433} = "Bas\-Congo\/Bandundu";
-$areanames{fr}->{2434} = "Kasai\-Oriental\/Kasai\-Occidental";
-$areanames{fr}->{2435} = "Province\ Orientale\ \(Kisanga\/Mbandaka\)";
-$areanames{fr}->{2436} = "Nord\-Kivu\/Sud\-Kivu\/Maniema";
+$areanames{en} = {"2432", "Katanga",
+"2434", "Kasai\-Oriental\/Kasai\-Occidental",
+"2431", "Kinshasa",
+"2436", "North\ Kivu\/South\ Kivu\/Maniema",
+"2435", "Oriental\ Province\ \(Kisanga\/Mbandaka\)",
+"2433", "Bas\-Congo\/Bandundu",};
+$areanames{fr} = {"2436", "Nord\-Kivu\/Sud\-Kivu\/Maniema",
+"2435", "Province\ Orientale\ \(Kisanga\/Mbandaka\)",};
 
     sub new {
       my $class = shift;

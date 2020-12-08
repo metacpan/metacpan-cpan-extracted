@@ -1,15 +1,16 @@
-#!/usr/bin/perl -w
-
 use strict;
-
+use warnings;
 use lib 't/inc';
-use fatalwarnings;
+use nptestutils;
+
+use Test::More;
+# see t/stubs.t for when uk_tests.pl are run against N::P::StubCountry::GB
+plan skip_all => 'not relevant if building --without_uk' if(building_without_uk());
 
 use Number::Phone;
-use Test::More;
-
-END { done_testing(); }
 
 require 'uk_tests.pl';
 
 ok(Number::Phone->new('+442087712924')->regulator() eq 'OFCOM, http://www.ofcom.org.uk/', "N:P:UK->regulator() works");
+
+done_testing();

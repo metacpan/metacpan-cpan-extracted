@@ -4,31 +4,40 @@
       "Paul Evans <leonerd@leonerd.org.uk>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4218",
+   "generated_by" : "Module::Build version 0.4231",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Device-Chip-DS1307",
    "prereqs" : {
-      "build" : {
+      "configure" : {
          "requires" : {
-            "Test::More" : "0.88"
+            "Module::Build" : "0.4004"
          }
       },
       "runtime" : {
          "requires" : {
-            "Device::Chip::Base::RegisteredI2C" : "0.03"
+            "Device::Chip::Base::RegisteredI2C" : "0.03",
+            "Future::AsyncAwait" : "0.47",
+            "Object::Pad" : "0.19",
+            "perl" : "5.026"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Device::Chip::Adapter" : "0",
+            "Test::More" : "0.88"
          }
       }
    },
    "provides" : {
       "Device::Chip::DS1307" : {
          "file" : "lib/Device/Chip/DS1307.pm",
-         "version" : "0.03"
+         "version" : "0.04"
       }
    },
    "release_status" : "stable",
@@ -37,6 +46,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.03",
-   "x_serialization_backend" : "JSON::PP version 2.27400"
+   "version" : "0.04",
+   "x_serialization_backend" : "JSON::PP version 4.04"
 }

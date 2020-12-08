@@ -1,4 +1,4 @@
-# AWS::KinesisAnalytics::Application generated from spec 3.2.0
+# AWS::KinesisAnalytics::Application generated from spec 18.4.0
 use Moose::Util::TypeConstraints;
 
 coerce 'Cfn::Resource::Properties::AWS::KinesisAnalytics::Application',
@@ -29,11 +29,11 @@ coerce 'Cfn::Resource::Properties::AWS::KinesisAnalytics::Application::JSONMappi
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::KinesisAnalytics::Application::JSONMappingParametersValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::KinesisAnalytics::Application::JSONMappingParameters->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::KinesisAnalytics::Application::JSONMappingParametersValue {
+package Cfn::Resource::Properties::Object::AWS::KinesisAnalytics::Application::JSONMappingParameters {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -50,11 +50,11 @@ coerce 'Cfn::Resource::Properties::AWS::KinesisAnalytics::Application::CSVMappin
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::KinesisAnalytics::Application::CSVMappingParametersValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::KinesisAnalytics::Application::CSVMappingParameters->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::KinesisAnalytics::Application::CSVMappingParametersValue {
+package Cfn::Resource::Properties::Object::AWS::KinesisAnalytics::Application::CSVMappingParameters {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -72,11 +72,11 @@ coerce 'Cfn::Resource::Properties::AWS::KinesisAnalytics::Application::MappingPa
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::KinesisAnalytics::Application::MappingParametersValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::KinesisAnalytics::Application::MappingParameters->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::KinesisAnalytics::Application::MappingParametersValue {
+package Cfn::Resource::Properties::Object::AWS::KinesisAnalytics::Application::MappingParameters {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -94,11 +94,11 @@ coerce 'Cfn::Resource::Properties::AWS::KinesisAnalytics::Application::RecordFor
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::KinesisAnalytics::Application::RecordFormatValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::KinesisAnalytics::Application::RecordFormat->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::KinesisAnalytics::Application::RecordFormatValue {
+package Cfn::Resource::Properties::Object::AWS::KinesisAnalytics::Application::RecordFormat {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -138,11 +138,11 @@ coerce 'Cfn::Resource::Properties::AWS::KinesisAnalytics::Application::RecordCol
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::KinesisAnalytics::Application::RecordColumnValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::KinesisAnalytics::Application::RecordColumn->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::KinesisAnalytics::Application::RecordColumnValue {
+package Cfn::Resource::Properties::Object::AWS::KinesisAnalytics::Application::RecordColumn {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -161,11 +161,11 @@ coerce 'Cfn::Resource::Properties::AWS::KinesisAnalytics::Application::InputLamb
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::KinesisAnalytics::Application::InputLambdaProcessorValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::KinesisAnalytics::Application::InputLambdaProcessor->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::KinesisAnalytics::Application::InputLambdaProcessorValue {
+package Cfn::Resource::Properties::Object::AWS::KinesisAnalytics::Application::InputLambdaProcessor {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -183,11 +183,11 @@ coerce 'Cfn::Resource::Properties::AWS::KinesisAnalytics::Application::KinesisSt
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::KinesisAnalytics::Application::KinesisStreamsInputValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::KinesisAnalytics::Application::KinesisStreamsInput->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::KinesisAnalytics::Application::KinesisStreamsInputValue {
+package Cfn::Resource::Properties::Object::AWS::KinesisAnalytics::Application::KinesisStreamsInput {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -205,11 +205,11 @@ coerce 'Cfn::Resource::Properties::AWS::KinesisAnalytics::Application::KinesisFi
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::KinesisAnalytics::Application::KinesisFirehoseInputValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::KinesisAnalytics::Application::KinesisFirehoseInput->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::KinesisAnalytics::Application::KinesisFirehoseInputValue {
+package Cfn::Resource::Properties::Object::AWS::KinesisAnalytics::Application::KinesisFirehoseInput {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -227,11 +227,11 @@ coerce 'Cfn::Resource::Properties::AWS::KinesisAnalytics::Application::InputSche
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::KinesisAnalytics::Application::InputSchemaValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::KinesisAnalytics::Application::InputSchema->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::KinesisAnalytics::Application::InputSchemaValue {
+package Cfn::Resource::Properties::Object::AWS::KinesisAnalytics::Application::InputSchema {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -250,11 +250,11 @@ coerce 'Cfn::Resource::Properties::AWS::KinesisAnalytics::Application::InputProc
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::KinesisAnalytics::Application::InputProcessingConfigurationValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::KinesisAnalytics::Application::InputProcessingConfiguration->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::KinesisAnalytics::Application::InputProcessingConfigurationValue {
+package Cfn::Resource::Properties::Object::AWS::KinesisAnalytics::Application::InputProcessingConfiguration {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -271,11 +271,11 @@ coerce 'Cfn::Resource::Properties::AWS::KinesisAnalytics::Application::InputPara
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::KinesisAnalytics::Application::InputParallelismValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::KinesisAnalytics::Application::InputParallelism->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::KinesisAnalytics::Application::InputParallelismValue {
+package Cfn::Resource::Properties::Object::AWS::KinesisAnalytics::Application::InputParallelism {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -314,11 +314,11 @@ coerce 'Cfn::Resource::Properties::AWS::KinesisAnalytics::Application::Input',
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::KinesisAnalytics::Application::InputValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::KinesisAnalytics::Application::Input->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::KinesisAnalytics::Application::InputValue {
+package Cfn::Resource::Properties::Object::AWS::KinesisAnalytics::Application::Input {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -343,3 +343,30 @@ package Cfn::Resource::Properties::AWS::KinesisAnalytics::Application {
 }
 
 1;
+### main pod documentation begin ###
+
+=encoding UTF-8
+
+=head1 NAME
+
+Cfn::Resource::AWS::KinesisAnalytics::Application - Cfn resource for AWS::KinesisAnalytics::Application
+
+=head1 DESCRIPTION
+
+This module implements a Perl module that represents the CloudFormation object AWS::KinesisAnalytics::Application.
+
+See L<Cfn> for more information on how to use it.
+
+=head1 AUTHOR
+
+    Jose Luis Martinez
+    CAPSiDE
+    jlmartinez@capside.com
+
+=head1 COPYRIGHT and LICENSE
+
+Copyright (c) 2013 by CAPSiDE
+This code is distributed under the Apache 2 License. The full text of the 
+license can be found in the LICENSE file included with this module.
+
+=cut

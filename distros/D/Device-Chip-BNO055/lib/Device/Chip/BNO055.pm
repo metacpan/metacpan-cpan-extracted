@@ -6,7 +6,8 @@
 use 5.026;
 use Object::Pad 0.19;
 
-class Device::Chip::BNO055 0.01
+package Device::Chip::BNO055 0.02;
+class Device::Chip::BNO055
    extends Device::Chip;
 
 use utf8;
@@ -29,9 +30,10 @@ C<Device::Chip::BNO055> - chip driver for F<BNO055>
 =head1 SYNOPSIS
 
    use Device::Chip::BNO055;
+   use Future::AsyncAwait;
 
    my $chip = Device::Chip::BNO055->new;
-   $chip->mount( Device::Chip::Adapter::...->new )->get;
+   await $chip->mount( Device::Chip::Adapter::...->new );
 
 =head1 DESCRIPTION
 
@@ -54,8 +56,8 @@ sub I2C_options
 
 =head1 METHODS
 
-The following methods documented with a trailing call to C<< ->get >> return
-L<Future> instances.
+The following methods documented in an C<await> expression return L<Future>
+instances.
 
 =cut
 
@@ -209,7 +211,7 @@ async method cached_write_reg ( $reg, $bytes )
 
 =head2 read_ids
 
-   $ids = $chip->read_ids->get
+   $ids = await $chip->read_ids;
 
 Returns an 8-character string composed of the four ID registers. For a
 C<BNO055> chip this should be the string
@@ -225,7 +227,7 @@ async method read_ids ()
 
 =head2 read_config
 
-   $config = $chip->read_config->get
+   $config = await $chip->read_config;
 
 Returns the current chip configuration.
 
@@ -243,7 +245,7 @@ async method read_config ()
 
 =head2 change_config
 
-   $chip->change_config( %changes )->get
+   await $chip->change_config( %changes );
 
 Changes the configuration. Any field names not mentioned will be preserved at
 their existing values.
@@ -275,7 +277,7 @@ async method change_config ( %changes )
 
 =head2 set_opr_mode
 
-   $chip->set_opr_mode( $mode )->get
+   await $chip->set_opr_mode( $mode );
 
 Sets the C<OPR_MODE> register.
 
@@ -290,7 +292,7 @@ async method set_opr_mode ( $mode )
 
 =head2 read_accelerometer_raw
 
-   ( $x, $y, $z ) = $chip->read_accelerometer_raw->get
+   ( $x, $y, $z ) = await $chip->read_accelerometer_raw;
 
 Returns the most recent accelerometer readings in raw 16bit signed integers
 
@@ -303,7 +305,7 @@ async method read_accelerometer_raw ()
 
 =head2 read_accelerometer
 
-   ( $x, $y, $z ) = $chip->read_accelerometer->get
+   ( $x, $y, $z ) = await $chip->read_accelerometer;
 
 Returns the most recent accelerometer readings in converted units, either
 C<m/s²> or C<G> depending on the chip's C<ACC_Unit> configuration.
@@ -324,7 +326,7 @@ async method read_accelerometer ()
 
 =head2 read_magnetometer_raw
 
-   ( $x, $y, $z ) = $chip->read_magnetometer_raw->get
+   ( $x, $y, $z ) = await $chip->read_magnetometer_raw;
 
 Returns the most recent magnetometer readings in raw 16bit signed integers
 
@@ -337,7 +339,7 @@ async method read_magnetometer_raw ()
 
 =head2 read_magnetometer
 
-   ( $x, $y, $z ) = $chip->read_magnetometer->get
+   ( $x, $y, $z ) = await $chip->read_magnetometer;
 
 Returns the most recent magnetometer readings in converted units of C<µT>.
 
@@ -350,7 +352,7 @@ async method read_magnetometer ()
 
 =head2 read_gyroscope_raw
 
-   ( $x, $y, $z ) = $chip->read_gyroscope_raw->get
+   ( $x, $y, $z ) = await $chip->read_gyroscope_raw;
 
 Returns the most recent gyroscope readings in raw 16bit signed integers
 
@@ -363,7 +365,7 @@ async method read_gyroscope_raw ()
 
 =head2 read_gyroscope
 
-   ( $x, $y, $z ) = $chip->read_gyroscope->get
+   ( $x, $y, $z ) = await $chip->read_gyroscope;
 
 Returns the most recent gyroscope readings in converted units, either
 C<dps> or C<rps> depending on the chip's C<GYR_Unit> configuration.
@@ -384,7 +386,7 @@ async method read_gyroscope ()
 
 =head2 read_euler_angles
 
-   ( $heading, $roll, $pitch ) = $chip->read_euler_angles->get
+   ( $heading, $roll, $pitch ) = await $chip->read_euler_angles;
 
 Returns the most recent Euler angle fusion readings in converted units, either
 degrees or radians depending on the chip's C<EUL_units> configuration.
@@ -407,7 +409,7 @@ async method read_euler_angles ()
 
 =head2 read_quarternion
 
-   ( $w, $x, $y, $z ) = $chip->read_quarternion->get
+   ( $w, $x, $y, $z ) = await $chip->read_quarternion;
 
 Returns the most recent quarternion fusion readings in converted units as
 scaled numbers between -1 and 1.
@@ -423,7 +425,7 @@ async method read_quarternion ()
 
 =head2 read_linear_acceleration
 
-   ( $x, $y, $z ) = $chip->read_linear_acceleration->get
+   ( $x, $y, $z ) = await $chip->read_linear_acceleration;
 
 Returns the most recent linear acceleration fusion readings in converted
 units, either C<m/s²> or C<G> depending on the chip's C<ACC_units>
@@ -447,7 +449,7 @@ async method read_linear_acceleration ()
 
 =head2 read_linear_acceleration
 
-   ( $x, $y, $z ) = $chip->read_linear_acceleration->get
+   ( $x, $y, $z ) = await $chip->read_linear_acceleration;
 
 Returns the most recent gravity fusion readings in converted units, either
 C<m/s²> or C<G> depending on the chip's C<ACC_units> configuration.

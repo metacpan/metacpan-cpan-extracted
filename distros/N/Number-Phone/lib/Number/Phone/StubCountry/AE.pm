@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20200904144526;
+our $VERSION = 1.20201204215954;
 
 my $formatters = [
                 {
@@ -69,36 +69,36 @@ my $validators = {
                 'voip' => ''
               };
 my %areanames = ();
-$areanames{en}->{9712} = "Abu\ dhabi";
-$areanames{en}->{9713} = "Al\ Ain";
-$areanames{en}->{97142} = "Dubai";
-$areanames{en}->{97143} = "Dubai";
-$areanames{en}->{97144} = "Dubai";
-$areanames{en}->{97145} = "Dubai";
-$areanames{en}->{97146} = "Dubai";
-$areanames{en}->{97147} = "Dubai";
-$areanames{en}->{97148} = "Dubai";
-$areanames{en}->{97162} = "Sharjah\,\ Ajman\,\ Umm\ Al\-Qaiwain";
-$areanames{en}->{97163} = "Sharjah\,\ Ajman\,\ Umm\ Al\-Qaiwain";
-$areanames{en}->{97164} = "Sharjah\,\ Ajman\,\ Umm\ Al\-Qaiwain";
-$areanames{en}->{97165} = "Sharjah\,\ Ajman\,\ Umm\ Al\-Qaiwain";
-$areanames{en}->{97166} = "Sharjah\,\ Ajman\,\ Umm\ Al\-Qaiwain";
-$areanames{en}->{97167} = "Sharjah\,\ Ajman\,\ Umm\ Al\-Qaiwain";
-$areanames{en}->{97168} = "Sharjah\,\ Ajman\,\ Umm\ Al\-Qaiwain";
-$areanames{en}->{97172} = "Ras\ Alkhaimah";
-$areanames{en}->{97173} = "Ras\ Alkhaimah";
-$areanames{en}->{97174} = "Ras\ Alkhaimah";
-$areanames{en}->{97175} = "Ras\ Alkhaimah";
-$areanames{en}->{97176} = "Ras\ Alkhaimah";
-$areanames{en}->{97177} = "Ras\ Alkhaimah";
-$areanames{en}->{97178} = "Ras\ Alkhaimah";
-$areanames{en}->{97192} = "Fujairah";
-$areanames{en}->{97193} = "Fujairah";
-$areanames{en}->{97194} = "Fujairah";
-$areanames{en}->{97195} = "Fujairah";
-$areanames{en}->{97196} = "Fujairah";
-$areanames{en}->{97197} = "Fujairah";
-$areanames{en}->{97198} = "Fujairah";
+$areanames{en} = {"97173", "Ras\ Alkhaimah",
+"97197", "Fujairah",
+"97198", "Fujairah",
+"97146", "Dubai",
+"97164", "Sharjah\,\ Ajman\,\ Umm\ Al\-Qaiwain",
+"97142", "Dubai",
+"97175", "Ras\ Alkhaimah",
+"9712", "Abu\ dhabi",
+"97192", "Fujairah",
+"97174", "Ras\ Alkhaimah",
+"97165", "Sharjah\,\ Ajman\,\ Umm\ Al\-Qaiwain",
+"97163", "Sharjah\,\ Ajman\,\ Umm\ Al\-Qaiwain",
+"97196", "Fujairah",
+"97148", "Dubai",
+"9713", "Al\ Ain",
+"97147", "Dubai",
+"97176", "Ras\ Alkhaimah",
+"97167", "Sharjah\,\ Ajman\,\ Umm\ Al\-Qaiwain",
+"97168", "Sharjah\,\ Ajman\,\ Umm\ Al\-Qaiwain",
+"97143", "Dubai",
+"97172", "Ras\ Alkhaimah",
+"97145", "Dubai",
+"97194", "Fujairah",
+"97144", "Dubai",
+"97162", "Sharjah\,\ Ajman\,\ Umm\ Al\-Qaiwain",
+"97195", "Fujairah",
+"97178", "Ras\ Alkhaimah",
+"97177", "Ras\ Alkhaimah",
+"97166", "Sharjah\,\ Ajman\,\ Umm\ Al\-Qaiwain",
+"97193", "Fujairah",};
 
     sub new {
       my $class = shift;

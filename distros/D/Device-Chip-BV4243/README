@@ -4,13 +4,14 @@ NAME
 
 SYNOPSIS
 
-     use Device::Chip::BV4243;
+       use Device::Chip::BV4243;
+       use Future::AsyncAwait;
     
-     my $chip = Device::Chip::BV4243->new;
-     $chip->mount( Device::Chip::Adapter::...->new )->get;
+       my $chip = Device::Chip::BV4243->new;
+       await $chip->mount( Device::Chip::Adapter::...->new );
     
-     $chip->lcd_reset->get;
-     $chip->lcd_string( "Hello, world!" )->get;
+       await $chip->lcd_reset;
+       await $chip->lcd_string( "Hello, world!" );
 
 DESCRIPTION
 
@@ -25,37 +26,37 @@ DESCRIPTION
 
 METHODS
 
-    The following methods documented with a trailing call to ->get return
-    Future instances.
+    The following methods documented in an await expression return Future
+    instances.
 
  clear_keys
 
-       $chip->clear_keys->get
+       await $chip->clear_keys;
 
     Clears the keypad buffer.
 
  get_keycount
 
-       $count = $chip->get_keycount->get
+       $count = await $chip->get_keycount;
 
     Returns the number of keys waiting in the keypad buffer.
 
  get_key
 
-       $key = $chip->get_key->get
+       $key = await $chip->get_key;
 
     Returns the next key from the keypad buffer, or 0 if there are none.
 
  find_key
 
-       $pos = $chip->find_key( $key )->get
+       $pos = await $chip->find_key( $key );
 
     Returns the position in the key buffer of the given key, or 0 if is not
     there.
 
  get_scancode
 
-       $code = $chip->get_scancode->get
+       $code = await $chip->get_scancode;
 
     Returns the scan value from the keypad scanning matrix. This will be 0
     if no key is being touched, or an integer value with at least two bits
@@ -63,50 +64,50 @@ METHODS
 
  beep
 
-       $chip->beep( $msec )->get
+       await $chip->beep( $msec );
 
     Turns on the BELL output line for the specified number of miliseconds.
 
  read_chan
 
-       @channels = $chip->read_chan->get
+       @channels = await $chip->read_chan;
 
     Returns the raw touchpad sensor values as 8 16bit integers.
 
  read_delta
 
-       @deltas = $chip->read_delta->get
+       @deltas = await $chip->read_delta;
 
     Returns the touchpad sensor values minus the trigger value.
 
  sleep
 
-       $chip->sleep->get
+       await $chip->sleep;
 
     Puts the device into sleep mode. It stops scanning the keypad, but will
     still respond to another command which will wake it up again.
 
  lcd_reset
 
-       $chip->lcd_reset->get
+       await $chip->lcd_reset;
 
     Resets the LCD.
 
  lcd_command
 
-       $chip->lcd_command( $cmd )->get;
+       await $chip->lcd_command( $cmd );
 
     Sends a numeric command to the LCD controller.
 
  lcd_data
 
-       $chip->lcd_data( $data )->get
+       await $chip->lcd_data( $data );
 
     Sends a byte of numerical data to the LCD controller.
 
  lcd_string
 
-       $chip->lcd_string( $str )->get
+       await $chip->lcd_string( $str );
 
     Sends a string of data to the LCD controller. This is a more efficient
     version of sending each byte of the string individually using
@@ -114,13 +115,13 @@ METHODS
 
  lcd_signon
 
-       $chip->lcd_signon->get
+       await $chip->lcd_signon;
 
     Displays the signon string stored the in EEPROM.
 
  lcd_backlight
 
-       $chip->lcd_backlight( $red, $green, $blue )->get
+       await $chip->lcd_backlight( $red, $green, $blue );
 
     Sets the level of each of the three backlight channels. Each must be a
     numeric value between 0 and 10 (inclusive). For single-backlight
@@ -134,31 +135,31 @@ METHODS
 
  device_id
 
-       $id = $chip->device_id->get
+       $id = await $chip->device_id;
 
     Returns the device ID value as a 16 bit integer
 
  version
 
-       $id = $chip->version->get
+       $id = await $chip->version;
 
     Returns the device firmware version as a 16 bit integer
 
  eeprom_reset
 
-       $chip->eeprom_reset->get
+       await $chip->eeprom_reset;
 
     Resets the configuration EEPROM back to default values.
 
  eeprom_read
 
-       $val = $chip->eeprom_read( $addr )->get
+       $val = await $chip->eeprom_read( $addr );
 
     Reads a byte from the configuration EEPROM.
 
  eeprom_write
 
-       $chip->eeprom_write( $addr, $val )->get
+       await $chip->eeprom_write( $addr, $val );
 
     Writes a byte to the configuration EEPROM.
 

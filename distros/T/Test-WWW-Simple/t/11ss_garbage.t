@@ -1,11 +1,14 @@
 #!/usr/bin/env perl
+use strict;
+use warnings;
+
 use Test::More tests=>2;
 
-@output = `$^X examples/simple_scan<examples/ss_garbage1.in`;
-@expected = ();
+my @output = `$^X -Iblib/lib examples/simple_scan<examples/ss_garbage1.in`;
+my @expected = ();
 is_deeply(\@output, \@expected, "working output as expected");
 
-@output = `$^X examples/simple_scan<examples/ss_garbage2.in`;
+@output = `examples/simple_scan<examples/ss_garbage2.in`;
 @expected = map {"$_\n"} split /\n/,<<EOF;
 1..1
 ok 1 - Garbage lines were ignored [http://perl.org/] [/perl/ should match]

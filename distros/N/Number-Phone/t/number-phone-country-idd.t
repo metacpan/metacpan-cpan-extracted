@@ -1,13 +1,9 @@
-#!/usr/bin/perl -w
-
 use strict;
-
+use warnings;
 use lib 't/inc';
-use fatalwarnings;
+use nptestutils;
 
 use Test::More;
-
-END { done_testing(); }
 
 use Number::Phone::Country qw(noexport);
 
@@ -24,3 +20,5 @@ sub country_and_idd {
     };
     return;
 }
+
+done_testing();

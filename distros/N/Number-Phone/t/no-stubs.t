@@ -1,17 +1,14 @@
-#!/usr/bin/perl -w
-
 use strict;
-
+use warnings;
 use lib 't/inc';
-use fatalwarnings;
+use nptestutils;
 
 use lib 't/lib';
 
 use Number::Phone qw(nostubs);
 
 use Test::More;
-
-END { done_testing(); }
+plan skip_all => 'not relevant if building --without_uk' if(building_without_uk());
 
 use Number::Phone::Country qw(noexport);
 
@@ -23,3 +20,5 @@ $Number::Phone::Country::prefix_codes{'MOCK'} = ['44',   '00',  undef];
 
 eval { Number::Phone->new('+442087712924') };
 ok($@, "nostubs works");
+
+done_testing();

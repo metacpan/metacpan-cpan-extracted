@@ -1,24 +1,26 @@
 #!/usr/bin/perl
 
-use strict;
+use v5.26;
 use warnings;
 
 use Test::More;
 use Test::Device::Chip::Adapter;
 
+use Future::AsyncAwait;
+
 use Device::Chip::CC1101;
 
 my $chip = Device::Chip::CC1101->new;
 
-$chip->mount(
+await $chip->mount(
    my $adapter = Test::Device::Chip::Adapter->new,
-)->get;
+);
 
 # ->reset
 {
    $adapter->expect_write( "\x30" );
 
-   $chip->reset()->get;
+   await $chip->reset;
 
    $adapter->check_and_clear( '->reset' );
 }
@@ -28,7 +30,7 @@ $chip->mount(
    $adapter->expect_write( "\x3A" );
    $adapter->expect_write( "\x3B" );
 
-   $chip->flush_fifos()->get;
+   await $chip->flush_fifos;
 
    $adapter->check_and_clear( '->flush_fifos' );
 }
@@ -46,7 +48,7 @@ $chip->mount(
    $adapter->expect_write_then_read( "\xF5", 1 )
       ->returns( "\x0D" );
 
-   $chip->start_rx()->get;
+   await $chip->start_rx;
 
    $adapter->check_and_clear( '->start_rx' );
 }
@@ -64,7 +66,7 @@ $chip->mount(
    $adapter->expect_write_then_read( "\xF5", 1 )
       ->returns( "\x13" );
 
-   $chip->start_tx()->get;
+   await $chip->start_tx;
 
    $adapter->check_and_clear( '->start_tx' );
 }
@@ -78,7 +80,7 @@ $chip->mount(
    $adapter->expect_write_then_read( "\xFF", 4 )
       ->returns( "1234" );
 
-   is( $chip->read_rxfifo( 4 )->get, "1234",
+   is( await $chip->read_rxfifo( 4 ), "1234",
       '->read_rxfifo yields bytes' );
 
    $adapter->check_and_clear( '->read_rxfifo' );
@@ -88,7 +90,7 @@ $chip->mount(
 {
    $adapter->expect_write( "\x7F" . "ABCD" );
 
-   $chip->write_txfifo( "ABCD" )->get;
+   await $chip->write_txfifo( "ABCD" );
 
    $adapter->check_and_clear( '->write_txfifo' );
 }

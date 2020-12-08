@@ -11,7 +11,7 @@ use strict;
 use warnings;
 use Rex::Interface::Shell::Csh;
 
-our $VERSION = '1.13.1'; # VERSION
+our $VERSION = '1.13.2'; # VERSION
 
 use base qw(Rex::Interface::Shell::Csh);
 

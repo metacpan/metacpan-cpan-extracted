@@ -33,7 +33,7 @@ use XSLoader qw();
 our($VERSION);
 
 BEGIN {
-    $VERSION = '2.08';
+    $VERSION = '2.09';
 
     XSLoader::load(__PACKAGE__, $VERSION);
 }
@@ -172,6 +172,20 @@ been set-up with a crypt mode that it does not recognize.
 
 I<None>.
 
+=head1 KNOWN BUGS
+
+=over
+
+=item C<__DATA__> is not accessible when running encrypted files.
+
+See L<https://rt.cpan.org/Ticket/Display.html?id=54370>.
+
+=item Infinite loop when running a program using an encrypted Data::Alias.
+
+See L<https://rt.cpan.org/Ticket/Display.html?id=122951>.
+
+=back
+
 =head1 SEE ALSO
 
 L<Filter::Crypto>;
@@ -207,11 +221,11 @@ License or the Artistic License, as specified in the F<LICENCE> file.
 
 =head1 VERSION
 
-Version 2.08
+Version 2.09
 
 =head1 DATE
 
-31 Jul 2018
+08 Dec 2020
 
 =head1 HISTORY
 

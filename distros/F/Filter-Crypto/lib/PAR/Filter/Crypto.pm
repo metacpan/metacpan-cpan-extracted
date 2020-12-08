@@ -40,7 +40,7 @@ our(@ISA, $VERSION);
 BEGIN {
     @ISA = qw(PAR::Filter);
 
-    $VERSION = '2.08';
+    $VERSION = '2.09';
 }
 
 #===============================================================================
@@ -234,6 +234,10 @@ version 0.76 or higher.
 
 I<None>.
 
+=head1 KNOWN BUGS
+
+I<None>.
+
 =head1 SEE ALSO
 
 L<PAR::Filter>;
@@ -261,11 +265,11 @@ License or the Artistic License, as specified in the F<LICENCE> file.
 
 =head1 VERSION
 
-Version 2.08
+Version 2.09
 
 =head1 DATE
 
-31 Jul 2018
+08 Dec 2020
 
 =head1 HISTORY
 

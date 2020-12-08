@@ -1,5 +1,9 @@
 Revision history for perl distribution App-tt
 
+0.14 2020-12-05T09:58:22+0900
+ - Fix Invalid time: 2020-13-01T00:00:00
+ - Can read defaults from ~/.TimeTracker/config or $PWD/.env
+
 0.13 2020-09-02T08:46:36+0900
  - Add support for "TT_COLUMNS=... tt export"
  - Can also edit description interactive

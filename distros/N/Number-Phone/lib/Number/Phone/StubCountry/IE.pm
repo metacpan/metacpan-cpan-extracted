@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20200904144533;
+our $VERSION = 1.20201204215956;
 
 my $formatters = [
                 {
@@ -192,306 +192,306 @@ my $validators = {
                 'voip' => '76\\d{7}'
               };
 my %areanames = ();
-$areanames{en}->{3531} = "Dublin";
-$areanames{en}->{35321} = "Cork";
-$areanames{en}->{3532140} = "Kinsale";
-$areanames{en}->{3532141} = "Kinsale";
-$areanames{en}->{3532147} = "Kinsale";
-$areanames{en}->{353217} = "Coachford";
-$areanames{en}->{353218} = "Cork\/Kinsale\/Coachford";
-$areanames{en}->{35322} = "Mallow";
-$areanames{en}->{35323} = "Bandon";
-$areanames{en}->{35324} = "Youghal";
-$areanames{en}->{35325} = "Fermoy";
-$areanames{en}->{35326} = "Macroom";
-$areanames{en}->{35327} = "Bantry";
-$areanames{en}->{35328} = "Skibbereen";
-$areanames{en}->{35329} = "Kanturk";
-$areanames{en}->{353402} = "Arklow";
-$areanames{en}->{353404} = "Wicklow";
-$areanames{en}->{35341} = "Drogheda";
-$areanames{en}->{3534120} = "Drogheda\/Ardee";
-$areanames{en}->{353416} = "Ardee";
-$areanames{en}->{3534199} = "Drogheda\/Ardee";
-$areanames{en}->{353420} = "Dundalk\/Carrickmacross\/Castleblaney";
-$areanames{en}->{353421} = "Dundalk\/Carrickmacross\/Castleblaney";
-$areanames{en}->{353422} = "Dundalk";
-$areanames{en}->{353423} = "Dundalk\/Carrickmacross\/Castleblaney";
-$areanames{en}->{353424} = "Carrickmacross";
-$areanames{en}->{353425} = "Castleblaney";
-$areanames{en}->{353426} = "Dundalk";
-$areanames{en}->{353427} = "Dundalk";
-$areanames{en}->{353428} = "Dundalk";
-$areanames{en}->{3534290} = "Dundalk";
-$areanames{en}->{3534291} = "Dundalk";
-$areanames{en}->{3534292} = "Dundalk";
-$areanames{en}->{3534293} = "Dundalk";
-$areanames{en}->{3534294} = "Dundalk";
-$areanames{en}->{3534295} = "Carrickmacross";
-$areanames{en}->{3534296} = "Carrickmacross";
-$areanames{en}->{3534297} = "Castleblaney";
-$areanames{en}->{3534298} = "Castleblaney";
-$areanames{en}->{3534299} = "Dundalk\/Carrickmacross\/Castleblaney";
-$areanames{en}->{35343} = "Longford\/Granard";
-$areanames{en}->{353432} = "Longford";
-$areanames{en}->{3534330} = "Longford";
-$areanames{en}->{3534331} = "Longford";
-$areanames{en}->{3534332} = "Longford";
-$areanames{en}->{3534333} = "Longford";
-$areanames{en}->{35343666} = "Granard";
-$areanames{en}->{35343667} = "Granard";
-$areanames{en}->{35343668} = "Granard";
-$areanames{en}->{35343669} = "Granard";
-$areanames{en}->{3534367} = "Granard";
-$areanames{en}->{3534368} = "Granard";
-$areanames{en}->{3534369} = "Granard";
-$areanames{en}->{353437} = "Granard";
-$areanames{en}->{353438} = "Granard";
-$areanames{en}->{35344} = "Mullingar";
-$areanames{en}->{353443} = "Mullingar\/Castlepollard\/Tyrrellspass";
-$areanames{en}->{353447} = "Castlepollard";
-$areanames{en}->{353448} = "Tyrellspass";
-$areanames{en}->{3534490} = "Tyrellspass";
-$areanames{en}->{3534491} = "Tyrellspass";
-$areanames{en}->{3534492} = "Tyrellspass";
-$areanames{en}->{3534495} = "Castlepollard";
-$areanames{en}->{3534496} = "Castlepollard";
-$areanames{en}->{3534497} = "Castlepollard";
-$areanames{en}->{3534498} = "Castlepollard";
-$areanames{en}->{3534499} = "Mullingar\/Castlepollard\/Tyrrellspass";
-$areanames{en}->{353450} = "Naas\/Kildare\/Curragh";
-$areanames{en}->{353451} = "Naas\/Kildare\/Curragh";
-$areanames{en}->{3534510} = "Kildare";
-$areanames{en}->{353452} = "Kildare";
-$areanames{en}->{353453} = "The\ Curragh";
-$areanames{en}->{353454} = "The\ Curragh";
-$areanames{en}->{353455} = "Kildare";
-$areanames{en}->{353456} = "Naas";
-$areanames{en}->{353457} = "Naas";
-$areanames{en}->{353458} = "Naas";
-$areanames{en}->{353459} = "Naas";
-$areanames{en}->{353460} = "Navan";
-$areanames{en}->{353461} = "Navan";
-$areanames{en}->{353462} = "Kells";
-$areanames{en}->{353463} = "Navan\/Kells\/Trim\/Edenderry\/Enfield";
-$areanames{en}->{353464} = "Trim";
-$areanames{en}->{353465} = "Enfield";
-$areanames{en}->{353466} = "Edenderry";
-$areanames{en}->{353467} = "Navan";
-$areanames{en}->{353468} = "Navan";
-$areanames{en}->{3534690} = "Navan";
-$areanames{en}->{3534691} = "Navan";
-$areanames{en}->{3534692} = "Kells";
-$areanames{en}->{3534693} = "Kells";
-$areanames{en}->{3534694} = "Trim";
-$areanames{en}->{3534695} = "Enfield";
-$areanames{en}->{3534696} = "Enfield";
-$areanames{en}->{3534697} = "Edenderry";
-$areanames{en}->{3534698} = "Edenderry";
-$areanames{en}->{3534699} = "Navan\/Kells\/Trim\/Edenderry\/Enfield";
-$areanames{en}->{353469900} = "Navan";
-$areanames{en}->{353469901} = "Navan";
-$areanames{en}->{353469907} = "Edenderry";
-$areanames{en}->{353470} = "Monaghan\/Clones";
-$areanames{en}->{353471} = "Monaghan\/Clones";
-$areanames{en}->{353472} = "Clones";
-$areanames{en}->{353473} = "Monaghan";
-$areanames{en}->{353474} = "Clones";
-$areanames{en}->{353475} = "Clones";
-$areanames{en}->{353476} = "Monaghan";
-$areanames{en}->{353477} = "Monaghan";
-$areanames{en}->{353478} = "Monaghan";
-$areanames{en}->{353479} = "Monaghan";
-$areanames{en}->{3534791} = "Monaghan\/Clones";
-$areanames{en}->{3534799} = "Monaghan\/Clones";
-$areanames{en}->{353490} = "Cavan\/Cootehill\/Oldcastle\/Belturbet";
-$areanames{en}->{353491} = "Cavan\/Cootehill\/Oldcastle\/Belturbet";
-$areanames{en}->{353492} = "Cootehill";
-$areanames{en}->{353493} = "Belturbet";
-$areanames{en}->{353494} = "Cavan";
-$areanames{en}->{353495} = "Cootehill";
-$areanames{en}->{353496} = "Cavan";
-$areanames{en}->{353497} = "Cavan";
-$areanames{en}->{353498} = "Oldcastle";
-$areanames{en}->{353499} = "Belturbet";
-$areanames{en}->{3534999} = "Cavan\/Cootehill\/Oldcastle\/Belturbet";
-$areanames{en}->{353504} = "Thurles";
-$areanames{en}->{353505} = "Roscrea";
-$areanames{en}->{35351} = "Waterford";
-$areanames{en}->{353512} = "Kilmacthomas";
-$areanames{en}->{353514} = "New\ Ross";
-$areanames{en}->{353516} = "Carrick\-on\-Suir";
-$areanames{en}->{35351999} = "Waterford\/Carrick\-on\-Suir\/New\ Ross\/Kilmacthomas";
-$areanames{en}->{35352} = "Clonmel\/Cahir\/Killenaule";
-$areanames{en}->{3535261} = "Clonmel";
-$areanames{en}->{3535274} = "Cahir";
-$areanames{en}->{3535291} = "Killenaule";
-$areanames{en}->{35353} = "Wexford\/Enniscorthy\/Ferns\/Gorey";
-$areanames{en}->{353530} = "Wexford";
-$areanames{en}->{353531} = "Wexford";
-$areanames{en}->{353531202} = "Enniscorthy";
-$areanames{en}->{353531203} = "Gorey";
-$areanames{en}->{3535390} = "Wexford";
-$areanames{en}->{3535391} = "Wexford";
-$areanames{en}->{3535392} = "Enniscorthy";
-$areanames{en}->{3535393} = "Ferns";
-$areanames{en}->{3535394} = "Gorey";
-$areanames{en}->{353539900} = "Wexford";
-$areanames{en}->{353539901} = "Wexford";
-$areanames{en}->{353539902} = "Enniscorthy";
-$areanames{en}->{353539903} = "Gorey";
-$areanames{en}->{35356} = "Kilkenny\/Castlecomer\/Freshford";
-$areanames{en}->{353560} = "Kilkenny";
-$areanames{en}->{353561} = "Kilkenny";
-$areanames{en}->{3535644} = "Castlecomer";
-$areanames{en}->{3535677} = "Kilkenny";
-$areanames{en}->{3535678} = "Kilkenny";
-$areanames{en}->{3535688} = "Freshford";
-$areanames{en}->{353569900} = "Kilkenny";
-$areanames{en}->{353569901} = "Kilkenny";
-$areanames{en}->{35357} = "Portlaoise\/Abbeyleix\/Tullamore\/Birr";
-$areanames{en}->{353570} = "Portlaoise";
-$areanames{en}->{353571} = "Portlaoise";
-$areanames{en}->{35357850} = "Portlaoise";
-$areanames{en}->{353578510} = "Portlaoise";
-$areanames{en}->{35357859} = "Portlaoise";
-$areanames{en}->{3535786} = "Portlaoise";
-$areanames{en}->{3535787} = "Abbeyleix";
-$areanames{en}->{3535791} = "Birr";
-$areanames{en}->{3535793} = "Tullamore";
-$areanames{en}->{353579900} = "Portlaoise";
-$areanames{en}->{353579901} = "Portlaoise";
-$areanames{en}->{35358} = "Dungarvan";
-$areanames{en}->{35359} = "Carlow\/Muine\ Bheag\/Athy\/Baltinglass";
-$areanames{en}->{3535964} = "Baltinglass";
-$areanames{en}->{3535986} = "Athy";
-$areanames{en}->{3535987} = "Athy";
-$areanames{en}->{3535988} = "Athy";
-$areanames{en}->{3535989} = "Athy";
-$areanames{en}->{3535991} = "Carlow";
-$areanames{en}->{3535997} = "Muine\ Bheag";
-$areanames{en}->{35361} = "Limerick";
-$areanames{en}->{353616} = "Scariff";
-$areanames{en}->{353619} = "Scariff";
-$areanames{en}->{35361999} = "Limerick\/Scariff";
-$areanames{en}->{353620} = "Tipperary\/Cashel";
-$areanames{en}->{353621} = "Tipperary\/Cashel";
-$areanames{en}->{353622} = "Cashel";
-$areanames{en}->{353623} = "Tipperary";
-$areanames{en}->{353624} = "Tipperary";
-$areanames{en}->{353625} = "Tipperary";
-$areanames{en}->{353626} = "Cashel";
-$areanames{en}->{353627} = "Cashel";
-$areanames{en}->{353628} = "Tipperary";
-$areanames{en}->{353629} = "Cashel";
-$areanames{en}->{3536299} = "Tipperary";
-$areanames{en}->{35363} = "Rathluirc";
-$areanames{en}->{35364} = "Killarney\/Rathmore";
-$areanames{en}->{3536466} = "Killarney";
-$areanames{en}->{353646700} = "Killarney";
-$areanames{en}->{353646701} = "Killarney";
-$areanames{en}->{3536477} = "Rathmore";
-$areanames{en}->{353650} = "Ennis\/Ennistymon\/Kilrush";
-$areanames{en}->{353651} = "Ennis\/Ennistymon\/Kilrush";
-$areanames{en}->{353652} = "Ennis";
-$areanames{en}->{353653} = "Ennis";
-$areanames{en}->{353654} = "Ennis";
-$areanames{en}->{353655} = "Ennis";
-$areanames{en}->{353656} = "Ennis";
-$areanames{en}->{353657} = "Ennistymon";
-$areanames{en}->{353658} = "Kilrush";
-$areanames{en}->{353659} = "Kilrush";
-$areanames{en}->{3536599} = "Ennis\/Ennistymon\/Kilrush";
-$areanames{en}->{35366} = "Tralee";
-$areanames{en}->{3536670} = "Tralee\/Dingle\/Killorglin\/Cahersiveen";
-$areanames{en}->{353668} = "Tralee\/Dingle\/Killorglin\/Cahersiveen";
-$areanames{en}->{3536690} = "Killorglin";
-$areanames{en}->{3536691} = "Dingle";
-$areanames{en}->{353669100} = "Killorglin";
-$areanames{en}->{3536692} = "Dingle";
-$areanames{en}->{3536693} = "Dingle";
-$areanames{en}->{3536694} = "Cahirciveen";
-$areanames{en}->{3536695} = "Cahirciveen";
-$areanames{en}->{3536696} = "Cahirciveen";
-$areanames{en}->{3536697} = "Killorglin";
-$areanames{en}->{3536698} = "Killorglin";
-$areanames{en}->{3536699} = "Tralee\/Dingle\/Killorglin\/Cahersiveen";
-$areanames{en}->{35367} = "Nenagh";
-$areanames{en}->{35368} = "Listowel";
-$areanames{en}->{35369} = "Newcastle\ West";
-$areanames{en}->{35371} = "Sligo\/Manorhamilton\/Carrick\-on\-Shannon";
-$areanames{en}->{353710} = "Sligo";
-$areanames{en}->{353711} = "Sligo";
-$areanames{en}->{353719010} = "Sligo";
-$areanames{en}->{3537191} = "Sligo";
-$areanames{en}->{35371930} = "Sligo";
-$areanames{en}->{35371931} = "Sligo";
-$areanames{en}->{35371932} = "Sligo";
-$areanames{en}->{353719330} = "Sligo";
-$areanames{en}->{353719331} = "Sligo";
-$areanames{en}->{353719332} = "Sligo";
-$areanames{en}->{353719334} = "Sligo";
-$areanames{en}->{353719335} = "Sligo";
-$areanames{en}->{353719344} = "Sligo";
-$areanames{en}->{353719401} = "Sligo";
-$areanames{en}->{35371959} = "Carrick\-on\-Shannon";
-$areanames{en}->{3537196} = "Carrick\-on\-Shannon";
-$areanames{en}->{3537198} = "Manorhamilton";
-$areanames{en}->{353719900} = "Sligo";
-$areanames{en}->{35374} = "Letterkenny\/Donegal\/Dungloe\/Buncrana";
-$areanames{en}->{353740} = "Letterkenny";
-$areanames{en}->{353741} = "Letterkenny";
-$areanames{en}->{3537491} = "Letterkenny";
-$areanames{en}->{35374920} = "Letterkenny";
-$areanames{en}->{353749210} = "Letterkenny";
-$areanames{en}->{353749211} = "Letterkenny";
-$areanames{en}->{353749212} = "Letterkenny";
-$areanames{en}->{353749214} = "Letterkenny";
-$areanames{en}->{3537493} = "Buncrana";
-$areanames{en}->{3537495} = "Dungloe";
-$areanames{en}->{35374960} = "Letterkenny";
-$areanames{en}->{3537497} = "Donegal";
-$areanames{en}->{353749888} = "Letterkenny";
-$areanames{en}->{353749889} = "Letterkenny";
-$areanames{en}->{35374989} = "Letterkenny";
-$areanames{en}->{353749900} = "Letterkenny";
-$areanames{en}->{35390} = "Athlone\/Ballinasloe\/Portumna\/Roscommon";
-$areanames{en}->{353900} = "Athlone";
-$areanames{en}->{353901} = "Athlone";
-$areanames{en}->{3539064} = "Athlone";
-$areanames{en}->{35390650} = "Athlone";
-$areanames{en}->{3539066} = "Roscommon";
-$areanames{en}->{3539096} = "Ballinasloe";
-$areanames{en}->{3539097} = "Portumna";
-$areanames{en}->{353909897} = "Athlone";
-$areanames{en}->{353909900} = "Athlone";
-$areanames{en}->{353909901} = "Athlone";
-$areanames{en}->{353909902} = "Ballinasloe";
-$areanames{en}->{353909903} = "Ballinasloe";
-$areanames{en}->{35391} = "Galway";
-$areanames{en}->{353912} = "Gort";
-$areanames{en}->{353916} = "Gort";
-$areanames{en}->{353918} = "Loughrea";
-$areanames{en}->{35393} = "Tuam";
-$areanames{en}->{35394} = "Castlebar\/Claremorris\/Castlerea\/Ballinrobe";
-$areanames{en}->{3539490} = "Castlebar";
-$areanames{en}->{35394925} = "Castlebar";
-$areanames{en}->{353949285} = "Castlebar";
-$areanames{en}->{353949286} = "Castlebar";
-$areanames{en}->{353949287} = "Castlebar";
-$areanames{en}->{353949288} = "Castlebar";
-$areanames{en}->{353949289} = "Castlebar";
-$areanames{en}->{353949290} = "Castlebar";
-$areanames{en}->{353949291} = "Castlebar";
-$areanames{en}->{3539493} = "Claremorris";
-$areanames{en}->{3539495} = "Ballinrobe";
-$areanames{en}->{3539496} = "Castlerea";
-$areanames{en}->{3539498} = "Castlerea";
-$areanames{en}->{35395} = "Clifden";
-$areanames{en}->{35396} = "Ballina";
-$areanames{en}->{35397} = "Belmullet";
-$areanames{en}->{35398} = "Westport";
-$areanames{en}->{35399} = "Kilronan";
+$areanames{en} = {"353719332", "Sligo",
+"353467", "Navan",
+"3536697", "Killorglin",
+"353909902", "Ballinasloe",
+"3534692", "Kells",
+"35374989", "Letterkenny",
+"353531203", "Gorey",
+"35363", "Rathluirc",
+"3534333", "Longford",
+"3537491", "Letterkenny",
+"353668", "Tralee\/Dingle\/Killorglin\/Cahersiveen",
+"353476", "Monaghan",
+"3535964", "Baltinglass",
+"353710", "Sligo",
+"353653", "Ennis",
+"3536670", "Tralee\/Dingle\/Killorglin\/Cahersiveen",
+"35343668", "Granard",
+"353428", "Dundalk",
+"35327", "Bantry",
+"353491", "Cavan\/Cootehill\/Oldcastle\/Belturbet",
+"35358", "Dungarvan",
+"353539900", "Wexford",
+"353627", "Cashel",
+"353218", "Cork\/Kinsale\/Coachford",
+"353420", "Dundalk\/Carrickmacross\/Castleblaney",
+"35399", "Kilronan",
+"353499", "Belturbet",
+"3534297", "Castleblaney",
+"353949287", "Castlebar",
+"353404", "Wicklow",
+"3535791", "Birr",
+"353443", "Mullingar\/Castlepollard\/Tyrrellspass",
+"3536699", "Tralee\/Dingle\/Killorglin\/Cahersiveen",
+"353570", "Portlaoise",
+"353900", "Athlone",
+"3539097", "Portumna",
+"35390650", "Athlone",
+"3537198", "Manorhamilton",
+"353469901", "Navan",
+"3534291", "Dundalk",
+"353616", "Scariff",
+"353719010", "Sligo",
+"3535393", "Ferns",
+"353438", "Granard",
+"35374920", "Letterkenny",
+"35396", "Ballina",
+"3534294", "Dundalk",
+"353646701", "Killarney",
+"35351", "Waterford",
+"3534298", "Castleblaney",
+"353652", "Ennis",
+"353425", "Castleblaney",
+"353424", "Carrickmacross",
+"353461", "Navan",
+"3535986", "Athy",
+"3537191", "Sligo",
+"35325", "Fermoy",
+"3534290", "Dundalk",
+"353621", "Tipperary\/Cashel",
+"353456", "Naas",
+"353912", "Gort",
+"3536698", "Killorglin",
+"3536690", "Killorglin",
+"3537497", "Donegal",
+"353740", "Letterkenny",
+"353949289", "Castlebar",
+"3534299", "Dundalk\/Carrickmacross\/Castleblaney",
+"353749888", "Letterkenny",
+"353629", "Cashel",
+"353497", "Cavan",
+"3536694", "Cahirciveen",
+"3536691", "Dingle",
+"3535987", "Athy",
+"353623", "Tipperary",
+"3534293", "Dundalk",
+"353458", "Naas",
+"3535394", "Gorey",
+"353475", "Clones",
+"3535391", "Wexford",
+"353474", "Clones",
+"353579900", "Portlaoise",
+"353719334", "Sligo",
+"353719330", "Sligo",
+"35359", "Carlow\/Muine\ Bheag\/Athy\/Baltinglass",
+"353909900", "Athlone",
+"353450", "Naas\/Kildare\/Curragh",
+"35323", "Bandon",
+"3539096", "Ballinasloe",
+"353657", "Ennistymon",
+"353949288", "Castlebar",
+"3535390", "Wexford",
+"353749889", "Letterkenny",
+"35398", "Westport",
+"3534791", "Monaghan\/Clones",
+"3536695", "Cahirciveen",
+"3535688", "Freshford",
+"353505", "Roscrea",
+"353504", "Thurles",
+"35371932", "Sligo",
+"35357850", "Portlaoise",
+"3534799", "Monaghan\/Clones",
+"353749900", "Letterkenny",
+"3535274", "Cahir",
+"35344", "Mullingar",
+"3534295", "Carrickmacross",
+"353463", "Navan\/Kells\/Trim\/Edenderry\/Enfield",
+"3536693", "Dingle",
+"35367", "Nenagh",
+"353539902", "Enniscorthy",
+"3531", "Dublin",
+"353492", "Cootehill",
+"35394", "Castlebar\/Claremorris\/Castlerea\/Ballinrobe",
+"3536477", "Rathmore",
+"35371959", "Carrick\-on\-Shannon",
+"353462", "Kells",
+"3535989", "Athy",
+"353426", "Dundalk",
+"353651", "Ennis\/Ennistymon\/Kilrush",
+"353949291", "Castlebar",
+"3534330", "Longford",
+"353493", "Belturbet",
+"3536696", "Cahirciveen",
+"35343666", "Granard",
+"3534331", "Longford",
+"3537493", "Buncrana",
+"353659", "Kilrush",
+"353512", "Kilmacthomas",
+"353569901", "Kilkenny",
+"3534510", "Kildare",
+"3534296", "Carrickmacross",
+"353470", "Monaghan\/Clones",
+"3535988", "Athy",
+"353749211", "Letterkenny",
+"353719900", "Sligo",
+"35341", "Drogheda",
+"3535291", "Killenaule",
+"3535644", "Castlecomer",
+"353454", "The\ Curragh",
+"353561", "Kilkenny",
+"353455", "Kildare",
+"3534492", "Tyrellspass",
+"3537495", "Dungloe",
+"353447", "Castlepollard",
+"3535793", "Tullamore",
+"3537196", "Carrick\-on\-Shannon",
+"353669100", "Killorglin",
+"353622", "Cashel",
+"35356", "Kilkenny\/Castlecomer\/Freshford",
+"35391", "Galway",
+"353478", "Monaghan",
+"353530", "Wexford",
+"35322", "Mallow",
+"35361999", "Limerick\/Scariff",
+"3535392", "Enniscorthy",
+"3534199", "Drogheda\/Ardee",
+"3534497", "Castlepollard",
+"353422", "Dundalk",
+"353619", "Scariff",
+"353466", "Edenderry",
+"353654", "Ennis",
+"353655", "Ennis",
+"353516", "Carrick\-on\-Suir",
+"353909903", "Ballinasloe",
+"35361", "Limerick",
+"3535677", "Kilkenny",
+"353448", "Tyrellspass",
+"353531202", "Enniscorthy",
+"353477", "Monaghan",
+"3534367", "Granard",
+"353909897", "Athlone",
+"353749212", "Letterkenny",
+"353719344", "Sligo",
+"3535997", "Muine\ Bheag",
+"35394925", "Castlebar",
+"35395", "Clifden",
+"353459", "Naas",
+"35343667", "Granard",
+"3534696", "Enfield",
+"3536599", "Ennis\/Ennistymon\/Kilrush",
+"35326", "Macroom",
+"353469900", "Navan",
+"3535786", "Portlaoise",
+"353626", "Cashel",
+"353451", "Naas\/Kildare\/Curragh",
+"35352", "Clonmel\/Cahir\/Killenaule",
+"353646700", "Killarney",
+"353539901", "Wexford",
+"353949286", "Castlebar",
+"35329", "Kanturk",
+"3534499", "Mullingar\/Castlepollard\/Tyrrellspass",
+"353918", "Loughrea",
+"3534693", "Kells",
+"353471", "Monaghan\/Clones",
+"35371930", "Sligo",
+"353531", "Wexford",
+"35397", "Belmullet",
+"35353", "Wexford\/Enniscorthy\/Ferns\/Gorey",
+"353479", "Monaghan",
+"353560", "Kilkenny",
+"35364", "Killarney\/Rathmore",
+"3534369", "Granard",
+"353469907", "Edenderry",
+"3535991", "Carlow",
+"3534332", "Longford",
+"3534490", "Tyrellspass",
+"3536466", "Killarney",
+"353432", "Longford",
+"35374960", "Letterkenny",
+"353949285", "Castlebar",
+"3534695", "Enfield",
+"353402", "Arklow",
+"353650", "Ennis\/Ennistymon\/Kilrush",
+"3534498", "Castlepollard",
+"353457", "Naas",
+"3539498", "Castlerea",
+"3535678", "Kilkenny",
+"35368", "Listowel",
+"353496", "Cavan",
+"3534491", "Tyrellspass",
+"353578510", "Portlaoise",
+"3534368", "Granard",
+"353658", "Kilrush",
+"3539490", "Castlebar",
+"353423", "Dundalk\/Carrickmacross\/Castleblaney",
+"35357859", "Portlaoise",
+"3539064", "Athlone",
+"353514", "New\ Ross",
+"3534691", "Navan",
+"353490", "Cavan\/Cootehill\/Oldcastle\/Belturbet",
+"3534694", "Trim",
+"3532141", "Kinsale",
+"35321", "Cork",
+"3536299", "Tipperary",
+"353711", "Sligo",
+"35371", "Sligo\/Manorhamilton\/Carrick\-on\-Shannon",
+"3539495", "Ballinrobe",
+"3534495", "Castlepollard",
+"353569900", "Kilkenny",
+"353749210", "Letterkenny",
+"3534690", "Navan",
+"353498", "Oldcastle",
+"353749214", "Letterkenny",
+"3534698", "Edenderry",
+"353656", "Ennis",
+"353421", "Dundalk\/Carrickmacross\/Castleblaney",
+"3532140", "Kinsale",
+"353465", "Enfield",
+"353464", "Trim",
+"3539493", "Claremorris",
+"353437", "Granard",
+"353719401", "Sligo",
+"3534120", "Drogheda\/Ardee",
+"35351999", "Waterford\/Carrick\-on\-Suir\/New\ Ross\/Kilmacthomas",
+"353625", "Tipperary",
+"353624", "Tipperary",
+"353916", "Gort",
+"353452", "Kildare",
+"3535261", "Clonmel",
+"353539903", "Gorey",
+"353473", "Monaghan",
+"35366", "Tralee",
+"353416", "Ardee",
+"353949290", "Castlebar",
+"353719335", "Sligo",
+"3534699", "Navan\/Kells\/Trim\/Edenderry\/Enfield",
+"3539496", "Castlerea",
+"35374", "Letterkenny\/Donegal\/Dungloe\/Buncrana",
+"3534999", "Cavan\/Cootehill\/Oldcastle\/Belturbet",
+"35324", "Youghal",
+"35371931", "Sligo",
+"353741", "Letterkenny",
+"353427", "Dundalk",
+"353620", "Tipperary\/Cashel",
+"3534292", "Dundalk",
+"35343669", "Granard",
+"3539066", "Roscommon",
+"35369", "Newcastle\ West",
+"353472", "Clones",
+"353217", "Coachford",
+"353628", "Tipperary",
+"353453", "The\ Curragh",
+"3534496", "Castlepollard",
+"3535787", "Abbeyleix",
+"353494", "Cavan",
+"353495", "Cootehill",
+"35328", "Skibbereen",
+"353571", "Portlaoise",
+"35390", "Athlone\/Ballinasloe\/Portumna\/Roscommon",
+"35357", "Portlaoise\/Abbeyleix\/Tullamore\/Birr",
+"353901", "Athlone",
+"353468", "Navan",
+"35393", "Tuam",
+"35343", "Longford\/Granard",
+"3532147", "Kinsale",
+"3536692", "Dingle",
+"353719331", "Sligo",
+"353579901", "Portlaoise",
+"3534697", "Edenderry",
+"353909901", "Athlone",
+"353460", "Navan",};
 
     sub new {
       my $class = shift;

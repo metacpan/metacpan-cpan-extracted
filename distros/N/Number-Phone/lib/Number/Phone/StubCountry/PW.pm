@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20200904144535;
+our $VERSION = 1.20201204215957;
 
 my $formatters = [
                 {
@@ -95,13 +95,14 @@ my $validators = {
         ',
                 'mobile' => '
           (?:
-            45[0-5]|
-            6[2-4689]0|
-            (?:
-              77|
-              88
-            )\\d
-          )\\d{4}
+            46[0-5]|
+            6[2-4689]0
+          )\\d{4}|
+          (?:
+            45|
+            77|
+            88
+          )\\d{5}
         ',
                 'pager' => '',
                 'personal_number' => '',
@@ -110,21 +111,21 @@ my $validators = {
                 'voip' => ''
               };
 my %areanames = ();
-$areanames{en}->{68025} = "Sonsorol\ State\ and\ Hatohobei\ State";
-$areanames{en}->{68027} = "Angaur\ State";
-$areanames{en}->{6803} = "Peleliu\ State";
-$areanames{en}->{68048} = "Koror\ State";
-$areanames{en}->{68053} = "Ngatpang\ State";
-$areanames{en}->{68054} = "Aimeliik\ State";
-$areanames{en}->{68058} = "Airai\ State";
-$areanames{en}->{680622} = "Ngchesar\ State";
-$areanames{en}->{68065} = "Melekeok\ State";
-$areanames{en}->{68067} = "Ngiwal\ State";
-$areanames{en}->{68073} = "Ngaremlengui\ State";
-$areanames{en}->{68074} = "Ngardmau\ State";
-$areanames{en}->{68082} = "Ngaraard\ State";
-$areanames{en}->{68085} = "Ngarchelong\ State";
-$areanames{en}->{68087} = "Kayangel\ State";
+$areanames{en} = {"68073", "Ngaremlengui\ State",
+"68067", "Ngiwal\ State",
+"68053", "Ngatpang\ State",
+"680622", "Ngchesar\ State",
+"68085", "Ngarchelong\ State",
+"68082", "Ngaraard\ State",
+"68025", "Sonsorol\ State\ and\ Hatohobei\ State",
+"68074", "Ngardmau\ State",
+"68065", "Melekeok\ State",
+"68054", "Aimeliik\ State",
+"68048", "Koror\ State",
+"6803", "Peleliu\ State",
+"68027", "Angaur\ State",
+"68087", "Kayangel\ State",
+"68058", "Airai\ State",};
 
     sub new {
       my $class = shift;

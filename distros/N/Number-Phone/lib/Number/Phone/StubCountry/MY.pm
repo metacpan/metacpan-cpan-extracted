@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20200904144534;
+our $VERSION = 1.20201204215957;
 
 my $formatters = [
                 {
@@ -252,3993 +252,3993 @@ my $validators = {
         '
               };
 my %areanames = ();
-$areanames{en}->{6032011} = "Kuala\ Lumpur";
-$areanames{en}->{6032020} = "Kuala\ Lumpur";
-$areanames{en}->{6032021} = "Kuala\ Lumpur";
-$areanames{en}->{6032022} = "Kuala\ Lumpur";
-$areanames{en}->{6032023} = "Kuala\ Lumpur";
-$areanames{en}->{6032024} = "Kuala\ Lumpur";
-$areanames{en}->{6032025} = "Kuala\ Lumpur";
-$areanames{en}->{6032026} = "Kuala\ Lumpur";
-$areanames{en}->{6032027} = "Kuala\ Lumpur";
-$areanames{en}->{6032028} = "Kuala\ Lumpur";
-$areanames{en}->{6032030} = "Kuala\ Lumpur";
-$areanames{en}->{6032031} = "Kuala\ Lumpur";
-$areanames{en}->{6032032} = "Kuala\ Lumpur";
-$areanames{en}->{6032034} = "Kuala\ Lumpur";
-$areanames{en}->{6032035} = "Kuala\ Lumpur";
-$areanames{en}->{6032036} = "Kuala\ Lumpur";
-$areanames{en}->{6032037} = "Kuala\ Lumpur";
-$areanames{en}->{6032039} = "Kuala\ Lumpur";
-$areanames{en}->{603205} = "Kuala\ Lumpur";
-$areanames{en}->{603207} = "Kuala\ Lumpur";
-$areanames{en}->{6032080} = "Kuala\ Lumpur";
-$areanames{en}->{6032081} = "Kuala\ Lumpur";
-$areanames{en}->{6032082} = "Kuala\ Lumpur";
-$areanames{en}->{6032083} = "Kuala\ Lumpur";
-$areanames{en}->{6032084} = "Kuala\ Lumpur";
-$areanames{en}->{6032085} = "Kuala\ Lumpur";
-$areanames{en}->{6032087} = "Kuala\ Lumpur";
-$areanames{en}->{6032088} = "Kuala\ Lumpur";
-$areanames{en}->{6032089} = "Kuala\ Lumpur";
-$areanames{en}->{603209} = "Kuala\ Lumpur";
-$areanames{en}->{6032106} = "Kuala\ Lumpur";
-$areanames{en}->{6032107} = "Kuala\ Lumpur";
-$areanames{en}->{6032108} = "Kuala\ Lumpur";
-$areanames{en}->{6032109} = "Kuala\ Lumpur";
-$areanames{en}->{6032110} = "Kuala\ Lumpur";
-$areanames{en}->{6032113} = "Kuala\ Lumpur";
-$areanames{en}->{6032114} = "Kuala\ Lumpur";
-$areanames{en}->{6032115} = "Kuala\ Lumpur";
-$areanames{en}->{6032116} = "Kuala\ Lumpur";
-$areanames{en}->{6032117} = "Kuala\ Lumpur";
-$areanames{en}->{6032118} = "Kuala\ Lumpur";
-$areanames{en}->{6032119} = "Kuala\ Lumpur";
-$areanames{en}->{603214} = "Kuala\ Lumpur";
-$areanames{en}->{603216} = "Kuala\ Lumpur";
-$areanames{en}->{603217} = "Kuala\ Lumpur";
-$areanames{en}->{6032180} = "Kuala\ Lumpur";
-$areanames{en}->{6032181} = "Kuala\ Lumpur";
-$areanames{en}->{6032182} = "Kuala\ Lumpur";
-$areanames{en}->{6032191} = "Kuala\ Lumpur";
-$areanames{en}->{6032193} = "Kuala\ Lumpur";
-$areanames{en}->{6032201} = "Kuala\ Lumpur";
-$areanames{en}->{6032202} = "Kuala\ Lumpur";
-$areanames{en}->{6032203} = "Kuala\ Lumpur";
-$areanames{en}->{6032222} = "Kuala\ Lumpur";
-$areanames{en}->{6032223} = "Kuala\ Lumpur";
-$areanames{en}->{6032224} = "Kuala\ Lumpur";
-$areanames{en}->{6032240} = "Kuala\ Lumpur";
-$areanames{en}->{6032241} = "Kuala\ Lumpur";
-$areanames{en}->{6032242} = "Kuala\ Lumpur";
-$areanames{en}->{6032245} = "Kuala\ Lumpur";
-$areanames{en}->{6032246} = "Kuala\ Lumpur";
-$areanames{en}->{6032247} = "Kuala\ Lumpur";
-$areanames{en}->{6032260} = "Kuala\ Lumpur";
-$areanames{en}->{6032261} = "Kuala\ Lumpur";
-$areanames{en}->{6032262} = "Kuala\ Lumpur";
-$areanames{en}->{6032263} = "Kuala\ Lumpur";
-$areanames{en}->{6032264} = "Kuala\ Lumpur";
-$areanames{en}->{6032265} = "Kuala\ Lumpur";
-$areanames{en}->{6032266} = "Kuala\ Lumpur";
-$areanames{en}->{6032267} = "Kuala\ Lumpur";
-$areanames{en}->{6032268} = "Kuala\ Lumpur";
-$areanames{en}->{6032270} = "Kuala\ Lumpur";
-$areanames{en}->{6032272} = "Kuala\ Lumpur";
-$areanames{en}->{6032273} = "Kuala\ Lumpur";
-$areanames{en}->{6032274} = "Kuala\ Lumpur";
-$areanames{en}->{6032275} = "Kuala\ Lumpur";
-$areanames{en}->{6032276} = "Kuala\ Lumpur";
-$areanames{en}->{6032278} = "Kuala\ Lumpur";
-$areanames{en}->{6032279} = "Kuala\ Lumpur";
-$areanames{en}->{603228} = "Kuala\ Lumpur";
-$areanames{en}->{6032295} = "Kuala\ Lumpur";
-$areanames{en}->{6032296} = "Kuala\ Lumpur";
-$areanames{en}->{6032297} = "Kuala\ Lumpur";
-$areanames{en}->{6032298} = "Kuala\ Lumpur";
-$areanames{en}->{6032299} = "Kuala\ Lumpur";
-$areanames{en}->{6032300} = "Kuala\ Lumpur";
-$areanames{en}->{6032301} = "Kuala\ Lumpur";
-$areanames{en}->{6032302} = "Kuala\ Lumpur";
-$areanames{en}->{6032303} = "Kuala\ Lumpur";
-$areanames{en}->{6032330} = "Kuala\ Lumpur";
-$areanames{en}->{6032331} = "Kuala\ Lumpur";
-$areanames{en}->{6032332} = "Kuala\ Lumpur";
-$areanames{en}->{6032333} = "Kuala\ Lumpur";
-$areanames{en}->{6032336} = "Kuala\ Lumpur";
-$areanames{en}->{6032380} = "Kuala\ Lumpur";
-$areanames{en}->{6032381} = "Kuala\ Lumpur";
-$areanames{en}->{6032382} = "Kuala\ Lumpur";
-$areanames{en}->{6032383} = "Kuala\ Lumpur";
-$areanames{en}->{6032385} = "Kuala\ Lumpur";
-$areanames{en}->{6032386} = "Kuala\ Lumpur";
-$areanames{en}->{6032387} = "Kuala\ Lumpur";
-$areanames{en}->{6032388} = "Kuala\ Lumpur";
-$areanames{en}->{6032389} = "Kuala\ Lumpur";
-$areanames{en}->{6032391} = "Kuala\ Lumpur";
-$areanames{en}->{6032392} = "Kuala\ Lumpur";
-$areanames{en}->{6032393} = "Kuala\ Lumpur";
-$areanames{en}->{6032600} = "Kuala\ Lumpur";
-$areanames{en}->{6032601} = "Kuala\ Lumpur";
-$areanames{en}->{6032602} = "Kuala\ Lumpur";
-$areanames{en}->{6032603} = "Kuala\ Lumpur";
-$areanames{en}->{6032604} = "Kuala\ Lumpur";
-$areanames{en}->{6032605} = "Kuala\ Lumpur";
-$areanames{en}->{603261} = "Kuala\ Lumpur";
-$areanames{en}->{603263} = "Kuala\ Lumpur";
-$areanames{en}->{6032681} = "Kuala\ Lumpur";
-$areanames{en}->{6032685} = "Kuala\ Lumpur";
-$areanames{en}->{6032686} = "Kuala\ Lumpur";
-$areanames{en}->{6032687} = "Kuala\ Lumpur";
-$areanames{en}->{6032688} = "Kuala\ Lumpur";
-$areanames{en}->{603269} = "Kuala\ Lumpur";
-$areanames{en}->{603271} = "Kuala\ Lumpur";
-$areanames{en}->{6032720} = "Kuala\ Lumpur";
-$areanames{en}->{6032721} = "Kuala\ Lumpur";
-$areanames{en}->{6032722} = "Kuala\ Lumpur";
-$areanames{en}->{6032723} = "Kuala\ Lumpur";
-$areanames{en}->{6032724} = "Kuala\ Lumpur";
-$areanames{en}->{6032725} = "Kuala\ Lumpur";
-$areanames{en}->{6032726} = "Kuala\ Lumpur";
-$areanames{en}->{6032727} = "Kuala\ Lumpur";
-$areanames{en}->{6032730} = "Kuala\ Lumpur";
-$areanames{en}->{6032731} = "Kuala\ Lumpur";
-$areanames{en}->{6032732} = "Kuala\ Lumpur";
-$areanames{en}->{6032733} = "Kuala\ Lumpur";
-$areanames{en}->{6032742} = "Kuala\ Lumpur";
-$areanames{en}->{6032770} = "Kuala\ Lumpur";
-$areanames{en}->{6032771} = "Kuala\ Lumpur";
-$areanames{en}->{6032772} = "Kuala\ Lumpur";
-$areanames{en}->{6032773} = "Kuala\ Lumpur";
-$areanames{en}->{6032775} = "Kuala\ Lumpur";
-$areanames{en}->{6032776} = "Kuala\ Lumpur";
-$areanames{en}->{6032780} = "Kuala\ Lumpur";
-$areanames{en}->{6032781} = "Kuala\ Lumpur";
-$areanames{en}->{6032782} = "Kuala\ Lumpur";
-$areanames{en}->{6032783} = "Kuala\ Lumpur";
-$areanames{en}->{6032785} = "Kuala\ Lumpur";
-$areanames{en}->{6032786} = "Kuala\ Lumpur";
-$areanames{en}->{6032787} = "Kuala\ Lumpur";
-$areanames{en}->{6032788} = "Kuala\ Lumpur";
-$areanames{en}->{6032800} = "Kuala\ Lumpur";
-$areanames{en}->{6032847} = "Kuala\ Lumpur";
-$areanames{en}->{6032848} = "Kuala\ Lumpur";
-$areanames{en}->{6032856} = "Kuala\ Lumpur";
-$areanames{en}->{6032857} = "Kuala\ Lumpur";
-$areanames{en}->{6032858} = "Kuala\ Lumpur";
-$areanames{en}->{6032859} = "Kuala\ Lumpur";
-$areanames{en}->{6032935} = "Kuala\ Lumpur";
-$areanames{en}->{6032938} = "Kuala\ Lumpur";
-$areanames{en}->{603300} = "Kelang";
-$areanames{en}->{6033006} = "Sabak\ Bernam";
-$areanames{en}->{6033007} = "Kuala\ Selangor";
-$areanames{en}->{6033008} = "Banting";
-$areanames{en}->{6033010} = "Pulau\ Ketam";
-$areanames{en}->{6033050} = "Kelang";
-$areanames{en}->{6033051} = "Kelang";
-$areanames{en}->{6033080} = "Kelang";
-$areanames{en}->{6033081} = "Kelang";
-$areanames{en}->{6033082} = "Kelang";
-$areanames{en}->{6033083} = "Kelang";
-$areanames{en}->{6033084} = "Kelang";
-$areanames{en}->{6033085} = "Kelang";
-$areanames{en}->{6033086} = "Kelang";
-$areanames{en}->{6033093} = "Pulau\ Ketam";
-$areanames{en}->{6033099} = "Pulau\ Ketam";
-$areanames{en}->{6033101} = "Pulau\ Ketam";
-$areanames{en}->{6033102} = "Pulau\ Ketam";
-$areanames{en}->{6033103} = "Pulau\ Ketam";
-$areanames{en}->{6033109} = "Pulau\ Ketam";
-$areanames{en}->{6033110} = "Pulau\ Ketam";
-$areanames{en}->{6033120} = "Tk\ Panglima\ Garang";
-$areanames{en}->{6033122} = "Tk\ Panglima\ Garang";
-$areanames{en}->{6033123} = "Tk\ Panglima\ Garang";
-$areanames{en}->{6033124} = "Tk\ Panglima\ Garang";
-$areanames{en}->{6033126} = "Tk\ Panglima\ Garang";
-$areanames{en}->{6033129} = "Tk\ Panglima\ Garang";
-$areanames{en}->{6033132} = "Tk\ Panglima\ Garang";
-$areanames{en}->{6033134} = "Kelang";
-$areanames{en}->{6033135} = "Kelang";
-$areanames{en}->{6033140} = "Banting";
-$areanames{en}->{6033141} = "Sepang";
-$areanames{en}->{6033142} = "Sepang";
-$areanames{en}->{6033143} = "Sepang";
-$areanames{en}->{6033145} = "Banting";
-$areanames{en}->{6033148} = "Banting";
-$areanames{en}->{6033149} = "Banting";
-$areanames{en}->{6033160} = "Kelang";
-$areanames{en}->{6033161} = "Kelang";
-$areanames{en}->{6033162} = "Kelang";
-$areanames{en}->{6033163} = "Kelang";
-$areanames{en}->{6033165} = "Kelang";
-$areanames{en}->{6033166} = "Kelang";
-$areanames{en}->{6033167} = "Kelang";
-$areanames{en}->{6033168} = "Kelang";
-$areanames{en}->{6033169} = "Kelang";
-$areanames{en}->{6033170} = "Kelang";
-$areanames{en}->{6033176} = "Kelang";
-$areanames{en}->{6033177} = "Kelang";
-$areanames{en}->{6033179} = "Kelang";
-$areanames{en}->{6033180} = "Banting";
-$areanames{en}->{6033181} = "Banting";
-$areanames{en}->{6033182} = "Banting";
-$areanames{en}->{6033183} = "Banting";
-$areanames{en}->{6033184} = "Banting";
-$areanames{en}->{6033185} = "Banting";
-$areanames{en}->{6033187} = "Banting";
-$areanames{en}->{6033190} = "Banting";
-$areanames{en}->{6033191} = "Banting";
-$areanames{en}->{6033192} = "Banting";
-$areanames{en}->{6033197} = "Banting";
-$areanames{en}->{6033198} = "Banting";
-$areanames{en}->{6033213} = "Hutan\ Melintang";
-$areanames{en}->{6033214} = "Sabak\ Bernam";
-$areanames{en}->{6033216} = "Sabak\ Bernam";
-$areanames{en}->{6033217} = "Sabak\ Bernam";
-$areanames{en}->{6033224} = "Sabak\ Bernam";
-$areanames{en}->{6033225} = "Sabak\ Bernam";
-$areanames{en}->{6033241} = "Sekinchan";
-$areanames{en}->{6033242} = "Sekinchan";
-$areanames{en}->{6033243} = "Sekinchan";
-$areanames{en}->{6033250} = "Kelang";
-$areanames{en}->{6033256} = "Kelang";
-$areanames{en}->{6033258} = "Kelang";
-$areanames{en}->{6033259} = "Kelang";
-$areanames{en}->{6033260} = "Kuala\ Selangor";
-$areanames{en}->{6033264} = "Kuala\ Selangor";
-$areanames{en}->{6033265} = "Kuala\ Selangor";
-$areanames{en}->{6033268} = "Kuala\ Selangor";
-$areanames{en}->{6033269} = "Kuala\ Selangor";
-$areanames{en}->{6033270} = "Batang\ Berjuntai";
-$areanames{en}->{6033271} = "Batang\ Berjuntai";
-$areanames{en}->{6033272} = "Batang\ Berjuntai";
-$areanames{en}->{6033273} = "Batang\ Berjuntai";
-$areanames{en}->{6033275} = "Batang\ Berjuntai";
-$areanames{en}->{6033277} = "Kuala\ Selangor";
-$areanames{en}->{6033279} = "Batang\ Berjuntai";
-$areanames{en}->{6033280} = "Kuala\ Selangor";
-$areanames{en}->{6033281} = "Kuala\ Selangor";
-$areanames{en}->{6033282} = "Kuala\ Selangor";
-$areanames{en}->{6033283} = "Kuala\ Selangor";
-$areanames{en}->{6033284} = "Kuala\ Selangor";
-$areanames{en}->{6033288} = "Kuala\ Selangor";
-$areanames{en}->{6033289} = "Kuala\ Selangor";
-$areanames{en}->{6033290} = "Kelang";
-$areanames{en}->{6033291} = "Kelang";
-$areanames{en}->{6033292} = "Kelang";
-$areanames{en}->{6033297} = "Kelang";
-$areanames{en}->{6033317} = "Kelang";
-$areanames{en}->{6033318} = "Kelang";
-$areanames{en}->{6033319} = "Kelang";
-$areanames{en}->{6033321} = "Kelang";
-$areanames{en}->{6033322} = "Kelang";
-$areanames{en}->{6033323} = "Kelang";
-$areanames{en}->{6033324} = "Kelang";
-$areanames{en}->{6033325} = "Kelang";
-$areanames{en}->{6033326} = "Kelang";
-$areanames{en}->{6033341} = "Kelang";
-$areanames{en}->{6033342} = "Kelang";
-$areanames{en}->{6033343} = "Kelang";
-$areanames{en}->{6033344} = "Kelang";
-$areanames{en}->{6033345} = "Kelang";
-$areanames{en}->{6033346} = "Kelang";
-$areanames{en}->{6033348} = "Kelang";
-$areanames{en}->{6033349} = "Kelang";
-$areanames{en}->{6033358} = "Kelang";
-$areanames{en}->{6033359} = "Kelang";
-$areanames{en}->{6033361} = "Kelang";
-$areanames{en}->{6033362} = "Kelang";
-$areanames{en}->{6033363} = "Kelang";
-$areanames{en}->{603337} = "Kelang";
-$areanames{en}->{6033381} = "Kelang";
-$areanames{en}->{6033382} = "Kelang";
-$areanames{en}->{6033385} = "Kelang";
-$areanames{en}->{6033392} = "Kelang";
-$areanames{en}->{6033393} = "Kelang";
-$areanames{en}->{6033396} = "Kelang";
-$areanames{en}->{6033610} = "Kuala\ Selangor";
-$areanames{en}->{6033620} = "Kelang";
-$areanames{en}->{6033630} = "Banting";
-$areanames{en}->{6033831} = "Semenyih";
-$areanames{en}->{6033850} = "Banting";
-$areanames{en}->{6033851} = "Banting";
-$areanames{en}->{6033852} = "Banting";
-$areanames{en}->{6033855} = "Sabak\ Bernam";
-$areanames{en}->{6033856} = "Sabak\ Bernam";
-$areanames{en}->{6033860} = "Sekinchan";
-$areanames{en}->{6033868} = "Batang\ Berjuntai";
-$areanames{en}->{6033884} = "Kelang";
-$areanames{en}->{6033885} = "Kelang";
-$areanames{en}->{6034009} = "Kuala\ Lumpur";
-$areanames{en}->{603401} = "Kuala\ Lumpur";
-$areanames{en}->{6034020} = "Kuala\ Lumpur";
-$areanames{en}->{6034021} = "Kuala\ Lumpur";
-$areanames{en}->{6034022} = "Kuala\ Lumpur";
-$areanames{en}->{6034023} = "Kuala\ Lumpur";
-$areanames{en}->{6034024} = "Kuala\ Lumpur";
-$areanames{en}->{6034025} = "Kuala\ Lumpur";
-$areanames{en}->{6034026} = "Kuala\ Lumpur";
-$areanames{en}->{6034027} = "Kuala\ Lumpur";
-$areanames{en}->{6034028} = "Kuala\ Lumpur";
-$areanames{en}->{6034031} = "Kuala\ Lumpur";
-$areanames{en}->{6034032} = "Kuala\ Lumpur";
-$areanames{en}->{603404} = "Kuala\ Lumpur";
-$areanames{en}->{6034050} = "Kuala\ Lumpur";
-$areanames{en}->{6034051} = "Kuala\ Lumpur";
-$areanames{en}->{6034065} = "Kuala\ Lumpur";
-$areanames{en}->{6034100} = "Kuala\ Lumpur";
-$areanames{en}->{6034101} = "Kuala\ Lumpur";
-$areanames{en}->{6034102} = "Kuala\ Lumpur";
-$areanames{en}->{6034103} = "Kuala\ Lumpur";
-$areanames{en}->{6034104} = "Kuala\ Lumpur";
-$areanames{en}->{6034105} = "Kuala\ Lumpur";
-$areanames{en}->{6034106} = "Kuala\ Lumpur";
-$areanames{en}->{6034107} = "Kuala\ Lumpur";
-$areanames{en}->{6034108} = "Kuala\ Lumpur";
-$areanames{en}->{6034131} = "Kuala\ Lumpur";
-$areanames{en}->{603414} = "Kuala\ Lumpur";
-$areanames{en}->{6034161} = "Kuala\ Lumpur";
-$areanames{en}->{6034162} = "Kuala\ Lumpur";
-$areanames{en}->{6034217} = "Kuala\ Lumpur";
-$areanames{en}->{6034250} = "Kuala\ Lumpur";
-$areanames{en}->{6034251} = "Kuala\ Lumpur";
-$areanames{en}->{6034252} = "Kuala\ Lumpur";
-$areanames{en}->{6034253} = "Kuala\ Lumpur";
-$areanames{en}->{6034255} = "Kuala\ Lumpur";
-$areanames{en}->{6034256} = "Kuala\ Lumpur";
-$areanames{en}->{6034257} = "Kuala\ Lumpur";
-$areanames{en}->{6034258} = "Kuala\ Lumpur";
-$areanames{en}->{6034259} = "Kuala\ Lumpur";
-$areanames{en}->{6034260} = "Kuala\ Lumpur";
-$areanames{en}->{6034262} = "Kuala\ Lumpur";
-$areanames{en}->{6034264} = "Kuala\ Lumpur";
-$areanames{en}->{6034265} = "Kuala\ Lumpur";
-$areanames{en}->{6034266} = "Kuala\ Lumpur";
-$areanames{en}->{6034270} = "Kuala\ Lumpur";
-$areanames{en}->{6034271} = "Kuala\ Lumpur";
-$areanames{en}->{6034278} = "Kuala\ Lumpur";
-$areanames{en}->{6034279} = "Kuala\ Lumpur";
-$areanames{en}->{6034280} = "Kuala\ Lumpur";
-$areanames{en}->{6034285} = "Kuala\ Lumpur";
-$areanames{en}->{6034287} = "Kuala\ Lumpur";
-$areanames{en}->{6034288} = "Kuala\ Lumpur";
-$areanames{en}->{6034289} = "Kuala\ Lumpur";
-$areanames{en}->{6034290} = "Kuala\ Lumpur";
-$areanames{en}->{6034291} = "Kuala\ Lumpur";
-$areanames{en}->{6034292} = "Kuala\ Lumpur";
-$areanames{en}->{6034293} = "Kuala\ Lumpur";
-$areanames{en}->{6034294} = "Kuala\ Lumpur";
-$areanames{en}->{6034295} = "Kuala\ Lumpur";
-$areanames{en}->{6034296} = "Kuala\ Lumpur";
-$areanames{en}->{6034297} = "Kuala\ Lumpur";
-$areanames{en}->{6034299} = "Kuala\ Lumpur";
-$areanames{en}->{6034770} = "Kuala\ Lumpur";
-$areanames{en}->{6034800} = "Kuala\ Lumpur";
-$areanames{en}->{6034801} = "Kuala\ Lumpur";
-$areanames{en}->{6034802} = "Kuala\ Lumpur";
-$areanames{en}->{6034810} = "Kuala\ Lumpur";
-$areanames{en}->{6034811} = "Kuala\ Lumpur";
-$areanames{en}->{6034812} = "Kuala\ Lumpur";
-$areanames{en}->{6034813} = "Kuala\ Lumpur";
-$areanames{en}->{6034815} = "Kuala\ Lumpur";
-$areanames{en}->{6034816} = "Kuala\ Lumpur";
-$areanames{en}->{6034819} = "Kuala\ Lumpur";
-$areanames{en}->{6034820} = "Kuala\ Lumpur";
-$areanames{en}->{6034821} = "Kuala\ Lumpur";
-$areanames{en}->{6035020} = "Kinrara";
-$areanames{en}->{6035021} = "Kinrara";
-$areanames{en}->{6035022} = "Kinrara";
-$areanames{en}->{6035030} = "Kinrara";
-$areanames{en}->{6035031} = "Kinrara";
-$areanames{en}->{6035032} = "Kinrara";
-$areanames{en}->{6035033} = "Kinrara";
-$areanames{en}->{6035035} = "Kinrara";
-$areanames{en}->{6035036} = "Kinrara";
-$areanames{en}->{6035039} = "Kinrara";
-$areanames{en}->{6035101} = "Kinrara";
-$areanames{en}->{6035102} = "Kinrara";
-$areanames{en}->{6035103} = "Kinrara";
-$areanames{en}->{6035110} = "Kinrara";
-$areanames{en}->{6035115} = "Kinrara";
-$areanames{en}->{6035120} = "Kinrara";
-$areanames{en}->{6035121} = "Kinrara";
-$areanames{en}->{6035122} = "Kinrara";
-$areanames{en}->{6035123} = "Kinrara";
-$areanames{en}->{6035124} = "Kinrara";
-$areanames{en}->{6035125} = "Kinrara";
-$areanames{en}->{6035126} = "Kinrara";
-$areanames{en}->{6035131} = "Kinrara";
-$areanames{en}->{6035161} = "Kinrara";
-$areanames{en}->{6035162} = "Kinrara";
-$areanames{en}->{6035163} = "Kinrara";
-$areanames{en}->{6035164} = "Kinrara";
-$areanames{en}->{6035165} = "Kinrara";
-$areanames{en}->{6035166} = "Kinrara";
-$areanames{en}->{6035167} = "Kinrara";
-$areanames{en}->{6035191} = "Kinrara";
-$areanames{en}->{6035192} = "Kinrara";
-$areanames{en}->{6035195} = "Kinrara";
-$areanames{en}->{6035198} = "Kinrara";
-$areanames{en}->{6035270} = "Kinrara";
-$areanames{en}->{6035480} = "Kinrara";
-$areanames{en}->{6035481} = "Kinrara";
-$areanames{en}->{6035482} = "Kinrara";
-$areanames{en}->{6035483} = "Kinrara";
-$areanames{en}->{6035484} = "Kinrara";
-$areanames{en}->{6035485} = "Kinrara";
-$areanames{en}->{603551} = "Kinrara";
-$areanames{en}->{6035520} = "Kinrara";
-$areanames{en}->{6035521} = "Kinrara";
-$areanames{en}->{6035522} = "Kinrara";
-$areanames{en}->{6035523} = "Kinrara";
-$areanames{en}->{6035524} = "Kinrara";
-$areanames{en}->{6035525} = "Kinrara";
-$areanames{en}->{6035526} = "Kinrara";
-$areanames{en}->{6035540} = "Kinrara";
-$areanames{en}->{6035541} = "Kinrara";
-$areanames{en}->{6035542} = "Kinrara";
-$areanames{en}->{6035543} = "Kinrara";
-$areanames{en}->{6035544} = "Kinrara";
-$areanames{en}->{6035545} = "Kinrara";
-$areanames{en}->{6035548} = "Kinrara";
-$areanames{en}->{6035549} = "Kinrara";
-$areanames{en}->{6035561} = "Kinrara";
-$areanames{en}->{6035562} = "Kinrara";
-$areanames{en}->{6035565} = "Kinrara";
-$areanames{en}->{6035566} = "Kinrara";
-$areanames{en}->{6035567} = "Kinrara";
-$areanames{en}->{6035568} = "Kinrara";
-$areanames{en}->{6035569} = "Kinrara";
-$areanames{en}->{6035590} = "Kinrara";
-$areanames{en}->{6035591} = "Kinrara";
-$areanames{en}->{6035611} = "Kinrara";
-$areanames{en}->{6035612} = "Kinrara";
-$areanames{en}->{6035613} = "Kinrara";
-$areanames{en}->{6035614} = "Kinrara";
-$areanames{en}->{6035620} = "Kinrara";
-$areanames{en}->{6035621} = "Kinrara";
-$areanames{en}->{6035622} = "Kinrara";
-$areanames{en}->{6035623} = "Kinrara";
-$areanames{en}->{6035624} = "Kinrara";
-$areanames{en}->{6035625} = "Kinrara";
-$areanames{en}->{6035628} = "Kinrara";
-$areanames{en}->{6035629} = "Kinrara";
-$areanames{en}->{603563} = "Kinrara";
-$areanames{en}->{6035650} = "Kinrara";
-$areanames{en}->{6035651} = "Kinrara";
-$areanames{en}->{6035652} = "Kinrara";
-$areanames{en}->{6035653} = "Kinrara";
-$areanames{en}->{6035721} = "Kinrara";
-$areanames{en}->{6035740} = "Kinrara";
-$areanames{en}->{6035878} = "Kinrara";
-$areanames{en}->{6035879} = "Kinrara";
-$areanames{en}->{6035880} = "Kinrara";
-$areanames{en}->{6035882} = "Kinrara";
-$areanames{en}->{6035885} = "Kinrara";
-$areanames{en}->{6035886} = "Kinrara";
-$areanames{en}->{6035887} = "Kinrara";
-$areanames{en}->{6035888} = "Kuala\ Lumpur";
-$areanames{en}->{6035889} = "Kinrara";
-$areanames{en}->{6035891} = "Kinrara";
-$areanames{en}->{6035892} = "Kinrara";
-$areanames{en}->{6036020} = "Batu\ Arang";
-$areanames{en}->{6036021} = "Batuarang";
-$areanames{en}->{6036022} = "Batu\ Arang";
-$areanames{en}->{6036028} = "Batu\ Arang";
-$areanames{en}->{6036032} = "Rawang";
-$areanames{en}->{6036034} = "Rawang";
-$areanames{en}->{6036035} = "Batuarang";
-$areanames{en}->{6036036} = "Batuarang";
-$areanames{en}->{6036037} = "Rawang";
-$areanames{en}->{6036038} = "Kuala\ Lumpur";
-$areanames{en}->{6036039} = "Kuala\ Lumpur";
-$areanames{en}->{6036042} = "Kampong\ Suharto";
-$areanames{en}->{6036044} = "Kampong\ Suharto";
-$areanames{en}->{6036046} = "Kampong\ Suharto";
-$areanames{en}->{6036047} = "Kerling";
-$areanames{en}->{6036048} = "Kerling";
-$areanames{en}->{6036049} = "Kerling";
-$areanames{en}->{6036055} = "Kuala\ Kubu\ Baru";
-$areanames{en}->{6036057} = "Kuala\ Kubu\ Baru";
-$areanames{en}->{6036061} = "Kuala\ Kubu\ Baru";
-$areanames{en}->{6036063} = "Kuala\ Kubu\ Baru";
-$areanames{en}->{6036064} = "Kuala\ Kubu\ Baru";
-$areanames{en}->{6036065} = "Kuala\ Kubu\ Baru";
-$areanames{en}->{6036066} = "Kuala\ Kubu\ Baru";
-$areanames{en}->{6036073} = "Kuala\ Kubu\ Baru";
-$areanames{en}->{6036075} = "Kuala\ Kubu\ Baru";
-$areanames{en}->{6036078} = "Batu\ Arang";
-$areanames{en}->{6036081} = "Batu\ Arang";
-$areanames{en}->{6036084} = "Batu\ Arang";
-$areanames{en}->{6036087} = "Rawang";
-$areanames{en}->{6036090} = "Rawang";
-$areanames{en}->{6036091} = "Rawang";
-$areanames{en}->{6036092} = "Rawang";
-$areanames{en}->{6036093} = "Rawang";
-$areanames{en}->{6036094} = "Rawang";
-$areanames{en}->{6036095} = "Rawang";
-$areanames{en}->{6036099} = "Rawang";
-$areanames{en}->{6036100} = "Genting";
-$areanames{en}->{6036101} = "Genting";
-$areanames{en}->{6036102} = "Genting";
-$areanames{en}->{6036103} = "Genting";
-$areanames{en}->{6036104} = "Genting";
-$areanames{en}->{6036105} = "Genting";
-$areanames{en}->{6036108} = "Genting";
-$areanames{en}->{6036120} = "Kuala\ Lumpur";
-$areanames{en}->{6036122} = "Kuala\ Lumpur";
-$areanames{en}->{6036123} = "Kuala\ Lumpur";
-$areanames{en}->{6036124} = "Kuala\ Lumpur";
-$areanames{en}->{6036125} = "Kuala\ Lumpur";
-$areanames{en}->{6036126} = "Kuala\ Lumpur";
-$areanames{en}->{6036127} = "Kuala\ Lumpur";
-$areanames{en}->{6036128} = "Kuala\ Lumpur";
-$areanames{en}->{6036130} = "Kuala\ Lumpur";
-$areanames{en}->{6036131} = "Kuala\ Lumpur";
-$areanames{en}->{6036135} = "Kuala\ Lumpur";
-$areanames{en}->{6036136} = "Kuala\ Lumpur";
-$areanames{en}->{6036137} = "Kuala\ Lumpur";
-$areanames{en}->{6036138} = "Kuala\ Lumpur";
-$areanames{en}->{6036139} = "Kuala\ Lumpur";
-$areanames{en}->{6036140} = "Kuala\ Lumpur";
-$areanames{en}->{6036141} = "Kuala\ Lumpur";
-$areanames{en}->{6036142} = "Kuala\ Lumpur";
-$areanames{en}->{6036143} = "Kuala\ Lumpur";
-$areanames{en}->{6036144} = "Kuala\ Lumpur";
-$areanames{en}->{6036145} = "Kuala\ Lumpur";
-$areanames{en}->{6036148} = "Kuala\ Lumpur";
-$areanames{en}->{6036150} = "Kuala\ Lumpur";
-$areanames{en}->{6036151} = "Kuala\ Lumpur";
-$areanames{en}->{6036156} = "Kuala\ Lumpur";
-$areanames{en}->{6036157} = "Kuala\ Lumpur";
-$areanames{en}->{6036158} = "Kuala\ Lumpur";
-$areanames{en}->{6036177} = "Kuala\ Lumpur";
-$areanames{en}->{6036178} = "Kuala\ Lumpur";
-$areanames{en}->{6036179} = "Kuala\ Lumpur";
-$areanames{en}->{6036181} = "Kuala\ Lumpur";
-$areanames{en}->{6036184} = "Kuala\ Lumpur";
-$areanames{en}->{6036185} = "Kuala\ Lumpur";
-$areanames{en}->{6036186} = "Kuala\ Lumpur";
-$areanames{en}->{6036187} = "Kuala\ Lumpur";
-$areanames{en}->{6036188} = "Kuala\ Lumpur";
-$areanames{en}->{6036189} = "Kuala\ Lumpur";
-$areanames{en}->{6036191} = "Kuala\ Lumpur";
-$areanames{en}->{6036192} = "Kuala\ Lumpur";
-$areanames{en}->{6036193} = "Kuala\ Lumpur";
-$areanames{en}->{6036195} = "Kuala\ Lumpur";
-$areanames{en}->{6036196} = "Kuala\ Lumpur";
-$areanames{en}->{603620} = "Kuala\ Lumpur";
-$areanames{en}->{6036211} = "Kuala\ Lumpur";
-$areanames{en}->{6036241} = "Kuala\ Lumpur";
-$areanames{en}->{6036242} = "Kuala\ Lumpur";
-$areanames{en}->{6036243} = "Kuala\ Lumpur";
-$areanames{en}->{603625} = "Kuala\ Lumpur";
-$areanames{en}->{6036261} = "Kuala\ Lumpur";
-$areanames{en}->{6036262} = "Kuala\ Lumpur";
-$areanames{en}->{6036263} = "Kuala\ Lumpur";
-$areanames{en}->{6036270} = "Kuala\ Lumpur";
-$areanames{en}->{6036272} = "Kuala\ Lumpur";
-$areanames{en}->{6036273} = "Kuala\ Lumpur";
-$areanames{en}->{6036274} = "Kuala\ Lumpur";
-$areanames{en}->{6036275} = "Kuala\ Lumpur";
-$areanames{en}->{6036276} = "Kuala\ Lumpur";
-$areanames{en}->{6036277} = "Kuala\ Lumpur";
-$areanames{en}->{6036279} = "Kuala\ Lumpur";
-$areanames{en}->{6036280} = "Kuala\ Lumpur";
-$areanames{en}->{6036281} = "Kuala\ Lumpur";
-$areanames{en}->{6036285} = "Kuala\ Lumpur";
-$areanames{en}->{6036286} = "Kuala\ Lumpur";
-$areanames{en}->{6036287} = "Kuala\ Lumpur";
-$areanames{en}->{6036303} = "Genting";
-$areanames{en}->{6036411} = "Kuala\ Lumpur";
-$areanames{en}->{6036412} = "Kuala\ Lumpur";
-$areanames{en}->{6036419} = "Kuala\ Lumpur";
-$areanames{en}->{6036420} = "Rawang";
-$areanames{en}->{6036421} = "Rawang";
-$areanames{en}->{6036433} = "Genting";
-$areanames{en}->{6036436} = "Genting";
-$areanames{en}->{6036460} = "Kerling";
-$areanames{en}->{6036461} = "Kerling";
-$areanames{en}->{6036462} = "Kerling";
-$areanames{en}->{6036690} = "Batuarang";
-$areanames{en}->{603673} = "Kuala\ Lumpur";
-$areanames{en}->{6036736} = "Batu\ Arang";
-$areanames{en}->{6036737} = "Kuala\ Kubu\ Baru";
-$areanames{en}->{6036738} = "Kuala\ Kubu\ Baru";
-$areanames{en}->{6036739} = "Kuala\ Kubu\ Baru";
-$areanames{en}->{6036789} = "Genting";
-$areanames{en}->{6037118} = "Kuala\ Lumpur";
-$areanames{en}->{6037200} = "Kuala\ Lumpur";
-$areanames{en}->{6037202} = "Kuala\ Lumpur";
-$areanames{en}->{6037260} = "Kuala\ Lumpur";
-$areanames{en}->{6037261} = "Kuala\ Lumpur";
-$areanames{en}->{603745} = "Kuala\ Lumpur";
-$areanames{en}->{6037480} = "Kuala\ Lumpur";
-$areanames{en}->{6037481} = "Kuala\ Lumpur";
-$areanames{en}->{603749} = "Kuala\ Lumpur";
-$areanames{en}->{6037610} = "Kuala\ Lumpur";
-$areanames{en}->{6037611} = "Kuala\ Lumpur";
-$areanames{en}->{603762} = "Kuala\ Lumpur";
-$areanames{en}->{6037650} = "Kuala\ Lumpur";
-$areanames{en}->{6037651} = "Kuala\ Lumpur";
-$areanames{en}->{6037652} = "Kuala\ Lumpur";
-$areanames{en}->{6037660} = "Kuala\ Lumpur";
-$areanames{en}->{6037661} = "Kuala\ Lumpur";
-$areanames{en}->{6037662} = "Kuala\ Lumpur";
-$areanames{en}->{6037663} = "Kuala\ Lumpur";
-$areanames{en}->{6037664} = "Kuala\ Lumpur";
-$areanames{en}->{6037665} = "Kuala\ Lumpur";
-$areanames{en}->{6037666} = "Kuala\ Lumpur";
-$areanames{en}->{6037669} = "Kuala\ Lumpur";
-$areanames{en}->{6037710} = "Kuala\ Lumpur";
-$areanames{en}->{6037711} = "Kuala\ Lumpur";
-$areanames{en}->{6037712} = "Kuala\ Lumpur";
-$areanames{en}->{6037713} = "Kuala\ Lumpur";
-$areanames{en}->{6037717} = "Kuala\ Lumpur";
-$areanames{en}->{6037718} = "Kuala\ Lumpur";
-$areanames{en}->{6037719} = "Kuala\ Lumpur";
-$areanames{en}->{603772} = "Kuala\ Lumpur";
-$areanames{en}->{6037731} = "Kuala\ Lumpur";
-$areanames{en}->{6037732} = "Kuala\ Lumpur";
-$areanames{en}->{6037733} = "Kuala\ Lumpur";
-$areanames{en}->{6037734} = "Kuala\ Lumpur";
-$areanames{en}->{6037735} = "Kuala\ Lumpur";
-$areanames{en}->{6037770} = "Kuala\ Lumpur";
-$areanames{en}->{6037771} = "Kuala\ Lumpur";
-$areanames{en}->{6037772} = "Kuala\ Lumpur";
-$areanames{en}->{6037773} = "Kuala\ Lumpur";
-$areanames{en}->{603778} = "Kuala\ Lumpur";
-$areanames{en}->{603780} = "Kuala\ Lumpur";
-$areanames{en}->{6037831} = "Kuala\ Lumpur";
-$areanames{en}->{6037832} = "Kuala\ Lumpur";
-$areanames{en}->{6037839} = "Kuala\ Lumpur";
-$areanames{en}->{603784} = "Kuala\ Lumpur";
-$areanames{en}->{6037859} = "Kuala\ Lumpur";
-$areanames{en}->{6037861} = "Kuala\ Lumpur";
-$areanames{en}->{6037862} = "Kuala\ Lumpur";
-$areanames{en}->{6037863} = "Kuala\ Lumpur";
-$areanames{en}->{6037865} = "Kuala\ Lumpur";
-$areanames{en}->{6037866} = "Kuala\ Lumpur";
-$areanames{en}->{6037870} = "Kuala\ Lumpur";
-$areanames{en}->{6037872} = "Kuala\ Lumpur";
-$areanames{en}->{6037873} = "Kuala\ Lumpur";
-$areanames{en}->{6037874} = "Kuala\ Lumpur";
-$areanames{en}->{6037875} = "Kuala\ Lumpur";
-$areanames{en}->{6037876} = "Kuala\ Lumpur";
-$areanames{en}->{6037877} = "Kuala\ Lumpur";
-$areanames{en}->{6037879} = "Kuala\ Lumpur";
-$areanames{en}->{6037880} = "Kuala\ Lumpur";
-$areanames{en}->{6037882} = "Kuala\ Lumpur";
-$areanames{en}->{6037883} = "Kuala\ Lumpur";
-$areanames{en}->{6037884} = "Kuala\ Lumpur";
-$areanames{en}->{6037885} = "Kuala\ Lumpur";
-$areanames{en}->{6037886} = "Kuala\ Lumpur";
-$areanames{en}->{6037887} = "Kuala\ Lumpur";
-$areanames{en}->{6037890} = "Kuala\ Lumpur";
-$areanames{en}->{6037910} = "Kuala\ Lumpur";
-$areanames{en}->{6037931} = "Kuala\ Lumpur";
-$areanames{en}->{6037932} = "Kuala\ Lumpur";
-$areanames{en}->{6037933} = "Kuala\ Lumpur";
-$areanames{en}->{6037940} = "Kuala\ Lumpur";
-$areanames{en}->{6037941} = "Kuala\ Lumpur";
-$areanames{en}->{6037946} = "Kuala\ Lumpur";
-$areanames{en}->{6037947} = "Kuala\ Lumpur";
-$areanames{en}->{6037948} = "Kuala\ Lumpur";
-$areanames{en}->{6037949} = "Kuala\ Lumpur";
-$areanames{en}->{603795} = "Kuala\ Lumpur";
-$areanames{en}->{603796} = "Kuala\ Lumpur";
-$areanames{en}->{6037971} = "Kuala\ Lumpur";
-$areanames{en}->{6037972} = "Kuala\ Lumpur";
-$areanames{en}->{603798} = "Kuala\ Lumpur";
-$areanames{en}->{6038000} = "Putrajaya";
-$areanames{en}->{6038008} = "Putrajaya";
-$areanames{en}->{6038011} = "Kinrara";
-$areanames{en}->{6038020} = "Kinrara";
-$areanames{en}->{6038021} = "Kinrara";
-$areanames{en}->{6038022} = "Kinrara";
-$areanames{en}->{6038023} = "Kinrara";
-$areanames{en}->{6038024} = "Kinrara";
-$areanames{en}->{6038025} = "Kinrara";
-$areanames{en}->{6038026} = "Kinrara";
-$areanames{en}->{6038027} = "Kinrara";
-$areanames{en}->{6038051} = "Kinrara";
-$areanames{en}->{6038052} = "Kinrara";
-$areanames{en}->{603806} = "Kinrara";
-$areanames{en}->{6038070} = "Kinrara";
-$areanames{en}->{6038071} = "Kinrara";
-$areanames{en}->{6038073} = "Kinrara";
-$areanames{en}->{6038074} = "Kinrara";
-$areanames{en}->{6038075} = "Kinrara";
-$areanames{en}->{6038076} = "Kinrara";
-$areanames{en}->{6038079} = "Kinrara";
-$areanames{en}->{6038080} = "Kinrara";
-$areanames{en}->{6038081} = "Kinrara";
-$areanames{en}->{6038082} = "Kinrara";
-$areanames{en}->{6038084} = "Kinrara";
-$areanames{en}->{6038090} = "Kinrara";
-$areanames{en}->{6038091} = "Kinrara";
-$areanames{en}->{6038092} = "Kinrara";
-$areanames{en}->{6038093} = "Kinrara";
-$areanames{en}->{6038094} = "Kinrara";
-$areanames{en}->{6038095} = "Kinrara";
-$areanames{en}->{6038100} = "Kinrara";
-$areanames{en}->{6038210} = "Semenyih";
-$areanames{en}->{6038211} = "Semenyih";
-$areanames{en}->{6038213} = "Putrajaya";
-$areanames{en}->{6038216} = "Kuala\ Lumpur";
-$areanames{en}->{6038308} = "Putrajaya";
-$areanames{en}->{603831} = "Putrajaya";
-$areanames{en}->{6038320} = "Putrajaya";
-$areanames{en}->{6038321} = "Putrajaya";
-$areanames{en}->{6038322} = "Putrajaya";
-$areanames{en}->{6038323} = "Putrajaya";
-$areanames{en}->{6038324} = "Putrajaya";
-$areanames{en}->{6038325} = "Putrajaya";
-$areanames{en}->{6038328} = "Putrajaya";
-$areanames{en}->{6038329} = "Putrajaya";
-$areanames{en}->{6038331} = "Putrajaya";
-$areanames{en}->{6038408} = "Cheras";
-$areanames{en}->{6038520} = "Kinrara";
-$areanames{en}->{6038521} = "Sepang";
-$areanames{en}->{6038522} = "Semenyih";
-$areanames{en}->{6038523} = "Kinrara";
-$areanames{en}->{6038525} = "Mantin";
-$areanames{en}->{6038526} = "Mantin";
-$areanames{en}->{6038527} = "Mantin";
-$areanames{en}->{6038529} = "Mantin";
-$areanames{en}->{6038588} = "Putrajaya";
-$areanames{en}->{6038600} = "Kinrara";
-$areanames{en}->{6038601} = "Kinrara";
-$areanames{en}->{6038602} = "Kinrara";
-$areanames{en}->{6038605} = "Kinrara";
-$areanames{en}->{6038609} = "Kinrara";
-$areanames{en}->{6038655} = "Cheras";
-$areanames{en}->{6038656} = "Cheras";
-$areanames{en}->{6038657} = "Cheras";
-$areanames{en}->{6038659} = "Cheras";
-$areanames{en}->{6038660} = "Mantin";
-$areanames{en}->{6038661} = "Mantin";
-$areanames{en}->{6038684} = "Putrajaya";
-$areanames{en}->{6038686} = "Putrajaya";
-$areanames{en}->{6038687} = "Putrajaya";
-$areanames{en}->{6038688} = "Putrajaya";
-$areanames{en}->{6038689} = "Putrajaya";
-$areanames{en}->{6038690} = "Semenyih";
-$areanames{en}->{6038691} = "Semenyih";
-$areanames{en}->{6038699} = "Semenyih";
-$areanames{en}->{6038703} = "Mantin";
-$areanames{en}->{6038705} = "Mantin";
-$areanames{en}->{6038706} = "Mantin";
-$areanames{en}->{6038707} = "Mantin";
-$areanames{en}->{6038708} = "Mantin";
-$areanames{en}->{6038723} = "Semenyih";
-$areanames{en}->{6038724} = "Semenyih";
-$areanames{en}->{6038725} = "Semenyih";
-$areanames{en}->{6038726} = "Semenyih";
-$areanames{en}->{6038727} = "Semenyih";
-$areanames{en}->{603873} = "Semenyih";
-$areanames{en}->{6038740} = "Semenyih";
-$areanames{en}->{6038741} = "Semenyih";
-$areanames{en}->{6038744} = "Semenyih";
-$areanames{en}->{6038749} = "Semenyih";
-$areanames{en}->{6038750} = "Semenyih";
-$areanames{en}->{6038751} = "Semenyih";
-$areanames{en}->{6038752} = "Semenyih";
-$areanames{en}->{6038760} = "Semenyih";
-$areanames{en}->{6038761} = "Semenyih";
-$areanames{en}->{6038766} = "Semenyih";
-$areanames{en}->{6038767} = "Semenyih";
-$areanames{en}->{6038768} = "Semenyih";
-$areanames{en}->{6038769} = "Semenyih";
-$areanames{en}->{6038775} = "Mantin";
-$areanames{en}->{6038776} = "Mantin";
-$areanames{en}->{6038777} = "Mantin";
-$areanames{en}->{6038778} = "Mantin";
-$areanames{en}->{6038779} = "Mantin";
-$areanames{en}->{6038780} = "Mantin";
-$areanames{en}->{6038783} = "Mantin";
-$areanames{en}->{6038787} = "Mantin";
-$areanames{en}->{6038790} = "Mantin";
-$areanames{en}->{6038800} = "Putrajaya\/Cyberjaya";
-$areanames{en}->{6038861} = "Putrajaya";
-$areanames{en}->{6038870} = "Putrajaya";
-$areanames{en}->{6038871} = "Putrajaya";
-$areanames{en}->{6038872} = "Putrajaya";
-$areanames{en}->{6038873} = "Putrajaya";
-$areanames{en}->{603888} = "Putrajaya";
-$areanames{en}->{6038890} = "Putrajaya";
-$areanames{en}->{6038891} = "Putrajaya";
-$areanames{en}->{6038892} = "Putrajaya";
-$areanames{en}->{6038893} = "Putrajaya";
-$areanames{en}->{6038894} = "Putrajaya";
-$areanames{en}->{6038911} = "Semenyih";
-$areanames{en}->{6038912} = "Semenyih";
-$areanames{en}->{6038913} = "Semenyih";
-$areanames{en}->{603892} = "Semenyih";
-$areanames{en}->{603893} = "Cheras";
-$areanames{en}->{603894} = "Cheras";
-$areanames{en}->{6038950} = "Cheras";
-$areanames{en}->{6038951} = "Cheras";
-$areanames{en}->{6038952} = "Cheras";
-$areanames{en}->{6038953} = "Cheras";
-$areanames{en}->{6038955} = "Serdang";
-$areanames{en}->{6038956} = "Serdang";
-$areanames{en}->{6038957} = "Cheras";
-$areanames{en}->{6038958} = "Cheras";
-$areanames{en}->{6038959} = "Cheras";
-$areanames{en}->{6038961} = "Cheras";
-$areanames{en}->{6038962} = "Cheras";
-$areanames{en}->{6038963} = "Cheras";
-$areanames{en}->{6038964} = "Cheras";
-$areanames{en}->{6038966} = "Cheras";
-$areanames{en}->{6038988} = "Cheras";
-$areanames{en}->{6038989} = "Cheras";
-$areanames{en}->{6038990} = "Cheras";
-$areanames{en}->{6038991} = "Cheras";
-$areanames{en}->{6038992} = "Cheras";
-$areanames{en}->{6038993} = "Cheras";
-$areanames{en}->{6038994} = "Cheras";
-$areanames{en}->{6038995} = "Cheras";
-$areanames{en}->{6038996} = "Cheras";
-$areanames{en}->{6038998} = "Cheras";
-$areanames{en}->{6038999} = "Cheras";
-$areanames{en}->{6039010} = "Cheras";
-$areanames{en}->{6039011} = "Cheras";
-$areanames{en}->{6039012} = "Cheras";
-$areanames{en}->{6039018} = "Cheras";
-$areanames{en}->{6039019} = "Cheras";
-$areanames{en}->{6039021} = "Kuala\ Lumpur";
-$areanames{en}->{6039025} = "Kuala\ Lumpur";
-$areanames{en}->{6039050} = "Cheras";
-$areanames{en}->{6039051} = "Cheras";
-$areanames{en}->{6039054} = "Cheras";
-$areanames{en}->{6039055} = "Cheras";
-$areanames{en}->{6039056} = "Cheras";
-$areanames{en}->{6039057} = "Cheras";
-$areanames{en}->{6039058} = "Cheras";
-$areanames{en}->{6039059} = "Cheras";
-$areanames{en}->{6039070} = "Cheras";
-$areanames{en}->{6039074} = "Cheras";
-$areanames{en}->{6039075} = "Cheras";
-$areanames{en}->{6039076} = "Cheras";
-$areanames{en}->{6039078} = "Cheras";
-$areanames{en}->{6039080} = "Cheras";
-$areanames{en}->{6039081} = "Cheras";
-$areanames{en}->{6039082} = "Cheras";
-$areanames{en}->{6039085} = "Cheras";
-$areanames{en}->{6039086} = "Cheras";
-$areanames{en}->{6039100} = "Cheras";
-$areanames{en}->{6039101} = "Cheras";
-$areanames{en}->{6039102} = "Cheras";
-$areanames{en}->{6039103} = "Cheras";
-$areanames{en}->{6039105} = "Cheras";
-$areanames{en}->{6039106} = "Cheras";
-$areanames{en}->{6039130} = "Kuala\ Lumpur";
-$areanames{en}->{6039131} = "Kuala\ Lumpur";
-$areanames{en}->{6039132} = "Kuala\ Lumpur";
-$areanames{en}->{6039133} = "Kuala\ Lumpur";
-$areanames{en}->{6039134} = "Kuala\ Lumpur";
-$areanames{en}->{6039139} = "Kuala\ Lumpur";
-$areanames{en}->{6039140} = "Kuala\ Lumpur";
-$areanames{en}->{6039141} = "Kuala\ Lumpur";
-$areanames{en}->{6039145} = "Kuala\ Lumpur";
-$areanames{en}->{6039170} = "Kuala\ Lumpur";
-$areanames{en}->{6039171} = "Kuala\ Lumpur";
-$areanames{en}->{6039172} = "Kuala\ Lumpur";
-$areanames{en}->{6039173} = "Kuala\ Lumpur";
-$areanames{en}->{6039174} = "Kuala\ Lumpur";
-$areanames{en}->{6039175} = "Kuala\ Lumpur";
-$areanames{en}->{6039179} = "Kuala\ Lumpur";
-$areanames{en}->{6039191} = "Kuala\ Lumpur";
-$areanames{en}->{6039195} = "Kuala\ Lumpur";
-$areanames{en}->{6039200} = "Kuala\ Lumpur";
-$areanames{en}->{6039201} = "Kuala\ Lumpur";
-$areanames{en}->{6039202} = "Kuala\ Lumpur";
-$areanames{en}->{6039205} = "Kuala\ Lumpur";
-$areanames{en}->{6039206} = "Kuala\ Lumpur";
-$areanames{en}->{6039207} = "Kuala\ Lumpur";
-$areanames{en}->{6039212} = "Kuala\ Lumpur";
-$areanames{en}->{6039221} = "Kuala\ Lumpur";
-$areanames{en}->{6039222} = "Kuala\ Lumpur";
-$areanames{en}->{6039223} = "Kuala\ Lumpur";
-$areanames{en}->{6039224} = "Kuala\ Lumpur";
-$areanames{en}->{6039225} = "Kuala\ Lumpur";
-$areanames{en}->{6039226} = "Kuala\ Lumpur";
-$areanames{en}->{6039231} = "Kuala\ Lumpur";
-$areanames{en}->{6039232} = "Kuala\ Lumpur";
-$areanames{en}->{6039235} = "Kuala\ Lumpur";
-$areanames{en}->{6039236} = "Kuala\ Lumpur";
-$areanames{en}->{6039271} = "Kuala\ Lumpur";
-$areanames{en}->{6039274} = "Kuala\ Lumpur";
-$areanames{en}->{603928} = "Kuala\ Lumpur";
-$areanames{en}->{6039368} = "Kuala\ Lumpur";
-$areanames{en}->{6039388} = "Cheras";
-$areanames{en}->{6039410} = "Cheras";
-$areanames{en}->{6039411} = "Cheras";
-$areanames{en}->{6039514} = "Kuala\ Lumpur";
-$areanames{en}->{6039520} = "Kuala\ Lumpur";
-$areanames{en}->{6039521} = "Kuala\ Lumpur";
-$areanames{en}->{6039540} = "Kuala\ Lumpur";
-$areanames{en}->{6039543} = "Cheras";
-$areanames{en}->{6039544} = "Cheras";
-$areanames{en}->{6039545} = "Kuala\ Lumpur";
-$areanames{en}->{6039546} = "Cheras";
-$areanames{en}->{6039547} = "Cheras";
-$areanames{en}->{6039548} = "Cheras";
-$areanames{en}->{6039549} = "Cheras";
-$areanames{en}->{6039765} = "Cheras";
-$areanames{en}->{6039766} = "Cheras";
-$areanames{en}->{6039767} = "Cheras";
-$areanames{en}->{6039769} = "Cheras";
-$areanames{en}->{6039770} = "Kuala\ Lumpur";
-$areanames{en}->{6039771} = "Kuala\ Lumpur";
-$areanames{en}->{6039772} = "Kuala\ Lumpur";
-$areanames{en}->{6039775} = "Kuala\ Lumpur";
-$areanames{en}->{6039776} = "Kuala\ Lumpur";
-$areanames{en}->{6039779} = "Kuala\ Lumpur";
-$areanames{en}->{604200} = "Penang";
-$areanames{en}->{604201} = "Penang";
-$areanames{en}->{604210} = "Penang";
-$areanames{en}->{604217} = "Penang";
-$areanames{en}->{604218} = "Penang";
-$areanames{en}->{604219} = "Penang";
-$areanames{en}->{604220} = "Penang";
-$areanames{en}->{604222} = "Penang";
-$areanames{en}->{604223} = "Penang";
-$areanames{en}->{604224} = "Penang";
-$areanames{en}->{604226} = "Penang";
-$areanames{en}->{604227} = "Penang";
-$areanames{en}->{604228} = "Penang";
-$areanames{en}->{604229} = "Penang";
-$areanames{en}->{604238} = "Penang";
-$areanames{en}->{604240} = "Penang";
-$areanames{en}->{604241} = "Penang";
-$areanames{en}->{604242} = "Penang";
-$areanames{en}->{604248} = "Penang";
-$areanames{en}->{604250} = "Penang";
-$areanames{en}->{604251} = "Penang";
-$areanames{en}->{604252} = "Penang";
-$areanames{en}->{604253} = "Penang";
-$areanames{en}->{604254} = "Penang";
-$areanames{en}->{604255} = "Penang";
-$areanames{en}->{604258} = "Penang";
-$areanames{en}->{604259} = "Penang";
-$areanames{en}->{604260} = "Penang";
-$areanames{en}->{604261} = "Penang";
-$areanames{en}->{604262} = "Penang";
-$areanames{en}->{604263} = "Penang";
-$areanames{en}->{604264} = "Penang";
-$areanames{en}->{604267} = "Penang";
-$areanames{en}->{604268} = "Penang";
-$areanames{en}->{604269} = "Penang";
-$areanames{en}->{604280} = "Penang";
-$areanames{en}->{604281} = "Penang";
-$areanames{en}->{604282} = "Penang";
-$areanames{en}->{604283} = "Penang";
-$areanames{en}->{604288} = "Penang";
-$areanames{en}->{604289} = "Penang";
-$areanames{en}->{604290} = "Penang";
-$areanames{en}->{604291} = "Penang";
-$areanames{en}->{604292} = "Penang";
-$areanames{en}->{604293} = "Penang";
-$areanames{en}->{604298} = "Penang";
-$areanames{en}->{604305} = "Penang";
-$areanames{en}->{604306} = "Penang";
-$areanames{en}->{604307} = "Penang";
-$areanames{en}->{604308} = "Tasek\ Gelugor";
-$areanames{en}->{604309} = "Sungai\ Petani";
-$areanames{en}->{604310} = "Penang";
-$areanames{en}->{604313} = "Penang";
-$areanames{en}->{604314} = "Penang";
-$areanames{en}->{604320} = "Penang";
-$areanames{en}->{604323} = "Penang";
-$areanames{en}->{604324} = "Penang";
-$areanames{en}->{604330} = "Penang";
-$areanames{en}->{604331} = "Penang";
-$areanames{en}->{604332} = "Penang";
-$areanames{en}->{604333} = "Penang";
-$areanames{en}->{604347} = "Penang";
-$areanames{en}->{604351} = "Kepala\ Batas";
-$areanames{en}->{604356} = "Tasek\ Gelugor";
-$areanames{en}->{604358} = "Tasek\ Gelugor";
-$areanames{en}->{604367} = "Serdang";
-$areanames{en}->{604368} = "Kepala\ Batas";
-$areanames{en}->{604369} = "Serdang";
-$areanames{en}->{604370} = "Penang";
-$areanames{en}->{604371} = "Penang";
-$areanames{en}->{604373} = "Penang";
-$areanames{en}->{604375} = "Penang";
-$areanames{en}->{604376} = "Penang";
-$areanames{en}->{604377} = "Penang";
-$areanames{en}->{604378} = "Penang";
-$areanames{en}->{60438} = "Penang";
-$areanames{en}->{604390} = "Penang";
-$areanames{en}->{604391} = "Penang";
-$areanames{en}->{604392} = "Penang";
-$areanames{en}->{604397} = "Penang";
-$areanames{en}->{604398} = "Penang";
-$areanames{en}->{604399} = "Penang";
-$areanames{en}->{604400} = "Padang\ Serai";
-$areanames{en}->{604401} = "Kulim";
-$areanames{en}->{604402} = "Kulim";
-$areanames{en}->{604403} = "Kulim";
-$areanames{en}->{604404} = "Mahang";
-$areanames{en}->{604405} = "Padang\ Serai";
-$areanames{en}->{604406} = "Padang\ Serai";
-$areanames{en}->{604407} = "Serdang";
-$areanames{en}->{604408} = "Kulim";
-$areanames{en}->{604409} = "Kulim";
-$areanames{en}->{604410} = "Kulim";
-$areanames{en}->{6044110} = "Serdang";
-$areanames{en}->{604412} = "Penang";
-$areanames{en}->{604413} = "Sungai\ Petani";
-$areanames{en}->{604414} = "Serdang";
-$areanames{en}->{604415} = "Sungai\ Petani";
-$areanames{en}->{604416} = "Sungai\ Petani";
-$areanames{en}->{604417} = "Mahang";
-$areanames{en}->{604418} = "Mahang";
-$areanames{en}->{604419} = "Sungai\ Petani";
-$areanames{en}->{60442} = "Sungai\ Petani";
-$areanames{en}->{604427} = "Kulim";
-$areanames{en}->{60443} = "Sungai\ Petani";
-$areanames{en}->{604432} = "Kulim";
-$areanames{en}->{604434} = "Padang\ Serai";
-$areanames{en}->{60444} = "Sungai\ Petani";
-$areanames{en}->{604447} = "Bedong";
-$areanames{en}->{604449} = "Baling";
-$areanames{en}->{60445} = "Bedong";
-$areanames{en}->{604451} = "Jeniang";
-$areanames{en}->{604453} = "Kulim";
-$areanames{en}->{604454} = "Sungai\ Petani";
-$areanames{en}->{604455} = "Sungai\ Petani";
-$areanames{en}->{604460} = "Bedong";
-$areanames{en}->{604461} = "Bedong";
-$areanames{en}->{604462} = "Jeniang";
-$areanames{en}->{604463} = "Jeniang";
-$areanames{en}->{604464} = "Jeniang";
-$areanames{en}->{604465} = "Bedong";
-$areanames{en}->{604466} = "Bedong";
-$areanames{en}->{604467} = "Jeniang";
-$areanames{en}->{604468} = "Bedong";
-$areanames{en}->{604469} = "Jeniang";
-$areanames{en}->{60447} = "Baling";
-$areanames{en}->{604471} = "Sungai\ Bakap";
-$areanames{en}->{604475} = "Kupang";
-$areanames{en}->{604476} = "Kupang";
-$areanames{en}->{60448} = "Kulim";
-$areanames{en}->{604483} = "Baling";
-$areanames{en}->{604485} = "Padang\ Serai";
-$areanames{en}->{604487} = "Sungai\ Bakap";
-$areanames{en}->{604488} = "Padang\ Serai";
-$areanames{en}->{60449} = "Kulim";
-$areanames{en}->{604497} = "Bedong";
-$areanames{en}->{604499} = "Baling";
-$areanames{en}->{60450} = "Tasek\ Gelugor";
-$areanames{en}->{604500} = "Kulim";
-$areanames{en}->{604510} = "Tasek\ Gelugor";
-$areanames{en}->{604511} = "Padang\ Serai";
-$areanames{en}->{604512} = "Penang";
-$areanames{en}->{604513} = "Padang\ Serai";
-$areanames{en}->{604515} = "Tasekgelugor";
-$areanames{en}->{604518} = "Tasekgelugor";
-$areanames{en}->{604521} = "Tasek\ Gelugor";
-$areanames{en}->{604522} = "Tasek\ Gelugor";
-$areanames{en}->{604524} = "Tasek\ Gelugor";
-$areanames{en}->{604526} = "Kulim";
-$areanames{en}->{604530} = "Tasek\ Gelugor";
-$areanames{en}->{604536} = "Tasek\ Gelugor";
-$areanames{en}->{604537} = "Tasek\ Gelugor";
-$areanames{en}->{604538} = "Tasek\ Gelugor";
-$areanames{en}->{604539} = "Tasek\ Gelugor";
-$areanames{en}->{604540} = "Tasek\ Gelugor";
-$areanames{en}->{604545} = "Sungai\ Bakap";
-$areanames{en}->{604548} = "Tasek\ Gelugor";
-$areanames{en}->{604549} = "Tasek\ Gelugor";
-$areanames{en}->{604551} = "Tasek\ Gelugor";
-$areanames{en}->{604552} = "Tasek\ Gelugor";
-$areanames{en}->{604554} = "Tasek\ Gelugor";
-$areanames{en}->{604555} = "Tasek\ Gelugor";
-$areanames{en}->{604557} = "Tasek\ Gelugor";
-$areanames{en}->{604558} = "Tasek\ Gelugor";
-$areanames{en}->{604559} = "Tasek\ Gelugor";
-$areanames{en}->{604560} = "Kepala\ Batas";
-$areanames{en}->{604561} = "Kepala\ Batas";
-$areanames{en}->{604562} = "Kepala\ Batas";
-$areanames{en}->{604563} = "Sungai\ Bakap";
-$areanames{en}->{604564} = "Kepala\ Batas";
-$areanames{en}->{604565} = "Kepala\ Batas";
-$areanames{en}->{604566} = "Tasekgelugor";
-$areanames{en}->{604568} = "Sungai\ Bakap";
-$areanames{en}->{604569} = "Kepala\ Batas";
-$areanames{en}->{60457} = "Kepala\ Batas";
-$areanames{en}->{604570} = "Tasek\ Gelugor";
-$areanames{en}->{604571} = "Tasek\ Gelugor";
-$areanames{en}->{604572} = "Tasek\ Gelugor";
-$areanames{en}->{604573} = "Tasek\ Gelugor";
-$areanames{en}->{60458} = "Sungai\ Bakap";
-$areanames{en}->{604592} = "Parit\ Buntar";
-$areanames{en}->{604593} = "Parit\ Buntar";
-$areanames{en}->{604594} = "Parit\ Buntar";
-$areanames{en}->{604595} = "Parit\ Buntar";
-$areanames{en}->{6045960} = "Parit\ Buntar";
-$areanames{en}->{604597} = "Parit\ Buntar";
-$areanames{en}->{604598} = "Parit\ Buntar";
-$areanames{en}->{604599} = "Parit\ Buntar";
-$areanames{en}->{604607} = "Penang";
-$areanames{en}->{604609} = "Penang";
-$areanames{en}->{604610} = "Penang";
-$areanames{en}->{604611} = "Penang";
-$areanames{en}->{604612} = "Penang";
-$areanames{en}->{604613} = "Penang";
-$areanames{en}->{604614} = "Penang";
-$areanames{en}->{604615} = "Penang";
-$areanames{en}->{604616} = "Penang";
-$areanames{en}->{604618} = "Penang";
-$areanames{en}->{604619} = "Penang";
-$areanames{en}->{604620} = "Penang";
-$areanames{en}->{604621} = "Penang";
-$areanames{en}->{604623} = "Penang";
-$areanames{en}->{604625} = "Penang";
-$areanames{en}->{604626} = "Penang";
-$areanames{en}->{604627} = "Penang";
-$areanames{en}->{604628} = "Penang";
-$areanames{en}->{604629} = "Penang";
-$areanames{en}->{60463} = "Penang";
-$areanames{en}->{60464} = "Penang";
-$areanames{en}->{60465} = "Penang";
-$areanames{en}->{604660} = "Penang";
-$areanames{en}->{604667} = "Penang";
-$areanames{en}->{604668} = "Penang";
-$areanames{en}->{604669} = "Penang";
-$areanames{en}->{604672} = "Penang";
-$areanames{en}->{604673} = "Penang";
-$areanames{en}->{604680} = "Penang";
-$areanames{en}->{604683} = "Penang";
-$areanames{en}->{604684} = "Penang";
-$areanames{en}->{604685} = "Penang";
-$areanames{en}->{604686} = "Penang";
-$areanames{en}->{604687} = "Penang";
-$areanames{en}->{604688} = "Penang";
-$areanames{en}->{604699} = "Alor\ Setar";
-$areanames{en}->{604700} = "Alor\ Setar";
-$areanames{en}->{604701} = "Bedong";
-$areanames{en}->{604702} = "Alor\ Setar";
-$areanames{en}->{604703} = "Bedong";
-$areanames{en}->{604704} = "Pokok\ Sena";
-$areanames{en}->{604705} = "Alor\ Setar";
-$areanames{en}->{604709} = "Alor\ Setar";
-$areanames{en}->{604710} = "Alor\ Setar";
-$areanames{en}->{604714} = "Alor\ Setar";
-$areanames{en}->{604716} = "Alor\ Setar";
-$areanames{en}->{604717} = "Pokok\ Sena";
-$areanames{en}->{604719} = "Sungai\ Petani";
-$areanames{en}->{60472} = "Alor\ Setar";
-$areanames{en}->{6047210} = "Sungai\ Petani";
-$areanames{en}->{604722} = "Kulim";
-$areanames{en}->{604727} = "Bedong";
-$areanames{en}->{60473} = "Alor\ Setar";
-$areanames{en}->{604740} = "Alor\ Setar";
-$areanames{en}->{604741} = "Alor\ Setar";
-$areanames{en}->{604744} = "Alor\ Setar";
-$areanames{en}->{6047450} = "Alor\ Setar";
-$areanames{en}->{6047451} = "Alor\ Setar";
-$areanames{en}->{6047452} = "Alor\ Setar";
-$areanames{en}->{6047453} = "Alor\ Setar";
-$areanames{en}->{6047454} = "Alor\ Setar";
-$areanames{en}->{6047455} = "Alor\ Setar";
-$areanames{en}->{6047456} = "Alor\ Setar";
-$areanames{en}->{604747} = "Alor\ Setar";
-$areanames{en}->{604748} = "Alor\ Setar";
-$areanames{en}->{60475} = "Lubuk\ Merbau";
-$areanames{en}->{604757} = "Alor\ Setar";
-$areanames{en}->{604758} = "Alor\ Setar";
-$areanames{en}->{604759} = "Alor\ Setar";
-$areanames{en}->{604760} = "Alor\ Setar";
-$areanames{en}->{604762} = "Alor\ Setar";
-$areanames{en}->{604764} = "Alor\ Setar";
-$areanames{en}->{604765} = "Alor\ Setar";
-$areanames{en}->{604766} = "Alor\ Setar";
-$areanames{en}->{604768} = "Alor\ Setar";
-$areanames{en}->{604769} = "Alor\ Setar";
-$areanames{en}->{60477} = "Alor\ Setar";
-$areanames{en}->{604778} = "Pokok\ Sena";
-$areanames{en}->{604779} = "Pokok\ Sena";
-$areanames{en}->{60478} = "Pokok\ Sena";
-$areanames{en}->{604783} = "Lubuk\ Merbau";
-$areanames{en}->{604784} = "Lubuk\ Merbau";
-$areanames{en}->{604787} = "Alor\ Setar";
-$areanames{en}->{604789} = "Alor\ Setar";
-$areanames{en}->{604790} = "Pokok\ Sena";
-$areanames{en}->{6047930} = "Pokok\ Sena";
-$areanames{en}->{6047931} = "Pokok\ Sena";
-$areanames{en}->{604794} = "Ayer\ Hitam";
-$areanames{en}->{604797} = "Ayer\ Hitam";
-$areanames{en}->{604799} = "Pokok\ Sena";
-$areanames{en}->{604810} = "Penang";
-$areanames{en}->{604811} = "Penang";
-$areanames{en}->{604818} = "Penang";
-$areanames{en}->{604819} = "Penang";
-$areanames{en}->{604820} = "Penang";
-$areanames{en}->{604824} = "Penang";
-$areanames{en}->{604826} = "Penang";
-$areanames{en}->{604827} = "Penang";
-$areanames{en}->{604828} = "Penang";
-$areanames{en}->{604829} = "Penang";
-$areanames{en}->{604830} = "Penang";
-$areanames{en}->{604835} = "Penang";
-$areanames{en}->{604838} = "Penang";
-$areanames{en}->{604850} = "Penang";
-$areanames{en}->{604852} = "Penang";
-$areanames{en}->{604859} = "Penang";
-$areanames{en}->{604860} = "Penang";
-$areanames{en}->{6048640} = "Penang";
-$areanames{en}->{604866} = "Penang";
-$areanames{en}->{604868} = "Penang";
-$areanames{en}->{604869} = "Penang";
-$areanames{en}->{604881} = "Penang";
-$areanames{en}->{604884} = "Penang";
-$areanames{en}->{604885} = "Penang";
-$areanames{en}->{604886} = "Penang";
-$areanames{en}->{604888} = "Penang";
-$areanames{en}->{604890} = "Penang";
-$areanames{en}->{604891} = "Penang";
-$areanames{en}->{604892} = "Penang";
-$areanames{en}->{604893} = "Penang";
-$areanames{en}->{604898} = "Penang";
-$areanames{en}->{604899} = "Penang";
-$areanames{en}->{604901} = "Changlon";
-$areanames{en}->{604903} = "Kuah";
-$areanames{en}->{604906} = "Changlon";
-$areanames{en}->{604908} = "Kangar";
-$areanames{en}->{604911} = "Alor\ Setar";
-$areanames{en}->{604913} = "Alor\ Setar";
-$areanames{en}->{604914} = "Alor\ Setar";
-$areanames{en}->{604915} = "Changlon";
-$areanames{en}->{604916} = "Alor\ Setar";
-$areanames{en}->{604917} = "Alor\ Setar";
-$areanames{en}->{604918} = "Alor\ Setar";
-$areanames{en}->{604919} = "Alor\ Setar";
-$areanames{en}->{604920} = "Kangar";
-$areanames{en}->{604921} = "Kangar";
-$areanames{en}->{604922} = "Kangar";
-$areanames{en}->{604923} = "Changlon";
-$areanames{en}->{604924} = "Changlon";
-$areanames{en}->{604925} = "Ayer\ Hitam";
-$areanames{en}->{604926} = "Ayer\ Hitam";
-$areanames{en}->{604927} = "Ayer\ Hitam";
-$areanames{en}->{604928} = "Changlon";
-$areanames{en}->{604929} = "Alor\ Setar";
-$areanames{en}->{604930} = "Alor\ Setar";
-$areanames{en}->{604931} = "Changlon";
-$areanames{en}->{604932} = "Ayer\ Hitam";
-$areanames{en}->{604933} = "Kuah";
-$areanames{en}->{604936} = "Kangar";
-$areanames{en}->{6049370} = "Kangar";
-$areanames{en}->{6049371} = "Kangar";
-$areanames{en}->{6049372} = "Kangar";
-$areanames{en}->{6049373} = "Kangar";
-$areanames{en}->{604938} = "Kangar";
-$areanames{en}->{604940} = "Kangar";
-$areanames{en}->{604941} = "Kangar";
-$areanames{en}->{604943} = "Kangar";
-$areanames{en}->{604944} = "Kangar";
-$areanames{en}->{604945} = "Kangar";
-$areanames{en}->{604946} = "Kangar";
-$areanames{en}->{604947} = "Kangar";
-$areanames{en}->{604949} = "Kangar";
-$areanames{en}->{604950} = "Kuah";
-$areanames{en}->{604951} = "Kuah";
-$areanames{en}->{604952} = "Kuah";
-$areanames{en}->{604953} = "Kuah";
-$areanames{en}->{604955} = "Kuah";
-$areanames{en}->{604956} = "Kuah";
-$areanames{en}->{604958} = "Kuah";
-$areanames{en}->{604959} = "Kuah";
-$areanames{en}->{604960} = "Kuah";
-$areanames{en}->{604961} = "Kuah";
-$areanames{en}->{604962} = "Kuah";
-$areanames{en}->{604963} = "Kuah";
-$areanames{en}->{604964} = "Kuah";
-$areanames{en}->{604966} = "Kuah";
-$areanames{en}->{604967} = "Kuah";
-$areanames{en}->{604968} = "Kuah";
-$areanames{en}->{604969} = "Kuah";
-$areanames{en}->{60497} = "Kangar";
-$areanames{en}->{604980} = "Kangar";
-$areanames{en}->{604981} = "Kangar";
-$areanames{en}->{604982} = "Kangar";
-$areanames{en}->{604984} = "Kangar";
-$areanames{en}->{604985} = "Kangar";
-$areanames{en}->{604986} = "Kangar";
-$areanames{en}->{604987} = "Kangar";
-$areanames{en}->{604988} = "Kangar";
-$areanames{en}->{604989} = "Kangar";
-$areanames{en}->{604997} = "Kangar";
-$areanames{en}->{605201} = "Chemor";
-$areanames{en}->{605203} = "Chemor";
-$areanames{en}->{605205} = "Ipoh";
-$areanames{en}->{605208} = "Ipoh";
-$areanames{en}->{605209} = "Ipoh";
-$areanames{en}->{605210} = "Ipoh";
-$areanames{en}->{605211} = "Ipoh";
-$areanames{en}->{605212} = "Ipoh";
-$areanames{en}->{605220} = "Ipoh";
-$areanames{en}->{605225} = "Ipoh";
-$areanames{en}->{605226} = "Ipoh";
-$areanames{en}->{605230} = "Ipoh";
-$areanames{en}->{6052320} = "Ipoh";
-$areanames{en}->{6052321} = "Ipoh";
-$areanames{en}->{605236} = "Ipoh";
-$areanames{en}->{605237} = "Ipoh";
-$areanames{en}->{605240} = "Ipoh";
-$areanames{en}->{605241} = "Ipoh";
-$areanames{en}->{605242} = "Ipoh";
-$areanames{en}->{605243} = "Ipoh";
-$areanames{en}->{605244} = "Ipoh";
-$areanames{en}->{605245} = "Ipoh";
-$areanames{en}->{605246} = "Ipoh";
-$areanames{en}->{605249} = "Ipoh";
-$areanames{en}->{605253} = "Ipoh";
-$areanames{en}->{605254} = "Ipoh";
-$areanames{en}->{605255} = "Ipoh";
-$areanames{en}->{605256} = "Ipoh";
-$areanames{en}->{605280} = "Ipoh";
-$areanames{en}->{605281} = "Ipoh";
-$areanames{en}->{605282} = "Ipoh";
-$areanames{en}->{605285} = "Ipoh";
-$areanames{en}->{605286} = "Ipoh";
-$areanames{en}->{605287} = "Pusing";
-$areanames{en}->{605288} = "Pusing";
-$areanames{en}->{605289} = "Pusing";
-$areanames{en}->{605290} = "Tanjung\ Rambutan";
-$areanames{en}->{605291} = "Tanjung\ Rambutan";
-$areanames{en}->{605292} = "Tanjung\ Rambutan";
-$areanames{en}->{605293} = "Tanjung\ Rambutan";
-$areanames{en}->{605294} = "Tanjung\ Rambutan";
-$areanames{en}->{605296} = "Tanjung\ Rambutan";
-$areanames{en}->{605299} = "Tanjung\ Rambutan";
-$areanames{en}->{605310} = "Ipoh";
-$areanames{en}->{605311} = "Ipoh";
-$areanames{en}->{605312} = "Ipoh";
-$areanames{en}->{605313} = "Ipoh";
-$areanames{en}->{605318} = "Ipoh";
-$areanames{en}->{605320} = "Ipoh";
-$areanames{en}->{605321} = "Ipoh";
-$areanames{en}->{605322} = "Ipoh";
-$areanames{en}->{605323} = "Ipoh";
-$areanames{en}->{605328} = "Ipoh";
-$areanames{en}->{605348} = "Batu\ Gajah";
-$areanames{en}->{605349} = "Batu\ Gajah";
-$areanames{en}->{605350} = "Batu\ Gajah";
-$areanames{en}->{605351} = "Batu\ Gajah";
-$areanames{en}->{605353} = "Ipoh";
-$areanames{en}->{605354} = "Ipoh";
-$areanames{en}->{605356} = "Ipoh";
-$areanames{en}->{605357} = "Ipoh";
-$areanames{en}->{605358} = "Batu\ Gajah";
-$areanames{en}->{605359} = "Batu\ Gajah";
-$areanames{en}->{60536} = "Batu\ Gajah";
-$areanames{en}->{605367} = "Pusing";
-$areanames{en}->{605368} = "Pusing";
-$areanames{en}->{605369} = "Pusing";
-$areanames{en}->{60537} = "Pusing";
-$areanames{en}->{605370} = "Batu\ Gajah";
-$areanames{en}->{605375} = "Bota";
-$areanames{en}->{605376} = "Bota";
-$areanames{en}->{605379} = "Batu\ Gajah";
-$areanames{en}->{605380} = "Pusing";
-$areanames{en}->{605381} = "Batugajah";
-$areanames{en}->{605385} = "Bota";
-$areanames{en}->{605388} = "Bota";
-$areanames{en}->{605389} = "Bota";
-$areanames{en}->{605395} = "Besout";
-$areanames{en}->{605401} = "Tapah";
-$areanames{en}->{605403} = "Tapah";
-$areanames{en}->{605404} = "Tapah";
-$areanames{en}->{605406} = "Tapah";
-$areanames{en}->{605410} = "Tapah";
-$areanames{en}->{605412} = "Trolak";
-$areanames{en}->{605413} = "Cameron\ Highland";
-$areanames{en}->{605415} = "Tapah";
-$areanames{en}->{605416} = "Tapah";
-$areanames{en}->{605417} = "Tapah";
-$areanames{en}->{605418} = "Tapah";
-$areanames{en}->{605419} = "Tapah";
-$areanames{en}->{605421} = "Besout";
-$areanames{en}->{605423} = "Tapah";
-$areanames{en}->{605427} = "Tapah";
-$areanames{en}->{605429} = "Trolak";
-$areanames{en}->{605430} = "Besout";
-$areanames{en}->{605431} = "Besout";
-$areanames{en}->{605432} = "Trolak";
-$areanames{en}->{605433} = "Tapah";
-$areanames{en}->{605434} = "Tapah";
-$areanames{en}->{605436} = "Tapah";
-$areanames{en}->{605437} = "Tapah";
-$areanames{en}->{605438} = "Tapah";
-$areanames{en}->{605439} = "Tapah";
-$areanames{en}->{605440} = "Tapah";
-$areanames{en}->{605441} = "Trolak";
-$areanames{en}->{605443} = "Tapah";
-$areanames{en}->{605446} = "Tapah";
-$areanames{en}->{605448} = "Tanjung\ Malim";
-$areanames{en}->{605449} = "Tanjung\ Malim";
-$areanames{en}->{60545} = "Tanjung\ Malim";
-$areanames{en}->{605461} = "Tapah";
-$areanames{en}->{6054620} = "Kampar";
-$areanames{en}->{605465} = "Kampar";
-$areanames{en}->{605466} = "Kampar";
-$areanames{en}->{605467} = "Kampar";
-$areanames{en}->{605468} = "Kampar";
-$areanames{en}->{605469} = "Kampar";
-$areanames{en}->{605470} = "Kampar";
-$areanames{en}->{605473} = "Bagan\ Datoh";
-$areanames{en}->{605476} = "Kampar";
-$areanames{en}->{605477} = "Kampar";
-$areanames{en}->{605478} = "Tapah";
-$areanames{en}->{605479} = "Tapah";
-$areanames{en}->{605480} = "Tanjung\ Malim";
-$areanames{en}->{605481} = "Tanjung\ Malim";
-$areanames{en}->{605485} = "Cameron\ Highland";
-$areanames{en}->{605486} = "Cameron\ Highland";
-$areanames{en}->{605487} = "Cameron\ Highland";
-$areanames{en}->{605488} = "Tanjung\ Malim";
-$areanames{en}->{60549} = "Cameron\ Highland";
-$areanames{en}->{605501} = "Ipoh";
-$areanames{en}->{605506} = "Ipoh";
-$areanames{en}->{605507} = "Ipoh";
-$areanames{en}->{605517} = "Tanjung\ Rambutan";
-$areanames{en}->{605520} = "Ipoh";
-$areanames{en}->{605522} = "Ipoh";
-$areanames{en}->{605525} = "Ipoh";
-$areanames{en}->{605526} = "Ipoh";
-$areanames{en}->{605527} = "Ipoh";
-$areanames{en}->{605528} = "Ipoh";
-$areanames{en}->{605529} = "Ipoh";
-$areanames{en}->{605530} = "Tanjung\ Rambutan";
-$areanames{en}->{605533} = "Tanjung\ Rambutan";
-$areanames{en}->{605535} = "Tanjung\ Rambutan";
-$areanames{en}->{605536} = "Tanjung\ Rambutan";
-$areanames{en}->{605537} = "Tanjung\ Rambutan";
-$areanames{en}->{605540} = "Ipoh";
-$areanames{en}->{605541} = "Ipoh";
-$areanames{en}->{605542} = "Ipoh";
-$areanames{en}->{605543} = "Ipoh";
-$areanames{en}->{605545} = "Ipoh";
-$areanames{en}->{605546} = "Ipoh";
-$areanames{en}->{605547} = "Ipoh";
-$areanames{en}->{605548} = "Ipoh";
-$areanames{en}->{605549} = "Ipoh";
-$areanames{en}->{605581} = "Chemor";
-$areanames{en}->{605583} = "Chemor";
-$areanames{en}->{605591} = "Lintang";
-$areanames{en}->{605592} = "Lintang";
-$areanames{en}->{605594} = "Chemor";
-$areanames{en}->{605595} = "Chemor";
-$areanames{en}->{605596} = "Chemor";
-$areanames{en}->{605597} = "Chemor";
-$areanames{en}->{605598} = "Chemor";
-$areanames{en}->{605599} = "Chemor";
-$areanames{en}->{605608} = "Teluk\ Intan";
-$areanames{en}->{605609} = "Teluk\ Intan";
-$areanames{en}->{605610} = "Telukintan";
-$areanames{en}->{605612} = "Sitiawan";
-$areanames{en}->{605613} = "Teluk\ Intan";
-$areanames{en}->{605614} = "Sitiawan";
-$areanames{en}->{605616} = "Bruas";
-$areanames{en}->{605617} = "Telukintan";
-$areanames{en}->{605618} = "Changkat\ Keruing";
-$areanames{en}->{605620} = "Telukintan";
-$areanames{en}->{605621} = "Telukintan";
-$areanames{en}->{605622} = "Telukintan";
-$areanames{en}->{605623} = "Telukintan";
-$areanames{en}->{605624} = "Hutan\ Melintang";
-$areanames{en}->{605625} = "Telukintan";
-$areanames{en}->{605626} = "Telukintan";
-$areanames{en}->{605629} = "Telukintan";
-$areanames{en}->{605631} = "Kampong\ Gajah";
-$areanames{en}->{605632} = "Kampong\ Gajah";
-$areanames{en}->{605633} = "Kampong\ Gajah";
-$areanames{en}->{6056340} = "Kampong\ Gajah";
-$areanames{en}->{605636} = "Sabak\ Bernam";
-$areanames{en}->{605637} = "Sabak\ Bernam";
-$areanames{en}->{605640} = "Hutan\ Melintang";
-$areanames{en}->{605641} = "Hutan\ Melintang";
-$areanames{en}->{605642} = "Hutan\ Melintang";
-$areanames{en}->{605643} = "Hutan\ Melintang";
-$areanames{en}->{605644} = "Hutan\ Melintang";
-$areanames{en}->{605645} = "Bagan\ Datoh";
-$areanames{en}->{605646} = "Bagan\ Datoh";
-$areanames{en}->{605648} = "Hutan\ Melintang";
-$areanames{en}->{605649} = "Hutan\ Melintang";
-$areanames{en}->{60565} = "Langkap";
-$areanames{en}->{605654} = "Kampong\ Gajah";
-$areanames{en}->{605655} = "Kampong\ Gajah";
-$areanames{en}->{605661} = "Ipoh";
-$areanames{en}->{605664} = "Sitiawan";
-$areanames{en}->{605665} = "Sitiawan";
-$areanames{en}->{605667} = "Bruas";
-$areanames{en}->{605668} = "Sitiawan";
-$areanames{en}->{605669} = "Sitiawan";
-$areanames{en}->{605670} = "Sitiawan";
-$areanames{en}->{605671} = "Sitiawan";
-$areanames{en}->{605672} = "Sitiawan";
-$areanames{en}->{605673} = "Bruas";
-$areanames{en}->{605674} = "Bruas";
-$areanames{en}->{605675} = "Changkat\ Keruing";
-$areanames{en}->{605676} = "Changkat\ Keruing";
-$areanames{en}->{605677} = "Bruas";
-$areanames{en}->{605678} = "Bruas";
-$areanames{en}->{605679} = "Sitiawan";
-$areanames{en}->{605680} = "Sitiawan";
-$areanames{en}->{605681} = "Sitiawan";
-$areanames{en}->{605682} = "Changkat\ Keruing";
-$areanames{en}->{605683} = "Sitiawan";
-$areanames{en}->{605684} = "Sitiawan";
-$areanames{en}->{605685} = "Sitiawan";
-$areanames{en}->{605687} = "Sitiawan";
-$areanames{en}->{605688} = "Sitiawan";
-$areanames{en}->{605689} = "Sitiawan";
-$areanames{en}->{605690} = "Sitiawan";
-$areanames{en}->{605691} = "Sitiawan";
-$areanames{en}->{605692} = "Sitiawan";
-$areanames{en}->{605693} = "Sitiawan";
-$areanames{en}->{605698} = "Sitiawan";
-$areanames{en}->{605699} = "Sitiawan";
-$areanames{en}->{605710} = "Parit\ Buntar";
-$areanames{en}->{605712} = "Parit\ Buntar";
-$areanames{en}->{605714} = "Parit\ Buntar";
-$areanames{en}->{605716} = "Parit\ Buntar";
-$areanames{en}->{605717} = "Parit\ Buntar";
-$areanames{en}->{6057180} = "Parit\ Buntar";
-$areanames{en}->{605719} = "Parit\ Buntar";
-$areanames{en}->{605720} = "Parit\ Buntar";
-$areanames{en}->{605721} = "Parit\ Buntar";
-$areanames{en}->{605722} = "Parit\ Buntar";
-$areanames{en}->{605723} = "Parit\ Buntar";
-$areanames{en}->{605725} = "Parit\ Buntar";
-$areanames{en}->{605726} = "Parit\ Buntar";
-$areanames{en}->{605727} = "Parit\ Buntar";
-$areanames{en}->{605728} = "Parit\ Buntar";
-$areanames{en}->{605732} = "Parit\ Buntar";
-$areanames{en}->{605733} = "Parit\ Buntar";
-$areanames{en}->{605743} = "Manong";
-$areanames{en}->{605744} = "Manong";
-$areanames{en}->{605750} = "Kuala\ Kangsar";
-$areanames{en}->{605751} = "Kuala\ Kangsar";
-$areanames{en}->{605752} = "Kuala\ Kangsar";
-$areanames{en}->{605753} = "Kuala\ Kangsar";
-$areanames{en}->{605756} = "Kuala\ Kangsar";
-$areanames{en}->{605757} = "Kuala\ Kangsar";
-$areanames{en}->{605758} = "Kuala\ Kangsar";
-$areanames{en}->{605759} = "Kuala\ Kangsar";
-$areanames{en}->{605763} = "Lenggong";
-$areanames{en}->{605765} = "Lenggong";
-$areanames{en}->{605766} = "Lenggong";
-$areanames{en}->{605767} = "Lenggong";
-$areanames{en}->{605768} = "Lenggong";
-$areanames{en}->{605769} = "Lenggong";
-$areanames{en}->{60577} = "Kuala\ Kangsar";
-$areanames{en}->{605771} = "Grik";
-$areanames{en}->{605782} = "Kuala\ Kangsar";
-$areanames{en}->{605783} = "Kuala\ Kangsar";
-$areanames{en}->{605791} = "Grik";
-$areanames{en}->{605792} = "Grik";
-$areanames{en}->{605793} = "Grik";
-$areanames{en}->{605794} = "Grik";
-$areanames{en}->{605795} = "Grik";
-$areanames{en}->{605796} = "Grik";
-$areanames{en}->{6057970} = "Grik";
-$areanames{en}->{605798} = "Lenggong";
-$areanames{en}->{605799} = "Lenggong";
-$areanames{en}->{605801} = "Taiping";
-$areanames{en}->{605804} = "Taiping";
-$areanames{en}->{605805} = "Taiping";
-$areanames{en}->{605806} = "Taiping";
-$areanames{en}->{605807} = "Taiping";
-$areanames{en}->{605808} = "Taiping";
-$areanames{en}->{605809} = "Taiping";
-$areanames{en}->{605810} = "Taiping";
-$areanames{en}->{605811} = "Taiping";
-$areanames{en}->{605812} = "Taiping";
-$areanames{en}->{605820} = "Taiping";
-$areanames{en}->{605829} = "Taiping";
-$areanames{en}->{6058300} = "Taiping";
-$areanames{en}->{6058301} = "Taiping";
-$areanames{en}->{6058307} = "Selama";
-$areanames{en}->{605831} = "Selama";
-$areanames{en}->{605834} = "Taiping";
-$areanames{en}->{605836} = "Selama";
-$areanames{en}->{605837} = "Selama";
-$areanames{en}->{605838} = "Selama";
-$areanames{en}->{605839} = "Selama";
-$areanames{en}->{605840} = "Taiping";
-$areanames{en}->{605841} = "Taiping";
-$areanames{en}->{605846} = "Taiping";
-$areanames{en}->{605847} = "Taiping";
-$areanames{en}->{605848} = "Taiping";
-$areanames{en}->{605849} = "Taiping";
-$areanames{en}->{605850} = "Sungai\ Nyior";
-$areanames{en}->{605852} = "Taiping";
-$areanames{en}->{605853} = "Sungai\ Nyior";
-$areanames{en}->{605854} = "Sungai\ Nyior";
-$areanames{en}->{605855} = "Taiping";
-$areanames{en}->{605856} = "Taiping";
-$areanames{en}->{605857} = "Taiping";
-$areanames{en}->{605858} = "Taiping";
-$areanames{en}->{605859} = "Taiping";
-$areanames{en}->{6058710} = "Semanggol";
-$areanames{en}->{605872} = "Semanggol";
-$areanames{en}->{605880} = "Selama";
-$areanames{en}->{605881} = "Selama";
-$areanames{en}->{605883} = "Taiping";
-$areanames{en}->{605885} = "Taiping";
-$areanames{en}->{605888} = "Taiping";
-$areanames{en}->{605889} = "Taiping";
-$areanames{en}->{605890} = "Semanggol";
-$areanames{en}->{605891} = "Taiping";
-$areanames{en}->{605892} = "Semanggol";
-$areanames{en}->{605893} = "Taiping";
-$areanames{en}->{605894} = "Taiping";
-$areanames{en}->{605895} = "Taiping";
-$areanames{en}->{605897} = "Semanggol";
-$areanames{en}->{605898} = "Semanggol";
-$areanames{en}->{605899} = "Semanggol";
-$areanames{en}->{605920} = "Sitiawan";
-$areanames{en}->{605930} = "Sitiawan";
-$areanames{en}->{606221} = "Melaka";
-$areanames{en}->{606222} = "Melaka";
-$areanames{en}->{606224} = "Melaka";
-$areanames{en}->{606226} = "Melaka";
-$areanames{en}->{606227} = "Melaka";
-$areanames{en}->{606228} = "Melaka";
-$areanames{en}->{606229} = "Melaka";
-$areanames{en}->{606230} = "Melaka";
-$areanames{en}->{606231} = "Melaka";
-$areanames{en}->{606232} = "Melaka";
-$areanames{en}->{606233} = "Melaka";
-$areanames{en}->{606234} = "Melaka";
-$areanames{en}->{606235} = "Melaka";
-$areanames{en}->{606240} = "Melaka";
-$areanames{en}->{606242} = "Melaka";
-$areanames{en}->{606251} = "Melaka";
-$areanames{en}->{606252} = "Melaka";
-$areanames{en}->{606253} = "Melaka";
-$areanames{en}->{60626} = "Melaka";
-$areanames{en}->{606265} = "Sungai\ Rambai";
-$areanames{en}->{606266} = "Sungai\ Rambai";
-$areanames{en}->{606270} = "Melaka";
-$areanames{en}->{6062710} = "Sungai\ Rambai";
-$areanames{en}->{606274} = "Melaka";
-$areanames{en}->{606275} = "Melaka";
-$areanames{en}->{606276} = "Melaka";
-$areanames{en}->{606277} = "Melaka";
-$areanames{en}->{606278} = "Melaka";
-$areanames{en}->{60628} = "Melaka";
-$areanames{en}->{606292} = "Melaka";
-$areanames{en}->{606293} = "Melaka";
-$areanames{en}->{606294} = "Melaka";
-$areanames{en}->{606295} = "Melaka";
-$areanames{en}->{606311} = "Melaka";
-$areanames{en}->{606312} = "Melaka";
-$areanames{en}->{6063130} = "Melaka";
-$areanames{en}->{6063131} = "Melaka";
-$areanames{en}->{606315} = "Melaka";
-$areanames{en}->{606316} = "Durian\ Tunggal";
-$areanames{en}->{606317} = "Melaka";
-$areanames{en}->{606318} = "Melaka";
-$areanames{en}->{606319} = "Melaka";
-$areanames{en}->{606330} = "Melaka";
-$areanames{en}->{606331} = "Melaka";
-$areanames{en}->{606332} = "Melaka";
-$areanames{en}->{606333} = "Melaka";
-$areanames{en}->{606334} = "Melaka";
-$areanames{en}->{606335} = "Melaka";
-$areanames{en}->{606336} = "Melaka";
-$areanames{en}->{606337} = "Melaka";
-$areanames{en}->{606350} = "Tangga\ Batu";
-$areanames{en}->{606351} = "Tangga\ Batu";
-$areanames{en}->{606352} = "Tangga\ Batu";
-$areanames{en}->{606353} = "Tangga\ Batu";
-$areanames{en}->{606354} = "Tangga\ Batu";
-$areanames{en}->{606357} = "Tangga\ Batu";
-$areanames{en}->{606358} = "Tangga\ Batu";
-$areanames{en}->{606379} = "Tangga\ Batu";
-$areanames{en}->{606383} = "Tangga\ Batu";
-$areanames{en}->{606384} = "Tangga\ Batu";
-$areanames{en}->{606385} = "Tangga\ Batu";
-$areanames{en}->{606387} = "Kuala\ Sungai\ Baru";
-$areanames{en}->{606388} = "Kuala\ Sungai\ Baru";
-$areanames{en}->{606390} = "Tangga\ Batu";
-$areanames{en}->{606391} = "Tangga\ Batu";
-$areanames{en}->{606398} = "Tangga\ Batu";
-$areanames{en}->{606410} = "Tampin";
-$areanames{en}->{606411} = "Simpang\ Empat";
-$areanames{en}->{606415} = "Tampin";
-$areanames{en}->{606420} = "Johol";
-$areanames{en}->{606421} = "Bahau";
-$areanames{en}->{606422} = "Tampin";
-$areanames{en}->{606423} = "Simpang\ Durian";
-$areanames{en}->{606424} = "Batu\ Kikir";
-$areanames{en}->{606425} = "Tampin";
-$areanames{en}->{606426} = "Ayer\ Hitam";
-$areanames{en}->{606427} = "Kuala\ Pilah";
-$areanames{en}->{606428} = "Kuala\ Pilah";
-$areanames{en}->{606429} = "Bahau";
-$areanames{en}->{606430} = "Gemencheh";
-$areanames{en}->{606431} = "Gemencheh";
-$areanames{en}->{606432} = "Gemencheh";
-$areanames{en}->{606433} = "Jelai";
-$areanames{en}->{606434} = "Jelai";
-$areanames{en}->{606435} = "Tampin";
-$areanames{en}->{606436} = "Johol";
-$areanames{en}->{606437} = "Johol";
-$areanames{en}->{606438} = "Simpang\ Empat";
-$areanames{en}->{606439} = "Simpang\ Empat";
-$areanames{en}->{60644} = "Tampin";
-$areanames{en}->{60645} = "Bahau";
-$areanames{en}->{606458} = "Serting";
-$areanames{en}->{606459} = "Serting";
-$areanames{en}->{606460} = "Bahau";
-$areanames{en}->{606461} = "Ladanggeddes";
-$areanames{en}->{606462} = "Palong";
-$areanames{en}->{606463} = "Palong";
-$areanames{en}->{606464} = "Ladang\ Geddes";
-$areanames{en}->{606465} = "Ayer\ Hitam";
-$areanames{en}->{606466} = "Palong";
-$areanames{en}->{606467} = "Ayer\ Hitam";
-$areanames{en}->{606468} = "Ayer\ Hitam";
-$areanames{en}->{606469} = "Kemavan";
-$areanames{en}->{606471} = "Simpang\ Durian";
-$areanames{en}->{606472} = "Kuala\ Klawang";
-$areanames{en}->{606473} = "Kemavan";
-$areanames{en}->{606474} = "Palong";
-$areanames{en}->{606475} = "Ayer\ Hitam";
-$areanames{en}->{606476} = "Ladang\ Geddes";
-$areanames{en}->{606477} = "Palong";
-$areanames{en}->{606479} = "Ayer\ Hitam";
-$areanames{en}->{60648} = "Kuala\ Pilah";
-$areanames{en}->{606480} = "Ayer\ Hitam";
-$areanames{en}->{606486} = "Simpang\ Durian";
-$areanames{en}->{606489} = "Kuala\ Klawang";
-$areanames{en}->{606490} = "Rembau";
-$areanames{en}->{606491} = "Simpang\ Durian";
-$areanames{en}->{606492} = "Kuala\ Klawang";
-$areanames{en}->{606493} = "Kuala\ Klawang";
-$areanames{en}->{606494} = "Kuala\ Klawang";
-$areanames{en}->{606495} = "Simpang\ Durian";
-$areanames{en}->{606496} = "Kuala\ Klawang";
-$areanames{en}->{606497} = "Rembau";
-$areanames{en}->{606498} = "Batu\ Kikir";
-$areanames{en}->{606499} = "Batu\ Kikir";
-$areanames{en}->{606509} = "Jasin";
-$areanames{en}->{6065110} = "Jasin";
-$areanames{en}->{606512} = "Jasin";
-$areanames{en}->{606514} = "Jasin";
-$areanames{en}->{606517} = "Jasin";
-$areanames{en}->{606519} = "Jasin";
-$areanames{en}->{606521} = "Jasin";
-$areanames{en}->{606522} = "Jasin";
-$areanames{en}->{606523} = "Jasin";
-$areanames{en}->{606524} = "Jasin";
-$areanames{en}->{606525} = "Jasin";
-$areanames{en}->{606527} = "Jasin";
-$areanames{en}->{606529} = "Jasin";
-$areanames{en}->{606530} = "Jasin";
-$areanames{en}->{606531} = "Jasin";
-$areanames{en}->{606532} = "Jasin";
-$areanames{en}->{606533} = "Jasin";
-$areanames{en}->{606534} = "Jasin";
-$areanames{en}->{6065350} = "Jasin";
-$areanames{en}->{606536} = "Jasin";
-$areanames{en}->{606537} = "Jasin";
-$areanames{en}->{606540} = "Durian\ Tunggal";
-$areanames{en}->{606541} = "Durian\ Tunggal";
-$areanames{en}->{606542} = "Durian\ Tunggal";
-$areanames{en}->{606544} = "Durian\ Tunggal";
-$areanames{en}->{606545} = "Durian\ Tunggal";
-$areanames{en}->{606546} = "Durian\ Tunggal";
-$areanames{en}->{606547} = "Durian\ Tunggal";
-$areanames{en}->{606549} = "Durian\ Tunggal";
-$areanames{en}->{60655} = "Durian\ Tunggal";
-$areanames{en}->{606550} = "Tampin";
-$areanames{en}->{606551} = "Simpang\ Empat";
-$areanames{en}->{606552} = "Simpang\ Empat";
-$areanames{en}->{606554} = "Tampin";
-$areanames{en}->{606560} = "Simpang\ Empat";
-$areanames{en}->{606601} = "Seremban";
-$areanames{en}->{606603} = "Seremban";
-$areanames{en}->{606611} = "Kuala\ Klawang";
-$areanames{en}->{606612} = "Kuala\ Klawang";
-$areanames{en}->{606613} = "Kuala\ Klawang";
-$areanames{en}->{606614} = "Kuala\ Klawang";
-$areanames{en}->{606615} = "Kuala\ Klawang";
-$areanames{en}->{606617} = "Kuala\ Klawang";
-$areanames{en}->{606620} = "Port\ Dickson";
-$areanames{en}->{606630} = "Seremban";
-$areanames{en}->{606631} = "Seremban";
-$areanames{en}->{606632} = "Seremban";
-$areanames{en}->{606633} = "Seremban";
-$areanames{en}->{606634} = "Seremban";
-$areanames{en}->{606637} = "Seremban";
-$areanames{en}->{606638} = "Kuala\ Pilah";
-$areanames{en}->{606640} = "Port\ Dickson";
-$areanames{en}->{606641} = "Port\ Dickson";
-$areanames{en}->{606642} = "Port\ Dickson";
-$areanames{en}->{606643} = "Port\ Dickson";
-$areanames{en}->{606644} = "Port\ Dickson";
-$areanames{en}->{606645} = "Port\ Dickson";
-$areanames{en}->{606646} = "Port\ Dickson";
-$areanames{en}->{606647} = "Port\ Dickson";
-$areanames{en}->{606648} = "Port\ Dickson";
-$areanames{en}->{606650} = "Port\ Dickson";
-$areanames{en}->{606651} = "Port\ Dickson";
-$areanames{en}->{606653} = "Port\ Dickson";
-$areanames{en}->{606654} = "Port\ Dickson";
-$areanames{en}->{606655} = "Port\ Dickson";
-$areanames{en}->{606656} = "Port\ Dickson";
-$areanames{en}->{606658} = "Sepang";
-$areanames{en}->{606659} = "Sepang";
-$areanames{en}->{606660} = "Tekok\ Kemang";
-$areanames{en}->{606661} = "Tekok\ Kemang";
-$areanames{en}->{606662} = "Tekok\ Kemang";
-$areanames{en}->{606663} = "Tekok\ Kemang";
-$areanames{en}->{606664} = "Tekok\ Kemang";
-$areanames{en}->{606666} = "Sepang";
-$areanames{en}->{606667} = "Sepang";
-$areanames{en}->{60667} = "Seremban";
-$areanames{en}->{60668} = "Rembau";
-$areanames{en}->{606681} = "Seremban";
-$areanames{en}->{606682} = "Seremban";
-$areanames{en}->{606691} = "Linggi";
-$areanames{en}->{6066920} = "Linggi";
-$areanames{en}->{606693} = "Rantau";
-$areanames{en}->{606694} = "Rantau";
-$areanames{en}->{606695} = "Linggi";
-$areanames{en}->{606696} = "Linggi";
-$areanames{en}->{606697} = "Linggi";
-$areanames{en}->{606698} = "Linggi";
-$areanames{en}->{606699} = "Linggi";
-$areanames{en}->{606701} = "Linggi";
-$areanames{en}->{606720} = "Seremban";
-$areanames{en}->{606726} = "Seremban";
-$areanames{en}->{606727} = "Seremban";
-$areanames{en}->{606728} = "Seremban";
-$areanames{en}->{606729} = "Seremban";
-$areanames{en}->{606733} = "Mantin";
-$areanames{en}->{606736} = "Mantin";
-$areanames{en}->{606737} = "Mantin";
-$areanames{en}->{606757} = "Mantin";
-$areanames{en}->{606758} = "Mantin";
-$areanames{en}->{606759} = "Mantin";
-$areanames{en}->{60676} = "Seremban";
-$areanames{en}->{606770} = "Seremban";
-$areanames{en}->{606771} = "Seremban";
-$areanames{en}->{606775} = "Seremban";
-$areanames{en}->{606776} = "Seremban";
-$areanames{en}->{606781} = "Sepang";
-$areanames{en}->{606782} = "Seremban";
-$areanames{en}->{606790} = "Mantin";
-$areanames{en}->{606791} = "Seremban";
-$areanames{en}->{606792} = "Sepang";
-$areanames{en}->{606793} = "Mantin";
-$areanames{en}->{606794} = "Mantin";
-$areanames{en}->{606797} = "Mantin";
-$areanames{en}->{606798} = "Mantin";
-$areanames{en}->{606799} = "Mantin";
-$areanames{en}->{606850} = "Mantin";
-$areanames{en}->{606851} = "Seremban";
-$areanames{en}->{606852} = "Melaka";
-$areanames{en}->{606856} = "Mantin";
-$areanames{en}->{606901} = "Muar";
-$areanames{en}->{606906} = "Muar";
-$areanames{en}->{606907} = "Muar";
-$areanames{en}->{606910} = "Muar";
-$areanames{en}->{60695} = "Muar";
-$areanames{en}->{606958} = "Bukit\ Gambir";
-$areanames{en}->{606960} = "Bukit\ Gambir";
-$areanames{en}->{606962} = "Bakri";
-$areanames{en}->{606963} = "Tangkak";
-$areanames{en}->{606964} = "Tangkak";
-$areanames{en}->{606965} = "Tangkak";
-$areanames{en}->{606966} = "Bakri";
-$areanames{en}->{606967} = "Bakri";
-$areanames{en}->{606968} = "Pagoh";
-$areanames{en}->{606969} = "Bukit\ Kepong";
-$areanames{en}->{606970} = "Muar";
-$areanames{en}->{606971} = "Bukit\ Kepong";
-$areanames{en}->{606972} = "Bukit\ Gambir";
-$areanames{en}->{606973} = "Bukit\ Gambir";
-$areanames{en}->{606974} = "Pagoh";
-$areanames{en}->{606975} = "Muar";
-$areanames{en}->{606976} = "Bukit\ Gambir";
-$areanames{en}->{606977} = "Tangkak";
-$areanames{en}->{606978} = "Tangkak";
-$areanames{en}->{606979} = "Tangkak";
-$areanames{en}->{606980} = "Bukit\ Gambir";
-$areanames{en}->{606981} = "Bakri";
-$areanames{en}->{606983} = "Bakri";
-$areanames{en}->{606984} = "Bukit\ Gambir";
-$areanames{en}->{606985} = "Muar";
-$areanames{en}->{606986} = "Bakri";
-$areanames{en}->{606987} = "Bakri";
-$areanames{en}->{606988} = "Bakri";
-$areanames{en}->{606989} = "Bakri";
-$areanames{en}->{607207} = "Johor\ Bahru";
-$areanames{en}->{607208} = "Johor\ Bahru";
-$areanames{en}->{607209} = "Johor\ Bahru";
-$areanames{en}->{607210} = "Johor\ Bahru";
-$areanames{en}->{607211} = "Johor\ Bahru";
-$areanames{en}->{607216} = "Johor\ Bahru";
-$areanames{en}->{607217} = "Johor\ Bahru";
-$areanames{en}->{607218} = "Johor\ Bahru";
-$areanames{en}->{607219} = "Johor\ Bahru";
-$areanames{en}->{607220} = "Johor\ Bahru";
-$areanames{en}->{607221} = "Johor\ Bahru";
-$areanames{en}->{607222} = "Johor\ Bahru";
-$areanames{en}->{607223} = "Johor\ Bahru";
-$areanames{en}->{607224} = "Johor\ Bahru";
-$areanames{en}->{607225} = "Johor\ Bahru";
-$areanames{en}->{607226} = "Johor\ Bahru";
-$areanames{en}->{607227} = "Johor\ Bahru";
-$areanames{en}->{607228} = "Johor\ Bahru";
-$areanames{en}->{60723} = "Johor\ Bahru";
-$areanames{en}->{607240} = "Johor\ Bahru";
-$areanames{en}->{607241} = "Johor\ Bahru";
-$areanames{en}->{607244} = "Johor\ Bahru";
-$areanames{en}->{607250} = "Johor\ Bahru";
-$areanames{en}->{607251} = "Johor\ Bahru";
-$areanames{en}->{607252} = "Johor\ Bahru";
-$areanames{en}->{607253} = "Johor\ Bahru";
-$areanames{en}->{607254} = "Johor\ Bahru";
-$areanames{en}->{607255} = "Johor\ Bahru";
-$areanames{en}->{607256} = "Johor\ Bahru";
-$areanames{en}->{607257} = "Johor\ Bharu";
-$areanames{en}->{607259} = "Johor\ Bahru";
-$areanames{en}->{607261} = "Johor\ Bahru";
-$areanames{en}->{607262} = "Johor\ Bahru";
-$areanames{en}->{607265} = "Johor\ Bahru";
-$areanames{en}->{607266} = "Johor\ Bahru";
-$areanames{en}->{607267} = "Johor\ Bahru";
-$areanames{en}->{607268} = "Johor\ Bahru";
-$areanames{en}->{607271} = "Johor\ Bahru";
-$areanames{en}->{607272} = "Johor\ Bahru";
-$areanames{en}->{607274} = "Johor\ Bahru";
-$areanames{en}->{607276} = "Johor\ Bahru";
-$areanames{en}->{607277} = "Johor\ Bahru";
-$areanames{en}->{607278} = "Johor\ Bahru";
-$areanames{en}->{607279} = "Johor\ Bahru";
-$areanames{en}->{607283} = "Johor\ Bahru";
-$areanames{en}->{607288} = "Johor\ Bahru";
-$areanames{en}->{607289} = "Johor\ Bahru";
-$areanames{en}->{607295} = "Johor\ Bahru";
-$areanames{en}->{607296} = "Johor\ Bahru";
-$areanames{en}->{607297} = "Johor\ Bahru";
-$areanames{en}->{607298} = "Johor\ Bahru";
-$areanames{en}->{607299} = "Johor\ Bahru";
-$areanames{en}->{607300} = "Johor\ Bahru";
-$areanames{en}->{607301} = "Johor\ Bahru";
-$areanames{en}->{607302} = "Johor\ Bahru";
-$areanames{en}->{607303} = "Johor\ Bahru";
-$areanames{en}->{607304} = "Johor\ Bahru";
-$areanames{en}->{607305} = "Johor\ Bahru";
-$areanames{en}->{60733} = "Johor\ Bahru";
-$areanames{en}->{607340} = "Johor\ Bahru";
-$areanames{en}->{60735} = "Johor\ Bahru";
-$areanames{en}->{607360} = "Johor\ Bahru";
-$areanames{en}->{607361} = "Johor\ Bharu";
-$areanames{en}->{607362} = "Johor\ Bharu";
-$areanames{en}->{607363} = "Johor\ Bahru";
-$areanames{en}->{607364} = "Johor\ Bahru";
-$areanames{en}->{607365} = "Johor\ Bahru";
-$areanames{en}->{607380} = "Johor\ Bahru";
-$areanames{en}->{607381} = "Johor\ Bahru";
-$areanames{en}->{607382} = "Johor\ Bahru";
-$areanames{en}->{607386} = "Johor\ Bahru";
-$areanames{en}->{607387} = "Johor\ Bahru";
-$areanames{en}->{607388} = "Johor\ Bahru";
-$areanames{en}->{607400} = "Rengit";
-$areanames{en}->{607407} = "Parit\ Sulong";
-$areanames{en}->{607408} = "Kampong\ Parit\ Tengah";
-$areanames{en}->{607409} = "Parit\ Sulong";
-$areanames{en}->{60741} = "Parit\ Sulong";
-$areanames{en}->{607412} = "Batu\ Pahat";
-$areanames{en}->{607413} = "Batu\ Pahat";
-$areanames{en}->{607414} = "Rengit";
-$areanames{en}->{607415} = "Batu\ Pahat";
-$areanames{en}->{607420} = "Senggarang";
-$areanames{en}->{607421} = "Kampung\ Parit\ Tengah";
-$areanames{en}->{607422} = "Kampung\ Parit\ Tengah";
-$areanames{en}->{607423} = "Rengit";
-$areanames{en}->{607424} = "Rengit";
-$areanames{en}->{607425} = "Parit\ Betak";
-$areanames{en}->{607426} = "Parit\ Betak";
-$areanames{en}->{607427} = "Senggarang";
-$areanames{en}->{607428} = "Senggarang";
-$areanames{en}->{607429} = "Senggarang";
-$areanames{en}->{60743} = "Batu\ Pahat";
-$areanames{en}->{607440} = "Batu\ Pahat";
-$areanames{en}->{607441} = "Senggarang";
-$areanames{en}->{607442} = "Senggarang";
-$areanames{en}->{607443} = "Rengit";
-$areanames{en}->{607444} = "Senggarang";
-$areanames{en}->{607445} = "Batu\ Pahat";
-$areanames{en}->{607446} = "Senggarang";
-$areanames{en}->{607447} = "Batu\ Pahat";
-$areanames{en}->{607448} = "Batu\ Pahat";
-$areanames{en}->{60745} = "Sri\ Gading";
-$areanames{en}->{607450} = "Senggarang";
-$areanames{en}->{607451} = "Batu\ Pahat";
-$areanames{en}->{607467} = "Sri\ Gading";
-$areanames{en}->{607468} = "Sri\ Gading";
-$areanames{en}->{607469} = "Sri\ Gading";
-$areanames{en}->{607475} = "Sri\ Gading";
-$areanames{en}->{607477} = "Sri\ Gading";
-$areanames{en}->{607481} = "Kangkar\ Baru";
-$areanames{en}->{607482} = "Kangkar\ Baru";
-$areanames{en}->{607483} = "Batu\ Pahat";
-$areanames{en}->{607484} = "Batu\ Pahat";
-$areanames{en}->{607485} = "Batu\ Pahat";
-$areanames{en}->{607486} = "Batu\ Pahat";
-$areanames{en}->{607488} = "Batu\ Pahat";
-$areanames{en}->{607500} = "Tanjung\ Kupang";
-$areanames{en}->{607504} = "Tanjung\ Kupang";
-$areanames{en}->{607505} = "Tanjung\ Kupang";
-$areanames{en}->{607506} = "Senai";
-$areanames{en}->{607507} = "Tanjung\ Kupang";
-$areanames{en}->{607508} = "Tanjung\ Kupang";
-$areanames{en}->{607509} = "Senai";
-$areanames{en}->{607510} = "Senai";
-$areanames{en}->{607511} = "Senai";
-$areanames{en}->{607512} = "Senai";
-$areanames{en}->{607513} = "Tanjung\ Kupang";
-$areanames{en}->{607514} = "Tanjung\ Kupang";
-$areanames{en}->{607515} = "Tanjung\ Kupang";
-$areanames{en}->{607516} = "Tanjung\ Kupang";
-$areanames{en}->{607518} = "Senai";
-$areanames{en}->{607520} = "Senai";
-$areanames{en}->{607521} = "Senai";
-$areanames{en}->{607522} = "Senai";
-$areanames{en}->{607523} = "Senai";
-$areanames{en}->{607527} = "Kangkar\ Pulai";
-$areanames{en}->{607528} = "Kangkar\ Pulai";
-$areanames{en}->{607530} = "Senai";
-$areanames{en}->{607531} = "Senai";
-$areanames{en}->{607532} = "Senai";
-$areanames{en}->{607533} = "Senai";
-$areanames{en}->{60755} = "Senai";
-$areanames{en}->{607560} = "Senai";
-$areanames{en}->{607561} = "Senai";
-$areanames{en}->{607562} = "Senai";
-$areanames{en}->{607570} = "Senai";
-$areanames{en}->{607571} = "Senai";
-$areanames{en}->{607578} = "Senai";
-$areanames{en}->{607585} = "Senai";
-$areanames{en}->{607586} = "Senai";
-$areanames{en}->{607587} = "Senai";
-$areanames{en}->{607590} = "Senai";
-$areanames{en}->{607595} = "Senai";
-$areanames{en}->{607596} = "Senai";
-$areanames{en}->{607597} = "Senai";
-$areanames{en}->{607598} = "Senai";
-$areanames{en}->{607599} = "Senai";
-$areanames{en}->{607650} = "Layang\-Layang";
-$areanames{en}->{607651} = "Layang\-Layang";
-$areanames{en}->{607652} = "Kulai";
-$areanames{en}->{607654} = "Linggiu";
-$areanames{en}->{607655} = "Kulai";
-$areanames{en}->{607656} = "Kulai";
-$areanames{en}->{607657} = "Kulai";
-$areanames{en}->{607658} = "Kulai";
-$areanames{en}->{607659} = "Linggiu";
-$areanames{en}->{607660} = "Kulai";
-$areanames{en}->{607661} = "Kulai";
-$areanames{en}->{607662} = "Kulai";
-$areanames{en}->{607663} = "Kulai";
-$areanames{en}->{607665} = "Kulai";
-$areanames{en}->{607666} = "Kulai";
-$areanames{en}->{607668} = "Kulai";
-$areanames{en}->{607670} = "Kulai";
-$areanames{en}->{607674} = "Pontian";
-$areanames{en}->{607675} = "Pontian";
-$areanames{en}->{607677} = "Pontian";
-$areanames{en}->{607678} = "Pontian";
-$areanames{en}->{607679} = "Pontian";
-$areanames{en}->{607680} = "Pontian";
-$areanames{en}->{607682} = "Air\ Baloi";
-$areanames{en}->{607683} = "Pontian";
-$areanames{en}->{607684} = "Pontian";
-$areanames{en}->{607685} = "Pontian";
-$areanames{en}->{607686} = "Pontian";
-$areanames{en}->{607687} = "Pontian";
-$areanames{en}->{607688} = "Pontian";
-$areanames{en}->{607689} = "Pontian";
-$areanames{en}->{60769} = "Air\ Baloi";
-$areanames{en}->{607696} = "Pontian";
-$areanames{en}->{607697} = "Pontian";
-$areanames{en}->{607699} = "Pontian";
-$areanames{en}->{607705} = "Keluang";
-$areanames{en}->{607706} = "Keluang";
-$areanames{en}->{607707} = "Keluang";
-$areanames{en}->{607708} = "Keluang";
-$areanames{en}->{607710} = "Keluang";
-$areanames{en}->{607711} = "Keluang";
-$areanames{en}->{6077120} = "Keluang";
-$areanames{en}->{607720} = "Mersing";
-$areanames{en}->{607721} = "Renggam";
-$areanames{en}->{607722} = "Renggam";
-$areanames{en}->{607734} = "Ayer\ Hitam";
-$areanames{en}->{607738} = "Lavang\-Lavang";
-$areanames{en}->{607739} = "Kluang";
-$areanames{en}->{607740} = "Kahang";
-$areanames{en}->{607741} = "Felda\ Kahang\ Timur";
-$areanames{en}->{607742} = "Lavang\-Lavang";
-$areanames{en}->{607743} = "Keluang";
-$areanames{en}->{607744} = "Ayer\ Hitam";
-$areanames{en}->{607745} = "Renggam";
-$areanames{en}->{607746} = "Renggam";
-$areanames{en}->{607747} = "Ayer\ Hitam";
-$areanames{en}->{607748} = "Keluang";
-$areanames{en}->{607749} = "Ayer\ Hitam";
-$areanames{en}->{607750} = "Lavang\-Lavang";
-$areanames{en}->{607751} = "Lavang\-Lavang";
-$areanames{en}->{607752} = "Lavang\-Lavang";
-$areanames{en}->{607753} = "Renggam";
-$areanames{en}->{607754} = "Ayer\ Hitam";
-$areanames{en}->{607755} = "Renggam";
-$areanames{en}->{607756} = "Renggam";
-$areanames{en}->{607757} = "Renggam";
-$areanames{en}->{607758} = "Ayer\ Hitam";
-$areanames{en}->{607759} = "Ayer\ Hitam";
-$areanames{en}->{607760} = "Keluang";
-$areanames{en}->{607761} = "Ayer\ Hitam";
-$areanames{en}->{607762} = "Renggam";
-$areanames{en}->{607763} = "Ayer\ Hitam";
-$areanames{en}->{607764} = "Felda\ Tenggaroh";
-$areanames{en}->{607765} = "Endau";
-$areanames{en}->{607766} = "Mersing";
-$areanames{en}->{607767} = "Mersing";
-$areanames{en}->{607768} = "Paloh";
-$areanames{en}->{6077690} = "Paloh";
-$areanames{en}->{60777} = "Keluang";
-$areanames{en}->{607780} = "Kahang";
-$areanames{en}->{607781} = "Paloh";
-$areanames{en}->{607782} = "Paloh";
-$areanames{en}->{607783} = "Keluang";
-$areanames{en}->{607784} = "Kahang";
-$areanames{en}->{607785} = "Keluang";
-$areanames{en}->{607786} = "Felda\ Kahang\ Timur";
-$areanames{en}->{607787} = "Keluang";
-$areanames{en}->{607788} = "Kahang";
-$areanames{en}->{607789} = "Keluang";
-$areanames{en}->{60779} = "Mersing";
-$areanames{en}->{607791} = "Felda\ Tenggaroh";
-$areanames{en}->{607793} = "Endau";
-$areanames{en}->{607794} = "Endau";
-$areanames{en}->{607795} = "Felda\ Tenggaroh";
-$areanames{en}->{6078010} = "Mersing";
-$areanames{en}->{6078011} = "Mersing";
-$areanames{en}->{607810} = "Paloh";
-$areanames{en}->{60782} = "Penggerang";
-$areanames{en}->{607822} = "Penawar";
-$areanames{en}->{607823} = "Penawar";
-$areanames{en}->{607828} = "Penawar";
-$areanames{en}->{607830} = "Penggerang";
-$areanames{en}->{607832} = "Penawar";
-$areanames{en}->{607838} = "Penawar";
-$areanames{en}->{607850} = "Tiram";
-$areanames{en}->{607860} = "Senai";
-$areanames{en}->{607861} = "Tiram";
-$areanames{en}->{607862} = "Tiram";
-$areanames{en}->{607863} = "Tiram";
-$areanames{en}->{607865} = "Tiram";
-$areanames{en}->{607867} = "Tiram";
-$areanames{en}->{607868} = "Tiram";
-$areanames{en}->{607869} = "Senai";
-$areanames{en}->{60787} = "Kota\ Tinggi";
-$areanames{en}->{6078710} = "Tiram";
-$areanames{en}->{607879} = "Linggiu";
-$areanames{en}->{607880} = "Kota\ Tinggi";
-$areanames{en}->{607881} = "Air\ Tawar";
-$areanames{en}->{607882} = "Kota\ Tinggi";
-$areanames{en}->{607883} = "Kota\ Tinggi";
-$areanames{en}->{607884} = "Kota\ Tinggi";
-$areanames{en}->{607885} = "Kota\ Tinggi";
-$areanames{en}->{607886} = "Penawar";
-$areanames{en}->{607887} = "Kota\ Tinggi";
-$areanames{en}->{607889} = "Kota\ Tinggi";
-$areanames{en}->{607890} = "Linggiu";
-$areanames{en}->{607891} = "Kota\ Tinggi";
-$areanames{en}->{607892} = "Kota\ Tinggi";
-$areanames{en}->{607893} = "Kota\ Tinggi";
-$areanames{en}->{607894} = "Kota\ Tinggi";
-$areanames{en}->{607895} = "Air\ Tawar";
-$areanames{en}->{607896} = "Tenggara";
-$areanames{en}->{607897} = "Tiram";
-$areanames{en}->{607898} = "Tenggara";
-$areanames{en}->{607899} = "Tiram";
-$areanames{en}->{607900} = "Tenggara";
-$areanames{en}->{6079010} = "Tenggara";
-$areanames{en}->{607902} = "Tangkak";
-$areanames{en}->{607904} = "Tenang";
-$areanames{en}->{607906} = "Segamat";
-$areanames{en}->{607907} = "Labis";
-$areanames{en}->{607908} = "Bekok";
-$areanames{en}->{607910} = "Tenang";
-$areanames{en}->{607911} = "Aver\ Panas";
-$areanames{en}->{607912} = "Aver\ Panas";
-$areanames{en}->{607913} = "Labis";
-$areanames{en}->{607914} = "Tenang";
-$areanames{en}->{607915} = "Bukit\ Kepong";
-$areanames{en}->{607916} = "Bekok";
-$areanames{en}->{607917} = "Tenang";
-$areanames{en}->{607918} = "Aver\ Panas";
-$areanames{en}->{607919} = "Labis";
-$areanames{en}->{607920} = "Segamat";
-$areanames{en}->{607921} = "Labis";
-$areanames{en}->{607922} = "Bekok";
-$areanames{en}->{607923} = "Bukit\ Kepong";
-$areanames{en}->{607924} = "Labis";
-$areanames{en}->{607925} = "Labis";
-$areanames{en}->{607926} = "Labis";
-$areanames{en}->{607927} = "Tenang";
-$areanames{en}->{607928} = "Aver\ Panas";
-$areanames{en}->{607929} = "Aver\ Panas";
-$areanames{en}->{60793} = "Segamat";
-$areanames{en}->{607930} = "Labis";
-$areanames{en}->{607934} = "Labis";
-$areanames{en}->{607938} = "Tenang";
-$areanames{en}->{60794} = "Gemas";
-$areanames{en}->{607940} = "Segamat";
-$areanames{en}->{607943} = "Tenang";
-$areanames{en}->{607944} = "Segamat";
-$areanames{en}->{607945} = "Tenang";
-$areanames{en}->{607950} = "Aver\ Panas";
-$areanames{en}->{607960} = "Gemas";
-$areanames{en}->{607961} = "Segamat";
-$areanames{en}->{607964} = "Bukit\ Gambir";
-$areanames{en}->{607965} = "Kota\ Tinggi";
-$areanames{en}->{607968} = "Gemas";
-$areanames{en}->{607969} = "Bukit\ Gambir";
-$areanames{en}->{607970} = "Segamat";
-$areanames{en}->{607980} = "Bakri";
-$areanames{en}->{607990} = "Bakri";
-$areanames{en}->{608220} = "Kuching";
-$areanames{en}->{608221} = "Kuching";
-$areanames{en}->{6082220} = "Kuching";
-$areanames{en}->{6082221} = "Kuching";
-$areanames{en}->{6082222} = "Kuching";
-$areanames{en}->{6082223} = "Kuching";
-$areanames{en}->{6082224} = "Kuching";
-$areanames{en}->{6082225} = "Kuching";
-$areanames{en}->{6082226} = "Kuching";
-$areanames{en}->{6082227} = "Kuching";
-$areanames{en}->{6082228} = "Kuching";
-$areanames{en}->{608223} = "Kuching";
-$areanames{en}->{608224} = "Kuching";
-$areanames{en}->{608225} = "Kuching";
-$areanames{en}->{6082260} = "Kuching";
-$areanames{en}->{6082261} = "Kuching";
-$areanames{en}->{6082270} = "Kuching";
-$areanames{en}->{6082271} = "Kuching";
-$areanames{en}->{6082272} = "Kuching";
-$areanames{en}->{6082273} = "Kuching";
-$areanames{en}->{6082274} = "Kuching";
-$areanames{en}->{6082275} = "Kuching";
-$areanames{en}->{6082278} = "Kuching";
-$areanames{en}->{6082279} = "Kuching";
-$areanames{en}->{6082280} = "Kuching";
-$areanames{en}->{6082281} = "Kuching";
-$areanames{en}->{6082282} = "Kuching";
-$areanames{en}->{6082283} = "Kuching";
-$areanames{en}->{6082284} = "Kuching";
-$areanames{en}->{6082285} = "Kuching";
-$areanames{en}->{6082286} = "Kuching";
-$areanames{en}->{6082287} = "Damai\ Beach";
-$areanames{en}->{6082288} = "Kuching";
-$areanames{en}->{6082290} = "Kuching";
-$areanames{en}->{6082291} = "Kuching";
-$areanames{en}->{6082292} = "Kuching";
-$areanames{en}->{6082293} = "Kuching";
-$areanames{en}->{6082294} = "Kuching";
-$areanames{en}->{6082299} = "Kuching";
-$areanames{en}->{6082300} = "Kuching";
-$areanames{en}->{6082301} = "Kuching";
-$areanames{en}->{6082302} = "Kuching";
-$areanames{en}->{6082303} = "Kuching";
-$areanames{en}->{6082304} = "Kota\ Samarahan";
-$areanames{en}->{6082305} = "Kuching";
-$areanames{en}->{6082306} = "Kuching";
-$areanames{en}->{6082308} = "Kuching";
-$areanames{en}->{6082309} = "Kuching";
-$areanames{en}->{6082311} = "Kuching";
-$areanames{en}->{6082312} = "Kuching";
-$areanames{en}->{6082313} = "Kuching";
-$areanames{en}->{6082314} = "Kuching";
-$areanames{en}->{6082315} = "Kuching";
-$areanames{en}->{6082319} = "Kuching";
-$areanames{en}->{6082320} = "Semantan";
-$areanames{en}->{6082321} = "Kuching";
-$areanames{en}->{6082322} = "Kuching";
-$areanames{en}->{6082323} = "Damai\ Beach";
-$areanames{en}->{6082324} = "Asajaya";
-$areanames{en}->{6082325} = "Serian";
-$areanames{en}->{6082326} = "Kuching";
-$areanames{en}->{6082328} = "Serian";
-$areanames{en}->{6082329} = "Serian";
-$areanames{en}->{608233} = "Kuching";
-$areanames{en}->{608234} = "Kuching";
-$areanames{en}->{608235} = "Kuching";
-$areanames{en}->{608236} = "Kuching";
-$areanames{en}->{608237} = "Kuching";
-$areanames{en}->{6082380} = "Kuching";
-$areanames{en}->{6082381} = "Kuching";
-$areanames{en}->{6082382} = "Kuching";
-$areanames{en}->{6082383} = "Kuching";
-$areanames{en}->{6082388} = "Kuching";
-$areanames{en}->{6082389} = "Kuching";
-$areanames{en}->{6082391} = "Kuching";
-$areanames{en}->{6082393} = "Sejingkat";
-$areanames{en}->{6082401} = "Kuching";
-$areanames{en}->{6082402} = "Kuching";
-$areanames{en}->{6082403} = "Kuching";
-$areanames{en}->{608241} = "Kuching";
-$areanames{en}->{608242} = "Kuching";
-$areanames{en}->{608243} = "Sejingkat";
-$areanames{en}->{608244} = "Kuching";
-$areanames{en}->{608245} = "Kuching";
-$areanames{en}->{608246} = "Kuching";
-$areanames{en}->{608247} = "Sejingkat";
-$areanames{en}->{6082471} = "Kuching";
-$areanames{en}->{6082472} = "Kuching";
-$areanames{en}->{6082473} = "Kuching";
-$areanames{en}->{6082474} = "Kuching";
-$areanames{en}->{608248} = "Kuching";
-$areanames{en}->{6082491} = "Kuching";
-$areanames{en}->{6082492} = "Kuching";
-$areanames{en}->{6082493} = "Kuching";
-$areanames{en}->{6082495} = "Kuching";
-$areanames{en}->{6082499} = "Kuching";
-$areanames{en}->{6082501} = "Kuching";
-$areanames{en}->{6082502} = "Kuching";
-$areanames{en}->{6082503} = "Kuching";
-$areanames{en}->{6082504} = "Kuching";
-$areanames{en}->{6082505} = "Kuching";
-$areanames{en}->{6082506} = "Kuching";
-$areanames{en}->{6082507} = "Kuching";
-$areanames{en}->{608251} = "Kuching";
-$areanames{en}->{6082520} = "Kuching";
-$areanames{en}->{6082530} = "Kuching";
-$areanames{en}->{6082531} = "Kuching";
-$areanames{en}->{6082532} = "Kuching";
-$areanames{en}->{6082536} = "Kuching";
-$areanames{en}->{6082537} = "Kuching";
-$areanames{en}->{6082538} = "Kuching";
-$areanames{en}->{6082539} = "Kuching";
-$areanames{en}->{6082541} = "Sejingkat";
-$areanames{en}->{6082542} = "Sejingkat";
-$areanames{en}->{6082543} = "Kuching";
-$areanames{en}->{6082544} = "Kuching";
-$areanames{en}->{6082545} = "Kuching";
-$areanames{en}->{6082546} = "Kuching";
-$areanames{en}->{6082547} = "Kuching";
-$areanames{en}->{6082548} = "Kuching";
-$areanames{en}->{6082549} = "Kuching";
-$areanames{en}->{6082550} = "Kuching";
-$areanames{en}->{6082551} = "Kuching";
-$areanames{en}->{6082552} = "Kuching";
-$areanames{en}->{6082553} = "Kuching";
-$areanames{en}->{6082555} = "Kuching";
-$areanames{en}->{608257} = "Kuching";
-$areanames{en}->{608258} = "Kuching";
-$areanames{en}->{6082580} = "Kota\ Samarahan";
-$areanames{en}->{6082581} = "Kota\ Samarahan";
-$areanames{en}->{6082582} = "Kota\ Samarahan";
-$areanames{en}->{6082583} = "Kota\ Samarahan";
-$areanames{en}->{6082590} = "Kuching";
-$areanames{en}->{6082592} = "Kota\ Samarahan";
-$areanames{en}->{6082593} = "Kuching";
-$areanames{en}->{6082596} = "Kuching";
-$areanames{en}->{6082597} = "Kuching";
-$areanames{en}->{608261} = "Kuching";
-$areanames{en}->{6082620} = "Kuching";
-$areanames{en}->{6082621} = "Kuching";
-$areanames{en}->{6082622} = "Kuching";
-$areanames{en}->{6082625} = "Kuching";
-$areanames{en}->{6082626} = "Kuching";
-$areanames{en}->{6082627} = "Kuching";
-$areanames{en}->{6082628} = "Kuching";
-$areanames{en}->{6082629} = "Kuching";
-$areanames{en}->{6082639} = "Kuching";
-$areanames{en}->{608264} = "Kuching";
-$areanames{en}->{6082650} = "Kuching";
-$areanames{en}->{6082651} = "Kuching";
-$areanames{en}->{6082658} = "Kuching";
-$areanames{en}->{6082659} = "Kota\ Samarahan";
-$areanames{en}->{6082661} = "Kota\ Samarahan";
-$areanames{en}->{6082662} = "Kota\ Samarahan";
-$areanames{en}->{6082663} = "Kota\ Samarahan";
-$areanames{en}->{6082664} = "Kota\ Samarahan";
-$areanames{en}->{6082665} = "Kota\ Samarahan";
-$areanames{en}->{6082666} = "Kota\ Samarahan";
-$areanames{en}->{6082667} = "Kota\ Samarahan";
-$areanames{en}->{6082668} = "Kota\ Samarahan";
-$areanames{en}->{6082669} = "Kota\ Samarahan";
-$areanames{en}->{608267} = "Kota\ Samarahan";
-$areanames{en}->{6082681} = "Kuching";
-$areanames{en}->{6082682} = "Kuching";
-$areanames{en}->{6082683} = "Kuching";
-$areanames{en}->{6082684} = "Kuching";
-$areanames{en}->{6082685} = "Kuching";
-$areanames{en}->{6082686} = "Kuching";
-$areanames{en}->{6082687} = "Kuching";
-$areanames{en}->{6082688} = "Kuching";
-$areanames{en}->{6082690} = "Kuching";
-$areanames{en}->{6082698} = "Kuching";
-$areanames{en}->{6082699} = "Kuching";
-$areanames{en}->{6082700} = "Lundu";
-$areanames{en}->{6082701} = "Lundu";
-$areanames{en}->{6082707} = "Kota\ Samarahan";
-$areanames{en}->{6082708} = "Kota\ Samarahan";
-$areanames{en}->{6082709} = "Kota\ Samarahan";
-$areanames{en}->{6082711} = "Semantan";
-$areanames{en}->{6082712} = "Semantan";
-$areanames{en}->{6082713} = "Semantan";
-$areanames{en}->{6082715} = "Semantan";
-$areanames{en}->{6082716} = "Semantan";
-$areanames{en}->{6082720} = "Lundu";
-$areanames{en}->{6082730} = "Lundu";
-$areanames{en}->{6082731} = "Lundu";
-$areanames{en}->{6082734} = "Lundu";
-$areanames{en}->{6082735} = "Lundu";
-$areanames{en}->{6082737} = "Lundu";
-$areanames{en}->{6082739} = "Lundu";
-$areanames{en}->{6082741} = "Lundu";
-$areanames{en}->{6082750} = "Kota\ Samarahan";
-$areanames{en}->{6082751} = "Bau";
-$areanames{en}->{6082752} = "Kuching";
-$areanames{en}->{6082755} = "Kuching";
-$areanames{en}->{6082760} = "Bau";
-$areanames{en}->{6082761} = "Bau";
-$areanames{en}->{6082762} = "Bau";
-$areanames{en}->{6082763} = "Bau";
-$areanames{en}->{6082764} = "Bau";
-$areanames{en}->{6082765} = "Bau";
-$areanames{en}->{6082766} = "Bau";
-$areanames{en}->{6082770} = "Bau";
-$areanames{en}->{6082780} = "Gedong";
-$areanames{en}->{6082781} = "Gedong";
-$areanames{en}->{6082782} = "Gedong";
-$areanames{en}->{6082790} = "Tebedu";
-$areanames{en}->{6082791} = "Tebedu";
-$areanames{en}->{6082793} = "Tebedu";
-$areanames{en}->{6082797} = "Tebedu";
-$areanames{en}->{6082798} = "Tebedu";
-$areanames{en}->{6082803} = "Simunjan";
-$areanames{en}->{6082804} = "Simunjan";
-$areanames{en}->{6082805} = "Simunjan";
-$areanames{en}->{6082807} = "Simunjan";
-$areanames{en}->{6082808} = "Simunjan";
-$areanames{en}->{6082809} = "Simunjan";
-$areanames{en}->{6082810} = "Asajaya";
-$areanames{en}->{6082821} = "Asajaya";
-$areanames{en}->{6082822} = "Asajaya";
-$areanames{en}->{6082824} = "Asajaya";
-$areanames{en}->{6082825} = "Asajaya";
-$areanames{en}->{6082826} = "Asajaya";
-$areanames{en}->{6082827} = "Asajaya";
-$areanames{en}->{6082828} = "Asajaya";
-$areanames{en}->{6082829} = "Asajaya";
-$areanames{en}->{6082830} = "Sebangan";
-$areanames{en}->{6082831} = "Sebangan";
-$areanames{en}->{6082840} = "Damai\ Beach";
-$areanames{en}->{6082842} = "Damai\ Beach";
-$areanames{en}->{6082843} = "Damai\ Beach";
-$areanames{en}->{6082844} = "Damai\ Beach";
-$areanames{en}->{6082845} = "Damai\ Beach";
-$areanames{en}->{6082846} = "Damai\ Beach";
-$areanames{en}->{6082850} = "Serian";
-$areanames{en}->{6082860} = "Kota\ Samarahan";
-$areanames{en}->{6082862} = "Kota\ Samarahan";
-$areanames{en}->{6082863} = "Kota\ Samarahan";
-$areanames{en}->{6082864} = "Kota\ Samarahan";
-$areanames{en}->{6082865} = "Kota\ Samarahan";
-$areanames{en}->{6082867} = "Kota\ Samarahan";
-$areanames{en}->{6082868} = "Kota\ Samarahan";
-$areanames{en}->{608287} = "Serian";
-$areanames{en}->{6082871} = "Baki";
-$areanames{en}->{6082878} = "Baki";
-$areanames{en}->{6082882} = "Serian";
-$areanames{en}->{6082885} = "Serian";
-$areanames{en}->{6082886} = "Serian";
-$areanames{en}->{6082887} = "Serian";
-$areanames{en}->{6082888} = "Serian";
-$areanames{en}->{6082889} = "Serian";
-$areanames{en}->{6082890} = "Serian";
-$areanames{en}->{6082894} = "Serian";
-$areanames{en}->{6082895} = "Serian";
-$areanames{en}->{6082896} = "Serian";
-$areanames{en}->{6082898} = "Serian";
-$areanames{en}->{6082899} = "Serian";
-$areanames{en}->{6083220} = "Bandar\ Sri\ Aman";
-$areanames{en}->{6083300} = "Bandar\ Sri\ Aman";
-$areanames{en}->{6083308} = "Bandar\ Sri\ Aman";
-$areanames{en}->{6083309} = "Bandar\ Sri\ Aman";
-$areanames{en}->{6083310} = "Bandar\ Sri\ Aman";
-$areanames{en}->{6083320} = "Bandar\ Sri\ Aman";
-$areanames{en}->{6083321} = "Bandar\ Sri\ Aman";
-$areanames{en}->{6083322} = "Bandar\ Sri\ Aman";
-$areanames{en}->{6083323} = "Bandar\ Sri\ Aman";
-$areanames{en}->{6083324} = "Bandar\ Sri\ Aman";
-$areanames{en}->{6083325} = "Bandar\ Sri\ Aman";
-$areanames{en}->{6083326} = "Bandar\ Sri\ Aman";
-$areanames{en}->{6083327} = "Bandar\ Sri\ Aman";
-$areanames{en}->{6083337} = "Bandar\ Sri\ Aman";
-$areanames{en}->{6083338} = "Bandar\ Sri\ Aman";
-$areanames{en}->{6083339} = "Bandar\ Sri\ Aman";
-$areanames{en}->{6083340} = "Bandar\ Sri\ Aman";
-$areanames{en}->{6083341} = "Bandar\ Sri\ Aman";
-$areanames{en}->{6083342} = "Bandar\ Sri\ Aman";
-$areanames{en}->{6083343} = "Bandar\ Sri\ Aman";
-$areanames{en}->{6083344} = "Bandar\ Sri\ Aman";
-$areanames{en}->{6083348} = "Bandar\ Sri\ Aman";
-$areanames{en}->{6083406} = "Maludam";
-$areanames{en}->{6083408} = "Maludam";
-$areanames{en}->{6083410} = "Kabong";
-$areanames{en}->{6083411} = "Kabong";
-$areanames{en}->{6083413} = "Kabong";
-$areanames{en}->{6083414} = "Kabong";
-$areanames{en}->{6083417} = "Betong";
-$areanames{en}->{6083418} = "Bandar\ Sri\ Aman";
-$areanames{en}->{6083425} = "Roban";
-$areanames{en}->{6083427} = "Roban";
-$areanames{en}->{6083430} = "Saratok";
-$areanames{en}->{6083435} = "Saratok";
-$areanames{en}->{6083436} = "Saratok";
-$areanames{en}->{6083437} = "Saratok";
-$areanames{en}->{6083438} = "Saratok";
-$areanames{en}->{6083439} = "Saratok";
-$areanames{en}->{6083450} = "Saratok";
-$areanames{en}->{6083460} = "Sebuyau";
-$areanames{en}->{6083461} = "Debak";
-$areanames{en}->{6083463} = "Debak";
-$areanames{en}->{6083464} = "Debak";
-$areanames{en}->{6083465} = "Debak";
-$areanames{en}->{6083466} = "Debak";
-$areanames{en}->{6083467} = "Sebuyau";
-$areanames{en}->{6083468} = "Sebuyau";
-$areanames{en}->{6083469} = "Sebuyau";
-$areanames{en}->{6083470} = "Betong";
-$areanames{en}->{6083471} = "Betong";
-$areanames{en}->{6083472} = "Betong";
-$areanames{en}->{6083473} = "Betong";
-$areanames{en}->{6083474} = "Debak";
-$areanames{en}->{6083475} = "Debak";
-$areanames{en}->{6083477} = "Betong";
-$areanames{en}->{6083480} = "Betong";
-$areanames{en}->{6083485} = "Betong";
-$areanames{en}->{6083496} = "Lingga";
-$areanames{en}->{6083545} = "Pantu";
-$areanames{en}->{6083547} = "Maludam";
-$areanames{en}->{6083548} = "Maludam";
-$areanames{en}->{6083549} = "Pantu";
-$areanames{en}->{6083555} = "Bandar\ Sri\ Aman";
-$areanames{en}->{6083562} = "Roban";
-$areanames{en}->{6083563} = "Engkilili";
-$areanames{en}->{6083564} = "Engkilili";
-$areanames{en}->{6083566} = "Pantu";
-$areanames{en}->{6083567} = "Lingga";
-$areanames{en}->{6083568} = "Engkilili";
-$areanames{en}->{6083569} = "Engkilili";
-$areanames{en}->{6083570} = "Lingga";
-$areanames{en}->{6083584} = "Lubukantu";
-$areanames{en}->{6083585} = "Lubukantu";
-$areanames{en}->{6083589} = "Lubukantu";
-$areanames{en}->{6083592} = "Lubuk\ Antu";
-$areanames{en}->{608421} = "Sibu";
-$areanames{en}->{6084220} = "Sibu";
-$areanames{en}->{6084221} = "Sibu";
-$areanames{en}->{6084222} = "Sibu";
-$areanames{en}->{6084223} = "Sibu";
-$areanames{en}->{6084224} = "Sibu";
-$areanames{en}->{6084228} = "Sibu";
-$areanames{en}->{6084229} = "Sibu";
-$areanames{en}->{6084231} = "Sibu";
-$areanames{en}->{6084232} = "Sibu";
-$areanames{en}->{6084234} = "Sibu";
-$areanames{en}->{6084235} = "Sibu";
-$areanames{en}->{6084236} = "Sibu";
-$areanames{en}->{6084237} = "Sibu";
-$areanames{en}->{6084238} = "Sibu";
-$areanames{en}->{6084239} = "Sibu";
-$areanames{en}->{608425} = "Sibu";
-$areanames{en}->{6084301} = "Sibu";
-$areanames{en}->{6084302} = "Sibu";
-$areanames{en}->{6084303} = "Sibu";
-$areanames{en}->{6084304} = "Sibu";
-$areanames{en}->{6084305} = "Sibu";
-$areanames{en}->{6084306} = "Sibu";
-$areanames{en}->{6084307} = "Sibu";
-$areanames{en}->{6084308} = "Sibu";
-$areanames{en}->{608431} = "Sibu";
-$areanames{en}->{608432} = "Sibu";
-$areanames{en}->{608433} = "Sibu";
-$areanames{en}->{608434} = "Sibu";
-$areanames{en}->{6084350} = "Sibu";
-$areanames{en}->{6084351} = "Miri";
-$areanames{en}->{6084352} = "Sibu";
-$areanames{en}->{6084353} = "Sibu";
-$areanames{en}->{6084361} = "Sibu";
-$areanames{en}->{6084362} = "Sibu";
-$areanames{en}->{6084363} = "Sibu";
-$areanames{en}->{6084364} = "Sibu";
-$areanames{en}->{6084365} = "Sibu";
-$areanames{en}->{6084366} = "Sibu";
-$areanames{en}->{6084367} = "Sibu";
-$areanames{en}->{6084375} = "Sibu";
-$areanames{en}->{6084380} = "Sibu";
-$areanames{en}->{6084381} = "Sibu";
-$areanames{en}->{6084382} = "Sibu";
-$areanames{en}->{6084383} = "Sibu";
-$areanames{en}->{6084384} = "Sibu";
-$areanames{en}->{6084391} = "Sibu";
-$areanames{en}->{6084392} = "Sibu";
-$areanames{en}->{6084393} = "Sibu";
-$areanames{en}->{6084394} = "Sibu";
-$areanames{en}->{6084395} = "Sibu";
-$areanames{en}->{6084398} = "Sibu";
-$areanames{en}->{6084405} = "Sibu";
-$areanames{en}->{6084480} = "Sibu";
-$areanames{en}->{6084555} = "Sibu";
-$areanames{en}->{6084610} = "Rejang";
-$areanames{en}->{6084612} = "Rejang";
-$areanames{en}->{6084613} = "Selalang";
-$areanames{en}->{6084614} = "Rejang";
-$areanames{en}->{6084620} = "Sarikei";
-$areanames{en}->{6084631} = "Selalang";
-$areanames{en}->{6084632} = "Selalang";
-$areanames{en}->{6084633} = "Selalang";
-$areanames{en}->{6084634} = "Pakan";
-$areanames{en}->{6084640} = "Sarikei";
-$areanames{en}->{6084641} = "Sarikei";
-$areanames{en}->{6084642} = "Sarikei";
-$areanames{en}->{6084644} = "Sarikei";
-$areanames{en}->{6084645} = "Sarikei";
-$areanames{en}->{6084646} = "Sarikei";
-$areanames{en}->{6084647} = "Sarikei";
-$areanames{en}->{608465} = "Sarikei";
-$areanames{en}->{6084660} = "Sarikei";
-$areanames{en}->{6084661} = "Sarikei";
-$areanames{en}->{6084662} = "Sarikei";
-$areanames{en}->{6084671} = "Sarikei";
-$areanames{en}->{6084680} = "Sarikei";
-$areanames{en}->{6084681} = "Sarikei";
-$areanames{en}->{6084682} = "Sarikei";
-$areanames{en}->{6084683} = "Sarikei";
-$areanames{en}->{6084684} = "Sarikei";
-$areanames{en}->{6084687} = "Sarikei";
-$areanames{en}->{6084689} = "Bintangor";
-$areanames{en}->{6084690} = "Bintangor";
-$areanames{en}->{6084691} = "Bintangor";
-$areanames{en}->{6084692} = "Bintangor";
-$areanames{en}->{6084693} = "Bintangor";
-$areanames{en}->{6084694} = "Bintangor";
-$areanames{en}->{6084695} = "Bintangor";
-$areanames{en}->{6084696} = "Bintangor";
-$areanames{en}->{6084698} = "Bintangor";
-$areanames{en}->{6084699} = "Bintangor";
-$areanames{en}->{6084702} = "Bintangor";
-$areanames{en}->{6084717} = "Pakan";
-$areanames{en}->{6084719} = "Pakan";
-$areanames{en}->{6084730} = "Julau";
-$areanames{en}->{6084731} = "Julau";
-$areanames{en}->{6084734} = "Julau";
-$areanames{en}->{6084736} = "Julau";
-$areanames{en}->{6084738} = "Julau";
-$areanames{en}->{6084750} = "Kanowit";
-$areanames{en}->{6084751} = "Kanowit";
-$areanames{en}->{6084752} = "Kanowit";
-$areanames{en}->{6084753} = "Kanowit";
-$areanames{en}->{6084754} = "Kanowit";
-$areanames{en}->{6084755} = "Kanowit";
-$areanames{en}->{6084760} = "Kanowit";
-$areanames{en}->{6084762} = "Kanowit";
-$areanames{en}->{6084765} = "Kanowit";
-$areanames{en}->{6084766} = "Kanowit";
-$areanames{en}->{6084770} = "Song";
-$areanames{en}->{6084772} = "Song";
-$areanames{en}->{6084773} = "Song";
-$areanames{en}->{6084777} = "Song";
-$areanames{en}->{6084780} = "Kapit";
-$areanames{en}->{6084788} = "Kapit";
-$areanames{en}->{6084789} = "Kapit";
-$areanames{en}->{6084790} = "Kapit";
-$areanames{en}->{6084796} = "Kapit";
-$areanames{en}->{6084797} = "Kapit";
-$areanames{en}->{6084798} = "Kapit";
-$areanames{en}->{6084799} = "Kapit";
-$areanames{en}->{6084801} = "Sibu";
-$areanames{en}->{6084802} = "Sibu";
-$areanames{en}->{6084803} = "Sibu";
-$areanames{en}->{6084804} = "Sarikei";
-$areanames{en}->{6084805} = "Kuala\ Igan";
-$areanames{en}->{6084806} = "Kapit";
-$areanames{en}->{6084807} = "Sibu";
-$areanames{en}->{6084808} = "Sibu";
-$areanames{en}->{6084809} = "Sibu";
-$areanames{en}->{6084810} = "Julau";
-$areanames{en}->{6084811} = "Mukah";
-$areanames{en}->{6084812} = "Stapang";
-$areanames{en}->{6084815} = "Rejang";
-$areanames{en}->{6084816} = "Rejang";
-$areanames{en}->{6084818} = "Daro";
-$areanames{en}->{6084820} = "Daro";
-$areanames{en}->{6084821} = "Daro";
-$areanames{en}->{6084823} = "Daro";
-$areanames{en}->{6084828} = "Daro";
-$areanames{en}->{6084830} = "Matu";
-$areanames{en}->{6084831} = "Matu";
-$areanames{en}->{6084832} = "Matu";
-$areanames{en}->{6084833} = "Matu";
-$areanames{en}->{6084834} = "Matu";
-$areanames{en}->{6084840} = "Kuala\ Igan";
-$areanames{en}->{6084844} = "Mukah";
-$areanames{en}->{6084848} = "Kuala\ Igan";
-$areanames{en}->{6084850} = "Dalat";
-$areanames{en}->{608486} = "Dalat";
-$areanames{en}->{6084869} = "Kuala\ Igan";
-$areanames{en}->{6084870} = "Mukah";
-$areanames{en}->{6084871} = "Mukah";
-$areanames{en}->{6084872} = "Mukah";
-$areanames{en}->{6084873} = "Mukah";
-$areanames{en}->{6084874} = "Mukah";
-$areanames{en}->{6084875} = "Mukah";
-$areanames{en}->{6084877} = "Mukah";
-$areanames{en}->{6084879} = "Dalat";
-$areanames{en}->{6084880} = "Daro";
-$areanames{en}->{6084891} = "Selangau";
-$areanames{en}->{6084892} = "Selangau";
-$areanames{en}->{6084893} = "Selangau";
-$areanames{en}->{6084894} = "Stapang";
-$areanames{en}->{6084895} = "Kuala\ Igan";
-$areanames{en}->{6084896} = "Stapang";
-$areanames{en}->{6084897} = "Stapang";
-$areanames{en}->{6084898} = "Sibu";
-$areanames{en}->{6085200} = "Limbang";
-$areanames{en}->{6085201} = "Limbang";
-$areanames{en}->{6085202} = "Limbang";
-$areanames{en}->{6085206} = "Kampung\ Pahlawan";
-$areanames{en}->{608521} = "Limbang";
-$areanames{en}->{6085220} = "Limbang";
-$areanames{en}->{6085221} = "Limbang";
-$areanames{en}->{6085222} = "Limbang";
-$areanames{en}->{6085223} = "Limbang";
-$areanames{en}->{6085224} = "Limbang";
-$areanames{en}->{6085225} = "Limbang";
-$areanames{en}->{6085231} = "Kampung\ Pahlawan";
-$areanames{en}->{6085238} = "Limbang";
-$areanames{en}->{6085240} = "Kampung\ Pahlawan";
-$areanames{en}->{6085241} = "Kampung\ Pahlawan";
-$areanames{en}->{6085242} = "Limbang";
-$areanames{en}->{6085263} = "Sundar";
-$areanames{en}->{6085264} = "Sundar";
-$areanames{en}->{6085265} = "Sundar";
-$areanames{en}->{6085266} = "Lawas";
-$areanames{en}->{6085268} = "Sundar";
-$areanames{en}->{6085270} = "Lawas";
-$areanames{en}->{6085280} = "Lawas";
-$areanames{en}->{6085282} = "Lawas";
-$areanames{en}->{6085283} = "Lawas";
-$areanames{en}->{6085284} = "Lawas";
-$areanames{en}->{6085285} = "Lawas";
-$areanames{en}->{6085286} = "Lawas";
-$areanames{en}->{6085287} = "Lawas";
-$areanames{en}->{6085288} = "Lawas";
-$areanames{en}->{6085290} = "Lawas";
-$areanames{en}->{6085295} = "Lawas";
-$areanames{en}->{6085296} = "Lawas";
-$areanames{en}->{6085297} = "Lawas";
-$areanames{en}->{6085298} = "Lawas";
-$areanames{en}->{6085299} = "Lawas";
-$areanames{en}->{6085310} = "Limbang";
-$areanames{en}->{608532} = "Miri";
-$areanames{en}->{6085331} = "Miri";
-$areanames{en}->{6085395} = "Miri";
-$areanames{en}->{6085401} = "Miri";
-$areanames{en}->{6085402} = "Miri";
-$areanames{en}->{6085403} = "Miri";
-$areanames{en}->{6085404} = "Miri";
-$areanames{en}->{6085405} = "Miri";
-$areanames{en}->{6085406} = "Miri";
-$areanames{en}->{6085407} = "Miri";
-$areanames{en}->{608541} = "Miri";
-$areanames{en}->{608542} = "Miri";
-$areanames{en}->{608543} = "Miri";
-$areanames{en}->{608544} = "Miri";
-$areanames{en}->{6085450} = "Miri";
-$areanames{en}->{6085452} = "Miri";
-$areanames{en}->{6085453} = "Miri";
-$areanames{en}->{6085454} = "Miri";
-$areanames{en}->{6085455} = "Miri";
-$areanames{en}->{6085456} = "Miri";
-$areanames{en}->{6085460} = "Miri";
-$areanames{en}->{6085461} = "Miri";
-$areanames{en}->{6085462} = "Miri";
-$areanames{en}->{6085463} = "Miri";
-$areanames{en}->{6085470} = "Miri";
-$areanames{en}->{6085471} = "Miri";
-$areanames{en}->{6085472} = "Miri";
-$areanames{en}->{6085474} = "Miri";
-$areanames{en}->{6085475} = "Miri";
-$areanames{en}->{6085481} = "Bekenu";
-$areanames{en}->{6085482} = "Kampung\ Bakam";
-$areanames{en}->{6085485} = "Kampung\ Bakam";
-$areanames{en}->{6085491} = "Miri";
-$areanames{en}->{6085492} = "Bekenu";
-$areanames{en}->{6085493} = "Sundar";
-$areanames{en}->{6085494} = "Bekenu";
-$areanames{en}->{6085495} = "Miri";
-$areanames{en}->{6085496} = "Ladang\ Tiga";
-$areanames{en}->{6085540} = "Miri";
-$areanames{en}->{6085555} = "Miri";
-$areanames{en}->{6085601} = "Miri";
-$areanames{en}->{6085604} = "Miri";
-$areanames{en}->{6085605} = "Miri";
-$areanames{en}->{6085609} = "Miri";
-$areanames{en}->{6085610} = "Miri";
-$areanames{en}->{6085611} = "Miri";
-$areanames{en}->{6085612} = "Miri";
-$areanames{en}->{6085613} = "Miri";
-$areanames{en}->{6085614} = "Miri";
-$areanames{en}->{6085615} = "Miri";
-$areanames{en}->{6085616} = "Miri";
-$areanames{en}->{6085617} = "Miri";
-$areanames{en}->{6085618} = "Miri";
-$areanames{en}->{6085620} = "Miri";
-$areanames{en}->{6085621} = "Miri";
-$areanames{en}->{6085622} = "Miri";
-$areanames{en}->{6085626} = "Miri";
-$areanames{en}->{6085627} = "Miri";
-$areanames{en}->{6085628} = "Miri";
-$areanames{en}->{6085630} = "Miri";
-$areanames{en}->{6085631} = "Miri";
-$areanames{en}->{6085632} = "Miri";
-$areanames{en}->{6085633} = "Miri";
-$areanames{en}->{6085635} = "Miri";
-$areanames{en}->{6085636} = "Miri";
-$areanames{en}->{6085637} = "Miri";
-$areanames{en}->{6085638} = "Miri";
-$areanames{en}->{608564} = "Miri";
-$areanames{en}->{608565} = "Miri";
-$areanames{en}->{6085660} = "Miri";
-$areanames{en}->{6085661} = "Miri";
-$areanames{en}->{6085662} = "Miri";
-$areanames{en}->{6085663} = "Miri";
-$areanames{en}->{6085664} = "Miri";
-$areanames{en}->{6085665} = "Miri";
-$areanames{en}->{6085666} = "Limbang";
-$areanames{en}->{6085667} = "Miri";
-$areanames{en}->{6085668} = "Miri";
-$areanames{en}->{6085680} = "Miri";
-$areanames{en}->{6085710} = "Bekenu";
-$areanames{en}->{6085717} = "Bekenu";
-$areanames{en}->{6085718} = "Bekenu";
-$areanames{en}->{6085719} = "Bekenu";
-$areanames{en}->{6085720} = "Batu\ Niah";
-$areanames{en}->{6085733} = "Batu\ Niah";
-$areanames{en}->{6085735} = "Batu\ Niah";
-$areanames{en}->{6085736} = "Batu\ Niah";
-$areanames{en}->{6085737} = "Batu\ Niah";
-$areanames{en}->{6085738} = "Batu\ Niah";
-$areanames{en}->{6085739} = "Batu\ Niah";
-$areanames{en}->{6085740} = "Mu";
-$areanames{en}->{6085742} = "Beluru";
-$areanames{en}->{6085743} = "Beluru";
-$areanames{en}->{6085744} = "Beluru";
-$areanames{en}->{6085750} = "Marudi";
-$areanames{en}->{6085755} = "Marudi";
-$areanames{en}->{6085756} = "Marudi";
-$areanames{en}->{6085758} = "Marudi";
-$areanames{en}->{6085759} = "Marudi";
-$areanames{en}->{6085760} = "Marudi";
-$areanames{en}->{6085761} = "Layang\-Layang";
-$areanames{en}->{6085765} = "Marudi";
-$areanames{en}->{6085766} = "Marudi";
-$areanames{en}->{6085767} = "Marudi";
-$areanames{en}->{6085768} = "Marudi";
-$areanames{en}->{6085769} = "Marudi";
-$areanames{en}->{6085770} = "Long\ Lama";
-$areanames{en}->{6085771} = "Long\ Lama";
-$areanames{en}->{6085779} = "Long\ Lama";
-$areanames{en}->{6085784} = "Bakun";
-$areanames{en}->{6085785} = "Marudi";
-$areanames{en}->{6085790} = "Miri";
-$areanames{en}->{6085791} = "Miri";
-$areanames{en}->{6085792} = "Mulu";
-$areanames{en}->{6086201} = "Bintulu";
-$areanames{en}->{6086231} = "Bintulu";
-$areanames{en}->{6086232} = "Bintulu";
-$areanames{en}->{6086251} = "Bintulu";
-$areanames{en}->{6086252} = "Bintulu";
-$areanames{en}->{6086253} = "Bintulu";
-$areanames{en}->{6086254} = "Bintulu";
-$areanames{en}->{6086255} = "Bintulu";
-$areanames{en}->{6086256} = "Bintulu";
-$areanames{en}->{6086257} = "Bintulu";
-$areanames{en}->{6086260} = "Bintulu";
-$areanames{en}->{6086281} = "Bintulu";
-$areanames{en}->{6086282} = "Bintulu";
-$areanames{en}->{6086283} = "Bintulu";
-$areanames{en}->{6086284} = "Bintulu";
-$areanames{en}->{6086285} = "Bintulu";
-$areanames{en}->{6086286} = "Bintulu";
-$areanames{en}->{6086290} = "Bintulu";
-$areanames{en}->{6086291} = "Bintulu";
-$areanames{en}->{6086292} = "Bintulu";
-$areanames{en}->{6086293} = "Bintulu";
-$areanames{en}->{6086294} = "Bintulu";
-$areanames{en}->{6086295} = "Bintulu";
-$areanames{en}->{6086296} = "Bintulu";
-$areanames{en}->{6086297} = "Bintulu";
-$areanames{en}->{6086298} = "Bintulu";
-$areanames{en}->{6086300} = "Bintulu";
-$areanames{en}->{6086301} = "Bintulu";
-$areanames{en}->{6086303} = "Bintulu";
-$areanames{en}->{6086307} = "Bintulu";
-$areanames{en}->{608631} = "Bintulu";
-$areanames{en}->{6086320} = "Bintulu";
-$areanames{en}->{6086321} = "Bintulu";
-$areanames{en}->{6086322} = "Bintulu";
-$areanames{en}->{6086323} = "Bintulu";
-$areanames{en}->{6086324} = "Bintulu";
-$areanames{en}->{6086325} = "Bintulu";
-$areanames{en}->{6086326} = "Bintulu";
-$areanames{en}->{6086327} = "Bintulu";
-$areanames{en}->{6086328} = "Bintulu";
-$areanames{en}->{608633} = "Bintulu";
-$areanames{en}->{608634} = "Bintulu";
-$areanames{en}->{6086350} = "Bintulu";
-$areanames{en}->{6086351} = "Bintulu";
-$areanames{en}->{6086360} = "Bintulu";
-$areanames{en}->{6086371} = "Sebauh";
-$areanames{en}->{6086381} = "Tatau";
-$areanames{en}->{6086390} = "Bintulu";
-$areanames{en}->{6086391} = "Bintulu";
-$areanames{en}->{6086422} = "Sebauh";
-$areanames{en}->{6086423} = "Sebauh";
-$areanames{en}->{6086424} = "Sebauh";
-$areanames{en}->{6086449} = "Pelagus";
-$areanames{en}->{6086457} = "Belaga";
-$areanames{en}->{6086460} = "Belaga";
-$areanames{en}->{6086461} = "Belaga";
-$areanames{en}->{6086462} = "Bakun";
-$areanames{en}->{6086466} = "Sebauh";
-$areanames{en}->{6086468} = "Belaga";
-$areanames{en}->{6086469} = "Belaga";
-$areanames{en}->{6086480} = "Balingan";
-$areanames{en}->{6086483} = "Pelagus";
-$areanames{en}->{6086484} = "Balingan";
-$areanames{en}->{6086485} = "Belaga";
-$areanames{en}->{6086486} = "Balingan";
-$areanames{en}->{6086488} = "Balingan";
-$areanames{en}->{6086506} = "Bintulu";
-$areanames{en}->{6086507} = "Bintulu";
-$areanames{en}->{6086508} = "Bintulu";
-$areanames{en}->{6086555} = "Bintulu";
-$areanames{en}->{6086580} = "Tatau";
-$areanames{en}->{6086581} = "Tatau";
-$areanames{en}->{6086584} = "Tatau";
-$areanames{en}->{6086590} = "Tatau";
-$areanames{en}->{608685} = "Bintulu";
-$areanames{en}->{6086860} = "Bintulu";
-$areanames{en}->{6086880} = "Bakun";
-$areanames{en}->{6086951} = "Bintulu";
-$areanames{en}->{6086952} = "Bintulu";
-$areanames{en}->{6087201} = "Beaufort";
-$areanames{en}->{6087208} = "Beaufort";
-$areanames{en}->{6087209} = "Beaufort";
-$areanames{en}->{6087211} = "Beaufort";
-$areanames{en}->{6087212} = "Beaufort";
-$areanames{en}->{6087213} = "Beaufort";
-$areanames{en}->{6087214} = "Beaufort";
-$areanames{en}->{6087215} = "Beaufort";
-$areanames{en}->{6087216} = "Beaufort";
-$areanames{en}->{6087217} = "Beaufort";
-$areanames{en}->{6087218} = "Beaufort";
-$areanames{en}->{6087219} = "Beaufort";
-$areanames{en}->{6087221} = "Beaufort";
-$areanames{en}->{6087222} = "Beaufort";
-$areanames{en}->{6087223} = "Beaufort";
-$areanames{en}->{6087224} = "Beaufort";
-$areanames{en}->{6087225} = "Beaufort";
-$areanames{en}->{6087226} = "Beaufort";
-$areanames{en}->{6087227} = "Beaufort";
-$areanames{en}->{6087228} = "Beaufort";
-$areanames{en}->{6087229} = "Beaufort";
-$areanames{en}->{6087230} = "Beaufort";
-$areanames{en}->{6087231} = "Beaufort";
-$areanames{en}->{6087232} = "Beaufort";
-$areanames{en}->{6087233} = "Beaufort";
-$areanames{en}->{6087234} = "Beaufort";
-$areanames{en}->{6087237} = "Beaufort";
-$areanames{en}->{6087250} = "Beaufort";
-$areanames{en}->{6087301} = "Keningau";
-$areanames{en}->{6087302} = "Keningau";
-$areanames{en}->{6087303} = "Keningau";
-$areanames{en}->{6087304} = "Keningau";
-$areanames{en}->{6087311} = "Keningau";
-$areanames{en}->{6087312} = "Keningau";
-$areanames{en}->{6087313} = "Keningau";
-$areanames{en}->{6087314} = "Keningau";
-$areanames{en}->{6087315} = "Keningau";
-$areanames{en}->{6087316} = "Keningau";
-$areanames{en}->{6087317} = "Keningau";
-$areanames{en}->{6087318} = "Keningau";
-$areanames{en}->{6087319} = "Keningau";
-$areanames{en}->{608733} = "Keningau";
-$areanames{en}->{6087340} = "Keningau";
-$areanames{en}->{6087341} = "Keningau";
-$areanames{en}->{6087342} = "Keningau";
-$areanames{en}->{6087344} = "Keningau";
-$areanames{en}->{6087391} = "Keningau";
-$areanames{en}->{6087392} = "Keningau";
-$areanames{en}->{6087401} = "Labuan";
-$areanames{en}->{6087402} = "Labuan";
-$areanames{en}->{6087403} = "Labuan";
-$areanames{en}->{6087404} = "Labuan";
-$areanames{en}->{6087405} = "Labuan";
-$areanames{en}->{6087406} = "Labuan";
-$areanames{en}->{6087407} = "Labuan";
-$areanames{en}->{6087408} = "Labuan";
-$areanames{en}->{6087409} = "Labuan";
-$areanames{en}->{608741} = "Labuan";
-$areanames{en}->{608742} = "Labuan";
-$areanames{en}->{6087431} = "Labuan";
-$areanames{en}->{6087436} = "Labuan";
-$areanames{en}->{6087437} = "Labuan";
-$areanames{en}->{6087438} = "Labuan";
-$areanames{en}->{6087439} = "Labuan";
-$areanames{en}->{6087440} = "Labuan";
-$areanames{en}->{6087441} = "Labuan";
-$areanames{en}->{6087442} = "Labuan";
-$areanames{en}->{6087443} = "Labuan";
-$areanames{en}->{6087450} = "Labuan";
-$areanames{en}->{6087451} = "Labuan";
-$areanames{en}->{6087452} = "Labuan";
-$areanames{en}->{6087453} = "Labuan";
-$areanames{en}->{6087459} = "Labuan";
-$areanames{en}->{6087460} = "Labuan";
-$areanames{en}->{6087461} = "Labuan";
-$areanames{en}->{6087462} = "Labuan";
-$areanames{en}->{6087463} = "Labuan";
-$areanames{en}->{6087464} = "Labuan";
-$areanames{en}->{6087465} = "Labuan";
-$areanames{en}->{6087466} = "Labuan";
-$areanames{en}->{6087467} = "Labuan";
-$areanames{en}->{6087468} = "Labuan";
-$areanames{en}->{6087472} = "Labuan";
-$areanames{en}->{6087475} = "Labuan";
-$areanames{en}->{6087476} = "Labuan";
-$areanames{en}->{6087477} = "Labuan";
-$areanames{en}->{6087478} = "Labuan";
-$areanames{en}->{6087479} = "Labuan";
-$areanames{en}->{6087480} = "Labuan";
-$areanames{en}->{6087481} = "Labuan";
-$areanames{en}->{6087482} = "Labuan";
-$areanames{en}->{6087483} = "Labuan";
-$areanames{en}->{6087484} = "Labuan";
-$areanames{en}->{6087485} = "Labuan";
-$areanames{en}->{6087486} = "Labuan";
-$areanames{en}->{6087490} = "Labuan";
-$areanames{en}->{6087501} = "Labuan";
-$areanames{en}->{6087502} = "Labuan";
-$areanames{en}->{6087503} = "Labuan";
-$areanames{en}->{6087504} = "Labuan";
-$areanames{en}->{6087505} = "Labuan";
-$areanames{en}->{6087506} = "Labuan";
-$areanames{en}->{6087507} = "Labuan";
-$areanames{en}->{6087508} = "Labuan";
-$areanames{en}->{6087509} = "Labuan";
-$areanames{en}->{608758} = "Labuan";
-$areanames{en}->{608759} = "Labuan";
-$areanames{en}->{6087718} = "Tenom";
-$areanames{en}->{6087725} = "Tenom";
-$areanames{en}->{6087726} = "Tenom";
-$areanames{en}->{6087727} = "Tenom";
-$areanames{en}->{6087728} = "Tenom";
-$areanames{en}->{6087729} = "Tenom";
-$areanames{en}->{6087730} = "Tenom";
-$areanames{en}->{6087731} = "Tenom";
-$areanames{en}->{6087733} = "Tenom";
-$areanames{en}->{6087734} = "Tenom";
-$areanames{en}->{6087735} = "Tenom";
-$areanames{en}->{6087736} = "Tenom";
-$areanames{en}->{6087737} = "Tenom";
-$areanames{en}->{6087738} = "Tenom";
-$areanames{en}->{6087739} = "Tenom";
-$areanames{en}->{6087750} = "Tenom";
-$areanames{en}->{6087760} = "Tenom";
-$areanames{en}->{6087761} = "Tenom";
-$areanames{en}->{6087765} = "Tambunan";
-$areanames{en}->{6087766} = "Tambunan";
-$areanames{en}->{6087768} = "Tambunan";
-$areanames{en}->{6087770} = "Tambunan";
-$areanames{en}->{6087771} = "Tambunan";
-$areanames{en}->{6087772} = "Tambunan";
-$areanames{en}->{6087773} = "Tambunan";
-$areanames{en}->{6087774} = "Tambunan";
-$areanames{en}->{6087775} = "Tambunan";
-$areanames{en}->{6087776} = "Keningau";
-$areanames{en}->{6087777} = "Tambunan";
-$areanames{en}->{6087782} = "Tambunan";
-$areanames{en}->{6087801} = "Sipitang";
-$areanames{en}->{6087802} = "Sipitang";
-$areanames{en}->{6087803} = "Sipitang";
-$areanames{en}->{6087810} = "Sipitang";
-$areanames{en}->{6087811} = "Sipitang";
-$areanames{en}->{6087812} = "Sipitang";
-$areanames{en}->{6087818} = "Sipitang";
-$areanames{en}->{6087820} = "Sipitang";
-$areanames{en}->{6087821} = "Sipitang";
-$areanames{en}->{6087822} = "Sipitang";
-$areanames{en}->{6087823} = "Sipitang";
-$areanames{en}->{6087828} = "Kuala\ Penyu";
-$areanames{en}->{6087831} = "Menumbok";
-$areanames{en}->{6087832} = "Menumbok";
-$areanames{en}->{6087833} = "Menumbok";
-$areanames{en}->{6087848} = "Sipitang";
-$areanames{en}->{6087850} = "Kuala\ Penyu";
-$areanames{en}->{6087851} = "Kuala\ Penyu";
-$areanames{en}->{6087852} = "Menumbok";
-$areanames{en}->{6087853} = "Kuala\ Penyu";
-$areanames{en}->{6087854} = "Bongawan";
-$areanames{en}->{6087861} = "Bongawan";
-$areanames{en}->{6087862} = "Bongawan";
-$areanames{en}->{6087863} = "Bongawan";
-$areanames{en}->{6087871} = "Weston";
-$areanames{en}->{6087872} = "Weston";
-$areanames{en}->{6087874} = "Weston";
-$areanames{en}->{6087880} = "Membakut";
-$areanames{en}->{6087881} = "Kuala\ Penyu";
-$areanames{en}->{6087883} = "Kuala\ Penyu";
-$areanames{en}->{6087884} = "Kuala\ Penyu";
-$areanames{en}->{6087885} = "Kuala\ Penyu";
-$areanames{en}->{6087887} = "Membakut";
-$areanames{en}->{6087888} = "Membakut";
-$areanames{en}->{6087889} = "Membakut";
-$areanames{en}->{6088201} = "Kota\ Kinabalu";
-$areanames{en}->{6088203} = "Kota\ Kinabalu";
-$areanames{en}->{6088204} = "Kota\ Kinabalu";
-$areanames{en}->{6088205} = "Kota\ Kinabalu";
-$areanames{en}->{6088206} = "Kota\ Kinabalu";
-$areanames{en}->{6088207} = "Kota\ Kinabalu";
-$areanames{en}->{608821} = "Kota\ Kinabalu";
-$areanames{en}->{608822} = "Kota\ Kinabalu";
-$areanames{en}->{608823} = "Kota\ Kinabalu";
-$areanames{en}->{608824} = "Kota\ Kinabalu";
-$areanames{en}->{608825} = "Kota\ Kinabalu";
-$areanames{en}->{608826} = "Kota\ Kinabalu";
-$areanames{en}->{608827} = "Kota\ Kinabalu";
-$areanames{en}->{608828} = "Kota\ Kinabalu";
-$areanames{en}->{608829} = "Kota\ Kinabalu";
-$areanames{en}->{6088301} = "Kota\ Kinabalu";
-$areanames{en}->{6088302} = "Kota\ Kinabalu";
-$areanames{en}->{6088303} = "Kota\ Kinabalu";
-$areanames{en}->{6088304} = "Kota\ Kinabalu";
-$areanames{en}->{6088307} = "Kota\ Kinabalu";
-$areanames{en}->{6088308} = "Kota\ Kinabalu";
-$areanames{en}->{6088309} = "Kota\ Kinabalu";
-$areanames{en}->{608831} = "Kota\ Kinabalu";
-$areanames{en}->{608832} = "Kota\ Kinabalu";
-$areanames{en}->{6088330} = "Kota\ Kinabalu";
-$areanames{en}->{6088331} = "Kota\ Kinabalu";
-$areanames{en}->{6088332} = "Kota\ Kinabalu";
-$areanames{en}->{6088333} = "Kota\ Kinabalu";
-$areanames{en}->{6088334} = "Kota\ Kinabalu";
-$areanames{en}->{6088341} = "Kota\ Kinabalu";
-$areanames{en}->{6088342} = "Kota\ Kinabalu";
-$areanames{en}->{6088343} = "Kota\ Kinabalu";
-$areanames{en}->{6088344} = "Kota\ Kinabalu";
-$areanames{en}->{6088345} = "Kota\ Kinabalu";
-$areanames{en}->{6088346} = "Kota\ Kinabalu";
-$areanames{en}->{6088347} = "Kota\ Kinabalu";
-$areanames{en}->{6088348} = "Kota\ Kinabalu";
-$areanames{en}->{6088349} = "Kota\ Kinabalu";
-$areanames{en}->{6088350} = "Kota\ Kinabalu";
-$areanames{en}->{6088351} = "Kota\ Kinabalu";
-$areanames{en}->{6088352} = "Kota\ Kinabalu";
-$areanames{en}->{6088353} = "Kota\ Kinabalu";
-$areanames{en}->{6088355} = "Kota\ Kinabalu";
-$areanames{en}->{6088356} = "Kota\ Kinabalu";
-$areanames{en}->{6088357} = "Kota\ Kinabalu";
-$areanames{en}->{6088360} = "Kota\ Kinabalu";
-$areanames{en}->{6088361} = "Kota\ Kinabalu";
-$areanames{en}->{6088362} = "Kota\ Kinabalu";
-$areanames{en}->{6088363} = "Kota\ Kinabalu";
-$areanames{en}->{6088364} = "Kota\ Kinabalu";
-$areanames{en}->{6088366} = "Kota\ Kinabalu";
-$areanames{en}->{6088367} = "Kota\ Kinabalu";
-$areanames{en}->{6088368} = "Kota\ Kinabalu";
-$areanames{en}->{6088369} = "Kota\ Kinabalu";
-$areanames{en}->{608838} = "Kota\ Kinabalu";
-$areanames{en}->{6088393} = "Kota\ Kinabalu";
-$areanames{en}->{6088394} = "Kota\ Kinabalu";
-$areanames{en}->{6088395} = "Kota\ Kinabalu";
-$areanames{en}->{6088396} = "Kota\ Kinabalu";
-$areanames{en}->{6088397} = "Kota\ Kinabalu";
-$areanames{en}->{6088401} = "Kota\ Kinabalu";
-$areanames{en}->{6088402} = "Kota\ Kinabalu";
-$areanames{en}->{6088403} = "Kota\ Kinabalu";
-$areanames{en}->{6088404} = "Kota\ Kinabalu";
-$areanames{en}->{6088405} = "Kota\ Kinabalu";
-$areanames{en}->{6088408} = "Kota\ Kinabalu";
-$areanames{en}->{6088411} = "Kota\ Kinabalu";
-$areanames{en}->{6088412} = "Kota\ Kinabalu";
-$areanames{en}->{6088413} = "Kota\ Kinabalu";
-$areanames{en}->{6088414} = "Kota\ Kinabalu";
-$areanames{en}->{6088415} = "Kota\ Kinabalu";
-$areanames{en}->{608842} = "Kota\ Kinabalu";
-$areanames{en}->{608843} = "Kota\ Kinabalu";
-$areanames{en}->{608844} = "Kota\ Kinabalu";
-$areanames{en}->{608845} = "Kota\ Kinabalu";
-$areanames{en}->{6088451} = "Kinarut";
-$areanames{en}->{6088469} = "Kota\ Kinabalu";
-$areanames{en}->{608847} = "Kota\ Kinabalu";
-$areanames{en}->{608848} = "Kota\ Kinabalu";
-$areanames{en}->{608849} = "Kota\ Kinabalu";
-$areanames{en}->{6088511} = "Kota\ Kinabalu";
-$areanames{en}->{6088512} = "Kota\ Kinabalu";
-$areanames{en}->{6088513} = "Kota\ Kinabalu";
-$areanames{en}->{6088515} = "Kota\ Kinabalu";
-$areanames{en}->{6088516} = "Kota\ Kinabalu";
-$areanames{en}->{6088517} = "Kota\ Kinabalu";
-$areanames{en}->{6088518} = "Kota\ Kinabalu";
-$areanames{en}->{6088519} = "Kota\ Kinabalu";
-$areanames{en}->{608852} = "Kota\ Kinabalu";
-$areanames{en}->{6088532} = "Kota\ Kinabalu";
-$areanames{en}->{6088533} = "Kota\ Kinabalu";
-$areanames{en}->{6088534} = "Kota\ Kinabalu";
-$areanames{en}->{6088535} = "Kota\ Kinabalu";
-$areanames{en}->{6088536} = "Kota\ Kinabalu";
-$areanames{en}->{6088537} = "Kota\ Kinabalu";
-$areanames{en}->{6088538} = "Kota\ Kinabalu";
-$areanames{en}->{6088552} = "Telupid";
-$areanames{en}->{6088602} = "Kudat";
-$areanames{en}->{6088605} = "Kudat";
-$areanames{en}->{6088606} = "Kudat";
-$areanames{en}->{6088607} = "Kudat";
-$areanames{en}->{6088608} = "Kudat";
-$areanames{en}->{6088609} = "Kudat";
-$areanames{en}->{6088611} = "Kudat";
-$areanames{en}->{6088612} = "Kudat";
-$areanames{en}->{6088613} = "Kudat";
-$areanames{en}->{6088614} = "Kudat";
-$areanames{en}->{6088615} = "Kudat";
-$areanames{en}->{6088616} = "Kudat";
-$areanames{en}->{6088617} = "Kudat";
-$areanames{en}->{6088618} = "Kudat";
-$areanames{en}->{608862} = "Kudat";
-$areanames{en}->{6088641} = "Kudat";
-$areanames{en}->{6088652} = "Kotamarudu";
-$areanames{en}->{6088653} = "Kotamarudu";
-$areanames{en}->{6088656} = "Kotamarudu";
-$areanames{en}->{6088657} = "Kotamarudu";
-$areanames{en}->{6088661} = "Kotamarudu";
-$areanames{en}->{6088662} = "Kota\ Marudu";
-$areanames{en}->{6088663} = "Kotamarudu";
-$areanames{en}->{6088664} = "Kota\ Marudu";
-$areanames{en}->{6088665} = "Kotamarudu";
-$areanames{en}->{6088667} = "Kota\ Marudu";
-$areanames{en}->{6088668} = "Kota\ Marudu";
-$areanames{en}->{6088669} = "Kota\ Marudu";
-$areanames{en}->{6088671} = "Kudat";
-$areanames{en}->{6088674} = "Kudat";
-$areanames{en}->{6088675} = "Pantai\ Pitas";
-$areanames{en}->{6088690} = "Kota\ Marudu";
-$areanames{en}->{6088695} = "Kudat";
-$areanames{en}->{6088701} = "Kinarut";
-$areanames{en}->{6088702} = "Kinarut";
-$areanames{en}->{6088703} = "Kinarut";
-$areanames{en}->{6088704} = "Kota\ Kinabalu";
-$areanames{en}->{6088705} = "Kota\ Kinabalu";
-$areanames{en}->{6088709} = "Kinarut";
-$areanames{en}->{608871} = "Kinarut";
-$areanames{en}->{608872} = "Kinarut";
-$areanames{en}->{608873} = "Kinarut";
-$areanames{en}->{6088740} = "Kinarut";
-$areanames{en}->{6088741} = "Kinarut";
-$areanames{en}->{6088742} = "Kinarut";
-$areanames{en}->{6088743} = "Kinarut";
-$areanames{en}->{6088744} = "Kinarut";
-$areanames{en}->{6088745} = "Kinarut";
-$areanames{en}->{6088746} = "Kinarut";
-$areanames{en}->{6088747} = "Kinarut";
-$areanames{en}->{608875} = "Kinarut";
-$areanames{en}->{608876} = "Kinarut";
-$areanames{en}->{608877} = "Kinarut";
-$areanames{en}->{6088780} = "Kota\ Kinabalu";
-$areanames{en}->{6088781} = "Tuaran";
-$areanames{en}->{6088782} = "Tuaran";
-$areanames{en}->{6088783} = "Tuaran";
-$areanames{en}->{6088784} = "Tuaran";
-$areanames{en}->{6088785} = "Tuaran";
-$areanames{en}->{6088786} = "Tuaran";
-$areanames{en}->{6088787} = "Tuaran";
-$areanames{en}->{6088788} = "Tuaran";
-$areanames{en}->{6088790} = "Tuaran";
-$areanames{en}->{6088791} = "Tuaran";
-$areanames{en}->{6088792} = "Tuaran";
-$areanames{en}->{6088793} = "Tuaran";
-$areanames{en}->{6088794} = "Tuaran";
-$areanames{en}->{6088796} = "Tuaran";
-$areanames{en}->{6088797} = "Tuaran";
-$areanames{en}->{6088798} = "Tuaran";
-$areanames{en}->{6088799} = "Tuaran";
-$areanames{en}->{6088801} = "Tuaran";
-$areanames{en}->{6088830} = "Tuaran";
-$areanames{en}->{6088850} = "Ranau";
-$areanames{en}->{6088851} = "Ranau";
-$areanames{en}->{6088852} = "Ranau";
-$areanames{en}->{6088853} = "Ranau";
-$areanames{en}->{6088854} = "Ranau";
-$areanames{en}->{6088858} = "Ranau";
-$areanames{en}->{6088861} = "Bongawan";
-$areanames{en}->{6088863} = "Bongawan";
-$areanames{en}->{608887} = "Ranau";
-$areanames{en}->{6088880} = "Ranau";
-$areanames{en}->{6088881} = "Ranau";
-$areanames{en}->{6088885} = "Ranau";
-$areanames{en}->{6088886} = "Ranau";
-$areanames{en}->{6088888} = "Ranau";
-$areanames{en}->{6088889} = "Ranau";
-$areanames{en}->{6088902} = "Papar";
-$areanames{en}->{6088903} = "Papar";
-$areanames{en}->{6088904} = "Papar";
-$areanames{en}->{6088906} = "Papar";
-$areanames{en}->{6088908} = "Papar";
-$areanames{en}->{6088909} = "Papar";
-$areanames{en}->{608891} = "Papar";
-$areanames{en}->{6088920} = "Papar";
-$areanames{en}->{6088928} = "Papar";
-$areanames{en}->{6088931} = "Kota\ Belud";
-$areanames{en}->{6088938} = "Kota\ Belud";
-$areanames{en}->{6088940} = "Kota\ Belud";
-$areanames{en}->{6088943} = "Kota\ Belud";
-$areanames{en}->{6088960} = "Tenghilan";
-$areanames{en}->{6088961} = "Kota\ Belud";
-$areanames{en}->{6088962} = "Papar";
-$areanames{en}->{6088966} = "Kota\ Belud";
-$areanames{en}->{6088967} = "Tenghilan";
-$areanames{en}->{6088968} = "Kota\ Belud";
-$areanames{en}->{6088969} = "Kota\ Belud";
-$areanames{en}->{6088970} = "Kota\ Belud";
-$areanames{en}->{6088971} = "Kota\ Belud";
-$areanames{en}->{6088972} = "Kota\ Belud";
-$areanames{en}->{6088973} = "Kota\ Belud";
-$areanames{en}->{6088975} = "Kota\ Belud";
-$areanames{en}->{6088976} = "Kota\ Belud";
-$areanames{en}->{6088977} = "Kota\ Belud";
-$areanames{en}->{6088979} = "Kota\ Belud";
-$areanames{en}->{6088981} = "Tenghilan";
-$areanames{en}->{6088982} = "Tenghilan";
-$areanames{en}->{6089201} = "Elopura";
-$areanames{en}->{6089202} = "Elopura";
-$areanames{en}->{6089203} = "Elopura";
-$areanames{en}->{6089204} = "Elopura";
-$areanames{en}->{6089205} = "Elopura";
-$areanames{en}->{6089206} = "Elopura";
-$areanames{en}->{6089207} = "Elopura";
-$areanames{en}->{6089208} = "Elopura";
-$areanames{en}->{6089209} = "Elopura";
-$areanames{en}->{608921} = "Elopura";
-$areanames{en}->{608922} = "Elopura";
-$areanames{en}->{608923} = "Elopura";
-$areanames{en}->{6089240} = "Elopura";
-$areanames{en}->{6089241} = "Elopura";
-$areanames{en}->{6089242} = "Elopura";
-$areanames{en}->{6089243} = "Elopura";
-$areanames{en}->{6089244} = "Elopura";
-$areanames{en}->{6089246} = "Elopura";
-$areanames{en}->{6089247} = "Elopura";
-$areanames{en}->{6089248} = "Elopura";
-$areanames{en}->{6089271} = "Elopura";
-$areanames{en}->{6089272} = "Elopura";
-$areanames{en}->{6089273} = "Elopura";
-$areanames{en}->{6089274} = "Elopura";
-$areanames{en}->{6089275} = "Elopura";
-$areanames{en}->{6089276} = "Elopura";
-$areanames{en}->{6089277} = "Elopura";
-$areanames{en}->{6089278} = "Elopura";
-$areanames{en}->{6089279} = "Elopura";
-$areanames{en}->{6089280} = "Elopura";
-$areanames{en}->{6089281} = "Elopura";
-$areanames{en}->{6089285} = "Elopura";
-$areanames{en}->{6089286} = "Elopura";
-$areanames{en}->{6089287} = "Elopura";
-$areanames{en}->{6089288} = "Elopura";
-$areanames{en}->{6089289} = "Elopura";
-$areanames{en}->{6089290} = "Elopura";
-$areanames{en}->{6089295} = "Elopura";
-$areanames{en}->{6089296} = "Elopura";
-$areanames{en}->{6089436} = "Kinabatangan";
-$areanames{en}->{6089461} = "Elopura";
-$areanames{en}->{6089462} = "Elopura";
-$areanames{en}->{6089463} = "Elopura";
-$areanames{en}->{6089464} = "Elopura";
-$areanames{en}->{6089465} = "Elopura";
-$areanames{en}->{6089466} = "Elopura";
-$areanames{en}->{6089491} = "Beluran";
-$areanames{en}->{6089492} = "Beluran";
-$areanames{en}->{6089505} = "Beluran";
-$areanames{en}->{6089506} = "Beluran";
-$areanames{en}->{6089510} = "Beluran";
-$areanames{en}->{6089511} = "Beluran";
-$areanames{en}->{6089512} = "Beluran";
-$areanames{en}->{6089513} = "Beluran";
-$areanames{en}->{6089514} = "Beluran";
-$areanames{en}->{6089515} = "Beluran";
-$areanames{en}->{6089517} = "Beluran";
-$areanames{en}->{6089518} = "Beluran";
-$areanames{en}->{6089519} = "Beluran";
-$areanames{en}->{6089520} = "Telupid";
-$areanames{en}->{6089521} = "Telupid";
-$areanames{en}->{6089523} = "Telupid";
-$areanames{en}->{6089524} = "Telupid";
-$areanames{en}->{6089531} = "Elopura";
-$areanames{en}->{6089532} = "Elopura";
-$areanames{en}->{6089533} = "Elopura";
-$areanames{en}->{6089534} = "Elopura";
-$areanames{en}->{6089535} = "Elopura";
-$areanames{en}->{6089536} = "Elopura";
-$areanames{en}->{6089537} = "Elopura";
-$areanames{en}->{6089538} = "Elopura";
-$areanames{en}->{6089557} = "Kinabatangan";
-$areanames{en}->{6089560} = "Kinabatangan";
-$areanames{en}->{6089561} = "Kinabatangan";
-$areanames{en}->{6089562} = "Kinabatangan";
-$areanames{en}->{6089563} = "Kinabatangan";
-$areanames{en}->{6089565} = "Kinabatangan";
-$areanames{en}->{6089566} = "Kinabatangan";
-$areanames{en}->{6089567} = "Kinabatangan";
-$areanames{en}->{6089568} = "Kinabatangan";
-$areanames{en}->{6089569} = "Kinabatangan";
-$areanames{en}->{6089570} = "Kinabatangan";
-$areanames{en}->{6089591} = "Telupid";
-$areanames{en}->{6089611} = "Elopura";
-$areanames{en}->{6089612} = "Elopura";
-$areanames{en}->{6089613} = "Elopura";
-$areanames{en}->{6089614} = "Elopura";
-$areanames{en}->{6089615} = "Elopura";
-$areanames{en}->{6089616} = "Elopura";
-$areanames{en}->{6089617} = "Elopura";
-$areanames{en}->{6089618} = "Elopura";
-$areanames{en}->{6089619} = "Elopura";
-$areanames{en}->{6089622} = "Elopura";
-$areanames{en}->{6089623} = "Elopura";
-$areanames{en}->{6089630} = "Elopura";
-$areanames{en}->{6089631} = "Elopura";
-$areanames{en}->{6089632} = "Elopura";
-$areanames{en}->{6089633} = "Elopura";
-$areanames{en}->{6089634} = "Elopura";
-$areanames{en}->{6089660} = "Elopura";
-$areanames{en}->{6089663} = "Elopura";
-$areanames{en}->{6089664} = "Elopura";
-$areanames{en}->{6089665} = "Elopura";
-$areanames{en}->{6089666} = "Elopura";
-$areanames{en}->{6089667} = "Elopura";
-$areanames{en}->{6089668} = "Elopura";
-$areanames{en}->{6089669} = "Elopura";
-$areanames{en}->{6089670} = "Elopura";
-$areanames{en}->{6089671} = "Elopura";
-$areanames{en}->{6089672} = "Elopura";
-$areanames{en}->{6089673} = "Elopura";
-$areanames{en}->{6089674} = "Elopura";
-$areanames{en}->{6089675} = "Elopura";
-$areanames{en}->{6089676} = "Elopura";
-$areanames{en}->{6089677} = "Elopura";
-$areanames{en}->{6089701} = "Tawau";
-$areanames{en}->{6089702} = "Tawau";
-$areanames{en}->{6089703} = "Tawau";
-$areanames{en}->{6089704} = "Tawau";
-$areanames{en}->{6089705} = "Tawau";
-$areanames{en}->{6089706} = "Tawau";
-$areanames{en}->{6089708} = "Tawau";
-$areanames{en}->{6089711} = "Tawau";
-$areanames{en}->{6089712} = "Tawau";
-$areanames{en}->{6089713} = "Tawau";
-$areanames{en}->{6089714} = "Tawau";
-$areanames{en}->{6089715} = "Tawau";
-$areanames{en}->{6089716} = "Tawau";
-$areanames{en}->{6089717} = "Tawau";
-$areanames{en}->{6089718} = "Tawau";
-$areanames{en}->{6089722} = "Tawau";
-$areanames{en}->{6089725} = "Tawau";
-$areanames{en}->{6089726} = "Tawau";
-$areanames{en}->{6089727} = "Tawau";
-$areanames{en}->{6089728} = "Tawau";
-$areanames{en}->{6089729} = "Tawau";
-$areanames{en}->{6089730} = "Tawau";
-$areanames{en}->{6089735} = "Semporna";
-$areanames{en}->{6089736} = "Tawau";
-$areanames{en}->{6089745} = "Merotai";
-$areanames{en}->{6089746} = "Tawau";
-$areanames{en}->{6089747} = "Tawau";
-$areanames{en}->{6089748} = "Tawau";
-$areanames{en}->{6089749} = "Tawau";
-$areanames{en}->{608975} = "Tawau";
-$areanames{en}->{608976} = "Tawau";
-$areanames{en}->{608977} = "Tawau";
-$areanames{en}->{608978} = "Semporna";
-$areanames{en}->{6089790} = "Merotai";
-$areanames{en}->{6089792} = "Semporna";
-$areanames{en}->{6089796} = "Merotai";
-$areanames{en}->{6089798} = "Tawau";
-$areanames{en}->{6089805} = "Lahad\ Datu";
-$areanames{en}->{608981} = "Felda\ Sahabat";
-$areanames{en}->{6089814} = "Tungku";
-$areanames{en}->{6089817} = "Lahatdatu";
-$areanames{en}->{6089818} = "Lahad\ Datu";
-$areanames{en}->{6089843} = "Kunak";
-$areanames{en}->{6089848} = "Kunak";
-$areanames{en}->{6089849} = "Kunak";
-$areanames{en}->{6089850} = "Kunak";
-$areanames{en}->{6089851} = "Kunak";
-$areanames{en}->{6089852} = "Kunak";
-$areanames{en}->{6089853} = "Kunak";
-$areanames{en}->{6089854} = "Kunak";
-$areanames{en}->{6089855} = "Kunak";
-$areanames{en}->{6089856} = "Kunak";
-$areanames{en}->{6089859} = "Kunak";
-$areanames{en}->{6089861} = "Lahad\ Datu";
-$areanames{en}->{6089862} = "Lahad\ Datu";
-$areanames{en}->{6089863} = "Lahad\ Datu";
-$areanames{en}->{6089864} = "Lahad\ Datu";
-$areanames{en}->{6089865} = "Lahad\ Datu";
-$areanames{en}->{6089866} = "Lahad\ Datu";
-$areanames{en}->{6089867} = "Lahad\ Datu";
-$areanames{en}->{6089868} = "Lahad\ Datu";
-$areanames{en}->{6089869} = "Lahad\ Datu";
-$areanames{en}->{6089871} = "Tungku";
-$areanames{en}->{608988} = "Lahad\ Datu";
-$areanames{en}->{608989} = "Lahad\ Datu";
-$areanames{en}->{6089894} = "Kunak";
-$areanames{en}->{6089901} = "Merotai";
-$areanames{en}->{6089902} = "Merotai";
-$areanames{en}->{6089903} = "Merotai";
-$areanames{en}->{608991} = "Tawau";
-$areanames{en}->{6089920} = "Tawau";
-$areanames{en}->{6089921} = "Balung";
-$areanames{en}->{6089922} = "Tawau";
-$areanames{en}->{6089923} = "Tawau";
-$areanames{en}->{6089925} = "Tawau";
-$areanames{en}->{6089926} = "Tawau";
-$areanames{en}->{6089927} = "Tawau";
-$areanames{en}->{6089936} = "Luasong";
-$areanames{en}->{6089937} = "Luasong";
-$areanames{en}->{6089941} = "Tawau";
-$areanames{en}->{6089942} = "Tawau";
-$areanames{en}->{6089950} = "Balung";
-$areanames{en}->{6089951} = "Balung";
-$areanames{en}->{6089952} = "Balung";
-$areanames{en}->{6089954} = "Balung";
-$areanames{en}->{6089959} = "Lahad\ Datu";
-$areanames{en}->{6089965} = "Lahad\ Datu";
-$areanames{en}->{6089966} = "Lahad\ Datu";
-$areanames{en}->{6089967} = "Lahad\ Datu";
-$areanames{en}->{6089968} = "Lahad\ Datu";
-$areanames{en}->{6089969} = "Lahad\ Datu";
-$areanames{en}->{6089981} = "Tawau";
-$areanames{en}->{6089982} = "Tawau";
-$areanames{en}->{6089983} = "Tawau";
-$areanames{en}->{6089984} = "Tawau";
-$areanames{en}->{6089985} = "Tawau";
-$areanames{en}->{6089986} = "Tawau";
-$areanames{en}->{609204} = "Jerantut";
-$areanames{en}->{609205} = "Jerantut";
-$areanames{en}->{609208} = "Sungai\ Tekam";
-$areanames{en}->{609212} = "Maran";
-$areanames{en}->{609213} = "Jengka\ Lapan\ Belas";
-$areanames{en}->{609214} = "Bentong";
-$areanames{en}->{609215} = "Genting";
-$areanames{en}->{609217} = "Mentakab";
-$areanames{en}->{609220} = "Bentong";
-$areanames{en}->{609221} = "Bentong";
-$areanames{en}->{609222} = "Bentong";
-$areanames{en}->{609223} = "Bentong";
-$areanames{en}->{609224} = "Bentong";
-$areanames{en}->{609225} = "Bentong";
-$areanames{en}->{609228} = "Bilut\ Valley";
-$areanames{en}->{609229} = "Bilut\ Valley";
-$areanames{en}->{609231} = "Karak";
-$areanames{en}->{609232} = "Karak";
-$areanames{en}->{609233} = "Genting";
-$areanames{en}->{609234} = "Karak";
-$areanames{en}->{609235} = "Genting";
-$areanames{en}->{609236} = "Bilut\ Valley";
-$areanames{en}->{609237} = "Bilut\ Valley";
-$areanames{en}->{609238} = "Karak";
-$areanames{en}->{609239} = "Telemong";
-$areanames{en}->{609240} = "Kemayan";
-$areanames{en}->{6092410} = "Telemong";
-$areanames{en}->{609242} = "Bera";
-$areanames{en}->{609243} = "Triang";
-$areanames{en}->{609244} = "Triang";
-$areanames{en}->{609245} = "Triang";
-$areanames{en}->{609246} = "Bera";
-$areanames{en}->{609247} = "Bera";
-$areanames{en}->{609248} = "Bera";
-$areanames{en}->{609249} = "Bera";
-$areanames{en}->{609250} = "Triang";
-$areanames{en}->{609252} = "Triang";
-$areanames{en}->{609254} = "Triang";
-$areanames{en}->{609255} = "Triang";
-$areanames{en}->{609256} = "Triang";
-$areanames{en}->{6092590} = "Karak";
-$areanames{en}->{609260} = "Jerantut";
-$areanames{en}->{6092620} = "Jerantut";
-$areanames{en}->{609263} = "Damak";
-$areanames{en}->{609264} = "Mentakab";
-$areanames{en}->{609265} = "Jerantut";
-$areanames{en}->{609266} = "Jerantut";
-$areanames{en}->{609267} = "Jerantut";
-$areanames{en}->{609268} = "Damak";
-$areanames{en}->{609269} = "Damak";
-$areanames{en}->{609270} = "Mentakab";
-$areanames{en}->{609271} = "Mentakab";
-$areanames{en}->{609272} = "Lanchang";
-$areanames{en}->{609276} = "Mentakab";
-$areanames{en}->{609277} = "Mentakab";
-$areanames{en}->{609278} = "Mentakab";
-$areanames{en}->{609279} = "Mentakab";
-$areanames{en}->{609280} = "Lanchang";
-$areanames{en}->{609281} = "Kuala\ Krau";
-$areanames{en}->{609282} = "Lanchang";
-$areanames{en}->{609284} = "Mentakab";
-$areanames{en}->{609285} = "Mentakab";
-$areanames{en}->{609286} = "Kuala\ Krau";
-$areanames{en}->{6092870} = "Kuala\ Krau";
-$areanames{en}->{6092871} = "Kuala\ Krau";
-$areanames{en}->{609288} = "Bukit\ Tinggi";
-$areanames{en}->{60929} = "Mentakab";
-$areanames{en}->{609294} = "Kuala\ Krau";
-$areanames{en}->{609300} = "Mentakab";
-$areanames{en}->{609301} = "Jerantut";
-$areanames{en}->{609310} = "Kuala\ Lipis";
-$areanames{en}->{609312} = "Kuala\ Lipis";
-$areanames{en}->{6093140} = "Kuala\ Lipis";
-$areanames{en}->{6093141} = "Kuala\ Lipis";
-$areanames{en}->{609315} = "Kuala\ Lipis";
-$areanames{en}->{609321} = "Kuala\ Lipis";
-$areanames{en}->{609322} = "Kuala\ Lipis";
-$areanames{en}->{609323} = "Kuala\ Lipis";
-$areanames{en}->{609324} = "Kuala\ Lipis";
-$areanames{en}->{6093260} = "Padang\ Tengku";
-$areanames{en}->{6093261} = "Padang\ Tengku";
-$areanames{en}->{6093262} = "Padang\ Tengku";
-$areanames{en}->{609327} = "Padang\ Tengku";
-$areanames{en}->{609328} = "Kuala\ Lipis";
-$areanames{en}->{609329} = "Padangtengku";
-$areanames{en}->{609340} = "Sungai\ Koyan";
-$areanames{en}->{609345} = "Raub";
-$areanames{en}->{609350} = "Raub";
-$areanames{en}->{609351} = "Raub";
-$areanames{en}->{609352} = "Sungai\ Koyan";
-$areanames{en}->{609353} = "Raub";
-$areanames{en}->{609355} = "Raub";
-$areanames{en}->{609356} = "Raub";
-$areanames{en}->{609358} = "Raub";
-$areanames{en}->{609361} = "Raub";
-$areanames{en}->{609362} = "Fraser\ Hill";
-$areanames{en}->{609363} = "Fraser\ Hill";
-$areanames{en}->{609365} = "Dong";
-$areanames{en}->{609367} = "Dong";
-$areanames{en}->{609368} = "Raub";
-$areanames{en}->{609369} = "Dong";
-$areanames{en}->{609370} = "Dong";
-$areanames{en}->{609380} = "Jerantut";
-$areanames{en}->{609402} = "Chini";
-$areanames{en}->{609404} = "Pekan";
-$areanames{en}->{609405} = "Pekan";
-$areanames{en}->{609408} = "Kuala\ Rompin";
-$areanames{en}->{609410} = "Pekan";
-$areanames{en}->{609412} = "Kuala\ Rompin";
-$areanames{en}->{609413} = "Kuala\ Rompin";
-$areanames{en}->{609414} = "Kuala\ Rompin";
-$areanames{en}->{609415} = "Kuala\ Rompin";
-$areanames{en}->{609417} = "Nenasi";
-$areanames{en}->{609418} = "Nenasi";
-$areanames{en}->{609419} = "Kuala\ Rompin";
-$areanames{en}->{60942} = "Pekan";
-$areanames{en}->{609423} = "Chini";
-$areanames{en}->{609430} = "Pekan";
-$areanames{en}->{6094310} = "Pekan";
-$areanames{en}->{6094311} = "Pekan";
-$areanames{en}->{609437} = "Perwira\ Jaya";
-$areanames{en}->{609438} = "Perwira\ Jaya";
-$areanames{en}->{609440} = "Bandar\ Tun\ Razak";
-$areanames{en}->{609443} = "Bandar\ Tun\ Razak";
-$areanames{en}->{609445} = "Bandar\ Tun\ Razak";
-$areanames{en}->{609447} = "Bandar\ Tun\ Razak";
-$areanames{en}->{609450} = "Bukit\ Ibam";
-$areanames{en}->{609451} = "Bandar\ Tun\ Razak";
-$areanames{en}->{609452} = "Bukit\ Ibam";
-$areanames{en}->{609453} = "Bukit\ Ibam";
-$areanames{en}->{609454} = "Bukit\ Ibam";
-$areanames{en}->{609455} = "Bukit\ Ibam";
-$areanames{en}->{609456} = "Chini";
-$areanames{en}->{609457} = "Chini";
-$areanames{en}->{609458} = "Bukit\ Ibam";
-$areanames{en}->{609460} = "Maran";
-$areanames{en}->{609466} = "Maran";
-$areanames{en}->{609467} = "Maran";
-$areanames{en}->{609468} = "Maran";
-$areanames{en}->{609470} = "Bukit\ Ibam";
-$areanames{en}->{609471} = "Sungai\ Tekam";
-$areanames{en}->{609473} = "Bukit\ Ibam";
-$areanames{en}->{609474} = "Kota\ Gelangi";
-$areanames{en}->{609475} = "Maran";
-$areanames{en}->{609476} = "Maran";
-$areanames{en}->{609477} = "Maran";
-$areanames{en}->{609478} = "Maran";
-$areanames{en}->{609479} = "Maran";
-$areanames{en}->{609480} = "Maran";
-$areanames{en}->{609481} = "Kota\ Gelangi";
-$areanames{en}->{609485} = "Jengka\ Lapan\ Belas";
-$areanames{en}->{609486} = "Jengka\ Tiga\ Belas";
-$areanames{en}->{609489} = "Maran";
-$areanames{en}->{609505} = "Kuantan";
-$areanames{en}->{6095070} = "Kuantan";
-$areanames{en}->{6095071} = "Kuantan";
-$areanames{en}->{609508} = "Teruntum";
-$areanames{en}->{609509} = "Kuantan";
-$areanames{en}->{60951} = "Kuantan";
-$areanames{en}->{609520} = "Kuantan";
-$areanames{en}->{609521} = "Kuantan";
-$areanames{en}->{609525} = "Kuantan";
-$areanames{en}->{609529} = "Kuantan";
-$areanames{en}->{609531} = "Kuantan";
-$areanames{en}->{609534} = "Kuantan";
-$areanames{en}->{609536} = "Kuantan";
-$areanames{en}->{609538} = "Kuantan";
-$areanames{en}->{609539} = "Kuantan";
-$areanames{en}->{609540} = "Kuantan";
-$areanames{en}->{609541} = "Sungai\ Lembing";
-$areanames{en}->{609542} = "Sungai\ Lembing";
-$areanames{en}->{609543} = "Sungai\ Lembing";
-$areanames{en}->{609544} = "Kuantan";
-$areanames{en}->{609546} = "Gambang";
-$areanames{en}->{609547} = "Kuantan";
-$areanames{en}->{609548} = "Gambang";
-$areanames{en}->{609549} = "Gambang";
-$areanames{en}->{609550} = "Kuantan";
-$areanames{en}->{609551} = "Kuantan";
-$areanames{en}->{609552} = "Kuantan";
-$areanames{en}->{609553} = "Kuantan";
-$areanames{en}->{609555} = "Kuantan";
-$areanames{en}->{609556} = "Kuantan";
-$areanames{en}->{609557} = "Kuantan";
-$areanames{en}->{609558} = "Kuantan";
-$areanames{en}->{609559} = "Kuantan";
-$areanames{en}->{609560} = "Kuantan";
-$areanames{en}->{609561} = "Kuantan";
-$areanames{en}->{609565} = "Kuantan";
-$areanames{en}->{609566} = "Kuantan";
-$areanames{en}->{609567} = "Kuantan";
-$areanames{en}->{609568} = "Kuantan";
-$areanames{en}->{609570} = "Kuantan";
-$areanames{en}->{609571} = "Kuantan";
-$areanames{en}->{609572} = "Kuantan";
-$areanames{en}->{609573} = "Kuantan";
-$areanames{en}->{609575} = "Kuantan";
-$areanames{en}->{609580} = "Gebeng";
-$areanames{en}->{609581} = "Gebeng";
-$areanames{en}->{609582} = "Gebeng";
-$areanames{en}->{609583} = "Gebeng";
-$areanames{en}->{609584} = "Gebeng";
-$areanames{en}->{609585} = "Gebeng";
-$areanames{en}->{609586} = "Gebeng";
-$areanames{en}->{609587} = "Gebeng";
-$areanames{en}->{609590} = "Kuantan";
-$areanames{en}->{609591} = "Kuantan";
-$areanames{en}->{609592} = "Kuantan";
-$areanames{en}->{609593} = "Gambang";
-$areanames{en}->{609595} = "Gebeng";
-$areanames{en}->{609598} = "Gambang";
-$areanames{en}->{609599} = "Gambang";
-$areanames{en}->{609602} = "Bandar\ Permaisuri";
-$areanames{en}->{609606} = "Tenang";
-$areanames{en}->{609609} = "Bandar\ Permaisuri";
-$areanames{en}->{60961} = "Kuala\ Brang";
-$areanames{en}->{609610} = "Bandar\ Permaisuri";
-$areanames{en}->{609611} = "Bandar\ Permaisuri";
-$areanames{en}->{60962} = "Kuala\ Brang";
-$areanames{en}->{609630} = "Kuala\ Brang";
-$areanames{en}->{609631} = "Kuala\ Brang";
-$areanames{en}->{609632} = "Kuala\ Brang";
-$areanames{en}->{609633} = "Bandar\ Permaisuri";
-$areanames{en}->{609634} = "Bandar\ Permaisuri";
-$areanames{en}->{609635} = "Kuala\ Brang";
-$areanames{en}->{609637} = "Kuala\ Brang";
-$areanames{en}->{609638} = "Kuala\ Berang";
-$areanames{en}->{609639} = "Kuala\ Brang";
-$areanames{en}->{609650} = "Batu\ Rakit";
-$areanames{en}->{609651} = "Batu\ Rakit";
-$areanames{en}->{609653} = "Batu\ Rakit";
-$areanames{en}->{609659} = "Batu\ Rakit";
-$areanames{en}->{609660} = "Kuala\ Brang";
-$areanames{en}->{609662} = "Kuala\ Brang";
-$areanames{en}->{609663} = "Batu\ Rakit";
-$areanames{en}->{609664} = "Batu\ Rakit";
-$areanames{en}->{609665} = "Kuala\ Brang";
-$areanames{en}->{609666} = "Kuala\ Brang";
-$areanames{en}->{609667} = "Kuala\ Brang";
-$areanames{en}->{609668} = "Batu\ Rakit";
-$areanames{en}->{609669} = "Batu\ Rakit";
-$areanames{en}->{609679} = "Jerteh";
-$areanames{en}->{609680} = "Kuala\ Brang";
-$areanames{en}->{609681} = "Kuala\ Brang";
-$areanames{en}->{609682} = "Kuala\ Brang";
-$areanames{en}->{6096830} = "Kuala\ Brang";
-$areanames{en}->{609684} = "Bukit\ Bading";
-$areanames{en}->{609685} = "Kuala\ Brang";
-$areanames{en}->{609686} = "Kuala\ Brang";
-$areanames{en}->{609687} = "Bukit\ Bading";
-$areanames{en}->{609688} = "Kuala\ Brang";
-$areanames{en}->{60969} = "Jerteh";
-$areanames{en}->{609700} = "Kota\ Bharu";
-$areanames{en}->{609701} = "Kota\ Bharu";
-$areanames{en}->{609703} = "Kota\ Bharu";
-$areanames{en}->{609706} = "Kota\ Bharu";
-$areanames{en}->{609707} = "Kota\ Bharu";
-$areanames{en}->{609708} = "Kota\ Bharu";
-$areanames{en}->{609710} = "Kota\ Bharu";
-$areanames{en}->{609712} = "Kota\ Bharu";
-$areanames{en}->{609713} = "Kota\ Bharu";
-$areanames{en}->{609714} = "Kota\ Bharu";
-$areanames{en}->{609718} = "Kota\ Bharu";
-$areanames{en}->{609719} = "Kota\ Bharu";
-$areanames{en}->{609721} = "Kota\ Bharu";
-$areanames{en}->{609725} = "Kota\ Bharu";
-$areanames{en}->{609726} = "Kota\ Bharu";
-$areanames{en}->{609732} = "Kota\ Bharu";
-$areanames{en}->{609735} = "Kota\ Bharu";
-$areanames{en}->{609738} = "Kota\ Bharu";
-$areanames{en}->{60974} = "Kota\ Bharu";
-$areanames{en}->{609750} = "Kota\ Bharu";
-$areanames{en}->{609751} = "Kota\ Bharu";
-$areanames{en}->{609752} = "Pasir\ Putih";
-$areanames{en}->{609753} = "Bachok";
-$areanames{en}->{609754} = "Bachok";
-$areanames{en}->{609755} = "Kota\ Bharu";
-$areanames{en}->{609758} = "Pasir\ Putih";
-$areanames{en}->{609759} = "Pasirputih";
-$areanames{en}->{609760} = "Bachok";
-$areanames{en}->{609762} = "Pasir\ Putih";
-$areanames{en}->{609764} = "Bachok";
-$areanames{en}->{609765} = "Bachok";
-$areanames{en}->{609766} = "Bachok";
-$areanames{en}->{609767} = "Bachok";
-$areanames{en}->{609768} = "Bachok";
-$areanames{en}->{609769} = "Bachok";
-$areanames{en}->{609770} = "Bachok";
-$areanames{en}->{609771} = "Kota\ Bharu";
-$areanames{en}->{609772} = "Kok\ Lanas";
-$areanames{en}->{609773} = "Kota\ Bharu";
-$areanames{en}->{609774} = "Kota\ Bharu";
-$areanames{en}->{609775} = "Kota\ Bharu";
-$areanames{en}->{609776} = "Bachok";
-$areanames{en}->{609778} = "Bachok";
-$areanames{en}->{609779} = "Bachok";
-$areanames{en}->{609780} = "Kok\ Lanas";
-$areanames{en}->{609781} = "Machang";
-$areanames{en}->{609782} = "Bachok";
-$areanames{en}->{609783} = "Bachok";
-$areanames{en}->{609784} = "Pasirputih";
-$areanames{en}->{609785} = "Pasirputih";
-$areanames{en}->{609786} = "Pasirputih";
-$areanames{en}->{609787} = "Machang";
-$areanames{en}->{609788} = "Kok\ Lanas";
-$areanames{en}->{609789} = "Pasir\ Putih";
-$areanames{en}->{60979} = "Kota\ Bharu";
-$areanames{en}->{609794} = "Kok\ Lanas";
-$areanames{en}->{6098000} = "Kerteh";
-$areanames{en}->{6098001} = "Kerteh";
-$areanames{en}->{609801} = "Paka";
-$areanames{en}->{609813} = "Paka";
-$areanames{en}->{609814} = "Paka";
-$areanames{en}->{609815} = "Kerteh";
-$areanames{en}->{609816} = "Dungun";
-$areanames{en}->{609817} = "Dungun";
-$areanames{en}->{609818} = "Kerteh";
-$areanames{en}->{609819} = "Paka";
-$areanames{en}->{609820} = "Paka";
-$areanames{en}->{609821} = "Sri\ Gading";
-$areanames{en}->{609822} = "Al\ Muktafi\ Billa\ H\ Shah";
-$areanames{en}->{609823} = "Al\ Muktafi\ Billa\ H\ Shah";
-$areanames{en}->{609824} = "Kerteh";
-$areanames{en}->{609825} = "Kerteh";
-$areanames{en}->{609826} = "Kerteh";
-$areanames{en}->{609827} = "Paka";
-$areanames{en}->{609828} = "Paka";
-$areanames{en}->{609829} = "Paka";
-$areanames{en}->{609830} = "Paka";
-$areanames{en}->{609831} = "Paka";
-$areanames{en}->{609832} = "Merchang";
-$areanames{en}->{609833} = "Bukit\ Besi";
-$areanames{en}->{609834} = "Bukit\ Besi";
-$areanames{en}->{609835} = "Dungun";
-$areanames{en}->{609838} = "Merchang";
-$areanames{en}->{609839} = "Merchang";
-$areanames{en}->{609840} = "Dungun";
-$areanames{en}->{609841} = "Dungun";
-$areanames{en}->{609842} = "Dungun";
-$areanames{en}->{609844} = "Dungun";
-$areanames{en}->{609845} = "Dungun";
-$areanames{en}->{609846} = "Kuala\ Brang";
-$areanames{en}->{609848} = "Dungun";
-$areanames{en}->{609849} = "Dungun";
-$areanames{en}->{609850} = "Chukai";
-$areanames{en}->{609851} = "Chukai";
-$areanames{en}->{609852} = "Chukai";
-$areanames{en}->{609853} = "Chukai";
-$areanames{en}->{609854} = "Chukai";
-$areanames{en}->{609855} = "Chukai";
-$areanames{en}->{609856} = "Chukai";
-$areanames{en}->{609858} = "Chukai";
-$areanames{en}->{609859} = "Chukai";
-$areanames{en}->{609860} = "Chukai";
-$areanames{en}->{609862} = "Chukai";
-$areanames{en}->{609863} = "Chukai";
-$areanames{en}->{609864} = "Kemasik";
-$areanames{en}->{609865} = "Kemasik";
-$areanames{en}->{609866} = "Kemasik";
-$areanames{en}->{609867} = "Kemasik";
-$areanames{en}->{609868} = "Chukai";
-$areanames{en}->{609869} = "Kemasik";
-$areanames{en}->{6098700} = "Kemasik";
-$areanames{en}->{6098710} = "Cheneh";
-$areanames{en}->{609872} = "Cheneh";
-$areanames{en}->{609873} = "Cheneh";
-$areanames{en}->{609874} = "Kemasik";
-$areanames{en}->{609888} = "Kemasik";
-$areanames{en}->{609900} = "Gua\ Musang";
-$areanames{en}->{609912} = "Gua\ Musang";
-$areanames{en}->{609913} = "Gua\ Musang";
-$areanames{en}->{609914} = "Gua\ Musang";
-$areanames{en}->{609915} = "Gua\ Musang";
-$areanames{en}->{609918} = "Gua\ Musang";
-$areanames{en}->{609919} = "Ayer\ Lanas";
-$areanames{en}->{6099200} = "Ayer\ Lanas";
-$areanames{en}->{609928} = "Gua\ Musang";
-$areanames{en}->{609936} = "Kuala\ Balah";
-$areanames{en}->{609937} = "Kuala\ Balah";
-$areanames{en}->{609944} = "Ayer\ Lanas";
-$areanames{en}->{609945} = "Ayer\ Lanas";
-$areanames{en}->{609946} = "Ayer\ Lanas";
-$areanames{en}->{609947} = "Ayer\ Lanas";
-$areanames{en}->{609949} = "Ayer\ Lanas";
-$areanames{en}->{609950} = "Machang";
-$areanames{en}->{609951} = "Machang";
-$areanames{en}->{609952} = "Machang";
-$areanames{en}->{609954} = "Machang";
-$areanames{en}->{609955} = "Machang";
-$areanames{en}->{6099560} = "Batu\ Gajah";
-$areanames{en}->{609957} = "Batu\ Gajah";
-$areanames{en}->{609958} = "Batu\ Gajah";
-$areanames{en}->{609959} = "Batu\ Gajah";
-$areanames{en}->{609960} = "Kuala\ Krai";
-$areanames{en}->{609961} = "Kuala\ Krai";
-$areanames{en}->{609965} = "Kuala\ Krai";
-$areanames{en}->{609966} = "Kuala\ Krai";
-$areanames{en}->{609970} = "Machang";
-$areanames{en}->{609974} = "Machang";
-$areanames{en}->{609975} = "Machang";
-$areanames{en}->{609976} = "Machang";
-$areanames{en}->{609977} = "Machang";
-$areanames{en}->{609978} = "Kuala\ Krai";
-$areanames{en}->{609979} = "Machang";
-$areanames{en}->{609980} = "Kuala\ Krai";
-$areanames{en}->{609981} = "Kuala\ Krai";
+$areanames{en} = {"6032117", "Kuala\ Lumpur",
+"6088797", "Tuaran",
+"607251", "Johor\ Bahru",
+"6034279", "Kuala\ Lumpur",
+"606509", "Jasin",
+"6089722", "Tawau",
+"6088801", "Tuaran",
+"605210", "Ipoh",
+"6088412", "Kota\ Kinabalu",
+"607961", "Segamat",
+"604919", "Alor\ Setar",
+"6037890", "Kuala\ Lumpur",
+"606531", "Jasin",
+"6089923", "Tawau",
+"6089560", "Kinabatangan",
+"604487", "Sungai\ Bakap",
+"6088404", "Kota\ Kinabalu",
+"6087770", "Tambunan",
+"609958", "Batu\ Gajah",
+"6033192", "Banting",
+"605732", "Parit\ Buntar",
+"609974", "Machang",
+"6082220", "Kuching",
+"6088863", "Bongawan",
+"607740", "Kahang",
+"605517", "Tanjung\ Rambutan",
+"606423", "Simpang\ Durian",
+"609268", "Damak",
+"6039236", "Kuala\ Lumpur",
+"605349", "Batu\ Gajah",
+"608634", "Bintulu",
+"607363", "Johor\ Bahru",
+"6083414", "Kabong",
+"604449", "Baling",
+"6035892", "Kinrara",
+"6084366", "Sibu",
+"6085630", "Miri",
+"609265", "Jerantut",
+"6035030", "Kinrara",
+"6035526", "Kinrara",
+"609229", "Bilut\ Valley",
+"604727", "Bedong",
+"607506", "Senai",
+"609955", "Machang",
+"6034290", "Kuala\ Lumpur",
+"6039103", "Cheras",
+"6037118", "Kuala\ Lumpur",
+"604399", "Penang",
+"6032781", "Kuala\ Lumpur",
+"604701", "Bedong",
+"6033216", "Sabak\ Bernam",
+"6033884", "Kelang",
+"6033140", "Banting",
+"6089288", "Elopura",
+"6082329", "Serian",
+"6037879", "Kuala\ Lumpur",
+"6038913", "Semenyih",
+"6036124", "Kuala\ Lumpur",
+"6032386", "Kuala\ Lumpur",
+"609237", "Bilut\ Valley",
+"60787", "Kota\ Tinggi",
+"605673", "Bruas",
+"6087466", "Labuan",
+"6087731", "Tenom",
+"607512", "Senai",
+"6039021", "Kuala\ Lumpur",
+"6049371", "Kangar",
+"6035033", "Kinrara",
+"606486", "Simpang\ Durian",
+"6033082", "Kelang",
+"6086880", "Bakun",
+"6085633", "Miri",
+"608433", "Sibu",
+"609784", "Pasirputih",
+"6084367", "Sibu",
+"609686", "Kuala\ Brang",
+"604621", "Penang",
+"6036064", "Kuala\ Kubu\ Baru",
+"6084788", "Kapit",
+"607765", "Endau",
+"6032387", "Kuala\ Lumpur",
+"604607", "Penang",
+"604908", "Kangar",
+"6089203", "Elopura",
+"6087467", "Labuan",
+"605294", "Tanjung\ Rambutan",
+"607447", "Batu\ Pahat",
+"606385", "Tangga\ Batu",
+"6036178", "Kuala\ Lumpur",
+"6087218", "Beaufort",
+"6033143", "Sepang",
+"605320", "Ipoh",
+"6087822", "Sipitang",
+"608521", "Limbang",
+"6033217", "Sabak\ Bernam",
+"6038769", "Semenyih",
+"6034293", "Kuala\ Lumpur",
+"6039100", "Cheras",
+"609703", "Kota\ Bharu",
+"6084222", "Sibu",
+"606612", "Kuala\ Klawang",
+"6087225", "Beaufort",
+"6036789", "Genting",
+"6085756", "Marudi",
+"6084662", "Sarikei",
+"6039779", "Kuala\ Lumpur",
+"6085284", "Lawas",
+"603300", "Kelang",
+"609412", "Kuala\ Rompin",
+"604358", "Tasek\ Gelugor",
+"6032240", "Kuala\ Lumpur",
+"6086321", "Bintulu",
+"607768", "Paloh",
+"6032116", "Kuala\ Lumpur",
+"6088796", "Tuaran",
+"6084818", "Daro",
+"6038084", "Kinrara",
+"606388", "Kuala\ Sungai\ Baru",
+"609240", "Kemayan",
+"605356", "Ipoh",
+"606726", "Seremban",
+"609547", "Kuantan",
+"609888", "Kemasik",
+"609751", "Kota\ Bharu",
+"6082663", "Kota\ Samarahan",
+"605807", "Taiping",
+"6088469", "Kota\ Kinabalu",
+"607382", "Johor\ Bahru",
+"6082223", "Kuching",
+"6083475", "Debak",
+"606973", "Bukit\ Gambir",
+"6087773", "Tambunan",
+"6089563", "Kinabatangan",
+"607917", "Tenang",
+"609370", "Dong",
+"6089920", "Tawau",
+"6083310", "Bandar\ Sri\ Aman",
+"609952", "Machang",
+"607531", "Senai",
+"6038957", "Cheras",
+"6089983", "Tawau",
+"6037947", "Kuala\ Lumpur",
+"60478", "Pokok\ Sena",
+"604281", "Penang",
+"6093261", "Padang\ Tengku",
+"609630", "Kuala\ Brang",
+"607509", "Senai",
+"6084807", "Sibu",
+"606430", "Gemencheh",
+"6039191", "Kuala\ Lumpur",
+"6033250", "Kelang",
+"6082280", "Kuching",
+"606251", "Melaka",
+"6034260", "Kuala\ Lumpur",
+"607423", "Rengit",
+"6035124", "Kinrara",
+"6085609", "Miri",
+"6083326", "Bandar\ Sri\ Aman",
+"605448", "Tanjung\ Malim",
+"6082824", "Asajaya",
+"6089668", "Elopura",
+"609250", "Triang",
+"608873", "Kinarut",
+"6032721", "Kuala\ Lumpur",
+"605767", "Lenggong",
+"606631", "Seremban",
+"6039174", "Kuala\ Lumpur",
+"607783", "Keluang",
+"609960", "Kuala\ Krai",
+"604916", "Alor\ Setar",
+"6036184", "Kuala\ Lumpur",
+"6033359", "Kelang",
+"6082389", "Kuching",
+"6089463", "Elopura",
+"605395", "Besout",
+"609863", "Chukai",
+"60442", "Sungai\ Petani",
+"604254", "Penang",
+"6033162", "Kelang",
+"605617", "Telukintan",
+"6033280", "Kuala\ Selangor",
+"605834", "Taiping",
+"6035625", "Kinrara",
+"6082690", "Kuching",
+"604964", "Kuah",
+"609557", "Kuantan",
+"605661", "Ipoh",
+"606737", "Mantin",
+"605793", "Grik",
+"6088361", "Kota\ Kinabalu",
+"6032034", "Kuala\ Lumpur",
+"6084692", "Bintangor",
+"6037863", "Kuala\ Lumpur",
+"608244", "Kuching",
+"6089534", "Elopura",
+"607486", "Batu\ Pahat",
+"6086351", "Bintulu",
+"6086284", "Bintulu",
+"6036211", "Kuala\ Lumpur",
+"609415", "Kuala\ Rompin",
+"6088512", "Kota\ Kinabalu",
+"607241", "Johor\ Bahru",
+"606512", "Jasin",
+"6035549", "Kinrara",
+"6089274", "Elopura",
+"606615", "Kuala\ Klawang",
+"6089950", "Balung",
+"605359", "Batu\ Gajah",
+"606729", "Seremban",
+"6039081", "Cheras",
+"60497", "Kangar",
+"607518", "Senai",
+"6082741", "Lundu",
+"60743", "Batu\ Pahat",
+"6082581", "Kota\ Samarahan",
+"607750", "Lavang\-Lavang",
+"6033283", "Kuala\ Selangor",
+"6085710", "Bekenu",
+"606524", "Jasin",
+"6033135", "Kelang",
+"6036738", "Kuala\ Kubu\ Baru",
+"6089869", "Lahad\ Datu",
+"6088303", "Kota\ Kinabalu",
+"6082283", "Kuching",
+"609945", "Ayer\ Lanas",
+"6084806", "Kapit",
+"607388", "Johor\ Bahru",
+"609586", "Gebeng",
+"604521", "Tasek\ Gelugor",
+"6084640", "Sarikei",
+"604200", "Penang",
+"6033346", "Kelang",
+"6032108", "Kuala\ Lumpur",
+"6032180", "Kuala\ Lumpur",
+"606489", "Kuala\ Klawang",
+"6032262", "Kuala\ Lumpur",
+"6039051", "Cheras",
+"6037946", "Kuala\ Lumpur",
+"607515", "Tanjung\ Kupang",
+"6038956", "Serdang",
+"6058710", "Semanggol",
+"6082551", "Kuching",
+"6039139", "Kuala\ Lumpur",
+"6036094", "Rawang",
+"609418", "Nenasi",
+"6085664", "Miri",
+"6086254", "Bintulu",
+"6085224", "Limbang",
+"6087852", "Menumbok",
+"6082878", "Baki",
+"609204", "Jerantut",
+"6038024", "Kinrara",
+"6086381", "Tatau",
+"607762", "Renggam",
+"6083327", "Bandar\ Sri\ Aman",
+"6088938", "Kota\ Belud",
+"605581", "Chemor",
+"6082797", "Tebedu",
+"609936", "Kuala\ Balah",
+"605810", "Taiping",
+"607788", "Kahang",
+"607425", "Parit\ Betak",
+"605672", "Sitiawan",
+"6035101", "Kinrara",
+"6038751", "Semenyih",
+"6087313", "Keningau",
+"6085616", "Miri",
+"607469", "Sri\ Gading",
+"6085474", "Miri",
+"607900", "Tenggara",
+"6086290", "Bintulu",
+"6034278", "Kuala\ Lumpur",
+"6035020", "Kinrara",
+"6083566", "Pantu",
+"6035163", "Kinrara",
+"6036193", "Kuala\ Lumpur",
+"6082863", "Kota\ Samarahan",
+"607362", "Johor\ Bharu",
+"606782", "Seremban",
+"6085620", "Miri",
+"6082315", "Kuching",
+"6087502", "Labuan",
+"609868", "Chukai",
+"6087441", "Labuan",
+"604941", "Kangar",
+"6088451", "Kinarut",
+"604610", "Penang",
+"609666", "Kuala\ Brang",
+"609525", "Kuantan",
+"6089670", "Elopura",
+"6086461", "Belaga",
+"6088702", "Kinarut",
+"606337", "Melaka",
+"6089289", "Elopura",
+"606466", "Palong",
+"609865", "Kemasik",
+"606422", "Tampin",
+"609764", "Bachok",
+"6039226", "Kuala\ Lumpur",
+"6085491", "Miri",
+"6086951", "Bintulu",
+"6082328", "Serian",
+"609829", "Paka",
+"606797", "Mantin",
+"605733", "Parit\ Buntar",
+"6039070", "Cheras",
+"6088961", "Kota\ Belud",
+"608875", "Kinarut",
+"6088903", "Papar",
+"604760", "Alor\ Setar",
+"608758", "Labuan",
+"6088854", "Ranau",
+"605443", "Tapah",
+"605311", "Ipoh",
+"605759", "Kuala\ Kangsar",
+"6034025", "Kuala\ Lumpur",
+"607785", "Keluang",
+"6089247", "Elopura",
+"607884", "Kota\ Tinggi",
+"607428", "Senggarang",
+"604748", "Alor\ Setar",
+"606972", "Bukit\ Gambir",
+"603772", "Kuala\ Lumpur",
+"605436", "Tapah",
+"6035885", "Kinrara",
+"6084789", "Kapit",
+"605367", "Pusing",
+"6087219", "Beaufort",
+"6036179", "Kuala\ Lumpur",
+"607216", "Johor\ Bahru",
+"609285", "Mentakab",
+"6033271", "Batang\ Berjuntai",
+"606691", "Linggi",
+"6038768", "Semenyih",
+"6089673", "Elopura",
+"609271", "Mentakab",
+"6033860", "Sekinchan",
+"605795", "Grik",
+"605894", "Taiping",
+"6089246", "Elopura",
+"6036142", "Kuala\ Lumpur",
+"6082294", "Kuching",
+"6086488", "Balingan",
+"6084232", "Sibu",
+"606613", "Kuala\ Klawang",
+"608261", "Kuching",
+"609413", "Kuala\ Rompin",
+"605644", "Hutan\ Melintang",
+"607677", "Pontian",
+"6085617", "Miri",
+"6082391", "Kuching",
+"606490", "Rembau",
+"606270", "Melaka",
+"6087832", "Menumbok",
+"6082684", "Kuching",
+"6083348", "Bandar\ Sri\ Aman",
+"607304", "Johor\ Bahru",
+"608742", "Labuan",
+"609840", "Dungun",
+"60438", "Penang",
+"605798", "Lenggong",
+"6085201", "Limbang",
+"6032084", "Kuala\ Lumpur",
+"609288", "Bukit\ Tinggi",
+"608432", "Sibu",
+"6089631", "Elopura",
+"6082271", "Kuching",
+"6036436", "Genting",
+"6085263", "Sundar",
+"6033185", "Banting",
+"6088663", "Kotamarudu",
+"6082860", "Kota\ Samarahan",
+"607513", "Tanjung\ Kupang",
+"6083496", "Lingga",
+"6082531", "Kuching",
+"6083567", "Lingga",
+"604467", "Jeniang",
+"6086293", "Bintulu",
+"609669", "Batu\ Rakit",
+"6084375", "Sibu",
+"606469", "Kemavan",
+"605480", "Tanjung\ Malim",
+"6038079", "Kinrara",
+"609862", "Chukai",
+"6085461", "Miri",
+"606425", "Tampin",
+"6082473", "Kuching",
+"6085680", "Miri",
+"609826", "Kerteh",
+"604881", "Penang",
+"6089851", "Kunak",
+"606851", "Seremban",
+"6039544", "Cheras",
+"604758", "Alor\ Setar",
+"6089711", "Tawau",
+"604510", "Tasek\ Gelugor",
+"609566", "Kuantan",
+"6084840", "Kuala\ Igan",
+"605678", "Bruas",
+"609351", "Raub",
+"6087768", "Tambunan",
+"604217", "Penang",
+"607782", "Paloh",
+"609719", "Kota\ Bharu",
+"605654", "Kampong\ Gajah",
+"6085403", "Miri",
+"6032336", "Kuala\ Lumpur",
+"607944", "Segamat",
+"605756", "Kuala\ Kangsar",
+"609770", "Bachok",
+"6087475", "Labuan",
+"6085242", "Limbang",
+"6085737", "Batu\ Niah",
+"6039205", "Kuala\ Lumpur",
+"6032731", "Kuala\ Lumpur",
+"608872", "Kinarut",
+"6032773", "Kuala\ Lumpur",
+"609850", "Chukai",
+"6036101", "Genting",
+"6039411", "Cheras",
+"6037663", "Kuala\ Lumpur",
+"607422", "Kampung\ Parit\ Tengah",
+"605675", "Changkat\ Keruing",
+"605681", "Sitiawan",
+"6084892", "Selangau",
+"6086260", "Bintulu",
+"6089669", "Elopura",
+"60969", "Jerteh",
+"606428", "Kuala\ Pilah",
+"609263", "Damak",
+"6083467", "Sebuyau",
+"6082300", "Kuching",
+"6088347", "Kota\ Kinabalu",
+"6038090", "Kinrara",
+"607365", "Johor\ Bahru",
+"6036276", "Kuala\ Lumpur",
+"606771", "Seremban",
+"607208", "Johor\ Bahru",
+"6088690", "Kota\ Marudu",
+"605720", "Parit\ Buntar",
+"606350", "Tangga\ Batu",
+"6085290", "Lawas",
+"6033358", "Kelang",
+"6082388", "Kuching",
+"607414", "Rengit",
+"6036020", "Batu\ Arang",
+"6089612", "Elopura",
+"6086201", "Bintulu",
+"606383", "Tangga\ Batu",
+"6088928", "Papar",
+"607763", "Ayer\ Hitam",
+"6083337", "Bandar\ Sri\ Aman",
+"609980", "Kuala\ Krai",
+"608844", "Kota\ Kinabalu",
+"6037481", "Kuala\ Lumpur",
+"6037660", "Kuala\ Lumpur",
+"6082766", "Bau",
+"6084302", "Sibu",
+"609590", "Kuantan",
+"609708", "Kota\ Bharu",
+"6039012", "Cheras",
+"6032770", "Kuala\ Lumpur",
+"6089868", "Lahad\ Datu",
+"6036739", "Kuala\ Kubu\ Baru",
+"6033264", "Kuala\ Selangor",
+"604432", "Kulim",
+"6084405", "Sibu",
+"604984", "Kangar",
+"6087811", "Sipitang",
+"6087402", "Labuan",
+"6037884", "Kuala\ Lumpur",
+"6082499", "Kuching",
+"6082890", "Serian",
+"6088741", "Kinarut",
+"603778", "Kuala\ Lumpur",
+"606978", "Tangkak",
+"609477", "Maran",
+"604799", "Pokok\ Sena",
+"6083466", "Debak",
+"6038093", "Kinrara",
+"6082303", "Kuching",
+"6082504", "Kuching",
+"6036277", "Kuala\ Lumpur",
+"604594", "Parit\ Buntar",
+"6035548", "Kinrara",
+"6088346", "Kota\ Kinabalu",
+"605439", "Tapah",
+"604261", "Penang",
+"60735", "Johor\ Bahru",
+"607219", "Johor\ Bahru",
+"609282", "Lanchang",
+"606981", "Bakri",
+"6034816", "Kuala\ Lumpur",
+"605401", "Tapah",
+"604951", "Kuah",
+"606975", "Muar",
+"605427", "Tapah",
+"6052321", "Ipoh",
+"6032109", "Kuala\ Lumpur",
+"6082842", "Damai\ Beach",
+"6085736", "Batu\ Niah",
+"6032024", "Kuala\ Lumpur",
+"6033361", "Kelang",
+"604903", "Kuah",
+"605792", "Grik",
+"603620", "Kuala\ Lumpur",
+"6084738", "Julau",
+"6089524", "Telupid",
+"6085331", "Miri",
+"6034820", "Kuala\ Lumpur",
+"607340", "Johor\ Bahru",
+"606410", "Tampin",
+"6039106", "Cheras",
+"6088943", "Kota\ Belud",
+"604764", "Alor\ Setar",
+"6089611", "Elopura",
+"6034297", "Kuala\ Lumpur",
+"609872", "Cheneh",
+"6033213", "Hutan\ Melintang",
+"609610", "Bandar\ Permaisuri",
+"6085540", "Miri",
+"6084301", "Sibu",
+"606242", "Melaka",
+"606479", "Ayer\ Hitam",
+"607511", "Senai",
+"6032383", "Kuala\ Lumpur",
+"604569", "Kepala\ Batas",
+"6089207", "Elopura",
+"6087463", "Labuan",
+"607880", "Kota\ Tinggi",
+"609679", "Jerteh",
+"6039011", "Cheras",
+"604829", "Penang",
+"6087401", "Labuan",
+"608826", "Kota\ Kinabalu",
+"6087812", "Sipitang",
+"6085637", "Miri",
+"608862", "Kudat",
+"6039271", "Kuala\ Lumpur",
+"604614", "Penang",
+"6084815", "Rejang",
+"6088742", "Kinarut",
+"6036281", "Kuala\ Lumpur",
+"6084363", "Sibu",
+"6036048", "Kerling",
+"6084755", "Kanowit",
+"604716", "Alor\ Setar",
+"6036420", "Rawang",
+"609760", "Bachok",
+"6035523", "Kinrara",
+"605668", "Sitiawan",
+"6087228", "Beaufort",
+"6089926", "Tawau",
+"605665", "Sitiawan",
+"605526", "Ipoh",
+"607296", "Johor\ Bahru",
+"6084828", "Daro",
+"6089567", "Kinabatangan",
+"6087777", "Tambunan",
+"604936", "Kangar",
+"605629", "Telukintan",
+"6087215", "Beaufort",
+"606611", "Kuala\ Klawang",
+"6035480", "Kinrara",
+"6082227", "Kuching",
+"6038870", "Putrajaya",
+"6087782", "Tambunan",
+"6088552", "Telupid",
+"6082667", "Kota\ Samarahan",
+"6035889", "Kinrara",
+"6083584", "Lubukantu",
+"60695", "Muar",
+"6088790", "Tuaran",
+"6032110", "Kuala\ Lumpur",
+"6032246", "Kuala\ Lumpur",
+"606693", "Rantau",
+"605637", "Sabak\ Bernam",
+"60626", "Melaka",
+"6033362", "Kelang",
+"604868", "Penang",
+"6085750", "Marudi",
+"607381", "Johor\ Bahru",
+"609752", "Pasir\ Putih",
+"607904", "Tenang",
+"607926", "Labis",
+"606532", "Jasin",
+"6038873", "Putrajaya",
+"6035483", "Kinrara",
+"6082666", "Kota\ Samarahan",
+"6033099", "Pulau\ Ketam",
+"605313", "Ipoh",
+"605441", "Trolak",
+"6082226", "Kuching",
+"6084874", "Mukah",
+"6089285", "Elopura",
+"6089852", "Kunak",
+"6033319", "Kelang",
+"6085462", "Miri",
+"6089927", "Tawau",
+"607252", "Johor\ Bahru",
+"6089712", "Tawau",
+"6087776", "Keningau",
+"6089566", "Kinabatangan",
+"605286", "Ipoh",
+"604943", "Kangar",
+"606494", "Kuala\ Klawang",
+"606274", "Melaka",
+"6083308", "Bandar\ Sri\ Aman",
+"604288", "Penang",
+"607300", "Johor\ Bahru",
+"6034104", "Kuala\ Lumpur",
+"60741", "Parit\ Sulong",
+"6089704", "Tawau",
+"606968", "Pagoh",
+"609467", "Maran",
+"6032113", "Kuala\ Lumpur",
+"6088793", "Tuaran",
+"6088641", "Kudat",
+"606667", "Sepang",
+"609844", "Dungun",
+"6032247", "Kuala\ Lumpur",
+"6032732", "Kuala\ Lumpur",
+"6085241", "Kampung\ Pahlawan",
+"6087460", "Labuan",
+"606965", "Tangkak",
+"605890", "Semanggol",
+"6032380", "Kuala\ Lumpur",
+"6036102", "Genting",
+"6089206", "Elopura",
+"60477", "Alor\ Setar",
+"607950", "Aver\ Panas",
+"6088940", "Kota\ Belud",
+"6084891", "Selangau",
+"605640", "Hutan\ Melintang",
+"6034296", "Kuala\ Lumpur",
+"60794", "Gemas",
+"605583", "Chemor",
+"6082319", "Kuching",
+"60565", "Langkap",
+"6035520", "Kinrara",
+"6035036", "Kinrara",
+"604413", "Sungai\ Petani",
+"6085636", "Miri",
+"606638", "Kuala\ Pilah",
+"609438", "Perwira\ Jaya",
+"60951", "Kuantan",
+"604702", "Alor\ Setar",
+"6096830", "Kuala\ Brang",
+"6089466", "Elopura",
+"6088307", "Kota\ Kinabalu",
+"605529", "Ipoh",
+"604850", "Penang",
+"607299", "Johor\ Bahru",
+"6033272", "Batang\ Berjuntai",
+"605626", "Telukintan",
+"604901", "Changlon",
+"605230", "Ipoh",
+"606354", "Tangga\ Batu",
+"6033129", "Tk\ Panglima\ Garang",
+"609755", "Kota\ Bharu",
+"609854", "Chukai",
+"604628", "Penang",
+"6038776", "Mantin",
+"6085720", "Batu\ Niah",
+"6036141", "Kuala\ Lumpur",
+"604927", "Ayer\ Hitam",
+"604263", "Penang",
+"605537", "Tanjung\ Rambutan",
+"6084231", "Sibu",
+"606983", "Bakri",
+"605712", "Parit\ Buntar",
+"6033392", "Kelang",
+"605403", "Tapah",
+"604953", "Kuah",
+"6037734", "Kuala\ Lumpur",
+"609380", "Jerantut",
+"6087831", "Menumbok",
+"6083323", "Bandar\ Sri\ Aman",
+"604669", "Penang",
+"607940", "Segamat",
+"6039766", "Cheras",
+"606476", "Ladang\ Geddes",
+"604522", "Tasek\ Gelugor",
+"6088602", "Kudat",
+"609758", "Pasir\ Putih",
+"609774", "Kota\ Bharu",
+"604625", "Penang",
+"604566", "Tasekgelugor",
+"6085202", "Limbang",
+"604826", "Penang",
+"6036037", "Rawang",
+"6082272", "Kuching",
+"6089632", "Elopura",
+"608829", "Kota\ Kinabalu",
+"6038950", "Cheras",
+"6037940", "Kuala\ Lumpur",
+"607761", "Ayer\ Hitam",
+"6032604", "Kuala\ Lumpur",
+"6084393", "Sibu",
+"604351", "Kepala\ Batas",
+"609217", "Mentakab",
+"604719", "Sungai\ Petani",
+"6089986", "Tawau",
+"6082532", "Kuching",
+"6082495", "Kuching",
+"6082287", "Damai\ Beach",
+"6088614", "Kudat",
+"6084646", "Sarikei",
+"6087490", "Labuan",
+"605540", "Ipoh",
+"604282", "Penang",
+"6039767", "Cheras",
+"606252", "Melaka",
+"6035628", "Kinrara",
+"609951", "Machang",
+"6083320", "Bandar\ Sri\ Aman",
+"6035102", "Kinrara",
+"6038752", "Semenyih",
+"603762", "Kuala\ Lumpur",
+"606962", "Bakri",
+"6084689", "Bintangor",
+"6034266", "Kuala\ Lumpur",
+"607532", "Senai",
+"6082286", "Kuching",
+"6084803", "Sibu",
+"604705", "Alor\ Setar",
+"60961", "Kuala\ Brang",
+"6033256", "Kelang",
+"607968", "Gemas",
+"6033343", "Kelang",
+"6084647", "Sarikei",
+"6036036", "Batuarang",
+"6039388", "Cheras",
+"6089665", "Elopura",
+"605683", "Sitiawan",
+"6038953", "Cheras",
+"6087501", "Labuan",
+"607274", "Johor\ Bahru",
+"609353", "Raub",
+"607929", "Aver\ Panas",
+"6035740", "Kinrara",
+"604980", "Kangar",
+"6087442", "Labuan",
+"607255", "Johor\ Bahru",
+"6086462", "Bakun",
+"6088701", "Kinarut",
+"6088675", "Pantai\ Pitas",
+"609327", "Padang\ Tengku",
+"6086952", "Bintulu",
+"6085492", "Bekenu",
+"6038075", "Kinrara",
+"6082544", "Kuching",
+"606632", "Seremban",
+"607965", "Kota\ Tinggi",
+"6088962", "Papar",
+"6085717", "Bekenu",
+"605289", "Pusing",
+"6085395", "Miri",
+"6087479", "Labuan",
+"6037866", "Kuala\ Lumpur",
+"609301", "Jerantut",
+"6088355", "Kota\ Kinabalu",
+"6038777", "Mantin",
+"6034131", "Kuala\ Lumpur",
+"6088362", "Kota\ Kinabalu",
+"6084691", "Bintangor",
+"605920", "Sitiawan",
+"6088906", "Papar",
+"6084384", "Sibu",
+"604530", "Tasek\ Gelugor",
+"6036049", "Kerling",
+"609753", "Bachok",
+"609272", "Lanchang",
+"6088511", "Kota\ Kinabalu",
+"6039775", "Kuala\ Lumpur",
+"6089240", "Elopura",
+"604955", "Kuah",
+"6038744", "Semenyih",
+"606971", "Bukit\ Kepong",
+"606546", "Durian\ Tunggal",
+"604308", "Tasek\ Gelugor",
+"604229", "Penang",
+"6087229", "Beaufort",
+"606985", "Muar",
+"6087881", "Kuala\ Penyu",
+"605857", "Taiping",
+"6039082", "Cheras",
+"609701", "Kota\ Bharu",
+"607587", "Senai",
+"6082582", "Kota\ Samarahan",
+"609534", "Kuantan",
+"6089677", "Elopura",
+"6039223", "Kuala\ Lumpur",
+"6056340", "Kampong\ Gajah",
+"6087484", "Labuan",
+"6089936", "Luasong",
+"6036087", "Rawang",
+"6039521", "Kuala\ Lumpur",
+"608741", "Labuan",
+"6086297", "Bintulu",
+"6036057", "Kuala\ Kubu\ Baru",
+"6083563", "Engkilili",
+"607896", "Tenggara",
+"6035166", "Kinrara",
+"6086485", "Belaga",
+"609970", "Machang",
+"6036196", "Kuala\ Lumpur",
+"607744", "Ayer\ Hitam",
+"6085627", "Miri",
+"604406", "Padang\ Serai",
+"6032261", "Kuala\ Lumpur",
+"6088667", "Kota\ Marudu",
+"6082552", "Kuching",
+"609919", "Ayer\ Lanas",
+"604958", "Kuah",
+"604305", "Penang",
+"6087851", "Kuala\ Penyu",
+"6032203", "Kuala\ Lumpur",
+"606988", "Bakri",
+"6082790", "Tebedu",
+"604268", "Penang",
+"6087316", "Keningau",
+"6085613", "Miri",
+"608431", "Sibu",
+"6035888", "Kuala\ Lumpur",
+"609873", "Cheneh",
+"604623", "Penang",
+"6083309", "Bandar\ Sri\ Aman",
+"6085626", "Miri",
+"6082867", "Kota\ Samarahan",
+"604412", "Penang",
+"607659", "Linggiu",
+"6036433", "Genting",
+"6085266", "Lawas",
+"6082734", "Lundu",
+"604703", "Bedong",
+"6035270", "Kinrara",
+"606620", "Port\ Dickson",
+"6047930", "Pokok\ Sena",
+"6034028", "Kuala\ Lumpur",
+"605685", "Sitiawan",
+"6093262", "Padang\ Tengku",
+"604240", "Penang",
+"609358", "Raub",
+"605671", "Sitiawan",
+"6035167", "Kinrara",
+"6086296", "Bintulu",
+"6087317", "Keningau",
+"607361", "Johor\ Bharu",
+"606775", "Seremban",
+"6038994", "Cheras",
+"6085610", "Miri",
+"6037875", "Kuala\ Lumpur",
+"6082325", "Serian",
+"6077690", "Paloh",
+"606781", "Sepang",
+"60628", "Melaka",
+"604888", "Penang",
+"6082793", "Tebedu",
+"6033318", "Kelang",
+"604370", "Penang",
+"609244", "Triang",
+"607860", "Senai",
+"607520", "Senai",
+"605470", "Kampar",
+"6032722", "Kuala\ Lumpur",
+"6089243", "Elopura",
+"605290", "Tanjung\ Rambutan",
+"6038308", "Putrajaya",
+"6033103", "Pulau\ Ketam",
+"604686", "Penang",
+"609456", "Chini",
+"606421", "Bahau",
+"606656", "Port\ Dickson",
+"6033325", "Kelang",
+"605419", "Tapah",
+"604885", "Penang",
+"6039140", "Kuala\ Lumpur",
+"604784", "Lubuk\ Merbau",
+"6089937", "Luasong",
+"607253", "Johor\ Bahru",
+"6039076", "Cheras",
+"605688", "Sitiawan",
+"6038699", "Semenyih",
+"603216", "Kuala\ Lumpur",
+"6033161", "Kelang",
+"609355", "Raub",
+"607227", "Johor\ Bahru",
+"60463", "Penang",
+"606533", "Jasin",
+"605597", "Chemor",
+"609780", "Kok\ Lanas",
+"6089676", "Elopura",
+"605312", "Ipoh",
+"6085555", "Miri",
+"6049372", "Kangar",
+"607899", "Tiram",
+"6036273", "Kuala\ Lumpur",
+"604250", "Penang",
+"6083460", "Sebuyau",
+"6099560", "Batu\ Gajah",
+"6085297", "Lawas",
+"6082896", "Serian",
+"604409", "Kulim",
+"6085485", "Kampung\ Bakam",
+"6033081", "Kelang",
+"6089622", "Elopura",
+"607595", "Senai",
+"603414", "Kuala\ Lumpur",
+"605225", "Ipoh",
+"604960", "Kuah",
+"6089798", "Tawau",
+"6032776", "Kuala\ Lumpur",
+"609278", "Mentakab",
+"609254", "Triang",
+"606698", "Linggi",
+"60942", "Pekan",
+"6082760", "Bau",
+"6087821", "Sipitang",
+"6037666", "Kuala\ Lumpur",
+"603337", "Kelang",
+"604557", "Tasek\ Gelugor",
+"6047454", "Alor\ Setar",
+"604741", "Alor\ Setar",
+"6038323", "Putrajaya",
+"6084719", "Pakan",
+"6084480", "Sibu",
+"6035545", "Kinrara",
+"608237", "Kuching",
+"606646", "Port\ Dickson",
+"6084661", "Sarikei",
+"6099200", "Ayer\ Lanas",
+"6084221", "Sibu",
+"6085406", "Miri",
+"6032333", "Kuala\ Lumpur",
+"604952", "Kuah",
+"606317", "Melaka",
+"6086322", "Bintulu",
+"606549", "Durian\ Tunggal",
+"609281", "Kuala\ Krau",
+"604226", "Penang",
+"6032274", "Kuala\ Lumpur",
+"606695", "Linggi",
+"6086507", "Bintulu",
+"604262", "Penang",
+"605791", "Grik",
+"6089865", "Lahad\ Datu",
+"6033051", "Kelang",
+"6085455", "Miri",
+"603205", "Kuala\ Lumpur",
+"6034810", "Kuala\ Lumpur",
+"609817", "Dungun",
+"607598", "Senai",
+"6089514", "Beluran",
+"609345", "Raub",
+"609634", "Bandar\ Permaisuri",
+"6088532", "Kota\ Kinabalu",
+"606434", "Jelai",
+"607687", "Pontian",
+"6032681", "Kuala\ Lumpur",
+"604945", "Kangar",
+"6086506", "Bintulu",
+"6088411", "Kota\ Kinabalu",
+"606852", "Melaka",
+"609521", "Kuantan",
+"6085733", "Batu\ Niah",
+"6032330", "Kuala\ Lumpur",
+"606659", "Sepang",
+"6085407", "Miri",
+"605416", "Tapah",
+"6086555", "Bintulu",
+"6035629", "Kinrara",
+"604418", "Mahang",
+"608871", "Kinarut",
+"6033191", "Banting",
+"606633", "Seremban",
+"607781", "Paloh",
+"6034813", "Kuala\ Lumpur",
+"609352", "Sungai\ Koyan",
+"605847", "Taiping",
+"6035891", "Kinrara",
+"607421", "Kampung\ Parit\ Tengah",
+"607656", "Kulai",
+"6085296", "Lawas",
+"6087478", "Labuan",
+"6082701", "Lundu",
+"605682", "Changkat\ Keruing",
+"607754", "Ayer\ Hitam",
+"6083463", "Debak",
+"605318", "Ipoh",
+"6036270", "Kuala\ Lumpur",
+"6082306", "Kuching",
+"6088784", "Tuaran",
+"604415", "Sungai\ Petani",
+"605889", "Taiping",
+"6087765", "Tambunan",
+"6084762", "Kanowit",
+"6088343", "Kota\ Kinabalu",
+"6032782", "Kuala\ Lumpur",
+"6038320", "Putrajaya",
+"6038964", "Cheras",
+"607533", "Senai",
+"606227", "Melaka",
+"606963", "Tangkak",
+"604283", "Penang",
+"6085605", "Miri",
+"6082763", "Bau",
+"6085771", "Long\ Lama",
+"6033385", "Kelang",
+"6088205", "Kota\ Kinabalu",
+"606253", "Melaka",
+"607407", "Parit\ Sulong",
+"606228", "Melaka",
+"6038894", "Putrajaya",
+"6039010", "Cheras",
+"606663", "Tekok\ Kemang",
+"604898", "Penang",
+"6038588", "Putrajaya",
+"6033184", "Banting",
+"6032772", "Kuala\ Lumpur",
+"606791", "Seremban",
+"607408", "Kampong\ Parit\ Tengah",
+"6084893", "Selangau",
+"604947", "Kangar",
+"605434", "Tapah",
+"6032787", "Kuala\ Lumpur",
+"6037662", "Kuala\ Lumpur",
+"606331", "Melaka",
+"609831", "Paka",
+"6084834", "Matu",
+"6082685", "Kuching",
+"6035192", "Kinrara",
+"605744", "Manong",
+"609505", "Kuantan",
+"609602", "Bandar\ Permaisuri",
+"6087736", "Tenom",
+"605646", "Bagan\ Datoh",
+"6089745", "Merotai",
+"607222", "Johor\ Bahru",
+"605592", "Lintang",
+"607266", "Johor\ Bahru",
+"605549", "Ipoh",
+"6036421", "Rawang",
+"608887", "Ranau",
+"6036280", "Kuala\ Lumpur",
+"6032085", "Kuala\ Lumpur",
+"605698", "Sitiawan",
+"607823", "Penawar",
+"604417", "Mahang",
+"6035481", "Kinrara",
+"6038871", "Putrajaya",
+"6087234", "Beaufort",
+"6036690", "Batuarang",
+"605848", "Taiping",
+"609508", "Teruntum",
+"6088536", "Kota\ Kinabalu",
+"6082472", "Kuching",
+"6083589", "Lubukantu",
+"608849", "Kota\ Kinabalu",
+"6085402", "Miri",
+"6089506", "Beluran",
+"604599", "Parit\ Buntar",
+"6088396", "Kota\ Kinabalu",
+"605280", "Ipoh",
+"6083547", "Maludam",
+"607920", "Segamat",
+"604989", "Kangar",
+"6086326", "Bintulu",
+"604794", "Ayer\ Hitam",
+"6082840", "Damai\ Beach",
+"6088791", "Tuaran",
+"609818", "Kerteh",
+"607597", "Senai",
+"6088537", "Kota\ Kinabalu",
+"607688", "Pontian",
+"6039231", "Kuala\ Lumpur",
+"6034024", "Kuala\ Lumpur",
+"605253", "Ipoh",
+"6082843", "Damai\ Beach",
+"606682", "Seremban",
+"6085240", "Kampung\ Pahlawan",
+"604461", "Bedong",
+"6084879", "Dalat",
+"604555", "Tasek\ Gelugor",
+"6086327", "Bintulu",
+"6083438", "Saratok",
+"604859", "Penang",
+"6038998", "Cheras",
+"605201", "Chemor",
+"6088397", "Kota\ Kinabalu",
+"605520", "Ipoh",
+"604930", "Alor\ Setar",
+"606318", "Melaka",
+"603894", "Cheras",
+"603795", "Kuala\ Lumpur",
+"605633", "Kampong\ Gajah",
+"606697", "Linggi",
+"603798", "Kuala\ Lumpur",
+"606315", "Melaka",
+"6089613", "Elopura",
+"604779", "Pokok\ Sena",
+"609277", "Mentakab",
+"6032786", "Kuala\ Lumpur",
+"6087461", "Labuan",
+"609664", "Batu\ Rakit",
+"6084303", "Sibu",
+"604558", "Tasek\ Gelugor",
+"606464", "Ladang\ Geddes",
+"609766", "Bachok",
+"6032381", "Kuala\ Lumpur",
+"608235", "Kuching",
+"6082314", "Kuching",
+"604710", "Alor\ Setar",
+"608923", "Elopura",
+"608267", "Kota\ Samarahan",
+"6084361", "Sibu",
+"607685", "Pontian",
+"605852", "Taiping",
+"6036135", "Kuala\ Lumpur",
+"6085768", "Marudi",
+"6087403", "Labuan",
+"607886", "Penawar",
+"6036022", "Batu\ Arang",
+"6084766", "Kanowit",
+"6082302", "Kuching",
+"609815", "Kerteh",
+"609714", "Kota\ Bharu",
+"609570", "Kuantan",
+"6087737", "Tenom",
+"6038092", "Kinrara",
+"6035521", "Kinrara",
+"6088885", "Ranau",
+"6085475", "Miri",
+"603207", "Kuala\ Lumpur",
+"604660", "Penang",
+"6034770", "Kuala\ Lumpur",
+"6088703", "Kinarut",
+"6085310", "Limbang",
+"605243", "Ipoh",
+"608989", "Lahad\ Datu",
+"6082625", "Kuching",
+"605687", "Sitiawan",
+"6089848", "Kunak",
+"6039086", "Cheras",
+"608542", "Miri",
+"6032025", "Kuala\ Lumpur",
+"607663", "Kulai",
+"607791", "Felda\ Tenggaroh",
+"605598", "Chemor",
+"607228", "Johor\ Bahru",
+"6087201", "Beaufort",
+"6033124", "Tk\ Panglima\ Garang",
+"604892", "Penang",
+"6088902", "Papar",
+"606266", "Sungai\ Rambai",
+"6088366", "Kota\ Kinabalu",
+"6035568", "Kinrara",
+"606222", "Melaka",
+"6034285", "Kuala\ Lumpur",
+"604545", "Sungai\ Bakap",
+"604699", "Alor\ Setar",
+"604986", "Kangar",
+"6032727", "Kuala\ Lumpur",
+"6036140", "Kuala\ Lumpur",
+"6032278", "Kuala\ Lumpur",
+"6034255", "Kuala\ Lumpur",
+"604548", "Tasek\ Gelugor",
+"6037885", "Kuala\ Lumpur",
+"604293", "Penang",
+"6087439", "Labuan",
+"6082505", "Kuching",
+"6087312", "Keningau",
+"6033341", "Kelang",
+"607830", "Penggerang",
+"609323", "Kuala\ Lipis",
+"6035162", "Kinrara",
+"6084797", "Kapit",
+"6084801", "Sibu",
+"605595", "Chemor",
+"607225", "Johor\ Bahru",
+"605692", "Sitiawan",
+"605649", "Hutan\ Melintang",
+"6037941", "Kuala\ Lumpur",
+"6089518", "Beluran",
+"6038951", "Cheras",
+"6087304", "Keningau",
+"6087503", "Labuan",
+"605546", "Ipoh",
+"605899", "Semanggol",
+"6039056", "Cheras",
+"6082862", "Kota\ Samarahan",
+"6036192", "Kuala\ Lumpur",
+"6089296", "Elopura",
+"6033265", "Kuala\ Selangor",
+"606987", "Bakri",
+"6083321", "Bandar\ Sri\ Aman",
+"6038331", "Putrajaya",
+"609725", "Kota\ Bharu",
+"609824", "Kerteh",
+"6087833", "Menumbok",
+"606312", "Melaka",
+"6035878", "Kinrara",
+"605533", "Tanjung\ Rambutan",
+"604923", "Changlon",
+"609769", "Bachok",
+"604267", "Penang",
+"6032224", "Kuala\ Lumpur",
+"6088662", "Kota\ Marudu",
+"6084391", "Sibu",
+"6084684", "Sarikei",
+"604560", "Kepala\ Batas",
+"607889", "Kota\ Tinggi",
+"6039057", "Cheras",
+"604820", "Penang",
+"6085622", "Miri",
+"6084796", "Kapit",
+"607571", "Senai",
+"6086292", "Bintulu",
+"6088975", "Kota\ Belud",
+"605421", "Besout",
+"6035022", "Kinrara",
+"607585", "Senai",
+"607682", "Air\ Baloi",
+"605855", "Taiping",
+"6089965", "Lahad\ Datu",
+"6088788", "Tuaran",
+"605858", "Taiping",
+"603401", "Kuala\ Lumpur",
+"604238", "Penang",
+"6089672", "Elopura",
+"609213", "Jengka\ Lapan\ Belas",
+"6048640", "Penang",
+"607697", "Pontian",
+"6036143", "Kuala\ Lumpur",
+"6032726", "Kuala\ Lumpur",
+"605620", "Telukintan",
+"6082549", "Kuching",
+"603749", "Kuala\ Lumpur",
+"605236", "Ipoh",
+"6089730", "Tawau",
+"6087871", "Weston",
+"609485", "Jengka\ Lapan\ Belas",
+"6039212", "Kuala\ Lumpur",
+"604307", "Penang",
+"604552", "Tasek\ Gelugor",
+"6039545", "Kuala\ Lumpur",
+"609471", "Sungai\ Tekam",
+"6088367", "Kota\ Kinabalu",
+"60979", "Kota\ Bharu",
+"605375", "Bota",
+"609786", "Pasirputih",
+"6089241", "Elopura",
+"607938", "Tenang",
+"605381", "Batugajah",
+"6087880", "Membakut",
+"604298", "Penang",
+"604454", "Sungai\ Petani",
+"609684", "Bukit\ Bading",
+"6083474", "Debak",
+"6084690", "Bintangor",
+"6033101", "Pulau\ Ketam",
+"6033396", "Kelang",
+"6038787", "Mantin",
+"6088967", "Tenghilan",
+"605245", "Ipoh",
+"609231", "Karak",
+"6033163", "Kelang",
+"609450", "Bukit\ Ibam",
+"604680", "Penang",
+"6087224", "Beaufort",
+"6085285", "Lawas",
+"606650", "Port\ Dickson",
+"6089462", "Elopura",
+"6038749", "Semenyih",
+"6089952", "Balung",
+"6036044", "Kampong\ Suharto",
+"607822", "Penawar",
+"608287", "Serian",
+"607665", "Kulai",
+"609328", "Kuala\ Lipis",
+"605476", "Kampar",
+"607562", "Senai",
+"605296", "Tanjung\ Rambutan",
+"6036065", "Kuala\ Kubu\ Baru",
+"606537", "Jasin",
+"6032182", "Kuala\ Lumpur",
+"6032260", "Kuala\ Lumpur",
+"6089982", "Tawau",
+"607223", "Johor\ Bahru",
+"604376", "Penang",
+"607668", "Kulai",
+"6039520", "Kuala\ Lumpur",
+"607257", "Johor\ Bharu",
+"6084642", "Sarikei",
+"609369", "Dong",
+"6087726", "Tenom",
+"6082536", "Kuching",
+"606529", "Jasin",
+"605880", "Selama",
+"603673", "Kuala\ Lumpur",
+"609651", "Batu\ Rakit",
+"6085206", "Kampung\ Pahlawan",
+"6082807", "Simunjan",
+"605354", "Ipoh",
+"6082791", "Tebedu",
+"606230", "Melaka",
+"604475", "Kupang",
+"6087850", "Kuala\ Penyu",
+"606662", "Tekok\ Kemang",
+"6087459", "Labuan",
+"6088606", "Kudat",
+"6082715", "Semantan",
+"6082537", "Kuching",
+"6033885", "Kelang",
+"6087727", "Tenom",
+"6082282", "Kuching",
+"609404", "Pekan",
+"6036125", "Kuala\ Lumpur",
+"605853", "Sungai\ Nyior",
+"6038705", "Mantin",
+"608922", "Elopura",
+"6047931", "Pokok\ Sena",
+"6036303", "Genting",
+"6036032", "Rawang",
+"6038999", "Cheras",
+"6083439", "Saratok",
+"6032263", "Kuala\ Lumpur",
+"605839", "Selama",
+"6087853", "Kuala\ Penyu",
+"6032201", "Kuala\ Lumpur",
+"604400", "Padang\ Serai",
+"6088607", "Kudat",
+"607911", "Aver\ Panas",
+"608838", "Kota\ Kinabalu",
+"6089708", "Tawau",
+"6034108", "Kuala\ Lumpur",
+"604969", "Kuah",
+"609541", "Sungai\ Lembing",
+"605535", "Tanjung\ Rambutan",
+"6034262", "Kuala\ Lumpur",
+"605632", "Kampong\ Gajah",
+"604925", "Ayer\ Hitam",
+"607890", "Linggiu",
+"6082739", "Lundu",
+"609976", "Machang",
+"605801", "Taiping",
+"6085611", "Miri",
+"604259", "Penang",
+"6085769", "Marudi",
+"6088405", "Kota\ Kinabalu",
+"604928", "Changlon",
+"6037862", "Kuala\ Lumpur",
+"607504", "Tanjung\ Kupang",
+"604627", "Penang",
+"6039141", "Kuala\ Lumpur",
+"6084693", "Bintangor",
+"60723", "Johor\ Bahru",
+"60458", "Sungai\ Bakap",
+"608220", "Kuching",
+"6087883", "Kuala\ Penyu",
+"6088513", "Kota\ Kinabalu",
+"60655", "Durian\ Tunggal",
+"6086466", "Sebauh",
+"6039221", "Kuala\ Lumpur",
+"606540", "Durian\ Tunggal",
+"6033277", "Kuala\ Selangor",
+"609215", "Genting",
+"6088302", "Kota\ Kinabalu",
+"6088966", "Kota\ Belud",
+"604536", "Tasek\ Gelugor",
+"607441", "Senggarang",
+"6085496", "Ladang\ Tiga",
+"6082885", "Serian",
+"6084634", "Pakan",
+"6033282", "Kuala\ Selangor",
+"6033160", "Kelang",
+"6033855", "Sabak\ Bernam",
+"6033080", "Kelang",
+"6036095", "Rawang",
+"6085665", "Miri",
+"6086255", "Bintulu",
+"6088746", "Kinarut",
+"6085225", "Limbang",
+"6038529", "Mantin",
+"6035569", "Kinrara",
+"609322", "Kuala\ Lipis",
+"604310", "Penang",
+"609437", "Perwira\ Jaya",
+"6038025", "Kinrara",
+"6088341", "Kota\ Kinabalu",
+"608246", "Kuching",
+"606637", "Seremban",
+"605693", "Sitiawan",
+"6083461", "Debak",
+"607828", "Penawar",
+"607484", "Batu\ Pahat",
+"6033008", "Banting",
+"604292", "Penang",
+"6087820", "Sipitang",
+"6036412", "Kuala\ Lumpur",
+"6089849", "Kunak",
+"609551", "Kuantan",
+"6039102", "Cheras",
+"6084702", "Bintangor",
+"6038727", "Semenyih",
+"6054620", "Kampar",
+"607650", "Layang\-Layang",
+"6082761", "Bau",
+"6038912", "Semenyih",
+"6032242", "Kuala\ Lumpur",
+"6088413", "Kota\ Kinabalu",
+"609789", "Pasir\ Putih",
+"6084220", "Sibu",
+"609584", "Gebeng",
+"6033134", "Kelang",
+"6089519", "Beluran",
+"6084660", "Sarikei",
+"6038609", "Kinrara",
+"604893", "Penang",
+"609468", "Maran",
+"606967", "Bakri",
+"607451", "Batu\ Pahat",
+"6089717", "Tawau",
+"6088618", "Kudat",
+"608543", "Miri",
+"6032035", "Kuala\ Lumpur",
+"607662", "Kulai",
+"6032279", "Kuala\ Lumpur",
+"6089922", "Tawau",
+"6089492", "Beluran",
+"6089535", "Elopura",
+"605410", "Tapah",
+"607869", "Senai",
+"606550", "Tampin",
+"6086285", "Bintulu",
+"6033050", "Kelang",
+"6087438", "Labuan",
+"604811", "Penang",
+"6089275", "Elopura",
+"605479", "Tapah",
+"605299", "Tanjung\ Rambutan",
+"605242", "Ipoh",
+"6034811", "Kuala\ Lumpur",
+"609224", "Bentong",
+"6032331", "Kuala\ Lumpur",
+"608832", "Kota\ Kinabalu",
+"6084223", "Sibu",
+"6089805", "Lahad\ Datu",
+"6035624", "Kinrara",
+"607706", "Keluang",
+"6082222", "Kuching",
+"604835", "Penang",
+"6082662", "Kota\ Samarahan",
+"604220", "Penang",
+"607289", "Johor\ Bahru",
+"609212", "Maran",
+"6039175", "Kuala\ Lumpur",
+"606640", "Port\ Dickson",
+"6035879", "Kinrara",
+"6089716", "Tawau",
+"6087772", "Tambunan",
+"6089562", "Kinabatangan",
+"604539", "Tasek\ Gelugor",
+"605255", "Ipoh",
+"6033190", "Banting",
+"6036185", "Kuala\ Lumpur",
+"609440", "Bandar\ Tun\ Razak",
+"6089856", "Kunak",
+"60755", "Senai",
+"6035032", "Kinrara",
+"606391", "Tangga\ Batu",
+"604914", "Alor\ Setar",
+"6082548", "Kuching",
+"607683", "Pontian",
+"6035125", "Kinrara",
+"6088747", "Kinarut",
+"6082825", "Asajaya",
+"604838", "Penang",
+"605667", "Bruas",
+"6085632", "Miri",
+"6033179", "Kelang",
+"6082700", "Lundu",
+"6033083", "Kelang",
+"609813", "Paka",
+"6089202", "Elopura",
+"605836", "Selama",
+"6085770", "Long\ Lama",
+"6038726", "Semenyih",
+"604922", "Kangar",
+"604966", "Kuah",
+"6034292", "Kuala\ Lumpur",
+"605717", "Parit\ Buntar",
+"608233", "Kuching",
+"6038321", "Putrajaya",
+"6087823", "Sipitang",
+"6033142", "Sepang",
+"609979", "Machang",
+"6032332", "Kuala\ Lumpur",
+"605771", "Grik",
+"60549", "Cameron\ Highland",
+"6088888", "Ranau",
+"607578", "Senai",
+"6088393", "Kota\ Kinabalu",
+"605350", "Batu\ Gajah",
+"606720", "Seremban",
+"6085765", "Marudi",
+"606234", "Melaka",
+"607443", "Rengit",
+"6086323", "Bintulu",
+"6036138", "Kuala\ Lumpur",
+"607759", "Ayer\ Hitam",
+"608465", "Sarikei",
+"6084614", "Rejang",
+"604369", "Serdang",
+"6082661", "Kota\ Samarahan",
+"6082889", "Serian",
+"6082221", "Kuching",
+"609246", "Bera",
+"603563", "Kinrara",
+"609475", "Maran",
+"6087771", "Tambunan",
+"6089561", "Kinabatangan",
+"606681", "Seremban",
+"609481", "Kota\ Gelangi",
+"6088334", "Kota\ Kinabalu",
+"6033324", "Kelang",
+"6088533", "Kota\ Kinabalu",
+"604462", "Jeniang",
+"6036272", "Kuala\ Lumpur",
+"609478", "Maran",
+"606977", "Tangkak",
+"6049373", "Kangar",
+"609454", "Bukit\ Ibam",
+"604684", "Penang",
+"6035031", "Kinrara",
+"6038995", "Cheras",
+"6083435", "Saratok",
+"6083592", "Lubuk\ Antu",
+"606654", "Port\ Dickson",
+"607913", "Labis",
+"6037874", "Kuala\ Lumpur",
+"6082324", "Asajaya",
+"6087733", "Tenom",
+"609721", "Kota\ Bharu",
+"6084760", "Kanowit",
+"609543", "Sungai\ Lembing",
+"6036287", "Kuala\ Lumpur",
+"60444", "Sungai\ Petani",
+"6089623", "Elopura",
+"6085631", "Miri",
+"6087407", "Labuan",
+"606480", "Ayer\ Hitam",
+"605469", "Kampar",
+"6089201", "Elopura",
+"6082735", "Lundu",
+"60473", "Alor\ Setar",
+"607879", "Linggiu",
+"6085744", "Beluru",
+"609680", "Kuala\ Brang",
+"6079010", "Tenggara",
+"6084307", "Sibu",
+"6038322", "Putrajaya",
+"6032780", "Kuala\ Lumpur",
+"6084896", "Stapang",
+"609707", "Kota\ Bharu",
+"6087848", "Sipitang",
+"6088858", "Ranau",
+"6034291", "Kuala\ Lumpur",
+"603214", "Kuala\ Lumpur",
+"6089617", "Elopura",
+"6033141", "Sepang",
+"607810", "Paloh",
+"6036286", "Kuala\ Lumpur",
+"6087406", "Labuan",
+"6089871", "Tungku",
+"606544", "Durian\ Tunggal",
+"606332", "Melaka",
+"606427", "Kuala\ Pilah",
+"609928", "Gua\ Musang",
+"609653", "Batu\ Rakit",
+"604483", "Baling",
+"6088342", "Kota\ Kinabalu",
+"6087730", "Tenom",
+"6082520", "Kuching",
+"6049370", "Kangar",
+"606792", "Sepang",
+"607207", "Johor\ Bahru",
+"605591", "Lintang",
+"6084897", "Stapang",
+"607221", "Johor\ Bahru",
+"609639", "Kuala\ Brang",
+"607500", "Tanjung\ Kupang",
+"6082658", "Kuching",
+"6039101", "Cheras",
+"606439", "Simpang\ Empat",
+"6036411", "Kuala\ Lumpur",
+"6086484", "Balingan",
+"6089616", "Elopura",
+"6032783", "Kuala\ Lumpur",
+"609832", "Merchang",
+"6062710", "Sungai\ Rambai",
+"608224", "Kuching",
+"6084306", "Sibu",
+"6038911", "Semenyih",
+"6082762", "Bau",
+"609536", "Kuantan",
+"6032088", "Kuala\ Lumpur",
+"6082846", "Damai\ Beach",
+"609233", "Genting",
+"6089894", "Kunak",
+"6037839", "Kuala\ Lumpur",
+"6086320", "Bintulu",
+"6032241", "Kuala\ Lumpur",
+"604404", "Mahang",
+"607746", "Renggam",
+"604218", "Penang",
+"608891", "Papar",
+"605677", "Bruas",
+"6089748", "Tawau",
+"6087485", "Labuan",
+"6083344", "Bandar\ Sri\ Aman",
+"607894", "Kota\ Tinggi",
+"6082688", "Kuching",
+"607795", "Felda\ Tenggaroh",
+"6089921", "Balung",
+"6089491", "Beluran",
+"604757", "Alor\ Setar",
+"6034812", "Kuala\ Lumpur",
+"6088861", "Bongawan",
+"606759", "Mantin",
+"605208", "Ipoh",
+"6093260", "Padang\ Tengku",
+"6038687", "Putrajaya",
+"606311", "Melaka",
+"6039548", "Cheras",
+"6083562", "Roban",
+"6082281", "Kuching",
+"6082829", "Asajaya",
+"607720", "Mersing",
+"604789", "Alor\ Setar",
+"6084790", "Kapit",
+"604468", "Bedong",
+"606554", "Tampin",
+"6085604", "Miri",
+"6087506", "Labuan",
+"603269", "Kuala\ Lumpur",
+"6082553", "Kuching",
+"6088204", "Kota\ Kinabalu",
+"607675", "Pontian",
+"6032202", "Kuala\ Lumpur",
+"605466", "Kampar",
+"609580", "Gebeng",
+"6086584", "Tatau",
+"606733", "Mantin",
+"6088785", "Tuaran",
+"6085612", "Miri",
+"6089968", "Lahad\ Datu",
+"6037861", "Kuala\ Lumpur",
+"6088363", "Kota\ Kinabalu",
+"6084237", "Sibu",
+"607678", "Pontian",
+"607654", "Linggiu",
+"605782", "Kuala\ Kangsar",
+"6089736", "Tawau",
+"609310", "Kuala\ Lipis",
+"607756", "Renggam",
+"6032720", "Kuala\ Lumpur",
+"6039222", "Kuala\ Lumpur",
+"604465", "Bedong",
+"604551", "Tasek\ Gelugor",
+"6036073", "Kuala\ Kubu\ Baru",
+"6082583", "Kota\ Samarahan",
+"6036189", "Kuala\ Lumpur",
+"605368", "Pusing",
+"6039179", "Kuala\ Lumpur",
+"609249", "Bera",
+"604747", "Alor\ Setar",
+"6089591", "Telupid",
+"605205", "Ipoh",
+"604314", "Penang",
+"6038657", "Cheras",
+"6088301", "Kota\ Kinabalu",
+"6033281", "Kuala\ Selangor",
+"603228", "Kuala\ Lumpur",
+"6032856", "Kuala\ Lumpur",
+"6089242", "Elopura",
+"6032723", "Kuala\ Lumpur",
+"6033268", "Kuala\ Selangor",
+"6086424", "Sebauh",
+"6089864", "Lahad\ Datu",
+"608541", "Miri",
+"6085454", "Miri",
+"607749", "Ayer\ Hitam",
+"608976", "Tawau",
+"609914", "Gua\ Musang",
+"6085238", "Limbang",
+"6089515", "Beluran",
+"6038605", "Kinrara",
+"607427", "Senggarang",
+"6088360", "Kota\ Kinabalu",
+"6084236", "Sibu",
+"6086350", "Bintulu",
+"6033102", "Pulau\ Ketam",
+"609838", "Merchang",
+"6038656", "Cheras",
+"6035544", "Kinrara",
+"6082639", "Kuching",
+"6089279", "Elopura",
+"609966", "Kuala\ Krai",
+"6032857", "Kuala\ Lumpur",
+"6089461", "Elopura",
+"6039080", "Cheras",
+"606798", "Mantin",
+"6089951", "Balung",
+"609256", "Triang",
+"604891", "Penang",
+"606221", "Melaka",
+"6082580", "Kota\ Samarahan",
+"6032039", "Kuala\ Lumpur",
+"6034258", "Kuala\ Lumpur",
+"6032275", "Kuala\ Lumpur",
+"6037718", "Kuala\ Lumpur",
+"6089290", "Elopura",
+"6039050", "Cheras",
+"60445", "Bedong",
+"6032181", "Kuala\ Lumpur",
+"6087507", "Labuan",
+"6089981", "Tawau",
+"604224", "Penang",
+"6082550", "Kuching",
+"609553", "Kuantan",
+"60648", "Kuala\ Pilah",
+"6034288", "Kuala\ Lumpur",
+"6084641", "Sarikei",
+"6038686", "Putrajaya",
+"609867", "Kemasik",
+"6035565", "Kinrara",
+"606644", "Port\ Dickson",
+"604390", "Penang",
+"606335", "Melaka",
+"6047455", "Alor\ Setar",
+"605613", "Teluk\ Intan",
+"6036099", "Rawang",
+"6038525", "Mantin",
+"609220", "Bentong",
+"6039134", "Kuala\ Lumpur",
+"6084734", "Julau",
+"607787", "Keluang",
+"606436", "Johol",
+"609835", "Dungun",
+"605841", "Taiping",
+"6032028", "Kuala\ Lumpur",
+"6082628", "Kuching",
+"605763", "Lenggong",
+"605691", "Sitiawan",
+"608877", "Kinarut",
+"609539", "Kuantan",
+"606617", "Kuala\ Klawang",
+"608921", "Elopura",
+"6082888", "Serian",
+"6038750", "Semenyih",
+"6083322", "Bandar\ Sri\ Aman",
+"6082393", "Sejingkat",
+"609417", "Nenasi",
+"604330", "Penang",
+"607924", "Labis",
+"6086371", "Sebauh",
+"604790", "Pokok\ Sena",
+"6088889", "Ranau",
+"605631", "Kampong\ Gajah",
+"609542", "Sungai\ Lembing",
+"609599", "Gambang",
+"6088661", "Kotamarudu",
+"605506", "Ipoh",
+"6084392", "Sibu",
+"6032267", "Kuala\ Lumpur",
+"6085621", "Miri",
+"609846", "Kuala\ Brang",
+"607387", "Johor\ Bahru",
+"6089633", "Elopura",
+"6082273", "Kuching",
+"6035021", "Kinrara",
+"606496", "Kuala\ Klawang",
+"6083425", "Roban",
+"606276", "Melaka",
+"609794", "Kok\ Lanas",
+"6086291", "Bintulu",
+"6088408", "Kota\ Kinabalu",
+"607912", "Aver\ Panas",
+"6036139", "Kuala\ Lumpur",
+"605609", "Teluk\ Intan",
+"6033166", "Kelang",
+"6036081", "Batu\ Arang",
+"6088960", "Tenghilan",
+"604463", "Jeniang",
+"6089671", "Elopura",
+"6034105", "Kuala\ Lumpur",
+"6089705", "Tawau",
+"6087440", "Labuan",
+"605203", "Chemor",
+"6083418", "Bandar\ Sri\ Aman",
+"6033273", "Batang\ Berjuntai",
+"609947", "Ayer\ Lanas",
+"6086460", "Belaga",
+"6087887", "Membakut",
+"6038708", "Mantin",
+"607442", "Senggarang",
+"6036128", "Kuala\ Lumpur",
+"607279", "Johor\ Bahru",
+"6088517", "Kota\ Kinabalu",
+"6084875", "Mukah",
+"6038780", "Mantin",
+"605430", "Besout",
+"6087872", "Weston",
+"6033393", "Kelang",
+"607210", "Johor\ Bahru",
+"606398", "Tangga\ Batu",
+"605618", "Changkat\ Keruing",
+"6033270", "Batang\ Berjuntai",
+"6083585", "Lubukantu",
+"6086590", "Tatau",
+"604497", "Bedong",
+"609779", "Bachok",
+"6087443", "Labuan",
+"6082659", "Kota\ Samarahan",
+"609558", "Kuantan",
+"604722", "Kulim",
+"6033167", "Kelang",
+"604766", "Alor\ Setar",
+"6082299", "Kuching",
+"609710", "Kota\ Bharu",
+"6085493", "Sundar",
+"6089817", "Lahatdatu",
+"605768", "Lenggong",
+"604347", "Penang",
+"6038783", "Mantin",
+"6084696", "Bintangor",
+"607561", "Senai",
+"6092410", "Telemong",
+"6087214", "Beaufort",
+"608824", "Kota\ Kinabalu",
+"609660", "Kuala\ Brang",
+"609232", "Karak",
+"604616", "Penang",
+"608564", "Miri",
+"6088516", "Kota\ Kinabalu",
+"606460", "Bahau",
+"6033010", "Pulau\ Ketam",
+"604570", "Tasek\ Gelugor",
+"604714", "Alor\ Setar",
+"6082803", "Simunjan",
+"609833", "Bukit\ Besi",
+"6085200", "Limbang",
+"6084754", "Kanowit",
+"604818", "Penang",
+"605765", "Lenggong",
+"6085288", "Lawas",
+"6035103", "Kinrara",
+"6038000", "Putrajaya",
+"6087311", "Keningau",
+"6082530", "Kuching",
+"6035161", "Kinrara",
+"609555", "Kuantan",
+"6032089", "Kuala\ Lumpur",
+"6033342", "Kelang",
+"6089749", "Tawau",
+"6084802", "Sibu",
+"607906", "Segamat",
+"606793", "Mantin",
+"606661", "Tekok\ Kemang",
+"6098700", "Kemasik",
+"609859", "Chukai",
+"6089630", "Elopura",
+"6082270", "Kuching",
+"6083555", "Bandar\ Sri\ Aman",
+"6038952", "Cheras",
+"6036191", "Kuala\ Lumpur",
+"606333", "Melaka",
+"6032266", "Kuala\ Lumpur",
+"6089850", "Kunak",
+"6032687", "Kuala\ Lumpur",
+"605808", "Taiping",
+"6085460", "Miri",
+"6035614", "Kinrara",
+"609548", "Gambang",
+"608831", "Kota\ Kinabalu",
+"60457", "Kepala\ Batas",
+"607918", "Aver\ Panas",
+"6087344", "Keningau",
+"6039232", "Kuala\ Lumpur",
+"609473", "Bukit\ Ibam",
+"6089969", "Lahad\ Datu",
+"6083485", "Betong",
+"605783", "Kuala\ Kangsar",
+"6089726", "Tawau",
+"6039549", "Cheras",
+"6032730", "Kuala\ Lumpur",
+"604323", "Penang",
+"6082828", "Asajaya",
+"607276", "Johor\ Bahru",
+"6088674", "Kudat",
+"606387", "Kuala\ Sungai\ Baru",
+"607445", "Batu\ Pahat",
+"6036158", "Kuala\ Lumpur",
+"6038074", "Kinrara",
+"6082545", "Kuching",
+"6033363", "Kelang",
+"607767", "Mersing",
+"6036188", "Kuala\ Lumpur",
+"607448", "Batu\ Pahat",
+"6083406", "Maludam",
+"6082755", "Kuching",
+"6087462", "Labuan",
+"605423", "Tapah",
+"6032382", "Kuala\ Lumpur",
+"606517", "Jasin",
+"6039410", "Cheras",
+"6089664", "Elopura",
+"6036100", "Genting",
+"6035115", "Kinrara",
+"607915", "Bukit\ Kepong",
+"6088743", "Kinarut",
+"6084362", "Sibu",
+"6032297", "Kuala\ Lumpur",
+"6036021", "Batuarang",
+"609849", "Dungun",
+"6088979", "Kota\ Belud",
+"606499", "Batu\ Kikir",
+"6082301", "Kuching",
+"607738", "Lavang\-Lavang",
+"605805", "Taiping",
+"604921", "Kangar",
+"6038091", "Kinrara",
+"6035522", "Kinrara",
+"6036103", "Genting",
+"6089278", "Elopura",
+"605624", "Hutan\ Melintang",
+"609321", "Kuala\ Lipis",
+"6038723", "Semenyih",
+"6032605", "Kuala\ Lumpur",
+"605726", "Parit\ Buntar",
+"6032771", "Kuala\ Lumpur",
+"6089538", "Elopura",
+"609238", "Karak",
+"6034259", "Kuala\ Lumpur",
+"6088615", "Kudat",
+"6037661", "Kuala\ Lumpur",
+"6037480", "Kuala\ Lumpur",
+"6035191", "Kinrara",
+"6033269", "Kuala\ Selangor",
+"6078710", "Tiram",
+"605612", "Sitiawan",
+"604291", "Penang",
+"609856", "Chukai",
+"604471", "Sungai\ Bakap",
+"605388", "Bota",
+"6087810", "Sipitang",
+"6082707", "Kota\ Samarahan",
+"6087750", "Tenom",
+"604485", "Padang\ Serai",
+"6088740", "Kinarut",
+"609552", "Kuantan",
+"6032296", "Kuala\ Lumpur",
+"6033086", "Kelang",
+"605385", "Bota",
+"606294", "Melaka",
+"606474", "Palong",
+"606458", "Serting",
+"609957", "Batu\ Gajah",
+"604564", "Kepala\ Batas",
+"609776", "Bachok",
+"604488", "Padang\ Serai",
+"6038872", "Putrajaya",
+"6035482", "Kinrara",
+"6032848", "Kuala\ Lumpur",
+"604824", "Penang",
+"6082629", "Kuching",
+"607711", "Keluang",
+"6089713", "Tawau",
+"604769", "Alor\ Setar",
+"6033197", "Banting",
+"609267", "Jerantut",
+"6032686", "Kuala\ Lumpur",
+"6085463", "Miri",
+"6082471", "Kuching",
+"6037735", "Kuala\ Lumpur",
+"605750", "Kuala\ Kangsar",
+"6089853", "Kunak",
+"6085401", "Miri",
+"6037719", "Kuala\ Lumpur",
+"609820", "Paka",
+"6034289", "Kuala\ Lumpur",
+"609235", "Genting",
+"6034821", "Kuala\ Lumpur",
+"605241", "Ipoh",
+"609560", "Kuantan",
+"6037859", "Kuala\ Lumpur",
+"606906", "Muar",
+"607793", "Endau",
+"607661", "Kulai",
+"6052320", "Ipoh",
+"6032733", "Kuala\ Lumpur",
+"604619", "Penang",
+"6089727", "Tawau",
+"6088792", "Tuaran",
+"6085668", "Miri",
+"605486", "Cameron\ Highland",
+"605358", "Batu\ Gajah",
+"606728", "Seremban",
+"603928", "Kuala\ Lumpur",
+"6083548", "Maludam",
+"6083436", "Saratok",
+"609582", "Gebeng",
+"6038996", "Cheras",
+"6088880", "Ranau",
+"606471", "Simpang\ Durian",
+"6085470", "Miri",
+"6082683", "Kuching",
+"6037772", "Kuala\ Lumpur",
+"609685", "Kuala\ Brang",
+"604455", "Sungai\ Petani",
+"604561", "Kepala\ Batas",
+"6032083", "Kuala\ Lumpur",
+"6034217", "Kuala\ Lumpur",
+"609949", "Ayer\ Lanas",
+"6036130", "Kuala\ Lumpur",
+"607570", "Senai",
+"6032222", "Kuala\ Lumpur",
+"607277", "Johor\ Bahru",
+"605244", "Ipoh",
+"6088664", "Kota\ Marudu",
+"6084682", "Sarikei",
+"6085264", "Sundar",
+"6063131", "Melaka",
+"6086294", "Bintulu",
+"604356", "Tasek\ Gelugor",
+"6089942", "Tawau",
+"607766", "Mersing",
+"6082809", "Simunjan",
+"607722", "Renggam",
+"6084895", "Kuala\ Igan",
+"6036084", "Batu\ Arang",
+"609419", "Kuala\ Rompin",
+"607482", "Kangkar\ Baru",
+"604906", "Changlon",
+"605621", "Telukintan",
+"6039074", "Cheras",
+"609324", "Kuala\ Lipis",
+"609470", "Bukit\ Ibam",
+"6089674", "Elopura",
+"6085766", "Marudi",
+"6087472", "Labuan",
+"6037931", "Kuala\ Lumpur",
+"6086391", "Bintulu",
+"6039202", "Kuala\ Lumpur",
+"6082293", "Kuching",
+"609312", "Kuala\ Lipis",
+"6088969", "Kota\ Belud",
+"604320", "Penang",
+"6095070", "Kuantan",
+"6086860", "Bintulu",
+"6086469", "Belaga",
+"6089281", "Elopura",
+"6088850", "Ranau",
+"607934", "Labis",
+"6032788", "Kuala\ Lumpur",
+"609688", "Kuala\ Brang",
+"6085767", "Marudi",
+"6089792", "Semporna",
+"606357", "Tangga\ Batu",
+"605727", "Parit\ Buntar",
+"6082845", "Damai\ Beach",
+"609405", "Pekan",
+"6033242", "Sekinchan",
+"605449", "Tanjung\ Malim",
+"605753", "Kuala\ Kangsar",
+"6087486", "Labuan",
+"6087738", "Tenom",
+"6033122", "Tk\ Panglima\ Garang",
+"6088853", "Ranau",
+"6082650", "Kuching",
+"6033279", "Batang\ Berjuntai",
+"6088904", "Papar",
+"6032193", "Kuala\ Lumpur",
+"609823", "Al\ Muktafi\ Billa\ H\ Shah",
+"604673", "Penang",
+"607508", "Tanjung\ Kupang",
+"6087211", "Beaufort",
+"604924", "Changlon",
+"6082290", "Kuching",
+"6084811", "Mukah",
+"607505", "Tanjung\ Kupang",
+"6087405", "Labuan",
+"6058300", "Taiping",
+"6082539", "Kuching",
+"604499", "Baling",
+"6086328", "Bintulu",
+"6084751", "Kanowit",
+"6087729", "Tenom",
+"6032080", "Kuala\ Lumpur",
+"6033290", "Kelang",
+"6036285", "Kuala\ Lumpur",
+"60536", "Batu\ Gajah",
+"609266", "Jerantut",
+"6082279", "Kuching",
+"6087314", "Keningau",
+"604210", "Penang",
+"609222", "Bentong",
+"6083437", "Saratok",
+"6089615", "Elopura",
+"6035164", "Kinrara",
+"6088609", "Kudat",
+"604392", "Penang",
+"6088538", "Kota\ Kinabalu",
+"6082403", "Kuching",
+"605487", "Cameron\ Highland",
+"6087302", "Keningau",
+"6093141", "Kuala\ Lipis",
+"609214", "Bentong",
+"6084305", "Sibu",
+"606907", "Muar",
+"609408", "Kuala\ Rompin",
+"6082864", "Kota\ Samarahan",
+"6082737", "Lundu",
+"6084798", "Kapit",
+"6035611", "Kinrara",
+"604460", "Bedong",
+"60733", "Johor\ Bahru",
+"6039540", "Kuala\ Lumpur",
+"6038211", "Semenyih",
+"605743", "Manong",
+"6084844", "Mukah",
+"6037713", "Kuala\ Lumpur",
+"6034022", "Kuala\ Lumpur",
+"6087341", "Keningau",
+"604931", "Changlon",
+"60779", "Mersing",
+"606519", "Jasin",
+"6088351", "Kota\ Kinabalu",
+"6089517", "Beluran",
+"6089735", "Semporna",
+"607485", "Batu\ Pahat",
+"607386", "Johor\ Bahru",
+"6086303", "Bintulu",
+"606664", "Tekok\ Kemang",
+"6088671", "Kudat",
+"6088705", "Kota\ Kinabalu",
+"6089859", "Kunak",
+"605507", "Ipoh",
+"6038071", "Kinrara",
+"6089523", "Telupid",
+"606277", "Melaka",
+"609315", "Kuala\ Lipis",
+"606497", "Rembau",
+"605433", "Tapah",
+"6032023", "Kuala\ Lumpur",
+"607670", "Kulai",
+"6088970", "Kota\ Belud",
+"6038527", "Mantin",
+"604333", "Penang",
+"607516", "Tanjung\ Kupang",
+"6038966", "Cheras",
+"6035567", "Kinrara",
+"6033176", "Kelang",
+"609682", "Kuala\ Brang",
+"609946", "Ayer\ Lanas",
+"6082830", "Sebangan",
+"609585", "Gebeng",
+"6087505", "Labuan",
+"6082312", "Kuching",
+"609571", "Kuantan",
+"6037883", "Kuala\ Lumpur",
+"6034253", "Kuala\ Lumpur",
+"607488", "Batu\ Pahat",
+"6082304", "Kota\ Samarahan",
+"6088786", "Tuaran",
+"6082503", "Kuching",
+"6038094", "Kinrara",
+"6087862", "Bongawan",
+"608821", "Kota\ Kinabalu",
+"609225", "Bentong",
+"6038892", "Putrajaya",
+"609959", "Batu\ Gajah",
+"6033620", "Kelang",
+"609830", "Paka",
+"6033182", "Banting",
+"6033260", "Kuala\ Selangor",
+"6038526", "Mantin",
+"6047456", "Alor\ Setar",
+"6082491", "Kuching",
+"603893", "Cheras",
+"609269", "Damak",
+"6033177", "Kelang",
+"6088973", "Kota\ Belud",
+"6088368", "Kota\ Kinabalu",
+"6035566", "Kinrara",
+"6037664", "Kuala\ Lumpur",
+"605348", "Batu\ Gajah",
+"6088787", "Tuaran",
+"606790", "Mantin",
+"6084832", "Matu",
+"6034250", "Kuala\ Lumpur",
+"6036078", "Batu\ Arang",
+"606330", "Melaka",
+"6037880", "Kuala\ Lumpur",
+"604918", "Alor\ Setar",
+"605254", "Ipoh",
+"6082894", "Serian",
+"6034280", "Kuala\ Lumpur",
+"6034162", "Kuala\ Lumpur",
+"604398", "Penang",
+"604915", "Changlon",
+"605281", "Ipoh",
+"6039058", "Cheras",
+"6037710", "Kuala\ Lumpur",
+"6036145", "Kuala\ Lumpur",
+"6087232", "Beaufort",
+"605446", "Tapah",
+"609402", "Chini",
+"6089901", "Merotai",
+"6084235", "Sibu",
+"6039543", "Cheras",
+"607921", "Labis",
+"6066920", "Linggi",
+"609713", "Kota\ Bharu",
+"6082474", "Kuching",
+"607907", "Labis",
+"6032020", "Kuala\ Lumpur",
+"6085404", "Miri",
+"6035882", "Kinrara",
+"6088931", "Kota\ Belud",
+"6089520", "Telupid",
+"6038655", "Cheras",
+"606463", "Palong",
+"609228", "Bilut\ Valley",
+"6032276", "Kuala\ Lumpur",
+"60667", "Seremban",
+"604573", "Tasek\ Gelugor",
+"6082871", "Baki",
+"6086300", "Bintulu",
+"6082620", "Kuching",
+"6082260", "Kuching",
+"60929", "Mentakab",
+"609663", "Batu\ Rakit",
+"604500", "Kulim",
+"609286", "Kuala\ Krau",
+"60472", "Alor\ Setar",
+"6085283", "Lawas",
+"6065350", "Jasin",
+"6033165", "Kelang",
+"6033850", "Banting",
+"606979", "Tangkak",
+"6035622", "Kinrara",
+"6082808", "Simunjan",
+"606641", "Port\ Dickson",
+"6089706", "Tawau",
+"6034106", "Kuala\ Lumpur",
+"606910", "Muar",
+"6082224", "Kuching",
+"6082664", "Kota\ Samarahan",
+"605467", "Kampar",
+"6083549", "Pantu",
+"607483", "Batu\ Pahat",
+"6087774", "Tambunan",
+"6034271", "Kuala\ Lumpur",
+"605796", "Grik",
+"6088331", "Kota\ Kinabalu",
+"6033321", "Kelang",
+"6037260", "Kuala\ Lumpur",
+"6088968", "Kota\ Belud",
+"608544", "Miri",
+"6082321", "Kuching",
+"6098000", "Kerteh",
+"6086468", "Belaga",
+"607757", "Renggam",
+"6033224", "Sabak\ Bernam",
+"604367", "Serdang",
+"6083410", "Kabong",
+"6089204", "Elopura",
+"6036120", "Kuala\ Lumpur",
+"605438", "Tapah",
+"606390", "Tangga\ Batu",
+"607218", "Johor\ Bahru",
+"6036063", "Kuala\ Kubu\ Baru",
+"6034294", "Kuala\ Lumpur",
+"606224", "Melaka",
+"60448", "Kulim",
+"60645", "Bahau",
+"6088653", "Kotamarudu",
+"6082850", "Serian",
+"609583", "Gebeng",
+"605679", "Sitiawan",
+"6038761", "Semenyih",
+"609550", "Kuantan",
+"608977", "Tawau",
+"609718", "Kota\ Bharu",
+"6083413", "Kabong",
+"6035721", "Kinrara",
+"605610", "Telukintan",
+"6036243", "Kuala\ Lumpur",
+"605872", "Semanggol",
+"607426", "Parit\ Betak",
+"607651", "Layang\-Layang",
+"609668", "Batu\ Rakit",
+"6083427", "Roban",
+"604554", "Tasek\ Gelugor",
+"606468", "Ayer\ Hitam",
+"609223", "Bentong",
+"6082713", "Semantan",
+"6032265", "Kuala\ Lumpur",
+"6087739", "Tenom",
+"6038703", "Mantin",
+"604759", "Alor\ Setar",
+"6036123", "Kuala\ Lumpur",
+"6088981", "Tenghilan",
+"606429", "Bahau",
+"6038080", "Kinrara",
+"6034107", "Kuala\ Lumpur",
+"607450", "Senggarang",
+"6088608", "Kudat",
+"607209", "Johor\ Bahru",
+"6038008", "Putrajaya",
+"609665", "Kuala\ Brang",
+"6034801", "Kuala\ Lumpur",
+"6065110", "Jasin",
+"6033132", "Tk\ Panglima\ Garang",
+"606551", "Simpang\ Empat",
+"606465", "Ayer\ Hitam",
+"6085280", "Lawas",
+"609822", "Al\ Muktafi\ Billa\ H\ Shah",
+"604672", "Penang",
+"604810", "Penang",
+"608234", "Kuching",
+"609866", "Kemasik",
+"6083341", "Bandar\ Sri\ Aman",
+"605752", "Kuala\ Kangsar",
+"607684", "Pontian",
+"6084695", "Bintangor",
+"606437", "Johol",
+"6084877", "Mukah",
+"607786", "Felda\ Kahang\ Timur",
+"609637", "Kuala\ Brang",
+"6087728", "Tenom",
+"6088403", "Kota\ Kinabalu",
+"6082538", "Kuching",
+"604913", "Alor\ Setar",
+"608876", "Kinarut",
+"609814", "Paka",
+"6039771", "Kuala\ Lumpur",
+"6088515", "Kota\ Kinabalu",
+"6087885", "Kuala\ Penyu",
+"6082278", "Kuching",
+"6088617", "Kudat",
+"607910", "Tenang",
+"6089718", "Tawau",
+"604401", "Kulim",
+"6082284", "Kuching",
+"607891", "Kota\ Tinggi",
+"6033381", "Kelang",
+"6087437", "Labuan",
+"6078010", "Mersing",
+"6085601", "Miri",
+"6036034", "Rawang",
+"609540", "Kuantan",
+"6037650", "Kuala\ Lumpur",
+"6088201", "Kota\ Kinabalu",
+"609247", "Bera",
+"6084799", "Kapit",
+"604453", "Kulim",
+"6085223", "Limbang",
+"6086253", "Bintulu",
+"6085663", "Miri",
+"6036093", "Rawang",
+"604332", "Penang",
+"6034264", "Kuala\ Lumpur",
+"6086581", "Tatau",
+"604427", "Kulim",
+"6038023", "Kinrara",
+"6035120", "Kinrara",
+"6087761", "Tenom",
+"6036150", "Kuala\ Lumpur",
+"6039170", "Kuala\ Lumpur",
+"604787", "Alor\ Setar",
+"606541", "Durian\ Tunggal",
+"6089533", "Elopura",
+"6084770", "Song",
+"6032302", "Kuala\ Lumpur",
+"605432", "Trolak",
+"6036262", "Kuala\ Lumpur",
+"6035652", "Kinrara",
+"606757", "Mantin",
+"606976", "Bukit\ Gambir",
+"6036108", "Genting",
+"607440", "Batu\ Pahat",
+"6089273", "Elopura",
+"6088830", "Tuaran",
+"605353", "Ipoh",
+"6086283", "Bintulu",
+"6082381", "Kuching",
+"6034032", "Kuala\ Lumpur",
+"60745", "Sri\ Gading",
+"605594", "Chemor",
+"6088415", "Kota\ Kinabalu",
+"607224", "Johor\ Bahru",
+"6089725", "Tawau",
+"6088304", "Kota\ Kinabalu",
+"6082546", "Kuching",
+"609706", "Kota\ Bharu",
+"6033007", "Kuala\ Selangor",
+"605799", "Lenggong",
+"608221", "Kuching",
+"6033284", "Kuala\ Selangor",
+"6084632", "Selalang",
+"606651", "Port\ Dickson",
+"606426", "Ayer\ Hitam",
+"604572", "Tasek\ Gelugor",
+"6089861", "Lahad\ Datu",
+"606462", "Palong",
+"609825", "Kerteh",
+"609662", "Kuala\ Brang",
+"609451", "Bandar\ Tun\ Razak",
+"609565", "Kuantan",
+"6083472", "Betong",
+"609529", "Kuantan",
+"6032030", "Kuala\ Lumpur",
+"6032685", "Kuala\ Lumpur",
+"6084773", "Song",
+"6039173", "Kuala\ Lumpur",
+"609869", "Kemasik",
+"605380", "Pusing",
+"6082547", "Kuching",
+"6087222", "Beaufort",
+"6035541", "Kinrara",
+"606603", "Seremban",
+"607789", "Keluang",
+"609712", "Kota\ Bharu",
+"6033006", "Sabak\ Bernam",
+"60450", "Tasek\ Gelugor",
+"6089464", "Elopura",
+"6036042", "Kampong\ Suharto",
+"608991", "Tawau",
+"6089954", "Balung",
+"607468", "Sri\ Gading",
+"6088369", "Kota\ Kinabalu",
+"6087818", "Sipitang",
+"605854", "Sungai\ Nyior",
+"6034065", "Kuala\ Lumpur",
+"605676", "Changkat\ Keruing",
+"6089984", "Tawau",
+"6057180", "Parit\ Buntar",
+"605881", "Selama",
+"6087436", "Labuan",
+"608759", "Labuan",
+"607747", "Ayer\ Hitam",
+"605758", "Kuala\ Kangsar",
+"606231", "Melaka",
+"6088616", "Kudat",
+"6084644", "Sarikei",
+"609650", "Batu\ Rakit",
+"607429", "Senggarang",
+"603892", "Semenyih",
+"6084731", "Julau",
+"6039131", "Kuala\ Lumpur",
+"60644", "Tampin",
+"6035123", "Kinrara",
+"6038020", "Kinrara",
+"6039059", "Cheras",
+"6033085", "Kelang",
+"6032295", "Kuala\ Lumpur",
+"6036090", "Rawang",
+"608733", "Keningau",
+"6085481", "Bekenu",
+"6085660", "Miri",
+"609828", "Paka",
+"6085220", "Limbang",
+"6033630", "Banting",
+"609568", "Kuantan",
+"607400", "Rengit",
+"6089862", "Lahad\ Datu",
+"6086422", "Sebauh",
+"6089244", "Elopura",
+"6038740", "Semenyih",
+"6039018", "Cheras",
+"60577", "Kuala\ Kangsar",
+"6085452", "Miri",
+"607969", "Bukit\ Gambir",
+"6084308", "Sibu",
+"604911", "Alor\ Setar",
+"605285", "Ipoh",
+"607925", "Labis",
+"6083471", "Betong",
+"6088535", "Kota\ Kinabalu",
+"6084380", "Sibu",
+"608247", "Sejingkat",
+"607259", "Johor\ Bahru",
+"609367", "Dong",
+"6089618", "Elopura",
+"604890", "Penang",
+"6087889", "Membakut",
+"6088395", "Kota\ Kinabalu",
+"6035542", "Kinrara",
+"6087221", "Beaufort",
+"6087480", "Labuan",
+"605413", "Cameron\ Highland",
+"6089505", "Beluran",
+"606527", "Jasin",
+"6088519", "Kota\ Kinabalu",
+"60668", "Rembau",
+"6086325", "Bintulu",
+"6087408", "Labuan",
+"60465", "Penang",
+"6084699", "Bintangor",
+"605840", "Taiping",
+"609221", "Bentong",
+"605690", "Sitiawan",
+"606966", "Bakri",
+"6084821", "Daro",
+"6087450", "Labuan",
+"604313", "Penang",
+"607832", "Penawar",
+"607928", "Aver\ Panas",
+"6087735", "Tenom",
+"6035590", "Kinrara",
+"6039132", "Kuala\ Lumpur",
+"6084350", "Sibu",
+"6038993", "Cheras",
+"6082686", "Kuching",
+"6039025", "Kuala\ Lumpur",
+"604709", "Alor\ Setar",
+"6085482", "Kampung\ Bakam",
+"6036137", "Kuala\ Lumpur",
+"605288", "Pusing",
+"6089746", "Tawau",
+"604391", "Penang",
+"6032785", "Kuala\ Lumpur",
+"607680", "Pontian",
+"6083564", "Engkilili",
+"604629", "Penang",
+"6087453", "Labuan",
+"609575", "Kuantan",
+"6033382", "Kelang",
+"604866", "Penang",
+"6082730", "Lundu",
+"604562", "Kepala\ Batas",
+"607707", "Keluang",
+"609581", "Gebeng",
+"604526", "Kulim",
+"606472", "Kuala\ Klawang",
+"606292", "Melaka",
+"6058307", "Selama",
+"607721", "Renggam",
+"6032087", "Kuala\ Lumpur",
+"609913", "Gua\ Musang",
+"6033297", "Kelang",
+"605528", "Ipoh",
+"6089747", "Tawau",
+"6036136", "Kuala\ Lumpur",
+"607298", "Johor\ Bahru",
+"604938", "Kangar",
+"603831", "Putrajaya",
+"608825", "Kota\ Kinabalu",
+"6088886", "Ranau",
+"6083430", "Saratok",
+"6038990", "Cheras",
+"608565", "Miri",
+"6085614", "Miri",
+"6084353", "Sibu",
+"6082687", "Kuching",
+"606379", "Tangga\ Batu",
+"6084765", "Kanowit",
+"608828", "Kota\ Kinabalu",
+"6084898", "Sibu",
+"6036261", "Kuala\ Lumpur",
+"6035651", "Kinrara",
+"605829", "Taiping",
+"6084383", "Sibu",
+"6032301", "Kuala\ Lumpur",
+"607481", "Kangkar\ Baru",
+"6033169", "Kelang",
+"6038691", "Semenyih",
+"605525", "Ipoh",
+"6089557", "Kinabatangan",
+"607475", "Sri\ Gading",
+"607295", "Johor\ Bahru",
+"605622", "Telukintan",
+"6039224", "Kuala\ Lumpur",
+"6034031", "Kuala\ Lumpur",
+"604967", "Kuah",
+"604223", "Penang",
+"6082382", "Kuching",
+"6085760", "Marudi",
+"605837", "Selama",
+"604668", "Penang",
+"605614", "Sitiawan",
+"609759", "Pasirputih",
+"609443", "Bandar\ Tun\ Razak",
+"6083545", "Pantu",
+"606643", "Port\ Dickson",
+"605716", "Parit\ Buntar",
+"6087483", "Labuan",
+"6084631", "Selalang",
+"607734", "Ayer\ Hitam",
+"6037886", "Kuala\ Lumpur",
+"609787", "Machang",
+"604289", "Penang",
+"6034256", "Kuala\ Lumpur",
+"607220", "Johor\ Bahru",
+"6088344", "Kota\ Kinabalu",
+"606969", "Bukit\ Kepong",
+"6088783", "Tuaran",
+"6082506", "Kuching",
+"6033610", "Kuala\ Selangor",
+"6083464", "Debak",
+"605883", "Taiping",
+"6037202", "Kuala\ Lumpur",
+"6084238", "Sibu",
+"6038963", "Cheras",
+"6032299", "Kuala\ Lumpur",
+"6047450", "Alor\ Setar",
+"6088977", "Kota\ Belud",
+"6038520", "Kinrara",
+"6089295", "Elopura",
+"6036148", "Kuala\ Lumpur",
+"607444", "Senggarang",
+"606233", "Melaka",
+"6039055", "Cheras",
+"605477", "Kampar",
+"607527", "Kangkar\ Pulai",
+"6082555", "Kuching",
+"6088982", "Tenghilan",
+"607867", "Tiram",
+"6082764", "Bau",
+"6039085", "Cheras",
+"6082626", "Kuching",
+"604377", "Penang",
+"606601", "Seremban",
+"606536", "Jasin",
+"6032270", "Kuala\ Lumpur",
+"6036075", "Kuala\ Kubu\ Baru",
+"607922", "Bekok",
+"604540", "Tasek\ Gelugor",
+"605282", "Ipoh",
+"6034802", "Kuala\ Lumpur",
+"607256", "Johor\ Bahru",
+"6089967", "Lahad\ Datu",
+"6039368", "Kuala\ Lumpur",
+"6083342", "Bandar\ Sri\ Aman",
+"6032026", "Kuala\ Lumpur",
+"6039547", "Cheras",
+"6038688", "Putrajaya",
+"606653", "Port\ Dickson",
+"607914", "Tenang",
+"604683", "Penang",
+"609453", "Bukit\ Ibam",
+"6039772", "Kuala\ Lumpur",
+"607838", "Penawar",
+"605804", "Taiping",
+"609544", "Kuantan",
+"6084229", "Sibu",
+"6038600", "Kinrara",
+"6089510", "Beluran",
+"604932", "Ayer\ Hitam",
+"605625", "Telukintan",
+"6038408", "Cheras",
+"605522", "Ipoh",
+"6032027", "Kuala\ Lumpur",
+"6089966", "Lahad\ Datu",
+"608257", "Kuching",
+"6086307", "Bintulu",
+"6082627", "Kuching",
+"6032273", "Kuala\ Lumpur",
+"609480", "Maran",
+"6035621", "Kinrara",
+"605669", "Sitiawan",
+"6038661", "Mantin",
+"6084612", "Rejang",
+"608223", "Kuching",
+"6032800", "Kuala\ Lumpur",
+"6089513", "Beluran",
+"6087508", "Labuan",
+"60464", "Penang",
+"6037717", "Kuala\ Lumpur",
+"6034287", "Kuala\ Lumpur",
+"6085790", "Miri",
+"6032725", "Kuala\ Lumpur",
+"609977", "Machang",
+"6032393", "Kuala\ Lumpur",
+"6089729", "Tawau",
+"6039546", "Cheras",
+"604568", "Sungai\ Bakap",
+"6033322", "Kelang",
+"6088332", "Kota\ Kinabalu",
+"605719", "Parit\ Buntar",
+"604828", "Penang",
+"605351", "Batu\ Gajah",
+"6082507", "Kuching",
+"607990", "Bakri",
+"606475", "Ayer\ Hitam",
+"6036274", "Kuala\ Lumpur",
+"606295", "Melaka",
+"604626", "Penang",
+"609681", "Kuala\ Brang",
+"604565", "Kepala\ Batas",
+"604451", "Jeniang",
+"6037872", "Kuala\ Lumpur",
+"6082322", "Kuching",
+"6088780", "Kota\ Kinabalu",
+"609572", "Kuantan",
+"6044110", "Serdang",
+"6085779", "Long\ Lama",
+"6032858", "Kuala\ Lumpur",
+"604869", "Penang",
+"6034257", "Kuala\ Lumpur",
+"6089843", "Kunak",
+"605850", "Sungai\ Nyior",
+"6037887", "Kuala\ Lumpur",
+"6036460", "Kerling",
+"6085742", "Beluru",
+"609234", "Karak",
+"604403", "Kulim",
+"608822", "Kota\ Kinabalu",
+"6033170", "Kelang",
+"603806", "Kinrara",
+"6038523", "Kinrara",
+"607893", "Kota\ Tinggi",
+"6038324", "Putrajaya",
+"6047453", "Alor\ Setar",
+"6082709", "Kota\ Samarahan",
+"604537", "Tasek\ Gelugor",
+"6088976", "Kota\ Belud",
+"6039195", "Kuala\ Lumpur",
+"6082275", "Kuching",
+"6038891", "Putrajaya",
+"603404", "Kuala\ Lumpur",
+"604324", "Penang",
+"6087888", "Membakut",
+"605885", "Taiping",
+"6088518", "Kota\ Kinabalu",
+"604419", "Sungai\ Petani",
+"607652", "Kulai",
+"6036127", "Kuala\ Lumpur",
+"6033181", "Banting",
+"6038707", "Mantin",
+"6036066", "Kuala\ Kubu\ Baru",
+"608847", "Kota\ Kinabalu",
+"6082492", "Kuching",
+"6087725", "Tenom",
+"606235", "Melaka",
+"604290", "Penang",
+"6085784", "Bakun",
+"607930", "Labis",
+"6084698", "Bintangor",
+"6087409", "Labuan",
+"6088656", "Kotamarudu",
+"606560", "Simpang\ Empat",
+"604597", "Parit\ Buntar",
+"6039019", "Cheras",
+"6084831", "Matu",
+"6088605", "Kudat",
+"609474", "Kota\ Gelangi",
+"609294", "Kuala\ Krau",
+"606776", "Seremban",
+"604688", "Penang",
+"609458", "Bukit\ Ibam",
+"606658", "Sepang",
+"6089619", "Elopura",
+"604987", "Kangar",
+"6083417", "Betong",
+"605240", "Ipoh",
+"606856", "Mantin",
+"609455", "Bukit\ Ibam",
+"609561", "Kuantan",
+"6034161", "Kuala\ Lumpur",
+"604685", "Penang",
+"6035484", "Kinrara",
+"606655", "Port\ Dickson",
+"606552", "Simpang\ Empat",
+"609821", "Sri\ Gading",
+"604886", "Penang",
+"6032268", "Kuala\ Lumpur",
+"6089902", "Merotai",
+"605412", "Trolak",
+"6087231", "Beaufort",
+"604949", "Kangar",
+"607660", "Kulai",
+"6084873", "Mukah",
+"605370", "Batu\ Gajah",
+"6082887", "Serian",
+"6085286", "Lawas",
+"6033275", "Batang\ Berjuntai",
+"605751", "Kuala\ Kangsar",
+"607710", "Keluang",
+"609356", "Raub",
+"6088794", "Tuaran",
+"6032114", "Kuala\ Lumpur",
+"605547", "Ipoh",
+"605888", "Taiping",
+"6089703", "Tawau",
+"6034103", "Kuala\ Lumpur",
+"6087718", "Tenom",
+"6084870", "Mukah",
+"604956", "Kuah",
+"605406", "Tapah",
+"609279", "Mentakab",
+"6035612", "Kinrara",
+"606545", "Durian\ Tunggal",
+"606986", "Bakri",
+"606699", "Linggi",
+"606642", "Port\ Dickson",
+"6087342", "Keningau",
+"6088352", "Kota\ Kinabalu",
+"604222", "Penang",
+"6034021", "Kuala\ Lumpur",
+"6094310", "Pekan",
+"6034100", "Kuala\ Lumpur",
+"60782", "Penggerang",
+"605623", "Telukintan",
+"607898", "Tenggara",
+"6033856", "Sabak\ Bernam",
+"6085287", "Lawas",
+"6082886", "Serian",
+"609732", "Kota\ Bharu",
+"604408", "Kulim",
+"608225", "Kuching",
+"603209", "Kuala\ Lumpur",
+"6085495", "Miri",
+"6089436", "Kinabatangan",
+"6092871", "Kuala\ Krau",
+"6033214", "Sabak\ Bernam",
+"6087803", "Sipitang",
+"604405", "Padang\ Serai",
+"6089818", "Lahad\ Datu",
+"6088657", "Kotamarudu",
+"607599", "Senai",
+"6082716", "Semantan",
+"6092620", "Jerantut",
+"609912", "Gua\ Musang",
+"605530", "Tanjung\ Rambutan",
+"607696", "Pontian",
+"6087464", "Labuan",
+"6037610", "Kuala\ Lumpur",
+"604920", "Kangar",
+"607895", "Air\ Tawar",
+"6082311", "Kuching",
+"607794", "Endau",
+"6038706", "Mantin",
+"6036126", "Kuala\ Lumpur",
+"6082720", "Lundu",
+"6084364", "Sibu",
+"606473", "Kemavan",
+"606293", "Melaka",
+"605237", "Ipoh",
+"6082805", "Simunjan",
+"604563", "Sungai\ Bakap",
+"6033168", "Kelang",
+"604306", "Penang",
+"6035524", "Kinrara",
+"6087861", "Bongawan",
+"607560", "Senai",
+"6033241", "Sekinchan",
+"6084239", "Sibu",
+"605415", "Tapah",
+"6032298", "Kuala\ Lumpur",
+"606461", "Ladanggeddes",
+"604571", "Tasek\ Gelugor",
+"6082543", "Kuching",
+"609452", "Bukit\ Ibam",
+"604946", "Kangar",
+"607674", "Pontian",
+"6089536", "Elopura",
+"6036187", "Kuala\ Lumpur",
+"607658", "Kulai",
+"6087828", "Kuala\ Penyu",
+"6032036", "Kuala\ Lumpur",
+"6084777", "Song",
+"6087212", "Beaufort",
+"6089276", "Elopura",
+"6038659", "Cheras",
+"605897", "Semanggol",
+"608685", "Bintulu",
+"607267", "Johor\ Bahru",
+"607923", "Bukit\ Kepong",
+"6086286", "Bintulu",
+"605689", "Sitiawan",
+"6038861", "Putrajaya",
+"606232", "Melaka",
+"6084812", "Stapang",
+"6098710", "Cheneh",
+"6038689", "Putrajaya",
+"606660", "Tekok\ Kemang",
+"604416", "Sungai\ Petani",
+"609460", "Maran",
+"6088745", "Kinarut",
+"6082827", "Asajaya",
+"6085666", "Limbang",
+"6086256", "Bintulu",
+"6084752", "Kanowit",
+"607655", "Kulai",
+"6036157", "Kuala\ Lumpur",
+"6038026", "Kinrara",
+"6084228", "Sibu",
+"604464", "Jeniang",
+"6032688", "Kuala\ Lumpur",
+"6033344", "Kelang",
+"6084804", "Sarikei",
+"6087301", "Keningau",
+"6032600", "Kuala\ Lumpur",
+"605418", "Tapah",
+"6036156", "Kuala\ Lumpur",
+"6035126", "Kinrara",
+"607892", "Kota\ Tinggi",
+"6083324", "Bandar\ Sri\ Aman",
+"6087509", "Labuan",
+"6082592", "Kota\ Samarahan",
+"607596", "Senai",
+"609915", "Gua\ Musang",
+"605226", "Ipoh",
+"6037771", "Kuala\ Lumpur",
+"6038027", "Kinrara",
+"6089728", "Tawau",
+"607699", "Pontian",
+"608823", "Kota\ Kinabalu",
+"6086257", "Bintulu",
+"604402", "Kulim",
+"6085667", "Miri",
+"609738", "Kota\ Bharu",
+"6083450", "Saratok",
+"6082826", "Asajaya",
+"603551", "Kinrara",
+"606648", "Port\ Dickson",
+"6084681", "Sarikei",
+"6084394", "Sibu",
+"604331", "Penang",
+"6084869", "Kuala\ Igan",
+"6038800", "Putrajaya\/Cyberjaya",
+"6032603", "Kuala\ Lumpur",
+"6038725", "Semenyih",
+"6032847", "Kuala\ Lumpur",
+"6035110", "Kinrara",
+"6036105", "Genting",
+"6033198", "Banting",
+"60793", "Segamat",
+"6089941", "Tawau",
+"6088613", "Kudat",
+"60447", "Baling",
+"6082810", "Asajaya",
+"604228", "Penang",
+"604309", "Sungai\ Petani",
+"609573", "Kuantan",
+"6082750", "Kota\ Samarahan",
+"604959", "Kuah",
+"609276", "Mentakab",
+"604830", "Penang",
+"606794", "Mantin",
+"6034051", "Kuala\ Lumpur",
+"60537", "Pusing",
+"606989", "Bakri",
+"6082780", "Gedong",
+"606696", "Linggi",
+"604269", "Penang",
+"609767", "Bachok",
+"606645", "Port\ Dickson",
+"6082708", "Kota\ Samarahan",
+"607211", "Johor\ Bahru",
+"606334", "Melaka",
+"606542", "Durian\ Tunggal",
+"6039201", "Kuala\ Lumpur",
+"6037932", "Kuala\ Lumpur",
+"605431", "Besout",
+"609445", "Bandar\ Tun\ Razak",
+"607887", "Kota\ Tinggi",
+"6089277", "Elopura",
+"6032859", "Kuala\ Lumpur",
+"609834", "Bukit\ Besi",
+"6083480", "Betong",
+"609735", "Kota\ Bharu",
+"6088709", "Kinarut",
+"6089855", "Kunak",
+"6036186", "Kuala\ Lumpur",
+"6037733", "Kuala\ Lumpur",
+"6083408", "Maludam",
+"6089537", "Elopura",
+"6087874", "Weston",
+"604933", "Kuah",
+"6089715", "Tawau",
+"609918", "Gua\ Musang",
+"6032037", "Kuala\ Lumpur",
+"6036263", "Kuala\ Lumpur",
+"6035653", "Kinrara",
+"6084381", "Sibu",
+"6083470", "Betong",
+"6032032", "Kuala\ Lumpur",
+"6084694", "Bintangor",
+"607751", "Lavang\-Lavang",
+"6032303", "Kuala\ Lumpur",
+"6089287", "Elopura",
+"605710", "Parit\ Buntar",
+"6089532", "Elopura",
+"6089925", "Tawau",
+"607424", "Rengit",
+"6038741", "Semenyih",
+"6086282", "Bintulu",
+"6087884", "Kuala\ Penyu",
+"608421", "Sibu",
+"6089272", "Elopura",
+"6087216", "Beaufort",
+"607412", "Batu\ Pahat",
+"609489", "Maran",
+"6032245", "Kuala\ Lumpur",
+"6082770", "Bau",
+"6033109", "Pulau\ Ketam",
+"603796", "Kuala\ Lumpur",
+"603745", "Kuala\ Lumpur",
+"607240", "Johor\ Bahru",
+"6087481", "Labuan",
+"6084633", "Selalang",
+"604852", "Penang",
+"609768", "Bachok",
+"609447", "Bandar\ Tun\ Razak",
+"6087451", "Labuan",
+"6084820", "Daro",
+"604253", "Penang",
+"6032938", "Kuala\ Lumpur",
+"608236", "Kuching",
+"606647", "Port\ Dickson",
+"609864", "Kemasik",
+"6039105", "Cheras",
+"609765", "Bachok",
+"6084671", "Sarikei",
+"6032264", "Kuala\ Lumpur",
+"604963", "Kuah",
+"604227", "Penang",
+"606316", "Durian\ Tunggal",
+"6086252", "Bintulu",
+"6085662", "Miri",
+"606415", "Tampin",
+"6036092", "Rawang",
+"6085222", "Limbang",
+"604860", "Penang",
+"609816", "Dungun",
+"6032118", "Kuala\ Lumpur",
+"6088798", "Tuaran",
+"6084816", "Rejang",
+"605930", "Sitiawan",
+"6087854", "Bongawan",
+"605859", "Taiping",
+"604201", "Penang",
+"607686", "Pontian",
+"6084351", "Miri",
+"6082597", "Kuching",
+"6085758", "Marudi",
+"6038022", "Kinrara",
+"6035591", "Kinrara",
+"607784", "Kahang",
+"607885", "Kota\ Tinggi",
+"605461", "Tapah",
+"6082731", "Lundu",
+"6089205", "Elopura",
+"6037652", "Kuala\ Lumpur",
+"605417", "Tapah",
+"6034295", "Kuala\ Lumpur",
+"609284", "Mentakab",
+"604997", "Kangar",
+"6084823", "Daro",
+"6033145", "Banting",
+"606523", "Jasin",
+"6038991", "Cheras",
+"6035035", "Kinrara",
+"608243", "Sejingkat",
+"607530", "Senai",
+"609609", "Bandar\ Permaisuri",
+"607265", "Johor\ Bahru",
+"6082596", "Kuching",
+"606960", "Bukit\ Gambir",
+"605794", "Grik",
+"6035122", "Kinrara",
+"6083300", "Bandar\ Sri\ Aman",
+"608988", "Lahad\ Datu",
+"605895", "Taiping",
+"609363", "Fraser\ Hill",
+"606431", "Gemencheh",
+"6033225", "Sabak\ Bernam",
+"6082822", "Asajaya",
+"605846", "Taiping",
+"605542", "Ipoh",
+"605599", "Chemor",
+"604280", "Penang",
+"6085635", "Miri",
+"605645", "Bagan\ Datoh",
+"609631", "Kuala\ Brang",
+"6083569", "Engkilili",
+"6082225", "Kuching",
+"604434", "Padang\ Serai",
+"6082665", "Kota\ Samarahan",
+"6032388", "Kuala\ Lumpur",
+"6087217", "Beaufort",
+"6036177", "Kuala\ Lumpur",
+"6087468", "Labuan",
+"607657", "Kulai",
+"6038690", "Semenyih",
+"607305", "Johor\ Bahru",
+"605648", "Hutan\ Melintang",
+"608842", "Kota\ Kinabalu",
+"6084772", "Song",
+"6039172", "Kuala\ Lumpur",
+"6089565", "Kinabatangan",
+"6087775", "Tambunan",
+"607268", "Johor\ Bahru",
+"605898", "Semanggol",
+"6089814", "Tungku",
+"6032300", "Kuala\ Lumpur",
+"6083473", "Betong",
+"6035650", "Kinrara",
+"6089286", "Elopura",
+"606226", "Melaka",
+"604549", "Tasek\ Gelugor",
+"604592", "Parit\ Buntar",
+"606630", "Seremban",
+"609430", "Pekan",
+"6087223", "Beaufort",
+"604744", "Alor\ Setar",
+"604982", "Kangar",
+"609961", "Kuala\ Krai",
+"6085761", "Layang\-Layang",
+"6087208", "Beaufort",
+"6036736", "Batu\ Arang",
+"603261", "Kuala\ Lumpur",
+"6033084", "Kelang",
+"606424", "Batu\ Kikir",
+"609762", "Pasir\ Putih",
+"606547", "Durian\ Tunggal",
+"609726", "Kota\ Bharu",
+"6038988", "Cheras",
+"605321", "Ipoh",
+"606319", "Melaka",
+"6084850", "Dalat",
+"6039765", "Cheras",
+"6089985", "Tawau",
+"6089667", "Elopura",
+"6083469", "Sebuyau",
+"607882", "Kota\ Tinggi",
+"609819", "Paka",
+"605655", "Kampong\ Gajah",
+"6038052", "Kinrara",
+"607586", "Senai",
+"6088349", "Kota\ Kinabalu",
+"605856", "Taiping",
+"606240", "Melaka",
+"607945", "Tenang",
+"607689", "Pontian",
+"6088652", "Kotamarudu",
+"6035561", "Kinrara",
+"604620", "Penang",
+"6084645", "Sarikei",
+"6038521", "Sepang",
+"6047451", "Alor\ Setar",
+"609750", "Kota\ Bharu",
+"6084224", "Sibu",
+"6034819", "Kuala\ Lumpur",
+"607897", "Tiram",
+"6085282", "Lawas",
+"608852", "Kota\ Kinabalu",
+"6089465", "Elopura",
+"605674", "Bruas",
+"607283", "Johor\ Bahru",
+"604407", "Serdang",
+"6038082", "Kinrara",
+"6035623", "Kinrara",
+"609486", "Jengka\ Tiga\ Belas",
+"6032011", "Kuala\ Lumpur",
+"6038601", "Kinrara",
+"6037948", "Kuala\ Lumpur",
+"6088357", "Kota\ Kinabalu",
+"6089511", "Beluran",
+"6087250", "Beaufort",
+"607364", "Johor\ Bahru",
+"6038775", "Mantin",
+"6038958", "Cheras",
+"608633", "Bintulu",
+"6084880", "Daro",
+"604778", "Pokok\ Sena",
+"6084808", "Sibu",
+"60974", "Kota\ Bharu",
+"6033348", "Kelang",
+"604559", "Tasek\ Gelugor",
+"6085739", "Batu\ Niah",
+"605820", "Taiping",
+"6037832", "Kuala\ Lumpur",
+"6032391", "Kuala\ Lumpur",
+"607415", "Batu\ Pahat",
+"6032106", "Kuala\ Lumpur",
+"6035620", "Kinrara",
+"607523", "Senai",
+"605293", "Tanjung\ Rambutan",
+"605473", "Bagan\ Datoh",
+"607863", "Tiram",
+"6038660", "Mantin",
+"608845", "Kota\ Kinabalu",
+"6088414", "Kota\ Kinabalu",
+"607302", "Johor\ Bahru",
+"605548", "Ipoh",
+"6034009", "Kuala\ Lumpur",
+"6083570", "Lingga",
+"6038076", "Kinrara",
+"607741", "Felda\ Kahang\ Timur",
+"6033852", "Banting",
+"6082882", "Serian",
+"606229", "Melaka",
+"6038216", "Kuala\ Lumpur",
+"604985", "Kangar",
+"605211", "Ipoh",
+"6088402", "Kota\ Kinabalu",
+"6037865", "Kuala\ Lumpur",
+"6032107", "Kuala\ Lumpur",
+"607250", "Johor\ Bahru",
+"604899", "Penang",
+"607409", "Parit\ Sulong",
+"606265", "Sungai\ Rambai",
+"6084398", "Sibu",
+"607960", "Gemas",
+"609783", "Bachok",
+"608434", "Sibu",
+"6088356", "Kota\ Kinabalu",
+"606530", "Jasin",
+"604595", "Parit\ Buntar",
+"6085791", "Miri",
+"604700", "Alor\ Setar",
+"6038329", "Putrajaya",
+"6083339", "Bandar\ Sri\ Aman",
+"609423", "Chini",
+"604598", "Parit\ Buntar",
+"6034265", "Kuala\ Lumpur",
+"604988", "Kangar",
+"609457", "Chini",
+"604687", "Penang",
+"606958", "Bukit\ Gambir",
+"606974", "Pagoh",
+"6036242", "Kuala\ Lumpur",
+"6036737", "Kuala\ Kubu\ Baru",
+"6088781", "Tuaran",
+"605642", "Hutan\ Melintang",
+"605699", "Sitiawan",
+"6038961", "Cheras",
+"609606", "Tenang",
+"605545", "Ipoh",
+"609531", "Kuantan",
+"6082712", "Semantan",
+"603217", "Kuala\ Lumpur",
+"6082285", "Kuching",
+"6036122", "Kuala\ Lumpur",
+"6089666", "Elopura",
+"6036461", "Kerling",
+"605892", "Semanggol",
+"605849", "Taiping",
+"605596", "Chemor",
+"6036035", "Batuarang",
+"607262", "Johor\ Bahru",
+"6036279", "Kuala\ Lumpur",
+"609509", "Kuantan",
+"604373", "Penang",
+"607226", "Johor\ Bahru",
+"608848", "Kota\ Kinabalu",
+"6086486", "Balingan",
+"6089614", "Elopura",
+"6035165", "Kinrara",
+"607943", "Tenang",
+"6087801", "Sipitang",
+"607288", "Johor\ Bahru",
+"6082313", "Kuching",
+"6038890", "Putrajaya",
+"6084304", "Sibu",
+"604538", "Tasek\ Gelugor",
+"6082865", "Kota\ Samarahan",
+"6033180", "Banting",
+"6089248", "Elopura",
+"6036195", "Kuala\ Lumpur",
+"604962", "Kuah",
+"6034252", "Kuala\ Lumpur",
+"6039274", "Kuala\ Lumpur",
+"605536", "Tanjung\ Rambutan",
+"604926", "Ayer\ Hitam",
+"609981", "Kuala\ Krai",
+"6037882", "Kuala\ Lumpur",
+"6087404", "Labuan",
+"6038766", "Semenyih",
+"609975", "Machang",
+"604252", "Penang",
+"6037877", "Kuala\ Lumpur",
+"6084830", "Matu",
+"6087863", "Bongawan",
+"6087315", "Keningau",
+"6082502", "Kuching",
+"609591", "Kuantan",
+"6088799", "Tuaran",
+"6032119", "Kuala\ Lumpur",
+"6087230", "Beaufort",
+"608532", "Miri",
+"609264", "Mentakab",
+"604827", "Penang",
+"6085759", "Marudi",
+"607413", "Batu\ Pahat",
+"609954", "Machang",
+"606477", "Palong",
+"609978", "Kuala\ Krai",
+"6039776", "Kuala\ Lumpur",
+"6037712", "Kuala\ Lumpur",
+"6034023", "Kuala\ Lumpur",
+"6082798", "Tebedu",
+"604260", "Penang",
+"608258", "Kuching",
+"6082622", "Kuching",
+"6082844", "Damai\ Beach",
+"6032022", "Kuala\ Lumpur",
+"604950", "Kuah",
+"60777", "Keluang",
+"6035880", "Kinrara",
+"607271", "Johor\ Bahru",
+"603780", "Kuala\ Lumpur",
+"606980", "Bukit\ Gambir",
+"6033093", "Pulau\ Ketam",
+"6034020", "Kuala\ Lumpur",
+"604248", "Penang",
+"609350", "Raub",
+"6094311", "Pekan",
+"605376", "Bota",
+"6033326", "Kelang",
+"604593", "Parit\ Buntar",
+"6084871", "Mukah",
+"609785", "Pasirputih",
+"6083568", "Engkilili",
+"6084620", "Sarikei",
+"6087233", "Beaufort",
+"609771", "Kota\ Bharu",
+"607764", "Felda\ Tenggaroh",
+"607865", "Tiram",
+"6086457", "Belaga",
+"604378", "Penang",
+"608843", "Kota\ Kinabalu",
+"605481", "Tanjung\ Malim",
+"6085618", "Miri",
+"607666", "Kulai",
+"606901", "Muar",
+"6039075", "Cheras",
+"606384", "Tangga\ Batu",
+"6037910", "Kuala\ Lumpur",
+"605246", "Ipoh",
+"606850", "Mantin",
+"604511", "Padang\ Serai",
+"6089701", "Tawau",
+"6034101", "Kuala\ Lumpur",
+"6089675", "Elopura",
+"6037611", "Kuala\ Lumpur",
+"6088665", "Kotamarudu",
+"6033183", "Banting",
+"6087391", "Keningau",
+"606514", "Jasin",
+"606770", "Seremban",
+"6085265", "Sundar",
+"6038893", "Putrajaya",
+"605543", "Ipoh",
+"607868", "Tiram",
+"606351", "Tangga\ Batu",
+"605721", "Parit\ Buntar",
+"6086295", "Bintulu",
+"6036055", "Kuala\ Kubu\ Baru",
+"6092870", "Kuala\ Krau",
+"6088972", "Kota\ Belud",
+"604375", "Penang",
+"608242", "Kuching",
+"609362", "Fraser\ Hill",
+"607528", "Kangkar\ Pulai",
+"6084894", "Stapang",
+"605478", "Tapah",
+"6032389", "Kuala\ Lumpur",
+"609788", "Kok\ Lanas",
+"6037876", "Kuala\ Lumpur",
+"6082326", "Kuching",
+"6086449", "Pelagus",
+"606522", "Jasin",
+"604476", "Kupang",
+"6084833", "Matu",
+"609851", "Chukai",
+"6057970", "Grik",
+"609900", "Gua\ Musang",
+"605680", "Sitiawan",
+"603873", "Semenyih",
+"6038767", "Semenyih",
+"6083468", "Sebuyau",
+"605838", "Selama",
+"604667", "Penang",
+"6085405", "Miri",
+"607705", "Keluang",
+"604968", "Kuah",
+"6088348", "Kota\ Kinabalu",
+"6089790", "Merotai",
+"609340", "Sungai\ Koyan",
+"604258", "Penang",
+"604717", "Pokok\ Sena",
+"6087209", "Beaufort",
+"6085456", "Miri",
+"605256", "Ipoh",
+"608827", "Kota\ Kinabalu",
+"6089866", "Lahad\ Datu",
+"6082292", "Kuching",
+"6036144", "Kuala\ Lumpur",
+"6092590", "Karak",
+"609270", "Mentakab",
+"6033120", "Tk\ Panglima\ Garang",
+"6084234", "Sibu",
+"6037731", "Kuala\ Lumpur",
+"6038989", "Cheras",
+"607477", "Sri\ Gading",
+"607297", "Johor\ Bahru",
+"605527", "Ipoh",
+"6035195", "Kinrara",
+"6037773", "Kuala\ Lumpur",
+"6082682", "Kuching",
+"6084736", "Julau",
+"6086232", "Bintulu",
+"6037949", "Kuala\ Lumpur",
+"6038959", "Cheras",
+"607883", "Kota\ Tinggi",
+"6032223", "Kuala\ Lumpur",
+"6084809", "Sibu",
+"6082895", "Serian",
+"6032082", "Kuala\ Lumpur",
+"6033292", "Kelang",
+"6033349", "Kelang",
+"6085738", "Batu\ Niah",
+"6088207", "Kota\ Kinabalu",
+"607980", "Bakri",
+"6038011", "Kinrara",
+"604929", "Alor\ Setar",
+"6037972", "Kuala\ Lumpur",
+"6084683", "Sarikei",
+"6087431", "Labuan",
+"606491", "Simpang\ Durian",
+"604255", "Penang",
+"6032775", "Kuala\ Lumpur",
+"6032601", "Kuala\ Lumpur",
+"609841", "Dungun",
+"607708", "Keluang",
+"607590", "Senai",
+"605636", "Sabak\ Bernam",
+"605220", "Ipoh",
+"6038684", "Putrajaya",
+"605501", "Ipoh",
+"6037665", "Kuala\ Lumpur",
+"6088611", "Kudat",
+"605893", "Taiping",
+"6088695", "Kudat",
+"609365", "Dong",
+"6085295", "Lawas",
+"608245", "Kuching",
+"60769", "Air\ Baloi",
+"607927", "Tenang",
+"605287", "Pusing",
+"609414", "Kuala\ Rompin",
+"6087766", "Tambunan",
+"605643", "Hutan\ Melintang",
+"6082305", "Kuching",
+"6038095", "Kinrara",
+"6037770", "Kuala\ Lumpur",
+"6085472", "Miri",
+"609208", "Sungai\ Tekam",
+"609329", "Padangtengku",
+"606614", "Kuala\ Klawang",
+"6082402", "Kuching",
+"605811", "Taiping",
+"604242", "Penang",
+"6082751", "Bau",
+"607850", "Tiram",
+"6084680", "Sarikei",
+"6088206", "Kota\ Kinabalu",
+"606525", "Jasin",
+"606666", "Sepang",
+"609466", "Maran",
+"604410", "Kulim",
+"6087303", "Keningau",
+"6087504", "Labuan",
+"605310", "Ipoh",
+"609944", "Ayer\ Lanas",
+"6033243", "Sekinchan",
+"609782", "Bachok",
+"6088704", "Kota\ Kinabalu",
+"6039200", "Kuala\ Lumpur",
+"605379", "Batu\ Gajah",
+"6082781", "Gedong",
+"607514", "Tanjung\ Kupang",
+"6034050", "Kuala\ Lumpur",
+"6082541", "Sejingkat",
+"607303", "Johor\ Bahru",
+"604940", "Kangar",
+"6088852", "Ranau",
+"604611", "Penang",
+"6083338", "Bandar\ Sri\ Aman",
+"6033123", "Tk\ Panglima\ Garang",
+"6038328", "Putrajaya",
+"609205", "Jerantut",
+"605292", "Tanjung\ Rambutan",
+"605249", "Ipoh",
+"607522", "Senai",
+"609368", "Raub",
+"608248", "Kuching",
+"6089867", "Lahad\ Datu",
+"6083220", "Bandar\ Sri\ Aman",
+"607862", "Tiram",
+"604264", "Penang",
+"6036131", "Kuala\ Lumpur",
+"6084753", "Kanowit",
+"6084365", "Sibu",
+"609853", "Chukai",
+"6082804", "Simunjan",
+"609567", "Kuantan",
+"605404", "Tapah",
+"606799", "Mantin",
+"609827", "Paka",
+"6088669", "Kota\ Marudu",
+"6082590", "Kuching",
+"6085471", "Miri",
+"6088881", "Ranau",
+"603784", "Kuala\ Lumpur",
+"6035525", "Kinrara",
+"606984", "Bukit\ Gambir",
+"609801", "Paka",
+"605757", "Kuala\ Kangsar",
+"606432", "Gemencheh",
+"6082401", "Kuching",
+"607748", "Keluang",
+"609632", "Kuala\ Brang",
+"609260", "Jerantut",
+"6089568", "Kinabatangan",
+"605541", "Ipoh",
+"6082752", "Kuching",
+"606353", "Tangga\ Batu",
+"605723", "Parit\ Buntar",
+"6087465", "Labuan",
+"609950", "Machang",
+"6082668", "Kota\ Samarahan",
+"6032385", "Kuala\ Lumpur",
+"6063130", "Melaka",
+"6082228", "Kuching",
+"609839", "Merchang",
+"609300", "Mentakab",
+"6085638", "Miri",
+"6086390", "Bintulu",
+"6036047", "Kerling",
+"607745", "Renggam",
+"604513", "Padang\ Serai",
+"6085494", "Bekenu",
+"607467", "Sri\ Gading",
+"6082542", "Sejingkat",
+"6087227", "Beaufort",
+"6082782", "Gedong",
+"609538", "Kuantan",
+"6033148", "Banting",
+"6089280", "Elopura",
+"6032191", "Kuala\ Lumpur",
+"6083477", "Betong",
+"604981", "Kangar",
+"603888", "Putrajaya",
+"6088851", "Ranau",
+"60676", "Seremban",
+"6039235", "Kuala\ Lumpur",
+"609252", "Triang",
+"6095071", "Kuantan",
+"6089208", "Elopura",
+"6087213", "Beaufort",
+"609773", "Kota\ Bharu",
+"6085755", "Marudi",
+"6087226", "Beaufort",
+"6088909", "Papar",
+"605684", "Sitiawan",
+"6037933", "Kuala\ Lumpur",
+"607752", "Lavang\-Lavang",
+"6032115", "Kuala\ Lumpur",
+"6036046", "Kampong\ Suharto",
+"6077120", "Keluang",
+"606758", "Mantin",
+"605209", "Ipoh",
+"605328", "Ipoh",
+"609476", "Maran",
+"6082291", "Kuching",
+"6035485", "Kinrara",
+"6084780", "Kapit",
+"604469", "Jeniang",
+"6082651", "Kuching",
+"6032935", "Kuala\ Lumpur",
+"609245", "Triang",
+"6037732", "Kuala\ Lumpur",
+"607760", "Keluang",
+"6082681", "Kuching",
+"6082593", "Kuching",
+"605369", "Pusing",
+"609248", "Bera",
+"6086231", "Bintulu",
+"6039514", "Kuala\ Lumpur",
+"6084810", "Julau",
+"60449", "Kulim",
+"6032081", "Kuala\ Lumpur",
+"6033291", "Kelang",
+"604884", "Penang",
+"6084750", "Kanowit",
+"609593", "Gambang",
+"6058301", "Taiping",
+"6087319", "Keningau",
+"6089634", "Elopura",
+"6082274", "Kuching",
+"6093140", "Kuala\ Lipis",
+"6032602", "Kuala\ Lumpur",
+"6037971", "Kuala\ Lumpur",
+"607679", "Pontian",
+"6085785", "Marudi",
+"6088612", "Kudat",
+"6088350", "Kota\ Kinabalu",
+"6087340", "Keningau",
+"607301", "Johor\ Bahru",
+"609638", "Kuala\ Berang",
+"6036038", "Kuala\ Lumpur",
+"607742", "Lavang\-Lavang",
+"609937", "Kuala\ Balah",
+"6086360", "Bintulu",
+"606438", "Simpang\ Empat",
+"604613", "Penang",
+"6082288", "Kuching",
+"6089854", "Kunak",
+"608981", "Felda\ Sahabat",
+"6084872", "Mukah",
+"6033258", "Kelang",
+"60545", "Tanjung\ Malim",
+"608975", "Tawau",
+"6089714", "Tawau",
+"6089903", "Merotai",
+"6038210", "Semenyih",
+"605440", "Tapah",
+"6038070", "Kinrara",
+"609255", "Triang",
+"6089702", "Tawau",
+"6033831", "Semenyih",
+"605212", "Ipoh",
+"6034102", "Kuala\ Lumpur",
+"609965", "Kuala\ Krai",
+"6085270", "Lawas",
+"6082831", "Sebangan",
+"6087392", "Keningau",
+"606336", "Melaka",
+"6084395", "Sibu",
+"606467", "Ayer\ Hitam",
+"6038724", "Semenyih",
+"609667", "Kuala\ Brang",
+"6089660", "Elopura",
+"6082309", "Kuching",
+"6036104", "Genting",
+"6085299", "Lawas",
+"6088971", "Kota\ Belud",
+"6035131", "Kinrara",
+"606694", "Rantau",
+"6082493", "Kuching",
+"6033288", "Kuala\ Selangor",
+"605891", "Taiping",
+"6083325", "Bandar\ Sri\ Aman",
+"604219", "Penang",
+"608978", "Semporna",
+"607261", "Johor\ Bahru",
+"6088308", "Kota\ Kinabalu",
+"609635", "Kuala\ Brang",
+"605641", "Hutan\ Melintang",
+"606435", "Tampin",
+"6082698", "Kuching",
+"6084717", "Pakan",
+"608264", "Kuching",
+"607217", "Johor\ Bahru",
+"6082899", "Serian",
+"6033345", "Kelang",
+"6087802", "Sipitang",
+"604944", "Kangar",
+"606493", "Kuala\ Klawang",
+"605437", "Tapah",
+"605322", "Ipoh",
+"6084805", "Kuala\ Igan",
+"6032742", "Kuala\ Lumpur",
+"6089663", "Elopura",
+"6038778", "Mantin",
+"6038955", "Serdang",
+"6085231", "Kampung\ Pahlawan",
+"6037669", "Kuala\ Lumpur",
+"609611", "Bandar\ Permaisuri",
+"6034251", "Kuala\ Lumpur",
+"606411", "Simpang\ Empat",
+"6088744", "Kinarut",
+"605429", "Trolak",
+"607881", "Air\ Tawar",
+"605465", "Kampar",
+"607510", "Senai",
+"607758", "Ayer\ Hitam",
+"6085718", "Bekenu",
+"604368", "Kepala\ Batas",
+"6082501", "Kuching",
+"6038213", "Putrajaya",
+"605468", "Kampar",
+"6035613", "Kinrara",
+"607755", "Renggam",
+"607380", "Johor\ Bahru",
+"608425", "Sibu",
+"6037711", "Kuala\ Lumpur",
+"604414", "Serdang",
+"6047210", "Sungai\ Petani",
+"6088353", "Kota\ Kinabalu",
+"604797", "Ayer\ Hitam",
+"609479", "Maran",
+"609242", "Bera",
+"6082261", "Kuching",
+"6082621", "Kuching",
+"6086301", "Bintulu",
+"604466", "Bedong",
+"609410", "Pekan",
+"6032021", "Kuala\ Lumpur",
+"6038073", "Kinrara",
+"6089521", "Telupid",
+"6039225", "Kuala\ Lumpur",
+"604765", "Alor\ Setar",
+"609772", "Kok\ Lanas",
+"604447", "Bedong",
+"607908", "Bekok",
+"6084610", "Rejang",
+"6089569", "Kinabatangan",
+"604524", "Tasek\ Gelugor",
+"605389", "Bota",
+"603271", "Kuala\ Lumpur",
+"6083343", "Bandar\ Sri\ Aman",
+"6033851", "Banting",
+"607780", "Kahang",
+"6035887", "Kinrara",
+"6082669", "Kota\ Samarahan",
+"604512", "Penang",
+"6088401", "Kota\ Kinabalu",
+"604615", "Penang",
+"609520", "Kuantan",
+"604397", "Penang",
+"6088330", "Kota\ Kinabalu",
+"6087237", "Beaufort",
+"6034270", "Kuala\ Lumpur",
+"609860", "Chukai",
+"6039145", "Kuala\ Lumpur",
+"6086298", "Bintulu",
+"6085628", "Miri",
+"6085268", "Sundar",
+"609239", "Telemong",
+"6085792", "Mulu",
+"6088668", "Kota\ Marudu",
+"6034026", "Kuala\ Lumpur",
+"605766", "Lenggong",
+"6083411", "Kabong",
+"608241", "Kuching",
+"606352", "Tangga\ Batu",
+"6033149", "Banting",
+"605722", "Parit\ Buntar",
+"6098001", "Kerteh",
+"605664", "Sitiawan",
+"6034299", "Kuala\ Lumpur",
+"609361", "Raub",
+"607244", "Johor\ Bahru",
+"606433", "Jelai",
+"6039078", "Cheras",
+"6037261", "Kuala\ Lumpur",
+"608486", "Dalat",
+"604618", "Penang",
+"6089209", "Elopura",
+"6084555", "Sibu",
+"6085615", "Miri",
+"6088782", "Tuaran",
+"6037870", "Kuala\ Lumpur",
+"6036241", "Kuala\ Lumpur",
+"604917", "Alor\ Setar",
+"6082320", "Semantan",
+"609633", "Bandar\ Permaisuri",
+"6086483", "Pelagus",
+"605616", "Bruas",
+"6082711", "Semantan",
+"606459", "Serting",
+"6038962", "Cheras",
+"609659", "Batu\ Rakit",
+"605714", "Parit\ Buntar",
+"607420", "Senggarang",
+"609556", "Kuantan",
+"6036462", "Kerling",
+"604768", "Alor\ Setar",
+"6033187", "Banting",
+"6035039", "Kinrara",
+"6085740", "Mu",
+"606521", "Jasin",
+"609852", "Chukai",
+"6087734", "Tenom",
+"6037873", "Kuala\ Lumpur",
+"6082323", "Damai\ Beach",
+"606634", "Seremban",
+"606736", "Mantin",
+"6036419", "Kuala\ Lumpur",
+"604740", "Alor\ Setar",
+"6033868", "Batang\ Berjuntai",
+"6038760", "Semenyih",
+"607970", "Segamat",
+"606275", "Melaka",
+"606495", "Simpang\ Durian",
+"604251", "Penang",
+"6085743", "Beluru",
+"6036061", "Kuala\ Kubu\ Baru",
+"605809", "Taiping",
+"60475", "Lubuk\ Merbau",
+"609592", "Kuantan",
+"609549", "Gambang",
+"6038051", "Kinrara",
+"6035562", "Kinrara",
+"607919", "Labis",
+"604961", "Kuah",
+"6088908", "Papar",
+"6037200", "Kuala\ Lumpur",
+"605831", "Selama",
+"609845", "Dungun",
+"6047452", "Alor\ Setar",
+"6086480", "Balingan",
+"6038522", "Semenyih",
+"6034800", "Kuala\ Lumpur",
+"6088394", "Kota\ Kinabalu",
+"6087318", "Keningau",
+"606964", "Tangkak",
+"6083340", "Bandar\ Sri\ Aman",
+"609848", "Dungun",
+"6035886", "Kinrara",
+"609587", "Gebeng",
+"60962", "Kuala\ Brang",
+"606498", "Batu\ Kikir",
+"606278", "Melaka",
+"6084613", "Selalang",
+"607739", "Kluang",
+"6086324", "Bintulu",
+"6033317", "Kelang",
+"6032272", "Kuala\ Lumpur",
+"6038081", "Kinrara",
+"607272", "Johor\ Bahru",
+"6039770", "Kuala\ Lumpur",
+"6082868", "Kota\ Samarahan",
+"607753", "Renggam",
+"6034027", "Kuala\ Lumpur",
+"604609", "Penang",
+"6089512", "Beluran",
+"6038602", "Kinrara",
+"609280", "Lanchang",
+"6088333", "Kota\ Kinabalu",
+"6045960", "Parit\ Buntar",
+"6033323", "Kelang",
+"6088534", "Kota\ Kinabalu",
+"6032392", "Kuala\ Lumpur",
+"6037831", "Kuala\ Lumpur",
+"605769", "Lenggong",
+"6078011", "Mersing",
+"607360", "Johor\ Bahru",
+"6037651", "Kuala\ Lumpur",
+"60443", "Sungai\ Petani",
+"604518", "Tasekgelugor",
+"6084848", "Kuala\ Igan",
+"6038325", "Putrajaya",
+"605725", "Parit\ Buntar",
+"605488", "Tanjung\ Malim",
+"604371", "Penang",
+"609754", "Bachok",
+"6036039", "Kuala\ Lumpur",
+"607902", "Tangkak",
+"609855", "Chukai",
+"6036275", "Kuala\ Lumpur",
+"6038992", "Cheras",
+"6086580", "Tatau",
+"609778", "Bachok",
+"6089570", "Kinabatangan",
+"6036151", "Kuala\ Lumpur",
+"6087760", "Tenom",
+"6039133", "Kuala\ Lumpur",
+"6035121", "Kinrara",
+"609559", "Kuantan",
+"605670", "Sitiawan",
+"6082821", "Asajaya",
+"605812", "Taiping",
+"6033259", "Kelang",
+"6086508", "Bintulu",
+"604241", "Penang",
+"6033289", "Kuala\ Selangor",
+"6085453", "Miri",
+"6088309", "Kota\ Kinabalu",
+"6089863", "Lahad\ Datu",
+"6032724", "Kuala\ Lumpur",
+"6086423", "Sebauh",
+"609858", "Chukai",
+"609775", "Kota\ Bharu",
+"6039171", "Kuala\ Lumpur",
+"609874", "Kemasik",
+"607507", "Tanjung\ Kupang",
+"6036181", "Kuala\ Lumpur",
+"604762", "Alor\ Setar",
+"609781", "Machang",
+"6082699", "Kuching",
+"607521", "Senai",
+"605291", "Tanjung\ Rambutan",
+"6082308", "Kuching",
+"605728", "Parit\ Buntar",
+"607861", "Tiram",
+"606358", "Tangga\ Batu",
+"604819", "Penang",
+"605485", "Cameron\ Highland",
+"6035543", "Kinrara",
+"6036028", "Batu\ Arang",
+"6039206", "Kuala\ Lumpur",
+"606420", "Johol",
+"6082380", "Kuching",
+"6087476", "Labuan",
+"6085298", "Lawas",
+"604612", "Penang",
+"609236", "Bilut\ Valley",
+"604515", "Tasekgelugor",
+"607743", "Keluang",
+"6032031", "Kuala\ Lumpur",
+"6088364", "Kota\ Kinabalu",
+"609598", "Gambang",
+"6084382", "Sibu",
+"6088920", "Papar",
+"6089959", "Lahad\ Datu",
+"608631", "Bintulu",
+"609700", "Kota\ Bharu",
+"6089531", "Elopura",
+"6033126", "Tk\ Panglima\ Garang",
+"609687", "Bukit\ Bading",
+"603625", "Kuala\ Lumpur",
+"6085450", "Miri",
+"609243", "Triang",
+"6086281", "Bintulu",
+"6034815", "Kuala\ Lumpur",
+"6085719", "Bekenu",
+"6089271", "Elopura",
+"605608", "Teluk\ Intan",
+"6087477", "Labuan",
+"6085735", "Batu\ Niah",
+"604704", "Pokok\ Sena",
+"607446", "Senggarang",
+"6082898", "Serian",
+"6039207", "Kuala\ Lumpur",
+"6033110", "Pulau\ Ketam",
+"6082383", "Kuching",
+"6089796", "Merotai",
+"6038779", "Mantin",
+"6035540", "Kinrara",
+"6087482", "Labuan",
+"6035198", "Kinrara",
+"606970", "Muar",
+"6087452", "Labuan",
+"6039769", "Cheras",
+"6038100", "Kinrara",
+"607254", "Johor\ Bahru",
+"607278", "Johor\ Bahru",
+"606701", "Linggi",
+"6039054", "Cheras",
+"6088203", "Kota\ Kinabalu",
+"6038790", "Mantin",
+"608251", "Kuching",
+"607964", "Bukit\ Gambir",
+"6084687", "Sarikei",
+"606534", "Jasin",
+"6082765", "Bau",
+"6085221", "Limbang",
+"609842", "Dungun",
+"6085661", "Miri",
+"6086251", "Bintulu",
+"605806", "Taiping",
+"6036091", "Rawang",
+"606727", "Seremban",
+"605357", "Ipoh",
+"603263", "Kuala\ Lumpur",
+"609546", "Gambang",
+"6038021", "Kinrara",
+"6088345", "Kota\ Kinabalu",
+"607916", "Bekok",
+"604783", "Lubuk\ Merbau",
+"6039130", "Kuala\ Lumpur",
+"6084352", "Sibu",
+"609595", "Gebeng",
+"6084730", "Julau",
+"605323", "Ipoh",
+"6083465", "Debak",
+"606492", "Kuala\ Klawang",};
 
     sub new {
       my $class = shift;

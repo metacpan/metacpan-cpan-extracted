@@ -1,4 +1,4 @@
-# AWS::CodeDeploy::DeploymentGroup generated from spec 5.3.0
+# AWS::CodeDeploy::DeploymentGroup generated from spec 18.4.0
 use Moose::Util::TypeConstraints;
 
 coerce 'Cfn::Resource::Properties::AWS::CodeDeploy::DeploymentGroup',
@@ -14,7 +14,7 @@ package Cfn::Resource::AWS::CodeDeploy::DeploymentGroup {
     [  ]
   }
   sub supported_regions {
-    [ 'ap-east-1','ap-northeast-1','ap-northeast-2','ap-northeast-3','ap-south-1','ap-southeast-1','ap-southeast-2','ca-central-1','cn-north-1','cn-northwest-1','eu-central-1','eu-north-1','eu-west-1','eu-west-2','eu-west-3','me-south-1','sa-east-1','us-east-1','us-east-2','us-gov-east-1','us-gov-west-1','us-west-1','us-west-2' ]
+    [ 'af-south-1','ap-east-1','ap-northeast-1','ap-northeast-2','ap-northeast-3','ap-south-1','ap-southeast-1','ap-southeast-2','ca-central-1','cn-north-1','cn-northwest-1','eu-central-1','eu-north-1','eu-south-1','eu-west-1','eu-west-2','eu-west-3','me-south-1','sa-east-1','us-east-1','us-east-2','us-gov-east-1','us-gov-west-1','us-west-1','us-west-2' ]
   }
 }
 
@@ -51,11 +51,11 @@ coerce 'Cfn::Resource::Properties::AWS::CodeDeploy::DeploymentGroup::TagFilter',
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::CodeDeploy::DeploymentGroup::TagFilterValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::CodeDeploy::DeploymentGroup::TagFilter->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::CodeDeploy::DeploymentGroup::TagFilterValue {
+package Cfn::Resource::Properties::Object::AWS::CodeDeploy::DeploymentGroup::TagFilter {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -74,11 +74,11 @@ coerce 'Cfn::Resource::Properties::AWS::CodeDeploy::DeploymentGroup::S3Location'
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::CodeDeploy::DeploymentGroup::S3LocationValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::CodeDeploy::DeploymentGroup::S3Location->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::CodeDeploy::DeploymentGroup::S3LocationValue {
+package Cfn::Resource::Properties::Object::AWS::CodeDeploy::DeploymentGroup::S3Location {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -99,11 +99,11 @@ coerce 'Cfn::Resource::Properties::AWS::CodeDeploy::DeploymentGroup::GitHubLocat
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::CodeDeploy::DeploymentGroup::GitHubLocationValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::CodeDeploy::DeploymentGroup::GitHubLocation->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::CodeDeploy::DeploymentGroup::GitHubLocationValue {
+package Cfn::Resource::Properties::Object::AWS::CodeDeploy::DeploymentGroup::GitHubLocation {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -143,11 +143,11 @@ coerce 'Cfn::Resource::Properties::AWS::CodeDeploy::DeploymentGroup::EC2TagFilte
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::CodeDeploy::DeploymentGroup::EC2TagFilterValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::CodeDeploy::DeploymentGroup::EC2TagFilter->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::CodeDeploy::DeploymentGroup::EC2TagFilterValue {
+package Cfn::Resource::Properties::Object::AWS::CodeDeploy::DeploymentGroup::EC2TagFilter {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -188,11 +188,11 @@ coerce 'Cfn::Resource::Properties::AWS::CodeDeploy::DeploymentGroup::TargetGroup
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::CodeDeploy::DeploymentGroup::TargetGroupInfoValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::CodeDeploy::DeploymentGroup::TargetGroupInfo->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::CodeDeploy::DeploymentGroup::TargetGroupInfoValue {
+package Cfn::Resource::Properties::Object::AWS::CodeDeploy::DeploymentGroup::TargetGroupInfo {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -209,11 +209,11 @@ coerce 'Cfn::Resource::Properties::AWS::CodeDeploy::DeploymentGroup::RevisionLoc
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::CodeDeploy::DeploymentGroup::RevisionLocationValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::CodeDeploy::DeploymentGroup::RevisionLocation->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::CodeDeploy::DeploymentGroup::RevisionLocationValue {
+package Cfn::Resource::Properties::Object::AWS::CodeDeploy::DeploymentGroup::RevisionLocation {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -254,11 +254,11 @@ coerce 'Cfn::Resource::Properties::AWS::CodeDeploy::DeploymentGroup::OnPremisesT
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::CodeDeploy::DeploymentGroup::OnPremisesTagSetListObjectValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::CodeDeploy::DeploymentGroup::OnPremisesTagSetListObject->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::CodeDeploy::DeploymentGroup::OnPremisesTagSetListObjectValue {
+package Cfn::Resource::Properties::Object::AWS::CodeDeploy::DeploymentGroup::OnPremisesTagSetListObject {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -297,11 +297,11 @@ coerce 'Cfn::Resource::Properties::AWS::CodeDeploy::DeploymentGroup::ELBInfo',
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::CodeDeploy::DeploymentGroup::ELBInfoValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::CodeDeploy::DeploymentGroup::ELBInfo->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::CodeDeploy::DeploymentGroup::ELBInfoValue {
+package Cfn::Resource::Properties::Object::AWS::CodeDeploy::DeploymentGroup::ELBInfo {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -340,11 +340,11 @@ coerce 'Cfn::Resource::Properties::AWS::CodeDeploy::DeploymentGroup::EC2TagSetLi
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::CodeDeploy::DeploymentGroup::EC2TagSetListObjectValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::CodeDeploy::DeploymentGroup::EC2TagSetListObject->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::CodeDeploy::DeploymentGroup::EC2TagSetListObjectValue {
+package Cfn::Resource::Properties::Object::AWS::CodeDeploy::DeploymentGroup::EC2TagSetListObject {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -383,11 +383,11 @@ coerce 'Cfn::Resource::Properties::AWS::CodeDeploy::DeploymentGroup::Alarm',
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::CodeDeploy::DeploymentGroup::AlarmValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::CodeDeploy::DeploymentGroup::Alarm->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::CodeDeploy::DeploymentGroup::AlarmValue {
+package Cfn::Resource::Properties::Object::AWS::CodeDeploy::DeploymentGroup::Alarm {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -426,11 +426,11 @@ coerce 'Cfn::Resource::Properties::AWS::CodeDeploy::DeploymentGroup::TriggerConf
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::CodeDeploy::DeploymentGroup::TriggerConfigValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::CodeDeploy::DeploymentGroup::TriggerConfig->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::CodeDeploy::DeploymentGroup::TriggerConfigValue {
+package Cfn::Resource::Properties::Object::AWS::CodeDeploy::DeploymentGroup::TriggerConfig {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -449,11 +449,11 @@ coerce 'Cfn::Resource::Properties::AWS::CodeDeploy::DeploymentGroup::OnPremisesT
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::CodeDeploy::DeploymentGroup::OnPremisesTagSetValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::CodeDeploy::DeploymentGroup::OnPremisesTagSet->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::CodeDeploy::DeploymentGroup::OnPremisesTagSetValue {
+package Cfn::Resource::Properties::Object::AWS::CodeDeploy::DeploymentGroup::OnPremisesTagSet {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -470,11 +470,11 @@ coerce 'Cfn::Resource::Properties::AWS::CodeDeploy::DeploymentGroup::LoadBalance
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::CodeDeploy::DeploymentGroup::LoadBalancerInfoValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::CodeDeploy::DeploymentGroup::LoadBalancerInfo->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::CodeDeploy::DeploymentGroup::LoadBalancerInfoValue {
+package Cfn::Resource::Properties::Object::AWS::CodeDeploy::DeploymentGroup::LoadBalancerInfo {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -492,11 +492,11 @@ coerce 'Cfn::Resource::Properties::AWS::CodeDeploy::DeploymentGroup::EC2TagSet',
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::CodeDeploy::DeploymentGroup::EC2TagSetValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::CodeDeploy::DeploymentGroup::EC2TagSet->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::CodeDeploy::DeploymentGroup::EC2TagSetValue {
+package Cfn::Resource::Properties::Object::AWS::CodeDeploy::DeploymentGroup::EC2TagSet {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -513,11 +513,11 @@ coerce 'Cfn::Resource::Properties::AWS::CodeDeploy::DeploymentGroup::DeploymentS
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::CodeDeploy::DeploymentGroup::DeploymentStyleValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::CodeDeploy::DeploymentGroup::DeploymentStyle->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::CodeDeploy::DeploymentGroup::DeploymentStyleValue {
+package Cfn::Resource::Properties::Object::AWS::CodeDeploy::DeploymentGroup::DeploymentStyle {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -535,11 +535,11 @@ coerce 'Cfn::Resource::Properties::AWS::CodeDeploy::DeploymentGroup::Deployment'
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::CodeDeploy::DeploymentGroup::DeploymentValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::CodeDeploy::DeploymentGroup::Deployment->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::CodeDeploy::DeploymentGroup::DeploymentValue {
+package Cfn::Resource::Properties::Object::AWS::CodeDeploy::DeploymentGroup::Deployment {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -558,11 +558,11 @@ coerce 'Cfn::Resource::Properties::AWS::CodeDeploy::DeploymentGroup::AutoRollbac
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::CodeDeploy::DeploymentGroup::AutoRollbackConfigurationValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::CodeDeploy::DeploymentGroup::AutoRollbackConfiguration->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::CodeDeploy::DeploymentGroup::AutoRollbackConfigurationValue {
+package Cfn::Resource::Properties::Object::AWS::CodeDeploy::DeploymentGroup::AutoRollbackConfiguration {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -580,11 +580,11 @@ coerce 'Cfn::Resource::Properties::AWS::CodeDeploy::DeploymentGroup::AlarmConfig
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::CodeDeploy::DeploymentGroup::AlarmConfigurationValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::CodeDeploy::DeploymentGroup::AlarmConfiguration->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::CodeDeploy::DeploymentGroup::AlarmConfigurationValue {
+package Cfn::Resource::Properties::Object::AWS::CodeDeploy::DeploymentGroup::AlarmConfiguration {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -617,3 +617,30 @@ package Cfn::Resource::Properties::AWS::CodeDeploy::DeploymentGroup {
 }
 
 1;
+### main pod documentation begin ###
+
+=encoding UTF-8
+
+=head1 NAME
+
+Cfn::Resource::AWS::CodeDeploy::DeploymentGroup - Cfn resource for AWS::CodeDeploy::DeploymentGroup
+
+=head1 DESCRIPTION
+
+This module implements a Perl module that represents the CloudFormation object AWS::CodeDeploy::DeploymentGroup.
+
+See L<Cfn> for more information on how to use it.
+
+=head1 AUTHOR
+
+    Jose Luis Martinez
+    CAPSiDE
+    jlmartinez@capside.com
+
+=head1 COPYRIGHT and LICENSE
+
+Copyright (c) 2013 by CAPSiDE
+This code is distributed under the Apache 2 License. The full text of the 
+license can be found in the LICENSE file included with this module.
+
+=cut

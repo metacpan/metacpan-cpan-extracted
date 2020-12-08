@@ -1,5 +1,11 @@
-Revision history for WordList-BEW-Betawi
+0.002   2020-09-14  Released-By: PERLANCAR; Urgency: low
 
-0.001   2016-06-21 (PERLANCAR)
+        - No functional changes.
+
+        - [doc] Rebuild with Pod::Weaver::Plugin::WordList 0.062 to rename
+          generated POD section Statistics to WordList Statistics.
+
+
+0.001   2016-06-21  Released-By: PERLANCAR
 
         - First release.

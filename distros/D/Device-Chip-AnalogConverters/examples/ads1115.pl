@@ -1,11 +1,12 @@
 #!/usr/bin/perl
 
-use strict;
+use v5.26;
 use warnings;
 
 use Device::Chip::ADS1115;
 use Device::Chip::Adapter;
 
+use Future::AsyncAwait;
 use Getopt::Long;
 use Time::HiRes qw( sleep );
 
@@ -17,12 +18,12 @@ GetOptions(
 ) or exit 1;
 
 my $chip = Device::Chip::ADS1115->new;
-$chip->mount_from_paramstr(
+await $chip->mount_from_paramstr(
    Device::Chip::Adapter->new_from_description( $ADAPTER ),
    $MOUNTPARAMS,
-)->get;
+);
 
-$chip->protocol->power(1)->get;
+await $chip->protocol->power(1);
 
 $SIG{INT} = $SIG{TERM} = sub { exit 1; };
 
@@ -30,25 +31,25 @@ END {
    $chip and $chip->protocol->power(0)->get;
 }
 
-$chip->change_config(
+await $chip->change_config(
    PGA => "4.096V",
    DR  => "32",
-)->get;
+);
 
 if( $PRINT_CONFIG ) {
-   my $config = $chip->read_config->get;
+   my $config = await $chip->read_config;
    printf "%20s: %s\n", $_, $config->{$_} for sort keys %$config;
 }
 
 sleep 1;
 
 foreach my $ch ( 0, 1 ) {
-   $chip->change_config(
+   await $chip->change_config(
       MUX => $ch,
-   )->get;
+   );
 
-   $chip->trigger->get;
+   await $chip->trigger;
    sleep 0.2;
 
-   printf "Channel %d: %.3f\n", $ch, $chip->read_adc_voltage->get;
+   printf "Channel %d: %.3f\n", $ch, await $chip->read_adc_voltage;
 }

@@ -1,26 +1,39 @@
-			XML::Encoding
+NAME
 
-Version 1.x Copyright (c) 1998 Clark Cooper <coopercc@netheaven.com>
-Changes in Version 2.00 onwards Copyright (C) 2007-2010 Steve Hay
-All rights reserved.
-This program is free software; you can redistribute it and/or modify it
-under the same terms as Perl itself. 
+    XML::Encoding - A perl module for parsing XML encoding maps.
 
-This module, built as a subclass of XML::Parser, parses encoding map
-XML files. Included in the distribution is the compile_encoding script
-that compiles these to the binary form used by XML::Parser in order to
-parse scripts in the given encoding. Also included is a script that
-generates encoding map XML files from the type of mapping files obtained
-at ftp://ftp.unicode.org/Public/MAPPINGS.
+SYNOPSIS
 
-Several encoding maps are included in the maps subdirectory.
+    use XML::Encoding;
+    my $em_parser = new XML::Encoding(ErrorContext  => 2,
+                                      ExpatRequired => 1,
+                                      PushPrefixFcn => \&push_prefix,
+                                      PopPrefixFcn  => \&pop_prefix,
+                                      RangeSetFcn   => \&range_set);
 
-There is nothing to build, but to test and install you need to do the
-following:
+    my $encmap_name = $em_parser->parsefile($ARGV[0]);
 
-	perl Makefile.PL
-	make test
-	make install
+DESCRIPTION
 
-Clark Cooper
-December 12, 1998
+    This module, which is built as a subclass of XML::Parser, provides a parser
+    for encoding map files, which are XML files. The file maps/encmap.dtd in the
+    distribution describes the structure of these files. Calling a parse method
+    returns the name of the encoding map (obtained from the name attribute of
+    the root element). The contents of the map are processed through the
+    callback functions push_prefix, pop_prefix, and range_set.
+
+INSTALLATION
+
+    See the INSTALL file.
+
+COPYRIGHT
+
+    Copyright (C) 1998 Clark Cooper. All rights reserved.
+    Copyright (C) 2007-2010, 2014, 2020 Steve Hay. All rights reserved.
+
+LICENCE
+
+    This distribution is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself, i.e. under the terms of either the GNU
+    General Public License or the Artistic License, as specified in the LICENCE
+    file.

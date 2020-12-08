@@ -1,25 +1,23 @@
 #!/usr/bin/perl
 
-use strict;
+use v5.26;
 use warnings;
 
 use Test::More;
 
-use Device::Chip::SSD1306;
+use Future::AsyncAwait;
 
-use Future;
+use Device::Chip::SSD1306;
 
 my @output;
 no warnings 'once';
-local *Device::Chip::SSD1306::send_cmd = sub {
+local *Device::Chip::SSD1306::send_cmd = async sub {
    shift;
    push @output, [ cmd => @_ ];
-   return Future->done;
 };
-local *Device::Chip::SSD1306::send_data = sub {
+local *Device::Chip::SSD1306::send_data = async sub {
    shift;
    push @output, [ data => unpack "H*", $_[0] ];
-   return Future->done;
 };
 
 my $chip = Device::Chip::SSD1306->new;
@@ -29,7 +27,7 @@ my $chip = Device::Chip::SSD1306->new;
    $chip->clear;
 
    undef @output;
-   $chip->refresh->get;
+   await $chip->refresh;
 
    my @expect = (
       # all blank
@@ -58,7 +56,7 @@ my $chip = Device::Chip::SSD1306->new;
    $chip->draw_blit( 12, 16, ( " # #", "# # " ) x 4 );
 
    undef @output;
-   $chip->refresh->get;
+   await $chip->refresh;
 
    my @expect = (
       # page 0 - row 2 is set for first 32 columns, also all of column 2

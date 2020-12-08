@@ -1,10 +1,12 @@
 #!/usr/bin/perl
 
-use strict;
+use v5.26;
 use warnings;
 
 use Device::Chip::NoritakeGU_D;
 use Device::Chip::Adapter;
+
+use Future::AsyncAwait;
 use Getopt::Long qw( :config no_ignore_case );
 use Time::HiRes qw( sleep );
 
@@ -16,25 +18,25 @@ GetOptions(
 
 my $chip = Device::Chip::NoritakeGU_D->new( interface => $INTERFACE );
 
-$chip->mount_from_paramstr(
+await $chip->mount_from_paramstr(
    Device::Chip::Adapter->new_from_description( $ADAPTER ),
    $MOUNTPARAMS,
-)->get;
+);
 
-$chip->power(1)->get;
+await $chip->power(1);
 
-$chip->initialise->get;
+await $chip->initialise;
 
 # Default font
-$chip->cursor_goto( 20, 0 )->get;
-$chip->text( "Hello, world" )->get;
+await $chip->cursor_goto( 20, 0 );
+await $chip->text( "Hello, world" );
 
 # Proportional font
-$chip->set_font_width( "prop2" )->get;
-$chip->cursor_goto( 26, 1 )->get;
-$chip->text( "Hello, world" )->get;
+await $chip->set_font_width( "prop2" );
+await $chip->cursor_goto( 26, 1 );
+await $chip->text( "Hello, world" );
 
 # Large font
-$chip->set_font_size( "8x16" )->get;
-$chip->cursor_goto( 15, 2 )->get;
-$chip->text( "Hello, world" )->get;
+await $chip->set_font_size( "8x16" );
+await $chip->cursor_goto( 15, 2 );
+await $chip->text( "Hello, world" );

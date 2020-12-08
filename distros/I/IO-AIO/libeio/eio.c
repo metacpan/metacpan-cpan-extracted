@@ -1641,7 +1641,7 @@ eio__scandir (eio_req *req, etp_worker *self)
 
 #if !HAVE_AT
 
-/* a bit like realpath, but usually faster because it doesn'T have to return */
+/* a bit like realpath, but usually faster because it doesn't have to return */
 /* an absolute or canonical path */
 static const char *
 wd_expand (struct etp_tmpbuf *tmpbuf, eio_wd wd, const char *path)

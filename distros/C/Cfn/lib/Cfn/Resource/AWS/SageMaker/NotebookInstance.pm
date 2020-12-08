@@ -1,4 +1,4 @@
-# AWS::SageMaker::NotebookInstance generated from spec 5.3.0
+# AWS::SageMaker::NotebookInstance generated from spec 14.3.0
 use Moose::Util::TypeConstraints;
 
 coerce 'Cfn::Resource::Properties::AWS::SageMaker::NotebookInstance',
@@ -42,3 +42,30 @@ package Cfn::Resource::Properties::AWS::SageMaker::NotebookInstance {
 }
 
 1;
+### main pod documentation begin ###
+
+=encoding UTF-8
+
+=head1 NAME
+
+Cfn::Resource::AWS::SageMaker::NotebookInstance - Cfn resource for AWS::SageMaker::NotebookInstance
+
+=head1 DESCRIPTION
+
+This module implements a Perl module that represents the CloudFormation object AWS::SageMaker::NotebookInstance.
+
+See L<Cfn> for more information on how to use it.
+
+=head1 AUTHOR
+
+    Jose Luis Martinez
+    CAPSiDE
+    jlmartinez@capside.com
+
+=head1 COPYRIGHT and LICENSE
+
+Copyright (c) 2013 by CAPSiDE
+This code is distributed under the Apache 2 License. The full text of the 
+license can be found in the LICENSE file included with this module.
+
+=cut

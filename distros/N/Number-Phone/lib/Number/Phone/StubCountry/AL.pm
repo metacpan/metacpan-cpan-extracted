@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20200904144526;
+our $VERSION = 1.20201204215954;
 
 my $formatters = [
                 {
@@ -103,180 +103,180 @@ my $validators = {
                 'voip' => ''
               };
 my %areanames = ();
-$areanames{en}->{355211} = "Koplik";
-$areanames{en}->{355212} = "Pukë";
-$areanames{en}->{355213} = "Bajram\ Curri";
-$areanames{en}->{355214} = "Krumë";
-$areanames{en}->{355215} = "Lezhë";
-$areanames{en}->{355216} = "Rrëshen";
-$areanames{en}->{355217} = "Burrel";
-$areanames{en}->{355218} = "Peshkopi";
-$areanames{en}->{355219} = "Bulqizë";
-$areanames{en}->{35522} = "Shkodër";
-$areanames{en}->{35524} = "Kukës";
-$areanames{en}->{355261} = "Vau\-Dejës";
-$areanames{en}->{355262} = "Rrethinat\/Ana\-Malit\,\ Shkodër";
-$areanames{en}->{355263} = "Pult\/Shalë\/Shosh\/Temal\/Shllak\,\ Shkodër";
-$areanames{en}->{355264} = "Postribë\/Gur\ i\ Zi";
-$areanames{en}->{355265} = "Vig\-Mnelë\/Hajmel\,\ Shkodër";
-$areanames{en}->{355266} = "Bushat\/Bërdicë\,\ Shkodër";
-$areanames{en}->{355267} = "Dajç\/Velipojë\,\ Shkodër";
-$areanames{en}->{355268} = "Qendër\/Gruemirë\,\ Malësi\ e\ Madhe";
-$areanames{en}->{355269} = "Kastrat\/Shkrel\/Kelmend\,\ Malësi\ e\ Madhe";
-$areanames{en}->{355270} = "Kolsh\/Surroj\/Arren\/Malzi\,\ Kukës";
-$areanames{en}->{355271} = "Fushë\-Arrëz\/Rrapë\,\ Pukë";
-$areanames{en}->{355272} = "Qerret\/Qelëz\/Gjegjan\,\ Pukë";
-$areanames{en}->{355273} = "Iballë\/Fierzë\/Blerim\/Qafë\-Mali\,\ Pukë";
-$areanames{en}->{355274} = "Tropojë\/Llugaj\/Margegaj\,\ Tropojë";
-$areanames{en}->{355275} = "Bujan\/Fierzë\/Bytyc\/Lekbiba\,\ Tropojë";
-$areanames{en}->{355276} = "Fajza\/Golaj\/Gjinaj\,\ Has";
-$areanames{en}->{355277} = "Shtiqen\/Tërthore\/Zapod\,\ Kukës";
-$areanames{en}->{355278} = "Bicaj\/Topojan\/Shishtavec\,\ Kukës";
-$areanames{en}->{355279} = "Gryk\-Çajë\/Ujmisht\/Bushtrice\/Kalis\,\ Kukës";
-$areanames{en}->{355281} = "Shëngjin\/Balldre\,\ Lezhë";
-$areanames{en}->{355282} = "Kallmet\/Blinisht\/Dajç\/Ungrej\,\ Lezhë";
-$areanames{en}->{355283} = "Kolsh\/Zejmen\/Shënkoll\,\ Lezhë";
-$areanames{en}->{355284} = "Rubik\,\ Mirditë";
-$areanames{en}->{355285} = "Kthjellë\/Selitë\,\ Mirditë";
-$areanames{en}->{355286} = "Kaçinar\/Orosh\/Fan\,\ Mirditë";
-$areanames{en}->{355287} = "Klos\/Suç\/Lis\,\ Mat";
-$areanames{en}->{355288} = "Baz\/Komsi\/Gurrë\/Xibër\,\ Mat";
-$areanames{en}->{355289} = "Ulëz\/Rukaj\/Derjan\/Macukull\,\ Mat";
-$areanames{en}->{355291} = "Tomin\/Luzni\,\ Dibër";
-$areanames{en}->{355292} = "Maqellarë\/Melan\,\ Dibër";
-$areanames{en}->{355293} = "Kastriot\/Muhur\/Selishtë\,\ Dibër";
-$areanames{en}->{355294} = "Arras\/Fushë\-Çidhën\/Lurë\,\ Dibër";
-$areanames{en}->{355295} = "Sllovë\/Zall\-Dardhë\/Zall\-Reç\/Kala\ e\ Dodes\,\ Dibër";
-$areanames{en}->{355296} = "Fushë\-Bulqizë\/Shupenzë\/Zerqan\,\ Bulqizë";
-$areanames{en}->{355297} = "Gjorice\/Ostren\/Trebisht\/Martanesh\,\ Bulqizë";
-$areanames{en}->{355311} = "Kuçovë";
-$areanames{en}->{355312} = "Çorovodë\,\ Skrapar";
-$areanames{en}->{355313} = "Ballsh\,\ Mallakastër";
-$areanames{en}->{35532} = "Berat";
-$areanames{en}->{35533} = "Vlorë";
-$areanames{en}->{35534} = "Fier";
-$areanames{en}->{35535} = "Lushnje";
-$areanames{en}->{355360} = "Leshnje\/Potom\/Çepan\/Gjerbës\/Zhepë\,\ Skrapar";
-$areanames{en}->{355361} = "Ura\ Vajgurore\,\ Berat";
-$areanames{en}->{355362} = "Velabisht\/Roshnik\,\ Berat";
-$areanames{en}->{355363} = "Otllak\/Lumas\,\ Berat";
-$areanames{en}->{355364} = "Vërtop\/Terpan\,\ Berat";
-$areanames{en}->{355365} = "Sinjë\/Cukalat\,\ Berat";
-$areanames{en}->{355366} = "Poshnjë\/Kutalli\,\ Berat";
-$areanames{en}->{355367} = "Perondi\/Kozarë\,\ Kuçovë";
-$areanames{en}->{355368} = "Poliçan\/Bogovë\,\ Skrapar";
-$areanames{en}->{355369} = "Qendër\/Vendreshë\,\ Skrapar";
-$areanames{en}->{355371} = "Divjakë\,\ Lushnjë";
-$areanames{en}->{355372} = "Karbunarë\/Fier\-Shegan\/Hysgjokaj\/Ballagat\,\ Lushnjë";
-$areanames{en}->{355373} = "Krutje\/Bubullimë\/Allkaj\,\ Lushnjë";
-$areanames{en}->{355374} = "Gradishtë\/Kolonjë\,\ Lushnjë";
-$areanames{en}->{355375} = "Golem\/Grabian\/Remas\,\ Lushnjë";
-$areanames{en}->{355376} = "Dushk\/Tërbuf\,\ Lushnjë";
-$areanames{en}->{355377} = "Qendër\/Greshicë\/Hekal\,\ Mallakastër";
-$areanames{en}->{355378} = "Aranitas\/Ngracan\/Selitë\/Fratar\/Kutë\,\ Mallakastër";
-$areanames{en}->{355381} = "Patos\,\ Fier";
-$areanames{en}->{355382} = "Roskovec\,\ Fier";
-$areanames{en}->{355383} = "Qendër\,\ Fier";
-$areanames{en}->{355384} = "Mbrostar\ Ura\/LIibofshë\,\ Fier";
-$areanames{en}->{355385} = "Portëz\/Zharëz\,\ Fier";
-$areanames{en}->{355386} = "Kuman\/Kurjan\/Strum\/Ruzhdie\,\ Fier";
-$areanames{en}->{355387} = "Cakran\/Frakull\,\ Fier";
-$areanames{en}->{355388} = "Levan\,\ Fier";
-$areanames{en}->{355389} = "Dermenas\/Topojë\,\ Fier";
-$areanames{en}->{355391} = "Orikum\,\ Vlorë";
-$areanames{en}->{355392} = "Selenicë\,\ Vlorë";
-$areanames{en}->{355393} = "Himarë\,\ Vlorë";
-$areanames{en}->{355394} = "Qendër\,\ Vlorë";
-$areanames{en}->{355395} = "Novoselë\,\ Vlorë";
-$areanames{en}->{355396} = "Shushicë\/Armen\,\ Vlorë";
-$areanames{en}->{355397} = "Vllahinë\/Kote\,\ Vlorë";
-$areanames{en}->{355398} = "Sevaster\/Brataj\/Hore\-Vranisht\,\ Vlorë";
-$areanames{en}->{35542} = "Tirana";
-$areanames{en}->{35543} = "Tirana";
-$areanames{en}->{35544} = "Tirana";
-$areanames{en}->{35545} = "Tirana";
-$areanames{en}->{35546} = "Tirana";
-$areanames{en}->{35547} = "Kamëz\/Vorë\/Paskuqan\/Zall\-Herr\/Burxullë\/Prezë\,\ Tiranë";
-$areanames{en}->{35548} = "Kashar\/Vaqar\/Ndroq\/Pezë\/Farkë\/Dajt\,\ Tiranë";
-$areanames{en}->{35549} = "Petrelë\/Baldushk\/Bërzhitë\/Krrabë\/Shengjergj\/Zall\-Bastar\,\ Tiranë";
-$areanames{en}->{355511} = "Kruje";
-$areanames{en}->{355512} = "Peqin";
-$areanames{en}->{355513} = "Gramsh";
-$areanames{en}->{355514} = "Librazhd";
-$areanames{en}->{35552} = "Durrës";
-$areanames{en}->{35553} = "Laç\,\ Kurbin";
-$areanames{en}->{35554} = "Elbasan";
-$areanames{en}->{35555} = "Kavajë";
-$areanames{en}->{355561} = "Mamurras\,\ Kurbin";
-$areanames{en}->{355562} = "Milot\/Fushe\-Kuqe\,\ Kurbin";
-$areanames{en}->{355563} = "Fushë\-Krujë";
-$areanames{en}->{355564} = "Nikël\/Bubq\,\ Kruje";
-$areanames{en}->{355565} = "Koder\-Thumane\/Cudhi\,\ Kruje";
-$areanames{en}->{355570} = "Gosë\/Lekaj\/Sinaballaj\,\ Kavajë";
-$areanames{en}->{355571} = "Shijak\,\ Durrës";
-$areanames{en}->{355572} = "Manëz\,\ Durrës";
-$areanames{en}->{355573} = "Sukth\,\ Durrës";
-$areanames{en}->{355574} = "Rashbull\/Gjepalaj\,\ Durrës";
-$areanames{en}->{355575} = "Xhafzotaj\/Maminas\,\ Durrës";
-$areanames{en}->{355576} = "Katund\ i\ Ri\/Ishem\,\ Durrës";
-$areanames{en}->{355577} = "Rrogozhinë\,\ Kavajë";
-$areanames{en}->{355578} = "Synej\/Golem\,\ Kavajë";
-$areanames{en}->{355579} = "Luz\ i\ Vogël\/Kryevidh\/Helmës\,\ Kavajë";
-$areanames{en}->{355580} = "Përparim\/Pajovë\,\ Peqin";
-$areanames{en}->{355581} = "Cërrik\,\ Elbasan";
-$areanames{en}->{355582} = "Belsh\,\ Elbasan";
-$areanames{en}->{355583} = "Bradashesh\/Shirgjan\,\ Elbasan";
-$areanames{en}->{355584} = "Labinot\-Fushë\/Labinot\-Mal\/Funarë\/Gracen\,\ Elbasan";
-$areanames{en}->{355585} = "Shushicë\/Tregan\/Gjinar\/Zavalinë\,\ Elbasan";
-$areanames{en}->{355586} = "Gjergjan\/Papër\/Shalës\,\ Elbasan";
-$areanames{en}->{355587} = "Gostime\/Klos\/Mollas\,\ Elbasan";
-$areanames{en}->{355588} = "Rrasë\/Fierzë\/Kajan\/Grekan\,\ Elbasan";
-$areanames{en}->{355589} = "Karinë\/Gjocaj\/Shezë\,\ Peqin";
-$areanames{en}->{355591} = "Përrenjas\,\ Librazhd";
-$areanames{en}->{355592} = "Qendër\,\ Librazhd";
-$areanames{en}->{355593} = "Lunik\/Orenjë\/Stebleve\,\ Librazhd";
-$areanames{en}->{355594} = "Hotolisht\/Polis\/Stravaj\,\ Librazhd";
-$areanames{en}->{355595} = "Qukës\/Rajcë\,\ Librazhd";
-$areanames{en}->{355596} = "Pishaj\/Sult\/Tunjë\/Kushovë\/Skënderbegas\,\ Gramsh";
-$areanames{en}->{355597} = "Kodovjat\/Poroçan\/Kukur\/Lenie\,\ Gramsh";
-$areanames{en}->{355811} = "Bilisht\,\ Devoll";
-$areanames{en}->{355812} = "Ersekë\,\ Kolonjë";
-$areanames{en}->{355813} = "Përmet";
-$areanames{en}->{355814} = "Tepelenë";
-$areanames{en}->{355815} = "Delvinë";
-$areanames{en}->{35582} = "Korçë";
-$areanames{en}->{35583} = "Pogradec";
-$areanames{en}->{35584} = "Gjirokastër";
-$areanames{en}->{35585} = "Sarandë";
-$areanames{en}->{355860} = "Trebinjë\/Proptisht\/Velçan\,\ Pogradec";
-$areanames{en}->{355861} = "Maliq\,\ Korçë";
-$areanames{en}->{355862} = "Qendër\,\ Korçë";
-$areanames{en}->{355863} = "Drenovë\/Mollaj\,\ Korçë";
-$areanames{en}->{355864} = "Voskop\/Voskopojë\/Vithkuq\/Lekas\,\ Korçë";
-$areanames{en}->{355865} = "Gorë\/Pirg\/Moglicë\,\ Korçë";
-$areanames{en}->{355866} = "Libonik\/Vreshtaz\,\ Korçë";
-$areanames{en}->{355867} = "Pojan\/Liqenas\,\ Korçë";
-$areanames{en}->{355868} = "Buçimas\/Udenisht\,\ Pogradec";
-$areanames{en}->{355869} = "Çëravë\/Dardhas\,\ Pogradec";
-$areanames{en}->{355871} = "Leskovik\/Barmash\/Novoselë\,\ Kolonjë";
-$areanames{en}->{355872} = "Qendër\ Ersekë\/Mollas\/Çlirim\,\ Kolonjë";
-$areanames{en}->{355873} = "Qendër\ Bilisht\/Progër\,\ Devoll";
-$areanames{en}->{355874} = "Hoçisht\/Miras\,\ Devoll";
-$areanames{en}->{355875} = "Këlcyrë\,\ Përmet";
-$areanames{en}->{355876} = "Qendër\/Frashër\/Petran\/Çarshovë\,\ Përmet";
-$areanames{en}->{355877} = "Dishnicë\/Sukë\/Ballaban\,\ Përmet";
-$areanames{en}->{355881} = "Libohovë\/Qendër\,\ Gjirokastër";
-$areanames{en}->{355882} = "Cepo\/Picar\/Lazarat\/Atigon\,\ Gjirokastër";
-$areanames{en}->{355883} = "Lunxheri\/Odrie\/Zagorie\/Pogon\,\ Gjirokastër";
-$areanames{en}->{355884} = "Dropull\ i\ Poshtëm\/Dropull\ i\ Sipërm\,\ Gjirokastër";
-$areanames{en}->{355885} = "Memaliaj\,\ Tepelenë";
-$areanames{en}->{355886} = "Qendër\/Kurvelesh\/Lopëz\,\ Tepelenë";
-$areanames{en}->{355887} = "Qesarat\/Krahës\/Luftinje\/Buz\,\ Tepelenë";
-$areanames{en}->{355891} = "Konispol\/Xare\/Markat\,\ Sarandë";
-$areanames{en}->{355892} = "Aliko\/Lukovë\,\ Sarandë";
-$areanames{en}->{355893} = "Ksamil\,\ Sarandë";
-$areanames{en}->{355894} = "Livadhja\/Dhivër\,\ Sarandë";
-$areanames{en}->{355895} = "Finiq\/Mesopotam\/Vergo\,\ Delvinë";
+$areanames{en} = {"355367", "Perondi\/Kozarë\,\ Kuçovë",
+"355513", "Gramsh",
+"35544", "Tirana",
+"355313", "Ballsh\,\ Mallakastër",
+"355872", "Qendër\ Ersekë\/Mollas\/Çlirim\,\ Kolonjë",
+"355582", "Belsh\,\ Elbasan",
+"355376", "Dushk\/Tërbuf\,\ Lushnjë",
+"355272", "Qerret\/Qelëz\/Gjegjan\,\ Pukë",
+"355382", "Roskovec\,\ Fier",
+"355286", "Kaçinar\/Orosh\/Fan\,\ Mirditë",
+"355886", "Qendër\/Kurvelesh\/Lopëz\,\ Tepelenë",
+"355576", "Katund\ i\ Ri\/Ishem\,\ Durrës",
+"355268", "Qendër\/Gruemirë\,\ Malësi\ e\ Madhe",
+"355868", "Buçimas\/Udenisht\,\ Pogradec",
+"355591", "Përrenjas\,\ Librazhd",
+"35548", "Kashar\/Vaqar\/Ndroq\/Pezë\/Farkë\/Dajt\,\ Tiranë",
+"355295", "Sllovë\/Zall\-Dardhë\/Zall\-Reç\/Kala\ e\ Dodes\,\ Dibër",
+"355294", "Arras\/Fushë\-Çidhën\/Lurë\,\ Dibër",
+"355894", "Livadhja\/Dhivër\,\ Sarandë",
+"355391", "Orikum\,\ Vlorë",
+"355895", "Finiq\/Mesopotam\/Vergo\,\ Delvinë",
+"355860", "Trebinjë\/Proptisht\/Velçan\,\ Pogradec",
+"35583", "Pogradec",
+"355369", "Qendër\/Vendreshë\,\ Skrapar",
+"355264", "Postribë\/Gur\ i\ Zi",
+"355265", "Vig\-Mnelë\/Hajmel\,\ Shkodër",
+"35582", "Korçë",
+"35522", "Shkodër",
+"355361", "Ura\ Vajgurore\,\ Berat",
+"355865", "Gorë\/Pirg\/Moglicë\,\ Korçë",
+"355864", "Voskop\/Voskopojë\/Vithkuq\/Lekas\,\ Korçë",
+"355561", "Mamurras\,\ Kurbin",
+"355273", "Iballë\/Fierzë\/Blerim\/Qafë\-Mali\,\ Pukë",
+"355583", "Bradashesh\/Shirgjan\,\ Elbasan",
+"355873", "Qendër\ Bilisht\/Progër\,\ Devoll",
+"355383", "Qendër\,\ Fier",
+"355597", "Kodovjat\/Poroçan\/Kukur\/Lenie\,\ Gramsh",
+"355512", "Peqin",
+"355216", "Rrëshen",
+"355397", "Vllahinë\/Kote\,\ Vlorë",
+"355312", "Çorovodë\,\ Skrapar",
+"355271", "Fushë\-Arrëz\/Rrapë\,\ Pukë",
+"355871", "Leskovik\/Barmash\/Novoselë\,\ Kolonjë",
+"355375", "Golem\/Grabian\/Remas\,\ Lushnjë",
+"35549", "Petrelë\/Baldushk\/Bërzhitë\/Krrabë\/Shengjergj\/Zall\-Bastar\,\ Tiranë",
+"355374", "Gradishtë\/Kolonjë\,\ Lushnjë",
+"355581", "Cërrik\,\ Elbasan",
+"355285", "Kthjellë\/Selitë\,\ Mirditë",
+"355284", "Rubik\,\ Mirditë",
+"355575", "Xhafzotaj\/Maminas\,\ Durrës",
+"355574", "Rashbull\/Gjepalaj\,\ Durrës",
+"355884", "Dropull\ i\ Poshtëm\/Dropull\ i\ Sipërm\,\ Gjirokastër",
+"355885", "Memaliaj\,\ Tepelenë",
+"355381", "Patos\,\ Fier",
+"355389", "Dermenas\/Topojë\,\ Fier",
+"355279", "Gryk\-Çajë\/Ujmisht\/Bushtrice\/Kalis\,\ Kukës",
+"355218", "Peshkopi",
+"355589", "Karinë\/Gjocaj\/Shezë\,\ Peqin",
+"35534", "Fier",
+"35554", "Elbasan",
+"355592", "Qendër\,\ Librazhd",
+"355363", "Otllak\/Lumas\,\ Berat",
+"355392", "Selenicë\,\ Vlorë",
+"355296", "Fushë\-Bulqizë\/Shupenzë\/Zerqan\,\ Bulqizë",
+"355563", "Fushë\-Krujë",
+"355362", "Velabisht\/Roshnik\,\ Berat",
+"355266", "Bushat\/Bërdicë\,\ Shkodër",
+"355866", "Libonik\/Vreshtaz\,\ Korçë",
+"355593", "Lunik\/Orenjë\/Stebleve\,\ Librazhd",
+"355562", "Milot\/Fushe\-Kuqe\,\ Kurbin",
+"355393", "Himarë\,\ Vlorë",
+"355587", "Gostime\/Klos\/Mollas\,\ Elbasan",
+"355877", "Dishnicë\/Sukë\/Ballaban\,\ Përmet",
+"355277", "Shtiqen\/Tërthore\/Zapod\,\ Kukës",
+"355387", "Cakran\/Frakull\,\ Fier",
+"355511", "Kruje",
+"355215", "Lezhë",
+"355214", "Krumë",
+"355570", "Gosë\/Lekaj\/Sinaballaj\,\ Kavajë",
+"355814", "Tepelenë",
+"355815", "Delvinë",
+"355311", "Kuçovë",
+"35585", "Sarandë",
+"355378", "Aranitas\/Ngracan\/Selitë\/Fratar\/Kutë\,\ Mallakastër",
+"355288", "Baz\/Komsi\/Gurrë\/Xibër\,\ Mat",
+"35546", "Tirana",
+"355578", "Synej\/Golem\,\ Kavajë",
+"355293", "Kastriot\/Muhur\/Selishtë\,\ Dibër",
+"355893", "Ksamil\,\ Sarandë",
+"355862", "Qendër\,\ Korçë",
+"355366", "Poshnjë\/Kutalli\,\ Berat",
+"355262", "Rrethinat\/Ana\-Malit\,\ Shkodër",
+"355887", "Qesarat\/Krahës\/Luftinje\/Buz\,\ Tepelenë",
+"355577", "Rrogozhinë\,\ Kavajë",
+"355287", "Klos\/Suç\/Lis\,\ Mat",
+"355377", "Qendër\/Greshicë\/Hekal\,\ Mallakastër",
+"355211", "Koplik",
+"355811", "Bilisht\,\ Devoll",
+"355270", "Kolsh\/Surroj\/Arren\/Malzi\,\ Kukës",
+"355514", "Librazhd",
+"355580", "Përparim\/Pajovë\,\ Peqin",
+"35542", "Tirana",
+"355388", "Levan\,\ Fier",
+"35555", "Kavajë",
+"355278", "Bicaj\/Topojan\/Shishtavec\,\ Kukës",
+"355219", "Bulqizë",
+"355588", "Rrasë\/Fierzë\/Kajan\/Grekan\,\ Elbasan",
+"35535", "Lushnje",
+"355281", "Shëngjin\/Balldre\,\ Lezhë",
+"355571", "Shijak\,\ Durrës",
+"355384", "Mbrostar\ Ura\/LIibofshë\,\ Fier",
+"355881", "Libohovë\/Qendër\,\ Gjirokastër",
+"355385", "Portëz\/Zharëz\,\ Fier",
+"355274", "Tropojë\/Llugaj\/Margegaj\,\ Tropojë",
+"355275", "Bujan\/Fierzë\/Bytyc\/Lekbiba\,\ Tropojë",
+"355371", "Divjakë\,\ Lushnjë",
+"355875", "Këlcyrë\,\ Përmet",
+"355874", "Hoçisht\/Miras\,\ Devoll",
+"355584", "Labinot\-Fushë\/Labinot\-Mal\/Funarë\/Gracen\,\ Elbasan",
+"355585", "Shushicë\/Tregan\/Gjinar\/Zavalinë\,\ Elbasan",
+"355289", "Ulëz\/Rukaj\/Derjan\/Macukull\,\ Mat",
+"35543", "Tirana",
+"355579", "Luz\ i\ Vogël\/Kryevidh\/Helmës\,\ Kavajë",
+"35524", "Kukës",
+"35584", "Gjirokastër",
+"355892", "Aliko\/Lukovë\,\ Sarandë",
+"355396", "Shushicë\/Armen\,\ Vlorë",
+"355217", "Burrel",
+"355292", "Maqellarë\/Melan\,\ Dibër",
+"355263", "Pult\/Shalë\/Shosh\/Temal\/Shllak\,\ Shkodër",
+"355863", "Drenovë\/Mollaj\,\ Korçë",
+"355596", "Pishaj\/Sult\/Tunjë\/Kushovë\/Skënderbegas\,\ Gramsh",
+"355269", "Kastrat\/Shkrel\/Kelmend\,\ Malësi\ e\ Madhe",
+"355869", "Çëravë\/Dardhas\,\ Pogradec",
+"35545", "Tirana",
+"35552", "Durrës",
+"355398", "Sevaster\/Brataj\/Hore\-Vranisht\,\ Vlorë",
+"355565", "Koder\-Thumane\/Cudhi\,\ Kruje",
+"355564", "Nikël\/Bubq\,\ Kruje",
+"355261", "Vau\-Dejës",
+"35532", "Berat",
+"355861", "Maliq\,\ Korçë",
+"355365", "Sinjë\/Cukalat\,\ Berat",
+"355364", "Vërtop\/Terpan\,\ Berat",
+"355283", "Kolsh\/Zejmen\/Shënkoll\,\ Lezhë",
+"355883", "Lunxheri\/Odrie\/Zagorie\/Pogon\,\ Gjirokastër",
+"355573", "Sukth\,\ Durrës",
+"355373", "Krutje\/Bubullimë\/Allkaj\,\ Lushnjë",
+"355812", "Ersekë\,\ Kolonjë",
+"355297", "Gjorice\/Ostren\/Trebisht\/Martanesh\,\ Bulqizë",
+"355212", "Pukë",
+"355213", "Bajram\ Curri",
+"355813", "Përmet",
+"355867", "Pojan\/Liqenas\,\ Korçë",
+"355267", "Dajç\/Velipojë\,\ Shkodër",
+"355572", "Manëz\,\ Durrës",
+"355882", "Cepo\/Picar\/Lazarat\/Atigon\,\ Gjirokastër",
+"355386", "Kuman\/Kurjan\/Strum\/Ruzhdie\,\ Fier",
+"355282", "Kallmet\/Blinisht\/Dajç\/Ungrej\,\ Lezhë",
+"355276", "Fajza\/Golaj\/Gjinaj\,\ Has",
+"355372", "Karbunarë\/Fier\-Shegan\/Hysgjokaj\/Ballagat\,\ Lushnjë",
+"355586", "Gjergjan\/Papër\/Shalës\,\ Elbasan",
+"355876", "Qendër\/Frashër\/Petran\/Çarshovë\,\ Përmet",
+"355291", "Tomin\/Luzni\,\ Dibër",
+"355394", "Qendër\,\ Vlorë",
+"35547", "Kamëz\/Vorë\/Paskuqan\/Zall\-Herr\/Burxullë\/Prezë\,\ Tiranë",
+"355891", "Konispol\/Xare\/Markat\,\ Sarandë",
+"355395", "Novoselë\,\ Vlorë",
+"355594", "Hotolisht\/Polis\/Stravaj\,\ Librazhd",
+"355595", "Qukës\/Rajcë\,\ Librazhd",
+"355368", "Poliçan\/Bogovë\,\ Skrapar",
+"35533", "Vlorë",
+"35553", "Laç\,\ Kurbin",
+"355360", "Leshnje\/Potom\/Çepan\/Gjerbës\/Zhepë\,\ Skrapar",};
 
     sub new {
       my $class = shift;

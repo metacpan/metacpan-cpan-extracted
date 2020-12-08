@@ -1,6 +1,10 @@
 Revision history for Perl module MARC::Moose
 
-1.0.40 2020-01-10
+1.0.42
+
+  - Fix Legacy formater losing '0' indicators
+
+1.0.41 2020-01-10
 
   - UnimarcToMarc21, convert 5.. vers 240 ou 130
 

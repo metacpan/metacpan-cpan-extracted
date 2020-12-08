@@ -1,4 +1,4 @@
-# AWS::AppMesh::VirtualRouter generated from spec 4.1.0
+# AWS::AppMesh::VirtualRouter generated from spec 18.4.0
 use Moose::Util::TypeConstraints;
 
 coerce 'Cfn::Resource::Properties::AWS::AppMesh::VirtualRouter',
@@ -11,7 +11,7 @@ package Cfn::Resource::AWS::AppMesh::VirtualRouter {
   has Properties => (isa => 'Cfn::Resource::Properties::AWS::AppMesh::VirtualRouter', is => 'rw', coerce => 1);
   
   sub AttributeList {
-    [ 'Arn','MeshName','Uid','VirtualRouterName' ]
+    [ 'Arn','MeshName','MeshOwner','ResourceOwner','Uid','VirtualRouterName' ]
   }
   sub supported_regions {
     [ 'ap-northeast-1','ap-northeast-2','ap-south-1','ap-southeast-1','ap-southeast-2','ca-central-1','eu-central-1','eu-west-1','eu-west-2','us-east-1','us-east-2','us-west-1','us-west-2' ]
@@ -29,11 +29,11 @@ coerce 'Cfn::Resource::Properties::AWS::AppMesh::VirtualRouter::PortMapping',
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::AppMesh::VirtualRouter::PortMappingValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::AppMesh::VirtualRouter::PortMapping->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::AppMesh::VirtualRouter::PortMappingValue {
+package Cfn::Resource::Properties::Object::AWS::AppMesh::VirtualRouter::PortMapping {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -73,11 +73,11 @@ coerce 'Cfn::Resource::Properties::AWS::AppMesh::VirtualRouter::VirtualRouterLis
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::AppMesh::VirtualRouter::VirtualRouterListenerValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::AppMesh::VirtualRouter::VirtualRouterListener->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::AppMesh::VirtualRouter::VirtualRouterListenerValue {
+package Cfn::Resource::Properties::Object::AWS::AppMesh::VirtualRouter::VirtualRouterListener {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -94,11 +94,11 @@ coerce 'Cfn::Resource::Properties::AWS::AppMesh::VirtualRouter::VirtualRouterSpe
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::AppMesh::VirtualRouter::VirtualRouterSpecValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::AppMesh::VirtualRouter::VirtualRouterSpec->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::AppMesh::VirtualRouter::VirtualRouterSpecValue {
+package Cfn::Resource::Properties::Object::AWS::AppMesh::VirtualRouter::VirtualRouterSpec {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -112,9 +112,37 @@ package Cfn::Resource::Properties::AWS::AppMesh::VirtualRouter {
   extends 'Cfn::Resource::Properties';
   
   has MeshName => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
+  has MeshOwner => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
   has Spec => (isa => 'Cfn::Resource::Properties::AWS::AppMesh::VirtualRouter::VirtualRouterSpec', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has Tags => (isa => 'ArrayOfCfn::Resource::Properties::TagType', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has VirtualRouterName => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
 }
 
 1;
+### main pod documentation begin ###
+
+=encoding UTF-8
+
+=head1 NAME
+
+Cfn::Resource::AWS::AppMesh::VirtualRouter - Cfn resource for AWS::AppMesh::VirtualRouter
+
+=head1 DESCRIPTION
+
+This module implements a Perl module that represents the CloudFormation object AWS::AppMesh::VirtualRouter.
+
+See L<Cfn> for more information on how to use it.
+
+=head1 AUTHOR
+
+    Jose Luis Martinez
+    CAPSiDE
+    jlmartinez@capside.com
+
+=head1 COPYRIGHT and LICENSE
+
+Copyright (c) 2013 by CAPSiDE
+This code is distributed under the Apache 2 License. The full text of the 
+license can be found in the LICENSE file included with this module.
+
+=cut

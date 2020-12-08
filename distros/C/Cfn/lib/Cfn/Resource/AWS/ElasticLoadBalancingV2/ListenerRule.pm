@@ -1,4 +1,4 @@
-# AWS::ElasticLoadBalancingV2::ListenerRule generated from spec 11.1.0
+# AWS::ElasticLoadBalancingV2::ListenerRule generated from spec 18.4.0
 use Moose::Util::TypeConstraints;
 
 coerce 'Cfn::Resource::Properties::AWS::ElasticLoadBalancingV2::ListenerRule',
@@ -14,7 +14,7 @@ package Cfn::Resource::AWS::ElasticLoadBalancingV2::ListenerRule {
     [  ]
   }
   sub supported_regions {
-    [ 'ap-east-1','ap-northeast-1','ap-northeast-2','ap-northeast-3','ap-south-1','ap-southeast-1','ap-southeast-2','ca-central-1','cn-north-1','cn-northwest-1','eu-central-1','eu-north-1','eu-west-1','eu-west-2','eu-west-3','me-south-1','sa-east-1','us-east-1','us-east-2','us-gov-east-1','us-gov-west-1','us-west-1','us-west-2' ]
+    [ 'af-south-1','ap-east-1','ap-northeast-1','ap-northeast-2','ap-northeast-3','ap-south-1','ap-southeast-1','ap-southeast-2','ca-central-1','cn-north-1','cn-northwest-1','eu-central-1','eu-north-1','eu-south-1','eu-west-1','eu-west-2','eu-west-3','me-south-1','sa-east-1','us-east-1','us-east-2','us-gov-east-1','us-gov-west-1','us-west-1','us-west-2' ]
   }
 }
 
@@ -51,11 +51,11 @@ coerce 'Cfn::Resource::Properties::AWS::ElasticLoadBalancingV2::ListenerRule::Ta
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::ElasticLoadBalancingV2::ListenerRule::TargetGroupTupleValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::ElasticLoadBalancingV2::ListenerRule::TargetGroupTuple->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::ElasticLoadBalancingV2::ListenerRule::TargetGroupTupleValue {
+package Cfn::Resource::Properties::Object::AWS::ElasticLoadBalancingV2::ListenerRule::TargetGroupTuple {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -73,11 +73,11 @@ coerce 'Cfn::Resource::Properties::AWS::ElasticLoadBalancingV2::ListenerRule::Ta
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::ElasticLoadBalancingV2::ListenerRule::TargetGroupStickinessConfigValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::ElasticLoadBalancingV2::ListenerRule::TargetGroupStickinessConfig->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::ElasticLoadBalancingV2::ListenerRule::TargetGroupStickinessConfigValue {
+package Cfn::Resource::Properties::Object::AWS::ElasticLoadBalancingV2::ListenerRule::TargetGroupStickinessConfig {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -117,11 +117,11 @@ coerce 'Cfn::Resource::Properties::AWS::ElasticLoadBalancingV2::ListenerRule::Qu
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::ElasticLoadBalancingV2::ListenerRule::QueryStringKeyValueValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::ElasticLoadBalancingV2::ListenerRule::QueryStringKeyValue->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::ElasticLoadBalancingV2::ListenerRule::QueryStringKeyValueValue {
+package Cfn::Resource::Properties::Object::AWS::ElasticLoadBalancingV2::ListenerRule::QueryStringKeyValue {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -139,11 +139,11 @@ coerce 'Cfn::Resource::Properties::AWS::ElasticLoadBalancingV2::ListenerRule::So
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::ElasticLoadBalancingV2::ListenerRule::SourceIpConfigValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::ElasticLoadBalancingV2::ListenerRule::SourceIpConfig->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::ElasticLoadBalancingV2::ListenerRule::SourceIpConfigValue {
+package Cfn::Resource::Properties::Object::AWS::ElasticLoadBalancingV2::ListenerRule::SourceIpConfig {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -160,11 +160,11 @@ coerce 'Cfn::Resource::Properties::AWS::ElasticLoadBalancingV2::ListenerRule::Re
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::ElasticLoadBalancingV2::ListenerRule::RedirectConfigValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::ElasticLoadBalancingV2::ListenerRule::RedirectConfig->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::ElasticLoadBalancingV2::ListenerRule::RedirectConfigValue {
+package Cfn::Resource::Properties::Object::AWS::ElasticLoadBalancingV2::ListenerRule::RedirectConfig {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -186,11 +186,11 @@ coerce 'Cfn::Resource::Properties::AWS::ElasticLoadBalancingV2::ListenerRule::Qu
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::ElasticLoadBalancingV2::ListenerRule::QueryStringConfigValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::ElasticLoadBalancingV2::ListenerRule::QueryStringConfig->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::ElasticLoadBalancingV2::ListenerRule::QueryStringConfigValue {
+package Cfn::Resource::Properties::Object::AWS::ElasticLoadBalancingV2::ListenerRule::QueryStringConfig {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -207,11 +207,11 @@ coerce 'Cfn::Resource::Properties::AWS::ElasticLoadBalancingV2::ListenerRule::Pa
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::ElasticLoadBalancingV2::ListenerRule::PathPatternConfigValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::ElasticLoadBalancingV2::ListenerRule::PathPatternConfig->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::ElasticLoadBalancingV2::ListenerRule::PathPatternConfigValue {
+package Cfn::Resource::Properties::Object::AWS::ElasticLoadBalancingV2::ListenerRule::PathPatternConfig {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -228,11 +228,11 @@ coerce 'Cfn::Resource::Properties::AWS::ElasticLoadBalancingV2::ListenerRule::Ht
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::ElasticLoadBalancingV2::ListenerRule::HttpRequestMethodConfigValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::ElasticLoadBalancingV2::ListenerRule::HttpRequestMethodConfig->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::ElasticLoadBalancingV2::ListenerRule::HttpRequestMethodConfigValue {
+package Cfn::Resource::Properties::Object::AWS::ElasticLoadBalancingV2::ListenerRule::HttpRequestMethodConfig {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -249,11 +249,11 @@ coerce 'Cfn::Resource::Properties::AWS::ElasticLoadBalancingV2::ListenerRule::Ht
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::ElasticLoadBalancingV2::ListenerRule::HttpHeaderConfigValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::ElasticLoadBalancingV2::ListenerRule::HttpHeaderConfig->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::ElasticLoadBalancingV2::ListenerRule::HttpHeaderConfigValue {
+package Cfn::Resource::Properties::Object::AWS::ElasticLoadBalancingV2::ListenerRule::HttpHeaderConfig {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -271,11 +271,11 @@ coerce 'Cfn::Resource::Properties::AWS::ElasticLoadBalancingV2::ListenerRule::Ho
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::ElasticLoadBalancingV2::ListenerRule::HostHeaderConfigValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::ElasticLoadBalancingV2::ListenerRule::HostHeaderConfig->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::ElasticLoadBalancingV2::ListenerRule::HostHeaderConfigValue {
+package Cfn::Resource::Properties::Object::AWS::ElasticLoadBalancingV2::ListenerRule::HostHeaderConfig {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -292,11 +292,11 @@ coerce 'Cfn::Resource::Properties::AWS::ElasticLoadBalancingV2::ListenerRule::Fo
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::ElasticLoadBalancingV2::ListenerRule::ForwardConfigValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::ElasticLoadBalancingV2::ListenerRule::ForwardConfig->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::ElasticLoadBalancingV2::ListenerRule::ForwardConfigValue {
+package Cfn::Resource::Properties::Object::AWS::ElasticLoadBalancingV2::ListenerRule::ForwardConfig {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -314,11 +314,11 @@ coerce 'Cfn::Resource::Properties::AWS::ElasticLoadBalancingV2::ListenerRule::Fi
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::ElasticLoadBalancingV2::ListenerRule::FixedResponseConfigValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::ElasticLoadBalancingV2::ListenerRule::FixedResponseConfig->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::ElasticLoadBalancingV2::ListenerRule::FixedResponseConfigValue {
+package Cfn::Resource::Properties::Object::AWS::ElasticLoadBalancingV2::ListenerRule::FixedResponseConfig {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -337,11 +337,11 @@ coerce 'Cfn::Resource::Properties::AWS::ElasticLoadBalancingV2::ListenerRule::Au
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::ElasticLoadBalancingV2::ListenerRule::AuthenticateOidcConfigValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::ElasticLoadBalancingV2::ListenerRule::AuthenticateOidcConfig->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::ElasticLoadBalancingV2::ListenerRule::AuthenticateOidcConfigValue {
+package Cfn::Resource::Properties::Object::AWS::ElasticLoadBalancingV2::ListenerRule::AuthenticateOidcConfig {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -368,11 +368,11 @@ coerce 'Cfn::Resource::Properties::AWS::ElasticLoadBalancingV2::ListenerRule::Au
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::ElasticLoadBalancingV2::ListenerRule::AuthenticateCognitoConfigValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::ElasticLoadBalancingV2::ListenerRule::AuthenticateCognitoConfig->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::ElasticLoadBalancingV2::ListenerRule::AuthenticateCognitoConfigValue {
+package Cfn::Resource::Properties::Object::AWS::ElasticLoadBalancingV2::ListenerRule::AuthenticateCognitoConfig {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -418,11 +418,11 @@ coerce 'Cfn::Resource::Properties::AWS::ElasticLoadBalancingV2::ListenerRule::Ru
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::ElasticLoadBalancingV2::ListenerRule::RuleConditionValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::ElasticLoadBalancingV2::ListenerRule::RuleCondition->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::ElasticLoadBalancingV2::ListenerRule::RuleConditionValue {
+package Cfn::Resource::Properties::Object::AWS::ElasticLoadBalancingV2::ListenerRule::RuleCondition {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -468,11 +468,11 @@ coerce 'Cfn::Resource::Properties::AWS::ElasticLoadBalancingV2::ListenerRule::Ac
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::ElasticLoadBalancingV2::ListenerRule::ActionValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::ElasticLoadBalancingV2::ListenerRule::Action->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::ElasticLoadBalancingV2::ListenerRule::ActionValue {
+package Cfn::Resource::Properties::Object::AWS::ElasticLoadBalancingV2::ListenerRule::Action {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -499,3 +499,30 @@ package Cfn::Resource::Properties::AWS::ElasticLoadBalancingV2::ListenerRule {
 }
 
 1;
+### main pod documentation begin ###
+
+=encoding UTF-8
+
+=head1 NAME
+
+Cfn::Resource::AWS::ElasticLoadBalancingV2::ListenerRule - Cfn resource for AWS::ElasticLoadBalancingV2::ListenerRule
+
+=head1 DESCRIPTION
+
+This module implements a Perl module that represents the CloudFormation object AWS::ElasticLoadBalancingV2::ListenerRule.
+
+See L<Cfn> for more information on how to use it.
+
+=head1 AUTHOR
+
+    Jose Luis Martinez
+    CAPSiDE
+    jlmartinez@capside.com
+
+=head1 COPYRIGHT and LICENSE
+
+Copyright (c) 2013 by CAPSiDE
+This code is distributed under the Apache 2 License. The full text of the 
+license can be found in the LICENSE file included with this module.
+
+=cut

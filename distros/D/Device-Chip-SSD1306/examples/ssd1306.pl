@@ -1,9 +1,11 @@
 #!/usr/bin/perl
 
-use strict;
+use v5.26;
 use warnings;
 
 use Device::Chip::Adapter;
+
+use Future::AsyncAwait;
 
 use Getopt::Long qw( :config no_ignore_case );
 use Time::HiRes qw( sleep );
@@ -21,12 +23,12 @@ require ( "$cls.pm" =~ s{::}{/}gr );
 my $chip = $cls->new(
    model => $MODEL,
 );
-$chip->mount_from_paramstr(
+await $chip->mount_from_paramstr(
    Device::Chip::Adapter->new_from_description( $ADAPTER ),
    $MOUNTPARAMS,
-)->get;
+);
 
-$chip->power(1)->get;
+await $chip->power(1);
 
 # Let power stablise for 100msec
 sleep 0.1;
@@ -38,14 +40,14 @@ END {
    $chip and $chip->power(0)->get;
 }
 
-$chip->init->get;
+await $chip->init;
 
-$chip->display( 1 )->get;
-$chip->display_lamptest( 1 )->get;
+await $chip->display( 1 );
+await $chip->display_lamptest( 1 );
 
 sleep 3;
 
-$chip->display_lamptest( 0 )->get;
+await $chip->display_lamptest( 0 );
 
 $chip->clear;
 
@@ -70,6 +72,6 @@ foreach my $i ( 0 .. $midrow ) {
    $chip->draw_pixel( $midcol+$i+1, $midrow+$i+1 );
 }
 
-$chip->refresh->get;
+await $chip->refresh;
 
 sleep 10;

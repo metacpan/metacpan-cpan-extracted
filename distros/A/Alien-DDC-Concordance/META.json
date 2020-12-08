@@ -37,7 +37,7 @@
    "provides" : {
       "Alien::DDC::Concordance" : {
          "file" : "lib/Alien/DDC/Concordance.pm",
-         "version" : "0.006"
+         "version" : "0.007"
       }
    },
    "release_status" : "stable",
@@ -46,6 +46,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.006",
+   "version" : "0.007",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20200904144533;
+our $VERSION = 1.20201204215956;
 
 my $formatters = [
                 {
@@ -81,8 +81,9 @@ my $validators = {
                 'mobile' => '
           (?:
             1(?:
-              0[0-2]|
-              1[0-5]
+              0[0-6]|
+              1[0-5]|
+              20
             )|
             7\\d\\d
           )\\d{6}
@@ -94,33 +95,33 @@ my $validators = {
                 'voip' => ''
               };
 my %areanames = ();
-$areanames{en}->{2542} = "Nairobi";
-$areanames{en}->{25440} = "Kwale\/Ukunda\/Msambweni\/Lungalunga";
-$areanames{en}->{25441} = "Mombasa\/Mariakani\/Kilifi";
-$areanames{en}->{25442} = "Malindi\/Lamu\/Garsen";
-$areanames{en}->{25443} = "Voi\/Wundanyi\/Mwatate\/Taveta";
-$areanames{en}->{25444} = "Machakos\/Makueni\/Mwingi\/Kitui";
-$areanames{en}->{25445} = "Kajiado\/Ngong\/Loitokitok\/Athi\ River";
-$areanames{en}->{25446} = "Garissa\/Hola\/Wajir\/Mandera";
-$areanames{en}->{25450} = "Naivasha\/Narok\/Gilgil";
-$areanames{en}->{25451} = "Nakuru\/Njoro\/Molo";
-$areanames{en}->{25452} = "Kericho\/Bomet";
-$areanames{en}->{25453} = "Eldoret\/Turbo\/Kapsabet\/Iten\/Kabarnet";
-$areanames{en}->{25454} = "Kitale\/Moi\'s\ Bridge\/Kapenguria\/Lodwar";
-$areanames{en}->{25455} = "Bungoma\/Busia";
-$areanames{en}->{25456} = "Kakamega\/Mbale\/Butere\/Mumias\/Vihiga";
-$areanames{en}->{25457} = "Kisumu\/Siaya\/Maseno";
-$areanames{en}->{25458} = "Kisii\/Kilgoris\/Oyugis\/Nyamira";
-$areanames{en}->{25459} = "Homabay\/Migori";
-$areanames{en}->{25460} = "Muranga\/Kerugoya";
-$areanames{en}->{25461} = "Nyeri\/Karatina";
-$areanames{en}->{25462} = "Nanyuki";
-$areanames{en}->{25464} = "Meru\/Maua\/Chuka";
-$areanames{en}->{25465} = "Nyahururu\/Maralal";
-$areanames{en}->{25466} = "Thika\/Ruiru";
-$areanames{en}->{25467} = "Kiambu\/Kikuyu";
-$areanames{en}->{25468} = "Embu";
-$areanames{en}->{25469} = "Marsabit\/Moyale";
+$areanames{en} = {"25460", "Muranga\/Kerugoya",
+"25451", "Nakuru\/Njoro\/Molo",
+"25459", "Homabay\/Migori",
+"25454", "Kitale\/Moi\'s\ Bridge\/Kapenguria\/Lodwar",
+"25465", "Nyahururu\/Maralal",
+"2542", "Nairobi",
+"25442", "Malindi\/Lamu\/Garsen",
+"25464", "Meru\/Maua\/Chuka",
+"25455", "Bungoma\/Busia",
+"25450", "Naivasha\/Narok\/Gilgil",
+"25446", "Garissa\/Hola\/Wajir\/Mandera",
+"25453", "Eldoret\/Turbo\/Kapsabet\/Iten\/Kabarnet",
+"25461", "Nyeri\/Karatina",
+"25469", "Marsabit\/Moyale",
+"25441", "Mombasa\/Mariakani\/Kilifi",
+"25458", "Kisii\/Kilgoris\/Oyugis\/Nyamira",
+"25466", "Thika\/Ruiru",
+"25457", "Kisumu\/Siaya\/Maseno",
+"25462", "Nanyuki",
+"25444", "Machakos\/Makueni\/Mwingi\/Kitui",
+"25445", "Kajiado\/Ngong\/Loitokitok\/Athi\ River",
+"25452", "Kericho\/Bomet",
+"25443", "Voi\/Wundanyi\/Mwatate\/Taveta",
+"25468", "Embu",
+"25456", "Kakamega\/Mbale\/Butere\/Mumias\/Vihiga",
+"25440", "Kwale\/Ukunda\/Msambweni\/Lungalunga",
+"25467", "Kiambu\/Kikuyu",};
 
     sub new {
       my $class = shift;

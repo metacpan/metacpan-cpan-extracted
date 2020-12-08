@@ -18,5 +18,7 @@ t/11_pod_coverage.t
 t/12_invalid.t
 t/13_exp.t
 t/14_abs.t
+t/15_zeroes.t
+t/16_decimals.t
 META.yml
 META.json

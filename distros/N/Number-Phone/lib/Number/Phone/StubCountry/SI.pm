@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20200904144535;
+our $VERSION = 1.20201204215957;
 
 my $formatters = [
                 {
@@ -114,35 +114,35 @@ my $validators = {
         '
               };
 my %areanames = ();
-$areanames{en}->{3861} = "Ljubljana";
-$areanames{en}->{3862} = "Maribor\/Ravne\ na\ Koroškem\/Murska\ Sobota";
-$areanames{en}->{38632} = "Celje\/Trbovlje";
-$areanames{en}->{38633} = "Celje\/Trbovlje";
-$areanames{en}->{38634} = "Celje\/Trbovlje";
-$areanames{en}->{38635} = "Celje\/Trbovlje";
-$areanames{en}->{38636} = "Celje\/Trbovlje";
-$areanames{en}->{38637} = "Celje\/Trbovlje";
-$areanames{en}->{38638} = "Celje\/Trbovlje";
-$areanames{en}->{38642} = "Kranj";
-$areanames{en}->{38644} = "Kranj";
-$areanames{en}->{38645} = "Kranj";
-$areanames{en}->{38646} = "Kranj";
-$areanames{en}->{38647} = "Kranj";
-$areanames{en}->{38648} = "Kranj";
-$areanames{en}->{38652} = "Gorica\/Koper\/Postojna";
-$areanames{en}->{38653} = "Gorica\/Koper\/Postojna";
-$areanames{en}->{38654} = "Gorica\/Koper\/Postojna";
-$areanames{en}->{38655} = "Gorica\/Koper\/Postojna";
-$areanames{en}->{38656} = "Gorica\/Koper\/Postojna";
-$areanames{en}->{38657} = "Gorica\/Koper\/Postojna";
-$areanames{en}->{38658} = "Gorica\/Koper\/Postojna";
-$areanames{en}->{38672} = "Novo\ Mesto\/Krško";
-$areanames{en}->{38673} = "Novo\ Mesto\/Krško";
-$areanames{en}->{38674} = "Novo\ Mesto\/Krško";
-$areanames{en}->{38675} = "Novo\ Mesto\/Krško";
-$areanames{en}->{38676} = "Novo\ Mesto\/Krško";
-$areanames{en}->{38677} = "Novo\ Mesto\/Krško";
-$areanames{en}->{38678} = "Novo\ Mesto\/Krško";
+$areanames{en} = {"38674", "Novo\ Mesto\/Krško",
+"38654", "Gorica\/Koper\/Postojna",
+"3862", "Maribor\/Ravne\ na\ Koroškem\/Murska\ Sobota",
+"38648", "Kranj",
+"38634", "Celje\/Trbovlje",
+"38647", "Kranj",
+"38646", "Kranj",
+"38635", "Celje\/Trbovlje",
+"38673", "Novo\ Mesto\/Krško",
+"38653", "Gorica\/Koper\/Postojna",
+"38655", "Gorica\/Koper\/Postojna",
+"38675", "Novo\ Mesto\/Krško",
+"38642", "Kranj",
+"38633", "Celje\/Trbovlje",
+"38637", "Celje\/Trbovlje",
+"38644", "Kranj",
+"38638", "Celje\/Trbovlje",
+"38678", "Novo\ Mesto\/Krško",
+"38657", "Gorica\/Koper\/Postojna",
+"38677", "Novo\ Mesto\/Krško",
+"38658", "Gorica\/Koper\/Postojna",
+"38632", "Celje\/Trbovlje",
+"38676", "Novo\ Mesto\/Krško",
+"38656", "Gorica\/Koper\/Postojna",
+"3861", "Ljubljana",
+"38652", "Gorica\/Koper\/Postojna",
+"38645", "Kranj",
+"38636", "Celje\/Trbovlje",
+"38672", "Novo\ Mesto\/Krško",};
 
     sub new {
       my $class = shift;

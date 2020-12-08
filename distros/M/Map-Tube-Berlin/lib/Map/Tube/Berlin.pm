@@ -12,7 +12,7 @@
 
 package Map::Tube::Berlin;
 
-$VERSION = '2020.1101';
+$VERSION = '2020.1204';
 
 =head1 NAME
 

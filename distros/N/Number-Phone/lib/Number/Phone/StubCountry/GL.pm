@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20200904144532;
+our $VERSION = 1.20201204215956;
 
 my $formatters = [
                 {
@@ -62,31 +62,31 @@ my $validators = {
                 'voip' => '3[89]\\d{4}'
               };
 my %areanames = ();
-$areanames{en}->{29931} = "Nuuk";
-$areanames{en}->{29932} = "Nuuk";
-$areanames{en}->{29933} = "Nuuk";
-$areanames{en}->{29934} = "Nuuk";
-$areanames{en}->{29935} = "Nuuk";
-$areanames{en}->{29936} = "Nuuk";
-$areanames{en}->{29961} = "Nanortalik";
-$areanames{en}->{29964} = "Qaqortoq";
-$areanames{en}->{29966} = "Narsaq";
-$areanames{en}->{29968} = "Paamiut";
-$areanames{en}->{299691} = "Ivittuut";
-$areanames{en}->{29981} = "Maniitsoq";
-$areanames{en}->{29984} = "Kangerlussuaq";
-$areanames{en}->{29985} = "Sisimiut";
-$areanames{en}->{29986} = "Sisimiut";
-$areanames{en}->{29987} = "Kangaatsiaq";
-$areanames{en}->{29989} = "Aasiaat";
-$areanames{en}->{29991} = "Qasigannguit";
-$areanames{en}->{29992} = "Qeqertasuaq";
-$areanames{en}->{29994} = "Ilulissat";
-$areanames{en}->{29995} = "Uummannaq";
-$areanames{en}->{29996} = "Upernavik";
-$areanames{en}->{29997} = "Qaanaaq";
-$areanames{en}->{29998} = "Tasiilaq";
-$areanames{en}->{29999} = "Ittoqqortoormiit";
+$areanames{en} = {"29986", "Sisimiut",
+"29968", "Paamiut",
+"29991", "Qasigannguit",
+"29932", "Nuuk",
+"29999", "Ittoqqortoormiit",
+"29994", "Ilulissat",
+"29936", "Nuuk",
+"29995", "Uummannaq",
+"29966", "Narsaq",
+"29987", "Kangaatsiaq",
+"299691", "Ivittuut",
+"29935", "Nuuk",
+"29961", "Nanortalik",
+"29998", "Tasiilaq",
+"29997", "Qaanaaq",
+"29964", "Qaqortoq",
+"29985", "Sisimiut",
+"29933", "Nuuk",
+"29984", "Kangerlussuaq",
+"29931", "Nuuk",
+"29992", "Qeqertasuaq",
+"29934", "Nuuk",
+"29996", "Upernavik",
+"29981", "Maniitsoq",
+"29989", "Aasiaat",};
 
     sub new {
       my $class = shift;

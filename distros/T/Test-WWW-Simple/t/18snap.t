@@ -1,3 +1,7 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+
 # Conditional testing that plugin-installed methods are visible
 # from the underlying Mech object returned by mech()
 use Test::More tests=>2;

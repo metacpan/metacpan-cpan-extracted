@@ -12,7 +12,11 @@ my $b = AudioFile::Info::Build->new(
         'MP3::Info'       => 0,
     },
     build_requires => {
-        'Module::Build'   => 0
+        'Module::Build'   => 0,
+        YAML              => 0,
+    },
+    configure_requires => {
+        YAML              => 0,
     },
     create_makefile_pl => 'traditional',
     dynamic_config => 1,
@@ -23,6 +27,9 @@ my $b = AudioFile::Info::Build->new(
                 type => 'git',
                 url  => 'https://github.com/davorg/audiofile-info-mp3-info.git',
                 web  => 'https://github.com/davorg/audiofile-info-mp3-info',
+            },
+            bugtracker => {
+                web  => 'https://github.com/davorg/audiofile-info-mp3-info/issues',
             },
         },
     },

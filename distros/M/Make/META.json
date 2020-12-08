@@ -46,7 +46,7 @@
             "Config" : "0",
             "Cwd" : "0",
             "File::Spec" : "0",
-            "Graph" : "0.9709",
+            "Graph" : "0.9712",
             "Text::Balanced" : "2.03",
             "Text::ParseWords" : "3.24",
             "perl" : "5.006",
@@ -59,7 +59,8 @@
             "App::Prove" : "3.00"
          },
          "requires" : {
-            "Test::More" : "0.82"
+            "Test::More" : "0.82",
+            "Test::Snapshot" : "0.06"
          }
       }
    },
@@ -76,6 +77,6 @@
       },
       "x_IRC" : "irc://irc.perl.org/#perl"
    },
-   "version" : "2.009",
+   "version" : "2.010",
    "x_serialization_backend" : "JSON::PP version 4.00"
 }

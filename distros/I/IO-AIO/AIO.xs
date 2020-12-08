@@ -346,7 +346,7 @@ fiemap (eio_req *req)
   req->flags |= EIO_FLAG_PTR1_FREE;
 
   /* heuristic: start with 512 bytes (8 extents), and if that isn't enough, */
-  /* increase in 3.5kb steps */
+  /* increase in fixed steps */
   if (count < 0)
     count = 8;
 
@@ -409,10 +409,10 @@ fiemap (eio_req *req)
         {
           struct fiemap_extent *e = incmap->fm_extents + count;
 
-          if (e->fe_logical + e->fe_length >= end_offset)
-            goto done;
-
           fiemap->fm_extents [fiemap->fm_mapped_extents++] = *e;
+
+          if (e->fe_logical >= end_offset)
+            goto done;
 
           if (e->fe_flags & FIEMAP_EXTENT_LAST)
             goto done;
@@ -1197,10 +1197,17 @@ BOOT:
     const_iv (MREMAP_MAYMOVE)
     const_iv (MREMAP_FIXED)
 
-    const_iv (F_DUPFD_CLOEXEC)
-
     const_iv (MSG_CMSG_CLOEXEC)
     const_iv (SOCK_CLOEXEC)
+
+    const_iv (F_DUPFD_CLOEXEC)
+
+    const_iv (F_ADD_SEALS)
+    const_iv (F_GET_SEALS)
+    const_iv (F_SEAL_SEAL)
+    const_iv (F_SEAL_SHRINK)
+    const_iv (F_SEAL_GROW)
+    const_iv (F_SEAL_WRITE)
 
     const_iv (F_OFD_GETLK)
     const_iv (F_OFD_SETLK)
@@ -2490,7 +2497,40 @@ stx_atimensec ()
 	OUTPUT:
         RETVAL
 
-int
+void
+accept4 (aio_rfd rfh, SV *sockaddr, int salen, int flags)
+	PPCODE:
+{
+        SV *retval;
+#if HAVE_ACCEPT4
+        socklen_t salen_ = salen ? salen + 1 : 0;
+
+        if (salen)
+          {
+            sv_upgrade (sockaddr, SVt_PV);
+            sv_grow (sockaddr, salen_);
+          }
+        
+        int res = accept4 (rfh, salen ? (struct sockaddr *)SvPVX (sockaddr) : 0, salen ? &salen_ : 0, flags);
+        
+        retval = newmortalFH (res, O_RDWR);
+
+        if (res >= 0 && salen > 0)
+          {
+            if (salen_ > salen + 1)
+              salen_ = salen + 1;
+
+            SvPOK_only (sockaddr);
+            SvCUR_set (sockaddr, salen_);
+          }
+#else
+        errno = ENOSYS;
+        retval = &PL_sv_undef;
+#endif
+        XPUSHs (retval);
+}
+
+ssize_t
 splice (aio_rfd rfh, SV *off_in, aio_wfd wfh, SV *off_out, size_t length, unsigned int flags)
         CODE:
 {
@@ -2508,7 +2548,7 @@ splice (aio_rfd rfh, SV *off_in, aio_wfd wfh, SV *off_out, size_t length, unsign
 	OUTPUT:
         RETVAL
 
-int
+ssize_t
 tee (aio_rfd rfh, aio_wfd wfh, size_t length, unsigned int flags)
         CODE:
 #if HAVE_LINUX_SPLICE
@@ -2689,7 +2729,7 @@ min_fdlimit (UV limit = 0x7fffffffU)
 
         if (errno == EPERM)
           {
-            /* setlimit failed with EPERM - maybe we can't raise the hardlimit, or maybe */
+            /* setrlimit failed with EPERM - maybe we can't raise the hardlimit, or maybe */
             /* our limit overflows a system-wide limit */
             /* try an adaptive algorithm, but do not lower the hardlimit */
             rl.rlim_max = 0;
@@ -2698,7 +2738,7 @@ min_fdlimit (UV limit = 0x7fffffffU)
                 rl.rlim_max |= bit;
                 rl.rlim_cur = rl.rlim_max;
 
-                /* nevr decrease the hard limit */
+                /* never decrease the hard limit */
                 if (rl.rlim_max < orig_rlim_max)
                   break;
 

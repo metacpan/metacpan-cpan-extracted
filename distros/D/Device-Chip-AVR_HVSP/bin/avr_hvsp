@@ -9,7 +9,7 @@ use Getopt::Long;
 use List::Util 1.29 qw( pairs pairkeys );
 use Time::HiRes qw( sleep );
 
-use Future::Utils qw( repeat );
+use Future::AsyncAwait;
 
 my %FORMATS = (
    i => "main::Fileformat::IntelHex",
@@ -21,8 +21,8 @@ my %FORMATS = (
 
 my @MEMOPS;
 GetOptions(
-   'adapter|A=s' => \( my $ADAPTER = "BusPirate" ),
-   'mount|M=s'   => \( my $MOUNTPARAMS ),
+   'adapter|A=s' => \my $ADAPTER,
+   'mount|M=s'   => \my $MOUNTPARAMS,
 
    'U|memop=s' => sub {
       my ( $memory, $op, $filename, $format ) = split /:/, $_[1];
@@ -50,12 +50,12 @@ $SIG{INT} = $SIG{TERM} = sub { exit };
 
 my $avr = Device::Chip::AVR_HVSP->new;
 
-$avr->mount_from_paramstr(
+await $avr->mount_from_paramstr(
    Device::Chip::Adapter->new_from_description( $ADAPTER ),
    $MOUNTPARAMS,
-)->get;
+);
 
-$avr->start->get;
+await $avr->start;
 
 print "Recognised part: $avr->{part}\n";
 
@@ -79,7 +79,7 @@ if( $BACKUP_ALL ) {
       next unless $avr->memory_info( $memory )->can_write;
 
       $outfile->print( "#MEM $memory\n" );
-      read_memory( $memory, $outfile );
+      await read_memory( $memory, $outfile );
    }
 }
 
@@ -89,7 +89,7 @@ if( $CHIP_ERASE ) {
    die "Cannot erase chip in no-write mode\n" if $NO_WRITE;
 
    print "Erasing chip...\n";
-   $avr->chip_erase->get;
+   await $avr->chip_erase;
    $erased++;
 }
 
@@ -100,7 +100,7 @@ if( $RESTORE_ALL ) {
       my $line = <$infile>;
       $line =~ m/^#MEM (.*)/ or next;
 
-      write_memory( $1, $infile );
+      await write_memory( $1, $infile );
    }
 }
 
@@ -110,14 +110,14 @@ foreach ( @MEMOPS ) {
    my ( $memory, $op, $handler ) = @$_;
 
    if( $op eq "r" ) {
-      read_memory( $memory, $handler );
+      await read_memory( $memory, $handler );
    }
    elsif( $op eq "w" ) {
-      write_memory( $memory, $handler ) or
+      ( await write_memory( $memory, $handler ) ) or
          $exitcode = 1;
    }
    else {
-      verify_memory( $memory, $handler ) or
+      ( await verify_memory( $memory, $handler ) ) or
          $exitcode = 1;
    }
 }
@@ -129,7 +129,7 @@ END {
    $avr and $avr->stop->get;
 }
 
-sub read_memory
+async sub read_memory
 {
    my ( $memory, $handler ) = @_;
 
@@ -137,12 +137,12 @@ sub read_memory
    my $bytes = $info->words * $info->wordsize / 8;
 
    print "Reading $memory ($bytes bytes)...\n";
-   my $data = $avr->${\"read_$memory"}->get;
+   my $data = await $avr->${\"read_$memory"};
 
    $handler->output( $data );
 }
 
-sub write_memory
+async sub write_memory
 {
    my ( $memory, $handler ) = @_;
    die "Cannot write $memory when in no-write mode\n" if $NO_WRITE;
@@ -154,23 +154,23 @@ sub write_memory
 
    if( $memory eq "eeprom" || $memory eq "flash" and !$erased and !$NO_AUTOERASE ) {
       print "Erasing chip...\n";
-      $avr->chip_erase->get;
+      await $avr->chip_erase;
       $erased++;
    }
 
    print "Writing $memory ($bytes bytes)...\n";
-   $avr->${\"write_$memory"}( $data )->get;
+   await $avr->${\"write_$memory"}( $data );
 
-   return verify_memory( $memory, undef, $data );
+   return await verify_memory( $memory, undef, $data );
 }
 
-sub verify_memory
+async sub verify_memory
 {
    my ( $memory, $handler, $exp ) = @_;
    $exp //= $handler->input;
 
    print "Verifying $memory...\n";
-   my $got = $avr->${\"read_$memory"}( bytes => length $exp )->get;
+   my $got = await $avr->${\"read_$memory"}( bytes => length $exp );
 
    $got eq $exp and return 1;
 

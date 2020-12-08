@@ -57,6 +57,6 @@
          "web" : "https://github.com/stevieb9/devel-examine-subs"
       }
    },
-   "version" : "1.70",
+   "version" : "1.71",
    "x_serialization_backend" : "JSON::PP version 2.27400_02"
 }

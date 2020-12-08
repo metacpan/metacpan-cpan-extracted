@@ -49,10 +49,25 @@ elsif ( $redundancy ) {
     @r = sort { $a->[0] cmp $b->[0] or $a->[1] cmp $b->[1] } @r;
     my %seen = map +("@$_" => 1), @r;
     for my $e (@r) {
-        my $es = "@$e";
-        print "Redundant: $es\n";
-        print "\t$_\n"
-            for sort grep !$seen{$_}++, map "@$_", all_paths($g, $tcg, @$e);
+        print "Redundant direct dep: @$e\n";
+        my @direct_recipes = make_recipe_tuples($g, $e);
+        my %seen_recipe;
+        if (map @{ $_->[1] }, @direct_recipes) {
+            $seen_recipe{$_->[0]}++ for @direct_recipes;
+            print print_recipe_tuple($_, 2) for @direct_recipes;
+        }
+        for my $l (sort {"@$a" cmp "@$b"} grep !$seen{"@$_"}++, $tcg->all_paths(@$e)) {
+            print "    @$l\n";
+            my @link_recipes = make_recipe_tuples($g, [ @$l[0,1] ]);
+            next if !map @{ $_->[1] }, @link_recipes;
+            for my $lr (@link_recipes) {
+                if ($seen_recipe{$lr->[0]}++) {
+                    print "      (already seen $lr->[0])\n";
+                } else {
+                    print print_recipe_tuple($_, 6) for @link_recipes;
+                }
+            }
+        }
     }
     ## use critic
 }
@@ -60,19 +75,23 @@ else {
     $info->Make(@ARGV);
 }
 
-sub all_paths {
-    my ($g, $tcg, $u, $v) = @_;
-    return if $u eq $v;
-    my @found;
-    push @found, [$u, $v] if $g->has_edge($u, $v);
+sub make_recipe_tuples {
+    my ($g, $e) = @_;
     ## no critic (BuiltinFunctions::RequireBlockGrep BuiltinFunctions::RequireBlockMap)
-    push @found,
-        map [$u, @$_],
-        map all_paths($g, $tcg, $_, $v),
-        grep $tcg->is_reachable($_, $v),
-        grep $_ ne $v, $g->successors($u);
+    return map [
+        "$e->[0]:$_", $g->get_edge_attribute_by_id(@$e, $_, 'recipe_raw')
+    ], $g->get_multiedge_ids(@$e);
     ## use critic
-    return @found;
+}
+
+sub print_recipe_tuple {
+    my ($t, $indent) = @_;
+    ## no critic (BuiltinFunctions::RequireBlockGrep BuiltinFunctions::RequireBlockMap)
+    return join '', map "$_\n",
+        (" " x $indent)."Recipe $t->[0]:",
+        map { my $t = $_; $t =~ s/^/\t/gm; $t } @{ $t->[1] },
+        ;
+    ## use critic
 }
 
 =head1 NAME

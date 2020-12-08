@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20200904144534;
+our $VERSION = 1.20201204215957;
 
 my $formatters = [
                 {
@@ -104,25 +104,25 @@ my $validators = {
                 'voip' => ''
               };
 my %areanames = ();
-$areanames{en}->{223202} = "Bamako";
-$areanames{en}->{2232070} = "Bamako";
-$areanames{en}->{2232071} = "Bamako";
-$areanames{en}->{2232072} = "Bamako";
-$areanames{en}->{2232073} = "Bamako";
-$areanames{en}->{2232074} = "Bamako";
-$areanames{en}->{2232075} = "Bamako";
-$areanames{en}->{2232076} = "Bamako";
-$areanames{en}->{2232077} = "Bamako";
-$areanames{en}->{2232078} = "Bamako";
-$areanames{en}->{223212} = "Koulikoro";
-$areanames{en}->{223214} = "Mopti";
-$areanames{en}->{223215} = "Kayes";
-$areanames{en}->{223216} = "Sikasso";
-$areanames{en}->{223218} = "Gao\/Kidal";
-$areanames{en}->{223219} = "Tombouctou";
-$areanames{en}->{223442} = "Bamako";
-$areanames{en}->{223443} = "Bamako";
-$areanames{en}->{223449} = "Bamako";
+$areanames{en} = {"2232078", "Bamako",
+"223442", "Bamako",
+"223218", "Gao\/Kidal",
+"223219", "Tombouctou",
+"223216", "Sikasso",
+"2232077", "Bamako",
+"223212", "Koulikoro",
+"223449", "Bamako",
+"2232070", "Bamako",
+"2232076", "Bamako",
+"2232073", "Bamako",
+"223443", "Bamako",
+"223214", "Mopti",
+"223202", "Bamako",
+"223215", "Kayes",
+"2232071", "Bamako",
+"2232072", "Bamako",
+"2232075", "Bamako",
+"2232074", "Bamako",};
 
     sub new {
       my $class = shift;

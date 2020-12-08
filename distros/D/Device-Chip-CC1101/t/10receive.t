@@ -1,18 +1,20 @@
 #!/usr/bin/perl
 
-use strict;
+use v5.26;
 use warnings;
 
 use Test::More;
 use Test::Device::Chip::Adapter;
 
+use Future::AsyncAwait;
+
 use Device::Chip::CC1101;
 
 my $chip = Device::Chip::CC1101->new;
 
-$chip->mount(
+await $chip->mount(
    my $adapter = Test::Device::Chip::Adapter->new,
-)->get;
+);
 
 # initialise config
 {
@@ -23,7 +25,7 @@ $chip->mount(
    $adapter->expect_write_then_read( "\xFE", 8 )
       ->returns( "\xC6\x00\x00\x00\x00\x00\x00\x00" );
 
-   $chip->read_config->get;
+   await $chip->read_config;
 }
 
 # ->receive in fixed length configuration
@@ -31,10 +33,10 @@ $chip->mount(
    # Update CONFIG
    $adapter->expect_write( "\x46" . "\x04\x04\x44" );
 
-   $chip->change_config(
+   await $chip->change_config(
       LENGTH_CONFIG => "fixed",
       PACKET_LENGTH => 4,
-   )->get;
+   );
 
    # read RXFIFO, returns packet
    $adapter->expect_write_then_read( "\xFB", 1 )
@@ -42,7 +44,7 @@ $chip->mount(
    $adapter->expect_write_then_read( "\xFF", 6 )
       ->returns( "ABCD\x30\xA0" );
 
-   is_deeply( $chip->receive->get,
+   is_deeply( await $chip->receive,
       {
          data   => "ABCD",
          CRC_OK => 1,
@@ -60,9 +62,9 @@ $chip->mount(
    # Update CONFIG
    $adapter->expect_write( "\x48" . "\x45" );
 
-   $chip->change_config(
+   await $chip->change_config(
       LENGTH_CONFIG => "variable",
-   )->get;
+   );
 
    # read RXFIFO, returns length
    $adapter->expect_write_then_read( "\xFB", 1 )
@@ -75,7 +77,7 @@ $chip->mount(
    $adapter->expect_write_then_read( "\xFF", 6 )
       ->returns( "EFGH\x32\xA1" );
 
-   is_deeply( $chip->receive->get,
+   is_deeply( await $chip->receive,
       {
          data   => "EFGH",
          CRC_OK => 1,

@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20200904144532;
+our $VERSION = 1.20201204215956;
 
 my $formatters = [
                 {
@@ -42,7 +42,7 @@ my $validators = {
                 'fixed_line' => '
           2(?:
             2(?:
-              0[0139]|
+              0[0-39]|
               1[1-36]|
               [23]\\d|
               4[04-6]|
@@ -93,7 +93,7 @@ my $validators = {
                 'geographic' => '
           2(?:
             2(?:
-              0[0139]|
+              0[0-39]|
               1[1-36]|
               [23]\\d|
               4[04-6]|
@@ -149,144 +149,145 @@ my $validators = {
                 'voip' => ''
               };
 my %areanames = ();
-$areanames{en}->{5042200} = "Polo\ Paz";
-$areanames{en}->{5042201} = "Polo\ Paz";
-$areanames{en}->{5042203} = "Polo\ Paz";
-$areanames{en}->{5042209} = "Res\.\ Centro\ América\,\ Tegucigalpa";
-$areanames{en}->{5042211} = "El\ Picacho";
-$areanames{en}->{5042212} = "Rdsi\ Tegucigalpa\ \(Pri3\)";
-$areanames{en}->{5042213} = "Telef\.\ Inalámbrica\ Tegucig\.";
-$areanames{en}->{5042216} = "Rdsi\ Tegucigalpa\ \(Pri3\)";
-$areanames{en}->{5042220} = "Principal";
-$areanames{en}->{5042221} = "Almendros";
-$areanames{en}->{5042222} = "Principal";
-$areanames{en}->{5042223} = "Polo\ Paz";
-$areanames{en}->{5042224} = "Cerro\ Grande";
-$areanames{en}->{5042225} = "La\ Granja";
-$areanames{en}->{5042226} = "Loarque";
-$areanames{en}->{5042227} = "Res\.\ Centro\ América\,\ Tegucigalpa";
-$areanames{en}->{5042228} = "Kennedy\,\ Tegucigalpa";
-$areanames{en}->{5042229} = "El\ Ocotal";
-$areanames{en}->{5042230} = "Kennedy\,\ Tegucigalpa";
-$areanames{en}->{5042231} = "Miraflores";
-$areanames{en}->{5042232} = "Miraflores";
-$areanames{en}->{5042233} = "Toncontín";
-$areanames{en}->{5042234} = "Toncontín";
-$areanames{en}->{5042235} = "Miraflores";
-$areanames{en}->{5042236} = "Almendros";
-$areanames{en}->{5042237} = "Principal";
-$areanames{en}->{5042238} = "Principal";
-$areanames{en}->{5042239} = "Miraflores";
-$areanames{en}->{5042240} = "Kennedy\,\ Tegucigalpa";
-$areanames{en}->{5042244} = "Tegucigalpa";
-$areanames{en}->{5042245} = "La\ Vega\,\ Tegucigalpa";
-$areanames{en}->{5042246} = "La\ Vega\,\ Tegucigalpa";
-$areanames{en}->{5042255} = "El\ Hato";
-$areanames{en}->{5042257} = "Prados\ Universitarios";
-$areanames{en}->{5042290} = "Toncontin";
-$areanames{en}->{5042291} = "Toncontin";
-$areanames{en}->{5042407} = "Roatán\,\ Bay\ Islands";
-$areanames{en}->{5042423} = "La\ Ceiba";
-$areanames{en}->{5042424} = "Sabá";
-$areanames{en}->{5042425} = "Utila\,\ Bay\ Islands";
-$areanames{en}->{5042429} = "San\ Alejo\/Mesapa";
-$areanames{en}->{5042431} = "San\ Francisco\,\ Atlántida";
-$areanames{en}->{5042433} = "Arenal";
-$areanames{en}->{5042434} = "Trujillo";
-$areanames{en}->{5042435} = "Oakridge";
-$areanames{en}->{5042436} = "La\ Masica";
-$areanames{en}->{5042438} = "Bonito\ Oriental";
-$areanames{en}->{5042440} = "La\ Ceiba";
-$areanames{en}->{5042442} = "La\ Ceiba";
-$areanames{en}->{5042443} = "La\ Ceiba";
-$areanames{en}->{5042444} = "Tocoa\,\ Colón";
-$areanames{en}->{5042445} = "Coxin\ Hole\,\ Roatán";
-$areanames{en}->{5042446} = "Olanchito";
-$areanames{en}->{5042448} = "Tela";
-$areanames{en}->{5042451} = "Sonaguera";
-$areanames{en}->{5042452} = "Coyoles\ Central";
-$areanames{en}->{5042453} = "Guanaja";
-$areanames{en}->{5042455} = "French\ Harbour";
-$areanames{en}->{504251} = "San\ Pedro\ Sula\,\ Cortés";
-$areanames{en}->{5042540} = "San\ Pedro\ Sula\,\ Cortés";
-$areanames{en}->{5042543} = "Inalámbrica\ Sps";
-$areanames{en}->{5042544} = "Rdsi\ San\ Pedro\ Sula";
-$areanames{en}->{5042545} = "San\ Pedro\ Sula\,\ Cortés";
-$areanames{en}->{5042550} = "San\ Pedro\ Sula\,\ Cortés";
-$areanames{en}->{5042551} = "Monte\ Prieto";
-$areanames{en}->{5042552} = "San\ Pedro\ Sula\,\ Cortés";
-$areanames{en}->{5042553} = "San\ Pedro\ Sula\,\ Cortés";
-$areanames{en}->{5042554} = "Monte\ Prieto";
-$areanames{en}->{5042555} = "Rivera\ Hernandez\,\ San\ Pedro\ Sula";
-$areanames{en}->{5042556} = "La\ Puerta";
-$areanames{en}->{5042557} = "San\ Pedro\ Sula\,\ Cortés";
-$areanames{en}->{5042558} = "San\ Pedro\ Sula\,\ Cortés";
-$areanames{en}->{5042559} = "Col\.\ Satélite";
-$areanames{en}->{5042564} = "San\ Pedro\ Sula\,\ Cortés";
-$areanames{en}->{5042565} = "Chamelecón";
-$areanames{en}->{5042566} = "Jardines\ Del\ Valle";
-$areanames{en}->{504257} = "Búfalo";
-$areanames{en}->{504261} = "Choloma\,\ Cortés";
-$areanames{en}->{5042640} = "C\.\ Comunitarios";
-$areanames{en}->{5042641} = "C\.\ Comunitarios";
-$areanames{en}->{5042642} = "C\.\ Comunitarios";
-$areanames{en}->{5042643} = "Santa\ Bárbara";
-$areanames{en}->{5042647} = "Progreso";
-$areanames{en}->{5042648} = "Progreso\/Santa\ Cruz";
-$areanames{en}->{5042650} = "San\ Manuel\/Rio\ Lindo";
-$areanames{en}->{5042651} = "Cucuyagua\/Copán";
-$areanames{en}->{5042652} = "Agua\ Caliente";
-$areanames{en}->{5042653} = "Nueva\ Ocotepeque";
-$areanames{en}->{5042654} = "Santa\ Cruz";
-$areanames{en}->{5042655} = "Lepaera\/Corquín";
-$areanames{en}->{5042656} = "Gracias\/S\.R\.Copán";
-$areanames{en}->{5042657} = "El\ Naranjo\ Sta\ Bárbara";
-$areanames{en}->{5042658} = "Macueliso\ Omoa\/Trascerros";
-$areanames{en}->{5042659} = "El\ Mochito\/Quimistán";
-$areanames{en}->{5042670} = "Villa\ Nueva";
-$areanames{en}->{5042671} = "Yoro";
-$areanames{en}->{5042672} = "Cofradía";
-$areanames{en}->{5042673} = "Potrerillos";
-$areanames{en}->{5042674} = "Sulaco\/Los\ Orcones";
-$areanames{en}->{5042675} = "Villa\ Nueva";
-$areanames{en}->{5042678} = "Potrerillos";
-$areanames{en}->{504268} = "La\ Lima";
-$areanames{en}->{5042690} = "El\ Negrito";
-$areanames{en}->{5042691} = "Morazán";
-$areanames{en}->{5042764} = "Amarat\/Marcala";
-$areanames{en}->{5042766} = "Valle\ De\ Ángeles";
-$areanames{en}->{5042767} = "Ojojona";
-$areanames{en}->{5042768} = "Sabana\ Grande";
-$areanames{en}->{5042769} = "Guaimaca";
-$areanames{en}->{5042770} = "Comayagua";
-$areanames{en}->{5042772} = "Comayagua";
-$areanames{en}->{5042773} = "Siguatepeque";
-$areanames{en}->{5042774} = "La\ Paz";
-$areanames{en}->{5042775} = "Talanga";
-$areanames{en}->{5042776} = "Zamorano";
-$areanames{en}->{5042777} = "Proyecto\ Ala";
-$areanames{en}->{5042778} = "Centros\ Comunitarios";
-$areanames{en}->{5042779} = "Santa\ Lucía";
-$areanames{en}->{5042780} = "Choluteca";
-$areanames{en}->{5042783} = "La\ Esperanza";
-$areanames{en}->{5042784} = "La\ Libertad";
-$areanames{en}->{504287} = "Choluteca";
-$areanames{en}->{5042880} = "Choluteca";
-$areanames{en}->{5042881} = "San\ Lorenzo";
-$areanames{en}->{5042882} = "Choluteca";
-$areanames{en}->{5042883} = "Danli";
-$areanames{en}->{5042885} = "Juticalpa";
-$areanames{en}->{5042887} = "Proyecto\ Ala";
-$areanames{en}->{5042888} = "S\.\ Marcos\/Proy\.\ Ala";
-$areanames{en}->{5042889} = "Campamento";
-$areanames{en}->{5042891} = "S\.\ Franc\.\ De\ La\ Paz";
-$areanames{en}->{5042892} = "Yuscarán";
-$areanames{en}->{5042893} = "El\ Paraíso";
-$areanames{en}->{5042894} = "Amatillo\/Goascorán";
-$areanames{en}->{5042895} = "Nacaome\/Amapala";
-$areanames{en}->{5042897} = "San\ Fco\.\ De\ Becerra";
-$areanames{en}->{5042898} = "Domsat";
-$areanames{en}->{5042899} = "Catacamas";
+$areanames{en} = {"5042425", "Utila\,\ Bay\ Islands",
+"5042885", "Juticalpa",
+"5042773", "Siguatepeque",
+"5042236", "Almendros",
+"5042673", "Potrerillos",
+"5042566", "Jardines\ Del\ Valle",
+"5042559", "Col\.\ Satélite",
+"5042223", "Polo\ Paz",
+"5042446", "Olanchito",
+"5042232", "Miraflores",
+"5042775", "Talanga",
+"5042203", "Polo\ Paz",
+"5042246", "La\ Vega\,\ Tegucigalpa",
+"5042883", "Danli",
+"5042423", "La\ Ceiba",
+"5042784", "La\ Libertad",
+"5042551", "Monte\ Prieto",
+"5042554", "Monte\ Prieto",
+"504251", "San\ Pedro\ Sula\,\ Cortés",
+"5042544", "Rdsi\ San\ Pedro\ Sula",
+"5042558", "San\ Pedro\ Sula\,\ Cortés",
+"5042436", "La\ Masica",
+"5042897", "San\ Fco\.\ De\ Becerra",
+"5042452", "Coyoles\ Central",
+"5042225", "La\ Granja",
+"5042442", "La\ Ceiba",
+"5042780", "Choluteca",
+"5042657", "El\ Naranjo\ Sta\ Bárbara",
+"5042647", "Progreso",
+"5042675", "Villa\ Nueva",
+"5042550", "San\ Pedro\ Sula\,\ Cortés",
+"5042540", "San\ Pedro\ Sula\,\ Cortés",
+"5042235", "Miraflores",
+"504261", "Choloma\,\ Cortés",
+"5042654", "Santa\ Cruz",
+"5042211", "El\ Picacho",
+"5042772", "Comayagua",
+"5042641", "C\.\ Comunitarios",
+"5042651", "Cucuyagua\/Copán",
+"5042290", "Toncontin",
+"5042894", "Amatillo\/Goascorán",
+"5042891", "S\.\ Franc\.\ De\ La\ Paz",
+"5042640", "C\.\ Comunitarios",
+"5042433", "Arenal",
+"5042650", "San\ Manuel\/Rio\ Lindo",
+"5042222", "Principal",
+"5042455", "French\ Harbour",
+"5042445", "Coxin\ Hole\,\ Roatán",
+"5042898", "Domsat",
+"5042557", "San\ Pedro\ Sula\,\ Cortés",
+"5042672", "Cofradía",
+"5042565", "Chamelecón",
+"5042291", "Toncontin",
+"5042648", "Progreso\/Santa\ Cruz",
+"5042658", "Macueliso\ Omoa\/Trascerros",
+"5042766", "Valle\ De\ Ángeles",
+"5042882", "Choluteca",
+"5042202", "Tegucigalpa",
+"5042255", "El\ Hato",
+"5042776", "Zamorano",
+"5042245", "La\ Vega\,\ Tegucigalpa",
+"5042233", "Toncontín",
+"5042899", "Catacamas",
+"504257", "Búfalo",
+"5042226", "Loarque",
+"5042659", "El\ Mochito\/Quimistán",
+"5042443", "La\ Ceiba",
+"5042453", "Guanaja",
+"5042435", "Oakridge",
+"5042556", "La\ Puerta",
+"5042438", "Bonito\ Oriental",
+"5042690", "El\ Negrito",
+"5042893", "El\ Paraíso",
+"5042244", "Tegucigalpa",
+"5042213", "Telef\.\ Inalámbrica\ Tegucig\.",
+"5042643", "Santa\ Bárbara",
+"5042653", "Nueva\ Ocotepeque",
+"5042887", "Proyecto\ Ala",
+"5042691", "Morazán",
+"5042431", "San\ Francisco\,\ Atlántida",
+"5042240", "Kennedy\,\ Tegucigalpa",
+"5042239", "Miraflores",
+"5042434", "Trujillo",
+"5042655", "Lepaera\/Corquín",
+"5042234", "Toncontín",
+"5042440", "La\ Ceiba",
+"5042231", "Miraflores",
+"5042448", "Tela",
+"5042895", "Nacaome\/Amapala",
+"5042552", "San\ Pedro\ Sula\,\ Cortés",
+"5042407", "Roatán\,\ Bay\ Islands",
+"5042227", "Res\.\ Centro\ América\,\ Tegucigalpa",
+"5042230", "Kennedy\,\ Tegucigalpa",
+"5042767", "Ojojona",
+"5042451", "Sonaguera",
+"5042444", "Tocoa\,\ Colón",
+"5042777", "Proyecto\ Ala",
+"5042564", "San\ Pedro\ Sula\,\ Cortés",
+"5042238", "Principal",
+"5042212", "Rdsi\ Tegucigalpa\ \(Pri3\)",
+"5042678", "Potrerillos",
+"5042652", "Agua\ Caliente",
+"5042642", "C\.\ Comunitarios",
+"5042774", "La\ Paz",
+"5042220", "Principal",
+"5042764", "Amarat\/Marcala",
+"5042892", "Yuscarán",
+"5042228", "Kennedy\,\ Tegucigalpa",
+"504287", "Choluteca",
+"5042545", "San\ Pedro\ Sula\,\ Cortés",
+"5042670", "Villa\ Nueva",
+"5042555", "Rivera\ Hernandez\,\ San\ Pedro\ Sula",
+"5042889", "Campamento",
+"5042209", "Res\.\ Centro\ América\,\ Tegucigalpa",
+"5042221", "Almendros",
+"5042429", "San\ Alejo\/Mesapa",
+"5042770", "Comayagua",
+"5042768", "Sabana\ Grande",
+"5042224", "Cerro\ Grande",
+"5042237", "Principal",
+"5042671", "Yoro",
+"5042778", "Centros\ Comunitarios",
+"5042674", "Sulaco\/Los\ Orcones",
+"5042553", "San\ Pedro\ Sula\,\ Cortés",
+"5042543", "Inalámbrica\ Sps",
+"5042783", "La\ Esperanza",
+"5042424", "Sabá",
+"5042201", "Polo\ Paz",
+"5042229", "El\ Ocotal",
+"5042881", "San\ Lorenzo",
+"5042216", "Rdsi\ Tegucigalpa\ \(Pri3\)",
+"5042656", "Gracias\/S\.R\.Copán",
+"5042257", "Prados\ Universitarios",
+"5042769", "Guaimaca",
+"5042888", "S\.\ Marcos\/Proy\.\ Ala",
+"504268", "La\ Lima",
+"5042200", "Polo\ Paz",
+"5042880", "Choluteca",
+"5042779", "Santa\ Lucía",};
 
     sub new {
       my $class = shift;

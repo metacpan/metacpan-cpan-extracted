@@ -1,0 +1,13 @@
+Revision history for Perl extension RogueQuest.
+
+0.0.3 Mon Dec 7 
+  	- added graphics copyright RPGrevolution, CC license
+	
+0.0.2 Mon Dec 7 
+	- README fixes
+
+0.0.1  Mon Dec  7 03:51:12 2020
+	- original version; created by h2xs 1.23 with options
+		-X -n RogueQuest
+
+	- graphics demo still

@@ -11,7 +11,7 @@ package UTF8::R2;
 use 5.00503;    # Universal Consensus 1998 for primetools
 # use 5.008001; # Lancaster Consensus 2013 for toolchains
 
-$VERSION = '0.10';
+$VERSION = '0.11';
 $VERSION = $VERSION;
 
 use strict;
@@ -412,15 +412,15 @@ sub UTF8::R2::qr ($) {
     }
 
     my @after_subregex = ();
-    while ($before_regex =~ s{ \A
-        (?> \[ (?: (?>\\x\{[01234567890ABCDEFabcdef]+\}) | (?>\\c[\x00-\xFF]) | (?>\\$x) | $x )+? \] ) |
-                   (?>\\x\{[01234567890ABCDEFabcdef]+\}) | (?>\\c[\x00-\xFF]) | (?>\\$x) | $x
-    }{}x) {
+    while ($before_regex =~ s! \A
+        (?> \[ (?: \[:[^:]+?:\] | \\x\{[01234567890ABCDEFabcdef]+\} | \\c[\x00-\xFF] | (?>\\$x) | $x )+? \] ) |
+                                  \\x\{[01234567890ABCDEFabcdef]+\} | \\c[\x00-\xFF] | (?>\\$x) | $x
+    !!x) {
         my $before_subregex = $&;
 
         # [^...] or [...]
         if (my($negative,$before_class) = $before_subregex =~ /\A \[ (\^?) ((?>\\$x|$x)+?) \] \z/x) {
-            my @before_subclass = $before_class =~ /\G (?: (?>\\x\{[01234567890ABCDEFabcdef]+\}) | (?>\\$x) | $x ) /xg;
+            my @before_subclass = $before_class =~ /\G (?: \[:.+?:\] | \\x\{[01234567890ABCDEFabcdef]+\} | (?>\\$x) | $x ) /xg;
             my @sbcs = ();
             my @mbcs = ();
 
@@ -433,25 +433,61 @@ sub UTF8::R2::qr ($) {
                     $i += 3;
                 }
 
-                # \any
+                # any "one"
                 else {
                     $before_subclass = _unicode_hex($before_subclass);
                     if (0) { }
-                    elsif ($before_subclass eq '\D')          { push @mbcs, "(?:(?![$bare_d])$x)"  }
-                    elsif ($before_subclass eq '\H')          { push @mbcs, "(?:(?![$bare_h])$x)"  }
-#                   elsif ($before_subclass eq '\N')          { push @mbcs, "(?:(?!\\n)$x)"        } # \N in a character class must be a named character: \N{...} in regex
-#                   elsif ($before_subclass eq '\R')          { push @mbcs, "(?>\\r\\n|[$bare_v])" } # Unrecognized escape \R in character class passed through in regex
-                    elsif ($before_subclass eq '\S')          { push @mbcs, "(?:(?![$bare_s])$x)"  }
-                    elsif ($before_subclass eq '\V')          { push @mbcs, "(?:(?![$bare_v])$x)"  }
-                    elsif ($before_subclass eq '\W')          { push @mbcs, "(?:(?![$bare_w])$x)"  }
-                    elsif ($before_subclass eq '\b')          { push @sbcs, $bare_b                }
-                    elsif ($before_subclass eq '\d')          { push @sbcs, $bare_d                }
-                    elsif ($before_subclass eq '\h')          { push @sbcs, $bare_h                }
-                    elsif ($before_subclass eq '\s')          { push @sbcs, $bare_s                }
-                    elsif ($before_subclass eq '\v')          { push @sbcs, $bare_v                }
-                    elsif ($before_subclass eq '\w')          { push @sbcs, $bare_w                }
-                    elsif (CORE::length($before_subclass)==1) { push @sbcs, $before_subclass       }
-                    else                                      { push @mbcs, $before_subclass       }
+
+                    # \any
+                    elsif ($before_subclass eq '\D'         ) { push @mbcs, "(?:(?![$bare_d])$x)"  }
+                    elsif ($before_subclass eq '\H'         ) { push @mbcs, "(?:(?![$bare_h])$x)"  }
+#                   elsif ($before_subclass eq '\N'         ) { push @mbcs, "(?:(?!\\n)$x)"        } # \N in a character class must be a named character: \N{...} in regex
+#                   elsif ($before_subclass eq '\R'         ) { push @mbcs, "(?>\\r\\n|[$bare_v])" } # Unrecognized escape \R in character class passed through in regex
+                    elsif ($before_subclass eq '\S'         ) { push @mbcs, "(?:(?![$bare_s])$x)"  }
+                    elsif ($before_subclass eq '\V'         ) { push @mbcs, "(?:(?![$bare_v])$x)"  }
+                    elsif ($before_subclass eq '\W'         ) { push @mbcs, "(?:(?![$bare_w])$x)"  }
+                    elsif ($before_subclass eq '\b'         ) { push @sbcs, $bare_b                }
+                    elsif ($before_subclass eq '\d'         ) { push @sbcs, $bare_d                }
+                    elsif ($before_subclass eq '\h'         ) { push @sbcs, $bare_h                }
+                    elsif ($before_subclass eq '\s'         ) { push @sbcs, $bare_s                }
+                    elsif ($before_subclass eq '\v'         ) { push @sbcs, $bare_v                }
+                    elsif ($before_subclass eq '\w'         ) { push @sbcs, $bare_w                }
+
+                    # [:POSIX:]
+                    elsif ($before_subclass eq '[:alnum:]'  ) { push @sbcs, '\x30-\x39\x41-\x5A\x61-\x7A';                  }
+                    elsif ($before_subclass eq '[:alpha:]'  ) { push @sbcs, '\x41-\x5A\x61-\x7A';                           }
+                    elsif ($before_subclass eq '[:ascii:]'  ) { push @sbcs, '\x00-\x7F';                                    }
+                    elsif ($before_subclass eq '[:blank:]'  ) { push @sbcs, '\x09\x20';                                     }
+                    elsif ($before_subclass eq '[:cntrl:]'  ) { push @sbcs, '\x00-\x1F\x7F';                                }
+                    elsif ($before_subclass eq '[:digit:]'  ) { push @sbcs, '\x30-\x39';                                    }
+                    elsif ($before_subclass eq '[:graph:]'  ) { push @sbcs, '\x21-\x7F';                                    }
+                    elsif ($before_subclass eq '[:lower:]'  ) { push @sbcs, '\x61-\x7A';                                    } # /i modifier requires 'a' to 'z' literally
+                    elsif ($before_subclass eq '[:print:]'  ) { push @sbcs, '\x20-\x7F';                                    }
+                    elsif ($before_subclass eq '[:punct:]'  ) { push @sbcs, '\x21-\x2F\x3A-\x3F\x40\x5B-\x5F\x60\x7B-\x7E'; }
+                    elsif ($before_subclass eq '[:space:]'  ) { push @sbcs, '\s\x0B';                                       } # "\s" and vertical tab ("\cK")
+                    elsif ($before_subclass eq '[:upper:]'  ) { push @sbcs, '\x41-\x5A';                                    } # /i modifier requires 'A' to 'Z' literally
+                    elsif ($before_subclass eq '[:word:]'   ) { push @sbcs, '\x30-\x39\x41-\x5A\x5F\x61-\x7A';              }
+                    elsif ($before_subclass eq '[:xdigit:]' ) { push @sbcs, '\x30-\x39\x41-\x46\x61-\x66';                  }
+
+                    # [:^POSIX:]
+                    elsif ($before_subclass eq '[:^alnum:]' ) { push @mbcs, "(?:(?![\\x30-\\x39\\x41-\\x5A\\x61-\\x7A])$x)";                      }
+                    elsif ($before_subclass eq '[:^alpha:]' ) { push @mbcs, "(?:(?![\\x41-\\x5A\\x61-\\x7A])$x)";                                 }
+                    elsif ($before_subclass eq '[:^ascii:]' ) { push @mbcs, "(?:(?![\\x00-\\x7F])$x)";                                            }
+                    elsif ($before_subclass eq '[:^blank:]' ) { push @mbcs, "(?:(?![\\x09\\x20])$x)";                                             }
+                    elsif ($before_subclass eq '[:^cntrl:]' ) { push @mbcs, "(?:(?![\\x00-\\x1F\\x7F])$x)";                                       }
+                    elsif ($before_subclass eq '[:^digit:]' ) { push @mbcs, "(?:(?![\\x30-\\x39])$x)";                                            }
+                    elsif ($before_subclass eq '[:^graph:]' ) { push @mbcs, "(?:(?![\\x21-\\x7F])$x)";                                            }
+                    elsif ($before_subclass eq '[:^lower:]' ) { push @mbcs, "(?:(?![\\x61-\\x7A])$x)";                                            } # /i modifier requires 'a' to 'z' literally
+                    elsif ($before_subclass eq '[:^print:]' ) { push @mbcs, "(?:(?![\\x20-\\x7F])$x)";                                            }
+                    elsif ($before_subclass eq '[:^punct:]' ) { push @mbcs, "(?:(?![\\x21-\\x2F\\x3A-\\x3F\\x40\\x5B-\\x5F\\x60\\x7B-\\x7E])$x)"; }
+                    elsif ($before_subclass eq '[:^space:]' ) { push @mbcs, "(?:(?![\\s\\x0B])$x)";                                               } # "\s" and vertical tab ("\cK")
+                    elsif ($before_subclass eq '[:^upper:]' ) { push @mbcs, "(?:(?![\\x41-\\x5A])$x)";                                            } # /i modifier requires 'A' to 'Z' literally
+                    elsif ($before_subclass eq '[:^word:]'  ) { push @mbcs, "(?:(?![\\x30-\\x39\\x41-\\x5A\\x5F\\x61-\\x7A])$x)";                 }
+                    elsif ($before_subclass eq '[:^xdigit:]') { push @mbcs, "(?:(?![\\x30-\\x39\\x41-\\x46\\x61-\\x66])$x)";                      }
+
+                    # other all
+                    elsif (CORE::length($before_subclass)==1) { push @sbcs, $before_subclass }
+                    else                                      { push @mbcs, $before_subclass }
                     $i += 1;
                 }
             }
@@ -908,13 +944,18 @@ UTF8::R2 - makes UTF-8 scripting easy for enterprise use or LTS
     $result = $_ =~ $mb{qr/$utf8regex/imsxogc}
     $result = $_ =~ s<$mb{qr/before/imsxo}><after>egr
 
-=head1 OCTET SEMANTICS FUNCTIONS VS. CODEPOINT SEMANTICS SUBROUTINES
+=head1 OCTET-semantics Functions vs. Codepoint-semantics Subroutines
 
-Because this module override nothing, the embedded functions provide octet semantics continue.
-UTF-8 codepoint semantics is provided by the new subroutine name.
+This software adds the ability to handle UTF-8 code points to bare Perl; it does
+not provide the ability to handle characters and graphene with UTF-8.
+(Time is on our side, so let's all be excited for the day when code points
+represent graphene.)
+Because this module override nothing, the functions of bare Perl provide octet
+semantics continue. UTF-8 codepoint semantics is provided by the new subroutine
+name.
 
   ------------------------------------------------------------------------------------------------------------------------------------------
-  Octet Semantics         UTF-8 Codepoint Semantics
+  Octet-semantics         UTF-8 Codepoint-semantics
   by traditional name     by new name                                Note and Limitations
   ------------------------------------------------------------------------------------------------------------------------------------------
   chop                    UTF8::R2::chop(@_)                         usually chomp() is useful
@@ -932,13 +973,15 @@ UTF-8 codepoint semantics is provided by the new subroutine name.
   length                  UTF8::R2::length($_)                       length() is compatible and usually useful
   ------------------------------------------------------------------------------------------------------------------------------------------
   // or m// or qr//       UTF8::R2::qr(qr/$utf8regex/imsxogc)        not supports metasymbol \X that match grapheme
-                            or                                       not supports POSIX character class (like an [:alpha:])
-                          use UTF8::R2 qw(%mb);                      not supports named character (such as \N{GREEK SMALL LETTER EPSILON}, \N{greek:epsilon}, or \N{epsilon})
-                          $mb{qr/$utf8regex/imsxogc}                 not supports character properties (like \p{PROP} and \P{PROP})
+                            or                                       not supports named character (such as \N{GREEK SMALL LETTER EPSILON}, \N{greek:epsilon}, or \N{epsilon})
+                          use UTF8::R2 qw(%mb);                      not supports character properties (like \p{PROP} and \P{PROP})
+                          $mb{qr/$utf8regex/imsxogc}
 
                           Special Escapes in Regex                   Support Perl Version
                           --------------------------------------------------------------------------------------------------
-                          $mb{qr/ \x{Unicode} /}                     since perl 5.006
+                          $mb{qr/ \x{Unicode} /}                     since perl 5.005
+                          $mb{qr/ [[:POSIX:]] /}                     since perl 5.005
+                          $mb{qr/ [[:^POSIX:]] /}                    since perl 5.005
                           $mb{qr/ [^ ... ] /}                        ** CAUTION ** perl 5.006 cannot this
                           $mb{qr/ \h /}                              since perl 5.010
                           $mb{qr/ \v /}                              since perl 5.010
@@ -1045,21 +1088,12 @@ page 402 of the Programming Perl, 3rd ed. again.
     |    Text string as Digital octet string     |
     |    Digital octet string as Text string     |
     +--------------------------------------------+
-    |       Not UTF8 Flagged, No Mojibake        |
+    |       Not UTF8 Flagged, No MOJIBAKE        |
     +--------------------------------------------+
 
   In UNIX Everything is a File
   - In UNIX everything is a stream of bytes
   - In UNIX the filesystem is used as a universal name space
-
-  Native Encoding Scripting
-  - native encoding of file contents
-  - native encoding of file name on filesystem
-  - native encoding of command line
-  - native encoding of environment variable
-  - native encoding of API
-  - native encoding of network packet
-  - native encoding of database
 
 Ideally, We'd like to achieve these five Goals:
 
@@ -1112,7 +1146,7 @@ Back when Programming Perl, 3rd ed. was written, UTF8 flag was not born
 and Perl is designed to make the easy jobs easy. This software provides
 programming environment like at that time.
 
-=head1 Perl's motto
+=head1 Perl's Motto
 
    Some computer scientists (the reductionists, in particular) would
   like to deny it, but people have funny-shaped minds. Mental geography

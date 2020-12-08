@@ -1,18 +1,18 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2016 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2016-2020 -- leonerd@leonerd.org.uk
 
-package Device::Chip::SDCard;
+use v5.26;
+use Object::Pad 0.19;
 
-use strict;
-use warnings;
-use base qw( Device::Chip );
+package Device::Chip::SDCard 0.03;
+class Device::Chip::SDCard
+   extends Device::Chip;
 
-our $VERSION = '0.02';
+use Future::AsyncAwait;
 
 use Data::Bitfield qw( bitfield boolfield );
-use Future::Utils qw( repeat );
 
 use constant PROTOCOL => "SPI";
 
@@ -22,18 +22,19 @@ C<Device::Chip::SDCard> - chip driver for F<SD> and F<MMC> cards
 
 =head1 SYNOPSIS
 
- use Device::Chip::SDCard;
+   use Device::Chip::SDCard;
+   use Future::AsyncAwait;
 
- my $card = Device::Chip::SDCard->new;
+   my $card = Device::Chip::SDCard->new;
 
- $card->mount( Device::Chip::Adapter::...->new )->get;
+   await $card->mount( Device::Chip::Adapter::...->new );
 
- $card->initialise->get;
+   await $card->initialise;
 
- my $bytes = $card->read_block( 0 )->get;
+   my $bytes = await $card->read_block( 0 );
 
- print "Read block zero:\n";
- printf "%v02X\n", $bytes;
+   print "Read block zero:\n";
+   printf "%v02X\n", $bytes;
 
 =head1 DESCRIPTION
 
@@ -45,7 +46,7 @@ or SDXC.
 
 =cut
 
-sub SPI_options
+method SPI_options
 {
    return (
       mode        => 0,
@@ -55,71 +56,56 @@ sub SPI_options
 
 =head1 METHODS
 
-The following methods documented with a trailing call to C<< ->get >> return
-L<Future> instances.
+The following methods documented in an C<await> expression return L<Future>
+instances.
 
 =cut
 
-sub send_command
+async method send_command ( $cmd, $arg = 0, $readlen = 0 )
 {
-   my $self = shift;
-   my ( $cmd, $arg, $readlen ) = @_;
-
-   $arg //= 0;
-   $readlen //= 0;
-
    my $crcstop = 0x95;
 
    # TODO: until we can perform dynamic transactions with D:C:A we'll have to
    #   do this by presuming the maximum amount of time for the card to respond
    #   (8 words) and look for the response in what's returned
 
-   $self->protocol->readwrite(
+   my ( $resp ) = await $self->protocol->readwrite(
       pack "C N C a*", 0x40 | $cmd, $arg, $crcstop, "\xFF" x ( 8 + $readlen ),
-   )->then( sub {
-      my ( $resp ) = @_;
+   );
 
-      # Trim to the start of the expected result
-      substr $resp, 0, 7, "";
+   # Trim to the start of the expected result
+   substr $resp, 0, 7, "";
 
-      # Look for a byte with top bit clear
-      while( length $resp ) {
-         my $ret = unpack( "C", $resp );
-         return Future->done( $ret, unpack "x a$readlen", $resp ) if !( $ret & 0x80 );
+   # Look for a byte with top bit clear
+   while( length $resp ) {
+      my $ret = unpack( "C", $resp );
+      return ( $ret, unpack "x a$readlen", $resp ) if !( $ret & 0x80 );
 
-         substr $resp, 0, 1, "";
-      }
-      return Future->fail(
-         sprintf "Timed out waiting for response to command %02X", $cmd
-      );
-   });
+      substr $resp, 0, 1, "";
+   }
+
+   die sprintf "Timed out waiting for response to command %02X", $cmd;
 }
 
-sub _recv_data_block
+async method _recv_data_block ( $buf, $len )
 {
-   my $self = shift;
-   my ( $buf, $len ) = @_;
-
    # Wait for a token
-   ( repeat {
+   while(1) {
       $buf =~ s/^\xFF+//;
-      $buf =~ s/^\xFE// and
-         return Future->done();
 
-      $self->protocol->readwrite_no_ss( "\xFF" x 16 )
-         ->on_done( sub { $buf .= $_[0] } );
-   } until => sub { !$_[0]->get } )
+      last if $buf =~ s/^\xFE//;
+
+      $buf .= await $self->protocol->readwrite_no_ss( "\xFF" x 16 );
+   }
+
    # Now want the data + CRC
-   ->then( sub {
-      length $buf >= $len + 2 and
-         return Future->done();
+   if( length $buf < $len + 2 ) {
+      $buf .= await $self->protocol->readwrite_no_ss( "\xFF" x ( $len + 2 - length $buf ) );
+   }
 
-      $self->protocol->readwrite_no_ss( "\xFF" x ( $len + 2 - length $buf ) )
-   })->then( sub {
-      $buf .= $_[0];
-      # TODO: might want to verify the CRC?
-      Future->done( substr $buf, 0, $len );
-   });
+   # TODO: might want to verify the CRC?
+
+   return substr $buf, 0, $len;
 }
 
 # Commands
@@ -145,67 +131,52 @@ use constant {
 
 =head2 initialise
 
-   $card->initialise->get
+   await $card->initialise;
 
 Checks that an SD card is present, switches it into SPI mode and waits for its
 initialisation process to complete.
 
 =cut
 
-sub initialise
+async method initialise ()
 {
-   my $self = shift;
-
    # Initialise first by switching the card into SPI mode
-   $self->protocol->write( "\xFF" x 10 )->then( sub {
-      $self->send_command( CMD_GO_IDLE_STATE )
-   })->then( sub {
-      my ( $resp ) = @_;
-      $resp == 1 or die "Expected 01 response; got $resp";
+   await $self->protocol->write( "\xFF" x 10 );
 
-      repeat {
-         # TODO: Consider using SEND_IF_COND and doing SDHC initialisation
-         $self->send_command( CMD_SEND_OP_COND );
-      } while => sub {
-         my $resp = shift->get;
-         $resp & RESP_IDLE;
-      }, foreach => [ 1 .. 200 ];
-   })->then( sub {
-      my ( $resp ) = @_;
-      $resp & RESP_IDLE and die "Timed out waiting for card to leave IDLE mode";
+   my $resp = await $self->send_command( CMD_GO_IDLE_STATE );
+   $resp == 1 or die "Expected 01 response; got $resp";
 
-      $self->send_command( CMD_SET_BLOCKLEN, 512 );
-   })->then( sub {
-      my ( $resp ) = @_;
-      $resp == 0 or die "Expected 00 response; got $resp";
+   foreach my $attempt ( 1 .. 200 ) {
+      # TODO: Consider using SEND_IF_COND and doing SDHC initialisation
+      $resp = await $self->send_command( CMD_SEND_OP_COND );
+      last unless $resp & RESP_IDLE;
+   }
 
-      Future->done;
-   });
+   $resp & RESP_IDLE and die "Timed out waiting for card to leave IDLE mode";
+
+   $resp = await $self->send_command( CMD_SET_BLOCKLEN, 512 );
+   $resp == 0 or die "Expected 00 response; got $resp";
+
+   return;
 }
 
 =head2 size
 
-   $n_bytes = $card->size->get
+   $n_bytes = await $card->size;
 
 Returns the size of the media card in bytes.
 
 =cut
 
-sub size
+async method size ()
 {
-   my $self = shift;
+   my $csd = await $self->read_csd;
 
-   $self->read_csd->then( sub {
-      my ( $csd ) = @_;
-      return Future->done( $csd->{bytes} );
-   });
+   return $csd->{bytes};
 }
 
-sub _spi_txn
+method _spi_txn ( $code )
 {
-   my $self = shift;
-   my ( $code ) = @_;
-
    $self->protocol->assert_ss->then(
       $code
    )->followed_by( sub {
@@ -216,7 +187,7 @@ sub _spi_txn
 
 =head2 read_csd
 
-   $data = $card->read_csd->get;
+   $data = await $card->read_csd;
 
 Returns a C<HASH> reference containing decoded fields from the SD card's CSD
 ("card-specific data") register.
@@ -262,9 +233,10 @@ decoded fields above for convenience of calling code.
 # This code is most annoying to write as it involves lots of bitwise unpacking
 # at non-byte boundaries. It's easier (though inefficient) to perform this on
 # an array of 128 1-bit values
-sub _bits_to_uint {
+sub _bits_to_uint ( @vals )
+{
    my $n = 0;
-   ( $n <<= 1 ) |= $_ for reverse @_;
+   ( $n <<= 1 ) |= $_ for reverse @vals;
    return $n;
 }
 
@@ -274,10 +246,8 @@ my %_DECSCALE = (
    0xC => 5.5, 0xD => 6.0, 0xE => 7.0, 0xF => 8.0
 );
 
-sub _convert_decimal
+sub _convert_decimal ( $unit, $val )
 {
-   my ( $unit, $val ) = @_;
-
    my $mult = $unit % 3;
    $unit -= $mult;
    $unit /= 3;
@@ -296,9 +266,8 @@ my %_CURRMAX = (
    4 => 35, 5 => 45, 6 => 80, 7 => 200,
 );
 
-sub _unpack_csd_v0
+sub _unpack_csd_v0 ( $bytes )
 {
-   my ( $bytes ) = @_;
    my @bits = reverse split //, unpack "B128", $bytes;
 
    my %csd = (
@@ -338,46 +307,40 @@ sub _unpack_csd_v0
    return \%csd;
 }
 
-sub read_csd
+async method read_csd ()
 {
-   my $self = shift;
-
    my $protocol = $self->protocol;
 
-   my $buf;
-
-   $self->_spi_txn( sub {
-      $protocol->write_no_ss(
+   my $csd = await $self->_spi_txn( async sub {
+      await $protocol->write_no_ss(
          pack "C N C a*", 0x40 | CMD_SEND_CSD, 0, 0xFF, "\xFF"
-      )->then( sub {
-         $protocol->readwrite_no_ss( "\xFF" x 8 )
-      })->then( sub {
-         ( $buf ) = @_;
-         $buf =~ s/^\xFF*//;
-         $buf =~ s/^\0// or
-            return Future->fail( sprintf "Expected response 00; got %02X to SEND_CSD", ord $buf );
+      );
 
-         $self->_recv_data_block( $buf, 16 );
-      });
-   })->then( sub {
-      my ( $csd ) = @_;
-      # Top two bits give the structure version
-      my $ver = vec( $csd, 0, 2 );
-      if( $ver == 0 ) {
-         return Future->done( _unpack_csd_v0( $csd ) );
-      }
-      elsif( $ver == 1 ) {
-         return Future->done( _unpack_csd_v1( $csd ) );
-      }
-      else {
-         return Future->fail( "Bad CSD structure version $ver" );
-      }
+      my $buf = await $protocol->readwrite_no_ss( "\xFF" x 8 );
+
+      $buf =~ s/^\xFF*//;
+      $buf =~ s/^\0// or
+         return Future->fail( sprintf "Expected response 00; got %02X to SEND_CSD", ord $buf );
+
+      return await $self->_recv_data_block( $buf, 16 );
    });
+
+   # Top two bits give the structure version
+   my $ver = vec( $csd, 0, 2 );
+   if( $ver == 0 ) {
+      return _unpack_csd_v0( $csd );
+   }
+   elsif( $ver == 1 ) {
+      return _unpack_csd_v1( $csd );
+   }
+   else {
+      die "Bad CSD structure version $ver";
+   }
 }
 
 =head2 read_ocr
 
-   $fields = $card->read_ocr->get
+   $fields = await $card->read_ocr;
 
 Returns a C<HASH> reference containing decoded fields from the card's OCR
 ("operating conditions register").
@@ -407,49 +370,42 @@ bitfield OCR =>
    '2V8'          => boolfield( 16 ),
    '2V7'          => boolfield( 15 );
 
-sub read_ocr
+async method read_ocr ()
 {
-   my $self = shift;
+   my ( $resp, $ocr ) = await $self->send_command( CMD_READ_OCR, undef, 4 );
 
-   $self->send_command( CMD_READ_OCR, undef, 4 )->then( sub {
-      my ( $resp, $ocr ) = @_;
-      Future->done( { unpack_OCR( unpack "N", $ocr ) } );
-   });
+   return { unpack_OCR( unpack "N", $ocr ) };
 }
 
 =head2 read_block
 
-   $bytes = $card->read_block( $lba )->get
+   $bytes = await $card->read_block( $lba );
 
 Returns a 512-byte bytestring containing data read from the given sector of
 the card.
 
 =cut
 
-sub read_block
+async method read_block ( $lba )
 {
-   my $self = shift;
-   my ( $lba ) = @_;
-
    my $byteaddr = $lba * 512;
 
    my $protocol = $self->protocol;
 
    my $buf;
 
-   $self->_spi_txn( sub {
-      $protocol->write_no_ss(
+   return await $self->_spi_txn( async sub {
+      await $protocol->write_no_ss(
          pack "C N C a*", 0x40 | CMD_READ_SINGLE_BLOCK, $byteaddr, 0xFF, "\xFF"
-      )->then( sub {
-         $protocol->readwrite_no_ss( "\xFF" x 8 );
-      })->then( sub {
-         ( $buf ) = @_;
-         $buf =~ s/^\xFF*//;
-         $buf =~ s/^\0// or
-            return Future->fail( sprintf "Expected response 00; got %02X to READ_SINGLE_BLOCK", ord $buf );
+      );
 
-         $self->_recv_data_block( $buf, 512 );
-      });
+      my $buf = await $protocol->readwrite_no_ss( "\xFF" x 8 );
+
+      $buf =~ s/^\xFF*//;
+      $buf =~ s/^\0// or
+         die sprintf "Expected response 00; got %02X to READ_SINGLE_BLOCK", ord $buf;
+
+      return await $self->_recv_data_block( $buf, 512 );
    });
 }
 

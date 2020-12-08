@@ -8,6 +8,18 @@ Revision history for Perl extension Text::NGrammer.
 
  - fixed dependencies
 
-0.02
+0.03
 
  - fixed dependencies in Makefile.PL
+
+0.04
+
+ - fixed a bug for n-grams n-skipgrams with n > 2
+ 
+0.05
+
+ - fixed test
+ 
+0.05
+
+ - fixed meta.yml

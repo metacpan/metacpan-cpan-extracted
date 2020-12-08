@@ -1,5 +1,9 @@
 Revision history for File-Edit-Portable
 
+1.25    2020-12-04
+        - fixed bug where platform_recsep() wasn't unlinking files created with
+          _temp_filename() (closes #37)
+
 1.24    2016-03-14
         - fixed bug where recsep() was producing uninit warnings if the file
           we're looking for an rs in was empty (ie. "-z $fh" is true)
@@ -200,4 +204,3 @@ Revision history for File-Edit-Portable
 0.01    2015-09-25
         - pread(), pwrite() completed
         - all tests pass
-        

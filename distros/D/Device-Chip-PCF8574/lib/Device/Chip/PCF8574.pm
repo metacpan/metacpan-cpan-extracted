@@ -1,27 +1,26 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2017 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2017-2020 -- leonerd@leonerd.org.uk
 
-package Device::Chip::PCF8574;
+use v5.26;
+use Object::Pad 0.19;
 
-use strict;
-use warnings;
-use base qw( Device::Chip::PCF857x );
-
-our $VERSION = '0.02';
+package Device::Chip::PCF8574 0.03;
+class Device::Chip::PCF8574
+   extends Device::Chip::PCF857x;
 
 =encoding UTF-8
 
 =head1 NAME
 
-C<Device::Chip::PCF8574> - chip driver for a F<PCF8574>
+C<Device::Chip::PCF8574> - chip driver for a F<PCF8574> or F<PCA8574>
 
 =head1 DESCRIPTION
 
 This L<Device::Chip> subclass provides specific communication to a
 F<NXP> or F<Texas Instruments> F<PCF8574> attached to a computer via an I²C
-adapter.
+adapter. Due to hardware similarity this can also drive a F<PCA8574>.
 
 The reader is presumed to be familiar with the general operation of this chip;
 the documentation here will not attempt to explain or define chip-specific
@@ -40,14 +39,14 @@ leading C<0> or C<0x> prefixes.
 
 =head1 METHODS
 
-The following methods documented with a trailing call to C<< ->get >> return
-L<Future> instances.
+The following methods documented in an C<await> expression return L<Future>
+instances.
 
 =cut
 
 =head2 write
 
-   $chip->write( $val )->get
+   await $chip->write( $val );
 
 Sets the value of the GPIO pins, as an 8-bit integer.
 
@@ -59,7 +58,7 @@ an active-low input signal, such as a button.
 
 =head2 read
 
-   $val = $chip->read->get
+   $val = await $chip->read;
 
 Reads the current logic levels on the GPIO pins, returned as an 8-bit
 integer. Pins of interest as inputs should have previously been set to high
@@ -78,12 +77,12 @@ Returns a new object implementing the L<Device::Chip::Adapter> interface which
 allows access to the GPIO pins of the chip as if it was a GPIO protocol
 adapter. The returned instance supports the following methods:
 
-   $protocol = $adapter->make_protocol( 'GPIO' )
+   $protocol = await $adapter->make_protocol( 'GPIO' )
 
    $protocol->list_gpios
-   $protocol->write_gpios
-   $protocol->read_gpios
-   $protocol->tris_gpios
+   await $protocol->write_gpios
+   await $protocol->read_gpios
+   await $protocol->tris_gpios
 
 =cut
 

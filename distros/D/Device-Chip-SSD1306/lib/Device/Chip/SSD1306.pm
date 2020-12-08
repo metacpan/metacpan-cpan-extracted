@@ -1,15 +1,14 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2015-2019 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2015-2020 -- leonerd@leonerd.org.uk
 
-package Device::Chip::SSD1306;
+use v5.26;
+use Object::Pad 0.19;
 
-use strict;
-use warnings;
-use base qw( Device::Chip );
-
-our $VERSION = '0.08';
+package Device::Chip::SSD1306 0.09;
+class Device::Chip::SSD1306
+   extends Device::Chip;
 
 use Carp;
 use Future::AsyncAwait;
@@ -147,28 +146,29 @@ the display, if it is mounted upside-down.
 
 =cut
 
-sub new
+has $_rows :reader;
+has $_columns :reader;
+
+has $_column_offset;
+has $_set_com_pins_arg;
+has $_xflip;
+has $_yflip;
+
+BUILD ( %args )
 {
-   my $class = shift;
-   my %args = @_;
-
-   my $self = $class->SUPER::new( %args );
-
    my $modelargs = $MODELS{ $args{model} // "SSD1306-128x64" }
       or croak "Unrecognised model $args{model}";
 
-   $self->{$_} = $modelargs->{$_} for keys %$modelargs;
+   ( $_rows, $_columns, $_column_offset, $_set_com_pins_arg ) =
+      @{$modelargs}{qw( rows columns column_offset set_com_pins_arg )};
 
-   defined $args{$_} and $self->{$_} = $args{$_}
-      for qw( xflip yflip );
-
-   return $self;
+   ( $_xflip, $_yflip ) = @args{qw( xflip yflip )};
 }
 
 =head1 METHODS
 
-The following methods documented with a trailing call to C<< ->get >> return
-L<Future> instances.
+The following methods documented in an C<await> expression return L<Future>
+instances.
 
 =cut
 
@@ -184,9 +184,6 @@ Simple accessors that return the number of rows or columns present on the
 physical display.
 
 =cut
-
-sub rows    { shift->{rows} }
-sub columns { shift->{columns} }
 
 use constant {
    CMD_SET_CONTRAST      => 0x81, #    , contrast
@@ -230,7 +227,7 @@ use constant {
 
 =head2 init
 
-   $chip->init->get
+   await $chip->init;
 
 Initialise the display after reset to some sensible defaults.
 
@@ -239,20 +236,18 @@ Initialise the display after reset to some sensible defaults.
 # This initialisation sequence is inspired by the Adafruit driver
 #   https://github.com/adafruit/Adafruit_SSD1306
 
-async sub init
+async method init ()
 {
-   my $self = shift;
-
    await $self->display( 0 );
    await $self->send_cmd( CMD_SET_CLOCKDIV,     ( 8 << 4 ) | 0x80 );
-   await $self->send_cmd( CMD_SET_MUX_RATIO,    $self->rows - 1 );
+   await $self->send_cmd( CMD_SET_MUX_RATIO,    $_rows - 1 );
    await $self->send_cmd( CMD_SET_DISPLAY_OFFS, 0 );
    await $self->send_cmd( CMD_SET_DISPLAY_START | 0 );
    await $self->send_cmd( CMD_SET_CHARGEPUMP,   0x14 );
    await $self->send_cmd( CMD_SET_ADDR_MODE,    MODE_HORIZONTAL );
-   await $self->send_cmd( CMD_SET_SEGMENT_REMAP | ( $self->{xflip} ? 1 : 0 ) );
-   await $self->send_cmd( CMD_SET_COM_SCAN_DIR  | ( $self->{yflip} ? 1<<3 : 0 ) );
-   await $self->send_cmd( CMD_SET_COM_PINS,     $self->{set_com_pins_arg} );
+   await $self->send_cmd( CMD_SET_SEGMENT_REMAP | ( $_xflip ? 1 : 0 ) );
+   await $self->send_cmd( CMD_SET_COM_SCAN_DIR  | ( $_yflip ? 1<<3 : 0 ) );
+   await $self->send_cmd( CMD_SET_COM_PINS,     $_set_com_pins_arg );
    await $self->send_cmd( CMD_SET_CONTRAST,     0x9F );
    await $self->send_cmd( CMD_SET_PRECHARGE,    ( 0x0f << 4 ) | ( 1 ) );
    await $self->send_cmd( CMD_SET_VCOMH_LEVEL,  ( 4 << 4 ) );
@@ -260,75 +255,63 @@ async sub init
 
 =head2 display
 
-   $chip->display( $on )->get
+   await $chip->display( $on );
 
 Turn on or off the display.
 
 =cut
 
-async sub display
+async method display ( $on )
 {
-   my $self = shift;
-   my ( $on ) = @_;
-
    await $self->send_cmd( $on ? CMD_DISPLAY_ON : CMD_DISPLAY_OFF );
 }
 
 =head2 display_lamptest
 
-   $chip->display_lamptest( $enable )->get
+   await $chip->display_lamptest( $enable );
 
 Turn on or off the all-pixels-lit lamptest mode.
 
 =cut
 
-async sub display_lamptest
+async method display_lamptest ( $enable )
 {
-   my $self = shift;
-   my ( $enable ) = @_;
-
    await $self->send_cmd( CMD_DISPLAY_LAMPTEST + !!$enable );
 }
 
 =head2 display_invert
 
-   $chip->display_invert( $enable )->get
+   await $chip->display_invert( $enable );
 
 Turn on or off the inverted output mode.
 
 =cut
 
-async sub display_invert
+async method display_invert ( $enable )
 {
-   my $self = shift;
-   my ( $enable ) = @_;
-
    await $self->send_cmd( CMD_DISPLAY_INVERT + !!$enable );
 }
 
 =head2 send_display
 
-   $chip->send_display( $pixels )->get
+   await $chip->send_display( $pixels );
 
 Sends an entire screen-worth of pixel data. The C<$pixels> should be in a
 packed binary string containing one byte per 8 pixels.
 
 =cut
 
-async sub send_display
+async method send_display ( $pixels )
 {
-   my $self = shift;
-   my ( $pixels ) = @_;
-
    # This output method isn't quite what most of the SSD1306 drivers use, but
    # it happens to work on both the SSD1306 and the SH1106, whereas other code
    # based on SET_COLUMN_ADDR + SET_PAGE_ADDR do not
 
-   my $pagewidth = $self->columns;
+   my $pagewidth = $_columns;
 
-   my $column = $self->{column_offset};
+   my $column = $_column_offset;
 
-   foreach my $page ( 0 .. ( $self->rows / 8 ) - 1 ) {
+   foreach my $page ( 0 .. ( $_rows / 8 ) - 1 ) {
       await $self->send_cmd( CMD_SET_PAGE_START + $page );
       await $self->send_cmd( CMD_SET_LOW_COLUMN | $column & 0x0f );
       await $self->send_cmd( CMD_SET_HIGH_COLUMN | $column >> 4 );
@@ -344,6 +327,12 @@ chip after calling them.
 
 =cut
 
+# The internal framebuffer
+has @_display;
+has $_display_dirty;
+has $_display_dirty_xlo;
+has $_display_dirty_xhi;
+
 =head2 clear
 
    $chip->clear
@@ -352,16 +341,14 @@ Resets the stored framebuffer to blank.
 
 =cut
 
-sub clear
+method clear ()
 {
-   my $self = shift;
-
-   $self->{display} = [
-      map { [ ( 0 ) x $self->columns ] } 1 .. $self->rows
-   ];
-   $self->{display_dirty} = ( 1 << $self->rows/8 ) - 1;
-   $self->{display_dirty_xlo} = 0;
-   $self->{display_dirty_xhi} = $self->columns-1;
+   @_display = (
+      map { [ ( 0 ) x $_columns ] } 1 .. $_rows
+   );
+   $_display_dirty = ( 1 << $_rows/8 ) - 1;
+   $_display_dirty_xlo = 0;
+   $_display_dirty_xhi = $_columns-1;
 }
 
 =head2 draw_pixel
@@ -373,17 +360,12 @@ cleared instead of set.
 
 =cut
 
-sub draw_pixel
+method draw_pixel ( $x, $y, $val = 1 )
 {
-   my $self = shift;
-   my ( $x, $y, $val ) = @_;
-
-   $val //= 1;
-
-   $self->{display}[$y][$x] = $val;
-   $self->{display_dirty} |= ( 1 << int( $y / 8 ) );
-   $self->{display_dirty_xlo} = $x if $self->{display_dirty_xlo} > $x;
-   $self->{display_dirty_xhi} = $x if $self->{display_dirty_xhi} < $x;
+   $_display[$y][$x] = $val;
+   $_display_dirty |= ( 1 << int( $y / 8 ) );
+   $_display_dirty_xlo = $x if $_display_dirty_xlo > $x;
+   $_display_dirty_xhi = $x if $_display_dirty_xhi < $x;
 }
 
 =head2 draw_hline
@@ -396,17 +378,12 @@ cleared instead of set.
 
 =cut
 
-sub draw_hline
+method draw_hline ( $x1, $x2, $y, $val = 1 )
 {
-   my $self = shift;
-   my ( $x1, $x2, $y, $val ) = @_;
-
-   $val //= 1;
-
-   $self->{display}[$y][$_] = $val for $x1 .. $x2;
-   $self->{display_dirty} |= ( 1 << int( $y / 8 ) );
-   $self->{display_dirty_xlo} = $x1 if $self->{display_dirty_xlo} > $x1;
-   $self->{display_dirty_xhi} = $x2 if $self->{display_dirty_xhi} < $x2;
+   $_display[$y][$_] = $val for $x1 .. $x2;
+   $_display_dirty |= ( 1 << int( $y / 8 ) );
+   $_display_dirty_xlo = $x1 if $_display_dirty_xlo > $x1;
+   $_display_dirty_xhi = $x2 if $_display_dirty_xhi < $x2;
 }
 
 =head2 draw_vline
@@ -419,17 +396,14 @@ cleared instead of set.
 
 =cut
 
-sub draw_vline
+method draw_vline ( $x, $y1, $y2, $val = 1 )
 {
-   my $self = shift;
-   my ( $x, $y1, $y2, $val ) = @_;
-
    $val //= 1;
 
-   $self->{display}[$_][$x] = $val for $y1 .. $y2;
-   $self->{display_dirty} |= ( 1 << int( $_ / 8 ) ) for $y1 .. $y2;
-   $self->{display_dirty_xlo} = $x if $self->{display_dirty_xlo} > $x;
-   $self->{display_dirty_xhi} = $x if $self->{display_dirty_xhi} < $x;
+   $_display[$_][$x] = $val for $y1 .. $y2;
+   $_display_dirty |= ( 1 << int( $_ / 8 ) ) for $y1 .. $y2;
+   $_display_dirty_xlo = $x if $_display_dirty_xlo > $x;
+   $_display_dirty_xhi = $x if $_display_dirty_xhi < $x;
 }
 
 =head2 draw_blit
@@ -456,13 +430,8 @@ For example, to draw an rightward-pointing arrow:
 
 =cut
 
-sub draw_blit
+method draw_blit ( $x0, $y, @lines )
 {
-   my $self = shift;
-   my ( $x0, $y, @lines ) = @_;
-
-   my $display = $self->{display};
-
    for( ; @lines; $y++ ) {
       my @pixels = split m//, shift @lines;
       @pixels or next;
@@ -472,41 +441,38 @@ sub draw_blit
          my $p = shift @pixels;
 
          $p eq " " ? next :
-         $p eq "-" ? ( $display->[$y][$x] = 0 ) :
-                     ( $display->[$y][$x] = 1 );
+         $p eq "-" ? ( $_display[$y][$x] = 0 ) :
+                     ( $_display[$y][$x] = 1 );
       }
       $x--;
 
-      $self->{display_dirty} |= ( 1 << int( $y / 8 ) );
-      $self->{display_dirty_xlo} = $x0 if $self->{display_dirty_xlo} > $x0;
-      $self->{display_dirty_xhi} = $x  if $self->{display_dirty_xhi} < $x;
+      $_display_dirty |= ( 1 << int( $y / 8 ) );
+      $_display_dirty_xlo = $x0 if $_display_dirty_xlo > $x0;
+      $_display_dirty_xhi = $x  if $_display_dirty_xhi < $x;
    }
 }
 
 =head2 refresh
 
-   $chip->refresh->get
+   await $chip->refresh;
 
 Sends the framebuffer to the display chip.
 
 =cut
 
-async sub refresh
+async method refresh ()
 {
-   my $self = shift;
+   my $maxcol = $_columns - 1;
+   my $column = $_column_offset + $_display_dirty_xlo;
 
-   my $display = $self->{display};
-   my $maxcol = $self->columns - 1;
-   my $column = $self->{column_offset} + $self->{display_dirty_xlo};
-
-   foreach my $page ( 0 .. ( $self->rows / 8 ) - 1 ) {
-      next unless $self->{display_dirty} & ( 1 << $page );
+   foreach my $page ( 0 .. ( $_rows / 8 ) - 1 ) {
+      next unless $_display_dirty & ( 1 << $page );
       my $row = $page * 8;
 
       my $data = "";
-      foreach my $col ( $self->{display_dirty_xlo} .. $self->{display_dirty_xhi} ) {
+      foreach my $col ( $_display_dirty_xlo .. $_display_dirty_xhi ) {
          my $v = 0;
-         $v <<= 1, $display->[$row+$_][$col] && ( $v |= 1 ) for reverse 0 .. 7;
+         $v <<= 1, $_display[$row+$_][$col] && ( $v |= 1 ) for reverse 0 .. 7;
          $data .= chr $v;
       }
 
@@ -515,11 +481,11 @@ async sub refresh
       await $self->send_cmd( CMD_SET_HIGH_COLUMN | $column >> 4 );
       await $self->send_data( $data );
 
-      $self->{display_dirty} &= ~( 1 << $page );
+      $_display_dirty &= ~( 1 << $page );
    }
 
-   $self->{display_dirty_xlo} = $self->columns;
-   $self->{display_dirty_xhi} = -1;
+   $_display_dirty_xlo = $_columns;
+   $_display_dirty_xhi = -1;
 }
 
 =head1 TODO

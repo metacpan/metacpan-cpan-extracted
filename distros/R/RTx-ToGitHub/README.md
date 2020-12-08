@@ -4,7 +4,7 @@ RTx::ToGitHub - Convert rt.cpan.org tickets to GitHub issues
 
 # VERSION
 
-version 0.08
+version 0.09
 
 # SYNOPSIS
 
@@ -29,7 +29,7 @@ will:
     one-time data dump made by pulling author data from MetaCPAN to make an email
     address to GitHub username map. Patches to this map are welcome.
 
-    Only tickets with the "new", "open", or "stalled" status are
+    Only tickets with the "new", "open", "patched", or "stalled" status are
     converted. Stalled tickets are given a "stalled" label on GitHub.
 
 - 3. Close the RT ticket
@@ -70,12 +70,13 @@ without a username. So pass "Net-Foo", not "username/Net-Foo".
 
 ## --pause-id
 
-Your PAUSE ID. If you have a `~/.pause` file this will be parsed your username.
+Your PAUSE ID. If you have a `~/.pause` file this will be parsed for your
+username.
 
 ## --pause-password
 
-Your PAUSE password. If you have a `~/.pause` file this will be parsed your
-username.
+Your PAUSE password. If you have a `~/.pause` file this will be parsed for
+your password.
 
 ## --dist
 
@@ -104,9 +105,13 @@ script at [https://github.com/dagolden/zzz-rt-to-github](https://github.com/dago
 
 # SUPPORT
 
-Bugs may be submitted through [https://github.com/houseabsolute/RTx-ToGitHub/issues](https://github.com/houseabsolute/RTx-ToGitHub/issues).
+Bugs may be submitted at [https://github.com/houseabsolute/RTx-ToGitHub/issues](https://github.com/houseabsolute/RTx-ToGitHub/issues).
 
 I am also usually active on IRC as 'autarch' on `irc://irc.perl.org`.
+
+# SOURCE
+
+The source code repository for RTx-ToGitHub can be found at [https://github.com/houseabsolute/RTx-ToGitHub](https://github.com/houseabsolute/RTx-ToGitHub).
 
 # DONATIONS
 
@@ -123,7 +128,7 @@ software much more, unless I get so many donations that I can consider working
 on free software full time (let's all have a chuckle at that together).
 
 To donate, log into PayPal and send money to autarch@urth.org, or use the
-button at [http://www.urth.org/~autarch/fs-donation.html](http://www.urth.org/~autarch/fs-donation.html).
+button at [https://www.urth.org/fs-donation.html](https://www.urth.org/fs-donation.html).
 
 # AUTHOR
 
@@ -136,8 +141,11 @@ Dave Rolsky <autarch@urth.org>
 
 # COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2016 by David Golden and Dave Rolsky.
+This software is Copyright (c) 2020 by David Golden and Dave Rolsky.
 
 This is free software, licensed under:
 
     The Apache License, Version 2.0, January 2004
+
+The full text of the license can be found in the
+`LICENSE` file included with this distribution.

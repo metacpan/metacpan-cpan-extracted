@@ -165,10 +165,14 @@ sub new {
 ## $dc = $dc->loadOptFile($fh,       %opts);
 ## $dc = $dc->loadOptFile(\$str,     %opts);
 ##  Sets client options from a DDC *.opt file: #fieldNames, metaNames, fieldSeparator.
-##  %opts:
-##  (
-##   clobber => $bool,  ##-- whether to clobber existing %$dc fields (default=false)
-##  )
+##   %opts:
+##   (
+##    clobber => $bool,  ##-- whether to clobber existing %$dc fields (default=false)
+##   )
+##
+##  NOTE: this is for parsing legacy (v1.x) DDC server response formats (table,text);
+##    you do NOT need to use this function if you're using DDC's JSON response
+##    format.
 ##
 ##  WARNING: for whatever reason, DDC does not return metadata fields in the same
 ##   order in which they appeared in the *.opt file (nor in any lexicographic order
@@ -345,7 +349,7 @@ sub version {
 }
 
 ## $status = $dc->status()
-## $status = $dc->status($timeout)
+## $status = $dc->status($timeout) ##-- not really supported by ddc
 sub status {
   my ($dc,$timeout) = @_;
   $timeout = $dc->{timeout} if (!defined($timeout));
@@ -367,6 +371,14 @@ sub info {
   $timeout = $dc->{timeout} if (!defined($timeout));
   return $dc->requestJson("info".(defined($timeout) ? " $timeout" : ''));
 }
+
+## $nodes = $dc->nodes()
+## $nodes = $dc->nodes($depth)
+sub nodes {
+  my ($dc,$depth) = @_;
+  return $dc->requestJson("nodes".(defined($depth) ? " $depth" : ''));
+}
+
 
 ## $expandRaw = $dc->expand_terms($pipeline, $term)
 ## $expandRaw = $dc->expand_terms($pipeline, $term, $timeout)
@@ -926,6 +938,7 @@ DDC::Client - Client socket object and utilities for DDC::Concordance
  $status  = $dc->status();                    ##-- get server status HASH-ref
  $vstatus = $dc->vstatus();                   ##-- get verbose status HASH-ref
  $info    = $dc->info();                      ##-- get server info HASH-ref
+ $nodes   = $dc->nodes();                     ##-- get server nodes ARRAY-ref
 
  $rsp     = $dc->expand_terms(\@pipeline, \@terms);  ##-- raw term expansion
  @terms   = $dc->expand(\@pipeline, \@terms);        ##-- parsed term expansion
@@ -1213,6 +1226,16 @@ wraps $dc-E<gt>L<requestJson|/requestJson>("vstatus $timeout").
 
 Get verbose server information;
 wraps $dc-E<gt>L<requestJson|/requestJson>("info $timeout").
+
+
+=item nodes
+
+ $info = $dc->nodes();
+ $info = $dc->nodes($depth);
+
+Get ARRAY-ref of accessible server nodes suitable for use with the
+':' query-operator;
+wraps $dc-E<gt>L<requestJson|/requestJson>("nodes $depth").
 
 
 =item expand_terms

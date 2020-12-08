@@ -1,5 +1,9 @@
 Revision history for Rex
 
+1.13.2 2020-12-05 Ferenc Erki <erkiferenc@gmail.com>
+ [DOCUMENTATION]
+ - Clarify templating documentation
+
 1.13.1 2020-11-05 Ferenc Erki <erkiferenc@gmail.com>
  [DOCUMENTATION]
  - Clarify perlcritic policy

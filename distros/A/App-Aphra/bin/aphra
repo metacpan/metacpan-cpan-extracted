@@ -27,12 +27,14 @@ and leaves the processed version in the output directory.
 
 See most of the rest of this documentation for the gory details.
 
-=item C<serve>
+=item B<serve>
 
 Starts a local HTTP server which serves the files currently in the
 output directory.
 
 You need to have L<App::HTTPThis> installed in order for this to work.
+
+=back
 
 =head1 OPTIONS
 

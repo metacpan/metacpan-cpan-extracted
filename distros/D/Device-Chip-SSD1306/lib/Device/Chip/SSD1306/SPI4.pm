@@ -1,15 +1,14 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2015-2019 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2015-2020 -- leonerd@leonerd.org.uk
 
-package Device::Chip::SSD1306::SPI4;
+use v5.26;
+use Object::Pad 0.19;
 
-use strict;
-use warnings;
-use base qw( Device::Chip::SSD1306 );
-
-our $VERSION = '0.08';
+package Device::Chip::SSD1306::SPI4 0.09;
+class Device::Chip::SSD1306::SPI4
+   extends Device::Chip::SSD1306;
 
 use Future::AsyncAwait;
 
@@ -29,11 +28,11 @@ L<Device::Chip::SSD1306> documentation.
 
 use constant PROTOCOL => "SPI";
 
-sub SPI_options
+method SPI_options
 {
    return (
       mode => 0,
-      max_bitrate => 8E6,
+      max_bitrate => 1E6,
    );
 }
 
@@ -46,11 +45,8 @@ of the chip.
 
 =cut
 
-sub mount
+method mount ( $adapter, %params )
 {
-   my $self = shift;
-   my ( $adapter, %params ) = @_;
-
    $self->{dc} = delete $params{dc} or
       die "Require a 'dc' parameter";
 
@@ -58,30 +54,21 @@ sub mount
 }
 
 # passthrough
-sub power { $_[0]->protocol->power( $_[1] ) }
+method power { $self->protocol->power( $_[0] ) }
 
-sub set_dc
+method set_dc ( $dc )
 {
-   my $self = shift;
-   my ( $dc ) = @_;
-
    $self->protocol->write_gpios( { $self->{dc} => $dc } );
 }
 
-async sub send_cmd
+async method send_cmd ( @vals )
 {
-   my $self = shift;
-   my @vals = @_;
-
    await $self->set_dc( 0 );
    await $self->protocol->readwrite( join "", map { chr } @vals );
 }
 
-async sub send_data
+async method send_data ( $bytes )
 {
-   my $self = shift;
-   my ( $bytes ) = @_;
-
    await $self->set_dc( 1 );
    await $self->protocol->readwrite( $bytes );
 }

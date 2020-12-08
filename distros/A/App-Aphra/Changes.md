@@ -1,5 +1,12 @@
 # Change Log
 
+## [0.0.6] - 2020-12-06
+
+### Fixed
+
+- Bring minimum Perl requirements into line
+- Add bugtracker details
+
 ## [0.0.5] - 2018-02-25
 
 ### Fixed

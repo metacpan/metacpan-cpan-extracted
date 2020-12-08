@@ -1,15 +1,20 @@
-Revision history for WWW-WTF
+0.1
+- no release yet
 
-0.1     Date/time
-        no release yet
+0.4 2020-11-17
+- structured test reports
 
-0.4     2020-11-17 12:00
-        structured test reports
+0.5 2020-11-19
+- get_a_tags for HTTPResource::Types::HTML
+- new class WWW::WTF::HTTPResource::Content
 
-0.5     2020-11-19 12:00
-        get_a_tags for HTTPResource::Types::HTML
-        new class WWW::WTF::HTTPResource::Content
+0.6 2020-11-24
+- get_images for WWW::WTF::HTTPResource::Types::PDF
+- add redirects to HTTPResource and UserAgent
 
-0.6     2020-11-24 12:00
-        get_images for WWW::WTF::HTTPResource::Types::PDF
-        add redirects to HTTPResource and UserAgent
+0.7 2020-12-04
+- reset HTML::Parser after get_foo, allowing multiple get_foo calls
+- extend get_a_tags/get_links filter and add the content of the a tag to the returned token
+- add set_cookie_policy for webkit
+- add generic filter methods to HTMLResource::HTML get_foo_tag
+- new objects for tags and their attributes

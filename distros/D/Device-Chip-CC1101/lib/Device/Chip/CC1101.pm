@@ -3,10 +3,10 @@
 #
 #  (C) Paul Evans, 2019-2020 -- leonerd@leonerd.org.uk
 
-use 5.026; # postfix-deref, signatures
+use v5.26; # postfix-deref, signatures
 use Object::Pad 0.27;
 
-package Device::Chip::CC1101 0.04;
+package Device::Chip::CC1101 0.05;
 class Device::Chip::CC1101
    extends Device::Chip;
 
@@ -85,8 +85,8 @@ method power ( $on ) { $self->protocol->power( $on ) }
 
 =head1 METHODS
 
-The following methods documented with a trailing call to C<< ->get >> return
-L<Future> instances.
+The following methods documented in an C<await> expression return L<Future>
+instances.
 
 =cut
 
@@ -119,7 +119,7 @@ use constant {
 
 =head2 read_register
 
-   $value = $chip->read_register( $addr )->get
+   $value = await $chip->read_register( $addr );
 
 Reads a single byte register and returns its numerical value.
 
@@ -286,7 +286,7 @@ use constant CONFIG_DEFAULT =>
 
 =head2 read_config
 
-   $config = $chip->read_config->get
+   $config = await $chip->read_config;
 
 Reads and returns the current chip configuration as a C<HASH> reference.
 
@@ -366,7 +366,7 @@ async method read_config ()
 
 =head2 change_config
 
-   $chip->change_config( %changes )->get
+   await $chip->change_config( %changes );
 
 Writes the configuration registers to apply the given changes. Any fields not
 specified will retain their current values. The value of C<PATABLE> can also
@@ -464,7 +464,7 @@ async method change_config ( %changes )
 
 =head2 read_marcstate
 
-   $state = $chip->read_marcstate->get
+   $state = await $chip->read_marcstate;
 
 Reads the C<MARCSTATE> register and returns the state name.
 
@@ -486,9 +486,9 @@ async method read_marcstate ()
 
 =head2 read_chipstatus_tx
 
-   $status = $chip->read_chipstatus_rx->get
+   $status = await $chip->read_chipstatus_rx;
 
-   $status = $chip->read_chipstatus_tx->get
+   $status = await $chip->read_chipstatus_tx;
 
 Reads the chip status word and returns a reference to a hash containing the
 following:
@@ -517,7 +517,7 @@ async method _read_chipstatus ( $rw )
 
 =head2 read_pktstatus
 
-   $status = $chip->read_pktstatus->get
+   $status = await $chip->read_pktstatus;
 
 Reads the C<PKTSTATUS> register and returns a reference to a hash containing
 boolean fields of the following names:
@@ -553,7 +553,7 @@ async method command ( $cmd )
 
 =head2 reset
 
-   $chip->reset->get
+   await $chip->reset;
 
 Command the chip to perform a software reset.
 
@@ -566,7 +566,7 @@ async method reset ()
 
 =head2 flush_fifos
 
-   $chip->flush_fifos->get
+   await $chip->flush_fifos;
 
 Command the chip to flush the RX and TX FIFOs.
 
@@ -580,7 +580,7 @@ async method flush_fifos ()
 
 =head2 start_rx
 
-   $chip->start_rx->get
+   await $chip->start_rx;
 
 Command the chip to enter RX mode.
 
@@ -597,7 +597,7 @@ async method start_rx ()
 
 =head2 start_tx
 
-   $chip->start_tx->get
+   await $chip->start_tx;
 
 Command the chip to enter TX mode.
 
@@ -614,7 +614,7 @@ async method start_tx ()
 
 =head2 idle
 
-   $chip->idle->get
+   await $chip->idle;
 
 Command the chip to enter IDLE mode.
 
@@ -627,7 +627,7 @@ async method idle ()
 
 =head2 read_rxfifo
 
-   $bytes = $chip->read_rxfifo( $len )->get
+   $bytes = await $chip->read_rxfifo( $len );
 
 Reads the given number of bytes from the RX FIFO.
 
@@ -645,7 +645,7 @@ async method read_rxfifo ( $len )
 
 =head2 write_txfifo
 
-   $chip->write_txfifo( $bytes )->get
+   await $chip->write_txfifo( $bytes );
 
 Writes the given bytes into the TX FIFO.
 
@@ -660,7 +660,7 @@ async method write_txfifo ( $bytes )
 
 =head2 receive
 
-   $packet = $chip->receive->get
+   $packet = await $chip->receive;
 
 Retrieves a packet from the RX FIFO, returning a HASH reference.
 
@@ -719,7 +719,7 @@ async method receive ()
 
 =head2 transmit
 
-   $chip->transmit( $bytes )->get
+   await $chip->transmit( $bytes );
 
 Enters TX mode and sends a packet containing the given bytes.
 

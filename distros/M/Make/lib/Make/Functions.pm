@@ -3,7 +3,7 @@ package Make::Functions;
 use strict;
 use warnings;
 
-our $VERSION = '2.009';
+our $VERSION = '2.010';
 
 my @temp_handles;    # so they don't get destroyed before end of program
 

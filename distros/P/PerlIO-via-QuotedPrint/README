@@ -1,21 +1,36 @@
-README for PerlIO::via::QuotedPrint
+NAME
 
-PerlIO layer that handles automatic conversion from and to quoted-printable
-format.  Intended to be used while opening a file with the ":via()" layer.
+    PerlIO::via::QuotedPrint - PerlIO layer for quoted-printable strings
 
-Copyright (c) 2002, 2003, 2004, 2012 Elizabeth Mattijsen <liz@dijkmat.nl>.
-All rights reserved.  This program is free software; you can redistribute it
-and/or modify it under the same terms as Perl itself.
+SYNOPSIS
 
-Version:
- 0.08
+    use PerlIO::via::QuotedPrint;
 
-Required Modules:
- MIME::QuotedPrint (any)
+    open(my $in, '<:via(QuotedPrint)', 'file.qp') or
+        die "Can't open file.qp for reading: $!\n";
 
-The build is standard:
+    open(my $out, '>:via(QuotedPrint)', 'file.qp') or
+        die "Can't open file.qp for writing: $!\n";
 
-perl Makefile.PL
-make
-make test
-make install
+DESCRIPTION
+
+    This module implements a PerlIO layer that works on files encoded in the
+    quoted-printable format. It will decode from quoted-printable while reading
+    from a handle, and it will encode as quoted-printable while writing to a
+    handle.
+
+INSTALLATION
+
+    See the INSTALL file.
+
+COPYRIGHT
+
+    Copyright (C) 2002-2004, 2012 Elizabeth Mattijsen. All rights reserved.
+    Copyright (C) 2015, 2020 Steve Hay. All rights reserved.
+
+LICENCE
+
+    This distribution is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself, i.e. under the terms of either the GNU
+    General Public License or the Artistic License, as specified in the LICENCE
+    file.

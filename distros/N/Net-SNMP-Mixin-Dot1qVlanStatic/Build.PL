@@ -11,7 +11,7 @@ my $builder = Module::Build->new(
   requires          => {
     'perl'             => '5.6.0',
     'Net::SNMP'        => '0',
-    'Net::SNMP::Mixin' => '0.13',
+    'Net::SNMP::Mixin' => '0.14',
     'Sub::Exporter'    => '0.978',
   },
   build_requires => {

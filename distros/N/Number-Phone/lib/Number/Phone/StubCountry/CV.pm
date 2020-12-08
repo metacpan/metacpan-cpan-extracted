@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20200904144530;
+our $VERSION = 1.20201204215956;
 
 my $formatters = [
                 {
@@ -69,82 +69,45 @@ my $validators = {
                 'voip' => ''
               };
 my %areanames = ();
-$areanames{en}->{238221} = "Ribeira\ Grande\,\ Santo\ Antão";
-$areanames{en}->{238222} = "Porto\ Novo\,\ Santo\ Antão";
-$areanames{en}->{238223} = "Paúl\,\ Santo\ Antão";
-$areanames{en}->{238224} = "Cocoli\,\ Santo\ Antão";
-$areanames{en}->{238225} = "Ponta\ do\ Sol\,\ Santo\ Antão";
-$areanames{en}->{238226} = "Chã\ da\ Igreja\,\ Santo\ Antão";
-$areanames{en}->{238227} = "Ribeira\ das\ Patas\,\ Santo\ Antão";
-$areanames{en}->{238230} = "Mindelo\,\ São\ Vicente";
-$areanames{en}->{238231} = "Mindelo\,\ São\ Vicente";
-$areanames{en}->{238232} = "Mindelo\,\ São\ Vicente";
-$areanames{en}->{238235} = "Ribeira\ Brava\,\ São\ Nicolau";
-$areanames{en}->{238236} = "Tarrafal\ de\ São\ Nicolau\,\ São\ Nicolau";
-$areanames{en}->{238237} = "Fajã\,\ São\ Nicolau";
-$areanames{en}->{238238} = "Praia\ Branca\,\ São\ Nicolau";
-$areanames{en}->{238241} = "Espargos\,\ Sal";
-$areanames{en}->{238242} = "Santa\ Maria\,\ Sal";
-$areanames{en}->{238251} = "Sal\ Rei\,\ Boa\ Vista";
-$areanames{en}->{238252} = "Funda\ das\ Figueiras\,\ Boa\ Vista";
-$areanames{en}->{238255} = "Vila\ do\ Maio\,\ Maio";
-$areanames{en}->{238256} = "Calheta\,\ Maio";
-$areanames{en}->{238260} = "Praia\,\ Santiago";
-$areanames{en}->{238261} = "Praia\,\ Santiago";
-$areanames{en}->{238262} = "Praia\,\ Santiago";
-$areanames{en}->{238263} = "Praia\,\ Santiago";
-$areanames{en}->{238264} = "Praia\,\ Santiago";
-$areanames{en}->{238265} = "Santa\ Catarina\,\ Santiago";
-$areanames{en}->{238266} = "Tarrafal\,\ Santiago";
-$areanames{en}->{238267} = "Cidade\ Velha\,\ Santiago";
-$areanames{en}->{238268} = "São\ Domingos\,\ Santiago";
-$areanames{en}->{238269} = "Pedra\ Badejo\,\ Santiago";
-$areanames{en}->{238271} = "São\ Lourenço\ dos\ Órgãos\/São\ Jorge\,\ Santiago";
-$areanames{en}->{238272} = "Picos\,\ Santiago";
-$areanames{en}->{238273} = "Calheta\ de\ São\ Miguel\,\ Santiago";
-$areanames{en}->{238281} = "São\ Filipe\,\ Fogo";
-$areanames{en}->{238282} = "Cova\ Figueira\,\ Fogo";
-$areanames{en}->{238283} = "Mosteiros\,\ Fogo";
-$areanames{en}->{238284} = "São\ Jorge\,\ Fogo";
-$areanames{en}->{238285} = "Nova\ Sintra\,\ Brava";
-$areanames{pt}->{238221} = "Ribeira\ Grande\,\ Santo\ Antão";
-$areanames{pt}->{238222} = "Porto\ Novo\,\ Santo\ Antão";
-$areanames{pt}->{238223} = "Paúl\,\ Santo\ Antão";
-$areanames{pt}->{238224} = "Cocoli\,\ Santo\ Antão";
-$areanames{pt}->{238225} = "Ponta\ do\ Sol\,\ Santo\ Antão";
-$areanames{pt}->{238226} = "Chã\ da\ Igreja\,\ Santo\ Antão";
-$areanames{pt}->{238227} = "Ribeira\ das\ Patas\,\ Santo\ Antão";
-$areanames{pt}->{238230} = "Mindelo\,\ São\ Vicente";
-$areanames{pt}->{238231} = "Mindelo\,\ São\ Vicente";
-$areanames{pt}->{238232} = "Mindelo\,\ São\ Vicente";
-$areanames{pt}->{238235} = "Ribeira\ Brava\,\ São\ Nicolau";
-$areanames{pt}->{238236} = "Tarrafal\ de\ São\ Nicolau\,\ São\ Nicolau";
-$areanames{pt}->{238237} = "Fajã\,\ São\ Nicolau";
-$areanames{pt}->{238238} = "Praia\ Branca\,\ São\ Nicolau";
-$areanames{pt}->{238241} = "Espargos\,\ Sal";
-$areanames{pt}->{238242} = "Santa\ Maria\,\ Sal";
-$areanames{pt}->{238251} = "Sal\ Rei\,\ Boa\ Vista";
-$areanames{pt}->{238252} = "Funda\ das\ Figueiras\,\ Boa\ Vista";
-$areanames{pt}->{238255} = "Vila\ do\ Maio\,\ Maio";
-$areanames{pt}->{238256} = "Calheta\,\ Maio";
-$areanames{pt}->{238260} = "Praia\,\ Santiago";
-$areanames{pt}->{238261} = "Praia\,\ Santiago";
-$areanames{pt}->{238262} = "Praia\,\ Santiago";
-$areanames{pt}->{238263} = "Praia\,\ Santiago";
-$areanames{pt}->{238264} = "Praia\,\ Santiago";
-$areanames{pt}->{238265} = "Santa\ Catarina\,\ Santiago";
-$areanames{pt}->{238266} = "Tarrafal\,\ Santiago";
-$areanames{pt}->{238267} = "Cidade\ Velha\,\ Santiago";
-$areanames{pt}->{238268} = "São\ Domingos\,\ Santiago";
-$areanames{pt}->{238269} = "Pedra\ Badejo\,\ Santiago";
-$areanames{pt}->{238271} = "São\ Lourenço\ dos\ Órgãos\/São\ Jorge\,\ Santiago";
-$areanames{pt}->{238272} = "Picos\,\ Santiago";
-$areanames{pt}->{238273} = "Calheta\ de\ São\ Miguel\,\ Santiago";
-$areanames{pt}->{238281} = "São\ Filipe\,\ Fogo";
-$areanames{pt}->{238282} = "Cova\ Figueira\,\ Fogo";
-$areanames{pt}->{238283} = "Mosteiros\,\ Fogo";
-$areanames{pt}->{238284} = "São\ Jorge\,\ Fogo";
-$areanames{pt}->{238285} = "Nova\ Sintra\,\ Brava";
+$areanames{en} = {"238267", "Cidade\ Velha\,\ Santiago",
+"238262", "Praia\,\ Santiago",
+"238226", "Chã\ da\ Igreja\,\ Santo\ Antão",
+"238285", "Nova\ Sintra\,\ Brava",
+"238284", "São\ Jorge\,\ Fogo",
+"238222", "Porto\ Novo\,\ Santo\ Antão",
+"238227", "Ribeira\ das\ Patas\,\ Santo\ Antão",
+"238269", "Pedra\ Badejo\,\ Santiago",
+"238266", "Tarrafal\,\ Santiago",
+"238238", "Praia\ Branca\,\ São\ Nicolau",
+"238271", "São\ Lourenço\ dos\ Órgãos\/São\ Jorge\,\ Santiago",
+"238281", "São\ Filipe\,\ Fogo",
+"238224", "Cocoli\,\ Santo\ Antão",
+"238225", "Ponta\ do\ Sol\,\ Santo\ Antão",
+"238261", "Praia\,\ Santiago",
+"238272", "Picos\,\ Santiago",
+"238282", "Cova\ Figueira\,\ Fogo",
+"238221", "Ribeira\ Grande\,\ Santo\ Antão",
+"238264", "Praia\,\ Santiago",
+"238230", "Mindelo\,\ São\ Vicente",
+"238265", "Santa\ Catarina\,\ Santiago",
+"238237", "Fajã\,\ São\ Nicolau",
+"238256", "Calheta\,\ Maio",
+"238241", "Espargos\,\ Sal",
+"238232", "Mindelo\,\ São\ Vicente",
+"238283", "Mosteiros\,\ Fogo",
+"238268", "São\ Domingos\,\ Santiago",
+"238252", "Funda\ das\ Figueiras\,\ Boa\ Vista",
+"238236", "Tarrafal\ de\ São\ Nicolau\,\ São\ Nicolau",
+"238273", "Calheta\ de\ São\ Miguel\,\ Santiago",
+"238255", "Vila\ do\ Maio\,\ Maio",
+"238263", "Praia\,\ Santiago",
+"238231", "Mindelo\,\ São\ Vicente",
+"238242", "Santa\ Maria\,\ Sal",
+"238251", "Sal\ Rei\,\ Boa\ Vista",
+"238260", "Praia\,\ Santiago",
+"238235", "Ribeira\ Brava\,\ São\ Nicolau",
+"238223", "Paúl\,\ Santo\ Antão",};
+$areanames{pt} = {};
 
     sub new {
       my $class = shift;

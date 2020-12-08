@@ -39,7 +39,7 @@ no_index:
 provides:
   Test::JSON::Schema::Acceptance:
     file: lib/Test/JSON/Schema/Acceptance.pm
-    version: '1.002'
+    version: '1.003'
 requires:
   File::ShareDir: '0'
   JSON::MaybeXS: '1.004001'
@@ -63,7 +63,7 @@ resources:
   bugtracker: https://github.com/karenetheridge/Test-JSON-Schema-Acceptance/issues
   homepage: https://github.com/karenetheridge/Test-JSON-Schema-Acceptance
   repository: https://github.com/karenetheridge/Test-JSON-Schema-Acceptance.git
-version: '1.002'
+version: '1.003'
 x_Dist_Zilla:
   perl:
     version: '5.033004'
@@ -88,7 +88,7 @@ x_Dist_Zilla:
           quiet: 0
           run:
             - 'git submodule update --remote'
-            - "if [[ -n $(git status --untracked --porcelain share) ]]; then echo \"!!! submodule has changed! run './update-share' to commit updates to share/\"; fi"
+            - "if [[ -n $(git status --untracked --porcelain share) ]]; then echo -e '\\033[1;33m!!! submodule has changed! run './update-share' to commit updates to share/\\033[0m'; fi"
           version: '0.048'
       name: Run::BeforeRelease
       version: '0.048'
@@ -772,7 +772,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v1.002
+          tag: v1.003
           tag_format: v%V
           tag_message: v%v%t
         Dist::Zilla::Role::Git::Repo:

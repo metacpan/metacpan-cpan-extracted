@@ -1,4 +1,4 @@
-# AWS::RoboMaker::SimulationApplication generated from spec 5.3.0
+# AWS::RoboMaker::SimulationApplication generated from spec 18.4.0
 use Moose::Util::TypeConstraints;
 
 coerce 'Cfn::Resource::Properties::AWS::RoboMaker::SimulationApplication',
@@ -51,11 +51,11 @@ coerce 'Cfn::Resource::Properties::AWS::RoboMaker::SimulationApplication::Source
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::RoboMaker::SimulationApplication::SourceConfigValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::RoboMaker::SimulationApplication::SourceConfig->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::RoboMaker::SimulationApplication::SourceConfigValue {
+package Cfn::Resource::Properties::Object::AWS::RoboMaker::SimulationApplication::SourceConfig {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -74,11 +74,11 @@ coerce 'Cfn::Resource::Properties::AWS::RoboMaker::SimulationApplication::Simula
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::RoboMaker::SimulationApplication::SimulationSoftwareSuiteValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::RoboMaker::SimulationApplication::SimulationSoftwareSuite->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::RoboMaker::SimulationApplication::SimulationSoftwareSuiteValue {
+package Cfn::Resource::Properties::Object::AWS::RoboMaker::SimulationApplication::SimulationSoftwareSuite {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -96,11 +96,11 @@ coerce 'Cfn::Resource::Properties::AWS::RoboMaker::SimulationApplication::RobotS
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::RoboMaker::SimulationApplication::RobotSoftwareSuiteValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::RoboMaker::SimulationApplication::RobotSoftwareSuite->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::RoboMaker::SimulationApplication::RobotSoftwareSuiteValue {
+package Cfn::Resource::Properties::Object::AWS::RoboMaker::SimulationApplication::RobotSoftwareSuite {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -118,11 +118,11 @@ coerce 'Cfn::Resource::Properties::AWS::RoboMaker::SimulationApplication::Render
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::RoboMaker::SimulationApplication::RenderingEngineValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::RoboMaker::SimulationApplication::RenderingEngine->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::RoboMaker::SimulationApplication::RenderingEngineValue {
+package Cfn::Resource::Properties::Object::AWS::RoboMaker::SimulationApplication::RenderingEngine {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -146,3 +146,30 @@ package Cfn::Resource::Properties::AWS::RoboMaker::SimulationApplication {
 }
 
 1;
+### main pod documentation begin ###
+
+=encoding UTF-8
+
+=head1 NAME
+
+Cfn::Resource::AWS::RoboMaker::SimulationApplication - Cfn resource for AWS::RoboMaker::SimulationApplication
+
+=head1 DESCRIPTION
+
+This module implements a Perl module that represents the CloudFormation object AWS::RoboMaker::SimulationApplication.
+
+See L<Cfn> for more information on how to use it.
+
+=head1 AUTHOR
+
+    Jose Luis Martinez
+    CAPSiDE
+    jlmartinez@capside.com
+
+=head1 COPYRIGHT and LICENSE
+
+Copyright (c) 2013 by CAPSiDE
+This code is distributed under the Apache 2 License. The full text of the 
+license can be found in the LICENSE file included with this module.
+
+=cut

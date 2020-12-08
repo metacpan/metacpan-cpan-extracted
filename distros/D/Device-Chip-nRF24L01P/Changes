@@ -1,5 +1,10 @@
 Revision history for Device-Chip-nRF24L01P
 
+0.04    2020-12-06
+        [CHANGES]
+         * Updated to use Object::Pad + Future::AsyncAwait
+         * Removed long-dead Device::BusPirate::Chip::nRF24L01P
+
 0.03    2016/12/18 23:30:41
         [BUGFIXES]
          * Add Test::Device::Chip::Adapter as a test-time dependency

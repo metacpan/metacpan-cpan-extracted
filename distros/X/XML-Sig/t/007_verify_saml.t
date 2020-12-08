@@ -11,7 +11,7 @@ BEGIN {
     use_ok( 'XML::Sig' );
 }
 
-open my $file, 't/saml_response.xml' or die "no test saml response";
+open my $file, 't/signed/saml_response.xml' or die "no test saml response";
 my $xml;
 {
     local undef $/;

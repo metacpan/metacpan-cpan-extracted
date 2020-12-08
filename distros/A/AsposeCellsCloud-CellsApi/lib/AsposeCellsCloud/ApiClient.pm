@@ -71,6 +71,14 @@ sub new {
     return bless \%args, $class;
 }
 
+sub need_auth{
+    my ($self) = @_;
+    
+    if( $self->{config}->{app_sid}  ||  $self->{config}->{app_key} ) {
+        return 1;
+    }
+    return  0;
+}
 # Set the user agent of the API client
 #
 # @param string $user_agent The user agent of the API client
@@ -163,6 +171,9 @@ sub o_auth_post {
 # check access token
 sub check_access_token {
     my ($self, %args) = @_;
+    if(!$self->need_auth()){
+        return;
+    }
     if($self->{get_access_token_time}){
         my $difference_in_seconds=time() - $self->{get_access_token_time};
         if($difference_in_seconds < 86300){
@@ -453,7 +464,9 @@ sub get_api_key_with_prefix
 # @param array $authSettings array of authentication scheme (e.g ['api_key'])
 sub update_params_for_auth {
     my ($self, $header_params, $query_params, $auth_settings) = @_;
-    
+    if(!$self->need_auth()){
+        return;
+    }
     return $self->_global_auth_setup($header_params, $query_params) 
     	unless $auth_settings && @$auth_settings;
   

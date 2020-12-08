@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!--Created by create_map_tube_xml.pl 0.03 (part of BBBike)-->
+<!--Created by create_map_tube_xml.pl 0.04 (part of BBBike)-->
 <tube name="Berlin Metro">
   <lines>
     <line id="S1" name="S1" color="#DD6CA6"/>
@@ -27,317 +27,319 @@
     <line id="U9" name="U9" color="#F28700"/>
   </lines>
   <stations>
-    <station id="S124" name="Adenauerplatz" line="U7" link="S123,S125"/>
-    <station id="S274" name="Adlershof" line="S45,S46,S8,S85,S9" link="S273,S275,S288"/>
-    <station id="S096" name="Afrikanische Str." line="U6" link="S095,S097"/>
-    <station id="S258" name="Ahrensfelde" line="S7" link="S259"/>
-    <station id="S033" name="Alexanderplatz" line="S3,S5,S7,S9,U2,U5,U8" link="S032,S034,S057,S144,S145,S238"/>
-    <station id="S076" name="Alt-Mariendorf" line="U6" link="S077"/>
-    <station id="S221" name="Alt-Reinickendorf" line="S25" link="S156,S190"/>
-    <station id="S102" name="Alt-Tegel" line="U6" link="S101" other_link="Street:S223"/>
-    <station id="S080" name="Alt-Tempelhof" line="U6" link="S079,S081"/>
-    <station id="S288" name="Altglienicke" line="S45,S9" link="S274,S287"/>
-    <station id="S136" name="Altstadt Spandau" line="U7" link="S135,S137"/>
-    <station id="S160" name="Amrumer Str." line="U9" link="S093,S161"/>
-    <station id="S183" name="Anhalter Bhf." line="S1,S2,S25,S26" link="S040,S118"/>
-    <station id="S301" name="Attilastr." line="S2" link="S220,S300"/>
+    <station id="S128" name="Adenauerplatz" line="U7" link="S127,S129"/>
+    <station id="S276" name="Adlershof" line="S45,S46,S8,S85,S9" link="S275,S277,S290"/>
+    <station id="S100" name="Afrikanische Str." line="U6" link="S099,S101"/>
+    <station id="S260" name="Ahrensfelde" line="S7" link="S261"/>
+    <station id="S033" name="Alexanderplatz" line="S3,S5,S7,S9,U2,U5,U8" link="S032,S034,S061,S062,S148,S149,S241"/>
+    <station id="S081" name="Alt-Mariendorf" line="U6" link="S082"/>
+    <station id="S224" name="Alt-Reinickendorf" line="S25" link="S160,S193"/>
+    <station id="S106" name="Alt-Tegel" line="U6" link="S105" other_link="Street:S226"/>
+    <station id="S085" name="Alt-Tempelhof" line="U6" link="S084,S086"/>
+    <station id="S290" name="Altglienicke" line="S45,S9" link="S276,S289"/>
+    <station id="S140" name="Altstadt Spandau" line="U7" link="S139,S141"/>
+    <station id="S164" name="Amrumer Str." line="U9" link="S097,S165"/>
+    <station id="S187" name="Anhalter Bhf." line="S1,S2,S25,S26" link="S040,S122"/>
+    <station id="S303" name="Attilastr." line="S2" link="S223,S302"/>
     <station id="S014" name="Augsburger Str." line="U3" link="S011,S015"/>
-    <station id="S266" name="Babelsberg" line="S7" link="S265,S267"/>
-    <station id="S277" name="Baumschulenweg" line="S45,S46,S47,S8,S85,S9" link="S276,S278,S310"/>
-    <station id="S054" name="Bayerischer Platz" line="U4,U7" link="S053,S055,S120,S121"/>
-    <station id="S240" name="Bellevue" line="S3,S5,S7,S9" link="S239,S241"/>
-    <station id="S283" name="Bergfelde b. Berlin" line="S8" link="S195,S282"/>
-    <station id="S121" name="Berliner Str." line="U7,U9" link="S054,S122,S165,S166"/>
-    <station id="S307" name="Bernau" line="S2" link="S306"/>
-    <station id="S306" name="Bernau-Friedenstal" line="S2" link="S305,S307"/>
-    <station id="S147" name="Bernauer Str." line="U8" link="S146,S148"/>
-    <station id="S235" name="Betriebsbhf. Rummelsburg" line="S3" link="S234,S236"/>
-    <station id="S275" name="Betriebsbhf. Schöneweide" line="S45,S46,S8,S85,S9" link="S274,S276"/>
-    <station id="S213" name="Beusselstr." line="S41/S42" link="S128,S161"/>
-    <station id="S255" name="Biesdorf" line="S5" link="S069,S256"/>
-    <station id="S067" name="Biesdorf-Süd" line="U5" link="S066,S068"/>
-    <station id="S252" name="Birkenstein" line="S5" link="S251,S253"/>
-    <station id="S162" name="Birkenstr." line="U9" link="S161,S163"/>
-    <station id="S196" name="Birkenwerder" line="S1,S8" link="S195,S197"/>
-    <station id="S046" name="Bismarckstr." line="U2,U7" link="S045,S047,S125,S126"/>
-    <station id="S280" name="Blankenburg" line="S2,S8" link="S279,S281,S302"/>
-    <station id="S295" name="Blankenfelde" line="S2" link="S296"/>
-    <station id="S110" name="Blaschkoallee" line="U7" link="S109,S111"/>
-    <station id="S122" name="Blissestr." line="U7" link="S017,S121"/>
-    <station id="S140" name="Boddinstr." line="U8" link="S115,S139"/>
-    <station id="S197" name="Borgsdorf" line="S1" link="S196,S198"/>
-    <station id="S188" name="Bornholmer Str." line="S1,S2,S25,S26,S8,S85" link="S027,S029,S149,S189"/>
-    <station id="S101" name="Borsigwerke" line="U6" link="S100,S102"/>
-    <station id="S178" name="Botanischer Garten" line="S1" link="S170,S177"/>
-    <station id="S184" name="Brandenburger Tor" line="S1,S2,S25,S26" link="S040,S087"/>
+    <station id="S268" name="Babelsberg" line="S7" link="S267,S269"/>
+    <station id="S279" name="Baumschulenweg" line="S45,S46,S47,S8,S85,S9" link="S278,S280,S312"/>
+    <station id="S054" name="Bayerischer Platz" line="U4,U7" link="S053,S055,S124,S125"/>
+    <station id="S242" name="Bellevue" line="S3,S5,S7,S9" link="S057,S243"/>
+    <station id="S285" name="Bergfelde b. Berlin" line="S8" link="S198,S284"/>
+    <station id="S125" name="Berliner Str." line="U7,U9" link="S054,S126,S169,S170"/>
+    <station id="S309" name="Bernau" line="S2" link="S308"/>
+    <station id="S308" name="Bernau-Friedenstal" line="S2" link="S307,S309"/>
+    <station id="S151" name="Bernauer Str." line="U8" link="S150,S152"/>
+    <station id="S238" name="Betriebsbhf. Rummelsburg" line="S3" link="S237,S239"/>
+    <station id="S277" name="Betriebsbhf. Schöneweide" line="S45,S46,S8,S85,S9" link="S276,S278"/>
+    <station id="S216" name="Beusselstr." line="S41/S42" link="S132,S165"/>
+    <station id="S257" name="Biesdorf" line="S5" link="S074,S258"/>
+    <station id="S072" name="Biesdorf-Süd" line="U5" link="S071,S073"/>
+    <station id="S254" name="Birkenstein" line="S5" link="S253,S255"/>
+    <station id="S166" name="Birkenstr." line="U9" link="S165,S167"/>
+    <station id="S199" name="Birkenwerder" line="S1,S8" link="S198,S200"/>
+    <station id="S046" name="Bismarckstr." line="U2,U7" link="S045,S047,S129,S130"/>
+    <station id="S282" name="Blankenburg" line="S2,S8" link="S281,S283,S304"/>
+    <station id="S297" name="Blankenfelde" line="S2" link="S298"/>
+    <station id="S114" name="Blaschkoallee" line="U7" link="S113,S115"/>
+    <station id="S126" name="Blissestr." line="U7" link="S017,S125"/>
+    <station id="S144" name="Boddinstr." line="U8" link="S119,S143"/>
+    <station id="S200" name="Borgsdorf" line="S1" link="S199,S201"/>
+    <station id="S191" name="Bornholmer Str." line="S1,S2,S25,S26,S8,S85" link="S027,S029,S153,S192"/>
+    <station id="S105" name="Borsigwerke" line="U6" link="S104,S106"/>
+    <station id="S182" name="Botanischer Garten" line="S1" link="S174,S181"/>
+    <station id="S059" name="Brandenburger Tor" line="S1,S2,S25,S26,U5" link="S040,S058,S060,S091"/>
     <station id="S020" name="Breitenbachplatz" line="U3" link="S019,S021"/>
-    <station id="S108" name="Britz-Süd" line="U7" link="S107,S109"/>
-    <station id="S303" name="Buch" line="S2" link="S302,S304"/>
-    <station id="S299" name="Buckower Chaussee" line="S2" link="S298,S300"/>
-    <station id="S166" name="Bundesplatz" line="S41/S42,S46,U9" link="S018,S056,S121,S167"/>
+    <station id="S112" name="Britz-Süd" line="U7" link="S111,S113"/>
+    <station id="S305" name="Buch" line="S2" link="S304,S306"/>
+    <station id="S301" name="Buckower Chaussee" line="S2" link="S300,S302"/>
+    <station id="S170" name="Bundesplatz" line="S41/S42,S46,U9" link="S018,S056,S125,S171"/>
+    <station id="S058" name="Bundestag" line="U5" link="S057,S059"/>
     <station id="S042" name="Bülowstr." line="U2" link="S008,S010"/>
-    <station id="S243" name="Charlottenburg" line="S3,S5,S7,S9" link="S210,S242" other_link="Street:S125"/>
-    <station id="S072" name="Cottbusser Platz" line="U5" link="S071,S073"/>
+    <station id="S245" name="Charlottenburg" line="S3,S5,S7,S9" link="S213,S244" other_link="Street:S129"/>
+    <station id="S077" name="Cottbusser Platz" line="U5" link="S076,S078"/>
     <station id="S022" name="Dahlem-Dorf" line="U3" link="S021,S023"/>
     <station id="S045" name="Deutsche Oper" line="U2" link="S044,S046"/>
     <station id="S030" name="Eberswalder Str." line="U2" link="S029,S031"/>
-    <station id="S222" name="Eichborndamm" line="S25" link="S156,S223"/>
-    <station id="S272" name="Eichwalde" line="S46,S8" link="S271,S273"/>
-    <station id="S120" name="Eisenacher Str." line="U7" link="S054,S119"/>
-    <station id="S068" name="Elsterwerdaer Platz" line="U5" link="S067,S069"/>
-    <station id="S227" name="Erkner" line="S3" link="S228"/>
+    <station id="S225" name="Eichborndamm" line="S25" link="S160,S226"/>
+    <station id="S274" name="Eichwalde" line="S46,S8" link="S273,S275"/>
+    <station id="S124" name="Eisenacher Str." line="U7" link="S054,S123"/>
+    <station id="S073" name="Elsterwerdaer Platz" line="U5" link="S072,S074"/>
+    <station id="S230" name="Erkner" line="S3" link="S231"/>
     <station id="S044" name="Ernst-Reuter-Platz" line="U2" link="S043,S045"/>
-    <station id="S017" name="Fehrbelliner Platz" line="U3,U7" link="S016,S018,S122,S123"/>
-    <station id="S179" name="Feuerbachstr." line="S1" link="S170,S180"/>
-    <station id="S284" name="Flughafen BER - Terminal 1-2" line="S45,S9" link="S285"/>
-    <station id="S286" name="Flughafen BER - Terminal 5" line="S45,S9" link="S285,S287"/>
-    <station id="S062" name="Frankfurter Allee" line="S41/S42,S8,S85,U5" link="S061,S063,S203,S204"/>
-    <station id="S060" name="Frankfurter Tor" line="U5" link="S059,S061"/>
-    <station id="S152" name="Franz-Neumann-Platz" line="U8" link="S151,S153"/>
-    <station id="S086" name="Französische Str." line="U6" link="S038,S087"/>
-    <station id="S249" name="Fredersdorf" line="S5" link="S248,S250"/>
+    <station id="S017" name="Fehrbelliner Platz" line="U3,U7" link="S016,S018,S126,S127"/>
+    <station id="S183" name="Feuerbachstr." line="S1" link="S174,S184"/>
+    <station id="S286" name="Flughafen BER - Terminal 1-2" line="S45,S9" link="S287"/>
+    <station id="S288" name="Flughafen BER - Terminal 5" line="S45,S9" link="S287,S289"/>
+    <station id="S067" name="Frankfurter Allee" line="S41/S42,S8,S85,U5" link="S066,S068,S206,S207"/>
+    <station id="S065" name="Frankfurter Tor" line="U5" link="S064,S066"/>
+    <station id="S156" name="Franz-Neumann-Platz" line="U8" link="S155,S157"/>
+    <station id="S251" name="Fredersdorf" line="S5" link="S250,S252"/>
     <station id="S023" name="Freie Universität" line="U3" link="S022,S024"/>
-    <station id="S180" name="Friedenau" line="S1" link="S179,S181"/>
-    <station id="S167" name="Friedrich-Wilhelm-Platz" line="U9" link="S166,S168"/>
-    <station id="S065" name="Friedrichsfelde" line="U5" link="S064,S066"/>
-    <station id="S256" name="Friedrichsfelde Ost" line="S5,S7,S75" link="S064,S255,S263"/>
-    <station id="S230" name="Friedrichshagen" line="S3" link="S229,S231"/>
-    <station id="S087" name="Friedrichstr." line="S1,S2,S25,S26,S3,S5,S7,S9,U6" link="S086,S088,S184,S185,S238,S239"/>
-    <station id="S194" name="Frohnau" line="S1" link="S193,S195"/>
-    <station id="S270" name="Gehrenseestr." line="S75" link="S263,S269"/>
-    <station id="S149" name="Gesundbrunnen" line="S1,S2,S25,S26,S41/S42,U8" link="S029,S092,S148,S150,S187,S188"/>
+    <station id="S184" name="Friedenau" line="S1" link="S183,S185"/>
+    <station id="S171" name="Friedrich-Wilhelm-Platz" line="U9" link="S170,S172"/>
+    <station id="S070" name="Friedrichsfelde" line="U5" link="S069,S071"/>
+    <station id="S258" name="Friedrichsfelde Ost" line="S5,S7,S75" link="S069,S257,S265"/>
+    <station id="S233" name="Friedrichshagen" line="S3" link="S232,S234"/>
+    <station id="S091" name="Friedrichstr." line="S1,S2,S25,S26,S3,S5,S7,S9,U6" link="S057,S059,S060,S092,S188,S241"/>
+    <station id="S197" name="Frohnau" line="S1" link="S196,S198"/>
+    <station id="S272" name="Gehrenseestr." line="S75" link="S265,S271"/>
+    <station id="S153" name="Gesundbrunnen" line="S1,S2,S25,S26,S41/S42,U8" link="S029,S096,S152,S154,S190,S191"/>
     <station id="S008" name="Gleisdreieck" line="U1,U2,U3" link="S007,S009,S041,S042"/>
-    <station id="S117" name="Gneisenaustr." line="U7" link="S084,S116"/>
-    <station id="S201" name="Greifswalder Str." line="S41/S42,S8,S85" link="S200,S202"/>
-    <station id="S111" name="Grenzallee" line="U7" link="S110,S112"/>
-    <station id="S265" name="Griebnitzsee" line="S7" link="S171,S266"/>
-    <station id="S264" name="Grunewald" line="S7" link="S172,S210"/>
-    <station id="S273" name="Grünau" line="S46,S8,S85" link="S272,S274"/>
-    <station id="S287" name="Grünbergallee" line="S45,S9" link="S286,S288"/>
+    <station id="S121" name="Gneisenaustr." line="U7" link="S089,S120"/>
+    <station id="S204" name="Greifswalder Str." line="S41/S42,S8,S85" link="S203,S205"/>
+    <station id="S115" name="Grenzallee" line="U7" link="S114,S116"/>
+    <station id="S267" name="Griebnitzsee" line="S7" link="S175,S268"/>
+    <station id="S266" name="Grunewald" line="S7" link="S176,S213"/>
+    <station id="S275" name="Grünau" line="S46,S8,S85" link="S274,S276"/>
+    <station id="S289" name="Grünbergallee" line="S45,S9" link="S288,S290"/>
     <station id="S003" name="Görlitzer Bhf." line="U1,U3" link="S002,S004"/>
-    <station id="S165" name="Güntzelstr." line="U9" link="S015,S121"/>
-    <station id="S238" name="Hackescher Markt" line="S3,S5,S7,S9" link="S033,S087"/>
-    <station id="S130" name="Halemweg" line="U7" link="S129,S131"/>
-    <station id="S209" name="Halensee" line="S41/S42,S46" link="S208,S210"/>
-    <station id="S006" name="Hallesches Tor" line="U1,U3,U6" link="S005,S007,S084,S085"/>
-    <station id="S164" name="Hansaplatz" line="U9" link="S043,S163"/>
-    <station id="S134" name="Haselhorst" line="U7" link="S133,S135"/>
-    <station id="S239" name="Hauptbahnhof" line="S3,S5,S7,S9" link="S087,S240"/>
+    <station id="S169" name="Güntzelstr." line="U9" link="S015,S125"/>
+    <station id="S241" name="Hackescher Markt" line="S3,S5,S7,S9" link="S033,S091"/>
+    <station id="S134" name="Halemweg" line="U7" link="S133,S135"/>
+    <station id="S212" name="Halensee" line="S41/S42,S46" link="S211,S213"/>
+    <station id="S006" name="Hallesches Tor" line="U1,U3,U6" link="S005,S007,S089,S090"/>
+    <station id="S168" name="Hansaplatz" line="U9" link="S043,S167"/>
+    <station id="S138" name="Haselhorst" line="U7" link="S137,S139"/>
+    <station id="S057" name="Hauptbahnhof" line="S3,S5,S7,S9,U5" link="S058,S091,S242"/>
     <station id="S037" name="Hausvogteiplatz" line="U2" link="S036,S038"/>
-    <station id="S290" name="Heerstr." line="S3,S9" link="S289,S291"/>
-    <station id="S246" name="Hegermühle" line="S5" link="S245,S247"/>
-    <station id="S018" name="Heidelberger Platz" line="S41/S42,S46,U3" link="S017,S019,S166,S208"/>
-    <station id="S225" name="Heiligensee" line="S25" link="S224,S226"/>
-    <station id="S143" name="Heinrich-Heine-Str." line="U8" link="S142,S144"/>
-    <station id="S073" name="Hellersdorf" line="U5" link="S072,S074"/>
-    <station id="S226" name="Hennigsdorf" line="S25" link="S225"/>
-    <station id="S115" name="Hermannplatz" line="U7,U8" link="S114,S116,S140,S141"/>
-    <station id="S138" name="Hermannstr." line="S41/S42,S45,S46,S47,U8" link="S081,S112,S139"/>
-    <station id="S193" name="Hermsdorf" line="S1" link="S192,S194"/>
-    <station id="S231" name="Hirschgarten" line="S3" link="S230,S232"/>
-    <station id="S195" name="Hohen Neuendorf" line="S1,S8" link="S194,S196,S283"/>
-    <station id="S269" name="Hohenschönhausen" line="S75" link="S268,S270"/>
-    <station id="S208" name="Hohenzollerndamm" line="S41/S42,S46" link="S018,S209"/>
+    <station id="S292" name="Heerstr." line="S3,S9" link="S291,S293"/>
+    <station id="S248" name="Hegermühle" line="S5" link="S247,S249"/>
+    <station id="S018" name="Heidelberger Platz" line="S41/S42,S46,U3" link="S017,S019,S170,S211"/>
+    <station id="S228" name="Heiligensee" line="S25" link="S227,S229"/>
+    <station id="S147" name="Heinrich-Heine-Str." line="U8" link="S146,S148"/>
+    <station id="S078" name="Hellersdorf" line="U5" link="S077,S079"/>
+    <station id="S229" name="Hennigsdorf" line="S25" link="S228"/>
+    <station id="S119" name="Hermannplatz" line="U7,U8" link="S118,S120,S144,S145"/>
+    <station id="S142" name="Hermannstr." line="S41/S42,S45,S46,S47,U8" link="S086,S116,S143"/>
+    <station id="S196" name="Hermsdorf" line="S1" link="S195,S197"/>
+    <station id="S234" name="Hirschgarten" line="S3" link="S233,S235"/>
+    <station id="S198" name="Hohen Neuendorf" line="S1,S8" link="S197,S199,S285"/>
+    <station id="S271" name="Hohenschönhausen" line="S75" link="S270,S272"/>
+    <station id="S211" name="Hohenzollerndamm" line="S41/S42,S46" link="S018,S212"/>
     <station id="S016" name="Hohenzollernplatz" line="U3" link="S015,S017"/>
-    <station id="S100" name="Holzhauser Str." line="U6" link="S099,S101"/>
-    <station id="S251" name="Hoppegarten" line="S5" link="S250,S252"/>
-    <station id="S187" name="Humboldthain" line="S1,S2,S25,S26" link="S149,S186"/>
-    <station id="S075" name="Hönow" line="U5" link="S074"/>
-    <station id="S056" name="Innsbrucker Platz" line="S41/S42,S46,U4" link="S055,S166,S181"/>
-    <station id="S129" name="Jakob-Kaiser-Platz" line="U7" link="S128,S130"/>
-    <station id="S144" name="Jannowitzbrücke" line="S3,S5,S7,S9,U8" link="S033,S143,S237"/>
-    <station id="S107" name="Johannisthaler Chaussee" line="U7" link="S106,S108"/>
-    <station id="S182" name="Julius-Leber-Brücke" line="S1" link="S118,S181"/>
-    <station id="S128" name="Jungfernheide" line="S41/S42,U7" link="S127,S129,S212,S213"/>
-    <station id="S048" name="Kaiserdamm" line="U2" link="S047,S049" other_link="Street:S211"/>
-    <station id="S079" name="Kaiserin-Augusta-Str." line="U6" link="S078,S080"/>
-    <station id="S156" name="Karl-Bonhoeffer-Nervenklinik" line="S25,U8" link="S155,S157,S221,S222"/>
-    <station id="S113" name="Karl-Marx-Str." line="U7" link="S112,S114"/>
-    <station id="S234" name="Karlshorst" line="S3" link="S233,S235"/>
-    <station id="S302" name="Karow" line="S2" link="S280,S303"/>
-    <station id="S254" name="Kaulsdorf" line="S5" link="S069,S253"/>
-    <station id="S070" name="Kaulsdorf-Nord" line="U5" link="S069,S071"/>
-    <station id="S071" name="Kienberg" line="U5" link="S070,S072"/>
-    <station id="S119" name="Kleistpark" line="U7" link="S118,S120"/>
+    <station id="S104" name="Holzhauser Str." line="U6" link="S103,S105"/>
+    <station id="S253" name="Hoppegarten" line="S5" link="S252,S254"/>
+    <station id="S190" name="Humboldthain" line="S1,S2,S25,S26" link="S153,S189"/>
+    <station id="S080" name="Hönow" line="U5" link="S079"/>
+    <station id="S056" name="Innsbrucker Platz" line="S41/S42,S46,U4" link="S055,S170,S185"/>
+    <station id="S133" name="Jakob-Kaiser-Platz" line="U7" link="S132,S134"/>
+    <station id="S148" name="Jannowitzbrücke" line="S3,S5,S7,S9,U8" link="S033,S147,S240"/>
+    <station id="S111" name="Johannisthaler Chaussee" line="U7" link="S110,S112"/>
+    <station id="S186" name="Julius-Leber-Brücke" line="S1" link="S122,S185"/>
+    <station id="S132" name="Jungfernheide" line="S41/S42,U7" link="S131,S133,S215,S216"/>
+    <station id="S048" name="Kaiserdamm" line="U2" link="S047,S049" other_link="Street:S214"/>
+    <station id="S084" name="Kaiserin-Augusta-Str." line="U6" link="S083,S085"/>
+    <station id="S160" name="Karl-Bonhoeffer-Nervenklinik" line="S25,U8" link="S159,S161,S224,S225"/>
+    <station id="S117" name="Karl-Marx-Str." line="U7" link="S116,S118"/>
+    <station id="S237" name="Karlshorst" line="S3" link="S236,S238"/>
+    <station id="S304" name="Karow" line="S2" link="S282,S305"/>
+    <station id="S256" name="Kaulsdorf" line="S5" link="S074,S255"/>
+    <station id="S075" name="Kaulsdorf-Nord" line="U5" link="S074,S076"/>
+    <station id="S076" name="Kienberg" line="U5" link="S075,S077"/>
+    <station id="S123" name="Kleistpark" line="U7" link="S122,S124"/>
     <station id="S034" name="Klosterstr." line="U2" link="S033,S035"/>
-    <station id="S085" name="Kochstr." line="U6" link="S006,S038"/>
-    <station id="S123" name="Konstanzer Str." line="U7" link="S017,S124"/>
-    <station id="S004" name="Kottbusser Tor" line="U1,U3,U8" link="S003,S005,S141,S142"/>
+    <station id="S090" name="Kochstr." line="U6" link="S006,S038"/>
+    <station id="S127" name="Konstanzer Str." line="U7" link="S017,S128"/>
+    <station id="S004" name="Kottbusser Tor" line="U1,U3,U8" link="S003,S005,S145,S146"/>
     <station id="S026" name="Krumme Lanke" line="U3" link="S025"/>
     <station id="S012" name="Kurfürstendamm" line="U1,U9" link="S011,S013,S015,S043"/>
     <station id="S009" name="Kurfürstenstr." line="U1,U3" link="S008,S010"/>
-    <station id="S097" name="Kurt-Schumacher-Platz" line="U6" link="S096,S098"/>
-    <station id="S310" name="Köllnische Heide" line="S45,S46,S47" link="S112,S277"/>
-    <station id="S312" name="Königs Wusterhausen" line="S46" link="S311"/>
-    <station id="S232" name="Köpenick" line="S3" link="S231,S233"/>
-    <station id="S202" name="Landsberger Allee" line="S41/S42,S8,S85" link="S201,S203"/>
-    <station id="S218" name="Lankwitz" line="S25,S26" link="S217,S219"/>
-    <station id="S198" name="Lehnitz" line="S1" link="S197,S199"/>
-    <station id="S139" name="Leinestr." line="U8" link="S138,S140"/>
-    <station id="S093" name="Leopoldplatz" line="U6,U9" link="S092,S094,S159,S160"/>
-    <station id="S064" name="Lichtenberg" line="S5,S7,S75,U5" link="S063,S065,S256,S257"/>
-    <station id="S297" name="Lichtenrade" line="S2" link="S296,S298"/>
-    <station id="S217" name="Lichterfelde Ost" line="S25,S26" link="S216,S218"/>
-    <station id="S215" name="Lichterfelde Süd" line="S25,S26" link="S214,S216"/>
-    <station id="S177" name="Lichterfelde-West" line="S1" link="S176,S178"/>
-    <station id="S155" name="Lindauer Allee" line="U8" link="S154,S156"/>
-    <station id="S106" name="Lipschitzallee" line="U7" link="S105,S107"/>
-    <station id="S074" name="Louis-Lewin-Str." line="U5" link="S073,S075"/>
-    <station id="S063" name="Magdalenenstr." line="U5" link="S062,S064"/>
-    <station id="S296" name="Mahlow" line="S2" link="S295,S297"/>
-    <station id="S253" name="Mahlsdorf" line="S5" link="S252,S254"/>
-    <station id="S300" name="Marienfelde" line="S2" link="S299,S301"/>
-    <station id="S261" name="Marzahn" line="S7" link="S260,S262"/>
-    <station id="S084" name="Mehringdamm" line="U6,U7" link="S006,S007,S083,S117"/>
-    <station id="S259" name="Mehrower Allee" line="S7" link="S258,S260"/>
+    <station id="S101" name="Kurt-Schumacher-Platz" line="U6" link="S100,S102"/>
+    <station id="S312" name="Köllnische Heide" line="S45,S46,S47" link="S116,S279"/>
+    <station id="S314" name="Königs Wusterhausen" line="S46" link="S313"/>
+    <station id="S235" name="Köpenick" line="S3" link="S234,S236"/>
+    <station id="S205" name="Landsberger Allee" line="S41/S42,S8,S85" link="S204,S206"/>
+    <station id="S221" name="Lankwitz" line="S25,S26" link="S220,S222"/>
+    <station id="S201" name="Lehnitz" line="S1" link="S200,S202"/>
+    <station id="S143" name="Leinestr." line="U8" link="S142,S144"/>
+    <station id="S097" name="Leopoldplatz" line="U6,U9" link="S096,S098,S163,S164"/>
+    <station id="S069" name="Lichtenberg" line="S5,S7,S75,U5" link="S068,S070,S258,S259"/>
+    <station id="S299" name="Lichtenrade" line="S2" link="S298,S300"/>
+    <station id="S220" name="Lichterfelde Ost" line="S25,S26" link="S219,S221"/>
+    <station id="S218" name="Lichterfelde Süd" line="S25,S26" link="S217,S219"/>
+    <station id="S181" name="Lichterfelde-West" line="S1" link="S180,S182"/>
+    <station id="S159" name="Lindauer Allee" line="U8" link="S158,S160"/>
+    <station id="S110" name="Lipschitzallee" line="U7" link="S109,S111"/>
+    <station id="S079" name="Louis-Lewin-Str." line="U5" link="S078,S080"/>
+    <station id="S068" name="Magdalenenstr." line="U5" link="S067,S069"/>
+    <station id="S298" name="Mahlow" line="S2" link="S297,S299"/>
+    <station id="S255" name="Mahlsdorf" line="S5" link="S254,S256"/>
+    <station id="S302" name="Marienfelde" line="S2" link="S301,S303"/>
+    <station id="S263" name="Marzahn" line="S7" link="S262,S264"/>
+    <station id="S089" name="Mehringdamm" line="U6,U7" link="S006,S007,S088,S121"/>
+    <station id="S261" name="Mehrower Allee" line="S7" link="S260,S262"/>
     <station id="S041" name="Mendelssohn-Bartholdy-Park" line="U2" link="S008,S040"/>
-    <station id="S211" name="Messe Nord/ICC" line="S41/S42,S46" link="S210,S212" other_link="Street:S048"/>
-    <station id="S289" name="Messe Süd" line="S3,S9" link="S210,S290"/>
-    <station id="S174" name="Mexikoplatz" line="S1" link="S173,S175"/>
-    <station id="S127" name="Mierendorffplatz" line="U7" link="S126,S128"/>
+    <station id="S214" name="Messe Nord/ICC" line="S41/S42,S46" link="S213,S215" other_link="Street:S048"/>
+    <station id="S291" name="Messe Süd" line="S3,S9" link="S213,S292"/>
+    <station id="S178" name="Mexikoplatz" line="S1" link="S177,S179"/>
+    <station id="S131" name="Mierendorffplatz" line="U7" link="S130,S132"/>
     <station id="S039" name="Mohrenstr." line="U2" link="S038,S040"/>
-    <station id="S142" name="Moritzplatz" line="U8" link="S004,S143"/>
+    <station id="S146" name="Moritzplatz" line="U8" link="S004,S147"/>
     <station id="S035" name="Märkisches Museum" line="U2" link="S034,S036"/>
-    <station id="S007" name="Möckernbrücke" line="U1,U3,U7" link="S006,S008,S084,S118"/>
-    <station id="S281" name="Mühlenbeck-Mönchsmühle" line="S8" link="S280,S282"/>
-    <station id="S089" name="Naturkundemuseum" line="U6" link="S088,S090"/>
-    <station id="S159" name="Nauener Platz" line="U9" link="S093,S151"/>
+    <station id="S007" name="Möckernbrücke" line="U1,U3,U7" link="S006,S008,S089,S122"/>
+    <station id="S283" name="Mühlenbeck-Mönchsmühle" line="S8" link="S282,S284"/>
+    <station id="S093" name="Naturkundemuseum" line="U6" link="S092,S094"/>
+    <station id="S163" name="Nauener Platz" line="U9" link="S097,S155"/>
     <station id="S050" name="Neu-Westend" line="U2" link="S049,S051"/>
-    <station id="S250" name="Neuenhagen" line="S5" link="S249,S251"/>
-    <station id="S112" name="Neukölln" line="S41/S42,S45,S46,S47,U7" link="S111,S113,S138,S206,S310"/>
-    <station id="S172" name="Nikolassee" line="S1,S7" link="S171,S173,S264"/>
+    <station id="S252" name="Neuenhagen" line="S5" link="S251,S253"/>
+    <station id="S116" name="Neukölln" line="S41/S42,S45,S46,S47,U7" link="S115,S117,S142,S209,S312"/>
+    <station id="S176" name="Nikolassee" line="S1,S7" link="S175,S177,S266"/>
     <station id="S010" name="Nollendorfplatz" line="U1,U2,U3,U4" link="S009,S011,S042,S053"/>
-    <station id="S186" name="Nordbahnhof" line="S1,S2,S25,S26" link="S185,S187"/>
-    <station id="S257" name="Nöldnerplatz" line="S5,S7,S75" link="S064,S204"/>
-    <station id="S309" name="Oberspree" line="S47" link="S276,S308"/>
+    <station id="S189" name="Nordbahnhof" line="S1,S2,S25,S26" link="S188,S190"/>
+    <station id="S259" name="Nöldnerplatz" line="S5,S7,S75" link="S069,S207"/>
+    <station id="S311" name="Oberspree" line="S47" link="S278,S310"/>
     <station id="S051" name="Olympia-Stadion" line="U2" link="S050,S052"/>
-    <station id="S291" name="Olympiastadion" line="S3,S9" link="S290,S292"/>
+    <station id="S293" name="Olympiastadion" line="S3,S9" link="S292,S294"/>
     <station id="S025" name="Onkel Toms Hütte" line="U3" link="S024,S026"/>
-    <station id="S199" name="Oranienburg" line="S1" link="S198"/>
-    <station id="S185" name="Oranienburger Str." line="S1,S2,S25,S26" link="S087,S186"/>
-    <station id="S088" name="Oranienburger Tor" line="U6" link="S087,S089"/>
-    <station id="S216" name="Osdorfer Str." line="S25,S26" link="S215,S217"/>
+    <station id="S202" name="Oranienburg" line="S1" link="S201"/>
+    <station id="S188" name="Oranienburger Str." line="S1,S2,S25,S26" link="S091,S189"/>
+    <station id="S092" name="Oranienburger Tor" line="U6" link="S091,S093"/>
+    <station id="S219" name="Osdorfer Str." line="S25,S26" link="S218,S220"/>
     <station id="S024" name="Oskar-Helene-Heim" line="U3" link="S023,S025"/>
-    <station id="S151" name="Osloer Str." line="U8,U9" link="S150,S152,S159"/>
-    <station id="S237" name="Ostbahnhof" line="S3,S5,S7,S9" link="S001,S144"/>
-    <station id="S204" name="Ostkreuz" line="S3,S41/S42,S5,S7,S75,S8,S85" link="S001,S062,S205,S236,S257"/>
-    <station id="S099" name="Otisstr." line="U6" link="S098,S100"/>
-    <station id="S027" name="Pankow" line="S2,S8,S85,U2" link="S028,S188,S279"/>
-    <station id="S279" name="Pankow-Heinersdorf" line="S2,S8" link="S027,S280"/>
-    <station id="S150" name="Pankstr." line="U8" link="S149,S151"/>
-    <station id="S154" name="Paracelsus-Bad" line="U8" link="S153,S155"/>
-    <station id="S082" name="Paradestr." line="U6" link="S081,S083"/>
-    <station id="S109" name="Parchimer Allee" line="U7" link="S108,S110"/>
-    <station id="S133" name="Paulsternstr." line="U7" link="S132,S134"/>
-    <station id="S248" name="Petershagen Nord" line="S5" link="S247,S249"/>
-    <station id="S292" name="Pichelsberg" line="S3,S9" link="S291,S293"/>
-    <station id="S083" name="Platz der Luftbrücke" line="U6" link="S082,S084"/>
-    <station id="S278" name="Plänterwald" line="S8,S85,S9" link="S205,S277"/>
+    <station id="S155" name="Osloer Str." line="U8,U9" link="S154,S156,S163"/>
+    <station id="S240" name="Ostbahnhof" line="S3,S5,S7,S9" link="S001,S148"/>
+    <station id="S207" name="Ostkreuz" line="S3,S41/S42,S5,S7,S75,S8,S85" link="S001,S067,S208,S239,S259"/>
+    <station id="S103" name="Otisstr." line="U6" link="S102,S104"/>
+    <station id="S027" name="Pankow" line="S2,S8,S85,U2" link="S028,S191,S281"/>
+    <station id="S281" name="Pankow-Heinersdorf" line="S2,S8" link="S027,S282"/>
+    <station id="S154" name="Pankstr." line="U8" link="S153,S155"/>
+    <station id="S158" name="Paracelsus-Bad" line="U8" link="S157,S159"/>
+    <station id="S087" name="Paradestr." line="U6" link="S086,S088"/>
+    <station id="S113" name="Parchimer Allee" line="U7" link="S112,S114"/>
+    <station id="S137" name="Paulsternstr." line="U7" link="S136,S138"/>
+    <station id="S250" name="Petershagen Nord" line="S5" link="S249,S251"/>
+    <station id="S294" name="Pichelsberg" line="S3,S9" link="S293,S295"/>
+    <station id="S088" name="Platz der Luftbrücke" line="U6" link="S087,S089"/>
+    <station id="S280" name="Plänterwald" line="S8,S85,S9" link="S208,S279"/>
     <station id="S021" name="Podbielskiallee" line="U3" link="S020,S022"/>
-    <station id="S262" name="Poelchaustr." line="S7" link="S261,S263"/>
-    <station id="S267" name="Potsdam Hauptbahnhof" line="S7" link="S266"/>
-    <station id="S040" name="Potsdamer Platz" line="S1,S2,S25,S26,U2" link="S039,S041,S183,S184"/>
-    <station id="S200" name="Prenzlauer Allee" line="S41/S42,S8,S85" link="S029,S201"/>
-    <station id="S220" name="Priesterweg" line="S2,S25,S26" link="S207,S219,S301"/>
+    <station id="S264" name="Poelchaustr." line="S7" link="S263,S265"/>
+    <station id="S269" name="Potsdam Hauptbahnhof" line="S7" link="S268"/>
+    <station id="S040" name="Potsdamer Platz" line="S1,S2,S25,S26,U2" link="S039,S041,S059,S187"/>
+    <station id="S203" name="Prenzlauer Allee" line="S41/S42,S8,S85" link="S029,S204"/>
+    <station id="S223" name="Priesterweg" line="S2,S25,S26" link="S210,S222,S303"/>
     <station id="S005" name="Prinzenstr." line="U1,U3" link="S004,S006"/>
-    <station id="S229" name="Rahnsdorf" line="S3" link="S228,S230"/>
-    <station id="S260" name="Raoul-Wallenberg-Str." line="S7" link="S259,S261"/>
-    <station id="S114" name="Rathaus Neukölln" line="U7" link="S113,S115"/>
-    <station id="S157" name="Rathaus Reinickendorf" line="U8" link="S156,S158"/>
+    <station id="S232" name="Rahnsdorf" line="S3" link="S231,S233"/>
+    <station id="S262" name="Raoul-Wallenberg-Str." line="S7" link="S261,S263"/>
+    <station id="S118" name="Rathaus Neukölln" line="U7" link="S117,S119"/>
+    <station id="S161" name="Rathaus Reinickendorf" line="U8" link="S160,S162"/>
     <station id="S055" name="Rathaus Schöneberg" line="U4" link="S054,S056"/>
-    <station id="S137" name="Rathaus Spandau" line="U7" link="S136" other_link="Street:S294"/>
-    <station id="S170" name="Rathaus Steglitz" line="S1,U9" link="S169,S178,S179"/>
-    <station id="S095" name="Rehberge" line="U6" link="S094,S096"/>
-    <station id="S091" name="Reinickendorfer Str." line="U6" link="S090,S092"/>
-    <station id="S153" name="Residenzstr." line="U8" link="S152,S154"/>
-    <station id="S126" name="Richard-Wagner-Platz" line="U7" link="S046,S127"/>
-    <station id="S132" name="Rohrdamm" line="U7" link="S131,S133"/>
+    <station id="S141" name="Rathaus Spandau" line="U7" link="S140" other_link="Street:S296"/>
+    <station id="S174" name="Rathaus Steglitz" line="S1,U9" link="S173,S182,S183"/>
+    <station id="S099" name="Rehberge" line="U6" link="S098,S100"/>
+    <station id="S095" name="Reinickendorfer Str." line="U6" link="S094,S096"/>
+    <station id="S157" name="Residenzstr." line="U8" link="S156,S158"/>
+    <station id="S130" name="Richard-Wagner-Platz" line="U7" link="S046,S131"/>
+    <station id="S136" name="Rohrdamm" line="U7" link="S135,S137"/>
     <station id="S032" name="Rosa-Luxemburg-Platz" line="U2" link="S031,S033"/>
-    <station id="S146" name="Rosenthaler Platz" line="U8" link="S145,S147"/>
-    <station id="S103" name="Rudow" line="U7" link="S104"/>
+    <station id="S150" name="Rosenthaler Platz" line="U8" link="S149,S151"/>
+    <station id="S061" name="Rotes Rathaus" line="U5" link="S033,S060"/>
+    <station id="S107" name="Rudow" line="U7" link="S108"/>
     <station id="S052" name="Ruhleben" line="U2" link="S051"/>
-    <station id="S236" name="Rummelsburg" line="S3" link="S204,S235"/>
-    <station id="S304" name="Röntgental" line="S2" link="S303,S305"/>
+    <station id="S239" name="Rummelsburg" line="S3" link="S207,S238"/>
+    <station id="S306" name="Röntgental" line="S2" link="S305,S307"/>
     <station id="S019" name="Rüdesheimer Platz" line="U3" link="S018,S020"/>
-    <station id="S061" name="Samariterstr." line="U5" link="S060,S062"/>
-    <station id="S242" name="Savignyplatz" line="S3,S5,S7,S9" link="S043,S243"/>
-    <station id="S098" name="Scharnweberstr." line="U6" link="S097,S099"/>
-    <station id="S298" name="Schichauweg" line="S2" link="S297,S299"/>
-    <station id="S057" name="Schillingstr." line="U5" link="S033,S058"/>
-    <station id="S173" name="Schlachtensee" line="S1" link="S172,S174"/>
+    <station id="S066" name="Samariterstr." line="U5" link="S065,S067"/>
+    <station id="S244" name="Savignyplatz" line="S3,S5,S7,S9" link="S043,S245"/>
+    <station id="S102" name="Scharnweberstr." line="U6" link="S101,S103"/>
+    <station id="S300" name="Schichauweg" line="S2" link="S299,S301"/>
+    <station id="S062" name="Schillingstr." line="U5" link="S033,S063"/>
+    <station id="S177" name="Schlachtensee" line="S1" link="S176,S178"/>
     <station id="S002" name="Schlesisches Tor" line="U1,U3" link="S001,S003"/>
-    <station id="S169" name="Schloßstr." line="U9" link="S168,S170"/>
-    <station id="S224" name="Schulzendorf" line="S25" link="S223,S225"/>
-    <station id="S090" name="Schwartzkopffstr." line="U6" link="S089,S091"/>
-    <station id="S181" name="Schöneberg" line="S1,S41/S42,S46" link="S056,S180,S182,S207"/>
-    <station id="S276" name="Schöneweide" line="S45,S46,S47,S8,S85,S9" link="S275,S277,S309"/>
-    <station id="S282" name="Schönfließ" line="S8" link="S281,S283"/>
-    <station id="S029" name="Schönhauser Allee" line="S41/S42,S8,S85,U2" link="S028,S030,S149,S188,S200"/>
-    <station id="S190" name="Schönholz" line="S1,S25,S26" link="S189,S191,S221"/>
-    <station id="S141" name="Schönleinstr." line="U8" link="S004,S115"/>
-    <station id="S094" name="Seestr." line="U6" link="S093,S095"/>
+    <station id="S173" name="Schloßstr." line="U9" link="S172,S174"/>
+    <station id="S227" name="Schulzendorf" line="S25" link="S226,S228"/>
+    <station id="S094" name="Schwartzkopffstr." line="U6" link="S093,S095"/>
+    <station id="S185" name="Schöneberg" line="S1,S41/S42,S46" link="S056,S184,S186,S210"/>
+    <station id="S278" name="Schöneweide" line="S45,S46,S47,S8,S85,S9" link="S277,S279,S311"/>
+    <station id="S284" name="Schönfließ" line="S8" link="S283,S285"/>
+    <station id="S029" name="Schönhauser Allee" line="S41/S42,S8,S85,U2" link="S028,S030,S153,S191,S203"/>
+    <station id="S193" name="Schönholz" line="S1,S25,S26" link="S192,S194,S224"/>
+    <station id="S145" name="Schönleinstr." line="U8" link="S004,S119"/>
+    <station id="S098" name="Seestr." line="U6" link="S097,S099"/>
     <station id="S031" name="Senefelderplatz" line="U2" link="S030,S032"/>
-    <station id="S131" name="Siemensdamm" line="U7" link="S130,S132"/>
-    <station id="S206" name="Sonnenallee" line="S41/S42" link="S112,S205"/>
+    <station id="S135" name="Siemensdamm" line="U7" link="S134,S136"/>
+    <station id="S209" name="Sonnenallee" line="S41/S42" link="S116,S208"/>
     <station id="S047" name="Sophie-Charlotte-Platz" line="U2" link="S046,S048"/>
-    <station id="S294" name="Spandau" line="S3,S9" link="S293" other_link="Street:S137"/>
-    <station id="S015" name="Spichernstr." line="U3,U9" link="S012,S014,S016,S165"/>
-    <station id="S308" name="Spindlersfeld" line="S47" link="S309"/>
+    <station id="S296" name="Spandau" line="S3,S9" link="S295" other_link="Street:S141"/>
+    <station id="S015" name="Spichernstr." line="U3,U9" link="S012,S014,S016,S169"/>
+    <station id="S310" name="Spindlersfeld" line="S47" link="S311"/>
     <station id="S036" name="Spittelmarkt" line="U2" link="S035,S037"/>
-    <station id="S263" name="Springpfuhl" line="S7,S75" link="S256,S262,S270"/>
-    <station id="S038" name="Stadtmitte" line="U2,U6" link="S037,S039,S085,S086"/>
-    <station id="S203" name="Storkower Str." line="S41/S42,S8,S85" link="S062,S202"/>
-    <station id="S247" name="Strausberg" line="S5" link="S246,S248"/>
-    <station id="S244" name="Strausberg Nord" line="S5" link="S245"/>
-    <station id="S245" name="Strausberg Stadt" line="S5" link="S244,S246"/>
-    <station id="S058" name="Strausberger Platz" line="U5" link="S057,S059"/>
-    <station id="S293" name="Stresow" line="S3,S9" link="S292,S294"/>
-    <station id="S176" name="Sundgauer Str." line="S1" link="S175,S177"/>
-    <station id="S219" name="Südende" line="S25,S26" link="S218,S220"/>
-    <station id="S207" name="Südkreuz" line="S2,S25,S26,S41/S42,S45,S46" link="S081,S118,S181,S220"/>
-    <station id="S116" name="Südstern" line="U7" link="S115,S117"/>
-    <station id="S223" name="Tegel" line="S25" link="S222,S224" other_link="Street:S102"/>
-    <station id="S214" name="Teltow Stadt" line="S25,S26" link="S215"/>
-    <station id="S081" name="Tempelhof" line="S41/S42,S45,S46,U6" link="S080,S082,S138,S207"/>
+    <station id="S265" name="Springpfuhl" line="S7,S75" link="S258,S264,S272"/>
+    <station id="S038" name="Stadtmitte" line="U2,U6" link="S037,S039,S060,S090"/>
+    <station id="S206" name="Storkower Str." line="S41/S42,S8,S85" link="S067,S205"/>
+    <station id="S249" name="Strausberg" line="S5" link="S248,S250"/>
+    <station id="S246" name="Strausberg Nord" line="S5" link="S247"/>
+    <station id="S247" name="Strausberg Stadt" line="S5" link="S246,S248"/>
+    <station id="S063" name="Strausberger Platz" line="U5" link="S062,S064"/>
+    <station id="S295" name="Stresow" line="S3,S9" link="S294,S296"/>
+    <station id="S180" name="Sundgauer Str." line="S1" link="S179,S181"/>
+    <station id="S222" name="Südende" line="S25,S26" link="S221,S223"/>
+    <station id="S210" name="Südkreuz" line="S2,S25,S26,S41/S42,S45,S46" link="S086,S122,S185,S223"/>
+    <station id="S120" name="Südstern" line="U7" link="S119,S121"/>
+    <station id="S226" name="Tegel" line="S25" link="S225,S227" other_link="Street:S106"/>
+    <station id="S217" name="Teltow Stadt" line="S25,S26" link="S218"/>
+    <station id="S086" name="Tempelhof" line="S41/S42,S45,S46,U6" link="S085,S087,S142,S210"/>
     <station id="S049" name="Theodor-Heuss-Platz" line="U2" link="S048,S050"/>
-    <station id="S241" name="Tiergarten" line="S3,S5,S7,S9" link="S043,S240"/>
-    <station id="S066" name="Tierpark" line="U5" link="S065,S067"/>
-    <station id="S205" name="Treptower Park" line="S41/S42,S8,S85,S9" link="S001,S204,S206,S278"/>
-    <station id="S163" name="Turmstr." line="U9" link="S162,S164"/>
+    <station id="S243" name="Tiergarten" line="S3,S5,S7,S9" link="S043,S242"/>
+    <station id="S071" name="Tierpark" line="U5" link="S070,S072"/>
+    <station id="S208" name="Treptower Park" line="S41/S42,S8,S85,S9" link="S001,S207,S209,S280"/>
+    <station id="S167" name="Turmstr." line="U9" link="S166,S168"/>
     <station id="S013" name="Uhlandstr." line="U1" link="S012"/>
-    <station id="S078" name="Ullsteinstr." line="U6" link="S077,S079"/>
+    <station id="S083" name="Ullsteinstr." line="U6" link="S082,S084"/>
+    <station id="S060" name="Unter den Linden" line="U5,U6" link="S038,S059,S061,S091"/>
     <station id="S053" name="Viktoria-Luise-Platz" line="U4" link="S010,S054"/>
     <station id="S028" name="Vinetastr." line="U2" link="S027,S029"/>
-    <station id="S148" name="Voltastr." line="U8" link="S147,S149"/>
-    <station id="S192" name="Waidmannslust" line="S1,S26" link="S158,S193"/>
-    <station id="S168" name="Walther-Schreiber-Platz" line="U9" link="S167,S169"/>
-    <station id="S171" name="Wannsee" line="S1,S7" link="S172,S265"/>
-    <station id="S001" name="Warschauer Str." line="S3,S5,S7,S75,S9,U1,U3" link="S002,S204,S205,S237"/>
-    <station id="S268" name="Wartenberg" line="S75" link="S269"/>
-    <station id="S285" name="Waßmannsdorf" line="S45,S9" link="S284,S286"/>
-    <station id="S059" name="Weberwiese" line="U5" link="S058,S060"/>
-    <station id="S092" name="Wedding" line="S41/S42,U6" link="S091,S093,S149,S161"/>
-    <station id="S145" name="Weinmeisterstr." line="U8" link="S033,S146"/>
-    <station id="S212" name="Westend" line="S41/S42,S46" link="S128,S211"/>
-    <station id="S161" name="Westhafen" line="S41/S42,U9" link="S092,S160,S162,S213"/>
-    <station id="S210" name="Westkreuz" line="S3,S41/S42,S46,S5,S7,S9" link="S209,S211,S243,S264,S289"/>
-    <station id="S077" name="Westphalweg" line="U6" link="S076,S078"/>
-    <station id="S311" name="Wildau" line="S46" link="S271,S312"/>
-    <station id="S228" name="Wilhelmshagen" line="S3" link="S227,S229"/>
-    <station id="S191" name="Wilhelmsruh" line="S1,S26" link="S158,S190"/>
-    <station id="S125" name="Wilmersdorfer Str." line="U7" link="S046,S124" other_link="Street:S243"/>
-    <station id="S158" name="Wittenau" line="S1,S26,U8" link="S157,S191,S192"/>
+    <station id="S152" name="Voltastr." line="U8" link="S151,S153"/>
+    <station id="S195" name="Waidmannslust" line="S1,S26" link="S162,S196"/>
+    <station id="S172" name="Walther-Schreiber-Platz" line="U9" link="S171,S173"/>
+    <station id="S175" name="Wannsee" line="S1,S7" link="S176,S267"/>
+    <station id="S001" name="Warschauer Str." line="S3,S5,S7,S75,S9,U1,U3" link="S002,S207,S208,S240"/>
+    <station id="S270" name="Wartenberg" line="S75" link="S271"/>
+    <station id="S287" name="Waßmannsdorf" line="S45,S9" link="S286,S288"/>
+    <station id="S064" name="Weberwiese" line="U5" link="S063,S065"/>
+    <station id="S096" name="Wedding" line="S41/S42,U6" link="S095,S097,S153,S165"/>
+    <station id="S149" name="Weinmeisterstr." line="U8" link="S033,S150"/>
+    <station id="S215" name="Westend" line="S41/S42,S46" link="S132,S214"/>
+    <station id="S165" name="Westhafen" line="S41/S42,U9" link="S096,S164,S166,S216"/>
+    <station id="S213" name="Westkreuz" line="S3,S41/S42,S46,S5,S7,S9" link="S212,S214,S245,S266,S291"/>
+    <station id="S082" name="Westphalweg" line="U6" link="S081,S083"/>
+    <station id="S313" name="Wildau" line="S46" link="S273,S314"/>
+    <station id="S231" name="Wilhelmshagen" line="S3" link="S230,S232"/>
+    <station id="S194" name="Wilhelmsruh" line="S1,S26" link="S162,S193"/>
+    <station id="S129" name="Wilmersdorfer Str." line="U7" link="S046,S128" other_link="Street:S245"/>
+    <station id="S162" name="Wittenau" line="S1,S26,U8" link="S161,S194,S195"/>
     <station id="S011" name="Wittenbergplatz" line="U1,U2,U3" link="S010,S012,S014,S043"/>
-    <station id="S189" name="Wollankstr." line="S1,S25,S26" link="S188,S190"/>
-    <station id="S069" name="Wuhletal" line="S5,U5" link="S068,S070,S254,S255"/>
-    <station id="S233" name="Wuhlheide" line="S3" link="S232,S234"/>
-    <station id="S105" name="Wutzkyallee" line="U7" link="S104,S106"/>
-    <station id="S118" name="Yorckstr." line="S1,S2,S25,S26,U7" link="S007,S119,S182,S183,S207"/>
-    <station id="S175" name="Zehlendorf" line="S1" link="S174,S176"/>
-    <station id="S305" name="Zepernick" line="S2" link="S304,S306"/>
-    <station id="S271" name="Zeuthen" line="S46,S8" link="S272,S311"/>
-    <station id="S135" name="Zitadelle" line="U7" link="S134,S136"/>
-    <station id="S043" name="Zoologischer Garten" line="S3,S5,S7,S9,U2,U9" link="S011,S012,S044,S164,S241,S242"/>
-    <station id="S104" name="Zwickauer Damm" line="U7" link="S103,S105"/>
+    <station id="S192" name="Wollankstr." line="S1,S25,S26" link="S191,S193"/>
+    <station id="S074" name="Wuhletal" line="S5,U5" link="S073,S075,S256,S257"/>
+    <station id="S236" name="Wuhlheide" line="S3" link="S235,S237"/>
+    <station id="S109" name="Wutzkyallee" line="U7" link="S108,S110"/>
+    <station id="S122" name="Yorckstr." line="S1,S2,S25,S26,U7" link="S007,S123,S186,S187,S210"/>
+    <station id="S179" name="Zehlendorf" line="S1" link="S178,S180"/>
+    <station id="S307" name="Zepernick" line="S2" link="S306,S308"/>
+    <station id="S273" name="Zeuthen" line="S46,S8" link="S274,S313"/>
+    <station id="S139" name="Zitadelle" line="U7" link="S138,S140"/>
+    <station id="S043" name="Zoologischer Garten" line="S3,S5,S7,S9,U2,U9" link="S011,S012,S044,S168,S243,S244"/>
+    <station id="S108" name="Zwickauer Damm" line="U7" link="S107,S109"/>
   </stations>
 </tube>

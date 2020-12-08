@@ -1,5 +1,20 @@
 Revision history for Devel::Examine::Subs
 
+1.71    2020-12-04
+        - fixes #31; unlink temporary file in _read_file() after we're done
+          with it. Without unlink, we were leaking temporary files
+        - add rw(), provides an interface to the internal File::Edit::Portable
+          object
+        - add tempfile(), provides an interface to the internal File::Temp
+          object
+        - added $ENV{ISSUE_31_TEST}, and modified _read_file() to allow tests
+          to skip the recsep checks for testing against issue #31
+        - updated file count tests to properly deal with the new test files
+        - added t/58-tempfile_unlink_bug.t, which tests against the problem
+          identified in issue #31
+        - in POD, move description section above synopsis (closes #30)
+        - fix misleading/incorrect comment (fixes #28)
+
 1.70    2018-10-24
         - clean up code in respect to specific layouts (closes #18)
         - efficiency change in the core _proc() sub. We now check for existence

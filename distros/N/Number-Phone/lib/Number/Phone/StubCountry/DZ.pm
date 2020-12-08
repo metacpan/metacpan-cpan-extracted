@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20200904144531;
+our $VERSION = 1.20201204215956;
 
 my $formatters = [
                 {
@@ -85,19 +85,19 @@ my $validators = {
                 'voip' => '98[23]\\d{6}'
               };
 my %areanames = ();
-$areanames{en}->{21321} = "Algiers";
-$areanames{en}->{21327} = "Chlef";
-$areanames{en}->{21329} = "Ghardaia\/Illizi\/Tamanrasset";
-$areanames{en}->{21331} = "Constantine";
-$areanames{en}->{21332} = "El\ Oued";
-$areanames{en}->{21333} = "Batna\/Beskra";
-$areanames{en}->{21334} = "Béjaïa\/Jijel";
-$areanames{en}->{21335} = "Bordj\ Bou\ Arreridj";
-$areanames{en}->{21337} = "Tebessa";
-$areanames{en}->{21338} = "Annaba\/Skikda";
-$areanames{en}->{21341} = "Oran";
-$areanames{en}->{21343} = "Tlemcen";
-$areanames{en}->{21349} = "Adrar\/Béchar\/Tindouf";
+$areanames{en} = {"21333", "Batna\/Beskra",
+"21332", "El\ Oued",
+"21335", "Bordj\ Bou\ Arreridj",
+"21343", "Tlemcen",
+"21321", "Algiers",
+"21341", "Oran",
+"21329", "Ghardaia\/Illizi\/Tamanrasset",
+"21349", "Adrar\/Béchar\/Tindouf",
+"21334", "Béjaïa\/Jijel",
+"21327", "Chlef",
+"21337", "Tebessa",
+"21338", "Annaba\/Skikda",
+"21331", "Constantine",};
 
     sub new {
       my $class = shift;

@@ -45,6 +45,12 @@ package Cfn::Resource::Properties::AWS::Serverless::Function {
   has Layers => ( isa => 'Cfn::Value::ArrayOfPrimitives', is => 'rw', coerce => 1 );
   has AutoPublishAlias => ( isa => 'Cfn::Value::String', is => 'rw', coerce => 1 );
   has ReservedConcurrentExecutions => ( isa => 'Cfn::Value::Integer', is => 'rw', coerce => 1 );
+  has AssumeRolePolicyDocument => ( isa => 'Cfn::Value', is => 'rw', coerce => 1 );
+  has AutoPublishCodeSha256 => ( isa => 'Cfn::Value::String', is => 'rw', coerce => 1 );
+  has EventInvokeConfig => ( isa => 'Cfn::Value', is => 'rw', coerce => 1 );
+  has PermissionsBoundary => ( isa => 'Cfn::Value::String', is => 'rw', coerce => 1 );
+  has ProvisionedConcurrencyConfig => ( isa => 'Cfn::Value', is => 'rw', coerce => 1 );
+  has VersionDescription => ( isa => 'Cfn::Value::String', is => 'rw', coerce => 1 );
 }
 
 1;

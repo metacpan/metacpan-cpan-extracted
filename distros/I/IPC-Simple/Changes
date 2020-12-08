@@ -1,3 +1,9 @@
+0.09 2020-12-08
+- Bugfix: deep recursion in IPC::Simple::Group->signal
+
+0.08 2020-12-07
+- New: running processes may be added to a group
+
 0.07 2020-11-25
 - Bugfix: use array of arguments for commands in tests to ensure we're
   controlling a single sub-process

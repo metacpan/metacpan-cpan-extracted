@@ -1,16 +1,16 @@
 {
-   "abstract" : "PerlIO Layer for quoted-printable encoding",
+   "abstract" : "PerlIO layer for quoted-printable strings",
    "author" : [
-      "Elizabeth Mattijsen (liz@dijkmat.nl)"
+      "Elizabeth Mattijsen <liz@dijkmat.nl>, Steve Hay <shay@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 6.62, CPAN::Meta::Converter version 2.112150",
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
    "license" : [
-      "unknown"
+      "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "PerlIO-via-QuotedPrint",
    "no_index" : {
@@ -19,23 +19,83 @@
          "inc"
       ]
    },
+   "optional_features" : {
+      "changestest" : {
+         "description" : "Changes testing",
+         "prereqs" : {
+            "test" : {
+               "requires" : {
+                  "Test::CPAN::Changes" : "0"
+               }
+            }
+         }
+      },
+      "critictest" : {
+         "description" : "Perl::Critic testing",
+         "prereqs" : {
+            "test" : {
+               "requires" : {
+                  "Test::Perl::Critic" : "0"
+               }
+            }
+         }
+      },
+      "podcoveragetest" : {
+         "description" : "POD coverage testing",
+         "prereqs" : {
+            "test" : {
+               "requires" : {
+                  "Test::Pod::Coverage" : "0.08"
+               }
+            }
+         }
+      },
+      "podtest" : {
+         "description" : "POD testing",
+         "prereqs" : {
+            "test" : {
+               "requires" : {
+                  "Test::Pod" : "1.00"
+               }
+            }
+         }
+      }
+   },
    "prereqs" : {
       "build" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : 0
+            "ExtUtils::MakeMaker" : "0"
          }
       },
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : 0
+            "Config" : "0",
+            "ExtUtils::MakeMaker" : "6.64",
+            "perl" : "5.008001",
+            "strict" : "0",
+            "warnings" : "0"
          }
       },
       "runtime" : {
          "requires" : {
-            "MIME::QuotedPrint" : 0
+            "MIME::QuotedPrint" : "0",
+            "perl" : "5.008001",
+            "strict" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "0.08"
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "web" : "https://github.com/steve-m-hay/PerlIO-via-QuotedPrint"
+      }
+   },
+   "version" : "0.09",
+   "x_serialization_backend" : "JSON::PP version 4.02"
 }

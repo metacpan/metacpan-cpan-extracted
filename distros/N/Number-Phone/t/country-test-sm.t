@@ -1,14 +1,10 @@
-#!/usr/bin/perl -w
-
 use strict;
-
+use warnings;
 use lib 't/inc';
-use fatalwarnings;
+use nptestutils;
 
 use Number::Phone::Lib;
 use Test::More;
-
-END { done_testing(); }
 
 {
     my $np = Number::Phone::Lib->new('SM', '912345');
@@ -35,3 +31,5 @@ END { done_testing(); }
     my $np = Number::Phone::Lib->new('SM', '0549 66661212');
     ok(!defined $np, '0549 66661212 is a mobile with the 0549 prefix, which is not valid');
 }
+
+done_testing();

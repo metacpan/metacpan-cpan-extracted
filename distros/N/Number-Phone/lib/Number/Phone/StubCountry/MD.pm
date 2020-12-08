@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20200904144534;
+our $VERSION = 1.20201204215957;
 
 my $formatters = [
                 {
@@ -87,138 +87,113 @@ my $validators = {
                 'voip' => '3[08]\\d{6}'
               };
 my %areanames = ();
-$areanames{en}->{373210} = "Grigoriopol";
-$areanames{en}->{373215} = "Dubasari";
-$areanames{en}->{373216} = "Camenca";
-$areanames{en}->{373219} = "Dnestrovsk";
-$areanames{en}->{37322} = "Chisinau";
-$areanames{en}->{373230} = "Soroca";
-$areanames{en}->{373231} = "Balţi";
-$areanames{en}->{373235} = "Orhei";
-$areanames{en}->{373236} = "Ungheni";
-$areanames{en}->{373237} = "Straseni";
-$areanames{en}->{373241} = "Cimislia";
-$areanames{en}->{373242} = "Stefan\ Voda";
-$areanames{en}->{373243} = "Causeni";
-$areanames{en}->{373244} = "Calarasi";
-$areanames{en}->{373246} = "Edineţ";
-$areanames{en}->{373247} = "Briceni";
-$areanames{en}->{373248} = "Criuleni";
-$areanames{en}->{373249} = "Glodeni";
-$areanames{en}->{373250} = "Floresti";
-$areanames{en}->{373251} = "Donduseni";
-$areanames{en}->{373252} = "Drochia";
-$areanames{en}->{373254} = "Rezina";
-$areanames{en}->{373256} = "Riscani";
-$areanames{en}->{373258} = "Telenesti";
-$areanames{en}->{373259} = "Falesti";
-$areanames{en}->{373262} = "Singerei";
-$areanames{en}->{373263} = "Leova";
-$areanames{en}->{373264} = "Nisporeni";
-$areanames{en}->{373265} = "Anenii\ Noi";
-$areanames{en}->{373268} = "Ialoveni";
-$areanames{en}->{373269} = "Hincesti";
-$areanames{en}->{373271} = "Ocniţa";
-$areanames{en}->{373272} = "Soldanesti";
-$areanames{en}->{373273} = "Cantemir";
-$areanames{en}->{373291} = "Ceadir\ Lunga";
-$areanames{en}->{373293} = "Vulcanesti";
-$areanames{en}->{373294} = "Taraclia";
-$areanames{en}->{373297} = "Basarabeasca";
-$areanames{en}->{373298} = "Comrat";
-$areanames{en}->{373299} = "Cahul";
-$areanames{en}->{37353} = "Tiraspol";
-$areanames{en}->{373552} = "Bender";
-$areanames{en}->{373555} = "Ribnita";
-$areanames{en}->{373557} = "Slobozia";
-$areanames{ro}->{373210} = "Grigoriopol";
-$areanames{ro}->{373215} = "Dubăsari";
-$areanames{ro}->{373216} = "Camenca";
-$areanames{ro}->{373219} = "Dnestrovsk";
-$areanames{ro}->{37322} = "Chişinău";
-$areanames{ro}->{373230} = "Soroca";
-$areanames{ro}->{373231} = "Bălţi";
-$areanames{ro}->{373235} = "Orhei";
-$areanames{ro}->{373236} = "Ungheni";
-$areanames{ro}->{373237} = "Străşeni";
-$areanames{ro}->{373241} = "Cimişlia";
-$areanames{ro}->{373242} = "Ştefan\ Vodă";
-$areanames{ro}->{373243} = "Căuşeni";
-$areanames{ro}->{373244} = "Călăraşi";
-$areanames{ro}->{373246} = "Edineţ";
-$areanames{ro}->{373247} = "Briceni";
-$areanames{ro}->{373248} = "Criuleni";
-$areanames{ro}->{373249} = "Glodeni";
-$areanames{ro}->{373250} = "Floreşti";
-$areanames{ro}->{373251} = "Donduşeni";
-$areanames{ro}->{373252} = "Drochia";
-$areanames{ro}->{373254} = "Rezina";
-$areanames{ro}->{373256} = "Rîşcani";
-$areanames{ro}->{373258} = "Teleneşti";
-$areanames{ro}->{373259} = "Făleşti";
-$areanames{ro}->{373262} = "Sîngerei";
-$areanames{ro}->{373263} = "Leova";
-$areanames{ro}->{373264} = "Nisporeni";
-$areanames{ro}->{373265} = "Anenii\ Noi";
-$areanames{ro}->{373268} = "Ialoveni";
-$areanames{ro}->{373269} = "Hînceşti";
-$areanames{ro}->{373271} = "Ocniţa";
-$areanames{ro}->{373272} = "Şoldăneşti";
-$areanames{ro}->{373273} = "Cantemir";
-$areanames{ro}->{373291} = "Ceadîr\ Lunga";
-$areanames{ro}->{373293} = "Vulcăneşti";
-$areanames{ro}->{373294} = "Taraclia";
-$areanames{ro}->{373297} = "Basarabeasca";
-$areanames{ro}->{373298} = "Comrat";
-$areanames{ro}->{373299} = "Cahul";
-$areanames{ro}->{37353} = "Tiraspol";
-$areanames{ro}->{373552} = "Bender";
-$areanames{ro}->{373555} = "Rîbniţa";
-$areanames{ro}->{373557} = "Slobozia";
-$areanames{ru}->{373210} = "Григориополь";
-$areanames{ru}->{373215} = "Дубэсарь";
-$areanames{ru}->{373216} = "Каменка";
-$areanames{ru}->{373219} = "Днестровск";
-$areanames{ru}->{37322} = "Кишинэу";
-$areanames{ru}->{373230} = "Сорока";
-$areanames{ru}->{373231} = "Бэлць";
-$areanames{ru}->{373235} = "Орхей";
-$areanames{ru}->{373236} = "Унгень";
-$areanames{ru}->{373237} = "Стрэшень";
-$areanames{ru}->{373241} = "Чимишлия";
-$areanames{ru}->{373242} = "Штефан\ Водэ";
-$areanames{ru}->{373243} = "Кэушень";
-$areanames{ru}->{373244} = "Кэлэрашь";
-$areanames{ru}->{373246} = "Единец";
-$areanames{ru}->{373247} = "Бричень";
-$areanames{ru}->{373248} = "Криулень";
-$areanames{ru}->{373249} = "Глодень";
-$areanames{ru}->{373250} = "Флорешть";
-$areanames{ru}->{373251} = "Дондушень";
-$areanames{ru}->{373252} = "Дрокия";
-$areanames{ru}->{373254} = "Резина";
-$areanames{ru}->{373256} = "Рышкань";
-$areanames{ru}->{373258} = "Теленешть";
-$areanames{ru}->{373259} = "Фэлешть";
-$areanames{ru}->{373262} = "Сынжерей";
-$areanames{ru}->{373263} = "Леова";
-$areanames{ru}->{373264} = "Ниспорень";
-$areanames{ru}->{373265} = "Анений\ Ной";
-$areanames{ru}->{373268} = "Яловень";
-$areanames{ru}->{373269} = "Хынчешть";
-$areanames{ru}->{373271} = "Окница";
-$areanames{ru}->{373272} = "Шолдэнешть";
-$areanames{ru}->{373273} = "Кантемир";
-$areanames{ru}->{373291} = "Чадыр\-Лунга";
-$areanames{ru}->{373293} = "Вулкэнешть";
-$areanames{ru}->{373294} = "Тараклия";
-$areanames{ru}->{373297} = "Басарабяска";
-$areanames{ru}->{373298} = "Комрат";
-$areanames{ru}->{373299} = "Кагул";
-$areanames{ru}->{37353} = "Тираспол";
-$areanames{ru}->{373552} = "Бендер";
-$areanames{ru}->{373555} = "Рыбница";
-$areanames{ru}->{373557} = "Слобозия";
+$areanames{ru} = {"373258", "Теленешть",
+"373250", "Флорешть",
+"373298", "Комрат",
+"37322", "Кишинэу",
+"373248", "Криулень",
+"373264", "Ниспорень",
+"373265", "Анений\ Ной",
+"373259", "Фэлешть",
+"373241", "Чимишлия",
+"373237", "Стрэшень",
+"373215", "Дубэсарь",
+"373557", "Слобозия",
+"373273", "Кантемир",
+"373291", "Чадыр\-Лунга",
+"373236", "Унгень",
+"373252", "Дрокия",
+"373555", "Рыбница",
+"37353", "Тираспол",
+"373299", "Кагул",
+"373242", "Штефан\ Водэ",
+"373263", "Леова",
+"373216", "Каменка",
+"373251", "Дондушень",
+"373249", "Глодень",
+"373235", "Орхей",
+"373262", "Сынжерей",
+"373243", "Кэушень",
+"373210", "Григориополь",
+"373293", "Вулкэнешть",
+"373269", "Хынчешть",
+"373271", "Окница",
+"373272", "Шолдэнешть",
+"373230", "Сорока",
+"373256", "Рышкань",
+"373294", "Тараклия",
+"373244", "Кэлэрашь",
+"373552", "Бендер",
+"373268", "Яловень",
+"373254", "Резина",
+"373231", "Бэлць",
+"373219", "Днестровск",
+"373247", "Бричень",
+"373297", "Басарабяска",
+"373246", "Единец",};
+$areanames{en} = {"373263", "Leova",
+"373216", "Camenca",
+"37353", "Tiraspol",
+"373555", "Ribnita",
+"373242", "Stefan\ Voda",
+"373299", "Cahul",
+"373235", "Orhei",
+"373251", "Donduseni",
+"373249", "Glodeni",
+"373215", "Dubasari",
+"373237", "Straseni",
+"373241", "Cimislia",
+"373259", "Falesti",
+"373291", "Ceadir\ Lunga",
+"373252", "Drochia",
+"373236", "Ungheni",
+"373273", "Cantemir",
+"373557", "Slobozia",
+"373298", "Comrat",
+"373250", "Floresti",
+"373265", "Anenii\ Noi",
+"373264", "Nisporeni",
+"373248", "Criuleni",
+"37322", "Chisinau",
+"373258", "Telenesti",
+"373247", "Briceni",
+"373219", "Dnestrovsk",
+"373231", "Balţi",
+"373254", "Rezina",
+"373246", "Edineţ",
+"373297", "Basarabeasca",
+"373294", "Taraclia",
+"373256", "Riscani",
+"373268", "Ialoveni",
+"373552", "Bender",
+"373244", "Calarasi",
+"373230", "Soroca",
+"373272", "Soldanesti",
+"373210", "Grigoriopol",
+"373243", "Causeni",
+"373262", "Singerei",
+"373271", "Ocniţa",
+"373269", "Hincesti",
+"373293", "Vulcanesti",};
+$areanames{ro} = {"373555", "Rîbniţa",
+"373242", "Ştefan\ Vodă",
+"373251", "Donduşeni",
+"373237", "Străşeni",
+"373241", "Cimişlia",
+"373259", "Făleşti",
+"373215", "Dubăsari",
+"373291", "Ceadîr\ Lunga",
+"373250", "Floreşti",
+"37322", "Chişinău",
+"373258", "Teleneşti",
+"373231", "Bălţi",
+"373256", "Rîşcani",
+"373244", "Călăraşi",
+"373272", "Şoldăneşti",
+"373243", "Căuşeni",
+"373262", "Sîngerei",
+"373269", "Hînceşti",
+"373293", "Vulcăneşti",};
 
     sub new {
       my $class = shift;

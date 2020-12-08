@@ -46,6 +46,8 @@ to localhost (similar to C<psql -h localhost> behaviour).
 
 =head1 METHODS
 
+=head2 configure
+
 =head2 connection
 
 Returns a L<Future> representing the database connection,
@@ -212,7 +214,7 @@ a ->connection first
 
 =item L<Database::Async::Engine>
 
-L<configure|Database::Async::Engine/configure>, L<db|Database::Async::Engine/db>, L<register_class|Database::Async::Engine/register_class>, L<uri|Database::Async::Engine/uri>
+L<db|Database::Async::Engine/db>, L<register_class|Database::Async::Engine/register_class>, L<uri|Database::Async::Engine/uri>
 
 =item L<IO::Async::Notifier>
 

@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20200904144533;
+our $VERSION = 1.20201204215956;
 
 my $formatters = [
                 {
@@ -184,40 +184,40 @@ my $validators = {
                 'voip' => '70\\d{8}'
               };
 my %areanames = ();
-$areanames{en}->{822} = "Seoul";
-$areanames{en}->{8231} = "Gyeonggi";
-$areanames{en}->{8232} = "Incheon";
-$areanames{en}->{8233} = "Gangwon";
-$areanames{en}->{8241} = "Chungnam";
-$areanames{en}->{8242} = "Daejeon";
-$areanames{en}->{8243} = "Chungbuk";
-$areanames{en}->{8244} = "Sejong\ City";
-$areanames{en}->{8251} = "Busan";
-$areanames{en}->{8252} = "Ulsan";
-$areanames{en}->{8253} = "Daegu";
-$areanames{en}->{8254} = "Gyeongbuk";
-$areanames{en}->{8255} = "Gyeongnam";
-$areanames{en}->{8261} = "Jeonnam";
-$areanames{en}->{8262} = "Gwangju";
-$areanames{en}->{8263} = "Jeonbuk";
-$areanames{en}->{8264} = "Jeju";
-$areanames{ko}->{822} = "서울";
-$areanames{ko}->{8231} = "경기";
-$areanames{ko}->{8232} = "인천";
-$areanames{ko}->{8233} = "강원";
-$areanames{ko}->{8241} = "충남";
-$areanames{ko}->{8242} = "대전";
-$areanames{ko}->{8243} = "충북";
-$areanames{ko}->{8244} = "세종";
-$areanames{ko}->{8251} = "부산";
-$areanames{ko}->{8252} = "울산";
-$areanames{ko}->{8253} = "대구";
-$areanames{ko}->{8254} = "경북";
-$areanames{ko}->{8255} = "경남";
-$areanames{ko}->{8261} = "전남";
-$areanames{ko}->{8262} = "광주";
-$areanames{ko}->{8263} = "전북";
-$areanames{ko}->{8264} = "제주";
+$areanames{ko} = {"8264", "제주",
+"8253", "대구",
+"8262", "광주",
+"8241", "충남",
+"8231", "경기",
+"8255", "경남",
+"8263", "전북",
+"8252", "울산",
+"8254", "경북",
+"8251", "부산",
+"822", "서울",
+"8233", "강원",
+"8243", "충북",
+"8242", "대전",
+"8244", "세종",
+"8232", "인천",
+"8261", "전남",};
+$areanames{en} = {"8231", "Gyeonggi",
+"8241", "Chungnam",
+"8264", "Jeju",
+"8262", "Gwangju",
+"8253", "Daegu",
+"8263", "Jeonbuk",
+"8254", "Gyeongbuk",
+"8252", "Ulsan",
+"8255", "Gyeongnam",
+"8243", "Chungbuk",
+"8233", "Gangwon",
+"822", "Seoul",
+"8251", "Busan",
+"8261", "Jeonnam",
+"8232", "Incheon",
+"8242", "Daejeon",
+"8244", "Sejong\ City",};
 
     sub new {
       my $class = shift;

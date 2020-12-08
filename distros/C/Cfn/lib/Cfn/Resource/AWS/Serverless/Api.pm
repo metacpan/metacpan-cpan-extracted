@@ -15,7 +15,7 @@ package Cfn::Resource::AWS::Serverless::Api {
   }
 
   sub AttributeList {
-    []
+    ['RootResourceId']
   }
 }
 
@@ -40,6 +40,11 @@ package Cfn::Resource::Properties::AWS::Serverless::Api {
   has AccessLogSetting => ( isa => 'Cfn::Value', is => 'rw', coerce => 1 );
   has CanarySetting  => ( isa => 'Cfn::Value', is => 'rw', coerce => 1 );
   has TracingEnabled => ( isa => 'Cfn::Value::Boolean', is => 'rw', coerce => 1 );
+  has Domain => ( isa => 'Cfn::Value', is => 'rw', coerce => 1 );
+  has GatewayResponses => ( isa => 'Cfn::Value', is => 'rw', coerce => 1 );
+  has Models => ( isa => 'Cfn::Value', is => 'rw', coerce => 1 );
+  has OpenApiVersion => ( isa => 'Cfn::Value::String', is => 'rw', coerce => 1 );
+  has Tags => ( isa => 'Cfn::Value', is => 'rw', coerce => 1 );
 }
 
 1;

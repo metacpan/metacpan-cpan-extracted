@@ -3,8 +3,8 @@ package Graph::BitMatrix;
 use strict;
 use warnings;
 
-# $SIG{__DIE__ } = sub { use Carp; confess };
-# $SIG{__WARN__} = sub { use Carp; confess };
+# $SIG{__DIE__ } = \&Graph::__carp_confess;
+# $SIG{__WARN__} = \&Graph::__carp_confess;
 
 sub _V () { 2 } # Graph::_V()
 sub _E () { 3 } # Graph::_E()
@@ -19,11 +19,7 @@ sub new {
     my %V; @V{ @V } = 0 .. $#V;
     my $bm = bless [ [ ( $Z ) x $V ], \%V ], $class;
     my $bm0 = $bm->[0];
-    my $connect_edges;
-    if (exists $opt{connect_edges}) {
-	$connect_edges = $opt{connect_edges};
-	delete $opt{connect_edges};
-    }
+    my $connect_edges = delete $opt{connect_edges};
     $connect_edges = 1 unless defined $connect_edges;
     Graph::_opt_unknown(\%opt);
     if ($connect_edges) {
@@ -36,21 +32,34 @@ sub new {
 	my $Vi = $g->[_V]->[_i];
 	my $Ei = $g->[_E]->[_i];
 	if ($g->is_undirected) {
-	    for my $e (keys %{ $Ei }) {
-		my ($i0, $j0) = @{ $Ei->{ $e } };
-		my $i1 = $V{ $Vi->{ $i0 } };
-		my $j1 = $V{ $Vi->{ $j0 } };
+	    for my $e (grep defined, @{ $Ei }) {
+		my ($i0, $j0) = @$e;
+		my $i1 = $V{ $Vi->[ $i0 ] };
+		my $j1 = $V{ $Vi->[ $j0 ] };
 		vec($bm0->[$i1], $j1, 1) = 1;
 		vec($bm0->[$j1], $i1, 1) = 1;
 	    }
 	} else {
-	    for my $e (keys %{ $Ei }) {
-		my ($i0, $j0) = @{ $Ei->{ $e } };
-		vec($bm0->[$V{ $Vi->{ $i0 } }], $V{ $Vi->{ $j0 } }, 1) = 1;
+	    for my $e (grep defined, @{ $Ei }) {
+		my ($i0, $j0) = @$e;
+		vec($bm0->[$V{ $Vi->[ $i0 ] }], $V{ $Vi->[ $j0 ] }, 1) = 1;
 	    }
 	}
     }
     return $bm;
+}
+
+sub stringify {
+    my ($m) = @_;
+    my @V = sort keys %{ $m->[1] };
+    my $top = join ' ', map sprintf('%4s', $_), 'to:', @V;
+    my @indices = map $m->[1]{$_}, @V;
+    my @rows;
+    for my $n (@V) {
+        my @vals = $m->get_row($n, @V);
+        push @rows, join ' ', map sprintf('%4s', defined()?$_:''), $n, @vals;
+    }
+    join '', map "$_\n", $top, @rows;
 }
 
 sub set {

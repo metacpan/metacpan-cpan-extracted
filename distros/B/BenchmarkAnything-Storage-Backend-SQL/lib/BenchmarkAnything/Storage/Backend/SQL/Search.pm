@@ -1,7 +1,7 @@
 package BenchmarkAnything::Storage::Backend::SQL::Search;
 our $AUTHORITY = 'cpan:TAPPER';
 # ABSTRACT: searchengine support functions
-$BenchmarkAnything::Storage::Backend::SQL::Search::VERSION = '0.026';
+$BenchmarkAnything::Storage::Backend::SQL::Search::VERSION = '0.028';
 use strict;
 use warnings;
 use Data::Dumper;
@@ -99,21 +99,24 @@ sub init_search_engine
             my $response = $or_es->indices->delete(index => $s_index);
         }
 
+        my $dynamic_templates = [
+          #{"typed_field_VALUE_(KEY FROM QUERY OPTIONS)" => { "match" => "VALUE",    "mapping" => { "type" => "long", } } },
+          { "typed_field_VALUE_numeric" => { "match" => "VALUE",    "mapping" => { "type" => "long", } } },
+          { "typed_field_VALUE_text"    => { "match" => "VALUE",    "mapping" => { "type" => "text", } } },
+          { "core_field_NAME"     => { "match" => "NAME",     "mapping" => { "type" => "keyword", "store" => json_true } } },
+          { "core_field_VALUE"    => { "match" => "VALUE",    "mapping" => { "type" => "text", } } },
+          { "core_field_UNIT"     => { "match" => "UNIT",     "mapping" => { "type" => "text", } } },
+          { "core_field_VALUE_ID" => { "match" => "VALUE_ID", "mapping" => { "type" => "long", } } },
+          { "core_field_CREATED"  => { "match" => "CREATED",  "mapping" => { "type" => "date", format => 'yyyy-MM-dd||yyyy-MM-dd HH:mm:ss', } } },
+          { "non_core_fields"     => { "match" => "*",        "mapping" => { "type" => "keyword", } } },
+        ];
+
         # mappings
-        my $mappings =
-        {
-         $s_type => {
-          dynamic_templates =>
-          [
-           { "core_field_NAME"     => { "match" => "NAME",     "mapping" => { "type" => "keyword", "store" => json_true } } },
-           { "core_field_VALUE"    => { "match" => "VALUE",    "mapping" => { "type" => "text", } } },
-           { "core_field_UNIT"     => { "match" => "UNIT",     "mapping" => { "type" => "text", } } },
-           { "core_field_VALUE_ID" => { "match" => "VALUE_ID", "mapping" => { "type" => "long", } } },
-           { "core_field_CREATED"  => { "match" => "CREATED",  "mapping" => { "type" => "date", format => 'yyyy-MM-dd||yyyy-MM-dd HH:mm:ss', } } },
-           { "non_core_fields"     => { "match" => "*",        "mapping" => { "type" => "keyword", } } },
-          ]
-         }
-        };
+        my $mappings = {
+          ($or_sql->{searchengine}{elasticsearch}{client} eq '5_0::Direct')
+            ? ( $s_type => { dynamic_templates => $dynamic_templates } )
+            : (              dynamic_templates => $dynamic_templates   )
+          };
         require JSON::XS;
         require Hash::Merge;
         require Data::Dumper;
@@ -229,7 +232,7 @@ Roberto Schaefer <schaefr@amazon.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2019 by Amazon.com, Inc. or its affiliates.
+This software is Copyright (c) 2020 by Amazon.com, Inc. or its affiliates.
 
 This is free software, licensed under:
 

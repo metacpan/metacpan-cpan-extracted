@@ -36,15 +36,15 @@ SKIP: {
 
   isa_ok( $session->mixer('Net::SNMP::Mixin::Dot1qVlanStatic'), 'Net::SNMP' );
   ok(
-    $session->can('map_vlan_static_ids2names'),
-    'can $session->map_vlan_static_ids2names'
+    $session->can('map_vlan_id2name'),
+    'can $session->map_vlan_id2name'
   );
   ok(
-    $session->can('map_vlan_static_ids2ports'),
-    'can $session->map_vlan_static_ids2ports'
+    $session->can('map_vlan_id2if_idx'),
+    'can $session->map_vlan_id2if_idx'
   );
-  ok( $session->can('map_vlan_static_ports2ids'),
-    'can $session->map_vlan_static_ports2ids' );
+  ok( $session->can('map_if_idx2vlan_id'),
+    'can $session->map_if_idx2vlan_id' );
 
 
   eval { $session->init_mixins };
@@ -71,14 +71,14 @@ SKIP: {
 
   my ($ids2names, $ids2ports, $ports2ids);
 
-  eval { $ids2names = $session->map_vlan_static_ids2names };
-  ok( !$@, 'map_vlan_static_ids2names' );
+  eval { $ids2names = $session->map_vlan_id2name };
+  ok( !$@, 'map_vlan_id2name' );
 
-  eval { $ids2ports = $session->map_vlan_static_ids2ports };
-  ok( !$@, 'map_vlan_static_ids2ports' );
+  eval { $ids2ports = $session->map_vlan_id2if_idx };
+  ok( !$@, 'map_vlan_id2if_idx' );
 
-  eval { $ports2ids = $session->map_vlan_static_ports2ids };
-  ok( !$@, 'map_vlan_static_ports2ids' );
+  eval { $ports2ids = $session->map_if_idx2vlan_id };
+  ok( !$@, 'map_if_idx2vlan_id' );
 
   undef $session;
 
@@ -105,14 +105,14 @@ SKIP: {
   snmp_dispatcher();
   ok( $session->init_ok('Net::SNMP::Mixin::Dot1qVlanStatic'), 'initialization successful completetd' );
 
-  eval { $ids2names = $session->map_vlan_static_ids2names };
-  ok( !$@, 'map_vlan_static_ids2names' );
+  eval { $ids2names = $session->map_vlan_id2name };
+  ok( !$@, 'map_vlan_id2name' );
 
-  eval { $ids2ports = $session->map_vlan_static_ids2ports };
-  ok( !$@, 'map_vlan_static_ids2ports' );
+  eval { $ids2ports = $session->map_vlan_id2if_idx };
+  ok( !$@, 'map_vlan_id2if_idx' );
 
-  eval { $ports2ids = $session->map_vlan_static_ports2ids };
-  ok( !$@, 'map_vlan_static_ports2ids' );
+  eval { $ports2ids = $session->map_if_idx2vlan_id };
+  ok( !$@, 'map_if_idx2vlan_id' );
 
   undef $session;
 
@@ -137,13 +137,13 @@ SKIP: {
     'No response from remote host'
   );
 
-  eval { $ids2names = $session->map_vlan_static_ids2names };
+  eval { $ids2names = $session->map_vlan_id2name };
   like( $@, qr/not initialized/, 'not initialized' );
 
-  eval { $ids2ports = $session->map_vlan_static_ids2ports };
+  eval { $ids2ports = $session->map_vlan_id2if_idx };
   like( $@, qr/not initialized/, 'not initialized' );
 
-  eval { $ports2ids = $session->map_vlan_static_ports2ids };
+  eval { $ports2ids = $session->map_if_idx2vlan_id };
   like( $@, qr/not initialized/, 'not initialized' );
 
   undef $session;
@@ -171,13 +171,13 @@ SKIP: {
     'No response from remote host'
   );
 
-  eval { $ids2names = $session->map_vlan_static_ids2names };
+  eval { $ids2names = $session->map_vlan_id2name };
   like( $@, qr/not initialized/, 'not initialized' );
 
-  eval { $ids2ports = $session->map_vlan_static_ids2ports };
+  eval { $ids2ports = $session->map_vlan_id2if_idx };
   like( $@, qr/not initialized/, 'not initialized' );
 
-  eval { $ports2ids = $session->map_vlan_static_ports2ids };
+  eval { $ports2ids = $session->map_if_idx2vlan_id };
   like( $@, qr/not initialized/, 'not initialized' );
 
 }

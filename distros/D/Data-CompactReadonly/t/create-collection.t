@@ -5,6 +5,8 @@ no warnings qw(portable);
 use File::Temp qw(tempfile);
 use Test::More;
 use Test::Exception;
+use lib 't/lib';
+use TestFloat;
 
 use Data::CompactReadonly;
 
@@ -46,12 +48,12 @@ is($data->element(1), undef,       "read a Null");
 is($data->element(2), 'apple',     "read a Text::Byte");
 is($data->element(3), 1,           "read a Byte");
 is($data->element(4), 256,         "read a Short");
-is($data->element(5), 3.4,         "read a Float");
 is($data->element(6), 0x12345678,  "read a Long");
 is($data->element(7), 0x100000000, "read a Huge");
 is($data->element(8), 0x100000000, "read another Huge");
 is($data->element(9), 'apple',     "read another Text");
 is($data->element(10), 'x' x 256,  "read another Text");
+cmp_float($data->element(5), 3.4,  "read a Float");
 is((stat($filename))[7], 317, "file size is correct");
 
 push @{$array}, [], $array;
@@ -69,12 +71,12 @@ is($data->element(1), undef,       "read a Null");
 is($data->element(2), 'apple',     "read a Text::Byte");
 is($data->element(3), 1,           "read a Byte");
 is($data->element(4), 256,         "read a Short");
-is($data->element(5), 3.4,         "read a Float");
 is($data->element(6), 0x12345678,  "read a Long");
 is($data->element(7), 0x100000000, "read a Huge");
 is($data->element(8), 0x100000000, "read another Huge");
 is($data->element(9), 'apple',     "read another Text");
 is($data->element(10), 'x' x 256,  "read a Text::Short");
+cmp_float($data->element(5), 3.4,  "read a Float");
 isa_ok(my $embedded_array = $data->element(11), 'Data::CompactReadonly::V0::Array::Byte',
     "can embed an array in an array");
 is($embedded_array->count(), 0, "sub-array is empty");
@@ -112,9 +114,9 @@ my $hash = {
     'hi mum!' => 'hi mum!',        #     free!!! storage
     "\x{5317}\x{4eac}\x{5e02}" => 'Beijing', # 11 bytes for key, 9 bytes for value
     'Beijing' => "\x{5317}\x{4eac}\x{5e02}", #     free storage
-    2      => 65,                  #  2 bytes for key (Byte), free storage for value
-    900    => 65,                  #  3 bytes for key (Short), free storage for value
-    6.28   => 65,                  #  9 bytes for key (Float), free storage for value
+    2      => 65,                  #  3 bytes for key, free storage for value
+    900    => 65,                  #  5 bytes for key, free storage for value
+    6.28   => 65,                  #  6 bytes for key, free storage for value
     # the last element in the hash, cos its key sorts last
     zzlongtext => 'z' x 300,       # 12 bytes for key, 303 for value (Text::Short)
     # 501 bytes total
@@ -125,16 +127,16 @@ isa_ok($data = Data::CompactReadonly->read($filename), 'Data::CompactReadonly::V
 isa_ok($data, 'Data::CompactReadonly::Dictionary', "and that isa Data::CompactReadonly::Dictionary");
 is($data->count(), 17, "17 entries");
 is($data->_ptr_size(), 1, "pointers are 1 byte");
-is($data->element('float'),      3.14,        "read a Float");
-is($data->element('byte'),       65,          "read a Byte");
-is($data->element('short'),      65534,       "read a Short");
-is($data->element('medium'),     65536,       "read a Medium");
-is($data->element('long'),       0x1000000,   "read a Long");
-is($data->element('huge'),       0xffffffff1, "read a Huge");
-is($data->element('null'),       undef,       "read a Null");
-is($data->element('text'),       'hi mum!',   "read a Text::Byte");
-is($data->element('hi mum!'),    'hi mum!',   "read the same text again (reused)");
-is($data->element('zzlongtext'), 'z' x 300,   "read a Text::Short");
+cmp_float($data->element('float'), 3.14,        "read a Float");
+is($data->element('byte'),         65,          "read a Byte");
+is($data->element('short'),        65534,       "read a Short");
+is($data->element('medium'),       65536,       "read a Medium");
+is($data->element('long'),         0x1000000,   "read a Long");
+is($data->element('huge'),         0xffffffff1, "read a Huge");
+is($data->element('null'),         undef,       "read a Null");
+is($data->element('text'),         'hi mum!',   "read a Text::Byte");
+is($data->element('hi mum!'),      'hi mum!',   "read the same text again (reused)");
+is($data->element('zzlongtext'),   'z' x 300,   "read a Text::Short");
 isa_ok($embedded_array = $data->element('array'), 'Data::CompactReadonly::V0::Array::Byte',
     "read an array from the Dictionary");
 is($embedded_array->count(), 0, "array is empty");

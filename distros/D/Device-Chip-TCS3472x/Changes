@@ -1,4 +1,8 @@
 Revision history for Device-Chip-TCS3472x
 
+0.02    2020-12-06
+        [CHANGES]
+         * Use toplevel 'await' ability from Future::AsyncAwait 0.47
+
 0.01    2020-11-28
         First version, released on an unsuspecting world.

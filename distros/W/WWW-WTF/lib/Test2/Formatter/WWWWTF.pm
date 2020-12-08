@@ -513,15 +513,22 @@ sub build_line {
     my $self = shift;
     my ($tree, $facet, $tag, $text) = @_;
 
-    return if $tag eq 'REASON';
-    return if $tag eq 'DIAG';
+    #filter output for 'end users'
+    unless ($self->{+VERBOSE}) {
+        return if $tag eq 'REASON';
+        return if $tag eq 'DIAG';
+        return if $tag eq 'STDERR';
+    }
+
+    return if $tag eq 'LAUNCH';
+    return if $tag eq 'PLAN';
 
     $tree ||= '';
     $tag  ||= '';
     $text ||= '';
     chomp($text);
 
-    substr($tree, -2, 1, '-') if $facet eq 'assert';
+    substr($tree, -2, 1, '-') if ($facet =~ m/^(assert|info)$/);
 
     $tag = substr($tag, 0 - TAG_WIDTH, TAG_WIDTH) if length($tag) > TAG_WIDTH;
 

@@ -46,12 +46,15 @@
    },
    "release_status" : "stable",
    "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/davorg/perl-ogg-vorbis-header-pureperl/issues"
+      },
       "repository" : {
          "type" : "git",
          "url" : "https://github.com/davorg/perl-ogg-vorbis-header-pureperl.git",
          "web" : "https://github.com/davorg/perl-ogg-vorbis-header-pureperl"
       }
    },
-   "version" : "1.04",
+   "version" : "1.05",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

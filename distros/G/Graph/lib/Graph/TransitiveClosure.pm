@@ -4,8 +4,8 @@ use strict;
 use warnings;
 
 # COMMENT THESE OUT FOR TESTING AND PRODUCTION.
-# $SIG{__DIE__ } = sub { use Carp; confess };
-# $SIG{__WARN__} = sub { use Carp; confess };
+# $SIG{__DIE__ } = \&Graph::__carp_confess;
+# $SIG{__WARN__} = \&Graph::__carp_confess;
 
 use base 'Graph';
 use Graph::TransitiveClosure::Matrix;
@@ -14,7 +14,6 @@ sub _G () { Graph::_G() }
 
 sub new {
     my ($class, $g, %opt) = @_;
-    $g->expect_non_multiedged;
     %opt = (path_vertices => 1) unless %opt;
     my $attr = Graph::_defattr();
     if (exists $opt{ attribute_name }) {
@@ -22,37 +21,37 @@ sub new {
 	# No delete $opt{ attribute_name } since we need to pass it on.
     }
     $opt{ reflexive } = 1 unless exists $opt{ reflexive };
-    my $tcm = $g->new( $opt{ reflexive } ?
-		       ( vertices => [ $g->vertices ] ) : ( ) );
-    my $tcg = $g->get_graph_attribute('_tcg');
-    if (defined $tcg && $tcg->[ 0 ] == $g->[ _G ]) {
-	$tcg = $tcg->[ 1 ];
+    my $tcg = $g->new(
+	multiedged => 0,
+	($opt{ reflexive } ? (vertices => [$g->vertices]) : ()),
+    );
+    my $tcm = $g->get_graph_attribute('_tcm');
+    if (defined $tcm && $tcm->[ 0 ] == $g->[ _G ]) {
+	$tcm = $tcm->[ 1 ];
     } else {
-	$tcg = Graph::TransitiveClosure::Matrix->new($g, %opt);
-	$g->set_graph_attribute('_tcg', [ $g->[ _G ], $tcg ]);
+	$tcm = Graph::TransitiveClosure::Matrix->new($g, %opt);
+	$g->set_graph_attribute('_tcm', [ $g->[ _G ], $tcm ]);
     }
-    my $tcg00 = $tcg->[0]->[0];
-    my $tcg11 = $tcg->[1]->[1];
-    for my $u ($tcg->vertices) {
-	my $tcg00i = $tcg00->[ $tcg11->{ $u } ];
-	for my $v ($tcg->vertices) {
+    my $tcm00 = $tcm->[0][0]; # 0=am, 0=bitmatrix
+    my $tcm01 = $tcm->[0][1]; #     , 1=hash mapping v-name to the offset into dm data structures (in retval of $g->vertices)
+    for my $u ($tcm->vertices) {
+	my $tcm00i = $tcm00->[ $tcm01->{ $u } ];
+	for my $v ($tcm->vertices) {
 	    next if $u eq $v && ! $opt{ reflexive };
-	    my $j = $tcg11->{ $v };
+	    my $j = $tcm01->{ $v };
 	    if (
-		# $tcg->is_transitive($u, $v)
-		# $tcg->[0]->get($u, $v)
-		vec($tcg00i, $j, 1)
+		# $tcm->is_transitive($u, $v)
+		# $tcm->[0]->get($u, $v)
+		vec($tcm00i, $j, 1)
 	       ) {
 		my $val = $g->_get_edge_attribute($u, $v, $attr);
-		$tcm->_set_edge_attribute($u, $v, $attr,
-					  defined $val ? $val :
-					  $u eq $v ?
-					  0 : 1);
+		$val = $u eq $v ? 0 : 1 if !defined $val;
+		$tcg->_set_edge_attribute($u, $v, $attr, $val);
 	    }
 	}
     }
-    $tcm->set_graph_attribute('_tcm', $tcg);
-    bless $tcm, $class;
+    $tcg->set_graph_attribute('_tcm', $tcm);
+    bless $tcg, $class;
 }
 
 sub is_transitive {
@@ -95,7 +94,7 @@ Graph::TransitiveClosure - create and query transitive closure of graph
     my $tcg = Graph::TransitiveClosure->new($g, path_length => 1);
     $tcg->path_length($u, $v)
 
-    # path_vertices is automatically always on so this is a no-op.
+    # path_vertices is on by default so this is a no-op.
     my $tcg = Graph::TransitiveClosure->new($g, path_vertices => 1);
     $tcg->path_vertices($u, $v)
 
@@ -151,11 +150,5 @@ Return true if the Graph $g is transitive.
 Return the transitive closure matrix of the transitive closure object.
 
 =back
-
-=head2 INTERNALS
-
-The transitive closure matrix is stored as an attribute of the graph
-called C<_tcm>, and any methods not found in the graph class are searched
-in the transitive closure matrix class. 
 
 =cut

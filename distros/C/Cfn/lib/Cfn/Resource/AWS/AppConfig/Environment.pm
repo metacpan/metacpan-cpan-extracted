@@ -1,4 +1,4 @@
-# AWS::AppConfig::Environment generated from spec 11.1.0
+# AWS::AppConfig::Environment generated from spec 18.4.0
 use Moose::Util::TypeConstraints;
 
 coerce 'Cfn::Resource::Properties::AWS::AppConfig::Environment',
@@ -51,11 +51,11 @@ coerce 'Cfn::Resource::Properties::AWS::AppConfig::Environment::Tags',
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::AppConfig::Environment::TagsValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::AppConfig::Environment::Tags->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::AppConfig::Environment::TagsValue {
+package Cfn::Resource::Properties::Object::AWS::AppConfig::Environment::Tags {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -95,11 +95,11 @@ coerce 'Cfn::Resource::Properties::AWS::AppConfig::Environment::Monitors',
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::AppConfig::Environment::MonitorsValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::AppConfig::Environment::Monitors->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::AppConfig::Environment::MonitorsValue {
+package Cfn::Resource::Properties::Object::AWS::AppConfig::Environment::Monitors {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -121,3 +121,30 @@ package Cfn::Resource::Properties::AWS::AppConfig::Environment {
 }
 
 1;
+### main pod documentation begin ###
+
+=encoding UTF-8
+
+=head1 NAME
+
+Cfn::Resource::AWS::AppConfig::Environment - Cfn resource for AWS::AppConfig::Environment
+
+=head1 DESCRIPTION
+
+This module implements a Perl module that represents the CloudFormation object AWS::AppConfig::Environment.
+
+See L<Cfn> for more information on how to use it.
+
+=head1 AUTHOR
+
+    Jose Luis Martinez
+    CAPSiDE
+    jlmartinez@capside.com
+
+=head1 COPYRIGHT and LICENSE
+
+Copyright (c) 2013 by CAPSiDE
+This code is distributed under the Apache 2 License. The full text of the 
+license can be found in the LICENSE file included with this module.
+
+=cut

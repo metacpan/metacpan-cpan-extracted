@@ -1,15 +1,14 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2015-2016 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2015-2020 -- leonerd@leonerd.org.uk
 
-package Device::Chip::SSD1306::I2C;
+use v5.26;
+use Object::Pad 0.19;
 
-use strict;
-use warnings;
-use base qw( Device::Chip::SSD1306 );
-
-our $VERSION = '0.08';
+package Device::Chip::SSD1306::I2C 0.09;
+class Device::Chip::SSD1306::I2C
+   extends Device::Chip::SSD1306;
 
 use constant PROTOCOL => "I2C";
 
@@ -31,44 +30,33 @@ L<Device::Chip::SSD1306> documentation.
 
 =cut
 
-sub mount
+method mount ( $adapter, %params )
 {
-   my $self = shift;
-   my ( $adapter, %params ) = @_;
-
    $self->{addr} = delete $params{addr} // DEFAULT_ADDR;
 
    return $self->SUPER::mount( $adapter, %params );
 }
 
-sub I2C_options
+method I2C_options
 {
-   my $self = shift;
-
    return (
       addr => $self->{addr},
    );
 }
 
 # passthrough
-sub power { $_[0]->protocol->power( $_[1] ) }
+method power { $self->protocol->power( $_[0] ) }
 
-sub send_cmd
+method send_cmd ( @vals )
 {
-   my $self = shift;
-   my @vals = @_;
-
    my $final = pop @vals;
 
    $self->protocol->write( join "", ( map { "\x80" . chr $_ } @vals ),
       "\x00" . chr $final );
 }
 
-sub send_data
+method send_data ( $bytes )
 {
-   my $self = shift;
-   my ( $bytes ) = @_;
-
    $self->protocol->write( "\x40" . $_[0] )
 }
 

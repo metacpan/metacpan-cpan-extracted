@@ -6,7 +6,7 @@
 use 5.026;
 use Object::Pad 0.19;
 
-package Device::Chip::MCP3221 0.10;
+package Device::Chip::MCP3221 0.11;
 class Device::Chip::MCP3221
    extends Device::Chip;
 
@@ -23,11 +23,12 @@ C<Device::Chip::MCP3221> - chip driver for F<MCP3221>
 =head1 SYNOPSIS
 
    use Device::Chip::MCP3221;
+   use Future::AsyncAwait;
 
    my $chip = Device::Chip::MCP3221->new;
-   $chip->mount( Device::Chip::Adapter::...->new )->get;
+   await $chip->mount( Device::Chip::Adapter::...->new );
 
-   printf "The reading is %d\n", $chip->read_adc->get;
+   printf "The reading is %d\n", await $chip->read_adc;
 
 =head1 DESCRIPTION
 
@@ -62,8 +63,8 @@ sub I2C_options ( $, %params )
 
 =head1 METHODS
 
-The following methods documented with a trailing call to C<< ->get >> return
-L<Future> instances.
+The following methods documented in an C<await> expression return L<Future>
+instances.
 
 =cut
 
@@ -73,7 +74,7 @@ async method change_config (%) { }
 
 =head2 read_adc
 
-   $value = $chip->read_adc->get
+   $value = await $chip->read_adc;
 
 Performs a conversion and returns the result as a plain unsigned 12-bit
 integer.
@@ -89,7 +90,7 @@ async method read_adc ()
 
 =head2 read_adc_ratio
 
-   $ratio = $chip->read_adc_ratio->get
+   $ratio = await $chip->read_adc_ratio;
 
 Performs a conversion and returns the result as a floating-point number
 between 0 and 1.

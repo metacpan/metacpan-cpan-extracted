@@ -5,7 +5,7 @@
 
 use Object::Pad 0.27;
 
-package Device::Chip::MAX11200 0.10;
+package Device::Chip::MAX11200 0.11;
 class Device::Chip::MAX11200
    extends Device::Chip;
 
@@ -24,13 +24,14 @@ C<Device::Chip::MAX11200> - chip driver for F<MAX11200>
 =head1 SYNOPSIS
 
    use Device::Chip::MAX11200;
+   use Future::AsyncAwait;
 
    my $chip = Device::Chip::MAX11200->new;
-   $chip->mount( Device::Chip::Adapter::...->new )->get;
+   await $chip->mount( Device::Chip::Adapter::...->new );
 
-   $chip->trigger->get;
+   await $chip->trigger;
 
-   printf "The reading is %d\n", $chip->read_adc->get;
+   printf "The reading is %d\n", await $chip->read_adc;
 
 =head1 DESCRIPTION
 
@@ -53,14 +54,14 @@ sub SPI_options
 
 =head1 METHODS
 
-The following methods documented with a trailing call to C<< ->get >> return
-L<Future> instances.
+The following methods documented in an C<await> expression return L<Future>
+instances.
 
 =cut
 
 =head2 init
 
-   $chip->init->get
+   await $chip->init;
 
 Performs startup self-calibration by setting C<NOSCG> and C<NOSCO> to zero
 then requesting a calibration cycle.
@@ -124,7 +125,7 @@ async method command ( $cmd )
 
 =head2 read_status
 
-   $status = $chip->read_status->get
+   $status = await $chip->read_status;
 
 Returns a C<HASH> reference containing the chip's current status.
 
@@ -154,7 +155,7 @@ async method read_status ()
 
 =head2 read_config
 
-   $config = $chip->read_config->get
+   $config = await $chip->read_config;
 
 Returns a C<HASH> reference containing the chip's current configuration.
 
@@ -201,7 +202,7 @@ async method read_config ()
 
 =head2 change_config
 
-   $chip->change_config( %changes )->get
+   await $chip->change_config( %changes );
 
 Changes the configuration. Any field names not mentioned will be preserved at
 their existing values.
@@ -223,7 +224,7 @@ async method change_config ( %changes )
 
 =head2 selfcal
 
-   $chip->selfcal->get
+   await $chip->selfcal;
 
 Requests the chip perform a self-calibration.
 
@@ -236,7 +237,7 @@ async method selfcal ()
 
 =head2 syscal_offset
 
-   $chip->syscal_offset->get
+   await $chip->syscal_offset;
 
 Requests the chip perform the offset part of system calibration.
 
@@ -249,7 +250,7 @@ async method syscal_offset ()
 
 =head2 syscal_gain
 
-   $chip->syscal_gain->get
+   await $chip->syscal_gain;
 
 Requests the chip perform the gain part of system calibration.
 
@@ -262,7 +263,7 @@ async method syscal_gain ()
 
 =head2 trigger
 
-   $chip->trigger( $rate )->get
+   await $chip->trigger( $rate );
 
 Requests the chip perform a conversion of the input level, at the given
 rate (which must be one of the values specified for the C<RATE> configuration
@@ -292,7 +293,7 @@ async method trigger ( $rate = $_default_trigger_rate )
 
 =head2 read_adc
 
-   $value = $chip->read_adc->get
+   $value = await $chip->read_adc;
 
 Reads the most recent reading from the result register on the tip. This method
 should be called after a suitable delay after the L</trigger> method when in
@@ -312,7 +313,7 @@ async method read_adc ()
 
 =head2 read_adc_ratio
 
-   $ratio = $chip->read_adc_ratio->get
+   $ratio = await $chip->read_adc_ratio;
 
 Converts a reading obtained by L</read_adc> into a ratio between -1 and 1,
 taking into account the current mode setting of the chip.
@@ -345,11 +346,11 @@ async method read_adc_ratio ()
 
 =head2 write_gpios
 
-   $chip->write_gpios( $values, $direction )->get
+   await $chip->write_gpios( $values, $direction );
 
 =head2 read_gpios
 
-   $values = $chip->read_gpios->get
+   $values = await $chip->read_gpios;
 
 Sets or reads the values of the GPIO pins as a 4-bit integer. Bits in the
 C<$direction> should be high to put the corresponding pin into output mode, or
@@ -373,15 +374,15 @@ async method read_gpios ()
 
 =head2 Calibration Registers
 
-   $value = $chip->read_selfcal_offset->get;
-   $value = $chip->read_selfcal_gain->get;
-   $value = $chip->read_syscal_offset->get;
-   $value = $chip->read_syscal_gain->get;
+   $value = await $chip->read_selfcal_offset;
+   $value = await $chip->read_selfcal_gain;
+   $value = await $chip->read_syscal_offset;
+   $value = await $chip->read_syscal_gain;
 
-   $chip->write_selfcal_offset( $value )->get;
-   $chip->write_selfcal_gain( $value )->get;
-   $chip->write_syscal_offset( $value )->get;
-   $chip->write_syscal_gain( $value )->get;
+   await $chip->write_selfcal_offset( $value );
+   await $chip->write_selfcal_gain( $value );
+   await $chip->write_syscal_offset( $value );
+   await $chip->write_syscal_gain( $value );
 
 Reads or writes the values of the calibration registers, as plain 24-bit
 integers.

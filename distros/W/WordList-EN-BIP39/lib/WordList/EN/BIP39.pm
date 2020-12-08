@@ -1,12 +1,12 @@
 package WordList::EN::BIP39;
 
-our $DATE = '2017-12-24'; # DATE
-our $VERSION = '0.001'; # VERSION
+our $DATE = '2020-09-14'; # DATE
+our $VERSION = '0.002'; # VERSION
 
 use WordList;
 our @ISA = qw(WordList);
 
-our %STATS = ("num_words_contains_nonword_chars",0,"num_words_contains_whitespace",0,"num_words",2048,"num_words_contains_unicode",0,"longest_word_len",8,"shortest_word_len",3,"avg_word_len",5.404296875); # STATS
+our %STATS = ("num_words_contain_nonword_chars",0,"num_words_contains_nonword_chars",0,"avg_word_len",5.404296875,"num_words_contain_whitespace",0,"shortest_word_len",3,"num_words_contains_whitespace",0,"longest_word_len",8,"num_words",2048,"num_words_contain_unicode",0,"num_words_contains_unicode",0); # STATS
 
 1;
 # ABSTRACT: English word list for BIP 39
@@ -21,7 +21,7 @@ WordList::EN::BIP39 - English word list for BIP 39
 
 =head1 VERSION
 
-This document describes version 0.001 of WordList::EN::BIP39 (from Perl distribution WordList-EN-BIP39), released on 2017-12-24.
+This document describes version 0.002 of WordList::EN::BIP39 (from Perl distribution WordList-EN-BIP39), released on 2020-09-14.
 
 =head1 SYNOPSIS
 
@@ -39,10 +39,14 @@ This document describes version 0.001 of WordList::EN::BIP39 (from Perl distribu
  # Call a callback for each word
  $wl->each_word(sub { my $word = shift; ... });
 
+ # Iterate
+ my $first_word = $wl->first_word;
+ while (defined(my $word = $wl->next_word)) { ... }
+
  # Get all the words
  my @all_words = $wl->all_words;
 
-=head1 STATISTICS
+=head1 WORDLIST STATISTICS
 
  +----------------------------------+-------------+
  | key                              | value       |
@@ -50,6 +54,9 @@ This document describes version 0.001 of WordList::EN::BIP39 (from Perl distribu
  | avg_word_len                     | 5.404296875 |
  | longest_word_len                 | 8           |
  | num_words                        | 2048        |
+ | num_words_contain_nonword_chars  | 0           |
+ | num_words_contain_unicode        | 0           |
+ | num_words_contain_whitespace     | 0           |
  | num_words_contains_nonword_chars | 0           |
  | num_words_contains_unicode       | 0           |
  | num_words_contains_whitespace    | 0           |
@@ -88,7 +95,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2017 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

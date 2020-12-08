@@ -1,4 +1,4 @@
-# AWS::Batch::JobQueue generated from spec 2.25.0
+# AWS::Batch::JobQueue generated from spec 20.1.0
 use Moose::Util::TypeConstraints;
 
 coerce 'Cfn::Resource::Properties::AWS::Batch::JobQueue',
@@ -51,11 +51,11 @@ coerce 'Cfn::Resource::Properties::AWS::Batch::JobQueue::ComputeEnvironmentOrder
      if (my $f = Cfn::TypeLibrary::try_function($_)) {
        return $f
      } else {
-       return Cfn::Resource::Properties::AWS::Batch::JobQueue::ComputeEnvironmentOrderValue->new( %$_ );
+       return Cfn::Resource::Properties::Object::AWS::Batch::JobQueue::ComputeEnvironmentOrder->new( %$_ );
      }
    };
 
-package Cfn::Resource::Properties::AWS::Batch::JobQueue::ComputeEnvironmentOrderValue {
+package Cfn::Resource::Properties::Object::AWS::Batch::JobQueue::ComputeEnvironmentOrder {
   use Moose;
   use MooseX::StrictConstructor;
   extends 'Cfn::Value::TypedValue';
@@ -73,6 +73,34 @@ package Cfn::Resource::Properties::AWS::Batch::JobQueue {
   has JobQueueName => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
   has Priority => (isa => 'Cfn::Value::Integer', is => 'rw', coerce => 1, required => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
   has State => (isa => 'Cfn::Value::String', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Mutable');
+  has Tags => (isa => 'Cfn::Value::Json|Cfn::DynamicValue', is => 'rw', coerce => 1, traits => [ 'CfnMutability' ], mutability => 'Immutable');
 }
 
 1;
+### main pod documentation begin ###
+
+=encoding UTF-8
+
+=head1 NAME
+
+Cfn::Resource::AWS::Batch::JobQueue - Cfn resource for AWS::Batch::JobQueue
+
+=head1 DESCRIPTION
+
+This module implements a Perl module that represents the CloudFormation object AWS::Batch::JobQueue.
+
+See L<Cfn> for more information on how to use it.
+
+=head1 AUTHOR
+
+    Jose Luis Martinez
+    CAPSiDE
+    jlmartinez@capside.com
+
+=head1 COPYRIGHT and LICENSE
+
+Copyright (c) 2013 by CAPSiDE
+This code is distributed under the Apache 2 License. The full text of the 
+license can be found in the LICENSE file included with this module.
+
+=cut

@@ -1,18 +1,20 @@
 #!/usr/bin/perl
 
-use strict;
+use v5.26;
 use warnings;
 
 use Test::More;
 use Test::Device::Chip::Adapter 0.05;  # ->expect_assert_ss, etc..
 
+use Future::AsyncAwait;
+
 use Device::Chip::SDCard;
 
 my $chip = Device::Chip::SDCard->new;
 
-$chip->mount(
+await $chip->mount(
    my $adapter = Test::Device::Chip::Adapter->new,
-)->get;
+);
 
 {
    $adapter->expect_assert_ss;
@@ -26,7 +28,7 @@ $chip->mount(
       ->returns( "\0" x 499 ); # remaining 512-15 = 497 bytes + 2 CRC
    $adapter->expect_release_ss;
 
-   is( $chip->read_block( 0 )->get, "BLOCK" . "\0" x ( 512 - 5 ),
+   is( await $chip->read_block( 0 ), "BLOCK" . "\0" x ( 512 - 5 ),
       '$chip->read_block returns bytes' );
 
    $adapter->check_and_clear( '$chip->read_block' );
@@ -46,7 +48,7 @@ $chip->mount(
       ->returns( "\0" x 507 ); # remaining 512-7 = 505 bytes + 2 CRC
    $adapter->expect_release_ss;
 
-   is( $chip->read_block( 0 )->get, "BLOCK" . "\0" x ( 512 - 5 ),
+   is( await $chip->read_block( 0 ), "BLOCK" . "\0" x ( 512 - 5 ),
       '$chip->read_block returns bytes' );
 
    $adapter->check_and_clear( '$chip->read_block with really slow reply' );
@@ -62,7 +64,7 @@ $chip->mount(
       ->returns( "K" . "\0" x 509 ); # remaining 512-4 = 508 bytes + 2 CRC
    $adapter->expect_release_ss;
 
-   is( $chip->read_block( 0 )->get, "BLOCK" . "\0" x ( 512 - 5 ),
+   is( await $chip->read_block( 0 ), "BLOCK" . "\0" x ( 512 - 5 ),
       '$chip->read_block returns bytes' );
 
    $adapter->check_and_clear( '$chip->read_block' );

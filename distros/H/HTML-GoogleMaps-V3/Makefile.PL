@@ -23,11 +23,13 @@ WriteMakefile(
         resources => {
             license    => 'http://dev.perl.org/licenses/',
             homepage   => 'https://metacpan.org/module/HTML/GoogleMaps/V3',
-            bugtracker => 'https://github.com/Humanstate/html-googlemaps-v3/issues',
             repository => {
                 type => 'git',
                 url  => 'https://github.com/Humanstate/html-googlemaps-v3.git',
                 web  => 'https://github.com/Humanstate/html-googlemaps-v3',
+            },
+            bugtracker => {
+                web => 'https://github.com/Humanstate/html-googlemaps-v3/issues',
             },
         },
     }):()),

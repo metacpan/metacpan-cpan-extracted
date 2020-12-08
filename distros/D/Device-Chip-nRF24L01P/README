@@ -23,6 +23,9 @@ MOUNT PARAMETERS
 
 METHODS
 
+    The following methods documented in an await expression return Future
+    instances.
+
  clear_caches
 
        $nrf->clear_caches
@@ -51,24 +54,24 @@ METHODS
 
  reset_interrupt
 
-       $nrf->reset_interrupt->get
+       await $nrf->reset_interrupt;
 
     Clears the interrupt flags in the STATUS register.
 
  read_status
 
-       $status = $nrf->read_status->get
+       $status = await $nrf->read_status;
 
     Reads and returns the current content of the status register as a HASH
     reference as per latest_status.
 
  read_config
 
-       $config = $nrf->read_config->get
+       $config = await $nrf->read_config;
 
  change_config
 
-       $nrf->change_config( %config )->get
+       await $nrf->change_config( %config );
 
     Reads or writes the chip-wide configuration. This is an amalgamation of
     all the non-pipe-specific configuration registers; CONFIG, SETUP_AW,
@@ -115,11 +118,11 @@ METHODS
 
  read_rx_config
 
-       $config = $nrf->read_rx_config( $pipeno )->get
+       $config = await $nrf->read_rx_config( $pipeno );
 
  change_rx_config
 
-       $nrf->change_rx_config( $pipeno, %config )->get
+       await $nrf->change_rx_config( $pipeno, %config );
 
     Reads or writes the per-pipe RX configuration. This is composed of the
     per-pipe bits of the EN_AA and EN_RXADDR registers and its RX_ADDR_Pn
@@ -134,37 +137,37 @@ METHODS
 
  observe_tx_counts
 
-       $counts = $nrf->observe_tx_counts->get
+       $counts = await $nrf->observe_tx_counts;
 
     Reads the OBSERVE_TX register and returns the two counts from it.
 
  rpd
 
-       $rpd = $nrf->rpd->get
+       $rpd = await $nrf->rpd;
 
     Reads the RPD register
 
  fifo_status
 
-       $status = $nrf->fifo_status->get
+       $status = await $nrf->fifo_status;
 
     Reads the FIFO_STATUS register and returns the five bit fields from it.
 
  pwr_up
 
-       $nrf->pwr_up( $pwr )->get
+       await $nrf->pwr_up( $pwr );
 
     A convenient shortcut to setting the PWR_UP configuration bit.
 
  chip_enable
 
-       $nrf->chip_enable( $ce )->get
+       await $nrf->chip_enable( $ce );
 
     Controls the Chip Enable (CE) pin of the chip.
 
  read_rx_payload_width
 
-       $len = $nrf->read_rx_payload_width->get
+       $len = await $nrf->read_rx_payload_width;
 
     Returns the width of the most recently received payload, when in DPL
     mode. Remember that DPL needs to be enabled (using EN_DPL) on both the
@@ -172,13 +175,13 @@ METHODS
 
  read_rx_payload
 
-       $data = $nrf->read_rx_payload( $len )->get
+       $data = await $nrf->read_rx_payload( $len );
 
     Reads the most recently received RX FIFO payload buffer.
 
  write_tx_payload
 
-       $nrf->write_tx_payload( $data, %opts )->get
+       await $nrf->write_tx_payload( $data, %opts );
 
     Writes the next TX FIFO payload buffer. Takes the following options:
 
@@ -189,11 +192,11 @@ METHODS
 
  flush_rx_fifo
 
-       $nrf->flush_rx_fifo->get
+       await $nrf->flush_rx_fifo;
 
  flush_tx_fifo
 
-       $nrf->flush_tx_fifo->get
+       await $nrf->flush_tx_fifo;
 
     Flush the RX or TX FIFOs, discarding all their contents.
 

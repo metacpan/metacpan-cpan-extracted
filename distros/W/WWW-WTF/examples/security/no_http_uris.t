@@ -16,7 +16,11 @@ $test->run_test(sub {
             my %http_uris;
             my %https_uris;
 
-            foreach my $uri ($http_resource->get_links) {
+            foreach my $link ($http_resource->get_links) {
+                my $uri = $link->uri;
+
+                next unless $uri;
+
                 next unless (($uri->scheme // '') =~ m/^http/);
 
                 if ($uri->scheme eq 'http') {

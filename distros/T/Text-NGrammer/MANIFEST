@@ -1,8 +1,7 @@
 Build.PL
 Changes
 INSTALL
-lib/Text/Shingle.pm
-bin/compare_text.pl
+lib/Text/NGrammer.pm
 Makefile.PL
 MANIFEST
 META.yml

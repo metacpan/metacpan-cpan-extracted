@@ -6,20 +6,22 @@ use warnings;
 use Test::More;
 use Test::Device::Chip::Adapter;
 
+use Future::AsyncAwait;
+
 use Device::Chip::AD9833;
 
 my $chip = Device::Chip::AD9833->new;
 
-$chip->mount(
+await $chip->mount(
    my $adapter = Test::Device::Chip::Adapter->new,
-)->get;
+);
 
 # ->init
 {
    $adapter->expect_write( "\x21\x00" ); # B28, RESET
    $adapter->expect_write( "\x20\x00" ); # B28
 
-   $chip->init->get;
+   await $chip->init;
 
    $adapter->check_and_clear( '->init' );
 }
@@ -29,7 +31,7 @@ $chip->mount(
    $adapter->expect_write( "\x45\x67" ); # FREQ0L
    $adapter->expect_write( "\x44\x8D" ); # FREQ0H
 
-   $chip->write_FREQ0( 0x1234567 )->get;
+   await $chip->write_FREQ0( 0x1234567 );
 
    $adapter->check_and_clear( '->write_FREQ0' );
 }
@@ -38,7 +40,7 @@ $chip->mount(
 {
    $adapter->expect_write( "\xC8\x9A" ); # PHASE0
 
-   $chip->write_PHASE0( 0x89A )->get;
+   await $chip->write_PHASE0( 0x89A );
 
    $adapter->check_and_clear( '->write_FREQ0' );
 }

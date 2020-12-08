@@ -160,6 +160,20 @@ GreaterByCountValue()
   RETVAL
 
 int
+LessByPruneKey()
+ CODE:
+  RETVAL = LessByPruneKey;
+ OUTPUT:
+  RETVAL
+
+int
+GreaterByPruneKey()
+ CODE:
+  RETVAL = GreaterByPruneKey;
+ OUTPUT:
+  RETVAL
+
+int
 HitSortsCount()
  CODE:
   RETVAL = HitSortsCount;

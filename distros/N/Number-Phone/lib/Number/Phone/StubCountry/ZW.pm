@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20200904144537;
+our $VERSION = 1.20201204215957;
 
 my $formatters = [
                 {
@@ -479,245 +479,245 @@ my $validators = {
         '
               };
 my %areanames = ();
-$areanames{en}->{26313} = "Victoria\ Falls";
-$areanames{en}->{26314} = "Rutenga";
-$areanames{en}->{26315} = "Binga";
-$areanames{en}->{26316} = "West\ Nicholson";
-$areanames{en}->{26317} = "Filabusi";
-$areanames{en}->{26318} = "Dete";
-$areanames{en}->{26319} = "Plumtree";
-$areanames{en}->{2632020} = "Mutare";
-$areanames{en}->{26320200} = "Odzi";
-$areanames{en}->{2632021} = "Dangamvura";
-$areanames{en}->{2632024} = "Penhalonga";
-$areanames{en}->{263204} = "Odzi";
-$areanames{en}->{263205} = "Pengalonga";
-$areanames{en}->{263206} = "Mutare";
-$areanames{en}->{263212} = "Murambinda";
-$areanames{en}->{263213} = "Victoria\ Falls";
-$areanames{en}->{263219} = "Plumtree";
-$areanames{en}->{263220201} = "Chikanga\/Mutare";
-$areanames{en}->{263220202} = "Mutare";
-$areanames{en}->{263220203} = "Dangamvura";
-$areanames{en}->{263221} = "Murambinda";
-$areanames{en}->{263222} = "Wedza";
-$areanames{en}->{263225} = "Rusape";
-$areanames{en}->{263227} = "Chipinge";
-$areanames{en}->{263228} = "Hauna";
-$areanames{en}->{263229} = "Juliasdale";
-$areanames{en}->{26323} = "Chiredzi";
-$areanames{en}->{263242} = "Harare";
-$areanames{en}->{2632421} = "Chitungwiza";
-$areanames{en}->{26324213} = "Ruwa";
-$areanames{en}->{26324214} = "Arcturus";
-$areanames{en}->{26324215} = "Norton";
-$areanames{en}->{263242150} = "Beatrice";
-$areanames{en}->{263248} = "Birchenough\ Bridge";
-$areanames{en}->{26325} = "Rusape";
-$areanames{en}->{263251} = "Zvishavane";
-$areanames{en}->{263252055} = "Nyazura";
-$areanames{en}->{26325206} = "Murambinda";
-$areanames{en}->{26325207} = "Headlands";
-$areanames{en}->{263254} = "Gweru";
-$areanames{en}->{2632582} = "Headlands";
-$areanames{en}->{2632583} = "Nyazura";
-$areanames{en}->{26326} = "Chimanimani";
-$areanames{en}->{263261} = "Kariba";
-$areanames{en}->{26326208} = "Juliasdale";
-$areanames{en}->{26326209} = "Hauna";
-$areanames{en}->{263262098} = "Nyanga";
-$areanames{en}->{263264} = "Karoi";
-$areanames{en}->{263270} = "Chitungwiza";
-$areanames{en}->{263271} = "Bindura";
-$areanames{en}->{263272} = "Mutoko";
-$areanames{en}->{26327203} = "Birchenough\ Bridge";
-$areanames{en}->{26327204} = "Chipinge";
-$areanames{en}->{263272046} = "Chipangayi";
-$areanames{en}->{26327205} = "Chimanimani";
-$areanames{en}->{263272317} = "Checheche";
-$areanames{en}->{263273} = "Ruwa";
-$areanames{en}->{263274} = "Arcturus";
-$areanames{en}->{263275219} = "Mazowe";
-$areanames{en}->{26327522} = "Mt\.\ Darwin";
-$areanames{en}->{26327523} = "Mt\.\ Darwin";
-$areanames{en}->{26327524} = "Mt\.\ Darwin";
-$areanames{en}->{26327525} = "Mt\.\ Darwin";
-$areanames{en}->{26327526} = "Mt\.\ Darwin";
-$areanames{en}->{26327527} = "Mt\.\ Darwin";
-$areanames{en}->{26327528} = "Mt\.\ Darwin";
-$areanames{en}->{26327529} = "Mt\.\ Darwin";
-$areanames{en}->{2632753} = "Mt\.\ Darwin";
-$areanames{en}->{26327540} = "Mt\.\ Darwin";
-$areanames{en}->{26327541} = "Mt\.\ Darwin";
-$areanames{en}->{263277} = "Mvurwi";
-$areanames{en}->{263278} = "Murewa";
-$areanames{en}->{263279} = "Marondera";
-$areanames{en}->{263281} = "Hwange";
-$areanames{en}->{263282} = "Kezi";
-$areanames{en}->{263283} = "Figtree";
-$areanames{en}->{263284} = "Gwanda";
-$areanames{en}->{263285} = "Turkmine";
-$areanames{en}->{263286} = "Beitbridge";
-$areanames{en}->{263287} = "Tsholotsho";
-$areanames{en}->{263288} = "Esigodini";
-$areanames{en}->{263289} = "Jotsholo";
-$areanames{en}->{26329} = "Bulawayo";
-$areanames{en}->{26329246} = "Bellevue";
-$areanames{en}->{26329252} = "Luveve";
-$areanames{en}->{263292800} = "Esigodini";
-$areanames{en}->{263292802} = "Shangani";
-$areanames{en}->{263292803} = "Turkmine";
-$areanames{en}->{263292804} = "Figtree";
-$areanames{en}->{263292807} = "Kezi";
-$areanames{en}->{263292809} = "Matopos";
-$areanames{en}->{263292821} = "Nyamandlovu";
-$areanames{en}->{263292861} = "Tsholotsho";
-$areanames{en}->{26330} = "Gutu";
-$areanames{en}->{263308} = "Chatsworth";
-$areanames{en}->{26331} = "Chiredzi";
-$areanames{en}->{26331233} = "Triangle";
-$areanames{en}->{263312337} = "Rutenga";
-$areanames{en}->{263312370} = "Ngundu";
-$areanames{en}->{263317} = "Checheche";
-$areanames{en}->{26332} = "Mvuma";
-$areanames{en}->{263329} = "Nyanga";
-$areanames{en}->{26333} = "Triangle";
-$areanames{en}->{263337} = "Nyaningwe";
-$areanames{en}->{263338} = "Nyika";
-$areanames{en}->{26334} = "Jerera";
-$areanames{en}->{26335} = "Mashava";
-$areanames{en}->{26336} = "Ngundu";
-$areanames{en}->{263371} = "Shamva";
-$areanames{en}->{263375} = "Concession";
-$areanames{en}->{263376} = "Glendale";
-$areanames{en}->{263379} = "Macheke";
-$areanames{en}->{263383} = "Matopose";
-$areanames{en}->{263387} = "Nyamandhlovu";
-$areanames{en}->{26339} = "Masvingo";
-$areanames{en}->{26339230} = "Gutu";
-$areanames{en}->{263392308} = "Chatsworth";
-$areanames{en}->{263392323} = "Nyika";
-$areanames{en}->{26339234} = "Jerera";
-$areanames{en}->{26339235} = "Zvishavane";
-$areanames{en}->{263392360} = "Mberengwa";
-$areanames{en}->{263392366} = "Mataga";
-$areanames{en}->{263392380} = "Nyaningwe";
-$areanames{en}->{26339245} = "Mashava";
-$areanames{en}->{263398} = "Lupane";
-$areanames{en}->{2634} = "Harare";
-$areanames{en}->{263420085} = "Selous";
-$areanames{en}->{263420086} = "Selous";
-$areanames{en}->{263420087} = "Selous";
-$areanames{en}->{263420088} = "Selous";
-$areanames{en}->{263420089} = "Selous";
-$areanames{en}->{26342009} = "Selous";
-$areanames{en}->{26342010} = "Selous";
-$areanames{en}->{263420106} = "Norton";
-$areanames{en}->{263420107} = "Norton";
-$areanames{en}->{263420108} = "Norton";
-$areanames{en}->{263420109} = "Norton";
-$areanames{en}->{263420110} = "Norton";
-$areanames{en}->{26342722} = "Chitungwiza";
-$areanames{en}->{26342723} = "Chitungwiza";
-$areanames{en}->{26342728} = "Marondera";
-$areanames{en}->{26342729} = "Marondera";
-$areanames{en}->{26350} = "Shanagani";
-$areanames{en}->{263512} = "Zvishavane";
-$areanames{en}->{263513} = "Zvishavane";
-$areanames{en}->{263514} = "Zvishavane";
-$areanames{en}->{263517} = "Mataga";
-$areanames{en}->{263518} = "Mberengwa";
-$areanames{en}->{26352} = "Shurugwi";
-$areanames{en}->{26353} = "Chegutu";
-$areanames{en}->{26354} = "Gweru";
-$areanames{en}->{26354212} = "Chivhu";
-$areanames{en}->{26354252} = "Shurugwi";
-$areanames{en}->{263542532} = "Mvuma";
-$areanames{en}->{263542548} = "Lalapanzi";
-$areanames{en}->{2635483} = "Lalapanzi";
-$areanames{en}->{26355} = "Kwekwe";
-$areanames{en}->{2635525} = "Battle\ Fields\/Kwekwe\/Redcliff";
-$areanames{en}->{263552557} = "Munyati";
-$areanames{en}->{263552558} = "Nkayi";
-$areanames{en}->{26355259} = "Gokwe";
-$areanames{en}->{263557} = "Munyati";
-$areanames{en}->{263558} = "Nkayi";
-$areanames{en}->{26356} = "Chivhu";
-$areanames{en}->{26357} = "Centenary";
-$areanames{en}->{26358} = "Guruve";
-$areanames{en}->{26359} = "Gokwe";
-$areanames{en}->{26360} = "Mhangura";
-$areanames{en}->{26361} = "Kariba";
-$areanames{en}->{263612140} = "Chirundu";
-$areanames{en}->{263612141} = "Makuti";
-$areanames{en}->{26361215} = "Karoi";
-$areanames{en}->{26362} = "Norton";
-$areanames{en}->{263628} = "Selous";
-$areanames{en}->{26363} = "Makuti";
-$areanames{en}->{263637} = "Chirundu";
-$areanames{en}->{26364} = "Karoi";
-$areanames{en}->{26365} = "Beatrice";
-$areanames{en}->{26365208} = "Wedza";
-$areanames{en}->{263652080} = "Macheke";
-$areanames{en}->{2636521} = "Murewa";
-$areanames{en}->{26365213} = "Mutoko";
-$areanames{en}->{2636523} = "Marondera";
-$areanames{en}->{26366} = "Banket";
-$areanames{en}->{26366210} = "Bindura\/Centenary";
-$areanames{en}->{26366212} = "Mount\ Darwin";
-$areanames{en}->{263662137} = "Shamva";
-$areanames{en}->{26366216} = "Mvurwi";
-$areanames{en}->{26366217} = "Guruve";
-$areanames{en}->{26366218} = "Glendale";
-$areanames{en}->{26366219} = "Christon\ Bank\/Concession\/Mazowe";
-$areanames{en}->{263667} = "Raffingora";
-$areanames{en}->{263668} = "Mutorashanga";
-$areanames{en}->{26367} = "Chinhoyi";
-$areanames{en}->{263672136} = "Trelawney";
-$areanames{en}->{26367214} = "Banket\/Mhangura";
-$areanames{en}->{26367215} = "Murombedzi";
-$areanames{en}->{263672192} = "Darwendale";
-$areanames{en}->{263672196} = "Mutorashanga";
-$areanames{en}->{263672198} = "Raffingora";
-$areanames{en}->{263675} = "Murombedzi";
-$areanames{en}->{26368} = "Kadoma";
-$areanames{en}->{2636821} = "Kadoma\/Selous";
-$areanames{en}->{26368215} = "Chegutu";
-$areanames{en}->{26368216} = "Sanyati";
-$areanames{en}->{263682189} = "Chakari";
-$areanames{en}->{263687} = "Sanyati";
-$areanames{en}->{263688} = "Chakari";
-$areanames{en}->{26369} = "Darwendale";
-$areanames{en}->{263698} = "Trelawney";
-$areanames{en}->{2638128} = "Baobab\/Hwange";
-$areanames{en}->{263812835} = "Dete";
-$areanames{en}->{263812847} = "Binga";
-$areanames{en}->{263812856} = "Lupane";
-$areanames{en}->{263812875} = "Jotsholo";
-$areanames{en}->{26383} = "Victoria\ Falls";
-$areanames{en}->{2638428} = "Gwanda";
-$areanames{en}->{263842801} = "Filabusi";
-$areanames{en}->{263842808} = "West\ Nicholson";
-$areanames{en}->{263842835} = "Collen\ Bawn";
-$areanames{en}->{26385} = "BeitBridge";
-$areanames{en}->{26389280} = "Plumtree";
-$areanames{en}->{2639} = "Bulawayo";
-$areanames{en}->{263920} = "Northend";
-$areanames{en}->{263921} = "Northend";
-$areanames{en}->{2639226} = "Queensdale";
-$areanames{en}->{2639228} = "Queensdale";
-$areanames{en}->{263924} = "Hillside";
-$areanames{en}->{263929} = "Killarney";
-$areanames{en}->{263940} = "Mabutewni";
-$areanames{en}->{263941} = "Mabutewni";
-$areanames{en}->{263942} = "Mabutewni";
-$areanames{en}->{263943} = "Mabutewni";
-$areanames{en}->{263946} = "Bellevue";
-$areanames{en}->{263947} = "Bellevue";
-$areanames{en}->{263948} = "Nkulumane";
-$areanames{en}->{263949} = "Nkulumane";
-$areanames{en}->{263952} = "Luveve";
-$areanames{en}->{263956} = "Luveve";
+$areanames{en} = {"263668", "Mutorashanga",
+"26339245", "Mashava",
+"263317", "Checheche",
+"26317", "Filabusi",
+"26366217", "Guruve",
+"263517", "Mataga",
+"26354", "Gweru",
+"263242150", "Beatrice",
+"26320200", "Odzi",
+"26325206", "Murambinda",
+"263220203", "Dangamvura",
+"26360", "Mhangura",
+"26334", "Jerera",
+"26363", "Makuti",
+"263292802", "Shangani",
+"263279", "Marondera",
+"263672192", "Darwendale",
+"2635525", "Battle\ Fields\/Kwekwe\/Redcliff",
+"26342010", "Selous",
+"263558", "Nkayi",
+"26355259", "Gokwe",
+"26367215", "Murombedzi",
+"263292821", "Nyamandlovu",
+"263285", "Turkmine",
+"263284", "Gwanda",
+"263942", "Mabutewni",
+"263375", "Concession",
+"2636821", "Kadoma\/Selous",
+"263920", "Northend",
+"263271", "Bindura",
+"26358", "Guruve",
+"26327203", "Birchenough\ Bridge",
+"263288", "Esigodini",
+"26385", "BeitBridge",
+"263251", "Zvishavane",
+"263943", "Mabutewni",
+"263637", "Chirundu",
+"26325", "Rusape",
+"26324214", "Arcturus",
+"26327528", "Mt\.\ Darwin",
+"263420086", "Selous",
+"263812875", "Jotsholo",
+"26331", "Chiredzi",
+"263392366", "Mataga",
+"263924", "Hillside",
+"2639226", "Queensdale",
+"263387", "Nyamandhlovu",
+"263248", "Birchenough\ Bridge",
+"263277", "Mvurwi",
+"263956", "Luveve",
+"263672198", "Raffingora",
+"263552558", "Nkayi",
+"26326209", "Hauna",
+"26315", "Binga",
+"26327525", "Mt\.\ Darwin",
+"26362", "Norton",
+"263420085", "Selous",
+"26365208", "Wedza",
+"263420106", "Norton",
+"263312370", "Ngundu",
+"263222", "Wedza",
+"263698", "Trelawney",
+"26342728", "Marondera",
+"26323", "Chiredzi",
+"26383", "Victoria\ Falls",
+"2632421", "Chitungwiza",
+"26331233", "Triangle",
+"26339", "Masvingo",
+"263662137", "Shamva",
+"263292800", "Esigodini",
+"2638428", "Gwanda",
+"263292804", "Figtree",
+"26359", "Gokwe",
+"26327526", "Mt\.\ Darwin",
+"263612141", "Makuti",
+"26367", "Chinhoyi",
+"263286", "Beitbridge",
+"263682189", "Chakari",
+"2635483", "Lalapanzi",
+"263272", "Mutoko",
+"263376", "Glendale",
+"263941", "Mabutewni",
+"263252055", "Nyazura",
+"263292809", "Matopos",
+"263949", "Nkulumane",
+"263513", "Zvishavane",
+"263227", "Chipinge",
+"26313", "Victoria\ Falls",
+"26327205", "Chimanimani",
+"26365213", "Mutoko",
+"263552557", "Munyati",
+"263512", "Zvishavane",
+"26339235", "Zvishavane",
+"2639228", "Queensdale",
+"26365", "Beatrice",
+"263383", "Matopose",
+"26339230", "Gutu",
+"2638128", "Baobab\/Hwange",
+"263688", "Chakari",
+"263842808", "West\ Nicholson",
+"26342723", "Chitungwiza",
+"263273", "Ruwa",
+"263542548", "Lalapanzi",
+"26366219", "Christon\ Bank\/Concession\/Mazowe",
+"26356", "Chivhu",
+"26329252", "Luveve",
+"26366212", "Mount\ Darwin",
+"263221", "Murambinda",
+"263264", "Karoi",
+"26336", "Ngundu",
+"26327523", "Mt\.\ Darwin",
+"2632753", "Mt\.\ Darwin",
+"263672136", "Trelawney",
+"263338", "Nyika",
+"2632583", "Nyazura",
+"263308", "Chatsworth",
+"263220201", "Chikanga\/Mutare",
+"263229", "Juliasdale",
+"263947", "Bellevue",
+"263292807", "Kezi",
+"263940", "Mabutewni",
+"26361", "Kariba",
+"263292803", "Turkmine",
+"263212", "Murambinda",
+"263420107", "Norton",
+"263220202", "Mutare",
+"26366218", "Glendale",
+"263948", "Nkulumane",
+"26329246", "Bellevue",
+"263283", "Figtree",
+"26316", "West\ Nicholson",
+"263337", "Nyaningwe",
+"26367214", "Banket\/Mhangura",
+"26326", "Chimanimani",
+"263292861", "Tsholotsho",
+"263652080", "Macheke",
+"263225", "Rusape",
+"26332", "Mvuma",
+"26368216", "Sanyati",
+"263261", "Kariba",
+"263398", "Lupane",
+"263420087", "Selous",
+"26352", "Shurugwi",
+"263687", "Sanyati",
+"263329", "Nyanga",
+"26366210", "Bindura\/Centenary",
+"263812847", "Binga",
+"263542532", "Mvuma",
+"263420109", "Norton",
+"26350", "Shanagani",
+"2636523", "Marondera",
+"26324215", "Norton",
+"263242", "Harare",
+"26353", "Chegutu",
+"26354212", "Chivhu",
+"26364", "Karoi",
+"263205", "Pengalonga",
+"26330", "Gutu",
+"263392308", "Chatsworth",
+"263204", "Odzi",
+"263392360", "Mberengwa",
+"26333", "Triangle",
+"263812856", "Lupane",
+"26327527", "Mt\.\ Darwin",
+"263228", "Hauna",
+"26329", "Bulawayo",
+"263420089", "Selous",
+"26319", "Plumtree",
+"26327524", "Mt\.\ Darwin",
+"26368", "Kadoma",
+"263282", "Kezi",
+"263675", "Murombedzi",
+"26327541", "Mt\.\ Darwin",
+"263842801", "Filabusi",
+"263213", "Victoria\ Falls",
+"26335", "Mashava",
+"263254", "Gweru",
+"263420088", "Selous",
+"263219", "Plumtree",
+"263278", "Murewa",
+"26326208", "Juliasdale",
+"26355", "Kwekwe",
+"263929", "Killarney",
+"2636521", "Murewa",
+"263514", "Zvishavane",
+"263921", "Northend",
+"263270", "Chitungwiza",
+"26342729", "Marondera",
+"26361215", "Karoi",
+"26342722", "Chitungwiza",
+"263275219", "Mazowe",
+"26354252", "Shurugwi",
+"263420108", "Norton",
+"263952", "Luveve",
+"263287", "Tsholotsho",
+"26327204", "Chipinge",
+"263312337", "Rutenga",
+"26327522", "Mt\.\ Darwin",
+"26327529", "Mt\.\ Darwin",
+"2632582", "Headlands",
+"263672196", "Mutorashanga",
+"263842835", "Collen\ Bawn",
+"263392380", "Nyaningwe",
+"26366", "Banket",
+"26389280", "Plumtree",
+"26318", "Dete",
+"26369", "Darwendale",
+"263272317", "Checheche",
+"263392323", "Nyika",
+"26324213", "Ruwa",
+"263628", "Selous",
+"2632020", "Mutare",
+"263612140", "Chirundu",
+"26339234", "Jerera",
+"2632021", "Dangamvura",
+"263557", "Munyati",
+"263206", "Mutare",
+"2632024", "Penhalonga",
+"263518", "Mberengwa",
+"263289", "Jotsholo",
+"26327540", "Mt\.\ Darwin",
+"263420110", "Norton",
+"26314", "Rutenga",
+"263379", "Macheke",
+"2639", "Bulawayo",
+"263272046", "Chipangayi",
+"26325207", "Headlands",
+"263667", "Raffingora",
+"263812835", "Dete",
+"263371", "Shamva",
+"263274", "Arcturus",
+"2634", "Harare",
+"26368215", "Chegutu",
+"263946", "Bellevue",
+"26342009", "Selous",
+"26357", "Centenary",
+"263281", "Hwange",
+"263262098", "Nyanga",
+"26366216", "Mvurwi",};
 
     sub new {
       my $class = shift;

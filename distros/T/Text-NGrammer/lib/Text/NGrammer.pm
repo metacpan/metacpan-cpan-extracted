@@ -10,7 +10,7 @@ use Carp;
 use Lingua::Sentence;
 
 use vars qw($VERSION);
-$VERSION = '0.03';
+$VERSION = '0.06';
 
 sub new {
   my $class = shift;
@@ -43,9 +43,10 @@ sub skipgrams_array {
   my $step = $k + 1;
   for (my $i = 0; $i <= ($length - ($n+($k*($n-1)))); $i += 1) {
     my @tokens = ();
-    push @tokens, $_[$i];
+    my $at = $i;
     while (@tokens < $n) {
-      push @tokens, $_[$i + ($k+1)];
+      push @tokens, $_[$at];
+      $at += $step;
     }
     push @ngrams, \@tokens;
   }
@@ -219,6 +220,18 @@ Fixed dependencies
 =item 0.03
 
 Fixed dependencies in Makefile.PL
+
+=item 0.04
+
+Fixed a bug for n-grams n-skipgrams with n > 2
+
+=item 0.05
+
+Fixed test
+
+=item 0.06
+
+Fixed meta.yml
 
 =back
 

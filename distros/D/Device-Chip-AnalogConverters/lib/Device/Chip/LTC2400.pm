@@ -5,7 +5,7 @@
 
 use Object::Pad 0.19;
 
-package Device::Chip::LTC2400 0.10;
+package Device::Chip::LTC2400 0.11;
 class Device::Chip::LTC2400
    extends Device::Chip;
 
@@ -39,14 +39,14 @@ sub SPI_options
 
 =head1 METHODS
 
-The following methods documented with a trailing call to C<< ->get >> return
-L<Future> instances.
+The following methods documented in an C<await> expression return L<Future>
+instances.
 
 =cut
 
 =head2 read_adc
 
-   $reading = $chip->read_adc->get
+   $reading = await $chip->read_adc;
 
 Returns a C<HASH> reference containing the fields obtained after a successful
 conversion.

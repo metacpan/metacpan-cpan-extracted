@@ -1,6 +1,6 @@
 package MARC::Moose::Formater::Legacy;
 # ABSTRACT: Record formater into the legacy MARC::Record object
-$MARC::Moose::Formater::Legacy::VERSION = '1.0.41';
+$MARC::Moose::Formater::Legacy::VERSION = '1.0.42';
 use Moose;
 
 extends 'MARC::Moose::Formater';
@@ -29,8 +29,8 @@ override 'format' => sub {
             }
             $nfield = MARC::Field->new(
                 $field->tag,
-                $field->ind1 || ' ',
-                $field->ind2 || ' ', @sf ) if @sf;
+                (defined $field->ind1 ) ? $field->ind1 : ' ',
+                (defined $field->ind2 ) ? $field->ind2 : ' ', @sf ) if @sf;
         }
         $marc->append_fields($nfield) if $nfield;
     }
@@ -52,7 +52,7 @@ MARC::Moose::Formater::Legacy - Record formater into the legacy MARC::Record obj
 
 =head1 VERSION
 
-version 1.0.41
+version 1.0.42
 
 =head1 AUTHOR
 

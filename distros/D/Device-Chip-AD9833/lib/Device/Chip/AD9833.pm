@@ -6,14 +6,14 @@
 use v5.26;
 use Object::Pad 0.19;
 
-package Device::Chip::AD9833 0.01;
+package Device::Chip::AD9833 0.02;
 class Device::Chip::AD9833
    extends Device::Chip;
 
 use Carp;
 use Data::Bitfield 0.02 qw( bitfield boolfield );
 
-use Future::AsyncAwait;
+use Future::AsyncAwait 0.38; # aync method
 
 use constant PROTOCOL => "SPI";
 
@@ -32,14 +32,15 @@ C<Device::Chip::AD9833> - chip driver for F<AD9833>
 =head1 SYNOPSIS
 
    use Device::Chip::AD9833;
+   use Future::AsyncAwait;
 
    my $chip = Device::Chip::AD9833->new;
-   $chip->mount( Device::Chip::Adapter::...->new )->get;
+   await $chip->mount( Device::Chip::Adapter::...->new );
 
-   $chip->init->get;
+   await $chip->init;
 
    my $freq = 440; # in Hz
-   $chip->write_FREQ0( ( $freq << 28 ) / 25E6 ); # presuming 25MHz reference
+   await $chip->write_FREQ0( ( $freq << 28 ) / 25E6 ); # presuming 25MHz reference
 
 =head1 DESCRIPTION
 
@@ -66,13 +67,14 @@ async method _write ( $word )
 
 =head1 METHODS
 
-The following methods documented with as C<async> return L<Future> instances.
+The following methods documented in an C<await> expression return L<Future>
+instances.
 
 =cut
 
 =head2 init
 
-   async method init();
+   await $chip->init;
 
 Resets the chip to a working configuration, including setting the C<B28> bit
 appropriately for the way this module writes the frequency registers.
@@ -101,7 +103,7 @@ bitfield { format => "integer" }, CONFIG =>
 
 =head2 read_config
 
-   async method read_config();
+   $config = await $chip->read_config;
 
 Returns a C<HASH> reference containing the current chip configuration. Note
 that since the chip does not support querying the configuration, this is just
@@ -148,7 +150,7 @@ async method read_config ()
 
 =head2 change_config
 
-   async method change_config(%changes);
+   await $chip->change_config( %changes );
 
 Writes updates to the chip configuration. Takes named arguments of the same
 form as returned by L</read_config>, including the synthesized C<wave>
@@ -177,8 +179,8 @@ async method change_config ( %changes )
 
 =head2 write_FREQ1
 
-   async method write_FREQ0($freq);
-   async method write_FREQ1($freq);
+   await $chip->write_FREQ0( $freq );
+   await $chip->write_FREQ1( $freq );
 
 Writes the C<FREQ0> or C<FREQ1> frequency control register. C<$freq> should
 be a 28bit integer value.
@@ -201,8 +203,8 @@ async method write_FREQ1 ( $freq )
 
 =head2 write_PHASE1
 
-   async method write_PHASE0($phase);
-   async method write_PHASE1($phase);
+   await $chip->write_PHASE0( $phase );
+   await $chip->write_PHASE1( $phase );
 
 Writes the C<PHASE0> or C<PHASE1> phase control register. C<$phase> should
 be a 12bit integer value.

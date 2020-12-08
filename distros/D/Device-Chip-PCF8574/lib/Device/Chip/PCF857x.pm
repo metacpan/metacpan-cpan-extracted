@@ -1,21 +1,21 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2016-2017 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2016-2020 -- leonerd@leonerd.org.uk
 
-package Device::Chip::PCF857x;
+use v5.26;
+use Object::Pad 0.19;
 
-use strict;
-use warnings;
-use base qw( Device::Chip );
-
-our $VERSION = '0.02';
+package Device::Chip::PCF857x 0.03;
+class Device::Chip::PCF857x
+   extends Device::Chip;
 
 use constant PROTOCOL => "I2C";
 
-sub I2C_options
+use Future::AsyncAwait;
+
+method I2C_options
 {
-   my $self = shift;
    my %opts = @_;
 
    my $addr = $opts{addr} // 0x20;
@@ -23,110 +23,92 @@ sub I2C_options
 
    return (
       addr        => $addr,
-      max_bitrate => 400E3,
+      max_bitrate => 100E3,
    );
 }
 
-sub write
+async method write ( $v )
 {
-   my $self = shift;
-   my ( $v ) = @_;
-
-   $self->protocol->write( pack( $self->PACKFMT, $v ) );
+   await $self->protocol->write( pack( $self->PACKFMT, $v ) );
 }
 
-sub read
+async method read
 {
-   my $self = shift;
-
-   $self->protocol->read( $self->READLEN )
-      ->then( sub {
-         my ( $b ) = @_;
-         Future->done( unpack $self->PACKFMT, $b );
-      });
+   return unpack $self->PACKFMT, await $self->protocol->read( $self->READLEN );
 }
 
-sub as_adapter
+method as_adapter
 {
-   my $self = shift;
-
    return Device::Chip::PCF857x::_Adapter->new( $self );
 }
 
-package # hide from indexer
+class # hide from indexer
    Device::Chip::PCF857x::_Adapter;
+# Can't 'extend' yet because D:C:A itself has no sub new
 use base qw( Device::Chip::Adapter );
 
 use Carp;
 
 use Future;
 
-sub new
-{
-   my $class = shift;
-   my ( $chip ) = @_;
+has $_chip;
+has $_mask;
+has $_gpiobits;
 
-   bless {
-      chip => $chip,
-      mask => $chip->DEFMASK,
-      gpiobits => $chip->GPIOBITS,
-   }, $class;
+BUILD ( $chip )
+{
+   $_chip = $chip;
+   $_mask = $chip->DEFMASK;
+   $_gpiobits = $chip->GPIOBITS;
 }
 
-sub make_protocol_GPIO { Future->done( shift ) }
-
-sub list_gpios
+async method power ( $on )
 {
-   my $self = shift;
-   return sort keys %{ $self->{gpiobits} };
+   await $_chip->protocol->power( $on );
 }
 
-sub write_gpios
-{
-   my $self = shift;
-   my ( $gpios ) = @_;
+async method make_protocol_GPIO { return $self }
 
-   my $newmask = $self->{mask};
+method list_gpios
+{
+   return sort keys %{ $_gpiobits };
+}
+
+async method write_gpios ( $gpios )
+{
+   my $newmask = $_mask;
 
    foreach my $pin ( keys %$gpios ) {
-      my $bit = $self->{gpiobits}{$pin} or
+      my $bit = $_gpiobits->{$pin} or
          croak "Unrecognised GPIO pin name $pin";
 
       $newmask &= ~$bit;
       $newmask |=  $bit if $gpios->{$pin};
    }
 
-   return Future->done if $newmask == $self->{mask};
+   return if $newmask == $_mask;
 
-   $self->{chip}->write( $self->{mask} = $newmask );
+   await $_chip->write( $_mask = $newmask );
 }
 
-sub read_gpios
+async method read_gpios ( $gpios )
 {
-   my $self = shift;
-   my ( $gpios ) = @_;
+   my $mask = await $_chip->read;
 
-   $self->{chip}->read->then( sub {
-      my ( $mask ) = @_;
+   my %ret;
+   foreach my $pin ( @$gpios ) {
+      my $bit = $_gpiobits->{$pin} or
+         croak "Unrecognised GPIO pin name $pin";
 
-      my %ret;
-      foreach my $pin ( @$gpios ) {
-         my $bit = $self->{gpiobits}{$pin} or
-            croak "Unrecognised GPIO pin name $pin";
+      $ret{$pin} = !!( $mask & $bit );
+   }
 
-         $ret{$pin} = !!( $mask & $bit );
-      }
-
-      Future->done( \%ret );
-   });
+   return \%ret;
 }
 
-sub tris_gpios
+async method tris_gpios ( $gpios )
 {
-   my $self = shift;
-   my ( $gpios ) = @_;
-
-   $self->write_gpios( { map { $_ => 1 } @$gpios } );
+   await $self->write_gpios( { map { $_ => 1 } @$gpios } );
 }
 
 0x55AA;

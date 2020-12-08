@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20200904144533;
+our $VERSION = 1.20201204215956;
 
 my $formatters = [
                 {
@@ -146,802 +146,802 @@ my $validators = {
                 'voip' => '56\\d{8}'
               };
 my %areanames = ();
-$areanames{en}->{44113} = "Leeds";
-$areanames{en}->{44114} = "Sheffield";
-$areanames{en}->{44115} = "Nottingham";
-$areanames{en}->{44116} = "Leicester";
-$areanames{en}->{44117} = "Bristol";
-$areanames{en}->{44118} = "Reading";
-$areanames{en}->{441200} = "Clitheroe";
-$areanames{en}->{441202} = "Bournemouth";
-$areanames{en}->{441204} = "Bolton";
-$areanames{en}->{441205} = "Boston";
-$areanames{en}->{441206} = "Colchester";
-$areanames{en}->{441207} = "Consett";
-$areanames{en}->{441208} = "Bodmin";
-$areanames{en}->{441209} = "Redruth";
-$areanames{en}->{441210} = "Birmingham";
-$areanames{en}->{441211} = "Birmingham";
-$areanames{en}->{441212} = "Birmingham";
-$areanames{en}->{441213} = "Birmingham";
-$areanames{en}->{441214} = "Birmingham";
-$areanames{en}->{441215} = "Birmingham";
-$areanames{en}->{441216} = "Birmingham";
-$areanames{en}->{441217} = "Birmingham";
-$areanames{en}->{4412180} = "Birmingham";
-$areanames{en}->{441223} = "Cambridge";
-$areanames{en}->{441224} = "Aberdeen";
-$areanames{en}->{441225} = "Bath";
-$areanames{en}->{441226} = "Barnsley";
-$areanames{en}->{441227} = "Canterbury";
-$areanames{en}->{441228} = "Carlisle";
-$areanames{en}->{4412290} = "Barrow\-in\-Furness\/Millom";
-$areanames{en}->{4412291} = "Barrow\-in\-Furness\/Millom";
-$areanames{en}->{4412292} = "Barrow\-in\-Furness";
-$areanames{en}->{4412293} = "Millom";
-$areanames{en}->{4412294} = "Barrow\-in\-Furness";
-$areanames{en}->{4412295} = "Barrow\-in\-Furness";
-$areanames{en}->{4412296} = "Barrow\-in\-Furness";
-$areanames{en}->{4412297} = "Millom";
-$areanames{en}->{4412298} = "Barrow\-in\-Furness";
-$areanames{en}->{4412299} = "Millom";
-$areanames{en}->{441233} = "Ashford\ \(Kent\)";
-$areanames{en}->{441234} = "Bedford";
-$areanames{en}->{441235} = "Abingdon";
-$areanames{en}->{441236} = "Coatbridge";
-$areanames{en}->{441237} = "Bideford";
-$areanames{en}->{441239} = "Cardigan";
-$areanames{en}->{441241} = "Arbroath";
-$areanames{en}->{441242} = "Cheltenham";
-$areanames{en}->{441243} = "Chichester";
-$areanames{en}->{441244} = "Chester";
-$areanames{en}->{441245} = "Chelmsford";
-$areanames{en}->{441246} = "Chesterfield";
-$areanames{en}->{441248} = "Bangor\ \(Gwynedd\)";
-$areanames{en}->{441249} = "Chippenham";
-$areanames{en}->{441250} = "Blairgowrie";
-$areanames{en}->{441252} = "Aldershot";
-$areanames{en}->{441253} = "Blackpool";
-$areanames{en}->{441254} = "Blackburn";
-$areanames{en}->{441255} = "Clacton\-on\-Sea";
-$areanames{en}->{441256} = "Basingstoke";
-$areanames{en}->{441257} = "Coppull";
-$areanames{en}->{441258} = "Blandford";
-$areanames{en}->{441259} = "Alloa";
-$areanames{en}->{441260} = "Congleton";
-$areanames{en}->{441261} = "Banff";
-$areanames{en}->{441262} = "Bridlington";
-$areanames{en}->{441263} = "Cromer";
-$areanames{en}->{441264} = "Andover";
-$areanames{en}->{441267} = "Carmarthen";
-$areanames{en}->{441268} = "Basildon";
-$areanames{en}->{441269} = "Ammanford";
-$areanames{en}->{441270} = "Crewe";
-$areanames{en}->{441271} = "Barnstaple";
-$areanames{en}->{441273} = "Brighton";
-$areanames{en}->{441274} = "Bradford";
-$areanames{en}->{441275} = "Clevedon";
-$areanames{en}->{441276} = "Camberley";
-$areanames{en}->{441277} = "Brentwood";
-$areanames{en}->{441278} = "Bridgwater";
-$areanames{en}->{441279} = "Bishops\ Stortford";
-$areanames{en}->{441280} = "Buckingham";
-$areanames{en}->{441282} = "Burnley";
-$areanames{en}->{441283} = "Burton\-on\-Trent";
-$areanames{en}->{441284} = "Bury\ St\ Edmunds";
-$areanames{en}->{441285} = "Cirencester";
-$areanames{en}->{441286} = "Caernarfon";
-$areanames{en}->{441287} = "Guisborough";
-$areanames{en}->{441288} = "Bude";
-$areanames{en}->{441289} = "Berwick\-upon\-Tweed";
-$areanames{en}->{441290} = "Cumnock";
-$areanames{en}->{441291} = "Chepstow";
-$areanames{en}->{441292} = "Ayr";
-$areanames{en}->{441293} = "Crawley";
-$areanames{en}->{441294} = "Ardrossan";
-$areanames{en}->{441295} = "Banbury";
-$areanames{en}->{441296} = "Aylesbury";
-$areanames{en}->{441297} = "Axminster";
-$areanames{en}->{441298} = "Buxton";
-$areanames{en}->{441299} = "Bewdley";
-$areanames{en}->{441300} = "Cerne\ Abbas";
-$areanames{en}->{441301} = "Arrochar";
-$areanames{en}->{441302} = "Doncaster";
-$areanames{en}->{441303} = "Folkestone";
-$areanames{en}->{441304} = "Dover";
-$areanames{en}->{441305} = "Dorchester";
-$areanames{en}->{441306} = "Dorking";
-$areanames{en}->{441307} = "Forfar";
-$areanames{en}->{441308} = "Bridport";
-$areanames{en}->{441309} = "Forres";
-$areanames{en}->{44131} = "Edinburgh";
-$areanames{en}->{441320} = "Fort\ Augustus";
-$areanames{en}->{441322} = "Dartford";
-$areanames{en}->{441323} = "Eastbourne";
-$areanames{en}->{441324} = "Falkirk";
-$areanames{en}->{441325} = "Darlington";
-$areanames{en}->{441326} = "Falmouth";
-$areanames{en}->{441327} = "Daventry";
-$areanames{en}->{441328} = "Fakenham";
-$areanames{en}->{441329} = "Fareham";
-$areanames{en}->{441330} = "Banchory";
-$areanames{en}->{441332} = "Derby";
-$areanames{en}->{441333} = "Peat\ Inn\ \(Leven\ \(Fife\)\)";
-$areanames{en}->{441334} = "St\ Andrews";
-$areanames{en}->{441335} = "Ashbourne";
-$areanames{en}->{441337} = "Ladybank";
-$areanames{en}->{4413390} = "Aboyne\/Ballater";
-$areanames{en}->{4413391} = "Aboyne\/Ballater";
-$areanames{en}->{4413392} = "Aboyne";
-$areanames{en}->{4413393} = "Aboyne";
-$areanames{en}->{4413394} = "Ballater";
-$areanames{en}->{4413395} = "Aboyne";
-$areanames{en}->{4413396} = "Ballater";
-$areanames{en}->{4413397} = "Ballater";
-$areanames{en}->{4413398} = "Aboyne";
-$areanames{en}->{4413399} = "Ballater";
-$areanames{en}->{441340} = "Craigellachie\ \(Aberlour\)";
-$areanames{en}->{441341} = "Barmouth";
-$areanames{en}->{441342} = "East\ Grinstead";
-$areanames{en}->{441343} = "Elgin";
-$areanames{en}->{441344} = "Bracknell";
-$areanames{en}->{441346} = "Fraserburgh";
-$areanames{en}->{441347} = "Easingwold";
-$areanames{en}->{441348} = "Fishguard";
-$areanames{en}->{441349} = "Dingwall";
-$areanames{en}->{441350} = "Dunkeld";
-$areanames{en}->{441352} = "Mold";
-$areanames{en}->{441353} = "Ely";
-$areanames{en}->{441354} = "Chatteris";
-$areanames{en}->{441355} = "East\ Kilbride";
-$areanames{en}->{441356} = "Brechin";
-$areanames{en}->{441357} = "Strathaven";
-$areanames{en}->{441358} = "Ellon";
-$areanames{en}->{441359} = "Pakenham";
-$areanames{en}->{441360} = "Killearn";
-$areanames{en}->{441361} = "Duns";
-$areanames{en}->{441362} = "Dereham";
-$areanames{en}->{441363} = "Crediton";
-$areanames{en}->{441364} = "Ashburton";
-$areanames{en}->{441366} = "Downham\ Market";
-$areanames{en}->{441367} = "Faringdon";
-$areanames{en}->{441368} = "Dunbar";
-$areanames{en}->{441369} = "Dunoon";
-$areanames{en}->{441371} = "Great\ Dunmow";
-$areanames{en}->{441372} = "Esher";
-$areanames{en}->{441373} = "Frome";
-$areanames{en}->{441375} = "Grays\ Thurrock";
-$areanames{en}->{441376} = "Braintree";
-$areanames{en}->{441377} = "Driffield";
-$areanames{en}->{441379} = "Diss";
-$areanames{en}->{441380} = "Devizes";
-$areanames{en}->{441381} = "Fortrose";
-$areanames{en}->{441382} = "Dundee";
-$areanames{en}->{441383} = "Dunfermline";
-$areanames{en}->{441384} = "Dudley";
-$areanames{en}->{441386} = "Evesham";
-$areanames{en}->{441387} = "Dumfries";
-$areanames{en}->{4413873} = "Langholm";
-$areanames{en}->{441388} = "Bishop\ Auckland";
-$areanames{en}->{4413880} = "Bishop\ Auckland\/Stanhope\ \(Eastgate\)";
-$areanames{en}->{4413881} = "Bishop\ Auckland\/Stanhope\ \(Eastgate\)";
-$areanames{en}->{4413882} = "Stanhope\ \(Eastgate\)";
-$areanames{en}->{4413885} = "Stanhope\ \(Eastgate\)";
-$areanames{en}->{441389} = "Dumbarton";
-$areanames{en}->{441392} = "Exeter";
-$areanames{en}->{441394} = "Felixstowe";
-$areanames{en}->{441395} = "Budleigh\ Salterton";
-$areanames{en}->{441397} = "Fort\ William";
-$areanames{en}->{441398} = "Dulverton";
-$areanames{en}->{441400} = "Honington";
-$areanames{en}->{441403} = "Horsham";
-$areanames{en}->{441404} = "Honiton";
-$areanames{en}->{441405} = "Goole";
-$areanames{en}->{441406} = "Holbeach";
-$areanames{en}->{441407} = "Holyhead";
-$areanames{en}->{441408} = "Golspie";
-$areanames{en}->{441409} = "Holsworthy";
-$areanames{en}->{44141} = "Glasgow";
-$areanames{en}->{441420} = "Alton";
-$areanames{en}->{441422} = "Halifax";
-$areanames{en}->{4414230} = "Harrogate\/Boroughbridge";
-$areanames{en}->{4414231} = "Harrogate\/Boroughbridge";
-$areanames{en}->{4414232} = "Harrogate";
-$areanames{en}->{4414233} = "Boroughbridge";
-$areanames{en}->{4414234} = "Boroughbridge";
-$areanames{en}->{4414235} = "Harrogate";
-$areanames{en}->{4414236} = "Harrogate";
-$areanames{en}->{4414237} = "Harrogate";
-$areanames{en}->{4414238} = "Harrogate";
-$areanames{en}->{4414239} = "Boroughbridge";
-$areanames{en}->{441424} = "Hastings";
-$areanames{en}->{441425} = "Ringwood";
-$areanames{en}->{441427} = "Gainsborough";
-$areanames{en}->{441428} = "Haslemere";
-$areanames{en}->{441429} = "Hartlepool";
-$areanames{en}->{4414300} = "North\ Cave\/Market\ Weighton";
-$areanames{en}->{4414301} = "North\ Cave\/Market\ Weighton";
-$areanames{en}->{4414302} = "North\ Cave";
-$areanames{en}->{4414303} = "North\ Cave";
-$areanames{en}->{4414304} = "North\ Cave";
-$areanames{en}->{4414305} = "North\ Cave";
-$areanames{en}->{4414306} = "Market\ Weighton";
-$areanames{en}->{4414307} = "Market\ Weighton";
-$areanames{en}->{4414308} = "Market\ Weighton";
-$areanames{en}->{4414309} = "Market\ Weighton";
-$areanames{en}->{441431} = "Helmsdale";
-$areanames{en}->{441432} = "Hereford";
-$areanames{en}->{441433} = "Hathersage";
-$areanames{en}->{4414340} = "Bellingham\/Haltwhistle\/Hexham";
-$areanames{en}->{4414341} = "Bellingham\/Haltwhistle\/Hexham";
-$areanames{en}->{4414342} = "Bellingham";
-$areanames{en}->{4414343} = "Haltwhistle";
-$areanames{en}->{4414344} = "Bellingham";
-$areanames{en}->{4414345} = "Haltwhistle";
-$areanames{en}->{4414346} = "Hexham";
-$areanames{en}->{4414347} = "Hexham";
-$areanames{en}->{4414348} = "Hexham";
-$areanames{en}->{4414349} = "Bellingham";
-$areanames{en}->{441435} = "Heathfield";
-$areanames{en}->{441436} = "Helensburgh";
-$areanames{en}->{4414370} = "Haverfordwest\/Clynderwen\ \(Clunderwen\)";
-$areanames{en}->{4414371} = "Haverfordwest\/Clynderwen\ \(Clunderwen\)";
-$areanames{en}->{4414372} = "Clynderwen\ \(Clunderwen\)";
-$areanames{en}->{4414373} = "Clynderwen\ \(Clunderwen\)";
-$areanames{en}->{4414374} = "Clynderwen\ \(Clunderwen\)";
-$areanames{en}->{4414375} = "Clynderwen\ \(Clunderwen\)";
-$areanames{en}->{4414376} = "Haverfordwest";
-$areanames{en}->{4414377} = "Haverfordwest";
-$areanames{en}->{4414378} = "Haverfordwest";
-$areanames{en}->{4414379} = "Haverfordwest";
-$areanames{en}->{441438} = "Stevenage";
-$areanames{en}->{441439} = "Helmsley";
-$areanames{en}->{441440} = "Haverhill";
-$areanames{en}->{441442} = "Hemel\ Hempstead";
-$areanames{en}->{441443} = "Pontypridd";
-$areanames{en}->{441444} = "Haywards\ Heath";
-$areanames{en}->{441445} = "Gairloch";
-$areanames{en}->{441446} = "Barry";
-$areanames{en}->{441449} = "Stowmarket";
-$areanames{en}->{441450} = "Hawick";
-$areanames{en}->{441451} = "Stow\-on\-the\-Wold";
-$areanames{en}->{441452} = "Gloucester";
-$areanames{en}->{441453} = "Dursley";
-$areanames{en}->{441454} = "Chipping\ Sodbury";
-$areanames{en}->{441455} = "Hinckley";
-$areanames{en}->{441456} = "Glenurquhart";
-$areanames{en}->{441457} = "Glossop";
-$areanames{en}->{441458} = "Glastonbury";
-$areanames{en}->{441460} = "Chard";
-$areanames{en}->{441461} = "Gretna";
-$areanames{en}->{441462} = "Hitchin";
-$areanames{en}->{441463} = "Inverness";
-$areanames{en}->{441464} = "Insch";
-$areanames{en}->{441465} = "Girvan";
-$areanames{en}->{441466} = "Huntly";
-$areanames{en}->{441467} = "Inverurie";
-$areanames{en}->{441469} = "Killingholme";
-$areanames{en}->{441470} = "Isle\ of\ Skye\ \-\ Edinbane";
-$areanames{en}->{441471} = "Isle\ of\ Skye\ \-\ Broadford";
-$areanames{en}->{441472} = "Grimsby";
-$areanames{en}->{441473} = "Ipswich";
-$areanames{en}->{441474} = "Gravesend";
-$areanames{en}->{441475} = "Greenock";
-$areanames{en}->{441476} = "Grantham";
-$areanames{en}->{441477} = "Holmes\ Chapel";
-$areanames{en}->{441478} = "Isle\ of\ Skye\ \-\ Portree";
-$areanames{en}->{441479} = "Grantown\-on\-Spey";
-$areanames{en}->{44147981} = "Aviemore";
-$areanames{en}->{44147982} = "Nethy\ Bridge";
-$areanames{en}->{44147983} = "Boat\ of\ Garten";
-$areanames{en}->{44147984} = "Carrbridge";
-$areanames{en}->{44147985} = "Dulnain\ Bridge";
-$areanames{en}->{44147986} = "Cairngorm";
-$areanames{en}->{441480} = "Huntingdon";
-$areanames{en}->{441481} = "Guernsey";
-$areanames{en}->{441482} = "Kingston\-upon\-Hull";
-$areanames{en}->{441483} = "Guildford";
-$areanames{en}->{441484} = "Huddersfield";
-$areanames{en}->{441485} = "Hunstanton";
-$areanames{en}->{441487} = "Warboys";
-$areanames{en}->{441488} = "Hungerford";
-$areanames{en}->{441489} = "Bishops\ Waltham";
-$areanames{en}->{441490} = "Corwen";
-$areanames{en}->{441491} = "Henley\-on\-Thames";
-$areanames{en}->{441492} = "Colwyn\ Bay";
-$areanames{en}->{441493} = "Great\ Yarmouth";
-$areanames{en}->{441494} = "High\ Wycombe";
-$areanames{en}->{441495} = "Pontypool";
-$areanames{en}->{441496} = "Port\ Ellen";
-$areanames{en}->{441497} = "Hay\-on\-Wye";
-$areanames{en}->{441499} = "Inveraray";
-$areanames{en}->{441501} = "Harthill";
-$areanames{en}->{441502} = "Lowestoft";
-$areanames{en}->{441503} = "Looe";
-$areanames{en}->{441505} = "Johnstone";
-$areanames{en}->{441506} = "Bathgate";
-$areanames{en}->{4415070} = "Louth\/Alford\ \(Lincs\)\/Spilsby\ \(Horncastle\)";
-$areanames{en}->{4415071} = "Louth\/Alford\ \(Lincs\)\/Spilsby\ \(Horncastle\)";
-$areanames{en}->{4415072} = "Spilsby\ \(Horncastle\)";
-$areanames{en}->{4415073} = "Louth";
-$areanames{en}->{4415074} = "Alford\ \(Lincs\)";
-$areanames{en}->{4415075} = "Spilsby\ \(Horncastle\)";
-$areanames{en}->{4415076} = "Louth";
-$areanames{en}->{4415077} = "Louth";
-$areanames{en}->{4415078} = "Alford\ \(Lincs\)";
-$areanames{en}->{4415079} = "Alford\ \(Lincs\)";
-$areanames{en}->{441508} = "Brooke";
-$areanames{en}->{441509} = "Loughborough";
-$areanames{en}->{44151} = "Liverpool";
-$areanames{en}->{441520} = "Lochcarron";
-$areanames{en}->{441522} = "Lincoln";
-$areanames{en}->{441524} = "Lancaster";
-$areanames{en}->{4415242} = "Hornby";
-$areanames{en}->{441525} = "Leighton\ Buzzard";
-$areanames{en}->{441526} = "Martin";
-$areanames{en}->{441527} = "Redditch";
-$areanames{en}->{441528} = "Laggan";
-$areanames{en}->{441529} = "Sleaford";
-$areanames{en}->{441530} = "Coalville";
-$areanames{en}->{441531} = "Ledbury";
-$areanames{en}->{441534} = "Jersey";
-$areanames{en}->{441535} = "Keighley";
-$areanames{en}->{441536} = "Kettering";
-$areanames{en}->{441538} = "Ipstones";
-$areanames{en}->{441539} = "Kendal";
-$areanames{en}->{4415394} = "Hawkshead";
-$areanames{en}->{4415395} = "Grange\-over\-Sands";
-$areanames{en}->{4415396} = "Sedbergh";
-$areanames{en}->{441540} = "Kingussie";
-$areanames{en}->{441542} = "Keith";
-$areanames{en}->{441543} = "Cannock";
-$areanames{en}->{441544} = "Kington";
-$areanames{en}->{441545} = "Llanarth";
-$areanames{en}->{441546} = "Lochgilphead";
-$areanames{en}->{441547} = "Knighton";
-$areanames{en}->{441548} = "Kingsbridge";
-$areanames{en}->{441549} = "Lairg";
-$areanames{en}->{441550} = "Llandovery";
-$areanames{en}->{441553} = "Kings\ Lynn";
-$areanames{en}->{441554} = "Llanelli";
-$areanames{en}->{441555} = "Lanark";
-$areanames{en}->{441556} = "Castle\ Douglas";
-$areanames{en}->{441557} = "Kirkcudbright";
-$areanames{en}->{441558} = "Llandeilo";
-$areanames{en}->{441559} = "Llandysul";
-$areanames{en}->{441560} = "Moscow";
-$areanames{en}->{441561} = "Laurencekirk";
-$areanames{en}->{441562} = "Kidderminster";
-$areanames{en}->{441563} = "Kilmarnock";
-$areanames{en}->{441564} = "Lapworth";
-$areanames{en}->{441565} = "Knutsford";
-$areanames{en}->{441566} = "Launceston";
-$areanames{en}->{441567} = "Killin";
-$areanames{en}->{441568} = "Leominster";
-$areanames{en}->{441569} = "Stonehaven";
-$areanames{en}->{441570} = "Lampeter";
-$areanames{en}->{441571} = "Lochinver";
-$areanames{en}->{441572} = "Oakham";
-$areanames{en}->{441573} = "Kelso";
-$areanames{en}->{441575} = "Kirriemuir";
-$areanames{en}->{441576} = "Lockerbie";
-$areanames{en}->{441577} = "Kinross";
-$areanames{en}->{441578} = "Lauder";
-$areanames{en}->{441579} = "Liskeard";
-$areanames{en}->{441580} = "Cranbrook";
-$areanames{en}->{441581} = "New\ Luce";
-$areanames{en}->{441582} = "Luton";
-$areanames{en}->{441583} = "Carradale";
-$areanames{en}->{441584} = "Ludlow";
-$areanames{en}->{441586} = "Campbeltown";
-$areanames{en}->{441588} = "Bishops\ Castle";
-$areanames{en}->{441590} = "Lymington";
-$areanames{en}->{441591} = "Llanwrtyd\ Wells";
-$areanames{en}->{441592} = "Kirkcaldy";
-$areanames{en}->{441593} = "Lybster";
-$areanames{en}->{441594} = "Lydney";
-$areanames{en}->{441595} = "Lerwick\,\ Foula\ \&\ Fair\ Isle";
-$areanames{en}->{441597} = "Llandrindod\ Wells";
-$areanames{en}->{441598} = "Lynton";
-$areanames{en}->{441599} = "Kyle";
-$areanames{en}->{441600} = "Monmouth";
-$areanames{en}->{441603} = "Norwich";
-$areanames{en}->{441604} = "Northampton";
-$areanames{en}->{441606} = "Northwich";
-$areanames{en}->{441608} = "Chipping\ Norton";
-$areanames{en}->{441609} = "Northallerton";
-$areanames{en}->{44161} = "Manchester";
-$areanames{en}->{441620} = "North\ Berwick";
-$areanames{en}->{441621} = "Maldon";
-$areanames{en}->{441622} = "Maidstone";
-$areanames{en}->{441623} = "Mansfield";
-$areanames{en}->{441624} = "Isle\ of\ Man";
-$areanames{en}->{441625} = "Macclesfield";
-$areanames{en}->{441626} = "Newton\ Abbot";
-$areanames{en}->{441628} = "Maidenhead";
-$areanames{en}->{441629} = "Matlock";
-$areanames{en}->{441630} = "Market\ Drayton";
-$areanames{en}->{441631} = "Oban";
-$areanames{en}->{441633} = "Newport";
-$areanames{en}->{441634} = "Medway";
-$areanames{en}->{441635} = "Newbury";
-$areanames{en}->{441636} = "Newark\-on\-Trent";
-$areanames{en}->{441637} = "Newquay";
-$areanames{en}->{441638} = "Newmarket";
-$areanames{en}->{441639} = "Neath";
-$areanames{en}->{441641} = "Strathy";
-$areanames{en}->{441642} = "Middlesbrough";
-$areanames{en}->{441643} = "Minehead";
-$areanames{en}->{441644} = "New\ Galloway";
-$areanames{en}->{441646} = "Milford\ Haven";
-$areanames{en}->{441647} = "Moretonhampstead";
-$areanames{en}->{441650} = "Cemmaes\ Road";
-$areanames{en}->{441651} = "Oldmeldrum";
-$areanames{en}->{441652} = "Brigg";
-$areanames{en}->{441653} = "Malton";
-$areanames{en}->{441654} = "Machynlleth";
-$areanames{en}->{441655} = "Maybole";
-$areanames{en}->{441656} = "Bridgend";
-$areanames{en}->{441659} = "Sanquhar";
-$areanames{en}->{441661} = "Prudhoe";
-$areanames{en}->{441663} = "New\ Mills";
-$areanames{en}->{441664} = "Melton\ Mowbray";
-$areanames{en}->{441665} = "Alnwick";
-$areanames{en}->{441666} = "Malmesbury";
-$areanames{en}->{441667} = "Nairn";
-$areanames{en}->{441668} = "Bamburgh";
-$areanames{en}->{441669} = "Rothbury";
-$areanames{en}->{441670} = "Morpeth";
-$areanames{en}->{441671} = "Newton\ Stewart";
-$areanames{en}->{441672} = "Marlborough";
-$areanames{en}->{441673} = "Market\ Rasen";
-$areanames{en}->{441674} = "Montrose";
-$areanames{en}->{441675} = "Coleshill";
-$areanames{en}->{441676} = "Meriden";
-$areanames{en}->{441677} = "Bedale";
-$areanames{en}->{441678} = "Bala";
-$areanames{en}->{441680} = "Isle\ of\ Mull\ \-\ Craignure";
-$areanames{en}->{441681} = "Isle\ of\ Mull\ \-\ Fionnphort";
-$areanames{en}->{441683} = "Moffat";
-$areanames{en}->{441684} = "Malvern";
-$areanames{en}->{441685} = "Merthyr\ Tydfil";
-$areanames{en}->{4416860} = "Newtown\/Llanidloes";
-$areanames{en}->{4416861} = "Newtown\/Llanidloes";
-$areanames{en}->{4416862} = "Llanidloes";
-$areanames{en}->{4416863} = "Llanidloes";
-$areanames{en}->{4416864} = "Llanidloes";
-$areanames{en}->{4416865} = "Newtown";
-$areanames{en}->{4416866} = "Newtown";
-$areanames{en}->{4416867} = "Llanidloes";
-$areanames{en}->{4416868} = "Newtown";
-$areanames{en}->{4416869} = "Newtown";
-$areanames{en}->{441687} = "Mallaig";
-$areanames{en}->{441688} = "Isle\ of\ Mull\ \-\ Tobermory";
-$areanames{en}->{441689} = "Orpington";
-$areanames{en}->{441690} = "Betws\-y\-Coed";
-$areanames{en}->{441691} = "Oswestry";
-$areanames{en}->{441692} = "North\ Walsham";
-$areanames{en}->{441694} = "Church\ Stretton";
-$areanames{en}->{441695} = "Skelmersdale";
-$areanames{en}->{441697} = "Brampton";
-$areanames{en}->{4416973} = "Wigton";
-$areanames{en}->{4416974} = "Raughton\ Head";
-$areanames{en}->{441698} = "Motherwell";
-$areanames{en}->{441700} = "Rothesay";
-$areanames{en}->{441702} = "Southend\-on\-Sea";
-$areanames{en}->{441704} = "Southport";
-$areanames{en}->{441706} = "Rochdale";
-$areanames{en}->{441707} = "Welwyn\ Garden\ City";
-$areanames{en}->{441708} = "Romford";
-$areanames{en}->{441709} = "Rotherham";
-$areanames{en}->{441720} = "Isles\ of\ Scilly";
-$areanames{en}->{441721} = "Peebles";
-$areanames{en}->{441722} = "Salisbury";
-$areanames{en}->{441723} = "Scarborough";
-$areanames{en}->{441724} = "Scunthorpe";
-$areanames{en}->{441725} = "Rockbourne";
-$areanames{en}->{441726} = "St\ Austell";
-$areanames{en}->{441727} = "St\ Albans";
-$areanames{en}->{441728} = "Saxmundham";
-$areanames{en}->{441729} = "Settle";
-$areanames{en}->{441730} = "Petersfield";
-$areanames{en}->{441732} = "Sevenoaks";
-$areanames{en}->{441733} = "Peterborough";
-$areanames{en}->{441736} = "Penzance";
-$areanames{en}->{441737} = "Redhill";
-$areanames{en}->{441738} = "Perth";
-$areanames{en}->{441740} = "Sedgefield";
-$areanames{en}->{441743} = "Shrewsbury";
-$areanames{en}->{441744} = "St\ Helens";
-$areanames{en}->{441745} = "Rhyl";
-$areanames{en}->{441746} = "Bridgnorth";
-$areanames{en}->{441747} = "Shaftesbury";
-$areanames{en}->{441748} = "Richmond";
-$areanames{en}->{441749} = "Shepton\ Mallet";
-$areanames{en}->{441750} = "Selkirk";
-$areanames{en}->{441751} = "Pickering";
-$areanames{en}->{441752} = "Plymouth";
-$areanames{en}->{441753} = "Slough";
-$areanames{en}->{441754} = "Skegness";
-$areanames{en}->{441756} = "Skipton";
-$areanames{en}->{441757} = "Selby";
-$areanames{en}->{441758} = "Pwllheli";
-$areanames{en}->{441759} = "Pocklington";
-$areanames{en}->{441760} = "Swaffham";
-$areanames{en}->{441761} = "Temple\ Cloud";
-$areanames{en}->{441763} = "Royston";
-$areanames{en}->{441764} = "Crieff";
-$areanames{en}->{441765} = "Ripon";
-$areanames{en}->{441766} = "Porthmadog";
-$areanames{en}->{441767} = "Sandy";
-$areanames{en}->{441768} = "Penrith";
-$areanames{en}->{4417683} = "Appleby";
-$areanames{en}->{4417684} = "Pooley\ Bridge";
-$areanames{en}->{4417687} = "Keswick";
-$areanames{en}->{441769} = "South\ Molton";
-$areanames{en}->{441770} = "Isle\ of\ Arran";
-$areanames{en}->{441771} = "Maud";
-$areanames{en}->{441772} = "Preston";
-$areanames{en}->{441773} = "Ripley";
-$areanames{en}->{441775} = "Spalding";
-$areanames{en}->{441776} = "Stranraer";
-$areanames{en}->{441777} = "Retford";
-$areanames{en}->{441778} = "Bourne";
-$areanames{en}->{441779} = "Peterhead";
-$areanames{en}->{441780} = "Stamford";
-$areanames{en}->{441782} = "Stoke\-on\-Trent";
-$areanames{en}->{441784} = "Staines";
-$areanames{en}->{441785} = "Stafford";
-$areanames{en}->{441786} = "Stirling";
-$areanames{en}->{441787} = "Sudbury";
-$areanames{en}->{441788} = "Rugby";
-$areanames{en}->{441789} = "Stratford\-upon\-Avon";
-$areanames{en}->{441790} = "Spilsby";
-$areanames{en}->{441792} = "Swansea";
-$areanames{en}->{441793} = "Swindon";
-$areanames{en}->{441794} = "Romsey";
-$areanames{en}->{441795} = "Sittingbourne";
-$areanames{en}->{441796} = "Pitlochry";
-$areanames{en}->{441797} = "Rye";
-$areanames{en}->{441798} = "Pulborough";
-$areanames{en}->{441799} = "Saffron\ Walden";
-$areanames{en}->{441803} = "Torquay";
-$areanames{en}->{441805} = "Torrington";
-$areanames{en}->{441806} = "Shetland";
-$areanames{en}->{441807} = "Ballindalloch";
-$areanames{en}->{441808} = "Tomatin";
-$areanames{en}->{441809} = "Tomdoun";
-$areanames{en}->{441821} = "Kinrossie";
-$areanames{en}->{441822} = "Tavistock";
-$areanames{en}->{441823} = "Taunton";
-$areanames{en}->{441824} = "Ruthin";
-$areanames{en}->{441825} = "Uckfield";
-$areanames{en}->{441827} = "Tamworth";
-$areanames{en}->{441828} = "Coupar\ Angus";
-$areanames{en}->{441829} = "Tarporley";
-$areanames{en}->{441830} = "Kirkwhelpington";
-$areanames{en}->{441832} = "Clopton";
-$areanames{en}->{441833} = "Barnard\ Castle";
-$areanames{en}->{441834} = "Narberth";
-$areanames{en}->{441835} = "St\ Boswells";
-$areanames{en}->{441837} = "Okehampton";
-$areanames{en}->{441838} = "Dalmally";
-$areanames{en}->{441840} = "Camelford";
-$areanames{en}->{441841} = "Newquay\ \(Padstow\)";
-$areanames{en}->{441842} = "Thetford";
-$areanames{en}->{441843} = "Thanet";
-$areanames{en}->{441844} = "Thame";
-$areanames{en}->{441845} = "Thirsk";
-$areanames{en}->{4418470} = "Thurso\/Tongue";
-$areanames{en}->{4418471} = "Thurso\/Tongue";
-$areanames{en}->{4418472} = "Thurso";
-$areanames{en}->{4418473} = "Thurso";
-$areanames{en}->{4418474} = "Thurso";
-$areanames{en}->{4418475} = "Thurso";
-$areanames{en}->{4418476} = "Tongue";
-$areanames{en}->{4418477} = "Tongue";
-$areanames{en}->{4418478} = "Thurso";
-$areanames{en}->{4418479} = "Tongue";
-$areanames{en}->{441848} = "Thornhill";
-$areanames{en}->{4418510} = "Great\ Bernera\/Stornoway";
-$areanames{en}->{4418511} = "Great\ Bernera\/Stornoway";
-$areanames{en}->{4418512} = "Stornoway";
-$areanames{en}->{4418513} = "Stornoway";
-$areanames{en}->{4418514} = "Great\ Bernera";
-$areanames{en}->{4418515} = "Stornoway";
-$areanames{en}->{4418516} = "Great\ Bernera";
-$areanames{en}->{4418517} = "Stornoway";
-$areanames{en}->{4418518} = "Stornoway";
-$areanames{en}->{4418519} = "Great\ Bernera";
-$areanames{en}->{441852} = "Kilmelford";
-$areanames{en}->{441854} = "Ullapool";
-$areanames{en}->{441855} = "Ballachulish";
-$areanames{en}->{441856} = "Orkney";
-$areanames{en}->{441857} = "Sanday";
-$areanames{en}->{441858} = "Market\ Harborough";
-$areanames{en}->{441859} = "Harris";
-$areanames{en}->{441862} = "Tain";
-$areanames{en}->{441863} = "Ardgay";
-$areanames{en}->{441864} = "Abington\ \(Crawford\)";
-$areanames{en}->{441865} = "Oxford";
-$areanames{en}->{441866} = "Kilchrenan";
-$areanames{en}->{441869} = "Bicester";
-$areanames{en}->{441870} = "Isle\ of\ Benbecula";
-$areanames{en}->{441871} = "Castlebay";
-$areanames{en}->{441872} = "Truro";
-$areanames{en}->{441873} = "Abergavenny";
-$areanames{en}->{441874} = "Brecon";
-$areanames{en}->{441875} = "Tranent";
-$areanames{en}->{441876} = "Lochmaddy";
-$areanames{en}->{441877} = "Callander";
-$areanames{en}->{441878} = "Lochboisdale";
-$areanames{en}->{441879} = "Scarinish";
-$areanames{en}->{441880} = "Tarbert";
-$areanames{en}->{441882} = "Kinloch\ Rannoch";
-$areanames{en}->{441883} = "Caterham";
-$areanames{en}->{441884} = "Tiverton";
-$areanames{en}->{441885} = "Pencombe";
-$areanames{en}->{441886} = "Bromyard\ \(Knightwick\/Leigh\ Sinton\)";
-$areanames{en}->{441887} = "Aberfeldy";
-$areanames{en}->{441888} = "Turriff";
-$areanames{en}->{441889} = "Rugeley";
-$areanames{en}->{4418900} = "Coldstream\/Ayton";
-$areanames{en}->{4418901} = "Coldstream\/Ayton";
-$areanames{en}->{4418902} = "Coldstream";
-$areanames{en}->{4418903} = "Coldstream";
-$areanames{en}->{4418904} = "Coldstream";
-$areanames{en}->{4418905} = "Ayton";
-$areanames{en}->{4418906} = "Ayton";
-$areanames{en}->{4418907} = "Ayton";
-$areanames{en}->{4418908} = "Coldstream";
-$areanames{en}->{4418909} = "Ayton";
-$areanames{en}->{441892} = "Tunbridge\ Wells";
-$areanames{en}->{441895} = "Uxbridge";
-$areanames{en}->{441896} = "Galashiels";
-$areanames{en}->{441899} = "Biggar";
-$areanames{en}->{441900} = "Workington";
-$areanames{en}->{441902} = "Wolverhampton";
-$areanames{en}->{441903} = "Worthing";
-$areanames{en}->{441904} = "York";
-$areanames{en}->{441905} = "Worcester";
-$areanames{en}->{441908} = "Milton\ Keynes";
-$areanames{en}->{441909} = "Worksop";
-$areanames{en}->{441910} = "Tyneside\/Durham\/Sunderland";
-$areanames{en}->{441911} = "Tyneside\/Durham\/Sunderland";
-$areanames{en}->{441912} = "Tyneside";
-$areanames{en}->{441913} = "Durham";
-$areanames{en}->{441914} = "Tyneside";
-$areanames{en}->{441915} = "Sunderland";
-$areanames{en}->{441916} = "Tyneside";
-$areanames{en}->{441917} = "Sunderland";
-$areanames{en}->{441918} = "Tyneside";
-$areanames{en}->{441919} = "Durham";
-$areanames{en}->{441920} = "Ware";
-$areanames{en}->{441922} = "Walsall";
-$areanames{en}->{441923} = "Watford";
-$areanames{en}->{441924} = "Wakefield";
-$areanames{en}->{441925} = "Warrington";
-$areanames{en}->{441926} = "Warwick";
-$areanames{en}->{441928} = "Runcorn";
-$areanames{en}->{441929} = "Wareham";
-$areanames{en}->{441931} = "Shap";
-$areanames{en}->{441932} = "Weybridge";
-$areanames{en}->{441933} = "Wellingborough";
-$areanames{en}->{441934} = "Weston\-super\-Mare";
-$areanames{en}->{441935} = "Yeovil";
-$areanames{en}->{441937} = "Wetherby";
-$areanames{en}->{441938} = "Welshpool";
-$areanames{en}->{441939} = "Wem";
-$areanames{en}->{441942} = "Wigan";
-$areanames{en}->{441943} = "Guiseley";
-$areanames{en}->{441944} = "West\ Heslerton";
-$areanames{en}->{441945} = "Wisbech";
-$areanames{en}->{441946} = "Whitehaven";
-$areanames{en}->{4419467} = "Gosforth";
-$areanames{en}->{441947} = "Whitby";
-$areanames{en}->{441948} = "Whitchurch";
-$areanames{en}->{441949} = "Whatton";
-$areanames{en}->{441950} = "Sandwick";
-$areanames{en}->{441951} = "Colonsay";
-$areanames{en}->{441952} = "Telford";
-$areanames{en}->{441953} = "Wymondham";
-$areanames{en}->{441954} = "Madingley";
-$areanames{en}->{441955} = "Wick";
-$areanames{en}->{441957} = "Mid\ Yell";
-$areanames{en}->{441959} = "Westerham";
-$areanames{en}->{441962} = "Winchester";
-$areanames{en}->{441963} = "Wincanton";
-$areanames{en}->{4419640} = "Hornsea\/Patrington";
-$areanames{en}->{4419641} = "Hornsea\/Patrington";
-$areanames{en}->{4419642} = "Hornsea";
-$areanames{en}->{4419643} = "Patrington";
-$areanames{en}->{4419644} = "Patrington";
-$areanames{en}->{4419645} = "Hornsea";
-$areanames{en}->{4419646} = "Patrington";
-$areanames{en}->{4419647} = "Patrington";
-$areanames{en}->{4419648} = "Hornsea";
-$areanames{en}->{4419649} = "Hornsea";
-$areanames{en}->{441967} = "Strontian";
-$areanames{en}->{441968} = "Penicuik";
-$areanames{en}->{441969} = "Leyburn";
-$areanames{en}->{441970} = "Aberystwyth";
-$areanames{en}->{441971} = "Scourie";
-$areanames{en}->{441972} = "Glenborrodale";
-$areanames{en}->{441974} = "Llanon";
-$areanames{en}->{4419750} = "Alford\ \(Aberdeen\)\/Strathdon";
-$areanames{en}->{4419751} = "Alford\ \(Aberdeen\)\/Strathdon";
-$areanames{en}->{4419752} = "Alford\ \(Aberdeen\)";
-$areanames{en}->{4419753} = "Strathdon";
-$areanames{en}->{4419754} = "Alford\ \(Aberdeen\)";
-$areanames{en}->{4419755} = "Alford\ \(Aberdeen\)";
-$areanames{en}->{4419756} = "Strathdon";
-$areanames{en}->{4419757} = "Strathdon";
-$areanames{en}->{4419758} = "Strathdon";
-$areanames{en}->{4419759} = "Alford\ \(Aberdeen\)";
-$areanames{en}->{441977} = "Pontefract";
-$areanames{en}->{441978} = "Wrexham";
-$areanames{en}->{441980} = "Amesbury";
-$areanames{en}->{441981} = "Wormbridge";
-$areanames{en}->{441982} = "Builth\ Wells";
-$areanames{en}->{441983} = "Isle\ of\ Wight";
-$areanames{en}->{441984} = "Watchet\ \(Williton\)";
-$areanames{en}->{441985} = "Warminster";
-$areanames{en}->{441986} = "Bungay";
-$areanames{en}->{441987} = "Ebbsfleet";
-$areanames{en}->{441988} = "Wigtown";
-$areanames{en}->{441989} = "Ross\-on\-Wye";
-$areanames{en}->{441992} = "Lea\ Valley";
-$areanames{en}->{441993} = "Witney";
-$areanames{en}->{441994} = "St\ Clears";
-$areanames{en}->{441995} = "Garstang";
-$areanames{en}->{441997} = "Strathpeffer";
-$areanames{en}->{4420} = "London";
-$areanames{en}->{442310} = "Portsmouth";
-$areanames{en}->{442311} = "Southampton";
-$areanames{en}->{44238} = "Southampton";
-$areanames{en}->{44239} = "Portsmouth";
-$areanames{en}->{44241} = "Coventry";
-$areanames{en}->{44247} = "Coventry";
-$areanames{en}->{44281} = "Northern\ Ireland";
-$areanames{en}->{442820} = "Ballycastle";
-$areanames{en}->{442821} = "Martinstown";
-$areanames{en}->{442825} = "Ballymena";
-$areanames{en}->{442827} = "Ballymoney";
-$areanames{en}->{442828} = "Larne";
-$areanames{en}->{442829} = "Kilrea";
-$areanames{en}->{442830} = "Newry";
-$areanames{en}->{442837} = "Armagh";
-$areanames{en}->{442838} = "Portadown";
-$areanames{en}->{442840} = "Banbridge";
-$areanames{en}->{442841} = "Rostrevor";
-$areanames{en}->{442842} = "Kircubbin";
-$areanames{en}->{442843} = "Newcastle\ \(Co\.\ Down\)";
-$areanames{en}->{442844} = "Downpatrick";
-$areanames{en}->{442866} = "Enniskillen";
-$areanames{en}->{442867} = "Lisnaskea";
-$areanames{en}->{442868} = "Kesh";
-$areanames{en}->{442870} = "Coleraine";
-$areanames{en}->{442871} = "Londonderry";
-$areanames{en}->{442877} = "Limavady";
-$areanames{en}->{442879} = "Magherafelt";
-$areanames{en}->{442880} = "Carrickmore";
-$areanames{en}->{442881} = "Newtownstewart";
-$areanames{en}->{442882} = "Omagh";
-$areanames{en}->{442885} = "Ballygawley";
-$areanames{en}->{442886} = "Cookstown";
-$areanames{en}->{442887} = "Dungannon";
-$areanames{en}->{442889} = "Fivemiletown";
-$areanames{en}->{442890} = "Belfast";
-$areanames{en}->{442891} = "Bangor\ \(Co\.\ Down\)";
-$areanames{en}->{442892} = "Lisburn";
-$areanames{en}->{442893} = "Ballyclare";
-$areanames{en}->{442894} = "Antrim";
-$areanames{en}->{442895} = "Belfast";
-$areanames{en}->{442896} = "Belfast";
-$areanames{en}->{442897} = "Saintfield";
-$areanames{en}->{442898} = "Belfast";
-$areanames{en}->{44291} = "Cardiff";
-$areanames{en}->{44292} = "Cardiff";
+$areanames{en} = {"442896", "Belfast",
+"441982", "Builth\ Wells",
+"441646", "Milford\ Haven",
+"441732", "Sevenoaks",
+"441845", "Thirsk",
+"441744", "St\ Helens",
+"441244", "Chester",
+"4418512", "Stornoway",
+"441392", "Exeter",
+"441349", "Dingwall",
+"441896", "Galashiels",
+"441592", "Kirkcaldy",
+"441549", "Lairg",
+"441695", "Skelmersdale",
+"441558", "Llandeilo",
+"4413396", "Ballater",
+"441905", "Worcester",
+"441210", "Birmingham",
+"441358", "Ellon",
+"4415396", "Sedbergh",
+"441420", "Alton",
+"441279", "Bishops\ Stortford",
+"441442", "Hemel\ Hempstead",
+"441499", "Inveraray",
+"441779", "Peterhead",
+"441859", "Harris",
+"441280", "Buckingham",
+"4413880", "Bishop\ Auckland\/Stanhope\ \(Eastgate\)",
+"441780", "Stamford",
+"4418470", "Thurso\/Tongue",
+"441924", "Wakefield",
+"441908", "Milton\ Keynes",
+"4414235", "Harrogate",
+"441555", "Lanark",
+"441461", "Gretna",
+"441673", "Market\ Rasen",
+"441652", "Brigg",
+"441355", "East\ Kilbride",
+"441997", "Strathpeffer",
+"441912", "Tyneside",
+"441456", "Glenurquhart",
+"441621", "Maldon",
+"441698", "Motherwell",
+"4414374", "Clynderwen\ \(Clunderwen\)",
+"441387", "Dumfries",
+"4419649", "Hornsea",
+"441833", "Barnard\ Castle",
+"441848", "Thornhill",
+"4414233", "Boroughbridge",
+"441474", "Gravesend",
+"441294", "Ardrossan",
+"441794", "Romsey",
+"4416973", "Wigton",
+"441458", "Glastonbury",
+"441895", "Uxbridge",
+"441239", "Cardigan",
+"4413391", "Aboyne\/Ballater",
+"441989", "Ross\-on\-Wye",
+"4418473", "Thurso",
+"4413398", "Aboyne",
+"442895", "Belfast",
+"441599", "Kyle",
+"441542", "Keith",
+"441334", "St\ Andrews",
+"441520", "Lochcarron",
+"441342", "East\ Grinstead",
+"441534", "Jersey",
+"441320", "Fort\ Augustus",
+"4414230", "Harrogate\/Boroughbridge",
+"441727", "St\ Albans",
+"4418902", "Coldstream",
+"441963", "Wincanton",
+"441227", "Canterbury",
+"4413885", "Stanhope\ \(Eastgate\)",
+"441772", "Preston",
+"441753", "Slough",
+"441449", "Stowmarket",
+"441492", "Colwyn\ Bay",
+"441253", "Blackpool",
+"4418475", "Thurso",
+"441556", "Castle\ Douglas",
+"441807", "Ballindalloch",
+"441356", "Brechin",
+"441873", "Abergavenny",
+"441852", "Kilmelford",
+"4419752", "Alford\ \(Aberdeen\)",
+"441659", "Sanquhar",
+"441487", "Warboys",
+"442898", "Belfast",
+"442821", "Martinstown",
+"441947", "Whitby",
+"441919", "Durham",
+"441633", "Newport",
+"441455", "Hinckley",
+"441561", "Laurencekirk",
+"4415079", "Alford\ \(Lincs\)",
+"4413397", "Ballater",
+"441361", "Duns",
+"441821", "Kinrossie",
+"441970", "Aberystwyth",
+"441856", "Orkney",
+"441373", "Frome",
+"4416865", "Newtown",
+"441352", "Mold",
+"441655", "Maybole",
+"441573", "Kelso",
+"441307", "Forfar",
+"441433", "Hathersage",
+"441743", "Shrewsbury",
+"441687", "Mallaig",
+"441243", "Chichester",
+"4416863", "Llanidloes",
+"4420", "London",
+"441738", "Perth",
+"441988", "Wigtown",
+"4418904", "Coldstream",
+"441598", "Lynton",
+"4412290", "Barrow\-in\-Furness\/Millom",
+"441700", "Rothesay",
+"441398", "Dulverton",
+"441915", "Sunderland",
+"441200", "Clitheroe",
+"442842", "Kircubbin",
+"441692", "North\ Walsham",
+"442820", "Ballycastle",
+"441595", "Lerwick\,\ Foula\ \&\ Fair\ Isle",
+"441918", "Tyneside",
+"441395", "Budleigh\ Salterton",
+"441346", "Fraserburgh",
+"441899", "Biggar",
+"441842", "Thetford",
+"441360", "Killearn",
+"4419754", "Alford\ \(Aberdeen\)",
+"441971", "Scourie",
+"441546", "Lochgilphead",
+"441235", "Abingdon",
+"4414303", "North\ Cave",
+"441985", "Warminster",
+"441560", "Moscow",
+"441834", "Narberth",
+"441767", "Sandy",
+"441923", "Watford",
+"441267", "Carmarthen",
+"441445", "Gairloch",
+"441276", "Camberley",
+"441496", "Port\ Ellen",
+"4414305", "North\ Cave",
+"441957", "Mid\ Yell",
+"441776", "Stranraer",
+"441902", "Wolverhampton",
+"441674", "Montrose",
+"441559", "Llandysul",
+"4414300", "North\ Cave\/Market\ Weighton",
+"441359", "Pakenham",
+"441211", "Birmingham",
+"4417683", "Appleby",
+"441754", "Skegness",
+"441278", "Bridgwater",
+"441855", "Ballachulish",
+"4418514", "Great\ Bernera",
+"441254", "Blackburn",
+"441778", "Bourne",
+"441656", "Bridgend",
+"441407", "Holyhead",
+"441452", "Gloucester",
+"441293", "Crawley",
+"441473", "Ipswich",
+"441661", "Prudhoe",
+"441916", "Tyneside",
+"441793", "Swindon",
+"442887", "Dungannon",
+"441348", "Fishguard",
+"441887", "Aberfeldy",
+"441548", "Kingsbridge",
+"441333", "Peat\ Inn\ \(Leven\ \(Fife\)\)",
+"441634", "Medway",
+"441236", "Coatbridge",
+"441545", "Llanarth",
+"4414349", "Bellingham",
+"4412295", "Barrow\-in\-Furness",
+"441736", "Penzance",
+"441642", "Middlesbrough",
+"441986", "Bungay",
+"441620", "North\ Berwick",
+"442892", "Lisburn",
+"44118", "Reading",
+"441892", "Tunbridge\ Wells",
+"441495", "Pontypool",
+"441858", "Market\ Harborough",
+"441275", "Clevedon",
+"4412293", "Millom",
+"441775", "Spalding",
+"441874", "Brecon",
+"441931", "Shap",
+"4414372", "Clynderwen\ \(Clunderwen\)",
+"441909", "Worksop",
+"4416860", "Newtown\/Llanidloes",
+"441460", "Chard",
+"441446", "Barry",
+"441832", "Clopton",
+"441467", "Inverurie",
+"441844", "Thame",
+"441745", "Rhyl",
+"441536", "Kettering",
+"441245", "Chelmsford",
+"4414302", "North\ Cave",
+"441476", "Grantham",
+"441296", "Aylesbury",
+"441639", "Neath",
+"441796", "Pitlochry",
+"441913", "Durham",
+"442844", "Downpatrick",
+"441694", "Church\ Stretton",
+"441904", "York",
+"441653", "Malton",
+"442879", "Magherafelt",
+"441672", "Marlborough",
+"441381", "Fortrose",
+"441575", "Kirriemuir",
+"441581", "New\ Luce",
+"441375", "Grays\ Thurrock",
+"4419647", "Patrington",
+"441879", "Scarinish",
+"44238", "Southampton",
+"441435", "Heathfield",
+"441928", "Runcorn",
+"44131", "Edinburgh",
+"441759", "Pocklington",
+"441880", "Tarbert",
+"441443", "Pontypridd",
+"441259", "Alloa",
+"441438", "Stevenage",
+"4416974", "Raughton\ Head",
+"44151", "Liverpool",
+"4419641", "Hornsea\/Patrington",
+"441925", "Warrington",
+"442880", "Carrickmore",
+"442311", "Southampton",
+"441554", "Llanelli",
+"4419648", "Hornsea",
+"441578", "Lauder",
+"441969", "Leyburn",
+"441354", "Chatteris",
+"44147984", "Carrbridge",
+"4418474", "Thurso",
+"441400", "Honington",
+"4415076", "Louth",
+"4416862", "Llanidloes",
+"441593", "Lybster",
+"441233", "Ashford\ \(Kent\)",
+"441733", "Peterborough",
+"441983", "Isle\ of\ Wight",
+"441748", "Richmond",
+"441248", "Bangor\ \(Gwynedd\)",
+"4414370", "Haverfordwest\/Clynderwen\ \(Clunderwen\)",
+"441295", "Banbury",
+"441475", "Greenock",
+"441795", "Sittingbourne",
+"441481", "Guernsey",
+"441950", "Sandwick",
+"4414375", "Clynderwen\ \(Clunderwen\)",
+"44147982", "Nethy\ Bridge",
+"441644", "New\ Galloway",
+"442894", "Antrim",
+"441335", "Ashbourne",
+"441746", "Bridgnorth",
+"441260", "Congleton",
+"441246", "Chesterfield",
+"441535", "Keighley",
+"441760", "Swaffham",
+"441567", "Killin",
+"4414373", "Clynderwen\ \(Clunderwen\)",
+"441436", "Helensburgh",
+"441827", "Tamworth",
+"4412292", "Barrow\-in\-Furness",
+"441367", "Faringdon",
+"4414234", "Boroughbridge",
+"4413399", "Ballater",
+"441576", "Lockerbie",
+"4415077", "Louth",
+"441872", "Truro",
+"4415242", "Hornby",
+"442827", "Ballymoney",
+"441376", "Braintree",
+"441207", "Consett",
+"441707", "Welwyn\ Garden\ City",
+"441252", "Aldershot",
+"4415071", "Louth\/Alford\ \(Lincs\)\/Spilsby\ \(Horncastle\)",
+"441493", "Great\ Yarmouth",
+"441273", "Brighton",
+"441752", "Plymouth",
+"441773", "Ripley",
+"4415078", "Alford\ \(Lincs\)",
+"441962", "Winchester",
+"441926", "Warwick",
+"441680", "Isle\ of\ Mull\ \-\ Craignure",
+"441543", "Cannock",
+"4419646", "Patrington",
+"441343", "Elgin",
+"44141", "Glasgow",
+"441538", "Ipstones",
+"441300", "Cerne\ Abbas",
+"441478", "Isle\ of\ Skye\ \-\ Portree",
+"441298", "Buxton",
+"441454", "Chipping\ Sodbury",
+"441798", "Pulborough",
+"44241", "Coventry",
+"441721", "Peebles",
+"441977", "Pontefract",
+"441756", "Skipton",
+"441256", "Basingstoke",
+"44116", "Leicester",
+"441654", "Machynlleth",
+"441903", "Worthing",
+"441678", "Bala",
+"441922", "Walsall",
+"44161", "Manchester",
+"441843", "Thanet",
+"441480", "Huntingdon",
+"441951", "Colonsay",
+"4412294", "Barrow\-in\-Furness",
+"441838", "Dalmally",
+"4414232", "Harrogate",
+"441261", "Banff",
+"442843", "Newcastle\ \(Co\.\ Down\)",
+"441761", "Temple\ Cloud",
+"442838", "Portadown",
+"441914", "Tyneside",
+"4418900", "Coldstream\/Ayton",
+"4417684", "Pooley\ Bridge",
+"441594", "Lydney",
+"4419750", "Alford\ \(Aberdeen\)\/Strathdon",
+"44147985", "Dulnain\ Bridge",
+"441394", "Felixstowe",
+"441539", "Kendal",
+"441501", "Harthill",
+"441479", "Grantown\-on\-Spey",
+"441242", "Cheltenham",
+"441299", "Bewdley",
+"441720", "Isles\ of\ Scilly",
+"441636", "Newark\-on\-Trent",
+"441799", "Saffron\ Walden",
+"441301", "Arrochar",
+"441234", "Bedford",
+"441984", "Watchet\ \(Williton\)",
+"441835", "St\ Boswells",
+"4414346", "Hexham",
+"4418513", "Stornoway",
+"441327", "Daventry",
+"441432", "Hereford",
+"441527", "Redditch",
+"441444", "Haywards\ Heath",
+"441353", "Ely",
+"4418515", "Stornoway",
+"441372", "Esher",
+"441681", "Isle\ of\ Mull\ \-\ Fionnphort",
+"441876", "Lochmaddy",
+"442867", "Lisnaskea",
+"441553", "Kings\ Lynn",
+"441572", "Oakham",
+"441675", "Coleshill",
+"4418510", "Great\ Bernera\/Stornoway",
+"441580", "Cranbrook",
+"4414347", "Hexham",
+"441380", "Devizes",
+"4414304", "North\ Cave",
+"441854", "Ullapool",
+"441255", "Clacton\-on\-Sea",
+"441878", "Lochboisdale",
+"4419753", "Strathdon",
+"441929", "Wareham",
+"44281", "Northern\ Ireland",
+"441600", "Monmouth",
+"441638", "Newmarket",
+"4419755", "Alford\ \(Aberdeen\)",
+"441787", "Sudbury",
+"442893", "Ballyclare",
+"441937", "Wetherby",
+"441643", "Minehead",
+"441287", "Guisborough",
+"441344", "Bracknell",
+"441635", "Newbury",
+"441332", "Derby",
+"441544", "Kington",
+"441427", "Gainsborough",
+"4418905", "Ayton",
+"4413882", "Stanhope\ \(Eastgate\)",
+"441792", "Swansea",
+"441749", "Shepton\ Mallet",
+"441292", "Ayr",
+"441249", "Chippenham",
+"441217", "Birmingham",
+"4418472", "Thurso",
+"441472", "Grimsby",
+"441453", "Dursley",
+"441274", "Bradford",
+"4418903", "Coldstream",
+"441494", "High\ Wycombe",
+"441758", "Pwllheli",
+"441875", "Tranent",
+"4416864", "Llanidloes",
+"441258", "Blandford",
+"441439", "Helmsley",
+"4412180", "Birmingham",
+"4414348", "Hexham",
+"441676", "Meriden",
+"4414341", "Bellingham\/Haltwhistle\/Hexham",
+"441579", "Liskeard",
+"441968", "Penicuik",
+"442310", "Portsmouth",
+"442881", "Newtownstewart",
+"441667", "Nairn",
+"441379", "Diss",
+"441202", "Bournemouth",
+"441702", "Southend\-on\-Sea",
+"441341", "Barmouth",
+"441257", "Coppull",
+"441757", "Selby",
+"44117", "Bristol",
+"441668", "Bamburgh",
+"441967", "Strontian",
+"441223", "Cambridge",
+"4414236", "Harrogate",
+"441723", "Scarborough",
+"441285", "Cirencester",
+"441428", "Haslemere",
+"441884", "Tiverton",
+"441935", "Yeovil",
+"441785", "Stafford",
+"4418477", "Tongue",
+"441491", "Henley\-on\-Thames",
+"441271", "Barnstaple",
+"441771", "Maud",
+"441550", "Llandovery",
+"441350", "Dunkeld",
+"441404", "Honiton",
+"441900", "Workington",
+"4418478", "Thurso",
+"4413393", "Aboyne",
+"441215", "Birmingham",
+"441469", "Killingholme",
+"4419644", "Patrington",
+"4413881", "Bishop\ Auckland\/Stanhope\ \(Eastgate\)",
+"441288", "Bude",
+"441425", "Ringwood",
+"4419467", "Gosforth",
+"441788", "Rugby",
+"4414379", "Haverfordwest",
+"441938", "Welshpool",
+"4418471", "Thurso\/Tongue",
+"441943", "Guiseley",
+"441637", "Newquay",
+"441562", "Kidderminster",
+"441526", "Martin",
+"441665", "Alnwick",
+"4415395", "Grange\-over\-Sands",
+"441362", "Dereham",
+"441483", "Guildford",
+"441840", "Camelford",
+"441822", "Tavistock",
+"442877", "Limavady",
+"441326", "Falmouth",
+"4413395", "Aboyne",
+"441866", "Kilchrenan",
+"4414342", "Bellingham",
+"441803", "Torquay",
+"441877", "Callander",
+"442866", "Enniskillen",
+"441629", "Matlock",
+"442840", "Banbridge",
+"441690", "Betws\-y\-Coed",
+"441528", "Laggan",
+"441709", "Rotherham",
+"441328", "Fakenham",
+"441209", "Redruth",
+"441591", "Llanwrtyd\ Wells",
+"441304", "Dover",
+"44239", "Portsmouth",
+"441450", "Hawick",
+"441981", "Wormbridge",
+"442868", "Kesh",
+"4413390", "Aboyne\/Ballater",
+"44113", "Leeds",
+"4414238", "Harrogate",
+"441286", "Caernarfon",
+"4414231", "Harrogate\/Boroughbridge",
+"441786", "Stirling",
+"441684", "Malvern",
+"441651", "Oldmeldrum",
+"441837", "Okehampton",
+"441383", "Dunfermline",
+"441462", "Hitchin",
+"4414237", "Harrogate",
+"4415074", "Alford\ \(Lincs\)",
+"441583", "Carradale",
+"441216", "Birmingham",
+"441993", "Witney",
+"442837", "Armagh",
+"441677", "Bedale",
+"441829", "Tarporley",
+"44291", "Cardiff",
+"441369", "Dunoon",
+"441954", "Madingley",
+"441603", "Norwich",
+"441978", "Wrexham",
+"441569", "Stonehaven",
+"4418476", "Tongue",
+"442829", "Kilrea",
+"442890", "Belfast",
+"441622", "Maidstone",
+"441911", "Tyneside\/Durham\/Sunderland",
+"441525", "Leighton\ Buzzard",
+"441666", "Malmesbury",
+"441264", "Andover",
+"441865", "Oxford",
+"441325", "Darlington",
+"441764", "Crieff",
+"441466", "Huntly",
+"441337", "Ladybank",
+"441422", "Halifax",
+"441440", "Haverhill",
+"441883", "Caterham",
+"441403", "Horsham",
+"4418909", "Ayton",
+"441797", "Rye",
+"441297", "Axminster",
+"441212", "Birmingham",
+"441477", "Holmes\ Chapel",
+"442825", "Ballymena",
+"441529", "Sleaford",
+"441590", "Lymington",
+"441708", "Romford",
+"4412291", "Barrow\-in\-Furness\/Millom",
+"441208", "Bodmin",
+"441329", "Fareham",
+"441869", "Bicester",
+"441224", "Aberdeen",
+"441724", "Scunthorpe",
+"4412298", "Barrow\-in\-Furness",
+"441825", "Uckfield",
+"4414306", "Market\ Weighton",
+"441980", "Amesbury",
+"441626", "Newton\ Abbot",
+"441451", "Stow\-on\-the\-Wold",
+"441565", "Knutsford",
+"4417687", "Keswick",
+"441730", "Petersfield",
+"441484", "Huddersfield",
+"441828", "Coupar\ Angus",
+"441368", "Dunbar",
+"4416866", "Newtown",
+"4415072", "Spilsby\ \(Horncastle\)",
+"441568", "Leominster",
+"442828", "Larne",
+"4412297", "Millom",
+"441641", "Strathy",
+"442891", "Bangor\ \(Co\.\ Down\)",
+"441910", "Tyneside\/Durham\/Sunderland",
+"441205", "Boston",
+"441650", "Cemmaes\ Road",
+"4419759", "Alford\ \(Aberdeen\)",
+"441944", "West\ Heslerton",
+"441932", "Weybridge",
+"441782", "Stoke\-on\-Trent",
+"441282", "Burnley",
+"441270", "Crewe",
+"441490", "Corwen",
+"441429", "Hartlepool",
+"441770", "Isle\ of\ Arran",
+"4412296", "Barrow\-in\-Furness",
+"4414308", "Market\ Weighton",
+"4414301", "North\ Cave\/Market\ Weighton",
+"441747", "Shaftesbury",
+"441683", "Moffat",
+"44147986", "Cairngorm",
+"441465", "Girvan",
+"4416867", "Llanidloes",
+"441862", "Tain",
+"441340", "Craigellachie\ \(Aberlour\)",
+"441322", "Dartford",
+"441366", "Downham\ Market",
+"4418519", "Great\ Bernera",
+"441540", "Kingussie",
+"441522", "Lincoln",
+"441625", "Macclesfield",
+"441566", "Launceston",
+"441377", "Driffield",
+"441503", "Looe",
+"441669", "Rothbury",
+"441577", "Kinross",
+"441303", "Folkestone",
+"441841", "Newquay\ \(Padstow\)",
+"441604", "Northampton",
+"441953", "Wymondham",
+"441972", "Glenborrodale",
+"441706", "Rochdale",
+"441206", "Colchester",
+"4419642", "Hornsea",
+"441263", "Cromer",
+"44147981", "Aviemore",
+"442841", "Rostrevor",
+"441763", "Royston",
+"441691", "Oswestry",
+"441628", "Maidenhead",
+"4416861", "Newtown\/Llanidloes",
+"441584", "Ludlow",
+"4414307", "Market\ Weighton",
+"441384", "Dudley",
+"441289", "Berwick\-upon\-Tweed",
+"4414344", "Bellingham",
+"441789", "Stratford\-upon\-Avon",
+"441939", "Wem",
+"4416868", "Newtown",
+"441994", "St\ Clears",
+"4415073", "Louth",
+"441306", "Dorking",
+"441506", "Bathgate",
+"441631", "Oban",
+"441857", "Sanday",
+"441609", "Northallerton",
+"4414377", "Haverfordwest",
+"441563", "Kilmarnock",
+"441823", "Taunton",
+"441482", "Kingston\-upon\-Hull",
+"441363", "Crediton",
+"441284", "Bury\ St\ Edmunds",
+"441934", "Weston\-super\-Mare",
+"441885", "Pencombe",
+"441784", "Staines",
+"441942", "Wigan",
+"4415075", "Spilsby\ \(Horncastle\)",
+"441871", "Castlebay",
+"441920", "Ware",
+"442885", "Ballygawley",
+"442871", "Londonderry",
+"441389", "Dumbarton",
+"441405", "Goole",
+"441214", "Birmingham",
+"441570", "Lampeter",
+"441408", "Golspie",
+"441424", "Hastings",
+"441888", "Turriff",
+"441547", "Knighton",
+"441751", "Pickering",
+"4419640", "Hornsea\/Patrington",
+"441347", "Easingwold",
+"441664", "Melton\ Mowbray",
+"4418479", "Tongue",
+"44115", "Nottingham",
+"441722", "Salisbury",
+"441740", "Sedgefield",
+"4414371", "Haverfordwest\/Clynderwen\ \(Clunderwen\)",
+"441766", "Porthmadog",
+"4414378", "Haverfordwest",
+"441777", "Retford",
+"441497", "Hay\-on\-Wye",
+"441277", "Brentwood",
+"4419643", "Patrington",
+"441623", "Mansfield",
+"4415394", "Hawkshead",
+"4414239", "Boroughbridge",
+"441268", "Basildon",
+"441809", "Tomdoun",
+"441768", "Penrith",
+"4413394", "Ballater",
+"441489", "Bishops\ Waltham",
+"441305", "Dorchester",
+"441505", "Johnstone",
+"441974", "Llanon",
+"442886", "Cookstown",
+"441949", "Whatton",
+"441992", "Lea\ Valley",
+"441917", "Sunderland",
+"4419645", "Hornsea",
+"441406", "Holbeach",
+"441382", "Dundee",
+"441463", "Inverness",
+"441886", "Bromyard\ \(Knightwick\/Leigh\ Sinton\)",
+"441671", "Newton\ Stewart",
+"441582", "Luton",
+"441685", "Merthyr\ Tydfil",
+"441737", "Redhill",
+"441987", "Ebbsfleet",
+"4414376", "Haverfordwest",
+"441237", "Bideford",
+"441688", "Isle\ of\ Mull\ \-\ Tobermory",
+"441397", "Fort\ William",
+"441597", "Llandrindod\ Wells",
+"4415070", "Louth\/Alford\ \(Lincs\)\/Spilsby\ \(Horncastle\)",
+"441470", "Isle\ of\ Skye\ \-\ Edinbane",
+"441290", "Cumnock",
+"441308", "Bridport",
+"441790", "Spilsby",
+"441729", "Settle",
+"441508", "Brooke",
+"441955", "Wick",
+"441330", "Banchory",
+"441524", "Lancaster",
+"441864", "Abington\ \(Crawford\)",
+"441530", "Coalville",
+"441324", "Falkirk",
+"441765", "Ripon",
+"441948", "Whitchurch",
+"441283", "Burton\-on\-Trent",
+"4413392", "Aboyne",
+"442897", "Saintfield",
+"441933", "Wellingborough",
+"441647", "Moretonhampstead",
+"4412299", "Millom",
+"4414345", "Haltwhistle",
+"441670", "Morpeth",
+"4418901", "Coldstream\/Ayton",
+"441269", "Ammanford",
+"442830", "Newry",
+"441808", "Tomatin",
+"441769", "South\ Molton",
+"4419757", "Strathdon",
+"4418908", "Coldstream",
+"441225", "Bath",
+"441488", "Hungerford",
+"441364", "Ashburton",
+"441725", "Rockbourne",
+"441824", "Ruthin",
+"441959", "Westerham",
+"4414343", "Haltwhistle",
+"4418516", "Great\ Bernera",
+"441830", "Kirkwhelpington",
+"441564", "Lapworth",
+"441228", "Carlisle",
+"441485", "Hunstanton",
+"441309", "Forres",
+"441728", "Saxmundham",
+"441291", "Chepstow",
+"4419758", "Strathdon",
+"441471", "Isle\ of\ Skye\ \-\ Broadford",
+"441509", "Loughborough",
+"441663", "New\ Mills",
+"4419751", "Alford\ \(Aberdeen\)\/Strathdon",
+"441606", "Northwich",
+"441531", "Ledbury",
+"4418907", "Ayton",
+"441805", "Torrington",
+"44247", "Coventry",
+"441704", "Southport",
+"441204", "Bolton",
+"441213", "Birmingham",
+"441457", "Glossop",
+"442882", "Omagh",
+"441689", "Orpington",
+"441945", "Wisbech",
+"4413873", "Langholm",
+"441586", "Campbeltown",
+"441882", "Kinloch\ Rannoch",
+"441386", "Evesham",
+"4418906", "Ayton",
+"441697", "Brampton",
+"441870", "Isle\ of\ Benbecula",
+"4418518", "Stornoway",
+"442870", "Coleraine",
+"4418511", "Great\ Bernera\/Stornoway",
+"44292", "Cardiff",
+"441588", "Bishops\ Castle",
+"441464", "Insch",
+"441388", "Bishop\ Auckland",
+"441226", "Barnsley",
+"441630", "Market\ Drayton",
+"441726", "St\ Austell",
+"441262", "Bridlington",
+"4414309", "Market\ Weighton",
+"441624", "Isle\ of\ Man",
+"441608", "Chipping\ Norton",
+"441952", "Telford",
+"441502", "Lowestoft",
+"441357", "Strathaven",
+"441241", "Arbroath",
+"44147983", "Boat\ of\ Garten",
+"441806", "Shetland",
+"441302", "Doncaster",
+"441557", "Kirkcudbright",
+"441323", "Eastbourne",
+"441863", "Ardgay",
+"4416869", "Newtown",
+"442889", "Fivemiletown",
+"4414340", "Bellingham\/Haltwhistle\/Hexham",
+"441946", "Whitehaven",
+"441371", "Great\ Dunmow",
+"4418517", "Stornoway",
+"441409", "Holsworthy",
+"441571", "Lochinver",
+"441750", "Selkirk",
+"441431", "Helmsdale",
+"441250", "Blairgowrie",
+"441889", "Rugeley",
+"4419756", "Strathdon",
+"44114", "Sheffield",
+"441995", "Garstang",};
 
     sub new {
       my $class = shift;
