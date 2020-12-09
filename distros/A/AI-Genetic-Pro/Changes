@@ -1,5 +1,8 @@
 Revision history for Perl extension AI::Genetic::Pro.
 
+1.005 Tue, 08 Dec 2020 21:32:15 +0100
+	- Fixed some bugs in a documentation.
+
 1.004 Sun, 15 Nov 2020 14:18:24 +0100
 	- Added specification of required MCE version.
 

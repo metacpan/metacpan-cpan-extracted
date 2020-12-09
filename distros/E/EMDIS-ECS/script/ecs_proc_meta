@@ -1,12 +1,12 @@
 #!/usr/bin/perl -w
 #
-# Copyright (C) 2002-2016 National Marrow Donor Program. All rights reserved.
+# Copyright (C) 2002-2020 National Marrow Donor Program. All rights reserved.
 #
 # For a description of this program, please refer to the POD documentation
 # embedded at the bottom of the file (e.g. perldoc ecs_proc_meta).
 
 use EMDIS::ECS qw($ECS_CFG $ECS_NODE_TBL load_ecs_config log_info
-           move_to_dir format_msg_filename send_ecsmsg_email send_admin_email);
+           move_to_dir format_doc_filename format_msg_filename send_admin_email);
 use EMDIS::ECS::FileBackedMessage;
 use EMDIS::ECS::Message;
 use Getopt::Long;
@@ -80,7 +80,7 @@ if($message_content =~ /msg_type\s*=\s*(\S+)/i) {
 }
 
 # READY
-if($msg_type =~ /READY/i)
+if($msg_type =~ /^READY/i)
 {
     $ECS_NODE_TBL->lock()     # lock node_tbl
         or die "ecs_proc_meta: unable to lock node_tbl: " .
@@ -103,7 +103,7 @@ if($msg_type =~ /READY/i)
 }
 
 # RE_SEND
-if($msg_type =~ /RE_SEND/i)
+if($msg_type =~ /^RE_SEND/i)
 {
     # get seq_num (and part_num, if specified)
     my $seq_num = '';
@@ -157,13 +157,13 @@ if($msg_type =~ /RE_SEND/i)
     die "ecs_proc_meta: found unexpected seq_num " . $msg->seq_num .
         ", expected $seq_num\n"
         unless $msg->seq_num == $seq_num;
-    $err = $msg->send_via_email($sender, 1, $part_num);
+    $err = $msg->send_this_message($sender, 1, $part_num);
 
     if ($err){
       send_admin_email("An error occurred while trying to resend ecs msg!" , 
                        " Email from $sender with sequence number $seq_num " ,
                        ($part_num ? "(part_num $part_num) " : '') .
-                       "could not be resend." );
+                       "could not be resent." );
       die "ecs_proc_meta: error sending email: $err\n"
     }
     unlink $filename;   # remove input file after successful processing
@@ -172,8 +172,70 @@ if($msg_type =~ /RE_SEND/i)
     exit 0;  # successful
 }
 
+# DOC_RE_SEND
+if($msg_type =~ /^DOC_RE_SEND/i)
+{
+    # get seq_num
+    my $seq_num = '';
+    if($message_content =~ /seq_num\s*=\s*(\d+)/i)
+    {
+        $seq_num = $1;
+    }
+    else
+    {
+        die "ecs_proc_meta: seq_num not specified in DOC_RE_SEND message: " .
+            "$filename\n";
+    }
+    # look up email address of sender
+    $ECS_NODE_TBL->lock()     # lock node_tbl
+        or die "ecs_proc_meta: unable to lock node_tbl: " .
+            $ECS_NODE_TBL->ERROR . "\n";
+    $node = $ECS_NODE_TBL->read($sender);
+    if($node)
+    {
+        $node->{last_in} = time;
+        $ECS_NODE_TBL->write($sender, $node);
+    }
+    $ECS_NODE_TBL->unlock();  # unlock node_tbl
+    if(not $node)
+    {
+        $err = move_to_dir($filename, $ECS_CFG->ECS_MBX_TRASH_DIR);
+        warn "ecs_proc_meta: $err\n" if $err;
+        die "ecs_proc_meta: node not found: $sender\n";
+    }
+    # check whether $seq_num > $node->{doc_out_seq}
+    if($seq_num > $node->{doc_out_seq})
+    {
+        die "ecs_proc_meta: node requested DOC_RE_SEND of unsent document " .
+            "($sender,$seq_num)\n";
+    }
+    # look in out_box for requested message
+    my $doc_filename = format_doc_filename($sender,$seq_num);
+    die "ecs_proc_meta: requested document file not found: $doc_filename\n"
+        unless -e $doc_filename;
+    # resend the message
+    my $msg = new EMDIS::ECS::FileBackedMessage($doc_filename);
+    die "ecs_proc_meta: unable to load document from file $doc_filename: " .
+        "$msg\n"
+        unless ref $msg;
+    die "ecs_proc_meta: found unexpected seq_num " . $msg->seq_num .
+        ", expected $seq_num\n"
+        unless $msg->seq_num == $seq_num;
+    $err = $msg->send_this_message($sender, 1, '');
+
+    if ($err){
+      send_admin_email("An error occurred while trying to resend ecs document!" , 
+                       " Email from $sender with sequence number $seq_num " ,
+                       "could not be resent." );
+      die "ecs_proc_meta: error sending email: $err\n"
+    }
+    unlink $filename;   # remove input file after successful processing
+    log_info("\nFinished processing $sender DOC_RE_SEND request $seq_num\n");
+    exit 0;  # successful
+}
+
 # MSG_ACK
-if($msg_type =~ /MSG_ACK/i)
+if($msg_type =~ /^MSG_ACK/i)
 {
     my $ack_seq = '';
     if($message_content =~ /seq_num\s*=\s*(\d+)/i)
@@ -191,7 +253,7 @@ if($msg_type =~ /MSG_ACK/i)
     $node = $ECS_NODE_TBL->read($sender);
     if($node)
     {
-        if($node->{ack_seq} < $ack_seq and $ack_seq <= $node->{out_seq})
+        if((not $node->{ack_seq}) or $node->{ack_seq} < $ack_seq and $ack_seq <= $node->{out_seq})
         {
             $node->{ack_seq} = $ack_seq;
         }
@@ -208,6 +270,48 @@ if($msg_type =~ /MSG_ACK/i)
     if($ack_seq > $node->{out_seq})
     {
         die "ecs_proc_meta: node acknowledged unsent message " .
+            "($sender,$ack_seq)\n";
+    }
+    unlink $filename;   # remove input file after successful processing
+    exit 0;  # successful
+}
+
+# DOC_MSG_ACK
+if($msg_type =~ /^DOC_MSG_ACK/i)
+{
+    my $ack_seq = '';
+    if($message_content =~ /seq_num\s*=\s*(\d+)/i)
+    {
+        $ack_seq = $1;
+    }
+    else
+    {
+        die "ecs_proc_meta: seq_num not specified in DOC_MSG_ACK message: " .
+            "$filename\n";
+    }
+    $ECS_NODE_TBL->lock()     # lock node_tbl
+        or die "ecs_proc_meta: unable to lock node_tbl: " .
+            $ECS_NODE_TBL->ERROR . "\n";
+    $node = $ECS_NODE_TBL->read($sender);
+    if($node)
+    {
+        if((not $node->{doc_ack_seq}) or $node->{doc_ack_seq} < $ack_seq and $ack_seq <= $node->{doc_out_seq})
+        {
+            $node->{doc_ack_seq} = $ack_seq;
+        }
+        $node->{last_in} = time;
+        $ECS_NODE_TBL->write($sender, $node);
+    }
+    $ECS_NODE_TBL->unlock();  # unlock node_tbl
+    if(not $node)
+    {
+        $err = move_to_dir($filename, $ECS_CFG->ECS_MBX_TRASH_DIR);
+        warn "ecs_proc_meta: $err\n" if $err;
+        die "ecs_proc_meta: node not found: $sender\n";
+    }
+    if($ack_seq > $node->{doc_out_seq})
+    {
+        die "ecs_proc_meta: node acknowledged unsent document " .
             "($sender,$ack_seq)\n";
     }
     unlink $filename;   # remove input file after successful processing
@@ -256,7 +360,7 @@ THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
 WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF 
 MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
 
-Copyright (C) 2002-2016 National Marrow Donor Program. All rights reserved.
+Copyright (C) 2002-2020 National Marrow Donor Program. All rights reserved.
 
 See LICENSE file for license details.
 

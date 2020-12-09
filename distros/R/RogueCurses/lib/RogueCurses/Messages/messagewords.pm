@@ -24,6 +24,8 @@ sub gen_dungeon_nouns {
 	%db[0] = ('candle', $score);
 	%db[1] = ('wall', $score);
 	%db[2] = ('chest', $score);
+	%db[3] = ('stone', $score);
+	%db[4] = ('torch', $score);
 
 	return %db;
 }
@@ -33,6 +35,9 @@ sub gen_dungeon_verbs {
 	my %db = {};
 
 	my $score = -1;
+
+	%db[0] = ('crawl', $score);
+	%db[1] = ('wander', $score);
 
 	return %db;
 }
@@ -79,6 +84,10 @@ sub gen_creatures_nouns {
 	%db[5] = ('newt', $score);
 	%db[5] = ('troll', $score);
 	%db[6] = ('mongbat', $score);
+	%db[7] = ('man', $score);
+	%db[8] = ('woman', $score);
+	%db[9] = ('elf', $score);
+	%db[10] = ('dwarf', $score);
 
 	return %db;
 }

@@ -1,3 +1,9 @@
+0.042   2020-12-09  Released-By: PERLANCAR; Urgency: medium
+
+	- Now defaults to github as bugtracker, as rt.cpan.org is going
+	  away in mar 2021.
+
+
 0.041   2020-10-27  Released-By: PERLANCAR; Urgency: medium
 
 	- Fix regex to extract github username and repo name.

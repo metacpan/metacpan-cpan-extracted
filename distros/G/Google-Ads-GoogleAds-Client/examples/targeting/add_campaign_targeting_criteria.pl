@@ -75,13 +75,13 @@ sub add_campaign_targeting_criteria {
     create_proximity_campaign_criterion_operation($campaign_resource_name)];
 
   # Add the campaign criterion.
-  my $campaign_criterion_response =
+  my $campaign_criteria_response =
     $api_client->CampaignCriterionService()->mutate({
       customerId => $customer_id,
       operations => $operations
     });
 
-  my $campaign_criterion_results = $campaign_criterion_response->{results};
+  my $campaign_criterion_results = $campaign_criteria_response->{results};
   printf "Added %d campaign criteria:\n", scalar @$campaign_criterion_results;
 
   foreach my $campaign_criterion_result (@$campaign_criterion_results) {
@@ -119,6 +119,7 @@ sub create_negative_keyword_campaign_criterion_operation {
 }
 
 # Creates a campaign criterion operation using the specified location ID.
+# [START add_campaign_targeting_criteria]
 sub create_location_campaign_criterion_operation {
   my ($location_id, $campaign_resource_name) = @_;
 
@@ -145,9 +146,11 @@ sub create_location_campaign_criterion_operation {
       create => $campaign_criterion
     });
 }
+# [END add_campaign_targeting_criteria]
 
 # Creates a campaign criterion operation for the area around a specific
 # address (proximity).
+# [START add_campaign_targeting_criteria_1]
 sub create_proximity_campaign_criterion_operation {
   my ($campaign_resource_name) = @_;
 
@@ -176,6 +179,7 @@ sub create_proximity_campaign_criterion_operation {
       create => $campaign_criterion
     });
 }
+# [END add_campaign_targeting_criteria_1]
 
 # Don't run the example if the file is being included.
 if (abs_path($0) ne abs_path(__FILE__)) {

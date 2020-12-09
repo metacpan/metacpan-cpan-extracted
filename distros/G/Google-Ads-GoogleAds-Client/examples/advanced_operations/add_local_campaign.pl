@@ -105,6 +105,7 @@ sub add_local_campaign {
 }
 
 # Creates a campaign budget.
+# [START add_local_campaign]
 sub create_campaign_budget {
   my ($api_client, $customer_id) = @_;
 
@@ -126,19 +127,21 @@ sub create_campaign_budget {
     });
 
   # Issue a mutate request to add the campaign budget.
-  my $campaign_budget_response = $api_client->CampaignBudgetService()->mutate({
+  my $campaign_budgets_response = $api_client->CampaignBudgetService()->mutate({
       customerId => $customer_id,
       operations => [$campaign_budget_operation]});
 
   my $campaign_budget_resource_name =
-    $campaign_budget_response->{results}[0]{resourceName};
+    $campaign_budgets_response->{results}[0]{resourceName};
   printf "Created campaign budget with resource name: '%s'.\n",
     $campaign_budget_resource_name;
 
   return $campaign_budget_resource_name;
 }
+# [END add_local_campaign]
 
 # Creates a Local campaign.
+# [START add_local_campaign_1]
 sub create_campaign {
   my ($api_client, $customer_id, $budget_resource_name) = @_;
 
@@ -188,19 +191,21 @@ sub create_campaign {
     });
 
   # Issue a mutate request to add the campaign.
-  my $campaign_response = $api_client->CampaignService()->mutate({
+  my $campaigns_response = $api_client->CampaignService()->mutate({
       customerId => $customer_id,
       operations => [$campaign_operation]});
 
   my $campaign_resource_name =
-    $campaign_response->{results}[0]{resourceName};
+    $campaigns_response->{results}[0]{resourceName};
   printf "Created Local campaign with resource name: '%s'.\n",
     $campaign_resource_name;
 
   return $campaign_resource_name;
 }
+# [END add_local_campaign_1]
 
 # Creates an ad group for a given campaign.
+# [START add_local_campaign_2]
 sub create_ad_group {
   my ($api_client, $customer_id, $campaign_resource_name) = @_;
 
@@ -221,19 +226,21 @@ sub create_ad_group {
     new({create => $ad_group});
 
   # Issue a mutate request to add the ad group.
-  my $ad_group_response = $api_client->AdGroupService()->mutate({
+  my $ad_groups_response = $api_client->AdGroupService()->mutate({
       customerId => $customer_id,
       operations => [$ad_group_operation]});
 
   my $ad_group_resource_name =
-    $ad_group_response->{results}[0]{resourceName};
+    $ad_groups_response->{results}[0]{resourceName};
   printf "Created ad group with resource name: '%s'.\n",
     $ad_group_resource_name;
 
   return $ad_group_resource_name;
 }
+# [END add_local_campaign_2]
 
 # Creates an Local ad for a given ad group.
+# [START add_local_campaign_3]
 sub create_local_ad {
   my ($api_client, $customer_id, $ad_group_resource_name) = @_;
 
@@ -284,13 +291,14 @@ sub create_local_ad {
     ->new({create => $ad_group_ad});
 
   # Issue a mutate request to add the ad group ad.
-  my $ad_group_ad_response = $api_client->AdGroupAdService()->mutate({
+  my $ad_group_ads_response = $api_client->AdGroupAdService()->mutate({
       customerId => $customer_id,
       operations => [$ad_group_ad_operation]});
 
   printf "Created ad group ad with resource name: '%s'.\n",
-    $ad_group_ad_response->{results}[0]{resourceName};
+    $ad_group_ads_response->{results}[0]{resourceName};
 }
+# [END add_local_campaign_3]
 
 # Creates an ad text asset.
 sub create_ad_text_asset {
@@ -302,6 +310,7 @@ sub create_ad_text_asset {
 }
 
 # Creates an image asset.
+# [START add_local_campaign_4]
 sub create_image_asset {
   my ($api_client, $customer_id, $image_url, $image_name) = @_;
 
@@ -319,19 +328,21 @@ sub create_image_asset {
     });
 
   # Issue a mutate request to add the asset.
-  my $asset_response = $api_client->AssetService()->mutate({
+  my $assets_response = $api_client->AssetService()->mutate({
       customerId => $customer_id,
       operations => [$asset_operation]});
 
   # Print out information about the newly added asset.
-  my $asset_resource_name = $asset_response->{results}[0]{resourceName};
+  my $asset_resource_name = $assets_response->{results}[0]{resourceName};
   printf "A new image asset has been added with resource name: '%s'.\n",
     $asset_resource_name;
 
   return $asset_resource_name;
 }
+# [END add_local_campaign_4]
 
 # Creates a YouTube video asset.
+# [START add_local_campaign_5]
 sub create_youtube_video_asset {
   my ($api_client, $customer_id, $youtube_video_id, $youtube_video_name) = @_;
 
@@ -351,17 +362,18 @@ sub create_youtube_video_asset {
     });
 
   # Issue a mutate request to add the asset.
-  my $asset_response = $api_client->AssetService()->mutate({
+  my $assets_response = $api_client->AssetService()->mutate({
       customerId => $customer_id,
       operations => [$asset_operation]});
 
   # Print out information about the newly added asset.
-  my $asset_resource_name = $asset_response->{results}[0]{resourceName};
+  my $asset_resource_name = $assets_response->{results}[0]{resourceName};
   printf "A new YouTube video asset has been added with resource name: '%s'.\n",
     $asset_resource_name;
 
   return $asset_resource_name;
 }
+# [END add_local_campaign_5]
 
 # Don't run the example if the file is being included.
 if (abs_path($0) ne abs_path(__FILE__)) {

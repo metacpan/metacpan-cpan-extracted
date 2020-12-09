@@ -11,6 +11,8 @@ use Test::More;
 
 use Tapper::Cmd::Testplan;
 use Tapper::Model 'model';
+use YAML::Syck qw /Load Dump LoadFile DumpFile/;
+use Data::Dumper;
 
 
 # -----------------------------------------------------------------------------------
@@ -38,6 +40,30 @@ diag "tr: $_" foreach @$testrun_ids;
 
 my $testplan = model('TestrunDB')->resultset('TestplanInstance')->find($testplan_id);
 is($testplan->testruns->count, 4, 'Testruns for testplan created');
+
+# check context
+my $tp = Load($testplan->evaluated_testplan);
+my $tp_context = $tp->{description}{context} || {};
+foreach my $tr_id (@$testrun_ids) {
+    my $tr = model('TestrunDB')->resultset('Testrun')->search({id => $tr_id})->first;
+    foreach my $p ($tr->ordered_preconditions) {
+        my @precond_array = Load($p->precondition);
+        foreach my $p (@precond_array) {
+            #diag Dumper($p);
+            my $pt = $p->{precondition_type};
+            if ($pt eq 'testprogram') {
+                my $p_context = $p->{context} || {};
+                is_deeply($p_context,
+                          $tp_context,
+                          "testrun $tr_id - context in '$pt' precondition (".$p->{program}.")")
+                    or diag Dumper($p_context, $tp_context);
+            } else {
+                is($p->{context}, undef, "testrun $tr_id - no context in '$pt' precondition");
+            }
+        }
+    }
+}
+done_testing; exit;
 
 $answer = $cmd->rerun($testplan_id);
 my $rerun_id = $answer->{testplan_id};

@@ -43,7 +43,7 @@
    "provides" : {
       "Music::Chord::Note" : {
          "file" : "lib/Music/Chord/Note.pm",
-         "version" : "0.09"
+         "version" : "0.10"
       }
    },
    "release_status" : "stable",
@@ -58,6 +58,6 @@
          "url" : "http://github.com/bayashi/Music-Chord-Note"
       }
    },
-   "version" : "0.09",
+   "version" : "0.10",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

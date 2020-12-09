@@ -50,6 +50,7 @@ my $conversion_action_id_1 = "INSERT_CONVERSION_ACTION_ID_1_HERE";
 my $conversion_action_id_2 = "INSERT_CONVERSION_ACTION_ID_2_HERE";
 my $conversion_action_ids  = [];
 
+# [START add_conversion_based_user_list]
 sub add_conversion_based_user_list {
   my ($api_client, $customer_id, $conversion_action_ids) = @_;
 
@@ -90,16 +91,17 @@ sub add_conversion_based_user_list {
     });
 
   # Issue a mutate request to add the user list and print some information.
-  my $user_list_response = $api_client->UserListService()->mutate({
+  my $user_lists_response = $api_client->UserListService()->mutate({
       customerId => $customer_id,
       operations => [$user_list_operation]});
 
   printf
     "Created basic user list with resource name '%s'.\n",
-    $user_list_response->{results}[0]{resourceName};
+    $user_lists_response->{results}[0]{resourceName};
 
   return 1;
 }
+# [END add_conversion_based_user_list]
 
 # Don't run the example if the file is being included.
 if (abs_path($0) ne abs_path(__FILE__)) {

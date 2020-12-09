@@ -1,6 +1,6 @@
 package Tapper::CLI::Host;
 our $AUTHORITY = 'cpan:TAPPER';
-$Tapper::CLI::Host::VERSION = '5.0.6';
+$Tapper::CLI::Host::VERSION = '5.0.7';
 use 5.010;
 
 use warnings;
@@ -534,12 +534,51 @@ sub print_hosts_yaml
 }
 
 
+sub print_hosts_json
+{
+        my ($hosts) = @_;
+        my @info;
+        while (my $host = $hosts->next ) {
+                my %host_data = (name       => $host->name,
+                                 comment    => $host->comment,
+                                 free       => $host->free,
+                                 active     => $host->active,
+                                 is_deleted => $host->is_deleted,
+                                 host_id    => $host->id,
+                                 );
+                my $job = $host->testrunschedulings->search({status => 'running'}, {rows => 1})->first; # this should always be only one
+                if ($job) {
+                        $host_data{running_testrun} = $job->testrun->id;
+                        $host_data{running_since}   = $job->testrun->starttime_testrun->iso8601;
+                }
+
+                if ($host->queuehosts->count > 0) {
+                        my @queues = map {$_->queue->name} $host->queuehosts->all;
+                        $host_data{queues} = \@queues;
+                }
+
+                my %features;
+                foreach my $feature ($host->features->all) {
+                        $features{$feature->entry} = $feature->value;
+                }
+                $host_data{features} = \%features;
+
+                push @info, \%host_data;
+        }
+
+        require JSON::XS;
+        print JSON::XS->new->utf8->encode(\@info);
+        print "\n";
+        return;
+}
+
+
 sub listhost
 {
         my ($c) = @_;
-        $c->getopt( 'free', 'name=s@', 'active', 'queue=s@', 'pool', 'all|a', 'verbose|v+', 'yaml', 'help|?' );
+        $c->getopt( 'free', 'name=s@', 'active', 'queue=s@', 'pool', 'all|a', 'verbose|v+', 'yaml', 'json', 'help|?' );
         if ( $c->options->{help} ) {
-                say STDERR "$0 host-list [ --verbose|v ] [ --free ] | [ --name=s ] [--pool] [ --active ] [ --queue=s@ ] [ --all|a] [ --yaml ]";
+                say STDERR "$0 host-list [ --verbose|v ] [ --free ] | [ --name=s ] [--pool] [ --active ] [ --queue=s@ ] [ --all|a] [ --yaml ] [ --json ]";
                 say STDERR "    --verbose      Increase verbosity level, without show only names, level one shows all but comments, level two shows all including comments";
                 say STDERR "    --free         List only free hosts";
                 say STDERR "    --name         Find host by name, implies verbose";
@@ -549,12 +588,15 @@ sub listhost
                 say STDERR "    --all          List all hosts, even deleted ones";
                 say STDERR "    --help         Print this help message and exit";
                 say STDERR "    --yaml         Print information in YAML format, implies verbose";
+                say STDERR "    --json         Print information in JSON format, implies verbose, yaml takes precedence over json";
                 return;
         }
         my $hosts = select_hosts($c->options);
 
         if ($c->options->{yaml}) {
                 print_hosts_yaml($hosts);
+        } elsif ($c->options->{json}) {
+                print_hosts_json($hosts);
         } elsif ($c->options->{verbose}) {
                 print_hosts_verbose($hosts, $c->options->{verbose});
         } else {
@@ -745,7 +787,8 @@ sub host_new
 
 sub ar_get_host_update_parameters {
     return [
-        [ 'id|i=i'              , 'change host with this id; required',                                                     ],
+        [ 'id|i=i'              , 'change host with this id; this or selectbyname is required',                             ],
+        [ 'selectbyname=s'      , 'change host with this name; this or id is required',                                     ],
         [ 'name|n=s'            , 'update name',                                                                            ],
         [ 'comment|c:s'         , 'Set a new comment for the host',                                                         ],
         [ 'addboundqueue=s@'    , 'Bind host to named queue without deleting other bindings (queue has to exists already)', ],
@@ -775,15 +818,23 @@ sub b_host_update {
         return;
     }
 
-    if (! $hr_options->{id} ) {
-        die "error: missing required parameter 'id'\n";
-    }
     if ( defined $hr_options->{active} && !grep { $hr_options->{active} == $_ } 0,1 ) {
         die "error: parameter '$hr_options->{active}' is not valid for 'active'\n";
     }
 
+    my $or_host;
+
     require Tapper::Model;
-    if ( my $or_host = Tapper::Model::model('TestrunDB')->resultset('Host')->find( $hr_options->{id} ) ) {
+    if ( $hr_options->{id} ) {
+        $or_host = Tapper::Model::model('TestrunDB')->resultset('Host')->find( $hr_options->{id} );
+    } elsif ( $hr_options->{selectbyname} ) {
+        # There should be only one host with the name
+        $or_host = Tapper::Model::model('TestrunDB')->resultset('Host')->search({ name => $hr_options->{selectbyname} })->first;
+    } else {
+        die "error: missing required parameter 'id' or 'selectbyname'\n";
+    }
+
+    if ( $or_host ) {
 
         my $b_update = 0;
         if ( defined $hr_options->{active} && $hr_options->{active} != $or_host->active ) {
@@ -964,6 +1015,10 @@ Print given host with all available information in YAML.
 
 @param host object
 
+=head2 print_hosts_json
+
+Print information in JSON format.
+
 =head2 listhost
 
 List hosts matching given criteria.
@@ -998,7 +1053,7 @@ AMD OSRC Tapper Team <tapper@amd64.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2020 by Advanced Micro Devices, Inc..
+This software is Copyright (c) 2020 by Advanced Micro Devices, Inc.
 
 This is free software, licensed under:
 

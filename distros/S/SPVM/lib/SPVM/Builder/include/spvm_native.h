@@ -32,7 +32,7 @@ union SPVM_value {
 #define SPVM_DIE(message, ...) do {\
   char* buffer = (char*)env->alloc_memory_block_zero(env, 255);\
   snprintf(buffer, 255, message " at %s line %d", __VA_ARGS__);\
-  void* exception = env->new_string_len_raw(env, buffer, strlen(buffer));\
+  void* exception = env->new_string_raw(env, buffer, strlen(buffer));\
   env->free_memory_block(env, buffer);\
   env->set_exception(env, exception);\
   return SPVM_EXCEPTION;\
@@ -223,7 +223,7 @@ union SPVM_value {
   if (id < 0) { SPVM_DIE("Method not found, package name:%s, sub name:%s, signature:%s", package_name, sub_name, signature, file, line); };\
   int32_t exception_flag = env->call_sub(env, id, stack);\
   if (exception_flag) {\
-    const char* message = env->get_elems_byte(env, env->exception(env));\
+    const char* message = env->get_chars(env, env->exception(env));\
     if (id < 0) { SPVM_DIE("%s", message, file, line); };\
     return SPVM_EXCEPTION;\
   }\
@@ -235,7 +235,7 @@ union SPVM_value {
   env->call_sub(env, id, stack);\
   int32_t exception_flag = env->call_sub(env, id, stack);\
   if (exception_flag) {\
-    const char* message = env->get_elems_byte(env, env->exception(env));\
+    const char* message = env->get_chars(env, env->exception(env));\
     if (id < 0) { SPVM_DIE("%s", message, file, line); };\
     return SPVM_EXCEPTION;\
   }\
@@ -334,10 +334,10 @@ struct SPVM_env {
   void* (*new_muldim_array)(SPVM_ENV* env, int32_t basic_type_id, int32_t element_dimension, int32_t length);
   void* (*new_mulnum_array_raw)(SPVM_ENV* env, int32_t basic_type_id, int32_t length);
   void* (*new_mulnum_array)(SPVM_ENV* env, int32_t basic_type_id, int32_t length);
-  void* (*new_string_raw)(SPVM_ENV* env, const char* bytes);
-  void* (*new_string)(SPVM_ENV* env, const char* bytes);
-  void* (*new_string_len_raw)(SPVM_ENV* env, const char* bytes, int32_t length);
-  void* (*new_string_len)(SPVM_ENV* env, const char* bytes, int32_t length);
+  void* (*new_string_nolen_raw)(SPVM_ENV* env, const char* bytes);
+  void* (*new_string_nolen)(SPVM_ENV* env, const char* bytes);
+  void* (*new_string_raw)(SPVM_ENV* env, const char* bytes, int32_t length);
+  void* (*new_string)(SPVM_ENV* env, const char* bytes, int32_t length);
   void* (*new_pointer_raw)(SPVM_ENV* env, int32_t basic_type_id, void* pointer);
   void* (*new_pointer)(SPVM_ENV* env, int32_t basic_type_id, void* pointer);
   void* (*concat_raw)(SPVM_ENV* env, void* string1, void* string2);
@@ -408,5 +408,6 @@ struct SPVM_env {
   SPVM_ENV* (*new_env)(SPVM_ENV* env);
   void (*free_env)(SPVM_ENV* env);
   int32_t memory_blocks_count;
+  const char* (*get_chars)(SPVM_ENV* env, void* string);
 };
 #endif

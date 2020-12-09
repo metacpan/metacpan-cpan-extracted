@@ -19,6 +19,12 @@ sub add_row {
 	push($self->{mat}, @l);
 }
 
+sub get_row {
+	my ($self, $i) = @_;
+
+	return $self->{mat}[$i];;
+}
+
 ### return m[row][col]
 sub mnth {
 	my ($self, $j, $i) = @_;

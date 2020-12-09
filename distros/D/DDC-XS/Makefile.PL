@@ -7,7 +7,7 @@ use ExtUtils::MakeMaker;
 use Alien::DDC::Concordance;
 my %prereq = (
 	      'ExtUtils::MakeMaker' => 6.52, ##-- for CONFIGURE_REQUIRES
-	      'Alien::DDC::Concordance' => 0.001,
+	      'Alien::DDC::Concordance' => 0.007,
 	      'ExtUtils::XSpp' => '0.18',
 	      'JSON' => 0,
 
@@ -19,11 +19,13 @@ my $min_version = "2.2.8";
 if (Alien::DDC::Concordance->install_type ne 'system') {
   my $alien_vstr = Alien::DDC::Concordance->config('version');
   (my $alien_version = $alien_vstr) =~ s/\-/_/g;
-  die("Required package ddc >= v$min_version not found; we have v$alien_vstr\n")
+  $alien_version =~ s/[^0-9\._]//g; ##-- 2020-12-09: version->parse() doesn't like "_rc2" suffix
+  die("Required package ddc >= v$min_version not found; we have v$alien_vstr (via Alien::DDC::Concordance v$Alien::DDC::Concordance::VERSION)\n")
     if (version->parse($alien_version) < version->parse($min_version));
 }
 elsif (system("pkg-config --atleast-version=${min_version} ddc") != 0) {
-  die("Required package ddc >= v$min_version not found; we have v", `pkg-config --modversion ddc`);
+  my ($got_version) = map {chomp;$_} `pkg-config --modversion ddc`;
+  die("Required package ddc >= v$min_version not found; we have v$got_version (maybe try updating Alien::DDC::Concordance?)");
 }
 
 ##----------------------------------------------------------------------

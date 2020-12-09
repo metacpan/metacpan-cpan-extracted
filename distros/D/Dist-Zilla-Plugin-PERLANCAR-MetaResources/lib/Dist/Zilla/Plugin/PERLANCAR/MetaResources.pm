@@ -1,7 +1,9 @@
 package Dist::Zilla::Plugin::PERLANCAR::MetaResources;
 
-our $DATE = '2020-10-27'; # DATE
-our $VERSION = '0.041'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-12-09'; # DATE
+our $DIST = 'Dist-Zilla-Plugin-PERLANCAR-MetaResources'; # DIST
+our $VERSION = '0.042'; # VERSION
 
 use 5.010001;
 use strict;
@@ -55,7 +57,9 @@ has homepage => (
 has bugtracker_web => (
     is      => 'ro',
     isa     => 'Str',
-    default => 'https://rt.cpan.org/Public/Dist/Display.html?Name=%N',
+    # old, will be dead in mar 2021
+    # default => 'https://rt.cpan.org/Public/Dist/Display.html?Name=%N',
+    default => 'https://github.com/%a/%r/issues',
 );
 
 has repository_url => (
@@ -177,7 +181,7 @@ Dist::Zilla::Plugin::PERLANCAR::MetaResources - Set meta resources for dists
 
 =head1 VERSION
 
-This document describes version 0.041 of Dist::Zilla::Plugin::PERLANCAR::MetaResources (from Perl distribution Dist-Zilla-Plugin-PERLANCAR-MetaResources), released on 2020-10-27.
+This document describes version 0.042 of Dist::Zilla::Plugin::PERLANCAR::MetaResources (from Perl distribution Dist-Zilla-Plugin-PERLANCAR-MetaResources), released on 2020-12-09.
 
 =head1 SYNOPSIS
 

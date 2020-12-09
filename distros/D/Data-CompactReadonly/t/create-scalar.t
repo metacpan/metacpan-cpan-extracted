@@ -9,6 +9,8 @@ use TestFloat;
 
 use Data::CompactReadonly;
 
+*_bytes_required_for_int = \&Data::CompactReadonly::V0::Node::_bytes_required_for_int;
+
 (undef, my $filename) = tempfile(UNLINK => 1);
 
 Data::CompactReadonly->create($filename, undef);
@@ -45,15 +47,17 @@ foreach my $length (1, 1000, 100000, 0x1000000) {
     #               ^  ^     ^       ^
     #        Byte --+  |     |       +-- Long 
     #       Short -----+     +---------- Medium
-    my $filesize = 5 + 1 + (1 + int(log($length) / log(256))) + $length;
+    my $filesize = 5 + 1 + _bytes_required_for_int(undef, $length) + $length;
     my $value = 'x' x $length;
     Data::CompactReadonly->create($filename, $value);
-    is($data = Data::CompactReadonly->read($filename), $value, "can create an ASCII Text file ($length chars)");
-        is((stat($filename))[7], $filesize, "... file is expected size $filesize");
+    my $data = Data::CompactReadonly->read($filename);
+    ok($data eq $value, "can create an ASCII Text file ($length chars), got ".length($data)." chars") ||
+        diag("Got ".length($data)." bytes from the db; expected ".length($value).":\n\n".`hexdump -C $filename`);
+    is((stat($filename))[7], $filesize, "... file is expected size $filesize");
 }
 
 foreach my $length (1, 1000) {
-    my $filesize = 5 + 1 + (1 + int(log(9 * $length) / log(256))) + 9 * $length;
+    my $filesize = 5 + 1 + _bytes_required_for_int(undef, $length) + 9 * $length;
     my $value = "\x{5317}\x{4eac}\x{5e02}" x $length;
     Data::CompactReadonly->create($filename, $value);
     is($data = Data::CompactReadonly->read($filename), $value, "can create a non-ASCII Text file ($length times three chars, each 3 utf-8 bytes)");

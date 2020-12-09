@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 #
-# Copyright (C) 2002-2018 National Marrow Donor Program. All rights reserved.
+# Copyright (C) 2002-2020 National Marrow Donor Program. All rights reserved.
 #
 # For a description of this program, please refer to the POD documentation
 # embedded at the bottom of the file (e.g. perldoc ecs_setup).
@@ -15,7 +15,7 @@ use Term::ReadLine;
 use vars qw(%attr_desc $cfg $CFGFMT $config_dir $opt_config $OUT
             $script_dir $term $usage);
 
-$CFGFMT = "%-14s | %-14s | %s\n";
+$CFGFMT = "%-20s | %-14s | %s\n";
 
 # initialize attribute descriptions
 %attr_desc =
@@ -47,6 +47,101 @@ $CFGFMT = "%-14s | %-14s | %s\n";
   'Otherwise, the ecs_chk_com program will periodically send MSG_ACKs,',
   'as indicated by in_seq and in_seq_ack.'
   ],
+ AMQP_ADDR_DOC =>
+ ['AMQP queue (address) for inbound EMDIS document messages',
+  'AMQP_ADDR_DOC specifies the name of the AMQP queue containing',
+  'EMDIS document messages for this node (if/when implemented).'
+  ],
+ AMQP_ADDR_META =>
+ ['AMQP queue (address) for inbound EMDIS META messages',
+  'AMQP_ADDR_META specifies the name of the AMQP queue containing',
+  'EMDIS META messages for this node.'
+  ],
+ AMQP_ADDR_MSG =>
+ ['AMQP queue (address) for inbound EMDIS regular messages',
+  'AMQP_ADDR_MSG specifies the name of the AMQP queue containing',
+  'EMDIS regular messages for this node.'
+  ],
+ AMQP_BROKER_URL =>
+ ['AMQP broker URL',
+  'AMQP_BROKER_URL identifies the default AMQP broker for AMQP',
+  'communications.  The URL scheme should be either "amqp" for',
+  'unencrypted AMQP or "amqps" for AMQP with SSL/TLS encryption,',
+  'e.g. amqps://msg01.emdis.net.  Note:  The IANA assigned port',
+  'numbers for amqp and amqps are, respectively, 5672 and 5671.'
+  ],
+ AMQP_CMD_RECV =>
+ ['base AMQP receive command',
+  'AMQP_CMD_RECV specifies the executable command the EMDIS::ECS',
+  'code will use as its starting point when constructing the command',
+  'it will execute to receive messages via AMQP 1.0.  For best results,',
+  'this executable should recognize the same command-line options as',
+  'those supported by the included ecs_amqp_recv.py Python program.'
+  ],
+ AMQP_CMD_SEND =>
+ ['base AMQP send command',
+  'AMQP_CMD_SEND specifies the executable command the EMDIS::ECS',
+  'code will use as its starting point when constructing the command',
+  'it will execute to send a message via AMQP 1.0.  For best results,',
+  'this executable should recognize the same command-line options as',
+  'those supported by the included ecs_amqp_send.py Python program.'
+  ],
+ AMQP_DEBUG_LEVEL =>
+ ['AMQP debug output level (passed to send/receive commands)',
+  'This value is included as the --debug command-line option in',
+  'constructed AMQP send and receive commands.'
+  ],
+ AMQP_PASSWORD =>
+ ['password for AMQP SASL PLAIN authentication (ECS_AMQP_PASSWORD)',
+  'This value, if defined, will be passed to AMQP send and receive',
+  'commands via the ECS_AMQP_PASSWORD environment variable.'
+  ],
+ AMQP_RECV_TIMEOUT =>
+ ['AMQP inactivity timeout in seconds (passed to receive command)',
+  'This value is included as the --timeout command-line option in',
+  'constructed AMQP send and receive commands.'
+  ],
+ AMQP_RECV_TIMELIMIT =>
+ ['time limit for AMQP receive command',
+  'Time limit (seconds) after which AMQP receive command is forcibly',
+  'terminated.'
+  ],
+ AMQP_SEND_TIMELIMIT =>
+ ['time limit in seconds for AMQP send command',
+  'Time limit (seconds) after which AMQP send command is forcibly',
+  'terminated.'
+  ],
+ AMQP_SSLCERT =>
+ ['AMQP client-side SSL/TLS certificate filename',
+  'This value is included as the --sslcert command-line option in',
+  'constructed AMQP send and receive commands.'
+  ],
+ AMQP_SSLKEY =>
+ ['AMQP client-side SSL/TLS secret key filename',
+  'This value is included as the --sslkey command-line option in',
+  'constructed AMQP send and receive commands.'
+  ],
+ AMQP_SSLPASS =>
+ ['password for AMQP client-side SSL/TLS secret key (ECS_AMQP_SSLPASS)',
+  'This value, if defined, will be passed to AMQP send and receive',
+  'commands via the ECS_AMQP_SSLPASS environment variable.'
+  ],
+ AMQP_TRUSTSTORE =>
+ ['trust store for verifying AMQP broker SSL/TLS connection',
+  'This value is included as the --truststore command-line option in',
+  'constructed AMQP send and receive commands.'
+  ],
+ AMQP_USERNAME =>
+ ['username for AMQP SASL PLAIN authentication',
+  'This value is included as the --username command-line option in',
+  'constructed AMQP send and receive commands.'
+  ],
+ AMQP_VHOST =>
+ ['virtual host namespace within AMQP broker (if needed)',
+  'AMQP_VHOST specifies the "virtual host" namespace to be used when',
+  'connecting to the AMQP broker.  (Some, but not all AMQP brokers use',
+  'virtual host namespaces to organize their queues.)'
+  ],
  BCK_DIR =>
  ['backup dir for incoming messages (or NONE)',
   ''
@@ -77,6 +172,10 @@ $CFGFMT = "%-14s | %-14s | %s\n";
  ECS_DEBUG =>
  ['ECS debug level',
   ''
+  ],
+ ENABLE_AMQP =>
+ ['enable use of AMQP messaging',
+  'AMQP communications are disabled unless this is set to YES or TRUE'
   ],
  ERR_FILE =>
  ['full pathname of the ECS error file',
@@ -137,10 +236,11 @@ $CFGFMT = "%-14s | %-14s | %s\n";
   ''
   ],
  INBOX_PROTOCOL =>
- ['inbox protocol: DIRECTORY, POP3 or IMAP',
+ ['inbox protocol: DIRECTORY, POP3, IMAP, or NONE',
   'INBOX_PROTOCOL specifies the protocol used by the ecs_scan_mail',
   'daemon to retrieve email messages.  "DIRECTORY", "POP3" and "IMAP" are',
-  'currently supported.'
+  'currently supported.  "NONE" may be useful for systems which exchange',
+  'messages via AMQP only (no inbound email).'
   ],
  INBOX_TIMEOUT =>
  ['seconds',
@@ -437,6 +537,53 @@ if($cfg->{INBOX_PROTOCOL} =~ /pop3/i or $cfg->{INBOX_PROTOCOL} =~ /imap/i) {
     ask('INBOX_USE_STARTTLS');
 }
 
+$cfg->{AMQP_BROKER_URL} = 'amqps://example.url:5671' unless $cfg->{AMQP_BROKER_URL};
+$cfg->{AMQP_VHOST} = '' unless $cfg->{AMQP_VHOST};
+$cfg->{AMQP_ADDR_META} = 'emdis.xx.meta' unless $cfg->{AMQP_ADDR_META};
+$cfg->{AMQP_ADDR_MSG} = 'emdis.xx.msg' unless $cfg->{AMQP_ADDR_MSG};
+$cfg->{AMQP_ADDR_DOC} = 'emdis.xx.doc' unless $cfg->{AMQP_ADDR_DOC};
+$cfg->{AMQP_DEBUG_LEVEL} = '0' unless $cfg->{AMQP_DEBUG_LEVEL};
+$cfg->{AMQP_CMD_SEND} = 'ecs_amqp_send.py' unless $cfg->{AMQP_CMD_SEND};
+$cfg->{AMQP_SEND_TIMELIMIT} = '60' unless $cfg->{AMQP_SEND_TIMELIMIT};
+$cfg->{AMQP_CMD_RECV} = 'ecs_amqp_recv.py' unless $cfg->{AMQP_CMD_RECV};
+$cfg->{AMQP_RECV_TIMEOUT} = '5' unless $cfg->{AMQP_RECV_TIMEOUT};
+$cfg->{AMQP_RECV_TIMELIMIT} = '300' unless $cfg->{AMQP_RECV_TIMELIMIT};
+$cfg->{AMQP_USERNAME} = 'username' unless $cfg->{AMQP_USERNAME};
+$cfg->{AMQP_PASSWORD} = 'password' unless $cfg->{AMQP_PASSWORD};
+$cfg->{AMQP_TRUSTSTORE} = 'ca-cert.pem' unless $cfg->{AMQP_TRUSTSTORE};
+$cfg->{AMQP_SSLCERT} = 'client-cert.pem' unless $cfg->{AMQP_SSLCERT};
+$cfg->{AMQP_SSLKEY} = 'client-key.pem' unless $cfg->{AMQP_SSLKEY};
+$cfg->{AMQP_SSLPASS} = 'password' unless $cfg->{AMQP_SSLPASS};
+ask('ENABLE_AMQP');
+if(is_yes($cfg->{ENABLE_AMQP})) {
+    ask('AMQP_BROKER_URL');
+    ask('AMQP_VHOST');
+    ask('AMQP_ADDR_META');
+    ask('AMQP_ADDR_MSG');
+    ask('AMQP_ADDR_DOC');
+    ask('AMQP_DEBUG_LEVEL');
+    ask('AMQP_CMD_SEND');
+    ask('AMQP_SEND_TIMELIMIT');
+    ask('AMQP_CMD_RECV');
+    ask('AMQP_RECV_TIMEOUT');
+    ask('AMQP_RECV_TIMELIMIT');
+    if(yes($term->readline("\nUse (SASL) username/password authentication to AMQP broker [Y/n]? "))) {
+        $cfg->{CFG_AMQP_SASL} = 1;
+        ask('AMQP_USERNAME');
+        ask('AMQP_PASSWORD');
+    }
+    if(yes($term->readline("\nUse SSL/TLS encryption for AMQP [Y/n]? "))) {
+        $cfg->{CFG_AMQP_SSL} = 1;
+        ask('AMQP_TRUSTSTORE');
+        if(yes($term->readline("\nUse client-side SSL/TLS certificate for AMQP [Y/n]? "))) {
+            $cfg->{CFG_AMQP_SSL_CLIENT} = 1;
+            ask('AMQP_SSLCERT');
+            ask('AMQP_SSLKEY');
+            ask('AMQP_SSLPASS');
+        }
+    }
+}
+
 $cfg->{GPG_HOMEDIR} = '/home/username/gpg'
     unless $cfg->{GPG_HOMEDIR};
 $cfg->{GPG_KEYID} = '0x00000000'
@@ -445,6 +592,7 @@ $cfg->{GPG_PASSPHRASE} = ''
     unless $cfg->{GPG_PASSPHRASE};
 if(yes($term->readline("\nConfigure GnuPG encryption [Y/n]? ")))
 {
+    $cfg->{CFG_GPG} = 1;
     ask('GPG_HOMEDIR');
     ask('GPG_KEYID');
     ask('GPG_PASSPHRASE');
@@ -458,6 +606,7 @@ $cfg->{PGP_PASSPHRASE} = 'pgpgp'
     unless $cfg->{PGP_PASSPHRASE};
 if(yes($term->readline("\nConfigure PGP encryption [Y/n]? ")))
 {
+    $cfg->{CFG_PGP} = 1;
     ask('PGP_HOMEDIR');
     ask('PGP_KEYID');
     ask('PGP_PASSPHRASE');
@@ -501,6 +650,7 @@ if(yes($term->readline("\nCreate ECS_DAT_DIR subdirectories [Y/n]? ")))
         chk_mkdir('ECS_TMP_DIR');
         if(chk_mkdir('ECS_MBX_DIR'))
         {
+            chk_mkdir('ECS_MBX_AMQP_STAGING_DIR') if is_yes($cfg->{ENABLE_AMQP});
             chk_mkdir('ECS_MBX_IN_DIR');
             chk_mkdir('ECS_MBX_IN_FML_DIR');
             chk_mkdir('ECS_MBX_OUT_DIR');
@@ -518,6 +668,10 @@ if(yes($term->readline("\nCreate ECS_DAT_DIR subdirectories [Y/n]? ")))
 # validate configuration
 if(yes($term->readline("\nValidate configuration [Y/n]? ")))
 {
+    # avoid spurious errors caused by in-memory default values
+    delete $cfg->{GPG_HOMEDIR} if not exists $cfg->{CFG_GPG};
+    delete $cfg->{PGP_HOMEDIR} if not exists $cfg->{CFG_PGP};
+ 
     my $err = $cfg->_validate_config();
     if($err)
     {
@@ -706,19 +860,61 @@ EOF
     print CFG cfgline('INBOX_PASSWORD');
     print CFG '#' if $cfg->{INBOX_PROTOCOL} !~ /DIRECTORY/i;    
     print CFG cfgline('INBOX_DIRECTORY');    
-
     print CFG cfgline('INBOX_MAX_MSG_SIZE');
 
+    print CFG "\n# AMQP configuration parameters\n";
+    print CFG cfgline('ENABLE_AMQP');
+    print CFG '#' if not is_yes($cfg->{ENABLE_AMQP});
+    print CFG cfgline('AMQP_BROKER_URL');
+    print CFG '#' if not is_yes($cfg->{ENABLE_AMQP});
+    print CFG cfgline('AMQP_VHOST');
+    print CFG '#' if not is_yes($cfg->{ENABLE_AMQP});
+    print CFG cfgline('AMQP_ADDR_META');
+    print CFG '#' if not is_yes($cfg->{ENABLE_AMQP});
+    print CFG cfgline('AMQP_ADDR_MSG');
+    print CFG '#' if not is_yes($cfg->{ENABLE_AMQP});
+    print CFG cfgline('AMQP_ADDR_DOC');
+    print CFG '#' if not is_yes($cfg->{ENABLE_AMQP});
+    print CFG cfgline('AMQP_DEBUG_LEVEL');
+    print CFG '#' if not is_yes($cfg->{ENABLE_AMQP});
+    print CFG cfgline('AMQP_CMD_SEND');
+    print CFG '#' if not is_yes($cfg->{ENABLE_AMQP});
+    print CFG cfgline('AMQP_SEND_TIMELIMIT');
+    print CFG '#' if not is_yes($cfg->{ENABLE_AMQP});
+    print CFG cfgline('AMQP_CMD_RECV');
+    print CFG '#' if not is_yes($cfg->{ENABLE_AMQP});
+    print CFG cfgline('AMQP_RECV_TIMEOUT');
+    print CFG '#' if not is_yes($cfg->{ENABLE_AMQP});
+    print CFG cfgline('AMQP_RECV_TIMELIMIT');
+    print CFG '#' if not is_yes($cfg->{ENABLE_AMQP}) or not exists $cfg->{CFG_AMQP_SASL};
+    print CFG cfgline('AMQP_USERNAME');
+    print CFG '#' if not is_yes($cfg->{ENABLE_AMQP}) or not exists $cfg->{CFG_AMQP_SASL};
+    print CFG cfgline('AMQP_PASSWORD');
+    print CFG '#' if not is_yes($cfg->{ENABLE_AMQP}) or not exists $cfg->{CFG_AMQP_SSL};
+    print CFG cfgline('AMQP_TRUSTSTORE');
+    print CFG '#' if not is_yes($cfg->{ENABLE_AMQP}) or not exists $cfg->{CFG_AMQP_SSL_CLIENT};
+    print CFG cfgline('AMQP_SSLCERT');
+    print CFG '#' if not is_yes($cfg->{ENABLE_AMQP}) or not exists $cfg->{CFG_AMQP_SSL_CLIENT};
+    print CFG cfgline('AMQP_SSLKEY');
+    print CFG '#' if not is_yes($cfg->{ENABLE_AMQP}) or not exists $cfg->{CFG_AMQP_SSL_CLIENT};
+    print CFG cfgline('AMQP_SSLPASS');
+
     print CFG "\n# GnuPG cryptography configuration parameters\n";
+    print CFG '#' if not exists $cfg->{CFG_GPG};
     print CFG cfgline('GPG_HOMEDIR');
+    print CFG '#' if not exists $cfg->{CFG_GPG};
     print CFG cfgline('GPG_KEYID');
+    print CFG '#' if not exists $cfg->{CFG_GPG};
     print CFG cfgline('GPG_PASSPHRASE');
     print CFG '#', cfgline('OPENPGP_CMD_ENCRYPT');
     print CFG '#', cfgline('OPENPGP_CMD_DECRYPT');
 
     print CFG "\n# PGP cryptography configuration parameters\n";
+    print CFG '#' if not exists $cfg->{CFG_PGP};
     print CFG cfgline('PGP_HOMEDIR');
+    print CFG '#' if not exists $cfg->{CFG_PGP};
     print CFG cfgline('PGP_KEYID');
+    print CFG '#' if not exists $cfg->{CFG_PGP};
     print CFG cfgline('PGP_PASSPHRASE');
     print CFG '#', cfgline('PGP2_CMD_ENCRYPT');
     print CFG '#', cfgline('PGP2_CMD_DECRYPT');
@@ -770,7 +966,7 @@ THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
 WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF 
 MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
 
-Copyright (C) 2002-2018 National Marrow Donor Program. All rights reserved.
+Copyright (C) 2002-2020 National Marrow Donor Program. All rights reserved.
 
 See LICENSE file for license details.
 

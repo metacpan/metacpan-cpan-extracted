@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use Carp qw( croak );
 
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 
 my @tone_list = ('C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B',
                  'C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B');
@@ -107,6 +107,35 @@ sub chord
     return @keys;
 }
 
+sub chord_with_octave
+{
+    my ($self, $chord_name, $octave) = @_;
+
+    $octave ||= 4;
+
+    return @{ $self->_chord_with_octave([$self->chord($chord_name)], $octave) };
+}
+
+sub _chord_with_octave
+{
+    my ($self, $chord, $octave) = @_;
+
+    if ($octave < -2 || $octave > 9) {
+        croak 'octave should be integer between -2 and 9';
+    }
+
+    my @position = map { $self->scale($_) } @{$chord};
+    my @formatted;
+    my $last_position = -1;
+    for my $n (0 .. $#{$chord}) {
+        $octave++ if $position[$n] < $last_position;
+        push @formatted, $chord->[$n] . $octave;
+        $last_position = $position[$n];
+    }
+
+    return \@formatted;
+}
+
 sub chord_num
 {
     my ($self, $chord) = @_;
@@ -155,6 +184,10 @@ Music::Chord::Note - get Chord Tone List from Chord Name
 
     print "@tone"; # C E G B
 
+    my @chord = $cn->chord_with_octave('B', 6);
+
+    print "@chord"; # B6 D#7 F#7
+
     my @tone_num = $cn->chord_num('M7');
 
     print "@tone_num"; # 0 4 7 11
@@ -175,6 +208,10 @@ constructor
 =item chord($chord_name)
 
 get tone list from chord name
+
+=item chord_with_octave($chord_name)
+
+get tone list from chord name with octave for MIDI
 
 =item chord_num($kind_of_chord)
 

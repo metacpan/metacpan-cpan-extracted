@@ -11,16 +11,12 @@
 #
 # 2) Build a "perlecs/centos" Docker image based on the Dockerfile.
 #
-#    docker build -t perlecs/centos:0.40-1 .
+#    docker build -t perlecs/centos:0.41-1 .
 #
 # 3) Generate a Docker container based on the image, and run an interactive
 #    bash shell within the container.
 #
-#    docker run -t -i --name=perlecs_centos  perlecs/centos:0.40-1 /bin/bash
-#
-#    Alternatively, restart the container after stopping it.
-#
-#    docker start -i perlecs_centos
+#    docker run --rm -it --name=perlecs_centos  perlecs/centos:0.41-1 /bin/bash
 #
 # 4) Configure Perl ECS within the docker container.  For example, use
 #    "ecs_setup" to generate an ecs.cfg configuration file, "ecstool" to
@@ -38,7 +34,7 @@
 FROM centos:7
 LABEL Maintainer="Joel Schneider <joel@joelschneider.net>"
 LABEL Description="EMDIS::ECS (Perl ECS) on CentOS"
-LABEL Version="0.40"
+LABEL Version="0.41"
 
 # install deltarpm, and update installed packages
 RUN yum -y install deltarpm.x86_64
@@ -46,14 +42,13 @@ RUN yum -y update
 
 # install extra CentOS packages
 RUN yum -y install \
- perl.x86_64 perl-Env.noarch perl-Data-Dumper.x86_64 \
- make.x86_64 perl-ExtUtils-MakeMaker.noarch perl-CPAN.noarch \
- perl-App-cpanminus.noarch gcc.x86_64 perl-Test-Simple.noarch \
- perl-Authen-SASL.noarch less.x86_64 which.x86_64
+ perl perl-Env perl-Data-Dumper make perl-ExtUtils-MakeMaker perl-CPAN \
+ perl-App-cpanminus gcc perl-Test-Simple perl-Authen-SASL less which \
+ python3 cyrus-sasl cyrus-sasl-plain
 
 # add EPEL repository and install Mail::IMAPClient from there
 RUN yum -y install epel-release
-RUN yum -y install perl-Mail-IMAPClient.noarch
+RUN yum -y install perl-Mail-IMAPClient python36-qpid-proton
 
 # create perlecs user
 RUN useradd --comment "Perl ECS user" --create-home perlecs

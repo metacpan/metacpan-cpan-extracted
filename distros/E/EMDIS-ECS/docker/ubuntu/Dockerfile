@@ -1,4 +1,4 @@
-# This file defines a docker image based on Ubuntu 16.04 which can be
+# This file defines a docker image based on Ubuntu 18.04 which can be
 # used for EMDIS::ECS (Perl ECS).
 #
 # For additional information about docker, see https://www.docker.com/
@@ -11,16 +11,12 @@
 #
 # 2) Build a "perlecs/ubuntu" Docker image based on the Dockerfile.
 #
-#    docker build -t perlecs/ubuntu:0.40-1 .
+#    docker build -t perlecs/ubuntu:0.41-1 .
 #
 # 3) Generate a Docker container based on the image, and run an interactive
 #    bash shell within the container.
 #
-#    docker run -t -i --name=perlecs_ubuntu  perlecs/ubuntu:0.40-1 /bin/bash
-#
-#    Alternatively, restart the container after stopping it.
-#
-#    docker start -i perlecs_ubuntu
+#    docker run -it --name=perlecs_ubuntu  perlecs/ubuntu:0.41-1 /bin/bash
 #
 # 4) Configure Perl ECS within the docker container.  For example, use
 #    "ecs_setup" to generate an ecs.cfg configuration file, "ecstool" to
@@ -34,35 +30,29 @@
 #    ECS, refer to the EMDIS and ECS specifications available from
 #    http://emdis.net/.
 
-# image is based on Ubuntu 16.04
-FROM ubuntu:16.04
+# image is based on Ubuntu 18.04
+FROM ubuntu:18.04
 LABEL Maintainer="Joel Schneider <joel@joelschneider.net>"
 LABEL Description="EMDIS::ECS (Perl ECS) on Ubuntu"
-LABEL Version="0.40"
+LABEL Version="0.41"
 
 # install extra Ubuntu packages
 RUN apt-get update -y
 #RUN apt-get upgrade -y perl-modules
 RUN apt-get install -y \
-  ca-certificates libmail-imapclient-perl \
-  build-essential cpanminus make telnet \
-  perl-doc man-db manpages groff-base
+  ca-certificates libmail-imapclient-perl build-essential cpanminus make telnet \
+  perl-doc man-db manpages groff-base vim-tiny python3 python3-qpid-proton
 
 # create perlecs user
-RUN useradd --comment "Perl ECS user" --create-home perlecs
+RUN useradd --comment "Perl ECS user" --shell /bin/bash --create-home perlecs
 
 # define ${HOME} environment variable
 ENV HOME=/home/perlecs
 
-# as perlecs user, install latest CPAN versions of some
-# Perl modules into local-lib directory (because module
-# versions provided by Ubuntu may not support SSL/TLS)
 USER perlecs
 WORKDIR ${HOME}
 RUN mkdir ${HOME}/perl5lib
-RUN cpanm --local-lib ${HOME}/perl5lib Net::SMTP~3.05 && \
- cpanm --local-lib ${HOME}/perl5lib Net::POP3~3.06 && \
- cpanm --local-lib ${HOME}/perl5lib IO::Socket::SSL~2.007
+COPY --chown=perlecs:perlecs README_GPG ${HOME}/README_GPG
 
 # install EMDIS::ECS into local-lib directory
 RUN cpanm --local-lib ${HOME}/perl5lib EMDIS::ECS

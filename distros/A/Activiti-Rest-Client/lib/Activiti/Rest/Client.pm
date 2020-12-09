@@ -7,7 +7,7 @@ use JSON qw(decode_json encode_json);
 use URI::Escape qw(uri_escape);
 use Activiti::Rest::Response;
 
-our $VERSION = "0.1257";
+our $VERSION = "0.1258";
 
 #see: http://www.activiti.org/userguide
 
@@ -1625,6 +1625,46 @@ sub execute_deadletter_job {
       'Content-Type' => "application/json",
       Content => encode_json({ action => "move" })
     }
+  );
+  Activiti::Rest::Response->from_http_response($res);
+}
+
+sub timer_jobs {
+  my($self,%args)=@_;
+  my $res = $self->ua->request(
+    path => "/management/timer-jobs",
+    params => \%args,
+    method => "GET"
+  );
+  Activiti::Rest::Response->from_http_response($res);
+}
+
+sub timer_job {
+  my($self,%args)=@_;
+  my $res = $self->ua->request(
+    path => "/management/timer-jobs/".uri_escape($args{jobId}),
+    params => {},
+    method => "GET"
+  );
+  Activiti::Rest::Response->from_http_response($res);
+}
+
+sub suspended_jobs {
+  my($self,%args)=@_;
+  my $res = $self->ua->request(
+    path => "/management/suspended-jobs",
+    params => \%args,
+    method => "GET"
+  );
+  Activiti::Rest::Response->from_http_response($res);
+}
+
+sub suspended_job {
+  my($self,%args)=@_;
+  my $res = $self->ua->request(
+    path => "/management/suspended-jobs/".uri_escape($args{jobId}),
+    params => {},
+    method => "GET"
   );
   Activiti::Rest::Response->from_http_response($res);
 }

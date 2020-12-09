@@ -1,5 +1,8 @@
 Revision history for Perl extension RogueCurses.
 
+0.0.4 Wed Dec 9
+	- added search through word fuzzy associative matrix
+
 0.0.3 Mon Dec 7
 	- finished partial speed grep, lib Lubina responds to it
 

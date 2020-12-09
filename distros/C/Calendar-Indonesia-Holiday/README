@@ -2,9 +2,9 @@ NAME
     Calendar::Indonesia::Holiday - List Indonesian public holidays
 
 VERSION
-    This document describes version 0.328 of Calendar::Indonesia::Holiday
+    This document describes version 0.330 of Calendar::Indonesia::Holiday
     (from Perl distribution Calendar-Indonesia-Holiday), released on
-    2020-12-03.
+    2020-12-08.
 
 SYNOPSIS
      use Calendar::Indonesia::Holiday qw(
@@ -731,8 +731,8 @@ FAQ
 
   Holidays after (current year)+1?
     Some religious holidays, especially Vesakha, are not determined yet.
-    Joint leave days are also usually decreed by the government in May/June
-    of the preceding year.
+    Joint leave days are also usually decreed by the government in as late
+    as October/November in the preceding year.
 
 HOMEPAGE
     Please visit the project's homepage at

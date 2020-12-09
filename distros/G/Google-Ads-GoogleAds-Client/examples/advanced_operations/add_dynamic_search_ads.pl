@@ -104,18 +104,19 @@ sub create_campaign_budget {
     ->new({create => $campaign_budget});
 
   # Add the campaign budget.
-  my $campaign_budget_response = $api_client->CampaignBudgetService()->mutate({
+  my $campaign_budgets_response = $api_client->CampaignBudgetService()->mutate({
       customerId => $customer_id,
       operations => [$campaign_budget_operation]});
 
   my $campaign_budget_resource_name =
-    $campaign_budget_response->{results}[0]{resourceName};
+    $campaign_budgets_response->{results}[0]{resourceName};
   printf "Created campaign budget '%s'.\n", $campaign_budget_resource_name;
 
   return $campaign_budget_resource_name;
 }
 
 # Creates a campaign.
+# [START add_dynamic_search_ads]
 sub create_campaign {
   my ($api_client, $customer_id, $campaign_budget_resource_name) = @_;
 
@@ -145,18 +146,20 @@ sub create_campaign {
     new({create => $campaign});
 
   # Add the campaign.
-  my $campaign_response = $api_client->CampaignService()->mutate({
+  my $campaigns_response = $api_client->CampaignService()->mutate({
       customerId => $customer_id,
       operations => [$campaign_operation]});
 
-  my $campaign_resource_name = $campaign_response->{results}[0]{resourceName};
+  my $campaign_resource_name = $campaigns_response->{results}[0]{resourceName};
 
   printf "Created campaign '%s'.\n", $campaign_resource_name;
 
   return $campaign_resource_name;
 }
+# [END add_dynamic_search_ads]
 
 # Creates an ad group.
+# [START add_dynamic_search_ads_1]
 sub create_ad_group {
   my ($api_client, $customer_id, $campaign_resource_name) = @_;
 
@@ -177,18 +180,20 @@ sub create_ad_group {
     new({create => $ad_group});
 
   # Add the ad group.
-  my $ad_group_response = $api_client->AdGroupService()->mutate({
+  my $ad_groups_response = $api_client->AdGroupService()->mutate({
       customerId => $customer_id,
       operations => [$ad_group_operation]});
 
-  my $ad_group_resource_name = $ad_group_response->{results}[0]{resourceName};
+  my $ad_group_resource_name = $ad_groups_response->{results}[0]{resourceName};
 
   printf "Created ad group '%s'.\n", $ad_group_resource_name;
 
   return $ad_group_resource_name;
 }
+# [END add_dynamic_search_ads_1]
 
 # Creates an expanded dynamic search ad.
+# [START add_dynamic_search_ads_2]
 sub create_expanded_dsa {
   my ($api_client, $customer_id, $ad_group_resource_name) = @_;
 
@@ -209,17 +214,18 @@ sub create_expanded_dsa {
     ->new({create => $ad_group_ad});
 
   # Add the ad group ad.
-  my $ad_group_ad_response = $api_client->AdGroupAdService()->mutate({
+  my $ad_group_ads_response = $api_client->AdGroupAdService()->mutate({
       customerId => $customer_id,
       operations => [$ad_group_ad_operation]});
 
   my $ad_group_ad_resource_name =
-    $ad_group_ad_response->{results}[0]{resourceName};
+    $ad_group_ads_response->{results}[0]{resourceName};
 
   printf "Created ad group ad '%s'.\n", $ad_group_ad_resource_name;
 
   return $ad_group_ad_resource_name;
 }
+# [END add_dynamic_search_ads_2]
 
 # Creates a webpage targeting criterion for the DSA.
 sub add_web_page_criterion {
@@ -252,13 +258,13 @@ sub add_web_page_criterion {
     ->new({create => $ad_group_criterion});
 
   # Add the ad group criterion.
-  my $ad_group_criterion_response =
+  my $ad_group_criteria_response =
     $api_client->AdGroupCriterionService()->mutate({
       customerId => $customer_id,
       operations => [$ad_group_criterion_operation]});
 
   my $ad_group_criterion_resource_name =
-    $ad_group_criterion_response->{results}[0]{resourceName};
+    $ad_group_criteria_response->{results}[0]{resourceName};
 
   printf "Created ad group criterion '%s'.\n",
     $ad_group_criterion_resource_name;

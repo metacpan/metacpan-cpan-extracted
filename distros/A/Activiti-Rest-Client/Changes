@@ -1,3 +1,6 @@
+0.1258  2020-12-09 10:04:22 CET
+   - add support for timer-jobs and suspended-jobs from flowable
+
 0.1257  2020-11-07 13:53:23 CET
    - add option keep_alive for client
 

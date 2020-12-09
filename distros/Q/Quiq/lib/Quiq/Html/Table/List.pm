@@ -5,7 +5,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.191';
+our $VERSION = '1.192';
 
 # -----------------------------------------------------------------------------
 
@@ -201,6 +201,19 @@ sub html {
 
     return '' if !@$titleA && !@$rowA;
 
+    my @align;
+    for (@$align) {
+        if (!$_ || /^l/) {
+            push @align,'left';
+        }
+        elsif (/^r/) {
+            push @align,'right';
+        }
+        else {
+            push @align,'center';
+        }
+    }
+
     my %allowHtml;
     @allowHtml{@$titleA} = (0) x @$titleA;
     if (ref $allowHtml) {
@@ -224,7 +237,7 @@ sub html {
         for my $title (@$titleA) {
             $ths .= $h->tag('th',
                 -text => !$allowHtml{$title},
-                align => $align->[$i++],
+                align => $align[$i++],
                 '-',
                 $title
             );
@@ -257,7 +270,7 @@ sub html {
         for my $tdA (@tds) {
             $tds .= $h->tag('td',
                 -text => !(@$titleA? $allowHtml{$titleA->[$j]}: $allowHtml),
-                align => $align->[$j++],
+                align => $align[$j++],
                 ref $tdA? @$tdA: $tdA # Array oder skalarer Wert
             );
         }
@@ -297,7 +310,7 @@ sub html {
 
 =head1 VERSION
 
-1.191
+1.192
 
 =head1 AUTHOR
 

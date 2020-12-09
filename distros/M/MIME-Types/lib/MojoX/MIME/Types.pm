@@ -1,4 +1,4 @@
-# Copyrights 1999-2018 by [Mark Overmeer <markov@cpan.org>].
+# Copyrights 1999-2020 by [Mark Overmeer <markov@cpan.org>].
 #  For other contributors see ChangeLog.
 # See the manual pages for details on the licensing terms.
 # Pod stripped from pm file by OODoc 2.02.
@@ -8,7 +8,7 @@
 
 package MojoX::MIME::Types;
 use vars '$VERSION';
-$VERSION = '2.17';
+$VERSION = '2.18';
 
 use Mojo::Base -base;
 
@@ -27,7 +27,7 @@ sub new(%)
 sub mimeTypes() { shift->{MMT_mt} }
 
 
-sub types(;$)
+sub mapping(;$)
 {   my $self = shift;
     return $self->{MMT_ext} if $self->{MMT_ext};
 
@@ -36,6 +36,8 @@ sub types(;$)
     while(my ($ext, $type) = each %$t) { $exttable{$ext} = [$type] }
     $self->{MMT_ext} = \%exttable;
 }
+
+*types = \&mapping;  # renamed in release 6.0
 
 #----------
 
@@ -57,6 +59,25 @@ sub type($;$)
 
     # stupid interface compatibility!
     $self;
+}
+
+
+sub file_type($) {
+	my ($self, $fn) = @_;
+	my $mt = $self->mimeTypes or return undef;
+	$mt->mimeTypeOf($fn);
+}
+
+
+sub content_type($;$) {
+	my ($self, $c, $opts) = @_;
+	my $headers = $c->res->headers;
+	return undef if $headers->content_type;
+
+	my $fn = $opts->{file} || $opts->{ext};
+
+	my $mt = $self->mimeTypes or return undef;
+	$headers->content_type($mt->mimeTypeOf($fn) || $mt->mimeTypeOf('txt'));
 }
 
 #---------------

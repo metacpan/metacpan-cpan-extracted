@@ -2,7 +2,7 @@ package AI::Genetic::Pro;
 
 use vars qw($VERSION);
 
-$VERSION = 1.004;
+$VERSION = 1.005;
 #---------------
 
 use warnings;
@@ -728,7 +728,7 @@ AI::Genetic::Pro - Efficient genetic algorithms for professional purpose with su
 =head1 DESCRIPTION
 
 This module provides efficient implementation of a genetic algorithm for
-professional use with support for multiprocessing. It was designed to operate as fast as possible
+professional purpose with support for multiprocessing. It was designed to operate as fast as possible
 even on very large populations and big individuals/chromosomes. C<AI::Genetic::Pro> 
 was inspired by C<AI::Genetic>, so it is in most cases compatible 
 (there are some changes). Additionally C<AI::Genetic::Pro> isn't a pure Perl solution, so it 
@@ -746,11 +746,11 @@ mind. This distribution was tested on Windows and Linux platforms
 (and should work on any other).
 
 Multicore support is available through Many-Core Engine (C<MCE>). 
-You can gain the most speed up for big populations ora time/CPU consuming 
+You can gain the most speed up for big populations or time/CPU consuming 
 fitness functions, however for small populations and/or simple fitness 
 function better choice will be single-process version.
 
-You can gat even more speed up if you turn on use of native arrays 
+You can get even more speed up if you turn on use of native arrays 
 (parameter: C<native>) instead of packing chromosomes into single scalar. 
 However you have to remember about expensive memory use in that case.
 

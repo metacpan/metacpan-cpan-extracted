@@ -5,7 +5,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.191';
+our $VERSION = '1.192';
 
 use Quiq::Unindent;
 use Quiq::Option;
@@ -86,6 +86,7 @@ erzeugt
   SET LINESIZE 10000
   SET SERVEROUTPUT ON SIZE 10000
   SET SQLBLANKLINES ON
+  SET NULL '~'
   SET TIMING ON
   
   WHENEVER OSERROR EXIT FAILURE ROLLBACK
@@ -235,6 +236,7 @@ sub script {
         SET TRIMSPOOL ON
         SET LINESIZE 2100
         SET SQLBLANKLINES ON
+        SET NULL '~'
         SET TIMING ON
 
         WHENEVER OSERROR EXIT FAILURE ROLLBACK
@@ -312,7 +314,7 @@ sub script {
 
 =head1 VERSION
 
-1.191
+1.192
 
 =head1 AUTHOR
 

@@ -59,7 +59,7 @@ HTTP::Request::Generator - generate HTTP requests
 
 =cut
 
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 our @EXPORT_OK = qw( generate_requests as_dancer as_plack as_http_request
     expand_curl_pattern
 );
@@ -192,25 +192,36 @@ sub expand_curl_pattern( $pattern ) {
     # Split up the URL pattern into a scheme, host(pattern), port number and
     # path (pattern)
     #use Regexp::Debugger;
-    #use re 'debug';
+    my $ipv4_digit = '(?:[01]?\d?\d|25[0-5]|2[0-4]\d)';
+    my $ipv4 = "(?:$ipv4_digit\\.$ipv4_digit\\.$ipv4_digit\\.$ipv4_digit)";
+    my $ipv6s = qr!(?:[\da-fA-F]{1,4})!;
+
     my( $scheme, $host, $port, $path, $query )
         = $pattern =~ m!^(?:([^:]+):)? # scheme
                          /?/?          # optional? slashes
                          (             # hostname
-                              \[(?:[:\da-fA-F]+)\]             # ipv6
+                              \[(?:    # ipv6
+                                   (?:$ipv6s ){1,1}(?::$ipv6s){7,7}              # plain ipv6
+                                  |(?:$ipv6s:){1,7}(?::      ){1,1}              # plain ipv6
+                                  |(?:$ipv6s:){1,6}(?::$ipv6s){1,1}              # plain ipv6
+                                  |(?:$ipv6s:){1,5}(?::$ipv6s){1,2}              # plain ipv6
+                                  |(?:$ipv6s:){1,4}(?::$ipv6s){1,3}              # plain ipv6
+                                  |(?:$ipv6s:){1,3}(?::$ipv6s){1,4}              # plain ipv6
+                                  |(?:$ipv6s:){1,2}(?::$ipv6s){1,5}              # plain ipv6
+                                  |(?:$ipv6s:){1,1}(?::$ipv6s){1,6}              # plain ipv6
+                                  |(?:      :){1,1}(?::$ipv6s){1,7}              # plain ipv6
+                                  |fe80:(?:$ipv6s){0,4}%%[0-9a-zA-Z]+          # link local+index
+                                  |(?:(?:0{1,4}:){1,5}|::)(?:ffff:(?:0{1,4}:)?)$ipv4          # ipv4-in-ipv6
+                                )\]
                              |[^/:\[]+
                                   (?:\[[^/\]]+\][^/:\[]*)*
                                   (?=[:/]|$)                     # plain, or expansion
-                             |\[[^:\]]+\][^/:]*                # expansion
+                             |\[[^:\]]+\][^/:]*                  # expansion
                          )
                          (?::(\d+))?   # optional port
                          ([^?]*)       # path
                          (?:\?(.*))?   # optional query part
-                         $!x;
-    #my( $scheme, $host, $port, $path, $query )
-    #    = $pattern =~ m!^(?:([^:]+):)?/?/?(\[(?:[:\da-fA-F]+)\]|[^/:\[]+(?:\[[^/\]]+\][^/:\[]*)*(?=[:/]|$)|\[[^:\]]+\][^/:]*)(?::(\d+))?([^?]*)(?:\?(.*))?$!;
-
-    #no Regexp::Debugger;
+                         $!xi;
 
     # Explicitly enumerate all ranges
     my $idx = 0;
@@ -318,9 +329,12 @@ sub _generate_requests_iter(%options) {
         if( @url_params ) {
             my %v;
             @v{ @url_params } = splice @v, 0, 0+@url_params;
-            #use Data::Dumper; warn Dumper \%values;
-            for my $key (qw(scheme host port path )) {
-                $values{ $key } = fill_url($values{ $key }, \%v, $options{ raw_params });
+
+            for my $key (qw(scheme port path host)) {
+                if( $key ne 'host'
+                    or $values{ $key } !~ /^\[.*\]$/ ) {
+                    $values{ $key } = fill_url($values{ $key }, \%v, $options{ raw_params });
+                };
             };
         };
 

@@ -47,6 +47,7 @@ use Data::Uniqid qw(uniqid);
 my $customer_id = "INSERT_CUSTOMER_ID_HERE";
 my $ad_id       = "INSERT_AD_ID_HERE";
 
+# [START update_expanded_text_ad]
 sub update_expanded_text_ad {
   my ($api_client, $customer_id, $ad_id) = @_;
 
@@ -74,15 +75,16 @@ sub update_expanded_text_ad {
       updateMask => all_set_fields_of($ad)});
 
   # Issue a mutate request to update the ad.
-  my $ad_response = $api_client->AdService()->mutate({
+  my $ads_response = $api_client->AdService()->mutate({
       customerId => $customer_id,
       operations => [$ad_operation]});
 
   printf "Updated ad with resource name: '%s'.\n",
-    $ad_response->{results}[0]{resourceName};
+    $ads_response->{results}[0]{resourceName};
 
   return 1;
 }
+# [END update_expanded_text_ad]
 
 # Don't run the example if the file is being included.
 if (abs_path($0) ne abs_path(__FILE__)) {

@@ -57,6 +57,7 @@ use POSIX qw(strftime mktime);
 my $customer_id = "INSERT_CUSTOMER_ID_HERE";
 my $campaign_id = "INSERT_CAMPAIGN_ID_HERE";
 
+# [START add_sitelinks_1]
 sub add_sitelinks {
   my ($api_client, $customer_id, $campaign_id) = @_;
 
@@ -85,18 +86,20 @@ sub add_sitelinks {
     });
 
   # Add the campaign extension setting.
-  my $campaign_extension_setting_response =
+  my $campaign_extension_settings_response =
     $api_client->CampaignExtensionSettingService()->mutate({
       customerId => $customer_id,
       operations => [$campaign_extension_setting_operation]});
 
   printf "Created campaign extension setting with resource name '%s'.\n",
-    $campaign_extension_setting_response->{results}[0]{resourceName};
+    $campaign_extension_settings_response->{results}[0]{resourceName};
 
   return 1;
 }
+# [END add_sitelinks_1]
 
 # Creates a list of extension feed items.
+# [START add_sitelinks]
 sub create_extension_feed_items {
   my ($api_client, $customer_id, $campaign_resource_name) = @_;
 
@@ -208,13 +211,13 @@ sub create_extension_feed_items {
     });
 
   # Add the extension feed item.
-  my $extension_feed_item_response =
+  my $extension_feed_items_response =
     $api_client->ExtensionFeedItemService()->mutate({
       customerId => $customer_id,
       operations => $operations
     });
 
-  my $extension_feed_item_results = $extension_feed_item_response->{results};
+  my $extension_feed_item_results = $extension_feed_items_response->{results};
   printf "Added %d extension feed items:\n",
     scalar @$extension_feed_item_results;
 
@@ -227,6 +230,7 @@ sub create_extension_feed_items {
 
   return $resource_names;
 }
+# [END add_sitelinks]
 
 # Creates a new sitelink feed item with the specified attributes.
 sub create_sitelink_feed_item {

@@ -16,16 +16,12 @@
 #
 # 2) Build "perlecs/greenmail" Docker image based on the Dockerfile.
 #
-#    docker build -t perlecs/greenmail:0.40-1 .
+#    docker build -t perlecs/greenmail:0.41-1 .
 #
 # 3) Generate a Docker container based on the image, and use it to run a
 #    GreenMail server.
 #
-#    docker run -t -i --name=perlecs_greenmail perlecs/greenmail:0.40-1
-#
-#    Alternatively, restart the container after stopping it.
-#
-#    docker start -i perlecs_greenmail
+#    docker run --rm --name=perlecs_greenmail perlecs/greenmail:0.41-1
 #
 # 4) Get the IP address of the running GreenMail container, and use that,
 #    along with the email users defined in GREENMAIL_OPTS below, to test
@@ -41,7 +37,7 @@
 FROM greenmail/standalone:1.5.7
 LABEL Maintainer="Joel Schneider <joel@joelschneider.net>"
 LABEL Description="GreenMail server for testing EMDIS::ECS (Perl ECS)"
-LABEL Version="0.40"
+LABEL Version="0.41"
 
 # greenmail.setup.test.all configuration starts all default email services
 # with a port offset of 3000

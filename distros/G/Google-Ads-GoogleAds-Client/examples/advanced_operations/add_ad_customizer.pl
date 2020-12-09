@@ -118,6 +118,7 @@ sub add_ad_customizer {
 }
 
 # Creates a feed to be used for ad customization.
+# [START add_ad_customizer]
 sub create_ad_customizer_feed {
   my ($api_client, $customer_id, $feed_name) = @_;
 
@@ -155,17 +156,19 @@ sub create_ad_customizer_feed {
     });
 
   # Issue a mutate request to add the feed.
-  my $feed_response = $api_client->FeedService()->mutate({
+  my $feeds_response = $api_client->FeedService()->mutate({
       customerId => $customer_id,
       operations => [$feed_operation]});
 
-  my $feed_resource_name = $feed_response->{results}[0]{resourceName};
+  my $feed_resource_name = $feeds_response->{results}[0]{resourceName};
   printf "Added feed with resource name '%s'.\n", $feed_resource_name;
 
   return $feed_resource_name;
 }
+# [END add_ad_customizer]
 
 # Retrieves attributes for a feed.
+# [START add_ad_customizer_1]
 sub get_feed_attributes {
   my ($api_client, $customer_id, $feed_resource_name) = @_;
 
@@ -190,8 +193,10 @@ sub get_feed_attributes {
   }
   return $feed_details;
 }
+# [END add_ad_customizer_1]
 
 # Creates a feed mapping for a given feed.
+# [START add_ad_customizer_2]
 sub create_ad_customizer_mapping {
   my (
     $api_client, $customer_id,
@@ -236,18 +241,20 @@ sub create_ad_customizer_mapping {
     });
 
   # Issue a mutate request to add the feed mapping.
-  my $feed_mapping_response = $api_client->FeedMappingService()->mutate({
+  my $feed_mappings_response = $api_client->FeedMappingService()->mutate({
       customerId => $customer_id,
       operations => [$feed_mapping_operation]});
 
   # Display the results.
-  foreach my $result (@{$feed_mapping_response->{results}}) {
+  foreach my $result (@{$feed_mappings_response->{results}}) {
     printf "Created feed mapping with resource name '%s'.\n",
       $result->{resourceName};
   }
 }
+# [END add_ad_customizer_2]
 
 # Creates two different feed items to enable two different ad customizations.
+# [START add_ad_customizer_3]
 sub create_feed_items {
   my (
     $api_client, $customer_id,
@@ -278,14 +285,14 @@ sub create_feed_items {
   );
 
   # Add the feed items.
-  my $feed_item_response = $api_client->FeedItemService()->mutate({
+  my $feed_items_response = $api_client->FeedItemService()->mutate({
     customerId => $customer_id,
     operations => $feed_item_operations
   });
 
   my $feed_item_resource_names = [];
   # Displays the results.
-  foreach my $result (@{$feed_item_response->{results}}) {
+  foreach my $result (@{$feed_items_response->{results}}) {
     printf "Created feed item with resource name '%s'.\n",
       $result->{resourceName};
     push @$feed_item_resource_names, $result->{resourceName};
@@ -293,8 +300,10 @@ sub create_feed_items {
 
   return $feed_item_resource_names;
 }
+# [END add_ad_customizer_3]
 
 # Creates a FeedItemOperation.
+# [START add_ad_customizer_4]
 sub create_feed_item_operation {
   my (
     $name, $price, $date,
@@ -332,10 +341,12 @@ sub create_feed_item_operation {
       create => $feed_item
     });
 }
+# [END add_ad_customizer_4]
 
 # Restricts the feed items to work only with a specific ad group; this prevents
 # the feed items from being used elsewhere and makes sure they are used only for
 # customizing a specific ad group.
+# [START add_ad_customizer_5]
 sub create_feed_item_targets {
   my ($api_client, $customer_id, $ad_group_ids, $feed_item_resource_names) = @_;
 
@@ -361,19 +372,21 @@ sub create_feed_item_targets {
       });
 
     # Issue a mutate request to add the feed item target.
-    my $feed_item_target_response =
+    my $feed_item_targets_response =
       $api_client->FeedItemTargetService()->mutate({
         customerId => $customer_id,
         operations => [$feed_item_target_operation]});
 
     my $feed_item_target_resource_name =
-      $feed_item_target_response->{results}[0]{resourceName};
+      $feed_item_targets_response->{results}[0]{resourceName};
     printf "Added feed item target with resource name '%s'.\n",
       $feed_item_target_resource_name;
   }
 }
+# [END add_ad_customizer_5]
 
 # Creates expanded text ads that use the ad customizer feed to populate the placeholders.
+# [START add_ad_customizer_6]
 sub create_ads_with_customizations {
   my ($api_client, $customer_id, $ad_group_ids, $feed_name) = @_;
 
@@ -404,18 +417,19 @@ sub create_ads_with_customizations {
   }
 
   # Issue a mutate request to add the ads.
-  my $ad_group_ad_response = $api_client->AdGroupAdService()->mutate({
+  my $ad_group_ads_response = $api_client->AdGroupAdService()->mutate({
     customerId => $customer_id,
     operations => $ad_group_ad_operations
   });
 
-  my $ad_group_ad_results = $ad_group_ad_response->{results};
+  my $ad_group_ad_results = $ad_group_ads_response->{results};
   printf "Added %d ads:\n", scalar @$ad_group_ad_results;
   foreach my $ad_group_ad_result (@$ad_group_ad_results) {
     printf "Added an ad with resource name '%s'.\n",
       $ad_group_ad_result->{resourceName};
   }
 }
+# [END add_ad_customizer_6]
 
 # Don't run the example if the file is being included.
 if (abs_path($0) ne abs_path(__FILE__)) {

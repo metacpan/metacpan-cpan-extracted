@@ -1,6 +1,6 @@
 package Tapper::Cmd::Testplan;
 our $AUTHORITY = 'cpan:TAPPER';
-$Tapper::Cmd::Testplan::VERSION = '5.0.11';
+$Tapper::Cmd::Testplan::VERSION = '5.0.12';
 use 5.010;
 use Moose;
 
@@ -96,6 +96,7 @@ sub cancel {
 
     $comment ||= 'Testplan cancelled';
     my $testplan = model('TestrunDB')->resultset('TestplanInstance')->find($id);
+    require Tapper::Cmd::Testrun;
     my $cmd = Tapper::Cmd::Testrun->new;
     my $testruns = $testplan->testruns;
     while(my $testrun = $testruns->next) {
@@ -376,7 +377,7 @@ Tapper Team <tapper-ops@amazon.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2020 by Advanced Micro Devices, Inc..
+This software is Copyright (c) 2020 by Advanced Micro Devices, Inc.
 
 This is free software, licensed under:
 

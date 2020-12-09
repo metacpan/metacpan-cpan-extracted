@@ -106,10 +106,11 @@ sub create_customer_match_user_list {
     });
 
   # Issue a mutate request to add the user list and print some information.
-  my $user_list_response = $api_client->UserListService()->mutate({
+  my $user_lists_response = $api_client->UserListService()->mutate({
       customerId => $customer_id,
       operations => [$user_list_operation]});
-  my $user_list_resource_name = $user_list_response->{results}[0]{resourceName};
+  my $user_list_resource_name =
+    $user_lists_response->{results}[0]{resourceName};
   printf "User list with resource name '%s' was created.\n",
     $user_list_resource_name;
 
@@ -118,6 +119,7 @@ sub create_customer_match_user_list {
 
 # Creates and executes an asynchronous job to add users to the Customer Match
 # user list.
+# [START add_customer_match_user_list]
 sub add_users_to_customer_match_user_list {
   my ($api_client, $customer_id, $user_list_resource_name) = @_;
 
@@ -190,6 +192,7 @@ sub add_users_to_customer_match_user_list {
       POLL_TIMEOUT_SECONDS;
   }
 }
+# [END add_customer_match_user_list]
 
 # Builds and returns offline user data job operations to add one user identified
 # by an email address and one user identified based on a physical address.

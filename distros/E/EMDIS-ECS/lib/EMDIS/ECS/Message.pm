@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 #
-# Copyright (C) 2002-2016 National Marrow Donor Program. All rights reserved.
+# Copyright (C) 2002-2020 National Marrow Donor Program. All rights reserved.
 #
 # For a description of this module, please refer to the POD documentation
 # embedded at the bottom of the file (e.g. perldoc EMDIS::ECS::Message).
@@ -55,6 +55,11 @@ sub new {
         return "message subject not found.";
     }
 
+    # get "x-emdis-message-type" (optional)
+    if($this->{headers} =~ /^x-emdis-message-type:\s*(\S+)\s*$/imo) {
+        $this->{emdis_message_type} = $1;
+    }
+
     # attempt to parse "Subject" into MAIL_MRK:sender[:seqnum]
     my $mail_mrk = 'EMDIS';
     if(ecs_is_configured()) {
@@ -68,6 +73,7 @@ sub new {
         # regular message
         $this->{is_ecs_message} = 1;
         $this->{is_meta_message} = '';
+        $this->{is_document} = '';
         $this->{sender} = $1;
         $this->{seq_num} = $2;
         $this->{part_num} = defined $4 ? $4 : 1;
@@ -76,30 +82,41 @@ sub new {
             return "part_num is greater than num_parts: " . $this->{subject};
         }
     }
+    elsif($this->{subject} =~ /$mail_mrk:(\S+?):(\d+):DOC\s*$/io) {
+        # document
+        $this->{sender} = $1;
+        $this->{is_ecs_message} = '';
+        $this->{is_meta_message} = '';
+        $this->{is_document} = 1;
+        $this->{seq_num} = $2;
+        $this->{emdis_message_type} = 'DOC';
+    }
     elsif($this->{subject} =~ /$mail_mrk:(\S+)\s*$/i) {
         # meta-message
+        $this->{sender} = $1;
         $this->{is_ecs_message} = 1;
         $this->{is_meta_message} = 1;
-        $this->{sender} = $1;
+        $this->{is_document} = '';
     }
     else {
         # not an ECS message
         $this->{is_ecs_message} = '';
         $this->{is_meta_message} = '';
+        $this->{is_document} = '';
     }
 
     # get "Content-type" (optional)
-    if($this->{headers} =~ /^Content-type:\s*(.+?)$/im) {
+    if($this->{headers} =~ /^Content-type:\s*(.+?)\s*$/im) {
         $this->{content_type} = $1;
     }
 
     # get "From" (optional)
-    if($this->{headers} =~ /^From:\s*(.+?)$/im) {
+    if($this->{headers} =~ /^From:\s*(.+?)\s*$/im) {
         $this->{from} = $1;
     }
 
     # get "To" (optional)
-    if($this->{headers} =~ /^To:\s*(.+?)$/im) {
+    if($this->{headers} =~ /^To:\s*(.+?)\s*$/im) {
         $this->{to} = $1;
     }
 
@@ -146,6 +163,13 @@ sub from {
 sub headers {
     my $this = shift;
     return $this->{headers};
+}
+
+# ----------------------------------------------------------------------
+# Accessor method (read-only).
+sub is_document {
+    my $this = shift;
+    return $this->{is_document};
 }
 
 # ----------------------------------------------------------------------
@@ -309,7 +333,7 @@ sub read_from_encrypted_file
     # read encrypted file
     my $newmsg = read_from_file($filename);
     return $newmsg unless ref $newmsg;   # check for error
-    return "not an ECS message" unless $newmsg->is_ecs_message;
+    return "not an ECS message" unless $newmsg->is_ecs_message or $newmsg->is_document;
 
     # read relevant node info from node_tbl
     my $node_tbl = $main::ECS_NODE_TBL;
@@ -424,7 +448,7 @@ THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
 WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF 
 MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
 
-Copyright (C) 2002-2016 National Marrow Donor Program. All rights reserved.
+Copyright (C) 2002-2020 National Marrow Donor Program. All rights reserved.
 
 See LICENSE file for license details.
 

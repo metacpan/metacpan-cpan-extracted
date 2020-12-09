@@ -1,5 +1,8 @@
 Revision history for Tapper-CLI
 
+5.0.7     2020-12-09
+        - cmdline usability [tu-maurice]
+
 5.0.6     2020-01-22
         - testplan-new ... new output format, also printing list of testruns
 

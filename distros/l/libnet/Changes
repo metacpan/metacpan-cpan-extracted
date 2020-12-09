@@ -1,5 +1,24 @@
 Revision history for Perl distribution libnet
 
+3.12 2020-12-09
+
+    - Change licence of libnetFAQ.pod to match everything else.  [CPAN
+      RT#117888]
+
+    - Remove unused "last" label to avoid portability problem.  [Zefram, CPAN
+      RT#122631]
+
+    - Use four-digit year in timegm() calls.  [perlbugbmw@lsmod.de, CPAN
+      RT#124534]
+
+    - Make Net::FTP work with TLS 1.3.  [Steffen Ullrich, PR#40]
+
+    - Fix EINTR interruption in sysread for getline method .  [Gabriel Muñoz,
+      PR#30]
+
+    - Use Test::More instead of custom test subroutines and improve skips in
+      various test scripts.  [James E. Keenan, PR#39]
+
 3.11 2017-11-14
 
     - Treat FTP MLSD commands case-insensitively.  [Brian M. Carlson, PR#32]
@@ -33,7 +52,7 @@ Revision history for Perl distribution libnet
     - Debug output now includes decoded (from base64) negotiation for SASL.
       [Philip Prindeville, PR#27]
 
-    - Adapted tests to Test2 revision of Test::More::note()  [James E. Keenan,
+    - Adapted tests to Test2 revision of Test::More::note().  [James E. Keenan,
       PR#28]
 
 3.08 2016-01-05

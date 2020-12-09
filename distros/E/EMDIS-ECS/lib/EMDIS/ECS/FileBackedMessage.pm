@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 #
-# Copyright (C) 2010-2016 National Marrow Donor Program. All rights reserved.
+# Copyright (C) 2010-2020 National Marrow Donor Program. All rights reserved.
 #
 # For a description of this module, please refer to the POD documentation
 # embedded at the bottom of the file (e.g. perldoc EMDIS::ECS::FileBackedMessage).
@@ -8,9 +8,10 @@
 package EMDIS::ECS::FileBackedMessage;
 
 use EMDIS::ECS qw($ECS_CFG $ECS_NODE_TBL $FILEMODE $VERSION ecs_is_configured
-           format_datetime format_msg_filename
+           format_datetime format_doc_filename format_msg_filename
            log_debug log_info log_warn log_error log_fatal
-           send_encrypted_email send_email dequote trim);
+           send_amqp_message send_encrypted_message send_email
+           dequote trim);
 use Fcntl qw(:DEFAULT :flock);
 use File::Basename;
 use File::Spec::Functions qw(catdir catfile);
@@ -44,14 +45,28 @@ sub new
     {
         $filename = shift;
     }
-    elsif($argc <= 3)
+    elsif($argc == 3)
     {
         ($sender_node_id, $seq_num, $filename) = @_;
+        $this->{sender_node_id} = $sender_node_id if $sender_node_id;
+        $this->{seq_num} = $seq_num if $seq_num;
     }
     else
     {
-        return "Illegal usage -- expected 0-3 parameters: " .
-            "[sender_node_id, seq_num,] [filename]";
+        return "Illegal usage -- expected 0, 1, or 3 parameters: " .
+            "[filename] or <sender_node_id>, <seq_num>, <filename>";
+    }
+
+    # set presumed message type flags - can be overridden by email headers or subject
+    $this->{is_ecs_message} = 1;
+    $this->{is_meta_message} = '';
+    $this->{is_document} = '';
+    if(defined $filename and $filename =~ /(\.doc|\.doc\.xml)$/io)
+    {
+        # filename ending in .doc or .doc.xml indicates document (not message)
+        $this->{is_ecs_message} = '';
+        $this->{is_meta_message} = '';
+        $this->{is_document} = 1;
     }
 
     $this->{temp_files} = [];
@@ -124,8 +139,8 @@ sub new
     my $email_headers = '';
     my $data_offset = 0;
 
-    # attempt to read email headers only if $sender_node_id not specified
-    if(not $sender_node_id)
+    # attempt to read email headers only if sender_node_id not yet defined
+    if(not exists $this->{sender_node_id})
     {
         # attempt to read email headers from file, determine data offset
         my $buf;
@@ -179,11 +194,7 @@ sub new
     # absence of "Subject" line indicates file contains data only
     if(not exists $this->{subject})
     {
-        $this->{sender_node_id} = $sender_node_id if $sender_node_id;
-        $this->{seq_num} = $seq_num if $seq_num;
         $this->{data_offset} = 0;
-        $err = inspect_fml $this;
-        return $err if $err;
         return $this;
     }
 
@@ -202,6 +213,7 @@ sub new
         # regular message
         $this->{is_ecs_message} = 1;
         $this->{is_meta_message} = '';
+        $this->{is_document} = '';
         $this->{sender_node_id} = $1;
         $this->{seq_num} = $2;
         $this->{part_num} = $4 if defined $4;
@@ -213,22 +225,30 @@ sub new
             return "part_num is greater than num_parts: " . $this->{subject};
         }
     }
+    elsif($this->{subject} =~ /$mail_mrk:(\S+?):(\d+):DOC\s*$/io) {
+        # document
+        $this->{sender_node_id} = $1;
+        $this->{is_ecs_message} = '';
+        $this->{is_meta_message} = '';
+        $this->{is_document} = 1;
+        $this->{seq_num} = $2;
+    }
     elsif($this->{subject} =~ /$mail_mrk:(\S+)\s*$/i)
     {
         # meta-message
+        $this->{sender_node_id} = $1;
         $this->{is_ecs_message} = 1;
         $this->{is_meta_message} = 1;
-        $this->{sender_node_id} = $1;
+        $this->{is_document} = '';
     }
     else
     {
-        # not an ECS message
+        # subject line indicates this is not an ECS message or document
         $this->{is_ecs_message} = '';
         $this->{is_meta_message} = '';
+        $this->{is_document} = '';
     }
 
-    return $err if $err;
-    $err = inspect_fml $this;
     return $err if $err;
 
     return $this;
@@ -323,6 +343,16 @@ sub is_meta_message
 
 # ----------------------------------------------------------------------
 # Accessor method (read-only).
+sub is_document
+{
+    my $this = shift;
+    die "is_document() must only be called as an instance method!"
+        unless ref $this;
+    return $this->{is_document};
+}
+
+# ----------------------------------------------------------------------
+# Accessor method (read-only).
 sub num_parts
 {
     my $this = shift;
@@ -339,6 +369,16 @@ sub part_num
     die "part_num() must only be called as an instance method!"
         unless ref $this;
     return $this->{part_num};
+}
+
+# ----------------------------------------------------------------------
+# Accessor method (read-only).
+sub sender
+{
+    my $this = shift;
+    die "sender() must only be called as an instance method!"
+        unless ref $this;
+    return $this->{sender_node_id};
 }
 
 # ----------------------------------------------------------------------
@@ -393,12 +433,13 @@ sub DESTROY
 
 # ----------------------------------------------------------------------
 # read first portion of message, attempt to extract HUB_SND and HUB_RCV
+# (deprecated -- may be called explicitly, but is no longer used by FileBackedMessage constructor)
 sub inspect_fml
 {
     my $this = shift;
-    return "compute_hub_snd_rcv() must only be called as an instance method!"
+    return "inspect_fml() must only be called as an instance method!"
         unless ref $this;
-    return "compute_hub_snd_rcv(): this FileBackedMessage object is closed!"
+    return "inspect_fml(): this FileBackedMessage object is closed!"
         if $this->{is_closed};
 
     # read first part of FML payload, look for HUB_SND, HUB_RCV
@@ -411,27 +452,26 @@ sub inspect_fml
     return "Unable to read from file " . $this->{filename} . ": $!"
         unless defined $bytecount;
 
-    if(not exists $this->{is_ecs_message})
+    # compute is_ecs_message and is_meta_message
+    if($fml =~ /^\s*(BLOCK_BEGIN\s+\w+\s*;\s*)?\w+\s*:/iso)
     {
-        # if not already set, do cursory check of payload to
-        # compute is_ecs_message and is_meta_message
-        if($fml =~ /^\s*(BLOCK_BEGIN\s+\w+\s*;\s*)?\w+\s*:/iso)
-        {
-            $this->{is_ecs_message} = 1;
-            $this->{is_meta_message} = '';
-        }
-        elsif($fml =~ /^\s*msg_type\s*=\s*\S+/isom)
-        {
-            $this->{is_ecs_message} = 1;
-            $this->{is_meta_message} = 1;
-            return '';
-        }
-        else
-        {
-            $this->{is_ecs_message} = '';
-            $this->{is_meta_message} = '';
-            return '';
-        }
+        $this->{is_ecs_message} = 1;
+        $this->{is_meta_message} = '';
+        $this->{is_document} = '';
+    }
+    elsif($fml =~ /^\s*msg_type\s*=\s*\S+/isom)
+    {
+        $this->{is_ecs_message} = 1;
+        $this->{is_meta_message} = 1;
+        $this->{is_document} = '';
+        return '';
+    }
+    else
+    {
+        $this->{is_ecs_message} = '';
+        $this->{is_meta_message} = '';
+        $this->{is_document} = '';
+        return '';
     }
 
     # Note: this code only understands the simple forms of FML assignments
@@ -453,14 +493,14 @@ sub inspect_fml
 }
 
 # ----------------------------------------------------------------------
-sub send_via_email
+sub send_this_message
 {
     my $this = shift;
-    return "send_via_email() must only be called as an instance method!"
+    return "send_this_message() must only be called as an instance method!"
         unless ref $this;
-    return "send_via_email(): this FileBackedMessage object is closed!"
+    return "send_this_message(): this FileBackedMessage object is closed!"
         if $this->{is_closed};
-    return "send_via_email(): this FileBackedMessage object represents " .
+    return "send_this_message(): this FileBackedMessage object represents " .
         "only a partial message!"
         if defined $this->{num_parts} and $this->{num_parts} > 1;
 
@@ -468,13 +508,13 @@ sub send_via_email
     my $rcv_node_id = shift;
     my $is_re_send = shift;
     my $part_num = shift;
-    return "send_via_email(): ECS has not been configured."
+    return "send_this_message(): ECS has not been configured."
         unless ecs_is_configured();
     my $cfg = $ECS_CFG;
     my $node_tbl = $ECS_NODE_TBL;
     my $err = '';
 
-    return "send_via_email(): Missing \$rcv_node_id!"
+    return "send_this_message(): Missing \$rcv_node_id!"
         unless defined $rcv_node_id and $rcv_node_id;
 
     # lock node_tbl, look up $rcv_node_id
@@ -482,39 +522,62 @@ sub send_via_email
     if(not $was_locked)
     {
         $node_tbl->lock()  # lock node_tbl
-            or return "send_via_email(): unable to lock node_tbl: " .
+            or return "send_this_message(): unable to lock node_tbl: " .
                 $node_tbl->ERROR;
     }
     my $node = $node_tbl->read($rcv_node_id);
     if(not $node)
     {
         $node_tbl->unlock() unless $was_locked;  # unlock node_tbl if needed
-        return "send_via_email(): node not found: $rcv_node_id";
+        return "send_this_message(): node not found: $rcv_node_id";
     }
     if(not $node->{addr})
     {
         $node_tbl->unlock() unless $was_locked;  # unlock node_tbl if needed
-        return "send_via_email(): addr not defined for node: $rcv_node_id";
+        return "send_this_message(): addr not defined for node: $rcv_node_id";
     }
 
     # compute or assign message seq_num
     my $seq_num = '';
-    if($is_re_send)
+    if($is_re_send and not $this->{is_document})
     {
         # sanity checks
         if(not defined $this->{seq_num})
         {
             $node_tbl->unlock() unless $was_locked; # unlock node_tbl if needed
-            return "send_via_email(): seq_num not defined for RE_SEND";
+            return "send_this_message(): seq_num not defined for RE_SEND";
         }
         if($this->{seq_num} > $node->{out_seq})
         {
             $node_tbl->unlock() unless $was_locked; # unlock node_tbl if needed
-            return "send_via_email(): seq_num for RE_SEND (" .
+            return "send_this_message(): seq_num for RE_SEND (" .
                 $this->{seq_num} . ") is greater than out_seq for node " .
                 "$rcv_node_id (" . $node->{out_seq} . ")!";
         }
         $seq_num = $this->{seq_num};
+    }
+    elsif($is_re_send and $this->{is_document})
+    {
+        # sanity checks
+        if(not defined $this->{seq_num})
+        {
+            $node_tbl->unlock() unless $was_locked; # unlock node_tbl if needed
+            return "send_this_message(): seq_num not defined for DOC_RE_SEND";
+        }
+        if($this->{seq_num} > $node->{doc_out_seq})
+        {
+            $node_tbl->unlock() unless $was_locked; # unlock node_tbl if needed
+            return "send_this_message(): seq_num for DOC_RE_SEND (" .
+                $this->{seq_num} . ") is greater than doc_out_seq for node " .
+                "$rcv_node_id (" . $node->{doc_out_seq} . ")!";
+        }
+        $seq_num = $this->{seq_num};
+    }
+    elsif($this->{is_document})
+    {
+        # automatically get next (doc) sequence number
+        $node->{doc_out_seq}++;
+        $seq_num = $node->{doc_out_seq};
     }
     elsif(not $this->{is_meta_message})
     {
@@ -522,10 +585,10 @@ sub send_via_email
         if($part_num)
         {
             $node_tbl->unlock() unless $was_locked; # unlock node_tbl if needed
-            return "send_via_email(): part_num specified ($part_num), for " .
+            return "send_this_message(): part_num specified ($part_num), for " .
                 "non- RE_SEND request!";
         }
-        # automatically get next sequence number
+        # automatically get next (msg) sequence number
         $node->{out_seq}++;
         $seq_num = $node->{out_seq};
     }
@@ -543,35 +606,41 @@ sub send_via_email
     if($data_size <= 0)
     {
         $node_tbl->unlock() unless $was_locked;  # unlock node_tbl if needed
-        return "send_via_email(): data_size is <= 0 ($data_size)!";
+        return "send_this_message(): data_size is <= 0 ($data_size)!";
+    }
+
+    # for document, force num_parts = 1
+    if($this->{is_document})
+    {
+        $msg_part_size = $data_size;
     }
 
     # compute num_parts
     my $num_parts = int($data_size / $msg_part_size);
     $num_parts++ if ($data_size % $msg_part_size) > 0;
-
     # num_parts should be 1 for meta message
     if($this->{is_meta_message} and $num_parts > 1)
     {
         $node_tbl->unlock() unless $was_locked;  # unlock node_tbl if needed
-        return "send_via_email(): num_parts cannot be > 1 for meta message!";
+        return "send_this_message(): num_parts cannot be > 1 for meta message!";
     }
     # $part_num cannot be greater than $num_parts
     if(defined $part_num and $part_num and $part_num > $num_parts)
     {
         $node_tbl->unlock() unless $was_locked;  # unlock node_tbl if needed
-        return "send_via_email(): part_num ($part_num) cannot be greater " .
+        return "send_this_message(): part_num ($part_num) cannot be greater " .
             "than num_parts ($num_parts)!";
     }
 
     # compute base subject
     my $subject = $cfg->MAIL_MRK . ':' . $cfg->THIS_NODE;
     $subject .= ":$seq_num" if $seq_num;
+    $subject .= ":DOC" if $this->{is_document};
 
     if($is_re_send)
     {
         # to save disk space, don't copy message to file for RE_SEND
-        log_info("send_via_email(): transmitting $rcv_node_id RE_SEND " .
+        log_info("send_this_message(): transmitting $rcv_node_id RE_SEND " .
                  "message $seq_num" . ($part_num ? ":$part_num" : '') . "\n");
     }
     else
@@ -592,8 +661,15 @@ sub send_via_email
         }
         else
         {
-            # copy regular message to mboxes/out_NODE subdirectory
-            $filename = format_msg_filename($rcv_node_id, $seq_num);
+            # copy regular message or document file to mboxes/out_NODE subdirectory
+            if($this->{is_document})
+            {
+                $filename = format_doc_filename($rcv_node_id, $seq_num);
+            }
+            else
+            {
+                $filename = format_msg_filename($rcv_node_id, $seq_num);
+            }
             # create directory if it doesn't already exist
             my $dirname = dirname($filename);
             mkdir $dirname unless -e $dirname;
@@ -605,14 +681,14 @@ sub send_via_email
         {
             my $template = $filename . "_XXXXXX";
             ($fh, $filename) = tempfile($template);
-            return "send_via_email(): unable to open _XXXX file: " .
+            return "send_this_message(): unable to open _XXXX file: " .
                 "$filename"
                     unless $fh;
         }
         else
         {
             $fh = new IO::File;
-            return "send_via_email(): unable to open file: " .
+            return "send_this_message(): unable to open file: " .
                 "$filename"
                 unless $fh->open("> $filename");
         }
@@ -638,7 +714,7 @@ sub send_via_email
             my $bytecount = read $this->{file_handle}, $buffer, 65536;
             if(not defined $bytecount)
             {
-                $err = "send_via_email(): Problem reading input file " .
+                $err = "send_this_message(): Problem reading input file " .
                     "$this->{filename}: $!";
             }
             elsif($bytecount == 0)
@@ -648,13 +724,17 @@ sub send_via_email
             else
             {
                 print $fh $buffer
-                    or $err = "send_via_email(): Problem writing output " .
+                    or $err = "send_this_message(): Problem writing output " .
                         "file $filename: $!";
             }
         }
         close $fh;
         chmod $FILEMODE, $filename;
     }
+
+    my $custom_headers = {};
+    $custom_headers->{'x-emdis-hub-rcv'} = $rcv_node_id;
+    $custom_headers->{'x-emdis-hub-snd'} = $cfg->THIS_NODE;
 
     if($num_parts == 1)
     {
@@ -670,12 +750,12 @@ sub send_via_email
 
             if(not defined $bytecount)
             {
-                $err = "send_via_email(): Problem reading input file " .
+                $err = "send_this_message(): Problem reading input file " .
                     "$this->{filename}: $!";
             }
             elsif($bytecount != $data_size)
             {
-                $err = "send_via_email(): Problem reading from input file " .
+                $err = "send_this_message(): Problem reading from input file " .
                     "$this->{filename}: expected $msg_part_size bytes, " .
                         "found $bytecount bytes.";
             }
@@ -683,18 +763,31 @@ sub send_via_email
                   and ($node->{encr_meta} !~ /true/io))
             {
                 # don't encrypt meta-message
-                $err = send_email($node->{addr}, $subject, $all_data);
+                if(is_yes($cfg->ENABLE_AMQP) and exists $node->{amqp_addr_meta} and $node->{amqp_addr_meta}) {
+                    # send meta-message via AMQP (if indicated by node config)
+                    return send_amqp_message(
+                        $node->{amqp_addr_meta},
+                        $subject,
+                        $node,
+                        $custom_headers,
+                        $all_data);
+                }
+                else {
+                    $err = send_email($node->{addr}, $subject, undef, $all_data);
+                }
             }
             else
             {
                 # send encrypted message
-                $err = send_encrypted_email(
+                $err = send_encrypted_message(
                     $node->{encr_typ},
                     $node->{addr_r},
                     $node->{addr},
                     $node->{encr_out_keyid},
                     $node->{encr_out_passphrase},
+                    $node,
                     $subject,
+                    $custom_headers,
                     $all_data);
             }
         }
@@ -730,32 +823,34 @@ sub send_via_email
 
                 if(not defined $bytecount)
                 {
-                    $err = "send_via_email(): Problem reading input file " .
+                    $err = "send_this_message(): Problem reading input file " .
                         "$this->{filename}: $!";
                 }
                 elsif($part_num < $num_parts and $bytecount != $msg_part_size)
                 {
-                    $err = "send_via_email(): Problem reading $rcv_node_id " .
+                    $err = "send_this_message(): Problem reading $rcv_node_id " .
                         "message part $part_num/$num_parts from input file " .
                         "$this->{filename}: expected $msg_part_size bytes, " .
                         "found $bytecount bytes.";
                 }
                 elsif($bytecount <= 0)
                 {
-                    $err = "send_via_email(): Problem reading $rcv_node_id " .
+                    $err = "send_this_message(): Problem reading $rcv_node_id " .
                         "message part $part_num/$num_parts from input file " .
                             "$this->{filename}: found $bytecount bytes.";
                 }
                 else
                 {
                     # send encrypted email message
-                    $err = send_encrypted_email(
+                    $err = send_encrypted_message(
                         $node->{encr_typ},
                         $node->{addr_r},
                         $node->{addr},
                         $node->{encr_out_keyid},
                         $node->{encr_out_passphrase},
+                        $node,
                         "$subject:$part_num/$num_parts",
+                        $custom_headers,
                         $part_data);
                 }
             }
@@ -815,13 +910,13 @@ EMDIS::ECS::FileBackedMessage - an ECS email message
  $msg = EMDIS::ECS::FileBackedMessage($sender_node_id, $seq_num, $data_file);
  die "unable to define message: $msg\n" unless ref $msg;
 
- $msg->send_via_email($rcv_node_id);
+ $msg->send_this_message($rcv_node_id);
 
 =head1 DESCRIPTION
 
 ECS file-backed message object, capable of handling very large messages.
 
-The send_via_email subroutine of this object knows how to split a large data
+The send_this_message subroutine of this object knows how to split a large data
 file into multiple encrypted email messages, as specified by the EMDISCORD RFC.
 
 =head1 SEE ALSO
@@ -838,7 +933,7 @@ THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
 WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF 
 MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
 
-Copyright (C) 2010-2016 National Marrow Donor Program. All rights reserved.
+Copyright (C) 2010-2020 National Marrow Donor Program. All rights reserved.
 
 See LICENSE file for license details.
 

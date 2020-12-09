@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 #
-# Copyright (C) 2002-2018 National Marrow Donor Program. All rights reserved.
+# Copyright (C) 2002-2020 National Marrow Donor Program. All rights reserved.
 
 use strict;
 use Test;
@@ -11,7 +11,7 @@ use lib "$FindBin::Bin";
 require 'setup';
 
 # print test plan before loading modules
-BEGIN { plan(tests => 75); }
+BEGIN { plan(tests => 87); }
 use EMDIS::ECS qw(:ALL);
 
 # [1] Was module successfully loaded?
@@ -69,10 +69,10 @@ ok(log_error("error text") =~ /$msg/);
 ok(log_fatal("error text") =~ /$msg/);
 ok(read_ecs_message_id("filename") =~ /$msg/);
 ok(send_admin_email("error description") =~ /$msg/);
-ok(send_ecsmsg_email("node_id", "seq_num", "message_body") =~ /$msg/);
-ok(send_email("recipient", "subject", "body") =~ /$msg/);
-ok(send_encrypted_email("encr_typ", "encr_recip", "recipient", "subject",
-                        "body") =~ /$msg/);
+ok(send_ecs_message("node_id", "seq_num", "message_body") =~ /$msg/);
+ok(send_email("recipient", "subject", undef, "body") =~ /$msg/);
+ok(send_encrypted_message("encr_typ", "encr_recip", "recipient", "subject",
+                          {}, "body") =~ /$msg/);
 ok(format_msg_filename("node_id", "seq_num") =~ /$msg/);
 ok(openpgp_decrypt("infile", "outfile", "reqdsig") =~ /$msg/);
 ok(openpgp_encrypt("infile", "outfile", "recipient") =~ /$msg/);
@@ -84,47 +84,60 @@ ok(pgp2_encrypt("infile", "outfile", "recipient") =~ /$msg/);
 # [] aaaaa
 #ok('AA_BB_0000012345.msg' eq format_msg_filename('AA', 'BB', 12345));
 
-# [44..75] read_ecs_message_id
+# [44..87] read_ecs_message_id
 require EMDIS::ECS::Config;
 $ECS_CFG = { MAIL_MRK => 'EMDIS' };
 bless $ECS_CFG, 'EMDIS::ECS::Config';
 $EMDIS::ECS::configured = 1;
 @arr = read_ecs_message_id(catfile($datadir, 'AA_meta.msg'));
-ok(scalar(@arr) == 4);
+ok(scalar(@arr) == 5);
 ok($arr[0] eq 'AA');
 ok(not defined $arr[1]);
 ok(not defined $arr[2]);
 ok(not defined $arr[3]);
+ok($arr[4] == 0);
 @arr = read_ecs_message_id(catfile($datadir, 'AA_01.msg'));
-ok(scalar(@arr) == 4);
+ok(scalar(@arr) == 5);
 ok($arr[0] eq 'AA');
 ok($arr[1] eq '01');
 ok($arr[2] == 1);
 ok($arr[3] == 1);
+ok($arr[4] == 0);
 @arr = read_ecs_message_id(catfile($datadir, 'AA_02.msg'));
-ok(scalar(@arr) == 4);
+ok(scalar(@arr) == 5);
 ok($arr[0] eq 'AA');
 ok($arr[1] eq '02');
 ok($arr[2] == 1);
 ok($arr[3] == 1);
+ok($arr[4] == 0);
 @arr = read_ecs_message_id(catfile($datadir, 'A1_01.msg'));
-ok(scalar(@arr) == 4);
+ok(scalar(@arr) == 5);
 ok($arr[0] eq 'A1');
 ok($arr[1] eq '01');
 ok($arr[2] == 1);
 ok($arr[3] == 1);
+ok($arr[4] == 0);
 @arr = read_ecs_message_id(catfile($datadir, 'AAA_01.msg'));
-ok(scalar(@arr) == 4);
+ok(scalar(@arr) == 5);
 ok($arr[0] eq 'AAA');
 ok($arr[1] eq '01');
 ok($arr[2] == 1);
 ok($arr[3] == 1);
+ok($arr[4] == 0);
 @arr = read_ecs_message_id(catfile($datadir, 'AA_01_32_47.msg'));
-ok(scalar(@arr) == 4);
+ok(scalar(@arr) == 5);
 ok($arr[0] eq 'AA');
 ok($arr[1] eq '01');
 ok($arr[2] == 32);
 ok($arr[3] == 47);
+ok($arr[4] == 0);
+@arr = read_ecs_message_id(catfile($datadir, 'AA_03.doc'));
+ok(scalar(@arr) == 5);
+ok($arr[0] eq 'AA');
+ok($arr[1] eq '03');
+ok($arr[2] == 1);
+ok($arr[3] == 1);
+ok($arr[4] == 1);
 @arr = read_ecs_message_id(catfile($datadir, 'non_ecs.msg'));
 ok(scalar(@arr) == 0);
 @arr = read_ecs_message_id(catfile($datadir, 'non_ecs_2.msg'));

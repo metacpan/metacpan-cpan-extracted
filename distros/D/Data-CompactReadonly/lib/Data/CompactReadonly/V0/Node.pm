@@ -1,5 +1,5 @@
 package Data::CompactReadonly::V0::Node;
-our $VERSION = '0.0.2';
+our $VERSION = '0.0.3';
 
 use warnings;
 use strict;
@@ -68,9 +68,15 @@ sub _node_at_current_offset {
 
 # what's the minimum number of bytes required to store this int?
 sub _bytes_required_for_int {
+    no warnings 'portable'; # perl worries about 32 bit machines. I don't.
     my($class, $int) = @_;
-    return 1 if($int == 0);
-    return 1 + int(log($int) / log(256));
+    return
+        $int <= 0xff               ? 1 : # Byte
+        $int <= 0xffff             ? 2 : # Short
+        $int <= 0xffffff           ? 3 : # Medium
+        $int <= 0xffffffff         ? 4 : # Long
+        $int <= 0xffffffffffffffff ? 8 : # Huge
+                                     9;  # 9 or greater signals too big for 64 bits
 }
 
 # given the number of elements in a Collection, figure out what the appropriate

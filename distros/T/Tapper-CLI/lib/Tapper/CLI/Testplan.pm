@@ -1,7 +1,7 @@
 package Tapper::CLI::Testplan;
 our $AUTHORITY = 'cpan:TAPPER';
 # ABSTRACT: Handle testplans
-$Tapper::CLI::Testplan::VERSION = '5.0.6';
+$Tapper::CLI::Testplan::VERSION = '5.0.7';
 use 5.010;
 use warnings;
 use strict;
@@ -18,8 +18,7 @@ sub testplanlist
 {
 
         my ($c) = @_;
-        $c->getopt( 'name|n=s@', 'path|p=s@', 'testrun|t=s@', 'id|i=i@','active|a','verbose|v', 'format=s', 'help|?' );
-
+        $c->getopt( 'name|n=s@', 'path|p=s@', 'testrun|t=s@', 'id|i=i@','active|a','verbose|v','result|r', 'format=s', 'help|?' );
         if ( $c->options->{help} ) {
                 say STDERR "Usage: $0 testplan-list [--path=path|-p=path]* [--name|-n=name]* [--testrun=id|-t=id]* [--id=number|-i=number] [--active|-a] [ --format=JSON|YAML ] [--verbose|-v]";
                 say STDERR "";
@@ -40,6 +39,7 @@ sub testplanlist
                 say STDERR "                      Will override --testrun, --path and --name";
                 say STDERR "    --active|-a       Only show testplan with testruns that are not finished yet.";
                 say STDERR "                      Will reduce number of testplans when given with any other filter.";
+                say STDERR "    --result|-r       Determine failure or success of testplan. Expensive operation.";
                 say STDERR "    --format          Give output in this format. Valid values are YAML, JSON. Case insensitive. Always verbose.";
                 say STDERR "    --verbose|-v      Show testplan with id, name and associated testruns. Without only testplan id is shown.";
                 say STDERR "    --help            Print this help message and exit.";
@@ -50,7 +50,9 @@ sub testplanlist
         my $format    = $c->options->{format};
 
         require Tapper::Model;
-        if (@{$c->options->{testrun} || []}) {
+        if (@{$c->options->{id} || []}) {
+                @ids = @{$c->options->{id}};
+        } elsif (@{$c->options->{testrun} || []}) {
                 my $testruns = Tapper::Model::model('TestrunDB')->resultset('Testrun')->search({id => $c->options->{testrun}});
                 while (my $testrun = $testruns->next) {
                         push @ids, $testrun->testplan_id if $testrun->testplan_id;
@@ -89,12 +91,20 @@ sub testplanlist
         my %inst_data;
         my $instances = Tapper::Model::model('TestrunDB')->resultset('TestplanInstance')->search({id => \@ids});
         while (my $instance = $instances->next) {
-                $inst_data{$instance->id} =
+                my $current_inst_data = $inst_data{$instance->id} =
                 {
                  path     => $instance->path ? $instance->path : '',
                  name     => $instance->path ? $instance->path : '',
                  testruns => [ map { {id => $_->id, status => ''.$_->testrun_scheduling->status} } $instance->testruns ], # stringify enum object
-                }
+                };
+
+               if ($c->options->{result}) {
+                        my %testrunrefs = map { $_->{id} => $_ } @{$current_inst_data->{testruns}};
+                        my $iter = Tapper::Model::model('TestrunDB')->resultset('ReportgroupTestrunStats')->search({testrun_id => [ keys %testrunrefs ]});
+                        while (my $stat = $iter->next) {
+                                $testrunrefs{$stat->testrun_id}->{success} = !($stat->success_ratio < 100);
+                        }
+               }
         }
         if ($c->options->{format}) {
                 use Data::Dumper;
@@ -179,12 +189,42 @@ sub testplannew
 }
 
 
+sub testplancancel
+{
+        my ($c) = @_;
+
+        $c->getopt( 'id|i=i@', 'comment=s', 'help|?' );
+        my $opt = $c->options;
+
+        if ( $opt->{help} or not $opt->{id}) {
+                say STDERR "Usage: $0 testplan-cancel --id=number [ --comment=comment ]";
+                say STDERR "";
+                say STDERR "    --id=number        Cancel the testplan with this id. Can be specified multiple times. Required at least once.";
+                say STDERR "    --comment=comment  Specify a comment to add to the cancelled testruns.";
+                say STDERR "    --help             Print this help message and exit.";
+                exit -1;
+        }
+
+        require Tapper::Cmd::Testplan;
+        my $cmd = Tapper::Cmd::Testplan->new();
+
+        my $comment = $opt->{comment} || "Cancelled from Tapper CLI";
+
+        foreach my $testplan (@{$opt->{id}}) {
+                print "Cancelling testplan $testplan\n";
+                $cmd->cancel( $testplan, $comment );
+        }
+        return;
+
+}
+
 
 sub setup
 {
         my ($c) = @_;
         $c->register('testplan-send', \&testplansend, 'Send choosen testplan reports');
         $c->register('testplan-list', \&testplanlist, 'List testplans matching a given pattern');
+        $c->register('testplan-cancel', \&testplancancel, 'Cancel testplans with given IDs');
         $c->register('testplan-tj-send', \&testplan_tj_send, 'Send all testplan reports that are due according to taskjuggler plan');
         $c->register('testplan-tj-generate', \&testplan_tj_generate, 'Apply all testplans that are due according to taskjuggler plan');
         $c->register('testplan-new', \&testplannew, 'Create new testplan instance from file');
@@ -231,6 +271,10 @@ List testplans matching a given pattern.
 
 Create new testplan instance from file.
 
+=head2 testplancancel
+
+Cancel a testplan
+
 =head2 setup
 
 Initialize the testplan functions for tapper CLI
@@ -241,7 +285,7 @@ AMD OSRC Tapper Team <tapper@amd64.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2020 by Advanced Micro Devices, Inc..
+This software is Copyright (c) 2020 by Advanced Micro Devices, Inc.
 
 This is free software, licensed under:
 

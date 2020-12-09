@@ -54,6 +54,6 @@
          "url" : "https://github.com/DrHyde/perl-modules-Data-CompactReadonly"
       }
    },
-   "version" : "v0.0.2",
+   "version" : "v0.0.3",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

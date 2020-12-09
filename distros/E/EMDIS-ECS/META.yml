@@ -34,4 +34,4 @@ requires:
   Net::SMTP: 2.13
   SDBM_File: 1.03
   Text::ParseWords: 3.2
-version: 0.40
+version: 0.41

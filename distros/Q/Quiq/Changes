@@ -1,3 +1,19 @@
+1.192 2020-12-09
+================
+
+[Quiq::Html::Table::List]
+* Attribut "align" erlaubt nun Abkürzungen
+
+[Quiq::PlotlyJs::XY::DiagramGroup]
+* Höhe ohne Rangeslider angepasst
+* Option "FillArea" zu Diagramm hinzugefügt
+
+[Quiq::Parameters]
+* extractToObject() - Fehlermeldung korrigiert
+
+[Quiq::SqlPlus]
+* script() - Sichtbarmachung Nullwert (SET NULL ~) hinzugefügt
+
 1.191 2020-11-01
 ================
 

@@ -58,6 +58,7 @@ my $adjustment_date_time = "INSERT_ADJUSTMENT_DATE_TIME_HERE";
 # This value will be ignored if you specify RETRACTION as adjustment type.
 my $restatement_value = undef;
 
+# [START upload_conversion_adjustment]
 sub upload_conversion_adjustment {
   my ($api_client, $customer_id, $conversion_action_id, $gclid,
     $adjustment_type, $conversion_date_time, $adjustment_date_time,
@@ -118,6 +119,7 @@ sub upload_conversion_adjustment {
 
   return 1;
 }
+# [END upload_conversion_adjustment]
 
 # Don't run the example if the file is being included.
 if (abs_path($0) ne abs_path(__FILE__)) {
@@ -150,7 +152,7 @@ pod2usage(2)
 # Call the example.
 upload_conversion_adjustment($api_client, $customer_id =~ s/-//gr,
   $conversion_action_id, $gclid,
-  $adjustment_type,      $conversion_date_time, $adjustment_date_time,
+  $adjustment_type, $conversion_date_time, $adjustment_date_time,
   $restatement_value);
 
 =pod

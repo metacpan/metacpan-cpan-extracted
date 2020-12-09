@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 #
-# Copyright (C) 2002-2018 National Marrow Donor Program. All rights reserved.
+# Copyright (C) 2002-2020 National Marrow Donor Program. All rights reserved.
 #
 # For a description of this program, please refer to the POD documentation
 # embedded at the bottom of the file (e.g. perldoc ecs_scan_mail).
@@ -106,6 +106,11 @@ eval
 
         # scan mail
         scan_mail();
+
+        last if $interrupted;  # quit now if interrupted
+
+        # scan AMQP "inbox" queue(s)
+        scan_amqp();
 
         last if $interrupted;  # quit now if interrupted
 
@@ -233,7 +238,7 @@ sub scan_mail
 
                 # construct EMDIS::ECS::Message object
                 my $msg = new EMDIS::ECS::Message($raw_msg);
-                if((not ref $msg) or (not $msg->is_ecs_message())) {
+                if((not ref $msg) or (not $msg->is_ecs_message() and not $msg->is_document())) {
                     my $template = sprintf('%s_%d_%04d_XXXX',
                        $fname_dttm, $loopnum, $msgnum);
                     my ($fh, $filename) = tempfile($template,
@@ -328,7 +333,7 @@ sub scan_mail
                     }
                 }
                 else {
-                    # copy regular ECS message to "store" folder
+                    # copy document or regular message to "store" folder
                     # for later processing
                     $err = move_to_dir($filename,
                                        $ECS_CFG->ECS_MBX_STORE_DIR);
@@ -365,6 +370,193 @@ sub scan_mail
             mbox_close();
             last if $interrupted;        # exit msgcount loop if interrupted
             last if $opt_once;           # 'once' option
+        }
+    }
+}
+
+# ----------------------------------------------------------------------
+# scan AMQP "inbox" queue(s) and process messages
+sub scan_amqp
+{
+    if(not is_yes($ECS_CFG->ENABLE_AMQP)) {
+        print "$DEBUG_LABEL skipping AMQP scan (ENABLE_AMQP = " . $ECS_CFG->ENABLE_AMQP . ")\n"
+            if $ECS_CFG->{ECS_DEBUG} > 0;
+        return;
+    }
+
+    # construct AMQP download command (minus queue name)
+    # to mboxes/in_amqp_tmp, mboxes/in_amqp, and optionally in_bck
+    my $cmd = sprintf('%s --debug %s --timeout %s --broker %s --outputdir %s --outputdir %s',
+                      $ECS_CFG->AMQP_CMD_RECV,
+                      $ECS_CFG->AMQP_DEBUG_LEVEL,
+                      $ECS_CFG->AMQP_RECV_TIMEOUT,
+                      $ECS_CFG->AMQP_BROKER_URL,
+                      $ECS_CFG->ECS_MBX_IN_DIR,
+                      $ECS_CFG->ECS_MBX_AMQP_STAGING_DIR);
+    $cmd .= sprintf(' --vhost %s', $ECS_CFG->AMQP_VHOST)
+        if $ECS_CFG->AMQP_VHOST;
+    $cmd .= sprintf(' --truststore %s', $ECS_CFG->AMQP_TRUSTSTORE)
+        if $ECS_CFG->AMQP_TRUSTSTORE;
+    $cmd .= sprintf(' --sslcert %s --sslkey %s',
+                    $ECS_CFG->AMQP_SSLCERT,
+                    $ECS_CFG->AMQP_SSLKEY)
+        if $ECS_CFG->AMQP_SSLCERT and $ECS_CFG->AMQP_SSLKEY;
+    $cmd .= sprintf(' --username %s', $ECS_CFG->AMQP_USERNAME)
+        if $ECS_CFG->AMQP_USERNAME;
+    $cmd .= sprintf(' --outputdir %s', $ECS_CFG->BCK_DIR)
+        if $ECS_CFG->BCK_DIR and $ECS_CFG->BCK_DIR ne 'NONE';
+
+    # set environment variables containing passwords:
+    # ECS_AMQP_PASSWORD and ECS_AMQP_SSLPASS
+    $ENV{ECS_AMQP_PASSWORD} = $ECS_CFG->AMQP_PASSWORD
+        if $ECS_CFG->AMQP_PASSWORD;
+    $ENV{ECS_AMQP_SSLPASS} = $ECS_CFG->AMQP_SSLPASS
+        if $ECS_CFG->AMQP_SSLPASS;
+
+    # download from meta message queue
+    my $cmd_meta = $cmd . sprintf(' --address %s', $ECS_CFG->AMQP_ADDR_META);
+    print "$DEBUG_LABEL AMQP META download command: $cmd_meta\n"
+        if $ECS_CFG->ECS_DEBUG > 0;
+    $err = timelimit_cmd($ECS_CFG->AMQP_RECV_TIMELIMIT, $cmd_meta);
+    if($err) {
+        log_error("scan_amqp(): unable to download from " .
+            "meta message queue " . $ECS_CFG->AMQP_ADDR_META . ": $err");
+    }
+
+    # download from regular message queue
+    my $cmd_msg = $cmd . sprintf(' --address %s', $ECS_CFG->AMQP_ADDR_MSG);
+    print "$DEBUG_LABEL AMQP MSG download command: $cmd_msg\n"
+        if $ECS_CFG->ECS_DEBUG > 0;
+    $err = timelimit_cmd($ECS_CFG->AMQP_RECV_TIMELIMIT, $cmd_msg);
+    if($err) {
+        log_error("scan_amqp(): unable to download from " .
+            "regular message queue " . $ECS_CFG->AMQP_ADDR_MSG . ": $err");
+    }
+
+    # download from document queue
+    # use .amqp.doc suffix for messages downloaded from document queue
+    my $cmd_doc = $cmd . sprintf(' --address %s --suffix .amqp.doc',
+        $ECS_CFG->AMQP_ADDR_DOC);
+    print "$DEBUG_LABEL AMQP DOC download command: $cmd_doc\n"
+        if $ECS_CFG->ECS_DEBUG > 0;
+    $err = timelimit_cmd($ECS_CFG->AMQP_RECV_TIMELIMIT, $cmd_doc);
+    if($err) {
+        log_error("scan_amqp(): unable to download from " .
+            "document queue " . $ECS_CFG->AMQP_ADDR_DOC . ": $err");
+    }
+
+    # process downloaded files
+    process_amqp_staging()
+}
+
+# ----------------------------------------------------------------------
+# Process inbound message files in AMQP staging folder
+sub process_amqp_staging
+{
+    print "$DEBUG_LABEL process_amqp_staging()\n"
+        if $ECS_CFG->{ECS_DEBUG} > 0;
+
+    # get sorted list of files in directory
+    if(not opendir(AMQP_STAGING, $ECS_CFG->ECS_MBX_AMQP_STAGING_DIR)) {
+        log_error("process_amqp_staging(): unable to open AMQP staging " .
+                  "directory: " . $ECS_CFG->ECS_MBX_AMQP_STAGING_DIR);
+        return;
+    }
+    my $file;
+    my @filelist = ();
+    while(defined($file = readdir(AMQP_STAGING))) {
+        push(@filelist, $file);
+    }
+    closedir(AMQP_STAGING);
+    @filelist = sort @filelist;
+
+    # process each file
+    for $file (@filelist)
+    {
+        last if $interrupted;
+        next if($file eq '.') or ($file eq '..');
+        my $filename = catfile($ECS_CFG->ECS_MBX_AMQP_STAGING_DIR, $file);
+        next unless -f $filename;
+        print "$DEBUG_LABEL processing AMQP staging file: $filename\n"
+            if $ECS_CFG->{ECS_DEBUG} > 0;
+
+        my $msg = new EMDIS::ECS::FileBackedMessage($filename);
+        if(not ref $msg)
+        {
+            log_error("process_amqp_staging(): skipping non-parsable file " .
+                      "$filename: $msg");
+            next; # skip this one
+        }
+
+        # retrieve node status from node_tbl
+        # lock ECS_NODE_TBL
+        if(not $ECS_NODE_TBL->lock())
+        {
+            log_error("process_amqp_staging(): unable to lock ECS_NODE_TBL: " .
+                      $ECS_NODE_TBL->ERROR);
+            last;
+        }
+        my $node = $ECS_NODE_TBL->read($msg->sender_node_id);
+        $ECS_NODE_TBL->unlock();
+
+        if (not defined $node) {
+           log_error("process_amqp_staging(): node '" . $msg->sender_node_id . "' not found -- skipping file $filename");
+           next;
+        }
+
+        # don't process the message if the sending node is disabled
+        if ((exists $node->{node_disabled}) and
+            is_yes($node->{node_disabled}) )
+        {
+            log_info("process_amqp_staging(): skipping message file from " .
+                     "disabled node " . $msg->hub_snd . ": $filename");
+            next;
+        }
+
+        if($msg->is_meta_message())
+        {
+            # process meta-message
+            $err = process_meta_message($msg, $filename);
+            if($err) {
+                log_error("scan_mail(): skipping file - unable to process meta-message $filename: $err");
+                next;
+            }
+        }
+        elsif($msg->is_document() || $msg->is_ecs_message())
+        {
+            # copy document or regular message to "store" folder for later processing
+            $err = move_to_dir($filename, $ECS_CFG->ECS_MBX_STORE_DIR);
+            if($err) {
+                log_error("scan_mail(): unable to move file to " .
+                          "\"store\" folder: $err");
+                next;
+            }
+
+            # update $node->{last_in} (if node defined in node_tbl)
+            $err = '';
+            $ECS_NODE_TBL->lock()    # lock node_tbl
+                or $err = "unable to lock node_tbl: " . $ECS_NODE_TBL->ERROR;
+            if(not $err) {
+                my $node = $ECS_NODE_TBL->read($msg->sender);
+                $err = $ECS_NODE_TBL->ERROR;
+                if($node and not $err) {
+                    $node->{last_in} = time;
+                    $ECS_NODE_TBL->write($msg->sender, $node);
+                    $err = $ECS_NODE_TBL->ERROR;
+                }
+            }
+            $ECS_NODE_TBL->unlock(); # unlock node_tbl
+            if($err) {
+                log_error("scan_mail(): unable to update last_in " .
+                          "for node " . $msg->sender . ": $err");
+            }
+        }
+        else
+        {
+            log_error("process_amqp_staging(): moving unrecognized file to " .
+                      "trash - unable to process $filename");
+            move_to_trash($filename);
+            next;
         }
     }
 }
@@ -411,6 +603,13 @@ sub process_maildrop
                       "$filename: $msg");
             last; # don't continue
         }
+        my $err = $msg->inspect_fml();
+        if($err)
+        {
+            log_error("process_maildrop(): unable to inspect FML in " .
+                      "$filename: $err");
+            last; # don't continue
+        }
 
         # retrieve node status from node_tbl
         my $was_locked = $ECS_NODE_TBL->LOCK;
@@ -437,7 +636,7 @@ sub process_maildrop
         if (not ( (exists $node->{node_disabled}) and
                   is_yes($node->{node_disabled}) ) )
         {
-           my $err = $msg->send_via_email($msg->hub_rcv);
+           my $err = $msg->send_this_message($msg->hub_rcv);
            undef $msg;   # closes file
 
            if($err)
@@ -510,10 +709,13 @@ sub process_to_XX
              next;
           }
 
+          # recognized filename suffixes:
+          # .msg = EMDIS message
+          # .doc or .doc.xml = EMDIS document
           my @filelist = grep -f,                      # only files, skips . and ..
                          map { catfile($to_xx, $_) }   # make full pathname
                          sort
-                         grep /^.+\.msg$/,
+                         grep /^.+(\.msg|\.doc|\.doc\.xml)$/,
                          readdir(TODIR);
 
           closedir(TODIR);
@@ -534,7 +736,7 @@ sub process_to_XX
                 last; # don't continue ...
              }
 
-             my $err = $msg->send_via_email($node_id);
+             my $err = $msg->send_this_message($node_id);
              undef $msg;   # closes file
 
              if($err)
@@ -563,7 +765,7 @@ sub compare_seq_part
 }
 
 # ----------------------------------------------------------------------
-# Process incoming messages in "store" folder
+# Process incoming messages and documents in "store" folder
 sub process_store
 {
     my $processing_start_time = shift;
@@ -631,11 +833,131 @@ sub process_store
             next NODE;
         }
         my $in_seq = $node->{in_seq};
+        my $doc_in_seq = $node->{doc_in_seq};
+
+        # process document files in sequential order by seq_num
+        my $docmsgpart = $nodes->{$node_id}->{docmsgpart};
+        my @docmsglist = sort compare_seq_part keys %$docmsgpart;
+        my $processed_seq_num = -1;
+        NODE_DOC_MSG_PART:
+        for my $seq_part_num (@docmsglist)
+        {
+            my ($seq_num, $part_num) = split '_', $seq_part_num;
+
+            # skip if this file is part of an already processed document
+            next NODE_DOC_MSG_PART if $seq_num <= $processed_seq_num;
+
+            # don't process now if document is still "early"
+            if($seq_num > ++$doc_in_seq)
+            {
+                my $q_doc_gap_seq = (exists $node->{q_doc_gap_seq} ?
+                    $node->{q_doc_gap_seq} : 0);
+                my $q_doc_gap_time = (exists $node->{q_doc_gap_time} ?
+                    $node->{q_doc_gap_time} : time());
+                # if q_doc_gap_seq hasn't changed and T_RESEND_DELAY has
+                # elapsed, send a batch of up to 100 DOC_RE_SEND requests
+                if($seq_num == $q_doc_gap_seq)
+                {
+                    if((time() - $q_doc_gap_time) > $ECS_CFG->T_RESEND_DELAY)
+                    {
+                        my $max_resend_seq = $seq_num - 1;
+                        $max_resend_seq = $doc_in_seq + 99
+                            if $max_resend_seq > ($doc_in_seq + 99);
+                        log_info(
+                            "process_store(): requesting DOC_RE_SEND for " .
+                            "documents $node_id:$doc_in_seq through " .
+                            "$node_id:$max_resend_seq");
+                        for(my $resend_seq = $doc_in_seq;
+                            $resend_seq <= $max_resend_seq; $resend_seq++)
+                        {
+                            $err = send_ecs_message($node_id, '',
+                                "msg_type=DOC_RE_SEND\n",
+                                "seq_num=$resend_seq\n",
+                                "# random noise: " . rand() . "\n");
+                            if($err)
+                            {
+                                log_error(
+                                    "process_store(): unable to send " .
+                                    "DOC_RE_SEND request to node $node_id: $err");
+                                last;
+                            }
+                        }
+                        $q_doc_gap_time = time();
+                    }
+                }
+                else
+                {
+                    $q_doc_gap_seq = $seq_num;
+                    $q_doc_gap_time = time();
+                }
+                # update q_doc_gap_seq and q_doc_gap_time in node_tbl
+                my $was_locked = $ECS_NODE_TBL->LOCK;
+                if(not $was_locked)
+                {
+                    if(not $ECS_NODE_TBL->lock())
+                    {
+                        log_error("process_store(): unable to lock " .
+                                  "ECS_NODE_TBL: " . $ECS_NODE_TBL->ERROR);
+                    }
+                }
+                if($ECS_NODE_TBL->LOCK)
+                {
+                    my $node = $ECS_NODE_TBL->read($node_id);
+                    $node->{q_doc_gap_seq} = $q_doc_gap_seq;
+                    $node->{q_doc_gap_time} = $q_doc_gap_time;
+                    $ECS_NODE_TBL->write($node_id, $node);
+                    $ECS_NODE_TBL->unlock() unless $was_locked;
+                }
+                last NODE_DOC_MSG_PART;
+            }
+
+            # sanity check - docnumparts should always be 1
+            if($nodes->{$node_id}->{docnumparts}->{$seq_num} != 1) {
+                log_error("process_store(): unexpected error, document parts > 1 " .
+                               "for $node_id:$seq_num:DOC");
+                last NODE_DOC_MSG_PART;
+            }
+
+            # process document
+            my $filename = $docmsgpart->{$seq_part_num};
+            print "$DEBUG_LABEL processing \"store\" document file: $filename\n"
+                if $ECS_CFG->{ECS_DEBUG} > 0;
+            my $msg = EMDIS::ECS::Message::read_from_file($filename);
+            if(not ref $msg)
+            {
+                log_error("process_store(): unable to read document " .
+                               "from file $filename: $msg");
+                last NODE_DOC_MSG_PART;
+            }
+            $processed_seq_num = $seq_num;
+            $err = process_document($msg, $filename, 1);
+            if($err)
+            {
+                if($err =~ /unable to decrypt document/)
+                {
+                    log_error("process_store(): unable to decrypt document " .
+                              "from file $filename (kept in store): $err");
+                    # (don't) attempt to process as clear-text
+                    # $err = process_document($msg, $filename, 0);
+                    last NODE_DOC_MSG_PART;
+                }
+                else {
+                    log_error("process_store(): unable to process document " .
+                              "from file $filename: $err");
+                    last NODE_DOC_MSG_PART;
+                }
+            }
+            unlink $filename;
+
+            last NODE_DOC_MSG_PART if $processing_end_time < time();
+            last NODE if $interrupted;
+        }
+        last NODE if $processing_end_time < time();
 
         # process message files in sequential order by seq_num
         my $msgpart = $nodes->{$node_id}->{msgpart};
         my @msglist = sort compare_seq_part keys %$msgpart;
-        my $processed_seq_num = -1;
+        $processed_seq_num = -1;
         NODE_MSG_PART:
         for my $seq_part_num (@msglist)
         {
@@ -667,7 +989,7 @@ sub process_store
                         for(my $resend_seq = $in_seq;
                             $resend_seq <= $max_resend_seq; $resend_seq++)
                         {
-                            $err = send_ecsmsg_email($node_id, '',
+                            $err = send_ecs_message($node_id, '',
                                 "msg_type=RE_SEND\n",
                                 "seq_num=$resend_seq\n",
                                 "# random noise: " . rand() . "\n");
@@ -742,7 +1064,7 @@ sub process_store
                             join(',', @missing_parts));
                         for my $pn (@missing_parts)
                         {
-                            $err = send_ecsmsg_email($node_id, '',
+                            $err = send_ecs_message($node_id, '',
                                 "msg_type=RE_SEND\n",
                                 "seq_num=$seq_num:$pn\n",
                                 "# random noise: " . rand() . "\n");
@@ -828,13 +1150,14 @@ sub process_store
         }
         last NODE if $processing_end_time < time();
     }
+
     @nodelist = ();
     $nodes = {};
     update_statistics(\@nodelist, $nodes);
 }
-# ----------------------------------------------------------------------
-# Updates statistics
 
+# ----------------------------------------------------------------------
+# Inspect "store" folder and compute message statistics
 sub update_statistics
 {
     my $nodelist = shift;
@@ -843,7 +1166,7 @@ sub update_statistics
     # get sorted list of files in directory
     if(not opendir(STORE, $ECS_CFG->ECS_MBX_STORE_DIR))
     {
-        log_error("process_store(): unable to open \"store\" " .
+        log_error("update_statistics(): unable to open \"store\" " .
                        "directory: " . $ECS_CFG->ECS_MBX_STORE_DIR);
         return;
     }
@@ -867,13 +1190,15 @@ sub update_statistics
                 $nodes->{$node_id} = {};
                 $nodes->{$node_id}->{msgpart} = {};
                 $nodes->{$node_id}->{numparts} = {};
+                $nodes->{$node_id}->{docmsgpart} = {};
+                $nodes->{$node_id}->{docnumparts} = {};
 
-                # read each node's in_seq from node_tbl, for use below
+                # read each node's in_seq and doc_in_seq from node_tbl, for use below
                 my $node = $ECS_NODE_TBL->read($node_id);
                 $err = $ECS_NODE_TBL->ERROR;
                 if($err)
                 {
-                    log_error("process_store(): unable to read node_tbl " .
+                    log_error("update_statistics(): unable to read node_tbl " .
                               "($node_id): $err\n");
                     $ECS_NODE_TBL->unlock();  # unlock node_tbl
                     return;
@@ -881,6 +1206,7 @@ sub update_statistics
                 else
                 {
                     $nodes->{$node_id}->{in_seq} = $node->{in_seq};
+                    $nodes->{$node_id}->{doc_in_seq} = $node->{doc_in_seq};
                 }
             }
         }
@@ -888,70 +1214,118 @@ sub update_statistics
     }
     else
     {
-        log_error("process_store(): unable to lock node_tbl: " .
+        log_error("update_statistics(): unable to lock node_tbl: " .
             $ECS_NODE_TBL->ERROR . "\n");
         return;
     }
 
-    # extract ECS $node_id, $seq_num, $part_num, and $num_parts from each file
+    # extract ECS $node_id, $seq_num, $part_num, $num_parts, and $is_document from each file
     for $file (@filelist)
     {
         return if $interrupted;
         next if($file eq '.') or ($file eq '..');
         my $filename = catfile($ECS_CFG->ECS_MBX_STORE_DIR, $file);
         next unless -f $filename;
-        my ($node_id, $seq_num, $part_num, $num_parts) =
+        my ($node_id, $seq_num, $part_num, $num_parts, $is_document) =
             read_ecs_message_id($filename);
         if(not defined($node_id) or not defined($seq_num)
-            or not defined($part_num) or not defined($num_parts))
+            or not defined($part_num) or not defined($num_parts)
+            or not defined($is_document))
         {
             # move file to "trash" subdirectory
-            log_error("process_store(): unable to process file " .
+            log_error("update_statistics(): unable to process file " .
                             "$filename");
             move_to_trash($filename);
             next;
         }
 
-        # check $seq_num vs. node's in_seq, to detect already processed message
-        if($seq_num <= $nodes->{$node_id}->{in_seq})
+        if($is_document)
         {
-            # move duplicate seq_num message file to "trash" subdirectory
-            log_warn("process_store(): encountered duplicate (already " .
-                     "processed) message part $node_id:$seq_num:" .
-                     "$part_num/$num_parts in file $filename");
-            move_to_trash($filename);
-            next;
-        }
+            # check $seq_num vs. node's doc_in_seq, to detect already processed document
+            if($seq_num <= $nodes->{$node_id}->{doc_in_seq})
+            {
+                # move duplicate seq_num document file to "trash" subdirectory
+                log_warn("update_statistics(): encountered duplicate (already " .
+                         "processed) document part $node_id:$seq_num:" .
+                         "$part_num/$num_parts:DOC in file $filename");
+                move_to_trash($filename);
+                next;
+            }
 
-        # store information about message num_parts
-        my $numparts = $nodes->{$node_id}->{numparts};
-        if(not exists $numparts->{$seq_num})
-        {
-            $numparts->{$seq_num} = $num_parts;
-        }
-        elsif($num_parts != $numparts->{$seq_num})
-        {
-            log_warn("process_store(): num_parts discrepancy for message " .
-                     "$node_id:$seq_num: expected $num_parts, found " .
-                     $numparts->{$seq_num} .
-                     " in file $filename");
-        }
+            # store information about document num_parts
+            my $numparts = $nodes->{$node_id}->{docnumparts};
+            if(not exists $numparts->{$seq_num})
+            {
+                $numparts->{$seq_num} = $num_parts;
+            }
+            elsif($num_parts != $numparts->{$seq_num})
+            {
+                log_warn("update_statistics(): num_parts discrepancy for document " .
+                         "$node_id:$seq_num: expected $num_parts, found " .
+                         $numparts->{$seq_num} .
+                         " in file $filename");
+            }
 
-        # store information about message part
-        my $msgpart = $nodes->{$node_id}->{msgpart};
-        my $msgkey = "${seq_num}_${part_num}";
-        if(not exists $msgpart->{$msgkey})
-        {
-            # store filename in hash
-            $msgpart->{$msgkey} = $filename
+            # store information about message part
+            my $msgpart = $nodes->{$node_id}->{docmsgpart};
+            my $msgkey = "${seq_num}_${part_num}";
+            if(not exists $msgpart->{$msgkey})
+            {
+                # store filename in hash
+                $msgpart->{$msgkey} = $filename
+            }
+            else
+            {
+                # move duplicate seq_num document file to "trash" subdirectory
+                log_warn("update_statistics(): encountered duplicate document " .
+                         "part $node_id:$seq_num:$part_num/$num_parts:DOC " .
+                         "in file $filename");
+                move_to_trash($filename);
+            }
         }
         else
         {
-            # move duplicate seq_num message file to "trash" subdirectory
-            log_warn("process_store(): encountered duplicate message " .
-                     "part $node_id:$seq_num:$part_num/$num_parts " .
-                     "in file $filename");
-            move_to_trash($filename);
+            # check $seq_num vs. node's in_seq, to detect already processed message
+            if($seq_num <= $nodes->{$node_id}->{in_seq})
+            {
+                # move duplicate seq_num message file to "trash" subdirectory
+                log_warn("update_statistics(): encountered duplicate (already " .
+                         "processed) message part $node_id:$seq_num:" .
+                         "$part_num/$num_parts in file $filename");
+                move_to_trash($filename);
+                next;
+            }
+
+            # store information about message num_parts
+            my $numparts = $nodes->{$node_id}->{numparts};
+            if(not exists $numparts->{$seq_num})
+            {
+                $numparts->{$seq_num} = $num_parts;
+            }
+            elsif($num_parts != $numparts->{$seq_num})
+            {
+                log_warn("update_statistics(): num_parts discrepancy for message " .
+                         "$node_id:$seq_num: expected $num_parts, found " .
+                         $numparts->{$seq_num} .
+                         " in file $filename");
+            }
+
+            # store information about message part
+            my $msgpart = $nodes->{$node_id}->{msgpart};
+            my $msgkey = "${seq_num}_${part_num}";
+            if(not exists $msgpart->{$msgkey})
+            {
+                # store filename in hash
+                $msgpart->{$msgkey} = $filename
+            }
+            else
+            {
+                # move duplicate seq_num message file to "trash" subdirectory
+                log_warn("update_statistics(): encountered duplicate message " .
+                         "part $node_id:$seq_num:$part_num/$num_parts " .
+                         "in file $filename");
+                move_to_trash($filename);
+            }
         }
     }
 
@@ -961,10 +1335,11 @@ sub update_statistics
     {
         for my $node_id (@$nodelist)
         {
-            my $msgpart = $nodes->{$node_id}->{msgpart};
             my $node = $ECS_NODE_TBL->read($node_id);
-            my @seq_part_num = sort compare_seq_part keys %$msgpart;
+
             # compute node q_max_seq, q_min_seq, q_first_file, q_size
+            my $msgpart = $nodes->{$node_id}->{msgpart};
+            my @seq_part_num = sort compare_seq_part keys %$msgpart;
             if($#seq_part_num >= 0)
             {
                 $node->{q_max_seq} =
@@ -997,13 +1372,50 @@ sub update_statistics
                 $node->{q_first_file} = '';
                 $node->{q_size} = 0;
             }
+
+            # compute node q_doc_max_seq, q_doc_min_seq, q_doc_first_file, q_doc_size
+            my $docmsgpart = $nodes->{$node_id}->{docmsgpart};
+            my @doc_seq_part_num = sort compare_seq_part keys %$docmsgpart;
+            if($#doc_seq_part_num >= 0)
+            {
+                $node->{q_doc_max_seq} =
+                    (split '_', $doc_seq_part_num[$#doc_seq_part_num])[0];
+                $node->{q_doc_min_seq} = (split '_', $doc_seq_part_num[0])[0];
+                $node->{q_doc_first_file} = $docmsgpart->{$doc_seq_part_num[0]};
+                # compute number of complete documents in queue for this node
+                my $q_doc_size = 0;
+                my $cur_seq = -1;
+                my $part_count = 0;
+                for my $spn (@doc_seq_part_num)
+                {
+                    my ($seq_num, $part_num) = split '_', $spn;
+                    if($seq_num == $cur_seq) {
+                        $part_count++;
+                    }
+                    else {
+                        $cur_seq = $seq_num;
+                        $part_count = 1;
+                    }
+                    $q_doc_size++ if ($part_count == $part_num) && ($part_num ==
+                        $nodes->{$node_id}->{docnumparts}->{$seq_num});
+                }
+                $node->{q_doc_size} = $q_doc_size;
+            }
+            else
+            {
+                $node->{q_doc_max_seq} = '';
+                $node->{q_doc_min_seq} = '';
+                $node->{q_doc_first_file} = '';
+                $node->{q_doc_size} = 0;
+            }
+
             $ECS_NODE_TBL->write($node_id, $node);
         }
         $ECS_NODE_TBL->unlock();  # release lock
     }
     else
     {
-        log_error("process_store(): unable to lock node_tbl [2]: " .
+        log_error("update_statistics(): unable to lock node_tbl [2]: " .
             $ECS_NODE_TBL->ERROR . "\n");
         return;
     }
@@ -1096,6 +1508,10 @@ sub mbox_open
             my @files =  sort grep { !/^\./ && !/Deleted/i } readdir(DIR);
             closedir (DIR);
             return("",scalar(@files));
+        };
+        /NONE/ and do {
+            log_debug("Skipping email inbox processing:  INBOX_PROTOCOL = NONE");
+            return('', 0);
         };
     }
     return("Unexpected mbox-protocol: $_", undef);
@@ -1246,6 +1662,202 @@ sub mbox_delete_message
 }
 
 # ----------------------------------------------------------------------
+# Process specified document.
+# returns error message, if any
+sub process_document
+{
+    my $msg = shift;
+    my $filename = shift;
+    my $decrypt = shift;
+    my $err = '';
+
+    print "$DEBUG_LABEL process_document(\$msg, $filename, $decrypt)\n"
+        if $ECS_CFG->ECS_DEBUG > 0;
+
+    # look up node in ECS_NODE_TBL
+    my $was_locked = $ECS_NODE_TBL->LOCK;
+    if(not $was_locked) {
+        # lock ECS_NODE_TBL
+        return "process_document(): unable to lock ECS_NODE_TBL: " .
+            $ECS_NODE_TBL->ERROR
+                unless $ECS_NODE_TBL->lock();
+    }
+    # store information about document currently being processed
+    my $this_node = $ECS_NODE_TBL->read($ECS_CFG->THIS_NODE);
+    $this_node->{proc_node} = $msg->sender;
+    $this_node->{proc_seq} = $msg->seq_num;
+    $this_node->{proc_file} = $filename;
+    $ECS_NODE_TBL->write($ECS_CFG->THIS_NODE, $this_node);
+    # retrieve node info
+    my $node = $ECS_NODE_TBL->read($msg->sender);
+    $ECS_NODE_TBL->unlock() unless $was_locked;  # release node_tbl lock
+    if(not $node) {
+        # don't process message from unknown node
+        $err = "process_document(): $err; " . EOL()
+            if $err;
+        $err .= "process_document(): document from unknown node: " .
+            $msg->sender;
+        return $err;
+    }
+
+    # don't process "duplicate" document (seq_num too low)
+    if($msg->seq_num < ($node->{doc_in_seq} + 1)) {
+        my @err = ();
+        push @err, "process_document(): received duplicate document: " .
+            $msg->sender . ":" . $msg->seq_num . ":DOC";
+        # move file to 'trash' folder
+        my $e = move_to_dir($filename, $ECS_CFG->ECS_MBX_TRASH_DIR);
+        push @err, "process_message(): $e"
+            if $e;
+        return join EOL(), @err;
+    }
+
+    # don't process "early" document (seq_num too high)
+    if($msg->seq_num > ($node->{doc_in_seq} + 1)) {
+        $err = "process_document(): $err; " . EOL()
+            if $err;
+        $err .= "process_document(): received early document: " .
+            $msg->sender . ":" . $msg->seq_num;
+        return $err;
+    }
+
+    # create document file
+    # decrypt (if indicated)
+    my $dmsg;
+    if($decrypt) {
+        $dmsg = EMDIS::ECS::Message::read_from_encrypted_file($filename);
+        if(not ref $dmsg)
+        {
+            $err = "process_document(): unable to decrypt document: $dmsg";
+        }
+    }
+    else {
+        $dmsg = EMDIS::ECS::Message::read_from_file($filename);
+        if(not ref $dmsg)
+        {
+            $err = "process_document(): unable to read document: $dmsg";
+        }
+    }
+    # if error encountered, return it
+    return $err if $err;
+
+    # write cleartext document to temp file in $ECS_DAT_DIR/tmp
+    my $template = $filename;
+    if($template =~ /_\w{4}(\.\w+)*$/o) {
+        $template =~ s/_\w{4}(\.\w+)*$/_XXXX/o;
+    }
+    else {
+        $template .= '_XXXX';
+    }
+    my ($fh, $doc_fname) = tempfile($template, SUFFIX => '.doc.asc');
+    print $fh $dmsg->cleartext
+        or $err = "process_document: Unable to write file " .
+            "$doc_fname: $!";
+    close $fh;
+    chmod $EMDIS::ECS::FILEMODE, $doc_fname;
+
+    # if error encountered, remove temp file and return error
+    if($err)
+    {
+        unlink $doc_fname;
+        return $err;
+    }
+
+    # store copy of decrypted payload in $ECS_MBX_IN_FML_DIR
+    my $in_fml_filename = catfile($ECS_CFG->ECS_MBX_IN_FML_DIR,
+        sprintf("%s_%s_%010d.doc", $msg->sender, $ECS_CFG->THIS_NODE,
+                $msg->seq_num));
+    if(not copy($doc_fname, $in_fml_filename))
+    {
+        $err = "process_document(): could not copy $doc_fname " .
+            "to $in_fml_filename: $!";
+        unlink $doc_fname;
+        return $err;
+    }
+    chmod $EMDIS::ECS::FILEMODE, $in_fml_filename;
+
+    # copy payload file to from_XX directory (if ECS_FROM_DIR is configured)
+    my $from_dir = $ECS_CFG->ECS_FROM_DIR;
+    if ( defined $from_dir and $from_dir ne '' ) {
+        # create temporary file (without extension .doc!)
+        # to prevent a race condition on the interface
+        $from_dir = catdir( $from_dir, 'from_' . $msg->sender );
+        my $template = sprintf( "tmp_doc_d%010d.XXXXXX", $msg->seq_num );
+        my( $tmp_fh, $from_tmp_filename ) = tempfile( $template,
+                                                      DIR => $from_dir,
+                                                      UNLINK => 0 );
+        # close the filehandle. We just want to make sure we reserve the
+        # temporary filename
+        close( $tmp_fh );
+
+        # now copy the actual file content over
+        if ( not copy( $doc_fname, $from_tmp_filename ) ) {
+            $err = "process_document(): could not copy $doc_fname "
+                 . "to $from_tmp_filename: $!";
+        }
+
+        # put the final filename together ...
+        my $from_filename = catfile( $from_dir,
+                                     sprintf("d%010d.doc", $msg->seq_num ) );
+        # ... and rename our temporary file in the same directory
+        if ( not rename( $from_tmp_filename, $from_filename ) )
+        {
+            $err = "process_document(): could not rename $from_tmp_filename "
+                 . "to $from_filename: $!";
+        }
+
+        chmod $EMDIS::ECS::FILEMODE, $from_filename;
+    }
+
+    # remove temp file
+    unlink $doc_fname;
+
+    return $err if $err ne '';
+
+    unlink $filename;   # remove input file after successful processing
+
+    # message was processed
+    # if needed, update $node->{doc_in_seq}
+    if(not $was_locked) {
+        $ECS_NODE_TBL->lock()     # lock ECS_NODE_TBL if needed
+            or return "process_document(): unable to (write) lock " .
+                "ECS_NODE_TBL: " . $ECS_NODE_TBL->ERROR;
+    }
+    $node = $ECS_NODE_TBL->read($msg->sender);
+    $err = $ECS_NODE_TBL->ERROR;
+    if((not $err) and (ref $node))
+    {
+        $node->{doc_in_seq}++;
+        if($msg->seq_num == $node->{doc_in_seq})
+        {
+            if(is_yes($ECS_CFG->ALWAYS_ACK))
+            {
+                # only send DOC_MSG_ACK if $ECS_CFG->ALWAYS_ACK is set
+                $err = send_ecs_message($msg->sender, '',
+                    "msg_type=DOC_MSG_ACK\n",
+                    "seq_num=$node->{doc_in_seq}\n",
+                    "# 10-4 " . rand() . "\n");
+                if($err)
+                {
+                    $err = "unable to send DOC_MSG_ACK $node->{doc_in_seq} " .
+                        "meta-message to node " . $msg->sender . ": $err";
+                }
+                else
+                {
+                    $node->{doc_in_seq_ack} = $node->{doc_in_seq};
+                }
+            }
+            $ECS_NODE_TBL->write($msg->sender,$node);
+            $err = $ECS_NODE_TBL->ERROR;
+        }
+    }
+    $ECS_NODE_TBL->unlock() unless $was_locked;  # release node_tbl lock
+    return "process_document(): $err" if $err;
+
+    return '';
+}
+
+# ----------------------------------------------------------------------
 # Process specified meta-message.
 # returns error message, if any
 sub process_meta_message
@@ -1378,7 +1990,7 @@ sub process_message
 
         # write FML message payload to temp file in $ECS_DAT_DIR/tmp
         my $template = $filename;
-        $template =~ s/_\w{4}\.\w+$/_XXXX/;
+        $template =~ s/_\w{4}(\.\w+)*$/_XXXX/;
         my ($fh, $mp_payload_fname) = tempfile($template, SUFFIX => '.fml');
         print $fh $dmsg->cleartext
             or $err = "process_message: Unable to write file " .
@@ -1564,8 +2176,7 @@ sub process_message
             if(is_yes($ECS_CFG->ALWAYS_ACK))
             {
                 # only send MSG_ACK if $ECS_CFG->ALWAYS_ACK is set
-                # (adds rand() to help defend against encryption attack)
-                $err = send_ecsmsg_email($msg->sender, '',
+                $err = send_ecs_message($msg->sender, '',
                     "msg_type=MSG_ACK\n",
                     "seq_num=$node->{in_seq}\n",
                     "# 10-4 " . rand() . "\n");
@@ -1683,7 +2294,7 @@ THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
 WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
 MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
 
-Copyright (C) 2002-2018 National Marrow Donor Program. All rights reserved.
+Copyright (C) 2002-2020 National Marrow Donor Program. All rights reserved.
 
 See LICENSE file for license details.
 

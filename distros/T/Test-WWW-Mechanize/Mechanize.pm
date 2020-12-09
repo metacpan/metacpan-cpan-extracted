@@ -9,11 +9,11 @@ Test::WWW::Mechanize - Testing-specific WWW::Mechanize subclass
 
 =head1 VERSION
 
-Version 1.52
+Version 1.54
 
 =cut
 
-our $VERSION = '1.52';
+our $VERSION = '1.54';
 
 =head1 SYNOPSIS
 
@@ -978,7 +978,7 @@ Tells if the text form of the page's content contains I<$str>.
 
 When your page contains HTML which is difficult, unimportant, or
 unlikely to match over time as designers alter markup, use
-C<text_contains> instead of L</content_contains>.
+C<text_contains> instead of C<content_contains>.
 
  # <b>Hi, <i><a href="some/path">User</a></i>!</b>
  $mech->content_contains('Hi, User'); # Fails.
@@ -1754,7 +1754,7 @@ sub lacks_ids_ok {
 
     assert_arrayref( $ids );
 
-    my $subtest_name = 'lacks_id_ok( [' . join( ', ', @{$ids} ) . ']';
+    my $subtest_name = 'lacks_ids_ok( [' . join( ', ', @{$ids} ) . ']';
     $subtest_name .= ", $msg" if defined $msg;
     $subtest_name .= ' )';
 
@@ -2152,6 +2152,8 @@ sub lacks_uncapped_inputs {
     my $self    = shift;
     my $comment = shift;
 
+    $comment = 'All text inputs should have maxlength attributes' unless defined($comment);
+
     local $Test::Builder::Level = $Test::Builder::Level + 1;
 
     my @uncapped;
@@ -2172,7 +2174,7 @@ sub lacks_uncapped_inputs {
         }
     }
 
-    my $ok = $TB->cmp_ok( scalar @uncapped, '==', 0, $comment );
+    my $ok = $TB->ok( @uncapped == 0, $comment );
     $TB->diag( $_ ) for @uncapped;
 
     return $ok;
@@ -2206,10 +2208,6 @@ You can also look for information at:
 =item * Bug tracker
 
 L<https://github.com/petdance/test-www-mechanize>
-
-=item * AnnoCPAN: Annotated CPAN documentation
-
-L<http://annocpan.org/dist/Test-WWW-Mechanize>
 
 =item * CPAN Ratings
 
@@ -2245,7 +2243,7 @@ and Pete Krawczyk for patches.
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright 2004-2018 Andy Lester.
+Copyright 2004-2020 Andy Lester.
 
 This library is free software; you can redistribute it and/or modify it
 under the terms of the Artistic License version 2.0.

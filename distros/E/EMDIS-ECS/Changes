@@ -444,6 +444,39 @@ Version 0.40, 2018-03-19
 - docker/greenmail/Dockerfile:  new Dockerfile to provide SMTP, POP3, and
   IMAP email services for testing of email communications
 
+Version 0.41, 2020-12-08
+========================
+- add Python scripts for AMQP 1.0 messaging using Apache Qpid Proton:
+  ecs_amqp_recv.py, ecs_amqp_send.py
+- docker/ubuntu:  update to use Ubuntu 18.04;  add Python 3 and Python
+  Qpid Proton to enable use of AMQP 1.0 scripts
+- docker/centos:  add Python 3 and Python Qpid Proton to enable use of
+  AMQP 1.0 scripts
+- docker/qpid-broker-cpp:  add Docker setup for AMQP broker using
+  Apache Qpid Broker-CPP (via RHEL/CentOS packages from EPEL repo)
+- docker/dist:  add test nodes DD and EE for testing AMQP communications,
+  along with AMQP configuration for test node AA, and supporting resources
+- Config.pm:  add AMQP-related configuration settings;  enable use of
+  INBOX_PROTOCOL "NONE"
+- FileBackedMessage.pm:  enable use of either email or AMQP to send message,
+  deprecate inspect_fml subroutine, make modifications to support document
+  exchange
+- Message.pm:  make modifications to support document exchange
+- ECS.pm:  enable use of either email or AMQP to send messages, enable
+  use of custom properties/headers in AMQP/email messages, make
+  modifications to support document exchange
+- ecs_scan_mail:  enable use of either email or AMQP to send and receive
+  messages, add process_document subroutine, make modifications to support
+  document exchange
+- ecs_proc_meta:  enable use of either email or AMQP to send messages,
+  add support for DOC_MSG_ACK and DOC_RE_SEND meta messages
+- ecs_chk_com:  enable use of either email or AMQP to send messages
+- ecstool:  enable use of either email or AMQP to send messages;  define
+  AMQP-related properties usable in node table, to enable node-level
+  customization of AMQP parameters, add support for DOC_MSG_ACK and
+  DOC_RE_SEND meta messages
+- ecs_setup:  add support for AMQP-related configuration settings
+
 
 Ideas for Future Enhancements
 =============================

@@ -1,9 +1,7 @@
 .github/ISSUE_TEMPLATE/bug_report.md
 .github/ISSUE_TEMPLATE/feature_request.md
-.idea/google-ads-perl.iml
 .idea/misc.xml
 .idea/modules.xml
-.idea/perl5local.xml
 .idea/vcs.xml
 .idea/workspace.xml
 .perltidyrc
@@ -87,6 +85,7 @@ examples/extensions/add_lead_form_extension.pl
 examples/extensions/add_prices.pl
 examples/extensions/add_sitelinks.pl
 examples/extensions/add_sitelinks_using_feeds.pl
+examples/extensions/remove_entire_sitelink_campaign_extension_setting.pl
 examples/extensions/update_sitelink.pl
 examples/extensions/update_sitelink_campaign_extension_setting.pl
 examples/feeds/create_feed_item_set.pl
@@ -108,6 +107,7 @@ examples/migration/README.md
 examples/migration/run_example.pl
 examples/misc/get_all_image_assets.pl
 examples/misc/get_all_videos_and_images.pl
+examples/misc/set_custom_client_timeouts.pl
 examples/misc/upload_image.pl
 examples/misc/upload_image_asset.pl
 examples/misc/upload_media_bundle.pl
@@ -131,6 +131,8 @@ examples/remarketing/add_logical_user_list.pl
 examples/remarketing/add_merchant_center_dynamic_remarketing_campaign.pl
 examples/remarketing/add_real_estate_feed.pl
 examples/remarketing/add_remarketing_action.pl
+examples/remarketing/setup_advanced_remarketing.pl
+examples/remarketing/setup_remarketing.pl
 examples/remarketing/update_audience_target_restriction.pl
 examples/remarketing/upload_call_conversion.pl
 examples/remarketing/upload_conversion_adjustment.pl
@@ -150,6 +152,7 @@ examples/targeting/add_demographic_targeting_criteria.pl
 examples/targeting/get_campaign_targeting_criteria.pl
 examples/targeting/get_geo_target_constants_by_names.pl
 examples/targeting/search_for_language_and_carrier_constants.pl
+google-ads-perl.iml
 googleads.properties
 lib/Google/Ads/GoogleAds/BaseEntity.pm
 lib/Google/Ads/GoogleAds/BaseService.pm
@@ -4863,10 +4866,7 @@ lib/Google/Ads/GoogleAds/V6/Services/VideoService/GetVideoRequest.pm
 lib/Google/Ads/GoogleAds/V6/Utils/ResourceNames.pm
 LICENSE
 log4perl.conf
-Makefile.PL
 MANIFEST			This list of files
-META.json
-META.yml
 README.md
 t/001_require.t
 t/011_Client.t
@@ -4895,3 +4895,6 @@ t/testdata/partial_failure_response.json
 t/testdata/stream_search_response.json
 t/utils/TestAPIUtils.pm
 t/utils/TestUtils.pm
+Makefile.PL
+META.yml
+META.json

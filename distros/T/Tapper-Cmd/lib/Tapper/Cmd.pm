@@ -1,9 +1,9 @@
 package Tapper::Cmd;
-# git description: v5.0.10-1-g39d0b86
+# git description: v5.0.11-3-geb410dc
 
 our $AUTHORITY = 'cpan:TAPPER';
 # ABSTRACT: Tapper - Backend functions for CLI and Web
-$Tapper::Cmd::VERSION = '5.0.11';
+$Tapper::Cmd::VERSION = '5.0.12';
 use Moose;
 
 extends 'Tapper::Base';
@@ -122,7 +122,7 @@ Tapper Team <tapper-ops@amazon.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2020 by Advanced Micro Devices, Inc..
+This software is Copyright (c) 2020 by Advanced Micro Devices, Inc.
 
 This is free software, licensed under:
 

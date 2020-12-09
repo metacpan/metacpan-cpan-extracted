@@ -1,5 +1,5 @@
 package Data::CompactReadonly::V0::Dictionary;
-our $VERSION = '0.0.2';
+our $VERSION = '0.0.3';
 
 use warnings;
 use strict;

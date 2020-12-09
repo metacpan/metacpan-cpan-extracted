@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 #
-# Copyright (C) 2002-2018 National Marrow Donor Program. All rights reserved.
+# Copyright (C) 2002-2020 National Marrow Donor Program. All rights reserved.
 #
 # For a description of this program, please refer to the POD documentation
 # embedded at the bottom of the file (e.g. perldoc ecstool).
@@ -9,7 +9,7 @@ use Data::Dumper;
 use EMDIS::ECS qw($ECS_CFG $ECS_NODE_TBL delete_old_files load_ecs_config
            move_to_dir valid_encr_typ
            pgp2_decrypt openpgp_decrypt read_ecs_message_id
-           send_ecsmsg_email format_datetime send_admin_email is_yes);
+           send_ecs_message format_datetime send_admin_email is_yes);
 use EMDIS::ECS::Message;
 use EMDIS::ECS::FileBackedMessage;
 use Fcntl qw(:DEFAULT :flock);
@@ -122,7 +122,14 @@ if($opt_add) {
             ack_seq      => 0,
             addr         => $addr,
             addr_r       => $addr_r,
+            amqp_addr_doc  => '',
+            amqp_addr_meta => '',
+            amqp_addr_msg  => '',
+            amqp_only    => 'no',
             contact      => '',
+            doc_ack_seq  => 0,
+            doc_in_seq   => 0,
+            doc_out_seq  => 0,
             encr_meta    => 'false',
             encr_sig     => $encr_sig,
             encr_typ     => $encr_typ,
@@ -538,8 +545,8 @@ if($opt_meta) {
     die "Error: node '$node_id' not defined.\n"
         unless $node;
     for ($msg_type) {
-        /READY/i and do {
-            $err = send_ecsmsg_email($node_id, '',
+        /^READY/i and do {
+            $err = send_ecs_message($node_id, '',
                 "msg_type=READY\n",
                 ((exists $node->{in_seq}) &&
                     ((!exists $node->{ready_num_disabled}) ||
@@ -551,10 +558,20 @@ if($opt_meta) {
                      not is_yes($node->{ready_num_disabled}))
                     ? "last_sent_num=" . $node->{out_seq}
                     : "") . "\n",
+                ((exists $node->{doc_in_seq}) &&
+                    ((!exists $node->{ready_num_disabled}) ||
+                     not is_yes($node->{ready_num_disabled}))
+                    ? "last_recv_doc=" . $node->{doc_in_seq}
+                    : "") . "\n",
+                ((exists $node->{doc_out_seq}) &&
+                    ((!exists $node->{ready_num_disabled}) ||
+                     not is_yes($node->{ready_num_disabled}))
+                    ? "last_sent_doc=" . $node->{doc_out_seq}
+                    : "") . "\n",
                 "# Hello Partner, I am alive. " . rand() . "\n");
             last;
         };
-        /MSG_ACK/i and do {
+        /^MSG_ACK/i and do {
             die "Error: seq_num not defined.\n"
                 unless defined $seq1;
             die "Error: seq_num not numeric: '$seq1'\n"
@@ -573,7 +590,7 @@ if($opt_meta) {
             my $seq_num;
             for($seq_num = $seq1; $seq_num <= $seq2; $seq_num++)
             {
-                $err = send_ecsmsg_email($node_id, '',
+                $err = send_ecs_message($node_id, '',
                     "msg_type=MSG_ACK\n",
                     "seq_num=$seq_num\n",
                     "# 10-4 " . rand() . "\n");
@@ -582,7 +599,7 @@ if($opt_meta) {
             }
             last;
         };
-        /RE_SEND/i and do {
+        /^RE_SEND/i and do {
             die "Error: seq_num not defined.\n"
                 unless defined $seq1;
             my $part_num = '';
@@ -612,10 +629,67 @@ if($opt_meta) {
             my $seq_num;
             for($seq_num = $seq1; $seq_num <= $seq2; $seq_num++)
             {
-                $err = send_ecsmsg_email($node_id, '', 
+                $err = send_ecs_message($node_id, '', 
                     "msg_type=RE_SEND\n",
                     ($part_num ? "seq_num=$seq_num:$part_num\n" :
                         "seq_num=$seq_num\n"));
+                die "Error sending email message: $err\n"
+                    if $err;
+            }
+            last;
+        };
+        /^DOC_MSG_ACK/i and do {
+            die "Error: seq_num not defined.\n"
+                unless defined $seq1;
+            die "Error: seq_num not numeric: '$seq1'\n"
+                unless $seq1 =~ /^\d+$/;
+            if(defined $seq2)
+            {
+                die "Error: seq2 not numeric: '$seq2'\n"
+                    unless $seq2 =~ /^\d+$/;
+                die "Error: seq2 ($seq2) cannot be less than seq_num ($seq1)\n"
+                    if $seq2 < $seq1;
+            }
+            else
+            {
+                $seq2 = $seq1;
+            }
+            my $seq_num;
+            for($seq_num = $seq1; $seq_num <= $seq2; $seq_num++)
+            {
+                $err = send_ecs_message($node_id, '',
+                    "msg_type=DOC_MSG_ACK\n",
+                    "seq_num=$seq_num\n",
+                    "# 10-4 " . rand() . "\n");
+                die "Error sending email message: $err\n"
+                    if $err;
+            }
+            last;
+        };
+        /^DOC_RE_SEND/i and do {
+            die "Error: seq_num not defined.\n"
+                unless defined $seq1;
+            if($seq1 !~ /^\d+$/)
+            {
+                die "Error: unable to parse seq_num: '$seq1'\n";
+            }
+            if(defined $seq2)
+            {
+                die "Error: seq2 not numeric: '$seq2'\n"
+                    unless $seq2 =~ /^\d+$/;
+                die "Error: seq2 ($seq2) cannot be less than seq_num ($seq1)\n"
+                    if $seq2 < $seq1;
+            }
+            else
+            {
+                $seq2 = $seq1;
+            }
+            my $seq_num;
+            for($seq_num = $seq1; $seq_num <= $seq2; $seq_num++)
+            {
+                $err = send_ecs_message($node_id, '', 
+                    "msg_type=DOC_RE_SEND\n",
+                    "seq_num=$seq_num\n");
                 die "Error sending email message: $err\n"
                     if $err;
             }
@@ -845,14 +919,15 @@ if($opt_send)
     die "Unable to construct FileBackedMessage object for file $filename: " .
         "$msg\n"
         unless ref $msg;
+    my $msgtype = ($msg->is_document() ? 'document' : 'message');
 
     my $re_send = 0;
     $re_send = 1 if $msg->{seq_num};
-    $err = $msg->send_via_email($rcv_node_id, $re_send);
-    die "Unable to send message: $err\n"
+    $err = $msg->send_this_message($rcv_node_id, $re_send);
+    die "Unable to send $msgtype: $err\n"
         if $err;
 
-    print "Message sent.\n";
+    print "$msgtype sent.\n";
 }
 
 # tweak
@@ -925,7 +1000,7 @@ if( $opt_get ) {
       if(not $node) {
          print "Unable to retrieve data for node: $node_id\n";
       }
-      elsif ($prop =~ /^(last_in|last_out|last_in_adm|q_gap_time)$/) {
+      elsif ($prop =~ /^(last_in|last_out|last_in_adm|q_doc_gap_time|q_gap_time)$/) {
          print $node_id . " : " . format_datetime($node->{$prop}) . "\n";
       }
       else {
@@ -960,7 +1035,7 @@ if($opt_export) {
       }
       else {
          foreach my $fld (sort keys %$node) {
-            if($fld =~ /^(last_in|last_out|last_in_adm|q_gap_time)$/) {
+            if($fld =~ /^(last_in|last_out|last_in_adm|q_doc_gap_time|q_gap_time)$/) {
                # display timestamp value
                $file_body .= "" . format_datetime($node->{$fld}) 
                              . $delimiter;
@@ -1005,7 +1080,7 @@ if($opt_view) {
         else {
             print "Node: $node_id\n";
             for my $fld (sort keys %$node) {
-                if($fld =~ /^(last_in|last_out|last_in_adm|q_gap_time)$/) {
+                if($fld =~ /^(last_in|last_out|last_in_adm|q_doc_gap_time|q_gap_time)$/) {
                     # display timestamp value
                     printf "  %-24s %-12s (%s)\n", $fld, $node->{$fld},
                   format_datetime($node->{$fld});
@@ -1026,14 +1101,21 @@ exit 0;
 # Check for correct properties
 # Returns true or false
 sub check_prop{
-   my $prop = shift;
-   return ($prop =~ /^(ack_seq|addr|addr_r|contact|encr_meta|
-                       encr_out_keyid|encr_out_passphrase|encr_sig|
-                       encr_typ|in_seq|in_seq_ack|last_in|last_in_adm|
-                       last_out|msg_part_size|node|node_disabled|out_seq|
-                       proc_node|proc_seq|proc_file|
-                       q_first_file|q_gap_seq|q_gap_time|q_max_seq|
-                       q_min_seq|q_size)$/x);
+    my $prop = shift;
+    return ($prop =~ /^(ack_seq|addr|addr_r|amqp_addr_doc|amqp_addr_meta|
+                        amqp_addr_msg|amqp_broker_url|amqp_cmd_send|
+                        amqp_debug_level|amqp_only|amqp_password|
+                        amqp_sslcert|amqp_sslkey|amqp_sslpass|amqp_truststore|
+                        amqp_username|amqp_vhost|contact|doc_ack_seq|
+                        doc_in_seq|doc_in_seq_ack|doc_out_seq|encr_meta|
+                        encr_out_keyid|encr_out_passphrase|encr_sig|
+                        encr_typ|in_seq|in_seq_ack|last_in|last_in_adm|
+                        last_out|msg_part_size|node|node_disabled|out_seq|
+                        proc_node|proc_seq|proc_file|
+                        q_first_file|q_gap_seq|q_gap_time|q_max_seq|
+                        q_min_seq|q_size|
+                        q_doc_first_file|q_doc_gap_seq|q_doc_gap_time|
+                        q_doc_max_seq|q_doc_min_seq|q_doc_size)$/x);
 }
 
 
@@ -1267,7 +1349,7 @@ THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
 WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF 
 MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
 
-Copyright (C) 2002-2018 National Marrow Donor Program. All rights reserved.
+Copyright (C) 2002-2020 National Marrow Donor Program. All rights reserved.
 
 See LICENSE file for license details.
 

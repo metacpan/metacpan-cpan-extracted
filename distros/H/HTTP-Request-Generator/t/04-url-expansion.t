@@ -1,6 +1,6 @@
 #!perl -w
 use strict;
-use Test::More tests => 14;
+use Test::More tests => 16;
 use Data::Dumper;
 
 use HTTP::Request::Generator 'generate_requests';
@@ -88,6 +88,16 @@ expands_properly('https://127.0.0.8:8443/[a..b].html', [
                  'https://127.0.0.8:8443/a.html',
                  'https://127.0.0.8:8443/b.html',
                  ], 'IPv4 addresses survive expansion');
+
+expands_properly('https://[0:0:0:0:0:ffff:10.138.196.205]:8443/[a..b].html', [
+                 'https://[0:0:0:0:0:ffff:10.138.196.205]:8443/a.html',
+                 'https://[0:0:0:0:0:ffff:10.138.196.205]:8443/b.html',
+                 ], 'Fancy embedded IPv4 addresses survive expansion');
+
+expands_properly('https://[::ffff:0:10.138.196.205]:8443/[a..b].html', [
+                 'https://[::ffff:0:10.138.196.205]:8443/a.html',
+                 'https://[::ffff:0:10.138.196.205]:8443/b.html',
+                 ], 'Fancy embedded routed IPv4 addresses survive expansion');
 
 my @urls = generate_requests(
     pattern => '//f/[0..11][0..11]',

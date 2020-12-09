@@ -1,6 +1,6 @@
 package Tapper::CLI::DbDeploy;
 our $AUTHORITY = 'cpan:TAPPER';
-$Tapper::CLI::DbDeploy::VERSION = '5.0.6';
+$Tapper::CLI::DbDeploy::VERSION = '5.0.7';
 use strict;
 use warnings;
 
@@ -62,7 +62,7 @@ AMD OSRC Tapper Team <tapper@amd64.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2020 by Advanced Micro Devices, Inc..
+This software is Copyright (c) 2020 by Advanced Micro Devices, Inc.
 
 This is free software, licensed under:
 

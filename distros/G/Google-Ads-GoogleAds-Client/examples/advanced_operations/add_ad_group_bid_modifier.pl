@@ -49,6 +49,7 @@ my $ad_group_id = "INSERT_AD_GROUP_ID_HERE";
 # Specify the bid modifier value here or the default specified below will be used.
 my $bid_modifier_value = 1.5;
 
+# [START add_ad_group_bid_modifier]
 sub add_ad_group_bid_modifier {
   my ($api_client, $customer_id, $ad_group_id, $bid_modifier_value) = @_;
 
@@ -72,16 +73,17 @@ sub add_ad_group_bid_modifier {
     });
 
   # Add the ad group bid modifier.
-  my $ad_group_bid_modifier_response =
+  my $ad_group_bid_modifiers_response =
     $api_client->AdGroupBidModifierService()->mutate({
       customerId => $customer_id,
       operations => [$ad_group_bid_modifier_operation]});
 
   printf "Created ad group bid modifier '%s'.\n",
-    $ad_group_bid_modifier_response->{results}[0]{resourceName};
+    $ad_group_bid_modifiers_response->{results}[0]{resourceName};
 
   return 1;
 }
+# [END add_ad_group_bid_modifier]
 
 # Don't run the example if the file is being included.
 if (abs_path($0) ne abs_path(__FILE__)) {

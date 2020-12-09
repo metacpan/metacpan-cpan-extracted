@@ -80,11 +80,7 @@ example:
 
 =over 4
 
-=item $obj-E<gt>B<mimeTypes>()
-
-Returns the internal mime types object.
-
-=item $obj-E<gt>B<types>( [\%table] )
+=item $obj-E<gt>B<mapping>( [\%table] )
 
 In Mojolicious::Types, this attribute exposes the internal
 administration of types, offering to change it with using a clean
@@ -94,11 +90,22 @@ complex internals.
 B<Avoid this method!>  The returned HASH is expensive to construct,
 changes passed via C<%table> are ignored: L<MIME::Types|MIME::Types> is very complete!
 
+=item $obj-E<gt>B<mimeTypes>()
+
+Returns the internal mime types object.
+
 =back
 
 =head2 Actions
 
 =over 4
+
+=item $obj-E<gt>B<content_type>($controller, \%options)
+
+Set a content type on the controller when not yet set.
+The C<%options> contains C<ext> or C<file> specify an file extension or file
+name which is used to derive the content type.
+Added and marked EXPERIMENTAL in Mojo 7.94.
 
 =item $obj-E<gt>B<detect>( $accept, [$prio] )
 
@@ -117,6 +124,11 @@ example:
 
   my $exts = $types->detect('application/json;q=9');
   my $exts = $types->detect('text/html, application/json;q=9');
+
+=item $obj-E<gt>B<file_type>($filename)
+
+Return the mime type for a filename.
+Added and marked EXPERIMENTAL in Mojo 7.94.
 
 =item $obj-E<gt>B<type>( $ext, [$type|\@types] )
 
@@ -179,7 +191,7 @@ There are a few major difference with Mojolicious::Types:
 =item *
 
 the tables maintained by L<MIME::Types|MIME::Types> are complete.  So: there shouldn't
-be a need to add your own types, not via L<types()|MojoX::MIME::Types/"Attributes">, not via L<type()|MojoX::MIME::Types/"Actions">.
+be a need to add your own types, not via MojoX::MIME::Types subroutine types, not via L<type()|MojoX::MIME::Types/"Actions">.
 All attempts to add types are ignored; better remove them from your code.
 
 =item *
@@ -202,12 +214,12 @@ L<MIME::Types::httpAcceptSelect()|MIME::Types/"HTTP support"> to replace this br
 
 =head1 SEE ALSO
 
-This module is part of MIME-Types distribution version 2.17,
-built on January 26, 2018. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of MIME-Types distribution version 2.18,
+built on December 09, 2020. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 
-Copyrights 1999-2018 by [Mark Overmeer <markov@cpan.org>]. For other contributors see ChangeLog.
+Copyrights 1999-2020 by [Mark Overmeer <markov@cpan.org>]. For other contributors see ChangeLog.
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

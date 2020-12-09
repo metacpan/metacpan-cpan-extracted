@@ -3,8 +3,6 @@ MANIFEST
 Makefile.PL
 README
 README.md
-bin/collect-types
-bin/update-iana
 lib/MIME/Type.pm
 lib/MIME/Type.pod
 lib/MIME/Types.pm

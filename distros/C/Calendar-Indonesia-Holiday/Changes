@@ -1,3 +1,16 @@
+0.330   2020-12-08  Released-By: PERLANCAR; Urgency: medium
+
+	- Update 2020 holidays (add joint regional election/pilkada
+	  serentak on dec 9th, decreed nov 27th).
+
+
+0.329   2020-12-04  Released-By: PERLANCAR; Urgency: low
+
+	- No functional changes.
+
+	- Refer to the official SKB in the comment.
+
+
 0.328   2020-12-03  Released-By: PERLANCAR; Urgency: medium
 
 	- Update 2020 holidays (3 joint leave days in Dec removed to
@@ -274,4 +287,3 @@
 0.01     2011-06-14  Released-By: SHARYANTO
 
          - First release.
-

@@ -1,13 +1,21 @@
-0.003   2018-09-10 (PERLANCAR)
+0.004   2020-09-14  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - [doc] Rebuild with Pod::Weaver::Plugin::Regexp::Patterns 0.008 to
+          rename generated POD section Patterns to Regexp Patterns.
+
+
+0.003   2018-09-10  Released-By: PERLANCAR
 
 	- Add examples.
 
 
-0.002   2018-09-02 (PERLANCAR)
+0.002   2018-09-02  Released-By: PERLANCAR
 
 	- Require uppercase for PAUSE ID instead of lowercase.
 
 
-0.001   2017-01-05 (PERLANCAR)
+0.001   2017-01-05  Released-By: PERLANCAR
 
         - First release.

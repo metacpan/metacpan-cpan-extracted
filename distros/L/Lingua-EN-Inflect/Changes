@@ -276,3 +276,9 @@ Revision history for Perl extension Lingua::EN::Inflect.
 
     - Corrected 'cyclops', 'triceratops', etc.
       (Thanks, Lady Aleena)
+
+
+1.905  Tue Dec  8 19:21:16 2020
+
+    - Removed gratuitous use of Env.pm
+    (Thanks, Bob)

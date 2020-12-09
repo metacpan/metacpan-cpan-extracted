@@ -34,6 +34,8 @@ sub work_on_mulitple_words {
 
 	$self->{probability} = max(@ps);
 	$self->set_highword(@ps, @values);
+
+	### FIXME permutate matrix (fill in row by row) with @ps
 }
 
 sub set_highwords

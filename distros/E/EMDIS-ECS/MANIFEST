@@ -2,11 +2,17 @@ Changes
 docker/centos/Dockerfile
 docker/dist/Dockerfile
 docker/dist/README
+docker/dist/certfiles.tar.gz
 docker/dist/ecs-AA.tar.gz
 docker/dist/ecs-BB.tar.gz
 docker/dist/ecs-CC.tar.gz
+docker/dist/ecs-DD.tar.gz
+docker/dist/ecs-EE.tar.gz
 docker/dist/gnupg.tar.gz
 docker/greenmail/Dockerfile
+docker/qpid-broker-cpp/certfiles.tar.gz
+docker/qpid-broker-cpp/Dockerfile
+docker/qpid-broker-cpp/generate_ca_and_certfiles.sh
 docker/ubuntu/Dockerfile
 generate_pdf.sh
 lib/EMDIS/ECS.pm
@@ -18,6 +24,8 @@ LICENSE
 Makefile.PL
 MANIFEST
 README
+script/ecs_amqp_recv.py
+script/ecs_amqp_send.py
 script/ecs_chk_com
 script/ecs_ctl
 script/ecs_pid_chk
@@ -37,6 +45,7 @@ t/data/A1_01.msg
 t/data/AA_01.msg
 t/data/AA_01_32_47.msg
 t/data/AA_02.msg
+t/data/AA_03.doc
 t/data/AA_meta.msg
 t/data/AAA_01.msg
 t/data/non_ecs.msg

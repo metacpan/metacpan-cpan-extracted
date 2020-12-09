@@ -6,7 +6,7 @@ use warnings;
 
 use Data::Printer;
 
-our $VERSION = 0.06;
+our $VERSION = 0.07;
 
 sub call {
 	my ($self, $env) = @_;
@@ -75,7 +75,7 @@ Returns Plack::Component object.
  use Plack::App::Env;
  use Plack::Runner;
 
- # Run application with one PYX file.
+ # Run application.
  my $app = Plack::App::Env->new->to_app;
  Plack::Runner->new->run($app);
 
@@ -137,6 +137,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.06
+0.07
 
 =cut

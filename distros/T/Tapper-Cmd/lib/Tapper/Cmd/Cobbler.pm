@@ -1,6 +1,6 @@
 package Tapper::Cmd::Cobbler;
 our $AUTHORITY = 'cpan:TAPPER';
-$Tapper::Cmd::Cobbler::VERSION = '5.0.11';
+$Tapper::Cmd::Cobbler::VERSION = '5.0.12';
 use warnings;
 use strict;
 
@@ -237,7 +237,7 @@ Tapper Team <tapper-ops@amazon.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2020 by Advanced Micro Devices, Inc..
+This software is Copyright (c) 2020 by Advanced Micro Devices, Inc.
 
 This is free software, licensed under:
 

@@ -5,7 +5,7 @@ author:
 build_requires:
   ExtUtils::MakeMaker: '0'
 configure_requires:
-  Alien::DDC::Concordance: '0.001'
+  Alien::DDC::Concordance: '0.007'
   ExtUtils::MakeMaker: '6.52'
   ExtUtils::XSpp: '0.18'
   JSON: '0'
@@ -23,12 +23,12 @@ no_index:
     - inc
 recommends: {}
 requires:
-  Alien::DDC::Concordance: '0.001'
+  Alien::DDC::Concordance: '0.007'
   ExtUtils::MakeMaker: '6.52'
   ExtUtils::XSpp: '0.18'
   JSON: '0'
   Test::More: '0'
 resources:
   repository: svn://svn.code.sf.net/p/ddc-concordance/code/ddc-perl-xs/
-version: '0.26'
+version: '0.27'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

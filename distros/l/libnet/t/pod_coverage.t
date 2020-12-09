@@ -7,7 +7,7 @@
 #   Test script to check POD coverage.
 #
 # COPYRIGHT
-#   Copyright (C) 2014, 2015 Steve Hay.  All rights reserved.
+#   Copyright (C) 2014, 2015, 2020 Steve Hay.  All rights reserved.
 #
 # LICENCE
 #   This script is free software; you can redistribute it and/or modify it under
@@ -42,6 +42,12 @@ MAIN: {
     }
     elsif ($Test::Pod::Coverage::VERSION < 0.08) {
         plan skip_all => 'Test::Pod::Coverage 0.08 or higher required to test POD coverage';
+    }
+    elsif (!eval { require Socket }) {
+        plan skip_all => 'no Socket';
+    }
+    elsif (ord('A') == 193 && !eval { require Convert::EBCDIC }) {
+        plan skip_all => 'EBCDIC but no Convert::EBCDIC';
     }
     else {
         plan tests => 12;

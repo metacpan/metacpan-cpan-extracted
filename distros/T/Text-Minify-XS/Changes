@@ -1,0 +1,24 @@
+Revision history for Text-Minify-XS:
+
+v0.2.1    2020-12-09 16:56:03+00:00 Europe/London
+  [Incompatabilities]
+  - The XS code uses newer Perl API memory allocation functions,
+    but is only usable in Perl v5.9.3 or later.
+
+  [Documentation]
+  - Fixed typo.
+
+  [Tests]
+  - Added more test cases.
+
+v0.2.0    2020-12-09 15:11:35+00:00 Europe/London
+  [Enhancements]
+  - Trailing whitespace is removed.
+
+  - EOL characters are changed to "\n".
+
+  [Documentation]
+  - Updated documentation.
+
+v0.1.0    2020-12-09 13:58:21+00:00 Europe/London
+- Initial version released.

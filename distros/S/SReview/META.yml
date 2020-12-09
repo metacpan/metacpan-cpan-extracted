@@ -1,14 +1,14 @@
 ---
-abstract: unknown
+abstract: 'a video review and transcoding system'
 author:
-  - unknown
+  - 'Wouter Verhelst <w@uter.be>'
 build_requires:
   ExtUtils::MakeMaker: '0'
   Test::More: '0'
 configure_requires:
-  ExtUtils::MakeMaker: '0'
+  ExtUtils::Depends: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010'
 license: unknown
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -21,10 +21,15 @@ no_index:
 requires:
   DateTime: '0'
   DateTime::Format::ISO8601: '0'
+  DateTime::Format::Pg: '0'
   Mojo::JSON: '0'
   Mojo::Pg: '0'
   Mojolicious::Plugin::OpenAPI: '0'
   Moose: '0'
   Net::Amazon::S3: '0'
-version: v0.6.0
+  Net::SSH::AuthorizedKeysFile: '0'
+resources:
+  homepage: https://yoe.github.io/SReview
+  repository: https://github.com/yoe/SReview.git
+version: v0.6.2
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

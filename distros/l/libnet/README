@@ -1,80 +1,88 @@
-libnet is a collection of Perl modules which provides a simple
-and consistent programming interface (API) to the client side
-of various protocols used in the internet community.
+NAME
 
-For details of each protocol please refer to the RFC. RFCs
-can be found in various places on the web, for a starting
-point look at:
+    libnet - Simple API to the client side of various internet protocols
 
-    http://www.rfc-editor.org/
+DESCRIPTION
 
-The RFCs implemented in this distribution are
+    libnet is a collection of Perl modules which provides a simple and
+    consistent programming interface (API) to the client side of various
+    protocols used in the internet community.
 
-Net::FTP        RFC959          File Transfer Protocol
-Net::SMTP       RFC821          Simple Mail Transfer Protocol
-Net::Time       RFC867          Daytime Protocol
-Net::Time       RFC868          Time Protocol
-Net::NNTP       RFC977          Network News Transfer Protocol
-Net::POP3       RFC1939         Post Office Protocol 3
+    For details of each protocol please refer to the RFC. RFCs can be found in
+    various places on the web, for a starting point look at:
+
+        https://www.rfc-editor.org/
+
+    The RFCs implemented in this distribution are:
+
+        Net::FTP        RFC959          File Transfer Protocol
+        Net::NNTP       RFC977          Network News Transfer Protocol
+        Net::POP3       RFC1939         Post Office Protocol 3
+        Net::SMTP       RFC821          Simple Mail Transfer Protocol
+        Net::Time       RFC867          Daytime Protocol
+        Net::Time       RFC868          Time Protocol
+
+EXAMPLES
+
+    The demos directory does contain a few demo scripts. These should be run
+    from the top directory like:
+
+        demos/smtp.self -user my-email-address -debug
+
+    However, I do not guarantee these scripts to work.
+
+FEEDBACK
+
+    Patches, bug reports, suggestions or any other feedback is welcome.
+
+    Patches can be sent as GitHub pull requests at
+    <https://github.com/steve-m-hay/perl-libnet/pulls>.
+
+    Bug reports and suggestions can be made on the CPAN Request Tracker at
+    <https://rt.cpan.org/Public/Bug/Report.html?Queue=libnet>.
+
+    (Most of the modules in this library have an option to output a debug
+    transcript to STDERR. When reporting bugs/problems please, if possible,
+    include a transcript of a run.)
+
+    Currently active requests on the CPAN Request Tracker can be viewed at
+    <https://rt.cpan.org/Public/Dist/Display.html?Status=Active;Queue=libnet>.
+
+    Please test this distribution.  See CPAN Testers Reports at
+    <https://www.cpantesters.org/> for details of how to get involved.
+
+    Previous test results on CPAN Testers Reports can be viewed at
+    <https://www.cpantesters.org/distro/L/libnet.html>.
+
+    Please rate this distribution on CPAN Ratings at
+    <https://cpanratings.perl.org/rate/?distribution=libnet>.
 
 AVAILABILITY
 
-The latest version of libnet is available from the Comprehensive Perl
-Archive Network (CPAN). To find a CPAN site near you see:
+    The latest version of this module is available from CPAN (see "CPAN" in
+    perlmodlib for details) at
 
-    http://search.cpan.org/dist/libnet/
+    <https://metacpan.org/release/libnet> or
 
-The GitHub source repository can be browsed at
+    <https://www.cpan.org/authors/id/S/SH/SHAY/> or
 
-    https://github.com/steve-m-hay/perl-libnet
+    <https://www.cpan.org/modules/by-module/libnet/>.
 
-If you have a Git client, then you can checkout the latest code with
-
-    git clone https://github.com/steve-m-hay/perl-libnet.git
-
-DOCUMENTATION
-
-See Changes for recent changes.  POD style documentation is included
-in all modules and scripts.  These are normally converted to manual
-pages and installed as part of the installation process.  You should
-also be able to use the 'perldoc' utility to extract documentation from
-the module files directly.
-
-DEMOS
-
-The demos directory does contain a few demo scripts. These should be
-run from the top directory like
-
-    demos/smtp.self -user my-email-address -debug
-
-However I do not guarantee these scripts to work.
-
-SUPPORT
-
-Questions about how to use this library should be directed to the
-comp.lang.perl.modules USENET Newsgroup.  Bug reports and suggestions
-for improvements can be reported on the CPAN Request Tracker at
-
-    https://rt.cpan.org/Public/Bug/Report.html?Queue=libnet
-
-Most of the modules in this library have an option to output a debug
-transcript to STDERR. When reporting bugs/problems please, if possible,
-include a transcript of a run.
+    The latest source code is available from GitHub at
+    <https://github.com/steve-m-hay/perl-libnet>.
 
 INSTALLATION
 
-See the INSTALL file.
+    See the INSTALL file.
 
 COPYRIGHT
 
-Copyright (C) 1996-2007 Graham Barr.  All rights reserved.
-Copyright (C) 2013-2017 Steve Hay.  All rights reserved.
+    Copyright (C) 1996-2007 Graham Barr.  All rights reserved.
+    Copyright (C) 2013-2017, 2020 Steve Hay.  All rights reserved.
 
 LICENCE
 
-This distribution is free software; you can redistribute it and/or modify it
-under the same terms as Perl itself, i.e. under the terms of either the GNU
-General Public License or the Artistic License, as specified in the LICENCE
-file.
-
-Share and Enjoy!
+    This distribution is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself, i.e. under the terms of either the GNU
+    General Public License or the Artistic License, as specified in the LICENCE
+    file.

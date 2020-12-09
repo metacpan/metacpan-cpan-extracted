@@ -54,7 +54,7 @@ test_year_has_num_of_holidays(2016, 15, 4);
 test_year_has_num_of_holidays(2017, 16, 5);
 test_year_has_num_of_holidays(2018, 17, 8);
 test_year_has_num_of_holidays(2019, 16, 4);
-test_year_has_num_of_holidays(2020, 16, 5);
+test_year_has_num_of_holidays(2020, 17, 5);
 test_year_has_num_of_holidays(2021, 16, 7);
 
 DONE_TESTING:

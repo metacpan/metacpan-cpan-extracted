@@ -3,14 +3,13 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: MIDI Utilities
 
-our $VERSION = '0.0700';
+our $VERSION = '0.0701';
 
 use strict;
 use warnings;
 
 use MIDI ();
 use MIDI::Simple ();
-use Music::Chord::Note;
 use Music::Tempo qw(bpm_to_ms);
 
 
@@ -155,21 +154,6 @@ sub midi_format {
 }
 
 
-sub add_octave {
-    my ($octave, @chord) = @_;
-    my $cn = Music::Chord::Note->new();
-    my @posn = map { $cn->scale($_) } @chord;
-    my @formatted;
-    my $last_posn = -1;
-    for my $n (0 .. $#chord) {
-        $octave = $posn[$n] > $last_posn ? $octave : ++$octave;
-        $last_posn = $posn[$n];
-        push @formatted, $chord[$n] . $octave;
-    }
-    return @formatted;
-}
-
-
 sub set_time_sig {
     my ($score, $signature) = @_;
     my ($beats, $divisions) = split /\//, $signature;
@@ -195,7 +179,7 @@ MIDI::Util - MIDI Utilities
 
 =head1 VERSION
 
-version 0.0700
+version 0.0701
 
 =head1 SYNOPSIS
 
@@ -210,8 +194,6 @@ version 0.0700
   my $dump = MIDI::Util::dump('volume'); # length, etc.
 
   my @notes = MIDI::Util::midi_format('C','C#','Db','D'); # C, Cs, Df, D
-
-  @notes = MIDI::Util::add_octave(4, qw(E G C)); # E4, G4, C5
 
 =head1 DESCRIPTION
 
@@ -292,12 +274,6 @@ L<MIDI::Simple>, and L<MIDI::Event> internal lists:
 Change sharp C<#> and flat C<b>, in the list of named notes, to the
 L<MIDI::Simple> C<s> and C<f> respectively.
 
-=head2 add_octave
-
-  @formatted = MIDI::Util::add_octave($octave, @chord);
-
-Append the octave to each *named* note in the given B<chord>.
-
 =head2 set_time_sig
 
   MIDI::Util::set_time_sig( $score, $signature );
@@ -305,6 +281,8 @@ Append the octave to each *named* note in the given B<chord>.
 Set the B<score> C<time_signature> based on the given string.
 
 =head1 SEE ALSO
+
+The F<t/01-functions.t> test file in this distribution
 
 L<MIDI>
 

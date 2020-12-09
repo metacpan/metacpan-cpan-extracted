@@ -80,6 +80,7 @@ sub use_portfolio_bidding_strategy {
 }
 
 # Creates the portfolio bidding strategy.
+# [START use_portfolio_bidding_strategy]
 sub create_bidding_strategy {
   my ($api_client, $customer_id) = @_;
 
@@ -101,21 +102,23 @@ sub create_bidding_strategy {
     });
 
   # Add the bidding strategy.
-  my $bidding_strategy_response =
+  my $bidding_strategies_response =
     $api_client->BiddingStrategyService()->mutate({
       customerId => $customer_id,
       operations => [$bidding_strategy_operation]});
 
   my $bidding_strategy_resource_name =
-    $bidding_strategy_response->{results}[0]{resourceName};
+    $bidding_strategies_response->{results}[0]{resourceName};
 
   printf "Created portfolio bidding strategy with resource name: '%s'.\n",
     $bidding_strategy_resource_name;
 
   return $bidding_strategy_resource_name;
 }
+# [END use_portfolio_bidding_strategy]
 
 # Creates an explicitly shared budget to be used to create the campaign.
+# [START use_portfolio_bidding_strategy_2]
 sub create_shared_campaign_buget {
   my ($api_client, $customer_id) = @_;
 
@@ -136,18 +139,19 @@ sub create_shared_campaign_buget {
     ->new({create => $campaign_budget});
 
   # Add the campaign budget.
-  my $campaign_budget_response = $api_client->CampaignBudgetService()->mutate({
+  my $campaign_budgets_response = $api_client->CampaignBudgetService()->mutate({
       customerId => $customer_id,
       operations => [$campaign_budget_operation]});
 
   my $campaign_budget_resource_name =
-    $campaign_budget_response->{results}[0]{resourceName};
+    $campaign_budgets_response->{results}[0]{resourceName};
 
   printf "Created a shared budget with resource name: '%s'.\n",
     $campaign_budget_resource_name;
 
   return $campaign_budget_resource_name;
 }
+# [END use_portfolio_bidding_strategy_2]
 
 # Creates a campaign with the created portfolio bidding strategy.
 sub create_campaign_with_bidding_strategy {
@@ -157,6 +161,7 @@ sub create_campaign_with_bidding_strategy {
     $campaign_budget_resource_name
   ) = @_;
 
+  # [START use_portfolio_bidding_strategy_1]
   # Create a search campaign.
   my $campaign = Google::Ads::GoogleAds::V6::Resources::Campaign->new({
       name                   => "Interplanetary Cruise #" . uniqid(),
@@ -177,6 +182,7 @@ sub create_campaign_with_bidding_strategy {
       biddingStrategy => $bidding_strategy_resource_name,
       campaignBudget  => $campaign_budget_resource_name
     });
+  # [END use_portfolio_bidding_strategy_1]
 
   # Create a campaign operation.
   my $campaign_operation =
@@ -184,11 +190,11 @@ sub create_campaign_with_bidding_strategy {
     new({create => $campaign});
 
   # Add the campaign.
-  my $campaign_response = $api_client->CampaignService()->mutate({
+  my $campaigns_response = $api_client->CampaignService()->mutate({
       customerId => $customer_id,
       operations => [$campaign_operation]});
 
-  my $campaign_resource_name = $campaign_response->{results}[0]{resourceName};
+  my $campaign_resource_name = $campaigns_response->{results}[0]{resourceName};
 
   printf "Created a campaign with resource name: '%s'.\n",
     $campaign_resource_name;

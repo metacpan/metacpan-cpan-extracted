@@ -12,7 +12,7 @@ use Test::More;
 eval "require Mojo::Base";
 plan skip_all => 'Mojo probably not installed' if $@;
 
-plan tests => 14;
+plan tests => 15;
 
 require_ok('MojoX::MIME::Types');
 
@@ -36,3 +36,5 @@ ok(grep $_ eq 'json', @$ext, 'contains json');
 is($m->type('html'), 'text/html', 'type($ext)');
 
 is_deeply $m->detect('image/missing'), [], 'missing type';
+
+is($m->file_type('a/b/c.gif'), 'image/gif');

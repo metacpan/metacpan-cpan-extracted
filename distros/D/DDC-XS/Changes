@@ -1,6 +1,12 @@
 #-*- Mode: ChangeLog -*-
 
-v0.26 Tue, 08 Dec 2020 13:52:19 +0100
+v0.27 Wed, 09 Dec 2020 10:20:36 +0100 moocow
+	* slightly more helpful error messages for DDC version mismatches
+	* updated Alien::DDC::Concordance dependency (for ddc >= v2.2.8)
+	* massage ddc pre-release version suffix format for non-system alien installs
+	  - because version->parse() chokes on "-rc2" and "_rc2" suffixes
+
+v0.26 Tue, 08 Dec 2020 13:52:19 +0100 moocow
 	* updated for ddc v2.2.8 (#prune[] filters, new ':'-operator syntax)
 
 v0.25 Tue, 30 Jun 2020 09:41:54 +0200 moocow

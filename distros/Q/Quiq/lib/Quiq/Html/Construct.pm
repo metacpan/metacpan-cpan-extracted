@@ -5,7 +5,7 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '1.191';
+our $VERSION = '1.192';
 
 use Quiq::Css;
 use Quiq::JavaScript;
@@ -85,7 +85,7 @@ sub loadFiles {
 
 =head1 VERSION
 
-1.191
+1.192
 
 =head1 AUTHOR
 

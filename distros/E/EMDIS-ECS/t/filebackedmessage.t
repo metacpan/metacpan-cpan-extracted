@@ -1,17 +1,17 @@
 #!/usr/bin/perl -w
 #
-# Copyright (C) 2016 National Marrow Donor Program. All rights reserved.
+# Copyright (C) 2016-2020 National Marrow Donor Program. All rights reserved.
 
 use strict;
 use File::Spec::Functions qw(catfile);
 use Test;
-use vars qw($filename $input_filename $msg $msg2 $tmpdir $txt);
+use vars qw($err $filename $input_docfile $input_docxmlfile $input_filename $msg $msg2 $tmpdir $txt);
 use FindBin;
 use lib "$FindBin::Bin";
 require 'setup';
 
 # print test plan before loading modules
-BEGIN { plan(tests => 116); }
+BEGIN { plan(tests => 122); }
 use EMDIS::ECS::FileBackedMessage;
 
 # [1] Was module successfully loaded?
@@ -27,6 +27,8 @@ select STDERR; $| = 1;   # make unbuffered
 select STDOUT; $| = 1;   # make unbuffered
 
 $input_filename = catfile($tmpdir, 'test_input.msg');
+$input_docfile = catfile($tmpdir, 'test_input.doc');
+$input_docxmlfile = catfile($tmpdir, 'test_input.doc.xml');
 
 # [3..7] valid meta-message
 create_file($input_filename, <<EOF);
@@ -127,7 +129,7 @@ create_file($input_filename, <<EOF);
 Subject: hi
 hi
 EOF
-$msg = new EMDIS::ECS::FileBackedMessage($input_filename);
+$msg = new EMDIS::ECS::FileBackedMessage('AA', '', $input_filename);
 ok(ref $msg);
 ok(not $msg->email_headers);
 ok($msg->is_ecs_message);
@@ -154,6 +156,8 @@ Date: Mon, 7 Apr 2003 16:41:49 -0500 (CDT)
 hi
 EOF
 $msg = new EMDIS::ECS::FileBackedMessage($input_filename);
+$err = $msg->inspect_fml();
+die "inspect_fml error: $err\n" if $err;
 ok(ref $msg);
 ok(not defined $msg->email_headers);
 ok(not defined $msg->subject);
@@ -398,6 +402,8 @@ REMARK = "java.rmi.RemoteException: CORBA UNKNOWN 0 CORBA UNKNOWN 0."
 ;
 EOF
 $msg = new EMDIS::ECS::FileBackedMessage($input_filename);
+$err = $msg->inspect_fml();
+die "inspect_fml error: $err\n" if $err;
 ok(ref $msg);
 ok($msg->subject eq 'EMDIS:Y3:123:4/5');
 ok($msg->is_ecs_message);
@@ -429,6 +435,8 @@ REMARK = "java.rmi.RemoteException: CORBA UNKNOWN 0 CORBA UNKNOWN 0."
 ;
 EOF
 $msg = new EMDIS::ECS::FileBackedMessage($input_filename);
+$err = $msg->inspect_fml();
+die "inspect_fml error: $err\n" if $err;
 ok(ref $msg);
 ok($msg->subject eq 'EMDIS:ZZ:32767');
 ok($msg->is_ecs_message);
@@ -548,7 +556,9 @@ create_file($input_filename, <<EOF);
 msg_type=RE_SEND
 seq_num=1001
 EOF
-$msg = new EMDIS::ECS::FileBackedMessage($input_filename);
+$msg = new EMDIS::ECS::FileBackedMessage('AA', '', $input_filename);
+$err = $msg->inspect_fml();
+die "inspect_fml error: $err\n" if $err;
 ok(ref $msg);
 ok($msg->is_ecs_message);
 ok($msg->is_meta_message);
@@ -558,7 +568,9 @@ $msg->DESTROY if ref $msg;  # release exclusive lock
 create_file($input_filename, <<EOF);
 What is this? testing: 123
 EOF
-$msg = new EMDIS::ECS::FileBackedMessage($input_filename);
+$msg = new EMDIS::ECS::FileBackedMessage('AA', '', $input_filename);
+$err = $msg->inspect_fml();
+die "inspect_fml error: $err\n" if $err;
 ok(ref $msg);
 ok(not $msg->is_ecs_message);
 ok(not $msg->is_meta_message);
@@ -577,14 +589,45 @@ HUB_SND = FX
 ;
 BLOCK_END 1;
 EOF
-$msg = new EMDIS::ECS::FileBackedMessage($input_filename);
+$msg = new EMDIS::ECS::FileBackedMessage('AA', '', $input_filename);
+$err = $msg->inspect_fml();
+die "inspect_fml error: $err\n" if $err;
 ok(ref $msg);
 ok($msg->is_ecs_message);
 ok(not $msg->is_meta_message);
 $msg->DESTROY if ref $msg;  # release exclusive lock
 
+# [117..122] various document input file types
+# document file indicated by .doc filename suffix (no header section)
+create_file($input_docfile, <<EOF);
+<MESSAGE>some document</MESSAGE>
+EOF
+$msg = new EMDIS::ECS::FileBackedMessage('AA', '', $input_docfile);
+ok(ref $msg);
+ok($msg->is_document);
+$msg->DESTROY if ref $msg;  # release exclusive lock
+# document file indicated by .doc.xml filename suffix (no header section)
+create_file($input_docxmlfile, <<EOF);
+<MESSAGE>some document</MESSAGE>
+EOF
+$msg = new EMDIS::ECS::FileBackedMessage('AA', '', $input_docxmlfile);
+ok(ref $msg);
+ok($msg->is_document);
+$msg->DESTROY if ref $msg;  # release exclusive lock
+# document file indicated by Subject header (and not filename suffix)
+create_file($input_filename, <<EOF);
+Subject: EMDIS:AA:123:DOC
+
+<MESSAGE>some document</MESSAGE>
+EOF
+$msg = new EMDIS::ECS::FileBackedMessage($input_filename);
+ok(ref $msg);
+ok($msg->is_document);
+$msg->DESTROY if ref $msg;  # release exclusive lock
+
+
 # test using STDIN for input to constructor (do this by hand using ecstool)
-# test send_via_email subroutine (do this by hand using ecstool)
+# test send_this_message subroutine (do this by hand using ecstool)
 
 exit 0;
 

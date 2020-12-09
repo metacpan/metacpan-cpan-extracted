@@ -12,6 +12,9 @@ description:
   - mem < 64GB
   requested_features_any:
   - vendor eq Intel
+  context:
+    brabbel: sabbel
+    foo: bar
   preconditions:
   - arch: linux64
     image: suse/suse_sles10_64b_smp_raw.tar.gz

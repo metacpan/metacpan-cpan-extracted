@@ -46,6 +46,7 @@ use constant PAGE_SIZE => 1000;
 # Running the example with -h will print the command line usage.
 my $customer_id = "INSERT_CUSTOMER_ID_HERE";
 
+# [START add_remarketing_action]
 sub add_remarketing_action {
   my ($api_client, $customer_id) = @_;
 
@@ -62,24 +63,26 @@ sub add_remarketing_action {
     });
 
   # Issue a mutate request to add the remarketing action and print out some information.
-  my $remarketing_action_response =
+  my $remarketing_actions_response =
     $api_client->RemarketingActionService()->mutate({
       customerId => $customer_id,
       operations => [$remarketing_action_operation]});
 
   my $remarketing_action_resource_name =
-    $remarketing_action_response->{results}[0]{resourceName};
+    $remarketing_actions_response->{results}[0]{resourceName};
   printf
     "Added remarketing action with resource name '%s'.\n",
     $remarketing_action_resource_name;
 
   # Create a query that retrieves the previously created remarketing action with
   # its generated tag snippets.
+  # [START add_remarketing_action_1]
   my $search_query =
     sprintf "SELECT remarketing_action.id, remarketing_action.name, " .
     "remarketing_action.tag_snippets FROM remarketing_action " .
     "WHERE remarketing_action.resource_name = '%s'",
     $remarketing_action_resource_name;
+  # [END add_remarketing_action_1]
 
   # Issue a search request by specifying page size.
   my $search_response = $api_client->GoogleAdsService()->search({
@@ -115,6 +118,7 @@ sub add_remarketing_action {
 
   return 1;
 }
+# [END add_remarketing_action]
 
 # Don't run the example if the file is being included.
 if (abs_path($0) ne abs_path(__FILE__)) {

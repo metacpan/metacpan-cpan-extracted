@@ -15,7 +15,7 @@ configure_requires:
   vars: '0'
   warnings: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.150001'
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -70,5 +70,6 @@ requires:
   utf8: '0'
   vars: '0'
 resources:
-  repository: https://github.com/steve-m-hay/perl-libnet.git
-version: '3.11'
+  repository: https://github.com/steve-m-hay/perl-libnet
+version: '3.12'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

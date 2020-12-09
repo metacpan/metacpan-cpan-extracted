@@ -27,7 +27,7 @@
       },
       "configure" : {
          "requires" : {
-            "Alien::DDC::Concordance" : "0.001",
+            "Alien::DDC::Concordance" : "0.007",
             "ExtUtils::MakeMaker" : "6.52",
             "ExtUtils::XSpp" : "0.18",
             "JSON" : "0",
@@ -37,7 +37,7 @@
       "runtime" : {
          "recommends" : {},
          "requires" : {
-            "Alien::DDC::Concordance" : "0.001",
+            "Alien::DDC::Concordance" : "0.007",
             "ExtUtils::MakeMaker" : "6.52",
             "ExtUtils::XSpp" : "0.18",
             "JSON" : "0",
@@ -56,6 +56,6 @@
          "web" : "https://sourceforge.net/p/ddc-concordance/code/HEAD/tree/ddc-perl-xs/"
       }
    },
-   "version" : "0.26",
+   "version" : "0.27",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

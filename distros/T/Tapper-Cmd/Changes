@@ -1,5 +1,8 @@
 Revision history for Tapper-Cmd
 
+5.0.12    2020-12-09
+        - introduce 'context' to testplans/testruns
+
 5.0.11    2020-01-22
         - [API change!] testplan add returns its created testruns, too
 

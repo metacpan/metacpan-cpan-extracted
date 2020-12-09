@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 #
-# Copyright (C) 2002-2016 National Marrow Donor Program. All rights reserved.
+# Copyright (C) 2002-2020 National Marrow Donor Program. All rights reserved.
 #
 # For a description of this module, please refer to the POD documentation
 # embedded at the bottom of the file (e.g. perldoc EMDIS::ECS).
@@ -33,7 +33,7 @@ BEGIN
 }
 
 # module/package version
-$VERSION = '0.40';
+$VERSION = '0.41';
 
 # file creation mode (octal, a la chmod)
 $FILEMODE = 0660;
@@ -48,8 +48,9 @@ require Exporter;
        load_ecs_config delete_old_files dequote ecs_is_configured
        log log_debug log_info log_warn log_error log_fatal
        copy_to_dir move_to_dir read_ecs_message_id
-       send_admin_email send_ecsmsg_email
-       send_email send_encrypted_email format_datetime
+       send_admin_email send_amqp_message send_ecs_message
+       send_email send_encrypted_message format_datetime
+       format_doc_filename
        format_msg_filename openpgp_decrypt openpgp_encrypt
        pgp2_decrypt pgp2_encrypt check_pid save_pid
        timelimit_cmd remove_pidfile trim valid_encr_typ EOL
@@ -269,7 +270,7 @@ sub move_to_dir {
 # ----------------------------------------------------------------------
 # Read ECS message id from specified file.  File is presumed to be in the
 # format of an email message;  message id is comprised of node_id and seq_num,
-# with optional $part_num and $num_parts.
+# with optional $part_num and $num_parts or DOC suffix.
 # Returns empty array if unable to retrieve ECS message id from file.
 sub read_ecs_message_id
 {
@@ -283,13 +284,16 @@ sub read_ecs_message_id
     return () unless $fh->open("< $filename");
     while(<$fh>) {
         /^Subject:.*$mail_mrk:(\S+?):(\d+):(\d+)\/(\d+)\s*$/io and do {
-            return ($1,$2,$3,$4);
+            return ($1,$2,$3,$4,0);
         };
         /^Subject:.*$mail_mrk:(\S+?):(\d+)\s*$/io and do {
-            return ($1,$2,1,1);
+            return ($1,$2,1,1,0);
+        };
+        /^Subject:.*$mail_mrk:(\S+?):(\d+):DOC\s*$/io and do {
+            return ($1,$2,1,1,1);
         };
         /^Subject:.*$mail_mrk:(\S+)\s*$/io and do {
-            return ($1,undef,undef,undef);
+            return ($1,undef,undef,undef,0);
         };
         /^$/ and last;  # blank line marks end of mail headers
     }
@@ -331,7 +335,7 @@ sub send_admin_email {
         foreach my $recipient (@recipients)
         {
             $err = send_email($recipient, '[' . $cfg->MAIL_MRK . '] ECS Error',
-                "Origin: $0\n", @_);
+                undef, "Origin: $0\n", @_);
 
             log_error("Unable to send admin email to $recipient: $err")
                 if $err and $_[$#_] !~ /Unable to send admin email/iso;
@@ -344,13 +348,13 @@ sub send_admin_email {
 # ----------------------------------------------------------------------
 # Send ECS email message.
 # Returns empty string if successful or error message if error encountered.
-sub send_ecsmsg_email {
+sub send_ecs_message {
     my $node_id = shift;
     my $seq_num = shift;
     # @_ now contains message body
 
     # initialize
-    return "EMDIS::ECS::send_ecsmsg_email(): ECS has not been configured."
+    return "EMDIS::ECS::send_ecs_message(): ECS has not been configured."
         unless ecs_is_configured();
     my $cfg = $ECS_CFG;
     my $node_tbl = $ECS_NODE_TBL;
@@ -362,26 +366,26 @@ sub send_ecsmsg_email {
         # parse FML to determing $node_id:
         # do some cursory validation, extract HUB_RCV and HUB_SND
         my $fml = join('', @_);
-        return "EMDIS::ECS::send_ecsmsg_email(): message does not contain valid FML"
+        return "EMDIS::ECS::send_ecs_message(): message does not contain valid FML"
                 unless $fml =~ /^.+:.+;/s;
         if($fml =~ /HUB_RCV\s*=\s*([^,;]+)/is) {  # presumes [^,;] in HUB_RCV
             $hub_rcv = dequote(trim($1));
         }
         else {
-            return "EMDIS::ECS::send_ecsmsg_email(): message does not specify " .
+            return "EMDIS::ECS::send_ecs_message(): message does not specify " .
                 "HUB_RCV";
         }
         if($fml =~ /HUB_SND\s*=\s*([^,;]+)/is) {  # presumes [^,;] in HUB_SND
             $hub_snd = dequote(trim($1));
         }
         else {
-            return "EMDIS::ECS::send_ecsmsg_email(): message does not specify " .
+            return "EMDIS::ECS::send_ecs_message(): message does not specify " .
                 "HUB_SND";
         }
-        return "EMDIS::ECS::send_ecsmsg_email(): HUB_SND is incorrect: $hub_snd"
+        return "EMDIS::ECS::send_ecs_message(): HUB_SND is incorrect: $hub_snd"
             unless $hub_snd eq $ECS_CFG->THIS_NODE;
         $node_id = $hub_rcv unless $node_id;
-        return "EMDIS::ECS::send_ecsmsg_email(): node_id ($node_id) and FML " .
+        return "EMDIS::ECS::send_ecs_message(): node_id ($node_id) and FML " .
             "HUB_RCV ($hub_rcv) do not match"
             unless $node_id eq $hub_rcv;
     }
@@ -390,17 +394,17 @@ sub send_ecsmsg_email {
     my $was_locked = $node_tbl->LOCK;
     if(not $was_locked) {
         $node_tbl->lock()     # lock node_tbl if needed
-            or return "EMDIS::ECS::send_ecsmsg_email(): unable to lock node_tbl: " .
+            or return "EMDIS::ECS::send_ecs_message(): unable to lock node_tbl: " .
                 $node_tbl->ERROR;
     }
     my $node = $node_tbl->read($node_id);
     if(not $node) {
         $node_tbl->unlock() unless $was_locked;  # unlock node_tbl if needed
-        return "EMDIS::ECS::send_ecsmsg_email(): node not found: " . $node_id;
+        return "EMDIS::ECS::send_ecs_message(): node not found: " . $node_id;
     }
     if(not $node->{addr}) {
         $node_tbl->unlock() unless $was_locked;  # unlock node_tbl if needed
-        return "EMDIS::ECS::send_ecsmsg_email(): addr not defined for node: $node_id";
+        return "EMDIS::ECS::send_ecs_message(): addr not defined for node: $node_id";
     }
     if($seq_num =~ /auto/i) {
         # automatically get next sequence number
@@ -435,13 +439,13 @@ sub send_ecsmsg_email {
      if(-e $filename) {
          my $template = $filename . "_XXXX";
          ($fh, $filename) = tempfile($template);
-         return "EMDIS::ECS::send_ecsmsg_email(): unable to open _XXXX file: " .
+         return "EMDIS::ECS::send_ecs_message(): unable to open _XXXX file: " .
              "$filename"
                  unless $fh;
      }
      else {
          $fh = new IO::File;
-         return "EMDIS::ECS::send_ecsmsg_email(): unable to open file: " .
+         return "EMDIS::ECS::send_ecs_message(): unable to open file: " .
              "$filename"
                  unless $fh->open("> $filename");
      }
@@ -454,21 +458,39 @@ sub send_ecsmsg_email {
      chmod $FILEMODE, $filename;
 
     if ( $err ) {
-        $err = "EMDIS::ECS::send_ecsmsg_email(): unable to update node $node_id: $err";
+        $err = "EMDIS::ECS::send_ecs_message(): unable to update node $node_id: $err";
     }
     elsif ( not $seq_num and ($node->{encr_meta} !~ /true/i) ) {
         # if indicated, don't encrypt meta-message
-        $err = send_email($node->{addr}, $subject, @_)
+        if(is_yes($cfg->ENABLE_AMQP) and exists $node->{amqp_addr_meta} and $node->{amqp_addr_meta}) {
+            # send meta-message via AMQP (if indicated by node config)
+            $err = send_amqp_message(
+                $node->{amqp_addr_meta},
+                $subject,
+                $node,
+                undef,
+                @_);
+        }
+        elsif(is_yes($node->{amqp_only})) {
+            $err = "EMDIS::ECS::send_ecs_message(): unable to send " .
+                "email META message to node " . $node->{node} .
+                ": amqp_only selected.";
+        }
+        else {
+            $err = send_email($node->{addr}, $subject, undef, @_);
+        }
     }
     else {
         # otherwise, send encrypted message
-        $err = send_encrypted_email(
+        $err = send_encrypted_message(
             $node->{encr_typ},
             $node->{addr_r},
             $node->{addr},
             $node->{encr_out_keyid},
             $node->{encr_out_passphrase},
+            $node,
             $subject,
+            undef,
             @_);
     }
 
@@ -485,17 +507,22 @@ sub send_ecsmsg_email {
 }
 
 # ----------------------------------------------------------------------
-# Send email message.  Takes three or more arguments: the recipient,
-# subject line, and body lines to be emailed.
+# Send email message.  Takes four or more arguments: the recipient,
+# subject line, custom headers (hash ref), and body lines to be emailed.
 # Returns empty string if successful or error message if error encountered.
 sub send_email {
     my $recipient = shift;
     my $subject = shift;
+    my $custom_headers = shift;
     # @_ now contains message body
 
     return "EMDIS::ECS::send_email(): ECS has not been configured."
         unless ecs_is_configured();
     my $cfg = $ECS_CFG;
+
+    return "EMDIS::ECS::send_email(): custom_headers must be undef or HASH ref (found " .
+        ref($custom_headers) . ")"
+        if defined $custom_headers and not 'HASH' eq ref $custom_headers;
 
     my $smtp;
     if(is_yes($cfg->SMTP_USE_SSL) or is_yes($cfg->SMTP_USE_STARTTLS)) {
@@ -543,6 +570,15 @@ sub send_email {
         or return "Unable to define email recipient.";
     $smtp->data()
         or return "Unable to start sending of email data.";
+    if(defined $custom_headers)
+    {
+        for my $key (keys %$custom_headers)
+        {
+            my $value = $custom_headers->{$key};
+            $smtp->datasend("$key: $value\n")
+                or return "Unable to send email data.";
+        }
+    }
     $smtp->datasend("Subject: $subject\n")
         or return "Unable to send email data.";
     $smtp->datasend("To: $recipient\n")
@@ -570,19 +606,165 @@ sub send_email {
 }
 
 # ----------------------------------------------------------------------
+# Send AMQP message.  AMQP analog for send_email().  Takes five or more
+# arguments: the AMQP address (queue name), subject line, node_info
+# (hash ref), custom properties (hash ref), and body lines to be
+# emailed.  Returns empty string if successful or error message if
+# error encountered.
+sub send_amqp_message {
+    my $amqp_addr = shift;
+    my $subject = shift;
+    my $node = shift;
+    my $custom_properties = shift;
+    # @_ now contains message body
+
+    if(not defined $amqp_addr) {
+        return 'send_amqp_message():  Missing amqp_addr (required).';
+    }
+
+    if(not defined $subject) {
+        return 'send_amqp_message():  Missing subject (required).';
+    }
+
+    if(not defined $node) {
+        return 'send_amqp_message():  Missing node details (required).';
+    }
+    elsif(not 'HASH' eq ref $node) {
+        return 'send_amqp_message():  unexpected node details; expected HASH ref, found ' .
+            (ref $custom_properties ? ref $custom_properties . ' ref' : '(non reference)');
+    }
+
+    if(defined $custom_properties and not 'HASH' eq ref $custom_properties) {
+        return 'send_amqp_message():  unexpected custom_properties value; expected undef or HASH ref, found ' .
+            (ref $custom_properties ? ref $custom_properties . ' ref' : '(non reference)');
+    }
+
+    if ((exists $node->{node_disabled}) and is_yes($node->{node_disabled}) )
+    {
+        return('send_amqp_message(): node_disabled is set for node ' .
+               $node->{node} . '.  Message not sent.');
+        next;
+    }
+
+    # default send_opts
+    my $send_opts = {
+        'amqp_broker_url'   => $ECS_CFG->AMQP_BROKER_URL,
+        'amqp_cmd_send'     => $ECS_CFG->AMQP_CMD_SEND,
+#        'amqp_content_type' => 'text/plain',
+        'amqp_debug_level'  => $ECS_CFG->AMQP_DEBUG_LEVEL,
+#        'amqp_encoding'     => 'utf-8',
+        'amqp_password'     => (exists $ECS_CFG->{AMQP_PASSWORD} ? $ECS_CFG->AMQP_PASSWORD : ''),
+        'amqp_sslcert'      => (exists $ECS_CFG->{AMQP_SSLCERT} ? $ECS_CFG->AMQP_SSLCERT : ''),
+        'amqp_sslkey'       => (exists $ECS_CFG->{AMQP_SSLKEY} ? $ECS_CFG->AMQP_SSLKEY : ''),
+        'amqp_sslpass'      => (exists $ECS_CFG->{AMQP_SSLPASS} ? $ECS_CFG->AMQP_SSLPASS : ''),
+        'amqp_truststore'   => (exists $ECS_CFG->{AMQP_TRUSTSTORE} ? $ECS_CFG->AMQP_TRUSTSTORE : ''),
+        'amqp_username'     => (exists $ECS_CFG->{AMQP_USERNAME} ? $ECS_CFG->AMQP_USERNAME : ''),
+        'amqp_vhost'        => (exists $ECS_CFG->{AMQP_VHOST} ? $ECS_CFG->AMQP_VHOST : '')
+    };
+
+    # override default send_opts with node-specific opts (where indicated)
+    foreach my $opt (keys $send_opts) {
+        $send_opts->{$opt} = $node->{$opt}
+            if exists $node->{$opt};
+    }
+
+    # default send_props
+    my $mail_mrk = $ECS_CFG->MAIL_MRK;
+    my $hub_snd = '';
+    my $seq_num = '';
+    if($subject =~ /$mail_mrk:(\S+?):(\d+):(\d+)\/(\d+)\s*$/io) {
+        $hub_snd = $1;
+        $seq_num = "$2:$3/$4";
+    }
+    elsif($subject =~ /$mail_mrk:(\S+?):(\d+)\s*$/io) {
+        $hub_snd = $1;
+        $seq_num = $2;
+    }
+    elsif($subject =~ /$mail_mrk:(\S+?):(\d+):DOC\s*$/io) {
+        $hub_snd = $1;
+        $seq_num = $2;
+    }
+    elsif($subject =~ /$mail_mrk:(\S+)\s*$/io) {
+        $hub_snd = $1;
+    }
+    # sanity check
+    if($ECS_CFG->THIS_NODE ne $hub_snd) {
+        return "send_amqp_message():  hub_snd ($hub_snd) ne THIS_NODE (" . $ECS_CFG->THIS_NODE . ")";
+    }
+    my $send_props = {
+        'x-emdis-hub-snd'           => $ECS_CFG->THIS_NODE,
+        'x-emdis-hub-rcv'           => ($node->{node} ? $node->{node} : ''),
+        'x-emdis-sequential-number' => ($seq_num ? $seq_num : '')
+    };
+
+    # add custom properties to send_props (where indicated)
+    if(defined $custom_properties) {
+        foreach my $prop (keys $custom_properties) {
+            $send_props->{$prop} = $custom_properties->{$prop};
+        }
+    }
+
+    # construct AMQP send command
+    my $cmd = sprintf('%s --inputfile - --debug %s --address %s --broker %s ' .
+                          '--subject %s',
+                      $send_opts->{amqp_cmd_send},
+                      $send_opts->{amqp_debug_level},
+                      $amqp_addr,
+                      $send_opts->{amqp_broker_url},
+                      $subject);
+    $cmd .= sprintf(' --type %s', $send_opts->{amqp_content_type})
+        if $send_opts->{amqp_content_type};
+    $cmd .= sprintf(' --encoding %s', $send_opts->{amqp_encoding})
+        if $send_opts->{amqp_encoding};
+    $cmd .= sprintf(' --vhost %s', $send_opts->{amqp_vhost})
+        if $send_opts->{amqp_vhost};
+    $cmd .= sprintf(' --truststore %s', $send_opts->{amqp_truststore})
+        if $send_opts->{amqp_truststore};
+    $cmd .= sprintf(' --sslcert %s --sslkey %s',
+                    $send_opts->{amqp_sslcert},
+                    $send_opts->{amqp_sslkey})
+        if $send_opts->{amqp_sslcert} and $send_opts->{amqp_sslkey};
+    $cmd .= sprintf(' --username %s', $send_opts->{amqp_username})
+        if $send_opts->{amqp_username};
+    foreach my $prop (keys $send_props) {
+        $cmd .= sprintf(' --property %s=%s', $prop, $send_props->{$prop})
+            if $send_props->{$prop};
+    }
+
+    # set environment variables containing passwords:
+    # ECS_AMQP_PASSWORD and ECS_AMQP_SSLPASS
+    $ENV{ECS_AMQP_PASSWORD} = $send_opts->{amqp_password}
+        if $send_opts->{amqp_password};
+    $ENV{ECS_AMQP_SSLPASS} = $send_opts->{amqp_sslpass}
+        if $send_opts->{amqp_sslpass};
+
+    # execute command to send AMQP message
+    print "<DEBUG>: AMQP send command: $cmd\n"
+        if $ECS_CFG->ECS_DEBUG > 0;
+    my $err = timelimit_cmd($ECS_CFG->AMQP_SEND_TIMELIMIT, $cmd, join('', @_));
+    if($err) {
+        return "send_amqp_message(): unable to send AMQP message to $amqp_addr: $err";
+    }
+
+    return '';
+}
+
+# ----------------------------------------------------------------------
 # Send encrypted email message.
 # Returns empty string if successful or error message if error encountered.
-sub send_encrypted_email
+sub send_encrypted_message
 {
     my $encr_typ = shift;
     my $encr_recip = shift;
     my $recipient = shift;
     my $encr_out_keyid = shift;
     my $encr_out_passphrase = shift;
+    my $node = shift;
     my $subject = shift;
+    my $custom_headers = shift;
     # @_ now contains message body
 
-    return "EMDIS::ECS::send_encrypted_email(): ECS has not been configured."
+    return "EMDIS::ECS::send_encrypted_message(): ECS has not been configured."
         unless ecs_is_configured();
     my $cfg = $ECS_CFG;
 
@@ -593,7 +775,7 @@ sub send_encrypted_email
     my ($fh, $filename) = tempfile($template,
                                    DIR    => $cfg->ECS_TMP_DIR,
                                    SUFFIX => '.tmp');
-    return "EMDIS::ECS::send_encrypted_email(): unable to create temporary file"
+    return "EMDIS::ECS::send_encrypted_message(): unable to create temporary file"
         unless $fh;
     print $fh @_;
     close $fh;
@@ -620,11 +802,11 @@ sub send_encrypted_email
     unlink $filename;
 
     # check for error
-    return "EMDIS::ECS::send_encrypted_email(): $result" if $result;
+    return "EMDIS::ECS::send_encrypted_message(): $result" if $result;
 
     # read contents of encrypted file
     $fh = new IO::File;
-    return "EMDIS::ECS::send_encrypted_email(): unable to open file: " .
+    return "EMDIS::ECS::send_encrypted_message(): unable to open file: " .
         "$encr_filename"
             unless $fh->open("< $encr_filename");
     my @body = $fh->getlines();
@@ -633,8 +815,59 @@ sub send_encrypted_email
     # delete encrypted (temp) file
     unlink $encr_filename;
 
-    # send email
-    return send_email($recipient, $subject, @body);
+    if(is_yes($cfg->ENABLE_AMQP)) {
+        # send message via AMQP, if indicated by node config
+        my $amqp_addr = '';
+        if($subject =~ /^[^:]+:[^:]+$/io) {
+            return "EMDIS::ECS::send_encrypted_message(): unable to send " .
+                "AMQP META message to node " . $node->{node} . ": amqp_only " .
+                "selected, but amqp_addr_meta not configured."
+                if not $node->{amqp_addr_meta} and is_yes($node->{amqp_only});
+            $amqp_addr = $node->{amqp_addr_meta};
+        }
+        elsif($subject =~ /^[^:]+:[^:]+:[0123456789]+/io) {
+            return "EMDIS::ECS::send_encrypted_message(): unable to send " .
+                "AMQP regular message to node " . $node->{node} . ": amqp_only " .
+                "selected, but amqp_addr_msg not configured."
+                if not $node->{amqp_addr_msg} and is_yes($node->{amqp_only});
+            $amqp_addr = $node->{amqp_addr_msg};
+        }
+        elsif($subject =~ /^[^:]+:[^:]+:DOC$/io) {
+            return "EMDIS::ECS::send_encrypted_message(): unable to send " .
+                "AMQP document to node " . $node->{node} . ": amqp_only " .
+                "selected, but amqp_addr_doc not configured."
+                if not $node->{amqp_addr_doc} and is_yes($node->{amqp_only});
+            $amqp_addr = $node->{amqp_addr_doc};
+        }
+        elsif(is_yes($node->{amqp_only})) {
+            return "EMDIS::ECS::send_encrypted_message(): unable to send " .
+                "via AMQP to node " . $node->{node} . ": amqp_only selected, " .
+                "but unable to determine amqp_addr from Subject: $subject"
+        }
+        if($amqp_addr) {
+            return send_amqp_message(
+                $amqp_addr,
+                $subject,
+                $node,
+                $custom_headers,
+                @body);
+        }
+    }
+
+    if(is_yes($node->{amqp_only})) {
+        return "EMDIS::ECS::send_encrypted_message(): unable to send " .
+            "via email to node " . $node->{node} . ": amqp_only selected"
+    }
+
+    if($node->{amqp_addr_meta} or $node->{amqp_addr_msg} or $node->{amqp_addr_doc}) {
+        # print debug message if AMQP is only partially configured for recipient node
+        print "<DEBUG> EMDIS::ECS::send_encrypted_message(): sending via " .
+            "email (not AMQP) to node " . $node->{node} . ": $subject\n"
+            if $cfg->ECS_DEBUG > 0;
+    }
+
+    # send message via email
+    return send_email($recipient, $subject, $custom_headers, @body);
 }
 
 # ----------------------------------------------------------------------
@@ -649,6 +882,21 @@ sub format_datetime
         $isdst) = localtime($datetime);
     return sprintf($format, $year + 1900, $month + 1, $mday,
                    $hours, $minutes, $seconds);
+}
+
+# ----------------------------------------------------------------------
+# Format filename for document.
+sub format_doc_filename
+{
+    return "EMDIS::ECS::format_doc_filename(): ECS has not been configured."
+        unless ecs_is_configured();
+    my $cfg = $ECS_CFG;
+    my $node_id = shift;
+    my $seq_num = shift;
+    my $template = sprintf("%s_%s_d%010d",
+                           $cfg->THIS_NODE, $node_id, $seq_num);
+    my $dirname = $cfg->ECS_MBX_OUT_DIR . "_$node_id";
+    return catfile($dirname, "$template.doc");
 }
 
 # ----------------------------------------------------------------------
@@ -1131,7 +1379,7 @@ EMDIS::ECS - ECS utility module
      "Here are details.\n");
  ECS::log_error("error sending admin email: $err") if $err;
 
- $err = EMDIS::ECS::send_ecsmsg_email('UX', '', "msg_type=READY\n",
+ $err = EMDIS::ECS::send_ecs_message('UX', '', "msg_type=READY\n",
      "# comment\n");
  ECS::log_error("error sending ECS message: $err") if $err;
 
@@ -1183,7 +1431,83 @@ http://www.pgp.com/, http://www.pgpi.org/, http://www.gnupg.org/,
 and http://www.philzimmermann.com/ for more information on the topic
 of PGP and related software.
 
+=item GnuPG Version 2.2 - Additional Notes
+
+The default OpenPGP configuration used by Perl-ECS is intended for use
+with GnuPG (gpg) versions 1.4 and 2.0.  However, gpg version 2.2 is a
+standard component of newer Linux systems such as Ubuntu 18.
+
+For systems using gpg version 2.2, configuration adjustments are needed
+in order to enable Perl-ECS to transmit the passphrase to gpg via stdin
+(pinentry-mode loopback).
+
+1. Create or edit $GNUPGHOME/gpg-agent.conf, adding the line:
+
+ allow-loopback-pinentry
+
+2. Execute the command:
+
+ gpg-connect-agent /bye
+
+3. In the ecs.cfg configuration file, revise the OPENPGP_CMD_ENCRYPT and
+OPENPGP_CMD_DECRYPT settings to add the following.  (If needed, first
+uncomment those settings.):
+
+ --pinentry-mode loopback
+
+4. If upgrading from an earlier gpg version, use ecstool --tweak to modify
+all (addr_r) key IDs in the node table, because the IDs change when the
+keyring is converted to gpg 2.2.
+
+=item AMQP Messaging
+
+As an experimental new feature, version 0.41 added support for use of
+AMQP messaging as an alternative to email.
+
+To use AMQP messaging, the ENABLE_AMQP setting must be set to YES or TRUE.
+AMQP communications utilize a mboxes/amqp_staging directory, which will
+need to be created manually, e.g.:
+
+ mkdir mboxes/amqp_staging
+
+Additionally, the node table now accepts new AMQP-related settings.
+These can be added via the "ecstool --tweak" command, e.g.:
+
+ ecstool --tweak BB amqp_addr_meta emdis.bb.meta
+ ecstool --tweak BB amqp_addr_msg emdis.bb.msg
+
+AMQP settings configured at the individual node level override equivalent
+global settings when communicating with that node.   The presence of
+amqp_addr_meta and amqp_addr_msg in the node configuration, respectively,
+enable use of AMQP for transmission of META and regular EMDIS messages to
+that node (assuming ENABLE_AMQP is also set in ecs.cfg).
+
+The node table also recognizes an amqp_only yes/no option.  If enabled,
+the amqp_only option disables use of email when transmitting
+meta-messages, documents, or regular messages messages to that node.
+
+=item Document Exchange
+
+As an experimental new feature, version 0.41 added support for document
+exchange.
+
+The ecs_scan_mail program, when processing files in the
+mboxes/to_dir/to_XX subdirectories, now looks for filenames with the
+suffix .doc or .doc.xml and sends those files as documents.
+
+Similarly, the "ecstool --send" command now sends files with a .doc or
+.doc.xml suffix as documents, e.g. "ecstool --send EE test01.doc"
+
+The ecs_scan_mail program copies documents received to the
+mboxes/from_dir/from_XX subdirectories, to a filename with a .doc suffix.
+
+Document exchange uses a Subject header of the form EMDIS:AA:123:DOC
+to indicate the presence of a document and its sequence number.
+DOC_MSG_ACK and DOC_RE_SEND are meta messages used for document exchange.
+
 =back
+
+=head2 Configuration
 
 Once the above prerequisites are in place, it's time to configure your
 ECS system.  Create a directory to hold the ECS data files and then run
@@ -1213,9 +1537,97 @@ The email address of this node.
 
 The PGP or GnuPG userid of this ECS node.
 
+=item I<amqp_addr_doc>
+
+Name of AMQP queue to use when sending ECS document messages to this node.
+(Note:  document exchange is not yet implemented.)
+
+=item I<amqp_addr_meta>
+
+Name of AMQP queue to use when sending ECS meta messages to this node.
+
+=item I<amqp_addr_msg>
+
+Name of AMQP queue to use when sending regular ECS messages to this node.
+
+=item I<amqp_broker_url>
+
+Node-specific AMQP_BROKER_URL configuration.
+See also EMDIS:ECS::Config documentation.
+
+=item I<amqp_cmd_recv>
+
+Node-specific AMQP_CMD_RECV configuration.
+See also EMDIS:ECS::Config documentation.
+
+=item I<amqp_cmd_send>
+
+Node-specific AMQP_CMD_SEND configuration.
+See also EMDIS:ECS::Config documentation.
+
+=item I<amqp_debug_level>
+
+Node-specific AMQP_DEBUG_LEVEL configuration.
+See also EMDIS:ECS::Config documentation.
+
+=item I<amqp_password>
+
+Node-specific AMQP_PASSWORD configuration.
+See also EMDIS:ECS::Config documentation.
+
+=item I<amqp_recv_timeout>
+
+Node-specific AMQP_RECV_TIMEOUT configuration.
+See also EMDIS:ECS::Config documentation.
+
+=item I<amqp_send_timelimit>
+
+Node-specific AMQP_SEND_TIMELIMIT configuration.
+See also EMDIS:ECS::Config documentation.
+
+=item I<amqp_sslcert>
+
+Node-specific AMQP_SSLCERT configuration.
+See also EMDIS:ECS::Config documentation.
+
+=item I<amqp_sslkey>
+
+Node-specific AMQP_SSLKEY configuration.
+See also EMDIS:ECS::Config documentation.
+
+=item I<amqp_sslpass>
+
+Node-specific AMQP_SSLPASS configuration.
+See also EMDIS:ECS::Config documentation.
+
+=item I<amqp_truststore>
+
+Node-specific AMQP_TRUSTSTORE configuration.
+See also EMDIS:ECS::Config documentation.
+
+=item I<amqp_username>
+
+Node-specific AMQP_USERNAME configuration.
+See also EMDIS:ECS::Config documentation.
+
+=item I<amqp_vhost>
+
+Node-specific AMQP_VHOST configuration.
+See also EMDIS:ECS::Config documentation.
+
 =item I<contact>
 
 Email address of administrator for this node.
+
+=item I<doc_in_seq>
+
+Sequence number assigned to the most recent document received from this
+node (intended for internal use only).
+
+=item I<doc_out_seq>
+
+Sequence number assigned to the most recent document sent to this node
+(intended for internal use only).
 
 =item I<encr_meta>
 
@@ -1486,7 +1898,7 @@ THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
 WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF 
 MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
 
-Copyright (C) 2002-2016, National Marrow Donor Program. All rights reserved.
+Copyright (C) 2002-2020, National Marrow Donor Program. All rights reserved.
 
 See LICENSE file for license details.
 
@@ -1511,4 +1923,4 @@ All email to admin statements are removed.
 In relation to the error code ECS.pm will send an email to admin or not.
 Bugfix for the regular expression in sub read_ecs_message_id():
 The regular expression now ignores spam tags in the subject line.
-Hold lock in send_ecsmsg_email until msg. is successfully send.
+Hold lock in send_ecs_message until msg. is successfully send.

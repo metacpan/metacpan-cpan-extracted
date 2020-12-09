@@ -3,8 +3,7 @@
   * My extended documentation: <http://perl.overmeer.net/CPAN/>
   * Development via GitHub: <https://github.com/markov2/perl5-MIME-Types>
   * Download from CPAN: <ftp://ftp.cpan.org/pub/CPAN/authors/id/M/MA/MARKOV/>
-  * Indexed from CPAN: <http://search.cpan.org/~markov/MIME-Types/>
-    and <https://metacpan.org/release/MIME-Types>
+  * Indexed from CPAN: <https://metacpan.org/release/MIME-Types>
 
 ## Development &rarr; Release
 

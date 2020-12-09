@@ -7,7 +7,7 @@ use base 							qw( AI::Genetic::Pro );
 use Clone 							qw( clone   );
 use List::Util 						qw( shuffle );
 use MCE( Sereal => 0 );
-use MCE::Loop;
+#use MCE::Loop;
 use MCE::Map;
 use MCE::Util;
 #-----------------------------------------------------------------------	

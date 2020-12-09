@@ -130,11 +130,11 @@ sub create_feed {
     {create => $feed});
 
   # Add the feed.
-  my $feed_response = $api_client->FeedService()->mutate({
+  my $feeds_response = $api_client->FeedService()->mutate({
       customerId => $customer_id,
       operations => [$feed_operation]});
 
-  my $feed_resource_name = $feed_response->{results}[0]{resourceName};
+  my $feed_resource_name = $feeds_response->{results}[0]{resourceName};
 
   printf "Created feed with resource name: '%s'.\n", $feed_resource_name;
 
@@ -194,12 +194,12 @@ sub create_feed_mapping {
       create => $feed_mapping
     });
 
-  my $feed_mapping_response = $api_client->FeedMappingService()->mutate({
+  my $feed_mappings_response = $api_client->FeedMappingService()->mutate({
       customerId => $customer_id,
       operations => [$feed_mapping_operation]});
 
   printf "Created feed mapping with resource name: '%s'.\n",
-    $feed_mapping_response->{results}[0]{resourceName};
+    $feed_mappings_response->{results}[0]{resourceName};
 }
 
 # Creates feed items for a given feed.
@@ -242,18 +242,19 @@ sub create_feed_items {
   }
 
   # Add the feed items.
-  my $feed_item_response = $api_client->FeedItemService()->mutate({
+  my $feed_items_response = $api_client->FeedItemService()->mutate({
     customerId => $customer_id,
     operations => $feed_item_operations
   });
 
-  foreach my $feed_item_result (@{$feed_item_response->{results}}) {
+  foreach my $feed_item_result (@{$feed_items_response->{results}}) {
     printf "Created feed item with resource name: '%s'.\n",
       $feed_item_result->{resourceName};
   }
 }
 
 # Updates a campaign to set the DSA feed.
+# [START add_dynamic_page_feed_1]
 sub update_campaign_dsa_setting {
   my ($api_client, $customer_id, $feed_details, $campaign_id) = @_;
 
@@ -282,16 +283,18 @@ sub update_campaign_dsa_setting {
     );
 
   # Update the campaign.
-  my $campaign_response = $api_client->CampaignService()->mutate({
+  my $campaigns_response = $api_client->CampaignService()->mutate({
       customerId => $customer_id,
       operations => [$campaign_operation]});
 
   printf "Updated campaign with resource name: '%s'.\n",
-    $campaign_response->{results}[0]{resourceName};
+    $campaigns_response->{results}[0]{resourceName};
 }
+# [END add_dynamic_page_feed_1]
 
 # Returns the DSA settings for a campaign. Dies if the campaign does not
 # exist or is not a DSA campaign.
+# [START add_dynamic_page_feed]
 sub get_dsa_setting {
   my ($api_client, $customer_id, $campaign_id) = @_;
 
@@ -324,8 +327,10 @@ sub get_dsa_setting {
 
   return $dynamic_search_ads_setting;
 }
+# [END add_dynamic_page_feed]
 
 # Creates an ad group criterion targeting the DSA label.
+# [START add_dynamic_page_feed_2]
 sub add_dsa_target {
   my ($api_client, $customer_id, $ad_group_id, $dsa_page_url_label) = @_;
 
@@ -360,14 +365,15 @@ sub add_dsa_target {
       create => $ad_group_criterion
     });
 
-  my $ad_group_criterion_response =
+  my $ad_group_criteria_response =
     $api_client->AdGroupCriterionService()->mutate({
       customerId => $customer_id,
       operations => [$ad_group_criterion_operation]});
 
   printf "Created ad group criterion with resource name: '%s'.\n",
-    $ad_group_criterion_response->{results}[0]{resourceName};
+    $ad_group_criteria_response->{results}[0]{resourceName};
 }
+# [END add_dynamic_page_feed_2]
 
 # Don't run the example if the file is being included.
 if (abs_path($0) ne abs_path(__FILE__)) {

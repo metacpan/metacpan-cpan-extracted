@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-# Updates the sitelink extension feed item with the specified link text and URL.
+# Updates the sitelink extension feed item with the specified link text.
 
 use strict;
 use warnings;
@@ -47,6 +47,7 @@ my $customer_id   = "INSERT_CUSTOMER_ID_HERE";
 my $feed_item_id  = "INSERT_FEED_ITEM_ID_HERE";
 my $sitelink_text = "INSERT_SITELINK_TEXT_HERE";
 
+# [START update_sitelink]
 sub update_sitelink {
   my ($api_client, $customer_id, $feed_item_id, $sitelink_text) = @_;
 
@@ -72,7 +73,7 @@ sub update_sitelink {
       updateMask => all_set_fields_of($extension_feed_item)});
 
   # Issue a mutate request to update the extension feed item.
-  my $extension_feed_item_response =
+  my $extension_feed_items_response =
     $api_client->ExtensionFeedItemService()->mutate({
       customerId => $customer_id,
       operations => [$extension_feed_item_operation]});
@@ -80,10 +81,11 @@ sub update_sitelink {
   # Print the resource name of the updated extension feed item.
   printf
     "Updated extension feed item with resource name: '%s'.\n",
-    $extension_feed_item_response->{results}[0]{resourceName};
+    $extension_feed_items_response->{results}[0]{resourceName};
 
   return 1;
 }
+# [END update_sitelink]
 
 # Don't run the example if the file is being included.
 if (abs_path($0) ne abs_path(__FILE__)) {
@@ -119,7 +121,7 @@ update_sitelink
 
 =head1 DESCRIPTION
 
-Updates the sitelink extension feed item with the specified link text and URL.
+Updates the sitelink extension feed item with the specified link text.
 
 =head1 SYNOPSIS
 

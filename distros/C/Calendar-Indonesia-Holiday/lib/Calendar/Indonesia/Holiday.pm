@@ -1,9 +1,9 @@
 package Calendar::Indonesia::Holiday;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-12-03'; # DATE
+our $DATE = '2020-12-08'; # DATE
 our $DIST = 'Calendar-Indonesia-Holiday'; # DIST
-our $VERSION = '0.328'; # VERSION
+our $VERSION = '0.330'; # VERSION
 
 use 5.010001;
 use strict;
@@ -801,23 +801,14 @@ my %year_holidays;
     ];
 }
 
-# decreed aug 28, 2019
-# revised mar 9, 2020
-# revised may 20, 2020
-# revised dec 1, 2020
+# decreed aug 28, 2019 (SKB ministry of religion, ministry of employment, ministry of state apparatus empowerment 728/2019, 213/2019, 01/2019)
+# revised mar  9, 2020 (SKB 174/2020, 01/2020, 01/2020)
+# revised apr  9, 2020 (SKB 391/2020, 02/2020, 02/2020)
+# revised may 20, 2020 (SKB 440/2020, 03/2020, 03/2020)
+# revised dec  1, 2020 (SKB 744/2020, 05/2020, 06/2020)
 #
 # ref:
-# - https://www.kominfo.go.id/content/detail/20922/inilah-jadwal-libur-nasional-dan-cuti-bersama-tahun-2020/0/berita
-#   "Jakarta, Kominfo - Rapat Tingkat Menteri (RTM) tentang Hari Libur Nasional
-#   dan Cuti Bersama Tahun 2020 yang dipimpin oleh Menko bidang Pembangunan
-#   Manusia dan Kebudayaan (PMK), Puan Maharani, di Gedung Kemenko PMK, Jakarta,
-#   Selasa (28/8/2019) pagi, telah menyepakati tahun 2020 akan memiliki 16 Hari
-#   Libur Nasional dan 4 hari Cuti Bersama."
-# - https://tirto.id/revisi-cuti-bersama-2020-dan-daftar-hari-libur-tahun-ini-sesuai-skb-eDRB
-#   "Rapat telah merumuskan untuk menambah hari libur tahun 2020, yang semula
-#   telah ditetapkan 20 hari, menjadi 24 hari. Yang tadi sudah ditetapkan
-#   bersama oleh Menag, Menaker, dan Menpan RB," kata Muhadjir, Senin
-#   (9/3/2020), usai rapat koordinasi di kantor Kemenko PMK, Jakarta.
+# - https://www.kemenkopmk.go.id/sites/default/files/artikel/2020-04/SKB%20Perubahan%20Kedua%20Libnas%20%26%20Cutber%202020.pdf
 # - https://www.kemenkopmk.go.id/sites/default/files/pengumuman/2020-12/SKB%203%20Menteri%20tentang%20Perubahan%20ke-4%20Libnas%20%26%20Cutber%202020_0.pdf
 
 {
@@ -841,6 +832,7 @@ my %year_holidays;
         # - independence day
         ($hijra2020 = _h_hijra     ({_expand_dm("20-08")}, {hyear=>1442})),
         ($mawlid2020 = _h_mawlid({_expand_dm("29-10")}, {hyear=>1442})),
+        _h_jrelection({_expand_dm("09-12")}, {decree_date => "2015-11-27"}), # keppres 20/2020 (2020-11-27), surat edaran menaker m/14/hk.04/xii/2020 (2020-12-07)
         # - christmas
     ];
 
@@ -853,10 +845,11 @@ my %year_holidays;
     );
 }
 
-# decreed sep 11, 2020
+# decreed sep 10, 2020
 #
 # ref:
 # - https://www.menpan.go.id/site/berita-terkini/libur-nasional-dan-cuti-bersama-tahun-2021-sebanyak-23-hari
+# - https://www.kemenkopmk.go.id/sites/default/files/artikel/2020-09/SKB%20Cuti%20Bersama%20Tahun%202021.pdf
 
 {
     my $isramiraj2021;
@@ -889,6 +882,32 @@ my %year_holidays;
         _jointlv     ({_expand_dm("24-12")}, {holiday=>$christmas}),
         _jointlv     ({_expand_dm("27-12")}, {holiday=>$christmas}),
     );
+}
+
+L2022: {
+    # 2022 holidays
+    1;
+}
+
+{
+    # 2023 holidays
+    1;
+}
+
+{
+    # 2024 holidays
+    1;
+}
+
+{
+    # 2025 holidays
+    #_h_jrelection({_expand_dm("09-12")}, {decree_date => "2025-11-xx"}), # keppres xx/2025, surat edaran menaker xxx.../2020 (2020-12-xx)
+    1;
+}
+
+{
+    # 2026 holidays
+    1;
 }
 
 
@@ -1215,7 +1234,7 @@ Calendar::Indonesia::Holiday - List Indonesian public holidays
 
 =head1 VERSION
 
-This document describes version 0.328 of Calendar::Indonesia::Holiday (from Perl distribution Calendar-Indonesia-Holiday), released on 2020-12-03.
+This document describes version 0.330 of Calendar::Indonesia::Holiday (from Perl distribution Calendar-Indonesia-Holiday), released on 2020-12-08.
 
 =head1 SYNOPSIS
 
@@ -1906,8 +1925,8 @@ Will be provided if there is demand and data source.
 =head2 Holidays after (current year)+1?
 
 Some religious holidays, especially Vesakha, are not determined yet. Joint leave
-days are also usually decreed by the government in May/June of the preceding
-year.
+days are also usually decreed by the government in as late as October/November
+in the preceding year.
 
 =head1 HOMEPAGE
 

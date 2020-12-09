@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 #
-# Copyright (C) 2002-2016 National Marrow Donor Program. All rights reserved.
+# Copyright (C) 2002-2020 National Marrow Donor Program. All rights reserved.
 
 use strict;
 use File::Spec::Functions qw(catfile);
@@ -12,7 +12,7 @@ use MIME::QuotedPrint qw( encode_qp decode_qp );
 require 'setup';
 
 # print test plan before loading modules
-BEGIN { plan(tests => 97); }
+BEGIN { plan(tests => 99); }
 use EMDIS::ECS::Message;
 
 # [1] Was module successfully loaded?
@@ -455,6 +455,23 @@ $body
 EOF
 ok(ref $msg);
 ok(decode_qp( $body . "\n" ), $msg->body());
+
+# [98..99] document
+$msg = new EMDIS::ECS::Message(<<EOF);
+Received: from nmdp.org (localhost [127.0.0.1])
+        by smtp.nmdp.org (8.9.3+Sun/8.9.1) with ESMTP id QAA22449
+        for <emdisdev\@smtp.nmdp.org>; Mon, 7 Apr 2003 16:41:49 -0500 (CDT)
+Date: Mon, 7 Apr 2003 16:41:49 -0500 (CDT)
+From: emdis-dev2 lbsw message processing <emdisdv2\@nmdp.org>
+Message-Id: <200304072141.QAA22449\@smtp.nmdp.org>
+Subject: EMDIS:Y2:456:DOC
+To: emdisdev\@smtp.nmdp.org
+X-UIDL: M[!!XT]"!BnI"!*,F!
+
+<MESSAGE><DOC_ID>1234</DOC_ID></MESSAGE>
+EOF
+ok(ref $msg);
+ok($msg->is_document());
 
 
 exit 0;

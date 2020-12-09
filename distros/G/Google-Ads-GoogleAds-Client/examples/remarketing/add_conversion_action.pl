@@ -47,6 +47,7 @@ use Data::Uniqid qw(uniqid);
 # Running the example with -h will print the command line usage.
 my $customer_id = "INSERT_CUSTOMER_ID_HERE";
 
+# [START add_conversion_action]
 sub add_conversion_action {
   my ($api_client, $customer_id) = @_;
 
@@ -70,16 +71,17 @@ sub add_conversion_action {
     ->new({create => $conversion_action});
 
   # Add the conversion action.
-  my $conversion_action_response =
+  my $conversion_actions_response =
     $api_client->ConversionActionService()->mutate({
       customerId => $customer_id,
       operations => [$conversion_action_operation]});
 
   printf "New conversion action added with resource name: '%s'.\n",
-    $conversion_action_response->{results}[0]{resourceName};
+    $conversion_actions_response->{results}[0]{resourceName};
 
   return 1;
 }
+# [END add_conversion_action]
 
 # Don't run the example if the file is being included.
 if (abs_path($0) ne abs_path(__FILE__)) {

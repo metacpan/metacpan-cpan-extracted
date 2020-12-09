@@ -38,7 +38,6 @@ t/external/pop3-ssl.t                    Test script
 t/external/smtp-ssl.t                    Test script
 t/ftp.t                                  Test script
 t/hostname.t                             Test script
-t/libnet_t.pl                            Test script
 t/netrc.t                                Test script
 t/nntp.t                                 Test script
 t/nntp_ipv6.t                            Test script

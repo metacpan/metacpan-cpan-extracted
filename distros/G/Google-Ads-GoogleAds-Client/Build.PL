@@ -42,7 +42,7 @@ $build_sc->new(
   create_makefile_pl => "traditional",
   dist_abstract      => "Google Ads API Client Library for Perl",
   dist_name          => "Google-Ads-GoogleAds-Client",
-  dist_version       => "6.0.0",
+  dist_version       => "6.0.1",
   requires           => {
     "Class::Load"                  => 0,
     "Class::Std::Fast"             => 0,
@@ -104,4 +104,9 @@ $build_sc->new(
     nondeterministic => [".ft"],
     functional       => [".ft"],
     smoke            => [".t"],
-  })->create_build_script();
+  },
+  meta_merge => {
+    resources => {
+      repository => 'https://github.com/googleads/google-ads-perl',
+      bugtracker => 'https://github.com/googleads/google-ads-perl/issues'
+    }})->create_build_script();

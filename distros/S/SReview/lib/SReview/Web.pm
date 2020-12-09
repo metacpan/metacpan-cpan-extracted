@@ -21,6 +21,7 @@ sub startup {
 	SReview::API::init($self);
 
 	my $config = SReview::Config::Common::setup;
+	$self->max_request_size(1024*1024*1024);
 
 	if(defined($config->get("web_pid_file"))) {
 		$self->config(hypnotoad => { pid_file => $config->get("web_pid_file") });
@@ -52,7 +53,7 @@ sub startup {
 			$vpr = $url->host;
 			$media = "media-src $vpr;";
 		}
-		$c->res->headers->content_security_policy("default-src 'none'; connect-src 'self'; script-src 'self' 'unsafe-inline'; font-src 'self'; style-src 'self'; img-src 'self'; frame-ancestors 'none'; $media");
+		$c->res->headers->content_security_policy("default-src 'none'; connect-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; font-src 'self'; style-src 'self'; img-src 'self'; frame-ancestors 'none'; $media");
 	});
 
 	$self->helper(dbh => sub {
@@ -124,13 +125,22 @@ sub startup {
 	});
 
 	my $eventid = undef;
-	my $st = $self->dbh->prepare("SELECT id FROM events WHERE name = ?");
-	$st->execute($config->get("event")) or die "Could not find event!\n";
-	while(my $row = $st->fetchrow_hashref("NAME_lc")) {
-		die if defined($eventid);
-		$eventid = $row->{id};
-	}
 	$self->helper(eventid => sub {
+		if(!defined($eventid)) {
+			if(defined($config->get("event"))) {
+				my $st = $self->dbh->prepare("SELECT id FROM events WHERE name = ?");
+				$st->execute($config->get("event")) or die "Could not find event!\n";
+				while(my $row = $st->fetchrow_hashref("NAME_lc")) {
+					die if defined($eventid);
+					$eventid = $row->{id};
+				}
+			} else {
+				my $st = $self->dbh->prepare("SELECT max(id) FROM events");
+				$st->execute() or die "Could not query for events";
+				my $row = $st->fetchrow_hashref("NAME_lc");
+				$eventid = $row->{id};
+			}
+		}
 		return $eventid;
 	});
 
@@ -191,6 +201,9 @@ sub startup {
 			return $c->redirect_to('/admin');
 		}
 	});
+
+	$r->get('/i/:nonce')->to(controller => 'inject', action => 'view', layout => 'default');
+	$r->post('/i/:nonce/update')->to(controller => 'inject', action => 'update', layout => 'default');
 
 	$r->get('/r/:nonce')->to(controller => 'review', action => 'view', layout => 'default');
 	$r->post('/r/:nonce/update')->to(controller => 'review', layout => 'default', action => 'update');
@@ -327,57 +340,19 @@ sub startup {
 
 	$r->get('/overview' => sub {
 		my $c = shift;
-		my $st;
-		if($config->get("anonreviews")) {
-			$st = $c->dbh->prepare('SELECT nonce, name, speakers, room, starttime::timestamp, endtime::timestamp, state, progress FROM talk_list WHERE eventid = ? AND state IS NOT NULL ORDER BY state, progress, room, starttime');
-			$c->stash(autorefresh => 1);
-		} else {
-			$st = $c->dbh->prepare('SELECT name, speakers, room, starttime::timestamp, endtime::timestamp, state, progress FROM talk_list WHERE eventid = ? AND state IS NOT NULL ORDER BY state, progress, room, starttime');
-			$c->stash(autorefresh => 0);
+		$c->stash(event => $c->eventid);
+		my $events = $c->dbh->prepare("SELECT id, name FROM events");
+		$events->execute();
+		my $event_res = [];
+		while(my $e = $events->fetchrow_hashref) {
+			my $v = {};
+			$v->{id} = $e->{id};
+			$v->{name} = $e->{name};
+			push @$event_res, $v;
 		}
-		my $tot = $c->dbh->prepare('SELECT state, count(*) FROM talks WHERE event = ? GROUP BY state ORDER BY state;');
-		my %expls;
-		my $tot_results;
-		my $totals = [];
-		$expls{'waiting_for_files'} = 'Still waiting for content files for these talks';
-		$expls{'cutting'} = 'Talk is being cut';
-		$expls{'generating_previews'} = 'Talk previews are being generated';
-		$expls{'notification'} = 'Sending out notifications';
-		$expls{'preview'} = 'Talk ready for review, waiting for reviewer';
-		$expls{'transcoding'} = 'High-quality transcodes running';
-		$expls{'uploading'} = 'Publishing results';
-		$expls{'announcing'} = 'Announcing completion of publication';
-		$expls{'done'} = 'Videos published, all done';
-		$expls{'broken'} = 'Review found problems, administrator required';
-		$expls{'ignored'} = 'Talk will not be/was not recorded, ignored for review';
-		$expls{'needs_work'} = 'Fixable problems exist, manual intervention required';
-		$expls{'lost'} = 'Nonfixable problems exist, talk lost';
-		$st->execute($c->eventid) or die;
-		$tot->execute($c->eventid) or die;
-		$c->stash(title => 'Video status overview');
-		$c->stash(titlerow => [ 'Talk', 'Speakers', 'Room', 'Start time', 'End time', 'State', 'Progress' ]);
-		$c->stash(tottitrow => [ 'State', 'Count', 'State meaning']);
-		my $rows = $st->fetchall_arrayref;
-		if($config->get("anonreviews")) {
-			my $newrows = [];
-			foreach my $row(@$rows) {
-				my $nonce = shift @$row;
-				my $name = shift @$row;
-				push @$newrows, [ "<a href='/r/$nonce'>$name</a>", @$row ];
-			}
-			$rows = $newrows;
-		}
-		$c->stash(rows => $rows);
-		$c->stash(header => 'Video status overview');
-		$tot_results = $tot->fetchall_arrayref();
-		foreach my $row(@{$tot_results}) {
-			push @$row, $expls{$row->[0]};
-			push @$totals, $row;
-		}
-		$c->stash(totals => $totals);
-		$c->stash(layout => 'default');
+		$c->stash(events => $event_res);
 		$c->render;
-	} => 'table');
+	});
 
 	$r->post('/talk_update' => sub {
 		my $c = shift;

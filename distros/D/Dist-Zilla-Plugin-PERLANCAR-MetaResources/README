@@ -3,9 +3,9 @@ NAME
     dists
 
 VERSION
-    This document describes version 0.041 of
+    This document describes version 0.042 of
     Dist::Zilla::Plugin::PERLANCAR::MetaResources (from Perl distribution
-    Dist-Zilla-Plugin-PERLANCAR-MetaResources), released on 2020-10-27.
+    Dist-Zilla-Plugin-PERLANCAR-MetaResources), released on 2020-12-09.
 
 SYNOPSIS
     In dist.ini:

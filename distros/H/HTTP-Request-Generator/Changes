@@ -1,3 +1,9 @@
+0.11 2020-12-08
+    * Support IPv4-in-IPv6 addresses
+      This comes at the expense of allowing fewer IPv6-addresses as parameters.
+      The ambiguity between expandable hostname and IPv6-address has been
+      resolved so far in favour of IPv6 addresses.
+
 0.10 2020-10-08
     * Fix documentation for the "wrap" callback option
       This adresses RT #133482, reported by Toby Inkster

@@ -1,11 +1,11 @@
 use strict;
 use warnings;
-package JSON::Schema::Draft201909; # git description: v0.017-17-gd4ed775
+package JSON::Schema::Draft201909; # git description: v0.018-4-g676ef6e
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Validate data against a schema
 # KEYWORDS: JSON Schema data validation structure specification
 
-our $VERSION = '0.018';
+our $VERSION = '0.019';
 
 use 5.016;  # for fc, unicode_strings features
 no if "$]" >= 5.031009, feature => 'indirect';
@@ -14,7 +14,7 @@ use JSON::MaybeXS;
 use Syntax::Keyword::Try 0.11;
 use Carp qw(croak carp);
 use List::Util 1.55 qw(pairs first uniqint);
-use Ref::Util 0.100 qw(is_ref is_plain_hashref is_plain_coderef is_plain_arrayref);
+use Ref::Util 0.100 qw(is_ref is_plain_hashref is_plain_coderef);
 use Mojo::URL;
 use Safe::Isa;
 use Path::Tiny;
@@ -100,7 +100,11 @@ sub add_schema {
       _evaluator => $self,
     );
 
-  die [ $document->errors ] if $document->has_errors;
+  die JSON::Schema::Draft201909::Result->new(
+    output_format => $self->output_format,
+    result => 0,
+    errors => [ $document->errors ],
+  ) if $document->has_errors;
 
   if (not grep $_->{document} == $document, $self->_resource_values) {
     my $schema_content = $document->_serialized_schema
@@ -256,8 +260,8 @@ sub evaluate {
     $result = $self->_eval($data, $schema, $state);
   }
   catch {
-    if (is_plain_arrayref($@)) {
-      push @{$state->{errors}}, @{$@};
+    if ($@->$_isa('JSON::Schema::Draft201909::Result')) {
+      return $@;
     }
     elsif ($@->$_isa('JSON::Schema::Draft201909::Error')) {
       push @{$state->{errors}}, $@;
@@ -458,6 +462,8 @@ sub _get_or_load_resource {
     my $file = path(dist_dir('JSON-Schema-Draft201909'), $local_filename);
     my $schema = $self->_json_decoder->decode($file->slurp_raw);
     my $document = JSON::Schema::Draft201909::Document->new(schema => $schema, _evaluator => $self);
+
+    # this should be caught by the try/catch in evaluate()
     die [ $document->errors ] if $document->has_errors;
 
     # we have already performed the appropriate collision checks, so we bypass them here
@@ -530,7 +536,7 @@ JSON::Schema::Draft201909 - Validate data against a schema
 
 =head1 VERSION
 
-version 0.018
+version 0.019
 
 =head1 SYNOPSIS
 
@@ -707,11 +713,10 @@ You B<MUST> call C<add_schema> for any external resources that a schema may refe
 before calling L</evaluate>, other than the standard metaschemas which are loaded from a local cache
 as needed.
 
-Returns the L<JSON::Schema::Draft201909::Document> that contains the added schema, or C<undef>
-if the resource could not be found.
-
-May die with a listref of L<JSON::Schema::Draft201909::Error> object(s), if there were errors in the
-document.
+Returns C<undef> if the resource could not be found;
+if there were errors in the document, will die with a L<JSON::Schema::Draft201909::Result> object
+containing the errors;
+otherwise returns the L<JSON::Schema::Draft201909::Document> that contains the added schema.
 
 =head2 get
 

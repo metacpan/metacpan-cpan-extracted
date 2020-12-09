@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 #
-# Copyright (C) 2002-2018 National Marrow Donor Program. All rights reserved.
+# Copyright (C) 2002-2020 National Marrow Donor Program. All rights reserved.
 #
 # For a description of this module, please refer to the POD documentation
 # embedded at the bottom of the file (e.g. perldoc EMDIS::ECS::Config).
@@ -36,6 +36,13 @@ BEGIN
         OPENPGP_CMD_ENCRYPT OPENPGP_CMD_DECRYPT
         PGP_HOMEDIR PGP_KEYID PGP_PASSPHRASE
         PGP2_CMD_ENCRYPT PGP2_CMD_DECRYPT
+        ENABLE_AMQP
+        AMQP_BROKER_URL AMQP_VHOST AMQP_ADDR_META AMQP_ADDR_MSG AMQP_ADDR_DOC
+        AMQP_TRUSTSTORE AMQP_SSLCERT AMQP_SSLKEY AMQP_SSLPASS
+        AMQP_USERNAME AMQP_PASSWORD
+        AMQP_RECV_TIMEOUT AMQP_RECV_TIMELIMIT AMQP_SEND_TIMELIMIT
+        AMQP_DEBUG_LEVEL AMQP_CMD_SEND AMQP_CMD_RECV
+        EMDIS_MESSAGE_VERSION
     );
     for my $attr (@attrlist)
     {
@@ -217,12 +224,14 @@ sub _massage_config
        $this->{ECS_DRP_DIR} = $this->{ECS_TMP_DIR};
     }
     $this->{ECS_MBX_DIR} = catdir($this->{ECS_DAT_DIR}, 'mboxes');
+    $this->{ECS_MBX_AMQP_STAGING_DIR} = catdir($this->{ECS_MBX_DIR}, 'amqp_staging');
     $this->{ECS_MBX_IN_DIR}     = catdir($this->{ECS_MBX_DIR}, 'in');
     $this->{ECS_MBX_IN_FML_DIR} = catdir($this->{ECS_MBX_DIR}, 'in_fml');
     $this->{ECS_MBX_OUT_DIR}    = catdir($this->{ECS_MBX_DIR}, 'out');
     $this->{ECS_MBX_TRASH_DIR}  = catdir($this->{ECS_MBX_DIR}, 'trash');
     $this->{ECS_MBX_STORE_DIR}  = catdir($this->{ECS_MBX_DIR}, 'store');
-    for my $attr (qw(ECS_TMP_DIR ECS_DRP_DIR ECS_MBX_DIR ECS_MBX_IN_DIR
+    for my $attr (qw(ECS_TMP_DIR ECS_DRP_DIR ECS_MBX_DIR
+                     ECS_MBX_AMQP_STAGING_DIR ECS_MBX_IN_DIR
                      ECS_MBX_IN_FML_DIR ECS_MBX_OUT_DIR ECS_MBX_TRASH_DIR
                      ECS_MBX_STORE_DIR))
     {
@@ -270,7 +279,9 @@ sub _massage_config
 # Note:  no default value for THIS_NODE, ADM_ADDR, ADAPTER_CMD, SMTP_DOMAIN,
 # SMTP_FROM, SMTP_PORT, SMTP_USERNAME, SMTP_PASSWORD, INBOX_PORT,
 # INBOX_FOLDER, INBOX_USERNAME, INBOX_PASSWORD, GPG_HOMEDIR, GPG_KEYID,
-# GPG_PASSPHRASE, PGP_HOMEDIR, PGP_KEYID, PGP_PASSPHRASE
+# GPG_PASSPHRASE, PGP_HOMEDIR, PGP_KEYID, PGP_PASSPHRASE,
+# AMQP_BROKER_URL, AMQP_VHOST, AMQP_TRUSTSTORE, AMQP_SSLCERT AMQP_SSLKEY,
+# AMQP_SSLPASS, AMQP_USERNAME, AMQP_PASSWORD
 sub _set_defaults
 {
     my $this = shift;
@@ -324,6 +335,13 @@ sub _set_defaults
             '-u __SELF__ -eats __INPUT__ __RECIPIENT__ __SELF__';
     $this->{PGP2_CMD_DECRYPT} = '/usr/local/bin/pgp +batchmode +verbose=0 ' .
         '+force +CharSet=latin1 -o __OUTPUT__ __INPUT__';
+    $this->{ENABLE_AMQP}       = "NO";
+    $this->{AMQP_RECV_TIMEOUT} = 5;
+    $this->{AMQP_RECV_TIMELIMIT} = 300;
+    $this->{AMQP_SEND_TIMELIMIT} = 60;
+    $this->{AMQP_DEBUG_LEVEL}  = 0;
+    $this->{AMQP_CMD_SEND}     = 'ecs_amqp_send.py';
+    $this->{AMQP_CMD_RECV}     = 'ecs_amqp_recv.py';
 }
 
 # ----------------------------------------------------------------------
@@ -380,11 +398,29 @@ sub _validate_config
         push(@errors, "INBOX_DIRECTORY not defined, but is required for " .
             "DIRECTORY protocol.")
             unless defined($this->{INBOX_DIRECTORY});           
-    }    
+    }
+    elsif($this->{INBOX_PROTOCOL} =~ /NONE/i)
+    {
+        $this->{INBOX_PROTOCOL} = 'NONE';  # force uppercase
+    }
     else
     {
         push(@errors,
             "Unrecognized INBOX_PROTOCOL:  $this->{INBOX_PROTOCOL}");
+    }
+
+    if(is_yes($this->{ENABLE_AMQP}))
+    {
+        # sanity checks on AMQP configuration
+        for my $attr (qw(AMQP_ADDR_META AMQP_ADDR_MSG AMQP_BROKER_URL
+                         AMQP_CMD_SEND AMQP_CMD_RECV AMQP_DEBUG_LEVEL
+                         AMQP_RECV_TIMEOUT AMQP_RECV_TIMELIMIT
+                         AMQP_SEND_TIMELIMIT))
+        {
+            push(@errors, "$attr not defined, but is required for AMQP " .
+                 "messaging.")
+                unless exists($this->{$attr});
+        }
     }
 
     # check whether an encryption method is configured
@@ -484,6 +520,7 @@ sub _validate_config
     push(@dirs, 'ECS_DRP_DIR')
        if( ! defined($this->{ECS_TO_DIR})
            || $this->{ECS_TO_DIR} eq '');
+    push(@dirs, 'ECS_MBX_AMQP_STAGING_DIR') if is_yes($this->{ENABLE_AMQP});
     for my $dir (@dirs)
     {
         if(exists $this->{$dir} and not -d $this->{$dir})
@@ -553,6 +590,80 @@ meta message after each successfully processed incoming message.  Otherwise,
 the ecs_chk_com program will periodically send MSG_ACK messages, for those
 nodes with in_seq_ack less than in_seq.
 
+=item AMQP_ADDR_DOC
+
+AMQP queue (or address) for inbound documents.
+
+=item AMQP_ADDR_META
+
+AMQP queue (or address) for inbound META messages
+
+=item AMQP_ADDR_MSG
+
+AMQP queue (or address) for inbound EMDIS messages
+
+=item AMQP_BROKER_URL
+
+URL for AMQP broker, e.g. amqps://msg01.emdis.net
+
+=item AMQP_CMD_RECV
+
+AMQP receive command, e.g. ecs_amqp_recv.py
+
+=item AMQP_CMD_SEND
+
+AMQP send command, e.g. ecs_amqp_send.py
+
+=item AMQP_DEBUG_LEVEL
+
+AMQP debug output level, e.g. 0
+
+=item AMQP_PASSWORD
+
+Password for AMQP SASL PLAIN authentication (see also AMQP_USERNAME)
+
+=item AMQP_RECV_TIMEOUT
+
+Inactivity timeout threshold, in seconds, before tearing down AMQP
+receiver link.  E.g. 5
+
+=item AMQP_RECV_TIMELIMIT
+
+Time limit, in seconds, after which AMQP_CMD_RECV command is
+forcibly terminated.
+
+=item AMQP_SEND_TIMELIMIT
+
+Time limit, in seconds, after which AMQP_CMD_SEND command is
+forcibly terminated.
+
+=item AMQP_SSLCERT
+
+Client-side SSL certificate for AMQP communications.
+E.g. sslcert.pem (see also AMQP_SSLKEY, AMQP_SSLPASS)
+
+=item AMQP_SSLKEY
+
+Client-side SSL secret key for AMQP communications.
+E.g. sslkey.pem (see also AMQP_SSLCERT, AMQP_SSLPASS)
+
+=item AMQP_SSLPASS
+
+Password for AMQP_SSLKEY (see also AMQP_SSLCERT)
+
+=item AMQP_TRUSTSTORE
+
+Trust store for verifying SSL connection to AMQP broker,
+e.g. truststore.pem
+
+=item AMQP_USERNAME
+
+User name for AMQP SASL PLAIN authentication (see also AMQP_PASSWORD)
+
+=item AMQP_VHOST
+
+AMQP broker virtual host namespace (if needed), e.g. default
+
 =item BCK_DIR
 
 backup directory for incoming messages (or NONE)
@@ -581,6 +692,10 @@ payload for messages from the corresponding partner node
 location of a directory which has a subdirectory for each partner
 node;  each subdirectory here contains untransmitted outbound messages
 for the corresponding partner node
+
+=item ENABLE_AMQP
+
+YES/NO value.  If set to YES, enable use of AMQP messaging.
 
 =item ERR_FILE
 
@@ -629,7 +744,7 @@ POP3/IMAP server port (default 110/143, or 995/993 if INBOX_USE_SSL is YES)
 
 =item INBOX_PROTOCOL
 
-inbox protocol:  DIRECTORY, POP3 or IMAP
+inbox protocol:  DIRECTORY, POP3, IMAP, or NONE
 
 =item INBOX_TIMEOUT
 
@@ -865,7 +980,7 @@ THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
 WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF 
 MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
 
-Copyright (C) 2002-2016 National Marrow Donor Program. All rights reserved.
+Copyright (C) 2002-2020 National Marrow Donor Program. All rights reserved.
 
 See LICENSE file for license details.
 

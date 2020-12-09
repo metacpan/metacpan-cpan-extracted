@@ -61,7 +61,7 @@
          "web" : "https://github.com/perlancar/perl-Dist-Zilla-Plugin-PERLANCAR-MetaResources"
       }
    },
-   "version" : "0.041",
+   "version" : "0.042",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.030000"
@@ -161,7 +161,7 @@
          {
             "class" : "Dist::Zilla::Plugin::PERLANCAR::BeforeBuild",
             "name" : "@Author::PERLANCAR/PERLANCAR::BeforeBuild",
-            "version" : "0.602"
+            "version" : "0.603"
          },
          {
             "class" : "Dist::Zilla::Plugin::Rinci::AbstractFromMeta",
@@ -181,7 +181,7 @@
          {
             "class" : "Dist::Zilla::Plugin::PERLANCAR::MetaResources",
             "name" : "@Author::PERLANCAR/PERLANCAR::MetaResources",
-            "version" : "0.040"
+            "version" : "0.041"
          },
          {
             "class" : "Dist::Zilla::Plugin::CheckChangeLog",

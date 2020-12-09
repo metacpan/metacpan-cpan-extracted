@@ -47,6 +47,7 @@ my $campaign_id2 = "INSERT_CAMPAIGN_ID_2_HERE";
 my $campaign_ids = [];
 my $label_id     = "INSERT_LABEL_ID_HERE";
 
+# [START add_campaign_labels]
 sub add_campaign_labels {
   my ($api_client, $customer_id, $campaign_ids, $label_id) = @_;
 
@@ -78,12 +79,12 @@ sub add_campaign_labels {
   }
 
   # Add the campaign labels to the campaigns.
-  my $campaign_label_response = $api_client->CampaignLabelService()->mutate({
+  my $campaign_labels_response = $api_client->CampaignLabelService()->mutate({
     customerId => $customer_id,
     operations => $campaign_label_operations
   });
 
-  my $campaign_label_results = $campaign_label_response->{results};
+  my $campaign_label_results = $campaign_labels_response->{results};
   printf "Added %d campaign labels:\n", scalar @$campaign_label_results;
 
   foreach my $campaign_label_result (@$campaign_label_results) {
@@ -93,6 +94,7 @@ sub add_campaign_labels {
 
   return 1;
 }
+# [END add_campaign_labels]
 
 # Don't run the example if the file is being included.
 if (abs_path($0) ne abs_path(__FILE__)) {

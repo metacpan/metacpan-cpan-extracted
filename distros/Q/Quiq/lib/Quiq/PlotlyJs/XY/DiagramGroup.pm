@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = '1.191';
+our $VERSION = '1.192';
 
 use Quiq::Math;
 use Quiq::Json;
@@ -432,7 +432,7 @@ sub html {
     }
 
     my $rangeSliderThickness = 25;
-    my $height2 = $height-($rangeSliderThickness+15);
+    my $height2 = $height-($rangeSliderThickness+18);
     my $bottomMargin2 = $bottomMargin-($rangeSliderThickness+18);
 
     my $titleY = Quiq::Math->roundTo(
@@ -1062,6 +1062,19 @@ sub htmlDiagram {
                     title => 'Connect data points with straight lines,'.
                         ' splines or show markers',
                 ).
+                ' | FillArea:'.Quiq::Html::Widget::CheckBox->html($h,
+                     id =>  "$name-y$i",
+                     option => 1,
+                     value => 1,
+                     style => 'vertical-align: middle',
+                     title => 'Toggle colored area above or below graph',
+                     onClick => qq~
+                        let fill = this.checked? 'tozeroy': 'none';
+                        Plotly.restyle('$name-d$i',{
+                            'fill': fill,
+                        });
+                     ~,
+                ).
                 ' | '.Quiq::Html::Widget::Button->html($h,
                     id => "$name-y$i",
                     content => 'Scale Y Axis',
@@ -1168,7 +1181,7 @@ sub jsDiagram {
 
 =head1 VERSION
 
-1.191
+1.192
 
 =head1 AUTHOR
 

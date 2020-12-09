@@ -1,0 +1,12 @@
+LICENSE
+MANIFEST
+Makefile.PL
+README.md
+CHANGES
+lib/PDF/QRCode.pm
+.gitignore
+t/loader.t
+t/builder.t
+t/api2.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

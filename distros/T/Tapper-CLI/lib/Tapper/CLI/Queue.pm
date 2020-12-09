@@ -1,6 +1,6 @@
 package Tapper::CLI::Queue;
 our $AUTHORITY = 'cpan:TAPPER';
-$Tapper::CLI::Queue::VERSION = '5.0.6';
+$Tapper::CLI::Queue::VERSION = '5.0.7';
 
 use 5.010;
 use warnings;
@@ -598,7 +598,7 @@ AMD OSRC Tapper Team <tapper@amd64.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2020 by Advanced Micro Devices, Inc..
+This software is Copyright (c) 2020 by Advanced Micro Devices, Inc.
 
 This is free software, licensed under:
 

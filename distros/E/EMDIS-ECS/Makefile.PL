@@ -5,6 +5,7 @@ use ExtUtils::MakeMaker;
 my @scripts = qw(ecs_chk_com ecs_pid_chk ecs_proc_meta ecs_proc_msg
                  ecs_scan_mail ecs_setup ecstool ecs_ctl);
 my @cgi_scripts = qw(ecs_status ecs_status.pl);
+my @python_scripts = qw(ecs_amqp_recv.py ecs_amqp_send.py);
 my @ecsmods = qw(Config FileBackedMessage LockedHash Message);
 WriteMakefile(
     'NAME'		=> 'EMDIS::ECS',
@@ -38,6 +39,7 @@ WriteMakefile(
     # executable scripts
     'EXE_FILES' => [
         (map { "script/$_" } @scripts),
+        (map { "script/$_" } @python_scripts),
         (map { "web_status/$_" } @cgi_scripts) ],
 
     # man pages for executable scripts

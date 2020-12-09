@@ -3,7 +3,7 @@ package Quiq;
 use strict;
 use warnings;
 
-our $VERSION = '1.191';
+our $VERSION = '1.192';
 
 =encoding utf8
 
@@ -108,7 +108,7 @@ L<Quiq::ContentProcessor> - Prozessor für Abschnitts-Dateien
 
 =item *
 
-L<Quiq::ContentProcessor::BaseType> - Typ
+L<Quiq::ContentProcessor::BaseType> - Gemeinsame Funktionalität aller Entitäten (abstrakte Basisklasse)
 
 =item *
 
@@ -116,11 +116,11 @@ L<Quiq::ContentProcessor::File> - Basisklasse für Ausgabe-Dateien
 
 =item *
 
-L<Quiq::ContentProcessor::SubType> - Sub-Typ
+L<Quiq::ContentProcessor::SubType> - Sub-Typ Objekte
 
 =item *
 
-L<Quiq::ContentProcessor::Type> - Entität
+L<Quiq::ContentProcessor::Type> - Entität, Basisklasse aller Plugin-Klassen
 
 =item *
 
@@ -878,7 +878,7 @@ L<Quiq::Xml::LibXml> - Funktionale Erweiterungen von XML::LibXML
 
 =head1 VERSION
 
-1.191
+1.192
 
 =head1 AUTHOR
 

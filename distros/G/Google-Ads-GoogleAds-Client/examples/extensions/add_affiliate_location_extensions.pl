@@ -74,14 +74,13 @@ my $campaign_id = "INSERT_CAMPAIGN_ID_HERE";
 # 1. Google Ads only allows one location extension feed per email address.
 # 2. A Google Ads account cannot have a location extension feed and an affiliate
 # location extension feed at the same time.
-my $should_delete_existing_feeds = 0;
+my $delete_existing_feeds = 0;
 
 sub add_affiliate_location_extensions {
   my ($api_client, $customer_id, $chain_id, $campaign_id,
-    $should_delete_existing_feeds)
-    = @_;
+    $delete_existing_feeds) = @_;
 
-  if ($should_delete_existing_feeds) {
+  if ($delete_existing_feeds) {
     delete_location_extension_feeds($api_client, $customer_id);
   }
 
@@ -222,6 +221,7 @@ sub remove_feeds {
 }
 
 # Creates the affiliate location extension feed.
+# [START add_affiliate_location_extensions_3]
 sub create_affiliate_location_extension_feed {
   my ($api_client, $customer_id, $chain_id) = @_;
 
@@ -258,8 +258,10 @@ sub create_affiliate_location_extension_feed {
 
   return $feed_resource_name;
 }
+# [END add_affiliate_location_extensions_3]
 
 # Waits for the affiliate location extension feed to be ready.
+# [START add_affiliate_location_extensions]
 sub wait_for_feed_to_be_ready {
   my ($api_client, $customer_id, $feed_resource_name) = @_;
 
@@ -294,8 +296,10 @@ sub wait_for_feed_to_be_ready {
     MAX_FEED_MAPPING_RETRIEVAL_ATTEMPTS
   );
 }
+# [END add_affiliate_location_extensions]
 
 # Gets the affiliate location extension feed mapping.
+# [START add_affiliate_location_extensions_4]
 sub get_affiliate_location_extension_feed_mapping {
   my ($api_client, $customer_id, $feed_resource_name) = @_;
 
@@ -319,8 +323,10 @@ sub get_affiliate_location_extension_feed_mapping {
     ? $response->{results}[0]{feedMapping}
     : undef;
 }
+# [END add_affiliate_location_extensions_4]
 
 # Create the campaign feed.
+# [START add_affiliate_location_extensions_1]
 sub create_campaign_feed {
   my ($api_client, $customer_id, $campaign_id, $feed_mapping,
     $feed_resource_name, $chain_id)
@@ -361,8 +367,10 @@ sub create_campaign_feed {
     "Campaign feed created with resource name: '%s'.\n",
     $response->{results}[0]{resourceName};
 }
+# [END add_affiliate_location_extensions_1]
 
 # Gets the feed attribute ID for the retail chain ID.
+# [START add_affiliate_location_extensions_2]
 sub get_attribute_id_for_chain_id {
   my ($feed_mapping) = @_;
 
@@ -374,6 +382,7 @@ sub get_attribute_id_for_chain_id {
 
   die "Affiliate location feed mapping isn't setup correctly.";
 }
+# [END add_affiliate_location_extensions_2]
 
 # Don't run the example if the file is being included.
 if (abs_path($0) ne abs_path(__FILE__)) {
@@ -388,10 +397,10 @@ $api_client->set_die_on_faults(1);
 
 # Parameters passed on the command line will override any parameters set in code.
 GetOptions(
-  "customer_id=s"                  => \$customer_id,
-  "chain_id=i"                     => \$chain_id,
-  "campaign_id=i"                  => \$campaign_id,
-  "should_delete_existing_feeds=i" => \$should_delete_existing_feeds,
+  "customer_id=s"           => \$customer_id,
+  "chain_id=i"              => \$chain_id,
+  "campaign_id=i"           => \$campaign_id,
+  "delete_existing_feeds=i" => \$delete_existing_feeds,
 );
 
 # Print the help message if the parameters are not initialized in the code nor
@@ -401,7 +410,7 @@ pod2usage(2)
 
 # Call the example.
 add_affiliate_location_extensions($api_client, $customer_id =~ s/-//gr,
-  $chain_id, $campaign_id, $should_delete_existing_feeds);
+  $chain_id, $campaign_id, $delete_existing_feeds);
 
 =pod
 
@@ -424,7 +433,7 @@ add_affiliate_location_extensions.pl [options]
     -chain_id                           The retail chain ID.
     -campaign_id                        The campaign ID for which the affiliate
                                         location extensions are added.
-    -should_delete_existing_feeds       [optional] Non-zero if it should delete
+    -delete_existing_feeds              [optional] Non-zero if it should delete
                                         the existing feeds.
 
 =cut

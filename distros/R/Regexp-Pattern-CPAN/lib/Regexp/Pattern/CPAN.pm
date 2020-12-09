@@ -1,7 +1,7 @@
 package Regexp::Pattern::CPAN;
 
-our $DATE = '2018-09-10'; # DATE
-our $VERSION = '0.003'; # VERSION
+our $DATE = '2020-09-14'; # DATE
+our $VERSION = '0.004'; # VERSION
 
 our %RE = (
     pause_id => {
@@ -38,7 +38,7 @@ Regexp::Pattern::CPAN - Regexp patterns related to CPAN
 
 =head1 VERSION
 
-This document describes version 0.003 of Regexp::Pattern::CPAN (from Perl distribution Regexp-Pattern-CPAN), released on 2018-09-10.
+This document describes version 0.004 of Regexp::Pattern::CPAN (from Perl distribution Regexp-Pattern-CPAN), released on 2020-09-14.
 
 =head1 SYNOPSIS
 
@@ -49,7 +49,7 @@ This document describes version 0.003 of Regexp::Pattern::CPAN (from Perl distri
 
 L<Regexp::Pattern> is a convention for organizing reusable regex patterns.
 
-=head1 PATTERNS
+=head1 REGEXP PATTERNS
 
 =over
 
@@ -63,19 +63,25 @@ assuming no.
 
 Examples:
 
+Example #1.
+
  "PERLANCAR" =~ re("CPAN::pause_id");  # matches
 
- # Only allows uppercase
- "perlancar" =~ re("CPAN::pause_id");  # doesn't match
+Only allows uppercase.
 
- # too short
- "A" =~ re("CPAN::pause_id");  # doesn't match
+ "perlancar" =~ re("CPAN::pause_id");  # DOESN'T MATCH
 
- # contains whitespace
- "PERL ANCAR" =~ re("CPAN::pause_id", {-anchor=>1});  # doesn't match
+too short.
 
- # too long
- "RANDALSCHWARTZ" =~ re("CPAN::pause_id", {-anchor=>1});  # doesn't match
+ "A" =~ re("CPAN::pause_id");  # DOESN'T MATCH
+
+contains whitespace.
+
+ "PERL ANCAR" =~ re("CPAN::pause_id", {-anchor=>1});  # DOESN'T MATCH
+
+too long.
+
+ "RANDALSCHWARTZ" =~ re("CPAN::pause_id", {-anchor=>1});  # DOESN'T MATCH
 
 =back
 
@@ -99,13 +105,17 @@ feature.
 
 L<Regexp::Pattern::Perl>
 
+L<Regexp::Pattern>
+
+Some utilities related to Regexp::Pattern: L<App::RegexpPatternUtils>, L<rpgrep> from L<App::rpgrep>.
+
 =head1 AUTHOR
 
 perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018, 2017 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2018, 2017 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -1,14 +1,25 @@
+=== README for MIME-Types version 2.18
+=   Generated on Wed Dec  9 10:29:07 2020 by OODoc 2.02
 
-MIME::Types
-===========
+There are various ways to install this module:
 
-A start for a more detailed data-structure to keep knowledge
-about various data types are defined by MIME.  Some basic
-treatments with mime types are implemented.
+ (1) if you have a command-line, you can do:
+       perl -MCPAN -e 'install <any package from this distribution>'
 
-The first special data item is whether a data type is binary
-or ascii.  This is required for correctly encoding e-mail
-attachments, and implemented for the Mail::Box module.
+ (2) if you use Windows, have a look at http://ppm.activestate.com/
 
-Improvements and additions please to
-       Mark Overmeer, <mimetypes@overmeer.net>
+ (3) if you have downloaded this module manually (as root/administrator)
+       gzip -d MIME-Types-2.18.tar.gz
+       tar -xf MIME-Types-2.18.tar
+       cd MIME-Types-2.18
+       perl Makefile.PL
+       make          # optional
+       make test     # optional
+       make install
+
+For usage, see the included manual-pages or
+    http://search.cpan.org/dist/MIME-Types-2.18/
+
+Please report problems to
+    http://rt.cpan.org/Dist/Display.html?Queue=MIME-Types
+

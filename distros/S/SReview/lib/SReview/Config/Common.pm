@@ -58,6 +58,7 @@ sub setup {
 	$config->define('output_profiles', 'An array of profiles, one for each encoding, to be used for output encodings', ['webm']);
 	$config->define('input_profile', 'The profile that is used for input videos.', undef);
 	$config->define('audio_multiplex_mode', 'The way in which the primary and backup audio are multiplexed in the input stream. One of \'stereo\' for the primary in the left channel of the first audio stream and the backup in the right channel, or \'astream\' for the primary in the first audio stream, and the backup in the second audio stream', 'stereo');
+	$config->define('normalizer', 'The implementation used to normalize audio. Currently only bs1770gain is supported', 'bs1770gain');
 	$config->define('web_pid_file', 'The PID file for the webinterface, when running under hypnotoad.','/var/run/sreview/sreview-web.pid');
 
 	# Values for detection script
@@ -73,9 +74,11 @@ sub setup {
 		uploading => 'sreview-skip <%== $talkid %>',
 		notification => 'sreview-skip <%== $talkid %>',
 		announcing => 'sreview-skip <%== $talkid %>',
+		injecting => 'sreview-inject -t <%== $talkid %>',
 	});
 	$config->define('query_limit', 'A maximum number of jobs that should be submitted in a single loop in sreview-dispatch. 0 means no limit.', 1);
 	$config->define('published_headers', 'The HTTP headers that indicate that the video is available now. Use _code for the HTTP status code.', undef);
+	$config->define('inject_actions', 'A command that tells SReview what to do with a talk that needs to be injected', 'sreview-inject <%== $talkid %> <%== $output_dir %>/inject.<%== $talkid %>.out 2> <%== $output_dir %>/cut.<%== $talkid %>.err');
 
 	# Values for notification script
 	$config->define('notify_actions', 'An array of things to do when notifying the readyness of a preview video. Can contain one or more of: email, command.', []);
@@ -101,6 +104,10 @@ sub setup {
 
 	# for extending profiles
 	$config->define('extra_profiles', 'Any extra custom profiles you want to use. This hash should have two keys: the "parent" should be a name of a profile to subclass from, and the "settings" should contain a hash reference with attributes for the new profile to set', {});
+
+	# for sreview-import
+	$config->define('schedule_format', 'The format in which the schedule is set. Must be implemented as a child class of SReview::Schedule::Base', 'penta');
+	$config->define('schedule_options', 'The options to pass to the schedule parser as specified through schedule_format. See the documentation of your chosen parser for details.', {});
 
 	# for tuning command stuff
 	$config->define('command_tune', 'Some commands change incompatibly from one version to the next. This option exists to deal with such incompatibilities', {});

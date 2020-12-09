@@ -3,6 +3,7 @@ package SReview::Talk;
 use Moose;
 use Mojo::Pg;
 use Mojo::Template;
+use Mojo::JSON qw/encode_json decode_json/;
 use SReview::Config::Common;
 use SReview::Talk::State;
 
@@ -74,7 +75,7 @@ sub _load_pathinfo {
 
 	my $pathinfo = {};
 
-	my $eventdata = $pg->db->dbh->prepare("SELECT events.id AS eventid, events.name AS event, rooms.name AS room, rooms.outputname AS room_output, rooms.id AS room_id, talks.starttime::date AS date, to_char(starttime, 'DD Month yyyy at HH:MI') AS readable_date, to_char(starttime, 'yyyy') AS year, talks.slug, talks.title, talks.subtitle, talks.state, talks.nonce, talks.apologynote FROM talks JOIN events ON talks.event = events.id JOIN rooms ON rooms.id = talks.room WHERE talks.id = ?");
+	my $eventdata = $pg->db->dbh->prepare("SELECT events.id AS eventid, events.name AS event, events.outputdir AS event_output, rooms.name AS room, rooms.outputname AS room_output, rooms.id AS room_id, talks.starttime::date AS date, to_char(starttime, 'DD Month yyyy at HH:MI') AS readable_date, to_char(starttime, 'yyyy') AS year, talks.slug, talks.title, talks.subtitle, talks.state, talks.nonce, talks.apologynote FROM talks JOIN events ON talks.event = events.id JOIN rooms ON rooms.id = talks.room WHERE talks.id = ?");
 	$eventdata->execute($self->talkid);
 	my $row = $eventdata->fetchrow_hashref();
 
@@ -91,6 +92,52 @@ sub _load_pathinfo {
 	$pathinfo->{"raw"} = $row;
 
 	return $pathinfo;
+}
+
+=head2 flags
+
+Flags set on this talk. Setter: C<set_flag>; getter: C<get_flag>. Flags can be deleted with C<delete_flag>.
+
+=cut
+
+has 'flags' => (
+	is => 'rw',
+	traits => [ 'Hash' ],
+	isa => 'HashRef[Bool]',
+	builder => '_probe_flags',
+	lazy => 1,
+	predicate => '_has_flags',
+	handles => {
+		set_flag => 'set',
+		get_flag => 'get',
+		delete_flag => 'delete',
+	},
+);
+
+sub _probe_flags {
+	my $self = shift;
+	my $st = $pg->db->dbh->prepare("SELECT flags FROM talks WHERE id = ?");
+	$st->execute($self->talkid);
+	my $row = $st->fetchrow_arrayref;
+	if(defined($row->[0])) {
+		return decode_json($row->[0]);
+	}
+	return {};
+}
+
+has 'active_stream' => (
+	is => 'rw',
+	builder => '_probe_stream',
+	lazy => 1,
+	predicate => 'has_stream',
+);
+
+sub _probe_stream {
+	my $self = shift;
+	my $st = $pg->db->dbh->prepare("SELECT active_stream FROM talks WHERE id = ?");
+	$st->execute($self->talkid);
+	my $row = $st->fetchrow_arrayref;
+	return $row->[0];
 }
 
 =head2 apology
@@ -246,6 +293,22 @@ sub _load_eventname {
 	return $self->_get_pathinfo->{raw}{event};
 }
 
+=head2 event_output
+
+The name of the event as used in output directories, if any.
+
+=cut
+
+has 'event_output' => (
+	lazy => 1,
+	is => 'ro',
+	builder => '_load_event_output',
+);
+
+sub _load_event_output {
+	return shift->_get_pathinfo->{raw}{event_output};
+}
+
 =head2 state
 
 The current state of the talk, as an L<SReview::Talk::State>
@@ -279,6 +342,23 @@ has 'title' => (
 sub _load_title {
 	my $self = shift;
 	return $self->_get_pathinfo->{raw}{title};
+}
+
+=head2 subtitle
+
+The subtitle of the talk
+
+=cut
+
+has 'subtitle' => (
+	lazy => 1,
+	is => 'rw',
+	builder => '_load_subtitle',
+);
+
+sub _load_subtitle {
+	my $self = shift;
+	return $self->_get_pathinfo->{raw}{subtitle};
 }
 
 =head2 workdir
@@ -608,6 +688,8 @@ sub _load_eventurl {
 			room => $self->room,
 			date => $self->date,
 			event => $self->eventname,
+			event_output => $self->event_output,
+			talk => $self,
 			year => $self->_get_pathinfo->{raw}{year}});
 	}
 	return "";
@@ -690,7 +772,7 @@ sub add_correction {
 =head2 done_correcting
 
 Commit the created corrections to the database. Also commits other
-things, like the comment.
+things, like the comment and the flags.
 
 =cut
 
@@ -717,8 +799,12 @@ sub done_correcting {
         }
 	if($self->has_apology) {
 		$db->prepare("UPDATE talks SET apologynote=? WHERE id = ?")->execute($self->apology, $self->talkid);
-	} else {
-		$db->prepare("UPDATE talks SET apologynote = NULL WHERE id = ?")->execute($self->talkid);
+	}
+	if($self->_has_flags) {
+		$db->prepare("UPDATE talks SET flags=? WHERE id = ?")->execute(encode_json($self->flags), $self->talkid);
+	}
+	if($self->has_stream) {
+		$db->prepare("UPDATE talks SET active_stream=? WHERE id = ?")->execute($self->active_stream, $self->talkid);
 	}
 }
 
@@ -733,9 +819,12 @@ just before destroying it.
 sub set_state {
         my $self = shift;
         my $newstate = shift;
+	my $progress = shift;
 
-        my $st = $pg->db->dbh->prepare("UPDATE talks SET state=?, progress='waiting' WHERE id=?");
-        $st->execute($newstate, $self->talkid);
+	$progress = 'waiting' unless defined($progress);
+
+        my $st = $pg->db->dbh->prepare("UPDATE talks SET state=?, progress=? WHERE id=?");
+        $st->execute($newstate, $progress, $self->talkid);
 }
 
 =head2 state_done

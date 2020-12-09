@@ -48,6 +48,7 @@ use Data::Uniqid qw(uniqid);
 my $customer_id = "INSERT_CUSTOMER_ID_HERE";
 my $ad_group_id = "INSERT_AD_GROUP_ID_HERE";
 
+# [START add_expanded_text_ads]
 sub add_expanded_text_ads {
   my ($api_client, $customer_id, $ad_group_id) = @_;
 
@@ -78,15 +79,16 @@ sub add_expanded_text_ads {
     ->new({create => $ad_group_ad});
 
   # Add the ad group ad.
-  my $ad_group_ad_response = $api_client->AdGroupAdService()->mutate({
+  my $ad_group_ads_response = $api_client->AdGroupAdService()->mutate({
       customerId => $customer_id,
       operations => [$ad_group_ad_operation]});
 
   printf "Created expanded text ad '%s'.\n",
-    $ad_group_ad_response->{results}[0]{resourceName};
+    $ad_group_ads_response->{results}[0]{resourceName};
 
   return 1;
 }
+# [END add_expanded_text_ads]
 
 # Don't run the example if the file is being included.
 if (abs_path($0) ne abs_path(__FILE__)) {

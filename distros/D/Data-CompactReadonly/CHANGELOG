@@ -1,3 +1,5 @@
+2020-12-09    0.0.3    More floating point fixes, for perls using gcc's libquadmath
+
 2020-12-05    0.0.2    Fix floating point issues in tests;
                        Stop writing numeric hash keys because of FP imprecision
 
