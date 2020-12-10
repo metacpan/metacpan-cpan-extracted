@@ -1,5 +1,5 @@
 package Image::PNG::Const;
-our $VERSION = '0.48';
+our $VERSION = '0.49';
 
 require Exporter;
 @ISA = qw(Exporter);
@@ -430,6 +430,7 @@ use constant {
     PNG_OPTION_OFF => 2,
     PNG_OPTION_ON => 3,
 };
+
 
 =head1 NAME
 
@@ -1300,7 +1301,7 @@ Ben Bullock, <bkb@cpan.org>
 =head1 COPYRIGHT & LICENCE
 
 This package and associated files are copyright (C) 
--2020
+2011-2020
 Ben Bullock.
 
 You can use, copy, modify and redistribute this package and associated
@@ -1309,6 +1310,8 @@ Licence.
 
 
 
+
+=cut
 
 # Local variables:
 # mode: perl

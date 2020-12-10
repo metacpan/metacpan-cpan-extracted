@@ -1,5 +1,27 @@
 Revision history for Text-Minify-XS:
 
+v0.3.0    2020-12-10 12:42:34+00:00 Europe/London
+  [Bug Fixes]
+  - Handle strings with embedded null "\0" characters.
+
+  [Enhancements]
+  - Add support for utf8 characters, GH#2.
+
+v0.2.3    2020-12-10 12:23:47+00:00 Europe/London
+  [Bug Fixes]
+  - Set utf8 flag on result if the input is utf8.
+
+  - Only normalise "\r" into "\n".
+
+  [Enhancements]
+  - Change internal functions to macros.
+
+  - Use Perl API macro for identifying whitespace.
+
+v0.2.2    2020-12-09 23:01:04+00:00 Europe/London
+  [Bug Fixes]
+  - Allocate the correct size.
+
 v0.2.1    2020-12-09 16:56:03+00:00 Europe/London
   [Incompatabilities]
   - The XS code uses newer Perl API memory allocation functions,

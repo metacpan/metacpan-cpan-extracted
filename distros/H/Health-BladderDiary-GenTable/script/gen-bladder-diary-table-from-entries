@@ -4,9 +4,9 @@
 # and generated automatically using Perinci::CmdLine::Gen version 0.497
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-11-13'; # DATE
+our $DATE = '2020-12-10'; # DATE
 our $DIST = 'Health-BladderDiary-GenTable'; # DIST
-our $VERSION = '0.004'; # VERSION
+our $VERSION = '0.006'; # VERSION
 
 use 5.010001;
 use strict;
@@ -40,15 +40,17 @@ gen-bladder-diary-table-from-entries - Create bladder diary table from bladder d
 
 =head1 VERSION
 
-This document describes version 0.004 of gen-bladder-diary-table-from-entries (from Perl distribution Health-BladderDiary-GenTable), released on 2020-11-13.
+This document describes version 0.006 of gen-bladder-diary-table-from-entries (from Perl distribution Health-BladderDiary-GenTable), released on 2020-12-10.
 
 =head1 SYNOPSIS
 
 Usage:
 
- % gen-bladder-diary-table-from-entries [--debug] [--format=name] [--json]
-     [--log-level=level] [--(no)naked-res] [--page-result[=program]]
-     [--quiet] [--trace] [--verbose] [--view-result[=program]] <entries>
+ % gen-bladder-diary-table-from-entries [--date=s] [--debug]
+     [--format=name] [--json] [--log-level=level] [--(no)naked-res]
+     [--page-result[=program]] [--quiet] [--trace] [--verbose]
+     [--view-result[=program]] [-y=s] [--yesterday-last-urination-entry=s]
+     <entries>
 
 =head1 OPTIONS
 
@@ -58,7 +60,11 @@ C<*> marks required options.
 
 =over
 
+=item B<--date>=I<s>
+
 =item B<--entries>=I<s>*
+
+=item B<--yesterday-last-urination-entry>=I<s>, B<-y>
 
 =back
 
@@ -193,7 +199,7 @@ Source repository is at L<https://github.com/perlancar/perl-Health-BladderDiary-
 
 =head1 BUGS
 
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Health-BladderDiary-GenTable>
+Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-Health-BladderDiary-GenTable/issues>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired

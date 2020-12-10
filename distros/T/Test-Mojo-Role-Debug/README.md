@@ -37,7 +37,7 @@ what's what. This module comes to the rescue.
 
 # METHODS
 
-You have all the methods provided by [Test::Mojo](https://metacpan.org/pod/Test::Mojo), plus these:
+You have all the methods provided by [Test::Mojo](https://metacpan.org/pod/Test%3A%3AMojo), plus these:
 
 ## `d`
 
@@ -48,14 +48,17 @@ You have all the methods provided by [Test::Mojo](https://metacpan.org/pod/Test:
     $t->d('#foo', 'file.html'); # dump specific element into a file
 
 **Returns** its invocant.
-On failure of previous tests (see ["success" in Mojo::DOM](https://metacpan.org/pod/Mojo::DOM#success)),
+On failure of previous tests (see ["success" in Test::Mojo](https://metacpan.org/pod/Test%3A%3AMojo#success)),
 dumps the DOM of the current page to the screen. **Takes** an optional
-selector to be passed to ["at" in Mojo::DOM](https://metacpan.org/pod/Mojo::DOM#at), in which case, only
+selector to be passed to ["at" in Mojo::DOM](https://metacpan.org/pod/Mojo%3A%3ADOM#at), in which case, only
 the markup of that element will be dumped.
 
 A filename can be provided as the second argument to put the contents into
 the file instead. To dump entire DOM, use `undef` or empty string as the
 first argument.
+
+**NOTE:** the plugin detects Mojolicious's error page and will dump
+only the error text from that page, instead of the entire DOM.
 
 ## `da`
 
@@ -69,7 +72,7 @@ test failed or not.
 
 # SEE ALSO
 
-[Test::Mojo](https://metacpan.org/pod/Test::Mojo) (["or" in Test::Mojo](https://metacpan.org/pod/Test::Mojo#or) in particular), [Mojo::DOM](https://metacpan.org/pod/Mojo::DOM)
+[Test::Mojo](https://metacpan.org/pod/Test%3A%3AMojo) (["or" in Test::Mojo](https://metacpan.org/pod/Test%3A%3AMojo#or) in particular), [Mojo::DOM](https://metacpan.org/pod/Mojo%3A%3ADOM)
 
 <div>
     <div style="background: url(http://zoffix.com/CPAN/Dist-Zilla-Plugin-Pod-Spiffy/icons/hr.png);height: 18px;"></div>

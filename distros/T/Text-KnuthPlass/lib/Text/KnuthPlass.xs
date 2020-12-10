@@ -129,7 +129,7 @@ void free_breakpoint(Breakpoint* b) {
     if (b) Safefree(b);
 }
 
-void _unlink(LinkedList* list, Breakpoint* a) {
+void _unlinkKP(LinkedList* list, Breakpoint* a) {
     if (!a->prev) { list->head = a->next; } else { a->prev->next = a->next; }
     if (!a->next) { list->tail = a->prev; } else { a->next->prev = a->prev; }
     list->list_size--;
@@ -248,7 +248,7 @@ _mainloop(self, node, index, nodes)
             ratio = _compute_cost(self, position, index, active, current_line, nodes);
             debug(warn("Got a ratio of %f\n", ratio));
             if (ratio < 1 || (isPenalty(node) && nodepenalty == -infinity))
-                _unlink(activelist, active);
+                _unlinkKP(activelist, active);
 
             if (-1 <= ratio && ratio <= tolerance) {
                 SV* nodeAtPos = *av_fetch(nodes, position, FALSE); 

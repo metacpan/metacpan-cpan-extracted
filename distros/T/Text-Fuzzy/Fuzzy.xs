@@ -6,7 +6,7 @@
 #include "ppport.h"
 
 #define ERROR_HANDLER perl_error_handler
-#define TEXT_FUZZY_USER_ERROR
+#define TEXT_FUZZY_USER_ERROR tfp_text_fuzzy_error
 
 #include "config.h"
 #define PERL_MEMORY_MANAGEMENT

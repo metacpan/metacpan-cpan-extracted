@@ -1,6 +1,15 @@
 Change history for OTRS::OPM::Parser
 ====================================
 
+1.04 2020-12-10 11:59:00
+
+  + fix built
+
+1.03 2020-12-10 11:54:00
+
+  + improved SYNOPSIS (thanks to Håkon Hægland (@hakonhagland), PR#4)
+  + added support for OTOBO (https://otobo.de)
+
 1.02 2019-02-07 08:44:00
 
   + forgot to remove some code where Moose was used

@@ -1,5 +1,11 @@
 Revision history for Perl extension RogueCurses.
 
+0.0.6 Thu Dec 10
+	- added permutation of row and column to field bam
+
+0.0.5 Thu Dec 10
+	- fielded BAM matrix (fieldbam), added start of permutation
+
 0.0.4 Wed Dec 9
 	- added search through word fuzzy associative matrix
 

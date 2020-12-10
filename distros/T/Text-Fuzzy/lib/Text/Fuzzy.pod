@@ -22,12 +22,12 @@ produces output
     Nearest array entry is brown
 
 
-(This example is included as L<F<synopsis.pl>|https://fastapi.metacpan.org/source/BKB/Text-Fuzzy-0.28/examples/synopsis.pl> in the distribution.)
+(This example is included as L<F<synopsis.pl>|https://fastapi.metacpan.org/source/BKB/Text-Fuzzy-0.29/examples/synopsis.pl> in the distribution.)
 
 =head1 VERSION
 
-This documents version 0.28 of Text::Fuzzy corresponding
-to git commit L<2b324ee39005d6c6670a6a41837fd2e43eda4d02|https://github.com/benkasminbullock/Text-Fuzzy/commit/2b324ee39005d6c6670a6a41837fd2e43eda4d02> released on Thu Oct 4 20:39:21 2018 +0900.
+This documents version 0.29 of Text::Fuzzy corresponding
+to git commit L<0e5db1fbccbc7d7518ec39a95d43a5b20166a727|https://github.com/benkasminbullock/Text-Fuzzy/commit/0e5db1fbccbc7d7518ec39a95d43a5b20166a727> released on Thu Dec 10 14:38:31 2020 +0900.
 
 =head1 DESCRIPTION
 
@@ -49,7 +49,7 @@ produces output
     2
 
 
-(This example is included as L<F<unicode.pl>|https://fastapi.metacpan.org/source/BKB/Text-Fuzzy-0.28/examples/unicode.pl> in the distribution.)
+(This example is included as L<F<unicode.pl>|https://fastapi.metacpan.org/source/BKB/Text-Fuzzy-0.29/examples/unicode.pl> in the distribution.)
 
 The default edit distance is the Levenshtein one, which counts each
 addition (C<cat> -> C<cart>), substitution (C<cat> -> C<cut>), and
@@ -158,7 +158,7 @@ produces output
     5
 
 
-(This example is included as L<F<distance.pl>|https://fastapi.metacpan.org/source/BKB/Text-Fuzzy-0.28/examples/distance.pl> in the distribution.)
+(This example is included as L<F<distance.pl>|https://fastapi.metacpan.org/source/BKB/Text-Fuzzy-0.29/examples/distance.pl> in the distribution.)
 
 To know which edits are used to convert the words, use
 L</distance_edits>.
@@ -185,7 +185,7 @@ produces output
     who what
 
 
-(This example is included as L<F<nearestv.pl>|https://fastapi.metacpan.org/source/BKB/Text-Fuzzy-0.28/examples/nearestv.pl> in the distribution.)
+(This example is included as L<F<nearestv.pl>|https://fastapi.metacpan.org/source/BKB/Text-Fuzzy-0.29/examples/nearestv.pl> in the distribution.)
 
 The behaviour of the match can be controlled with L</no_exact> and
 L</set_max_distance> in exactly the same way as L</nearest>.
@@ -239,7 +239,7 @@ produces output
     Not found anywhere.
 
 
-(This example is included as L<F<check-return.pl>|https://fastapi.metacpan.org/source/BKB/Text-Fuzzy-0.28/examples/check-return.pl> in the distribution.)
+(This example is included as L<F<check-return.pl>|https://fastapi.metacpan.org/source/BKB/Text-Fuzzy-0.29/examples/check-return.pl> in the distribution.)
 
 If there is more than one word with the same edit distance in
 C<@words>, this returns the last one found, unless it is an exact
@@ -269,7 +269,7 @@ produces output
     The nearest words are nice, rice, lice, distance 1.
 
 
-(This example is included as L<F<list-context.pl>|https://fastapi.metacpan.org/source/BKB/Text-Fuzzy-0.28/examples/list-context.pl> in the distribution.)
+(This example is included as L<F<list-context.pl>|https://fastapi.metacpan.org/source/BKB/Text-Fuzzy-0.29/examples/list-context.pl> in the distribution.)
 
 =head2 last_distance
 
@@ -297,7 +297,7 @@ produces output
     3
 
 
-(This example is included as L<F<last-distance.pl>|https://fastapi.metacpan.org/source/BKB/Text-Fuzzy-0.28/examples/last-distance.pl> in the distribution.)
+(This example is included as L<F<last-distance.pl>|https://fastapi.metacpan.org/source/BKB/Text-Fuzzy-0.29/examples/last-distance.pl> in the distribution.)
 
 =head2 set_max_distance
 
@@ -338,7 +338,7 @@ produces output
     11
 
 
-(This example is included as L<F<max-dist.pl>|https://fastapi.metacpan.org/source/BKB/Text-Fuzzy-0.28/examples/max-dist.pl> in the distribution.)
+(This example is included as L<F<max-dist.pl>|https://fastapi.metacpan.org/source/BKB/Text-Fuzzy-0.29/examples/max-dist.pl> in the distribution.)
 
 Setting the maximum distance is a way to make a search more rapid. For
 example if you are searching over a dictionary of 100,000 or a million
@@ -396,7 +396,7 @@ produces output
     Without exact, nearest to boo is bobbity
 
 
-(This example is included as L<F<no-exact.pl>|https://fastapi.metacpan.org/source/BKB/Text-Fuzzy-0.28/examples/no-exact.pl> in the distribution.)
+(This example is included as L<F<no-exact.pl>|https://fastapi.metacpan.org/source/BKB/Text-Fuzzy-0.29/examples/no-exact.pl> in the distribution.)
 
 This is for the case of searching over an array which contains the
 searched-for item itself.
@@ -450,7 +450,7 @@ produces output
     kkdddk
 
 
-(This example is included as L<F<distance-edits.pl>|https://fastapi.metacpan.org/source/BKB/Text-Fuzzy-0.28/examples/distance-edits.pl> in the distribution.)
+(This example is included as L<F<distance-edits.pl>|https://fastapi.metacpan.org/source/BKB/Text-Fuzzy-0.29/examples/distance-edits.pl> in the distribution.)
 
 This does not handle transpositions. Unlike the rest of the module,
 this is pure Perl rather than XS, and not optimized for speed. The
@@ -483,7 +483,7 @@ practical problems.
 =head2 misspelt-web-page.cgi
 
 The file 
-L<F<examples/misspelt-web-page.cgi>|https://fastapi.metacpan.org/source/BKB/Text-Fuzzy-0.28/examples/misspelt-web-page.cgi> is an example of a CGI
+L<F<examples/misspelt-web-page.cgi>|https://fastapi.metacpan.org/source/BKB/Text-Fuzzy-0.29/examples/misspelt-web-page.cgi> is an example of a CGI
 script which does something similar to the Apache mod_speling module,
 offering spelling corrections for mistyped URLs and sending the user
 to a correct page.
@@ -591,7 +591,7 @@ set up F<.htaccess> to use the script.
 =head2 spell-check.pl
 
 The file 
-L<F<examples/spell-check.pl>|https://fastapi.metacpan.org/source/BKB/Text-Fuzzy-0.28/examples/spell-check.pl> is a spell checker. It uses a
+L<F<examples/spell-check.pl>|https://fastapi.metacpan.org/source/BKB/Text-Fuzzy-0.29/examples/spell-check.pl> is a spell checker. It uses a
 dictionary of words specified by a command-line option "-d":
 
     spell-check.pl -d /usr/dict/words file1.txt file2.txt
@@ -726,7 +726,7 @@ of verbs.
 =head2 extract-kana.pl
 
 The file 
-L<F<examples/extract-kana.pl>|https://fastapi.metacpan.org/source/BKB/Text-Fuzzy-0.28/examples/extract-kana.pl> extracts the kana entries
+L<F<examples/extract-kana.pl>|https://fastapi.metacpan.org/source/BKB/Text-Fuzzy-0.29/examples/extract-kana.pl> extracts the kana entries
 from "edict", a freely-available Japanese to English electronic
 dictionary, and does some fuzzy searches on them. It requires a local
 copy of the file to run. This script demonstrates the use of Unicode
@@ -1062,7 +1062,7 @@ Ben Bullock, <bkb@cpan.org>
 =head1 COPYRIGHT & LICENCE
 
 This package and associated files are copyright (C) 
-2012-2018
+2012-2020
 Ben Bullock.
 
 You can use, copy, modify and redistribute this package and associated

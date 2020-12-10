@@ -22,7 +22,7 @@ cmp_deeply(gen_bladder_diary_table_from_entries(entries => $entries1, _raw=>1), 
             superhashof({time=>'09.00', vol=>'250', comment=>'test comment', type=>'milk'}),
         ],
         urinations => [
-            superhashof({time=>'07.15', vol=>'200', urgency=>4, color=>'clear'}),
+            superhashof({time=>'07.15', vol=>'200', urgency=>4, "color"=>'0/6   clear'}),
         ],
     }]);
 
@@ -43,7 +43,7 @@ cmp_deeply(gen_bladder_diary_table_from_entries(entries => $entries2, _raw=>1), 
             superhashof({time=>'09.00', vol=>'250', comment=>'test comment', type=>'milk'}),
         ],
         urinations => [
-            superhashof({time=>'07.15', vol=>'200', urgency=>4, color=>'clear'}),
+            superhashof({time=>'07.15', vol=>'200', urgency=>4, "color"=>'0/6   clear'}),
         ],
     }]);
 

@@ -10,13 +10,16 @@
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "OTRS-OPM-Parser",
    "prereqs" : {
       "configure" : {
          "requires" : {
             "ExtUtils::MakeMaker" : "0"
+         },
+         "suggests" : {
+            "JSON::PP" : "2.27300"
          }
       },
       "develop" : {
@@ -54,11 +57,11 @@
    "provides" : {
       "OTRS::OPM::Parser" : {
          "file" : "lib/OTRS/OPM/Parser.pm",
-         "version" : "1.02"
+         "version" : "1.04"
       },
       "OTRS::OPM::Parser::Types" : {
          "file" : "lib/OTRS/OPM/Parser/Types.pm",
-         "version" : "1.02"
+         "version" : "1.04"
       }
    },
    "release_status" : "stable",
@@ -73,11 +76,12 @@
          "web" : "http://github.com/reneeb/OTRS-OPM-Parser"
       }
    },
-   "version" : "1.02",
+   "version" : "1.04",
    "x_contributors" : [
+      "H\u00e5kon H\u00e6gland <hakon.hagland@gmail.com>",
       "Mohammad S Anwar <mohammad.anwar@yahoo.com>",
       "reneeb <info@perl-services.de>"
    ],
-   "x_serialization_backend" : "JSON::XS version 3.04"
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.19"
 }
 

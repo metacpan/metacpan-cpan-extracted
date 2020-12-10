@@ -37,7 +37,8 @@ do { my $x = {
                    'requires' => {
                                    'File::Spec' => '0',
                                    'Module::Metadata' => '0',
-                                   'Test::More' => '0'
+                                   'Test::More' => '0',
+                                   'utf8' => '0'
                                  }
                  }
      };

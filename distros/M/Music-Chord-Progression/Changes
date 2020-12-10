@@ -1,0 +1,11 @@
+Revision history for Music-Chord-Progression
+
+0.0003 2020-12-10 05:16:34
+    - Add the resolve attribute.
+
+0.0002 2020-12-10 04:56:27
+    - Change attribute name.
+    - Add the eg/moduation example program.
+
+0.0001 2020-12-10 04:14:53
+    - Mint with Dist::Zilla.

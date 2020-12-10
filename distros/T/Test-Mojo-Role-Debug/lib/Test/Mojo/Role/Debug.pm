@@ -7,7 +7,7 @@ use Role::Tiny;
 use Carp qw/croak/;
 use Test::More ();
 
-our $VERSION = '1.004001'; # VERSION
+our $VERSION = '1.005001'; # VERSION
 
 sub d {
     my ( $self, $selector, $dump_file ) = @_;
@@ -24,6 +24,13 @@ sub da {
         Test::More::diag "\nDEBUG DUMPER: the selector ($selector) you provided "
             . "did not match any elements\n\n";
         return $self;
+    }
+
+    if ($markup =~ /<!-- Request ID: \S+ -->/
+        and $markup->at('div#mojobar div#mojobar-links')
+        and (my $mojo_error = $markup->at('div#wrapperlicious pre#error'))
+    ) {
+        $markup = $mojo_error->all_text;
     }
 
     if (length($dump_file//'')) {
@@ -95,7 +102,7 @@ You have all the methods provided by L<Test::Mojo>, plus these:
     $t->d('#foo', 'file.html'); # dump specific element into a file
 
 B<Returns> its invocant.
-On failure of previous tests (see L<Mojo::DOM/"success">),
+On failure of previous tests (see L<Test::Mojo/"success">),
 dumps the DOM of the current page to the screen. B<Takes> an optional
 selector to be passed to L<Mojo::DOM/"at">, in which case, only
 the markup of that element will be dumped.
@@ -103,6 +110,9 @@ the markup of that element will be dumped.
 A filename can be provided as the second argument to put the contents into
 the file instead. To dump entire DOM, use C<undef> or empty string as the
 first argument.
+
+B<NOTE:> the plugin detects Mojolicious's error page and will dump
+only the error text from that page, instead of the entire DOM.
 
 =head2 C<da>
 

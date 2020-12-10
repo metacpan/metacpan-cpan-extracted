@@ -19,6 +19,11 @@ meta-spec:
   version: '1.4'
 name: Health-BladderDiary-GenTable
 requires:
+  Data::Sah::Coerce::perl::To_date::From_float::epoch: '0'
+  Data::Sah::Coerce::perl::To_date::From_obj::datetime: '0'
+  Data::Sah::Coerce::perl::To_date::From_obj::time_moment: '0'
+  Data::Sah::Coerce::perl::To_date::From_str::iso8601: '0'
+  Data::Sah::Compiler::perl::TH::date: '0'
   Data::Sah::Compiler::perl::TH::str: '0'
   Exporter: '5.57'
   Log::ger: '0.037'
@@ -27,10 +32,10 @@ requires:
   strict: '0'
   warnings: '0'
 resources:
-  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Health-BladderDiary-GenTable
+  bugtracker: https://github.com/perlancar/perl-Health-BladderDiary-GenTable/issues
   homepage: https://metacpan.org/release/Health-BladderDiary-GenTable
   repository: git://github.com/perlancar/perl-Health-BladderDiary-GenTable.git
-version: '0.004'
+version: '0.006'
 x_Dist_Zilla:
   perl:
     version: '5.030000'
@@ -130,7 +135,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::PERLANCAR::MetaResources
       name: '@Author::PERLANCAR/PERLANCAR::MetaResources'
-      version: '0.041'
+      version: '0.042'
     -
       class: Dist::Zilla::Plugin::CheckChangeLog
       name: '@Author::PERLANCAR/CheckChangeLog'

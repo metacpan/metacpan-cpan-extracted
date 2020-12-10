@@ -39,12 +39,12 @@ $handler = Plack::App::DirectoryIndex->new({
     my $desc = 'Dir index defined';
 
     open my $fh, ">", "t/share/index.html" or die $!;
-    print $fh "<html>\n</html>";
+    print $fh "<html></html>";
     close $fh;
   
     my $res = $cb->(GET "/");
     is $res->code, 200, "$desc - response code is 200";
-    is $res->content, "<html>\n</html>", "$desc - content is correct";
+    is $res->content, "<html></html>", "$desc - content is correct";
   
     unlink "t/share/index.html";
   },
@@ -65,15 +65,15 @@ $handler = Plack::App::DirectoryIndex->new({
     my $desc = 'Non-standard dir index defined';
 
     open my $fh, ">", "t/share/random.html" or die $!;
-    print $fh "<html>random\n</html>";
+    print $fh "<html>random</html>";
     close $fh;
     open my $fh2, ">", "t/share/index.html" or die $!;
-    print $fh2 "<html>\n</html>";
+    print $fh2 "<html></html>";
     close $fh2;
   
     my $res = $cb->(GET "/");
     is $res->code, 200, "$desc - response code is 200";
-    is $res->content, "<html>random\n</html>", "$desc - content is correct";
+    is $res->content, "<html>random</html>", "$desc - content is correct";
   
     unlink "t/share/index.html";
     unlink "t/share/random.html";
@@ -93,12 +93,12 @@ $handler = Plack::App::DirectoryIndex->new({
     my $desc = 'Default dir index';
 
     open my $fh, ">", "t/share/index.html" or die $!;
-    print $fh "<html>\n</html>";
+    print $fh "<html></html>";
     close $fh;
   
     my $res = $cb->(GET "/");
     is $res->code, 200, "$desc - response code is 200";
-    is $res->content, "<html>\n</html>", "$desc - content is correct";
+    is $res->content, "<html></html>", "$desc - content is correct";
   
     unlink "t/share/index.html";
   },

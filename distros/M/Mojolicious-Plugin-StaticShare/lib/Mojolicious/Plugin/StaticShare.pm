@@ -98,7 +98,7 @@ sub _make_route {
   my $r = $arg->{routes}->$action($arg->{path});
   $r->to(namespace=>$PKG, controller=>"Controller", action=>$arg->{action}, defined $arg->{pth} ? (pth=>$arg->{pth}) : (), plugin=>$self, );
   $r->name($arg->{name});
-  $r->over(host => $arg->{host})
+  $r->requires(host => $arg->{host})
     if $arg->{host};
   return $self;
 }
@@ -186,17 +186,16 @@ sub _hook_chunk {
       #~ Mojolicious::Controller->new(app=>$app, tx=>$tx)
       my $host = $self->host;
       $match->find(undef, {method => $tx->req->method, path => $url->path->to_route});# websocket => $ws
-      $app->log->debug("TX ONCE CHUNK check route: [".$url->path->to_route."]",
+      $app->log->debug("TX ONCE CHUNK check path: [".$url->path->to_route."]",
         "match route: ". (($match->endpoint && $match->endpoint->name) || 'none'),
         $host ? ("match host: ". $tx->req->headers->host =~ /$host/) : ()  #, Mojo::Util::dumper($url)
       ) if $self->debug;
       my $route = $match->endpoint
         || return;
       
-      # eq $self->routes_names->[1] || $route->name eq $self->routes_names->[3]);#Mojo::Util::dumper($url);, length($chunk)
       $tx->req->max_message_size($self->max_upload_size)
         if (($route->name eq $self->routes_names->[2]) || ($route->name eq $self->routes_names->[3]))
-          && $host && $tx->req->headers->host =~ /$host/;
+          && $host && $tx->req->headers->host =~ /$host/; # Хост ловится только так, в $url нет(
       # TODO admin session
       
     });
@@ -224,7 +223,7 @@ sub _patch_emit_chunk {
   
 }
 
-our $VERSION = '0.074';
+our $VERSION = '0.075';
 
 ##############################################
 package __internal__::Markdown;
@@ -261,7 +260,7 @@ Mojolicious::Plugin::StaticShare - browse, upload, copy, move, delete, edit, ren
 
 =head1 VERSION
 
-0.074
+0.075
 
 =head1 SYNOPSIS
 
@@ -292,6 +291,13 @@ Append param C<< admin=<admin_pass> option >> to any url inside B<root_url> requ
 
 =head1 OPTIONS
 
+=head2 host
+
+  host => 'local', # mean =~ /local/
+  host => qr/fobar\.com$/, 
+
+String or regexp C< qr// >. Allow routing for given host.
+
 =head2 root_dir
 
 Absolute or relative file system path root directory. Defaults to '.'.
@@ -315,7 +321,7 @@ Admin password (be sure https) for admin tasks. None defaults.
 
   admin_pass => '$%^!!9nes--', # 
 
-Signin to admin interface C< https://myhost/my/share/foo/bar?admin=$%^!!9nes-- >
+Sign into admin interface by pass param B<admin> to shares paths C< https://<...>?admin=$%^!!9nes-- >
 
 =head2 render_dir
 
@@ -406,13 +412,13 @@ Boolean to disable/enable uploads for public users. Defaults to undef (disable).
 
   max_upload_size=>0, # unlimited POST
 
-Numeric value limiting uploads size for route.
-WARN-EXPIRIMENTAL patching of L<Mojo::Transaction::HTTP#server_read>
-for emit chunk event.
+Numeric value limiting uploads size for route. Defaults to Mojolicious setting.
+EXPIRIMENTAL patching of the L<Mojo::Transaction::HTTP#server_read>
+for emit B<chunk> event.
 
 See also L<Mojolicious#max_request_size>, L<Mojolicious#build_tx>.
 
-=head1 Extended markdown & pod
+=head1 Extended MARKDOWN & POD
 
 You can place attributes like:
 
@@ -424,12 +430,12 @@ You can place attributes like:
 
 to markup elements as below.
 
-In markdown:
+In MARKDOWN:
 
   # {#foo123 .class1 .class2 padding: 0 0.5rem;} Header 1
   {.brown-text} brown paragraph text ...
 
-In pod:
+In POD:
 
   =head2 {.class1.blue-text border-bottom: 1px dotted;} Header 2
   
@@ -438,7 +444,7 @@ In pod:
 =head1 METHODS
 
 L<Mojolicious::Plugin::StaticShare> inherits all methods from
-L<Mojolicious::Plugin> and implements the following new ones.
+parent L<Mojolicious::Plugin> and implements the following new ones.
 
 =head2 register
 
@@ -448,17 +454,18 @@ Register plugin in L<Mojolicious> application.
 
 =head1 MULTI PLUGIN
 
-A possible:
+Yep, possible:
 
   # Mojolicious
-  $app->plugin('StaticShare', <options-1>)
-           ->plugin('StaticShare', <options-2>); # and so on ...
+  $app->config(...)
+           ->plugin('StaticShare', ...)
+           ->plugin('StaticShare', ...); # and so on ...
   
   # Mojolicious::Lite
   app->config(...)
-         ->plugin('StaticShare', <options-1>)
-         ->plugin('StaticShare', <options-2>) # and so on ...
-         ...
+         ->plugin('StaticShare', ...)
+         ->plugin('StaticShare', ...) # and so on ...
+
 
 =head1 UTF-8
 

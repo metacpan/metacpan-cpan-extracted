@@ -84,4 +84,5 @@ sub determinant {
 
 	return $det;
 }	
+
 1;

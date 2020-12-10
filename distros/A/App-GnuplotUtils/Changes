@@ -1,3 +1,13 @@
-0.001   2018-05-07 (PERLANCAR)
+0.002   2020-12-10  Released-By: PERLANCAR; Urgency: medium
+
+	[cli xyplot]
+
+        - Allow multiple datasets, setting chart title, dataset titles, dataset
+	  styles.
+
+	- [bugfix] Didn't supply y values due to copy-paste mistake.
+
+
+0.001   2018-05-07  Released-By: PERLANCAR
 
         - First release.

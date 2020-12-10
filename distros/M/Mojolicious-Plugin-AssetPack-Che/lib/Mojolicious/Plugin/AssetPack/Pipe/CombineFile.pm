@@ -11,7 +11,7 @@ has revision => sub { shift->assetpack->revision // '' };
 
 sub new {
   my $self = shift->SUPER::new(@_);
-  $self->app->routes->route('/assets/*topic')->via(qw(HEAD GET))
+  $self->app->routes->any('/assets/*topic')->methods(qw(HEAD GET))
     ->name('assetpack by topic')->to(cb => $self->_cb_route_by_topic);
   $self;
 }

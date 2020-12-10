@@ -1,4 +1,6 @@
 #line 2 "Libpng.xs.tmpl"
+
+
 #include "EXTERN.h"
 #include "perl.h"
 #include "XSUB.h"
@@ -9,7 +11,9 @@
    Ubuntu Linux. */
 
 #define PNG_SKIP_SETJMP_CHECK
+#include <zlib.h>
 #include <png.h>
+
 #include <stdarg.h>
 #include <time.h>
 
@@ -141,7 +145,7 @@ const char * perl_png_text_compression_name (text_compression)
 
 const char * perl_png_get_libpng_ver ()
         CODE:
-        RETVAL = png_get_libpng_ver (0);
+        RETVAL = png_get_libpng_ver (UNUSED_ZERO_ARG);
         OUTPUT:
         RETVAL
 
@@ -207,7 +211,7 @@ void perl_png_set_filter (Png, filters)
         Image::PNG::Libpng Png
         int filters;
         CODE:
-        png_set_filter (Png->png, 0, filters);
+        png_set_filter (Png->png, UNUSED_ZERO_ARG, filters);
         OUTPUT:
 
 void perl_png_set_verbosity (Png, verbosity = 0)
@@ -680,13 +684,26 @@ CODE:
 OUTPUT:
 	RETVAL
 
-#if 0
+# These functions predate the macro and were valid in libpng 1.2, yet
+# the macro is invalid except for libpng 1.6.17, so conditional
+# compilation doesn't seem to offer any benefit, hence the following
+# is commented out. 
+
+# #ifdef PNG_WRITE_CUSTOMIZE_COMPRESSION_SUPPORTED
 
 void
 perl_png_set_compression_level (Png, level)
 	Image::PNG::Libpng Png;
 	int level
 CODE:
+	if (level != Z_DEFAULT_COMPRESSION) {
+	    if (level < Z_NO_COMPRESSION || level > Z_BEST_COMPRESSION) {
+		croak ("Compression level must be %d for default or "
+		       "between %d and %d",
+		       Z_DEFAULT_COMPRESSION, Z_NO_COMPRESSION,
+		       Z_BEST_COMPRESSION);
+	    }
+	}
 	png_set_compression_level (Png->png, level);
 
 void
@@ -694,14 +711,7 @@ perl_png_set_compression_mem_level (Png, mem_level);
 	Image::PNG::Libpng Png;
 	int mem_level;
 CODE:
-	png_set_compression_level (Png->png, mem_level);
-
-void
-perl_png_set_compression_method (Png, method);
-	Image::PNG::Libpng Png;
-	int method;
-CODE:
-	png_set_compression_method (Png->png, method);
+	png_set_compression_mem_level (Png->png, mem_level);
 
 void
 perl_png_set_compression_strategy (Png, strategy);
@@ -716,6 +726,55 @@ perl_png_set_compression_window_bits  (Png,   window_bits);
 	int window_bits;
 CODE:
 	png_set_compression_window_bits (Png->png, window_bits);
+
+# #endif /* WRITE_CUSTOMIZE_COMPRESSION */
+
+# This macro is not documented in CHANGES in libpng.
+
+#ifdef PNG_WRITE_CUSTOMIZE_ZTXT_COMPRESSION_SUPPORTED
+
+void
+perl_png_set_text_compression_level (Png, level);
+	Image::PNG::Libpng Png;
+	int level;
+CODE:
+	png_set_text_compression_level (Png->png, level);
+
+void
+perl_png_set_text_compression_mem_level (Png, mem_level);
+	Image::PNG::Libpng Png;
+	int mem_level;
+CODE:
+	png_set_compression_mem_level (Png->png, mem_level);
+
+void
+perl_png_set_text_compression_strategy (Png, strategy);
+	Image::PNG::Libpng Png;
+	int strategy;
+CODE:
+	png_set_compression_strategy (Png->png, strategy);
+
+void
+perl_png_set_text_compression_window_bits  (Png,   window_bits);
+	Image::PNG::Libpng Png;
+	int window_bits;
+CODE:
+	png_set_compression_window_bits (Png->png, window_bits);
+
+#endif /* WRITE_CUSTOMIZE_ZTXT_COMPRESSION */
+
+#if 0
+
+void
+perl_png_set_compression_method (Png, method);
+	Image::PNG::Libpng Png;
+	int method;
+CODE:
+	png_set_compression_method (Png->png, method);
+
+#endif /* 0 */
+
+#if 0
 
 void
 perl_png_set_crc_action  (Png, crit_action, ancil_action);

@@ -5,6 +5,7 @@ examples/color-type-name.pl
 examples/copy-png.pl
 examples/get-www-png.pl
 examples/png-cgi.pl
+examples/set-text.pl
 examples/set-unknown-chunk.pl
 examples/supports.pl
 examples/synopsis.pl
@@ -25,6 +26,7 @@ t/bKGD-test.png
 t/bKGD.t
 t/bogus.t
 t/cHRM.t
+t/compress-level.t
 t/Const.t
 t/copy-all-png.t
 t/functions.t
@@ -216,6 +218,7 @@ t/PLTE.t
 t/saru-fs8.png
 t/sBIT.t
 t/sCAL.t
+t/set-itxt.t
 t/set-text.t
 t/split-alpha.t
 t/split-alpha/basi4a08-alpha.bin

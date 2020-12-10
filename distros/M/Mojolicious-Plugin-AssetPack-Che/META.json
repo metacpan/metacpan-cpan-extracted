@@ -37,7 +37,7 @@
             "HTML::Packer" : "2.03",
             "JavaScript::Minifier::XS" : "0.1",
             "JavaScript::Packer" : "2.0",
-            "Mojolicious::Plugin::AssetPack" : "2.02",
+            "Mojolicious::Plugin::AssetPack" : "2.09",
             "perl" : "5.006"
          }
       }
@@ -50,6 +50,6 @@
          "web" : "https://github.com/mche/Mojolicious-Plugin-AssetPack-Che"
       }
    },
-   "version" : "2.081",
+   "version" : "2.091",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

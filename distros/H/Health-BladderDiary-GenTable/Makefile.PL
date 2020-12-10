@@ -20,6 +20,11 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.010001",
   "NAME" => "Health::BladderDiary::GenTable",
   "PREREQ_PM" => {
+    "Data::Sah::Coerce::perl::To_date::From_float::epoch" => 0,
+    "Data::Sah::Coerce::perl::To_date::From_obj::datetime" => 0,
+    "Data::Sah::Coerce::perl::To_date::From_obj::time_moment" => 0,
+    "Data::Sah::Coerce::perl::To_date::From_str::iso8601" => 0,
+    "Data::Sah::Compiler::perl::TH::date" => 0,
     "Data::Sah::Compiler::perl::TH::str" => 0,
     "Exporter" => "5.57",
     "Log::ger" => "0.037",
@@ -35,7 +40,7 @@ my %WriteMakefileArgs = (
     "Test::Deep" => 0,
     "Test::More" => "0.98"
   },
-  "VERSION" => "0.004",
+  "VERSION" => "0.006",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -43,6 +48,11 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
+  "Data::Sah::Coerce::perl::To_date::From_float::epoch" => 0,
+  "Data::Sah::Coerce::perl::To_date::From_obj::datetime" => 0,
+  "Data::Sah::Coerce::perl::To_date::From_obj::time_moment" => 0,
+  "Data::Sah::Coerce::perl::To_date::From_str::iso8601" => 0,
+  "Data::Sah::Compiler::perl::TH::date" => 0,
   "Data::Sah::Compiler::perl::TH::str" => 0,
   "Exporter" => "5.57",
   "File::Spec" => 0,

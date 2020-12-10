@@ -2,73 +2,83 @@
 #include "EXTERN.h"         // globals/constant import locations
 #include "perl.h"           // Perl symbols, structures and constants definition
 #include "XSUB.h"           // xsubpp functions and macros
+#define NEED_utf8_to_uvchr_buf
+#include "ppport.h"
 
 #include <string.h>
 #include <stdlib.h>
 
-int isEOL(char c) {
-  if ((c == '\n') || (c == '\r') || (c == '\f') || (c == '\v') || (c == 0x85))
-    return 1;
-  return 0;
-}
+#define isEOL(c) ((c >= 0xa) && (c <= 0xd ) || (c == 0x85) || c == 0x2028 || c == 0x2029)
 
-int isWhitespace(char c) {
-  if ((c == ' ') || (c == '\t') || isEOL(c))
-    return 1;
-  return 0;
-}
+STATIC U8* TextMinify(pTHX_ U8* src, STRLEN len, STRLEN* packed) {
+  U8* dest;
 
+  Newx(dest, len, U8);
 
-char* TextMinify(const char* inStr) {
-  size_t len   = strlen(inStr);
-  char* outStr;
+  if (!dest) /* malloc failed */
+    return dest;
 
-  Newx(outStr, 1, char);
+  U8* end = src + len;
+  U8* ptr = dest;
+  U8* leading = ptr;
+  U8* trailing = NULL;
 
-  if (!outStr) /* malloc failed */
-    return outStr;
+  while (len) {
 
-  char* ptr = outStr;
-  char* leading = ptr;
-  char* trailing = NULL;
+    UV c = *src;
 
-  while (*inStr) {
-    char c = *inStr;
+    if (!UTF8_IS_INVARIANT(c)) {
+       STRLEN skip;
+       c = utf8_to_uvchr_buf(src, end, &skip);
+       src += skip;
+       len -= skip;
+    }
+    else {
+      src ++;
+      len --;
+    }
 
-    if (leading && !isWhitespace(c))
+    if (leading && !isSPACE(c))
         leading = NULL;
 
     if (!leading) {
-      *ptr = c;
+
       if (isEOL(c)) {
-        if (trailing) {
-          ptr = trailing;
-        }
-        *ptr = '\n';
+        if (trailing) ptr = trailing;
+        if ( c == '\r' ) c = '\n'; /* Normalise EOL */
         leading = ptr;
       }
-      else if (isWhitespace(c)) {
+      else if (isSPACE(c)) {
         if (!trailing) trailing = ptr;
       }
       else {
         trailing = NULL;
       }
-      ptr++;
+
+      if (!UTF8_IS_INVARIANT(c))
+        ptr = uvchr_to_utf8( ptr, c);
+      else
+        *ptr++ = c;
+
     }
 
-    inStr++;
   }
 
   if (trailing) {
     ptr = trailing;
-    if (isEOL(*ptr)) ptr++;
+    UV c = *ptr;
+    STRLEN skip = UTF8SKIP(ptr);
+    if (!UTF8_IS_INVARIANT(c))
+      c = utf8_to_uvchr_buf(ptr, ptr + skip, &skip);
+    if (isEOL(c)) {
+      ptr += skip;
+    }
   }
 
-  *ptr = '\0';
+  *packed = ptr - dest;
 
-  return outStr;
+  return dest;
 }
-
 MODULE = Text::Minify::XS PACKAGE = Text::Minify::XS
 
 PROTOTYPES: ENABLE
@@ -80,9 +90,16 @@ minify(inStr)
     char* outStr = NULL;
     RETVAL = &PL_sv_undef;
   CODE:
-    outStr = TextMinify( SvPVX(inStr) );
+    char*  src = SvPVX(inStr);
+    STRLEN len = SvCUR(inStr);
+    STRLEN packed = 0;
+    U32 is_utf8 = SvUTF8(inStr);
+    outStr = TextMinify(aTHX_ src, len, &packed);
     if (outStr != NULL) {
-      RETVAL = newSVpv(outStr, 0);
+      SV* result = newSVpv(outStr, packed);
+      if (is_utf8)
+        SvUTF8_on(result);
+      RETVAL = result;
       Safefree(outStr);
     }
   OUTPUT:

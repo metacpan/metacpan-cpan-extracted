@@ -1,9 +1,7 @@
 package BeePack;
-BEGIN {
-  $BeePack::AUTHORITY = 'cpan:GETTY';
-}
+our $AUTHORITY = 'cpan:GETTY';
 # ABSTRACT: Primitive MsgPack based key value storage
-$BeePack::VERSION = '0.102';
+$BeePack::VERSION = '0.103';
 use Moo;
 use bytes;
 use CDB::TinyCDB;
@@ -182,7 +180,7 @@ BeePack - Primitive MsgPack based key value storage
 
 =head1 VERSION
 
-version 0.102
+version 0.103
 
 =head1 SYNOPSIS
 
@@ -262,16 +260,16 @@ manipulate B<BeePack> from the comandline.
 
 IRC
 
-  Join #vonBienenstock on irc.freenode.net. Highlight Getty for fast reaction :).
+  Join #hardware on irc.perl.org. Highlight Getty for fast reaction :).
 
 Repository
 
-  http://github.com/vonBienenstock/p5-beepack
+  http://github.com/cindustries/perl-beepack
   Pull request and additional contributors are welcome
 
 Issue Tracker
 
-  http://github.com/vonBienenstock/p5-beepack/issues
+  http://github.com/cindustries/perl-beepack/issues
 
 =head1 AUTHOR
 
@@ -279,7 +277,7 @@ Torsten Raudssus <torsten@raudss.us>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2014 by Torsten Raudssus.
+This software is copyright (c) 2020 by Torsten Raudssus.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

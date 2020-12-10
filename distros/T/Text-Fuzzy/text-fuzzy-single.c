@@ -382,7 +382,7 @@ ualphabet_t;
 typedef struct text_fuzzy_string
 {
     /* The text of the string. */
-    char * text;
+    const char * text;
 
     /* The length of "text". */
     int length;
@@ -429,6 +429,20 @@ typedef struct
     int max;
 }
 idic_t;
+typedef enum
+{
+    /* Use zero value as invalid, so we know if we haven't done things
+     * properly. */
+    tf_invalid,
+    /* Keep, insert, replace, delete for standard Lev. edits. */
+    tf_keep,
+    tf_insert,
+    tf_replace,
+    tf_delete,
+    /* Transpose THIS char with the NEXT char. */
+    tf_transpose,
+}
+tf_edit_t;
 typedef struct text_fuzzy
 {
     /* The string we are to match. */
@@ -498,6 +512,11 @@ typedef struct text_fuzzy
 
     idic_t idic;
 
+    /* The edits required to turn "text" into "b". */
+    tf_edit_t * edits;
+    int edits_size;
+    int n_edit;
+
     /* Does the user want to use an alphabet filter? Default is yes,
        so this must be set to a non-zero value to switch off use. */
     unsigned int user_no_alphabet : 1;
@@ -536,91 +555,91 @@ typedef struct text_fuzzy
 text_fuzzy_t;
 #define TEXT_FUZZY_INVALID_UNICODE_LENGTH -1
 
-#line 86 "/usr/home/ben/projects/text-fuzzy/text-fuzzy.c.in"
+#line 90 "/usr/home/ben/projects/text-fuzzy/text-fuzzy.c.in"
 int minimum (int a, int b);
 
-#line 187 "/usr/home/ben/projects/text-fuzzy/text-fuzzy.c.in"
+#line 191 "/usr/home/ben/projects/text-fuzzy/text-fuzzy.c.in"
 int idic_free_dic (idic_t* dic);
 
-#line 207 "/usr/home/ben/projects/text-fuzzy/text-fuzzy.c.in"
+#line 211 "/usr/home/ben/projects/text-fuzzy/text-fuzzy.c.in"
 int idic_find (idic_t* dic, int key);
 
-#line 220 "/usr/home/ben/projects/text-fuzzy/text-fuzzy.c.in"
+#line 224 "/usr/home/ben/projects/text-fuzzy/text-fuzzy.c.in"
 int idic_set (idic_t* dic, int key, int position);
 
-#line 237 "/usr/home/ben/projects/text-fuzzy/text-fuzzy.c.in"
+#line 241 "/usr/home/ben/projects/text-fuzzy/text-fuzzy.c.in"
 int idic_reset (idic_t* dic);
 
-#line 247 "/usr/home/ben/projects/text-fuzzy/text-fuzzy.c.in"
+#line 251 "/usr/home/ben/projects/text-fuzzy/text-fuzzy.c.in"
 int adic_reset_dic (adic_t* dic);
 
-#line 257 "/usr/home/ben/projects/text-fuzzy/text-fuzzy.c.in"
+#line 261 "/usr/home/ben/projects/text-fuzzy/text-fuzzy.c.in"
 int adic_find (adic_t* dic, uint8_t key);
 
-#line 263 "/usr/home/ben/projects/text-fuzzy/text-fuzzy.c.in"
+#line 267 "/usr/home/ben/projects/text-fuzzy/text-fuzzy.c.in"
 int adic_set (adic_t* dic, uint8_t key, int position);
 
-#line 282 "/usr/home/ben/projects/text-fuzzy/text-fuzzy.c.in"
+#line 324 "/usr/home/ben/projects/text-fuzzy/text-fuzzy.c.in"
 text_fuzzy_status_t text_fuzzy_generate_ualphabet (text_fuzzy_t* tf);
 
-#line 453 "/usr/home/ben/projects/text-fuzzy/text-fuzzy.c.in"
+#line 495 "/usr/home/ben/projects/text-fuzzy/text-fuzzy.c.in"
 text_fuzzy_status_t text_fuzzy_compare_single (text_fuzzy_t* tf);
 
-#line 607 "/usr/home/ben/projects/text-fuzzy/text-fuzzy.c.in"
+#line 651 "/usr/home/ben/projects/text-fuzzy/text-fuzzy.c.in"
 text_fuzzy_status_t text_fuzzy_get_candidates (text_fuzzy_t* text_fuzzy, int* n_candidates_ptr, int** candidates_ptr);
 
-#line 657 "/usr/home/ben/projects/text-fuzzy/text-fuzzy.c.in"
+#line 701 "/usr/home/ben/projects/text-fuzzy/text-fuzzy.c.in"
 text_fuzzy_status_t text_fuzzy_free_candidates (text_fuzzy_t* text_fuzzy, int* candidates);
 
-#line 672 "/usr/home/ben/projects/text-fuzzy/text-fuzzy.c.in"
+#line 716 "/usr/home/ben/projects/text-fuzzy/text-fuzzy.c.in"
 text_fuzzy_status_t text_fuzzy_generate_alphabet (text_fuzzy_t* text_fuzzy);
 
-#line 704 "/usr/home/ben/projects/text-fuzzy/text-fuzzy.c.in"
+#line 748 "/usr/home/ben/projects/text-fuzzy/text-fuzzy.c.in"
 text_fuzzy_status_t text_fuzzy_begin_scanning (text_fuzzy_t* text_fuzzy);
 
-#line 734 "/usr/home/ben/projects/text-fuzzy/text-fuzzy.c.in"
+#line 778 "/usr/home/ben/projects/text-fuzzy/text-fuzzy.c.in"
 text_fuzzy_status_t text_fuzzy_end_scanning (text_fuzzy_t* text_fuzzy);
 
-#line 818 "/usr/home/ben/projects/text-fuzzy/text-fuzzy.c.in"
+#line 862 "/usr/home/ben/projects/text-fuzzy/text-fuzzy.c.in"
 text_fuzzy_status_t text_fuzzy_scan_file (text_fuzzy_t* text_fuzzy, char* file_name, char** nearest_ptr, int* nearest_length_ptr);
 
-#line 863 "/usr/home/ben/projects/text-fuzzy/text-fuzzy.c.in"
+#line 907 "/usr/home/ben/projects/text-fuzzy/text-fuzzy.c.in"
 text_fuzzy_status_t text_fuzzy_scan_file_free (char* nearest);
 
-#line 869 "/usr/home/ben/projects/text-fuzzy/text-fuzzy.c.in"
+#line 913 "/usr/home/ben/projects/text-fuzzy/text-fuzzy.c.in"
 text_fuzzy_status_t text_fuzzy_alphabet_rejections (text_fuzzy_t* text_fuzzy, int* r);
 
-#line 877 "/usr/home/ben/projects/text-fuzzy/text-fuzzy.c.in"
+#line 921 "/usr/home/ben/projects/text-fuzzy/text-fuzzy.c.in"
 text_fuzzy_status_t text_fuzzy_free_memory (text_fuzzy_t* text_fuzzy);
 
-#line 892 "/usr/home/ben/projects/text-fuzzy/text-fuzzy.c.in"
+#line 942 "/usr/home/ben/projects/text-fuzzy/text-fuzzy.c.in"
 text_fuzzy_status_t text_fuzzy_set_max_distance (text_fuzzy_t* text_fuzzy, int max_distance);
 
-#line 898 "/usr/home/ben/projects/text-fuzzy/text-fuzzy.c.in"
+#line 948 "/usr/home/ben/projects/text-fuzzy/text-fuzzy.c.in"
 text_fuzzy_status_t text_fuzzy_get_max_distance (text_fuzzy_t* text_fuzzy, int* max_distance);
 
-#line 904 "/usr/home/ben/projects/text-fuzzy/text-fuzzy.c.in"
+#line 954 "/usr/home/ben/projects/text-fuzzy/text-fuzzy.c.in"
 text_fuzzy_status_t text_fuzzy_set_transpositions (text_fuzzy_t* text_fuzzy, int transpositions);
 
-#line 910 "/usr/home/ben/projects/text-fuzzy/text-fuzzy.c.in"
+#line 960 "/usr/home/ben/projects/text-fuzzy/text-fuzzy.c.in"
 text_fuzzy_status_t text_fuzzy_get_transpositions (text_fuzzy_t* text_fuzzy, int* transpositions);
 
-#line 916 "/usr/home/ben/projects/text-fuzzy/text-fuzzy.c.in"
+#line 966 "/usr/home/ben/projects/text-fuzzy/text-fuzzy.c.in"
 text_fuzzy_status_t text_fuzzy_last_distance (text_fuzzy_t* text_fuzzy, int* last_distance);
 
-#line 922 "/usr/home/ben/projects/text-fuzzy/text-fuzzy.c.in"
+#line 972 "/usr/home/ben/projects/text-fuzzy/text-fuzzy.c.in"
 text_fuzzy_status_t text_fuzzy_no_alphabet (text_fuzzy_t* text_fuzzy, int yes_no);
 
-#line 932 "/usr/home/ben/projects/text-fuzzy/text-fuzzy.c.in"
+#line 982 "/usr/home/ben/projects/text-fuzzy/text-fuzzy.c.in"
 text_fuzzy_status_t text_fuzzy_ualphabet_rejections (text_fuzzy_t* text_fuzzy, int* ualphabet_rejections);
 
-#line 938 "/usr/home/ben/projects/text-fuzzy/text-fuzzy.c.in"
+#line 988 "/usr/home/ben/projects/text-fuzzy/text-fuzzy.c.in"
 text_fuzzy_status_t text_fuzzy_set_no_exact (text_fuzzy_t* text_fuzzy, int yes_no);
 
-#line 944 "/usr/home/ben/projects/text-fuzzy/text-fuzzy.c.in"
+#line 994 "/usr/home/ben/projects/text-fuzzy/text-fuzzy.c.in"
 text_fuzzy_status_t text_fuzzy_get_length_rejections (text_fuzzy_t* text_fuzzy, int* length_rejections);
 
-#line 950 "/usr/home/ben/projects/text-fuzzy/text-fuzzy.c.in"
+#line 1000 "/usr/home/ben/projects/text-fuzzy/text-fuzzy.c.in"
 text_fuzzy_status_t text_fuzzy_get_unicode_length (text_fuzzy_t* text_fuzzy, int* unicode_length);
 
 #endif /* CFH_TEXT_FUZZY_H */
@@ -691,7 +710,7 @@ ualphabet_t;
 typedef struct text_fuzzy_string
 {
     /* The text of the string. */
-    char * text;
+    const char * text;
 
     /* The length of "text". */
     int length;
@@ -751,6 +770,23 @@ typedef struct
     int max;
 }
 idic_t;
+
+/* Type of edit applied. */
+
+typedef enum
+{
+    /* Use zero value as invalid, so we know if we haven't done things
+     * properly. */
+    tf_invalid,
+    /* Keep, insert, replace, delete for standard Lev. edits. */
+    tf_keep,
+    tf_insert,
+    tf_replace,
+    tf_delete,
+    /* Transpose THIS char with the NEXT char. */
+    tf_transpose,
+}
+tf_edit_t;
 
 /* The following structure contains one string plus additional
    paraphenalia used in searching for the string, for example the
@@ -824,6 +860,11 @@ typedef struct text_fuzzy
        searches. */
 
     idic_t idic;
+
+    /* The edits required to turn "text" into "b". */
+    tf_edit_t * edits;
+    int edits_size;
+    int n_edit;
 
     /* Does the user want to use an alphabet filter? Default is yes,
        so this must be set to a non-zero value to switch off use. */
@@ -1058,6 +1099,44 @@ adic_set (adic_t * dic, uint8_t key, int position)
 {
     dic->dic[key] = position;
     return position;
+}
+
+static text_fuzzy_status_t text_fuzzy_large_edits (text_fuzzy_string_t * string, int * size_ptr)
+{
+    int len;
+    int size;
+    len = string->length;
+    if (string->ulength > len) {
+	len = string->ulength;
+    }
+    len *= 2;
+    size = 1;
+    while (len >>= 1) {
+	size <<= 1;
+    }
+    * size_ptr = size;
+    OK;
+}
+
+static text_fuzzy_status_t text_fuzzy_allocate_edits (text_fuzzy_t * text_fuzzy)
+{
+    int edits_size;
+    CALL (large_edits (& text_fuzzy->text, & edits_size));
+    CALLOC (text_fuzzy->edits, edits_size, tf_edit_t);
+    text_fuzzy->n_mallocs++;
+    text_fuzzy->edits_size = edits_size;
+    OK;
+}
+
+static text_fuzzy_status_t text_fuzzy_resize_edits (text_fuzzy_t * text_fuzzy)
+{
+    if (text_fuzzy->b.length > text_fuzzy->edits_size ||
+	text_fuzzy->b.ulength > text_fuzzy->edits_size) {
+	int b_size;
+	CALL (large_edits (& text_fuzzy->b, & b_size));
+	REALLOC (text_fuzzy->edits, b_size, tf_edit_t);
+    }
+    OK;
 }
 
 #line 1 "ed-trans-char.c"
@@ -1397,6 +1476,8 @@ static int distance_char (text_fuzzy_t * tf)
     int * matrix[2];
 #endif
 
+    tf->n_edit = 0;
+
     max = tf->max_distance;
 
 #ifndef STACKALLOCOK
@@ -1568,6 +1649,8 @@ static int distance_int (text_fuzzy_t * tf)
 #else
     int * matrix[2];
 #endif
+
+    tf->n_edit = 0;
 
     max = tf->max_distance;
 
@@ -1905,6 +1988,8 @@ text_fuzzy_status_t text_fuzzy_compare_single (text_fuzzy_t * tf)
        truncated version of "tf->buf". */
 
     int d;
+
+    CALL (resize_edits (tf));
 
     d = NOT_FOUND;
 
@@ -2393,6 +2478,12 @@ text_fuzzy_status_t text_fuzzy_free_memory (text_fuzzy_t * text_fuzzy)
     if (text_fuzzy->idic_ok) {
 	idic_free_dic (& text_fuzzy->idic);
 	text_fuzzy->idic_ok = 0;
+	text_fuzzy->n_mallocs--;
+    }
+    if (text_fuzzy->edits) {
+	FREE (text_fuzzy->edits);
+	text_fuzzy->edits = 0;
+	text_fuzzy->edits_size = 0;
 	text_fuzzy->n_mallocs--;
     }
 

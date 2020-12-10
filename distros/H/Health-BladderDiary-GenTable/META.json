@@ -33,6 +33,11 @@
       },
       "runtime" : {
          "requires" : {
+            "Data::Sah::Coerce::perl::To_date::From_float::epoch" : "0",
+            "Data::Sah::Coerce::perl::To_date::From_obj::datetime" : "0",
+            "Data::Sah::Coerce::perl::To_date::From_obj::time_moment" : "0",
+            "Data::Sah::Coerce::perl::To_date::From_str::iso8601" : "0",
+            "Data::Sah::Compiler::perl::TH::date" : "0",
             "Data::Sah::Compiler::perl::TH::str" : "0",
             "Exporter" : "5.57",
             "Log::ger" : "0.037",
@@ -56,7 +61,7 @@
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Health-BladderDiary-GenTable"
+         "web" : "https://github.com/perlancar/perl-Health-BladderDiary-GenTable/issues"
       },
       "homepage" : "https://metacpan.org/release/Health-BladderDiary-GenTable",
       "repository" : {
@@ -65,7 +70,7 @@
          "web" : "https://github.com/perlancar/perl-Health-BladderDiary-GenTable"
       }
    },
-   "version" : "0.004",
+   "version" : "0.006",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.030000"
@@ -190,7 +195,7 @@
          {
             "class" : "Dist::Zilla::Plugin::PERLANCAR::MetaResources",
             "name" : "@Author::PERLANCAR/PERLANCAR::MetaResources",
-            "version" : "0.041"
+            "version" : "0.042"
          },
          {
             "class" : "Dist::Zilla::Plugin::CheckChangeLog",

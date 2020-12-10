@@ -2,13 +2,15 @@ NAME
     App::ZodiacUtils - CLI utilities related to zodiac
 
 VERSION
-    This document describes version 0.114 of App::ZodiacUtils (from Perl
-    distribution App-ZodiacUtils), released on 2020-08-28.
+    This document describes version 0.115 of App::ZodiacUtils (from Perl
+    distribution App-ZodiacUtils), released on 2020-09-14.
 
 DESCRIPTION
     This distribution includes the following CLI utilities:
 
     *   chinese-zodiac-of
+
+    *   list-chinese-zodiac-table
 
     *   zodiac-of
 

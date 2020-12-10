@@ -7,10 +7,6 @@ BEGIN { *PIPE_BUF = Atomic::Pipe->can('PIPE_BUF') }
 
 my $p = Atomic::Pipe->new;
 
-print STDERR "\n";
-print STDERR "Size: " . ($p->size || 'na') . "\n";
-print STDERR "Buff: " . PIPE_BUF . "\n";
-
 my @threads;
 sub worker(&) {
     my ($code) = @_;

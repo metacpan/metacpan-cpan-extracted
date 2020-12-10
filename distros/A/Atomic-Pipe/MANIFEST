@@ -14,5 +14,6 @@ t/fork.t
 t/nofork.t
 t/stress_fork.t
 t/stress_threads.t
+t/takeover.t
 t/threads.t
 xt/author/pod-syntax.t

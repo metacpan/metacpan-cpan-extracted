@@ -19,7 +19,7 @@ if (! $vars) {
 
 my %wm = (
     NAME         => 'Image::PNG::Libpng',
-    VERSION      => '0.48',
+    VERSION      => '0.49',
     ABSTRACT     => 'Perl interface to libpng',
     OBJECT       => 'Libpng.o',
     LIBS         => '-lpng',
@@ -33,6 +33,12 @@ my %wm = (
         no_index => {
             directory => ['tmpl', 'build', 'inc'],
         },
+	x_contributors => [
+	    'Greg Kennedy <gregk@cpan.org>',
+	    'Phil Perry <pmperry@cpan.org>',
+	    'Petr Pisar',
+	    'Aaron Crane <arc@cpan.org>',
+	],
     },
     MIN_PERL_VERSION => '5.008001',
     EXE_FILES => ['script/pnginspect',],

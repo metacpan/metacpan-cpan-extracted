@@ -1,34 +1,30 @@
 ---
-abstract: 'Breaks paragraphs into lines using the TeX algorithm'
+abstract: 'Paragraph shaping (line breaking) with Knuth-Plass TeX algorithm'
 author:
-  - 'Simon Cozens <simon@cpan.org>'
+  - 'Phil Perry <pmperry at cpan.org>'
 build_requires:
-  Class::Accessor: 0
-  ExtUtils::CBuilder: 0
-  Test::More: 0
-  Text::Hyphen: 0
+  ExtUtils::MakeMaker: '0'
+  JSON::Syck: '0'
 configure_requires:
-  Module::Build: 0.36
-generated_by: 'Module::Build version 0.3623'
-license: Perl
+  ExtUtils::MakeMaker: '6.5503'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.56, CPAN::Meta::Converter version 2.150010'
+license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: Text-KnuthPlass
-provides:
-  Text::KnuthPlass:
-    file: lib/Text/KnuthPlass.pm
-    version: 1.02
-  Text::KnuthPlass::Box:
-    file: lib/Text/KnuthPlass.pm
-  Text::KnuthPlass::Breakpoint:
-    file: lib/Text/KnuthPlass.pm
-  Text::KnuthPlass::DummyHyphenator:
-    file: lib/Text/KnuthPlass.pm
-  Text::KnuthPlass::Element:
-    file: lib/Text/KnuthPlass.pm
-  Text::KnuthPlass::Glue:
-    file: lib/Text/KnuthPlass.pm
-  Text::KnuthPlass::Penalty:
-    file: lib/Text/KnuthPlass.pm
-version: 1.02
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Class::Accessor: '0'
+  Text::Hyphen: '0'
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/PhilterPaper/Text-KnuthPlass/issues
+  homepage: 'https://metacpan.org/search?q=TextAAKnuthPlass, https://www.catskilltech.com'
+  repository: git://github.com/PhilterPaper/Text-KnuthPlass.git
+version: '1.03'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

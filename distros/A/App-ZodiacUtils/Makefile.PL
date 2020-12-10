@@ -17,16 +17,30 @@ my %WriteMakefileArgs = (
     "script/_chinese-zodiac-of",
     "script/_zodiac-of",
     "script/chinese-zodiac-of",
+    "script/list-chinese-zodiac-table",
     "script/zodiac-of"
   ],
   "LICENSE" => "perl",
   "MIN_PERL_VERSION" => "5.010001",
   "NAME" => "App::ZodiacUtils",
   "PREREQ_PM" => {
+    "Data::Sah::Coerce::perl::To_date::From_float::epoch" => 0,
+    "Data::Sah::Coerce::perl::To_date::From_obj::datetime" => 0,
+    "Data::Sah::Coerce::perl::To_date::From_obj::time_moment" => 0,
+    "Data::Sah::Coerce::perl::To_date::From_str::iso8601" => 0,
+    "Data::Sah::Compiler::perl::TH::array" => 0,
+    "Data::Sah::Compiler::perl::TH::bool" => 0,
+    "Data::Sah::Compiler::perl::TH::date" => 0,
+    "Data::Sah::Compiler::perl::TH::int" => 0,
+    "Data::Sah::Compiler::perl::TH::str" => 0,
     "DateTime" => 0,
     "DateTime::Format::Alami::EN" => "0.13",
     "DateTime::Format::Natural" => 0,
     "List::Util" => "1.45",
+    "Perinci::CmdLine::Any" => 0,
+    "Perinci::CmdLine::Lite" => "1.827",
+    "Perinci::Sub::Gen::AccessTable" => "0.583",
+    "Perinci::Sub::Property::result::table" => 0,
     "Scalar::Util" => 0,
     "Zodiac::Chinese::Table" => 0,
     "Zodiac::Tiny" => 0,
@@ -39,7 +53,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.114",
+  "VERSION" => "0.115",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -47,6 +61,15 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
+  "Data::Sah::Coerce::perl::To_date::From_float::epoch" => 0,
+  "Data::Sah::Coerce::perl::To_date::From_obj::datetime" => 0,
+  "Data::Sah::Coerce::perl::To_date::From_obj::time_moment" => 0,
+  "Data::Sah::Coerce::perl::To_date::From_str::iso8601" => 0,
+  "Data::Sah::Compiler::perl::TH::array" => 0,
+  "Data::Sah::Compiler::perl::TH::bool" => 0,
+  "Data::Sah::Compiler::perl::TH::date" => 0,
+  "Data::Sah::Compiler::perl::TH::int" => 0,
+  "Data::Sah::Compiler::perl::TH::str" => 0,
   "DateTime" => 0,
   "DateTime::Format::Alami::EN" => "0.13",
   "DateTime::Format::Natural" => 0,
@@ -54,6 +77,10 @@ my %FallbackPrereqs = (
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
   "List::Util" => "1.45",
+  "Perinci::CmdLine::Any" => 0,
+  "Perinci::CmdLine::Lite" => "1.827",
+  "Perinci::Sub::Gen::AccessTable" => "0.583",
+  "Perinci::Sub::Property::result::table" => 0,
   "Scalar::Util" => 0,
   "Test::More" => 0,
   "Zodiac::Chinese::Table" => 0,

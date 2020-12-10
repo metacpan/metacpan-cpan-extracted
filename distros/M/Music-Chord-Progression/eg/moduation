@@ -1,0 +1,22 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+
+use Data::Dumper::Compact 'ddc';
+use lib map { "$ENV{HOME}/sandbox/$_/lib" } qw(MIDI-Util);
+use MIDI::Util;
+use Music::Chord::Progression;
+
+my $score = MIDI::Util::setup_score();
+
+for my $note (qw(A D A E D A)) {
+    my $prog = Music::Chord::Progression->new(scale_note => $note);
+    my $notes = $prog->generate;
+    for my $chord (@$notes) {
+        $chord = [ MIDI::Util::midi_format(@$chord) ];
+        $score->n('wn', @$chord);
+    }
+    print $note, ': ', ddc($notes);
+}
+
+$score->write_score("$0.mid");

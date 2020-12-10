@@ -12,7 +12,7 @@ require XSLoader;
 our @ISA = qw(Exporter);
 our @EXPORT_OK = qw(minify);
 
-our $VERSION = 'v0.2.1';
+our $VERSION = 'v0.3.0';
 
 XSLoader::load( "Text::Minify::XS", $VERSION );
 
@@ -30,7 +30,7 @@ Text::Minify::XS - Simple text minification
 
 =head1 VERSION
 
-version v0.2.1
+version v0.3.0
 
 =head1 SYNOPSIS
 
@@ -57,15 +57,11 @@ It does the following:
 
 =item removes multiple newlines,
 
-=item and changes all line endings to a newline, "\n",
+=item and changes carriage returns to newlines.
 
 =back
 
 It does not recognise any form of markup, comments or text quoting.
-
-=head1 KNOWN ISSUES
-
-This only supports ASCII/Latin-1 text.
 
 =head1 SOURCE
 

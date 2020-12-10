@@ -1,9 +1,9 @@
 package Health::BladderDiary::GenTable;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-11-13'; # DATE
+our $DATE = '2020-12-10'; # DATE
 our $DIST = 'Health-BladderDiary-GenTable'; # DIST
-our $VERSION = '0.004'; # VERSION
+our $VERSION = '0.006'; # VERSION
 
 use 5.010001;
 use strict;
@@ -23,6 +23,13 @@ $SPEC{gen_bladder_diary_table_from_entries} = {
             req => 1,
             pos => 0,
             cmdline_src => 'stdin_or_file',
+        },
+        yesterday_last_urination_entry => {
+            schema => 'str*',
+            cmdline_aliases => {y=>{}},
+        },
+        date => {
+            schema => ['date*', 'x.perl.coerce_to' => 'DateTime'],
         },
     },
 };
@@ -50,73 +57,99 @@ sub gen_bladder_diary_table_from_entries {
         }
     } # SPLIT_ENTRIES
 
+    my $code_parse_entry = sub {
+        my ($uentry, $label) = @_;
+        my $uentry0 = $uentry;
+        my @warnings;
+
+        $uentry =~ s/\A(\d\d)[:.]?(\d\d)(?:-(\d\d)[:.]?(\d\d))?\s*//
+            or return [400, "Entry $label: invalid time, please start with hhmm or hh:mm: $uentry0"];
+        my ($h, $m, $h2, $m2) = ($1, $2, $3, $4);
+        $uentry =~ s/(\w+):?\s*//
+            or return [400, "Entry $label: event (e.g. drink, urinate) expected: $uentry"];
+        my $event = $1;
+        if    ($event eq 'u' || $event eq 'urin') { $event = 'urinate' }
+        elsif ($event eq 'd') { $event = 'drink' }
+        elsif ($event eq 'c') { $event = 'comment' }
+        $event =~ /\A(drink|eat|poop|urinate|comment)\z/
+            or return [400, "Entry $label: unknown event '$event', please choose eat|drink|poop|urinate|comment"];
+
+        my $parsed_entry = {
+            # XXX check that time is monotonically increasing
+            time   => sprintf("%02d.%02d", $h, $m),
+            _event => $event,
+            _h     => $h,
+            _m     => $m,
+            _time  => $h*60 + $m,
+            _raw   => $uentry0,
+        };
+
+        # scrape key-value pairs from unparsed entry
+        my %kv;
+        while ($uentry =~ /(\w+)=(.+?)(?=[,.]?\s+\w+=|[.]?\s*\z)/g) {
+            $kv{$1} = $2;
+        }
+        #use DD; dd \%kv;
+        for my $k (sort keys %kv) {
+            unless ($k =~ /\A(vol|type|comment|urgency|color)\z/) {
+                push @warnings, "Entry $label: unknown key '$k'";
+            }
+        }
+
+        for my $k (qw/vol type comment urgency color/) {
+            if (defined $kv{$k}) {
+                $parsed_entry->{$k} = $kv{$k};
+            }
+        }
+
+        $uentry =~ /\b(\d+)ml\b/     and $parsed_entry->{vol}     //= $1;
+        $uentry =~ /\bv(\d+)\b/      and $parsed_entry->{vol}     //= $1;
+        $uentry =~ /\bu([0-9]|10)\b/ and $parsed_entry->{urgency} //= $1;
+        $uentry =~ /\bc([0-6](?:\.5)?)\b/ and $parsed_entry->{color}   //= do {
+            if    ($1 == 0)   { '0/6   clear' }                   # very good
+            elsif ($1 == 0.5) { '0-1/6 clear to light yellow' }   # good
+            elsif ($1 == 1)   { '1/6   light yellow' }            # good
+            elsif ($1 == 1.5) { '1-2/6 light yellow to yellow' }  # good
+            elsif ($1 == 2)   { '2/6   yellow' }                  # fair
+            elsif ($1 == 2.5) { '2-3/6 yellow to dark yellow' }   # fair
+            elsif ($1 == 3)   { '3/6   dark yellow' }             # light dehydrated
+            elsif ($1 == 4)   { '4/6   amber' }                   # dehydrated
+            elsif ($1 == 5)   { '5/6   brown' }                   # very dehydrated
+            elsif ($1 == 6)   { '6/6   red' }                     # severe dehydrated
+        };
+
+        if ($event eq 'drink') {
+            return [400, "Entry $label: please specify volume for $event"]
+                unless defined $parsed_entry->{vol};
+            $parsed_entry->{type} //= "water";
+        } elsif ($event eq 'eat') {
+            $parsed_entry->{type} //= "food";
+        } elsif ($event eq 'urinate') {
+            return [400, "Entry $label: please specify volume for $event"]
+                unless defined $parsed_entry->{vol};
+            $parsed_entry->{"ucomment"} = "poop" .
+                ($parsed_entry->{comment} ? ": $parsed_entry->{comment}" : "");
+        }
+
+        [200, "OK", $parsed_entry, {'func.warnings'=>\@warnings}];
+    }; # code_parse_entry
+
     my @urinations;
     my @intakes;
   PARSE_ENTRIES: {
         my $i = 0;
         for my $uentry (@unparsed_entries) {
-            my $uentry0 = $uentry;
             $i++;
-            my $time;
-            $uentry =~ s/\A(\d\d)[:.]?(\d\d)(?:-(\d\d)[:.]?(\d\d))?\s*//
-                or return [400, "Entry #$i: invalid time, please start with hhmm or hh:mm: $uentry0"];
-            my ($h, $m, $h2, $m2) = ($1, $2, $3, $4);
-            $uentry =~ s/(\w+):?\s*//
-                or return [400, "Entry #$i: event (e.g. drink, urinate) expected: $uentry"];
-            my $event = $1;
-            if    ($event eq 'u' || $event eq 'urin') { $event = 'urinate' }
-            elsif ($event eq 'd') { $event = 'drink' }
-            elsif ($event eq 'c') { $event = 'comment' }
-            $event =~ /\A(drink|eat|poop|urinate|comment)\z/
-                or return [400, "Entry #$i: unknown event '$event', please choose eat|drink|poop|urinate|comment"];
+            my $res = $code_parse_entry->($uentry, "#$i");
+            return $res unless $res->[0] == 200;
 
-            my $parsed_entry = {
-                # XXX check that time is monotonically increasing
-                time => sprintf("%02d.%02d", $h, $m),
-                _h    => $h,
-                _m    => $m,
-                _time => $h*60 + $m,
-                _raw  => $uentry0,
-            };
-
-            # scrape key-value pairs from unparsed entry
-            my %kv;
-            while ($uentry =~ /(\w+)=(.+?)(?=[,.]?\s+\w+=|[.]?\s*\z)/g) {
-                $kv{$1} = $2;
-            }
-            #use DD; dd \%kv;
-
-            for my $k (qw/vol type comment urgency color/) {
-                if (defined $kv{$k}) {
-                    $parsed_entry->{$k} = $kv{$k};
-                }
-            }
-
-            $uentry =~ /\b(\d+)ml\b/     and $parsed_entry->{vol}     //= $1;
-            $uentry =~ /\bv(\d+)\b/      and $parsed_entry->{vol}     //= $1;
-            $uentry =~ /\bu([0-9]|10)\b/ and $parsed_entry->{urgency} //= $1;
-            $uentry =~ /\bc([0-6])\b/    and $parsed_entry->{color}   //= do {
-                if    ($1 == 0) { 'clear' } # very good
-                elsif ($1 == 1) { 'light yellow' } # good
-                elsif ($1 == 2) { 'yellow' } # fair
-                elsif ($1 == 3) { 'dark yellow' } # light dehydrated
-                elsif ($1 == 4) { 'amber' } # dehydrated
-                elsif ($1 == 5) { 'brown' } # very dehydrated
-                elsif ($1 == 6) { 'red' } # severe dehydrated
-            };
-
+            my $parsed_entry = $res->[2];
+            my $event = delete $parsed_entry->{_event};
             if ($event eq 'drink') {
-                return [400, "Entry #$i: please specify volume for $event"]
-                    unless defined $parsed_entry->{vol};
-                $parsed_entry->{type} //= "water";
                 push @intakes, $parsed_entry;
             } elsif ($event eq 'eat') {
-                $parsed_entry->{type} = "food";
                 push @intakes, $parsed_entry;
             } elsif ($event eq 'urinate') {
-                return [400, "Entry #$i: please specify volume for $event"]
-                unless defined $parsed_entry->{vol};
-                $parsed_entry->{"ucomment"} = "poop" . ($parsed_entry->{comment} ? ": $parsed_entry->{comment}" : "");
                 push @urinations, $parsed_entry;
             }
         }
@@ -129,10 +162,23 @@ sub gen_bladder_diary_table_from_entries {
         }];
     }
 
+    my $yesterday_last_urination_parsed_entry;
+    if ($args{yesterday_last_urination_entry}) {
+        my $res = $code_parse_entry->(
+            $args{yesterday_last_urination_entry}, "yesterday's urination");
+        return $res unless $res->[0] == 200;
+        $yesterday_last_urination_parsed_entry = $res->[2];
+        my $event = delete $yesterday_last_urination_parsed_entry->{_event};
+        unless ($event eq 'urinate') {
+            return [400, "Yesterday's urination event must be 'urinate', not $event"];
+        }
+    }
+
     my @rows;
     my $ivol_cum = 0;
     my $uvol_cum = 0;
-    my $prev_utime;
+    my $prev_utime = $yesterday_last_urination_parsed_entry ?
+        $yesterday_last_urination_parsed_entry->{_time} : undef;
     my $num_drink = 0;
     my $num_urinate = 0;
   GROUP_INTO_HOURS: {
@@ -169,7 +215,7 @@ sub gen_bladder_diary_table_from_entries {
             while (@urinations && $urinations[0]{_h} == $h) {
                 my $entry = shift @urinations;
                 $hour_rows[$j]{"urin/defec time"}  = $entry->{time};
-                $hour_rows[$j]{"color"}            = $entry->{color};
+                $hour_rows[$j]{"color (0-6)"}      = $entry->{color};
                 $hour_rows[$j]{"ucomment"}         = $entry->{comment};
                 $hour_rows[$j]{"urgency (0-10)"}   = $entry->{urgency};
                 if (defined $entry->{vol}) {
@@ -219,14 +265,14 @@ sub gen_bladder_diary_table_from_entries {
             'itime',
             'ivol (ml)',
             'ivol cum',
-            'icomment',
+            'icomment', # intake comment
             'urin/defec time',
             'uvol (ml)',
             'uvol cum',
             'urate (ml/h)',
-            'color',
+            'color (0-6)',
             'urgency (0-10)',
-            'ucomment',
+            'ucomment', # urinate comment
         ],
         'table.field_aligns' => [
             'left', #'time',
@@ -239,7 +285,7 @@ sub gen_bladder_diary_table_from_entries {
             'right', #'uvol (ml)',
             'right', #'uvol cum',
             'right', #'urate (ml/h)',
-            'left', #'color',
+            'left', #'color (0-6)',
             'left', #'urgency (0-10)',
             'left', #'ucomment',
         ],
@@ -261,7 +307,7 @@ Health::BladderDiary::GenTable - Create bladder diary table from entries
 
 =head1 VERSION
 
-This document describes version 0.004 of Health::BladderDiary::GenTable (from Perl distribution Health-BladderDiary-GenTable), released on 2020-11-13.
+This document describes version 0.006 of Health::BladderDiary::GenTable (from Perl distribution Health-BladderDiary-GenTable), released on 2020-12-10.
 
 =head1 SYNOPSIS
 
@@ -376,7 +422,7 @@ which is a number from 0 (not urgent at all) to 10 (most urgent). Example:
 
  1230 u 200ml c2 u4
 
-=head2 Drink entries
+=head2 Drink (fluid intake) entries
 
 A drink (fluid intake) entry is an entry with event C<drink> (can be written as
 just C<d>). At least volume is required, can be written in ml unit e.g.
@@ -389,6 +435,14 @@ You can also input the kind of drink using C<type=NAME>. If type is not
 specified, C<water> is assumed. Example:
 
  1300 d 300ml type=coffee
+
+=head2 Eat (food intake) entries
+
+The diary can also contain food intake entries. Currently volume or weight of
+food (or volume of fluid, by percentage of food volume) is not measured or
+displayed. You can put comments here for more detailed information. The table
+generator will create a row for each food intake, but will just display the
+time, type ("food"), and comment columns.
 
 =head1 KEYWORDS
 
@@ -411,7 +465,11 @@ Arguments ('*' denotes required arguments):
 
 =over 4
 
+=item * B<date> => I<date>
+
 =item * B<entries>* => I<str>
+
+=item * B<yesterday_last_urination_entry> => I<str>
 
 
 =back
@@ -437,7 +495,7 @@ Source repository is at L<https://github.com/perlancar/perl-Health-BladderDiary-
 
 =head1 BUGS
 
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Health-BladderDiary-GenTable>
+Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-Health-BladderDiary-GenTable/issues>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired

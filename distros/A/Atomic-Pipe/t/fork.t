@@ -7,10 +7,6 @@ BEGIN { *PIPE_BUF = Atomic::Pipe->can('PIPE_BUF') }
 
 my ($r, $w) = Atomic::Pipe->pair;
 
-print STDERR "\n";
-print STDERR "Size: " . ($r->size || 'na') . "\n";
-print STDERR "Buff: " . PIPE_BUF . "\n";
-
 $SIG{CHLD} = 'IGNORE';
 sub worker(&) {
     my ($code) = @_;

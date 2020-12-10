@@ -7,7 +7,18 @@ use Image::PNG::Const ':all';
 if (! libpng_supports ('iTXt') ||
     ! libpng_supports ('zTXt') ||
     ! libpng_supports ('tEXt')) {
-    plan skip_all => 'libpng has no iTXt/zTXt/tEXt',
+    plan skip_all => 'your libpng does not support iTXt/zTXt/tEXt',
+}
+
+# http://www.cpantesters.org/cpan/report/6174e60e-6bf3-1014-896f-3999f29aa079
+
+# and similar, this appears to be a bug in libpng version 1.6.3.
+
+my $libpngver = Image::PNG::Libpng::get_libpng_ver ();
+
+if ($libpngver =~ /^1\.[0-5]/ ||
+    $libpngver =~ /^1\.6\.[0-3]([^0-9]|$)/) {
+    plan skip_all => "Skip - iTXt trips bugs in libpng version $libpngver";
 }
 
 use utf8;
@@ -457,9 +468,10 @@ key => 'Disclaimer',
 },
 );
 
-# There are some instances of libpngs which return 2 for the text
-# compression. However, this does not occur in any of the examples, so
-# it seems like there must be a faulty libpng.
+# There are some instances of libpngs which return 2
+# (PNG_ITXT_COMPRESSION_zTXt) for the text compression. However, this
+# does not occur in any of the examples, so it seems like there must
+# be a faulty libpng.
 
 for my $test (@stuff) {
     my $png = read_png_file ("$Bin/libpng/$test->{file}.png");
@@ -468,11 +480,17 @@ for my $test (@stuff) {
 	for my $text (@$texts) {
 	    if ($text->{compression} == 2) {
 
-		# There are no examples with compression = 2 in the
-		# examples anywhere, so how this happens I don't know,
-		# but it does:
+		# There are no examples in pngsuite with compression
+		# value 2 (PNG_ITXT_COMPRESSION_zTXt). The following
+		# test failure dates from before I introduced
+		# "bogus.t" to get the version number of libpng:
 
 		# http://www.cpantesters.org/cpan/report/717bf5a4-8284-11e3-bd14-e3bee4621ba3
+
+		# The following still doesn't seem to work to skip the
+		# tests though, so we also test the version at the top
+		# of this file and stop if the version is 1.6.3 or
+		# less.
 
 		plan skip_all => 'Bad compression value detected, your libpng is faulty';
 		goto end;
@@ -485,11 +503,13 @@ for my $test (@stuff) {
     my $png = read_png_file ("$Bin/libpng/$test->{file}.png");
     my $texts = $png->get_text ();
     if ($test->{empty}) {
-	ok (! $texts, "no text chunks for empty");
+	ok (! $texts,
+	    "There were no text chunks in $test->{file}, as expected");
     }
     else {
 	my $chunks = $test->{chunks};
-	is_deeply ($texts, $chunks, "Got expected stuff");
+	is_deeply ($texts, $chunks,
+		   "Text chunk from $test->{file} was as expected");
     }
 }
 

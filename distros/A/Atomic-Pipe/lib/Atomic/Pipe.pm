@@ -2,7 +2,7 @@ package Atomic::Pipe;
 use strict;
 use warnings;
 
-our $VERSION = '0.004';
+our $VERSION = '0.006';
 
 use IO();
 use Carp qw/croak/;
@@ -38,6 +38,53 @@ use constant STATE => 'state';
 sub _get_tid {
     return 0 unless $INC{'threads.pm'};
     return threads->tid();
+}
+
+sub from_fh {
+    my $class = shift;
+    my ($ifh) = @_;
+
+    croak "Filehandle is not a pipe (-p check)" unless -p $ifh;
+
+    my ($dir, $fh);
+    my $mode = fcntl($ifh, Fcntl::F_GETFL(), 0);
+    if ($mode & Fcntl::O_RDONLY() || $mode == Fcntl::O_RDONLY()) {
+        $dir = RH();
+        open($fh, '<&', $ifh) or croak "Could not clone filehandle: $!";
+    }
+    elsif ($mode & Fcntl::O_WRONLY() || $mode == Fcntl::O_WRONLY()) {
+        $dir = WH();
+        open($fh, '>&', $ifh) or croak "Could not clone filehandle: $!";
+    }
+    else {
+        croak "Unknown handle mode ($mode)";
+    }
+
+    binmode($fh);
+    return bless({$dir => $fh}, $class);
+}
+
+sub from_fd {
+    my $class = shift;
+    my ($mode, $fd) = @_;
+
+    my ($dir, $fh);
+    if ($mode eq '<&' || $mode eq '<&=') {
+        $dir = RH();
+        open($fh, $mode, $fd) or croak "Could not open fd$fd: $!";
+    }
+    elsif ($mode eq '>&' || '>&=') {
+        $dir = WH();
+        open($fh, $mode, $fd) or croak "Could not clone fd$fd: $!";
+    }
+    else {
+        croak "Invalid mode: $mode";
+    }
+
+    croak "Filehandle is not a pipe (-p check)" unless -p $fh;
+
+    binmode($fh);
+    return bless({$dir => $fh}, $class);
 }
 
 sub new {
@@ -381,6 +428,42 @@ If you really must have a C<new()> method it is here for you to abuse. The
 returned pipe has both handles, it is your job to then turn it into 2 clones
 one with the reader and one with the writer. It is also your job to make you do
 not have too many handles floating around preventing an EOF.
+
+=item $p = Atomic::Pipe->from_fh($fh)
+
+Create an instance around an existing filehandle (A clone of the handle will be
+made and kept internally).
+
+This will fail if the handle is not a pipe. This constructor will determine the
+mode (reader or writer) for you from the given handle.
+
+=item $p = Atomic::Pipe->from_fd($mode, $fd)
+
+C<$fd> must be a file descriptor number.
+
+This will fail if the fd is not a pipe.
+
+You must specify one of these modes (as a string):
+
+=over 4
+
+=item '>&'
+
+Write-only.
+
+=item '>&='
+
+Write-only and reuse fileno.
+
+=item '<&'
+
+Read-only.
+
+=item '<&='
+
+Read-only and reuse fileno.
+
+=back
 
 =back
 

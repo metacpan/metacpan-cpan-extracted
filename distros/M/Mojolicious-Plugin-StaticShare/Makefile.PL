@@ -18,7 +18,7 @@ WriteMakefile(
       'Test::More' => '0',
   },
   PREREQ_PM    => {
-    'Mojolicious' => '7.36',
+    'Mojolicious' => '8.67',
     'HTTP::AcceptLanguage'=>'0.02',
     'Time::Piece'=>'1.31',
     #~ Text::Markdown::Hoedown if markdown

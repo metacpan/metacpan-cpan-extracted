@@ -1,11 +1,12 @@
 #!perl
 
 # Note: This script is a CLI for Riap function /App/GnuplotUtils/xyplot
-# and generated automatically using Perinci::CmdLine::Gen version 0.485
+# and generated automatically using Perinci::CmdLine::Gen version 0.497
 
-our $DATE = '2018-05-07'; # DATE
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-12-10'; # DATE
 our $DIST = 'App-GnuplotUtils'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 use 5.010001;
 use strict;
@@ -22,7 +23,7 @@ my $cmdline = Perinci::CmdLine::Any->new(
 
 $cmdline->run;
 
-# ABSTRACT: Plot XY data using gnuplot
+# ABSTRACT: Plot XY dataset(s) using gnuplot
 # PODNAME: xyplot
 
 __END__
@@ -33,21 +34,27 @@ __END__
 
 =head1 NAME
 
-xyplot - Plot XY data using gnuplot
+xyplot - Plot XY dataset(s) using gnuplot
 
 =head1 VERSION
 
-This document describes version 0.001 of xyplot (from Perl distribution App-GnuplotUtils), released on 2018-05-07.
+This document describes version 0.002 of xyplot (from Perl distribution App-GnuplotUtils), released on 2020-12-10.
 
 =head1 SYNOPSIS
 
 Usage:
 
- % xyplot [options]
+ % xyplot [--chart-title=s] [-d=s] [--dataset-file=s+]
+     [--dataset-files-json=s] [--dataset-style=s+]
+     [--dataset-styles-json=s] [--dataset-title=s+]
+     [--dataset-titles-json=s] [--datasets-json=s] [--datasets=s]
+     [--field-delimiter=s] [--format=name] [--json] [--(no)naked-res]
+     [--page-result[=program]] [--view-result[=program]]
 
 =head1 DESCRIPTION
 
-Example C<input.txt>:
+Example C<input1.txt>, each line contains whitespace-separated values of X data
+(number), Y data (number):
 
  1 1
  2 3
@@ -55,9 +62,23 @@ Example C<input.txt>:
  4 7.9
  6 11.5
 
-Example using C<xyplot>:
+Example using C<xyplot> (one data-set):
 
- % xyplot < input.txt
+ % xyplot < input1.txt
+
+Example C<input2.txt>:
+
+ 1 8
+ 2 12
+ 3 5
+ 4 4
+ 6 8
+
+Using two datasets:
+
+ % xyplot --dataset-file  input1.txt  --dataset-file  input2.txt \
+          --dataset-color red         --dataset-color blue \
+          --dataset-style linespoints --dataset-style points
 
 Keywords: xychart, XY chart, XY plot
 
@@ -69,9 +90,57 @@ C<*> marks required options.
 
 =over
 
-=item B<--delimiter>=I<s>, B<-d>
+=item B<--chart-title>=I<s>
 
-Supply field delimiter character instead of the default whitespace(s).
+=item B<--dataset-file>=I<s@>
+
+Dataset(s) from file(s).
+
+Can be specified multiple times.
+
+=item B<--dataset-files-json>=I<s>
+
+Dataset(s) from file(s) (JSON-encoded).
+
+See C<--dataset-file>.
+
+=item B<--dataset-style>=I<s@>
+
+Dataset plot style(s).
+
+Can be specified multiple times.
+
+=item B<--dataset-styles-json>=I<s>
+
+Dataset plot style(s) (JSON-encoded).
+
+See C<--dataset-style>.
+
+=item B<--dataset-title>=I<s@>
+
+Dataset title(s).
+
+Can be specified multiple times.
+
+=item B<--dataset-titles-json>=I<s>
+
+Dataset title(s) (JSON-encoded).
+
+See C<--dataset-title>.
+
+=item B<--datasets-json>=I<s>
+
+Dataset(s) (JSON-encoded).
+
+See C<--datasets>.
+
+=item B<--datasets>=I<s>
+
+Dataset(s).
+
+=item B<--field-delimiter>=I<s>, B<-d>
+
+Supply field delimiter character in dataset file instead of the default whitespace(s).
 
 =back
 
@@ -111,6 +180,14 @@ you want to pipe the result for more post-processing. In this case you can use
 
     [1,2,3]
 
+
+=item B<--page-result>
+
+Filter output through a pager.
+
+=item B<--view-result>
+
+View output using a viewer.
 
 =back
 
@@ -172,7 +249,7 @@ Source repository is at L<https://github.com/perlancar/perl-App-GnuplotUtils>.
 
 =head1 BUGS
 
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-GnuplotUtils>
+Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-App-GnuplotUtils/issues>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
@@ -184,7 +261,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2018 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

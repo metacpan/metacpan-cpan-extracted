@@ -15,7 +15,7 @@ use warnings;
 
 use Test::Perl::Critic (-profile => "") x!! -e "";
 
-my $filenames = ['lib/App/ZodiacUtils.pm','script/_chinese-zodiac-of','script/_zodiac-of','script/chinese-zodiac-of','script/zodiac-of'];
+my $filenames = ['lib/App/ZodiacUtils.pm','lib/App/ZodiacUtils/Table.pm','script/_chinese-zodiac-of','script/_zodiac-of','script/chinese-zodiac-of','script/list-chinese-zodiac-table','script/zodiac-of'];
 unless ($filenames && @$filenames) {
     $filenames = -d "blib" ? ["blib"] : ["lib"];
 }

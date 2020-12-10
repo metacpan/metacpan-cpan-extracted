@@ -1,9 +1,19 @@
 ==================================================
-Changes from 1741-03-05 00:00:00 +0000 to present.
+Changes from 1747-02-26 00:00:00 +0000 to present.
 ==================================================
 
 ------------------------------------------
-version 0.102 at 2014-12-18 03:39:05 +0000
+version 0.103 at 2020-12-10 05:51:57 +0000
+------------------------------------------
+
+  Change: 448ec4277e25198f6991359e10e5c43bec47c028
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2020-12-10 06:51:31 +0000
+
+    Repository moved, new .travis.yml 
+
+------------------------------------------
+version 0.102 at 2014-12-18 03:37:52 +0000
 ------------------------------------------
 
   Change: bd2942ab0ab32f5deed7d0dbd4faa4deb272c1d5
@@ -30,6 +40,10 @@ version 0.102 at 2014-12-18 03:39:05 +0000
 
     More documentation about what it is 
 
+------------------------------------------
+version 0.101 at 2014-12-18 03:08:24 +0000
+------------------------------------------
+
   Change: 5d72c698a81997e9a6eb75c7d880b93cc14ac8ea
   Author: Torsten Raudssus <torsten@raudss.us>
   Date : 2014-12-18 04:08:24 +0000
@@ -47,6 +61,10 @@ version 0.102 at 2014-12-18 03:39:05 +0000
   Date : 2014-12-18 03:41:34 +0000
 
     Fix for travis 
+
+------------------------------------------
+version 0.100 at 2014-12-18 02:35:17 +0000
+------------------------------------------
 
   Change: 62e572dd2e6e0c7c61168e8aa3abe50706f5da1a
   Author: Torsten Raudssus <torsten@raudss.us>
@@ -67,6 +85,10 @@ version 0.102 at 2014-12-18 03:39:05 +0000
 
     Hups, fix in doc 
 
+------------------------------------------
+version 0.002 at 2014-12-14 02:01:26 +0000
+------------------------------------------
+
   Change: 8edac616e0536c88d5436b6c01b7941198d5af85
   Author: Torsten Raudssus <torsten@raudss.us>
   Date : 2014-12-14 03:01:26 +0000
@@ -84,6 +106,10 @@ version 0.102 at 2014-12-18 03:39:05 +0000
   Date : 2014-12-14 02:58:50 +0000
 
     Made bee giving out raw value for piping 
+
+------------------------------------------
+version 0.001 at 2014-12-14 01:50:03 +0000
+------------------------------------------
 
   Change: a648b6de0b14427deb774d118cebf77e5f8c1fbf
   Author: Torsten Raudssus <torsten@raudss.us>

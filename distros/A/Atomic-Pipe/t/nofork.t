@@ -4,10 +4,6 @@ BEGIN { *PIPE_BUF = Atomic::Pipe->can('PIPE_BUF') }
 
 my $p = Atomic::Pipe->new;
 
-print STDERR "\n";
-print STDERR "Size: " . ($p->size || 'na') . "\n";
-print STDERR "Buff: " . PIPE_BUF . "\n";
-
 my $w1 = $p->clone_writer;
 my $w2 = $p->clone_writer;
 my $w3 = $p->clone_writer;

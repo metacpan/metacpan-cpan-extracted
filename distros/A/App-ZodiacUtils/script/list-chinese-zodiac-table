@@ -1,0 +1,831 @@
+#!perl
+
+# Note: This script is a CLI for Riap function /App/ZodiacUtils/Table/list_chinese_zodiac_table
+# and generated automatically using Perinci::CmdLine::Gen version 0.497
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-09-14'; # DATE
+our $DIST = 'App-ZodiacUtils'; # DIST
+our $VERSION = '0.115'; # VERSION
+
+use 5.010001;
+use strict;
+use warnings;
+
+use Perinci::CmdLine::Any;
+
+my $cmdline = Perinci::CmdLine::Any->new(
+    url => "/App/ZodiacUtils/Table/list_chinese_zodiac_table",
+    program_name => "list-chinese-zodiac-table",
+    read_config => 0,
+    read_env => 0,
+);
+
+$cmdline->run;
+
+# ABSTRACT: Chinese zodiac
+# PODNAME: list-chinese-zodiac-table
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+list-chinese-zodiac-table - Chinese zodiac
+
+=head1 VERSION
+
+This document describes version 0.115 of list-chinese-zodiac-table (from Perl distribution App-ZodiacUtils), released on 2020-09-14.
+
+=head1 SYNOPSIS
+
+Usage:
+
+ % list-chinese-zodiac-table [--detail] [--earthly-branch-contains=s]
+     [--earthly-branch-in-json=s] [--earthly-branch-in=s+]
+     [--earthly-branch-is=s] [--earthly-branch-isnt=s]
+     [--earthly-branch-max=s] [--earthly-branch-min=s]
+     [--earthly-branch-not-contains=s] [--earthly-branch-not-in-json=s]
+     [--earthly-branch-not-in=s+] [--earthly-branch-xmax=s]
+     [--earthly-branch-xmin=s] [--earthly-branch=s] [--element-contains=s]
+     [--element-in-json=s] [--element-in=s+] [--element-is=s]
+     [--element-isnt=s] [--element-max=s] [--element-min=s]
+     [--element-not-contains=s] [--element-not-in-json=s]
+     [--element-not-in=s+] [--element-xmax=s] [--element-xmin=s]
+     [--element=s] [--en-animal-contains=s] [--en-animal-in-json=s]
+     [--en-animal-in=s+] [--en-animal-is=s] [--en-animal-isnt=s]
+     [--en-animal-max=s] [--en-animal-min=s] [--en-animal-not-contains=s]
+     [--en-animal-not-in-json=s] [--en-animal-not-in=s+]
+     [--en-animal-xmax=s] [--en-animal-xmin=s] [--en-animal=s]
+     [--end-date-in-json=s] [--end-date-in=s+] [--end-date-is=s]
+     [--end-date-isnt=s] [--end-date-max=s] [--end-date-min=s]
+     [--end-date-not-in-json=s] [--end-date-not-in=s+] [--end-date-xmax=s]
+     [--end-date-xmin=s] [--end-date=s] [--exclude-field=s+]
+     [--exclude-fields-json=s] [--field=s+] [--fields-json=s]
+     [--format=name] [--heavenly-stem-contains=s]
+     [--heavenly-stem-in-json=s] [--heavenly-stem-in=s+]
+     [--heavenly-stem-is=s] [--heavenly-stem-isnt=s]
+     [--heavenly-stem-max=s] [--heavenly-stem-min=s]
+     [--heavenly-stem-not-contains=s] [--heavenly-stem-not-in-json=s]
+     [--heavenly-stem-not-in=s+] [--heavenly-stem-xmax=s]
+     [--heavenly-stem-xmin=s] [--heavenly-stem=s] [--json] [-l]
+     [--(no)naked-res] [--no-detail] [--no-random] [--nodetail]
+     [--norandom] [--page-result[=program]] [--random] [--result-limit=s]
+     [--result-start=s] [--sort-json=s] [--sort=s+]
+     [--start-date-in-json=s] [--start-date-in=s+] [--start-date-is=s]
+     [--start-date-isnt=s] [--start-date-max=s] [--start-date-min=s]
+     [--start-date-not-in-json=s] [--start-date-not-in=s+]
+     [--start-date-xmax=s] [--start-date-xmin=s] [--start-date=s]
+     [--with-field-names] [--without-field-names] [--yin-yang-contains=s]
+     [--yin-yang-in-json=s] [--yin-yang-in=s+] [--yin-yang-is=s]
+     [--yin-yang-isnt=s] [--yin-yang-max=s] [--yin-yang-min=s]
+     [--yin-yang-not-contains=s] [--yin-yang-not-in-json=s]
+     [--yin-yang-not-in=s+] [--yin-yang-xmax=s] [--yin-yang-xmin=s]
+     [--yin-yang=s] [--zh-animal-contains=s] [--zh-animal-in-json=s]
+     [--zh-animal-in=s+] [--zh-animal-is=s] [--zh-animal-isnt=s]
+     [--zh-animal-max=s] [--zh-animal-min=s] [--zh-animal-not-contains=s]
+     [--zh-animal-not-in-json=s] [--zh-animal-not-in=s+]
+     [--zh-animal-xmax=s] [--zh-animal-xmin=s] [--zh-animal=s] [query]
+
+=head1 DESCRIPTION
+
+REPLACE ME
+
+=head1 OPTIONS
+
+C<*> marks required options.
+
+=head2 Field selection options
+
+=over
+
+=item B<--detail>, B<-l>
+
+Return array of full records instead of just ID fields.
+
+By default, only the key (ID) field is returned per result entry.
+
+
+=item B<--exclude-field>=I<s@>
+
+Select fields to return.
+
+Can be specified multiple times.
+
+=item B<--exclude-fields-json>=I<s>
+
+Select fields to return (JSON-encoded).
+
+See C<--exclude-field>.
+
+=item B<--field>=I<s@>
+
+Select fields to return.
+
+Can be specified multiple times.
+
+=item B<--fields-json>=I<s>
+
+Select fields to return (JSON-encoded).
+
+See C<--field>.
+
+=item B<--with-field-names>
+
+Return field names in each record (as hash/associative array).
+
+When enabled, function will return each record as hash/associative array
+(field name => value pairs). Otherwise, function will return each record
+as list/array (field value, field value, ...).
+
+
+=back
+
+=head2 Filtering for earthly_branch options
+
+=over
+
+=item B<--earthly-branch-contains>=I<s>
+
+Only return records where the 'earthly_branch' field contains specified text.
+
+=item B<--earthly-branch-in-json>=I<s>
+
+Only return records where the 'earthly_branch' field is in the specified values (JSON-encoded).
+
+See C<--earthly-branch-in>.
+
+=item B<--earthly-branch-in>=I<s@>
+
+Only return records where the 'earthly_branch' field is in the specified values.
+
+Can be specified multiple times.
+
+=item B<--earthly-branch-is>=I<s>
+
+Only return records where the 'earthly_branch' field equals specified value.
+
+=item B<--earthly-branch-isnt>=I<s>
+
+Only return records where the 'earthly_branch' field does not equal specified value.
+
+=item B<--earthly-branch-max>=I<s>
+
+Only return records where the 'earthly_branch' field is less than or equal to specified value.
+
+=item B<--earthly-branch-min>=I<s>
+
+Only return records where the 'earthly_branch' field is greater than or equal to specified value.
+
+=item B<--earthly-branch-not-contains>=I<s>
+
+Only return records where the 'earthly_branch' field does not contain specified text.
+
+=item B<--earthly-branch-not-in-json>=I<s>
+
+Only return records where the 'earthly_branch' field is not in the specified values (JSON-encoded).
+
+See C<--earthly-branch-not-in>.
+
+=item B<--earthly-branch-not-in>=I<s@>
+
+Only return records where the 'earthly_branch' field is not in the specified values.
+
+Can be specified multiple times.
+
+=item B<--earthly-branch-xmax>=I<s>
+
+Only return records where the 'earthly_branch' field is less than specified value.
+
+=item B<--earthly-branch-xmin>=I<s>
+
+Only return records where the 'earthly_branch' field is greater than specified value.
+
+=item B<--earthly-branch>=I<s>
+
+Only return records where the 'earthly_branch' field equals specified value.
+
+=back
+
+=head2 Filtering for element options
+
+=over
+
+=item B<--element-contains>=I<s>
+
+Only return records where the 'element' field contains specified text.
+
+=item B<--element-in-json>=I<s>
+
+Only return records where the 'element' field is in the specified values (JSON-encoded).
+
+See C<--element-in>.
+
+=item B<--element-in>=I<s@>
+
+Only return records where the 'element' field is in the specified values.
+
+Can be specified multiple times.
+
+=item B<--element-is>=I<s>
+
+Only return records where the 'element' field equals specified value.
+
+=item B<--element-isnt>=I<s>
+
+Only return records where the 'element' field does not equal specified value.
+
+=item B<--element-max>=I<s>
+
+Only return records where the 'element' field is less than or equal to specified value.
+
+=item B<--element-min>=I<s>
+
+Only return records where the 'element' field is greater than or equal to specified value.
+
+=item B<--element-not-contains>=I<s>
+
+Only return records where the 'element' field does not contain specified text.
+
+=item B<--element-not-in-json>=I<s>
+
+Only return records where the 'element' field is not in the specified values (JSON-encoded).
+
+See C<--element-not-in>.
+
+=item B<--element-not-in>=I<s@>
+
+Only return records where the 'element' field is not in the specified values.
+
+Can be specified multiple times.
+
+=item B<--element-xmax>=I<s>
+
+Only return records where the 'element' field is less than specified value.
+
+=item B<--element-xmin>=I<s>
+
+Only return records where the 'element' field is greater than specified value.
+
+=item B<--element>=I<s>
+
+Only return records where the 'element' field equals specified value.
+
+=back
+
+=head2 Filtering for en_animal options
+
+=over
+
+=item B<--en-animal-contains>=I<s>
+
+Only return records where the 'en_animal' field contains specified text.
+
+=item B<--en-animal-in-json>=I<s>
+
+Only return records where the 'en_animal' field is in the specified values (JSON-encoded).
+
+See C<--en-animal-in>.
+
+=item B<--en-animal-in>=I<s@>
+
+Only return records where the 'en_animal' field is in the specified values.
+
+Can be specified multiple times.
+
+=item B<--en-animal-is>=I<s>
+
+Only return records where the 'en_animal' field equals specified value.
+
+=item B<--en-animal-isnt>=I<s>
+
+Only return records where the 'en_animal' field does not equal specified value.
+
+=item B<--en-animal-max>=I<s>
+
+Only return records where the 'en_animal' field is less than or equal to specified value.
+
+=item B<--en-animal-min>=I<s>
+
+Only return records where the 'en_animal' field is greater than or equal to specified value.
+
+=item B<--en-animal-not-contains>=I<s>
+
+Only return records where the 'en_animal' field does not contain specified text.
+
+=item B<--en-animal-not-in-json>=I<s>
+
+Only return records where the 'en_animal' field is not in the specified values (JSON-encoded).
+
+See C<--en-animal-not-in>.
+
+=item B<--en-animal-not-in>=I<s@>
+
+Only return records where the 'en_animal' field is not in the specified values.
+
+Can be specified multiple times.
+
+=item B<--en-animal-xmax>=I<s>
+
+Only return records where the 'en_animal' field is less than specified value.
+
+=item B<--en-animal-xmin>=I<s>
+
+Only return records where the 'en_animal' field is greater than specified value.
+
+=item B<--en-animal>=I<s>
+
+Only return records where the 'en_animal' field equals specified value.
+
+=back
+
+=head2 Filtering for end_date options
+
+=over
+
+=item B<--end-date-in-json>=I<s>
+
+Only return records where the 'end_date' field is in the specified values (JSON-encoded).
+
+See C<--end-date-in>.
+
+=item B<--end-date-in>=I<s@>
+
+Only return records where the 'end_date' field is in the specified values.
+
+Can be specified multiple times.
+
+=item B<--end-date-is>=I<s>
+
+Only return records where the 'end_date' field equals specified value.
+
+=item B<--end-date-isnt>=I<s>
+
+Only return records where the 'end_date' field does not equal specified value.
+
+=item B<--end-date-max>=I<s>
+
+Only return records where the 'end_date' field is less than or equal to specified value.
+
+=item B<--end-date-min>=I<s>
+
+Only return records where the 'end_date' field is greater than or equal to specified value.
+
+=item B<--end-date-not-in-json>=I<s>
+
+Only return records where the 'end_date' field is not in the specified values (JSON-encoded).
+
+See C<--end-date-not-in>.
+
+=item B<--end-date-not-in>=I<s@>
+
+Only return records where the 'end_date' field is not in the specified values.
+
+Can be specified multiple times.
+
+=item B<--end-date-xmax>=I<s>
+
+Only return records where the 'end_date' field is less than specified value.
+
+=item B<--end-date-xmin>=I<s>
+
+Only return records where the 'end_date' field is greater than specified value.
+
+=item B<--end-date>=I<s>
+
+Only return records where the 'end_date' field equals specified value.
+
+=back
+
+=head2 Filtering for heavenly_stem options
+
+=over
+
+=item B<--heavenly-stem-contains>=I<s>
+
+Only return records where the 'heavenly_stem' field contains specified text.
+
+=item B<--heavenly-stem-in-json>=I<s>
+
+Only return records where the 'heavenly_stem' field is in the specified values (JSON-encoded).
+
+See C<--heavenly-stem-in>.
+
+=item B<--heavenly-stem-in>=I<s@>
+
+Only return records where the 'heavenly_stem' field is in the specified values.
+
+Can be specified multiple times.
+
+=item B<--heavenly-stem-is>=I<s>
+
+Only return records where the 'heavenly_stem' field equals specified value.
+
+=item B<--heavenly-stem-isnt>=I<s>
+
+Only return records where the 'heavenly_stem' field does not equal specified value.
+
+=item B<--heavenly-stem-max>=I<s>
+
+Only return records where the 'heavenly_stem' field is less than or equal to specified value.
+
+=item B<--heavenly-stem-min>=I<s>
+
+Only return records where the 'heavenly_stem' field is greater than or equal to specified value.
+
+=item B<--heavenly-stem-not-contains>=I<s>
+
+Only return records where the 'heavenly_stem' field does not contain specified text.
+
+=item B<--heavenly-stem-not-in-json>=I<s>
+
+Only return records where the 'heavenly_stem' field is not in the specified values (JSON-encoded).
+
+See C<--heavenly-stem-not-in>.
+
+=item B<--heavenly-stem-not-in>=I<s@>
+
+Only return records where the 'heavenly_stem' field is not in the specified values.
+
+Can be specified multiple times.
+
+=item B<--heavenly-stem-xmax>=I<s>
+
+Only return records where the 'heavenly_stem' field is less than specified value.
+
+=item B<--heavenly-stem-xmin>=I<s>
+
+Only return records where the 'heavenly_stem' field is greater than specified value.
+
+=item B<--heavenly-stem>=I<s>
+
+Only return records where the 'heavenly_stem' field equals specified value.
+
+=back
+
+=head2 Filtering for start_date options
+
+=over
+
+=item B<--start-date-in-json>=I<s>
+
+Only return records where the 'start_date' field is in the specified values (JSON-encoded).
+
+See C<--start-date-in>.
+
+=item B<--start-date-in>=I<s@>
+
+Only return records where the 'start_date' field is in the specified values.
+
+Can be specified multiple times.
+
+=item B<--start-date-is>=I<s>
+
+Only return records where the 'start_date' field equals specified value.
+
+=item B<--start-date-isnt>=I<s>
+
+Only return records where the 'start_date' field does not equal specified value.
+
+=item B<--start-date-max>=I<s>
+
+Only return records where the 'start_date' field is less than or equal to specified value.
+
+=item B<--start-date-min>=I<s>
+
+Only return records where the 'start_date' field is greater than or equal to specified value.
+
+=item B<--start-date-not-in-json>=I<s>
+
+Only return records where the 'start_date' field is not in the specified values (JSON-encoded).
+
+See C<--start-date-not-in>.
+
+=item B<--start-date-not-in>=I<s@>
+
+Only return records where the 'start_date' field is not in the specified values.
+
+Can be specified multiple times.
+
+=item B<--start-date-xmax>=I<s>
+
+Only return records where the 'start_date' field is less than specified value.
+
+=item B<--start-date-xmin>=I<s>
+
+Only return records where the 'start_date' field is greater than specified value.
+
+=item B<--start-date>=I<s>
+
+Only return records where the 'start_date' field equals specified value.
+
+=back
+
+=head2 Filtering for yin_yang options
+
+=over
+
+=item B<--yin-yang-contains>=I<s>
+
+Only return records where the 'yin_yang' field contains specified text.
+
+=item B<--yin-yang-in-json>=I<s>
+
+Only return records where the 'yin_yang' field is in the specified values (JSON-encoded).
+
+See C<--yin-yang-in>.
+
+=item B<--yin-yang-in>=I<s@>
+
+Only return records where the 'yin_yang' field is in the specified values.
+
+Can be specified multiple times.
+
+=item B<--yin-yang-is>=I<s>
+
+Only return records where the 'yin_yang' field equals specified value.
+
+=item B<--yin-yang-isnt>=I<s>
+
+Only return records where the 'yin_yang' field does not equal specified value.
+
+=item B<--yin-yang-max>=I<s>
+
+Only return records where the 'yin_yang' field is less than or equal to specified value.
+
+=item B<--yin-yang-min>=I<s>
+
+Only return records where the 'yin_yang' field is greater than or equal to specified value.
+
+=item B<--yin-yang-not-contains>=I<s>
+
+Only return records where the 'yin_yang' field does not contain specified text.
+
+=item B<--yin-yang-not-in-json>=I<s>
+
+Only return records where the 'yin_yang' field is not in the specified values (JSON-encoded).
+
+See C<--yin-yang-not-in>.
+
+=item B<--yin-yang-not-in>=I<s@>
+
+Only return records where the 'yin_yang' field is not in the specified values.
+
+Can be specified multiple times.
+
+=item B<--yin-yang-xmax>=I<s>
+
+Only return records where the 'yin_yang' field is less than specified value.
+
+=item B<--yin-yang-xmin>=I<s>
+
+Only return records where the 'yin_yang' field is greater than specified value.
+
+=item B<--yin-yang>=I<s>
+
+Only return records where the 'yin_yang' field equals specified value.
+
+=back
+
+=head2 Filtering for zh_animal options
+
+=over
+
+=item B<--zh-animal-contains>=I<s>
+
+Only return records where the 'zh_animal' field contains specified text.
+
+=item B<--zh-animal-in-json>=I<s>
+
+Only return records where the 'zh_animal' field is in the specified values (JSON-encoded).
+
+See C<--zh-animal-in>.
+
+=item B<--zh-animal-in>=I<s@>
+
+Only return records where the 'zh_animal' field is in the specified values.
+
+Can be specified multiple times.
+
+=item B<--zh-animal-is>=I<s>
+
+Only return records where the 'zh_animal' field equals specified value.
+
+=item B<--zh-animal-isnt>=I<s>
+
+Only return records where the 'zh_animal' field does not equal specified value.
+
+=item B<--zh-animal-max>=I<s>
+
+Only return records where the 'zh_animal' field is less than or equal to specified value.
+
+=item B<--zh-animal-min>=I<s>
+
+Only return records where the 'zh_animal' field is greater than or equal to specified value.
+
+=item B<--zh-animal-not-contains>=I<s>
+
+Only return records where the 'zh_animal' field does not contain specified text.
+
+=item B<--zh-animal-not-in-json>=I<s>
+
+Only return records where the 'zh_animal' field is not in the specified values (JSON-encoded).
+
+See C<--zh-animal-not-in>.
+
+=item B<--zh-animal-not-in>=I<s@>
+
+Only return records where the 'zh_animal' field is not in the specified values.
+
+Can be specified multiple times.
+
+=item B<--zh-animal-xmax>=I<s>
+
+Only return records where the 'zh_animal' field is less than specified value.
+
+=item B<--zh-animal-xmin>=I<s>
+
+Only return records where the 'zh_animal' field is greater than specified value.
+
+=item B<--zh-animal>=I<s>
+
+Only return records where the 'zh_animal' field equals specified value.
+
+=back
+
+=head2 Filtering options
+
+=over
+
+=item B<--query>=I<s>, B<-q>
+
+Search.
+
+=back
+
+=head2 Ordering options
+
+=over
+
+=item B<--random>
+
+Return records in random order.
+
+=item B<--sort-json>=I<s>
+
+Order records according to certain field(s) (JSON-encoded).
+
+See C<--sort>.
+
+=item B<--sort>=I<s@>
+
+Order records according to certain field(s).
+
+A list of field names separated by comma. Each field can be prefixed with '-' to
+specify descending order instead of the default ascending.
+
+
+Can be specified multiple times.
+
+=back
+
+=head2 Output options
+
+=over
+
+=item B<--format>=I<s>
+
+Choose output format, e.g. json, text.
+
+Default value:
+
+ undef
+
+=item B<--json>
+
+Set output format to json.
+
+=item B<--naked-res>
+
+When outputing as JSON, strip result envelope.
+
+Default value:
+
+ 0
+
+By default, when outputing as JSON, the full enveloped result is returned, e.g.:
+
+    [200,"OK",[1,2,3],{"func.extra"=>4}]
+
+The reason is so you can get the status (1st element), status message (2nd
+element) as well as result metadata/extra result (4th element) instead of just
+the result (3rd element). However, sometimes you want just the result, e.g. when
+you want to pipe the result for more post-processing. In this case you can use
+`--naked-res` so you just get:
+
+    [1,2,3]
+
+
+=item B<--page-result>
+
+Filter output through a pager.
+
+=back
+
+=head2 Paging options
+
+=over
+
+=item B<--result-limit>=I<s>
+
+Only return a certain number of records.
+
+=item B<--result-start>=I<s>
+
+Only return starting from the n'th record.
+
+Default value:
+
+ 1
+
+=back
+
+=head2 Other options
+
+=over
+
+=item B<--help>, B<-h>, B<-?>
+
+Display help message and exit.
+
+=item B<--version>, B<-v>
+
+Display program's version and exit.
+
+=back
+
+=head1 COMPLETION
+
+This script has shell tab completion capability with support for several
+shells.
+
+=head2 bash
+
+To activate bash completion for this script, put:
+
+ complete -C list-chinese-zodiac-table list-chinese-zodiac-table
+
+in your bash startup (e.g. F<~/.bashrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is recommended, however, that you install modules using L<cpanm-shcompgen>
+which can activate shell completion for scripts immediately.
+
+=head2 tcsh
+
+To activate tcsh completion for this script, put:
+
+ complete list-chinese-zodiac-table 'p/*/`list-chinese-zodiac-table`/'
+
+in your tcsh startup (e.g. F<~/.tcshrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is also recommended to install L<shcompgen> (see above).
+
+=head2 other shells
+
+For fish and zsh, install L<shcompgen> as described above.
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/App-ZodiacUtils>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-App-ZodiacUtils>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-ZodiacUtils>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2020, 2019, 2016, 2015 by perlancar@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

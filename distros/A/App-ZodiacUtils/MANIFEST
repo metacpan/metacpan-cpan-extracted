@@ -8,9 +8,11 @@ Makefile.PL
 README
 dist.ini
 lib/App/ZodiacUtils.pm
+lib/App/ZodiacUtils/Table.pm
 script/_chinese-zodiac-of
 script/_zodiac-of
 script/chinese-zodiac-of
+script/list-chinese-zodiac-table
 script/zodiac-of
 t/00-compile.t
 t/author-critic.t

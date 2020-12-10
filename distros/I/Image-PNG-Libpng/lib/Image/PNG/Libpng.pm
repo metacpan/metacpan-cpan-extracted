@@ -84,14 +84,14 @@ our @EXPORT_OK = qw/
 	set_tIME
 	get_tRNS
 	set_tRNS
-read_png_file
-write_png_file
-color_type_name
-get_internals
-copy_png
-image_data_diff
-png_compare
-split_alpha
+	color_type_name
+	copy_png
+	get_internals
+	image_data_diff
+	png_compare
+	read_png_file
+	split_alpha
+	write_png_file
 /;
 
 our %EXPORT_TAGS = (
@@ -99,7 +99,7 @@ our %EXPORT_TAGS = (
 );
 
 require XSLoader;
-our $VERSION = '0.48';
+our $VERSION = '0.49';
 
 XSLoader::load('Image::PNG::Libpng', $VERSION);
 

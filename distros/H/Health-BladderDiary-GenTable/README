@@ -2,9 +2,9 @@ NAME
     Health::BladderDiary::GenTable - Create bladder diary table from entries
 
 VERSION
-    This document describes version 0.004 of Health::BladderDiary::GenTable
+    This document describes version 0.006 of Health::BladderDiary::GenTable
     (from Perl distribution Health-BladderDiary-GenTable), released on
-    2020-11-13.
+    2020-12-10.
 
 SYNOPSIS
     Your bladder entries e.g. in `bd-entry1.txt` (I usually write in Org
@@ -119,7 +119,7 @@ DESCRIPTION
 
      1230 u 200ml c2 u4
 
-  Drink entries
+  Drink (fluid intake) entries
     A drink (fluid intake) entry is an entry with event "drink" (can be
     written as just "d"). At least volume is required, can be written in ml
     unit e.g. "300ml", or using "vNUMBER" e.g. "v300", or using "vol" key,
@@ -131,6 +131,13 @@ DESCRIPTION
     specified, "water" is assumed. Example:
 
      1300 d 300ml type=coffee
+
+  Eat (food intake) entries
+    The diary can also contain food intake entries. Currently volume or
+    weight of food (or volume of fluid, by percentage of food volume) is not
+    measured or displayed. You can put comments here for more detailed
+    information. The table generator will create a row for each food intake,
+    but will just display the time, type ("food"), and comment columns.
 
 KEYWORDS
     voiding diary, bladder diary
@@ -147,7 +154,11 @@ FUNCTIONS
 
     Arguments ('*' denotes required arguments):
 
+    *   date => *date*
+
     *   entries* => *str*
+
+    *   yesterday_last_urination_entry => *str*
 
     Returns an enveloped result (an array).
 
@@ -170,8 +181,7 @@ SOURCE
 
 BUGS
     Please report any bugs or feature requests on the bugtracker website
-    <https://rt.cpan.org/Public/Dist/Display.html?Name=Health-BladderDiary-G
-    enTable>
+    <https://github.com/perlancar/perl-Health-BladderDiary-GenTable/issues>
 
     When submitting a bug or request, please include a test-file or a patch
     to an existing test-file that illustrates the bug or desired feature.

@@ -6,16 +6,18 @@ use warnings;
 
 use Test::More;
 
-plan tests => 5 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 7 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
-    'App/ZodiacUtils.pm'
+    'App/ZodiacUtils.pm',
+    'App/ZodiacUtils/Table.pm'
 );
 
 my @scripts = (
     'script/_chinese-zodiac-of',
     'script/_zodiac-of',
     'script/chinese-zodiac-of',
+    'script/list-chinese-zodiac-table',
     'script/zodiac-of'
 );
 

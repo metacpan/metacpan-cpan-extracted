@@ -63,6 +63,7 @@ has default => sub {
     module => 'Guest',
     #~ import => [qw(load_guest)],
   },
+  
   log=>{
     namespace => PKG,
     module => 'Log',
@@ -163,7 +164,7 @@ sub register {
     $access->apply_route($_) for $oauth->_routes;
   }
   
-  if ($self->conf->{admin} && ref $self->conf->{admin} eq 'HASH' && keys %{$self->conf->{admin}}) {
+  if ($self->conf->{admin} && ref($self->conf->{admin} eq 'HASH') && keys(%{$self->conf->{admin}})) {
     my $admin = $self->admin;
     $access->apply_route($_) for $admin->self_routes;
   }
@@ -360,7 +361,7 @@ sub model {
   
 };
 
-our $VERSION = '0.872';
+our $VERSION = '0.880';
 
 =pod
 
@@ -376,7 +377,7 @@ Plugin makes an auth operations throught the plugin L<Mojolicious::Plugin::Authe
 
 =head1 VERSION
 
-0.872
+0.880
 
 =head1 NAME
 

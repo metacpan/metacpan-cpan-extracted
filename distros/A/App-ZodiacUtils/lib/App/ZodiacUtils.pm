@@ -1,9 +1,9 @@
 package App::ZodiacUtils;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-08-28'; # DATE
+our $DATE = '2020-09-14'; # DATE
 our $DIST = 'App-ZodiacUtils'; # DIST
-our $VERSION = '0.114'; # VERSION
+our $VERSION = '0.115'; # VERSION
 
 use 5.010001;
 use strict;
@@ -146,7 +146,7 @@ App::ZodiacUtils - CLI utilities related to zodiac
 
 =head1 VERSION
 
-This document describes version 0.114 of App::ZodiacUtils (from Perl distribution App-ZodiacUtils), released on 2020-08-28.
+This document describes version 0.115 of App::ZodiacUtils (from Perl distribution App-ZodiacUtils), released on 2020-09-14.
 
 =head1 DESCRIPTION
 
@@ -155,6 +155,8 @@ This distribution includes the following CLI utilities:
 =over
 
 =item * L<chinese-zodiac-of>
+
+=item * L<list-chinese-zodiac-table>
 
 =item * L<zodiac-of>
 

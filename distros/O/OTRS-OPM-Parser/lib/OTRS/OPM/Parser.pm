@@ -2,7 +2,7 @@ package OTRS::OPM::Parser;
 
 # ABSTRACT: Parser for the .opm file
 
-our $VERSION = 1.02;
+our $VERSION = 1.04;
 
 use Moo;
 use MooX::HandlesVia;
@@ -14,6 +14,7 @@ use Try::Tiny;
 use XML::LibXML;
 
 # declare attributes
+has product      => ( is  => 'rw', isa => Str, );
 has name         => ( is  => 'rw', isa => Str, );
 has version      => ( is  => 'rw', isa => VersionString, );
 has vendor       => ( is  => 'rw', isa => Str, );
@@ -186,6 +187,11 @@ sub parse {
     $self->license(   $root->findvalue( 'License' ) );
     $self->version(   $root->findvalue( 'Version' ) );
     $self->url(       $root->findvalue( 'URL' ) );
+
+    my $root_name = $root->nodeName;
+    $root_name    =~ s{_package}{};
+
+    $self->product( $root_name );
     
     # retrieve framework information
     my @frameworks = $root->findnodes( 'Framework' );
@@ -299,506 +305,415 @@ sub _get_xsd {
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
     <xs:import namespace="http://www.w3.org/XML/1998/namespace"/>
     
-    <xs:element name="otrs_package">
-        <xs:complexType>
-            <xs:all>
-                <xs:element ref="CVS" minOccurs="0" maxOccurs="1"/>
-                <xs:element ref="Name" minOccurs="1" maxOccurs="1"/>
-                <xs:element ref="Version" maxOccurs="1"/>
-                <xs:element ref="Vendor" maxOccurs="1"/>
-                <xs:element ref="URL" maxOccurs="1"/>
-                <xs:element ref="License" maxOccurs="1"/>
-                <xs:element ref="ChangeLog" minOccurs="0" />
-                <xs:element ref="Description" maxOccurs="unbounded" />
-                <xs:element ref="Framework" maxOccurs="unbounded" />
-                <xs:element ref="OS" minOccurs="0" maxOccurs="unbounded" />
-                <xs:element ref="IntroInstall" minOccurs="0" maxOccurs="unbounded" />
-                <xs:element ref="IntroUninstall" minOccurs="0" maxOccurs="unbounded" />
-                <xs:element ref="IntroReinstall" minOccurs="0" maxOccurs="unbounded" />
-                <xs:element ref="IntroUpgrade" minOccurs="0" maxOccurs="unbounded" />
-                <xs:element ref="PackageRequired" minOccurs="0" maxOccurs="unbounded" />
-                <xs:element ref="ModuleRequired" minOccurs="0" maxOccurs="unbounded" />
-                <xs:element ref="CodeInstall" minOccurs="0" maxOccurs="unbounded" />
-                <xs:element ref="CodeUpgrade" minOccurs="0" maxOccurs="unbounded" />
-                <xs:element ref="CodeUninstall" minOccurs="0" maxOccurs="unbounded" />
-                <xs:element ref="CodeReinstall" minOccurs="0" maxOccurs="unbounded" />
-                <xs:element ref="BuildDate" minOccurs="0" maxOccurs="1" />
-                <xs:element ref="BuildHost" minOccurs="0" maxOccurs="1"/>
-                <xs:element ref="Filelist" minOccurs="1" maxOccurs="1"/>
-                <xs:element ref="DatabaseInstall" minOccurs="0" maxOccurs="unbounded" />
-                <xs:element ref="DatabaseUpgrade" minOccurs="0" maxOccurs="unbounded" />
-                <xs:element ref="DatabaseReinstall" minOccurs="0" maxOccurs="unbounded" />
-                <xs:element ref="DatabaseUninstall" minOccurs="0" maxOccurs="unbounded" />
-            </xs:all>
-            <xs:attribute name="version" use="required" type="xs:anySimpleType"/>
-        </xs:complexType>
-    </xs:element>
-    
-    <xs:element name="ChangeLog">
-        <xs:complexType>
-            <xs:simpleContent>
-                <xs:extension base="xs:string">
-                    <xs:attribute name="Date" use="required" type="xs:anySimpleType"/>
-                    <xs:attribute name="Version" use="required" type="xs:anySimpleType"/>
-                </xs:extension>
-            </xs:simpleContent>
-        </xs:complexType>
-    </xs:element>
-    
-    <xs:element name="Description">
-        <xs:complexType>
-            <xs:simpleContent>
-                <xs:extension base="xs:string">
-                    <xs:attribute name="Lang" use="optional" type="xs:anySimpleType"/>
-                    <xs:attribute name="Format" use="optional" type="xs:anySimpleType"/>
-                    <xs:attribute name="Translatable" use="optional" type="xs:anySimpleType"/>
-                </xs:extension>
-            </xs:simpleContent>
-        </xs:complexType>
-    </xs:element>
-    
-    <xs:element name="Framework">
-        <xs:complexType>
-            <xs:simpleContent>
-                <xs:extension base="xs:string">
-                    <xs:attribute name="Minimum" use="optional" type="xs:anySimpleType"/>
-                    <xs:attribute name="Maximum" use="optional" type="xs:anySimpleType"/>
-                </xs:extension>
-            </xs:simpleContent>
-        </xs:complexType>
-    </xs:element>
+    <xs:element name="otrs_package" type="Package"/>
+    <xs:element name="otobo_package" type="Package" />
 
-    <xs:element name="Filelist">
-        <xs:complexType>
-            <xs:sequence>
-                <xs:element ref="File" maxOccurs="unbounded" />
-            </xs:sequence>
-        </xs:complexType>
-    </xs:element>
+    <xs:complexType name="Package">
+        <xs:all>
+            <xs:element name="CVS" minOccurs="0" maxOccurs="1" type="xs:token"/>
+            <xs:element name="Name" minOccurs="1" maxOccurs="1" type="xs:token"/>
+            <xs:element name="Version" maxOccurs="1" type="xs:token"/>
+            <xs:element name="Vendor" maxOccurs="1" type="xs:token"/>
+            <xs:element name="URL" maxOccurs="1" type="xs:token"/>
+            <xs:element name="License" maxOccurs="1" type="xs:token"/>
+            <xs:element name="ChangeLog" minOccurs="0" type="ChangeLog" />
+            <xs:element name="Description" maxOccurs="unbounded" type="Description" />
+            <xs:element name="Framework" maxOccurs="unbounded" type="Framework" />
+            <xs:element name="OS" minOccurs="0" maxOccurs="unbounded" type="xs:token"/>
+            <xs:element name="IntroInstall" minOccurs="0" maxOccurs="unbounded" type="IntroInstall"/>
+            <xs:element name="IntroUninstall" minOccurs="0" maxOccurs="unbounded" type="IntroUninstall"/>
+            <xs:element name="IntroReinstall" minOccurs="0" maxOccurs="unbounded" type="IntroReinstall"/>
+            <xs:element name="IntroUpgrade" minOccurs="0" maxOccurs="unbounded" type="IntroUpgrade"/>
+            <xs:element name="PackageRequired" minOccurs="0" maxOccurs="unbounded" type="PackageRequired"/>
+            <xs:element name="ModuleRequired" minOccurs="0" maxOccurs="unbounded" type="ModuleRequired"/>
+            <xs:element name="CodeInstall" minOccurs="0" maxOccurs="unbounded" type="CodeInstall"/>
+            <xs:element name="CodeUpgrade" minOccurs="0" maxOccurs="unbounded" type="CodeUpgrade" />
+            <xs:element name="CodeUninstall" minOccurs="0" maxOccurs="unbounded" type="CodeUninstall" />
+            <xs:element name="CodeReinstall" minOccurs="0" maxOccurs="unbounded" type="CodeReinstall" />
+            <xs:element name="BuildDate" minOccurs="0" maxOccurs="1" type="xs:token"/>
+            <xs:element name="BuildHost" minOccurs="0" maxOccurs="1" type="xs:token"/>
+            <xs:element name="Filelist" minOccurs="1" maxOccurs="1" type="Filelist"/>
+            <xs:element name="DatabaseInstall" minOccurs="0" maxOccurs="unbounded" type="DatabaseInstall" />
+            <xs:element name="DatabaseUpgrade" minOccurs="0" maxOccurs="unbounded" type="DatabaseUpgrade" />
+            <xs:element name="DatabaseReinstall" minOccurs="0" maxOccurs="unbounded" type="DatabaseReinstall" />
+            <xs:element name="DatabaseUninstall" minOccurs="0" maxOccurs="unbounded" type="DatabaseUninstall" />
+        </xs:all>
+        <xs:attribute name="version" use="required" type="xs:anySimpleType"/>
+    </xs:complexType>
     
-    <xs:element name="File">
-        <xs:complexType>
-            <xs:simpleContent>
-                <xs:extension base="xs:string">
-                    <xs:attribute name="Location" use="required" type="xs:anySimpleType"/>
-                    <xs:attribute name="Permission" use="required" type="xs:anySimpleType"/>
-                    <xs:attribute name="Encode" use="required" type="xs:anySimpleType"/>
-                </xs:extension>
-            </xs:simpleContent>
-        </xs:complexType>
-    </xs:element>
+    <xs:complexType name="ChangeLog">
+        <xs:simpleContent>
+            <xs:extension base="xs:string">
+                <xs:attribute name="Date" use="required" type="xs:anySimpleType"/>
+                <xs:attribute name="Version" use="required" type="xs:anySimpleType"/>
+            </xs:extension>
+        </xs:simpleContent>
+    </xs:complexType>
     
-    <xs:element name="PackageRequired">
-        <xs:complexType>
-            <xs:simpleContent>
-                <xs:extension base="xs:string">
-                    <xs:attribute name="Version" use="required" type="xs:anySimpleType"/>
-                </xs:extension>
-            </xs:simpleContent>
-        </xs:complexType>
-    </xs:element>
+    <xs:complexType name="Description">
+        <xs:simpleContent>
+            <xs:extension base="xs:string">
+                <xs:attribute name="Lang" use="optional" type="xs:anySimpleType"/>
+                <xs:attribute name="Format" use="optional" type="xs:anySimpleType"/>
+                <xs:attribute name="Translatable" use="optional" type="xs:anySimpleType"/>
+            </xs:extension>
+        </xs:simpleContent>
+    </xs:complexType>
     
-    <xs:element name="ModuleRequired">
-        <xs:complexType>
-            <xs:simpleContent>
-                <xs:extension base="xs:string">
-                    <xs:attribute name="Version" use="required" type="xs:anySimpleType"/>
-                </xs:extension>
-            </xs:simpleContent>
-        </xs:complexType>
-    </xs:element>
+    <xs:complexType name="Framework">
+        <xs:simpleContent>
+            <xs:extension base="xs:string">
+                <xs:attribute name="Minimum" use="optional" type="xs:anySimpleType"/>
+                <xs:attribute name="Maximum" use="optional" type="xs:anySimpleType"/>
+            </xs:extension>
+        </xs:simpleContent>
+    </xs:complexType>
+
+    <xs:complexType name="Filelist">
+        <xs:sequence>
+            <xs:element name="File" maxOccurs="unbounded" type="File" />
+        </xs:sequence>
+    </xs:complexType>
     
-    <xs:element name="IntroInstall">
-        <xs:complexType>
-            <xs:simpleContent>
-                <xs:extension base="xs:string">
-                    <xs:attribute name="Type" use="required" type="xs:anySimpleType"/>
-                    <xs:attribute name="Lang" use="optional" type="xs:anySimpleType"/>
-                    <xs:attribute name="Title" use="optional" type="xs:anySimpleType"/>
-                    <xs:attribute name="Translatable" use="optional" type="xs:anySimpleType"/>
-                    <xs:attribute name="Format" use="optional" type="xs:anySimpleType"/>
-                </xs:extension>
-            </xs:simpleContent>
-        </xs:complexType>
-    </xs:element>
-    <xs:element name="IntroUninstall">
-        <xs:complexType>
-            <xs:simpleContent>
-                <xs:extension base="xs:string">
-                    <xs:attribute name="Type" use="required" type="xs:anySimpleType"/>
-                    <xs:attribute name="Lang" use="optional" type="xs:anySimpleType"/>
-                    <xs:attribute name="Title" use="optional" type="xs:anySimpleType"/>
-                    <xs:attribute name="Translatable" use="optional" type="xs:anySimpleType"/>
-                    <xs:attribute name="Format" use="optional" type="xs:anySimpleType"/>
-                </xs:extension>
-            </xs:simpleContent>
-        </xs:complexType>
-    </xs:element>
-    <xs:element name="IntroReinstall">
-        <xs:complexType>
-            <xs:simpleContent>
-                <xs:extension base="xs:string">
-                    <xs:attribute name="Type" use="required" type="xs:anySimpleType"/>
-                    <xs:attribute name="Lang" use="optional" type="xs:anySimpleType"/>
-                    <xs:attribute name="Title" use="optional" type="xs:anySimpleType"/>
-                    <xs:attribute name="Translatable" use="optional" type="xs:anySimpleType"/>
-                    <xs:attribute name="Format" use="optional" type="xs:anySimpleType"/>
-                </xs:extension>
-            </xs:simpleContent>
-        </xs:complexType>
-    </xs:element>
-    <xs:element name="IntroUpgrade">
-        <xs:complexType>
-            <xs:simpleContent>
-                <xs:extension base="xs:string">
-                    <xs:attribute name="Type" use="required" type="xs:anySimpleType"/>
-                    <xs:attribute name="Lang" use="optional" type="xs:anySimpleType"/>
-                    <xs:attribute name="Title" use="optional" type="xs:anySimpleType"/>
-                    <xs:attribute name="Translatable" use="optional" type="xs:anySimpleType"/>
-                    <xs:attribute name="Version" use="optional" type="xs:anySimpleType"/>
-                    <xs:attribute name="Format" use="optional" type="xs:anySimpleType"/>
-                </xs:extension>
-            </xs:simpleContent>
-        </xs:complexType>
-    </xs:element>
+    <xs:complexType name="File">
+        <xs:simpleContent>
+            <xs:extension base="xs:string">
+                <xs:attribute name="Location" use="required" type="xs:anySimpleType"/>
+                <xs:attribute name="Permission" use="required" type="xs:anySimpleType"/>
+                <xs:attribute name="Encode" use="required" type="xs:anySimpleType"/>
+            </xs:extension>
+        </xs:simpleContent>
+    </xs:complexType>
     
-    <xs:element name="CodeInstall">
-        <xs:complexType>
-            <xs:simpleContent>
-                <xs:extension base="xs:string">
-                    <xs:attribute name="Type" use="optional" type="xs:anySimpleType"/>
-                </xs:extension>
-            </xs:simpleContent>
-        </xs:complexType>
-    </xs:element>
-    <xs:element name="CodeUninstall">
-        <xs:complexType>
-            <xs:simpleContent>
-                <xs:extension base="xs:string">
-                    <xs:attribute name="Type" use="optional" type="xs:anySimpleType"/>
-                </xs:extension>
-            </xs:simpleContent>
-        </xs:complexType>
-    </xs:element>
-    <xs:element name="CodeReinstall">
-        <xs:complexType>
-            <xs:simpleContent>
-                <xs:extension base="xs:string">
-                    <xs:attribute name="Type" use="optional" type="xs:anySimpleType"/>
-                </xs:extension>
-            </xs:simpleContent>
-        </xs:complexType>
-    </xs:element>
-    <xs:element name="CodeUpgrade">
-        <xs:complexType>
-            <xs:simpleContent>
-                <xs:extension base="xs:string">
-                    <xs:attribute name="Type" use="optional" type="xs:anySimpleType"/>
-                    <xs:attribute name="Version" use="optional" type="xs:anySimpleType"/>
-                </xs:extension>
-            </xs:simpleContent>
-        </xs:complexType>
-    </xs:element>
+    <xs:complexType name="PackageRequired">
+        <xs:simpleContent>
+            <xs:extension base="xs:string">
+                <xs:attribute name="Version" use="required" type="xs:anySimpleType"/>
+            </xs:extension>
+        </xs:simpleContent>
+    </xs:complexType>
     
-    <xs:element name="CVS" type="xs:token"/>
-    <xs:element name="Name" type="xs:token"/>
-    <xs:element name="Vendor" type="xs:token"/>
-    <xs:element name="URL" type="xs:token"/>
-    <xs:element name="Version" type="xs:token"/>
-    <xs:element name="License" type="xs:token"/>
-    <xs:element name="OS" type="xs:token"/>
-    <xs:element name="BuildDate" type="xs:token"/>
-    <xs:element name="BuildHost" type="xs:token"/>
+    <xs:complexType name="ModuleRequired">
+        <xs:simpleContent>
+            <xs:extension base="xs:string">
+                <xs:attribute name="Version" use="required" type="xs:anySimpleType"/>
+            </xs:extension>
+        </xs:simpleContent>
+    </xs:complexType>
     
+    <xs:complexType name="IntroInstall">
+        <xs:simpleContent>
+            <xs:extension base="xs:string">
+                <xs:attribute name="Type" use="required" type="xs:anySimpleType"/>
+                <xs:attribute name="Lang" use="optional" type="xs:anySimpleType"/>
+                <xs:attribute name="Title" use="optional" type="xs:anySimpleType"/>
+                <xs:attribute name="Translatable" use="optional" type="xs:anySimpleType"/>
+                <xs:attribute name="Format" use="optional" type="xs:anySimpleType"/>
+            </xs:extension>
+        </xs:simpleContent>
+    </xs:complexType>
+    <xs:complexType name="IntroUninstall">
+        <xs:simpleContent>
+            <xs:extension base="xs:string">
+                <xs:attribute name="Type" use="required" type="xs:anySimpleType"/>
+                <xs:attribute name="Lang" use="optional" type="xs:anySimpleType"/>
+                <xs:attribute name="Title" use="optional" type="xs:anySimpleType"/>
+                <xs:attribute name="Translatable" use="optional" type="xs:anySimpleType"/>
+                <xs:attribute name="Format" use="optional" type="xs:anySimpleType"/>
+            </xs:extension>
+        </xs:simpleContent>
+    </xs:complexType>
+    <xs:complexType name="IntroReinstall">
+        <xs:simpleContent>
+            <xs:extension base="xs:string">
+                <xs:attribute name="Type" use="required" type="xs:anySimpleType"/>
+                <xs:attribute name="Lang" use="optional" type="xs:anySimpleType"/>
+                <xs:attribute name="Title" use="optional" type="xs:anySimpleType"/>
+                <xs:attribute name="Translatable" use="optional" type="xs:anySimpleType"/>
+                <xs:attribute name="Format" use="optional" type="xs:anySimpleType"/>
+            </xs:extension>
+        </xs:simpleContent>
+    </xs:complexType>
+    <xs:complexType name="IntroUpgrade">
+        <xs:simpleContent>
+            <xs:extension base="xs:string">
+                <xs:attribute name="Type" use="required" type="xs:anySimpleType"/>
+                <xs:attribute name="Lang" use="optional" type="xs:anySimpleType"/>
+                <xs:attribute name="Title" use="optional" type="xs:anySimpleType"/>
+                <xs:attribute name="Translatable" use="optional" type="xs:anySimpleType"/>
+                <xs:attribute name="Version" use="optional" type="xs:anySimpleType"/>
+                <xs:attribute name="Format" use="optional" type="xs:anySimpleType"/>
+            </xs:extension>
+        </xs:simpleContent>
+    </xs:complexType>
+    
+    <xs:complexType name="CodeInstall">
+        <xs:simpleContent>
+            <xs:extension base="xs:string">
+                <xs:attribute name="Type" use="optional" type="xs:anySimpleType"/>
+            </xs:extension>
+        </xs:simpleContent>
+    </xs:complexType>
+    <xs:complexType name="CodeUninstall">
+        <xs:simpleContent>
+            <xs:extension base="xs:string">
+                <xs:attribute name="Type" use="optional" type="xs:anySimpleType"/>
+            </xs:extension>
+        </xs:simpleContent>
+    </xs:complexType>
+    <xs:complexType name="CodeReinstall">
+        <xs:simpleContent>
+            <xs:extension base="xs:string">
+                <xs:attribute name="Type" use="optional" type="xs:anySimpleType"/>
+            </xs:extension>
+        </xs:simpleContent>
+    </xs:complexType>
+    <xs:complexType name="CodeUpgrade">
+        <xs:simpleContent>
+            <xs:extension base="xs:string">
+                <xs:attribute name="Type" use="optional" type="xs:anySimpleType"/>
+                <xs:attribute name="Version" use="optional" type="xs:anySimpleType"/>
+            </xs:extension>
+        </xs:simpleContent>
+    </xs:complexType>
     
     <!--                -->
     <!-- Database stuff -->
     <!--                -->
     
-    <xs:element name="DatabaseInstall">
-        <xs:complexType>
-            <xs:choice maxOccurs="unbounded">
-                <xs:element ref="TableCreate" minOccurs="0" maxOccurs="unbounded" />
-                <xs:element ref="TableAlter" minOccurs="0" maxOccurs="unbounded" />
-                <xs:element ref="Insert" minOccurs="0" maxOccurs="unbounded" />
-            </xs:choice>
-            <xs:attribute name="Type" use="optional" type="xs:anySimpleType"/>
-        </xs:complexType>
-    </xs:element>
-    <xs:element name="DatabaseUninstall">
-        <xs:complexType>
-            <xs:choice maxOccurs="unbounded">
-                <xs:element ref="TableDrop" minOccurs="0" maxOccurs="unbounded" />
-                <xs:element ref="TableAlter" minOccurs="0" maxOccurs="unbounded" />
-            </xs:choice>
-            <xs:attribute name="Type" use="optional" type="xs:anySimpleType"/>
-        </xs:complexType>
-    </xs:element>
-    <xs:element name="DatabaseReinstall">
-        <xs:complexType>
-            <xs:simpleContent>
-                <xs:extension base="xs:string">
-                    <xs:attribute name="Type" use="optional" type="xs:anySimpleType"/>
-                </xs:extension>
-            </xs:simpleContent>
-        </xs:complexType>
-    </xs:element>
-    <xs:element name="DatabaseUpgrade">
-        <xs:complexType>
-            <xs:choice maxOccurs="unbounded">
-                <xs:element ref="TableCreate" minOccurs="0" maxOccurs="unbounded" />
-                <xs:element ref="TableAlter" minOccurs="0" maxOccurs="unbounded" />
-                <xs:element ref="Insert" minOccurs="0" maxOccurs="unbounded" />
-            </xs:choice>
-            <xs:attribute name="Type" use="optional" type="xs:anySimpleType"/>
-            <xs:attribute name="Version" use="optional" type="xs:anySimpleType"/>
-        </xs:complexType>
-    </xs:element>
+    <xs:complexType name="DatabaseInstall">
+        <xs:choice maxOccurs="unbounded">
+            <xs:element name="TableCreate" minOccurs="0" maxOccurs="unbounded" type="TableCreate" />
+            <xs:element name="TableAlter" minOccurs="0" maxOccurs="unbounded" type="TableAlter" />
+            <xs:element name="Insert" minOccurs="0" maxOccurs="unbounded" type="Insert" />
+        </xs:choice>
+        <xs:attribute name="Type" use="optional" type="xs:anySimpleType"/>
+    </xs:complexType>
+    <xs:complexType name="DatabaseUninstall">
+        <xs:choice maxOccurs="unbounded">
+            <xs:element name="TableDrop" minOccurs="0" maxOccurs="unbounded" type="TableDrop" />
+            <xs:element name="TableAlter" minOccurs="0" maxOccurs="unbounded" type="TableAlter" />
+        </xs:choice>
+        <xs:attribute name="Type" use="optional" type="xs:anySimpleType"/>
+    </xs:complexType>
+    <xs:complexType name="DatabaseReinstall">
+        <xs:simpleContent>
+            <xs:extension base="xs:string">
+                <xs:attribute name="Type" use="optional" type="xs:anySimpleType"/>
+            </xs:extension>
+        </xs:simpleContent>
+    </xs:complexType>
+    <xs:complexType name="DatabaseUpgrade">
+        <xs:choice maxOccurs="unbounded">
+            <xs:element name="TableCreate" minOccurs="0" maxOccurs="unbounded" type="TableCreate"/>
+            <xs:element name="TableAlter" minOccurs="0" maxOccurs="unbounded" type="TableAlter"/>
+            <xs:element name="Insert" minOccurs="0" maxOccurs="unbounded" type="Insert"/>
+        </xs:choice>
+        <xs:attribute name="Type" use="optional" type="xs:anySimpleType"/>
+        <xs:attribute name="Version" use="optional" type="xs:anySimpleType"/>
+    </xs:complexType>
     
-    <xs:element name="TableCreate">
-        <xs:complexType>
-            <xs:choice maxOccurs="unbounded">
-                <xs:element ref="Column" maxOccurs="unbounded" />
-                <xs:element ref="ForeignKey" minOccurs="0" maxOccurs="unbounded" />
-                <xs:element ref="Index" minOccurs="0" maxOccurs="unbounded" />
-                <xs:element ref="Unique" minOccurs="0" maxOccurs="unbounded" />
-            </xs:choice>
-            <xs:attribute name="Type" use="optional" type="xs:anySimpleType"/>
-            <xs:attribute name="Name" use="optional" type="xs:anySimpleType"/>
-            <xs:attribute name="Version" use="optional" type="xs:anySimpleType"/>
-        </xs:complexType>
-    </xs:element>
+    <xs:complexType name="TableCreate">
+        <xs:choice maxOccurs="unbounded">
+            <xs:element name="Column" maxOccurs="unbounded" type="Column"/>
+            <xs:element name="ForeignKey" minOccurs="0" maxOccurs="unbounded" type="ForeignKey"/>
+            <xs:element name="Index" minOccurs="0" maxOccurs="unbounded" type="Index"/>
+            <xs:element name="Unique" minOccurs="0" maxOccurs="unbounded" type="Unique"/>
+        </xs:choice>
+        <xs:attribute name="Type" use="optional" type="xs:anySimpleType"/>
+        <xs:attribute name="Name" use="optional" type="xs:anySimpleType"/>
+        <xs:attribute name="Version" use="optional" type="xs:anySimpleType"/>
+    </xs:complexType>
+
+    <xs:complexType name="TableAlter">
+        <xs:choice maxOccurs="unbounded">
+            <xs:element name="ColumnAdd" minOccurs="0" maxOccurs="unbounded" type="ColumnAdd"/>
+            <xs:element name="ColumnChange" minOccurs="0" maxOccurs="unbounded" type="ColumnChange"/>
+            <xs:element name="ColumnDrop" minOccurs="0" maxOccurs="unbounded" type="ColumnDrop"/>
+            <xs:element name="ForeignKeyCreate" minOccurs="0" maxOccurs="unbounded" type="ForeignKeyCreate"/>
+            <xs:element name="ForeignKeyDrop" minOccurs="0" maxOccurs="unbounded" type="ForeignKeyDrop"/>
+            <xs:element name="IndexCreate" minOccurs="0" maxOccurs="unbounded" type="IndexCreate"/>
+            <xs:element name="IndexDrop" minOccurs="0" maxOccurs="unbounded" type="IndexDrop"/>
+            <xs:element name="UniqueCreate" minOccurs="0" maxOccurs="unbounded" type="UniqueCreate"/>
+            <xs:element name="UniqueDrop" minOccurs="0" maxOccurs="unbounded" type="UniqueDrop"/>
+        </xs:choice>
+        <xs:attribute name="Type" use="optional" type="xs:anySimpleType"/>
+        <xs:attribute name="Name" use="optional" type="xs:anySimpleType"/>
+        <xs:attribute name="Version" use="optional" type="xs:anySimpleType"/>
+    </xs:complexType>
     
-    <xs:element name="TableAlter">
-        <xs:complexType>
-            <xs:choice maxOccurs="unbounded">
-                <xs:element ref="ColumnAdd" minOccurs="0" maxOccurs="unbounded" />
-                <xs:element ref="ColumnChange" minOccurs="0" maxOccurs="unbounded" />
-                <xs:element ref="ColumnDrop" minOccurs="0" maxOccurs="unbounded" />
-                <xs:element ref="ForeignKeyCreate" minOccurs="0" maxOccurs="unbounded" />
-                <xs:element ref="ForeignKeyDrop" minOccurs="0" maxOccurs="unbounded" />
-                <xs:element ref="IndexCreate" minOccurs="0" maxOccurs="unbounded" />
-                <xs:element ref="IndexDrop" minOccurs="0" maxOccurs="unbounded" />
-                <xs:element ref="UniqueCreate" minOccurs="0" maxOccurs="unbounded" />
-                <xs:element ref="UniqueDrop" minOccurs="0" maxOccurs="unbounded" />
-            </xs:choice>
-            <xs:attribute name="Type" use="optional" type="xs:anySimpleType"/>
-            <xs:attribute name="Name" use="optional" type="xs:anySimpleType"/>
-            <xs:attribute name="Version" use="optional" type="xs:anySimpleType"/>
-        </xs:complexType>
-    </xs:element>
-    
-    <xs:element name="TableDrop">
-        <xs:complexType>
-            <xs:simpleContent>
-                <xs:extension base="xs:string">
-                    <xs:attribute name="Name" use="required" type="xs:anySimpleType"/>
-                    <xs:attribute name="Type" use="optional" type="xs:anySimpleType"/>
-                </xs:extension>
-            </xs:simpleContent>
-        </xs:complexType>
-    </xs:element>
+    <xs:complexType name="TableDrop">
+        <xs:simpleContent>
+            <xs:extension base="xs:string">
+                <xs:attribute name="Name" use="required" type="xs:anySimpleType"/>
+                <xs:attribute name="Type" use="optional" type="xs:anySimpleType"/>
+            </xs:extension>
+        </xs:simpleContent>
+    </xs:complexType>
     
     <!-- Columns -->
     
-    <xs:element name="Column">
-        <xs:complexType>
-            <xs:simpleContent>
-                <xs:extension base="xs:string">
-                    <xs:attribute name="Type" use="optional" type="xs:anySimpleType"/>
-                    <xs:attribute name="AutoIncrement" use="optional" type="xs:anySimpleType"/>
-                    <xs:attribute name="Name" use="required" type="xs:anySimpleType"/>
-                    <xs:attribute name="Required" use="optional" type="xs:anySimpleType"/>
-                    <xs:attribute name="Size" use="optional" type="xs:anySimpleType"/>
-                    <xs:attribute name="PrimaryKey" use="optional" type="xs:anySimpleType"/>
-                    <xs:attribute name="Default" use="optional" type="xs:anySimpleType"/>
-                </xs:extension>
-            </xs:simpleContent>
-        </xs:complexType>
-    </xs:element>
-    <xs:element name="ColumnAdd">
-        <xs:complexType>
-            <xs:simpleContent>
-                <xs:extension base="xs:string">
-                    <xs:attribute name="Type" use="optional" type="xs:anySimpleType"/>
-                    <xs:attribute name="AutoIncrement" use="optional" type="xs:anySimpleType"/>
-                    <xs:attribute name="Name" use="required" type="xs:anySimpleType"/>
-                    <xs:attribute name="Required" use="optional" type="xs:anySimpleType"/>
-                    <xs:attribute name="Size" use="optional" type="xs:anySimpleType"/>
-                    <xs:attribute name="PrimaryKey" use="optional" type="xs:anySimpleType"/>
-                    <xs:attribute name="Default" use="optional" type="xs:anySimpleType"/>
-                </xs:extension>
-            </xs:simpleContent>
-        </xs:complexType>
-    </xs:element>
-    <xs:element name="ColumnChange">
-        <xs:complexType>
-            <xs:simpleContent>
-                <xs:extension base="xs:string">
-                    <xs:attribute name="Type" use="optional" type="xs:anySimpleType"/>
-                    <xs:attribute name="Default" use="optional" type="xs:anySimpleType"/>
-                    <xs:attribute name="NameOld" use="optional" type="xs:anySimpleType"/>
-                    <xs:attribute name="NameNew" use="optional" type="xs:anySimpleType"/>
-                    <xs:attribute name="AutoIncrement" use="optional" type="xs:anySimpleType"/>
-                    <xs:attribute name="Required" use="optional" type="xs:anySimpleType"/>
-                    <xs:attribute name="Size" use="optional" type="xs:anySimpleType"/>
-                    <xs:attribute name="PrimaryKey" use="optional" type="xs:anySimpleType"/>
-                </xs:extension>
-            </xs:simpleContent>
-        </xs:complexType>
-    </xs:element>
-    <xs:element name="ColumnDrop">
-        <xs:complexType>
-            <xs:attribute name="Name" use="required" type="xs:anySimpleType"/>
-        </xs:complexType>
-    </xs:element>
+    <xs:complexType name="Column">
+        <xs:simpleContent>
+            <xs:extension base="xs:string">
+                <xs:attribute name="Type" use="optional" type="xs:anySimpleType"/>
+                <xs:attribute name="AutoIncrement" use="optional" type="xs:anySimpleType"/>
+                <xs:attribute name="Name" use="required" type="xs:anySimpleType"/>
+                <xs:attribute name="Required" use="optional" type="xs:anySimpleType"/>
+                <xs:attribute name="Size" use="optional" type="xs:anySimpleType"/>
+                <xs:attribute name="PrimaryKey" use="optional" type="xs:anySimpleType"/>
+                <xs:attribute name="Default" use="optional" type="xs:anySimpleType"/>
+            </xs:extension>
+        </xs:simpleContent>
+    </xs:complexType>
+    <xs:complexType name="ColumnAdd">
+        <xs:simpleContent>
+            <xs:extension base="xs:string">
+                <xs:attribute name="Type" use="optional" type="xs:anySimpleType"/>
+                <xs:attribute name="AutoIncrement" use="optional" type="xs:anySimpleType"/>
+                <xs:attribute name="Name" use="required" type="xs:anySimpleType"/>
+                <xs:attribute name="Required" use="optional" type="xs:anySimpleType"/>
+                <xs:attribute name="Size" use="optional" type="xs:anySimpleType"/>
+                <xs:attribute name="PrimaryKey" use="optional" type="xs:anySimpleType"/>
+                <xs:attribute name="Default" use="optional" type="xs:anySimpleType"/>
+            </xs:extension>
+        </xs:simpleContent>
+    </xs:complexType>
+    <xs:complexType name="ColumnChange">
+        <xs:simpleContent>
+            <xs:extension base="xs:string">
+                <xs:attribute name="Type" use="optional" type="xs:anySimpleType"/>
+                <xs:attribute name="Default" use="optional" type="xs:anySimpleType"/>
+                <xs:attribute name="NameOld" use="optional" type="xs:anySimpleType"/>
+                <xs:attribute name="NameNew" use="optional" type="xs:anySimpleType"/>
+                <xs:attribute name="AutoIncrement" use="optional" type="xs:anySimpleType"/>
+                <xs:attribute name="Required" use="optional" type="xs:anySimpleType"/>
+                <xs:attribute name="Size" use="optional" type="xs:anySimpleType"/>
+                <xs:attribute name="PrimaryKey" use="optional" type="xs:anySimpleType"/>
+            </xs:extension>
+        </xs:simpleContent>
+    </xs:complexType>
+    <xs:complexType name="ColumnDrop">
+        <xs:attribute name="Name" use="required" type="xs:anySimpleType"/>
+    </xs:complexType>
     
     <!-- Foreign Keys -->
     
-    <xs:element name="ForeignKey">
-        <xs:complexType>
-            <xs:sequence>
-                <xs:element ref="Reference" maxOccurs="unbounded" />
-            </xs:sequence>
-            <xs:attribute name="ForeignTable" use="required" type="xs:anySimpleType"/>
-        </xs:complexType>
-    </xs:element>
-    
-    <xs:element name="ForeignKeyCreate">
-        <xs:complexType>
-            <xs:sequence>
-                <xs:element ref="Reference" maxOccurs="unbounded" />
-            </xs:sequence>
-            <xs:attribute name="ForeignTable" use="required" type="xs:anySimpleType"/>
-        </xs:complexType>
-    </xs:element>
-    
-    <xs:element name="ForeignKeyDrop">
-        <xs:complexType>
-            <xs:sequence>
-                <xs:element ref="Reference" maxOccurs="unbounded" />
-            </xs:sequence>
-            <xs:attribute name="ForeignTable" use="required" type="xs:anySimpleType"/>
-        </xs:complexType>
-    </xs:element>
-    
-    <xs:element name="Reference">
-        <xs:complexType>
-            <xs:simpleContent>
-                <xs:extension base="xs:string">
-                    <xs:attribute name="Local" use="required" type="xs:anySimpleType"/>
-                    <xs:attribute name="Foreign" use="required" type="xs:anySimpleType"/>
-                </xs:extension>
-            </xs:simpleContent>
-        </xs:complexType>
-    </xs:element>
+    <xs:complexType name="ForeignKey">
+        <xs:sequence>
+            <xs:element ref="Reference" maxOccurs="unbounded" />
+        </xs:sequence>
+        <xs:attribute name="ForeignTable" use="required" type="xs:anySimpleType"/>
+    </xs:complexType>
+
+    <xs:complexType name="ForeignKeyCreate">
+        <xs:sequence>
+            <xs:element ref="Reference" maxOccurs="unbounded" />
+        </xs:sequence>
+        <xs:attribute name="ForeignTable" use="required" type="xs:anySimpleType"/>
+    </xs:complexType>
+
+    <xs:complexType name="ForeignKeyDrop">
+        <xs:sequence>
+            <xs:element ref="Reference" maxOccurs="unbounded" />
+        </xs:sequence>
+        <xs:attribute name="ForeignTable" use="required" type="xs:anySimpleType"/>
+    </xs:complexType>
+
+    <xs:complexType name="Reference">
+        <xs:simpleContent>
+            <xs:extension base="xs:string">
+                <xs:attribute name="Local" use="required" type="xs:anySimpleType"/>
+                <xs:attribute name="Foreign" use="required" type="xs:anySimpleType"/>
+            </xs:extension>
+        </xs:simpleContent>
+    </xs:complexType>
     
     <!-- Unique columns -->
     
-    <xs:element name="Unique">
-        <xs:complexType>
-            <xs:sequence>
-                <xs:element ref="UniqueColumn" maxOccurs="unbounded" />
-            </xs:sequence>
-            <xs:attribute name="Name" use="optional" type="xs:anySimpleType"/>
-        </xs:complexType>
-    </xs:element>
-    
-    <xs:element name="UniqueColumn">
-        <xs:complexType>
-            <xs:simpleContent>
-                <xs:extension base="xs:string">
-                    <xs:attribute name="Name" use="required" type="xs:anySimpleType"/>
-                </xs:extension>
-            </xs:simpleContent>
-        </xs:complexType>
-    </xs:element>
-    
-    <xs:element name="UniqueCreate">
-        <xs:complexType>
-            <xs:simpleContent>
-                <xs:extension base="xs:string">
-                    <xs:attribute name="Name" use="required" type="xs:anySimpleType"/>
-                </xs:extension>
-            </xs:simpleContent>
-        </xs:complexType>
-    </xs:element>
-    
-    <xs:element name="UniqueDrop">
-        <xs:complexType>
-            <xs:simpleContent>
-                <xs:extension base="xs:string">
-                    <xs:attribute name="Name" use="required" type="xs:anySimpleType"/>
-                </xs:extension>
-            </xs:simpleContent>
-        </xs:complexType>
-    </xs:element>
+    <xs:complexType name="Unique">
+        <xs:sequence>
+            <xs:element name="UniqueColumn" maxOccurs="unbounded" type="UniqueColumn"/>
+        </xs:sequence>
+        <xs:attribute name="Name" use="optional" type="xs:anySimpleType"/>
+    </xs:complexType>
+
+    <xs:complexType name="UniqueColumn">
+        <xs:simpleContent>
+            <xs:extension base="xs:string">
+                <xs:attribute name="Name" use="required" type="xs:anySimpleType"/>
+            </xs:extension>
+        </xs:simpleContent>
+    </xs:complexType>
+
+    <xs:complexType name="UniqueCreate">
+        <xs:simpleContent>
+            <xs:extension base="xs:string">
+                <xs:attribute name="Name" use="required" type="xs:anySimpleType"/>
+            </xs:extension>
+        </xs:simpleContent>
+    </xs:complexType>
+
+    <xs:complexType name="UniqueDrop">
+        <xs:simpleContent>
+            <xs:extension base="xs:string">
+                <xs:attribute name="Name" use="required" type="xs:anySimpleType"/>
+            </xs:extension>
+        </xs:simpleContent>
+    </xs:complexType>
     
     <!-- Index columns -->
     
-    <xs:element name="Index">
-        <xs:complexType>
-            <xs:sequence>
-                <xs:element ref="IndexColumn" maxOccurs="unbounded" />
-            </xs:sequence>
-            <xs:attribute name="Name" use="optional" type="xs:anySimpleType"/>
-        </xs:complexType>
-    </xs:element>
-    
-    <xs:element name="IndexColumn">
-        <xs:complexType>
-            <xs:simpleContent>
-                <xs:extension base="xs:string">
-                    <xs:attribute name="Name" use="required" type="xs:anySimpleType"/>
-                </xs:extension>
-            </xs:simpleContent>
-        </xs:complexType>
-    </xs:element>
-    
-    <xs:element name="IndexCreate">
-        <xs:complexType>
-            <xs:simpleContent>
-                <xs:extension base="xs:string">
-                    <xs:attribute name="Name" use="required" type="xs:anySimpleType"/>
-                </xs:extension>
-            </xs:simpleContent>
-        </xs:complexType>
-    </xs:element>
-    
-    <xs:element name="IndexDrop">
-        <xs:complexType>
-            <xs:simpleContent>
-                <xs:extension base="xs:string">
-                    <xs:attribute name="Name" use="required" type="xs:anySimpleType"/>
-                </xs:extension>
-            </xs:simpleContent>
-        </xs:complexType>
-    </xs:element>
+    <xs:complexType name="Index">
+        <xs:sequence>
+            <xs:element ref="IndexColumn" maxOccurs="unbounded" />
+        </xs:sequence>
+        <xs:attribute name="Name" use="optional" type="xs:anySimpleType"/>
+    </xs:complexType>
+
+    <xs:complexType name="IndexColumn">
+        <xs:simpleContent>
+            <xs:extension base="xs:string">
+                <xs:attribute name="Name" use="required" type="xs:anySimpleType"/>
+            </xs:extension>
+        </xs:simpleContent>
+    </xs:complexType>
+
+    <xs:complexType name="IndexCreate">
+        <xs:simpleContent>
+            <xs:extension base="xs:string">
+                <xs:attribute name="Name" use="required" type="xs:anySimpleType"/>
+            </xs:extension>
+        </xs:simpleContent>
+    </xs:complexType>
+
+    <xs:complexType name="IndexDrop">
+        <xs:simpleContent>
+            <xs:extension base="xs:string">
+                <xs:attribute name="Name" use="required" type="xs:anySimpleType"/>
+            </xs:extension>
+        </xs:simpleContent>
+    </xs:complexType>
     
     <!-- Insert stuff into database -->
     
-    <xs:element name="Insert">
-        <xs:complexType>
-            <xs:sequence>
-                <xs:element ref="Data" maxOccurs="unbounded" />
-            </xs:sequence>
-            <xs:attribute name="Type" use="optional" type="xs:anySimpleType"/>
-            <xs:attribute name="Table" use="required" type="xs:anySimpleType"/>
-            <xs:attribute name="Version" use="optional" type="xs:anySimpleType"/>
-        </xs:complexType>
-    </xs:element>
-    
-    <xs:element name="Data">
-        <xs:complexType>
-            <xs:simpleContent>
-                <xs:extension base="xs:string">
-                    <xs:attribute name="Key" use="optional" type="xs:anySimpleType"/>
-                    <xs:attribute name="Type" use="optional" type="xs:anySimpleType"/>
-                </xs:extension>
-            </xs:simpleContent>
-        </xs:complexType>
-    </xs:element>
-    
+    <xs:complexType name="Insert">
+        <xs:sequence>
+            <xs:element name="Data" maxOccurs="unbounded" type="Data"/>
+        </xs:sequence>
+        <xs:attribute name="Type" use="optional" type="xs:anySimpleType"/>
+        <xs:attribute name="Table" use="required" type="xs:anySimpleType"/>
+        <xs:attribute name="Version" use="optional" type="xs:anySimpleType"/>
+    </xs:complexType>
+
+    <xs:complexType name="Data">
+        <xs:simpleContent>
+            <xs:extension base="xs:string">
+                <xs:attribute name="Key" use="optional" type="xs:anySimpleType"/>
+                <xs:attribute name="Type" use="optional" type="xs:anySimpleType"/>
+            </xs:extension>
+        </xs:simpleContent>
+    </xs:complexType>
 </xs:schema>
 ~;
 }
@@ -817,7 +732,7 @@ OTRS::OPM::Parser - Parser for the .opm file
 
 =head1 VERSION
 
-version 1.02
+version 1.04
 
 =head1 SYNOPSIS
 
@@ -825,6 +740,7 @@ version 1.02
     
     my $opm_file = 'QuickMerge-3.3.2.opm';
     my $opm      = OTRS::OPM::Parser->new( opm_file => $opm_file );
+    $opm->parse or die "OPM parse failed: ", $opm->error_string;
     
     say sprintf "This is version %s of package %s",
         $opm->version,

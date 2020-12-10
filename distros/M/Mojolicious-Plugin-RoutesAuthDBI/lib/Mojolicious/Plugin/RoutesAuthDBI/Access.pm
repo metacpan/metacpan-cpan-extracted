@@ -93,16 +93,16 @@ sub apply_route {# meth in Plugin
   if (@request eq 2 && $request[0] =~ /websocket|ws/i) {
     $nr = $r->websocket(pop @request);
   } else {
-    $nr = $r->route(pop @request);
-    $nr->via(@request)
+    $nr = $r->any(pop @request);#Mojolicious::Routes::Route::route is DEPRECATED
+    $nr->methods(@request)# Deprecated Mojolicious::Routes::Route::via in favor of Mojolicious::Routes::Route::methods.
       if @request;
   }
   # STEP AUTH не катит! только один over!
   #~ $nr->over(authenticated=>$r_hash->{auth});
   # STEP ACCESS
-  $nr->over(access => $r_hash);
+  $nr->requires(access => $r_hash);# Deprecated Mojolicious::Routes::Route::over in favor of Mojolicious::Routes::Route::requires
   my $host = eval($r_hash->{host_re} || $r_hash->{host} || '');
-  $nr->over(host => $host)
+  $nr->requires(host => $host)
     if $host;
   
 # Controller and action in Mojolicious::Routes::Route->to

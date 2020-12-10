@@ -7,7 +7,7 @@ use warnings;
 
 use Plack::Util::Accessor 'dir_index';
 
-our $VERSION = '0.0.1';
+our $VERSION = '0.0.2';
 
 sub serve_path {
   my $self = shift;

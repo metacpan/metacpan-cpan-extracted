@@ -4,7 +4,7 @@ Text::Minify::XS - Simple text minification
 
 # VERSION
 
-version v0.2.1
+version v0.3.0
 
 # SYNOPSIS
 
@@ -30,13 +30,9 @@ It does the following:
 - removes leading whitespace (indentation),
 - removes trailing whitespace,
 - removes multiple newlines,
-- and changes all line endings to a newline, "\\n",
+- and changes carriage returns to newlines.
 
 It does not recognise any form of markup, comments or text quoting.
-
-# KNOWN ISSUES
-
-This only supports ASCII/Latin-1 text.
 
 # SOURCE
 

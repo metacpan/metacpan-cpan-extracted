@@ -9,7 +9,7 @@ use List::Util qw(uniq any first);
 use Moose::Util::TypeConstraints qw(enum subtype where);
 use namespace::autoclean;
 
-our $VERSION = '2.8';
+our $VERSION = '2.9';
 
 with
     'Dist::Zilla::Role::PluginBundle::Easy',
@@ -361,7 +361,7 @@ Dist::Zilla::PluginBundle::Author::WATERKIP - An plugin bundle for all distribut
 
 =head1 VERSION
 
-version 2.8
+version 2.9
 
 =head1 SYNOPSIS
 

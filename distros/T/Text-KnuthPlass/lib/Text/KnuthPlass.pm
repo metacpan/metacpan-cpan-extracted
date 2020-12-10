@@ -4,7 +4,9 @@ use constant DEBUG => 0;
 use warnings;
 use strict;
 
-our $VERSION = '1.02';
+our $VERSION = '1.03'; # VERSION
+my $LAST_UPDATE = '1.03'; # manually update whenever file is edited
+
 eval { XSLoader::load("Text::KnuthPlass", $VERSION); } or die $@;
 # Or else there's a Perl version
 use Data::Dumper;
@@ -12,29 +14,47 @@ use Data::Dumper;
 package Text::KnuthPlass::Element;
 use base 'Class::Accessor';
 __PACKAGE__->mk_accessors("width");
-sub new { my $self = shift; bless { width => 0, @_ }, $self }
-sub is_penalty { return shift->isa("Text::KnuthPlass::Penalty") }
-sub is_glue    { return shift->isa("Text::KnuthPlass::Glue") }
+sub new { 
+    my $self = shift; 
+    return bless { width => 0, @_ }, $self; 
+}
+sub is_penalty { 
+    return shift->isa("Text::KnuthPlass::Penalty"); 
+}
+sub is_glue { 
+    return shift->isa("Text::KnuthPlass::Glue"); 
+}
 
 package Text::KnuthPlass::Box; 
 use base 'Text::KnuthPlass::Element';
 __PACKAGE__->mk_accessors("value");
 
-sub _txt { return "[".$_[0]->value."/".$_[0]->width."]"; }
-
+sub _txt { 
+    return "[".$_[0]->value."/".$_[0]->width."]"; 
+}
 
 package Text::KnuthPlass::Glue;
 use base 'Text::KnuthPlass::Element';
 __PACKAGE__->mk_accessors("stretch", "shrink");
 
-sub new { my $self = shift; $self->SUPER::new(stretch => 0, shrink => 0, @_) }
-sub _txt { return sprintf "<%.2f+%.2f-%.2f>", $_[0]->width, $_[0]->stretch, $_[0]->shrink; }
+sub new { 
+    my $self = shift; 
+    return $self->SUPER::new(stretch => 0, shrink => 0, @_);
+}
+sub _txt { 
+    return sprintf "<%.2f+%.2f-%.2f>", $_[0]->width, $_[0]->stretch, $_[0]->shrink; 
+}
 
 package Text::KnuthPlass::Penalty;
 use base 'Text::KnuthPlass::Element';
 __PACKAGE__->mk_accessors("penalty", "flagged", "shrink");
-sub new { my $self = shift; $self->SUPER::new(flagged => 0, shrink => 0, @_) }
-sub _txt { "(".$_[0]->penalty.($_[0]->flagged &&"!").")"; }
+sub new { 
+    my $self = shift; 
+    return $self->SUPER::new(flagged => 0, shrink => 0, @_);
+}
+sub _txt { 
+    return "(".$_[0]->penalty.($_[0]->flagged &&"!").")"; 
+}
 
 package Text::KnuthPlass::Breakpoint;
 use base 'Text::KnuthPlass::Element';
@@ -42,7 +62,9 @@ __PACKAGE__->mk_accessors(qw/position demerits ratio line fitnessClass totals pr
 
 package Text::KnuthPlass::DummyHyphenator;
 use base 'Class::Accessor';
-sub hyphenate { return $_[1] }
+sub hyphenate { 
+    return $_[1]; 
+}
 
 package Text::KnuthPlass;
 use base 'Class::Accessor';
@@ -61,7 +83,10 @@ my %defaults = (
         Text::KnuthPlass::DummyHyphenator->new()
 );
 __PACKAGE__->mk_accessors(keys %defaults);
-sub new { my $self = shift; bless {%defaults, @_}, $self }
+sub new { 
+    my $self = shift; 
+    return bless {%defaults, @_}, $self;
+}
 
 =head1 NAME
 
@@ -85,7 +110,7 @@ To use with plain text:
         print "\n";
     }
 
-To use with PDF::API2:
+To use with PDF::Builder: (as well as PDF::API2)
 
     my $text = $page->text;
     $text->font($font, 12);
@@ -208,7 +233,7 @@ sub typeset {
         pop @{ $lines[-1]->{nodes} } ;
         pop @{ $lines[-1]->{nodes} } ;
     }
-    @lines;
+    return @lines;
 }
 
 =head2 break_text_into_nodes
@@ -238,6 +263,7 @@ sub _add_word {
                 flagged => 1, penalty => $self->hyphenpenalty);
         }
     }
+    return;
 }
 
 sub break_text_into_nodes {
@@ -262,7 +288,9 @@ sub break_text_into_nodes {
     return @nodes;
 }
 
-sub _start_justify { }
+sub _start_justify { 
+    return;
+}
 sub _add_space_justify {
     my ($self, $nodes_r, $final) = @_;
     if ($final) { 
@@ -279,6 +307,7 @@ sub _add_space_justify {
                shrink => $self->{spaceshrink}
            );
    }
+   return;
 }
 
 sub _start_center {
@@ -288,7 +317,8 @@ sub _start_center {
         Text::KnuthPlass::Glue->new(
             width => 0, 
             stretch => 2*$self->{emwidth},
-            shrink => 0)
+            shrink => 0);
+    return;
 }
 
 sub _add_space_center {
@@ -306,6 +336,7 @@ sub _add_space_center {
             Text::KnuthPlass::Penalty->new(width => 0, penalty => $self->infinity, flagged => 0),
             Text::KnuthPlass::Glue->new( width => 0, stretch => 2*$self->{emwidth}, shrink => 0),
     }
+    return;
 }
 
 =head2 break
@@ -325,13 +356,14 @@ sub _init_nodelist { # Overridden by XS
             totals => { width => 0, stretch => 0, shrink => 0}
         )
     ];
+    return;
 }
 
 sub break {
     my ($self, $nodes) = @_;
     $self->{sum} = {width => 0, stretch => 0, shrink => 0 };
     $self->_init_nodelist();
-    if (!$self->{linelengths} or ref $self->{linelengths} ne "ARRAY") {
+    if (!$self->{linelengths} || ref $self->{linelengths} ne "ARRAY") {
         croak "No linelengths set";
     }
 
@@ -356,7 +388,7 @@ sub break {
     return @retval;
 }
 
-sub _cleanup { } 
+sub _cleanup { return; } 
 
 sub _active_to_breaks { # Overridden by XS
     my $self = shift;
@@ -432,7 +464,7 @@ sub _mainloop {
             }
             $active = $next;
             #warn "Active is now $active" if DEBUG;
-            last if !$active or 
+            last if !$active || 
                 $active->line >= $currentLine;
         }
         warn  "Post inner loop\n" if DEBUG;
@@ -470,6 +502,7 @@ sub _mainloop {
             }
         }
     }
+    return;
 }
 
 sub _computeCost {
@@ -491,14 +524,14 @@ sub _computeCost {
         warn sprintf "Stretch %f\n", $stretch if DEBUG;
         if ($stretch > 0) {
             return ($linelength - $width) / $stretch;
-        } else { return $self->infinity}
+        } else { return $self->infinity(); }
     } elsif ($width > $linelength) {
         $shrink = $self->{sum}{shrink} - $active->totals->{shrink};
         warn sprintf "Shrink %f\n", $shrink if DEBUG;
         if ($shrink > 0) {
             return ($linelength - $width) / $shrink;
         } else { return $self->infinity}
-    } else { return 0 }
+    } else { return 0; }
 }
 
 sub _computeSum {
@@ -557,12 +590,18 @@ For subclassers.
 
 =cut
 
-sub glueclass    { "Text::KnuthPlass::Glue" }
-sub penaltyclass { "Text::KnuthPlass::Penalty" }
+sub glueclass { 
+    return "Text::KnuthPlass::Glue";
+}
+sub penaltyclass { 
+    return "Text::KnuthPlass::Penalty";
+}
 
 =head1 AUTHOR
 
-Simon Cozens, C<< <simon at cpan.org> >>
+originally written by Simon Cozens, C<< <simon at cpan.org> >>
+
+since 2020, maintained by Phil Perry C<< <pmperry at cpan.org> >>
 
 =head1 ACKNOWLEDGEMENTS
 
@@ -571,13 +610,15 @@ implementation. Any bugs, however, are probably my fault.
 
 =head1 BUGS
 
-Please report any bugs or feature requests to C<bug-text-knuthplass at rt.cpan.org>, or through
-the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Text-KnuthPlass>.  I will be notified, and then you'll
-automatically be notified of progress on your bug as I make changes.
+Please report any bugs or feature requests to the _issues_ section of 
+C<https://github.com/PhilterPaper/Text-KnuthPlass>, or via email (please see
+C<README.md> for details).
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright 2011 Simon Cozens.
+Copyright (c) 2011 Simon Cozens.
+
+Copyright (c) 2020 Phil M Perry.
 
 This program is released under the following license: Perl, GPL
 

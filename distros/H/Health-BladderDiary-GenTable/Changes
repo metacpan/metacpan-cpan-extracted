@@ -1,3 +1,19 @@
+0.006   2020-12-10  Released-By: PERLANCAR; Urgency: medium
+
+	- Add argument 'date' for interoperability with
+	  Health::BladderDiary::GenChart.
+
+
+0.005   2020-12-10  Released-By: PERLANCAR; Urgency: medium
+
+	- Allow more colors (0.5, 1.5, 2.5), tweak color output & column
+	  name.
+
+	- Add option: --yesterday-last-urination-entry (-y).
+
+	- Add documentation.
+
+
 0.004   2020-11-13  Released-By: PERLANCAR; Urgency: low
 
 	- No functional changes.

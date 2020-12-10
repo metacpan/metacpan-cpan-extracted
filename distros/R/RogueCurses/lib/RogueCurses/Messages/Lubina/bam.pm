@@ -17,6 +17,7 @@ sub new {
 	bless $self, $class;
 }
 
+### NOTE : the energy can only be calculated for a n x n matrix 
 sub energy {
 	my $self = shift;
 	my $det =  $self->{matrix}->determinant;

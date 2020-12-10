@@ -18,7 +18,7 @@ WriteMakefile(
         'Test::More' => 0,
     },
     PREREQ_PM => {
-        'Mojolicious::Plugin::AssetPack'              => '2.02',
+        'Mojolicious::Plugin::AssetPack'              => '2.09',
         'HTML::Packer'=> '2.03',
         'IO::Compress::Gzip '=> '2.0',
         'CSS::Minifier::XS'	=> '0.09',

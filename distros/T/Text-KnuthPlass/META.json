@@ -1,0 +1,61 @@
+{
+   "abstract" : "Paragraph shaping (line breaking) with Knuth-Plass TeX algorithm",
+   "author" : [
+      "Phil Perry <pmperry at cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.56, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Text-KnuthPlass",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.5503"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Class::Accessor" : "0",
+            "Text::Hyphen" : "0",
+            "perl" : "5.008001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "JSON::Syck" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "pmperry [at] cpan.org",
+         "web" : "https://github.com/PhilterPaper/Text-KnuthPlass/issues"
+      },
+      "homepage" : "https://metacpan.org/search?q=TextAAKnuthPlass, https://www.catskilltech.com",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/PhilterPaper/Text-KnuthPlass.git",
+         "web" : "https://github.com/PhilterPaper/Text-KnuthPlass"
+      }
+   },
+   "version" : "1.03",
+   "x_serialization_backend" : "JSON::PP version 4.05"
+}
