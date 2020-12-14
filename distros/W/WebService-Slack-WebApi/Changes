@@ -1,5 +1,14 @@
 Revision history for Perl extension WebService-Slack-WebApi
 
+0.17 2020-12-12T10:48:35Z
+    - allow user to decide the HTTP user agent (thx mikkoi)
+    - correct parameter for conversations.open (thx mikkoi)
+    - depends on JSON instead of JSON::XS (thx mikkoi)
+
+    # Breaking change
+    Requirement for Furl has been changed from `requires` to `recommends`. But it is still default
+    user agent. You may need to install explicitly it to use default behavior.
+
 0.16 2020-11-28T14:02:16Z
     - correct parameter name for conversations.join (thx mikkoi)
     - replace deprecated method in README (thx sironekotoro)

@@ -21,7 +21,7 @@ has 'date'        => (is => 'ro', isa => 'Date_ISO', default =>
 has 'run'         => (is => 'ro', isa => 'MsOffice::Word::Surgeon::Run');
 has 'xml_before'  => (is => 'ro', isa => 'Str');
 
-our $VERSION = '1.04';
+our $VERSION = '1.05';
 
 sub BUILD {
   my $self = shift;

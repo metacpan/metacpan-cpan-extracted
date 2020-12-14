@@ -12,7 +12,7 @@
                 |_|          |___/ 
 
 
-This is the README for Image::PNG::Libpng version 0.49.
+This is the README for Image::PNG::Libpng version 0.52.
 
 Image::PNG::Libpng is a "module" for the Perl computer programming
 language, a library of computer code to install on a computer.  This
@@ -76,11 +76,11 @@ If you have the App::cpanminus installer, you may prefer
 
     cpanm Image::PNG::Libpng
 
-To install the module from the source file, Image-PNG-Libpng-0.49.tar.gz,
+To install the module from the source file, Image-PNG-Libpng-0.52.tar.gz,
 follow this sequence of commands:
 
-    tar xfz Image-PNG-Libpng-0.49.tar.gz
-    cd Image-PNG-Libpng-0.49
+    tar xfz Image-PNG-Libpng-0.52.tar.gz
+    cd Image-PNG-Libpng-0.52
     perl Makefile.PL
     make
     make install
@@ -105,6 +105,6 @@ public repository on github at
 
 -----------------------------------------------------------------------------
 
-This README was written on Thu Dec 10 08:48:22 2020.
+This README was written on Sun Dec 13 11:45:53 2020.
 
 -----------------------------------------------------------------------------

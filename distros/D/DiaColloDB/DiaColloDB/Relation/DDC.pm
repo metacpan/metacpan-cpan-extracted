@@ -265,10 +265,12 @@ sub profile {
   ##-- setup meta-profile query info
   my $qtemplate = $qcount->getDtr->clone();
   my $qinfo = {
+	       qcanon=>$qcount->getDtr->toStringFull,
 	       q12=>$qcount->toStringFull,
 	       #q1=>$qcount1->toStringFull,
 	       #q2=>$qcount2->toStringFull,
 	       #qN=>$qstrN,
+	       ##
 	       fcoef=>$fcoef,
 	       qtemplate=>$opts{qtemplate},
 	      };

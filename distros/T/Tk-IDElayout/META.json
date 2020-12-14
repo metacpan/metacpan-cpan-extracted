@@ -4,7 +4,7 @@
       "jcerney@home.com (John Cerney)"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.56, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -36,7 +36,7 @@
       },
       "runtime" : {
          "requires" : {
-            "Graph" : "0.20105",
+            "Graph" : "0.50",
             "Tk" : "804.027",
             "Tk::DynaTabFrame" : "0.23"
          }
@@ -44,12 +44,15 @@
    },
    "release_status" : "stable",
    "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/asb-capfan/Tk-IDElayout/issues"
+      },
       "repository" : {
          "type" : "git",
          "url" : "https://github.com/asb-capfan/Tk-IDElayout.git",
          "web" : "https://github.com/asb-capfan/Tk-IDElayout"
       }
    },
-   "version" : "0.36",
-   "x_serialization_backend" : "JSON::PP version 4.02"
+   "version" : "0.37",
+   "x_serialization_backend" : "JSON::PP version 4.04"
 }

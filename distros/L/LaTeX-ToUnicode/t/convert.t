@@ -111,7 +111,7 @@ __DATA__
 {\sl L'Informatique Nouvelle}	L’Informatique Nouvelle
 {\small and}	and
 {\ss}	ß
-{\TeX}	TEX
+{\TeX}	TeX
 {\TM}	™
 {\tt awk}	awk
 {\^u}	û

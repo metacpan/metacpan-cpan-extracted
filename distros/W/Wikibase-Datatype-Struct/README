@@ -1,0 +1,63 @@
+NAME
+    Wikibase::Datatype::Struct - Wikibase structure serialization.
+
+DESCRIPTION
+    This conversion is between objects defined in Wikibase::Datatype and
+    structures serialized via JSON to MediaWiki.
+
+SEE ALSO
+    Wikibase::Datatype::Struct::Reference
+        Wikibase reference structure serialization.
+
+    Wikibase::Datatype::Struct::Sitelink
+        Wikibase sitelink structure serialization.
+
+    Wikibase::Datatype::Struct::Snak
+        Wikibase snak structure serialization.
+
+    Wikibase::Datatype::Struct::Statement
+        Wikibase statement structure serialization.
+
+    Wikibase::Datatype::Struct::Utils
+        Wikibase structure serialization utilities.
+
+    Wikibase::Datatype::Struct::Value
+        Wikibase value structure serialization.
+
+    Wikibase::Datatype::Struct::Value::Globecoordinate
+        Wikibase globe coordinate structure serialization.
+
+    Wikibase::Datatype::Struct::Value::Item
+        Wikibase item structure serialization.
+
+    Wikibase::Datatype::Struct::Value::Monolingual
+        Wikibase monolingual structure serialization.
+
+    Wikibase::Datatype::Struct::Value::Property
+        Wikibase property structure serialization.
+
+    Wikibase::Datatype::Struct::Value::Quantity
+        Wikibase quantity structure serialization.
+
+    Wikibase::Datatype::Struct::Value::String
+        Wikibase string structure serialization.
+
+    Wikibase::Datatype::Struct::Value::Time
+        Wikibase time structure serialization.
+
+REPOSITORY
+    <https://github.com/michal-josef-spacek/Wikibase-Datatype-Struct>
+
+AUTHOR
+    Michal Josef Špaček <mailto:skim@cpan.org>
+
+    <http://skim.cz>
+
+LICENSE AND COPYRIGHT
+    © Michal Josef Špaček 2020
+
+    BSD 2-Clause License
+
+VERSION
+    0.03
+

@@ -561,6 +561,7 @@ sub qinfo {
   return {
 	  fcoef => 1,
 	  qtemplate => $qstr,
+	  qcanon => $rel->qcanon($coldb,%opts),
 	 };
 }
 

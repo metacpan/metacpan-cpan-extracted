@@ -3,7 +3,7 @@ use utf8;
 use ExtUtils::MakeMaker;
 my %WriteMakefileArgs = (
   NAME           => 'Mojolicious::Plugin::AssetPack',
-  AUTHOR         => 'Jan Henning Thorsen <jhthorsen@cpan.org>',
+  AUTHOR         => 'Zoffix Znet <cpan@zoffix.com>',
   LICENSE        => 'artistic_2',
   ABSTRACT_FROM  => 'lib/Mojolicious/Plugin/AssetPack.pm',
   VERSION_FROM   => 'lib/Mojolicious/Plugin/AssetPack.pm',

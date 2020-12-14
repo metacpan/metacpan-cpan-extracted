@@ -142,7 +142,7 @@ elsif($command eq 'backup') {
 	
 	exists $options{$_} or usage("Option --$_ is required for command backup") foreach qw(cfg backup-name);
 	
-	App::SimpleBackuper::StorageCheck(\%options, \%state);
+	App::SimpleBackuper::StorageCheck(\%options, \%state, 1);
 	
 	App::SimpleBackuper::Backup(\%options, \%state);
 	

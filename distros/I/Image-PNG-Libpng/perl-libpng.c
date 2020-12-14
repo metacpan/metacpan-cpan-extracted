@@ -60,14 +60,6 @@ typedef struct perl_libpng
     /* If the following variable is set to a true value, the module
        prints messages about what it is doing. */
     int verbosity : 1;
-    /* If the following variable is set to a true value, the module
-       raises an error (die) if there is an error other than something
-       being undefined. */
-    int raise_errors : 1;
-    /* Print error messages. */
-    int print_errors : 1;
-    /* Print a message on STDERR if something is undefined. */
-    int print_undefined : 1;
     /* Has input/output been initiated? */
     int init_io_done : 1;
 }
@@ -137,7 +129,6 @@ typedef perl_libpng_t * Image__PNG__Libpng;
 static void
 perl_png_error_fn (png_structp png_ptr, png_const_charp error_msg)
 {
-    perl_libpng_t * png = png_get_error_ptr (png_ptr);
     /* An error from libpng sent via Perl's warning handler. */
     croak ("libpng error: %s\n", error_msg);
 }
@@ -147,7 +138,6 @@ perl_png_error_fn (png_structp png_ptr, png_const_charp error_msg)
 static void
 perl_png_warning_fn (png_structp png_ptr, png_const_charp warning_msg)
 {
-    perl_libpng_t * png = png_get_error_ptr (png_ptr);
     /* A warning from libpng sent via Perl's warning handler. */
     warn ( "libpng warning: %s\n", warning_msg);
 }
@@ -167,6 +157,21 @@ perl_png_warning_fn (png_structp png_ptr, png_const_charp warning_msg)
                                                  
 
 
+/* The following is a debugging construction which is usually "off". */
+
+#if 0
+#define GABBLE_IN(x)			\
+    fprintf (stderr, "Get #%d of %s\n", \
+	     png->memory_gets, #x)
+
+#define GABBLE_OUT(x)				\
+    fprintf (stderr, "Free #%d of %s\n",	\
+	     png->memory_gets, #x)
+#else
+#define GABBLE_IN(x)
+#define GABBLE_OUT(x)
+#endif /* 0 */
+
 /* Get memory using the following in order to keep count of the number
    of objects in use at the end of execution, to ensure that there are
    no memory leaks. All allocation is done via Newxz ("calloc") rather
@@ -175,6 +180,7 @@ perl_png_warning_fn (png_structp png_ptr, png_const_charp warning_msg)
 #define GET_MEMORY(thing, number, type) {	\
         Newxz (thing, number, type);		\
         png->memory_gets++;                     \
+	GABBLE_IN(thing);			\
     }
 
 /* Free memory using the following in order to keep count of the
@@ -183,6 +189,7 @@ perl_png_warning_fn (png_structp png_ptr, png_const_charp warning_msg)
 #define PERL_PNG_FREE(thing) {   \
         png->memory_gets--;      \
         Safefree (thing);	 \
+	GABBLE_OUT(thing);	 \
     }
 
 static perl_libpng_t *
@@ -510,37 +517,48 @@ perl_png_get_text (perl_libpng_t * png)
 #endif
 }
 
-/* Set a PNG text from "chunk". The return value is true if
-   successful. */
+/* The macro which SvPV consists of fouls things up with the STRLEN
+   pointer if we try to use a function. */
 
-static int
+#define SOFT_HASH_FETCH_PV(chunk, key) {			\
+	SV ** sv_ptr;						\
+	sv_ptr = hv_fetch (chunk, #key, strlen (#key), 0);	\
+	if (sv_ptr) {						\
+	    key = SvPV(*sv_ptr, key ## _length);		\
+	} else {						\
+	    key = 0;						\
+	    key ## _length = 0;					\
+	}							\
+    }
+
+/* Set a PNG text "text_out" from "chunk". */
+
+static void
 perl_png_set_text_from_hash (perl_libpng_t * png,
-                             png_text * text_out, HV * chunk)
+                             png_text * png_texts, int i, HV * chunk)
 {
+    png_text * text_out;
     int compression;
     char * key;
     STRLEN key_length;
-#ifdef PNG_iTXt_SUPPORTED
-    char * lang;
-    STRLEN lang_length;
-    char * lang_key;
-    STRLEN lang_key_length;
-#endif /* PNG_iTXt_SUPPORTED */
-    int is_itxt = 0;
-    char * text;
+    char * text = 0;
     STRLEN text_length;
-    /* The return value of this function. */
-    int ok = 1;
-    SV ** compression_sv_ptr;
+    SV ** c_sv_ptr;
+#ifdef PNG_iTXt_SUPPORTED
+    char * lang = 0;
+    STRLEN lang_length;
+    char * lang_key = 0;
+    STRLEN lang_key_length;
+    int is_itxt = 0;
+#endif /* PNG_iTXt_SUPPORTED */
 
-    MESSAGE ("Putting it into something.");
+    text_out = & png_texts[i];
 
     /* Check the compression field of the chunk */
 
-    compression_sv_ptr =
-	hv_fetch (chunk, "compression", strlen ("compression"), 0);
-    if (compression_sv_ptr) {
-	compression = SvIV (* compression_sv_ptr);
+    c_sv_ptr = hv_fetch (chunk, "compression", strlen ("compression"), 0);
+    if (c_sv_ptr) {
+	compression = SvIV (* c_sv_ptr);
     }
     else {
 	MESSAGE ("Using default compression PNG_TEXT_COMPRESSION_NONE");
@@ -548,55 +566,51 @@ perl_png_set_text_from_hash (perl_libpng_t * png,
     }
     switch (compression) {
     case PNG_TEXT_COMPRESSION_NONE:
-        break;
     case PNG_TEXT_COMPRESSION_zTXt:
         break;
+#ifdef PNG_iTXt_SUPPORTED
     case PNG_ITXT_COMPRESSION_NONE:
-        is_itxt = 1;
-        break;
     case PNG_ITXT_COMPRESSION_zTXt: 
         is_itxt = 1;
         break;
+#endif /* PNG_iTXt_SUPPORTED */
     default:
-        ok = 0;
-        fprintf (stderr, "Unknown compression %d\n", 
-                 compression);
-        return 0;
-        break;
+	PERL_PNG_FREE(png_texts);
+	croak ("Unknown compression %d", compression);
     }
+    text_out->compression = compression;
 
     MESSAGE ("Getting key.");
-    HASH_FETCH_PV (chunk, key);
-    if (key_length < 1 || key_length > 79) {
-        /* Key is too long or empty */
-        MESSAGE ("Bad length of key.");
-
-        ok = 0;
-        return 0;
+    SOFT_HASH_FETCH_PV (chunk, key);
+    if (key == 0) {
+	PERL_PNG_FREE(png_texts);
+	croak ("Text chunk %d has no 'key' field", i);
     }
-    MESSAGE ("Getting text.");
-    HASH_FETCH_PV (chunk, text);
-    if (ok) {
-        MESSAGE ("Copying.");
-        text_out->compression = compression;
-        text_out->key = (char *) key;
-        text_out->text = (char *) text;
-        text_out->text_length = text_length;
+    if (key_length < 1) {
+	PERL_PNG_FREE(png_texts);
+	croak ("Text chunk %d key field is empty", i);
+    }
+    if (key_length > 79) {
+	PERL_PNG_FREE(png_texts);
+	croak ("Text chunk %d key field is too long %d > 79",
+	       i, (int) key_length);
+    }
+    text_out->key = (char *) key;
+    /* Libpng documentation says it is OK to send NULLs here. */
+    SOFT_HASH_FETCH_PV (chunk, text);
+    text_out->text = (char *) text;
+    text_out->text_length = text_length;
 #ifdef PNG_iTXt_SUPPORTED
-        if (is_itxt) {
-            HASH_FETCH_PV (chunk, lang);
-            HASH_FETCH_PV (chunk, lang_key);
-            text_out->lang = (char *) lang;
-            text_out->lang_key = (char *) lang_key;
-        }
-#endif
+    if (is_itxt) {
+    /* Set this in case it starts to be required by future versions of
+       libpng. */
+	text_out->itxt_length = text_length;
+	SOFT_HASH_FETCH_PV (chunk, lang);
+	text_out->lang = (char *) lang;
+	SOFT_HASH_FETCH_PV (chunk, lang_key);
+	text_out->lang_key = (char *) lang_key;
     }
-    else {
-            /* Compression method unknown. */
-        ;
-    }
-
-    return ok;
+#endif /* PNG_iTXt_SUPPORTED */
 }
 
 /* Set the text chunks in the PNG. This actually pushes text chunks
@@ -607,52 +621,43 @@ static void
 perl_png_set_text (perl_libpng_t * png, AV * text_chunks)
 {
     int num_text;
-    int num_ok = 0;
     int i;
     png_text * png_texts;
+
+#ifndef PNG_tEXt_SUPPORTED
+    UNSUPPORTED(tEXt);
+    return;
+#endif
 
     num_text = av_len (text_chunks) + 1;
     MESSAGE ("You have %d text chunks.\n", num_text);
     if (num_text <= 0) {
-        /* Complain to the user */
         return;
     }
+    /* This memory needs to be freed before we call "croak", hence we
+       cannot "croak" inside perl_png_set_text_from_hash but have to
+       use error return values, then free this, and then croak. */
     GET_MEMORY (png_texts, num_text, png_text);
     for (i = 0; i < num_text; i++) {
-        int ok = 0;
         SV ** chunk_pointer;
 
         MESSAGE ("Fetching chunk %d.\n", i);
         chunk_pointer = av_fetch (text_chunks, i, 0);
         if (! chunk_pointer) {
-            /* Complain */
-            MESSAGE ("Chunk pointer null.");
-            continue;
+	    PERL_PNG_FREE(png_texts);
+	    croak ("Null chunk pointer");
         }
         if (SvROK (* chunk_pointer) && 
             SvTYPE (SvRV (* chunk_pointer)) == SVt_PVHV) {
-            MESSAGE ("Looks like a hash.");
-            ok = perl_png_set_text_from_hash (png, & png_texts[num_ok],
-                                              (HV *) SvRV (* chunk_pointer));
-            if (ok) {
-                MESSAGE ("This chunk is OK.");
-                num_ok++;
-            }
-            else {
-                MESSAGE ("The chunk is not OK.");
-            }
+	    perl_png_set_text_from_hash (png, png_texts, i,
+					 (HV *) SvRV (* chunk_pointer));
         }
+	else {
+	    PERL_PNG_FREE(png_texts);
+	    croak ("Element %d of text_chunks is not a hash reference", i);
+	}
     }
-    if (num_ok > 0) {
-        MESSAGE ("Writing %d text chunks to your PNG.\n",
-                num_ok);
-        png_set_text (pngi, png_texts, num_ok);
-    }
-    else {
-        /* The user tried to set some text chunks in the image but
-           they were not allowed. */
-        warn ( "None of your text chunks was allowed");
-    }
+    png_set_text (pngi, png_texts, num_text);
     PERL_PNG_FREE (png_texts);
 }
 
@@ -726,44 +731,43 @@ perl_png_get_tIME (perl_libpng_t * png)
 static void
 perl_png_set_tIME (perl_libpng_t * png, SV * input_time)
 {
-    /* The PNG month and day fields shouldn't be equal to zero. 
-       See PNG specification "4.2.4.6. tIME Image last-modification time"
-    */
+    /* The PNG month and day fields shouldn't be equal to zero.
+       See PNG specification "4.2.4.6. tIME Image
+       last-modification time". */
     png_time mod_time = {0,1,1,0,0,0};
-    int time_ok = 0;
     if (input_time) {
 	SV * ref;
+	HV * time_hash;
         ref = SvRV(input_time);
-        if (ref && SvTYPE (ref) == SVt_PVHV) {
-            HV * time_hash = (HV *) SvRV (input_time);
-            MESSAGE ("Setting time from a hash.");
-#define SET_TIME(field) {                                               \
-                SV ** field_sv_ptr = hv_fetch (time_hash, #field,       \
-                                               strlen (#field), 0);     \
-                if (field_sv_ptr) {                                     \
-                    SV * field_sv = * field_sv_ptr;                     \
-                    MESSAGE ("OK for %s\n", #field);                    \
-                    mod_time.field = SvIV (field_sv);                   \
-                }                                                       \
-            }
-            SET_TIME(year);
-            SET_TIME(month);
-            SET_TIME(day);
-            SET_TIME(hour);
-            SET_TIME(minute);
-            SET_TIME(second);
-#undef SET_TIME    
-            time_ok = 1;
-        }
-    }
-    if (! time_ok) {
-        /* There is no valid time argument, so just set it to the time
-           now, according to the system clock. */
-        time_t now;
+        if (! ref || SvTYPE (ref) != SVt_PVHV) {
+	    croak ("Argument to set_tIME should be a hash reference");
+	}
+	time_hash = (HV *) ref;
 
-        MESSAGE ("The modification time doesn't look OK so I am going to set the modification time to the time now instead.");
-        now = time (0);
-        png_convert_from_time_t (& mod_time, now);
+	MESSAGE ("Setting time from a hash.");
+#define SET_TIME(field) {					\
+	    SV ** field_sv_ptr = hv_fetch (time_hash, #field,	\
+					   strlen (#field), 0);	\
+	    if (field_sv_ptr) {					\
+		SV * field_sv = * field_sv_ptr;			\
+		MESSAGE ("OK for %s\n", #field);		\
+		mod_time.field = SvIV (field_sv);		\
+	    }							\
+	}
+	SET_TIME(year);
+	SET_TIME(month);
+	SET_TIME(day);
+	SET_TIME(hour);
+	SET_TIME(minute);
+	SET_TIME(second);
+#undef SET_TIME    
+    }
+    else {
+	/* Use the current time. */
+	time_t now;
+	
+	now = time (0);
+	png_convert_from_time_t (& mod_time, now);
     }
     png_set_tIME (pngi, & mod_time);
 }
@@ -904,6 +908,9 @@ perl_png_write_to_scalar (perl_libpng_t * png, int transforms)
 {
     scalar_as_image_t * si;
     SV * image_data;
+    if (png->type != perl_png_write_obj) {
+	croak ("This is a read object, use copy_png to copy it");
+    }
 
     GET_TRANSFORMS;
 
@@ -1053,6 +1060,8 @@ const char * perl_png_color_type_name (int color_type)
     return name;
 }
 
+#undef PERL_PNG_COLOR_TYPE
+
 #define PERL_PNG_TEXT_COMP(x,y)                  \
     case PNG_ ## x ## _COMPRESSION_ ## y:        \
     name = #x "_" #y;                            \
@@ -1064,18 +1073,21 @@ const char * perl_png_text_compression_name (int text_compression)
 {
     const char * name;
     switch (text_compression) {
+#ifdef PNG_tEXt_SUPPORTED
         PERL_PNG_TEXT_COMP(TEXT,NONE);
         PERL_PNG_TEXT_COMP(TEXT,zTXt);
+#ifdef PNG_iTXt_SUPPORTED
         PERL_PNG_TEXT_COMP(ITXT,NONE);
         PERL_PNG_TEXT_COMP(ITXT,zTXt);
+#endif /* iTXt */
+#endif /* PNG_tEXt_SUPPORTED */
     default:
-        /* Moan about not knowing this text compression type. */
+	warn ("Unknown compression type %d", text_compression);
         name = "";
     }
     return name;
 }
 
-#undef PERL_PNG_COLOR_TYPE
 
 /*  ____       _      _   _       
    |  _ \ __ _| | ___| |_| |_ ___ 
@@ -1171,13 +1183,6 @@ perl_png_set_PLTE (perl_libpng_t * png, AV * perl_colors)
     PERL_PNG_FREE (colors);
 }
 
-/* Set the palette directly, using a pointer. */
-
-static void
-perl_png_set_PLTE_pointer (perl_libpng_t * png, png_colorp colors, int n_colors){
-    png_set_PLTE (pngi, colors, n_colors);
-}
-
 /* Create a hash containing the colour values of a pointer to a
    png_color_16 structure. */
 
@@ -1247,22 +1252,23 @@ static void perl_png_set_bKGD (perl_libpng_t * png, HV * bKGD)
 }
 
 /* Get the pCAL (calibration of pixel values) chunk from a PNG
-   image. This currently does nothing. */
+   image. */
 
 static SV * perl_png_get_pCAL (perl_libpng_t * png)
 {
+    SV * pcal = & PL_sv_undef;
 #ifdef PNG_pCAL_SUPPORTED
     HV * ice;
     char * purpose;
-    int x0;
-    int x1;
+    png_int_32 x0;
+    png_int_32 x1;
     int type;
     int n_params;
     char * units;
     char ** png_params;
 
     if (! VALID (pCAL)) {
-	return & PL_sv_undef;
+	return pcal;
     }
     png_get_pCAL (pngi, & purpose, & x0, & x1, & type,
 		  & n_params, & units, & png_params);
@@ -1276,18 +1282,16 @@ static SV * perl_png_get_pCAL (perl_libpng_t * png)
 	AV * params;
 	int i;
 	params = newAV ();
-	/* Looks like a memory leak here. */
-	GET_MEMORY (png_params, n_params, char *);
 	for (i = 0; i < n_params; i++) {
 	    ARRAY_STORE_PV (params, png_params[i]);
 	}
 	HASH_STORE_AV (ice, params);
     }
-    return newRV_noinc ((SV *) ice);
+    pcal = newRV_noinc ((SV *) ice);
 #else
     UNSUPPORTED(pCAL);
-    return & PL_sv_undef;
 #endif
+    return pcal;
 }
 
 /* Set the pCAL (calibration of pixel values) chunk of a PNG
@@ -1326,6 +1330,9 @@ static void perl_png_set_pCAL (perl_libpng_t * png, HV * pCAL)
 	}
     }
     png_set_pCAL (pngi, purpose, x0, x1, type, n_params, units, png_params);
+    if (png_params) {
+	PERL_PNG_FREE (png_params);
+    }
 #else
     UNSUPPORTED(pCAL);
 #endif
@@ -1365,27 +1372,29 @@ static void perl_png_set_gAMA (perl_libpng_t * png, double gamma)
 
 static SV * perl_png_get_iCCP (perl_libpng_t * png)
 {
+    SV * iccp = & PL_sv_undef;
 #ifdef PNG_iCCP_SUPPORTED
-    if (VALID (iCCP)) {
-	char * name;
-	unsigned char * profile;
-	int compression_method;
-	unsigned int proflen;
-        HV * ice;
-	SV * profile_sv;
-	png_get_iCCP (pngi, & name, & compression_method, & profile,
-		      & proflen);
-        ice = newHV ();
-	HASH_STORE_PV (ice, name);
-	profile_sv = newSVpv ((char *) profile, proflen);
-	(void) hv_store (ice, "profile", strlen ("profile"), profile_sv, 0);
-        return newRV_noinc ((SV *) ice);
+    png_charp name;
+    png_bytep profile;
+    int compression_type = UNUSED_ZERO_ARG;
+    png_uint_32 proflen;
+    HV * ice;
+    SV * profile_sv;
+
+    if (! VALID (iCCP)) {
+	return iccp;
     }
-    return & PL_sv_undef;
+    png_get_iCCP (pngi, & name, & compression_type, & profile,
+		  & proflen);
+    ice = newHV ();
+    HASH_STORE_PV (ice, name);
+    profile_sv = newSVpv ((char *) profile, proflen);
+    (void) hv_store (ice, "profile", strlen ("profile"), profile_sv, 0);
+    iccp = newRV_noinc ((SV *) ice);
 #else /* PNG_iCCP_SUPPORTED */
     UNSUPPORTED(iCCP);
-    return & PL_sv_undef;
 #endif /* PNG_iCCP_SUPPORTED */
+    return iccp;
 }
 
 static void perl_png_set_iCCP (perl_libpng_t * png, HV * iCCP)
@@ -1395,15 +1404,12 @@ static void perl_png_set_iCCP (perl_libpng_t * png, HV * iCCP)
     STRLEN name_length;
     char * profile;
     STRLEN profile_length;
-    int compression_method;
-
-    compression_method = PNG_COMPRESSION_TYPE_BASE;
 
     HASH_FETCH_PV (iCCP, profile);
     HASH_FETCH_PV (iCCP, name);
 
-    png_set_iCCP (pngi, name, compression_method,
-		  (unsigned char *) profile, profile_length);
+    png_set_iCCP (pngi, name, UNUSED_ZERO_ARG,
+		  (png_bytep) profile, (png_uint_32) profile_length);
 #else /* PNG_iCCP_SUPPORTED */
     UNSUPPORTED(iCCP);
 #endif /* PNG_iCCP_SUPPORTED */
@@ -1447,7 +1453,7 @@ static SV * perl_png_get_tRNS (perl_libpng_t * png)
     else {
 	HV * trans_hv;
 	trans_hv = newHV ();
-#line 1450 "/usr/home/ben/projects/image-png-libpng/build/../perl-libpng.c"
+#line 1456 "/usr/home/ben/projects/image-png-libpng/build/../perl-libpng.c"
         
 	HASH_STORE_IV_MEMBER (trans_hv, red, trans_values);
 	
@@ -1457,7 +1463,7 @@ static SV * perl_png_get_tRNS (perl_libpng_t * png)
 	
 	HASH_STORE_IV_MEMBER (trans_hv, gray, trans_values);
 	
-#line 1455 "perl-libpng.c.tmpl"
+#line 1461 "perl-libpng.c.tmpl"
 	return newRV_noinc ((SV *) trans_hv);
     }
 #else
@@ -1475,7 +1481,6 @@ static void perl_png_set_tRNS (perl_libpng_t * png, SV * tRNS)
     png_byte color_type;
     png_byte trans[256] = {0};
     int num_trans;
-    png_uint_32 status;
     png_color_16 trans_values = {0};
     color_type = png_get_color_type (pngi);
     if (color_type & PNG_COLOR_MASK_PALETTE) {
@@ -1512,7 +1517,7 @@ static void perl_png_set_tRNS (perl_libpng_t * png, SV * tRNS)
 	    /* unhandled error */
 	}
 	trans_hv = (HV *) SvRV (tRNS);
-#line 1515 "/usr/home/ben/projects/image-png-libpng/build/../perl-libpng.c"
+#line 1520 "/usr/home/ben/projects/image-png-libpng/build/../perl-libpng.c"
         
 	    HASH_FETCH_IV_MEMBER (trans_hv, red, (& trans_values));
 	
@@ -1522,7 +1527,7 @@ static void perl_png_set_tRNS (perl_libpng_t * png, SV * tRNS)
 	
 	    HASH_FETCH_IV_MEMBER (trans_hv, gray, (& trans_values));
 	
-#line 1514 "perl-libpng.c.tmpl"
+#line 1519 "perl-libpng.c.tmpl"
 	num_trans = 1;
 	png_set_tRNS (pngi, trans, num_trans, & trans_values); 
     }
@@ -1550,14 +1555,14 @@ perl_png_spalette_to_hv (png_sPLT_tp spalette)
 	png_sPLT_entry * entry;
 	entry = spalette->entries + i;
 	perl_entry = newHV ();
-#line 1553 "/usr/home/ben/projects/image-png-libpng/build/../perl-libpng.c"
+#line 1558 "/usr/home/ben/projects/image-png-libpng/build/../perl-libpng.c"
 		HASH_STORE_IV_MEMBER (perl_entry, red, entry);
 		HASH_STORE_IV_MEMBER (perl_entry, green, entry);
 		HASH_STORE_IV_MEMBER (perl_entry, blue, entry);
 		HASH_STORE_IV_MEMBER (perl_entry, alpha, entry);
 		HASH_STORE_IV_MEMBER (perl_entry, frequency, entry);
 	
-#line 1546 "perl-libpng.c.tmpl"
+#line 1551 "perl-libpng.c.tmpl"
 	av_push (entries, newRV_noinc ((SV *) perl_entry));
     }
     HASH_STORE_AV (perl_spalette, entries);
@@ -1661,14 +1666,14 @@ static void perl_png_set_sPLT (perl_libpng_t * png, AV * sPLT_entries)
 	    }
 	    MESSAGE ("Copying entry %d", j);
 	    e = entry->entries + j;
-#line 1664 "/usr/home/ben/projects/image-png-libpng/build/../perl-libpng.c"
+#line 1669 "/usr/home/ben/projects/image-png-libpng/build/../perl-libpng.c"
  	    	    HASH_FETCH_IV_MEMBER (perl_entry, red, e);
 	    	    HASH_FETCH_IV_MEMBER (perl_entry, green, e);
 	    	    HASH_FETCH_IV_MEMBER (perl_entry, blue, e);
 	    	    HASH_FETCH_IV_MEMBER (perl_entry, alpha, e);
 	    	    HASH_FETCH_IV_MEMBER (perl_entry, frequency, e);
 	    
-#line 1654 "perl-libpng.c.tmpl"
+#line 1659 "perl-libpng.c.tmpl"
 	}
     }
     MESSAGE ("Setting the entries");
@@ -1771,73 +1776,86 @@ static SV * perl_png_get_hIST (perl_libpng_t * png)
 
 static SV * perl_png_get_sBIT (perl_libpng_t * png)
 {
+    SV * sbit = & PL_sv_undef;
 #ifdef PNG_sBIT_SUPPORTED
     if (VALID (sBIT)) {
         HV * sig_bit;
         png_color_8p colors;
 	png_uint_32 status;
+	int color_type;
+
+	color_type = png_get_color_type (pngi);
         sig_bit = newHV ();
 	status = png_get_sBIT (pngi, & colors);
 	if (status != PNG_INFO_sBIT) {
-	    /* error */
+	    return sbit;
 	}
-#line 1784 "/usr/home/ben/projects/image-png-libpng/build/../perl-libpng.c"
-        
-	HASH_STORE_IV_MEMBER (sig_bit, red, colors);
-	
-	HASH_STORE_IV_MEMBER (sig_bit, green, colors);
-	
-	HASH_STORE_IV_MEMBER (sig_bit, blue, colors);
-	
-	HASH_STORE_IV_MEMBER (sig_bit, gray, colors);
-	
-	HASH_STORE_IV_MEMBER (sig_bit, alpha, colors);
-	
-#line 1771 "perl-libpng.c.tmpl"
-        return newRV_noinc ((SV *) sig_bit);
+	if ((color_type & PNG_COLOR_MASK_COLOR) != 0) {
+	    
+	    HASH_STORE_IV_MEMBER (sig_bit, red, colors);
+	    
+	    HASH_STORE_IV_MEMBER (sig_bit, green, colors);
+	    
+	    HASH_STORE_IV_MEMBER (sig_bit, blue, colors);
+	    
+	}
+	else {
+	    HASH_STORE_IV_MEMBER (sig_bit, gray, colors);
+	}
+	if ((color_type & PNG_COLOR_MASK_ALPHA) != 0) {
+	    HASH_STORE_IV_MEMBER (sig_bit, alpha, colors);
+	}
+        sbit = newRV_noinc ((SV *) sig_bit);
     }
-    return & PL_sv_undef;
 #else
     /* libpng was compiled without this option. */
     UNSUPPORTED(sBIT);
-    return & PL_sv_undef;
 #endif
+    return sbit;
 }
 
 static void perl_png_set_sBIT (perl_libpng_t * png, HV * sBIT)
 {
 #ifdef PNG_sBIT_SUPPORTED
     png_color_8 colors;
-     HASH_FETCH_IV_MEMBER (sBIT,red,(&colors)); HASH_FETCH_IV_MEMBER (sBIT,green,(&colors)); HASH_FETCH_IV_MEMBER (sBIT,blue,(&colors)); HASH_FETCH_IV_MEMBER (sBIT,gray,(&colors)); HASH_FETCH_IV_MEMBER (sBIT,alpha,(&colors));
+    
+    HASH_FETCH_IV_MEMBER (sBIT, red, (& colors));
+    
+    HASH_FETCH_IV_MEMBER (sBIT, green, (& colors));
+    
+    HASH_FETCH_IV_MEMBER (sBIT, blue, (& colors));
+    
+    HASH_FETCH_IV_MEMBER (sBIT, gray, (& colors));
+    
+    HASH_FETCH_IV_MEMBER (sBIT, alpha, (& colors));
+    
     png_set_sBIT (pngi, & colors);
 #else
-    /* libpng was compiled without this option. */
     UNSUPPORTED(sBIT);
 #endif
 }
 
 static SV * perl_png_get_oFFs (perl_libpng_t * png)
 {
+    SV * offs = & PL_sv_undef;
 #ifdef PNG_oFFs_SUPPORTED
     if (VALID (oFFs)) {
         HV * offset;
-        
-        png_int_32 x_offset;
+	png_int_32 x_offset;
         png_int_32 y_offset;
         int unit_type;
+
         offset = newHV ();
         png_get_oFFs (pngi, & x_offset, & y_offset, & unit_type);
         HASH_STORE_IV (offset, x_offset);
         HASH_STORE_IV (offset, y_offset);
         HASH_STORE_IV (offset, unit_type);
-        return newRV_noinc ((SV *) offset);
+        offs = newRV_noinc ((SV *) offset);
     }
-    return & PL_sv_undef;
 #else
-    /* libpng was compiled without this option. */
     UNSUPPORTED(oFFs);
-    return & PL_sv_undef;
 #endif
+    return offs;
 }
 
 /* set oFFs of PNG image. */
@@ -1853,13 +1871,13 @@ static void perl_png_set_oFFs (perl_libpng_t * png, HV * oFFs)
     HASH_FETCH_IV (oFFs, unit_type);
     png_set_oFFs (pngi, x_offset, y_offset, unit_type);
 #else
-    /* libpng was compiled without this option. */
     UNSUPPORTED(oFFs);
 #endif
 }
 
 static SV * perl_png_get_pHYs (perl_libpng_t * png)
 {
+    SV * physsv = & PL_sv_undef;
 #ifdef PNG_pHYs_SUPPORTED
     if (VALID (pHYs)) {
         png_uint_32 res_x;
@@ -1871,14 +1889,13 @@ static SV * perl_png_get_pHYs (perl_libpng_t * png)
         HASH_STORE_IV (phys, res_x);
         HASH_STORE_IV (phys, res_y);
         HASH_STORE_IV (phys, unit_type);
-        return newRV_noinc ((SV *) phys);
+        physsv = newRV_noinc ((SV *) phys);
     }
-    return & PL_sv_undef;
 #else
     /* libpng was compiled without this option. */
     UNSUPPORTED(pHYs);
-    return & PL_sv_undef;
 #endif
+    return physsv;
 }
 
 static void perl_png_set_pHYs (perl_libpng_t * png, HV * pHYs)
@@ -1975,9 +1992,9 @@ static SV * perl_png_get_valid (perl_libpng_t * png)
     valid = png_get_valid (pngi, 0xFFFFFFFF);
 #define V(x) \
     (void) hv_store (perl_valid, #x, strlen (#x), newSViv (valid & PNG_INFO_ ## x), 0)
-#line 1978 "/usr/home/ben/projects/image-png-libpng/build/../perl-libpng.c"
+#line 1995 "/usr/home/ben/projects/image-png-libpng/build/../perl-libpng.c"
 V(bKGD);V(cHRM);V(gAMA);V(hIST);V(iCCP);V(IDAT);V(oFFs);V(pCAL);V(pHYs);V(PLTE);V(sBIT);V(sCAL);V(sPLT);V(sRGB);V(tIME);V(tRNS);
-#line 1955 "perl-libpng.c.tmpl"
+#line 1968 "perl-libpng.c.tmpl"
 #undef V
 
     return newRV_noinc ((SV *) perl_valid);
@@ -1997,7 +2014,6 @@ perl_png_get_rows (perl_libpng_t * png)
     png_bytepp rows;
     int rowbytes;
     int height;
-    SV ** row_svs;
     int r;
     AV * perl_rows;
 
@@ -2075,8 +2091,6 @@ perl_png_read_image (perl_libpng_t * png)
         png->row_pointers[i] = png->image_data + rowbytes * i;
     }
     png_read_image (png->png, png->row_pointers);
-    /* Set the row_pointers pointers to point into the allocated
-       memory. */
 }
 
 /* Get the row pointers directly. */
@@ -2171,6 +2185,7 @@ static void perl_png_set_rows (perl_libpng_t * png, AV * rows)
 	r += rbytes;
     }
     if (r != ar + arbytes) {
+	/* Final check after writing row data. */
 	croak ("%s:%d: Mismatch %p != %p", __FILE__, __LINE__,
 	       r, ar + arbytes);
     }
@@ -2351,97 +2366,55 @@ static void perl_png_set_unknown_chunks (perl_libpng_t * png, AV * chunk_list)
 
 int perl_png_libpng_supports (const char * what)
 {
-#line 2354 "/usr/home/ben/projects/image-png-libpng/build/../perl-libpng.c"
-    if (strcmp (what, "iTXt") == 0) {
-#ifdef PNG_iTXt_SUPPORTED
+    if (strcmp (what, "sCAL") == 0) {
+#ifdef PERL_PNG_sCAL_s_SUPPORTED
         return 1;
 #else
         return 0;
-#endif /* iTXt */
+#endif /* PERL_PNG_sCAL_s_SUPPORTED */
     }
-    if (strcmp (what, "UNKNOWN_CHUNKS") == 0) {
-#ifdef PNG_UNKNOWN_CHUNKS_SUPPORTED
+#line 2376 "/usr/home/ben/projects/image-png-libpng/build/../perl-libpng.c"
+    if (strcmp (what, "16BIT") == 0) {
+#ifdef PNG_16BIT_SUPPORTED
         return 1;
 #else
         return 0;
-#endif /* UNKNOWN_CHUNKS */
+#endif /* 16BIT */
     }
-    if (strcmp (what, "zTXt") == 0) {
-#ifdef PNG_zTXt_SUPPORTED
+    if (strcmp (what, "ALIGNED_MEMORY") == 0) {
+#ifdef PNG_ALIGNED_MEMORY_SUPPORTED
         return 1;
 #else
         return 0;
-#endif /* zTXt */
+#endif /* ALIGNED_MEMORY */
     }
-    if (strcmp (what, "tEXt") == 0) {
-#ifdef PNG_tEXt_SUPPORTED
+    if (strcmp (what, "ARM_NEON_API") == 0) {
+#ifdef PNG_ARM_NEON_API_SUPPORTED
         return 1;
 #else
         return 0;
-#endif /* tEXt */
+#endif /* ARM_NEON_API */
     }
-    if (strcmp (what, "pCAL") == 0) {
-#ifdef PNG_pCAL_SUPPORTED
+    if (strcmp (what, "BENIGN_ERRORS") == 0) {
+#ifdef PNG_BENIGN_ERRORS_SUPPORTED
         return 1;
 #else
         return 0;
-#endif /* pCAL */
+#endif /* BENIGN_ERRORS */
     }
-    if (strcmp (what, "iCCP") == 0) {
-#ifdef PNG_iCCP_SUPPORTED
+    if (strcmp (what, "BENIGN_READ_ERRORS") == 0) {
+#ifdef PNG_BENIGN_READ_ERRORS_SUPPORTED
         return 1;
 #else
         return 0;
-#endif /* iCCP */
+#endif /* BENIGN_READ_ERRORS */
     }
-    if (strcmp (what, "sPLT") == 0) {
-#ifdef PNG_sPLT_SUPPORTED
+    if (strcmp (what, "BENIGN_WRITE_ERRORS") == 0) {
+#ifdef PNG_BENIGN_WRITE_ERRORS_SUPPORTED
         return 1;
 #else
         return 0;
-#endif /* sPLT */
-    }
-    if (strcmp (what, "USER_LIMITS") == 0) {
-#ifdef PNG_USER_LIMITS_SUPPORTED
-        return 1;
-#else
-        return 0;
-#endif /* USER_LIMITS */
-    }
-    if (strcmp (what, "tIME") == 0) {
-#ifdef PNG_tIME_SUPPORTED
-        return 1;
-#else
-        return 0;
-#endif /* tIME */
-    }
-    if (strcmp (what, "TEXT") == 0) {
-#ifdef PNG_TEXT_SUPPORTED
-        return 1;
-#else
-        return 0;
-#endif /* TEXT */
-    }
-    if (strcmp (what, "HANDLE_AS_UNKNOWN") == 0) {
-#ifdef PNG_HANDLE_AS_UNKNOWN_SUPPORTED
-        return 1;
-#else
-        return 0;
-#endif /* HANDLE_AS_UNKNOWN */
-    }
-    if (strcmp (what, "USER_CHUNKS") == 0) {
-#ifdef PNG_USER_CHUNKS_SUPPORTED
-        return 1;
-#else
-        return 0;
-#endif /* USER_CHUNKS */
-    }
-    if (strcmp (what, "CONVERT_tIME") == 0) {
-#ifdef PNG_CONVERT_tIME_SUPPORTED
-        return 1;
-#else
-        return 0;
-#endif /* CONVERT_tIME */
+#endif /* BENIGN_WRITE_ERRORS */
     }
     if (strcmp (what, "bKGD") == 0) {
 #ifdef PNG_bKGD_SUPPORTED
@@ -2450,12 +2423,131 @@ int perl_png_libpng_supports (const char * what)
         return 0;
 #endif /* bKGD */
     }
+    if (strcmp (what, "BUILD_GRAYSCALE_PALETTE") == 0) {
+#ifdef PNG_BUILD_GRAYSCALE_PALETTE_SUPPORTED
+        return 1;
+#else
+        return 0;
+#endif /* BUILD_GRAYSCALE_PALETTE */
+    }
+    if (strcmp (what, "BUILTIN_BSWAP16") == 0) {
+#ifdef PNG_BUILTIN_BSWAP16_SUPPORTED
+        return 1;
+#else
+        return 0;
+#endif /* BUILTIN_BSWAP16 */
+    }
+    if (strcmp (what, "CHECK_FOR_INVALID_INDEX") == 0) {
+#ifdef PNG_CHECK_FOR_INVALID_INDEX_SUPPORTED
+        return 1;
+#else
+        return 0;
+#endif /* CHECK_FOR_INVALID_INDEX */
+    }
     if (strcmp (what, "cHRM") == 0) {
 #ifdef PNG_cHRM_SUPPORTED
         return 1;
 #else
         return 0;
 #endif /* cHRM */
+    }
+    if (strcmp (what, "COLORSPACE") == 0) {
+#ifdef PNG_COLORSPACE_SUPPORTED
+        return 1;
+#else
+        return 0;
+#endif /* COLORSPACE */
+    }
+    if (strcmp (what, "CONSOLE_IO") == 0) {
+#ifdef PNG_CONSOLE_IO_SUPPORTED
+        return 1;
+#else
+        return 0;
+#endif /* CONSOLE_IO */
+    }
+    if (strcmp (what, "CONVERT_tIME") == 0) {
+#ifdef PNG_CONVERT_tIME_SUPPORTED
+        return 1;
+#else
+        return 0;
+#endif /* CONVERT_tIME */
+    }
+    if (strcmp (what, "CONVERT_tIME") == 0) {
+#ifdef PNG_CONVERT_tIME_SUPPORTED
+        return 1;
+#else
+        return 0;
+#endif /* CONVERT_tIME */
+    }
+    if (strcmp (what, "EASY_ACCESS") == 0) {
+#ifdef PNG_EASY_ACCESS_SUPPORTED
+        return 1;
+#else
+        return 0;
+#endif /* EASY_ACCESS */
+    }
+    if (strcmp (what, "ERROR_NUMBERS") == 0) {
+#ifdef PNG_ERROR_NUMBERS_SUPPORTED
+        return 1;
+#else
+        return 0;
+#endif /* ERROR_NUMBERS */
+    }
+    if (strcmp (what, "ERROR_TEXT") == 0) {
+#ifdef PNG_ERROR_TEXT_SUPPORTED
+        return 1;
+#else
+        return 0;
+#endif /* ERROR_TEXT */
+    }
+    if (strcmp (what, "eXIf") == 0) {
+#ifdef PNG_eXIf_SUPPORTED
+        return 1;
+#else
+        return 0;
+#endif /* eXIf */
+    }
+    if (strcmp (what, "FIXED_POINT") == 0) {
+#ifdef PNG_FIXED_POINT_SUPPORTED
+        return 1;
+#else
+        return 0;
+#endif /* FIXED_POINT */
+    }
+    if (strcmp (what, "FIXED_POINT_MACRO") == 0) {
+#ifdef PNG_FIXED_POINT_MACRO_SUPPORTED
+        return 1;
+#else
+        return 0;
+#endif /* FIXED_POINT_MACRO */
+    }
+    if (strcmp (what, "FLOATING_ARITHMETIC") == 0) {
+#ifdef PNG_FLOATING_ARITHMETIC_SUPPORTED
+        return 1;
+#else
+        return 0;
+#endif /* FLOATING_ARITHMETIC */
+    }
+    if (strcmp (what, "FLOATING_POINT") == 0) {
+#ifdef PNG_FLOATING_POINT_SUPPORTED
+        return 1;
+#else
+        return 0;
+#endif /* FLOATING_POINT */
+    }
+    if (strcmp (what, "FORMAT_AFIRST") == 0) {
+#ifdef PNG_FORMAT_AFIRST_SUPPORTED
+        return 1;
+#else
+        return 0;
+#endif /* FORMAT_AFIRST */
+    }
+    if (strcmp (what, "FORMAT_BGR") == 0) {
+#ifdef PNG_FORMAT_BGR_SUPPORTED
+        return 1;
+#else
+        return 0;
+#endif /* FORMAT_BGR */
     }
     if (strcmp (what, "gAMA") == 0) {
 #ifdef PNG_gAMA_SUPPORTED
@@ -2464,12 +2556,89 @@ int perl_png_libpng_supports (const char * what)
         return 0;
 #endif /* gAMA */
     }
+    if (strcmp (what, "GAMMA") == 0) {
+#ifdef PNG_GAMMA_SUPPORTED
+        return 1;
+#else
+        return 0;
+#endif /* GAMMA */
+    }
+    if (strcmp (what, "GET_PALETTE_MAX") == 0) {
+#ifdef PNG_GET_PALETTE_MAX_SUPPORTED
+        return 1;
+#else
+        return 0;
+#endif /* GET_PALETTE_MAX */
+    }
+    if (strcmp (what, "HANDLE_AS_UNKNOWN") == 0) {
+#ifdef PNG_HANDLE_AS_UNKNOWN_SUPPORTED
+        return 1;
+#else
+        return 0;
+#endif /* HANDLE_AS_UNKNOWN */
+    }
+    if (strcmp (what, "HANDLE_AS_UNKNOWN") == 0) {
+#ifdef PNG_HANDLE_AS_UNKNOWN_SUPPORTED
+        return 1;
+#else
+        return 0;
+#endif /* HANDLE_AS_UNKNOWN */
+    }
     if (strcmp (what, "hIST") == 0) {
 #ifdef PNG_hIST_SUPPORTED
         return 1;
 #else
         return 0;
 #endif /* hIST */
+    }
+    if (strcmp (what, "iCCP") == 0) {
+#ifdef PNG_iCCP_SUPPORTED
+        return 1;
+#else
+        return 0;
+#endif /* iCCP */
+    }
+    if (strcmp (what, "INCH_CONVERSIONS") == 0) {
+#ifdef PNG_INCH_CONVERSIONS_SUPPORTED
+        return 1;
+#else
+        return 0;
+#endif /* INCH_CONVERSIONS */
+    }
+    if (strcmp (what, "INFO_IMAGE") == 0) {
+#ifdef PNG_INFO_IMAGE_SUPPORTED
+        return 1;
+#else
+        return 0;
+#endif /* INFO_IMAGE */
+    }
+    if (strcmp (what, "IO_STATE") == 0) {
+#ifdef PNG_IO_STATE_SUPPORTED
+        return 1;
+#else
+        return 0;
+#endif /* IO_STATE */
+    }
+    if (strcmp (what, "iTXt") == 0) {
+#ifdef PNG_iTXt_SUPPORTED
+        return 1;
+#else
+        return 0;
+#endif /* iTXt */
+    }
+    if (strcmp (what, "MIPS_MSA_API") == 0) {
+#ifdef PNG_MIPS_MSA_API_SUPPORTED
+        return 1;
+#else
+        return 0;
+#endif /* MIPS_MSA_API */
+    }
+    if (strcmp (what, "MNG_FEATURES") == 0) {
+#ifdef PNG_MNG_FEATURES_SUPPORTED
+        return 1;
+#else
+        return 0;
+#endif /* MNG_FEATURES */
     }
     if (strcmp (what, "oFFs") == 0) {
 #ifdef PNG_oFFs_SUPPORTED
@@ -2478,12 +2647,271 @@ int perl_png_libpng_supports (const char * what)
         return 0;
 #endif /* oFFs */
     }
+    if (strcmp (what, "pCAL") == 0) {
+#ifdef PNG_pCAL_SUPPORTED
+        return 1;
+#else
+        return 0;
+#endif /* pCAL */
+    }
+    if (strcmp (what, "PEDANTIC_WARNINGS") == 0) {
+#ifdef PNG_PEDANTIC_WARNINGS_SUPPORTED
+        return 1;
+#else
+        return 0;
+#endif /* PEDANTIC_WARNINGS */
+    }
     if (strcmp (what, "pHYs") == 0) {
 #ifdef PNG_pHYs_SUPPORTED
         return 1;
 #else
         return 0;
 #endif /* pHYs */
+    }
+    if (strcmp (what, "POINTER_INDEXING") == 0) {
+#ifdef PNG_POINTER_INDEXING_SUPPORTED
+        return 1;
+#else
+        return 0;
+#endif /* POINTER_INDEXING */
+    }
+    if (strcmp (what, "POWERPC_VSX_API") == 0) {
+#ifdef PNG_POWERPC_VSX_API_SUPPORTED
+        return 1;
+#else
+        return 0;
+#endif /* POWERPC_VSX_API */
+    }
+    if (strcmp (what, "PROGRESSIVE_READ") == 0) {
+#ifdef PNG_PROGRESSIVE_READ_SUPPORTED
+        return 1;
+#else
+        return 0;
+#endif /* PROGRESSIVE_READ */
+    }
+    if (strcmp (what, "READ") == 0) {
+#ifdef PNG_READ_SUPPORTED
+        return 1;
+#else
+        return 0;
+#endif /* READ */
+    }
+    if (strcmp (what, "READ_16_TO_8") == 0) {
+#ifdef PNG_READ_16_TO_8_SUPPORTED
+        return 1;
+#else
+        return 0;
+#endif /* READ_16_TO_8 */
+    }
+    if (strcmp (what, "READ_ALPHA_MODE") == 0) {
+#ifdef PNG_READ_ALPHA_MODE_SUPPORTED
+        return 1;
+#else
+        return 0;
+#endif /* READ_ALPHA_MODE */
+    }
+    if (strcmp (what, "READ_BACKGROUND") == 0) {
+#ifdef PNG_READ_BACKGROUND_SUPPORTED
+        return 1;
+#else
+        return 0;
+#endif /* READ_BACKGROUND */
+    }
+    if (strcmp (what, "READ_BGR") == 0) {
+#ifdef PNG_READ_BGR_SUPPORTED
+        return 1;
+#else
+        return 0;
+#endif /* READ_BGR */
+    }
+    if (strcmp (what, "READ_COMPOSITE_NODIV") == 0) {
+#ifdef PNG_READ_COMPOSITE_NODIV_SUPPORTED
+        return 1;
+#else
+        return 0;
+#endif /* READ_COMPOSITE_NODIV */
+    }
+    if (strcmp (what, "READ_COMPRESSED_TEXT") == 0) {
+#ifdef PNG_READ_COMPRESSED_TEXT_SUPPORTED
+        return 1;
+#else
+        return 0;
+#endif /* READ_COMPRESSED_TEXT */
+    }
+    if (strcmp (what, "READ_EXPAND") == 0) {
+#ifdef PNG_READ_EXPAND_SUPPORTED
+        return 1;
+#else
+        return 0;
+#endif /* READ_EXPAND */
+    }
+    if (strcmp (what, "READ_EXPAND_16") == 0) {
+#ifdef PNG_READ_EXPAND_16_SUPPORTED
+        return 1;
+#else
+        return 0;
+#endif /* READ_EXPAND_16 */
+    }
+    if (strcmp (what, "READ_FILLER") == 0) {
+#ifdef PNG_READ_FILLER_SUPPORTED
+        return 1;
+#else
+        return 0;
+#endif /* READ_FILLER */
+    }
+    if (strcmp (what, "READ_GRAY_TO_RGB") == 0) {
+#ifdef PNG_READ_GRAY_TO_RGB_SUPPORTED
+        return 1;
+#else
+        return 0;
+#endif /* READ_GRAY_TO_RGB */
+    }
+    if (strcmp (what, "READ_INTERLACING") == 0) {
+#ifdef PNG_READ_INTERLACING_SUPPORTED
+        return 1;
+#else
+        return 0;
+#endif /* READ_INTERLACING */
+    }
+    if (strcmp (what, "READ_INT_FUNCTIONS") == 0) {
+#ifdef PNG_READ_INT_FUNCTIONS_SUPPORTED
+        return 1;
+#else
+        return 0;
+#endif /* READ_INT_FUNCTIONS */
+    }
+    if (strcmp (what, "READ_INVERT") == 0) {
+#ifdef PNG_READ_INVERT_SUPPORTED
+        return 1;
+#else
+        return 0;
+#endif /* READ_INVERT */
+    }
+    if (strcmp (what, "READ_INVERT_ALPHA") == 0) {
+#ifdef PNG_READ_INVERT_ALPHA_SUPPORTED
+        return 1;
+#else
+        return 0;
+#endif /* READ_INVERT_ALPHA */
+    }
+    if (strcmp (what, "READ_OPT_PLTE") == 0) {
+#ifdef PNG_READ_OPT_PLTE_SUPPORTED
+        return 1;
+#else
+        return 0;
+#endif /* READ_OPT_PLTE */
+    }
+    if (strcmp (what, "READ_PACK") == 0) {
+#ifdef PNG_READ_PACK_SUPPORTED
+        return 1;
+#else
+        return 0;
+#endif /* READ_PACK */
+    }
+    if (strcmp (what, "READ_PACKSWAP") == 0) {
+#ifdef PNG_READ_PACKSWAP_SUPPORTED
+        return 1;
+#else
+        return 0;
+#endif /* READ_PACKSWAP */
+    }
+    if (strcmp (what, "READ_QUANTIZE") == 0) {
+#ifdef PNG_READ_QUANTIZE_SUPPORTED
+        return 1;
+#else
+        return 0;
+#endif /* READ_QUANTIZE */
+    }
+    if (strcmp (what, "READ_RGB_TO_GRAY") == 0) {
+#ifdef PNG_READ_RGB_TO_GRAY_SUPPORTED
+        return 1;
+#else
+        return 0;
+#endif /* READ_RGB_TO_GRAY */
+    }
+    if (strcmp (what, "READ_SCALE_16_TO_8") == 0) {
+#ifdef PNG_READ_SCALE_16_TO_8_SUPPORTED
+        return 1;
+#else
+        return 0;
+#endif /* READ_SCALE_16_TO_8 */
+    }
+    if (strcmp (what, "READ_SHIFT") == 0) {
+#ifdef PNG_READ_SHIFT_SUPPORTED
+        return 1;
+#else
+        return 0;
+#endif /* READ_SHIFT */
+    }
+    if (strcmp (what, "READ_STRIP_16_TO_8") == 0) {
+#ifdef PNG_READ_STRIP_16_TO_8_SUPPORTED
+        return 1;
+#else
+        return 0;
+#endif /* READ_STRIP_16_TO_8 */
+    }
+    if (strcmp (what, "READ_STRIP_ALPHA") == 0) {
+#ifdef PNG_READ_STRIP_ALPHA_SUPPORTED
+        return 1;
+#else
+        return 0;
+#endif /* READ_STRIP_ALPHA */
+    }
+    if (strcmp (what, "READ_SWAP") == 0) {
+#ifdef PNG_READ_SWAP_SUPPORTED
+        return 1;
+#else
+        return 0;
+#endif /* READ_SWAP */
+    }
+    if (strcmp (what, "READ_SWAP_ALPHA") == 0) {
+#ifdef PNG_READ_SWAP_ALPHA_SUPPORTED
+        return 1;
+#else
+        return 0;
+#endif /* READ_SWAP_ALPHA */
+    }
+    if (strcmp (what, "READ_tEXt") == 0) {
+#ifdef PNG_READ_tEXt_SUPPORTED
+        return 1;
+#else
+        return 0;
+#endif /* READ_tEXt */
+    }
+    if (strcmp (what, "READ_TRANSFORMS") == 0) {
+#ifdef PNG_READ_TRANSFORMS_SUPPORTED
+        return 1;
+#else
+        return 0;
+#endif /* READ_TRANSFORMS */
+    }
+    if (strcmp (what, "READ_USER_TRANSFORM") == 0) {
+#ifdef PNG_READ_USER_TRANSFORM_SUPPORTED
+        return 1;
+#else
+        return 0;
+#endif /* READ_USER_TRANSFORM */
+    }
+    if (strcmp (what, "READ_zTXt") == 0) {
+#ifdef PNG_READ_zTXt_SUPPORTED
+        return 1;
+#else
+        return 0;
+#endif /* READ_zTXt */
+    }
+    if (strcmp (what, "SAVE_INT_32") == 0) {
+#ifdef PNG_SAVE_INT_32_SUPPORTED
+        return 1;
+#else
+        return 0;
+#endif /* SAVE_INT_32 */
+    }
+    if (strcmp (what, "SAVE_UNKNOWN_CHUNKS") == 0) {
+#ifdef PNG_SAVE_UNKNOWN_CHUNKS_SUPPORTED
+        return 1;
+#else
+        return 0;
+#endif /* SAVE_UNKNOWN_CHUNKS */
     }
     if (strcmp (what, "sBIT") == 0) {
 #ifdef PNG_sBIT_SUPPORTED
@@ -2492,12 +2920,145 @@ int perl_png_libpng_supports (const char * what)
         return 0;
 #endif /* sBIT */
     }
+    if (strcmp (what, "sCAL") == 0) {
+#ifdef PNG_sCAL_SUPPORTED
+        return 1;
+#else
+        return 0;
+#endif /* sCAL */
+    }
+    if (strcmp (what, "SEQUENTIAL_READ") == 0) {
+#ifdef PNG_SEQUENTIAL_READ_SUPPORTED
+        return 1;
+#else
+        return 0;
+#endif /* SEQUENTIAL_READ */
+    }
+    if (strcmp (what, "SETJMP") == 0) {
+#ifdef PNG_SETJMP_SUPPORTED
+        return 1;
+#else
+        return 0;
+#endif /* SETJMP */
+    }
+    if (strcmp (what, "SET_OPTION") == 0) {
+#ifdef PNG_SET_OPTION_SUPPORTED
+        return 1;
+#else
+        return 0;
+#endif /* SET_OPTION */
+    }
+    if (strcmp (what, "SET_UNKNOWN_CHUNKS") == 0) {
+#ifdef PNG_SET_UNKNOWN_CHUNKS_SUPPORTED
+        return 1;
+#else
+        return 0;
+#endif /* SET_UNKNOWN_CHUNKS */
+    }
+    if (strcmp (what, "SET_USER_LIMITS") == 0) {
+#ifdef PNG_SET_USER_LIMITS_SUPPORTED
+        return 1;
+#else
+        return 0;
+#endif /* SET_USER_LIMITS */
+    }
+    if (strcmp (what, "SIMPLIFIED_READ") == 0) {
+#ifdef PNG_SIMPLIFIED_READ_SUPPORTED
+        return 1;
+#else
+        return 0;
+#endif /* SIMPLIFIED_READ */
+    }
+    if (strcmp (what, "SIMPLIFIED_READ_AFIRST") == 0) {
+#ifdef PNG_SIMPLIFIED_READ_AFIRST_SUPPORTED
+        return 1;
+#else
+        return 0;
+#endif /* SIMPLIFIED_READ_AFIRST */
+    }
+    if (strcmp (what, "SIMPLIFIED_WRITE") == 0) {
+#ifdef PNG_SIMPLIFIED_WRITE_SUPPORTED
+        return 1;
+#else
+        return 0;
+#endif /* SIMPLIFIED_WRITE */
+    }
+    if (strcmp (what, "SIMPLIFIED_WRITE_AFIRST") == 0) {
+#ifdef PNG_SIMPLIFIED_WRITE_AFIRST_SUPPORTED
+        return 1;
+#else
+        return 0;
+#endif /* SIMPLIFIED_WRITE_AFIRST */
+    }
+    if (strcmp (what, "SIMPLIFIED_WRITE_BGR") == 0) {
+#ifdef PNG_SIMPLIFIED_WRITE_BGR_SUPPORTED
+        return 1;
+#else
+        return 0;
+#endif /* SIMPLIFIED_WRITE_BGR */
+    }
+    if (strcmp (what, "SIMPLIFIED_WRITE_STDIO") == 0) {
+#ifdef PNG_SIMPLIFIED_WRITE_STDIO_SUPPORTED
+        return 1;
+#else
+        return 0;
+#endif /* SIMPLIFIED_WRITE_STDIO */
+    }
+    if (strcmp (what, "sPLT") == 0) {
+#ifdef PNG_sPLT_SUPPORTED
+        return 1;
+#else
+        return 0;
+#endif /* sPLT */
+    }
     if (strcmp (what, "sRGB") == 0) {
 #ifdef PNG_sRGB_SUPPORTED
         return 1;
 #else
         return 0;
 #endif /* sRGB */
+    }
+    if (strcmp (what, "STDIO") == 0) {
+#ifdef PNG_STDIO_SUPPORTED
+        return 1;
+#else
+        return 0;
+#endif /* STDIO */
+    }
+    if (strcmp (what, "STORE_UNKNOWN_CHUNKS") == 0) {
+#ifdef PNG_STORE_UNKNOWN_CHUNKS_SUPPORTED
+        return 1;
+#else
+        return 0;
+#endif /* STORE_UNKNOWN_CHUNKS */
+    }
+    if (strcmp (what, "TEXT") == 0) {
+#ifdef PNG_TEXT_SUPPORTED
+        return 1;
+#else
+        return 0;
+#endif /* TEXT */
+    }
+    if (strcmp (what, "tEXt") == 0) {
+#ifdef PNG_tEXt_SUPPORTED
+        return 1;
+#else
+        return 0;
+#endif /* tEXt */
+    }
+    if (strcmp (what, "tIME") == 0) {
+#ifdef PNG_tIME_SUPPORTED
+        return 1;
+#else
+        return 0;
+#endif /* tIME */
+    }
+    if (strcmp (what, "TIME_RFC1123") == 0) {
+#ifdef PNG_TIME_RFC1123_SUPPORTED
+        return 1;
+#else
+        return 0;
+#endif /* TIME_RFC1123 */
     }
     if (strcmp (what, "tRNS") == 0) {
 #ifdef PNG_tRNS_SUPPORTED
@@ -2506,12 +3067,82 @@ int perl_png_libpng_supports (const char * what)
         return 0;
 #endif /* tRNS */
     }
-    if (strcmp (what, "WRITE_CUSTOMIZE_ZTXT_COMPRESSION") == 0) {
-#ifdef PNG_WRITE_CUSTOMIZE_ZTXT_COMPRESSION_SUPPORTED
+    if (strcmp (what, "UNKNOWN_CHUNKS") == 0) {
+#ifdef PNG_UNKNOWN_CHUNKS_SUPPORTED
         return 1;
 #else
         return 0;
-#endif /* WRITE_CUSTOMIZE_ZTXT_COMPRESSION */
+#endif /* UNKNOWN_CHUNKS */
+    }
+    if (strcmp (what, "USER_CHUNKS") == 0) {
+#ifdef PNG_USER_CHUNKS_SUPPORTED
+        return 1;
+#else
+        return 0;
+#endif /* USER_CHUNKS */
+    }
+    if (strcmp (what, "USER_LIMITS") == 0) {
+#ifdef PNG_USER_LIMITS_SUPPORTED
+        return 1;
+#else
+        return 0;
+#endif /* USER_LIMITS */
+    }
+    if (strcmp (what, "USER_LIMITS") == 0) {
+#ifdef PNG_USER_LIMITS_SUPPORTED
+        return 1;
+#else
+        return 0;
+#endif /* USER_LIMITS */
+    }
+    if (strcmp (what, "USER_MEM") == 0) {
+#ifdef PNG_USER_MEM_SUPPORTED
+        return 1;
+#else
+        return 0;
+#endif /* USER_MEM */
+    }
+    if (strcmp (what, "USER_TRANSFORM_INFO") == 0) {
+#ifdef PNG_USER_TRANSFORM_INFO_SUPPORTED
+        return 1;
+#else
+        return 0;
+#endif /* USER_TRANSFORM_INFO */
+    }
+    if (strcmp (what, "USER_TRANSFORM_PTR") == 0) {
+#ifdef PNG_USER_TRANSFORM_PTR_SUPPORTED
+        return 1;
+#else
+        return 0;
+#endif /* USER_TRANSFORM_PTR */
+    }
+    if (strcmp (what, "WARNINGS") == 0) {
+#ifdef PNG_WARNINGS_SUPPORTED
+        return 1;
+#else
+        return 0;
+#endif /* WARNINGS */
+    }
+    if (strcmp (what, "WRITE") == 0) {
+#ifdef PNG_WRITE_SUPPORTED
+        return 1;
+#else
+        return 0;
+#endif /* WRITE */
+    }
+    if (strcmp (what, "WRITE_BGR") == 0) {
+#ifdef PNG_WRITE_BGR_SUPPORTED
+        return 1;
+#else
+        return 0;
+#endif /* WRITE_BGR */
+    }
+    if (strcmp (what, "WRITE_COMPRESSED_TEXT") == 0) {
+#ifdef PNG_WRITE_COMPRESSED_TEXT_SUPPORTED
+        return 1;
+#else
+        return 0;
+#endif /* WRITE_COMPRESSED_TEXT */
     }
     if (strcmp (what, "WRITE_CUSTOMIZE_COMPRESSION") == 0) {
 #ifdef PNG_WRITE_CUSTOMIZE_COMPRESSION_SUPPORTED
@@ -2520,7 +3151,140 @@ int perl_png_libpng_supports (const char * what)
         return 0;
 #endif /* WRITE_CUSTOMIZE_COMPRESSION */
     }
-#line 2343 "perl-libpng.c.tmpl"
+    if (strcmp (what, "WRITE_CUSTOMIZE_ZTXT_COMPRESSION") == 0) {
+#ifdef PNG_WRITE_CUSTOMIZE_ZTXT_COMPRESSION_SUPPORTED
+        return 1;
+#else
+        return 0;
+#endif /* WRITE_CUSTOMIZE_ZTXT_COMPRESSION */
+    }
+    if (strcmp (what, "WRITE_FILLER") == 0) {
+#ifdef PNG_WRITE_FILLER_SUPPORTED
+        return 1;
+#else
+        return 0;
+#endif /* WRITE_FILLER */
+    }
+    if (strcmp (what, "WRITE_FILTER") == 0) {
+#ifdef PNG_WRITE_FILTER_SUPPORTED
+        return 1;
+#else
+        return 0;
+#endif /* WRITE_FILTER */
+    }
+    if (strcmp (what, "WRITE_FLUSH") == 0) {
+#ifdef PNG_WRITE_FLUSH_SUPPORTED
+        return 1;
+#else
+        return 0;
+#endif /* WRITE_FLUSH */
+    }
+    if (strcmp (what, "WRITE_FLUSH_AFTER_IEND") == 0) {
+#ifdef PNG_WRITE_FLUSH_AFTER_IEND_SUPPORTED
+        return 1;
+#else
+        return 0;
+#endif /* WRITE_FLUSH_AFTER_IEND */
+    }
+    if (strcmp (what, "WRITE_INTERLACING") == 0) {
+#ifdef PNG_WRITE_INTERLACING_SUPPORTED
+        return 1;
+#else
+        return 0;
+#endif /* WRITE_INTERLACING */
+    }
+    if (strcmp (what, "WRITE_INT_FUNCTIONS") == 0) {
+#ifdef PNG_WRITE_INT_FUNCTIONS_SUPPORTED
+        return 1;
+#else
+        return 0;
+#endif /* WRITE_INT_FUNCTIONS */
+    }
+    if (strcmp (what, "WRITE_INVERT") == 0) {
+#ifdef PNG_WRITE_INVERT_SUPPORTED
+        return 1;
+#else
+        return 0;
+#endif /* WRITE_INVERT */
+    }
+    if (strcmp (what, "WRITE_INVERT_ALPHA") == 0) {
+#ifdef PNG_WRITE_INVERT_ALPHA_SUPPORTED
+        return 1;
+#else
+        return 0;
+#endif /* WRITE_INVERT_ALPHA */
+    }
+    if (strcmp (what, "WRITE_OPTIMIZE_CMF") == 0) {
+#ifdef PNG_WRITE_OPTIMIZE_CMF_SUPPORTED
+        return 1;
+#else
+        return 0;
+#endif /* WRITE_OPTIMIZE_CMF */
+    }
+    if (strcmp (what, "WRITE_PACK") == 0) {
+#ifdef PNG_WRITE_PACK_SUPPORTED
+        return 1;
+#else
+        return 0;
+#endif /* WRITE_PACK */
+    }
+    if (strcmp (what, "WRITE_PACKSWAP") == 0) {
+#ifdef PNG_WRITE_PACKSWAP_SUPPORTED
+        return 1;
+#else
+        return 0;
+#endif /* WRITE_PACKSWAP */
+    }
+    if (strcmp (what, "WRITE_SHIFT") == 0) {
+#ifdef PNG_WRITE_SHIFT_SUPPORTED
+        return 1;
+#else
+        return 0;
+#endif /* WRITE_SHIFT */
+    }
+    if (strcmp (what, "WRITE_SWAP") == 0) {
+#ifdef PNG_WRITE_SWAP_SUPPORTED
+        return 1;
+#else
+        return 0;
+#endif /* WRITE_SWAP */
+    }
+    if (strcmp (what, "WRITE_SWAP_ALPHA") == 0) {
+#ifdef PNG_WRITE_SWAP_ALPHA_SUPPORTED
+        return 1;
+#else
+        return 0;
+#endif /* WRITE_SWAP_ALPHA */
+    }
+    if (strcmp (what, "WRITE_TRANSFORMS") == 0) {
+#ifdef PNG_WRITE_TRANSFORMS_SUPPORTED
+        return 1;
+#else
+        return 0;
+#endif /* WRITE_TRANSFORMS */
+    }
+    if (strcmp (what, "WRITE_USER_TRANSFORM") == 0) {
+#ifdef PNG_WRITE_USER_TRANSFORM_SUPPORTED
+        return 1;
+#else
+        return 0;
+#endif /* WRITE_USER_TRANSFORM */
+    }
+    if (strcmp (what, "WRITE_WEIGHTED_FILTER") == 0) {
+#ifdef PNG_WRITE_WEIGHTED_FILTER_SUPPORTED
+        return 1;
+#else
+        return 0;
+#endif /* WRITE_WEIGHTED_FILTER */
+    }
+    if (strcmp (what, "zTXt") == 0) {
+#ifdef PNG_zTXt_SUPPORTED
+        return 1;
+#else
+        return 0;
+#endif /* zTXt */
+    }
+#line 2357 "perl-libpng.c.tmpl"
 
     /* sCAL is a special case. */
 
@@ -2531,9 +3295,25 @@ int perl_png_libpng_supports (const char * what)
         return 0;
 #endif /* sCAL */
     }
+    /* These were in the module prior to 0.50, even though there is no
+       such macro in libpng. */
+    if (strcmp (what, "zTXt") == 0) {
+#if defined(PNG_READ_zTXt_SUPPORTED) && defined(PNG_WRITE_zTXt_SUPPORTED)
+	return 1;
+#else
+	return 0;
+#endif
+    }
+    if (strcmp (what, "tEXt") == 0) {
+#if defined(PNG_READ_tEXt_SUPPORTED) && defined(PNG_WRITE_tEXt_SUPPORTED)
+	return 1;
+#else
+	return 0;
+#endif
+    }
     /* The user asked whether something was supported, but we don't
        know what that thing is. */
-    warn ( "Unknown whether '%s' is supported", what);
+    warn ("Unknown whether '%s' is supported", what);
     return 0;
 }
 
@@ -2597,36 +3377,13 @@ perl_png_set_keep_unknown_chunks (perl_libpng_t * png, int keep,
 #endif
 }
 
-static void
-perl_png_set_expand (perl_libpng_t * png)
-{
-    png_set_expand (png->png);
-}
-
-static void
-perl_png_set_gray_to_rgb (perl_libpng_t * png)
-{
-    png_set_gray_to_rgb(png->png);
-}
-
-static void
-perl_png_set_filler (perl_libpng_t * png, int filler, int flags)
-{
-    png_set_filler (png->png, filler, flags);
-}
-
-static void
-perl_png_set_strip_16 (perl_libpng_t * png)
-{
-    png_set_strip_16 (png->png);
-}
-
 static SV * perl_png_get_cHRM (perl_libpng_t * png)
 {
+    SV * chrm = & PL_sv_undef; 
 #ifdef PNG_cHRM_SUPPORTED
     if (VALID (cHRM)) {
         HV * ice;
-#line 2629 "/usr/home/ben/projects/image-png-libpng/build/../perl-libpng.c"
+#line 3386 "/usr/home/ben/projects/image-png-libpng/build/../perl-libpng.c"
         double white_x;
         double white_y;
         double red_x;
@@ -2635,10 +3392,10 @@ static SV * perl_png_get_cHRM (perl_libpng_t * png)
         double green_y;
         double blue_x;
         double blue_y;
-#line 2453 "perl-libpng.c.tmpl"
+#line 2455 "perl-libpng.c.tmpl"
         png_get_cHRM (pngi , & white_x, & white_y, & red_x, & red_y, & green_x, & green_y, & blue_x, & blue_y);
         ice = newHV ();
-#line 2641 "/usr/home/ben/projects/image-png-libpng/build/../perl-libpng.c"
+#line 3398 "/usr/home/ben/projects/image-png-libpng/build/../perl-libpng.c"
         (void) hv_store (ice, "white_x", strlen ("white_x"),
                          newSVnv (white_x), 0);
         (void) hv_store (ice, "white_y", strlen ("white_y"),
@@ -2655,22 +3412,21 @@ static SV * perl_png_get_cHRM (perl_libpng_t * png)
                          newSVnv (blue_x), 0);
         (void) hv_store (ice, "blue_y", strlen ("blue_y"),
                          newSVnv (blue_y), 0);
-#line 2462 "perl-libpng.c.tmpl"
-        return newRV_noinc ((SV *) ice);
+#line 2464 "perl-libpng.c.tmpl"
+        chrm = newRV_noinc ((SV *) ice);
     }
-    return & PL_sv_undef;
 #else
     /* libpng was compiled without this option. */
     UNSUPPORTED(cHRM);
-    return & PL_sv_undef;
 #endif
+    return chrm;
 }
 
 static void perl_png_set_cHRM (perl_libpng_t * png, HV * cHRM)
 {
 #ifdef PNG_cHRM_SUPPORTED
     SV ** key_sv_ptr;
-#line 2673 "/usr/home/ben/projects/image-png-libpng/build/../perl-libpng.c"
+#line 3429 "/usr/home/ben/projects/image-png-libpng/build/../perl-libpng.c"
     double white_x = 0.0;
     double white_y = 0.0;
     double red_x = 0.0;
@@ -2711,9 +3467,9 @@ static void perl_png_set_cHRM (perl_libpng_t * png, HV * cHRM)
     if (key_sv_ptr) {
         blue_y = SvNV (* key_sv_ptr);
     }
-#line 2487 "perl-libpng.c.tmpl"
+#line 2488 "perl-libpng.c.tmpl"
     png_set_cHRM (pngi, white_x, white_y, red_x, red_y, green_x, green_y, blue_x, blue_y);
-#line 2490 "perl-libpng.c.tmpl"
+#line 2491 "perl-libpng.c.tmpl"
 #else
     /* libpng was compiled without this option. */
     UNSUPPORTED(cHRM);
@@ -2747,7 +3503,7 @@ static void perl_png_copy_row_pointers (perl_libpng_t * png, SV * row_pointers)
     png_set_rows (pngi, png->row_pointers);
 }
 
-#line 2750 "/usr/home/ben/projects/image-png-libpng/build/../perl-libpng.c"
+#line 3506 "/usr/home/ben/projects/image-png-libpng/build/../perl-libpng.c"
 
 static int
 perl_png_get_image_width (perl_libpng_t * png)
@@ -2761,7 +3517,7 @@ perl_png_get_image_height (perl_libpng_t * png)
     return png_get_image_height (pngi);
 }
 
-#line 2532 "perl-libpng.c.tmpl"
+#line 2533 "perl-libpng.c.tmpl"
 
 
 static void
@@ -2821,6 +3577,41 @@ perl_png_get_user_height_max (perl_libpng_t * png)
 #endif
 }
 
+
+static SV *
+perl_png_get_eXIf (perl_libpng_t * png)
+{
+    SV * exif = & PL_sv_undef;
+#ifdef PNG_eXIf_SUPPORTED
+    if (VALID (eXIf)) {
+	png_uint_32 num_exif;
+	png_bytep exif_buf;
+	
+	png_get_eXIf_1 (png->png, png->info, & num_exif, & exif_buf);
+	exif = newSVpvn ((const char *) exif_buf, (STRLEN) num_exif);
+    }
+#else /*  PNG_eXIf_SUPPORTED */
+    UNSUPPORTED (eXIf);
+#endif /*  PNG_eXIf_SUPPORTED */
+    return exif;
+}
+
+static void
+perl_png_set_eXIf (perl_libpng_t * png, SV * exif)
+{
+#ifdef PNG_eXIf_SUPPORTED
+    png_uint_32 num_exif;
+    png_bytep exif_buf;
+    STRLEN exif_len;
+    
+    exif_buf = (png_bytep) SvPV (exif, exif_len);
+    num_exif = (png_uint_32) exif_len;
+
+    png_set_eXIf_1 (png->png, png->info, num_exif, exif_buf);
+#else /*  PNG_eXIf_SUPPORTED */
+    UNSUPPORTED (eXIf);
+#endif /*  PNG_eXIf_SUPPORTED */
+}
 
 static SV *
 perl_png_split_alpha (perl_libpng_t * png)

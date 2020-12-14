@@ -44,7 +44,13 @@ my $frameNum = 1;
 my $height = 5;
 foreach my $node(@nodes){
 	next unless( $node->{type} eq 'widget') ; # Only create widgets
-	my $widget = $TOP->Label(-text=> "Frame $frameNum Label", -width => 40, -height => $height, -bg => 'white');
+	my $widget = $TOP->Label(
+		-text=> "Frame $frameNum Label",
+		-width => 40,
+		-height => $height,
+		-bg => 'white',
+		-fg => 'black',
+	);
 	$widgets{"Frame $frameNum"} = $widget;
 	$frameNum++;
 	$height+=5; # Make each label widget request a different height

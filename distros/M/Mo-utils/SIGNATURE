@@ -1,0 +1,62 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.83.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA512
+
+SHA256 0c28ccf3e316d2dae14916a769a21031c5f6b043819439ccc3d195c88b74e4d7 Changes
+SHA256 9984f7b209d43761721f55f57d3b943c1d5308788d8d1818642db5deac235044 LICENSE
+SHA256 39e2b52b11c644233ec2e30a9d2c92ce91d8e6a436c6bab816a3cad18e9b8792 MANIFEST
+SHA256 356a2958bb980cf8919fb78caf44b26939ecdbd0956defdf292a0701984a8300 META.yml
+SHA256 a3c3ebb61588fd1fe9316d2410aea805fd25830cd2ef21af9c7e7e961fa1f5e6 Makefile.PL
+SHA256 634ae88e21110e6cd7d76b01793592f7a92f2ff6035ca63927c057ad08de546e README
+SHA256 61de8afc19cced4d74ead84330bcd24b7a5f6fda7b2b902a2a4cd61d2fdece3c examples/ex1.pl
+SHA256 de58f967431cdb99aad806c2504f4f0fde90b3f598ad0e7445a32cf6e2a8ef35 examples/ex2.pl
+SHA256 c94a3384233bedfef2a5bb27933bf8376e46ed93cf9a7ff4714f8ec68955a71d examples/ex3.pl
+SHA256 50176fbec2e360851487667e9cd5572749bdfd993719db59fb4f25903198182e examples/ex4.pl
+SHA256 3f60d20359b49cac6ff32de945c4697983fada41c63d3daab7f0d0140cd622c4 examples/ex5.pl
+SHA256 6eb7e8aa0c0e3f2b10bda4529f8ea7f8f26e3ffdb1367902fbd521ee1123ee94 examples/ex6.pl
+SHA256 bbf36c125bf8eee94d7b0e0cc01717223b9f55db9e0269465d99346ba22e3abf examples/ex7.pl
+SHA256 356e20d019501c00c14808674e4be37b45774d9128387a8ac201322626d82079 examples/ex8.pl
+SHA256 67d139199c03b8bf8447a5a62f0d0b6dc1bd5bf6dbe04de6d21998c577823ed6 inc/Module/Install.pm
+SHA256 8bd506c33fb78f10f6451413e931ca23541fcc4eebe05fcb7c7c9577341223c4 inc/Module/Install/AuthorRequires.pm
+SHA256 1b5430a46a35142ef8914d8c745196fca825defc9dfa7e389299bf294613825e inc/Module/Install/AuthorTests.pm
+SHA256 6ebcc53a161dd5dc0aae69e4704575f2b00181901d768a82e26722a309cfdbe4 inc/Module/Install/Base.pm
+SHA256 d3f8c839d03fd21c197d05362dbb277cd7cadb15da6390d124b61e851f15146e inc/Module/Install/Can.pm
+SHA256 e9e72e18921c10c87bc4ea4c20af83e52015b9f5775d00ac64073042403717ca inc/Module/Install/Fetch.pm
+SHA256 a7a681bf2c9eee58a372cb642ffe42b0301d1200432ba8de9f7791cd1ecc9827 inc/Module/Install/Makefile.pm
+SHA256 aa887fa65a5eb6bbd1805706ce298b3f3cd55b353ecfd37aa7d35ae419331a49 inc/Module/Install/Metadata.pm
+SHA256 53825bc78e4c910b888160bc148c8bc211be58e02b99c8edcbf4854f95faa049 inc/Module/Install/ReadmeFromPod.pm
+SHA256 26b166ff62aacdb55317d1659f160aa4935097eea9810ea980e6d747206b5dc0 inc/Module/Install/Win32.pm
+SHA256 5f73a6851a91ea44e65b924f918743ad6e860620ad7a38a39d0295e0c5652a9f inc/Module/Install/WriteAll.pm
+SHA256 d6ab9ca5ae45306ffa809c0b6e398b0118fd6b09c55e7c041c44bc316ab7a9dd t/Mo-utils/01-use.t
+SHA256 5707b20fc32f84d938586689609bfbc70a330e6047976415d4cdf395bf795dfe t/Mo-utils/02-version.t
+SHA256 5ba59288dad57292799ac47e4ad24292c983284a72707ec8d6d481cb42e2682d t/Mo-utils/03-check_array_object.t
+SHA256 4552a23d8be48495a289f380118574d2dc78b20fefca7ab7cf9623bcd4f7a66c t/Mo-utils/04-check_isa.t
+SHA256 6467441d41e24c3b8aabd36febddebdc7ffb18226c1d3aab00ba7926e1b6286f t/Mo-utils/05-check_number.t
+SHA256 986667a9dda8c2003889a9999888af17ee349cbdddf13f17e345bf33310cdd7e t/Mo-utils/06-check_number_of_items.t
+SHA256 92226333d7c9e0eeb9f0021aa42f452d72ebb9677b6571df36b149f22bbab2c4 t/Mo-utils/07-check_required.t
+SHA256 8aabc2e9cd6eb36405918af2769003428942be8c5eee755f3ae4e8513952f501 utils.pm
+SHA256 2ef54a3142318d8a00fa48c1b1c1db4b37e694c62ae6ed326ff6a4655b083afc xt/Mo-utils/01-pod_coverage.t
+SHA256 859d1142003f3b0e390d41fe669c2603f808b1caf67eb935805ececf63b2ef22 xt/Mo-utils/02-pod.t
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCgAdFiEEAxWqUSy7qDLVZJQKKyiOZjWerHYFAl/Tb90ACgkQKyiOZjWe
+rHayUAf9EVTsHVMyBt2/M6RkJIWm7K8NnD/UqtatLgG0Z0RivTY5uF+8OG6z/Es8
+7evI0v6FmmwG5bmMPWCJG2zhwjA3vggjdT5EuSLxS0i+flEB7YTcsqiQ4uFKPbO1
+ZjRYSI6xY5oOap4fgzEbQg30pQp8AUF6I3C9rdOkwt5OAhSPOYGPfJ9fMFECH+Eq
+yKCs1Eg8R4BxLzWyCYJ/xtYdW7FfXHBt812WoTpYIWzOPLxOysXWltcfxObxGcgM
+3gLJF1c+5zQqkRHvghL0IJBhnvA4LPO7eFpZFAzgVedre1Ot5BUA5G3LmybI1rKm
+8+YeTaXTHzkBsHPTEtBIAT6ypQ3ZRw==
+=H5i6
+-----END PGP SIGNATURE-----

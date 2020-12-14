@@ -6,7 +6,7 @@ use feature qw/state/;
 
 use parent 'WebService::Slack::WebApi::Base';
 
-use JSON::XS;
+use JSON;
 
 sub open {
   state $rule = Data::Validator->new(

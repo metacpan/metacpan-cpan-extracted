@@ -17,8 +17,13 @@ meta-spec:
   version: '1.4'
 name: App-FfmpegUtils
 requires:
+  Data::Sah::Coerce::perl::To_duration::From_float::seconds: '0'
+  Data::Sah::Coerce::perl::To_duration::From_obj::datetime_duration: '0'
+  Data::Sah::Coerce::perl::To_duration::From_str::human: '0'
+  Data::Sah::Coerce::perl::To_duration::From_str::iso8601: '0'
   Data::Sah::Coerce::perl::To_float::From_str::percent: '0'
   Data::Sah::Compiler::perl::TH::array: '0'
+  Data::Sah::Compiler::perl::TH::duration: '0'
   Data::Sah::Compiler::perl::TH::float: '0'
   Data::Sah::Compiler::perl::TH::int: '0'
   Data::Sah::Compiler::perl::TH::str: '0'
@@ -29,9 +34,11 @@ requires:
   Log::ger: '0.037'
   Math::Image::CalcResized: '0.003'
   Media::Info: '0.131'
+  POSIX: '0'
   Perinci::CmdLine::Any: '0'
   Perinci::CmdLine::Lite: '1.827'
   Perinci::Exporter: '0.080'
+  Perinci::Sub::DepChecker: '0'
   Sah::Schema::filename: '0'
   Sah::Schema::ufloat: '0'
   Sah::Schema::uint: '0'
@@ -42,7 +49,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-FfmpegUtils
   homepage: https://metacpan.org/release/App-FfmpegUtils
   repository: git://github.com/perlancar/perl-App-FfmpegUtils.git
-version: '0.006'
+version: '0.007'
 x_Dist_Zilla:
   perl:
     version: '5.030002'
@@ -50,7 +57,11 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::GenPericmdScript
       name: 'GenPericmdScript reencode-video-with-libx264'
-      version: '0.422'
+      version: '0.423'
+    -
+      class: Dist::Zilla::Plugin::GenPericmdScript
+      name: 'GenPericmdScript split-video-by-duration'
+      version: '0.423'
     -
       class: Dist::Zilla::Plugin::PERLANCAR::CheckPendingRelease
       name: '@Author::PERLANCAR/PERLANCAR::CheckPendingRelease'
@@ -126,7 +137,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::PERLANCAR::BeforeBuild
       name: '@Author::PERLANCAR/PERLANCAR::BeforeBuild'
-      version: '0.602'
+      version: '0.603'
     -
       class: Dist::Zilla::Plugin::Rinci::AbstractFromMeta
       name: '@Author::PERLANCAR/Rinci::AbstractFromMeta'
@@ -327,7 +338,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::Rinci::EmbedValidator
       name: '@Author::PERLANCAR/Rinci::EmbedValidator'
-      version: '0.250'
+      version: '0.251'
     -
       class: Dist::Zilla::Plugin::SetScriptShebang
       name: '@Author::PERLANCAR/SetScriptShebang'

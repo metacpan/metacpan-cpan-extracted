@@ -183,7 +183,7 @@ real object in this hash.
 =cut
 
 package Tk::IDEtabFrame;
-our ($VERSION) = ('0.36');
+our ($VERSION) = ('0.37');
 
 use Carp;
 use strict;
@@ -595,7 +595,7 @@ sub endDrag {
 			$contents->wmRelease;
 			# MainWindow needed here because wmReleased widget don't properly inherit from
 			#   Tk::Toplevel
-			$contents->MainWindow::attributes(-toolwindow => 1) if( $^O =~ /mswin32/i);
+			$contents->MainWindow::attributes(-toolwindow => 1) if ($^O eq 'MSWin32');
 			$contents->MainWindow::title($caption);
 			$contents->MainWindow::geometry($geometry);
  			$contents->MainWindow::deiconify;

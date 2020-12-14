@@ -1,6 +1,7 @@
 Changes
 const-c.inc
 const-xs.inc
+CONTRIBUTING
 examples/color-type-name.pl
 examples/copy-png.pl
 examples/get-www-png.pl
@@ -8,6 +9,7 @@ examples/png-cgi.pl
 examples/set-text.pl
 examples/set-unknown-chunk.pl
 examples/supports.pl
+examples/synopsis-easy.pl
 examples/synopsis.pl
 inc/CheckForLibPng.pm
 lib/Image/PNG/Const.pm
@@ -26,14 +28,18 @@ t/bKGD-test.png
 t/bKGD.t
 t/bogus.t
 t/cHRM.t
+t/comp-buff.t
 t/compress-level.t
 t/Const.t
 t/copy-all-png.t
+t/daft.t
+t/exif.t
 t/functions.t
 t/gAMA.t
 t/get-internals.t
 t/get-text.t
 t/hIST.t
+t/IPNGLT.pm
 t/Libpng.t
 t/libpng/basi0g01.png
 t/libpng/basi0g02.png
@@ -213,8 +219,11 @@ t/libpng/z03n2c08.png
 t/libpng/z06n2c08.png
 t/libpng/z09n2c08.png
 t/make-tEXT.pl
+t/oFFs.t
+t/pCAL.t
 t/pHYs.t
 t/PLTE.t
+t/read-from-scalar.t
 t/saru-fs8.png
 t/sBIT.t
 t/sCAL.t

@@ -1,6 +1,6 @@
 #!/usr/bin/env perl
 # PODNAME: ali2phylip.pl
-# ABSTRACT: Convert ALI files to PHYLIP files
+# ABSTRACT: Convert (and filter) ALI files to PHYLIP files for tree building
 # CONTRIBUTOR: Arnaud DI FRANCO <arnaud.difranco@gmail.com>
 # CONTRIBUTOR: Raphael LEONARD <rleonard@doct.uliege.be>
 
@@ -138,11 +138,11 @@ __END__
 
 =head1 NAME
 
-ali2phylip.pl - Convert ALI files to PHYLIP files
+ali2phylip.pl - Convert (and filter) ALI files to PHYLIP files for tree building
 
 =head1 VERSION
 
-version 0.202310
+version 0.203490
 
 =head1 USAGE
 

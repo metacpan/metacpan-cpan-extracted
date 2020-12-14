@@ -10,5 +10,11 @@ use Class::Accessor::Lite (
     ro => [qw/ response /],
 );
 
+package WebService::Slack::WebApi::Exception::IllegalParameters;
+use parent -norequire, 'WebService::Slack::WebApi::Exception';
+use Class::Accessor::Lite (
+    ro => [qw/ /],
+);
+
 1;
 

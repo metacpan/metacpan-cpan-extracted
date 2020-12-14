@@ -4,22 +4,23 @@ use Config;
 no  lib '.';
 use ExtUtils::MakeMaker;
 BEGIN {
-    
+
     warn("### Note: 'Building Outside of Tk itself' Messages are Expected Here ####\n");
 
     $IsWin32 = ($^O eq 'MSWin32' || $Config{'ccflags'} =~ /-D_?WIN32_?/);
 
-    $VERSION = '0.36';
+    $VERSION = '0.37';
     $win_arch = shift @ARGV if @ARGV and $ARGV[0] =~ /^(open32|pm|x|MSWin32)$/;
     require('fix_4_os2.pl'), OS2_massage() if $^O eq 'os2';
-    
+
     # Currently 'x', 'pm', 'open32', 'MSWin32'
     $win_arch = ($IsWin32) ? 'MSWin32' : 'x' if not defined $win_arch;
 
-    eval{ require "./myConfig"; };
+    eval { require './myConfig'; 1; };
     if( $@ ){
-        print "\n#### Error requiring 'myConfig': Perhaps you don't have Tk installed ###\n";
-        print "####  This module requires a Tk installation                           ###\n";
+        warn $@;
+        print STDERR "\n#### Error requiring 'myConfig': Perhaps you don't have Tk installed ###\n";
+        print STDERR   "####  This module requires a Tk installation                         ###\n";
 
         # Write out a simple makefile with PREREQ_PM, so CPAN will at least detect our
         #   prerequisites.
@@ -40,10 +41,17 @@ BEGIN {
                         url => 'https://github.com/asb-capfan/Tk-IDElayout.git',
                         web => 'https://github.com/asb-capfan/Tk-IDElayout',
                     },
+                    bugtracker => {
+                        web => 'https://github.com/asb-capfan/Tk-IDElayout/issues',
+                    },
                 },
             },
-            'PREREQ_PM'  => { Tk => 804.027, 'Tk::DynaTabFrame' => 0.23, Graph => 0.20105}
-            );
+            'PREREQ_PM'  => {
+                'Tk' => '804.027',
+                'Tk::DynaTabFrame' => '0.23',
+                'Graph' => '0.50',
+            },
+        );
         exit();
     }
 
@@ -93,7 +101,7 @@ if ($IsWin32) {
     my $plibs = $Config{'libs'};
     my $libs  = "$xlib -lX11";   # Used to have -lpt in here as well.
     my @try   = qw(-lsocket -lnsl -lm);
-    push(@try,'-lc') if $^O =~ /svr4/i;
+    push(@try,'-lc') if $^O eq 'svr4';
     my $lib;
     # perl needs sockets and math library too
     # so only include these if they made it through perl's Configure
@@ -108,7 +116,7 @@ delete $dir->{'pTk'};
 
 # Find path to existing pTk include files
 my $ptkPath = Tk::MMutil::findINC('Tk/pTk/Lang.h');
-$ptkPath =~ s/\/Lang.h$//g;
+$ptkPath =~ s/\/Lang\.h$//g;
 
 
 
@@ -130,6 +138,9 @@ Tk::MMutil::TkExtMakefile(
                 url => 'https://github.com/asb-capfan/Tk-IDElayout.git',
                 web => 'https://github.com/asb-capfan/Tk-IDElayout',
             },
+            bugtracker => {
+                web => 'https://github.com/asb-capfan/Tk-IDElayout/issues',
+            },
         },
     },
     'DIR'      => [reverse(sort(keys %$dir))],
@@ -137,9 +148,13 @@ Tk::MMutil::TkExtMakefile(
     'DEFINE'   => $mydefine,
     'INC'    => "-I$ptkPath",
     'LIBS'    => \@libs,
-     'OBJECT'  => '$(O_FILES)'. " $TkLibPath", # Tk Lib path will be the Tk library on Unix, blank for win32
-    'PREREQ_PM'  => { Tk => 804.027, 'Tk::DynaTabFrame' => 0.23, Graph => 0.20105},
-    @macro
+    'OBJECT'  => '$(O_FILES)'. " $TkLibPath", # Tk Lib path will be the Tk library on Unix, blank for win32
+    'PREREQ_PM' => {
+        'Tk' => '804.027',
+        'Tk::DynaTabFrame' => '0.23',
+        'Graph' => '0.50',
+    },
+    @macro,
 );
 
 
@@ -191,7 +206,7 @@ sub MY::test {
         @tests = grep(!needs_Test($_),@tests);
     }
     $attrib{'TESTS'} = join(' ',@tests);
-    
+
     # Temporarily remove sub-dirs from $self as we 'know'
     # there are no tests down there
     my $dir  = delete $self->{'DIR'};
@@ -216,5 +231,3 @@ MANIFEST : MANIFEST.SKIP $(FIRST_MAKEFILE)
 
 ';
 }
-
-

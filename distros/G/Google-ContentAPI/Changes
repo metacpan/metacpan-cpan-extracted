@@ -1,5 +1,15 @@
 Revision history for Google::ContentAPI.
 
+1.03 2020-12-10 Added support for Google Content API for Shopping v2.1 via new
+                'endpoint' attribute. If endpoint attribute not provided, defaults
+                to v2.0 endpoint for backwards compatibility. Google::ContentAPI
+                is code compatible with both v2.0 and v2.1 endpoints.
+
+                You may need to update your application to account for several
+                breaking changes introduced in v2.1. Review to Google's migration document,
+                "Migrating from Content API v2 to v2.1" at
+                https://developers.google.com/shopping-content/guides/migration
+
 1.02  2018-04-11 Added accountstatuses and productstatuses methods. Also added 
                  a "custom" resource to perform methods that are not implemented 
                  by this module.

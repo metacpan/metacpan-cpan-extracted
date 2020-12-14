@@ -1,0 +1,74 @@
+diff --git a/vendor/newrelic/axiom/nr_axiom.h b/vendor/newrelic/axiom/nr_axiom.h
+index 79aa7ba..1db08cc 100644
+--- a/vendor/newrelic/axiom/nr_axiom.h
++++ b/vendor/newrelic/axiom/nr_axiom.h
+@@ -80,6 +80,20 @@ NRINLINE void* nr_remove_const(const void* ptr) {
+ 
+ #endif /* } */
+ 
++#if defined(__clang__)
++#if __has_attribute(fallthrough)
++#define FALLTHROUGH __attribute__((fallthrough));
++#else
++#define FALLTHROUGH
++#endif
++#else
++#if defined(__GNUC__) && __GNUC__ >= 7
++#define FALLTHROUGH __attribute__((fallthrough));
++#else
++#define FALLTHROUGH
++#endif /* __GNUC__ >= 7 */
++#endif
++
+ /*
+  * The macro nr_clang_assert is redefined to assert iff we are compiling using
+  * the clang static analyzer scan-build.  scan-build is sensitive to
+diff --git a/vendor/newrelic/axiom/util_hash.c b/vendor/newrelic/axiom/util_hash.c
+index d32a591..b742b15 100644
+--- a/vendor/newrelic/axiom/util_hash.c
++++ b/vendor/newrelic/axiom/util_hash.c
+@@ -189,10 +189,10 @@ uint32_t nr_mkhash(const char* str, int* len) {
+   switch (str_len & 3) {
+     case 3:
+       k1 ^= tail[2] << 16;
+-      /* FALLTHROUGH */
++      FALLTHROUGH
+     case 2:
+       k1 ^= tail[1] << 8;
+-      /* FALLTHROUGH */
++      FALLTHROUGH
+     case 1:
+       k1 ^= tail[0];
+ 
+diff --git a/vendor/newrelic/axiom/util_object.c b/vendor/newrelic/axiom/util_object.c
+index 881088d..02dd857 100644
+--- a/vendor/newrelic/axiom/util_object.c
++++ b/vendor/newrelic/axiom/util_object.c
+@@ -1349,12 +1349,12 @@ static const char* parse_string(nrintobj_t* item, const char* str) {
+             case 3:
+               *--ptr2 = ((uc | 0x80) & 0xBF);
+               uc >>= 6;
+-              /*FALLTHROUGH*/
++              FALLTHROUGH
+ 
+             case 2:
+               *--ptr2 = ((uc | 0x80) & 0xBF);
+               uc >>= 6;
+-              /*FALLTHROUGH*/
++              FALLTHROUGH
+ 
+             case 1:
+               *--ptr2 = (uc | firstByteMark[len]);
+diff --git a/vendor/newrelic/axiom/util_regex.c b/vendor/newrelic/axiom/util_regex.c
+index 35d356e..73aeabd 100644
+--- a/vendor/newrelic/axiom/util_regex.c
++++ b/vendor/newrelic/axiom/util_regex.c
+@@ -328,7 +328,7 @@ void nr_regex_add_quoted_to_buffer(nrbuf_t* buf,
+       case ':':
+       case '-':
+         nr_buffer_add(buf, NR_PSTR("\\"));
+-        /* FALLTHROUGH */
++        FALLTHROUGH
+ 
+       default:
+         nr_buffer_add(buf, &str[i], 1);

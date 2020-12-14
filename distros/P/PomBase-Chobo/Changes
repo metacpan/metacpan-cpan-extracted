@@ -1,5 +1,8 @@
 Revision history for PomBase-Chobo
 
+0.027     2020-12-11 16:06:38
+          Catch colon at start or end of relationship name
+
 0.026     2018-11-01 17:15:07
           Don't merge an obsolete term with a non-obsolete using alt_id
 

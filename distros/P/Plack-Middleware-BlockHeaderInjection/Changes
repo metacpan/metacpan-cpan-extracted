@@ -1,4 +1,17 @@
-Revision history for Plack::Middleware::BlockHeaderInjection
+Revision history for Plack-Middleware-BlockHeaderInjection
+
+v1.0.1    2020-12-11 15:32:37+00:00 Europe/London
+  [Toolchain]
+  - Fixed error in Dist::Zilla config.
+
+v1.0.0    2020-12-11 15:29:14+00:00 Europe/London
+  [Toolchain]
+  - Change distribution to use Dist::Zilla for building.
+
+  [Other]
+  - Bumped version to v1.0.0.
+
+  - Lowered minimum Perl version to v5.8.
 
 v0.1.1  2014-08-16
 

@@ -8,7 +8,9 @@ Makefile.PL
 README
 README.md
 dist.ini
+eg/chromatic
 eg/moduation
+eg/progression
 lib/Music/Chord/Progression.pm
 t/00-compile.t
 t/01-methods.t

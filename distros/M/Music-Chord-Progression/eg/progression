@@ -1,0 +1,25 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+
+use Data::Dumper::Compact 'ddc';
+use lib map { "$ENV{HOME}/sandbox/$_/lib" } qw(MIDI-Util);
+use MIDI::Util;
+use Music::Chord::Progression;
+
+my $score = MIDI::Util::setup_score();
+
+my $prog = Music::Chord::Progression->new(
+    chord_map => [qw(M7 m7 m7 M7 7 m7)],
+    substitute => 1,
+#    resolve => 0,
+    verbose => 1,
+);
+my $chords = $prog->generate;
+
+for my $chord (@$chords) {
+    my @chord = MIDI::Util::midi_format(@$chord);
+    $score->n('wn', @chord);
+}
+
+$score->write_score("$0.mid");

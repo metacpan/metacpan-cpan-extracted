@@ -1,5 +1,13 @@
 Summary of Changes to Tk::IDElayout
 
+Release 0.37:  2020-12-12
+
+ * Use Graph 0.50 syntax (mandatory as of Graph 0.9712)
+
+Release 0.36_01:  2020-12-11
+
+ * Specify GitHub issues as bugtracker
+
 Release 0.36:  2020-11-14
 
  * Fix for Darwin/macOS build:

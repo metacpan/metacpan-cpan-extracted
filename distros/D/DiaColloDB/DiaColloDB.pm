@@ -44,7 +44,7 @@ use strict;
 ##==============================================================================
 ## Globals & Constants
 
-our $VERSION = "0.12.017";
+our $VERSION = "0.12.019";
 our @ISA = qw(DiaColloDB::Client);
 
 ## $TDF_MGOOD_DEFAULT
@@ -743,6 +743,8 @@ sub qparse {
 ##  + %opts:
 ##     warn  => $level,       ##-- log-level for unknown attributes (default: 'warn')
 ##     logas => $reqtype,     ##-- request type for warnings
+##     parseas => $reqtype,   ##-- request type for parsing ('groupby' or 'query' (default))
+##     qref => \$qref,        ##-- store parsed query in SCALAR-ref $qref
 ##     default => $attr,      ##-- default attribute (for query requests)
 ##     mapand => $bool,       ##-- map CQAnd to CQWith? (default=true unless '&&' occurs in query string)
 ##     ddcmode => $bool,      ##-- force ddc query parsing? (0:no:default, >0:always, <0:fallback)
@@ -752,6 +754,7 @@ sub parseQuery {
   my $wlevel = $opts{warn} // 'warn';
   my $defaultIndex = $opts{default};
   my $logas = $opts{logas}//'';
+  my $parseas = $opts{parseas} || $logas || 'query';
   my $ddcmode = $opts{ddcmode} || 0;
 
   ##-- compat: accept ARRAY or HASH requests
@@ -770,7 +773,10 @@ sub parseQuery {
   my $setre  = qr{(?:(?:${charre}+)(?:${orre}${charre}+)*)};	##-- value: |-separated barewords
   my $regre  = qr{(?:/(?:\\/|[^/]*)/(?:[gimsadlux]*))};		##-- value regexes
   my $valre  = qr{(?:${setre}|${regre})};
-  my $reqre  = qr{(?:(?:${attrre}(?:[:=]${valre})?)|${valre})};
+  my $reqre  = ($parseas eq 'groupby'
+		? qr{(?:(?:${attrre}(?:[:=]${valre})?)|${valre})}  ##-- groupby mode: require ATTRIBUTES
+		: qr{(?:(?:${attrre}[:=])?${valre})}               ##-- query   mode: reqzure VALUES
+	       );
   if (!$areqs
       && ($ddcmode <= 0)			##-- allow native parsing?
       && $req =~ m/^${sepre}*			##-- initial separators (optional)
@@ -880,6 +886,9 @@ sub parseQuery {
 			 return UNIVERSAL::isa($_[0],'DDC::Any::CQAnd') ? DDC::Any::CQWith->new($_[0]->getDtr1,$_[0]->getDtr2) : $_[0];
 		       })
     if ($opts{mapand} || (!defined($opts{mapand}) && $req0 !~ /\&\&/));
+
+  ##-- maybe store parsed query
+  ${$opts{qref}} = $q if (ref($opts{qref}));
 
   $coldb->debug("parseQuery($logas): parsed query: ", $q->toString) if ($coldb->{debug});
 
@@ -1053,7 +1062,7 @@ sub groupby {
   my $gb = { req=>$gbreq };
 
   ##-- get attribute requests
-  my $gbareqs = $gb->{areqs} = $coldb->parseRequest($gb->{req}, %opts,logas=>'groupby');
+  my $gbareqs = $gb->{areqs} = $coldb->parseRequest($gb->{req}, %opts,parseas=>'groupby',logas=>'groupby');
 
   ##-- get attribute names (compat)
   my $gbattrs = $gb->{attrs} = [map {$_->[0]} @$gbareqs];
@@ -1231,7 +1240,7 @@ sub parseGroupBy {
   }
   else {
     ##-- native-style request with optional restrictions
-    my $gbreq  = $coldb->parseRequest($req, logas=>'groupby', default=>undef, relax=>1, allowUnknown=>1);
+    my $gbreq  = $coldb->parseRequest($req, parseas=>'groupby', logas=>'groupby', default=>undef, relax=>1, allowUnknown=>1);
     my ($filter);
     foreach (@$gbreq) {
       push(@$gbexprs, $coldb->attrCountBy($_->[0], 2));

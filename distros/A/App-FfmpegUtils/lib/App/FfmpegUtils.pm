@@ -1,9 +1,9 @@
 package App::FfmpegUtils;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-09-23'; # DATE
+our $DATE = '2020-12-12'; # DATE
 our $DIST = 'App-FfmpegUtils'; # DIST
-our $VERSION = '0.006'; # VERSION
+our $VERSION = '0.007'; # VERSION
 
 use 5.010001;
 use strict;
@@ -18,6 +18,14 @@ $SPEC{':package'} = {
     v => 1.1,
     summary => 'Utilities related to ffmpeg',
 };
+
+our %arg0_file = (
+    file => {
+        schema => 'filename*',
+        req => 1,
+        pos => 0,
+    },
+);
 
 our %arg0_files = (
     files => {
@@ -44,7 +52,6 @@ sub _nearest {
 
 $SPEC{reencode_video_with_libx264} = {
     v => 1.1,
-    summary => 'Re-encode video (using ffmpeg and libx265) to reduce file size with minimal visual quality loss',
     summary => 'Re-encode video (using ffmpeg and libx264)',
     description => <<'_',
 
@@ -249,6 +256,62 @@ sub reencode_video_with_libx264 {
     [200];
 }
 
+$SPEC{split_video_by_duration} = {
+    v => 1.1,
+    summary => 'Split video by duration into parts',
+    args => {
+        %arg0_file,
+        # XXX start => {},
+        every => {
+            schema => 'duration*',
+            req => 1,
+            pos => 1,
+        },
+        # XXX merge_if_last_part_is_shorter_than => {},
+        # XXX output_filename_pattern
+    },
+    examples => [
+    ],
+    features => {
+        dry_run => 1,
+    },
+    deps => {
+        prog => "ffmpeg", # XXX allow FFMPEG_PATH
+    },
+};
+sub split_video_by_duration {
+    require POSIX;
+
+    my %args = @_;
+    my $file = $args{file};
+    my $part_dur = $args{every};
+    $part_dur > 0 or return [400, "Please specify a non-zero --every"];
+
+    require Media::Info;
+    my $res = Media::Info::get_media_info(media => $file);
+    return $res unless $res->[0] == 200;
+
+    my $total_dur = $res->[2]{duration}
+        or return [412, "Duration of video is zero"];
+
+    my $num_parts = POSIX::ceil($total_dur / $part_dur);
+    my $fmt = $num_parts >= 1000 ? "%04d" : $num_parts >= 100 ? "%03d" : $num_parts >= 10 ? "%02d" : "%d";
+
+    return [304, "No split necessary"] if $num_parts < 2;
+
+    require IPC::System::Options;
+    for my $i (1..$num_parts) {
+        my $part_label = sprintf "$fmt of %d", $i, $num_parts;
+        my $ofile = $file;
+        if ($ofile =~ /\.\w+\z/) { $ofile =~ s/(\.\w+)\z/.$part_label$1/ } else { $ofile .= ".$part_label" }
+        my $time_start = ($i-1)*$part_dur;
+        IPC::System::Options::system(
+            {log=>1, dry_run=>$args{-dry_run}},
+            "ffmpeg", "-i", $file, "-c", "copy", "-ss", $time_start, "-t", $part_dur, $ofile);
+    }
+    [200];
+}
+
 1;
 # ABSTRACT: Utilities related to ffmpeg
 
@@ -264,7 +327,7 @@ App::FfmpegUtils - Utilities related to ffmpeg
 
 =head1 VERSION
 
-This document describes version 0.006 of App::FfmpegUtils (from Perl distribution App-FfmpegUtils), released on 2020-09-23.
+This document describes version 0.007 of App::FfmpegUtils (from Perl distribution App-FfmpegUtils), released on 2020-12-12.
 
 =head1 FUNCTIONS
 
@@ -347,6 +410,53 @@ than 1080p.
 
 To disable scaling, set C<--scale> to '' (empty string), or specify
 C<--dont-scale> on the CLI.
+
+
+=back
+
+Special arguments:
+
+=over 4
+
+=item * B<-dry_run> => I<bool>
+
+Pass -dry_run=E<gt>1 to enable simulation mode.
+
+=back
+
+Returns an enveloped result (an array).
+
+First element (status) is an integer containing HTTP status code
+(200 means OK, 4xx caller error, 5xx function error). Second element
+(msg) is a string containing error message, or 'OK' if status is
+200. Third element (payload) is optional, the actual result. Fourth
+element (meta) is called result metadata and is optional, a hash
+that contains extra information.
+
+Return value:  (any)
+
+
+
+=head2 split_video_by_duration
+
+Usage:
+
+ split_video_by_duration(%args) -> [status, msg, payload, meta]
+
+Split video by duration into parts.
+
+This function is not exported.
+
+This function supports dry-run operation.
+
+
+Arguments ('*' denotes required arguments):
+
+=over 4
+
+=item * B<every>* => I<duration>
+
+=item * B<file>* => I<filename>
 
 
 =back

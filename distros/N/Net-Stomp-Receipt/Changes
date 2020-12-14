@@ -1,5 +1,9 @@
 Revision history for Perl extension Net::Stomp::Receipt.
 
+0.40  Sun 13 dec 2020 16:57:28 -03
+      CPAN RT sunset. Changing code repository and issue tracker to
+      sourcehut.
+
 0.36  Wed Jun 17 18:42:24 CLST 2009
     - fixed unnecessary perl 5.10 requisite.
 

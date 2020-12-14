@@ -73,7 +73,7 @@
          "web" : "http://github.com/benchmarkanything/BenchmarkAnything-Storage-Backend-SQL"
       }
    },
-   "version" : "0.028",
+   "version" : "0.029",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.022000"
@@ -417,7 +417,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "v0.028",
+                  "tag" : "v0.029",
                   "tag_format" : "v%v",
                   "tag_message" : "v%v"
                },

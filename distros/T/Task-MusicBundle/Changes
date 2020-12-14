@@ -1,5 +1,8 @@
 Revision history for Task-MusicBundle
 
+0.1902 2020-12-11 08:18:44
+    - Add Music::Chord::Progression.
+
 0.1901 2020-12-01 05:40:23
     - Remove non-composition oriented modules.
 

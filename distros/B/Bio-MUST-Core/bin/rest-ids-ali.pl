@@ -24,9 +24,6 @@ for my $infile (@ARGV_infiles) {
     my $idmfile = change_suffix($infile, '.idm');
     my $idm = IdMapper->load($idmfile);
     ### Restoring seq ids from: $idmfile
-    ### $idm
-    ### long: $idm->all_long_seq_ids
-    ### abbr: $idm->all_abbr_seq_ids
     $ali->restore_ids($idm);
 
     my $outfile = secure_outfile($infile, $ARGV_out_suffix);
@@ -43,7 +40,7 @@ rest-ids-ali.pl - Restore ids in ALI files
 
 =head1 VERSION
 
-version 0.202310
+version 0.203490
 
 =head1 USAGE
 

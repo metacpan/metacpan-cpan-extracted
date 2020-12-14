@@ -20,7 +20,7 @@ dailyfail - generate random newspaper headlines
 
 =head1 VERSION
 
-version 1.16
+version 1.18
 
 =head1 AUTHOR
 
@@ -28,7 +28,7 @@ Chris Williams <chris@bingosnet.co.uk>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by Chris Applegate and Chris Williams.
+This software is copyright (c) 2020 by Chris Applegate and Chris Williams.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

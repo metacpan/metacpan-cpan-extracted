@@ -820,6 +820,7 @@ sub qinfo {
   return {
 	  fcoef => 2*$rel->{dmax},
 	  qtemplate => $qstr,
+	  qcanon => $rel->qcanon($coldb,%opts),
 	 };
 }
 

@@ -4,7 +4,7 @@
 body,h1,h2,h3,h4,h5,h6,p,center,td,th,ul,dl,div {
   font-family: Bitstream Vera Sans, Arial Unicode MS, Arial, sans-serif;
 }
-h1,h2,h3, .h1,.h2,.h3, .hlb {
+h1,h2,h3,h4, .h1,.h2,.h3,.h4, .hlb {
  text-align: left;
  color: #000099; /* dark blue */
 }
@@ -414,6 +414,42 @@ DD {
 
 DD DT { font-weight: normal; font-style: italic; }
 
+/*------------------------------------------------------
+ * pod2html stuff
+ */
+
+div.pod2html_index {
+    border: 1px solid gray;
+    background-color: #e8e8e8;/*-- light grey --*/
+}
+ul#index {    
+  background-color: #e8e8e8;/*-- light grey --*/
+  padding-top: 0px;
+  padding-bottom: 0px;
+  margin-top: 5px;
+  margin-bottom: 5px;
+}
+div.pod2html_index > ul#index {
+    border: none;
+}
+
+div.pod2html_index h1, div.pod2html_index h2, div.pod2html_index h3 {
+    padding: 0px;
+    margin: 5px;
+}
+
+div.pod2html_title {
+    min-height: 50px;
+    margin: 5px;
+}
+div.pod2html_title .logo {
+    float: right;
+    max-height: 50px;
+}
+div.pod2html_title h1 {
+    font-size: 175%;
+    vertical-align: middle;
+}
 
 /*------------------------------------------------------
  * footer stuff: dummy, nopad
@@ -438,6 +474,31 @@ DD DT { font-weight: normal; font-style: italic; }
   padding: 0;
 }
 
+/*------------------------------------------------------
+ * post-footer stuff
+ */
+.pfright { 
+  float: right;
+  display: block;
+  text-align: right;
+  font-style: italic;
+  font-size: smaller;
+}
+.pfleft {
+  float: left;
+  display: block;  
+  font-family: monospace;
+  font-size: small;
+}
+.pfmid { 
+  display: block;
+  text-align: center;
+  font-size: smaller;
+  color: #666666;
+}
+.pfmid a {
+    color: #666666;
+}
 
 /*------------------------------------------------------
  * generic fonts
@@ -454,6 +515,7 @@ DD DT { font-weight: normal; font-style: italic; }
 .monospace, .mono {  font-family:monospace !important; font-weight:normal; }
 .smallcaps, .sc { font-variant:small-caps !important; }
 
+.nowrap { white-space: nowrap; }
 
 
 /*------------------------------------------------------

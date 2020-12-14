@@ -1,3 +1,9 @@
+0.002   2020-09-21  Released-By: PERLANCAR; Urgency: medium
+
+	- Replace participant PERLANCAR::Module::List with
+	  Module::List::More; add participant: Module::List::Wildcard.
+
+
 0.001   2019-09-02  Released-By: PERLANCAR
 
         - First release.

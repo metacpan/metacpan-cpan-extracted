@@ -9,7 +9,7 @@
 package WebService::HashiCorp::Vault::Secret::Cassandra;
 
 use Moo;
-our $VERSION = '0.004'; # VERSION
+our $VERSION = '0.005'; # VERSION
 use namespace::clean;
 
 extends 'WebService::HashiCorp::Vault::Secret::LeasableBase';
@@ -31,7 +31,7 @@ WebService::HashiCorp::Vault::Secret::Cassandra - Perl API for HashiCorp's Vault
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 SYNOPSIS
 
@@ -57,7 +57,7 @@ To be used via L<WebService::HashiCorp::Vault>.
 
  Generates dynamic credentials based upon the named role
 
-B<Paramaters>
+B<Parameters>
 
 =over 4
 
@@ -75,7 +75,7 @@ Dean Hamstead <dean@bytefoundry.com.au>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Dean Hamstad.
+This software is copyright (c) 2020 by Dean Hamstad.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

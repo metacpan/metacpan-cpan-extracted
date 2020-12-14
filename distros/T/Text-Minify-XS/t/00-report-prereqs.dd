@@ -35,9 +35,11 @@ do { my $x = {
                                      'CPAN::Meta' => '2.120900'
                                    },
                    'requires' => {
+                                   'Encode' => '0',
                                    'File::Spec' => '0',
                                    'Module::Metadata' => '0',
                                    'Test::More' => '0',
+                                   'Test::Warnings' => '0',
                                    'utf8' => '0'
                                  }
                  }

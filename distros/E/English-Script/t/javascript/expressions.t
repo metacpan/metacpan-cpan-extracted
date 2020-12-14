@@ -38,7 +38,7 @@ is(
         'set simple object',
         'Set prime to 3.',
         [
-            'if ( typeof( prime ) == "undefined" ) var prime;',
+            'if ( typeof( prime ) == "undefined" ) var prime = "";',
             'prime = 3;'
         ],
     ],
@@ -47,7 +47,7 @@ is(
         'Set special prime to 3.',
         [
             'if ( typeof( special ) == "undefined" ) var special = {};',
-            'if ( typeof( special.prime ) == "undefined" ) var special.prime;',
+            'if ( typeof( special.prime ) == "undefined" ) special.prime = "";',
             'special.prime = 3;'
         ],
     ],
@@ -56,8 +56,8 @@ is(
         'Set 42 special prime to 3.',
         [
             'if ( typeof( _42 ) == "undefined" ) var _42 = {};',
-            'if ( typeof( _42.special ) == "undefined" ) var _42.special = {};',
-            'if ( typeof( _42.special.prime ) == "undefined" ) var _42.special.prime;',
+            'if ( typeof( _42.special ) == "undefined" ) _42.special = {};',
+            'if ( typeof( _42.special.prime ) == "undefined" ) _42.special.prime = "";',
             '_42.special.prime = 3;'
         ],
     ],
@@ -66,7 +66,7 @@ is(
         'Set the special prime list value string text number list array to 3.',
         [
             'if ( typeof( special ) == "undefined" ) var special = {};',
-            'if ( typeof( special.prime ) == "undefined" ) var special.prime;',
+            'if ( typeof( special.prime ) == "undefined" ) special.prime = "";',
             'special.prime = 3;'
         ],
     ],
@@ -75,8 +75,8 @@ is(
         'Set the sum of 27 to the value of 3 plus 5 times 10 divided by 2 minus 1.',
         [
             'if ( typeof( sum ) == "undefined" ) var sum = {};',
-            'if ( typeof( sum.of ) == "undefined" ) var sum.of = {};',
-            'if ( typeof( sum.of.27 ) == "undefined" ) var sum.of.27;',
+            'if ( typeof( sum.of ) == "undefined" ) sum.of = {};',
+            'if ( typeof( sum.of.27 ) == "undefined" ) sum.of.27 = "";',
             'sum.of.27 = 3 + 5 * 10 / 2 - 1;'
         ],
     ],
@@ -84,7 +84,7 @@ is(
         'set a floating point number with commas',
         'Set the answer to 123,456.78.',
         [
-            'if ( typeof( answer ) == "undefined" ) var answer;',
+            'if ( typeof( answer ) == "undefined" ) var answer = "";',
             'answer = 123456.78;'
         ],
     ],

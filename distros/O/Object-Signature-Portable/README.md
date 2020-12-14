@@ -4,7 +4,7 @@ Object::Signature::Portable - generate portable fingerprints of objects
 
 # VERSION
 
-version v0.2.0
+version v1.0.0
 
 # SYNOPSIS
 
@@ -109,12 +109,23 @@ The following options are supported:
 
     - JSON is a simple, text-based format. The output is not likely to
     change between module versions.
+    - Consistent encoding of integers are strings.
     - Classes can be extended with hooks for JSON serialization.
     - Speed is not a factor.
 
     However, see ["LIMITATIONS"](#limitations) below.
 
 # LIMITATIONS
+
+## Encoding
+
+The default JSON serializer will use UTF-8 encoding by default, which
+generally removes an issue with [Storable](https://metacpan.org/pod/Storable) when identical strings
+have different encodings.
+
+Numeric values may be inconsistently represented if they are not
+numified, e.g. `"123"` vs `123` may not produce the same JSON. (This too
+is an issue with `Storable`.)
 
 ## Signatures for Arbitrary Objects
 
@@ -185,7 +196,8 @@ This module is _not_ intended for hashing passwords.
     hexidecimal string as a signature.
 
     This has the drawback that machines with different architectures,
-    different versions of Perl, or different versions [Storable](https://metacpan.org/pod/Storable) may not
+    different versions of Perl, or different versions [Storable](https://metacpan.org/pod/Storable), or in
+    some cases different encodings of the same scalar, may not
     produce the same signature for the same data. (This does not mean that
     [Storable](https://metacpan.org/pod/Storable) is unable to de-serialize data produced by different
     versions; it only means that the serialized data is not identical
@@ -237,7 +249,7 @@ Thanks to various people at YAPC::EU 2014 for suggestions about
 
 # COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2013-2014, 2019 by Robert Rothenberg.
+This software is Copyright (c) 2013-2014, 2019-2020 by Robert Rothenberg.
 
 This is free software, licensed under:
 

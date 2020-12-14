@@ -11,7 +11,7 @@ package mb;
 use 5.00503;    # Universal Consensus 1998 for primetools
 # use 5.008001; # Lancaster Consensus 2013 for toolchains
 
-$VERSION = '0.12';
+$VERSION = '0.14';
 $VERSION = $VERSION;
 
 # internal use
@@ -80,7 +80,7 @@ sub import {
     # set script encoding
     if (defined $_[0]) {
         my $encoding = $_[0];
-        if ($encoding =~ /\A (?: big5 | big5hkscs | eucjp | gb18030 | gbk | sjis | uhc | utf8 ) \z/xms) {
+        if ($encoding =~ /\A (?: big5 | big5hkscs | eucjp | gb18030 | gbk | sjis | uhc | utf8 | wtf8 ) \z/xms) {
             set_script_encoding($encoding);
         }
         else {
@@ -109,7 +109,7 @@ sub main {
         die <<END;
 usage:
 
-perl mb.pm              MBCS_Perl_script.pl
+perl mb.pm              MBCS_Perl_script.pl (auto detect)
 perl mb.pm -e big5      MBCS_Perl_script.pl
 perl mb.pm -e big5hkscs MBCS_Perl_script.pl
 perl mb.pm -e eucjp     MBCS_Perl_script.pl
@@ -118,6 +118,7 @@ perl mb.pm -e gbk       MBCS_Perl_script.pl
 perl mb.pm -e sjis      MBCS_Perl_script.pl
 perl mb.pm -e uhc       MBCS_Perl_script.pl
 perl mb.pm -e utf8      MBCS_Perl_script.pl
+perl mb.pm -e wtf8      MBCS_Perl_script.pl
 
 END
     }
@@ -125,7 +126,7 @@ END
     # set script encoding from command line
     my $encoding = '';
     if (($encoding) = $ARGV[0] =~ /\A -e ( .+ ) \z/xms) {
-        if ($encoding =~ /\A (?: big5 | big5hkscs | eucjp | gb18030 | gbk | sjis | uhc | utf8 ) \z/xms) {
+        if ($encoding =~ /\A (?: big5 | big5hkscs | eucjp | gb18030 | gbk | sjis | uhc | utf8 | wtf8 ) \z/xms) {
             set_script_encoding($encoding);
             shift @ARGV;
         }
@@ -135,7 +136,7 @@ END
     }
     elsif ($ARGV[0] =~ /\A -e \z/xms) {
         $encoding = $ARGV[1];
-        if ($encoding =~ /\A (?: big5 | big5hkscs | eucjp | gb18030 | gbk | sjis | uhc | utf8 ) \z/xms) {
+        if ($encoding =~ /\A (?: big5 | big5hkscs | eucjp | gb18030 | gbk | sjis | uhc | utf8 | wtf8 ) \z/xms) {
             set_script_encoding($encoding);
             shift @ARGV;
             shift @ARGV;
@@ -402,7 +403,7 @@ sub mb::getc {
             }
         }
     }
-    elsif ($script_encoding =~ /\A (?: utf8 ) \z/xms) {
+    elsif ($script_encoding =~ /\A (?: utf8 | wtf8 ) \z/xms) {
         if ($getc =~ /\A [\xC2-\xDF] \z/xms) {
             $getc .= CORE::getc $fh;
         }
@@ -662,6 +663,7 @@ sub mb::set_script_encoding {
         'gb18030'   => '(?>[\x81-\xFE][\x30-\x39][\x81-\xFE][\x30-\x39]|[\x81-\xFE][\x00-\xFF])', # GB18030 Windows XP and later: GB18030 Simplified Chinese (4 byte); Chinese Simplified (GB18030)
     #   'utf8'      => '(?>[\xC2-\xDF][\x80-\xBF]|[\xE0-\xEF][\x80-\xBF][\x80-\xBF]|[\xF0-\xF4][\x80-\xBF][\x80-\xBF][\x80-\xBF])', # utf-8 Unicode (UTF-8) RFC2279
         'utf8'      => '(?>[\xE1-\xEC][\x80-\xBF][\x80-\xBF]|[\xC2-\xDF][\x80-\xBF]|[\xEE-\xEF][\x80-\xBF][\x80-\xBF]|[\xF0-\xF0][\x90-\xBF][\x80-\xBF][\x80-\xBF]|[\xE0-\xE0][\xA0-\xBF][\x80-\xBF]|[\xED-\xED][\x80-\x9F][\x80-\xBF]|[\xF1-\xF3][\x80-\xBF][\x80-\xBF][\x80-\xBF]|[\xF4-\xF4][\x80-\x8F][\x80-\xBF][\x80-\xBF])', # utf-8 Unicode (UTF-8) optimized RFC3629 for ja_JP
+        'wtf8'      => '(?>[\xE1-\xEF][\x80-\xBF][\x80-\xBF]|[\xC2-\xDF][\x80-\xBF]|[\xE0-\xE0][\xA0-\xBF][\x80-\xBF]|[\xF0-\xF0][\x90-\xBF][\x80-\xBF][\x80-\xBF]|[\xF1-\xF3][\x80-\xBF][\x80-\xBF][\x80-\xBF]|[\xF4-\xF4][\x80-\x8F][\x80-\xBF][\x80-\xBF])',                                                                     # optimized WTF-8 for ja_JP
     }->{$script_encoding} || '[\x80-\xFF]';
 
     # supports qr/./ in MBCS script
@@ -701,7 +703,7 @@ sub mb::set_script_encoding {
     # Break through the limitations of regular expressions of Perl
     # http://d.hatena.ne.jp/gfx/20110212/1297512479
 
-    if ($script_encoding =~ /\A (?: utf8 ) \z/xms) {
+    if ($script_encoding =~ /\A (?: utf8 | wtf8 ) \z/xms) {
         ${mb::_anchor} = qr{.*?}xms;
     }
     elsif ($] >= 5.030000) {
@@ -809,11 +811,44 @@ END
 }
 
 #---------------------------------------------------------------------
+# tr/A-C/1-3/ for UTF-8 codepoint
+sub _list_all_ASCII_by_hyphen {
+    my @hyphened = @_;
+    my @list_all = ();
+    for (my $i=0; $i <= $#hyphened; ) {
+        if (
+            ($i+1 < $#hyphened)      and
+            ($hyphened[$i+1] eq '-') and
+        1) {
+            if (0) { }
+            elsif ($hyphened[$i+0] !~ m/\A [\x00-\x7F] \z/oxms) {
+                confess sprintf(qq{@{[__FILE__]}: "$hyphened[$i+0]-$hyphened[$i+2]" in tr/// is not ASCII});
+            }
+            elsif ($hyphened[$i+2] !~ m/\A [\x00-\x7F] \z/oxms) {
+                confess sprintf(qq{@{[__FILE__]}: "$hyphened[$i+0]-$hyphened[$i+2]" in tr/// is not ASCII});
+            }
+            elsif ($hyphened[$i+0] gt $hyphened[$i+2]) {
+                confess sprintf(qq{@{[__FILE__]}: "$hyphened[$i+0]-$hyphened[$i+2]" in tr/// is not "$hyphened[$i+0]" le "$hyphened[$i+2]"});
+            }
+            else {
+                push @list_all, ($hyphened[$i+0] .. $hyphened[$i+2]);
+                $i += 3;
+            }
+        }
+        else {
+            push @list_all, $hyphened[$i];
+            $i++;
+        }
+    }
+    return @list_all;
+}
+
+#---------------------------------------------------------------------
 # tr/// and y/// for MBCS encoding
 sub mb::tr {
     my @x           = $_[0] =~ /\G${mb::x}/g;
-    my @search      = $_[1] =~ /\G${mb::x}/g;
-    my @replacement = $_[2] =~ /\G${mb::x}/g;
+    my @search      = _list_all_ASCII_by_hyphen($_[1] =~ /\G${mb::x}/g);
+    my @replacement = _list_all_ASCII_by_hyphen($_[2] =~ /\G${mb::x}/g);
     my %modifier    = (defined $_[3]) ? (map { $_ => 1 } CORE::split //, $_[3]) : ();
 
     my %tr = ();
@@ -1563,7 +1598,7 @@ sub mb::_unlink {
 ######################################################################
 
 #---------------------------------------------------------------------
-# detect system encoding any of big5, big5hkscs, eucjp, gb18030, gbk, sjis, uhc, utf8
+# detect system encoding any of big5, big5hkscs, eucjp, gb18030, gbk, sjis, uhc, utf8, wtf8
 sub detect_system_encoding {
 
     # running on Microsoft Windows
@@ -4218,6 +4253,7 @@ mb - run Perl script in MBCS encoding (not only CJK ;-)
   $ perl mb.pm -e sjis      MBCS_Perl_script.pl
   $ perl mb.pm -e uhc       MBCS_Perl_script.pl
   $ perl mb.pm -e utf8      MBCS_Perl_script.pl
+  $ perl mb.pm -e wtf8      MBCS_Perl_script.pl
 
   MBCS subroutines:
     mb::chop(...);
@@ -4242,7 +4278,7 @@ mb - run Perl script in MBCS encoding (not only CJK ;-)
     $mb::ORIG_PROGRAM_NAME
 
   supported encodings:
-    Big5, Big5-HKSCS, EUC-JP, GB18030, GBK, Sjis, UHC, UTF-8
+    Big5, Big5-HKSCS, EUC-JP, GB18030, GBK, Sjis, UHC, UTF-8, WTF-8
 
   supported operating systems:
     Apple Inc. OS X,
@@ -4296,7 +4332,7 @@ To install this software without make, type the following:
 
   This software ...
   * supports MBCS literals in Perl scripts
-  * supports Big5, Big5-HKSCS, EUC-JP, GB18030, GBK, Sjis, UHC, and UTF-8
+  * supports Big5, Big5-HKSCS, EUC-JP, GB18030, GBK, Sjis, UHC, UTF-8, and WTF-8
   * does not use the UTF8 flag to avoid MOJIBAKE
   * escapes DAMEMOJI in scripts
   * handles raw encoding to support GAIJI
@@ -4305,9 +4341,10 @@ To install this software without make, type the following:
   * supports special variables $`, $&, and $'
   * does not change features of octet-oriented built-in functions
   * lc(), lcfirst(), uc(), and ucfirst() convert US-ASCII only
-  * character ranges by hyphen of regular expression supports US-ASCII only
-  * tr/// and y/// doesn't support ranges by hyphen
+  * codepoint range by hyphen of regular expression supports US-ASCII only
+  * codepoint range by hyphen of tr/// and y/// support US-ASCII only
   * You have to write mb::* subroutines if you want codepoint semantics
+  * supports WTF-8
 
   Let's enjoy MBSC scripting in Perl, together!!
 
@@ -4438,6 +4475,22 @@ To install this software without make, type the following:
              F4..F4    80..8F    80..BF    80..BF
              00..7F
              https://en.wikipedia.org/wiki/UTF-8
+             * needs no multibyte anchoring
+             * needs no escaping meta char of 1st-4th octets
+             * safe US-ASCII casefolding
+             * enforces surrogate codepoints must be paired
+  ------------------------------------------------------------------------------
+  wtf8 (WTF-8)
+             1st       2nd       3rd       4th
+             E1..EF    80..BF    80..BF
+             C2..DF    80..BF
+             E0..E0    A0..BF    80..BF
+             F0..F0    90..BF    80..BF    80..BF
+             F1..F3    80..BF    80..BF    80..BF
+             F4..F4    80..8F    80..BF    80..BF
+             00..7F
+             http://simonsapin.github.io/wtf-8/
+             * superset of UTF-8 that encodes surrogate codepoints if they are not in a pair
              * needs no multibyte anchoring
              * needs no escaping meta char of 1st-4th octets
              * safe US-ASCII casefolding
@@ -5074,17 +5127,17 @@ To install this software without make, type the following:
   Each elements in strings or regular expressions that are double-quote like are
   transpiled as follows.
 
-  ---------------------------------------------------------------------------------------------
+  -----------------------------------------------------------------------------------------------
   in your script                             script transpiled by this software
-  ---------------------------------------------------------------------------------------------
-  \L\u MBCS-quotee \E\E                      \L\u OO-quotee \E\E
-  \U\l MBCS-quotee \E\E                      \U\l OO-quotee \E\E
-  \L MBCS-quotee \E                          \L OO-quotee \E
-  \U MBCS-quotee \E                          \U OO-quotee \E
-  \l MBCS-quotee \E                          \l OO-quotee \E
-  \u MBCS-quotee \E                          \u OO-quotee \E
-  \Q MBCS-quotee \E                          \Q OO-quotee \E
-  ---------------------------------------------------------------------------------------------
+  -----------------------------------------------------------------------------------------------
+  "\L\u MBCS-quotee \E\E"                    "@{[mb::ucfirst(qq<@{[mb::lc(qq< OO-quotee >)]}>)]}"
+  "\U\l MBCS-quotee \E\E"                    "@{[mb::lcfirst(qq<@{[mb::uc(qq< OO-quotee >)]}>)]}"
+  "\L MBCS-quotee \E"                        "@{[mb::lc(qq< OO-quotee >)]}"
+  "\U MBCS-quotee \E"                        "@{[mb::uc(qq< OO-quotee >)]}"
+  "\l MBCS-quotee \E"                        "@{[mb::lcfirst(qq< OO-quotee >)]}"
+  "\u MBCS-quotee \E"                        "@{[mb::ucfirst(qq< OO-quotee >)]}"
+  "\Q MBCS-quotee \E"                        "@{[quotemeta(qq< OO-quotee >)]}"
+  -----------------------------------------------------------------------------------------------
 
   Each elements in regular expressions are transpiled as follows.
 
@@ -5192,7 +5245,7 @@ You can avoid the following bugs with little hacks.
 
 =over 2
 
-=item * Special Variables $` and $& need /( Capture All )/
+=item * Special Variables $` and $& need m/( Capture All )/
 
 If you use the special variables $ ` or $&, you must enclose the entire regular
 expression in parentheses. Because $` and $& needs $1 to implement its.
@@ -5216,10 +5269,10 @@ slow execution. Both that era and today, capturing by parentheses works well.
 =item * character ranges by hyphen
 
 Character ranges by hyphen of regular expression supports US-ASCII only.
-And tr///, y/// doesn't support ranges by hyphen. This limitation dares to exist
-to help you when you change the encoding of your script. If you want to be
-perfect, you need to check the use of the following operators when changing the
-encoding of your script.
+And also tr/// and y/// support ranges only US-ASCII by hyphen. This limitation
+dares to exist to help you when you change the encoding of your script. If you
+want to be perfect, you need to check the use of the following operators when
+changing the encoding of your script.
 
   eq  ne  le  lt  ge  gt  cmp  sort
 
@@ -5366,6 +5419,8 @@ A named codepoint, such \N{GREEK SMALL LETTER EPSILON}, \N{greek:epsilon}, or
   # suggested module name
   use mb::Charnames qw( %N ); # supports for all MBCS, including UTF-8
   print "$N{'GREEK SMALL LETTER EPSILON'}";
+  
+  # By the way, you know how great it is to be able to write MBCS literal strings in your Perl scripts, right?
 
 =item * Unicode Properties (aka Codepoint Properties) of Regular Expression
 
@@ -5572,7 +5627,7 @@ figure of Goal #1 and Goal #2.
       | interpreter  |  Old  |              New              |
       +--------------+-------+-------------------------------+
       Old --- Old byte-oriented
-      New --- New character-oriented
+      New --- New codepoint-oriented
 
 There is a combination from (a) to (e) in data, script, and interpreter
 of old and new. Let's add JPerl, utf8 pragma, and this software.
@@ -5587,7 +5642,7 @@ of old and new. Let's add JPerl, utf8 pragma, and this software.
       | interpreter  |  Old  |              New              |
       +--------------+-------+-------------------------------+
       Old --- Old byte-oriented
-      New --- New character-oriented
+      New --- New codepoint-oriented
 
 The reason why JPerl is very excellent is that it is at the position of
 (c). That is, it is almost not necessary to write a special code to process
@@ -5636,7 +5691,7 @@ Back when Programming Perl, 3rd ed. was written, UTF8 flag was not born
 and Perl is designed to make the easy jobs easy. This software provides
 programming environment like at that time.
 
-=head1 Perl's motto
+=head1 Perl's Motto
 
    Some computer scientists (the reductionists, in particular) would
   like to deny it, but people have funny-shaped minds. Mental geography

@@ -4,13 +4,13 @@
       "Bryan Jurish <moocow@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.141520",
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "DiaColloDB",
    "no_index" : {
@@ -69,5 +69,6 @@
    },
    "release_status" : "stable",
    "resources" : {},
-   "version" : "v0.12.017"
+   "version" : "v0.12.019",
+   "x_serialization_backend" : "JSON::PP version 4.02"
 }

@@ -1,55 +1,73 @@
-# Phoebe
+# NAME
 
-Phoebe serves a wiki as a Gemini site.
-
-It does two and a half things:
-
-- It's a program that you run on a computer and other people connect to it
-      using their [Gemini client](https://gemini.circumlunar.space/clients.html)
-      in order to read the pages on it.
-- It's a wiki, which means that people can edit the pages without needing an
-      account. All they need is a client that speaks both
-      [Gemini](https://gemini.circumlunar.space/) and
-      [Titan](https://communitywiki.org/wiki/Titan), and the password. The
-      default password is "hello". 😃
-- People can also access it using a regular web browser. They'll get a very
-      simple, read-only version of the site.
-
-To take a look for yourself, check out the test wiki via the
-[web](https://transjovian.org:1965/test) or via
-[Gemini](gemini://transjovian.org/test).
+Phoebe - serve a wiki as a Gemini site
 
 **Table of Contents**
 
-- [What are pages written in?](#what-are-pages-written-in)
-- [How do you edit a Phoebe wiki?](#how-do-you-edit-a-phoebe-wiki)
-- [What is Titan?](#what-is-titan)
-- [License](#license)
+- [Name](#name)
+- [Synopsis](#synopsis)
+- [Description](#description)
+- [Gemtext](#gemtext)
+- [Editing the wiki](#editing-the-wiki)
 - [Installation](#installation)
 - [Dependencies](#dependencies)
 - [Quickstart](#quickstart)
 - [Image uploads](#image-uploads)
-- [Troubleshooting](#troubleshooting)
-- [Wiki Directory](#wiki-directory)
-- [Options](#options)
 - [Using systemd](#using-systemd)
+- [Troubleshooting](#troubleshooting)
+- [Files](#files)
+- [Options](#options)
+- [Files](#files)
+- [Notes](#notes)
 - [Security](#security)
 - [Privacy](#privacy)
-- [Files](#files)
-- [Main Page and Title](#main-page-and-title)
-- [GUS and robots.txt](#gus-and-robots-txt)
-- [Limited, read-only HTTP support](#limited-read-only-http-support)
+- [Example](#example)
+- [Certificates and file permission](#certificates-and-file-permission)
+- [Main page and title](#main-page-and-title)
+- [Gus and robots.txt](#gus-and-robots-txt)
+- [Limited, read-only http support](#limited-read-only-http-support)
 - [Configuration](#configuration)
-- [Wiki Spaces](#wiki-spaces)
-- [Tokens per Wiki Space](#tokens-per-wiki-space)
-- [Client Certificates](#client-certificates)
-- [Virtual Hosting](#virtual-hosting)
-- [Multiple Certificates](#multiple-certificates)
-- [CSS for the Web](#css-for-the-web)
-- [Favicon for the Web](#favicon-for-the-web)
-- [More](#more)
+- [Wiki spaces](#wiki-spaces)
+- [Tokens per wiki space](#tokens-per-wiki-space)
+- [Client certificates](#client-certificates)
+- [Virtual hosting](#virtual-hosting)
+- [Multiple certificates](#multiple-certificates)
+- [Css for the web](#css-for-the-web)
+- [Favicon for the web](#favicon-for-the-web)
+- [See also](#see-also)
+- [License](#license)
 
-## What are pages written in?
+# SYNOPSIS
+
+**phoebe** \[**--host=**_hostname_ ...\] \[**--port=**_port_\]
+\[**--cert\_file=**_filename_\] \[**--key\_file=**_filename_\]
+\[**--log\_level=error**|**warn**|**info**|**debug**\] \[**--log\_file=**_filename_\]
+\[**--wiki\_dir=**_directory_\] \[**--wiki\_token=**_token_ ...\]
+\[**--wiki\_page=**_pagename_ ...\] \[**--wiki\_main\_page=**_pagename_\]
+\[**--wiki\_mime\_type=**_mimetype_ ...\] \[**--wiki\_page\_size\_limit=**_n_\]
+\[**--wiki\_space=**_space_ ...\]
+
+# DESCRIPTION
+
+Phoebe does two and a half things:
+
+It's a program that you run on a computer and other people connect to it using
+their Gemini client in order to read the pages on it.
+
+It's a wiki, which means that people can edit the pages without needing an
+account. All they need is a client that speaks both Gemini and Titan, and the
+password. The default password is "hello". 😃
+
+People can also access it using a regular web browser. They'll get a very
+simple, read-only version of the site.
+
+To take a look for yourself, check out the test wiki via the web or via the web.
+
+- [https://gemini.circumlunar.space/clients.html](https://gemini.circumlunar.space/clients.html)
+- [https://transjovian.org:1965/test](https://transjovian.org:1965/test)
+- [gemini://transjovian.org/test](gemini://transjovian.org/test)
+
+# GEMTEXT
 
 Pages are written in gemtext, a lightweight hypertext format. You can use your
 favourite text editor to write them.
@@ -88,36 +106,30 @@ A line starting with ">", followed by a space and some text is a quote.
     The monologue at the end is fantastic, with the city lights and the rain.
     > I've seen things you people wouldn't believe.
 
-## How do you edit a Phoebe wiki?
+# EDITING THE WIKI
 
-You need to use a Titan-enabled client.
+How do you edit a Phoebe wiki? You need to use a Titan-enabled client.
+
+Titan is a companion protocol to Gemini: it allows clients to upload files to
+Gemini sites, if servers allow this. On Phoebe, you can edit "raw" pages. That
+is, at the bottom of a page you'll see a link to the "raw" page. If you follow
+it, you'll see the page content as plain text. You can submit a changed version
+of this text to the same URL using Titan. There is more information for
+developers available on Community Wiki. [https://communitywiki.org/wiki/Titan](https://communitywiki.org/wiki/Titan)
 
 Known clients:
 
-- This repository comes with a Perl script called
-      [titan](https://alexschroeder.ch/cgit/phoebe/plain/titan) to upload
-      files
-- [Gemini Write](https://alexschroeder.ch/cgit/gemini-write/) is an
-      extension for the Emacs Gopher and Gemini client
-      [Elpher](https://thelambdalab.xyz/elpher/)
-- [Gemini & Titan for Bash](https://alexschroeder.ch/cgit/gemini-titan/about/)
-      are two shell functions that allow you to download and upload files
+This repository comes with a Perl script called `titan` to upload files.
+[https://alexschroeder.ch/cgit/phoebe/plain/titan](https://alexschroeder.ch/cgit/phoebe/plain/titan)
 
-## What is Titan?
+_Gemini Write_ is an extension for the Emacs Gopher and Gemini client
+_Elpher_. [https://alexschroeder.ch/cgit/gemini-write/](https://alexschroeder.ch/cgit/gemini-write/)
+[https://thelambdalab.xyz/elpher/](https://thelambdalab.xyz/elpher/)
 
-Titan is a companion protocol to Gemini: it allows clients to upload files to
-Gemini sites, if servers allow this. On Phoebe, you can edit "raw"
-pages. That is, at the bottom of a page you'll see a link to the "raw" page. If
-you follow it, you'll see the page content as plain text. You can submit a
-changed version of this text to the same URL using Titan. There is more
-information for developers available
-[on Community Wiki](https://communitywiki.org/wiki/Titan).
+Gemini & Titan for Bash are two shell functions that allow you to download and
+upload files. [https://alexschroeder.ch/cgit/gemini-titan/about/](https://alexschroeder.ch/cgit/gemini-titan/about/)
 
-## License
-
-GNU Affero General Public License
-
-## Installation
+# INSTALLATION
 
 Using `cpan`:
 
@@ -140,11 +152,13 @@ Perl libraries you need to install if you want to run Phoebe:
 - [IO::Socket::SSL](https://metacpan.org/pod/IO%3A%3ASocket%3A%3ASSL), or `libio-socket-ssl-perl`
 - [Modern::Perl](https://metacpan.org/pod/Modern%3A%3APerl), or `libmodern-perl-perl`
 - [URI::Escape](https://metacpan.org/pod/URI%3A%3AEscape), or `liburi-escape-xs-perl`
+- [Net::IDN::Encode](https://metacpan.org/pod/Net%3A%3AIDN%3A%3AEncode), or `libnet-idn-encode-perl`
+- [Encode::Locale](https://metacpan.org/pod/Encode%3A%3ALocale), or `libencode-locale-perl`
 
 I'm going to be using `curl` and `openssl` in the ["Quickstart"](#quickstart) instructions,
 so you'll need those tools as well. And finally, when people download their
-data, the code calls `tar` (available from package with the same name on Debian
-derived systems).
+data, the code calls `tar` (available from packages with the same name on
+Debian derived systems).
 
 The `update-readme.pl` script I use to generate `README.md` also requires some
 libraries:
@@ -177,6 +191,7 @@ This starts the server in the foreground. If it aborts, see the
 it:
 
     perl5/bin/gemini gemini://localhost/
+
 You should see a Gemini page starting with the following:
 
     20 text/gemini; charset=UTF-8
@@ -284,14 +299,44 @@ Alternatively, you can increase the size limit using the
 
 Now you can upload about 10MB…
 
-## Troubleshooting
+## Using systemd
 
-🔥 **SSL\_cert\_file cert.pem can't be used: No such file or directory** 🔥 Perhaps
-you're missing the certificate (`cert.pem`) or key file (`key.pem`). The git
-repo has the necessary files which you can use to do a quick test. Copy them
-into the installation directory where you want to run Phoebe and try again. Once
-it works, you should _generate your own_ using the Makefile: `make cert`
-should do it.
+Systemd is going to handle daemonisation for us. There's more documentation
+available online.
+[https://www.freedesktop.org/software/systemd/man/systemd.service.html](https://www.freedesktop.org/software/systemd/man/systemd.service.html).
+
+Basically, this is the template for our service:
+
+    [Unit]
+    Description=Phoebe
+    After=network.target
+    [Service]
+    Type=simple
+    WorkingDirectory=/home/phoebe
+    ExecStart=/home/phoebe/phoebe
+    Restart=always
+    User=phoebe
+    Group=phoebe
+    [Install]
+    WantedBy=multi-user.target
+
+Save this as `phoebe.service`, and then link it:
+
+    sudo ln -s /home/phoebe/phoebe.service /etc/systemd/system/
+
+Reload systemd:
+
+    sudo systemctl daemon-reload
+
+Start Phoebe:
+
+    sudo systemctl start phoebe
+
+Check the log output:
+
+    sudo journalctl --unit phoebe
+
+## Troubleshooting
 
 🔥 **1408A0C1:SSL routines:ssl3\_get\_client\_hello:no shared cipher** 🔥 If you
 created a new certificate and key using elliptic curves using an older OpenSSL,
@@ -301,63 +346,58 @@ least it'll work.
     openssl req -new -x509 -newkey rsa \
     -days 1825 -nodes -out cert.pem -keyout key.pem
 
-## Wiki Directory
+# FILES
 
-Your home directory should now also contain a wiki directory called `wiki`. In
-it, you'll find a few more files:
+Your home directory should now also contain a wiki directory called `wiki`,
+your wiki directory. In it, you'll find a few more files:
 
-- `page` is the directory with all the page files in it; each file has the
-      `gmi` extension and should be written in Gemtext format
-- `index` is a file containing all the files in your `page` directory for
-      quick access; if you create new files in the `page` directory, you should
-      delete the `index` file – it will get regenerated when needed; the format
-      is one page name (without the `.gmi` extension) per line, with lines
-      separated from each other by a single `\n`
-- `keep` is the directory with all the old revisions of pages in it – if
-      you've only made one change, then it won't exist; if you don't care about
-      the older revisions, you can delete them; assuming you have a page called
-      `Welcome` and edit it once, you have the current revision as
-      `page/Welcome.gmi`, and the old revision in `keep/Welcome/1.gmi` (the
-      page name turns into a subdirectory and each revision gets an apropriate
-      number)
-- `file` is the directory with all the uploaded files in it – if you
-      haven't uploaded any files, then it won't exist; you must explicitly allow
-      MIME types for upload using the `--wiki_mime_type` option (see _Options_
-      below)
-- `meta` is the directory with all the meta data for uploaded files in it –
-      there should be a file here for every file in the `file` directory; if
-      you create new files in the `file` directory, you should create a
-      matching file here; if you have a file `file/alex.jpg` you want to create
-      a file `meta/alex.jpg` containing the line `content-type: image/jpeg`
-- `changes.log` is a file listing all the pages made to the wiki; if you
-      make changes to the files in the `page` or `file` directory, they aren't
-      going to be listed in this file and thus people will be confused by the
-      changes you made – your call (but in all fairness, if you're collaborating
-      with others you probably shouldn't do this); the format is one change per
-      line, with lines separated from each other by a single `\n`, and each
-      line consisting of time stamp, pagename or filename, revision number if a
-      page or 0 if a file, and the numeric code of the user making the edit (see
-      ["Privacy"](#privacy) below), all separated from each other with a `\x1f`
-- `config` probably doesn't exist, yet; it is an optional file containing
-      Perl code where you can add new features and change how Phoebe works (see
-      ["Configuration"](#configuration) below)
-- `conf.d` probably doesn't exist, either; it is an optional directory
-      containing even more Perl files where you can add new features and change
-      how Phoebe works (see ["Configuration"](#configuration) below); the idea is that people
-      can share stand-alone configurations that you can copy into this directory
-      without having to edit your own `config` file.
+`page` is the directory with all the page files in it; each file has the `gmi`
+extension and should be written in Gemtext format
 
-## Options
+`index` is a file containing all the files in your `page` directory for quick
+access; if you create new files in the `page` directory, you should delete the
+`index` file – it will get regenerated when needed; the format is one page name
+(without the `.gmi` extension) per line, with lines separated from each other
+by a single `\n`
 
-Here's an example:
+`keep` is the directory with all the old revisions of pages in it – if you've
+only made one change, then it won't exist; if you don't care about the older
+revisions, you can delete them; assuming you have a page called `Welcome` and
+edit it once, you have the current revision as `page/Welcome.gmi`, and the old
+revision in `keep/Welcome/1.gmi` (the page name turns into a subdirectory and
+each revision gets an apropriate number)
 
-    perl phoebe \
-      --wiki_token=Elrond \
-      --wiki_token=Thranduil \
-      --wiki_page=Welcome \
-      --wiki_page=About
+`file` is the directory with all the uploaded files in it – if you haven't
+uploaded any files, then it won't exist; you must explicitly allow MIME types
+for upload using the `--wiki_mime_type` option (see _Options_ below)
 
-Here's the documentation for the most useful options:
+`meta` is the directory with all the meta data for uploaded files in it – there
+should be a file here for every file in the `file` directory; if you create new
+files in the `file` directory, you should create a matching file here; if you
+have a file `file/alex.jpg` you want to create a file `meta/alex.jpg`
+containing the line `content-type: image/jpeg`
+
+`changes.log` is a file listing all the pages made to the wiki; if you make
+changes to the files in the `page` or `file` directory, they aren't going to
+be listed in this file and thus people will be confused by the changes you made
+– your call (but in all fairness, if you're collaborating with others you
+probably shouldn't do this); the format is one change per line, with lines
+separated from each other by a single `\n`, and each line consisting of time
+stamp, pagename or filename, revision number if a page or 0 if a file, and the
+numeric code of the user making the edit (see ["Privacy"](#privacy) below), all separated
+from each other with a `\x1f`
+
+`config` probably doesn't exist, yet; it is an optional file containing Perl
+code where you can add new features and change how Phoebe works (see
+["Configuration"](#configuration) below)
+
+`conf.d` probably doesn't exist, either; it is an optional directory containing
+even more Perl files where you can add new features and change how Phoebe works
+(see ["Configuration"](#configuration) below); the idea is that people can share stand-alone
+configurations that you can copy into this directory without having to edit your
+own `config` file.
+
+# OPTIONS
 
 - `--wiki_token` is for the token that users editing pages have to provide;
       the default is "hello"; you can use this option multiple times and give
@@ -398,42 +438,17 @@ Here's the documentation for the most useful options:
 - `--log_file` is the log file to use; the default is undefined, which
       means that STDERR is used
 
-## Using systemd
+## FILES
 
-Systemd is going to handle daemonisation for us. There's more documentation
-[available
-online](https://www.freedesktop.org/software/systemd/man/systemd.service.html).
+If you allow uploads of binary files, these are stored separately from the
+regular pages; the wiki doesn't keep old revisions of files around. If somebody
+overwrites a file, the old revision is gone.
 
-Basically, this is the template for our service:
+You definitely don't want random people uploading all sorts of images, videos
+and binaries to your server. Make sure you set up those [tokens](#security)
+using `--wiki_token`!
 
-    [Unit]
-    Description=Phoebe
-    After=network.target
-    [Service]
-    Type=simple
-    WorkingDirectory=/home/phoebe
-    ExecStart=/home/phoebe/phoebe
-    Restart=always
-    User=phoebe
-    Group=phoebe
-    [Install]
-    WantedBy=multi-user.target
-
-Save this as `phoebe.service`, and then link it:
-
-    sudo ln -s /home/phoebe/phoebe.service /etc/systemd/system/
-
-Reload systemd:
-
-    sudo systemctl daemon-reload
-
-Start Phoebe:
-
-    sudo systemctl start phoebe
-
-Check the log output:
-
-    sudo journalctl --unit phoebe
+# NOTES
 
 ## Security
 
@@ -473,15 +488,80 @@ IP numbers, in which case you will need to tell them about it using in order to
 comply with the
 [GDPR](https://en.wikipedia.org/wiki/General_Data_Protection_Regulation).
 
-## Files
+# EXAMPLE
 
-If you allow uploads of binary files, these are stored separately from the
-regular pages; the wiki doesn't keep old revisions of files around. If somebody
-overwrites a file, the old revision is gone.
+Here's an example for how to start Phoebe. It listens on `localhost` port 1965,
+adds the "Welcome" and the "About" page to the main menu, and allows editing
+using one of two tokens.
 
-You definitely don't want random people uploading all sorts of images, videos
-and binaries to your server. Make sure you set up those [tokens](#security)
-using `--wiki_token`!
+    perl phoebe \
+      --wiki_token=Elrond \
+      --wiki_token=Thranduil \
+      --wiki_page=Welcome \
+      --wiki_page=About
+
+Here's what my `phoebe.service` file actually looks like:
+
+    [Unit]
+    Description=Phoebe
+    After=network.target
+    [Install]
+    WantedBy=multi-user.target
+    [Service]
+    Type=simple
+    WorkingDirectory=/home/alex/farm
+    Restart=always
+    User=alex
+    Group=ssl-cert
+    ExecStart=/home/alex/src/phoebe/script/phoebe \
+     --port=1965 \
+     --log_level=info \
+     --wiki_dir=/home/alex/phoebe \
+     --host=transjovian.org \
+     --cert_file=/var/lib/dehydrated/certs/transjovian.org/fullchain.pem \
+     --key_file=/var/lib/dehydrated/certs/transjovian.org/privkey.pem \
+     --host=toki.transjovian.org \
+     --cert_file=/var/lib/dehydrated/certs/transjovian.org/fullchain.pem \
+     --key_file=/var/lib/dehydrated/certs/transjovian.org/privkey.pem \
+     --host=vault.transjovian.org \
+     --cert_file=/var/lib/dehydrated/certs/transjovian.org/fullchain.pem \
+     --key_file=/var/lib/dehydrated/certs/transjovian.org/privkey.pem \
+     --host=communitywiki.org \
+     --cert_file=/var/lib/dehydrated/certs/communitywiki.org/fullchain.pem \
+     --key_file=/var/lib/dehydrated/certs/communitywiki.org/privkey.pem \
+     --host=alexschroeder.ch \
+     --cert_file=/var/lib/dehydrated/certs/alexschroeder.ch/fullchain.pem \
+     --key_file=/var/lib/dehydrated/certs/alexschroeder.ch/privkey.pem \
+     --host=next.oddmuse.org \
+     --cert_file=/var/lib/dehydrated/certs/oddmuse.org/fullchain.pem \
+     --key_file=/var/lib/dehydrated/certs/oddmuse.org/privkey.pem \
+     --host=emacswiki.org \
+     --cert_file=/var/lib/dehydrated/certs/emacswiki.org/fullchain.pem \
+     --key_file=/var/lib/dehydrated/certs/emacswiki.org/privkey.pem \
+     --wiki_main_page=Welcome \
+     --wiki_page=About \
+     --wiki_mime_type=image/png \
+     --wiki_mime_type=image/jpeg \
+     --wiki_mime_type=audio/mpeg \
+     --wiki_space=transjovian.org/test \
+     --wiki_space=transjovian.org/phoebe \
+     --wiki_space=transjovian.org/anthe \
+     --wiki_space=transjovian.org/gemini \
+     --wiki_space=transjovian.org/titan
+
+## Certificates and File Permission
+
+In the example above, I'm using certificates I get from Let's Encrypt. Thus, the
+regular website served on port 443 and the Phoebe website on port 1965 use the
+same certificates. My problem is that for the regular website, Apache can read
+the certificates, but in the setup above Phoebe runs as the user `alex` and
+cannot access the certificates. My solution is to use the group `ssl-cert`.
+This is the group that already has read access to `/etc/ssl/private` on my
+system. I granted the following permissions:
+
+    drwxr-x--- root ssl-cert /var/lib/dehydrated/certs
+    drwxr-s--- root ssl-cert /var/lib/dehydrated/certs/*
+    drwxr----- root ssl-cert /var/lib/dehydrated/certs/*/*.pem
 
 ## Main Page and Title
 
@@ -504,10 +584,9 @@ shown on your front page.
 There are search machines out there that will index your site. Ideally, these
 wouldn't index the history pages and all that: they would only get the list of
 all pages, and all the pages. I'm not even sure that we need them to look at all
-the files. The [robots exclusion
-standard](https://en.wikipedia.org/wiki/Robots_exclusion_standard) lets you
-control what the bots ought to index and what they ought to skip. It doesn't
-always work.
+the files. The Robots Exclusion Standard lets you control what the bots ought to
+index and what they ought to skip. It doesn't always work.
+[https://en.wikipedia.org/wiki/Robots\_exclusion\_standard](https://en.wikipedia.org/wiki/Robots_exclusion_standard)
 
 Here's my suggestion:
 
@@ -581,23 +660,31 @@ signal, if you know the pid, or if you have a pid file:
 
 Here are the ways you can hook into Phoebe code:
 
-- `@extensions` is a list of code references allowing you to handle
-      additional URLs; return 1 if you handle a URL; each code reference gets
-      called with $stream ([Mojo::IOLoop::Stream](https://metacpan.org/pod/Mojo%3A%3AIOLoop%3A%3AStream)), the first line of the
-      request (a Gemini URL, a Gopher selector, a finger user, a HTTP request
-      line), a hash reference for the headers (in the case of HTTP requests),
-      and a buffer of bytes (e.g. for Titan or HTTP PUT or POST requests)
-- `@main_menu` adds more lines to the main menu, possibly links that aren't
-      simply links to existing pages
-- `@footer` is a list of code references allowing you to add things like
-      licenses or contact information to every page; each code reference gets
-      called with $stream ([Mojo::IOLoop::Stream](https://metacpan.org/pod/Mojo%3A%3AIOLoop%3A%3AStream)), $host, $space, $id,
-      $revision, and $format ('gemini' or 'html') used to serve the page; return
-      a gemtext string to append at the end; the alternative is to overwrite the
-      `footer` or `html_footer` subs – the default implementation for Gemini
-      adds History, Raw text and HTML link, and `@footer` to the bottom of
-      every page; the default implementation for HTTP just adds `@footer` to
-      the bottom of every page
+`@extensions` is a list of code references allowing you to handle additional
+URLs; return 1 if you handle a URL; each code reference gets called with $stream
+([Mojo::IOLoop::Stream](https://metacpan.org/pod/Mojo%3A%3AIOLoop%3A%3AStream)), the first line of the request (a Gemini URL, a Gopher
+selector, a finger user, a HTTP request line), a hash reference for the headers
+(in the case of HTTP requests), and a buffer of bytes (e.g. for Titan or HTTP
+PUT or POST requests)
+
+`@main_menu` adds more lines to the main menu, possibly links that aren't
+simply links to existing pages
+
+`@footer` is a list of code references allowing you to add things like licenses
+or contact information to every page; each code reference gets called with
+$stream ([Mojo::IOLoop::Stream](https://metacpan.org/pod/Mojo%3A%3AIOLoop%3A%3AStream)), $host, $space, $id, $revision, and $format
+('gemini' or 'html') used to serve the page; return a gemtext string to append
+at the end; the alternative is to overwrite the `footer` or `html_footer` subs
+– the default implementation for Gemini adds History, Raw text and HTML link,
+and `@footer` to the bottom of every page; the default implementation for HTTP
+just adds `@footer` to the bottom of every page
+
+If you do hook into Phoebe's code, you probably want to make use of the
+following variables:
+
+`$server` stores the command line options provided by the user.
+
+`$log` is how you log things.
 
 A very simple example to add a contact mail at the bottom of every page; this
 works for both Gemini and the web:
@@ -608,8 +695,8 @@ works for both Gemini and the web:
     push(@footer, sub { '=> mailto:alex@alexschroeder.ch Mail' });
 
 This prints a very simply footer instead of the usual footer for Gemini, as the
-`footer` sub is redefined. At the same time, the `@footer` array is still used
-for the web:
+`footer` function is redefined. At the same time, the `@footer` array is still
+used for the web:
 
     package App::Phoebe;
     use Modern::Perl;
@@ -636,7 +723,7 @@ for it:
       my $stream = shift;
       my $url = shift;
       my $headers = shift;
-      my $host = $host_regex();
+      my $host = host_regex();
       my $port = port($stream);
       if ($url =~ m!^gemini://($host)(?::$port)?/do/test$!) {
         $stream->write("20 text/plain\r\n");
@@ -704,11 +791,11 @@ certificates to limit writing to a single, known fingerprint:
     sub protected_wiki {
       my $stream = shift;
       my $url = shift;
-      my $host_regex = host_regex();
+      my $hosts = host_regex();
       my $port = port($stream);
       my $spaces = space_regex($stream);
       my $fingerprint = $server->{client}->get_fingerprint();
-      if (my ($host, $path) = $url =~ m!^titan://($host_regex)(?::$port)?([^?#]*)!) {
+      if (my ($host, $path) = $url =~ m!^titan://($hosts)(?::$port)?([^?#]*)!) {
         my ($space, $resource) = $path =~ m!^(?:/($spaces))?(?:/raw)?/([^/;=&]+(?:;\w+=[^;=&]+)+)!;
         if (not $resource) {
           $log->debug("The Titan URL is malformed: $path $spaces");
@@ -819,10 +906,11 @@ The wiki can also answer web requests. By default, it only does that on port
 1965\. The web pages refer to a CSS file at `/default.css`, and the response to
 a request for this CSS is served by a function that you can override in your
 config file. The following would be the beginning of a CSS that supports a dark
-theme, for example. The
-[Cache-Control](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Cache-Control)
-header makes sure browsers don't keep trying to revalidate the CSS more than
-once a day.
+theme, for example. The Cache-Control header makes sure browsers don't keep
+trying to revalidate the CSS more than once a day.
+[https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Cache-Control](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Cache-Control)
+
+    our ($log);
 
     sub serve_css_via_http {
       my $stream = shift;
@@ -853,6 +941,8 @@ for all hosts. You could, of course, accept the `$headers` as an additional
 argument to `favicon`, match hostnames, pass the `$host` to
 `serve_favicon_via_http`, and return different images depending on the host.
 Let me know if you need this and you are stuck.
+
+    our (@extensions, $log);
 
     push(@extensions, \&favicon);
 
@@ -888,11 +978,15 @@ Let me know if you need this and you are stuck.
     EOT
     }
 
-## More
+# SEE ALSO
 
 As you might have guessed, the system is easy to tinker with, if you know some
-Perl. [The Transjovian Council](https://transjovian.org:1965/) has [a wiki
-space dedicated to Phoebe](https://transjovian.org:1965/phoebe/), and it includes
-a section with more configuration examples, including simple comments
+Perl. The Transjovian Council has a wiki space dedicated to Phoebe, and it
+includes a section with more configuration examples, including simple comments
 (append-only via Gemini), complex comments (editing via Titan or the web),
 wholesale page editing via the web, user-agent blocking, and so on.
+[gemini://transjovian.org/](gemini://transjovian.org/) [https://transjovian.org:1965/](https://transjovian.org:1965/)
+
+# LICENSE
+
+GNU Affero General Public License

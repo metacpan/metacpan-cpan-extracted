@@ -3,9 +3,9 @@ package Term::ANSIColor::Conditional;
 ## no critic (Modules::ProhibitAutomaticExportation)
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-03-21'; # DATE
+our $DATE = '2020-08-10'; # DATE
 our $DIST = 'Term-ANSIColor-Conditional'; # DIST
-our $VERSION = '0.007'; # VERSION
+our $VERSION = '0.008'; # VERSION
 
 use strict 'subs', 'vars';
 use warnings;
@@ -75,7 +75,7 @@ Term::ANSIColor::Conditional - Colorize text only if color is enabled
 
 =head1 VERSION
 
-This document describes version 0.007 of Term::ANSIColor::Conditional (from Perl distribution Term-ANSIColor-Conditional), released on 2020-03-21.
+This document describes version 0.008 of Term::ANSIColor::Conditional (from Perl distribution Term-ANSIColor-Conditional), released on 2020-08-10.
 
 =head1 SYNOPSIS
 
@@ -104,9 +104,9 @@ How to determine "color is enabled":
 =back
 
 Note that Term::ANSIColor already supports conditional color via the
-C<ANSI_COLORS_DISABLED> environment variable, but it does not supports the "more
-standard" C<NO_COLOR> and C<COLOR>, and it also does not check or interactive
-terminal.
+C<ANSI_COLORS_DISABLED> environment variable, but it does not support the "more
+standard" C<NO_COLOR> and C<COLOR> variables, and it also does not check for
+interactive terminal.
 
 =for Pod::Coverage ^(.+)$
 

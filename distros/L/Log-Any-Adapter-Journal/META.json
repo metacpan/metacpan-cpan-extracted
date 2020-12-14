@@ -4,7 +4,7 @@
       "Mark Grimes E<lt>mgrimes@cpan.orgE<gt>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "App::ModuleBuildTiny version 0.011",
+   "generated_by" : "App::ModuleBuildTiny version 0.027",
    "license" : [
       "perl_5"
    ],
@@ -21,7 +21,7 @@
       },
       "develop" : {
          "requires" : {
-            "App::ModuleBuildTiny" : "0.011"
+            "App::ModuleBuildTiny" : "0.027"
          }
       },
       "runtime" : {
@@ -29,14 +29,14 @@
             "Class::Method::Modifiers" : "2.00",
             "Log::Any" : "1.00",
             "Log::Any::Adapter::Screen" : "0.12",
-            "Module::Build::Tiny" : "0.030"
+            "Module::Build::Tiny" : "0.034"
          }
       }
    },
    "provides" : {
       "Log::Any::Adapter::Journal" : {
          "file" : "lib/Log/Any/Adapter/Journal.pm",
-         "version" : "0.13"
+         "version" : "1.0"
       }
    },
    "release_status" : "stable",
@@ -50,7 +50,8 @@
          "web" : "http://github.com/mvgrimes/Log-Any-Adapter-Journal"
       }
    },
-   "version" : "0.13",
+   "version" : "1.0",
    "x_contributors" : [],
-   "x_serialization_backend" : "JSON::PP version 2.27300"
+   "x_serialization_backend" : "JSON::PP version 2.27400_02",
+   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }

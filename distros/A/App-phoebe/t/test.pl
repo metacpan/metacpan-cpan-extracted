@@ -17,11 +17,19 @@ use Modern::Perl;
 use Test::More;
 use IO::Socket::SSL;
 use File::Slurper qw(write_text);
-use Mojo::IOLoop::Server;
+use Mojo::IOLoop;
+use Encode;
 
-our $host //= "127.0.0.1";
+our $host;
 our @hosts;
-@hosts = ($host) unless @hosts;
+if ($host and not grep { $_ eq $host } @hosts) {
+  push(@hosts, $host);
+} elsif (not $host and @hosts) {
+  $host = $hosts[0];
+} else {
+  $host = '127.0.0.1';
+  @hosts = ($host);
+}
 our @pages;
 our @spaces;
 our $port = Mojo::IOLoop::Server->generate_port;
@@ -38,16 +46,20 @@ push(@extensions, \&serve_test);
 sub serve_test {
   my $stream = shift;
   my $url = shift;
-  my $host = host_regex();
+  my $hosts = host_regex();
   my $port = port($stream);
-  if ($url =~ m!^gemini://($host):$port/do/test$!) {
+  if ($url =~ m!^gemini://($hosts):$port/do/test$!) {
     $stream->write("20 text/plain\r\n");
     $stream->write("Test\n");
     return 1;
   }
   return;
 }
-1;
+no warnings 'redefine';
+sub get_ip_numbers {
+  return '127.0.0.1';
+}
+
 EOT
 
 our $pid = fork();
@@ -88,19 +100,47 @@ if (!defined $pid) {
 sub query_gemini {
   my $query = shift;
   my $text = shift;
+  my ($header, $mimetype, $encoding, $buffer);
 
   # create client
-  my $socket = IO::Socket::SSL->new(
-    PeerHost => "127.0.0.1",
-    PeerService => $port,
-    SSL_verify_mode => SSL_VERIFY_NONE)
-      or die "Cannot construct client socket to $port: $@";
+  Mojo::IOLoop->client({
+    address => "127.0.0.1",
+    port => $port,
+    tls => 1,
+    tls_cert => "t/cert.pem",
+    tls_key => "t/key.pem",
+    tls_verify => 0x00, } => sub {
+      my ($loop, $err, $stream) = @_;
+      $stream->on(read => sub {
+	my ($stream, $bytes) = @_;
+	if ($header and $encoding) {
+	  $buffer .= decode($encoding, $bytes);
+	} elsif ($header) {
+	  $buffer .= $bytes;
+	} else {
+	  ($header) = $bytes =~ /^(.*?)\r\n/;
+	  $header = decode_utf8 $header;
+	  if ($header =~ /^2\d* (?:text\/\S+)?(?:; *charset=(\S+))?$/g) {
+	    # empty, or text without charset defaults to UTF-8
+	    $encoding = $1 || 'UTF-8';
+	  }
+	  $bytes =~ s/^(.*?)\r\n//;
+	  if ($encoding) {
+	    $buffer .= decode($encoding, $bytes);
+	  } else {
+	    $buffer .= $bytes;
+	  }
+	}});
+      # Write request
+      $stream->write("$query\r\n");
+      $stream->write($text) if $text;
+		       });
 
-  print $socket "$query\r\n";
-  print $socket $text if defined $text;
+  # Start event loop if necessary
+  Mojo::IOLoop->start unless Mojo::IOLoop->is_running;
 
-  undef $/; # slurp
-  return <$socket>;
+  # When we're done
+  return "$header\r\n$buffer";
 }
 
 sub query_web {
@@ -109,11 +149,11 @@ sub query_web {
 }
 
 say "This is the client waiting 1s for the server to start on port $port...";
-sleep 1; eval { query_gemini('/') };
-if ($@) { say "One more second..."; sleep 1; eval { query_gemini('/') }}
-if ($@) { say "Just one more second..."; sleep 1; eval { query_gemini('/') }}
-if ($@) { say "Another second..."; sleep 1; eval { query_gemini('/') }}
-if ($@) { say "One last second..."; sleep 1; eval { query_gemini('/') }}
+sleep 1; eval { query_gemini('gemini://localhost/') };
+if ($@) { say "One more second..."; sleep 1; eval { query_gemini('gemini://localhost/') }}
+if ($@) { say "Just one more second..."; sleep 1; eval { query_gemini('gemini://localhost/') }}
+if ($@) { say "Another second..."; sleep 1; eval { query_gemini('gemini://localhost/') }}
+if ($@) { say "One last second..."; sleep 1; eval { query_gemini('gemini://localhost/') }}
 if ($@) { say "Still getting an error: $@" }
 
 1;

@@ -6,6 +6,12 @@ use ExtUtils::MakeMaker;
 use File::ShareDir::Install;
 install_share dist=>'share';
 
+##-- workaround for irritating "/some/symlinked/file is encountered a second time at File/Find.pm line 79." errors
+##   under ExtUtils::MakeMaker 7.1002 (see also RT bug #99018)
+#*ExtUtils::MakeMaker::_check_files = sub {};
+#*ExtUtils::MakeMaker::check_manifest = sub {};
+do "./find.hack" if (-e "./find.hack");
+
 ##----------------------------------------------------------------------
 ## MAIN
 ##----------------------------------------------------------------------
@@ -248,6 +254,14 @@ $(INST_PODDIR)$(DFSEP).exists :: Makefile.PL
 
   ##-- return
   return $out;
+}
+
+##---------------------------------------------------------------
+sub MY::dist_basics {
+  package MY;
+  my $inherited = shift->SUPER::dist_basics(@_);
+  $inherited =~ s{(-MExtUtils::Manifest=.*? -e)\s*(\S+)}{$1 "do './find.hack'; $2"}mg;
+  return $inherited;
 }
 
 ##---------------------------------------------------------------

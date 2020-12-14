@@ -1,5 +1,9 @@
 Revision history for Finance-Currency-Convert-BChile
 
+0.06    Sun Dec 13 13:16:08 -03 2020
+        CPAN RT sunset. Changing code repository and issue tracker to
+        sourcehut.
+
 0.05    Wed Jul 24 10:38:32 CLT 2013
         Banco Central has changed its homepage. The numbers now are inside
         a frame with different URL and layout.

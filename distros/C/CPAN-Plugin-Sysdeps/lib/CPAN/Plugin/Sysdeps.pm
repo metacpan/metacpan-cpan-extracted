@@ -3,7 +3,7 @@ package CPAN::Plugin::Sysdeps;
 use strict;
 use warnings;
 
-our $VERSION = '0.66';
+our $VERSION = '0.67';
 
 use List::Util 'first';
 
@@ -220,8 +220,8 @@ sub _detect_linux_distribution_lsb_release {
 sub _detect_linux_distribution_fallback {
     if (open my $fh, '<', '/etc/redhat-release') {
 	my $contents = <$fh>;
-	if ($contents =~ m{^(CentOS|RedHat|Fedora) (?:Linux )?release (\d+)\S* \((.*?)\)}) {
-	    return {linuxdistro => $1, linuxdistroversion => $2, linuxdistrocodename => $3};
+	if ($contents =~ m{^(CentOS|RedHat|Fedora) (?:Linux )?release (\d+)\S*( \((.*?)\))?}) {
+	    return {linuxdistro => $1, linuxdistroversion => $2, linuxdistrocodename => defined $3 ? $3 : ''};
 	}
     }
     if (open my $fh, '<', '/etc/issue') {
@@ -410,13 +410,12 @@ sub _detect_dnf {
     require Symbol;
     my $err = Symbol::gensym();
     my $fh;
-    eval {
+    return eval {
 	    if (my $pid = IPC::Open3::open3(undef, $fh, $err, @cmd)) {
 		    waitpid $pid, 0;
 		    return $? == 0;
 		}
     };
-    return;
 }
 
 sub _find_missing_deb_packages {

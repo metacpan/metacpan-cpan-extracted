@@ -1,7 +1,7 @@
 
 BEGIN {
   unless ($ENV{AUTHOR_TESTING}) {
-    print "1..0 # SKIP these tests are for testing by the author\n";
+    print qq{1..0 # SKIP these tests are for testing by the author\n};
     exit
   }
 }
@@ -28,10 +28,14 @@ my @files = (
     'lib/WebService/HashiCorp/Vault/Secret/RabbitMQ.pm',
     'lib/WebService/HashiCorp/Vault/Secret/SSH.pm',
     'lib/WebService/HashiCorp/Vault/Sys.pm',
+    't/00-compile.t',
     't/000-load.t',
     't/001-vault.t',
     't/author-critic.t',
+    't/author-eof.t',
     't/author-eol.t',
+    't/author-no-breakpoints.t',
+    't/author-no-tabs.t',
     't/author-pod-coverage.t',
     't/author-pod-syntax.t',
     't/author-portability.t',

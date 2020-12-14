@@ -10,6 +10,7 @@ WriteMakefile(
     VERSION_FROM     => 'lib/Net/Address/IP/Cipher.pm',
     ABSTRACT_FROM    => 'lib/Net/Address/IP/Cipher.pm',
     LICENSE          => 'artistic_2',
+    SIGN             => 1,
     PL_FILES         => {},
     MIN_PERL_VERSION => 5.12.0,
     CONFIGURE_REQUIRES => {
@@ -29,6 +30,9 @@ WriteMakefile(
     META_MERGE => {
         'meta-spec' => { version => 2 },
         resources => {
+            bugtracker => {
+                "web" => "https://github.com/huguei/p5-Net-Address-IP-Cipher/issues",
+            },
             repository => {
                 type => 'git',
                 url  => 'https://github.com/huguei/p5-Net-Address-IP-Cipher.git',

@@ -1,5 +1,5 @@
 This file contains message digests of all files listed in MANIFEST,
-signed via the Module::Signature module, version 0.81.
+signed via the Module::Signature module, version 0.87.
 
 To verify the content in this distribution, first make sure you have
 Module::Signature installed, then type:
@@ -12,26 +12,26 @@ the distribution may already have been compromised, and you should
 not run its Makefile.PL or Build.PL.
 
 -----BEGIN PGP SIGNED MESSAGE-----
-Hash: SHA1
+Hash: RIPEMD160
 
-SHA1 54de3ae921fe5e002bf8d4502a208b894c9fe715 Changes
-SHA1 3e6512d8af259da08b8b35a8f7b785dac5d4242d MANIFEST
-SHA1 108cdf24b5adcab6ffd50eca2a23f5539914865b META.json
-SHA1 439d6c31a5b9540f92e6a0cc150e6ec9576a0d01 META.yml
-SHA1 cb35e4b6f5d3cb2cfff6295d0054da4afaaa9d74 Makefile.PL
-SHA1 78f73f3c66117c54e4eecc7a63087d9e2b01bdb9 README
-SHA1 93effae77b03aef9a81654ed48b3a539c97045cf ignore.txt
-SHA1 2d3fdd73f6402b7aa36cdedb1358207ef720e491 lib/Net/Address/IP/Cipher.pm
-SHA1 91131cf063bde2fd0b106f94b544b71052402a25 t/00-load.t
-SHA1 81d00e78c1b2d2b92280dbcfc80143dd5a721463 t/01-key.t
-SHA1 eb5cc7adec4866a2f45ec4aedce3b5f1939cbfe5 t/02-password.t
-SHA1 7e88e5ac68c6620b86fc2cbbad92dc2b74b55d7a t/boilerplate.t
-SHA1 3e86d3e277d4233e55b8a4555bf6edf2dcdf7bd0 t/manifest.t
-SHA1 898aef3ac1bdafaccea9cd7d25b34965408ade63 t/pod-coverage.t
-SHA1 a572bbed348e70b106f01fa02fee8b8edd6735d5 t/pod.t
+SHA256 879f8c6f40bfdba8e0ffc3401787fcf133e99055f6bacf7436ab1f7a2a0960a8 Changes
+SHA256 8f5324c7353193404c183ebb963d3a19a80c8fb0d0ebce26efc4eeda1948d54f MANIFEST
+SHA256 a201d414c2f827eb38dfba0a287ce1b203567e6559e8430796b56626438b04b9 META.json
+SHA256 acc20124a3a71bcd363e79f5279c470815fa40350d634a154c849852604d6cca META.yml
+SHA256 3c799c88f7bac1accb43c183e672c169d7219458669097f570479ce75614598b Makefile.PL
+SHA256 dbf3d8795031491d54d6ab0ecfe53f6b3598699e2bd32d7eb1034cf8031f93a2 README
+SHA256 87053e0e5e18019f0f4fff19fa35a305caeb020360ef4f8606dc9f96418d911e ignore.txt
+SHA256 278617ba0d8f39144e0327d54e7484e9b8e6bfff1773ce6ab9b389e5185bc5e6 lib/Net/Address/IP/Cipher.pm
+SHA256 91d62ecc6df9e15fd92794c812fa06eafa36a39facd13dcb3ac7fe8457cfd341 t/00-load.t
+SHA256 d75c5ab9fa8d4e760afec6e8252d6fef1dad45cbc33cac5065cce4ba967e7103 t/01-key.t
+SHA256 7f3e0e38baa18e711e33547db8af2b699a4944f3211ef83bd1101daa76ad1221 t/02-password.t
+SHA256 a5056bcef8854d442d92b4898811ccc5828f9f27bf018384a4ad0ece539b0d80 t/boilerplate.t
+SHA256 a80be90196a4d0b250fe255a60489fdf12d452f12c3bf8fe7e724bda53bf8d18 t/manifest.t
+SHA256 bc6bacebd8e3967572149a6bffe240b28aefc773efdb7c5e3c0ad2bfca86c708 t/pod-coverage.t
+SHA256 69a39e15ffd8e533230052376d3b8f87f9be65e3aaf1d6124bc2bd14b3d8c467 t/pod.t
 -----BEGIN PGP SIGNATURE-----
 
-iF0EARECAB0WIQQGIpAXkA908yCaLyQ4i3ZypuWMzQUCWwbKDAAKCRA4i3ZypuWM
-zb7tAKCJD35PaMGefh/tUs73xZESMRMqDgCgrXXPkwbh/EfB+JivORRPWHLH/yQ=
-=J9zw
+iF0EAREDAB0WIQQGIpAXkA908yCaLyQ4i3ZypuWMzQUCX9ZvgAAKCRA4i3ZypuWM
+zYHJAJ9fX6BM4KBXErKR/Tym/ugLDyK1IwCguZrIHo8PrDUCcG5zZPwGqHZ9U/I=
+=u7Ko
 -----END PGP SIGNATURE-----

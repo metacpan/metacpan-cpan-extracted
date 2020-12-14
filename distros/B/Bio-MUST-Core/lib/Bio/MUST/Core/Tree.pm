@@ -1,7 +1,7 @@
 package Bio::MUST::Core::Tree;
 # ABSTRACT: Thin wrapper around Bio::Phylo trees
 # CONTRIBUTOR: Valerian LUPO <valerian.lupo@doct.uliege.be>
-$Bio::MUST::Core::Tree::VERSION = '0.202310';
+$Bio::MUST::Core::Tree::VERSION = '0.203490';
 use Moose;
 # use MooseX::SemiAffordanceAccessor;
 use namespace::autoclean;
@@ -12,6 +12,7 @@ use feature qw(say);
 use Smart::Comments;
 
 use Carp;
+use Const::Fast;
 use File::Basename;
 use List::AllUtils qw(uniq);
 use Tie::IxHash;
@@ -20,6 +21,7 @@ use Bio::Phylo::IO qw(parse);
 
 use Bio::MUST::Core::Types;
 use Bio::MUST::Core::Constants qw(:files);
+use Bio::MUST::Core::Utils qw(:filenames);
 use aliased 'Bio::MUST::Core::SeqId';
 with 'Bio::MUST::Core::Roles::Commentable',
      'Bio::MUST::Core::Roles::Listable';
@@ -32,6 +34,9 @@ has 'tree' => (
     writer   => '_set_tree',
 );
 
+
+# color for uncolored taxon (see Taxonomy::ColorScheme)
+const my $BLACK => '#000000';
 
 # Note: we don't store SeqId objects in the tree but dynamically build them
 # to benefit from SeqId methods (e.g., auto-removal of first '_'). This is
@@ -193,6 +198,10 @@ sub collapse_subtrees {
             return if List::AllUtils::any { not defined $_ } @attrs;
             return if uniq(@attrs) > 1;
 
+            # skip black color when collapsing at color
+            my $color = shift @attrs;
+            return if $color eq $BLACK;
+
             # compute and set FigTree's "node height" for collapsed clade
             # Note: the tallest tip will be 0
             my $sub_max_path = $node->calc_max_path_to_tips
@@ -217,78 +226,6 @@ sub collapse_subtrees {
             return;
         },
      );
-
-    return;
-}
-
-
-sub store_itol_collapse {
-    my $self          = shift;
-    my $label_file    = shift;
-    my $collapse_file = shift;
-
-    open my $l_out, '>', $label_file;
-    say {$l_out} join "\n", 'LABELS', 'SEPARATOR COMMA', 'DATA';
-    ### Output iTOL node label: $label_file
-    open my $c_out, '>', $collapse_file;
-    say {$c_out} join "\n", 'COLLAPSE', 'DATA';
-    ### Output iTOL collapse: $collapse_file
-
-    # "balanced"-order tree traversal
-    my $collapsed;      # will be defined when within a collapsed subtree
-    $self->tree->visit_depth_first(
-
-       # collapse subtrees with identical attributes
-        -pre_daughter => sub {
-            my $node = shift;
-            return if $node->is_terminal;
-
-            # do not further collapse children of a collapsed subtree
-            # to facilitate interactive uncollapsing (e.g., in FigTree)
-            return if $collapsed;
-
-            # collect children attributes
-            my @attrs;
-            for (my $i = 0; my $child = $node->get_child($i); $i++) {
-                push @attrs, $child->get_generic('taxon_collapse');
-            }
-
-            # collapse subtree if all attributes are defined and identical
-            return if List::AllUtils::any { not defined $_ } @attrs;
-            return if uniq(@attrs) > 1;
-
-            my $taxon    = $node->get_generic('taxon');
-            my $collapse = $node->get_generic('taxon_collapse');
-            my @descendants = map { 
-                SeqId->new( full_id => $_->get_name )->foreign_id
-            } @{ $node->get_terminals };
-
-            my $node_name
-                = @descendants > 1 ? $descendants[0] . '|' . $descendants[-1]
-                : $descendants[0]
-            ;
-
-            # writing outfiles
-            say {$l_out} join q{,}, $node_name, $taxon if $taxon;
-            say {$c_out} $node_name if $collapse;
-
-            # set "within a collapsed subtree" status
-            $collapsed = $node->get_id;
-
-            return;
-        },
-
-        -post_daughter => sub {
-            my $node = shift;
-            return if $node->is_terminal;
-
-            # unset "within a collapsed subtree" status (when leaving subtree)
-            $collapsed = undef
-                if defined $collapsed && $collapsed eq $node->get_id;
-
-            return;
-        },
-    );
 
     return;
 }
@@ -382,6 +319,77 @@ sub store {
 
     open my $out, '>', $outfile;
     say {$out} _clean_newick_str( $self->tree->to_newick( %$args ) );
+
+    return;
+}
+
+
+sub store_itol_datasets {
+    my $self    = shift;
+    my $outfile = shift;
+    my $key     = shift // 'taxon';
+
+    # name dataset files
+    my $outbase    = change_suffix($outfile, '.txt');
+    my $color_file = insert_suffix($outbase, '-color');
+    my $range_file = insert_suffix($outbase, '-range');
+    my $label_file = insert_suffix($outbase, '-label');
+    my $colps_file = insert_suffix($outbase, '-collapse');
+
+    # open and setup dataset files
+    open my $color_out, '>', $color_file;
+    say {$color_out} join "\n", 'TREE_COLORS', 'SEPARATOR COMMA', 'DATA';
+    open my $range_out, '>', $range_file;
+    say {$range_out} join "\n", 'TREE_COLORS', 'SEPARATOR COMMA', 'DATA';
+    open my $label_out, '>', $label_file;
+    say {$label_out} join "\n", 'LABELS', 'SEPARATOR COMMA', 'DATA';
+    open my $colps_out, '>', $colps_file;
+    say {$colps_out} join "\n", 'COLLAPSE', 'DATA';
+
+    # setup format
+    my $type = 'normal',
+    my $size = 1;
+
+    NODE:
+    for my $node ( @{ $self->tree->get_entities } ){
+        my $color    = $node->get_generic('!color') // $BLACK;
+        my $label    = $node->get_generic($key);
+        my $collapse = $node->get_generic('!collapse');
+
+        if ($node->is_terminal) {
+            next NODE if $color eq $BLACK;
+
+            my $id = SeqId->new( full_id => $node->get_name )->foreign_id;
+            say {$color_out} join q{,}, $id, 'clade', $color, $type, $size;
+            say {$range_out} join q{,}, $id, 'range', $color, $type, $size;
+
+            next NODE;
+        }
+
+        my @descendants;
+        for (my $i = 0; my $child = $node->get_child($i); $i++) {
+            push @descendants, @{ $child->get_terminals };
+        }
+
+        # Note: Simply calling get_terminals on node returns descendants
+        # in an order that leads to mis-selecting the first and last ones.
+        # Instead we store the descendants from node's main two (or more)
+        # children sequentially. This seems to fix the issue.
+
+        # determine first and last descendants to build node id
+        my $id = join '|', map {
+            SeqId->new( full_id => $_->get_name )->foreign_id
+        } @descendants[ @descendants > 1 ? (0,-1) : (0) ];
+        # Note: should always > 1 but one never knows...
+
+        say {$label_out} join q{,}, $id, $label if $collapse;
+        say {$colps_out}            $id         if $collapse;
+
+        next NODE if $color eq $BLACK;
+
+        say {$color_out} join q{,}, $id, 'clade', $color, $type, $size;
+        say {$range_out} join q{,}, $id, 'range', $color, $type, $size;
+    }
 
     return;
 }
@@ -544,7 +552,7 @@ Bio::MUST::Core::Tree - Thin wrapper around Bio::Phylo trees
 
 =head1 VERSION
 
-version 0.202310
+version 0.203490
 
 =head1 SYNOPSIS
 
@@ -572,13 +580,13 @@ version 0.202310
 
 =head2 collapse_subtrees
 
-=head2 store_itol_collapse
-
 =head2 match_branch_lengths
 
 =head2 load
 
 =head2 store
+
+=head2 store_itol_datasets
 
 =head2 store_figtree
 

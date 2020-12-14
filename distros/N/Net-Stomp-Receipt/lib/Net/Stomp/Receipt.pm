@@ -14,7 +14,7 @@ use base 'Net::Stomp';
 #
 # I start the version in sync with Net::Stomp
 # (and hopes to keep it in that way)
-our $VERSION = '0.36';
+our $VERSION = '0.40';
 
 
 # Added a new configuration variable on creation,
@@ -163,9 +163,23 @@ Hugo Salgado, E<lt>huguei@cpan.org<gt>
 This module was built for NIC Chile (http://www.nic.cl), who
 granted its liberation as free software.
 
+=head1 SUPPORT
+
+You can find documentation for this module with the perldoc command.
+
+    perldoc Net::Stomp::Receipt
+
+You can also look for information at:
+
+=over 4
+
+=item * sourcehut's request tracker
+
+L<https://todo.sr.ht/~huguei/perl-Net-Stomp-Receipt>
+
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2008 by Hugo Salgado
+Copyright (C) 2020 by Hugo Salgado
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.10.0 or,

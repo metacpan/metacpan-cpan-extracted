@@ -4,7 +4,7 @@ NAME
 
 SYNOPSIS
 
-  $ perl mb.pm              MBCS_Perl_script.pl
+  $ perl mb.pm              MBCS_Perl_script.pl (auto detect encoding of script)
   $ perl mb.pm -e big5      MBCS_Perl_script.pl
   $ perl mb.pm -e big5hkscs MBCS_Perl_script.pl
   $ perl mb.pm -e eucjp     MBCS_Perl_script.pl
@@ -13,6 +13,7 @@ SYNOPSIS
   $ perl mb.pm -e sjis      MBCS_Perl_script.pl
   $ perl mb.pm -e uhc       MBCS_Perl_script.pl
   $ perl mb.pm -e utf8      MBCS_Perl_script.pl
+  $ perl mb.pm -e wtf8      MBCS_Perl_script.pl
 
 DESCRIPTION
 

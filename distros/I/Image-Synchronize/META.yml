@@ -31,5 +31,5 @@ requires:
 resources:
   bugtracker: https://github.com/LouisStrous/p5-Image-Synchronize/issues
   repository: https://github.com/LouisStrous/p5-Image-Synchronize.git
-version: '2.005'
+version: '2.007'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

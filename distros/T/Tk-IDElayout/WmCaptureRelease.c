@@ -222,8 +222,8 @@ Tcl_Obj *CONST objv[];		/* Argument objects. */
 }
 
 /* ---------------------------------------------------------------
-   Function that implements the wmCapture command 
-    "Captures" a toplevel window and makes it a sub-window.
+   Function that implements the wmRelease command 
+    "Releases" a sub-window and makes it a toplevel.
 */
 static int
 WmReleaseCmd(tkwin, winPtr, interp, objc, objv)

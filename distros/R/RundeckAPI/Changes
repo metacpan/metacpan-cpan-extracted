@@ -1,3 +1,13 @@
+20201212
+	version 1.3.0
+	Handle more response types (json, text, binary)
+	Renamed methods put/postFile -> put/postData. Keep old methods
+	for compatibility (removed in furure releases)
+
+20201201
+	Get rid of passwd authentifiaction, which is not as secure than token.
+	Therefore, the code is cleaner.
+
 20200924
 	Fixed token auth problem -> API version must be >= 19
 

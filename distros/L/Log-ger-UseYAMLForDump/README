@@ -1,0 +1,63 @@
+NAME
+    Log::ger::UseYAMLForDump - Use YAML::PP to dump data structures (as
+    JSON)
+
+VERSION
+    This document describes version 0.001 of Log::ger::UseYAMLForDump (from
+    Perl distribution Log-ger-UseYAMLForDump), released on 2020-06-06.
+
+SYNOPSIS
+     use Log::ger::UseYAMLForDump;
+
+DESCRIPTION
+CONFIGURATION
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Log-ger-UseYAMLForDump>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Log-ger-UseYAMLForDump>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Log-ger-UseYAMLForDum
+    p>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    Log::ger
+
+    YAML::PP
+
+    Other modules to set data dumper for Log::ger:
+
+    *   Log::ger::UseBaheForDump
+
+    *   Log::ger::UseDataDump
+
+    *   Log::ger::UseDataDumpColor
+
+    *   Log::ger::UseDataDumpObjectAsString
+
+    *   Log::ger::UseDataDumpOptions
+
+    *   Log::ger::UseDataDumper
+
+    *   Log::ger::UseDataDumperCompact
+
+    *   Log::ger::UseDataPrinter
+
+    *   Log::ger::UseJSONForDump
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2020 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

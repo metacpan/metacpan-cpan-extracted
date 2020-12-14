@@ -1,5 +1,8 @@
 Revision history for perl module DBIx::Class::Schema::Diff
 
+1.12 2020-12-11
+   - Remove rogue RapidApp::Util use statement (PR #7, @jwrightecs)
+
 1.11 2020-11-24
    - Add new 'DBIx::Class::Schema::Diff::State' class (VANSTYN)
    - Add new fingerprint method to Diff/State object classes (VANSTYN)

@@ -1,5 +1,8 @@
 Revision history for Perl extension Sub-WrapInType
 
+0.04 2020-12-12T14:15:19Z
+    - Fix the version of Type::Tiny
+
 0.03 2020-09-27T12:41:30Z
 
     - New format support `wrap_sub($param, ...)`

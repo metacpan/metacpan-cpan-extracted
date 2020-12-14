@@ -1,3 +1,32 @@
+2.02
+
+- Handle international domain names: when you provide them with the
+  --host option, the address lookup happens using their punycode
+  representation, and URIs containing these punycode representations
+  of the international domain name are served correctly.
+
+- Improvements to the gemini script (the simple command line client):
+  knows how to stream; decodes text appropriately; has a --verbose
+  flag; takes client certificates.
+
+- Add all the extensions from the Phoebe wiki as config files for your
+  conf.d directory.
+
+- Add a gemini-chat script to work with the chat.pl config file.
+
+- Man pages look more like man pages.
+
+- Fixed a bug in printing the source code.
+
+- Fixed several instances of streams not being closed correctly,
+  leading to timeouts for clients that kept waiting for the end of
+  file.
+
+- Fixed the bug that config was running before the config files in
+  conf.d, making it impossible to overwrite our variables.
+
+- Changed some functions to no longer take a $stream argument.
+
 2.00
 
 - This is a .00 release. I expect things to break. That said, I run my

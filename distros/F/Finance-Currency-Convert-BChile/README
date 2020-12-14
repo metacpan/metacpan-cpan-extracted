@@ -38,11 +38,8 @@ perldoc command.
 
 You can also look for information at:
 
-    RT, CPAN's request tracker
-        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Finance-Currency-Convert-BChile
-
-    AnnoCPAN, Annotated CPAN documentation
-        http://annocpan.org/dist/Finance-Currency-Convert-BChile
+    sourcehut's request tracker
+        https://todo.sr.ht/~huguei/perl-Finance-Currency-Convert-BChile
 
     CPAN Ratings
         http://cpanratings.perl.org/d/Finance-Currency-Convert-BChile

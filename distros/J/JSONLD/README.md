@@ -4,7 +4,7 @@
 
 ## VERSION
 
-This document describes JSONLD version 0.002.
+This document describes JSONLD version 0.004_01.
 
 ## SYNOPSIS
 
@@ -42,11 +42,11 @@ Prints the JSON-LD 1.1 *deserialization* of the data in `input.jsonld` to standa
 This module implements part of the JSON-LD 1.1 standard for manipulating JSON
 data as linked data.
 
-This version (0.002) provides full support for the JSON-LD 1.1 "Expansion" and
+This version provides full support for the JSON-LD 1.1 "Expansion" and
 "toRdf" transformations (the latter primarily being useful through a subclass
 of JSON-LD, such as that provided by L<AtteanX::Parser::JSONLD>).
 Partial support for the "Compaction" transformation is provided, but it
-contains many known deficiencies. Full support for "Compaction" will be
+contains many known deficiencies. Full support for "Compaction" may be
 forthcoming in a future release.
 No other JSON-LD transformation are supported at this time.
 

@@ -62,13 +62,26 @@ DiaColloDB->ensureLog(level=>$logLevel, rootLevel=>'FATAL');
   my $dbdir  = (grep {defined($_) && $_ ne ''} map {$stash->get($_)} qw(DIACOLLO_DBDIR dstar.diacollo_dbdir diacollo_dbdir))[0];
   my $dburl  = (grep {defined($_) && $_ ne ''} map {$stash->get($_)} qw(DIACOLLO_DBURL dstar.diacollo_dburl diacollo_dburl))[0];
   if (!$dburl) {
-    $dbdir ||= "data";
-    $dburl   = "file://$dbdir";
+    $dbdir ||= "data" if (-d "data");
+
+    if ($dbdir && -d $dbdir) {
+	$dburl = "file://$dbdir"; 
+    }
+    elsif (-e "client.rc") {
+        $dbdir = "client.rc";
+        $dburl = "rcfile://client.rc";
+    }
+    else {
+	##-- fallback
+        $dbdir ||= 'data';
+        $dburl = "file://data";
+    }
   } else {
     $dbdir = $1 if ($dburl =~ m{(?:file://)?([^?#]*)});
   }
-  my $is_dbdir = (defined($dbdir) && $dbdir ne '' && -d $dbdir);
-  my $is_list  = ($dburl =~ m{^list://}i);
+  my $is_dbdir  = (defined($dbdir) && $dbdir ne '' && -d $dbdir);
+  my $is_dbfile = (defined($dbdir) && $dbdir ne '' && !-d $dbdir && -f $dbdir);
+  my $is_list   = ($dburl =~ m{^list://}i);
   #print STDERR "dburl[initial;is_dbdir=".($is_dbdir||0).";is_list=".($is_list||0)."] = $dburl\ndbdir[initial] = $dbdir\n";
 
   ##-- db options: log-level
@@ -83,8 +96,9 @@ DiaColloDB->ensureLog(level=>$logLevel, rootLevel=>'FATAL');
   if ($is_dbdir) {
     ##-- local directory: load JSON header directly
     $stash->set('dbhdr' => DiaColloDB::Utils::loadJsonFile("$dbdir/header.json") // {});
-  } else {
-    ##-- non-local dburl: use info API (slow)
+  }
+  else {
+    ##-- non-local dburl or rcfile: use info API (slow)
     $stash->set('dbhdr' => DiaColloDB::Client->new($dburl)->dbinfo());
     undef $dbdir;
   }
@@ -94,21 +108,20 @@ DiaColloDB->ensureLog(level=>$logLevel, rootLevel=>'FATAL');
   $stash->set('tdf_enabled' => ($dbhdr->{index_tdf} || $dbhdr->{relations}{tdf}) ? 1 : 0);
 
   ##-- check for relations: ddc
-  if ($is_dbdir) {
+  my $ddcsrv = $dbhdr->{ddcServer};
+  if (!$ddcsrv) {
     ##-- auto-detect ddc server host+port if running under dstar --> update local options
-    my ($ddcsrv);
-    if ( !($ddcsrv=$dbhdr->{ddcServer}) ) {
-      my $ddchost = $stash->get('dstar.server_host');
-      my $ddcport = $stash->get('dstar.server_port');
-      $ddcsrv     = $ddchost && $ddcport ? "${ddchost}:${ddcport}" : undef;
-    }
-    $stash->set('ddc_enabled' => ($ddcsrv ? 1 : 0));
-    $dburl = $stash->get('cdb')->quri($dburl,{ddcServer=>$ddcsrv});
+    my $ddchost = $stash->get('dstar.server_host');
+    my $ddcport = $stash->get('dstar.server_port');
+    $ddcsrv     = $ddchost && $ddcport ? "${ddchost}:${ddcport}" : undef;
+    $dburl      = $stash->get('cdb')->quri($dburl,{ddcServer=>$ddcsrv}) if ($ddcsrv);
   }
-  else {
-    ##-- rc-file or other dburl: detect support from db-header
-    $stash->set('ddc_enabled' => ($dbhdr->{ddcServer} || $dbhdr->{relations}{ddc}) ? 1 : 0);
-  }
+  #if (!($dbdir || $dbfile)) {
+  #  ##-- rc-file or other dburl: detect support from db-header [DISABLED for lazy-union client rcfiles, 2020-03-13]
+  # $stash->set('ddc_enabled' => ($dbhdr->{ddcServer} || $dbhdr->{relations}{ddc}) ? 1 : 0);
+  #}
+  $stash->set('ddc_enabled' => ($ddcsrv ? 1 : 0));
+
 
   ## conundrum: how should we handle ddc "dstar.server_host" for list or rcfile dburls?
   ## --> ignored for now (Wed, 15 Mar 2017 11:16:55 +0100 moocow)
@@ -250,6 +263,20 @@ DiaColloDB->ensureLog(level=>$logLevel, rootLevel=>'FATAL');
   print STDERR "DCDEBUG: --\n";
 #END %]
 
+[%##---------------------------------------------------------
+  ## Logo and Banner
+%]
+[% BLOCK diacolloHeaderLogo %]
+  [% IF diacollo_logo_block %]
+    [% PROCESS $diacollo_logo_block %]
+  [% ELSIF diacollo_logo %]
+    <a href="[% diacollo_logo_href | url %]" style="float:right;"><img class="dlogo" style="[% diacollo_logo_style | html %]" src="[% diacollo_logo | url %]"/></a>
+  [% END %]
+[% END %]
+
+[% BLOCK diacolloBanner %]
+  [% IF ! diacollo_standalone ; PROCESS banner ; END %]
+[% END %]
 
 [%##---------------------------------------------------------
   ## db open

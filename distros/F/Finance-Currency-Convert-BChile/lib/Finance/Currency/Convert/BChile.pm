@@ -12,11 +12,11 @@ between Chilean Pesos (CLP) and USA Dollars (USD).
 
 =head1 VERSION
 
-Version 0.05
+Version 0.06
 
 =cut
 
-$Finance::Currency::Convert::BChile::VERSION = '0.05';
+$Finance::Currency::Convert::BChile::VERSION = '0.06';
 
 use LWP::UserAgent;
 use HTML::TokeParser;
@@ -237,8 +237,8 @@ Hugo Salgado, C<< <hsalgado at vulcano.cl> >>
 
 =head1 BUGS
 
-Please report any bugs or feature requests to C<bug-finance-currency-convert-bchile at rt.cpan.org>, or through
-the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Finance-Currency-Convert-BChile>.  I will be notified, and then you'll
+Please report any bugs or feature requests to C<~huguei/perl-Finance-Currency-Convert-BChile@todo.sr.ht>, or through
+the web interface at L<https://todo.sr.ht/~huguei/perl-Finance-Currency-Convert-BChile>.  I will be notified, and then you'll
 automatically be notified of progress on your bug as I make changes.
 
 =head1 SUPPORT
@@ -252,13 +252,9 @@ You can also look for information at:
 
 =over 4
 
-=item * RT: CPAN's request tracker
+=item * sourcehut's request tracker
 
-L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Finance-Currency-Convert-BChile>
-
-=item * AnnoCPAN: Annotated CPAN documentation
-
-L<http://annocpan.org/dist/Finance-Currency-Convert-BChile>
+L<https://todo.sr.ht/~huguei/perl-Finance-Currency-Convert-BChile>
 
 =item * CPAN Ratings
 
@@ -295,7 +291,7 @@ granted its liberation as free software.
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright 2007 Hugo Salgado, all rights reserved.
+Copyright 2020 Hugo Salgado, all rights reserved.
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

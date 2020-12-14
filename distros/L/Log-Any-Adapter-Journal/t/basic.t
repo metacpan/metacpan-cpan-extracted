@@ -28,8 +28,15 @@ is( $log->is_critical,  1, 'is_critical' );
 is( $log->is_alert,     1, 'is_alert' );
 is( $log->is_emergency, 1, 'is_emergency' );
 
+# We shouldn't print traces if min_level is debug or higher
+Log::Any::Adapter->set( 'Journal', min_level => 'debug' );
+_test_log( 'trace', 'TEST trace', undef, 'no trace when min_level=debug' );
+_test_log( 'debug', 'TEST debug', '<7>TEST debug' );
+
 sub _test_log {
-    my ( $level, $msg, $expected_msg ) = @_;
+    my ( $level, $msg, $expected_msg, $debug_msg ) = @_;
+    $debug_msg ||= $expected_msg;
+    $expected_msg &&= $expected_msg . "\n";
 
     # Bump Builder level so it reports caller for _test_log
     local $Test::Builder::Level = $Test::Builder::Level + 1;
@@ -44,7 +51,7 @@ sub _test_log {
 
     # Close the filehandle and check the result
     close $fh;
-    is $messages, $expected_msg . "\n", $expected_msg;
+    is $messages, $expected_msg, $debug_msg;
 }
 
 done_testing;

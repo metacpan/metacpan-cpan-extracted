@@ -2,6 +2,16 @@
 ##
 ## Change log for perl distribution DiaColloDB
 
+v0.12.019 Mon, 14 Dec 2020 11:26:33 +0100 moocow
+	* fixed UTF-8 bug with new {qinfo}{qcanon}
+
+v0.12.018 Mon, 14 Dec 2020 09:39:44 +0100 moocow
+	* fixed parsing of bare |-separated values (qnc_value, $valre) for native syntax queries
+	  + problem was dual use of DiaColloDB::queryAttributes for BOTH query and groupby-requests
+            - query requests: barewords are VALUES (-> use default attribute)
+            - groupby requests: barewords are ATTRIBUTES (-> no value restriction)
+	* added response {qinfo}{qcanon} : "canonical" (parsed) query string, for debugging
+
 v0.12.017 Wed, 18 Mar 2020 16:05:32 +0100 moocow
 	* disabled null-query sanity checks in TDF ("no index documents(s) matched user query") if "fill" option is active
 	  (used by diff profiles and list clients)

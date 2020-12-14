@@ -6,20 +6,27 @@ use utf8;
 use Class::Load qw/ load_class /;
 use Class::Accessor::Lite::Lazy (
     new     => 1,
-    rw      => [qw/ team_domain token opt /],
+    rw      => [qw/ team_domain token opt ua /],
     ro_lazy => [qw/ client api auth channels conversations chat dialog emoji files groups im oauth pins reactions rtm search stars team users dnd bots migration /],
 );
 
+use WebService::Slack::WebApi::Exception;
 use WebService::Slack::WebApi::Client;
 
-our $VERSION = '0.16';
+our $VERSION = '0.17';
 
 sub _build_client {
     my $self = shift;
+    if( $self->opt && $self->ua ) {
+        WebService::Slack::WebApi::Exception::IllegalParameters->throw(
+            message  => 'Illegal parameters. You cannot use both parameters \'opt\' and \'ua\' together',
+        );
+    }
     return WebService::Slack::WebApi::Client->new(
         team_domain => $self->team_domain,
         token       => $self->token,
         opt         => $self->opt,
+        useragent   => $self->ua,
     );
 }
 
@@ -47,6 +54,10 @@ WebService::Slack::WebApi - a simple wrapper for Slack Web API
 
     use WebService::Slack::WebApi;
 
+    # By default we use the HTTP client library Furl but you can also use any other
+    # Eg. LWP::UserAgent
+    my $slack = WebService::Slack::WebApi->new( ua => LWP::UserAgent->new() );
+
     # the token is required unless using $slack->oauth->access
     my $slack = WebService::Slack::WebApi->new(token => 'access token');
 
@@ -68,9 +79,26 @@ WebService::Slack::WebApi is a simple wrapper for Slack Web API (https://api.sla
 =head1 Options
 
 You can set some options by giving C<opt> parameter to C<new> method.
-Almost values of C<opt> are gived to C<Furl#new>.
+All values of C<opt> are given to C<Furl#new>.
 
     WebService::Slack::WebApi->new(token => 'access token', opt => {});
+
+=head2 User Agent
+
+By default WebService::Slack::WebApi uses the L<Furl> HTTP client.
+But if your software is already using some other client,
+e.g. L<LWP::UserAgent> or L<HTTP::Tiny>,
+you can also use that. Under the hood WebService::Slack::WebApi uses
+the HTTP client wrapper L<HTTP::AnyUA>.
+
+Use parameter C<ua> to specify the user agent which you have already
+created.
+
+    my $ua = LWP::UserAgent->new( timeout => 10 );
+    my $slack = WebService::Slack::WebApi->new( ua => $ua );
+
+If you use both parameters C<ua> and C<opt>, WebService::Slack::WebApi
+will throw an exception. This combination is illegal.
 
 =head2 Proxy
 

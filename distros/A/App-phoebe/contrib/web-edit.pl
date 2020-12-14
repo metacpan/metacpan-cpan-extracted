@@ -16,6 +16,7 @@
 
 package App::Phoebe;
 use Modern::Perl;
+use Encode qw(encode_utf8);
 
 our (@footer, @extensions, @request_handlers, @main_menu, $server, $log);
 
@@ -87,7 +88,7 @@ sub serve_edit_via_http {
   $stream->write("<p><label for=\"token\">Token:</label>\n");
   $stream->write("<br><input type=\"text\" id=\"token\" name=\"token\" required>\n");
   $stream->write("<p><label for=\"text\">Text:</label>\n");
-  my $text = text($stream, $host, $space, $id);
+  my $text = text($host, $space, $id);
   # textarea can be empty in order to delete a page
   $stream->write(encode_utf8 "<br><textarea style=\"width: 100%; height: 20em;\" id=\"text\" name=\"text\">$text</textarea>\n");
   $stream->write("<p><input type=\"submit\" value=\"Save\">\n");
@@ -155,7 +156,7 @@ sub write_page_for_http {
     my $index = "$dir/index";
     if (not open(my $fh, ">>:encoding(UTF-8)", $index)) {
       $log->error("Cannot write index $index: $!");
-      return http_error("Unable to write index");
+      return http_error($stream, "Unable to write index");
     } else {
       say $fh $id;
       close($fh);
@@ -164,7 +165,7 @@ sub write_page_for_http {
   my $changes = "$dir/changes.log";
   if (not open(my $fh, ">>:encoding(UTF-8)", $changes)) {
     $log->error("Cannot write log $changes: $!");
-    return http_error("Unable to write log");
+    return http_error($stream, "Unable to write log");
   } else {
     my $peerhost = $stream->handle->peerhost;
     say $fh join("\x1f", scalar(time), $id, $revision + 1, bogus_hash($peerhost));
@@ -174,7 +175,7 @@ sub write_page_for_http {
   eval { write_text($file, $text) };
   if ($@) {
     $log->error("Unable to save $id: $@");
-    return http_error("Unable to save $id");
+    return http_error($stream, "Unable to save $id");
   } else {
     $log->info("Wrote $id");
     my $message = to_url($stream, $host, $space, "page/$id", "https");

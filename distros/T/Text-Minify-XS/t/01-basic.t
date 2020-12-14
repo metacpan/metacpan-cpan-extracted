@@ -1,6 +1,9 @@
 use utf8;
 
 use Test::More;
+use Test::Warnings qw/ warning /;
+
+use Encode qw/ encode_utf8 /;
 
 use_ok "Text::Minify::XS", "minify";
 
@@ -37,6 +40,18 @@ is minify(" £ simple") => "£ simple";
 
 {
     is minify(" \0 x") => "\0 x";
+}
+
+my $warning = warning {
+    local $TODO = "Bad encoding";
+    my $n = chr(160);
+    my $r = minify($n);
+};
+like $warning, qr/Malformed UTF-8 character/;
+
+{
+    my $n = encode_utf8(chr(160));
+    is minify($n) => $n;
 }
 
 done_testing;

@@ -12,7 +12,7 @@ use MsOffice::Word::Surgeon::Change;
 
 use namespace::clean -except => 'meta';
 
-our $VERSION = '1.04';
+our $VERSION = '1.05';
 
 # constant integers to specify indentation modes -- see L<XML::LibXML>
 use constant XML_NO_INDENT     => 0;
@@ -43,6 +43,7 @@ has 'rev_id'    => (is => 'bare', isa => 'Num', default => 1, init_arg => undef)
 
 # Various regexes for removing uninteresting XML information
 my %noise_reduction_regexes = (
+  goback_bookmark       => qr(<w:bookmarkStart[^>]+?w:name="_GoBack"/><w:bookmarkEnd[^>]+/>),
   proof_checking        => qr(<w:(?:proofErr[^>]+|noProof/)>),
   revision_ids          => qr(\sw:rsid\w+="[^"]+"),
   complex_script_bold   => qr(<w:bCs/>),
@@ -51,8 +52,8 @@ my %noise_reduction_regexes = (
   empty_run_props       => qr(<w:rPr></w:rPr>),
  );
 
-my @noise_reduction_list     = qw/proof_checking  revision_ids complex_script_bold
-                                  page_breaks language empty_run_props/;
+my @noise_reduction_list = qw/goback_bookmark proof_checking revision_ids
+                              complex_script_bold page_breaks language empty_run_props/;
 
 
 #======================================================================
@@ -174,6 +175,9 @@ sub plain_text {
   # replace opening paragraph tags by newlines
   $txt =~ s/(<w:p[ >])/\n$1/g;
 
+  # replace break tags by newlines
+  $txt =~ s/<br>/\n/g;
+
   # replace tab nodes by ASCII tabs
   $txt =~ s/<w:tab[^s][^>]*>/\t/g;
 
@@ -186,6 +190,15 @@ sub plain_text {
 #======================================================================
 # MODIFYING CONTENTS
 #======================================================================
+
+sub cleanup_XML {
+  my ($self) = @_;
+
+  $self->reduce_all_noises;
+  $self->unlink_fields;
+  $self->merge_runs;
+}
+
 
 sub noise_reduction_regex {
   my ($self, $regex_name) = @_;
@@ -247,7 +260,7 @@ sub merge_runs {
 sub unlink_fields {
   my $self = shift;
 
-  # just remove field nodes and "field instruction" nodes
+  # regexes to remove field nodes and "field instruction" nodes
   state $field_instruction_txt_rx = qr[<w:instrText.*?</w:instrText>];
   state $field_boundary_rx        = qr[<w:fldChar
                                          (?:  [^>]*?/>                 # ignore all attributes until end of node ..
@@ -262,9 +275,19 @@ sub unlink_fields {
 sub replace {
   my ($self, $pattern, $replacement_callback, %replacement_args) = @_;
 
+  # cleanup the XML structure so that replacements work better
+  my $keep_xml_as_is = delete $replacement_args{keep_xml_as_is};
+  $self->cleanup_XML unless $keep_xml_as_is;
+
+  # special option to avoid modying contents
+  my $dont_overwrite_contents = delete $replacement_args{dont_overwrite_contents};
+
+  # apply replacements and generate new XML
   my $xml = join "", map {
     $_->replace($pattern, $replacement_callback, %replacement_args)
   }  @{$self->runs};
+
+  $self->contents($xml) unless $dont_overwrite_contents;
 
   return $xml;
 }
@@ -324,11 +347,6 @@ MsOffice::Word::Surgeon - tamper wit the guts of Microsoft docx documents
   # extract plain text
   my $text = $surgeon->plain_text;
 
-  # simplify the internal XML structure -- so that later replacements work better
-  $surgeon->reduce_all_noises;
-  $surgeon->unlink_fields;
-  $surgeon->merge_runs;
-
   # anonymize
   my %alias = ('Claudio MONTEVERDI' => 'A_____', 'Heinrich SCHÜTZ' => 'B_____');
   my $pattern = join "|", keys %alias;
@@ -338,12 +356,10 @@ MsOffice::Word::Surgeon - tamper wit the guts of Microsoft docx documents
                                        to_insert  => $alias{$args{matched}},
                                        run        => $args{run},
                                        xml_before => $args{xml_before},
-                                       author     => __PACKAGE__,
                                       );
     return $replacement;
   };
-  my $anonymized = $surgeon->replace(qr[$pattern], $replacement_callback);
-  $surgeon->contents($anonymized);
+  $surgeon->replace(qr[$pattern], $replacement_callback);
 
   # save the result
   $surgeon->overwrite; # or ->save_as($new_filename);
@@ -384,6 +400,7 @@ anonymization, i.e. replacement of names or adresses by aliases;
 =item *
 
 templating, i.e. replacement of special markup by contents coming from a data tree
+(see also L<MsOffice::Word::Template>).
 
 =back
 
@@ -410,12 +427,6 @@ properties). All remaining XML information, for example for
 representing sections, paragraphs, tables, etc., is stored as opaque
 XML fragments; these fragments are re-inserted at proper places when
 reassembling the whole document after having modified some text nodes.
-
-=head2 Status
-
-This is the first release; the software architecture is quite stable
-but the module is not battle-proofed. Minor changes to the public
-interface may occur in future versions.
 
 
 =head1 METHODS
@@ -452,7 +463,7 @@ byte string, not a Perl string.
 =head3 plain_text
 
 Returns the text contents of the document, without any markup.
-Paragraphs are converted to newlines, all other formatting instructions are ignored.
+Paragraphs and breaks are converted to newlines, all other formatting instructions are ignored.
 
 
 =head3 runs
@@ -465,6 +476,14 @@ restores the complete document.
 
 
 =head2 Modifying contents
+
+=head3 cleanup_XML
+
+  $surgeon->cleanup_XML;
+
+Apply several other methods for removing unnecessary nodes within the internal
+XML. This method successively calls L</reduce_all_noises>, L</unlink_fields> and L</merge_runs>.
+
 
 =head3 reduce_noise
 
@@ -485,6 +504,7 @@ are applied to the whole XML contents, not only to run nodes.
 Returns the builtin regex corresponding to the given name.
 Known regexes are :
 
+  goback_bookmark      => qr(<w:bookmarkStart[^>]+?w:name="_GoBack"/><w:bookmarkEnd[^>]+/>),
   proof_checking       => qr(<w:(?:proofErr[^>]+|noProof/)>),
   revision_ids         => qr(\sw:rsid\w+="[^"]+"),
   complex_script_bold  => qr(<w:bCs/>),
@@ -524,14 +544,13 @@ into uppercase and removing the property; this makes more merges possible.
 
 =head3 replace
 
-  my $xml = $surgeon->replace($pattern, $replacement, %replacement_args);
+  $surgeon->replace($pattern, $replacement, %replacement_args);
 
 Replaces all occurrences of C<$pattern> regex within the text nodes by the
-given C<$replacement>, and returns new XML corresponding to the whole document
-contents after all these operations. This is not exactly like a search-replace
+given C<$replacement>. This is not exactly like a search-replace
 operation performed within MsWord, because the search does not cross boundaries
-of text nodes; so it is highly recommended to call  L</merge_runs> before invoking
-C<replace()>, to maximize the chances of successful replacements.
+of text nodes. In order to maximize the chances of successful replacements,
+the L</cleanup_XML> method is automatically called before starting the operation.
 
 The argument C<$pattern> can be either a string or a reference to a regular expression.
 It should not contain any capturing parentheses, because that would perturb text
@@ -539,8 +558,10 @@ splitting operations.
 
 The argument C<$replacement> can be either a fixed string, or a reference to
 a callback subroutine that will be called for each match.
-The subroutine will receive a copy of C<< %replacement_args >>, enriched
-with three entries :
+
+
+The C<< %replacement_args >> hash can be used to pass information to the callback
+subroutine. That hash will be enriched with three entries :
 
 =over
 
@@ -560,6 +581,24 @@ The XML fragment (possibly empty) found before the matched text .
 
 The callback subroutine may return either plain text or structured XML.
 See the L</SYNOPSIS> for an example of a replacement callback.
+
+
+The following special keys within C<< %replacement_args >> are interpreted by the 
+C<replace()> method itself, and therefore are not passed to the callback subroutine :
+
+=over
+
+=item keep_xml_as_is
+
+if true, no call is made to the L</cleanup_XML> method before performing the replacements
+
+=item dont_overwrite_contents
+
+if true, the internal XML contents is not modified in place; the new XML after performing
+replacements is merely returned to the caller.
+
+=back
+
 
 
 
@@ -672,6 +711,10 @@ paragraphes, styles, fonts, inline shapes, etc.
 The present module is much simpler but also much more limited : it was optimised
 for dealing with the text contents and offers no support for presentation or
 paging features.
+
+The L<MsOffice::Word::Template> module relies on the present module, together with
+the L<Perl Template Toolkit|Template>, to implement a templating system for Word documents.
+
 
 =head1 AUTHOR
 

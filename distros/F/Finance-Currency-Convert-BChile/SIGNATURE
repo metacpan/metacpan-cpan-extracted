@@ -1,5 +1,5 @@
 This file contains message digests of all files listed in MANIFEST,
-signed via the Module::Signature module, version 0.68.
+signed via the Module::Signature module, version 0.87.
 
 To verify the content in this distribution, first make sure you have
 Module::Signature installed, then type:
@@ -12,25 +12,25 @@ the distribution may already have been compromised, and you should
 not run its Makefile.PL or Build.PL.
 
 -----BEGIN PGP SIGNED MESSAGE-----
-Hash: SHA1
+Hash: RIPEMD160
 
-SHA1 23956363de6b5cd04cd4ed83ff382dbe547dbe1e Changes
-SHA1 eb6735cbdd69fb601488e4b120126a3e1ad1a349 MANIFEST
-SHA1 088e2345eb94fbc8e34278201c4d9d1f01f7960c META.yml
-SHA1 c9e504e8070c3bb740622f70a8190cbcf16e5389 Makefile.PL
-SHA1 b386f2d0e0487c4df55e3117f99edee3406ae7a1 README
-SHA1 43e9a8c88b16f15074d2d91c2cf58076e33f60de lib/Finance/Currency/Convert/BChile.pm
-SHA1 d1defb182ec8e2a25810826606aec7d787dfedfa t/00-load.t
-SHA1 2840ae1be441b919942327354e64f34fd95ed459 t/01-object.t
-SHA1 a11ef1c6223740fc271678c736e293d9946ba22a t/05-update.t
-SHA1 8f5b16f2f4d7dfb4b3653383af880b818cdc3d4b t/10-dollar.t
-SHA1 c54de9ce8196ad7acab843bd07624ba2155dde84 t/15-date.t
-SHA1 65f396cb1bf59b3c9aea665a78b7c97df4406fad t/20-rate.t
-SHA1 9b2faf47f810473ce4585e431f3edd07584f5953 t/25-conversion.t
+SHA256 b461e5df0b954cd7279bf8f293e65a1b7e4f9f22abe42d11cd1a12c4dfa0ee4f Changes
+SHA256 85efdb979ea2049da1aa68631e3a836491459d5056231fcbc802c9e294edad80 MANIFEST
+SHA256 4827d3fc95652bf805c6be45dd86bd3a62d141c3f09379136a36aa176d6abbc8 META.json
+SHA256 886152c755e787d5e14189426723fdc1118b7871fe5db556b80c7ca69d86de23 META.yml
+SHA256 d4954581acbbcd55bd8490cc6e253670241a538a0fdd484635cd5894aa117b23 Makefile.PL
+SHA256 bb7d173485a9d6036516f9eaeddf58f463f12028c17400cbac20e2286d457948 README
+SHA256 7f6910b4b184460e7e1a47f568bea67691eb1bf8f0bdcbeeb826f6dae259994f lib/Finance/Currency/Convert/BChile.pm
+SHA256 fcc2858cf4dfafe74eea505cd80cde84401f661c61afb02887ee1bb6614746bc t/00-load.t
+SHA256 9df6a8a830538183a8279891039578f8f3abc48ee35b3837ec118a3147b88ec3 t/01-object.t
+SHA256 3a53dd2071a7b44040cfe50b5fa65ad3e0da5bb7503e35fe3c56de108f568fab t/05-update.t
+SHA256 3c2ebfd1967d13f1b0917e1bbb0dc2d6169264d378257b2c88c1e7229b266c3f t/10-dollar.t
+SHA256 683b72a5dd8f77b6e273eb5dbff5b922e0fd6cb7bab7dd5162b75ae34ba62e93 t/15-date.t
+SHA256 7f14dfb6649c8f8bb623aa9d4f46183a56edc08b7c3f63298500d895356e3980 t/20-rate.t
+SHA256 c1f38c3108e7a94be8cf92ded4e1b610dc0f84d5dd9eb89db253f4e17f4f8724 t/25-conversion.t
 -----BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.11 (GNU/Linux)
 
-iEYEARECAAYFAk6BHrUACgkQOIt2cqbljM3gwwCfdRsB+Lb6v7g/1oN4eA+UpjXy
-oJMAoJSMYU7j/K0vokd7KvspzDLUbxaI
-=PRR6
+iF0EAREDAB0WIQQGIpAXkA908yCaLyQ4i3ZypuWMzQUCX9ZE4QAKCRA4i3ZypuWM
+zV4tAJ48Qllrmbftp1MCbW7tlIY40SoCuQCghsu0tCh6U11mTuI6OKFUcXSjd5E=
+=FT99
 -----END PGP SIGNATURE-----

@@ -1,5 +1,9 @@
 Revision history for Perl extension Map::Tube::Berlin.
 
+2020.1213
+	- data changes
+	  - new station name Johannisthal
+
 2020.1204
 	- data changes
 	  - U5 between Hauptbahnhof and Alexanderplatz opens

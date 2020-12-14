@@ -1,13 +1,22 @@
-[%#-- Defaults %]
-[%
+[%-
+   ##-- Defaults
    IF dc_link_home == "" ; dc_link_home = !diacollo_standalone; END;
    IF dc_link_dchome == "" ; dc_link_dchome = 0; END;
    IF dc_link_info == "" ; dc_link_info = 1; END;
    IF dc_link_help == "" ; dc_link_help = 1; END;
    IF dc_link_tutorial == "" ; dc_link_tutorial = 1; END;
    IF dc_link_export == "" ; dc_link_export = 1; END;
-%]
-[% IF dc_link_home %]<a class="navLink" href="[% dc_home_url || root_url %]" title="[% root_title %] home">Home</a>[% END +%]
+
+   DEFAULT dc_home_url = home_url || root_url ;
+   DEFAULT dc_home_label = home_label || "Home" ;
+   DEFAULT dc_home_title = home_title || "$root_title home";
+
+   DEFAULT parent_url = "";
+   DEFAULT parent_label = "Project Home";
+   DEFAULT parent_title = "$parent_label root";
+-%]
+[% IF parent_url %]<a class="navLink" href="[% parent_url | url %]" title="[% parent_title | html %]">[% ( parent_label || "Parent" ) | html %]</a>[% END +%]
+[% IF dc_link_home && dc_home_label %]<a class="navLink" href="[% dc_home_url | url %]" title="[% dc_home_title | html %] home">[% dc_home_label | html %]</a>[% END +%]
 [% IF dc_link_dchome %]<a class="navLink" href="./" title="[% root_title %] DiaColloDB home">DiaCollo</a>[% END +%]
 [% IF dc_link_info %]<a class="navLink" href="info.perl" title="[% root_title %] DiaColloDB information (JSON)">Info</a>[% END +%]
 [% IF dc_link_help %]<a class="navLink" href="help.perl" title="[% root_title %] DiaColloDB help &amp; examples">Help</a>[% END +%]

@@ -9,11 +9,11 @@ HTTP::WebTest::Plugin::Sticky - Propagate hidden and text form fields
 
 =head1 VERSION
 
-Version 0.02
+Version 0.03
 
 =cut
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 =head1 SYNOPSIS
 
@@ -115,8 +115,8 @@ Hugo Salgado H., C<< <huguei at cpan.org> >>
 =head1 BUGS
 
 Please report any bugs or feature requests to
-C<bug-http-webtest-plugin-sticky at rt.cpan.org>, or through the web interface at
-L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=HTTP-WebTest-Plugin-Sticky>.
+C<~huguei/perl-HTTP-WebTest-Plugin-Sticky@todo.sr.ht>, or through the web interface at
+L<https://todo.sr.ht/~huguei/perl-HTTP-WebTest-Plugin-Sticky>.
 I will be notified, and then you'll automatically be notified of progress on
 your bug as I make changes.
 
@@ -132,17 +132,13 @@ You can also look for general information at:
 
 =over 4
 
-=item * AnnoCPAN: Annotated CPAN documentation
-
-L<http://annocpan.org/dist/HTTP-WebTest-Plugin-Sticky>
-
 =item * CPAN Ratings
 
 L<http://cpanratings.perl.org/d/HTTP-WebTest-Plugin-Sticky>
 
-=item * RT: CPAN's request tracker
+=item * sourcehut's request tracker
 
-L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=HTTP-WebTest-Plugin-Sticky>
+L<https://todo.sr.ht/~huguei/perl-HTTP-WebTest-Plugin-Sticky>
 
 =item * Search CPAN
 

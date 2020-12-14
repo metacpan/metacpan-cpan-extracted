@@ -1,5 +1,7 @@
 Changes for LaTeX::ToUnicode
 
+0.11    2020-12-12  Updates and cleaing
+
 0.05    2016-11-23 02:28:35+00:00
         Compatibility with perl 5.25 (Alexandr Ciornii)
 

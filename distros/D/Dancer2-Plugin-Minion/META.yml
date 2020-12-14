@@ -23,6 +23,6 @@ resources:
   WebIRC: https://chat.mibbit.com/#dancer@irc.perl.org
   bugtracker: https://github.com/cromedome/Dancer2-Plugin-Minion/issues
   repository: https://github.com/cromedome/Dancer2-Plugin-Minion
-version: 0.1.0
+version: 0.1.1
 x_generated_by_perl: v5.28.2
 x_serialization_backend: 'YAML::Tiny version 1.73'

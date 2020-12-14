@@ -3,7 +3,7 @@ package CPAN::Plugin::Sysdeps::Mapping;
 use strict;
 use warnings;
 
-our $VERSION = '0.66';
+our $VERSION = '0.67';
 
 # shortcuts
 #  os and distros
@@ -1289,8 +1289,6 @@ sub mapping {
       [like_fedora,
        [linuxdistro => 'centos', linuxdistroversion => {'<', 7},
 	[package => []]],
-       [linuxdistro => 'centos', linuxdistroversion => {'>=', 8},
-	[package => []]],
        [package => 'gobject-introspection-devel']],
       [os_darwin,
        [package => 'glib']],
@@ -1314,6 +1312,10 @@ sub mapping {
        [package => 'gobject-introspection']],
       [like_debian,
        [package => 'libgirepository1.0-dev']],
+      [like_fedora,
+       [linuxdistro => 'centos', linuxdistroversion => {'<', 7},
+	[package => []]],
+       [package => 'gobject-introspection-devel']],
       [os_darwin,
        [package => [qw(gobject-introspection libffi)]]],
      ],
@@ -1582,6 +1584,18 @@ sub mapping {
        [package => 'libwebkitgtk-3.0-dev']],
       [like_fedora,
        [package => 'webkitgtk3-devel']],
+     ],
+
+     [cpanmod => 'Gtk3::WebKit2',
+      [like_debian,
+       [before_ubuntu_trusty, # at least not available in debian/wheezy
+	[package => []]],
+       [package => 'libwebkit2gtk-4.0-dev']],
+      [like_fedora,
+       [linuxdistro => 'centos',
+	linuxdistroversion => qr{^[67]\.},
+	package => []], # N/A for centos6+7
+       [package => 'webkit2gtk3-devel']],
      ],
 
      [cpanmod => 'GTop',

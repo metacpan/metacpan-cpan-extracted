@@ -1,10 +1,10 @@
 use strict;
-BEGIN { $INC{'warnings.pm'} = '' if $] < 5.006 }; use warnings; $^W=1;
+BEGIN { $INC{'warnings.pm'} = '' if $] < 5.006 }; use warnings; local $^W=1;
 use ExtUtils::MakeMaker;
 
 WriteMakefile(
     'NAME'      => q{mb},
-    'VERSION'   => q{0.12},
+    'VERSION'   => q{0.14},
     'ABSTRACT'  => q{run Perl script in MBCS encoding (not only CJK ;-)},
     'PREREQ_PM' => {
         'Cwd' => '0',

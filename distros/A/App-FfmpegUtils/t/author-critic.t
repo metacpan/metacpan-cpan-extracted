@@ -15,7 +15,7 @@ use warnings;
 
 use Test::Perl::Critic (-profile => "") x!! -e "";
 
-my $filenames = ['lib/App/FfmpegUtils.pm','script/reencode-video-with-libx264'];
+my $filenames = ['lib/App/FfmpegUtils.pm','script/reencode-video-with-libx264','script/split-video-by-duration'];
 unless ($filenames && @$filenames) {
     $filenames = -d "blib" ? ["blib"] : ["lib"];
 }

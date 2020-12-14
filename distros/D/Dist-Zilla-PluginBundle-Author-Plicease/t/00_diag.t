@@ -29,6 +29,7 @@ $modules{$_} = $_ for qw(
   ExtUtils::MakeMaker
   File::ShareDir::Dist
   File::ShareDir::Install
+  File::Which
   File::chdir
   IPC::System::Simple
   Moose

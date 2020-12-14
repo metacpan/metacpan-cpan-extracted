@@ -1,0 +1,16 @@
+Thank you for your interest in contributing.
+
+If you would like to contribute to Image::PNG::Libpng, the first thing
+to do is to either email me or add an issue at the github. Because I
+started off making this to be distributed by CPAN, the github
+repository doesn't contain all of the scripts used to build the
+module, so forking there will probably end up annoying you.
+
+Although the module does most of the big parts of libpng, there is a
+lot of detailed work on this module remaining to be done, such as the
+handling of unknown chunks. Please be warned that the underlying
+library, "libpng", has a lot of "quirks" in its implementation and
+documentation, so an inevitable part of contributing to this module
+will be your having to root through the libpng C source code.
+
+

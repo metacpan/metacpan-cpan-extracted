@@ -1,7 +1,7 @@
 package Bio::MUST::Core::Taxonomy::ColorScheme;
 # ABSTRACT: Helper class providing color scheme for taxonomic annotations
 # CONTRIBUTOR: Valerian LUPO <valerian.lupo@doct.uliege.be>
-$Bio::MUST::Core::Taxonomy::ColorScheme::VERSION = '0.202310';
+$Bio::MUST::Core::Taxonomy::ColorScheme::VERSION = '0.203490';
 use Moose;
 use namespace::autoclean;
 
@@ -152,11 +152,12 @@ around qw(hex rgb icol) => sub {
     # consider input as a SeqId object (or NCBI lineage)
     # ... and select the lowest taxon to which a color is associated
     # if a lineage has no colored taxon then it will be black
-    my $name = $self->classify($seq_id) // $NOCOLOR;
+    my $label = $self->classify($seq_id) // $NOCOLOR;
 
     # return color (possibly doubly translated)
     # ... e.g., taxon => color-name => color-hex-code
-    return $self->$method( $self->color_for($name), @_ );
+    my $color = $self->$method( $self->color_for($label), @_ );
+    return wantarray ? ($color, $label) : $color;
 };
 
 
@@ -167,37 +168,9 @@ sub attach_colors_to_entities {
     my $key  = shift // 'taxonomy';
 
     for my $node ( @{ $tree->tree->get_entities } ) {
-        my $color = $self->hex( $node->get_generic($key), '#' );
-        $node->set_generic('!color' => $color);
-    }
-
-    return;
-}
-
-
-sub store_itol_colors {
-    my $self    = shift;
-    my $tree    = shift;
-    my $outfile = shift;
-    my $key     = shift // 'taxonomy';
-
-    open my $out, '>', $outfile;
-    say {$out} join "\n", 'TREE_COLORS', 'SEPARATOR COMMA', 'DATA';
-    ### Output iTOL color: $outfile
-
-    for my $node ( @{ $tree->tree->get_entities } ){
-        my $color = $self->hex( $node->get_generic($key), q{#} );
-        my @descendants = map { 
-            SeqId->new( full_id => $_->get_name )->foreign_id
-        } @{ $node->get_terminals };
-        my $node_name
-            = @descendants > 1 ? $descendants[0] . '|' . $descendants[-1]
-            :                    $descendants[0]
-        ;
-        my $type = 'normal',
-        my $size = 1;
-
-        say {$out} join q{,}, $node_name, 'clade', $color, $type, $size;
+        my ($color, $label) = $self->hex( $node->get_generic($key), '#' );
+        $node->set_generic(    '!color' => $color );
+        $node->set_generic( taxon_label => $label ) unless $label eq $NOCOLOR;
     }
 
     return;
@@ -275,7 +248,7 @@ Bio::MUST::Core::Taxonomy::ColorScheme - Helper class providing color scheme for
 
 =head1 VERSION
 
-version 0.202310
+version 0.203490
 
 =head1 SYNOPSIS
 
@@ -288,8 +261,6 @@ version 0.202310
 =head1 METHODS
 
 =head2 attach_color_to_entities
-
-=head2 store_itol_colors
 
 =head2 spectrum
 

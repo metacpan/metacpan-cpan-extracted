@@ -1,5 +1,21 @@
 Revision history for File::Rotate::Simple
 
+v0.2.5    2020-12-13 11:50:21+00:00 Europe/London
+  [Documentation]
+  - Added INSTALL file to the distribution.
+
+  - Updated copyright year.
+
+  [Toolchain]
+  - Tweaks to dist.ini for simplifying build.
+
+  - Remove use of Travis-CI.
+
+  [Other]
+  - Minor code improvements.
+
+  - Explicitly declare Perl v5.8 as the minimum version.
+
 v0.2.4    2018-09-07 13:56:03+01:00 Europe/London
   [Bug Fixes]
   - Explicitly require List::Util v1.43.

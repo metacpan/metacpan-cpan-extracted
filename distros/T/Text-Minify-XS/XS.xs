@@ -27,19 +27,26 @@ STATIC U8* TextMinify(pTHX_ U8* src, STRLEN len, STRLEN* packed) {
 
     UV c = *src;
 
-    if (!UTF8_IS_INVARIANT(c)) {
-       STRLEN skip;
-       c = utf8_to_uvchr_buf(src, end, &skip);
-       src += skip;
-       len -= skip;
-    }
-    else {
+    if (UTF8_IS_INVARIANT(c)) {
       src ++;
       len --;
     }
+    else {
+      STRLEN skip;
+      c = utf8_to_uvchr_buf(src, end, &skip);
+      if (c != 0) {
+        src += skip;
+        len -= skip;
+      }
+      else {
+        c = *src;
+        src ++;
+        len --;
+      }
+    }
 
     if (leading && !isSPACE(c))
-        leading = NULL;
+      leading = NULL;
 
     if (!leading) {
 
@@ -55,10 +62,10 @@ STATIC U8* TextMinify(pTHX_ U8* src, STRLEN len, STRLEN* packed) {
         trailing = NULL;
       }
 
-      if (!UTF8_IS_INVARIANT(c))
-        ptr = uvchr_to_utf8( ptr, c);
-      else
+      if (UTF8_IS_INVARIANT(c))
         *ptr++ = c;
+      else
+        ptr = uvchr_to_utf8( ptr, c);
 
     }
 
@@ -70,6 +77,10 @@ STATIC U8* TextMinify(pTHX_ U8* src, STRLEN len, STRLEN* packed) {
     STRLEN skip = UTF8SKIP(ptr);
     if (!UTF8_IS_INVARIANT(c))
       c = utf8_to_uvchr_buf(ptr, ptr + skip, &skip);
+      if (c == 0) {
+        c = *ptr;
+        skip = 1;
+      }
     if (isEOL(c)) {
       ptr += skip;
     }

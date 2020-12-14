@@ -83,7 +83,7 @@ use YAML::Any qw(
 # always use x.yyy version numbering, so that string comparison and
 # numeric comparison give the same ordering, to avoid trouble due to
 # different ways of interpreting version numbers.
-our $VERSION = '2.005';
+our $VERSION = '2.007';
 
 my $CASE_TOLERANT;
 
@@ -100,7 +100,6 @@ BEGIN {
 }
 
 my @gps_location_tags      = qw(GPSLatitude GPSLongitude GPSAltitude);
-my @gps_location_tags_read = map { "$_#" } @gps_location_tags;
 my %gps_location_tags      = map { $_ => 1 } @gps_location_tags;
 
 # The ExiftimeVersion is here temporarily. It is associated with a
@@ -117,16 +116,27 @@ my @own_xmp_tags = qw(
 
 my @all_tags;
 {
-  my %tags = map { $_ => 1 } (
-    'CreateDate',             'DateTimeOriginal',
-    'Duration',               'FileModifyDate',
-    'GPSAltitude',            'GPSDateTime',
-    'GPSLatitude',            'GPSLongitude',
-    'ImageWidth',             'Make',
-    'MIMEType',               'Model',
-    'QuickTime:CreationDate', 'SerialNumber',
-    map { "XMP:$_" } @own_xmp_tags,
-  );
+  my %tags = map { $_ => 1 }
+    (
+     'CreateDate',
+     'DateTimeOriginal',
+     'Duration',
+     'FileModifyDate',
+     'GPSAltitude',
+     'GPSAltitudeRef',
+     'GPSDateTime',
+     'GPSLatitude',
+     'GPSLatitudeRef',
+     'GPSLongitude',
+     'GPSLongitudeRef',
+     'ImageWidth',
+     'Make',
+     'MIMEType',
+     'Model',
+     'QuickTime:CreationDate',
+     'SerialNumber',
+     map { "XMP:$_" } @own_xmp_tags,
+   );
   @all_tags = sort keys %tags;
 }
 
@@ -1603,20 +1613,35 @@ sub geo_distance {
 
 =head2 get_image_info
 
-  $et->get_image_info($file, @tags);
+  $et->get_image_info($file);
 
 Extract relevant information from the C<$file>, using
 L<Image::ExifTool>, and returns a reference to a hash map containing
-the extracted information.  The extracted tags are C<@tags> plus the
-following fixed set of tags:
+the extracted information.  The extracted tags are:
 
 =over
 
-=item CameraID
+=item CreateDate
 
-=item ImsyncVersion
+=item DateTimeOriginal
+
+=item Duration
 
 =item FileModifyDate
+
+=item GPSAltitude
+
+=item GPSAltitudeRef
+
+=item GPSDateTime
+
+=item GPSLatitude
+
+=item GPSLatitudeRef
+
+=item GPSLongitude
+
+=item GPSLongitudeRef
 
 =item ImageWidth
 
@@ -1626,11 +1651,17 @@ following fixed set of tags:
 
 =item Model
 
-=item QuickTime:CreateDate
+=item QuickTime:CreationDate
 
 =item SerialNumber
 
-=item TimeSource
+=item XMP:CameraID
+
+=item XMP:ImsyncVersion
+
+=item XMP:TimeSource
+
+=item XMP:ExiftimeVersion
 
 =back
 
@@ -1727,13 +1758,6 @@ sub get_image_info {
       my $group    = $self->backend->GetGroup($tag);
       my $bare_tag = $tag =~ s/ \(\d+\)$//r;          # omit index number if any
 
-      # For GPS tags we reject those in the EXIF group because they
-      # lack the N/S or E/W or +/- "sign".  The corresponding tags in
-      # the Composite or XMP groups are complete and are acceptable.
-      next
-        if exists $gps_location_tags{$bare_tag}
-        and $group eq 'EXIF';
-
       my $value    = $image_info->{$tag};
 
       if ( exists $time_tags{$bare_tag}
@@ -1746,6 +1770,42 @@ sub get_image_info {
         $info->set( $group, $bare_tag, $value );
       } # otherwise $value was undefined, for example because a
         # timestamp tag's value wasn't valid.
+    }
+
+    # The GPS tags need special treatment.  The sign of the
+    # longitude/latitude/altitude is generally stored separately from
+    # the value, and we need to combine them.  Exiftool may provide
+    # already combined values in the 'Composite' and 'XMP' groups,
+    # except that XMP:GPSAltitude appears not to include a sign yet.
+    foreach my $tag (@gps_location_tags) {
+      foreach my $composite_group (qw(Composite XMP)) {
+        my $composite = $info->get($composite_group, $tag);
+        if (defined($composite)
+            && ($tag ne 'GPSAltitude'
+                || $composite_group ne 'XMP')) {
+          # We have a composite value, store in the group with the
+          # empty name ('') so it is the preferred value
+          $info->set('', $tag, $composite);
+          last;
+        }
+      }
+      if (not defined $info->get('', $tag)) {
+        # no composite value yet, so try to construct one from the
+        # separate parts
+        foreach my $group ($info->groups($tag)) {
+          my $value = $info->get($group, $tag);
+          my $ref = $info->get($group, $tag . 'Ref');
+          if (defined($value) and defined($ref)) {
+            if ((   $tag eq 'GPSLongitude' and $ref eq 'W')
+                || ($tag eq 'GPSLatitude'  and $ref eq 'S')
+                || ($tag eq 'GPSAltitude'  and $ref eq '1')) {
+              $value = -$value;
+            }
+            $info->set('', $tag, $value);
+            last;
+          }
+        }
+      }
     }
   }
 
@@ -2001,8 +2061,7 @@ sub inspect_files {
     }
     else {
       my $info =
-        $self->get_image_info( $file, keys(%time_tags), @gps_location_tags_read,
-        @own_xmp_tags );
+        $self->get_image_info( $file );
 
       # TODO: remove this when the author no longer needs it to
       # transition from exiftime to imsync
@@ -2743,7 +2802,8 @@ sub process_user_times {
       else {    # timestamp
         $value = Image::Synchronize::Timestamp->new($rhs);
         if ( defined $value ) {
-          $value->set_to_local_timezone_if_not_set;
+          $value->adjust_to_local_timezone
+            unless $value->has_timezone_offset;
         }
         else {
           log_error(
@@ -3426,7 +3486,7 @@ sub resolve_files {
     }
     elsif ( -f $item ) {
       my $f = file($item);
-      @extra = $rule->clone->max_depth(1)->name($f->basename)->all($f->parent);
+      @extra = ($f);
     }
     else {
       # the item was not found as a literal name; maybe it is a file

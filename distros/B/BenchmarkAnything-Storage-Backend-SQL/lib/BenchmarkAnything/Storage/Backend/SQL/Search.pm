@@ -1,7 +1,7 @@
 package BenchmarkAnything::Storage::Backend::SQL::Search;
 our $AUTHORITY = 'cpan:TAPPER';
 # ABSTRACT: searchengine support functions
-$BenchmarkAnything::Storage::Backend::SQL::Search::VERSION = '0.028';
+$BenchmarkAnything::Storage::Backend::SQL::Search::VERSION = '0.029';
 use strict;
 use warnings;
 use Data::Dumper;

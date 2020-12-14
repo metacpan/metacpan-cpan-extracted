@@ -26,21 +26,21 @@ no_index:
 provides:
   Sub::WrapInType:
     file: lib/Sub/WrapInType.pm
-    version: '0.03'
+    version: '0.04'
 requires:
   Carp: '0'
   Class::InsideOut: '0'
   Exporter: '0'
   Hash::Util: '0'
   Scalar::Util: '0'
-  Type::Tiny: '0'
+  Type::Tiny: '1.012000'
   namespace::autoclean: '0'
   perl: '5.010001'
 resources:
   bugtracker: https://github.com/ybrliiu/p5-Sub-WrapInType/issues
   homepage: https://github.com/ybrliiu/p5-Sub-WrapInType
   repository: git://github.com/ybrliiu/p5-Sub-WrapInType.git
-version: '0.03'
+version: '0.04'
 x_contributors:
   - 'ybrliiu <raian@reeshome.org>'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

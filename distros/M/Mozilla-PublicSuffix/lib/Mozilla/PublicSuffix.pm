@@ -8,7 +8,7 @@ use URI::_idna;
 
 our @EXPORT_OK = qw(public_suffix);
 
-our $VERSION = 'v1.0.1'; # VERSION
+our $VERSION = 'v1.0.2'; # VERSION
 # ABSTRACT: Get a domain name's public suffix via the Mozilla Public Suffix List
 
 my $dn_re = do {
@@ -152,6 +152,12 @@ not found.
 Similar to this module, with an object-oriented interface and somewhat
 alternative interpretation of the rules Mozilla stipulates for determining a
 public suffix.
+
+=item L<IO::Socket::SSL::PublicSuffix>
+
+Ships with C<IO::Socket::SSL>, used by many HTTP client libraries for
+SSL/TLS support, and makes it easy to use the current version of the
+public suffix list at run-time.
 
 =back
 

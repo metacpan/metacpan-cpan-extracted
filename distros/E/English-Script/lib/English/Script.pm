@@ -9,7 +9,7 @@ package English::Script {
     use Parse::RecDescent;
     use YAML::XS 'Dump';
 
-    our $VERSION = '1.02'; # VERSION
+    our $VERSION = '1.03'; # VERSION
 
     sub new {
         my $self = shift;
@@ -35,7 +35,10 @@ package English::Script {
                 | <error>
 
             command :
-                ( say | set | append | add | subtract | multiply | divide | if | otherwise | for )
+                (
+                    say | set | append | add | subtract | multiply | divide |
+                    otherwise_if | if | otherwise | for
+                )
                 { +{@item} }
                 | <error>
 
@@ -65,6 +68,10 @@ package English::Script {
 
             divide : /\bdivide\b/ object '~' expression
                 { +{ $item[0] => [ $item[2], $item[4] ] } }
+                | <error>
+
+            otherwise_if : /\botherwise,\s*if\b/ expression '::' ( block | command )
+                { +{ $item[0] => { %{ $item[2] }, %{ $item[4] } } } }
                 | <error>
 
             if : /\bif\b/ expression '::' ( block | command )
@@ -367,7 +374,7 @@ package English::Script::JavaScript {
     use warnings;
     use JavaScript::Packer;
 
-    our $VERSION = '1.02'; # VERSION
+    our $VERSION = '1.03'; # VERSION
 
     sub new {
         my ( $self, $args ) = @_;
@@ -396,8 +403,8 @@ package English::Script::JavaScript {
 
         return join( "\n", (
             map {
-                'if ( typeof( ' . $_ . ' ) == "undefined" ) var ' . $_ .
-                    ( ( $self->{objects}{$_} ) ? ' = ' . $self->{objects}{$_} : '' ) . ';'
+                'if ( typeof( ' . $_ . ' ) == "undefined" ) ' . ( (/\./) ? '' : 'var ' ) . $_ .
+                    ( ( $self->{objects}{$_} ) ? ' = ' . $self->{objects}{$_} : ' = ""' ) . ';'
             } sort keys %{ $self->{objects} }
         ), $text );
     }
@@ -474,11 +481,19 @@ package English::Script::JavaScript {
                 $self->object( $tree->[0]{object} ), '/=', $self->expression( $tree->[1]{expression} ),
             ) . ";\n";
         }
+        elsif ( $command_name eq 'otherwise_if' ) {
+            return 'else if ( ' .
+                join( ' ', $self->expression( $tree->{expression} ) ) . " ) {\n" . join( ' ', (
+                    ( exists $tree->{command} ) ? $self->command( $tree->{command} ) :
+                    ( exists $tree->{block}   ) ? $self->block( $tree->{block}     ) : ''
+                ) ) . "}\n";
+        }
         elsif ( $command_name eq 'if' ) {
-            return 'if ( ' . join( ' ', $self->expression( $tree->{expression} ) ) . " ) {\n" . join( ' ', (
-                ( exists $tree->{command} ) ? $self->command( $tree->{command} ) :
-                ( exists $tree->{block}   ) ? $self->block( $tree->{block}     ) : ''
-            ) ) . "}\n";
+            return 'if ( ' .
+                join( ' ', $self->expression( $tree->{expression} ) ) . " ) {\n" . join( ' ', (
+                    ( exists $tree->{command} ) ? $self->command( $tree->{command} ) :
+                    ( exists $tree->{block}   ) ? $self->block( $tree->{block}     ) : ''
+                ) ) . "}\n";
         }
         elsif ( $command_name eq 'otherwise' ) {
             return "else {\n" . join( ' ', (
@@ -575,7 +590,9 @@ package English::Script::JavaScript {
 
                 if ($contains_non_number) {
                     for ( my $i = 0; $i < @parts; $i++ ) {
-                        $self->{objects}{ join( '.', @parts[ 0 .. $i ] ) } //= ( $i == @parts - 1 ) ? '' : '{}';
+                        $self->{objects}{
+                            join( '.', @parts[ 0 .. $i ] )
+                        } //= ( $i == @parts - 1 ) ? '' : '{}';
                     }
                 }
             }
@@ -624,10 +641,10 @@ English::Script - Parse English subset and convert to data or code
 
 =head1 VERSION
 
-version 1.02
+version 1.03
 
-=for markdown [![Build Status](https://travis-ci.org/gryphonshafer/English-Script.svg)](https://travis-ci.org/gryphonshafer/English-Script)
-[![Coverage Status](https://coveralls.io/repos/gryphonshafer/English-Script/badge.png)](https://coveralls.io/r/gryphonshafer/English-Script)
+=for markdown [![test](https://github.com/gryphonshafer/English-Script/workflows/test/badge.svg)](https://github.com/gryphonshafer/English-Script/actions?query=workflow%3Atest)
+[![codecov](https://codecov.io/gh/gryphonshafer/English-Script/graph/badge.svg)](https://codecov.io/gh/gryphonshafer/English-Script)
 
 =head1 SYNOPSIS
 
@@ -1035,11 +1052,11 @@ L<MetaCPAN|https://metacpan.org/pod/English::Script>
 
 =item *
 
-L<Travis CI|https://travis-ci.org/gryphonshafer/English-Script>
+L<GitHub Actions|https://github.com/gryphonshafer/English-Script/actions>
 
 =item *
 
-L<Coveralls|https://coveralls.io/r/gryphonshafer/English-Script>
+L<Codecov|https://codecov.io/gh/gryphonshafer/English-Script>
 
 =item *
 
@@ -1057,9 +1074,10 @@ Gryphon Shafer <gryphon@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by Gryphon Shafer.
+This software is Copyright (c) 2020-2021 by Gryphon Shafer.
 
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
+This is free software, licensed under:
+
+  The Artistic License 2.0 (GPL Compatible)
 
 =cut

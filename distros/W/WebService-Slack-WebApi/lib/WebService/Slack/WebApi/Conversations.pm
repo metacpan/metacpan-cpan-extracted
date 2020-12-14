@@ -54,7 +54,7 @@ use WebService::Slack::WebApi::Generator (
         limit   => { isa => 'Int',  optional => 1 },
     },
     open => {
-        channel   => 'Str',
+        channel   => { isa => 'Str',  optional => 1 },
         return_im => { isa => 'Bool', optional => 1 },
         users     => { isa => 'Str',  optional => 1 },
     },

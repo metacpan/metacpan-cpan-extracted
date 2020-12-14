@@ -102,7 +102,7 @@ sub get_context {
   }
   else {
     # look for groups in descending order of preference
-    foreach my $group ( '', 'XMP', 'EXIF', 'File' ) { # TODO: switch '' and XMP
+    foreach my $group ( '', 'XMP', 'EXIF', 'File' ) {
       my $v = $self->{$tag}->{$group};
       if ( defined $v ) {
         return wantarray ? ( $group, $v ) : $v;
@@ -111,7 +111,11 @@ sub get_context {
 
     # otherwise return value for lexicographically first group
     my $g = ( sort keys %{ $self->{$tag} } )[0];
-    return wantarray ? ( $g, $self->{$tag}->{$g} ) : $self->{$tag}->{$g};
+    if (defined $g) {
+      return wantarray ? ( $g, $self->{$tag}->{$g} ) : $self->{$tag}->{$g};
+    } else {
+      return wantarray ? () : undef;
+    }
   }
 }
 

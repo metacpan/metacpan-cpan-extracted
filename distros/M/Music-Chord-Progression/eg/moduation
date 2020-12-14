@@ -6,17 +6,25 @@ use Data::Dumper::Compact 'ddc';
 use lib map { "$ENV{HOME}/sandbox/$_/lib" } qw(MIDI-Util);
 use MIDI::Util;
 use Music::Chord::Progression;
+use Music::Scales qw(get_scale_notes);
 
 my $score = MIDI::Util::setup_score();
 
-for my $note (qw(A D A E D A)) {
-    my $prog = Music::Chord::Progression->new(scale_note => $note);
-    my $notes = $prog->generate;
-    for my $chord (@$notes) {
+my @pitches = get_scale_notes('C', 'pentatonic');
+my @notes = map { $pitches[int rand @pitches] } 1 .. 4;
+
+for my $note (@notes) {
+    my $prog = Music::Chord::Progression->new(
+        scale_note => $note,
+#        substitute => 1,
+    );
+    my $chords = $prog->generate;
+
+    for my $chord (@$chords) {
         $chord = [ MIDI::Util::midi_format(@$chord) ];
         $score->n('wn', @$chord);
     }
-    print $note, ': ', ddc($notes);
+    print $note, ': ', ddc($chords);
 }
 
 $score->write_score("$0.mid");

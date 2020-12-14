@@ -6,12 +6,12 @@ use Mojolicious::Plugin::AssetPack::Asset::Null;
 use Mojolicious::Plugin::AssetPack::Store;
 use Mojolicious::Plugin::AssetPack::Util qw(diag has_ro load_module DEBUG);
 
-our $VERSION = '2.09';
+our $VERSION = '2.10';
 
 has minify => sub { shift->_app->mode eq 'development' ? 0 : 1 };
 
 has route => sub {
-  shift->_app->routes->route('/asset/:checksum/*name')->via(qw(HEAD GET))->name('assetpack')->to(cb => \&_serve);
+  shift->_app->routes->any([qw(HEAD GET)] => '/asset/:checksum/*name')->name('assetpack')->to(cb => \&_serve);
 };
 
 has store => sub {
@@ -335,8 +335,7 @@ C<$definition_file> defaults to "assetpack.def".
   $collection = $self->processed($topic);
 
 Can be used to retrieve a L<Mojo::Collection> object, with zero or more
-L<Mojolicious::Plugin::AssetPack::Asset> objects. Returns undef if C<$topic> is
-not defined with L</process>.
+L<Mojolicious::Plugin::AssetPack::Asset> objects.
 
 =head2 register
 

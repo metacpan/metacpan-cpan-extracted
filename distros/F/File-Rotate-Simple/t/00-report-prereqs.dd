@@ -37,7 +37,8 @@ do { my $x = {
                                       'Ref::Util' => '0',
                                       'Time::Seconds' => '0',
                                       'Types::Standard' => '0',
-                                      'namespace::autoclean' => '0'
+                                      'namespace::autoclean' => '0',
+                                      'perl' => 'v5.8.8'
                                     }
                     },
        'test' => {

@@ -12,7 +12,7 @@ require XSLoader;
 our @ISA = qw(Exporter);
 our @EXPORT_OK = qw(minify);
 
-our $VERSION = 'v0.3.0';
+our $VERSION = 'v0.3.2';
 
 XSLoader::load( "Text::Minify::XS", $VERSION );
 
@@ -30,7 +30,7 @@ Text::Minify::XS - Simple text minification
 
 =head1 VERSION
 
-version v0.3.0
+version v0.3.2
 
 =head1 SYNOPSIS
 
@@ -62,6 +62,12 @@ It does the following:
 =back
 
 It does not recognise any form of markup, comments or text quoting.
+
+=head1 KNOWN ISSUES
+
+Malformed UTF-8 characters may be be mangled or omitted from the
+output. You should ensure that the input string is properly encoded as
+UTF-8.
 
 =head1 SOURCE
 

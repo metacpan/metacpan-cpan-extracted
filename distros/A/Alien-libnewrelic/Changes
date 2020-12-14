@@ -1,5 +1,8 @@
 Revision history for Alien-libnewrelic
 
+0.06      2020-12-10 12:57:40 -0700
+  - Patch to allow libnewrelic to build on clang 10 (gh#7)
+
 0.05      2020-06-03 14:15:21 -0600
   - Add patch to override hostname (gh#6)
     (based on https://github.com/plicease/newrelic-c-sdk/tree/graham/perl-patches)

@@ -1,0 +1,52 @@
+{
+   "abstract" : "An extension to Net::Stomp (STOMP client) to allow transactional sends.",
+   "author" : [
+      "Hugo Salgado <huguei@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Net-Stomp-Receipt",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Net::Stomp" : "0.34"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://todo.sr.ht/~huguei/perl-Net-Stomp-Receipt"
+      },
+      "repository" : {
+         "type" : "mercurial",
+         "url" : "https://hg.sr.ht/~huguei/perl-Net-Stomp-Receipt",
+         "web" : "https://hg.sr.ht/~huguei/perl-Net-Stomp-Receipt"
+      }
+   },
+   "version" : "0.40",
+   "x_serialization_backend" : "JSON::PP version 4.05"
+}

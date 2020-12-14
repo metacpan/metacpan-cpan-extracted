@@ -1,5 +1,11 @@
 Revision history for File-LoadLines
 
+1.01	2020-12-10
+
+	Change README to README.md.
+	Return the encoding used in the $options hash, if any.
+	Detect ASCII.
+
 1.00	2020-12-03
 
 	Fix Carp and Test::Exception dependencies.

@@ -17,6 +17,7 @@
 package App::Phoebe;
 use Mojo::UserAgent;
 use Modern::Perl;
+use MIME::Base64;
 use List::Util qw(uniq);
 use Encode qw(encode_utf8);
 use DateTime::Format::ISO8601;
@@ -480,7 +481,7 @@ sub oddmuse_serve_main_menu {
   success($stream);
   my $page = $server->{wiki_main_page};
   if ($page) {
-    $stream->write(encode_utf8 text($stream, $host, undef, $page) . "\n");
+    $stream->write(encode_utf8 text($host, undef, $page) . "\n");
   } else {
     $stream->write("# Welcome!\n");
     $stream->write("\n");

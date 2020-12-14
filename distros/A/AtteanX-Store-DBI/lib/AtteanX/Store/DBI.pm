@@ -4,7 +4,7 @@ AtteanX::Store::DBI - Database quad-store
 
 =head1 VERSION
 
-This document describes AtteanX::Store::DBI version 0.001
+This document describes AtteanX::Store::DBI version 0.002
 
 =head1 SYNOPSIS
 
@@ -30,7 +30,7 @@ use v5.14;
 use warnings;
 
 package AtteanX::Store::DBI {
-	our $VERSION	= '0.001';
+	our $VERSION	= '0.002';
 	use Moo;
 	use DBI;
 	use Attean 0.013;
@@ -971,7 +971,7 @@ Gregory Todd Williams  C<< <gwilliams@cpan.org> >>
 
 =head1 COPYRIGHT
 
-Copyright (c) 2014--2016 Gregory Todd Williams. This
+Copyright (c) 2014--2020 Gregory Todd Williams. This
 program is free software; you can redistribute it and/or modify it under
 the same terms as Perl itself.
 

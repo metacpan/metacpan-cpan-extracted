@@ -1,6 +1,16 @@
 ==================================================
-Changes from 2013-06-11 00:00:00 +0000 to present.
+Changes from 2015-12-14 00:00:00 +0000 to present.
 ==================================================
+
+-----------------------------------------
+version 1.18 at 2020-12-12 13:34:35 +0000
+-----------------------------------------
+
+  Change: fedfc2d9e21392722bbe221d9b16c06b6689238a
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2020-12-12 13:34:35 +0000
+
+    Added COVID as bad and fishermen as good #topical 
 
 -----------------------------------------
 version 1.16 at 2018-06-10 12:32:48 +0000
@@ -32,34 +42,6 @@ version 1.12 at 2016-09-02 20:10:34 +0000
 
     Added some changes from upstream 
 
------------------------------------------
-version 1.10 at 2014-03-24 22:24:12 +0000
------------------------------------------
-
-  Change: 7e2f3cbd3441facddea9502699721994e36be5e3
-  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
-  Date : 2014-03-24 22:24:12 +0000
-
-    Added some new upstream nouns 
-
------------------------------------------
-version 1.08 at 2014-03-24 21:58:10 +0000
------------------------------------------
-
-  Change: ea1b899ddd2c341a9c4a27c7dff4ce1ef487068a
-  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
-  Date : 2014-03-24 21:58:10 +0000
-
-    Added dailyfail command
-
-    Suggested by those fine gentlemen jkg and Trelane from #london.pm 
-
-  Change: bf6453c561c70999f01837e15835442ca6d30454
-  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
-  Date : 2011-03-31 11:10:40 +0000
-
-    Trailing whitespace fixen 
-
 ================================================
-Plus 5 releases after 2013-06-11 00:00:00 +0000.
+Plus 7 releases after 2015-12-14 00:00:00 +0000.
 ================================================

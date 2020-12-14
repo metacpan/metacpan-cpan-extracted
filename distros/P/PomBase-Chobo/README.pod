@@ -9,7 +9,7 @@ L<https://github.com/pombase/chobo>
 
 =head2 Build status
 
-=for html <a href="https://travis-ci.org/pombase/chobo"><img src="https://travis-ci.org/pombase/chobo.svg?branch=master"></a>
+=for html <a href="https://github.com/pombase/chobo/actions?query=workflow%3ATests"><img src="https://github.com/pombase/chobo/workflows/Tests/badge.svg"></a>
 
 =head1 Features
 

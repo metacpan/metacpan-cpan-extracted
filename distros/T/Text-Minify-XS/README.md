@@ -4,7 +4,7 @@ Text::Minify::XS - Simple text minification
 
 # VERSION
 
-version v0.3.0
+version v0.3.2
 
 # SYNOPSIS
 
@@ -33,6 +33,12 @@ It does the following:
 - and changes carriage returns to newlines.
 
 It does not recognise any form of markup, comments or text quoting.
+
+# KNOWN ISSUES
+
+Malformed UTF-8 characters may be be mangled or omitted from the
+output. You should ensure that the input string is properly encoded as
+UTF-8.
 
 # SOURCE
 

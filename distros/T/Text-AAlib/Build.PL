@@ -9,18 +9,36 @@ use strict;
 use warnings;
 use utf8;
 
+BEGIN { push @INC, '.' }
 use builder::MyBuilder;
 use File::Basename;
 use File::Spec;
-use CPAN::Meta;
-use CPAN::Meta::Prereqs;
 
 my %args = (
-    license              => 'perl',
+    license              => 'perl_5',
     dynamic_config       => 0,
 
     configure_requires => {
-        'Module::Build' => 0.38,
+        'Module::Build' => '0.4005',
+    },
+
+    requires => {
+        'Term::ANSIColor' => '0',
+        'XSLoader' => '0.02',
+        'perl' => '5.008001',
+    },
+
+    recommends => {
+    },
+
+    suggests => {
+    },
+
+    build_requires => {
+        'Test::More' => '0.88',
+    },
+
+    test_requires => {
     },
 
     name            => 'Text-AAlib',
@@ -28,10 +46,12 @@ my %args = (
     allow_pureperl => 0,
 
     script_files => [glob('script/*'), glob('bin/*')],
-    c_source     => [qw()],
+    PL_files => {},
 
     test_files           => ((-d '.git' || $ENV{RELEASE_TESTING}) && -d 'xt') ? 't/ xt/' : 't/',
     recursive_test_files => 1,
+
+
 );
 if (-d 'share') {
     $args{share_dir} = 'share';
@@ -50,20 +70,3 @@ my $builder = builder::MyBuilder->subclass(
 )->new(%args);
 $builder->create_build_script();
 
-my $mbmeta = CPAN::Meta->load_file('MYMETA.json');
-my $meta = CPAN::Meta->load_file('META.json');
-my $prereqs_hash = CPAN::Meta::Prereqs->new(
-    $meta->prereqs
-)->with_merged_prereqs(
-    CPAN::Meta::Prereqs->new($mbmeta->prereqs)
-)->as_string_hash;
-my $mymeta = CPAN::Meta->new(
-    {
-        %{$meta->as_struct},
-        prereqs => $prereqs_hash
-    }
-);
-print "Merging cpanfile prereqs to MYMETA.yml\n";
-$mymeta->save('MYMETA.yml', { version => 1.4 });
-print "Merging cpanfile prereqs to MYMETA.json\n";
-$mymeta->save('MYMETA.json', { version => 2 });

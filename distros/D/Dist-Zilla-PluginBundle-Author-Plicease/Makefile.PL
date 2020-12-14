@@ -84,6 +84,7 @@ my %WriteMakefileArgs = (
     "Dist::Zilla::Role::TextTemplate"         => 0,
     "Dist::Zilla::Util::CurrentCmd"           => 0,
     "File::ShareDir::Dist"                    => 0,
+    "File::Which"                             => 0,
     "File::chdir"                             => 0,
     "IPC::System::Simple"                     => "1.25",
     "Moose"                                   => 0,
@@ -106,7 +107,7 @@ my %WriteMakefileArgs = (
     "Test::More"   => "0.98",
     "Test::Script" => "1.10"
   },
-  "VERSION" => "2.58",
+  "VERSION" => "2.59",
   "test"    => {
     "TESTS" => "t/*.t"
   }

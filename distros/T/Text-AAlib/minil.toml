@@ -1,3 +1,6 @@
+name = "Text-AAlib"
+module_maker = "ModuleBuild"
+
 [build]
 build_class = "builder::MyBuilder"
 

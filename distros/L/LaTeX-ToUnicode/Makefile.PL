@@ -20,7 +20,7 @@ my %WriteMakefileArgs = (
   'LICENSE' => 'perl',
   'NAME' => 'LaTeX::ToUnicode',
   'PREREQ_PM' => {},
-  'VERSION' => '0.05',
+  'VERSION' => '0.11',
   'test' => {
     'TESTS' => 't/*.t'
   }

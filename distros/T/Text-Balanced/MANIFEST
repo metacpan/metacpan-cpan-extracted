@@ -1,19 +1,26 @@
-Changes
-lib/Text/Balanced.pm
-LICENSE
-Makefile.PL
-MANIFEST			This list of files
-README
-t/01_compile.t
-t/02_extbrk.t
-t/03_extcbk.t
-t/04_extdel.t
-t/05_extmul.t
-t/06_extqlk.t
-t/07_exttag.t
-t/08_extvar.t
-t/09_gentag.t
-t/97_meta.t
-t/98_pod.t
-t/99_pmv.t
-META.yml                                 Module meta-data (added by MakeMaker)
+Artistic                                 The "Artistic License"
+Changes                                  Differences from previous version
+Copying                                  The GNU General Public License
+INSTALL                                  Detailed installation instructions
+lib/Text/Balanced.pm                     Text::Balanced Perl module
+LICENCE                                  The Licence
+Makefile.PL                              Makefile writer
+MANIFEST                                 This list of files
+MANIFEST.SKIP                            Manifest skip specs
+README                                   The Instructions
+t/01_compile.t                           Test script
+t/02_extbrk.t                            Test script
+t/03_extcbk.t                            Test script
+t/04_extdel.t                            Test script
+t/05_extmul.t                            Test script
+t/06_extqlk.t                            Test script
+t/07_exttag.t                            Test script
+t/08_extvar.t                            Test script
+t/09_gentag.t                            Test script
+t/94_changes.t                           See if Changes file format is OK
+t/95_critic.t                            See if coding style is OK
+t/96_pmv.t                               Test script
+t/97_pod.t                               See if POD is OK
+t/98_pod_coverage.t                      See if POD coverage is OK
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

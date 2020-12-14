@@ -8,8 +8,6 @@ use Moo;
 extends 'DBIx::Class::Schema::Diff';
 #with 'DBIx::Class::Schema::Diff::Role::Common';
 
-use RapidApp::Util ':all';
-
 require DBIx::Class::Schema::Diff::Schema;
 
 use Types::Standard qw(:all);

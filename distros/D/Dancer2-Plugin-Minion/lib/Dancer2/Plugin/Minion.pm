@@ -55,7 +55,7 @@ Dancer2::Plugin::Minion - Use the Minion job queue in your Dancer2 apps.
 
 =head1 VERSION
 
-version 0.1.0
+version 0.1.1
 
 =head1 SYNOPSIS
 
@@ -116,13 +116,13 @@ additional methods provided.
 
 =head2 add_task()
 
-Keyword/shortcut for C<minion->add_task()>. See 
+Keyword/shortcut for C<< minion->add_task() >>. See 
 L<Minion's add_task() documentation|Minion/add_task> for
 more information.
 
 =head2 enqueue()
 
-Keyword/shortcut for C<minion->enqueue()>. 
+Keyword/shortcut for C<< minion->enqueue() >>. 
 See L<Minion's enqueue() documentation|Minion/enqueue1>
 for more information.
 

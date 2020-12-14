@@ -1,5 +1,13 @@
 Revision history for this software.
 
+0.14  2020-12-13 00:00:00
+  - supports WTF-8
+  - created by INABA Hitoshi
+
+0.13  2020-12-12 00:00:00
+  - supports range of ASCII by hyphen for tr///
+  - created by INABA Hitoshi
+
 0.12  2020-11-28 00:00:00
   - was changed interface of mb::_open_w()
   - supports mb::get_OSNAME()

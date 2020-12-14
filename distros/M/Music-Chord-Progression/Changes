@@ -1,5 +1,70 @@
 Revision history for Music-Chord-Progression
 
+0.0401 2020-12-13 10:28:21
+    - Fix verbose mode code.
+
+0.0400 2020-12-13 06:45:20
+    - Change chords attribute name to chord_map.
+
+0.0306 2020-12-12 23:50:13
+    - Don't re-build the graph every ->generate call.
+    - Don't re-create the scale every ->generate call.
+
+0.0305 2020-12-12 23:04:38
+    - Add a substitution test.
+    - Fix-up variable names in the eg/ programs.
+    - Improve documentation.
+
+0.0304 2020-12-12 14:54:56
+    - Improve test file.
+    - Croak if given invalid chords/net keys.
+
+0.0303 2020-12-12 14:18:44
+    - Improve documentation.
+    - Only compute the scale and tritones if we are substituting.
+
+0.0302 2020-12-12 11:56:02
+    - Make sure a progression item is defined before using it.
+    - Add the eg/chromatic program.
+
+0.0301 2020-12-12 05:37:24
+    - Add missing prerequisite.
+
+0.0300 2020-12-12 05:33:41
+    - Repair the tritone substitution logic.
+
+0.0204 2020-12-11 16:32:07
+    - Also substitute M7 chords.
+
+0.0203 2020-12-11 08:15:24
+    - Do not overrite the chords attribute in the substitution process.
+    - Programmatically build the tritone hash.
+    - Fix-up the eg/ programs a bit.
+
+0.0202 2020-12-11 05:37:22
+    - Improve documentation again!
+
+0.0201 2020-12-11 05:15:04
+    - Improve documentation.
+
+0.0200 2020-12-10 16:43:41
+    - Add tritone substitution.
+    - Add a ->sub_cond code reference attribute.
+
+0.0100 2020-12-10 12:29:14
+    - Improve documentation.
+    - Bump the major version now.
+
+0.0005 2020-12-10 09:44:54
+    - Improve documentation.
+    - Enhance the ->tonic and ->resolve attribute logic.
+    - Add a net test.
+
+0.0004 2020-12-10 08:15:25
+    - Improve documentation.
+    - Add the eg/progression example program.
+    - Add a feeble version of jazz chord substitution.
+
 0.0003 2020-12-10 05:16:34
     - Add the resolve attribute.
 

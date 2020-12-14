@@ -4,7 +4,7 @@
 
 use strict;
 use warnings;
-use Test::More tests => 6;
+use Test::More tests => 7;
 use utf8;
 
 use File::LoadLines;
@@ -26,8 +26,9 @@ sub testlines {
 	$tally++ if /€urø/;
     }
     is( $tally, 4, "matches" );
-    exit;
 }
 
 # test0.dat: ISO-8859.15 text
-testlines( "test0.dat", { encoding => "iso-8859-15" } );
+my $o = { encoding => "iso-8859-15" };
+testlines( "test0.dat", $o );
+is ( $o->{encoding}, "iso-8859-15", "returned encoding" );

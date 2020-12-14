@@ -1,0 +1,14 @@
+0.003   2020-06-06  Released-By: PERLANCAR; Urgency: medium
+
+	- Rename module Log::ger::UseJSON{,ForDump} for clarity.
+
+
+0.002   2019-09-11  Released-By: PERLANCAR; Urgency: medium
+
+	- Update to new module name: Data::Clean::JSON ->
+	  Data::Clean::ForJSON.
+
+
+0.001   2018-06-17  Released-By: PERLANCAR
+
+        - First release.

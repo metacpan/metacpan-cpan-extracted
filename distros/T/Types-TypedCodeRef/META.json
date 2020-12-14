@@ -4,7 +4,7 @@
       "ybrliiu <raian@reeshome.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.1.9",
+   "generated_by" : "Minilla/v3.1.10",
    "license" : [
       "perl_5"
    ],
@@ -43,18 +43,18 @@
       "runtime" : {
          "requires" : {
             "Carp" : "0",
-            "Moo" : "0",
+            "Moo" : "2.004004",
             "Scalar::Util" : "0",
-            "Sub::Meta" : "0",
+            "Sub::Meta" : "0.04",
             "Sub::WrapInType" : "0.03",
-            "Type::Tiny" : "0",
-            "namespace::autoclean" : "0",
+            "Type::Tiny" : "1.010004",
+            "namespace::autoclean" : "0.29",
             "perl" : "5.010001"
          }
       },
       "test" : {
          "requires" : {
-            "Test2::Suite" : "0",
+            "Test2::Suite" : "0.000138",
             "Test::More" : "0.98"
          }
       }
@@ -62,7 +62,7 @@
    "provides" : {
       "Types::TypedCodeRef" : {
          "file" : "lib/Types/TypedCodeRef.pm",
-         "version" : "0.02"
+         "version" : "0.04"
       },
       "Types::TypedCodeRef::Factory" : {
          "file" : "lib/Types/TypedCodeRef/Factory.pm"
@@ -79,10 +79,10 @@
          "web" : "https://github.com/ybrliiu/p5-Types-TypedCodeRef"
       }
    },
-   "version" : "0.02",
+   "version" : "0.04",
    "x_contributors" : [
       "kusuda <kusuda@mfac.jp>"
    ],
-   "x_serialization_backend" : "JSON::PP version 4.02",
+   "x_serialization_backend" : "JSON::PP version 4.04",
    "x_static_install" : 1
 }

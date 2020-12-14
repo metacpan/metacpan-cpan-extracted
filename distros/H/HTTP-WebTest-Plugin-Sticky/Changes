@@ -1,5 +1,9 @@
 Revision history for HTTP-WebTest-Plugin-Sticky
 
+0.03    2020-12-13
+        CPAN RT sunset. Changing code repository and issue tracker to
+        sourcehut.
+
 0.02    2009-02-05
         Corrected bug that was sending checkboxes even if they
         we're not "checked"

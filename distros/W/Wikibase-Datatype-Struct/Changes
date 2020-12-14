@@ -1,0 +1,15 @@
+0.03 2020-12-14T11:30:28+01:00
+ - Add tests.
+ - Change minimal version of Perl to 5.10 because some weird bug with pod.
+
+0.02 2020-12-12T00:29:46+01:00
+ - Add check for defined object in obj2struct() methods.
+ - Add missing dependency.
+ - Add test for Item::obj2struct().
+ - Add test for Item::struct2obj().
+ - Fix issue with novalue Snak.
+ - Improve creating of Wikibase::Datatype::Item in struct2obj() to explicit
+   readable code.
+
+0.01 2020-12-11T17:07:30+01:00
+ - First version.

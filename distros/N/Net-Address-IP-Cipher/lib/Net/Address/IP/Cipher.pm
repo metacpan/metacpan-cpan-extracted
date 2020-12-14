@@ -1,4 +1,4 @@
-package Net::Address::IP::Cipher 0.4;
+package Net::Address::IP::Cipher 0.5;
 
 use 5.012;
 use strict;
@@ -17,7 +17,7 @@ address, for pseudo anonymization.
 
 =head1 VERSION
 
-Version 0.4
+Version 0.5
 
 =head1 SYNOPSIS
 
@@ -278,8 +278,8 @@ Hugo Salgado, C<< <hsalgado at vulcano.cl> >>
 
 =head1 BUGS
 
-Please report any bugs or feature requests to C<bug-net-address-ip-cipher at rt.cpan.org>, or through
-the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Net-Address-IP-Cipher>.  I will be notified, and then you'll
+Please report any bugs or feature requests through
+the web interface at L<https://github.com/huguei/p5-Net-Address-IP-Cipher/issues>.  I will be notified, and then you'll
 automatically be notified of progress on your bug as I make changes.
 
 
@@ -296,13 +296,9 @@ You can also look for information at:
 
 =over 4
 
-=item * RT: CPAN's request tracker (report bugs here)
+=item * Github's request tracker (report bugs here)
 
-L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Net-Address-IP-Cipher>
-
-=item * AnnoCPAN: Annotated CPAN documentation
-
-L<http://annocpan.org/dist/Net-Address-IP-Cipher>
+L<https://github.com/huguei/p5-Net-Address-IP-Cipher/issues>
 
 =item * CPAN Ratings
 
@@ -326,7 +322,7 @@ Jean-Philippe Aumasson:
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2018 Hugo Salgado.
+Copyright 2020 Hugo Salgado.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of the the Artistic License (2.0). You may obtain a

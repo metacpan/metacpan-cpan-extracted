@@ -1,4 +1,4 @@
-package NewFangle::Config 0.03 {
+package NewFangle::Config 0.04 {
 
   use strict;
   use warnings;
@@ -48,7 +48,7 @@ NewFangle::Config - NewRelic Configuration class.
 
 =head1 VERSION
 
-version 0.03
+version 0.04
 
 =head1 SYNOPSIS
 
@@ -68,7 +68,7 @@ version 0.03
    redirect_collector => '',
    span_events => {
      enabled => 1,
-   }.
+   },
    transaction_tracer => {
      datastore_reporting => {
        enabled => 1,

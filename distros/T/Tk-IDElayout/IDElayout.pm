@@ -361,7 +361,7 @@ The last side of the frame (e.g. left, right, top, bot) that the mouse pointer w
 
 package Tk::IDElayout;
 
-our ($VERSION) = ('0.36');
+our ($VERSION) = ('0.37');
 
 use strict;
 
@@ -539,9 +539,7 @@ sub frameStructure{
 	}
 	
 	# Create the directed graph structure used to store the layout
-        my @createArgs = ();
-        @createArgs = ( compat02 => 1 ) if( defined($Graph::VERSION) and $Graph::VERSION > .3);
-	my $frameGraph = Graph::Directed->new(@createArgs);
+	my $frameGraph = Graph::Directed->new;
 
  	# Build Graph Struct
 	foreach my $node (@$nodes) {  # Build Nodes
@@ -553,7 +551,7 @@ sub frameStructure{
 			next if ( $attrName eq 'name' );    # skip name, we are already using that for the vertex name
 			$attr->{$attrName} = $node->{$attrName};
 		}
-		$frameGraph->set_attribute( 'attr', $node->{name}, $attr );
+		$frameGraph->set_vertex_attribute($node->{name}, 'attr', $attr);
 	}
 	foreach my $edge (@$edges) {  # Build Edges
 		$frameGraph->add_edge(@$edge);
@@ -610,7 +608,7 @@ sub populateWindow{
 	my $widgets = shift;
 	
 	# Create Paned Window
-	my $attr = $frameStruct->get_attribute('attr', $name); # Get the attribute hash
+	my $attr = $frameStruct->get_vertex_attribute($name, 'attr'); # Get the attribute hash
 	my $dir =  ($attr->{dir} =~ /v/i) ? 'vertical' : 'horiz';
 	
 	my @kids = $frameStruct->successors($name);  # get the childs
@@ -629,7 +627,7 @@ sub populateWindow{
 	my @widgetsToAdd;
         my $childIndex = 0;
 	foreach my $childName(@$childOrder){	
-		my $childAttr = $frameStruct->get_attribute('attr', $childName);
+		my $childAttr = $frameStruct->get_vertex_attribute($childName, 'attr');
 		if( defined( $childAttr->{childOrder})){ # Another paned window, recurse
 			my $childPW = $cw->populateWindow($pw, $top, $frameStruct, $childName, $widgets);
 			push @widgetsToAdd, $childPW;
@@ -1033,7 +1031,7 @@ sub addWidgetAtSide{
 	if ( defined($parent) ) {
 
 		# Find parent direction
-		my $pAttr = $frameStruct->get_attribute( 'attr', $parent );
+		my $pAttr = $frameStruct->get_vertex_attribute($parent, 'attr');
 		my $dir   = $pAttr->{dir} || '';
 		if (     $dir eq 'H' && ( $currentSide eq 'left' || $currentSide eq 'right' )
 		      || $dir eq 'V' && ( $currentSide eq 'top'  || $currentSide =~ 'bot' ) ) {
@@ -1201,7 +1199,7 @@ sub addWidgetAtSide{
 			# Add attributes for the new PW vertex in the frameStruct
 			my $attr = { dir => $dir, childOrder => [@newChildOrder],
                                      expandfactors => [@newExpandfactors] };
-			$frameStruct->set_attribute( 'attr', $PWname, $attr );
+			$frameStruct->set_vertex_attribute($PWname, 'attr', $attr);
 
 			# Add edges for the leaf nodes
 			$frameStruct->add_edge( $PWname, $widgetName );
@@ -1260,7 +1258,7 @@ sub _createNewPWname{
         my @pwNodes;
         # Find the PaneWindow nodes
         foreach my $node(@nodes){
-                my $attr = $frameGraph->get_attribute('attr', $node); # Get the attribute hash
+                my $attr = $frameGraph->get_vertex_attribute($node, 'attr'); # Get the attribute hash
                 push @pwNodes, $node if( defined($attr->{childOrder}));
         }
         
@@ -1361,7 +1359,7 @@ sub simplifyAfterDelete{
 	$frameStruct->delete_vertex($frameName);
 	
 	# Remove frame from parent childorder
-	my $pwAttr = $frameStruct->get_attribute( 'attr', $pwName );
+	my $pwAttr = $frameStruct->get_vertex_attribute($pwName, 'attr');
 	my $childOrder = $pwAttr->{childOrder};
 	@$childOrder = grep $_ ne $frameName, @$childOrder;
 	
@@ -1378,7 +1376,7 @@ sub simplifyAfterDelete{
 		my ($p2Name) = $frameStruct->predecessors($pwName);
 		if( $p2Name){ 
 			my $p2 = $widgets->{$p2Name};
-			my $p2Attr = $frameStruct->get_attribute( 'attr', $p2Name );
+			my $p2Attr = $frameStruct->get_vertex_attribute($p2Name, 'attr');
 
 
 			# Find Parents place in Parents's parent (p2)
@@ -1471,13 +1469,11 @@ sub displayStruct{
         
 	my $g = new GraphViz;
 	my @edges = $graph->edges();
-	
-	while (@edges){
-		my $from = shift @edges;
-		my $to   = shift @edges;
-		$g->add_edge($from,$to);
+
+	foreach my $edge (@edges) {
+		$g->add_edge(@$edge);
 	}
-	
+
 	my $gviewer = $self->Toplevel->GraphVizViewer( 
  	-graphviz => $g,
 	-nodefill => 'lightsteelblue1',
@@ -1489,7 +1485,7 @@ sub displayStruct{
 	 print "#########################\n";
 	 foreach my $widget(sort keys %$widgets){
 		 if( $widget =~ /^P\d+/){
-			 my $attr = $graph->get_attribute('attr', $widget); # Get the attribute hash
+			 my $attr = $graph->get_vertex_attribute($widget, 'attr'); # Get the attribute hash
 			 my $dir =  $attr->{dir};
 			 my $childOrder = $attr->{childOrder};
 			 print "$widget: $dir  ".join(", ", @$childOrder)."\n";

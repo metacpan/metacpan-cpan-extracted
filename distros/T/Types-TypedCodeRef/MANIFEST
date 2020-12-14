@@ -10,7 +10,9 @@ lib/Types/TypedCodeRef/Factory.pm
 minil.toml
 t/00_compile.t
 t/01_typed_code_ref.t
-t/factory/constraint_generator.t
-t/factory/name_generator.t
+t/10-unit/Factory/coercion_generator.t
+t/10-unit/Factory/constraint_generator.t
+t/10-unit/Factory/name_generator.t
+t/20-integration/Moo/coercion.t
 META.yml
 MANIFEST

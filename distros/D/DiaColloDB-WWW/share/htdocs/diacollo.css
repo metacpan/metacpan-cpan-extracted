@@ -52,6 +52,24 @@ label.hl2 {
 }
 
 /*======================================================================
+ * profile query: debug table
+ */
+.debugInfo {
+    display:none;
+    color: #666;
+    border: 1px solid red;
+    background-color: #ffe4e1;
+    margin: 5px;
+    margin-left: 10px;
+    margin-right: 10px;
+}
+.debugInfo table th {
+    text-align: right;
+    font-weight: bold;
+    font-variant: small-caps;
+}
+
+/*======================================================================
  * profile query: data area
  */
 .rawURL {
@@ -467,7 +485,7 @@ div#profileDataD3 {
 
 #d3slider .brush .domain,
 #d3slider .brush .slider .background {
-    opacity: 0%;
+    /*opacity: 0%;*/ /*-- x-axis disappears under chromium, 2020-10-07 --*/
     fill: none;
 }
 

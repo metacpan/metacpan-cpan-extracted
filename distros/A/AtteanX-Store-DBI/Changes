@@ -5,6 +5,13 @@ Created:      2016-03-14
 Home page:    <https://metacpan.org/release/AtteanX-Store-DBI/>
 Bug tracker:  <https://github.com/kasei/atteanx-store-dbi/issues>
 
+0.002  2020-12-12
+
+ - (Update) Add DBD::SQLite as a test prereq (#6).
+ - (Update) Remove Math::Cartesian::Product from prereq list (#4).
+ - (Update) Remove mistakenly added LICENSE file (#5).
+ - (Update) Update copyright years (#3).
+
 0.001  2020-12-02
 
  - (Addition) Initial release.

@@ -1,0 +1,130 @@
+# carton snapshot format: version 1.0
+DISTRIBUTIONS
+  Class-Method-Modifiers-2.13
+    pathname: E/ET/ETHER/Class-Method-Modifiers-2.13.tar.gz
+    provides:
+      Class::Method::Modifiers 2.13
+    requirements:
+      B 0
+      Carp 0
+      Exporter 0
+      ExtUtils::MakeMaker 0
+      base 0
+      perl 5.006
+      strict 0
+      warnings 0
+  ExtUtils-Config-0.008
+    pathname: L/LE/LEONT/ExtUtils-Config-0.008.tar.gz
+    provides:
+      ExtUtils::Config 0.008
+    requirements:
+      Data::Dumper 0
+      ExtUtils::MakeMaker 6.30
+      strict 0
+      warnings 0
+  ExtUtils-Helpers-0.026
+    pathname: L/LE/LEONT/ExtUtils-Helpers-0.026.tar.gz
+    provides:
+      ExtUtils::Helpers 0.026
+      ExtUtils::Helpers::Unix 0.026
+      ExtUtils::Helpers::VMS 0.026
+      ExtUtils::Helpers::Windows 0.026
+    requirements:
+      Carp 0
+      Exporter 5.57
+      ExtUtils::MakeMaker 0
+      File::Basename 0
+      File::Copy 0
+      File::Spec::Functions 0
+      Text::ParseWords 3.24
+      perl 5.006
+      strict 0
+      warnings 0
+  ExtUtils-InstallPaths-0.012
+    pathname: L/LE/LEONT/ExtUtils-InstallPaths-0.012.tar.gz
+    provides:
+      ExtUtils::InstallPaths 0.012
+    requirements:
+      Carp 0
+      ExtUtils::Config 0.002
+      ExtUtils::MakeMaker 0
+      File::Spec 0
+      perl 5.006
+      strict 0
+      warnings 0
+  Log-Any-1.708
+    pathname: P/PR/PREACTION/Log-Any-1.708.tar.gz
+    provides:
+      Log::Any 1.708
+      Log::Any::Adapter 1.708
+      Log::Any::Adapter::Base 1.708
+      Log::Any::Adapter::Capture 1.708
+      Log::Any::Adapter::File 1.708
+      Log::Any::Adapter::Multiplex 1.708
+      Log::Any::Adapter::Null 1.708
+      Log::Any::Adapter::Stderr 1.708
+      Log::Any::Adapter::Stdout 1.708
+      Log::Any::Adapter::Syslog 1.708
+      Log::Any::Adapter::Test 1.708
+      Log::Any::Adapter::Util 1.708
+      Log::Any::Manager 1.708
+      Log::Any::Proxy 1.708
+      Log::Any::Proxy::Null 1.708
+      Log::Any::Proxy::Test 1.708
+      Log::Any::Test 1.708
+    requirements:
+      B 0
+      Carp 0
+      Data::Dumper 0
+      Exporter 0
+      ExtUtils::MakeMaker 0
+      Fcntl 0
+      File::Basename 0
+      FindBin 0
+      IO::File 0
+      List::Util 0
+      Storable 0
+      Sys::Syslog 0
+      Test::Builder 0
+      constant 0
+      strict 0
+      warnings 0
+  Log-Any-Adapter-Screen-0.140
+    pathname: P/PE/PERLANCAR/Log-Any-Adapter-Screen-0.140.tar.gz
+    provides:
+      Log::Any::Adapter::Screen 0.140
+    requirements:
+      ExtUtils::MakeMaker 0
+      Log::Any 0
+      Log::Any::Adapter 0.11
+      Term::ANSIColor 0
+      Time::HiRes 0
+      parent 0
+      perl 5.010001
+      strict 0
+      warnings 0
+  Module-Build-Tiny-0.039
+    pathname: L/LE/LEONT/Module-Build-Tiny-0.039.tar.gz
+    provides:
+      Module::Build::Tiny 0.039
+    requirements:
+      CPAN::Meta 0
+      DynaLoader 0
+      Exporter 5.57
+      ExtUtils::CBuilder 0
+      ExtUtils::Config 0.003
+      ExtUtils::Helpers 0.020
+      ExtUtils::Install 0
+      ExtUtils::InstallPaths 0.002
+      ExtUtils::ParseXS 0
+      File::Basename 0
+      File::Find 0
+      File::Path 0
+      File::Spec::Functions 0
+      Getopt::Long 2.36
+      JSON::PP 2
+      Pod::Man 0
+      TAP::Harness::Env 0
+      perl 5.006
+      strict 0
+      warnings 0

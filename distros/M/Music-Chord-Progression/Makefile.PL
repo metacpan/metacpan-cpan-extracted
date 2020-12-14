@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-use 5.006;
+use 5.012;
 
 use ExtUtils::MakeMaker;
 
@@ -14,13 +14,14 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "Music-Chord-Progression",
   "LICENSE" => "perl",
-  "MIN_PERL_VERSION" => "5.006",
+  "MIN_PERL_VERSION" => "5.012",
   "NAME" => "Music::Chord::Progression",
   "PREREQ_PM" => {
+    "Carp" => 0,
     "Data::Dumper::Compact" => 0,
     "Graph::Directed" => 0,
     "Moo" => 2,
-    "Music::Chord::Note" => 0,
+    "Music::Chord::Note" => "0.10",
     "Music::Scales" => 0,
     "namespace::clean" => 0,
     "strictures" => 2
@@ -30,11 +31,13 @@ my %WriteMakefileArgs = (
     "IO::Handle" => 0,
     "IPC::Open3" => 0,
     "Moo" => 2,
+    "Music::Chord::Note" => "0.10",
+    "Test::Exception" => 0,
     "Test::More" => "0.88",
     "strict" => 0,
     "warnings" => 0
   },
-  "VERSION" => "0.0003",
+  "VERSION" => "0.0401",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -42,14 +45,16 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
+  "Carp" => 0,
   "Data::Dumper::Compact" => 0,
   "File::Spec" => 0,
   "Graph::Directed" => 0,
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
   "Moo" => 2,
-  "Music::Chord::Note" => 0,
+  "Music::Chord::Note" => "0.10",
   "Music::Scales" => 0,
+  "Test::Exception" => 0,
   "Test::More" => "0.88",
   "namespace::clean" => 0,
   "strict" => 0,

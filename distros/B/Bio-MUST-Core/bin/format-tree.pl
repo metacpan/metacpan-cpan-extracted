@@ -1,6 +1,6 @@
 #!/usr/bin/env perl
 # PODNAME: format-tree.pl
-# ABSTRACT: Format trees for printing
+# ABSTRACT: Format (and annotate) trees for printing
 
 use Modern::Perl '2011';
 use autodie;
@@ -17,7 +17,6 @@ use aliased 'Bio::MUST::Core::Taxonomy';
 use aliased 'Bio::MUST::Core::Tree';
 
 # TODO: implement numbered taxonomic levels as in fetch-tax.pl
-
 # check for conditionally required arguments
 die <<'EOT' if !$ARGV_annotate && ($ARGV_collapse || $ARGV_colorize);
 Missing required arguments:
@@ -42,6 +41,19 @@ if ($ARGV_taxdir) {
     ### Annotating tree using: $ARGV_taxdir
     $tax = Taxonomy->new_from_cache( tax_dir => $ARGV_taxdir );
 }
+
+# setup collapsing and group naming
+my $annotate_key;
+my $collapse_key;
+if ($ARGV_collapse && ($ARGV_collapse =~ m/label|color/xms)) {
+    $annotate_key  = 'taxon_label' if $ARGV_annotate eq 'missing';
+    $collapse_key  = 'taxon_label' if $ARGV_collapse eq 'label';
+    $collapse_key  = '!color'      if $ARGV_collapse eq 'color';
+    $ARGV_collapse = 'no rank';
+}
+$ARGV_annotate = 'no rank' if $ARGV_annotate eq 'missing';
+my %opts = (name  => $ARGV_annotate);
+$opts{  collapse} =  $ARGV_collapse if $ARGV_collapse;
 
 TREE:
 for my $infile (@ARGV_infiles) {
@@ -90,35 +102,25 @@ for my $infile (@ARGV_infiles) {
     if ($ARGV_annotate) {
         $tax->attach_taxonomies_to_terminals($tree);
         $tax->attach_taxonomies_to_internals($tree);
-
-        my %opts = (name  => $ARGV_annotate);
-        $opts{  collapse} =  $ARGV_collapse if $ARGV_collapse;
         $tax->attach_taxa_to_entities($tree, \%opts);
 
-        my $scheme;
         if ($ARGV_colorize) {
             ### Coloring tree using: $ARGV_colorize
-            $scheme = $tax->load_color_scheme($ARGV_colorize);
+            my $scheme = $tax->load_color_scheme($ARGV_colorize);
+            $scheme->attach_colors_to_entities($tree);
         }
 
-        # FigTree output
-        if ($ARGV_figtree) {
-            $scheme->attach_colors_to_entities($tree) if $ARGV_colorize;
-              $tree->collapse_subtrees                if $ARGV_collapse;
+        if ($ARGV_collapse) {
+            $tree->collapse_subtrees($collapse_key);
         }
 
         # iTOL output
         if ($ARGV_itol) {
-            my $itol_outfile  = change_suffix($infile, '.txt');
-            my $color_file    = insert_suffix($itol_outfile, '-color');
-            my $label_file    = insert_suffix($itol_outfile, '-label');
-            my $collapse_file = insert_suffix($itol_outfile, '-collapse');
-            $scheme->store_itol_colors($tree, $color_file)            if $ARGV_colorize;
-              $tree->store_itol_collapse($label_file, $collapse_file) if $ARGV_collapse;
+            $tree->store_itol_datasets($infile, $annotate_key);
         }
 
         # TRE or ARB output
-        else {
+        unless ($ARGV_figtree || $ARGV_itol) {
             $tree->switch_attributes_and_labels_for_internals('taxon');
         }
     }
@@ -164,17 +166,19 @@ for my $infile (@ARGV_infiles) {
     }
 }
 
+# TODO: set `no rank` by default for annotate
+
 __END__
 
 =pod
 
 =head1 NAME
 
-format-tree.pl - Format trees for printing
+format-tree.pl - Format (and annotate) trees for printing
 
 =head1 VERSION
 
-version 0.202310
+version 0.203490
 
 =head1 USAGE
 
@@ -264,24 +268,31 @@ directions are available: asc and desc.
 =for Euclid: dir.type:       /asc|desc/
     dir.type.error: <dir> must be one of asc or desc (not dir)
 
-=item --annotate=<level>
+=item --annotate[=][<level>]
 
 When specified, a taxonomic analysis of all nodes is carried out and the
 nodes are named after their taxon at (or above) the specified taxonomic
 level. This requires a local mirror of the NCBI Taxonomy database.
 
-Available levels are: superkingdom, kingdom, subkingdom, superphylum,
-phylum, subphylum, superclass, class, subclass, infraclass, superorder,
-order, suborder, infraorder, parvorder, superfamily, family, subfamily,
-tribe, subtribe, genus, subgenus, species group, species subgroup, species,
+Available levels are: superkingdom, kingdom, subkingdom, superphylum, phylum,
+subphylum, superclass, class, subclass, infraclass, superorder, order,
+suborder, infraorder, parvorder, superfamily, family, subfamily, tribe,
+subtribe, genus, subgenus, species group, species subgroup, species,
 subspecies, varietas, forma and 'no rank' (don't forget the quotes).
 
 =for Euclid: level.type: string
+    level.opt_default: 'missing'
 
 =item --collapse=<level>
 
 When specified, monophyletic nodes are collapsed exactly at the specified
 taxonomic level. This requires enabling taxonomic annotation.
+
+Two special levels are also supported: label and color. With label, subtrees
+are collapsed on the various taxa of the CLS file (see C<--colorize> option
+just below), whereas with color, subtrees colored in the same color are
+collapsed. This allows collapsing nodes at various taxonomic levels and even
+non-monophyletic nodes composed of taxa identically colored on purpose.
 
 =for Euclid: level.type: string
 

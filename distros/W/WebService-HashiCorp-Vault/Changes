@@ -1,5 +1,8 @@
 WebService::HashiCorp::Vault - perl API for HashiCorp's Vault
 
+0.005 2020-12-11
+- Carry the ua in to objects which are returned. See GH#3
+
 0.004 2017-11-08
  - Back out changes to path, accepting the change was a mistake
  - Correctly pass base_url through to secrets when created, see GH#1

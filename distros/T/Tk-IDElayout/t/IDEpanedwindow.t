@@ -21,7 +21,11 @@ my $TOP = MainWindow->new;
 my $pwH = $TOP->IDEpanedwindow(qw/-sashpad 1 -sashwidth 3 -sashrelief groove/);;
 $pwH->pack(qw/-side top -expand yes -fill both /);
 
-    my $label1 = $pwH->Label(-text => "This is the\nleft side", -background => 'yellow');
+    my $label1 = $pwH->Label(
+        -text => "This is the\nleft side",
+        -background => 'yellow',
+        -foreground => 'black',
+    );
 
     my $Frame2 = $pwH->Frame();
     

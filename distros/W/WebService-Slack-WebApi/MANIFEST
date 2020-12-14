@@ -38,6 +38,7 @@ t/00_compile.t
 t/01_web_api.t
 t/02_api_test.t
 t/03_call_methods.t
+t/04_anyua.t
 t/Util.pm
 META.yml
 MANIFEST

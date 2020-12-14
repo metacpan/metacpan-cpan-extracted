@@ -1,0 +1,257 @@
+NAME
+    Mo::utils - Mo utilities.
+
+SYNOPSIS
+     use Mo::utils qw(check_array_object check_isa check_number check_number_of_items check_required);
+
+     check_array_object($self, $key, $class, $class_name);
+     check_isa($self, $key, $class);
+     check_number($self, $key);
+     check_number_of_items($self, $list_method, $item_method, $object_name, $item_name);
+     check_required($self, $key);
+
+DESCRIPTION
+    Mo utilities for checking of data objects.
+
+SUBROUTINES
+  "check_array_object"
+     check_array_object($self, $key, $class, $class_name);
+
+    Check parameter defined by $key which is reference to array with
+    instances of some object type ($class). $class_name is used to error
+    message.
+
+    Put error if check isn't ok.
+
+    Returns undef.
+
+  "check_isa"
+     check_isa($self, $key, $class);
+
+    Check parameter defined by $key which is instance of $class or no.
+
+    Put error if check isn't ok.
+
+    Returns undef.
+
+  "check_number"
+     check_number($self, $key);
+
+    Check parameter defined by $key which is number (positive or negative)
+    or no.
+
+    Put error if check isn't ok.
+
+    Returns undef.
+
+  "check_number_of_items"
+     check_number_of_items($self, $list_method, $item_method, $object_name, $item_name);
+
+    Check number of items. Must be 0 or 1. List items via $list_method and
+    get value via $item_method method. $object_name and $item_name are
+    variables for error output.
+
+    Put error if check isn't ok.
+
+    Returns undef.
+
+  "check_required"
+     check_required($self, $key);
+
+    Check required parameter defined by $key.
+
+    Put error if check isn't ok.
+
+    Returns undef.
+
+ERRORS
+     check_array_object():
+             Parameter '%s' must be a array.
+             %s isn't '%s' object.
+
+     check_isa():
+             Parameter '%s' must be a '%s' object.
+
+     check_number():
+             Parameter '%s' must a number.
+
+     check_number_of_items():
+             %s for %s '%s' has multiple values.
+
+     check_required():
+             Parameter '%s' is required.
+
+EXAMPLE1
+     use strict;
+     use warnings;
+
+     use Mo::utils qw(check_array_object);
+     use Test::MockObject;
+
+     my $self = {
+             'key' => [
+                     Test::MockObject->new,
+             ],
+     };
+     check_array_object($self, 'key', 'Test::MockObject', 'Value');
+
+     # Print out.
+     print "ok\n";
+
+     # Output:
+     # ok
+
+EXAMPLE2
+     use strict;
+     use warnings;
+
+     use Error::Pure;
+     use Mo::utils qw(check_array_object);
+
+     $Error::Pure::TYPE = 'Error';
+
+     my $self = {
+             'key' => [
+                     'foo',
+             ],
+     };
+     check_array_object($self, 'key', 'Test::MockObject', 'Value');
+
+     # Print out.
+     print "ok\n";
+
+     # Output like:
+     # #Error [..utils.pm:?] Value isn't 'Test::MockObject' object.
+
+EXAMPLE3
+     use strict;
+     use warnings;
+
+     use Mo::utils qw(check_isa);
+     use Test::MockObject;
+
+     my $self = {
+             'key' => Test::MockObject->new,
+     };
+     check_isa($self, 'key', 'Test::MockObject');
+
+     # Print out.
+     print "ok\n";
+
+     # Output:
+     # ok
+
+EXAMPLE4
+     use strict;
+     use warnings;
+
+     $Error::Pure::TYPE = 'Error';
+
+     use Mo::utils qw(check_isa);
+
+     my $self = {
+             'key' => 'foo',
+     };
+     check_isa($self, 'key', 'Test::MockObject');
+
+     # Print out.
+     print "ok\n";
+
+     # Output like:
+     # #Error [...utils.pm:?] Parameter 'key' must be a 'Test::MockObject' object.
+
+EXAMPLE5
+     use strict;
+     use warnings;
+
+     use Mo::utils qw(check_number);
+
+     my $self = {
+             'key' => '10',
+     };
+     check_number($self, 'key');
+
+     # Print out.
+     print "ok\n";
+
+     # Output:
+     # ok
+
+EXAMPLE6
+     use strict;
+     use warnings;
+
+     $Error::Pure::TYPE = 'Error';
+
+     use Mo::utils qw(check_number);
+
+     my $self = {
+             'key' => 'foo',
+     };
+     check_number($self, 'key');
+
+     # Print out.
+     print "ok\n";
+
+     # Output like:
+     # #Error [...utils.pm:?] Parameter 'key' must be a number.
+
+EXAMPLE7
+     use strict;
+     use warnings;
+
+     use Mo::utils qw(check_required);
+
+     my $self = {
+             'key' => 'value',
+     };
+     check_required($self, 'key');
+
+     # Print out.
+     print "ok\n";
+
+     # Output:
+     # ok
+
+EXAMPLE8
+     use strict;
+     use warnings;
+
+     use Error::Pure;
+     use Mo::utils qw(check_required);
+
+     $Error::Pure::TYPE = 'Error';
+
+     my $self = {
+             'key' => undef,
+     };
+     check_required($self, 'key');
+
+     # Print out.
+     print "ok\n";
+
+     # Output like:
+     # #Error [...utils.pm:?] Parameter 'key' is required.
+
+DEPENDENCIES
+    Exporter, Error::Pure, Readonly.
+
+SEE ALSO
+    Mo  Micro Objects. Mo is less.
+
+REPOSITORY
+    <https://github.com/michal-josef-spacek/Mo-utils>
+
+AUTHOR
+    Michal Josef Špaček <mailto:skim@cpan.org>
+
+    <http://skim.cz>
+
+LICENSE AND COPYRIGHT
+    © Michal Josef Špaček 2020
+
+    BSD 2-Clause License
+
+VERSION
+    0.03
+

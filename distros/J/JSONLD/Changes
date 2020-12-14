@@ -2,10 +2,15 @@ JSONLD
 ======
 
 Created:      2019-10-28
-Home page:    <http://search.cpan.org/dist/JSONLD/>
+Home page:    <https://metacpan.org/release/JSONLD/>
 Bug tracker:  <https://github.com/kasei/perl-jsonld/issues>
 
-0.003  2020-05-17
+0.005  2020-12-12
+
+ - (Update) Fix package metadata (#4).
+ - (Update) Fix version references in README.md (#5).
+
+0.004  2020-05-17
 
  - (Update) Allow specifying a context file on the command line for
    jsonld-expand.

@@ -1,5 +1,12 @@
 Revision history for English::Script
 
+1.03      2020-12-10 09:32:56-08:00 America/Los_Angeles
+        - Compile "otherwise, if" into an "else if"
+        - Fix for JS object definition syntax
+        - License migrate to Artistic 2.0
+        - Migrate Travis CI and Coveralls to GitHub Actions and Codecov
+        - Update copyright year
+
 1.02      2020-09-25 12:07:39-07:00 America/Los_Angeles
         - Add support for negative numbers
 

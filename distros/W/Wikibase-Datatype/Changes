@@ -1,0 +1,11 @@
+0.03 2020-12-11T16:19:01+01:00
+ - Add test for check_property().
+ - Update dependency to Mo::utils 0.03, because i need support of floating
+   numbers in quantity.
+
+0.02 2020-12-11T13:06:58+01:00
+ - Add id parameter and method for Item.
+ - Add page_id parameter and method for Item.
+
+0.01 2020-12-11T11:46:07+01:00
+ - First version.

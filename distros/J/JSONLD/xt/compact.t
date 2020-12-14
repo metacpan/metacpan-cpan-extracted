@@ -2,7 +2,6 @@ use v5.14;
 use autodie;
 use utf8;
 use Carp qw(confess);
-use Test::More;
 use Test::Exception;
 use FindBin qw($Bin);
 use File::Glob qw(bsd_glob);
@@ -14,6 +13,8 @@ use open ':std', ':encoding(UTF-8)';
 
 use Moo;
 use Type::Tiny::Role;
+
+use Test::More skip_all => 'JSON-LD 1.1 Compation is not currently supported';
 
 our $debug	= 0;
 $JSONLD::debug	= $debug;

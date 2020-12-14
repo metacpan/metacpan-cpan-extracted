@@ -1,3 +1,10 @@
+0.008   2020-08-10  Released-By: PERLANCAR; Urgency: low
+
+	- No functional changes.
+
+	- [doc] Grammar fixes.
+
+
 0.007   2020-03-21  Released-By: PERLANCAR; Urgency: medium
 
 	- Load Win32::Console::ANSI on Windows, for convenience.

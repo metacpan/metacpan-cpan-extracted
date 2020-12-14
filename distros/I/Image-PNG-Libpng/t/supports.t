@@ -5,8 +5,8 @@ use Image::PNG::Libpng 'libpng_supports';
 
 my @values = (qw/
 sCAL
-tEXt
-zTXt
+READ_tEXt
+READ_zTXt
 iTXt
 pCAL
 iCCP

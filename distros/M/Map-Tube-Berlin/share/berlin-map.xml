@@ -52,7 +52,6 @@
     <station id="S308" name="Bernau-Friedenstal" line="S2" link="S307,S309"/>
     <station id="S151" name="Bernauer Str." line="U8" link="S150,S152"/>
     <station id="S238" name="Betriebsbhf. Rummelsburg" line="S3" link="S237,S239"/>
-    <station id="S277" name="Betriebsbhf. Schöneweide" line="S45,S46,S8,S85,S9" link="S276,S278"/>
     <station id="S216" name="Beusselstr." line="S41/S42" link="S132,S165"/>
     <station id="S257" name="Biesdorf" line="S5" link="S074,S258"/>
     <station id="S072" name="Biesdorf-Süd" line="U5" link="S071,S073"/>
@@ -146,6 +145,7 @@
     <station id="S056" name="Innsbrucker Platz" line="S41/S42,S46,U4" link="S055,S170,S185"/>
     <station id="S133" name="Jakob-Kaiser-Platz" line="U7" link="S132,S134"/>
     <station id="S148" name="Jannowitzbrücke" line="S3,S5,S7,S9,U8" link="S033,S147,S240"/>
+    <station id="S277" name="Johannisthal" line="S45,S46,S8,S85,S9" link="S276,S278"/>
     <station id="S111" name="Johannisthaler Chaussee" line="U7" link="S110,S112"/>
     <station id="S186" name="Julius-Leber-Brücke" line="S1" link="S122,S185"/>
     <station id="S132" name="Jungfernheide" line="S41/S42,U7" link="S131,S133,S215,S216"/>

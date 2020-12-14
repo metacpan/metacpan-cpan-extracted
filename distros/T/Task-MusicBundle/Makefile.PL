@@ -40,6 +40,7 @@ my %WriteMakefileArgs = (
     "Music::Chord::Namer" => 0,
     "Music::Chord::Note" => 0,
     "Music::Chord::Positions" => 0,
+    "Music::Chord::Progression" => 0,
     "Music::ChordBot" => 0,
     "Music::Duration" => 0,
     "Music::Duration::Partition" => 0,
@@ -70,7 +71,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.1901",
+  "VERSION" => "0.1902",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -104,6 +105,7 @@ my %FallbackPrereqs = (
   "Music::Chord::Namer" => 0,
   "Music::Chord::Note" => 0,
   "Music::Chord::Positions" => 0,
+  "Music::Chord::Progression" => 0,
   "Music::ChordBot" => 0,
   "Music::Duration" => 0,
   "Music::Duration::Partition" => 0,

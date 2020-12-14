@@ -1,6 +1,9 @@
 NAME
     Digest::SipHash - Perl XS interface to the SipHash algorithm
 
+VERSION
+    $Id: README,v 0.4 2020/12/11 18:06:57 dankogai Exp dankogai $
+
 SYNOPSIS
       use Digest::SipHash qw/siphash/;
       my $seed = pack 'C16', 0 .. 0xF;    # 16 chars long
@@ -20,7 +23,8 @@ SYNOPSIS
 DESCRIPTION
     SipHash is the default perl hash function for 64 bit builds now.
 
-    <http://perl5.git.perl.org/perl.git/commit/3db6cbfca39da94d152d3e860e2aa79b9c6bb161>
+    <http://perl5.git.perl.org/perl.git/commit/3db6cbfca39da94d152d3e860e2aa
+    79b9c6bb161>
 
     <https://131002.net/siphash/>
 
@@ -34,8 +38,8 @@ EXPORT
 
 SUBROUTINES/METHODS
   siphash
-      my ($hi, $lo) = siphash($str [, $seed]);
-      my $uint32    = siphash($str [, $seed]);
+      my ($hi, $lo) = siphash($str [, $seed][, $no_downgrade]);
+      my $uint32    = siphash($str [, $seed][, $no_downgrade]);
 
     Calculates the SipHash value of $src with $<$seed>.
 
@@ -54,6 +58,16 @@ SUBROUTINES/METHODS
       hash_value($str) == siphash($str, hash_seed()); # scalar context
 
     always holds true when PERL_HASH_FUN_SIPHASH is in effect.
+
+  About Unicode
+    By default this module follows the same rules as Perl does regarding
+    hashing, utf8 strings are passed to utf8::downgrade() with the $fail_ok
+    flag set to true. This means that if the complete string can be
+    downgraded to non-utf8 prior to hashing it will be, otherwise it will be
+    left in utf8 form. This means that all strings which are string
+    equivalent hash equivalently, and may not be what you want. In which
+    case you can pass a third argument to the hash functions, which when
+    true disables the downgrade behavior.
 
   siphash32
     just an alias of "siphash".

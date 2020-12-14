@@ -1,4 +1,4 @@
-package NewFangle::Transaction 0.03 {
+package NewFangle::Transaction 0.04 {
 
   use strict;
   use warnings;
@@ -123,7 +123,7 @@ NewFangle::Transaction - NewRelic application class
 
 =head1 VERSION
 
-version 0.03
+version 0.04
 
 =head1 SYNOPSIS
 

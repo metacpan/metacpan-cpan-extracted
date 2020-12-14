@@ -1,13 +1,13 @@
 /* Fetch a value "field" from a hash. */
 
 #define HASH_FETCH(hash,field)     {                            \
-    SV ** field_sv_ptr = hv_fetch (hash, #field,                \
-                                   strlen (#field), 0);         \
-    if (! field_sv_ptr) {                                       \
-        fprintf (stderr, "Field '%s' in '%s' not valid.\n",     \
-                 #field, #hash);                                \
-    }                                                           \
-    field_sv = * field_sv_ptr;					\
+	SV ** field_sv_ptr = hv_fetch (hash, #field,		\
+				       strlen (#field), 0);	\
+	if (! field_sv_ptr) {					\
+	    croak ("Required key '%s' not in '%s'",		\
+		   #field, #hash);				\
+	}							\
+	field_sv = * field_sv_ptr;				\
     }								\
 
 #define HASH_FETCH_IV(hash,field) {                             \

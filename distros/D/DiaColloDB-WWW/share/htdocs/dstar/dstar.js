@@ -111,10 +111,23 @@ function userFormInit() {
   initInput("limit");
   initInput("ctx");
   initInput("debug");
+  initInput("export");
   if (document.getElementById('in_flags') != null) {
       initInput("flags", "corpus");
       initInput("flags");
   }
+}
+
+function userFormExport() {
+    var bdebug = valGet('in_debug');
+    valSet('in_debug','');
+    valSet('in_export',1);
+    try {
+	userFormSubmit();
+    } finally {
+	valSet('in_debug', bdebug);
+	valSet('in_export','');
+    }
 }
 
 function userFormSubmit() {
@@ -129,8 +142,13 @@ function userFormSubmit() {
   valSet('qf_start',valGet('in_start'));
   valSet('qf_limit',valGet('in_limit'));
   valSet('qf_ctx',valGet('in_ctx'));
+
   if (any2bool(valGet('in_debug'))) { valSet('qf_debug',1); }
   else { valSet('qf_debug',''); }
+
+  if (any2bool(valGet('in_export'))) { valSet('qf_export',1); }
+  else { valSet('qf_export',''); }
+ 
   if (document.getElementById('in_flags') != null) { valSet('qf_flags',valGet('in_flags')); }
 
   document.getElementById('queryForm').submit();
@@ -189,6 +207,7 @@ if (typeof String.prototype.trim != 'function') { // detect native implementatio
 }
 //----------------------------------------------------------------------
 String.prototype.xlit = function () {
+    //-- really stupid minimal hack for transliteration "usual suspects" (for default caberr mapping creation)
     return (this
 	    .replace(/ſ/g, 's')
 	    .replace(/aͤ/g, 'ä')
@@ -200,17 +219,31 @@ String.prototype.xlit = function () {
 	   );
 };
 
-function toggleVerboseQueryForm() {
+function toggleVerboseQueryForm(ev) {
     if ($("#qFormVerbose").is(":visible")) {
 	$("#qFormVerbose").hide();
-	$("#qFormShort input").removeAttr("disabled");
-	$("#vqFormTgl").text("+").attr("title","Show detailed query/export options");
+	$(".qFormShort input").removeAttr("disabled");
+	$(".vqFormTgl").text("+").attr("title","Show detailed query/export options");
     } else {
-	$("#qFormVerbose").show();
-	$("#qFormShort input").attr("disabled",true);
-	$("#vqFormTgl").text("-").attr("title","Hide detailed query/export options");
+        $("#qFormVerbose").show();
+	$(".qFormShort input").attr("disabled",true);
+	$(".vqFormTgl").text("-").attr("title","Hide detailed query/export options");
+
+        //-- scroll top of user query form into view if required (e.g. if invoked from footer link-bar)
+        //   + see mantis #44965
+        var uftop = $("#userForm").offset().top - 5;
+        if ($(window).scrollTop() > uftop) {
+            $("html,body").animate({scrollTop:uftop},'fast');
+        }
+        $("#in_q").focus();
     }
 }
+
+function scrollToId(aid){
+    var a = $("#"+aid);
+    $('html,body').animate({scrollTop: a.offset().top},'slow');
+}
+
 
 //=============================================================================)
 // caberr stuff
@@ -288,6 +321,7 @@ function dhistReady() {
     $("#i_window").val(user_query["window"]);
     $("#i_wbase").val(user_query["wbase"]);
     $("#i_totals").prop('checked', ubool(user_query["totals"]) );
+    $("#i_bare").prop('checked', ubool(user_query["bare"]) );
     $("#i_single").prop('checked', ubool(user_query["single"]) );
     $("#i_grand").prop('checked', ubool(user_query["grand"]) );
     $("#i_grid").prop('checked', ubool(user_query["grid"]) );

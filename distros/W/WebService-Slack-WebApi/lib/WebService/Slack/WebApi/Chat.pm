@@ -6,7 +6,7 @@ use feature qw/state/;
 
 use parent 'WebService::Slack::WebApi::Base';
 
-use JSON::XS;
+use JSON;
 use WebService::Slack::WebApi::Generator (
     delete => {
         channel => 'Str',

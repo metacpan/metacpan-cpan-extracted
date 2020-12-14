@@ -7,6 +7,7 @@ use Moo;
 use overload ();
 use Carp ();
 use Type::Tiny ();
+use Type::Coercion;
 use Type::Params qw( compile compile_named multisig );
 use Types::Standard -types;
 use Scalar::Util;
@@ -14,7 +15,20 @@ use Sub::Meta;
 use Sub::Meta::Param;
 use Sub::Meta::Parameters;
 use Sub::Meta::Returns;
+use Sub::WrapInType qw( wrap_sub );
+use Carp qw( croak );
 use namespace::autoclean;
+
+our @CARP_NOT;
+
+my $CallableType = Type::Tiny->new(
+  name       => 'Callable',
+  constraint => sub {
+    my $callable = shift;
+    my $reftype = Scalar::Util::reftype($callable);
+    ( defined $reftype && $reftype eq 'CODE' ) || overload::Overloaded($callable);
+  },
+);
 
 has name => (
   is      => 'ro',
@@ -39,6 +53,13 @@ has sub_meta_finders => (
   is       => 'ro',
   isa      => ArrayRef[CodeRef],
   required => 1,
+);
+
+has coercion_generator => (
+  is       => 'ro',
+  isa      => CodeRef,
+  lazy     => 1,
+  builder  => '_build_coercion_generator',
 );
 
 sub _build_name_generator {
@@ -135,18 +156,10 @@ sub _build_constraint_generator {
 
     sub {
         my $typed_code_ref = shift;
-        return !!0 unless _is_callable($typed_code_ref);
-
         my $maybe_sub_meta = $self->find_sub_meta($typed_code_ref);
         $constraints_sub_meta->is_same_interface($maybe_sub_meta // create_unknown_sub_meta());
     };
   };
-}
-
-sub _is_callable {
-  my $callable = shift;
-  my $reftype = Scalar::Util::reftype($callable);
-  ( defined $reftype && $reftype eq 'CODE' ) || overload::Overloaded($callable);
 }
 
 sub find_sub_meta {
@@ -168,13 +181,39 @@ sub create_unknown_sub_meta {
   );
 }
 
+sub _build_coercion_generator {
+  my $self = shift;
+
+  sub {
+    my (undef, $type, @type_parameters) = @_;
+    
+    if (@type_parameters == 0) {
+      local @CARP_NOT = (__PACKAGE__, 'Type::Tiny');
+      croak 'No coercion for this type constraint';
+    }
+
+    my ($params_types, $return_types) = @type_parameters;
+    Type::Coercion->new(
+      display_name      => "to_${type}",
+      type_constraint   => $type,
+      type_coercion_map => [
+        $CallableType => sub {
+          my $coderef = shift;
+          wrap_sub($params_types, $return_types, $coderef);
+        },
+      ],
+    );
+  };
+}
+
 sub create {
   my $self = shift;
   Type::Tiny->new(
+    parent               => $CallableType,
     name                 => $self->name,
     name_generator       => $self->name_generator,
-    constraint           => sub { _is_callable(shift) },
     constraint_generator => $self->constraint_generator,
+    coercion_generator   => $self->coercion_generator,
   );
 }
 

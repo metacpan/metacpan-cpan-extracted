@@ -26,5 +26,5 @@ requires:
   namespace::clean: '0'
 resources:
   repository: https://github.com/eserte/Map-Tube-Berlin.git
-version: '2020.1204'
+version: '2020.1213'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,4 +1,8 @@
 Revision history for Alien-Expat
 
+0.02      2020-12-11 04:45:01 -0700
+  - Fix regex in test to recognize some legal versions that
+    were being excluded (gh#1)
+
 0.01      2019-11-01 16:16:56 -0700
   - initial version

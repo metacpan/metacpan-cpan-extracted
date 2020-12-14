@@ -8,9 +8,11 @@ requires "strict" => "0";
 requires "warnings" => "0";
 
 on 'test' => sub {
+  requires "Encode" => "0";
   requires "File::Spec" => "0";
   requires "Module::Metadata" => "0";
   requires "Test::More" => "0";
+  requires "Test::Warnings" => "0";
   requires "utf8" => "0";
 };
 

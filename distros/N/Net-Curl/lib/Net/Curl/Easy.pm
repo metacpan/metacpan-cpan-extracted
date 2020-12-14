@@ -5,7 +5,7 @@ use warnings;
 use Net::Curl ();
 use Exporter 'import';
 
-our $VERSION = '0.47';
+our $VERSION = '0.48';
 
 our @EXPORT_OK = grep { /^CURL/x } keys %{Net::Curl::Easy::};
 our %EXPORT_TAGS = ( constants => \@EXPORT_OK );
@@ -157,6 +157,9 @@ Retrieve a value. OPTION is one of C<CURLINFO_*> constants.
 Calls L<curl_easy_getinfo(3)|https://curl.haxx.se/libcurl/c/curl_easy_getinfo.html>.
 Throws L</Net::Curl::Easy::Code> on error.
 
+In the case of C<CURLINFO_CERTINFO>, the return is an array reference of
+hash references; each hash represents one certificate.
+
 =item pause( )
 
 Pause the transfer.
@@ -275,7 +278,7 @@ base object.
 =item CURLOPT_ERRORBUFFER
 
 setopt() does not allow to use this constant. You can always retrieve latest
-error message with $east->error() method.
+error message with $easy->error() method.
 
 =back
 

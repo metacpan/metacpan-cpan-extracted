@@ -15,6 +15,12 @@ binmode $builder->todo_output,    ":utf8";
 binmode STDOUT, ":encoding(utf8)";
 binmode STDERR, ":encoding(utf8)";
 
+BEGIN: {
+    use lib "$Bin";
+    use IPNGLT;
+};
+skip_old ();
+
 use Image::PNG::Libpng ':all';
 
 # These are the compression levels used in the PngSuite 

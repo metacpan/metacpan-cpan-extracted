@@ -24,6 +24,7 @@ our $port;
 require './t/test.pl';
 
  SKIP: {
+   skip "Set DIAGNOSTICS to run gemini-diagnostics" unless $ENV{DIAGNOSTICS};
    say "Running gemini-diagnostics $host $port";
    open(my $fh, "-|:utf8", "gemini-diagnostics $host $port")
        or skip "Cannot run gemini-diagnostics";

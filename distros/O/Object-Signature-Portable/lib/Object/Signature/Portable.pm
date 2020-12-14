@@ -12,7 +12,7 @@ use Crypt::Digest;
 use Exporter::Lite;
 use JSON::MaybeXS;
 
-our $VERSION = 'v0.2.0';
+our $VERSION = 'v1.0.0';
 
 our @EXPORT    = qw/ signature /;
 our @EXPORT_OK = @EXPORT;
@@ -67,7 +67,7 @@ Object::Signature::Portable - generate portable fingerprints of objects
 
 =head1 VERSION
 
-version v0.2.0
+version v1.0.0
 
 =head1 SYNOPSIS
 
@@ -176,12 +176,22 @@ based on the following considerations:
 
 =over
 
-=item JSON is a simple, text-based format. The output is not likely to
+=item *
+
+JSON is a simple, text-based format. The output is not likely to
 change between module versions.
 
-=item Classes can be extended with hooks for JSON serialization.
+=item *
 
-=item Speed is not a factor.
+Consistent encoding of integers are strings.
+
+=item *
+
+Classes can be extended with hooks for JSON serialization.
+
+=item *
+
+Speed is not a factor.
 
 =back
 
@@ -190,6 +200,16 @@ However, see L</LIMITATIONS> below.
 =back
 
 =head1 LIMITATIONS
+
+=head2 Encoding
+
+The default JSON serializer will use UTF-8 encoding by default, which
+generally removes an issue with L<Storable> when identical strings
+have different encodings.
+
+Numeric values may be inconsistently represented if they are not
+numified, e.g. C<"123"> vs C<123> may not produce the same JSON. (This too
+is an issue with C<Storable>.)
 
 =head2 Signatures for Arbitrary Objects
 
@@ -262,7 +282,8 @@ This uses L<Storable> to serialise objects and generate a MD5
 hexidecimal string as a signature.
 
 This has the drawback that machines with different architectures,
-different versions of Perl, or different versions L<Storable> may not
+different versions of Perl, or different versions L<Storable>, or in
+some cases different encodings of the same scalar, may not
 produce the same signature for the same data. (This does not mean that
 L<Storable> is unable to de-serialize data produced by different
 versions; it only means that the serialized data is not identical
@@ -318,7 +339,7 @@ L<Sereal::Encoder>.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2013-2014, 2019 by Robert Rothenberg.
+This software is Copyright (c) 2013-2014, 2019-2020 by Robert Rothenberg.
 
 This is free software, licensed under:
 

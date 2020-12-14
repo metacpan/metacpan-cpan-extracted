@@ -78,11 +78,12 @@
          "type" : "git",
          "url" : "git://github.com/plicease/NewFangle.git",
          "web" : "https://github.com/plicease/NewFangle"
-      }
+      },
+      "x_IRC" : "irc://irc.perl.org/#native"
    },
-   "version" : "0.03",
-   "x_generated_by_perl" : "v5.32.0",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.19",
+   "version" : "0.04",
+   "x_generated_by_perl" : "v5.33.3",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.24",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later",
    "x_use_unsafe_inc" : 0
 }

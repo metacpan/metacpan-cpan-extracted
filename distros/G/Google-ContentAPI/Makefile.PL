@@ -7,10 +7,12 @@ WriteMakefile(
     VERSION_FROM       => 'lib/Google/ContentAPI.pm',
     ABSTRACT_FROM      => 'lib/Google/ContentAPI.pm',
     AUTHOR             => 'Bill Gerrard <bill@gerrard.org>',
-    LICENSE            => 'perl',
+    LICENSE            => 'Perl_5',
     MIN_PERL_VERSION   => '5.008004',
     PREREQ_PM => {
       'strict'         => 0,
+      'warnings'       => 0,
+      'Carp'           => 0,
       'JSON'           => 0,
       'Crypt::JWT'     => 0,
       'REST::Client'   => 0,

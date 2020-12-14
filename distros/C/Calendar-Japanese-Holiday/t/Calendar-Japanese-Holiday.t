@@ -2,7 +2,7 @@
 
 use utf8;
 
-use Test::More tests => 88;
+use Test::More tests => 92;
 BEGIN { use_ok('Calendar::Japanese::Holiday') };
 
 #########################
@@ -243,7 +243,8 @@ ok(checkHoliday(2003, 2003, 7, 20, ''),             'Umi(2003 !Happy Monday)');
 ok(checkHoliday(2007, 2007, 7, 16, '海の日'),       'Umi(2007 Happy Monday)');
 ok(checkHoliday(2019, 2019, 7, 15, '海の日'),       'Umi(2019 Happy Monday)');
 ok(checkHoliday(2020, 2020, 7, 23, '海の日'),       'Umi(2020 olympic)');
-ok(checkHoliday(2021, 2021, 7, 19, '海の日'),       'Umi(2021 Happy Monday)');
+ok(checkHoliday(2021, 2021, 7, 22, '海の日'),       'Umi(2021 olympic)');
+ok(checkHoliday(2022, 2022, 7, 18, '海の日'),       'Umi(2022 Happy Monday)');
 
 ok(checkHoliday( $ST, 1965, 9, 15, ''),             'Keirou(-1965)');
 ok(checkHoliday(1966, 2002, 9, 15, '敬老の日'),     'Keirou(1966-2002)');
@@ -257,7 +258,8 @@ ok(checkHoliday(2000, 2000,10, 10, ''),             'Taiiku(2000 !Happy Monday)'
 ok(checkHoliday(2007, 2007,10,  8, '体育の日'),     'Taiiku(2007 Happy Monday)');
 ok(checkHoliday(2019, 2019,10, 14, '体育の日'),     'Taiiku(2019 Happy Monday)');
 ok(checkHoliday(2020, 2020, 7, 24, 'スポーツの日'), 'Taiiku(2020 olympic)');
-ok(checkHoliday(2021, 2021,10, 11, 'スポーツの日'), 'Taiiku(2021 olympic)');
+ok(checkHoliday(2021, 2021, 7, 23, 'スポーツの日'), 'Taiiku(2021 olympic)');
+ok(checkHoliday(2022, 2022,10, 10, 'スポーツの日'), 'Taiiku(2021 Happy Monday)');
 
 ok(checkHoliday( $ST,  $ED,11,  3, '文化の日'),     'Bunka');
 
@@ -273,12 +275,16 @@ ok(checkHoliday(2019, 2019,10, 22, '即位礼正殿の儀の行われる日'), '
 ok(checkHoliday( $ST, 2015, 8, 11, ''),             'Yama(-2015)');
 ok(checkHoliday(2016, 2019, 8, 11, '山の日'),       'Yama(2016-2019)');
 ok(checkHoliday(2020, 2020, 8, 10, '山の日'),       'Yama(2020)');
-ok(checkHoliday(2021,  $ED, 8, 11, '山の日'),       'Yama(2016-2021)');
+ok(checkHoliday(2021, 2021, 8,  8, '山の日'),       'Yama(2021)');
+ok(checkHoliday(2022,  $ED, 8, 11, '山の日'),       'Yama(2022-)');
 
 ok(checkShunbunShuubun(), 'Shunbun/Shuubun');
 
 ok(!isHoliday(2007, 9, 24),                         'Furikae (FALSE)');
 ok(isHoliday(2007, 9, 24, 1) eq '振替',             'Furikae (TRUE)');
+# 2021年は山の日が8/8に移動したことにより8/9が振替になる
+ok(isHoliday(2021, 8,  9, 1) eq '振替',             'Furikae (TRUE)');
+
 
 #
 # Test string arguments

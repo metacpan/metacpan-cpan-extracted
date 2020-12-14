@@ -1,8 +1,9 @@
-package Dist::Zilla::Plugin::Author::Plicease::ReadmeAnyFromPod 2.58 {
+package Dist::Zilla::Plugin::Author::Plicease::ReadmeAnyFromPod 2.59 {
 
   use 5.014;
   use Moose;
   use URI::Escape ();
+  use File::Which ();
 
 
   extends 'Dist::Zilla::Plugin::ReadmeAnyFromPod';
@@ -75,8 +76,39 @@ package Dist::Zilla::Plugin::Author::Plicease::ReadmeAnyFromPod 2.58 {
 
   has default_branch => (
     is      => 'ro',
-    default => 'master',  # apologize, until I can update all of my repos,
-                          # this needs to use the git default branch name.
+    lazy    => 1,
+    default => sub {
+      my($self) = @_;
+      if(File::Which::which('git'))
+      {
+        my %b = map { $_ => 1 }
+                map { s/\s$//r }
+                map { s/^\*?\s*//r }
+                `git branch`;
+        if($b{main} && $b{master})
+        {
+          $self->log("!! You have both a main and master branch, please switch to just a main branch (or explicitly set default_branch) !!");
+          return 'main';
+        }
+        elsif($b{main})
+        {
+          $self->log("deteching main as default branch");
+          return 'main';
+        }
+        elsif($b{master})
+        {
+          $self->log("!! Please switch to using main as the main branch (or explicitly set default_branch) !!");
+          return 'master';
+        }
+        else
+        {
+          $self->log("!! cannot find either a main or master branch please create one or explicitly set default_branch !!");
+          return 'main';
+        }
+      }
+      $self->log("unable to detect default branch assuming main");
+      return 'main';  # may need to update the repo
+    },
   );
 
   sub mvp_multivalue_args { qw( workflow ) }
@@ -136,7 +168,7 @@ Dist::Zilla::Plugin::Author::Plicease::ReadmeAnyFromPod
 
 =head1 VERSION
 
-version 2.58
+version 2.59
 
 =head1 SYNOPSIS
 

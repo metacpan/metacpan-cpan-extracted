@@ -3,23 +3,12 @@ use strict;
 use Test::More;
 use Image::PNG::Libpng ':all';
 use Image::PNG::Const ':all';
+use FindBin '$Bin';
 
-if (! libpng_supports ('iTXt') ||
-    ! libpng_supports ('zTXt') ||
-    ! libpng_supports ('tEXt')) {
-    plan skip_all => 'your libpng does not support iTXt/zTXt/tEXt',
-}
-
-# http://www.cpantesters.org/cpan/report/6174e60e-6bf3-1014-896f-3999f29aa079
-
-# and similar, this appears to be a bug in libpng version 1.6.3.
-
-my $libpngver = Image::PNG::Libpng::get_libpng_ver ();
-
-if ($libpngver =~ /^1\.[0-5]/ ||
-    $libpngver =~ /^1\.6\.[0-3]([^0-9]|$)/) {
-    plan skip_all => "Skip - iTXt trips bugs in libpng version $libpngver";
-}
+BEGIN: {
+    use lib "$Bin";
+    use IPNGLT;
+};
 
 use utf8;
 use FindBin '$Bin';
@@ -29,6 +18,13 @@ my $builder = Test::More->builder;
 binmode $builder->output,         ":utf8";
 binmode $builder->failure_output, ":utf8";
 binmode $builder->todo_output,    ":utf8";
+
+# http://www.cpantesters.org/cpan/report/6174e60e-6bf3-1014-896f-3999f29aa079
+
+# and similar, this appears to be a bug in libpng version 1.6.3.
+
+skip_itxt ();
+skip_old ();
 
 my @stuff = (
 {

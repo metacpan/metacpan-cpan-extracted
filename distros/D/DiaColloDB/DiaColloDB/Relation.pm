@@ -120,7 +120,7 @@ sub profile {
   my $attrs  = $coldb->attrs();
   my $adata  = $coldb->attrData($attrs);
   my $a2data = $opts{a2data} = {map {($_->{a}=>$_)} @$adata};
-  my $areqs  = $coldb->parseRequest($opts{query}, logas=>'query', default=>$attrs->[0]);
+  my $areqs  = $coldb->parseRequest($opts{query}, logas=>'query', default=>$attrs->[0], qref=>\$opts{qobj});
   foreach (@$areqs) {
     $a2data->{$_->[0]}{req} = $_->[1];
   }
@@ -412,6 +412,7 @@ sub subprofile2 {
 ##    (
 ##     fcoef => $fcoef,         ##-- frequency coefficient (2*$coldb->{dmax} for CoFreqs)
 ##     qtemplate => $qtemplate, ##-- query template with __W1.I1__ rsp __W2.I2__ replacing groupby fields
+##     qcanon => $qcanon,       ##-- canonical query string (after parsing)
 ##    )
 sub qinfo {
   my ($rel,$coldb,%opts) = @_;
@@ -458,6 +459,20 @@ sub qinfoData {
   }
 
   return (\@q1strs,\@q2strs,\@qxstrs,\@fstrs);
+}
+
+## $qstr_or_undef = $rel->qcanon($coldb,%opts)
+##  + returns "canonical" query string for %opts
+##  + default implementation uses:
+##    - $opts{qcanon} if defined
+##    - $opts{qobj}->toStringFull() if available
+##    - undef
+sub qcanon {
+  my ($rel,$coldb,%opts) = @_;
+  my $q = $opts{qcanon} // $opts{qobj};
+  $q = $q->toStringFull if (ref($q) && UNIVERSAL::can($q,'toStringFull'));
+  utf8::decode($q) if (!utf8::is_utf8($q));
+  return $q;
 }
 
 

@@ -33,13 +33,16 @@
       "runtime" : {
          "requires" : {
             "Algorithm::Diff" : "0",
+            "Encode::Locale" : "0",
             "File::ReadBackwards" : "0",
             "File::Slurper" : "0",
             "IO::Socket::SSL" : "0",
+            "IRI" : "0",
             "Modern::Perl" : "1.20180701",
             "Mojo::IOLoop" : "0",
             "Mojo::Log" : "0",
             "Mojolicious" : "8.12",
+            "Net::IDN::Encode" : "0",
             "URI::Escape" : "0",
             "perl" : "5.026000",
             "strict" : "0",
@@ -55,6 +58,6 @@
          "web" : "https://alexschroeder.ch/cgit/phoebe/about/"
       }
    },
-   "version" : 2.01,
+   "version" : 2.03,
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

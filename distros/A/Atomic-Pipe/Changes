@@ -1,3 +1,30 @@
+0.012     2020-12-13 18:30:33-08:00 America/Los_Angeles
+
+    - Fix some tests that were breaking Test2's IPC
+    - Fix missing PIPE->autoflush() on some platforms
+
+0.011     2020-12-12 22:01:30-08:00 America/Los_Angeles
+
+    - Fix non-blocking mode in windows
+    - Single implementation of IPC tests where fork or threads are picked as
+      needed.
+
+0.010     2020-12-12 15:18:53-08:00 America/Los_Angeles
+
+    - Fix win32
+
+0.009     2020-12-10 22:46:18-08:00 America/Los_Angeles
+
+    - Add fifo support
+
+0.008     2020-12-10 20:35:19-08:00 America/Los_Angeles
+
+    - Add write_burst, fits_in_burst(), and parts_needed()
+
+0.007     2020-12-10 19:05:37-08:00 America/Los_Angeles
+
+    - Fix takeover for non-linux platforms
+
 0.006     2020-12-09 22:53:06-08:00 America/Los_Angeles
 
     - Make it possible to takeover an existing pipe

@@ -14,37 +14,37 @@ not run its Makefile.PL or Build.PL.
 -----BEGIN PGP SIGNED MESSAGE-----
 Hash: SHA1
 
-SHA1 6bdc540a45202f8ee9e85e7e2c8befefbd928253 Changes
+SHA1 383921a327fba5996d53a5670b60552cea2410ce Changes
 SHA1 9352b8d24a802ce693ffc882e2a950140b42c862 MANIFEST
-SHA1 3c4cc40eeacc76def52096968937ccf10008eb6e META.yml
+SHA1 61ad6eb44b73aa8528b890b6a0a6ff23e95bacd2 META.yml
 SHA1 bd5b70b536496c33dc46830b4217535fc2ce6ec8 Makefile.PL
-SHA1 86265d817d8e8f7b766376a1c7975d60ea466bf4 README.md
+SHA1 aa9cf00713b223e48bed2d689b4088863eb7c7f9 README.md
 SHA1 98c7471eea1dc975c7fb0c23429360709af667d9 bin/jsonld-compact
 SHA1 bcc660197d0dbef42a7cb27b86d3f18543c0da28 bin/jsonld-expand
 SHA1 9f330f63a8f5c0a0a77ea34231ffc01aed4de2a3 bin/jsonld-nq
-SHA1 05a17c51aceb6435a1eac17137f19911a09e5050 inc/Module/Install.pm
+SHA1 c3f8f9f2a209f80b7ca3c8af3a6b1b7b408ad620 inc/Module/Install.pm
 SHA1 d001b4b9a48395a8c4134b234a0e1789138427c5 inc/Module/Install/AuthorTests.pm
-SHA1 dc73c2baf4357ad1cc884146147f557a50a29300 inc/Module/Install/Base.pm
-SHA1 c7f311a5bc5a7f96e9105d5f16a0e13fc596899d inc/Module/Install/Can.pm
+SHA1 de30b539a326675c42e6ad360fddb05902d621be inc/Module/Install/Base.pm
+SHA1 81fffeca82bcd7100d8435b139f0780fcc5cdf9c inc/Module/Install/Can.pm
 SHA1 470809a1dbe03e197e74dde79c6af40b5f7f9b26 inc/Module/Install/DOAPChangeSets.pm
-SHA1 8c8f9ff5b0a536af59814e16a901ce39fbc23299 inc/Module/Install/Fetch.pm
-SHA1 4f77eb02e104324b08a047585c498146b045613b inc/Module/Install/Makefile.pm
-SHA1 2f5be6af6098acf6d786a4a7299a34d0c6c04ef9 inc/Module/Install/Metadata.pm
-SHA1 fa532ce949d1c607589aded93d5ea1d49a27e5d8 inc/Module/Install/Scripts.pm
-SHA1 aa6723cc4a8d4475026f6ceb28e1f16459e8a11b inc/Module/Install/Win32.pm
-SHA1 6661285caedfe012cb5a1ca915a422ffc292ae2b inc/Module/Install/WriteAll.pm
-SHA1 306c6f762bfb71d90ac3e297785e62c8b9597c97 lib/JSONLD.pm
-SHA1 8a057779c2ea8d0fd970e24fb40fabc5fd277319 meta/changes.ttl
+SHA1 b4dd9cb3cf0cb60390c575bd3405e2297d4a0b1a inc/Module/Install/Fetch.pm
+SHA1 b84cf97b12f8e5ef37bea54e33ddce32dff804d1 inc/Module/Install/Makefile.pm
+SHA1 0d9fd69718198fcd1560214c4f23fcaa44f8395e inc/Module/Install/Metadata.pm
+SHA1 78f307119470d0c85d7d6496e76fc95cb939b462 inc/Module/Install/Scripts.pm
+SHA1 99b8179fbd9e05422b161cf91abe198744188064 inc/Module/Install/Win32.pm
+SHA1 6a91e14bbecc64e9c8e2261dfa4b360641d152e4 inc/Module/Install/WriteAll.pm
+SHA1 b91aec4bdfd19e5f88e401fc319103342b89d811 lib/JSONLD.pm
+SHA1 51ee239931a92a3be64fb21b50cce4c4d9d932a6 meta/changes.ttl
 SHA1 b366e7addb62f2915ae0a13ba50ad28188c33f63 t/00.load.t
 SHA1 8d62325b1ec6fcadd2237bbb698ade4ffaa54df4 t/simple.t
-SHA1 929a28352946c0ae371899181ce6ac2583428037 xt/compact.t
+SHA1 a6f82497ea87a646305a407bbb1b126b420173c3 xt/compact.t
 SHA1 17c83eb9789ff167ea1ad6ebe8a5c8f80af683f8 xt/earl.pl
 SHA1 c6d9bd4c7fa83453df76a7e9f140adbfafa86983 xt/expand.t
-SHA1 ebc64fb6c87617e4868e43fe26c3b5e7a14b4fce xt/to-rdf.t
+SHA1 fbb88a9a40c21568b6d5ee2f477dcf1546932977 xt/to-rdf.t
 -----BEGIN PGP SIGNATURE-----
 Comment: GPGTools - http://gpgtools.org
 
-iEYEARECAAYFAl7B/goACgkQhPK6VMqoyC1u5wCcCsK44GVnZwdafICkN75mGvwW
-EfcAoKR2JnJvQEkZpdsH+bNWlt8mlDLQ
-=XY4f
+iEYEARECAAYFAl/VlD4ACgkQhPK6VMqoyC2khgCgmLLB3wJUeKWW7nW4GLKDT4hx
+e7sAn06PSsbFVRhsBorGrJIFT75pkHBY
+=nx9g
 -----END PGP SIGNATURE-----

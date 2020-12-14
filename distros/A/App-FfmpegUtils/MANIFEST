@@ -9,6 +9,7 @@ README
 dist.ini
 lib/App/FfmpegUtils.pm
 script/reencode-video-with-libx264
+script/split-video-by-duration
 t/00-compile.t
 t/author-critic.t
 t/author-pod-coverage.t

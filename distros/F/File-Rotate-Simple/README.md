@@ -4,7 +4,7 @@ File::Rotate::Simple - no-frills file rotation
 
 # VERSION
 
-version v0.2.4
+version v0.2.5
 
 # SYNOPSIS
 
@@ -231,7 +231,7 @@ Mohammad S Anwar <mohammad.anwar@yahoo.com>
 
 # COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018 by Robert Rothenberg.
+This software is Copyright (c) 2015-2020 by Robert Rothenberg.
 
 This is free software, licensed under:
 

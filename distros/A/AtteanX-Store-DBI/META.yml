@@ -4,6 +4,7 @@ author:
   - 'Gregory Todd Williams  C<< <gwilliams@cpan.org> >>'
   - 'Gregory Todd Williams <gwilliams@cpan.org>'
 build_requires:
+  DBD::SQLite: 0
   ExtUtils::MakeMaker: 6.59
   HTTP::Message::PSGI: 0
   Test::Exception: 0
@@ -36,7 +37,6 @@ requires:
   File::ShareDir: 0
   File::Slurp: 0
   List::MoreUtils: 0
-  Math::Cartesian::Product: 1.008
   Moo: 1.006
   MooX::Log::Any: 0
   Try::Tiny: 0
@@ -49,4 +49,4 @@ resources:
   homepage: https://metacpan.org/release/AtteanX-Store-DBI/
   license: http://dev.perl.org/licenses/
   repository: https://github.com/kasei/atteanx-store-dbi/
-version: '0.001'
+version: '0.002'

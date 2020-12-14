@@ -15,7 +15,6 @@
 
 use Modern::Perl;
 use Test::More;
-use Encode qw(decode_utf8);
 use File::Slurper qw(write_text read_binary);
 use utf8; # tests contain UTF-8 characters and it matters
 
@@ -74,8 +73,7 @@ like($page, qr/$haiku/m, "Raw text");
 my $data = read_binary("t/alex.jpg");
 my $size = length($data);
 $page = query_gemini("$titan/raw/Alex;size=$size;mime=image/png;token=hello", $data);
-# in this situation the client simply returns undef!?
-# like($page, qr/^59 This wiki does not allow image\/png$/, "Upload image with wrong MIME type");
+like($page, qr/^59 This wiki does not allow image\/png/, "Upload image with wrong MIME type");
 $page = query_gemini("$base/page/Alex");
 like($page, qr/This page does not yet exist/, "Save of unsupported MIME type failed");
 
@@ -114,7 +112,7 @@ $page = query_gemini("$base/page/Haiku/1");
 like($page, qr/Quiet disk ratling/m, "Revision 1 content");
 
 # diffs
-$page = decode_utf8(query_gemini("$base/diff/Haiku/1"));
+$page = query_gemini("$base/diff/Haiku/1");
 like($page, qr/^> ｢Quiet disk ratling｣$/m, "Removed content, per line");
 like($page, qr/^> ｢Muffled honking cars｣$/sm, "Added content, per line");
 
@@ -133,7 +131,7 @@ $page = query_gemini("$titan/raw/Haiku;size=77;mime=text/plain;token=hello", $ha
 like($page, qr/^30 $base\/page\/Haiku\r$/, "Titan Haiku 3");
 
 # diffs accross lines
-$page = decode_utf8(query_gemini("$base/diff/Haiku/2"));
+$page = query_gemini("$base/diff/Haiku/2");
 like($page, qr/^> Muffled ｢honking cars｣$/m, "Removed content, partial line");
 like($page, qr/^> ｢Keyboard ｣clicking, then it stops\.$/m, "Removed content, partial line");
 like($page, qr/^> Muffled ｢spinning disk｣$/sm, "Added content, partial line");
@@ -151,7 +149,7 @@ $page = query_gemini("$titan/raw/Haiku;size=65;mime=text/plain;token=hello", $ha
 like($page, qr/^30 $base\/page\/Haiku\r$/, "Titan Haiku 4"); # not really a haiku anymore…
 
 # diffs accross paragraphs
-$page = decode_utf8(query_gemini("$base/diff/Haiku/3"));
+$page = query_gemini("$base/diff/Haiku/3");
 like($page, qr/^> ｢random clicking, then it stops\.｣$/m, "Added content, paragraph");
 like($page, qr/^> ｢Rain falls and ｣I think$/m, "Added content, paragraph");
 like($page, qr/^> ｢electronic humming just｣$/m, "Added content, paragraph");

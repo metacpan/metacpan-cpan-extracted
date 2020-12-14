@@ -28,7 +28,21 @@ my:project
 	:bug-database			<https://github.com/kasei/atteanx-store-dbi/issues> ;
 	doap:download-page		<https://metacpan.org/release/AtteanX-Store-DBI/> ;
 	doap:download-mirror	<http://kasei.us/code/files/> ;
-	:release				my:v_0-001 ;
+	:release				my:v_0-001 , my:v_0-002 ;
+	.
+
+my:v_0-002
+	a					:Version ;
+	dc:issued			"2020-12-12"^^xsd:date ;
+	:revision			"0.002" ;
+	dcterms:replaces	my:v_0-001 ;
+	dcs:changeset [
+		dcs:item
+			[ a dcs:Update ; rdfs:label "Add DBD::SQLite as a test prereq (#6)." ] ,
+			[ a dcs:Update ; rdfs:label "Remove mistakenly added LICENSE file (#5)." ] ,
+			[ a dcs:Update ; rdfs:label "Remove Math::Cartesian::Product from prereq list (#4)." ] ,
+			[ a dcs:Update ; rdfs:label "Update copyright years (#3)." ]
+	]
 	.
 
 my:v_0-001

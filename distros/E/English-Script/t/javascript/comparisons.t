@@ -18,9 +18,9 @@ is(
         'greather than and length of',
         'If the object is greater than the length of the other object, then say 42.',
         [
-            'if ( typeof( object ) == "undefined" ) var object;',
+            'if ( typeof( object ) == "undefined" ) var object = "";',
             'if ( typeof( other ) == "undefined" ) var other = {};',
-            'if ( typeof( other.object ) == "undefined" ) var other.object;',
+            'if ( typeof( other.object ) == "undefined" ) other.object = "";',
             'if ( object > other.object.length ) {',
             'console.log( 42 );',
             '}',
@@ -30,8 +30,8 @@ is(
         'greater than or equal to',
         'If the thing value is greater than or equal to the stuff value plus 17, then say 43.',
         [
-            'if ( typeof( stuff ) == "undefined" ) var stuff;',
-            'if ( typeof( thing ) == "undefined" ) var thing;',
+            'if ( typeof( stuff ) == "undefined" ) var stuff = "";',
+            'if ( typeof( thing ) == "undefined" ) var thing = "";',
             'if ( thing >= stuff + 17 ) {',
             'console.log( 43 );',
             '}',
@@ -41,8 +41,8 @@ is(
         'greater than',
         'If the thing value is greater than the stuff value, then say 43.',
         [
-            'if ( typeof( stuff ) == "undefined" ) var stuff;',
-            'if ( typeof( thing ) == "undefined" ) var thing;',
+            'if ( typeof( stuff ) == "undefined" ) var stuff = "";',
+            'if ( typeof( thing ) == "undefined" ) var thing = "";',
             'if ( thing > stuff ) {',
             'console.log( 43 );',
             '}',
@@ -52,7 +52,7 @@ is(
         'less than or equal to',
         'If the thing value is less than or equal to 42, then say 42.',
         [
-            'if ( typeof( thing ) == "undefined" ) var thing;',
+            'if ( typeof( thing ) == "undefined" ) var thing = "";',
             'if ( thing <= 42 ) {',
             'console.log( 42 );',
             '}',
@@ -62,7 +62,7 @@ is(
         'less than',
         'If the thing value is less than 42, then say 42.',
         [
-            'if ( typeof( thing ) == "undefined" ) var thing;',
+            'if ( typeof( thing ) == "undefined" ) var thing = "";',
             'if ( thing < 42 ) {',
             'console.log( 42 );',
             '}',
@@ -86,7 +86,7 @@ is(
         'begins with',
         'If phrase begins with "start", then say 42.',
         [
-            'if ( typeof( phrase ) == "undefined" ) var phrase;',
+            'if ( typeof( phrase ) == "undefined" ) var phrase = "";',
             'if ( phrase.indexOf( "start" ) == 0 ) {',
             'console.log( 42 );',
             '}',
@@ -96,7 +96,7 @@ is(
         'does not begin with',
         'If phrase does not begin with "start", then say 42.',
         [
-            'if ( typeof( phrase ) == "undefined" ) var phrase;',
+            'if ( typeof( phrase ) == "undefined" ) var phrase = "";',
             'if ( phrase.indexOf( "start" ) != 0 ) {',
             'console.log( 42 );',
             '}',

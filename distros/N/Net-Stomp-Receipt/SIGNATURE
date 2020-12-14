@@ -1,5 +1,5 @@
 This file contains message digests of all files listed in MANIFEST,
-signed via the Module::Signature module, version 0.55.
+signed via the Module::Signature module, version 0.87.
 
 To verify the content in this distribution, first make sure you have
 Module::Signature installed, then type:
@@ -12,19 +12,20 @@ the distribution may already have been compromised, and you should
 not run its Makefile.PL or Build.PL.
 
 -----BEGIN PGP SIGNED MESSAGE-----
-Hash: SHA1
+Hash: RIPEMD160
 
-SHA1 2edec6418410e621f6784b73d5b149f36b2dd10f Changes
-SHA1 44601163a18ebce5390dc9e715e92768fb3e7221 MANIFEST
-SHA1 c44b318214e99b4bccf83a6add1773c4f1a41444 Makefile.PL
-SHA1 a2dbabc00f6a9f0a9b1d2f729c51868f8b138147 README
-SHA1 7520155eab09d28257e409c97bc5ba6e1bedba8e lib/Net/Stomp/Receipt.pm
-SHA1 9852102e5562c14f4faac3edfc3bbbfe613c3a05 t/01-preload.t
-SHA1 34cd5aa9e623915f405448074cfd9a5cd5bc3452 t/02-load.t
+SHA256 9f6c25cc771d924f72b25b32d3b4b802bd92dd00f832db835f16bf02a1d35421 Changes
+SHA256 dac8535e657ec7725e5add5d4346d696ea3d8367376b4147baf9e27d10c0bc1c MANIFEST
+SHA256 921ad6d38666fdf1aa95317e57ee70445519444d01f09611487a241066f01176 META.json
+SHA256 a9909fcd855ac64a5e9844d58968067d1a6e3210dfff240901f996693235ed51 META.yml
+SHA256 7cc4a477a9185180696530406ec3045d35e85c1c85cd6769b8bf83d9b07bc3fd Makefile.PL
+SHA256 bb724dc78d3b51e21bc0c15fd9527a97e155dc1b3d6047ea50cd03c06c29ad34 README
+SHA256 820fe9179cf2ba85c1c8f365ba3b9112f267d5aba53c8a93e6e702838d7c7428 lib/Net/Stomp/Receipt.pm
+SHA256 b33e08ed9718272daa111496cb18065069dd79e34055040ad84a4ecbb7136dc4 t/01-preload.t
+SHA256 1052926d6ed759f81331a2900a61c3f9d9a84381c2e8353d706a6e95a6b1f1f6 t/02-load.t
 -----BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.9 (GNU/Linux)
 
-iEYEARECAAYFAko5cakACgkQOIt2cqbljM0I1gCgks0MnaoEi5HLGgpcW9yXpaU8
-uVUAniza4yyt0zqwtigu0NSZus3ikM+f
-=T9O6
+iF0EAREDAB0WIQQGIpAXkA908yCaLyQ4i3ZypuWMzQUCX9ZzagAKCRA4i3ZypuWM
+zdn0AKCxuCzr+JDlChmmmvZNPLEuuXF7ggCfXkypwi/CXgHKE3lHHnD2Jjsnboo=
+=cs9s
 -----END PGP SIGNATURE-----

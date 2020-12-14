@@ -1,5 +1,10 @@
 Revision history for MsOffice-Word-Surgeon
 
+1.05     13.12.2020
+  - new behaviour for the replace() method : by default it automatically cleans up the XML and automatically
+    overwrites $surgeon->contents
+  - additional noise reduction : remove the _goBack bookmark added automatically by MsWord
+
 1.04     10.11.2020
   - the synopsis was incorrect in its example of the replace() method
 

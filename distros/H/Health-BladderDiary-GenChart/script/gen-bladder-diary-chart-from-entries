@@ -1,0 +1,219 @@
+#!perl
+
+# Note: This script is a CLI for Riap function /Health/BladderDiary/GenChart/gen_bladder_diary_chart_from_entries
+# and generated automatically using Perinci::CmdLine::Gen version 0.497
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-12-11'; # DATE
+our $DIST = 'Health-BladderDiary-GenChart'; # DIST
+our $VERSION = '0.001'; # VERSION
+
+use 5.010001;
+use strict;
+use warnings;
+use Log::ger;
+
+use Perinci::CmdLine::Any;
+
+my $cmdline = Perinci::CmdLine::Any->new(
+    url => "/Health/BladderDiary/GenChart/gen_bladder_diary_chart_from_entries",
+    program_name => "gen-bladder-diary-chart-from-entries",
+    log => 1,
+    read_config => 0,
+    read_env => 0,
+);
+
+$cmdline->run;
+
+# ABSTRACT: Create bladder chart from bladder diary entries
+# PODNAME: gen-bladder-diary-chart-from-entries
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+gen-bladder-diary-chart-from-entries - Create bladder chart from bladder diary entries
+
+=head1 VERSION
+
+This document describes version 0.001 of gen-bladder-diary-chart-from-entries (from Perl distribution Health-BladderDiary-GenChart), released on 2020-12-11.
+
+=head1 SYNOPSIS
+
+Usage:
+
+ % gen-bladder-diary-chart-from-entries [-d=s] [--date=s] [--debug]
+     [--format=name] [--json] [--log-level=level] [--(no)naked-res]
+     [--page-result[=program]] [--quiet] [--trace] [--verbose]
+     [--view-result[=program]] [-y=s] [--yesterday-last-urination-entry=s]
+     <entries>
+
+=head1 OPTIONS
+
+C<*> marks required options.
+
+=head2 Main options
+
+=over
+
+=item B<--date>=I<s>*, B<-d>
+
+=item B<--entries>=I<s>*
+
+=item B<--yesterday-last-urination-entry>=I<s>, B<-y>
+
+=back
+
+=head2 Logging options
+
+=over
+
+=item B<--debug>
+
+Shortcut for --log-level=debug.
+
+=item B<--log-level>=I<s>
+
+Set log level.
+
+=item B<--quiet>
+
+Shortcut for --log-level=error.
+
+=item B<--trace>
+
+Shortcut for --log-level=trace.
+
+=item B<--verbose>
+
+Shortcut for --log-level=info.
+
+=back
+
+=head2 Output options
+
+=over
+
+=item B<--format>=I<s>
+
+Choose output format, e.g. json, text.
+
+Default value:
+
+ undef
+
+=item B<--json>
+
+Set output format to json.
+
+=item B<--naked-res>
+
+When outputing as JSON, strip result envelope.
+
+Default value:
+
+ 0
+
+By default, when outputing as JSON, the full enveloped result is returned, e.g.:
+
+    [200,"OK",[1,2,3],{"func.extra"=>4}]
+
+The reason is so you can get the status (1st element), status message (2nd
+element) as well as result metadata/extra result (4th element) instead of just
+the result (3rd element). However, sometimes you want just the result, e.g. when
+you want to pipe the result for more post-processing. In this case you can use
+`--naked-res` so you just get:
+
+    [1,2,3]
+
+
+=item B<--page-result>
+
+Filter output through a pager.
+
+=item B<--view-result>
+
+View output using a viewer.
+
+=back
+
+=head2 Other options
+
+=over
+
+=item B<--help>, B<-h>, B<-?>
+
+Display help message and exit.
+
+=item B<--version>, B<-v>
+
+Display program's version and exit.
+
+=back
+
+=head1 COMPLETION
+
+This script has shell tab completion capability with support for several
+shells.
+
+=head2 bash
+
+To activate bash completion for this script, put:
+
+ complete -C gen-bladder-diary-chart-from-entries gen-bladder-diary-chart-from-entries
+
+in your bash startup (e.g. F<~/.bashrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is recommended, however, that you install modules using L<cpanm-shcompgen>
+which can activate shell completion for scripts immediately.
+
+=head2 tcsh
+
+To activate tcsh completion for this script, put:
+
+ complete gen-bladder-diary-chart-from-entries 'p/*/`gen-bladder-diary-chart-from-entries`/'
+
+in your tcsh startup (e.g. F<~/.tcshrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is also recommended to install L<shcompgen> (see above).
+
+=head2 other shells
+
+For fish and zsh, install L<shcompgen> as described above.
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/Health-BladderDiary-GenChart>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-Health-BladderDiary-GenChart>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-Health-BladderDiary-GenChart/issues>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2020 by perlancar@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

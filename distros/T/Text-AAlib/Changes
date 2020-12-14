@@ -1,5 +1,8 @@
 Revision history for Perl extension Text::AAlib
 
+0.07 2020-12-13T13:48:20Z
+        - Regenerate build files for newer Perls
+
 0.06 2013-07-05T01:34:31Z
         - Fix configure dependency
 

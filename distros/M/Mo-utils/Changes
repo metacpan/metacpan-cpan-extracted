@@ -1,0 +1,11 @@
+0.03 2020-12-11T14:10:51+01:00
+ - Add support for '+10' syntax of number to check_number().
+ - Add support for floating numbers to check_number().
+
+0.02 2020-12-11T12:32:57+01:00
+ - Fix SYNOPSIS section in doc.
+ - Fix usage of check_number() in case that not exist key.
+ - check_array_object() rewrite to readable version.
+
+0.01 2020-12-11T10:20:27+01:00
+ - First version.

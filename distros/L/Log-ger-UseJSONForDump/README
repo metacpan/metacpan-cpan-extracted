@@ -1,0 +1,69 @@
+NAME
+    Log::ger::UseJSONForDump - Use JSON::MaybeXS to dump data structures (as
+    JSON)
+
+VERSION
+    This document describes version 0.003 of Log::ger::UseJSONForDump (from
+    Perl distribution Log-ger-UseJSONForDump), released on 2020-06-06.
+
+SYNOPSIS
+     use Log::ger::UseJSONForDump;
+
+    To configure:
+
+     use Log::ger::UseJSONForDump (clean=>0, pretty=>0);
+
+DESCRIPTION
+CONFIGURATION
+  pretty
+  clean
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Log-ger-UseJSONForDump>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Log-ger-UseJSONForDump>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Log-ger-UseJSONForDum
+    p>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    Log::ger
+
+    JSON::MaybeXS
+
+    Other modules to set data dumper for Log::ger:
+
+    *   Log::ger::UseDataBahe
+
+    *   Log::ger::UseDataDump
+
+    *   Log::ger::UseDataDumpColor
+
+    *   Log::ger::UseDataDumpObjectAsString
+
+    *   Log::ger::UseDataDumpOptions
+
+    *   Log::ger::UseDataDumper
+
+    *   Log::ger::UseDataDumperCompact
+
+    *   Log::ger::UseDataPrinter
+
+    *   Log::ger::UseYAMLForDump
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2020, 2018 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

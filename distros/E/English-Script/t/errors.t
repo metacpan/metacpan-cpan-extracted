@@ -13,7 +13,7 @@ throws_ok(
     'bad sentence throws exception',
 );
 
-is( scalar( @{ $es->data->{errors} } ), 14, 'total errors returned is correct' );
+is( scalar( @{ $es->data->{errors} } ), 15, 'total errors returned is correct' );
 
 is(
     $es->data->{errors}[-1]{message},

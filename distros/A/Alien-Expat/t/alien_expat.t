@@ -42,7 +42,7 @@ expat_version();
 EOM
 
   xs_ok $xs, with_subtest {
-    like $xs_version = expat_version(), qr/^([0-9]+\.){2}[0-9]$/;
+    like $xs_version = expat_version(), qr/^([0-9]+\.){2}[0-9]+$/;
     note "v = $xs_version";
   };
 
@@ -68,7 +68,7 @@ subtest ffi => sub {
     my $f = $ffi->function('XML_ExpatVersionInfo' => [] => 'XML_Expat_Version');
     my $v = $f->call;
     my $ffi_version = sprintf "%d.%d.%d", $v->major, $v->minor, $v->micro;
-    like $ffi_version, qr/^([0-9]+\.){2}[0-9]$/;
+    like $ffi_version, qr/^([0-9]+\.){2}[0-9]+$/;
     note "v = $ffi_version";
     if(defined $xs_version)
     {

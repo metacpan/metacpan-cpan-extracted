@@ -1,3 +1,5 @@
+0.2.20	2020-12-12
+	- Before backup storage fix instead of storage check (for more simplicity).
 0.2.19	2020-12-02
 	- Fix: periodically db saving cancels part of backuped files.
 	- Fix: dirs in path to backuped files doesn't counts in backup counters.

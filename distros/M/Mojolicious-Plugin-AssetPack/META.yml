@@ -1,7 +1,7 @@
 ---
 abstract: 'Compress and convert css, less, sass, javascript and coffeescript files'
 author:
-  - 'Jan Henning Thorsen <jhthorsen@cpan.org>'
+  - 'Zoffix Znet <cpan@zoffix.com>'
 build_requires:
   Test::More: '0.88'
 configure_requires:
@@ -25,7 +25,7 @@ resources:
   bugtracker: https://github.com/jhthorsen/mojolicious-plugin-assetpack/issues
   homepage: https://github.com/jhthorsen/mojolicious-plugin-assetpack
   repository: https://github.com/jhthorsen/mojolicious-plugin-assetpack.git
-version: '2.09'
+version: '2.10'
 x_contributors:
   - 'Jan Henning Thorsen <jhthorsen@cpan.org>'
   - 'Alexander Rymasheusky'

@@ -16,6 +16,8 @@
 
 package App::Phoebe;
 use Modern::Perl;
+use Encode qw(encode_utf8);
+use JSON;
 
 our (@extensions, $log);
 
@@ -23,7 +25,8 @@ our (@extensions, $log);
 
 push(@extensions, \&galleries);
 
-my $parent = "/home/alex/alexschroeder.ch/gallery";
+our $galleries_dir = "/home/alex/alexschroeder.ch/gallery";
+our $galleries_host = "alexschroeder.ch";
 
 sub gallery_title {
   my $dir = shift;
@@ -34,7 +37,7 @@ sub gallery_title {
 sub galleries {
   my $stream = shift;
   my $url = shift;
-  my $host = "alexschroeder.ch";
+  my $host = $galleries_host;
   my $port = port($stream);
   if ($url =~ m!^gemini://$host(?::$port)?/do/gallery$!) {
     success($stream);
@@ -46,21 +49,21 @@ sub galleries {
 	my ($year_b, $title_b) = split(/-/, $b, 2);
 	return ($year_b <=> $year_a || $title_a cmp $title_b);
       } grep {
-	-d "$parent/$_"
-      } read_dir($parent)) {
+	-d "$galleries_dir/$_"
+      } read_dir($galleries_dir)) {
       gallery_print_link($stream, "alexschroeder.ch", gallery_title($dir), "do/gallery/$dir");
     };
     return 1;
   } elsif (my ($dir) = $url =~ m!^gemini://$host(?::$port)?/do/gallery/([^/?]*)$!) {
-    if (not -d "$parent/$dir") {
+    if (not -d "$galleries_dir/$dir") {
       $stream->write("40 This is not actuall a gallery\r\n");
       return 1;
     }
-    if (not -r "$parent/$dir/data.json") {
+    if (not -r "$galleries_dir/$dir/data.json") {
       $stream->write("40 This gallery does not contain a data.json file like the one created by sitelen-mute or fgallery\r\n");
       return 1;
     }
-    my $bytes = read_binary("$parent/$dir/data.json");
+    my $bytes = read_binary("$galleries_dir/$dir/data.json");
     if (not $bytes) {
       $stream->write("40 Cannot read the data.json file in this gallery\r\n");
       return 1;
@@ -74,32 +77,32 @@ sub galleries {
     }
     success($stream);
     $log->info("Serving gallery $dir");
-    if (-r "$parent/$dir/index.html") {
-      my $dom = Mojo::DOM->new(read_text("$parent/$dir/index.html"));
+    if (-r "$galleries_dir/$dir/index.html") {
+      my $dom = Mojo::DOM->new(read_text("$galleries_dir/$dir/index.html"));
       $log->info("Parsed index.html");
       my $title = $dom->at('*[itemprop="name"]');
       $title = $title ? $title->text : gallery_title($dir);
-      $stream->write("# $title\n");
+      $stream->write(encode_utf8 "# $title\n");
       my $description = $dom->at('*[itemprop="description"]');
-      $stream->write($description->text . "\n") if $description;
+      $stream->write(encode_utf8 $description->text . "\n") if $description;
       $stream->write("## Images\n");
     } else {
-      $stream->write("# " . gallery_title($dir) . "\n");
+      $stream->write(encode_utf8 "# " . gallery_title($dir) . "\n");
     }
     for my $image (@{$data->{data}}) {
       $stream->write("\n");
-      $stream->write(join("\n", grep /\S/, @{$image->{caption}}) . "\n") if $image->{caption};
+      $stream->write(encode_utf8 join("\n", grep /\S/, @{$image->{caption}}) . "\n") if $image->{caption};
       gallery_print_link($stream, "alexschroeder.ch", "Thumbnail", "do/gallery/$dir/" . $image->{thumb}->[0]);
       gallery_print_link($stream, "alexschroeder.ch", "Image", "do/gallery/$dir/" . $image->{img}->[0]);
     }
     return 1;
   } elsif (my ($file, $extension) = $url =~ m!^gemini://$host(?::$port)?/do/gallery/([^/?]*/(?:thumbs|imgs)/[^/?]*\.(jpe?g|png))$!i) {
-    if (not -r "$parent/$file") {
-      $stream->write("40 Cannot read $file\r\n");
+    if (not -r "$galleries_dir/$file") {
+      $stream->write(encode_utf8 "40 Cannot read $file\r\n");
     } else {
       success($stream, $extension =~ /^png$/i ? "image/png" : "image/jpg");
       $log->info("Serving image $file");
-      print(read_binary("$parent/$file"));
+      $stream->write(read_binary("$galleries_dir/$file"));
     }
     return 1;
   }

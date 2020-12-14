@@ -18,7 +18,7 @@ is(
         'append "+" to a variable',
         'Append "+" to the answer text.',
         [
-            'if ( typeof( answer ) == "undefined" ) var answer;',
+            'if ( typeof( answer ) == "undefined" ) var answer = "";',
             'answer += "+";',
         ],
     ],

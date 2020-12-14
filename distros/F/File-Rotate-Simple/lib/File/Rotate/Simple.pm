@@ -1,5 +1,7 @@
 package File::Rotate::Simple;
 
+use v5.8.8;
+
 use Moo 1.001000;
 extends 'Exporter';
 
@@ -13,7 +15,7 @@ use Types::Standard -types;
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.2.4';
+our $VERSION = 'v0.2.5';
 
 # ABSTRACT: no-frills file rotation
 
@@ -41,7 +43,7 @@ has max => (
 has file => (
     is       => 'ro',
     isa      => InstanceOf['Path::Tiny'],
-    coerce   => sub { path(shift) },
+    coerce   => \&path,
     required => 1,
 );
 
@@ -273,7 +275,7 @@ File::Rotate::Simple - no-frills file rotation
 
 =head1 VERSION
 
-version v0.2.4
+version v0.2.5
 
 =head1 SYNOPSIS
 
@@ -525,7 +527,7 @@ Mohammad S Anwar <mohammad.anwar@yahoo.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018 by Robert Rothenberg.
+This software is Copyright (c) 2015-2020 by Robert Rothenberg.
 
 This is free software, licensed under:
 

@@ -15,12 +15,12 @@ test_requires	'Test::More'				=> 0.88;
 test_requires	'Test::Roo'					=> 0;
 test_requires	'HTTP::Message::PSGI'		=> 0;
 test_requires	'Test::LWP::UserAgent'		=> 0;
+test_requires	'DBD::SQLite'				=> 0;
 
 perl_version	'5.014';
 
 requires		'Attean'					=> 0.013;
 requires		'List::MoreUtils'			=> 0;
-requires		'Math::Cartesian::Product'	=> 1.008;
 requires		'Moo'						=> 1.006000;
 requires		'MooX::Log::Any'			=> 0;
 requires		'namespace::clean'			=> 0;

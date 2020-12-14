@@ -14,7 +14,7 @@
 {
     package Map::Metro::Plugin::Map::Berlin;
 
-    our $VERSION = '2020.1204';
+    our $VERSION = '2020.1213';
 
     use Moose;
     use File::ShareDir 'dist_dir';

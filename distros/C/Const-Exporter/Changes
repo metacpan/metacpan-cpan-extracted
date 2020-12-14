@@ -1,5 +1,8 @@
 Revision history for Const-Exporter
 
+v1.0.0    2020-12-11 13:56:43+00:00 Europe/London
+  - No changes: version bumped because module is considered mature.
+
 v0.4.2    2020-09-10 12:52:53+01:00 Europe/London
   [Documentation]
   - Added INSTALL file to the distribution.

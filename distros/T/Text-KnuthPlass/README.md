@@ -31,10 +31,10 @@ can also handle varying-length lines, if your column is not a perfect rectangle.
 
 ## Installation
 
-    perl Makefile.PL
-    gmake
-    gmake test
-    gmake install
+    perl Build.PL
+    ./Build
+    ./Build test
+    ./Build install
 
 ## Documentation
 

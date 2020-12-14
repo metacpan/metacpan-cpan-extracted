@@ -18,9 +18,9 @@ is(
         'for each item in items block',
         'For each prime in primes, apply the following block. Add prime to sum. This ends the block.',
         [
-            'if ( typeof( prime ) == "undefined" ) var prime;',
-            'if ( typeof( primes ) == "undefined" ) var primes;',
-            'if ( typeof( sum ) == "undefined" ) var sum;',
+            'if ( typeof( prime ) == "undefined" ) var prime = "";',
+            'if ( typeof( primes ) == "undefined" ) var primes = "";',
+            'if ( typeof( sum ) == "undefined" ) var sum = "";',
             'for ( prime of primes ) {',
             'sum += prime;',
             '}',

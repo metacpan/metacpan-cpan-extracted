@@ -1,4 +1,4 @@
-package Dist::Zilla::Plugin::Author::Plicease::Init2 2.58 {
+package Dist::Zilla::Plugin::Author::Plicease::Init2 2.59 {
 
   use 5.014;
   use Moose;
@@ -385,7 +385,7 @@ Dist::Zilla::Plugin::Author::Plicease::Init2 - Dist::Zilla initialization tasks 
 
 =head1 VERSION
 
-version 2.58
+version 2.59
 
 =head1 DESCRIPTION
 
@@ -740,7 +740,10 @@ jobs:
       - name: Set up Perl
         run: |
           choco install strawberryperl
-          echo "##[add-path]C:\cx\bin;C:\strawberry\c\bin;C:\strawberry\perl\site\bin;C:\strawberry\perl\bin"
+          echo "C:\cx\bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+          echo "C:\strawberry\c\bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+          echo "C:\strawberry\perl\site\bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+          echo "C:\strawberry\perl\bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
       - name: perl -V
         run: perl -V
       - name: Install Static Dependencies
@@ -783,7 +786,7 @@ jobs:
         run: |
           brew install perl
           curl https://cpanmin.us | perl - App::cpanminus -n
-          echo "##[add-path]/Users/runner/perl5/bin"
+          echo "/Users/runner/perl5/bin" >> $GITHUB_PATH
 
       - name: perl -V
         run: perl -V

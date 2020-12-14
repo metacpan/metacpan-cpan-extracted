@@ -3,20 +3,18 @@ abstract: 'Perl Binding for AAlib'
 author:
   - 'Syohei YOSHIDA <syohex@gmail.com>'
 build_requires:
-  Test::More: 0.88
+  Test::More: '0.88'
 configure_requires:
-  CPAN::Meta: 0
-  CPAN::Meta::Prereqs: 0
-  Devel::CheckLib: 0
-  File::Which: 0
-  Module::Build: 0.38
-  Module::Build::XSUtil: 0.02
+  Devel::CheckLib: '0'
+  File::Which: '0'
+  Module::Build: '0.4005'
+  Module::Build::XSUtil: '0.02'
 dynamic_config: 0
-generated_by: 'Minilla/v0.5.5, CPAN::Meta::Converter version 2.131560'
+generated_by: 'Minilla/v3.1.11, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: Text-AAlib
 no_index:
   directory:
@@ -32,13 +30,15 @@ no_index:
 provides:
   Text::AAlib:
     file: lib/Text/AAlib.pm
-    version: 0.06
+    version: '0.07'
 requires:
-  Term::ANSIColor: 0
-  XSLoader: 0.02
-  perl: 5.008001
+  Term::ANSIColor: '0'
+  XSLoader: '0.02'
+  perl: '5.008001'
 resources:
   bugtracker: https://github.com/syohex/p5-Text-AAlib/issues
   homepage: https://github.com/syohex/p5-Text-AAlib
   repository: git://github.com/syohex/p5-Text-AAlib.git
-version: 0.06
+version: '0.07'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 0

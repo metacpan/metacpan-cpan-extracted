@@ -10,80 +10,104 @@ require Exporter;
 use Carp;
 our @ISA = qw(Exporter);
 our @EXPORT_OK = qw/
+	access_version_number
+	color_type_name
+	copy_row_pointers
 	create_read_struct
 	create_write_struct
 	destroy_read_struct
 	destroy_write_struct
-	write_png
-	init_io
-	read_info
-	read_update_info
-	read_image
-	read_png
-	get_text
-	set_text
-	sig_cmp
-	scalar_as_input
-	read_from_scalar
-	color_type_name
-	text_compression_name
-	get_libpng_ver
-	access_version_number
-	get_row_pointers
-	get_rows
-	get_rowbytes
-	get_valid
-	set_tRNS_pointer
-	set_rows
-	write_to_scalar
-	set_filter
-	set_verbosity
-	set_unknown_chunks
-	get_unknown_chunks
-	libpng_supports
-	set_keep_unknown_chunks
-	get_tRNS_palette
-	set_PLTE_pointer
-	set_expand
-	set_gray_to_rgb
-	set_filler
-	get_sRGB
-	set_sRGB
-	set_packing
-	set_strip_16
-	get_internals
-	set_transforms
-	copy_row_pointers
-	get_bKGD
-	set_bKGD
-	get_cHRM
-	set_cHRM
-	get_gAMA
-	set_gAMA
-	get_hIST
-	set_hIST
-	get_iCCP
-	set_iCCP
 	get_IHDR
-	set_IHDR
-	get_oFFs
-	set_oFFs
-	get_pCAL
-	set_pCAL
-	get_pHYs
-	set_pHYs
 	get_PLTE
-	set_PLTE
+	get_bKGD
+	get_bit_depth
+	get_cHRM
+	get_channels
+	get_color_type
+	get_compression_buffer_size
+	get_eXIf
+	get_gAMA
+	get_hIST
+	get_iCCP
+	get_interlace_type
+	get_internals
+	get_libpng_ver
+	get_oFFs
+	get_pCAL
+	get_pHYs
+	get_row_pointers
+	get_rowbytes
+	get_rows
 	get_sBIT
-	set_sBIT
 	get_sCAL
-	set_sCAL
 	get_sPLT
-	set_sPLT
+	get_sRGB
 	get_tIME
-	set_tIME
 	get_tRNS
+	get_tRNS_palette
+	get_text
+	get_unknown_chunks
+	get_valid
+	init_io
+	libpng_supports
+	read_from_scalar
+	read_image
+	read_info
+	read_png
+	read_struct
+	read_update_info
+	scalar_as_input
+	set_IHDR
+	set_PLTE
+	set_bKGD
+	set_cHRM
+	set_compression_buffer_size
+	set_compression_level
+	set_compression_mem_level
+	set_compression_method
+	set_compression_strategy
+	set_compression_window_bits
+	set_crc_action
+	set_eXIf
+	set_expand
+	set_filler
+	set_filter
+	set_gAMA
+	set_gray_to_rgb
+	set_hIST
+	set_iCCP
+	set_image_data
+	set_keep_unknown_chunks
+	set_oFFs
+	set_pCAL
+	set_pHYs
+	set_packing
+	set_rgb_to_gray
+	set_rgb_to_gray_fixed
+	set_row_pointers
+	set_rows
+	set_sBIT
+	set_sCAL
+	set_sPLT
+	set_sRGB
+	set_strip_16
+	set_tIME
 	set_tRNS
+	set_tRNS_pointer
+	set_text
+	set_text_compression_level
+	set_text_compression_mem_level
+	set_text_compression_strategy
+	set_text_compression_window_bits
+	set_transforms
+	set_unknown_chunks
+	set_user_limits
+	set_verbosity
+	sig_cmp
+	split_alpha
+	text_compression_name
+	write_png
+	write_to_scalar
 	color_type_name
 	copy_png
 	get_internals
@@ -99,7 +123,7 @@ our %EXPORT_TAGS = (
 );
 
 require XSLoader;
-our $VERSION = '0.49';
+our $VERSION = '0.52';
 
 XSLoader::load('Image::PNG::Libpng', $VERSION);
 
@@ -140,6 +164,22 @@ sub read_png_file
 sub write_png_file
 {
     my ($png, $file_name) = @_;
+    if ($png->read_struct ()) {
+
+	# The following is more convenient but might not work in some
+	# cases, depending on how libpng handles different
+	# transformations and so on, so I don't really want to risk
+	# it.
+
+	# my $copy = $png->copy_png ();
+	# write_png_file ($copy, $file_name);
+	# return;
+
+	croak "The png is a read structure, use copy_png to copy it to a write structure";
+    }
+    if (! $file_name) {
+	croak "Supply a file name";
+    }
     open my $in, ">:raw", $file_name
         or croak "Cannot open '$file_name' for writing: $!";
     $png->init_io ($in);
@@ -152,6 +192,8 @@ my %known_chunks = (
 bKGD => 1,
 
 cHRM => 1,
+
+
 
 gAMA => 1,
 

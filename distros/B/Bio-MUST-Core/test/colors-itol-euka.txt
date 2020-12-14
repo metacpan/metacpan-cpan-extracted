@@ -1,0 +1,16 @@
+Amoebozoa	#fbb9b4
+Glaucocystophyceae	#fff7bc
+Rhodophyta	#e34a33
+Viridiplantae	#31a354
+Apicomplexa	#dace7f
+Ciliophora	#dace7f
+Colpodellida	#bcd67f
+Cryptophyceae	#3182bd
+Haptophyta	#3182bd
+Dinophyceae	#feb24c
+Euglenozoa	#addd8e
+Opisthokonta	#afcdff
+Rhizaria	#a1d99b
+Chlorarachniophyceae	#a1d99b
+Stramenopiles	#fc9272
+Perkinsozoa	#c0c0c0

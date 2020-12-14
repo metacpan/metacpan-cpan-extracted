@@ -1,5 +1,15 @@
 Changes for Log::Any::Adapter::Journal
 
+1.0 - Fri Dec 11 10:48:27 EST 2020
+    Fixes unexpected behavior of trace messages
+    Systemd's journald doesn't support the trace level (8). Prior to version
+    1.0, Log::Any::Adapter::Journal treated all trace messages as if they
+    were debug messages. This meant that traces messages were printed when
+    min_level=='debug'. With the 1.0 release, trace message are only printed
+    when min_level=='trace'. They continue to be sent to journald as debug
+    (7) level messages.
+    [Upgrade recommended if using trace messages.]
+
 0.13 - Tue May  3 10:51:38 EDT 2016
     Minor fixes to the description in the documentation
     - Thanks to @jonassmedegaard for the bug report [GH#1]

@@ -1,3 +1,8 @@
+0.007   2020-12-12  Released-By: PERLANCAR; Urgency: medium
+
+	- Add script: split-video-by-duration.
+
+
 0.006   2020-09-23  Released-By: PERLANCAR; Urgency: high
 
         - Merge releases 0.005 and 0.004.1.

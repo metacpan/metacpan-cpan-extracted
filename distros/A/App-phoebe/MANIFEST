@@ -1,12 +1,18 @@
 Changes
 contrib/block-fediverse.pl
+contrib/chat.pl
+contrib/comments.pl
 contrib/debug-ip-numbers.pl
+contrib/default-css.pl
 contrib/favicon.pl
 contrib/galleries.pl
 contrib/moku-pona.pl
 contrib/oddmuse.pl
+contrib/page-headings.pl
 contrib/README.md
+contrib/registered-editors-only.pl
 contrib/toki-pona.pl
+contrib/web-comments.pl
 contrib/web-edit.pl
 contrib/wikipedia.pl
 CONTRIBUTING.md
@@ -16,6 +22,7 @@ Makefile.PL
 MANIFEST			This list of files
 README.md
 script/gemini
+script/gemini-chat
 script/phoebe
 script/phoebe-ctl
 script/titan

@@ -11,7 +11,7 @@ use Types::Standard -types;
 use Type::Params qw( multisig compile compile_named Invocant );
 use namespace::autoclean;
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 our @EXPORT  = qw( wrap_sub );
 
 readonly params  => my %params;
@@ -184,6 +184,10 @@ it under the same terms as Perl itself.
 =head1 AUTHOR
 
 mp0liiu E<lt>mpoliiu@cpan.orgE<gt>
+
+=head1 SEE ALSE
+
+L<Type::Params> exports the function wrap_sub. It check only parameters type.
 
 =cut
 

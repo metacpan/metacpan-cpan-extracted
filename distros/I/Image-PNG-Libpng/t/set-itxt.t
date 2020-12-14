@@ -16,14 +16,13 @@ use FindBin '$Bin';
 use Image::PNG::Const ':all';
 use Image::PNG::Libpng ':all';
 
-plan skip_all => "iTXt is not supported by your libpng" unless libpng_supports ('iTXt');
+BEGIN: {
+    use lib "$Bin";
+    use IPNGLT;
+};
 
-my $libpngver = Image::PNG::Libpng::get_libpng_ver ();
-
-if ($libpngver =~ /^1\.[0-5]/ ||
-    $libpngver =~ /^1\.6\.[0-3]([^0-9]|$)/) {
-    plan skip_all => "Skip - iTXt trips bugs in libpng version $libpngver";
-}
+skip_itxt ();
+skip_old ();
 
 my $file = "$Bin/set-text.png";
 my $text = [
@@ -32,38 +31,30 @@ my $text = [
 	{key => 'bobo', lang => 'bonkers', lang_key => 'ぼぼ', text => 'びび',
 	 compression => PNG_ITXT_COMPRESSION_zTXt},
     ];
-round_trip ($file, $text);
+itxt_round_trip ($file, $text);
 
 my $longfile = "$Bin/long-set-text.png";
+
+# The "lang" field should be only eight bytes long, so the following
+# is actually in error according to the PNG specification, but libpng
+# doesn't seem to restrict the length of the language string that it
+# allows, or writes, or reads.
+
 my $longtext = [
     {lang => 'verylonglanguageindeed', key => 'bonkers', lang_key => 'binkers',
      text => 'plonkers', compression => PNG_ITXT_COMPRESSION_NONE},
 ];
-round_trip ($longfile, $longtext);
+itxt_round_trip ($longfile, $longtext);
 
 done_testing ();
 exit;
 
-sub rmfile
-{
-    my ($file) = @_;
-    if (-f $file) {
-	unlink $file or warn "Can't unlink $file: $!";
-    }
-}
-
-sub round_trip
+sub itxt_round_trip
 {
     my ($longfile, $longtext) = @_;
-    rmfile ($longfile);
-    my $longpng = create_write_struct ();
-    $longpng->set_IHDR ({width => 1, height => 1, bit_depth => 8,
-			 color_type => PNG_COLOR_TYPE_GRAY});
-    $longpng->set_rows (['X']);
+    my $longpng = fake_wpng ();
     $longpng->set_text ($longtext);
-    $longpng->write_png_file ($longfile);
-    my $longcheck = read_png_file ($longfile);
-    rmfile ($longfile);
+    my $longcheck = round_trip ($longpng, $longfile);
     my $longcheck_text = $longcheck->get_text ();
     for my $i (0..$#$longtext) {
 	my $x = $longtext->[$i];

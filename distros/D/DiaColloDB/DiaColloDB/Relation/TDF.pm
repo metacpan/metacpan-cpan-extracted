@@ -863,6 +863,7 @@ sub union {
 	$tavals[$tai]->sever;
       }
     }
+    #$vs->vlog('trace', "union(): $dbvs->{base}: appending to $tdm0file"); ##-- DEBUG
     wcols(@tavals,$dbdix,$dbvals, $tdm0fh);
     $Doff += $dbvs->nDocs;
   }
@@ -1737,6 +1738,7 @@ sub qinfo {
   return {
 	  fcoef => 1,
 	  qtemplate => $qtemplate,
+	  qcanon => $vs->qcanon($coldb, qobj=>$q1),
 	 };
 }
 

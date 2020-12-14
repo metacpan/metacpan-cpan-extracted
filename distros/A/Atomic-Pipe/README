@@ -108,13 +108,53 @@ METHODS
       your job to make you do not have too many handles floating around
       preventing an EOF.
 
+    $r = Atomic::Pipe->read_fifo($FIFO_PATH)
+
+    $w = Atomic::Pipe->write_fifo($FIFO_PATH)
+
+      These 2 constructors let you connect to a FIFO by filesystem path.
+
+      The interface difference (read_fifo and write_fifo vs specifying a
+      mode) is because the modes to use for fifo's are not obvious ('+<'
+      for reading).
+
+      NOTE: THERE IS NO EOF for the read-end in the process that created
+      the fifo. You need to figure out when the last message is received on
+      your own somehow. If you use blocking reads in a loop with no loop
+      exit condition then the loop will never end even after all writers
+      are gone.
+
     $p = Atomic::Pipe->from_fh($fh)
+
+    $p = Atomic::Pipe->from_fh($mode, $fh)
 
       Create an instance around an existing filehandle (A clone of the
       handle will be made and kept internally).
 
-      This will fail if the handle is not a pipe. This constructor will
-      determine the mode (reader or writer) for you from the given handle.
+      This will fail if the handle is not a pipe.
+
+      If no mode is provided this constructor will determine the mode
+      (reader or writer) for you from the given handle. Note: This works on
+      linux, but not BSD or Solaris, on most platforms your must provide a
+      mode.
+
+      Valid modes:
+
+      '>&'
+
+	Write-only.
+
+      '>&='
+
+	Write-only and reuse fileno.
+
+      '<&'
+
+	Read-only.
+
+      '<&='
+
+	Read-only and reuse fileno.
 
     $p = Atomic::Pipe->from_fd($mode, $fd)
 
@@ -155,6 +195,11 @@ METHODS
       message is ready, this will return undef. This will also return undef
       when the pipe is closed (EOF).
 
+    $count = $self->parts_needed($data)
+
+      Get the number of parts the data will be split into for it to be
+      written in atomic chunks.
+
     $p->blocking($bool)
 
     $bool = $p->blocking
@@ -169,6 +214,29 @@ METHODS
 
       Close this end of the pipe (or both ends if this is not yet split
       into reader/writer pairs).
+
+    $undef_or_bytes = $p->fits_in_burst($data)
+
+      This will return undef if the data DES NOT fit in a burst. This will
+      return the size of the data in bytes if it will fit in a burst.
+
+    $undef_or_bytes = $p->write_burst($data)
+
+      Attempt to write $data in a single atomic burst. If the data is too
+      big to write atomically this method will not write any data and will
+      return undef. If the data does fit in an atomic write then the data
+      will be written and the total number of bytes written will be
+      returned.
+
+      Note: YOU MUST NOT USE read_message() when writing bursts. This
+      method sends the data as-is with no data-header or modification. This
+      method should be used when the other side is reading the pipe
+      directly without an Atomic::Pipe on the receiving end.
+
+      The primary use case of this is if you have multiple writers sending
+      short plain-text messages that will not exceed the atomic pipe buffer
+      limit (minimum of 512 bytes on systems that support atomic pipes
+      accoring to POSIX).
 
   RESIZING THE PIPE BUFFER
 

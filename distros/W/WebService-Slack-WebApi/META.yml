@@ -4,8 +4,8 @@ author:
   - 'Mihyaeru/mihyaeru21 <mihyaeru21@gmail.com>'
 build_requires:
   Devel::Cover::Report::Coveralls: '0'
+  Furl: '0'
   Test::Exception: '0'
-  Test::Mock::Furl: '0'
   Test::More: '0'
 configure_requires:
   Module::Build::Tiny: '0.035'
@@ -29,7 +29,7 @@ no_index:
 provides:
   WebService::Slack::WebApi:
     file: lib/WebService/Slack/WebApi.pm
-    version: '0.16'
+    version: '0.17'
   WebService::Slack::WebApi::Api:
     file: lib/WebService/Slack/WebApi/Api.pm
   WebService::Slack::WebApi::Auth:
@@ -55,6 +55,8 @@ provides:
   WebService::Slack::WebApi::Exception:
     file: lib/WebService/Slack/WebApi/Exception.pm
   WebService::Slack::WebApi::Exception::FailureResponse:
+    file: lib/WebService/Slack/WebApi/Exception.pm
+  WebService::Slack::WebApi::Exception::IllegalParameters:
     file: lib/WebService/Slack/WebApi/Exception.pm
   WebService::Slack::WebApi::Files:
     file: lib/WebService/Slack/WebApi/Files.pm
@@ -84,27 +86,29 @@ provides:
     file: lib/WebService/Slack/WebApi/Users.pm
   WebService::Slack::WebApi::Users::Profile:
     file: lib/WebService/Slack/WebApi/Users/Profile.pm
+recommends:
+  Furl: '0'
+  JSON::XS: '0'
 requires:
   Class::Accessor::Lite: '0'
   Class::Accessor::Lite::Lazy: '0'
   Class::Load: '0'
   Data::Validator: '0'
   Exception::Tiny: '0'
-  Furl: '0'
-  HTTP::Request::Common: '0'
+  HTTP::AnyUA: '0'
   IO::Socket::SSL: '0'
-  JSON::XS: '0'
+  JSON: '0'
   perl: '5.010'
 resources:
   bugtracker: https://github.com/mihyaeru21/p5-WebService-Slack-WebApi/issues
   homepage: https://github.com/mihyaeru21/p5-WebService-Slack-WebApi
   repository: git://github.com/mihyaeru21/p5-WebService-Slack-WebApi.git
-version: '0.16'
+version: '0.17'
 x_contributors:
   - 'Askar Timirgazin <anotheroneackap@gmail.com>'
   - 'Ivan Wills <Ivan.Wills2@optus.com.au>'
   - 'Matt Hallacy <mhallacy+github@haproxy.com>'
-  - 'Mikko Koivunalho <mikko.koivunalho@iki.fi>'
+  - 'Mikko Johannes Koivunalho <mikko.koivunalho@iki.fi>'
   - 'Sterling Hanenkamp <sterling@hanenkamp.com>'
   - 'Sterling Hanenkamp <sterling@ziprecruiter.com>'
   - 'Steven Arnott <steven.arnott@grantstreet.com>'

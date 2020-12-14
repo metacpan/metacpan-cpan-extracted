@@ -1,14 +1,15 @@
 package BenchmarkAnything::Storage::Backend::SQL;
-# git description: v0.027-2-gae57af0
+# git description: v0.028-6-g8b3d653
 
 our $AUTHORITY = 'cpan:TAPPER';
 # ABSTRACT: Autonomous SQL backend to store benchmarks
-$BenchmarkAnything::Storage::Backend::SQL::VERSION = '0.028';
+$BenchmarkAnything::Storage::Backend::SQL::VERSION = '0.029';
 use 5.008;
 use utf8;
 use strict;
 use warnings;
 use Try::Tiny;
+use Data::Dumper;
 
 my $hr_default_config = {
     select_cache        => 0,
@@ -376,7 +377,6 @@ sub add_single_benchmark {
 
         my $hr_bmk = $or_self->get_single_benchmark_point($VALUE_ID);
         my $ret = $or_es->index(index => $s_index,
-                                type  => $s_type,
                                 id    => $VALUE_ID,
                                 body  => $hr_bmk);
     }
@@ -447,25 +447,30 @@ sub process_queued_multi_benchmark {
 
             $ar_results_process = $or_self->{query}->select_raw_bench_bundle_for_processing2(@a_bench_bundle_ids);
             @a_serialized  = map { $_->[0] } @{$ar_results_process->fetchall_arrayref()};
+            require Sereal::Decoder;
+            my @a_data_points = map { @{Sereal::Decoder::decode_sereal($_) || []}; } @a_serialized;
+
+            # please note, this reorders data points for efficiency,
+            # read the comments there.
+            # (maybe this bulk insert is broken - use with care, double check)
+            # $or_self->add_multi_benchmark(\@a_data_points, $hr_options);
+
+            # preserve order by adding each data_point separately,
+            # otherwise add_multi_benchmark() would reorder to optimize insert
             eval {
-                require Sereal::Decoder;
-
-                my @a_data_points = map {
-                    @{Sereal::Decoder::decode_sereal($_) || []};
-                } @a_serialized;
-
-                # please note, this reorders data points for efficiency,
-                # read the comments there.
-                # (maybe this bulk insert is broken - use with care, double check)
-                # $or_self->add_multi_benchmark(\@a_data_points, $hr_options);
-
-                # preserve order by adding each data_point separately,
-                # otherwise add_multi_benchmark() would reorder to optimize insert
                 foreach my $hr_data_point (@a_data_points) {
-                    $or_self->add_multi_benchmark([$hr_data_point], $hr_options);
+                    eval {
+                        $or_self->add_multi_benchmark([$hr_data_point], $hr_options);
+                    };
+                    if ($@) {
+                        if ($@ =~ /failed to parse field.*VALUE/) {
+                            print STDERR "IGNORE - field parse failure on VALUE: ".Dumper($hr_data_point);
+                        } else {
+                            print STDERR "UNEXPECTED ERROR during add_multi_benchmark\n";
+                            die $@;
+                        }
+                    }
                 }
-            };
-            if (!$@) {
                 $or_self->{query}->update_raw_bench_bundle_set_processed3(@a_bench_bundle_ids);
             }
         }
@@ -829,7 +834,9 @@ sub search_array {
             my $field_mapping = {};
             my @sort_fields = map {keys %$_} @{$hr_es_query->{sort}||[]};
             if (@sort_fields) {
-                $field_mapping = $or_es->indices->get_mapping->{$s_index}{mappings}{$s_type}{properties};
+                $field_mapping =
+                  $or_es->indices->get_mapping->{$s_index}{mappings}{properties} ||        # > v5
+                  $or_es->indices->get_mapping->{$s_index}{mappings}{$s_type}{properties}; # = v5
             }
             foreach my $sort_field (@sort_fields)
             {
@@ -839,16 +846,21 @@ sub search_array {
                     $or_es->indices->put_mapping
                      (
                       index => $s_index,
-                      type => $s_type,
-                      body => { $s_type => { properties => { $sort_field => { type => 'text',
-                                                                              fielddata => BenchmarkAnything::Storage::Backend::SQL::Search::json_true(),
-                                                                            }}}}
+                      body => {
+                        properties => {
+                          $sort_field => {
+                            type => 'text',
+                            fielddata => BenchmarkAnything::Storage::Backend::SQL::Search::json_true(),
+                          },
+                        },
+                      },
                      );
                 }
             }
 
             # ===== search =====
-            my $hr_es_answer = $or_es->search(index => $s_index, type => $s_type, body => $hr_es_query);
+            my $hr_es_answer = $or_es->search(index => $s_index,
+                                              body => $hr_es_query);
 
             if (
                 !$hr_es_answer->{timed_out} and
@@ -1765,20 +1777,17 @@ You can pass through a config entry for an external search engine
             # touch the internal fields you better know what you are
             # doing.
             additional_mappings => {
-                # type as defined above in elasticsearch.type
-                benchmarkanything => {
-                    # static key <properties>
-                    properties => {
-                        # field
-                        tapper_report => {
-                            type => long,
-                        },
-                        tapper_testrun => {
-                            type => long,
-                        },
-                        tapper_testplan => {
-                            type => long,
-                        },
+                # static key <properties>
+                properties => {
+                    # field
+                    tapper_report => {
+                        type => long,
+                    },
+                    tapper_testrun => {
+                        type => long,
+                    },
+                    tapper_testplan => {
+                        type => long,
                     },
                 },
             },

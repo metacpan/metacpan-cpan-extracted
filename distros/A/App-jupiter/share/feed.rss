@@ -1,0 +1,29 @@
+% my ($globals, $feeds, $entries) = @_;
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <channel>
+    <title>Planet</title>
+    <description>This is in an aggregate of multiple feeds.</description>
+    <link>https://alexschroeder.ch/cgit/planet-jupiter/about</link>
+    <pubDate><%= DateTime::Format::Mail->format_datetime(DateTime->now) %></pubDate>
+% for my $entry (@$entries) {
+    <item>
+      <title><%= $entry->{title} %></title>
+      <link><%= $entry->{link} %></link>
+% if ($entry->{date}) {
+      <pubDate><%= DateTime::Format::Mail->format_datetime($entry->{date}) %></pubDate>
+% }
+% for my $author (@{$entry->{authors}}) {
+      <dc:creator><%= $author %></dc:creator>
+% }
+% for my $category (@{$entry->{categories}}) {
+      <category><%= $category %></category>
+% }
+      <source url="<%= $entry->{blog_url} %>"><%= $entry->{blog_title} %></source>
+      <description>
+%= $entry->{content}
+      </description>
+    </item>
+% }
+  </channel>
+</rss>

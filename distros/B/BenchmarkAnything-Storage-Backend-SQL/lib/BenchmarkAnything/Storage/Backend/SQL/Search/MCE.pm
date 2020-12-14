@@ -1,7 +1,7 @@
 package BenchmarkAnything::Storage::Backend::SQL::Search::MCE;
 our $AUTHORITY = 'cpan:TAPPER';
 # ABSTRACT: searchengine support functions using MCE
-$BenchmarkAnything::Storage::Backend::SQL::Search::MCE::VERSION = '0.028';
+$BenchmarkAnything::Storage::Backend::SQL::Search::MCE::VERSION = '0.029';
 use MCE::Flow;
 
 

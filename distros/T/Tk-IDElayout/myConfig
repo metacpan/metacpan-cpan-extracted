@@ -106,36 +106,6 @@ if (!try_compile("config/Ksprintf.c") &&
   $define{'SPRINTF_RETURN_CHAR'} = 1;
  }
 
-if (!$IsWin32)
- {
-  if (!try_compile("config/tod.c"))
-   {
-    my $d;
-    my $def;
-    foreach $d (qw(TZ NO_TZ DOTS))
-     {
-      if (try_compile("-DTIMEOFDAY_$d config/tod.c"))
-       {
-        $def = "TIMEOFDAY_$d";
-        print STDERR "$d gettimeofday()\n";
-        last;
-       }
-     }
-    if (defined $def)
-     {
-      $define{$def} = 1;
-     }
-    else
-     {
-      print STDERR "Problem gettimeofday()\n";
-     }
-   }
-  else
-   {
-    print STDERR "Generic gettimeofday()\n";
-   }
- }
-
 #
 # Hunt down X Library - first a function
 #

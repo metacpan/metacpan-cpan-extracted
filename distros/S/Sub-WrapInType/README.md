@@ -94,3 +94,7 @@ it under the same terms as Perl itself.
 # AUTHOR
 
 mp0liiu <mpoliiu@cpan.org>
+
+# SEE ALSE
+
+[Type::Params](https://metacpan.org/pod/Type%3A%3AParams) exports the function wrap\_sub. It check only parameters type.

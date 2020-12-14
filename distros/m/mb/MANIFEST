@@ -75,6 +75,7 @@ t/4017_mb_substr.t
 t/4018_mb_tr.t
 t/4019_mb_uc.t
 t/4020_mb_ucfirst.t
+t/4021_mb_tr_hyphen.t
 t/5001_chdir.t
 t/5002_lstat.t
 t/5003_opendir.t

@@ -10,7 +10,7 @@ use Dumpvalue;
 use version ();
 use File::Spec ();
 
-our $VERSION = '0.42';
+our $VERSION = '0.43';
 our $VERBOSE = 0;
 our $ALLOW_DEV_VERSION = 0;
 our $FORK = 0;
@@ -208,28 +208,31 @@ sub _parse_version {
         } else {
             # XXX Limit Resources too
 
-            my($comp) = Safe->new;
+            my $comp;
             my $eval = qq{
                 local(\$^W) = 0;
                 Parse::PMFile::_parse_version_safely("$pmcp");
             };
-            $comp->permit("entereval"); # for MBARBON/Module-Info-0.30.tar.gz
-            $comp->share("*Parse::PMFile::_parse_version_safely");
-            $comp->share("*version::new");
-            $comp->share("*version::numify");
-            $comp->share_from('main', ['*version::',
-                                        '*charstar::',
-                                        '*Exporter::',
-                                        '*DynaLoader::']);
-            $comp->share_from('version', ['&qv']);
-            $comp->permit(":base_math"); # atan2 (Acme-Pi)
-            # $comp->permit("require"); # no strict!
-            $comp->deny(qw/enteriter iter unstack goto/); # minimum protection against Acme::BadExample
+            unless ($self->{UNSAFE} || $UNSAFE) {
+                $comp = Safe->new;
+                $comp->permit("entereval"); # for MBARBON/Module-Info-0.30.tar.gz
+                $comp->share("*Parse::PMFile::_parse_version_safely");
+                $comp->share("*version::new");
+                $comp->share("*version::numify");
+                $comp->share_from('main', ['*version::',
+                                            '*charstar::',
+                                            '*Exporter::',
+                                            '*DynaLoader::']);
+                $comp->share_from('version', ['&qv']);
+                $comp->permit(":base_math"); # atan2 (Acme-Pi)
+                # $comp->permit("require"); # no strict!
+                $comp->deny(qw/enteriter iter unstack goto/); # minimum protection against Acme::BadExample
+            }
 
             version->import('qv') if $self->{UNSAFE} || $UNSAFE;
             {
                 no strict;
-                $v = ($self->{UNSAFE} || $UNSAFE) ? eval $eval : $comp->reval($eval);
+                $v = $comp ? $comp->reval($eval) : eval $eval;
             }
             if ($@){ # still in the child process, out of Safe::reval
                 my $err = $@;
@@ -239,7 +242,7 @@ sub _parse_version {
                         local($^W) = 0;
                         my ($sigil, $vstr) = ($1, $3);
                         $self->_restore_overloaded_stuff(1) if $err->{line} =~ /use\s+version\b|version\->|qv\(/;
-                        $v = ($self->{UNSAFE} || $UNSAFE) ? eval $vstr : $comp->reval($vstr);
+                        $v = $comp ? $comp->reval($vstr) : eval $vstr;
                         $v = $$v if $sigil eq '*' && ref $v;
                     }
                     if ($@ or !$v) {
@@ -267,7 +270,7 @@ sub _parse_version {
                 utf8::encode($v);
                 # undefine empty $v as if read from the tmpfile
                 $v = undef if defined $v && !length $v;
-                $comp->erase;
+                $comp->erase if ($comp);
                 $self->_restore_overloaded_stuff;
             }
         }

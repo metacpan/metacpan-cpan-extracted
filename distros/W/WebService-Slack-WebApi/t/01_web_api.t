@@ -56,10 +56,10 @@ subtest 'types' => sub {
 
 subtest 'opts' => sub {
     subtest 'proxy' => sub {
-        subtest 'proxy' => sub {
+        subtest 'opt_proxy' => sub {
             my $obj = WebService::Slack::WebApi->new(token => 'hoge', opt => {proxy => 'proxy'});
             my $ua = $obj->client->ua;
-            is $$ua->{proxy}, 'proxy';
+            is ${ $ua->{'ua'} }->{'proxy'}, 'proxy';
         };
 
         subtest 'env_proxy' => sub {
@@ -67,7 +67,7 @@ subtest 'opts' => sub {
             local $ENV{http_proxy} = 'proxy';
             my $obj = WebService::Slack::WebApi->new(token => 'hoge', opt => {env_proxy => 1});
             my $ua = $obj->client->ua;
-            is $$ua->{proxy}, 'proxy';
+            is ${ $ua->{'ua'} }->{'proxy'}, 'proxy';
         };
     };
 };

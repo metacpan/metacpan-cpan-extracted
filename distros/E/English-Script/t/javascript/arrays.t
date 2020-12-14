@@ -19,8 +19,8 @@ is(
         'Set number to a removed item from favorite numbers.',
         [
             'if ( typeof( favorite ) == "undefined" ) var favorite = {};',
-            'if ( typeof( favorite.numbers ) == "undefined" ) var favorite.numbers = [];',
-            'if ( typeof( number ) == "undefined" ) var number;',
+            'if ( typeof( favorite.numbers ) == "undefined" ) favorite.numbers = [];',
+            'if ( typeof( number ) == "undefined" ) var number = "";',
             'number = favorite.numbers.shift;',
         ],
     ],
@@ -29,9 +29,9 @@ is(
         'Set string size to the length of strings example.',
         [
             'if ( typeof( string ) == "undefined" ) var string = {};',
-            'if ( typeof( string.size ) == "undefined" ) var string.size;',
+            'if ( typeof( string.size ) == "undefined" ) string.size = "";',
             'if ( typeof( strings ) == "undefined" ) var strings = {};',
-            'if ( typeof( strings.example ) == "undefined" ) var strings.example;',
+            'if ( typeof( strings.example ) == "undefined" ) strings.example = "";',
             'string.size = strings.example.length;',
         ],
     ],
@@ -47,7 +47,7 @@ is(
         'set a list (wrongly) without spaces',
         'Set the answer to 5,6,7.',
         [
-            'if ( typeof( answer ) == "undefined" ) var answer;',
+            'if ( typeof( answer ) == "undefined" ) var answer = "";',
             'answer = 567;',
         ],
     ],
@@ -64,8 +64,8 @@ is(
         'Set number to item 1 of favorite numbers.',
         [
             'if ( typeof( favorite ) == "undefined" ) var favorite = {};',
-            'if ( typeof( favorite.numbers ) == "undefined" ) var favorite.numbers;',
-            'if ( typeof( number ) == "undefined" ) var number;',
+            'if ( typeof( favorite.numbers ) == "undefined" ) favorite.numbers = "";',
+            'if ( typeof( number ) == "undefined" ) var number = "";',
             'number = favorite.numbers[0];',
         ],
     ],
@@ -74,8 +74,8 @@ is(
         'Set number to the length of item 1 of favorite numbers.',
         [
             'if ( typeof( favorite ) == "undefined" ) var favorite = {};',
-            'if ( typeof( favorite.numbers ) == "undefined" ) var favorite.numbers;',
-            'if ( typeof( number ) == "undefined" ) var number;',
+            'if ( typeof( favorite.numbers ) == "undefined" ) favorite.numbers = "";',
+            'if ( typeof( number ) == "undefined" ) var number = "";',
             'number = favorite.numbers[0].length;',
         ],
     ],

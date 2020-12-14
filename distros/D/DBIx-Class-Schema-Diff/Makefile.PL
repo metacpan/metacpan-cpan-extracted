@@ -33,7 +33,6 @@ my %WriteMakefileArgs = (
     "Moo" => 0,
     "Moo::Role" => 0,
     "Path::Class" => 0,
-    "RapidApp::Util" => 0,
     "Scalar::Util" => 0,
     "Try::Tiny" => 0,
     "Types::Standard" => 0,
@@ -50,7 +49,7 @@ my %WriteMakefileArgs = (
     "base" => 0,
     "lib" => 0
   },
-  "VERSION" => "1.11",
+  "VERSION" => "1.12",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -75,7 +74,6 @@ my %FallbackPrereqs = (
   "Moo" => 0,
   "Moo::Role" => 0,
   "Path::Class" => 0,
-  "RapidApp::Util" => 0,
   "Scalar::Util" => 0,
   "Test::Exception" => 0,
   "Test::More" => 0,

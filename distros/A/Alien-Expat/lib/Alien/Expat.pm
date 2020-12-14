@@ -6,7 +6,7 @@ use 5.008001;
 use base qw( Alien::Base );
 
 # ABSTRACT: Find or install the Expat stream-oriented XML parser
-our $VERSION = '0.01'; # VERSION
+our $VERSION = '0.02'; # VERSION
 
 
 1;
@@ -23,7 +23,7 @@ Alien::Expat - Find or install the Expat stream-oriented XML parser
 
 =head1 VERSION
 
-version 0.01
+version 0.02
 
 =head1 SYNOPSIS
 

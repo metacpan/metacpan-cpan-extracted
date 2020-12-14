@@ -5,7 +5,7 @@ BODY,H1,H2,H3,H4,H5,H6,P,CENTER,TD,TH,UL,DL,DIV {
   font-family: Arial Unicode MS, Arial, Bitstream Vera Sans, sans-serif;
   /*font-family: Bitstream Vera Sans, Geneva, Arial, Helvetica, sans-serif;*/
 }
-H1,H2,H3 {
+H1,H2,H3,H4,H5,H6 {
  text-align: left;
  color: #000099; /* dark blue */
 }
@@ -51,7 +51,7 @@ div,img {
 #headers, .headers {
   padding: 0;
   margin: 10px auto;
-  min-height: 74px;
+  min-height: 80px;
   /*background-color: #ccffff;*/
   /*background-color: #ffffcc;*/
   /*background-color: #f5f5f5;*/
@@ -222,6 +222,9 @@ h1, h2, h3 {
   margin-left: 2em;
 }
 .sectionB, .subsectionB { border: 1px solid gray; }
+.headLeft {
+  margin-left: -1em;
+}
 
 .hit0, .hit1 {
   border: none;
@@ -887,12 +890,28 @@ DD DT { font-weight: normal; font-style: italic; }
  * logo
  */
 .headers .logo, .headers .dlogo, #headers .logo {
+  display: block;
   background: #ffffff;
   border: 4px solid white;
   margin: 4px;
+  min-height: 50px;
 }
 .headers .dlogo {
-  border-top: 2px solid white;
+   border-top: 2px solid white;
+}
+
+/*------------------------------------------------------
+ * banner (unused by default)
+ */
+.banner {
+    display: block;
+    border: 1px solid gray;
+    width: 100%;
+    margin: auto;
+}
+.banner img {
+    display: block;
+    margin: auto;
 }
 
 /*------------------------------------------------------
@@ -938,13 +957,25 @@ DD DT { font-weight: normal; font-style: italic; }
 
 .elapsed { 
   float: right;
-  display:block;
+  display: block;
   text-align: right;
   font-style: italic;
   font-size: smaller;
 }
+.privacyLink { 
+  display: block;
+  text-align: center;
+  font-size: smaller;
+  color: #666666;
+}
+.privacyLink a {
+    color: #666666;
+}
 .package {
+  float: left;
+  display: block;  
   font-family: monospace;
+  font-size: small;
 }
 div.acknowledge {
   font-size: smaller;

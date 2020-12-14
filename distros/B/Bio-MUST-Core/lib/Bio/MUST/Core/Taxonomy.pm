@@ -2,7 +2,7 @@ package Bio::MUST::Core::Taxonomy;
 # ABSTRACT: NCBI Taxonomy one-stop shop
 # CONTRIBUTOR: Loic MEUNIER <loic.meunier@doct.uliege.be>
 # CONTRIBUTOR: Mick VAN VLIERBERGHE <mvanvlierberghe@doct.uliege.be>
-$Bio::MUST::Core::Taxonomy::VERSION = '0.202310';
+$Bio::MUST::Core::Taxonomy::VERSION = '0.203490';
 use Moose;
 use namespace::autoclean;
 
@@ -1752,7 +1752,7 @@ Bio::MUST::Core::Taxonomy - NCBI Taxonomy one-stop shop
 
 =head1 VERSION
 
-version 0.202310
+version 0.203490
 
 =head1 SYNOPSIS
 

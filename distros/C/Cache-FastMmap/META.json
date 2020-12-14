@@ -32,7 +32,8 @@
       },
       "runtime" : {
          "requires" : {
-            "Storable" : "0"
+            "Storable" : "0",
+            "Test::Deep" : "0"
          }
       }
    },
@@ -45,5 +46,5 @@
          "url" : "https://github.com/robmueller/cache-fastmmap"
       }
    },
-   "version" : "1.53"
+   "version" : "1.56"
 }

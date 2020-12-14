@@ -48,7 +48,7 @@ my $get_new_list = $builder->y_n(
 if ($get_new_list) {
     my $http = HTTP::Tiny->new( timeout => 6 );
     my $list_uri = URI->new(
-        "https://publicsuffix.org/list/$dat_file"
+        "https://publicsuffix.org/list/public_suffix_list.dat"
     );
     $list_uri->query_form({ raw => 1 });
     my %options = (

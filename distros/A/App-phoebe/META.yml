@@ -19,18 +19,21 @@ no_index:
     - inc
 requires:
   Algorithm::Diff: '0'
+  Encode::Locale: '0'
   File::ReadBackwards: '0'
   File::Slurper: '0'
   IO::Socket::SSL: '0'
+  IRI: '0'
   Modern::Perl: '1.20180701'
   Mojo::IOLoop: '0'
   Mojo::Log: '0'
   Mojolicious: '8.12'
+  Net::IDN::Encode: '0'
   URI::Escape: '0'
   perl: '5.026000'
   strict: '0'
   warnings: '0'
 resources:
   repository: https://alexschroeder.ch/cgit/phoebe
-version: 2.01
+version: 2.03
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

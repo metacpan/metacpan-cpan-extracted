@@ -42,7 +42,7 @@ resources:
   bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=BenchmarkAnything-Storage-Backend-SQL
   homepage: http://metacpan.org/release/BenchmarkAnything-Storage-Backend-SQL
   repository: git://github.com/benchmarkanything/BenchmarkAnything-Storage-Backend-SQL.git
-version: '0.028'
+version: '0.029'
 x_Dist_Zilla:
   perl:
     version: '5.022000'
@@ -309,7 +309,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v0.028
+          tag: v0.029
           tag_format: v%v
           tag_message: v%v
         Dist::Zilla::Role::Git::Repo:

@@ -1,12 +1,12 @@
 #!perl
 
 # Note: This script is a CLI for Riap function /App/FfmpegUtils/reencode_video_with_libx264
-# and generated automatically using Perinci::CmdLine::Gen version 0.496
+# and generated automatically using Perinci::CmdLine::Gen version 0.497
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-09-23'; # DATE
+our $DATE = '2020-12-12'; # DATE
 our $DIST = 'App-FfmpegUtils'; # DIST
-our $VERSION = '0.006'; # VERSION
+our $VERSION = '0.007'; # VERSION
 
 use 5.010001;
 use strict;
@@ -39,7 +39,7 @@ reencode-video-with-libx264 - Re-encode video (using ffmpeg and libx264)
 
 =head1 VERSION
 
-This document describes version 0.006 of reencode-video-with-libx264 (from Perl distribution App-FfmpegUtils), released on 2020-09-23.
+This document describes version 0.007 of reencode-video-with-libx264 (from Perl distribution App-FfmpegUtils), released on 2020-12-12.
 
 =head1 SYNOPSIS
 

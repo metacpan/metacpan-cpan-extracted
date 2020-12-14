@@ -1,5 +1,9 @@
 Revision history for Perl application 'sdif-tools'.
 
+4.17.0 2020-12-14T09:51:48Z
+
+    - Implement "VISUAL" effect for --visible characters.
+
 4.16.1 2020-08-26T07:24:30Z
 
     - Eliminate indirect object call.

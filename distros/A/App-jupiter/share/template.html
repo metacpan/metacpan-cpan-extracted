@@ -1,0 +1,77 @@
+% my ($globals, $feeds, $entries) = @_;
+<!DOCTYPE html>
+<html>
+<head profile="http://www.w3.org/2005/10/profile">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="shortcut icon" href="jupiter.png" type="image/png"/>
+<link rel="icon" href="jupiter.png" type="image/png"/>
+<link rel="stylesheet" href="default.css" type="text/css"/>
+<title>Planet</title>
+<meta name="robots" content="noindex,nofollow">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="generator" content="Jupiter">
+<link rel="alternate" href="https://example.org/atom.xml" title="Planet" type="application/atom+xml">
+<script type="text/javascript" src="personalize.js"> </script></head>
+
+<body>
+  <p class="invisible">
+    <a href="#body">Skip to content</a>
+  <h1>Planet</h1>
+  <div id="sidebar">
+    <p class="logo">
+      <img src="jupiter.svg">
+    <p class="small">
+      <a href="/wiki/Planet/What_is_this%3f">What is this?</a> •
+      <a href="/wiki/Planet/Please_join!">Please join!</a>
+    <h2><label for="toggle">Members</label></h2>
+    <input type="checkbox" id="toggle">
+    <ul id="toggled">
+% for my $feed (@$feeds) {
+      <li><a href="<%= $feed->{url} =%>"><img src="feed.png" alt="(feed)"></a> \
+%   if ($feed->{message} and $feed->{code} and $feed->{code} ne "200" and $feed->{code} ne "304" and $feed->{link}) {
+<a class="message" title="<%= $feed->{message} =%>" href="<%= $feed->{link} =%>"><%= $feed->{title} =%></a>
+%   } elsif ($feed->{link}) {
+<a href="<%= $feed->{link} =%>"><%= $feed->{title} =%></a>
+%   } elsif ($feed->{message} and (not $feed->{code} or $feed->{code} ne "200")) {
+<a class="message" title="<%= $feed->{message} =%>"><%= $feed->{title} =%></a>
+%   } else {
+%= $feed->{title}
+%   }
+% }
+    </ul>
+    <h2>Info</h2>
+    <dl>
+      <dt>Last updated:</dt>
+      <dd><span class="date" title="GMT"><%= $globals->{date} %></span></dd>
+      <dt>Powered by:</dt>
+      <dd><a href="https://alexschroeder.ch/cgit/planet-jupiter/about/" class="jupiter button">Jupiter</a></dd>
+      <dt>Export:</dt>
+      <dd><a href="feed.xml" class="feed button">RSS</a></dd>
+% for my $file (@{$globals->{files}}) {
+      <dd><a href="<%= $file->{file} %>" class="opml button"><%= $file->{name} %></a></dd>
+% }
+    </dl>
+  </div>
+  <div id="body">
+% my $day = "";
+% for my $entry (@$entries) {
+% if ($entry->{day} ne $day) {
+%   $day = $entry->{day};
+    <h2 class="date"><%= $entry->{day} =%></h2>
+% }
+    <div class="post">
+      <h3><a href="<%= $entry->{blog_link} %>"><%= $entry->{blog_title} %></a> — <a href="<%= $entry->{link} %>"><%= $entry->{title} %></a></h3>
+      <div class="content"><%= $entry->{excerpt} %></div>
+% if ($entry->{categories}) {
+      <div class="categories"><p>Categories:<ul class="categories"><%= join '', map { "<li>$_</li>" } (@{$entry->{categories}}); %></ul></div>
+% }
+      <div class="permalink">\
+% if ($entry->{authors}) {
+by <%= join ', ', @{$entry->{authors}}; %>, \
+% }
+<a href="<%= $entry->{link} %>" class="permalink"><span class="date" title="GMT"><%= $entry->{day} %></span></a></div>
+</div>
+% }
+    </div>
+  </body>
+</html>

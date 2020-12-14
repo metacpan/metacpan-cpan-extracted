@@ -1,7 +1,7 @@
 {
    "abstract" : "Compress and convert css, less, sass, javascript and coffeescript files",
    "author" : [
-      "Jan Henning Thorsen <jhthorsen@cpan.org>"
+      "Zoffix Znet <cpan@zoffix.com>"
    ],
    "dynamic_config" : 0,
    "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
@@ -53,7 +53,7 @@
          "web" : "https://github.com/jhthorsen/mojolicious-plugin-assetpack"
       }
    },
-   "version" : "2.09",
+   "version" : "2.10",
    "x_contributors" : [
       "Jan Henning Thorsen <jhthorsen@cpan.org>",
       "Alexander Rymasheusky",

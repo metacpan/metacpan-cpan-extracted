@@ -4,13 +4,13 @@
       "Kim Rutherford <kim@pombase.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.015, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "PomBase-Chobo",
    "prereqs" : {
@@ -61,7 +61,9 @@
          "web" : "https://github.com/pombase/chobo"
       }
    },
-   "version" : "0.026",
-   "x_serialization_backend" : "JSON::XS version 3.04"
+   "version" : "0.027",
+   "x_generated_by_perl" : "v5.30.3",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.21",
+   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }
 

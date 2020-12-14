@@ -1,5 +1,10 @@
 Revision history for Perl extension CPAN::Plugin::Sysdeps.
 
+0.67  2020-12-12
+	- mapping update
+	- fix a dnf check (by Petr Pisar)
+	- improve CentOS detection
+
 0.66  2020-08-16
 	- mapping update
 	- recognize Ubuntu 20.04 codename

@@ -15,7 +15,7 @@ File::LoadLines - Load lines from file
 
 =cut
 
-our $VERSION = '1.00';
+our $VERSION = '1.01';
 
 =head1 SYNOPSIS
 
@@ -30,7 +30,7 @@ File::LoadLines provides an easy way to load the contents of a text
 file into an array of lines. It is intended for relatively small files
 like config files that are often produced by weird tools (and users).
 
-It automatically handles ASCII, Latin and UTF-8 text.
+It automatically handles ASCII, Latin-1 and UTF-8 text.
 When the file has a BOM, it handles UTF-8, UTF-16 LE and BE, and
 UTF-32 LE and BE.
 
@@ -79,6 +79,14 @@ Enabled by default.
 If set to zero, the line terminators are not removed from the
 resultant lines.
 
+=item encoding
+
+If specified, loadlines() will use this encoding to decode the file
+data if it cannot automatically detect the encoding.
+
+If you pass an options hash, File::LoadLines will set C<encoding> to
+the encoding it detected and used for this file data.
+
 =back
 
 =cut
@@ -123,33 +131,39 @@ sub loadlines {
     my $name = encode_utf8($filename);
     if ( $encoded ) {
 	# Nothing to do, already dealt with.
+	$options->{encoding} = 'Perl';
     }
 
     # Detect Byte Order Mark.
     elsif ( $data =~ /^\xEF\xBB\xBF/ ) {
 	warn("$name is UTF-8 (BOM)\n") if $options->{debug};
+	$options->{encoding} = 'UTF-8';
 	$data = decode( "UTF-8", substr($data, 3) );
     }
     elsif ( $data =~ /^\xFE\xFF/ ) {
 	warn("$name is UTF-16BE (BOM)\n") if $options->{debug};
+	$options->{encoding} = 'UTF-16BE';
 	$data = decode( "UTF-16BE", substr($data, 2) );
     }
     elsif ( $data =~ /^\xFF\xFE\x00\x00/ ) {
 	warn("$name is UTF-32LE (BOM)\n") if $options->{debug};
+	$options->{encoding} = 'UTF-32LE';
 	$data = decode( "UTF-32LE", substr($data, 4) );
     }
     elsif ( $data =~ /^\xFF\xFE/ ) {
 	warn("$name is UTF-16LE (BOM)\n") if $options->{debug};
+	$options->{encoding} = 'UTF-16LE';
 	$data = decode( "UTF-16LE", substr($data, 2) );
     }
     elsif ( $data =~ /^\x00\x00\xFE\xFF/ ) {
 	warn("$name is UTF-32BE (BOM)\n") if $options->{debug};
+	$options->{encoding} = 'UTF-32BE';
 	$data = decode( "UTF-32BE", substr($data, 4) );
     }
 
     # No BOM, did user specify an encoding?
     elsif ( $options->{encoding} ) {
-	warn("$name is ", $options->{encoding}, " (--encoding)\n")
+	warn("$name is ", $options->{encoding}, " (fallback)\n")
 	  if $options->{debug};
 	$data = decode( $options->{encoding}, $data, 1 );
     }
@@ -159,10 +173,17 @@ sub loadlines {
 	my $d = eval { decode( "UTF-8", $data, 1 ) };
 	if ( $@ ) {
 	    warn("$name is ISO-8859.1 (assumed)\n") if $options->{debug};
+	    $options->{encoding} = 'ISO-8859-1';
 	    $data = decode( "iso-8859-1", $data );
+	}
+	elsif ( $d !~ /[^[:ascii:]]/ ) {
+	    warn("$name is ASCII (detected)\n") if $options->{debug};
+	    $options->{encoding} = 'ASCII';
+	    $data = $d;
 	}
 	else {
 	    warn("$name is UTF-8 (detected)\n") if $options->{debug};
+	    $options->{encoding} = 'UTF-8';
 	    $data = $d;
 	}
     }
@@ -192,6 +213,14 @@ line splitting.
 
 I have a faint hope that future versions of Perl and Raku will deal
 with this transparently, but I fear the worst.
+
+=head1 HINTS
+
+When you have raw file data (e.g. from a zip), you can use loadlines()
+to decode and unpack:
+
+    open( my $data, '<', \$contents );
+    $lines = loadlines( $data, $options );
 
 =head1 AUTHOR
 

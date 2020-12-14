@@ -5,7 +5,7 @@ use feature qw/state/;
 
 use Test::More;
 use lib '.';
-use t::Util qw/ slack set_any_mock_response /;
+use t::Util qw/ any_mocked_slack /;
 
 my %tests = (
     auth => {
@@ -530,8 +530,7 @@ my %tests = (
     },
 );
 
-set_any_mock_response;
-my $slack = slack();
+my $slack = any_mocked_slack();
 
 while (my ($ns, $methods) = each %tests) {
     subtest $ns => sub {

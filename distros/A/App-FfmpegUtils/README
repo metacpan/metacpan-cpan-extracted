@@ -2,8 +2,8 @@ NAME
     App::FfmpegUtils - Utilities related to ffmpeg
 
 VERSION
-    This document describes version 0.006 of App::FfmpegUtils (from Perl
-    distribution App-FfmpegUtils), released on 2020-09-23.
+    This document describes version 0.007 of App::FfmpegUtils (from Perl
+    distribution App-FfmpegUtils), released on 2020-12-12.
 
 FUNCTIONS
   reencode_video_with_libx264
@@ -82,6 +82,40 @@ FUNCTIONS
 
         To disable scaling, set "--scale" to '' (empty string), or specify
         "--dont-scale" on the CLI.
+
+    Special arguments:
+
+    *   -dry_run => *bool*
+
+        Pass -dry_run=>1 to enable simulation mode.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  split_video_by_duration
+    Usage:
+
+     split_video_by_duration(%args) -> [status, msg, payload, meta]
+
+    Split video by duration into parts.
+
+    This function is not exported.
+
+    This function supports dry-run operation.
+
+    Arguments ('*' denotes required arguments):
+
+    *   every* => *duration*
+
+    *   file* => *filename*
 
     Special arguments:
 

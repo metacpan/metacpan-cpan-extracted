@@ -168,6 +168,7 @@ $rel  = "d$rel" if ($isDiff);
 
 ##-- DEBUG queries
 if (0 && $query{query} eq 'debug') {
+  $query{query}  = 'Mann|Frau';
   #$query{query} = '$p=NN !#has[textClass,/politik/i]';
   #$query{query} = 'Mann #has[textClass,/zeitung/i]';
   #$query{query} = '* #has[textClass,/Zeitung/i]';
@@ -204,7 +205,7 @@ if (0 && $query{query} eq 'debug') {
   ##
   #($rel,@query{qw(slice groupby query)}) = ('ddc',0,'l','"(ge* &= $p=ADJA)=2 $l=@Maschine" #fmin 1'); ##-- xykeys-like f2 bug
   #($rel,@query{qw(slice groupby query)}) = ('ddc',0,'l','Haus=2 || Garten=1 #fmin 1'); ##-- xykeys-like f2 bug
-  ($rel,@query{qw(slice groupby query)}) = ('ddc',0,'l','"*=2 Mansch" #fmin 1'); ##-- missing {schön,ganz,",d} from list-client (was cutoff=>0, fixed with  cutoff=>'' in Client::list)
+  #($rel,@query{qw(slice groupby query)}) = ('ddc',0,'l','"*=2 Mansch" #fmin 1'); ##-- missing {schön,ganz,",d} from list-client (was cutoff=>0, fixed with  cutoff=>'' in Client::list)
 }
 ##--/DEBUG queries
 

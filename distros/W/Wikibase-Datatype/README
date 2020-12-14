@@ -1,0 +1,71 @@
+NAME
+    Wikibase::Datatype - Wikibase datatypes.
+
+DESCRIPTION
+    This distributions is set of datatypes for Wikibase.
+
+SEE ALSO
+    Wikibase::Datatype::Form
+        Wikibase form datatype.
+
+    Wikibase::Datatype::Item
+        Wikibase item datatype.
+
+    Wikibase::Datatype::Reference
+        Wikibase reference datatype.
+
+    Wikibase::Datatype::Sense
+        Wikibase sense datatype.
+
+    Wikibase::Datatype::Sitelink
+        Wikibase sitelink datatype.
+
+    Wikibase::Datatype::Snak
+        Wikibase snak datatype.
+
+    Wikibase::Datatype::Statement
+        Wikibase statement datatype.
+
+    Wikibase::Datatype::Utils
+        Wikibase datatype utilities.
+
+    Wikibase::Datatype::Value
+        Wikibase value datatype.
+
+    Wikibase::Datatype::Value::Globecoordinate
+        Wikibase globe coordinate value datatype.
+
+    Wikibase::Datatype::Value::Item
+        Wikibase item value datatype.
+
+    Wikibase::Datatype::Value::Monolingual
+        Wikibase monolingual value datatype.
+
+    Wikibase::Datatype::Value::Property
+        Wikibase property value datatype.
+
+    Wikibase::Datatype::Value::Quantity
+        Wikibase quantity value datatype.
+
+    Wikibase::Datatype::Value::String
+        Wikibase string value datatype.
+
+    Wikibase::Datatype::Value::Time
+        Wikibase time value datatype.
+
+REPOSITORY
+    <https://github.com/michal-josef-spacek/Wikibase-Datatype>
+
+AUTHOR
+    Michal Josef Špaček <mailto:skim@cpan.org>
+
+    <http://skim.cz>
+
+LICENSE AND COPYRIGHT
+    © Michal Josef Špaček 2020
+
+    BSD 2-Clause License
+
+VERSION
+    0.03
+

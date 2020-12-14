@@ -1,5 +1,9 @@
 Revision history for Parse-PMFile
 
+0.43 2020/12/12
+  - Avoid instantiating `Safe` compartment if operating in "unsafe" mode.
+    (GH#12; bleargh45++)
+
 0.42 2019/11/09
   - no code changes
   - explicitly declared ExtUtils::MakeMaker::CPANfile as a configure

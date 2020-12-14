@@ -1,0 +1,28 @@
+Changes
+lib/App/jupiter.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+README.md
+script/jupiter
+share/default.css
+share/feed.png
+share/feed.rss
+share/jupiter.png
+share/jupiter.svg
+share/personalize.js
+share/template.html
+t/author.t
+t/basic-operation.t
+t/duplicate-links.t
+t/duplicates.t
+t/elements.t
+t/empty.t
+t/encoding-atom.t
+t/encoding-rss.t
+t/limits.t
+t/messages.t
+t/rss2sample.xml
+t/test.pl
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

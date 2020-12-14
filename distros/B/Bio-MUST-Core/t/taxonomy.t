@@ -391,13 +391,13 @@ my @dupe_tests = (
         [ qw(Eukaryota Metazoa Chordata undef undef undef undef undef) ]  ],
 
     # short lineages
-    [ 'mixed libraries', 'unclassified sequences; mixed libraries', 704107,
+    [ 'mixed libraries', 'unclassified entries; unclassified sequences; mixed libraries', 704107,
         [ qw(undef undef undef undef undef undef undef undef) ] ],
     [ 'environmental samples', 'Viruses; environmental samples', 186616,
         [ qw(Viruses undef undef undef undef undef undef undef) ] ],
 
     # names impossible to disambiguate due to completely identical lineage
-    [ 'Frankia', 'cellular organisms; Bacteria; Terrabacteria group; Actinobacteria; Actinobacteria; Frankiales; Frankiaceae; Frankia; unclassified Frankia; Frankia sp. NRRL B-16315', 683321,
+    [ 'Frankia', 'cellular organisms; Bacteria; Terrabacteria group; Actinobacteria; Actinobacteria; Frankiales; Frankiaceae; Frankia; unclassified Frankia; Frankia sp. NRRL B-16315', 683320,
         [ qw(Bacteria undef Actinobacteria Actinobacteria Frankiales Frankiaceae Frankia), 'Frankia sp. NRRL B-16315' ]  ],
 );
 
@@ -864,7 +864,7 @@ EOT
             'got expected indexed colors from .cls file';
     }
 
-    is_deeply [ map { $scheme->hex($_) } @seq_ids ], \@bact_colors,
+    is_deeply [ map { scalar $scheme->hex($_) } @seq_ids ], \@bact_colors,
         "got expected colors for seq_ids using $infile";
 }
 
@@ -874,7 +874,7 @@ my @life_icols  = (4, 1, 2, 2, 2, 5, 3, 6);
 {
     my $infile = file('test', 'life.cls');
     my $scheme = $tax->load_color_scheme($infile);
-    is_deeply [ map { $scheme->hex($_) } @seq_ids ], \@life_colors,
+    is_deeply [ map { scalar $scheme->hex($_) } @seq_ids ], \@life_colors,
         "got expected colors for seq_ids using $infile";
 
 #     explain \@seq_ids;
@@ -889,7 +889,7 @@ my @life_icols  = (4, 1, 2, 2, 2, 5, 3, 6);
     is_deeply \@icols, \@life_icols,
         "got expected indexed colors (indirectly) for seq_ids using $infile";
 
-    my @icols_dir = map { $scheme->icol($_) } @seq_ids;
+    my @icols_dir = map { scalar $scheme->icol($_) } @seq_ids;
     is_deeply \@icols_dir, \@life_icols,
         "got expected indexed colors (directly) for seq_ids using $infile";
 }
@@ -899,7 +899,7 @@ my @html_colors = qw( ff6347 6a5acd 228b22 228b22 228b22 a0522d b22222 ffd700 );
 {
     my $infile = file('test', 'life_html.cls');
     my $scheme = $tax->load_color_scheme($infile);
-    is_deeply [ map { $scheme->hex($_) } @seq_ids ], \@html_colors,
+    is_deeply [ map { scalar $scheme->hex($_) } @seq_ids ], \@html_colors,
         "got expected colors for lineages using $infile";
 }
 
@@ -1004,34 +1004,85 @@ my @html_colors = qw( ff6347 6a5acd 228b22 228b22 228b22 a0522d b22222 ffd700 );
 }
 
 {
-    my $infile  = file('test', 'PBP3.tre');
-    my $tree = Bio::MUST::Core::Tree->load($infile);
-    my $color_file = file('test', 'PBP3_color4_itol.txt');
-    my $label_file = file('test', 'PBP3_label4_itol.txt');
-    my $collapse_file = file('test', 'PBP3_collapse4_itol.txt');
-    my $outfile1 = file('test', 'my_PBP3_color4_itol.txt');
-    my $outfile2 = file('test', 'my_PBP3_label4_itol.txt');
-    my $outfile3 = file('test', 'my_PBP3_collapse4_itol.txt');
+    my $infile   = file('test', 'PBP3.tre');
 
+    my $outfile  = file('test', "my_PBP3.tre");
+    my $outfile1 = file('test', 'my_PBP3-color.txt');
+    my $outfile2 = file('test', 'my_PBP3-range.txt');
+    my $outfile3 = file('test', 'my_PBP3-label.txt');
+    my $outfile4 = file('test', 'my_PBP3-collapse.txt');
+
+    my $color_file = file('test', 'PBP3-color.txt');
+    my $range_file = file('test', 'PBP3-range.txt');
+    my $label_file = file('test', 'PBP3-label.txt');
+    my $colps_file = file('test', 'PBP3-collapse.txt');
+
+    my $tree = Bio::MUST::Core::Tree->load($infile);
     $tax->attach_taxonomies_to_terminals($tree);
     $tax->attach_taxonomies_to_internals($tree);
-
     $tax->attach_taxa_to_entities($tree, {     name => 'phylum',
-                                               collapse => 'phylum' } );
+                                           collapse => 'phylum' } );
+
+    my $scheme = $tax->load_color_scheme( file('test', 'bacteria.cls') );
+    $scheme->attach_colors_to_entities($tree);
+    $tree->collapse_subtrees;
+
     $outfile1->remove;
     $outfile2->remove;
     $outfile3->remove;
+    $outfile4->remove;
 
-    my $scheme = $tax->load_color_scheme(file('test', 'bacteria.cls'));
-    $scheme->store_itol_colors($tree, $outfile1->stringify);    # for S::C
-    compare_ok($outfile1, $color_file,
-        "wrote expected iTOL color file: $color_file");
+    $tree->store_itol_datasets($outfile);
+     compare_ok($outfile1, $color_file,
+         "wrote expected iTOL color file: $color_file");
+     compare_ok($outfile2, $range_file,
+         "wrote expected iTOL range file: $range_file");
+     compare_ok($outfile3, $label_file,
+         "wrote expected iTOL label file: $label_file");
+     compare_ok($outfile4, $colps_file,
+         "wrote expected iTOL collapse file: $colps_file");
+}
 
-    $tree->store_itol_collapse($outfile2->stringify, $outfile3->stringify);
-    compare_ok($outfile2, $label_file,                          # for S::C
-        "wrote expected iTOL label file: $label_file");
-    compare_ok($outfile3, $collapse_file,
-        "wrote expected iTOL collapse file: $collapse_file");
+{
+    my $infile   = file('test', 'OG0000464-edit-MMETSP172.tre');
+
+    my $outfile  = file('test', 'my_OG0000464-edit-MMETSP172.tre');
+    my $outfile1 = file('test', 'my_OG0000464-edit-MMETSP172-color.txt');
+    my $outfile2 = file('test', 'my_OG0000464-edit-MMETSP172-range.txt');
+    my $outfile3 = file('test', 'my_OG0000464-edit-MMETSP172-label.txt');
+    my $outfile4 = file('test', 'my_OG0000464-edit-MMETSP172-collapse.txt');
+
+    my $color_file = file('test', 'OG0000464-edit-MMETSP172-color.txt');
+    my $range_file = file('test', 'OG0000464-edit-MMETSP172-range.txt');
+    my $label_file = file('test', 'OG0000464-edit-MMETSP172-label.txt');
+    my $colps_file = file('test', 'OG0000464-edit-MMETSP172-collapse.txt');
+
+    my $collapse_key = ( my $annotate_key = 'taxon_label' );
+
+    my $tree = Bio::MUST::Core::Tree->load($infile);
+    $tax->attach_taxonomies_to_terminals($tree);
+    $tax->attach_taxonomies_to_internals($tree);
+    $tax->attach_taxa_to_entities($tree, {     name => 'no rank',
+                                           collapse => 'no rank' } );
+
+    my $scheme = $tax->load_color_scheme(file('test', 'colors-itol-euka.txt'));
+    $scheme->attach_colors_to_entities($tree);
+    $tree->collapse_subtrees($collapse_key);
+
+    $outfile1->remove;
+    $outfile2->remove;
+    $outfile3->remove;
+    $outfile4->remove;
+
+    $tree->store_itol_datasets($outfile, $annotate_key);
+     compare_ok($outfile1, $color_file,
+         "wrote expected iTOL color file: $color_file");
+     compare_ok($outfile2, $range_file,
+         "wrote expected iTOL range file: $range_file");
+     compare_ok($outfile3, $label_file,
+         "wrote expected iTOL label file: $label_file");
+     compare_ok($outfile4, $colps_file,
+         "wrote expected iTOL collapse file: $colps_file");
 }
 
 # {

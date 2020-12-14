@@ -26,7 +26,9 @@
             "Devel::Peek" : "0",
             "ExtUtils::MakeMaker" : "0",
             "File::Temp" : "0",
-            "Test::More" : "0"
+            "Test::Fatal" : "0",
+            "Test::More" : "0",
+            "Test::Warnings" : "0"
          }
       },
       "configure" : {
@@ -40,7 +42,9 @@
             "B::COW" : "0",
             "Devel::Peek" : "0",
             "File::Temp" : "0",
-            "Test::More" : "0"
+            "Test::Fatal" : "0",
+            "Test::More" : "0",
+            "Test::Warnings" : "0"
          }
       }
    },
@@ -56,6 +60,6 @@
          "url" : "https://github.com/toddr/CDB_File"
       }
    },
-   "version" : "1.03",
+   "version" : "1.05",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

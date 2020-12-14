@@ -4,6 +4,7 @@ use Test::More;
 use FindBin '$Bin';
 use Image::PNG::Const ':all';
 use Image::PNG::Libpng ':all';
+
 plan skip_all => "sCAL is not supported by your libpng" unless libpng_supports ('sCAL');
 
 # I don't have an example PNG with an sCAL chunk. So this is tested by

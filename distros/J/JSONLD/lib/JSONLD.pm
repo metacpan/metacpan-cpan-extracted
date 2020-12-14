@@ -4,7 +4,7 @@ JSONLD - A toolkit for transforming JSON-LD data.
 
 =head1 VERSION
 
-This document describes JSONLD version 0.004.
+This document describes JSONLD version 0.005.
 
 =head1 SYNOPSIS
 
@@ -25,11 +25,11 @@ This document describes JSONLD version 0.004.
 This module implements part of the JSON-LD 1.1 standard for manipulating JSON
 data as linked data.
 
-This version (0.004) provides full support for the JSON-LD 1.1 "Expansion" and
+This version provides full support for the JSON-LD 1.1 "Expansion" and
 "toRdf" transformations (the latter primarily being useful through a subclass
 of JSON-LD, such as that provided by L<AtteanX::Parser::JSONLD>).
 Partial support for the "Compaction" transformation is provided, but it
-contains many known deficiencies. Full support for "Compaction" will be
+contains many known deficiencies. Full support for "Compaction" may be
 forthcoming in a future release.
 No other JSON-LD transformation are supported at this time.
 
@@ -42,7 +42,7 @@ No other JSON-LD transformation are supported at this time.
 package JSONLD {
 	use v5.14;
 	use autodie;
-	our $VERSION	= '0.004';
+	our $VERSION	= '0.005';
 	use utf8;
 	use Moo;
 	use LWP;

@@ -4,7 +4,7 @@ use constant DEBUG => 0;
 use warnings;
 use strict;
 
-our $VERSION = '1.03'; # VERSION
+our $VERSION = '1.04'; # VERSION
 my $LAST_UPDATE = '1.03'; # manually update whenever file is edited
 
 eval { XSLoader::load("Text::KnuthPlass", $VERSION); } or die $@;

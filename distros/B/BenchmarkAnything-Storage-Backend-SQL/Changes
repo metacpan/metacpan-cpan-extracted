@@ -1,5 +1,8 @@
 Revision history for BenchmarkAnything-Storage-Backend-SQL
 
+0.029     2020-12-10
+        - elasticsearch indexing error handling
+
 0.028     2020-12-08
         - fix use of --startid in search-sync
 

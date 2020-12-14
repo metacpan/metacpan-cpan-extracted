@@ -25,9 +25,22 @@ This module requires these other modules and libraries:
 
   Net::Stomp
 
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Net::Stomp::Receipt
+
+You can also look for information at:
+
+    sourcehut's request tracker
+        https://todo.sr.ht/~huguei/perl-Net-Stomp-Receipt
+
+
 COPYRIGHT AND LICENCE
 
-Copyright (C) 2008 by Hugo Salgado
+Copyright (C) 2020 by Hugo Salgado
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.10.0 or,

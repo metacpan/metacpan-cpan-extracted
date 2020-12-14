@@ -1,7 +1,7 @@
 Changes
 MANIFEST
 Makefile.PL
-README
+README.md
 lib/File/LoadLines.pm
 t/00-load.t
 t/10-basic.t
@@ -9,6 +9,8 @@ t/11-basic.t
 t/12-basic.t
 t/20-encoding.t
 t/21-encoding.t
+t/22-encoding.t
+t/test_.dat
 t/test0.dat
 t/test1.dat
 t/test2.dat

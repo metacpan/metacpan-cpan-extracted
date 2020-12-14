@@ -18,7 +18,7 @@ is(
         'add number to object',
         'Add 42 to favorite number.',
         [
-            'if ( typeof( favorite ) == "undefined" ) var favorite;',
+            'if ( typeof( favorite ) == "undefined" ) var favorite = "";',
             'favorite += 42;',
         ],
     ],
@@ -26,7 +26,7 @@ is(
         'subtract number from object',
         'Subtract 42 from favorite number.',
         [
-            'if ( typeof( favorite ) == "undefined" ) var favorite;',
+            'if ( typeof( favorite ) == "undefined" ) var favorite = "";',
             'favorite -= 42;',
         ],
     ],
@@ -34,7 +34,7 @@ is(
         'multiply object by number',
         'Multiply favorite number by 42.',
         [
-            'if ( typeof( favorite ) == "undefined" ) var favorite;',
+            'if ( typeof( favorite ) == "undefined" ) var favorite = "";',
             'favorite *= 42;',
         ],
     ],
@@ -42,7 +42,7 @@ is(
         'divide object by number',
         'Divide favorite number by 42.',
         [
-            'if ( typeof( favorite ) == "undefined" ) var favorite;',
+            'if ( typeof( favorite ) == "undefined" ) var favorite = "";',
             'favorite /= 42;',
         ],
     ],

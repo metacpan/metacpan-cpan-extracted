@@ -1,6 +1,5 @@
 #line 2 "Libpng.xs.tmpl"
 
-
 #include "EXTERN.h"
 #include "perl.h"
 #include "XSUB.h"
@@ -28,35 +27,37 @@ PROTOTYPES: ENABLE
 INCLUDE: const-xs.inc
 
 Image::PNG::Libpng perl_png_create_read_struct ()
-        CODE:
+CODE:
         RETVAL = perl_png_create_read_struct ();
-        OUTPUT:
+OUTPUT:
         RETVAL
 
 Image::PNG::Libpng perl_png_create_write_struct ()
-        CODE:
+CODE:
         RETVAL = perl_png_create_write_struct ();
-        OUTPUT:
+OUTPUT:
         RETVAL
 
-void perl_png_destroy_read_struct (Png)
+void
+perl_png_destroy_read_struct (Png)
         Image::PNG::Libpng  Png
-        CODE:
+CODE:
         perl_png_destroy_read_struct (Png);
-        OUTPUT:
 
-void perl_png_destroy_write_struct (Png)
+
+void
+perl_png_destroy_write_struct (Png)
         Image::PNG::Libpng  Png
-        CODE:
+CODE:
         perl_png_destroy_write_struct (Png);
-        OUTPUT:
+
 
 void perl_png_write_png (Png, transforms = PNG_TRANSFORM_IDENTITY)
         Image::PNG::Libpng  Png
         int transforms
-        CODE:
+CODE:
         perl_png_write_png (Png, transforms);
-        OUTPUT:
+
 
 void perl_png_init_io (Png, fp)
         Image::PNG::Libpng  Png
@@ -67,21 +68,21 @@ CODE:
 
 void perl_png_read_info (Png)
         Image::PNG::Libpng  Png
-        CODE:
+CODE:
         png_read_info (Png->png, Png->info);
-        OUTPUT:
+
 
 void perl_png_read_update_info (Png)
         Image::PNG::Libpng  Png
-        CODE:
+CODE:
         png_read_update_info (Png->png, Png->info);
-        OUTPUT:
+
 
 void perl_png_read_image (Png)
         Image::PNG::Libpng  Png
-        CODE:
+CODE:
         perl_png_read_image (Png);
-        OUTPUT:
+
 
 void perl_png_read_png (Png, transforms = PNG_TRANSFORM_IDENTITY)
         Image::PNG::Libpng  Png
@@ -92,147 +93,155 @@ OUTPUT:
 
 SV * perl_png_get_text (Png)
         Image::PNG::Libpng  Png
-        CODE:
+CODE:
         RETVAL = perl_png_get_text (Png);
-        OUTPUT:
+OUTPUT:
         RETVAL
 
 void perl_png_set_text (Png, text)
         Image::PNG::Libpng  Png
         AV * text
-        CODE:
+CODE:
         perl_png_set_text (Png, text);
-        OUTPUT:
+
 
 int perl_png_sig_cmp (sig, start = 0, num_to_check = 8)
         SV * sig
         int start
         int num_to_check
-        CODE:
+CODE:
         RETVAL = perl_png_sig_cmp (sig, start, num_to_check);
-        OUTPUT:
+OUTPUT:
         RETVAL
 
 void perl_png_scalar_as_input (Png, scalar, transforms = 0)
         Image::PNG::Libpng Png
         SV * scalar
         int transforms
-        CODE:
+CODE:
         perl_png_scalar_as_input (Png, scalar, transforms);
-        OUTPUT:
 
-Image::PNG::Libpng perl_png_read_from_scalar (scalar, transforms = 0)
+
+Image::PNG::Libpng
+perl_png_read_from_scalar (scalar, transforms = 0)
         SV * scalar
         int transforms
-        CODE:
+CODE:
         RETVAL = perl_png_read_from_scalar (scalar, transforms);
-        OUTPUT:
+OUTPUT:
 	RETVAL
 
-const char * perl_png_color_type_name (color_type)
+const char *
+perl_png_color_type_name (color_type)
         int color_type
-        CODE:
+CODE:
         RETVAL = perl_png_color_type_name (color_type);
-        OUTPUT:
+OUTPUT:
         RETVAL
 
-const char * perl_png_text_compression_name (text_compression)
+const char *
+perl_png_text_compression_name (text_compression)
         int text_compression
-        CODE:
+CODE:
         RETVAL = perl_png_text_compression_name (text_compression);
-        OUTPUT:
+OUTPUT:
         RETVAL
 
-const char * perl_png_get_libpng_ver ()
-        CODE:
+const char *
+perl_png_get_libpng_ver ()
+CODE:
         RETVAL = png_get_libpng_ver (UNUSED_ZERO_ARG);
-        OUTPUT:
+OUTPUT:
         RETVAL
 
-int perl_png_access_version_number ()
-        CODE:
+int
+perl_png_access_version_number ()
+CODE:
         RETVAL = png_access_version_number ();
-        OUTPUT:
+OUTPUT:
         RETVAL
 
-void * perl_png_get_row_pointers (Png)
+void *
+perl_png_get_row_pointers (Png)
         Image::PNG::Libpng  Png
-        CODE:
+CODE:
         RETVAL = perl_png_get_row_pointers (Png);
-        OUTPUT:
+OUTPUT:
         RETVAL
 
-SV * perl_png_get_rows (Png)
+SV *
+perl_png_get_rows (Png)
         Image::PNG::Libpng  Png
-        CODE:
+CODE:
         RETVAL = perl_png_get_rows (Png);
-        OUTPUT:
+OUTPUT:
         RETVAL
 
-int perl_png_get_rowbytes (Png)
+int
+perl_png_get_rowbytes (Png)
         Image::PNG::Libpng  Png
-        CODE:
+CODE:
         RETVAL = png_get_rowbytes (Png->png, Png->info);
-        OUTPUT:
+OUTPUT:
         RETVAL
 
 
 SV * perl_png_get_valid (Png)
         Image::PNG::Libpng Png
-        CODE:
+CODE:
         RETVAL = perl_png_get_valid (Png);
-        OUTPUT:
+OUTPUT:
         RETVAL
 
 void perl_png_set_tRNS_pointer (Png, tRNS_pointer, num_tRNS_pointer)
         Image::PNG::Libpng Png
         void * tRNS_pointer
         int num_tRNS_pointer
-        CODE:
+CODE:
         perl_png_set_tRNS_pointer (Png, tRNS_pointer, num_tRNS_pointer);
-        OUTPUT:
+
 
 void perl_png_set_rows (Png, rows)
         Image::PNG::Libpng Png
         AV * rows
-        CODE:
+CODE:
         perl_png_set_rows (Png, rows);
-        OUTPUT:
+
 
 SV * perl_png_write_to_scalar (Png, transforms = 0)
         Image::PNG::Libpng Png
         int transforms;
-        CODE:
+CODE:
         RETVAL = perl_png_write_to_scalar (Png, transforms);
-        OUTPUT:
+OUTPUT:
         RETVAL
 
 void perl_png_set_filter (Png, filters)
         Image::PNG::Libpng Png
         int filters;
-        CODE:
+CODE:
         png_set_filter (Png->png, UNUSED_ZERO_ARG, filters);
-        OUTPUT:
+
 
 void perl_png_set_verbosity (Png, verbosity = 0)
         Image::PNG::Libpng Png
         int verbosity; 
-        CODE:
+CODE:
         perl_png_set_verbosity (Png, verbosity);
-        OUTPUT:
+OUTPUT:
         
 void perl_png_set_unknown_chunks (Png, unknown_chunks)
         Image::PNG::Libpng Png
         AV * unknown_chunks
-        CODE:
+CODE:
         perl_png_set_unknown_chunks (Png, unknown_chunks);
-        OUTPUT:
+
 
 SV * perl_png_get_unknown_chunks (Png)
         Image::PNG::Libpng Png
-        CODE:
+CODE:
         RETVAL = perl_png_get_unknown_chunks (Png);
-        OUTPUT:
+OUTPUT:
         RETVAL
 
 int perl_png_libpng_supports (what)
@@ -246,70 +255,60 @@ void perl_png_set_keep_unknown_chunks (Png, keep, chunk_list = 0)
         Image::PNG::Libpng Png
         int keep
         SV * chunk_list
-        CODE:
+CODE:
         perl_png_set_keep_unknown_chunks (Png, keep, chunk_list);
-        OUTPUT:
+
 
 SV * perl_png_get_tRNS_palette (Png)
         Image::PNG::Libpng Png
-        CODE:
+CODE:
         RETVAL = perl_png_get_tRNS_palette (Png);
-        OUTPUT:
+OUTPUT:
         RETVAL
-
-void perl_png_set_PLTE_pointer (Png, colors, n_colors)
-        Image::PNG::Libpng Png
-        void * colors
-        int n_colors
-        CODE:
-        perl_png_set_PLTE_pointer (Png, colors, n_colors);
-        OUTPUT:
 
 void perl_png_set_expand (Png)
         Image::PNG::Libpng Png
-        CODE:
-        perl_png_set_expand (Png);
-        OUTPUT:
+CODE:
+        png_set_expand (Png->png);
 
 void perl_png_set_gray_to_rgb (Png)
         Image::PNG::Libpng Png
-        CODE:
-        perl_png_set_gray_to_rgb (Png);
-        OUTPUT:
+CODE:
+        png_set_gray_to_rgb (Png->png);
+
 
 void perl_png_set_filler (Png, filler, flags)
         Image::PNG::Libpng Png
         int filler
         int flags
-        CODE:
-        perl_png_set_filler (Png, filler, flags);
-        OUTPUT:
+CODE:
+        png_set_filler (Png->png, filler, flags);
 
-int perl_png_get_sRGB (Png)
+int
+perl_png_get_sRGB (Png)
         Image::PNG::Libpng Png
-        CODE:
+CODE:
         RETVAL = perl_png_get_sRGB (Png);
-        OUTPUT:
+OUTPUT:
         RETVAL
 
 void perl_png_set_sRGB (Png, sRGB)
         Image::PNG::Libpng Png
         int sRGB
-        CODE:
-        perl_png_set_sRGB (Png, sRGB);
-        OUTPUT:
+CODE:
+        png_set_sRGB (Png->png, Png->info, sRGB);
+
 
 void perl_png_set_packing (Png)
         Image::PNG::Libpng Png
-        CODE:
+CODE:
         png_set_packing (Png->png);
-        OUTPUT:
+
 
 void perl_png_set_strip_16 (Png)
         Image::PNG::Libpng Png
-        CODE:
-        perl_png_set_strip_16 (Png);
-        OUTPUT: 
+CODE:
+        png_set_strip_16 (Png->png);
 
 void perl_png_DESTROY (Png)
         Image::PNG::Libpng Png
@@ -317,231 +316,245 @@ void perl_png_DESTROY (Png)
         if (Png) {
         	perl_png_destroy (Png);
 	}
-	OUTPUT:
 
 SV * perl_png_get_bKGD (Png)
         Image::PNG::Libpng Png
-        CODE:
+CODE:
         RETVAL = perl_png_get_bKGD (Png);
-        OUTPUT:
+OUTPUT:
         RETVAL
 
 void perl_png_set_bKGD (Png, bKGD)
         Image::PNG::Libpng Png
         HV * bKGD
-        CODE:
+CODE:
         perl_png_set_bKGD (Png, bKGD);
-        OUTPUT:
+
 
 
 SV * perl_png_get_cHRM (Png)
         Image::PNG::Libpng Png
-        CODE:
+CODE:
         RETVAL = perl_png_get_cHRM (Png);
-        OUTPUT:
+OUTPUT:
         RETVAL
 
 void perl_png_set_cHRM (Png, cHRM)
         Image::PNG::Libpng Png
         HV * cHRM
-        CODE:
+CODE:
         perl_png_set_cHRM (Png, cHRM);
-        OUTPUT:
+
+
+
+SV * perl_png_get_eXIf (Png)
+        Image::PNG::Libpng Png
+CODE:
+        RETVAL = perl_png_get_eXIf (Png);
+OUTPUT:
+        RETVAL
+
+void perl_png_set_eXIf (Png, eXIf)
+        Image::PNG::Libpng Png
+        SV * eXIf
+CODE:
+        perl_png_set_eXIf (Png, eXIf);
+
 
 
 SV * perl_png_get_gAMA (Png)
         Image::PNG::Libpng Png
-        CODE:
+CODE:
         RETVAL = perl_png_get_gAMA (Png);
-        OUTPUT:
+OUTPUT:
         RETVAL
 
 void perl_png_set_gAMA (Png, gAMA)
         Image::PNG::Libpng Png
         double gAMA
-        CODE:
+CODE:
         perl_png_set_gAMA (Png, gAMA);
-        OUTPUT:
+
 
 
 SV * perl_png_get_hIST (Png)
         Image::PNG::Libpng Png
-        CODE:
+CODE:
         RETVAL = perl_png_get_hIST (Png);
-        OUTPUT:
+OUTPUT:
         RETVAL
 
 void perl_png_set_hIST (Png, hIST)
         Image::PNG::Libpng Png
         AV * hIST
-        CODE:
+CODE:
         perl_png_set_hIST (Png, hIST);
-        OUTPUT:
+
 
 
 SV * perl_png_get_iCCP (Png)
         Image::PNG::Libpng Png
-        CODE:
+CODE:
         RETVAL = perl_png_get_iCCP (Png);
-        OUTPUT:
+OUTPUT:
         RETVAL
 
 void perl_png_set_iCCP (Png, iCCP)
         Image::PNG::Libpng Png
         HV * iCCP
-        CODE:
+CODE:
         perl_png_set_iCCP (Png, iCCP);
-        OUTPUT:
+
 
 
 SV * perl_png_get_IHDR (Png)
         Image::PNG::Libpng Png
-        CODE:
+CODE:
         RETVAL = perl_png_get_IHDR (Png);
-        OUTPUT:
+OUTPUT:
         RETVAL
 
 void perl_png_set_IHDR (Png, IHDR)
         Image::PNG::Libpng Png
         HV * IHDR
-        CODE:
+CODE:
         perl_png_set_IHDR (Png, IHDR);
-        OUTPUT:
+
 
 
 SV * perl_png_get_oFFs (Png)
         Image::PNG::Libpng Png
-        CODE:
+CODE:
         RETVAL = perl_png_get_oFFs (Png);
-        OUTPUT:
+OUTPUT:
         RETVAL
 
 void perl_png_set_oFFs (Png, oFFs)
         Image::PNG::Libpng Png
         HV * oFFs
-        CODE:
+CODE:
         perl_png_set_oFFs (Png, oFFs);
-        OUTPUT:
+
 
 
 SV * perl_png_get_pCAL (Png)
         Image::PNG::Libpng Png
-        CODE:
+CODE:
         RETVAL = perl_png_get_pCAL (Png);
-        OUTPUT:
+OUTPUT:
         RETVAL
 
 void perl_png_set_pCAL (Png, pCAL)
         Image::PNG::Libpng Png
         HV * pCAL
-        CODE:
+CODE:
         perl_png_set_pCAL (Png, pCAL);
-        OUTPUT:
+
 
 
 SV * perl_png_get_pHYs (Png)
         Image::PNG::Libpng Png
-        CODE:
+CODE:
         RETVAL = perl_png_get_pHYs (Png);
-        OUTPUT:
+OUTPUT:
         RETVAL
 
 void perl_png_set_pHYs (Png, pHYs)
         Image::PNG::Libpng Png
         HV * pHYs
-        CODE:
+CODE:
         perl_png_set_pHYs (Png, pHYs);
-        OUTPUT:
+
 
 
 SV * perl_png_get_PLTE (Png)
         Image::PNG::Libpng Png
-        CODE:
+CODE:
         RETVAL = perl_png_get_PLTE (Png);
-        OUTPUT:
+OUTPUT:
         RETVAL
 
 void perl_png_set_PLTE (Png, PLTE)
         Image::PNG::Libpng Png
         AV * PLTE
-        CODE:
+CODE:
         perl_png_set_PLTE (Png, PLTE);
-        OUTPUT:
+
 
 
 SV * perl_png_get_sBIT (Png)
         Image::PNG::Libpng Png
-        CODE:
+CODE:
         RETVAL = perl_png_get_sBIT (Png);
-        OUTPUT:
+OUTPUT:
         RETVAL
 
 void perl_png_set_sBIT (Png, sBIT)
         Image::PNG::Libpng Png
         HV * sBIT
-        CODE:
+CODE:
         perl_png_set_sBIT (Png, sBIT);
-        OUTPUT:
+
 
 
 SV * perl_png_get_sCAL (Png)
         Image::PNG::Libpng Png
-        CODE:
+CODE:
         RETVAL = perl_png_get_sCAL (Png);
-        OUTPUT:
+OUTPUT:
         RETVAL
 
 void perl_png_set_sCAL (Png, sCAL)
         Image::PNG::Libpng Png
         HV * sCAL
-        CODE:
+CODE:
         perl_png_set_sCAL (Png, sCAL);
-        OUTPUT:
+
 
 
 SV * perl_png_get_sPLT (Png)
         Image::PNG::Libpng Png
-        CODE:
+CODE:
         RETVAL = perl_png_get_sPLT (Png);
-        OUTPUT:
+OUTPUT:
         RETVAL
 
 void perl_png_set_sPLT (Png, sPLT)
         Image::PNG::Libpng Png
         AV * sPLT
-        CODE:
+CODE:
         perl_png_set_sPLT (Png, sPLT);
-        OUTPUT:
+
 
 
 SV * perl_png_get_tIME (Png)
         Image::PNG::Libpng Png
-        CODE:
+CODE:
         RETVAL = perl_png_get_tIME (Png);
-        OUTPUT:
+OUTPUT:
         RETVAL
 
 void perl_png_set_tIME (Png, tIME =  0)
         Image::PNG::Libpng Png
         SV * tIME
-        CODE:
+CODE:
         perl_png_set_tIME (Png, tIME);
-        OUTPUT:
+
 
 
 SV * perl_png_get_tRNS (Png)
         Image::PNG::Libpng Png
-        CODE:
+CODE:
         RETVAL = perl_png_get_tRNS (Png);
-        OUTPUT:
+OUTPUT:
         RETVAL
 
 void perl_png_set_tRNS (Png, tRNS)
         Image::PNG::Libpng Png
         SV * tRNS
-        CODE:
+CODE:
         perl_png_set_tRNS (Png, tRNS);
-        OUTPUT:
+
 
 
 #line 353 "Libpng.xs.tmpl"
@@ -616,6 +629,14 @@ perl_png_get_interlace_type (Png)
 	Image::PNG::Libpng Png;
 CODE: 
     	RETVAL = png_get_interlace_type (Png->png, Png->info);
+OUTPUT:
+	RETVAL
+
+int
+perl_png_get_color_type (Png)
+	Image::PNG::Libpng Png;
+CODE: 
+    	RETVAL = png_get_color_type (Png->png, Png->info);
 OUTPUT:
 	RETVAL
 
@@ -707,6 +728,24 @@ CODE:
 	png_set_compression_level (Png->png, level);
 
 void
+perl_png_set_compression_buffer_size (Png, size)
+	Image::PNG::Libpng Png;
+	size_t size;
+CODE:
+	png_set_compression_buffer_size (Png->png, size);
+
+SV *
+perl_png_get_compression_buffer_size (Png)
+	Image::PNG::Libpng Png;
+PREINIT:
+	size_t size;
+CODE:
+	size = png_get_compression_buffer_size (Png->png);
+	RETVAL = newSViv (size);
+OUTPUT:
+	RETVAL
+	
+void
 perl_png_set_compression_mem_level (Png, mem_level);
 	Image::PNG::Libpng Png;
 	int mem_level;
@@ -791,5 +830,14 @@ perl_png_split_alpha (Png)
 	Image::PNG::Libpng Png;
 CODE:
 	RETVAL = perl_png_split_alpha (Png);
+OUTPUT:
+	RETVAL
+
+
+int
+perl_png_read_struct (Png)
+	Image::PNG::Libpng Png;
+CODE:
+	RETVAL = (Png->type == perl_png_read_obj);
 OUTPUT:
 	RETVAL

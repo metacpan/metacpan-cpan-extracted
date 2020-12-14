@@ -1,5 +1,5 @@
 package Image::PNG::Const;
-our $VERSION = '0.49';
+our $VERSION = '0.52';
 
 require Exporter;
 @ISA = qw(Exporter);
@@ -434,7 +434,7 @@ use constant {
 
 =head1 NAME
 
-Image::PNG::Const - make libpng constants available
+Image::PNG::Const - Constants for libpng
 
 =head1 SYNOPSIS
 

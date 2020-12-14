@@ -1,5 +1,9 @@
 Revision history for Dist-Zilla-PluginBundle-Author-Plicease
 
+2.59      2020-12-10 16:17:30 -0700
+  - Update template for github actions to use new add-path incantation
+  - Try to autodetect the default branch
+
 2.58      2020-10-26 19:14:59 -0600
   - Added travis_com and travis_base options
 

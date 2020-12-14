@@ -7,13 +7,15 @@ build_requires:
   IO::Handle: '0'
   IPC::Open3: '0'
   Moo: '2'
+  Music::Chord::Note: '0.10'
+  Test::Exception: '0'
   Test::More: '0.88'
-  perl: '5.006'
+  perl: '5.012'
   strict: '0'
   warnings: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
-  perl: '5.006'
+  perl: '5.012'
 dynamic_config: 0
 generated_by: 'Dist::Zilla version 6.015, CPAN::Meta::Converter version 2.150010'
 license: perl
@@ -22,18 +24,19 @@ meta-spec:
   version: '1.4'
 name: Music-Chord-Progression
 requires:
+  Carp: '0'
   Data::Dumper::Compact: '0'
   Graph::Directed: '0'
   Moo: '2'
-  Music::Chord::Note: '0'
+  Music::Chord::Note: '0.10'
   Music::Scales: '0'
   namespace::clean: '0'
-  perl: '5.006'
+  perl: '5.012'
   strictures: '2'
 resources:
   homepage: https://github.com/ology/Music-Chord-Progression
   repository: https://github.com/ology/Music-Chord-Progression.git
-version: '0.0003'
+version: '0.0401'
 x_Dist_Zilla:
   perl:
     version: '5.030002'
@@ -214,7 +217,8 @@ x_Dist_Zilla:
             - lib
           spell_cmd: 'aspell list'
           stopwords:
-            - foo
+            - th
+            - tritone
           wordlist: Pod::Wordlist
       name: Test::PodSpelling
       version: '2.007005'

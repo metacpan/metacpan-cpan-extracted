@@ -1,7 +1,9 @@
 package Bencher::Scenario::ListingModules::Startup;
 
-our $DATE = '2019-09-02'; # DATE
-our $VERSION = '0.001'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-09-21'; # DATE
+our $DIST = 'Bencher-Scenarios-ListingModules'; # DIST
+our $VERSION = '0.002'; # VERSION
 
 use 5.010001;
 use strict;
@@ -12,13 +14,16 @@ our $scenario = {
     module_startup => 1,
     participants => [
         {
-            module => 'PERLANCAR::Module::List',
-        },
-        {
             module => 'Module::List',
         },
         {
+            module => 'Module::List::More',
+        },
+        {
             module => 'Module::List::Tiny',
+        },
+        {
+            module => 'Module::List::Wildcard',
         },
     ],
 };
@@ -38,7 +43,7 @@ Bencher::Scenario::ListingModules::Startup - Benchmark module startup
 
 =head1 VERSION
 
-This document describes version 0.001 of Bencher::Scenario::ListingModules::Startup (from Perl distribution Bencher-Scenarios-ListingModules), released on 2019-09-02.
+This document describes version 0.002 of Bencher::Scenario::ListingModules::Startup (from Perl distribution Bencher-Scenarios-ListingModules), released on 2020-09-21.
 
 =head1 SYNOPSIS
 
@@ -56,25 +61,27 @@ Packaging a benchmark script as a Bencher scenario makes it convenient to includ
 
 Version numbers shown below are the versions used when running the sample benchmark.
 
-L<PERLANCAR::Module::List> 0.004004
-
 L<Module::List> 0.004
 
-L<Module::List::Tiny> 0.004001
+L<Module::List::More> 0.004008
+
+L<Module::List::Tiny> 0.004003
+
+L<Module::List::Wildcard> 0.004006
 
 =head1 BENCHMARK PARTICIPANTS
 
 =over
 
-=item * PERLANCAR::Module::List (perl_code)
-
-L<PERLANCAR::Module::List>
-
-
-
 =item * Module::List (perl_code)
 
 L<Module::List>
+
+
+
+=item * Module::List::More (perl_code)
+
+L<Module::List::More>
 
 
 
@@ -84,23 +91,30 @@ L<Module::List::Tiny>
 
 
 
+=item * Module::List::Wildcard (perl_code)
+
+L<Module::List::Wildcard>
+
+
+
 =back
 
 =head1 SAMPLE BENCHMARK RESULTS
 
-Run on: perl: I<< v5.28.2 >>, CPU: I<< Intel(R) Core(TM) i5-2400 CPU @ 3.10GHz (4 cores) >>, OS: I<< GNU/Linux LinuxMint version 18.3 >>, OS kernel: I<< Linux version 4.8.0-53-generic >>.
+Run on: perl: I<< v5.30.2 >>, CPU: I<< Intel(R) Core(TM) i7-4770 CPU @ 3.40GHz (4 cores) >>, OS: I<< GNU/Linux LinuxMint version 19 >>, OS kernel: I<< Linux version 4.15.0-91-generic >>.
 
 Benchmark with default options (C<< bencher -m ListingModules::Startup >>):
 
  #table1#
- +-------------------------+-----------+------------------------+------------+-----------+---------+
- | participant             | time (ms) | mod_overhead_time (ms) | vs_slowest |  errors   | samples |
- +-------------------------+-----------+------------------------+------------+-----------+---------+
- | Module::List            |      34   |                   28   |        1   |   0.00011 |      22 |
- | PERLANCAR::Module::List |       7.8 |                    1.8 |        4.3 | 5.3e-05   |      20 |
- | Module::List::Tiny      |       6   |                    0   |        5   | 9.2e-05   |      21 |
- | perl -e1 (baseline)     |       6   |                    0   |        6   | 9.7e-05   |      20 |
- +-------------------------+-----------+------------------------+------------+-----------+---------+
+ +------------------------+-----------+-------------------+-----------------------+-----------------------+-----------+---------+
+ | participant            | time (ms) | mod_overhead_time | pct_faster_vs_slowest | pct_slower_vs_fastest |  errors   | samples |
+ +------------------------+-----------+-------------------+-----------------------+-----------------------+-----------+---------+
+ | Module::List           |      20   |              15   |                 0.00% |               332.72% |   0.00017 |      20 |
+ | Module::List::Wildcard |       7.1 |               2.1 |               190.33% |                49.04% | 3.9e-05   |      20 |
+ | Module::List::More     |       7   |               2   |               199.23% |                44.61% |   0.0002  |      20 |
+ | Module::List::Tiny     |       6.1 |               1.1 |               238.22% |                27.94% |   7e-06   |      20 |
+ | perl -e1 (baseline)    |       5   |               0   |               332.72% |                 0.00% |   0.0001  |      20 |
+ +------------------------+-----------+-------------------+-----------------------+-----------------------+-----------+---------+
 
 
 To display as an interactive HTML table on a browser, you can add option C<--format html+datatables>.
@@ -127,7 +141,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2019 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -39,8 +39,8 @@ is(
             'This ends the block.',
         ],
         [
-            'if ( typeof( answer ) == "undefined" ) var answer;',
-            'if ( typeof( prime ) == "undefined" ) var prime;',
+            'if ( typeof( answer ) == "undefined" ) var answer = "";',
+            'if ( typeof( prime ) == "undefined" ) var prime = "";',
             'if ( prime == 3 ) {',
             'answer = 42;',
             '// This is a comment.',

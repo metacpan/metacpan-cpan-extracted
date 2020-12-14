@@ -9,7 +9,7 @@
 package WebService::HashiCorp::Vault;
 
 use Moo;
-our $VERSION = '0.004'; # VERSION
+our $VERSION = '0.005'; # VERSION
 
 extends 'WebService::HashiCorp::Vault::Base';
 use namespace::clean;
@@ -51,6 +51,7 @@ sub secret {
     $args{token}    = $self->token();
     $args{version}  = $self->version();
     $args{base_url} = $self->base_url();
+    $args{ua}       = $self->ua();
 
     $args{backend} ||= 'generic';
     die sprintf( "Unknown backend type: %s\n", $args{backend} )
@@ -89,7 +90,7 @@ WebService::HashiCorp::Vault - Perl API for HashiCorp's Vault
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 SYNOPSIS
 
@@ -205,7 +206,7 @@ Dean Hamstead <dean@bytefoundry.com.au>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Dean Hamstad.
+This software is copyright (c) 2020 by Dean Hamstad.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

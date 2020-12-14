@@ -1,0 +1,32 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.87.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: RIPEMD160
+
+SHA256 ff2edae405ac1dbe2ee6341599abb29a1c73d59faf39f8e2c39e48f12e4bf25c Changes
+SHA256 f29223ce0e654710ab4a858c5f3a77f4759a0aafa40ab45a60cc0ecb215d4db5 MANIFEST
+SHA256 0b9703fbefbc2984b17ca8ef43cf09c722eb1877e5bcd9797645364cc4cf108b META.json
+SHA256 de61a31358730ef722139b48c1c796ea93400bb7ee147f1810c7aecfad676431 META.yml
+SHA256 8cbd378e164e8386ab222cb94af5cfc07d3be5990e5c36b475af19b63acc0dfd Makefile.PL
+SHA256 475297851db514f9b049ea20edda89dab58666c670b6ff534eb6e4dbd78a65b6 README
+SHA256 4ece5887611f65b31964d067351414b8047d6e4368248de9baaf50dd6394f01c lib/HTTP/WebTest/Plugin/Sticky.pm
+SHA256 0c45e2d93f5a265066f56bb466d236ffaeed8627231befc180586e1db3a9a934 t/00-load.t
+SHA256 cb20085bb175969855616ce99dd071ecff0317379f80f7f50c1c551a8ee5447f t/boilerplate.t
+SHA256 505f0d5c68824b3d02df44fa02031c9a379939327af4ef3565166d713cd24f70 t/pod.t
+-----BEGIN PGP SIGNATURE-----
+
+iF0EAREDAB0WIQQGIpAXkA908yCaLyQ4i3ZypuWMzQUCX9ZtVAAKCRA4i3ZypuWM
+zZEEAJ9LP9gifg/W72g0dVp9yn6mW7rQowCfQlaa7LlmNIovDoEfUHyXh9u2V0k=
+=OQYK
+-----END PGP SIGNATURE-----

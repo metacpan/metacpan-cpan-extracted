@@ -135,7 +135,7 @@ Wedding
 Köllnische Heide
 Baumschulenweg
 Schöneweide
-Betriebsbhf. Schöneweide
+Johannisthal
 Adlershof
 Altglienicke
 Grünbergallee
@@ -397,8 +397,8 @@ Schloßstr.
 
 7|Adenauerplatz|Wilmersdorfer Str.
 1045|Adlershof|Altglienicke
-1008,1009,1085|Adlershof|Betriebsbhf. Schöneweide
 1046|Adlershof|Grünau
+1008,1009,1085|Adlershof|Johannisthal
 6|Afrikanische Str.|Kurt-Schumacher-Platz
 1007|Ahrensfelde|Mehrower Allee
 1003,1005,1007,1009|Alexanderplatz|Hackescher Markt
@@ -430,8 +430,6 @@ Schloßstr.
 1002|Bernau-Friedenstal|Bernau
 8|Bernauer Str.|Voltastr.
 1003|Betriebsbhf. Rummelsburg|Rummelsburg
-1046,1045|Betriebsbhf. Schöneweide|Adlershof
-1008,1009,1085|Betriebsbhf. Schöneweide|Schöneweide
 1041|Beusselstr.|Westhafen
 1005|Biesdorf|Friedrichsfelde Ost
 5|Biesdorf-Süd|Elsterwerdaer Platz
@@ -556,6 +554,8 @@ Schloßstr.
 7|Jakob-Kaiser-Platz|Halemweg
 8,1003,1005,1007,1009|Jannowitzbrücke|Alexanderplatz
 1003|Jannowitzbrücke|Ostbahnhof
+1046,1045|Johannisthal|Adlershof
+1008,1009,1085|Johannisthal|Schöneweide
 7|Johannisthaler Chaussee|Britz-Süd
 1001|Julius-Leber-Brücke|Yorckstr.
 1041|Jungfernheide|Beusselstr.
@@ -700,7 +700,7 @@ Schloßstr.
 1001|Schöneberg|Julius-Leber-Brücke
 1046|Schöneberg|Südkreuz
 1008,1009,1085,1047|Schöneweide|Baumschulenweg
-1046,1045|Schöneweide|Betriebsbhf. Schöneweide
+1046,1045|Schöneweide|Johannisthal
 1008|Schönfließ|Bergfelde b. Berlin
 1008,1085|Schönhauser Allee|Bornholmer Str.
 2|Schönhauser Allee|Eberswalder Str.

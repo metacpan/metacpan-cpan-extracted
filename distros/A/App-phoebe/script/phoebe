@@ -16,34 +16,47 @@
 
 =encoding utf8
 
-=head1 Phoebe
+=head1 NAME
 
-Phoebe serves a wiki as a Gemini site.
+Phoebe - serve a wiki as a Gemini site
 
-It does two and a half things:
+=head1 SYNOPSIS
+
+B<phoebe> [B<--host=>I<hostname> ...] [B<--port=>I<port>]
+[B<--cert_file=>I<filename>] [B<--key_file=>I<filename>]
+[B<--log_level=error>|B<warn>|B<info>|B<debug>] [B<--log_file=>I<filename>]
+[B<--wiki_dir=>I<directory>] [B<--wiki_token=>I<token> ...]
+[B<--wiki_page=>I<pagename> ...] [B<--wiki_main_page=>I<pagename>]
+[B<--wiki_mime_type=>I<mimetype> ...] [B<--wiki_page_size_limit=>I<n>]
+[B<--wiki_space=>I<space> ...]
+
+=head1 DESCRIPTION
+
+Phoebe does two and a half things:
+
+It's a program that you run on a computer and other people connect to it using
+their Gemini client in order to read the pages on it.
+
+It's a wiki, which means that people can edit the pages without needing an
+account. All they need is a client that speaks both Gemini and Titan, and the
+password. The default password is "hello". 😃
+
+People can also access it using a regular web browser. They'll get a very
+simple, read-only version of the site.
+
+To take a look for yourself, check out the test wiki via the web or via the web.
 
 =over
 
-=item It's a program that you run on a computer and other people connect to it
-      using their L<Gemini client|https://gemini.circumlunar.space/clients.html>
-      in order to read the pages on it.
+=item L<https://gemini.circumlunar.space/clients.html>
 
-=item It's a wiki, which means that people can edit the pages without needing an
-      account. All they need is a client that speaks both
-      L<Gemini|https://gemini.circumlunar.space/> and
-      L<Titan|https://communitywiki.org/wiki/Titan>, and the password. The
-      default password is "hello". 😃
+=item L<https://transjovian.org:1965/test>
 
-=item People can also access it using a regular web browser. They'll get a very
-      simple, read-only version of the site.
+=item L<gemini://transjovian.org/test>
 
 =back
 
-To take a look for yourself, check out the test wiki via the
-L<web|https://transjovian.org:1965/test> or via
-L<Gemini|gemini://transjovian.org/test>.
-
-=head2 What are pages written in?
+=head1 GEMTEXT
 
 Pages are written in gemtext, a lightweight hypertext format. You can use your
 favourite text editor to write them.
@@ -82,42 +95,30 @@ A line starting with ">", followed by a space and some text is a quote.
     The monologue at the end is fantastic, with the city lights and the rain.
     > I've seen things you people wouldn't believe.
 
-=head2 How do you edit a Phoebe wiki?
+=head1 EDITING THE WIKI
 
-You need to use a Titan-enabled client.
+How do you edit a Phoebe wiki? You need to use a Titan-enabled client.
+
+Titan is a companion protocol to Gemini: it allows clients to upload files to
+Gemini sites, if servers allow this. On Phoebe, you can edit "raw" pages. That
+is, at the bottom of a page you'll see a link to the "raw" page. If you follow
+it, you'll see the page content as plain text. You can submit a changed version
+of this text to the same URL using Titan. There is more information for
+developers available on Community Wiki. L<https://communitywiki.org/wiki/Titan>
 
 Known clients:
 
-=over
+This repository comes with a Perl script called F<titan> to upload files.
+L<https://alexschroeder.ch/cgit/phoebe/plain/titan>
 
-=item This repository comes with a Perl script called
-      L<titan|https://alexschroeder.ch/cgit/phoebe/plain/titan> to upload
-      files
+I<Gemini Write> is an extension for the Emacs Gopher and Gemini client
+I<Elpher>. L<https://alexschroeder.ch/cgit/gemini-write/>
+L<https://thelambdalab.xyz/elpher/>
 
-=item L<Gemini Write|https://alexschroeder.ch/cgit/gemini-write/> is an
-      extension for the Emacs Gopher and Gemini client
-      L<Elpher|https://thelambdalab.xyz/elpher/>
+Gemini & Titan for Bash are two shell functions that allow you to download and
+upload files. L<https://alexschroeder.ch/cgit/gemini-titan/about/>
 
-=item L<Gemini & Titan for Bash|https://alexschroeder.ch/cgit/gemini-titan/about/>
-      are two shell functions that allow you to download and upload files
-
-=back
-
-=head2 What is Titan?
-
-Titan is a companion protocol to Gemini: it allows clients to upload files to
-Gemini sites, if servers allow this. On Phoebe, you can edit "raw"
-pages. That is, at the bottom of a page you'll see a link to the "raw" page. If
-you follow it, you'll see the page content as plain text. You can submit a
-changed version of this text to the same URL using Titan. There is more
-information for developers available
-L<on Community Wiki|https://communitywiki.org/wiki/Titan>.
-
-=head2 License
-
-GNU Affero General Public License
-
-=head2 Installation
+=head1 INSTALLATION
 
 Using C<cpan>:
 
@@ -149,12 +150,16 @@ Perl libraries you need to install if you want to run Phoebe:
 
 =item L<URI::Escape>, or C<liburi-escape-xs-perl>
 
+=item L<Net::IDN::Encode>, or C<libnet-idn-encode-perl>
+
+=item L<Encode::Locale>, or C<libencode-locale-perl>
+
 =back
 
 I'm going to be using F<curl> and F<openssl> in the L</Quickstart> instructions,
 so you'll need those tools as well. And finally, when people download their
-data, the code calls C<tar> (available from package with the same name on Debian
-derived systems).
+data, the code calls C<tar> (available from packages with the same name on
+Debian derived systems).
 
 The F<update-readme.pl> script I use to generate F<README.md> also requires some
 libraries:
@@ -191,8 +196,8 @@ This starts the server in the foreground. If it aborts, see the
 L</Troubleshooting> section below. If it runs, open a second terminal and test
 it:
 
-
     perl5/bin/gemini gemini://localhost/
+
 You should see a Gemini page starting with the following:
 
     20 text/gemini; charset=UTF-8
@@ -306,14 +311,44 @@ C<--wiki_page_size_limit> option, but you need to restart Phoebe:
 
 Now you can upload about 10MB…
 
-=head2 Troubleshooting
+=head2 Using systemd
 
-🔥 B<SSL_cert_file cert.pem can't be used: No such file or directory> 🔥 Perhaps
-you're missing the certificate (F<cert.pem>) or key file (F<key.pem>). The git
-repo has the necessary files which you can use to do a quick test. Copy them
-into the installation directory where you want to run Phoebe and try again. Once
-it works, you should I<generate your own> using the Makefile: C<make cert>
-should do it.
+Systemd is going to handle daemonisation for us. There's more documentation
+available online.
+L<https://www.freedesktop.org/software/systemd/man/systemd.service.html>.
+
+Basically, this is the template for our service:
+
+    [Unit]
+    Description=Phoebe
+    After=network.target
+    [Service]
+    Type=simple
+    WorkingDirectory=/home/phoebe
+    ExecStart=/home/phoebe/phoebe
+    Restart=always
+    User=phoebe
+    Group=phoebe
+    [Install]
+    WantedBy=multi-user.target
+
+Save this as F<phoebe.service>, and then link it:
+
+    sudo ln -s /home/phoebe/phoebe.service /etc/systemd/system/
+
+Reload systemd:
+
+    sudo systemctl daemon-reload
+
+Start Phoebe:
+
+    sudo systemctl start phoebe
+
+Check the log output:
+
+    sudo journalctl --unit phoebe
+
+=head2 Troubleshooting
 
 🔥 B<1408A0C1:SSL routines:ssl3_get_client_hello:no shared cipher> 🔥 If you
 created a new certificate and key using elliptic curves using an older OpenSSL,
@@ -323,74 +358,58 @@ least it'll work.
     openssl req -new -x509 -newkey rsa \
     -days 1825 -nodes -out cert.pem -keyout key.pem
 
-=head2 Wiki Directory
+=head1 FILES
 
-Your home directory should now also contain a wiki directory called F<wiki>. In
-it, you'll find a few more files:
+Your home directory should now also contain a wiki directory called F<wiki>,
+your wiki directory. In it, you'll find a few more files:
 
-=over
+F<page> is the directory with all the page files in it; each file has the C<gmi>
+extension and should be written in Gemtext format
 
-=item F<page> is the directory with all the page files in it; each file has the
-      C<gmi> extension and should be written in Gemtext format
+F<index> is a file containing all the files in your F<page> directory for quick
+access; if you create new files in the F<page> directory, you should delete the
+F<index> file – it will get regenerated when needed; the format is one page name
+(without the C<.gmi> extension) per line, with lines separated from each other
+by a single C<\n>
 
-=item F<index> is a file containing all the files in your F<page> directory for
-      quick access; if you create new files in the F<page> directory, you should
-      delete the F<index> file – it will get regenerated when needed; the format
-      is one page name (without the C<.gmi> extension) per line, with lines
-      separated from each other by a single C<\n>
+F<keep> is the directory with all the old revisions of pages in it – if you've
+only made one change, then it won't exist; if you don't care about the older
+revisions, you can delete them; assuming you have a page called C<Welcome> and
+edit it once, you have the current revision as F<page/Welcome.gmi>, and the old
+revision in F<keep/Welcome/1.gmi> (the page name turns into a subdirectory and
+each revision gets an apropriate number)
 
-=item F<keep> is the directory with all the old revisions of pages in it – if
-      you've only made one change, then it won't exist; if you don't care about
-      the older revisions, you can delete them; assuming you have a page called
-      C<Welcome> and edit it once, you have the current revision as
-      F<page/Welcome.gmi>, and the old revision in F<keep/Welcome/1.gmi> (the
-      page name turns into a subdirectory and each revision gets an apropriate
-      number)
+F<file> is the directory with all the uploaded files in it – if you haven't
+uploaded any files, then it won't exist; you must explicitly allow MIME types
+for upload using the C<--wiki_mime_type> option (see I<Options> below)
 
-=item F<file> is the directory with all the uploaded files in it – if you
-      haven't uploaded any files, then it won't exist; you must explicitly allow
-      MIME types for upload using the C<--wiki_mime_type> option (see I<Options>
-      below)
+F<meta> is the directory with all the meta data for uploaded files in it – there
+should be a file here for every file in the F<file> directory; if you create new
+files in the F<file> directory, you should create a matching file here; if you
+have a file F<file/alex.jpg> you want to create a file F<meta/alex.jpg>
+containing the line C<content-type: image/jpeg>
 
-=item F<meta> is the directory with all the meta data for uploaded files in it –
-      there should be a file here for every file in the F<file> directory; if
-      you create new files in the F<file> directory, you should create a
-      matching file here; if you have a file F<file/alex.jpg> you want to create
-      a file F<meta/alex.jpg> containing the line C<content-type: image/jpeg>
+F<changes.log> is a file listing all the pages made to the wiki; if you make
+changes to the files in the F<page> or F<file> directory, they aren't going to
+be listed in this file and thus people will be confused by the changes you made
+– your call (but in all fairness, if you're collaborating with others you
+probably shouldn't do this); the format is one change per line, with lines
+separated from each other by a single C<\n>, and each line consisting of time
+stamp, pagename or filename, revision number if a page or 0 if a file, and the
+numeric code of the user making the edit (see L</Privacy> below), all separated
+from each other with a C<\x1f>
 
-=item F<changes.log> is a file listing all the pages made to the wiki; if you
-      make changes to the files in the F<page> or F<file> directory, they aren't
-      going to be listed in this file and thus people will be confused by the
-      changes you made – your call (but in all fairness, if you're collaborating
-      with others you probably shouldn't do this); the format is one change per
-      line, with lines separated from each other by a single C<\n>, and each
-      line consisting of time stamp, pagename or filename, revision number if a
-      page or 0 if a file, and the numeric code of the user making the edit (see
-      L</Privacy> below), all separated from each other with a C<\x1f>
+F<config> probably doesn't exist, yet; it is an optional file containing Perl
+code where you can add new features and change how Phoebe works (see
+L</Configuration> below)
 
-=item F<config> probably doesn't exist, yet; it is an optional file containing
-      Perl code where you can add new features and change how Phoebe works (see
-      L</Configuration> below)
+F<conf.d> probably doesn't exist, either; it is an optional directory containing
+even more Perl files where you can add new features and change how Phoebe works
+(see L</Configuration> below); the idea is that people can share stand-alone
+configurations that you can copy into this directory without having to edit your
+own F<config> file.
 
-=item F<conf.d> probably doesn't exist, either; it is an optional directory
-      containing even more Perl files where you can add new features and change
-      how Phoebe works (see L</Configuration> below); the idea is that people
-      can share stand-alone configurations that you can copy into this directory
-      without having to edit your own F<config> file.
-
-=back
-
-=head2 Options
-
-Here's an example:
-
-    perl phoebe \
-      --wiki_token=Elrond \
-      --wiki_token=Thranduil \
-      --wiki_page=Welcome \
-      --wiki_page=About
-
-Here's the documentation for the most useful options:
+=head1 OPTIONS
 
 =over
 
@@ -447,42 +466,17 @@ Here's the documentation for the most useful options:
 
 =back
 
-=head2 Using systemd
+=head2 FILES
 
-Systemd is going to handle daemonisation for us. There's more documentation
-L<available
-online|https://www.freedesktop.org/software/systemd/man/systemd.service.html>.
+If you allow uploads of binary files, these are stored separately from the
+regular pages; the wiki doesn't keep old revisions of files around. If somebody
+overwrites a file, the old revision is gone.
 
-Basically, this is the template for our service:
+You definitely don't want random people uploading all sorts of images, videos
+and binaries to your server. Make sure you set up those L<tokens|/Security>
+using C<--wiki_token>!
 
-    [Unit]
-    Description=Phoebe
-    After=network.target
-    [Service]
-    Type=simple
-    WorkingDirectory=/home/phoebe
-    ExecStart=/home/phoebe/phoebe
-    Restart=always
-    User=phoebe
-    Group=phoebe
-    [Install]
-    WantedBy=multi-user.target
-
-Save this as F<phoebe.service>, and then link it:
-
-    sudo ln -s /home/phoebe/phoebe.service /etc/systemd/system/
-
-Reload systemd:
-
-    sudo systemctl daemon-reload
-
-Start Phoebe:
-
-    sudo systemctl start phoebe
-
-Check the log output:
-
-    sudo journalctl --unit phoebe
+=head1 NOTES
 
 =head2 Security
 
@@ -522,15 +516,80 @@ IP numbers, in which case you will need to tell them about it using in order to
 comply with the
 L<GDPR|https://en.wikipedia.org/wiki/General_Data_Protection_Regulation>.
 
-=head2 Files
+=head1 EXAMPLE
 
-If you allow uploads of binary files, these are stored separately from the
-regular pages; the wiki doesn't keep old revisions of files around. If somebody
-overwrites a file, the old revision is gone.
+Here's an example for how to start Phoebe. It listens on C<localhost> port 1965,
+adds the "Welcome" and the "About" page to the main menu, and allows editing
+using one of two tokens.
 
-You definitely don't want random people uploading all sorts of images, videos
-and binaries to your server. Make sure you set up those L<tokens|/Security>
-using C<--wiki_token>!
+    perl phoebe \
+      --wiki_token=Elrond \
+      --wiki_token=Thranduil \
+      --wiki_page=Welcome \
+      --wiki_page=About
+
+Here's what my F<phoebe.service> file actually looks like:
+
+    [Unit]
+    Description=Phoebe
+    After=network.target
+    [Install]
+    WantedBy=multi-user.target
+    [Service]
+    Type=simple
+    WorkingDirectory=/home/alex/farm
+    Restart=always
+    User=alex
+    Group=ssl-cert
+    ExecStart=/home/alex/src/phoebe/script/phoebe \
+     --port=1965 \
+     --log_level=debug \
+     --wiki_dir=/home/alex/phoebe \
+     --host=transjovian.org \
+     --cert_file=/var/lib/dehydrated/certs/transjovian.org/fullchain.pem \
+     --key_file=/var/lib/dehydrated/certs/transjovian.org/privkey.pem \
+     --host=toki.transjovian.org \
+     --cert_file=/var/lib/dehydrated/certs/transjovian.org/fullchain.pem \
+     --key_file=/var/lib/dehydrated/certs/transjovian.org/privkey.pem \
+     --host=vault.transjovian.org \
+     --cert_file=/var/lib/dehydrated/certs/transjovian.org/fullchain.pem \
+     --key_file=/var/lib/dehydrated/certs/transjovian.org/privkey.pem \
+     --host=communitywiki.org \
+     --cert_file=/var/lib/dehydrated/certs/communitywiki.org/fullchain.pem \
+     --key_file=/var/lib/dehydrated/certs/communitywiki.org/privkey.pem \
+     --host=alexschroeder.ch \
+     --cert_file=/var/lib/dehydrated/certs/alexschroeder.ch/fullchain.pem \
+     --key_file=/var/lib/dehydrated/certs/alexschroeder.ch/privkey.pem \
+     --host=next.oddmuse.org \
+     --cert_file=/var/lib/dehydrated/certs/oddmuse.org/fullchain.pem \
+     --key_file=/var/lib/dehydrated/certs/oddmuse.org/privkey.pem \
+     --host=emacswiki.org \
+     --cert_file=/var/lib/dehydrated/certs/emacswiki.org/fullchain.pem \
+     --key_file=/var/lib/dehydrated/certs/emacswiki.org/privkey.pem \
+     --wiki_main_page=Welcome \
+     --wiki_page=About \
+     --wiki_mime_type=image/png \
+     --wiki_mime_type=image/jpeg \
+     --wiki_mime_type=audio/mpeg \
+     --wiki_space=transjovian.org/test \
+     --wiki_space=transjovian.org/phoebe \
+     --wiki_space=transjovian.org/anthe \
+     --wiki_space=transjovian.org/gemini \
+     --wiki_space=transjovian.org/titan
+
+=head2 Certificates and File Permission
+
+In the example above, I'm using certificates I get from Let's Encrypt. Thus, the
+regular website served on port 443 and the Phoebe website on port 1965 use the
+same certificates. My problem is that for the regular website, Apache can read
+the certificates, but in the setup above Phoebe runs as the user C<alex> and
+cannot access the certificates. My solution is to use the group C<ssl-cert>.
+This is the group that already has read access to F</etc/ssl/private> on my
+system. I granted the following permissions:
+
+    drwxr-x--- root ssl-cert /var/lib/dehydrated/certs
+    drwxr-s--- root ssl-cert /var/lib/dehydrated/certs/*
+    drwxr----- root ssl-cert /var/lib/dehydrated/certs/*/*.pem
 
 =head2 Main Page and Title
 
@@ -553,10 +612,9 @@ shown on your front page.
 There are search machines out there that will index your site. Ideally, these
 wouldn't index the history pages and all that: they would only get the list of
 all pages, and all the pages. I'm not even sure that we need them to look at all
-the files. The L<robots exclusion
-standard|https://en.wikipedia.org/wiki/Robots_exclusion_standard> lets you
-control what the bots ought to index and what they ought to skip. It doesn't
-always work.
+the files. The Robots Exclusion Standard lets you control what the bots ought to
+index and what they ought to skip. It doesn't always work.
+L<https://en.wikipedia.org/wiki/Robots_exclusion_standard>
 
 Here's my suggestion:
 
@@ -630,29 +688,31 @@ signal, if you know the pid, or if you have a pid file:
 
 Here are the ways you can hook into Phoebe code:
 
-=over
+C<@extensions> is a list of code references allowing you to handle additional
+URLs; return 1 if you handle a URL; each code reference gets called with $stream
+(L<Mojo::IOLoop::Stream>), the first line of the request (a Gemini URL, a Gopher
+selector, a finger user, a HTTP request line), a hash reference for the headers
+(in the case of HTTP requests), and a buffer of bytes (e.g. for Titan or HTTP
+PUT or POST requests)
 
-=item C<@extensions> is a list of code references allowing you to handle
-      additional URLs; return 1 if you handle a URL; each code reference gets
-      called with $stream (L<Mojo::IOLoop::Stream>), the first line of the
-      request (a Gemini URL, a Gopher selector, a finger user, a HTTP request
-      line), a hash reference for the headers (in the case of HTTP requests),
-      and a buffer of bytes (e.g. for Titan or HTTP PUT or POST requests)
+C<@main_menu> adds more lines to the main menu, possibly links that aren't
+simply links to existing pages
 
-=item C<@main_menu> adds more lines to the main menu, possibly links that aren't
-      simply links to existing pages
+C<@footer> is a list of code references allowing you to add things like licenses
+or contact information to every page; each code reference gets called with
+$stream (L<Mojo::IOLoop::Stream>), $host, $space, $id, $revision, and $format
+('gemini' or 'html') used to serve the page; return a gemtext string to append
+at the end; the alternative is to overwrite the C<footer> or C<html_footer> subs
+– the default implementation for Gemini adds History, Raw text and HTML link,
+and C<@footer> to the bottom of every page; the default implementation for HTTP
+just adds C<@footer> to the bottom of every page
 
-=item C<@footer> is a list of code references allowing you to add things like
-      licenses or contact information to every page; each code reference gets
-      called with $stream (L<Mojo::IOLoop::Stream>), $host, $space, $id,
-      $revision, and $format ('gemini' or 'html') used to serve the page; return
-      a gemtext string to append at the end; the alternative is to overwrite the
-      C<footer> or C<html_footer> subs – the default implementation for Gemini
-      adds History, Raw text and HTML link, and C<@footer> to the bottom of
-      every page; the default implementation for HTTP just adds C<@footer> to
-      the bottom of every page
+If you do hook into Phoebe's code, you probably want to make use of the
+following variables:
 
-=back
+C<$server> stores the command line options provided by the user.
+
+C<$log> is how you log things.
 
 A very simple example to add a contact mail at the bottom of every page; this
 works for both Gemini and the web:
@@ -663,8 +723,8 @@ works for both Gemini and the web:
     push(@footer, sub { '=> mailto:alex@alexschroeder.ch Mail' });
 
 This prints a very simply footer instead of the usual footer for Gemini, as the
-C<footer> sub is redefined. At the same time, the C<@footer> array is still used
-for the web:
+C<footer> function is redefined. At the same time, the C<@footer> array is still
+used for the web:
 
     package App::Phoebe;
     use Modern::Perl;
@@ -691,7 +751,7 @@ for it:
       my $stream = shift;
       my $url = shift;
       my $headers = shift;
-      my $host = $host_regex();
+      my $host = host_regex();
       my $port = port($stream);
       if ($url =~ m!^gemini://($host)(?::$port)?/do/test$!) {
 	$stream->write("20 text/plain\r\n");
@@ -765,11 +825,11 @@ certificates to limit writing to a single, known fingerprint:
     sub protected_wiki {
       my $stream = shift;
       my $url = shift;
-      my $host_regex = host_regex();
+      my $hosts = host_regex();
       my $port = port($stream);
       my $spaces = space_regex($stream);
       my $fingerprint = $server->{client}->get_fingerprint();
-      if (my ($host, $path) = $url =~ m!^titan://($host_regex)(?::$port)?([^?#]*)!) {
+      if (my ($host, $path) = $url =~ m!^titan://($hosts)(?::$port)?([^?#]*)!) {
 	my ($space, $resource) = $path =~ m!^(?:/($spaces))?(?:/raw)?/([^/;=&]+(?:;\w+=[^;=&]+)+)!;
 	if (not $resource) {
 	  $log->debug("The Titan URL is malformed: $path $spaces");
@@ -880,10 +940,11 @@ The wiki can also answer web requests. By default, it only does that on port
 1965. The web pages refer to a CSS file at C</default.css>, and the response to
 a request for this CSS is served by a function that you can override in your
 config file. The following would be the beginning of a CSS that supports a dark
-theme, for example. The
-L<Cache-Control|https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Cache-Control>
-header makes sure browsers don't keep trying to revalidate the CSS more than
-once a day.
+theme, for example. The Cache-Control header makes sure browsers don't keep
+trying to revalidate the CSS more than once a day.
+L<https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Cache-Control>
+
+    our ($log);
 
     sub serve_css_via_http {
       my $stream = shift;
@@ -914,6 +975,8 @@ for all hosts. You could, of course, accept the C<$headers> as an additional
 argument to C<favicon>, match hostnames, pass the C<$host> to
 C<serve_favicon_via_http>, and return different images depending on the host.
 Let me know if you need this and you are stuck.
+
+    our (@extensions, $log);
 
     push(@extensions, \&favicon);
 
@@ -949,26 +1012,32 @@ Let me know if you need this and you are stuck.
     EOT
     }
 
-=head2 More
+=head1 SEE ALSO
 
 As you might have guessed, the system is easy to tinker with, if you know some
-Perl. L<The Transjovian Council|https://transjovian.org:1965/> has L<a wiki
-space dedicated to Phoebe|https://transjovian.org:1965/phoebe/>, and it includes
-a section with more configuration examples, including simple comments
+Perl. The Transjovian Council has a wiki space dedicated to Phoebe, and it
+includes a section with more configuration examples, including simple comments
 (append-only via Gemini), complex comments (editing via Titan or the web),
 wholesale page editing via the web, user-agent blocking, and so on.
+L<gemini://transjovian.org/> L<https://transjovian.org:1965/>
+
+=head1 LICENSE
+
+GNU Affero General Public License
 
 =cut
 
 package App::Phoebe;
 use File::Slurper qw(read_text read_binary read_lines read_dir write_text write_binary);
-use Encode qw(encode_utf8 decode_utf8);
+use Encode qw(encode_utf8 decode_utf8 decode);
+use Net::IDN::Encode qw(domain_to_ascii);
 use Socket qw(:addrinfo SOCK_RAW);
 use List::Util qw(first min);
 use Modern::Perl '2018';
 use File::ReadBackwards;
 use IO::Socket::SSL;
 use Algorithm::Diff;
+use Encode::Locale;
 use Mojo::IOLoop;
 use Getopt::Long;
 use URI::Escape;
@@ -982,6 +1051,7 @@ our (@extensions, @main_menu, @footer);
 our $log ||= Mojo::Log->new(level => 'warn');
 our $server = {host => {}};
 
+# Some of these need to be decoded (hostnames, pagenames).
 GetOptions(
   $server,
   'help' => \&help,
@@ -989,16 +1059,19 @@ GetOptions(
   'log_file=s' => sub { $log->path($_[1]) },
   'cert_file=s' => \&host_setup,
   'key_file=s' => \&host_setup,
-  'host=s' => \&host_setup,
+  'host=s' => sub { host_setup(shift, decode(locale => shift)) },
   'port=i@', # same ports for all hosts!
   'wiki_dir=s',
-  'wiki_space=s@',
-  'wiki_token=s@',
-  'wiki_page=s@',
-  'wiki_main_page=s',
+  'wiki_space=s@' => \&utf8_list_item,
+  'wiki_token=s@' => \&utf8_list_item,
+  'wiki_page=s@' => \&utf8_list_item,
+  'wiki_main_page=s' => \&utf8_item,
   'wiki_mime_type=s@',
   'wiki_page_size_limit=i')
     or die("Error in command line arguments\n");
+
+sub utf8_list_item { my ($key, $value) = @_; push(@{$server->{$key}}, decode(locale => $value)) };
+sub utf8_item { my ($key, $value) = @_; $server->{$key} = decode(locale => $value) };
 
 {
   # use a block so that these variables stay local
@@ -1163,8 +1236,9 @@ sub configure {
   # config file with extra code; restart server if you change it
   my $dir = $server->{wiki_dir};
   my @config;
-  push(@config, "$dir/config") if -f "$dir/config";
   push(@config, map { "$dir/conf.d/$_" } grep(/\.p[lm]$/, read_dir("$dir/conf.d"))) if -d "$dir/conf.d";
+  # allow override of config files in conf.d
+  push(@config, "$dir/config") if -f "$dir/config";
   for my $config (@config) {
     $log->info("Running $config");
     do $config if -r $config;
@@ -1176,8 +1250,8 @@ sub configure {
   $log->info("Port: @{$server->{port}}");
     $log->info("Space: @{$server->{wiki_space}}");
   if (keys %{$server->{host}} > 1) {
-    my $host_regex = host_regex();
-    for (grep(!/^$host_regex\//, @{$server->{wiki_space}})) {
+    my $hosts = host_regex();
+    for (grep(!/^$hosts\//, @{$server->{wiki_space}})) {
       $log->warn("Space $_ is not prefixed with a known host");
     }
   } else {
@@ -1194,12 +1268,13 @@ sub configure {
 
 sub get_ip_numbers {
   my $hostname = shift;
+  my $punycode = domain_to_ascii($hostname);
   my @addresses;
-  my ($err, @res) = getaddrinfo($hostname, "", {socktype => SOCK_RAW});
-  $log->error("Cannot determine the IP number of $hostname: $err") if $err;
+  my ($err, @res) = getaddrinfo($punycode, "", {socktype => SOCK_RAW});
+  $log->error("Cannot determine the IP number of $punycode: $err") if $err;
   for my $ai (@res) {
     my ($err, $ipaddr) = getnameinfo($ai->{addr}, NI_NUMERICHOST, NIx_NOSERV);
-    $log->error("Cannot get a readable IP number of $hostname: $err") if $err;
+    $log->error("Cannot get a readable IP number of $punycode: $err") if $err;
     push(@addresses, $ipaddr) if $ipaddr;
   }
   return @addresses;
@@ -1388,7 +1463,7 @@ sub with_lock {
 # options.
 sub host_regex {
   my $stream = shift;
-  return join("|", map { quotemeta } keys %{$server->{host}});
+  return join("|", map { quotemeta domain_to_ascii $_ } keys %{$server->{host}});
 }
 
 sub port {
@@ -1458,7 +1533,6 @@ sub print_link {
 }
 
 sub pages {
-  my $stream = shift;
   my $host = shift;
   my $space = shift;
   my $re = shift;
@@ -1475,10 +1549,9 @@ sub pages {
 }
 
 sub blog_pages {
-  my $stream = shift;
   my $host = shift;
   my $space = shift;
-  return sort { $b cmp $a } pages($stream, $host, $space, '^\d\d\d\d-\d\d-\d\d');
+  return sort { $b cmp $a } pages($host, $space, '^\d\d\d\d-\d\d-\d\d');
 }
 
 sub blog {
@@ -1486,7 +1559,7 @@ sub blog {
   my $host = shift;
   my $space = shift;
   my $n = shift || 10;
-  my @blog = blog_pages($stream, $host, $space);
+  my @blog = blog_pages($host, $space);
   return unless @blog;
   $stream->write("Blog:\n");
   # we should check for pages marked for deletion!
@@ -1502,7 +1575,7 @@ sub blog_html {
   my $host = shift;
   my $space = shift;
   my $n = shift || 10;
-  my @blog = blog_pages($stream, $host, $space);
+  my @blog = blog_pages($host, $space);
   return unless @blog;
   $stream->write("<p>Blog:\n");
   $stream->write("<ul>\n");
@@ -1521,7 +1594,7 @@ sub serve_main_menu {
   success($stream);
   my $page = $server->{wiki_main_page};
   if ($page) {
-    $stream->write(encode_utf8 text($stream, $host, $space, $page) . "\n");
+    $stream->write(encode_utf8 text($host, $space, $page) . "\n");
   } else {
     $stream->write("# Welcome to Phoebe!\n");
     $stream->write("\n");
@@ -1571,7 +1644,7 @@ sub serve_main_menu_via_http {
   $stream->write("</head>\n");
   $stream->write("<body>\n");
   if ($page) {
-    $stream->write(encode_utf8 to_html($stream, text($stream, $host, $space, $page)) . "\n");
+    $stream->write(encode_utf8 to_html($stream, text($host, $space, $page)) . "\n");
   } else {
     $stream->write("<h1>Welcome to Phoebe!</h1>\n");
   }
@@ -1622,7 +1695,7 @@ sub serve_blog {
   success($stream);
   $log->info("Serving blog");
   $stream->write("# Blog\n");
-  my @blog = blog_pages($stream, $host, $space);
+  my @blog = blog_pages($host, $space);
   if (not @blog) {
     $stream->write("The are no blog pages.\n");
     return;
@@ -1641,7 +1714,7 @@ sub serve_index {
   success($stream);
   $log->info("Serving index of all pages");
   $stream->write("# All Pages\n");
-  my @pages = pages($stream, $host, $space);
+  my @pages = pages($host, $space);
   $stream->write("The are no pages.\n") unless @pages;
   for my $id (sort { newest_first($stream, $a, $b) } @pages) {
     print_link($stream, $host, $space, $id);
@@ -1666,7 +1739,7 @@ sub serve_index_via_http {
   $stream->write("</head>\n");
   $stream->write("<body>\n");
   $stream->write("<h1>All Pages</h1>\n");
-  my @pages = pages($stream, $host, $space);
+  my @pages = pages($host, $space);
   if (@pages) {
     $stream->write("<ul>\n");
     for my $id (sort { newest_first($stream, $a, $b) } @pages) {
@@ -1817,7 +1890,7 @@ sub serve_match {
   $log->info("Serving pages matching $match");
   $stream->write(encode_utf8 "# Search page titles for $match\n");
   $stream->write("Use a Perl regular expression to match page titles.\n");
-  my @pages = pages($stream, $host, $space, $match);
+  my @pages = pages($host, $space, $match);
   $stream->write("No matching page names found.\n") unless @pages;
   for my $id (sort { newest_first($stream, $a, $b) } @pages) {
     print_link($stream, $host, $space, $id);
@@ -1848,11 +1921,11 @@ sub search {
   my $space = shift;
   my $str = shift;
   my $func = shift;
-  my @pages = sort { newest_first($stream, $a, $b) } pages($stream, $host, $space);
+  my @pages = sort { newest_first($stream, $a, $b) } pages($host, $space);
   return unless @pages;
   my $found = 0;
   for my $id (@pages) {
-    my $text = text($stream, $host, $space, $id);
+    my $text = text($host, $space, $id);
     if ($id =~ /$str/ or $text =~ /$str/) {
       $func->($host, $space, $id, $text, $str);
       $found++;
@@ -2300,7 +2373,7 @@ sub rss {
       my $link = to_url($stream, $host, $space, "page/$id", $scheme);
       $stream->write("<link>$link</link>\n");
       $stream->write("<guid>$link</guid>\n");
-      $stream->write(encode_utf8 "<description>" . quote_html(text($stream, $host, $space, $id)) . "</description>\n");
+      $stream->write(encode_utf8 "<description>" . quote_html(text($host, $space, $id)) . "</description>\n");
       my ($sec, $min, $hour, $mday, $mon, $year, $wday) = gmtime($ts); # Sat, 07 Sep 2002 00:00:01 GMT
       $stream->write("<pubDate>"
 		     . sprintf("%s, %02d %s %04d %02d:%02d:%02d GMT", qw(Sun Mon Tue Wed Thu Fri Sat)[$wday], $mday,
@@ -2419,7 +2492,7 @@ sub atom {
       my $link = to_url($stream, $host, $space, "page/$id", $scheme);
       $stream->write("<link href=\"$link\"/>\n");
       $stream->write("<id>$link</id>\n");
-      $stream->write(encode_utf8 "<content type=\"text\">" . quote_html(text($stream, $host, $space, $id)) . "</content>\n");
+      $stream->write(encode_utf8 "<content type=\"text\">" . quote_html(text($host, $space, $id)) . "</content>\n");
       $seen{$name} = 1;
     } else {
       # a file
@@ -2450,7 +2523,7 @@ sub serve_raw {
   my $revision = shift;
   $log->info("Serving raw $id");
   success($stream, 'text/plain; charset=UTF-8');
-  $stream->write(encode_utf8 text($stream, $host, $space, $id, $revision));
+  $stream->write(encode_utf8 text($host, $space, $id, $revision));
 }
 
 sub serve_raw_via_http {
@@ -2463,7 +2536,7 @@ sub serve_raw_via_http {
   $stream->write("HTTP/1.1 200 OK\r\n");
   $stream->write("Content-Type: text/plain; charset=UTF-8\r\n");
   $stream->write("\r\n");
-  $stream->write(encode_utf8 text($stream, $host, $space, $id, $revision));
+  $stream->write(encode_utf8 text($host, $space, $id, $revision));
 }
 
 sub serve_diff {
@@ -2479,8 +2552,8 @@ sub serve_diff {
   if (not $style) { print_link($stream, $host, $space, "Colour diff", "diff/$id/$revision/colour") }
   else { print_link($stream, $host, $space, "Normal diff", "diff/$id/$revision") }
   $stream->write("Showing the differences between revision $revision and the current revision.\n");
-  my $new = text($stream, $host, $space, $id);
-  my $old = text($stream, $host, $space, $id, $revision);
+  my $new = text($host, $space, $id);
+  my $old = text($host, $space, $id, $revision);
   if (not $style) {
     diff($old, $new,
 	 sub { $stream->write(encode_utf8 "$_\n") for @_ },
@@ -2517,8 +2590,8 @@ sub serve_diff_via_http {
   $stream->write("<body>\n");
   $stream->write(encode_utf8 "<h1>Differences for " . quote_html($id) . "</h1>\n");
   $stream->write("<p>Showing the differences between revision $revision and the current revision.\n");
-  my $new = text($stream, $host, $space, $id);
-  my $old = text($stream, $host, $space, $id, $revision);
+  my $new = text($host, $space, $id);
+  my $old = text($host, $space, $id, $revision);
   diff($old, $new,
        sub { $stream->write(encode_utf8 "<p>$_\n") for @_ },
        sub { $stream->write(encode_utf8 "<p style=\"color: rgb(222,56,43)\">" . join("<br>", map { $_||"⏎" } @_) . "\n") },
@@ -2622,7 +2695,7 @@ sub html_page {
   $stream->write("</head>\n");
   $stream->write("<body>\n");
   $stream->write(encode_utf8 "<h1>" . quote_html($id) . "</h1>\n");
-  $stream->write(encode_utf8 to_html($stream, text($stream, $host, $space, $id, $revision)) . "\n");
+  $stream->write(encode_utf8 to_html($stream, text($host, $space, $id, $revision)) . "\n");
   $stream->write(encode_utf8 to_html($stream, html_footer($stream, $host, $space, $id, $revision)) . "\n");
   $stream->write("</body>\n");
   $stream->write("</html>\n");
@@ -2686,7 +2759,7 @@ sub html_footer {
   my $revision = shift||"";
   my @links;
   push(@links, $_->($stream, $host, $space, $id, $revision, "html")) for @footer;
-  my $html = join("\n", @links);
+  my $html = join("\n", grep /\S/, @links);
   return "\n\nMore:\n$html" if $html =~ /\S/;
   return "";
 }
@@ -2806,7 +2879,7 @@ sub footer {
   push(@links, gemini_link($stream, $host, $space, "Raw text", "raw/$id/$revision"));
   push(@links, gemini_link($stream, $host, $space, "HTML", "html/$id/$revision"));
   push(@links, $_->($stream, $host, $space, $id, $revision, "gemini")) for @footer;
-  return join("\n", "\n\nMore:", @links, ""); # includes a trailing newline
+  return join("\n", "\n\nMore:", (grep /\S/, @links), ""); # includes a trailing newline
 }
 
 sub serve_page {
@@ -2818,12 +2891,11 @@ sub serve_page {
   $log->info("Serve Gemini page $id");
   success($stream);
   $stream->write(encode_utf8 "# $id\n");
-  $stream->write(encode_utf8 text($stream, $host, $space, $id, $revision));
+  $stream->write(encode_utf8 text($host, $space, $id, $revision));
   $stream->write(encode_utf8 footer($stream, $host, $space, $id, $revision));
 }
 
 sub text {
-  my $stream = shift;
   my $host = shift;
   my $space = shift;
   my $id = shift;
@@ -2831,13 +2903,12 @@ sub text {
   my $dir = wiki_dir($host, $space);
   return read_text "$dir/keep/$id/$revision.gmi" if $revision and -f "$dir/keep/$id/$revision.gmi";
   return read_text "$dir/page/$id.gmi" if -f "$dir/page/$id.gmi";
-  return robots($stream) if $id eq "robots" and not $space;
+  return robots() if $id eq "robots" and not $space;
   return "This this revision is no longer available." if $revision;
   return "This page does not yet exist.";
 }
 
 sub robots () {
-  my $stream = shift;
   my $ban = << 'EOT';
 User-agent: *
 Disallow: /raw/*
@@ -3278,7 +3349,7 @@ sub process_http {
       $log->error("Timeout processing $request");
     };
     alarm(10); # timeout
-    my $host_regex = host_regex();
+    my $hosts = host_regex();
     my $port = port($stream);
     my $spaces = space_regex();
     $log->info("Looking at $request");
@@ -3286,64 +3357,64 @@ sub process_http {
     if (run_extensions($stream, $request, $headers, $buffer)) {
       # config file goes first
     } elsif ($request =~ m!^GET /default.css HTTP/1\.[01]$!
-	and ($host) = $headers->{host} =~ m!^($host_regex)(?::$port)$!) {
+	and ($host) = $headers->{host} =~ m!^($hosts)(?::$port)$!) {
       serve_css_via_http($stream, $host);
     } elsif (($space) = $request =~ m!^GET (?:(?:/($spaces)/?)?|/) HTTP/1\.[01]$!
-	     and ($host) = $headers->{host} =~ m!^($host_regex)(?::$port)$!) {
+	     and ($host) = $headers->{host} =~ m!^($hosts)(?::$port)$!) {
       serve_main_menu_via_http($stream, $host, space($stream, $host, $space));
     } elsif (($space, $id, $n) = $request =~ m!^GET (?:/($spaces))?/page/([^/]*)(?:/(\d+))? HTTP/1\.[01]$!
-	     and ($host) = $headers->{host} =~ m!^($host_regex)(?::$port)$!) {
+	     and ($host) = $headers->{host} =~ m!^($hosts)(?::$port)$!) {
       serve_page_via_http($stream, $host, space($stream, $host, $space), decode_utf8(uri_unescape($id)), $n);
     } elsif (($space, $id, $n) = $request =~ m!^GET (?:/($spaces))?/file/([^/]*)(?:/(\d+))? HTTP/1\.[01]$!
-	     and ($host) = $headers->{host} =~ m!^($host_regex)(?::$port)$!) {
+	     and ($host) = $headers->{host} =~ m!^($hosts)(?::$port)$!) {
       serve_file_via_http($stream, $host, space($stream, $host, $space), decode_utf8(uri_unescape($id)), $n);
     } elsif (($space, $id, $n) = $request =~ m!^GET (?:/($spaces))?/history/([^/]*)(?:/(\d+))? HTTP/1\.[01]$!
-	     and ($host) = $headers->{host} =~ m!^($host_regex)(?::$port)$!) {
+	     and ($host) = $headers->{host} =~ m!^($hosts)(?::$port)$!) {
       serve_history_via_http($stream, $host, space($stream, $host, $space), decode_utf8(uri_unescape($id)), $n||10);
     } elsif (($space, $id, $n) = $request =~ m!^GET (?:/($spaces))?/diff/([^/]*)(?:/(\d+))? HTTP/1\.[01]$!
-	     and ($host) = $headers->{host} =~ m!^($host_regex)(?::$port)$!) {
+	     and ($host) = $headers->{host} =~ m!^($hosts)(?::$port)$!) {
       serve_diff_via_http($stream, $host, space($stream, $host, $space), decode_utf8(uri_unescape($id)), $n||10);
     } elsif (($space, $id, $n) = $request =~ m!^GET (?:/($spaces))?/raw/([^/]*)(?:/(\d+))? HTTP/1\.[01]$!
-	     and ($host) = $headers->{host} =~ m!^($host_regex)(?::$port)$!) {
+	     and ($host) = $headers->{host} =~ m!^($hosts)(?::$port)$!) {
       serve_raw_via_http($stream, $host, space($stream, $host, $space), decode_utf8(uri_unescape($id)), $n);
     } elsif ($request =~ m!^GET /robots.txt HTTP/1\.[01]$!
-	     and ($host) = $headers->{host} =~ m!^($host_regex)(?::$port)$!) {
+	     and ($host) = $headers->{host} =~ m!^($hosts)(?::$port)$!) {
       serve_raw_via_http($stream, $host, undef, 'robots');
     } elsif (($space, $id, $n) = $request =~ m!^GET (?:/($spaces))?/do/changes(?:/(\d+))? HTTP/1\.[01]$!
-	     and ($host) = $headers->{host} =~ m!^($host_regex)(?::$port)$!) {
+	     and ($host) = $headers->{host} =~ m!^($hosts)(?::$port)$!) {
       serve_changes_via_http($stream, $host, space($stream, $host, $space), $n||100);
     } elsif (($filter, $n) = $request =~ m!^GET /do/all(?:/(latest))?/changes(?:/(\d+))? HTTP/1\.[01]$!
-	     and ($host) = $headers->{host} =~ m!^($host_regex)(?::$port)$!) {
+	     and ($host) = $headers->{host} =~ m!^($hosts)(?::$port)$!) {
       serve_all_changes_via_http($stream, $host, $n||100, $filter||"");
     } elsif (($space, $id, $n) = $request =~ m!^GET (?:/($spaces))?/do/index HTTP/1\.[01]$!
-	     and ($host) = $headers->{host} =~ m!^($host_regex)(?::$port)$!) {
+	     and ($host) = $headers->{host} =~ m!^($hosts)(?::$port)$!) {
       serve_index_via_http($stream, $host, space($stream, $host, $space));
     } elsif (($space, $id, $n) = $request =~ m!^GET (?:/($spaces))?/do/files HTTP/1\.[01]$!
-	     and ($host) = $headers->{host} =~ m!^($host_regex)(?::$port)$!) {
+	     and ($host) = $headers->{host} =~ m!^($hosts)(?::$port)$!) {
       serve_files_via_http($stream, $host, space($stream, $host, $space));
     } elsif (($space, $id, $n) = $request =~ m!^GET (?:/($spaces))?/do/spaces HTTP/1\.[01]$!
-	     and ($host) = $headers->{host} =~ m!^($host_regex)(?::$port)$!) {
+	     and ($host) = $headers->{host} =~ m!^($hosts)(?::$port)$!) {
       serve_spaces_via_http($stream, $host, $port);
     } elsif (($space, $id, $n) = $request =~ m!^GET (?:/($spaces))?/do/rss HTTP/1\.[01]$!
-	     and ($host) = $headers->{host} =~ m!^($host_regex)(?::$port)$!) {
+	     and ($host) = $headers->{host} =~ m!^($hosts)(?::$port)$!) {
       serve_rss_via_http($stream, $host, space($stream, $host, $space));
     } elsif (($space, $id, $n) = $request =~ m!^GET (?:/($spaces))?/do/atom HTTP/1\.[01]$!
-	     and ($host) = $headers->{host} =~ m!^($host_regex)(?::$port)$!) {
+	     and ($host) = $headers->{host} =~ m!^($hosts)(?::$port)$!) {
       serve_atom_via_http($stream, $host, space($stream, $host, $space));
     } elsif (($space, $n) = $request =~ m!^GET /do/all/atom HTTP/1\.[01]$!
-	     and ($host) = $headers->{host} =~ m!^($host_regex)(?::$port)$!) {
+	     and ($host) = $headers->{host} =~ m!^($hosts)(?::$port)$!) {
       serve_all_atom_via_http($stream, $host);
     } elsif ($request =~ m!^GET (?:/($spaces))?/do/source HTTP/1\.[01]$!
-	     and ($host) = $headers->{host} =~ m!^($host_regex)(?::$port)$!) {
+	     and ($host) = $headers->{host} =~ m!^($hosts)(?::$port)$!) {
       $stream->write("HTTP/1.1 200 OK\r\n");
       $stream->write("Content-Type: text/plain; charset=UTF-8\r\n");
       $stream->write("\r\n");
       seek DATA, 0, 0;
       local $/ = undef; # slurp
-      $stream->write(<DATA>);
+      $stream->write(encode_utf8 <DATA>);
     } else {
       $log->debug("No http handler for $request");
-      http_error("Don't know how to handle $request");
+      http_error($stream, "Don't know how to handle $request");
     }
     $log->debug("Done");
   };
@@ -3356,10 +3427,10 @@ sub is_upload {
   my $stream = shift;
   my $request = shift;
   $log->info("Looking at $request");
-  my $host_regex = host_regex();
+  my $hosts = host_regex();
   my $spaces_regex = space_regex();
   my $port = port($stream);
-  if ($request =~ m!^titan://($host_regex)(?::$port)?!) {
+  if ($request =~ m!^titan://($hosts)(?::$port)?!) {
     my $host = $1;
     my($scheme, $authority, $path, $query, $fragment) =
 	$request =~ m|(?:([^:/?#]+):)?(?://([^/?#]*))?([^?#]*)(?:\?([^#]*))?(?:#(.*))?|;
@@ -3454,10 +3525,12 @@ sub valid_mime_type {
   if (not $type) {
     $log->debug("Uploads require a MIME type");
     $stream->write("59 Uploads require a MIME type\r\n");
+    $stream->close_gracefully();
     return;
   } elsif ($type ne "text/plain" and not grep(/^$type$/, @types) and not grep(/^$main_type$/, @types)) {
     $log->debug("This wiki does not allow $type");
     $stream->write("59 This wiki does not allow $type\r\n");
+    $stream->close_gracefully();
     return;
   }
   return 1;
@@ -3473,6 +3546,7 @@ sub valid_size {
   if ($size !~ /^\d+$/) {
     $log->debug("You need to send along the number of bytes, not '$size'");
     $stream->write("59 You need to send along the number of bytes, not '$size'\r\n");
+    $stream->close_gracefully();
     return;
   } elsif ($size > $server->{wiki_page_size_limit}) {
     $log->debug("This wiki does not allow more than $server->{wiki_page_size_limit} bytes per page");
@@ -3490,11 +3564,11 @@ sub process_gemini {
       $log->error("Timeout processing $url");
     };
     alarm(10); # timeout
-    my $host_regex = host_regex();
+    my $hosts = host_regex();
     my $port = port($stream);
     my $spaces = space_regex();
     my $reserved = reserved_regex($stream);
-    $log->debug("Serving ($host_regex)(?::$port)?");
+    $log->debug("Serving ($hosts)(?::$port)?");
     $log->debug("Spaces $spaces");
     my($scheme, $authority, $path, $query, $fragment) =
 	$url =~ m|(?:([^:/?#]+):)?(?://([^/?#]*))?([^?#]*)(?:\?([^#]*))?(?:#(.*))?|;
@@ -3508,70 +3582,70 @@ sub process_gemini {
     } elsif (length($url) > 1024) {
       $log->debug("The URL is too long");
       $stream->write("59 The URL is too long\r\n");
-    } elsif (($host, $n, $space) = $url =~ m!^(?:gemini:)?//($host_regex)(:$port)?(?:/($spaces))?/(?:$reserved)$!) {
+    } elsif (($host, $n, $space) = $url =~ m!^(?:gemini:)?//($hosts)(:$port)?(?:/($spaces))?/(?:$reserved)$!) {
       # redirect gemini://localhost:2020/do to gemini://localhost:2020/
       # redirect gemini://localhost:2020/space/do to gemini://localhost:2020/space
       $space = space($stream, $host, $space) || "";
       $stream->write("31 gemini://$host" . ($n ? ":$port" : "") . "/$space\r\n"); # this supports "up"
-    } elsif (($host, $space) = $url =~ m!^(?:gemini:)?//($host_regex)(?::$port)?(?:/($spaces))?/?$!) {
+    } elsif (($host, $space) = $url =~ m!^(?:gemini:)?//($hosts)(?::$port)?(?:/($spaces))?/?$!) {
       serve_main_menu($stream, $host, space($stream, $host, $space));
-    } elsif (($host, $space, $n) = $url =~ m!^(?:gemini:)?//($host_regex)(?::$port)?(?:/($spaces))?/do/more(?:/(\d+))?$!) {
+    } elsif (($host, $space, $n) = $url =~ m!^(?:gemini:)?//($hosts)(?::$port)?(?:/($spaces))?/do/more(?:/(\d+))?$!) {
       serve_blog($stream, $host, space($stream, $host, $space), $n);
-    } elsif (($host, $space) = $url =~ m!^(?:gemini:)?//($host_regex)(?::$port)?(?:/($spaces))?/do/index$!) {
+    } elsif (($host, $space) = $url =~ m!^(?:gemini:)?//($hosts)(?::$port)?(?:/($spaces))?/do/index$!) {
       serve_index($stream, $host, space($stream, $host, $space));
-    } elsif (($host, $space) = $url =~ m!^(?:gemini:)?//($host_regex)(?::$port)?(?:/($spaces))?/do/files$!) {
+    } elsif (($host, $space) = $url =~ m!^(?:gemini:)?//($hosts)(?::$port)?(?:/($spaces))?/do/files$!) {
       serve_files($stream, $host, space($stream, $host, $space));
-    } elsif (($host) = $url =~ m!^(?:gemini:)?//($host_regex)(?::$port)?(?:/($spaces))?/do/spaces$!) {
+    } elsif (($host) = $url =~ m!^(?:gemini:)?//($hosts)(?::$port)?(?:/($spaces))?/do/spaces$!) {
       serve_spaces($stream, $host, $port);
-    } elsif (($host, $space) = $url =~ m!^(?:gemini:)?//($host_regex)(?::$port)?(?:/($spaces))?/do/data$!) {
+    } elsif (($host, $space) = $url =~ m!^(?:gemini:)?//($hosts)(?::$port)?(?:/($spaces))?/do/data$!) {
       serve_data($stream, $host, space($stream, $host, $space));
-    } elsif ($url =~ m!^(?:gemini:)?//($host_regex)(?::$port)?/do/source$!) {
+    } elsif ($url =~ m!^(?:gemini:)?//($hosts)(?::$port)?/do/source$!) {
       success($stream, 'text/plain; charset=UTF-8');
       seek DATA, 0, 0;
       local $/ = undef; # slurp
-      $stream->write(<DATA>);
-    } elsif ($url =~ m!^(?:gemini:)?//($host_regex)(?::$port)?(?:/($spaces))?/do/match$!) {
+      $stream->write(encode_utf8 <DATA>);
+    } elsif ($url =~ m!^(?:gemini:)?//($hosts)(?::$port)?(?:/($spaces))?/do/match$!) {
       $stream->write("10 Find page by name (Perl regex)\r\n");
-    } elsif ($query and ($host, $space) = $url =~ m!^(?:gemini:)?//($host_regex)(?::$port)?(?:/($spaces))?/do/match\?!) {
+    } elsif ($query and ($host, $space) = $url =~ m!^(?:gemini:)?//($hosts)(?::$port)?(?:/($spaces))?/do/match\?!) {
       serve_match($stream, $host, map {decode_utf8(uri_unescape($_))} $space, $query);
-    } elsif ($url =~ m!^(?:gemini:)?//($host_regex)(?::$port)?(?:/($spaces))?/do/search$!) {
+    } elsif ($url =~ m!^(?:gemini:)?//($hosts)(?::$port)?(?:/($spaces))?/do/search$!) {
       $stream->write("10 Find page by content (Perl regex)\r\n");
-    } elsif ($query and ($host, $space) = $url =~ m!^(?:gemini:)?//($host_regex)(?::$port)?(?:/($spaces))?/do/search\?!) {
+    } elsif ($query and ($host, $space) = $url =~ m!^(?:gemini:)?//($hosts)(?::$port)?(?:/($spaces))?/do/search\?!) {
       serve_search($stream, $host, space($stream, $host, $space), decode_utf8(uri_unescape($query))); # search terms include spaces
-    } elsif ($url =~ m!^(?:gemini:)?//($host_regex)(?::$port)?(?:/($spaces))?/do/new$!) {
+    } elsif ($url =~ m!^(?:gemini:)?//($hosts)(?::$port)?(?:/($spaces))?/do/new$!) {
       $stream->write("10 New page\r\n");
-    } elsif ($query and ($host, $space) = $url =~ m!^(?:gemini:)?//($host_regex)(?::$port)?(?:/($spaces))?/do/new\?!) {
       # no URI escaping required
+    } elsif ($query and ($host, $space) = $url =~ m!^(?:gemini:)?//($hosts)(?::$port)?(?:/($spaces))?/do/new\?!) {
       if ($space) {
 	$stream->write("30 gemini://$host:$port/$space/raw/$query\r\n");
       } else {
 	$stream->write("30 gemini://$host:$port/raw/$query\r\n");
       }
-    } elsif (($host, $space, $n, $style) = $url =~ m!^(?:gemini:)?//($host_regex)(?::$port)?(?:/($spaces))?/do/changes(?:/(\d+))?(?:/(colour|fancy))?$!) {
+    } elsif (($host, $space, $n, $style) = $url =~ m!^(?:gemini:)?//($hosts)(?::$port)?(?:/($spaces))?/do/changes(?:/(\d+))?(?:/(colour|fancy))?$!) {
       serve_changes($stream, $host, space($stream, $host, $space), $n||100, $style);
-    } elsif (($host, $filter, $n, $style) = $url =~ m!^(?:gemini:)?//($host_regex)(?::$port)?/do/all(?:/(latest))?/changes(?:/(\d+))?(?:/(colour|fancy))?$!) {
+    } elsif (($host, $filter, $n, $style) = $url =~ m!^(?:gemini:)?//($hosts)(?::$port)?/do/all(?:/(latest))?/changes(?:/(\d+))?(?:/(colour|fancy))?$!) {
       serve_all_changes($stream, $host, $n||100, $style||"", $filter||"");
-    } elsif (($host, $space) = $url =~ m!^(?:gemini:)?//($host_regex)(?::$port)?(?:/($spaces))?/do/rss$!) {
+    } elsif (($host, $space) = $url =~ m!^(?:gemini:)?//($hosts)(?::$port)?(?:/($spaces))?/do/rss$!) {
       serve_rss($stream, $host, space($stream, $host, $space));
-    } elsif (($host, $space) = $url =~ m!^(?:gemini:)?//($host_regex)(?::$port)?(?:/($spaces))?/do/atom$!) {
+    } elsif (($host, $space) = $url =~ m!^(?:gemini:)?//($hosts)(?::$port)?(?:/($spaces))?/do/atom$!) {
       serve_atom($stream, $host, space($stream, $host, $space));
-    } elsif (($host, $space) = $url =~ m!^(?:gemini:)?//($host_regex)(?::$port)?(?:/($spaces))?/do/all/atom$!) {
+    } elsif (($host, $space) = $url =~ m!^(?:gemini:)?//($hosts)(?::$port)?(?:/($spaces))?/do/all/atom$!) {
       serve_all_atom($stream, $host);
-    } elsif ($url =~ m!^(?:gemini:)?//($host_regex)(?::$port)?/robots.txt$!) {
+    } elsif ($url =~ m!^(?:gemini:)?//($hosts)(?::$port)?/robots.txt$!) {
       serve_raw($stream, $host, undef, "robots");
-    } elsif (($host, $space, $id, $n, $style) = $url =~ m!^(?:gemini:)?//($host_regex)(?::$port)?(?:/($spaces))?/history/([^/]*)(?:/(\d+))?(?:/(colour|fancy))?$!) {
+    } elsif (($host, $space, $id, $n, $style) = $url =~ m!^(?:gemini:)?//($hosts)(?::$port)?(?:/($spaces))?/history/([^/]*)(?:/(\d+))?(?:/(colour|fancy))?$!) {
       serve_history($stream, $host, space($stream, $host, $space), decode_utf8(uri_unescape($id)), $n||10, $style);
-    } elsif (($host, $space, $id, $n, $style) = $url =~ m!^(?:gemini:)?//($host_regex)(?::$port)?(?:/($spaces))?/diff/([^/]*)(?:/(\d+))?(?:/(colour))?$!) {
+    } elsif (($host, $space, $id, $n, $style) = $url =~ m!^(?:gemini:)?//($hosts)(?::$port)?(?:/($spaces))?/diff/([^/]*)(?:/(\d+))?(?:/(colour))?$!) {
       serve_diff($stream, $host, space($stream, $host, $space), decode_utf8(uri_unescape($id)), $n, $style);
-    } elsif (($host, $space, $id, $n) = $url =~ m!^(?:gemini:)?//($host_regex)(?::$port)?(?:/($spaces))?/raw/([^/]*)(?:/(\d+))?$!) {
+    } elsif (($host, $space, $id, $n) = $url =~ m!^(?:gemini:)?//($hosts)(?::$port)?(?:/($spaces))?/raw/([^/]*)(?:/(\d+))?$!) {
       serve_raw($stream, $host, space($stream, $host, $space), decode_utf8(uri_unescape($id)), $n);
-    } elsif (($host, $space, $id, $n) = $url =~ m!^(?:gemini:)?//($host_regex)(?::$port)?(?:/($spaces))?/html/([^/]*)(?:/(\d+))?$!) {
+    } elsif (($host, $space, $id, $n) = $url =~ m!^(?:gemini:)?//($hosts)(?::$port)?(?:/($spaces))?/html/([^/]*)(?:/(\d+))?$!) {
       serve_html($stream, $host, space($stream, $host, $space), decode_utf8(uri_unescape($id)), $n);
-    } elsif (($host, $space, $id, $n) = $url =~ m!^(?:gemini:)?//($host_regex)(?::$port)?(?:/($spaces))?/page/([^/]+)(?:/(\d+))?$!) {
+    } elsif (($host, $space, $id, $n) = $url =~ m!^(?:gemini:)?//($hosts)(?::$port)?(?:/($spaces))?/page/([^/]+)(?:/(\d+))?$!) {
       serve_page($stream, $host, space($stream, $host, $space), decode_utf8(uri_unescape($id)), $n);
-    } elsif (($host, $space, $id) = $url =~ m!^(?:gemini:)?//($host_regex)(?::$port)?(?:/($spaces))?/file/([^/]+)?$!) {
+    } elsif (($host, $space, $id) = $url =~ m!^(?:gemini:)?//($hosts)(?::$port)?(?:/($spaces))?/file/([^/]+)?$!) {
       serve_file($stream, $host, space($stream, $host, $space), decode_utf8(uri_unescape($id)));
-    } elsif (($host) = $url =~ m!^(?:gemini:)?//($host_regex)(?::$port)?(/|$)!) {
+    } elsif (($host) = $url =~ m!^(?:gemini:)?//($hosts)(?::$port)?(/|$)!) {
       $log->info("Unknown path for $url\r");
       $stream->write("51 Path not found for $url\r\n");
     } elsif ($authority) {

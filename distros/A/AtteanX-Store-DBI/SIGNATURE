@@ -14,11 +14,10 @@ not run its Makefile.PL or Build.PL.
 -----BEGIN PGP SIGNED MESSAGE-----
 Hash: SHA1
 
-SHA1 3c5d8728a9fa01aac53b2c564d7fcafae7e2a11a Changes
-SHA1 349e3c3f8e1bb1bd4d3335b2ffe8e5e3539b020b LICENSE
-SHA1 16d76d83d4907fadf4a8b83e40b7899f32ce75e6 MANIFEST
-SHA1 14a1b7a45bc44764f3005458bf6c81e8afd29620 META.yml
-SHA1 3e5762956aecad9288774eaffd3070bc6102af7e Makefile.PL
+SHA1 25e4d6942df15b2bed4ad0a8ad7fd001ecdd4924 Changes
+SHA1 77dd35c1247483f080d885f9dab85436494709e4 MANIFEST
+SHA1 d86aa4c01b118c8f49456252b8619a1fd47865fc META.yml
+SHA1 7123645c1dc9aa69d0b8762ebc6e64f3f51afbc1 Makefile.PL
 SHA1 05411a9b4c484a973260a56aacdaad48e4be6914 README.md
 SHA1 0195dc3a3cae16a81231087f5e8b6e52364de6d5 bin/attean_dbi
 SHA1 c3f8f9f2a209f80b7ca3c8af3a6b1b7b408ad620 inc/Module/Install.pm
@@ -33,9 +32,9 @@ SHA1 78f307119470d0c85d7d6496e76fc95cb939b462 inc/Module/Install/Scripts.pm
 SHA1 a4ed3f5a3e2f117b8f453771b9e52e8c0f5fcfbc inc/Module/Install/Share.pm
 SHA1 99b8179fbd9e05422b161cf91abe198744188064 inc/Module/Install/Win32.pm
 SHA1 6a91e14bbecc64e9c8e2261dfa4b360641d152e4 inc/Module/Install/WriteAll.pm
-SHA1 a3224eec57be64b02d871edb2498db655d4dd331 lib/AtteanX/Store/DBI.pm
+SHA1 60ea9dd220cc035417ab40f4f407aa5519d1a53c lib/AtteanX/Store/DBI.pm
 SHA1 19894ead40e6a0c6c527a133dacdeeac7d56f4af lib/Test/AtteanX/Store/DBI.pm
-SHA1 71a9f55c4f6c74ce872d5407b38b546e69295440 meta/changes.ttl
+SHA1 de7a9c395b6e24abb2f42f50ea1b3bc6538af23d meta/changes.ttl
 SHA1 d1003e1dc2641a248f2b923c19fd2925968e1f40 share/database-schema/mysql-create.sql
 SHA1 af09f59eb466d0f248d22c5536222d29279211f6 share/database-schema/mysql-drop.sql
 SHA1 b95f5a6d45b5cb15b667aee3d32d68fee33e4d80 share/database-schema/postgresql-create.sql
@@ -53,7 +52,7 @@ SHA1 6387af7a5fde0747be5bc9ad2ec15ca9759bd95a xt/pod.t
 -----BEGIN PGP SIGNATURE-----
 Comment: GPGTools - http://gpgtools.org
 
-iEYEARECAAYFAl/IE5EACgkQhPK6VMqoyC3KrACeOceWyrDGYhOpcfPA+rY06vNY
-13UAoLWu301o5nqy1gkHvdMvN5Hy5wOK
-=HRDH
+iEYEARECAAYFAl/VlWUACgkQhPK6VMqoyC1BBwCgpVDmj5LNLENpwrL7rYUTZ4qy
++x8AoLRJmKQNvyqCTLKnvPUXT6fz3c79
+=TBgi
 -----END PGP SIGNATURE-----

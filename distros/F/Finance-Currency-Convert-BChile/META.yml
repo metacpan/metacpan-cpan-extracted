@@ -1,24 +1,28 @@
 ---
-abstract: 'Currency conversion module'
+abstract: 'Currency conversion module between Chilean Pesos (CLP) and USA Dollars (USD).'
 author:
   - 'Hugo Salgado <hsalgado@vulcano.cl>'
 build_requires:
-  ExtUtils::MakeMaker: 0
+  ExtUtils::MakeMaker: '0'
 configure_requires:
-  ExtUtils::MakeMaker: 0
+  ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 6.6302, CPAN::Meta::Converter version 2.130880'
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
 license: unknown
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: Finance-Currency-Convert-BChile
 no_index:
   directory:
     - t
     - inc
 requires:
-  HTML::TokeParser: 0
-  LWP::UserAgent: 0
-  Test::More: 0
-version: 0.05
+  HTML::TokeParser: '0'
+  LWP::UserAgent: '0'
+  Test::More: '0'
+resources:
+  bugtracker: https://todo.sr.ht/~huguei/perl-Finance-Currency-Convert-BChile
+  repository: https://hg.sr.ht/~huguei/perl-Finance-Currency-Convert-BChile
+version: '0.06'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

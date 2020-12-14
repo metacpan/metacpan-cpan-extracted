@@ -1,7 +1,7 @@
 package Bio::MUST::Core::SeqId;
 # ABSTRACT: Modern and legacy MUST-compliant sequence id
 # CONTRIBUTOR: Mick VAN VLIERBERGHE <mvanvlierberghe@doct.uliege.be>
-$Bio::MUST::Core::SeqId::VERSION = '0.202310';
+$Bio::MUST::Core::SeqId::VERSION = '0.203490';
 use Moose;
 use namespace::autoclean;
 
@@ -205,6 +205,7 @@ const my @GENERA  => qw(
     Aids-associated
     alk-system
     Altai-like
+    Amalga-like
     ammonia-oxidizing
     aniline-degrading
     ANME-1
@@ -240,6 +241,7 @@ const my @GENERA  => qw(
     BD2-11
     Bean-associated
     Bean-pod
+    Bear-associated
     Begomovirus-associated
     Bemisia-associated
     benzene-decomposing
@@ -295,9 +297,11 @@ const my @GENERA  => qw(
     BtRs-BetaCoV/YN2013
     BtTp-BetaCoV/GX2012
     BtVs-BetaCoV/SC2013
+    bubaline-associated
     Bufavirus-1
     Bufavirus-2
     Bufavirus-3
+    Bunya-like
     Burke-Gilman
     butyrate-producing
     Buxtonella-like
@@ -323,6 +327,8 @@ const my @GENERA  => qw(
     Ceratium-like
     CFB-group
     chain-forming
+    Chaq-like
+    Chiba-040502
     chlamydia-associated
     Chlorante-Aster
     Chlorella-like
@@ -334,6 +340,7 @@ const my @GENERA  => qw(
     cilia-associated
     Circo-like
     Circovirus-like
+    Citrus-associated
     Clavibacter-like
     Clostridium-like
     Co-expression
@@ -355,6 +362,136 @@ const my @GENERA  => qw(
     CRISPR-cas9
     CRISPR-mediated
     Crow-dipper
+    Crucivirus-102
+    Crucivirus-111
+    Crucivirus-112
+    Crucivirus-113
+    Crucivirus-119
+    Crucivirus-122
+    Crucivirus-124
+    Crucivirus-133
+    Crucivirus-141
+    Crucivirus-146
+    Crucivirus-147
+    Crucivirus-148
+    Crucivirus-152
+    Crucivirus-158
+    Crucivirus-163
+    Crucivirus-168
+    Crucivirus-170
+    Crucivirus-174
+    Crucivirus-175
+    Crucivirus-182
+    Crucivirus-183
+    Crucivirus-184
+    Crucivirus-190
+    Crucivirus-195
+    Crucivirus-204
+    Crucivirus-205
+    Crucivirus-207
+    Crucivirus-211
+    Crucivirus-212
+    Crucivirus-224
+    Crucivirus-234
+    Crucivirus-241
+    Crucivirus-243
+    Crucivirus-245
+    Crucivirus-250
+    Crucivirus-251
+    Crucivirus-255
+    Crucivirus-264
+    Crucivirus-265
+    Crucivirus-266
+    Crucivirus-272
+    Crucivirus-275
+    Crucivirus-276
+    Crucivirus-277
+    Crucivirus-278
+    Crucivirus-281
+    Crucivirus-282
+    Crucivirus-291
+    Crucivirus-293
+    Crucivirus-295
+    Crucivirus-298
+    Crucivirus-304
+    Crucivirus-305
+    Crucivirus-306
+    Crucivirus-309
+    Crucivirus-310
+    Crucivirus-311
+    Crucivirus-312
+    Crucivirus-322
+    Crucivirus-323
+    Crucivirus-324
+    Crucivirus-326
+    Crucivirus-339
+    Crucivirus-340
+    Crucivirus-345
+    Crucivirus-349
+    Crucivirus-350
+    Crucivirus-353
+    Crucivirus-359
+    Crucivirus-362
+    Crucivirus-364
+    Crucivirus-371
+    Crucivirus-372
+    Crucivirus-373
+    Crucivirus-380
+    Crucivirus-384
+    Crucivirus-387
+    Crucivirus-389
+    Crucivirus-392
+    Crucivirus-402
+    Crucivirus-406
+    Crucivirus-407
+    Crucivirus-409
+    Crucivirus-410
+    Crucivirus-411
+    Crucivirus-416
+    Crucivirus-419
+    Crucivirus-427
+    Crucivirus-429
+    Crucivirus-432
+    Crucivirus-438
+    Crucivirus-453
+    Crucivirus-454
+    Crucivirus-455
+    Crucivirus-456
+    Crucivirus-458
+    Crucivirus-468
+    Crucivirus-472
+    Crucivirus-474
+    Crucivirus-475
+    Crucivirus-479
+    Crucivirus-480
+    Crucivirus-482
+    Crucivirus-483
+    Crucivirus-495
+    Crucivirus-497
+    Crucivirus-499
+    Crucivirus-501
+    Crucivirus-505
+    Crucivirus-506
+    Crucivirus-509
+    Crucivirus-513
+    Crucivirus-514
+    Crucivirus-520
+    Crucivirus-523
+    Crucivirus-527
+    Crucivirus-528
+    Crucivirus-530
+    Crucivirus-534
+    Crucivirus-536
+    Crucivirus-538
+    Crucivirus-539
+    Crucivirus-540
+    Crucivirus-81
+    Crucivirus-88
+    Crucivirus-93
+    Crucivirus-94
+    Crucivirus-97
+    Crucivirus-99
+    Crucivirus-like
     Cryphonectria-Endothia
     Cryptaulaxoides-like
     Ctenophore-associated
@@ -385,10 +522,12 @@ const my @GENERA  => qw(
     DSMP-degrading
     Dual-tagging
     Duck-dominant
+    dye-degrading
     EDTA-degrading
     Ehrlichia-like
     EIAV-based
     Endornavirus-like
+    Entamoeba-associated
     Epomophorini-Myonycterini
     Epstein-barr
     Erythrobacter-like
@@ -409,6 +548,7 @@ const my @GENERA  => qw(
     Finkel-Biskis-Jinkins
     Fisa-like
     FLAG-tagging
+    Flavi-like
     Flavobacterium-like
     Flexibacter-like
     Flexistipes-like
@@ -420,12 +560,14 @@ const my @GENERA  => qw(
     FRT-Tp-FRT
     furfural-degrading
     gamma-symbiont
+    Ganwon-do
     Gardner-Arnstein
     GBV-A-like
     Gemmata-like
     Gene-editing
     Gene-trap
     Gene-trapping
+    Giardia-associated
     Gill-associated
     Ginkgoaceae-associated
     Glaucous-winged
@@ -439,6 +581,7 @@ const my @GENERA  => qw(
     Gordonia-like
     Gram-negative
     Gram-positive
+    Grapevine-associated
     Grass-Cactus
     Gray-bellied
     Gyrovirus-like
@@ -544,6 +687,7 @@ const my @GENERA  => qw(
     Mini-Tn7
     Mint-like
     Mirim-like
+    Mito-like
     MLV-like
     MLV-related
     MMTV-luciferase
@@ -551,6 +695,7 @@ const my @GENERA  => qw(
     Mononegavirus-like
     mosquito-borne
     mouse-rat
+    Mu-like
     Multi-host
     Murine-associated
     Mx-Lox
@@ -562,6 +707,7 @@ const my @GENERA  => qw(
     naphthalene-utilizing
     narna-like
     Nebraska-like
+    Negelike-virus
     Negev-like
     Neo-uvaria
     NFAT-DsRed
@@ -617,15 +763,15 @@ const my @GENERA  => qw(
     PAH-degrading
     Paracoccus-like
     Parecho-like
-    Parechovirus-like
     Paromomycin-resistant
+    Partiti-like
     Partitivirus-like
     Parvo-like
     PCB-dechlorinating
     Pechuel-loeschea
     Peptococcus-like
-    Perchlorate-reducing
     perchlorate-reducing
+    Perchlorate-reducing
     Perkinsela-like
     Perkinsiella-like
     pesticide-degrading
@@ -634,6 +780,7 @@ const my @GENERA  => qw(
     phenanthrene-degrading
     phenanthrene-metabolizing
     phenol-degrading
+    Phlebotomus-associated
     Phoma-like
     phosphorous-removal
     Picorna-like
@@ -652,6 +799,7 @@ const my @GENERA  => qw(
     Poaceae-associated
     Point-Douro
     Polycystine-like
+    porcine-murine
     Porphyromonas-like
     Port-miou
     Posa-like
@@ -728,6 +876,7 @@ const my @GENERA  => qw(
     S7-like
     Santee-Cooper
     Sapelovirus-like
+    Sapporo-HK299
     SARS-like
     SARS-related
     Saxo-fridericia
@@ -783,7 +932,6 @@ const my @GENERA  => qw(
     sulfite-reducing
     sulfo-oxidizing
     sulfur-oxidizing
-    Sulfur-oxidizing
     Sunn-hemp
     Synechococcus-like
     Synechocystis-like
@@ -807,6 +955,7 @@ const my @GENERA  => qw(
     Tick-borne
     tick-borne
     toluene-degrading
+    Tombus-like
     Totivirus-like
     Tri-shuttle
     trichloroacetic-acid-degrading
@@ -825,6 +974,7 @@ const my @GENERA  => qw(
     Type-E
     Type-F
     U1Ap-mCherry
+    UAG-readthrough
     UAS-less
     UAS-Red
     UAS-Stinger
@@ -833,6 +983,7 @@ const my @GENERA  => qw(
     VDV-1/DWV
     VESV-like
     Violaceae-associated
+    Virga-like
     Viroid-like
     Virus-associated
     Virus-induced
@@ -1077,6 +1228,7 @@ const my @SPECIES => qw(
     30_xplvp384
     31_xplvp325
     32_xplvp209
+    33_17
     33_xplvp322
     34_xplvp425
     35_xplvp171
@@ -1117,6 +1269,7 @@ const my @SPECIES => qw(
     56_oclvp163
     57_xplvp332
     58_oclvp104
+    59_13
     59_oclvp166
     5_25as
     5_xplvp440
@@ -1128,15 +1281,21 @@ const my @SPECIES => qw(
     61_oclvp108
     62_oclvp107
     63_oclvp173
+    64_12
     64_oclvp174
+    65_10
     65_oclvp553
     66_1
+    66_12
     66_oclvp134
+    67_12
     67_oclvp138
+    68_12
     68_oclvp142
     69_oclvp189
     6_xplvp63
     70_oclvp488
+    71_18
     71_oclvp188
     72_oclvp145
     73_oclvp578
@@ -1663,6 +1822,7 @@ const my @SPECIES => qw(
     C79_CLW
     C84_CLW
     C92_CLW
+    cat_SB2894
     CCSD_DF2030_Ag37_isolate_1
     CCSD_DF2030_Ag37_isolate_2
     CCSD_DF2030_Ag68_isolate_1
@@ -1703,11 +1863,48 @@ const my @SPECIES => qw(
     CH64b_2B
     CN30_LM100
     Col_A
+    cr106_1
+    cr107_1
+    cr108_1
+    cr109_1
+    cr10_1
+    cr110_1
+    cr111_1
+    cr112_1
+    cr113_1
+    cr114_1
+    cr115_1
+    cr116_1
+    cr118_1
+    cr11_1
+    cr124_1
+    cr125_1
+    cr126_1
+    cr127_1
+    cr128_1
+    cr130_1
+    cr131_1
+    cr1_1
     CR1_10_MR-20148
     CR1_11_MR-2014
+    cr271_1
+    cr272_1
+    cr273_1
+    cr3_1
+    cr4_1
+    cr50_1
+    cr52_1
+    cr53_1
+    cr55_1
+    cr56_1
     CR5_1_MR-2014
     CR5_2_MR-2014
+    cr60_1
+    cr6_1
+    cr7_1
     CR7_6_MR-2014
+    cr85_1
+    cr8_1
     CRF01_AE
     CRF02_AG:08GQ032
     CRF02_AG:08GQ057
@@ -1836,6 +2033,9 @@ const my @SPECIES => qw(
     DSFBPS_UR3A
     DSFBPS_UR3B
     DSFBPS_UR3C
+    DSS3_MAL1
+    DSS3_PM1
+    DSS3_VP1
     E01_10wb_b10_2005-12-15
     E56_UTI
     E60_UTI
@@ -3103,6 +3303,7 @@ const my @SPECIES => qw(
     JCVI_control_MDA_Saureus_10
     JL4_S
     JN18_A7_F*
+    Jomon_CT89
     JPL_7
     K12_27
     K12_28b
@@ -5844,7 +6045,6 @@ const my @SPECIES => qw(
     UAB_Phi87
     UBP10_UBA1149
     UBP10_UBA1160
-    UBP10_UBA7539
     UBP11_UBA4055
     UBP12_UBA5184
     UBP13_UBA5359
@@ -6075,6 +6275,18 @@ const my @SPECIES => qw(
     WS13_484
     WS18_483
     WS19_479
+    XAN_1
+    XAN_14
+    XAN_8
+    XZ110_XZ_CHN_2017
+    XZ111_XZ_CHN_2017
+    XZ112_XZ_CHN_2017
+    XZ114_XZ_CHN_2017
+    XZ115_XZ_CHN_2017
+    XZ93_XZ_CHN_2017
+    XZ97_XZ_CHN_2017
+    XZ98_XZ_CHN_2017
+    XZ99_XZ_CHN_2017
     Y4_579_1
     YS1-2_2434
     YS1-2_2437
@@ -6462,7 +6674,7 @@ Bio::MUST::Core::SeqId - Modern and legacy MUST-compliant sequence id
 
 =head1 VERSION
 
-version 0.202310
+version 0.203490
 
 =head1 SYNOPSIS
 

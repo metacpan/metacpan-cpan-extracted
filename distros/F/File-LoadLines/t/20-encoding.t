@@ -1,6 +1,6 @@
 #! perl
 
-# Test auto-sense Latin encoding.
+# Test explicit encoding.
 
 use strict;
 use warnings;
@@ -23,12 +23,10 @@ sub testlines {
     foreach ( @lines ) {
 	is( length($_), $lengths[$line], "line $line" );
 	$line++;
-	$tally++ if /¤urø/;
     }
-    is( $tally, 4, "matches" );
-    exit;
 }
 
-# test0.dat: ISO-8859.1 text
-# Should auto-sense.
-testlines( "test0.dat" );
+# test0.dat: ISO-8859.15 text
+my $o = {};
+testlines( "test_.dat", $o );
+is ( $o->{encoding}, "ASCII", "returned encoding" );

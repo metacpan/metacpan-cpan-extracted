@@ -7,6 +7,10 @@ WebService::Slack::WebApi - a simple wrapper for Slack Web API
 
     use WebService::Slack::WebApi;
 
+    # By default we use the HTTP client library Furl but you can also use any other
+    # Eg. LWP::UserAgent
+    my $slack = WebService::Slack::WebApi->new( ua => LWP::UserAgent->new() );
+
     # the token is required unless using $slack->oauth->access
     my $slack = WebService::Slack::WebApi->new(token => 'access token');
 
@@ -28,9 +32,26 @@ WebService::Slack::WebApi is a simple wrapper for Slack Web API (https://api.sla
 # Options
 
 You can set some options by giving `opt` parameter to `new` method.
-Almost values of `opt` are gived to `Furl#new`.
+All values of `opt` are given to `Furl#new`.
 
     WebService::Slack::WebApi->new(token => 'access token', opt => {});
+
+## User Agent
+
+By default WebService::Slack::WebApi uses the [Furl](https://metacpan.org/pod/Furl) HTTP client.
+But if your software is already using some other client,
+e.g. [LWP::UserAgent](https://metacpan.org/pod/LWP%3A%3AUserAgent) or [HTTP::Tiny](https://metacpan.org/pod/HTTP%3A%3ATiny),
+you can also use that. Under the hood WebService::Slack::WebApi uses
+the HTTP client wrapper [HTTP::AnyUA](https://metacpan.org/pod/HTTP%3A%3AAnyUA).
+
+Use parameter `ua` to specify the user agent which you have already
+created.
+
+    my $ua = LWP::UserAgent->new( timeout => 10 );
+    my $slack = WebService::Slack::WebApi->new( ua => $ua );
+
+If you use both parameters `ua` and `opt`, WebService::Slack::WebApi
+will throw an exception. This combination is illegal.
 
 ## Proxy
 

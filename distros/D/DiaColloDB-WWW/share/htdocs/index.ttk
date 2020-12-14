@@ -23,8 +23,9 @@
 </head>
   <body>
     <div class="outer">
+      [% PROCESS diacolloBanner %]
       <div class="headers">
-	<a href="[% root_url %]" style="float: right;"><img class="dlogo" src="[% diacollo_logo | url %]"/></a>
+	[% PROCESS diacolloHeaderLogo %]
 	<h1>[% html_title %]</h1>
 	<form id="dqForm" method="get">
 	  <table class="headerTable"><tbody>
@@ -153,14 +154,20 @@
 	      </td>
 	      <td class="jr" title="Enable debugging mode?">
 		<label class="hl2" for="in_debug">debug:</label>
-		<input class="hi2" id="in_debug" type="checkbox" name="debug" value="1" [% qdebug ? 'checked="1"' : '' %]/>
+		<input class="hi2" id="in_debug" type="checkbox" name="debug" value="1" [% qdebug ? 'checked="1"' : '' %] onchange="setupDebugTable()"/>
 	      </td>
 	      <td/>
 	    </tr>
 	  </tbody></table>
 	  <input type="hidden" id="in_eps" name="eps" value="[% qeps %]"/>
 	</form>
-	<div class="linkbar">[% PROCESS "dc-links.ttk" %]</div>
+	<div class="debugInfo" title="Debugging information">
+	  <table><tbody>
+	    <tr><th>qcanon:</th><td title="DEBUG: qcanon: canonical form of parsed query" id="debug_qcanon"/></tr>
+	    <tr><th>qtemplate:</th><td title="DEBUG: qtemplate: DDC query template for generated KWIC-links" id="debug_qtemplate"/></tr>
+	  </tbody></table>
+	</div>
+      	<div class="linkbar">[% PROCESS "dc-links.ttk" %]</div>
       </div>
       <div class="content">
 	<div class="rawURL"><b>Raw URL:</b> <a id="rawLink" href="[% uprofile_rel |html %]" style="display:none">[% uprofile_abs |html %]</a></div>

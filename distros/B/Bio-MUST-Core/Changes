@@ -1,3 +1,12 @@
+0.203490  2020-12-14 13:36:11+01:00 Europe/Brussels
+    - Additions
+      - binaries: added new collapsing modes to format-tree.pl
+    - Changes
+      - binaries: moved 'inst' executables to 'instant' dir (no default install)
+      - binaries: moved specialized and obsolete executables to 'private' dir (no default install)
+      - Constants: expanded suffix list for Ali files
+      - ColorScheme and Tree: refactored iTOL coloring and collapsing for robustness
+
 0.202310  2020-08-18 12:59:49+02:00 Europe/Brussels
     - Fixes
       - binaries: fixed spurious comment line bug in fetch-tax.pl output files

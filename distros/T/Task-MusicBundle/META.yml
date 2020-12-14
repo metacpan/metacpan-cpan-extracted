@@ -41,6 +41,7 @@ requires:
   Music::Chord::Namer: '0'
   Music::Chord::Note: '0'
   Music::Chord::Positions: '0'
+  Music::Chord::Progression: '0'
   Music::ChordBot: '0'
   Music::Duration: '0'
   Music::Duration::Partition: '0'
@@ -67,7 +68,7 @@ requires:
 resources:
   homepage: https://github.com/ology/Task-MusicBundle
   repository: https://github.com/ology/Task-MusicBundle.git
-version: '0.1901'
+version: '0.1902'
 x_Dist_Zilla:
   perl:
     version: '5.030002'

@@ -7,6 +7,7 @@
 
 
 
+
 =pod
 
 =encoding UTF-8
@@ -16,6 +17,8 @@
 Image::PNG::Libpng - Perl interface to the C library "libpng".
 
 =head1 SYNOPSIS
+
+Libpng-like interface:
 
     
     use Image::PNG::Libpng ':all';
@@ -34,12 +37,38 @@ Image::PNG::Libpng - Perl interface to the C library "libpng".
         print "$k: $header->{$k}\n";
     }
 
-(This example is included as L<F<synopsis.pl>|https://fastapi.metacpan.org/source/BKB/Image-PNG-Libpng-0.49/examples/synopsis.pl> in the distribution.)
+(This example is included as L<F<synopsis.pl>|https://fastapi.metacpan.org/source/BKB/Image-PNG-Libpng-0.52/examples/synopsis.pl> in the distribution.)
+
+
+Simple interface:
+
+    
+    use Image::PNG::Libpng ':all';
+    my $png = read_png_file ('../t/tantei-san.png');
+    # Get all valid chunks
+    my $valid = $png->get_valid ();
+    my @valid_chunks = sort grep {$valid->{$_}} keys %$valid;
+    print "Valid chunks are ", join (", ", @valid_chunks), "\n";
+    # Print image information
+    my $header = $png->get_IHDR ();
+    for my $k (keys %$header) {
+        if ($k eq 'color_type') {
+            print "$k: " . color_type_name ($header->{$k}) . "\n";
+        }
+        else {
+            print "$k: $header->{$k}\n";
+        }
+    }
+    my $wpng = $png->copy_png ();
+    $wpng->write_png_file ('new.png');
+    
+
+(This example is included as L<F<synopsis-easy.pl>|https://fastapi.metacpan.org/source/BKB/Image-PNG-Libpng-0.52/examples/synopsis-easy.pl> in the distribution.)
 
 
 =head1 VERSION
 
-This document describes Image::PNG::Libpng version 0.49, corresponding to git commit L<f38ec837a4703027147409f4976d08a5f5d10efc|https://github.com/benkasminbullock/image-png-libpng/commit/f38ec837a4703027147409f4976d08a5f5d10efc> at Thu Dec 10 08:47:36 2020 +0900.
+This document describes Image::PNG::Libpng version 0.52, corresponding to git commit L<57e9a3bcfd6f03292fac6bf46c6c1f57c6d7f7d7|https://github.com/benkasminbullock/image-png-libpng/commit/57e9a3bcfd6f03292fac6bf46c6c1f57c6d7f7d7> at Sun Dec 13 11:45:08 2020 +0900.
 
 Unless otherwise qualified, comments in this document on the libpng
 source code and documentation refer to libpng version 1.6.37. Libpng is not bundled with this distribution, so
@@ -69,120 +98,14 @@ convenience functions, L</Input and output libpng style>, which
 describes functions which closely mirror libpng, L</The image header>,
 which describes functions for reading and writing the meta-information
 about PNG images, L</Image data>, which describes functions for
-accessing the image data itself, L</PNG timestamps>, L</Text chunks>,
-L</Private chunks>, L</Helper functions>, L</Library version
-functions>, L</Palettes>, for handling paletted images, L</Compression
-and filtering>, and L</Other chunks>. There are also L</META
-FUNCTIONS> for examining your installed libpng, L</UNDOCUMENTED
-FUNCTIONS>, and L</TESTING FUNCTIONS> which are functions used in
-testing this module itself.
+accessing the image data itself, L</Text chunks>, L</Private chunks>,
+L</Library version functions>, L</Compression
+and filtering>, and L</Other chunks>. 
 
 =head1 Simple input and output
 
-These are convenience functions which combine common operations.
-
-=head2 read_png_file
-
-     my $png = read_png_file ('q.png');
-
-Open F<q.png> and read its contents into C<$png>.
-
-This combines L</create_read_struct>, open, L</init_io>, and
-L</read_png>. The return value is the same as that of
-L</create_read_struct> with the entire PNG image already read in.
-
-The optional argument to L</read_png> can be specified using an
-optional C<transforms> argument:
-
-    my $png = read_png_file ('file.png', transforms => PNG_TRANSFORM_EXPAND);
-
-L<Carp/croak> is used to signal errors opening or closing the file.
-
-=head2 write_png_file
-
-    $png->write_png_file ('nice.png');
-
-This combines open, L</init_io>, and L</write_png> to write an entire
-PNG image out to the file name specified by the argument. C<$png> must
-be the object created by L</create_write_struct>, so L</read_png_file>
-followed by a call to this does not work. See L</copy_png> if you need
-to do that kind of operation.
-
-The optional argument to L</write_png> can be specified using
-L</set_transforms>.
-
-L<Carp/croak> is used to signal errors opening or closing the file.
-
-=head2 read_from_scalar
-
-     my $png = read_from_scalar ($string);
-
-This creates an image structure C<$png> from the contents of a Perl
-scalar variable C<$string> containing PNG image data, for example data
-read from a file, or data obtained from a web page. The first argument, C<$png>, is a PNG structure created with 
-L</create_read_struct>. It
-reads in all the data from the structure on being called.
-
-This is useful when image data is stored in a Perl scalar. For example
-
-    
-    use Image::PNG::Libpng 'read_from_scalar';
-    use LWP::Simple;
-    my $image_data = get 'http://libpng.org/pub/png/img_png/libpng-88x31.png';
-    # Now $image_data contains the PNG file
-    my $png = read_from_scalar ($image_data);
-    # Now $png contains the PNG information from the image.
-    # Get the header.
-    my $header = $png->get_IHDR ();
-    printf "Your PNG has width %d and height %d\n", $header->{width}, $header->{height};
-    
-
-(This example is included as L<F<get-www-png.pl>|https://fastapi.metacpan.org/source/BKB/Image-PNG-Libpng-0.49/examples/get-www-png.pl> in the distribution.)
-
-
-See also L</Input/output manipulation functions>.
-
-=head2 write_to_scalar
-
-    my $image_data = $png->write_to_scalar ();
-
-This writes the PNG image data in C<$png> into a Perl scalar. The first argument, C<$png>, is a writeable PNG structure created with 
-L</create_write_struct>. The return value of the subroutine is the Perl scalar
-containing the image data.
-
-So, for example,
-
-    
-    
-    # This CGI script prints a PNG in a random colour.
-    
-    use lib '/home/ben/projects/image-png-libpng/blib/arch';
-    use lib '/home/ben/projects/image-png-libpng/blib/lib';
-    use Image::PNG::Libpng ':all';
-    use Image::PNG::Const ':all';
-    my $png = create_write_struct ();
-    my $size = 100;
-    $png->set_IHDR ({height => $size, width => $size, bit_depth => 8,
-                     color_type => PNG_COLOR_TYPE_RGB});
-    my $bytes = pack "CCC", randcol (), randcol (), randcol ();
-    my @rows = ($bytes x $size) x $size;
-    $png->set_rows (\@rows);
-    my $img = $png->write_to_scalar ();
-    binmode STDOUT;
-    print "Content-Type:image/png\r\n\r\n$img";
-    exit;
-    sub randcol
-    {
-        return int (rand () * 0x100);
-    }
-
-(This example is included as L<F<png-cgi.pl>|https://fastapi.metacpan.org/source/BKB/Image-PNG-Libpng-0.49/examples/png-cgi.pl> in the distribution.)
-
-
-See also L</Input/output manipulation functions>.
-
-The optional argument to L</write_png> can be specified using
-L</set_transforms>.
+These convenience functions combine common operations. They are not
+part of the original libpng API.
 
 =head2 copy_png
 
@@ -205,17 +128,19 @@ The following example demonstrates copying a PNG.
     $pngout->set_text ([{key => 'Name', text => 'Shunsaku Kudo'}]); 
     # $pngout->write_png_file ('copy.png');
 
-(This example is included as L<F<copy-png.pl>|https://fastapi.metacpan.org/source/BKB/Image-PNG-Libpng-0.49/examples/copy-png.pl> in the distribution.)
+(This example is included as L<F<copy-png.pl>|https://fastapi.metacpan.org/source/BKB/Image-PNG-Libpng-0.52/examples/copy-png.pl> in the distribution.)
 
 
-=head2 set_transforms
+=head2 get_chunk
 
-    $png->set_transforms (PNG_TRANSFORM_BGR);
+    my $timechunk = $png->get_chunk ('tIME');
 
-Set transforms for reading and writing. This is the same as the
-optional argument to L</read_png> or L</write_png>. If both this and
-the optional argument are given, the optional argument overrides what
-is set here.
+Get the specified chunk. This produces a fatal error if asked for the
+C<IDAT> (image data) chunk, use L</get_rows> instead. Returns C<undef>
+if asked for an unknown chunk name.
+
+This is used by L<pnginspect> to get the valid chunks. See also
+L</set_chunk>.
 
 =head2 png_compare
 
@@ -230,40 +155,131 @@ does not compare to see if the PNG files "look like" each other, but
 whether each pixel contains exactly the same values. Please see
 L<Image::Similar> for a looser comparison of images.
 
-=head2 get_chunk
+=head2 read_from_scalar
 
-    my $timechunk = $png->get_chunk ('tIME');
+     my $png = read_from_scalar ($string);
 
-Get the specified chunk. Croaks if given C<IDAT> chunk, use
-L</get_rows> instead. Returns undef if given unknown chunk. 
+This creates an image structure C<$png> from the contents of a Perl
+scalar variable C<$string> containing PNG image data, for example data
+read from a file, or data obtained from a web page. The first argument, C<$png>, is a PNG structure created with 
+L</create_read_struct>. It
+reads in all the data from the structure on being called.
 
-This is used by L<pnginspect> to get the valid chunks.
+This is useful when image data is stored in a Perl scalar. For example
+
+    
+    use Image::PNG::Libpng 'read_from_scalar';
+    use LWP::Simple;
+    use JSON::Create;
+    my $image_data = get 'http://libpng.org/pub/png/img_png/libpng-88x31.png';
+    # Now $image_data contains the PNG file
+    my $png = read_from_scalar ($image_data);
+    # Now $png contains the PNG information from the image.
+    # Get the header.
+    my $header = $png->get_IHDR ();
+    my $jc = JSON::Create->new ();
+    $jc->indent (1);
+    print $jc->run ($header);
+
+(This example is included as L<F<get-www-png.pl>|https://fastapi.metacpan.org/source/BKB/Image-PNG-Libpng-0.52/examples/get-www-png.pl> in the distribution.)
+
+
+See also L</Input/output manipulation functions>.
+
+=head2 read_png_file
+
+     my $png = read_png_file ('q.png');
+
+Open F<q.png> and read its contents into C<$png>.
+
+This combines L</create_read_struct>, C<open>, L</init_io>, and
+L</read_png>. The return value is the same as that of
+L</create_read_struct> with the entire PNG image already read in.
+
+The optional argument to L</read_png> can be specified using an
+optional C<transforms> argument:
+
+    my $png = read_png_file ('file.png', transforms => PNG_TRANSFORM_EXPAND);
+
+L<Carp/croak> is used to signal errors opening or closing the file.
 
 =head2 set_chunk
 
     $png->set_chunk ('tIME', $timechunk);
 
-Set the specified chunk. Croaks if given C<IDAT> chunk, use
-L</set_rows> instead. Croaks if given unknown chunk.
+Set the specified chunk. This produces a fatal error if given an
+C<IDAT> (image data) chunk, use L</set_rows> instead. Produces a fatal
+error if given an unknown chunk name.
 
-=head2 split_alpha
+=head2 set_transforms
 
-    my $split = $png->split_alpha ();
-    my $alpha = $split->{alpha};
-    my $colour = $split->{data};
+    $png->set_transforms (PNG_TRANSFORM_BGR);
 
-Split the alpha channel away from the other data. This only works for
-RGBA images or gray/alpha images.
+Set transforms for reading and writing. This is the same as the
+optional argument to L</read_png> or L</write_png>. If both this and
+the optional argument are given, the optional argument overrides what
+is set here.
 
-If your purpose of splitting out the Alpha channel is simply to
-discard it, you may get better performance by using
-C<PNG_TRANSFORM_STRIP_ALPHA> in L</read_png> instead.
+=head2 write_png_file
+
+    $png->write_png_file ('nice.png');
+
+This combines open, L</init_io>, and L</write_png> to write an entire
+PNG image out to the file name specified by the argument. C<$png> must
+be the object created by L</create_write_struct>, so L</read_png_file>
+followed by a call to this does not work. See L</copy_png> if you need
+to do that kind of operation.
+
+The optional argument to L</write_png> can be specified using
+L</set_transforms>.
+
+L<Carp/croak> is used to signal errors opening or closing the file.
+
+=head2 write_to_scalar
+
+    my $image_data = $png->write_to_scalar ();
+
+This writes the PNG image data in C<$png> into a Perl scalar. The first argument, C<$png>, is a writeable PNG structure created with 
+L</create_write_struct>. The return value of the subroutine is the Perl scalar
+containing the image data.
+
+So, for example,
+
+    
+    
+    # This CGI script prints a PNG in a random colour.
+    
+    use Image::PNG::Libpng ':all';
+    use Image::PNG::Const ':all';
+    my $png = create_write_struct ();
+    my $size = 100;
+    $png->set_IHDR ({height => $size, width => $size, bit_depth => 8,
+                     color_type => PNG_COLOR_TYPE_RGB});
+    my $bytes = pack "CCC", randcol (), randcol (), randcol ();
+    my @rows = ($bytes x $size) x $size;
+    $png->set_rows (\@rows);
+    my $img = $png->write_to_scalar ();
+    binmode STDOUT;
+    print "Content-Type:image/png\r\n\r\n$img";
+    exit;
+    sub randcol
+    {
+        return int (rand () * 0x100);
+    }
+
+(This example is included as L<F<png-cgi.pl>|https://fastapi.metacpan.org/source/BKB/Image-PNG-Libpng-0.52/examples/png-cgi.pl> in the distribution.)
+
+
+See also L</Input/output manipulation functions>.
+
+The optional argument to L</write_png> can be specified using
+L</set_transforms>.
 
 =head1 New-like functions
 
 There are two different "new"-like functions, depending on whether you
 want to read or write a PNG. (See L</copy_png> for a function to copy
-one to the other.)
+one to the other.) These are based on the libpng API.
 
 =head2 create_read_struct
 
@@ -288,7 +304,7 @@ Perl's error reporting.
 
 =head1 Input and output libpng style
 
-These functions mirror libpng's functions.
+These functions mirror libpng's API.
 
 =head2 init_io
 
@@ -471,51 +487,61 @@ This function corresponds to C<png_write_png> in libpng.
 
 =head1 The image header
 
-See L<this subsection|http://www.w3.org/TR/PNG/#11IHDR>
-of L</The PNG specification> for information on the PNG standards for
-the image header.
+These functions handle the header part of PNG image data. See L<this subsection|http://www.w3.org/TR/PNG/#11IHDR>
+of L</The PNG specification> for information on the PNG standards for the image
+header.
 
-=head2 sig_cmp
+=head2 color_type_name
 
-    if (sig_cmp ($should_be_png)) {
-        print "Your data does not have a PNG signature.\n";
-    }
+    $name = color_type_name ($color_type);
 
-This subroutine looks at C<$should_be_png> and checks whether its
-first bytes correspond to a valid PNG signature. It returns a true
-value if they do not. 
+This is a convenience function which returns a string corresponding to
+the numerical color type in C<$color_type>. The name is in upper
+case, with words separated by underscores, as in C<RGB_ALPHA>.
 
-It can also take two further arguments consisting of a byte offset and
-a number of bytes to check respectively:
+    
+    use Image::PNG::Libpng ':all';
+    my $png = read_png_file ('tantei-san.png');
+    my $name = color_type_name ($png->get_IHDR->{color_type});
+    print "Your PNG has colour type $name.\n";
 
-    sig_cmp ($should_be_png, 0, 8);
+(This example is included as L<F<color-type-name.pl>|https://fastapi.metacpan.org/source/BKB/Image-PNG-Libpng-0.52/examples/color-type-name.pl> in the distribution.)
 
-If these arguments are not supplied, the byte offset is assumed
-to be zero, and the number of bytes to check is assumed to be eight.
 
-This function corresponds to C<png_sig_cmp> in libpng, with default arguments of
-0 and 8 if second and third arguments are not supplied.
+This function does not correspond to anything in libpng. The names of
+the color types are taken from those defined in the libpng header
+file, C<png.h>.
 
-=head2 get_valid
+=head2 get_bit_depth
 
-    my $valid = $png->get_valid ();
-    if ($valid->{oFFs}) {
-        print "The PNG has valid screen offsets.\n";
-    }
+    my $bit_depth = $png->get_bit_depth ();
 
-This function returns a hash with a key for each possible chunk which
-may or may not be valid. The chunks which you can test for are 
-L</bKGD>, L</cHRM>, L</gAMA>, L</hIST>, L</hIST>, L</iCCP>, L<IDAT|/Image data>, L<IHDR|/The image header>, L</iTXt>, L</oFFs>, L</pCAL>, L</pHYs>, L<PLTE|/Palettes>, L</sBIT>, L</sCAL>, L</sPLT>, L</sRGB>, L</tEXt>, L<tIME|/PNG timestamps>, L</tRNS>, and L</zTXt>.
+Get the bit depth, the number of bits for one channel of one pixel.
 
-Whereas L</libpng_supports> tells you whether the installed libpng on
-your system supports various chunks, this tells you whether the chunks
-are present in a particular PNG image file.
+This function corresponds to C<png_get_bit_depth> in libpng
 
-The first argument, C<$png>, is a PNG structure created with 
-L</create_read_struct>.
+=head2 get_channels
 
-This function corresponds to C<png_get_valid> in libpng, with the difference being that the
-return value is a hash containing a key for each possible chunk.
+    my $channels = $png->get_channels ();
+
+Get the number of channels, from one to four. Channels here basically
+means the number of components of one pixel. The return value is 1 for
+color type C<PNG_COLOR_TYPE_GRAY> and C<PNG_COLOR_TYPE_PALETTE>, 2 for
+C<PNG_COLOR_TYPE_GRAY_ALPHA>, 3 for C<PNG_COLOR_TYPE_RGB> and 4 for
+C<PNG_COLOR_TYPE_RGB_ALPHA> or C<PNG_COLOR_TYPE_RGB> with a filler
+byte. This doesn't necessarily correspond to the number of bytes,
+since the bit depth can also be 1, 2, 4, 8, or 16.
+
+This function corresponds to C<png_get_channels> in libpng
+
+=head2 get_color_type
+
+    my $color_type = $png->get_color_type ();
+
+This returns an integer value. If you want to get a name for the
+color type, use L</color_type_name>.
+
+This function corresponds to C<png_get_color_type> in libpng.
 
 =head2 get_IHDR
 
@@ -539,13 +565,13 @@ The height of the image in pixels.
 
 =item bit_depth
 
-The bit depth of the image (the number of bits used for each colour in
+The bit depth of the image (the number of bits used for each color in
 a pixel).
 This can take the values 1, 2, 4, 8, 16.
 
 =item color_type
 
-The colour type.
+The color type.
 This can take the values PNG_COLOR_TYPE_GRAY, PNG_COLOR_TYPE_GRAY_ALPHA, PNG_COLOR_TYPE_PALETTE, PNG_COLOR_TYPE_RGB, PNG_COLOR_TYPE_RGB_ALPHA.
 
 =item interlace_method
@@ -566,13 +592,66 @@ So, for example, to get the width and height of an image,
 This function corresponds to C<png_get_IHDR> in libpng, with a single Perl hash reference used
 instead of the several pointers to integers used in libpng. 
 
-⛐🤪⚠ It does not return the fields C<filter_method> and
-C<compression_method>, which are always 0. See L<Unused arguments omitted>.
+It does not return the fields C<filter_method> and
+C<compression_method>, since these are always 0. See L<Unused arguments omitted>.
+
+=head2 get_image_height
+
+    my $height = $png->get_image_height ();
+
+Get the image's height from the header.
+
+This function corresponds to C<png_get_image_height> in libpng
+
+=head2 get_image_width
+
+    my $width = $png->get_image_width ();
+
+Get the image's width from the header.
+
+This function corresponds to C<png_get_image_width> in libpng
+
+=head2 get_interlace_type
+
+    my $interlace_type = $png->get_interlace_type ();
+
+Get the interlace type. This is either PNG_INTERLACE_NONE or
+PNG_INTERLACE_ADAM7.
+
+This function corresponds to C<png_get_interlace_type> in libpng
+
+=head2 get_valid
+
+    my $valid = $png->get_valid ();
+    if ($valid->{oFFs}) {
+        print "The PNG has valid screen offsets.\n";
+    }
+
+This function returns a hash with a key for each possible chunk which
+may or may not be valid. The chunks which you can test for are 
+L</bKGD>, L</cHRM>, L</eXIf>, L</gAMA>, L</hIST>, L</hIST>, L</iCCP>, L<IDAT|/Image data>, L<IHDR|/The image header>, L</iTXt>, L</oFFs>, L</pCAL>, L</pHYs>, L</PLTE>, L</sBIT>, L</sCAL>, L</sPLT>, L</sRGB>, L</tEXt>, L</tIME>, L</tRNS>, and L</zTXt>.
+
+Whereas L</libpng_supports> tells you whether the installed libpng on
+your system supports various chunks, this tells you whether the chunks
+are present in a particular PNG image file.
+
+The first argument, C<$png>, is a PNG structure created with 
+L</create_read_struct>.
+
+This function corresponds to C<png_get_valid> in libpng, with the difference being that the
+return value is a hash containing a key for each possible chunk.
+
+=head2 height
+
+    my $height = $png->height ();
+
+Alias for L</get_image_height>. This is not exported, it's
+intended for use with the object only.
 
 =head2 set_IHDR
 
-    my $ihdr = { width => 10, height => 10, bit_depth => 8,
-                 color_type => PNG_COLOR_TYPE_RGB };
+    my $ihdr = {width => 10, height => 10, bit_depth => 8,
+                color_type => PNG_COLOR_TYPE_RGB};
     $png->set_IHDR ($ihdr);
 
 Set the IHDR chunk (the image header) of the PNG image. 
@@ -595,13 +674,13 @@ The height of the image in pixels.
 
 =item bit_depth
 
-The bit depth of the image (the number of bits used for each colour in
+The bit depth of the image (the number of bits used for each color in
 a pixel).
  This cannot be omitted. This can have the values 1, 2, 4, 8, 16.
 
 =item color_type
 
-The colour type.
+The color type.
  This cannot be omitted. This can have the values PNG_COLOR_TYPE_GRAY, PNG_COLOR_TYPE_GRAY_ALPHA, PNG_COLOR_TYPE_PALETTE, PNG_COLOR_TYPE_RGB, PNG_COLOR_TYPE_RGB_ALPHA.
 
 =item interlace_method
@@ -619,51 +698,31 @@ Other fields in the hash are ignored.
 This function corresponds to C<png_set_IHDR> in libpng, with a single Perl hash reference
 used instead of the seven integers. 
 
-⛐🤪⚠ The variables
+The values
 C<compression_method>, C<filter_method>, 
-in C<png_set_IHDR> can only take one possible value, 0, so the routine
-ignores them. See L<Unused arguments omitted>.
+may be supplied by the user but are ignored since they may only take
+the value 0. See L<Unused arguments omitted>.
 
-=head2 get_color_type
+=head2 sig_cmp
 
-    my $color_type;
-    $png->get_color_type (\$color_type);
+    if (sig_cmp ($should_be_png)) {
+        print "Your data does not have a PNG signature.\n";
+    }
 
-This returns an integer value. If you want to get a name for the
-colour type, use L</color_type_name>.
+This subroutine looks at C<$should_be_png> and checks whether its
+first bytes correspond to a valid PNG signature. It returns a true
+value if they do not. 
 
-This function corresponds to C<png_get_color_type> in libpng.
+It can also take two further arguments consisting of a byte offset and
+a number of bytes to check respectively:
 
-=head2 color_type_name
+    sig_cmp ($should_be_png, 0, 8);
 
-    $name = color_type_name ($color_type);
+If these arguments are not supplied, the byte offset is assumed
+to be zero, and the number of bytes to check is assumed to be eight.
 
-Given a numerical colour type in C<$color_type>, return the equivalent
-name. The name is in upper case, with words separated by underscores,
-as in C<RGB_ALPHA>.
-
-    
-    use Image::PNG::Libpng ':all';
-    my $png = read_png_file ('tantei-san.png');
-    my $name = color_type_name ($png->get_IHDR->{color_type});
-    print "Your PNG has colour type $name.\n";
-
-(This example is included as L<F<color-type-name.pl>|https://fastapi.metacpan.org/source/BKB/Image-PNG-Libpng-0.49/examples/color-type-name.pl> in the distribution.)
-
-
-This function does not correspond to anything in libpng. The names of
-the colour types are taken from those defined in the libpng header
-file, C<png.h>.
-
-
-
-=head2 get_image_width
-
-    my $width = $png->get_image_width ();
-
-Get the image's width from the header.
-
-This function corresponds to C<png_get_image_width> in libpng
+This function corresponds to C<png_sig_cmp> in libpng, with default arguments of
+0 and 8 if second and third arguments are not supplied.
 
 =head2 width
 
@@ -672,59 +731,18 @@ This function corresponds to C<png_get_image_width> in libpng
 Alias for L</get_image_width>. This is not exported, it's
 intended for use with the object only.
 
-
-
-=head2 get_image_height
-
-    my $height = $png->get_image_height ();
-
-Get the image's height from the header.
-
-This function corresponds to C<png_get_image_height> in libpng
-
-=head2 height
-
-    my $height = $png->height ();
-
-Alias for L</get_image_height>. This is not exported, it's
-intended for use with the object only.
-
-
-
-=head2 get_channels
-
-    my $channels = $png->get_channels ();
-
-Get the number of channels, from one to four. This means the number of
-components of one pixel. The return value is 1 for colour type
-PNG_COLOR_TYPE_GRAY and PNG_COLOR_TYPE_PALETTE, 2 for
-PNG_COLOR_TYPE_GRAY_ALPHA, 3 for PNG_COLOR_TYPE_RGB and 4 for
-PNG_COLOR_TYPE_RGB_ALPHA or PNG_COLOR_TYPE_RGB with a filler
-byte. This doesn't necessarily correspond to the number of bytes,
-since the bit depth can also be 1, 2, 4, 8, or 16.
-
-This function corresponds to C<png_get_channels> in libpng
-
-=head2 get_bit_depth
-
-    my $bit_depth = $png->get_bit_depth ();
-
-Get the bit depth, the number of bits for one channel of one pixel.
-
-This function corresponds to C<png_get_bit_depth> in libpng
-
-=head2 get_interlace_type
-
-    my $interlace_type = $png->get_interlace_type ();
-
-Get the interlace type. This is either PNG_INTERLACE_NONE or
-PNG_INTERLACE_ADAM7.
-
-This function corresponds to C<png_get_interlace_type> in libpng
-
 =head1 Image data
 
 These functions deal with accessing the image data itself.
+
+=head2 get_rowbytes
+
+    my $bytes_in_a_row = $png->get_rowbytes ();
+
+This returns the number of bytes needed to hold a transformed row of
+an image.
+
+This function corresponds to C<png_get_rowbytes> in libpng.
 
 =head2 get_rows
 
@@ -761,64 +779,6 @@ This function was changed to copy the data in version 0.46.
 
 This function corresponds to C<png_set_rows> in libpng.
 
-=head2 get_rowbytes
-
-    my $bytes_in_a_row = $png->get_rowbytes ();
-
-This returns the number of bytes needed to hold a transformed row of
-an image.
-
-This function corresponds to C<png_get_rowbytes> in libpng.
-
-=head1 PNG timestamps
-
-See L<this subsection|http://www.w3.org/TR/PNG/#11timestampinfo>
-of L</The PNG specification> for information on the PNG standards for
-time stamp information.
-
-=head2 get_tIME
-
-    my $time = $png->get_tIME ();
-    if ($time && $time->{year} < 2005) {
-        warn "Your PNG is now getting old. Don't forget to oil it to prevent rust.";
-    }
-
-The return value is either the undefined value, if no C<tIME> chunk
-exists in the PNG, or a hash reference containing fields "year",
-"month", "day", "hour", "minute" and "second". "Month" and "day" start
-from 1 rather than 0.
-
-The "modification time value" of the PNG image is a chunk written into
-the PNG file itself, and may not have the same value as the operating
-system's modification time for the file. The tIME chunk is not a
-compulsory requirement for PNG files, and most PNG image files do not
-contain this chunk. PNG tIME chunks do not contain a time zone. According to L<this subsection|http://www.w3.org/TR/PNG/#11tIME>
-of L</The PNG specification>, "Universal Time (UTC) should be specified rather
-than local time."
-
-This function corresponds to C<png_get_tIME> in libpng, with a Perl hash reference
-substituted for the C struct C<png_timep> used in libpng.
-
-=head2 set_tIME
-
-    # Set the time to "now"
-    $png->set_tIME ();
-    # Set the time
-    $png->set_tIME ({year => 1999, month => 12});
-
-Set the modification time of the PNG to the values given by the
-argument, a hash reference containing the fields C<year>, C<month>,
-C<day> for the day of the month, C<hour>, C<minute>, and C<second>.
-The numbering for C<month> and C<day> is from 1, not 0. If any of
-year, hour, minute or second is omitted from the hash reference, these
-are set to zero. If month or day are omitted, these are set to 1.  PNG tIME chunks do not contain a time zone. According to L<this subsection|http://www.w3.org/TR/PNG/#11tIME>
-of L</The PNG specification>, "Universal Time (UTC) should be specified rather
-than local time." If the entire argument is omitted or contains an invalid
-value, the time is set to the current time.
-
-This function corresponds to C<png_set_tIME> in libpng, with a Perl hash reference
-substituted for the C struct C<png_timep> used in libpng.
-
 =head1 Text chunks
 
 See L<this subsection|http://www.w3.org/TR/PNG/#11textinfo>
@@ -848,27 +808,21 @@ L</set_text> for details of the keys and values which may be returned.
 
 =head2 set_text
 
-    $png->set_text ($text_chunks);
+    $png->set_text ([\%chunk1, \%chunk2]);
 
-This sets the text chunks in an array reference C<$text_chunks>. The
-input value is an array reference containing hash references. Each
-hash reference must have the following keys:
+This sets the text chunks in a writeable image. The input value is an
+array reference containing one or more hash references. Each hash
+reference must have a C<key> value for the text. According to the PNG
+specification, this should be between one and 79 bytes in length. This
+module enforces that restriction, so if you supply a key longer than
+that, the chunk cannot be added. A hash reference may also have the
+following:
 
 =over
 
-=item C<key>
+=item C<compression>
 
-The "key" value for the text. According to the PNG specification, this
-should be between one and 79 bytes in length, so if you supply a key
-longer than that the chunk cannot be added.
-
-=item C<text>
-
-The "text" value for the text.
-
-=back
-
-The optional key C<compression> controls the compression of the
+The value of C<compression> controls the compression of the
 text. If C<compression> is not supplied, a default value of
 PNG_TEXT_COMPRESSION_NONE is applied. The C<compression> field can
 take the following values, available from L<Image::PNG::Const>:
@@ -892,49 +846,6 @@ ITXT = International text, should be UTF-8.
 ITXT = International text, should be UTF-8.
 
 =back
-
-Whether or not the value of C<text> is an ITXT field is also decided
-by the compression value. People who want to fiddle with the text
-compression can do so via L</set_text_compression_level> and the other
-functions described below that.
-
-If it is called more than once, the chunks are not overwritten but
-appended to the existing ones. (This behaviour is copied from libpng
-itself.)
-
-This function corresponds to C<png_set_text> in libpng.
-
-=head3 Example
-
-    
-    use utf8;
-    use Image::PNG::Const ':all';
-    use Image::PNG::Libpng ':all';
-    my $png = create_write_struct ();
-    $png->set_IHDR ({width => 1, height => 1, bit_depth => 8,
-                     color_type => PNG_COLOR_TYPE_GRAY});
-    $png->set_rows (['X']);
-    $png->set_text ([{
-        compression => PNG_TEXT_COMPRESSION_NONE,
-        key => "Copyright",
-        text => "Copyright (C) 2020 Fat Cat",
-    }, {
-        compression => PNG_ITXT_COMPRESSION_zTXt,
-        key => "Copyright",
-        lang_key => '著者権',
-        lang => 'ja_JP',
-        text => '©令和２年茉莉ニャンバーガーさん',
-    }]);
-    $png->write_png_file ('copyright.png');
-
-(This example is included as L<F<set-text.pl>|https://fastapi.metacpan.org/source/BKB/Image-PNG-Libpng-0.49/examples/set-text.pl> in the distribution.)
-
-
-=head3 Other fields
-
-The following fields can also be used in C<set_text>:
-
-=over
 
 =item C<itxt_length>
 
@@ -964,23 +875,105 @@ either, nor to enforce restrictions on its length.
 =item C<lang_key>
 
 This corresponds to the "Translated keyword" of the PNG
-specification. Note that the user needs to supply L</key> and L</lang>
+specification. Note that the user needs to supply C<key> and L</lang>
 as well as C<lang_key>.
 
 Support for writing C<lang_key> was added in version 0.49 of this
 module.  (Prior to that undocumented support existed via a
 differently-named key.)
 
+=item C<text>
+
+The value of "text" is added to the PNG as the text segment. This can
+be omitted if you just want to write a key value without any
+accompanying text.
+
 =item C<text_length>
 
 The string length in bytes. The user may set this, but it is ignored
 when writing PNG text chunks, instead this module uses the string
-length obtained from Perl. This key is used to set the length of the
-string when reading text via L</get_text>. If the text is marked as
-international text, L</itxt_length> is used to return its length in
+length obtained from Perl. This key contains the length of the string
+when reading text chunks via L</get_text>, but if the text is marked
+as international text, L</itxt_length> is used to return its length in
 bytes, rather than this.
 
 =back
+
+Whether or not the value of C<text> is an ITXT field is decided by the
+value of C<compression>. 
+
+People who want to fiddle with the text compression applied can do so
+via L</set_text_compression_level> and the other functions described
+below that.
+
+If C<set_text> is called more than once, the chunks are not overwritten but
+appended to the existing ones. (This behaviour is from libpng itself.)
+
+Prior to version 0.50, C<set_text> would fail silently if the user
+added invalid chunks, for example hash references without a valid
+C<key>, or things which were not hash references at all. From version
+0.50, all invalid inputs cause fatal errors. However, unknown keys in
+the hash references do not cause fatal errors.
+
+This function corresponds to C<png_set_text> in libpng.
+
+=head3 Example
+
+    
+    use utf8;
+    use Image::PNG::Const ':all';
+    use Image::PNG::Libpng ':all';
+    my $png = create_write_struct ();
+    $png->set_IHDR ({width => 1, height => 1, bit_depth => 8,
+                     color_type => PNG_COLOR_TYPE_GRAY});
+    $png->set_rows (['X']);
+    $png->set_text ([{
+        compression => PNG_TEXT_COMPRESSION_NONE,
+        key => "Copyright",
+        text => "Copyright (C) 2020 Fat Cat",
+    }, {
+        compression => PNG_ITXT_COMPRESSION_zTXt,
+        key => "Copyright",
+        lang_key => '著者権',
+        lang => 'ja_JP',
+        text => '©令和２年茉莉ニャンバーガーさん',
+    }]);
+    $png->write_png_file ('copyright.png');
+
+(This example is included as L<F<set-text.pl>|https://fastapi.metacpan.org/source/BKB/Image-PNG-Libpng-0.52/examples/set-text.pl> in the distribution.)
+
+
+=head2 text_compression_name
+
+    my $name = Image::PNG::Libpng::text_compression_name ($text->{compression});
+
+Given a numerical text compression type, return the equivalent
+name. The name is in upper case. The possible return values are
+
+=over
+
+=item TEXT_NONE
+
+=item TEXT_zTXt
+
+=item ITXT_NONE
+
+=item ITXT_zTXt
+
+=item an empty string
+
+if the compression method is unknown.
+
+=back
+
+The compression field is also used to store the information about
+whether the text is "international text" in UTF-8 or not.
+
+This function does not correspond to anything in libpng. The names of
+the text compression types are based on those in C<png.h>, but without
+the word "COMPRESSION", so for example the libpng constant
+C<PNG_ITXT_COMPRESSION_zTXt> corresponds to a return value of
+C<ITXT_zTXt>.
 
 =head1 Private chunks
 
@@ -1050,46 +1043,16 @@ This function corresponds to C<png_get_unknown_chunks> in libpng
 
 This function corresponds to C<png_set_unknown_chunks> in libpng
 
-=head1 Helper functions
-
-These helper functions assist the programmer in the transition from
-libpng, which uses C conventions such as upper case macros standing
-for numerical constants and C structures, to Perl's string-based
-conventions.
-
-=head2 text_compression_name
-
-    my $name = Image::PNG::Libpng::text_compression_name ($text->{compression});
-
-Given a numerical text compression type, return the equivalent
-name. The name is in upper case. The possible return values are
-
-=over
-
-=item TEXT_NONE
-
-=item TEXT_zTXt
-
-=item ITXT_NONE
-
-=item ITXT_zTXt
-
-=item an empty string
-
-if the compression method is unknown.
-
-=back
-
-The compression field is also used to store the information about
-whether the text is "international text" in UTF-8 or not.
-
-This function does not correspond to anything in libpng. The names of
-the text compression types are based on those in C<png.h>, but without
-the word "COMPRESSION", so for example the libpng constant
-C<PNG_ITXT_COMPRESSION_zTXt> corresponds to a return value of
-C<ITXT_zTXt>.
-
 =head1 Library version functions
+
+=head2 access_version_number
+
+    my $libpng_version_number = Image::PNG::Libpng::access_version_number ();
+
+This function returns the version of the libpng library which the
+module is using as an integer number.
+
+This function corresponds to C<png_access_version_number> in libpng.
 
 =head2 get_libpng_ver
 
@@ -1101,166 +1064,41 @@ module is using.
 This function corresponds to C<png_get_libpng_ver> in libpng. However, it doesn't require the
 C<png_structp> argument of the C function. See L<Unused arguments omitted>.
 
-=head2 access_version_number
-
-    my $libpng_version_number = Image::PNG::Libpng::access_version_number ();
-
-This function returns the version of the libpng library which the
-module is using as an integer number.
-
-This function corresponds to C<png_access_version_number> in libpng.
-
-=head1 Palettes
-
-See L<this subsection|http://www.w3.org/TR/PNG/#11PLTE>
-of L</The PNG specification> for information on the PNG standards for
-the palette chunk.
-
-=head2 get_PLTE
-
-     my $colours = $png->get_PLTE ();
-     # Get the green value of the twentieth entry in the palette.
-     my $green = $colours->[20]->{green};
-
-This function gets the palette from the PNG. The return value is an
-array reference containing the palette. This array contains hash
-references with the values "green", "blue" and "red" for the colour of
-each pixel in the palette. If the PNG has no palette, it returns an
-undefined value.
-
-A PNG image may or may not contain a palette. To check whether the
-image contains a palette, use something of the following form:
-
-     use Image::PNG::Const ':all';
-     my $color_type = $png->get_color_type ();
-     if ($color_type == PNG_COLOR_TYPE_PALETTE) {
-         # The PNG uses a palette.
-     }
-
-A PNG image may also contain a palette even when the "color_type" does
-not indicate that. To check for that case, use L</get_valid>.
-
-This function corresponds to C<png_get_PLTE> in libpng.
-
-=head2 set_PLTE
-
-    $png->set_PLTE ($palette);
-
-Set the palette of C<$png>. The argument is an array reference
-containing hash references. There is one hash reference for each
-palette entry. The hash references contain three fields, red, green,
-and blue, corresponding to the pixel value for that palette
-entry. Other values in the hash references are ignored. For example,
-
-    $png->set_PLTE ([{red => 1, green => 99, blue => 0x10},
-                     {red => 0xFF, green => 0xFF, blue => 0xFF}]);
-
-creates a palette with two entries in C<$png>.
-
-This function corresponds to C<png_set_PLTE> in libpng.
-
 =head1 Compression and filtering
 
-=head2 set_filter
-
-    use Image::PNG::Const 'PNG_FILTER_NONE';
-    $png->set_filter (PNG_FILTER_NONE);
-
-This sets the filters which are allowed to be used for writing a PNG
-image. The possible values are
-
-=over
-
-=item PNG_NO_FILTERS
-
-=item PNG_FILTER_NONE
-
-=item PNG_FILTER_SUB
-
-=item PNG_FILTER_UP
-
-=item PNG_FILTER_AVG
-
-=item PNG_FILTER_PAETH
-
-=item PNG_ALL_FILTERS
-
-=back
-
-These can be combined using C<|> (logical or):
-
-    use Image::PNG::Const ':all';
-    set_filter ($png, PNG_FILTER_UP | PNG_FILTER_AVG);
-
-Please see L<this subsection|http://www.w3.org/TR/PNG/#9Filter-types>
-of L</The PNG specification> for the meanings of these
-filter types.
-
-This function corresponds to C<png_set_filter> in libpng with the second (unused)
-argument omitted. See L<Unused arguments omitted>.
-
-=head2 set_user_limits
-
-    $png->set_user_limits ($width, $height);
-
-This enables a user to override libpng's restrictions to one million
-pixels in width and one million pixels in height for a PNG image.
-
-This function corresponds to C<png_set_user_limits> in libpng
 
 
+=head2 get_compression_buffer_size
 
-=head2 get_user_width_max
+    my $size = $png->get_compression_buffer_size ();
 
-    $png->get_user_width_max ();
+Returns the value of the compression buffer size, which may be altered
+with L</set_compression_buffer_size>.
 
-Get the maximum width allowed. These values can be changed by
-L</set_user_limits>.
+=head2 set_compression_buffer_size
 
-This function corresponds to C<png_get_user_width_max> in libpng
+    $png->set_compression_buffer_size (100);
 
-
-
-=head2 get_user_height_max
-
-    $png->get_user_height_max ();
-
-Get the maximum height allowed. These values can be changed by
-L</set_user_limits>.
-
-This function corresponds to C<png_get_user_height_max> in libpng
-
-
+Set the size of the buffer which zlib uses to compress or decompress
+the image data. It takes one argument, an integer number. This cannot
+be less than 6.
 
 =head2 set_compression_level
 
     $png->set_compression_level ($number);
 
 Set the compression level used to make the PNG. A value of 0
-corresponds to no compression at all, otherwise C<$number> may take
-values of 1 to 9, with smaller values giving faster, and larger values
-giving better, that is with smaller output, compression. These
-correspond to the -1, -2, ... -9 options to the C<gzip> utility, or
-the compression level parameter of C<zlib>. Calling with C<-1> reverts
-to the default compression. Calling with any other number outside the
-range 0 to 9 results in a fatal error.
-
-(⛐🤪⚠ The libpng documentation, and online sites derived from it,
-incorrectly states that the underlying function
-C<png_set_compression_level> takes only arguments from 0 to 9 and that
-this function should be called with a value of 6 to obtain the default
-compression; libpng in fact uses the value of -1 via the macro
-C<PNG_Z_DEFAULT_COMPRESSION> to set its default compression. This may
-be confirmed by examining the source code of F<pnglibconf.h>,
-F<pngwrite.c>, and F<pngwutil.c> in the libpng
-distribution. Image::PNG::Libpng supports the libpng default value of
--1 but doesn't allow other negative numbers. Whether or not the value
-0 results in no compression is untested as of Image::PNG::Libpng
-version 0.49.)
+(C<Z_NO_COMPRESSION>) corresponds to no compression at all, otherwise
+C<$number> may take values of 1 (C<Z_BEST_SPEED>) to 9
+(C<Z_BEST_COMPRESSION>), with smaller values giving faster, and
+larger values giving better, that is with smaller output,
+compression. These correspond to the -1, -2, ... -9 options to the
+C<gzip> utility, or the compression level parameter of
+C<zlib>. Calling with C<-1> (C<Z_DEFAULT_COMPRESSION>)
+reverts to the default compression. Calling with any other number
+outside the range 0 to 9 results in a fatal error.
 
 This function was added to the module in version 0.49.
-
-
 
 
 =head2 set_compression_mem_level
@@ -1301,6 +1139,44 @@ zlib, the argument is either 0 for default behaviour, or 1 to 4.  See
 the L</zlib documentation>. libpng uses the default strategy 0
 (C<Z_DEFAULT_STRATEGY>) for unfiltered image data, and 1
 (C<Z_FILTERED>) for filtered image data.
+
+=head2 set_filter
+
+    use Image::PNG::Const 'PNG_FILTER_NONE';
+    $png->set_filter (PNG_FILTER_NONE);
+
+This sets the filters which are allowed to be used for writing a PNG
+image. The possible values are
+
+=over
+
+=item PNG_NO_FILTERS
+
+=item PNG_FILTER_NONE
+
+=item PNG_FILTER_SUB
+
+=item PNG_FILTER_UP
+
+=item PNG_FILTER_AVG
+
+=item PNG_FILTER_PAETH
+
+=item PNG_ALL_FILTERS
+
+=back
+
+These can be combined using C<|> (logical or):
+
+    use Image::PNG::Const ':all';
+    set_filter ($png, PNG_FILTER_UP | PNG_FILTER_AVG);
+
+Please see L<this subsection|http://www.w3.org/TR/PNG/#9Filter-types>
+of L</The PNG specification> for the meanings of these
+filter types.
+
+This function corresponds to C<png_set_filter> in libpng with the second (unused)
+argument omitted. See L<Unused arguments omitted>.
 
 
 =head2 set_text_compression_level
@@ -1360,7 +1236,7 @@ undefined value.
 
 =head2 bKGD
 
-The background colour of the PNG image.
+The background color of the PNG image.
 
 See L<this subsection|http://www.w3.org/TR/PNG/#11bKGD>
 of L</The PNG specification> for information on the PNG standards for
@@ -1373,17 +1249,17 @@ the background chunk.
 Get the bKGD (background) chunk of the image.
 
 The return value is a hash with the following keys, depending on the
-colour type of the image:
+color type of the image:
 
 =over
 
 =item index
 
-For palette colour types, this is the offset into the palette.
+For palette color types, this is the offset into the palette.
 
 =item gray
 
-For greyscale colour types.
+For greyscale color types.
 
 =item red
 
@@ -1415,70 +1291,55 @@ point".
 
 =head3 get_cHRM
 
-    my %cHRM = $png->get_cHRM ();
+    my $cHRM = $png->get_cHRM ();
 
-Get the cHRM chunk as a hash.
+Get the cHRM chunk as a hash reference.
 
-The keys of the hash are
-
-=over
-
-=item white_x
-
-=item white_y
-
-=item red_x
-
-=item red_y
-
-=item green_x
-
-=item green_y
-
-=item blue_x
-
-=item blue_y
-
-=back
+The keys of the hash are white_x, white_y, red_x, red_y, green_x, green_y, blue_x, blue_y.
 
 The values of the hash are floating point numbers between 0 and 1.
 
-This function corresponds to C<png_get_cHRM> in libpng with a hash function instead of the C<double>
-arguments. The hash key names correspond to the names of the C<double>
+This function corresponds to C<png_get_cHRM> in libpng with a hash reference supplying the
+arguments. The hash's keys correspond to the names of the C<double>
 arguments in libpng.
 
 =head3 set_cHRM
 
     $png->set_cHRM (\%cHRM);
 
-Set the cHRM chunk from a hash.
+Set the cHRM chunk from a hash reference.
 
-The keys of the hash are
+The keys of the hash are as for L</get_cHRM>. The values are floating
+point numbers between 0 and 1.
 
-=over
-
-=item white_x
-
-=item white_y
-
-=item red_x
-
-=item red_y
-
-=item green_x
-
-=item green_y
-
-=item blue_x
-
-=item blue_y
-
-=back
-
-The values of the hash are floating point numbers between 0 and 1.
-
-This function corresponds to C<png_set_cHRM> in libpng with a hash function instead of the C<double>
+This function corresponds to C<png_set_cHRM> in libpng with a hash reference instead of the C<double>
 arguments.
+
+=head2 eXIf
+
+The C<eXIf> chunk is an extension to the PNG specification. See
+L<http://www.simplesystems.org/png-group/proposals/eXIf/>. Support for
+this chunk was added in version 0.50 of this module.
+
+=head3 get_eXIf
+
+    my $exif = $png->get_eXIf ();
+
+This retrieves the C<eXIf> chunk from C<$png> but does not process the
+internal information.
+
+=head3 set_eXIf
+
+    $png->set_eXIf ($exif);
+
+libpng checks whether the chunk's first two bytes are either C<II> for
+little-endian (from Intel) or C<MM> for big-endian (from Motorola)
+then adds the entire chunk, including the first two bytes, to the PNG.
+
+⛐🤪⚠ As of December 2020, there appears to be a bug in libpng
+in which the eXIf chunk is added twice, causing a warning of the form
+C<libpng warning: eXIf: duplicate> on reading a PNG file back in. See
+L<https://github.com/glennrp/libpng/pull/351>.
 
 =head2 gAMA
 
@@ -1502,123 +1363,31 @@ Set the gamma value or gAMA chunk.
 
 This function corresponds to C<png_set_gAMA> in libpng
 
-=head2 sRGB
+=head2 hIST
 
-See L<this subsection|http://www.w3.org/TR/PNG/#11sRGB>
+See L<this subsection|http://www.w3.org/TR/PNG/#11hIST>
 of L</The PNG specification>.
 
-=head3 get_sRGB
+=head3 get_hIST
 
-    my $sRGB = $png->get_sRGB ();
+    my $hist = $png->get_hIST ();
 
-The return value is an integer number corresponding to one of the
-following:
+If the PNG file contains a histogram, the return value is array
+reference, otherwise it is the undefined value. The number of entries
+in the array reference is the same as in the palette.
 
-=over
+This function corresponds to C<png_get_hIST> in libpng
 
-=item PNG_sRGB_INTENT_SATURATION
+=head3 set_hIST
 
-=item PNG_sRGB_INTENT_PERCEPTUAL
+    $png->set_hIST (\@hist);
 
-=item PNG_sRGB_INTENT_ABSOLUTE
+Set the histogram. The entries of the histogram are 16 bit unsigned
+integers, so the maximum value that can be entered will be 2^16 -
+1. Larger numbers and floating point numbers will just be silently
+truncated.
 
-=item PNG_sRGB_INTENT_RELATIVE
-
-=back
-
-This function corresponds to C<png_get_sRGB> in libpng
-
-=head3 set_sRGB
-
-    $png->set_sRGB ($srgb);
-
-C<$srgb> is one of the following (integer numbers).
-
-=over
-
-=item PNG_sRGB_INTENT_SATURATION
-
-=item PNG_sRGB_INTENT_PERCEPTUAL
-
-=item PNG_sRGB_INTENT_ABSOLUTE
-
-=item PNG_sRGB_INTENT_RELATIVE
-
-=back
-
-This function corresponds to C<png_set_sRGB> in libpng
-
-=head2 pHYs
-
-See L<this subsection|http://www.w3.org/TR/PNG/#11pHYs>
-of L</The PNG specification>.
-
-=head3 get_pHYs
-
-    my $phys = $png->get_pHYs ();
-
-The return value is a hash reference with the keys
-
-=over
-
-=item res_x
-
-=item res_y
-
-=item unit_type
-
-=back
-
-This function corresponds to C<png_get_pHYs> in libpng
-
-=head3 set_pHYs
-
-    $png->set_pHYs ({res_x => 1, res_y => 1, unit_type => 99});
-
-This function corresponds to C<png_set_pHYs> in libpng
-
-=head2 oFFs
-
-This is an extension to the PNG specification. See L<http://www.libpng.org/pub/png/spec/1.1/pngext-1.1.0-pdg.html#C.oFFs>.
-
-=head3 get_oFFs
-
-    my $phys = $png->get_oFFs ();
-
-Get oFFs chunk. Return value is a hash reference
-
-This function corresponds to C<png_get_oFFs> in libpng
-
-=head3 set_oFFs
-
-    $png->set_oFFs ({x_offset => 1, y_offset => 1, unit_type => 99});
-
-Set oFFs chunk.
-
-This function corresponds to C<png_set_oFFs> in libpng
-
-=head2 sBIT
-
-See L<this subsection|http://www.w3.org/TR/PNG/#11sBIT>
-of L</The PNG specification>.
-
-=head3 get_sBIT
-
-    my $sbit = $png->get_sBIT ();
-
-The return value is a hash reference containing integer values for the
-keys C<red>, C<blue>, C<green>, and C<gray>.
-
-This function corresponds to C<png_get_sBIT> in libpng
-
-=head3 set_sBIT
-
-    $png->set_sBIT ({red => 1, blue => 2, green => 3});
-
-The argument is a hash reference containing integer values for the
-keys C<red>, C<blue>, C<green>, and C<gray>.
-
-This function corresponds to C<png_set_sBIT> in libpng
+This function corresponds to C<png_set_hIST> in libpng
 
 =head2 iCCP
 
@@ -1639,9 +1408,11 @@ The name of the profile.
 
 =item profile
 
-The colour profile.
+The color profile.
 
 =back
+
+The C<compression_type> value, which is always 0, is not returned. See L<Unused arguments omitted>.
 
 This function corresponds to C<png_get_iCCP> in libpng.
 
@@ -1649,11 +1420,36 @@ This function corresponds to C<png_get_iCCP> in libpng.
 
     $png->set_iCCP ({name => 'name', profile => 'profile'});
 
-This function corresponds to C<png_set_iCCP> in libpng.
+This function corresponds to C<png_set_iCCP> in libpng. A C<compression_type> argument, which must
+always be 0 anyway, is ignored. See L<Unused arguments omitted>.
+
+=head2 oFFs
+
+This is an extension to the PNG specification. See L<http://www.libpng.org/pub/png/spec/1.1/pngext-1.1.0-pdg.html#C.oFFs>.
+
+=head3 get_oFFs
+
+    my $phys = $png->get_oFFs ();
+
+Get oFFs chunk. Return value is a hash reference
+
+This function corresponds to C<png_get_oFFs> in libpng
+
+=head3 set_oFFs
+
+    $png->set_oFFs ({x_offset => 1, y_offset => 1, unit_type => 0});
+
+Set oFFs chunk. See the specification linked above for the meanings of
+the parameters. If C<unit_type> is not 0 or 1, a warning is produced.
+
+This function corresponds to C<png_set_oFFs> in libpng
 
 =head2 pCAL
 
-pCAL is an extension of the PNG specification. See L<http://www.libpng.org/pub/png/spec/1.1/pngext-1.1.0-pdg.html#C.pCAL>.
+pCAL is an extension of the PNG specification which allows one to
+associate pixels in the PNG image with non-image data such as a heat
+map. See
+L<http://www.libpng.org/pub/png/spec/1.1/pngext-1.1.0-pdg.html#C.pCAL>.
 
 You can test whether your version of libpng supports the pCAL extension
 with L</libpng_supports> as follows:
@@ -1666,35 +1462,40 @@ with L</libpng_supports> as follows:
 
     my $pcal = $png->get_pCAL ();
 
-⛐🤪⚠ Implemented but not tested. Return value is a hash with
-the following keys:
+The return value is a hash reference with the following keys:
 
 =over
+
+=item params
+
+If this exists, its value is a reference to an array containing the
+parameter list of the pCAL chunk, which are floating point
+numbers. Within the PNG file chunk, these parameters are stored as
+strings representing floating point numbers, but you can pass in Perl
+floating point numbers rather than strings. The number of parameters
+you should set is fixed by the C<type> parameter. Refer to the PNG
+specification for full details.
 
 =item purpose
 
 The purpose string of the pCAL chunk.
 
-=item x0
-
-The zero value for the equation.
-
-=item x1
-
-The max value for the equation.
-
 =item type
 
-The equation type as a number.
+The equation type as a number, from 0 to 3. See the PNG specification
+for the meanings. Other numbers cause an error.
 
 =item units
 
-The units as a string.
+The units as a string. See the PNG specification for details.
 
-=item params
+=item x0
 
-If this exists, its value is a reference to an array containing the
-parameter list of the pCAL chunk.
+The zero value for the equation, an integer.
+
+=item x1
+
+The max value for the equation, an integer.
 
 =back
 
@@ -1702,34 +1503,121 @@ This function corresponds to C<png_get_pCAL> in libpng
 
 =head3 set_pCAL
 
-    $png->set_pCAL ($values);
+    $png->set_pCAL (\%values);
 
-⛐🤪⚠ Implemented but not tested. The input is just the same as
-the output of L</get_pCAL>.
+See L</get_pCAL> for the parameters of C<%values>.
 
 This function corresponds to C<png_set_pCAL> in libpng
 
-=head2 hIST
+=head2 pHYs
 
-See L<this subsection|http://www.w3.org/TR/PNG/#11hIST>
+See L<this subsection|http://www.w3.org/TR/PNG/#11pHYs>
 of L</The PNG specification>.
 
-=head3 get_hIST
+=head3 get_pHYs
 
-    my $hist = $png->get_hIST ();
+    my $phys = $png->get_pHYs ();
 
-Return value is array reference. The number of entries in the array
-reference is the same as in the palette.
+The return value is a hash reference with the keys
 
-This function corresponds to C<png_get_hIST> in libpng
+=over
 
-=head3 set_hIST
+=item res_x
 
-    $png->set_hIST (\@hist);
+=item res_y
 
-Set the histogram.
+=item unit_type
 
-This function corresponds to C<png_set_hIST> in libpng
+Is either 0 or 1.
+
+=back
+
+This function corresponds to C<png_get_pHYs> in libpng
+
+=head3 set_pHYs
+
+    $png->set_pHYs ({res_x => 1, res_y => 1, unit_type => 1});
+
+This function corresponds to C<png_set_pHYs> in libpng
+
+=head2 PLTE
+
+See L<this subsection|http://www.w3.org/TR/PNG/#11PLTE>
+of L</The PNG specification> for information on the PNG standards for
+the palette chunk.
+
+=head3 get_PLTE
+
+     my $colors = $png->get_PLTE ();
+     # Get the green value of the twentieth entry in the palette.
+     my $green = $colors->[20]->{green};
+
+This function gets the palette from the PNG. The return value is an
+array reference containing the palette. This array contains hash
+references with the values "green", "blue" and "red" for the color of
+each pixel in the palette. If the PNG has no palette, it returns an
+undefined value.
+
+A PNG image may or may not contain a palette. To check whether the
+image contains a palette, use something of the following form:
+
+     use Image::PNG::Const ':all';
+     my $color_type = $png->get_color_type ();
+     if ($color_type == PNG_COLOR_TYPE_PALETTE) {
+         # The PNG uses a palette.
+     }
+
+A PNG image may also contain a palette even when the "color_type" does
+not indicate that. To check for that case, use L</get_valid>.
+
+This function corresponds to C<png_get_PLTE> in libpng.
+
+=head3 set_PLTE
+
+    $png->set_PLTE ($palette);
+
+Set the palette of C<$png>. The argument is an array reference
+containing hash references. There is one hash reference for each
+palette entry. The hash references contain three fields, red, green,
+and blue, corresponding to the pixel value for that palette
+entry. Other values in the hash references are ignored. For example,
+
+    $png->set_PLTE ([{red => 1, green => 99, blue => 0x10},
+                     {red => 0xFF, green => 0xFF, blue => 0xFF}]);
+
+creates a palette with two entries in C<$png>.
+
+This function corresponds to C<png_set_PLTE> in libpng.
+
+=head2 sBIT
+
+See L<this subsection|http://www.w3.org/TR/PNG/#11sBIT>
+of L</The PNG specification>.
+
+=head3 get_sBIT
+
+    my $sbit = $png->get_sBIT ();
+
+The return value is a hash reference containing integer values for the
+keys C<red>, C<blue>, C<green>, C<gray> and C<alpha>, depending on the
+C<color_type> of C<$png>.
+
+⛐🤪⚠ Prior to version 0.50 of this module, get_sBIT wrote
+values of 0 for all of the keys, regardless of the C<color_type>,
+causing errors in some circumstances. From version 0.50, hash keys are
+not entered if the C<color_type> of the image makes them invalid.
+
+This function corresponds to C<png_get_sBIT> in libpng
+
+=head3 set_sBIT
+
+    $png->set_sBIT ({red => 1, blue => 2, green => 3});
+
+The argument is a hash reference containing integer values for the
+keys C<red>, C<blue>, C<green>, C<gray>, and C<alpha>, as required by
+the C<color_type> of C<$png>.
+
+This function corresponds to C<png_set_sBIT> in libpng
 
 =head2 sCAL
 
@@ -1766,7 +1654,6 @@ The height, as a string.
 
 =back
 
-
 This function corresponds to C<png_get_sCAL_s> in libpng. Note that this uses the sCAL_s function
 rather than the get_sCAL and the returned values are the strings
 themselves rather than parsed numbers.
@@ -1789,8 +1676,8 @@ of L</The PNG specification>.
 
 =head3 get_sPLT
 
-Provisional. See L</set_sPLT> for documentation, the return value is
-like the input of that.
+⛐🤪⚠ Provisional. See L</set_sPLT> for documentation, the
+return value is like the input of that.
 
 =head3 set_sPLT
 
@@ -1833,6 +1720,89 @@ references with keys as follows:
 The field C<nentries> which is returned by L</get_sPLT> does not need
 to be specified, it is calculated from the length of C<entries>.
 
+=head2 sRGB
+
+See L<this subsection|http://www.w3.org/TR/PNG/#11sRGB>
+of L</The PNG specification>.
+
+=head3 get_sRGB
+
+    my $sRGB = $png->get_sRGB ();
+
+The return value is an integer number corresponding to one of the
+following:
+
+=over
+
+=item PNG_sRGB_INTENT_SATURATION
+
+=item PNG_sRGB_INTENT_PERCEPTUAL
+
+=item PNG_sRGB_INTENT_ABSOLUTE
+
+=item PNG_sRGB_INTENT_RELATIVE
+
+=back
+
+This function corresponds to C<png_get_sRGB> in libpng
+
+=head3 set_sRGB
+
+    $png->set_sRGB ($srgb);
+
+C<$srgb> is one of the values described in L</get_sRGB>.
+
+This function corresponds to C<png_set_sRGB> in libpng
+
+=head2 tIME
+
+See L<this subsection|http://www.w3.org/TR/PNG/#11timestampinfo>
+of L</The PNG specification> for information on the PNG standards for
+time stamp information.
+
+=head3 get_tIME
+
+    my $time = $png->get_tIME ();
+    if ($time && $time->{year} < 2005) {
+        warn "Your PNG is now getting old. Don't forget to oil it to prevent rust.";
+    }
+
+The return value is either the undefined value, if no C<tIME> chunk
+exists in the PNG, or a hash reference containing fields C<year>,
+C<month>, C<day>, C<hour>, C<minute> and C<second>. C<month> and
+C<day> start from 1 rather than 0.
+
+The "modification time value" of the PNG image is a chunk written into
+the PNG file itself, and may not have the same value as the operating
+system's modification time for the file. The tIME chunk is not a
+compulsory requirement for PNG files, and most PNG image files do not
+contain this chunk. PNG tIME chunks do not contain a time zone. According to L<this subsection|http://www.w3.org/TR/PNG/#11tIME>
+of L</The PNG specification>, "Universal Time (UTC) should be specified rather
+than local time."
+
+This function corresponds to C<png_get_tIME> in libpng, with a Perl hash reference
+substituted for the C struct C<png_timep> used in libpng.
+
+=head3 set_tIME
+
+    # Set the time to "now"
+    $png->set_tIME ();
+    # Set the time
+    $png->set_tIME ({year => 1999, month => 12});
+
+Set the modification time of the PNG to the values given by the
+argument, a hash reference containing the fields C<year>, C<month>,
+C<day> for the day of the month, C<hour>, C<minute>, and C<second>.
+The numbering for C<month> and C<day> is from 1, not 0. If any of
+year, hour, minute or second is omitted from the hash reference, these
+are set to zero. If month or day are omitted, these are set to 1.  PNG tIME chunks do not contain a time zone. According to L<this subsection|http://www.w3.org/TR/PNG/#11tIME>
+of L</The PNG specification>, "Universal Time (UTC) should be specified rather
+than local time." If the entire argument is omitted or contains an invalid
+value, the time is set to the current time.
+
+This function corresponds to C<png_set_tIME> in libpng, with a Perl hash reference
+substituted for the C struct C<png_timep> used in libpng.
+
 =head2 tRNS
 
 See L<this subsection|http://www.w3.org/TR/PNG/#11tRNS>
@@ -1856,73 +1826,60 @@ the same size as the palette. It must not contain more than 256
 values. If the image is not a palette type, C<$trns> is a hash
 reference containing values for the keys red, green, blue and gray.
 
-=head1 META FUNCTIONS
+=head1 OTHER LIBPNG FUNCTIONS
 
-These functions enable examination of the installed libpng from Perl.
 
-=head2 libpng_supports
 
-    if (libpng_supports ('iTXt')) {
-        print "Your libpng supports international text.\n";
-    }
+=head2 get_user_width_max
 
-This function returns true or false depending on whether the version
-of libpng which this was compiled with supports or does not support a
-particular facility.
+    $png->get_user_width_max ();
 
-The possible arguments to C<libpng_supports> are
+Get the maximum width allowed for a PNG file. The default is 1
+million pixels. These values can be changed by L</set_user_limits>.
 
-=over
+This function corresponds to C<png_get_user_width_max> in libpng
 
-=item iTXt
 
-Does the libpng support international text?
 
-=item tEXt
+=head2 get_user_height_max
 
-Does the libpng support text?
+    $png->get_user_height_max ();
 
-=item zTXt
+Get the maximum height allowed for a PNG file. The default is 1
+million pixels. These values can be changed by L</set_user_limits>.
 
-Does the libpng support compressed text?
+This function corresponds to C<png_get_user_height_max> in libpng
 
-=item sCAL
 
-Does the libpng support the L</sCAL> extension?  This actually tests
-for the presence of the C<get_sCAL_s>/C<set_sCAL_s> functions, so its
-behaviour is dependent on other factors for versions 1.2 and 1.4 of
-libpng.
 
-=item pCAL
+=head2 set_expand
 
-Does the libpng support the L</pCAL> extension?
+    $png->set_expand ();
 
-=item sPLT
+Set transformation in C<$png> such that paletted images are expanded
+to RGB, grayscale images of bit-depth less than 8 are expanded to
+8-bit images, and tRNS chunks are expanded to alpha channels.
 
-Does the libpng support L</sPLT> chunks?
-
-=item UNKNOWN_CHUNKS
-
-Does the libpng support unknown chunks (see L<Private chunks>)?
-
-=back
-
-=head1 UNDOCUMENTED FUNCTIONS
-
-⛐🤪⚠ These functions aren't fully documented and are subject to
-change. You can examine the source code or the libpng documentation to
-discover their function.
+This function corresponds to C<png_set_expand> in libpng
 
 =head2 set_filler
 
     $png->set_filler ($filler, $flags);
 
-Set transformations in $png such that a filler byte C<$filler> is
+Set transformations in C<$png> such that a filler byte C<$filler> is
 added when an 8-bit grayscale image or 24-bit RGB image is read, and a
 filler byte is deleted when an 8-bit grayscale image or 24-bit RGB
 image is written. C<$flags> may be C<PNG_FLAG_FILLER_AFTER> or zero.
 
 This function corresponds to C<png_set_filler> in libpng
+
+=head2 set_gray_to_rgb
+
+    $png->set_gray_to_rgb ();
+
+Convert a grayscale PNG file to RGB format on reading.
+
+This function corresponds to C<png_set_gray_to_rgb> in libpng
 
 =head2 set_packing
 
@@ -1944,58 +1901,43 @@ per channel.
 
 This function corresponds to C<png_set_strip_16> in libpng
 
-=head2 set_expand
+=head2 set_user_limits
 
-    $png->set_expand ();
+    $png->set_user_limits ($width, $height);
 
-Set transformation in C<$png> such that paletted images are expanded
-to RGB, grayscale images of bit-depth less than 8 are expanded to
-8-bit images, and tRNS chunks are expanded to alpha channels.
+This enables a user to override libpng's restrictions to one million
+pixels in width and one million pixels in height for a PNG image.
 
-This function corresponds to C<png_set_expand> in libpng
+This function corresponds to C<png_set_user_limits> in libpng
 
-=head2 set_gray_to_rgb
+=head1 OTHER FUNCTIONS
 
-    $png->set_gray_to_rgb ();
+This section contains other functions which don't correspond to
+anything in libpng itself, but which have been added to the module for
+utility.
 
-This function corresponds to C<png_set_gray_to_rgb> in libpng
+=head2 copy_row_pointers
 
-=head2 set_rgb_to_gray_fixed
+    $png->copy_row_pointers ($row_pointers);
 
-    $png->set_gray_to_rgb ();
+This allows XS routines to directly set the value of the row pointers
+for the PNG image. The memory is copied, so whatever is in the row
+pointers can be freed immediately after calling this. However, the
+image data it points to is not copied, so this needs to be valid until
+the PNG is written.
 
-This function corresponds to C<png_set_gray_to_rgb_fixed> in libpng
+The Perl scalar C<$row_pointers> should be set up something like the
+following (where C<rp> is the C pointer):
 
-=head2 get_tRNS_palette
+    RETVAL = newSViv (PTR2IV (rp));
 
-    $png->get_tRNS_palette ();
+It's extracted from the Perl scalar using
 
-This is not a libpng-equivalent function.
+    rp = INT2PTR (png_byte **, SvIV (row_pointers));
 
-=head2 set_PLTE_pointer
-
-    $png->set_PLTE_pointer ();
-
-This is not a libpng-equivalent function.
-
-=head1 TESTING FUNCTIONS
-
-=head2 image_data_diff
-
-    my $diff = image_data_diff ('a.png', 'b.png');
-
-This returns the undefined value if the image data in F<a.png> is the
-same as the image data in F<b.png>. If the image data is different, it
-returns a readable text message describing the first difference found,
-for example the height is different, or row 0 of the image data is
-different, etc. 
-
-This function is used in testing this module. See also L</png_compare>.
-
-=head1 ACCESS FUNCTIONS
-
-These functions access the libpng C structures within the Perl
-object. They are for people writing XS or C code.
+where row_pointers is the C<SV *> corresponding to C<$row_pointers> in
+the Perl script. See also L</set_row_pointers> which does the same
+thing but takes ownership of the memory.
 
 =head2 get_internals
 
@@ -2021,28 +1963,715 @@ To access the values of the pointers, use something like this:
 
 An example exists in L<Image::PNG::Cairo>.    
 
-=head2 copy_row_pointers
+=head2 get_tRNS_palette
 
-    $png->copy_row_pointers ($row_pointers);
+    $png->get_tRNS_palette ();
 
-This allows XS routines to directly set the value of the row pointers
-for the PNG image. The memory is copied, so whatever is in the row
-pointers can be freed immediately after calling this. However, the
-image data it points to is not copied, so this needs to be valid until
-the PNG is written.
+This is not a libpng-equivalent function.
 
-The Perl scalar C<$row_pointers> should be set up something like the
-following (where C<rp> is the C pointer):
+=head2 image_data_diff
 
-    RETVAL = newSViv (PTR2IV (rp));
+    my $diff = image_data_diff ('a.png', 'b.png');
 
-It's extracted from the Perl scalar using
+This returns the undefined value if the image data in F<a.png> is the
+same as the image data in F<b.png>. If the image data is different, it
+returns a readable text message describing the first difference found,
+for example the height is different, or row 0 of the image data is
+different, etc. 
 
-    rp = INT2PTR (png_byte **, SvIV (row_pointers));
+This function is used in testing this module. See also L</png_compare>.
 
-where row_pointers is the C<SV *> corresponding to C<$row_pointers> in
-the Perl script. See also L</set_row_pointers> which does the same
-thing but takes ownership of the memory.
+=head2 libpng_supports
+
+    if (libpng_supports ('iTXt')) {
+        print "Your libpng supports international text.\n";
+    }
+
+This function returns true or false depending on whether the version
+of libpng which this was compiled with supports or does not support a
+particular facility. Libpng actually has a lot of macros of the form
+WRITE_bKGd and READ_tEXt which control the reading and writing of
+individual chunks, but I have assumed that it is rare for someone in a
+Perl programming environment to have a libpng with these kinds of
+things switched off, and do not currently support those arguments.
+
+The possible arguments to C<libpng_supports> are:
+
+=over
+
+
+=item 16BIT
+
+
+
+
+=item ALIGNED_MEMORY
+
+
+
+
+=item ARM_NEON_API
+
+
+
+
+=item BENIGN_ERRORS
+
+
+
+
+=item BENIGN_READ_ERRORS
+
+
+
+
+=item BENIGN_WRITE_ERRORS
+
+
+
+
+=item bKGD
+
+Does the libpng support the L</bKGD> chunk?
+
+
+=item BUILD_GRAYSCALE_PALETTE
+
+
+
+
+=item BUILTIN_BSWAP16
+
+
+
+
+=item CHECK_FOR_INVALID_INDEX
+
+
+
+
+=item cHRM
+
+Does the libpng support the L</cHRM> chunk?
+
+
+=item COLORSPACE
+
+
+
+
+=item CONSOLE_IO
+
+
+
+
+=item CONVERT_tIME
+
+This is related to two deprecated functions,
+L</png_convert_from_time_t> and L</png_convert_from_struct_tm>.
+
+
+=item CONVERT_tIME
+
+
+
+
+=item EASY_ACCESS
+
+
+
+
+=item ERROR_NUMBERS
+
+
+
+
+=item ERROR_TEXT
+
+
+
+
+=item eXIf
+
+Does the libpng support the L</eXIf> chunk?
+
+
+=item FIXED_POINT
+
+
+
+
+=item FIXED_POINT_MACRO
+
+
+
+
+=item FLOATING_ARITHMETIC
+
+
+
+
+=item FLOATING_POINT
+
+
+
+
+=item FORMAT_AFIRST
+
+
+
+
+=item FORMAT_BGR
+
+
+
+
+=item gAMA
+
+Does the libpng support the L</gAMA> chunk?
+
+
+=item GAMMA
+
+
+
+
+=item GET_PALETTE_MAX
+
+
+
+
+=item HANDLE_AS_UNKNOWN
+
+
+
+
+=item HANDLE_AS_UNKNOWN
+
+
+
+
+=item hIST
+
+Does the libpng support the L</hIST> chunk?
+
+
+=item iCCP
+
+Does the libpng support the L</iCCP> chunk?
+
+
+=item INCH_CONVERSIONS
+
+
+
+
+=item INFO_IMAGE
+
+
+
+
+=item IO_STATE
+
+
+
+
+=item iTXt
+
+Does the libpng support international text?
+
+
+=item MIPS_MSA_API
+
+
+
+
+=item MNG_FEATURES
+
+
+
+
+=item oFFs
+
+Does the libpng support the L</oFFs> chunk?
+
+
+=item pCAL
+
+Does the libpng support the L</pCAL> extension?
+
+
+=item PEDANTIC_WARNINGS
+
+
+
+
+=item pHYs
+
+Does the libpng support the L</pHYs> chunk?
+
+
+=item POINTER_INDEXING
+
+
+
+
+=item POWERPC_VSX_API
+
+
+
+
+=item PROGRESSIVE_READ
+
+
+
+
+=item READ
+
+Can libpng read PNGs?
+
+
+=item READ_16_TO_8
+
+
+
+
+=item READ_ALPHA_MODE
+
+
+
+
+=item READ_BACKGROUND
+
+
+
+
+=item READ_BGR
+
+
+
+
+=item READ_COMPOSITE_NODIV
+
+
+
+
+=item READ_COMPRESSED_TEXT
+
+
+
+
+=item READ_EXPAND
+
+
+
+
+=item READ_EXPAND_16
+
+
+
+
+=item READ_FILLER
+
+
+
+
+=item READ_GRAY_TO_RGB
+
+
+
+
+=item READ_INTERLACING
+
+
+
+
+=item READ_INT_FUNCTIONS
+
+
+
+
+=item READ_INVERT
+
+
+
+
+=item READ_INVERT_ALPHA
+
+
+
+
+=item READ_OPT_PLTE
+
+
+
+
+=item READ_PACK
+
+
+
+
+=item READ_PACKSWAP
+
+
+
+
+=item READ_QUANTIZE
+
+
+
+
+=item READ_RGB_TO_GRAY
+
+
+
+
+=item READ_SCALE_16_TO_8
+
+
+
+
+=item READ_SHIFT
+
+
+
+
+=item READ_STRIP_16_TO_8
+
+
+
+
+=item READ_STRIP_ALPHA
+
+
+
+
+=item READ_SWAP
+
+
+
+
+=item READ_SWAP_ALPHA
+
+
+
+
+=item READ_tEXt
+
+
+
+
+=item READ_TRANSFORMS
+
+
+
+
+=item READ_USER_TRANSFORM
+
+
+
+
+=item READ_zTXt
+
+
+
+
+=item SAVE_INT_32
+
+
+
+
+=item SAVE_UNKNOWN_CHUNKS
+
+
+
+
+=item sBIT
+
+Does the libpng support the L</sBIT> chunk?
+
+
+=item sCAL
+
+Does the libpng support the L</sCAL> extension?  This actually tests
+for the presence of the C<get_sCAL_s>/C<set_sCAL_s> functions, so its
+behaviour is dependent on other factors for versions 1.2 and 1.4 of
+libpng.
+
+
+=item SEQUENTIAL_READ
+
+
+
+
+=item SETJMP
+
+
+
+
+=item SET_OPTION
+
+
+
+
+=item SET_UNKNOWN_CHUNKS
+
+
+
+
+=item SET_USER_LIMITS
+
+
+
+
+=item SIMPLIFIED_READ
+
+
+
+
+=item SIMPLIFIED_READ_AFIRST
+
+
+
+
+=item SIMPLIFIED_WRITE
+
+
+
+
+=item SIMPLIFIED_WRITE_AFIRST
+
+
+
+
+=item SIMPLIFIED_WRITE_BGR
+
+
+
+
+=item SIMPLIFIED_WRITE_STDIO
+
+
+
+
+=item sPLT
+
+Does the libpng support L</sPLT> chunks?
+
+
+=item sRGB
+
+Does the libpng support the L</sRGB> chunk?
+
+
+=item STDIO
+
+
+
+
+=item STORE_UNKNOWN_CHUNKS
+
+
+
+
+=item TEXT
+
+Does the libpng support text?
+
+
+=item tEXt
+
+Does the libpng support tEXt chunks?
+
+
+=item tIME
+
+Does the libpng support the L</tIME> chunk?
+
+
+=item TIME_RFC1123
+
+
+
+
+=item tRNS
+
+Does the libpng support the L</tRNS> chunk?
+
+
+=item UNKNOWN_CHUNKS
+
+Does the libpng support unknown chunks (see L<Private chunks>)?
+
+
+=item USER_CHUNKS
+
+
+
+
+=item USER_LIMITS
+
+Does the libpng support L</set_user_limits> and the related functions
+L</get_user_width_max>, and L</get_user_height_max>?
+
+
+=item USER_LIMITS
+
+
+
+
+=item USER_MEM
+
+
+
+
+=item USER_TRANSFORM_INFO
+
+
+
+
+=item USER_TRANSFORM_PTR
+
+
+
+
+=item WARNINGS
+
+
+
+
+=item WRITE
+
+Can libpng write pngs?
+
+
+=item WRITE_BGR
+
+
+
+
+=item WRITE_COMPRESSED_TEXT
+
+
+
+
+=item WRITE_CUSTOMIZE_COMPRESSION
+
+Does the libpng support L</set_compression_level> and similar functions?
+
+⛐🤪⚠ It's not very clear that this returns a useful value,
+since L</set_compression_level> seems to be in libpngs from at least
+as far back as C<1.5.1>, and yet this macro was only added to libpng
+in version C<1.6.13>.
+
+
+=item WRITE_CUSTOMIZE_ZTXT_COMPRESSION
+
+Does the libpng support L</set_text_compression_level> and similar functions?
+
+
+=item WRITE_FILLER
+
+
+
+
+=item WRITE_FILTER
+
+
+
+
+=item WRITE_FLUSH
+
+
+
+
+=item WRITE_FLUSH_AFTER_IEND
+
+
+
+
+=item WRITE_INTERLACING
+
+
+
+
+=item WRITE_INT_FUNCTIONS
+
+
+
+
+=item WRITE_INVERT
+
+
+
+
+=item WRITE_INVERT_ALPHA
+
+
+
+
+=item WRITE_OPTIMIZE_CMF
+
+
+
+
+=item WRITE_PACK
+
+
+
+
+=item WRITE_PACKSWAP
+
+
+
+
+=item WRITE_SHIFT
+
+
+
+
+=item WRITE_SWAP
+
+
+
+
+=item WRITE_SWAP_ALPHA
+
+
+
+
+=item WRITE_TRANSFORMS
+
+
+
+
+=item WRITE_USER_TRANSFORM
+
+
+
+
+=item WRITE_WEIGHTED_FILTER
+
+
+
+
+=item zTXt
+
+Does the libpng support C<zTXt> chunks?
+
+
+=back
+
+=head2 read_struct
+
+    if ($png->read_struct ()) {
+         warn "Can't write this, use copy_png to copy it";
+    }
+
+This returns a true value if C<$png> was created with
+L</create_read_struct> or allied functions like L</read_from_scalar>,
+and a false value if C<$png> was created with L</create_write_struct>
+or allied functions like L</copy_png>.
 
 =head2 set_image_data
 
@@ -2067,14 +2696,30 @@ C<$png>, which will free it with C<Safefree> when C<$png> is
 destroyed. See also L</copy_row_pointers>, which does the same thing
 except for the freeing of the memory.
 
+=head2 split_alpha
+
+    my $split = $png->split_alpha ();
+    my $alpha = $split->{alpha};
+    my $color = $split->{data};
+
+Split the alpha channel away from the other data. This only works for
+RGBA images or gray/alpha images. This is not part of the libpng API,
+it was added to this module to assist the author of L<PDF::Builder>.
+
+If your purpose of splitting out the Alpha channel is simply to
+discard it, you may get better performance by using
+C<PNG_TRANSFORM_STRIP_ALPHA> in L</read_png> instead.
+
 =head1 EXPORTS
 
-Nothing is exported by default, but all the functions in this module
-can be exported on request. The export tag 'all' exports everything in
-the module:
+Nothing is exported by default, but all the functions in this module,
+including the object methods, can be exported on request. The export
+tag 'all' exports everything in the module:
 
     use Image::PNG::Libpng ':all';
-    # Now everything in the module has been imported
+
+This includes all the methods, which can then be used with the C<$png>
+argument as the first argument.
 
 =head1 Differences from libpng
 
@@ -2091,15 +2736,15 @@ the first argument to each function.
 
 =head2 Unused arguments omitted
 
-⛐🤪⚠ This module eliminates all the unevaluated arguments of
-libpng. For example, libpng requires the user to pass a pointer to a
-C<png_struct> to call the libpng version number function, (see
-L</get_libpng_ver>), but it actually completely ignores this
-structure. There are many similar instances of unevaluated arguments,
-which have all been eliminated from this module.
+This module eliminates unevaluated arguments of libpng. For example,
+libpng requires the user to pass a pointer to a C<png_struct> to call
+the libpng version number function, (see L</get_libpng_ver>), but it
+actually ignores this structure. There are many similar instances of
+unevaluated arguments, which have all been eliminated from this
+module.
 
 If you are interested in exactly which libpng arguments are omitted,
-you can find each instance L<in the file C<perl-libpng.c> in the top directory of the distribution|http://cpansearch.perl.org/src/BKB/Image-PNG-Libpng-0.49/perl-libpng.c> in the macro
+you can find each instance L<in the file C<perl-libpng.c> in the top directory of the distribution|http://cpansearch.perl.org/src/BKB/Image-PNG-Libpng-0.52/perl-libpng.c> in the macro
 C<UNUSED_ZERO_ARG>.
 
 =head2 Function return values are used to return values
@@ -2169,8 +2814,8 @@ C<png_write_row>, or C<png_write_rows>.
 
 =item Fixed point functions
 
-There is no support for the PNG fixed point functions in this Perl
-module.
+There is currently no support for the PNG fixed point functions in
+this Perl module, the functions with suffix C<_fixed>.
 
 =item Other unsupported functions
 
@@ -2180,33 +2825,89 @@ Unsupported functions from the libpng API include the following:
 
 =item png_benign_error
 
+=item png_build_grayscale_palette
+
+Undocumented function, but it is part of the public API.
+
 =item png_chunk_benign_error
+
+=item png_convert_from_struct_tm
+
+This function related to the C<tIME> chunk is deprecated in libpng
+1.7.
+
+=item png_convert_from_time_t
+
+This function related to the C<tIME> chunk is deprecated in libpng 1.7.
+
+=item png_convert_to_rfc1123
+
+This function related to the C<tIME> chunk is deprecated in libpng 1.7.
+
+=item png_convert_to_rfc1123_buffer
+
+This function is related to the C<tIME> chunk; it seems fairly
+superfluous with the many other ways to manipulate time strings
+already in Perl.
 
 =item png_get_chunk_cache_max
 
-=item png_get_compression_buffer_size
-
 =item png_get_compression_type
+
+🙃🤡 Useless function which returns 0 since there is only one type of
+compression.
+
+=item png_get_copyright
+
+🙃🤡 This function gives you the copyright string for libpng.
 
 =item png_get_filter_type
 
-=item png_get_interlace_type
+=item png_get_header_version
+
+Identical to L</get_libpng_ver>.
+
+=item png_get_header_ver
+
+Identical to L</get_libpng_ver>.
 
 =item png_get_io_ptr
 
 =item png_get_progressive_ptr
 
+Incremental reading of PNGs is not handled yet.
+
 =item png_get_signature
+
+Returns the PNG signature of a PNG you read in.
 
 =item png_get_x_offset_pixels
 
+Duplicates L</get_oFFs>.
+
 =item png_get_x_pixels_per_meter
+
+Duplicates L</get_oFFs>.
 
 =item png_get_y_offset_pixels
 
+Duplicates L</get_oFFs>.
+
 =item png_get_y_pixels_per_meter
 
+Duplicates L</get_oFFs>.
+
+=item png_set_bgr
+
+Flips RGB to BGR.
+
+=item png_set_background
+
+Sets the background when an alpha channel is removed.
+
 =item png_set_benign_errors
+
+See L</Error handling functions>.
 
 =item png_set_cHRM_XYZ
 
@@ -2216,19 +2917,22 @@ There is no Z value allowed in L</set_cHRM> at present.
 
 =item png_set_chunk_cache_max
 
-=item png_set_compression_buffer_size
-
 =item png_set_compression_method
 
-⛐🤪⚠ This is a useless function in libpng corresponding to the
-useless C<method> parameter of zlib functions like
-C<deflateInit2>. See L</zlib documentation>. The libpng function just
-produces a warning if the user sets the value to anything but 8, the
-value of the macro C<Z_DEFLATED>, and then lets zlib produce an error.
+🙃🤡 This function in libpng corresponds to the unused
+C<method> parameter of zlib functions like C<deflateInit2>. See
+L</zlib documentation>. The libpng function just produces a warning if
+the user sets the value to anything but 8, the value of the macro
+C<Z_DEFLATED>, and then lets zlib produce an error.
+
+=item png_set_interlace_handling
+
+Incremental writing is not handled.
 
 =item png_set_text_compression_method
 
-Unsupported for the same reasons as L</png_set_compression_method>.
+🙃🤡 Unsupported for the same reasons as
+L</png_set_compression_method>.
 
 =item png_set_crc_action
 
@@ -2236,15 +2940,22 @@ See L</Error handling functions>.
 
 =item png_set_filter_heuristics
 
+=item png_set_gamma
+
 =item png_set_packswap
 
 =item png_set_quantize
+
+This is fairly difficult to implement since it requires interfacing
+various different things.
 
 =item png_set_rgb_to_gray
 
 =item png_set_scale_16
 
 =item png_set_sig_bytes
+
+This doesn't seem useful for Perl programmers.
 
 =item png_set_strip_alpha
 
@@ -2254,13 +2965,12 @@ See L</Error handling functions>.
 
 =item png_set_unknown_chunk_location
 
+This is related to some kind of bug in version 1.5 and previous of
+libpng.
+
 =item png_set_write_status_fn
 
-=item png_get_eXIf
-
-=item png_set_eXIf
-
-The eXIf chunk is not supported yet.
+See L</Error handling functions>.
 
 =back
 
@@ -2268,259 +2978,6 @@ The eXIf chunk is not supported yet.
 
 =back
 
-=head1 DIAGNOSTICS
-
-The module may produce the following error or warning messages. Errors
-are marked "(F)" and warnings are marked "(W)".
-
-=over
-
-
-=item The %s chunk is not supported in this libpng
-
-(W) 
-
-
-
-=item libpng error: %s
-
-(F) 
-An error from libpng sent via Perl's warning handler.
-
-
-
-
-=item libpng warning: %s
-
-(W) 
-A warning from libpng sent via Perl's warning handler.
-
-
-
-
-=item Memory leak detected: there are %d allocated pieces of memory which have not been freed.
-
-(W) 
-The module's internal check for memory errors was tripped somehow. This probably indicates a bug in the module.
-
-
-
-
-=item Attempt to destroy an object of unknown type
-
-(F) 
-There was an attempt to free some corrupted memory.
-
-
-
-
-=item According to its compression type, a text chunk in the current PNG file claims to be ITXT but Perl's 'is_utf8_string' says that its encoding is invalid.
-
-(W) 
-
-
-
-=item A language key 'lang_key' member of a 'png_text' structure in the file failed Perl's 'is_utf8_string' test, which says that its encoding is invalid.
-
-(W) 
-
-
-
-=item None of your text chunks was allowed
-
-(W) 
-The user tried to set some text chunks in the image but they were not allowed.
-
-
-
-
-=item Trying to read from a PNG in memory but there is no PNG in memory
-
-(F) 
-Something went wrong trying to read a PNG from a Perl scalar. This probably indicates a bug in the program.
-
-
-
-
-=item Request for too many bytes %zu on a scalar of length %zu at read position %d.
-
-(F) 
-There was an attempt to read some data from a Perl scalar which went beyond the expected end of the scalar in memory.
-
-
-
-
-=item Attempt to write PNG without calling init_io
-
-(F) 
-write_png was called before a file handle was associated with the PNG.
-
-
-
-
-=item set_IHDR: Bad values for width (%d), height (%d), or bit depth (%d)
-
-(F) 
-The user tried to set a PNG header with unacceptable values, as indicated.
-
-
-
-
-=item set_PLTE: Empty array of colors in set_PLTE
-
-(F) 
-The user tried to set an empty palette of colours.
-
-
-
-
-=item Not a hash reference at position %d
-
-(W) 
-
-
-
-=item Could not get entries at position %d
-
-(W) 
-
-
-
-=item Could not get entry %d
-
-(W) 
-
-
-
-=item sCAL chunk not supported in this libpng
-
-(W) 
-PERL_PNG_sCAL_s_SUPPORTED
-
-
-
-
-=item Too many transparencies %d supplied
-
-(F) 
-The user tried to set more than the maximum possible number of transparencies for a paletted image.
-
-
-
-
-=item Image has zero height
-
-(F) 
-The height of the image is zero.
-
-
-
-
-=item Image has no rows
-
-(F) 
-The image does not have any rows of image data.
-
-
-
-
-=item Image rows have zero length
-
-(F) 
-The rows of image data have zero length.
-
-
-
-
-=item Image has zero height
-
-(F) 
-The image we are trying to read has zero height.
-
-
-
-
-=item Out of memory allocating %d bytes for image
-
-(F) 
-We were refused the memory we want to read the image into.
-
-
-
-
-=item Row pointers already set
-
-(F) 
-There was an attempt to set the rows of an image after they had already been set.
-
-
-
-
-=item array has %d rows but PNG image requires %d rows
-
-(F) 
-set_rows was called with an array of the wrong size.
-
-
-
-
-=item Row %d is %zu bytes, which is too long; truncating to %d
-
-(W) 
-
-
-
-=item %s:%d: Mismatch %p != %p
-
-(F) 
-
-
-
-=item Number of unknown chunks is zero
-
-(F) 
-The user tried to set an empty list of unknown chunks.
-
-
-
-
-=item Non-hash in chunk array
-
-(W) 
-
-
-
-=item Illegal PNG chunk name length, chunk names must be %d characters long
-
-(W) 
-The user's name for a private chunk was not a valid length. In this case the chunk is ignored.
-
-
-
-
-=item Unknown whether '%s' is supported
-
-(W) 
-The user asked whether something was supported, but we don't know what that thing is.
-
-
-
-
-=item undefined chunk name at offset %d in chunk list
-
-(F) 
-The chunk name was not defined.
-
-
-
-
-=item chunk %i has bad length %zu: should be %d in chunk list
-
-(F) 
-
-
-
-=back
 
 =head1 BUGS
 
@@ -2565,12 +3022,6 @@ its constants. Because of this, some constant values like
 C<PNG_Z_DEFAULT_COMPRESSION> aren't currently available in
 L<Image::PNG::Const>. This probably should be fixed to extract the
 constants from the other files in a future version.
-
-=head2 Text chunk addition fails silently
-
-If some of your text chunks are incorrectly formatted, L</set_text>
-just silently refuses to add them rather than warning you. This
-behaviour may be modified in future versions.
 
 =head2 Issues with old versions of libpng
 

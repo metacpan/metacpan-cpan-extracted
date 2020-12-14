@@ -4,7 +4,7 @@ use 5.008001;
 use strict;
 use warnings;
 
-our $VERSION = sprintf "%d.%02d", q$Revision: 0.20 $ =~ /(\d+)/g;
+our $VERSION = sprintf "%d.%02d", q$Revision: 0.21 $ =~ /(\d+)/g;
 require XSLoader;
 XSLoader::load( 'Digest::SipHash', $VERSION );
 
@@ -21,6 +21,10 @@ our $DEFAULT_SEED = pack 'C16', map { int( rand(256) ) } ( 0 .. 0xF );
 sub siphash {
     my $str = shift;
     my $seed = shift || $DEFAULT_SEED;
+    unless (@_) {
+        utf8::downgrade($str,1);
+        utf8::downgrade($seed,1);
+    }
     use bytes;
     $seed .= substr( $DEFAULT_SEED, length($seed) ) if length($seed) < 16;
     my $lohi = _xs_siphash_av( $str, $seed );
@@ -33,6 +37,10 @@ if (USE64BITINT) {
     *siphash64 = sub {
         my $str = shift;
         my $seed = shift || $DEFAULT_SEED;
+        unless (@_) {
+            utf8::downgrade($str,1);
+            utf8::downgrade($seed,1);
+        }
         use bytes;
         $seed .= substr( $DEFAULT_SEED, length($seed) ) if length($seed) < 16;
         return _xs_siphash64( $str, $seed );
@@ -47,7 +55,7 @@ Digest::SipHash - Perl XS interface to the SipHash algorithm
 
 =head1 VERSION
 
-$Id: SipHash.pm,v 0.20 2016/03/04 13:05:32 dankogai Exp $
+$Id: SipHash.pm,v 0.21 2020/12/11 18:05:44 dankogai Exp $
 
 =head1 SYNOPSIS
 
@@ -87,8 +95,8 @@ C<:all> to all of above
 
 =head2 siphash
 
-  my ($hi, $lo) = siphash($str [, $seed]);
-  my $uint32    = siphash($str [, $seed]);
+  my ($hi, $lo) = siphash($str [, $seed][, $no_downgrade]);
+  my $uint32    = siphash($str [, $seed][, $no_downgrade]);
 
 Calculates the SipHash value of C<$src> with $<$seed>.
 
@@ -106,6 +114,17 @@ always returns the lower 32-bit first so that:
   hash_value($str) == siphash($str, hash_seed()); # scalar context
 
 always holds true when PERL_HASH_FUN_SIPHASH is in effect.
+
+=head2 About Unicode
+
+By default this module follows the same rules as Perl does regarding
+hashing, utf8 strings are passed to utf8::downgrade() with the $fail_ok
+flag set to true. This means that if the complete string can be downgraded
+to non-utf8 prior to hashing it will be, otherwise it will be left in
+utf8 form. This means that all strings which are string equivalent
+hash equivalently, and may not be what you want. In which case you can
+pass a third argument to the hash functions, which when true disables
+the downgrade behavior.
 
 =head2 siphash32
 

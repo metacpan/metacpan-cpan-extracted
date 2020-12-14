@@ -1,0 +1,322 @@
+/*
+ * Written by Stefano Mazzocchi <stefano at apache dot org>
+ * Adapted by Alex Schroeder <alex@gnu.org>
+ */
+
+/* ----------------------------- Global Definitions -------------------- */
+
+body {
+    margin: 1em 2em;
+    max-width: 68em;
+    padding: 0;
+    color: #222;
+    background-color: #fff;
+    quotes: "\201C" "\201E" "\2018" "\2019";
+}
+
+@media (prefers-color-scheme: dark) {
+    body { color: #ddd; background-color: #000; }
+    img { opacity: .75; transition: opacity .5s ease-in-out; }
+    img:hover { opacity: 1; }
+}
+
+.invisible {
+    display: none;
+}
+
+.small {
+    font-size: smaller;
+}
+
+a:link { color: #222; }
+a:visited { color: #555; }
+@media (prefers-color-scheme: dark) {
+    a:link { color: #6ca6cd }
+    a:visited { color: #4a708b }
+    
+}
+
+h1 {
+    font-size: 1.75em;
+    text-transform: uppercase;
+    letter-spacing: 0.25em;
+    padding: 10px;
+    margin: 0;
+    font-weight: normal;
+}
+
+/* ----------------------------- Sidebar --------------------------- */
+
+.logo {
+    text-align: center;
+}
+.logo img {
+    width: 80px;
+}
+
+#sidebar {
+    float: right;
+    top: 150px;
+    right: 0px;
+    width: 15em;
+    padding: 0px 10px 20px 0px;
+    margin: 0px 0px 20px 20px;
+}
+
+#sidebar h2 {
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    font-size: .9em;
+    color: #222;
+    font-weight: bold;
+    padding: 3px 0px 2px 4px;
+    margin: 15px 0px 5px 10px;
+}
+@media (prefers-color-scheme: dark) {
+    #sidebar h2 { color: #999 }
+}
+
+#sidebar p {
+    font-size: .8em;
+    padding-left: 20px;
+    padding-right: 5px;
+}
+
+#sidebar ul {
+    font-family: sans-serif;
+    margin-left: 5px;
+    padding-left: 25px;
+}
+
+#sidebar li {
+    margin-left: 0px;
+    text-indent: -15px;
+    list-style-type: none;
+    font-size: .8em;
+    line-height: 1.2em;
+}
+
+#sidebar ul li a {
+    text-decoration: none;
+}
+
+#sidebar ul li a:hover {
+    text-decoration: underline;
+}
+
+#sidebar img {
+    border: 0;
+}
+
+#sidebar dl {
+    font-size: .8em;
+    padding-left: 1.0em;
+}
+
+#sidebar dl ul {
+    padding-left: 1em;
+}
+
+#sidebar dt {
+    margin-top: 1em;
+    font-weight: bold;
+    padding-left: 1.0em;
+}
+
+#sidebar dd {
+    margin-left: 2.5em;
+}
+
+#sidebar .message {
+    cursor: help;
+    border-bottom: 1px dashed salmon;
+}
+
+#sidebar a.message:hover {
+    cursor: help;
+    background-color: #ffD0D0;
+    color:#000;
+    border: 1px dashed red !important;
+    text-decoration: none !important;
+}
+#sidebar dl a {
+    text-decoration:none;
+}
+
+#sidebar dd {
+    margin-top: 5px;
+}
+#sidebar .button {
+    margin: 0 2px;
+    color: white;
+    font-weight: bold;
+    font-size: 80%;
+    padding: 2px 3px;
+    border-radius: 3px;
+    text-transform: uppercase;
+}
+.opml {
+    background-color: orange;
+}
+.jupiter {
+    background-color: salmon;
+}
+
+/* ----------------------------- Body ---------------------------- */
+
+#body {
+    margin-top: 10px;
+}
+
+#body h2.date {
+    text-transform: none;
+    font-size: 1em;
+    color: #444;
+    text-align: right;
+    font-weight: normal;
+    font-family: sans-serif;
+    max-width:50em;
+    padding-right: 10px;
+}
+@media (prefers-color-scheme: dark) {
+    #body h2.date { color: #aaa; }
+}
+#body h2.date:before {
+    content: "🌞 ";
+}
+
+.paragraph {
+    padding: 2px;
+    font-size: 80%;
+    color: #888;
+}
+
+
+/* ----------------------------- Posts ---------------------------- */
+
+.post {
+    margin: 30px 10px 30px 10px;
+    clear: left;
+    max-width: 50em;
+    line-height: 1.5em;
+    font-family: sans-serif;
+}
+
+.post h3 {
+    margin: 0 0 .5em 0;
+    padding: 0px;
+    font-size: 1.5em;
+    font-weight: normal;
+    font-family: serif;
+}
+.post h3 a {
+    color:#036;
+    text-decoration:none;
+}
+@media (prefers-color-scheme: dark) {
+    .post h3 a { color:#87ceff; }
+}
+.post div {
+    margin: 5px 5px 5px 15px;
+    padding: 0px 1em 1em 1em;
+}
+
+.post .categories {
+    margin-top: 1em;
+    padding-bottom: 0;
+}
+.post .categories li:first-child:before {
+    content: " ";
+}
+.post .categories * {
+    display: inline;
+    margin: 0;
+    padding: 0;
+}
+.post .categories li:before {
+    content: ", ";
+}
+
+.post .permalink {
+    text-align: right;
+}
+
+.post .icon {
+    height: 1em;
+    width: 1em;
+    border: 0;
+    bottom: 0;
+}
+
+/* ----------------------------- Post Content ---------------------------- */
+
+.post .content p {
+    line-height: 1.2em;
+}
+
+.post .content img {
+    margin: 5px;
+}
+
+/* ------------------------- Small Devices ------------------------- */
+
+#toggle {
+    display: none;
+}
+
+@media only screen and (max-width: 800px) {
+    body {
+        margin: 0.2em;
+    }
+    .post div {
+	padding: 0;
+	margin: 0;
+    }
+    .logo {
+	display: none;
+    }
+    #sidebar {
+	float: none;
+	width: 100%;
+	padding: 0;
+	margin: 0;
+    }
+    #sidebar ul {
+	list-style: none;
+	display: none;
+    }
+    #sidebar h2 label:before {
+	content: "☰ ";
+	font-size: 1.2em;
+    }
+    #sidebar h2 label:hover {
+	cursor: pointer;
+    }
+    #toggle:checked ~ #toggled {
+	display: block;
+    }
+    #sidebar li {
+	float: left;
+	width: 100%;
+	white-space: nowrap;
+    }
+    /* hide INFO */
+    #sidebar h2, #sidebar dl, #sidebar form {
+	display: none;
+    }
+    #sidebar h2, #sidebar dl, #sidebar form {
+	display: none;
+    }
+    /* show MEMBERS */
+    #sidebar h2:first-of-type {
+	display: block;
+	background-color: #ddd;
+	margin: 0.5em;
+	cursor: pointer;
+    }
+    @media (prefers-color-scheme: dark) {
+	#sidebar h2:first-of-type {
+	    background-color:#222;
+	}
+    }
+}

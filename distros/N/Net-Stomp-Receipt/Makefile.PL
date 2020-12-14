@@ -1,12 +1,28 @@
+use strict;
+use warnings;
 use ExtUtils::MakeMaker;
-# See lib/ExtUtils/MakeMaker.pm for details of how to influence
-# the contents of the Makefile that is written.
+
 WriteMakefile(
     NAME              => 'Net::Stomp::Receipt',
     VERSION_FROM      => 'lib/Net/Stomp/Receipt.pm',
-    PREREQ_PM         => { Net::Stomp => 0.34 },
-    ($] >= 5.005 ?     ## Add these new keywords supported since 5.005
-      (ABSTRACT_FROM  => 'lib/Net/Stomp/Receipt.pm',
-       AUTHOR         => 'Hugo Salgado <huguei@cpan.org>') : ()),
+    PL_FILES            => {},
+    SIGN                => 1,
+    PREREQ_PM         => { "Net::Stomp" => 0.34 },
+    ABSTRACT_FROM  => 'lib/Net/Stomp/Receipt.pm',
+    AUTHOR         => 'Hugo Salgado <huguei@cpan.org>',
+    META_MERGE        => {
+      'meta-spec' => { version => 2 },
+      resources   => {
+         bugtracker => {
+            "web" => "https://todo.sr.ht/~huguei/perl-Net-Stomp-Receipt",
+         },
+         repository => {
+            type => 'mercurial',
+            url => 'https://hg.sr.ht/~huguei/perl-Net-Stomp-Receipt',
+            web => 'https://hg.sr.ht/~huguei/perl-Net-Stomp-Receipt'
+         }
+      }
+    },
+    dist                => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
+    clean               => { FILES => 'Net-Stomp-Receipt-*' },
 );
-

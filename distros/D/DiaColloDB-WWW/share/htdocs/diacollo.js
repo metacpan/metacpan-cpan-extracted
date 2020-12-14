@@ -84,7 +84,7 @@ function dqReady() {
     }
 
     if (param.query == null) {
-	dcpErrorMsg("No 'query' parameter specified!");
+	dcpInfoMsg("No 'query' parameter specified - please enter a query.");
 	return;
     }
 
@@ -102,6 +102,9 @@ function dqReady() {
     var uparam = $.param(param);
     var uhref  = dcp_url_base + "?" + uparam;
     $("#rawLink").prop("href",uhref).text(uhref).show();
+
+    //-- setup initial debug table
+    setupDebugTable({});
 
     //-- check for pre-fetched data (--> loading from local file exported by browser "Save As" function)
     if (dcpData != null) {
@@ -127,6 +130,22 @@ function dqReady() {
 	    error: dcpOnError,
 	    complete: dcpOnComplete
 	})
+    }
+}
+
+//----------------------------------------------------------------------
+function setupDebugTable(qinfo = null) {
+    //-- populate
+    if (qinfo) {
+	$("#debug_qcanon").text(qinfo.qcanon ? qinfo.qcanon : "(not available)")
+	$("#debug_qtemplate").text(qinfo.qtemplate ? qinfo.qtemplate : "(not available)")
+    }
+
+    //-- show/hide
+    if ($("#in_debug").prop('checked')) {
+	$(".debugInfo").show();
+    } else {
+	$(".debugInfo").hide();
     }
 }
 
@@ -194,6 +213,13 @@ function dcpOnSuccess(data,textStatus,jqXHR) {
     }
     else {
 	//-- response: other (treat as text data)
+	if (user_format == "json") {
+	    var jdata = (data instanceof Object) ? data : $.parseJSON(data);
+	    qinfo = jdata.qinfo;
+	} else {
+	    qinfo = {};
+	}
+	setupDebugTable(qinfo);
 	$("#profileDataText").text(data).fadeIn();
     }
 }
@@ -231,6 +257,9 @@ function dcpFormatHtml(data, jqXHR) {
     }
     $("#profileDataHtml").fadeIn();
 
+    //-- setup debug debug
+    setupDebugTable(qinfo);
+   
     //-- parse headers
     var cols = [];
     $("#profileDataHtml tr:first-child th").each(function(i,th) {
@@ -238,7 +267,6 @@ function dcpFormatHtml(data, jqXHR) {
     });
     var ilabel = cols.indexOf("label");
     var iscore = cols.indexOf(isDiff ? "diff" : "score");
-
 
     //-- setup label-change classes
     var plabel = '';
@@ -316,6 +344,7 @@ function dcpFormatGMotion(data, jqXHR) {
     //-- parse data
     data  = $.parseJSON(data);
     qinfo = data.qinfo;
+    setupDebugTable(qinfo);
     if (data.profiles.length == 0) {
 	dcpErrorMsg("Error: no data to display!");
 	return;
@@ -509,6 +538,7 @@ var brushSnap;    //-- function variable for brush snap
 //  + where items[itemId] =
 //     item    = {id:$itemId, item:$itemKey, label:$itemLabel, score:[...], value:[...], avalue:[...], sizes:[...], opacity:[...], maxSize:maxSize?}
 //  + array-valued item data keys are indexed by dlabels[] index
+//  + calls setupDebugTable() after parsing qinfo()
 //  + options:
 //     mode: MODE,   //-- parse mode (known values: "bubble", "cloud")
 var d3data = null;
@@ -520,6 +550,7 @@ function dcpParseFlat(data,opts) {
     if (!(data instanceof Object)) { data = $.parseJSON(data); }
     d3data = data;
     qinfo = data.qinfo;
+    setupDebugTable(qinfo);
     if (data.profiles.length == 0) {
 	dcpErrorMsg("Error: no data to display!");
 	return null;

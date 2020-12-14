@@ -1,0 +1,8 @@
+\.perltidyrc
+^MANIFEST.bak
+^Makefile$
+^.github/
+^.git/
+^MYMETA.*
+^.gitignore
+^FindBin-

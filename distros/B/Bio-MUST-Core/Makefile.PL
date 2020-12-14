@@ -23,21 +23,14 @@ my %WriteMakefileArgs = (
     "bin/fetch-tax.pl",
     "bin/format-tree.pl",
     "bin/idealize-ali.pl",
-    "bin/inst-abbr-ids.pl",
-    "bin/inst-qual-filter.pl",
-    "bin/inst-tax-filter.pl",
-    "bin/jack-ali-dir.pl",
     "bin/list2mapper.pl",
-    "bin/map-gis-ali.pl",
     "bin/mask-ali.pl",
     "bin/phylip2ali.pl",
-    "bin/ppred-comp-test.pl",
     "bin/prune-ali.pl",
     "bin/prune-tree.pl",
     "bin/rest-ids-ali.pl",
     "bin/setup-taxdir.pl",
     "bin/split-matrix.pl",
-    "bin/split-ppred-ali.pl",
     "bin/split-rates-ali.pl",
     "bin/stock2ali.pl",
     "bin/subs-forest.pl",
@@ -107,7 +100,7 @@ my %WriteMakefileArgs = (
     "Config::Any" => 0,
     "Test::Deep" => 0
   },
-  "VERSION" => "0.202310",
+  "VERSION" => "0.203490",
   "test" => {
     "TESTS" => "t/*.t"
   }

@@ -59,7 +59,7 @@ $TOP->after(2000, sub{
  
                 # MainWindow needed here because wmReleased widget don't properly inherit from
                 #   Tk::Toplevel
-                $contents->MainWindow::attributes(-toolwindow => 1) if( $^O =~ /mswin32/i);
+                $contents->MainWindow::attributes(-toolwindow => 1) if ($^O eq 'MSWin32');
                 $contents->MainWindow::title("IDEtabFrame.pm");
                 $contents->MainWindow::deiconify;
                 $contents->raise;

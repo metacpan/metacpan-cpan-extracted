@@ -14,14 +14,20 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "App-FfmpegUtils",
   "EXE_FILES" => [
-    "script/reencode-video-with-libx264"
+    "script/reencode-video-with-libx264",
+    "script/split-video-by-duration"
   ],
   "LICENSE" => "perl",
   "MIN_PERL_VERSION" => "5.010001",
   "NAME" => "App::FfmpegUtils",
   "PREREQ_PM" => {
+    "Data::Sah::Coerce::perl::To_duration::From_float::seconds" => 0,
+    "Data::Sah::Coerce::perl::To_duration::From_obj::datetime_duration" => 0,
+    "Data::Sah::Coerce::perl::To_duration::From_str::human" => 0,
+    "Data::Sah::Coerce::perl::To_duration::From_str::iso8601" => 0,
     "Data::Sah::Coerce::perl::To_float::From_str::percent" => 0,
     "Data::Sah::Compiler::perl::TH::array" => 0,
+    "Data::Sah::Compiler::perl::TH::duration" => 0,
     "Data::Sah::Compiler::perl::TH::float" => 0,
     "Data::Sah::Compiler::perl::TH::int" => 0,
     "Data::Sah::Compiler::perl::TH::str" => 0,
@@ -32,9 +38,11 @@ my %WriteMakefileArgs = (
     "Log::ger" => "0.037",
     "Math::Image::CalcResized" => "0.003",
     "Media::Info" => "0.131",
+    "POSIX" => 0,
     "Perinci::CmdLine::Any" => 0,
     "Perinci::CmdLine::Lite" => "1.827",
     "Perinci::Exporter" => "0.080",
+    "Perinci::Sub::DepChecker" => 0,
     "Sah::Schema::filename" => 0,
     "Sah::Schema::ufloat" => 0,
     "Sah::Schema::uint" => 0,
@@ -47,7 +55,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.006",
+  "VERSION" => "0.007",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -55,8 +63,13 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
+  "Data::Sah::Coerce::perl::To_duration::From_float::seconds" => 0,
+  "Data::Sah::Coerce::perl::To_duration::From_obj::datetime_duration" => 0,
+  "Data::Sah::Coerce::perl::To_duration::From_str::human" => 0,
+  "Data::Sah::Coerce::perl::To_duration::From_str::iso8601" => 0,
   "Data::Sah::Coerce::perl::To_float::From_str::percent" => 0,
   "Data::Sah::Compiler::perl::TH::array" => 0,
+  "Data::Sah::Compiler::perl::TH::duration" => 0,
   "Data::Sah::Compiler::perl::TH::float" => 0,
   "Data::Sah::Compiler::perl::TH::int" => 0,
   "Data::Sah::Compiler::perl::TH::str" => 0,
@@ -70,9 +83,11 @@ my %FallbackPrereqs = (
   "Log::ger" => "0.037",
   "Math::Image::CalcResized" => "0.003",
   "Media::Info" => "0.131",
+  "POSIX" => 0,
   "Perinci::CmdLine::Any" => 0,
   "Perinci::CmdLine::Lite" => "1.827",
   "Perinci::Exporter" => "0.080",
+  "Perinci::Sub::DepChecker" => 0,
   "Sah::Schema::filename" => 0,
   "Sah::Schema::ufloat" => 0,
   "Sah::Schema::uint" => 0,

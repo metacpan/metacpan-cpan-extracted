@@ -1,7 +1,7 @@
 package BenchmarkAnything::Storage::Backend::SQL::Query::SQLite;
 our $AUTHORITY = 'cpan:TAPPER';
 # ABSTRACT: BenchmarkAnything::Storage::Backend::SQL - querying - SQLite backend
-$BenchmarkAnything::Storage::Backend::SQL::Query::SQLite::VERSION = '0.028';
+$BenchmarkAnything::Storage::Backend::SQL::Query::SQLite::VERSION = '0.029';
 use strict;
 use warnings;
 use base 'BenchmarkAnything::Storage::Backend::SQL::Query::common';

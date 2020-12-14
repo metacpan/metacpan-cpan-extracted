@@ -4,8 +4,6 @@
 
 use warnings;
 use strict;
-use lib '/home/ben/projects/image-png-libpng/blib/arch';
-use lib '/home/ben/projects/image-png-libpng/blib/lib';
 use Image::PNG::Libpng ':all';
 use Image::PNG::Const ':all';
 my $png = create_write_struct ();

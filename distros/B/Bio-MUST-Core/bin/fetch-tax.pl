@@ -1,6 +1,6 @@
 #!/usr/bin/env perl
 # PODNAME: fetch-tax.pl
-# ABSTRACT: Fetch information from the NCBI Taxonomy database
+# ABSTRACT: Fetch (and format) information from the NCBI Taxonomy database
 
 use Modern::Perl '2011';
 use autodie;
@@ -171,11 +171,11 @@ __END__
 
 =head1 NAME
 
-fetch-tax.pl - Fetch information from the NCBI Taxonomy database
+fetch-tax.pl - Fetch (and format) information from the NCBI Taxonomy database
 
 =head1 VERSION
 
-version 0.202310
+version 0.203490
 
 =head1 USAGE
 

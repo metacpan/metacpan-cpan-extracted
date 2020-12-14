@@ -38,6 +38,10 @@
   w12 = w1 _ w2;
   suba = "<sub>a</sub>";
   subb = "<sub>b</sub>";
+  e = "<i>e</i>";
+  E = "<i>E</i>";
+  q = "<i>q</i>";
+  g = "<i>q</i>";
   qa = "<i>q<sub>a</sub></i>";
   qb = "<i>q<sub>b</sub></i>";
   xa = "<i>s<sub>a</sub></i>";
@@ -70,6 +74,9 @@
   submi3 = "<sub>mi3</sub>";
   subld = "<sub>ld</sub>";
   subll = "<sub>ll</sub>";
+  podurl = "//metacpan.org/pod/distribution/DiaColloDB"
+  wpodurl = "//metacpan.org/pod/distribution/DiaColloDB-WWW"
+  qdocurl = "//kaskade.dwds.de/~moocow/software/ddc/querydoc.html"
   %]
 [%#=====================================================================
   # config: examples & links
@@ -136,8 +143,9 @@
 </head>
 <body>
     <div class="outer">
+      [% PROCESS diacolloBanner %]
       <div class="headers">
-	<a href="[% root_url %]" style="float: right;"><img class="dlogo" src="[% diacollo_logo | url %]"/></a>
+	[% PROCESS diacolloHeaderLogo %]
 	<h1>[% html_title %]</h1>
 	<div class="linkbar">[% PROCESS "dc-links.ttk" %]</div>
       </div>
@@ -241,7 +249,13 @@
 		    {label=>"Attribute Examples",href=>"#ex-attrs"},
     		    {label=>"TDF Examples",href=>"#ex-tdf"},
 		    {label=>"DDC Examples",href=>"#ex-ddc"},
-		   ]},
+		    ]},
+	     {label=>"Fiendishly Awkward Questions",href=>"#faq",
+	      sub=>[
+	            {label=>"Corpora",href=>"#faq-corpora"},
+	            {label=>"Runtime",href=>"#faq-runtime"},
+	            {label=>"Errors",href=>"#faq-errors"},
+	           ]},
 	     {label=>"References",href=>"#references",
 	      sub=>[
      		    {label=>"DiaCollo",href=>"#ref-diacollo"},
@@ -358,22 +372,15 @@
 	    e.g. at <a href="//metacpan.org/release/DiaColloDB">http://metacpan.org/release/DiaColloDB</a>.
 	    In addition to the source code, a number of DiaCollo instances
 	    are accessible by means of an online RESTful web-service plugin
-	    for the DDC/D* corpus management framework.  In particular,
-	    DiaCollo instances for the following corpora should be available:
-	    <ul>
-	      <li>[% corpuslink('blogs') %]: Blogs</li>
-	      <li>[% corpuslink('bz') %]: <i>Berliner Zeitung</i></li>
-	      <!--<li>[% corpuslink('c4') %]: C4</li>-->
-	      <li>[% corpuslink('dingler') %]: Dingler's <i>Polytechnisches Journal</i></li>
-	      <li>[% corpuslink('dta+dwds') %]: Aggregate <i>Deutsches Textarchiv</i> + <i>DWDS-Kerncorpus</i></li>
-	      <li>[% corpuslink('dta') %]: <i>Deutsches Textarchiv</i></li>
-	      <li>[% corpuslink('kern') %]: <i>DWDS-Kerncorpus</i></li>
-	      <li>[% corpuslink('korpus21') %]: <i>DWDS-Kerncorpus 21</i></li>
-	      <li>[% corpuslink('tagesspiegel') %]: <i>Tagesspiegel</i></li>
-	      <!--<li>[% corpuslink('untertitel') %]: <i>Filmuntertitel</i></li>-->
-	      <li>[% corpuslink('wende') %]: <i>Berliner Wendekorpus</i></li>
-	      <li>[% corpuslink('zeit') %]: <i>DIE ZEIT</i></li>
-	    </ul>
+	    for the <a href="#faq-ddc">DDC/D*</a> corpus management framework.
+	    A list of publicly available DiaCollo corpora can be found
+	    <a href="//kaskade.dwds.de/~jurish/diacollo/corpora/">here</a>.
+	    A list of all DiaCollo indices hosted by the
+	    <a href="//www.dwds.de">DWDS</a> project
+	    at the <a href="http://www.bbaw.de">BBAW</a>
+	    is maintained <a href="https://www.dwds.de/r/#corpusstat">here</a>
+	    (click on the DiaCollo icon <img src="images/diacollo-favicon.png" style="height:1em;"/>
+	    in the "Tools" column to access the DiaCollo GUI for a particular corpus).
 	  </div>
 	  <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
 	  <div class="subsection" id="intro_links">
@@ -381,6 +388,7 @@
 	    <ul>
 	      <li><a href="//kaskade.dwds.de/diacollo-tutorial/">DiaCollo Tutorial</a> (in German)</li>
 	      <li><a href="//clarin-d.de/de/kollokationsanalyse-in-diachroner-perspektive">CLARIN-D Showcase</a> for DiaCollo (in German)</li>
+	      <li><a href="//kaskade.dwds.de/~jurish/diacollo/">DiaCollo Smorgasboard</a></li>
 	      <li>The <a href="#ref-diacollo">DiaCollo References</a> section contains a list of selected DiaCollo-related publications.</li>
 	    </ul>
 	  </div>
@@ -391,7 +399,7 @@
 	  <a name="params"><h2>Parameters</h2></a>
 	  <dl>
 	    <dt><a name="query">query</a></dt>
-	    <dd>Target <i>LEMMA(s)</i> or <i>/REGEX/</i> or DDC <i>QUERY</i> (aliases: query q lemmata lemmas lemma lem l; <b>REQUIRED</b>).
+	    <dd>Target <i>LEMMA(s)</i> or <i>/REGEX/</i> or <a href="#faq-ddc">DDC</a> <i>QUERY</i> (aliases: query q lemmata lemmas lemma lem l; <b>REQUIRED</b>).
 	    See <a href="#queries">Query Syntax</a> for details.
 	    </dd>
 
@@ -493,7 +501,7 @@
 	  appropriate for simple queries and the <a href="[% help_url %]">DDC Query Language</a>
 	  (since DiaCollo v0.06.004),
 	  although not all <a href="#profiles">profile types</a> support
-	  all DDC query operations.
+	  all <a href="#faq-ddc">DDC</a> query operations.
 
 	  <div class="subsection" id="#qnative">
 	    <h3><a name="qnative">Native Query Syntax</a></h3>
@@ -531,9 +539,9 @@
 	  <div class="subsection" id="#qddc">
 	    <h3><a name="qddc">DDC Query Syntax</a></h3>
 
-	    As of v0.06.004, DiaCollo additionally supports DDC query syntax,
+	    As of v0.06.004, DiaCollo additionally supports <a href="[% help_url %]">DDC query syntax</a>,
 	    although not all <a href="#profiles">profile types</a> support
-	    all DDC query operations.
+	    all <a href="#faq-ddc">DDC</a> query operations.
 	    In particular:
 	    <ul>
 	      <li>
@@ -556,8 +564,8 @@
 		in the <a href="#groupby">groupby</a> clause.
 	      </li>
 	      <li>
-		The DDC profile types
-		<a href="#prf-ddc">DDC</a> and <a href="#prf-diff-ddc">diff-ddc</a>
+		The <a href="#faq-ddc">DDC</a> profile types
+		<a href="#prf-ddc">ddc</a> and <a href="#prf-diff-ddc">diff-ddc</a>
 		require that an explicit <a href="[% help_url %]#rule_matchid">match-id</a> <span class="math">=2</span> is included
 		to indicate the position(s) of the collocate target(s) for which a profile is to be computed,
 		otherwise a default <a href="[% help_url %]#rule_qc_near">NEAR()</a> query is automatically generated.
@@ -576,33 +584,33 @@
 	      </dd>
 
 	      <dt>#LIMIT[<i>N</i>]</dt>
-	      <dd>Requests that DDC retrieve at most <i>N</i> items; useful for speeding up response times for large result-sets
+	      <dd>Requests that <a href="#faq-ddc">DDC</a> retrieve at most <i>N</i> items; useful for speeding up response times for large result-sets
 	      </dd>
 
-	      <dt>#SAMPLE[<i>N</i>]</dt>
-	      <dd>Requests that generated <a href="[% help_url %]#count">count()-queries</a> operate on a random sample of at most <i>N</i> tokens.
+	      <dt id="SAMPLE">#SAMPLE[<i>N</i>]</dt>
+	      <dd>Requests that generated <a href="#faq-ddc">DDC</a> <a href="[% help_url %]#count">count()-queries</a> operate on a random sample of at most <i>N</i> tokens.
 	      Can actually wind up taking longer than without a #SAMPLE clause, since this requires hits to be (randomly) sorted.
 	      </dd>
 
-	      <dt>#DMAX[<i>D</i>]</dt>
+	      <dt id="DMAX">#DMAX[<i>D</i>]</dt>
 	      <dd>Set maximum proximity distance (+1) for implicit <a href="[% help_url %]#rule_qc_near">NEAR()</a> queries.
 	      Note that the value for <i>D</i> should be 1 greater than the value passed to the DDC <a href="[% help_url %]#rule_qc_near">NEAR()</a>
 	      operator itself.
 	      The default value depends on the DiaCollo index, but is usually 5 (up to 4 intervening tokens between $w1 and $w2).
 	      </dd>
 
-	      <dt>#FMIN[<i>N</i>]</dt>
+	      <dt id="FMIN">#FMIN[<i>N</i>]</dt>
 	      <dd>Set minimum frequency of collocate targets to be profiled.
-	      Useful for reducing network I/O overhead between the client and the DDC server.
-	      Default value depends on the DiaCollo index, but is usally 2.
+	      Useful for reducing network I/O overhead between the client and the <a href="#faq-ddc">DDC server</a>.
+	      Default value depends on the DiaCollo index, but is usually 2.
 	      Higher values should result in shorter running times, but may filter out some interesting results.
-	      Note that this frequency thresshold applies on a DDC subcorpus basis,
+	      Note that this frequency threshold applies on a DDC subcorpus (&quot;shard&quot;) basis.
 	      </dd>
 
 	      <dt>#FCOEF[<i>C</i>]</dt>
 	      <dd>Override the relation-specific frequency scaling coefficient for this query.
 	      For formal reasons, the independent frequencies $f1, $f2, and $N are scaled up
-	      by a query-specific factor when computing <a href="#scores">score-functions</a> from DDC data,
+	      by a query-specific factor when computing <a href="#scores">score-functions</a> from <a href="#faq-ddc">DDC</a> count data,
 	      in order to ensure that the quantities involved can be interpreted as probabilities.
 	      The scaling coefficient is usually automatically guessed from the DDC query
 	      (e.g. <i>C=2(N+1)</i> for a query of the form <tt class="math">NEAR(* =2,<i>X</i>,<i>N</i>)</tt>,
@@ -613,7 +621,7 @@
 	      [% SET l_countkeys = "<i><a href=\"" _ help_url _ "#rule_l_countkeys\">l_countkeys</a></i>"; %]	      
 	      <dt>"[" $l_countkeys "]"</dt>
 	      <dd>A <a href="#groupby">groupby</a> request can be explicitly wrapped in square brackets
-	      to force its interpretation as a DDC $l_countkeys
+	      to force its interpretation as a <a href="#faq-ddc">DDC</a> $l_countkeys
 	      count-key list as opposed to a <a href="#qnative">native groupby request</a>.
 	      Potentially useful if you want/need to use alternative target offsets,
 	      biliographic metadata fields, or regex transformations on the result tuple attributes.
@@ -669,7 +677,7 @@
 
 	<!--=================================================-->
 	<div class="section" id="scores">
-	  <a name="queries"><h2>Score Functions</h2></a>
+	  <a name="scores"><h2>Score Functions</h2></a>
           <p>
 	    DiaCollo assigns each collocate in a unary profile a real-valued score by means of a user-specified
 	    <i>score function</i>. Currently, DiaCollo supports the following score functions:
@@ -812,14 +820,14 @@
 	    </table>
 	  </p>
 
-	  ... where the variables in the above definitions are interpreted per epoch as:
+	  <a name="vars">... where the variables in the above definitions are interpreted per epoch as:</vars>
 	  <table style="margin-left:3em"><tbody>
 	    <tr><td>$w1</td><td>: target token matching the user <a href="#query">query</a> request</td></tr>
 	    <tr><td>$w2</td><td>: collocate token matching the user <a href="#groupby">groupby</a> request</td></tr>
-	    <tr><td>$N</td><td>: total number of collocation relations in the corpus epoch</td></tr>
-	    <tr><td>$f12</td><td>: frequency of the collocation ($w1,$w2)</td></tr>
-	    <tr><td>$f1</td><td>: total frequency of the query term ($w1) in the selected <a href="#profiles">profile type</a></td></tr>
-	    <tr><td>$f2</td><td>: total frequency of the collocate term ($w2) in the selected <a href="#profiles">profile type</a></td></tr>
+	    <tr><td>$N</td><td>: total number of collocation relations in the current corpus <a href="#slice">epoch</a></td></tr>
+	    <tr><td>$f12</td><td>: frequency of the collocation ($w1,$w2) in the current corpus <a href="#slice">epoch</a></td></tr>
+	    <tr><td>$f1</td><td>: total frequency of the query term ($w1) in the selected <a href="#profiles">profile type</a> for the current corpus <a href="#slice">epoch</a></td></tr>
+	    <tr><td>$f2</td><td>: total frequency of the collocate term ($w2) in the selected <a href="#profiles">profile type</a> for the current corpus <a href="#slice">epoch</a></td></tr>
 	    <tr><td>$eps</td><td>: smoothing constant, by default zero.</td></tr>
 	  </tbody></table>
 	  <p/>
@@ -1041,15 +1049,15 @@
 	   Native collocation profile.
 	   Retrieves and ranks all content words ($w2)
 	   occurring together with the search term ($w1)
-	   within a context window of $dmax content words and
+	   within a context window of <a href="$podurl/dcdb-create.perl#-dmax-DIST">$dmax</a> content words and
 	   without an intervening boundary of the selected
-	   DDC &quot;break collection&quot;.
-	   Only collocation tuple-pairs with a minimum frequency of $cfmin are considered.
+	   <a href="#faq-ddc">DDC</a> &quot;break collection&quot;.
+	   Only collocation tuple-pairs with a minimum frequency of <a href="$podurl/dcdb-create.perl#-cfmin-CFMIN">$cfmin</a> are considered.
 	   Note that for reasons of efficiency,
 	   the frequency threshold $cfmin,
 	   the context-window size $dmax,
 	   and the boundary DDC break collection must be specified at compile-time,
-	   and cannot be changed by the user.  The default DiaCollo configuration
+	   and cannot be changed by the user.  The default DiaCollo configuration for corpora at the BBAW
 	   uses sentence-break boundaries, <span class="math">$dmax = 5</span>,
 	   and <span class="math">$cfmin = 5</span>.
 	   </dd>
@@ -1074,7 +1082,7 @@
 	   Native collocation profile based on an underlying term-document frequency matrix.
 	   Retrieves and ranks all content words ($w2)
 	   occurring together with the search term ($w1)
-	   within a single "document" as defined by the DDC &quot;break collection&quot; specified
+	   within a single "document" as defined by the <a href="#faq-ddc">DDC</a> &quot;break collection&quot; specified
 	   via the compile-time option <span class="math">-dbreak</span>
    	   (by default, source paragraphs are used as "document" boundaries for matrix construction).
 	   Allows more flexible queries and result-set aggregation than
@@ -1084,7 +1092,8 @@
 
            <dt><a name="prf-ddc">ddc</a></dt>
 	   <dd>(aliases: ddc DDC)<br/>
-	   Advanced profile using <a href="[% help_url %]#rule_count_query">DDC count() queries</a> to acquire raw frequency data.
+	   Advanced profile using <a href="[% help_url %]#rule_count_query">count() queries</a> submitted to an independent
+	   <a href="#faq-ddc">DDC</a> search engine to acquire raw frequency data.
 	   Unlike the <a href="#prf-collocations">collocations</a> or <a href="#prf-unigrams">unigrams</a> profile types,
 	   DDC profiles are not limited to the default break collection or a fixed context window size
 	   (although by default DDC profiles approximate the <a href="#prf-collocations">collocations</a> profile type
@@ -1159,7 +1168,7 @@
 	   Simple <a href="http://www.w3.org/html/">HTML</a> table format, used for live display in the demo interface.
 	   In addition to a tabular display of the <a href="#profiles">profile</a> data,
 	   the web front-end HTML display uses <a href="//en.wikipedia.org/wiki/JavaScript">JavaScript</a>
-	   to generate hyperlinks to underlying corpus hits (&quot;KWIC-links&quot;)
+	   to generate hyperlinks to (close approximations of) underlying corpus hits (&quot;KWIC-links&quot;)
 	   as well as a color-coded representation
 	   of the <a href="#scores">association score</a> (rsp. score-difference for <a href="#prf-diff">diff profiles</a>)
 	   associated with each row.
@@ -1260,7 +1269,6 @@
 	  </center>
 	  <p/>
 	</div>
-
 
 	<!--=================================================-->
 	<div class="section" id="examples">
@@ -1399,16 +1407,6 @@
 	      in the <a href="[% topurl.dta %]">DTA corpus</a>.
 	      </li>
 
-	      <li>[% exlink("dta", ["q","Vernunft #has[author,/Kant/]",
-	                            "bq","Vernunft !#has[author,/Kant/]",
-				    "slice",0,
-				    "gb","l,p=ADJA",
-				    "p","diff-tdf"])
-                  %]
-              Adjective collocates of `Vernunft' ("reason") in the works of <a href="//www.deutschestextarchiv.de/api/pnd/118559796">Immanuel Kant</a>
-	      versus other authors in the <a href="[% topurl.dta %]">DTA corpus</a>.
-	      </li>
-
 	      <li>[% exlink("dta", [
 				    #"q","* #has[textClass,/./]",
 	      			    #"gb","genre,l=Vernunft",
@@ -1496,7 +1494,7 @@
 	      and <a href="[% help_url %]#rule_matchid">match-id</a> for the collocate target term.
 	      </li>
 
-	      <li>[% exlink("current", ["q","\"* =2 Mann\"", "slice",0, "gb","l,p=ADJA", "p","ddc"]) %]
+	      <li id="ex-mann-phrase">[% exlink("current", ["q","\"* =2 Mann\"", "slice",0, "gb","l,p=ADJA", "p","ddc"]) %]
 	      Immediate adjective predecessors of &quot;Mann&quot;, using implicit restriction of candidate collocates
 	      via the <a href="#groupby">groupby</a> clause.
 	      </li>
@@ -1507,7 +1505,7 @@
 	      </li>
 
 	      <li>[% exlink("current", ["q","\"\$p=ADJA =2 Mann\"", "slice",0, "gb","[\$l,textClass]", "p","ddc"]) %]
-	      ... as above, using DDC <a href="http://odo.dwds.de/~moocow/software/ddc/querydoc.html#rule_count_by">DDC count-by</a>
+	      ... as above, using DDC <a href="$qdocurl#rule_count_by">DDC count-by</a>
 	      syntax in the <a href="#groupby">groupby</a> clause and including the &quot;textClass&quot; metadata attribute
 	      in the profile target tuples.
 	      </li>
@@ -1604,6 +1602,507 @@
 	</div>
 	<!--/div.section#examples-->
 
+
+	<!--=================================================-->
+	<div class="section" id="faq">
+	  <a name="faq"><h2>Fiendishly Awkward Questions</h2></a>
+
+	  <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
+	  <div class="subsection" id="faq-corpora">
+	    <h3><a name="faq-corpora">Corpora</a></h3>
+	    <dl>
+	      <dt id="faq-user-corpus">Can I use DiaCollo on my own corpus?</dt>
+	      <dd><ul>
+		<li>
+		  Sure - check out the
+		  <a href="//metacpan.org/release/DiaColloDB">DiaColloDB</a>
+		  and <a href="//metacpan.org/release/DiaColloDB-WWW">DiaColloDB::WWW</a>
+		  distributions on <a href="//metacpan.org/">CPAN</a>.
+		</li>
+		<li>
+		  Consider using <a href="//metacpan.org/pod/distribution/App-cpanminus/bin/cpanm">cpanm</a> for batch installations.
+		</li>
+		<li>
+		  DiaCollo assumes a UNIX-like environment (various flavors of Linux work great).
+		</li>
+		<li>
+		  <a href="#fmt-html">KWIC-links</a> and <a href="#prf-ddc">DDC profiles</a> require an independently configured
+		  <a href="#faq-ddc">DDC index and server</a>.
+		</li>
+	      </ul></dd>
+
+	      <dt>What languages are supported?</dt>
+	      <dd>pretty much any written language ought to work: DiaCollo aspires to be language-agnostic.</dd>
+
+	      <dt>What corpus formats are supported?</dt>
+	      <dd><ul>
+		<li>input data must be encoded in <a href="http://en.wikipedia.org/wiki/UTF-8">UTF-8</a></li>
+		<li>
+		  only <b>pre-tokenized</b> and <b>pre-annotated</b> formats are supported;
+		  see
+		  <a href="$podurl/DiaColloDB/Document.pod#SUBCLASSES">SUBCLASSES in DiaColloDB::Document(3pm)</a>
+		  for a list.
+		</li>
+	      </ul></dd>
+
+	      <dt>Why must I tokenize and annotate my corpus myself?</dt>
+	      <dd><ul>
+		<li>one tool ⇔ one job</li>
+		<li>language agnosia ↝ flexibility</li>
+		<li>DiaCollo is <b>not</b> an all-singing+dancing, one-stop-shopping text analysis tool (and almost certainly never will be)</li>
+		<li>consider using <a href="http://weblicht.sfs.uni-tuebingen.de/">CLARIN-D WebLicht</a> if you want a generic corpus annotation framework</li>
+	      </ul></dd>
+
+	      <dt>Can I use DiaCollo to directly compare different corpora?</dt>
+	      <dd><ul>
+		<li>
+		  ... on the command line:
+		  <ul>
+		    <li>pass a <a href="$podurl/DiaColloDB/Client/list.pod"><tt>list://</tt></a> URL
+		    to <a href="$podurl/dcdb-query.perl">dcdb-query.perl</a>
+		    or <a href="$wpodurl/dcdb-www-server.perl">dcdb-www-server.perl</a>
+		    </li>
+		    <li>
+		      beware the <tt>fudge</tt> and <tt>extend</tt> properties!
+		    </li>
+		  </ul>
+		</li>
+		<li>... from the dstar WWW GUI: only for <a href="https://kaskade.dwds.de/~moocow/diacollo/corpora/#meta">pre-aggregated corpora</a></li>
+	      </ul></dd>
+
+	      <dt id="faq-ddc">What is &quot;DDC&quot; and why might I care?</dt>
+	      <dd><ul>
+		<li>
+		  DDC (&quot;<a href="https://sourceforge.net/projects/ddc-concordance/">DiaLing/DWDS Concordancer</a>&quot;)
+		  is an open-source corpus search engine used by the
+		  <a href="//www.dwds.de">DWDS</a>,
+		  <a href="http://www.deutschestextarchiv.de">DTA</a>,
+		  and <a href="//www.zdl.org">ZDL</a>
+		  projects at the <a href="http://www.bbaw.de">BBAW</a>.
+		</li>
+		<li>
+		  &quot;D*&quot; (<a href="//kaskade.dwds.de/dstar/doc/README.html">&quot;dstar&quot;</a>)
+		  is the corpus management framework used by the
+		  <a href="//www.dwds.de">DWDS</a>,
+		  <a href="http://www.deutschestextarchiv.de">DTA</a>,
+		  and <a href="//www.zdl.org">ZDL</a>
+		  projects at the <a href="http://www.bbaw.de">BBAW</a>.
+		  It employs DDC as a low-level corpus search engine, and optionally
+		  includes additional auxiliary indices (including DiaCollo itself) and RESTful
+		  web-wrappers (chances are high that you're accessing this document through
+		  a D* web wrapper).
+		</li>
+		<li>
+		  Both DiaCollo and DDC indices can be <b>managed by</b> the D* corpus management framework,
+		  and any D* DiaCollo instance at the BBAW should have an associated DDC index and server.
+		</li>
+		<li>
+		  DDC is <b>not</b> "part of" DiaCollo and is <b>not</b> included with the DiaCollo source distribution;
+		  <b>nor</b> is DiaCollo "part of" DDC.  DiaCollo and DDC are independent modular software packages
+		  which - when correctly configured - can play together nicely.
+		</li>
+		<li>
+		  A functional DDC corpus index and a running <tt>ddc_daemon</tt> server
+		  <a href="#faq-no-ddc-url"><b>are</b> required</a>
+		  for evaluating DiaCollo's <a href="#fmt-html">KWIC-link approximations</a> and
+		  <a href="#prf-ddc">DDC profile relation</a>.
+		</li>
+		<li>
+		  Configuration, compilation, maintenance, and usage of D*, DDC, and/or <tt>ddc_daemon</tt>
+		  is beyond the scope of this FAQ.
+		</li>
+	      </ul></dd>
+
+	      <dt>How large does my corpus need to be in order to get reliable results?</dt>
+	      <dd><ul>
+		<li>
+		  <a href="#slice">Epoch (slice) size</a> is more relevant than total corpus size:
+		  if you just want a larger sample for a particular query,
+		  try increasing the value of the <a href="#slice">slice</a> parameter
+		  (↝ reduce diachronic granularity).
+		</li>
+		<li>
+		  A &quot;good&quot; epoch size depends on both the <i>absolute</i> and <i>relative frequency</i> of the target phenomenon
+		  as specified by the
+		  <a href="#query"><tt>query</tt></a>,
+		  and <a href="#groupby"><tt>groupby</tt></a>,
+		  and <a href="#date"><tt>date</tt></a>
+		  parameters.
+		  Since frequencies of natural language phenomena can <a href="https://en.wikipedia.org/wiki/Zipf%27s_law">vary widely</a>,
+		  there is no reliable &quot;one-size-fits-all&quot; strategy for determining a &quot;good&quot; epoch size
+		  independently of the corpus distribution and the other <a href="#params">user query parameters</a>;
+		  see <a href="gabrielatos2012">Gabrielatos et al. (2012)</a> for a more detailed discussion.
+		</li>
+		<li>
+		  Beware compile-time filters
+		  (<a href="$podurl/dcdb-create.perl#-tfmin-TFMIN"><tt>-tfmin</tt></a>,
+		  <a href="$podurl/dcdb-create.perl#-lfmin-TFMIN"><tt>-lfmin</tt></a>,
+		  <a href="$podurl/dcdb-create.perl#-option-OPT=VAL"><tt>-Opgood</tt></a>,
+		  etc.),
+		  <a href="#FMIN">server-side pruning thresholds</a>,
+		  and <a href="#kbest">k-best pruning</a> 
+		  <ul>
+		    <li>
+		      the indexing option <a href="$podurl/dcdb-create.perl#-use-all-the-data"><tt>-use-all-the-data</tt></a> disables all compile-time thresholds for
+		      the <a href="#prf-native">native</a> and <a href="#prf-tdf">TDF</a> relations
+		    </li>
+		    <li>
+		      the <a href="#FMIN"><tt>#FMIN</tt></a> operator disables runtime pruning for the <a href="#prf-ddc">DDC</a> relation
+		    </li>
+		  </ul>
+		</li>
+		<li>
+		  corpus artefacts are always possible (e.g.
+		  <a href="//www.dwds.de/r/plot?q=Pferd&amp;view=3&amp;window=3&amp;corpus=dta%2Bdwds">&quot;Pferdebuckel&quot;</a>,
+		  <a href="//kaskade.dwds.de/dstar/zeit/?q=NEAR%28Krise%3D1%2C+Tolstoj%3D2%2C+8%29+%23asc_date%5B1960%2C1969-12-31%5D"><i>Krise→Tolstoj</i></a>)
+		</li>
+		<li>
+		  completely subjective, non-rigorous, &amp; informal recommendation:
+		  <ul>
+		    <li>
+		      your chances are pretty good if
+		      <span class="math">min{$f1,$f2} ≥ 100</span>
+		      (using the variables described  <a href="#vars">above</a>)
+		      ... but DiaCollo can also produce interesting results from small corpora
+		      and/or epochs <i>well below this threshold</i>!
+		    </li>
+		  </ul>
+		</li>
+	      </ul></dd>
+	    </dl>
+	  </div>
+	  <!--/div.subsection#faq-corpora-->
+
+	  <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
+	  <div class="subsection" id="faq-runtime">
+	    <h3><a name="faq-runtime">Runtime</a></h3>
+	    <dl>
+	      <dt id="faq-offline">Can I download DiaCollo results for offline use?</dt>
+	      <dd>
+		Probably yes: most <a href="#formats">output formats</a> supported by DiaCollo can be saved to your local
+		computer and used offline.
+		<ul>
+		  <li>
+		    Static tabular formats such as
+		    <a href="#fmt-txt">txt</a>,
+		    <a href="#fmt-html">html</a>,
+		    <a href="#fmt-json">json</a>,
+		    and <a href="#fmt-storable">storable</a>
+		    can be downloaded by clickin on the &quot;Raw URL&quot; link above the main display canvas
+		    and using your browser's &quot;Save As&quot; function (typically invoked by right-clicking
+		    on a blank area of the page display and choosing &quot;Save As&quot; from the context menu).
+		  </li>
+		  <li>
+		    A snapshot of a single epoch visualization in the
+		    <a href="#fmt-bubble"><tt>bubble</tt></a> or <a href="#fmt-cloud"><tt>cloud</tt></a>
+		    format can be exported by clicking on the
+		    download icon (<img src="[% root_dir %]images/download-24px.png" style="height:1em" alt="download icon"/>)
+		    in the upper right corner of the display canvas.
+		  </li>
+		  <li>
+		    An interactive GUI snapshot for the
+		    <a href="#fmt-bubble"><tt>bubble</tt></a> or <a href="#fmt-cloud"><tt>cloud</tt></a>
+		    visualization formats can be saved to your local computer by using your browser's
+		    &quot;Save As (Web-page, complete)&quot;
+		    function (typically invoked by right-clicking
+		    on a blank area of the page display and choosing &quot;Save As&quot; from the context menu).
+		    Note that you will not be able to submit changes to any query parameters from such an offline
+		    snapshot.
+		  </li>
+		  <li>
+		    <a href="#fmt-gmotion">google motion charts</a> don't support offline use at all.
+		  </li>
+		</ul>
+	      </dd>
+
+	      <dt>How can I restrict the profiled collocates to immediate predecessors?</dt>
+	      <dd>
+		Use the <a href="#prf-ddc">DDC profile relation</a> together with a
+		  <a href="$qdocurl#rule_qc_phrase">phrase query</a>, e.g.
+		  <code>"*=2 Mann" #FMIN 1</code>;
+		  see also <a href="#ex-mann-phrase">this example</a>.
+	      </dd>
+
+	      <dt>Why does my collocant appear as a collocate for itself?</dt>
+	      <dd>
+		Self-collocations are never counted for a single <a href="https://en.wikipedia.org/wiki/Type%E2%80%93token_distinction">token</a>.
+		Co-occurrences between multiple tokens of a single type are counted twice
+		(yes, this is a wart, but it's not the wart you probably think it is).
+		Consider for example the sentence "<i>Flies flew</i>".  This sentence
+		contains 2 tokens (the individual words "Flies" and "flew").  Both of
+		these are instances of a single lemma type (let's call it "FLY"),
+		so that at indexing time, DiaCollo would index the sentence as "FLY FLY",
+		which would result in 2 co-occurrences being counted for the lemma-pair
+		("FLY","FLY"): one occurrence left-to-right ("Flies","flew") and one occurrence
+		right-to-left ("flew","Flies").  If only lemmata are being indexed, these would be
+		true identity pairs and could be handled by a special exception at indexing time.  Usually however,
+		additional attributes will be indexed (such as part-of-speech tag or surface form),
+		so the actual co-occurrence pairs are more likely to be complex and not strictly
+		identical; in this case something like ("FLY/NNS:Flies","FLY/VBD:flew").
+		Further, it is entirely possible that lexical items do in fact self-collocate,
+		as in the sentence "Fly, fly away!".
+	      </dd>
+
+	      <dt id="faq-collocate-gone">Why does my collocate item <i>g</i> "disappear" in epoch <i>e</i>?</dt>
+	      <dd><ul>
+		<li>
+		  It may not be among the <a href="#kbest"><i>k</i>-best</a> collocates in epoch <i>e</i>.
+		  By default, DiaCollo prunes  results to the <a href="#kbest"><i>k</i>-best</a> items in each
+		  <a href="#slice">epoch</a> <b>independently</b>.
+		  <ul>
+		    <li>Raising the <a href="#kbest"><tt>kbest</tt></a> will allow more collocates to be displayed per epoch.</li>
+		    <li>
+		      Setting the <a href="#global"><tt>global</tt></a> option to a true value should cause the exact same set
+		      of collocates to be displayed in every epoch (possibly with <span class="math">$f12 = 0</span>).
+		    </li>
+		    <li>
+		      If you just want to check a particular association scores (or indexed frequencies)
+		      for a particular item (or items), you can use
+		      the <a href="#groupby">groupby</a> parameter to select the collocate(s) of interest.
+		    </li>
+		  </ul>
+		</li>
+		<li>
+		  It may have been omitted from the <a href="#prf-native">native index</a> by compile-time filters
+		  (<a href="$podurl/dcdb-create.perl#-cfmin-CFMIN"><tt>-cfmin</tt></a>,
+		  <a href="$podurl/dcdb-create.perl#-tfmin-TFMIN"><tt>-tfmin</tt></a>,
+		  <a href="$podurl/dcdb-create.perl#-option-OPT=VAL"><tt>-Opgood</tt></a>
+		  etc.).
+		  DiaCollo cannot return or display data which hasn't been indexed.
+		  <ul>
+		    <li>
+		      If you have compiled your own DiaCollo index, try lowering the compile-time
+		      filter thresholds or specifying the
+		      <a href="$podurl/dcdb-create.perl#-use-all-the-data"><tt>-use-all-the-data</tt></a> flag
+		      to <a href="$podurl/dcdb-create.perl"><tt>dcdb-create.perl</tt></a>.
+		    </li>
+		  </ul>
+		</li>
+		<li>
+		  It may be have been suppressed by <a href="#FMIN">server-side pruning</a> for
+		  the <a href="#prf-ddc">DDC profile relation</a>.
+		  Try specifying the <a href="#FMIN"><tt>#FMIN 1</tt></a> query operator.
+		</li>
+		<li>
+		  It may not occur at all (or not co-occur with your collocant) in the specified epoch.
+		  DiaCollo only indices only store frequency data for attested phenomena (<span class="math"><i>f</i>&gt;0</span>).
+		  Try raising the value <a href="#slice">slice</a> parameter or setting it to 0 (zero) for
+		  a corpus-global profile.
+		</li>
+	      </ul></dd>
+
+	      <dt>Why does the D3 date-slider (bubble, cloud) "snap" to epoch boundaries?</dt>
+	      <dd>
+		A DiaCollo profile includes at most one data point per candidate collocate per epoch,
+		where epochs are treated as opaque <a href="https://en.wikipedia.org/wiki/Ordinal_data">ordinal</a> classification categories;
+		see <a href="$podurl/DiaColloDB/Profile/Multi.pod">DiaColloDB::Profile::Multi(3pm)</a>.
+		For visual clarity,
+		size and color of collocate items in DiaCollo's
+		<a href="//d3js.org/">D3.js</a> visualization formats
+		(<a href="#fmt-bubble">bubble</a> and <a href="#fmt-cloud">cloud</a>)
+		are <a href="https://en.wikipedia.org/wiki/Linear_interpolation">linearly interpolated</a>
+		between discrete epochs by the JavaScript GUI code, causing them to smoothly
+		grow and/or shrink in the GUI animation rather than suddenly "jumping" to a new
+		state.  Manually adjusting ("dragging") the position of the date-slider will however cause it "snap"
+		to the nearest epoch boundary, since that is the closest ordinal category for which
+		the profile has actual data points.
+	      </dd>
+
+	      <dt>Why does the collocation pair ($q,$g) appear at epoch $e$ (even tough I know it doesn't really occur until later)?</dt>
+	      <dd>
+		<a href="#slice">Epochs</a> are labelled by their minimum possible element (year),
+		so for <a href="#slice"><tt>slice=</tt>$E</a>,
+		the epoch <span class="math">$e</span> represents the date interval <span class="math">[$e .. $e+$E-1]</span>
+		(e.g. for <tt>slice=10</tt>, the epoch "1980" represents the interval <tt>1980-1989</tt>).
+	      </dd>
+
+	      <dt>Why don't the corpus KWIC links always return exactly $f12$ hits?</dt>
+	      <dd><ul>
+		<li>
+		  DiaCollo itself does <b>not</b> create or maintain a full-text index (<i>one tool ⇔ one job</i>);
+		  retrieval of actual corpus hits is performed by an independent <a href="#faq-ddc">DDC server</a>.
+		</li>
+		<li>
+		  DiaCollo's <a href="#fmt-html">KWIC links</a> are nothing more or less than dynamically generated
+		  DDC search queries which – when evaluated by an appropriate <a href="#faq-ddc">DDC server</a>
+		  (typically when you click on such a link from the DiaCollo GUI) –
+		  should closely approximate the corpus hits for the associated collocation pair.
+		</li>
+		<li>
+		  The DDC queries generated by DiaCollo for its KWIC links are <b>only</b> approximations in the case
+		  of <a href="#prf-native">native profile relations</a>, since there are no equivalent DDC query expressions
+		  for many of DiaCollo's compile-time filters (e.g. content-word filtering).
+		</li>
+		<li>
+		  If you need to ensure exact results, use the <a href="#prf-ddc">DDC relation</a>
+		  together with the <a href="#FMIN"><tt>#FMIN 1</tt></a> query operator.
+		</li>
+	      </ul></dd>
+	      
+	    </dl>
+	  </div>
+	  <!--/div.subsection#faq-runtime-->
+
+	  <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
+	  <div class="subsection" id="faq-errors">
+	    <h3><a name="faq-Errors">Errors</a></h3>
+	    <dl>
+	      <dt>Error: DiaColloDB::Document::CLASS: cannot load file ...</dt>
+	      <dd>
+		This error message can be emitted at indexing time by
+		<a href="$podurl/dcdb-create.perl">dcdb-create.perl</a> if the corpus input data you
+		supplied does not appear to be formatted correctly.
+		Ensure that your data is formatted properly and that you have specified the correct
+		<a href="$podurl/dcdb-create.perl#-dclass-CLASS"><tt>-dclass=CLASS</tt></a> option
+		to <a href="$podurl/dcdb-create.perl">dcdb-create.perl</a>.
+	      </dd>
+
+	      <dt>Error: No 'query' parameter specified</dt>
+	      <dd>
+		This message indicates that your request did not include a collocant query specification
+		by means of the <a href="#query">query</a> parameter (rsp.
+		the <a href="$podurl/dcdb-query.perl#QUERY1"><tt>QUERY1</tt></a> argument
+		to <a href="$podurl/dcdb-query.perl">dcdb-query.perl</a>).
+		It can appear in the <a href="./">HTML GUI</a> before any request has been submitted.
+		The <a href="#query">query</a> parameter is required.
+	      </dd>
+
+	      <dt>Error: No data to display</dt>
+	      <dd>
+		No index entries matched your <a href="#intro_reqs">request</a>.  Underlying causes may vary,
+		but possible reasons include:
+		<ul>
+		  <li>
+		    Typographical errors in your request's <a href="#params">parameters</a>,
+		    in particular <a href="#query">query</a> or <a href="#date">date</a>.
+		  </li>
+		  <li>
+		    Matching co-occurrences were omitted from the index due to
+		    compile-time filtering of <a href="#intro_attrs">native index data</a>
+		    (<a href="$podurl/dcdb-create.perl#-tfmin-TFMIN"><tt>-tfmin</tt></a>,
+		    <a href="$podurl/dcdb-create.perl#-lfmin-TFMIN"><tt>-lfmin</tt></a>,
+		    <a href="$podurl/dcdb-create.perl#-option-OPT=VAL"><tt>-Opgood</tt></a>,
+		    etc.).
+		    Check the compile-time parameters using <a href="$podurl/dcdb-info.perl">dcdb-info.perl</a>
+		    or the <a href="info.perl">info.perl</a> URL to see the compile-time thresholds
+		    used to compile a DiaCollo index, and see
+		    <a href="$podurl/DiaColloDB.pm#new">DiaColloDB(3pm)</a> for details on what
+		    the various compile-time properties mean.
+		  </li>
+		  <li>
+		    Matching co-occurrences were omitted from the requested <a href="#prf-ddc">DDC profile</a>
+		    due to <a href="#FMIN">server-side pruning</a>.
+		    Try re-submitting your request using the <a href="#FMIN"><tt>#FMIN 1</tt></a>
+		    query operator.
+		  </li>
+		</ul>
+	      </dd>
+
+	      <dt>Error: You cannot submit queries from an offline data set</dt>
+	      <dd>
+		This error indicates that you attempted to submit a new profile <a href="#intro_reqs">request</a> to
+		a <a href="#faq-offline">static GUI snapshot</a>, which is not supported.
+		Submit new requests to &quot;live&quot; index wrapper instead.
+	      </dd>
+
+	      <dt id="faq-no-ddc-url">Error: Variable 'ddc_url_root' not set: KWIC links disabled</dt>
+	      <dd>
+		This indicates that the DiaCollo index is not associated with any running
+		<a href="#faq-ddc">DDC/D* REST API</a>.  If this error appears for a
+		DDC/D* DiaCollo instance hosted by the BBAW, it probably indicates
+		a corpus configuration bug: please inform the corpus maintainer.  If you have <a href="#faq-user-corpus">indexed your own corpus</a>,
+		you will need to <a href="#faq-ddc">setup a D*-compatbile DDC server</a>
+		and set DiaCollo's <a href="$podurl/dcdb-create.perl#-option-OPT=VAL"><tt>ddcServer</tt></a>
+		option
+		if you want to support
+		<a href="#prf-ddc">DDC profiles</a> and <a href="#fmt-html">KWIC links</a>.
+	      </dd>
+
+	      <dt>Error: 500 Internal Server Error</dt>
+	      <dd>
+		This is just an <a href="//en.wikipedia.org/wiki/List_of_HTTP_status_codes">HTTP status code</a>,
+		and <b>not</b> an error message (and also not very informative).
+		Keep reading for some (hopefully) more useful diagnostics.
+	      </dd>
+
+	      <dt>Error: ttk_process(): template error: undef error - <i>[MESSAGE]</i></dt>
+	      <dd>
+		Something went wrong using the <a href="//metacpan.org/release/DiaColloDB-WWW">DiaColloDB::WWW</a> GUI
+		(still not very informative).  The actual diagnostic message begins with <i>[MESSAGE]</i>.
+	      </dd>
+
+	      <dt>Error: ... called at FILE.pm line XYZ</dt>
+	      <dd>
+		This is a <a href="https://en.wikipedia.org/wiki/Stack_trace">stack trace</a>
+		of the actual error.  Only first few lines are likely to be informative.
+	      </dd>
+
+	      <dt>Error: parseQuery(): ... could not parse query: syntax error: ...</dt>
+	      <dd>
+		Indicates that the <a href="#query">query</a> parameter could not be parsed.
+		Ensure that your <a href="#query">query</a> is syntactically valid;
+		see &quot;<a href="#queries">Query Syntax</a>&quot; for details.
+	      </dd>
+
+	      <dt>Error: align(): cannot align non-trivial multi-profiles of unequal size</dt>
+	      <dd>
+		You tried to <a href="#intro_profiles">compare</a> two profiles with incompatible
+		epoch partitions.  Diff comparisons (<a href="#prf-diff">diff</a>, <a href="#prf-diff-tdf">diff-tdf</a>, etc.) require both operand
+		profiles to contain the same number of <a href="#slice">epochs</a> or only a single epoch (e.g. <a href="#slice"><tt>slice=0</tt></a>).
+	      </dd>
+
+	      <dt>Error: ... abstract method called</dt>
+	      <dd>
+		I probably forgot to implement something; please let me know!
+	      </dd>
+
+	      <dt>Error: ... timeout elapsed</dt>
+	      <dd>
+		This usually means that the independent <a href="#faq-ddc">DDC</a> server took too long to respond for
+		a <a href="#prf-ddc">DDC profile</a>.  You query may be too complex to be handled gracefully:
+		try raising the value of <a href="#FMIN"><tt>#FMIN</tt></a>, lowering the
+		value of <a href="#DMAX"><tt>#DMAX</tt></a>, and/or profiling only a corpus
+		<a href="#SAMPLE">sample</a>.  Please <b>do not</b> simply re-submit a query which has
+		caused a timeout immediately in the hope that
+		this error will have been magically resolved, and please
+		<b>do</b> wait at least for the &quot;timeout elapsed&quot; message to appear
+		before submitting a new query to an unresponsive server.
+	      </dd>
+
+	      <dt id="faq-no-ddc-server">Error: no 'ddcServer' key defined</dt>
+	      <dd>
+		This indicates that you tried to use the <a href="#prf-ddc">DDC profile relation</a>
+		without declaring an associated <a href="#faq-ddc">DDC server</a> to provide
+		frequency data.
+		If this error appears for a
+		DDC/D* DiaCollo instance hosted by the BBAW, it probably indicates
+		a corpus configuration bug: please inform the corpus maintainer.
+
+		If you have a running <a href="#faq-ddc">DDC server</a> for a
+		<a href="#faq-user-corpus">your own corpus</a>,
+		  you can EITHER
+		  <ul>
+		    <li>
+		      edit your index <tt>header.json</tt> file and add a line
+		      <code>&quot;ddcServer&quot;:&quot;<i>HOST:PORT</i>&quot;</code>, or
+		    </li>
+		    <li>
+		      use the <a href="$podurl/dcdb-query.perl#-O-KEY=VALUE"><tt>-OddcServer=<i>HOST:PORT</i></tt></a>
+		      option to <a href="$podurl/dcdb-query.perl">dcdb-query.perl</a>
+		      when querying your DiaCollo index.
+		    </li>
+		  </ul>
+		  Replace <i>HOST</i> and <i>PORT</i> in the examples above with values appropriate for
+		  your <a href="#faq-ddc">DDC server</a>.
+	      </dd>
+	      
+	    </dl>
+	  </div>
+	  <!--/div.subsection#faq-errors-->
+
+        </div>
+	<!--/div.section#faq-->
+	
 	<!--=================================================-->
 	<div class="section" id="references">
 	  <a name="references"><h2>References</h2></a>
@@ -1612,19 +2111,24 @@
 	    <h3><a name="ref-diacollo">DiaCollo</a></h3>
 	    <ul>
 	      <li>
-		<a name="jurish2016genre">Bryan Jurish (2016).</a>
-		&quot;Diachronic Collocations and Genre: a case for DiaCollo?&quot;
+		<a name="jn2019using">Bryan Jurish and Maret Nieländer (2019)</a>.
+		&quot;Using DiaCollo for historical research.&quot;
+		In: K.<!--Kiril--> Simov and M.<!--Maria--> Eskevich (eds.),
+		<i>Selected Papers from the CLARIN Annual Conference 2019</i>,
+		Linköping Electronic Conference Proceedings 172 (2020),
+		pages 33-40.
+		(<a href="https://doi.org/10.3384/ecp2020172">DOI [proceedings]</a>,
+		<a href="https://doi.org/10.3384/ecp2020172005">DOI [article]</a>,
+		<a href="http://www.ep.liu.se/ecp/172/005/ecp20172005.pdf">PDF [article]</a>)
+	      </li>
+	      <li>
+		<a name="jurish2018genre">Bryan Jurish (2018)</a>.
+		&quot;Diachronic Collocations, Genre, and DiaCollo.&quot;
 		In R.<!--Richard--> J.<!--Jason--> Whitt (editor),
-		<!--<a href="http://nottinghamcorpusconference2016.weebly.com/uploads/4/8/0/8/48086357/dcglc_abstractbook.pdf">Proceedings</a>
-		    of the conference <a href="http://nottinghamcorpusconference2016.weebly.com/">Diachronic Corpora, Genre, and Language Change</a>,
-		-->
-		<a href="http://nottinghamcorpusconference2016.weebly.com/uploads/4/8/0/8/48086357/dcglc_abstractbook.pdf#page=22">Diachronic Corpora, Genre, and Language Change: Book of Abstracts</a>,
-		Nottingham, UK, 8th-9th April,
-		pages 22-24.
-		(<a href="[% puburl %]jurish2016genre.pdf">PDF</a>,
-		<a href="http://nottinghamcorpusconference2016.weebly.com/uploads/4/8/0/8/48086357/dcglc_abstractbook.pdf#page=22">EPUB</a>		,
-		<a href="[% puburl %]jurish2016genre-slides.pdf">Slides</a>)
-		<!--<a href="jurish2016genre.bib">bib</a>)-->
+		<a href="https://benjamins.com/catalog/scl.85"><i>Diachronic Corpora, Genre, and Language Change</i></a>.
+		Amsterdam, John Benjamins, pages 42–64.
+		(<a href="https://benjamins.com/catalog/scl.85.03jur">Online</a>,
+		<a href="[% puburl %]jurish2018genre.pdf">Draft</a>)
 	      </li>
 	      <li>
 		<a name="jgw2016dhd">Bryan Jurish, Alexander Geyken, and Thomas Werneke (2016).</a>
@@ -1635,7 +2139,7 @@
 		<!--Digital Humanities im deutschprachigen Raum eV-->
 		pages 172-175.
 		(<a href="[% puburl %]jgw2016diacollo.pdf">PDF</a>,
-		 <a href="http://dhd2016.de/boa.pdf#page=172">EPUB</a> [contains typesetting errors])
+		 <a href="http://dhd2016.de/boa.pdf#page=172">official</a> [contains typesetting errors])
 	      </li>
 	      <li>
 		<a name="jurish2015diacollo">Bryan Jurish (2015)</a>.
@@ -1687,6 +2191,14 @@
 		article 58, Berlin, Mouton de Gruyter, pages 1212-1248.
       		(<a href="http://purl.org/stefan.evert/PUB/Evert2007HSK_extended_manuscript.pdf">PDF [extended manuscript]</a>)
 	      </li>
+	      <li>
+		<a name="gabrielatos2012">C. Gabrielatos, T. McEnery, P. J. Diggle, and P. Baker (2012).</a>
+		&quot;The peaks and troughs of corpus-based contextual analysis.&quot;
+		<i>International Journal of Corpus Linguistics</i>
+		17(2), pages 151–175.
+		(<a href="//dx.doi.org/doi:10.1075/ijcl.17.2.01gab">DOI</a>,
+		<a href="https://research.edgehill.ac.uk/ws/portalfiles/portal/20154619/Peaks%26Troughs.Post-print.pdf">PDF [post-print]</a>)
+		<!--<a href="http://www.jbe-platform.com/content/journals/10.1075/ijcl.17.2.01gab">PDF</a>-->
 	      <li>
 		<a name="rychly2008">Pavel Rychlý (2008)</a>.
 		&quot;A lexicographer-friendly association score&quot;.

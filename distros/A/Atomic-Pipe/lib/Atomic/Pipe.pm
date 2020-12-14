@@ -2,7 +2,7 @@ package Atomic::Pipe;
 use strict;
 use warnings;
 
-our $VERSION = '0.006';
+our $VERSION = '0.012';
 
 use IO();
 use Carp qw/croak/;
@@ -34,33 +34,72 @@ use Scalar::Util qw/blessed/;
 use constant RH    => 'rh';
 use constant WH    => 'wh';
 use constant STATE => 'state';
+use constant BLOCKING => 'blocking';
 
 sub _get_tid {
     return 0 unless $INC{'threads.pm'};
     return threads->tid();
 }
 
+sub _fh_mode {
+    my $self = shift;
+    my ($fh) = @_;
+
+    my $mode = fcntl($fh, Fcntl::F_GETFL(), 0) // return undef;
+    return '<&' if $mode == Fcntl::O_RDONLY();
+    return '>&' if $mode == Fcntl::O_WRONLY();
+    return undef;
+}
+
+my %MODE_TO_DIR = (
+    '<&'  => RH(),
+    '<&=' => RH(),
+    '>&'  => WH(),
+    '>&=' => WH(),
+);
+sub _mode_to_dir {
+    my $self = shift;
+    my ($mode) = @_;
+    return $MODE_TO_DIR{$mode};
+}
+
+sub read_fifo {
+    my $class = shift;
+    my ($fifo) = @_;
+
+    croak "File '$fifo' is not a pipe (-p check)" unless -p $fifo;
+
+    open(my $fh, '+<', $fifo) or die "Could not open fifo ($fifo) for reading: $!";
+    binmode($fh);
+
+    return bless({RH() => $fh}, $class);
+}
+
+sub write_fifo {
+    my $class = shift;
+    my ($fifo) = @_;
+
+    croak "File '$fifo' is not a pipe (-p check)" unless -p $fifo;
+
+    open(my $fh, '>', $fifo) or die "Could not open fifo ($fifo) for writing: $!";
+    binmode($fh);
+
+    return bless({WH() => $fh}, $class);
+}
+
 sub from_fh {
     my $class = shift;
-    my ($ifh) = @_;
+    my $ifh = pop;
+    my ($mode) = @_;
 
     croak "Filehandle is not a pipe (-p check)" unless -p $ifh;
 
-    my ($dir, $fh);
-    my $mode = fcntl($ifh, Fcntl::F_GETFL(), 0);
-    if ($mode & Fcntl::O_RDONLY() || $mode == Fcntl::O_RDONLY()) {
-        $dir = RH();
-        open($fh, '<&', $ifh) or croak "Could not clone filehandle: $!";
-    }
-    elsif ($mode & Fcntl::O_WRONLY() || $mode == Fcntl::O_WRONLY()) {
-        $dir = WH();
-        open($fh, '>&', $ifh) or croak "Could not clone filehandle: $!";
-    }
-    else {
-        croak "Unknown handle mode ($mode)";
-    }
+    $mode //= $class->_fh_mode($ifh) // croak "Could not determine filehandle mode, please specify '>&' or '<&'";
+    my $dir = $class->_mode_to_dir($mode) // croak "Invalid mode: $mode";
 
+    open(my $fh, $mode, $ifh) or croak "Could not clone ($mode) filehandle: $!";
     binmode($fh);
+
     return bless({$dir => $fh}, $class);
 }
 
@@ -68,18 +107,8 @@ sub from_fd {
     my $class = shift;
     my ($mode, $fd) = @_;
 
-    my ($dir, $fh);
-    if ($mode eq '<&' || $mode eq '<&=') {
-        $dir = RH();
-        open($fh, $mode, $fd) or croak "Could not open fd$fd: $!";
-    }
-    elsif ($mode eq '>&' || '>&=') {
-        $dir = WH();
-        open($fh, $mode, $fd) or croak "Could not clone fd$fd: $!";
-    }
-    else {
-        croak "Invalid mode: $mode";
-    }
+    my $dir = $class->_mode_to_dir($mode) // croak "Invalid mode: $mode";
+    open(my $fh, $mode, $fd) or croak "Could not open ($mode) fd$fd: $!";
 
     croak "Filehandle is not a pipe (-p check)" unless -p $fh;
 
@@ -114,10 +143,41 @@ sub pair {
     );
 }
 
+# This is a heavily modified version of a pattern suggested on stack-overflow
+# and also used in Win32::PowerShell::IPC.
+my $peek_named_pipe;
+sub _win32_pipe_ready {
+    my $self = shift;
+    my $wh = Win32API::File::FdGetOsFHandle(fileno($self->{+RH}));
+
+    my $buf = "";
+    my $buflen = 0;
+
+    $peek_named_pipe ||= Win32::API->new("kernel32", 'PeekNamedPipe', 'NPIPPP', 'N')
+        || die "Can't load PeekNamedPipe from kernel32.dll";
+
+    my $got    = pack('L', 0);
+    my $avail  = pack('L', 0);
+    my $remain = pack('L', 0);
+
+    my $ret = $peek_named_pipe->Call($wh, $buf, $buflen, $got, $avail, $remain);
+
+    return unpack('L', $avail);
+}
+
 sub blocking {
     my $self = shift;
-    my $rh = $self->{+RH} or croak "Not a reader";
-    $rh->blocking(@_);
+    my $rh   = $self->{+RH} or croak "Not a reader";
+
+    if ($^O eq 'MSWin32') {
+        eval { require Win32::API; 1 } or die "non-blocking on windows requires Win32::API please install it.\n$@";
+        eval { require Win32API::File; 1 } or die "non-blocking on windows requires Win32API::File please install it.\n$@";
+        ($self->{+BLOCKING}) = @_ if @_;
+        return $self->{+BLOCKING};
+    }
+    else {
+        $rh->blocking(@_);
+    }
 }
 
 sub size {
@@ -213,16 +273,59 @@ sub close {
 my $psize = 16; # 32bit pid, 32bit tid, 32 bit size, 32 bit int part id;
 my $dsize = PIPE_BUF - $psize;
 
+sub fits_in_burst {
+    my $self = shift;
+    my ($data) = @_;
+
+    my $size = bytes::length($data);
+    return undef unless $size <= PIPE_BUF;
+
+    return $size;
+}
+
+sub write_burst {
+    my $self = shift;
+    my ($data) = @_;
+
+    my $size = $self->fits_in_burst($data) // return undef;
+
+    return $self->_write_burst($data, $size);
+}
+
+sub _write_burst {
+    my $self = shift;
+    my ($data, $size) = @_;
+
+    my $wh = $self->{+WH} or croak "Cannot call write on a pipe reader";
+
+    my $wrote;
+    SWRITE: {
+        $wrote = syswrite($wh, $data, $size);
+        redo SWRITE if !$wrote || $RETRY_ERRNO{0 + $!};
+        last SWRITE if $wrote == $size;
+        $wrote //= "<NULL>";
+        die "$wrote vs $size: $!";
+    }
+
+    return $wrote;
+}
+
+sub parts_needed {
+    my $self = shift;
+    my ($data) = @_;
+
+    my $dtotal = bytes::length($data);
+    my $parts = int($dtotal / $dsize);
+    $parts++ if $dtotal % $dsize;
+
+    return $parts;
+}
+
 sub write_message {
     my $self = shift;
     my ($data) = @_;
 
-    my $wh = $self->{+WH} or croak "Cannot call write on a pipe reader";
-
-    my $dtotal = bytes::length($data);
-
-    my $parts = int($dtotal / $dsize);
-    $parts++ if $dtotal % $dsize;
+    my $parts = $self->parts_needed($data);
 
     my $id = $parts - 1;
     for (my $part = 0; $part < $parts; $part++) {
@@ -231,14 +334,7 @@ sub write_message {
         my $out = pack("l2L2a$size", $$, _get_tid(), $id--, $size, $bytes);
         my $write = $size + $psize;
 
-        SWRITE: {
-            my $wrote = syswrite($wh, $out, $write);
-            redo SWRITE if !$wrote || $RETRY_ERRNO{0 + $!};
-            last SWRITE if $wrote == $write;
-            $wrote //= "<NULL>";
-            die "$wrote vs $write: $!";
-        }
-
+        $self->_write_burst($out, $write);
     }
 
     return $parts;
@@ -248,12 +344,17 @@ sub eof { shift->{+STATE}->{EOF} ? 1 : 0 }
 
 sub read_message {
     my $self = shift;
+    my %params = @_;
 
     my $state = $self->{+STATE} //= {};
 
     return if $state->{EOF};
 
     my $rh = $self->{+RH} or croak "Not a reader";
+
+    if ($^O eq 'MSWin32' && defined($self->{+BLOCKING}) && !$self->{+BLOCKING}) {
+        return undef unless $self->_win32_pipe_ready();
+    }
 
     while (1) {
         my $pb_size = $state->{pb_size} //= 0;
@@ -300,15 +401,26 @@ sub read_message {
         my $id = $key->{id};
         my $tag = join ':' => @{$key}{qw/pid tid/};
         $state->{buffers}->{$tag} = $state->{buffers}->{$tag} ? $state->{buffers}->{$tag} . $state->{d_buffer} : $state->{d_buffer};
+        push @{$state->{parts}->{$tag} //= []} => $id;
 
         %$state = (
             buffers => $state->{buffers},
+            parts   => $state->{parts},
             EOF     => $state->{EOF},
         );
 
         next unless $id == 0;
         my $message = delete $state->{buffers}->{$tag};
-        return $message;
+        my $parts   = delete $state->{parts}->{$tag};
+
+        return $message unless $params{debug};
+
+        return {
+            message => $message,
+            parts   => $parts,
+            pid     => $key->{pid},
+            tid     => $key->{tid},
+        };
     }
 }
 
@@ -429,13 +541,54 @@ returned pipe has both handles, it is your job to then turn it into 2 clones
 one with the reader and one with the writer. It is also your job to make you do
 not have too many handles floating around preventing an EOF.
 
+=item $r = Atomic::Pipe->read_fifo($FIFO_PATH)
+
+=item $w = Atomic::Pipe->write_fifo($FIFO_PATH)
+
+These 2 constructors let you connect to a FIFO by filesystem path.
+
+The interface difference (read_fifo and write_fifo vs specifying a mode) is
+because the modes to use for fifo's are not obvious (C<< '+<' >> for reading).
+
+B<NOTE:> THERE IS NO EOF for the read-end in the process that created the fifo.
+You need to figure out when the last message is received on your own somehow.
+If you use blocking reads in a loop with no loop exit condition then the loop
+will never end even after all writers are gone.
+
 =item $p = Atomic::Pipe->from_fh($fh)
+
+=item $p = Atomic::Pipe->from_fh($mode, $fh)
 
 Create an instance around an existing filehandle (A clone of the handle will be
 made and kept internally).
 
-This will fail if the handle is not a pipe. This constructor will determine the
-mode (reader or writer) for you from the given handle.
+This will fail if the handle is not a pipe.
+
+If no mode is provided this constructor will determine the mode (reader or
+writer) for you from the given handle. B<Note:> This works on linux, but not
+BSD or Solaris, on most platforms your must provide a mode.
+
+Valid modes:
+
+=over 4
+
+=item '>&'
+
+Write-only.
+
+=item '>&='
+
+Write-only and reuse fileno.
+
+=item '<&'
+
+Read-only.
+
+=item '<&='
+
+Read-only and reuse fileno.
+
+=back
 
 =item $p = Atomic::Pipe->from_fd($mode, $fd)
 
@@ -484,6 +637,11 @@ set C<< $p->blocking(0) >>. If blocking is turned off, and no message is ready,
 this will return undef. This will also return undef when the pipe is closed
 (EOF).
 
+=item $count = $self->parts_needed($data)
+
+Get the number of parts the data will be split into for it to be written in
+atomic chunks.
+
 =item $p->blocking($bool)
 
 =item $bool = $p->blocking
@@ -498,6 +656,27 @@ True if EOF (all writers are closed).
 
 Close this end of the pipe (or both ends if this is not yet split into
 reader/writer pairs).
+
+=item $undef_or_bytes = $p->fits_in_burst($data)
+
+This will return C<undef> if the data DES NOT fit in a burst. This will return
+the size of the data in bytes if it will fit in a burst.
+
+=item $undef_or_bytes = $p->write_burst($data)
+
+Attempt to write C<$data> in a single atomic burst. If the data is too big to
+write atomically this method will not write any data and will return C<undef>.
+If the data does fit in an atomic write then the data will be written and the
+total number of bytes written will be returned.
+
+B<Note:> YOU MUST NOT USE C<read_message()> when writing bursts. This method
+sends the data as-is with no data-header or modification. This method should be
+used when the other side is reading the pipe directly without an Atomic::Pipe
+on the receiving end.
+
+The primary use case of this is if you have multiple writers sending short
+plain-text messages that will not exceed the atomic pipe buffer limit (minimum
+of 512 bytes on systems that support atomic pipes accoring to POSIX).
 
 =back
 

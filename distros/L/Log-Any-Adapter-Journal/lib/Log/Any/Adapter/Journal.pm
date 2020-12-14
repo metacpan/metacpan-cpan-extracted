@@ -10,20 +10,19 @@ use Log::Any::Adapter::Util qw(logging_methods numeric_level);
 use parent 'Log::Any::Adapter::Screen';
 use Class::Method::Modifiers;
 
-our $VERSION = '0.13';
+our $VERSION = '1.0';
 
 # sub init {
 #     my ($self) = @_;
 # }
 
-# Journal doesn't recognize trace, use debug instead
-sub trace    { shift->debug(@_) }
-sub is_trace { shift->is_debug(@_) }
-
 # For each of the logging methods exposed by Log::Any, add the level
 # prefix in angled brackets.
-for my $method ( grep { !/trace/ } logging_methods ) {
+for my $method ( logging_methods ) {
     my $level = numeric_level( $method );
+
+    # Journal doesn't recognize trace (8), print as debug instead
+    $level = 7 if $level > 7;
 
     before $method => sub {
         $_[1] = "<$level>$_[1]" unless $_[0]->{use_color};
@@ -53,7 +52,7 @@ Log::Any::Adapter::Journal - Adapter for Log::Any that outputs with a priority p
 
 =head1 VERSION
 
-version 0.13
+version 1.0
 
 =head1 STATUS
 
@@ -82,6 +81,12 @@ By default, systemd will parse the output from commands run as systemd
 services/units for the priority prefix (both STDOUT and STDERR). Users can
 also pipe output through the C<systemd-cat> command to enable parsing of
 priority for scripts.
+
+Journald doesn't support the trace (8) log level. If the min_level is set to
+'trace', then logs will be sent to journald with the debug (7) log level.
+This behavior changed in version 1.0 of L<Log::Any::Adapter::Journal>.
+Prior to version 1.0, trace logs were treated as if they were debug logs,
+so they were sent to with debug (7) log level even if min_level was 'debug'.
 
 This adapter is based on the L<Log::Any::Adapter::Screen>, and accepts the same
 optional settings. We assume you want color output when running interactively

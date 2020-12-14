@@ -6,7 +6,7 @@ use base 'Module::Build::XSUtil';
 use File::Which;
 use Devel::CheckLib;
 
-which('aalib-config') or exit;
+which('aalib-config') or exit 1;
 my @link_flags = split ' ', `aalib-config --libs`;
 my @cflags     = split ' ', `aalib-config --cflags`;
 

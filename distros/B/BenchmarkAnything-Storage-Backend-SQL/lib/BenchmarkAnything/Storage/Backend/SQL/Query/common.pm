@@ -1,7 +1,7 @@
 package BenchmarkAnything::Storage::Backend::SQL::Query::common;
 our $AUTHORITY = 'cpan:TAPPER';
 # ABSTRACT: BenchmarkAnything::Storage::Backend::SQL - querying - backend base class
-$BenchmarkAnything::Storage::Backend::SQL::Query::common::VERSION = '0.028';
+$BenchmarkAnything::Storage::Backend::SQL::Query::common::VERSION = '0.029';
 use strict;
 use warnings;
 use base 'BenchmarkAnything::Storage::Backend::SQL::Query';

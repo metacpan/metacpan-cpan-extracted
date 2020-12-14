@@ -64,4 +64,19 @@ eval {
 };
 ok (! $@, "set_tIME without a time value");
 
+# Test the setting and getting of a time.
+
+my %mb = (year => 2000, month => 3, day => 15,
+	  hour => 3, minute => 0, second => 0);
+my $bpng = create_write_struct ();
+$bpng->set_IHDR ({width => 1, height => 1, bit_depth => 8,
+		 color_type => PNG_COLOR_TYPE_GRAY});
+$bpng->set_rows (['X']);
+$bpng->set_tIME (\%mb);
+my $file = "$Bin/mb.png";
+$bpng->write_png_file ($file);
+my $mbpng = read_png_file ($file);
+my $round_trip = $mbpng->get_tIME ();
+is_deeply ($round_trip, \%mb, "recovered time from file");
+unlink $file or warn "Can't unlink $file: $!";
 done_testing ();

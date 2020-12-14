@@ -1,5 +1,8 @@
 Revision history for NewFangle},
 
+0.04      2020-12-10 15:27:00 -0700
+  - Bump version requirement of Alien::libnewrelic for clang 10 fixes
+
 0.03      2020-06-03 14:19:13 -0600
   - Add NewFangle::newrelic_set_host_display_name (gh#14)
   - Add NEWRELIC_APP_HOSTNAME environment variable (gh#14)

@@ -23,6 +23,7 @@ Chord
 Gene
 Music
 Progression
-foo
 gene
 lib
+th
+tritone

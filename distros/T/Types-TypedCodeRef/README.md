@@ -44,3 +44,5 @@ ybrliiu <raian@reeshome.org>
 # SEE ALSO
 
 [Sub::WrapInType](https://metacpan.org/pod/Sub%3A%3AWrapInType)
+
+[Type::Tiny](https://metacpan.org/pod/Type%3A%3ATiny)
