@@ -95,6 +95,7 @@ DiLuain
 Dilbata
 Dimingu
 Divehi
+Dogri
 Domhnaigh
 Duala
 Duşenbe
@@ -403,6 +404,7 @@ Sayass
 Sena
 Senin
 Senni
+Senén
 Serbo
 Sergey
 Shambala
@@ -472,7 +474,9 @@ Wa
 Wai
 Walamo
 Walser
+Wiik
 Wiixata
+Wik
 Woche
 Wolof
 Wuok
@@ -591,13 +595,12 @@ cgg
 cgg_UG
 chr
 chr_US
+cikin
 ckb
 ckb_IQ
 ckb_IR
 cs
 cs_CZ
-cu
-cu_RU
 cy
 cy_GB
 của
@@ -625,6 +628,8 @@ diluns
 dimanche
 dje
 dje_NE
+doi
+doi_IN
 domingo
 drolsky
 dsb
@@ -887,6 +892,7 @@ fur
 fur_IT
 fy
 fy_NL
+fọ
 ga
 ga_GB
 ga_IE
@@ -930,6 +936,7 @@ hms
 hmsv
 hmsvvvv
 hmv
+hmvvvv
 hodź
 hono
 hr
@@ -1200,8 +1207,6 @@ ponedeljak
 ponedeljek
 ponedjeljak
 poniedzia
-prg
-prg_001
 ps
 ps_AF
 ps_PK
@@ -1251,6 +1256,7 @@ rw_RW
 rwk
 rwk_TZ
 sa
+sa_IN
 sabaat
 sah
 sah_RU
@@ -1261,6 +1267,8 @@ saq_KE
 sat
 sat_Olck
 sat_Olck_IN
+sati
+satiik
 sav
 sbp
 sbp_TZ
@@ -1421,8 +1429,6 @@ vi_VN
 viikko
 vika
 viku
-vo
-vo_001
 vun
 vun_TZ
 vuoden

@@ -130,9 +130,9 @@
     "Baada ya Kristo",
   ],
   first_day_of_week => 7,
-  glibc_date_1_format => "%a %b %e %H:%M:%S %Z %Y",
+  glibc_date_1_format => "%e %B %Y %I:%M:%S %p %Z",
   glibc_date_format => "%d/%m/%Y",
-  glibc_datetime_format => "%e %B %Y %I:%M:%S %p %Z",
+  glibc_datetime_format => "%e %B %Y %I:%M:%S %p",
   glibc_time_12_format => "%I:%M:%S %p",
   glibc_time_format => "%I:%M:%S %p",
   language => "Swahili",
@@ -269,5 +269,5 @@
   time_format_medium => "HH:mm:ss",
   time_format_short => "HH:mm",
   variant => undef,
-  version => 37,
+  version => 38,
 }

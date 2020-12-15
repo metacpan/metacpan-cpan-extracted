@@ -135,9 +135,9 @@
     "An d\N{U+00e8}idh Chr\N{U+00ec}osta",
   ],
   first_day_of_week => 1,
-  glibc_date_1_format => "%a %b %e %H:%M:%S %Z %Y",
+  glibc_date_1_format => "%a %d %b %Y %T %Z",
   glibc_date_format => "%d/%m/%y",
-  glibc_datetime_format => "%a %d %b %Y %T %Z",
+  glibc_datetime_format => "%a %d %b %Y %T",
   glibc_time_12_format => "%I:%M:%S %p",
   glibc_time_format => "%r",
   language => "Scottish Gaelic",
@@ -274,5 +274,5 @@
   time_format_medium => "HH:mm:ss",
   time_format_short => "HH:mm",
   variant => undef,
-  version => 37,
+  version => 38,
 }

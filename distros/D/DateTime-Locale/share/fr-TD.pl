@@ -60,7 +60,7 @@
   date_format_short => "dd/MM/y",
   datetime_format_full => "{1} '\N{U+00e0}' {0}",
   datetime_format_long => "{1} '\N{U+00e0}' {0}",
-  datetime_format_medium => "{1} '\N{U+00e0}' {0}",
+  datetime_format_medium => "{1}, {0}",
   datetime_format_short => "{1} {0}",
   day_format_abbreviated => [
     "lun.",
@@ -268,5 +268,5 @@
   time_format_medium => "h:mm:ss a",
   time_format_short => "h:mm a",
   variant => undef,
-  version => 37,
+  version => 38,
 }

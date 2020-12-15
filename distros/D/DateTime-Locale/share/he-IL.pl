@@ -134,9 +134,9 @@
     "\N{U+05dc}\N{U+05e1}\N{U+05e4}\N{U+05d9}\N{U+05e8}\N{U+05d4}",
   ],
   first_day_of_week => 7,
-  glibc_date_1_format => "%a %b %e %H:%M:%S %Z %Y",
+  glibc_date_1_format => "%Z %H:%M:%S %Y %b %d %a",
   glibc_date_format => "%d/%m/%y",
-  glibc_datetime_format => "%Z %H:%M:%S %Y %b %d %a",
+  glibc_datetime_format => "%H:%M:%S %Y %b %d %a",
   glibc_time_12_format => "%I:%M:%S %P",
   glibc_time_format => "%H:%M:%S",
   language => "Hebrew",
@@ -273,5 +273,5 @@
   time_format_medium => "H:mm:ss",
   time_format_short => "H:mm",
   variant => undef,
-  version => 37,
+  version => 38,
 }

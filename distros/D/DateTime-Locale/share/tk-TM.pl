@@ -131,7 +131,7 @@
     "Isadan so\N{U+0148}",
   ],
   first_day_of_week => 1,
-  glibc_date_1_format => "%a %b %e %H:%M:%S %Z %Y",
+  glibc_date_1_format => "%d.%m.%Y %T %Z",
   glibc_date_format => "%d.%m.%Y",
   glibc_datetime_format => "%d.%m.%Y %T",
   glibc_time_12_format => "%I:%M:%S %p",
@@ -270,5 +270,5 @@
   time_format_medium => "HH:mm:ss",
   time_format_short => "HH:mm",
   variant => undef,
-  version => 37,
+  version => 38,
 }

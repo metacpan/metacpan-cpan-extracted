@@ -129,9 +129,9 @@
     "\N{U+0554}\N{U+0580}\N{U+056b}\N{U+057d}\N{U+057f}\N{U+0578}\N{U+057d}\N{U+056b}\N{U+0581} \N{U+0570}\N{U+0565}\N{U+057f}\N{U+0578}",
   ],
   first_day_of_week => 1,
-  glibc_date_1_format => "%a %b %e %H:%M:%S %Z %Y",
+  glibc_date_1_format => "%a %d %b %Y %r %Z",
   glibc_date_format => "%m/%d/%y",
-  glibc_datetime_format => "%a %d %b %Y %r %Z",
+  glibc_datetime_format => "%a %d %b %Y %r",
   glibc_time_12_format => "%I:%M:%S %p",
   glibc_time_format => "%r",
   language => "Armenian",
@@ -268,5 +268,5 @@
   time_format_medium => "HH:mm:ss",
   time_format_short => "HH:mm",
   variant => undef,
-  version => 37,
+  version => 38,
 }

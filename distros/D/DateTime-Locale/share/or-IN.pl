@@ -131,9 +131,9 @@
     "\N{U+0b16}\N{U+0b4d}\N{U+0b30}\N{U+0b40}\N{U+0b37}\N{U+0b4d}\N{U+0b1f}\N{U+0b3e}\N{U+0b2c}\N{U+0b4d}\N{U+0b26}",
   ],
   first_day_of_week => 7,
-  glibc_date_1_format => "%a %b %e %H:%M:%S %Z %Y",
+  glibc_date_1_format => "%Oe %B %Oy %OI:%OM:%OS %p %Z",
   glibc_date_format => "%Od-%Om-%Oy",
-  glibc_datetime_format => "%Oe %B %Oy %OI:%OM:%OS %p %Z",
+  glibc_datetime_format => "%Oe %B %Oy %OI:%OM:%OS %p",
   glibc_time_12_format => "%OI:%OM:%OS %p",
   glibc_time_format => "%OI:%OM:%OS %p",
   language => "Odia",
@@ -270,5 +270,5 @@
   time_format_medium => "h:mm:ss a",
   time_format_short => "h:mm a",
   variant => undef,
-  version => 37,
+  version => 38,
 }

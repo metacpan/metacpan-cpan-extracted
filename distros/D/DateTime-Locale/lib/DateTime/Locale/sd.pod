@@ -231,7 +231,7 @@ Sindhi locale.
 
 =head3 Wide (format)
 
-  مسيح کان اڳ
+  قبل مسيح
   عيسوي کان پهرين
 
 =head3 Abbreviated (format)

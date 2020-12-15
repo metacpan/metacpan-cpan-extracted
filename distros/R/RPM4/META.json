@@ -4,7 +4,7 @@
       "unknown"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.56, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "gpl_2"
    ],
@@ -53,6 +53,6 @@
          "web" : "http://gitweb.mageia.org/software/rpm/perl-RPM4/"
       }
    },
-   "version" : "0.43",
-   "x_serialization_backend" : "JSON::PP version 4.04"
+   "version" : "0.44",
+   "x_serialization_backend" : "JSON::PP version 4.05"
 }

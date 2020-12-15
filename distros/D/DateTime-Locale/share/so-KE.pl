@@ -130,11 +130,11 @@
     "Ciise Dabadii",
   ],
   first_day_of_week => 7,
-  glibc_date_1_format => "%A, %B %e, %r %Z %Y",
+  glibc_date_1_format => "%A, %B %e, %X %Z %Y",
   glibc_date_format => "%d/%m/%Y",
-  glibc_datetime_format => "%A, %B %e, %Y %r %Z",
-  glibc_time_12_format => "%X %p",
-  glibc_time_format => "%l:%M:%S",
+  glibc_datetime_format => "%A, %B %e, %Y %X %Z",
+  glibc_time_12_format => "%I:%M:%S %p",
+  glibc_time_format => "%T",
   language => "Somali",
   month_format_abbreviated => [
     "Jan",
@@ -269,5 +269,5 @@
   time_format_medium => "HH:mm:ss",
   time_format_short => "HH:mm",
   variant => undef,
-  version => 37,
+  version => 38,
 }

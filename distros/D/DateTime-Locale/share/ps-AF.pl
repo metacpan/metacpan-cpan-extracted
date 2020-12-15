@@ -129,9 +129,9 @@
     "\N{U+0644}\N{U+0647} \N{U+0645}\N{U+06cc}\N{U+0644}\N{U+0627}\N{U+062f} \N{U+0685}\N{U+062e}\N{U+0647} \N{U+0648}\N{U+0631}\N{U+0648}\N{U+0633}\N{U+062a}\N{U+0647}",
   ],
   first_day_of_week => 6,
-  glibc_date_1_format => "%a %b %e %H:%M:%S %Z %Y",
+  glibc_date_1_format => "%A \N{U+062f} %Y \N{U+062f} %B %e\N{U+060c} %Z %H:%M:%S",
   glibc_date_format => "\N{U+062f} %Y \N{U+062f} %B %e",
-  glibc_datetime_format => "%A \N{U+062f} %Y \N{U+062f} %B %e\N{U+060c} %Z %H:%M:%S",
+  glibc_datetime_format => "%A \N{U+062f} %Y \N{U+062f} %B %e\N{U+060c} %H:%M:%S",
   glibc_time_12_format => "\N{U+202b}%I:%M:%S %p\N{U+202c}",
   glibc_time_format => "%H:%M:%S",
   language => "Pashto",
@@ -268,5 +268,5 @@
   time_format_medium => "H:mm:ss",
   time_format_short => "H:mm",
   variant => undef,
-  version => 37,
+  version => 38,
 }

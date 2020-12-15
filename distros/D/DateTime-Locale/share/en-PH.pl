@@ -130,11 +130,11 @@
     "Anno Domini",
   ],
   first_day_of_week => 7,
-  glibc_date_1_format => "%a %b %e %H:%M:%S %Z %Y",
+  glibc_date_1_format => "%A, %d %B, %Y %I:%M:%S %p %Z",
   glibc_date_format => "%A, %d %B, %Y",
-  glibc_datetime_format => "%A, %d %B, %Y %I:%M:%S %p %Z",
+  glibc_datetime_format => "%A, %d %B, %Y %I:%M:%S %p",
   glibc_time_12_format => "%I:%M:%S %p %Z",
-  glibc_time_format => "%I:%M:%S  %Z",
+  glibc_time_format => "%I:%M:%S %p %Z",
   language => "English",
   month_format_abbreviated => [
     "Jan",
@@ -269,5 +269,5 @@
   time_format_medium => "h:mm:ss a",
   time_format_short => "h:mm a",
   variant => undef,
-  version => 37,
+  version => 38,
 }

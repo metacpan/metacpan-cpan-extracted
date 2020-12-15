@@ -128,11 +128,11 @@
     "\N{U+0938}\N{U+0928}",
   ],
   first_day_of_week => 7,
-  glibc_date_1_format => "%a %b %e %H:%M:%S %Z %Y",
-  glibc_date_format => "%A %d %b %Y",
-  glibc_datetime_format => "%A %d %b %Y %I:%M:%S %p %Z",
+  glibc_date_1_format => "%A %d %b %Y %I:%M:%S %p %Z",
+  glibc_date_format => "%-m/%-d/%y",
+  glibc_datetime_format => "%A %d %b %Y %I:%M:%S %p",
   glibc_time_12_format => "%I:%M:%S %p %Z",
-  glibc_time_format => "%I:%M:%S  %Z",
+  glibc_time_format => "%I:%M:%S %p %Z",
   language => "Bodo",
   month_format_abbreviated => [
     "\N{U+091c}\N{U+093e}\N{U+0928}\N{U+0941}\N{U+0935}\N{U+093e}\N{U+0930}\N{U+0940}",
@@ -267,5 +267,5 @@
   time_format_medium => "h:mm:ss a",
   time_format_short => "h:mm a",
   variant => undef,
-  version => 37,
+  version => 38,
 }

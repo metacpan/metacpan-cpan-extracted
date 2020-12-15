@@ -131,11 +131,11 @@
     "\N{U+0b85}\N{U+0ba9}\N{U+0bcd}\N{U+0ba9}\N{U+0bcb} \N{U+0b9f}\N{U+0bcb}\N{U+0bae}\N{U+0bbf}\N{U+0ba9}\N{U+0bbf}",
   ],
   first_day_of_week => 7,
-  glibc_date_1_format => "%a %b %e %H:%M:%S %Z %Y",
-  glibc_date_format => "%A %d %B %Y",
-  glibc_datetime_format => "%A %d %B %Y %I:%M:%S %p %Z",
-  glibc_time_12_format => "%I:%M:%S %p %Z",
-  glibc_time_format => "%I:%M:%S  %Z",
+  glibc_date_1_format => "%A %d %B %Y %p %I:%M:%S %Z",
+  glibc_date_format => "%-d/%-m/%y",
+  glibc_datetime_format => "%A %d %B %Y %p %I:%M:%S",
+  glibc_time_12_format => "%p %I:%M:%S %Z",
+  glibc_time_format => "%p %I:%M:%S %Z",
   language => "Tamil",
   month_format_abbreviated => [
     "\N{U+0b9c}\N{U+0ba9}.",
@@ -270,5 +270,5 @@
   time_format_medium => "a h:mm:ss",
   time_format_short => "a h:mm",
   variant => undef,
-  version => 37,
+  version => 38,
 }

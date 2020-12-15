@@ -1,7 +1,7 @@
 {
   am_pm_abbreviated => [
-    "\N{U+1295}\N{U+1309}\N{U+1206} \N{U+1230}\N{U+12d3}\N{U+1270}",
-    "\N{U+12f5}\N{U+1215}\N{U+122d} \N{U+1230}\N{U+12d3}\N{U+1275}",
+    "\N{U+1245} \N{U+134d}\N{U+122d}-\N{U+1218}\N{U+12d3}",
+    "\N{U+12f0}\N{U+1215} \N{U+134d}\N{U+122d}-\N{U+1218}\N{U+12d3}",
   ],
   available_formats => {
     Bh => "h B",
@@ -15,7 +15,7 @@
     Ed => "d, E",
     Ehm => "E h:mm a",
     Ehms => "E h:mm:ss a",
-    Gy => "G y",
+    Gy => "y G",
     GyMMM => "G y MMM",
     GyMMMEd => "G y MMM d, E",
     GyMMMd => "G y MMM d",
@@ -128,7 +128,7 @@
     "\N{U+12d3}/\N{U+121d}",
   ],
   era_wide => [
-    "\N{U+12d3}/\N{U+12d3}",
+    "\N{U+1245}\N{U+12f5}\N{U+1218} \N{U+12ad}\N{U+122d}\N{U+1235}\N{U+1276}\N{U+1235}",
     "\N{U+12d3}\N{U+1218}\N{U+1270} \N{U+121d}\N{U+1205}\N{U+1228}\N{U+1275}",
   ],
   first_day_of_week => 1,
@@ -223,16 +223,16 @@
     "\N{U+1273}\N{U+1215}\N{U+1233}\N{U+1235}",
   ],
   name => "Tigrinya",
-  native_language => "\N{U+1275}\N{U+130d}\N{U+122d}\N{U+129b}",
-  native_name => "\N{U+1275}\N{U+130d}\N{U+122d}\N{U+129b}",
+  native_language => "\N{U+1275}\N{U+130d}\N{U+122d}",
+  native_name => "\N{U+1275}\N{U+130d}\N{U+122d}",
   native_script => undef,
   native_territory => undef,
   native_variant => undef,
   quarter_format_abbreviated => [
-    "\N{U+122d}1",
-    "\N{U+122d}2",
-    "\N{U+122d}3",
-    "\N{U+122d}4",
+    "\N{U+1240}\N{U+12f3}\N{U+121b}\N{U+12ed} \N{U+122d}\N{U+1265}\N{U+12d2}",
+    "\N{U+12ab}\N{U+120d}\N{U+12a3}\N{U+12ed} \N{U+122d}\N{U+1265}\N{U+12d2}",
+    "\N{U+1233}\N{U+120d}\N{U+1233}\N{U+12ed} \N{U+122d}\N{U+1265}\N{U+12d2}",
+    "\N{U+122b}\N{U+1265}\N{U+12d3}\N{U+12ed} \N{U+122d}\N{U+1265}\N{U+12d2}",
   ],
   quarter_format_narrow => [
     1,
@@ -271,5 +271,5 @@
   time_format_medium => "h:mm:ss a",
   time_format_short => "h:mm a",
   variant => undef,
-  version => 37,
+  version => 38,
 }

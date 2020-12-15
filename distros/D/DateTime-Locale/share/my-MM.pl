@@ -128,9 +128,9 @@
     "\N{U+1001}\N{U+101b}\N{U+1005}\N{U+103a}\N{U+1014}\N{U+103e}\N{U+1005}\N{U+103a}",
   ],
   first_day_of_week => 7,
-  glibc_date_1_format => "%a %b %e %H:%M:%S %Z %Y",
+  glibc_date_1_format => "%OC%Oy %b %Od %A %OI:%OM:%OS %p %Z",
   glibc_date_format => "%OC%Oy %b %Od %A",
-  glibc_datetime_format => "%OC%Oy %b %Od %A %OI:%OM:%OS %Op %Z",
+  glibc_datetime_format => "%OC%Oy %b %Od %A %OI:%OM:%OS %p",
   glibc_time_12_format => "%OI:%OM:%OS %p",
   glibc_time_format => "%OI:%OM:%OS %p",
   language => "Burmese",
@@ -267,5 +267,5 @@
   time_format_medium => "B HH:mm:ss",
   time_format_short => "B H:mm",
   variant => undef,
-  version => 37,
+  version => 38,
 }

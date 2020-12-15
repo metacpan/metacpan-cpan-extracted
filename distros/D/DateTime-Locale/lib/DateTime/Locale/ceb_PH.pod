@@ -108,14 +108,14 @@ Cebuano Philippines locale.
 
 =head3 Abbreviated (format)
 
-  En
+  Ene
   Peb
   Mar
-  Apr
+  Abr
   May
   Hun
   Hul
-  Ag
+  Ago
   Set
   Okt
   Nob
@@ -237,12 +237,12 @@ Cebuano Philippines locale.
 =head3 Abbreviated (format)
 
   BC
-  KP
+  AD
 
 =head3 Narrow (format)
 
   BC
-  KP
+  AD
 
 =head2 Date Formats
 
@@ -393,28 +393,28 @@ Cebuano Philippines locale.
    1995-12-22T09:05:02 = Biy 9:05:02 AM
   -0010-09-15T04:44:23 = Sab 4:44:23 AM
 
-=head3 Gy (G y)
+=head3 Gy (y G)
 
-   2008-02-05T18:30:30 = KP 2008
-   1995-12-22T09:05:02 = KP 1995
-  -0010-09-15T04:44:23 = BC -10
+   2008-02-05T18:30:30 = 2008 AD
+   1995-12-22T09:05:02 = 1995 AD
+  -0010-09-15T04:44:23 = -10 BC
 
 =head3 GyMMM (MMM y G)
 
-   2008-02-05T18:30:30 = Peb 2008 KP
-   1995-12-22T09:05:02 = Dis 1995 KP
+   2008-02-05T18:30:30 = Peb 2008 AD
+   1995-12-22T09:05:02 = Dis 1995 AD
   -0010-09-15T04:44:23 = Set -10 BC
 
 =head3 GyMMMEd (E, MMM d, y G)
 
-   2008-02-05T18:30:30 = Mar, Peb 5, 2008 KP
-   1995-12-22T09:05:02 = Biy, Dis 22, 1995 KP
+   2008-02-05T18:30:30 = Mar, Peb 5, 2008 AD
+   1995-12-22T09:05:02 = Biy, Dis 22, 1995 AD
   -0010-09-15T04:44:23 = Sab, Set 15, -10 BC
 
 =head3 GyMMMd (MMM d, y G)
 
-   2008-02-05T18:30:30 = Peb 5, 2008 KP
-   1995-12-22T09:05:02 = Dis 22, 1995 KP
+   2008-02-05T18:30:30 = Peb 5, 2008 AD
+   1995-12-22T09:05:02 = Dis 22, 1995 AD
   -0010-09-15T04:44:23 = Set 15, -10 BC
 
 =head3 H (HH)

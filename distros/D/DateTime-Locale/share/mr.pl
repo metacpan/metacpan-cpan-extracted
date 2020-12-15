@@ -1,7 +1,7 @@
 {
   am_pm_abbreviated => [
-    "\N{U+092e}.\N{U+092a}\N{U+0942}.",
-    "\N{U+092e}.\N{U+0909}.",
+    "AM",
+    "PM",
   ],
   available_formats => {
     Bh => "B h",
@@ -270,5 +270,5 @@
   time_format_medium => "h:mm:ss a",
   time_format_short => "h:mm a",
   variant => undef,
-  version => 37,
+  version => 38,
 }

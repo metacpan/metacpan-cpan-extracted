@@ -24,7 +24,7 @@ my %WriteMakefileArgs = (
     "Test::More" => "0.92",
     "Test::WWW::Mechanize::PSGI" => 0
   },
-  "VERSION" => "0.1.1",
+  "VERSION" => "0.2.1",
   "test" => {
     "TESTS" => "t/*.t"
   }

@@ -132,11 +132,11 @@
     "\N{U+0996}\N{U+09cd}\N{U+09b0}\N{U+09c0}\N{U+09b7}\N{U+09cd}\N{U+099f}\N{U+09be}\N{U+09ac}\N{U+09cd}\N{U+09a6}",
   ],
   first_day_of_week => 7,
-  glibc_date_1_format => "%a %b %e %H:%M:%S %Z %Y",
-  glibc_date_format => "%A %d %b %Y",
-  glibc_datetime_format => "%A %d %b %Y %I:%M:%S %p %Z",
+  glibc_date_1_format => "%A %d %b %Y %I:%M:%S %p %Z",
+  glibc_date_format => "%-d/%-m/%y",
+  glibc_datetime_format => "%A %d %b %Y %I:%M:%S %p",
   glibc_time_12_format => "%I:%M:%S %p %Z",
-  glibc_time_format => "%I:%M:%S  %Z",
+  glibc_time_format => "%I:%M:%S %p %Z",
   language => "Bangla",
   month_format_abbreviated => [
     "\N{U+099c}\N{U+09be}\N{U+09a8}\N{U+09c1}",
@@ -271,5 +271,5 @@
   time_format_medium => "h:mm:ss a",
   time_format_short => "h:mm a",
   variant => undef,
-  version => 37,
+  version => 38,
 }

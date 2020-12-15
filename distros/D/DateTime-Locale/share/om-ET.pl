@@ -135,8 +135,8 @@
   glibc_date_1_format => "%A, %B %e, %r %Z %Y",
   glibc_date_format => "%d/%m/%Y",
   glibc_datetime_format => "%A, %B %e, %Y %r %Z",
-  glibc_time_12_format => "%X %p",
-  glibc_time_format => "%l:%M:%S",
+  glibc_time_12_format => "%l:%M:%S %p",
+  glibc_time_format => "%l:%M:%S %p",
   language => "Oromo",
   month_format_abbreviated => [
     "Ama",
@@ -271,5 +271,5 @@
   time_format_medium => "h:mm:ss a",
   time_format_short => "h:mm a",
   variant => undef,
-  version => 37,
+  version => 38,
 }

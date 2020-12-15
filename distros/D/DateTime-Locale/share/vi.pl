@@ -120,15 +120,15 @@
   ],
   era_abbreviated => [
     "Tr\N{U+01b0}\N{U+1edb}c CN",
-    "sau CN",
+    "Sau CN",
   ],
   era_narrow => [
     "tr. CN",
     "sau CN",
   ],
   era_wide => [
-    "Tr\N{U+01b0}\N{U+1edb}c CN",
-    "sau CN",
+    "Tr\N{U+01b0}\N{U+1edb}c Thi\N{U+00ea}n Ch\N{U+00fa}a",
+    "Sau C\N{U+00f4}ng Nguy\N{U+00ea}n",
   ],
   first_day_of_week => 1,
   glibc_date_1_format => "%a %b %e %H:%M:%S %Z %Y",
@@ -270,5 +270,5 @@
   time_format_medium => "HH:mm:ss",
   time_format_short => "HH:mm",
   variant => undef,
-  version => 37,
+  version => 38,
 }

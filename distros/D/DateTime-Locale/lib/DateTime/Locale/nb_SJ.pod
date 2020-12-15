@@ -302,9 +302,9 @@ Norwegian Bokmål Svalbard & Jan Mayen locale.
 
 =head3 Full
 
-   2008-02-05T18:30:30 = tirsdag 5. februar 2008 18:30:30 UTC
-   1995-12-22T09:05:02 = fredag 22. desember 1995 09:05:02 UTC
-  -0010-09-15T04:44:23 = lørdag 15. september -10 04:44:23 UTC
+   2008-02-05T18:30:30 = tirsdag 5. februar 2008 kl. 18:30:30 UTC
+   1995-12-22T09:05:02 = fredag 22. desember 1995 kl. 09:05:02 UTC
+  -0010-09-15T04:44:23 = lørdag 15. september -10 kl. 04:44:23 UTC
 
 =head3 Long
 
@@ -363,17 +363,17 @@ Norwegian Bokmål Svalbard & Jan Mayen locale.
    1995-12-22T09:05:02 = fre. 9:05:02 B
   -0010-09-15T04:44:23 = lør. 4:44:23 B
 
-=head3 EHm (E HH:mm)
+=head3 EHm (E 'kl'. HH:mm)
 
-   2008-02-05T18:30:30 = tir. 18:30
-   1995-12-22T09:05:02 = fre. 09:05
-  -0010-09-15T04:44:23 = lør. 04:44
+   2008-02-05T18:30:30 = tir. kl. 18:30
+   1995-12-22T09:05:02 = fre. kl. 09:05
+  -0010-09-15T04:44:23 = lør. kl. 04:44
 
-=head3 EHms (E HH:mm:ss)
+=head3 EHms (E 'kl'. HH:mm:ss)
 
-   2008-02-05T18:30:30 = tir. 18:30:30
-   1995-12-22T09:05:02 = fre. 09:05:02
-  -0010-09-15T04:44:23 = lør. 04:44:23
+   2008-02-05T18:30:30 = tir. kl. 18:30:30
+   1995-12-22T09:05:02 = fre. kl. 09:05:02
+  -0010-09-15T04:44:23 = lør. kl. 04:44:23
 
 =head3 Ed (E d.)
 
@@ -561,11 +561,11 @@ Norwegian Bokmål Svalbard & Jan Mayen locale.
    1995-12-22T09:05:02 = 12.1995
   -0010-09-15T04:44:23 = 9.-10
 
-=head3 yMEd (E d.MM.y)
+=head3 yMEd (E d.M.y)
 
-   2008-02-05T18:30:30 = tir. 5.02.2008
+   2008-02-05T18:30:30 = tir. 5.2.2008
    1995-12-22T09:05:02 = fre. 22.12.1995
-  -0010-09-15T04:44:23 = lør. 15.09.-10
+  -0010-09-15T04:44:23 = lør. 15.9.-10
 
 =head3 yMM (MM.y)
 

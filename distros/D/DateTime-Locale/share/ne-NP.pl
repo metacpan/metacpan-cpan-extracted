@@ -129,8 +129,8 @@
     "\N{U+0938}\N{U+0928}\N{U+094d}",
   ],
   first_day_of_week => 7,
-  glibc_date_1_format => "%a %b %e %H:%M:%S %Z %Y",
-  glibc_date_format => "%Y %B %d %A",
+  glibc_date_1_format => "%Y %B %d %I:%M:%S %p %Z",
+  glibc_date_format => "%y/%-m/%-d",
   glibc_datetime_format => "%Y %B %d %I:%M:%S %p",
   glibc_time_12_format => "%I:%M:%S %p",
   glibc_time_format => "%H:%M:%S",
@@ -268,5 +268,5 @@
   time_format_medium => "HH:mm:ss",
   time_format_short => "HH:mm",
   variant => undef,
-  version => 37,
+  version => 38,
 }

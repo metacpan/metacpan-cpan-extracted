@@ -1,7 +1,7 @@
 {
   am_pm_abbreviated => [
-    "a.m.",
-    "p.m.",
+    "a.\N{U+00a0}m.",
+    "p.\N{U+00a0}m.",
   ],
   available_formats => {
     Bh => "h B",
@@ -53,12 +53,12 @@
     yM => "M/y",
     yMEd => "E d/M/y",
     yMM => "M/y",
-    yMMM => "MMMM 'de' y",
+    yMMM => "MMM 'de' y",
     yMMMEd => "E, d 'de' MMM 'de' y",
     yMMMM => "MMMM 'de' y",
     yMMMMEd => "EEE, d 'de' MMMM 'de' y",
     yMMMMd => "d 'de' MMMM 'de' y",
-    yMMMd => "d 'de' MMMM 'de' y",
+    yMMMd => "d 'de' MMM 'de' y",
     yMd => "d/M/y",
     yQQQ => "QQQ 'de' y",
     yQQQQ => "QQQQ 'de' y",
@@ -75,13 +75,13 @@
   datetime_format_medium => "{1} {0}",
   datetime_format_short => "{1} {0}",
   day_format_abbreviated => [
-    "lun.",
-    "mar.",
-    "mi\N{U+00e9}.",
-    "jue.",
-    "vie.",
-    "s\N{U+00e1}b.",
-    "dom.",
+    "lun",
+    "mar",
+    "mi\N{U+00e9}",
+    "jue",
+    "vie",
+    "s\N{U+00e1}b",
+    "dom",
   ],
   day_format_narrow => [
     "l",
@@ -280,5 +280,5 @@
   time_format_medium => "HH:mm:ss",
   time_format_short => "HH:mm",
   variant => undef,
-  version => 37,
+  version => 38,
 }

@@ -267,10 +267,10 @@
   ],
   script => undef,
   territory => undef,
-  time_format_full => "'kl'. HH:mm:ss zzzz",
+  time_format_full => "HH:mm:ss zzzz",
   time_format_long => "HH:mm:ss z",
   time_format_medium => "HH:mm:ss",
   time_format_short => "HH:mm",
   variant => undef,
-  version => 37,
+  version => 38,
 }

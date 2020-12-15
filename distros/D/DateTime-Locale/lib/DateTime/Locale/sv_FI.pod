@@ -275,9 +275,9 @@ Swedish Finland locale.
 
 =head3 Full
 
-   2008-02-05T18:30:30 = kl. 18:30:30 UTC
-   1995-12-22T09:05:02 = kl. 09:05:02 UTC
-  -0010-09-15T04:44:23 = kl. 04:44:23 UTC
+   2008-02-05T18:30:30 = 18:30:30 UTC
+   1995-12-22T09:05:02 = 09:05:02 UTC
+  -0010-09-15T04:44:23 = 04:44:23 UTC
 
 =head3 Long
 
@@ -302,9 +302,9 @@ Swedish Finland locale.
 
 =head3 Full
 
-   2008-02-05T18:30:30 = tisdag 5 februari 2008 kl. 18:30:30 UTC
-   1995-12-22T09:05:02 = fredag 22 december 1995 kl. 09:05:02 UTC
-  -0010-09-15T04:44:23 = lördag 15 september -10 kl. 04:44:23 UTC
+   2008-02-05T18:30:30 = tisdag 5 februari 2008 18:30:30 UTC
+   1995-12-22T09:05:02 = fredag 22 december 1995 09:05:02 UTC
+  -0010-09-15T04:44:23 = lördag 15 september -10 04:44:23 UTC
 
 =head3 Long
 

@@ -68,6 +68,24 @@ has _source_data_root => (
     builder => '_build_source_data_root',
 );
 
+has _glibc_root => (
+    is      => 'ro',
+    isa     => t('Dir'),
+    lazy    => 1,
+    default => sub ($self) {
+        $self->_source_data_root->child('glibc-locales');
+    },
+);
+
+has _cldr_root => (
+    is      => 'ro',
+    isa     => t('Dir'),
+    lazy    => 1,
+    default => sub ($self) {
+        $self->_source_data_root->child(qw( cldr-json cldr-json ));
+    },
+);
+
 has _locale_codes => (
     is      => 'ro',
     isa     => t( 'ArrayRef', of => t('Str') ),
@@ -83,6 +101,9 @@ has _locales => (
 );
 
 sub run ($self) {
+    binmode STDOUT, ':encoding(UTF-8)'
+        or die $!;
+
     $self->_clean_old_data;
     $self->_locales;
     $self->_write_data_files;
@@ -106,8 +127,9 @@ sub _build_locales ($self) {
     my @locales;
     for my $code ( $self->_locale_codes->@* ) {
         my $locale = ModuleGenerator::Locale->instance(
-            code             => $code,
-            source_data_root => $self->_source_data_root,
+            code       => $code,
+            cldr_root  => $self->_cldr_root,
+            glibc_root => $self->_glibc_root,
         );
 
         ## no critic (InputOutput::RequireCheckedSyscalls)
@@ -382,7 +404,7 @@ sub _write_pod_files ($self) {
             HASH => {
                 autogen_warning => $self->_autogen_warning,
                 name            => 'DateTime::Locale::' . $underscore,
-                description =>
+                description     =>
                     "Locale data examples for the $name ($code) locale",
                 example_dts => \@example_dts,
                 locale      => \$locale,
@@ -400,7 +422,7 @@ sub _build_generator_script {
 }
 
 sub _build_source_data_root ($self) {
-    return $self->_generator_script->parent->parent->child('source-data');
+    return $self->_generator_script->parent->parent->child(qw( source-data ));
 }
 
 sub _build_locale_codes ($self) {
@@ -409,14 +431,14 @@ sub _build_locale_codes ($self) {
     return [ uniq( 'en-US', @{ $self->_only_locales } ) ]
         if $self->_has_only_locales;
 
-    my $avail = decode_json(
-        $self->_source_data_root->child(
-            qw( cldr-core availableLocales.json ))->slurp_raw
-    );
+    my $avail
+        = decode_json(
+        $self->_cldr_root->child(qw( cldr-core availableLocales.json ))
+            ->slurp_raw );
 
     my $default
         = decode_json(
-        $self->_source_data_root->child(qw( cldr-core defaultContent.json ))
+        $self->_cldr_root->child(qw( cldr-core defaultContent.json ))
             ->slurp_raw );
 
     return [

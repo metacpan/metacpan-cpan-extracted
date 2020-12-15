@@ -129,9 +129,9 @@
     "\N{U+0996}\N{U+09cd}\N{U+09f0}\N{U+09c0}\N{U+09b7}\N{U+09cd}\N{U+099f}\N{U+09be}\N{U+09ac}\N{U+09cd}\N{U+09a6}",
   ],
   first_day_of_week => 7,
-  glibc_date_1_format => "%a %b %e %H:%M:%S %Z %Y",
+  glibc_date_1_format => "%e %B, %Y %I.%M.%S %p %Z",
   glibc_date_format => "%e-%m-%Y",
-  glibc_datetime_format => "%e %B, %Y %I.%M.%S %p %Z",
+  glibc_datetime_format => "%e %B, %Y %I.%M.%S %p",
   glibc_time_12_format => "%I.%M.%S %p",
   glibc_time_format => "%I.%M.%S %p",
   language => "Assamese",
@@ -268,5 +268,5 @@
   time_format_medium => "a h.mm.ss",
   time_format_short => "a h.mm",
   variant => undef,
-  version => 37,
+  version => 38,
 }

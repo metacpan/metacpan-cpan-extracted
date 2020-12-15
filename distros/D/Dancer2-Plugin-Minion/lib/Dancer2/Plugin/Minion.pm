@@ -34,11 +34,11 @@ has 'minion' => (
 );
 
 sub add_task {
-    return $_[0]->minion->add_task( @_ );
+    return shift->minion->add_task( @_ );
 }
 
 sub enqueue {
-    return $_[0]->minion->enqueue( $_[1] );
+    return shift->minion->enqueue( @_ );
 }
 
 1;
@@ -55,7 +55,7 @@ Dancer2::Plugin::Minion - Use the Minion job queue in your Dancer2 apps.
 
 =head1 VERSION
 
-version 0.1.1
+version 0.2.1
 
 =head1 SYNOPSIS
 
@@ -140,7 +140,7 @@ lines of code:
 
     minion->add_task( my_job_1 => MyJobLib::job1());
 
-    my $worker = Minion::Worker->new( minion );
+    my $worker = minion->worker;
     $worker->run;
 
 By using C<Dancer2::Plugin::Minion>, your worker will be configured with 
@@ -166,6 +166,17 @@ Jason A. Crome C< cromedome AT cpan DOT org >
 I'd like to extend a hearty thanks to my employer, Clearbuilt Technologies,
 for giving me the necessary time and support for this module to come to
 life.
+
+The following contributors have sent patches, suggestions, or bug reports that
+led to the improvement of this plugin:
+
+=over 4
+
+=item * Gabor Szabo
+=item * Joel Berger
+=item * Slaven Rezić
+
+=back
 
 =head1 COPYRIGHT AND LICENSE
 

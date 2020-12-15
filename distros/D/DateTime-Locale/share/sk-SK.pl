@@ -137,10 +137,10 @@
     "po Kristovi",
   ],
   first_day_of_week => 1,
-  glibc_date_1_format => "%a %b %e %H:%M:%S %Z %Y",
+  glibc_date_1_format => "%a\240%e.\240%B\240%Y,\240%H:%M:%S\240%Z",
   glibc_date_format => "%d.%m.%Y",
-  glibc_datetime_format => "%a\240%e.\240%B\240%Y,\240%H:%M:%S\240%Z",
-  glibc_time_12_format => "%I:%M:%S",
+  glibc_datetime_format => "%a\240%e.\240%B\240%Y,\240%H:%M:%S",
+  glibc_time_12_format => "%I:%M:%S %p",
   glibc_time_format => "%H:%M:%S",
   language => "Slovak",
   month_format_abbreviated => [
@@ -276,5 +276,5 @@
   time_format_medium => "H:mm:ss",
   time_format_short => "H:mm",
   variant => undef,
-  version => 37,
+  version => 38,
 }

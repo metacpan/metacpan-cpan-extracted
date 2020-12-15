@@ -63,7 +63,7 @@
   date_format_short => "y-MM-dd",
   datetime_format_full => "{1} '\N{U+00e0}' {0}",
   datetime_format_long => "{1} '\N{U+00e0}' {0}",
-  datetime_format_medium => "{1} {0}",
+  datetime_format_medium => "{1}, {0}",
   datetime_format_short => "{1} {0}",
   day_format_abbreviated => [
     "lun.",
@@ -132,9 +132,9 @@
     "apr\N{U+00e8}s J\N{U+00e9}sus-Christ",
   ],
   first_day_of_week => 7,
-  glibc_date_1_format => "%a %b %e %H:%M:%S %Z %Y",
+  glibc_date_1_format => "%a %d %b %Y %T %Z",
   glibc_date_format => "%Y-%m-%d",
-  glibc_datetime_format => "%a %d %b %Y %T %Z",
+  glibc_datetime_format => "%a %d %b %Y %T",
   glibc_time_12_format => "%I:%M:%S %p",
   glibc_time_format => "%T",
   language => "French",
@@ -271,5 +271,5 @@
   time_format_medium => "HH 'h' mm 'min' ss 's'",
   time_format_short => "HH 'h' mm",
   variant => undef,
-  version => 37,
+  version => 38,
 }

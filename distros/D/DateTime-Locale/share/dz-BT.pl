@@ -127,7 +127,7 @@
     "CE",
   ],
   first_day_of_week => 7,
-  glibc_date_1_format => "%a %b %e %H:%M:%S %Z %Y",
+  glibc_date_1_format => "\N{U+0f54}\N{U+0f66}\N{U+0fb1}\N{U+0f72}\N{U+0f0b}\N{U+0f63}\N{U+0f7c}%y\N{U+0f5f}\N{U+0f63}%m\N{U+0f5a}\N{U+0f7a}\N{U+0f66}%d\N{U+0f46}\N{U+0f74}\N{U+0f0b}\N{U+0f5a}\N{U+0f7c}\N{U+0f51}%H\N{U+0f40}\N{U+0f66}\N{U+0f62}\N{U+0f0b}\N{U+0f58}%M\N{U+0f40}\N{U+0f66}\N{U+0f62}\N{U+0f0b}\N{U+0f46}%S",
   glibc_date_format => "\N{U+0f54}\N{U+0f66}\N{U+0fb1}\N{U+0f72}\N{U+0f0b}\N{U+0f63}\N{U+0f7c}%y\N{U+0f5f}\N{U+0f63}%m\N{U+0f5a}\N{U+0f7a}\N{U+0f66}%d",
   glibc_datetime_format => "\N{U+0f54}\N{U+0f66}\N{U+0fb1}\N{U+0f72}\N{U+0f0b}\N{U+0f63}\N{U+0f7c}%y\N{U+0f5f}\N{U+0f63}%m\N{U+0f5a}\N{U+0f7a}\N{U+0f66}%d\N{U+0f46}\N{U+0f74}\N{U+0f0b}\N{U+0f5a}\N{U+0f7c}\N{U+0f51}%H\N{U+0f40}\N{U+0f66}\N{U+0f62}\N{U+0f0b}\N{U+0f58}%M\N{U+0f40}\N{U+0f66}\N{U+0f62}\N{U+0f0b}\N{U+0f46}%S",
   glibc_time_12_format => "\N{U+0f46}\N{U+0f74}\N{U+0f0b}\N{U+0f5a}\N{U+0f7c}\N{U+0f51}%I\N{U+0f40}\N{U+0f66}\N{U+0f62}\N{U+0f0b}\N{U+0f58}%M\N{U+0f40}\N{U+0f66}\N{U+0f62}\N{U+0f0b}\N{U+0f46}%S %p",
@@ -266,5 +266,5 @@
   time_format_medium => "\N{U+0f46}\N{U+0f74}\N{U+0f0b}\N{U+0f5a}\N{U+0f7c}\N{U+0f51}\N{U+0f0b}h:mm:ss a",
   time_format_short => "\N{U+0f46}\N{U+0f74}\N{U+0f0b}\N{U+0f5a}\N{U+0f7c}\N{U+0f51}\N{U+0f0b} h \N{U+0f66}\N{U+0f90}\N{U+0f62}\N{U+0f0b}\N{U+0f58}\N{U+0f0b} mm a",
   variant => undef,
-  version => 37,
+  version => 38,
 }

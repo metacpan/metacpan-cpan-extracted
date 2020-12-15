@@ -133,11 +133,11 @@
     "Wara Kristu",
   ],
   first_day_of_week => 7,
-  glibc_date_1_format => "%a %b %e %H:%M:%S %Z %Y",
+  glibc_date_1_format => "%A, %d ta %b, %Y %H:%M:%S %Z",
   glibc_date_format => "%A, %d ta %b, %Y",
-  glibc_datetime_format => "%A, %d ta %b, %Y %I:%M:%S %p %Z",
-  glibc_time_12_format => "%I:%M:%S %p %Z",
-  glibc_time_format => "%I:%M:%S  %Z",
+  glibc_datetime_format => "%A, %d ta %b, %Y %H:%M:%S",
+  glibc_time_12_format => "%I:%M:%S %p",
+  glibc_time_format => "%H:%M:%S %Z",
   language => "Maltese",
   month_format_abbreviated => [
     "Jan",
@@ -272,5 +272,5 @@
   time_format_medium => "HH:mm:ss",
   time_format_short => "HH:mm",
   variant => undef,
-  version => 37,
+  version => 38,
 }

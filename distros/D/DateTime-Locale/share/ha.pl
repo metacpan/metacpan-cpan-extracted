@@ -1,7 +1,7 @@
 {
   am_pm_abbreviated => [
-    "AM",
-    "PM",
+    "SF",
+    "YM",
   ],
   available_formats => {
     Bh => "h B",
@@ -29,7 +29,8 @@
     MMM => "LLL",
     MMMEd => "E, MMM d",
     MMMMEd => "E, MMMM d",
-    "MMMMW-count-other" => "'week' W 'of' MMMM",
+    "MMMMW-count-one" => "'satin' W 'cikin' MMMM",
+    "MMMMW-count-other" => "'satin' W 'cikin' MMMM",
     MMMMd => "MMMM d",
     MMMd => "MMM d",
     Md => "M/d",
@@ -50,7 +51,8 @@
     yMd => "y-MM-dd",
     yQQQ => "QQQ y",
     yQQQQ => "QQQQ y",
-    "yw-count-other" => "'week' w 'of' Y",
+    "yw-count-one" => "'sati' w 'cikin' Y",
+    "yw-count-other" => "'sati' w 'cikin' Y",
   },
   code => "ha",
   date_format_full => "EEEE d MMMM, y",
@@ -58,9 +60,9 @@
   date_format_medium => "d MMM, y",
   date_format_short => "d/M/yy",
   datetime_format_full => "{1} {0}",
-  datetime_format_long => "{1} {0}",
-  datetime_format_medium => "{1} {0}",
-  datetime_format_short => "{1} {0}",
+  datetime_format_long => "{1} 'da' {0}",
+  datetime_format_medium => "{1}, {0}",
+  datetime_format_short => "{1}, {0}",
   day_format_abbreviated => [
     "Lit",
     "Tal",
@@ -267,5 +269,5 @@
   time_format_medium => "HH:mm:ss",
   time_format_short => "HH:mm",
   variant => undef,
-  version => 37,
+  version => 38,
 }

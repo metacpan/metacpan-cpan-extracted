@@ -129,11 +129,11 @@
     "\N{U+0632}\N{U+0627}\N{U+06cc}\N{U+06cc}\N{U+0646}\N{U+06cc}",
   ],
   first_day_of_week => 6,
-  glibc_date_1_format => "%a %b %e %H:%M:%S %Z %Y",
-  glibc_date_format => "%m/%d/%y",
-  glibc_datetime_format => "%a %b %e %H:%M:%S %Y",
+  glibc_date_1_format => "%A %d %B %Y, %Z %I:%M:%S %p",
+  glibc_date_format => "%A %d %b %Y",
+  glibc_datetime_format => "%A %d %b %Y, %I:%M:%S %p",
   glibc_time_12_format => "%I:%M:%S %p",
-  glibc_time_format => "%H:%M:%S",
+  glibc_time_format => "%Z %I:%M:%S %p",
   language => "Central Kurdish",
   month_format_abbreviated => [
     "\N{U+06a9}\N{U+0627}\N{U+0646}\N{U+0648}\N{U+0648}\N{U+0646}\N{U+06cc} \N{U+062f}\N{U+0648}\N{U+0648}\N{U+06d5}\N{U+0645}",
@@ -268,5 +268,5 @@
   time_format_medium => "h:mm:ss a",
   time_format_short => "h:mm a",
   variant => undef,
-  version => 37,
+  version => 38,
 }

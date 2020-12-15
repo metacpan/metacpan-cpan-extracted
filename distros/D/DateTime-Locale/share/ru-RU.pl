@@ -135,7 +135,7 @@
     "\N{U+043e}\N{U+0442} \N{U+0420}\N{U+043e}\N{U+0436}\N{U+0434}\N{U+0435}\N{U+0441}\N{U+0442}\N{U+0432}\N{U+0430} \N{U+0425}\N{U+0440}\N{U+0438}\N{U+0441}\N{U+0442}\N{U+043e}\N{U+0432}\N{U+0430}",
   ],
   first_day_of_week => 1,
-  glibc_date_1_format => "%a %b %e %H:%M:%S %Z %Y",
+  glibc_date_1_format => "%a %d %b %Y %T %Z",
   glibc_date_format => "%d.%m.%Y",
   glibc_datetime_format => "%a %d %b %Y %T",
   glibc_time_12_format => "%I:%M:%S %p",
@@ -274,5 +274,5 @@
   time_format_medium => "HH:mm:ss",
   time_format_short => "HH:mm",
   variant => undef,
-  version => 37,
+  version => 38,
 }

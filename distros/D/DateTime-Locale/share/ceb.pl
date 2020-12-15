@@ -15,7 +15,7 @@
     Ed => "d E",
     Ehm => "E h:mm a",
     Ehms => "E h:mm:ss a",
-    Gy => "G y",
+    Gy => "y G",
     GyMMM => "MMM y G",
     GyMMMEd => "E, MMM d, y G",
     GyMMMd => "MMM d, y G",
@@ -118,11 +118,11 @@
   ],
   era_abbreviated => [
     "BC",
-    "KP",
+    "AD",
   ],
   era_narrow => [
     "BC",
-    "KP",
+    "AD",
   ],
   era_wide => [
     "Sa Wala Pa Si Kristo",
@@ -136,14 +136,14 @@
   glibc_time_format => "%H:%M:%S",
   language => "Cebuano",
   month_format_abbreviated => [
-    "En",
+    "Ene",
     "Peb",
     "Mar",
-    "Apr",
+    "Abr",
     "May",
     "Hun",
     "Hul",
-    "Ag",
+    "Ago",
     "Set",
     "Okt",
     "Nob",
@@ -268,5 +268,5 @@
   time_format_medium => "h:mm:ss a",
   time_format_short => "h:mm a",
   variant => undef,
-  version => 37,
+  version => 38,
 }

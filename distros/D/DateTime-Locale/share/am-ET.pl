@@ -29,7 +29,8 @@
     MMM => "LLL",
     MMMEd => "E\N{U+1363} MMM d",
     MMMMEd => "E\N{U+1363} MMMM d",
-    "MMMMW-count-other" => "'week' W 'of' MMMM",
+    "MMMMW-count-one" => "\N{U+1233}\N{U+121d}\N{U+1295}\N{U+1275} W \N{U+12e8} MMMM",
+    "MMMMW-count-other" => "\N{U+1233}\N{U+121d}\N{U+1295}\N{U+1275} W \N{U+12e8} MMMM",
     MMMMd => "MMMM d",
     MMMd => "MMM d",
     Md => "M/d",
@@ -132,8 +133,8 @@
   glibc_date_1_format => "%A\N{U+1363} %B %e \N{U+1240}\N{U+1295} %r %Z %Y \N{U+12d3}/\N{U+121d}",
   glibc_date_format => "%d/%m/%Y",
   glibc_datetime_format => "%A\N{U+1363} %B %e \N{U+1240}\N{U+1295} %Y %r %Z",
-  glibc_time_12_format => "%X %p",
-  glibc_time_format => "%l:%M:%S",
+  glibc_time_12_format => "%l:%M:%S %p",
+  glibc_time_format => "%l:%M:%S %p",
   language => "Amharic",
   month_format_abbreviated => [
     "\N{U+1303}\N{U+1295}\N{U+12e9}",
@@ -268,5 +269,5 @@
   time_format_medium => "h:mm:ss a",
   time_format_short => "h:mm a",
   variant => undef,
-  version => 37,
+  version => 38,
 }

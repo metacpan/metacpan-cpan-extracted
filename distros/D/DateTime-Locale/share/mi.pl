@@ -218,8 +218,8 @@
     "Hakihea",
   ],
   name => "Maori",
-  native_language => "M\N{U+0101}ori",
-  native_name => "M\N{U+0101}ori",
+  native_language => "te reo M\N{U+0101}ori",
+  native_name => "te reo M\N{U+0101}ori",
   native_script => undef,
   native_territory => undef,
   native_variant => undef,
@@ -266,5 +266,5 @@
   time_format_medium => "h:mm:ss a",
   time_format_short => "h:mm a",
   variant => undef,
-  version => 37,
+  version => 38,
 }

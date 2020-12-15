@@ -140,16 +140,16 @@ Azerbaijani Latin locale.
 =head3 Wide (stand-alone)
 
   yanvar
-  Fevral
+  fevral
   mart
-  Aprel
-  May
-  İyun
-  İyul
-  Avqust
-  Sentyabr
-  Oktyabr
-  Noyabr
+  aprel
+  may
+  iyun
+  iyul
+  avqust
+  sentyabr
+  oktyabr
+  noyabr
   dekabr
 
 =head3 Abbreviated (stand-alone)

@@ -477,11 +477,11 @@ Lower Sorbian Germany locale.
    1995-12-22T09:05:02 = week 3 of decembra
   -0010-09-15T04:44:23 = week 2 of septembra
 
-=head3 MMMMd (MMMM d)
+=head3 MMMMd (d MMMM)
 
-   2008-02-05T18:30:30 = februara 5
-   1995-12-22T09:05:02 = decembra 22
-  -0010-09-15T04:44:23 = septembra 15
+   2008-02-05T18:30:30 = 5 februara
+   1995-12-22T09:05:02 = 22 decembra
+  -0010-09-15T04:44:23 = 15 septembra
 
 =head3 MMMd (d. MMM)
 
@@ -567,11 +567,11 @@ Lower Sorbian Germany locale.
    1995-12-22T09:05:02 = pět, 22. dec. 1995
   -0010-09-15T04:44:23 = sob, 15. sep. -10
 
-=head3 yMMMM (y MMMM)
+=head3 yMMMM (LLLL y)
 
-   2008-02-05T18:30:30 = 2008 februara
-   1995-12-22T09:05:02 = 1995 decembra
-  -0010-09-15T04:44:23 = -10 septembra
+   2008-02-05T18:30:30 = februar 2008
+   1995-12-22T09:05:02 = december 1995
+  -0010-09-15T04:44:23 = september -10
 
 =head3 yMMMd (d. MMM y)
 

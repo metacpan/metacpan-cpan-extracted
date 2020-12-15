@@ -131,11 +131,11 @@
     "mbas Krishtit",
   ],
   first_day_of_week => 1,
-  glibc_date_1_format => "%a %b %e %H:%M:%S %Z %Y",
-  glibc_date_format => "%Y-%b-%d",
-  glibc_datetime_format => "%Y-%b-%d %I.%M.%S.%p %Z",
-  glibc_time_12_format => "%I.%M.%S.%p %Z",
-  glibc_time_format => "%I.%M.%S. %Z",
+  glibc_date_1_format => "%a %-d %b %Y %I:%M:%S.%p %Z",
+  glibc_date_format => "%-d.%-m.%y",
+  glibc_datetime_format => "%a %-d %b %Y %I:%M:%S.%p",
+  glibc_time_12_format => "%I:%M:%S.%p %Z",
+  glibc_time_format => "%I:%M:%S.%p %Z",
   language => "Albanian",
   month_format_abbreviated => [
     "jan",
@@ -270,5 +270,5 @@
   time_format_medium => "h:mm:ss a",
   time_format_short => "h:mm a",
   variant => undef,
-  version => 37,
+  version => 38,
 }

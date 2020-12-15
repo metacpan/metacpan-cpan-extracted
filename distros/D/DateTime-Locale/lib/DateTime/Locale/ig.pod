@@ -46,7 +46,7 @@ Igbo locale.
   Tọọ
   Fraị
   Sat
-  Ụka
+  Sọn
 
 =head3 Narrow (format)
 
@@ -77,7 +77,7 @@ Igbo locale.
   Tọọ
   Fraị
   Sat
-  Ụka
+  Sọn
 
 =head3 Narrow (stand-alone)
 

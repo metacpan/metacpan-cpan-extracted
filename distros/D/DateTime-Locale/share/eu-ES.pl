@@ -131,9 +131,9 @@
     "Kristo ondoren",
   ],
   first_day_of_week => 1,
-  glibc_date_1_format => "%a %b %e %H:%M:%S %Z %Y",
+  glibc_date_1_format => "%y-%m-%d %T %Z",
   glibc_date_format => "%a, %Y.eko %bren %da",
-  glibc_datetime_format => "%y-%m-%d %T %Z",
+  glibc_datetime_format => "%y-%m-%d %T",
   glibc_time_12_format => "%I:%M:%S %p",
   glibc_time_format => "%T",
   language => "Basque",
@@ -270,5 +270,5 @@
   time_format_medium => "HH:mm:ss",
   time_format_short => "HH:mm",
   variant => undef,
-  version => 37,
+  version => 38,
 }

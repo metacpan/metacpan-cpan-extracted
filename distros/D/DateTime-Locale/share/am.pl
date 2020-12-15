@@ -29,7 +29,8 @@
     MMM => "LLL",
     MMMEd => "E\N{U+1363} MMM d",
     MMMMEd => "E\N{U+1363} MMMM d",
-    "MMMMW-count-other" => "'week' W 'of' MMMM",
+    "MMMMW-count-one" => "\N{U+1233}\N{U+121d}\N{U+1295}\N{U+1275} W \N{U+12e8} MMMM",
+    "MMMMW-count-other" => "\N{U+1233}\N{U+121d}\N{U+1295}\N{U+1275} W \N{U+12e8} MMMM",
     MMMMd => "MMMM d",
     MMMd => "MMM d",
     Md => "M/d",
@@ -268,5 +269,5 @@
   time_format_medium => "h:mm:ss a",
   time_format_short => "h:mm a",
   variant => undef,
-  version => 37,
+  version => 38,
 }

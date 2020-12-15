@@ -35,7 +35,7 @@ Kabuverdianu locale.
   kuarta-fera
   kinta-fera
   sesta-fera
-  sabadu
+  sábadu
   dumingu
 
 =head3 Abbreviated (format)
@@ -250,7 +250,7 @@ Kabuverdianu locale.
 
    2008-02-05T18:30:30 = tersa-fera, 5 di Febreru di 2008
    1995-12-22T09:05:02 = sesta-fera, 22 di Dizenbru di 1995
-  -0010-09-15T04:44:23 = sabadu, 15 di Setenbru di -10
+  -0010-09-15T04:44:23 = sábadu, 15 di Setenbru di -10
 
 =head3 Long
 
@@ -304,7 +304,7 @@ Kabuverdianu locale.
 
    2008-02-05T18:30:30 = tersa-fera, 5 di Febreru di 2008, 18:30:30 UTC
    1995-12-22T09:05:02 = sesta-fera, 22 di Dizenbru di 1995, 09:05:02 UTC
-  -0010-09-15T04:44:23 = sabadu, 15 di Setenbru di -10, 04:44:23 UTC
+  -0010-09-15T04:44:23 = sábadu, 15 di Setenbru di -10, 04:44:23 UTC
 
 =head3 Long
 

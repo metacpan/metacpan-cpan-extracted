@@ -621,35 +621,35 @@ Irish United Kingdom locale.
    1995-12-22T09:05:02 = 4ú ráithe 1995
   -0010-09-15T04:44:23 = 3ú ráithe -10
 
-=head3 yw-count-few ('seachtain' 'a' w 'i' Y)
+=head3 yw-count-few ('seachtain' 'a' w 'in' Y)
 
-   2008-02-05T18:30:30 = seachtain a 6 i 2008
-   1995-12-22T09:05:02 = seachtain a 51 i 1995
-  -0010-09-15T04:44:23 = seachtain a 37 i -10
+   2008-02-05T18:30:30 = seachtain a 6 in 2008
+   1995-12-22T09:05:02 = seachtain a 51 in 1995
+  -0010-09-15T04:44:23 = seachtain a 37 in -10
 
-=head3 yw-count-many ('seachtain' 'a' w 'i' Y)
+=head3 yw-count-many ('seachtain' 'a' w 'in' Y)
 
-   2008-02-05T18:30:30 = seachtain a 6 i 2008
-   1995-12-22T09:05:02 = seachtain a 51 i 1995
-  -0010-09-15T04:44:23 = seachtain a 37 i -10
+   2008-02-05T18:30:30 = seachtain a 6 in 2008
+   1995-12-22T09:05:02 = seachtain a 51 in 1995
+  -0010-09-15T04:44:23 = seachtain a 37 in -10
 
-=head3 yw-count-one ('seachtain' 'a' w 'i' Y)
+=head3 yw-count-one ('seachtain' 'a' w 'in' Y)
 
-   2008-02-05T18:30:30 = seachtain a 6 i 2008
-   1995-12-22T09:05:02 = seachtain a 51 i 1995
-  -0010-09-15T04:44:23 = seachtain a 37 i -10
+   2008-02-05T18:30:30 = seachtain a 6 in 2008
+   1995-12-22T09:05:02 = seachtain a 51 in 1995
+  -0010-09-15T04:44:23 = seachtain a 37 in -10
 
-=head3 yw-count-other ('seachtain' 'a' w 'i' Y)
+=head3 yw-count-other ('seachtain' 'a' w 'in' Y)
 
-   2008-02-05T18:30:30 = seachtain a 6 i 2008
-   1995-12-22T09:05:02 = seachtain a 51 i 1995
-  -0010-09-15T04:44:23 = seachtain a 37 i -10
+   2008-02-05T18:30:30 = seachtain a 6 in 2008
+   1995-12-22T09:05:02 = seachtain a 51 in 1995
+  -0010-09-15T04:44:23 = seachtain a 37 in -10
 
-=head3 yw-count-two ('seachtain' 'a' w 'i' Y)
+=head3 yw-count-two ('seachtain' 'a' w 'in' Y)
 
-   2008-02-05T18:30:30 = seachtain a 6 i 2008
-   1995-12-22T09:05:02 = seachtain a 51 i 1995
-  -0010-09-15T04:44:23 = seachtain a 37 i -10
+   2008-02-05T18:30:30 = seachtain a 6 in 2008
+   1995-12-22T09:05:02 = seachtain a 51 in 1995
+  -0010-09-15T04:44:23 = seachtain a 37 in -10
 
 
 =head2 Miscellaneous

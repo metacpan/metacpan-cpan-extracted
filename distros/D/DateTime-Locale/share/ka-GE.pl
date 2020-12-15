@@ -129,9 +129,9 @@
     "\N{U+10d0}\N{U+10ee}\N{U+10d0}\N{U+10da}\N{U+10d8} \N{U+10ec}\N{U+10d4}\N{U+10da}\N{U+10d7}\N{U+10d0}\N{U+10e6}\N{U+10e0}\N{U+10d8}\N{U+10ea}\N{U+10ee}\N{U+10d5}\N{U+10d8}\N{U+10d7}",
   ],
   first_day_of_week => 1,
-  glibc_date_1_format => "%a %b %e %H:%M:%S %Z %Y",
+  glibc_date_1_format => "%Y \N{U+10ec}\N{U+10da}\N{U+10d8}\N{U+10e1} %d %B, %T %Z",
   glibc_date_format => "%m/%d/%Y",
-  glibc_datetime_format => "%Y \N{U+10ec}\N{U+10da}\N{U+10d8}\N{U+10e1} %d %B, %T %Z",
+  glibc_datetime_format => "%Y \N{U+10ec}\N{U+10da}\N{U+10d8}\N{U+10e1} %d %B, %T",
   glibc_time_12_format => "%I:%M:%S %p",
   glibc_time_format => "%T",
   language => "Georgian",
@@ -268,5 +268,5 @@
   time_format_medium => "HH:mm:ss",
   time_format_short => "HH:mm",
   variant => undef,
-  version => 37,
+  version => 38,
 }

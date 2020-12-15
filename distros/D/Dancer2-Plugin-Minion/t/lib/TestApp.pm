@@ -11,18 +11,19 @@ set plugins => {
     },
 };
 
+add_task( foo => sub {
+    print STDERR join( ', ', @_ ) . "\n";
+});
+
 get '/' => sub {
-    add_task( foo => sub {
-        print STDERR join( ', ', @_ ) . "\n";
-    });
-
-    return "OK - Task Added";
-};
-
-get '/start' => sub { 
     my $id = enqueue( foo => [ qw( Foo Bar Baz ) ] );
     var job_id => $id;
     return "OK - job $id started";
+};
+
+get '/run' => sub { 
+    minion->perform_jobs;
+    return "OK - Task Running";
 };
 
 get '/state/:id' => sub {

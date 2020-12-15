@@ -127,9 +127,9 @@
     "\N{U+1782}\N{U+17d2}\N{U+179a}\N{U+17b7}\N{U+179f}\N{U+17d2}\N{U+178f}\N{U+179f}\N{U+1780}\N{U+179a}\N{U+17b6}\N{U+1787}",
   ],
   first_day_of_week => 7,
-  glibc_date_1_format => "%a %b %e %H:%M:%S %Z %Y",
+  glibc_date_1_format => "%A \N{U+1790}\N{U+17d2}\N{U+1784}\N{U+17c3} %e \N{U+1781}\N{U+17c2} %B \N{U+1786}\N{U+17d2}\N{U+1793}\N{U+17b6}\N{U+17c6} %Y, %H \N{U+1798}\N{U+17c9}\N{U+17c4}\N{U+1784} %M \N{U+1793}\N{U+17b6}\N{U+1791}\N{U+17b8} %S \N{U+179c}\N{U+17b7}\N{U+1793}\N{U+17b6}\N{U+1791}\N{U+17b8}\N{U+200b}",
   glibc_date_format => "%e %B %Y",
-  glibc_datetime_format => "%A \N{U+1790}\N{U+17d2}\N{U+1784}\N{U+17c3} %e \N{U+1781}\N{U+17c2} %B \N{U+1786}\N{U+17d2}\N{U+1793}\N{U+17b6}\N{U+17c6} %Y, %H \N{U+1798}\N{U+17c9}\N{U+17c4}\N{U+1784} m \N{U+1793}\N{U+17b6}\N{U+1791}\N{U+17b8} %S \N{U+179c}\N{U+17b7}\N{U+1793}\N{U+17b6}\N{U+1791}\N{U+17b8}\N{U+200b}",
+  glibc_datetime_format => "%A \N{U+1790}\N{U+17d2}\N{U+1784}\N{U+17c3} %e \N{U+1781}\N{U+17c2} %B \N{U+1786}\N{U+17d2}\N{U+1793}\N{U+17b6}\N{U+17c6} %Y, %H \N{U+1798}\N{U+17c9}\N{U+17c4}\N{U+1784} %M \N{U+1793}\N{U+17b6}\N{U+1791}\N{U+17b8} %S \N{U+179c}\N{U+17b7}\N{U+1793}\N{U+17b6}\N{U+1791}\N{U+17b8}\N{U+200b}",
   glibc_time_12_format => "%I:%M:%S %p",
   glibc_time_format => "%H:%M:%S",
   language => "Khmer",
@@ -266,5 +266,5 @@
   time_format_medium => "h:mm:ss a",
   time_format_short => "h:mm a",
   variant => undef,
-  version => 37,
+  version => 38,
 }

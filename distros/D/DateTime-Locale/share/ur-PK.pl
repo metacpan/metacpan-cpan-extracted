@@ -129,9 +129,9 @@
     "\N{U+0639}\N{U+06cc}\N{U+0633}\N{U+0648}\N{U+06cc}",
   ],
   first_day_of_week => 7,
-  glibc_date_1_format => "%a %b %e %H:%M:%S %Z %Y",
+  glibc_date_1_format => "\N{U+0648} %H:%M:%S %Z \N{U+062a} %d %B %Y",
   glibc_date_format => "%d/%m/%Y",
-  glibc_datetime_format => "\N{U+0648} %H:%M:%S %Z \N{U+062a} %d %B %Y",
+  glibc_datetime_format => "\N{U+0648} %H:%M:%S \N{U+062a} %d %B %Y",
   glibc_time_12_format => "%P %I:%M:%S",
   glibc_time_format => "%H:%M:%S",
   language => "Urdu",
@@ -268,5 +268,5 @@
   time_format_medium => "h:mm:ss a",
   time_format_short => "h:mm a",
   variant => undef,
-  version => 37,
+  version => 38,
 }

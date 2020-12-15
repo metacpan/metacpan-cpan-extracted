@@ -231,13 +231,13 @@ Vietnamese locale.
 
 =head3 Wide (format)
 
-  Trước CN
-  sau CN
+  Trước Thiên Chúa
+  Sau Công Nguyên
 
 =head3 Abbreviated (format)
 
   Trước CN
-  sau CN
+  Sau CN
 
 =head3 Narrow (format)
 
@@ -395,26 +395,26 @@ Vietnamese locale.
 
 =head3 Gy (y G)
 
-   2008-02-05T18:30:30 = 2008 sau CN
-   1995-12-22T09:05:02 = 1995 sau CN
+   2008-02-05T18:30:30 = 2008 Sau CN
+   1995-12-22T09:05:02 = 1995 Sau CN
   -0010-09-15T04:44:23 = -10 Trước CN
 
 =head3 GyMMM (MMM y G)
 
-   2008-02-05T18:30:30 = thg 2 2008 sau CN
-   1995-12-22T09:05:02 = thg 12 1995 sau CN
+   2008-02-05T18:30:30 = thg 2 2008 Sau CN
+   1995-12-22T09:05:02 = thg 12 1995 Sau CN
   -0010-09-15T04:44:23 = thg 9 -10 Trước CN
 
 =head3 GyMMMEd (E, dd/MM/y G)
 
-   2008-02-05T18:30:30 = Th 3, 05/02/2008 sau CN
-   1995-12-22T09:05:02 = Th 6, 22/12/1995 sau CN
+   2008-02-05T18:30:30 = Th 3, 05/02/2008 Sau CN
+   1995-12-22T09:05:02 = Th 6, 22/12/1995 Sau CN
   -0010-09-15T04:44:23 = Th 7, 15/09/-10 Trước CN
 
 =head3 GyMMMd (dd MMM, y G)
 
-   2008-02-05T18:30:30 = 05 thg 2, 2008 sau CN
-   1995-12-22T09:05:02 = 22 thg 12, 1995 sau CN
+   2008-02-05T18:30:30 = 05 thg 2, 2008 Sau CN
+   1995-12-22T09:05:02 = 22 thg 12, 1995 Sau CN
   -0010-09-15T04:44:23 = 15 thg 9, -10 Trước CN
 
 =head3 H (HH)

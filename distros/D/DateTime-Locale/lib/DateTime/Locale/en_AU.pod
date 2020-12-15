@@ -113,10 +113,10 @@ English Australia locale.
   Mar
   Apr
   May
-  Jun
-  Jul
+  June
+  July
   Aug
-  Sep
+  Sept
   Oct
   Nov
   Dec
@@ -262,7 +262,7 @@ English Australia locale.
 
    2008-02-05T18:30:30 = 5 Feb 2008
    1995-12-22T09:05:02 = 22 Dec 1995
-  -0010-09-15T04:44:23 = 15 Sep -10
+  -0010-09-15T04:44:23 = 15 Sept -10
 
 =head3 Short
 
@@ -316,7 +316,7 @@ English Australia locale.
 
    2008-02-05T18:30:30 = 5 Feb 2008, 6:30:30 pm
    1995-12-22T09:05:02 = 22 Dec 1995, 9:05:02 am
-  -0010-09-15T04:44:23 = 15 Sep -10, 4:44:23 am
+  -0010-09-15T04:44:23 = 15 Sept -10, 4:44:23 am
 
 =head3 Short
 
@@ -403,19 +403,19 @@ English Australia locale.
 
    2008-02-05T18:30:30 = Feb 2008 AD
    1995-12-22T09:05:02 = Dec 1995 AD
-  -0010-09-15T04:44:23 = Sep -10 BC
+  -0010-09-15T04:44:23 = Sept -10 BC
 
 =head3 GyMMMEd (E, d MMM y G)
 
    2008-02-05T18:30:30 = Tue, 5 Feb 2008 AD
    1995-12-22T09:05:02 = Fri, 22 Dec 1995 AD
-  -0010-09-15T04:44:23 = Sat, 15 Sep -10 BC
+  -0010-09-15T04:44:23 = Sat, 15 Sept -10 BC
 
 =head3 GyMMMd (d MMM y G)
 
    2008-02-05T18:30:30 = 5 Feb 2008 AD
    1995-12-22T09:05:02 = 22 Dec 1995 AD
-  -0010-09-15T04:44:23 = 15 Sep -10 BC
+  -0010-09-15T04:44:23 = 15 Sept -10 BC
 
 =head3 H (HH)
 
@@ -469,7 +469,7 @@ English Australia locale.
 
    2008-02-05T18:30:30 = Tue, 5 Feb
    1995-12-22T09:05:02 = Fri, 22 Dec
-  -0010-09-15T04:44:23 = Sat, 15 Sep
+  -0010-09-15T04:44:23 = Sat, 15 Sept
 
 =head3 MMMMW-count-one ('week' W 'of' MMMM)
 
@@ -493,7 +493,7 @@ English Australia locale.
 
    2008-02-05T18:30:30 = 5 Feb
    1995-12-22T09:05:02 = 22 Dec
-  -0010-09-15T04:44:23 = 15 Sep
+  -0010-09-15T04:44:23 = 15 Sept
 
 =head3 MMdd (dd/MM)
 
@@ -571,13 +571,13 @@ English Australia locale.
 
    2008-02-05T18:30:30 = Feb 2008
    1995-12-22T09:05:02 = Dec 1995
-  -0010-09-15T04:44:23 = Sep -10
+  -0010-09-15T04:44:23 = Sept -10
 
 =head3 yMMMEd (E, d MMM y)
 
    2008-02-05T18:30:30 = Tue, 5 Feb 2008
    1995-12-22T09:05:02 = Fri, 22 Dec 1995
-  -0010-09-15T04:44:23 = Sat, 15 Sep -10
+  -0010-09-15T04:44:23 = Sat, 15 Sept -10
 
 =head3 yMMMM (MMMM y)
 
@@ -589,7 +589,7 @@ English Australia locale.
 
    2008-02-05T18:30:30 = 5 Feb 2008
    1995-12-22T09:05:02 = 22 Dec 1995
-  -0010-09-15T04:44:23 = 15 Sep -10
+  -0010-09-15T04:44:23 = 15 Sept -10
 
 =head3 yMd (dd/MM/y)
 

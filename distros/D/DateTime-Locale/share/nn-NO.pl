@@ -222,8 +222,8 @@
     "desember",
   ],
   name => "Norwegian Nynorsk Norway",
-  native_language => "nynorsk",
-  native_name => "nynorsk Noreg",
+  native_language => "norsk nynorsk",
+  native_name => "norsk nynorsk Noreg",
   native_script => undef,
   native_territory => "Noreg",
   native_variant => undef,
@@ -270,5 +270,5 @@
   time_format_medium => "HH:mm:ss",
   time_format_short => "HH:mm",
   variant => undef,
-  version => 37,
+  version => 38,
 }

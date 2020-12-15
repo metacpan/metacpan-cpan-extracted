@@ -69033,3 +69033,7 @@ M/MI/MIHYAERU/WebService-Slack-WebApi-0.17.tar.gz
 S/SK/SKIM/Wikibase-Datatype-0.03.tar.gz
 S/SK/SKIM/Wikibase-Datatype-Struct-0.03.tar.gz
 G/GE/GETTY/WWW-Picnic-0.001.tar.gz
+P/PE/PERLANCAR/Acme-CPANModules-PortedFrom-Ruby-0.002.tar.gz
+C/CR/CROMEDOME/Dancer2-Plugin-Minion-0.2.1.tar.gz
+D/DR/DROLSKY/DateTime-Locale-1.29.tar.gz
+T/TV/TVIGNAUD/RPM4-0.44.tgz

@@ -232,7 +232,7 @@ Tajik Tajikistan locale.
 =head3 Wide (format)
 
   Пеш аз милод
-  ПаМ
+  Пас аз милод
 
 =head3 Abbreviated (format)
 

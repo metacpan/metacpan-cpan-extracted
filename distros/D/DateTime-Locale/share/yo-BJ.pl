@@ -220,9 +220,9 @@
   ],
   name => "Yoruba Benin",
   native_language => "\N{U+00c8}d\N{U+00e8} Yor\N{U+00f9}b\N{U+00e1}",
-  native_name => "\N{U+00c8}d\N{U+00e8} Yor\N{U+00f9}b\N{U+00e1} Or\N{U+00ed}l\N{U+025b}\N{U+0301}\N{U+00e8}de B\N{U+025b}\N{U+0300}n\N{U+025b}\N{U+0300}",
+  native_name => "\N{U+00c8}d\N{U+00e8} Yor\N{U+00f9}b\N{U+00e1} B\N{U+025b}\N{U+0300}n\N{U+025b}\N{U+0300}",
   native_script => undef,
-  native_territory => "Or\N{U+00ed}l\N{U+025b}\N{U+0301}\N{U+00e8}de B\N{U+025b}\N{U+0300}n\N{U+025b}\N{U+0300}",
+  native_territory => "B\N{U+025b}\N{U+0300}n\N{U+025b}\N{U+0300}",
   native_variant => undef,
   quarter_format_abbreviated => [
     "\N{U+00cc}d\N{U+00e1}m\N{U+025b}\N{U+0301}rin k\N{U+00ed}n\N{U+00ed}",
@@ -267,5 +267,5 @@
   time_format_medium => "H:m:s",
   time_format_short => "H:m",
   variant => undef,
-  version => 37,
+  version => 38,
 }

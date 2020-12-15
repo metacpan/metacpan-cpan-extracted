@@ -131,11 +131,11 @@
     "\N{U+0a87}\N{U+0ab8}\N{U+0ab5}\N{U+0ac0}\N{U+0ab8}\N{U+0aa8}",
   ],
   first_day_of_week => 7,
-  glibc_date_1_format => "%a %b %e %H:%M:%S %Z %Y",
-  glibc_date_format => "%A %d %b %Y",
-  glibc_datetime_format => "%A %d %b %Y %I:%M:%S %p %Z",
+  glibc_date_1_format => "%A %d %b %Y %I:%M:%S %p %Z",
+  glibc_date_format => "%-d/%-m/%y",
+  glibc_datetime_format => "%A %d %b %Y %I:%M:%S %p",
   glibc_time_12_format => "%I:%M:%S %p %Z",
-  glibc_time_format => "%I:%M:%S  %Z",
+  glibc_time_format => "%I:%M:%S %p %Z",
   language => "Gujarati",
   month_format_abbreviated => [
     "\N{U+0a9c}\N{U+0abe}\N{U+0aa8}\N{U+0acd}\N{U+0aaf}\N{U+0ac1}",
@@ -270,5 +270,5 @@
   time_format_medium => "hh:mm:ss a",
   time_format_short => "hh:mm a",
   variant => undef,
-  version => 37,
+  version => 38,
 }

@@ -88,7 +88,7 @@
     "kuarta-fera",
     "kinta-fera",
     "sesta-fera",
-    "sabadu",
+    "s\N{U+00e1}badu",
     "dumingu",
   ],
   day_stand_alone_abbreviated => [
@@ -270,5 +270,5 @@
   time_format_medium => "HH:mm:ss",
   time_format_short => "HH:mm",
   variant => undef,
-  version => 37,
+  version => 38,
 }

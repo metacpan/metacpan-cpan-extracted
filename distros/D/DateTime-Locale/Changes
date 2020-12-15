@@ -1,3 +1,8 @@
+1.29     2020-12-14
+
+- Rebuilt all locale data with the data from CLDR 38.0.0 and glibc 2.32.
+
+
 1.28     2020-08-28
 
 - Move a test that was added in 1.27 to xt. This test is a sensitive to small
@@ -42,7 +47,7 @@
 
 1.22     2018-06-08
 
-- Rebuilt all locale date with the glibc data from glibc 2.27.
+- Rebuilt all locale data with the glibc data from glibc 2.27.
 
 - Added documentation for this glibc data.
 

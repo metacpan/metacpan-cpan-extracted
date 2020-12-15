@@ -30,7 +30,7 @@ Serbian Bosnia & Herzegovina Latin locale.
 
 =head3 Wide (format)
 
-  ponedeljak
+  ponedjeljak
   utorak
   srijeda
   četvrtak
@@ -41,8 +41,8 @@ Serbian Bosnia & Herzegovina Latin locale.
 =head3 Abbreviated (format)
 
   pon
-  ut
-  sr
+  uto
+  sre
   čet
   pet
   sub
@@ -61,7 +61,7 @@ Serbian Bosnia & Herzegovina Latin locale.
 
 =head3 Wide (stand-alone)
 
-  ponedeljak
+  ponedjeljak
   utorak
   srijeda
   četvrtak
@@ -72,8 +72,8 @@ Serbian Bosnia & Herzegovina Latin locale.
 =head3 Abbreviated (stand-alone)
 
   pon
-  ut
-  sr
+  uto
+  sri
   čet
   pet
   sub
@@ -347,49 +347,49 @@ Serbian Bosnia & Herzegovina Latin locale.
 
 =head3 E (E)
 
-   2008-02-05T18:30:30 = ut
+   2008-02-05T18:30:30 = uto
    1995-12-22T09:05:02 = pet
   -0010-09-15T04:44:23 = sub
 
 =head3 EBhm (E hh:mm B)
 
-   2008-02-05T18:30:30 = ut 06:30 B
+   2008-02-05T18:30:30 = uto 06:30 B
    1995-12-22T09:05:02 = pet 09:05 B
   -0010-09-15T04:44:23 = sub 04:44 B
 
 =head3 EBhms (E hh:mm:ss B)
 
-   2008-02-05T18:30:30 = ut 06:30:30 B
+   2008-02-05T18:30:30 = uto 06:30:30 B
    1995-12-22T09:05:02 = pet 09:05:02 B
   -0010-09-15T04:44:23 = sub 04:44:23 B
 
 =head3 EHm (E HH:mm)
 
-   2008-02-05T18:30:30 = ut 18:30
+   2008-02-05T18:30:30 = uto 18:30
    1995-12-22T09:05:02 = pet 09:05
   -0010-09-15T04:44:23 = sub 04:44
 
 =head3 EHms (E HH:mm:ss)
 
-   2008-02-05T18:30:30 = ut 18:30:30
+   2008-02-05T18:30:30 = uto 18:30:30
    1995-12-22T09:05:02 = pet 09:05:02
   -0010-09-15T04:44:23 = sub 04:44:23
 
 =head3 Ed (E d.)
 
-   2008-02-05T18:30:30 = ut 5.
+   2008-02-05T18:30:30 = uto 5.
    1995-12-22T09:05:02 = pet 22.
   -0010-09-15T04:44:23 = sub 15.
 
 =head3 Ehm (E h:mm a)
 
-   2008-02-05T18:30:30 = ut 6:30 po podne
+   2008-02-05T18:30:30 = uto 6:30 po podne
    1995-12-22T09:05:02 = pet 9:05 prije podne
   -0010-09-15T04:44:23 = sub 4:44 prije podne
 
 =head3 Ehms (E h:mm:ss a)
 
-   2008-02-05T18:30:30 = ut 6:30:30 po podne
+   2008-02-05T18:30:30 = uto 6:30:30 po podne
    1995-12-22T09:05:02 = pet 9:05:02 prije podne
   -0010-09-15T04:44:23 = sub 4:44:23 prije podne
 
@@ -407,7 +407,7 @@ Serbian Bosnia & Herzegovina Latin locale.
 
 =head3 GyMMMEd (E, d. MMM y. G)
 
-   2008-02-05T18:30:30 = ut, 5. feb 2008. n. e.
+   2008-02-05T18:30:30 = uto, 5. feb 2008. n. e.
    1995-12-22T09:05:02 = pet, 22. dec 1995. n. e.
   -0010-09-15T04:44:23 = sub, 15. sep -10. p. n. e.
 
@@ -455,7 +455,7 @@ Serbian Bosnia & Herzegovina Latin locale.
 
 =head3 MEd (E, d.M.)
 
-   2008-02-05T18:30:30 = ut, 5.2.
+   2008-02-05T18:30:30 = uto, 5.2.
    1995-12-22T09:05:02 = pet, 22.12.
   -0010-09-15T04:44:23 = sub, 15.9.
 
@@ -467,33 +467,33 @@ Serbian Bosnia & Herzegovina Latin locale.
 
 =head3 MMMEd (E d. MMM)
 
-   2008-02-05T18:30:30 = ut 5. feb
+   2008-02-05T18:30:30 = uto 5. feb
    1995-12-22T09:05:02 = pet 22. dec
   -0010-09-15T04:44:23 = sub 15. sep
 
 =head3 MMMMEd (E, d. MMMM)
 
-   2008-02-05T18:30:30 = ut, 5. februar
+   2008-02-05T18:30:30 = uto, 5. februar
    1995-12-22T09:05:02 = pet, 22. decembar
   -0010-09-15T04:44:23 = sub, 15. septembar
 
-=head3 MMMMW-count-few (W. 'sjedmica' 'u' MMMM)
+=head3 MMMMW-count-few (W. 'sedmica' 'u' MMMM.)
 
-   2008-02-05T18:30:30 = 1. sjedmica u februar
-   1995-12-22T09:05:02 = 3. sjedmica u decembar
-  -0010-09-15T04:44:23 = 2. sjedmica u septembar
+   2008-02-05T18:30:30 = 1. sedmica u februar.
+   1995-12-22T09:05:02 = 3. sedmica u decembar.
+  -0010-09-15T04:44:23 = 2. sedmica u septembar.
 
-=head3 MMMMW-count-one (W. 'sjedmica' 'u' MMMM)
+=head3 MMMMW-count-one (W. 'sedmica' 'u' MMMM.)
 
-   2008-02-05T18:30:30 = 1. sjedmica u februar
-   1995-12-22T09:05:02 = 3. sjedmica u decembar
-  -0010-09-15T04:44:23 = 2. sjedmica u septembar
+   2008-02-05T18:30:30 = 1. sedmica u februar.
+   1995-12-22T09:05:02 = 3. sedmica u decembar.
+  -0010-09-15T04:44:23 = 2. sedmica u septembar.
 
-=head3 MMMMW-count-other (W. 'sjedmica' 'u' MMMM)
+=head3 MMMMW-count-other (W. 'sedmica' 'u' MMMM.)
 
-   2008-02-05T18:30:30 = 1. sjedmica u februar
-   1995-12-22T09:05:02 = 3. sjedmica u decembar
-  -0010-09-15T04:44:23 = 2. sjedmica u septembar
+   2008-02-05T18:30:30 = 1. sedmica u februar.
+   1995-12-22T09:05:02 = 3. sedmica u decembar.
+  -0010-09-15T04:44:23 = 2. sedmica u septembar.
 
 =head3 MMMMd (d. MMMM)
 
@@ -581,7 +581,7 @@ Serbian Bosnia & Herzegovina Latin locale.
 
 =head3 yMEd (E, d.M.y.)
 
-   2008-02-05T18:30:30 = ut, 5.2.2008.
+   2008-02-05T18:30:30 = uto, 5.2.2008.
    1995-12-22T09:05:02 = pet, 22.12.1995.
   -0010-09-15T04:44:23 = sub, 15.9.-10.
 
@@ -599,7 +599,7 @@ Serbian Bosnia & Herzegovina Latin locale.
 
 =head3 yMMMEd (E, d. MMM y.)
 
-   2008-02-05T18:30:30 = ut, 5. feb 2008.
+   2008-02-05T18:30:30 = uto, 5. feb 2008.
    1995-12-22T09:05:02 = pet, 22. dec 1995.
   -0010-09-15T04:44:23 = sub, 15. sep -10.
 
@@ -639,23 +639,23 @@ Serbian Bosnia & Herzegovina Latin locale.
    1995-12-22T09:05:02 = četvrti kvartal 1995.
   -0010-09-15T04:44:23 = treći kvartal -10.
 
-=head3 yw-count-few (w. 'sjedmica' 'u' Y.)
+=head3 yw-count-few (w. 'sedmica' 'u' Y.)
 
-   2008-02-05T18:30:30 = 6. sjedmica u 2008.
-   1995-12-22T09:05:02 = 51. sjedmica u 1995.
-  -0010-09-15T04:44:23 = 37. sjedmica u -10.
+   2008-02-05T18:30:30 = 6. sedmica u 2008.
+   1995-12-22T09:05:02 = 51. sedmica u 1995.
+  -0010-09-15T04:44:23 = 37. sedmica u -10.
 
-=head3 yw-count-one (w. 'sjedmica' 'u' Y.)
+=head3 yw-count-one (w. 'sedmica' 'u' Y.)
 
-   2008-02-05T18:30:30 = 6. sjedmica u 2008.
-   1995-12-22T09:05:02 = 51. sjedmica u 1995.
-  -0010-09-15T04:44:23 = 37. sjedmica u -10.
+   2008-02-05T18:30:30 = 6. sedmica u 2008.
+   1995-12-22T09:05:02 = 51. sedmica u 1995.
+  -0010-09-15T04:44:23 = 37. sedmica u -10.
 
-=head3 yw-count-other (w. 'sjedmica' 'u' Y.)
+=head3 yw-count-other (w. 'sedmica' 'u' Y.)
 
-   2008-02-05T18:30:30 = 6. sjedmica u 2008.
-   1995-12-22T09:05:02 = 51. sjedmica u 1995.
-  -0010-09-15T04:44:23 = 37. sjedmica u -10.
+   2008-02-05T18:30:30 = 6. sedmica u 2008.
+   1995-12-22T09:05:02 = 51. sedmica u 1995.
+  -0010-09-15T04:44:23 = 37. sedmica u -10.
 
 
 =head2 Miscellaneous
@@ -666,7 +666,7 @@ Yes
 
 =head3 Local first day of the week
 
-1 (ponedeljak)
+1 (ponedjeljak)
 
 =head1 SUPPORT
 

@@ -27,11 +27,18 @@ has code => (
     required => 1,
 );
 
-has _source_data_root => (
+has _glibc_root => (
     is       => 'ro',
     isa      => t('Dir'),
     required => 1,
-    init_arg => 'source_data_root',
+    init_arg => 'glibc_root',
+);
+
+has _cldr_root => (
+    is       => 'ro',
+    isa      => t('Dir'),
+    required => 1,
+    init_arg => 'cldr_root',
 );
 
 has _parent_code => (
@@ -172,11 +179,21 @@ sub source_files ($self) {
     return grep {-f} $self->_json_file, $self->_glibc_file;
 }
 
-sub _build_cldr_json_data($self) {
+sub _build_cldr_json_data ($self) {
     my $json = $self->_json_from( $self->_json_file );
 
     my $json_file_id = $self->_json_file->parent->basename;
-    return $json->{main}{$json_file_id};
+    my $cldr         = $json->{main}{$json_file_id};
+
+    # https://unicode-org.atlassian.net/browse/CLDR-14361
+    if (   $self->code =~ /^sd-Deva/
+        && $cldr->{dates}{calendars}{gregorian}{quarters}{format}{narrow}{4}
+        == 1 ) {
+
+        $cldr->{dates}{calendars}{gregorian}{quarters}{format}{narrow}{4} = 4;
+    }
+
+    return $cldr;
 }
 
 sub _build_data_hash ($self) {
@@ -247,6 +264,10 @@ sub _build_glibc_data ($self) {
     my $parent = $self->_parent_locale;
 
     unless ( -f $self->_glibc_file ) {
+        die sprintf(
+            'No glibc data for %s and it has no parent',
+            $self->code
+        ) unless $parent;
         return $parent->_glibc_data;
     }
 
@@ -278,7 +299,7 @@ sub _build_glibc_file ($self) {
     # This ensures some sort of sanish fallback
     $glibc_code = 'POSIX' if $self->code eq 'root';
 
-    return $self->_source_data_root->child( 'glibc-locales', $glibc_code );
+    return $self->_glibc_root->child($glibc_code);
 }
 
 sub _extract_glibc_value ( $self, $key, $raw ) {
@@ -335,7 +356,7 @@ sub _parent_of_code ( $self, $code ) {
 }
 
 sub _gregorian_file_for_code ( $self, $code ) {
-    return $self->_source_data_root->child(
+    return $self->_cldr_root->child(
         qw( cldr-dates-full main ),
         $code,
         'ca-gregorian.json'
@@ -349,8 +370,9 @@ sub _has_parent_code ($self) {
 sub _build_parent_locale ($self) {
     return unless $self->_has_parent_code;
     return ModuleGenerator::Locale->instance(
-        code             => $self->_parent_code,
-        source_data_root => $self->_source_data_root
+        code       => $self->_parent_code,
+        cldr_root  => $self->_cldr_root,
+        glibc_root => $self->_glibc_root,
     );
 }
 
@@ -359,7 +381,7 @@ sub _explicit_parents ($self) {
     return $explicit_parents if $explicit_parents;
 
     my $json = $self->_json_from(
-        $self->_source_data_root->child(
+        $self->_cldr_root->child(
             qw( cldr-core supplemental parentLocales.json ))
     );
 
@@ -391,10 +413,10 @@ sub _first_day_of_week_index ($self) {
     state $first_day_of_week_index;
     return $first_day_of_week_index if $first_day_of_week_index;
 
-    my $json = $self->_json_from(
-        $self->_source_data_root->child(
-            qw( cldr-core supplemental weekData.json ))
-    );
+    my $json
+        = $self->_json_from(
+        $self->_cldr_root->child(qw( cldr-core supplemental weekData.json ))
+        );
 
     return $first_day_of_week_index
         = $json->{supplemental}{weekData}{firstDay};
@@ -447,7 +469,7 @@ sub _en_variants_data ($self) {
 
 sub _populate_en_lookup ( $self, $type ) {
     my $json = $self->_json_from(
-        $self->_source_data_root->child(
+        $self->_cldr_root->child(
             qw( cldr-localenames-full main en ), $type . '.json'
         )
     );
@@ -484,7 +506,7 @@ sub _native_lookup ( $self, $type ) {
     my $file;
     my $locale = $self;
     while ($locale) {
-        $file = $self->_source_data_root->child(
+        $file = $self->_cldr_root->child(
             qw( cldr-localenames-full main  ),
             $locale->code, $type . '.json'
         );

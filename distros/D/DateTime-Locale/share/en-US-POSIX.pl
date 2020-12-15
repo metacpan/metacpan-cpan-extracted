@@ -129,7 +129,7 @@
     "Anno Domini",
   ],
   first_day_of_week => 7,
-  glibc_date_1_format => "%a %b %e %H:%M:%S %Z %Y",
+  glibc_date_1_format => "%a %b %e %r %Z %Y",
   glibc_date_format => "%m/%d/%Y",
   glibc_datetime_format => "%a %d %b %Y %r %Z",
   glibc_time_12_format => "%I:%M:%S %p",
@@ -268,5 +268,5 @@
   time_format_medium => "h:mm:ss a",
   time_format_short => "h:mm a",
   variant => "Computer",
-  version => 37,
+  version => 38,
 }

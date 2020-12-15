@@ -68,7 +68,7 @@
     "T\N{U+1ecd}\N{U+1ecd}",
     "Fra\N{U+1ecb}",
     "Sat",
-    "\N{U+1ee4}ka",
+    "S\N{U+1ecd}n",
   ],
   day_format_narrow => [
     "M",
@@ -95,7 +95,7 @@
     "T\N{U+1ecd}\N{U+1ecd}",
     "Fra\N{U+1ecb}",
     "Sat",
-    "\N{U+1ee4}ka",
+    "S\N{U+1ecd}n",
   ],
   day_stand_alone_narrow => [
     "M",
@@ -219,8 +219,8 @@
     "Disemba",
   ],
   name => "Igbo",
-  native_language => "As\N{U+1ee5}s\N{U+1ee5} Igbo",
-  native_name => "As\N{U+1ee5}s\N{U+1ee5} Igbo",
+  native_language => "Igbo",
+  native_name => "Igbo",
   native_script => undef,
   native_territory => undef,
   native_variant => undef,
@@ -267,5 +267,5 @@
   time_format_medium => "HH:mm:ss",
   time_format_short => "HH:mm",
   variant => undef,
-  version => 37,
+  version => 38,
 }

@@ -1,6 +1,7 @@
 # $Id$
 
 # use 5.008;
+use Config;
 use ExtUtils::MakeMaker;
 use ExtUtils::PkgConfig;
 use Getopt::Long;
@@ -100,6 +101,6 @@ WriteMakefile(
     OBJECT       => "RPM4.o $obj",
     INC	         => "-I$rpmheaderlocation",
     LIBS         => [ $cfg{libs} . " -lrpmsign -lrpmbuild $ldd" ],
-    CCFLAGS      => "$cfg{cflags} -Wall $fl -DRPM$v",
+    CCFLAGS      => "$cfg{cflags} -Wall $fl -DRPM$v $Config{ccflags}",
     depend       => { "RPM4.xs" => join(" ", @rpmconstantfiles) },
 );
