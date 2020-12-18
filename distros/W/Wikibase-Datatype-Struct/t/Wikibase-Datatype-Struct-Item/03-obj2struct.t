@@ -3,7 +3,7 @@ use warnings;
 
 use English;
 use Error::Pure::Utils qw(clean);
-use Test::More 'tests' => 5;
+use Test::More 'tests' => 8;
 use Test::NoWarnings;
 use Wikibase::Datatype::Item;
 use Wikibase::Datatype::Snak;
@@ -405,3 +405,82 @@ eval {
 };
 is($EVAL_ERROR, "Object doesn't exist.\n", "Object doesn't exist.");
 clean();
+
+# Test.
+$obj = Wikibase::Datatype::Item->new;
+eval {
+	Wikibase::Datatype::Struct::Item::obj2struct($obj);
+};
+is($EVAL_ERROR, "Base URI is required.\n", 'Base URI is required.');
+clean();
+
+# Test.
+$obj = Wikibase::Datatype::Item->new(
+	'statements' => [
+		Wikibase::Datatype::Statement->new(
+			'snak' => Wikibase::Datatype::Snak->new(
+				'datatype' => 'string',
+				'datavalue' => Wikibase::Datatype::Value::String->new(
+					'value' => '1.1',
+				),
+				'property' => 'P11',
+			),
+			'rank' => 'normal',
+		),
+		Wikibase::Datatype::Statement->new(
+			'snak' => Wikibase::Datatype::Snak->new(
+				'datatype' => 'string',
+				'property' => 'P11',
+				'snaktype' => 'novalue',
+			),
+			'rank' => 'normal',
+		),
+	],
+);
+$ret_hr = Wikibase::Datatype::Struct::Item::obj2struct($obj,
+	'http://test.wikidata.org/entity/');
+is_deeply(
+	$ret_hr,
+	{
+		'claims' => {
+			'P11' => [{
+				'mainsnak' => {
+					'datatype' => 'string',
+					'datavalue' => {
+						'type' => 'string',
+						'value' => '1.1',
+					},
+					'property' => 'P11',
+					'snaktype' => 'value',
+				},
+				'rank' => 'normal',
+				'type' => 'statement',
+			}, {
+				'mainsnak' => {
+					'datatype' => 'string',
+					'property' => 'P11',
+					'snaktype' => 'novalue',
+				},
+				'rank' => 'normal',
+				'type' => 'statement',
+			}],
+		},
+		'ns' => 0,
+		'type' => 'item',
+	},
+	'Output of obj2struct() subroutine. Two claims for one property.',
+);
+
+# Test.
+$obj = Wikibase::Datatype::Item->new(
+	'ns' => undef,
+);
+$ret_hr = Wikibase::Datatype::Struct::Item::obj2struct($obj,
+	'http://test.wikidata.org/entity/');
+is_deeply(
+	$ret_hr,
+	{
+		'type' => 'item',
+	},
+	'Output of obj2struct() subroutine. Undefined name space.',
+);

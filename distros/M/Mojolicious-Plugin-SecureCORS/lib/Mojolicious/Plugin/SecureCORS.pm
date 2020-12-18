@@ -3,7 +3,7 @@ package Mojolicious::Plugin::SecureCORS;
 use Mojo::Base 'Mojolicious::Plugin';
 use Carp;
 
-our $VERSION = 'v2.0.2';
+our $VERSION = 'v2.0.3';
 
 use List::MoreUtils qw( any none );
 
@@ -25,9 +25,9 @@ sub register {
 
     $root->add_shortcut(cors => sub {
         my ($r, @args) = @_;
-        return $r->route(@args)
-            ->via('OPTIONS')
-            ->over(
+        return $r->any(@args)
+            ->methods('OPTIONS')
+            ->requires(
                 headers => {
                     'Origin' => qr/\S/ms,
                     'Access-Control-Request-Method' => qr/\S/ms,
@@ -199,7 +199,7 @@ Mojolicious::Plugin::SecureCORS - Complete control over CORS
 
 =head1 VERSION
 
-This document describes Mojolicious::Plugin::SecureCORS version v2.0.2
+This document describes Mojolicious::Plugin::SecureCORS version v2.0.3
 
 
 =head1 SYNOPSIS

@@ -20,7 +20,7 @@ name: DBD-CSV
 provides: 
   DBD::CSV: 
     file: lib/DBD/CSV.pm
-    version: '0.56'
+    version: '0.57'
 recommends: 
   DBD::File: '0.44'
   DBI: '1.643'
@@ -39,7 +39,8 @@ requires:
   charnames: 0
   perl: '5.008001'
 resources: 
+  bugtracker: https://github.com/perl5-dbi/DBD-CSV/issues
   license: http://dev.perl.org/licenses/
   repository: https://github.com/perl5-dbi/DBD-CSV
-version: '0.56'
+version: '0.57'
 x_installdirs: site

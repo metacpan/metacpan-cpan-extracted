@@ -69,7 +69,7 @@ package SVG::Timeline::Genealogy;
 
 use 5.010;
 
-our $VERSION = '0.0.3';
+our $VERSION = '0.0.4';
 
 use Moose;
 use Moose::Util::TypeConstraints;

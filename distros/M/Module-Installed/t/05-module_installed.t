@@ -37,9 +37,14 @@ my @not_installed = qw(
 # load
 {
     if (module_installed('Carp')) {
+        is eval { confess("test"); 1 }, undef, "require/import fails if module isn't loaded ok";
+        like $@, qr/confess/, "...and error is that module isn't loaded ok";
+
         require Carp;
-        Carp->import('croak');
-        is eval { croak("error"); 1 }, undef, "require/import ok";
+        Carp->import('confess');
+        is eval { confess("test2"); 1 }, undef, "require/import ok";
+        like $@, qr/test2/, "...and error is from the required module ok";
+
     }
 }
 

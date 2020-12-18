@@ -39,13 +39,11 @@ ok(read_text("$dir/page/Haiku.gmi") eq $haiku, "Haiku saved");
 
 mkdir("$dir/locked");
 
-local $SIG{'ALRM'} = sub {
-  pass("Timeout 1s");
+# 1s timer
+Mojo::IOLoop->timer(1 => sub {
+  pass("Waiting 1s");
   ok(read_text("$dir/page/Haiku.gmi") eq $haiku, "Haiku unchanged");
-  rmdir("$dir/locked");
-};
-
-alarm(1); # timeout
+  rmdir("$dir/locked")});
 
 my $haiku2 = <<EOT;
 Pink peaks and blue rocks
@@ -53,8 +51,7 @@ The sun is gone and I'm cold
 The Blackbird still sings
 EOT
 
-# while it waits for the lock to expire, the 1s alarm is raised and the lock is
-# removed
+# while it waits for the lock to expire, 1s passes and the lock is removed
 query_gemini("$titan/raw/Haiku;size=81;mime=text/plain;token=hello", $haiku2);
 
 ok(read_text("$dir/page/Haiku.gmi") eq $haiku2, "Haiku changed");

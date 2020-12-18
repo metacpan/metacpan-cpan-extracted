@@ -1,0 +1,60 @@
+#!/usr/bin/env perl
+
+# https://en.wikipedia.org/wiki/Inversion_(music)#Twelve-tone_music
+# Similar to the Schönberg example
+
+use strict;
+use warnings;
+
+use Data::Dumper::Compact 'ddc';
+use lib map { "$ENV{HOME}/sandbox/$_/lib" } qw(MIDI-Util);
+use MIDI::Util;
+use Music::MelodicDevice::Inversion;
+use Music::Scales qw(get_scale_notes);
+
+my $max = 12;
+my $scale_note = 'C';
+my $scale_name = 'chromatic';
+
+my $score = MIDI::Util::setup_score();
+
+my $md = Music::MelodicDevice::Inversion->new(
+    scale_note => $scale_note,
+    scale_name => $scale_name,
+#    verbose => 1,
+);
+
+my @scale = (
+    (map { $_ . 4 } get_scale_notes($scale_note, $scale_name)),
+    (map { $_ . 5 } get_scale_notes($scale_note, $scale_name)),
+    'C6'
+);
+
+my %seen;
+my $notes;
+my $note = $scale[int rand @scale];
+(my $name = $note) =~ s/^([A-G][#b]?)\d+$/$1/;
+for my $n (1 .. $max) {
+    while ($seen{$name}++) {
+        $note = $scale[int rand @scale];
+        ($name = $note) =~ s/^([A-G][#b]?)\d+$/$1/;
+    }
+    push @$notes, $note;
+}
+my $retrograde = [ reverse @$notes ];
+my $inverted = $md->invert($notes->[0], $notes);
+my $retro_inv = [ reverse @$inverted ];
+
+for my $phrase ($notes, $retrograde, $inverted, $retro_inv) {
+    @$phrase = MIDI::Util::midi_format(@$phrase);
+    print ddc($phrase);
+}
+
+for my $n (0 .. $#$notes) {
+    $score->n('qn', $notes->[$n], $inverted->[$n]);
+}
+for my $n (0 .. $#$retrograde) {
+    $score->n('qn', $retrograde->[$n], $retro_inv->[$n]);
+}
+
+$score->write_score("$0.mid");

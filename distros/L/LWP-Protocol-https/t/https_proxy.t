@@ -85,6 +85,10 @@ $ua{proxy_nokeepalive} = LWP::UserAgent->new(
 	SSL_ca_file => $cafile
     }
 );
+
+# both lower- and upper-case versions are accepted by `env_proxy`, and
+# the user may have any of them set: override them all
+$ENV{HTTP_PROXY} = $ENV{HTTPS_PROXY} =
 $ENV{http_proxy} = $ENV{https_proxy} = "http://foo:bar\@$saddr[0]";
 $ua{proxy}->env_proxy;
 $ua{proxy_nokeepalive}->env_proxy;
@@ -239,7 +243,7 @@ sub _server {
     if ( $ssl_host ) {
 	my ($cert,$key) = @{
 	    $certs{$ssl_host} ||= do {
-		diag("creating cert for $ssl_host");
+		note("creating cert for $ssl_host");
 		my ($c,$k) = CERT_create(
 		    subject => { commonName => $ssl_host },
 		    issuer_cert => $cacert,

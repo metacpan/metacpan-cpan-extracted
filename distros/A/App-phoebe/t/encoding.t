@@ -52,13 +52,17 @@ my $punycode = domain_to_ascii($idn);
 $base = encode_utf8 "gemini://$punycode:$port";
 $titan = encode_utf8 "titan://$punycode:$port";
 
-$page = query_gemini("$base/page/$encoded_name");
-like($page, qr/# 日本語\nThis page does not yet exist/, "International Domain Name");
+ SKIP: {
+   skip "Locale cannot handle test data", 3 unless decode(locale => encode(locale => $name)) eq $name;
 
-$page = query_gemini("$titan/raw/$encoded_name;size=$length;mime=text/plain;token=hello", $encoded_text);
-like($page, qr/^30 $base\/page\/$encoded_name\r$/, "Titan Text");
+   $page = query_gemini("$base/page/$encoded_name");
+   like($page, qr/# 日本語\nThis page does not yet exist/, "International Domain Name");
 
-$page = query_gemini("$base/page/$encoded_name");
-like($page, qr/^20 text\/gemini; charset=UTF-8\r\n# $name\n$text/, "Text saved");
+   $page = query_gemini("$titan/raw/$encoded_name;size=$length;mime=text/plain;token=hello", $encoded_text);
+   like($page, qr/^30 $base\/page\/$encoded_name\r$/, "Titan Text");
+
+   $page = query_gemini("$base/page/$encoded_name");
+   like($page, qr/^20 text\/gemini; charset=UTF-8\r\n# $name\n$text/, "Text saved");
+}
 
 done_testing();

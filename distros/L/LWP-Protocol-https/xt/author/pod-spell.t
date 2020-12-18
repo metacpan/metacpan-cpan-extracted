@@ -22,6 +22,7 @@ Bill
 Book
 Bron
 Burke
+Ceccarelli
 Chase
 Christopher
 Chrysostomos
@@ -38,6 +39,7 @@ Father
 Finch
 Froehlich
 Gavin
+Gianni
 Gisle
 Golden
 Gondwana
@@ -132,6 +134,7 @@ denaxas
 dot
 drieux
 ether
+gianni
 gisle
 github
 gpeters

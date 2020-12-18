@@ -19,7 +19,7 @@ try_link('s/\.dat$/.tmp/', "02link.tmp", "link1");
 { my $warn;
   local $SIG{__WARN__} = sub { $warn = "@_"; };
   $tf = "02link.dat";
-  is(File::PerlMove::move('s/\.dat$/.tmp/', [ $tf ], { link => 1 }), 0, "link2");
+  is(File::PerlMove::pmv('s/\.dat$/.tmp/', [ $tf ], { link => 1 }), 0, "link2");
   like($warn, qr/: exists/, "link2 warning");
 }
 
@@ -27,7 +27,7 @@ cleanup();
 
 sub try_link {
     my ($code, $new, $tag) = @_;
-    is(File::PerlMove::move($code, [ $tf ], { link => 1 }), 1, $tag);
+    is(File::PerlMove::pmv($code, [ $tf ], { link => 1 }), 1, $tag);
     verify($new, $tag);
     my @st1 = lstat($tf);
     my @st2 = lstat($new);

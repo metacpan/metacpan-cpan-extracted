@@ -1,3 +1,7 @@
+0.013     2020-12-15 00:07:22-08:00 America/Los_Angeles
+
+    - Add non-blocking write (*nix, and windows too!)
+
 0.012     2020-12-13 18:30:33-08:00 America/Los_Angeles
 
     - Fix some tests that were breaking Test2's IPC

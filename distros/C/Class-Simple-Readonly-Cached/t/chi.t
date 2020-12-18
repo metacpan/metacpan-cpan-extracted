@@ -2,7 +2,7 @@
 
 use strict;
 use warnings;
-use Test::Most tests => 33;
+use Test::Most tests => 34;
 use Test::NoWarnings;
 use CHI;
 
@@ -62,17 +62,20 @@ CHI: {
 		# diag($key);
 	# }
 
-	# diag(Data::Dumper->new([$l->state()])->Dump());
-	my $misses = $l->state()->{'misses'};
-	my $fail;
-	while(my($k, $v) = each %{$misses}) {
-		if($v != 1) {
-			$fail = $k;
-			last;
-		}
+	# diag(Data::Dumper->new([$cached->state()])->Dump());
+	my $hits = $l->state()->{'hits'};
+	my $count;
+	while(my($k, $v) = each %{$hits}) {
+		$count += $v;
 	}
-	ok(!defined($fail));
-	diag($fail) if($fail);
+	is($count, 7, 'cache contains 7 hits');
+
+	my $misses = $l->state()->{'misses'};
+	$count = 0;
+	while(my($k, $v) = each %{$misses}) {
+		$count += $v;
+	}
+	is($count, 8, 'cache contains 8 misses');
 }
 
 package x;

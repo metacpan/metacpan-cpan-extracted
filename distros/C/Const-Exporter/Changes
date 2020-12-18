@@ -1,4 +1,15 @@
-Revision history for Const-Exporter
+#Revision history for Const-Exporter
+
+v1.1.1    2020-12-17 15:51:58+00:00 Europe/London
+  [Tests]
+  - Specify minimum version of Sub::Identify.
+
+v1.1.0    2020-12-17 13:42:01+00:00 Europe/London
+  [Enhancements]
+  - Subroutine constants are genuinely marked as subroutine constants.
+
+  [Toolchain]
+  - Removed `.travis.yml` from git repo.
 
 v1.0.0    2020-12-11 13:56:43+00:00 Europe/London
   - No changes: version bumped because module is considered mature.

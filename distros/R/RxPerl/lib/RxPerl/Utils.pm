@@ -10,7 +10,7 @@ our @EXPORT_OK = qw/
     get_timer_subs get_interval_subs
 /;
 
-our $VERSION = "v6.2.1";
+our $VERSION = "v6.3.0";
 
 my %KEEP_ALIVE;
 

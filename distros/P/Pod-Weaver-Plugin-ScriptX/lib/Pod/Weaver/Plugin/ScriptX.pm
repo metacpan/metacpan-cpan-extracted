@@ -1,9 +1,9 @@
 package Pod::Weaver::Plugin::ScriptX;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-04-16'; # DATE
+our $DATE = '2020-09-15'; # DATE
 our $DIST = 'Pod-Weaver-Plugin-ScriptX'; # DIST
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.003'; # VERSION
 
 use 5.010001;
 use Moose;
@@ -69,7 +69,7 @@ sub _process_module {
             }
         }
         $self->add_text_to_section(
-            $document, join("", @pod), 'CONFIGURATION',
+            $document, join("", @pod), 'SCRIPTX PLUGIN CONFIGURATION',
             {
                 after_section => ['DESCRIPTION'],
                 ignore => 1,
@@ -121,7 +121,7 @@ Pod::Weaver::Plugin::ScriptX - Plugin to use when building ScriptX::* distributi
 
 =head1 VERSION
 
-This document describes version 0.002 of Pod::Weaver::Plugin::ScriptX (from Perl distribution Pod-Weaver-Plugin-ScriptX), released on 2020-04-16.
+This document describes version 0.003 of Pod::Weaver::Plugin::ScriptX (from Perl distribution Pod-Weaver-Plugin-ScriptX), released on 2020-09-15.
 
 =head1 SYNOPSIS
 
@@ -172,7 +172,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2019 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

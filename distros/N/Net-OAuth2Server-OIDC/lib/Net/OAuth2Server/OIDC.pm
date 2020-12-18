@@ -2,11 +2,11 @@ use strict; use warnings;
 
 package Net::OAuth2Server::OIDC;
 
-our $VERSION = '0.004';
+our $VERSION = '0.005';
 
 package Net::OAuth2Server::Request::Authorization::Role::OIDC;
 
-our $VERSION = '0.004';
+our $VERSION = '0.005';
 
 use Role::Tiny;
 use Class::Method::Modifiers 'fresh';
@@ -50,7 +50,7 @@ undef *around__new;
 
 package Net::OAuth2Server::Response::Role::OIDC;
 
-our $VERSION = '0.004';
+our $VERSION = '0.005';
 
 use Role::Tiny;
 use Class::Method::Modifiers 'fresh';
@@ -100,12 +100,12 @@ sub fresh__add_id_token {
 	Carp::croak 'missing payload' unless $pay;
 	Carp::croak 'header and payload must be hashes' if grep 'HASH' ne ref, $pay, $head || ();
 	$pay->{'nonce'} = $nonce if $nonce;
-	my $p = $self->param;
 	my $alg = ( $head && $head->{'alg'} ) || 'none';
 	if ( $alg =~ /\A[A-Za-z]{2}([0-9]+)\z/ ) {
 		my $sha = Digest::SHA->new( "$1" );
 		while ( my ( $k, $k_hash ) = each %hashed ) {
-			my $digest = exists $p->{ $k } ? $sha->reset->add( $p->{ $k } )->digest : next;
+			next unless $self->has_param( $k );
+			my $digest = $sha->reset->add( $self->param( $k ) )->digest;
 			$pay->{ $k_hash } = $b64url_enc->( substr $digest, 0, length( $digest ) / 2 );
 		}
 	}

@@ -15,7 +15,7 @@ name: Device-Chip-nRF24L01P
 provides:
   Device::Chip::nRF24L01P:
     file: lib/Device/Chip/nRF24L01P.pm
-    version: '0.04'
+    version: '0.05'
 requires:
   Data::Bitfield: '0'
   Device::Chip: '0'
@@ -24,5 +24,5 @@ requires:
   perl: '5.026'
 resources:
   license: http://dev.perl.org/licenses/
-version: '0.04'
+version: '0.05'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

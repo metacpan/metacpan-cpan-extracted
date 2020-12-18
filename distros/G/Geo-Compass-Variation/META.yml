@@ -18,9 +18,10 @@ no_index:
     - t
     - inc
 requires:
+  Carp: '0'
   perl: '5.006'
 resources:
   bugtracker: https://github.com/stevieb9/geo-compass-variation/issues
   repository: https://github.com/stevieb9/geo-compass-variation.git
-version: '1.03'
+version: '1.06'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

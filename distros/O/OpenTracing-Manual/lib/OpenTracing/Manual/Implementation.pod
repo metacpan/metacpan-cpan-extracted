@@ -188,45 +188,110 @@ a call back added as a C<on_finish> attribute, would transmit the span.
 
 At the boundary or edges of an application, Frameworks use the two methods
 L<< C<inject_context>|OpenTracing::Interface::Tracer/
-"inject_context(-OPENTRACING_CARRIER_FORMAT-=>-$carrier,-$span_context-)" >> and
+"inject_context(-$carrier,-$span_context-)" >> and
 L<< C<extract_context>|OpenTracing::Interface::Tracer/
-"extract_context(-OPENTRACING_CARRIER_FORMAT-=>-$carrier-)" >>
+"extract_context(-$carrier-)" >>
 (L<https://opentracing.io/docs/overview/tracers/#propagating-a-trace-with-inject-extract>).
 
 
-It is required that these methods are provided in the implementation. There are
-at least three OpenTracing required formats that need to be support. Only the
-C<OPENTRACING_CARRIER_FORMAT_HTTP_HEADERS> is being described in the manual.
+It is required that these methods are provided in the implementation. The
+official documentation requires the use of a I<Carrier Format> so that is clear
+what is exactly expected to happen within these C<inject_context> and
+C<extract_context> methods. But since this is Perl, it is possible to inspect
+the given carrier and check the type of the reference.
 
-An C<inject_context> might be implemented like:
+Perl implementations are expected handle the following C<carrier>
+Type::Tiny types:
 
-    package OpenTracing::Implementation::MyServiceProvider::Tracer
+=over
+
+=item *
+
+C<ArrayRef>
+
+=item *
+
+C<HashRef>
+
+=item *
+
+C<InstanceOf['HTTP::Headers']>
+
+notably, these inherently include L<HTTP::Headers>, L<HTTP::Headers::Fast>, and
+L<HTTP::Headers::Fast::XS>.
+
+=back
+
+The possible solution might be implemented like:
+
+    package OpenTracing::Implementation::MyServiceProvider::Tracer;
     
-    our $injectors = {
-        OPENTRACING_CARRIER_FORMAT_HTTP_HEADERS => sub {
-            my $http_headers = shift;
-            my $context = shift;
-            
-            return $http_headers->clone(
-                X_YOUR_IMPLEMENTATION_TRACE_ID = $context->trace_id,
-                ...
-        },
-        OPENTRACING_CARRIER_FORMAT_BINARY => sub { ... },
-        OPENTRACING_CARRIER_FORMAT_TEXT_MAP => sub { ... },
+    # dispatch simple calls into seperate methods per type
+    
+    sub inject_context ($self, $carrier, $context) {
+        
+        ArrayRef->check($carrier) and return
+            $self->inject_context_into_array_reference($carrier, $context);
+        
+        HashRef->check($carrier) and return
+            $self->inject_context_into_hash_reference($carrier, $context);
+        
+        (InstanceOf['HTTP::Headers'])->check($carrier) and return
+            $self->inject_context_into_http_headers($carrier, $context);
+        
+        return $carrier
     }
     
-    sub inject_tracer {
-        my $self = shift;
-        my $carrier_format = shift;
-        my $carrier;
-        
-        croak "unsupported carrier format [$carrier_format]"
-            unless exists %$injectors{$carrier_format};
-        
-        my $context = $self->get_active_span->get_context;
-        
-        return $injectors->{$carrier_format}->($carrier, $context)
+    sub extract_context ($self, $carrier) {
+        ...
+        return undef
     }
+    
+    #dispatched methods
+    
+    sub inject_context_into_array_reference  { ... }
+    
+    sub inject_context_into_hash_reference ($self, $carrier, $context) {
+        return Hash::Merge->new('RIGHT_PRECEDENT')->merge(
+            $carrier,
+            {
+                opentracing_context => {
+                    trace_id  => $context->trace_id,
+                    span_id   => $context->span_id,
+                }
+                 
+            }
+        )
+    }
+    
+    sub inject_context_into_http_headers ($self, $carrier, $context) {
+        return $carrier->clone->push_header(
+            X_YOUR_IMPLEMENTATION_TRACE_ID => $context->trace_id,
+            X_YOUR_IMPLEMENTATION_SPAN_ID  => $context->span_id,
+        )
+    }
+    
+    sub extract_context_from_array_reference { ... }
+    
+    sub extract_context_from_hash_reference ($self, $carrier) {
+        $self->maybe_build_context_with( $carrier->{ opentracing_context } )
+    }
+    
+    sub extract_context_from_http_headers ($self, $carrier) {
+        $self->maybe_build_context_with(
+            trace_id => $carrier->header('X_YOUR_IMPLEMENTATION_TRACE_ID'),
+            span_id  => $carrier->header('X_YOUR_IMPLEMENTATION_SPAN_ID' ),
+    }
+    
+    sub maybe_build_context_with ($self, %context_args) {
+        return unless ( $context_args{trace_id} && $context_args{span_id};
+        return $self->build_context_with(%context_args)
+    }
+    # This may return undef iff the carrier can be understood, and no relevant
+    # information could be detected. This usually happens at incomming request
+    # that are not part of a ditributed service.
+    
+    sub build_context_with ($self, %context_args) { ... }
 
 Where the C<X_YOUR_IMPLEMENTATION_TRACE_ID> is fully provider dependent. The
 other (micro) service you want to talk may be implemented using a complete

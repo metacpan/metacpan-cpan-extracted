@@ -2,9 +2,8 @@
 
 use strict;
 use warnings;
-use Test::Most tests => 38;
+use Test::Most tests => 39;
 use Test::NoWarnings;
-use CHI;
 
 BEGIN {
 	use_ok('Class::Simple::Readonly::Cached');
@@ -79,16 +78,18 @@ HASH: {
 	# }
 
 	# diag(Data::Dumper->new([$cached->state()])->Dump());
-	my $misses = $cached->state()->{'misses'};
-	my $fail;
-	while(my($k, $v) = each %{$misses}) {
-		if($v != 1) {
-			$fail = $k;
-			last;
-		}
+	my $hits = $cached->state()->{'hits'};
+	my $count;
+	while(my($k, $v) = each %{$hits}) {
+		$count += $v;
 	}
-	ok(!defined($fail));
-	diag($fail) if($fail);
+	ok($count == 8);
+	my $misses = $cached->state()->{'misses'};
+	$count = 0;
+	while(my($k, $v) = each %{$misses}) {
+		$count += $v;
+	}
+	ok($count == 10);
 }
 
 package x;

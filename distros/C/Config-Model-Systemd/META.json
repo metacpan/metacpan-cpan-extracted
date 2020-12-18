@@ -45,6 +45,7 @@
          "requires" : {
             "Config::Model::Tester" : "4.005",
             "Config::Model::Tester::Setup" : "0",
+            "English" : "0",
             "Test::File::Contents" : "0",
             "Test::More" : "0",
             "Test::Pod" : "1.00"
@@ -64,8 +65,8 @@
          "web" : "http://github.com/dod38fr/config-model-systemd"
       }
    },
-   "version" : "0.246.1",
-   "x_generated_by_perl" : "v5.30.3",
+   "version" : "0.247.1",
+   "x_generated_by_perl" : "v5.32.0",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.25",
    "x_spdx_expression" : "LGPL-2.1"
 }

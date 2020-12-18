@@ -13,7 +13,7 @@ Meerkat::Tutorial - Getting started with Meerkat
 
 =head1 VERSION
 
-version 0.015
+version 0.016
 
 =head1 TUTORIAL
 

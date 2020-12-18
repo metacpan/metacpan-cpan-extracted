@@ -29,7 +29,7 @@ try_symlink('s/\.dat$/.tmp/', "03symlink.tmp", "symlink1");
 { my $warn;
   local $SIG{__WARN__} = sub { $warn = "@_"; };
   $tf = "03symlink.dat";
-  is(File::PerlMove::move('s/\.dat$/.tmp/', [ $tf ], { symlink => 1 }), 0, "symlink2");
+  is(File::PerlMove::pmv('s/\.dat$/.tmp/', [ $tf ], { symlink => 1 }), 0, "symlink2");
   like($warn, qr/: exists/, "symlink2 warning");
 }
 
@@ -37,7 +37,7 @@ cleanup();
 
 sub try_symlink {
     my ($code, $new, $tag) = @_;
-    is(File::PerlMove::move($code, [ $tf ], { symlink => 1 }), 1, $tag);
+    is(File::PerlMove::pmv($code, [ $tf ], { symlink => 1 }), 1, $tag);
     verify($new, $tag);
     my @st1 = lstat($tf);
     my @st2 = lstat($new);

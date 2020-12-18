@@ -2,7 +2,7 @@ requires 'perl', '5.010001';
 
 requires 'List::MoreUtils', '0.34';
 requires 'Mojo::Base';
-requires 'Mojolicious', '7.75';
+requires 'Mojolicious', '8.67';
 
 on configure => sub {
     requires 'Module::Build::Tiny', '0.034';

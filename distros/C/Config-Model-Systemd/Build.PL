@@ -31,6 +31,7 @@ my $build = Module::Build->new(
     'Config::Model' => '2.133',
     'Config::Model::Tester' => '4.005',
     'Config::Model::Tester::Setup' => '0',
+    'English' => '0',
     'Module::Build' => '0.34',
     'Test::File::Contents' => '0',
     'Test::More' => '0',

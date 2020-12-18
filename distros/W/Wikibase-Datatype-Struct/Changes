@@ -1,3 +1,7 @@
+0.04 2020-12-16T00:02:49+01:00
+ - Add tests for Item.
+ - Fix Item->obj2struct conditions.
+
 0.03 2020-12-14T11:30:28+01:00
  - Add tests.
  - Change minimal version of Perl to 5.10 because some weird bug with pod.

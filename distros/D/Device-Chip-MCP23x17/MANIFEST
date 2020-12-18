@@ -12,7 +12,6 @@ t/11read-gpio.t
 t/12settings.t
 t/20adapter.t
 t/99pod.t
-Makefile.PL
 README
 LICENSE
 META.yml

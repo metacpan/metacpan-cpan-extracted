@@ -37,10 +37,9 @@ WriteMakefile(
 				url => 'git://github.com/nigelhorne/Class-Simple-Readonly-Cached.git',
 				web => 'https://github.com/nigelhorne/Class-Simple-Readonly-Cached',
 				repository => 'https://github.com/nigelhorne/Class-Simple-Readonly-Cached',
-			},
-			bugtracker => {
+			}, bugtracker => {
 				# web => 'https://rt.cpan.org/Public/Dist/Display.html?Name=Class-Simple-Readonly-Cached',
-				# mailto => 'bug-Class-Simple-Readonly-Cached@rt.cpan.org'
+				mailto => 'bug-Class-Simple-Readonly-Cached@rt.cpan.org',
 				web => 'https://github.com/nigelhorne/Class-Simple-Readonly-Cached/issues',
 				url => 'https://github.com/nigelhorne/Class-Simple-Readonly-Cached/issues',
 			}

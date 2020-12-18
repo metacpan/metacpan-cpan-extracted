@@ -14,7 +14,7 @@ use Wikibase::Datatype::Struct::Value::Monolingual;
 
 Readonly::Array our @EXPORT_OK => qw(obj2struct struct2obj);
 
-our $VERSION = 0.03;
+our $VERSION = 0.04;
 
 sub obj2struct {
 	my ($obj, $base_uri) = @_;
@@ -154,15 +154,15 @@ sub struct2obj {
 	my $obj = Wikibase::Datatype::Item->new(
 		'aliases' => $aliases_ar,
 		'descriptions' => $descriptions_ar,
-		$struct_hr->{'id'} ? ('id' => $struct_hr->{'id'}) : (),
+		defined $struct_hr->{'id'} ? ('id' => $struct_hr->{'id'}) : (),
 		'labels' => $labels_ar,
-		$struct_hr->{'lastrevid'} ? ('lastrevid' => $struct_hr->{'lastrevid'}) : (),
-		$struct_hr->{'modified'} ? ('modified' => $struct_hr->{'modified'}) : (),
-		$struct_hr->{'ns'} ? ('ns' => $struct_hr->{'ns'}) : (),
-		$struct_hr->{'pageid'} ? ('page_id' => $struct_hr->{'pageid'}) : (),
+		defined $struct_hr->{'lastrevid'} ? ('lastrevid' => $struct_hr->{'lastrevid'}) : (),
+		defined $struct_hr->{'modified'} ? ('modified' => $struct_hr->{'modified'}) : (),
+		defined $struct_hr->{'ns'} ? ('ns' => $struct_hr->{'ns'}) : (),
+		defined $struct_hr->{'pageid'} ? ('page_id' => $struct_hr->{'pageid'}) : (),
 		'sitelinks' => $sitelinks_ar,
 		'statements' => $statements_ar,
-		$struct_hr->{'title'} ? ('title' => $struct_hr->{'title'}) : (),
+		defined $struct_hr->{'title'} ? ('title' => $struct_hr->{'title'}) : (),
 	);
 
 	return $obj;
@@ -828,6 +828,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.03
+0.04
 
 =cut

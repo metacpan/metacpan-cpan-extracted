@@ -1,4 +1,4 @@
-# COPYRIGHTuse strict;
+use strict;
 use warnings;
 use Test::Roo;
 use Test::Deep '!blessed';

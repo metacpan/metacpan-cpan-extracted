@@ -1,3 +1,7 @@
+0.000005  2020-12-15 19:58:49-08:00 America/Los_Angeles
+
+    - Work around issue where tests cannot always be renamed
+
 0.000004  2017-06-25 13:43:46-07:00 America/Los_Angeles
 
     - Remove useless chomp

@@ -5,7 +5,7 @@ use warnings;
 package Meerkat::Collection;
 # ABSTRACT: Associate a class, database and MongoDB collection
 
-our $VERSION = '0.015';
+our $VERSION = '0.016';
 
 use Moose 2;
 use MooseX::AttributeShortcuts;
@@ -118,15 +118,22 @@ sub create {
 #pod
 #pod Returns the number of documents in the associated collection or throws an error on
 #pod failure.  If a hash reference is provided, it is passed as a query parameter to
-#pod the MongoDB L<count|MongoDB::Collection/count> method.
+#pod the MongoDB L<count_documents|MongoDB::Collection/count_documents> method.
+#pod Otherwise, the MongoDB
+#pod L<estimated_document_count|MongoDB::Collection/estimated_document_count> method
+#pod is used instead.
 #pod
 #pod =cut
 
 sub count {
     state $check = compile( Object, Optional [HashRef] );
     my ( $self, $query ) = $check->(@_);
-    return $self->_try_mongo_op( count => sub { $self->_mongo_collection->count($query) }
-    );
+    if ( defined $query ) {
+        return $self->_try_mongo_op(
+            count => sub { $self->_mongo_collection->count_documents($query) } );
+    }
+    return $self->_try_mongo_op(
+        count => sub { $self->_mongo_collection->estimated_document_count() } );
 }
 
 #pod =method find_id
@@ -139,7 +146,7 @@ sub count {
 #pod
 #pod     $person->find_one( { _id => $id } );
 #pod
-#pod However, C<find_id> can take either a scalar C<_id> or a L<MongoDB::OID> object
+#pod However, C<find_id> can take either a scalar C<_id> or a L<BSON::OID> object
 #pod as an argument.
 #pod
 #pod =cut
@@ -147,7 +154,6 @@ sub count {
 sub find_id {
     state $check = compile( Object, Defined );
     my ( $self, $id ) = $check->(@_);
-    $id = ref($id) eq 'MongoDB::OID' ? $id : MongoDB::OID->new($id);
     my $data =
       $self->_try_mongo_op(
         find_id => sub { $self->_mongo_collection->find_one( { _id => $id } ) } );
@@ -183,16 +189,18 @@ sub find_one {
 #pod Executes a query against C<collection_name>.  It returns a L<Meerkat::Cursor>
 #pod or throws an error on failure.  If a hash reference is provided, it is passed
 #pod as a query parameter to the MongoDB L<find|MongoDB::Collection/find> method,
-#pod otherwise all documents are returned.  Iterating the cursor will return
+#pod otherwise all documents are returned.  You may include and optional options
+#pod hash reference after the query hash reference.  Iterating the cursor will return
 #pod objects of the associated class.
 #pod
 #pod =cut
 
 sub find {
-    state $check = compile( Object, Optional [HashRef] );
-    my ( $self, $query ) = $check->(@_);
+    state $check = compile( Object, Optional [HashRef], Optional [HashRef] );
+    my ( $self, $query, $options ) = $check->(@_);
     my $cursor =
-      $self->_try_mongo_op( find => sub { $self->_mongo_collection->find($query) } );
+      $self->_try_mongo_op(
+        find => sub { $self->_mongo_collection->find( $query, $options ) } );
     return Meerkat::Cursor->new( cursor => $cursor, collection => $self );
 }
 
@@ -218,8 +226,7 @@ sub ensure_indexes {
         my $options = ref $copy[0] eq 'HASH' ? shift @copy : undef;
         if ( @copy % 2 != 0 ) {
             $self->_croak(
-                "_indexes must provide a list of key/value pairs, with an optional leading hashref"
-            );
+                "_indexes must provide a list of key/value pairs, with an optional leading hashref");
         }
         my $spec = Tie::IxHash->new(@copy);
         push @indexes, { keys => $spec, ( $options ? ( options => $options ) : () ) };
@@ -372,7 +379,7 @@ Meerkat::Collection - Associate a class, database and MongoDB collection
 
 =head1 VERSION
 
-version 0.015
+version 0.016
 
 =head1 SYNOPSIS
 
@@ -441,7 +448,10 @@ Arguments may be given either as a list or as a hash reference.
 
 Returns the number of documents in the associated collection or throws an error on
 failure.  If a hash reference is provided, it is passed as a query parameter to
-the MongoDB L<count|MongoDB::Collection/count> method.
+the MongoDB L<count_documents|MongoDB::Collection/count_documents> method.
+Otherwise, the MongoDB
+L<estimated_document_count|MongoDB::Collection/estimated_document_count> method
+is used instead.
 
 =head2 find_id
 
@@ -453,7 +463,7 @@ if one occurs.  This is a shorthand for the same query via C<find_one>:
 
     $person->find_one( { _id => $id } );
 
-However, C<find_id> can take either a scalar C<_id> or a L<MongoDB::OID> object
+However, C<find_id> can take either a scalar C<_id> or a L<BSON::OID> object
 as an argument.
 
 =head2 find_one
@@ -472,7 +482,8 @@ found or throws an error if one occurs.
 Executes a query against C<collection_name>.  It returns a L<Meerkat::Cursor>
 or throws an error on failure.  If a hash reference is provided, it is passed
 as a query parameter to the MongoDB L<find|MongoDB::Collection/find> method,
-otherwise all documents are returned.  Iterating the cursor will return
+otherwise all documents are returned.  You may include and optional options
+hash reference after the query hash reference.  Iterating the cursor will return
 objects of the associated class.
 
 =head2 ensure_indexes

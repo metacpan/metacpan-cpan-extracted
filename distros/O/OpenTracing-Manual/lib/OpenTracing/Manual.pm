@@ -1,5 +1,5 @@
 package OpenTracing::Manual;
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 'so we get indexed'

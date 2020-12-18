@@ -327,34 +327,47 @@ and explanations and how both settings play together, see below.',
       },
       'RandomizedDelaySec',
       {
-        'description' => 'Delay the timer by a randomly selected, evenly
-distributed amount of time between 0 and the specified time
-value. Defaults to 0, indicating that no randomized delay
-shall be applied. Each timer unit will determine this delay
-randomly before each iteration, and the delay will simply be
-added on top of the next determined elapsing time. This is
-useful to stretch dispatching of similarly configured timer
-events over a certain amount time, to avoid that they all fire
-at the same time, possibly resulting in resource
-congestion. Note the relation to
-C<AccuracySec> above: the latter allows the
-service manager to coalesce timer events within a specified
-time range in order to minimize wakeups, the former does the
-opposite: it stretches timer events over a time range, to make
-it unlikely that they fire simultaneously. If
-C<RandomizedDelaySec> and
-C<AccuracySec> are used in conjunction, first
-the randomized delay is added, and then the result is
-possibly further shifted to coalesce it with other timer
-events happening on the system. As mentioned above
-C<AccuracySec> defaults to 1min and
-C<RandomizedDelaySec> to 0, thus encouraging
-coalescing of timer events. In order to optimally stretch
-timer events over a certain range of time, make sure to set
-C<RandomizedDelaySec> to a higher value, and
-C<AccuracySec=1us>.',
+        'description' => 'Delay the timer by a randomly selected, evenly distributed amount of time between 0
+and the specified time value. Defaults to 0, indicating that no randomized delay shall be applied.
+Each timer unit will determine this delay randomly before each iteration, and the delay will simply
+be added on top of the next determined elapsing time, unless modified with
+C<FixedRandomDelay>, see below.
+
+This setting is useful to stretch dispatching of similarly configured timer events over a
+certain time interval, to prevent them from firing all at the same time, possibly resulting in
+resource congestion.
+
+Note the relation to C<AccuracySec> above: the latter allows the service
+manager to coalesce timer events within a specified time range in order to minimize wakeups, while
+this setting does the opposite: it stretches timer events over an interval, to make it unlikely that
+they fire simultaneously. If C<RandomizedDelaySec> and
+C<AccuracySec> are used in conjunction, first the randomized delay is added, and
+then the result is possibly further shifted to coalesce it with other timer events happening on the
+system. As mentioned above C<AccuracySec> defaults to 1 minute and
+C<RandomizedDelaySec> to 0, thus encouraging coalescing of timer events. In order to
+optimally stretch timer events over a certain range of time, set
+C<AccuracySec=1us> and C<RandomizedDelaySec> to some higher value.
+',
         'type' => 'leaf',
         'value_type' => 'uniline'
+      },
+      'FixedRandomDelay',
+      {
+        'description' => 'Takes a boolean argument. When enabled, the randomized offset specified by
+C<RandomizedDelaySec> is reused for all firings of the same timer. For a given timer
+unit, the offset depends on the machine ID, user identifier and timer name, which means that it is
+stable between restarts of the manager. This effectively creates a fixed offset for an individual
+timer, reducing the jitter in firings of this timer, while still avoiding firing at the same time as
+other similarly configured timers.
+
+This setting has no effect if C<RandomizedDelaySec> is set to 0. Defaults to
+C<false>.',
+        'type' => 'leaf',
+        'value_type' => 'boolean',
+        'write_as' => [
+          'no',
+          'yes'
+        ]
       },
       'OnClockChange',
       {
@@ -362,7 +375,7 @@ C<AccuracySec=1us>.',
 when the system clock (C<CLOCK_REALTIME>) jumps relative to the monotonic clock
 (C<CLOCK_MONOTONIC>), or when the local system timezone is modified. These options
 can be used alone or in combination with other timer expressions (see above) within the same timer
-unit. These options default to false.',
+unit. These options default to C<false>.',
         'type' => 'leaf',
         'value_type' => 'uniline'
       },
@@ -372,7 +385,7 @@ unit. These options default to false.',
 when the system clock (C<CLOCK_REALTIME>) jumps relative to the monotonic clock
 (C<CLOCK_MONOTONIC>), or when the local system timezone is modified. These options
 can be used alone or in combination with other timer expressions (see above) within the same timer
-unit. These options default to false.',
+unit. These options default to C<false>.',
         'type' => 'leaf',
         'value_type' => 'uniline'
       },
@@ -447,7 +460,7 @@ timer units. Note that this setting has an effect when repeatedly starting a tim
 C<RemainAfterElapse> is on, starting the timer a second time has no effect. However,
 if C<RemainAfterElapse> is off and the timer unit was already unloaded, it can be
 started again, and thus the service can be triggered multiple times. Defaults to
-C<yes>.',
+C<true>.',
         'type' => 'leaf',
         'value_type' => 'boolean',
         'write_as' => [
@@ -456,7 +469,7 @@ C<yes>.',
         ]
       }
     ],
-    'generated_by' => 'parse-man.pl from systemd 246 doc',
+    'generated_by' => 'parse-man.pl from systemd 247 doc',
     'license' => 'LGPLv2.1+',
     'name' => 'Systemd::Section::Timer'
   }

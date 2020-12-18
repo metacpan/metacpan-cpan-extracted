@@ -1,5 +1,16 @@
 Revision history for Meerkat
 
+0.016     2020-12-16 22:08:18-05:00 America/New_York
+
+    [INCOMPATIBLE CHANGES]
+
+    - Requires MongoDB 2.0+.  Uses BSON type wrappers instead of legacy
+      MongodDB type wrappers.
+
+    [ADDED]
+
+    - Added ability to specify options to find.
+
 0.015     2016-12-12 12:36:52-05:00 America/New_York
 
     [FIXED]

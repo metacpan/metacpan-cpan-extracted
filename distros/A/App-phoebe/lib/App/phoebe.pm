@@ -1,6 +1,6 @@
 package App::phoebe;
 
-our $VERSION = 2.03;
+our $VERSION = 2.05;
 
 =head1 NAME
 

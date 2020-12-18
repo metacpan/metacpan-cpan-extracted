@@ -3,8 +3,8 @@
 # Author          : Johan Vromans
 # Created On      : Tue Sep 15 15:59:04 1992
 # Last Modified By: Johan Vromans
-# Last Modified On: Tue Apr 11 11:15:23 2017
-# Update Count    : 154
+# Last Modified On: Tue Dec 15 14:59:05 2020
+# Update Count    : 158
 # Status          : Unknown, Use with caution!
 
 ################ Common stuff ################
@@ -20,6 +20,7 @@ my $createdirs	= 0;		# create missing dirs
 my $link	= 0;		# link instead of rename
 my $symlink	= 0;		# symlink instead
 my $verbose	= 0;		# more verbosity
+my $trace	= 0;		# tracing
 
 # Process command line options.
 app_options();
@@ -33,16 +34,16 @@ use File::PerlMove;
 # Get the command string;
 my $cmd = shift;
 
-File::PerlMove::move
-  ($cmd, \@ARGV,
-   { showonly	 => $showonly,
-     reverse	 => $reverse,
-     overwrite	 => $overwrite,
-     createdirs	 => $createdirs,
-     link	 => $link,
-     symlink	 => $symlink,
-     verbose	 => $verbose,
-   });
+pmv(  $cmd, \@ARGV,
+      { showonly   => $showonly,
+	reverse	   => $reverse,
+	overwrite  => $overwrite,
+	createdirs => $createdirs,
+	link	   => $link,
+	symlink	   => $symlink,
+	verbose	   => $verbose,
+	trace	   => $trace,
+      } );
 
 exit;
 
@@ -55,6 +56,7 @@ sub app_options {
 
     GetOptions(ident	     => \&app_ident,
 	       'verbose|v'   => \$verbose,
+	       'trace'       => \$trace,
 
 	       # application specific options go here
 	       'link|l'	     => \$link,

@@ -7,7 +7,7 @@ use v5.10.0;
 use strict;
 use warnings;
 
-our $VERSION = 'v1.0.0';
+our $VERSION = 'v1.1.1';
 
 use Carp;
 use Const::Fast;
@@ -41,7 +41,7 @@ sub import {
     $stash->add_symbol( '&import', \&Exporter::import )
       unless ( $stash->has_symbol('&import') );
 
-    _add_symbol( $stash, 'const', \&Const::Fast::const );
+    $stash->add_symbol( '&const', \&Const::Fast::const );
     _export_symbol( $stash, 'const' );
 
     foreach my $set ( pairs @_ ) {
@@ -185,8 +185,8 @@ sub _add_symbol {
     }
     else {
 
-        $stash->add_symbol( '&' . $symbol,
-            is_coderef($value) ? $value : sub { $value } );
+        const my $copy => is_coderef($value) ? $value->() : $value;
+        $stash->add_symbol( '&' . $symbol, sub() { $copy } );
 
     }
 }
@@ -242,7 +242,7 @@ Const::Exporter - Declare constants for export.
 
 =head1 VERSION
 
-version v1.0.0
+version v1.1.1
 
 =head1 SYNOPSIS
 

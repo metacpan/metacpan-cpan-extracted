@@ -3,6 +3,7 @@ Changes
 LICENSE
 META.json
 README.md
+appveyor.yml
 cpanfile
 lib/Data/Cuid.pm
 minil.toml

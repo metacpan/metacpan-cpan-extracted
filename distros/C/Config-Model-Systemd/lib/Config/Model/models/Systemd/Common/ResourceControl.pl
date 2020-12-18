@@ -189,46 +189,38 @@ L<systemd-system.conf(5)>.',
       },
       'MemoryMin',
       {
-        'description' => 'Specify the memory usage protection of the executed processes in this unit. If the memory usages of
-this unit and all its ancestors are below their minimum boundaries, this unit\'s memory won\'t be reclaimed.
+        'description' => 'Specify the memory usage protection of the executed processes in this unit.
+When reclaiming memory, the unit is treated as if it was using less memory resulting in memory
+to be preferentially reclaimed from unprotected units.
+Using C<MemoryLow> results in a weaker protection where memory may still
+be reclaimed to avoid invoking the OOM killer in case there is no other reclaimable memory.
+
+For a protection to be effective, it is generally required to set a corresponding
+allocation on all ancestors, which is then distributed between children
+(with the exception of the root slice).
+Any C<MemoryMin> or C<MemoryLow> allocation that is not
+explicitly distributed to specific children is used to create a shared protection for all children.
+As this is a shared protection, the children will freely compete for the memory.
 
 Takes a memory size in bytes. If the value is suffixed with K, M, G or T, the specified memory size is
 parsed as Kilobytes, Megabytes, Gigabytes, or Terabytes (with the base 1024), respectively. Alternatively, a
 percentage value may be specified, which is taken relative to the installed physical memory on the
 system. If assigned the special value C<infinity>, all available memory is protected, which may be
 useful in order to always inherit all of the protection afforded by ancestors.
-This controls the C<memory.min> control group attribute. For details about this
-control group attribute, see L<Memory Interface Files|https://www.kernel.org/doc/html/latest/admin-guide/cgroup-v2.html#memory-interface-files>.
+This controls the C<memory.min> or C<memory.low> control group attribute.
+For details about this control group attribute, see L<Memory Interface Files|https://www.kernel.org/doc/html/latest/admin-guide/cgroup-v2.html#memory-interface-files>.
 
 This setting is supported only if the unified control group hierarchy is used and disables
 C<MemoryLimit>.
 
-Units may have their children use a default C<memory.min> value by specifying
-C<DefaultMemoryMin>, which has the same semantics as C<MemoryMin>. This setting
-does not affect C<memory.min> in the unit itself.',
-        'type' => 'leaf',
-        'value_type' => 'uniline'
-      },
-      'MemoryLow',
-      {
-        'description' => 'Specify the best-effort memory usage protection of the executed processes in this unit. If the memory
-usages of this unit and all its ancestors are below their low boundaries, this unit\'s memory won\'t be
-reclaimed as long as memory can be reclaimed from unprotected units.
-
-Takes a memory size in bytes. If the value is suffixed with K, M, G or T, the specified memory size is
-parsed as Kilobytes, Megabytes, Gigabytes, or Terabytes (with the base 1024), respectively. Alternatively, a
-percentage value may be specified, which is taken relative to the installed physical memory on the
-system. If assigned the special value C<infinity>, all available memory is protected, which may be
-useful in order to always inherit all of the protection afforded by ancestors.
-This controls the C<memory.low> control group attribute. For details about this
-control group attribute, see L<Memory Interface Files|https://www.kernel.org/doc/html/latest/admin-guide/cgroup-v2.html#memory-interface-files>.
-
-This setting is supported only if the unified control group hierarchy is used and disables
-C<MemoryLimit>.
-
-Units may have their children use a default C<memory.low> value by specifying
-C<DefaultMemoryLow>, which has the same semantics as C<MemoryLow>. This setting
-does not affect C<memory.low> in the unit itself.',
+Units may have their children use a default C<memory.min> or
+C<memory.low> value by specifying C<DefaultMemoryMin> or
+C<DefaultMemoryLow>, which has the same semantics as
+C<MemoryMin> and C<MemoryLow>.
+This setting does not affect C<memory.min> or C<memory.low>
+in the unit itself.
+Using it to set a default child allocation is only useful on kernels older than 5.7,
+which do not support the C<memory_recursiveprot> cgroup2 mount option.',
         'type' => 'leaf',
         'value_type' => 'uniline'
       },
@@ -812,6 +804,77 @@ the disabled controller list.',
         'type' => 'leaf',
         'value_type' => 'uniline'
       },
+      'ManagedOOMSwap',
+      {
+        'choice' => [
+          'auto',
+          'kill'
+        ],
+        'description' => 'Specifies how
+L<systemd-oomd.service(8)>
+will act on this unit\'s cgroups. Defaults to C<auto>.
+
+When set to C<kill>, systemd-oomd will actively monitor this unit\'s
+cgroup metrics to decide whether it needs to act. If the cgroup passes the limits set by
+L<oomd.conf(5)> or its
+overrides, systemd-oomd will send a C<SIGKILL> to all of the processes
+under the chosen candidate cgroup. Note that only descendant cgroups can be eligible candidates for killing;
+the unit that set its property to C<kill> is not a candidate (unless one of its ancestors set
+their property to C<kill>). You can find more details on candidates and kill behavior at
+L<systemd-oomd.service(8)>
+and L<oomd.conf(5)>. Setting
+either of these properties to C<kill> will also automatically acquire
+C<After> and C<Wants> dependencies on
+C<systemd-oomd.service> unless C<DefaultDependencies=no>.
+
+When set to C<auto>, systemd-oomd will not actively use this cgroup\'s
+data for monitoring and detection. However, if an ancestor cgroup has one of these properties set to
+C<kill>, a unit with C<auto> can still be an eligible candidate for
+systemd-oomd to act on.',
+        'type' => 'leaf',
+        'value_type' => 'enum'
+      },
+      'ManagedOOMMemoryPressure',
+      {
+        'choice' => [
+          'auto',
+          'kill'
+        ],
+        'description' => 'Specifies how
+L<systemd-oomd.service(8)>
+will act on this unit\'s cgroups. Defaults to C<auto>.
+
+When set to C<kill>, systemd-oomd will actively monitor this unit\'s
+cgroup metrics to decide whether it needs to act. If the cgroup passes the limits set by
+L<oomd.conf(5)> or its
+overrides, systemd-oomd will send a C<SIGKILL> to all of the processes
+under the chosen candidate cgroup. Note that only descendant cgroups can be eligible candidates for killing;
+the unit that set its property to C<kill> is not a candidate (unless one of its ancestors set
+their property to C<kill>). You can find more details on candidates and kill behavior at
+L<systemd-oomd.service(8)>
+and L<oomd.conf(5)>. Setting
+either of these properties to C<kill> will also automatically acquire
+C<After> and C<Wants> dependencies on
+C<systemd-oomd.service> unless C<DefaultDependencies=no>.
+
+When set to C<auto>, systemd-oomd will not actively use this cgroup\'s
+data for monitoring and detection. However, if an ancestor cgroup has one of these properties set to
+C<kill>, a unit with C<auto> can still be an eligible candidate for
+systemd-oomd to act on.',
+        'type' => 'leaf',
+        'value_type' => 'enum'
+      },
+      'ManagedOOMMemoryPressureLimitPercent',
+      {
+        'description' => 'Overrides the default memory pressure limit set by
+L<oomd.conf(5)> for this unit
+(cgroup). Takes a percentage value between 0% and 100%, inclusive. This property is ignored unless
+C<ManagedOOMMemoryPressure>C<kill>. Defaults to 0%, which means use the
+default set by L<oomd.conf(5)>.
+',
+        'type' => 'leaf',
+        'value_type' => 'uniline'
+      },
       'CPUShares',
       {
         'description' => 'Assign the specified CPU time share weight to the processes executed. These options take an integer
@@ -1000,7 +1063,7 @@ C<IOWriteBandwidthMax> instead.',
         'value_type' => 'uniline'
       }
     ],
-    'generated_by' => 'parse-man.pl from systemd 246 doc',
+    'generated_by' => 'parse-man.pl from systemd 247 doc',
     'license' => 'LGPLv2.1+',
     'name' => 'Systemd::Common::ResourceControl'
   }

@@ -2,16 +2,16 @@
    "abstract" : "Perl extension for base 85 numbers, as referenced by RFC 1924",
    "author" : [
       "Tony Monroe <tmonroe plus perl at nog dot net>",
-      "Paul Cochrane <paul@liekut.de>"
+      "Paul Cochrane <ptc@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150001",
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Math-Base85",
    "no_index" : {
@@ -52,10 +52,14 @@
    },
    "release_status" : "stable",
    "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/paultcochrane/Math-Base85/issues"
+      },
       "repository" : {
          "type" : "git",
          "web" : "https://github.com/paultcochrane/Math-Base85"
       }
    },
-   "version" : "0.4"
+   "version" : "0.5",
+   "x_serialization_backend" : "JSON::PP version 4.02"
 }

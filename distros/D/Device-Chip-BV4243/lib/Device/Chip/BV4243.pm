@@ -6,7 +6,7 @@
 use v5.26;
 use Object::Pad 0.19;
 
-package Device::Chip::BV4243 0.02;
+package Device::Chip::BV4243 0.03;
 class Device::Chip::BV4243
    extends Device::Chip;
 

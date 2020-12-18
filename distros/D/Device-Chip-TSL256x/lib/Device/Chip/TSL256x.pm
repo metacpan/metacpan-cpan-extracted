@@ -6,7 +6,7 @@
 use v5.26;
 use Object::Pad 0.19;
 
-package Device::Chip::TSL256x 0.03;
+package Device::Chip::TSL256x 0.04;
 class Device::Chip::TSL256x
    extends Device::Chip;
 

@@ -6,7 +6,7 @@
 use v5.26;
 use Object::Pad 0.19;
 
-package Device::Chip::nRF24L01P 0.04;
+package Device::Chip::nRF24L01P 0.05;
 class Device::Chip::nRF24L01P
    extends Device::Chip;
 

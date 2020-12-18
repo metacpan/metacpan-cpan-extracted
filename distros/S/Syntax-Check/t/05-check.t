@@ -11,7 +11,6 @@ BEGIN {
     use_ok( 'Syntax::Check' ) || print "Bail out!\n";
 }
 
-my $t;
 my $m = 'Syntax::Check';
 my $f = 't/data/test.pl';
 my $b = 'bin/syncheck';
@@ -97,13 +96,13 @@ my $b = 'bin/syncheck';
 {
     # no file param
     {
-        my ($out, $err) = capture { `perl $b` };
+        my ($out, $err) = capture { `$^X $b` };
         like $err, qr/Program needs a file/, "bin: croak if no file arg ok";
     }
 
     # only file param
     {
-        my ($out, $err) = capture { `perl $b $f` };
+        my ($out, $err) = capture { `$^X $b $f` };
         like $err, qr/syntax OK/, "bin: with just file param, ok";
         unlike $err, qr/pragma/, "bin: with just file param, no verbose ok";
     }
@@ -113,7 +112,7 @@ my $b = 'bin/syncheck';
         # -v
         {
             my $out;
-            my (undef, $err) = capture {$out = `perl $b -v $f`};
+            my (undef, $err) = capture {$out = `$^X $b -v $f`};
 
             like $err, qr/syntax OK/, "bin: -v success ok";
             like $out, qr/pragma/, "bin: -v success prints pragma ok";
@@ -127,7 +126,7 @@ my $b = 'bin/syncheck';
         # --verbose
         {
             my $out;
-            my (undef, $err) = capture { $out = `perl $b --verbose $f` };
+            my (undef, $err) = capture { $out = `$^X $b --verbose $f` };
 
             like $err, qr/syntax OK/, "bin: --verbose success ok";
             like $out, qr/pragma/, "bin: --verbose info output ok";
@@ -141,7 +140,7 @@ my $b = 'bin/syncheck';
     # keep disabled (default)
     {
         my $out;
-        my (undef, $err) = capture { $out = `perl $b $f`};
+        my (undef, $err) = capture { $out = `$^X $b $f`};
 
         like $err, qr/syntax OK/, "bin: keep disabled success ok";
         unlike $out, qr/pragma/, "bin: keep disabled w/o verbose output ok";
@@ -154,7 +153,7 @@ my $b = 'bin/syncheck';
     # keep enabled
     {
         my $out;
-        my (undef, $err) = capture { $out = `perl $b -v -k $f` };
+        my (undef, $err) = capture { $out = `$^X $b -v -k $f` };
 
         like $err, qr/syntax OK/, "bin: enable keep success ok";
         like $out, qr/pragma/, "bin: enable keep with verbose output ok";
@@ -168,8 +167,8 @@ my $b = 'bin/syncheck';
 
     # help
     {
-        like `perl $b -h`, qr/USAGE/, "help displayed with -h ok";
-        like `perl $b --help`, qr/USAGE/, "help displayed with --help ok";
+        like `$^X $b -h`, qr/USAGE/, "help displayed with -h ok";
+        like `$^X $b --help`, qr/USAGE/, "help displayed with --help ok";
     }
 }
 

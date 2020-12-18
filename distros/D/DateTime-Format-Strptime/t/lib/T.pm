@@ -41,13 +41,6 @@ sub run_tests_from_data {
                     "no exception building parser for $test->{pattern}"
                 ) or return;
 
-                # Thursday changed from "Thu" to "Thu." and December went from
-                # "Dec" to "Dec." between CLDR versions.
-                $test->{input}
-                    =~ s/AU_THU/DateTime::Locale->load('en-AU')->day_format_abbreviated->[3]/e;
-                $test->{input}
-                    =~ s/AU_DEC/DateTime::Locale->load('en-AU')->month_format_abbreviated->[11]/e;
-
                 ( my $real_input = $test->{input} ) =~ s/\\n/\n/g;
 
                 my $dt;

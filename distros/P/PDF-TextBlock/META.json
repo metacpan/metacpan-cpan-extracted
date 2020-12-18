@@ -4,13 +4,13 @@
       "Jay Hannah <jay@jays.net>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.143240",
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "unknown"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "PDF-TextBlock",
    "no_index" : {
@@ -45,5 +45,6 @@
          "url" : "https://github.com/jhannah/pdf-textblock"
       }
    },
-   "version" : "0.08"
+   "version" : "0.10",
+   "x_serialization_backend" : "JSON::PP version 2.97001"
 }

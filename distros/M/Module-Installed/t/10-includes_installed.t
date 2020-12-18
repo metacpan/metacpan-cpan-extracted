@@ -40,5 +40,22 @@ my $file = 't/data/test.pl';
     }
 }
 
+# validate cb
+{
+
+    if (module_installed('PPI')) {
+        my @warnings;
+        local $SIG{__WARN__} = sub { push @warnings, shift; };
+
+        my $includes = includes_installed($file, sub { warn "$_[0]\n"; });
+
+        for my $w (@warnings) {
+            chomp $w;
+            is((grep {$w eq $_} keys %$includes), 1, "$w included in return ok");
+
+        }
+    }
+}
+
 done_testing();
 

@@ -1,16 +1,18 @@
 package Acme::CPANModules::COLOR;
 
-our $DATE = '2018-12-22'; # DATE
-our $VERSION = '0.001'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-09-15'; # DATE
+our $DIST = 'Acme-CPANModules-COLOR'; # DIST
+our $VERSION = '0.002'; # VERSION
 
 our $LIST = {
-    summary => "Modules that follow the COLOR convention",
+    summary => "Modules that follow the COLOR & NO_COLOR convention",
     description => <<'_',
 
 The NO_COLOR convention (see https://no-color.org) lets user disable color
 output of console programs by defining an environment variable called NO_COLOR.
-The existence of said environment variable, regardless of its value, signals
-that programs should not use colored output.
+The existence of said environment variable, regardless of its value (including
+empty string, undef, or 0), signals that programs should not use colored output.
 
 Another similar convention is the use of the COLOR environment variable. False
 value (empty string or the value 0) means that programs should disable colored
@@ -57,7 +59,7 @@ _
 };
 
 1;
-# ABSTRACT: Modules that follow the COLOR convention
+# ABSTRACT: Modules that follow the COLOR & NO_COLOR convention
 
 __END__
 
@@ -67,20 +69,18 @@ __END__
 
 =head1 NAME
 
-Acme::CPANModules::COLOR - Modules that follow the COLOR convention
+Acme::CPANModules::COLOR - Modules that follow the COLOR & NO_COLOR convention
 
 =head1 VERSION
 
-This document describes version 0.001 of Acme::CPANModules::COLOR (from Perl distribution Acme-CPANModules-COLOR), released on 2018-12-22.
+This document describes version 0.002 of Acme::CPANModules::COLOR (from Perl distribution Acme-CPANModules-COLOR), released on 2020-09-15.
 
 =head1 DESCRIPTION
 
-Modules that follow the COLOR convention.
-
 The NO_COLOR convention (see https://no-color.org) lets user disable color
 output of console programs by defining an environment variable called NO_COLOR.
-The existence of said environment variable, regardless of its value, signals
-that programs should not use colored output.
+The existence of said environment variable, regardless of its value (including
+empty string, undef, or 0), signals that programs should not use colored output.
 
 Another similar convention is the use of the COLOR environment variable. False
 value (empty string or the value 0) means that programs should disable colored
@@ -92,7 +92,7 @@ the environment variable.
 
 If you know of other modules that should be listed here, please contact me.
 
-=head1 INCLUDED MODULES
+=head1 MODULES INCLUDED IN THIS ACME::CPANMODULE MODULE
 
 =over
 
@@ -148,6 +148,23 @@ If you know of other modules that should be listed here, please contact me.
 
 =back
 
+=head1 FAQ
+
+=head2 What are ways to use this module?
+
+Aside from reading it, you can install all the listed modules using
+L<cpanmodules>:
+
+    % cpanmodules ls-entries COLOR | cpanm -n
+
+or L<Acme::CM::Get>:
+
+    % perl -MAcme::CM::Get=COLOR -E'say $_->{module} for @{ $LIST->{entries} }' | cpanm -n
+
+This module also helps L<lcpan> produce a more meaningful result for C<lcpan
+related-mods> when it comes to finding related modules for the modules listed
+in this Acme::CPANModules module.
+
 =head1 HOMEPAGE
 
 Please visit the project's homepage at L<https://metacpan.org/release/Acme-CPANModules-COLOR>.
@@ -176,7 +193,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2018 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

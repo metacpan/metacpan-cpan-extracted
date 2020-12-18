@@ -53,6 +53,11 @@ order.
     # Note, you can set the reader to be non-blocking:
     $r->blocking(0);
 
+    # Writer too (but buffers unwritten items until your next write_burst(),
+    # write_message(), or flush(), or will do a writing block when the pipe
+    # instance is destroyed.
+    $w->blocking(0);
+
     # $msg2 will be undef as no messages were sent, and blocking is turned off.
     my $msg2 = $r->read_message;
 
@@ -195,7 +200,16 @@ Fork example from tests:
 - $p->blocking($bool)
 - $bool = $p->blocking
 
-    Get/Set blocking status.
+    Get/Set blocking status. This works on read and write handles. On writers this
+    will write as many chunks/bursts as it can, then buffer any remaining until
+    your next write\_message(), write\_burst(), or flush(), at which point it will
+    write as much as it can again. If the instance is garbage collected with
+    chunks/bursts in the buffer it will block until all can be written.
+
+- $w->flush()
+
+    Write any buffered items. This is only useful on writers that are in
+    non-blocking mode, it is a no-op everywhere else.
 
 - $bool = $p->eof
 
@@ -211,12 +225,11 @@ Fork example from tests:
     This will return `undef` if the data DES NOT fit in a burst. This will return
     the size of the data in bytes if it will fit in a burst.
 
-- $undef\_or\_bytes = $p->write\_burst($data)
+- $undef\_or\_true = $p->write\_burst($data)
 
     Attempt to write `$data` in a single atomic burst. If the data is too big to
     write atomically this method will not write any data and will return `undef`.
-    If the data does fit in an atomic write then the data will be written and the
-    total number of bytes written will be returned.
+    If the data does fit in an atomic write then a true value will be returned.
 
     **Note:** YOU MUST NOT USE `read_message()` when writing bursts. This method
     sends the data as-is with no data-header or modification. This method should be

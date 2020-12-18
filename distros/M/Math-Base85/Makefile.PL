@@ -11,7 +11,7 @@ WriteMakefile(
     ABSTRACT_FROM => 'lib/Math/Base85.pm',
     AUTHOR        => [
         'Tony Monroe <tmonroe plus perl at nog dot net>',
-        'Paul Cochrane <paul@liekut.de>',
+        'Paul Cochrane <ptc@cpan.org>',
     ],
     LICENSE          => 'perl_5',
     MIN_PERL_VERSION => 5.006,
@@ -32,6 +32,9 @@ WriteMakefile(
         "meta-spec"    => { version => 2 },
         dynamic_config => 0,
         resources      => {
+            bugtracker => {
+                web => 'https://github.com/paultcochrane/Math-Base85/issues',
+            },
             repository => {
                 type => 'git',
                 url  => 'git@github.com:paultcochrane/Math-Base85.git',

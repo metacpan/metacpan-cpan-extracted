@@ -1,0 +1,20 @@
+Revision history for Music-MelodicDevice-Transposition
+
+0.0104 2020-12-17 06:14:30
+    - Whoops. Data::Dumper::Compact is necessary.
+
+0.0103 2020-12-16 18:50:26
+    - Fix-up the eg/modulate program.
+    - Improve documentation.
+    - Drop the dependency on Data::Dumper::Compact.
+
+0.0102 2020-12-16 18:16:08
+    - Add the eg/modulate program.
+    - Add transpose down tests.
+
+0.0101 2020-12-16 17:37:05
+    - Handle and test the note index not found case.
+
+0.0100 2020-12-16 16:40:34
+    - Mint with Dist::Zilla.
+    - Copy functionality from the Music::MelodicDevice::Inversion module.

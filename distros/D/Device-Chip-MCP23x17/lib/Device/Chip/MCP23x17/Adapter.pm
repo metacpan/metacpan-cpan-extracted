@@ -6,7 +6,7 @@
 use v5.26;
 use Object::Pad 0.19;
 
-package Device::Chip::MCP23x17::Adapter 0.02;
+package Device::Chip::MCP23x17::Adapter 0.03;
 class Device::Chip::MCP23x17::Adapter;
 # can't 'extends Device::Chip::Adapter' because that doesn't provide a SUPER::new
 use base qw( Device::Chip::Adapter );

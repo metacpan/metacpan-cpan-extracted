@@ -909,8 +909,6 @@ share/ckb-IR.pl
 share/ckb.pl
 share/cs-CZ.pl
 share/cs.pl
-share/cu-RU.pl
-share/cu.pl
 share/cy-GB.pl
 share/cy.pl
 share/da-DK.pl
@@ -1102,8 +1100,6 @@ share/ff-Adlm-NG.pl
 share/ff-Adlm-SL.pl
 share/ff-Adlm-SN.pl
 share/ff-Adlm.pl
-share/ff-CM.pl
-share/ff-GN.pl
 share/ff-Latn-BF.pl
 share/ff-Latn-CM.pl
 share/ff-Latn-GH.pl
@@ -1117,8 +1113,6 @@ share/ff-Latn-NG.pl
 share/ff-Latn-SL.pl
 share/ff-Latn-SN.pl
 share/ff-Latn.pl
-share/ff-MR.pl
-share/ff-SN.pl
 share/ff.pl
 share/fi-FI.pl
 share/fi.pl
@@ -1267,7 +1261,6 @@ share/kok-IN.pl
 share/kok.pl
 share/ks-Arab-IN.pl
 share/ks-Arab.pl
-share/ks-IN.pl
 share/ks.pl
 share/ksb-TZ.pl
 share/ksb.pl
@@ -1398,8 +1391,6 @@ share/pcm-NG.pl
 share/pcm.pl
 share/pl-PL.pl
 share/pl.pl
-share/prg-001.pl
-share/prg.pl
 share/ps-AF.pl
 share/ps-PK.pl
 share/ps.pl
@@ -1455,7 +1446,6 @@ share/sd-Arab-PK.pl
 share/sd-Arab.pl
 share/sd-Deva-IN.pl
 share/sd-Deva.pl
-share/sd-PK.pl
 share/sd.pl
 share/se-FI.pl
 share/se-NO.pl
@@ -1565,8 +1555,6 @@ share/vai-Vaii.pl
 share/vai.pl
 share/vi-VN.pl
 share/vi.pl
-share/vo-001.pl
-share/vo.pl
 share/vun-TZ.pl
 share/vun.pl
 share/wae-CH.pl
@@ -1584,7 +1572,6 @@ share/yi.pl
 share/yo-BJ.pl
 share/yo-NG.pl
 share/yo.pl
-share/yue-HK.pl
 share/yue-Hans-CN.pl
 share/yue-Hans.pl
 share/yue-Hant-HK.pl

@@ -1,3 +1,11 @@
+0.247.1 2020-12-17
+
+  Model update:
+    * update model from systemd 247 documentation
+
+  Other Changes:
+    * skip tests on Solaris
+
 0.246.1 2020-11-08
 
   Model update:

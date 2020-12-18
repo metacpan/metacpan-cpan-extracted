@@ -1,5 +1,9 @@
 Revision history for Device-Chip-TSL256x
 
+0.04    2020-12-15
+        [BUGFIXES]
+         * Re-packed tarball, removing stale Makefile.PL
+
 0.03    2020-12-06
         [CHANGES]
          * Updated to use Object::Pad

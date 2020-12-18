@@ -13,11 +13,11 @@ Class::Simple::Readonly::Cached - cache messages to an object
 
 =head1 VERSION
 
-Version 0.05
+Version 0.06
 
 =cut
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 =head1 SYNOPSIS
 
@@ -27,11 +27,11 @@ the status of an object that are otherwise expensive.
 It is up to the caller to maintain the cache if the object comes out of sync with the cache,
 for example by changing its state.
 
-Note that it only works on objects which doesn't change its state based on input
+You can use this class to create a caching layer to an object of any class
+that works on objects which doesn't change its state based on input:
 
     $val = $obj->val();
     $val = $obj->val(a => 'b');
-
 
 =head1 SUBROUTINES/METHODS
 
@@ -48,6 +48,15 @@ It takes one optional argument: object,
 which is an object which is taken to be the object to be cached.
 If not given, an object of the class L<Class::Simple> is instantiated
 and that is used.
+
+    use Gedcom;
+
+    my %hash;
+    my $person = Gedcom::Person->new();
+    ... # Set up some data
+    my $object = Class::Simple::Readonly::Cached(object => $person, cache => \%hash);
+    my $father1 = $object->father();	# Will call gedcom->father() to get the person's father
+    my $father2 = $object->father();	# Will retived the father from the cache without calling person->father()
 
 =cut
 
@@ -142,7 +151,6 @@ sub AUTOLOAD {
 
 	# my $func = $self->{'object'} . "::$param";
 	my $func = $param;
-	my $object = $self->{'object'};
 
 	# if($param =~ /^[gs]et_/) {
 		# # $param = "SUPER::$param";
@@ -179,9 +187,10 @@ sub AUTOLOAD {
 			return $rc;
 		}
 	}
+	$self->{_misses}{$key}++;
+	my $object = $self->{'object'};
 	if(wantarray) {
 		my @rc = $object->$func(@_);
-		$self->{_hits}{$key}++;
 		if(scalar(@rc) == 0) {
 			return;
 		}
@@ -192,7 +201,6 @@ sub AUTOLOAD {
 		}
 		return @rc;
 	}
-	$self->{_misses}{$key}++;
 	$rc = $object->$func(@_);
 	if(!defined($rc)) {
 		if(ref($cache) eq 'HASH') {
@@ -241,13 +249,29 @@ You can also look for information at:
 
 =over 4
 
+=item * MetaCPAN
+
+L<https://metacpan.org/release/Class-Simple-Readonly-Cached>
+
 =item * RT: CPAN's request tracker
 
-L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Class-Simple-Readonly-Cached>
+L<https://rt.cpan.org/NoAuth/Bugs.html?Dist=Class-Simple-Readonly-Cached>
+
+=item * CPANTS
+
+L<http://cpants.cpanauthors.org/dist/Class-Simple-Readonly-Cached>
+
+=item * CPAN Testers' Matrix
+
+L<http://matrix.cpantesters.org/?dist=Class-Simple-Readonly-Cached>
 
 =item * CPAN Ratings
 
 L<http://cpanratings.perl.org/d/Class-Simple-Readonly-Cached>
+
+=item * CPAN Testers Dependencies
+
+L<http://deps.cpantesters.org/?module=Class::Simple::Readonly::Cached>
 
 =item * Search CPAN
 

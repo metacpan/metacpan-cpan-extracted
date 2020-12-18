@@ -5,12 +5,13 @@ package Dancer2::Plugin::Minion;
 use Dancer2::Plugin;
 use Minion;
 
-our $VERSION = '0.1.0';
+our $VERSION = '0.3.1';
 
 plugin_keywords qw(
     minion
     add_task
     enqueue
+    minion_app
 );
 
 has _backend => (
@@ -41,6 +42,27 @@ sub enqueue {
     return shift->minion->enqueue( @_ );
 }
 
+sub minion_app {
+    my $plugin = shift;
+    my $return_to = shift || '/';
+
+    require Mojolicious;
+    my $app = Mojolicious->new;
+    $app->log->level('warn');
+
+    # emulate minion plugin, needed for admin panel
+    $app->helper(minion => sub { $plugin->minion });
+    # enable the minion command system
+    push @{ $app->commands->namespaces }, 'Minion::Command';
+
+    $app->plugin('Minion::Admin' => {
+        route => $app->routes->any('/'),
+        return_to => $return_to,
+    });
+
+    return $app;
+}
+
 1;
 
 __END__
@@ -55,13 +77,14 @@ Dancer2::Plugin::Minion - Use the Minion job queue in your Dancer2 apps.
 
 =head1 VERSION
 
-version 0.2.1
+version 0.3.1
 
 =head1 SYNOPSIS
 
     package MyApp;
     use Dancer2;
     use Dancer2::Plugin::Minion;
+    use Plack::Builder;
 
     get '/' => sub {
         add_task( add => sub {
@@ -79,6 +102,11 @@ version 0.2.1
         # Get a job ID, then...
         my $result = minion->job($id)->info->{result};
     };
+
+    build {
+      mount '/dashboard/' => minion_app->start;
+      mount '/' => start;
+    }
 
     # In config.yml
     plugins:
@@ -125,6 +153,18 @@ more information.
 Keyword/shortcut for C<< minion->enqueue() >>. 
 See L<Minion's enqueue() documentation|Minion/enqueue1>
 for more information.
+
+=head2 minion_app()
+
+Build a L<Mojolicious> application with the
+L<Mojolicious::Plugin::Minion::Admin> application running. This application can
+then be started and mounted inside your own but be sure to leave a trailing
+slash in your mount path!
+
+You can optionally pass in an absolute URL to act as the "return to" link. The url must
+be absolute or else it will be made relative to the admin UI, which is probably
+not what you want. For example: 
+C<< mount '/dashboard/' => minion_app( '/foo/bar' )->start; >>
 
 =head1 RUNNING JOBS
 

@@ -1,5 +1,5 @@
 ---
-abstract: 'indtsll and update Farsi free fonts'
+abstract: 'Install and update free Farsi fonts'
 author:
   - Kiavash
 build_requires:
@@ -33,5 +33,5 @@ requires:
   perl: '5.012'
 resources:
   repository: https://github.com/kiamazi/kateb.git
-version: v01.00.20
+version: v01.00.22
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

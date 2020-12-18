@@ -54,7 +54,7 @@ $tb->text($text);
 ok(($endw, $ypos) = $tb->apply(),                     "apply()");
 
 $tb->y($ypos);
-$tb->text($text_with_bold . " (This is BUG1.)");
+$tb->text($text_with_bold . " (This is github issue #4)");
 ok(($endw, $ypos) = $tb->apply(),                     "apply()");
 
 # ---
@@ -70,7 +70,7 @@ $tb->text($text);
 ok(($endw, $ypos) = $tb->apply(),                     "apply()");
 
 $tb->y($ypos);
-$tb->text($text_with_bold . " (This is BUG1.)");
+$tb->text($text_with_bold . " (This is github issue #4)");
 ok(($endw, $ypos) = $tb->apply(),                     "apply()");
 
 # ---

@@ -3,10 +3,13 @@ lib/Class/Simple/Readonly/Cached.pm
 LICENSE
 Makefile.PL
 MANIFEST			This list of files
+MANIFEST.SKIP
 README.md
 t/carp.t
 t/chi.t
 t/hash.t
+t/lcm.t
+t/links.t
 t/no404s.t
 t/noopentickets.t
 t/noplan.t
@@ -16,6 +19,7 @@ t/port.t
 t/spelling.t
 t/unused.t
 t/used.t
+t/utf8.t
 t/vars.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

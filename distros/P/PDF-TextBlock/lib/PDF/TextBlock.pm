@@ -22,7 +22,7 @@ PDF::TextBlock - Easier creation of text blocks when using PDF::API2
 
 =cut
 
-our $VERSION = '0.08';
+our $VERSION = '0.10';
 
 =head1 SYNOPSIS
 
@@ -397,14 +397,13 @@ sub apply {
       # If we want to justify this line, or if there are any markup tags
       # in here we'll have to split the line up word for word.
       if ( $align eq 'justify' or (grep /<.*>/, @line) ) {
-         # TODO: [BUG1] This loop is DOA for align 'right' and 'center' with any tags. 
+         # TODO: #4 This loop is DOA for align 'right' and 'center' with any tags. 
          foreach my $word (@line) {
             if (($tag) = ($word =~ /<(.*?)>/)) {
                # warn "tag is $tag";
-               if ($tag =~ /^href/) {
-                  ($href) = ($tag =~ /href="(.*?)"/);
-                  # warn "href is now $href";
-                  $current_content_text = $content_texts{href} if ref $content_texts{href};
+               if ($tag =~ /^href[a-z]?/) {
+                  ($tag, $href) = ($tag =~ /(href[a-z]?)="(.*?)"/);
+                  $current_content_text = $content_texts{$tag} if ref $content_texts{$tag};
                } elsif ($tag !~ /\//) {
                   $current_content_text = $content_texts{$tag};
                }
@@ -425,7 +424,7 @@ sub apply {
                # $underline->strokecolor('black');
                $underline->linewidth(.5);
                $underline->move( $xpos, $ypos - 2);
-               if ($word =~ /<\/href/) {
+               if ($word =~ /<\/href[a-z]?/) {
                   $underline->line( $xpos + $width{$word}, $ypos - 2);
                } else {
                   $underline->line( $xpos + $width{$word} + $wordspace, $ypos - 2);
@@ -447,7 +446,7 @@ sub apply {
             $xpos += ( $width{$word} + $wordspace ) if (@line);
 
             if ($word =~ /\//) {
-               if ($word =~ /\/href/) {
+               if ($word =~ /\/href[a-z]?/) {
                   undef $href;
                }
                unless ($href) {
@@ -559,13 +558,10 @@ As written the software is in a loop calculating x position of each word,
 one word at a time from left to right. But in the case of aligns 'right' 
 and 'center' we don't know the position of the first word until we know the 
 x positions of ALL words. 
-We need a smarter handler for this scenario. See t/30-demo.t. [BUG1]
+We need a smarter handler for this scenario. See t/30-demo.t.
+https://github.com/jhannah/pdf-textblock/issues/4
 
 =back
-
-Please report any bugs or feature requests to C<bug-pdf-textblock at rt.cpan.org>, or through
-the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=PDF-TextBlock>.  I will be notified, and then you'll
-automatically be notified of progress on your bug as I make changes.
 
 =head1 SUPPORT
 
@@ -573,31 +569,7 @@ You can find documentation for this module with the perldoc command.
 
     perldoc PDF::TextBlock
 
-You can also look for information at:
-
-=over 4
-
-=item * RT: CPAN's request tracker
-
-L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=PDF-TextBlock>
-
-=item * AnnoCPAN: Annotated CPAN documentation
-
-L<http://annocpan.org/dist/PDF-TextBlock>
-
-=item * CPAN Ratings
-
-L<http://cpanratings.perl.org/d/PDF-TextBlock>
-
-=item * Search CPAN
-
-L<http://search.cpan.org/dist/PDF-TextBlock>
-
-=item * Version control
-
-L<http://github.com/jhannah/pdf-textblock>
-
-=back
+Source code and bug reports on github: L<http://github.com/jhannah/pdf-textblock>
 
 =head1 ACKNOWLEDGEMENTS
 
@@ -606,7 +578,7 @@ This module started from, and has grown on top of, Rick Measham's (aka Woosta)
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright 2009-2013 Jay Hannah, all rights reserved.
+Copyright 2009-2020 Jay Hannah, all rights reserved.
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

@@ -58,6 +58,6 @@
          "web" : "https://alexschroeder.ch/cgit/phoebe/about/"
       }
    },
-   "version" : 2.03,
+   "version" : 2.05,
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

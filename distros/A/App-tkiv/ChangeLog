@@ -1,3 +1,11 @@
+0.131 - 17 Dec 2020, H.Merijn Brand
+    * Checked with perl-5.24.0 .. 5.30.0
+    * It's 2017
+    * It's 2018
+    * It's 2019
+    * Add cpanfile
+    * It's 2020
+
 0.130 - 02 Jan 2016, H.Merijn Brand
     * Add a third line to in-image exif info showing device/camera
     * Add CONTRIBUTING.md

@@ -155,9 +155,9 @@ instance, and the alias template instance are read.
 
 In addition to C</etc/systemd/system>, the drop-in C<.d/>
 directories for system services can be placed in C</usr/lib/systemd/system> or
-C</run/systemd/system> directories. Drop-in files in C</etc>
-take precedence over those in C</run> which in turn take precedence over those
-in C</usr/lib>. Drop-in files under any of these directories take precedence
+C</run/systemd/system> directories. Drop-in files in C</etc/>
+take precedence over those in C</run/> which in turn take precedence over those
+in C</usr/lib/>. Drop-in files under any of these directories take precedence
 over unit files wherever located. Multiple drop-in files with different names are applied in
 lexicographic order, regardless of which of the directories they reside in.
 
@@ -200,7 +200,7 @@ start it even manually.
 
 The unit file format is covered by the
 L<Interface
-Stability Promise|https://www.freedesktop.org/wiki/Software/systemd/InterfaceStabilityPromise>.
+Portability and Stability Promise|https://systemd.io/PORTABILITY_AND_STABILITY/>.
 
 The set of load paths for the user manager instance may be augmented or
 changed using various environment variables. And environment variables may in
@@ -590,9 +590,9 @@ the C<PrivateNetwork>, C<NetworkNamespacePath> and
 C<PrivateTmp> directives (see
 L<systemd.exec(5)> for
 details). If a unit that has this setting set is started, its processes will see the same
-C</tmp>, C</var/tmp> and network namespace as one listed unit
+C</tmp/>, C</var/tmp/> and network namespace as one listed unit
 that is started. If multiple listed units are already started, it is not defined which namespace is
-joined.  Note that this setting only has an effect if
+joined. Note that this setting only has an effect if
 C<PrivateNetwork>/C<NetworkNamespacePath> and/or
 C<PrivateTmp> is enabled for both the unit that joins the namespace and the unit
 whose namespace is joined.',
@@ -974,6 +974,7 @@ C<zvm>,
 C<vmware>,
 C<microsoft>,
 C<oracle>,
+C<powervm>,
 C<xen>,
 C<bochs>,
 C<uml>,
@@ -988,6 +989,7 @@ C<podman>,
 C<rkt>,
 C<wsl>,
 C<proot>,
+C<pouch>,
 C<acrn> to test
 against a specific implementation, or
 C<private-users> to check whether we are running in a user namespace. See
@@ -1023,7 +1025,10 @@ specific kernel command line option is set (or if prefixed with the exclamation 
 argument must either be a single word, or an assignment (i.e. two words, separated by
 C<=>). In the former case the kernel command line is searched for the word
 appearing as is, or as left hand side of an assignment. In the latter case, the exact assignment is
-looked for with right and left hand side matching.",
+looked for with right and left hand side matching. This operates on the kernel command line
+communicated to userspace via C</proc/cmdline>, except when the service manager
+is invoked as payload of a container manager, in which case the command line of C<PID
+1> is used instead (i.e. C</proc/1/cmdline>).",
         'type' => 'list'
       },
       'ConditionKernelVersion',
@@ -1112,21 +1117,21 @@ disconnected from a power source.',
       {
         'cargo' => {
           'choice' => [
-            '/var',
-            '/etc',
-            '!/var',
-            '!/etc'
+            '/var/',
+            '/etc/',
+            '!/var/',
+            '!/etc/'
           ],
           'type' => 'leaf',
           'value_type' => 'enum'
         },
-        'description' => 'Takes one of C</var> or C</etc> as argument,
+        'description' => 'Takes one of C</var/> or C</etc/> as argument,
 possibly prefixed with a C<!> (to invert the condition). This condition may be
 used to conditionalize units on whether the specified directory requires an update because
-C</usr>\'s modification time is newer than the stamp file
+C</usr/>\'s modification time is newer than the stamp file
 C<.updated> in the specified directory. This is useful to implement offline
-updates of the vendor operating system resources in C</usr> that require updating
-of C</etc> or C</var> on the next following boot. Units making
+updates of the vendor operating system resources in C</usr/> that require updating
+of C</etc/> or C</var/> on the next following boot. Units making
 use of this condition should order themselves before
 L<systemd-update-done.service(8)>,
 to make sure they run before the stamp file\'s modification time gets reset indicating a completed
@@ -1151,10 +1156,16 @@ command line option is not specified anymore.',
           ]
         },
         'description' => 'Takes a boolean argument. This condition may be used to conditionalize units on
-whether the system is booting up with an unpopulated C</etc> directory
-(specifically: an C</etc> with no C</etc/machine-id>). This may
-be used to populate C</etc> on the first boot after factory reset, or when a new
-system instance boots up for the first time.
+whether the system is booting up for the first time.  This roughly means that C</etc/>
+is unpopulated (for details, see "First Boot Semantics" in
+L<machine-id(5)>).
+This may be used to populate C</etc/> on the first boot after factory reset, or
+when a new system instance boots up for the first time.
+
+For robustness, units with C<ConditionFirstBoot=yes> should order themselves
+before C<first-boot-complete.target> and pull in this passive target with
+C<Wants>.  This ensures that in a case of an aborted first boot, these units will
+be re-run during the next system startup.
 
 If the C<systemd.condition-first-boot=> option is specified on the kernel
 command line (taking a boolean), it will override the result of this condition check, taking
@@ -1672,7 +1683,7 @@ into.",
         'warn' => 'OnFailureIsolate is now OnFailureJobMode.'
       }
     ],
-    'generated_by' => 'parse-man.pl from systemd 246 doc',
+    'generated_by' => 'parse-man.pl from systemd 247 doc',
     'license' => 'LGPLv2.1+',
     'name' => 'Systemd::Section::Unit'
   }

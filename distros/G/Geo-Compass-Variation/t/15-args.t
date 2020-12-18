@@ -7,7 +7,8 @@ use Test::More;
 my $m = 'Geo::Compass::Variation';
 my $ok;
 
-{ # not enough args
+# not enough args
+{
 
     $ok = eval {
         Geo::Compass::Variation::_args();
@@ -26,7 +27,8 @@ my $ok;
     like $@, qr/Minimum latitude and longitude/, "and error is sane";
 }
 
-{ # lat
+# lat
+{
     $ok = eval {
         Geo::Compass::Variation::_args(-181, 0);
         1;
@@ -53,7 +55,9 @@ my $ok;
         like $@, qr/Latitude must be a number/, "and error is sane";
     }
 }
-{ # lon
+
+# lon
+{
 
     $ok = eval {
         Geo::Compass::Variation::_args(0, -181);
@@ -81,8 +85,9 @@ my $ok;
         like $@, qr/Longitude must be a number/, "and error is sane";
     }
 }
-{ # alt
 
+# alt
+{
     $ok = eval {
         Geo::Compass::Variation::_args(0, 0);
         1;
@@ -107,8 +112,9 @@ my $ok;
         like $@, qr/Altitude must be an integer/, "and error is sane";
     }
 }
-{ # year
 
+# year
+{
     for (qw(! a A)) {
         $ok = eval {
             Geo::Compass::Variation::_args(0, 0, 0, $_);
@@ -119,4 +125,5 @@ my $ok;
         like $@, qr/Year must be a number/, "and error is sane";
     }
 }
+
 done_testing;

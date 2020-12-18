@@ -263,14 +263,12 @@ plugins:
    +prereqs:
     - develop_requires: Badge::Depot 0.0103
     - develop_requires: Badge::Depot::Plugin::Perl
-    - develop_requires: Badge::Depot::Plugin::Travis
     - develop_requires: Badge::Depot::Plugin::Kwalitee
     - develop_requires: Badge::Depot::Plugin::Cpantesters
     - develop_requires: Badge::Depot::Plugin::Coverage
     - develop_requires: Pod::Weaver::Section::Badges 0.0401
    badge:
     - perl
-    - travis
     - kwalitee
     - cpantesters
     - coverage

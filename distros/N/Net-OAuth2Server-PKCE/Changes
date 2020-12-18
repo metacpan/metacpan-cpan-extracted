@@ -1,5 +1,8 @@
 Revision history for Net-OAuth2Server-PKCE
 
+0.003 Thu 17 Dec 2020
+	- Compatibility with Net::OAuth2Server 0.004
+
 0.002 Tue 10 Nov 2020
 	- Better error reporting
 

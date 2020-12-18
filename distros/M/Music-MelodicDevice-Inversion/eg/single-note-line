@@ -1,0 +1,43 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+
+use Data::Dumper::Compact 'ddc';
+use lib map { "$ENV{HOME}/sandbox/$_/lib" } qw(MIDI-Util);
+use MIDI::Util;
+use Music::MelodicDevice::Inversion;
+use Music::Scales qw(get_scale_notes);
+
+my $scale_note = shift || 'C';
+my $scale_name = shift || 'major';
+
+my $score = MIDI::Util::setup_score();
+
+my $md = Music::MelodicDevice::Inversion->new(
+    scale_note => $scale_note,
+    scale_name => $scale_name,
+#    verbose => 1,
+);
+
+my @scale = (
+    (map { $_ . 4 } get_scale_notes($scale_note, $scale_name)),
+    (map { $_ . 5 } get_scale_notes($scale_note, $scale_name)),
+);
+
+my @notes;
+
+for my $i (1 .. 4) {
+    if ($i % 2 == 0) {
+        @notes = @{ $md->invert($scale_note . 5, \@notes) };
+    }
+    else {
+        @notes = map { $scale[int rand @scale] } 1 .. 4;
+    }
+
+    @notes = MIDI::Util::midi_format(@notes);
+    print ddc(\@notes);
+
+    $score->n('qn', $_) for @notes;
+}
+
+$score->write_score("$0.mid");

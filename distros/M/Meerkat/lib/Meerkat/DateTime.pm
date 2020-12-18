@@ -5,7 +5,7 @@ use warnings;
 package Meerkat::DateTime;
 # ABSTRACT: DateTime proxy for lazy inflation from an epoch value
 
-our $VERSION = '0.015';
+our $VERSION = '0.016';
 
 use Moose 2;
 use MooseX::AttributeShortcuts;
@@ -64,7 +64,7 @@ Meerkat::DateTime - DateTime proxy for lazy inflation from an epoch value
 
 =head1 VERSION
 
-version 0.015
+version 0.016
 
 =head1 SYNOPSIS
 
@@ -77,7 +77,7 @@ version 0.015
 =head1 DESCRIPTION
 
 This module provides a way to lazily inflate floating point epoch seconds into
-a L<DateTime object>.  It's conceptually similar to L<DateTime::Tiny>, but
+a L<DateTime> object.  It's conceptually similar to L<DateTime::Tiny>, but
 without all the year, month, day, etc. fields.
 
 The L<Meerkat::Types> module provides Moose type support and coercions and

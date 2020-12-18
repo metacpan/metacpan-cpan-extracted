@@ -1,0 +1,68 @@
+---
+abstract: 'Convert exported Perl constants to JavaScript'
+author:
+  - 'Robert Rothenberg <rrwo@cpan.org>'
+build_requires:
+  Exporter: '0'
+  File::Spec: '0'
+  Module::Metadata: '0'
+  Test2::V0: '0'
+  Test::Deep: '0'
+  Test::Deep::Regexp: '0'
+  Test::Deep::Set: '0'
+  Test::Differences: '0'
+  Test::More: '0'
+  Test::Most: '0.35'
+  Test::Script: '1.23'
+  Test::Warnings: '0.028'
+  constant: '0'
+  lib: '0'
+  version: '0.77'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.015, CPAN::Meta::Converter version 2.150010'
+keywords:
+  - JavaScript
+  - constants
+  - web
+  - development
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: JavaScript-Const-Exporter
+provides:
+  JavaScript::Const::Exporter:
+    file: lib/JavaScript/Const/Exporter.pm
+    version: v0.1.4
+recommends:
+  Cpanel::JSON::XS: '0'
+  Package::Stash::XS: '0'
+  Ref::Util::XS: '0'
+  Type::Tiny::XS: '0'
+requires:
+  Carp: '0'
+  JSON::MaybeXS: '0'
+  Module::Load: '0'
+  Moo: '1.002000'
+  MooX::Options: '0'
+  Package::Stash: '0'
+  Path::Tiny: '0'
+  Ref::Util: '0'
+  Sub::Identify: '0.06'
+  Try::Tiny: '0'
+  Types::Common::String: '0'
+  Types::Standard: '0'
+  namespace::autoclean: '0'
+  perl: v5.10.0
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/robrwo/JavaScript-Const-Exporter/issues
+  repository: git://github.com/robrwo/JavaScript-Const-Exporter.git
+version: v0.1.4
+x_authority: cpan:RRWO
+x_generated_by_perl: v5.28.1
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: Artistic-2.0

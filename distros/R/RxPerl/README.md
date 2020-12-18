@@ -37,7 +37,7 @@ The documentation in this POD applies to all three adapter modules as well.
 This module is an implementation of [Reactive Extensions](http://reactivex.io/) in Perl. It replicates the
 behavior of [rxjs 6](https://www.npmjs.com/package/rxjs) which is the JavaScript implementation of ReactiveX.
 
-Currently 52 of the 100+ operators in rxjs are implemented in this module.
+Currently 53 of the 100+ operators in rxjs are implemented in this module.
 
 # EXPORTABLE FUNCTIONS
 
@@ -133,14 +133,14 @@ should apply to RxPerl too).
 
     [https://rxjs.dev/api/index/function/forkJoin](https://rxjs.dev/api/index/function/forkJoin)
 
-        # [30, 3, 'c']
+        # [30, 3, 'c'], complete
         rx_fork_join([
             rx_of(10, 20, 30),
             rx_of(1, 2, 3),
             rx_of('a', 'b', 'c'),
         ])->subscribe($observer);
 
-        # {x => 30, y => 3, z => 'c'}
+        # {x => 30, y => 3, z => 'c'}, complete
         rx_fork_join({
             x => rx_of(10, 20, 30),
             y => rx_of(1, 2, 3),
@@ -243,6 +243,8 @@ should apply to RxPerl too).
 
     [https://rxjs.dev/api/index/class/ReplaySubject](https://rxjs.dev/api/index/class/ReplaySubject)
 
+    Works like rxjs's "replaySubject", except the `window_time` parameter is in seconds instead of ms.
+
         # 20, 30, 40, 50, complete
         my $rs = rx_replay_subject(2);
         $rs->next(10);
@@ -313,6 +315,20 @@ too).
             op_audit_time(1),
         )->subscribe($observer);
 
+- op\_buffer\_count
+
+    [https://rxjs.dev/api/operators/bufferCount](https://rxjs.dev/api/operators/bufferCount)
+
+        # [10, 20, 30], [40, 50], complete
+        rx_of(10, 20, 30, 40, 50)->pipe(
+            op_buffer_count(3),
+        )->subscribe($observer);
+
+        # [10, 20, 30], [20, 30, 40], [30, 40, 50], [40, 50], [50], complete
+        rx_of(10, 20, 30, 40, 50)->pipe(
+            op_buffer_count(3, 1),
+        )->subscribe($observer);
+
 - op\_catch\_error
 
     [https://rxjs.dev/api/operators/catchError](https://rxjs.dev/api/operators/catchError)
@@ -359,7 +375,7 @@ too).
 
     [https://rxjs.dev/api/operators/distinctUntilChanged](https://rxjs.dev/api/operators/distinctUntilChanged)
 
-        # 10, undef, 20, 30, [], []
+        # 10, undef, 20, 30, [], [], complete
         rx_of(10, 10, undef, undef, 20, 20, 20, 30, 30, [], [])->pipe(
             op_distinct_until_changed(),
         )->subscribe($observer);
@@ -419,7 +435,7 @@ too).
             op_filter(sub {$_[0] % 2 == 0}),
         )->subscribe($observer);
 
-        # 10, 36, 50
+        # 10, 36, 50, complete
         rx_of(10, 22, 36, 41, 50, 73)->pipe(
             op_filter(sub ($v, $idx) { $idx % 2 == 0 }),
         )->subscribe($observer);
@@ -760,8 +776,9 @@ ReactiveX to cater for web developers already familiar with rxjs.
 
 # LEARNING RESOURCES
 
-- [Ultimate RxJS courses](https://ultimatecourses.com/courses/rxjs)
-- [egghead RxJS courses](https://egghead.io/browse/libraries/rxjs)
+- [RxJS Top Ten - Code This, Not That](https://www.youtube.com/watch?v=ewcoEYS85Co)
+- [Ultimate RxJS courses](https://ultimatecourses.com/courses/rxjs) _(paid)_
+- [egghead RxJS courses](https://egghead.io/browse/libraries/rxjs) _(paid)_
 - [Rx Marbles](https://rxmarbles.com/)
 
 # SEE ALSO

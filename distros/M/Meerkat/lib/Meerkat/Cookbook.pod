@@ -1,5 +1,5 @@
 # PODNAME: Meerkat::Cookbook
-# ABSTRACT: Meerkat recipes with dos and don'ts
+# ABSTRACT: Meerkat recipes with do's and don'ts
 
 __END__
 
@@ -9,11 +9,11 @@ __END__
 
 =head1 NAME
 
-Meerkat::Cookbook - Meerkat recipes with dos and don'ts
+Meerkat::Cookbook - Meerkat recipes with do's and don'ts
 
 =head1 VERSION
 
-version 0.015
+version 0.016
 
 =head1 COOKBOOK
 

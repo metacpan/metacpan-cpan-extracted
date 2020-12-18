@@ -1,5 +1,9 @@
 Revision history for Class::Simple::Readonly::Cached
 
+0.06	Thu Dec 17 14:38:12 EST 2020
+	Was falsely claiming retrieval of an array after a scalar retrieval
+		is a cache hit
+
 0.05	Thu 17 Oct 09:36:27 EDT 2019
 	Improved caching of functions that return 0
 	Better testing that caching actually caches everywhere

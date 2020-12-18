@@ -1,0 +1,115 @@
+#!perl
+
+# ABSTRACT: Generate JavaScript from exported Perl constants
+# PODNAME: js-const
+
+
+use strict;
+use warnings;
+
+use Path::Tiny qw/ path /;
+use JavaScript::Const::Exporter;
+
+my $exporter = JavaScript::Const::Exporter->new_with_options;
+
+my $buffer = $exporter->process;
+
+if (my $output = shift @ARGV) {
+
+    my $file = path($output);
+    $file->spew_raw($buffer);
+
+}
+else {
+
+    print $buffer;
+
+}
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+js-const - Generate JavaScript from exported Perl constants
+
+=head1 VERSION
+
+version v0.1.4
+
+=head1 SYNOPSIS
+
+  js-const -Ilib -m MyApp::Consts public/js/consts.js
+
+=head1 OPTIONS
+
+=head2 C<-c> I<symbol>
+
+=head2 C<--constants> I<symbol>
+
+This specifies a constant or export tag to extract.
+
+Can be specified multiple times.
+
+If omitted, it will attempt to use the module's C<@EXPORT_OK>.
+
+=head2 C<-I> I<path>
+
+=head2 C<--include> I<path>
+
+Option paths to include in C<@INC>.
+
+=head2 C<-m> I<module>
+
+=head2 C<--mpdile> I<module>
+
+The module name to extract constants from.
+
+=head2 C<-p>
+
+=head2 C<--pretty>
+
+Enable pretty printed JSON for arrays or objects (hashes).
+
+=head2 C<-u>
+
+=head2 C<--use_var>
+
+Use var instead of const.
+
+=head1 SEE ALSO
+
+L<JavaScript::Const::Exporter>
+
+L<MooX::Options>
+
+=head1 SOURCE
+
+The development version is on github at L<https://github.com/robrwo/JavaScript-Const-Exporter>
+and may be cloned from L<git://github.com/robrwo/JavaScript-Const-Exporter.git>
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website
+L<https://github.com/robrwo/JavaScript-Const-Exporter/issues>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 AUTHOR
+
+Robert Rothenberg <rrwo@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2020 by Robert Rothenberg.
+
+This is free software, licensed under:
+
+  The Artistic License 2.0 (GPL Compatible)
+
+=cut

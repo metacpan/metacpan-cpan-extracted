@@ -34,8 +34,8 @@
       "test" : {
          "requires" : {
             "Data::Dumper" : "0",
-            "Net::OAuth2Server::Request::Authorization" : "0.003",
-            "Net::OAuth2Server::Request::Token::AuthorizationCode" : "0.003"
+            "Net::OAuth2Server::Request::Authorization" : "0.004",
+            "Net::OAuth2Server::Request::Token::AuthorizationCode" : "0.004"
          }
       }
    },
@@ -50,7 +50,7 @@
          "web" : "https://github.com/ap/Net-OAuth2Server-PKCE"
       }
    },
-   "version" : "0.002",
+   "version" : "0.003",
    "x_copyright" : {
       "holder" : "Aristotle Pagaltzis",
       "year" : 2020

@@ -1,6 +1,6 @@
 package Module::Installed;
 
-our $VERSION = '1.01';
+our $VERSION = '1.02';
 
 use strict;
 use warnings;
@@ -26,7 +26,7 @@ BEGIN {
 }
 
 sub includes_installed {
-    my $file = shift;
+    my ($file, $cb) = @_;
 
     my $PPI = $ENV{MI_TEST_PPI} ? $ENV{MI_TEST_PPI} : 'PPI';
 
@@ -47,13 +47,13 @@ sub includes_installed {
     my %includes;
 
     for (@$includes) {
-        $includes{$_->module} = module_installed($_->module) ? 1 : 0;
+        $includes{$_->module} = module_installed($_->module, $cb) ? 1 : 0;
     }
 
     return \%includes;
 }
 sub module_installed {
-    my $name = shift;
+    my ($name, $sub) = @_;
 
     # convert Foo::Bar -> Foo/Bar.pm
     my $name_pm;
@@ -63,8 +63,23 @@ sub module_installed {
         $name_pm = $name;
     }
 
-    return 1 if exists $INC{$name_pm};
-    return eval {_module_source($name_pm); 1 } ? 1 : 0;
+    my $installed = 0;
+
+    if (exists $INC{$name_pm}) {
+        $installed = 1;
+    }
+    elsif (eval {_module_source($name_pm); 1 } ? 1 : 0) {
+        $installed = 1;
+    }
+
+    if (defined $sub) {
+        if (ref $sub ne 'CODE') {
+            croak("Callback parameter to module_installed() must be a code ref")
+        }
+        $sub->($name, $name_pm, $installed);
+    }
+
+    return $installed;
 }
 sub _get_module_source {
     my $name = shift;
@@ -153,8 +168,8 @@ Module::Installed - Check whether a module, or a file's list of includes are
 installed.
 
 =for html
-<a href="http://travis-ci.org/stevieb9/mock-sub"><img src="https://secure.travis-ci.org/stevieb9/module_installed.png"/>
-<a href='https://coveralls.io/github/stevieb9/module_installed?branch=master'><img src='https://coveralls.io/repos/stevieb9/module_installed/badge.svg?branch=master&service=github' alt='Coverage Status' /></a>
+<a href="http://travis-ci.com/stevieb9/module-installed"><img src="https://www.travis-ci.com/stevieb9/module-installed.svg?branch=master"/>
+<a href='https://coveralls.io/github/stevieb9/module-installed?branch=master'><img src='https://coveralls.io/repos/stevieb9/module-installed/badge.svg?branch=master&service=github' alt='Coverage Status' /></a>
 
 =head1 SYNOPSIS
 
@@ -192,7 +207,7 @@ Verifies whether or not a module or a file's list of includes are installed.
 
 =head1 FUNCTIONS
 
-=head2 module_installed($name)
+=head2 module_installed($name, $callback)
 
 Checks whether a module is installed on your system.
 
@@ -204,7 +219,40 @@ Mandatory, String: The name of the module to check against (eg: C<Mock::Sub>).
 
 Returns: True (C<1>) if the module is found, and false (C<0>) if not.
 
-=head2 includes_installed($file)
+    $callback
+
+Optional, code reference: A callback that we'll execute on each call.
+
+The callback will receive three parameters:
+
+
+I<< $module >>: The name of the module in question (eg: Mock::Sub).
+
+I<< $module_file >>: The file name of the module (can be used with C<require>).
+
+I<< $installed >>: Bool indicating whether the module is installed or not.
+
+=head3 Callback Example
+
+    my @modules = qw(Mock::Sub Devel::Trace);
+
+    for (@modules) {
+        module_installed($_, \&cb);
+    }
+
+    sub cb {
+        my ($module, $module_file, $installed) = @_;
+
+        if ($installed) {
+            require $module_file;
+            $module->import;
+        }
+        else {
+            warn "Module $module not installed... skipping";
+        }
+    }
+
+=head2 includes_installed($file, $callback)
 
 This function reads in a Perl file, strips out all of its includes (C<use> and
 C<require>), and checks whether each one is installed on the system.
@@ -217,6 +265,11 @@ Parameters:
     $file
 
 Mandatory, String: The name of a Perl file.
+
+    $callback
+
+Optional, code reference: A reference to a subroutine where you can perform
+actions on the modules you're checking. See L<callback/module_installed($name, $callback)>.
 
 Returns: A hash reference where the found included modules' name as the key,
 and for the value, true (C<1>) if the module is installed and false (C<0>) if

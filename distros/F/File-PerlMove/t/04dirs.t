@@ -16,12 +16,12 @@ our $sz = create_testfile(our $tf = "04dirs.dat");
 
 { my $warn;
   local $SIG{__WARN__} = sub { $warn = "@_"; };
-  is(File::PerlMove::move('s;^;04dirs/;', [ $tf ], { errno => 1 }), 0, "move1");
+  is(File::PerlMove::pmv('s;^;04dirs/;', [ $tf ], { errno => 1 }), 0, "move1");
   like($warn, qr/: 2/, "move1 warning");
 }
 
 $tf = "04dirs.dat";
-is(File::PerlMove::move('s;^;04dirs/;', [ $tf ], { createdirs => 1 }), 1, "move2");
+is(File::PerlMove::pmv('s;^;04dirs/;', [ $tf ], { createdirs => 1 }), 1, "move2");
 $tf = verify("04dirs/$tf", "move2");
 
 cleanup();

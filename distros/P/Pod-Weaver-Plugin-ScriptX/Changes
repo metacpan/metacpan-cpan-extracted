@@ -1,3 +1,8 @@
+0.003   2020-09-15  Released-By: PERLANCAR; Urgency: medium
+
+	- Rename section Configuration -> ScriptX Plugin Configuration.
+
+
 0.002   2020-04-16  Released-By: PERLANCAR; Urgency: medium
 
 	- Add text to Description section from meta's description.

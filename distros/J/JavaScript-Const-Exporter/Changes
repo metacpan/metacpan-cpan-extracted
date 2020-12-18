@@ -1,0 +1,31 @@
+Revision history for JavaScript-Const-Exporter
+
+v0.1.4    2020-12-17 22:21:26+00:00 Europe/London
+  [Tests]
+  - Added more tests.
+
+  - Specified an appropriate minimum versions of various testing modules.
+
+v0.1.3    2020-12-17 15:59:13+00:00 Europe/London
+  [Bug Fixes]
+  - Specify minimum versions of Moo and Sub::Identify.
+
+v0.1.2    2020-12-17 14:04:58+00:00 Europe/London
+  [Enhancements]
+  - Emit a warning when coderef constants are not actually constants.
+
+  [Tests]
+  - Fixed test that used Const::Exporter.
+
+v0.1.1    2020-12-16 21:28:48+00:00 Europe/London
+  [Tests]
+  - Added recommended prereqs.
+
+  - Fixed test that was supposed to skip when Const::Fast::Exporter
+    was not installed.
+
+  [Other]
+  - Fixed incorrect keywords in distribution metadata.
+
+v0.1.0    2020-12-16 17:45:07+00:00 Europe/London
+  - Initial version released.

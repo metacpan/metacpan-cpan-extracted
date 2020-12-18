@@ -6,7 +6,7 @@
 use v5.26;
 use Object::Pad 0.19;
 
-package Device::Chip::INA219 0.06;
+package Device::Chip::INA219 0.07;
 class Device::Chip::INA219
    extends Device::Chip::Base::RegisteredI2C 0.10;
 

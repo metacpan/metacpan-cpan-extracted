@@ -4,6 +4,9 @@ LICENSE
 MANIFEST
 META.yml
 Makefile.PL
+README.md
+'\\'
 lib/Dancer2/Plugin/Minion.pm
 t/01-basic.t
+t/02-minion_app.t
 t/lib/TestApp.pm

@@ -30,12 +30,13 @@ my %WriteMakefileArgs = (
     "File::Spec" => 0,
     "Hash::Objectify" => 0,
     "Module::Metadata" => 0,
+    "Sub::Identify" => "0.06",
     "Test::More" => 0,
     "Test::Most" => 0,
     "if" => 0,
     "lib" => 0
   },
-  "VERSION" => "v1.0.0",
+  "VERSION" => "v1.1.1",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -52,6 +53,7 @@ my %FallbackPrereqs = (
   "Module::Metadata" => 0,
   "Package::Stash" => 0,
   "Ref::Util" => 0,
+  "Sub::Identify" => "0.06",
   "Test::More" => 0,
   "Test::Most" => 0,
   "if" => 0,

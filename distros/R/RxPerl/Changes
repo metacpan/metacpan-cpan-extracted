@@ -1,5 +1,10 @@
 Revision history for Perl extension RxPerl
 
+v6.3.0 2020-12-15T13:51:24Z
+
+    - added a video to the Learning Resources section
+    - added op_buffer_count
+
 v6.2.1 2020-11-24T15:33:09Z
 
     - introduce gitlab CI/CD pipeline testing

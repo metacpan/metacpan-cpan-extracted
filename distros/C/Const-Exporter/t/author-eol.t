@@ -21,6 +21,7 @@ my @files = (
     't/10-basic.t',
     't/11-tags.t',
     't/12-blessed.t',
+    't/13-is_const.t',
     't/20-example.t',
     't/21-example.t',
     't/author-critic.t',

@@ -4,7 +4,7 @@ use parent 'Monitoring::Livestatus';
 use strict;
 use warnings;
 use IO::Socket::UNIX ();
-use Carp qw/confess croak/;
+use Carp qw/confess/;
 
 =head1 NAME
 
@@ -54,32 +54,29 @@ sub _open {
     if(!-S $self->{'peer'}) {
         my $msg = "failed to open socket $self->{'peer'}: $!";
         if($self->{'errors_are_fatal'}) {
-            croak($msg);
+            confess($msg);
         }
         $Monitoring::Livestatus::ErrorCode    = 500;
         $Monitoring::Livestatus::ErrorMessage = $msg;
         return;
     }
     my $sock;
-    my $remaining = alarm($self->{'connect_timeout'});
     eval {
-        local $SIG{'ALRM'} = sub { die("connection timeout"); };
         $sock = IO::Socket::UNIX->new(
                                         Peer     => $self->{'peer'},
                                         Type     => IO::Socket::UNIX::SOCK_STREAM,
+                                        Timeout  => $self->{'connect_timeout'},
                                     );
         if(!defined $sock || !$sock->connected()) {
             my $msg = "failed to connect to $self->{'peer'}: $!";
             if($self->{'errors_are_fatal'}) {
-                croak($msg);
+                confess($msg);
             }
             $Monitoring::Livestatus::ErrorCode    = 500;
             $Monitoring::Livestatus::ErrorMessage = $msg;
             return;
         }
     };
-    alarm(0);
-    alarm($remaining) if $remaining;
 
     if($@) {
         $Monitoring::Livestatus::ErrorCode    = 500;

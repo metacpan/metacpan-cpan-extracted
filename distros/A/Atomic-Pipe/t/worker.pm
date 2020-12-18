@@ -43,4 +43,13 @@ else {
     };
 }
 
+sub note_sleep {
+    my ($end) = @_;
+    for (1 .. 10) {
+        print "# " . ($end - $_ + 1) . "\n";
+        sleep 1;
+    }
+}
+
+
 1;

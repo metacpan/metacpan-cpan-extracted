@@ -4,7 +4,7 @@ use v5.14;
 use warnings;
 use utf8;
 
-our $VERSION = "2.07";
+our $VERSION = "2.08";
 
 use Data::Dumper;
 use Carp;
@@ -100,6 +100,8 @@ sub new {
 	runout    => $DEFAULT_RUNOUT_WIDTH,
 	expand    => 0,
 	tabstop   => 8,
+	tabhead   => ' ',
+	tabspace  => ' ',
 	discard   => {},
     }, $class;
 
@@ -242,10 +244,9 @@ sub fold {
 	}
 
 	# tab
-	if ($opt{expand} and s/\A(\t+)//) {
-	    my $space =
-		$opt{tabstop} * length($1) - ($width - $room) % $opt{tabstop};
-	    $_ = ' ' x $space . $_;
+	if ($opt{expand} and s/\A\t//) {
+	    my $space = $opt{tabstop} - ($width - $room) % $opt{tabstop};
+	    $_ = $opt{tabhead} . $opt{tabspace} x ($space - 1) . $_;
 	    next;
 	}
 
@@ -449,7 +450,7 @@ Text::ANSI::Fold - Text folding library supporting ANSI terminal sequence and As
 
 =head1 VERSION
 
-Version 2.07
+Version 2.08
 
 =head1 SYNOPSIS
 
@@ -680,8 +681,16 @@ characters.  Default values are both 2.
 
 =item B<tabstop> => I<n>
 
-Enable tab character expansion.  Default tabstop is 8 and can be set
-by B<tabstop> option.
+=item B<tabhead> => I<char>
+
+=item B<tabspace> => I<char>
+
+Enable tab character expansion.
+
+Default tabstop is 8 and can be set by B<tabstop> option.
+
+Tab character is converted to B<tabhead> and following B<tabspace>
+characters.  Both are white space by default.
 
 =back
 

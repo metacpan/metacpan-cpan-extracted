@@ -16,13 +16,14 @@ name: Config-Perl-V
 provides: 
   Config::Perl::V: 
     file: V.pm
-    version: '0.31'
+    version: '0.32'
 requires: 
   Config: 0
   Test::More: 0
   Test::NoWarnings: 0
   perl: '5.006'
 resources: 
+  bugtracker: https://github.com/Tux/Config-Perl-V/issues
   license: http://dev.perl.org/licenses/
   repository: https://github.com/Tux/Config-Perl-V
-version: '0.31'
+version: '0.32'

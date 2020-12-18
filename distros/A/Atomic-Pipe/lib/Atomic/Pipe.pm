@@ -2,10 +2,12 @@ package Atomic::Pipe;
 use strict;
 use warnings;
 
-our $VERSION = '0.012';
+our $VERSION = '0.013';
 
 use IO();
 use Carp qw/croak/;
+
+use constant IS_WIN32 => ($^O eq 'MSWin32' ? 1 : 0);
 
 BEGIN {
     # POSIX says writes of 512 or less are atomic, but some platforms allow for
@@ -31,10 +33,12 @@ require bytes;
 use List::Util qw/min/;
 use Scalar::Util qw/blessed/;
 
-use constant RH    => 'rh';
-use constant WH    => 'wh';
-use constant STATE => 'state';
-use constant BLOCKING => 'blocking';
+use constant RH             => 'rh';
+use constant WH             => 'wh';
+use constant STATE          => 'state';
+use constant OUT_BUFFER     => 'out_buffer';
+use constant READ_BLOCKING  => 'read_blocking';
+use constant WRITE_BLOCKING => 'write_blocking';
 
 sub _get_tid {
     return 0 unless $INC{'threads.pm'};
@@ -153,7 +157,7 @@ sub _win32_pipe_ready {
     my $buf = "";
     my $buflen = 0;
 
-    $peek_named_pipe ||= Win32::API->new("kernel32", 'PeekNamedPipe', 'NPIPPP', 'N')
+    $peek_named_pipe //= Win32::API->new("kernel32", 'PeekNamedPipe', 'NPIPPP', 'N')
         || die "Can't load PeekNamedPipe from kernel32.dll";
 
     my $got    = pack('L', 0);
@@ -165,19 +169,90 @@ sub _win32_pipe_ready {
     return unpack('L', $avail);
 }
 
-sub blocking {
+my $set_named_pipe_handle_state;
+sub _win32_set_pipe_state {
+    my $self = shift;
+    my ($state) = @_;
+    my $wh = Win32API::File::FdGetOsFHandle(fileno($self->{+WH}));
+
+    $set_named_pipe_handle_state //= Win32::API->new("kernel32", 'SetNamedPipeHandleState', 'NPPP', 'N')
+        || die "Can't load SetNamedPipeHandleState from kernel32.dll";
+
+    # Block or non-block?
+    my $lpmode = $state ? pack('L', 0x00000000) : pack('L', 0x00000001);
+
+    my $ret = $set_named_pipe_handle_state->Call($wh, $lpmode, +0, +0);
+
+    return $ret;
+}
+
+my $WIN32_API_LOADED = 0;
+
+sub _load_win32_api {
+    return 1 if $WIN32_API_LOADED;
+
+    eval { require Win32::API;     1 } or die "non-blocking on windows requires Win32::API please install it.\n$@";
+    eval { require Win32API::File; 1 } or die "non-blocking on windows requires Win32API::File please install it.\n$@";
+
+    return $WIN32_API_LOADED = 1;
+}
+
+sub read_blocking {
     my $self = shift;
     my $rh   = $self->{+RH} or croak "Not a reader";
 
-    if ($^O eq 'MSWin32') {
-        eval { require Win32::API; 1 } or die "non-blocking on windows requires Win32::API please install it.\n$@";
-        eval { require Win32API::File; 1 } or die "non-blocking on windows requires Win32API::File please install it.\n$@";
-        ($self->{+BLOCKING}) = @_ if @_;
-        return $self->{+BLOCKING};
+    ($self->{+READ_BLOCKING}) = @_ if @_;
+
+    if (IS_WIN32) {
+        _load_win32_api() unless $self->{+READ_BLOCKING} || $WIN32_API_LOADED;
     }
     else {
         $rh->blocking(@_);
     }
+
+    return $self->{+READ_BLOCKING};
+}
+
+sub write_blocking {
+    my $self = shift;
+    my $wh   = $self->{+WH} or croak "Not a writer";
+
+    return $self->{+WRITE_BLOCKING} unless @_;
+
+    my ($val) = @_;
+    $self->{+WRITE_BLOCKING} = $val;
+
+    if (IS_WIN32) {
+        _load_win32_api() unless $self->{+WRITE_BLOCKING} || $WIN32_API_LOADED;
+        $self->_win32_set_pipe_state(@_) if @_;
+    }
+    else {
+        my $flags = 0;
+        fcntl($wh, &Fcntl::F_GETFL, $flags) || die $!;    # Get the current flags on the filehandle
+        if   ($val) { $flags ^= &Fcntl::O_NONBLOCK }      # Remove non-blocking
+        else        { $flags |= &Fcntl::O_NONBLOCK }      # Add non-blocking to the flags
+        fcntl($wh, &Fcntl::F_SETFL, $flags) || die $!;    # Set the flags on the filehandle
+    }
+
+    return $self->{+WRITE_BLOCKING};
+}
+
+sub blocking {
+    my $self = shift;
+
+    if ($self->{+RH} && !$self->{+WH}) {
+        return $self->read_blocking(@_);
+    }
+    elsif ($self->{+WH} && !$self->{+RH}) {
+        return $self->write_blocking(@_);
+    }
+
+    my $r = $self->read_blocking(@_);
+    my $w = $self->write_blocking(@_);
+
+    return 1 if $r && $w;
+    return 0 if !$r && !$w;
+    return undef;
 }
 
 sub size {
@@ -285,11 +360,39 @@ sub fits_in_burst {
 
 sub write_burst {
     my $self = shift;
-    my ($data) = @_;
+    my ($data, $size) = @_;
 
-    my $size = $self->fits_in_burst($data) // return undef;
+    $size //= $self->fits_in_burst($data) // return undef;
 
-    return $self->_write_burst($data, $size);
+    push @{$self->{+OUT_BUFFER} //= []} => [$data, $size];
+    $self->flush();
+
+    return 1;
+}
+
+sub DESTROY {
+    my $self = shift;
+    $self->flush(blocking => 1) if $self->{+OUT_BUFFER} && @{$self->{+OUT_BUFFER}};
+}
+
+sub flush {
+    my $self = shift;
+    my %params = @_;
+    my $blocking = $params{blocking} // $self->{+WRITE_BLOCKING} // 1;
+
+    my $buffer = $self->{+OUT_BUFFER} // return;
+
+    while (@$buffer) {
+        my $set = $buffer->[0];
+        my $got = $self->_write_burst(@$set);
+
+        return unless $blocking || defined $got;
+        next unless defined $got;
+
+        shift @$buffer;
+    }
+
+    return;
 }
 
 sub _write_burst {
@@ -299,8 +402,10 @@ sub _write_burst {
     my $wh = $self->{+WH} or croak "Cannot call write on a pipe reader";
 
     my $wrote;
+    my $loop = 0;
     SWRITE: {
         $wrote = syswrite($wh, $data, $size);
+        return undef if $! == EAGAIN || ($! == 28 && IS_WIN32); # NON-BLOCKING
         redo SWRITE if !$wrote || $RETRY_ERRNO{0 + $!};
         last SWRITE if $wrote == $size;
         $wrote //= "<NULL>";
@@ -334,7 +439,7 @@ sub write_message {
         my $out = pack("l2L2a$size", $$, _get_tid(), $id--, $size, $bytes);
         my $write = $size + $psize;
 
-        $self->_write_burst($out, $write);
+        $self->write_burst($out, $write);
     }
 
     return $parts;
@@ -352,7 +457,7 @@ sub read_message {
 
     my $rh = $self->{+RH} or croak "Not a reader";
 
-    if ($^O eq 'MSWin32' && defined($self->{+BLOCKING}) && !$self->{+BLOCKING}) {
+    if (IS_WIN32 && defined($self->{+READ_BLOCKING}) && !$self->{+READ_BLOCKING}) {
         return undef unless $self->_win32_pipe_ready();
     }
 
@@ -486,6 +591,11 @@ order.
 
     # Note, you can set the reader to be non-blocking:
     $r->blocking(0);
+
+    # Writer too (but buffers unwritten items until your next write_burst(),
+    # write_message(), or flush(), or will do a writing block when the pipe
+    # instance is destroyed.
+    $w->blocking(0);
 
     # $msg2 will be undef as no messages were sent, and blocking is turned off.
     my $msg2 = $r->read_message;
@@ -646,7 +756,16 @@ atomic chunks.
 
 =item $bool = $p->blocking
 
-Get/Set blocking status.
+Get/Set blocking status. This works on read and write handles. On writers this
+will write as many chunks/bursts as it can, then buffer any remaining until
+your next write_message(), write_burst(), or flush(), at which point it will
+write as much as it can again. If the instance is garbage collected with
+chunks/bursts in the buffer it will block until all can be written.
+
+=item $w->flush()
+
+Write any buffered items. This is only useful on writers that are in
+non-blocking mode, it is a no-op everywhere else.
 
 =item $bool = $p->eof
 
@@ -662,12 +781,11 @@ reader/writer pairs).
 This will return C<undef> if the data DES NOT fit in a burst. This will return
 the size of the data in bytes if it will fit in a burst.
 
-=item $undef_or_bytes = $p->write_burst($data)
+=item $undef_or_true = $p->write_burst($data)
 
 Attempt to write C<$data> in a single atomic burst. If the data is too big to
 write atomically this method will not write any data and will return C<undef>.
-If the data does fit in an atomic write then the data will be written and the
-total number of bytes written will be returned.
+If the data does fit in an atomic write then a true value will be returned.
 
 B<Note:> YOU MUST NOT USE C<read_message()> when writing bursts. This method
 sends the data as-is with no data-header or modification. This method should be

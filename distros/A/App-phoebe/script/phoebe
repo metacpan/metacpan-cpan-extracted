@@ -1059,7 +1059,7 @@ GetOptions(
   'log_file=s' => sub { $log->path($_[1]) },
   'cert_file=s' => \&host_setup,
   'key_file=s' => \&host_setup,
-  'host=s' => sub { host_setup(shift, decode(locale => shift)) },
+  'host=s' => \&host_setup,
   'port=i@', # same ports for all hosts!
   'wiki_dir=s',
   'wiki_space=s@' => \&utf8_list_item,
@@ -1080,7 +1080,7 @@ sub utf8_item { my ($key, $value) = @_; $server->{$key} = decode(locale => $valu
   sub host_setup {
     my ($opt, $val) = @_;
     if ($opt eq 'host') {
-      push @host, $val;
+      push @host, decode(locale => $val);
       return;
     };
     die "$val does not exist\n" unless -f $val;

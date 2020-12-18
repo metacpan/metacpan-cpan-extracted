@@ -8,7 +8,7 @@ configure_requires:
   ExtUtils::MakeMaker: 6.59
 distribution_type: module
 dynamic_config: 1
-generated_by: 'Module::Install version 1.17'
+generated_by: 'Module::Install version 1.19'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -21,8 +21,8 @@ no_index:
     - t
 requires:
   Cpanel::JSON::XS: 0
-  Digest::MD5: 0
   Encode: 0
+  IO::Select: 0
   IO::Socket::IP: 0
   IO::Socket::UNIX: 0
   Test::More: '0.87'
@@ -33,4 +33,4 @@ resources:
   homepage: http://search.cpan.org/dist/Monitoring-Livestatus/
   license: http://dev.perl.org/licenses/
   repository: http://github.com/sni/Monitoring-Livestatus
-version: '0.80'
+version: '0.84'

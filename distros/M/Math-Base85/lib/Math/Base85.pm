@@ -9,7 +9,7 @@ use Carp;
 use Exporter;
 use Math::BigInt qw(:constant);
 
-$VERSION = '0.4';
+$VERSION = '0.5';
 
 @ISA = qw(Math::BigInt);
 @EXPORT = qw();
@@ -78,7 +78,7 @@ sub from_base85
 {
     my $num = shift;
     my @digits = split(//, $num);
-    my $answer = new Math::BigInt "0";
+    my $answer = Math::BigInt->new("0");
     my $n;
     my $d;
     while (defined($d = shift @digits)) {

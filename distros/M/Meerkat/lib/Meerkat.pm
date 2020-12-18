@@ -5,7 +5,7 @@ use warnings;
 package Meerkat;
 # ABSTRACT: Manage MongoDB documents as Moose objects
 
-our $VERSION = '0.015';
+our $VERSION = '0.016';
 
 # Dependencies
 use Moose 2;
@@ -13,7 +13,7 @@ use MooseX::AttributeShortcuts;
 
 use Meerkat::Collection;
 use Module::Runtime qw/require_module compose_module_name/;
-use MongoDB 1;
+use MongoDB 2;
 use Try::Tiny;
 use Type::Params qw/compile/;
 use Types::Standard qw/:types/;
@@ -177,7 +177,7 @@ Meerkat - Manage MongoDB documents as Moose objects
 
 =head1 VERSION
 
-version 0.015
+version 0.016
 
 =head1 SYNOPSIS
 
@@ -493,34 +493,29 @@ L<Mongoose>
 
 =back
 
-=for :stopwords cpan testmatrix url annocpan anno bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
-
-=head1 SUPPORT
-
-=head2 Bugs / Feature Requests
-
-Please report any bugs or feature requests through the issue tracker
-at L<https://github.com/dagolden/Meerkat/issues>.
-You will be notified automatically of any progress on your issue.
-
-=head2 Source Code
-
-This is open source software.  The code repository is available for
-public review and contribution under the terms of the license.
-
-L<https://github.com/dagolden/Meerkat>
-
-  git clone https://github.com/dagolden/Meerkat.git
-
 =head1 AUTHOR
 
 David Golden <dagolden@cpan.org>
 
-=head1 CONTRIBUTOR
+=head1 CONTRIBUTORS
 
-=for stopwords Todd Bruner
+=for stopwords Mohammad S Anwar Todd Bruner
+
+=over 4
+
+=item *
+
+Mohammad S Anwar <mohammad.anwar@yahoo.com>
+
+=item *
+
+Todd Bruner <tbruner@as3036snllx.sandia.gov>
+
+=item *
 
 Todd Bruner <todd.bruner@gmail.com>
+
+=back
 
 =head1 COPYRIGHT AND LICENSE
 

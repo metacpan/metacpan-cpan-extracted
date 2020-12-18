@@ -32,8 +32,8 @@ L<mailto:hannover-pm@pm.org>
 
 =head2 Meetups
 
-Every second and fourth Thursday at 6pm; date and location details announced
-via Twitter, email and via the web site:
+Every second and fourth Thursday at 6pm. Date and location details are
+announced via Twitter, email and via the web site:
 
 http://hannover.pm/treffen
 
@@ -67,7 +67,7 @@ L<https://github.com/paultcochrane/PerlMongers-Hannover>
 
 =head1 AUTHOR
 
-Paul Cochrane <ptc@hannover.pm>
+Paul Cochrane <ptc@cpan.org>
 
 =head1 NOTES
 
@@ -76,7 +76,7 @@ modeled after C<PerlMongers::Bangalore>.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by Hannover Perl Mongers.
+This software is copyright (c) 2020 by Hannover Perl Mongers.
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

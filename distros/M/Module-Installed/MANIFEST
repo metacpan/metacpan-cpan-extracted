@@ -7,6 +7,8 @@ README
 t/00-load.t
 t/05-module_installed.t
 t/10-includes_installed.t
+t/15-callback.t
+t/20-cb_require.t
 t/data/test.pl
 t/manifest.t
 t/pod-coverage.t

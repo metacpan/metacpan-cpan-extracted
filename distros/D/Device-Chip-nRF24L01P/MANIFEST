@@ -6,7 +6,6 @@ examples/nRF24L01+_PRX.pl
 examples/nRF24L01+_PTX.pl
 lib/Device/Chip/nRF24L01P.pm
 LICENSE
-Makefile.PL
 MANIFEST			This list of files
 META.json
 META.yml

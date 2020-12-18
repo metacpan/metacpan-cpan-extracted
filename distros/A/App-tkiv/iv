@@ -92,8 +92,7 @@ my %Option = (
     keys_crop		=> [qw( Control-y		)],
     );
 
-sub usage
-{
+sub usage {
     my ($show_opt) = (@_, 0);
     warn "usage: iv.pl [-f] [option=value ...] [dir]\n";
     if ($show_opt) {
@@ -286,13 +285,11 @@ my (@loc, %loc) = qw( nw n ne e se s sw w c );
 # Selections and tools
 my %selection; reset_selection ();
 
-sub reset_selection
-{
+sub reset_selection {
     %selection = ( Sx => -1, Sy => -1, Ex => -1, Ey => -1 );
     } # reset_selection
 
-sub loc
-{
+sub loc {
     my $loc = $loc{shift @_};
     my ($ww, $wh) = map { int $_ } (@_, 0, 0);
     if ($loc =~ m/[XY]/) {
@@ -306,8 +303,7 @@ sub loc
     $loc;
     } # loc
 
-sub bind_wheel
-{
+sub bind_wheel {
     my ($w, $sw, $u) = @_;
 
     $w->bind ($_, sub { $sw->yview (scroll => -$u, "units") }) for "<4>", @{$Option{keys_scroll_up}};
@@ -318,8 +314,7 @@ sub bind_wheel
 
 my $pxyid = 10000;
 
-sub Tk::PhotoXY
-{
+sub Tk::PhotoXY {
     my ($w, $f, $x, $y, $r, $p) = (@_, 0);
     $f && $x && $y or return;
     my ($cfh, $cfn) = tempfile ("iv#$$-XXXXXX", DIR => $tmp);
@@ -340,8 +335,7 @@ my @rm_cfn;
 END { -f $_ && unlink $_ for @rm_cfn; }
 
 # Cropping version
-sub Tk::PhotoXYXY
-{
+sub Tk::PhotoXYXY {
     my ($w, $f, $x, $y, $X, $Y, $p) = (@_, 0);
     $f && $x && $y or return;
     my ($cfh, $cfn) = tempfile ("iv#$$-XXXXXX", DIR => $tmp);
@@ -361,8 +355,7 @@ sub Tk::PhotoXYXY
     $p;
     } # PhotoXYXY
 
-sub show_exifinfo
-{
+sub show_exifinfo {
     my $w  = shift or return;
     $w->delete ("exifinfo");
     $Option{showexifinfo} or return;
@@ -412,8 +405,7 @@ sub show_exifinfo
 	}
     } # show_exifinfo
 
-sub show_exif
-{
+sub show_exif {
     my $exif = shift or return;
     my $tl = $mw->Toplevel (-title => "Image EXIF info");
     $ow = $tl->Scrolled ("Frame",
@@ -462,8 +454,7 @@ sub show_exif
 	}
     } # show_exif
 
-sub options
-{
+sub options {
     my $tl = $mw->Toplevel (-title => "IV options");
     $ow = $tl->Frame ()->grid (-sticky => "nsew");
     $ow->gridRowconfigure    (0, -weight => 1); # allow expansion in both ...
@@ -539,8 +530,7 @@ my %tsort = (
     );
 my $refreshing = "";
 
-sub dtcmd
-{
+sub dtcmd {
     # trigger $tn to show thumbnails of all pics in current dir
     # Expansion also invokes this callback
     @_ == 1                or return;
@@ -1299,8 +1289,7 @@ bind_wheel ($dt, $dt, 10);
 # I also want the focus to follow keyboard actions
 $dt->autosetmode;
 
-sub dirup
-{
+sub dirup {
     (my $up = $idir) =~ s:/[^/]+$:: or return;
     $dt->close ($idir);
     $dt->setmode ($idir, "close");
@@ -1314,8 +1303,7 @@ sub dirup
     dtcmd ($up);
     } # dirup
 
-sub openupdir
-{
+sub openupdir {
     (my $up = $idir) =~ s:/[^/]+$:: or return;
 
     $dt->chdir ($up);
@@ -1324,8 +1312,7 @@ sub openupdir
     return ($dt->child_entries ($up, 1), $idir);
     } # openupdir
 
-sub dirnext
-{
+sub dirnext {
     (my $up = $idir) =~ s:/[^/]+$:: or return;
 
     my @dir = openupdir ();
@@ -1342,8 +1329,7 @@ sub dirnext
     dtcmd ($up);
     } # dirnext
 
-sub dirprev
-{
+sub dirprev {
     (my $up = $idir) =~ s:/[^/]+$:: or return;
 
     my @dir = reverse openupdir ();

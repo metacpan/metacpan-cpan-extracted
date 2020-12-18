@@ -37,7 +37,6 @@
             "Badge::Depot::Plugin::Cpantesters" : "0",
             "Badge::Depot::Plugin::Kwalitee" : "0",
             "Badge::Depot::Plugin::Perl" : "0",
-            "Badge::Depot::Plugin::Travis" : "0",
             "Dist::Zilla" : "6.015",
             "Dist::Zilla::Plugin::Authority" : "1.009",
             "Dist::Zilla::Plugin::BumpVersionAfterRelease::Transitional" : "0.009",
@@ -85,7 +84,6 @@
             "Dist::Zilla::Plugin::Test::ReportPrereqs" : "0.027",
             "Dist::Zilla::Plugin::Test::Version" : "1.09",
             "Dist::Zilla::Plugin::TestRelease" : "0",
-            "Dist::Zilla::Plugin::TravisYML" : "1.15",
             "Dist::Zilla::Plugin::UploadToCPAN" : "0",
             "Pod::Elemental::Transformer::List" : "0",
             "Pod::Elemental::Transformer::Splint" : "0.1201",
@@ -112,7 +110,7 @@
          },
          "suggests" : {
             "Dist::Iller" : "0.1408",
-            "Dist::Iller::Config::Author::CSSON" : "0.0325"
+            "Dist::Iller::Config::Author::CSSON" : "0.0326"
          }
       },
       "runtime" : {
@@ -143,11 +141,11 @@
    "provides" : {
       "Dist::Iller::Config::Author::CSSON" : {
          "file" : "lib/Dist/Iller/Config/Author/CSSON.pm",
-         "version" : "0.0325"
+         "version" : "0.0326"
       },
       "Dist::Iller::Config::Author::CSSON::MapMetro" : {
          "file" : "lib/Dist/Iller/Config/Author/CSSON/MapMetro.pm",
-         "version" : "0.0325"
+         "version" : "0.0326"
       }
    },
    "release_status" : "stable",
@@ -162,7 +160,7 @@
          "web" : "https://github.com/Csson/p5-Dist-Iller-Config-Author-CSSON"
       }
    },
-   "version" : "0.0325",
+   "version" : "0.0326",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.020001"
@@ -631,11 +629,6 @@
             "version" : "6.015"
          },
          {
-            "class" : "Dist::Zilla::Plugin::TravisYML",
-            "name" : "TravisYML",
-            "version" : "1.15"
-         },
-         {
             "class" : "Dist::Zilla::Plugin::Git::Commit",
             "config" : {
                "Dist::Zilla::Plugin::Git::Commit" : {
@@ -670,7 +663,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "0.0325",
+                  "tag" : "0.0326",
                   "tag_format" : "%v",
                   "tag_message" : "Release %v%n%n%c"
                },

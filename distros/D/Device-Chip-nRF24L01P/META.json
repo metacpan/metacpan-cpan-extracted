@@ -33,7 +33,7 @@
    "provides" : {
       "Device::Chip::nRF24L01P" : {
          "file" : "lib/Device/Chip/nRF24L01P.pm",
-         "version" : "0.04"
+         "version" : "0.05"
       }
    },
    "release_status" : "stable",
@@ -42,6 +42,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.04",
+   "version" : "0.05",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

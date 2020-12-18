@@ -32,13 +32,13 @@ SKIP: {
     try_move('lc', "01basic.tmp", "move3");
 }
 
-try_move(sub { s/^(\d+)/sprintf("%03d", 32+$1)/e; },
-	 "033basic.tmp", "move4");
+try_move( sub { $_ = $_[0]; s/^(\d+)/sprintf("%03d", 32+$1)/e; $_ },
+	  "033basic.tmp", "move4");
 
 cleanup();
 
 sub try_move {
     my ($code, $new, $tag) = @_;
-    is(File::PerlMove::move($code, [ $tf ]), 1, $tag);
+    is(File::PerlMove::pmv($code, [ $tf ]), 1, $tag);
     $tf = verify($new, $tag);
 }

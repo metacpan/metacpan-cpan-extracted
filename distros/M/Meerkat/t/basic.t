@@ -40,9 +40,6 @@ test 'round trip' => sub {
     my $obj2 = $self->person->find_id( $obj1->_id );
     is_deeply( $obj2, $obj1, "retrieve first object from database by OID" );
 
-    my $obj3 = $self->person->find_id( $obj1->_id->value );
-    is_deeply( $obj3, $obj1, "retrieve first object from database by string" );
-
     ok( my $cursor = $self->person->find( { name => $obj1->name } ), "find query ran" );
     isa_ok( $cursor, 'Meerkat::Cursor' );
     my $obj4 = $cursor->next;
@@ -54,7 +51,7 @@ test 'not found' => sub {
     my $self = shift;
     ok( my $obj1 = $self->create_person, "created object" );
 
-    my $fake_id = MongoDB::OID->new;
+    my $fake_id = BSON::OID->new;
     is( $self->person->find_id($fake_id),
         undef, "find_id on non-existent doc returns undef" );
     is( $self->person->find_one( { _id => $fake_id } ),

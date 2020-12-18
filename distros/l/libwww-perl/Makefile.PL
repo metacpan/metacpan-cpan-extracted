@@ -86,7 +86,7 @@ my %WriteMakefileArgs = (
     "Test::Needs" => 0,
     "Test::RequiresInternet" => 0
   },
-  "VERSION" => "6.49",
+  "VERSION" => "6.50",
   "test" => {
     "TESTS" => "t/*.t t/base/*.t t/base/protocols/*.t t/leak/*.t t/local/*.t t/robot/*.t"
   }
@@ -135,7 +135,7 @@ my %FallbackPrereqs = (
   "warnings" => 0
 );
 
-# inserted by Dist::Zilla::Plugin::DynamicPrereqs 0.037
+# inserted by Dist::Zilla::Plugin::DynamicPrereqs 0.039
 requires('HTTP::Status', '6.18') if has_module('HTTP::Status', '6.17');
 
 unless ( eval { ExtUtils::MakeMaker->VERSION('6.63_03') } ) {
@@ -149,7 +149,7 @@ delete $WriteMakefileArgs{CONFIGURE_REQUIRES}
 
 WriteMakefile(%WriteMakefileArgs);
 
-# inserted by Dist::Zilla::Plugin::DynamicPrereqs 0.037
+# inserted by Dist::Zilla::Plugin::DynamicPrereqs 0.039
 sub _add_prereq {
   my ($mm_key, $module, $version_or_range) = @_;
   $version_or_range ||= 0;
@@ -157,7 +157,7 @@ sub _add_prereq {
     if exists $WriteMakefileArgs{$mm_key}{$module}
       and $WriteMakefileArgs{$mm_key}{$module} ne '0'
       and $WriteMakefileArgs{$mm_key}{$module} ne $version_or_range;
-  warn "$module already exists in FallbackPrereqs (at version $FallbackPrereqs{$mm_key}{$module}) -- need to do a sane metamerge!"
+  warn "$module already exists in FallbackPrereqs (at version $FallbackPrereqs{$module}) -- need to do a sane metamerge!"
     if exists $FallbackPrereqs{$module} and $FallbackPrereqs{$module} ne '0'
         and $FallbackPrereqs{$module} ne $version_or_range;
   $WriteMakefileArgs{$mm_key}{$module} = $FallbackPrereqs{$module} = $version_or_range;

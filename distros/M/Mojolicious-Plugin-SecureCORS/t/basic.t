@@ -21,11 +21,11 @@ $strict->get({'cors.origin'=>'*', text=>'list users'});
 $strict->post({text=>'add user'});
 
 my ($r1, $r2);
-$r = $r->route('/a')->to('cors.headers' => 'X-Requested-With');
-$r = $r->route('/b');
-$r = $r->route('/c')->to('cors.credentials' => 1);
-$r1 = $r->route('/d1')->to('cors.credentials' => undef);
-$r2 = $r->route('/d2');
+$r = $r->any('/a')->to('cors.headers' => 'X-Requested-With');
+$r = $r->any('/b');
+$r = $r->any('/c')->to('cors.credentials' => 1);
+$r1 = $r->any('/d1')->to('cors.credentials' => undef);
+$r2 = $r->any('/d2');
 $r2->cors('<*path>')->to(path=>undef);
 $r1->get('/e1', {'cors.origin'=>'http://localhost null', text=>'E1'});
 $r2->put('/e2', {'cors.origin'=>qr/\.local\z/, text=>'E2'});

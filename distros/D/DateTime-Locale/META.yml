@@ -35,22 +35,22 @@ no_index:
 provides:
   DateTime::Locale:
     file: lib/DateTime/Locale.pm
-    version: '1.29'
+    version: '1.30'
   DateTime::Locale::Base:
     file: lib/DateTime/Locale/Base.pm
-    version: '1.29'
+    version: '1.30'
   DateTime::Locale::Catalog:
     file: lib/DateTime/Locale/Catalog.pm
-    version: '1.29'
+    version: '1.30'
   DateTime::Locale::Data:
     file: lib/DateTime/Locale/Data.pm
-    version: '1.29'
+    version: '1.30'
   DateTime::Locale::FromData:
     file: lib/DateTime/Locale/FromData.pm
-    version: '1.29'
+    version: '1.30'
   DateTime::Locale::Util:
     file: lib/DateTime/Locale/Util.pm
-    version: '1.29'
+    version: '1.30'
 requires:
   Carp: '0'
   Dist::CheckConflicts: '0.02'
@@ -71,7 +71,7 @@ resources:
   bugtracker: https://github.com/houseabsolute/DateTime-Locale/issues
   homepage: https://metacpan.org/release/DateTime-Locale
   repository: git://github.com/houseabsolute/DateTime-Locale.git
-version: '1.29'
+version: '1.30'
 x_Dist_Zilla:
   perl:
     version: '5.030001'
@@ -1359,7 +1359,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v1.29
+          tag: v1.30
           tag_format: v%V
           tag_message: v%V
         Dist::Zilla::Role::Git::Repo:

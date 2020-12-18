@@ -16,7 +16,7 @@ resources(
 
 requires 'IO::Socket::UNIX';
 requires 'IO::Socket::IP';
-requires 'Digest::MD5';
+requires 'IO::Select';
 requires 'Test::More'        => '0.87';
 requires 'utf8';
 requires 'Encode';

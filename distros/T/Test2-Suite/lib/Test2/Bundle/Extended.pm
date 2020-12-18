@@ -4,7 +4,7 @@ use warnings;
 
 use Test2::V0;
 
-our $VERSION = '0.000138';
+our $VERSION = '0.000139';
 
 BEGIN {
     push @Test2::Bundle::Extended::ISA => 'Test2::V0';
@@ -283,6 +283,8 @@ See L<Test2::Tools::Compare>.
 =item $check = number($num)
 
 =item $check = string($str)
+
+=item $check = check_isa($class_name)
 
 =item $check = in_set(@things)
 

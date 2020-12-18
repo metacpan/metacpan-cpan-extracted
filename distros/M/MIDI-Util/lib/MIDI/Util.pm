@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: MIDI Utilities
 
-our $VERSION = '0.0702';
+our $VERSION = '0.0703';
 
 use strict;
 use warnings;
@@ -148,6 +148,10 @@ sub midi_format {
     for my $note (@notes) {
         $note =~ s/#/s/;
         $note =~ s/b/f/;
+        $note =~ s/Es/F/;
+        $note =~ s/Bs/C/;
+        $note =~ s/Cf/B/;
+        $note =~ s/Ff/E/;
         push @formatted, $note;
     }
     return @formatted;
@@ -179,7 +183,7 @@ MIDI::Util - MIDI Utilities
 
 =head1 VERSION
 
-version 0.0702
+version 0.0703
 
 =head1 SYNOPSIS
 

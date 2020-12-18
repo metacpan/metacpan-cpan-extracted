@@ -360,7 +360,7 @@ second => 56
 
 [Australian date/time]
 %c
-AU_THU 31 AU_DEC 1998 13:34:56 AEDT
+Thu 31 Dec 1998 13:34:56
 locale = en-AU
 skip round trip
 year   => 1998
@@ -369,7 +369,6 @@ day    => 31
 hour   => 13
 minute => 34
 second => 56
-offset => 39600
 
 [US date]
 %x
@@ -453,7 +452,7 @@ second => 56
 
 [French (France) date/time]
 %c
-jeu. 31 Déc. 1998 13:34:56 CEST
+jeu. 31 Déc. 1998 13:34:56
 locale = fr-FR
 skip round trip
 year   => 1998
@@ -462,7 +461,6 @@ day    => 31
 hour   => 13
 minute => 34
 second => 56
-offset => 7200
 
 [French (Generic) date]
 %x

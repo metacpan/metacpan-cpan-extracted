@@ -115,8 +115,9 @@ See L<OpenTracing::Implementation> for more on how to bootstrap.
 
 The OpenTracing specification requires a L<Tracer|
 OpenTracing::Interface::Tracer> implementation to understand how a L<SpanContext
-|OpenTracing::Interface::SpanContext> will be I<inject>ed into or I<extract>ed from
-a so-called I<carrier> or I<request> (L<https://opentracing.io/docs/overview/inject-extract/>).
+|OpenTracing::Interface::SpanContext> will be I<inject>ed into or I<extract>ed
+from a so-called I<carrier> or I<request>
+(L<https://opentracing.io/docs/overview/inject-extract/>).
 
 The I<carrier formats> required are I<text>, I<http>, and I<binary>, but there
 is no strict I<standard> on how those formats look exactly look. The formats are
@@ -139,9 +140,7 @@ provide it as an HTTP::Headers object.
     #
     # as long as this is a HTTP::Headers object
     
-    my $root_context = $TRACER->extract_context(
-        OPENTRACING_CARRIER_FORMAT_HTTP_HEADERS => $http_headers
-    );
+    my $root_context = $TRACER->extract_context( $http_headers );
 
 All Spans are part of a context. That is also true for the rootspan in a
 framework. Spans are started as a C<child_of> a specific L<SpanContext|
@@ -150,7 +149,7 @@ OpenTracing::Interface::SpanContext>.
 The SpanContext for a root-span is the incoming request that may or may not
 contain tracer information from its requestor. Use the L<< C<extract_context>
 from a I<Tracer> object|OpenTracing::Interface::Tracer/
-"extract_context(-OPENTRACING_CARRIER_FORMAT-=>-$carrier-)" >>
+"extract_context(-$carrier-)" >>
 
 
 Since some implementations may use immutable objects and may have required
@@ -170,9 +169,9 @@ framework and the implementation like so, at initialization time:
         }
     };
 
-And as such the returned hash reference might be merged with extracted tracer info
-and used to create a complete L<SpanContext|OpenTracing::Interface::SpanContext>
-object.
+And as such the returned hash reference might be merged with extracted tracer
+info and used to create a complete
+L<SpanContext|OpenTracing::Interface::SpanContext> object.
 
 But remember, such mechanisms are entirely dependent on the implementation.
 
@@ -180,9 +179,9 @@ But remember, such mechanisms are entirely dependent on the implementation.
 
 =head2 Inject Context into an Outgoing Request
 
-To provide your tracing context to a downstream service, create the HTTP::Headers
-object, then inject your current context into the headers before passing the
-request on to the microservice.
+To provide your tracing context to a downstream service, create the
+HTTP::Headers object, then inject your current context into the headers before
+passing the request on to the microservice.
 
     my $span_context = $TRACER->get_active_span->get_context;
     
@@ -190,15 +189,23 @@ request on to the microservice.
     my $http_headers = HTTP::Headers->new( ... );
     
     my $cntx_headers =
-        $tracer->inject_context(
-            OPENTRACING_CARRIER_FORMAT_HTTP_HEADERS => $http_headers,
-            $opentracing_spancontext
-    );
+        $tracer->inject_context( $http_headers, $opentracing_spancontext );
     
     my $request = HTTP::Request->new(
         GET => 'https://...', $cntx_headers
     );
     my response = LWP::UserAgent->request( $request );
+
+
+
+=head3 NOTE
+
+The OpenTracing specifications mention a I<CARRIER_FORMAT>, which was used in an
+earlier version. But since the carrier type can be detected by perl, this has
+been removed form the Perl interface for the C<inject_context> and
+C<extract_context> definitions. (See also
+L<OpenTracing::Manual::Implementation/"Propagating Tracer Information between Services">
+for an example)
 
 
 

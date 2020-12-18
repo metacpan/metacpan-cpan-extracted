@@ -26,15 +26,17 @@ no_index:
 provides:
   Mojolicious::Plugin::SecureCORS:
     file: lib/Mojolicious/Plugin/SecureCORS.pm
-    version: v2.0.2
+    version: v2.0.3
 requires:
   List::MoreUtils: '0.34'
   Mojo::Base: '0'
-  Mojolicious: '7.75'
+  Mojolicious: '8.67'
   perl: '5.010001'
 resources:
   bugtracker: https://github.com/powerman/perl-Mojolicious-Plugin-SecureCORS/issues
   homepage: https://github.com/powerman/perl-Mojolicious-Plugin-SecureCORS
   repository: https://github.com/powerman/perl-Mojolicious-Plugin-SecureCORS.git
-version: v2.0.2
+version: v2.0.3
+x_contributors:
+  - 'Veesh Goldman <rabbiveesh@gmail.com>'
 x_serialization_backend: 'YAML::Tiny version 1.73'

@@ -31,14 +31,6 @@ plugins:
 
   - +plugin: MapMetro::MakeLinePod
 
-  - +replace_plugin: TravisYML
-    perl_version: 5.16 5.18 5.20 5.22
-    post_before_install:
-     - sudo apt-get update -qq
-     - sudo apt-get install -y graphviz
-    pre_install: 
-     - cpanm Test::Stream --force
-     - cpanm GraphViz2 -v
 
 ---
 doctype: weaver

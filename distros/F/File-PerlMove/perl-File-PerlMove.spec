@@ -1,6 +1,6 @@
 %define modname File-PerlMove
 %define perlmodname File::PerlMove
-%define modversion 1.01
+%define modversion 2.01
 
 Name: perl-%modname
 Version: %modversion

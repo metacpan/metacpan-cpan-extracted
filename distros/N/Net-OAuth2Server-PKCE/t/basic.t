@@ -26,13 +26,13 @@ for (
 	my @ret = $req->get_pkce_challenge;
 	if ( defined $error ) {
 		is 0+@ret, 0, "challenge with $desc: no values returned";
-		is_deeply $req->error ? $req->error->param : undef, { qw( error invalid_request error_description ), $error }, '... with correct error';
+		is_deeply $req->error ? $req->error->parameters : undef, { qw( error invalid_request error_description ), $error }, '... with correct error';
 	}
 	else {
 		( my $dec = $v ) =~ s!%(..)! chr hex $1 !ge;
 		is_deeply \@ret, [ $dec, 'S256' ], "challenge with $desc: values returned";
 		ok !$req->error, '... and no error';
-		diag +Data::Dumper->Dump( [ $req->error->param ], [ 'req->error->param' ] ) if $req->error;
+		diag +Data::Dumper->Dump( [ $req->error->parameters ], [ 'req->error->parameters' ] ) if $req->error;
 	}
 }
 
@@ -52,12 +52,12 @@ for (
 	my @ret = $req->get_pkce_challenge( 'S256' );
 	if ( defined $error ) {
 		is 0+@ret, 0, "verifier with $desc: no values returned";
-		is_deeply $req->error ? $req->error->param : undef, { qw( error invalid_request error_description ), $error }, '... with correct error';
+		is_deeply $req->error ? $req->error->parameters : undef, { qw( error invalid_request error_description ), $error }, '... with correct error';
 	}
 	else {
 		is 0+@ret, 1, "verifier with $desc: values returned";
 		ok !$req->error, '... and no error';
-		diag +Data::Dumper->Dump( [ $req->error->param ], [ 'req->error->param' ] ) if $req->error;
+		diag +Data::Dumper->Dump( [ $req->error->parameters ], [ 'req->error->parameters' ] ) if $req->error;
 	}
 }
 

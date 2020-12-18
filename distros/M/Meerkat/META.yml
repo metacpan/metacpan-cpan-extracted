@@ -21,7 +21,7 @@ configure_requires:
   ExtUtils::MakeMaker: '6.17'
   perl: v5.10.0
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.017, CPAN::Meta::Converter version 2.150010'
 license: apache
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -38,28 +38,28 @@ no_index:
 provides:
   Meerkat:
     file: lib/Meerkat.pm
-    version: '0.015'
+    version: '0.016'
   Meerkat::Collection:
     file: lib/Meerkat/Collection.pm
-    version: '0.015'
+    version: '0.016'
   Meerkat::Cursor:
     file: lib/Meerkat/Cursor.pm
-    version: '0.015'
+    version: '0.016'
   Meerkat::DateTime:
     file: lib/Meerkat/DateTime.pm
-    version: '0.015'
+    version: '0.016'
   Meerkat::Role::Document:
     file: lib/Meerkat/Role/Document.pm
-    version: '0.015'
+    version: '0.016'
   Meerkat::Types:
     file: lib/Meerkat/Types.pm
-    version: '0.015'
+    version: '0.016'
 requires:
+  BSON::OID: '0'
   Carp: '0'
   DateTime: '0'
   Module::Runtime: '0'
-  MongoDB: '1'
-  MongoDB::OID: '0'
+  MongoDB: '2'
   Moose: '2'
   Moose::Role: '2'
   MooseX::AttributeShortcuts: '0'
@@ -84,8 +84,12 @@ resources:
   bugtracker: https://github.com/dagolden/Meerkat/issues
   homepage: https://github.com/dagolden/Meerkat
   repository: https://github.com/dagolden/Meerkat.git
-version: '0.015'
+version: '0.016'
 x_authority: cpan:DAGOLDEN
 x_contributors:
+  - 'Mohammad S Anwar <mohammad.anwar@yahoo.com>'
+  - 'Todd Bruner <tbruner@as3036snllx.sandia.gov>'
   - 'Todd Bruner <todd.bruner@gmail.com>'
-x_serialization_backend: 'YAML::Tiny version 1.69'
+x_generated_by_perl: v5.32.0
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: Apache-2.0

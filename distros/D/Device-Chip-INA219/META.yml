@@ -15,7 +15,7 @@ name: Device-Chip-INA219
 provides:
   Device::Chip::INA219:
     file: lib/Device/Chip/INA219.pm
-    version: '0.06'
+    version: '0.07'
 requires:
   Data::Bitfield: '0'
   Device::Chip: '0.04'
@@ -25,5 +25,5 @@ requires:
   perl: '5.026'
 resources:
   license: http://dev.perl.org/licenses/
-version: '0.06'
+version: '0.07'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

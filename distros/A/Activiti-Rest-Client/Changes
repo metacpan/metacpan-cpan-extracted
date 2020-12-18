@@ -1,3 +1,6 @@
+0.1259  2020-12-17 09:11:46 CET
+   - timer jobs have different execute path in flowable
+
 0.1258  2020-12-09 10:04:22 CET
    - add support for timer-jobs and suspended-jobs from flowable
 

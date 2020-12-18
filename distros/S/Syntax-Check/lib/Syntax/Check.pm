@@ -9,9 +9,10 @@ use Data::Dumper;
 use Exporter qw(import);
 use File::Path qw(make_path);
 use File::Temp qw(tempdir);
+use Module::Installed qw(module_installed);
 use PPI;
 
-our $VERSION = '1.04';
+our $VERSION = '1.05';
 
 my $SEPARATOR;
 
@@ -62,7 +63,7 @@ sub check {
             $file .= '.pm';
             my $path = "$dir/$file";
 
-            if (_module_installed($package)) {
+            if (module_installed($package)) {
                 # Skip includes that are actually installed
                 say "Skipping available module '$package'" if $self->{verbose};
                 next;
@@ -112,19 +113,6 @@ sub _create_lib_dir {
         say "Created temp lib dir '$self->{lib}'" if $self->{verbose};
     }
 }
-sub _module_installed {
-    my ($name) = @_;
-
-    my $name_pm;
-
-    if ($name =~ /\A\w+(?:::\w+)*\z/) {
-        ($name_pm = "$name.pm") =~ s!::!$SEPARATOR!g;
-    } else {
-        $name_pm = $name;
-    }
-
-    return 1 if exists $INC{$name_pm};
-}
 sub __placeholder {}
 
 1;
@@ -135,7 +123,7 @@ __END__
 Syntax::Check - Wraps 'perl -c' so it works even if modules are unavailable
 
 =for html
-<a href="http://travis-ci.org/stevieb9/mock-sub"><img src="https://secure.travis-ci.org/stevieb9/syntax-check.png"/>
+<a href="http://travis-ci.com/stevieb9/syntax-check"><img src="https://www.travis-ci.com/stevieb9/syntax-check.svg?branch=master"/>
 <a href='https://coveralls.io/github/stevieb9/syntax-check?branch=master'><img src='https://coveralls.io/repos/stevieb9/syntax-check/badge.svg?branch=master&service=github' alt='Coverage Status' /></a>
 
 

@@ -658,6 +658,7 @@ t/01_basic.t
 t/02_rapiddbic_opts1.t
 t/03_authcore.t
 t/04_virtual_columns.t
+t/10_moniker_naming.t
 t/author/kwalitee.t
 t/author/pod.t
 t/author/podcoverage.t

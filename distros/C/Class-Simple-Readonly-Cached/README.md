@@ -1,10 +1,13 @@
+[![Kwalitee](https://cpants.cpanauthors.org/dist/Class-Simple-Readonly-Cached.png)](http://cpants.cpanauthors.org/dist/Class-Simple-Readonly-Cached)
+[![Tweet](https://img.shields.io/twitter/url/http/shields.io.svg?style=social)](https://twitter.com/intent/tweet?text=Cache+messages+to+an+object+#perl&url=https://github.com/nigelhorne/class-simple-readonly-cached&via=nigelhorne)
+
 # NAME
 
 Class::Simple::Readonly::Cached - cache messages to an object
 
 # VERSION
 
-Version 0.05
+Version 0.06
 
 # SYNOPSIS
 
@@ -14,7 +17,8 @@ the status of an object that are otherwise expensive.
 It is up to the caller to maintain the cache if the object comes out of sync with the cache,
 for example by changing its state.
 
-Note that it only works on objects which doesn't change its state based on input
+You can use this class to create a caching layer to an object of any class
+that works on objects which doesn't change its state based on input:
 
     $val = $obj->val();
     $val = $obj->val(a => 'b');
@@ -34,6 +38,15 @@ It takes one optional argument: object,
 which is an object which is taken to be the object to be cached.
 If not given, an object of the class [Class::Simple](https://metacpan.org/pod/Class%3A%3ASimple) is instantiated
 and that is used.
+
+    use Gedcom;
+
+    my %hash;
+    my $person = Gedcom::Person->new();
+    ... # Set up some data
+    my $object = Class::Simple::Readonly::Cached(object => $person, cache => \%hash);
+    my $father1 = $object->father();    # Will call gedcom->father() to get the person's father
+    my $father2 = $object->father();    # Will retived the father from the cache without calling person->father()
 
 ## object
 
@@ -76,13 +89,29 @@ You can find documentation for this module with the perldoc command.
 
 You can also look for information at:
 
+- MetaCPAN
+
+    [https://metacpan.org/release/Class-Simple-Readonly-Cached](https://metacpan.org/release/Class-Simple-Readonly-Cached)
+
 - RT: CPAN's request tracker
 
-    [http://rt.cpan.org/NoAuth/Bugs.html?Dist=Class-Simple-Readonly-Cached](http://rt.cpan.org/NoAuth/Bugs.html?Dist=Class-Simple-Readonly-Cached)
+    [https://rt.cpan.org/NoAuth/Bugs.html?Dist=Class-Simple-Readonly-Cached](https://rt.cpan.org/NoAuth/Bugs.html?Dist=Class-Simple-Readonly-Cached)
+
+- CPANTS
+
+    [http://cpants.cpanauthors.org/dist/Class-Simple-Readonly-Cached](http://cpants.cpanauthors.org/dist/Class-Simple-Readonly-Cached)
+
+- CPAN Testers' Matrix
+
+    [http://matrix.cpantesters.org/?dist=Class-Simple-Readonly-Cached](http://matrix.cpantesters.org/?dist=Class-Simple-Readonly-Cached)
 
 - CPAN Ratings
 
     [http://cpanratings.perl.org/d/Class-Simple-Readonly-Cached](http://cpanratings.perl.org/d/Class-Simple-Readonly-Cached)
+
+- CPAN Testers Dependencies
+
+    [http://deps.cpantesters.org/?module=Class::Simple::Readonly::Cached](http://deps.cpantesters.org/?module=Class::Simple::Readonly::Cached)
 
 - Search CPAN
 

@@ -1,7 +1,9 @@
 use strict;
 use warnings;
 
-use Test::More 'tests' => 15;
+use English;
+use Error::Pure::Utils qw(clean);
+use Test::More 'tests' => 24;
 use Test::NoWarnings;
 use Wikibase::Datatype::Struct::Item;
 
@@ -233,3 +235,37 @@ is($ret->modified, '2020-12-02T13:39:18Z', 'Method modified().');
 is($ret->ns, 0, 'Method ns().');
 is($ret->page_id, 123, 'Method page_id().');
 is($ret->title, 'Q42', 'Method title().');
+
+# Test.
+$struct_hr = {};
+eval {
+	Wikibase::Datatype::Struct::Item::struct2obj($struct_hr);
+};
+is($EVAL_ERROR, "Structure isn't for 'item' type.\n",
+	"Structure isn't for 'item' type.");
+clean();
+
+# Test.
+$struct_hr = {
+	'type' => 'bad',
+};
+eval {
+	Wikibase::Datatype::Struct::Item::struct2obj($struct_hr);
+};
+is($EVAL_ERROR, "Structure isn't for 'item' type.\n",
+	"Structure isn't for 'item' type.");
+clean();
+
+# Test.
+$struct_hr = {
+	'type' => 'item',
+};
+$ret = Wikibase::Datatype::Struct::Item::struct2obj($struct_hr);
+isa_ok($ret, 'Wikibase::Datatype::Item');
+is($ret->id, undef, 'Method id().');
+is($ret->lastrevid, undef, 'Method lastrevid().');
+is($ret->modified, undef, 'Method modified().');
+# XXX Is it right?
+is($ret->ns, 0, 'Method ns() (undefined).');
+is($ret->page_id, undef, 'Method page_id().');
+is($ret->title, undef, 'Method title().');

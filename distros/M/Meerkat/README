@@ -2,7 +2,7 @@ NAME
     Meerkat - Manage MongoDB documents as Moose objects
 
 VERSION
-    version 0.015
+    version 0.016
 
 SYNOPSIS
         use Meerkat;
@@ -248,25 +248,15 @@ SEE ALSO
 
     *   Mongoose
 
-SUPPORT
-  Bugs / Feature Requests
-    Please report any bugs or feature requests through the issue tracker at
-    <https://github.com/dagolden/Meerkat/issues>. You will be notified
-    automatically of any progress on your issue.
-
-  Source Code
-    This is open source software. The code repository is available for
-    public review and contribution under the terms of the license.
-
-    <https://github.com/dagolden/Meerkat>
-
-      git clone https://github.com/dagolden/Meerkat.git
-
 AUTHOR
     David Golden <dagolden@cpan.org>
 
-CONTRIBUTOR
-    Todd Bruner <todd.bruner@gmail.com>
+CONTRIBUTORS
+    *   Mohammad S Anwar <mohammad.anwar@yahoo.com>
+
+    *   Todd Bruner <tbruner@as3036snllx.sandia.gov>
+
+    *   Todd Bruner <todd.bruner@gmail.com>
 
 COPYRIGHT AND LICENSE
     This software is Copyright (c) 2013 by David Golden.

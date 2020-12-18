@@ -1,0 +1,30 @@
+Revision history for Music-MelodicDevice-Inversion
+
+0.0106 2020-12-16 05:07:12
+    - Add the eg/tandem program à la Schönberg.
+
+0.0105 2020-12-15 16:01:38
+    - Add yet another test from the wikipedia link.
+    - Improve documentation.
+
+0.0104 2020-12-15 14:26:34
+    - Add another test from the wikipedia link.
+    - Use the is_scale() function to check the scale name attribute.
+
+0.0103 2020-12-15 09:25:24
+    - Fix MIDI octave range.
+    - Reorder tests.
+    - Improve documentation.
+
+0.0102 2020-12-15 07:37:54
+    - Improve documentation.
+
+0.0101 2020-12-15 06:38:01
+    - Clean-up code.
+    - Improve documentation.
+    - Add the eg/single-note-line program.
+
+0.0100 2020-12-15 01:41:18
+    - Mint with Dist::Zilla.
+    - Add the ->intervals method.
+    - Add the ->invert method.

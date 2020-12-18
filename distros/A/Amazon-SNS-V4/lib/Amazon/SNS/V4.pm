@@ -5,15 +5,17 @@ use warnings;
 
 use base qw/ Class::Accessor::Fast /;
 
-__PACKAGE__->mk_accessors(qw/ key secret error status_code service debug signer /);
+__PACKAGE__->mk_accessors(qw/ key secret error status_code service debug signer error_response/);
 
 use LWP::UserAgent;
 use XML::Simple;
 use URI::Escape;
 use AWS::Signature4;
 use HTTP::Request::Common;
+use Amazon::SNS::V4::Target;
+use Amazon::SNS::V4::Topic;
 
-our $VERSION = '1.4';
+our $VERSION = '1.7';
 
 
 sub CreateTopic
@@ -105,6 +107,7 @@ sub dispatch
 	my ($self, $args) = @_;
 
 	$self->error(undef);
+	$self->error_response(undef);
 
 	$self->service('http://sns.eu-west-1.amazonaws.com')
 		unless defined $self->service;
@@ -140,7 +143,7 @@ sub dispatch
 				'ForceArray' => [ qw/ Topics member / ],
 		);
 	} else {
-		print $response->content, "\n";
+		$self->error_response( $response_content );
 		$self->error(
 			($response->content =~ /^<.+>/)
 				? eval { XMLin($response->content)->{'Error'}{'Message'} || $response->status_line }
@@ -169,6 +172,7 @@ package Amazon::SNS::V4::Topic;
 use strict;
 use warnings;
 
+our $VERSION = '1.7';
 use base qw(Class::Accessor);
 
 use JSON;
@@ -218,6 +222,7 @@ package Amazon::SNS::V4::Target;
 use strict;
 use warnings;
 
+our $VERSION = '1.7';
 use base qw(Class::Accessor);
 
 use JSON;
@@ -273,7 +278,6 @@ sub Publish
 }
 
 1;
-
 
 =head1 NAME
 
@@ -422,12 +426,15 @@ L<AWS::Signature4>
 
 =head1 COPYRIGHT AND LICENSE
 
+Copyright (C) 2020 James Wright
+
 Copyright (C) 2011-15 Alessandro Zummo
 
-Copyright (C) 2020 James Wright
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License version 2 as
 published by the Free Software Foundation.
 
+
 =cut
+

@@ -140,10 +140,11 @@ PID file must refer to a process already belonging to the service.',
       },
       'BusName',
       {
-        'description' => 'Takes a D-Bus bus name that this service is
-reachable as. This option is mandatory for services where
-C<Type> is set to
-C<dbus>.',
+        'description' => 'Takes a D-Bus destination name that this service shall use. This option is mandatory
+for services where C<Type> is set to C<dbus>. It is recommended to
+always set this property if known to make it easy to map the service name to the D-Bus destination.
+In particular, systemctl service-log-level/service-log-target verbs make use of
+this.',
         'type' => 'leaf',
         'value_type' => 'uniline'
       },
@@ -860,7 +861,7 @@ L<sd_pid_notify_with_fds(3)>\'s
 C<FDSTORE=1> messages. This is useful for implementing services that can restart
 after an explicit request or a crash without losing state. Any open sockets and other file
 descriptors which should not be closed during the restart may be stored this way. Application state
-can either be serialized to a file in C</run>, or better, stored in a
+can either be serialized to a file in C</run/>, or better, stored in a
 L<memfd_create(2)>
 memory file descriptor. Defaults to 0, i.e. no file descriptors may be stored in the service
 manager. All file descriptors passed to the service manager from a specific service are passed back

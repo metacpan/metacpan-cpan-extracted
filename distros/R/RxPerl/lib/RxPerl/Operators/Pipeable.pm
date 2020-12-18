@@ -12,7 +12,7 @@ use Scalar::Util 'reftype', 'refaddr';
 
 use Exporter 'import';
 our @EXPORT_OK = qw/
-    op_audit_time op_catch_error op_concat_map op_debounce_time op_delay op_distinct_until_changed
+    op_audit_time op_buffer_count op_catch_error op_concat_map op_debounce_time op_delay op_distinct_until_changed
     op_distinct_until_key_changed op_end_with op_exhaust_map op_filter op_finalize op_first op_map op_map_to
     op_merge_map op_multicast op_pairwise op_pluck op_ref_count op_repeat op_retry op_sample_time op_scan
     op_share op_skip op_start_with op_switch_map op_take op_take_until op_take_while op_tap op_throttle_time
@@ -53,6 +53,57 @@ sub op_audit_time {
                     }
                 },
             });
+        });
+    };
+}
+
+sub op_buffer_count {
+    my ($buffer_size, $start_buffer_every) = @_;
+
+    $start_buffer_every //= $buffer_size;
+
+    return sub {
+        my ($source) = @_;
+
+        return rx_observable->new(sub {
+            my ($subscriber) = @_;
+
+            my @buffers;
+            my $count = 0;
+            my $own_subscriber = {
+                %$subscriber,
+                next     => sub {
+                    my ($value) = @_;
+
+                    if ($count++ % $start_buffer_every == 0) {
+                        push @buffers, [];
+                    }
+
+                    for (my $i = 0; $i < @buffers; $i++) {
+                        my $buffer = $buffers[$i];
+
+                        push @$buffer, $value;
+
+                        if (@$buffer == $buffer_size) {
+                            $subscriber->{next}->($buffer) if defined $subscriber->{next};
+                            splice @buffers, $i, 1;
+                            $i--;
+                            next;
+                        }
+                    }
+                },
+                complete => sub {
+                    if (defined $subscriber->{next}) {
+                        $subscriber->{next}->($_) foreach @buffers;
+                    }
+
+                    $subscriber->{complete}->() if defined $subscriber->{complete};
+                },
+            };
+
+            $source->subscribe($own_subscriber);
+
+            return;
         });
     };
 }

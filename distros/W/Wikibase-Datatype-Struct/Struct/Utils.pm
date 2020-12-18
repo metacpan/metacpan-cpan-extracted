@@ -10,7 +10,7 @@ use Wikibase::Datatype::Struct::Snak;
 
 Readonly::Array our @EXPORT_OK => qw(obj_array_ref2struct struct2snaks_array_ref);
 
-our $VERSION = 0.03;
+our $VERSION = 0.04;
 
 sub obj_array_ref2struct {
 	my ($snaks_ar, $key, $base_uri) = @_;
@@ -283,6 +283,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.03
+0.04
 
 =cut

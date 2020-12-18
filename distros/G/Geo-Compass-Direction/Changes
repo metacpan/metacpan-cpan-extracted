@@ -1,0 +1,9 @@
+Revision history for Geo-Compass-Direction
+
+1.00    2020-12-16
+        - Add check and croak if degree param is outside of 0-360
+        - POD fixes
+
+0.01    2020-12-16
+        - First release
+

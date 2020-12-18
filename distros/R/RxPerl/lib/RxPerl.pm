@@ -13,7 +13,7 @@ our @EXPORT_OK = (
 );
 our %EXPORT_TAGS = (all => \@EXPORT_OK);
 
-our $VERSION = "v6.2.1";
+our $VERSION = "v6.3.0";
 
 1;
 __END__
@@ -59,7 +59,7 @@ The documentation in this POD applies to all three adapter modules as well.
 This module is an implementation of L<Reactive Extensions|http://reactivex.io/> in Perl. It replicates the
 behavior of L<rxjs 6|https://www.npmjs.com/package/rxjs> which is the JavaScript implementation of ReactiveX.
 
-Currently 52 of the 100+ operators in rxjs are implemented in this module.
+Currently 53 of the 100+ operators in rxjs are implemented in this module.
 
 =head1 EXPORTABLE FUNCTIONS
 
@@ -157,14 +157,14 @@ L<https://rxjs.dev/api/index/const/EMPTY>
 
 L<https://rxjs.dev/api/index/function/forkJoin>
 
-    # [30, 3, 'c']
+    # [30, 3, 'c'], complete
     rx_fork_join([
         rx_of(10, 20, 30),
         rx_of(1, 2, 3),
         rx_of('a', 'b', 'c'),
     ])->subscribe($observer);
 
-    # {x => 30, y => 3, z => 'c'}
+    # {x => 30, y => 3, z => 'c'}, complete
     rx_fork_join({
         x => rx_of(10, 20, 30),
         y => rx_of(1, 2, 3),
@@ -267,6 +267,8 @@ L<https://rxjs.dev/api/index/function/race>
 
 L<https://rxjs.dev/api/index/class/ReplaySubject>
 
+Works like rxjs's "replaySubject", except the C<window_time> parameter is in seconds instead of ms.
+
     # 20, 30, 40, 50, complete
     my $rs = rx_replay_subject(2);
     $rs->next(10);
@@ -341,6 +343,20 @@ Works like rxjs's "auditTime", except the parameter is in seconds instead of ms.
         op_audit_time(1),
     )->subscribe($observer);
 
+=item op_buffer_count
+
+L<https://rxjs.dev/api/operators/bufferCount>
+
+    # [10, 20, 30], [40, 50], complete
+    rx_of(10, 20, 30, 40, 50)->pipe(
+        op_buffer_count(3),
+    )->subscribe($observer);
+
+    # [10, 20, 30], [20, 30, 40], [30, 40, 50], [40, 50], [50], complete
+    rx_of(10, 20, 30, 40, 50)->pipe(
+        op_buffer_count(3, 1),
+    )->subscribe($observer);
+
 =item op_catch_error
 
 L<https://rxjs.dev/api/operators/catchError>
@@ -387,7 +403,7 @@ Works like rxjs's "delay", except the parameter is in seconds instead of ms.
 
 L<https://rxjs.dev/api/operators/distinctUntilChanged>
 
-    # 10, undef, 20, 30, [], []
+    # 10, undef, 20, 30, [], [], complete
     rx_of(10, 10, undef, undef, 20, 20, 20, 30, 30, [], [])->pipe(
         op_distinct_until_changed(),
     )->subscribe($observer);
@@ -447,7 +463,7 @@ L<https://rxjs.dev/api/operators/filter>
         op_filter(sub {$_[0] % 2 == 0}),
     )->subscribe($observer);
 
-    # 10, 36, 50
+    # 10, 36, 50, complete
     rx_of(10, 22, 36, 41, 50, 73)->pipe(
         op_filter(sub ($v, $idx) { $idx % 2 == 0 }),
     )->subscribe($observer);
@@ -805,9 +821,11 @@ ReactiveX to cater for web developers already familiar with rxjs.
 
 =over
 
-=item * L<Ultimate RxJS courses|https://ultimatecourses.com/courses/rxjs>
+=item * L<RxJS Top Ten - Code This, Not That|https://www.youtube.com/watch?v=ewcoEYS85Co>
 
-=item * L<egghead RxJS courses|https://egghead.io/browse/libraries/rxjs>
+=item * L<Ultimate RxJS courses|https://ultimatecourses.com/courses/rxjs> I<(paid)>
+
+=item * L<egghead RxJS courses|https://egghead.io/browse/libraries/rxjs> I<(paid)>
 
 =item * L<Rx Marbles|https://rxmarbles.com/>
 

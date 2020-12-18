@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use IO::Socket::IP ();
 use Socket qw(IPPROTO_TCP TCP_NODELAY);
-use Carp qw/confess croak/;
+use Carp qw/confess/;
 
 =head1 NAME
 
@@ -39,6 +39,10 @@ sub new {
     bless $self, $class;
     confess('not a scalar') if ref $self->{'peer'} ne '';
 
+    if(($self->{'peer'}//$self->{'server'}) =~ m|^tls://|mx) {
+        require IO::Socket::SSL;
+    }
+
     return $self;
 }
 
@@ -53,30 +57,42 @@ sub _open {
     my $self = shift;
     my $sock;
 
-    my $remaining = alarm($self->{'connect_timeout'});
+    my $options = {
+        PeerAddr => $self->{'peer'},
+        Type     => IO::Socket::IP::SOCK_STREAM,
+        Timeout  => $self->{'connect_timeout'},
+    };
+
+    my $tls = 0;
+    my $peer_addr = $self->{'peer'};
+    if($peer_addr =~ s|tls://||mx) {
+        $options->{'PeerAddr'} = $peer_addr;
+        $options->{'SSL_cert_file'}   = $self->{'cert'};
+        $options->{'SSL_key_file'}    = $self->{'key'};
+        $options->{'SSL_ca_file'}     = $self->{'ca_file'};
+        $options->{'SSL_verify_mode'} = 0 if(defined $self->{'verify'} && $self->{'verify'} == 0);
+        $tls = 1;
+    }
+
     eval {
-        local $SIG{'ALRM'} = sub { die("connection timeout"); };
-        $sock = IO::Socket::IP->new(
-                                         PeerAddr => $self->{'peer'},
-                                         Type     => IO::Socket::IP::SOCK_STREAM,
-                                         Timeout  => $self->{'connect_timeout'},
-                                         );
+        if($tls) {
+            $sock = IO::Socket::SSL->new(%{$options});
+        } else {
+            $sock = IO::Socket::IP->new(%{$options});
+        }
         if(!defined $sock || !$sock->connected()) {
-            my $msg = "failed to connect to $self->{'peer'}: $!";
+            my $msg = "failed to connect to $peer_addr: $!";
             if($self->{'errors_are_fatal'}) {
-                croak($msg);
+                confess($msg);
             }
             $Monitoring::Livestatus::ErrorCode    = 500;
             $Monitoring::Livestatus::ErrorMessage = $msg;
-            alarm(0);
             return;
         }
 
         setsockopt($sock, IPPROTO_TCP, TCP_NODELAY, 1);
 
     };
-    alarm(0);
-    alarm($remaining) if $remaining;
 
     if($@) {
         $Monitoring::Livestatus::ErrorCode    = 500;

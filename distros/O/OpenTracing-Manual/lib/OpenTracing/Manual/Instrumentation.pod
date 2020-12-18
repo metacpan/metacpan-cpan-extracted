@@ -40,6 +40,20 @@ OpenTracing::Manual::Instrumentation - monitor your application
 This manual documents the process of instrumenting a program,
 in order to gain insights about specific parts of the code.
 
+=head1 TABLE OF CONTENTS
+
+
+
+=over
+
+=item L</"Selecting a tracer">
+
+=item L</"Adding OpenTracing to your Application">
+
+=item L</"Adding extra information to spans">
+
+=back
+
 =head1 Selecting a tracer
 
 In order to instrument an application, an OpenTracing-compatible

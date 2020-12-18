@@ -7,7 +7,7 @@ failure.
 
 This plugin injects diagnostics messages that include the lines of source that
 executed to produce the test failure. This is a less magical answer to Damian
-Conway's [Test::Expr](https://metacpan.org/pod/Test::Expr) module, that has the benefit of working on any Test2
+Conway's [Test::Expr](https://metacpan.org/pod/Test%3A%3AExpr) module, that has the benefit of working on any Test2
 based test.
 
 # SYNOPSIS

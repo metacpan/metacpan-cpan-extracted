@@ -25,7 +25,7 @@ requires:
 resources:
   bugtracker: https://github.com/ap/Net-OAuth2Server-OIDC/issues
   repository: git://github.com/ap/Net-OAuth2Server-OIDC.git
-version: '0.004'
+version: '0.005'
 x_copyright:
   holder: 'Aristotle Pagaltzis'
   year: 2020

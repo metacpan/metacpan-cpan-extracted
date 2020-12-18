@@ -1,5 +1,11 @@
 # Change Log
 
+## [0.0.4] - 2020-12-17
+
+### Added
+
+- Details of bugtracker 
+
 ## [0.0.3] - 2017-09-06
 
 ### Fixed

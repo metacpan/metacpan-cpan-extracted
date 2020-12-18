@@ -168,7 +168,7 @@ C<WatchdogSec>). Defaults to C<SIGABRT>.
         'value_type' => 'uniline'
       }
     ],
-    'generated_by' => 'parse-man.pl from systemd 246 doc',
+    'generated_by' => 'parse-man.pl from systemd 247 doc',
     'license' => 'LGPLv2.1+',
     'name' => 'Systemd::Common::Kill'
   }

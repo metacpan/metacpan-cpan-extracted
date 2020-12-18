@@ -4,7 +4,6 @@ examples/dump-eeprom
 examples/echo
 lib/Device/Chip/BV4243.pm
 LICENSE
-Makefile.PL
 MANIFEST			This list of files
 META.json
 META.yml

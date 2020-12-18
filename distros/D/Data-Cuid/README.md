@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/zakame/Data-Cuid.svg?branch=master)](https://travis-ci.org/zakame/Data-Cuid) [![Coverage Status](https://img.shields.io/coveralls/zakame/Data-Cuid/master.svg?style=flat)](https://coveralls.io/r/zakame/Data-Cuid?branch=master) [![MetaCPAN Release](https://badge.fury.io/pl/Data-Cuid.svg)](https://metacpan.org/release/Data-Cuid) [![Build Status](https://img.shields.io/appveyor/ci/zakame/Data-Cuid/master.svg?logo=appveyor)](https://ci.appveyor.com/project/zakame/Data-Cuid/branch/master)
+[![Actions Status](https://github.com/zakame/Data-Cuid/workflows/Test%20on%20latest%20supported%20Perls/badge.svg)](https://github.com/zakame/Data-Cuid/actions) [![Coverage Status](https://img.shields.io/coveralls/zakame/Data-Cuid/master.svg?style=flat)](https://coveralls.io/r/zakame/Data-Cuid?branch=master) [![MetaCPAN Release](https://badge.fury.io/pl/Data-Cuid.svg)](https://metacpan.org/release/Data-Cuid) [![Build Status](https://img.shields.io/appveyor/ci/zakame/Data-Cuid/master.svg?logo=appveyor)](https://ci.appveyor.com/project/zakame/Data-Cuid/branch/master)
 # NAME
 
 Data::Cuid - collision-resistant IDs

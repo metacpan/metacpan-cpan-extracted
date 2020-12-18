@@ -7,7 +7,7 @@ use JSON qw(decode_json encode_json);
 use URI::Escape qw(uri_escape);
 use Activiti::Rest::Response;
 
-our $VERSION = "0.1258";
+our $VERSION = "0.1259";
 
 #see: http://www.activiti.org/userguide
 
@@ -1645,6 +1645,20 @@ sub timer_job {
     path => "/management/timer-jobs/".uri_escape($args{jobId}),
     params => {},
     method => "GET"
+  );
+  Activiti::Rest::Response->from_http_response($res);
+}
+
+sub execute_timer_job {
+  my($self,%args)=@_;
+  my $res = $self->ua->request(
+    path => "/management/timer-jobs/".uri_escape($args{jobId}),
+    params => {},
+    method => "POST",
+    headers => {
+      'Content-Type' => "application/json",
+      Content => encode_json({ action => "move" })
+    }
   );
   Activiti::Rest::Response->from_http_response($res);
 }

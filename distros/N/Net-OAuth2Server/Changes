@@ -1,5 +1,12 @@
 Revision history for Net-OAuth2Server
 
+0.004 Thu 17 Dec 2020
+	- Response method names matching the Request method names:
+		- old Response->param renamed to parameters (like Request->parameters)
+		- new Response->param (like Request->param)
+		- new Response->params (like Request->params)
+		- new has_param method for both classes
+
 0.003 Sun 01 Nov 2020
 	- Ability to control grant constructor parameters and required parameters
 	  separately from each other in token requests

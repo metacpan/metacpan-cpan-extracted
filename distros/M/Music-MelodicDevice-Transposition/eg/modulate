@@ -1,0 +1,30 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+
+use lib map { "$ENV{HOME}/sandbox/$_/lib" } qw(MIDI-Util);
+use MIDI::Util;
+use Music::MelodicDevice::Transposition;
+
+my @notes = qw(C4 E4 D4 G4);
+
+my $md = Music::MelodicDevice::Transposition->new(
+    scale_note => 'C',
+    scale_name => 'major',
+    verbose => 1,
+);
+
+my $score = MIDI::Util::setup_score();
+
+@notes = MIDI::Util::midi_format(@notes);
+$score->n('qn', $_) for @notes;
+$score->r('hn');
+
+for my $i (1, 2, 3) {
+    my $transposed = $md->transpose($i, \@notes);
+    @$transposed = MIDI::Util::midi_format(@$transposed);
+    $score->n('qn', $_) for @$transposed;
+    $score->r('hn') unless $i == 3;
+}
+
+$score->write_score("$0.mid");

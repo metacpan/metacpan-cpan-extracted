@@ -5,7 +5,7 @@ use warnings;
 package Meerkat::Types;
 # ABSTRACT: Moose types for Meerkat
 
-our $VERSION = '0.015';
+our $VERSION = '0.016';
 
 use MooseX::Types -declare => [qw(MeerkatDateTime)];
 use MooseX::Storage::Engine;
@@ -21,6 +21,7 @@ coerce MeerkatDateTime, (
     from Num,                           via { MDT->new( epoch => $_ ) },
     from InstanceOf ['DateTime'],       via { MDT->new( epoch => $_->epoch ) },
     from InstanceOf ['DateTime::Tiny'], via { MDT->new( epoch => $_->DateTime->epoch ) },
+    from InstanceOf ['BSON::Time'],     via { MDT->new( epoch => $_->epoch ) },
 #>>>
 );
 
@@ -31,7 +32,7 @@ coerce MeerkatDateTime, (
 MooseX::Storage::Engine->add_custom_type_handler(
     MeerkatDateTime,
     (
-        expand   => sub { MDT->new( epoch             => $_[0] ) },
+        expand   => sub { MDT->new( epoch             => "$_[0]" ) },
         collapse => sub { DateTime->from_epoch( epoch => $_[0]->epoch ) },
     )
 );
@@ -53,7 +54,7 @@ Meerkat::Types - Moose types for Meerkat
 
 =head1 VERSION
 
-version 0.015
+version 0.016
 
 =head1 SYNOPSIS
 
@@ -76,7 +77,7 @@ This module defines Moose types and coercions.
 =head2 MeerkatDateTime
 
 This type is a L<Meerkat::DateTime>.  It defines coercions from C<Num> (an epoch value),
-L<DateTime> and L<DateTime::Tiny>.
+L<DateTime>, L<DateTime::Tiny>, and L<BSON::Time>.
 
 It also sets up a L<MooseX::Storage> type handler that 'collapses' to a
 DateTime object for storage by the MongoDB client, but 'expands' from an epoch

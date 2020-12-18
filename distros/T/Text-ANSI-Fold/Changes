@@ -1,5 +1,9 @@
 Revision history for Perl extension Text-ANSI-Fold
 
+2.08 2020-12-16T05:03:22Z
+
+    - Introduce 'tabhead' and 'tabspace' options.
+
 2.07 2020-11-20T08:54:39Z
 
     - Add dependency for List::Util.

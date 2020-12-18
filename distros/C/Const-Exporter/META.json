@@ -71,6 +71,7 @@
             "File::Spec" : "0",
             "Hash::Objectify" : "0",
             "Module::Metadata" : "0",
+            "Sub::Identify" : "0.06",
             "Test::More" : "0",
             "Test::Most" : "0",
             "if" : "0",
@@ -81,7 +82,7 @@
    "provides" : {
       "Const::Exporter" : {
          "file" : "lib/Const/Exporter.pm",
-         "version" : "v1.0.0"
+         "version" : "v1.1.1"
       }
    },
    "release_status" : "stable",
@@ -95,7 +96,7 @@
          "web" : "https://github.com/robrwo/Const-Exporter"
       }
    },
-   "version" : "v1.0.0",
+   "version" : "v1.1.1",
    "x_authority" : "cpan:RRWO",
    "x_contributors" : [
       "B. Estrade <estrabd@cpan.org>"

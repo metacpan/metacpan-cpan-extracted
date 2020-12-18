@@ -36,6 +36,7 @@ WriteMakefile(
         'Carp'                    => 0,
         'File::Path'              => 0,
         'File::Temp'              => 0,
+        'Module::Installed'       => 1.01,
         'PPI'                     => 0,
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },

@@ -4,55 +4,58 @@ use strict;
 use Geo::Compass::Variation qw(mag_dec);
 use Test::More;
 
+use constant {
+    REL     => 2020,    # release year
+    EXP     => 2024,    # expire year
+    BEFORE  => 2026,    # before release
+    PAST    => 2019,    # beyond expire
+};
+
 my $year;
 (undef, undef, undef, undef, undef, $year) = localtime;
 $year += 1900;
 
 my @t = (51.0486, -114.0708, 1100, $year);
 
-my $ok = eval {
+# new model not available
+{
+    my $w;
+    local $SIG{__WARN__} = sub {$w = shift};
     mag_dec(@t);
-    1;
+    is $w, undef, "new WWM data not yet available";
 };
 
-is $ok, 1, "new WWM data not yet available";
+# rel is valid year
+{
+    my $w;
+    local $SIG{__WARN__} = sub {$w = shift};
+    mag_dec(10, 10, 0, REL);
+    is $w, undef, REL . " is a valid year";
+}
 
-$ok = eval {
-    mag_dec(10, 10, 0, 2015);
-    1;
-};
+# exp is valid year
+{
+    my $w;
+    local $SIG{__WARN__} = sub {$w = shift};
+    mag_dec(10, 10, 0, EXP);
+    is $w, undef, EXP . " is a valid year";
+}
 
-is $ok, 1, "2015 is a valid year";
+# prior to first year
+{
+    my $warn;
+    local $SIG{__WARN__} = sub {$warn = $_[0];};
+    mag_dec(10, 10, 0, BEFORE);
+    like $warn, qr/Calculation model is expired/, "fail prior to " . REL;
+}
 
-$ok = eval {
-    mag_dec(10, 10, 0, 2019);
-    1;
-};
-
-is $ok, 1, "2019 is a valid year";
-
-$ok = eval {
-    mag_dec(10, 10, 0, 2014);
-    1;
-};
-
-is $ok, undef, "fail prior to 2015";
-
-$ok = eval {
-    mag_dec(10, 10, 0, 2020);
-    1;
-};
-
-is $ok, undef, "fail after 2019";
-like $@, qr/Calculation model has expired:/, "error is sane";
-
-$ok = eval {
-    mag_dec(10, 10, 0, 2020);
-    1;
-};
-
-is $ok, undef, "fail after 2018.9";
-like $@, qr/Calculation model has expired:/, "error is sane";
+# greater than last year
+{
+    my $warn;
+    local $SIG{__WARN__} = sub {$warn = $_[0];};
+    mag_dec(10, 10, 0, PAST);
+    like $warn, qr/Calculation model is expired/, "fail after " . EXP;
+}
 
 done_testing;
 

@@ -2,7 +2,7 @@ use strict; use warnings;
 
 package Net::OAuth2Server;
 
-our $VERSION = '0.003';
+our $VERSION = '0.004';
 
 __END__
 

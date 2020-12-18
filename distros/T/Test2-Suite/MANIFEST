@@ -30,6 +30,7 @@ lib/Test2/Compare/Event.pm
 lib/Test2/Compare/EventMeta.pm
 lib/Test2/Compare/Float.pm
 lib/Test2/Compare/Hash.pm
+lib/Test2/Compare/Isa.pm
 lib/Test2/Compare/Meta.pm
 lib/Test2/Compare/Negatable.pm
 lib/Test2/Compare/Number.pm
@@ -166,6 +167,7 @@ t/modules/Compare/Event.t
 t/modules/Compare/EventMeta.t
 t/modules/Compare/Float.t
 t/modules/Compare/Hash.t
+t/modules/Compare/Isa.t
 t/modules/Compare/Meta.t
 t/modules/Compare/Number.t
 t/modules/Compare/Object.t

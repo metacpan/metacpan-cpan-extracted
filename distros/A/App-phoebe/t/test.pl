@@ -19,6 +19,7 @@ use IO::Socket::SSL;
 use File::Slurper qw(write_text);
 use Mojo::IOLoop;
 use Encode;
+use Encode::Locale;
 
 our $host;
 our @hosts;
@@ -85,15 +86,18 @@ if (!defined $pid) {
   use Config;
   my $secure_perl_path = $Config{perlpath};
   my @args = ("blib/script/phoebe",
-	      (map { "--host=$_" } @hosts),
+	      # The test files containing hostnames are UTF-8 encoded, thus
+	      # $host and @host are unicode strings. Command line parsing
+	      # expects them encoded in the current locale, however.
+	      (map { "--host=" . encode(locale => $_) } @hosts),
 	      "--port=$port",
 	      "--log_level=warn", # set to debug if you are bug hunting?
 	      "--cert_file=t/cert.pem",
 	      "--key_file=t/key.pem",
 	      "--wiki_dir=$dir",
 	      "--wiki_mime_type=image/jpeg",
-	      (map { "--wiki_page=$_" } @pages),
-	      (map { "--wiki_space=$_" } @spaces));
+	      (map { "--wiki_page=" . encode(locale => $_) } @pages),
+	      (map { "--wiki_space=" . encode(locale => $_) } @spaces));
   exec($secure_perl_path, @args) or die "Cannot exec: $!";
 }
 
@@ -149,11 +153,11 @@ sub query_web {
 }
 
 say "This is the client waiting 1s for the server to start on port $port...";
-sleep 1; eval { query_gemini('gemini://localhost/') };
-if ($@) { say "One more second..."; sleep 1; eval { query_gemini('gemini://localhost/') }}
-if ($@) { say "Just one more second..."; sleep 1; eval { query_gemini('gemini://localhost/') }}
-if ($@) { say "Another second..."; sleep 1; eval { query_gemini('gemini://localhost/') }}
-if ($@) { say "One last second..."; sleep 1; eval { query_gemini('gemini://localhost/') }}
+sleep 1; eval { query_gemini("gemini://$host:$port/") };
+if ($@) { say "One more second..."; sleep 1; eval { query_gemini("gemini://$host:$port/") }}
+if ($@) { say "Just one more second..."; sleep 1; eval { query_gemini("gemini://$host:$port/") }}
+if ($@) { say "Another second..."; sleep 1; eval { query_gemini("gemini://$host:$port/") }}
+if ($@) { say "One last second..."; sleep 1; eval { query_gemini("gemini://$host:$port/") }}
 if ($@) { say "Still getting an error: $@" }
 
 1;

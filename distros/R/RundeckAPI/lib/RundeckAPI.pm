@@ -38,13 +38,13 @@ use JSON;
 use Storable qw(dclone);
 use Exporter qw(import);
 
-our @EXPORT_OK = qw(get post put delete postData putData);
+our @EXPORT_OK = qw(get post put delete postData putData postFile putFile);
 
 #####
 ## CONSTANTS
 #####
 our $TIMEOUT = 10;
-our $VERSION = "1.3.0";
+our $VERSION = "1.3.2";
 #####
 ## VARIABLES
 #####
@@ -316,7 +316,7 @@ sub _handleResponse () {
 	$responsehash->{'httpstatus'} = 200;
 
 	# is data JSON ?
-	if ($responseType eq 'application/json') {
+	if ($responseType =~ /^application\/json.*/) {
 		$self->_logV2($responseContent);
 		$responseJSON = decode_json($responseContent) if $responseContent ne '';
 		my $reftype = reftype($responseJSON);
@@ -335,7 +335,7 @@ sub _handleResponse () {
 		}
 		$responsehash->{'reqstatus'} = 'OK';
 		$responsehash->{'httpstatus'} = $rc;
-	} elsif ($responseType eq 'text/plain') {
+	} elsif ($responseType =~ /text\/plain.*/) {
 		$self->_logV2($responseContent);
 		$responsehash->{'content'} = $responseContent;
 	} else { # assume binary, like text, but do not log

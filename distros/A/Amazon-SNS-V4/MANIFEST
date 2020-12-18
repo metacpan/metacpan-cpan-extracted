@@ -1,7 +1,13 @@
-MANIFEST
 AUTHORS
-ChangeLog
+Build.PL
+Changes
+LICENSE
+MANIFEST
+META.json
+META.yml
+README
+cpanfile
 lib/Amazon/SNS/V4.pm
-Makefile.PL
-META.yml                                 Module YAML meta-data (added by MakeMaker)
-META.json                                Module JSON meta-data (added by MakeMaker)
+lib/Amazon/SNS/V4/Target.pm
+lib/Amazon/SNS/V4/Topic.pm
+pl.pl

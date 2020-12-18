@@ -1,0 +1,19 @@
+version: 1.0.{build}
+clone_folder: C:\projects\data-cuid
+install:
+- cmd: >-
+    if not exist "C:\strawberry" cinst strawberryperl
+
+    set PATH=C:\strawberry\perl\bin;C:\strawberry\perl\site\bin;C:\strawberry\c\bin;%PATH%
+
+    cd C:\projects\data-cuid
+
+    cpanm --installdeps . -n
+cache: C:\strawberry
+build_script:
+- cmd: >-
+    perl Build.PL
+
+    perl ./Build build
+test_script:
+- cmd: perl ./Build test

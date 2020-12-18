@@ -3,7 +3,7 @@ use strict;
 
 use Data::Dump qw(dd);
 
-my $file = -e 'script/wmm.com' ? 'script/wmm.com' : 'wmm.com';
+my $file = -e 'script/WMM.COF' ? 'script/WMM.COF' : 'WMM.COF';
 
 open my $fh, '<', $file or die $!;
 
@@ -19,7 +19,7 @@ while (my $line = <$fh>){
 
     $line =~ s/^\s+//;
 
-    (my $current_list, my $list_position, my @wmm_data) = split /\s+/, $line;
+    my ($current_list, $list_position, @wmm_data) = split /\s+/, $line;
 
     push @{ $wmm[$current_list]->[$list_position] }, @wmm_data;
 }

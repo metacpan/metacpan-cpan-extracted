@@ -200,6 +200,7 @@ Olly
 Ondrej
 Onken
 Oosten
+Orton
 Oschwald
 Paaske
 Panchenko
@@ -290,6 +291,7 @@ Yitzchak
 Yoshinari
 Yuri
 Yury
+Yves
 Zajac
 Zakharevich
 Zavarin
@@ -412,5 +414,6 @@ waif
 wfmann
 wolfsage
 yury
+yves
 zefram
 zigorou

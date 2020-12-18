@@ -11,8 +11,19 @@ my $events = intercept {
     is($x, $y);
 };
 
-is($events->[0]->name, 'is($x, $y);', "injected name");
-is($events->[1]->message, "Failure Arguments: ('X', 'Y')", "got args");
+if ($events->[0]->name) {
+    is($events->[0]->name, 'is($x, $y);', "injected name");
+    is($events->[1]->message, "Failure Arguments: ('X', 'Y')", "got args");
+}
+else {
+    is($events->[1]->message . "\n", <<'    EOT', "Could not set name, so added to message");
+Failure source code:
+------------
+11:     is($x, $y);
+------------
+Failure Arguments: ('X', 'Y')
+    EOT
+}
 
 $events = intercept {
     Test2::Plugin::SourceDiag->import(show_source => 1, show_args => 1, inject_name => 1);
@@ -26,7 +37,7 @@ $events = intercept {
 is($events->[0]->name, 'named', "do not injected name");
 is(
     $events->[1]->message,
-    "Failure source code:\n------------\n23:     is(\$x, \$y, \"named\");\n------------\nFailure Arguments: ('X', 'Y', 'named')",
+    "Failure source code:\n------------\n34:     is(\$x, \$y, \"named\");\n------------\nFailure Arguments: ('X', 'Y', 'named')",
     "got args and source"
 );
 

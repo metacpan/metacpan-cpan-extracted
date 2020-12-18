@@ -4,7 +4,7 @@ Text::ANSI::Fold - Text folding library supporting ANSI terminal sequence and As
 
 # VERSION
 
-Version 2.07
+Version 2.08
 
 # SYNOPSIS
 
@@ -229,9 +229,15 @@ function as well as **new** and **configure** method.
 
 - **expand** => _bool_
 - **tabstop** => _n_
+- **tabhead** => _char_
+- **tabspace** => _char_
 
-    Enable tab character expansion.  Default tabstop is 8 and can be set
-    by **tabstop** option.
+    Enable tab character expansion.
+
+    Default tabstop is 8 and can be set by **tabstop** option.
+
+    Tab character is converted to **tabhead** and following **tabspace**
+    characters.  Both are white space by default.
 
 # EXAMPLE
 

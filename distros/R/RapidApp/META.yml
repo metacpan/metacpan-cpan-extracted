@@ -168,7 +168,7 @@ resources:
   bugtracker: https://github.com/vanstyn/RapidApp/issues
   homepage: http://www.rapidapp.info
   repository: https://github.com/vanstyn/RapidApp.git
-version: 1.3302
+version: 1.3400
 x_contributors:
   - 'Michael Conrad <mconrad@intellitree.com>'
   - 'Torsten Raudssus <torsten@raudss.us>'
@@ -182,3 +182,5 @@ x_contributors:
   - 'Scott Walters <scott@slowass.net>'
   - 'Tim Bunce <Tim.Bunce@pobox.com>'
   - 'Dagfinn Ilmari Mannsåker <ilmari@ilmari.org>'
+  - 'Roman Pavlov <rp@freeshell.org>'
+  - 'James Wright <jwright@ecstuning.com>'

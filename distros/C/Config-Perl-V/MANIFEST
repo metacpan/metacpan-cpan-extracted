@@ -4,6 +4,7 @@ Makefile.PL
 README
 CONTRIBUTING.md
 V.pm
+cpanfile
 t/10_base.t
 t/20_plv56.t
 t/21_plv58.t
@@ -24,6 +25,10 @@ t/31_plv52511.t
 t/32_plv5261rc1.t
 t/33_plv52711r.t
 t/34_plv5280.t
+t/35_plv52910g.t
+t/36_plv5300.t
+t/37_plv53111qm.t
+t/38_plv5320tld.t
 examples/show-v.pl
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

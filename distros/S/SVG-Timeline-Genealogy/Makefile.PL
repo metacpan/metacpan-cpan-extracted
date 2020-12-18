@@ -32,6 +32,9 @@ WriteMakefile(
         url => 'git://github.com/davorg/svg-timeline-genealogy.git',
         web => 'https://github.com/davorg/svg-timeline-genealogy',
       },
+      bugtracker => {
+        web => 'https://github.com/davorg/svg-timeline-genealogy/issues',
+      }
     },
   },
   EXE_FILES => [ 'bin/treeline' ],

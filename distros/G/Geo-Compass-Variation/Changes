@@ -1,5 +1,16 @@
 Revision history for Geo-Compass-Variation
 
+1.06    2020-12-07
+        - Slightly modified tests as Testers was producing slightly different
+          floats for results which was breaking tests
+
+1.05    2020-12-16
+        - We now warn and not die if WMM data is out of year range
+        - Changed to Carp::croak from die
+        - Updated WMM data to the Dec 10, 2019 set, valid Jan 1, 2020 through
+          Dec 31, 2024
+        - Added CI and test coverage badges
+
 1.03    2019-05-21
         - fix issue where tests were failing if perl was compiled with
           uselongdouble (thanks for reporting, Slaven Rezić)

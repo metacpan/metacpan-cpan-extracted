@@ -1,5 +1,5 @@
 name = "Data-Cuid"
-badges = ["travis", "coveralls", "metacpan", "appveyor"]
+badges = ["github-actions/Test on latest supported Perls", "coveralls", "metacpan", "appveyor"]
 authority="cpan:ZAKAME"
 
 module_maker="ModuleBuildTiny"

@@ -132,21 +132,24 @@ in the service being available via both IPv6 and IPv4
 (default) or just via IPv6.
 
 If the address string is a string in the format
-v.w.x.y:z, it is read as IPv4 specifier for listening on an
-address v.w.x.y on a port z.
-
-If the address string is a string in the format [x]:y,
-it is read as IPv6 address x on a port y. Note that this might
-make the service available via IPv4, too, depending on the
-C<BindIPv6Only> setting (see below).
+C<v.w.x.y:z>, it is interpreted
+as IPv4 address v.w.x.y and port z.
 
 If the address string is a string in the format
-C<vsock:x:y>, it is read as CID C<x> on
-a port C<y> address in the
-C<AF_VSOCK> family.  The CID is a unique 32-bit
-integer identifier in C<AF_VSOCK> analogous to an IP
-address.  Specifying the CID is optional, and may be set to the empty
-string.
+C<[x]:y>, it is interpreted as
+IPv6 address x and port y. An optional
+interface scope (interface name or number) may be specified after a C<%> symbol:
+C<[x]:y%dev>.
+Interface scopes are only useful with link-local addresses, because the kernel ignores them in other
+cases. Note that if an address is specified as IPv6, it might still make the service available via
+IPv4 too, depending on the C<BindIPv6Only> setting (see below).
+
+If the address string is a string in the format
+C<vsock:x:y>, it is read as CID
+x on a port y address in the
+C<AF_VSOCK> family.  The CID is a unique 32-bit integer identifier in
+C<AF_VSOCK> analogous to an IP address.  Specifying the CID is optional, and may be
+set to the empty string.
 
 Note that C<SOCK_SEQPACKET> (i.e.
 C<ListenSequentialPacket>) is only available
@@ -211,21 +214,24 @@ in the service being available via both IPv6 and IPv4
 (default) or just via IPv6.
 
 If the address string is a string in the format
-v.w.x.y:z, it is read as IPv4 specifier for listening on an
-address v.w.x.y on a port z.
-
-If the address string is a string in the format [x]:y,
-it is read as IPv6 address x on a port y. Note that this might
-make the service available via IPv4, too, depending on the
-C<BindIPv6Only> setting (see below).
+C<v.w.x.y:z>, it is interpreted
+as IPv4 address v.w.x.y and port z.
 
 If the address string is a string in the format
-C<vsock:x:y>, it is read as CID C<x> on
-a port C<y> address in the
-C<AF_VSOCK> family.  The CID is a unique 32-bit
-integer identifier in C<AF_VSOCK> analogous to an IP
-address.  Specifying the CID is optional, and may be set to the empty
-string.
+C<[x]:y>, it is interpreted as
+IPv6 address x and port y. An optional
+interface scope (interface name or number) may be specified after a C<%> symbol:
+C<[x]:y%dev>.
+Interface scopes are only useful with link-local addresses, because the kernel ignores them in other
+cases. Note that if an address is specified as IPv6, it might still make the service available via
+IPv4 too, depending on the C<BindIPv6Only> setting (see below).
+
+If the address string is a string in the format
+C<vsock:x:y>, it is read as CID
+x on a port y address in the
+C<AF_VSOCK> family.  The CID is a unique 32-bit integer identifier in
+C<AF_VSOCK> analogous to an IP address.  Specifying the CID is optional, and may be
+set to the empty string.
 
 Note that C<SOCK_SEQPACKET> (i.e.
 C<ListenSequentialPacket>) is only available
@@ -290,21 +296,24 @@ in the service being available via both IPv6 and IPv4
 (default) or just via IPv6.
 
 If the address string is a string in the format
-v.w.x.y:z, it is read as IPv4 specifier for listening on an
-address v.w.x.y on a port z.
-
-If the address string is a string in the format [x]:y,
-it is read as IPv6 address x on a port y. Note that this might
-make the service available via IPv4, too, depending on the
-C<BindIPv6Only> setting (see below).
+C<v.w.x.y:z>, it is interpreted
+as IPv4 address v.w.x.y and port z.
 
 If the address string is a string in the format
-C<vsock:x:y>, it is read as CID C<x> on
-a port C<y> address in the
-C<AF_VSOCK> family.  The CID is a unique 32-bit
-integer identifier in C<AF_VSOCK> analogous to an IP
-address.  Specifying the CID is optional, and may be set to the empty
-string.
+C<[x]:y>, it is interpreted as
+IPv6 address x and port y. An optional
+interface scope (interface name or number) may be specified after a C<%> symbol:
+C<[x]:y%dev>.
+Interface scopes are only useful with link-local addresses, because the kernel ignores them in other
+cases. Note that if an address is specified as IPv6, it might still make the service available via
+IPv4 too, depending on the C<BindIPv6Only> setting (see below).
+
+If the address string is a string in the format
+C<vsock:x:y>, it is read as CID
+x on a port y address in the
+C<AF_VSOCK> family.  The CID is a unique 32-bit integer identifier in
+C<AF_VSOCK> analogous to an IP address.  Specifying the CID is optional, and may be
+set to the empty string.
 
 Note that C<SOCK_SEQPACKET> (i.e.
 C<ListenSequentialPacket>) is only available
@@ -344,11 +353,9 @@ below.',
           'type' => 'leaf',
           'value_type' => 'uniline'
         },
-        'description' => 'Specifies a file system FIFO to listen on.
-This expects an absolute file system path as argument.
-Behavior otherwise is very similar to the
-C<ListenDatagram> directive
-above.',
+        'description' => 'Specifies a file system FIFO (see L<fifo(7)> for
+details) to listen on.  This expects an absolute file system path as argument.  Behavior otherwise is
+very similar to the C<ListenDatagram> directive above.',
         'type' => 'list'
       },
       'ListenSpecial',
@@ -362,8 +369,8 @@ listen on. This expects an absolute file system path as
 argument. Behavior otherwise is very similar to the
 C<ListenFIFO> directive above. Use this to
 open character device nodes as well as special files in
-C</proc> and
-C</sys>.',
+C</proc/> and
+C</sys/>.',
         'type' => 'list'
       },
       'ListenNetlink',
@@ -388,12 +395,11 @@ above.',
           'type' => 'leaf',
           'value_type' => 'uniline'
         },
-        'description' => 'Specifies a POSIX message queue name to listen
-on. This expects a valid message queue name (i.e. beginning
-with /). Behavior otherwise is very similar to the
-C<ListenFIFO> directive above. On Linux
-message queue descriptors are actually file descriptors and
-can be inherited between processes.',
+        'description' => 'Specifies a POSIX message queue name to listen on (see L<mq_overview(7)>
+for details). This expects a valid message queue name (i.e. beginning with
+C</>). Behavior otherwise is very similar to the C<ListenFIFO>
+directive above. On Linux message queue descriptors are actually file descriptors and can be
+inherited between processes.',
         'type' => 'list'
       },
       'ListenUSBFunction',
@@ -405,7 +411,7 @@ can be inherited between processes.',
         'description' => 'Specifies a L<USB
 FunctionFS|https://www.kernel.org/doc/Documentation/usb/functionfs.txt> endpoints location to listen on, for
 implementation of USB gadget functions. This expects an
-absolute file system path of FunctionFS mount point as the argument.
+absolute file system path of a FunctionFS mount point as the argument.
 Behavior otherwise is very similar to the C<ListenFIFO>
 directive above. Use this to open the FunctionFS endpoint
 C<ep0>. When using this option, the
@@ -516,14 +522,14 @@ notation. Defaults to 0755.',
       },
       'Accept',
       {
-        'description' => 'Takes a boolean argument. If true, a service
+        'description' => 'Takes a boolean argument. If yes, a service
 instance is spawned for each incoming connection and only the
-connection socket is passed to it. If false, all listening
+connection socket is passed to it. If no, all listening
 sockets themselves are passed to the started service unit, and
 only one service unit is spawned for all connections (also see
 above). This value is ignored for datagram sockets and FIFOs
 where a single service unit unconditionally handles all
-incoming traffic. Defaults to C<false>. For
+incoming traffic. Defaults to C<no>. For
 performance reasons, it is recommended to write new daemons
 only in a way that is suitable for
 C<Accept=no>. A daemon listening on an
@@ -559,6 +565,23 @@ protocol.',
 conjunction with C<ListenSpecial>. If true,
 the specified special file is opened in read-write mode, if
 false, in read-only mode. Defaults to false.',
+        'type' => 'leaf',
+        'value_type' => 'boolean',
+        'write_as' => [
+          'no',
+          'yes'
+        ]
+      },
+      'FlushPending',
+      {
+        'description' => 'Takes a boolean argument. May only be used when
+C<Accept=no>. If yes, the socket\'s buffers are cleared after the
+triggered service exited. This causes any pending data to be
+flushed and any pending incoming connections to be rejected. If no, the
+socket\'s buffers won\'t be cleared, permitting the service to handle any
+pending connections after restart, which is the usually expected behaviour.
+Defaults to C<no>.
+',
         'type' => 'leaf',
         'value_type' => 'boolean',
         'write_as' => [
@@ -712,27 +735,21 @@ details.). The usual suffixes K, M, G are supported and are understood to the ba
       },
       'IPTOS',
       {
-        'description' => 'Takes an integer argument controlling the IP
-Type-Of-Service field for packets generated from this socket.
-This controls the IP_TOS socket option (see
-L<ip(7)>
-for details.). Either a numeric string or one of
-C<low-delay>, C<throughput>,
-C<reliability> or C<low-cost> may
-be specified.',
+        'description' => 'Takes an integer argument controlling the IP Type-Of-Service field for packets
+generated from this socket.  This controls the C<IP_TOS> socket option (see
+L<ip(7)> for
+details.). Either a numeric string or one of C<low-delay>, C<throughput>,
+C<reliability> or C<low-cost> may be specified.',
         'type' => 'leaf',
         'value_type' => 'integer'
       },
       'IPTTL',
       {
-        'description' => 'Takes an integer argument controlling the IPv4
-Time-To-Live/IPv6 Hop-Count field for packets generated from
-this socket. This sets the IP_TTL/IPV6_UNICAST_HOPS socket
-options (see
-L<ip(7)>
-and
-L<ipv6(7)>
-for details.)',
+        'description' => 'Takes an integer argument controlling the IPv4 Time-To-Live/IPv6 Hop-Count field for
+packets generated from this socket. This sets the
+C<IP_TTL>/C<IPV6_UNICAST_HOPS> socket options (see L<ip(7)> and
+L<ipv6(7)> for
+details.)',
         'type' => 'leaf',
         'value_type' => 'integer'
       },
@@ -809,7 +826,7 @@ binary that is effectively triggered by socket unit or from
 the value of the C<SELinuxContext> option.
 This configuration option only affects sockets with
 C<Accept> mode set to
-C<true>. Also note that this option is useful
+C<yes>. Also note that this option is useful
 only when MLS/MCS SELinux policy is deployed. Defaults to
 C<false>.',
         'type' => 'leaf',
@@ -842,14 +859,12 @@ for details.',
       },
       'FreeBind',
       {
-        'description' => 'Takes a boolean value. Controls whether the
-socket can be bound to non-local IP addresses. This is useful
-to configure sockets listening on specific IP addresses before
-those IP addresses are successfully configured on a network
-interface. This sets the IP_FREEBIND socket option. For
-robustness reasons it is recommended to use this option
-whenever you bind a socket to a specific IP address. Defaults
-to C<false>.',
+        'description' => 'Takes a boolean value. Controls whether the socket can be bound to non-local IP
+addresses. This is useful to configure sockets listening on specific IP addresses before those IP
+addresses are successfully configured on a network interface. This sets the
+C<IP_FREEBIND>/C<IPV6_FREEBIND> socket option. For robustness
+reasons it is recommended to use this option whenever you bind a socket to a specific IP
+address. Defaults to C<false>.',
         'type' => 'leaf',
         'value_type' => 'boolean',
         'write_as' => [
@@ -860,7 +875,7 @@ to C<false>.',
       'Transparent',
       {
         'description' => 'Takes a boolean value. Controls the
-IP_TRANSPARENT socket option. Defaults to
+C<IP_TRANSPARENT>/C<IPV6_TRANSPARENT> socket option. Defaults to
 C<false>.',
         'type' => 'leaf',
         'value_type' => 'boolean',
@@ -908,16 +923,35 @@ sending process in an ancillary message.  Defaults to C<false>.',
       'PassPacketInfo',
       {
         'description' => 'Takes a boolean value. This controls the C<IP_PKTINFO>,
-C<IPV6_RECVPKTINFO> and C<NETLINK_PKTINFO> socket options, which
-enable reception of additional per-packet metadata as ancillary message, on
-C<AF_INET>, C<AF_INET6> and C<AF_UNIX> sockets.
-Defaults to C<false>.',
+C<IPV6_RECVPKTINFO>, C<NETLINK_PKTINFO> or
+C<PACKET_AUXDATA> socket options, which enable reception of additional per-packet
+metadata as ancillary message, on C<AF_INET>, C<AF_INET6>,
+C<AF_UNIX> and C<AF_PACKET> sockets.  Defaults to
+C<false>.',
         'type' => 'leaf',
         'value_type' => 'boolean',
         'write_as' => [
           'no',
           'yes'
         ]
+      },
+      'Timestamping',
+      {
+        'choice' => [
+          'off',
+          'us',
+          'usec',
+          "\x{b5}s",
+          'ns',
+          'nsec'
+        ],
+        'description' => "Takes one of C<off>, C<us> (alias:
+C<usec>, C<\x{b5}s>) or C<ns> (alias:
+C<nsec>). This controls the C<SO_TIMESTAMP> or
+C<SO_TIMESTAMPNS> socket options, and enables whether ingress network traffic shall
+carry timestamping metadata. Defaults to C<off>.",
+        'type' => 'leaf',
+        'value_type' => 'enum'
       },
       'TCPCongestion',
       {
@@ -1103,7 +1137,7 @@ limit is enforced before the service activation is enqueued.",
         'value_type' => 'uniline'
       }
     ],
-    'generated_by' => 'parse-man.pl from systemd 246 doc',
+    'generated_by' => 'parse-man.pl from systemd 247 doc',
     'license' => 'LGPLv2.1+',
     'name' => 'Systemd::Section::Socket'
   }

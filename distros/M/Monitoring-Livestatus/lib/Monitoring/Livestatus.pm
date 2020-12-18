@@ -4,15 +4,15 @@ use 5.006;
 use strict;
 use warnings;
 use Data::Dumper qw/Dumper/;
-use Carp qw/carp croak confess/;
-use Digest::MD5 qw(md5_hex);
+use Carp qw/carp confess/;
 use Cpanel::JSON::XS ();
 use Storable qw/dclone/;
+use IO::Select ();
 
-use Monitoring::Livestatus::INET qw//;
-use Monitoring::Livestatus::UNIX qw//;
+use Monitoring::Livestatus::INET ();
+use Monitoring::Livestatus::UNIX ();
 
-our $VERSION = '0.80';
+our $VERSION = '0.84';
 
 
 # list of allowed options
@@ -158,6 +158,11 @@ sub new {
       'deepcopy'                    => undef,   # copy result set to avoid errors with tied structures
       'retries_on_connection_error' => 3,       # retry x times to connect
       'retry_interval'              => 1,       # retry after x seconds
+    # tls options
+      'cert'                        => undef,
+      'key'                         => undef,
+      'ca_file'                     => undef,
+      'verify'                      => undef,
     };
 
     my %old_key = (
@@ -181,12 +186,12 @@ sub new {
             $self->{$opt_key} = $options{$opt_key};
         }
         else {
-            croak("unknown option: $opt_key");
+            confess("unknown option: $opt_key");
         }
     }
 
     if($self->{'verbose'} && !defined $self->{'logger'}) {
-        croak('please specify a logger object when using verbose mode');
+        confess('please specify a logger object when using verbose mode');
     }
 
     # setting a general timeout?
@@ -295,11 +300,10 @@ sub selectall_arrayref {
 
     if(!defined $result) {
         $result = &_send($self, $statement, $opt);
-        return $result if $ENV{'THRUK_SELECT'};
 
         if(!defined $result) {
             return unless $self->{'errors_are_fatal'};
-            croak("got undef result for: $statement");
+            confess("got undef result for: $statement");
         }
     }
 
@@ -380,7 +384,7 @@ sub selectall_hashref {
 
     $opt->{'slice'} = 1;
 
-    croak('key is required for selectall_hashref') if !defined $key_field;
+    confess('key is required for selectall_hashref') if !defined $key_field;
 
     my $result = $self->selectall_arrayref($statement, $opt);
 
@@ -391,7 +395,7 @@ sub selectall_hashref {
         }
         elsif(!defined $row->{$key_field}) {
             my %possible_keys = keys %{$row};
-            croak("key $key_field not found in result set, possible keys are: ".join(', ', sort keys %possible_keys));
+            confess("key $key_field not found in result set, possible keys are: ".join(', ', sort keys %possible_keys));
         } else {
             $indexed{$row->{$key_field}} = $row;
         }
@@ -580,7 +584,7 @@ sub selectscalar_value {
  errors_are_fatal()
  errors_are_fatal($value)
 
-Enable or disable fatal errors. When enabled the module will croak on any error.
+Enable or disable fatal errors. When enabled the module will confess on any error.
 
 returns the current setting if called without new value
 
@@ -692,14 +696,9 @@ sub peer_name {
 
 returns a uniq key for this peer
 
-when using multiple backends, a list of all keys is returned in list context
-
 =cut
 sub peer_key {
     my($self) = @_;
-
-    if(!defined $self->{'key'}) { $self->{'key'} = md5_hex($self->peer_addr.' '.$self->peer_name); }
-
     return $self->{'key'};
 }
 
@@ -819,7 +818,6 @@ sub _send {
         my $send = "$statement\n$header";
         $self->{'logger'}->debug('> '.Dumper($send)) if $self->{'verbose'};
         ($status,$msg,$body) = &_send_socket($self, $send);
-        return([$status, $opt, $keys]) if $ENV{'THRUK_SELECT'};
         if($self->{'verbose'}) {
             #$self->{'logger'}->debug("got:");
             #$self->{'logger'}->debug(Dumper(\@erg));
@@ -841,7 +839,7 @@ sub _send {
         }
         $self->{'logger'}->error($status.' - '.$Monitoring::Livestatus::ErrorMessage." in query:\n".$statement) if $self->{'verbose'};
         if($self->{'errors_are_fatal'}) {
-            croak('ERROR '.$status.' - '.$Monitoring::Livestatus::ErrorMessage." in query:\n".$statement."\n");
+            confess('ERROR '.$status.' - '.$Monitoring::Livestatus::ErrorMessage." in query:\n".$statement."\n");
         }
         return;
     }
@@ -875,7 +873,7 @@ sub _send {
             my $message = 'ERROR '.$@." in text: '".$body."'\" for statement: '$statement'\n";
             $self->{'logger'}->error($message) if $self->{'verbose'};
             if($self->{'errors_are_fatal'}) {
-                croak($message);
+                confess($message);
             }
             return({ keys => [], result => []});
         }
@@ -884,7 +882,7 @@ sub _send {
         my $message = "ERROR undef result for text: '".$body."'\" for statement: '$statement'\n";
         $self->{'logger'}->error($message) if $self->{'verbose'};
         if($self->{'errors_are_fatal'}) {
-            croak($message);
+            confess($message);
         }
         return({ keys => [], result => []});
     }
@@ -980,11 +978,10 @@ sub _open {
 
 ########################################
 sub _close {
-    my($self, $sock) = @_;
-    undef $self->{'sock'};
+    my($self) = @_;
+    my $sock = delete $self->{'sock'};
     return($self->{'CONNECTOR'}->_close($sock));
 }
-
 
 ########################################
 
@@ -1091,16 +1088,15 @@ sub _send_socket {
     my $retries = 0;
     my($status, $msg, $recv, $sock);
 
+    # closing a socket sends SIGPIPE to reader
+    # https://riptutorial.com/posix/example/17424/handle-sigpipe-generated-by-write---in-a-thread-safe-manner
+    local $SIG{PIPE} = 'IGNORE';
+
     # try to avoid connection errors
     eval {
-        local $SIG{PIPE} = sub {
-            die('broken pipe');
-        };
-
         if($self->{'retries_on_connection_error'} <= 0) {
             ($sock, $msg, $recv) = &_send_socket_do($self, $statement);
             return($sock, $msg, $recv) if $msg;
-            return $sock if $ENV{'THRUK_SELECT'};
             ($status, $msg, $recv) = &_read_socket_do($self, $sock, $statement);
             return($status, $msg, $recv);
         }
@@ -1109,7 +1105,6 @@ sub _send_socket {
             $retries++;
             ($sock, $msg, $recv) = &_send_socket_do($self, $statement);
             return($status, $msg, $recv) if $msg;
-            return $sock if $ENV{'THRUK_SELECT'};
             ($status, $msg, $recv) = &_read_socket_do($self, $sock, $statement);
             $self->{'logger'}->debug('query status '.$status) if $self->{'verbose'};
             if($status == 491 or $status == 497 or $status == 500) {
@@ -1124,15 +1119,14 @@ sub _send_socket {
         if(defined $@ and $@ =~ /broken\ pipe/mx) {
             ($sock, $msg, $recv) = &_send_socket_do($self, $statement);
             return($status, $msg, $recv) if $msg;
-            return $sock if $ENV{'THRUK_SELECT'};
             return(&_read_socket_do($self, $sock, $statement));
         }
-        croak($@) if $self->{'errors_are_fatal'};
+        confess($@) if $self->{'errors_are_fatal'};
     }
 
     $status = $sock unless $status;
-    return $sock if $ENV{'THRUK_SELECT'};
-    croak($msg) if($status >= 400 and $self->{'errors_are_fatal'});
+    $msg =~ s/^$status:\s+//gmx;
+    confess($status.": ".$msg) if($status >= 400 and $self->{'errors_are_fatal'});
 
     return($status, $msg, $recv);
 }
@@ -1140,10 +1134,10 @@ sub _send_socket {
 ########################################
 sub _send_socket_do {
     my($self, $statement) = @_;
-    my $sock = $self->_open() or return(491, $self->_get_error(491, $!), $!);
+    my $sock = $self->_open() or return(491, $self->_get_error(491, $@ || $!), $@ || $!);
     utf8::decode($statement);
     utf8::encode($statement);
-    print $sock $statement or return($self->_socket_error($statement, $sock, 'write to socket failed: '.$!));
+    print $sock $statement or return($self->_socket_error($statement, $sock, 'write to socket failed: '.($@ || $!)));
     print $sock "\n";
     return $sock;
 }
@@ -1153,9 +1147,22 @@ sub _read_socket_do {
     my($self, $sock, $statement) = @_;
     my($recv,$header);
 
-    # COMMAND statements never return something
+    # COMMAND statements might return a error message
     if($statement && $statement =~ m/^COMMAND/mx) {
-        return('201', $self->_get_error(201), undef);
+        shutdown($sock, 1);
+        my $s = IO::Select->new();
+        $s->add($sock);
+        if($s->can_read(0.5)) {
+            $recv = <$sock>;
+        }
+        if($recv) {
+            chomp($recv);
+            if($recv =~ m/^(\d+):\s*(.*)$/mx) {
+                return($1, $recv, undef);
+            }
+            return('400', $self->_get_error(400), $recv);
+        }
+        return('200', $self->_get_error(200), undef);
     }
 
     $sock->read($header, 16) or return($self->_socket_error($statement, $sock, 'reading header from socket failed, check your livestatus logfile: '.$!));
@@ -1180,14 +1187,14 @@ sub _read_socket_do {
                 $remaining = $remaining -$length;
                 if($remaining < $length) { $length = $remaining; }
             }
-            $recv = $json_decoder->incr_parse or return($self->_socket_error($statement, $sock, 'reading body from socket failed: '.$json_decoder->incr_text.$json_decoder->incr_reset));
+            $recv = $json_decoder->incr_parse or return($self->_socket_error($statement, $sock, 'reading remaining '.$length.' bytes from socket failed: '.$!));
             $json_decoder->incr_reset;
         } else {
             $sock->read($recv, $content_length) or return($self->_socket_error($statement, $sock, 'reading body from socket failed'));
         }
     }
 
-    $self->_close($sock) unless $self->{'keepalive'};
+    $self->_close() unless $self->{'keepalive'};
     if($status >= 400 && $recv) {
         $msg .= ' - '.$recv;
     }
@@ -1208,7 +1215,7 @@ sub _socket_error {
 
     if($self->{'retries_on_connection_error'} <= 0) {
         if($self->{'errors_are_fatal'}) {
-            croak($message);
+            confess($message);
         }
         else {
             carp($message);
@@ -1382,7 +1389,7 @@ Errorhandling can be done like this:
     $ml->errors_are_fatal(0);
     my $hosts = $ml->selectall_arrayref("GET hosts");
     if($Monitoring::Livestatus::ErrorCode) {
-        croak($Monitoring::Livestatus::ErrorMessage);
+        confess($Monitoring::Livestatus::ErrorMessage);
     }
 
 =cut
@@ -1398,6 +1405,7 @@ sub _get_error {
         '403' => 'The request is incomplete.',
         '404' => 'The target of the GET has not been found (e.g. the table).',
         '405' => 'A non-existing column was being referred to',
+        '413' => 'Maximum response size reached',
         '452' => 'internal livestatus error',
         '490' => 'no query',
         '491' => 'failed to connect',
@@ -1410,6 +1418,7 @@ sub _get_error {
         '498' => 'header is not exactly 16byte long',
         '499' => 'not a valid header (no content-length)',
         '500' => 'socket error',
+        '502' => 'backend connection proxy error',
     };
 
     confess('non existant error code: '.$code) if !defined $codes->{$code};
@@ -1477,7 +1486,7 @@ sub _get_peer {
     }
 
     # check if we got a peer
-    croak('please specify a peer');
+    confess('please specify a peer');
 }
 
 

@@ -17,8 +17,8 @@ my %META = (
 		)} },
 		test => { requires => {qw(
 			Data::Dumper                                             0
-			Net::OAuth2Server::Request::Authorization            0.003
-			Net::OAuth2Server::Request::Token::AuthorizationCode 0.003
+			Net::OAuth2Server::Request::Authorization            0.004
+			Net::OAuth2Server::Request::Token::AuthorizationCode 0.004
 		)} },
 	},
 	dynamic_config => 0,

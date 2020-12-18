@@ -1,104 +1,107 @@
 {
-   "meta-spec" : {
-      "version" : "2",
-      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec"
-   },
    "dynamic_config" : 1,
-   "prereqs" : {
-      "configure" : {
-         "requires" : {
-            "ExtUtils::MakeMaker" : "0"
-         }
-      },
-      "runtime" : {
-         "requires" : {
-            "Image::ExifTool" : "0",
-            "Tk::Balloon" : "0",
-            "Data::Peek" : "0",
-            "Tk::Bitmap" : "0",
-            "Getopt::Long" : "2.27",
-            "Tk::Dialog" : "0",
-            "File::Copy" : "0",
-            "File::Temp" : "0",
-            "Tk::DirTree" : "0",
-            "Tk::BrowseEntry" : "0",
-            "Tk" : "804.027",
-            "Tk::Pixmap" : "0",
-            "Tk::PNG" : "0",
-            "perl" : "5.010",
-            "Tk::JPEG" : "0",
-            "Tk::Photo" : "0",
-            "Tk::Animation" : "0",
-            "Tk::Pane" : "0"
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/Tux/App-tkiv/issues"
          },
-         "recommends" : {
-            "Getopt::Long" : "2.48",
-            "Data::Peek" : "0.44",
-            "X11::Protocol" : "0.56",
-            "Image::ExifTool" : "10.00",
-            "Tk::TIFF" : "0.11",
-            "Image::Size" : "3.300",
-            "Tk" : "804.033",
-            "Image::Info" : "1.38"
+      "license" : [
+         "http://dev.perl.org/licenses/"
+         ],
+      "repository" : {
+         "url" : "https://github.com/Tux/App-tkiv",
+         "web" : "https://github.com/Tux/App-tkiv",
+         "type" : "git"
          }
       },
+   "provides" : {
+      "App::tkiv" : {
+         "file" : "lib/App/tkiv.pm",
+         "version" : "0.131"
+         }
+      },
+   "generated_by" : "Author",
+   "version" : "0.131",
+   "name" : "App-tkiv",
+   "license" : [
+      "perl_5"
+      ],
+   "prereqs" : {
       "test" : {
          "requires" : {
             "Test::Harness" : "0",
             "Test::More" : "0.88"
-         },
+            },
          "recommends" : {
-            "Test::More" : "1.001014"
+            "Test::More" : "1.302183"
+            }
+         },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+            }
+         },
+      "runtime" : {
+         "requires" : {
+            "Tk::Bitmap" : "0",
+            "Tk::Dialog" : "0",
+            "Tk::DirTree" : "0",
+            "Data::Peek" : "0",
+            "perl" : "5.010",
+            "Tk::Balloon" : "0",
+            "Tk::Pixmap" : "0",
+            "Tk" : "804.027",
+            "Tk::Pane" : "0",
+            "File::Copy" : "0",
+            "Image::ExifTool" : "0",
+            "Getopt::Long" : "2.27",
+            "Tk::Photo" : "0",
+            "Tk::JPEG" : "0",
+            "File::Temp" : "0",
+            "Tk::Animation" : "0",
+            "Tk::BrowseEntry" : "0",
+            "Tk::PNG" : "0"
+            },
+         "recommends" : {
+            "Image::Info" : "1.42",
+            "Getopt::Long" : "2.52",
+            "Data::Peek" : "0.49",
+            "Image::Size" : "3.300",
+            "Tk" : "804.035",
+            "X11::Protocol" : "0.56",
+            "Tk::TIFF" : "0.11",
+            "Image::ExifTool" : "12.00"
+            }
          }
-      }
-   },
-   "provides" : {
-      "App::tkiv" : {
-         "file" : "lib/App/tkiv.pm",
-         "version" : "0.130"
-      }
-   },
-   "license" : [
-      "perl_5"
-   ],
+      },
    "author" : [
       "H.Merijn Brand <h.m.brand@xs4all.nl>"
-   ],
-   "resources" : {
-      "license" : [
-         "http://dev.perl.org/licenses/"
       ],
-      "repository" : {
-         "web" : "https://github.com/Tux/App-tkiv",
-         "type" : "git",
-         "url" : "https://github.com/Tux/App-tkiv"
-      }
-   },
-   "version" : "0.130",
-   "generated_by" : "Author",
    "abstract" : "An image viewer in Perl::Tk based on IrfanView",
-   "release_status" : "stable",
-   "name" : "App-tkiv",
    "optional_features" : {
       "opt_xeleven_protocol" : {
-         "description" : "Use X11::Protocol to get the screen size",
          "prereqs" : {
             "runtime" : {
                "requires" : {
                   "X11::Protocol" : "0"
+                  }
                }
-            }
-         }
-      },
+            },
+         "description" : "Use X11::Protocol to get the screen size"
+         },
       "opt_format_tiff" : {
          "description" : "Support for TIFF",
          "prereqs" : {
             "runtime" : {
                "requires" : {
                   "Tk::TIFF" : "0"
+                  }
                }
             }
          }
+      },
+   "meta-spec" : {
+      "version" : 2,
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec"
       }
    }
-}

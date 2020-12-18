@@ -1,5 +1,10 @@
 Revision history for Perl extension Data-cuid
 
+0.07 2020-12-17T08:38:42Z
+
+    - Maintenance release, no functional changes
+    - Switch from Travis CI to GitHub Actions
+
 0.06 2018-07-21T10:50:45Z
 
     - Add extra test for multi-process collisions (needs IO::Async)

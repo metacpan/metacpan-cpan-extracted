@@ -5,7 +5,7 @@ package App::tkiv;
 use strict;
 use warnings;
 
-our $VERSION = "0.130";
+our $VERSION = "0.131";
 
 1;
 
@@ -445,7 +445,7 @@ personal use, but was asked to make it publicly available as application.
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2004-2016 H.Merijn Brand
+Copyright (C) 2004-2020 H.Merijn Brand
 
 This software is free; you can redistribute it and/or modify
 it under the same terms as Perl itself.

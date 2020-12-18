@@ -35,7 +35,7 @@ under the same terms as Perl itself.
 
 =cut
 
-our $VERSION = '0.027'; # VERSION
+our $VERSION = '0.028'; # VERSION
 
 use Mouse::Role;
 use Text::CSV::Encoded;
@@ -153,6 +153,7 @@ my %row_makers = (
         if (!defined $accession) {
           die "accession is null for accession in db: $db_name\n";
         }
+        $accession =~ s|\\(.)|$1|g;
         [$db_id, $accession];
       } @ont_db_termids;
     } $ontology_data->get_db_names();

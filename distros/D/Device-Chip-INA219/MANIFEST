@@ -7,7 +7,6 @@ t/00use.t
 t/01config.t
 t/02read.t
 t/99pod.t
-Makefile.PL
 README
 LICENSE
 META.yml

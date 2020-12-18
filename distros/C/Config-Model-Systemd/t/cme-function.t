@@ -1,12 +1,18 @@
 # -*- cperl -*-
 use strict;
 use warnings;
+use English;
 use Path::Tiny;
 
 use Test::More;
 use Test::File::Contents;
 use Config::Model qw/cme/;
 use Config::Model::Tester::Setup qw/init_test setup_test_dir/;
+
+if ($OSNAME eq 'solaris' ) {
+    plan skip_all => "Test irrelevant on $OSNAME";
+    exit;
+}
 
 my ($model, $trace) = init_test();
 

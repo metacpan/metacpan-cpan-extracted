@@ -5,7 +5,7 @@ use warnings;
 package Meerkat::Role::Document;
 # ABSTRACT: Enhances a Moose object with Meerkat methods and metadata
 
-our $VERSION = '0.015';
+our $VERSION = '0.016';
 
 use Moose::Role 2;
 use MooseX::AttributeShortcuts;
@@ -15,7 +15,7 @@ use MooseX::Storage::Engine;
 use Carp qw/croak/;
 use Scalar::Util qw/blessed/;
 use Syntax::Keyword::Junction qw/any none/;
-use MongoDB::OID;
+use BSON::OID;
 use Type::Params qw/compile/;
 use Types::Standard qw/slurpy :types/;
 use Scalar::Util qw/looks_like_number/; # XXX crude but fast
@@ -27,7 +27,7 @@ with Storage;
 # pass through OID's without modification as MongoDB will
 # consume/provide them; pass through Meerkat::Collection
 # as Meerkat will strip/add as necessary
-for my $type (qw/MongoDB::OID Meerkat::Collection DateTime DateTime::Tiny/) {
+for my $type (qw/BSON::OID Meerkat::Collection DateTime DateTime::Tiny/) {
     MooseX::Storage::Engine->add_custom_type_handler(
         $type => (
             expand   => sub { shift },
@@ -53,8 +53,8 @@ has _collection => (
 
 has _id => (
     is      => 'ro',
-    isa     => 'MongoDB::OID',
-    default => sub { MongoDB::OID->new },
+    isa     => 'BSON::OID',
+    default => sub { BSON::OID->new },
 );
 
 has _removed => (
@@ -450,7 +450,7 @@ Meerkat::Role::Document - Enhances a Moose object with Meerkat methods and metad
 
 =head1 VERSION
 
-version 0.015
+version 0.016
 
 =head1 SYNOPSIS
 

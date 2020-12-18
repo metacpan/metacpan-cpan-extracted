@@ -1,5 +1,5 @@
 {
-   "abstract" : "indtsll and update Farsi free fonts",
+   "abstract" : "Install and update free Farsi fonts",
    "author" : [
       "Kiavash"
    ],
@@ -56,6 +56,6 @@
          "web" : "https://github.com/kiamazi/kateb"
       }
    },
-   "version" : "v01.00.20",
+   "version" : "v01.00.22",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

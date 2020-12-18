@@ -1,0 +1,148 @@
+NAME
+
+    Amazon::SNS::V4 - Amazon Simple Notification Service with v4 Signatures
+
+SYNOPSIS
+
+      use Amazon::SNS::V4;
+    
+      my $sns = Amazon::SNS::V4->new({ 'key' => '...', 'secret' => '...' });
+    
+    
+      # create a new topic and publish
+    
+      my $topic = $sns->CreateTopic('MyTopic')
+            or die $sns->error;
+    
+      $topic->Publish('My test message');
+    
+    
+      # delete it!
+    
+      $topic->DeleteTopic;
+    
+    
+      # publish to a known ARN
+    
+      my $topic = $sns->GetTopic('arn:aws:sns:eu-west-1:123456789099:MyTopic');
+    
+      $topic->Publish('My test message', 'My Subject');
+    
+    
+      # get all topics
+    
+      my @topics = $sns->ListTopics;
+    
+      print $_->arn, "\n" for @topics;
+    
+    
+    
+      # change region
+    
+      $sns->service('http://sns.us-east-1.amazonaws.com');
+
+DESCRIPTIN
+
+    Amazon::SNS::V4 is basically Amazon::SNS v1.3, changed to use v4
+    Signatures, from AWS::Signature4.
+
+    Sorry for not providing a better documentation, patches are always
+    accepted. ;)
+
+METHODS
+
+    Amazon::SNS::V4->new({ 'key' => '...', 'secret' => '...' })
+
+              Creates an Amazon::SNS::V4 object with given key and secret.
+
+    $sns->GetTopic($arn)
+
+              Gives you an Amazon::SNS::V4::Topic object using an existing ARN.
+
+    $sns->GetTarget($arn)
+
+              Gives you an Amazon::SNS::V4::Target object using an existing ARN. Sending Notification to TargetArn instead of TopicArn.
+
+    $sns->Publish($message, $subject, $attributes)
+    (Amazon::SNS::V4::Target)
+
+              When used with Amazon::SNS::V4::Target object (see GetTarget), additional parameter $attributes is used to pass 
+              MessageAttributes.entry.N attributes with message.
+              An example of MobilePush TTL: $attributes = {"AWS.SNS.MOBILE.APNS.TTL" => {"Type" => "String", "Value" => 3600}};
+              More information can be found on Amazon web site: http://docs.aws.amazon.com/sns/latest/dg/sns-ttl.html
+
+    $sns->CreateTopic($name)
+
+              Gives you an Amazon::SNS::V4::Topic object with the given name, creating it 
+              if it does not already exist in your Amazon SNS account.
+
+    $sns->DeleteTopic($arn)
+
+              Deletes a topic using its ARN.
+
+    $sns->ListTopics
+
+              The result is a list of all the topics in your account, as an array of Amazon::SNS::V4::Topic objects.
+
+    $sns->error
+
+              Description of the last error, or undef if none.
+
+    $sns->status_code
+
+              The status code of the last HTTP response.
+
+ATTRIBUTES
+
+    $sns->service
+
+    $sns->service($service_url)
+
+              Get/set SNS service url, something like 'http://sns.us-east-1.amazonaws.com'.
+
+    $sns->key
+
+    $sns->key('...')
+
+              Get/set auth key.
+
+    $sns->secret
+
+    $sns->secret('...')
+
+              Get/set secret.
+
+    $sns->debug
+
+    $sns->debug(1)
+
+              Get/set debug level. When set to 1 you'll get some debug output on STDERR.
+
+NOTES
+
+    Be sure to use ARNs in the same region as you have set the service to.
+
+    The module defaults to the EU (Ireland) region.
+
+AUTHOR
+
+    Alessandro Zummo, <a.zummo@towertech.it>
+
+    James Wright, <jwright@cpan.org>
+
+SEE ALSO
+
+    Amazon::SNS
+
+    AWS::Signature4
+
+COPYRIGHT AND LICENSE
+
+    Copyright (C) 2020 James Wright
+
+    Copyright (C) 2011-15 Alessandro Zummo
+
+    This program is free software; you can redistribute it and/or modify it
+    under the terms of the GNU General Public License version 2 as
+    published by the Free Software Foundation.
+

@@ -1,0 +1,57 @@
+Changes
+lib/Finance/IG.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/00-load.t
+t/01.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+xt/boilerplate.t
+ignore.txt
+######################################################################
+# The following files are used by the special REST::Client.pm module
+# and are responses to requests specified by md5s of request data 
+# format is json 
+######################################################################
+Testing/Data/7a63f8351df6b8597f83f0eaca0ff221.txt
+Testing/Data/a58c22f82bca38beacd1cbfb809b07b7.txt
+Testing/Data/a1b31613ad093f44d310581cadd22596.txt
+Testing/Data/00e064258be7502d8322fe3640cb27f5.txt
+Testing/Data/8e7e673aa01c070d444c5c929943fd41.txt
+Testing/Data/0168bd66b155dba0d159bf511dbd0d5b.txt
+Testing/Data/afbeb9cadce34bb4ed70af5dfb98bbd0.txt
+Testing/Data/4a9b1748675fc54fd67345091c858089.txt
+Testing/Data/87a37c51845a8ba711a2a5c5815d751a.txt
+Testing/Data/82a8fba7c548c5ff900897b193239174.txt
+Testing/Data/e7a6447917226282632dae7b4f4a212f.txt
+Testing/Data/3b08d66d4f71297c0c2025e8e094363a.txt
+Testing/Data/b963c6fd0921b1bcdcbcab64bb72142a.txt
+Testing/Data/333789b6ab6560d0c3e8c8fa73ec1b10.txt
+Testing/Data/59b5ed021aa683d3da82764cd7e4246d.txt
+Testing/Data/1bac9345a5a1013beac8d7a92fdb6965.txt
+Testing/Data/d192bbb58a26487768300a2a6bbc742b.txt
+Testing/Data/79c4d38e763034226d3a895b31b73b2a.txt
+Testing/Data/2dcb4dc1c1b5836b3f8e6324a04e12c6.txt
+######################################################################
+# special rest client that uses canned file access instead of 
+# needing an account on IG. 
+######################################################################
+Testing/REST/Client.pm
+######################################################################
+# Special module that generates md5 keyed canned responses. 
+# perhaps I should call this module Canning/REST?Client! 
+# Note you will need your true IG credentials to use this 
+######################################################################
+Testing/Record/REST/Client.pm
+######################################################################
+# Test utilities. 
+######################################################################
+Testing/test.pl
+Testing/trans_test.pl
+######################################################################
+script/igdisp.pl
+
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

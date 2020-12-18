@@ -1,3 +1,21 @@
+2.01 Dec 15 2020
+
+     Fix entry point in pmv script.
+
+2.00 Dec 14 2020
+
+     API CHANGED: Transform subroutines must now operate on their
+     (single) argument and return the result.
+
+     Main routine is now pmv(), and exported by default.
+     File::PerlMove::move can be used as a legacy call with the old
+     API.
+
+     Handle lc, uc and ucfirst as builtins. Add tc.
+
+     Allow extensions by defining custom transformation routines in
+     File::PerlMove::XXX modules.
+
 1.01 Apr 24 2017
 
      Allow tests to be executed in parallel.

@@ -5,21 +5,31 @@ package File::PerlMove;
 # Author          : Johan Vromans
 # Created On      : Tue Sep 15 15:59:04 1992
 # Last Modified By: Johan Vromans
-# Last Modified On: Mon Apr 24 10:04:57 2017
-# Update Count    : 177
+# Last Modified On: Tue Dec 15 14:59:21 2020
+# Update Count    : 223
 # Status          : Unknown, Use with caution!
 
 ################ Common stuff ################
 
-our $VERSION = "1.01";
+our $VERSION = "2.01";
 
 use strict;
 use warnings;
 use Carp;
 use File::Basename;
 use File::Path;
+use parent qw(Exporter);
+
+our @EXPORT = qw( pmv );
 
 sub move {
+    my $transform = shift;
+    my $filelist  = shift;
+    my $options   = shift || {};
+    pmv( $transform, $filelist, { %$options, legacy => 1 } );
+}
+
+sub pmv {
     my $transform = shift;
     my $filelist  = shift;
     my $options   = shift || {};
@@ -34,7 +44,7 @@ sub move {
     $options->{createdirs} ||= delete $options->{'create-dirs'};
 
     # Create transformer.
-    $transform = build_sub($transform)
+    $transform = build_sub( $transform, $options )
       unless ref($transform) eq 'CODE';
 
     # Process arguments.
@@ -42,10 +52,17 @@ sub move {
     foreach ( @$filelist ) {
 	# Save the name.
 	my $old = $_;
+
 	# Perform the transformation.
-	$transform->();
-	# Get the new name.
-	my $new = $_;
+	my $new;
+	if ( $options->{legacy}) {
+	    # Legacy operates on $_.
+	    $transform->();
+	    $new = $_;
+	}
+	else {
+	    $new = $transform->($_);
+	}
 
 	# Anything changed?
 	unless ( $old eq $new ) {
@@ -102,18 +119,55 @@ sub move {
 }
 
 sub build_sub {
-    my $cmd = shift;
-    # Special treatment for some.
-    if ( $cmd =~ /^(uc|lc|ucfirst)$/ ) {
-	$cmd = '$_ = ' . $cmd;
+    my ( $cmd, $options ) = @_;
+
+    # If it is a verb, try extensions and builtins.
+    # foo           File::PerlMove::foo => &File::PerlMove::foo::foo
+    # foo=bar       File::PerlMove::foo => &File::PerlMove::foo::bar
+    # xx::foo       xx::foo => &xx::foo::foo
+    # xx::foo=bar   xx::foo => &xx::foo::bar
+    if ( $cmd =~ /^((?:\w|::)+)(?:=(\w+))?$/ ) {
+	my $pkg = $1;
+	my $sub = $2;
+	if ( !defined($sub) ) {
+	    if ( $pkg =~ /^(.*)::(\w+)$/ ) {
+		$sub = $2;
+	    }
+	    else {
+		$sub = $pkg;
+	    }
+	}
+	$pkg = __PACKAGE__."::".$pkg unless $pkg =~ /::/;
+	warn("OP: $pkg => $sub\n") if $options->{trace};
+
+	# Extensions.
+	if ( eval "require $pkg" ) {
+	    if ( my $op = $pkg->can($sub) ) {
+		return "$pkg => $sub" if $options->{testing};
+		return $op;
+	    }
+	    else {
+		croak("$pkg does not provide a subroutine $sub");
+	    }
+	}
+	# Builtins.
+	elsif ( my $op = (__PACKAGE__."::BuiltIn")->can($cmd) ) {
+	    return __PACKAGE__."::BuiltIn => $cmd" if $options->{testing};
+	    return $op;
+	}
+	croak("No such operation: $cmd");
     }
-    elsif ( $cmd =~ /^:(.+):(.+):$/ ) {
+
+    # Recode.
+    if ( $cmd =~ /^:(.+):(.+):$/ ) {
+	return 'Encode::from_to($_,"'.$1.'","'.$2.'")' if $options->{testing};
 	require Encode;
 	$cmd = 'Encode::from_to($_,"'.$1.'","'.$2.'")';
     }
 
-    # Build subroutine.
-    my $op = eval "sub { $cmd }";
+    # Hopefully a regex. Build subroutine.
+    return "sub { \$_ = \$_[0]; $cmd; \$_ }" if $options->{testing};
+    my $op = eval "sub { \$_ = \$_[0]; $cmd; \$_ }";
     if ( $@ ) {
 	$@ =~ s/ at \(eval.*/./;
 	croak($@);
@@ -121,6 +175,12 @@ sub build_sub {
 
     return $op;
 }
+
+package File::PerlMove::BuiltIn;
+
+sub lc { CORE::lc($_[0]) }
+sub uc { CORE::uc($_[0]) }
+sub ucfirst { CORE::ucfirst($_[0]) }
 
 1;
 
@@ -132,25 +192,21 @@ File::PerlMove - Rename files using Perl expressions
 
 =head1 SYNOPSIS
 
-  use File::PerlMove;
-  File::PerlMove::move(sub { $_ = lc }, \@filelist, { verbose => 1 });
+  use File::PerlMove qw(pmv);
+  pmv( sub { lc($_[0]) }, \@filelist, { verbose => 1 });
 
 =head1 DESCRIPTION
 
-File::PerlMove provides a single subroutine: B<File::PerlMove::move>.
+File::PerlMove provides a single subroutine: B<File::PerlMove::pmv>.
 
-B<move> takes three arguments: transform, filelist, and options.
+B<pmv> takes three arguments: transform, filelist, and options.
 
-I<transform> must be a string or a code reference. If it is not a
-string, it is assumed to be a valid Perl expression that will be
-turned into a anonymous subroutine that evals the expression. If the
-expression is any of C<uc>, C<lc>, of C<ucfirst>, the resultant code
-will behave as if these operations would modify C<$_> in-place.
-Note, however, that using any of these operations is useless on file
-systems that are case insensitive, like MS Windows and Mac.
+I<transform> must be a string or a code reference. If it is a string,
+it is assumed to be a valid Perl expression that will be evaluated to
+modify C<$_>.
 
-When I<transform> is invoked it should transform a file name in C<$_>
-into a new file name.
+When I<transform> is invoked it should transform a file name passes as
+argument into a new file name.
 
 I<filelist> must be an array reference containing the list of file
 names to be processed.
@@ -186,6 +242,14 @@ Overwrite existing files.
 
 Create target directories if necessary.
 
+=item B<legacy>
+
+If I<transform> is a code reference, it is called with the old name as
+argument and must return the new, transformed name.
+
+If B<legacy> is true, the code reference adheres to the old API where
+the routine modifies the filename stored in C<$_>.
+
 =item B<verbose>
 
 More verbose information.
@@ -194,7 +258,58 @@ More verbose information.
 
 =head1 EXPORTS
 
-None.
+The main subroutine pmv() can be exported on demand.
+
+=head1 EXTENSIONS
+
+If the I<transform> argument is a verb, File::PerlMove will try to load
+(require) a package File::PerlMove::I<verb>. This package B<must> define
+a subroutine File::PerlMove::I<verb>::I<verb>. This subroutine is then used to perform
+the transformation.
+
+If such a package cannot be loaded it may be the name of a builtin routine.
+See L</BUILTINS>.
+
+If the transform argument is in the form I<pkg>B<=>I<verb> then
+File::PerlMove::I<pkg> is used instead of File::PerlMove::I<verb>.
+This makes it possible to have extension modules that define multiple
+transform routines.
+
+If the package name contains C<::> it is taken to be the full package name. For example,
+
+    t::foo=bar
+
+will load package t::foo and call subroutine t::foo::bar.
+
+=head1 BUILTINS
+
+If the I<transform> argument is a verb and not an extension (see L</EXTENSIONS>),
+it may be the name of a builtin routine.
+
+Currently supported builtins:
+
+=over 8
+
+=item B<lc>
+
+Performs a lowercase operation.
+
+=item B<uc>
+
+Performs an uppercase operation.
+
+=item B<ucfirst>
+
+Upcases the first letter.
+
+=item B<tc>
+
+Performs a titlecase operation.
+
+=back
+
+Note, however, that using any of these operations is useless on file
+systems that are case insensitive, like MS Windows and Mac.
 
 =head1 EXAMPLES
 
@@ -210,7 +325,7 @@ App::perlmv (and perlmv), File::Rename (and rename).
 
 =head1 COPYRIGHT
 
-This programs is Copyright 2004,2010,2017 Squirrel Consultancy.
+This programs is Copyright 2004,2010,2017,2020 Squirrel Consultancy.
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the Perl Artistic License or the GNU General

@@ -1,5 +1,9 @@
 Revision history for Device-Chip-INA219
 
+0.07    2020-12-15
+        [BUGFIXES]
+         * Re-packed tarball, removing stale Makefile.PL
+
 0.06    2020-12-06
         [CHANGES]
          * Updated to Object::Pad + Future::AsyncAwait

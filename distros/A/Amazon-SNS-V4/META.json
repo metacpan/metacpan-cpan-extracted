@@ -1,47 +1,57 @@
 {
-   "abstract" : "Amazon Simple Notification Service, V4 Signatures",
+   "abstract" : "Amazon Simple Notification Service with v4 Signatures",
    "author" : [
-      "James Wright <jwright@cpan.org>"
+      "Alessandro Zummo, <a.zummo@towertech.it>",
+      "James Wright, <jwright@cpan.org>"
    ],
-   "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
+   "dynamic_config" : 0,
+   "generated_by" : "App::ModuleBuildTiny version 0.028",
    "license" : [
-      "unknown"
+      "gpl_2"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : 2
+      "version" : "2"
    },
    "name" : "Amazon-SNS-V4",
-   "no_index" : {
-      "directory" : [
-         "t",
-         "inc"
-      ]
-   },
    "prereqs" : {
-      "build" : {
-         "requires" : {
-            "ExtUtils::MakeMaker" : "0"
-         }
-      },
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0"
+            "Module::Build::Tiny" : "0.034"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "App::ModuleBuildTiny" : "0.028"
          }
       },
       "runtime" : {
          "requires" : {
             "AWS::Signature4" : "0",
+            "Class::Accessor" : "0",
             "Class::Accessor::Fast" : "0",
+            "HTTP::Request::Common" : "0",
             "JSON" : "0",
-            "LWP::UserAgent" : "0",
-            "URI::Escape" : "0",
             "XML::Simple" : "0"
          }
       }
    },
+   "provides" : {
+      "Amazon::SNS::V4" : {
+         "file" : "lib/Amazon/SNS/V4.pm",
+         "version" : "1.7"
+      },
+      "Amazon::SNS::V4::Target" : {
+         "file" : "lib/Amazon/SNS/V4/Target.pm",
+         "version" : "1.7"
+      },
+      "Amazon::SNS::V4::Topic" : {
+         "file" : "lib/Amazon/SNS/V4/Topic.pm",
+         "version" : "1.7"
+      }
+   },
    "release_status" : "stable",
-   "version" : "1.4",
-   "x_serialization_backend" : "JSON::PP version 4.02"
+   "version" : "1.7",
+   "x_serialization_backend" : "JSON::PP version 4.02",
+   "x_spdx_expression" : "GPL-2.0-only"
 }
