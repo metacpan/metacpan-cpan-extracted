@@ -1,0 +1,9 @@
+Revision history for Data-Dump-JavaScript: 0.002
+
+0.002     2020-12-22 11:51:15+01:00 Europe/Vienna
+    - fix missing Changes file
+    - fix Perl 5.32 compatibility (RT#130608)
+    - change bugtracker to github.com
+
+0.001     2016-05-18 17:44:09+02:00 Europe/Vienna
+    - Initial release

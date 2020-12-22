@@ -1,3 +1,10 @@
+0.002   2020-09-21  Released-By: PERLANCAR; Urgency: low
+
+	- No functional changes.
+
+	- [doc] Mention Module::List::More::Patch::Hide.
+
+
 0.001   2020-02-13  Released-By: PERLANCAR
 
         - First release.

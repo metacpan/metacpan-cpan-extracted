@@ -2,15 +2,21 @@ use strict;
 use warnings;
 use ExtUtils::MakeMaker;
 use ExtUtils::Constant;
+use Getopt::Long;
+use Config qw/%Config/;
+
+my $ok = GetOptions (
+    check => \my $check,
+    optimize => \my $optimize,
+    "prefix=s" => \my $prefix,
+);
 
 use 5.008001;
 
 use lib 'inc';
 use CheckForLibPng;
 
-# Set argument to any true value to get debugging messages.
-
-my $vars = check_for_libpng (undef);
+my $vars = check_for_libpng (verbose => $check, prefix => $prefix,);
 
 if (! $vars) {
     print STDERR "Libpng may not be present on this system.\n";
@@ -19,7 +25,7 @@ if (! $vars) {
 
 my %wm = (
     NAME         => 'Image::PNG::Libpng',
-    VERSION      => '0.52',
+    VERSION      => '0.55',
     ABSTRACT     => 'Perl interface to libpng',
     OBJECT       => 'Libpng.o',
     LIBS         => '-lpng',
@@ -44,8 +50,12 @@ my %wm = (
     },
     MIN_PERL_VERSION => '5.008001',
     EXE_FILES => ['script/pnginspect',],
-    #OPTIMIZE => '-Wall -O',
 );
+
+if ($optimize) {
+    warn "Optimizing is on";
+    $wm{OPTIMIZE} = ' -Wall -O ';
+}
 
 if ($vars) {
     if ($vars->{inc}) {
@@ -53,6 +63,9 @@ if ($vars) {
     }
     if ($vars->{libs}) {
 	$wm{LIBS} = "$vars->{libs}";
+	# This overrides loading the library from /usr/local/lib by
+	# putting the directory we want to use first.
+	$wm{LDDLFLAGS} = "$vars->{libs} $Config{lddlflags}";
     }
 }
 

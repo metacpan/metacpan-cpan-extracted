@@ -21,32 +21,30 @@ sub new {
     my $bm0 = $bm->[0];
     my $connect_edges = delete $opt{connect_edges};
     $connect_edges = 1 unless defined $connect_edges;
+    my $transpose = delete $opt{transpose};
     Graph::_opt_unknown(\%opt);
-    if ($connect_edges) {
-	# for (my $i = 0; $i <= $#V; $i++) {
-	#    my $u = $V[$i];
-	#    for (my $j = 0; $j <= $#V; $j++) {
-	#	vec($bm0->[$i], $j, 1) = 1 if $g->has_edge($u, $V[$j]);
-	#    }
-	# }
-	my $Vi = $g->[_V]->[_i];
-	my $Ei = $g->[_E]->[_i];
-	if ($g->is_undirected) {
-	    for my $e (grep defined, @{ $Ei }) {
-		my ($i0, $j0) = @$e;
-		my $i1 = $V{ $Vi->[ $i0 ] };
-		my $j1 = $V{ $Vi->[ $j0 ] };
-		vec($bm0->[$i1], $j1, 1) = 1;
-		vec($bm0->[$j1], $i1, 1) = 1;
-	    }
-	} else {
-	    for my $e (grep defined, @{ $Ei }) {
-		my ($i0, $j0) = @$e;
-		vec($bm0->[$V{ $Vi->[ $i0 ] }], $V{ $Vi->[ $j0 ] }, 1) = 1;
-	    }
+    return $bm if !$connect_edges;
+    # for (my $i = 0; $i <= $#V; $i++) {
+    #    my $u = $V[$i];
+    #    for (my $j = 0; $j <= $#V; $j++) {
+    #	vec($bm0->[$i], $j, 1) = 1 if $g->has_edge($u, $V[$j]);
+    #    }
+    # }
+    my $Ei = $g->[_E]->[_i];
+    if ($g->is_undirected) {
+	for my $e (grep defined, @{ $Ei }) {
+	    my ($i0, $j0) = @$e;
+	    vec($bm0->[$i0], $j0, 1) = 1;
+	    vec($bm0->[$j0], $i0, 1) = 1;
+	}
+    } else {
+	for my $e (grep defined, @{ $Ei }) {
+	    my ($i0, $j0) = @$e;
+            ($j0, $i0) = ($i0, $j0) if $transpose;
+	    vec($bm0->[$i0], $j0, 1) = 1;
 	}
     }
-    return $bm;
+    $bm;
 }
 
 sub stringify {
@@ -169,6 +167,14 @@ connect_edges
 If true or if not present, set the bits in the bit matrix that
 correspond to edges.  If false, do not set any bits.  In either
 case the bit matrix of V x V bits is allocated.
+
+=item *
+
+transpose
+
+If true, set the bits in the bit matrix that correspond to edges
+but in the reverse direction. This has the effect of transposing the
+matrix. Obviously makes no difference to the result for undirected graphs.
 
 =back
 

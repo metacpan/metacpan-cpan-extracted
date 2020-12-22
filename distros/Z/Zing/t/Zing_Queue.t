@@ -187,7 +187,7 @@ $subs->example(-2, 'send', 'method', fun($tryable) {
 
 $subs->example(-1, 'term', 'method', fun($tryable) {
   ok my $result = $tryable->result;
-  like $result, qr/^zing:main:local\(0\.0\.0\.0\):queue:tasks$/;
+  like $result, qr/^zing:main:global:queue:tasks$/;
 
   $result
 });

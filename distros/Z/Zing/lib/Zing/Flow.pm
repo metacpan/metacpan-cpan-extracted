@@ -11,7 +11,7 @@ use routines;
 use Data::Object::Class;
 use Data::Object::ClassHas;
 
-our $VERSION = '0.13'; # VERSION
+our $VERSION = '0.20'; # VERSION
 
 # ATTRIBUTES
 

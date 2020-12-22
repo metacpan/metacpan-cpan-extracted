@@ -1,5 +1,30 @@
-Revision history for Perl extension Acme::Cow.
+0.02 2020-12-20
 
-0.01  Fri Feb 29 14:48:49 2008
-	- original version; created by h2xs 1.23 with options
-		-AX --skip-exporter --use-new-tests -n Acme::Cow::Interpreter
+ * Format CHANGES according to CPAN::Changes::Spec.
+
+ * Update MANIFEST.SKIP.
+
+ * Update link to language definition.
+
+ * Update author information.
+
+ * Remove references to the CPAN RT as it is soon to be shut down.
+
+ * Add reference to the GitHub issue tracker.
+
+ * Replace t/02-pod.t by xt/release/pod-syntax.t.
+
+ * Replace t/03-pod-coverage.t by xt/release/pod-coverage.t.
+
+ * Add new test files xt/release/cpan-changes.t, xt/release/kwalitee.t,
+   xt/release/portability.t, xt/release/synopsis.t, xt/release/test-version.t,
+   xt/release/unused-vars.t, xt/release/version.t, and xt/release/whitespaces.t.
+
+ * Remove Emacs variables from various files.
+
+ * Add new file README.md for
+
+0.01 2008-02-29
+
+ * original version; created by h2xs 1.23 with options
+       -AX --skip-exporter --use-new-tests -n Acme::Cow::Interpreter

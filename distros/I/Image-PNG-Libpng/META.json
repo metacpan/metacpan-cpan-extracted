@@ -51,7 +51,7 @@
          "url" : "https://github.com/benkasminbullock/image-png-libpng"
       }
    },
-   "version" : "0.52",
+   "version" : "0.55",
    "x_contributors" : [
       "Aaron Crane <arc@cpan.org>",
       "Greg Kennedy <gregk@cpan.org>",

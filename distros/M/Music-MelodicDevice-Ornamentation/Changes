@@ -1,0 +1,51 @@
+Revision history for Music-MelodicDevice-Ornamentation
+
+0.0400 2020-12-19 18:45:13
+    - Find enharmonic pitches if not found the first time.
+
+0.0300 2020-12-19 06:53:18
+    - Remove the redundant "chromatic" logic.
+    - Drop the dependency on Music::Note.
+
+0.0208 2020-12-19 06:17:40
+    - Clean-up code a bit...
+
+0.0207 2020-12-18 13:54:46
+    - Improve the eg/ode-to-joy program majorly.
+    - Fix confusing "documentation."
+
+0.0206 2020-12-18 12:29:32
+    - Improve documentation.
+    - Improve the eg/ode-to-joy program slightly.
+
+0.0205 2020-12-18 09:21:11
+    - Slow down the grace-note to a thrirty-second.
+    - Clean-up code a bit.
+    - Drop the Carp module since we don't croak anymore.
+    - Drop the misleading response comments in the SYNOPSIS - Read the test instead.
+
+0.0204 2020-12-18 07:54:23
+    - Fix the mordent divisions.
+    - Add the eg/ode-to-joy program.
+
+0.0203 2020-12-18 07:16:15
+    - Improve documentation.
+    - Use "defined-or" for the offsets.
+
+0.0202 2020-12-18 06:57:39
+    - Simplify ->turn logic.
+    - Improve documentation.
+
+0.0201 2020-12-17 21:08:10
+    - Improve documentation.
+    - Fix ->mordent logic big-time.
+
+0.0200 2020-12-17 20:41:09
+    - Implement, document and test the ->mordent method.
+
+0.0101 2020-12-17 18:52:48
+    - Improve documentation.
+    - Add tests!
+
+0.0100 2020-12-17 18:27:16
+    - Mint with Dist::Zilla.

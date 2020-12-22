@@ -1,11 +1,11 @@
 package Power::Outlet::Common;
 use strict;
 use warnings;
-use Time::HiRes qw{sleep};
+use Time::HiRes qw{};
 use base qw{Package::New};
 
-our $VERSION='0.24';
-our $STATE="OFF";
+our $VERSION = '0.24';
+our $STATE   = 'OFF';
 
 =head1 NAME
 
@@ -49,7 +49,7 @@ Note: This should cancel any non-blocking cycle requests
 
 =cut
 
-sub on {return $STATE="ON"};
+sub on {return $STATE = 'ON'};
 
 =head2 off
 
@@ -61,7 +61,7 @@ Note: This should cancel any non-blocking cycle requests
 
 =cut
 
-sub off {return $STATE="OFF"};
+sub off {return $STATE = 'OFF'};
 
 =head2 switch
 
@@ -74,10 +74,10 @@ Note: The default implementations does not cancel non-blocking cycle requests
 =cut
 
 sub switch {
-  my $self=shift;
-  my $query=$self->query;
-  return $query eq "OFF" ? $self->on  :
-         $query eq "ON"  ? $self->off :
+  my $self  = shift;
+  my $query = $self->query;
+  return $query eq 'OFF' ? $self->on  :
+         $query eq 'ON'  ? $self->off :
          $query; #e.g. CYCLE, BUSY, etc.
 }
 
@@ -92,9 +92,9 @@ Note: Implementations may be blocking or non-blocking.
 =cut
 
 sub cycle {
-  my $self=shift;
+  my $self = shift;
   $self->switch;
-  sleep $self->cycle_duration; #blocking. Maybe we should be non-blocking somehow.
+  Time::HiRes::sleep $self->cycle_duration; #blocking. Maybe we should be non-blocking somehow.
   return $self->switch;
 }
 
@@ -107,10 +107,10 @@ Default; 10 seconds (floating point number)
 =cut
 
 sub cycle_duration {
-  my $self=shift;
-  $self->{"cycle_duration"}=shift if @_;
-  $self->{"cycle_duration"}=10 unless defined $self->{"cycle_duration"};
-  return $self->{"cycle_duration"};
+  my $self                  = shift;
+  $self->{'cycle_duration'} = shift if @_;
+  $self->{'cycle_duration'} = 10 unless defined $self->{'cycle_duration'};
+  return $self->{'cycle_duration'};
 }
 
 =head2 name
@@ -120,13 +120,13 @@ User friendly name for an outlet.
 =cut
 
 sub name {
-  my $self=shift;
-  $self->{"name"}=shift if @_;
-  $self->{"name"}=$self->_name_default unless defined $self->{"name"};
-  return $self->{"name"};
+  my $self        = shift;
+  $self->{'name'} = shift if @_;
+  $self->{'name'} = $self->_name_default unless defined $self->{'name'};
+  return $self->{'name'};
 }
 
-sub _name_default {""};
+sub _name_default {''};
 
 =head1 BUGS
 

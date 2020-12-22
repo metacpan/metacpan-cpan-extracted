@@ -1,0 +1,21 @@
+runtime:
+  requires:
+    perl: '5.010001'
+    Carp: 0
+    Exporter: 0
+    List::Util: '1.33'
+    parent: 0
+    Path::Tiny: '0.101'
+    Perl::Critic: '1.126'
+    Perl::Critic::Policy::Objects::ProhibitIndirectSyntax: '1.126'
+    Perl::Critic::Policy::Subroutines::ProhibitAmpersandSigils: '1.126'
+    Perl::Critic::Policy::ValuesAndExpressions::ProhibitArrayAssignAref: '90'
+    Perl::Critic::Policy::Variables::ProhibitConditionalDeclarations: '1.126'
+    Perl::Critic::Policy::Variables::ProhibitLoopOnHash: '0.005'
+    Perl::Critic::Policy::Variables::RequireLexicalLoopIterators: '1.126'
+    PPI: '1.254'
+    Scalar::Util: 0
+    version: 0
+develop:
+  suggests:
+    App::PPI::Dumper: 0

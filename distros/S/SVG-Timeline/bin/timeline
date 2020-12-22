@@ -29,13 +29,13 @@ C<red>) or an RGB string as recognised by SVG (e.g. C<rgb(255,0,0)>).
 
 An example input file might be:
 
-    World War I	1914	1918
-    World War II	1939	1945
+    World War I  1914 1918
+    World War II 1939 1945
 
 Or, with colours included:
 
-    World War I	1914	1918	red
-    World War II	1939	1940	blue
+    World War I  1914 1918 red
+    World War II 1939 1940 blue
 
 =head2 Command Line Options
 
@@ -81,7 +81,6 @@ GetOptions(
 
 my $timeline = SVG::Timeline->new(%opts);
 
-my @events;
 while (<>) {
   chomp;
   my %rec;

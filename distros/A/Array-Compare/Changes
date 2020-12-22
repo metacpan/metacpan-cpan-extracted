@@ -1,3 +1,7 @@
+3.0.8 2020-12-21
+
+ - Only support versions 5.10+
+
 3.0.7 2020-12-06
 
  - Actually release the previous fix

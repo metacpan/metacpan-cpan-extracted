@@ -1,5 +1,8 @@
 Revision history for Perl extension CPAN::Plugin::Sysdeps.
 
+0.68  2020-12-19
+	- mapping update
+
 0.67  2020-12-12
 	- mapping update
 	- fix a dnf check (by Petr Pisar)

@@ -20,6 +20,22 @@ WriteMakefile(
                           'Archive::Tar' => 0,
 
     },
+    (eval { ExtUtils::MakeMaker->VERSION(6.46)} ? (META_MERGE => {
+    	'meta-spec' => { version => 2 },
+      resources => {
+        repository => {
+          type => 'git',
+          url => 'https://github.com/Bas-Man/File-TVShow-Organize.git',
+          web => 'https://github.com/Bas-Man/File-TVShow-Organize',
+        },
+        bugtracker => {
+          web => 'https://github.com/Bas-Man/File-TVShow-Organize/issues',
+        },
+        homepage => 'https://bas-man.github.io',
+      },
+    })
+      : ()
+    ),
     ($] >= 5.005 ?     ## Add these new keywords supported since 5.005
       (ABSTRACT_FROM  => 'lib/File/TVShow/Organize.pm', # retrieve abstract from module
        AUTHOR         => 'Adam Spann <bans@cpan.org>') : ()),

@@ -1,5 +1,5 @@
 package Data::CompactReadonly::Array;
-our $VERSION = '0.0.3';
+our $VERSION = '0.0.4';
 sub use_base_is_buggy_and_insists_that_there_be_something_here {}
 1;
 

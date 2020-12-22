@@ -1,5 +1,5 @@
 package Lab::Moose::Instrument::SR830;
-$Lab::Moose::Instrument::SR830::VERSION = '3.730';
+$Lab::Moose::Instrument::SR830::VERSION = '3.731';
 #ABSTRACT: Stanford Research SR830 Lock-In Amplifier
 
 use v5.20;
@@ -216,23 +216,12 @@ sub _int_to_sens {
     return $sens;
 }
 
-cache sens => ( getter => 'get_sens' );
-
-sub get_sens {
-    my ( $self, %args ) = validated_getter( \@_ );
-    my $int_sens = $self->query( command => 'SENS?', %args );
-    return $self->cached_sens( $self->_int_to_sens($int_sens) );
-}
-
-sub set_sens {
-    my ( $self, $sens, %args ) = validated_setter(
-        \@_,
-        value => { isa => 'Num' }
-    );
-
-    my $logval   = log10($sens);
-    my $n        = floor($logval);
-    my $rest     = $logval - $n;
+sub _sens_to_int {
+    my $self = shift;
+    my ($sens) = pos_validated_list( \@_, { isa => 'Lab::Moose::PosNum' } );
+    my $logval = log10($sens);
+    my $n      = floor($logval);
+    my $rest   = $logval - $n;
     my $int_sens = 3 * $n + 26;
 
     if ( $rest > log10(7.5) ) {
@@ -253,8 +242,70 @@ sub set_sens {
         croak "maximum value for sensitivity is 1V";
     }
 
+    return $int_sens;
+}
+
+cache sens => ( getter => 'get_sens' );
+
+sub get_sens {
+    my ( $self, %args ) = validated_getter( \@_ );
+    my $int_sens = $self->query( command => 'SENS?', %args );
+    return $self->cached_sens( $self->_int_to_sens($int_sens) );
+}
+
+sub set_sens {
+    my ( $self, $sens, %args ) = validated_setter(
+        \@_,
+        value => { isa => 'Num' }
+    );
+
+    my $int_sens = $self->_sens_to_int($sens);
+
     $self->write( command => "SENS $int_sens", %args );
     $self->cached_sens( $self->_int_to_sens($int_sens) );
+}
+
+
+sub set_auto_sens {
+    my ( $self, %args ) = validated_getter(
+        \@_,
+        r        => { isa => 'Lab::Moose::PosNum' },
+        min_sens => { isa => 'Lab::Moose::PosNum', default => 2e-9 },
+        max_sens => { isa => 'Lab::Moose::PosNum', default => 1 },
+        up_at    => { isa => 'Lab::Moose::PosNum', default => 0.9 },
+        down_at  => { isa => 'Lab::Moose::PosNum', default => 0.9 }
+    );
+
+    my ( $r, $min_sens, $max_sens, $up_at, $down_at )
+        = delete @args{qw/r min_sens max_sens up_at down_at/};
+    my $current_sens     = $self->cached_sens();
+    my $current_sens_int = $self->_sens_to_int($current_sens);
+
+    if ( $r > $current_sens * $up_at ) {
+
+        # Go to next higher range
+
+        if ( $current_sens_int == 26 ) {
+
+            # Already in 1V range
+            return;
+        }
+
+        my $upper_sens = $self->_int_to_sens( $current_sens_int + 1 );
+        if ( $upper_sens < $max_sens ) {
+            return $self->set_sens( value => $upper_sens );
+        }
+    }
+    elsif ( $current_sens_int > 0 ) {
+        my $lower_sens = $self->_int_to_sens( $current_sens_int - 1 );
+        if ( $r < $lower_sens * $down_at ) {
+            if ( $lower_sens > $min_sens ) {
+                return $self->set_sens( value => $lower_sens );
+            }
+        }
+
+    }
+    return;
 }
 
 
@@ -406,7 +457,7 @@ Lab::Moose::Instrument::SR830 - Stanford Research SR830 Lock-In Amplifier
 
 =head1 VERSION
 
-version 3.730
+version 3.731
 
 =head1 SYNOPSIS
 
@@ -478,7 +529,7 @@ Query the X and Y values.
 
 =head2 get_rphi
 
- my $rphi = $lia->get_rphi();
+ My $rphi = $lia->get_rphi();
  my $r = $rphi->{r};
  my $phi = $rphi->{phi};
 
@@ -552,6 +603,26 @@ Get sensitivity (in Volt).
 Set sensitivity (in Volt).
 
 Same rounding as for C<set_tc>.
+
+=head2 set_auto_sens
+
+  my $rphi = $lia->get_rphi
+  my $r = $rphi->{r};
+  $lia->set_auto_sens(
+      r => $r,
+      min_sens => 100e-9, # Smallest allowed range is 100nV
+      max_sens => 1e6   , # Largest allowed range is 1μV
+      up_at    => 0.8   , # Go to next higher sens if $r is above 80%
+                          # of current range (default: 90%)
+      down_at => 0.8    , # Go to next lower sens if $r is below 80% of
+                          # next lower sens    
+      
+ );
+
+Set optimal sensitvity for current input signal, determined from the C<r> attribute.
+The attributes C<min_sens> and C<max_sens> are optional.
+
+If the sensitvity is changed, return the new value. Otherwise return nothing.
 
 =head2 get_input
 
@@ -725,7 +796,7 @@ This software is copyright (c) 2020 by the Lab::Measurement team; in detail:
   Copyright 2016       Simon Reinhardt
             2017       Andreas K. Huettel, Simon Reinhardt
             2018       Simon Reinhardt
-            2020       Andreas K. Huettel
+            2020       Andreas K. Huettel, Simon Reinhardt
 
 
 This is free software; you can redistribute it and/or modify it under

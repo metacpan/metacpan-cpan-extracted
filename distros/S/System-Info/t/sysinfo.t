@@ -15,14 +15,14 @@ ok (defined &sysinfo,  "sysinfo  imported");
 ok (defined &si_uname, "si_uname imported");
 
 {   local $^O = "Generic";
-    ok (my $si = System::Info->new);
+    ok (my $si = System::Info->new, "new instance");
 
     isa_ok ($si => "System::Info::Base");
-    ok (        $si->cpu_type, $si->cpu_type);
-    ok (        $si->cpu,      $si->cpu);
-    is (        $si->ncpu,     "",            "no ncpu");
-    ok (        $si->os,       $si->os);
-    ok (defined $si->host,     $si->host); # Hostname can be Empty
+    ok (        $si->cpu_type, "CPU type: ".$si->cpu_type);
+    ok (        $si->cpu,      "CPU     : ".$si->cpu);
+    is (        $si->ncpu, "", "no ncpu");
+    ok (        $si->os,       "OS      : ".$si->os);
+    ok (defined $si->host,     "Host    : ".($si->host||"")); # Hostname can be Empty
     }
 
 {   my $si = System::Info->new;

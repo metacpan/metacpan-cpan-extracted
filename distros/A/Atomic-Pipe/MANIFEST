@@ -13,6 +13,7 @@ lib/Atomic/Pipe.pm
 t/burst.t
 t/fifo.t
 t/ipc.t
+t/mixed_data_mode.t
 t/read_block.t
 t/simple.t
 t/stress.t

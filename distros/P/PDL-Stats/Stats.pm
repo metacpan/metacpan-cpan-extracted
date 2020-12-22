@@ -6,7 +6,7 @@ PDL::Stats - a collection of statistics modules in Perl Data Language, with a qu
 
 =cut
 
-$VERSION = '0.75';
+$VERSION = '0.76';
 
 $PDL::onlinedoc->scan(__FILE__) if $PDL::onlinedoc;
 
@@ -14,7 +14,7 @@ $PDL::onlinedoc->scan(__FILE__) if $PDL::onlinedoc;
 
 Loads modules named below, making the functions available in the current namespace.
 
-Properly formated documentations online at http://pdl-stats.sf.net
+Properly formatted documentations online at http://pdl-stats.sf.net
  
 =head1 SYNOPSIS
 
@@ -190,7 +190,7 @@ if the input is of 2D, say you want to compute the stdv for each of the 3 variab
     [ 1.2990381   1.118034   1.118034]
     PDL: Double D [3]
 
-Here the function was given an input with an extra dimension of size 3, so it repeates the stdv operation on the extra dimenion 3 times, and gives back a 1D pdl of size 3.
+Here the function was given an input with an extra dimension of size 3, so it repeates the stdv operation on the extra dimension 3 times, and gives back a 1D pdl of size 3.
 
 Threading works for arbitrary number of dimensions, but it's best to refrain from higher dim pdls unless you have already decided to become a PDL wiz / witch.
 

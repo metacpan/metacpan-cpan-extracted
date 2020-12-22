@@ -13,9 +13,15 @@ use Data::Object::ClassHas;
 
 use Zing::Flow;
 
-our $VERSION = '0.13'; # VERSION
+our $VERSION = '0.20'; # VERSION
 
 # ATTRIBUTES
+
+has 'debug' => (
+  is => 'ro',
+  isa => 'Bool',
+  def => 0,
+);
 
 has 'interupt' => (
   is => 'rw',
@@ -95,15 +101,6 @@ sub _words {
 
 # METHODS
 
-method debug(Any @data) {
-  if ($ENV{ZING_DEBUG}) {
-    $self->process->log->debug(
-      join ' ', sprintf('in %s, %s', _words($self, $self->process)), @data
-    );
-  }
-  return $self;
-}
-
 method flow() {
   my $step_0 = Zing::Flow->new(
     name => 'on_register',
@@ -127,6 +124,15 @@ method flow() {
   ));
 
   $step_0
+}
+
+method note(Any @data) {
+  if ($self->debug) {
+    $self->process->log->debug(
+      join ' ', sprintf('in %s, %s', _words($self, $self->process)), @data
+    );
+  }
+  return $self;
 }
 
 method handle_perform_event() {
@@ -157,7 +163,7 @@ method handle_register_event() {
 
   return $self if $self->{registered};
 
-  $self->{registered} = $process->registry->send($process);
+  $self->{registered} = $process->meta->send($process->metadata);
 
   return $self;
 }
@@ -165,7 +171,7 @@ method handle_register_event() {
 method handle_reset_event() {
   my $process = $self->process;
 
-  if ($process->journal && $process->log->count) {
+  if ($process->journal && $process->log->count && $process->env->debug) {
     $process->journal->send({
       from => $process->name,
       data => {
@@ -186,7 +192,7 @@ method handle_suicide_event() {
   return $self if !$process->parent;
 
   # children who don't known their parents kill themeselves :)
-  $process->winddown unless $process->ping($process->parent->node->pid);
+  $process->winddown unless $process->ping($process->parent->pid);
 
   return $self;
 }
@@ -215,7 +221,7 @@ method signals() {
 method trace(Str $method, Any @args) {
   my @with = (@args ? (join ', ', 'with', _words(@args)) : ());
 
-  return $self->debug(qq(invokes "$method"), @with)->$method(@args);
+  return $self->note(qq(invokes "$method"), @with)->$method(@args);
 }
 
 1;

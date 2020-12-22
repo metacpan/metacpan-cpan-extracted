@@ -4,7 +4,7 @@ use warnings;
 
 # ABSTRACT: Flexible change tracking framework for DBIx::Class
 
-our $VERSION = '0.200100';
+our $VERSION = '0.200200';
 
 use 5.010;
 

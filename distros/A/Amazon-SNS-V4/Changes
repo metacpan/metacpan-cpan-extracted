@@ -1,40 +1,48 @@
 Revision history for perl module Amazon::SNS::V4
 
+1.9 2020-12-18
+   - Actually move ::Target and ::Topic into separate
+     files
+
+1.8 2020-12-18
+   - [James Wright]
+   - Add github meta data
+
 1.7 2020-12-15
-   [James Wright]
+   - [James Wright]
    - Split ::Topic and ::Target into separate files to
      appease PAUSE
 
 1.6 2020-12-15 
-   [James Wright]
+   - [James Wright]
    - Actually switch to Module::Build::Tiny
    - remove Makefile.PL
    - Re-add missed XML::Simple dependency
 
 1.5 2020-12-15
-   [James Wright]
+   - [James Wright]
    - Remove the printing of the raw response on Publish erors  
    - Raw XML error response now in error_response 
    - Convert to Module::Build::Tiny
    - Convert ChangeLog to Changes
 
 1.4 2020-11-27
-   [James Wright]
+   - [James Wright]
    - New Module Amazon::SNS::V4 to support V4 Signatures
 
 1.3 2015-06-20
    - Added Subscribe, Unsubscribe
 
 1.2.2 2015-02-21 
-   [David Ihnen]
+   - [David Ihnen]
    - Add required version (2010-03-31) field to packets
 
 1.2.1 2015-01-22 
-   [Sergey Basmanov]
+   - [Sergey Basmanov]
    - Added SNS::Target and MobileAttributes
 
 1.2 2013-08-24 
-   [Alessandro Zummo]
+   - [Alessandro Zummo]
    - add utf8 support
    - use POST instead of GET, as a side-effect internal signing
      has been implemented and thus Net::Amazon::AWSSign
@@ -44,5 +52,6 @@ Revision history for perl module Amazon::SNS::V4
    - support Subject in the Publish method
 
 1.0 2011-01-29 
-   [Alessandro Zummo]
+   - [Alessandro Zummo]
    - First release
+

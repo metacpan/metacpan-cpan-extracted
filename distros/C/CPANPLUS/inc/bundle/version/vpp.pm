@@ -123,7 +123,7 @@ use warnings::register;
 
 use Config;
 
-our $VERSION = 0.9924;
+our $VERSION = 0.9928;
 our $CLASS = 'version::vpp';
 our ($LAX, $STRICT, $WARN_CATEGORY);
 
@@ -777,6 +777,7 @@ sub stringify {
 
 sub vcmp {
     my ($left,$right,$swap) = @_;
+    die "Usage: version::vcmp(lobj, robj, ...)" if @_ < 2;
     my $class = ref($left);
     unless ( UNIVERSAL::isa($right, $class) ) {
 	$right = $class->new($right);

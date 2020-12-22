@@ -17,13 +17,15 @@ use Zing::KeyVal;
 my $k = Zing::KeyVal->new(name => 'states');
 
 for my $i (1..1_000) {
-  warn "state-$i", " ", $k->send("state-$i", {created => time});
+  warn "state-$i", " ", Zing::KeyVal->new(name => "state-$i")->send({created => time});
 }
 
 for my $i (1..1_000) {
-  warn "state-$i", " ", "created", " ", $k->recv("state-$i")->{created};
+  warn "state-$i", " ", "created", " ", Zing::KeyVal->new(name => "state-$i")->recv("state-$i")->{created};
 }
 
-warn 'key/val data saved under', ' ', $k->term;
+for my $i (1..1_000) {
+  warn "state-$i", " ", "dropped", " ", Zing::KeyVal->new(name => "state-$i")->drop;
+}
 
-$k->drop;
+warn 'key/val data sent and received';

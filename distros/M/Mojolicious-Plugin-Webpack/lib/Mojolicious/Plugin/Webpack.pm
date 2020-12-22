@@ -9,7 +9,7 @@ use Mojo::Util;
 
 use constant LAZY => $ENV{MOJO_WEBPACK_LAZY} ? 1 : 0;
 
-our $VERSION = '0.13';
+our $VERSION = '0.14';
 
 sub assets_dir { shift->{assets_dir} }
 sub out_dir    { shift->{out_dir} }
@@ -18,7 +18,7 @@ sub route      { shift->{route} }
 
 sub register {
   my ($self, $app, $config) = @_;
-  $self->{route} = $app->routes->route('/asset/*name')->via(qw(HEAD GET))->name('webpack.asset');
+  $self->{route} = $app->routes->any([qw(HEAD GET)] => '/asset/*name')->name('webpack.asset');
 
   $self->{$_} = path $config->{$_} for grep { $config->{$_} } qw(assets_dir out_dir);
   $self->{node_env} = $config->{node_env} || ($app->mode eq 'development' ? 'development' : 'production');

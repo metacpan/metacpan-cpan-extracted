@@ -26,7 +26,7 @@ requires:
 resources:
   homepage: https://github.com/ology/Music-Duration
   repository: https://github.com/ology/Music-Duration.git
-version: '0.0801'
+version: '0.0802'
 x_Dist_Zilla:
   perl:
     version: '5.030002'

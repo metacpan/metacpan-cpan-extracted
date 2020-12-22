@@ -3,7 +3,7 @@ package System::Info;
 use strict;
 use warnings;
 
-our $VERSION = "0.059";
+our $VERSION = "0.060";
 
 use base "Exporter";
 our @EXPORT_OK = qw( &sysinfo &sysinfo_hash &si_uname );
@@ -224,9 +224,37 @@ from call to call. YMMV.
 Sys::CPU is not available on CPAN anymore, but you can still get is from
 BackPAN.
 
+=head2 Devel::Platform::Info
+
+L<Devel::Platform::Info> derives information from the files C</etc/issue>,
+C</etc/.issue> and the output of the commands C<uname -a> (and C<-m>, C<-o>,
+C<-r>, and C<-s>) and C<lsb_release -a>. It returns no information on CPU
+type, CPU speed, or Memory.
+
+ use Devel::Platform::Info;
+ my $info = Devel::Platform::Info->new->get_info ();
+
+ ->
+
+ use System::Info;
+ my $si = System::Info->new;
+ my $info = {
+    archname => $si->cpu_type,
+    codename => undef,
+    is32bit  => undef,
+    is64bit  => undef,
+    kernel   => "$^O-".$si->_osvers,
+    kname    => $si->_osname,
+    kvers    => $si->_osvers,
+    osflag   => $^O,
+    oslabel  => $si->distro,
+    osname   => undef,
+    osvers   => $si->distro,
+    };
+
 =head1 COPYRIGHT AND LICENSE
 
-(c) 2016-2019, Abe Timmerman & H.Merijn Brand All rights reserved.
+(c) 2016-2020, Abe Timmerman & H.Merijn Brand, All rights reserved.
 
 With contributions from Jarkko Hietaniemi, Campo Weijerman, Alan Burlison,
 Allen Smith, Alain Barbet, Dominic Dunlop, Rich Rauenzahn, David Cantrell.

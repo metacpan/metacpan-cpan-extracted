@@ -1,0 +1,18 @@
+commit b8042c9c0c1ece46fbc0177bf1791f86386558f0
+Author: craig kaiser <craig@bestpractical.com>
+Date:   Fri Aug 28 15:40:04 2020 -0400
+
+    Add callback to edit CSS files loaded in header
+
+diff --git a/share/html/Elements/Header b/share/html/Elements/Header
+index e93f27999..43bb62ac9 100644
+--- a/share/html/Elements/Header
++++ b/share/html/Elements/Header
+@@ -145,6 +145,7 @@ else {
+       RT::Interface::Web::SquishedCSS( $style )->Key;
+     @css_files = "/NoAuth/css/$style/squished-$key.css";
+ }
++$m->callback( CallbackName => "MassageCSSFiles", CSSFiles => \@css_files );
+ 
+ # We use BodyClass in its $ARGS form so that callbacks have a chance to
+ # massage it

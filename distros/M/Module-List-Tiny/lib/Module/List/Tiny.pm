@@ -1,7 +1,7 @@
 package Module::List::Tiny;
 
-our $DATE = '2019-09-02'; # DATE
-our $VERSION = '0.004002'; # VERSION
+our $DATE = '2020-09-21'; # DATE
+our $VERSION = '0.004003'; # VERSION
 
 #IFUNBUILT
 # # use strict 'subs', 'vars';
@@ -104,7 +104,7 @@ Module::List::Tiny - A fork of Module::List that starts faster
 
 =head1 VERSION
 
-This document describes version 0.004002 of Module::List::Tiny (from Perl distribution Module-List-Tiny), released on 2019-09-02.
+This document describes version 0.004003 of Module::List::Tiny (from Perl distribution Module-List-Tiny), released on 2020-09-21.
 
 =head1 SYNOPSIS
 
@@ -159,9 +159,7 @@ feature.
 
 =head1 SEE ALSO
 
-L<Module::List>
-
-L<PERLANCAR::Module::List> - my other, personal fork, with additional features
+L<Module::List>, L<Module::List::Wildcard>, L<Module::List::More>
 
 =head1 AUTHOR
 
@@ -169,7 +167,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2019 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

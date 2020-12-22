@@ -20,6 +20,7 @@ my %WriteMakefileArgs = (
     "MIDI" => 0,
     "MIDI::Simple" => 0,
     "Music::Tempo" => 0,
+    "constant" => 0,
     "strict" => 0,
     "warnings" => 0
   },
@@ -30,7 +31,7 @@ my %WriteMakefileArgs = (
     "Test::Exception" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.0703",
+  "VERSION" => "0.0704",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -46,6 +47,7 @@ my %FallbackPrereqs = (
   "Music::Tempo" => 0,
   "Test::Exception" => 0,
   "Test::More" => 0,
+  "constant" => 0,
   "strict" => 0,
   "warnings" => 0
 );

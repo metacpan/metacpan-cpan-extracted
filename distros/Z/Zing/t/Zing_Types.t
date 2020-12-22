@@ -52,6 +52,32 @@ system.
 
 =cut
 
+=type App
+
+  App
+
+=type-library App
+
+Zing::Types
+
+=type-composite App
+
+  InstanceOf["Zing::App"]
+
+=type-parent App
+
+  Object
+
+=type-example-1 App
+
+  # given: synopsis
+
+  use Zing::App;
+
+  my $app = Zing::App->new;
+
+=cut
+
 =type Channel
 
   Channel
@@ -78,6 +104,61 @@ Zing::Types
 
 =cut
 
+=type Cli
+
+  Cli
+
+=type-library Cli
+
+Zing::Types
+
+=type-composite Cli
+
+  InstanceOf["Zing::Cli"]
+
+=type-parent Cli
+
+  Object
+
+=type-example-1 Cli
+
+  # given: synopsis
+
+  use Zing::Cli;
+
+  my $cli = Zing::Cli->new;
+
+=cut
+
+=type Daemon
+
+  Daemon
+
+=type-library Daemon
+
+Zing::Types
+
+=type-composite Daemon
+
+  InstanceOf["Zing::Daemon"]
+
+=type-parent Daemon
+
+  Object
+
+=type-example-1 Daemon
+
+  # given: synopsis
+
+  use Zing::Cartridge;
+  use Zing::Daemon;
+
+  my $daemon = Zing::Daemon->new(
+    cartridge => Zing::Cartridge->new(name => 'myapp')
+  );
+
+=cut
+
 =type Data
 
   Data
@@ -101,7 +182,7 @@ Zing::Types
   use Zing::Data;
   use Zing::Process;
 
-  my $data = Zing::Data->new(process => Zing::Process->new);
+  my $data = Zing::Data->new(name => 'random');
 
 =cut
 
@@ -128,6 +209,58 @@ Zing::Types
   use Zing::Domain;
 
   my $domain = Zing::Domain->new(name => 'exchange');
+
+=cut
+
+=type Entity
+
+  Entity
+
+=type-library Entity
+
+Zing::Types
+
+=type-composite Entity
+
+  InstanceOf["Zing::Entity"]
+
+=type-parent Entity
+
+  Object
+
+=type-example-1 Entity
+
+  # given: synopsis
+
+  use Zing::Entity;
+
+  my $app = Zing::Entity->new;
+
+=cut
+
+=type Env
+
+  Env
+
+=type-library Env
+
+Zing::Types
+
+=type-composite Env
+
+  InstanceOf["Zing::Env"]
+
+=type-parent Env
+
+  Object
+
+=type-example-1 Env
+
+  # given: synopsis
+
+  use Zing::Env;
+
+  my $env = Zing::Env->new;
 
 =cut
 
@@ -231,6 +364,30 @@ Zing::Types
 
 =cut
 
+=type Key
+
+  Key
+
+=type-library Key
+
+Zing::Types
+
+=type-composite Key
+
+  StrMatch[qr(^[^\:\*]+:[^\:\*]+:[^\:\*]+:[^\:\*]+:[^\:\*]+$)]
+
+=type-parent Key
+
+  Str
+
+=type-example-1 Key
+
+  # given: synopsis
+
+  "zing:main:global:repo:random"
+
+=cut
+
 =type KeyVal
 
   KeyVal
@@ -280,8 +437,7 @@ Zing::Types
   use Zing::Logic;
   use Zing::Process;
 
-  my $process = Zing::Process->new;
-  my $logic = Zing::Logic->new(process => $process);
+  my $logic = Zing::Logic->new(process => Zing::Process->new);
 
 =cut
 
@@ -363,33 +519,57 @@ Zing::Types
   use Zing::Mailbox;
   use Zing::Process;
 
-  my $mailbox = Zing::Mailbox->new(process => Zing::Process->new);
+  my $mailbox = Zing::Mailbox->new(name => 'shared');
 
 =cut
 
-=type Node
+=type Meta
 
-  Node
+  Meta
 
-=type-library Node
+=type-library Meta
 
 Zing::Types
 
-=type-composite Node
+=type-composite Meta
 
-  InstanceOf["Zing::Node"]
+  InstanceOf["Zing::Meta"]
 
-=type-parent Node
+=type-parent Meta
 
   Object
 
-=type-example-1 Node
+=type-example-1 Meta
 
   # given: synopsis
 
-  use Zing::Node;
+  use Zing::Meta;
 
-  my $node = Zing::Node->new;
+  my $meta = Zing::Meta->new(name => '$process');
+
+=cut
+
+=type Name
+
+  Name
+
+=type-library Name
+
+Zing::Types
+
+=type-composite Name
+
+  StrMatch[qr(^[^\:\*]+$)]
+
+=type-parent Name
+
+  Str
+
+=type-example-1 Name
+
+  # given: synopsis
+
+  "main"
 
 =cut
 
@@ -499,58 +679,6 @@ Zing::Types
 
 =cut
 
-=type Registry
-
-  Registry
-
-=type-library Registry
-
-Zing::Types
-
-=type-composite Registry
-
-  InstanceOf["Zing::Registry"]
-
-=type-parent Registry
-
-  Object
-
-=type-example-1 Registry
-
-  # given: synopsis
-
-  use Zing::Process;
-  use Zing::Registry;
-
-  my $process = Zing::Process->new;
-  my $registry = Zing::Registry->new(process => $process);
-
-=cut
-
-=type Redis
-
-  Redis
-
-=type-library Redis
-
-Zing::Types
-
-=type-composite Redis
-
-  InstanceOf["Zing::Redis"]
-
-=type-parent Redis
-
-  Object
-
-=type-example-1 Redis
-
-  # given: synopsis
-
-  bless {}, 'Redis';
-
-=cut
-
 =type Repo
 
   Repo
@@ -635,29 +763,29 @@ Zing::Types
 
 =cut
 
-=type Server
+=type Search
 
-  Server
+  Search
 
-=type-library Server
+=type-library Search
 
 Zing::Types
 
-=type-composite Server
+=type-composite Search
 
-  InstanceOf["Zing::Server"]
+  InstanceOf["Zing::Search"]
 
-=type-parent Server
+=type-parent Search
 
   Object
 
-=type-example-1 Server
+=type-example-1 Search
 
   # given: synopsis
 
-  use Zing::Server;
+  use Zing::Search;
 
-  my $server = Zing::Server->new;
+  my $search = Zing::Search->new;
 
 =cut
 
@@ -710,6 +838,30 @@ Zing::Types
   use Zing::Store;
 
   my $store = Zing::Store->new;
+
+=cut
+
+=type Term
+
+  Term
+
+=type-library Term
+
+Zing::Types
+
+=type-composite Term
+
+  InstanceOf["Zing::Term"]
+
+=type-parent Term
+
+  Object
+
+=type-example-1 Term
+
+  # given: synopsis
+
+  bless {}, 'Zing::Term';
 
 =cut
 

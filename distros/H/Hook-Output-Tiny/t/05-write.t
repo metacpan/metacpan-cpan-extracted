@@ -10,7 +10,8 @@ my $ef = 't/stderr.txt';
 
 my $h = Hook::Output::Tiny->new;
 
-{ # both
+# both
+{
     $h->hook();
 
     print "out 1\n";
@@ -28,30 +29,34 @@ my $h = Hook::Output::Tiny->new;
     close $ofh;
 
     is (@out, 2, "write() stdout file ok");
-    is ($h->stdout, 0, "write() stdout() ok");
+
+    my @stdout = $h->stdout;
+    is (@stdout, 0, "write() stdout() ok");
 
     $h->write($ef, 'stderr');
+
     open my $efh, '<', $ef or die $!;
     my @err = <$efh>;
     close $efh;
 
     is (@err, 2, "write() stderr file ok");
-    is ($h->stderr, 0, "write() stderr() ok");
+
+    my @stderr = $h->stderr;
+
+    is (@stderr, 0, "write() stderr() ok");
 
     _unlink();
 }
-{ #stdout
 
-    my $warn;
-    local $SIG{__WARN__} = sub { $warn = shift; };
-    warn 'blah';
-
+#stdout
+{
     $h->hook('stdout');
     print "blah";
     $h->write($of, 'stdout');
     $h->unhook('stdout');
 
-    is ($h->stdout, 0, "stdout empty in only write");
+    my @stdout = $h->stdout;
+    is (@stdout, 0, "stdout empty in only write");
 
     open my $ofh, '<', $of or die $!;
     my @out = <$ofh>;
@@ -61,16 +66,16 @@ my $h = Hook::Output::Tiny->new;
 
     _unlink();
 }
-{ #stderr
 
-    print "blah\n";
+#stderr
+{
     $h->hook('stderr');
     warn 'blah';
-
     $h->write($ef, 'stderr');
     $h->unhook('stderr');
 
-    is ($h->stderr, 0, "stderr empty in only write");
+    my @stderr = $h->stderr;
+    is (@stderr , 0, "stderr empty in only write");
 
     open my $efh, '<', $ef or die $!;
     my @err = <$efh>;
@@ -80,6 +85,7 @@ my $h = Hook::Output::Tiny->new;
 
     _unlink();
 }
+
 sub _unlink {
     for ($of, $ef){
         unlink $_ or die $! if -e $_;

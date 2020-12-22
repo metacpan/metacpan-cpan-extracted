@@ -8,6 +8,7 @@ require Exporter;
 our @ISA = qw(Exporter);
 # We just export everything by default, because this is not a user module.
 our @EXPORT = qw/
+		    chunk_ok
 		    fake_wpng
 		    rmfile
 		    round_trip
@@ -125,6 +126,14 @@ sub fake_wpng
     $longpng->set_IHDR ($ihdr);
     $longpng->set_rows (['X']);
     return $longpng;
+}
+
+sub chunk_ok
+{
+    my ($chunk) = @_;
+    if (! libpng_supports ($chunk)) {
+	plan skip_all => "This libpng doesn't support '$chunk'"
+    }
 }
 
 1;

@@ -14,7 +14,7 @@ Lab::Measurement::Tutorial - Lab::Measurement tutorial
 
 =head1 VERSION
 
-version 3.730
+version 3.731
 
 =head1 How to read the documentation
 
@@ -757,7 +757,7 @@ increasing delay of the measurement.
 
 =head3 Refresh interval
 
-We can set a mininum type between redraws of the live plot. This becomes handy
+We can set a mininum time between redraws of the live plot. This becomes handy
 for large plot, where the redrawing the plot is slow. 
 
  # Wait at least 10 minutes before redraw:

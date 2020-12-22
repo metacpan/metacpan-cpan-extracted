@@ -23,5 +23,5 @@ requires:
 resources:
   bugtracker: https://github.com/davorg/plack-app-directoryindex/issues
   repository: git://github.com/davorg/plack-app-directoryindex.git
-version: v0.0.2
+version: v0.0.3
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

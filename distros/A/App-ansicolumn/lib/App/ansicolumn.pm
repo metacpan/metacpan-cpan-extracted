@@ -1,6 +1,6 @@
 package App::ansicolumn;
 
-our $VERSION = "1.02";
+our $VERSION = "1.03";
 
 use v5.14;
 use warnings;
@@ -35,6 +35,8 @@ sub new {
 	pane             => 0,
 	pane_width       => undef,
 	tabstop          => 8,
+	tabhead          => undef,
+	tabspace         => undef,
 	ignore_space     => 1,
 	fullwidth        => undef,
 	linestyle        => '',
@@ -77,6 +79,8 @@ sub run {
 	"pane|C=i",
 	"pane_width|pw|S=i",
 	"tabstop=i",
+	"tabhead=s",
+	"tabspace=s",
 	"ignore_space|is!",
 	"fullwidth|F!",
 	"linestyle|ls=s",
@@ -86,7 +90,7 @@ sub run {
 	"border_style|bs=s",
 	"document|D",
 	"colormap|cm=s@",
-	"insert_space!",
+	"insert_space|paragraph!",
 	"white_space!",
 	"isolation!",
 	"fillup:s",
@@ -159,6 +163,16 @@ sub setup_options {
     if ($obj->{ambiguous} eq 'wide') {
 	$Text::VisualWidth::PP::EastAsian = 1;
 	Text::ANSI::Fold->configure(ambiguous => 'wide');
+    }
+
+    ## --tabhead, --tabspace
+    use charnames ':loose';
+    for my $opt (qw(tabhead tabspace)) {
+	for ($obj->{$opt}) {
+	    defined or length or next;
+	    $_ = do { eval qq("\\N{$_}") or die "$!" } if length > 1;
+	    Text::ANSI::Fold->configure($opt => $_);
+	}
     }
 
     $obj;

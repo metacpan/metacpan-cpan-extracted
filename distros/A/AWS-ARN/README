@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    0.005
+    0.007
 
 DESCRIPTION
 
@@ -73,7 +73,8 @@ AUTHOR
 
 SEE ALSO
 
-      * AWS Resource Names 
+      * AWS Resource Names
+      <https://docs.aws.amazon.com/general/latest/gr/aws-arns-and-namespaces.html>
 
 COPYRIGHT AND LICENSE
 

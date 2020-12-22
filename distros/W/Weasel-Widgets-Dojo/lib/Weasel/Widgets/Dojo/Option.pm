@@ -43,7 +43,8 @@ sub click {
                            split /\s+/, $class);
         });
     }
-    $self->SUPER::click;
+    # Click the text, which masks $self under Firefox
+    $self->find("//*[\@id='" . $self->get_attribute('id') . "_text']")->SUPER::click;
     $self->session->wait_for(
       # Wait till popup closes
       sub {

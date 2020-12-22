@@ -1,3 +1,12 @@
+0.50	- 2020-12-21, H.Merijn Brand   <h.m.brand@xs4all.nl>
+    * Update to Devel::PPPort-3.58
+    * Prevent false negative CPANTESTERS fail reports
+    * Prepare for perl7
+    * Move to XSLoader
+    * Update to Devel::PPPort-3.61
+    * Update to Devel::PPPort-3.62
+    * Fix META for bugtracker
+
 0.49	- 2020-01-31, H.Merijn Brand   <h.m.brand@xs4all.nl>
     * Add sort types N and NR
     * Add tests for sorting

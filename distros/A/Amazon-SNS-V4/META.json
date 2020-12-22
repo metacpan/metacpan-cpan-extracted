@@ -11,7 +11,7 @@
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Amazon-SNS-V4",
    "prereqs" : {
@@ -39,19 +39,30 @@
    "provides" : {
       "Amazon::SNS::V4" : {
          "file" : "lib/Amazon/SNS/V4.pm",
-         "version" : "1.7"
+         "version" : "1.9"
       },
       "Amazon::SNS::V4::Target" : {
          "file" : "lib/Amazon/SNS/V4/Target.pm",
-         "version" : "1.7"
+         "version" : "1.9"
       },
       "Amazon::SNS::V4::Topic" : {
          "file" : "lib/Amazon/SNS/V4/Topic.pm",
-         "version" : "1.7"
+         "version" : "1.9"
       }
    },
    "release_status" : "stable",
-   "version" : "1.7",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/tehmoth/Amazon-SNS-V4/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/tehmoth/Amazon-SNS-V4.git",
+         "web" : "https://github.com/tehmoth/Amazon-SNS-V4"
+      },
+      "x_IRC" : "irc://irc.styxnet.tech/#perl"
+   },
+   "version" : "1.9",
    "x_serialization_backend" : "JSON::PP version 4.02",
    "x_spdx_expression" : "GPL-2.0-only"
 }

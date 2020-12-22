@@ -40,9 +40,8 @@ method: size
 =synopsis
 
   use Zing::Mailbox;
-  use Zing::Process;
 
-  my $mailbox = Zing::Mailbox->new(process => Zing::Process->new);
+  my $mailbox = Zing::Mailbox->new(name => rand);
 
   # $mailbox->recv;
 
@@ -63,7 +62,6 @@ Zing::PubSub
 =attributes
 
 name: ro, opt, Str
-process: ro, req, Process
 
 =cut
 
@@ -105,7 +103,7 @@ received and returns the size of the recipient mailbox.
 
 =signature reply
 
-reply(HashRef $bag, HashRef $value) : Int
+reply(HashRef $message, HashRef $value) : Int
 
 =example-1 reply
 
@@ -113,9 +111,9 @@ reply(HashRef $bag, HashRef $value) : Int
 
   $mailbox->send($mailbox->term, { status => 'hello' });
 
-  my $data = $mailbox->recv;
+  my $message = $mailbox->recv;
 
-  $mailbox->reply($data, { status => 'thank you' });
+  $mailbox->reply($message, { status => 'thank you' });
 
 =cut
 

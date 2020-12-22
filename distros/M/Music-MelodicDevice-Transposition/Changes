@@ -1,5 +1,12 @@
 Revision history for Music-MelodicDevice-Transposition
 
+0.0300 2020-12-19 18:44:30
+    - Find enharmonic pitches if not found the 1st time.
+
+0.0200 2020-12-19 06:58:17
+    - Remove the redundant "chromatic" logic.
+    - Drop the dependency on Music::Note.
+
 0.0104 2020-12-17 06:14:30
     - Whoops. Data::Dumper::Compact is necessary.
 

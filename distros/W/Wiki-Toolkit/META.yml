@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.142690'
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
 license: unknown
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -19,13 +19,18 @@ no_index:
     - inc
 requires:
   CGI: '0'
+  DBD::Pg: '0'
   DBD::SQLite: '0.25'
+  DBD::mysql: '0'
   DBI: '0'
   Digest::MD5: '0'
+  Digest::SHA1: '0'
   HTML::PullParser: '0'
+  Plucene: '1.19'
   Test::More: '0'
   Text::WikiFormat: '0.78'
   Time::Piece: '0'
 resources:
   repository: https://github.com/OpenGuides/Wiki-Toolkit.git
-version: '0.85'
+version: '0.86'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

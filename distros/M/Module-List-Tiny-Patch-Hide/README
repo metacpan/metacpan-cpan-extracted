@@ -3,9 +3,9 @@ NAME
     Module::List::Tiny
 
 VERSION
-    This document describes version 0.001 of Module::List::Tiny::Patch::Hide
+    This document describes version 0.002 of Module::List::Tiny::Patch::Hide
     (from Perl distribution Module-List-Tiny-Patch-Hide), released on
-    2020-02-13.
+    2020-09-21.
 
 SYNOPSIS
      % PERL5OPT=-MModule::List::Tiny::Patch::Hide=-module,'Foo::Bar;Baz' app.pl
@@ -51,7 +51,8 @@ SEE ALSO
 
     Module::List::Tiny
 
-    Module::List::Patch::Hide, Module::List::Wildcard::Patch::Hide
+    Module::List::Patch::Hide, Module::List::Wildcard::Patch::Hide,
+    Module::List::More::Patch::Hide
 
     Module::Path::Patch::Hide, Module::Path::More::Patch::Hide.
 

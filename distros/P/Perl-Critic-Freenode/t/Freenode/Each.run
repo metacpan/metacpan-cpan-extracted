@@ -1,11 +1,13 @@
 ## name UseEach
-## failures 1
+## failures 2
 ## cut
 
 while (($key, $value) = each %hash) { ... }
+while (($i, $elem) = each @array) { ... }
 
 ## name NoEach
 ## failures 0
 ## cut
 
 foreach my $key (keys %hash) { ... }
+foreach my $i (0..$#array) { ... }

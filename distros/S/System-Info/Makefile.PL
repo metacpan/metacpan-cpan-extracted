@@ -3,6 +3,14 @@
 require 5.008003;
 use strict;
 
+if ($ENV{PERLBREW_HOME} and $ENV{PERLBREW_HOME} eq "/home/njh/.perlbrew") {
+     warn "Your smokers have been blocked because of consistent failures that\n";
+     warn " are all caused by the smoking setup and not by module errors. I you\n";
+     warn " have fixed that all, please inform the authors, so this block can\n";
+     warn " be lifted again.\n";
+     exit 0;
+     }
+
 use ExtUtils::MakeMaker;
 
 my %wm = (

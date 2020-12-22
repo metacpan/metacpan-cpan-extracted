@@ -4,7 +4,7 @@ Text::ANSI::Fold::Util - Text::ANSI::Fold utilities (width, substr, expand)
 
 # VERSION
 
-Version 0.04
+Version 0.05
 
 # SYNOPSIS
 
@@ -54,6 +54,15 @@ unexportable functions without them.
 
     Dafault tabstop is 8, and can be accessed through
     `$Text::ANSI::Fold::Util::tabstop` variable.
+
+    Option for underlying **ansi\_fold** can be passed by first parameter as
+    an array reference, as well as `Text::ANSI::Fold->configure` call.
+
+        my $opt = [ tabhead => 'T', tabspace => '_' ];
+        ansi_expand($opt, @text);
+
+        Text::ANSI::Fold->configure(tabhead => 'T', tabspace => '_');
+        ansi_expand($opt);
 
 # SEE ALSO
 

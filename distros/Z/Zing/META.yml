@@ -6,11 +6,11 @@ build_requires:
   Data::Object::Class: '2.02'
   Data::Object::ClassHas: '2.01'
   Data::Object::Cli: '2.03'
+  Data::Object::Exception: '2.02'
   Data::Object::Space: '2.10'
+  Data::Object::Try: '2.02'
   Data::Object::Types: '0.04'
   FlightRecorder: '0.09'
-  JSON: '4.02'
-  Redis: '1.996'
   Test::Auto: '0.12'
   Test::Trap: v0.3.4
   Time::Crontab: '0.04'
@@ -22,7 +22,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.015, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.017, CPAN::Meta::Converter version 2.150010'
 license: apache
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -32,11 +32,11 @@ requires:
   Data::Object::Class: '2.02'
   Data::Object::ClassHas: '2.01'
   Data::Object::Cli: '2.03'
+  Data::Object::Exception: '2.02'
   Data::Object::Space: '2.10'
+  Data::Object::Try: '2.02'
   Data::Object::Types: '0.04'
   FlightRecorder: '0.09'
-  JSON: '4.02'
-  Redis: '1.996'
   Time::Crontab: '0.04'
   Time::Piece: '1.3401'
   perl: '5.014'
@@ -44,10 +44,10 @@ requires:
   strict: '0'
   warnings: '0'
 resources:
-  bugtracker: https://github.com/iamalnewkirk/zing/issues
+  bugtracker: https://github.com/cpanery/zing/issues
   homepage: https://metacpan.org/release/Zing
-  repository: git://github.com/iamalnewkirk/zing.git
-version: '0.13'
+  repository: git://github.com/cpanery/zing.git
+version: '0.20'
 x_authority: cpan:AWNCORP
 x_generated_by_perl: v5.26.1
 x_serialization_backend: 'YAML::Tiny version 1.73'

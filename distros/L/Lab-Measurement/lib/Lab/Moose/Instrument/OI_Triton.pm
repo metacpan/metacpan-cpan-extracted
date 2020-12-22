@@ -1,5 +1,5 @@
 package Lab::Moose::Instrument::OI_Triton;
-$Lab::Moose::Instrument::OI_Triton::VERSION = '3.730';
+$Lab::Moose::Instrument::OI_Triton::VERSION = '3.731';
 #ABSTRACT: Oxford Instruments Triton gas handling system control
 
 use v5.20;
@@ -213,10 +213,10 @@ sub set_T {
     }
 
     # Adjust heater setting.
-    if ( $value < 0.035 ) {
+    if ( $value < 0.031 ) {
         $self->set_max_current( value => 0.000316 );
     }
-    elsif ( $value < 0.07 ) {
+    elsif ( $value < 0.126 ) {
         $self->set_max_current( value => 0.001 );
     }
     elsif ( $value < 0.35 ) {
@@ -245,6 +245,12 @@ sub set_P {
     );
 }
 
+# Setter for Step::Power sweep
+sub set_power {
+    my $self = shift;
+    return $self->set_P(@_);
+}
+
 __PACKAGE__->meta()->make_immutable();
 
 1;
@@ -261,7 +267,7 @@ Lab::Moose::Instrument::OI_Triton - Oxford Instruments Triton gas handling syste
 
 =head1 VERSION
 
-version 3.730
+version 3.731
 
 =head1 SYNOPSIS
 
@@ -384,7 +390,7 @@ This software is copyright (c) 2020 by the Lab::Measurement team; in detail:
 
   Copyright 2018       Andreas K. Huettel, Simon Reinhardt
             2019       Simon Reinhardt
-            2020       Andreas K. Huettel
+            2020       Andreas K. Huettel, Simon Reinhardt
 
 
 This is free software; you can redistribute it and/or modify it under

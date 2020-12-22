@@ -12,14 +12,14 @@
 #
 # 2) Build a "perlecs/dist" Docker image based on the Dockerfile.
 #
-#    docker build -t perlecs/dist:0.41-1 .
+#    docker build -t perlecs/dist:0.42-1 .
 #
 # 3) Generate a Docker container based on the image, and run an interactive
 #    bash shell within the container.
 #
-#    docker run --rm -t -i --name=perlecs_dist perlecs/dist:0.41-1 /bin/bash
+#    docker run --rm -t -i --name=perlecs_dist perlecs/dist:0.42-1 /bin/bash
 #
-#    If the container will be used for email and AMQP esting, e.g. in
+#    If the container will be used for email and AMQP testing, e.g. in
 #    conjunction with dockerized email server and amqp broker, use docker
 #    inspect to get the IP addresses of those containers.  Then, when starting
 #    the perlecs_dist container, use --add-host options to define IP address
@@ -32,7 +32,7 @@
 #        perlecs_qpid_broker_cpp
 #
 #    docker run -t -i --name=perlecs_dist --add-host email-server:172.17.0.2 \
-#        --add-host amqp-broker:172.17.0.3 perlecs/dist:0.41-1 /bin/bash
+#        --add-host amqp-broker:172.17.0.3 perlecs/dist:0.42-1 /bin/bash
 #
 #    The container includes subdirectories containing test configurations to
 #    facilitate testing of email communications.  The test configurations
@@ -58,7 +58,7 @@
 FROM centos:7
 LABEL Maintainer="Joel Schneider <joel@joelschneider.net>"
 LABEL Description="EMDIS::ECS (Perl ECS) distribution builder and test setup"
-LABEL Version="0.41"
+LABEL Version="0.42"
 
 # install deltarpm, and update installed packages
 RUN yum -y install deltarpm.x86_64
@@ -103,7 +103,7 @@ RUN cpanm --local-lib ${HOME}/perl5lib Net::SMTP~3.05 && \
  cpanm --local-lib ${HOME}/perl5lib IO::Socket::SSL~2.007
 
 # overridable at Docker build time, via docker build --build-arg <varname>=<value>
-ARG TAGGED_VERSION=0.41
+ARG TAGGED_VERSION=0.42
 
 # Export tagged version of the Perl ECS code from the Subversion repository.
 RUN svn export https://svn.code.sf.net/p/perlecs/code/tags/EMDIS-ECS-${TAGGED_VERSION}

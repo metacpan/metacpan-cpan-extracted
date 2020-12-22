@@ -13,26 +13,25 @@ use Data::Object::Class;
 extends 'Zing::Repo';
 
 use Zing::Poll;
-use Zing::Term;
 
-our $VERSION = '0.13'; # VERSION
+our $VERSION = '0.20'; # VERSION
 
 # METHODS
 
-method poll(Str $key) {
-  return Zing::Poll->new(repo => $self, name => $key);
+method poll() {
+  return Zing::Poll->new(repo => $self);
 }
 
-method recv(Str $key) {
-  return $self->store->recv($self->term($key));
+method recv() {
+  return $self->store->recv($self->term);
 }
 
-method send(Str $key, HashRef $val) {
-  return $self->store->send($self->term($key), $val);
+method send(HashRef $value) {
+  return $self->store->send($self->term, $value);
 }
 
-method term(Str @keys) {
-  return Zing::Term->new($self, @keys)->keyval;
+method term() {
+  return $self->app->term($self)->keyval;
 }
 
 1;
@@ -57,7 +56,7 @@ Generic Key/Value Store
 
   my $keyval = Zing::KeyVal->new(name => 'notes');
 
-  # $keyval->recv('today');
+  # $keyval->recv;
 
 =cut
 
@@ -105,7 +104,7 @@ This package implements the following methods:
 
 =head2 poll
 
-  poll(Str $key) : Poll
+  poll() : Poll
 
 The poll method returns a L<Zing::Poll> object which can be used to perform a
 blocking-fetch from the store.
@@ -116,7 +115,7 @@ blocking-fetch from the store.
 
   # given: synopsis
 
-  $keyval->poll('today');
+  $keyval->poll;
 
 =back
 
@@ -124,7 +123,7 @@ blocking-fetch from the store.
 
 =head2 recv
 
-  recv(Str $key) : Maybe[HashRef]
+  recv() : Maybe[HashRef]
 
 The recv method fetches the data (if any) from the store.
 
@@ -134,7 +133,7 @@ The recv method fetches the data (if any) from the store.
 
   # given: synopsis
 
-  $keyval->recv('today');
+  $keyval->recv;
 
 =back
 
@@ -144,9 +143,9 @@ The recv method fetches the data (if any) from the store.
 
   # given: synopsis
 
-  $keyval->send('today', { status => 'happy' });
+  $keyval->send({ status => 'happy' });
 
-  $keyval->recv('today');
+  $keyval->recv;
 
 =back
 
@@ -154,7 +153,7 @@ The recv method fetches the data (if any) from the store.
 
 =head2 send
 
-  send(Str $key, HashRef $value) : Str
+  send(HashRef $value) : Str
 
 The send method commits data to the store overwriting any existing data.
 
@@ -164,7 +163,7 @@ The send method commits data to the store overwriting any existing data.
 
   # given: synopsis
 
-  $keyval->send('today', { status => 'happy' });
+  $keyval->send({ status => 'happy' });
 
 =back
 
@@ -176,7 +175,7 @@ The send method commits data to the store overwriting any existing data.
 
   $keyval->drop;
 
-  $keyval->send('today', { status => 'happy' });
+  $keyval->send({ status => 'happy' });
 
 =back
 
@@ -184,7 +183,7 @@ The send method commits data to the store overwriting any existing data.
 
 =head2 term
 
-  term(Str @keys) : Str
+  term() : Str
 
 The term method generates a term (safe string) for the datastore.
 
@@ -194,7 +193,7 @@ The term method generates a term (safe string) for the datastore.
 
   # given: synopsis
 
-  $keyval->term('today');
+  $keyval->term;
 
 =back
 

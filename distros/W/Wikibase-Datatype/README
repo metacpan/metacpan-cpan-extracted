@@ -53,6 +53,11 @@ SEE ALSO
     Wikibase::Datatype::Value::Time
         Wikibase time value datatype.
 
+    Another projects:
+
+    Wikibase::Datatype::Struct
+        Wikibase structure serialization.
+
 REPOSITORY
     <https://github.com/michal-josef-spacek/Wikibase-Datatype>
 
@@ -67,5 +72,5 @@ LICENSE AND COPYRIGHT
     BSD 2-Clause License
 
 VERSION
-    0.03
+    0.04
 

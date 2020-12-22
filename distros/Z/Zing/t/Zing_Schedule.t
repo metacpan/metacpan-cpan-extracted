@@ -95,7 +95,7 @@ $subs->synopsis(fun($tryable) {
 
 $subs->example(-1, 'queues', 'method', fun($tryable) {
   ok my $result = $tryable->result;
-  is_deeply $result, ['scheduled'];
+  is_deeply $result, ['$scheduled'];
 
   $result
 });

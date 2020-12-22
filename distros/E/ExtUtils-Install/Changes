@@ -1,5 +1,13 @@
 Revision history for ExtUtils-Install
 
+2.20
+
+- Exercise _is_prefix() method more in tests
+- Optimisations for file comparisons
+- Optimisations for directory creation
+- Typo fix in POD
+- Optimisations for tree traversal
+
 2.18
 
 - Add descriptions for 3 tests lacking them

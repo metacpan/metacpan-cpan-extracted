@@ -1,0 +1,4 @@
+Size before: 97299
+The image was grayscale already.
+Size after: 46956
+The two files contain exactly the same image data.

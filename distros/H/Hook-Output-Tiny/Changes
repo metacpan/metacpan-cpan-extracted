@@ -1,15 +1,31 @@
 Revision history for Hook-Output-Tiny
 
+1.00    2020-12-20
+        - Completely redesigned stdout() and stderr(). We now auto-generate
+          them dynamically within a BEGIN block
+        - _stdout() _stderr() private methods are also now dynamically auto
+          generated
+        - Code refactoring to reduce number of lines
+        - Changed from die() to Carp::croak()
+
+0.06    2020-12-19
+        - Rephrase POD to reflect this dist was written as a learning exercise
+          (closes #12)
+        - We now return an empty array from stdout() and stderr() if the data
+          has been flushed (fixes #10)
+        - We now warn if stdout() or stderr() are called in non-list context,
+          and that calling in scalar context is deprecated and will be removed
+        - Changed from dmake to gmake in Appveyor config
+
 0.05    2016-04-30
         - replaced $h with $output in SYNOPSIS for hopefully a better
           description (closes #1)
         - DESC update in POD (closes #2)
         - EXAMPLE fixed in POD (closes #3)
         - code cleanup (closes #5 & #6)
-        - added appveyor Windows testing
+        - added Appveyor Windows testing
         - added _validate_param() and added param tests (closes #7)
         - added SEE ALSO POD section (closes #4)
-
 
 0.04    2016-04-29
         - ugh, SYNOPSIS fix

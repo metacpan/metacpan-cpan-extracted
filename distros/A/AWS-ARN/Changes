@@ -1,17 +1,23 @@
 Revision history for AWS::ARN
 
-0.005
+0.007 2020-12-18
+          - Correct AWS links
+
+0.006 2020-12-18
+          - Add github links for metacpan
+
+0.005 2020-12-01
           - Fix where condition for AWS ARN regex
 
-0.004
+0.004 2020-12-01
           - Add link to the ARN format documentation
 
-0.003
+0.003 2020-12-01
           - Loosen Type::Tiny requirements
 
-0.002
+0.002 2020-12-01
           - Edit POD slightly
 
-0.001
+0.001 2020-12-01
           - Initial release to an unsuspecting world
 

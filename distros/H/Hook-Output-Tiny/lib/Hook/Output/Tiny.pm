@@ -2,82 +2,87 @@ package Hook::Output::Tiny;
 use strict;
 use warnings;
 
-our $VERSION = '0.05';
+our $VERSION = '1.00';
+
+use Carp qw(croak);
+
+BEGIN {
+    # Auto generate the stdout() and stderr() methods, and their private
+    # helper counterparts
+
+    no strict 'refs';
+
+    for ('stdout', 'stderr') {
+        my $sub_name = $_; # We need to make a copy
+
+        # Public
+
+        *$_ = sub {
+            my ($self) = @_;
+
+            if (!wantarray) {
+                warn "Calling $sub_name() in non-list context is deprecated!\n";
+            }
+            return defined $self->{$sub_name}{data}
+                ? split /\n/, $self->{$sub_name}{data}
+                : @{[ () ]}; # Empty list
+        };
+
+        # Private
+
+        my $private_sub_name = "_$sub_name";
+
+        *$private_sub_name = sub {
+            my ($self) = @_;
+
+            my $HANDLE = uc $sub_name;
+            open $self->{$sub_name}{handle}, ">&$HANDLE"
+              or croak("can't hook " . uc $sub_name . ": $!");
+            close $HANDLE;
+            open $HANDLE, '>>', \$self->{$sub_name}{data} or croak($!);
+        };
+    }
+}
 
 sub new {
     my %struct = map { $_ => {_struct()} } qw(stderr stdout);
-    return bless \%struct, shift;
+    return bless \%struct, $_[0];
 }
 sub hook {
     my ($self, $handle) = @_;
-
-    for(_handles($handle)) {
-        if ($_ eq 'stderr') {
-            $self->_stderr;
-        }
-        else {
-            $self->_stdout;
-        }
-    }
+    $_ eq 'stderr' ? $self->_stderr : $self->_stdout for _handles($handle);
 }
 sub unhook {
     my ($self, $handle) = @_;
 
-    my @handles = _handles($handle);
-
-    if (grep {$_ eq 'stdout'} @handles) {
-        close STDOUT;
-        open STDOUT, ">&$self->{stdout}{handle}" or die $!;
+    for (_handles($handle)) {
+        no strict 'refs'; # To allow a string as STDOUT/STDERR bareword handles
+        close uc $_;
+        open uc $_, ">&$self->{$_}{handle}" or croak($!);
     }
-    if (grep {$_ eq 'stderr'} @handles) {
-        close STDERR;
-        open STDERR, ">&$self->{stderr}{handle}" or die $!;
-    }
-}
-sub stdout {
-    return split /\n/, $_[0]->{stdout}{data};
-}
-sub stderr {
-    return split /\n/, $_[0]->{stderr}{data};
 }
 sub flush {
     my ($self, $handle) = @_;
-    my @handles = _handles($handle);
-    for (@handles){
-        delete $self->{$_}{data};
-    }
+    delete $self->{$_}{data} for _handles($handle);
 }
 sub write {
     my ($self, $fn, $handle) = @_;
     if ($fn eq 'stderr' || $fn eq 'stdout'){
-        die "write() requires a file name sent in before the handle\n";
+        croak("write() requires a file name sent in before the handle\n");
     }
 
-    my @handles = _handles($handle);
-    for (@handles){
-        open my $wfh, '>>', $fn or die $!;
+    for (_handles($handle)){
+        open my $wfh, '>>', $fn or croak($!);
         print $wfh $self->{$_}{data};
         close $wfh;
         $self->flush($_);
     }
 }
-sub _stdout {
-    my $self = shift;
-    open $self->{stdout}{handle}, ">&STDOUT" or die "can't hook STDOUT: $!";
-    close STDOUT;
-    open STDOUT, '>>', \$self->{stdout}{data} or die $!;
-}
-sub _stderr {
-    my $self = shift;
-    open $self->{stderr}{handle}, ">&STDERR" or die "can't hook STDERR: $!";
-    close STDERR;
-    open STDERR, '>>', \$self->{stderr}{data} or die $!;
-}
 sub _struct {
      return (handle => *fh, data => '');
 }
 sub _handles {
-    my $handle = shift;
+    my ($handle) = @_;
     my $sub = (caller(1))[3];
     _check_param($sub, $handle) if $handle;
     return $handle ? ($handle) : qw(stderr stdout);
@@ -86,11 +91,15 @@ sub _check_param {
     # validates the $handle param
     my ($sub, $handle) = @_;
     if (! grep {$handle eq $_} qw(stderr stdout)){
-        die "$sub() either takes 'stderr', 'stdout' or no params\n" .
-            "You supplied '$handle'\n";
+        croak(
+            "$sub() either takes 'stderr', 'stdout' or no params\n" .
+            "You supplied '$handle'\n"
+        );
     }
 }
+
 1;
+__END__
 
 =head1 NAME
 
@@ -105,33 +114,39 @@ Hook::Output::Tiny - Easily enable/disable trapping of STDOUT/STDERR
 
     use Hook::Output::Tiny;
 
-    my $output = Hook::Output::Tiny->new;
+    my $trap = Hook::Output::Tiny->new;
 
     # trap either
 
-    $output->hook('stdout');
-    my @out = $output->stdout;
+    $trap->hook('stdout');
+    ...
+    my @out = $trap->stdout;
 
-    $output->hook('stderr');
-    my @err = $output->stderr;
+    $trap->hook('stderr');
+    ...
+    my @err = $trap->stderr;
 
     # untrap either
 
-    $output->unhook('stdout');
-    $output->unhook('stderr');
+    $trap->unhook('stdout');
+    $trap->unhook('stderr');
 
     # trap/untrap both simultaneously
 
-    $output->hook;
-    $output->unhook;
+    $trap->hook;
+
+    print "blah!\n"; # STDOUT
+    warn  "blah!\n"; # STDERR
+
+    $trap->unhook;
 
     # delete all entries from both (can specify individually)
 
-    $output->flush;
+    $trap->flush;
 
     # append to a file (can specify individually)
 
-    $output->write('file.txt');
+    $trap->write('file.txt');
 
 =head1 DESCRIPTION
 
@@ -140,8 +155,8 @@ Extremely lightweight mechanism for trapping C<STDOUT>, C<STDERR> or both.
 We save the captured output internally, so on long running applications, memory
 usage may become an issue if you don't C<flush()> out or C<write()> out the data.
 
-There are many modules that perform this task. I wrote this one for fun, and to
-be as small and as simple as possible.
+There are many modules that perform this task. I wrote this one as a learning
+exercise, and to make it as small and as simple as possible.
 
 =head1 METHODS
 
@@ -164,9 +179,15 @@ both.
 
 Returns a list of all the C<STDOUT> entries that have been trapped.
 
+Calling this method in non-list context now throws a warning, and is now
+deprecated and will be removed in a future release.
+
 =head2 stderr
 
 Returns a list of all the C<STDERR> entries that have been trapped.
+
+Calling this method in non-list context now throws a warning, and is now
+deprecated and will be removed in a future release.
 
 =head2 write($filename, $handle)
 

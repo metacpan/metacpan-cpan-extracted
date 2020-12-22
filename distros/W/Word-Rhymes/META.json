@@ -1,0 +1,55 @@
+{
+   "abstract" : "Takes a word and fetches rhyming matches from RhymeZone.com",
+   "author" : [
+      "Steve Bertrand <steveb@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Word-Rhymes",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "HTTP::Request" : "0",
+            "JSON" : "0",
+            "LWP::UserAgent" : "0",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/stevieb9/word-rhymes/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/stevieb9/word-rhymes.git",
+         "web" : "https://github.com/stevieb9/word-rhymes"
+      }
+   },
+   "version" : "1.02",
+   "x_serialization_backend" : "JSON::PP version 2.27400_02"
+}

@@ -22,8 +22,8 @@ use Zing::Process;
 my $p1 = Zing::Process->new;
 my $p2 = Zing::Process->new;
 
-my $m1 = Zing::Mailbox->new(process => $p1);
-my $m2 = Zing::Mailbox->new(process => $p2);
+my $m1 = Zing::Mailbox->new(name => $p1->name);
+my $m2 = Zing::Mailbox->new(name => $p2->name);
 
 my $msg;
 

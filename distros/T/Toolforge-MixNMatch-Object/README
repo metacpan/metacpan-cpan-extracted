@@ -1,0 +1,33 @@
+NAME
+    Toolforge::MixNMatch::Object - Toolforge Mix'n'match tool objects.
+
+DESCRIPTION
+    This distributions is set of basic objects from Toolforge Mix'n'match
+    tool (https://mix-n-match.toolforge.org/).
+
+SEE ALSO
+    Toolforge::MixNMatch::Object::Catalog
+        Mix'n'match catalog datatype.
+
+    Toolforge::MixNMatch::Object::User
+        Mix'n'match user datatype.
+
+    Toolforge::MixNMatch::Object::YearMonth
+        Mix'n'match year/month datatype.
+
+REPOSITORY
+    <https://github.com/michal-josef-spacek/Toolforge-MixNMatch-Object>
+
+AUTHOR
+    Michal Josef Špaček <mailto:skim@cpan.org>
+
+    <http://skim.cz>
+
+LICENSE AND COPYRIGHT
+    © Michal Josef Špaček 2020
+
+    BSD 2-Clause License
+
+VERSION
+    0.03
+

@@ -2,56 +2,89 @@
 use strict;
 use warnings;
 use CGI qw{};
-use Config::IniFiles qw{};
-use Power::Outlet qw{};
-use JSON qw{to_json};
+use JSON qw{encode_json};
+use Power::Outlet::Config qw{};
 
-my $cgi      = CGI->new;
-my $ini      = "../conf/power-outlet.ini";
-my $status   = "";
-my $state  = "";
-my $name     = $cgi->param("name");
+my $cgi        = CGI->new;
+my $ini        = '/etc/power-outlet.ini';
+my $status     = '';
+my $state      = '';
+my $error      = '';
+my $httpstatus = '';
+my $name       = $cgi->param('name');
 
-if (defined($name)) {
-  my $action = $cgi->param("action");
-  if (defined($action)) {
-    my $cfg    = Config::IniFiles->new(-file=>$ini);
-    my @keys   = $cfg->Parameters($name);
-    if (@keys) {
-      my %config = map {$_ => $cfg->val($name=>$_)} @keys;
-      my $outlet = Power::Outlet->new(%config);
-      if ($action eq "on") {
-        $state = $outlet->on;
-        $status  = $state eq "ON" ? "OK" : "FAILED";
-      } elsif ($action eq "off") {
-        $state = $outlet->off;
-        $status  = $state eq "OFF" ? "OK" : "FAILED";
-      } elsif ($action eq "query") {
-        $state = $outlet->query;
-        $status  = ($state eq "OFF" or $state eq "ON") ? "OK" : "FAILED";
-      } elsif ($action eq "switch") {
-        $state = $outlet->switch;
-        $status  = ($state eq "OFF" or $state eq "ON") ? "OK" : "FAILED";
+if (defined($name) and length($name)) {
+  my $action = $cgi->param('action');
+  if (defined($action) and length($action)) {
+    local $@;
+    my $outlet = eval{Power::Outlet::Config->new(section=>$name)};
+    $error     = $@;
+    if ($error) {
+      if ($error =~ m/Error: .* Section .* does not exist/) {
+        $status     = 'PARAMETER_NAME_INVALID';
+        $httpstatus = '400 Bad Request';
       } else {
-        $status  = "INVALID_ACTION";
+        $status     = 'UNKNOWN';
+        $httpstatus = '500 Internal Server Error';
       }
     } else {
-      $status = "CONFIGURATION_MISSING_NAME";
+
+      sub _call {
+        my $outlet     = shift or die;
+        my $method     = shift or die;
+        my $list       = shift or die;
+        my $status     = '';
+        local $@;
+        my $state      = eval{$outlet->$method};
+        my $error      = $@;
+        my $httpstatus = '';
+        if ($error) {
+          $status     = 'COMMUNICATIONS_ISSUE';
+          $httpstatus = '502 Bad Gateway';
+        } elsif (grep {$state eq $_} @$list) {
+          $status     = 'OK';
+          $httpstatus = '200 OK';
+        } else {
+          $status     = 'UNKNOWN';
+          $httpstatus = '500 Internal Server Error';
+        }
+        return($status, $state, $error, $httpstatus);
+      }
+
+      if ($action =~ m/\AON\Z/i) {
+        ($status, $state, $error, $httpstatus) = _call($outlet => on     => [qw{ ON     }]);
+      } elsif ($action =~ m/\AOFF\Z/i) {
+        ($status, $state, $error, $httpstatus) = _call($outlet => off    => [qw{    OFF }]);
+      } elsif ($action =~ m/\AQUERY\Z/i) {
+        ($status, $state, $error, $httpstatus) = _call($outlet => query  => [qw{ ON OFF }]);
+      } elsif ($action =~ m/\ASWITCH\Z/i) {
+        ($status, $state, $error, $httpstatus) = _call($outlet => switch => [qw{ ON OFF }]);
+      } else {
+        $status     = 'PARAMETER_ACTION_INVALID';
+        $error      = 'Error: Parameter "action" must be one of "ON", "OFF", "QUERY", "SWITCH"';
+        $httpstatus = '400 Bad Request';
+      }
     }
   } else {
-    $status = "PARAMETER_MISSING_ACTION";
+    $status     = 'PARAMETER_ACTION_MISSING';
+    $error      = 'Error: Parameter "action" required';
+    $httpstatus = '400 Bad Request';
   }
 } else {
-  $status = "PARAMETER_MISSING_NAME";
+  $status     = 'PARAMETER_NAME_MISSING';
+  $error      = 'Error: Parameter "name" required';
+  $httpstatus = '400 Bad Request';
 }
 
-my %return=(
-             status  => $status,
-             state => $state,
-           );
+my %return = (
+              status => $status,
+              state  => $state,
+              error  => $error,
+             );
 
-print $cgi->header(-type=>"application/json"),
-      to_json(\%return),
+print $cgi->header(-status => $httpstatus,
+                   -type   => 'application/json'),
+      encode_json(\%return),
       "\n";
 
 __END__
@@ -77,6 +110,24 @@ Return is a JSON hash with keys status and state.  status is OK if there are no 
 
   {"status":"OK","state":"ON"}
 
+=head1 Node-Red Integration
+
+Use three nodes: inject, http request, and debug.
+
+In the inject node
+  - Set the "Payload" to one of "ON", "OFF", "QUERY" or "SWITCH"
+  - Set the "Topic" to the desired INI config file [section] name.
+
+In the http request nodei
+  - Set the "Method" to GET (script also supports POST)
+  - Set the "URL" to https://127.0.0.1/power-outlet/power-outlet-json.cgi?name={{topic}};action={{payload}}
+  - Set the "Return" to a parsed JSON Object
+
+In the debug node 
+  - Set the "Output" to msg.payload.state which returns "ON" or "OFF"
+
+[{"id":"736cc2df.cc616c","type":"inject","z":"bbbcee28.8891c","name":"","topic":"Christmas Tree","payload":"Off","payloadType":"str","repeat":"","crontab":"","once":false,"onceDelay":0.1,"x":330,"y":1480,"wires":[["6f024760.ea5058"]]},{"id":"6f024760.ea5058","type":"http request","z":"bbbcee28.8891c","name":"power-outlet-json.cgi","method":"GET","ret":"obj","paytoqs":false,"url":"https://127.0.0.1/power-outlet/power-outlet-json.cgi?name={{topic}};action={{payload}}","tls":"","persist":false,"proxy":"","authType":"","x":560,"y":1480,"wires":[["2673faca.21f8d6"]],"inputLabels":["Topic=>name, Payload=>action"]},{"id":"2673faca.21f8d6","type":"debug","z":"bbbcee28.8891c","name":"","active":true,"tosidebar":true,"console":false,"tostatus":false,"complete":"payload.state","targetType":"msg","x":790,"y":1480,"wires":[]}]
+
 =head1 CONFIGURATION
 
 To add an outlet for the web service, add a new INI section to the power-outlet.ini file.
@@ -100,7 +151,7 @@ WeMo device
   type=WeMo
   host=mywemo
 
-Default Location: /usr/share/power-outlet/conf/power-outlet.ini
+Default Location: /etc/power-outlet.ini
 
 =head2 BUILD
 

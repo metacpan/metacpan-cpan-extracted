@@ -3,7 +3,7 @@ package Wiki::Toolkit;
 use strict;
 
 use vars qw( $VERSION );
-$VERSION = '0.85';
+$VERSION = '0.86';
 
 use Carp qw(croak carp);
 use Digest::MD5 "md5_hex";
@@ -33,6 +33,9 @@ you.  You will still need to write some code - this isn't an instant Wiki.
   # inverted index/DB_File search backend.  This store/search
   # combination can be used on systems with no access to an actual
   # database server.
+  #
+  # The database should already exist; it can be created using
+  # the supplied wiki-toolkit-setupdb script.
 
   my $store     = Wiki::Toolkit::Store::SQLite->new(
       dbname => "/home/wiki/store.db" );
@@ -1049,13 +1052,7 @@ You could also subscribe to the dev list at
 
 =head1 BUGS
 
-Versions between 0.75 and 0.79 inclusive contain a bug which prevents
-Recent Changes routines from working correctly if minor changes are excluded
-<http://www.wiki-toolkit.org/ticket/41>. You may wish to avoid upgrading to
-this version until it is fixed if this is important to you; the fix is
-however not trivial so noone has been able to step up yet.
-
-Other minor bugs are documented at <http://www.wiki-toolkit.org/report>
+Bugs are documented at <https://github.com/OpenGuides/Wiki-Toolkit/issues>
 
 =head1 CREDITS
 

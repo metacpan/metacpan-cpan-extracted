@@ -10,7 +10,7 @@ use List::Util qw(min);
 
 sub _A() { 0 } # adjacency
 sub _D() { 1 } # distance
-sub _P() { 2 } # predecessors
+sub _S() { 2 } # successors
 sub _V() { 3 } # vertices
 sub _G() { 4 } # the original graph (OG)
 
@@ -20,168 +20,87 @@ sub _new {
     my @V = $g->vertices;
     my %v2i; @v2i{ @V } = 0..$#V; # paths are in array -> stable ordering
     my $am = $m->adjacency_matrix;
-    my $dm; # The distance matrix.
-    my $pm; # The predecessor matrix.
-    my @di;
+    $am->[1] = \%v2i;
+    my ($dm, @di); # The distance matrix.
+    my ($sm, @si); # The successor matrix.
+    # directly use (not via API) arrays of bit-vectors etc for speed.
+    # the API is so low-level it adds no clarity anyway
     my @ai = @{ $am->[0] };
-    my @pi;
     my $multi = $g->multiedged;
     unless ($want_transitive) {
-	$dm = $m->distance_matrix;
-	$dm = $m->[ Graph::AdjacencyMatrix::_DM ] = Graph::Matrix->new($g)
-	    if !defined $dm; # if no distance_matrix in AM, we make our own
+	$dm = $m->distance_matrix || Graph::Matrix->new($g); # if no distance_matrix in AM, we make our own
 	if ($want_path_count) {
 	    # force defined
 	    @di = map [ (0) x @V ], 0..$#V;
 	} else {
 	    @di = @{ $dm->[0] };
 	}
-	$pm = Graph::Matrix->new($g);
-	@pi = @{ $pm->[0] };
+	$sm = Graph::Matrix->new($g);
+	$dm->[1] = $sm->[1] = \%v2i;
+	@si = @{ $sm->[0] };
 	for (my $iu = $#V; $iu >= 0; $iu--) {
+	    vec($ai[$iu], $iu, 1) = 1 if $want_reflexive;
 	    for (my $iv = $#V; $iv >= 0; $iv--) {
-		next unless
-		    # $am->get($u, $v)
-		    vec($ai[$iu], $iv, 1)
-			;
-		if ($want_path_count or
-		    !defined $di[$iu][$iv] # $dm->get($u, $v)
-		) {
-		    # $dm->set($u, $v, $u eq $v ? 0 : 1)
+		next unless vec($ai[$iu], $iv, 1);
+		if ($want_path_count or !defined $di[$iu][$iv]) {
 		    $di[$iu][$iv] = $iu == $iv ? 0 : 1;
 		} elsif ($multi and ref($di[$iu][$iv]) eq 'HASH') {
 		    $di[$iu][$iv] = min values %{ $di[$iu][$iv] };
 		}
-		$pi[$iu]->[$iv] = $V[$iv] unless $iu == $iv;
+		$si[$iu]->[$iv] = $V[$iv] unless $iu == $iv;
 	    }
 	}
     }
-    # XXX (see the bits below): sometimes, being nice and clean is the
-    # wrong thing to do.  In this case, using the public API for graph
-    # transitive matrices and bitmatrices makes things awfully slow.
-    # Instead, we go straight for the jugular of the data structures.
-    for (my $iu = $#V; $iu >= 0; $iu--) {
-	my $didiu = $di[$iu];
-	my $aiaiu = $ai[$iu];
-	for (my $iv = $#V; $iv >= 0; $iv--) {
-	    my $didiv = $di[$iv];
-	    my $aiaiv = $ai[$iv];
-	    if (
-		# $am->get($v, $u)
-		vec($aiaiv, $iu, 1)
-		|| ($want_reflexive && $iu == $iv)) {
-		my $aivivo = $aiaiv;
-		if ($want_transitive) {
-		    if ($want_reflexive) {
-			for (my $iw = $#V; $iw >= 0; $iw--) {
-			    next if $iw == $iu;
-			    return 0
-				if  vec($aiaiu, $iw, 1) &&
-				   !vec($aiaiv, $iw, 1);
-			}
-			# See XXX above.
-			# for my $w (@V) {
-			#    my $aiw = $ai{$w};
-			#    if (
-			#	# $am->get($u, $w)
-			#	vec($aiaiu, $aiw, 1)
-			#	|| ($u eq $w)) {
-			#	return 0
-			#	    if $u ne $w &&
-			#		# !$am->get($v, $w)
-			#		!vec($aiaiv, $aiw, 1)
-			#		    ;
-			#	# $am->set($v, $w)
-			#	vec($aiaiv, $aiw, 1) = 1
-			#	    ;
-			#     }
-			# }
-		    } else {
-			# See XXX above.
-			# for my $w (@V) {
-			#     my $aiw = $ai{$w};
-			#     if (
-			#	# $am->get($u, $w)
-			#	vec($aiaiu, $aiw, 1)
-			#       ) {
-			#	return 0
-			#	    if $u ne $w &&
-			#		# !$am->get($v, $w)
-			#		!vec($aiaiv, $aiw, 1)
-			#		    ;
-			# 	# $am->set($v, $w)
-			# 	vec($aiaiv, $aiw, 1) = 1
-			# 	    ;
-			#     }
-			# }
-			$aiaiv |= $aiaiu; # uncoverable statement
-		    }
-		} else {
-		    $aiaiv |= $aiaiu;
-		    vec($aiaiv, $iu, 1) = 1 if $want_reflexive;
-		}
-		if ($aiaiv ne $aivivo) {
-		    $ai[$iv] = $aiaiv;
-		    $aiaiu = $aiaiv if $iu == $iv;
-		}
-	    }
-						   # $am->get($v, $u)
-	    if ($want_path && !$want_transitive && vec($aiaiv, $iu, 1)) {
+    # naming here is u = start, v = midpoint, w = endpoint
+    for (my $iv = $#V; $iv >= 0; $iv--) {
+	my $div = $di[$iv];
+	my $aiv = $ai[$iv];
+	for (my $iu = $#V; $iu >= 0; $iu--) {
+	    my $aiu = $ai[$iu];
+	    next if !vec($aiu, $iv, 1);
+	    if ($want_transitive) {
 		for (my $iw = $#V; $iw >= 0; $iw--) {
-		    next unless
-			# See XXX above.
-			# $am->get($u, $w)
-			vec($aiaiu, $iw, 1)
-			    ;
-		    if ($want_path_count) {
-			$didiv->[$iw]++ if $iw != $iu and $iw != $iv and $iu != $iv;
-			next;
-		    }
-		    # See XXX above.
-		    # $d0  = $dm->get($v, $w);
-		    # $d1a = $dm->get($v, $u) || 1;
-		    # $d1b = $dm->get($u, $w) || 1;
-		    my $d0  = $didiv->[$iw];
-		    # no override sum-zero paths which can happen with negative weights
-		    my $d1a = $didiv->[$iu];
-		    $d1a = 1 unless defined $d1a;
-		    my $d1b = $didiu->[$iw];
-		    $d1b = 1 unless defined $d1b;
-		    my $d1 = $d1a + $d1b;
-		    if (!defined $d0 || ($d1 < $d0)) {
-			# print "d1 = $d1a ($v, $u) + $d1b ($u, $w) = $d1 ($v, $w) (".(defined$d0?$d0:"-").")\n";
-			# See XXX above.
-			# $dm->set($v, $w, $d1);
-			$didiv->[$iw] = $d1;
-			$pi[$iv]->[$iw] = $pi[$iv]->[$iu]
-			    if $want_path_vertices;
-		    }
+		    return 0
+			if  $iw != $iv &&
+			    vec($aiv, $iw, 1) &&
+			   !vec($aiu, $iw, 1);
 		}
-		# $dm->set($u, $v, 1)
-		$didiu->[$iv] = 1
-		    if $iu != $iv &&
-		       # $am->get($u, $v)
-		       vec($aiaiu, $iv, 1)
-			   &&
-		       # !defined $dm->get($u, $v);
-		       !defined $didiu->[$iv];
+		next;
+	    }
+	    my $aiuo = $aiu;
+	    $aiu |= $aiv;
+	    if ($aiu ne $aiuo) {
+		$ai[$iu] = $aiu;
+		$aiv = $aiu if $iv == $iu;
+	    }
+	    next if !$want_path;
+	    my $diu = $di[$iu];
+	    my $d1a = $diu->[$iv];
+	    for (my $iw = $#V; $iw >= 0; $iw--) {
+		next unless vec($aiv, $iw, 1);
+		if ($want_path_count) {
+		    $diu->[$iw]++ if $iu != $iv and $iv != $iw and $iw != $iu;
+		    next;
+		}
+		my $d0  = $diu->[$iw];
+		my $d1b = $div->[$iw];
+		my $d1 = $d1a + $d1b;
+		if (!defined $d0 || ($d1 < $d0)) {
+		    # print "d1 = $d1a ($V[$iu], $V[$iv]) + $d1b ($V[$iv], $V[$iw]) = $d1 ($V[$iu], $V[$iw]) (".(defined$d0?$d0:"-").") (propagate=".($aiu ne $aiuo?1:0).")\n";
+		    $diu->[$iw] = $d1;
+		    $si[$iu]->[$iw] = $si[$iu]->[$iv]
+			if $want_path_vertices;
+		}
 	    }
 	}
     }
     return 1 if $want_transitive;
     my %V; @V{ @V } = @V;
     $am->[0] = \@ai;
-    $am->[1] = \%v2i;
-    if (defined $dm) {
-	$dm->[0] = \@di;
-	$dm->[1] = \%v2i;
-    }
-    if (defined $pm) {
-	$pm->[0] = \@pi;
-	$pm->[1] = \%v2i;
-    }
+    $dm->[0] = \@di if defined $dm;
+    $sm->[0] = \@si if defined $sm;
     weaken(my $og = $g);
-    bless [ $am, $dm, $pm, \%V, $og ], $class;
+    bless [ $am, $dm, $sm, \%V, $og ], $class;
 }
 
 sub new {
@@ -199,8 +118,7 @@ sub new {
     my $want_reflexive = delete $opt{reflexive};
     $am_opt{is_transitive} = my $want_transitive = delete $opt{is_transitive}
 	if exists $opt{is_transitive};
-    die "Graph::TransitiveClosure::Matrix::new: Unknown options: @{[map { qq['$_' => $opt{$_}]} keys %opt]}"
-	if keys %opt;
+    Graph::_opt_unknown(\%opt);
     $want_reflexive = 1 unless defined $want_reflexive;
     my $want_path = $want_path_length || $want_path_vertices || $want_path_count;
     # $g->expect_dag if $want_path;
@@ -246,11 +164,11 @@ sub path_length {
     $tc->[ _D ]->get($u, $v);
 }
 
-sub path_predecessor {
+sub path_successor {
     my ($tc, $u, $v) = @_;
     return undef if $u eq $v;
     return undef unless $tc->has_vertices($u, $v);
-    $tc->[ _P ]->get($u, $v);
+    $tc->[ _S ]->get($u, $v);
 }
 
 sub path_vertices {
@@ -259,10 +177,10 @@ sub path_vertices {
     return wantarray ? () : 0 if $u eq $v;
     my @v = ( $u );
     while ($u ne $v) {
-	last unless defined($u = $tc->path_predecessor($u, $v));
+	last unless defined($u = $tc->path_successor($u, $v));
 	push @v, $u;
     }
-    $tc->[ _P ]->set($u, $v, [ @v ]) if @v;
+    $tc->[ _S ]->set($u, $v, [ @v ]) if @v;
     return @v;
 }
 
@@ -427,10 +345,10 @@ false if not.
 
 Return the list of vertices in the transitive closure matrix.
 
-=item path_predecessor
+=item path_successor($u, $v)
 
-Return the predecessor of vertex $v in the transitive closure path
-going back to vertex $u.
+Return the successor of vertex $u in the transitive closure path towards
+vertex $v.
 
 =item all_paths($u, $v)
 

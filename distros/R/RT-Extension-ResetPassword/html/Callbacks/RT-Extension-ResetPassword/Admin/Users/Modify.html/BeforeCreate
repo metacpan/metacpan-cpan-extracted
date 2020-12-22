@@ -1,0 +1,7 @@
+<%INIT>
+# Need to stash the arg as it is not passed to the modify page on redirect
+$session{'SendPasswordResetEmail'} = $ARGSRef->{'SendPasswordResetEmail'};
+</%INIT>
+<%ARGS>
+$ARGSRef
+</%ARGS>

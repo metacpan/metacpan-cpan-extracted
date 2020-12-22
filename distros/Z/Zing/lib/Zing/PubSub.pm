@@ -13,26 +13,25 @@ use Data::Object::Class;
 extends 'Zing::Repo';
 
 use Zing::Poll;
-use Zing::Term;
 
-our $VERSION = '0.13'; # VERSION
+our $VERSION = '0.20'; # VERSION
 
 # METHODS
 
-method poll(Str $key) {
-  return Zing::Poll->new(repo => $self, name => $key);
+method poll() {
+  return Zing::Poll->new(repo => $self);
 }
 
-method recv(Str $key) {
-  return $self->store->lpull($self->term($key));
+method recv() {
+  return $self->store->lpull($self->term);
 }
 
-method send(Str $key, HashRef $val) {
-  return $self->store->rpush($self->term($key), $val);
+method send(HashRef $value) {
+  return $self->store->rpush($self->term, $value);
 }
 
-method term(Str @keys) {
-  return Zing::Term->new($self, @keys)->pubsub;
+method term() {
+  return $self->app->term($self)->pubsub;
 }
 
 1;
@@ -57,7 +56,7 @@ Generic Pub/Sub Store
 
   my $pubsub = Zing::PubSub->new(name => 'tasks');
 
-  # $pubsub->recv('priority-1');
+  # $pubsub->recv;
 
 =cut
 
@@ -91,7 +90,7 @@ This package implements the following methods:
 
 =head2 poll
 
-  poll(Str $key) : Poll
+  poll() : Poll
 
 The poll method returns a L<Zing::Poll> object which can be used to perform a
 blocking-fetch from the store.
@@ -102,7 +101,7 @@ blocking-fetch from the store.
 
   # given: synopsis
 
-  $pubsub->poll('priority-1');
+  $pubsub->poll;
 
 =back
 
@@ -110,7 +109,7 @@ blocking-fetch from the store.
 
 =head2 recv
 
-  recv(Str $key) : Maybe[HashRef]
+  recv() : Maybe[HashRef]
 
 The recv method receives a single new message from the store.
 
@@ -120,7 +119,7 @@ The recv method receives a single new message from the store.
 
   # given: synopsis
 
-  $pubsub->recv('priority-1');
+  $pubsub->recv;
 
 =back
 
@@ -130,9 +129,9 @@ The recv method receives a single new message from the store.
 
   # given: synopsis
 
-  $pubsub->send('priority-1', { task => 'restart' });
+  $pubsub->send({ task => 'restart' });
 
-  $pubsub->recv('priority-1');
+  $pubsub->recv;
 
 =back
 
@@ -150,7 +149,7 @@ The send method sends a new message to the store and return the message count.
 
   # given: synopsis
 
-  $pubsub->send('priority-1', { task => 'restart' });
+  $pubsub->send({ task => 'restart' });
 
 =back
 
@@ -162,7 +161,9 @@ The send method sends a new message to the store and return the message count.
 
   $pubsub->drop;
 
-  $pubsub->send('priority-1', { task => 'restart' });
+  $pubsub->send({ task => 'stop' });
+
+  $pubsub->send({ task => 'restart' });
 
 =back
 
@@ -180,7 +181,7 @@ The term method return a term (safe string) for the store.
 
   # given: synopsis
 
-  $pubsub->term('priority-1');
+  $pubsub->term;
 
 =back
 

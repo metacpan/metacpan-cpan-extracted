@@ -2,13 +2,13 @@ use strict;
 use warnings;
 package MetaCPAN::Client::DownloadURL;
 # ABSTRACT: A Download URL data object
-$MetaCPAN::Client::DownloadURL::VERSION = '2.028000';
+$MetaCPAN::Client::DownloadURL::VERSION = '2.029000';
 use Moo;
 
 with 'MetaCPAN::Client::Role::Entity';
 
 my %known_fields = (
-    scalar   => [qw< date download_url status version >],
+    scalar   => [qw< checksum_md5 checksum_sha256 date download_url status version >],
     arrayref => [],
     hashref  => [],
 );
@@ -43,7 +43,7 @@ MetaCPAN::Client::DownloadURL - A Download URL data object
 
 =head1 VERSION
 
-version 2.028000
+version 2.029000
 
 =head1 SYNOPSIS
 
@@ -54,6 +54,14 @@ version 2.028000
 A MetaCPAN download_url entity object.
 
 =head1 ATTRIBUTES
+
+=head2 checksum_sha256
+
+The sha256 hexdigest for the file.
+
+=head2 checksum_md5
+
+The md5 hexdigest for the file.
 
 =head2 date
 

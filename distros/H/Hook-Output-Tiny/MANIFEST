@@ -12,6 +12,7 @@ t/04-flush.t
 t/05-write.t
 t/06-unhook.t
 t/07-bad_param.t
+t/08-non_list_context.t
 t/manifest.t
 t/pod-coverage.t
 t/pod.t

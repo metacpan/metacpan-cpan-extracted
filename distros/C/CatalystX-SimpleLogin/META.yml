@@ -18,7 +18,7 @@ configure_requires:
   ExtUtils::MakeMaker: 6.36
 distribution_type: module
 dynamic_config: 1
-generated_by: 'Module::Install version 1.18'
+generated_by: 'Module::Install version 1.19'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -45,6 +45,7 @@ requires:
   Try::Tiny: '0.24'
   namespace::autoclean: 0
 resources:
+  bugtracker: https://github.com/bobtfish/catalystx-simplelogin/issues
   license: http://dev.perl.org/licenses/
-  repository: git://github.com/bobtfish/catalystx-simplelogin.git
-version: '0.20'
+  repository: https://github.com/bobtfish/catalystx-simplelogin
+version: '0.21'

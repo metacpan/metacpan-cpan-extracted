@@ -1,14 +1,16 @@
 package Module::List::Wildcard;
 
-our $DATE = '2019-09-03'; # DATE
-our $VERSION = '0.004005'; # VERSION
+our $DATE = '2020-09-21'; # DATE
+our $VERSION = '0.004006'; # VERSION
 
 #IFUNBUILT
 # # use strict 'subs', 'vars';
 # # use warnings;
 #END IFUNBUILT
 
-# do our own exporting to be Tiny
+my $has_globstar;
+
+# do our own exporting to start faster
 sub import {
     my $pkg = shift;
     my $caller = caller;
@@ -17,8 +19,6 @@ sub import {
         else { die "$sym is not exported!" }
     }
 }
-
-my $has_globstar;
 
 sub list_modules($$) {
     my($prefix, $options) = @_;
@@ -72,7 +72,6 @@ sub list_modules($$) {
     my $use_pod_dir = $options->{use_pod_dir};
     return {} unless $list_modules || $list_prefixes || $list_pod;
     my $return_path = $options->{return_path};
-    my $all = $options->{all};
     my @prefixes = ($prefix);
     my %seen_prefixes;
     my %results;
@@ -95,8 +94,8 @@ sub list_modules($$) {
                         $entry =~ $pod_rx)) {
                     my $key = $prefix.$1;
                     next if $re_wildcard && $key !~ $re_wildcard;
-                    $results{$key} = $return_path ? ($all ? [@{ $results{$key} || [] }, "$dir/$entry"] : "$dir/$entry") : undef
-                        if $all && $return_path || !exists($results{$key});
+                    $results{$key} = $return_path ? "$dir/$entry" : undef
+                        if $return_path || !exists($results{$key});
                 } elsif(($list_prefixes || $recurse) &&
                             ($entry ne '.' && $entry ne '..') &&
                             $entry =~ $dir_rx &&
@@ -105,8 +104,8 @@ sub list_modules($$) {
                     my $newmod = $prefix.$entry;
                     my $newpfx = $newmod."::";
                     next if exists $seen_prefixes{$newpfx};
-                    $results{$newpfx} = $return_path ? ($all ? [@{ $results{$newpfx} || [] }, "$dir/$entry/"] : "$dir/$entry/") : undef
-                        if ($all && $return_path || !exists($results{$newpfx})) && $list_prefixes;
+                    $results{$newpfx} = $return_path ? "$dir/$entry/" : undef
+                        if ($return_path || !exists($results{$newpfx})) && $list_prefixes;
                     push @prefixes, $newpfx if $recurse;
                 }
             }
@@ -117,7 +116,7 @@ sub list_modules($$) {
                 if($entry =~ $pod_rx) {
                     my $key = $prefix.$1;
                     next if $re_wildcard && $key !~ $re_wildcard;
-                    $results{$key} = $return_path ? ($all ? [@{ $results{$key} || [] }, "$dir/$entry"] : "$dir/$entry") : undef;
+                    $results{$key} = $return_path ? "$dir/$entry" : undef;
                 }
             }
         }
@@ -199,7 +198,7 @@ sub _convert_wildcard_to_re {
 }
 
 1;
-# ABSTRACT: A fork of Module::List that supports wildcard
+# ABSTRACT: A fork of Module::List that groks wildcard
 
 __END__
 
@@ -209,13 +208,15 @@ __END__
 
 =head1 NAME
 
-Module::List::Wildcard - A fork of Module::List that supports wildcard
+Module::List::Wildcard - A fork of Module::List that groks wildcard
 
 =head1 VERSION
 
-This document describes version 0.004005 of Module::List::Wildcard (from Perl distribution Module-List-Wildcard), released on 2019-09-03.
+This document describes version 0.004006 of Module::List::Wildcard (from Perl distribution Module-List-Wildcard), released on 2020-09-21.
 
 =head1 SYNOPSIS
+
+Use like you would L<Module::List>, e.g.:
 
  use Module::List::Wildcard qw(list_modules);
 
@@ -245,12 +246,6 @@ goal of saving a few milliseconds (a casual test on my PC results in 11ms vs
 39ms).
 
 Path separator is hard-coded as C</>.
-
-=item * Recognize C<all> option
-
-If set to true and C<return_path> is also set to true, will return all found
-paths for each module instead of just the first found one. The values of result
-will be an arrayref containing all found paths.
 
 =item * Recognize C<wildcard> option
 
@@ -321,9 +316,7 @@ feature.
 
 =head1 SEE ALSO
 
-L<Module::List>
-
-Other forks: L<Module::List::Tiny>
+L<Module::List>, L<Module::List::Tiny>, L<Module::List::More>
 
 =head1 AUTHOR
 
@@ -331,7 +324,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2019 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

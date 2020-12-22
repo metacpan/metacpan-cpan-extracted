@@ -1,6 +1,25 @@
 Also see Moose::Manual::Delta for more details of, and workarounds
 for, noteworthy changes.
 
+2.2014   2020-12-19
+
+  [ENHANCEMENTS]
+
+  - Include details about expected values when Enum type checks fail (#174;
+    thanks sherrardb)
+
+  [DOCUMENTATION]
+
+  - fix misleading missing semicolon in exceptions example (#170; thanks
+    Perlover)
+
+  [OTHER]
+
+  - allow internal packages to be indexed by PAUSE. This avoids their
+    permissions being captured (possibly unintentionally) by others.
+  - Sub::Identify prerequisite removed, in favour of already-existing local
+    code.
+
 2.2013   2020-07-21
 
   [DOCUMENTATION]

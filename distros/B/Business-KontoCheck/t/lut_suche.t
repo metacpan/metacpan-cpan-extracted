@@ -216,7 +216,7 @@ sub suche_multiple
 $retval=lut_init("blz.lut");
 ok(($retval gt 0 || $retval==-38),"init: $retval => $kto_retval{$retval}");
 
-chk_int(\&lut_suche_blz,"lut_suche_blz",10000000,10100000);
+chk_int(\&lut_suche_blz,"lut_suche_blz",10000000,10500000);
 chk_int(\&lut_suche_plz,"lut_suche_plz",67000,67200);
 chk_int(\&lut_suche_pz,"lut_suche_pz",98,102);
 chk_str(\&lut_suche_ort,"lut_suche_ort","aa");

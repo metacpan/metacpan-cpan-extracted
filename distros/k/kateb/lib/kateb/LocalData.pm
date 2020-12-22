@@ -1,5 +1,5 @@
 package kateb::LocalData;
-$kateb::LocalData::VERSION = '01.00.22';
+$kateb::LocalData::VERSION = '01.00.23';
 
 use strict;
 use warnings;
@@ -13,11 +13,11 @@ use File::Spec;
 use File::Spec::Functions qw(catdir catfile tmpdir);
 
 sub new {
-    my $class  = shift;
+	my $class  = shift;
 	my $self = _prepare();
-    bless $self, $class;
+	bless $self, $class;
 
-    return $self;
+	return $self;
 }
 
 sub _prepare {

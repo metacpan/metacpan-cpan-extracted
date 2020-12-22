@@ -6,4 +6,4 @@ use Test::NoWarnings;
 use Wikibase::Datatype::Sitelink;
 
 # Test.
-is($Wikibase::Datatype::Sitelink::VERSION, 0.03, 'Version.');
+is($Wikibase::Datatype::Sitelink::VERSION, 0.04, 'Version.');

@@ -1,6 +1,6 @@
 package Lab::Moose::DataFile::Meta;
 #ABSTRACT: YAML Metadata file
-$Lab::Moose::DataFile::Meta::VERSION = '3.730';
+$Lab::Moose::DataFile::Meta::VERSION = '3.731';
 use v5.20;
 
 use warnings;
@@ -95,7 +95,7 @@ Lab::Moose::DataFile::Meta - YAML Metadata file
 
 =head1 VERSION
 
-version 3.730
+version 3.731
 
 =head1 SYNOPSIS
 

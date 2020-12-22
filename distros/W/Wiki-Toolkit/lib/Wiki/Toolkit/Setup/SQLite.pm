@@ -7,7 +7,7 @@ use vars qw( @ISA $VERSION $SCHEMA_VERSION );
 use Wiki::Toolkit::Setup::Database;
 
 @ISA = qw( Wiki::Toolkit::Setup::Database );
-$VERSION = '0.10';
+$VERSION = '0.11';
 
 use DBI;
 use Carp;
@@ -15,100 +15,11 @@ use Carp;
 $SCHEMA_VERSION = $VERSION*100;
 
 my $create_sql = {
-    8 => {
-        schema_info => [ qq|
-CREATE TABLE schema_info (
-  version   integer      NOT NULL default 0
-);
-|, qq|
-INSERT INTO schema_info VALUES (8)
-| ],
-        node => [ qq|
-CREATE TABLE node (
-  id        integer      NOT NULL PRIMARY KEY AUTOINCREMENT,
-  name      varchar(200) NOT NULL DEFAULT '',
-  version   integer      NOT NULL default 0,
-  text      mediumtext   NOT NULL default '',
-  modified  datetime     default NULL
-)
-| ],
-        content => [ qq|
-CREATE TABLE content (
-  node_id   integer      NOT NULL,
-  version   integer      NOT NULL default 0,
-  text      mediumtext   NOT NULL default '',
-  modified  datetime     default NULL,
-  comment   mediumtext   NOT NULL default '',
-  PRIMARY KEY (node_id, version)
-)
-| ],
-        internal_links => [ qq|
-CREATE TABLE internal_links (
-  link_from varchar(200) NOT NULL default '',
-  link_to   varchar(200) NOT NULL default '',
-  PRIMARY KEY (link_from, link_to)
-)
-| ],
-        metadata => [ qq|
-CREATE TABLE metadata (
-  node_id        integer      NOT NULL,
-  version        integer      NOT NULL default 0,
-  metadata_type  varchar(200) NOT NULL DEFAULT '',
-  metadata_value mediumtext   NOT NULL DEFAULT ''
-)
-| ]
-    },
-    9 => {
-        schema_info => [ qq|
-CREATE TABLE schema_info (
-  version   integer      NOT NULL default 0
-);
-|, qq|
-INSERT INTO schema_info VALUES (9)
-| ],
-
-        node => [ qq|
-CREATE TABLE node (
-  id        integer      NOT NULL PRIMARY KEY AUTOINCREMENT,
-  name      varchar(200) NOT NULL DEFAULT '',
-  version   integer      NOT NULL default 0,
-  text      mediumtext   NOT NULL default '',
-  modified  datetime     default NULL,
-  moderate  boolean      NOT NULL default '0'
-)
-| ],
-        content => [ qq|
-CREATE TABLE content (
-  node_id   integer      NOT NULL,
-  version   integer      NOT NULL default 0,
-  text      mediumtext   NOT NULL default '',
-  modified  datetime     default NULL,
-  comment   mediumtext   NOT NULL default '',
-  moderated boolean      NOT NULL default '1',
-  PRIMARY KEY (node_id, version)
-)
-| ],
-        internal_links => [ qq|
-CREATE TABLE internal_links (
-  link_from varchar(200) NOT NULL default '',
-  link_to   varchar(200) NOT NULL default '',
-  PRIMARY KEY (link_from, link_to)
-)
-| ],
-        metadata => [ qq|
-CREATE TABLE metadata (
-  node_id        integer      NOT NULL,
-  version        integer      NOT NULL default 0,
-  metadata_type  varchar(200) NOT NULL DEFAULT '',
-  metadata_value mediumtext   NOT NULL DEFAULT ''
-)
-| ]
-    },
     10 => {
         schema_info => [ qq|
 CREATE TABLE schema_info (
   version   integer      NOT NULL default 0
-); 
+);
 |, qq|
 INSERT INTO schema_info VALUES (10)
 | ],
@@ -121,7 +32,7 @@ CREATE TABLE node (
   text      mediumtext   NOT NULL default '',
   modified  datetime     default NULL,
   moderate  boolean      NOT NULL default '0'
-) 
+)
 |, qq|
 CREATE UNIQUE INDEX node_name ON node (name)
 | ],
@@ -136,14 +47,14 @@ CREATE TABLE content (
   verified  datetime     default NULL,
   verified_info mediumtext   NOT NULL default '',
   PRIMARY KEY (node_id, version)
-) 
+)
 | ],
         internal_links => [ qq|
 CREATE TABLE internal_links (
   link_from varchar(200) NOT NULL default '',
   link_to   varchar(200) NOT NULL default '',
   PRIMARY KEY (link_from, link_to)
-) 
+)
 | ],
         metadata => [ qq|
 CREATE TABLE metadata (
@@ -151,18 +62,63 @@ CREATE TABLE metadata (
   version        integer      NOT NULL default 0,
   metadata_type  varchar(200) NOT NULL DEFAULT '',
   metadata_value mediumtext   NOT NULL DEFAULT ''
-) 
-| ] 
+)
+| ]
+    },
+    11 => {
+        schema_info => [ qq|
+CREATE TABLE schema_info (
+  version   integer      NOT NULL default 0
+);
+|, qq|
+INSERT INTO schema_info VALUES (11)
+| ],
+
+        node => [ qq|
+CREATE TABLE node (
+  id        integer      NOT NULL PRIMARY KEY AUTOINCREMENT,
+  name      varchar(200) NOT NULL DEFAULT '',
+  version   integer      NOT NULL default 0,
+  text      mediumtext   NOT NULL,
+  modified  datetime     default NULL,
+  moderate  boolean      NOT NULL default '0'
+)
+|, qq|
+CREATE UNIQUE INDEX node_name ON node (name)
+| ],
+        content => [ qq|
+CREATE TABLE content (
+  node_id   integer      NOT NULL,
+  version   integer      NOT NULL default 0,
+  text      mediumtext   NOT NULL,
+  modified  datetime     default NULL,
+  comment   mediumtext,
+  moderated boolean      NOT NULL default '1',
+  verified  datetime     default NULL,
+  verified_info mediumtext,
+  PRIMARY KEY (node_id, version)
+)
+| ],
+        internal_links => [ qq|
+CREATE TABLE internal_links (
+  link_from varchar(200) NOT NULL default '',
+  link_to   varchar(200) NOT NULL default '',
+  PRIMARY KEY (link_from, link_to)
+)
+| ],
+        metadata => [ qq|
+CREATE TABLE metadata (
+  node_id        integer      NOT NULL,
+  version        integer      NOT NULL default 0,
+  metadata_type  varchar(200) NOT NULL DEFAULT '',
+  metadata_value mediumtext   NOT NULL
+)
+| ]
     },
 };
 
 my %fetch_upgrades = (
-    old_to_8  => 1,
-    old_to_9  => 1,
-    old_to_10 => 1,
-    '8_to_9'  => 1,
-    '8_to_10' => 1,
-    '9_to_10' => 1,
+    '10_to_11' => 1,
 );
 
 my %upgrades = ();
@@ -224,7 +180,7 @@ sub setup {
     # Do we need to upgrade the schema?
     # (Don't check if no tables currently exist)
     my $upgrade_schema;
-    my @cur_data; 
+    my @cur_data;
     if(scalar keys %tables > 0) {
         $upgrade_schema = Wiki::Toolkit::Setup::Database::get_database_upgrade_required($dbh,$wanted_schema);
     }
@@ -271,7 +227,7 @@ sub setup {
                 } else {
                     $dbh->do($update);
                 }
-            } 
+            }
         }
     }
 

@@ -9,6 +9,7 @@ README.md
 dist.ini
 lib/DBIx/Class/StateMigrations.pm
 lib/DBIx/Class/StateMigrations/Migration.pm
+lib/DBIx/Class/StateMigrations/Migration/Invalid.pm
 lib/DBIx/Class/StateMigrations/Migration/Routine.pm
 lib/DBIx/Class/StateMigrations/Migration/Routine/PerlCode.pm
 lib/DBIx/Class/StateMigrations/Migration/Routine/SQL.pm

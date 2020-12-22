@@ -1,5 +1,5 @@
 package Data::CompactReadonly::V0::Array::Medium;
-our $VERSION = '0.0.3';
+our $VERSION = '0.0.4';
 
 use warnings;
 use strict;

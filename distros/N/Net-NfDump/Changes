@@ -1,5 +1,16 @@
 Revision history for C and Perl extension of nfdump.
 
+1.29 2020-12-20
+	- updated to nfdump 1.6.22
+	- c: fixed issue with creating exporter map 
+	- nfdupp: fixes issue with reporting wrong number of output records 
+	- nfdump: duriation is now printed with units (s,m,h) 
+	- nfdump: tcp flags are displayed in default output 
+	- nfdump: fixed issue when -O flags was zeroing last 8 bits in src and dst
+	  address
+	- perl: updated info in perl documentation 
+
+
 1.28 2020-04-10
 	- updated to nfdump 1.6.20
 	- code cleanup 

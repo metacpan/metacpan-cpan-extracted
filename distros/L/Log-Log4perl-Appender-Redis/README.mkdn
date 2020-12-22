@@ -1,0 +1,82 @@
+# NAME
+
+Log::Log4perl::Appender::Redis - Log to a Redis channel
+
+# VERSION
+
+version 0.01
+
+# DESCRIPTION
+
+Based on the Log::Log4perl::Appender::Socket by Mike Schilli <m@perlmeister.com> and Kevin Goess <cpan@goess.org>.
+
+# EXAMPLE
+
+Start it and then run the following script as a client:
+
+    use Log::Log4perl qw(:easy);
+
+    my $conf = <<EOC;
+    log4perl.category = TRACE, Redis
+    log4perl.appender.Redis = Log::Log4perl::Appender::Redis
+    log4perl.appender.Redis.min_level = debug
+    log4perl.appender.Redis.PeerAddr = localhost
+    log4perl.appender.Redis.PeerPort = 6379
+    log4perl.appender.Redis.channel = mylog
+    log4perl.appender.Redis.separator = ;;
+    log4perl.appender.Redis.layout = Log::Log4perl::Layout::PatternLayout
+    log4perl.appender.Redis.layout.ConversionPattern = %d [%H:%P] %m
+    log4perl.appender.Redis.defer_connection = 1
+    EOC
+
+    Log::Log4perl->init(\$conf);
+    TRACE("The");
+    DEBUG("duck");
+    INFO("came");
+    WARN("singing");
+    ERROR("cheerfully");
+    FATAL("Quack!");
+
+# OUTPUT
+
+    echo "PSUBSCRIBE *" | redis-cli
+    Reading messages... (press Ctrl-C to quit)
+    1) "psubscribe"
+    2) "*"
+    3) (integer) 1
+    1) "pmessage"
+    2) "*"
+    3) "mylog;;gamma.localdomain;;r.pl;;TRACE"
+    4) "2014/01/24 12:55:41 [gamma.localdomain:1323] The"
+    1) "pmessage"
+    2) "*"
+    3) "mylog;;gamma.localdomain;;r.pl;;DEBUG"
+    4) "2014/01/24 12:55:41 [gamma.localdomain:1323] duck"
+    1) "pmessage"
+    2) "*"
+    3) "mylog;;gamma.localdomain;;r.pl;;INFO"
+    4) "2014/01/24 12:55:41 [gamma.localdomain:1323] came"
+    1) "pmessage"
+    2) "*"
+    3) "mylog;;gamma.localdomain;;r.pl;;WARN"
+    4) "2014/01/24 12:55:41 [gamma.localdomain:1323] singing"
+    1) "pmessage"
+    2) "*"
+    3) "mylog;;gamma.localdomain;;r.pl;;ERROR"
+    4) "2014/01/24 12:55:41 [gamma.localdomain:1323] cheerfully"
+    1) "pmessage"
+    2) "*"
+    3) "mylog;;gamma.localdomain;;r.pl;;FATAL"
+    4) "2014/01/24 12:55:41 [gamma.localdomain:1323] Quack!"
+
+
+# AUTHOR
+
+pedro.frazao
+
+# COPYRIGHT AND LICENSE
+
+Copyright 2014 by pedro.frazao
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

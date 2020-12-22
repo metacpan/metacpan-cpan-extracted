@@ -1,5 +1,5 @@
 package Lab::Moose::Sweep::DataFile;
-$Lab::Moose::Sweep::DataFile::VERSION = '3.730';
+$Lab::Moose::Sweep::DataFile::VERSION = '3.731';
 # ABSTRACT: Store parameters of datafile and its plots.
 use Moose;
 use MooseX::Params::Validate 'validated_hash';
@@ -32,7 +32,7 @@ Lab::Moose::Sweep::DataFile - Store parameters of datafile and its plots.
 
 =head1 VERSION
 
-version 3.730
+version 3.731
 
 =head1 COPYRIGHT AND LICENSE
 

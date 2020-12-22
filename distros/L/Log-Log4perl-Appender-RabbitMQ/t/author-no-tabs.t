@@ -18,7 +18,9 @@ my @files = (
     'lib/Log/Log4perl/Appender/RabbitMQ.pm',
     't/00-compile.t',
     't/author-critic.t',
+    't/author-distmeta.t',
     't/author-eol.t',
+    't/author-minimum-version.t',
     't/author-mojibake.t',
     't/author-no-tabs.t',
     't/author-pod-coverage.t',
@@ -31,10 +33,8 @@ my @files = (
     't/init_failure.t',
     't/release-cpan-changes.t',
     't/release-dist-manifest.t',
-    't/release-distmeta.t',
     't/release-kwalitee.t',
     't/release-meta-json.t',
-    't/release-minimum-version.t',
     't/release-unused-vars.t'
 );
 

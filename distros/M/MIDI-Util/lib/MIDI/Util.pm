@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: MIDI Utilities
 
-our $VERSION = '0.0703';
+our $VERSION = '0.0704';
 
 use strict;
 use warnings;
@@ -11,6 +11,8 @@ use warnings;
 use MIDI ();
 use MIDI::Simple ();
 use Music::Tempo qw(bpm_to_ms);
+
+use constant TICKS => 96;
 
 
 sub setup_score {
@@ -68,6 +70,13 @@ sub dump {
     elsif ( lc $key eq 'length' ) {
         return [
             map { "$_ => $MIDI::Simple::Length{$_}" }
+                sort { $MIDI::Simple::Length{$a} <=> $MIDI::Simple::Length{$b} }
+                    keys %MIDI::Simple::Length
+        ];
+    }
+    elsif ( lc $key eq 'ticks' ) {
+        return [
+            map { "$_ => " . $MIDI::Simple::Length{$_} * TICKS }
                 sort { $MIDI::Simple::Length{$a} <=> $MIDI::Simple::Length{$b} }
                     keys %MIDI::Simple::Length
         ];
@@ -183,7 +192,7 @@ MIDI::Util - MIDI Utilities
 
 =head1 VERSION
 
-version 0.0703
+version 0.0704
 
 =head1 SYNOPSIS
 
@@ -262,6 +271,7 @@ L<MIDI::Simple>, and L<MIDI::Event> internal lists:
 
   Volume
   Length
+  TICKS
   Note
   note2number
   number2note

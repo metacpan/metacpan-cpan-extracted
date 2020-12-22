@@ -166,4 +166,4 @@ sub set_error_invalid_scope             { shift->set_error( invalid_scope       
 sub set_error_server_error              { shift->set_error( server_error              => @_ ) }
 sub set_error_temporarily_unavailable   { shift->set_error( temporarily_unavailable   => @_ ) }
 
-our $VERSION = '0.004';
+our $VERSION = '0.005';

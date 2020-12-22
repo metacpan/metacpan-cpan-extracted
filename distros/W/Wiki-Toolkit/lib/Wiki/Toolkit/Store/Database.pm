@@ -11,8 +11,8 @@ use Time::Seconds;
 use Carp qw( carp croak );
 use Digest::MD5 qw( md5_hex );
 
-$VERSION = '0.31';
-my $SCHEMA_VER = 10;
+$VERSION = '0.32';
+my $SCHEMA_VER = 11;
 
 # first, detect if Encode is available - it's not under 5.6. If we _are_
 # under 5.6, give up - we'll just have to hope that nothing explodes. This

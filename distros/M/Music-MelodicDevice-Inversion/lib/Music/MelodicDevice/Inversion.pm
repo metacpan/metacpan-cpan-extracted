@@ -3,12 +3,11 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Apply melodic inversion to a series of notes
 
-our $VERSION = '0.0106';
+our $VERSION = '0.0300';
 
 use Data::Dumper::Compact qw(ddc);
 use List::SomeUtils qw(first_index);
 use Music::Scales qw(get_scale_notes is_scale);
-use Music::Note;
 use Moo;
 use strictures 2;
 use namespace::clean;
@@ -44,6 +43,25 @@ sub _build__scale {
     return \@with_octaves;
 }
 
+has _enharmonics => (
+    is        => 'lazy',
+    init_args => undef,
+);
+
+sub _build__enharmonics {
+  my ($self) = @_;
+  my %enharmonics = (
+      'C#' => 'Db',
+      'D#' => 'Eb',
+      'E#' => 'F',
+      'F#' => 'Gb',
+      'G#' => 'Ab',
+      'A#' => 'Bb',
+      'B#' => 'C',
+  );
+  return { %enharmonics, reverse %enharmonics }
+}
+
 
 has verbose => (
     is      => 'ro',
@@ -57,13 +75,9 @@ sub intervals {
 
     my @pitches;
 
-    if ($self->scale_name eq 'chromatic') {
-        @pitches = map { Music::Note->new($_, 'ISO')->format('midinum') } @$notes;
-    }
-    else {
-        for my $note (@$notes) {
-            push @pitches, first_index { $_ eq $note } @{ $self->_scale };
-        }
+    for my $note (@$notes) {
+        (my $i, $note) = $self->_find_pitch($note);
+        push @pitches, $i;
     }
     print 'Pitches: ', ddc(\@pitches) if $self->verbose;
 
@@ -91,7 +105,8 @@ sub invert {
 
     for my $interval (@$intervals) {
         # Find the note that is the opposite interval away from the original note
-        my $pitch = $self->_scale->[ (first_index { $_ eq $note } @{ $self->_scale }) - $interval ];
+        (my $i, $note) = $self->_find_pitch($note);
+        my $pitch = $self->_scale->[ $i - $interval ];
 
         push @inverted, $pitch;
 
@@ -101,6 +116,17 @@ sub invert {
     print 'Inverted: ', ddc(\@inverted) if $self->verbose;
 
     return \@inverted;
+}
+
+sub _find_pitch {
+    my ($self, $pitch) = @_;
+    my $i = first_index { $_ eq $pitch } @{ $self->_scale };
+    if ($i == -1) {
+        my $enharmonics = $self->_enharmonics;
+        $pitch =~ s/^([A-G][#b]?)(\d+)$/$enharmonics->{$1}$2/;
+        $i = first_index { $_ eq $pitch } @{ $self->_scale };
+    }
+    return $i, $pitch;
 }
 
 1;
@@ -117,7 +143,7 @@ Music::MelodicDevice::Inversion - Apply melodic inversion to a series of notes
 
 =head1 VERSION
 
-version 0.0106
+version 0.0300
 
 =head1 SYNOPSIS
 

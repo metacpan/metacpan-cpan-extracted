@@ -1,5 +1,5 @@
 package metaclass;
-our $VERSION = '2.2013';
+our $VERSION = '2.2014';
 
 use strict;
 use warnings;
@@ -56,7 +56,7 @@ metaclass - a pragma for installing and using Class::MOP metaclasses
 
 =head1 VERSION
 
-version 2.2013
+version 2.2014
 
 =head1 SYNOPSIS
 
@@ -105,7 +105,7 @@ to be using this - look into L<Moose::Util::MetaRole> instead.
 
 =item *
 
-Stevan Little <stevan.little@iinteractive.com>
+Stevan Little <stevan@cpan.org>
 
 =item *
 
@@ -113,11 +113,11 @@ Dave Rolsky <autarch@urth.org>
 
 =item *
 
-Jesse Luehrs <doy@tozt.net>
+Jesse Luehrs <doy@cpan.org>
 
 =item *
 
-Shawn M Moore <code@sartak.org>
+Shawn M Moore <sartak@cpan.org>
 
 =item *
 
@@ -133,7 +133,7 @@ Florian Ragwitz <rafl@debian.org>
 
 =item *
 
-Hans Dieter Pearcey <hdp@weftsoar.net>
+Hans Dieter Pearcey <hdp@cpan.org>
 
 =item *
 
@@ -141,7 +141,7 @@ Chris Prather <chris@prather.org>
 
 =item *
 
-Matt S Trout <mst@shadowcat.co.uk>
+Matt S Trout <mstrout@cpan.org>
 
 =back
 

@@ -44,7 +44,7 @@ method: term
 
   my $pubsub = Zing::PubSub->new(name => 'tasks');
 
-  # $pubsub->recv('priority-1');
+  # $pubsub->recv;
 
 =cut
 
@@ -73,13 +73,13 @@ blocking-fetch from the store.
 
 =signature poll
 
-poll(Str $key) : Poll
+poll() : Poll
 
 =example-1 poll
 
   # given: synopsis
 
-  $pubsub->poll('priority-1');
+  $pubsub->poll;
 
 =cut
 
@@ -89,21 +89,21 @@ The recv method receives a single new message from the store.
 
 =signature recv
 
-recv(Str $key) : Maybe[HashRef]
+recv() : Maybe[HashRef]
 
 =example-1 recv
 
   # given: synopsis
 
-  $pubsub->recv('priority-1');
+  $pubsub->recv;
 
 =example-2 recv
 
   # given: synopsis
 
-  $pubsub->send('priority-1', { task => 'restart' });
+  $pubsub->send({ task => 'restart' });
 
-  $pubsub->recv('priority-1');
+  $pubsub->recv;
 
 =cut
 
@@ -119,7 +119,7 @@ send(Str $key, HashRef $value) : Int
 
   # given: synopsis
 
-  $pubsub->send('priority-1', { task => 'restart' });
+  $pubsub->send({ task => 'restart' });
 
 =example-2 send
 
@@ -127,7 +127,9 @@ send(Str $key, HashRef $value) : Int
 
   $pubsub->drop;
 
-  $pubsub->send('priority-1', { task => 'restart' });
+  $pubsub->send({ task => 'stop' });
+
+  $pubsub->send({ task => 'restart' });
 
 =cut
 
@@ -143,7 +145,7 @@ term(Str @keys) : Str
 
   # given: synopsis
 
-  $pubsub->term('priority-1');
+  $pubsub->term;
 
 =cut
 
@@ -194,7 +196,7 @@ $subs->example(-2, 'send', 'method', fun($tryable) {
 
 $subs->example(-1, 'term', 'method', fun($tryable) {
   ok my $result = $tryable->result;
-  like $result, qr/:priority-1$/;
+  like $result, qr/zing:main:global:pubsub:tasks/;
 
   $result
 });

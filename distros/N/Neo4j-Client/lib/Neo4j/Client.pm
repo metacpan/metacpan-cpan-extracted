@@ -7,7 +7,7 @@ use File::Spec;
 use strict;
 use warnings;
 
-$Neo4j::Client::VERSION="0.17";
+$Neo4j::Client::VERSION="0.21";
 
 $Neo4j::Client::LIBS =
   join(' ', "-L".realpath(module_dir(__PACKAGE__))." -lClient",
@@ -19,6 +19,7 @@ $Neo4j::Client::CCFLAGS =
 
 $Neo4j::Client::DEV_CCFLAGS =
   join(' ',"-I".realpath(module_dir(__PACKAGE__))."/include",
+       "-iquote=".realpath(module_dir(__PACKAGE__))."/include",
        $Neo4j::Client::CCFLAGS);
        
 sub Neo4j::Client::LIBS_ARY { split /\s+/,$Neo4j::Client::LIBS }

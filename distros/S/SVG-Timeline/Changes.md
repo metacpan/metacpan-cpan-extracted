@@ -1,5 +1,22 @@
 # Change Log
 
+## [0.0.9] - 2020-12-22
+
+### Fixed
+
+- Added Time::Piece to pre-reqs
+
+## [0.0.8] - 2020-12-21
+
+### Fixed
+
+- Better testing
+- More subclassable
+
+### Added
+
+- Bugtracker info
+
 ## [0.0.7] - 2017-09-06
 
 ### Fixed
@@ -38,7 +55,7 @@
 - Various packaing fixes for better kwalitee
 
 ## [0.0.1] - 2017-07-29
- 
+
 ### Added
- 
+
 - All the things. Release early, release often.

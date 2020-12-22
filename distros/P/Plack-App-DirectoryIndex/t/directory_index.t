@@ -3,11 +3,12 @@ use warnings;
 use Test::More;
 use HTTP::Request::Common;
 use HTTP::Response;
+use File::Spec::Functions;
 use Plack::Test;
 use Plack::App::DirectoryIndex;
 
 my $handler = Plack::App::DirectoryIndex->new({
-  root => 't/share',
+  root => catdir(qw[t share]),
   dir_index => '',
 });
 
@@ -28,7 +29,7 @@ my %test = (
 test_psgi %test;
 
 $handler = Plack::App::DirectoryIndex->new({
-  root => 't/share',
+  root => catdir(qw[t share]),
   dir_index => 'index.html',
 });
 
@@ -38,7 +39,7 @@ $handler = Plack::App::DirectoryIndex->new({
 
     my $desc = 'Dir index defined';
 
-    open my $fh, ">", "t/share/index.html" or die $!;
+    open my $fh, ">", catfile(qw[t share index.html]) or die $!;
     print $fh "<html></html>";
     close $fh;
   
@@ -46,7 +47,7 @@ $handler = Plack::App::DirectoryIndex->new({
     is $res->code, 200, "$desc - response code is 200";
     is $res->content, "<html></html>", "$desc - content is correct";
   
-    unlink "t/share/index.html";
+    unlink catfile(qw[t share index.html]);
   },
   app => $handler,
 );
@@ -54,7 +55,7 @@ $handler = Plack::App::DirectoryIndex->new({
 test_psgi %test;
 
 $handler = Plack::App::DirectoryIndex->new({
-  root => 't/share',
+  root => catdir(qw[t share]),
   dir_index => 'random.html',
 });
 
@@ -64,10 +65,10 @@ $handler = Plack::App::DirectoryIndex->new({
 
     my $desc = 'Non-standard dir index defined';
 
-    open my $fh, ">", "t/share/random.html" or die $!;
+    open my $fh, ">", catfile(qw[t share random.html]) or die $!;
     print $fh "<html>random</html>";
     close $fh;
-    open my $fh2, ">", "t/share/index.html" or die $!;
+    open my $fh2, ">", catfile(qw[t share index.html]) or die $!;
     print $fh2 "<html></html>";
     close $fh2;
   
@@ -75,15 +76,15 @@ $handler = Plack::App::DirectoryIndex->new({
     is $res->code, 200, "$desc - response code is 200";
     is $res->content, "<html>random</html>", "$desc - content is correct";
   
-    unlink "t/share/index.html";
-    unlink "t/share/random.html";
+    unlink catfile(qw[t share index.html]);
+    unlink catfile(qw[t share random.html]);
   },
   app => $handler,
 );
 
 test_psgi %test;
 $handler = Plack::App::DirectoryIndex->new({
-  root => 't/share',
+  root => catdir(qw[t share]),
 });
 
 %test = (
@@ -92,7 +93,7 @@ $handler = Plack::App::DirectoryIndex->new({
   
     my $desc = 'Default dir index';
 
-    open my $fh, ">", "t/share/index.html" or die $!;
+    open my $fh, ">", catfile(qw[t share index.html]) or die $!;
     print $fh "<html></html>";
     close $fh;
   
@@ -100,7 +101,7 @@ $handler = Plack::App::DirectoryIndex->new({
     is $res->code, 200, "$desc - response code is 200";
     is $res->content, "<html></html>", "$desc - content is correct";
   
-    unlink "t/share/index.html";
+    unlink catfile(qw[t share index.html]);
   },
   app => $handler,
 );

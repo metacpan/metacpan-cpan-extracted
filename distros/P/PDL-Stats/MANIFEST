@@ -1,11 +1,7 @@
-Changes
-MANIFEST
-Makefile.PL
 add_doc.pl
-README.md
-Stats.pm
-Basic/stats_basic.pd
 Basic/Makefile.PL
+Basic/stats_basic.pd
+Changes
 Distr/distr.pd
 Distr/Makefile.PL
 Distr/t/stats_distr.t
@@ -16,15 +12,18 @@ GSL/Makefile.PL
 GSL/t/cdf.t
 Kmeans/kmeans.pd
 Kmeans/Makefile.PL
-t/01-checkmanifest.t
+Makefile.PL
+MANIFEST			This list of files
+README.md
+Stats.pm
+t/00-report-prereqs.t
 t/stats_basic.t
 t/stats_glm.t
-t/stats_ols_rptd.t
 t/stats_kmeans.t
+t/stats_ols_rptd.t
 t/stats_ts.t
-TS/ts.pd
 TS/Makefile.PL
-xt/00-check-changelog.t
+TS/ts.pd
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)
 GENERATED/PDL/GSL/CDF.pm                 mod=PDL::GSL::CDF pd=GSL/gsl_cdf.pd (added by pdlpp_mkgen)

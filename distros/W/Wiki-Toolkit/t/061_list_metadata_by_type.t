@@ -80,8 +80,8 @@ while ( my $wiki = $iterator->new_wiki ) {
        "Correct metadata names" );
 
 
-    # And un-moderate another, see its go away
-    $wiki->store->dbh->do("UPDATE content SET moderated = 'f' WHERE version = 2");
+    # And un-moderate another, see it go away
+    $wiki->store->dbh->do("UPDATE content SET moderated = '0' WHERE version = 2");
     @md = $wiki->store->list_metadata_by_type("category");
     is_deeply( [sort @md], [ "Burgers", "Cafe", "Hammersmith",
                            "Oxford", "Restaurant", "Thai Food" ],

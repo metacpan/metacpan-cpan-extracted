@@ -59,7 +59,7 @@ resources:
   bugtracker: https://github.com/vanstyn/DBIx-Class-AuditAny/issues
   homepage: https://github.com/vanstyn/DBIx-Class-AuditAny
   repository: https://github.com/vanstyn/DBIx-Class-AuditAny.git
-version: 0.200100
+version: 0.200200
 x_contributors:
   - 'Peter Rabbitson <ribasushi@cpan.org>'
   - 'Tom Bloor <tom.bloor@googlemail.com>'

@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package MetaCPAN::Client::Release;
 # ABSTRACT: A Release data object
-$MetaCPAN::Client::Release::VERSION = '2.028000';
+$MetaCPAN::Client::Release::VERSION = '2.029000';
 use Moo;
 use Ref::Util qw< is_hashref >;
 use JSON::MaybeXS qw< decode_json >;
@@ -16,6 +16,8 @@ my %known_fields = (
         archive
         author
         authorized
+        checksum_md5
+        checksum_sha256
         date
         deprecated
         distribution
@@ -97,7 +99,7 @@ MetaCPAN::Client::Release - A Release data object
 
 =head1 VERSION
 
-version 2.028000
+version 2.029000
 
 =head1 SYNOPSIS
 
@@ -145,6 +147,14 @@ A boolean indicating whether or not this was an authorized release.
 =head2 download_url
 
 A URL for this release's distribution archive file.
+
+=head2 checksum_sha256
+
+The sha256 hexdigest for this release's distribution archive file.
+
+=head2 checksum_md5
+
+The md5 hexdigest for this release's distribution archive file.
 
 =head2 first
 

@@ -7,7 +7,7 @@ use vars qw( @ISA $VERSION $SCHEMA_VERSION );
 use Wiki::Toolkit::Setup::Database;
 
 @ISA = qw( Wiki::Toolkit::Setup::Database );
-$VERSION = '0.10';
+$VERSION = '0.11';
 
 use DBI;
 use Carp;
@@ -15,123 +15,6 @@ use Carp;
 $SCHEMA_VERSION = $VERSION*100;
 
 my $create_sql = {
-    8 => {
-        schema_info => [ qq|
-CREATE TABLE schema_info (
-  version   integer      NOT NULL default 0
-)
-|, qq|
-INSERT INTO schema_info VALUES (8)
-| ],
-
-        node => [ qq|
-CREATE SEQUENCE node_seq
-|, qq|
-CREATE TABLE node (
-  id        integer      NOT NULL DEFAULT NEXTVAL('node_seq'),
-  name      varchar(200) NOT NULL DEFAULT '',
-  version   integer      NOT NULL default 0,
-  text      text         NOT NULL default '',
-  modified  timestamp without time zone    default NULL,
-  CONSTRAINT pk_id PRIMARY KEY (id)
-)
-|, qq|
-CREATE UNIQUE INDEX node_name ON node (name)
-| ],
-
-        content => [ qq|
-CREATE TABLE content (
-  node_id   integer      NOT NULL,
-  version   integer      NOT NULL default 0,
-  text      text         NOT NULL default '',
-  modified  timestamp without time zone    default NULL,
-  comment   text         NOT NULL default '',
-  CONSTRAINT pk_node_id PRIMARY KEY (node_id,version),
-  CONSTRAINT fk_node_id FOREIGN KEY (node_id) REFERENCES node (id)
-)
-| ],
-
-        internal_links => [ qq|
-CREATE TABLE internal_links (
-  link_from varchar(200) NOT NULL default '',
-  link_to   varchar(200) NOT NULL default ''
-)
-|, qq|
-CREATE UNIQUE INDEX internal_links_pkey ON internal_links (link_from, link_to)
-| ],
-
-        metadata => [ qq|
-CREATE TABLE metadata (
-  node_id        integer      NOT NULL,
-  version        integer      NOT NULL default 0,
-  metadata_type  varchar(200) NOT NULL DEFAULT '',
-  metadata_value text         NOT NULL DEFAULT '',
-  CONSTRAINT fk_node_id FOREIGN KEY (node_id) REFERENCES node (id)
-)
-|, qq|
-CREATE INDEX metadata_index ON metadata (node_id, version, metadata_type, metadata_value)
-| ]
-
-    },
-    9 => {
-        schema_info => [ qq|
-CREATE TABLE schema_info (
-  version   integer      NOT NULL default 0
-)
-|, qq|
-INSERT INTO schema_info VALUES (9)
-| ],
-
-        node => [ qq|
-CREATE SEQUENCE node_seq
-|, qq|
-CREATE TABLE node (
-  id        integer      NOT NULL DEFAULT NEXTVAL('node_seq'),
-  name      varchar(200) NOT NULL DEFAULT '',
-  version   integer      NOT NULL default 0,
-  text      text         NOT NULL default '',
-  modified  timestamp without time zone    default NULL,
-  moderate  boolean      NOT NULL default '0',
-  CONSTRAINT pk_id PRIMARY KEY (id)
-)
-|, qq|
-CREATE UNIQUE INDEX node_name ON node (name)
-| ],
-
-        content => [ qq|
-CREATE TABLE content (
-  node_id   integer      NOT NULL,
-  version   integer      NOT NULL default 0,
-  text      text         NOT NULL default '',
-  modified  timestamp without time zone    default NULL,
-  comment   text         NOT NULL default '',
-  moderated boolean      NOT NULL default '1',
-  CONSTRAINT pk_node_id PRIMARY KEY (node_id,version),
-  CONSTRAINT fk_node_id FOREIGN KEY (node_id) REFERENCES node (id)
-)
-| ],
-
-        internal_links => [ qq|
-CREATE TABLE internal_links (
-  link_from varchar(200) NOT NULL default '',
-  link_to   varchar(200) NOT NULL default ''
-)
-|, qq|
-CREATE UNIQUE INDEX internal_links_pkey ON internal_links (link_from, link_to)
-| ],
-
-        metadata => [ qq|
-CREATE TABLE metadata (
-  node_id        integer      NOT NULL,
-  version        integer      NOT NULL default 0,
-  metadata_type  varchar(200) NOT NULL DEFAULT '',
-  metadata_value text         NOT NULL DEFAULT '',
-  CONSTRAINT fk_node_id FOREIGN KEY (node_id) REFERENCES node (id)
-)
-|, qq|
-CREATE INDEX metadata_index ON metadata (node_id, version, metadata_type, metadata_value)
-| ]
-    },
     10 => {
         schema_info => [ qq|
 CREATE TABLE schema_info (
@@ -193,80 +76,90 @@ CREATE TABLE metadata (
 CREATE INDEX metadata_index ON metadata (node_id, version, metadata_type, metadata_value)
 | ]
     },
+    11 => {
+        schema_info => [ qq|
+CREATE TABLE schema_info (
+  version   integer      NOT NULL default 0
+)
+|, qq|
+INSERT INTO schema_info VALUES (11)
+| ],
+
+        node => [ qq|
+CREATE SEQUENCE node_seq
+|, qq|
+CREATE TABLE node (
+  id        integer      NOT NULL DEFAULT NEXTVAL('node_seq'),
+  name      varchar(200) NOT NULL DEFAULT '',
+  version   integer      NOT NULL default 0,
+  text      text         NOT NULL,
+  modified  timestamp without time zone    default NULL,
+  moderate  boolean      NOT NULL default '0',
+  CONSTRAINT pk_id PRIMARY KEY (id)
+)
+|, qq|
+CREATE UNIQUE INDEX node_name ON node (name)
+| ],
+
+        content => [ qq|
+CREATE TABLE content (
+  node_id   integer      NOT NULL,
+  version   integer      NOT NULL default 0,
+  text      text         NOT NULL,
+  modified  timestamp without time zone    default NULL,
+  comment   text,
+  moderated boolean      NOT NULL default '1',
+  verified  timestamp without time zone    default NULL,
+  verified_info text,
+  CONSTRAINT pk_node_id PRIMARY KEY (node_id,version),
+  CONSTRAINT fk_node_id FOREIGN KEY (node_id) REFERENCES node (id)
+)
+| ],
+
+        internal_links => [ qq|
+CREATE TABLE internal_links (
+  link_from varchar(200) NOT NULL default '',
+  link_to   varchar(200) NOT NULL default ''
+)
+|, qq|
+CREATE UNIQUE INDEX internal_links_pkey ON internal_links (link_from, link_to)
+| ],
+
+        metadata => [ qq|
+CREATE TABLE metadata (
+  node_id        integer      NOT NULL,
+  version        integer      NOT NULL default 0,
+  metadata_type  varchar(200) NOT NULL DEFAULT '',
+  metadata_value text         NOT NULL,
+  CONSTRAINT fk_node_id FOREIGN KEY (node_id) REFERENCES node (id)
+)
+|, qq|
+CREATE INDEX metadata_index ON metadata (node_id, version, metadata_type, metadata_value)
+| ]
+    },
 };
 
 my %upgrades = (
-    old_to_8 => [ qq|
-CREATE SEQUENCE node_seq;
-ALTER TABLE node ADD COLUMN id INTEGER;
-UPDATE node SET id = NEXTVAL('node_seq');
+    '10_to_11' => [
+        qq|
+ALTER TABLE node ALTER COLUMN text DROP DEFAULT
+ |, qq|
+ALTER TABLE content ALTER COLUMN text DROP DEFAULT
 |, qq|
-ALTER TABLE node ALTER COLUMN id SET NOT NULL;
-ALTER TABLE node ALTER COLUMN id SET DEFAULT NEXTVAL('node_seq');
+ALTER TABLE content ALTER COLUMN comment DROP DEFAULT
 |, qq|
-DROP INDEX node_pkey;
-ALTER TABLE node ADD CONSTRAINT pk_id PRIMARY KEY (id);
-CREATE UNIQUE INDEX node_name ON node (name)
-|, 
-
-qq|
-ALTER TABLE content ADD COLUMN node_id INTEGER;
-UPDATE content SET node_id = 
-    (SELECT id FROM node where node.name = content.name)
+ALTER TABLE content ALTER COLUMN comment DROP NOT NULL
 |, qq|
-DELETE FROM content WHERE node_id IS NULL;
-ALTER TABLE content ALTER COLUMN node_id SET NOT NULL;
-ALTER TABLE content DROP COLUMN name;
-ALTER TABLE content ADD CONSTRAINT pk_node_id PRIMARY KEY (node_id,version);
-ALTER TABLE content ADD CONSTRAINT fk_node_id FOREIGN KEY (node_id) REFERENCES node (id)
-|, 
-
-qq|
-ALTER TABLE metadata ADD COLUMN node_id INTEGER;
-UPDATE metadata SET node_id = 
-    (SELECT id FROM node where node.name = metadata.node)
+ALTER TABLE content ALTER COLUMN verified_info DROP DEFAULT
 |, qq|
-DELETE FROM metadata WHERE node_id IS NULL;
-ALTER TABLE metadata ALTER COLUMN node_id SET NOT NULL;
-ALTER TABLE metadata DROP COLUMN node;
-ALTER TABLE metadata ADD CONSTRAINT fk_node_id FOREIGN KEY (node_id) REFERENCES node (id);
-CREATE INDEX metadata_index ON metadata (node_id, version, metadata_type, metadata_value)
+ALTER TABLE content ALTER COLUMN verified_info DROP NOT NULL
+|, qq|
+ALTER TABLE metadata ALTER COLUMN metadata_value DROP DEFAULT
+|, qq|
+UPDATE schema_info SET version = 11
 |,
-
-qq|
-CREATE TABLE schema_info (version integer NOT NULL default 0);
-INSERT INTO schema_info VALUES (8)
-|
-],
-
-'8_to_9' => [ qq|
-ALTER TABLE node ADD COLUMN moderate boolean;
-UPDATE node SET moderate = '0';
-ALTER TABLE node ALTER COLUMN moderate SET DEFAULT '0';
-ALTER TABLE node ALTER COLUMN moderate SET NOT NULL;
-|, qq|
-ALTER TABLE content ADD COLUMN moderated boolean;
-UPDATE content SET moderated = '1';
-ALTER TABLE content ALTER COLUMN moderated SET DEFAULT '1';
-ALTER TABLE content ALTER COLUMN moderated SET NOT NULL;
-UPDATE schema_info SET version = 9;
-|
-],
-
-'9_to_10' => [ qq|
-ALTER TABLE content ADD COLUMN verified timestamp without time zone default NULL;
-ALTER TABLE content ADD COLUMN verified_info text NOT NULL default '';
-|, qq|
-UPDATE schema_info SET version = 10;
-|
-],
-
+    ],
 );
-
-my @old_to_10 = ($upgrades{'old_to_8'},$upgrades{'8_to_9'},$upgrades{'9_to_10'});
-my @eight_to_10 = ($upgrades{'8_to_9'},$upgrades{'9_to_10'});
-$upgrades{'old_to_10'} = \@old_to_10;
-$upgrades{'8_to_10'} = \@eight_to_10;
 
 =head1 NAME
 

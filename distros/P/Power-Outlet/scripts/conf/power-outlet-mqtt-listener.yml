@@ -1,7 +1,7 @@
 ---
 host: mqtt
 
-directives: 
+directives:
 
 - name: Smart Outlet Top Button Press
   topic: cmnd/smartoutlet_button_topic/POWER1
@@ -25,20 +25,9 @@ directives:
       outlets: '1,2,6,7'
       host: bar
 
-- name: Outlet One Toggle Outside Lights
-  topic: stat/outlet-one/POWER
-  value: ON
-  actions:
-  - name: Outside Lights
-    driver: iBootBarGroup
-    command: 'SWITCH'
-    options:
-      outlets: '1,2,6,7'
-      host: bar
-
-- name: Outlet One Toggle Outside Lights
-  topic: stat/outlet-one/POWER
-  value: OFF
+- name: MQTT Event Toggle Outside Lights
+  topic: cmnd/outside_lights/EVENT
+  value: TOGGLE
   actions:
   - name: Outside Lights
     driver: iBootBarGroup

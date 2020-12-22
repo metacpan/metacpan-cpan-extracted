@@ -1,5 +1,5 @@
 package Yancy::Util;
-our $VERSION = '1.067';
+our $VERSION = '1.068';
 # ABSTRACT: Utilities for Yancy
 
 #pod =head1 SYNOPSIS
@@ -42,7 +42,7 @@ use Mojo::Util qw( xml_escape );
 use Carp qw( carp );
 
 our @EXPORT_OK = qw( load_backend curry currym copy_inline_refs match derp fill_brackets
-    is_type order_by is_format );
+    is_type order_by is_format json_validator );
 
 #pod =sub load_backend
 #pod
@@ -487,6 +487,32 @@ sub derp(@) {
     $DERPED{ $key } = 1;
 }
 
+#pod =sub json_validator
+#pod
+#pod     my $json_validator = json_validator( $schema );
+#pod
+#pod Build a L<JSON::Validator> object for the given schema, adding all the
+#pod necessary attributes.
+#pod
+#pod =cut
+
+sub json_validator {
+    my ( $schema ) = @_;
+    my $v = JSON::Validator::OpenAPI::Mojolicious->new(
+        # This fixes HTML forms submitting the string "20" not being
+        # detected as a number, or the number 1 not being detected as
+        # a boolean
+        coerce => { booleans => 1, numbers => 1, strings => 1 },
+    );
+    my $formats = $v->formats;
+    $formats->{ password } = sub { undef };
+    $formats->{ filepath } = sub { undef };
+    $formats->{ markdown } = sub { undef };
+    $formats->{ tel } = sub { undef };
+    $formats->{ textarea } = sub { undef };
+    return $v;
+}
+
 1;
 
 __END__
@@ -499,7 +525,7 @@ Yancy::Util - Utilities for Yancy
 
 =head1 VERSION
 
-version 1.067
+version 1.068
 
 =head1 SYNOPSIS
 
@@ -668,6 +694,13 @@ Returns true if the given JSON schema format value (a string) is the given value
 
 Print out a deprecation message as a warning. A message will only be
 printed once for each set of arguments from each caller.
+
+=head2 json_validator
+
+    my $json_validator = json_validator( $schema );
+
+Build a L<JSON::Validator> object for the given schema, adding all the
+necessary attributes.
 
 =head1 SEE ALSO
 

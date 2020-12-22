@@ -41,7 +41,7 @@ SYNOPSIS
     
       $sns->service('http://sns.us-east-1.amazonaws.com');
 
-DESCRIPTIN
+DESCRIPTION
 
     Amazon::SNS::V4 is basically Amazon::SNS v1.3, changed to use v4
     Signatures, from AWS::Signature4.

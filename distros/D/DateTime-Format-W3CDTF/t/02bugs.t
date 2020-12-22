@@ -11,7 +11,7 @@
 #   explicitly as "00:00:00", the method will not print a timestamp or an offset.
 
 use strict;
-use Test::More tests => 5;
+use Test::More tests => 7;
 
 use DateTime;
 use DateTime::Format::W3CDTF;
@@ -51,11 +51,29 @@ my @dates = (
         },
         w3cdtf => '2009-11-25T00:00:00+00:00',
         msg    => 'formatter handles tz offset of 0 properly'
+    }, {
+        date => {
+            year => 1977, month => 11, day => 11, hour => 1, minute => 12,
+            time_zone => 'floating'
+        },
+        w3cdtf => '1977-11-11T01:12:00',
+        msg    => 'loose formatter works with "floating" timezone',
+    }, {
+        date => {
+            year => 1977, month => 11, day => 11, hour => 1, minute => 12,
+            time_zone => 'floating'
+        },
+        strict => 1,
+        w3cdtf => undef,
+        msg    => 'strict formatter fails with "floating" timezone',
     }
 );
-my $f = DateTime::Format::W3CDTF->new();
 
 foreach my $d (@dates) {
-    my $dt = DateTime->new( %{ $d->{date} } );
-    is( $f->format_datetime($dt), $d->{w3cdtf}, $d->{msg} );
+    my %opts = map {$_ => $d->{$_}} qw/ strict default_tz /;
+    my $f    = DateTime::Format::W3CDTF->new(%opts);
+    my $dt   = DateTime->new( %{ $d->{date} } );
+    my $str  = eval { $f->format_datetime($dt) };
+
+    is( $str, $d->{w3cdtf}, $d->{msg} );
 }

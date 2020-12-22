@@ -1,4 +1,4 @@
-File-TVShow-Organize version 0.35
+File-TVShow-Organize version 0.360.1 / 0.36.1
 ============================
 
 This module makes it easier to move TV Show files into the correct Show
@@ -60,7 +60,28 @@ Example Usage:
   #end of program
 
 
-  See perldoc for more examples of usage.
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc File::TVShow::Organize
+
+You can also look for information at:
+
+	GitHub
+	https://github.com/Bas-Man/File-TVShow-Organize
+	https://github.com/Bas-Man/File-TVShow-Organize/issues
+
+	RT, CPAN's request tracker (report bugs here)
+        https://rt.cpan.org/NoAuth/Bugs.html?Dist=File-TVShow-Organize
+
+	CPAN Ratings
+        https://cpanratings.perl.org/d/File-TVShow-Organize
+
+	Search CPAN
+        https://metacpan.org/release/File-TVShow-Organize
+
 
 DEPENDENCIES
 
@@ -69,13 +90,14 @@ This module requires these other modules and libraries:
 File::TVShow::Info;
 File::Path;
 File::Copy;
+IPC::Cmd;
 Carp;
 
 These files are of course accessible through CPAN
 
 COPYRIGHT AND LICENCE
 
-Copyright (C) 2018 by Adam Spann
+Copyright (C) 2018-2020 by Adam Spann
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.12.4 or,

@@ -76,6 +76,9 @@
     (void) hv_store (hash, #field, strlen (#field),			\
 		     newSViv (str->field), 0)
 
+/* TODO: Dereferencing the av_fetch pointer like this is dangerous,
+   these macros need to be changed. */
+
 #define ARRAY_FETCH_PV(array,n,value,length)	\
     {						\
 	SV * sv;				\

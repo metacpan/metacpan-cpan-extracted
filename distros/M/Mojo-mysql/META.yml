@@ -26,7 +26,7 @@ resources:
   bugtracker: https://github.com/jhthorsen/mojo-mysql/issues
   homepage: https://github.com/jhthorsen/mojo-mysql
   repository: https://github.com/jhthorsen/mojo-mysql.git
-version: '1.20'
+version: '1.22'
 x_contributors:
   - 'Curt Hochwender <hochwender@centurytel.net>'
   - 'Dan Book <dbook@cpan.org>'

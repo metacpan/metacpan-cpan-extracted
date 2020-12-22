@@ -1,3 +1,11 @@
+0.004003  2020-09-21  Released-By: PERLANCAR; Urgency: low
+
+	  - No functional changes.
+
+	  - [doc] Mention Module::List::{More,Wildcard}, remove mention to
+	    PERLANCAR::Module::List.
+
+
 0.004002  2019-09-02  Released-By: PERLANCAR; Urgency: low
 
 	  - No functional changes.

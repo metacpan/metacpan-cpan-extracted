@@ -12,16 +12,29 @@ use Types::Standard qw(:all);
 has 'fingerprint', is => 'ro', lazy => 1, default => sub {
   my $self = shift;
   die __PACKAGE__ . ' must supply either a checksum "fingerprint" or "DiffState"' unless ($self->DiffState);
-  my $fp = $self->filtered_DiffState->fingerprint;
-  $fp =~ s/\-/_/g;
-  return $fp
+  $self->_normalize_fingerprint( $self->filtered_DiffState->fingerprint )
 }, isa => Str;
 
+sub _normalize_fingerprint {
+  my $self = shift;
+  my $fp = shift or return undef;
+  $fp =~ s/\-/_/g;
+  return $fp
+}
+
+
 has 'DiffState' => (
-  is => 'ro', lazy => 1,
+  is => 'rwp', lazy => 1,
   isa => Maybe[InstanceOf['DBIx::Class::Schema::Diff::State']],
   default => sub { undef }
 );
+
+sub _clear_DiffState {
+  my $self = shift;
+  $self->fingerprint; # make sure we've already recorded the fingerprint
+  $self->_set_DiffState( undef )
+}
+
 
 has 'diff_filters', is => 'ro', default => sub {[]}, isa => ArrayRef;
 
@@ -43,6 +56,21 @@ sub filtered_DiffState {
   }
   
   $State
+}
+
+sub validate_fingerprint {
+  my $self = shift;
+  my $fp = $self->fingerprint or die "Couldn't obtain fingerprint";
+  
+  if($self->DiffState) {
+    my $fresh_fp = $self->_normalize_fingerprint(
+      $self->filtered_DiffState->fingerprint
+    ) or die "Failed to obtain fingerprint from DiffState data";
+    
+    $fp eq $fresh_fp or die (
+      "The recalculated fingerprint of the filtered DiffState data ($fresh_fp) does not match the declared/supplied fingerprint ($fp)"
+    )
+  }
 }
 
 

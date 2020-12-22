@@ -1,17 +1,11 @@
 #!/usr/bin/perl
 #
 # text2cow - prints Cow source code that prints a given text
-#
-# Author:      Peter John Acklam
-# Time-stamp:  2010-05-26 14:18:31 +02:00
-# E-mail:      pjacklam@online.no
-# URL:         http://home.online.no/~pjacklam
 
-###############################################################################
+################################################################################
 ## Modules and package variables.
-###############################################################################
+################################################################################
 
-use 5.008;              # required version of Perl
 use strict;             # restrict unsafe constructs
 use warnings;           # control optional warnings
 
@@ -23,20 +17,20 @@ use Getopt::Std ();     # process single-character command line options
 our $opt_h;
 our $opt_v;
 
-###############################################################################
+################################################################################
 ## File-private lexical variables.
-###############################################################################
+################################################################################
 
-my $VERSION  = '0.001';                         # program version
+my $VERSION  = '0.002';                         # program version
 my $PROGNAME = File::Basename::basename($0);    # program name
 
 my $ncmd_on_line = 0;   # number of command written on current line
 
-###############################################################################
+################################################################################
 ## Subroutines.
-###############################################################################
+################################################################################
 
-###############################################################################
+################################################################################
 # print_version
 #
 # Print program version and copyright information.
@@ -46,14 +40,14 @@ sub print_version () {
 
 $PROGNAME $VERSION
 
-Copyright 2007-2010 Peter John Acklam.
+Copyright 2007-2020 Peter John Acklam.
 This program is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself.
 
 EOF
 }
 
-###############################################################################
+################################################################################
 # print_usage
 #
 # Print program usage.
@@ -72,11 +66,11 @@ Example: \$ printf 'Hello, World!\\n' | $PROGNAME > hello.cow
          \$ cow hello.cow
          Hello, World!
 
-Report bugs to <pjacklam\@online.no>.
+Report bugs to <pjacklam\@gmail.com>.
 EOF
 }
 
-###############################################################################
+################################################################################
 # output COMMAND
 #
 # Prints a COMMAND to the standard output.
@@ -93,9 +87,9 @@ sub output {
     ++ $ncmd_on_line;
 }
 
-###############################################################################
+################################################################################
 ## Process command line options and arguments.
-###############################################################################
+################################################################################
 
 Getopt::Std::getopts('hv') or die <<"EOF";
 For more information: $PROGNAME -h
@@ -104,9 +98,9 @@ EOF
 print_usage,   exit if $opt_h;
 print_version, exit if $opt_v;
 
-###############################################################################
+################################################################################
 ## This is where the real action begins.
-###############################################################################
+################################################################################
 
 die "$PROGNAME: Too many input arguments" if @ARGV > 1;
 
@@ -174,7 +168,3 @@ for (my $i = 0 ; $i < $n ; ++ $i) {
 }
 
 print "\n" or die "$PROGNAME: print failed: $!\n";
-
-# Emacs Local Variables:
-# Emacs coding: us-ascii-unix
-# Emacs End:

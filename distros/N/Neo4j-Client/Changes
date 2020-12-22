@@ -9,4 +9,5 @@ Revision history for Perl module Neo4j::Client
     - Install config.h, libneo4j-client src/lib/*.h, and add DEV_CCFLAGS
 0.17 2020-06-03
     - Workaround when pkg-config not present, but ssl libs are (freebsd)
-    
+0.20 2020-12-19
+    - Add -DHAVE_BIO_METH_NEW for openssl 1.1.1

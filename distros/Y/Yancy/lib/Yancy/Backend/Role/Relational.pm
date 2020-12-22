@@ -1,5 +1,5 @@
 package Yancy::Backend::Role::Relational;
-our $VERSION = '1.067';
+our $VERSION = '1.068';
 # ABSTRACT: A role to give a relational backend relational capabilities
 
 #pod =head1 SYNOPSIS
@@ -461,7 +461,7 @@ Yancy::Backend::Role::Relational - A role to give a relational backend relationa
 
 =head1 VERSION
 
-version 1.067
+version 1.068
 
 =head1 SYNOPSIS
 

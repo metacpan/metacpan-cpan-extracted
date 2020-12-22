@@ -42,15 +42,14 @@ use Chj::xperlfunc ":all";
 use FP::PureArray ":all";
 use Chj::TEST ":all";
 use FP::Carp;
-
-my $mainfile = "README.md";
+use Chj::xIO qw(with_output_to_file);
 
 sub usage {
-    print "usage: $myname path/to/hiring-without-whiteboards/
+    print "usage: $myname path/to/hiring-without-whiteboards/README.md
 
   Starts an \`FP::Repl\` with access to a \`cs\` function which returns a
   stream (\`FP::Stream\`) of \`Company\` objects representing the contents
-  of the $mainfile file of a check-out of
+  of the given file from a check-out of
   https://github.com/poteto/hiring-without-whiteboards
 
   You can then enter 'queries' like:
@@ -66,6 +65,10 @@ sub usage {
   variable (don't use \`my\` for making variables, or they won't persist
   to your next entry). Also see the docs on \`functional-perl.org\`.
 
+  To redirect printing to a file, use
+
+     with_output_to_file \$filename, sub { ... }
+
   See https://news.ycombinator.com/item?id=19290044 for a
   discussion.
 
@@ -76,16 +79,16 @@ sub usage {
 our $verbose = 0;
 GetOptions("verbose" => \$verbose, "help" => sub {usage},) or exit 1;
 
-my ($basedir) = @ARGV;
+my ($file) = @ARGV;
 
 # XX lib
 sub triples {
     my @out;
     while (@_) {
         my $k = shift;
-        @_ or die "wrong number of inputs";
+        @_ or fp_croak_arity "n*3";
         my $v = shift;
-        @_ or die "wrong number of inputs";
+        @_ or fp_croak_arity "n*3";
         my $v2 = shift;
         push @out, [$k, $v, $v2]
     }
@@ -447,13 +450,13 @@ sub parse_line($line) {
 
     my @p = split /\s*\|\s*/, $rest;
     @p == 2 or @p == 3 or die "rest does not contain 2 or 3 parts: '$rest'";
-    my (undef, $locations, $process) = @p;
+    my (undef, $locations, $maybe_process) = @p;
     Company(
         $name, $url,
 
         # /, ; and & used inconsistently:
         list(map { parse_location $_ } split m%\s*[/;&]\s*%, $locations),
-        $process
+        $maybe_process
     )
 }
 
@@ -478,7 +481,7 @@ sub FP::Abstract::Sequence::drop_over ($l, $pred) {
 }
 
 sub datalines () {
-    xfile_lines_chomp("$basedir/$mainfile", "UTF-8")->drop_over(\&is_hr)
+    xfile_lines_chomp("$file", "UTF-8")->drop_over(\&is_hr)
         ->take_while(complement \&is_AlsoSee)->filter(complement \&is_empty)
 }
 

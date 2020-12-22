@@ -1,3 +1,8 @@
+
+0.07 2020-12-19
+  - Use the Down Arrow Button to get selectbox options
+    and option text to select
+
 0.06  2020-03-14
   - Move 01-critic.t to xt/ in order to stop CPANtesters
     from failing

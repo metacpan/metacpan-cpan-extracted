@@ -83,6 +83,9 @@ sub draw_on {
   )->cdata($self->text);
 }
 
+no Moose;
+__PACKAGE__->meta->make_immutable;
+
 =head1 AUTHOR
 
 Dave Cross <dave@perlhacks.com>

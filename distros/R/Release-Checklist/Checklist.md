@@ -86,7 +86,7 @@ history.
 # Dependencies
 
 Every module you use is a module your release will depend on. If a new
-release of such module fails, the likelyhood of your release being
+release of such module fails, the likelihood of your release being
 unable to install increases. So only use modules that you need. Each
 dependency should be well-considered.
 
@@ -171,7 +171,7 @@ license.
 
 # Documentation
 
-Make sure that you have a clear, consice, and short SYNOPSIS section. This
+Make sure that you have a clear, concise, and short SYNOPSIS section. This
 section should show the most important code as simple and clear as possible.
 If you have 3500 methods in your class, do not list all of the there. Just
 show how to create the object and show the 4 methods that a beginner would
@@ -213,7 +213,7 @@ might be an insult to others. Keep neutral.
 
 Not every developer is of native English tongue. And even if, they
 also make (spelling) mistakes. There are enough tools available to
-prevent public display of misspellings and typoes. Use them.
+prevent public display of misspellings and typos. Use them.
 
 It is a good plan to have someone else proofread your documentation.
 If you can, ask three readers: one who knows about what the module is
@@ -442,9 +442,18 @@ Check [MANIFEST](./MANIFEST) and [MANIFEST.skip](./MANIFEST.skip) are complete.
  - [Test::Manifest](https://metacpan.org/pod/Test::Manifest)
  - [Test::DistManifest](https://metacpan.org/pod/Test::DistManifest)
 
+``` sh
+ $ perl -MTest::DistManifest -we'manifest_ok'
+ 1..4
+ ok 1 - Parse MANIFEST or equivalent
+ ok 2 - All files are listed in MANIFEST or skipped
+ ok 3 - All files listed in MANIFEST exist on disk
+ ok 4 - No files are in both MANIFEST and MANIFEST.SKIP
+```
+
 # File naming
 
-Don not make it hard for people and modules to use the files in your
+Do not make it hard for people and modules to use the files in your
 distribution by using spaces and special characters in file names. Also try
 to not use overly long names and deep directory structures.
 
@@ -569,7 +578,7 @@ configuration files or set up databases, that should be mentioned too.
 
 # Tickets
 
-If your module is on [github][https://github.com] or similar, regularly check
+If your module is on [github](https://github.com) or similar, regularly check
 on submitted issues and deal with them: either explain why it is not an issue
 or comment with alternatives or even better: this has been fixed now.
 Additionally, you should check on possible forks of your code and check the
@@ -578,12 +587,28 @@ you could use to improve your code. If the changes they made are already taken
 into your own code, or your code offers a (better) alternative to their change
 you could comment on their commits with additional information.
 
-Likewise if you use [RT][https://rt.perl.org] as bug tracker.
+Likewise if you use [RT](https://rt.perl.org) as bug tracker.
 
 If any ticket is entered as a vulnerability issue, be sure to make clear in
 the feedback to that issue that it is indeed a security issue and how you
 dealt with it or that you do/did not acknowledge this as a vulnerability, but
 as a (plain/simple) bug and deal with at with the appropriate actions.
+
+Whatever you choose, make it clear in your META information, so the link to
+issues on [metacpan](https://metacpan.org/) points to the correct location.
+
+ META.yml
+ ---
+ resources:
+  bugtracker: https://github.com/Tux/Release-Checklist/issues
+
+ META.json
+ ---
+ "resources" : {
+   "bugtracker" : {
+     "web" : "https://github.com/Tux/Release-Checklist/issues"
+     }
+   }
 
 # Downriver
 
@@ -596,7 +621,7 @@ if the new release would cause the other module(s) to break.
 [used_by.pl](./scripts/used-by.pl) will check the depending modules with the
 upcoming version.
 
-Of course it is imposible to cover every possible situation here. The DarkPAN
+Of course it is impossible to cover every possible situation here. The DarkPAN
 (uses of your module beyond what is registered on CPAN) is huge.
 
 # LICENSE

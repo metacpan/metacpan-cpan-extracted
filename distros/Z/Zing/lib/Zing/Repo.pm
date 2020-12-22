@@ -12,29 +12,20 @@ use Data::Object::Class;
 use Data::Object::ClassHas;
 use Data::Object::Space;
 
-use Zing::Server;
+extends 'Zing::Entity';
+
 use Zing::Store;
 use Zing::Term;
 
-our $VERSION = '0.13'; # VERSION
+our $VERSION = '0.20'; # VERSION
 
 # ATTRIBUTES
 
 has 'name' => (
   is => 'ro',
-  isa => 'Str',
+  isa => 'Name',
   req => 1,
 );
-
-has 'server' => (
-  is => 'ro',
-  isa => 'Server',
-  new => 1,
-);
-
-fun new_server($self) {
-  Zing::Server->new
-}
 
 has 'store' => (
   is => 'ro',
@@ -43,35 +34,25 @@ has 'store' => (
 );
 
 fun new_store($self) {
-  Data::Object::Space->new($ENV{ZING_STORE} || 'Zing::Redis')->build
-}
-
-has 'target' => (
-  is => 'ro',
-  isa => 'Enum[qw(global local)]',
-  new => 1,
-);
-
-fun new_target($self) {
-  $ENV{ZING_TARGET} || 'local'
+  $self->app->store
 }
 
 # METHODS
 
-method drop(Str @keys) {
-  return $self->store->drop($self->term(@keys));
+method drop() {
+  return $self->store->drop($self->term);
 }
 
-method keys() {
-  return $self->store->keys($self->term);
+method search() {
+  $self->app->search(store => $self->store)->using($self);
 }
 
-method term(Str @keys) {
-  return Zing::Term->new($self, @keys)->repo;
+method term() {
+  return $self->app->term($self)->repo;
 }
 
 method test(Str @keys) {
-  return $self->store->test($self->term(@keys));
+  return $self->store->test($self->term);
 }
 
 1;
@@ -94,9 +75,9 @@ Generic Store Abstraction
 
   use Zing::Repo;
 
-  my $repo = Zing::Repo->new(name => 'repo');
+  my $repo = Zing::Repo->new(name => 'text');
 
-  # $repo->recv('text-1');
+  # $repo->recv;
 
 =cut
 
@@ -128,27 +109,11 @@ This attribute is read-only, accepts C<(Str)> values, and is required.
 
 =cut
 
-=head2 server
-
-  server(Server)
-
-This attribute is read-only, accepts C<(Server)> values, and is optional.
-
-=cut
-
 =head2 store
 
   store(Store)
 
 This attribute is read-only, accepts C<(Store)> values, and is optional.
-
-=cut
-
-=head2 target
-
-  target(Enum[qw(global local)])
-
-This attribute is read-only, accepts C<(Enum[qw(global local)])> values, and is optional.
 
 =cut
 
@@ -160,7 +125,7 @@ This package implements the following methods:
 
 =head2 drop
 
-  drop(Str @keys) : Int
+  drop() : Int
 
 The drop method returns truthy if the data was removed from the store.
 
@@ -176,20 +141,20 @@ The drop method returns truthy if the data was removed from the store.
 
 =cut
 
-=head2 keys
+=head2 search
 
-  keys() : ArrayRef[Str]
+  search() : Search
 
-The keys method returns a list of fully-qualified keys stored under the
-datastore namespace.
+The search method returns a L<Zing::Search> object based on the current repo or
+L<Zing::Repo> derived object.
 
 =over 4
 
-=item keys example #1
+=item search example #1
 
   # given: synopsis
 
-  my $keys = $repo->keys;
+  my $search = $repo->search;
 
 =back
 
@@ -197,7 +162,7 @@ datastore namespace.
 
 =head2 term
 
-  term(Str @keys) : Str
+  term() : Str
 
 The term method generates a term (safe string) for the datastore.
 
@@ -207,7 +172,7 @@ The term method generates a term (safe string) for the datastore.
 
   # given: synopsis
 
-  my $term = $repo->term('text-1');
+  my $term = $repo->term;
 
 =back
 
@@ -215,7 +180,7 @@ The term method generates a term (safe string) for the datastore.
 
 =head2 test
 
-  test(Str @keys) : Int
+  test() : Int
 
 The test method returns truthy if the specific key (or datastore) exists.
 
@@ -225,7 +190,7 @@ The test method returns truthy if the specific key (or datastore) exists.
 
   # given: synopsis
 
-  $repo->test('text-1');
+  $repo->test;
 
 =back
 
@@ -235,9 +200,9 @@ The test method returns truthy if the specific key (or datastore) exists.
 
   # given: synopsis
 
-  $repo->store->send($repo->term('text-1'), { test => time });
+  $repo->store->send($repo->term, { test => time });
 
-  $repo->test('text-1');
+  $repo->test;
 
 =back
 

@@ -1,5 +1,5 @@
 package Yancy::Plugin::Auth::Password;
-our $VERSION = '1.067';
+our $VERSION = '1.068';
 # ABSTRACT: A simple password-based auth
 
 #pod =encoding utf8
@@ -535,7 +535,9 @@ sub _get_id_for_username {
 sub current_user {
     my ( $self, $c ) = @_;
     return undef unless my $session = $c->session;
-    my $username = $session->{yancy}{auth}{password} or return undef;
+    my $yancy    = $session->{yancy} or return undef;
+    my $auth     = $yancy->{auth}    or return undef;
+    my $username = $auth->{password} or return undef;
     my $user = $self->_get_user( $c, $username );
     delete $user->{ $self->password_field };
     return $user;
@@ -775,7 +777,7 @@ Yancy::Plugin::Auth::Password - A simple password-based auth
 
 =head1 VERSION
 
-version 1.067
+version 1.068
 
 =head1 SYNOPSIS
 

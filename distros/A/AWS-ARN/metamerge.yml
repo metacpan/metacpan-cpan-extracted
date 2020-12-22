@@ -1,0 +1,8 @@
+resources:
+    repository:
+        type: git
+        url: https://github.com/tehmoth/AWS-ARN.git
+        web: https://github.com/tehmoth/AWS-ARN
+    bugtracker:
+        web: https://github.com/tehmoth/AWS-ARN/issues
+    x_IRC: irc://irc.styxnet.tech/#perl

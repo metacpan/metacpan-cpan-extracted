@@ -1,0 +1,58 @@
+{
+   "abstract" : "JSON Serialization Abstraction",
+   "author" : [
+      "Al Newkirk <awncorp@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.017, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "apache_2_0"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Zing-Encoder-Json",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "JSON" : "4.02",
+            "Zing" : "0.20",
+            "perl" : "5.014",
+            "routines" : "0.02",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "JSON" : "4.02",
+            "Test::Auto" : "0.12",
+            "Zing" : "0.20",
+            "perl" : "5.014",
+            "routines" : "0.02",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/iamalnewkirk/Zing-Encoder-Json.git",
+         "web" : "https://github.com/iamalnewkirk/Zing-Encoder-Json"
+      }
+   },
+   "version" : "0.01",
+   "x_authority" : "cpan:AWNCORP",
+   "x_generated_by_perl" : "v5.26.1",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.25",
+   "x_spdx_expression" : "Apache-2.0"
+}
+

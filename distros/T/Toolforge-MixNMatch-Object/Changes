@@ -1,0 +1,13 @@
+0.03 2020-12-20T02:28:15+01:00
+ - Add documentation for User.
+ - Add documentation for YearMonth.
+ - Add tests.
+
+0.02 2020-12-19T02:33:55+01:00
+ - Add test of Catalog and User constructor.
+ - Fix tests.
+ - Fix author tests and BUILD doc.
+ - Rewrite User and YearMonth to Mo::utils.
+
+0.01 2020-12-18T20:12:16+01:00
+ - First version.

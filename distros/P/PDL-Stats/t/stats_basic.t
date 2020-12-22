@@ -175,13 +175,13 @@ SKIP: {
     my $ans_bad = pdl( 0,0,1,1,2,2 );
     $ans_bad = $ans_bad->setbadat(-1);
 
-    is( $a_bad(-1)->isbad(), 1, '_array_to_pdl with missing value undef' );
+    like( $a_bad(-1)->isbad(), qr/1/, '_array_to_pdl with missing value undef' );
     is( tapprox( sum(abs($a_bad - $ans_bad)), 0 ), 1, '_array_to_pdl with missing value undef correctly coded' );
 
     $a[-1] = 'BAD';
     $a_bad = PDL::Stats::Basic::_array_to_pdl( \@a );
 
-    is( $a_bad(-1)->isbad(), 1, '_array_to_pdl with missing value BAD' );
+    like( $a_bad(-1)->isbad(), qr/1/, '_array_to_pdl with missing value BAD' );
     is( tapprox( sum(abs($a_bad - $ans_bad)), 0 ), 1, '_array_to_pdl with missing value BAD correctly coded' );
 }
 

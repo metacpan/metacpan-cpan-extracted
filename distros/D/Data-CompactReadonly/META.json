@@ -40,8 +40,7 @@
             "String::Binary::Interpolation" : "0",
             "Test::Differences" : "0",
             "Test::Exception" : "0",
-            "Test::More" : "0.96",
-            "Try::Tiny" : "0"
+            "Test::More" : "0.96"
          }
       }
    },
@@ -54,6 +53,6 @@
          "url" : "https://github.com/DrHyde/perl-modules-Data-CompactReadonly"
       }
    },
-   "version" : "v0.0.3",
+   "version" : "v0.0.4",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

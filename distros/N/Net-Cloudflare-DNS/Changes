@@ -1,0 +1,8 @@
+Revision history for Net-Cloudflare-DNS
+
+0.01    2020-12-18
+        First version, released on ubuntu 18.04
+
+0.02    2020-12-19
+        Change the returned content to perl's structure
+

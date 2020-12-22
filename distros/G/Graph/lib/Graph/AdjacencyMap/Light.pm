@@ -11,7 +11,6 @@ use Graph::AdjacencyMap qw(:flags :fields);
 use base 'Graph::AdjacencyMap';
 
 use Scalar::Util qw(weaken);
-use List::Util qw(first);
 
 sub _V () { 2 } # Graph::_V
 sub _E () { 3 } # Graph::_E
@@ -27,7 +26,7 @@ sub _new {
 sub stringify {
     my $m = shift;
     my @rows;
-    my $a = $m->[ _a ];
+    my $a = $m->[ _arity ];
     if ($a == 2) {
 	my @p = sort keys %{ $m->[ _s ] };
 	my @s = sort keys %{ $m->[ _p ] };
@@ -63,9 +62,22 @@ sub set_path {
 	unless (exists $s->{ $e0 }) {
 	    $n = $m->[ _n ]++;
 	    $s->{ $e0 } = $n;
-	    $i->[ $n ] = $e0;
+	    $i->[ $n ] = [ $e0 ];
 	}
     }
+}
+
+sub paths_non_existing {
+    my ($m, $list) = @_;
+    my ($n, $f, $a, $i, $s) = @$m;
+    my $unord = $f & _UNORD;
+    map {
+	my @p = @$_;
+	@p = sort @p if $unord;
+	my $this_s = $s;
+	$this_s = $this_s->{ shift @p } while defined $this_s and @p;
+	!defined $this_s ? $_ : ();
+    } @$list;
 }
 
 sub has_path {
@@ -83,19 +95,17 @@ sub has_path {
     exists $s->{ $e };
 }
 
-sub _get_path_id {
-    my $m = shift;
+sub get_ids_by_paths {
+    my ($m, $list) = @_;
     my ($n, $f, $a, $i, $s) = @$m;
-    return undef unless $a == @_;
-    my $e;
-    if ($a == 2) {
-	@_ = sort @_ if ($f & _UNORD);
-	$e = shift;
-	return undef unless exists $s->{ $e };
-        $s = $s->{ $e };
-    }
-    $e = shift;
-    $s->{ $e };
+    my $unord = $a > 1 && ($f & _UNORD);
+    map {
+	my @p = @$_;
+	@p = sort @p if $unord;
+	my $this_s = $s;
+	$this_s = $this_s->{ shift @p } while defined $this_s and @p;
+	defined $this_s ? $this_s : ();
+    } @$list;
 }
 
 sub _get_path_count {
@@ -113,21 +123,6 @@ sub _get_path_count {
 }
 
 sub has_paths { keys %{ $_[0]->[ _s ] } }
-
-sub paths {
-    my $m = shift;
-    return if !defined(my $i = $m->[ _i ]);
-    my ($v) = first { defined } @$i;
-    return grep defined, @$i if ref $v;
-    return map [ $_ ], grep defined, @$i;
-}
-
-sub _get_id_path {
-    my $m = shift;
-    my ($n, $f, $a, $i) = @$m;
-    my $p = $i->[ $_[ 0 ] ];
-    defined $p ? ( ref $p eq 'ARRAY' ? @$p : $p ) : ( );
-}
 
 sub del_path {
     my $m = shift;
@@ -156,66 +151,8 @@ sub rename_path {
     return 1 if $a > 1; # arity > 1, all integers, no names
     return 0 unless exists $s->{ $from };
     $s->{ $to } = delete $s->{ $from };
-    $i->[ $s->{ $to } ] = $to;
+    $i->[ $s->{ $to } ] = [ $to ];
     return 1;
-}
-
-sub __successors {
-    my ($E, $g) = @_;
-    return wantarray ? () : 0 unless defined $E->[ _s ];
-    my $V = $g->[ _V ];
-    return wantarray ? () : 0 unless defined $V && defined $V->[ _s ];
-    # my $i = $V->_get_path_id( $_[0] );
-    my $i =
-	($V->[ _f ] & _LIGHT) ?
-	    $V->[ _s ]->{ $_[2] } :
-	    $V->_get_path_id( $_[2] );
-    return wantarray ? () : 0 unless defined $i && defined $E->[ _s ]->{ $i };
-    return keys %{ $E->[ _s ]->{ $i } };
-}
-
-sub _successors {
-    my ($E, $g) = @_;
-    my @s = &__successors;
-    if ($E->[ _f ] & _UNORD) {
-	push @s, &__predecessors;
-	my %s; @s{ @s } = ();
-	@s = keys %s;
-    }
-    my $V = $g->[ _V ];
-    return @s if !wantarray;
-    @s = map $V->[ _i ][ $_ ], @s;
-    return @s if !($V->[ _f ] & _MULTI);
-    map @$_, @s;
-}
-
-sub __predecessors {
-    my ($E, $g) = @_;
-    return wantarray ? () : 0 unless defined $E->[ _p ];
-    my $V = $g->[ _V ];
-    return wantarray ? () : 0 unless defined $V && defined $V->[ _s ];
-    # my $i = $V->_get_path_id( $_[0] );
-    my $i =
-	($V->[ _f ] & _LIGHT) ?
-	    $V->[ _s ]->{ $_[2] } :
-	    $V->_get_path_id( $_[2] );
-    return wantarray ? () : 0 unless defined $i && defined $E->[ _p ]->{ $i };
-    return keys %{ $E->[ _p ]->{ $i } };
-}
-
-sub _predecessors {
-    my ($E, $g) = @_;
-    my @p = &__predecessors;
-    if ($E->[ _f ] & _UNORD) {
-	push @p, &__successors;
-	my %p; @p{ @p } = ();
-	@p = keys %p;
-    }
-    my $V = $g->[ _V ];
-    return @p if !wantarray;
-    @p = map $V->[ _i ][ $_ ], @p;
-    return @p if !($V->[ _f ] & _MULTI);
-    map @$_, @p;
 }
 
 sub __attr {
@@ -224,11 +161,10 @@ sub __attr {
     # The other map types will sort @_ for _UNORD purposes.
     my $m = $_[0];
     my ($n, $f, $a, $i, $s, $p, $g) = @$m;
-    my ($v) = first { defined } @$i;
     my @V = @{ $g->[ _V ] };
     my @E = $g->edges; # TODO: Both these (ZZZ) lines are mysteriously needed!
     # ZZZ: an example of failing tests is t/52_edge_attributes.t.
-    if (ref $v eq 'ARRAY') { # Edges, then.
+    if ($a > 1) { # Edges, then.
 	# print "Reedging.\n";
 	@E = $g->edges; # TODO: Both these (ZZZ) lines are mysteriously needed!
 	require Graph::AdjacencyMap::Heavy;
@@ -245,7 +181,7 @@ sub __attr {
 	$g->[ _V ] = $m;
     }
     $_[0] = $m;
-    goto &{ ref($m) . "::__attr" }; # Redispatch.
+    goto &Graph::AdjacencyMap::__attr; # Redispatch.
 }
 
 sub _is_COUNT    () { 0 }

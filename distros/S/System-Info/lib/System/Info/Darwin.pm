@@ -5,7 +5,7 @@ use warnings;
 
 use base "System::Info::BSD";
 
-our $VERSION = "0.053";
+our $VERSION = "0.054";
 
 =head1 NAME
 
@@ -24,6 +24,9 @@ sub prepare_sysinfo {
     $self->System::Info::Base::prepare_sysinfo ();
 
     $self->{__os} .= " (Mac OS X)";
+
+    my $scl = __get_sysctl_list () || {};
+
     my $system_profiler = __get_system_profiler () or
 	return $self->SUPER::prepare_sysinfo ();
 
@@ -35,19 +38,31 @@ sub prepare_sysinfo {
     my $model = $system_profiler->{"machine name"} ||
 		$system_profiler->{"machine model"};
 
-    my $ncpu = $system_profiler->{"number of cpus"};
+    my $ncpu = # $scl->{"hw.ncpu"} ||
+	$system_profiler->{"number of cpus"};
     $system_profiler->{"total number of cores"} and
 	$ncpu .= " [$system_profiler->{'total number of cores'} cores]";
 
     $self->{__cpu_type}  = $system_profiler->{"cpu type"}
 	if $system_profiler->{"cpu type"};
-    $self->{__cpu}       = "$model ($system_profiler->{'cpu speed'})";
+    $self->{__cpu}       = # $scl->{"machdep.cpu.brand_string"} ||
+	"$model ($system_profiler->{'cpu speed'})";
     $self->{__cpu_count} = $ncpu;
+    $scl->{"machdep.cpu.core_count"} and
+	$self->{_ncore}  = $scl->{"machdep.cpu.core_count"};
 
     chomp ($self->{__osvers} = `sw_vers -productVersion` || "");
 
+    $self->{__memsize} = $scl->{"hw.memsize"};
+
     return $self;
     } # prepare_sysinfo
+
+sub __get_sysctl_list {
+    chomp (my @sl = `sysctl -a 2>/dev/null`) or return;
+    my %h = map { split m/\s*[:=]\s*/, $_, 2 } grep m/[:=]/ => @sl;
+    \%h;
+    } # __get_sysctl_list
 
 sub __get_system_profiler {
     my $system_profiler_output = do {
@@ -119,7 +134,7 @@ Mac::OSVersion
 
 =head1 COPYRIGHT AND LICENSE
 
-(c) 2016-2019, Abe Timmerman & H.Merijn Brand All rights reserved.
+(c) 2016-2020, Abe Timmerman & H.Merijn Brand, All rights reserved.
 
 With contributions from Jarkko Hietaniemi, Campo Weijerman, Alan Burlison,
 Allen Smith, Alain Barbet, Dominic Dunlop, Rich Rauenzahn, David Cantrell.

@@ -1,5 +1,5 @@
 This file contains message digests of all files listed in MANIFEST,
-signed via the Module::Signature module, version 0.64.
+signed via the Module::Signature module, version 0.83.
 
 To verify the content in this distribution, first make sure you have
 Module::Signature installed, then type:
@@ -14,27 +14,41 @@ not run its Makefile.PL or Build.PL.
 -----BEGIN PGP SIGNED MESSAGE-----
 Hash: SHA1
 
-SHA1 0ff06447407d28a5e40fea9b59a6e6c4d08c67ef Changes
-SHA1 f1892383560003c47da5b7d0376f11a3a88b1133 MANIFEST
-SHA1 1daedeabd7a37135d4cbd9008abfe872a8c30556 META.yml
-SHA1 6caa67fe02ba8a14e5204715bb5650c85eb6a624 Makefile.PL
-SHA1 8a8338c7db778e346176c4395b94b0c94c2b04b7 README
-SHA1 e3c0aa060408050a842b6b17dcb810b2456b62f5 bin/cow.c
-SHA1 77a4cb87710b273e2a80cbe4f833100015438dbf bin/cow.pl
-SHA1 93c4f8f3a257f4bccda991ce787f237e0e1f1418 bin/cowtidy.pl
-SHA1 6b98f2ca15e7f881eb410e96b2ae3ba1da478d17 bin/text2cow.pl
-SHA1 7365e808b87ca5c295ba6a32f82c84fa3cf45f2f examples/fibonacci.cow
-SHA1 b109aedb6debe6d0df7eb8c27fa19f67f1f51207 examples/hello.cow
-SHA1 95abbd43fdcd5da1296953f9ab8111a429d9b292 lib/Acme/Cow/Interpreter.pm
-SHA1 7b1f10c2507015bfe040823addf12704f8a91fff t/00-signature.t
-SHA1 e9f8566c98647a7f965e4163e34be0e95a466bd0 t/01-load.t
-SHA1 eb02f3b4962fdac122ec4d8292d8613de87e1923 t/02-pod.t
-SHA1 7468083fbdea2dcdd2e8b661371b34d0e3da21b2 t/03-pod-coverage.t
-SHA1 1147731837c848a7bfa7a962d52b919fbc9f33a7 t/10-methods.t
+SHA256 910071570e562a41d9a24eed26e3e30e418c0e665e2dbd515d097083f4685778 Changes
+SHA256 24e796d0f02fbe4ee802d2bea3a2a43e902ac67b262506e372338294607ed061 MANIFEST
+SHA256 9dfc51cb9f8145e4a3becb545b32f0999b90b4c8227e726ea8278a55b5060182 MANIFEST.SKIP
+SHA256 027d6e38622261057404a621ef804356c44d60049bfc5679b70ba74e5f970a33 META.json
+SHA256 5e19bb7e1e687d5b6b2170f65a357db1b0f626684d1c22c51f5404ec959ae91a META.yml
+SHA256 97a21a4cf340a740ea4f74649e58f7e9cf02a50a15d83f899a4d3b11e0260d8e Makefile.PL
+SHA256 5093815a4283cfb377b9e33a84069d6f01d8e7807aa09b42de5275814358de13 README
+SHA256 191fc04c31de7d1959bbef039e1397e209108b58e2d7ea4e7d6282d234df1d9f README.md
+SHA256 4970b69a8e21d9c137cfeaa9bef4710b6b370dc285c273a77bb62c6ffc4a4f1c bin/cow.c
+SHA256 6b628c5fa3697d39572d62ebac4da53ff2e247c3d6ffe7193a52f9559009d86e bin/cow.pl
+SHA256 e9b8ea60e4fca6cda8ec8fad9be7ffe40df699c1b4d3b29278dbb7d406609b9b bin/cowtidy.pl
+SHA256 a77a247e76768fc408e27507b6744e0588d647bd337a193117256f4ea9851e73 bin/text2cow.pl
+SHA256 976fd77e3d1ae0ea40905081d770fafcc306eff798b4bb8cd2d7545bb424496b examples/fibonacci.cow
+SHA256 19477237b2ded77ae10fb695d7dd3e721b7db68c3ef234248f78a85d9bb67ed0 examples/hello.cow
+SHA256 4f6526159c7f2bd9ecc99bb018cfa1828a7cc4d956bb71f9ab0dd67e46720f68 lib/Acme/Cow/Interpreter.pm
+SHA256 b12a6e43af468b6c0967784e70b02a07ebb92d085e947040c5d81ed34a713758 t/00-signature.t
+SHA256 00d431383df09a685a823e909bdc8aa1edfe3d6b7a2391a58d659ed0a8035ec4 t/01-load.t
+SHA256 4deedbbd406728efea69b48775429736bffdd4f380747e2feb4124e1f8ab37f5 t/10-methods.t
+SHA256 3895f91b6c6a050c93926abafd9db783f70a0ea96b5a16880f19bea536e9955e xt/release/cpan-changes.t
+SHA256 3f3c44f4c1d2b7bd15dafc9e372745b71dde066780c01e43328ae708f876b799 xt/release/kwalitee.t
+SHA256 4a0f3dda9cb3ca48fd8a646eaa7a584c74741eb990be5a85f44e172bb0ac4000 xt/release/pod-coverage.t
+SHA256 719727b9d070d578d1b260726488405a50297cedad0caf1bf172ddcea3a0d4ed xt/release/pod-syntax.t
+SHA256 cf700ae02d47468fdfe1df5d1eb56457319750a9f5022832da54428d54242d0c xt/release/portability.t
+SHA256 365f0d117b1555121cc55e247d1e12db946592e3ab060303d40e784d1c0d543b xt/release/synopsis.t
+SHA256 d326c0695d9453313ee410b4ee7e81d01f0326e2891f39d2887c2388de8c5afd xt/release/test-version.t
+SHA256 4eccf03fbe993f81dae7dbd4ffe00e49f59666e7c2612954a454c31fe3e33b6c xt/release/unused-vars.t
+SHA256 d326c0695d9453313ee410b4ee7e81d01f0326e2891f39d2887c2388de8c5afd xt/release/version.t
+SHA256 2542dc5a4ede594e1ff8632dc8661a90b4684aabe452b3341797857426b2aeef xt/release/whitespaces.t
 -----BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.9 (Cygwin)
 
-iEYEARECAAYFAkv9EbsACgkQVQvyyU1bchqKsACgscNY/S367sMAwanGhyRS/jtR
-HCUAoJb7vL/L6jgHVN5t1GmEQ0N3i/8V
-=dkll
+iQEcBAEBAgAGBQJf3vkkAAoJEGcmPl2fr166v84H/1kypGkx5Cq75A7v3MOSUtxh
+Xxqhap/YMoYU6GksTYqxovzX22AdwhoI+CShNP5i5m/Fu7kIEJda6ybJNkNPECvI
+Rv3G/aIQvF7laFJMyRl8zOh5GD9xbltNmkhW4tJPRAzKzvUDvKFbx97mt1pLZNLk
+jD1nA212yawFlb1LFIPXi7ZGu9oz7KLWPpOvGTPA0i2N/Okfl60a7kATmQL5sOHn
++WO7MlDMiQmx5yTfr9+pODGBOWs6Oumpmls8ZUDLFMWXQ18IbSx/z2Bshhh/3NQ4
+S4CSe7i2PrqJx+ckUepsrnIxd/HgbfS2gD5rzP+HSNJi/M8Q7zfGgSjIUNT5iss=
+=UXHB
 -----END PGP SIGNATURE-----

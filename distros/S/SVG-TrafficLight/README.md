@@ -9,16 +9,16 @@ Perl module for drawing traffic lights using SVG
 This module can be downloaded from CPAN at:
 
 * [https://metacpan.org/release/SVG-TrafficLight](https://metacpan.org/release/SVG-TrafficLight)
-    
+
 (See the "Download" link on the left.)
-    
+
 You can then install it using the standard CPAN installation dance of:
 
     $ perl Makefile.PL
     $ make
     $ make test
     $ sudo make install
-    
+
 But you're probably better off installing it using your favourite CPAN module
 installation tool, like `cpan` or `cpanm`.
 
@@ -27,7 +27,7 @@ installation tool, like `cpan` or `cpanm`.
 The code is available on Github
 
 * [https://github.com/davorg/svg-trafficlight](https://github.com/davorg/svg-trafficlight)
-    
+
 ## Copyright
 
 Copyright (c) 2017 Magnum Solutions Ltd. All rights reserved.

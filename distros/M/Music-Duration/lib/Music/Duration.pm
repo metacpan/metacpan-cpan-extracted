@@ -8,7 +8,7 @@ use warnings;
 
 use MIDI::Simple ();
 
-our $VERSION = '0.0801';
+our $VERSION = '0.0802';
 
 
 {
@@ -67,29 +67,32 @@ Music::Duration - Add 32nd, 64th, 128th and tuplet durations to MIDI-Perl
 
 =head1 VERSION
 
-version 0.0801
+version 0.0802
 
 =head1 SYNOPSIS
 
   use Music::Duration;
 
-  Music::Duration::tuplet( 'ten', 'z', 5 ); # 5 divisions in place of an eighth note triplet
+  # 5 divisions in place of an eighth note triplet:
+  Music::Duration::tuplet( 'ten', 'z', 5 );
 
-  my $black_page = MIDI::Simple->new_score();
-  # ...
-  $black_page->n( 'zten', 'n38' ) for 1 .. 5;
-
+  # Add an arbitrary duration:
   Music::Duration::add_duration( phi => 1.618 );
-  # ...
-  $black_page->n( 'phi', 'n38' ) for 1 .. 4;
 
   # Now inspect the known lengths:
   my %x = %MIDI::Simple::Length;
   print Dumper [ map { "$_ => $x{$_}" } sort { $x{$a} <=> $x{$b} } keys %x ];
 
+  # Use the new durations in a composition:
+  my $black_page = MIDI::Simple->new_score();
+  $black_page->Channel(9);
+  # ...
+  $black_page->n( 'zten', 'n38' ) for 1 .. 5;
+  $black_page->n( 'phi', 'n38' ) for 1 .. 4;
+
 =head1 DESCRIPTION
 
-This module adds 32nd, 64th, and 128th triplet and dotted note
+This module adds 32nd, 64th, and 128th notes, triplet and dotted
 divisions to C<%MIDI::Simple::Length>.  It also computes and inserts a
 fractional note division of an existing duration.  Additionally, this
 module will insert any named note duration to the length hash.
@@ -131,7 +134,7 @@ given B<name> and B<duration>.
 Musically, this creates a series of notes in place of the given
 B<duration>.
 
-A triplet is a 3-tuplet.
+A triplet is a "3-tuplet."
 
 So in the first example, instead of a quarter note, we instead play 5
 beats - a 5-tuple.  In the second, instead of a whole note (of four
@@ -141,15 +144,15 @@ beats), we instead play 7 beats.
 
   Music::Duration::add_duration( $name => $duration );
 
-This simple function just adds a B<name>d B<duration> length to
+This function just adds a B<name>d B<duration> length to
 C<%MIDI::Simple::Length> so that it can be used to add notes or rests
 to the score.
 
 =head1 SEE ALSO
 
-The C<%Length> hash in L<MIDI::Simple>
+The code in F<t/01-functions.t> and F<eg/*> in this distribution
 
-The code in the F<eg/> and F<t/> directories
+The C<%Length> hash in L<MIDI::Simple>
 
 L<https://www.scribd.com/doc/26974069/Frank-Zappa-The-Black-Page-1-Melody-Score>
 

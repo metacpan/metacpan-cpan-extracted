@@ -14,4 +14,4 @@ sub get_grant {
 	$grant_maker->from_password( $self, $self->params( $self->grant_parameters ), @_ );
 }
 
-our $VERSION = '0.004';
+our $VERSION = '0.005';

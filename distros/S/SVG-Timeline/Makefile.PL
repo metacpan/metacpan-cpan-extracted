@@ -19,6 +19,7 @@ WriteMakefile(
     Moose => 0,
     'List::Util' => 0,
     Carp => 0,
+    'Time::Piece' => 0,
   },
   META_MERGE => {
     'meta-spec' => { version => 2 },
@@ -27,6 +28,9 @@ WriteMakefile(
         type => 'git',
         url => 'git://github.com/davorg/svg-timeline.git',
         web => 'https://github.com/davorg/svg-timeline',
+      },
+      bugtracker => {
+        web => 'https://github.com/davorg/svg-timeline/issues',
       },
     },
   },

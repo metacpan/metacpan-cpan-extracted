@@ -16,15 +16,15 @@ name: Array-Compare
 provides:
   Array::Compare:
     file: lib/Array/Compare.pm
-    version: v3.0.7
+    version: v3.0.8
 requires:
   Carp: '0'
   Moo: '0'
   Types::Standard: '0'
-  perl: v5.6.0
+  perl: v5.10.0
 resources:
   bugtracker: https://github.com/davorg/array-compare/issues
   license: http://dev.perl.org/licenses/
   repository: https://github.com/davorg/array-compare.git
-version: v3.0.7
+version: v3.0.8
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

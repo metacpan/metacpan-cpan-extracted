@@ -1,5 +1,9 @@
 Revision history for MetaCPAN-Client (previously MetaCPAN-API)
 
+2.029000    20.12.20
+            * Added checksum_sha256 & checksum_md5 fields support (stigo, GH#110)
+            * Cleanup old files (Mickey)
+
 2.028000    24.8.20
             * Support specific versions in download_url (Nicolas R (atoomic), GH#107)
 

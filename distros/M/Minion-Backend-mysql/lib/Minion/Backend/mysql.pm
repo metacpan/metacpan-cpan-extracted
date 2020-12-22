@@ -13,7 +13,7 @@ use Time::Piece ();
 
 has 'mysql';
 
-our $VERSION = '0.21';
+our $VERSION = '0.23';
 
 sub dequeue {
   my ($self, $worker_id, $wait, $options) = @_;
@@ -645,9 +645,13 @@ sub receive {
 sub _migrate_notes {
   my ( $mysql ) = @_;
   my $db = $mysql->db;
-  my $tx = $db->begin;
-  $db->select( minion_notes => ['job_id', 'note_value'], { note_key => '***MIGRATED NOTE***' })
-    ->hashes->each(sub {
+  my $rows_to_migrate = $db->select(
+    minion_notes => ['job_id', 'note_value'],
+    { note_key => '***MIGRATED NOTE***' },
+  )->hashes;
+  if ( $rows_to_migrate->size > 0 ) {
+    my $tx = $db->begin;
+    $rows_to_migrate->each(sub {
       my ( $row ) = @_;
       my $notes = decode_json( $row->{note_value} );
       for my $note_key ( keys %$notes ) {
@@ -662,7 +666,8 @@ sub _migrate_notes {
           note_key => '***MIGRATED NOTE***',
       } );
     } );
-  $tx->commit;
+    $tx->commit;
+  }
 }
 
 1;
@@ -1085,7 +1090,7 @@ Minion::Backend::mysql
 
 =head1 VERSION
 
-version 0.21
+version 0.23
 
 =head1 SYNOPSIS
 
@@ -1507,7 +1512,7 @@ Doug Bell <preaction@cpan.org>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Alexander Nalobin Dmitry Krylov Jason A. Crome Larry Leszczynski Olaf Alders Paul Cochrane Zoffix Znet
+=for stopwords Alexander Nalobin Dmitry Krylov Hu Yin Jason A. Crome Larry Leszczynski Olaf Alders Paul Cochrane Zoffix Znet
 
 =over 4
 
@@ -1518,6 +1523,10 @@ Alexander Nalobin <nalobin@reg.ru>
 =item *
 
 Dmitry Krylov <pentabion@gmail.com>
+
+=item *
+
+Hu Yin <huyin8@gmail.com>
 
 =item *
 
@@ -1695,3 +1704,10 @@ DROP INDEX minion_jobs_expires ON minion_jobs;
 ALTER TABLE minion_jobs DROP COLUMN expires;
 ALTER TABLE minion_jobs DROP COLUMN lax;
 
+-- 8 up
+ALTER TABLE minion_jobs_depends
+    ADD PRIMARY KEY (parent_id, child_id);
+
+-- 8 down
+ALTER TABLE minion_jobs_depends
+    DROP PRIMARY KEY;

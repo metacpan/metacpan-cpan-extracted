@@ -13,50 +13,12 @@ use Data::Object::ClassHas;
 
 extends 'Zing::KeyVal';
 
-use Zing::Term;
-
-our $VERSION = '0.13'; # VERSION
-
-# ATTRIBUTES
-
-has 'name' => (
-  is => 'ro',
-  isa => 'Str',
-  init_arg => undef,
-  new => 1,
-  mod => 1,
-);
-
-fun new_name($self) {
-  $self->process->name
-}
-
-has 'process' => (
-  is => 'ro',
-  isa => 'Process',
-  req => 1,
-);
-
-# BUILDERS
-
-fun BUILD($self) {
-  $self->{name} = $self->new_name;
-
-  return $self;
-}
+our $VERSION = '0.20'; # VERSION
 
 # METHODS
 
-method recv() {
-  return $self->store->recv($self->term);
-}
-
-method send(HashRef $val) {
-  return $self->store->send($self->term, $val);
-}
-
 method term() {
-  return Zing::Term->new($self)->data;
+  return $self->app->term($self)->data;
 }
 
 1;
@@ -78,9 +40,8 @@ Process Key/Val Data Store
 =head1 SYNOPSIS
 
   use Zing::Data;
-  use Zing::Process;
 
-  my $data = Zing::Data->new(process => Zing::Process->new);
+  my $data = Zing::Data->new(name => rand);
 
   # $data->recv;
 
@@ -119,14 +80,6 @@ This package has the following attributes:
   name(Str)
 
 This attribute is read-only, accepts C<(Str)> values, and is optional.
-
-=cut
-
-=head2 process
-
-  process(Process)
-
-This attribute is read-only, accepts C<(Process)> values, and is required.
 
 =cut
 

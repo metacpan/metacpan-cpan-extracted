@@ -7,7 +7,7 @@ use vars qw( @ISA $VERSION $SCHEMA_VERSION );
 use Wiki::Toolkit::Setup::Database;
 
 @ISA = qw( Wiki::Toolkit::Setup::Database );
-$VERSION = '0.10';
+$VERSION = '0.11';
 
 use DBI;
 use Carp;
@@ -15,104 +15,6 @@ use Carp;
 $SCHEMA_VERSION = $VERSION*100;
 
 my $create_sql = {
-    8 => {
-        schema_info => [ qq|
-CREATE TABLE schema_info (
-  version   int(10)      NOT NULL default 0
-)
-|, qq|
-INSERT INTO schema_info VALUES (8)
-| ],
-
-        node => [ qq|
-CREATE TABLE node (
-  id        integer      NOT NULL AUTO_INCREMENT,
-  name      varchar(200) NOT NULL DEFAULT '',
-  version   int(10)      NOT NULL default 0,
-  text      mediumtext   NOT NULL default '',
-  modified  datetime     default NULL,
-  PRIMARY KEY (id)
-)
-| ],
-
-        content => [ qq|
-CREATE TABLE content (
-  node_id   integer      NOT NULL,
-  version   int(10)      NOT NULL default 0,
-  text      mediumtext   NOT NULL default '',
-  modified  datetime     default NULL,
-  comment   mediumtext   NOT NULL default '',
-  PRIMARY KEY (node_id, version)
-)
-| ],
-        internal_links => [ qq|
-CREATE TABLE internal_links (
-  link_from varchar(200) NOT NULL default '',
-  link_to   varchar(200) NOT NULL default '',
-  PRIMARY KEY (link_from, link_to)
-)
-| ],
-        metadata => [ qq|
-CREATE TABLE metadata (
-  node_id        integer      NOT NULL,
-  version        int(10)      NOT NULL default 0,
-  metadata_type  varchar(200) NOT NULL DEFAULT '',
-  metadata_value mediumtext   NOT NULL DEFAULT ''
-)
-|, qq|
-CREATE INDEX metadata_index ON metadata(node_id, version, metadata_type, metadata_value(10))
-| ]
-    },
-    9 => {
-        schema_info => [ qq|
-CREATE TABLE schema_info (
-  version   int(10)      NOT NULL default 0
-)
-|, qq|
-INSERT INTO schema_info VALUES (9)
-| ],
-
-        node => [ qq|
-CREATE TABLE node (
-  id        integer      NOT NULL AUTO_INCREMENT,
-  name      varchar(200) NOT NULL DEFAULT '',
-  version   int(10)      NOT NULL default 0,
-  text      mediumtext   NOT NULL default '',
-  modified  datetime     default NULL,
-  moderate  bool         NOT NULL default '0',
-  PRIMARY KEY (id)
-)
-| ],
-
-        content => [ qq|
-CREATE TABLE content (
-  node_id   integer      NOT NULL,
-  version   int(10)      NOT NULL default 0,
-  text      mediumtext   NOT NULL default '',
-  modified  datetime     default NULL,
-  comment   mediumtext   NOT NULL default '',
-  moderated bool         NOT NULL default '1',
-  PRIMARY KEY (node_id, version)
-)
-| ],
-        internal_links => [ qq|
-CREATE TABLE internal_links (
-  link_from varchar(200) NOT NULL default '',
-  link_to   varchar(200) NOT NULL default '',
-  PRIMARY KEY (link_from, link_to)
-)
-| ],
-        metadata => [ qq|
-CREATE TABLE metadata (
-  node_id        integer      NOT NULL,
-  version        int(10)      NOT NULL default 0,
-  metadata_type  varchar(200) NOT NULL DEFAULT '',
-  metadata_value mediumtext   NOT NULL DEFAULT ''
-)
-|, qq|
-CREATE INDEX metadata_index ON metadata(node_id, version, metadata_type, metadata_value(10))
-| ]
-    },
     10 => {
         schema_info => [ qq|
 CREATE TABLE schema_info (
@@ -167,34 +69,80 @@ CREATE TABLE metadata (
 CREATE INDEX metadata_index ON metadata(node_id, version, metadata_type, metadata_value(10))
 | ]
     },
+    11 => {
+        schema_info => [ qq|
+CREATE TABLE schema_info (
+  version   int(10)      NOT NULL default 0
+)
+|, qq|
+INSERT INTO schema_info VALUES (11)
+| ],
+
+        node => [ qq|
+CREATE TABLE node (
+  id        integer      NOT NULL AUTO_INCREMENT,
+  name      varchar(200) NOT NULL DEFAULT '',
+  version   int(10)      NOT NULL default 0,
+  text      mediumtext   NOT NULL,
+  modified  datetime     default NULL,
+  moderate  bool         NOT NULL default '0',
+  PRIMARY KEY (id)
+)
+|, qq|
+CREATE UNIQUE INDEX node_name ON node (name)
+| ],
+
+        content => [ qq|
+CREATE TABLE content (
+  node_id   integer      NOT NULL,
+  version   int(10)      NOT NULL default 0,
+  text      mediumtext   NOT NULL,
+  modified  datetime     default NULL,
+  comment   mediumtext,
+  moderated bool         NOT NULL default '1',
+  verified  datetime     default NULL,
+  verified_info mediumtext,
+  PRIMARY KEY (node_id, version)
+)
+| ],
+        internal_links => [ qq|
+CREATE TABLE internal_links (
+  link_from varchar(200) NOT NULL default '',
+  link_to   varchar(200) NOT NULL default '',
+  PRIMARY KEY (link_from, link_to)
+)
+| ],
+        metadata => [ qq|
+CREATE TABLE metadata (
+  node_id        integer      NOT NULL,
+  version        int(10)      NOT NULL default 0,
+  metadata_type  varchar(200) NOT NULL DEFAULT '',
+  metadata_value mediumtext   NOT NULL
+)
+|, qq|
+CREATE INDEX metadata_index ON metadata(node_id, version, metadata_type, metadata_value(10))
+| ]
+    },
 };
 
-my %fetch_upgrades = (
-    old_to_8  => 1,
-    old_to_9  => 1,
-    old_to_10 => 1,
-    '8_to_9'  => 1,
-    '8_to_10' => 1,
-);
+my %fetch_upgrades = ();
 
 my %upgrades = (
-    '9_to_10' => [ sub {
-        my $dbh = shift;
-        my $sth = $dbh->prepare('SHOW INDEX FROM node WHERE key_name="node_name"');
-        $sth->execute();
-        unless ( $sth->rows ) {
-            $dbh->do('CREATE UNIQUE INDEX node_name ON node (name)')
-                or croak $dbh->errstr;
-        }
-    },
-    qq|
-ALTER TABLE content ADD COLUMN verified datetime default NULL
+    '10_to_11' => [
+        qq|
+ALTER TABLE node ALTER text DROP DEFAULT
 |, qq|
-ALTER TABLE content ADD COLUMN verified_info mediumtext NOT NULL default ''
+ALTER TABLE content ALTER text DROP DEFAULT
 |, qq|
-UPDATE schema_info SET version = 10
-| ]
-
+ALTER TABLE content MODIFY comment mediumtext
+|, qq|
+ALTER TABLE content MODIFY verified_info mediumtext
+|, qq|
+ALTER TABLE metadata ALTER metadata_value DROP DEFAULT
+|, qq|
+UPDATE schema_info SET version = 11
+|,
+],
 );
 
 =head1 NAME

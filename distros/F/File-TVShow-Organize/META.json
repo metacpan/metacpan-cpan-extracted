@@ -52,6 +52,17 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.35",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/Bas-Man/File-TVShow-Organize/issues"
+      },
+      "homepage" : "https://bas-man.github.io",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/Bas-Man/File-TVShow-Organize.git",
+         "web" : "https://github.com/Bas-Man/File-TVShow-Organize"
+      }
+   },
+   "version" : "v0.360.1",
    "x_serialization_backend" : "JSON::PP version 4.00"
 }

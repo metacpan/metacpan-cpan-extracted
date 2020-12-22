@@ -11,12 +11,42 @@ use base 'Data::Object::Types::Library';
 
 extends 'Types::Standard';
 
-our $VERSION = '0.13'; # VERSION
+our $VERSION = '0.20'; # VERSION
+
+register {
+  name => 'App',
+  parent => 'Object',
+  validation => is_instance_of('Zing::App'),
+};
+
+register {
+  name => 'Cartridge',
+  parent => 'Object',
+  validation => is_instance_of('Zing::Cartridge'),
+};
 
 register {
   name => 'Channel',
   parent => 'Object',
   validation => is_instance_of('Zing::Channel'),
+};
+
+register {
+  name => 'Cli',
+  parent => 'Object',
+  validation => is_instance_of('Zing::Cli'),
+};
+
+register {
+  name => 'Cursor',
+  parent => 'Object',
+  validation => is_instance_of('Zing::Cursor'),
+};
+
+register {
+  name => 'Daemon',
+  parent => 'Object',
+  validation => is_instance_of('Zing::Daemon'),
 };
 
 register {
@@ -29,6 +59,24 @@ register {
   name => 'Domain',
   parent => 'Object',
   validation => is_instance_of('Zing::Domain'),
+};
+
+register {
+  name => 'Encoder',
+  parent => 'Object',
+  validation => is_instance_of('Zing::Encoder'),
+};
+
+register {
+  name => 'Entity',
+  parent => 'Object',
+  validation => is_instance_of('Zing::Entity'),
+};
+
+register {
+  name => 'Env',
+  parent => 'Object',
+  validation => is_instance_of('Zing::Env'),
 };
 
 register {
@@ -53,10 +101,28 @@ declare 'Interupt',
   as Enum([qw(CHLD HUP INT QUIT TERM USR1 USR2)]);
 
 register {
+  name => 'ID',
+  parent => 'Object',
+  validation => is_instance_of('Zing::ID'),
+};
+
+register {
+  name => 'Journal',
+  parent => 'Object',
+  validation => is_instance_of('Zing::Journal'),
+};
+
+register {
   name => 'Kernel',
   parent => 'Object',
   validation => is_instance_of('Zing::Kernel'),
 };
+
+declare 'Key',
+  as Str(),
+  where {
+    $_ =~ qr(^[^\:\*]+:[^\:\*]+:[^\:\*]+:[^\:\*]+:[^\:\*]+$)
+  };
 
 register {
   name => 'KeyVal',
@@ -65,9 +131,21 @@ register {
 };
 
 register {
+  name => 'Launcher',
+  parent => 'Object',
+  validation => is_instance_of('Zing::Launcher'),
+};
+
+register {
   name => 'Logic',
   parent => 'Object',
   validation => is_instance_of('Zing::Logic'),
+};
+
+register {
+  name => 'Lookup',
+  parent => 'Object',
+  validation => is_instance_of('Zing::Lookup'),
 };
 
 register {
@@ -89,10 +167,16 @@ register {
 };
 
 register {
-  name => 'Node',
+  name => 'Meta',
   parent => 'Object',
-  validation => is_instance_of('Zing::Node'),
+  validation => is_instance_of('Zing::Meta'),
 };
+
+declare 'Name',
+  as Str(),
+  where {
+    $_ =~ qr(^[^\:\*]+$)
+  };
 
 register {
   name => 'Poll',
@@ -119,21 +203,27 @@ register {
 };
 
 register {
-  name => 'Registry',
-  parent => 'Object',
-  validation => is_instance_of('Zing::Registry'),
-};
-
-register {
-  name => 'Redis',
-  parent => 'Object',
-  validation => is_instance_of('Redis'),
-};
-
-register {
   name => 'Repo',
   parent => 'Object',
   validation => is_instance_of('Zing::Repo'),
+};
+
+register {
+  name => 'Ring',
+  parent => 'Object',
+  validation => is_instance_of('Zing::Ring'),
+};
+
+register {
+  name => 'Scheduler',
+  parent => 'Object',
+  validation => is_instance_of('Zing::Scheduler'),
+};
+
+register {
+  name => 'Search',
+  parent => 'Object',
+  validation => is_instance_of('Zing::Search'),
 };
 
 declare 'Schedule',
@@ -143,15 +233,33 @@ declare 'Scheme',
   as Tuple([Str(), ArrayRef(), Int()]);
 
 register {
-  name => 'Server',
+  name => 'Savepoint',
   parent => 'Object',
-  validation => is_instance_of('Zing::Server'),
+  validation => is_instance_of('Zing::Savepoint'),
+};
+
+register {
+  name => 'Simple',
+  parent => 'Object',
+  validation => is_instance_of('Zing::Simple'),
+};
+
+register {
+  name => 'Single',
+  parent => 'Object',
+  validation => is_instance_of('Zing::Single'),
 };
 
 register {
   name => 'Space',
   parent => 'Object',
   validation => is_instance_of('Data::Object::Space'),
+};
+
+register {
+  name => 'Spawner',
+  parent => 'Object',
+  validation => is_instance_of('Zing::Spawner'),
 };
 
 register {
@@ -164,6 +272,18 @@ register {
   name => 'Task',
   parent => 'Object',
   validation => is_instance_of('Zing::Task'),
+};
+
+register {
+  name => 'Term',
+  parent => 'Object',
+  validation => is_instance_of('Zing::Term'),
+};
+
+register {
+  name => 'Timer',
+  parent => 'Object',
+  validation => is_instance_of('Zing::Timer'),
 };
 
 register {
@@ -230,6 +350,42 @@ This package declares the following type constraints:
 
 =cut
 
+=head2 app
+
+  App
+
+This type is defined in the L<Zing::Types> library.
+
+=over 4
+
+=item app parent
+
+  Object
+
+=back
+
+=over 4
+
+=item app composition
+
+  InstanceOf["Zing::App"]
+
+=back
+
+=over 4
+
+=item app example #1
+
+  # given: synopsis
+
+  use Zing::App;
+
+  my $app = Zing::App->new;
+
+=back
+
+=cut
+
 =head2 channel
 
   Channel
@@ -266,6 +422,81 @@ This type is defined in the L<Zing::Types> library.
 
 =cut
 
+=head2 cli
+
+  Cli
+
+This type is defined in the L<Zing::Types> library.
+
+=over 4
+
+=item cli parent
+
+  Object
+
+=back
+
+=over 4
+
+=item cli composition
+
+  InstanceOf["Zing::Cli"]
+
+=back
+
+=over 4
+
+=item cli example #1
+
+  # given: synopsis
+
+  use Zing::Cli;
+
+  my $cli = Zing::Cli->new;
+
+=back
+
+=cut
+
+=head2 daemon
+
+  Daemon
+
+This type is defined in the L<Zing::Types> library.
+
+=over 4
+
+=item daemon parent
+
+  Object
+
+=back
+
+=over 4
+
+=item daemon composition
+
+  InstanceOf["Zing::Daemon"]
+
+=back
+
+=over 4
+
+=item daemon example #1
+
+  # given: synopsis
+
+  use Zing::Cartridge;
+  use Zing::Daemon;
+
+  my $daemon = Zing::Daemon->new(
+    cartridge => Zing::Cartridge->new(name => 'myapp')
+  );
+
+=back
+
+=cut
+
 =head2 data
 
   Data
@@ -297,7 +528,7 @@ This type is defined in the L<Zing::Types> library.
   use Zing::Data;
   use Zing::Process;
 
-  my $data = Zing::Data->new(process => Zing::Process->new);
+  my $data = Zing::Data->new(name => 'random');
 
 =back
 
@@ -334,6 +565,78 @@ This type is defined in the L<Zing::Types> library.
   use Zing::Domain;
 
   my $domain = Zing::Domain->new(name => 'exchange');
+
+=back
+
+=cut
+
+=head2 entity
+
+  Entity
+
+This type is defined in the L<Zing::Types> library.
+
+=over 4
+
+=item entity parent
+
+  Object
+
+=back
+
+=over 4
+
+=item entity composition
+
+  InstanceOf["Zing::Entity"]
+
+=back
+
+=over 4
+
+=item entity example #1
+
+  # given: synopsis
+
+  use Zing::Entity;
+
+  my $app = Zing::Entity->new;
+
+=back
+
+=cut
+
+=head2 env
+
+  Env
+
+This type is defined in the L<Zing::Types> library.
+
+=over 4
+
+=item env parent
+
+  Object
+
+=back
+
+=over 4
+
+=item env composition
+
+  InstanceOf["Zing::Env"]
+
+=back
+
+=over 4
+
+=item env example #1
+
+  # given: synopsis
+
+  use Zing::Env;
+
+  my $env = Zing::Env->new;
 
 =back
 
@@ -475,6 +778,40 @@ This type is defined in the L<Zing::Types> library.
 
 =cut
 
+=head2 key
+
+  Key
+
+This type is defined in the L<Zing::Types> library.
+
+=over 4
+
+=item key parent
+
+  Str
+
+=back
+
+=over 4
+
+=item key composition
+
+  StrMatch[qr(^[^\:\*]+:[^\:\*]+:[^\:\*]+:[^\:\*]+:[^\:\*]+$)]
+
+=back
+
+=over 4
+
+=item key example #1
+
+  # given: synopsis
+
+  "zing:main:global:repo:random"
+
+=back
+
+=cut
+
 =head2 keyval
 
   KeyVal
@@ -578,8 +915,7 @@ This type is defined in the L<Zing::Types> library.
   use Zing::Logic;
   use Zing::Process;
 
-  my $process = Zing::Process->new;
-  my $logic = Zing::Logic->new(process => $process);
+  my $logic = Zing::Logic->new(process => Zing::Process->new);
 
 =back
 
@@ -655,21 +991,21 @@ This type is defined in the L<Zing::Types> library.
   use Zing::Mailbox;
   use Zing::Process;
 
-  my $mailbox = Zing::Mailbox->new(process => Zing::Process->new);
+  my $mailbox = Zing::Mailbox->new(name => 'shared');
 
 =back
 
 =cut
 
-=head2 node
+=head2 meta
 
-  Node
+  Meta
 
 This type is defined in the L<Zing::Types> library.
 
 =over 4
 
-=item node parent
+=item meta parent
 
   Object
 
@@ -677,21 +1013,55 @@ This type is defined in the L<Zing::Types> library.
 
 =over 4
 
-=item node composition
+=item meta composition
 
-  InstanceOf["Zing::Node"]
+  InstanceOf["Zing::Meta"]
 
 =back
 
 =over 4
 
-=item node example #1
+=item meta example #1
 
   # given: synopsis
 
-  use Zing::Node;
+  use Zing::Meta;
 
-  my $node = Zing::Node->new;
+  my $meta = Zing::Meta->new(name => '$process');
+
+=back
+
+=cut
+
+=head2 name
+
+  Name
+
+This type is defined in the L<Zing::Types> library.
+
+=over 4
+
+=item name parent
+
+  Str
+
+=back
+
+=over 4
+
+=item name composition
+
+  StrMatch[qr(^[^\:\*]+$)]
+
+=back
+
+=over 4
+
+=item name example #1
+
+  # given: synopsis
+
+  "main"
 
 =back
 
@@ -843,78 +1213,6 @@ This type is defined in the L<Zing::Types> library.
 
 =cut
 
-=head2 redis
-
-  Redis
-
-This type is defined in the L<Zing::Types> library.
-
-=over 4
-
-=item redis parent
-
-  Object
-
-=back
-
-=over 4
-
-=item redis composition
-
-  InstanceOf["Zing::Redis"]
-
-=back
-
-=over 4
-
-=item redis example #1
-
-  # given: synopsis
-
-  bless {}, 'Redis';
-
-=back
-
-=cut
-
-=head2 registry
-
-  Registry
-
-This type is defined in the L<Zing::Types> library.
-
-=over 4
-
-=item registry parent
-
-  Object
-
-=back
-
-=over 4
-
-=item registry composition
-
-  InstanceOf["Zing::Registry"]
-
-=back
-
-=over 4
-
-=item registry example #1
-
-  # given: synopsis
-
-  use Zing::Process;
-  use Zing::Registry;
-
-  my $process = Zing::Process->new;
-  my $registry = Zing::Registry->new(process => $process);
-
-=back
-
-=cut
-
 =head2 repo
 
   Repo
@@ -1029,15 +1327,15 @@ This type is defined in the L<Zing::Types> library.
 
 =cut
 
-=head2 server
+=head2 search
 
-  Server
+  Search
 
 This type is defined in the L<Zing::Types> library.
 
 =over 4
 
-=item server parent
+=item search parent
 
   Object
 
@@ -1045,21 +1343,21 @@ This type is defined in the L<Zing::Types> library.
 
 =over 4
 
-=item server composition
+=item search composition
 
-  InstanceOf["Zing::Server"]
+  InstanceOf["Zing::Search"]
 
 =back
 
 =over 4
 
-=item server example #1
+=item search example #1
 
   # given: synopsis
 
-  use Zing::Server;
+  use Zing::Search;
 
-  my $server = Zing::Server->new;
+  my $search = Zing::Search->new;
 
 =back
 
@@ -1132,6 +1430,40 @@ This type is defined in the L<Zing::Types> library.
   use Zing::Store;
 
   my $store = Zing::Store->new;
+
+=back
+
+=cut
+
+=head2 term
+
+  Term
+
+This type is defined in the L<Zing::Types> library.
+
+=over 4
+
+=item term parent
+
+  Object
+
+=back
+
+=over 4
+
+=item term composition
+
+  InstanceOf["Zing::Term"]
+
+=back
+
+=over 4
+
+=item term example #1
+
+  # given: synopsis
+
+  bless {}, 'Zing::Term';
 
 =back
 

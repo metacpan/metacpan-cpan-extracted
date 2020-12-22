@@ -12,11 +12,13 @@ use Data::Object::Class;
 use Data::Object::ClassHas;
 use Data::Object::Space;
 
+extends 'Zing::Class';
+
 use POSIX ();
 
 use Config;
 
-our $VERSION = '0.13'; # VERSION
+our $VERSION = '0.20'; # VERSION
 
 # ATTRIBUTES
 
@@ -62,18 +64,18 @@ method execute() {
   my $sid = $$;
 
   if ($Config{d_pseudofork}) {
-    Carp::confess "Error on fork: fork emulation not supported";
+    $self->throw(error_fork('emulation not supported'));
   }
 
   if(!defined($pid = fork)) {
-    Carp::confess "Error on fork: $!";
+    $self->fork(error_fork("$!"));
   }
 
   # parent
   if ($pid) {
     $process = $self->space->load->new(
       @{$self->scheme->[1]},
-      node => Zing::Node->new(pid => $pid),
+      pid => $pid,
       parent => $self->parent,
     );
     return $self->processes->{$pid} = $process;
@@ -81,9 +83,9 @@ method execute() {
   # child
   else {
     $pid = $$;
-    $process = $self->space->reload->new(
+    $process = $self->space->load->new(
       @{$self->scheme->[1]},
-      node => Zing::Node->new(pid => $pid),
+      pid => $pid,
       parent => $self->parent,
 
     );
@@ -123,6 +125,13 @@ method terminate(Str $signal = 'kill') {
   }
 
   return $result;
+}
+
+# ERRORS
+
+fun error_fork(Str $reason) {
+  code => 'error_fork',
+  message => "Error on fork: $reason",
 }
 
 1;

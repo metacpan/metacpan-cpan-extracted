@@ -13,7 +13,7 @@ use Data::Object::ClassHas;
 
 extends 'Zing::Kernel';
 
-our $VERSION = '0.13'; # VERSION
+our $VERSION = '0.20'; # VERSION
 
 # ATTRIBUTES
 
@@ -150,6 +150,10 @@ L<Zing::KeyVal>: Key/Value Store
 
 =item *
 
+L<Zing::Lookup>: Domain Index
+
+=item *
+
 L<Zing::Mailbox>: Process Mailbox
 
 =item *
@@ -227,6 +231,42 @@ L<Zing::Watcher>: Watcher Process
 =item *
 
 L<Zing::Worker>: Worker Process
+
+=back
+
+=head2 stores
+
+These classes handle data persistence for all messaging abstractions:
+
+=over 4
+
+=item *
+
+L<Zing::Store::Disk>: File-based Persistence
+
+=item *
+
+L<Zing::Store::Hash>: In-Memory Persistence
+
+=item *
+
+L<Zing::Store::Mysql>: MySQL Persistence
+
+=item *
+
+L<Zing::Store::Pg>: PostgreSQL Persistence
+
+=item *
+
+L<Zing::Store::Redis>: Redis Persistence
+
+=item *
+
+L<Zing::Store::SQLite>: SQLite Persistence
+
+=item *
+
+L<Zing::Store::Temp>: Temporary File-based Persistence
 
 =back
 
@@ -455,16 +495,19 @@ scale your deployments without changing your implementations.
   ZING_HOST=68.80.90.100
 
   # configure the resource target (e.g. when distributing across multiple hosts)
-  ZING_TARGET='global' # or 'local'
+  ZING_TARGET='global' # 'us-east', 'us-west', etc
 
-  # configure the system datastore (defaults to 'Zing::Redis')
-  ZING_STORE='Zing::Redis'
+  # configure the datastore (defaults to 'Zing::Store::Redis')
+  ZING_STORE='Zing::Store::Redis'
 
   # configure Redis driver without touching your source code
   ZING_REDIS='server=127.0.0.1:6379'
   ZING_REDIS='every=1_000_000,reconnect=60'
   ZING_REDIS='sentinels=127.0.0.1:12345|127.0.0.1:23456,sentinels_cnx_timeout=0.1'
   ZING_REDIS='server=192.168.0.1:6379,debug=0'
+
+  # configure the object encoder (defaults to 'Zing::Encoder::Json')
+  ZING_ENCODER='Zing::Encoder::Json'
 
   # configure where the command-line tool finds catridges and PID files
   ZING_APPDIR=./

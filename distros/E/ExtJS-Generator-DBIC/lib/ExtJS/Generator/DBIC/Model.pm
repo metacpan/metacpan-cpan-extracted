@@ -1,5 +1,5 @@
 package ExtJS::Generator::DBIC::Model;
-$ExtJS::Generator::DBIC::Model::VERSION = '0.003';
+$ExtJS::Generator::DBIC::Model::VERSION = '0.004';
 #ABSTRACT: ExtJS model producer
 
 
@@ -643,7 +643,7 @@ ExtJS::Generator::DBIC::Model - ExtJS model producer
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 SYNOPSIS
 
@@ -776,7 +776,7 @@ Alexander Hartmaier <abraxxa@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by Alexander Hartmaier.
+This software is copyright (c) 2020 by Alexander Hartmaier.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -4,13 +4,13 @@
       "unknown"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4003, CPAN::Meta::Converter version 2.133380",
+   "generated_by" : "Module::Build version 0.4231",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "OpenGuides",
    "prereqs" : {
@@ -67,7 +67,7 @@
             "Template::Plugin::JSON::Escape" : "0",
             "Time::Piece" : "0",
             "URI::Escape" : "0",
-            "Wiki::Toolkit" : "0.84",
+            "Wiki::Toolkit" : "0.86",
             "Wiki::Toolkit::Feed::Atom" : "0",
             "Wiki::Toolkit::Feed::RSS" : "0",
             "Wiki::Toolkit::Formatter::UseMod" : "0.25",
@@ -82,7 +82,7 @@
    "provides" : {
       "OpenGuides" : {
          "file" : "lib/OpenGuides.pm",
-         "version" : "0.83"
+         "version" : "0.84"
       },
       "OpenGuides::Build" : {
          "file" : "lib/OpenGuides/Build.pm",
@@ -94,7 +94,7 @@
       },
       "OpenGuides::Config" : {
          "file" : "lib/OpenGuides/Config.pm",
-         "version" : "0.10"
+         "version" : "0.11"
       },
       "OpenGuides::Feed" : {
          "file" : "lib/OpenGuides/Feed.pm",
@@ -144,5 +144,6 @@
       "x_IRC" : "irc://irc.perl.org/#openguides",
       "x_MailingList" : "openguides-dev@lists.openguides.org"
    },
-   "version" : "0.83"
+   "version" : "0.84",
+   "x_serialization_backend" : "JSON::PP version 4.04"
 }

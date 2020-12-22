@@ -31,19 +31,24 @@ Daemon Process Management
 
 =includes
 
-method: execute
 method: fork
+method: restart
 method: start
+method: stop
 
 =cut
 
 =synopsis
 
-  use Zing;
+  use Zing::Cartridge;
   use Zing::Daemon;
 
-  my $scheme = ['MyApp', [], 1];
-  my $daemon = Zing::Daemon->new(name => 'app', app => Zing->new(scheme => $scheme));
+  my $daemon = Zing::Daemon->new(
+    cartridge => Zing::Cartridge->new(
+      name => 'example',
+      scheme => ['MyApp', [], 1],
+    )
+  );
 
   # $daemon->start;
 
@@ -55,38 +60,31 @@ Zing::Types
 
 =cut
 
+=inherits
+
+Zing::Entity
+
+=cut
+
 =attributes
 
-app: ro, req, Zing
-name: ro, req, Str
-log: ro, opt, Logger
-pid_dir: ro, opt, Str
-pid_file: ro, opt, Str
-pid_path: ro, opt, Str
+cartridge: ro, req, Cartridge
+journal: ro, opt, Journal
+kernel: ro, opt, Zing
+log_filter_from: ro, opt, Str
+log_filter_queries: ro, opt, ArrayRef[Str]
+log_filter_tag: ro, opt, Str
+log_level: ro, opt, Str
+log_reset: ro, opt, Bool
+log_verbose: ro, opt, Bool
+logger: ro, opt, Logger
 
 =cut
 
 =description
 
-This package provides the mechanisms for running a L<Zing> application as a
-daemon process.
-
-=cut
-
-=method execute
-
-The execute method forks the application and creates a pid file under the
-L</pid_path>.
-
-=signature execute
-
-execute() : Int
-
-=example-1 execute
-
-  # given: synopsis
-
-  my $exit = $daemon->execute;
+This package provides the mechanisms for running a L<Zing> application
+as a daemon process.
 
 =cut
 
@@ -106,20 +104,84 @@ fork() : Int
 
 =cut
 
+=method restart
+
+The restart method stops and then starts the application and creates a pid file
+under the L<Zing::Cartridge/pidfile>.
+
+=signature restart
+
+restart() : Bool
+
+=example-1 restart
+
+  use FlightRecorder;
+  use Zing::Cartridge;
+  use Zing::Daemon;
+
+  my $daemon = Zing::Daemon->new(
+    logger => FlightRecorder->new(auto => undef),
+    cartridge => Zing::Cartridge->new(
+      name => 'example',
+      scheme => ['MyApp', [], 1],
+    )
+  );
+
+  $daemon->restart;
+
+=cut
+
 =method start
 
-The start method executes the application and exits the program with the proper
-exit code.
+The start method forks the application and creates a pid file under the
+L<Zing::Cartridge/pidfile>.
 
 =signature start
 
-start() : Any
+start() : Bool
 
 =example-1 start
 
-  # given: synopsis
+  use FlightRecorder;
+  use Zing::Cartridge;
+  use Zing::Daemon;
+
+  my $daemon = Zing::Daemon->new(
+    logger => FlightRecorder->new(auto => undef),
+    cartridge => Zing::Cartridge->new(
+      name => 'example',
+      scheme => ['MyApp', [], 1],
+    )
+  );
 
   $daemon->start;
+
+=cut
+
+=method stop
+
+The stop method stops the application and removes the pid file under the
+L<Zing::Cartridge/pidfile>.
+
+=signature stop
+
+stop() : Bool
+
+=example-1 stop
+
+  use FlightRecorder;
+  use Zing::Cartridge;
+  use Zing::Daemon;
+
+  my $daemon = Zing::Daemon->new(
+    logger => FlightRecorder->new(auto => undef),
+    cartridge => Zing::Cartridge->new(
+      name => 'example',
+      scheme => ['MyApp', [], 1],
+    )
+  );
+
+  $daemon->stop;
 
 =cut
 
@@ -145,20 +207,26 @@ $subs->synopsis(fun($tryable) {
   $result
 });
 
-$subs->example(-1, 'execute', 'method', fun($tryable) {
-  ok !(my $result = $tryable->result); # good
-
-  $result
-});
-
 $subs->example(-1, 'fork', 'method', fun($tryable) {
   ok my $result = $tryable->result;
 
   $result
 });
 
+$subs->example(-1, 'restart', 'method', fun($tryable) {
+  ok my $result = $tryable->result; # good
+
+  $result
+});
+
 $subs->example(-1, 'start', 'method', fun($tryable) {
-  ok !(my $result = $tryable->result); # good
+  ok my $result = $tryable->result; # good
+
+  $result
+});
+
+$subs->example(-1, 'stop', 'method', fun($tryable) {
+  ok my $result = $tryable->result; # good
 
   $result
 });

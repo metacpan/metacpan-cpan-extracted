@@ -14,6 +14,8 @@ meta-spec:
 name: DBIx-Class-StateMigrations
 requires:
   Class::Inspector: 0
+  Class::Unload: 0
+  Clone: 0
   DBIx::Class::Schema::Diff: 1.11
   DBIx::Class::Schema::Diff::State: 0
   Data::Dump: 0
@@ -30,4 +32,4 @@ requires:
 resources:
   bugtracker: https://github.com/vanstyn/DBIx-Class-StateMigrations/issues
   repository: https://github.com/vanstyn/DBIx-Class-StateMigrations.git
-version: 0.001
+version: 0.002

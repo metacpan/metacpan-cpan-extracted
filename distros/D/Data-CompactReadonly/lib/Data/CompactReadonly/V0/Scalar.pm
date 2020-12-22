@@ -1,5 +1,5 @@
 package Data::CompactReadonly::V0::Scalar;
-our $VERSION = '0.0.3';
+our $VERSION = '0.0.4';
 
 use warnings;
 use strict;
@@ -32,6 +32,7 @@ sub _create {
 
     print $fh $class->_type_byte_from_class().
               $class->_get_bytes_from_word(abs($args{data}));
+    $class->_set_next_free_ptr(%args);
 }
 
 sub _get_bytes_from_word {

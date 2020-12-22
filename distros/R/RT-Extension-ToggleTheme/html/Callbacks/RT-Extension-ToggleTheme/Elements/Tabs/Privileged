@@ -1,4 +1,6 @@
 <%init>
+return unless $session{'CurrentUser'}->HasRight( Object=> $RT::System, Right => 'ModifySelf' );
+
 # Only show theme toggle for either of the elevator themes light/dark
 if ( RT->Config->Get('WebDefaultStylesheet', $session{CurrentUser}) =~ /elevator-/ ) {
     my $theme = RT->Config->Get('WebDefaultStylesheet', $session{CurrentUser}) =~ /-dark$/ ? 'fa-sun' : 'fa-moon';

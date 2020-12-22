@@ -1,0 +1,15 @@
+	<explain xmlns="http://www.postgresql.org/2009/explain">
+	  <Query-Text>select 1;</Query-Text>
+	  <Plan>
+	    <Node-Type>Result</Node-Type>
+	    <Parallel-Aware>false</Parallel-Aware>
+	    <Startup-Cost>0.00</Startup-Cost>
+	    <Total-Cost>0.01</Total-Cost>
+	    <Plan-Rows>1</Plan-Rows>
+	    <Plan-Width>4</Plan-Width>
+	    <Actual-Startup-Time>0.003</Actual-Startup-Time>
+	    <Actual-Total-Time>0.004</Actual-Total-Time>
+	    <Actual-Rows>1</Actual-Rows>
+	    <Actual-Loops>1</Actual-Loops>
+	  </Plan>
+	</explain>

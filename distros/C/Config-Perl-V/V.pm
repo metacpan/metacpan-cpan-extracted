@@ -6,7 +6,7 @@ use warnings;
 use Config;
 use Exporter;
 use vars qw($VERSION @ISA @EXPORT_OK %EXPORT_TAGS);
-$VERSION     = "0.32";
+$VERSION     = "0.33";
 @ISA         = qw( Exporter );
 @EXPORT_OK   = qw( plv2hash summary myconfig signature );
 %EXPORT_TAGS = (

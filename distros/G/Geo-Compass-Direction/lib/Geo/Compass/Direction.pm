@@ -7,7 +7,7 @@ use warnings;
 use Carp qw(croak);
 use Exporter qw(import);
 
-our $VERSION = '1.00';
+our $VERSION = '1.01';
 
 our @ISA = qw(Exporter);
 our @EXPORT_OK = qw(direction);
@@ -51,11 +51,9 @@ direction
 
     use Geo::Compass::Direction qw(direction);
 
-    my $dir;
-
-    $dir = direction(0);              # N
-    $dir = direction(327);            # NNW
-    $dir = direction(180.235323411);  # S
+    print direction(0);              # N
+    print direction(327);            # NNW
+    print direction(180.235323411);  # S
 
 =head1 DESCRIPTION
 
@@ -64,7 +62,7 @@ Converts a compass heading degree into human readable direction
 
 =head1 EXPORT_OK
 
-This module exports only a single function, C<<direction()>>, and it must
+This module exports only a single function, C<direction()>, and it must
 be imported explicitly.
 
 =head1 FUNCTIONS
@@ -73,14 +71,18 @@ be imported explicitly.
 
 Convert a compass heading degree into human readable format.
 
-Parameters:
+I<Parameters>:
 
     $degree
 
 Mandatory, Int|Float: The compass degree to use for the conversion. Can be an
 integer (eg C<360>) or a float (eg C<179.12352211>).
 
-Returns: String. The letter designation of the heading.
+I<Returns>: String. The letter designation of the heading.
+
+=head1 SEE ALSO
+
+L<Compass::Bearing>, L<Compass::Points>
 
 =head1 AUTHOR
 
@@ -95,4 +97,3 @@ under the terms of the the Artistic License (2.0). You may obtain a
 copy of the full license at:
 
 L<http://www.perlfoundation.org/artistic_license_2_0>
-

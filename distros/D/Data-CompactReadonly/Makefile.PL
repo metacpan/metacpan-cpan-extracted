@@ -25,6 +25,5 @@ WriteMakefile(
     'Test::Differences'             => 0,
     'Test::Exception'               => 0,
     'Test::More'                    => '0.96', # done_testing and subtests
-    'Try::Tiny'                     => 0,
   },
 );

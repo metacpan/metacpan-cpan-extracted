@@ -98,7 +98,8 @@ SUBROUTINES
     UTF8::R2::split(qr/$utf8regex/imsxo, $_, 3)
     UTF8::R2::tr($_, 'ABC', 'XYZ', 'cdsr')
     use UTF8::R2 qw(%mb);
-      $_ =~ $mb{qr/$utf8regex/imsxogc}
+      $_ =~ $mb{qr/$utf8regex/imsxo}
+      $_ =~ m<\G$mb{qr/$utf8regex/imsxo}>gc
       $_ =~ s<$mb{qr/before/imsxo}><after>egr
 
   OTHER UTF-8 CODEPOINT FEATURE

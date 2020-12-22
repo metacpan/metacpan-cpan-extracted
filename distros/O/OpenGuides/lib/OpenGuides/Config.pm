@@ -3,7 +3,7 @@ use strict;
 use warnings;
 
 use vars qw( $VERSION );
-$VERSION = '0.10';
+$VERSION = '0.11';
 
 use Carp qw( croak );
 use Config::Tiny;
@@ -52,7 +52,8 @@ This documentation is probably only useful to OpenGuides developers.
 
   my $config = OpenGuides::Config->new( file => "wiki.conf" );
 
-Initialises itself from the config file specified.  Variables which
+Initialises itself from the config file specified and environment
+variables of the form OPENGUIDES_CONFIG_READ_ONLY.  Variables which
 are not set in that file, and which have sensible defaults, will be
 initialised as described below in ACCESSORS; others will be given a
 value of C<undef>.
@@ -151,7 +152,14 @@ sub _init {
             warn "Don't know what to do with variable '$var'";
         }
     }
-
+    # Override config from file or defaults if an environment variable
+    # is set for a variable. e.g OPENGUIDES_CONFIG_read_only
+    foreach my $var ( @variables ) {
+       my $envvar = "OPENGUIDES_CONFIG_" . uc ( $var );
+       if ( exists $ENV{$envvar} ) {
+           $self->$var ( $ENV{$envvar} );
+       }
+    }
     # And the questions.
     # Don't forget to add to INSTALL when changing these.
     my %questions = (
@@ -387,7 +395,7 @@ The OpenGuides Project (openguides-dev@lists.openguides.org)
 
 =head1 COPYRIGHT
 
-     Copyright (C) 2004-2013 The OpenGuides Project.  All Rights Reserved.
+     Copyright (C) 2004-2020 The OpenGuides Project.  All Rights Reserved.
 
 The OpenGuides distribution is free software; you can redistribute it
 and/or modify it under the same terms as Perl itself.

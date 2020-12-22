@@ -14,9 +14,16 @@ require Data::Dump;
 require Module::Locate;
 require Module::Runtime;
 use Class::Inspector;
+use Clone 'clone';
+use Try::Tiny;
+
+require DBIx::Class::StateMigrations;
 
 use DBIx::Class::StateMigrations::Migration::Routine::PerlCode;
 use DBIx::Class::StateMigrations::Migration::Routine::SQL;
+use DBIx::Class::StateMigrations::Migration::Invalid;
+
+our $LOADED_MIGRATION_SUBCLASSES = {};
 
 sub BUILD {
   my $self = shift;
@@ -29,8 +36,11 @@ sub BUILD {
   die "At least one trigger_SchemaState required" unless (
     scalar(@{ $self->trigger_SchemaStates }) > 0
   );
+  
+  $self->_validate_fingerprints;
 }
 
+sub invalid { 0 }
 
 has 'migration_name', is => 'ro', lazy => 1, default => sub {
   my $self = shift;
@@ -43,6 +53,11 @@ has 'trigger_SchemaStates', is => 'ro', required => 1, isa => ArrayRef[
   InstanceOf['DBIx::Class::StateMigrations::SchemaState']
 ];
 
+has 'frozen_trigger_SchemaStates', is => 'ro', lazy => 1, default => sub {
+  my $self = shift;
+  clone( $self->trigger_SchemaStates )
+}, isa => ArrayRef[InstanceOf['DBIx::Class::StateMigrations::SchemaState']];
+
 has 'DBI_Driver_Name', is => 'ro', required => 1, isa => Str;
 
 has 'completed_SchemaState', is => 'ro', isa => Maybe[
@@ -53,9 +68,9 @@ sub number_routines { scalar(@{ (shift)->Routines }) };
 
 has 'Routines', is => 'ro', required => 1, lazy => 1, default => sub {
   my $self = shift;
-  return undef unless ($self->is_migration_class && $self->directory);
+  return [] unless ($self->is_migration_class && $self->directory);
   my $Dir = dir( $self->directory, 'routines' )->absolute;
-  return undef unless (-d $Dir);
+  return [] unless (-d $Dir);
   
   my @routines = ();
   
@@ -170,24 +185,38 @@ has '_migration_name_from_classname', is => 'ro', init_arg => undef, lazy => 1, 
 sub new_from_migration_dir {
   my $self = shift;
   my $dir = shift or die "dir not supplied";
+  my $match_DBI_Driver_Name = shift;
   
   my $Dir = dir( $dir )->absolute;
   -d $Dir or die "'$dir' does not exist or is not a directory";
   
   my $pm_file;
+  my $child_count = 0;
+  my $has_routines_dir = 0;
   for my $File ($Dir->children) {
-    next if $File->is_dir;
+    $child_count++;
+    if($File->is_dir) {
+      $has_routines_dir = 1 if ($File->basename eq 'routines');
+      next;
+    }
+    
     next unless (-f $File);
     my $ext = (reverse split(/\./,$File->basename))[0];
     next unless ($ext && lc($ext) eq 'pm');
     
-    die "Error - multiple pm files found in directory '$dir'" if ($pm_file);
+    return $self->_fatal_Invalid("multiple pm files found in directory '$dir'") if ($pm_file);
     
     $pm_file = $File->absolute;
   }
   
-  die "No Migration pm file found in directory '$dir'" unless ($pm_file);
-  die "Invalid Migration pm file '$pm_file' - must start with 'Migration_'" 
+  return $self->_Invalid("ignoring empty migration directory '$dir'") unless ($child_count > 0);
+  
+  return $self->_Invalid("ignoring migration directory '$dir' with no pm file or routines dir") 
+    unless ($pm_file || $has_routines_dir);
+  
+  return $self->_fatal_Invalid("No Migration pm file found in directory '$dir'") unless ($pm_file);
+  
+  return $self->_fatal_Invalid("Invalid Migration pm file '$pm_file' - must start with 'Migration_'")
     unless ($pm_file->basename =~ /^Migration_/);
     
   my $mclass = $pm_file->basename;
@@ -196,23 +225,48 @@ sub new_from_migration_dir {
   unless (Class::Inspector->loaded($mclass)) {
   
     # TODO: this is now probably redundant:
-    die "Not loading $pm_file - class named '$mclass' already loaded!" if (Module::Locate::locate($mclass));
+    return $self->_fatal_Invalid(
+      "Not loading $pm_file - class named '$mclass' already loaded!"
+    ) if (Module::Locate::locate($mclass));
     
-    eval "use lib '$Dir'";
-    Module::Runtime::require_module($mclass);
+    my $caught = undef;
+    try {
+      eval "use lib '$Dir'";
+      Module::Runtime::require_module($mclass);
+      $LOADED_MIGRATION_SUBCLASSES->{$mclass}++;
+    }
+    catch {
+      $caught = shift;
+    };
+    $caught and return $self->_fatal_Invalid("Caught exception trying to load Migration class '$mclass' [$caught]");
     
-    die "Error loading $pm_file - '$mclass' still not loaded after require" unless (Module::Locate::locate($mclass));
+    return $self->_fatal_Invalid(
+      "Error loading $pm_file - '$mclass' still not loaded after require"
+    ) unless (Module::Locate::locate($mclass));
   }
   
-  my $Migration = $mclass->new;
+  my $Migration;
+  my $caught = undef;
+  try {
+    $Migration = $mclass->new;
+  }
+  catch {
+    $caught = shift;
+  };
+  $caught and return $self->_fatal_Invalid("Caught exception trying to create '$mclass' object instance [$caught]");
   
-  die "Error loading new $mclass object instance - not a valid Migration class" unless (
-    blessed($Migration) && $Migration->isa('DBIx::Class::StateMigrations::Migration')
-  );
+  return $self->_fatal_Invalid(
+    "Created $mclass object instance is not a blessed subclass of 'DBIx::Class::StateMigrations::Migration"
+  ) unless (blessed($Migration) && $Migration->isa('DBIx::Class::StateMigrations::Migration'));
   
-  die "New $mclass object instance returns false for ->is_migration_class" unless (
-    $Migration->is_migration_class
-  );
+  return $self->_fatal_Invalid(
+    "New $mclass object instance method ->is_migration_class() does not return true" 
+  ) unless ($Migration->is_migration_class);
+  
+  return $self->_fatal_Invalid(
+    "$mclass is the wrong DBI driver database type ('".$Migration->DBI_Driver_Name . 
+    "') - for Migrations on the current connected database driver type ('$match_DBI_Driver_Name')"
+  ) if ($match_DBI_Driver_Name && $match_DBI_Driver_Name ne $Migration->DBI_Driver_Name);
   
   return $Migration
 }
@@ -222,21 +276,53 @@ sub new_from_migration_dir {
 sub as_subclass_pm_code {
   my $self = shift;
   
+  $self->frozen_trigger_SchemaStates;
+  
+  # frozen_trigger_SchemaStates does this also, but we don't want to rely
+  # on when is was loaded/generated (even though it was probably above)
+  my $ss_clone = clone($self->trigger_SchemaStates);
+  
+  $_->_clear_DiffState for (@{ $self->trigger_SchemaStates });
+  
   my @embed_attrs = qw(DBI_Driver_Name completed_SchemaState trigger_SchemaStates);
   
   my $classname = join('_','Migration',$self->migration_name);
   
+  my $ver = $DBIx::Class::StateMigrations::VERSION or die "unable to load module version number?";
+  
   my @pm_file_lines = (
     'package ',
     '   ' . $classname . ';','',
+    "## This file was originally generated by DBIx::Class::StateMigrations v$ver",
+    "## using the class name '$classname'.",
+    "## The part of the class/package name above after 'Migration_' is the",
+    "## the 'name' of the migration and can be changed as long as it is unique",
+    "## and the parent directory is also renamed to match",
+    '',
+    "use DBIx::Class::StateMigrations $ver; # require minimum version",'', 
     'use strict;',
     'use warnings;','',
     'use Moo;',
     'extends "DBIx::Class::StateMigrations::Migration";',
     '',
     $self->__generate_inline_pm_code_lines_for_attrs(@embed_attrs),
-    '1',''
+    '1;','','',
+    '#########################################################################################',
+    '##     -  THE REST OF THE CONTENT IN THIS FILE IS NOT REQUIRED MAY BE REMOVED  -       ##',
+    '##                                                                                     ##',
+    '##  The "frozen_trigger_SchemaStates" contains the full datasets used to generate the  ##',
+    '##    SchemaState fingerprints and is only useful for historical/forensic purposes.    ##',
+    '##                                                                                     ##',
+    '##                YOU MAY DELETE THESE COMMENT LINES AND EVERYTHING BELOW              ##',
+    '#########################################################################################',
+    '',
+    $self->__generate_inline_pm_code_lines_for_attrs('frozen_trigger_SchemaStates'),
+    '','',
+    '1'
   );
+  
+  # Put trigger_SchemaStates back the way it was
+  @{ $self->trigger_SchemaStates } = @$ss_clone;
 
   return join("\n",@pm_file_lines);
 }
@@ -293,6 +379,32 @@ sub write_subclass_pm_file {
 }
 
 
+
+sub _validate_fingerprints {
+  my $self = shift;
+  
+  $_->validate_fingerprint for (@{ $self->trigger_SchemaStates });
+  $_->validate_fingerprint for (@{ $self->frozen_trigger_SchemaStates });
+  
+  my %f1 = map { $_->fingerprint => 1 } (@{ $self->trigger_SchemaStates });
+  my %f2 = map { $_->fingerprint => 1 } (@{ $self->frozen_trigger_SchemaStates });
+  
+  for (keys %f2) {
+    $f1{$_} or die "mismatch with frozen copy of SchemaStates - frozen fingerprint '$_' not found in trigger_SchemaStates";
+  }
+}
+
+
+sub _Invalid {
+  my $self = shift;
+  my $fatal = $_[1] ? 1 : 0;
+  my $reason = shift or die "Must supply invalid 'reason'";
+  DBIx::Class::StateMigrations::Migration::Invalid->new( reason => $reason, fatal => $fatal )
+}
+
+sub _fatal_Invalid { (shift)->_Invalid(@_,1) }
+
+
 sub _Dump {
   my $self = shift;
   my $obj = shift;
@@ -302,6 +414,7 @@ sub _Dump {
   
   return Data::Dump::dump($obj);
 }
+
 
 
 

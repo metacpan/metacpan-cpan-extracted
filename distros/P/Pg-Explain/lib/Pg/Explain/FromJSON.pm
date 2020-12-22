@@ -27,11 +27,11 @@ Pg::Explain::FromJSON - Parser for explains in JSON format
 
 =head1 VERSION
 
-Version 1.03
+Version 1.04
 
 =cut
 
-our $VERSION = '1.03';
+our $VERSION = '1.04';
 
 =head1 SYNOPSIS
 
@@ -51,7 +51,6 @@ Returns Top node of query plan.
 sub parse_source {
     my $self   = shift;
     my $source = shift;
-    my $prefix = '';
 
     # We need to remove things before and/or after explain
     # To do this, first - split explain into lines...
@@ -60,7 +59,7 @@ sub parse_source {
     if ( 1 < scalar @source_lines ) {
 
         # If there are many lines, there could be line prefix...
-        my $prefix = '';
+        my $prefix = undef;
 
         # Now, find first line of explain, and cache it's prefix (some spaces ...)
         for my $l ( @source_lines ) {
@@ -68,13 +67,31 @@ sub parse_source {
             $prefix = $1;
         }
 
-        # Now, extract lines with explain using known prefix
-        my @use_lines = grep { /\A$prefix\[\s*\z/ .. /\A$prefix\]\s*\z/ } @source_lines;
-        $source = join( "\n", @use_lines );
+        if ( defined $prefix ) {
+
+            # Now, extract lines with explain using known prefix
+            my @use_lines = grep { /\A$prefix\[\s*\z/ ... /\A$prefix\]\s*\z/ } @source_lines;
+            $source = join( "\n", @use_lines );
+        }
     }
 
     # And now parse the json...
-    my $struct = from_json( $source )->[ 0 ];
+    my $struct = from_json( $source );
+    if (   ( 'ARRAY' eq ref $struct )
+        && ( defined $struct->[ 0 ]->{ 'Plan' } ) )
+    {
+        # This structure is used by normal "explain" command
+        $struct = $struct->[ 0 ];
+    }
+    elsif (( 'HASH' eq ref $struct )
+        && ( defined $struct->{ 'Plan' } ) )
+    {
+        # This structure is used by auto-explain command
+        # empty command block, so I can have simple else condition
+    }
+    else {
+        croak( 'Unknown JSON parsed' );
+    }
 
     my $top_node = $self->make_node_from( $struct->{ 'Plan' } );
 

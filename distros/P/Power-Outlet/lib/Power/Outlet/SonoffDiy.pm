@@ -19,7 +19,7 @@ Power::Outlet::SonoffDiy - Control and query a Sonoff DIY device
 
 =head1 DESCRIPTION
 
-Power::Outlet::SonoffDiy is a package for controlling and querying Sonoff ESP8266 hardware running Sonoff firmware in DIY mode.  My hardware is running firmware version 3.3.0 which support 1.4 version of the HTTP protocol.  But, the 2.0 version of the protocol appears to be 100% backwards compatabile with the protocol.
+Power::Outlet::SonoffDiy is a package for controlling and querying Sonoff ESP8266 hardware running Sonoff firmware in DIY mode.  My hardware is running firmware version 3.3.0 which supports 1.4 version of the HTTP protocol.  But, the 2.0 version of the protocol appears to be 100% backwards compatible with the protocol.
 
 From: L<https://github.com/itead/Sonoff_Devices_DIY_Tools>
 
@@ -163,11 +163,8 @@ our %ERROR_STRING = (
                      '404' => 'The operation failed and the device does not exist. The device does not support the requested deviceid.',
                      '422' => 'The operation failed and the request parameters are invalid. For example, the device does not support setting specific device information.',
                      '403' => 'The operation failed and the OTA function was not unlocked. The interface "3.2.6OTA function unlocking" must be successfully called first.',
-
                      '408' => 'The operation failed and the pre-download firmware timed out. You can try to call this interface again after optimizing the network environment or increasing the network speed.',
-
                      '413' => 'The operation failed and the request body size is too large. The size of the new OTA firmware exceeds the firmware size limit allowed by the device.',
-
                      '424' => 'The operation failed and the firmware could not be downloaded. The URL address is unreachable (IP address is unreachable, HTTP protocol is unreachable, firmware does not exist, server does not support Range request header, etc.)',
                      '471' => "The operation failed and the firmware integrity check failed. The SHA256 checksum of the downloaded new firmware does not match the value of the request body's sha256sum field. Restarting the device will cause bricking issue.",
                     );

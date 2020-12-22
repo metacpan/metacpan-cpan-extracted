@@ -7,24 +7,25 @@ use Data::Dumper;
 
 # Ok to connect to web?
 
-my $webok;
+my $web_ok;
 
 eval {
     require Data::Validate::URI;
     Data::Validate::URI->import (qw/is_web_uri/);
     require LWP::Simple;
     LWP::Simple->import ();
-    $webok = 1;
+    $web_ok = 1;
 };
 
 if ($@) {
-    $webok = 0;
+    $web_ok = 0;
 }
 
-binmode STDOUT, ":utf8";
+binmode STDOUT, ":encoding(utf8)";
 
 for my $file (@ARGV) {
     my $png;
+    my $size;
     if (-f $file) {
 	eval {
 	    $png = read_png_file ($file);
@@ -33,14 +34,16 @@ for my $file (@ARGV) {
 	    warn "Could not read '$file': $@";
 	    next;
 	}
+	$size = -s $file;
     }
     else {
-	if ($webok) {
+	if ($web_ok) {
 	    if (is_web_uri ($file)) {
 		print "Getting '$file' from web.\n";
 		my $png_data = get ($file);
 		if ($png_data) {
 		    $png = read_from_scalar ($png_data);
+		    $size = length ($png);
 		}
 		else {
 		    warn "Could not download '$file', skipping.\n";
@@ -57,6 +60,7 @@ for my $file (@ARGV) {
     }
 
     print "Contents of '$file':\n\n";
+    print "File size: $size\n";
     my $ihdr = $png->get_IHDR ();
     for my $k (sort keys %$ihdr) {
 	# Display key
@@ -91,16 +95,12 @@ for my $file (@ARGV) {
 	    print "Valid $key chunk";
 	    if ($key eq 'IDAT' || $key eq 'tIME') {
 		print ".\n";
-
 	    }
 	    elsif ($key eq 'PLTE') {
 		my $plte = $png->get_chunk ($key);
 		printf " containing %d colours as follows (CSS format):\n",
 		       scalar (@$plte);
-		for my $rgb (@$plte) {
-		    printf "#%02X%02X%02X ", $rgb->{red},
-			    $rgb->{green}, $rgb->{blue};
-		}
+		print_PLTE ($plte);
 		print "\n";
 	    }
 	    elsif ($key eq 'tRNS') {
@@ -144,6 +144,21 @@ for my $file (@ARGV) {
 	}
     }
     print "\n";
+}
+
+sub print_PLTE
+{
+    my ($plte) = @_;
+    my $col = 10;
+    my $i = 0;
+    for my $rgb (@$plte) {
+	printf "#%02X%02X%02X ", $rgb->{red}, $rgb->{green}, $rgb->{blue};
+	$i++;
+	if (($i % $col) == 0) {
+	    print "\n";
+	}
+    }
+
 }
 
 __END__

@@ -1,6 +1,9 @@
 Changes
 etc/initialdata
+html/Callbacks/RT-Extension-ResetPassword/Admin/Users/Modify.html/BeforeCreate
+html/Callbacks/RT-Extension-ResetPassword/Admin/Users/Modify.html/BeforeUpdate
 html/Callbacks/RT-Extension-ResetPassword/Elements/Login/Default
+html/Elements/EditPassword
 html/NoAuth/ResetPassword/Request.html
 html/NoAuth/ResetPassword/Reset/dhandler
 inc/Module/Install.pm
@@ -21,4 +24,5 @@ Makefile.PL
 MANIFEST			This list of files
 META.yml
 README
+static/css/resetpassword.css
 SIGNATURE                                Public-key signature (added by MakeMaker)

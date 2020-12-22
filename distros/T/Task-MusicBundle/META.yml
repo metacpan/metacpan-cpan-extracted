@@ -25,7 +25,6 @@ requires:
   MIDI::Chord::Guitar: '0'
   MIDI::Drummer::Tiny: '0'
   MIDI::Morph: '0'
-  MIDI::Ngram: '0'
   MIDI::Pitch: '0'
   MIDI::Praxis::Variation: '0'
   MIDI::Simple::Drummer: '0'
@@ -49,6 +48,9 @@ requires:
   Music::Harmonics: '0'
   Music::Interval::Barycentric: '0'
   Music::Intervals: '0'
+  Music::MelodicDevice::Inversion: '0'
+  Music::MelodicDevice::Ornamentation: '0'
+  Music::MelodicDevice::Transposition: '0'
   Music::NeoRiemannianTonnetz: '0'
   Music::Note::Frequency: '0'
   Music::Note::Role::Operators: '0'
@@ -68,7 +70,7 @@ requires:
 resources:
   homepage: https://github.com/ology/Task-MusicBundle
   repository: https://github.com/ology/Task-MusicBundle.git
-version: '0.1902'
+version: '0.1903'
 x_Dist_Zilla:
   perl:
     version: '5.030002'

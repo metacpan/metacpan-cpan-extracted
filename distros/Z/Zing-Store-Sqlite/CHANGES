@@ -1,0 +1,16 @@
+Changelog for Zing-Store-Sqlite
+
+0.03 2020-12-20T22:07:43
+ - Add release updates
+ - Add fault-tolerance, and unique message per dequeue (#8)
+
+0.02 2020-12-20T09:36:26
+ - Built release version 0.02
+ - Add release updates
+ - Refactor persistence architecture (#5)
+
+0.01 2020-12-19T02:20:42
+ - Built release version 0.01
+ - Add release updates
+ - Initial implementation (#2)
+ - Initial commit

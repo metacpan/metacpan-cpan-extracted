@@ -17,7 +17,7 @@ ansicolumn - ANSI terminal sequence aware column command
 
 =head1 VERSION
 
-Version 1.02
+Version 1.03
 
 =head1 SYNOPSIS
 
@@ -186,7 +186,9 @@ Set page height and page mode on.
 When used B<-t> option, leading spaces are ignored by default.  Use
 B<--no-ignore-space> option to disable it.
 
-=item B<--insert-space>
+=item B<-->[B<no->]B<insert-space>
+
+=item B<-->[B<no->]B<paragraph>
 
 Insert empty line between every successive non-empty lines.
 

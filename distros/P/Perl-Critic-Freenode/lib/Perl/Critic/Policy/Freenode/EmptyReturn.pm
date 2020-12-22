@@ -9,7 +9,7 @@ use parent 'Perl::Critic::Policy';
 use List::Util 'any';
 use Perl::Critic::Freenode::Utils qw(is_empty_return is_structural_block);
 
-our $VERSION = '0.032';
+our $VERSION = '0.033';
 
 use constant DESC => 'return called with no arguments';
 use constant EXPL => 'return with no arguments may return either undef or an empty list depending on context. This can be surprising for the same reason as other context-sensitive returns. Return undef or the empty list explicitly.';
@@ -69,8 +69,8 @@ return the appropriate value explicitly.
   }
   my %stuff = (
     one => 1,
-    two => 2,
-    three => get_stuff(), # oops! function returns empty list if @things is empty
+    two => get_stuff(), # oops! function returns empty list if @things is empty
+    three => 3,
   );
 
 Empty returns are permitted by this policy if the subroutine contains no

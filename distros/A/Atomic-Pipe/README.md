@@ -91,6 +91,92 @@ Fork example from tests:
 
     done_testing;
 
+# MIXED DATA MODE
+
+Mixed data mode is a special use-case for Atomic::Pipe. In this mode the
+assumption is that the writer end of the pipe uses the pipe as STDOUT or
+STDERR, and as such a lot of random non-atomic prints can happen on the writer
+end of the pipe. The special case is when you want to send atomic-chunks of
+data inline with the random prints, and in the end extract the data from the
+noise. The atomic nature of messages and bursts makes this possible.
+
+Please note that mixed data mode makes use of 3 ASCII control characters:
+
+- SHIFT OUT (^N or \\x0E)
+
+    Used to start a burst
+
+- SHIFT IN (^O or \\x0F)
+
+    Used to terminate a burst
+
+- DATA LINK ESCAPE (^P or \\x10)
+
+    If this directly follows a SHIFT-OUT it marks the burst as being part of a
+    data-message.
+
+If the random prints include SHIFT OUT then they will confuse the read-side
+parser and it will not be possible to extract data, in fact reading from the
+pipe will become quite unpredictable. In practice this is unlikely to cause
+issues, but printing a binary file or random noise could do it.
+
+A burst may not include SHIFT IN as the SHIFT IN control+character marks the
+end of a burst. A burst may also not start with the DATA LINK ESCAPE control
+character as that is used to mark the start of a data-message.
+
+data-messages may contain any data/characters/bytes as they messages include a
+length so an embedded SHIFT IN will not terminate things early.
+
+    # Create a pair in mixed-data mode
+    my ($r, $w) = Atomic::Pipe->pair(mixed_data_mode => 1);
+
+    # Open STDOUT to the write handle
+    open(STDOUT, '>&', $w->{wh}) or die "Could not clone write handle: $!";
+
+    # For sanity
+    $wh->autoflush(1);
+
+    print "A line!\n";
+
+    print "Start a line ..."; # Note no "\n"
+
+    # Any number of newlines is fine the message will send/recieve as a whole.
+    $w->write_burst("This is a burst message\n\n\n");
+
+    # Data will be broken into atomic chunks and sent
+    $w->write_message($data);
+
+    print "... Finish the line we started earlier\n";
+
+    my ($type, $data) = $r->get_line_burst_or_data;
+    # Type: 'line'
+    # Data: "A line!\n"
+
+    ($type, $data) = $r->get_line_burst_or_data;
+    # Type: 'burst'
+    # Data: "This is a burst message\n\n\n"
+
+    ($type, $data) = $r->get_line_burst_or_data;
+    # Type: 'message'
+    # Data: $data
+
+    ($type, $data) = $r->get_line_burst_or_data;
+    # Type: 'line'
+    # Data: "Start a line ...... Finish the line we started earlier\n"
+
+    # mixed-data mode is always non-blocking
+    ($type, $data) = $r->get_line_burst_or_data;
+    # Type: undef
+    # Data: undef
+
+You can also turn mixed-data mode after construction, but you must do so on both ends:
+
+    $r->set_mixed_data_mode();
+    $w->set_mixed_data_mode();
+
+Doing so will make the pipe non-blocking, and will make all bursts/messages
+include the necessary control characters.
+
 # METHODS
 
 ## CLASS METHODS
@@ -240,6 +326,11 @@ Fork example from tests:
     plain-text messages that will not exceed the atomic pipe buffer limit (minimum
     of 512 bytes on systems that support atomic pipes accoring to POSIX).
 
+- $fh = $p->rh
+- $fh = $p->wh
+
+    Get the read or write handles.
+
 ### RESIZING THE PIPE BUFFER
 
 On some newer linux systems it is possible to get/set the pipe size. On
@@ -300,6 +391,21 @@ into readers and writers. These help you do that.
     This turnes the object into a writer-only. Note that if you have no
     reader-copies then effectively makes it impossible to read from the pipe as you
     cannot get a reader anymore.
+
+### MIXED DATA MODE METHODS
+
+- $p->set\_mixed\_data\_mode
+
+    Enable mixed-data mode. Also makes read-side non-blocking.
+
+- ($type, $data) = $r->get\_line\_burst\_or\_data()
+
+    Get a line, a burst, or a message from the pipe. Always non-blocking, will
+    return `(undef, undef)` if no complete line/burst/message is ready.
+
+    $type will be one of: `undef`, `'line'`, `'burst'`, or `'message'`.
+
+    $data will either be `undef`, or a complete line, burst, or message.
 
 # SOURCE
 

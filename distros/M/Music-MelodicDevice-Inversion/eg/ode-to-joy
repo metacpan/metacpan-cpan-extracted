@@ -1,0 +1,46 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+
+use Data::Dumper::Compact 'ddc';
+use lib map { "$ENV{HOME}/sandbox/$_/lib" } qw(MIDI-Util);
+use MIDI::Util;
+use Music::MelodicDevice::Inversion;
+
+my $score = MIDI::Util::setup_score();
+
+my $md = Music::MelodicDevice::Inversion->new(
+    scale_note => 'C',
+    scale_name => 'major',
+#    verbose => 1,
+);
+
+my $motif = [(('qn') x 12), qw(dqn en hn)];
+my $notes = [qw(E4 E4 F4 G4  G4 F4 E4 D4  C4 C4 D4 E4  E4 D4 D4)];
+my $inverted = $md->invert('G4', $notes);
+my $retrograde = [ reverse @$notes ];
+my $retro_inv = [ reverse @$inverted ];
+
+# Simultaneous
+#for my $n (0 .. $#$motif) {
+#    $score->n($motif->[$n], $notes->[$n], $inverted->[$n]);
+#}
+#for my $n (0 .. $#$motif) {
+#    $score->n($motif->[$n], $retrograde->[$n], $retro_inv->[$n]);
+#}
+
+# In sequence
+for my $phrase (
+    $notes,
+    $inverted,
+    $retrograde,
+    $retro_inv,
+) {
+    @$phrase = MIDI::Util::midi_format(@$phrase);
+    print ddc($phrase);
+    for my $n (0 .. $#$phrase) {
+        $score->n($motif->[$n], $phrase->[$n]);
+    }
+}
+
+$score->write_score("$0.mid");

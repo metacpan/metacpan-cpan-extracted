@@ -13,3 +13,4 @@ t/01-Date-HolidayParser.t
 t/02-iCalendar-submod-basics.t
 t/03-iCalendar.t
 t/basicTest.pm
+META.json                                Module JSON meta-data (added by MakeMaker)

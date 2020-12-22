@@ -1,0 +1,18 @@
+0.04 2020-12-22T12:11:00+01:00
+ - Add checks for object in obj2struct() in all classes.
+ - Add doc for Catalog. And examples for it.
+ - Add doc for User. And examples for it.
+ - Add doc for YearMonth. And examples for it.
+ - Export obj2struct() and struct2obj().
+
+0.03 2020-12-20T12:00:07+01:00
+ - Fix dependencies.
+
+0.02 2020-12-19T18:17:52+01:00
+ - Add tests for Catalog.
+ - Add tests for User.
+ - Add tests for YearMonth.
+ - Fix conversion of month in YearMonth class.
+
+0.01 2020-12-19T17:20:09+01:00
+ - First version.

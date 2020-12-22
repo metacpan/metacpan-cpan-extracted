@@ -1,0 +1,3913 @@
+[
+   {
+      "numSyllables" : 1,
+      "word" : "to",
+      "score" : 18213
+   },
+   {
+      "score" : 9356,
+      "word" : "through",
+      "numSyllables" : 1
+   },
+   {
+      "score" : 8923,
+      "word" : "blue",
+      "numSyllables" : 1
+   },
+   {
+      "score" : 6075,
+      "word" : "into",
+      "numSyllables" : 2
+   },
+   {
+      "numSyllables" : 1,
+      "word" : "do",
+      "score" : 4809
+   },
+   {
+      "score" : 4268,
+      "word" : "you",
+      "numSyllables" : 1
+   },
+   {
+      "numSyllables" : 1,
+      "word" : "que",
+      "score" : 3889
+   },
+   {
+      "word" : "view",
+      "numSyllables" : 1,
+      "score" : 3265
+   },
+   {
+      "score" : 3238,
+      "numSyllables" : 2,
+      "word" : "pursue"
+   },
+   {
+      "score" : 3109,
+      "numSyllables" : 1,
+      "word" : "hew"
+   },
+   {
+      "word" : "purview",
+      "numSyllables" : 2,
+      "score" : 3087
+   },
+   {
+      "score" : 2993,
+      "word" : "review",
+      "numSyllables" : 2
+   },
+   {
+      "word" : "queue",
+      "numSyllables" : 1,
+      "score" : 2900
+   },
+   {
+      "score" : 2813,
+      "word" : "eschew",
+      "numSyllables" : 2
+   },
+   {
+      "score" : 2668,
+      "numSyllables" : 2,
+      "word" : "accrue"
+   },
+   {
+      "score" : 2562,
+      "numSyllables" : 1,
+      "word" : "cue"
+   },
+   {
+      "numSyllables" : 1,
+      "word" : "new",
+      "score" : 2438
+   },
+   {
+      "score" : 2418,
+      "word" : "true",
+      "numSyllables" : 1
+   },
+   {
+      "word" : "due",
+      "numSyllables" : 1,
+      "score" : 2408
+   },
+   {
+      "numSyllables" : 1,
+      "word" : "two",
+      "score" : 2309
+   },
+   {
+      "score" : 2174,
+      "numSyllables" : 1,
+      "word" : "screw"
+   },
+   {
+      "word" : "coup",
+      "numSyllables" : 1,
+      "score" : 1966
+   },
+   {
+      "score" : 1951,
+      "word" : "rue",
+      "numSyllables" : 1
+   },
+   {
+      "score" : 1884,
+      "numSyllables" : 1,
+      "word" : "slew"
+   },
+   {
+      "numSyllables" : 3,
+      "word" : "revenue",
+      "score" : 1882
+   },
+   {
+      "score" : 1856,
+      "numSyllables" : 1,
+      "word" : "shoe"
+   },
+   {
+      "score" : 1817,
+      "numSyllables" : 2,
+      "word" : "imbue"
+   },
+   {
+      "score" : 1759,
+      "word" : "crew",
+      "numSyllables" : 1
+   },
+   {
+      "word" : "too",
+      "numSyllables" : 1,
+      "score" : 1758
+   },
+   {
+      "word" : "u",
+      "numSyllables" : 1,
+      "score" : 1746
+   },
+   {
+      "word" : "hue",
+      "numSyllables" : 1,
+      "score" : 1738
+   },
+   {
+      "score" : 1675,
+      "numSyllables" : 1,
+      "word" : "lieu"
+   },
+   {
+      "score" : 1667,
+      "word" : "tissue",
+      "numSyllables" : 2
+   },
+   {
+      "word" : "skew",
+      "numSyllables" : 1,
+      "score" : 1641
+   },
+   {
+      "score" : 1527,
+      "numSyllables" : 2,
+      "word" : "ensue"
+   },
+   {
+      "word" : "stew",
+      "numSyllables" : 1,
+      "score" : 1523
+   },
+   {
+      "score" : 1489,
+      "word" : "few",
+      "numSyllables" : 1
+   },
+   {
+      "numSyllables" : 3,
+      "word" : "rendezvous",
+      "score" : 1427
+   },
+   {
+      "score" : 1386,
+      "numSyllables" : 2,
+      "word" : "construe"
+   },
+   {
+      "score" : 1385,
+      "numSyllables" : 3,
+      "word" : "avenue"
+   },
+   {
+      "score" : 1368,
+      "numSyllables" : 2,
+      "word" : "breakthrough"
+   },
+   {
+      "score" : 1329,
+      "word" : "guru",
+      "numSyllables" : 2
+   },
+   {
+      "word" : "brew",
+      "numSyllables" : 1,
+      "score" : 1328
+   },
+   {
+      "score" : 1324,
+      "numSyllables" : 2,
+      "word" : "debut"
+   },
+   {
+      "word" : "sue",
+      "numSyllables" : 1,
+      "score" : 1310
+   },
+   {
+      "word" : "who",
+      "numSyllables" : 1,
+      "score" : 1302
+   },
+   {
+      "score" : 1295,
+      "numSyllables" : 2,
+      "word" : "ado"
+   },
+   {
+      "score" : 1295,
+      "word" : "boo",
+      "numSyllables" : 1
+   },
+   {
+      "score" : 1279,
+      "numSyllables" : 1,
+      "word" : "flu"
+   },
+   {
+      "numSyllables" : 3,
+      "word" : "hitherto",
+      "score" : 1276
+   },
+   {
+      "score" : 1263,
+      "word" : "strew",
+      "numSyllables" : 1
+   },
+   {
+      "numSyllables" : 1,
+      "word" : "woo",
+      "score" : 1221
+   },
+   {
+      "score" : 1208,
+      "numSyllables" : 3,
+      "word" : "overview"
+   },
+   {
+      "score" : 1201,
+      "numSyllables" : 1,
+      "word" : "shrew"
+   },
+   {
+      "score" : 1194,
+      "numSyllables" : 2,
+      "word" : "taboo"
+   },
+   {
+      "numSyllables" : 1,
+      "word" : "ewe",
+      "score" : 1190
+   },
+   {
+      "numSyllables" : 2,
+      "word" : "yahoo",
+      "score" : 1187
+   },
+   {
+      "word" : "glue",
+      "numSyllables" : 1,
+      "score" : 1182
+   },
+   {
+      "word" : "coo",
+      "numSyllables" : 1,
+      "score" : 1180
+   },
+   {
+      "numSyllables" : 2,
+      "word" : "bamboo",
+      "score" : 1163
+   },
+   {
+      "numSyllables" : 2,
+      "word" : "subdue",
+      "score" : 1159
+   },
+   {
+      "score" : 1157,
+      "word" : "clue",
+      "numSyllables" : 1
+   },
+   {
+      "score" : 1145,
+      "word" : "loo",
+      "numSyllables" : 1
+   },
+   {
+      "score" : 1121,
+      "word" : "redo",
+      "numSyllables" : 2
+   },
+   {
+      "word" : "outdo",
+      "numSyllables" : 2,
+      "score" : 1098
+   },
+   {
+      "word" : "undo",
+      "numSyllables" : 2,
+      "score" : 1066
+   },
+   {
+      "score" : 1059,
+      "word" : "tattoo",
+      "numSyllables" : 2
+   },
+   {
+      "numSyllables" : 3,
+      "word" : "retinue",
+      "score" : 1057
+   },
+   {
+      "score" : 1040,
+      "word" : "poo",
+      "numSyllables" : 1
+   },
+   {
+      "score" : 1025,
+      "numSyllables" : 2,
+      "word" : "undue"
+   },
+   {
+      "score" : 1015,
+      "numSyllables" : 1,
+      "word" : "pew"
+   },
+   {
+      "score" : 1002,
+      "numSyllables" : 1,
+      "word" : "spew"
+   },
+   {
+      "score" : 1001,
+      "numSyllables" : 1,
+      "word" : "thru"
+   },
+   {
+      "score" : 981,
+      "word" : "askew",
+      "numSyllables" : 2
+   },
+   {
+      "numSyllables" : 2,
+      "word" : "adieu",
+      "score" : 969
+   },
+   {
+      "word" : "vue",
+      "numSyllables" : 1,
+      "score" : 964
+   },
+   {
+      "score" : 961,
+      "numSyllables" : 1,
+      "word" : "q"
+   },
+   {
+      "score" : 956,
+      "word" : "ingenue",
+      "numSyllables" : 3
+   },
+   {
+      "word" : "goo",
+      "numSyllables" : 1,
+      "score" : 946
+   },
+   {
+      "score" : 937,
+      "word" : "statue",
+      "numSyllables" : 2
+   },
+   {
+      "score" : 933,
+      "word" : "interview",
+      "numSyllables" : 3
+   },
+   {
+      "word" : "lulu",
+      "numSyllables" : 2,
+      "score" : 894
+   },
+   {
+      "score" : 887,
+      "word" : "dew",
+      "numSyllables" : 1
+   },
+   {
+      "numSyllables" : 3,
+      "word" : "barbecue",
+      "score" : 879
+   },
+   {
+      "score" : 874,
+      "numSyllables" : 2,
+      "word" : "anew"
+   },
+   {
+      "numSyllables" : 1,
+      "word" : "vu",
+      "score" : 871
+   },
+   {
+      "word" : "yew",
+      "numSyllables" : 1,
+      "score" : 865
+   },
+   {
+      "score" : 858,
+      "numSyllables" : 2,
+      "word" : "cuckoo"
+   },
+   {
+      "numSyllables" : 2,
+      "word" : "renew",
+      "score" : 857
+   },
+   {
+      "numSyllables" : 2,
+      "word" : "canoe",
+      "score" : 832
+   },
+   {
+      "score" : 829,
+      "word" : "xu",
+      "numSyllables" : 1
+   },
+   {
+      "score" : 827,
+      "numSyllables" : 2,
+      "word" : "emu"
+   },
+   {
+      "numSyllables" : 3,
+      "word" : "residue",
+      "score" : 817
+   },
+   {
+      "score" : 814,
+      "word" : "chew",
+      "numSyllables" : 1
+   },
+   {
+      "numSyllables" : 1,
+      "word" : "shue",
+      "score" : 810
+   },
+   {
+      "score" : 789,
+      "numSyllables" : 1,
+      "word" : "gnu"
+   },
+   {
+      "numSyllables" : 1,
+      "word" : "flue",
+      "score" : 778
+   },
+   {
+      "numSyllables" : 1,
+      "word" : "mew",
+      "score" : 774
+   },
+   {
+      "score" : 768,
+      "word" : "overdo",
+      "numSyllables" : 3
+   },
+   {
+      "score" : 762,
+      "numSyllables" : 1,
+      "word" : "roux"
+   },
+   {
+      "word" : "sprew",
+      "numSyllables" : 1,
+      "score" : 759
+   },
+   {
+      "numSyllables" : 1,
+      "word" : "flew",
+      "score" : 748
+   },
+   {
+      "word" : "jew",
+      "numSyllables" : 1,
+      "score" : 744
+   },
+   {
+      "score" : 738,
+      "numSyllables" : 1,
+      "word" : "phew"
+   },
+   {
+      "score" : 709,
+      "word" : "kangaroo",
+      "numSyllables" : 3
+   },
+   {
+      "score" : 701,
+      "word" : "drew",
+      "numSyllables" : 1
+   },
+   {
+      "word" : "preview",
+      "numSyllables" : 2,
+      "score" : 690
+   },
+   {
+      "score" : 687,
+      "word" : "shoo",
+      "numSyllables" : 1
+   },
+   {
+      "word" : "knew",
+      "numSyllables" : 1,
+      "score" : 680
+   },
+   {
+      "score" : 678,
+      "numSyllables" : 1,
+      "word" : "shew"
+   },
+   {
+      "score" : 666,
+      "numSyllables" : 1,
+      "word" : "nu"
+   },
+   {
+      "score" : 666,
+      "numSyllables" : 3,
+      "word" : "overdue"
+   },
+   {
+      "score" : 649,
+      "word" : "ballyhoo",
+      "numSyllables" : 3
+   },
+   {
+      "score" : 639,
+      "numSyllables" : 1,
+      "word" : "whew"
+   },
+   {
+      "word" : "peru",
+      "numSyllables" : 2,
+      "score" : 629
+   },
+   {
+      "word" : "voodoo",
+      "numSyllables" : 2,
+      "score" : 626
+   },
+   {
+      "numSyllables" : 2,
+      "word" : "fondue",
+      "score" : 624
+   },
+   {
+      "score" : 622,
+      "numSyllables" : 1,
+      "word" : "moo"
+   },
+   {
+      "word" : "waterloo",
+      "numSyllables" : 3,
+      "score" : 617
+   },
+   {
+      "score" : 616,
+      "word" : "threw",
+      "numSyllables" : 1
+   },
+   {
+      "numSyllables" : 2,
+      "word" : "tutu",
+      "score" : 610
+   },
+   {
+      "word" : "doo",
+      "numSyllables" : 1,
+      "score" : 602
+   },
+   {
+      "score" : 598,
+      "word" : "deja vu",
+      "numSyllables" : 3
+   },
+   {
+      "word" : "wahoo",
+      "numSyllables" : 2,
+      "score" : 596
+   },
+   {
+      "score" : 582,
+      "numSyllables" : 4,
+      "word" : "hullabaloo"
+   },
+   {
+      "score" : 571,
+      "numSyllables" : 3,
+      "word" : "barbeque"
+   },
+   {
+      "score" : 567,
+      "word" : "thew",
+      "numSyllables" : 1
+   },
+   {
+      "score" : 566,
+      "word" : "urdu",
+      "numSyllables" : 2
+   },
+   {
+      "score" : 561,
+      "word" : "bugaboo",
+      "numSyllables" : 3
+   },
+   {
+      "numSyllables" : 4,
+      "word" : "tiramisu",
+      "score" : 561
+   },
+   {
+      "numSyllables" : 1,
+      "word" : "deux",
+      "score" : 552
+   },
+   {
+      "word" : "misconstrue",
+      "numSyllables" : 3,
+      "score" : 548
+   },
+   {
+      "score" : 546,
+      "numSyllables" : 2,
+      "word" : "hindu"
+   },
+   {
+      "score" : 544,
+      "numSyllables" : 1,
+      "word" : "hugh"
+   },
+   {
+      "word" : "mildew",
+      "numSyllables" : 2,
+      "score" : 543
+   },
+   {
+      "score" : 538,
+      "numSyllables" : 3,
+      "word" : "caribou"
+   },
+   {
+      "word" : "sough",
+      "numSyllables" : 1,
+      "score" : 537
+   },
+   {
+      "numSyllables" : 1,
+      "word" : "hoo",
+      "score" : 534
+   },
+   {
+      "word" : "bleu",
+      "numSyllables" : 1,
+      "score" : 533
+   },
+   {
+      "numSyllables" : 1,
+      "word" : "lou",
+      "score" : 532
+   },
+   {
+      "score" : 524,
+      "word" : "breaux",
+      "numSyllables" : 1
+   },
+   {
+      "score" : 517,
+      "word" : "cashew",
+      "numSyllables" : 2
+   },
+   {
+      "numSyllables" : 1,
+      "word" : "grew",
+      "score" : 511
+   },
+   {
+      "score" : 507,
+      "numSyllables" : 2,
+      "word" : "revue"
+   },
+   {
+      "score" : 506,
+      "word" : "jus",
+      "numSyllables" : 1
+   },
+   {
+      "numSyllables" : 1,
+      "word" : "fu",
+      "score" : 503
+   },
+   {
+      "score" : 501,
+      "numSyllables" : 1,
+      "word" : "hu"
+   },
+   {
+      "score" : 500,
+      "numSyllables" : 1,
+      "word" : "pooh"
+   },
+   {
+      "score" : 487,
+      "word" : "zulu",
+      "numSyllables" : 2
+   },
+   {
+      "word" : "kazoo",
+      "numSyllables" : 2,
+      "score" : 472
+   },
+   {
+      "score" : 470,
+      "numSyllables" : 2,
+      "word" : "due to"
+   },
+   {
+      "numSyllables" : 1,
+      "word" : "frew",
+      "score" : 467
+   },
+   {
+      "numSyllables" : 1,
+      "word" : "pu",
+      "score" : 467
+   },
+   {
+      "numSyllables" : 2,
+      "word" : "fescue",
+      "score" : 464
+   },
+   {
+      "score" : 453,
+      "word" : "go through",
+      "numSyllables" : 2
+   },
+   {
+      "score" : 453,
+      "word" : "withdrew",
+      "numSyllables" : 2
+   },
+   {
+      "word" : "up to",
+      "numSyllables" : 2,
+      "score" : 450
+   },
+   {
+      "numSyllables" : 1,
+      "word" : "lew",
+      "score" : 441
+   },
+   {
+      "word" : "chou",
+      "numSyllables" : 1,
+      "score" : 437
+   },
+   {
+      "score" : 433,
+      "word" : "iou",
+      "numSyllables" : 3
+   },
+   {
+      "numSyllables" : 1,
+      "word" : "sioux",
+      "score" : 429
+   },
+   {
+      "score" : 425,
+      "numSyllables" : 3,
+      "word" : "subject to"
+   },
+   {
+      "score" : 420,
+      "numSyllables" : 1,
+      "word" : "lue"
+   },
+   {
+      "score" : 405,
+      "word" : "blew",
+      "numSyllables" : 1
+   },
+   {
+      "numSyllables" : 1,
+      "word" : "rhue",
+      "score" : 405
+   },
+   {
+      "score" : 403,
+      "word" : "yu",
+      "numSyllables" : 1
+   },
+   {
+      "word" : "hairdo",
+      "numSyllables" : 2,
+      "score" : 401
+   },
+   {
+      "word" : "lu",
+      "numSyllables" : 1,
+      "score" : 397
+   },
+   {
+      "score" : 396,
+      "numSyllables" : 2,
+      "word" : "horseshoe"
+   },
+   {
+      "word" : "du",
+      "numSyllables" : 1,
+      "score" : 394
+   },
+   {
+      "word" : "chough",
+      "numSyllables" : 1,
+      "score" : 392
+   },
+   {
+      "word" : "marabou",
+      "numSyllables" : 3,
+      "score" : 392
+   },
+   {
+      "score" : 391,
+      "numSyllables" : 2,
+      "word" : "shampoo"
+   },
+   {
+      "word" : "leu",
+      "numSyllables" : 1,
+      "score" : 390
+   },
+   {
+      "score" : 387,
+      "numSyllables" : 1,
+      "word" : "foo"
+   },
+   {
+      "numSyllables" : 1,
+      "word" : "sprue",
+      "score" : 387
+   },
+   {
+      "score" : 384,
+      "numSyllables" : 1,
+      "word" : "ou"
+   },
+   {
+      "numSyllables" : 3,
+      "word" : "montague",
+      "score" : 373
+   },
+   {
+      "word" : "baku",
+      "numSyllables" : 2,
+      "score" : 371
+   },
+   {
+      "score" : 371,
+      "word" : "come through",
+      "numSyllables" : 2
+   },
+   {
+      "score" : 371,
+      "numSyllables" : 1,
+      "word" : "mu"
+   },
+   {
+      "word" : "thank you",
+      "numSyllables" : 2,
+      "score" : 371
+   },
+   {
+      "word" : "tu",
+      "numSyllables" : 1,
+      "score" : 371
+   },
+   {
+      "score" : 367,
+      "numSyllables" : 1,
+      "word" : "ooh"
+   },
+   {
+      "score" : 364,
+      "numSyllables" : 2,
+      "word" : "ragu"
+   },
+   {
+      "score" : 363,
+      "word" : "shu",
+      "numSyllables" : 1
+   },
+   {
+      "numSyllables" : 2,
+      "word" : "used to",
+      "score" : 362
+   },
+   {
+      "score" : 361,
+      "word" : "pass through",
+      "numSyllables" : 2
+   },
+   {
+      "word" : "bbq",
+      "numSyllables" : 3,
+      "score" : 358
+   },
+   {
+      "score" : 358,
+      "word" : "look into",
+      "numSyllables" : 3
+   },
+   {
+      "score" : 353,
+      "word" : "hoopoe",
+      "numSyllables" : 2
+   },
+   {
+      "score" : 351,
+      "numSyllables" : 2,
+      "word" : "c2"
+   },
+   {
+      "score" : 351,
+      "numSyllables" : 2,
+      "word" : "gumshoe"
+   },
+   {
+      "word" : "babu",
+      "numSyllables" : 2,
+      "score" : 348
+   },
+   {
+      "numSyllables" : 1,
+      "word" : "stu",
+      "score" : 344
+   },
+   {
+      "score" : 340,
+      "word" : "get to",
+      "numSyllables" : 2
+   },
+   {
+      "score" : 340,
+      "numSyllables" : 3,
+      "word" : "look up to"
+   },
+   {
+      "score" : 336,
+      "numSyllables" : 2,
+      "word" : "as to"
+   },
+   {
+      "score" : 336,
+      "word" : "nehru",
+      "numSyllables" : 2
+   },
+   {
+      "numSyllables" : 1,
+      "word" : "qu",
+      "score" : 329
+   },
+   {
+      "word" : "miscue",
+      "numSyllables" : 2,
+      "score" : 326
+   },
+   {
+      "score" : 325,
+      "numSyllables" : 3,
+      "word" : "cockatoo"
+   },
+   {
+      "score" : 325,
+      "word" : "wu",
+      "numSyllables" : 1
+   },
+   {
+      "score" : 321,
+      "word" : "gu",
+      "numSyllables" : 1
+   },
+   {
+      "word" : "untrue",
+      "numSyllables" : 2,
+      "score" : 318
+   },
+   {
+      "score" : 310,
+      "numSyllables" : 3,
+      "word" : "honeydew"
+   },
+   {
+      "score" : 307,
+      "numSyllables" : 3,
+      "word" : "follow through"
+   },
+   {
+      "score" : 300,
+      "word" : "corkscrew",
+      "numSyllables" : 2
+   },
+   {
+      "numSyllables" : 2,
+      "word" : "look to",
+      "score" : 298
+   },
+   {
+      "word" : "uwe",
+      "numSyllables" : 1,
+      "score" : 296
+   },
+   {
+      "score" : 295,
+      "numSyllables" : 1,
+      "word" : "ru"
+   },
+   {
+      "numSyllables" : 4,
+      "word" : "kalamazoo",
+      "score" : 292
+   },
+   {
+      "numSyllables" : 3,
+      "word" : "jujitsu",
+      "score" : 288
+   },
+   {
+      "word" : "point of view",
+      "numSyllables" : 3,
+      "score" : 288
+   },
+   {
+      "numSyllables" : 2,
+      "word" : "ballou",
+      "score" : 286
+   },
+   {
+      "score" : 286,
+      "word" : "come to",
+      "numSyllables" : 2
+   },
+   {
+      "numSyllables" : 3,
+      "word" : "amadou",
+      "score" : 283
+   },
+   {
+      "score" : 274,
+      "numSyllables" : 3,
+      "word" : "devalue"
+   },
+   {
+      "numSyllables" : 2,
+      "word" : "get through",
+      "score" : 270
+   },
+   {
+      "score" : 268,
+      "numSyllables" : 1,
+      "word" : "tew"
+   },
+   {
+      "score" : 262,
+      "word" : "chu",
+      "numSyllables" : 1
+   },
+   {
+      "word" : "drough",
+      "numSyllables" : 1,
+      "score" : 259
+   },
+   {
+      "score" : 259,
+      "word" : "feverfew",
+      "numSyllables" : 3
+   },
+   {
+      "score" : 258,
+      "numSyllables" : 1,
+      "word" : "gue"
+   },
+   {
+      "score" : 253,
+      "word" : "richelieu",
+      "numSyllables" : 3
+   },
+   {
+      "numSyllables" : 1,
+      "word" : "heugh",
+      "score" : 250
+   },
+   {
+      "score" : 250,
+      "numSyllables" : 3,
+      "word" : "katmandu"
+   },
+   {
+      "score" : 247,
+      "numSyllables" : 2,
+      "word" : "fall through"
+   },
+   {
+      "score" : 246,
+      "word" : "go to",
+      "numSyllables" : 2
+   },
+   {
+      "numSyllables" : 4,
+      "word" : "with regard to",
+      "score" : 244
+   },
+   {
+      "score" : 241,
+      "numSyllables" : 1,
+      "word" : "ku"
+   },
+   {
+      "score" : 240,
+      "numSyllables" : 4,
+      "word" : "out of the blue"
+   },
+   {
+      "score" : 239,
+      "numSyllables" : 2,
+      "word" : "bellevue"
+   },
+   {
+      "score" : 238,
+      "numSyllables" : 1,
+      "word" : "choo"
+   },
+   {
+      "word" : "ju",
+      "numSyllables" : 1,
+      "score" : 238
+   },
+   {
+      "score" : 236,
+      "word" : "zaibatsu",
+      "numSyllables" : 3
+   },
+   {
+      "word" : "soo",
+      "numSyllables" : 1,
+      "score" : 234
+   },
+   {
+      "score" : 232,
+      "numSyllables" : 2,
+      "word" : "take to"
+   },
+   {
+      "word" : "get into",
+      "numSyllables" : 3,
+      "score" : 230
+   },
+   {
+      "score" : 223,
+      "word" : "timbuktu",
+      "numSyllables" : 3
+   },
+   {
+      "numSyllables" : 2,
+      "word" : "khufu",
+      "score" : 222
+   },
+   {
+      "score" : 222,
+      "word" : "pas de deux",
+      "numSyllables" : 3
+   },
+   {
+      "word" : "kew",
+      "numSyllables" : 1,
+      "score" : 221
+   },
+   {
+      "score" : 221,
+      "numSyllables" : 3,
+      "word" : "run into"
+   },
+   {
+      "score" : 219,
+      "word" : "isu",
+      "numSyllables" : 2
+   },
+   {
+      "numSyllables" : 2,
+      "word" : "manu",
+      "score" : 218
+   },
+   {
+      "word" : "su",
+      "numSyllables" : 1,
+      "score" : 218
+   },
+   {
+      "word" : "perdue",
+      "numSyllables" : 2,
+      "score" : 216
+   },
+   {
+      "numSyllables" : 1,
+      "word" : "zooplasty",
+      "score" : 215
+   },
+   {
+      "score" : 214,
+      "word" : "run through",
+      "numSyllables" : 2
+   },
+   {
+      "score" : 214,
+      "word" : "see through",
+      "numSyllables" : 2
+   },
+   {
+      "score" : 214,
+      "numSyllables" : 4,
+      "word" : "with respect to"
+   },
+   {
+      "score" : 213,
+      "word" : "stick to",
+      "numSyllables" : 2
+   },
+   {
+      "numSyllables" : 2,
+      "word" : "larue",
+      "score" : 212
+   },
+   {
+      "word" : "cebu",
+      "numSyllables" : 2,
+      "score" : 211
+   },
+   {
+      "score" : 208,
+      "numSyllables" : 2,
+      "word" : "goto"
+   },
+   {
+      "numSyllables" : 1,
+      "word" : "vous",
+      "score" : 203
+   },
+   {
+      "numSyllables" : 3,
+      "word" : "cmu",
+      "score" : 202
+   },
+   {
+      "word" : "break into",
+      "numSyllables" : 3,
+      "score" : 200
+   },
+   {
+      "score" : 200,
+      "numSyllables" : 1,
+      "word" : "liu"
+   },
+   {
+      "score" : 199,
+      "numSyllables" : 1,
+      "word" : "krewe"
+   },
+   {
+      "numSyllables" : 1,
+      "word" : "mmbtu",
+      "score" : 199
+   },
+   {
+      "word" : "make do",
+      "numSyllables" : 2,
+      "score" : 196
+   },
+   {
+      "numSyllables" : 2,
+      "word" : "push through",
+      "score" : 195
+   },
+   {
+      "score" : 194,
+      "word" : "bartholomew",
+      "numSyllables" : 4
+   },
+   {
+      "numSyllables" : 2,
+      "word" : "drive-thru",
+      "score" : 193
+   },
+   {
+      "word" : "attend to",
+      "numSyllables" : 3,
+      "score" : 192
+   },
+   {
+      "word" : "tuvalu",
+      "numSyllables" : 3,
+      "score" : 191
+   },
+   {
+      "score" : 188,
+      "word" : "crewe",
+      "numSyllables" : 1
+   },
+   {
+      "score" : 187,
+      "word" : "revalue",
+      "numSyllables" : 3
+   },
+   {
+      "score" : 186,
+      "word" : "phu",
+      "numSyllables" : 1
+   },
+   {
+      "word" : "pugh",
+      "numSyllables" : 1,
+      "score" : 180
+   },
+   {
+      "score" : 179,
+      "word" : "cou",
+      "numSyllables" : 1
+   },
+   {
+      "score" : 178,
+      "numSyllables" : 2,
+      "word" : "a few"
+   },
+   {
+      "score" : 178,
+      "numSyllables" : 3,
+      "word" : "live up to"
+   },
+   {
+      "score" : 177,
+      "word" : "resort to",
+      "numSyllables" : 3
+   },
+   {
+      "numSyllables" : 2,
+      "word" : "speak to",
+      "score" : 177
+   },
+   {
+      "word" : "go into",
+      "numSyllables" : 3,
+      "score" : 176
+   },
+   {
+      "word" : "prue",
+      "numSyllables" : 1,
+      "score" : 175
+   },
+   {
+      "numSyllables" : 3,
+      "word" : "fontainebleau",
+      "score" : 172
+   },
+   {
+      "numSyllables" : 1,
+      "word" : "glew",
+      "score" : 171
+   },
+   {
+      "word" : "turn to",
+      "numSyllables" : 2,
+      "score" : 171
+   },
+   {
+      "word" : "yue",
+      "numSyllables" : 1,
+      "score" : 171
+   },
+   {
+      "score" : 170,
+      "numSyllables" : 1,
+      "word" : "trew"
+   },
+   {
+      "score" : 168,
+      "numSyllables" : 2,
+      "word" : "aircrew"
+   },
+   {
+      "word" : "plew",
+      "numSyllables" : 1,
+      "score" : 168
+   },
+   {
+      "score" : 168,
+      "numSyllables" : 3,
+      "word" : "tae kwon do"
+   },
+   {
+      "score" : 168,
+      "numSyllables" : 3,
+      "word" : "turn into"
+   },
+   {
+      "score" : 166,
+      "numSyllables" : 3,
+      "word" : "countersue"
+   },
+   {
+      "numSyllables" : 2,
+      "word" : "pull through",
+      "score" : 165
+   },
+   {
+      "word" : "m2",
+      "numSyllables" : 2,
+      "score" : 164
+   },
+   {
+      "word" : "jue",
+      "numSyllables" : 1,
+      "score" : 162
+   },
+   {
+      "numSyllables" : 2,
+      "word" : "cut through",
+      "score" : 161
+   },
+   {
+      "score" : 159,
+      "numSyllables" : 2,
+      "word" : "work through"
+   },
+   {
+      "word" : "zhou",
+      "numSyllables" : 1,
+      "score" : 158
+   },
+   {
+      "score" : 157,
+      "word" : "tatu",
+      "numSyllables" : 2
+   },
+   {
+      "score" : 156,
+      "word" : "hutu",
+      "numSyllables" : 2
+   },
+   {
+      "numSyllables" : 3,
+      "word" : "buy into",
+      "score" : 155
+   },
+   {
+      "numSyllables" : 1,
+      "word" : "pru",
+      "score" : 155
+   },
+   {
+      "numSyllables" : 3,
+      "word" : "cordon bleu",
+      "score" : 154
+   },
+   {
+      "numSyllables" : 4,
+      "word" : "mogadishu",
+      "score" : 153
+   },
+   {
+      "score" : 153,
+      "word" : "snowshoe",
+      "numSyllables" : 2
+   },
+   {
+      "score" : 149,
+      "word" : "thankyou",
+      "numSyllables" : 2
+   },
+   {
+      "score" : 148,
+      "word" : "jammu",
+      "numSyllables" : 2
+   },
+   {
+      "score" : 148,
+      "numSyllables" : 1,
+      "word" : "rew"
+   },
+   {
+      "word" : "tue",
+      "numSyllables" : 1,
+      "score" : 147
+   },
+   {
+      "score" : 145,
+      "numSyllables" : 3,
+      "word" : "appeal to"
+   },
+   {
+      "numSyllables" : 4,
+      "word" : "in regard to",
+      "score" : 145
+   },
+   {
+      "numSyllables" : 4,
+      "word" : "related to",
+      "score" : 145
+   },
+   {
+      "numSyllables" : 3,
+      "word" : "come into",
+      "score" : 142
+   },
+   {
+      "score" : 142,
+      "word" : "joo",
+      "numSyllables" : 1
+   },
+   {
+      "numSyllables" : 2,
+      "word" : "abou",
+      "score" : 141
+   },
+   {
+      "score" : 138,
+      "word" : "kyu",
+      "numSyllables" : 1
+   },
+   {
+      "score" : 136,
+      "word" : "apple of peru",
+      "numSyllables" : 5
+   },
+   {
+      "word" : "world view",
+      "numSyllables" : 2,
+      "score" : 136
+   },
+   {
+      "word" : "capital of peru",
+      "numSyllables" : 6,
+      "score" : 135
+   },
+   {
+      "word" : "kung fu",
+      "numSyllables" : 2,
+      "score" : 134
+   },
+   {
+      "score" : 133,
+      "word" : "to do",
+      "numSyllables" : 2
+   },
+   {
+      "score" : 132,
+      "numSyllables" : 1,
+      "word" : "yoo"
+   },
+   {
+      "numSyllables" : 3,
+      "word" : "peer review",
+      "score" : 131
+   },
+   {
+      "score" : 129,
+      "numSyllables" : 2,
+      "word" : "purdue"
+   },
+   {
+      "score" : 128,
+      "word" : "in relation to",
+      "numSyllables" : 5
+   },
+   {
+      "score" : 127,
+      "numSyllables" : 2,
+      "word" : "bellew"
+   },
+   {
+      "word" : "break through",
+      "numSyllables" : 2,
+      "score" : 127
+   },
+   {
+      "numSyllables" : 3,
+      "word" : "cobalt blue",
+      "score" : 127
+   },
+   {
+      "score" : 126,
+      "numSyllables" : 2,
+      "word" : "have to"
+   },
+   {
+      "numSyllables" : 3,
+      "word" : "irish stew",
+      "score" : 126
+   },
+   {
+      "score" : 126,
+      "word" : "oooh",
+      "numSyllables" : 1
+   },
+   {
+      "score" : 124,
+      "numSyllables" : 3,
+      "word" : "accede to"
+   },
+   {
+      "score" : 124,
+      "numSyllables" : 1,
+      "word" : "hsu"
+   },
+   {
+      "numSyllables" : 3,
+      "word" : "pompidou",
+      "score" : 121
+   },
+   {
+      "word" : "with reference to",
+      "numSyllables" : 5,
+      "score" : 121
+   },
+   {
+      "score" : 120,
+      "numSyllables" : 3,
+      "word" : "montagu"
+   },
+   {
+      "score" : 114,
+      "numSyllables" : 3,
+      "word" : "carry through"
+   },
+   {
+      "numSyllables" : 2,
+      "word" : "chengdu",
+      "score" : 113
+   },
+   {
+      "word" : "tsu",
+      "numSyllables" : 1,
+      "score" : 113
+   },
+   {
+      "numSyllables" : 3,
+      "word" : "bump into",
+      "score" : 112
+   },
+   {
+      "word" : "fall into",
+      "numSyllables" : 3,
+      "score" : 109
+   },
+   {
+      "score" : 109,
+      "word" : "koo",
+      "numSyllables" : 1
+   },
+   {
+      "score" : 109,
+      "numSyllables" : 3,
+      "word" : "overdrew"
+   },
+   {
+      "word" : "mobutu",
+      "numSyllables" : 3,
+      "score" : 107
+   },
+   {
+      "score" : 104,
+      "numSyllables" : 4,
+      "word" : "netanyahu"
+   },
+   {
+      "score" : 101,
+      "numSyllables" : 2,
+      "word" : "put through"
+   },
+   {
+      "numSyllables" : 4,
+      "word" : "get around to",
+      "score" : 100
+   },
+   {
+      "score" : 100,
+      "word" : "giroux",
+      "numSyllables" : 2
+   },
+   {
+      "score" : 100,
+      "word" : "guangzhou",
+      "numSyllables" : 2
+   },
+   {
+      "score" : 100,
+      "numSyllables" : 2,
+      "word" : "lakeview"
+   },
+   {
+      "score" : 99,
+      "word" : "lag screw",
+      "numSyllables" : 2
+   },
+   {
+      "word" : "karlsruhe",
+      "numSyllables" : 2,
+      "score" : 98
+   },
+   {
+      "word" : "balsam of peru",
+      "numSyllables" : 5,
+      "score" : 96
+   },
+   {
+      "score" : 95,
+      "numSyllables" : 2,
+      "word" : "unglue"
+   },
+   {
+      "numSyllables" : 5,
+      "word" : "dfw",
+      "score" : 94
+   },
+   {
+      "word" : "beef stew",
+      "numSyllables" : 2,
+      "score" : 93
+   },
+   {
+      "score" : 93,
+      "word" : "field of view",
+      "numSyllables" : 3
+   },
+   {
+      "numSyllables" : 1,
+      "word" : "chiu",
+      "score" : 92
+   },
+   {
+      "word" : "greenish blue",
+      "numSyllables" : 3,
+      "score" : 91
+   },
+   {
+      "numSyllables" : 3,
+      "word" : "komatsu",
+      "score" : 91
+   },
+   {
+      "score" : 91,
+      "word" : "royal blue",
+      "numSyllables" : 3
+   },
+   {
+      "score" : 91,
+      "word" : "zhu",
+      "numSyllables" : 1
+   },
+   {
+      "score" : 90,
+      "numSyllables" : 2,
+      "word" : "bring to"
+   },
+   {
+      "numSyllables" : 1,
+      "word" : "hewe",
+      "score" : 89
+   },
+   {
+      "numSyllables" : 3,
+      "word" : "machine screw",
+      "score" : 89
+   },
+   {
+      "score" : 89,
+      "word" : "overthrew",
+      "numSyllables" : 3
+   },
+   {
+      "word" : "xue",
+      "numSyllables" : 1,
+      "score" : 89
+   },
+   {
+      "numSyllables" : 1,
+      "word" : "beu",
+      "score" : 87
+   },
+   {
+      "score" : 87,
+      "word" : "conform to",
+      "numSyllables" : 3
+   },
+   {
+      "score" : 87,
+      "numSyllables" : 1,
+      "word" : "coups"
+   },
+   {
+      "numSyllables" : 1,
+      "word" : "hou",
+      "score" : 87
+   },
+   {
+      "word" : "navy blue",
+      "numSyllables" : 3,
+      "score" : 87
+   },
+   {
+      "word" : "abreu",
+      "numSyllables" : 2,
+      "score" : 85
+   },
+   {
+      "numSyllables" : 3,
+      "word" : "prussian blue",
+      "score" : 85
+   },
+   {
+      "score" : 84,
+      "numSyllables" : 2,
+      "word" : "ledoux"
+   },
+   {
+      "word" : "close to",
+      "numSyllables" : 2,
+      "score" : 83
+   },
+   {
+      "score" : 82,
+      "word" : "loux",
+      "numSyllables" : 1
+   },
+   {
+      "word" : "all too",
+      "numSyllables" : 2,
+      "score" : 81
+   },
+   {
+      "score" : 80,
+      "numSyllables" : 3,
+      "word" : "angelou"
+   },
+   {
+      "word" : "tried and true",
+      "numSyllables" : 3,
+      "score" : 80
+   },
+   {
+      "numSyllables" : 3,
+      "word" : "come up to",
+      "score" : 79
+   },
+   {
+      "numSyllables" : 5,
+      "word" : "judicial review",
+      "score" : 79
+   },
+   {
+      "score" : 79,
+      "word" : "schuh",
+      "numSyllables" : 1
+   },
+   {
+      "numSyllables" : 3,
+      "word" : "byu",
+      "score" : 76
+   },
+   {
+      "score" : 76,
+      "word" : "taku",
+      "numSyllables" : 2
+   },
+   {
+      "score" : 76,
+      "word" : "wandering jew",
+      "numSyllables" : 4
+   },
+   {
+      "score" : 74,
+      "numSyllables" : 2,
+      "word" : "outgrew"
+   },
+   {
+      "score" : 74,
+      "word" : "ratu",
+      "numSyllables" : 2
+   },
+   {
+      "numSyllables" : 1,
+      "word" : "dru",
+      "score" : 72
+   },
+   {
+      "numSyllables" : 4,
+      "word" : "fifth avenue",
+      "score" : 72
+   },
+   {
+      "score" : 72,
+      "numSyllables" : 3,
+      "word" : "good for you"
+   },
+   {
+      "score" : 72,
+      "word" : "incidental to",
+      "numSyllables" : 5
+   },
+   {
+      "numSyllables" : 2,
+      "word" : "add to",
+      "score" : 71
+   },
+   {
+      "word" : "side view",
+      "numSyllables" : 2,
+      "score" : 71
+   },
+   {
+      "word" : "chicken stew",
+      "numSyllables" : 3,
+      "score" : 70
+   },
+   {
+      "score" : 70,
+      "word" : "connective tissue",
+      "numSyllables" : 5
+   },
+   {
+      "score" : 68,
+      "numSyllables" : 5,
+      "word" : "adipose tissue"
+   },
+   {
+      "numSyllables" : 2,
+      "word" : "cling to",
+      "score" : 68
+   },
+   {
+      "numSyllables" : 3,
+      "word" : "eat into",
+      "score" : 68
+   },
+   {
+      "score" : 68,
+      "word" : "going to",
+      "numSyllables" : 3
+   },
+   {
+      "word" : "lay into",
+      "numSyllables" : 3,
+      "score" : 67
+   },
+   {
+      "numSyllables" : 2,
+      "word" : "bright blue",
+      "score" : 66
+   },
+   {
+      "score" : 66,
+      "word" : "dark blue",
+      "numSyllables" : 2
+   },
+   {
+      "score" : 65,
+      "word" : "subscribe to",
+      "numSyllables" : 3
+   },
+   {
+      "numSyllables" : 2,
+      "word" : "brake shoe",
+      "score" : 64
+   },
+   {
+      "word" : "cut into",
+      "numSyllables" : 3,
+      "score" : 64
+   },
+   {
+      "score" : 64,
+      "numSyllables" : 3,
+      "word" : "dig into"
+   },
+   {
+      "numSyllables" : 3,
+      "word" : "out of view",
+      "score" : 64
+   },
+   {
+      "numSyllables" : 3,
+      "word" : "baby shoe",
+      "score" : 63
+   },
+   {
+      "word" : "badu",
+      "numSyllables" : 2,
+      "score" : 63
+   },
+   {
+      "score" : 63,
+      "word" : "rioux",
+      "numSyllables" : 1
+   },
+   {
+      "score" : 62,
+      "numSyllables" : 3,
+      "word" : "grow into"
+   },
+   {
+      "score" : 62,
+      "word" : "in proportion to",
+      "numSyllables" : 5
+   },
+   {
+      "score" : 62,
+      "word" : "kwangju",
+      "numSyllables" : 2
+   },
+   {
+      "score" : 62,
+      "numSyllables" : 3,
+      "word" : "mcadoo"
+   },
+   {
+      "score" : 61,
+      "word" : "adequate to",
+      "numSyllables" : 4
+   },
+   {
+      "numSyllables" : 3,
+      "word" : "open to",
+      "score" : 61
+   },
+   {
+      "score" : 61,
+      "word" : "powder blue",
+      "numSyllables" : 3
+   },
+   {
+      "numSyllables" : 1,
+      "word" : "brue",
+      "score" : 60
+   },
+   {
+      "word" : "stomach flu",
+      "numSyllables" : 3,
+      "score" : 60
+   },
+   {
+      "score" : 59,
+      "word" : "dip into",
+      "numSyllables" : 3
+   },
+   {
+      "score" : 59,
+      "numSyllables" : 1,
+      "word" : "grewe"
+   },
+   {
+      "word" : "talk into",
+      "numSyllables" : 3,
+      "score" : 59
+   },
+   {
+      "score" : 58,
+      "word" : "crazy glue",
+      "numSyllables" : 3
+   },
+   {
+      "numSyllables" : 1,
+      "word" : "thuy",
+      "score" : 58
+   },
+   {
+      "score" : 56,
+      "word" : "daewoo",
+      "numSyllables" : 2
+   },
+   {
+      "score" : 56,
+      "word" : "kourou",
+      "numSyllables" : 2
+   },
+   {
+      "numSyllables" : 3,
+      "word" : "peacock blue",
+      "score" : 56
+   },
+   {
+      "score" : 56,
+      "word" : "through and through",
+      "numSyllables" : 3
+   },
+   {
+      "numSyllables" : 3,
+      "word" : "book review",
+      "score" : 55
+   },
+   {
+      "word" : "zanu",
+      "numSyllables" : 2,
+      "score" : 55
+   },
+   {
+      "numSyllables" : 3,
+      "word" : "devereux",
+      "score" : 54
+   },
+   {
+      "word" : "lace into",
+      "numSyllables" : 3,
+      "score" : 54
+   },
+   {
+      "score" : 54,
+      "numSyllables" : 3,
+      "word" : "meadow rue"
+   },
+   {
+      "score" : 53,
+      "word" : "danish blue",
+      "numSyllables" : 3
+   },
+   {
+      "numSyllables" : 2,
+      "word" : "home brew",
+      "score" : 53
+   },
+   {
+      "numSyllables" : 1,
+      "word" : "hoogh",
+      "score" : 53
+   },
+   {
+      "score" : 53,
+      "word" : "rat kangaroo",
+      "numSyllables" : 4
+   },
+   {
+      "score" : 53,
+      "word" : "talking to",
+      "numSyllables" : 3
+   },
+   {
+      "numSyllables" : 2,
+      "word" : "theroux",
+      "score" : 53
+   },
+   {
+      "numSyllables" : 3,
+      "word" : "check into",
+      "score" : 52
+   },
+   {
+      "score" : 52,
+      "numSyllables" : 3,
+      "word" : "donahue"
+   },
+   {
+      "score" : 51,
+      "word" : "luck through",
+      "numSyllables" : 2
+   },
+   {
+      "score" : 51,
+      "numSyllables" : 1,
+      "word" : "pou"
+   },
+   {
+      "numSyllables" : 3,
+      "word" : "suu",
+      "score" : 51
+   },
+   {
+      "word" : "true to",
+      "numSyllables" : 2,
+      "score" : 51
+   },
+   {
+      "score" : 51,
+      "numSyllables" : 2,
+      "word" : "warm to"
+   },
+   {
+      "numSyllables" : 2,
+      "word" : "bring through",
+      "score" : 50
+   },
+   {
+      "word" : "in view",
+      "numSyllables" : 2,
+      "score" : 50
+   },
+   {
+      "numSyllables" : 2,
+      "word" : "plainview",
+      "score" : 49
+   },
+   {
+      "score" : 48,
+      "numSyllables" : 3,
+      "word" : "lay waste to"
+   },
+   {
+      "word" : "park avenue",
+      "numSyllables" : 4,
+      "score" : 48
+   },
+   {
+      "score" : 48,
+      "word" : "plue",
+      "numSyllables" : 1
+   },
+   {
+      "numSyllables" : 2,
+      "word" : "sea mew",
+      "score" : 48
+   },
+   {
+      "word" : "suzhou",
+      "numSyllables" : 2,
+      "score" : 48
+   },
+   {
+      "score" : 48,
+      "numSyllables" : 2,
+      "word" : "want to"
+   },
+   {
+      "word" : "cardinal richelieu",
+      "numSyllables" : 6,
+      "score" : 47
+   },
+   {
+      "score" : 47,
+      "word" : "lemieux",
+      "numSyllables" : 2
+   },
+   {
+      "score" : 47,
+      "word" : "ramu",
+      "numSyllables" : 2
+   },
+   {
+      "score" : 47,
+      "numSyllables" : 3,
+      "word" : "sneak preview"
+   },
+   {
+      "numSyllables" : 3,
+      "word" : "ran into",
+      "score" : 46
+   },
+   {
+      "numSyllables" : 2,
+      "word" : "gym shoe",
+      "score" : 45
+   },
+   {
+      "word" : "how to",
+      "numSyllables" : 2,
+      "score" : 45
+   },
+   {
+      "numSyllables" : 2,
+      "word" : "longview",
+      "score" : 45
+   },
+   {
+      "score" : 45,
+      "numSyllables" : 2,
+      "word" : "zuzu"
+   },
+   {
+      "numSyllables" : 4,
+      "word" : "dugout canoe",
+      "score" : 44
+   },
+   {
+      "numSyllables" : 4,
+      "word" : "foray into",
+      "score" : 44
+   },
+   {
+      "score" : 44,
+      "numSyllables" : 2,
+      "word" : "out to"
+   },
+   {
+      "score" : 44,
+      "numSyllables" : 1,
+      "word" : "shiu"
+   },
+   {
+      "numSyllables" : 3,
+      "word" : "tear into",
+      "score" : 43
+   },
+   {
+      "word" : "allen screw",
+      "numSyllables" : 3,
+      "score" : 42
+   },
+   {
+      "word" : "equal to",
+      "numSyllables" : 3,
+      "score" : 42
+   },
+   {
+      "word" : "chicken cordon bleu",
+      "numSyllables" : 5,
+      "score" : 41
+   },
+   {
+      "score" : 41,
+      "numSyllables" : 3,
+      "word" : "depardieu"
+   },
+   {
+      "word" : "granulation tissue",
+      "numSyllables" : 6,
+      "score" : 41
+   },
+   {
+      "score" : 41,
+      "word" : "oyster stew",
+      "numSyllables" : 3
+   },
+   {
+      "numSyllables" : 4,
+      "word" : "reference to",
+      "score" : 41
+   },
+   {
+      "score" : 40,
+      "word" : "mulligan stew",
+      "numSyllables" : 4
+   },
+   {
+      "score" : 38,
+      "word" : "brunswick stew",
+      "numSyllables" : 3
+   },
+   {
+      "score" : 38,
+      "numSyllables" : 2,
+      "word" : "fish glue"
+   },
+   {
+      "score" : 38,
+      "numSyllables" : 4,
+      "word" : "methylene blue"
+   },
+   {
+      "word" : "pool cue",
+      "numSyllables" : 2,
+      "score" : 38
+   },
+   {
+      "numSyllables" : 7,
+      "word" : "analytical review",
+      "score" : 37
+   },
+   {
+      "score" : 37,
+      "numSyllables" : 4,
+      "word" : "animal glue"
+   },
+   {
+      "score" : 37,
+      "word" : "critical review",
+      "numSyllables" : 5
+   },
+   {
+      "numSyllables" : 4,
+      "word" : "epoxy glue",
+      "score" : 37
+   },
+   {
+      "word" : "tennis shoe",
+      "numSyllables" : 3,
+      "score" : 37
+   },
+   {
+      "score" : 36,
+      "numSyllables" : 2,
+      "word" : "glenview"
+   },
+   {
+      "score" : 35,
+      "word" : "attach to",
+      "numSyllables" : 3
+   },
+   {
+      "word" : "casein glue",
+      "numSyllables" : 3,
+      "score" : 35
+   },
+   {
+      "score" : 35,
+      "numSyllables" : 2,
+      "word" : "ground crew"
+   },
+   {
+      "score" : 35,
+      "numSyllables" : 3,
+      "word" : "poke into"
+   },
+   {
+      "numSyllables" : 2,
+      "word" : "reto",
+      "score" : 35
+   },
+   {
+      "numSyllables" : 1,
+      "word" : "schewe",
+      "score" : 35
+   },
+   {
+      "score" : 35,
+      "numSyllables" : 4,
+      "word" : "tree kangaroo"
+   },
+   {
+      "numSyllables" : 2,
+      "word" : "cap screw",
+      "score" : 34
+   },
+   {
+      "word" : "cut to",
+      "numSyllables" : 2,
+      "score" : 34
+   },
+   {
+      "word" : "grandview",
+      "numSyllables" : 2,
+      "score" : 34
+   },
+   {
+      "word" : "kotzebue",
+      "numSyllables" : 3,
+      "score" : 34
+   },
+   {
+      "numSyllables" : 3,
+      "word" : "move into",
+      "score" : 34
+   },
+   {
+      "word" : "out of true",
+      "numSyllables" : 3,
+      "score" : 34
+   },
+   {
+      "score" : 33,
+      "numSyllables" : 6,
+      "word" : "battle of waterloo"
+   },
+   {
+      "score" : 33,
+      "numSyllables" : 4,
+      "word" : "chocolate fondue"
+   },
+   {
+      "score" : 33,
+      "word" : "gross revenue",
+      "numSyllables" : 4
+   },
+   {
+      "word" : "iliescu",
+      "numSyllables" : 4,
+      "score" : 33
+   },
+   {
+      "word" : "papandreou",
+      "numSyllables" : 4,
+      "score" : 33
+   },
+   {
+      "numSyllables" : 3,
+      "word" : "pitch into",
+      "score" : 33
+   },
+   {
+      "score" : 33,
+      "numSyllables" : 2,
+      "word" : "stage crew"
+   },
+   {
+      "score" : 33,
+      "numSyllables" : 2,
+      "word" : "steel blue"
+   },
+   {
+      "score" : 33,
+      "numSyllables" : 3,
+      "word" : "tended to"
+   },
+   {
+      "word" : "hip to",
+      "numSyllables" : 2,
+      "score" : 32
+   },
+   {
+      "word" : "leroux",
+      "numSyllables" : 2,
+      "score" : 32
+   },
+   {
+      "score" : 32,
+      "word" : "meadow fescue",
+      "numSyllables" : 4
+   },
+   {
+      "word" : "extend to",
+      "numSyllables" : 3,
+      "score" : 31
+   },
+   {
+      "numSyllables" : 2,
+      "word" : "fairview",
+      "score" : 31
+   },
+   {
+      "score" : 31,
+      "word" : "neveu",
+      "numSyllables" : 2
+   },
+   {
+      "numSyllables" : 3,
+      "word" : "phillips screw",
+      "score" : 31
+   },
+   {
+      "word" : "tax revenue",
+      "numSyllables" : 4,
+      "score" : 31
+   },
+   {
+      "numSyllables" : 5,
+      "word" : "unearned revenue",
+      "score" : 31
+   },
+   {
+      "score" : 31,
+      "word" : "wont to",
+      "numSyllables" : 2
+   },
+   {
+      "word" : "bukavu",
+      "numSyllables" : 3,
+      "score" : 30
+   },
+   {
+      "score" : 30,
+      "numSyllables" : 3,
+      "word" : "give tongue to"
+   },
+   {
+      "numSyllables" : 3,
+      "word" : "purplish blue",
+      "score" : 30
+   },
+   {
+      "word" : "unix guru",
+      "numSyllables" : 4,
+      "score" : 30
+   },
+   {
+      "word" : "wise to",
+      "numSyllables" : 2,
+      "score" : 30
+   },
+   {
+      "word" : "work shoe",
+      "numSyllables" : 2,
+      "score" : 30
+   },
+   {
+      "score" : 29,
+      "word" : "fatty tissue",
+      "numSyllables" : 4
+   },
+   {
+      "numSyllables" : 6,
+      "word" : "internal revenue",
+      "score" : 29
+   },
+   {
+      "numSyllables" : 6,
+      "word" : "literary review",
+      "score" : 29
+   },
+   {
+      "score" : 29,
+      "numSyllables" : 2,
+      "word" : "soak through"
+   },
+   {
+      "word" : "vascular tissue",
+      "numSyllables" : 5,
+      "score" : 29
+   },
+   {
+      "score" : 28,
+      "word" : "chugoku",
+      "numSyllables" : 3
+   },
+   {
+      "score" : 28,
+      "word" : "giant timber bamboo",
+      "numSyllables" : 6
+   },
+   {
+      "word" : "kentucky blue",
+      "numSyllables" : 4,
+      "score" : 28
+   },
+   {
+      "score" : 28,
+      "word" : "matter to",
+      "numSyllables" : 3
+   },
+   {
+      "score" : 28,
+      "word" : "sweep through",
+      "numSyllables" : 2
+   },
+   {
+      "score" : 27,
+      "word" : "angle of view",
+      "numSyllables" : 4
+   },
+   {
+      "score" : 27,
+      "word" : "bathroom tissue",
+      "numSyllables" : 4
+   },
+   {
+      "word" : "beef fondue",
+      "numSyllables" : 3,
+      "score" : 27
+   },
+   {
+      "numSyllables" : 2,
+      "word" : "depew",
+      "score" : 27
+   },
+   {
+      "word" : "donohue",
+      "numSyllables" : 3,
+      "score" : 27
+   },
+   {
+      "numSyllables" : 4,
+      "word" : "giant bamboo",
+      "score" : 27
+   },
+   {
+      "score" : 27,
+      "word" : "iron blue",
+      "numSyllables" : 3
+   },
+   {
+      "score" : 27,
+      "numSyllables" : 2,
+      "word" : "naidoo"
+   },
+   {
+      "score" : 27,
+      "word" : "prince albert yew",
+      "numSyllables" : 4
+   },
+   {
+      "score" : 27,
+      "word" : "sail through",
+      "numSyllables" : 2
+   },
+   {
+      "numSyllables" : 2,
+      "word" : "stoop to",
+      "score" : 27
+   },
+   {
+      "score" : 27,
+      "numSyllables" : 2,
+      "word" : "whip through"
+   },
+   {
+      "score" : 26,
+      "word" : "black bamboo",
+      "numSyllables" : 3
+   },
+   {
+      "word" : "fitzhugh",
+      "numSyllables" : 2,
+      "score" : 26
+   },
+   {
+      "word" : "jamu",
+      "numSyllables" : 2,
+      "score" : 26
+   },
+   {
+      "word" : "mailloux",
+      "numSyllables" : 2,
+      "score" : 26
+   },
+   {
+      "word" : "siew",
+      "numSyllables" : 1,
+      "score" : 26
+   },
+   {
+      "numSyllables" : 4,
+      "word" : "unequal to",
+      "score" : 26
+   },
+   {
+      "score" : 26,
+      "word" : "zhengzhou",
+      "numSyllables" : 2
+   },
+   {
+      "word" : "cosatu",
+      "numSyllables" : 3,
+      "score" : 25
+   },
+   {
+      "word" : "limited review",
+      "numSyllables" : 5,
+      "score" : 25
+   },
+   {
+      "score" : 25,
+      "word" : "new caledonian yew",
+      "numSyllables" : 7
+   },
+   {
+      "score" : 25,
+      "numSyllables" : 3,
+      "word" : "reach into"
+   },
+   {
+      "score" : 25,
+      "word" : "wing screw",
+      "numSyllables" : 2
+   },
+   {
+      "score" : 24,
+      "numSyllables" : 5,
+      "word" : "bavarian blue"
+   },
+   {
+      "word" : "duc de richelieu",
+      "numSyllables" : 5,
+      "score" : 24
+   },
+   {
+      "score" : 24,
+      "numSyllables" : 3,
+      "word" : "in full view"
+   },
+   {
+      "word" : "only too",
+      "numSyllables" : 3,
+      "score" : 24
+   },
+   {
+      "score" : 24,
+      "word" : "slice through",
+      "numSyllables" : 2
+   },
+   {
+      "word" : "tai lue",
+      "numSyllables" : 2,
+      "score" : 24
+   },
+   {
+      "numSyllables" : 2,
+      "word" : "wenzhou",
+      "score" : 24
+   },
+   {
+      "score" : 23,
+      "numSyllables" : 3,
+      "word" : "bottle screw"
+   },
+   {
+      "score" : 23,
+      "word" : "breeze through",
+      "numSyllables" : 2
+   },
+   {
+      "score" : 23,
+      "word" : "false rue",
+      "numSyllables" : 2
+   },
+   {
+      "score" : 23,
+      "numSyllables" : 5,
+      "word" : "giant kangaroo"
+   },
+   {
+      "score" : 23,
+      "word" : "greenland caribou",
+      "numSyllables" : 5
+   },
+   {
+      "score" : 23,
+      "numSyllables" : 5,
+      "word" : "outrigger canoe"
+   },
+   {
+      "word" : "respect to",
+      "numSyllables" : 3,
+      "score" : 23
+   },
+   {
+      "score" : 23,
+      "word" : "take kindly to",
+      "numSyllables" : 4
+   },
+   {
+      "score" : 22,
+      "numSyllables" : 5,
+      "word" : "animal tissue"
+   },
+   {
+      "score" : 22,
+      "numSyllables" : 4,
+      "word" : "bomber aircrew"
+   },
+   {
+      "score" : 22,
+      "word" : "coutu",
+      "numSyllables" : 2
+   },
+   {
+      "numSyllables" : 3,
+      "word" : "doggy do",
+      "score" : 22
+   },
+   {
+      "word" : "european cuckoo",
+      "numSyllables" : 6,
+      "score" : 22
+   },
+   {
+      "numSyllables" : 4,
+      "word" : "facial tissue",
+      "score" : 22
+   },
+   {
+      "numSyllables" : 2,
+      "word" : "mchugh",
+      "score" : 22
+   },
+   {
+      "numSyllables" : 3,
+      "word" : "nerve tissue",
+      "score" : 22
+   },
+   {
+      "word" : "barren ground caribou",
+      "numSyllables" : 6,
+      "score" : 21
+   },
+   {
+      "score" : 21,
+      "numSyllables" : 2,
+      "word" : "fish stew"
+   },
+   {
+      "numSyllables" : 4,
+      "word" : "japanese yew",
+      "score" : 21
+   },
+   {
+      "score" : 21,
+      "numSyllables" : 5,
+      "word" : "lymphatic tissue"
+   },
+   {
+      "score" : 21,
+      "numSyllables" : 4,
+      "word" : "pacific yew"
+   },
+   {
+      "numSyllables" : 3,
+      "word" : "running shoe",
+      "score" : 21
+   },
+   {
+      "score" : 21,
+      "numSyllables" : 2,
+      "word" : "wall rue"
+   },
+   {
+      "score" : 20,
+      "word" : "rhew",
+      "numSyllables" : 1
+   },
+   {
+      "score" : 20,
+      "word" : "telephone interview",
+      "numSyllables" : 6
+   },
+   {
+      "word" : "veal cordon bleu",
+      "numSyllables" : 4,
+      "score" : 20
+   },
+   {
+      "score" : 20,
+      "word" : "woodland caribou",
+      "numSyllables" : 5
+   },
+   {
+      "numSyllables" : 4,
+      "word" : "brush kangaroo",
+      "score" : 19
+   },
+   {
+      "word" : "cortelyou",
+      "numSyllables" : 3,
+      "score" : 19
+   },
+   {
+      "word" : "goat rue",
+      "numSyllables" : 2,
+      "score" : 19
+   },
+   {
+      "score" : 19,
+      "numSyllables" : 3,
+      "word" : "old world yew"
+   },
+   {
+      "word" : "pheasant cuckoo",
+      "numSyllables" : 4,
+      "score" : 19
+   },
+   {
+      "numSyllables" : 5,
+      "word" : "powdery mildew",
+      "score" : 19
+   },
+   {
+      "score" : 19,
+      "numSyllables" : 3,
+      "word" : "saddle shoe"
+   },
+   {
+      "score" : 18,
+      "numSyllables" : 4,
+      "word" : "bill of review"
+   },
+   {
+      "word" : "dog do",
+      "numSyllables" : 2,
+      "score" : 18
+   },
+   {
+      "score" : 18,
+      "word" : "downy mildew",
+      "numSyllables" : 4
+   },
+   {
+      "word" : "eastern sioux",
+      "numSyllables" : 3,
+      "score" : 18
+   },
+   {
+      "numSyllables" : 4,
+      "word" : "fibrous tissue",
+      "score" : 18
+   },
+   {
+      "numSyllables" : 2,
+      "word" : "french blue",
+      "score" : 18
+   },
+   {
+      "numSyllables" : 4,
+      "word" : "intrude into",
+      "score" : 18
+   },
+   {
+      "score" : 18,
+      "numSyllables" : 5,
+      "word" : "muscular tissue"
+   },
+   {
+      "score" : 18,
+      "word" : "reddish blue",
+      "numSyllables" : 3
+   },
+   {
+      "score" : 18,
+      "numSyllables" : 4,
+      "word" : "toilet tissue"
+   },
+   {
+      "numSyllables" : 3,
+      "word" : "congress shoe",
+      "score" : 17
+   },
+   {
+      "score" : 17,
+      "numSyllables" : 4,
+      "word" : "florida yew"
+   },
+   {
+      "numSyllables" : 2,
+      "word" : "liou",
+      "score" : 17
+   },
+   {
+      "score" : 17,
+      "word" : "mcgrew",
+      "numSyllables" : 2
+   },
+   {
+      "numSyllables" : 4,
+      "word" : "musk kangaroo",
+      "score" : 17
+   },
+   {
+      "score" : 17,
+      "word" : "progress to",
+      "numSyllables" : 3
+   },
+   {
+      "score" : 17,
+      "numSyllables" : 3,
+      "word" : "travel to"
+   },
+   {
+      "score" : 16,
+      "numSyllables" : 5,
+      "word" : "asiatic flu"
+   },
+   {
+      "word" : "bull through",
+      "numSyllables" : 2,
+      "score" : 16
+   },
+   {
+      "score" : 16,
+      "word" : "collector of internal revenue",
+      "numSyllables" : 10
+   },
+   {
+      "score" : 16,
+      "word" : "common bamboo",
+      "numSyllables" : 4
+   },
+   {
+      "score" : 16,
+      "word" : "graue",
+      "numSyllables" : 1
+   },
+   {
+      "score" : 16,
+      "numSyllables" : 2,
+      "word" : "netview"
+   },
+   {
+      "score" : 16,
+      "numSyllables" : 2,
+      "word" : "new to"
+   },
+   {
+      "word" : "repair to",
+      "numSyllables" : 3,
+      "score" : 16
+   },
+   {
+      "score" : 16,
+      "word" : "trieu",
+      "numSyllables" : 1
+   },
+   {
+      "score" : 15,
+      "numSyllables" : 3,
+      "word" : "bowling shoe"
+   },
+   {
+      "word" : "computer guru",
+      "numSyllables" : 5,
+      "score" : 15
+   },
+   {
+      "numSyllables" : 3,
+      "word" : "daily dew",
+      "score" : 15
+   },
+   {
+      "word" : "louw",
+      "numSyllables" : 1,
+      "score" : 15
+   },
+   {
+      "numSyllables" : 4,
+      "word" : "onion mildew",
+      "score" : 15
+   },
+   {
+      "score" : 15,
+      "numSyllables" : 4,
+      "word" : "rock kangaroo"
+   },
+   {
+      "numSyllables" : 3,
+      "word" : "sheep fescue",
+      "score" : 15
+   },
+   {
+      "score" : 15,
+      "word" : "stinking yew",
+      "numSyllables" : 3
+   },
+   {
+      "word" : "turkey stew",
+      "numSyllables" : 3,
+      "score" : 15
+   },
+   {
+      "score" : 14,
+      "word" : "california yew",
+      "numSyllables" : 5
+   },
+   {
+      "numSyllables" : 3,
+      "word" : "english yew",
+      "score" : 14
+   },
+   {
+      "word" : "false mildew",
+      "numSyllables" : 3,
+      "score" : 14
+   },
+   {
+      "score" : 14,
+      "numSyllables" : 2,
+      "word" : "goodhue"
+   },
+   {
+      "score" : 14,
+      "word" : "igou",
+      "numSyllables" : 2
+   },
+   {
+      "word" : "khoo",
+      "numSyllables" : 1,
+      "score" : 14
+   },
+   {
+      "score" : 14,
+      "word" : "nervous tissue",
+      "numSyllables" : 4
+   },
+   {
+      "numSyllables" : 6,
+      "word" : "security review",
+      "score" : 14
+   },
+   {
+      "score" : 13,
+      "word" : "be due",
+      "numSyllables" : 2
+   },
+   {
+      "score" : 13,
+      "numSyllables" : 3,
+      "word" : "lam into"
+   },
+   {
+      "numSyllables" : 3,
+      "word" : "lobster stew",
+      "score" : 13
+   },
+   {
+      "word" : "mcandrew",
+      "numSyllables" : 3,
+      "score" : 13
+   },
+   {
+      "score" : 13,
+      "word" : "squeak through",
+      "numSyllables" : 2
+   },
+   {
+      "word" : "belgian beef stew",
+      "numSyllables" : 4,
+      "score" : 12
+   },
+   {
+      "score" : 12,
+      "numSyllables" : 4,
+      "word" : "parasite yew"
+   },
+   {
+      "numSyllables" : 3,
+      "word" : "slice into",
+      "score" : 12
+   },
+   {
+      "score" : 12,
+      "numSyllables" : 3,
+      "word" : "western yew"
+   },
+   {
+      "score" : 11,
+      "word" : "bomber crew",
+      "numSyllables" : 3
+   },
+   {
+      "score" : 11,
+      "numSyllables" : 3,
+      "word" : "cheese fondue"
+   },
+   {
+      "numSyllables" : 6,
+      "word" : "embryonic tissue",
+      "score" : 11
+   },
+   {
+      "score" : 11,
+      "word" : "government revenue",
+      "numSyllables" : 6
+   },
+   {
+      "numSyllables" : 5,
+      "word" : "potato mildew",
+      "score" : 11
+   },
+   {
+      "numSyllables" : 2,
+      "word" : "broadview",
+      "score" : 10
+   },
+   {
+      "word" : "muscle into",
+      "numSyllables" : 4,
+      "score" : 10
+   },
+   {
+      "word" : "tieu",
+      "numSyllables" : 2,
+      "score" : 10
+   },
+   {
+      "score" : 10,
+      "word" : "tobacco mildew",
+      "numSyllables" : 5
+   },
+   {
+      "numSyllables" : 3,
+      "word" : "walking shoe",
+      "score" : 10
+   },
+   {
+      "score" : 9,
+      "word" : "great gray kangaroo",
+      "numSyllables" : 5
+   },
+   {
+      "score" : 9,
+      "word" : "houx",
+      "numSyllables" : 1
+   },
+   {
+      "score" : 9,
+      "numSyllables" : 3,
+      "word" : "metal screw"
+   },
+   {
+      "score" : 9,
+      "numSyllables" : 4,
+      "word" : "pink cockatoo"
+   },
+   {
+      "word" : "plant tissue",
+      "numSyllables" : 3,
+      "score" : 9
+   },
+   {
+      "word" : "schue",
+      "numSyllables" : 1,
+      "score" : 9
+   },
+   {
+      "score" : 8,
+      "numSyllables" : 3,
+      "word" : "luck into"
+   },
+   {
+      "score" : 7,
+      "numSyllables" : 7,
+      "word" : "american feverfew"
+   },
+   {
+      "score" : 7,
+      "numSyllables" : 2,
+      "word" : "not due"
+   },
+   {
+      "score" : 6,
+      "numSyllables" : 2,
+      "word" : "depue"
+   },
+   {
+      "numSyllables" : 3,
+      "word" : "donahoo",
+      "score" : 6
+   },
+   {
+      "word" : "pardue",
+      "numSyllables" : 2,
+      "score" : 6
+   },
+   {
+      "numSyllables" : 3,
+      "word" : "regard to",
+      "score" : 6
+   },
+   {
+      "score" : 6,
+      "numSyllables" : 2,
+      "word" : "vanloo"
+   },
+   {
+      "score" : 6,
+      "word" : "whole slew",
+      "numSyllables" : 2
+   },
+   {
+      "score" : 6,
+      "word" : "wood hoopoe",
+      "numSyllables" : 3
+   },
+   {
+      "numSyllables" : 2,
+      "word" : "deaf to",
+      "score" : 5
+   },
+   {
+      "word" : "marcoux",
+      "numSyllables" : 2,
+      "score" : 5
+   },
+   {
+      "score" : 5,
+      "numSyllables" : 2,
+      "word" : "ooze through"
+   },
+   {
+      "score" : 5,
+      "numSyllables" : 2,
+      "word" : "soohoo"
+   },
+   {
+      "numSyllables" : 2,
+      "word" : "laroux",
+      "score" : 4
+   },
+   {
+      "score" : 4,
+      "word" : "peugh",
+      "numSyllables" : 1
+   },
+   {
+      "score" : 4,
+      "numSyllables" : 2,
+      "word" : "the new"
+   },
+   {
+      "word" : "treu",
+      "numSyllables" : 1,
+      "score" : 4
+   },
+   {
+      "score" : 3,
+      "numSyllables" : 5,
+      "word" : "equivalent to"
+   },
+   {
+      "numSyllables" : 2,
+      "word" : "ought to",
+      "score" : 3
+   },
+   {
+      "numSyllables" : 2,
+      "word" : "would you",
+      "score" : 3
+   },
+   {
+      "score" : 2,
+      "word" : "deblois",
+      "numSyllables" : 2
+   },
+   {
+      "score" : 2,
+      "word" : "mcnew",
+      "numSyllables" : 2
+   },
+   {
+      "word" : "tantamount to",
+      "numSyllables" : 4,
+      "score" : 2
+   },
+   {
+      "numSyllables" : 2,
+      "word" : "vanlue",
+      "score" : 2
+   },
+   {
+      "score" : 1,
+      "numSyllables" : 2,
+      "word" : "champoux"
+   },
+   {
+      "word" : "heroux",
+      "numSyllables" : 2,
+      "score" : 1
+   },
+   {
+      "word" : "mayhue",
+      "numSyllables" : 2,
+      "score" : 1
+   },
+   {
+      "numSyllables" : 2,
+      "word" : "mccue",
+      "score" : 1
+   },
+   {
+      "numSyllables" : 2,
+      "word" : "northview",
+      "score" : 1
+   },
+   {
+      "numSyllables" : 4,
+      "word" : "relation to",
+      "score" : 1
+   },
+   {
+      "score" : 1,
+      "word" : "schoo",
+      "numSyllables" : 1
+   },
+   {
+      "numSyllables" : 2,
+      "word" : "to you",
+      "score" : 1
+   },
+   {
+      "word" : "a new",
+      "numSyllables" : 2
+   },
+   {
+      "word" : "advalue",
+      "numSyllables" : 3
+   },
+   {
+      "numSyllables" : 4,
+      "word" : "aeroperu"
+   },
+   {
+      "word" : "and to",
+      "numSyllables" : 2
+   },
+   {
+      "numSyllables" : 2,
+      "word" : "and you"
+   },
+   {
+      "numSyllables" : 4,
+      "word" : "attested to"
+   },
+   {
+      "numSyllables" : 2,
+      "word" : "banyu"
+   },
+   {
+      "numSyllables" : 3,
+      "word" : "belyeu"
+   },
+   {
+      "numSyllables" : 3,
+      "word" : "benhamou"
+   },
+   {
+      "numSyllables" : 5,
+      "word" : "blink 182"
+   },
+   {
+      "word" : "carilou",
+      "numSyllables" : 3
+   },
+   {
+      "numSyllables" : 2,
+      "word" : "cat-2"
+   },
+   {
+      "numSyllables" : 2,
+      "word" : "chaloux"
+   },
+   {
+      "numSyllables" : 3,
+      "word" : "codrescu"
+   },
+   {
+      "word" : "corbu",
+      "numSyllables" : 2
+   },
+   {
+      "word" : "decou",
+      "numSyllables" : 2
+   },
+   {
+      "word" : "deja vous",
+      "numSyllables" : 3
+   },
+   {
+      "numSyllables" : 5,
+      "word" : "develop into"
+   },
+   {
+      "word" : "did you",
+      "numSyllables" : 2
+   },
+   {
+      "numSyllables" : 2,
+      "word" : "do you"
+   },
+   {
+      "word" : "donohoo",
+      "numSyllables" : 3
+   },
+   {
+      "numSyllables" : 1,
+      "word" : "douwe"
+   },
+   {
+      "word" : "egnew",
+      "numSyllables" : 2
+   },
+   {
+      "word" : "fauroux",
+      "numSyllables" : 2
+   },
+   {
+      "word" : "fourtou",
+      "numSyllables" : 2
+   },
+   {
+      "word" : "frueh",
+      "numSyllables" : 1
+   },
+   {
+      "word" : "fs to",
+      "numSyllables" : 1
+   },
+   {
+      "word" : "geroux",
+      "numSyllables" : 2
+   },
+   {
+      "word" : "gignoux",
+      "numSyllables" : 2
+   },
+   {
+      "word" : "got to",
+      "numSyllables" : 2
+   },
+   {
+      "word" : "got you",
+      "numSyllables" : 2
+   },
+   {
+      "word" : "have you",
+      "numSyllables" : 2
+   },
+   {
+      "word" : "herscu",
+      "numSyllables" : 2
+   },
+   {
+      "word" : "hokuriku",
+      "numSyllables" : 4
+   },
+   {
+      "numSyllables" : 3,
+      "word" : "i have to"
+   },
+   {
+      "numSyllables" : 2,
+      "word" : "if you"
+   },
+   {
+      "word" : "interbrew",
+      "numSyllables" : 3
+   },
+   {
+      "word" : "itochu",
+      "numSyllables" : 3
+   },
+   {
+      "word" : "joanou",
+      "numSyllables" : 2
+   },
+   {
+      "word" : "kaifu",
+      "numSyllables" : 2
+   },
+   {
+      "word" : "karatsu",
+      "numSyllables" : 3
+   },
+   {
+      "numSyllables" : 2,
+      "word" : "ketou"
+   },
+   {
+      "numSyllables" : 1,
+      "word" : "khuu"
+   },
+   {
+      "numSyllables" : 5,
+      "word" : "konishiroku"
+   },
+   {
+      "word" : "landview",
+      "numSyllables" : 2
+   },
+   {
+      "word" : "lhommedieu",
+      "numSyllables" : 3
+   },
+   {
+      "word" : "long-overdue",
+      "numSyllables" : 4
+   },
+   {
+      "numSyllables" : 2,
+      "word" : "lulue"
+   },
+   {
+      "word" : "marcou",
+      "numSyllables" : 2
+   },
+   {
+      "numSyllables" : 2,
+      "word" : "marrou"
+   },
+   {
+      "numSyllables" : 2,
+      "word" : "mcgue"
+   },
+   {
+      "word" : "mcknew",
+      "numSyllables" : 2
+   },
+   {
+      "word" : "meiyuh",
+      "numSyllables" : 2
+   },
+   {
+      "word" : "merieux",
+      "numSyllables" : 3
+   },
+   {
+      "word" : "muramatsu",
+      "numSyllables" : 4
+   },
+   {
+      "numSyllables" : 7,
+      "word" : "n92762"
+   },
+   {
+      "word" : "nangaku",
+      "numSyllables" : 3
+   },
+   {
+      "numSyllables" : 3,
+      "word" : "oceanview"
+   },
+   {
+      "word" : "otterloo",
+      "numSyllables" : 3
+   },
+   {
+      "numSyllables" : 3,
+      "word" : "pas-de-deux"
+   },
+   {
+      "numSyllables" : 2,
+      "word" : "peipu"
+   },
+   {
+      "numSyllables" : 3,
+      "word" : "presume to"
+   },
+   {
+      "word" : "prew",
+      "numSyllables" : 1
+   },
+   {
+      "numSyllables" : 1,
+      "word" : "prugh"
+   },
+   {
+      "numSyllables" : 1,
+      "word" : "pshew"
+   },
+   {
+      "numSyllables" : 3,
+      "word" : "qiaotou"
+   },
+   {
+      "word" : "raoux",
+      "numSyllables" : 2
+   },
+   {
+      "word" : "richoux",
+      "numSyllables" : 2
+   },
+   {
+      "numSyllables" : 2,
+      "word" : "sam-joo"
+   },
+   {
+      "word" : "schou",
+      "numSyllables" : 1
+   },
+   {
+      "word" : "seiyaku",
+      "numSyllables" : 3
+   },
+   {
+      "word" : "seydoux",
+      "numSyllables" : 2
+   },
+   {
+      "numSyllables" : 2,
+      "word" : "shamu"
+   },
+   {
+      "numSyllables" : 3,
+      "word" : "silvershoe"
+   },
+   {
+      "numSyllables" : 2,
+      "word" : "soundview"
+   },
+   {
+      "word" : "stuewe",
+      "numSyllables" : 1
+   },
+   {
+      "numSyllables" : 3,
+      "word" : "supposed to"
+   },
+   {
+      "numSyllables" : 3,
+      "word" : "teikoku"
+   },
+   {
+      "numSyllables" : 2,
+      "word" : "tell you"
+   },
+   {
+      "numSyllables" : 2,
+      "word" : "that you"
+   },
+   {
+      "word" : "tien-fu",
+      "numSyllables" : 2
+   },
+   {
+      "numSyllables" : 2,
+      "word" : "tobu"
+   },
+   {
+      "numSyllables" : 3,
+      "word" : "tougaloo"
+   },
+   {
+      "numSyllables" : 2,
+      "word" : "toyoo"
+   },
+   {
+      "word" : "transou",
+      "numSyllables" : 2
+   },
+   {
+      "numSyllables" : 2,
+      "word" : "troyu"
+   },
+   {
+      "numSyllables" : 2,
+      "word" : "true-view"
+   },
+   {
+      "word" : "vanuaaku",
+      "numSyllables" : 4
+   },
+   {
+      "numSyllables" : 3,
+      "word" : "what are you"
+   },
+   {
+      "word" : "what did you",
+      "numSyllables" : 3
+   },
+   {
+      "word" : "what do",
+      "numSyllables" : 2
+   },
+   {
+      "word" : "what do you",
+      "numSyllables" : 3
+   },
+   {
+      "numSyllables" : 2,
+      "word" : "what you"
+   },
+   {
+      "word" : "whay-yu",
+      "numSyllables" : 2
+   },
+   {
+      "word" : "yabbadabbadoo",
+      "numSyllables" : 5
+   },
+   {
+      "word" : "you do",
+      "numSyllables" : 2
+   },
+   {
+      "numSyllables" : 3,
+      "word" : "you have to"
+   },
+   {
+      "numSyllables" : 2,
+      "word" : "you to"
+   },
+   {
+      "numSyllables" : 3,
+      "word" : "you want to"
+   },
+   {
+      "numSyllables" : 2,
+      "word" : "zenchu"
+   },
+   {
+      "word" : "zhambu",
+      "numSyllables" : 2
+   },
+   {
+      "numSyllables" : 2,
+      "word" : "zhenyu"
+   },
+   {
+      "numSyllables" : 1,
+      "word" : "zue"
+   },
+   {
+      "numSyllables" : 2,
+      "word" : "zungu"
+   }
+]

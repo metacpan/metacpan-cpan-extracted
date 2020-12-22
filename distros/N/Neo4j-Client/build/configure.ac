@@ -14,9 +14,10 @@
 #
 dnl Process this file with autoconf to produce a configure script
 AC_PREREQ([2.69])
-AC_INIT([libneo4j-client],[2.2.0])
-AC_CONFIG_SRCDIR([src/lib/neo4j-client.h.in])
-AC_CONFIG_MACRO_DIR([m4])
+AC_INIT([libneo4j-client],[2.3.0])
+AC_CONFIG_SRCDIR([lib/src/neo4j-client.h.in])
+AC_CONFIG_AUX_DIR([build-aux])
+AC_CONFIG_MACRO_DIR([build-aux/m4])
 AM_INIT_AUTOMAKE([foreign])
 AC_CONFIG_HEADER([config.h])
 AM_MAINTAINER_MODE([enable])
@@ -24,10 +25,18 @@ AM_MAINTAINER_MODE([enable])
 DECLARE_VERSIONS
 WITH_LIBS
 
-GCC_CFLAGS="-fvisibility=hidden -pipe -Wall -W -Werror \
-    -Wno-unused-parameter -Wno-missing-field-initializers -Wpointer-arith \
-    -Wstrict-prototypes -Wcast-qual -Wcast-align -Wno-error=unused-function \
-    -Wno-error=unused-variable -Wno-error=deprecated-declarations"
+GCC_CFLAGS="-fvisibility=hidden -pipe -Wall -W -Wno-unused-parameter \
+    -Wno-missing-field-initializers -Wpointer-arith -Wstrict-prototypes \
+    -Wcast-qual -Wcast-align -Wno-error=unused-function \
+    -Wno-error=unused-variable -Wno-error=deprecated-declarations \
+    -Wno-error=stringop-truncation -Wno-unknown-warning-option"
+
+AC_ARG_ENABLE([werror],
+  AS_HELP_STRING([--disable-werror],
+  [Do not make warnings into errors even if the compiler supports -Werror.]),
+  [werror_flag=$enableval], [werror_flag=yes])
+AS_IF([test "X$werror_flag" = "Xyes"], [GCC_CFLAGS="$GCC_CFLAGS -Werror"])
+
 
 LT_INIT
 AC_LANG([C])
@@ -181,35 +190,44 @@ AS_IF([test "X$has_tls" = "Xyes"],
   [AC_MSG_ERROR([TLS library "$with_tls" not found])])
 AM_CONDITIONAL([WITH_TLS], [test "X$has_tls" != "Xno"])
 
+
 dnl Check for check test support
 PKG_CHECK_MODULES([CHECK], [check >= 0.9.4], [has_check=yes], [has_check=no])
 AM_CONDITIONAL([HAVE_CHECK], [test "X$has_check" = "Xyes"])
 
 
 dnl Check if command line tools should be built
-dnl AC_ARG_ENABLE([tools],
-dnl   AS_HELP_STRING([--disable-tools], [Do not build command line tools]))
-dnl AM_CONDITIONAL([WANT_TOOLS], [test "X$enable_tools" != "Xno"])
-AC_SUBST([WANT_TOOLS],[])
+AC_ARG_ENABLE([tools],
+  AS_HELP_STRING([--disable-tools], [Do not build command line tools]))
+AM_CONDITIONAL([WANT_TOOLS], [test "X$enable_tools" != "Xno"])
+
+dnl Check for required libraries for tools
+PKG_CHECK_MODULES([LIBEDIT], [libedit], [has_libedit=yes], [has_libedit=no])
+AS_IF([test "X$enable_tools" != "Xno" -a "X$has_libedit" != "Xyes"],
+  [AC_MSG_ERROR([libedit is required for building command line tools (specify --disable-tools to ignore)])])
+
+PKG_CHECK_MODULES([CYPHER_PARSER], [cypher-parser >= 0.5.1], [has_cypher_parser=yes], [has_cypher_parser=no])
+AS_IF([test "X$enable_tools" != "Xno" -a "X$has_cypher_parser" != "Xyes"],
+  [AC_MSG_ERROR([libcypher-parser (>= 0.5.1) is required for building command line tools (specify --disable-tools to ignore)])])
+
 
 dnl Check if assertions should be disabled
 AC_ARG_ENABLE([debug], AS_HELP_STRING([--disable-debug], [Disable debug]))
 AS_IF([test "X$enable_debug" = "Xno"],
   [AC_DEFINE([NDEBUG], [1], [Define to 1 to disable assertions.])])
 
+
 dnl Add GCC flags
 AS_IF([test "X$GCC" = "Xyes"], [CFLAGS="$CFLAGS $GCC_CFLAGS"])
+
+
+dnl Check for doxygen support
 
 AC_SUBST([REQUIRES], [`echo "$REQUIRES" | cut -c3-`])
 
 AC_CONFIG_FILES([
-    Makefile \
-    src/lib/Makefile \
-    src/lib/neo4j-client.h \
+	Makefile \
+	lib/Makefile \
+	lib/src/Makefile \
 ])
 AC_OUTPUT
-
-dnl    Makefile \
-dnl    m4/Makefile \
-dnl    src/Makefile \
-dnl    src/bin/Makefile \

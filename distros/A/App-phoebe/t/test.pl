@@ -115,8 +115,16 @@ sub query_gemini {
     tls_key => "t/key.pem",
     tls_verify => 0x00, } => sub {
       my ($loop, $err, $stream) = @_;
+      die "Client creation failed: $err\n" if $err;
+      $stream->on(error => sub {
+	my ($stream, $err) = @_;
+	die "Stream error: $err\n" if $err });
+      $stream->on(close => sub {
+	my ($stream) = @_;
+	diag "Closing stream\n" if $ENV{TEST_VERBOSE} });
       $stream->on(read => sub {
 	my ($stream, $bytes) = @_;
+	diag "Reading " . length($bytes) . " bytes\n" if $ENV{TEST_VERBOSE};
 	if ($header and $encoding) {
 	  $buffer .= decode($encoding, $bytes);
 	} elsif ($header) {
@@ -137,13 +145,12 @@ sub query_gemini {
 	}});
       # Write request
       $stream->write("$query\r\n");
-      $stream->write($text) if $text;
-		       });
-
+      $stream->write($text) if $text });
   # Start event loop if necessary
   Mojo::IOLoop->start unless Mojo::IOLoop->is_running;
 
   # When we're done
+  return "" unless $header;
   return "$header\r\n$buffer";
 }
 

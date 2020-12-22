@@ -1,5 +1,5 @@
 package Moose::Meta::Method::Destructor;
-our $VERSION = '2.2013';
+our $VERSION = '2.2014';
 
 use strict;
 use warnings;
@@ -145,7 +145,7 @@ Moose::Meta::Method::Destructor - Method Meta Object for destructors
 
 =head1 VERSION
 
-version 2.2013
+version 2.2014
 
 =head1 DESCRIPTION
 
@@ -201,7 +201,7 @@ See L<Moose/BUGS> for details on reporting bugs.
 
 =item *
 
-Stevan Little <stevan.little@iinteractive.com>
+Stevan Little <stevan@cpan.org>
 
 =item *
 
@@ -209,11 +209,11 @@ Dave Rolsky <autarch@urth.org>
 
 =item *
 
-Jesse Luehrs <doy@tozt.net>
+Jesse Luehrs <doy@cpan.org>
 
 =item *
 
-Shawn M Moore <code@sartak.org>
+Shawn M Moore <sartak@cpan.org>
 
 =item *
 
@@ -229,7 +229,7 @@ Florian Ragwitz <rafl@debian.org>
 
 =item *
 
-Hans Dieter Pearcey <hdp@weftsoar.net>
+Hans Dieter Pearcey <hdp@cpan.org>
 
 =item *
 
@@ -237,7 +237,7 @@ Chris Prather <chris@prather.org>
 
 =item *
 
-Matt S Trout <mst@shadowcat.co.uk>
+Matt S Trout <mstrout@cpan.org>
 
 =back
 

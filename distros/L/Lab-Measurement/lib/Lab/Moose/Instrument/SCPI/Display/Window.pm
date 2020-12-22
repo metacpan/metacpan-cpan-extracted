@@ -1,5 +1,5 @@
 package Lab::Moose::Instrument::SCPI::Display::Window;
-$Lab::Moose::Instrument::SCPI::Display::Window::VERSION = '3.730';
+$Lab::Moose::Instrument::SCPI::Display::Window::VERSION = '3.731';
 #ABSTRACT: Role for the SCPI DISPlay:WINDow subsystem
 
 use v5.20;
@@ -47,7 +47,7 @@ Lab::Moose::Instrument::SCPI::Display::Window - Role for the SCPI DISPlay:WINDow
 
 =head1 VERSION
 
-version 3.730
+version 3.731
 
 =head1 METHODS
 

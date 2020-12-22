@@ -1,3 +1,29 @@
+0.55 2020-12-21
+
+- Add README to distribution
+- Bugs in transform fixed
+ -- Always call png_read_update_info before reading image data
+- New "any2gray8" converts any kind of PNG file to an 8-bit gray one
+- Document read_update_info
+- Add support for (g|s)et_chunk_malloc_max
+
+0.54 2020-12-19
+
+- Implement the histogram part of set_quantize
+- set_hIST error handling changed to check values and warn within Perl
+- Automatically test against old versions of libpng before release
+
+0.53 2020-12-16
+
+- Support png_(g|s)et_(cHRM_XYZ|chunk_cache_max) 
+- Support png_set_(background|rgb_to_gray|quantize); add examples
+- Add create_(reader|writer), color_type_channels convenience functions
+- Support partial read functions png_(read|write)_(end|image|info)
+- Support transform functions png_set_(.*) where possible
+- init_io made safer
+- Set palette chunk bugs fixed
+- split_alpha internals simplified, doc changed
+
 0.52 2020-12-13
 
 - Bug fixes for iTXt, sCAL chunk tests

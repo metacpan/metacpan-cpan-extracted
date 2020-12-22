@@ -1,5 +1,5 @@
 package Data::CompactReadonly::V0::Dictionary;
-our $VERSION = '0.0.3';
+our $VERSION = '0.0.4';
 
 use warnings;
 use strict;
@@ -7,6 +7,7 @@ use base qw(Data::CompactReadonly::V0::Collection Data::CompactReadonly::Diction
 
 use Data::CompactReadonly::V0::TiedDictionary;
 use Scalar::Util qw(blessed);
+use Devel::StackTrace;
 
 sub _init {
     my($class, %args) = @_;
@@ -39,7 +40,7 @@ sub _create {
     # empty pointer table
     my $table_start_ptr = tell($fh);
     print $fh "\x00" x $args{ptr_size} x 2 x scalar(keys %{$args{data}}); 
-    my $next_free_ptr = tell($fh); 
+    $class->_set_next_free_ptr(%args);
 
     my @sorted_keys = sort keys %{$args{data}};
     foreach my $index (0 .. $#sorted_keys) {
@@ -57,8 +58,8 @@ sub _create {
             if(my $ptr = $class->_get_already_seen(%args, data => $item->{data})) {
                 print $fh $class->_encode_ptr(%args, pointer => $ptr);
             } else {
-                print $fh $class->_encode_ptr(%args, pointer => $next_free_ptr);
-                $class->_seek(%args, pointer => $next_free_ptr);
+                print $fh $class->_encode_ptr(%args, pointer => $class->_get_next_free_ptr(%args));
+                $class->_seek(%args, pointer => $class->_get_next_free_ptr(%args));
 
                 my $node_class = 'Data::CompactReadonly::V0::Node';
                 if($item->{coerce_to_text}) {
@@ -66,8 +67,6 @@ sub _create {
                     eval "use $node_class";
                 }
                 $node_class->_create(%args, data => $item->{data});
-
-                $next_free_ptr = tell($fh);
             }
         }
     }
@@ -118,6 +117,7 @@ sub element {
 
 sub exists {
     my($self, $element) = @_;
+    return 0 if($self->count() == 0);
     eval { $self->element($element) };
     if($@ =~ /doesn't exist/) {
         return 0;
@@ -134,11 +134,16 @@ sub _nth_key {
     $self->_seek($self->_nth_key_ptr_location($n));
     $self->_seek($self->_ptr_at_current_offset());
 
+    my $offset = tell($self->_fh());
     my $key = $self->_node_at_current_offset();
     if(!defined($key) || ref($key)) {
         die("$self: Invalid type: ".
-            (!defined($key) ? 'Null' : blessed($key)).
-            ": Dictionary keys must be Text\n")
+            (!defined($key) ? 'Null' : $key).
+            ": Dictionary keys must be Text at ".
+            sprintf("0x%08x", $offset).
+            "\n".
+            Devel::StackTrace->new()->as_string()
+        );
     }
     return $key;
 }

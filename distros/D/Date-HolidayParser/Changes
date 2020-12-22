@@ -1,5 +1,13 @@
 Revision history for Date-HolidayParser
 
+Version 0.43
+-------------------------------------------
+- Declare dependencies properly
+
+Version 0.42
+-------------------------------------------
+- Migrated to using Moo instead of Any::Moose
+
 Version 0.41
 -------------------------------------------
 - Fixed a problem where the UIDs in Date::HolidayParser::iCalendar was

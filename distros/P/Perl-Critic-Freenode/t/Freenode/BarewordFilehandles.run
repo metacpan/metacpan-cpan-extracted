@@ -1,26 +1,21 @@
-## name BarewordOpen1
-## failures 1
+## name BarewordOpen
+## failures 12
 ## cut
 
 open FILE;
-
-## name BarewordOpen2
-## failures 1
-## cut
-
 open FILE, "<$filename";
-
-## name BarewordOpen3
-## failures 1
-## cut
-
 open FILE, '<', $filename;
-
-## name BarewordOpenParentheses
-## failures 1
-## cut
-
 open(FILE, '<', $filename);
+
+open FH, '>', $some_file;
+open FH, '>', $some_file or die;
+open(FH, '>', $some_file);
+open(FH, '>', $some_file) or die;
+
+open FH, ">$some_file";
+open FH, ">$some_file" or die;
+open(FH, ">$some_file");
+open(FH, ">$some_file") or die;
 
 ## name BarewordOpenBuiltin
 ## failures 0
@@ -30,56 +25,113 @@ open STDOUT;
 open STDIN, "<$filename";
 open(STDERR, '>', $filename);
 
-## name LexicalOpen
+open STDIN, '>', $some_file;
+open STDIN, '>', $some_file or die;
+open(STDIN, '>', $some_file);
+open(STDIN, '>', $some_file) or die;
+
+open STDIN, ">$some_file";
+open STDIN, ">$some_file" or die;
+open(STDIN, ">$some_file");
+open(STDIN, ">$some_file") or die;
+
+open STDOUT, '>', $some_file;
+open STDOUT, '>', $some_file or die;
+open(STDOUT, '>', $some_file);
+open(STDOUT, '>', $some_file) or die;
+
+open STDOUT, ">$some_file";
+open STDOUT, ">$some_file" or die;
+open(STDOUT, ">$some_file");
+open(STDOUT, ">$some_file") or die;
+
+open STDERR, '>', $some_file;
+open STDERR, '>', $some_file or die;
+open(STDERR, '>', $some_file);
+open(STDERR, '>', $some_file) or die;
+
+open STDERR, ">$some_file";
+open STDERR, ">$some_file" or die;
+open(STDERR, ">$some_file");
+open(STDERR, ">$some_file") or die;
+
+## name VariableOpen
 ## failures 0
 ## cut
 
-open my $fh, '<', $filename;
+open $fh, '>', $some_file;
+open $fh, '>', $some_file or die;
+open($fh, '>', $some_file);
+open($fh, '>', $some_file) or die;
 
-## name LexicalOpenParentheses
-## failures 0
-## cut
+open my $fh, '>', $some_file;
+open my $fh, '>', $some_file or die;
+open(my $fh, '>', $some_file);
+open(my $fh, '>', $some_file) or die;
 
-open(my $fh, '<', $filename);
+open our $fh, '>', $some_file;
+open our $fh, '>', $some_file or die;
+open(our $fh, '>', $some_file);
+open(our $fh, '>', $some_file) or die;
 
-## name BarewordPipe1
-## failures 1
+open local $foo{fh}, '>', $some_file;
+open local $foo{fh}, '>', $some_file or die;
+open(local $foo{fh}, '>', $some_file);
+open(local $foo{fh}, '>', $some_file) or die;
+
+open local $foo{fh}, ">$some_file";
+open local $foo{fh}, ">$some_file" or die;
+open(local $foo{fh}, ">$some_file");
+open(local $foo{fh}, ">$some_file") or die;
+
+open local *STDIN, '>', $some_file;
+open local *STDIN, '>', $some_file or die;
+open(local *STDIN, '>', $some_file);
+open(local *STDIN, '>', $some_file) or die;
+
+open local *STDIN, ">$some_file";
+open local *STDIN, ">$some_file" or die;
+open(local *STDIN, ">$some_file");
+open(local *STDIN, ">$some_file") or die;
+
+open local *STDOUT, '>', $some_file;
+open local *STDOUT, '>', $some_file or die;
+open(local *STDOUT, '>', $some_file);
+open(local *STDOUT, '>', $some_file) or die;
+
+open local *STDOUT, ">$some_file";
+open local *STDOUT, ">$some_file" or die;
+open(local *STDOUT, ">$some_file");
+open(local *STDOUT, ">$some_file") or die;
+
+open local *STDERR, '>', $some_file;
+open local *STDERR, '>', $some_file or die;
+open(local *STDERR, '>', $some_file);
+open(local *STDERR, '>', $some_file) or die;
+
+open local *STDERR, ">$some_file";
+open local *STDERR, ">$some_file" or die;
+open(local *STDERR, ">$some_file");
+open(local *STDERR, ">$some_file") or die;
+
+## name BarewordPipe
+## failures 6
 ## cut
 
 pipe READ, my $write;
-
-## name BarewordPipe2
-## failures 1
-## cut
-
 pipe my $read, WRITE;
-
-## name BarewordPipe3
-## failures 2
-## cut
-
 pipe READ, WRITE;
-
-## name BarewordPipeParentheses
-## failures 2
-## cut
-
 pipe(READ, WRITE);
 
 ## name BarewordPipeBuiltin
-## failures 1
+## failures 0
 ## cut
 
-pipe DATA, WRITE;
+pipe DATA, my $write;
 
 ## name LexicalPipe
 ## failures 0
 ## cut
 
 pipe my $read, my $write;
-
-## name LexicalPipeParentheses
-## failures 0
-## cut
-
 pipe(my $read, my $write);

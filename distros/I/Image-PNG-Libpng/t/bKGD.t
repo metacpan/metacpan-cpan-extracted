@@ -5,6 +5,11 @@ use Test::More;
 use Image::PNG::Libpng ':all';
 use Image::PNG::Const ':all';
 
+BEGIN: {
+    use lib "$Bin";
+    use IPNGLT;
+};
+
 # Test reading a background.
 
 my $png = create_read_struct ();
@@ -34,6 +39,7 @@ for my $k (@expect) {
 # Test writing a background.
 
 my $bKGD_file = "$Bin/bKGD-test.png";
+rmfile ($bKGD_file);
 my $wpng = create_write_struct ();
 open my $wfh, ">:raw", $bKGD_file or die $!;
 init_io ($wpng, $wfh);
@@ -61,6 +67,6 @@ my $rbg = get_bKGD ($rpng);
 for my $k (keys %bKGD) {
     is ($rbg->{$k}, $bKGD{$k}, "Key $k OK in written then read file");
 }
-
+rmfile ($bKGD_file);
 done_testing ();
 exit;

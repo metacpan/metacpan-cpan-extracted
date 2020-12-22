@@ -1,0 +1,2 @@
+	Query Text: select 1;
+	Result  (cost=0.00..0.01 rows=1 width=4) (actual time=0.003..0.004 rows=1 loops=1)

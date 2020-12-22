@@ -4,7 +4,7 @@ use v5.14;
 use warnings;
 use utf8;
 
-use App::ansifold qw($VERSION);
+our $VERSION = "1.05";
 
 =encoding utf-8
 
@@ -14,13 +14,13 @@ ansifold - fold command handling ANSI terminal sequences
 
 =head1 VERSION
 
-Version 1.04
+Version 1.05
 
 =head1 SYNOPSIS
 
 ansifold [ options ]
 
-    -w#, --width=#                Folding width (default 70)
+    -w#, --width=#                Folding width (default 72)
          --boundary=word          Fold on word boundary
          --padding                Padding to margin space
          --padchar=_              Padding character
@@ -32,6 +32,10 @@ ansifold [ options ]
          --runin                  Run-in width (default 4)
          --runout                 Run-out width (default 4)
     -s,  --smart                  Short cut for --boundary=word --linebreak=all
+         --expand[=mode]          Expand tabs
+         --tabstop=n              Tab-stop position (default 8)
+         --tabhead=char           Tab-head character (default space)
+         --tabspace=char          Tab-space character (default space)
 
 =head1 DESCRIPTION
 
@@ -39,7 +43,7 @@ B<ansifold> is almost B<fold> compatible command utilizing
 L<Text::ANSI::Fold> module, which enables to handle ANSI terminal
 sequences and Unicode multibyte characters properly.
 
-It folds lines in 70 column by default.  Use option B<-w> to change
+It folds lines in 72 column by default.  Use option B<-w> to change
 the folding width.
 
     $ ansifold -w132
@@ -71,6 +75,20 @@ Single field is used repeatedly for the same line, but multiple fields
 are not.  Put comma at the end of single field to discard the rest:
 
     ansifold -w 80,
+
+Option C<-w 80,> is equivalent to C<-w 80,0>.  Zero width is ignored
+when seen as a final number, but not ignored otherwise.
+
+If the final width is negative, it is not discarded but takes all the
+rest instead.  So next commands do the same thing.
+
+    $ colrm 7 10
+
+    $ ansifold -nw 6,-4,-1
+
+Next command implements ANSI/Unicode aware L<expand(1)> command.
+
+    $ ansifold -w -1 --expand
 
 Number description is handled by L<Getopt::EX::Numbers> module, and
 consists of C<start>, C<end>, C<step> and C<length> elements.  For
@@ -115,11 +133,35 @@ Option B<--smart> (or simply B<-s>) is shortcut for
 "B<--boundary=word> B<--linebreak=all>" and enables all smart text
 formatting capability.
 
+=head1 TAB EXPANSION
+
+Option B<--expand> enables tab character expansion.  Each tab
+character is converted to B<tabhead> and following B<tabspace>
+characters (both are space by default).  They can be specified by
+B<--tabhead> and B<--tabspace> option.  If the option value is longer
+than single characger, it is evaluated as unicode name.  Next example
+makes tab character visible keeping text layout.
+
+    $ ansifold --expand --tabhead="MEDIUM SHADE" --tabspace="LIGHT SHADE"
+
+Option B<--expand> also takes option of pre-defined names.  Currently
+these names are available.
+
+    dot    => [ '.', '.' ],
+    symbol => [ "\N{SYMBOL FOR HORIZONTAL TABULATION}", ' ' ],
+    shade  => [ "\N{MEDIUM SHADE}", "\N{LIGHT SHADE}" ],
+
+You can use like this:
+
+    $ ansifold --expand=symbol
+
 =head1 SEE ALSO
 
 L<ansifold|https://github.com/kaz-utashiro/ansifold>
 
 L<Text::ANSI::Fold|https://github.com/kaz-utashiro/Text-ANSI-Fold>
+
+L<Text::ANSI::Fold::Util|https://github.com/kaz-utashiro/Text-ANSI-Fold-Util>
 
 L<Getopt::EX::Numbers>
 
@@ -129,7 +171,7 @@ W3C Working Group Note 3 April 2012
 
 =head1 LICENSE
 
-Copyright (C) 2018- Kazumasa Utashiro
+Copyright 2018- Kazumasa Utashiro
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
@@ -141,6 +183,8 @@ Kazumasa Utashiro
 =cut
 
 use open IO => 'utf8', ':std';
+use Encode;
+map { $_ = decode 'utf8', $_ unless utf8::is_utf8($_) } @ARGV;
 
 use Pod::Usage;
 use List::Util qw(min);
@@ -154,6 +198,11 @@ my %opt = (
     linebreak => LINEBREAK_NONE,
     runin => 4,
     runout => 4,
+    expand => undef,
+    tabstop => undef,
+    tabhead => undef,
+    tabspace => undef,
+    discard => [],
     );
 
 my @optargs = (
@@ -186,6 +235,11 @@ my @optargs = (
 	    }
 	};
     },
+    "expand:s"   => \$opt{expand},
+    "tabstop=i"  => \$opt{tabstop},
+    "tabhead=s"  => \$opt{tabhead},
+    "tabspace=s" => \$opt{tabspace},
+    "discard=s"  =>  $opt{discard},
     "version|v" => sub {
 	print "Version: $VERSION\n";
 	exit;
@@ -196,18 +250,14 @@ use Getopt::EX::Long;
 Getopt::Long::Configure("bundling");
 GetOptions(@optargs) || pod2usage();
 
-my $DEFAULT_WIDTH = 70;
+my $DEFAULT_WIDTH = 72;
 my @width_map;
 my @width_index;
 
 use Getopt::EX::Numbers;
 my $numbers = Getopt::EX::Numbers->new;
 
-@{$opt{width}} = do {
-    map {
-	push @width_map, $_ > 0;
-	$_ < 0 ? -$_ : $_;
-    }
+my @width = do {
     map {
 	if    (/^$/)                 { 0 }		# empty
 	elsif (/^-?\d+$/)            { ($_) }		# 10
@@ -221,24 +271,43 @@ my $numbers = Getopt::EX::Numbers->new;
     map { split /,/, $_, -1 }
     @{$opt{width}};
 };
-if (@{$opt{width}} > 1 and grep { not $_ } @width_map) {
-    @width_index = grep { $width_map[$_] } 0 .. $#width_map;
+
+$opt{width} = do {
+    if    (@width == 0) { $DEFAULT_WIDTH }
+    elsif (@width == 1) { $width[0] }
+    else {
+	my @map = [ (int(pop @width)) x 2 ];
+	unshift @map, map { [ $_ < 0 ? (-$_, 0) : ($_, 1) ] } @width;
+	@width = map { $_->[0] } @map;
+	@width_index = grep { $map[$_][1] } 0 .. $#map;
+	\@width;
+    }
+};
+
+my %tabs = (
+    dot    => [ '.', '.' ],
+    symbol => [ "\N{SYMBOL FOR HORIZONTAL TABULATION}", ' ' ],
+    shade  => [ "\N{MEDIUM SHADE}", "\N{LIGHT SHADE}" ],
+    );
+if (defined(my $expand = $opt{expand})) {
+    if (my $tabs = $tabs{$expand}) {
+	@opt{qw(tabhead tabspace)} = @$tabs;
+    }
+    $opt{expand} = 1;
 }
 
-if (@{$opt{width}} == 0) {
-    $opt{width} = $DEFAULT_WIDTH;
-}
-elsif (@{$opt{width}} == 1) {
-    $opt{width} = $opt{width}->[0];
-}
-else {
-    @{$opt{width}} = grep { $_ } @{$opt{width}}; # remove zero
+use charnames ':loose';
+for (@opt{qw(tabhead tabspace)}) {
+    defined or next;
+    $_ = do { eval qq["\\N{$_}"] or die "$!" } if length > 1;
 }
 
 my $fold = Text::ANSI::Fold->new(
     map  { $_ => $opt{$_} }
     grep { defined $opt{$_} }
-    qw(width boundary padding padchar ambiguous linebreak runin runout)
+    qw(width boundary padding padchar ambiguous
+       linebreak runin runout
+       expand tabstop tabhead tabspace discard)
     );
 
 my $separator = do {

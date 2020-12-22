@@ -6,7 +6,7 @@ WriteMakefile(
     NAME              => 'Date::HolidayParser',
     VERSION_FROM      => 'lib/Date/HolidayParser.pm', # finds $VERSION
     PREREQ_PM         => {
-		'Any::Moose' => 0,
+		'Moo' => 0,
 	},
 	BUILD_REQUIRES	=> {
 		'Test::More' => 0,

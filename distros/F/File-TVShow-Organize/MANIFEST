@@ -1,7 +1,11 @@
 Changes
+Examples/basic.pl
+Examples/myPersonalCode.pl
+lib/File/TVShow/Organize.pm
 Makefile.PL
 MANIFEST
 README
+t/00-load.t
 t/00CheckTestDirectorStructures.t
 t/01TestDirectoryHandling.t
 t/02TestBaseFunctions.t
@@ -11,9 +15,9 @@ t/05TestMainImport.t
 t/06TestSuccessfulImport.t
 t/07TestRecursiveImport.t
 t/10Clean.t
-t/testrules.yml
 t/test-data.tar.gz
+t/testrules.yml
 t/tv-shows.tar.gz
-lib/File/TVShow/Organize.pm
+TODO
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

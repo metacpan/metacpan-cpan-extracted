@@ -1,0 +1,8 @@
+resources:
+    repository:
+        type: git
+        url: https://github.com/tehmoth/Amazon-SNS-V4.git
+        web: https://github.com/tehmoth/Amazon-SNS-V4
+    bugtracker:
+        web: https://github.com/tehmoth/Amazon-SNS-V4/issues
+    x_IRC: irc://irc.styxnet.tech/#perl

@@ -12,12 +12,12 @@ use Data::Object::Class;
 
 extends 'Zing::Launcher';
 
-our $VERSION = '0.13'; # VERSION
+our $VERSION = '0.20'; # VERSION
 
 # METHODS
 
 method queues() {
-  ['scheduled']
+  ['$scheduled']
 }
 
 1;

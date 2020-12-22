@@ -461,7 +461,7 @@ if ($do==1) {
    #}
    ($stdout,$stderr)=$handle->cmd($sudo."pkill nginx");
    ($stdout,$stderr)=$handle->cmd($sudo."rm -rvf /usr/local/nginx",'__display__');
-   ($stdout,$stderr)=$handle->cmd("wget -qO- http://icanhazip.com");
+   ($stdout,$stderr)=$handle->cmd("wget -qO- https://icanhazip.com");
    $public_ip=$stdout if $stdout=~/^\d+\.\d+\.\d+\.\d+\s*/s;
    unless ($public_ip) {
       require Sys::Hostname;

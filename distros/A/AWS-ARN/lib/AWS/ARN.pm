@@ -6,7 +6,7 @@ use Moo;
 use Types::Standard qw/Str/;
 use Type::Utils;
 
-our $VERSION = '0.005';
+our $VERSION = '0.007';
 
 use overload '""' => sub {
 	shift->arn;
@@ -177,7 +177,7 @@ AWS::ARN -  module to parse and generate ARNs
 
 =head1 VERSION
 
-0.005
+0.007
 
 =head1 DESCRIPTION
 
@@ -250,7 +250,7 @@ James Wright <jwright@cpan.org>
 
 =over
 
-=item * L<< AWS Resource Names | https://docs.aws.amazon.com/general/latest/gr/aws-arns-and-namespaces.html >>
+=item * L<AWS Resource Names|https://docs.aws.amazon.com/general/latest/gr/aws-arns-and-namespaces.html>
 
 =back
 

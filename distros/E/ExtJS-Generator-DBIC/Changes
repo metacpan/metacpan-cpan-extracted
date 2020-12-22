@@ -1,4 +1,8 @@
-Revision history for ExtJS-Generator-DBIC: 0.003
+Revision history for ExtJS-Generator-DBIC: 0.004
+
+0.004     2020-12-22 12:44:28+01:00 Europe/Vienna
+    - fix missing DBIx::Class dependency (RT#127770)
+    - change bugtracker to github.com
 
 0.003     2016-06-24 14:59:25+02:00 Europe/Vienna
     - fix failing tests under unsupported Perl versions (< 5.22) (RT#114531)

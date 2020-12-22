@@ -1,5 +1,5 @@
 package Data::CompactReadonly::V0::Array;
-our $VERSION = '0.0.3';
+our $VERSION = '0.0.4';
 
 use warnings;
 use strict;
@@ -38,7 +38,7 @@ sub _create {
     # empty pointer table
     my $table_start_ptr = tell($fh);
     print $fh "\x00" x $args{ptr_size} x (1 + $#{$args{data}});
-    my $next_free_ptr = tell($fh); 
+    $class->_set_next_free_ptr(%args);
 
     # write a pointer to each item in turn, and if necessary also write
     # item, which can be of any type
@@ -48,10 +48,9 @@ sub _create {
         if(my $ptr = $class->_get_already_seen(%args, data => $this_data)) {
             print $fh $class->_encode_ptr(%args, pointer => $ptr);
         } else {
-            print $fh $class->_encode_ptr(%args, pointer => $next_free_ptr);
-            $class->_seek(%args, pointer => $next_free_ptr);
+            print $fh $class->_encode_ptr(%args, pointer => $class->_get_next_free_ptr(%args));
+            $class->_seek(%args, pointer => $class->_get_next_free_ptr(%args));
             Data::CompactReadonly::V0::Node->_create(%args, data => $this_data);
-            $next_free_ptr = tell($fh);
         }
     }
 }

@@ -114,7 +114,7 @@ $subs->example(-1, 'main', 'method', fun($tryable) {
 
   local @ARGV = ('start', 'once', '-I', 't/lib', '-a', 't/app');
   trap { ok $result = $tryable->result }; # exit 0 is good
-  is $trap->exit, undef;
+  is $trap->exit, 0;
 
   $result
 });

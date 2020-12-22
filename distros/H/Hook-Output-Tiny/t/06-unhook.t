@@ -17,8 +17,11 @@ warn "err 2\n";
 
 $h->unhook;
 
-is ($h->stderr, 2, "stderr ok after unhook");
-is ($h->stdout, 2, "stdout ok after unhook");
+my @stdout = $h->stdout;
+my @stderr = $h->stderr;
+
+is (@stdout, 2, "stdout ok after unhook");
+is (@stderr, 2, "stderr ok after unhook");
 
 $h->hook('stderr');
 
@@ -27,7 +30,10 @@ print "out 3\n";
 
 $h->unhook;
 
-is ($h->stderr, 3, "stderr ok after 2 unhook");
-is ($h->stdout, 2, "stdout ok after 2 unhook");
+@stdout = $h->stdout;
+@stderr = $h->stderr;
+
+is (@stdout, 2, "stdout ok after 2 unhook");
+is (@stderr, 3, "stderr ok after 2 unhook");
 
 done_testing();

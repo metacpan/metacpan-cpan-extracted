@@ -9,7 +9,7 @@ use IO::Uncompress::UnXz qw( $UnXzError );
 #use Data::Peek;
 use Carp;
 
-our $VERSION = "0.02";
+our $VERSION = "0.03";
 
 sub import {
     my ($class, %args) = @_;
@@ -212,8 +212,6 @@ This module implements a PerlIO layer which will let you handle
 xz compressed files transparently.
 
 =head1 BUGS
-
-Setting C<$/> to C<undef> causes havoc. This is under investigation.
 
 Using C<binmode> on an opened file for compression will pop (remove)
 the layer.

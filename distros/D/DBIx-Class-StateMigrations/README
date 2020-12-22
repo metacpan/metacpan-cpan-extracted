@@ -1,7 +1,7 @@
 
 
 This archive contains the distribution DBIx-Class-StateMigrations,
-version 0.001:
+version 0.002:
 
   Schema migrations via checksums instead of versions
 

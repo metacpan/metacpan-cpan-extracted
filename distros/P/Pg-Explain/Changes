@@ -1,5 +1,11 @@
 Revision history for Pg-Explain
 
+1.04    2020/12/21
+        - Add handling of autoexplain plans in non-text formats.
+        Apparently autoexplain logs plans that are different from normal
+        explain command when using json/yaml/xml.
+        Problem reported by Robert Emery.
+
 1.03    2020/09/17
         - Fix bug in parsing json/yaml/xml plans that contained Function Scans
 

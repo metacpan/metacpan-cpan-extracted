@@ -59,6 +59,11 @@ and functionality available.
 The [Minion](https://metacpan.org/pod/Minion)-based object. See the [Minion](https://metacpan.org/pod/Minion) documentation for a list of
 additional methods provided.
 
+If no backend is specified, Minion will default to an in-memory temporary
+database. This is not recommended for any serious use. See
+[the Mojo::SQLite](https://metacpan.org/pod/Mojo::SQLite#BASICS) docs
+for details
+
 # METHODS
 
 ## add\_task()
@@ -83,7 +88,7 @@ slash in your mount path!
 You can optionally pass in an absolute URL to act as the "return to" link. The url must
 be absolute or else it will be made relative to the admin UI, which is probably
 not what you want. For example: 
-`mount '/dashboard/' => minion_app( '/foo/bar' )->start;`
+`mount '/dashboard/' => minion_app( 'http://localhost:5000/foo' )->start;`
 
 # RUNNING JOBS
 
@@ -139,6 +144,6 @@ the same terms as the Perl 5 programming language system itself.
 
 Hey! **The above document had some coding errors, which are explained below:**
 
-- Around line 206:
+- Around line 211:
 
     Non-ASCII character seen before =encoding in 'Rezić'. Assuming UTF-8

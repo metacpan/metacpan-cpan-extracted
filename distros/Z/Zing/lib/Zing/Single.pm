@@ -14,12 +14,13 @@ use Zing::Logic::Single;
 
 extends 'Zing::Process';
 
-our $VERSION = '0.13'; # VERSION
+our $VERSION = '0.20'; # VERSION
 
 # BUILDERS
 
 fun new_logic($self) {
-  Zing::Logic::Single->new(process => $self)
+  my $debug = $self->env->debug;
+  Zing::Logic::Single->new(debug => $debug, process => $self)
 }
 
 1;

@@ -219,6 +219,7 @@ WriteMakefile( (MM->can('signature_target') ? (SIGN => 1) : ()),
                PREREQ_PM    => { 'Text::WikiFormat' => '0.78', #earlier's buggy
                                  'HTML::PullParser' => 0,
                                  'Digest::MD5'      => 0,
+                                 'Digest::SHA1'     => 0,
                                  'Test::More'       => 0,
                                  'Time::Piece'      => 0,
                                  'DBI'              => 0,

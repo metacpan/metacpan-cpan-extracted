@@ -8,6 +8,7 @@ Makefile.PL
 README
 README.md
 dist.ini
+eg/ode-to-joy
 eg/single-note-line
 eg/tandem
 lib/Music/MelodicDevice/Inversion.pm

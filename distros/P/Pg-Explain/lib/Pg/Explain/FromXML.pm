@@ -27,11 +27,11 @@ Pg::Explain::FromXML - Parser for explains in XML format
 
 =head1 VERSION
 
-Version 1.03
+Version 1.04
 
 =cut
 
-our $VERSION = '1.03';
+our $VERSION = '1.04';
 
 =head1 SYNOPSIS
 
@@ -102,7 +102,10 @@ sub parse_source {
         return;
     }
 
-    my $struct = XMLin( $source )->{ 'Query' };
+    my $struct = XMLin( $source );
+
+    # Need this to work around a bit different format from auto-explain module
+    $struct = $struct->{ 'Query' } if defined $struct->{ 'Query' };
 
     my $top_node = $self->make_node_from( $struct->{ 'Plan' } );
 

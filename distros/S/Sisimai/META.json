@@ -60,7 +60,7 @@
    "provides" : {
       "Sisimai" : {
          "file" : "lib/Sisimai.pm",
-         "version" : "v4.25.9"
+         "version" : "v4.25.10"
       },
       "Sisimai::ARF" : {
          "file" : "lib/Sisimai/ARF.pm"
@@ -437,7 +437,7 @@
          "web" : "https://github.com/sisimai/p5-sisimai"
       }
    },
-   "version" : "v4.25.9",
+   "version" : "v4.25.10",
    "x_contributors" : [
       "0xcdcdcdcd <0xcdcdcdcd@gmail.com>",
       "Adrian Yee <adrian@gt.net>",
@@ -446,6 +446,7 @@
       "Jonathan Leroy <jonathan@inikup.com>",
       "Mutsutoshi Yoshimoto <negachov@gmail.com>",
       "Stefan Hornburg (Racke) <racke@linuxia.de>",
+      "Valentin Henon <valentin.henon@gmail.com>",
       "Xavier <yadd@debian.org>",
       "Xavier Guimard <x.guimard@free.fr>",
       "azuma, kuniyuki <azumakuniyuki@users.noreply.github.com>",

@@ -11,7 +11,7 @@ package UTF8::R2;
 use 5.00503;    # Universal Consensus 1998 for primetools
 # use 5.008001; # Lancaster Consensus 2013 for toolchains
 
-$VERSION = '0.11';
+$VERSION = '0.12';
 $VERSION = $VERSION;
 
 use strict;
@@ -521,7 +521,7 @@ sub UTF8::R2::qr ($) {
         }
 
         # \any or /./
-        elsif ($before_subregex eq '.')  { push @after_subregex, ($modifiers =~ /s/) ? $x : "(?:(?!\\n)$x)"                    }
+        elsif ($before_subregex eq '.' ) { push @after_subregex, ($modifiers =~ /s/) ? $x : "(?:(?!\\n)$x)"                    }
         elsif ($before_subregex eq '\B') { push @after_subregex, "(?:(?<![$bare_w])(?![$bare_w])|(?<=[$bare_w])(?=[$bare_w]))" }
         elsif ($before_subregex eq '\D') { push @after_subregex, "(?:(?![$bare_d])$x)"                                         }
         elsif ($before_subregex eq '\H') { push @after_subregex, "(?:(?![$bare_h])$x)"                                         }
@@ -941,7 +941,8 @@ UTF8::R2 - makes UTF-8 scripting easy for enterprise use or LTS
     $result = UTF8::R2::ucfirst($_)
 
     use UTF8::R2 qw(%mb);
-    $result = $_ =~ $mb{qr/$utf8regex/imsxogc}
+    $result = $_ =~ $mb{qr/$utf8regex/imsxo}
+    $result = $_ =~ m<\G$mb{qr/$utf8regex/imsxo}>gc
     $result = $_ =~ s<$mb{qr/before/imsxo}><after>egr
 
 =head1 OCTET-semantics Functions vs. Codepoint-semantics Subroutines
@@ -972,10 +973,12 @@ name.
   ------------------------------------------------------------------------------------------------------------------------------------------
   length                  UTF8::R2::length($_)                       length() is compatible and usually useful
   ------------------------------------------------------------------------------------------------------------------------------------------
-  // or m// or qr//       UTF8::R2::qr(qr/$utf8regex/imsxogc)        not supports metasymbol \X that match grapheme
+  // or m// or qr//       UTF8::R2::qr(qr/$utf8regex/imsxo)          not supports metasymbol \X that match grapheme
+                          m<@{[UTF8::R2::qr(qr/$utf8regex/imsxo)]}>gc
                             or                                       not supports named character (such as \N{GREEK SMALL LETTER EPSILON}, \N{greek:epsilon}, or \N{epsilon})
                           use UTF8::R2 qw(%mb);                      not supports character properties (like \p{PROP} and \P{PROP})
-                          $mb{qr/$utf8regex/imsxogc}
+                          $mb{qr/$utf8regex/imsxo}
+                          m<\G$mb{qr/$utf8regex/imsxo}>gc
 
                           Special Escapes in Regex                   Support Perl Version
                           --------------------------------------------------------------------------------------------------

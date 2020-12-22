@@ -1,0 +1,34 @@
+NAME
+    Toolforge::MixNMatch::Print - Toolforge Mix'n'match tool object print
+    routines.
+
+DESCRIPTION
+    This distributions is set of print routins for objects from Toolforge
+    Mix'n'match tool (https://mix-n-match.toolforge.org/).
+
+SEE ALSO
+    Toolforge::MixNMatch::Print::Catalog
+        Mix'n'match user structure print.
+
+    Toolforge::MixNMatch::Print::User
+        Mix'n'match user structure print.
+
+    Toolforge::MixNMatch::Print::YearMonth
+        Mix'n'match year/month structure print.
+
+REPOSITORY
+    <https://github.com/michal-josef-spacek/Toolforge-MixNMatch-Print>
+
+AUTHOR
+    Michal Josef Špaček <mailto:skim@cpan.org>
+
+    <http://skim.cz>
+
+LICENSE AND COPYRIGHT
+    © Michal Josef Špaček 2020
+
+    BSD 2-Clause License
+
+VERSION
+    0.03
+

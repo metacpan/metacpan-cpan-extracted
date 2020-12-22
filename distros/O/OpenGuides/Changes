@@ -3,6 +3,13 @@
 More detailed changelogs can be found at
 <http://github.com/OpenGuides/OpenGuides>
 
+0.84    22 December 2020
+        Switch to HTTPS for map tiles and icons, to avoid mixed-content
+        warnings.
+        Use Wiki::Toolkit 0.86 to fix issues with modern versions of MySQL
+        Allow configuration of OpenGuides using environment variables
+        Add a Dockerfile which runs OpenGuides under Plack
+
 0.83    06 January 2020
         Remove use of MapQuest tiles, as they're no longer available.
         Add full CGI URL to popups on map search results, so they can be

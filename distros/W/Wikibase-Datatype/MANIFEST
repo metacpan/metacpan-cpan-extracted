@@ -31,6 +31,8 @@ examples/ex19.pl
 examples/ex2.pl
 examples/ex20.pl
 examples/ex21.pl
+examples/ex22.pl
+examples/ex23.pl
 examples/ex3.pl
 examples/ex4.pl
 examples/ex5.pl
@@ -112,7 +114,8 @@ t/Wikibase-Datatype-Statement/07-snak.t
 t/Wikibase-Datatype-Utils/01-use.t
 t/Wikibase-Datatype-Utils/02-version.t
 t/Wikibase-Datatype-Utils/03-check_entity.t
-t/Wikibase-Datatype-Utils/04-check_property.t
+t/Wikibase-Datatype-Utils/04-check_lexeme.t
+t/Wikibase-Datatype-Utils/05-check_property.t
 t/Wikibase-Datatype-Value-Globecoordinate/01-use.t
 t/Wikibase-Datatype-Value-Globecoordinate/02-version.t
 t/Wikibase-Datatype-Value-Globecoordinate/03-new.t

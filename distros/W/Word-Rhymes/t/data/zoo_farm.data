@@ -1,0 +1,22 @@
+[
+   {
+      "word" : "revenue",
+      "numSyllables" : 3,
+      "score" : 1882
+   },
+   {
+      "numSyllables" : 1,
+      "word" : "ewe",
+      "score" : 1190
+   },
+   {
+      "score" : 827,
+      "numSyllables" : 2,
+      "word" : "emu"
+   },
+   {
+      "score" : 511,
+      "word" : "grew",
+      "numSyllables" : 1
+   }
+]

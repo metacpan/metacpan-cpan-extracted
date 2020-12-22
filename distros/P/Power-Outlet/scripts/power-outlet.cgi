@@ -7,26 +7,29 @@ use CGI qw{};
 use CGI::Carp qw{fatalsToBrowser}; #not an exporter
 use Config::IniFiles qw{};
 use Power::Outlet qw{};
+use Time::HiRes qw{alarm};
+use Parallel::ForkManager 1.01;
 
 my $cgi      = CGI->new;
-my $ini      = '../conf/power-outlet.ini';
+my $ini      = '/etc/power-outlet.ini';
 my $cfg      = Config::IniFiles->new(-file=>$ini);
-
 my $switch   = $cgi->param('switch.x');
 my $group    = $cgi->param('group') || 'Main';
 my @groups   = uniq map {$cfg->val($_=>'groups', 'Main')} $cfg->Sections;
+my $pm       = Parallel::ForkManager->new(16);
 
 my @outlets  = map {
-                 my $section=$_;
+                 my $section = $_;
                  {
                    section => $section,
                    map {
-                        my $key=$_;
-                        $key => $cfg->val($section=>$key);
+                        my $key = $_;
+                        my @val = $cfg->val($section => $key);
+                        @val == 1 ? ($key => $val[0]) : ();
                        } $cfg->Parameters($section)
                  };
                } grep {
-                 my $section=$_;
+                 my $section = $_;
                  first {$_ eq $group} $cfg->val($section=>'groups', 'Main');
                } $cfg->Sections;
 
@@ -37,34 +40,63 @@ if (defined $switch) {
   Power::Outlet->new(%$data)->switch;
 }
 
-my @forms    = ();
-foreach my $data (@outlets) {
-  my $outlet = Power::Outlet->new(%$data);
-  my $status = eval{$outlet->query} || 'NO ACCESS';
-  my $image  = $status eq 'ON' ? '/power-outlet-images/btn-on.png' : '/power-outlet-images/btn-off.png';
-  #Generate a form for each outlet
-  push @forms, $cgi->div({-style=>'width: 119px; padding-bottom: 109px; position: relative; float: left;'},
+my %forms    = ();
+
+$pm->run_on_finish( #register before main forking loop
+  sub {
+    my ($pid, $exit_code, $ident, $exit_signal, $core_dump, $data) = @_;
+    my $section      = $data->{'section'};
+    my $form         = $data->{'form'};
+    $forms{$section} = $form;
+  }
+);
+
+foreach my $outlet (@outlets) {#main forking loop
+  $pm->start and next; #child fork for each outlet
+  my $Power_Outlet = Power::Outlet->new(%$outlet);
+  local $@;
+  my $status = eval{
+                    local $SIG{ALRM} = sub {die "timeout\n"};
+                    alarm 1.25; #some devices are slow to warmup
+                    my $return       = $Power_Outlet->query;
+                    alarm 0;
+                    $return;
+                   } || 'ERROR';
+  my $error  = $@;
+  print STDERR $error;
+  $status    = 'TIMEOUT' if $error =~ m/timeout/;
+  my $image  = $status eq 'TIMEOUT' ? '/power-outlet-images/btn-timeout.png'
+             : $status eq 'ON'      ? '/power-outlet-images/btn-on.png'
+             : $status eq 'OFF'     ? '/power-outlet-images/btn-off.png'
+             :                        '/power-outlet-images/btn-error.png';
+  #form for each outlet
+  my $form   = $cgi->div({-style=>'width: 119px; padding-bottom: 109px; position: relative; float: left;'},
                  $cgi->div({-style=>'background-color: #FFFFFF; position: absolute; left: 1px; right: 1px; top: 1px; bottom: 1px; padding: 1px; border: 1px solid; border-color: #D9D9D9; border-radius: 25px;'},
-                   $cgi->p({-align=>'center', -width=>'100%'}, $outlet->name),
+                   $cgi->p({-align=>'center', -width=>'100%'}, $Power_Outlet->name),
                    $cgi->p({-align=>'center', -width=>'100%'},
                      $cgi->start_multipart_form(#-style=>"display: inline; margin: 0px 0px 0px 0px; padding: 0px 0px 0px 0px;",
                                                 -method=>'POST',
                                                 -action=>$cgi->script_name),
                      $cgi->hidden(-name => 'group'),
-                     $cgi->hidden(-name => 'outlet', -value=>$data->{'section'}, -override=>1),
+                     $cgi->hidden(-name => 'outlet', -value=>$outlet->{'section'}, -override=>1),
                      $cgi->image_button(-name=>'switch',  -src=>$image),
                      $cgi->end_multipart_form,
                    ),
                  ),
                );
+  #data to return to parent process
+  $pm->finish(0 => {section=>$outlet->{'section'}, form=>$form});
 }
 
+$pm->wait_all_children; #back to parent
+
+my @forms    = map {$forms{$_->{'section'}}} @outlets; #ordered per ini
 my $title    = 'Power::Outlet Controller';
 print $cgi->header(-type=>'text/html', -charset=>'utf-8'),
       $cgi->start_html({
-                        -title=>$title,
-                        -bgcolor=>'#C3CAD2',
-                        -meta=>{viewport=>'initial-scale = 1.0, maximum-scale = 1.0'}, #for iPhone
+                        -title   => $title,
+                        -bgcolor => '#C3CAD2',
+                        -meta    => {viewport=>'initial-scale = 1.0, maximum-scale = 1.0'}, #for iPhone
                        }),
       $cgi->title($title),
       $cgi->h1($cgi->a({-href=>$cgi->script_name, -style=>'text-decoration: none; color: black;'}, $title)),

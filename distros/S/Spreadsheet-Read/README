@@ -59,16 +59,17 @@ possible name clash:
 
 =head1 TODO
 
-  * Make tests for examples/xlscat
+  * Make tests for scripts/xlscat
   * Support Parsers native module options
   * Check if Tk is installed before asking if ss2tk is wanted
   * Test diagnostics output
   * Make clip skip empty sheets
-  * Support Data::XLSX::Parser ?
+  * Support Spreadsheet::Perl
+  * Support Data::XLSX::Parser
 
 =head1 AUTHOR
 
-H.Merijn Brand, <h.m.brand@xs4all.nl>
+H.Merijn Brand <perl5@tux.freedom.nl>
 
 =head1 COPYRIGHT AND LICENSE
 

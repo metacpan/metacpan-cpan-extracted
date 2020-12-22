@@ -19,7 +19,7 @@ use Zing::Process;
 =cut
 
 my $p = Zing::Process->new;
-my $d = Zing::Data->new(process => $p);
+my $d = Zing::Data->new(name => $p->name);
 
 for my $i (1..1_000) {
   warn $d->send({created => "state-$i"});

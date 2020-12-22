@@ -46,62 +46,145 @@
 <& /Elements/Header, Title => $title &>
 <div id="body" class="login-body">
 
+% if ( RT::Handle::cmp_version($RT::VERSION, '5.0.0') >= 0 ) {
+<& /Elements/ListActions, actions => \@actions &>
+
+<form action="Request.html" method="post" class="mx-auto max-width-sm">
+
+% my $title_box_title;
+% if ( $Mode eq 'create' ) {
+%     $title_box_title = loc("Enter your email address to create a new account");
+% }
+% else {
+%     $title_box_title = loc("Enter your email address to reset your password");
+% }
+
+<&| /Widgets/TitleBox, title => $title_box_title, hideable => 0, content_class => 'mx-auto col-12', class => 'text-center' &>
+  <div class="form-row">
+% if ( $Mode eq 'reset' ) {
+      <p class="col-12 text-center"><i><&|/l&>RT can send you an email with a link that will allow you to reset your password.</&></i></p>
+% }
+  </div>
+  <div class="form-row">
+    <div class="label col-3">
+      <&|/l&>Email address</&>:
+    </div>
+    <div class="value col-8">
+      <input type="text" class="form-control" name="Email" value="" />
+    </div>
+  </div>
+  <div class="form-row">
+    <div class="col-3"></div>
+    <div class="col-8 text-right">
+      <input class="button btn btn-primary form-control" type="submit" value="<%loc('Send it!')%>" />
+      <a class="btn btn-primary" href="<%$RT::WebURL|n%>"><&|/l&>Cancel</&></a>
+    </div>
+  </div>
+</&>
+
+</form>
+% }
+% else {
 <h1><%$title%></h1>
 <& /Elements/ListActions, actions => \@actions  &>
 <p>
-<&|/l&>RT can send you an email message with a link that will allow you to reset your password.</&>
+% if ( $Mode eq 'create' ) {
+<&|/l&>Enter your email address to create a new account.</&>
+% } else {
+<&|/l&>RT can send you an email with a link that will allow you to reset your password.</&>
+% }
 <form method="post" action="Request.html">
     <&|/l&>Email address</&>:<input name="Email" value="" />
     <input type="submit" class="button" value="<%loc('Send it!')%>" />
 </form>
+    <a href="<%$RT::WebURL|n%>"><&|/l&>Back to Login</&></a>
+% }
 </div>
 
+<& /Elements/Footer, Menu => 0 &>
 <%INIT>
 my @actions;
 
 my $title = loc("Reset your password");
 
+if ( $Mode eq 'create' ) {
+    $title = loc("Create account");
+}
+
 if ($ARGS{'Email'}) {
     my $u = RT::User->new($RT::SystemUser);
     $u->LoadByCols(EmailAddress => $ARGS{'Email'});
-    if ($u->id and $u->HasPassword and not $u->Disabled) {
-        my $token = Digest::MD5->new()->add(
-            $u->id,
-            $u->__Value('Password'),
-            $RT::DatabasePassword,
-            $u->LastUpdated,
-            @{[$RT::WebPath]} . '/NoAuth/ResetPassword/Reset'
-        )->hexdigest();
 
-        my ($status, $msg) = RT::Interface::Email::SendEmailUsingTemplate(
-            To        => $u->EmailAddress,
-            Template  => 'PasswordReset',
-            Arguments => {
-                Token => $token,
-                User  => $u,
-            },
-        );
+    # Do not allow password reset if this page is suppose to be hidden
+    return if RT->Config->Get('DisableResetPasswordOnLogin');
+
+    # If the user exists and has a password and is not disabled then they can always reset their password
+    if ($u->id and $u->HasPassword and !$u->Disabled) {
+        my ($status, $msg) = RT::Extension::ResetPassword::CreateTokenAndResetPassword($u);
 
         if ($status) {
             push @actions, loc("RT has sent you an email message with instructions about how to reset your password");
             RT->Logger->info("Password reset token send to " . $u->EmailAddress);
-        } else {
+        }
+        else {
             push @actions, loc("Failed to send password reset token, please contact your RT administrator.");
             RT->Logger->error("Failed to send password reset token to " . $u->EmailAddress . ": $msg");
         }
-    } elsif ($u->id and $u->Disabled) {
+    }
+    # Disabled users do not get to reset their passwords
+    elsif ($u->id and $u->Disabled) {
         push @actions, loc("You can't reset your password because your user is disabled.");
         RT->Logger->warning("Disabled user " . $u->Name . " attempted to reset password");
-    } elsif ($u->id) {
-        push @actions, loc("You can't reset your password as you don't already have one.");
-        RT->Logger->warning("User " . $u->Name . " with no password attempted a password reset")
-    } else {
-        push @actions, loc("RT couldn't find a user with that email address. Give it another try?");
-        RT->Logger->warning("Password reset attempted for non-existent user " . $ARGS{'Email'});
     }
+    # If the user exists but does not have a password value then we need to consult the config flag
+    elsif ($u->id) {
+        if ( RT::Config->Get('AllowUsersWithoutPassword') ) {
+            my ($status, $msg) = RT::Extension::ResetPassword::CreateTokenAndResetPassword($u);
+            if ($status) {
+                push @actions, loc("RT has sent you an email message with instructions about how to reset your password");
+                RT->Logger->info("Password reset token send to " . $u->EmailAddress);
+            }
+            else {
+                push @actions, loc("Unable to send new password email, contact your RT administrator for more assistance");
+                RT->Logger->error("Failed to send password reset token to " . $u->EmailAddress . ": $msg");
+            }
+        }
+        else {
+            push @actions, loc("Unable to send new password email, contact your RT administrator for more assistance");
+            RT->Logger->warning("User " . $u->Name . " attempted to reset their password without having an existing password");
+        }
+    }
+    # If the user does not exists check if users are allowed to be created via this page
+    else {
+        if ( RT::Config->Get('CreateNewUserAndSetPassword') ) {
+            my ($status, $msg) = $u->Create(
+                Privileged   => RT::Config->Get('CreateNewUserAsPrivileged') || 0,
+                EmailAddress => $ARGS{'Email'},
+            );
+            RT::Logger->error($msg) unless $status;
+
+            ($status, $msg) = RT::Extension::ResetPassword::CreateTokenAndResetPassword($u);
+            if ($status) {
+                push @actions, loc("RT has sent you an email message with instructions about how to reset your password");
+                RT->Logger->info("Password reset token send to " . $u->EmailAddress);
+            }
+            else {
+                push @actions, loc("Unable to send new password email, contact your RT administrator for more assistance");
+                RT->Logger->error("Failed to send password reset token to " . $u->EmailAddress . ": $msg");
+            }
+        }
+        else {
+            push @actions, loc("Unable to send new password email, contact your RT administrator for more assistance");
+            RT->Logger->warning("Password reset attempted for non-existent user " . $ARGS{'Email'});
+        }
+    }
+
     if(RT->Config->Get("HidePasswordResetErrors")) {
         pop @actions;
         push @actions, loc("RT has sent you an email message with instructions about how to reset your password");
     }
 }
 </%INIT>
+<%ARGS>
+$Mode => 'reset'
+</%ARGS>

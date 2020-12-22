@@ -13,7 +13,7 @@ require Exporter;
 
 our @ISA = qw(Exporter);
 
-our $VERSION = '0.35';
+our $VERSION = '0.360.1';
 
 # Preloaded methods go here.
 
@@ -416,7 +416,7 @@ matching Show Folder on a media server.
 
 =head1 VERSION
 
-VERSION 0.35
+VERSION 0.360.1
 
 =head1 SYNOPSIS
 

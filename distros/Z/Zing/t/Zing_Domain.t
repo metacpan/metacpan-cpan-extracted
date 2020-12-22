@@ -40,6 +40,7 @@ method: get
 method: ignore
 method: incr
 method: listen
+method: merge
 method: pop
 method: push
 method: set
@@ -336,6 +337,47 @@ listen(Str $key, CodeRef $sub) : Object
 
 =cut
 
+=method merge
+
+The merge method commits the data associated with a specific key to the channel
+as a partial to be merged into any existing data.
+
+=signature merge
+
+merge(Str $key, HashRef $val) : Object
+
+=example-1 merge
+
+  # given: synopsis
+
+  $domain->merge(data => { email => 'me@example.com', username => 'me' });
+
+  $domain->merge(data => { email => 'we@example.com' });
+
+=example-2 merge
+
+  # given: synopsis
+
+  $domain->set(data => { username => 'we' });
+
+  $domain->merge(data => { email => 'me@example.com', username => 'me' });
+
+  $domain->merge(data => { email => 'we@example.com' });
+
+=example-3 merge
+
+  # given: synopsis
+
+  $domain->set(data => { username => 'we', colors => ['white'] });
+
+  $domain->merge(data => { email => 'me@example.com', username => 'me' });
+
+  $domain->merge(data => { email => 'we@example.com' });
+
+  $domain->merge(data => { colors => ['white', 'green'], username => 'we' });
+
+=cut
+
 =method pop
 
 The pop method pops the data off of the stack associated with a specific key.
@@ -581,6 +623,37 @@ $subs->example(-3, 'listen', 'method', fun($tryable) {
   $result
 });
 
+$subs->example(-1, 'merge', 'method', fun($tryable) {
+  ok my $result = $tryable->result;
+  is_deeply $result->state->{data}, {
+    email => 'we@example.com',
+    username => 'me',
+  };
+
+  $result
+});
+
+$subs->example(-2, 'merge', 'method', fun($tryable) {
+  ok my $result = $tryable->result;
+  is_deeply $result->state->{data}, {
+    email => 'we@example.com',
+    username => 'me',
+  };
+
+  $result
+});
+
+$subs->example(-3, 'merge', 'method', fun($tryable) {
+  ok my $result = $tryable->result;
+  is_deeply $result->state->{data}, {
+    email => 'we@example.com',
+    username => 'we',
+    colors => ['white', 'green'],
+  };
+
+  $result
+});
+
 $subs->example(-1, 'pop', 'method', fun($tryable) {
   ok my $result = $tryable->result;
   is @{$result->state->{history}}, 0;
@@ -615,7 +688,12 @@ $subs->example(-1, 'state', 'method', fun($tryable) {
     'email' => 'me@example.com',
     'history' => [],
     'karma' => 4,
-    'updated' => 1234567890
+    'updated' => 1234567890,
+    'data' => {
+      email => 'we@example.com',
+      username => 'we',
+      colors => ['white', 'green'],
+    },
   };
 
   $result

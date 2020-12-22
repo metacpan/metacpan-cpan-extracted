@@ -13,11 +13,11 @@
 #
 # 2) Build a "perlecs/qpid-broker-cpp" Docker image based on the Dockerfile, e.g.
 #
-#    docker build -t perlecs/qpid-broker-cpp:0.41-1 .
+#    docker build -t perlecs/qpid-broker-cpp:0.42-1 .
 #
 # 3) Run a Docker container based on the image, e.g.
 #
-#    docker run --rm --name=perlecs_qpid_broker_cpp --expose 5671 --expose 5672 perlecs/qpid-broker-cpp:0.41-1
+#    docker run --rm --name=perlecs_qpid_broker_cpp --expose 5671 --expose 5672 perlecs/qpid-broker-cpp:0.42-1
 #
 # 4) If needed, start a separate bash shell within the running container and
 #    use it to execute commands such as qpid-stat and qpid-config, e.g.
@@ -35,7 +35,7 @@
 FROM centos:7
 LABEL Maintainer="Joel Schneider <joel@joelschneider.net>" \
       Description="Apache Qpid Broker-CPP" \
-      Version="0.41"
+      Version="0.42"
 
 # install deltarpm, and update installed packages
 RUN yum -y install deltarpm.x86_64

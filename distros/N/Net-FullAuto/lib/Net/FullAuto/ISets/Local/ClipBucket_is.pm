@@ -1279,7 +1279,7 @@ END
        "${sudo}sed -i 's/\\(^[<]div.*\\\)/                                \\1/' ".
        "/var/www/html/clipbucket/styles/cb_28/layout/header.html");
    ($stdout,$stderr)=$handle->cwd('/opt/source/');
-   ($stdout,$stderr)=$handle->cmd($sudo.'wget -qO- http://icanhazip.com');
+   ($stdout,$stderr)=$handle->cmd($sudo.'wget -qO- https://icanhazip.com');
    my $public_ip=$stdout if $stdout=~/^\d+\.\d+\.\d+\.\d+\s*/s;
    unless ($public_ip) {
       require Sys::Hostname;

@@ -101,8 +101,6 @@ subtest "all" => sub {
     # XXX test opt:list_modules + opt:list_prefixes
 
     # XXX test opt:return_path
-
-    # XXX test opt:all
 };
 
 done_testing;

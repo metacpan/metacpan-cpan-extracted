@@ -1,9 +1,4 @@
 # -*- mode: perl; coding: us-ascii-unix; -*-
-#
-# Author:      Peter John Acklam
-# Time-stamp:  2010-05-26 13:12:29 +02:00
-# E-mail:      pjacklam@online.no
-# URL:         http://home.online.no/~pjacklam
 
 =pod
 
@@ -33,14 +28,12 @@ only 12 commands.
 
 package Acme::Cow::Interpreter;
 
-use 5.008;              # required version of Perl
 use strict;             # restrict unsafe constructs
 use warnings;           # control optional warnings
-#use utf8;               # enable UTF-8 in source code
 
 use Carp;
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 # This hash maps each of the 12 command (used in the source code) to the
 # corresponding numerical code, from 0 to 11.
@@ -90,7 +83,7 @@ my $cmd_regex = '(?:[Mm][Oo][Oo]|MMM|OO[MO]|oom)';
 
 =over 4
 
-=item new ()
+=item new()
 
 Return a new Cow interpreter.
 
@@ -122,7 +115,7 @@ sub new {
 
 =pod
 
-=item init ()
+=item init()
 
 Initialize an object instance. Clears the memory and register and sets the
 memory pointer to zero. Also, the internally stored program source is
@@ -157,7 +150,7 @@ sub init {
 
 =pod
 
-=item copy ()
+=item copy()
 
 Copy (clone) an Acme::Cow::Interpreter object.
 
@@ -196,7 +189,7 @@ sub copy {
 
 =pod
 
-=item parse_string ( STRING )
+=item parse_string( STRING )
 
 Parses the given string and stores the resulting list of codes in the
 object.  The return value is the object itself.
@@ -241,7 +234,7 @@ sub parse_string {
 
 =pod
 
-=item parse_file ( FILENAME )
+=item parse_file( FILENAME )
 
 Parses the contents of the given file and stores the resulting list of codes
 in the object. The return value is the object itself.
@@ -290,7 +283,7 @@ sub parse_file {
 
 =pod
 
-=item dump_mem ( )
+=item dump_mem()
 
 Returns a nicely formatted string showing the current memory state.
 
@@ -340,7 +333,7 @@ sub dump_mem {
 
 =pod
 
-=item dump_obj ( )
+=item dump_obj()
 
 Returns a text version of object structure.
 
@@ -394,7 +387,7 @@ sub dump_obj {
 
 =pod
 
-=item execute ( )
+=item execute()
 
 Executes the source code. The return value is the object itself.
 
@@ -807,33 +800,33 @@ Add more tests. The module is far from being tested thoroughly.
 
 There are currently no known bugs.
 
-Please report any bugs or feature requests to
-C<bug-acme-cow-interpreter at rt.cpan.org>, or through the web interface at
-L<http://rt.cpan.org/Public/Bug/Report.html?Queue=Acme-Cow-Interpreter>.
-I will be notified, and then you'll automatically be notified of progress on
-your bug as I make changes.
+Please report any bugs or feature requests via
+L<https://github.com/pjacklam/p5-Acme-Cow-Interpreter/issues>.
+
+Old bug reports and feature requests can be found at
+L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Acme-Cow-Interpreter>.
 
 =head1 SUPPORT
 
 You can find documentation for this module with the perldoc command.
 
-  perldoc Acme::Cow::Interpreter
+    perldoc Acme::Cow::Interpreter
 
 You can also look for information at:
 
 =over 4
 
-=item * RT: CPAN's request tracker
+=item * GitHub
 
 L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Acme-Cow-Interpreter>
+
+=item * MetaCPAN
+
+L<https://metacpan.org/release/Acme-Cow-Interpreter>
 
 =item * CPAN Ratings
 
 L<http://cpanratings.perl.org/d/Acme-Cow-Interpreter>
-
-=item * Search CPAN
-
-L<http://search.cpan.org/dist/Acme-Cow-Interpreter>
 
 =item * CPAN Testers PASS Matrix
 
@@ -853,17 +846,17 @@ L<http://matrix.cpantesters.org/?dist=Acme-Cow-Interpreter>
 
 =over 4
 
-=item * L<http://www.bigzaphod.org/cow/>
+=item * L<http://bigzaphod.github.io/COW/>
 
 =back
 
 =head1 AUTHOR
 
-Peter John Acklam E<lt>pjacklam@online.noE<gt>
+Peter John Acklam E<lt>pjacklam@gmail.com<gt>
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright 2007-2010 Peter John Acklam.
+Copyright 2007-2020 Peter John Acklam.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.8.0 or,

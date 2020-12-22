@@ -2,9 +2,9 @@ Build.PL
 Changes
 LICENSE
 MANIFEST
-MANIFEST.SKIP
 META.json
 META.yml
 README
 cpanfile
 lib/AWS/ARN.pm
+metamerge.yml

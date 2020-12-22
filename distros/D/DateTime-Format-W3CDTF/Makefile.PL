@@ -9,16 +9,19 @@ all_from			'lib/DateTime/Format/W3CDTF.pm';
 author				'Gregory Todd Williams <gwilliams@cpan.org>';
 license				'perl';
 
-build_requires		'Test::More'				=> 0.61;
+test_requires		'Test::More'				=> 0.61;
 
-requires			'DateTime'	=> 0;
+perl_version		'5.008';
+
+requires			'DateTime'					=> 0;
 
 resources(
-	'homepage'   => "http://search.cpan.org/dist/DateTime-Format-W3CDTF/",
-	'repository' => "http://github.com/kasei/datetime-format-w3cdtf",
-	'bugtracker' => "http://rt.cpan.org/NoAuth/Bugs.html?Dist=DateTime-Format-W3CDTF",
+	'homepage'   => "https://metacpan.org/release/DateTime-Format-W3CDTF/",
+	'repository' => "https://github.com/kasei/datetime-format-w3cdtf",
+	'bugtracker' => "https://github.com/kasei/datetime-format-w3cdtf/issues",
 );
 
-sign;
+write_doap_changes "meta/changes.ttl", "Changes", "turtle";
 
+sign;
 WriteAll;

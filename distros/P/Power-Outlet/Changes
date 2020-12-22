@@ -4,11 +4,42 @@ TODO
   - RE-write Net::UPnP interfaces as Net:UPnP is not good at error trapping or timeouts.
   - Update error handling for Power::Outlet::Hue->name
 
+0.35 2020-12-21
+  - Updated scripts/power-outlet-json.cgi.pod
+
+0.34 2020-12-21
+  - Updated scripts/power-outlet-json.cgi to support better integration with Node-Red
+    - Updated to use Power::Outlet::Config
+    - Fixed INI path (0.28 change)
+    - Updated error management for better Node-Red integration
+    - Updated action to be case insensitive
+    - Added HTTP status return codes
+
+0.33 2020-11-25
+  - Updated lib/Power/Outlet/Config.pm - Updated to support final api
+
+0.32 2020-11-25
+  - Updated scripts/power-outlet.cgi - Added forking model for each outlet for performance
+
+0.31 2020-11023
+  - Updated scripts/power-outlet.cgi - Added separate timeout icon
+
+0.30 2020-11-23
+  - Updated scripts/power-outlet.cgi - Added timeout and error capability
+
+0.29 2020-10-13
+  - Updated lib/Power/Outlet/Config.pm - Updated error messages
+
+0.28 2020-10-12
+  - Added lib/Power/Outlet/Config.pm - to support /etc/power-outlet.cgi
+  - Updated perl-Power-Outlet.spec and scripts/power-outlet.cgi
+    - Moved power-outlet.ini from /usr/share to /etc - BACKWARDS INCOMPATABLE CHANGE
+
 0.27 2020-04-22
   - Added Power/Outlet/SonoffDiy.pm - To support Sonoff firmware in DIY mode on hardware like the Sonoff Mini
 
 0.26 2020-04-18
-  - Updated Power/Outlet/Tasmota.pm - For devices with just one relay the JSON key is POWER not POWER1
+  - Updated Power/Outlet/Tasmota.pm - For devices with just one relay the JSON key is POWER not POWER1 (see SetOption26)
 
 0.25 2020-04-12
   - Added pod files since meta::cpan does not support indexing pod from .cgi files

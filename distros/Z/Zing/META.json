@@ -4,7 +4,7 @@
       "Al Newkirk <awncorp@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.015, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.017, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "apache_2_0"
    ],
@@ -24,11 +24,11 @@
             "Data::Object::Class" : "2.02",
             "Data::Object::ClassHas" : "2.01",
             "Data::Object::Cli" : "2.03",
+            "Data::Object::Exception" : "2.02",
             "Data::Object::Space" : "2.10",
+            "Data::Object::Try" : "2.02",
             "Data::Object::Types" : "0.04",
             "FlightRecorder" : "0.09",
-            "JSON" : "4.02",
-            "Redis" : "1.996",
             "Time::Crontab" : "0.04",
             "Time::Piece" : "1.3401",
             "perl" : "5.014",
@@ -42,11 +42,11 @@
             "Data::Object::Class" : "2.02",
             "Data::Object::ClassHas" : "2.01",
             "Data::Object::Cli" : "2.03",
+            "Data::Object::Exception" : "2.02",
             "Data::Object::Space" : "2.10",
+            "Data::Object::Try" : "2.02",
             "Data::Object::Types" : "0.04",
             "FlightRecorder" : "0.09",
-            "JSON" : "4.02",
-            "Redis" : "1.996",
             "Test::Auto" : "0.12",
             "Test::Trap" : "v0.3.4",
             "Time::Crontab" : "0.04",
@@ -61,19 +61,19 @@
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://github.com/iamalnewkirk/zing/issues"
+         "web" : "https://github.com/cpanery/zing/issues"
       },
       "homepage" : "https://metacpan.org/release/Zing",
       "repository" : {
          "type" : "git",
-         "url" : "git://github.com/iamalnewkirk/zing.git",
-         "web" : "https://github.com/iamalnewkirk/zing"
+         "url" : "git://github.com/cpanery/zing.git",
+         "web" : "https://github.com/cpanery/zing"
       }
    },
-   "version" : "0.13",
+   "version" : "0.20",
    "x_authority" : "cpan:AWNCORP",
    "x_generated_by_perl" : "v5.26.1",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.19",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.25",
    "x_spdx_expression" : "Apache-2.0"
 }
 

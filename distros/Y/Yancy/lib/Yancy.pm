@@ -1,5 +1,5 @@
 package Yancy;
-our $VERSION = '1.067';
+our $VERSION = '1.068';
 # ABSTRACT: The Best Web Framework Deserves the Best CMS
 
 # "Mr. Fry: Son, your name is Yancy, just like me and my grandfather and
@@ -343,7 +343,7 @@ Yancy - The Best Web Framework Deserves the Best CMS
 
 =head1 VERSION
 
-version 1.067
+version 1.068
 
 =head1 SYNOPSIS
 
@@ -652,6 +652,10 @@ Boris Däppen <bdaeppen.perl@gmail.com>
 =item *
 
 Ed J <mohawk2@users.noreply.github.com>
+
+=item *
+
+Erik Johansen <github@uniejo.dk>
 
 =item *
 

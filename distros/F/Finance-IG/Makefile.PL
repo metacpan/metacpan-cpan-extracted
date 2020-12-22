@@ -19,6 +19,7 @@ my %WriteMakefileArgs = (
     PREREQ_PM => {
         #'ABC'              => '1.6',
         #'Foo::Bar::Module' => '5.0401',
+        'Moose' => '0', 
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'Finance-IG-*' },

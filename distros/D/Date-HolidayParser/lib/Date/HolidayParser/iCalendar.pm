@@ -16,22 +16,20 @@
 
 package Date::HolidayParser::iCalendar;
 
-use Any::Moose;
+use Moo;
 use Date::HolidayParser;
 use constant { true => 1, false => undef };
 
-our $VERSION = 0.41;
+our $VERSION = 0.4_2;
 
 extends 'Date::HolidayParser';
 
 has '_UID_List' => (
 	is => 'rw',
-	isa => 'HashRef',
 	default => sub { {} },
 );
 has '_iCal_cache' => (
 	is => 'rw',
-	isa => 'HashRef',
 	default => sub { {} },
 );
 

@@ -19,6 +19,7 @@ lib/Power/Outlet/SonoffDiy.pm
 lib/Power/Outlet/Tasmota.pm
 lib/Power/Outlet/WeMo.pm
 lib/Power/Outlet/Virtual.pm
+lib/Power/Outlet/Config.pm
 t/001_load.t
 t/002_http.t
 t/002_ip.t
@@ -29,6 +30,8 @@ t/003_SonoffDiy_live.t
 t/003_Tasmota_live.t
 t/003_WeMo_live.t
 t/003_Virtual_live.t
+t/003_Config_live.t
+t/003_Config_live.t.ini
 t/004_iBoot_defaults.t
 t/005_iBootBar_defaults.t
 perl-Power-Outlet.spec
@@ -43,6 +46,8 @@ scripts/power-outlet-json.cgi.pod
 scripts/conf/power-outlet.ini
 scripts/images/btn-on.png
 scripts/images/btn-off.png
+scripts/images/btn-error.png
+scripts/images/btn-timeout.png
 scripts/images/btn-license.txt
 scripts/httpd/power-outlet.conf
 META.yml                                 Module YAML meta-data (added by MakeMaker)

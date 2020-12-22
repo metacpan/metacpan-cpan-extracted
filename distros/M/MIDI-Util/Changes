@@ -1,5 +1,8 @@
 Revision history for MIDI-Util
 
+0.0704 2020-12-18 09:47:22
+    - Add the TICKS dump functionality.
+
 0.0703 2020-12-15 06:56:12
     - Add checks in midi_format() for "bogus" enharmonic equivalents.
 

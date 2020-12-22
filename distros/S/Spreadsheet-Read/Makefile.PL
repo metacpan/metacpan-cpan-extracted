@@ -21,7 +21,8 @@ sub link_or_copy {
 
 my @exe;
 unless (exists $ENV{AUTOMATED_TESTING} and $ENV{AUTOMATED_TESTING} == 1) {
-    -f "examples/xlsgrep" or link_or_copy "examples/xlscat", "examples/xlsgrep";
+    -f "scripts/xls2csv" or link_or_copy "scripts/xlsx2csv", "scripts/xls2csv";
+    -f "scripts/xlsgrep" or link_or_copy "scripts/xlscat",   "scripts/xlsgrep";
     for ( [ "xlscat",	"Convert Spreadsheet to plain text or CSV"	],
 	  [ "xlsgrep",	"Grep pattern from Spreadsheet"			],
 	  [ "ss2tk",	"Show a Spreadsheet in Perl/Tk"			],
@@ -30,14 +31,14 @@ unless (exists $ENV{AUTOMATED_TESTING} and $ENV{AUTOMATED_TESTING} == 1) {
 	  [ "xlsx2csv",	"Wrapper around xlscat for easy XLSX => CSV"	],
 	  ) {
 	prompt ("Do you want to install $_->[0]\t$_->[1] ?", "y") =~ m/[Yy]/ and
-	    push @exe, "examples/$_->[0]";
+	    push @exe, "scripts/$_->[0]";
 	}
     }
 my %wm = (
     NAME         => "Spreadsheet::Read",
     DISTNAME     => "Spreadsheet-Read",
     ABSTRACT     => "Read the data from a spreadsheet",
-    AUTHOR       => "H.Merijn Brand <h.merijn\@procura.nl>",
+    AUTHOR       => "H.Merijn Brand <perl5\@tux.freedom.nl>",
     VERSION_FROM => "Read.pm",
     EXE_FILES    => [ @exe ],
     PREREQ_FATAL => 0,
@@ -69,7 +70,8 @@ if ($ENV{EXTENDED_TESTING}) { # for CpanCover and masochists
     # Versions also need to be declared inside Read.pm !
     $wm{PREREQ_PM}{"Text::CSV_PP"}		= "1.97";
     $wm{PREREQ_PM}{"Text::CSV_XS"}		= "1.36";
-    $wm{PREREQ_PM}{"Spreadsheet::ReadSXC"}	= "0.20";
+    $wm{PREREQ_PM}{"Spreadsheet::ReadSXC"}	= "0.26";
+    $wm{PREREQ_PM}{"Spreadsheet::ParseODS"}	= "0.26";
     $wm{PREREQ_PM}{"Spreadsheet::ParseExcel"}	= "0.65";
     $wm{PREREQ_PM}{"Spreadsheet::ParseXLSX"}	= "0.27";
     $wm{PREREQ_PM}{"Spreadsheet::XLSX"}		= "0.15";

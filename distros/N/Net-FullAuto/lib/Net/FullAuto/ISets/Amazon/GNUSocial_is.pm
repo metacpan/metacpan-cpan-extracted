@@ -160,7 +160,7 @@ print "\n\n\n\n\n\n\nWE SHOULD HAVE INSTALLED MARIADB=$stdout<==\n\n\n\n\n\n\n";
    ($stdout,$stderr)=$handle->cmd(
       "sudo cp -Rv gnu-social /var/www/gnusocial",'__display__');
    ($stdout,$stderr)=$handle->cwd('/var/www/gnusocial');
-   ($stdout,$stderr)=$handle->cmd("sudo wget -qO- http://icanhazip.com");
+   ($stdout,$stderr)=$handle->cmd("sudo wget -qO- https://icanhazip.com");
    my $public_ip=$stdout if $stdout=~/^\d+\.\d+\.\d+\.\d+\s*/s;
    unless ($public_ip) {
       require Sys::Hostname;

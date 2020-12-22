@@ -41,7 +41,6 @@ examples/rev_deps-recursive.pl
 examples/rev_deps.pl
 examples/top20_favorites.pl
 examples/totals.pl
-fav.pl
 lib/MetaCPAN/Client.pm
 lib/MetaCPAN/Client/Author.pm
 lib/MetaCPAN/Client/Cover.pm

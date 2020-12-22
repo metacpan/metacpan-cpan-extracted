@@ -32,6 +32,9 @@ is $x->[-1], 'fff => 127', 'volume';
 $x = MIDI::Util::dump('length');
 is $x->[-1], 'ddwn => 7', 'length';
 
+$x = MIDI::Util::dump('ticks');
+is $x->[-1], 'ddwn => 672', 'ticks';
+
 $x = MIDI::Util::dump('note');
 is $x->[-1], 'B => 11', 'note';
 

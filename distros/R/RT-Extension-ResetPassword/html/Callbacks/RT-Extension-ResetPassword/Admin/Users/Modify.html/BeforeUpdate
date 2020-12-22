@@ -1,0 +1,26 @@
+<%INIT>
+if ( ( $ARGS{'SendPasswordResetEmail'} || $session{'SendPasswordResetEmail'} ) && $User && $User->Id ) {
+
+    if ( $ARGS{'Pass1'} or $ARGS{'Pass2'} ) {
+        # If the password is reset and the new password link is sent, the token
+        # won't match, so don't send the email.
+
+        push @{$Results}, 'Password reset email not sent: cannot send password reset email and then reset user password. Resubmit with password fields blank to send password reset email.';
+        return;
+    }
+
+    my ($ret, $msg) = RT::Extension::ResetPassword::CreateTokenAndResetPassword($User);
+    if ( $ret ) {
+        push @{$Results}, 'Password reset email passed to new user';
+    }
+    else {
+        RT::Logger->error( "$msg" );
+    }
+}
+delete $session{'SendPasswordResetEmail'};
+</%INIT>
+<%ARGS>
+$Results
+$User
+$ARGSRef
+</%ARGS>

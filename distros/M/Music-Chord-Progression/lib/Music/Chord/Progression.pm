@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Create network transition chord progressions
 
-our $VERSION = '0.0401';
+our $VERSION = '0.0502';
 
 use Carp qw(croak);
 use Data::Dumper::Compact qw(ddc);
@@ -31,7 +31,8 @@ has net => (
         3 => [qw( 1 2 4 6 )],
         4 => [qw( 1 3 5 6 )],
         5 => [qw( 1 4 6 )],
-        6 => [qw( 1 2 4 5 )] }
+        6 => [qw( 1 2 4 5 )],
+        7 => [] }
     },
 );
 
@@ -39,7 +40,7 @@ has net => (
 has chord_map => (
     is      => 'ro',
     isa     => sub { die "$_[0] is not a arrayref" unless ref $_[0] eq 'ARRAY' },
-    default => sub { ['', 'm', 'm', '', '', 'm'] },
+    default => sub { ['', 'm', 'm', '', '', 'm', 'dim'] },
 );
 
 
@@ -65,6 +66,7 @@ has scale => (
 sub _build_scale {
     my ($self) = @_;
     my @scale = get_scale_notes($self->scale_note, $self->scale_name);
+    print 'Scale: ', ddc(\@scale) if $self->verbose;
     return \@scale;
 }
 
@@ -150,7 +152,7 @@ sub generate {
         $v = $self->_next_successor($n, $v);
         push @progression, $v;
     }
-    print "Progression: @progression\n" if $self->verbose;
+    print 'Progression: ', ddc(\@progression) if $self->verbose;
 
     my @chord_map = @{ $self->chord_map };
 
@@ -165,9 +167,10 @@ sub generate {
             $i++;
         }
     }
+    print 'Chord map: ', ddc(\@chord_map) if $self->verbose;
 
     my @phrase = map { $self->_tt_sub(\@chord_map, $_) } @progression;
-    print "Phrase: @phrase\n" if $self->verbose;
+    print 'Phrase: ', ddc(\@phrase) if $self->verbose;
 
     # Add octaves to the chords
     my $mcn = Music::Chord::Note->new;
@@ -219,7 +222,7 @@ sub _next_successor {
     }
     elsif ($n == $self->max) {
         if ($self->resolve == 0) {
-            $s = $self->graph->random_successor(scalar keys %{ $self->net });
+            $s = $self->graph->random_successor($v) || $self->_full_keys;
         }
         elsif ($self->resolve == 1) {
             $s = 1;
@@ -260,7 +263,10 @@ sub _tt_sub {
         $note = $self->scale->[$n - 1];
     }
 
-    return $note . $chord_map->[$n - 1];
+    $note .= $chord_map->[$n - 1];
+    print "Note: $note\n" if $self->verbose;
+
+    return $note;
 }
 
 
@@ -312,7 +318,7 @@ Music::Chord::Progression - Create network transition chord progressions
 
 =head1 VERSION
 
-version 0.0401
+version 0.0502
 
 =head1 SYNOPSIS
 
@@ -351,7 +357,8 @@ Default:
     3 => [qw( 1 2 4 6 )],
     4 => [qw( 1 3 5 6 )],
     5 => [qw( 1 4 6 )],
-    6 => [qw( 1 2 4 5 )] }
+    6 => [qw( 1 2 4 5 )],
+    7 => [] }
 
 Alternative example:
 
@@ -360,7 +367,8 @@ Alternative example:
     3 => [qw( 2 4 6 )],
     4 => [qw( 1 2 3 5 )],
     5 => [qw( 1 )],
-    6 => [qw( 2 4 )] }
+    6 => [qw( 2 4 )],
+    7 => [] }
 
 The keys must start with C<1> and be contiguous to the end.
 
@@ -389,13 +397,13 @@ The chord names of each scale position.
 The number of items in this list must be equal and correspond to the
 number of keys in the B<net>.
 
-Default: C<[ '', 'm', 'm', '', '', 'm' ]>
+Default: C<[ '', 'm', 'm', '', '', 'm', 'dim' ]>
 
 Here C<''> refers to the major chord and C<'m'> means minor.
 
 Alternative example:
 
-  [ 'M7', 'm7', 'm7', 'M7', '7', 'm7' ]
+  [ 'M7', 'm7', 'm7', 'M7', '7', 'm7', 'dim7' ]
 
 The different chord names are listed in the source of L<Music::Chord::Note>.
 
@@ -494,8 +502,8 @@ Show the B<generate> and B<substitute> progress.
 
   $prog = Music::Chord::Progression->new( # Override the defaults
     max        => 4,
-    net        => { 1 => [...], ... 6 => [...] },
-    chord_map  => ['m','','m','m','',''],
+    net        => { 1 => [...], ... 7 => [...] },
+    chord_map  => ['m','dim','','m','m','',''],
     scale_name => 'minor',
     scale_note => 'A',
     octave     => 5,

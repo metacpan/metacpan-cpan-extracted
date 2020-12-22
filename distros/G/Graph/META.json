@@ -39,7 +39,7 @@
       "runtime" : {
          "requires" : {
             "Heap" : "0.80",
-            "List::Util" : "0",
+            "List::Util" : "1.45",
             "Safe" : "0",
             "Scalar::Util" : "0",
             "Storable" : "2.05",
@@ -67,6 +67,6 @@
          "web" : "https://github.com/graphviz-perl/Graph"
       }
    },
-   "version" : "0.9712",
+   "version" : "0.9713",
    "x_serialization_backend" : "JSON::PP version 4.00"
 }

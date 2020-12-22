@@ -3,7 +3,7 @@ var positions = [], markers = [];
 
 var gicon = L.Icon.extend( {
     options: {
-      iconUrl: 'http://maps.google.com/mapfiles/ms/micons/red-dot.png',
+      iconUrl: 'https://maps.google.com/mapfiles/ms/micons/red-dot.png',
       shadowUrl: null,
       iconSize: new L.Point( 32, 32 ),
       iconAnchor: new L.Point( 15, 32 ),
@@ -17,7 +17,7 @@ $(
       var map_centre = new L.LatLng( centre_lat, centre_long );
 
       var osm_layer = new L.TileLayer(
-          'http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png' );
+          'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png' );
 
       map = new L.Map( map_div_id, {
         center: map_centre,

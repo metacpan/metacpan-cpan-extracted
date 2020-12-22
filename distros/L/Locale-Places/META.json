@@ -1,0 +1,65 @@
+{
+   "abstract" : "Translate places using http://download.geonames.org/",
+   "author" : [
+      "Nigel Horne <njh@bandsman.co.uk>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.56, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "open_source"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Locale-Places",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {}
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "CHI" : "0",
+            "DBD::CSV" : "0",
+            "DBD::SQLite" : "0",
+            "DBI" : "0",
+            "File::Spec" : "0",
+            "File::pfopen" : "0",
+            "Module::Info" : "0",
+            "Text::CSV" : "0",
+            "Text::xSV::Slurp" : "0",
+            "perl" : "5.006002"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Most" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-Locale-Places@rt.cpan.org",
+         "web" : "https://github.com/nigelhorne/Locale-Places/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/nigelhorne/Locale-Places.git",
+         "web" : "https://github.com/nigelhorne/Locale-Places"
+      }
+   },
+   "version" : "0.02",
+   "x_serialization_backend" : "JSON::PP version 4.05"
+}

@@ -1,0 +1,4 @@
+These items should be completed before the next major push to GitHub or local origin.
+Update Testing to make it more organised again. Its gotten a bit out of control.
+
+Look at using Path::Tiny for path and file handling.

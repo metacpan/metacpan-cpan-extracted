@@ -32,11 +32,11 @@ Pg::Explain - Object approach at reading explain analyze output
 
 =head1 VERSION
 
-Version 1.03
+Version 1.04
 
 =cut
 
-our $VERSION = '1.03';
+our $VERSION = '1.04';
 
 =head1 SYNOPSIS
 
@@ -277,18 +277,37 @@ sub parse_source {
     my $parser;
 
     if ( $source =~ m{^\s*<explain xmlns="http://www.postgresql.org/2009/explain">}m ) {
+
+        # Format used by both explain command and autoexplain module
         $self->{ 'source_format' } = 'XML';
         $parser = Pg::Explain::FromXML->new();
     }
     elsif ( $source =~ m{ ^ \s* \[ \s* \{ \s* "Plan" \s* : \s* \{ }xms ) {
+
+        # Format used by explain command
         $self->{ 'source_format' } = 'JSON';
         $parser = Pg::Explain::FromJSON->new();
     }
-    elsif ( $source =~ m{ ^ (\s*) - \s+ Plan: \s* \n }xms ) {
+    elsif ( $source =~ m{ ^ \s* \{ \s* "Query \s+ Text" \s* : \s* ".*", \s* "Plan" \s* : \s* \{ .* \} \s* \z }xms ) {
+
+        # Format used by autoexplain module
+        $self->{ 'source_format' } = 'JSON';
+        $parser = Pg::Explain::FromJSON->new();
+    }
+    elsif ( $source =~ m{ ^ \s* - \s+ Plan: \s* \n }xms ) {
+
+        # Format used by explain command
+        $self->{ 'source_format' } = 'YAML';
+        $parser = Pg::Explain::FromYAML->new();
+    }
+    elsif ( $source =~ m{ ^ \s* Query \s+ Text: \s+ ".*" \s+ Plan: \s* \n }xms ) {
+
+        # Format used by autoexplain module
         $self->{ 'source_format' } = 'YAML';
         $parser = Pg::Explain::FromYAML->new();
     }
     else {
+        # Format used by both explain command and autoexplain module
         $self->{ 'source_format' } = 'TEXT';
         $parser = Pg::Explain::FromText->new();
     }

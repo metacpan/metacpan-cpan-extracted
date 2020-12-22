@@ -64,7 +64,7 @@ sub selected {
     my ($self, $new_value) = @_;
 
     if (defined $new_value) {
-        my $selected = $self->session->get_attribute($self, 'selected');
+        my $selected = $self->session->get_selected($self);
         if (! $new_value && $selected) {
             $self->click; # unselect
         }
@@ -72,7 +72,7 @@ sub selected {
             $self->click; # select
         }
     }
-    return $self->session->get_attribute($self, 'selected');
+    return $self->session->get_selected($self);
 }
 
 =item value([$new_value])

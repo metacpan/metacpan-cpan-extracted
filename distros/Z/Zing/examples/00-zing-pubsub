@@ -14,11 +14,9 @@ use Zing::PubSub;
 
 =cut
 
-my $p = Zing::PubSub->new(name => 'sockets');
-
 for my $i (1..10) {
   for my $j (1..1_000) {
-    $p->send("socket-$i", {value => $j});
+    Zing::PubSub->new(name => "socket-$i")->send({value => $j});
 
     warn "socket-$i", " ", "value-$j", " ", "sent";
   }
@@ -26,17 +24,15 @@ for my $i (1..10) {
 
 for my $i (1..10) {
   for my $j (1..1_000) {
-    my $d = $p->recv("socket-$i");
+    my $d = Zing::PubSub->new(name => "socket-$i")->recv;
     my $x = $d->{value};
 
     warn "socket-$i", " ", "value-$x", " ", "received";
   }
 }
 
-warn 'pub/sub data saved under', ' ', $p->term;
-
 for my $i (1..10) {
-  for my $j (1..1_000) {
-    $p->drop("socket-$i");
-  }
+  Zing::PubSub->new(name => "socket-$i")->drop;
 }
+
+warn 'pub/sub data saved and dropped';

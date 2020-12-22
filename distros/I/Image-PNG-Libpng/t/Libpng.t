@@ -106,7 +106,7 @@ eval {
     $png_no_io_init->set_rows ([0]);
     $png_no_io_init->write_png ($png_no_io_init);
 };
-like ($@, qr/Attempt to write PNG without calling init_io/,
+like ($@, qr/No call to init_io before read\/write/,
       "Produces error on write if no output file has been set");
 done_testing ();
 exit;

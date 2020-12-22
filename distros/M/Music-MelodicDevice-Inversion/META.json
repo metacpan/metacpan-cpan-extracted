@@ -37,7 +37,6 @@
             "Data::Dumper::Compact" : "0",
             "List::SomeUtils" : "0",
             "Moo" : "2",
-            "Music::Note" : "0",
             "Music::Scales" : "0",
             "namespace::clean" : "0",
             "perl" : "5.006",
@@ -66,7 +65,7 @@
          "web" : "https://github.com/ology/Music-MelodicDevice-Inversion"
       }
    },
-   "version" : "0.0106",
+   "version" : "0.0300",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.030002"

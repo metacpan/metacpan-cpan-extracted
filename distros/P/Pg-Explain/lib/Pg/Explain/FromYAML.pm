@@ -27,11 +27,11 @@ Pg::Explain::FromYAML - Parser for explains in YAML format
 
 =head1 VERSION
 
-Version 1.03
+Version 1.04
 
 =cut
 
-our $VERSION = '1.03';
+our $VERSION = '1.04';
 
 =head1 SYNOPSIS
 
@@ -51,13 +51,22 @@ Returns Top node of query plan.
 sub parse_source {
     my $self   = shift;
     my $source = shift;
-    my $prefix = '';
+
+    # If this is plan from auto-explain
+    if ( $source =~ s{ \A (\s*) Query \s+ Text [^\n]* \n }{}xms ) {
+        my $prefix = $1;
+
+        # Change prefix to two spaces in all lines
+        $source =~ s{^$prefix}{  }gm;
+
+        # Add - to first line (should be Plan:)
+        $source =~ s{ \A \s \s }{- }xms;
+    }
 
     unless ( $source =~ s{\A .*? ^ (\s*) ( - \s+ Plan: \s*\n )}{$1$2}xms ) {
         carp( 'Source does not match first s///' );
         return;
     }
-    $prefix = $1;
 
     $source =~ s{ ^ ( \s* | [^\s-] [^\n] * ) \n .* \z }{}xms;
 

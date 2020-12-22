@@ -1,7 +1,7 @@
 use strict;
 use warnings;
-package Moose; # git description: 2.2012-11-g02c978bf9
-our $VERSION = '2.2013';
+package Moose; # git description: 2.2013-17-gcfc59a232
+our $VERSION = '2.2014';
 our $AUTHORITY = 'cpan:STEVAN';
 
 use 5.008003;
@@ -298,7 +298,7 @@ Moose - A postmodern object system for Perl 5
 
 =head1 VERSION
 
-version 2.2013
+version 2.2014
 
 =head1 SYNOPSIS
 
@@ -1110,7 +1110,7 @@ can contribute.
 There are only a few people with the rights to release a new version
 of Moose. The Moose Cabal are the people to go to with questions regarding
 the wider purview of Moose. They help maintain not just the code
-but the community as well. See the list below under C<AUTHORS>.
+but the community as well. See the list below under L</AUTHORS>.
 
 =head1 CONTRIBUTORS
 
@@ -1218,7 +1218,7 @@ Wallace (wreis) Reis
 
 =item *
 
-Stevan Little <stevan.little@iinteractive.com>
+Stevan Little <stevan@cpan.org>
 
 =item *
 
@@ -1226,11 +1226,11 @@ Dave Rolsky <autarch@urth.org>
 
 =item *
 
-Jesse Luehrs <doy@tozt.net>
+Jesse Luehrs <doy@cpan.org>
 
 =item *
 
-Shawn M Moore <code@sartak.org>
+Shawn M Moore <sartak@cpan.org>
 
 =item *
 
@@ -1246,7 +1246,7 @@ Florian Ragwitz <rafl@debian.org>
 
 =item *
 
-Hans Dieter Pearcey <hdp@weftsoar.net>
+Hans Dieter Pearcey <hdp@cpan.org>
 
 =item *
 
@@ -1254,7 +1254,7 @@ Chris Prather <chris@prather.org>
 
 =item *
 
-Matt S Trout <mst@shadowcat.co.uk>
+Matt S Trout <mstrout@cpan.org>
 
 =back
 

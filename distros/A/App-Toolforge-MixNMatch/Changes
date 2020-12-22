@@ -1,0 +1,14 @@
+0.04 2020-12-19T18:36:05+01:00
+ - Aaa. Bad module dependency. Right is LWP::Protocol::https.
+
+0.03 2020-12-19T18:33:33+01:00
+ - Fix missing LWP::UserAgent::https dependency for urls with https://.
+ - Update minimal dependency to Toolforge::MixNMatch::Struct@0.02.
+
+0.02 2020-12-19T17:31:55+01:00
+ - Add examples/ directory.
+ - Fix dependency.
+ - Fix example in doc.
+
+0.01 2020-12-19T12:17:11+01:00
+ - First version.

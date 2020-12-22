@@ -1,5 +1,17 @@
 Revision history for Music-Chord-Progression
 
+0.0502 2020-12-21 08:36:49
+    - Use ddc() in ->verbose output.
+    - Fix resolve == 0 logic.
+
+0.0501 2020-12-20 11:46:45
+    - Fix the chord_map in eg/progression.
+    - Only add a defined successor to the progression.
+
+0.0500 2020-12-20 09:05:10
+    - Add the 7th to the default net & chord_map.
+    - Fix the "max random_successor" argument.
+
 0.0401 2020-12-13 10:28:21
     - Fix verbose mode code.
 

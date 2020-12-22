@@ -1,0 +1,28 @@
+Changes
+lib/Locale/Places.pm
+lib/Locale/Places/DB.pm
+lib/Locale/Places/DB/GB.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README.md
+t/00-load.t
+t/coverage.t
+t/critic.t
+t/eol.t
+t/gb.t
+t/kwalitee.t
+t/lib/MyLogger.pm
+t/links.t
+t/manifest.t
+t/no404s.t
+t/pod-cm.t
+t/pod.t
+t/port.t
+t/snippets.t
+t/translate.t
+t/unused.t
+t/vars.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

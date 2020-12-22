@@ -270,7 +270,7 @@ sub record {
 	my $new_columns = shift;
 	$self->enforce_unrecorded;
 	$self->change_ts;
-	$self->change_elapsed(tv_interval($self->start_timeofday));
+	$self->change_elapsed(sprintf('%.8g',tv_interval($self->start_timeofday)));
 	
 	%{$self->new_columns} = %$new_columns if (
 		ref($new_columns) eq 'HASH' and

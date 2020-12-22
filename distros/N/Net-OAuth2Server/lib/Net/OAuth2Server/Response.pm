@@ -106,4 +106,4 @@ sub as_uri {
 	$uri . $sep . $qps;
 }
 
-our $VERSION = '0.004';
+our $VERSION = '0.005';

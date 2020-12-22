@@ -1,0 +1,33 @@
+NAME
+    Toolforge::MixNMatch::Struct - Toolforge Mix'n'match tool structures.
+
+DESCRIPTION
+    This distributions is set of basic conversions from/to Toolforge
+    Mix'n'match tool JSON structures. (https://mix-n-match.toolforge.org/).
+
+SEE ALSO
+    Toolforge::MixNMatch::Struct::Catalog
+        Mix'n'match catalog structure serialization.
+
+    Toolforge::MixNMatch::Struct::User
+        Mix'n'match user structure serialization.
+
+    Toolforge::MixNMatch::Struct::YearMonth
+        Mix'n'match year/month structure serialization.
+
+REPOSITORY
+    <https://github.com/michal-josef-spacek/Toolforge-MixNMatch-Struct>
+
+AUTHOR
+    Michal Josef Špaček <mailto:skim@cpan.org>
+
+    <http://skim.cz>
+
+LICENSE AND COPYRIGHT
+    © Michal Josef Špaček 2020
+
+    BSD 2-Clause License
+
+VERSION
+    0.04
+

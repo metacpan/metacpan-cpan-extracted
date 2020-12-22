@@ -15,7 +15,7 @@ use threads;
 
 our @ISA = qw(Exporter);
 
-our $VERSION = '1.28';
+our $VERSION = '1.29';
 
 # XXX
 # Items to export into callers namespace by default. Note: do not export
@@ -218,7 +218,7 @@ The architecture is following:
          NFDUMP FILES
 
 
-This version of Net::NfDump module is based on B<nfdump-1.6.12> available on L<http://sourceforge.net/projects/nfdump/>. Support for NSEL code is enabled. 
+We always try to update Net::NfDump te lastest version of B<nfdump> available on L<https://github.com/phaag/nfdump>. Support for NSEL code is enabled. 
 
 =head1 WARNING FOR VERSION >= 0.13
 
@@ -1425,7 +1425,7 @@ another 8 bits for the second one).
 
 =head1 SEE ALSO
 
-nfdump project - http://nfdump.sourceforge.net/
+nfdump project - https://github.com/phaag/nfdump
 libnf C interface http://libnf.net/
 
 =head1 AUTHOR

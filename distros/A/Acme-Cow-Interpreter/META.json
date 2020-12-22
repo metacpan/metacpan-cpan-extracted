@@ -1,0 +1,51 @@
+{
+   "abstract" : "Cow programming language interpreter",
+   "author" : [
+      "Peter John Acklam <pjacklam@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.50, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Acme-Cow-Interpreter",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {}
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.58"
+         }
+      },
+      "runtime" : {
+         "requires" : {}
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.47",
+            "Test::Output" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/pjacklam/p5-Acme-Cow-Interpreter.git",
+         "web" : "https://github.com/pjacklam/p5-Acme-Cow-Interpreter"
+      }
+   },
+   "version" : "0.02",
+   "x_serialization_backend" : "JSON::PP version 4.02"
+}

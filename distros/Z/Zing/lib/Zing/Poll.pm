@@ -13,15 +13,9 @@ use Data::Object::ClassHas;
 
 use Time::HiRes ();
 
-our $VERSION = '0.13'; # VERSION
+our $VERSION = '0.20'; # VERSION
 
 # ATTRIBUTES
-
-has 'name' => (
-  is => 'ro',
-  isa => 'Str',
-  req => 1,
-);
 
 has 'repo' => (
   is => 'ro',
@@ -33,12 +27,11 @@ has 'repo' => (
 
 method await(Int $secs) {
   my $data;
-  my $name = $self->name;
   my $repo = $self->repo;
   my @tres = (Time::HiRes::gettimeofday);
   my $time = join('', $tres[0] + $secs, $tres[1]);
 
-  until ($data = $repo->recv($name)) {
+  until ($data = $repo->recv) {
     last if join('', Time::HiRes::gettimeofday) >= $time;
   }
 
@@ -66,8 +59,9 @@ Blocking Receive Construct
   use Zing::Poll;
   use Zing::KeyVal;
 
-  my $keyval = Zing::KeyVal->new(name => 'notes');
-  my $poll = Zing::Poll->new(name => 'last-week', repo => $keyval);
+  my $poll = Zing::Poll->new(repo => Zing::KeyVal->new(name => 'notes'));
+
+  # $poll->await(0);
 
 =cut
 
@@ -89,14 +83,6 @@ L<Zing::Types>
 =head1 ATTRIBUTES
 
 This package has the following attributes:
-
-=cut
-
-=head2 name
-
-  name(Str)
-
-This attribute is read-only, accepts C<(Str)> values, and is required.
 
 =cut
 
@@ -138,7 +124,7 @@ or undefined.
 
   # given: synopsis
 
-  $poll->repo->send('last-week', { task => 'write research paper' });
+  $poll->repo->send({ task => 'write research paper' });
 
   $poll->await(0);
 

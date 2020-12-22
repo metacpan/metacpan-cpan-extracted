@@ -1,0 +1,118 @@
+NAME
+    mix-n-match - Script to handle catalog files.
+
+SYNOPSIS
+     mix-n-match [-h] [--version] [command] [command_args ..]
+
+DESCRIPTION
+    mix-n-match script uses Toolforge::MixNMatch::* modules to handle
+    catalog files.
+
+ARGUMENTS
+    *       "-h"
+
+            Print help.
+
+    *       "--version"
+
+            Print version of script.
+
+    *       "command"
+
+            Command. Possible commands are: diff, download, print
+
+    *       "command_args"
+
+            "diff"
+                 json_file1 - JSON file #1.
+                 json_file2 - JSON file #2.
+                 [print_options] - Print options (type, count, year_months, users). It's optional.
+
+            "download"
+                 catalog_id - Catalog ID.
+                 [output_file] - Output file (default is catalog_id.json). It's optional.
+
+            "print"
+                 json_file or catalog_id - Catalog ID or JSON file.
+                 [print_options] - Print options (type, count, year_months, users). It's optional.
+
+EXAMPLE1
+     mix-n-match
+
+     # Output like:
+     # Usage: mix-n-match [-h] [--version] [command] [command_args ..]
+     #         -h              Print help.
+     #         --version       Print version.
+     #         command         Command (diff, download, print).
+     #
+     #         command 'diff' arguments:
+     #                 json_file1 - JSON file #1
+     #                 json_file2 - JSON file #2
+     #                 [print_options] - Print options (type, count, year_months, users)
+     #         command 'download' arguments:
+     #                 catalog_id - Catalog ID
+     #                 [output_file] - Output file (default is catalog_id.json)
+     #         command 'print' arguments:
+     #                 json_file or catalog_id - Catalog ID or JSON file
+     #                 [print_options] - Print options (type, count, year_months, users)
+
+  EXAMPLE2
+     mix-n-match print 3869
+
+     # Output like (20201219 - https://mix-n-match.toolforge.org/#/catalog/3869):
+     # Type: Q5
+     # Count: 875
+     # Year/months:
+     #         2020/09: 432
+     #         2020/10: 103
+     #         2020/11: 44
+     #         2020/12: 32
+     # Users:
+     #         Skim (1192968): 541
+     #         Automatic name/date matcher (3): 51
+     #         Jklamo (2399): 6
+     #         Michal Josef Špaček (WMCZ) (4735667): 5
+     #         -1 (421968): 4
+     #         Adam Harangozó (54660): 2
+     #         Epìdosis (54694): 1
+     #         Auxiliary data matcher (4): 1
+
+   EXAMPLE3
+     mix-n-match download 3869
+
+     # Output:
+     # Catalog with '3869' ID was saved to '3869.json'.
+
+SEE ALSO
+    Toolforge::MixNMatch::Diff
+        Toolforge Mix'n'match tool object diff routines.
+
+    Toolforge::MixNMatch::Object
+        Toolforge Mix'n'match tool objects.
+
+    Toolforge::MixNMatch::Print
+        Toolforge Mix'n'match tool object print routines.
+
+REPOSITORY
+    <https://github.com/tupinek/App-Toolforge-MixNMatch>
+
+AUTHOR
+    Michal Josef Špaček <mailto:skim@cpan.org>
+
+    <http://skim.cz>
+
+LICENSE AND COPYRIGHT
+    © 2020 Michal Josef Špaček
+
+    BSD 2-Clause License
+
+VERSION
+    0.04
+
+POD ERRORS
+    Hey! The above document had some coding errors, which are explained
+    below:
+
+    Around line 144:
+        You forgot a '=back' before '=head1'
+

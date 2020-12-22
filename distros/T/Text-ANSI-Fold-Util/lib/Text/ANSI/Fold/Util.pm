@@ -1,5 +1,5 @@
 package Text::ANSI::Fold::Util;
-our $VERSION = "0.04";
+our $VERSION = "0.05";
 
 use v5.14;
 use utf8;
@@ -21,7 +21,7 @@ Text::ANSI::Fold::Util - Text::ANSI::Fold utilities (width, substr, expand)
 
 =head1 VERSION
 
-Version 0.04
+Version 0.05
 
 =head1 SYNOPSIS
 
@@ -111,6 +111,15 @@ Expand tabs.  Interface is compatible with L<Text::Tabs>::expand().
 Dafault tabstop is 8, and can be accessed through
 C<$Text::ANSI::Fold::Util::tabstop> variable.
 
+Option for underlying B<ansi_fold> can be passed by first parameter as
+an array reference, as well as C<< Text::ANSI::Fold->configure >> call.
+
+    my $opt = [ tabhead => 'T', tabspace => '_' ];
+    ansi_expand($opt, @text);
+
+    Text::ANSI::Fold->configure(tabhead => 'T', tabspace => '_');
+    ansi_expand($opt);
+
 =cut
 
 BEGIN { push @EXPORT_OK, qw(&ansi_expand $tabstop) }
@@ -120,12 +129,11 @@ our $tabstop = 8;
 our $spacechar = ' ';
 
 sub expand {
+    my @opt = ref $_[0] eq 'ARRAY' ? @{+shift} : ();
     my @l = map {
-	s{^(\t+)}{ $spacechar x ($tabstop * length($1)) }mge;
 	s{^(.*\t)}{
-	    (ansi_fold($1, -1, expand => 1, tabstop => $tabstop))[0];
-	}mge;
-	$_;
+	    (ansi_fold($1, -1, expand => 1, tabstop => $tabstop, @opt))[0];
+	}mger;
     } @_;
     wantarray ? @l : $l[0];
 }

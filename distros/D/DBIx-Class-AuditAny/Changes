@@ -1,5 +1,8 @@
 Revision history for DBIx::Class::AuditAny
 
+0.200200 2020-12-20
+    - Limit recording of "elapsed" to precision of 8 places
+
 0.200100 2017-03-17
     - Allow multi-col-pk tables to be audited (PR #3) (JROBINSON,TBSLIVER)
 

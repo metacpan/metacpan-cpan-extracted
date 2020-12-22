@@ -12,7 +12,7 @@
 
 package Date::HolidayParser;
 
-use Any::Moose;
+use Moo;
 use Carp;
 use Exporter;
 use POSIX;
@@ -21,34 +21,30 @@ use constant { true => 1, false => 0 };
 # Exportable functions are EasterCalc
 my @EXPORT_OK = qw(EasterCalc);
 
-# Version number
-our $VERSION;
-$VERSION = 0.4_1;
-
 # Deprecated silencing variable
 our $BeSilent;
+
+# Version number
+our $VERSION;
+$VERSION = 0.4_3;
 
 # --- Attributes ---
 has 'file' => (
 	is	=> 'ro',
-	isa => 'Str',
 );
 
 has 'silent' => (
 	is => 'rw',
-	isa => 'Bool',
-	default => false,
 );
 
 has '_cache' => (
 	is => 'rw',
-	isa => 'HashRef',
 	default => sub { {} },
 );
 
 has '_parsed' => (
 	is => 'rw',
-	isa => 'HashRef', # TODO: Move to arrayref(?)
+	# TODO: Move to arrayref(?)
 	default => sub { {} },
 );
 

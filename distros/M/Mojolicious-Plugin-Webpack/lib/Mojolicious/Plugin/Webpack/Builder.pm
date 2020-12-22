@@ -8,15 +8,15 @@ use Mojo::Path;
 use Mojo::Util;
 use Mojolicious::Plugin::Webpack;
 
-use constant DEBUG => $ENV{MOJO_WEBPACK_DEBUG} ? 1 : 0;
+use constant DEBUG => $ENV{MOJO_WEBPACK_DEBUG} // $ENV{HARNESS_IS_VERBOSE} // 0;
 
 our $VERSION = $Mojolicious::Plugin::Webpack::VERSION || '0.01';
 
 has dependencies => sub {
   return {
-    core => [qw(webpack webpack-cli webpack-plugin-hash-output html-webpack-plugin)],
-    css  => [qw(css-loader mini-css-extract-plugin optimize-css-assets-webpack-plugin)],
-    js   => [qw(@babel/core @babel/preset-env babel-loader terser-webpack-plugin)],
+    core => [qw(webpack webpack-cli html-webpack-plugin@next)],
+    css  => [qw(css-loader mini-css-extract-plugin css-minimizer-webpack-plugin)],
+    js   => [qw(@babel/core @babel/preset-env babel-loader)],
     sass => [qw(node-sass sass-loader)],
     vue  => [qw(vue vue-loader vue-template-compiler)],
   };
@@ -51,7 +51,7 @@ sub register {
   else {
     $self->_render_to_file($app, 'webpack.config.js');
     $self->_render_to_file($app, 'webpack.custom.js', $self->_custom_file);
-    $self->_render_to_file($app, 'my_app.js', $self->assets_dir->child('my_app.js'))
+    $self->_render_to_file($app, 'my_app.js',         $self->assets_dir->child('my_app.js'))
       if $self->{files}{'webpack.custom.js'}[0] eq 'generated';
   }
 
@@ -74,15 +74,13 @@ sub _build_custom_file {
 }
 
 sub _install_node_deps {
-  return if -d 'node_modules' and !$ENV{MOJO_WEBPACK_REINSTALL};
-
   my $self         = shift;
   my $package_file = $self->{files}{'package.json'}[1];
   my $package_json = Mojo::JSON::decode_json($package_file->slurp);
   my $n            = 0;
 
   my $CWD = Mojolicious::Plugin::Webpack::CWD->new($package_file->dirname);
-  $self->_run_npm('install') if %{$package_json->{dependencies}};
+  $self->_run_npm('install') unless -d 'node_modules';
 
   if ($self->dependencies->{core} eq 'rollup') {
     $self->dependencies->{core}
@@ -91,8 +89,9 @@ sub _install_node_deps {
 
   for my $preset ('core', @{$self->process}) {
     for my $module (@{$self->dependencies->{$preset} || []}) {
-      next if $package_json->{dependencies}{$module};
-      next if $package_json->{devDependencies}{$module};
+      my $lookup = (split '@', $module)[0];
+      next if $package_json->{dependencies}{$module}    or $package_json->{dependencies}{$lookup};
+      next if $package_json->{devDependencies}{$module} or $package_json->{devDependencies}{$lookup};
       $self->_run_npm(install => $module);
       $n++;
     }
@@ -184,6 +183,7 @@ sub _render_to_file {
   $template =~ s!__NAME__!{$app->moniker}!ge;
   $template =~ s!__VERSION__!{_semver($app->VERSION)}!ge;
   $out_file->spurt($template);
+  warn "[Webpack] Generated $out_file\n";
   return $self->{files}{$name} = [generated => $out_file];
 }
 
@@ -283,11 +283,6 @@ L</MOJO_WEBPACK_CONFIG>.
 
 Defaults to C<webpack.config.js>, but can be set to another config file, such
 as C<rollup.config.js>.
-
-=head2 MOJO_WEBPACK_REINSTALL
-
-Set this variable if you already have a C<node_modules/> directory, but you
-want C<npm install> to be run again.
 
 =head2 MOJO_WEBPACK_VERBOSE
 

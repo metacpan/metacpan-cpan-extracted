@@ -24,6 +24,7 @@ BEGIN {
 	$f |= $_ for map $FLAG2I{$_}, @{ $FLAG_COMBOS{$k} };
 	no strict 'refs';
 	*$k = sub () { return $f }; # return to dodge pointless 5.22 stricture
+	*{"_is$k"} = sub { $_[0]->[ 1 ] & $f }; # 1 = _f
     }
 }
 
@@ -32,7 +33,7 @@ use vars qw(@ISA @EXPORT_OK %EXPORT_TAGS);
 @ISA = qw(Exporter);
 %EXPORT_TAGS =
     (flags =>  [@FLAGS, keys %FLAG_COMBOS, qw(_GEN_ID)],
-     fields => [qw(_n _f _a _i _s _p _g _u _ni _nc _na _nm)]);
+     fields => [qw(_n _f _arity _i _s _p _g _u _ni _nc _na _nm)]);
 @EXPORT_OK = map @$_, values %EXPORT_TAGS;
 
 my $_GEN_ID = 0;
@@ -46,7 +47,7 @@ sub _nm () { 3 } # Node map.
 
 sub _n () { 0 } # Next id.
 sub _f () { 1 } # Flags.
-sub _a () { 2 } # Arity.
+sub _arity () { 2 } # Arity.
 sub _i () { 3 } # Index to path.
 sub _s () { 4 } # Successors / Path to Index.
 sub _p () { 5 } # Predecessors.
@@ -57,7 +58,7 @@ sub _V () { 2 }  # Graph::_V()
 sub stringify {
     my $m = shift;
     <<EOF;
-@{[ref $m]} arity=@{[$m->[ _a ]]} flags: @{[_stringify_fields($m->[ _f ])]}
+@{[ref $m]} arity=@{[$m->[ _arity ]]} flags: @{[_stringify_fields($m->[ _f ])]}
 EOF
 }
 
@@ -86,14 +87,7 @@ sub _ids {
 }
 
 sub has_paths {
-    my $m = shift;
-    return defined $m->[ _i ] && @{ $m->[ _i ] };
-}
-
-sub _del_id {
-    my ($m, $i) = @_;
-    my @p = $m->_get_id_path( $i );
-    $m->del_path( @p ) if @p;
+    @{ $_[0]->[ _i ] || [] };
 }
 
 sub _new_node {
@@ -129,36 +123,103 @@ sub _inc_node {
 
 sub __get_path_node {
     my ($p, $k);
+    &__arg;
     my $f = $_[0]->[ _f ];
-    if (@_ > 2 && ($f & _UNORDUNIQ)) {
-        if (($f & _UNORDUNIQ) == _UNORD && @_ > 2) { @_ = ($_[0], sort @_[1..$#_]) }
-        else { &__arg }
-    }
     my ($m) = @_;
-    if ($m->[ _a ] == 2 && @_ == 3 && !($f & (_HYPER|_REF|_UNIQ))) { # Fast path.
-	return unless exists $m->[ _s ]->{ $_[1] };
-	$p = [ $m->[ _s ], $m->[ _s ]->{ $_[1] } ];
+    if ($m->[ _arity ] == 2 && @_ == 3 && !($f & (_HYPER|_REF|_UNIQ|_MULTI))) { # Fast path.
+	my $s = $m->[ _s ];
+	return unless exists $s->{ $_[1] };
+	$p = [ $s, $s->{ $_[1] } ];
 	$k = [ $_[1], $_[2] ];
     } else {
 	return unless ($p, $k) = &{ $m->can('__has_path') };
     }
     my $l = defined $k->[-1] ? $k->[-1] : "";
-    return ( exists $p->[-1]->{ $l }, $p->[-1]->{ $l }, $p, $k, $l );
+    exists $p->[-1]->{ $l } ? ( $p->[-1]->{ $l }, $p, $k, $l ) : ();
+}
+
+sub set_path {
+    my ($m) = @_;
+    my $f = $m->[ _f ];
+    return if @_ == 1 && !($f & _HYPER);
+    &__arg;
+    my ($p, $k) = &{ $m->can('__set_path') };
+    $m->__set_path_node( $p, defined $k->[-1] ? $k->[-1] : "", @_[1..$#_] );
 }
 
 sub set_path_by_multi_id {
     my $m = $_[0];
     my ($p, $k) = &{ $m->can('__set_path') };
-    return unless defined $p && defined $k;
-    my $l = defined $k->[-1] ? $k->[-1] : "";
-    return $m->__set_path_node( $p, $l, @_[1..$#_] );
+    $m->__set_path_node( $p, $k->[-1], @_[1..$#_] );
+}
+
+sub paths_non_existing {
+    my ($m, $list) = @_;
+    grep !$m->has_path(@$_), @$list;
+}
+
+sub has_path {
+    my $m = $_[0];
+    return unless my ($p, $k) = &{ $m->can('__has_path') };
+    return exists $p->[-1]->{ $k->[-1] };
+}
+
+sub has_path_by_multi_id {
+    my $m = $_[0];
+    my $id = pop;
+    return undef unless my ($n) = &{ $m->can('__get_path_node') };
+    return exists $n->[ _nm ]->{ $id };
+}
+
+sub del_path {
+    my $m = $_[0];
+    my $f = $m->[ _f ];
+    return unless my ($n, $p, $k, $l) = &{ $m->can('__get_path_node') };
+    my $c = ($f & _COUNT) ? --$n->[ _nc ] : 0;
+    if ($c == 0) {
+	delete $m->[ _i ]->[ ref $n ? $n->[ _ni ] : $n ];
+	delete $p->[-1]->{ $l };
+	while (@$p && @$k && keys %{ $p->[-1]->{ $k->[-1] } } == 0) {
+	    delete $p->[-1]->{ $k->[-1] };
+	    pop @$p;
+	    pop @$k;
+	}
+    }
+    return 1;
+}
+
+sub del_path_by_multi_id {
+    my $m = $_[0];
+    my $id = pop;
+    return unless my ($n, $p, $k, $l) = &{ $m->can('__get_path_node') };
+    delete $n->[ _nm ]->{ $id };
+    unless (keys %{ $n->[ _nm ] }) {
+	delete $m->[ _i ]->[ $n->[ _ni ] ];
+	delete $p->[-1]->{ $l };
+	while (@$p && @$k && keys %{ $p->[-1]->{ $k->[-1] } } == 0) {
+	    delete $p->[-1]->{ $k->[-1] };
+	    pop @$p;
+	    pop @$k;
+	}
+    }
+    return 1;
 }
 
 sub get_multi_ids {
     my $f = $_[0]->[ _f ];
-    return () unless ($f & _MULTI);
-    my ($e, $n) = &__get_path_node;
-    return $e ? keys %{ $n->[ _nm ] } : ();
+    return unless ($f & _MULTI);
+    return unless my ($n) = &__get_path_node;
+    keys %{ $n->[ _nm ] };
+}
+
+sub get_paths_by_ids {
+    my ($m, $list) = @_;
+    my $i = $m->[ _i ];
+    map [ map $i->[ $_ ], @$_ ], @$list;
+}
+
+sub paths {
+    grep defined, @{ $_[0]->[ _i ] || [] };
 }
 
 sub _has_path_attrs {
@@ -174,8 +235,7 @@ sub _set_path_attrs {
     my ($m) = @_;
     push @_, $id if ($f & _MULTI);
     my ($p, $k) = &{ $m->can('__set_path') };
-    return unless defined $p && defined $k;
-    my $l = defined $k->[-1] ? $k->[-1] : "";
+    my $l = $k->[-1];
     $m->__set_path_node( $p, $l, @_[1..$#_] ) unless exists $p->[-1]->{ $l };
     if (($f & _MULTI)) {
 	$p->[-1]->{ $l }->[ _nm ]->{ $id } = $attrs;
@@ -201,8 +261,7 @@ sub _set_path_attr {
     my ($m) = @_;
     push @_, $id if ($f & _MULTI);
     my ($p, $k) = &{ $m->can('__set_path') };
-    return unless defined $p && defined $k;
-    my $l = defined $k->[-1] ? $k->[-1] : "";
+    my $l = $k->[-1];
     $m->__set_path_node( $p, $l, @_[1..$#_] ) unless exists $p->[-1]->{ $l };
     if (($f & _MULTI)) {
 	$p->[-1]->{ $l }->[ _nm ]->{ $id }->{ $attr } = $val;
@@ -225,8 +284,7 @@ sub _get_path_attrs {
 	my $l = defined $k->[-1] ? $k->[-1] : "";
 	$p->[-1]->{ $l }->[ _nm ]->{ $id };
     } else {
-	my ($e, $n) = &{ $m->can('__get_path_node') };
-	return unless $e;
+	return unless my ($n) = &{ $m->can('__get_path_node') };
 	return $n->[ _na ] if ref $n && $#$n == _na;
 	return;
     }
@@ -263,10 +321,9 @@ sub _del_path_attrs {
 		   (defined $p->[-1]->{ $l }->[ _na ] &&
 		    keys %{ $p->[-1]->{ $l }->[ _na ] });
     } else {
-	my ($e, $n) = &{ $m->can('__get_path_node') };
-	return undef unless $e;
+	return undef unless my ($n) = &{ $m->can('__get_path_node') };
 	return 0 if !ref $n;
-	$e = _na == $#$n && keys %{ $n->[ _na ] } ? 1 : 0;
+	my $e = _na == $#$n && keys %{ $n->[ _na ] } ? 1 : 0;
 	$#$n = _na - 1;
 	return $e;
     }
@@ -286,34 +343,17 @@ sub __arg {
     my ($m) = @_;
     return if @_ < 3; # nothing to do if 1 or 0 passed args
     my $f = $m->[ _f ];
+    Graph::__carp_confess(sprintf "arguments %d expected %d for\n".$m->stringify,
+		  @_ - 1, $m->[ _arity ])
+        if !($f & _HYPER) and @_ - 1 != $m->[ _arity ];
+    return if !($f & _UNORDUNIQ);
     my @a = @_[1..$#_];
     my %u;
     @a = grep !$u{$_}++, @a if $f & _UNIQ;
     # Alphabetic or numeric sort, does not matter as long as it unifies.
     @_ = ($_[0], $f & _UNORD ? sort @a : @a);
 }
-
-sub _successors {
-    my ($E, $g) = @_;
-    return $g->_edges_from( @_[2..$#_] ) if !wantarray;
-    my $V = $g->[ _V ];
-    my @v = map +(
-	map $V->_get_id_path($_), @{ $_->[ 1 ] }[ 1 .. $#{$_->[ 1 ]} ]
-    ), $g->_edges_from( @_[2..$#_] );
-    return @v if !($V->[ _f ] & _MULTI);
-    map @$_, @v;
-}
-
-sub _predecessors {
-    my ($E, $g) = @_;
-    return $g->_edges_to( @_[2..$#_] ) if !wantarray;
-    my $V = $g->[ _V ];
-    my @v = map +(
-	map $V->_get_id_path($_), @{ $_->[ 1 ] }[ 0 .. $#{$_->[ 1 ]}-1 ]
-    ), $g->_edges_to( @_[2..$#_] );
-    return @v if !($V->[ _f ] & _MULTI);
-    map @$_, @v;
-}
+*__attr = \&__arg;
 
 1;
 __END__
@@ -368,6 +408,25 @@ Set the path by @ids.
 =head2 set_path_by_multi_id
 
 Set the path in the Map by the multi id.
+
+=head2 get_paths_by_ids
+
+Given an array-ref of array-refs of vertex IDs, returns a list of
+array-refs of paths.
+
+=head2 paths_non_existing
+
+    @non_existing = $m->paths_non_existing(\@paths);
+
+Given an array-ref of array-refs with paths, returns a list of
+non-existing paths.
+
+=head2 get_ids_by_paths
+
+    @ids = $m->get_ids_by_paths(\@paths);
+
+Given an array-ref of array-refs with paths, returns a list of IDs of
+existing paths (non-existing ones will not be represented).
 
 =head2 rename_path($from, $to)
 

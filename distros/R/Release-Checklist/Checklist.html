@@ -93,7 +93,7 @@ history.</p>
 <h1 id="dependencies">Dependencies</h1>
 
 <p>Every module you use is a module your release will depend on. If a new
-release of such module fails, the likelyhood of your release being
+release of such module fails, the likelihood of your release being
 unable to install increases. So only use modules that you need. Each
 dependency should be well-considered.</p>
 
@@ -177,7 +177,7 @@ license.</p>
 
 <h1 id="documentation">Documentation</h1>
 
-<p>Make sure that you have a clear, consice, and short SYNOPSIS section. This
+<p>Make sure that you have a clear, concise, and short SYNOPSIS section. This
 section should show the most important code as simple and clear as possible.
 If you have 3500 methods in your class, do not list all of the there. Just
 show how to create the object and show the 4 methods that a beginner would
@@ -221,7 +221,7 @@ might be an insult to others. Keep neutral.</p>
 
 <p>Not every developer is of native English tongue. And even if, they
 also make (spelling) mistakes. There are enough tools available to
-prevent public display of misspellings and typoes. Use them.</p>
+prevent public display of misspellings and typos. Use them.</p>
 
 <p>It is a good plan to have someone else proofread your documentation.
 If you can, ask three readers: one who knows about what the module is
@@ -466,9 +466,18 @@ keep passing.</p>
 <li><a href="https://metacpan.org/pod/Test::DistManifest">Test::DistManifest</a></li>
 </ul>
 
+<pre class="sh">
+ $ perl -MTest::DistManifest -we'manifest_ok'
+ 1..4
+ ok 1 - Parse MANIFEST or equivalent
+ ok 2 - All files are listed in MANIFEST or skipped
+ ok 3 - All files listed in MANIFEST exist on disk
+ ok 4 - No files are in both MANIFEST and MANIFEST.SKIP
+</pre>
+
 <h1 id="filenaming">File naming</h1>
 
-<p>Don not make it hard for people and modules to use the files in your
+<p>Do not make it hard for people and modules to use the files in your
 distribution by using spaces and special characters in file names. Also try
 to not use overly long names and deep directory structures.</p>
 
@@ -608,7 +617,7 @@ configuration files or set up databases, that should be mentioned too.</p>
 
 <h1 id="tickets">Tickets</h1>
 
-<p>If your module is on [github][https://github.com] or similar, regularly check
+<p>If your module is on <a href="https://github.com">github</a> or similar, regularly check
 on submitted issues and deal with them: either explain why it is not an issue
 or comment with alternatives or even better: this has been fixed now.
 Additionally, you should check on possible forks of your code and check the
@@ -617,12 +626,28 @@ you could use to improve your code. If the changes they made are already taken
 into your own code, or your code offers a (better) alternative to their change
 you could comment on their commits with additional information.</p>
 
-<p>Likewise if you use [RT][https://rt.perl.org] as bug tracker.</p>
+<p>Likewise if you use <a href="https://rt.perl.org">RT</a> as bug tracker.</p>
 
 <p>If any ticket is entered as a vulnerability issue, be sure to make clear in
 the feedback to that issue that it is indeed a security issue and how you
 dealt with it or that you do/did not acknowledge this as a vulnerability, but
 as a (plain/simple) bug and deal with at with the appropriate actions.</p>
+
+<p>Whatever you choose, make it clear in your META information, so the link to
+issues on <a href="https://metacpan.org/">metacpan</a> points to the correct location.</p>
+
+<h2 id="meta.yml">META.yml</h2>
+
+<p>resources:
+bugtracker: https://github.com/Tux/Release-Checklist/issues</p>
+
+<h2 id="meta.json">META.json</h2>
+
+<p>&#8220;resources&#8221; : {
+&#8220;bugtracker&#8221; : {
+ &#8220;web&#8221; : &#8220;https://github.com/Tux/Release-Checklist/issues&#8221;
+ }
+}</p>
 
 <h1 id="downriver">Downriver</h1>
 
@@ -635,7 +660,7 @@ if the new release would cause the other module(s) to break.</p>
 <p><a href="./scripts/used-by.pl">used_by.pl</a> will check the depending modules with the
 upcoming version.</p>
 
-<p>Of course it is imposible to cover every possible situation here. The DarkPAN
+<p>Of course it is impossible to cover every possible situation here. The DarkPAN
 (uses of your module beyond what is registered on CPAN) is huge.</p>
 
 <h1 id="license">LICENSE</h1>

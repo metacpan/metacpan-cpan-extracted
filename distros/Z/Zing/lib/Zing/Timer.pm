@@ -9,16 +9,18 @@ use registry 'Zing::Types';
 use routines;
 
 use Data::Object::Class;
+
 use Zing::Logic::Timer;
 
 extends 'Zing::Process';
 
-our $VERSION = '0.13'; # VERSION
+our $VERSION = '0.20'; # VERSION
 
 # BUILDERS
 
 fun new_logic($self) {
-  Zing::Logic::Timer->new(process => $self)
+  my $debug = $self->env->debug;
+  Zing::Logic::Timer->new(debug => $debug, process => $self)
 }
 
 1;

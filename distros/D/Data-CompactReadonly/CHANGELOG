@@ -1,3 +1,7 @@
+2020-12-18    0.0.4    Bugfixes for writing nested data structures and reading empty tied hashes;
+                       Bugfix for calling exists() on an empty Dictionary;
+                       De-dup entire hashes/arrays on file creation if their contents are the same
+
 2020-12-09    0.0.3    More floating point fixes, for perls using gcc's libquadmath
 
 2020-12-05    0.0.2    Fix floating point issues in tests;

@@ -21,6 +21,8 @@ my %WriteMakefileArgs = (
   "NAME" => "DBIx::Class::StateMigrations",
   "PREREQ_PM" => {
     "Class::Inspector" => 0,
+    "Class::Unload" => 0,
+    "Clone" => 0,
     "DBIx::Class::Schema::Diff" => "1.11",
     "DBIx::Class::Schema::Diff::State" => 0,
     "Data::Dump" => 0,
@@ -35,7 +37,7 @@ my %WriteMakefileArgs = (
     "strict" => 0,
     "warnings" => 0
   },
-  "VERSION" => "0.001",
+  "VERSION" => "0.002",
   "test" => {
     "TESTS" => ""
   }
@@ -44,6 +46,8 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "Class::Inspector" => 0,
+  "Class::Unload" => 0,
+  "Clone" => 0,
   "DBIx::Class::Schema::Diff" => "1.11",
   "DBIx::Class::Schema::Diff::State" => 0,
   "Data::Dump" => 0,

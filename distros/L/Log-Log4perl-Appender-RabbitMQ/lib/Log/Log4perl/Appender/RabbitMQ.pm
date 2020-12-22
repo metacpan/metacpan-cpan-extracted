@@ -5,7 +5,7 @@ use strict;
 use warnings;
 
 package Log::Log4perl::Appender::RabbitMQ;
-$Log::Log4perl::Appender::RabbitMQ::VERSION = '0.200001';
+$Log::Log4perl::Appender::RabbitMQ::VERSION = '0.200002';
 our @ISA = qw/ Log::Log4perl::Appender /;
 
 use Net::AMQP::RabbitMQ 2.30000;
@@ -64,6 +64,7 @@ sub new {
        ssl_verify_host
        ssl_cacert
        ssl_init
+       timeout
     /) {
         $connect_options{$name} = $args{$name} if exists $args{$name};
     }
@@ -184,7 +185,7 @@ Log::Log4perl::Appender::RabbitMQ - Log to RabbitMQ
 
 =head1 VERSION
 
-version 0.200001
+version 0.200002
 
 =head1 SYNOPSIS
 
@@ -252,6 +253,8 @@ Defaults to localhost.
 =item ssl_cacert
 
 =item ssl_init
+
+=item timeout
 
 =back
 
@@ -346,7 +349,7 @@ Alexander Hartmaier <abraxxa@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Alexander Hartmaier.
+This software is copyright (c) 2020 by Alexander Hartmaier.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

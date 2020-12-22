@@ -1,3 +1,7 @@
+0.033     2020-12-21 19:39:58 EST
+  - Update various recommendations for alternatives in DiscouragedModules policy
+  - Add better examples for EmptyReturn (#39) and Each policies
+
 0.032     2019-11-11 11:09:08 EST
   - Add check for CORE::wantarray and CORE'wantarray to WantArray policy (simcop2387 #37)
 

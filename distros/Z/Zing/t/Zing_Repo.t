@@ -32,7 +32,7 @@ Generic Store Abstraction
 =includes
 
 method: drop
-method: keys
+method: search
 method: term
 method: test
 
@@ -42,9 +42,9 @@ method: test
 
   use Zing::Repo;
 
-  my $repo = Zing::Repo->new(name => 'repo');
+  my $repo = Zing::Repo->new(name => 'text');
 
-  # $repo->recv('text-1');
+  # $repo->recv;
 
 =cut
 
@@ -57,9 +57,7 @@ Zing::Types
 =attributes
 
 name: ro, req, Str
-server: ro, opt, Server
 store: ro, opt, Store
-target: ro, opt, Enum[qw(global local)]
 
 =cut
 
@@ -75,7 +73,7 @@ The drop method returns truthy if the data was removed from the store.
 
 =signature drop
 
-drop(Str @keys) : Int
+drop() : Int
 
 =example-1 drop
 
@@ -85,20 +83,20 @@ drop(Str @keys) : Int
 
 =cut
 
-=method keys
+=method search
 
-The keys method returns a list of fully-qualified keys stored under the
-datastore namespace.
+The search method returns a L<Zing::Search> object based on the current repo or
+L<Zing::Repo> derived object.
 
-=signature keys
+=signature search
 
-keys() : ArrayRef[Str]
+search() : Search
 
-=example-1 keys
+=example-1 search
 
   # given: synopsis
 
-  my $keys = $repo->keys;
+  my $search = $repo->search;
 
 =cut
 
@@ -108,13 +106,13 @@ The term method generates a term (safe string) for the datastore.
 
 =signature term
 
-term(Str @keys) : Str
+term() : Str
 
 =example-1 term
 
   # given: synopsis
 
-  my $term = $repo->term('text-1');
+  my $term = $repo->term;
 
 =cut
 
@@ -124,21 +122,21 @@ The test method returns truthy if the specific key (or datastore) exists.
 
 =signature test
 
-test(Str @keys) : Int
+test() : Int
 
 =example-1 test
 
   # given: synopsis
 
-  $repo->test('text-1');
+  $repo->test;
 
 =example-2 test
 
   # given: synopsis
 
-  $repo->store->send($repo->term('text-1'), { test => time });
+  $repo->store->send($repo->term, { test => time });
 
-  $repo->test('text-1');
+  $repo->test;
 
 =cut
 
@@ -160,16 +158,21 @@ $subs->example(-1, 'drop', 'method', fun($tryable) {
   $result
 });
 
-$subs->example(-1, 'keys', 'method', fun($tryable) {
+$subs->example(-1, 'search', 'method', fun($tryable) {
   ok my $result = $tryable->result;
+  is $result->bucket, 'text';
+  is $result->handle, 'main';
+  is $result->symbol, 'repo';
+  is $result->system, 'zing';
+  is $result->target, 'global';
 
   $result
 });
 
 $subs->example(-1, 'term', 'method', fun($tryable) {
   ok my $result = $tryable->result;
-  my $local = qr/zing:main:local\(\d+\.\d+\.\d+\.\d+\)/;
-  like $result, qr/^$local:repo:repo:text-1$/;
+  my $local = qr/zing:main:/;
+  like $result, qr/^zing:main:global:repo:text$/;
 
   $result
 });

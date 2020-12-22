@@ -1,7 +1,3 @@
-#
-# $Id$
-#
-
 =head1 NAME
 
 Array::Compare - Perl extension for comparing arrays.
@@ -186,7 +182,7 @@ use Moo;
 use Types::Standard qw(Str Bool HashRef);
 use Carp;
 
-$VERSION = '3.0.7';
+$VERSION = '3.0.8';
 
 has Sep        => ( is => 'rw', isa => Str,     default => '^G' );
 has WhiteSpace => ( is => 'rw', isa => Bool,    default => 1 );

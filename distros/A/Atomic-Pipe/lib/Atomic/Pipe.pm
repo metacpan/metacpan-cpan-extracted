@@ -2,7 +2,7 @@ package Atomic::Pipe;
 use strict;
 use warnings;
 
-our $VERSION = '0.013';
+our $VERSION = '0.014';
 
 use IO();
 use Carp qw/croak/;
@@ -39,6 +39,14 @@ use constant STATE          => 'state';
 use constant OUT_BUFFER     => 'out_buffer';
 use constant READ_BLOCKING  => 'read_blocking';
 use constant WRITE_BLOCKING => 'write_blocking';
+use constant BURST_PREFIX   => 'burst_prefix';
+use constant BURST_POSTFIX  => 'burst_postfix';
+use constant ADJUSTED_DSIZE => 'adjusted_dsize';
+use constant MESSAGE_KEY    => 'message_key';
+use constant MIXED_BUFFER   => 'mixed_buffer';
+
+sub wh { shift->{+WH} }
+sub rh { shift->{+RH} }
 
 sub _get_tid {
     return 0 unless $INC{'threads.pm'};
@@ -69,26 +77,26 @@ sub _mode_to_dir {
 
 sub read_fifo {
     my $class = shift;
-    my ($fifo) = @_;
+    my ($fifo, %params) = @_;
 
     croak "File '$fifo' is not a pipe (-p check)" unless -p $fifo;
 
     open(my $fh, '+<', $fifo) or die "Could not open fifo ($fifo) for reading: $!";
     binmode($fh);
 
-    return bless({RH() => $fh}, $class);
+    return bless({%params, RH() => $fh}, $class);
 }
 
 sub write_fifo {
     my $class = shift;
-    my ($fifo) = @_;
+    my ($fifo, %params) = @_;
 
     croak "File '$fifo' is not a pipe (-p check)" unless -p $fifo;
 
     open(my $fh, '>', $fifo) or die "Could not open fifo ($fifo) for writing: $!";
     binmode($fh);
 
-    return bless({WH() => $fh}, $class);
+    return bless({%params, WH() => $fh}, $class);
 }
 
 sub from_fh {
@@ -122,6 +130,7 @@ sub from_fd {
 
 sub new {
     my $class = shift;
+    my (%params) = @_;
 
     my ($rh, $wh);
     pipe($rh, $wh) or die "Could not create pipe: $!";
@@ -129,11 +138,14 @@ sub new {
     binmode($wh);
     binmode($rh);
 
-    return bless({RH() => $rh, WH() => $wh}, $class);
+    return bless({%params, RH() => $rh, WH() => $wh}, $class);
 }
 
 sub pair {
     my $class = shift;
+    my (%params) = @_;
+
+    my $mixed = delete $params{mixed_data_mode};
 
     my ($rh, $wh);
     pipe($rh, $wh) or die "Could not create pipe: $!";
@@ -141,10 +153,166 @@ sub pair {
     binmode($wh);
     binmode($rh);
 
-    return (
-        bless({RH() => $rh}, $class),
-        bless({WH() => $wh}, $class),
-    );
+    my $r = bless({%params, RH() => $rh}, $class);
+    my $w = bless({%params, WH() => $wh}, $class);
+
+    if ($mixed) {
+        $r->set_mixed_data_mode();
+        $w->set_mixed_data_mode();
+    }
+
+    return ($r, $w);
+}
+
+sub set_mixed_data_mode {
+    my $self = shift;
+
+    $self->read_blocking(0) if $self->{+RH};
+
+    $self->{+BURST_PREFIX}  //= "\x0E";    # Shift out
+    $self->{+BURST_POSTFIX} //= "\x0F";    # Shift in
+    $self->{+MESSAGE_KEY}   //= "\x10";    # Data link escape
+}
+
+sub get_line_burst_or_data {
+    my $self = shift;
+    my %params = @_;
+
+    my $rh = $self->{+RH} // croak "Not a read handle";
+
+    my $prefix  = $self->{+BURST_PREFIX}  // croak "missing 'burst_prefix', not in mixed_data_mode";
+    my $postfix = $self->{+BURST_POSTFIX} // croak "missing 'burst_postfix', not in mixed_data_mode";
+    my $key     = $self->{+MESSAGE_KEY}   // croak "missing 'message_key', not in mixed_data_mode";
+
+    my $buffer = $self->{+MIXED_BUFFER} //= {
+        raw      => '',
+        lines    => '',
+        burst    => '',
+        in_burst => 0,
+        do_extra_loop => 0,
+    };
+
+    while (1) {
+        my $start = length($buffer->{raw} //= '');
+
+        if (IS_WIN32) {
+            if (my $size = $self->_win32_pipe_ready()) {
+                $size = $params{read_size} if $params{read_size} && $params{read_size} < $size;
+                my $x = '';
+                sysread($rh, $x, $size);
+                $buffer->{raw} .= $x;
+            }
+        }
+        elsif (my $size = $params{read_size}) {
+            my $x = '';
+            sysread($rh, $x, $size);
+            $buffer->{raw} .= $x;
+        }
+        else {
+            local $/;
+            $buffer->{raw} .= <$rh> // '';
+        }
+
+        my $delta = length($buffer->{raw}) - $start;
+
+        return () unless length($buffer->{raw}) || $buffer->{do_extra_loop};
+        $buffer->{do_extra_loop}-- if $buffer->{do_extra_loop};
+
+        if ($buffer->{strip_term}) {
+            next unless $buffer->{raw};
+            die "Internal Error: No Terminator?" unless substr($buffer->{raw}, 0, 1, '') eq $postfix;
+            $buffer->{strip_term}--;
+            next;
+        }
+        elsif ($buffer->{in_message}) {
+            my $state = $buffer->{+STATE} //= {};
+
+            my ($id, $message) = $self->_extract_message(
+                state => $state,
+                one_part_only => 1,
+                read => sub {
+                    if (bytes::length($buffer->{raw}) >= $_[1]) {
+                        $_[0] //= '';
+                        $_[0] .= bytes::substr($buffer->{raw}, 0, $_[1], '');
+                        $! = 0;
+                        return $_[1];
+                    }
+
+                    $! = EAGAIN;
+                    return undef;
+                },
+            );
+
+            next unless defined $id;
+
+            if (substr($buffer->{raw}, 0, 1) eq $postfix) {
+                substr($buffer->{raw}, 0, 1, '');
+            }
+            else {
+                $buffer->{strip_term}++;
+            }
+
+            $buffer->{in_message} = 0;
+            $buffer->{do_extra_loop}++;
+            return (message => $message) if defined $message;
+            next;
+        }
+        elsif ($buffer->{in_burst}) {
+            if (substr($buffer->{raw}, 0, 1) eq $key) {
+                substr($buffer->{raw}, 0, 1, ''); # Strip off the key
+                $buffer->{in_message} = 1;
+                $buffer->{in_burst} = 0;
+                $buffer->{do_extra_loop}++;
+                next;
+            }
+
+            $buffer->{burst} //= '';
+            my ($burst_data, $term);
+            ($burst_data, $term, $buffer->{raw}) = split /(\Q$postfix\E)/, $buffer->{raw}, 2;
+            $buffer->{burst} .= $burst_data;
+
+            if ($term) {
+                $buffer->{in_burst} = 0;
+                $buffer->{do_extra_loop}++;
+                return (burst => delete($buffer->{burst}));
+            }
+
+            next;
+        }
+        else {
+            # Look for the start of a burst
+            $buffer->{lines} //= '';
+            my $linedata;
+            ($linedata, $buffer->{in_burst}, $buffer->{raw}) = split /(\Q$prefix\E)/, $buffer->{raw}, 2;
+            $buffer->{lines} .= $linedata if length($linedata);
+
+            # Look for a complete line
+            my $term;
+            ($linedata, $term, $buffer->{lines}) = split /(\r?\n)/, $buffer->{lines}, 2;
+            if ($term) {
+                $buffer->{do_extra_loop}++;
+                return (line => "${linedata}${term}");
+            }
+
+            # No line found, put the linedata back in the buffer
+            $buffer->{lines} = $linedata;
+        }
+    }
+}
+
+sub debug {
+    my ($id, $buffer) = @_;
+
+    print "---debug $id---\n";
+    for my $key (sort keys %$buffer) {
+        my $val = $buffer->{$key} // '<UNDEF>';
+        $val =~ s/\x0E/\\x0E/g;
+        $val =~ s/\x0F/\\x0F/g;
+        $val =~ s/\x10/\\x10/g;
+        $val =~ s/\n/\\n/g;
+        $val =~ s/\r/\\r/g;
+        print "$key: |$val|\n\n";
+    };
 }
 
 # This is a heavily modified version of a pattern suggested on stack-overflow
@@ -352,7 +520,10 @@ sub fits_in_burst {
     my $self = shift;
     my ($data) = @_;
 
-    my $size = bytes::length($data);
+    my $prefix  = $self->{+BURST_PREFIX}  // '';
+    my $postfix = $self->{+BURST_POSTFIX} // '';
+
+    my $size = bytes::length($prefix . $data . $postfix);
     return undef unless $size <= PIPE_BUF;
 
     return $size;
@@ -360,9 +531,9 @@ sub fits_in_burst {
 
 sub write_burst {
     my $self = shift;
-    my ($data, $size) = @_;
+    my ($data) = @_;
 
-    $size //= $self->fits_in_burst($data) // return undef;
+    my $size = $self->fits_in_burst($data) // return undef;
 
     push @{$self->{+OUT_BUFFER} //= []} => [$data, $size];
     $self->flush();
@@ -401,6 +572,11 @@ sub _write_burst {
 
     my $wh = $self->{+WH} or croak "Cannot call write on a pipe reader";
 
+    my $prefix  = $self->{+BURST_PREFIX}  // '';
+    my $postfix = $self->{+BURST_POSTFIX} // '';
+
+    $data = "${prefix}${data}${postfix}" if length($prefix) || length($postfix);
+
     my $wrote;
     my $loop = 0;
     SWRITE: {
@@ -415,13 +591,28 @@ sub _write_burst {
     return $wrote;
 }
 
+sub _adjusted_dsize {
+    my $self = shift;
+
+    return $self->{+ADJUSTED_DSIZE} if defined $self->{+ADJUSTED_DSIZE};
+
+    my $message_key = $self->{+MESSAGE_KEY}   // '';
+    my $prefix      = $self->{+BURST_PREFIX}  // '';
+    my $postfix     = $self->{+BURST_POSTFIX} // '';
+
+    my $fix_size = bytes::length($prefix) + bytes::length($postfix) + bytes::length($message_key);
+    return $self->{+ADJUSTED_DSIZE} = $dsize - $fix_size;
+}
+
 sub parts_needed {
     my $self = shift;
     my ($data) = @_;
 
+    my $adjusted_dsize = $self->_adjusted_dsize;
+
     my $dtotal = bytes::length($data);
-    my $parts = int($dtotal / $dsize);
-    $parts++ if $dtotal % $dsize;
+    my $parts = int($dtotal / $adjusted_dsize);
+    $parts++ if $dtotal % $adjusted_dsize;
 
     return $parts;
 }
@@ -432,14 +623,16 @@ sub write_message {
 
     my $parts = $self->parts_needed($data);
 
+    my $adjusted_dsize = $self->_adjusted_dsize;
+    my $message_key = $self->{+MESSAGE_KEY} // '';
+
     my $id = $parts - 1;
     for (my $part = 0; $part < $parts; $part++) {
-        my $bytes = bytes::substr($data, $part * $dsize, $dsize);
+        my $bytes = bytes::substr($data, $part * $adjusted_dsize, $adjusted_dsize);
         my $size = bytes::length($bytes);
-        my $out = pack("l2L2a$size", $$, _get_tid(), $id--, $size, $bytes);
-        my $write = $size + $psize;
+        my $out = $message_key . pack("l2L2a$size", $$, _get_tid(), $id--, $size, $bytes);
 
-        $self->write_burst($out, $write);
+        $self->write_burst($out);
     }
 
     return $parts;
@@ -461,10 +654,32 @@ sub read_message {
         return undef unless $self->_win32_pipe_ready();
     }
 
+    my ($id, $out) = $self->_extract_message(
+        %params,
+        state => $state,
+        read => sub {
+            my $buffer = '';
+            my $out = sysread($rh, $buffer, $_[1]);
+            $_[0] //= '';
+            $_[0] .= $buffer if $out;
+            return $out;
+        },
+    );
+
+    return $out if defined $id;
+    return;
+}
+
+sub _extract_message {
+    my $self   = shift;
+    my %params = @_;
+    my $state  = $params{state};
+    my $read   = $params{read};
+
     while (1) {
         my $pb_size = $state->{pb_size} //= 0;
         while ($pb_size < $psize) {
-            my $read = sysread($rh, $state->{p_buffer}, $psize - $pb_size);
+            my $read = $read->($state->{p_buffer}, $psize - $pb_size);
             unless (defined $read) {
                 return if $! == EAGAIN; # NON-BLOCKING
                 next if $RETRY_ERRNO{0 + $!};
@@ -488,7 +703,7 @@ sub read_message {
         my $key = $state->{key};
         my $db_size = $state->{db_size} //= 0;
         while ($db_size < $key->{size}) {
-            my $read = sysread($rh, $state->{d_buffer}, $key->{size} - $db_size);
+            my $read = $read->($state->{d_buffer}, $key->{size} - $db_size);
             unless (defined $read) {
                 return if $! == EAGAIN; # NON-BLOCKING
                 next if $RETRY_ERRNO{0 + $!};
@@ -514,18 +729,25 @@ sub read_message {
             EOF     => $state->{EOF},
         );
 
-        next unless $id == 0;
+        unless ($id == 0) {
+            return ($id, undef) if $params{one_part_only};
+            next;
+        }
+
         my $message = delete $state->{buffers}->{$tag};
         my $parts   = delete $state->{parts}->{$tag};
 
-        return $message unless $params{debug};
+        return ($id, $message) unless $params{debug};
 
-        return {
-            message => $message,
-            parts   => $parts,
-            pid     => $key->{pid},
-            tid     => $key->{tid},
-        };
+        return (
+            $id,
+            {
+                message => $message,
+                parts   => $parts,
+                pid     => $key->{pid},
+                tid     => $key->{tid},
+            },
+        );
     }
 }
 
@@ -629,6 +851,96 @@ Fork example from tests:
     );
 
     done_testing;
+
+=head1 MIXED DATA MODE
+
+Mixed data mode is a special use-case for Atomic::Pipe. In this mode the
+assumption is that the writer end of the pipe uses the pipe as STDOUT or
+STDERR, and as such a lot of random non-atomic prints can happen on the writer
+end of the pipe. The special case is when you want to send atomic-chunks of
+data inline with the random prints, and in the end extract the data from the
+noise. The atomic nature of messages and bursts makes this possible.
+
+Please note that mixed data mode makes use of 3 ASCII control characters:
+
+=over 4
+
+=item SHIFT OUT (^N or \x0E)
+
+Used to start a burst
+
+=item SHIFT IN (^O or \x0F)
+
+Used to terminate a burst
+
+=item DATA LINK ESCAPE (^P or \x10)
+
+If this directly follows a SHIFT-OUT it marks the burst as being part of a
+data-message.
+
+=back
+
+If the random prints include SHIFT OUT then they will confuse the read-side
+parser and it will not be possible to extract data, in fact reading from the
+pipe will become quite unpredictable. In practice this is unlikely to cause
+issues, but printing a binary file or random noise could do it.
+
+A burst may not include SHIFT IN as the SHIFT IN control+character marks the
+end of a burst. A burst may also not start with the DATA LINK ESCAPE control
+character as that is used to mark the start of a data-message.
+
+data-messages may contain any data/characters/bytes as they messages include a
+length so an embedded SHIFT IN will not terminate things early.
+
+    # Create a pair in mixed-data mode
+    my ($r, $w) = Atomic::Pipe->pair(mixed_data_mode => 1);
+
+    # Open STDOUT to the write handle
+    open(STDOUT, '>&', $w->{wh}) or die "Could not clone write handle: $!";
+
+    # For sanity
+    $wh->autoflush(1);
+
+    print "A line!\n";
+
+    print "Start a line ..."; # Note no "\n"
+
+    # Any number of newlines is fine the message will send/recieve as a whole.
+    $w->write_burst("This is a burst message\n\n\n");
+
+    # Data will be broken into atomic chunks and sent
+    $w->write_message($data);
+
+    print "... Finish the line we started earlier\n";
+
+    my ($type, $data) = $r->get_line_burst_or_data;
+    # Type: 'line'
+    # Data: "A line!\n"
+
+    ($type, $data) = $r->get_line_burst_or_data;
+    # Type: 'burst'
+    # Data: "This is a burst message\n\n\n"
+
+    ($type, $data) = $r->get_line_burst_or_data;
+    # Type: 'message'
+    # Data: $data
+
+    ($type, $data) = $r->get_line_burst_or_data;
+    # Type: 'line'
+    # Data: "Start a line ...... Finish the line we started earlier\n"
+
+    # mixed-data mode is always non-blocking
+    ($type, $data) = $r->get_line_burst_or_data;
+    # Type: undef
+    # Data: undef
+
+You can also turn mixed-data mode after construction, but you must do so on both ends:
+
+    $r->set_mixed_data_mode();
+    $w->set_mixed_data_mode();
+
+Doing so will make the pipe non-blocking, and will make all bursts/messages
+include the necessary control characters.
 
 =head1 METHODS
 
@@ -796,6 +1108,12 @@ The primary use case of this is if you have multiple writers sending short
 plain-text messages that will not exceed the atomic pipe buffer limit (minimum
 of 512 bytes on systems that support atomic pipes accoring to POSIX).
 
+=item $fh = $p->rh
+
+=item $fh = $p->wh
+
+Get the read or write handles.
+
 =back
 
 =head3 RESIZING THE PIPE BUFFER
@@ -864,6 +1182,25 @@ cannot get a writer anymore.
 This turnes the object into a writer-only. Note that if you have no
 reader-copies then effectively makes it impossible to read from the pipe as you
 cannot get a reader anymore.
+
+=back
+
+=head3 MIXED DATA MODE METHODS
+
+=over 4
+
+=item $p->set_mixed_data_mode
+
+Enable mixed-data mode. Also makes read-side non-blocking.
+
+=item ($type, $data) = $r->get_line_burst_or_data()
+
+Get a line, a burst, or a message from the pipe. Always non-blocking, will
+return C<< (undef, undef) >> if no complete line/burst/message is ready.
+
+$type will be one of: C<undef>, C<'line'>, C<'burst'>, or C<'message'>.
+
+$data will either be C<undef>, or a complete line, burst, or message.
 
 =back
 

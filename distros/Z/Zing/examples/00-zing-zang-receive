@@ -48,7 +48,7 @@ my $z = Zing::Zang->new(
 
 # initial send
 # note: z-process mailbox doesn't actually exist yet
-$y->mailbox->send('z-process', {text => join(' ', "it's", time)});
+$y->mailbox->send($z->mailbox->term, {text => join(' ', "it's", time)});
 $y->exercise; # no message
 $z->exercise; # has message, replies
 $y->exercise; # has message, replies

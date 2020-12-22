@@ -14,9 +14,8 @@ name: PerlIO-via-xz
 provides: 
   PerlIO::via::xz: 
     file: lib/PerlIO/via/xz.pm
-    version: '0.02'
+    version: '0.03'
 recommends: 
-  Encode: '3.07'
   Test::More: '1.302183'
 requires: 
   Carp: 0
@@ -27,7 +26,8 @@ requires:
   perl: '5.012000'
 resources: 
   IRC: irc://irc.perl.org/#csv
+  bugtracker: https://github.com/Tux/PerlIO-via-xs/issues
   homepage: https://metacpan.org/pod/PerlIO::via::xz
   license: http://dev.perl.org/licenses/
   repository: https://github.com/Tux/PerlIO-via-xs
-version: '0.02'
+version: '0.03'

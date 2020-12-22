@@ -1,7 +1,7 @@
 --- 
 abstract: Meta-Wrapper for reading spreadsheet data
 author: 
-  - H.Merijn Brand <h.m.brand@xs4all.nl>
+  - H.Merijn Brand <perl5@tux.freedom.nl>
 configure_requires: 
   ExtUtils::MakeMaker: 0
 dynamic_config: 1
@@ -19,11 +19,11 @@ optional_features:
   opt_ods: 
     description: Provides parsing of OpenOffice spreadsheets
     requires: 
-      Spreadsheet::ParseODS: '0.25'
+      Spreadsheet::ParseODS: '0.26'
   opt_sxc: 
     description: Provides parsing of OpenOffice spreadsheets old style
     requires: 
-      Spreadsheet::ReadSXC: '0.24'
+      Spreadsheet::ReadSXC: '0.26'
   opt_tools: 
     description: Spreadsheet tools
   opt_xls: 
@@ -39,12 +39,12 @@ optional_features:
 provides: 
   Spreadsheet::Read: 
     file: Read.pm
-    version: '0.82'
+    version: '0.83'
 recommends: 
-  Data::Peek: '0.49'
-  File::Temp: '0.2309'
+  Data::Peek: '0.50'
+  File::Temp: '0.2311'
   IO::Scalar: 0
-  Test::More: '1.302181'
+  Test::More: '1.302183'
 requires: 
   Carp: 0
   Data::Dumper: 0
@@ -58,6 +58,7 @@ requires:
   Test::NoWarnings: 0
   perl: '5.008001'
 resources: 
+  bugtracker: https://github.com/Tux/Spreadsheet-Read/issues
   license: http://dev.perl.org/licenses/
   repository: https://github.com/Tux/Spreadsheet-Read
-version: '0.82'
+version: '0.83'

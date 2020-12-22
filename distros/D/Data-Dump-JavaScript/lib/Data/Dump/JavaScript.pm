@@ -1,10 +1,11 @@
 package Data::Dump::JavaScript;
-$Data::Dump::JavaScript::VERSION = '0.001';
+$Data::Dump::JavaScript::VERSION = '0.002';
 use strict;
 use warnings;
 use Exporter 'import';
 use Scalar::Util 'blessed';
 use Encode ();
+use B;
 
 # ABSTRACT: Pretty printing of data structures as JavaScript
 
@@ -120,16 +121,8 @@ sub _encode_value {
 
   # Number (bitwise operators change behavior based on the internal value type)
 
-  # "0" & $x will modify the flags on the "0" on perl < 5.14, so use a copy
-  my $zero = "0";
-  # "0" & $num -> 0. "0" & "" -> "". "0" & $string -> a character.
-  # this maintains the internal type but speeds up the xor below.
-  my $check = $zero & $value;
   return $value
-    if length $check
-    # 0 ^ itself          -> 0    (false)
-    # $character ^ itself -> "\0" (true)
-    && !($check ^ $check)
+    if B::svref_2object(\$value)->FLAGS & (B::SVp_IOK | B::SVp_NOK)
     # filter out "upgraded" strings whose numeric form doesn't strictly match
     && 0 + $value eq $value
     # filter out inf and nan
@@ -145,7 +138,7 @@ sub _get_indented {
 
 # Emulate boolean type
 package Data::Dump::JavaScript::_Bool;
-$Data::Dump::JavaScript::_Bool::VERSION = '0.001';
+$Data::Dump::JavaScript::_Bool::VERSION = '0.002';
 use overload '""' => sub { ${$_[0]} }, fallback => 1;
 
 
@@ -163,7 +156,7 @@ Data::Dump::JavaScript - Pretty printing of data structures as JavaScript
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 
@@ -224,7 +217,7 @@ Alexander Hartmaier <abraxxa@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by Alexander Hartmaier.
+This software is copyright (c) 2020 by Alexander Hartmaier.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

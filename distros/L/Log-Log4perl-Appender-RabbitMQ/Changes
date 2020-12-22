@@ -1,3 +1,7 @@
+0.200002  2020-12-22 12:59:19+01:00 Europe/Vienna
+    - add timeout connection option
+    - change bugtracker to github.com
+
 0.200001  2017-02-21 17:11:43+01:00 Europe/Vienna
     - fix end_to_end.t due to different return values by Net::AMQP::RabbitMQ
       (RT#102485, GH#2)

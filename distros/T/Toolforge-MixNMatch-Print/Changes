@@ -1,0 +1,13 @@
+0.03 2020-12-22T13:19:25+01:00
+ - Add check for objects to print.
+ - Add documentation.
+ - Remove TODOs from Print doc.
+
+0.02 2020-12-19T11:38:38+01:00
+ - Add basic tests.
+ - Improve printing of Catalog to way, that no printing of users and
+   month/year if doesnt' exist.
+ - Optimization in creating of Indent object.
+
+0.01 2020-12-19T11:10:18+01:00
+ - First version.

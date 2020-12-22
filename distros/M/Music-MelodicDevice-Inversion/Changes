@@ -1,5 +1,12 @@
 Revision history for Music-MelodicDevice-Inversion
 
+0.0300 2020-12-19 18:44:47
+    - Find enharmonic pitches if not found the 1st time.
+
+0.0200 2020-12-19 07:01:09
+    - Remove the redundant "chromatic" logic.
+    - Drop the dependency on Music::Note.
+
 0.0106 2020-12-16 05:07:12
     - Add the eg/tandem program à la Schönberg.
 

@@ -230,6 +230,7 @@ Hoblitt
 Hong
 Hong_Kong
 Honolulu
+Horsfall
 Hovd
 IM
 Iain
@@ -330,6 +331,7 @@ Marino
 Marquesas
 Martinique
 Matamoros
+Matthew
 Mauritius
 Mawson
 Mayen
@@ -596,4 +598,5 @@ subclasses
 timezones
 uk
 versa
+wolfsage
 wyant

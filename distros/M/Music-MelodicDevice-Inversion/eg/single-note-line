@@ -28,7 +28,7 @@ my @notes;
 
 for my $i (1 .. 4) {
     if ($i % 2 == 0) {
-        @notes = @{ $md->invert($scale_note . 5, \@notes) };
+        @notes = @{ $md->invert($notes[0], \@notes) };
     }
     else {
         @notes = map { $scale[int rand @scale] } 1 .. 4;

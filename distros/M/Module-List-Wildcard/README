@@ -1,11 +1,13 @@
 NAME
-    Module::List::Wildcard - A fork of Module::List that supports wildcard
+    Module::List::Wildcard - A fork of Module::List that groks wildcard
 
 VERSION
-    This document describes version 0.004005 of Module::List::Wildcard (from
-    Perl distribution Module-List-Wildcard), released on 2019-09-03.
+    This document describes version 0.004006 of Module::List::Wildcard (from
+    Perl distribution Module-List-Wildcard), released on 2020-09-21.
 
 SYNOPSIS
+    Use like you would Module::List, e.g.:
+
      use Module::List::Wildcard qw(list_modules);
 
      $id_modules = list_modules("Data::ID::", { list_modules => 1});
@@ -31,12 +33,6 @@ DESCRIPTION
         11ms vs 39ms).
 
         Path separator is hard-coded as "/".
-
-    *   Recognize "all" option
-
-        If set to true and "return_path" is also set to true, will return
-        all found paths for each module instead of just the first found one.
-        The values of result will be an arrayref containing all found paths.
 
     *   Recognize "wildcard" option
 
@@ -102,15 +98,13 @@ BUGS
     to an existing test-file that illustrates the bug or desired feature.
 
 SEE ALSO
-    Module::List
-
-    Other forks: Module::List::Tiny
+    Module::List, Module::List::Tiny, Module::List::More
 
 AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2019 by perlancar@cpan.org.
+    This software is copyright (c) 2020, 2019 by perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

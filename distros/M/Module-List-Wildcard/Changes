@@ -1,3 +1,11 @@
-0.004005  2019-09-03  Released-By: PERLANCAR
+0.004006  2020-09-21  Released-By: PERLANCAR; Urgency: low
 
-          - First release, renamed from PERLANCAR-Module-List.
+	  - No functional changes.
+
+	  - [doc] Mention Module::List::More, remove mention to
+	    PERLANCAR::Module::List.
+
+
+0.004001 2019-09-12  Released-By: PERLANCAR
+
+         - First release, spun out of PERLANCAR-Module-List.

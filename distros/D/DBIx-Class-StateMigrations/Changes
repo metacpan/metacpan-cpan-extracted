@@ -1,5 +1,13 @@
 Revision history for perl module DBIx::Class::StateMigrations
 
+0.002 2020-12-19
+   - Misc bugfixes
+   - Lots of smarter error handing of loaded migrations
+   - Better blank migration creation
+   - Make it easy to remove 'DiffState' from generated migration (for smaller size)
+   - README.txt file created in routines directory for new/blank migrations
+   - Still considered EXPERIMENTAL non-production ready
+
 0.001 2020-11-24
    - EXPERIMENTAL non-production ready release (VANSTYN)
 

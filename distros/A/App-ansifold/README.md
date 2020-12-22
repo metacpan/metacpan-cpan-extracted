@@ -4,13 +4,13 @@ ansifold - fold command handling ANSI terminal sequences
 
 # VERSION
 
-Version 1.04
+Version 1.05
 
 # SYNOPSIS
 
 ansifold \[ options \]
 
-    -w#, --width=#                Folding width (default 70)
+    -w#, --width=#                Folding width (default 72)
          --boundary=word          Fold on word boundary
          --padding                Padding to margin space
          --padchar=_              Padding character
@@ -22,6 +22,10 @@ ansifold \[ options \]
          --runin                  Run-in width (default 4)
          --runout                 Run-out width (default 4)
     -s,  --smart                  Short cut for --boundary=word --linebreak=all
+         --expand[=mode]          Expand tabs
+         --tabstop=n              Tab-stop position (default 8)
+         --tabhead=char           Tab-head character (default space)
+         --tabspace=char          Tab-space character (default space)
 
 # DESCRIPTION
 
@@ -29,7 +33,7 @@ ansifold \[ options \]
 [Text::ANSI::Fold](https://metacpan.org/pod/Text::ANSI::Fold) module, which enables to handle ANSI terminal
 sequences and Unicode multibyte characters properly.
 
-It folds lines in 70 column by default.  Use option **-w** to change
+It folds lines in 72 column by default.  Use option **-w** to change
 the folding width.
 
     $ ansifold -w132
@@ -61,6 +65,20 @@ Single field is used repeatedly for the same line, but multiple fields
 are not.  Put comma at the end of single field to discard the rest:
 
     ansifold -w 80,
+
+Option `-w 80,` is equivalent to `-w 80,0`.  Zero width is ignored
+when seen as a final number, but not ignored otherwise.
+
+If the final width is negative, it is not discarded but takes all the
+rest instead.  So next commands do the same thing.
+
+    $ colrm 7 10
+
+    $ ansifold -nw 6,-4,-1
+
+Next command implements ANSI/Unicode aware [expand(1)](http://man.he.net/man1/expand) command.
+
+    $ ansifold -w -1 --expand
 
 Number description is handled by [Getopt::EX::Numbers](https://metacpan.org/pod/Getopt::EX::Numbers) module, and
 consists of `start`, `end`, `step` and `length` elements.  For
@@ -105,11 +123,35 @@ Option **--smart** (or simply **-s**) is shortcut for
 "**--boundary=word** **--linebreak=all**" and enables all smart text
 formatting capability.
 
+# TAB EXPANSION
+
+Option **--expand** enables tab character expansion.  Each tab
+character is converted to **tabhead** and following **tabspace**
+characters (both are space by default).  They can be specified by
+**--tabhead** and **--tabspace** option.  If the option value is longer
+than single characger, it is evaluated as unicode name.  Next example
+makes tab character visible keeping text layout.
+
+    $ ansifold --expand --tabhead="MEDIUM SHADE" --tabspace="LIGHT SHADE"
+
+Option **--expand** also takes option of pre-defined names.  Currently
+these names are available.
+
+    dot    => [ '.', '.' ],
+    symbol => [ "\N{SYMBOL FOR HORIZONTAL TABULATION}", ' ' ],
+    shade  => [ "\N{MEDIUM SHADE}", "\N{LIGHT SHADE}" ],
+
+You can use like this:
+
+    $ ansifold --expand=symbol
+
 # SEE ALSO
 
 [ansifold](https://github.com/kaz-utashiro/ansifold)
 
 [Text::ANSI::Fold](https://github.com/kaz-utashiro/Text-ANSI-Fold)
+
+[Text::ANSI::Fold::Util](https://github.com/kaz-utashiro/Text-ANSI-Fold-Util)
 
 [Getopt::EX::Numbers](https://metacpan.org/pod/Getopt::EX::Numbers)
 
@@ -119,7 +161,7 @@ W3C Working Group Note 3 April 2012
 
 # LICENSE
 
-Copyright (C) 2018- Kazumasa Utashiro
+Copyright 2018- Kazumasa Utashiro
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

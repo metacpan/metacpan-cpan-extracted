@@ -98,7 +98,6 @@ use Dist::CheckConflicts
         Params::Util
         Scalar::Util
         Sub::Exporter
-        Sub::Identify
         Sub::Name
         Try::Tiny
         parent

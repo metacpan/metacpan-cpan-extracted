@@ -6,9 +6,10 @@ use vars qw( @ISA $VERSION );
 
 use Wiki::Toolkit::Store::Database;
 use Carp qw/carp croak/;
+use Digest::SHA1 qw/ sha1_hex /;
 
 @ISA = qw( Wiki::Toolkit::Store::Database );
-$VERSION = 0.05;
+$VERSION = 0.06;
 
 =head1 NAME
 
@@ -74,8 +75,9 @@ sub check_and_write_node {
 sub _lock_node {
     my ($self, $node) = @_;
     my $dbh = $self->{_dbh};
-    $node = $dbh->quote($node);
-    my $sql = "SELECT GET_LOCK($node, 10)";
+    # SHA1 the node name to make sure the lock name isn't >64 characters.
+    my $lock_name = $dbh->quote( sha1_hex( $node ) );
+    my $sql = "SELECT GET_LOCK( $lock_name, 10 )";
     my $sth = $dbh->prepare($sql);
     $sth->execute or croak $dbh->errstr;
     my $locked = $sth->fetchrow_array;
@@ -87,8 +89,8 @@ sub _lock_node {
 sub _unlock_node {
     my ($self, $node) = @_;
     my $dbh = $self->{_dbh};
-    $node = $dbh->quote($node);
-    my $sql = "SELECT RELEASE_LOCK($node)";
+    my $lock_name = $dbh->quote( sha1_hex( $node ) );
+    my $sql = "SELECT RELEASE_LOCK( $lock_name )";
     my $sth = $dbh->prepare($sql);
     $sth->execute or croak $dbh->errstr;
     my $unlocked = $sth->fetchrow_array;

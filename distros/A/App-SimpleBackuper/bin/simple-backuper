@@ -176,9 +176,19 @@ elsif($command eq 'backup') {
 			print "Top ".@{ $state{heaviweightest_files} }." heaviweightest files:\n";
 			printf "% 10s\t%s\n", fmt_weight($_->{weight}), $_->{path} foreach @{ $state{heaviweightest_files} };
 		}
+        
+        if($state{deletions_stats}) {
+            printf "To free up space deleted: %s of %d versions of %d files\n",
+                fmt_weight($state{deletions_stats}->{bytes}),
+                $state{deletions_stats}->{versions},
+                $state{deletions_stats}->{files},
+                ;
+        }
 	}
 	
 	App::SimpleBackuper::StorageCheck(\%options, \%state);
+    
+    exit -1 if $state{fails};
 }
 elsif($command eq 'info') {
 	use Fcntl ':mode'; # For S_ISDIR & same	

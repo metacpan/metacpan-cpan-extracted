@@ -65,20 +65,20 @@ Zing::Types
 =attributes
 
 cleanup: ro, opt, Str
-data: ro, opt, Str
-journal: ro, opt, Str
-log: ro, opt, Str
-logic: ro, opt, Str
-loop: ro, opt, Str
-mailbox: ro, opt, Str
-name: ro, opt, Str
-node: ro, opt, Str
-parent: ro, opt, Str
-registry: ro, opt, Str
-server: ro, opt, Str
-signals: ro, opt, Str
-started: ro, opt, Str
-stopped: ro, opt, Str
+data: ro, opt, Data
+journal: ro, opt, Channel
+log: ro, opt, Logger
+logic: ro, opt, Logic
+loop: ro, opt, Loop
+mailbox: ro, opt, Mailbox
+meta: ro, opt, Meta
+name: ro, opt, Name
+parent: ro, opt, Maybe[Process]
+pid: ro, opt, Int
+signals: ro, opt, HashRef[Str|CodeRef]
+started: ro, opt, Int
+stopped: ro, opt, Int
+tag: ro, opt, Str
 
 =cut
 
@@ -406,16 +406,13 @@ $subs->example(-1, 'execute', 'method', fun($tryable) {
 
 $subs->example(-1, 'metadata', 'method', fun($tryable) {
   ok my $result = $tryable->result;
-  my $global = qr/zing:main:global/;
-  my $local = qr/zing:main:local\(\d+\.\d+\.\d+\.\d+\)/;
-  my $process = qr/\d+\.\d+\.\d+\.\d+:\d+:\d+:\d+/;
-  like $result->{data}, qr/$local:data:$process/;
-  like $result->{mailbox}, qr/$global:mailbox:$process/;
-  like $result->{name}, $process;
-  like $result->{node}, qr/\d+:\d+/;
+  like $result->{data}, qr/zing:main:global:data:\w{40}/;
+  like $result->{mailbox}, qr/zing:main:global:mailbox:\w{40}/;
+  like $result->{name}, qr/\w{40}/;
+  like $result->{host}, qr/.+/;
   ok !$result->{parent};
   like $result->{process}, qr/\d+/;
-  like $result->{server}, qr/\d+\.\d+\.\d+\.\d+/;
+  ok !$result->{tag};
   $result
 });
 
@@ -499,9 +496,7 @@ $subs->example(-1, 'spawn', 'method', fun($tryable) {
 
 $subs->example(-1, 'term', 'method', fun($tryable) {
   ok my $result = $tryable->result;
-  my $local = qr/zing:main:local\(\d+\.\d+\.\d+\.\d+\)/;
-  my $process = qr/\d+\.\d+\.\d+\.\d+:\d+:\d+:\d+/;
-  like $result, qr/$local:process:$process/;
+  like $result, qr/zing:main:global:process:\w{40}/;
 
   $result
 });

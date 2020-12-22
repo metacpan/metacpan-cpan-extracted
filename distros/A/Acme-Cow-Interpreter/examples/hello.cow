@@ -30,13 +30,6 @@
 #   This library is free software; you can redistribute it and/or modify
 #   it under the same terms as Perl itself, either Perl version 5.8.0 or,
 #   at your option, any later version of Perl 5 you may have available.
-#
-# AUTHOR
-#
-#   Author:      Peter John Acklam
-#   Time-stamp:  2010-03-27 12:51:14 +01:00
-#   E-mail:      pjacklam@online.no
-#   URL:         http://home.online.no/~pjacklam
 
 # increment the value of the first memory block to 72 (ordinal value of "H")
 
@@ -172,7 +165,3 @@ MoO MoO MoO MoO MoO MoO MoO MoO MoO MoO
 # print the LF/newline
 
 Moo
-
-# Emacs Local Variables:
-# Emacs mode: sh
-# Emacs End:

@@ -120,7 +120,7 @@ $subs->scenario('perform', fun($tryable) {
 
 $subs->scenario('receive', fun($tryable) {
   ok my $result = $tryable->result;
-  like $result->[0], qr/^\d+\.\d+\.\d+\.\d+:\d+:\d+:\d+$/;
+  like $result->[0], qr/^\w{40}$/;
   is_deeply $result->[1], { task => 'fuzzy_logic' };
 
   $result

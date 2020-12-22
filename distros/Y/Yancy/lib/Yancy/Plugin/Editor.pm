@@ -1,5 +1,5 @@
 package Yancy::Plugin::Editor;
-our $VERSION = '1.067';
+our $VERSION = '1.068';
 # ABSTRACT: Yancy content editor, admin, and management application
 
 #pod =head1 SYNOPSIS
@@ -184,7 +184,7 @@ use Mojo::Base 'Mojolicious::Plugin';
 use Mojo::JSON qw( true false );
 use Mojo::Util qw( url_escape );
 use Sys::Hostname qw( hostname );
-use Yancy::Util qw( derp currym );
+use Yancy::Util qw( derp currym json_validator );
 
 has moniker => 'editor';
 has route =>;
@@ -254,18 +254,13 @@ sub register {
         route => $route->any( '/api' )->to( backend => $self->backend )->name( 'yancy.api' ),
         spec => $spec,
         default_response_name => '_Error',
+        validator => json_validator(),
     } );
     $app->helper( 'yancy.openapi' => sub {
         derp 'yancy.openapi helper is deprecated. Use yancy.editor.openapi instead';
         return $openapi;
     } );
     $app->helper( $self->_helper_name( 'openapi' ) => sub { $openapi } );
-
-    # Add supported formats to silence warnings from JSON::Validator
-    my $formats = $openapi->validator->formats;
-    $formats->{ password } = sub { undef };
-    $formats->{ markdown } = sub { undef };
-    $formats->{ tel } = sub { undef };
 
     # Do some sanity checks on the config to make sure nothing bad
     # happens
@@ -701,7 +696,7 @@ Yancy::Plugin::Editor - Yancy content editor, admin, and management application
 
 =head1 VERSION
 
-version 1.067
+version 1.068
 
 =head1 SYNOPSIS
 

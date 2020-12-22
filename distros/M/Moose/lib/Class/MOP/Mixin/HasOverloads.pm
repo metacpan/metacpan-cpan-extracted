@@ -1,5 +1,5 @@
 package Class::MOP::Mixin::HasOverloads;
-our $VERSION = '2.2013';
+our $VERSION = '2.2014';
 
 use strict;
 use warnings;
@@ -8,7 +8,6 @@ use Class::MOP::Overload;
 
 use Devel::OverloadInfo 0.005 'overload_info', 'overload_op_info';
 use Scalar::Util 'blessed';
-use Sub::Identify 'sub_name', 'stash_name';
 
 use overload ();
 
@@ -66,11 +65,12 @@ sub add_overloaded_operator {
         $overload = Class::MOP::Overload->new(%p);
     }
     elsif ( !blessed $overload) {
+        my ($coderef_package, $coderef_name) = Class::MOP::get_code_info($overload);
         $overload = Class::MOP::Overload->new(
             operator        => $op,
             coderef         => $overload,
-            coderef_name    => sub_name($overload),
-            coderef_package => stash_name($overload),
+            coderef_name    => $coderef_name,
+            coderef_package => $coderef_package,
             %p,
         );
     }
@@ -179,7 +179,7 @@ Class::MOP::Mixin::HasOverloads - Methods for metaclasses which have overloads
 
 =head1 VERSION
 
-version 2.2013
+version 2.2014
 
 =head1 DESCRIPTION
 
@@ -193,7 +193,7 @@ API details.
 
 =item *
 
-Stevan Little <stevan.little@iinteractive.com>
+Stevan Little <stevan@cpan.org>
 
 =item *
 
@@ -201,11 +201,11 @@ Dave Rolsky <autarch@urth.org>
 
 =item *
 
-Jesse Luehrs <doy@tozt.net>
+Jesse Luehrs <doy@cpan.org>
 
 =item *
 
-Shawn M Moore <code@sartak.org>
+Shawn M Moore <sartak@cpan.org>
 
 =item *
 
@@ -221,7 +221,7 @@ Florian Ragwitz <rafl@debian.org>
 
 =item *
 
-Hans Dieter Pearcey <hdp@weftsoar.net>
+Hans Dieter Pearcey <hdp@cpan.org>
 
 =item *
 
@@ -229,7 +229,7 @@ Chris Prather <chris@prather.org>
 
 =item *
 
-Matt S Trout <mst@shadowcat.co.uk>
+Matt S Trout <mstrout@cpan.org>
 
 =back
 

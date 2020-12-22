@@ -11,84 +11,168 @@ use routines;
 use Data::Object::Class;
 use Data::Object::ClassHas;
 
-use Carp ();
+extends 'Zing::Entity';
 
 use Config;
 use File::Spec;
+use FlightRecorder;
 use POSIX;
 
-our $VERSION = '0.13'; # VERSION
+our $VERSION = '0.20'; # VERSION
 
 # ATTRIBUTES
 
-has 'app' => (
+has cartridge => (
   is => 'ro',
-  isa => 'Zing',
+  isa => 'Cartridge',
   req => 1,
 );
 
-has 'name' => (
-  is => 'ro',
-  isa => 'Str',
-  req => 1,
-);
-
-has 'log' => (
+has logger => (
   is => 'ro',
   isa => 'Logger',
   new => 1,
 );
 
-fun new_log($self) {
-  FlightRecorder->new(level => 'info')
+fun new_logger($self) {
+  $self->app->logger
 }
 
-has 'pid_dir' => (
+has journal => (
   is => 'ro',
-  isa => 'Str',
+  isa => 'Journal',
   new => 1,
 );
 
-fun new_pid_dir($self) {
-  -w $ENV{ZING_PIDDIR} ? $ENV{ZING_PIDDIR} :
-  -w $ENV{ZING_HOME} ? $ENV{ZING_HOME} :
-  -w File::Spec->curdir ? File::Spec->curdir : File::Spec->tmpdir
+fun new_journal($self) {
+  $self->app->journal(
+    level => $self->log_level,
+    verbose => $self->log_verbose,
+  )
 }
 
-has 'pid_file' => (
+has kernel => (
   is => 'ro',
-  isa => 'Str',
+  isa => 'Zing',
   new => 1,
 );
 
-fun new_pid_file($self) {
-  join '.', $self->name, 'pid'
+fun new_kernel($self) {
+  $self->app->zing(scheme => $self->cartridge->scheme)
 }
 
-has 'pid_path' => (
+has log_filter_from => (
   is => 'ro',
   isa => 'Str',
-  new => 1,
+  opt => 1,
 );
 
-fun new_pid_path($self) {
-  File::Spec->catfile($self->pid_dir, $self->pid_file)
-}
+has log_filter_queries => (
+  is => 'ro',
+  isa => 'ArrayRef[Str]',
+  opt => 1,
+);
+
+has log_filter_tag => (
+  is => 'ro',
+  isa => 'Str',
+  opt => 1,
+);
+
+has log_level => (
+  is => 'ro',
+  isa => 'Str',
+  def => 'debug',
+);
+
+has log_reset => (
+  is => 'ro',
+  isa => 'Bool',
+  def => 0,
+);
+
+has log_verbose => (
+  is => 'ro',
+  isa => 'Bool',
+  def => 0,
+);
 
 # METHODS
 
-method execute() {
-  my $app = $self->app;
-  my $file = $self->pid_path;
+method fork() {
+  if ($Config{d_pseudofork}) {
+    $self->throw(error_fork("emulation not supported"));
+  }
+
+  my $pid = fork;
+
+  if (!defined $pid) {
+    $self->throw(error_fork("$!"));
+  }
+  elsif ($pid == 0) {
+    $self->throw(error_fork("terminal detach failed")) if POSIX::setsid() < 0;
+    $self->kernel->start; # child
+    unlink $self->cartridge->pidfile;
+    POSIX::_exit(0);
+  }
+
+  return $pid;
+}
+
+method logs(CodeRef $callback) {
+  my $journal = $self->journal;
+
+  if ($self->log_reset) {
+    $journal->reset;
+  }
+
+  $journal->stream(fun ($info, $data, $lines) {
+    my $cont = 1;
+
+    my $from = $info->{from};
+    my $tag = $info->{data}{tag} || '--';
+
+    if (my $filter = $self->log_filter_from) {
+      $cont = 0 unless $from =~ /$filter/;
+    }
+
+    if (my $filter = $self->log_filter_tag) {
+      $cont = 0 unless $tag =~ /$filter/;
+    }
+
+    if (my $queries = $self->log_filter_queries) {
+      for my $query (@$queries) {
+        @$lines = grep /$query/, @$lines;
+      }
+    }
+
+    if ($cont) {
+      for my $line (@$lines) {
+        $callback->(join ' ', $from, ' ', $tag, ' ', $line);
+      }
+    }
+  });
+
+  return 1;
+}
+
+method restart() {
+  return $self->stop && $self->start;
+}
+
+method start() {
+  my $logger = $self->logger;
+  my $cartridge = $self->cartridge;
+  my $file = $cartridge->pidfile;
 
   if (-e $file) {
-    $self->log->fatal("pid file exists: $file");
-    return 1;
+    $logger->fatal("pid file exists: $file");
+    return 0;
   }
 
   open(my $fh, ">", "$file") or do {
-    $self->log->fatal("pid file error: $!");
-    return 1;
+    $logger->fatal("pid file error: $!");
+    return 0;
   };
 
   my ($cnt, $err) = do {
@@ -96,47 +180,62 @@ method execute() {
     (eval{chmod(0644, $file)}, $@)
   };
   if ($err) {
-    $self->log->fatal("pid file error: $err");
-    return 1;
+    $logger->fatal("pid file error: $err");
+    return 0;
   }
 
-  # launch app
   my $pid = $self->fork;
-  my $name = $self->name;
+  my $name = $cartridge->name;
 
   print $fh "$pid\n";
   close $fh;
 
-  $self->log->info("app created: $name");
-  $self->log->info("pid file created: $file");
+  $logger->info("app created: $name");
+  $logger->info("pid file created: $file");
 
-  return 0;
+  return 1;
 }
 
-method fork() {
-  my $app = $self->app;
+method stop() {
+  my $logger = $self->logger;
+  my $cartridge = $self->cartridge;
+  my $file = $cartridge->pidfile;
+  my $pid = $cartridge->pid;
 
-  if ($Config{d_pseudofork}) {
-    Carp::confess "Error on fork: fork emulation not supported";
+  unlink $file;
+
+  if (!$pid) {
+    $logger->warn("no pid in file: $file");
+  }
+  else {
+    kill 'TERM', $pid;
   }
 
-  my $pid = fork;
-
-  if (!defined $pid) {
-    Carp::confess "Error on fork: $!";
-  }
-  elsif ($pid == 0) {
-    Carp::confess "Error in fork: terminal detach failed" if POSIX::setsid() < 0;
-    $self->app->start; # child
-    unlink $self->pid_path;
-    POSIX::_exit(0);
-  }
-
-  return $pid;
+  return 1;
 }
 
-method start() {
-  exit($self->execute);
+method update() {
+  my $logger = $self->logger;
+  my $cartridge = $self->cartridge;
+  my $file = $cartridge->pidfile;
+  my $pid = $cartridge->pid;
+
+  if (!$pid) {
+    $logger->fatal("no pid in file: $file");
+    return 0;
+  }
+  else {
+    kill 'USR2', $pid;
+  }
+
+  return 1;
+}
+
+# ERRORS
+
+fun error_fork(Str $reason) {
+  code => 'error_fork',
+  message => "Error on fork: $reason",
 }
 
 1;
@@ -157,11 +256,15 @@ Daemon Process Management
 
 =head1 SYNOPSIS
 
-  use Zing;
+  use Zing::Cartridge;
   use Zing::Daemon;
 
-  my $scheme = ['MyApp', [], 1];
-  my $daemon = Zing::Daemon->new(name => 'app', app => Zing->new(scheme => $scheme));
+  my $daemon = Zing::Daemon->new(
+    cartridge => Zing::Cartridge->new(
+      name => 'example',
+      scheme => ['MyApp', [], 1],
+    )
+  );
 
   # $daemon->start;
 
@@ -169,8 +272,16 @@ Daemon Process Management
 
 =head1 DESCRIPTION
 
-This package provides the mechanisms for running a L<Zing> application as a
-daemon process.
+This package provides the mechanisms for running a L<Zing> application
+as a daemon process.
+
+=cut
+
+=head1 INHERITS
+
+This package inherits behaviors from:
+
+L<Zing::Entity>
 
 =cut
 
@@ -188,76 +299,89 @@ This package has the following attributes:
 
 =cut
 
-=head2 app
+=head2 cartridge
 
-  app(Zing)
+  cartridge(Cartridge)
 
-This attribute is read-only, accepts C<(Zing)> values, and is required.
+This attribute is read-only, accepts C<(Cartridge)> values, and is required.
 
 =cut
 
-=head2 log
+=head2 journal
 
-  log(Logger)
+  journal(Journal)
+
+This attribute is read-only, accepts C<(Journal)> values, and is optional.
+
+=cut
+
+=head2 kernel
+
+  kernel(Zing)
+
+This attribute is read-only, accepts C<(Zing)> values, and is optional.
+
+=cut
+
+=head2 log_filter_from
+
+  log_filter_from(Str)
+
+This attribute is read-only, accepts C<(Str)> values, and is optional.
+
+=cut
+
+=head2 log_filter_queries
+
+  log_filter_queries(ArrayRef[Str])
+
+This attribute is read-only, accepts C<(ArrayRef[Str])> values, and is optional.
+
+=cut
+
+=head2 log_filter_tag
+
+  log_filter_tag(Str)
+
+This attribute is read-only, accepts C<(Str)> values, and is optional.
+
+=cut
+
+=head2 log_level
+
+  log_level(Str)
+
+This attribute is read-only, accepts C<(Str)> values, and is optional.
+
+=cut
+
+=head2 log_reset
+
+  log_reset(Bool)
+
+This attribute is read-only, accepts C<(Bool)> values, and is optional.
+
+=cut
+
+=head2 log_verbose
+
+  log_verbose(Bool)
+
+This attribute is read-only, accepts C<(Bool)> values, and is optional.
+
+=cut
+
+=head2 logger
+
+  logger(Logger)
 
 This attribute is read-only, accepts C<(Logger)> values, and is optional.
-
-=cut
-
-=head2 name
-
-  name(Str)
-
-This attribute is read-only, accepts C<(Str)> values, and is required.
-
-=cut
-
-=head2 pid_dir
-
-  pid_dir(Str)
-
-This attribute is read-only, accepts C<(Str)> values, and is optional.
-
-=cut
-
-=head2 pid_file
-
-  pid_file(Str)
-
-This attribute is read-only, accepts C<(Str)> values, and is optional.
-
-=cut
-
-=head2 pid_path
-
-  pid_path(Str)
-
-This attribute is read-only, accepts C<(Str)> values, and is optional.
 
 =cut
 
 =head1 METHODS
 
 This package implements the following methods:
-
-=cut
-
-=head2 execute
-
-  execute() : Int
-
-The execute method forks the application and creates a pid file under the
-L</pid_path>.
-
-=over 4
-
-=item execute example #1
-
-  # given: synopsis
-
-  my $exit = $daemon->execute;
-
-=back
 
 =cut
 
@@ -279,20 +403,88 @@ The fork method forks the application and returns a pid.
 
 =cut
 
+=head2 restart
+
+  restart() : Bool
+
+The restart method stops and then starts the application and creates a pid file
+under the L<Zing::Cartridge/pidfile>.
+
+=over 4
+
+=item restart example #1
+
+  use FlightRecorder;
+  use Zing::Cartridge;
+  use Zing::Daemon;
+
+  my $daemon = Zing::Daemon->new(
+    logger => FlightRecorder->new(auto => undef),
+    cartridge => Zing::Cartridge->new(
+      name => 'example',
+      scheme => ['MyApp', [], 1],
+    )
+  );
+
+  $daemon->restart;
+
+=back
+
+=cut
+
 =head2 start
 
-  start() : Any
+  start() : Bool
 
-The start method executes the application and exits the program with the proper
-exit code.
+The start method forks the application and creates a pid file under the
+L<Zing::Cartridge/pidfile>.
 
 =over 4
 
 =item start example #1
 
-  # given: synopsis
+  use FlightRecorder;
+  use Zing::Cartridge;
+  use Zing::Daemon;
+
+  my $daemon = Zing::Daemon->new(
+    logger => FlightRecorder->new(auto => undef),
+    cartridge => Zing::Cartridge->new(
+      name => 'example',
+      scheme => ['MyApp', [], 1],
+    )
+  );
 
   $daemon->start;
+
+=back
+
+=cut
+
+=head2 stop
+
+  stop() : Bool
+
+The stop method stops the application and removes the pid file under the
+L<Zing::Cartridge/pidfile>.
+
+=over 4
+
+=item stop example #1
+
+  use FlightRecorder;
+  use Zing::Cartridge;
+  use Zing::Daemon;
+
+  my $daemon = Zing::Daemon->new(
+    logger => FlightRecorder->new(auto => undef),
+    cartridge => Zing::Cartridge->new(
+      name => 'example',
+      scheme => ['MyApp', [], 1],
+    )
+  );
+
+  $daemon->stop;
 
 =back
 

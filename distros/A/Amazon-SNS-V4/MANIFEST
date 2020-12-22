@@ -10,4 +10,4 @@ cpanfile
 lib/Amazon/SNS/V4.pm
 lib/Amazon/SNS/V4/Target.pm
 lib/Amazon/SNS/V4/Topic.pm
-pl.pl
+metamerge.yml

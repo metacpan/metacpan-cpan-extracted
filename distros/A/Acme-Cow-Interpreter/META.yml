@@ -1,23 +1,25 @@
---- #YAML:1.0
-name:               Acme-Cow-Interpreter
-version:            0.01
-abstract:           Cow programming language interpreter
+---
+abstract: 'Cow programming language interpreter'
 author:
-    - Peter John Acklam <pjacklam@online.no>
-license:            unknown
-distribution_type:  module
-configure_requires:
-    ExtUtils::MakeMaker:  0
+  - 'Peter John Acklam <pjacklam@gmail.com>'
 build_requires:
-    ExtUtils::MakeMaker:  0
-requires:
-    Test::More:    0
-    Test::Output:  0
-no_index:
-    directory:
-        - t
-        - inc
-generated_by:       ExtUtils::MakeMaker version 6.56
+  Test::More: '0.47'
+  Test::Output: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '6.58'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.50, CPAN::Meta::Converter version 2.150010'
+license: perl
 meta-spec:
-    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
-    version:  1.4
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Acme-Cow-Interpreter
+no_index:
+  directory:
+    - t
+    - inc
+requires: {}
+resources:
+  repository: https://github.com/pjacklam/p5-Acme-Cow-Interpreter.git
+version: '0.02'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

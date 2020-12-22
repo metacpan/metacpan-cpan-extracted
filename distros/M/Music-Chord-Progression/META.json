@@ -69,7 +69,7 @@
          "web" : "https://github.com/ology/Music-Chord-Progression"
       }
    },
-   "version" : "0.0401",
+   "version" : "0.0502",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.030002"

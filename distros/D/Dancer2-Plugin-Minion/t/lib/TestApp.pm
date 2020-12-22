@@ -4,15 +4,9 @@ use Cwd;
 use Dancer2;
 use Dancer2::Plugin::Minion;
 
-set plugins => {
-    'Minion' => {
-        dsn     => 'sqlite::memory:',
-        backend => 'SQLite',
-    },
-};
-
 add_task( foo => sub {
-    print STDERR join( ', ', @_ ) . "\n";
+    my $job = shift;
+    return join( ', ', @_ ) . "\n";
 });
 
 get '/' => sub {

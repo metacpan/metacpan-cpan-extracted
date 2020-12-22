@@ -44,7 +44,7 @@ method: term
 
   my $keyval = Zing::KeyVal->new(name => 'notes');
 
-  # $keyval->recv('today');
+  # $keyval->recv;
 
 =cut
 
@@ -79,13 +79,13 @@ blocking-fetch from the store.
 
 =signature poll
 
-poll(Str $key) : Poll
+poll() : Poll
 
 =example-1 poll
 
   # given: synopsis
 
-  $keyval->poll('today');
+  $keyval->poll;
 
 =cut
 
@@ -95,21 +95,21 @@ The recv method fetches the data (if any) from the store.
 
 =signature recv
 
-recv(Str $key) : Maybe[HashRef]
+recv() : Maybe[HashRef]
 
 =example-1 recv
 
   # given: synopsis
 
-  $keyval->recv('today');
+  $keyval->recv;
 
 =example-2 recv
 
   # given: synopsis
 
-  $keyval->send('today', { status => 'happy' });
+  $keyval->send({ status => 'happy' });
 
-  $keyval->recv('today');
+  $keyval->recv;
 
 =cut
 
@@ -119,13 +119,13 @@ The send method commits data to the store overwriting any existing data.
 
 =signature send
 
-send(Str $key, HashRef $value) : Str
+send(HashRef $value) : Str
 
 =example-1 send
 
   # given: synopsis
 
-  $keyval->send('today', { status => 'happy' });
+  $keyval->send({ status => 'happy' });
 
 =example-2 send
 
@@ -133,7 +133,7 @@ send(Str $key, HashRef $value) : Str
 
   $keyval->drop;
 
-  $keyval->send('today', { status => 'happy' });
+  $keyval->send({ status => 'happy' });
 
 =cut
 
@@ -143,13 +143,13 @@ The term method generates a term (safe string) for the datastore.
 
 =signature term
 
-term(Str @keys) : Str
+term() : Str
 
 =example-1 term
 
   # given: synopsis
 
-  $keyval->term('today');
+  $keyval->term;
 
 =cut
 
@@ -200,7 +200,7 @@ $subs->example(-2, 'send', 'method', fun($tryable) {
 
 $subs->example(-1, 'term', 'method', fun($tryable) {
   ok my $result = $tryable->result;
-  like $result, qr/:today$/;
+  like $result, qr/zing:main:global:keyval:notes/;
 
   $result
 });

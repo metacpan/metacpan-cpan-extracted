@@ -1,3 +1,20 @@
+0.060	- 2020-12-21,  H.Merijn Brand
+    * Use sysctl on Darwin
+    * Compare to Devel::Platform::Info
+    * Add CentOS-7.7
+    * Add openSUSE Leap 15.1
+    * Add Oracle Linux 7.7
+    * Add CentOS 8.1
+    * It's 2020
+    * Add Oracle Linux 7.8
+    * Prevent false negative CPANTESTERS fail reports
+    * Add CentOS 8.2
+    * Add openSUSE-15.2
+    * Add CentOS 7.8
+    * Add CentOS 7.9
+    * Add Oracle Linux 7.9
+    * Fix META issue for bugtracker
+
 0.059	- 2019-07-11,  H.Merijn Brand
     * Add CentOS 7.5
     * Add DSM-6.2

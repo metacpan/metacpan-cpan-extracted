@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-
+use 5.016;
 
 use ExtUtils::MakeMaker;
 
@@ -14,6 +14,7 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "Dancer2-Plugin-Minion",
   "LICENSE" => "perl",
+  "MIN_PERL_VERSION" => "5.016",
   "NAME" => "Dancer2::Plugin::Minion",
   "PREREQ_PM" => {
     "Dancer2" => "0.200000",
@@ -21,10 +22,11 @@ my %WriteMakefileArgs = (
   },
   "TEST_REQUIRES" => {
     "Minion::Backend::SQLite" => 0,
+    "Mojolicious::Plugin::Minion::Admin" => 0,
     "Test::More" => "0.92",
     "Test::WWW::Mechanize::PSGI" => 0
   },
-  "VERSION" => "0.3.1",
+  "VERSION" => "0.3.3",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -35,6 +37,7 @@ my %FallbackPrereqs = (
   "Dancer2" => "0.200000",
   "Minion" => 0,
   "Minion::Backend::SQLite" => 0,
+  "Mojolicious::Plugin::Minion::Admin" => 0,
   "Test::More" => "0.92",
   "Test::WWW::Mechanize::PSGI" => 0
 );

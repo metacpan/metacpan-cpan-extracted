@@ -19,8 +19,11 @@ sub _BlockDelete {
 		my $full_path = shift @$block_files;
 		my $file = $files->find_all({parent_id => $parent_id, id => $id})->[0];
 		
+        my $found;
 		foreach my $version ( @{ $file->{versions} } ) {
 			next if $version->{block_id} != $block->{id};
+            
+            $found = 1;
 			
 			if($options->{verbose}) {
 				print "\t\t\tDeleting $full_path from ".
@@ -32,7 +35,11 @@ sub _BlockDelete {
 					)."\n";
 			}
 			
-			$parts2delete{ $_->{hash} } = $_ foreach @{ $version->{parts} };
+            foreach my $part ( @{ $version->{parts} } ) {
+			    $parts2delete{ $part->{hash} } = $part;
+                $state->{deletions_stats}->{bytes} += $part->{size};
+            }
+            $state->{deletions_stats}->{versions}++;
 			
 			
 			foreach my $backup_id ( $version->{backup_id_min} .. $version->{backup_id_max} ) {
@@ -46,15 +53,19 @@ sub _BlockDelete {
 				}
 			}
 		}
-		
-		# Delete version
-		@{ $file->{versions} } = grep {$_->{block_id} != $block->{id}} @{ $file->{versions} };
-		
-		if( @{ $file->{versions} } ) {
-			$files->upsert({parent_id => $parent_id, id => $id}, $file);
-		} else {
-			$files->delete({parent_id => $parent_id, id => $id});
-		}
+        
+        if($found) {
+            $state->{deletions_stats}->{files}++;
+            
+            # Delete version
+            @{ $file->{versions} } = grep {$_->{block_id} != $block->{id}} @{ $file->{versions} };
+            
+            if( @{ $file->{versions} } ) {
+                $files->upsert({parent_id => $parent_id, id => $id}, $file);
+            } else {
+                $files->delete({parent_id => $parent_id, id => $id});
+            }
+        }
 	}
 	$state->{profile}->{db_delete_all_from_block} += time;
 	

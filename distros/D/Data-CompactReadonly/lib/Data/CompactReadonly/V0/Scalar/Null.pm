@@ -1,5 +1,5 @@
 package Data::CompactReadonly::V0::Scalar::Null;
-our $VERSION = '0.0.3';
+our $VERSION = '0.0.4';
 
 use warnings;
 use strict;
@@ -10,6 +10,7 @@ sub _create {
     my $fh = $args{fh};
     $class->_stash_already_seen(%args);
     print $fh $class->_type_byte_from_class();
+    $class->_set_next_free_ptr(%args);
 }
 
 sub _init { return undef; }

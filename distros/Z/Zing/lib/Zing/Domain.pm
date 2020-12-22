@@ -13,11 +13,9 @@ use Data::Object::ClassHas;
 
 extends 'Zing::Channel';
 
-use Zing::Term;
-
 use Scalar::Util ();
 
-our $VERSION = '0.13'; # VERSION
+our $VERSION = '0.20'; # VERSION
 
 # ATTRIBUTES
 
@@ -34,7 +32,9 @@ fun new_metadata($self) {
 # BUILDERS
 
 fun BUILD($self) {
-  $self->{cursor}-- if $self->{cursor};
+  $self->{position} = $self->size;
+
+  $self->{position}-- if $self->{position};
 
   return $self->apply;
 }
@@ -66,6 +66,25 @@ sub _copy {
   }
 }
 
+sub _merge {
+  my ($a_data, $b_data) = @_;
+
+  return $a_data unless defined $b_data;
+
+  for my $key (keys %$b_data) {
+    my ($x, $y) = map { ref $_->{$key} eq 'HASH' } $b_data, $a_data;
+
+    if ($x and $y) {
+      $a_data->{$key} = _merge($a_data->{$key}, $b_data->{$key});
+    }
+    else {
+      $a_data->{$key} = $b_data->{$key};
+    }
+  }
+
+  return $a_data;
+}
+
 # METHODS
 
 method apply() {
@@ -74,10 +93,10 @@ method apply() {
   while (my $data = $self->recv) {
     my $op = $data->{op};
     my $key = $data->{key};
-    my $val = $data->{val};
+    my $val = $data->{value};
 
-    if ($data->{snapshot} && !$self->{state}) {
-      $self->{state} = _copy($data->{snapshot});
+    if ((not defined $self->{state}) && %{$data->{snapshot}}) {
+      $self->restore($data);
     }
 
     local $@;
@@ -90,6 +109,9 @@ method apply() {
     }
     elsif ($op eq 'incr') {
       eval{($self->state->{$key} //= 0 ) += ($val->[0] // 0)};
+    }
+    elsif ($op eq 'merge') {
+      eval{_merge(($self->state->{$key} //= {}), $val->[0])};
     }
     elsif ($op eq 'pop') {
       eval{CORE::pop @{$self->state->{$key}}};
@@ -107,19 +129,23 @@ method apply() {
       eval{CORE::unshift @{$self->state->{$key}}, @$val};
     }
 
+    if (%{$data->{metadata}}) {
+      $self->{metadata} = _copy($data->{metadata});
+    }
+
     $self->emit($key, $data);
   }
 
   return $self;
 }
 
-method change(Str $op, Str $key, Any @val) {
+method change(Str $op, Str $key, Any @value) {
   my %fields = (
     key => $key,
     metadata => $self->metadata,
-    snapshot => _copy($self->state),
+    snapshot => $self->snapshot,
     time => time,
-    val => [@val],
+    value => [@value],
   );
 
   if ($op eq 'decr') {
@@ -130,6 +156,9 @@ method change(Str $op, Str $key, Any @val) {
   }
   elsif ($op eq 'incr') {
     $self->send({ %fields, op => 'incr' });
+  }
+  elsif ($op eq 'merge') {
+    $self->send({ %fields, op => 'merge' });
   }
   elsif ($op eq 'pop') {
     $self->send({ %fields, op => 'pop' });
@@ -153,8 +182,8 @@ method change(Str $op, Str $key, Any @val) {
   return $self->apply;
 }
 
-method decr(Str $key, Int $val = 1) {
-  return $self->apply->change('decr', $key, $val);
+method decr(Str $key, Int $value = 1) {
+  return $self->apply->change('decr', $key, $value);
 }
 
 method del(Str $key) {
@@ -195,24 +224,36 @@ method ignore(Str $key, Maybe[CodeRef] $sub) {
   return $self;
 }
 
-method incr(Str $key, Int $val = 1) {
-  return $self->apply->change('incr', $key, $val);
+method incr(Str $key, Int $value = 1) {
+  return $self->apply->change('incr', $key, $value);
+}
+
+method merge(Str $key, HashRef $value) {
+  return $self->apply->change('merge', $key, $value);
 }
 
 method pop(Str $key) {
   return $self->apply->change('pop', $key);
 }
 
-method push(Str $key, Any @val) {
-  return $self->apply->change('push', $key, @val);
+method push(Str $key, Any @value) {
+  return $self->apply->change('push', $key, @value);
 }
 
-method set(Str $key, Any $val) {
-  return $self->apply->change('set', $key, $val);
+method restore(HashRef $data) {
+  return $self->{state} = _copy($data->{snapshot});
+}
+
+method set(Str $key, Any $value) {
+  return $self->apply->change('set', $key, $value);
 }
 
 method shift(Str $key) {
   return $self->apply->change('shift', $key);
+}
+
+method snapshot() {
+  return _copy($self->state);
 }
 
 method state() {
@@ -228,11 +269,11 @@ method listen(Str $key, CodeRef $sub) {
 }
 
 method term() {
-  return Zing::Term->new($self)->domain;
+  return $self->app->term($self)->domain;
 }
 
-method unshift(Str $key, Any @val) {
-  return $self->apply->change('unshift', $key, @val);
+method unshift(Str $key, Any @value) {
+  return $self->apply->change('unshift', $key, @value);
 }
 
 1;
@@ -609,6 +650,57 @@ specified is received and applied.
   my $callback_2 = sub { my ($self, $data) = @_; $self->{event} = [$data, 2]; };
 
   $domain->listen('email', $callback_2);
+
+=back
+
+=cut
+
+=head2 merge
+
+  merge(Str $key, HashRef $val) : Object
+
+The merge method commits the data associated with a specific key to the channel
+as a partial to be merged into any existing data.
+
+=over 4
+
+=item merge example #1
+
+  # given: synopsis
+
+  $domain->merge(data => { email => 'me@example.com', username => 'me' });
+
+  $domain->merge(data => { email => 'we@example.com' });
+
+=back
+
+=over 4
+
+=item merge example #2
+
+  # given: synopsis
+
+  $domain->set(data => { username => 'we' });
+
+  $domain->merge(data => { email => 'me@example.com', username => 'me' });
+
+  $domain->merge(data => { email => 'we@example.com' });
+
+=back
+
+=over 4
+
+=item merge example #3
+
+  # given: synopsis
+
+  $domain->set(data => { username => 'we', colors => ['white'] });
+
+  $domain->merge(data => { email => 'me@example.com', username => 'me' });
+
+  $domain->merge(data => { email => 'we@example.com' });
+
+  $domain->merge(data => { colors => ['white', 'green'], username => 'we' });
 
 =back
 

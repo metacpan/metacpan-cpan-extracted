@@ -17,7 +17,7 @@ name: System-Info
 provides: 
   System::Info: 
     file: lib/System/Info.pm
-    version: '0.059'
+    version: '0.060'
   System::Info::AIX: 
     file: lib/System/Info/AIX.pm
     version: '0.050'
@@ -32,7 +32,7 @@ provides:
     version: '0.050'
   System::Info::Darwin: 
     file: lib/System/Info/Darwin.pm
-    version: '0.053'
+    version: '0.054'
   System::Info::Generic: 
     file: lib/System/Info/Generic.pm
     version: '0.050'
@@ -58,7 +58,7 @@ provides:
     file: lib/System/Info/Windows.pm
     version: '0.051'
 recommends: 
-  Test::More: '1.302164'
+  Test::More: '1.302183'
 requires: 
   POSIX: 0
   Test::More: '0.88'
@@ -66,6 +66,7 @@ requires:
   perl: '5.008003'
 resources: 
   IRC: irc://irc.perl.org/#perl-qa
+  bugtracker: https://github.com/Tux/System-Info/issues
   license: http://dev.perl.org/licenses/
   repository: https://github.com/Tux/System-Info
-version: '0.059'
+version: '0.060'

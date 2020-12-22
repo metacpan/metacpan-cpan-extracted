@@ -4,6 +4,11 @@ History for the Lab-Measurement Perl distribution
 This document is work in progress (in the sense of adding
 historical information).
 
+3.731 2020-12-18
+  * OI_Triton: ajust power ranges for temperature setters
+  * SR830: Add method to automatically set optimal input range
+  * Documentation improvements
+
 3.730 2020-11-04
   * Support Tektronix TBS1000C oscilloscope
   * Support Rigol DG5000 series waveform generator

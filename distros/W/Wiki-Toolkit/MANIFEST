@@ -60,6 +60,7 @@ t/025_list_node_all_versions.t
 t/026_schema_current.t
 t/027_list_last_version_before.t
 t/040_rename.t
+t/041_long_node_names.t
 t/050_mysql_store.t
 t/051_pg_store.t
 t/052_sqlite_store.t

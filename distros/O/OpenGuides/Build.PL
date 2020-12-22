@@ -344,7 +344,7 @@ $build->requires({
     'CGI'                                 => '4.08',  # use multi_param
     'CGI::Carp'                           => 0,
     'CGI::Cookie'                         => 0,
-    'Wiki::Toolkit'                       => '0.84',
+    'Wiki::Toolkit'                       => '0.86',
     'Wiki::Toolkit::Feed::Atom'           => 0,
     'Wiki::Toolkit::Feed::RSS'            => 0,
     'Wiki::Toolkit::Formatter::UseMod'    => 0.25, # for escape_url_commas

@@ -1,5 +1,24 @@
 Revision history for Perl extension Minion::Backend::mysql.
 
+0.23      2020-12-19 16:56:40-06:00 America/Chicago
+
+  [Fixed]
+
+  - Fixed backend committing the current transaction whenever it is
+    instanciated. This was causing problems with tests that use
+    transactions for isolation and then rollback to restore. Thanks
+    Grant Street Group for reporting this issue!
+
+0.22      2020-12-17 22:04:50-06:00 America/Chicago
+
+  [Fixed]
+
+  - Added a primary key to the dependencies table
+    (`minion_job_depends`). This helps with MySQL cluster systems (like
+    Percona XtraDB) which need primary keys in order to correctly
+    propagate writes. Thanks @nickyinhu and Grant Street Group for
+    submitting this patch! (Github #31)
+
 0.21      2020-07-31 22:55:46-05:00 America/Chicago
 
   [Fixed]

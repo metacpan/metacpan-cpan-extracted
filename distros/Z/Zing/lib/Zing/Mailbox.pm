@@ -13,34 +13,7 @@ use Data::Object::ClassHas;
 
 extends 'Zing::PubSub';
 
-use Zing::Term;
-
-our $VERSION = '0.13'; # VERSION
-
-# ATTRIBUTES
-
-has 'name' => (
-  is => 'ro',
-  isa => 'Str',
-  init_arg => undef,
-  new => 1,
-);
-
-fun new_name($self) {
-  $self->process->name
-}
-
-has 'process' => (
-  is => 'ro',
-  isa => 'Process',
-  req => 1,
-);
-
-# BUILDERS
-
-fun new_target($self) {
-  $ENV{ZING_TARGET} || 'global'
-}
+our $VERSION = '0.20'; # VERSION
 
 # METHODS
 
@@ -48,16 +21,16 @@ method recv() {
   return $self->store->lpull($self->term);
 }
 
-method message(HashRef $val) {
-  return { data => $val, from => $self->term };
+method message(HashRef $value) {
+  return { data => $value, from => $self->term };
 }
 
-method reply(HashRef $bag, HashRef $val) {
-  return $self->send($bag->{from}, $val);
+method reply(HashRef $msg, HashRef $value) {
+  return $self->send($msg->{from}, $value);
 }
 
-method send(Str $key, HashRef $val) {
-  return $self->store->rpush($self->term($key), $self->message($val));
+method send(Str $key, HashRef $value) {
+  return $self->store->rpush($self->term($key), $self->message($value));
 }
 
 method size() {
@@ -65,7 +38,7 @@ method size() {
 }
 
 method term(Maybe[Str] $name) {
-  return Zing::Term->new($name || $self)->mailbox;
+  return $self->app->term($name || $self)->mailbox;
 }
 
 1;
@@ -87,9 +60,8 @@ Interprocess Communication Mechanism
 =head1 SYNOPSIS
 
   use Zing::Mailbox;
-  use Zing::Process;
 
-  my $mailbox = Zing::Mailbox->new(process => Zing::Process->new);
+  my $mailbox = Zing::Mailbox->new(name => rand);
 
   # $mailbox->recv;
 
@@ -132,14 +104,6 @@ This attribute is read-only, accepts C<(Str)> values, and is optional.
 
 =cut
 
-=head2 process
-
-  process(Process)
-
-This attribute is read-only, accepts C<(Process)> values, and is required.
-
-=cut
-
 =head1 METHODS
 
 This package implements the following methods:
@@ -178,7 +142,7 @@ The recv method receives a single new message from the mailbox.
 
 =head2 reply
 
-  reply(HashRef $bag, HashRef $value) : Int
+  reply(HashRef $message, HashRef $value) : Int
 
 The reply method sends a message to the mailbox represented by the C<$bag>
 received and returns the size of the recipient mailbox.
@@ -191,9 +155,9 @@ received and returns the size of the recipient mailbox.
 
   $mailbox->send($mailbox->term, { status => 'hello' });
 
-  my $data = $mailbox->recv;
+  my $message = $mailbox->recv;
 
-  $mailbox->reply($data, { status => 'thank you' });
+  $mailbox->reply($message, { status => 'thank you' });
 
 =back
 

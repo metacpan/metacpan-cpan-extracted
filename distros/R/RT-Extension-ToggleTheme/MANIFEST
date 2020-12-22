@@ -1,6 +1,7 @@
 Changes
 html/Callbacks/RT-Extension-ToggleTheme/Elements/Header/MassageCSSFiles
 html/Callbacks/RT-Extension-ToggleTheme/Elements/Tabs/Privileged
+html/Callbacks/RT-Extension-ToggleTheme/Elements/Tabs/SelfService
 html/Helpers/Toggle/Theme
 inc/Module/Install.pm
 inc/Module/Install/Base.pm
@@ -21,5 +22,7 @@ MANIFEST			This list of files
 META.yml
 patches/header-callback.patch
 README
+README.md
+static/images/demo.gif
 static/js/fontawesome-icons.js
 static/js/themes.js

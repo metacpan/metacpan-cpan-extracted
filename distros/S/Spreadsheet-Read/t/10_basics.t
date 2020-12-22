@@ -3,20 +3,22 @@
 use strict;
 use warnings;
 
-use Test::More tests => 112;
+use Test::More tests => 115;
 use Test::NoWarnings;
 
 use Spreadsheet::Read qw(:DEFAULT parses rows );
 
 is (Spreadsheet::Read::Version (), $Spreadsheet::Read::VERSION, "Version check");
 
-is (parses (undef),   0, "No sheet type");
+ok (my @ext = parses (undef), "No sheet type");
+is_deeply ([ grep m/^sc/ => @ext ], [ "sc" ], "Supports Squirrelcalc");
+
 is (parses ("xyzzy"), 0, "Unknown sheet type");
 
 is (parses ("xls"), parses ("excel"),      "Excel alias type");
 is (parses ("ods"), parses ("oo"),         "OpenOffice alias type 1");
 is (parses ("ods"), parses ("OpenOffice"), "OpenOffice alias type 2");
-is (parses ("prl"), parses ("perl"),       "Perl alias type");
+is (parses ("sc"),  parses ("scalc"),      "SquirrelCalc alias type");
 
 foreach my $x ([ "A1",              1,      1 ],
                [ "Z26",            26,     26 ],
@@ -105,3 +107,9 @@ for (undef, "", " ", 0, 1, [], {}) {
     my $arg = defined $_ ? $_ : "-- undef --";
     is ($ref, undef, "Illegal ReadData ({ $arg })");
     }
+
+my $sr = "Spreadsheet::Read";
+ok (my @p = $sr->parsers (), "Parser info");
+is_deeply ((grep { $_->{ext} eq "sc" } @p)[0],
+    { ext => "sc", min => "0.01", mod => $sr, vsn => $sr->VERSION, def => "*" },
+    "SquirrelCalc is internal");

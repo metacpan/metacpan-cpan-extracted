@@ -12,14 +12,12 @@ use Data::Object::Class;
 
 extends 'Zing::PubSub';
 
-use Zing::Term;
-
-our $VERSION = '0.13'; # VERSION
+our $VERSION = '0.20'; # VERSION
 
 # BUILDERS
 
 fun BUILD($self) {
-  $self->{cursor} = $self->size;
+  $self->{position} = $self->size;
 
   return $self;
 }
@@ -27,23 +25,23 @@ fun BUILD($self) {
 # METHODS
 
 method recv() {
-  $self->{cursor}++ if (
-    my $data = $self->store->slot($self->term, int($self->{cursor}))
+  $self->{position}++ if (
+    my $data = $self->store->slot($self->term, int($self->{position}))
   );
   return $data;
 }
 
 method renew() {
-  return !($self->{cursor} = 0) if $self->{cursor} > $self->size;
+  return $self->reset if $self->{position} > $self->size;
   return 0;
 }
 
 method reset() {
-  return !($self->{cursor} = 0);
+  return !($self->{position} = 0);
 }
 
-method send(HashRef $val) {
-  return $self->store->rpush($self->term, $val);
+method send(HashRef $value) {
+  return $self->store->rpush($self->term, $value);
 }
 
 method size() {
@@ -51,7 +49,7 @@ method size() {
 }
 
 method term() {
-  return Zing::Term->new($self)->channel;
+  return $self->app->term($self)->channel;
 }
 
 1;

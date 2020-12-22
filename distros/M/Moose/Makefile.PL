@@ -17,7 +17,7 @@ check_conflicts();
 
 my %WriteMakefileArgs = (
   "ABSTRACT" => "A postmodern object system for Perl 5",
-  "AUTHOR" => "Stevan Little <stevan.little\@iinteractive.com>, Dave Rolsky <autarch\@urth.org>, Jesse Luehrs <doy\@tozt.net>, Shawn M Moore <code\@sartak.org>, \x{5d9}\x{5d5}\x{5d1}\x{5dc} \x{5e7}\x{5d5}\x{5d2}'\x{5de}\x{5df} (Yuval Kogman) <nothingmuch\@woobling.org>, Karen Etheridge <ether\@cpan.org>, Florian Ragwitz <rafl\@debian.org>, Hans Dieter Pearcey <hdp\@weftsoar.net>, Chris Prather <chris\@prather.org>, Matt S Trout <mst\@shadowcat.co.uk>",
+  "AUTHOR" => "Stevan Little <stevan\@cpan.org>, Dave Rolsky <autarch\@urth.org>, Jesse Luehrs <doy\@cpan.org>, Shawn M Moore <sartak\@cpan.org>, \x{5d9}\x{5d5}\x{5d1}\x{5dc} \x{5e7}\x{5d5}\x{5d2}'\x{5de}\x{5df} (Yuval Kogman) <nothingmuch\@woobling.org>, Karen Etheridge <ether\@cpan.org>, Florian Ragwitz <rafl\@debian.org>, Hans Dieter Pearcey <hdp\@cpan.org>, Chris Prather <chris\@prather.org>, Matt S Trout <mstrout\@cpan.org>",
   "CONFIGURE_REQUIRES" => {
     "Dist::CheckConflicts" => "0.02",
     "ExtUtils::MakeMaker" => 0
@@ -49,7 +49,6 @@ my %WriteMakefileArgs = (
     "Params::Util" => "1.00",
     "Scalar::Util" => "1.19",
     "Sub::Exporter" => "0.980",
-    "Sub::Identify" => 0,
     "Sub::Name" => "0.20",
     "Try::Tiny" => "0.17",
     "parent" => "0.223",
@@ -66,7 +65,7 @@ my %WriteMakefileArgs = (
     "Test::More" => "0.96",
     "Test::Requires" => "0.05"
   },
-  "VERSION" => "2.2013",
+  "VERSION" => "2.2014",
   "XS" => {
     "xs/Attribute.xs" => "xs/Attribute.c",
     "xs/AttributeCore.xs" => "xs/AttributeCore.c",
@@ -114,7 +113,6 @@ my %FallbackPrereqs = (
   "Params::Util" => "1.00",
   "Scalar::Util" => "1.19",
   "Sub::Exporter" => "0.980",
-  "Sub::Identify" => 0,
   "Sub::Name" => "0.20",
   "Test::CleanNamespaces" => "0.13",
   "Test::Fatal" => "0.001",

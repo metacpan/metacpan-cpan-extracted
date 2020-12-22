@@ -189,9 +189,14 @@ while ( my $wiki = $iterator->new_wiki ) {
             or die "Couldn't write Test Node";
         # "testing node" should be forced to "Testing Node"
         $wiki->rename_node( "Test Node", "testing node" );
-        ok( $wiki->retrieve_node( "Testing Node" ),
+
+        # We have to do the testing via ->list_all_nodes rather than
+        # ->retrieve_node or ->node_exists, because databases can be
+        # case-insensitive.
+        my %nodes = map { $_ => 1 } $wiki->list_all_nodes;
+        ok( $nodes{"Testing Node"},
             "New name for renamed node is forced ucfirst if we want it to be");
-        ok( !$wiki->retrieve_node( "testing node" ),
+        ok( !$nodes{"testing node"},
             "... and the non-ucfirst name is not found" );
 
         # And now check with it off.
@@ -202,10 +207,11 @@ while ( my $wiki = $iterator->new_wiki ) {
         $wiki->write_node( "Test Node Two", "Another test node" )
             or die "Couldn't write Test Node Two";
         $wiki->rename_node( "Test Node Two", "testing node two" );
-        ok( !$wiki->retrieve_node( "Testing Node Two" ),
+        %nodes = map { $_ => 1 } $wiki->list_all_nodes;
+        ok( !$nodes{"Testing Node Two"},
             "New name for renamed node isn't forced ucfirst if we don't "
             . "want it to be" );
-        ok( $wiki->retrieve_node( "testing node two" ),
+        ok( $nodes{"testing node two"},
             "... and the non-ucfirst name is found instead" );
     }
 }

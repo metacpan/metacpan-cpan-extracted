@@ -39,9 +39,8 @@ method: send
 =synopsis
 
   use Zing::Data;
-  use Zing::Process;
 
-  my $data = Zing::Data->new(process => Zing::Process->new);
+  my $data = Zing::Data->new(name => rand);
 
   # $data->recv;
 
@@ -62,7 +61,6 @@ Zing::KeyVal
 =attributes
 
 name: ro, opt, Str
-process: ro, req, Process
 
 =cut
 

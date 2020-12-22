@@ -477,6 +477,11 @@ Version 0.41, 2020-12-08
   DOC_RE_SEND meta messages
 - ecs_setup:  add support for AMQP-related configuration settings
 
+Version 0.42, 2020-12-19
+========================
+- ECS.pm: revise code to avoid "Experimental keys on scalar is now forbidden"
+  error using newer versions of Perl
+
 
 Ideas for Future Enhancements
 =============================

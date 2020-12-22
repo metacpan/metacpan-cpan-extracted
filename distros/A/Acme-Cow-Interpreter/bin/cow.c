@@ -17,11 +17,6 @@
   If you rename the Perl program to something other than
   `/usr/local/bin/cow.pl', you must change the code below
   accordingly.
-
-  Author:      Peter John Acklam
-  Time-stamp:  2010-05-26 10:45:05 +02:00
-  E-mail:      pjacklam@online.no
-  URL:         http://home.online.no/~pjacklam
 */
 
 #include <unistd.h>     /* for execv */

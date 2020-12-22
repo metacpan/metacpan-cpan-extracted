@@ -1,3 +1,10 @@
+0.04 2020-12-20T02:27:02+01:00
+ - Add check_lexeme() to Utils.
+ - Add helper to Utils and rewrite to it.
+ - Add link to Wikidata::Datatype::Struct in doc.
+ - Fix SYNOPSIS section in doc of Utils.
+ - Fix indentation in EXAMPLE in Item doc.
+
 0.03 2020-12-11T16:19:01+01:00
  - Add test for check_property().
  - Update dependency to Mo::utils 0.03, because i need support of floating

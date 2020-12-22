@@ -112,7 +112,7 @@ sub finish {
 	return if ($self->finished);
 	
 	$self->changeset_finish_ts($self->get_dt);
-	$self->changeset_elapsed(tv_interval($self->start_timeofday));
+	$self->changeset_elapsed(sprintf('%.8g',tv_interval($self->start_timeofday)));
 	
 	return $self->finished(1);
 }

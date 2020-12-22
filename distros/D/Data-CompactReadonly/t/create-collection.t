@@ -199,4 +199,12 @@ is($data->element('7.00'), 'seven point oh oh', 'trailing zeroes on strings that
 is($data->element('7.10'), 'seven point one oh', 'trailing zeroes on strings that look like floats are preserved (7.10)');
 throws_ok { $data->element(7.1) } qr/Invalid element: 7.1: doesn't exist/, "key 7.10 is not the same as key 7.1";
 
+Data::CompactReadonly->create($filename, [
+                  { aardvark => 'bat', cat => 'doge' },                 
+    [ [ 65, 66 ], { aardvark => 'bat', cat => 'doge' } ],
+      [ 65, 66 ]
+]);
+# this would be 64 without array/hash de-duping
+is((stat($filename))[7], 54, "arrays and dictionaries aren't repeated if their contents are identical");
+
 done_testing;

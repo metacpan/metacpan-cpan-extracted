@@ -786,7 +786,7 @@ sub PDL::iv_cluster {
 
 =head2 pca_cluster
 
-Assgin variables to components ie clusters based on pca loadings or scores. One way to seed kmeans (see Ding & He, 2004, and Su & Dy, 2004 for other ways of using pca with kmeans). Variables are assigned to their most associated component. Note that some components may not have any variable that is most associated with them, so the returned number of clusters may be smaller than NCOMP.
+Assign variables to components ie clusters based on pca loadings or scores. One way to seed kmeans (see Ding & He, 2004, and Su & Dy, 2004 for other ways of using pca with kmeans). Variables are assigned to their most associated component. Note that some components may not have any variable that is most associated with them, so the returned number of clusters may be smaller than NCOMP.
 
 Default options (case insensitive):
 

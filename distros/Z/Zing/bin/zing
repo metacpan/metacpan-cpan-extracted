@@ -21,7 +21,6 @@ Multi-Process Management System
 
   Commands:
 
-    clean            Prune the process registry
     install          Create an application cartridge
     logs             Tap logs and output to STDOUT
     monitor          Monitor the specified application (start if not started)
@@ -29,20 +28,19 @@ Multi-Process Management System
     restart          Restart the specified application
     start            Start the specified application
     stop             Stop the specified application
-    terms            Display resource identifiers (under specified namespace)
     update           Hot-reload application processes
 
   Options:
 
-    -I,--libdir, +1  [string] Directory for @INC
-    -P,--package     [string] Provide a process package name
     -a,--appdir      [string] Directory of the app file
     -b,--backlog     [flag] Produce log output using the backlog
     -d,--piddir      [string] Directory for the pid file
-    -g,--global      [flag] Tap the "global" log channel (defaults to "local")
     -h,--handle      [string] Provide a handle (namespace)
+    -i,--libdir, +1  [string] Directory for @INC
     -l,--level       [string] Reduce log output by log-level
+    -n,--package     [string] Provide a process package name
     -p,--process     [string] Reduce log output by process name
+    -r,--target      [string] Provide a target (package)
     -s,--search, +1  [string] Reduce log output by search string
     -t,--tag         [string] Reduce log output by process tag
     -v,--verbose     [flag] Produce verbose log output

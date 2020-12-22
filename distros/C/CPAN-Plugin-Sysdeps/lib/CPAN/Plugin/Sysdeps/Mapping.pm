@@ -3,7 +3,7 @@ package CPAN::Plugin::Sysdeps::Mapping;
 use strict;
 use warnings;
 
-our $VERSION = '0.67';
+our $VERSION = '0.68';
 
 # shortcuts
 #  os and distros
@@ -904,7 +904,7 @@ sub mapping {
 
      [cpanmod => 'DBD::Pg',
       [os_freebsd,
-       [package => 'postgresql11-client | postgresql10-client | postgresql96-client | postgresql95-client | postgresql94-client | postgresql93-client']],
+       [package => 'postgresql12-client | postgresql11-client | postgresql10-client | postgresql96-client | postgresql95-client | postgresql94-client | postgresql93-client']],
       [os_dragonfly,
        [package => 'postgresql10-server | postgresql96-server | postgresql94-server | postgresql93-server | postgresql92-server']],
       [os_openbsd,

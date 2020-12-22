@@ -461,7 +461,7 @@ if ($do==1) {
          'make install','__display__');
    }
 }
-$do=0;
+$do=1;
 if ($do==1) { # INSTALL LATEST VERSION OF PYTHON
    ($stdout,$stderr)=$handle->cwd('/opt/source');
    ($stdout,$stderr)=$handle->cmd($sudo.
@@ -504,6 +504,9 @@ if ($do==1) { # INSTALL LATEST VERSION OF PYTHON
          '__display__');
       ($stdout,$stderr)=$handle->cmd($sudo.
          "/usr/local/bin/python$version -m pip install pyasn1-modules",
+         '__display__');
+      ($stdout,$stderr)=$handle->cmd($sudo.
+         "/usr/local/bin/python$version -m pip install meson",
          '__display__');
       ($stdout,$stderr)=$handle->cmd($sudo.
          "/usr/local/bin/python$version -m pip install --upgrade oauth2client",
@@ -1138,7 +1141,7 @@ END
       "make -f Makefile.init makefiles",'__display__');
    ($stdout,$stderr)=$handle->cmd($sudo.
       "make",'__display__');
-   $handle->print('make install');
+   $handle->print($sudo.'make install');
    $prompt=$handle->prompt();
    while (1) {
       my $output=fetch($handle);
@@ -1228,7 +1231,7 @@ END
    ($stdout,$stderr)=$handle->cmd($sudo.
       'wget -qO- https://dovecot.org/download');
    $stdout=~s/^.*?EOL statement.*?[<]a href=["]([^"]+)?["]\s.*$/$1/s;
-   my $gtarfile=$stdout;
+   $gtarfile=$stdout;
    ($stdout,$stderr)=$handle->cmd($sudo.
       "wget --random-wait --progress=dot ".$stdout,
       '__display__');
@@ -1773,6 +1776,7 @@ END
          '--with-freetype '.
          '--with-jpeg '.
          '--enable-intl '.
+         '--enable-exif '.
          '--enable-mbstring '.
          '--with-sodium '.
          '--enable-mysqlnd '.
@@ -1869,7 +1873,7 @@ END
       #          $  -   \\x24     %  -  \\x25
       #
       # https://www.lisenet.com/2014/ - bash approach to conversion
-   my $fpmsrv=<<END;
+      my $fpmsrv=<<END;
 [Unit]
 Description=The PHP FastCGI Process Manager
 After=syslog.target network.target
@@ -1936,7 +1940,102 @@ END
          "/etc/init.d/ea-php70-php-fpm start",'__display__');
    }
 
-   # http://www.theblogmaven.com/best-emailserver-plugins/
+   ($stdout,$stderr)=$handle->cwd('/opt/source');
+   my $install_roundcube=<<'END';
+
+
+          o o    o .oPYo. ooooo    .oo o     o     o o    o .oPYo.
+          8 8b   8 8        8     .P 8 8     8     8 8b   8 8    8
+          8 8`b  8 `Yooo.   8    .P  8 8     8     8 8`b  8 8
+          8 8 `b 8     `8   8   oPooo8 8     8     8 8 `b 8 8   oo
+          8 8  `b8      8   8  .P    8 8     8     8 8  `b8 8    8
+          8 8   `8 `YooP'   8 .P     8 8oooo 8oooo 8 8   `8 `YooP8
+          ........................................................
+          ::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+                                        888                888
+                                        888                888
+                                        888                888
+    888d888 .d88b. 888  88888888b.  .d88888 .d8888b888  88888888b.  .d88b.
+    888P"  d88""88b888  888888 "88bd88" 888d88P"   888  888888 "88bd8P  Y8b
+    888    888  888888  888888  888888  888888     888  888888  88888888888
+    888    Y88..88PY88b 888888  888Y88b 888Y88b.   Y88b 888888 d88PY8b.
+    888     "Y88P"  "Y88888888  888 "Y88888 "Y8888P "Y8888888888P"  "Y8888
+
+
+          (roundcube is **NOT** a sponsor of the FullAuto© Project.)
+
+
+END
+   ($stdout,$stderr)=$handle->cwd('/opt/source');
+   print $install_roundcube;
+   sleep 5;
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'wget -qO- https://roundcube.net/download/');
+   $stdout=~s/^.*?Stable version.*?href=["](https[^"]+)?["].*$/$1/s;
+   my $gtarfile=$stdout;
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      "wget --random-wait --progress=dot ".$stdout,
+      '__display__');
+   $gtarfile=~s/^.*\///;
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      "tar xvf $gtarfile",'__display__');
+   $gtarfile=~s/.tar.gz$//;
+   ($stdout,$stderr)=$handle->cwd($gtarfile);
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      "wget --random-wait --progress=dot ".
+      "https://getcomposer.org/composer-stable.phar",
+      '__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'mv composer.json-dist composer.json');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'php composer-stable.phar install --no-dev','__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'bin/install-jsdeps.sh','__display__');
+
+   ($stdout,$stderr)=$handle->cwd('/opt/source');
+   my $install_rspamd=<<'END';
+
+
+          o o    o .oPYo. ooooo    .oo o     o     o o    o .oPYo.
+          8 8b   8 8        8     .P 8 8     8     8 8b   8 8    8
+          8 8`b  8 `Yooo.   8    .P  8 8     8     8 8`b  8 8
+          8 8 `b 8     `8   8   oPooo8 8     8     8 8 `b 8 8   oo
+          8 8  `b8      8   8  .P    8 8     8     8 8  `b8 8    8
+          8 8   `8 `YooP'   8 .P     8 8oooo 8oooo 8 8   `8 `YooP8
+          ........................................................
+          ::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+
+         ########   ######  ########    ###    ##     ## ########
+         ##     ## ##    ## ##     ##  ## ##   ###   ### ##     ##
+         ##     ## ##       ##     ## ##   ##  #### #### ##     ##
+         ########   ######  ######## ##     ## ## ### ## ##     ##
+         ##   ##         ## ##       ######### ##     ## ##     ##
+         ##    ##  ##    ## ##       ##     ## ##     ## ##     ##
+         ##     ##  ######  ##       ##     ## ##     ## ########
+
+
+          (RSPAMD is **NOT** a sponsor of the FullAuto© Project.)
+
+
+END
+   ($stdout,$stderr)=$handle->cwd('/opt/source');
+   print $install_rspamd;
+   sleep 5;
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'git clone --recursive https://github.com/vstakhov/rspamd.git',
+      '__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'git clone git://github.com/ninja-build/ninja.git',
+      '__display__');
+   ($stdout,$stderr)=$handle->cwd('ninja');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'git checkout release','__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      '/usr/local/bin/cmake -Bbuild-cmake -H.','__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      '/usr/local/bin/cmake --build build-cmake','__display__');
 
 #cleanup;
 
@@ -2289,7 +2388,7 @@ our $domain_url=sub {
    package domain_url;
    use Net::FullAuto;
    my $handle=connect_shell();
-   my ($stdout,$stderr)=$handle->cmd("wget -qO- http://icanhazip.com");
+   my ($stdout,$stderr)=$handle->cmd("wget -qO- https://icanhazip.com");
    my $public_ip=$stdout if $stdout=~/^\d+\.\d+\.\d+\.\d+\s*/s;
    unless ($public_ip) {
       require Sys::Hostname;

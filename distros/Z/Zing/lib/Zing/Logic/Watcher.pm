@@ -16,7 +16,7 @@ extends 'Zing::Logic';
 use Zing::Flow;
 use Zing::Fork;
 
-our $VERSION = '0.13'; # VERSION
+our $VERSION = '0.20'; # VERSION
 
 # ATTRIBUTES
 
@@ -172,13 +172,13 @@ method signals() {
   };
 
   $trapped->{USR1} = sub {
-    $self->debug('handles "interupt", with, USR1');
+    $self->note('handles "interupt", with, USR1');
     $fork->terminate('INT');
     do {0} while ($fork->sanitize); # reap children
   };
 
   $trapped->{USR2} = sub {
-    $self->debug('handles "interupt", with, USR2');
+    $self->note('handles "interupt", with, USR2');
     $fork->terminate('INT');
     do {0} while ($fork->sanitize); # reap children
   };

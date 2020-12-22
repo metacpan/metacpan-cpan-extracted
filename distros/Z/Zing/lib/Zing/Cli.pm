@@ -5,42 +5,255 @@ use 5.014;
 use strict;
 use warnings;
 
+use feature 'say';
+
 use lib '.';
 
-use parent 'Data::Object::Cli';
+use registry 'Zing::Types';
+use routines;
 
-use Zing;
-use Zing::Channel;
-use Zing::Daemon;
-use Zing::Registry;
+use Data::Object::Class;
+use Data::Object::ClassHas;
 
-use FlightRecorder;
-use File::Spec;
+extends 'Data::Object::Cli';
 
-our $VERSION = '0.13'; # VERSION
+our $VERSION = '0.20'; # VERSION
+
+# ATTRIBUTES
+
+has app => (
+  is => 'ro',
+  isa => 'App',
+  new => 1,
+);
+
+fun new_app($self) {
+  require Zing::App;
+  require Zing::Env;
+
+  Zing::App->new(
+    env => Zing::Env->new(
+      $self->opt_appdir ? (
+        appdir => $self->opt_appdir
+      ) : (),
+      $self->opt_handle ? (
+        handle => $self->opt_handle
+      ) : (),
+      $self->opt_level ? (
+        level => $self->opt_level
+      ) : (),
+      $self->opt_piddir ? (
+        piddir => $self->opt_piddir
+      ) : (),
+      $self->opt_target ? (
+        target => $self->opt_target
+      ) : (),
+    )
+  )
+}
+
+has arg_app => (
+  is => 'ro',
+  isa => 'Maybe[Str]',
+  new => 1,
+);
+
+fun new_arg_app($self) {
+  $self->args->app
+}
+
+has cartridge => (
+  is => 'ro',
+  isa => 'Cartridge',
+  new => 1,
+);
+
+fun new_cartridge($self) {
+  $self->app->cartridge(
+    name => $self->arg_app,
+    $self->opt_appdir ? (
+      appdir => $self->opt_appdir
+    ) : (),
+    $self->opt_libdir ? (
+      libdir => $self->opt_libdir
+    ) : (),
+    $self->opt_piddir ? (
+      piddir => $self->opt_piddir
+    ) : (),
+  )
+}
+
+has daemon => (
+  is => 'ro',
+  isa => 'Daemon',
+  new => 1,
+);
+
+fun new_daemon($self) {
+  $self->app->daemon(
+    cartridge => $self->cartridge,
+    $self->opt_backlog ? (
+      log_reset => $self->opt_backlog
+    ) : (),
+    $self->opt_level ? (
+      log_level => $self->opt_level
+    ) : (),
+    $self->opt_process ? (
+      log_filter_from => $self->opt_process
+    ) : (),
+    $self->opt_search ? (
+      log_filter_queries => $self->$self->opt_search
+    ) : (),
+    $self->opt_tag ? (
+      log_filter_tag => $self->opt_tag
+    ) : (),
+    $self->opt_verbose ? (
+      log_verbose => $self->opt_verbose
+    ) : (),
+  )
+}
+
+has opt_appdir => (
+  is => 'ro',
+  isa => 'Maybe[Str]',
+  new => 1,
+);
+
+fun new_opt_appdir($self) {
+  $self->opts->appdir
+}
+
+has opt_backlog => (
+  is => 'ro',
+  isa => 'Maybe[Bool]',
+  new => 1,
+);
+
+fun new_opt_backlog($self) {
+  $self->opts->backlog
+}
+
+has opt_target => (
+  is => 'ro',
+  isa => 'Maybe[Str]',
+  new => 1,
+);
+
+fun new_opt_target($self) {
+  $self->opts->target
+}
+
+has opt_handle => (
+  is => 'ro',
+  isa => 'Maybe[Str]',
+  new => 1,
+);
+
+fun new_opt_handle($self) {
+  $self->opts->handle
+}
+
+has opt_level => (
+  is => 'ro',
+  isa => 'Maybe[Str]',
+  new => 1,
+);
+
+fun new_opt_level($self) {
+  $self->opts->level
+}
+
+has opt_libdir => (
+  is => 'ro',
+  isa => 'Maybe[ArrayRef[Str]]',
+  new => 1,
+);
+
+fun new_opt_libdir($self) {
+  $self->opts->libdir
+}
+
+has opt_package => (
+  is => 'ro',
+  isa => 'Maybe[Str]',
+  new => 1,
+);
+
+fun new_opt_package($self) {
+  $self->opts->package
+}
+
+has opt_piddir => (
+  is => 'ro',
+  isa => 'Maybe[Str]',
+  new => 1,
+);
+
+fun new_opt_piddir($self) {
+  $self->opts->piddir
+}
+
+has opt_process => (
+  is => 'ro',
+  isa => 'Maybe[Str]',
+  new => 1,
+);
+
+fun new_opt_process($self) {
+  $self->opts->process
+}
+
+has opt_search => (
+  is => 'ro',
+  isa => 'Maybe[ArrayRef[Str]]',
+  new => 1,
+);
+
+fun new_opt_search($self) {
+  $self->opts->search
+}
+
+has opt_tag => (
+  is => 'ro',
+  isa => 'Maybe[Str]',
+  new => 1,
+);
+
+fun new_opt_tag($self) {
+  $self->opts->tag
+}
+
+has opt_verbose => (
+  is => 'ro',
+  isa => 'Maybe[Bool]',
+  new => 1,
+);
+
+fun new_opt_verbose($self) {
+  $self->opts->verbose
+}
+
+# USAGE
 
 our $name = 'zing <{command}> [<{app}>] [options]';
 
-# METHODS
+# CONFIGURATION
 
-sub auto {
+fun auto() {
   {
-    clean => '_handle_clean',
-    install => '_handle_install',
-    logs => '_handle_logs',
-    monitor => '_handle_monitor',
-    pid => '_handle_pid',
-    restart => '_handle_restart',
-    start => '_handle_start',
-    stop => '_handle_stop',
-    terms => '_handle_terms',
-    update => '_handle_update',
+    install => 'handle_install',
+    logs => 'handle_logs',
+    monitor => 'handle_monitor',
+    pid => 'handle_pid',
+    restart => 'handle_restart',
+    start => 'handle_start',
+    stop => 'handle_stop',
+    update => 'handle_update',
   }
 }
 
-sub subs {
+fun subs() {
   {
-    clean => 'Prune the process registry',
     install => 'Create an application cartridge',
     logs => 'Tap logs and output to STDOUT',
     monitor => 'Monitor the specified application (start if not started)',
@@ -48,12 +261,11 @@ sub subs {
     restart => 'Restart the specified application',
     start => 'Start the specified application',
     stop => 'Stop the specified application',
-    terms => 'Display resource identifiers (under specified namespace)',
     update => 'Hot-reload application processes',
   }
 }
 
-sub spec {
+fun spec() {
   {
     appdir => {
       desc => 'Directory of the app file',
@@ -70,11 +282,6 @@ sub spec {
       type => 'string',
       flag => 'h',
     },
-    global => {
-      desc => 'Tap the "global" log channel (defaults to "local")',
-      type => 'flag',
-      flag => 'g',
-    },
     process => {
       desc => 'Reduce log output by process name',
       type => 'string',
@@ -88,13 +295,13 @@ sub spec {
     libdir => {
       desc => 'Directory for @INC',
       type => 'string',
-      flag => 'I',
+      flag => 'i',
       args => '@',
     },
     package => {
       desc => 'Provide a process package name',
       type => 'string',
-      flag => 'P',
+      flag => 'n',
     },
     piddir => {
       desc => 'Directory for the pid file',
@@ -106,6 +313,11 @@ sub spec {
       type => 'string',
       flag => 's',
       args => '@',
+    },
+    target => {
+      desc => 'Provide a target (package)',
+      type => 'string',
+      flag => 'r',
     },
     tag => {
       desc => 'Reduce log output by process tag',
@@ -120,359 +332,142 @@ sub spec {
   }
 }
 
-sub _handle_clean {
-  my ($self) = @_;
+# METHODS
 
-  my $r = Zing::Registry->new;
-
-  if ($self->opts->handle) {
-    $ENV{ZING_HANDLE} = $self->opts->handle;
+method handle_install() {
+  if (!$self->arg_app) {
+    $self->output('error: app required');
+    exit(1);
   }
-
-  for my $id (@{$r->keys}) {
-    my $data = $r->store->recv($id) or next;
-    my $pid = $data->{process} or next;
-    $r->store->drop($id) unless kill 0, $pid;
+  if (!$self->opt_package) {
+    $self->output('error: package required');
+    exit(1);
   }
-
-  return $self;
-}
-
-sub _handle_install {
-  my ($self) = @_;
-
-  my $app = $self->args->app;
-
-  if (!$app) {
-    print $self->help, "\n";
-    return $self->okay;
-  }
-
-  my $appdir  = $self->opts->appdir;
-  my $libdir  = $self->opts->libdir;
-  my $package = $self->opts->package;
-
-  unshift @INC, @$libdir if $libdir;
-
-  if (!$package) {
-    print "No package was provided\n";
-    return $self->fail;
-  }
-
-  require Data::Object::Space;
-
-  my $space = Data::Object::Space->new($package);
-
-  if (!$space->tryload) {
-    print "Package provided could not be loaded: @{[$space->package]}\n";
-    return $self->fail;
-  }
-
-  if (!$space->package->can("install")) {
-    print "Package provided can't be installed: @{[$space->package]}\n";
-    return $self->fail;
-  }
-
-  $appdir ||= $ENV{ZING_APPDIR} || $ENV{ZING_HOME} || File::Spec->curdir;
-
-  my $appfile = File::Spec->catfile($appdir, $app);
-
-  if (-e $appfile) {
-    print "Cartridge already exists: $appfile\n";
-    return $self->fail;
-  }
-
-  require Data::Dumper;
-
-  no warnings 'once';
-
-  local $Data::Dumper::Indent = 0;
-  local $Data::Dumper::Purity = 0;
-  local $Data::Dumper::Quotekeys = 0;
-  local $Data::Dumper::Deepcopy = 1;
-  local $Data::Dumper::Deparse = 1;
-  local $Data::Dumper::Sortkeys = 1;
-  local $Data::Dumper::Terse = 1;
-  local $Data::Dumper::Useqq = 1;
-
-  my $service = $space->package->new;
-
-  open(my $fh, ">", "$appfile") or do {
-    print "Can't create cartridge $appfile: $!";
-    $self->fail;
-  };
-  print $fh Data::Dumper::Dumper($service->install);
-  close $fh;
-
-  print "Cartridge created: $appfile\n";
-
-  return $self;
-}
-
-sub _handle_logs {
-  my ($self) = @_;
-
-  my $c = Zing::Channel->new(
-    name => '$journal',
-    (target => $self->opts->global ? 'global' : $ENV{ZING_TARGET} || 'local')
-  );
-
-  if ($self->opts->backlog) {
-    $c->reset;
-  }
-
-  if ($self->opts->handle) {
-    $ENV{ZING_HANDLE} = $self->opts->handle;
-  }
-
-  while (1) {
-    next unless my $info = $c->recv;
-
-    my $from = $info->{from};
-    my $data = $info->{data};
-    my $logs = $data->{logs};
-
-    $logs->{level} = $self->opts->level if $self->opts->level;
-
-    my $logger = FlightRecorder->new($logs);
-    my $report = $self->opts->verbose ? 'verbose' : 'simple';
-    my $lines = $logger->$report->lines;
-    my $tag = $data->{tag} || '--';
-
-    if (my $filter = $self->opts->from) {
-      next unless $from =~ /$filter/;
+  else {
+    my $space = Data::Object::Space->new($self->opt_package);
+    my %seen = map {$_, 1} @INC;
+    for my $dir (@{$self->opt_libdir}) {
+      push @INC, $dir if !$seen{$dir}++;
     }
-
-    if (my $filter = $self->opts->tag) {
-      next unless $tag =~ /$filter/;
+    if (!$space->load->can('install')) {
+      $self->output('error: uninstallable');
+      exit(1);
     }
-
-    if (my $search = $self->opts->search) {
-      for my $search (@$search) {
-        @$lines = grep /$search/, @$lines;
-      }
+    else {
+      $self->output('installing ...');
+      $self->cartridge->install($space->build->install);
+      exit(0);
     }
-
-    print STDOUT $from, ' ', $tag, ' ', $_, "\n" for @$lines;
   }
-
-  return $self;
 }
 
-sub _handle_monitor {
-  my ($self) = @_;
-
-  my $app = $self->args->app;
-
-  if (!$app) {
-    print $self->help, "\n";
-    return $self->okay;
+method handle_logs() {
+  if (!$self->arg_app) {
+    $self->output('error: app required');
+    exit(1);
   }
-
-  my $appdir = $self->opts->appdir;
-  my $piddir = $self->opts->piddir
-    || $ENV{ZING_PIDDIR}
-    || $ENV{ZING_HOME}
-    || File::Spec->curdir;
-
-  $appdir ||= $ENV{ZING_APPDIR} || $ENV{ZING_HOME} || File::Spec->curdir;
-
-  my $appfile = File::Spec->catfile($appdir, $app);
-  my $pidfile = File::Spec->catfile($piddir, "$app.pid");
-
-  $self->opts->tag($app) if !$self->opts->tag;
-  $self->_handle_start if !-e $pidfile;
-
-  do $appfile if -e $appfile;
-
-  $self->_handle_logs;
-
-  return $self;
+  else {
+    $self->daemon->logs(fun($line) {
+      $self->output($line);
+    });
+    exit(0);
+  }
 }
 
-sub _handle_pid {
-  my ($self) = @_;
-
-  my $app = $self->args->app;
-
-  if (!$app) {
-    print $self->help, "\n";
-    return $self->okay;
+method handle_monitor() {
+  if (!$self->arg_app) {
+    $self->output('error: app required');
+    exit(1);
   }
-
-  my $piddir = $self->opts->piddir
-    || $ENV{ZING_PIDDIR}
-    || $ENV{ZING_HOME}
-    || File::Spec->curdir;
-
-  my $pidfile = File::Spec->catfile($piddir, "$app.pid");
-
-  if (! -e $pidfile) {
-    print "Can't find pid $pidfile\n";
-    return $self->fail;
+  else {
+    $self->output('monitoring ...');
   }
-
-  my $pid = do { local $@; eval { do $pidfile } };
-
-  if (!$pid || ref $pid) {
-    print "File didn't return a process ID: $pidfile\n";
-    return $self->fail;
+  if (!-e $self->cartridge->pidfile) {
+    $self->daemon->start;
   }
-
-  print "Process ID: $pid\n";
-
-  return $self;
+  $self->handle_logs;
+  exit(0);
 }
 
-sub _handle_restart {
-  my ($self) = @_;
-
-  $self->_handle_stop;
-  $self->_handle_start;
-
-  return $self;
+method handle_pid() {
+  if (!$self->arg_app) {
+    $self->output('error: app required');
+    exit(1);
+  }
+  else {
+    if (my $pid = $self->cartridge->pid) {
+      $self->output($pid);
+      exit(0);
+    }
+    else {
+      $self->output('error: no pid');
+      exit(1);
+    }
+  }
 }
 
-sub _handle_start {
-  my ($self) = @_;
-
-  my $app = $self->args->app;
-
-  if (!$app) {
-    print $self->help, "\n";
-    return $self->okay;
+method handle_restart() {
+  if (!$self->arg_app) {
+    $self->output('error: app required');
+    exit(1);
   }
-
-  my $appdir = $self->opts->appdir;
-  my $piddir = $self->opts->piddir;
-  my $libdir = $self->opts->libdir;
-
-  unshift @INC, @$libdir if $libdir;
-
-  if ($self->opts->handle) {
-    $ENV{ZING_HANDLE} = $self->opts->handle;
+  elsif (!-f $self->cartridge->appfile) {
+    $self->output('error: app not found');
+    exit(1);
   }
-
-  $appdir ||= $ENV{ZING_APPDIR} || $ENV{ZING_HOME} || File::Spec->curdir;
-
-  my $appfile = File::Spec->catfile($appdir, $app);
-
-  if (! -e $appfile) {
-    print "Can't find app: $appfile\n";
-    return $self->fail;
+  else {
+    $self->output('restarting ...');
   }
-
-  my $scheme = do { local $@; eval { do $appfile } };
-
-  if (ref $scheme ne 'ARRAY') {
-    print "File didn't return an app scheme: $appfile\n";
-    return $self->fail;
-  }
-
-  if (ref $scheme->[1] eq 'ARRAY') {
-    unshift @{$scheme->[1]}, tag => $app; # auto-tagging
-  }
-
-  my $daemon = Zing::Daemon->new(
-    name => $app,
-    app => Zing->new(scheme => $scheme),
-    ($piddir ? (pid_dir => $piddir) : ()),
-  );
-
-  $daemon->execute;
-
-  return $self;
+  exit(!$self->daemon->restart);
 }
 
-sub _handle_stop {
-  my ($self) = @_;
-
-  my $app = $self->args->app;
-
-  if (!$app) {
-    print $self->help, "\n";
-    return $self->okay;
+method handle_start() {
+  if (!$self->arg_app) {
+    $self->output('error: app required');
+    exit(1);
   }
-
-  my $piddir = $self->opts->piddir
-    || $ENV{ZING_PIDDIR}
-    || $ENV{ZING_HOME}
-    || File::Spec->curdir;
-
-  my $pidfile = File::Spec->catfile($piddir, "$app.pid");
-
-  if (! -e $pidfile) {
-    print "Can't find pid $pidfile\n";
-    return $self->fail;
+  elsif (!-f $self->cartridge->appfile) {
+    $self->output('error: app not found');
+    exit(1);
   }
-
-  my $pid = do { local $@; eval { do $pidfile } };
-
-  if (!$pid || ref $pid) {
-    print "File didn't return a process ID: $pidfile\n";
-    return $self->fail;
+  else {
+    $self->output('starting ...');
   }
-
-  kill 'TERM', $pid;
-
-  unlink $pidfile;
-
-  return $self;
+  exit(!$self->daemon->start);
 }
 
-sub _handle_terms {
-  my ($self) = @_;
-
-  if ($self->opts->handle) {
-    $ENV{ZING_HANDLE} = $self->opts->handle;
+method handle_stop() {
+  if (!$self->arg_app) {
+    $self->output('error: app required');
+    exit(1);
   }
-
-  my $registry = Zing::Registry->new;
-  my $terms = $registry->store->keys((split /:/, $registry->term)[0,1]);
-  my $search = $self->opts->search || [];
-  my $lines = [sort @$terms];
-
-  for my $search (@$search) {
-    @$lines = grep /$search/, @$lines;
+  elsif (!-f $self->cartridge->appfile) {
+    $self->output('error: app not found');
+    exit(1);
   }
-
-  print "$_\n" for sort @$lines;
-
-  return $self;
+  else {
+    $self->output('stopping ...');
+  }
+  exit(!$self->daemon->stop);
 }
 
-sub _handle_update {
-  my ($self) = @_;
-
-  my $app = $self->args->app;
-
-  if (!$app) {
-    print $self->help, "\n";
-    return $self->okay;
+method handle_update() {
+  if (!$self->arg_app) {
+    $self->output('error: app required');
+    exit(1);
   }
-
-  my $piddir = $self->opts->piddir
-    || $ENV{ZING_PIDDIR}
-    || $ENV{ZING_HOME}
-    || File::Spec->curdir;
-
-  my $pidfile = File::Spec->catfile($piddir, "$app.pid");
-
-  if (! -e $pidfile) {
-    print "Can't find pid $pidfile\n";
-    return $self->fail;
+  elsif (!-f $self->cartridge->appfile) {
+    $self->output('error: app not found');
+    exit(1);
   }
-
-  my $pid = do { local $@; eval { do $pidfile } };
-
-  if (!$pid || ref $pid) {
-    print "File didn't return a process ID: $pidfile\n";
-    return $self->fail;
+  else {
+    $self->output('updating ...');
   }
+  exit(!$self->daemon->update);
+}
 
-  kill 'USR2', $pid;
-
-  return $self;
+method output(Str @args) {
+  say $_ for @args; return $self;
 }
 
 1;

@@ -14,6 +14,8 @@ sub _G () { Graph::_G() }
 
 sub new {
     my ($class, $g, %opt) = @_;
+    Graph::__carp_confess(__PACKAGE__."->new given non-Graph '$g'")
+	if !(ref $g and $g->isa('Graph'));
     %opt = (path_vertices => 1) unless %opt;
     my $attr = Graph::_defattr();
     if (exists $opt{ attribute_name }) {
@@ -25,13 +27,8 @@ sub new {
 	multiedged => 0,
 	($opt{ reflexive } ? (vertices => [$g->vertices]) : ()),
     );
-    my $tcm = $g->get_graph_attribute('_tcm');
-    if (defined $tcm && $tcm->[ 0 ] == $g->[ _G ]) {
-	$tcm = $tcm->[ 1 ];
-    } else {
-	$tcm = Graph::TransitiveClosure::Matrix->new($g, %opt);
-	$g->set_graph_attribute('_tcm', [ $g->[ _G ], $tcm ]);
-    }
+    my $tcm = $g->_check_cache('transitive_closure_matrix', [],
+	\&_transitive_closure_matrix_compute, %opt);
     my $tcm00 = $tcm->[0][0]; # 0=am, 0=bitmatrix
     my $tcm01 = $tcm->[0][1]; #     , 1=hash mapping v-name to the offset into dm data structures (in retval of $g->vertices)
     for my $u ($tcm->vertices) {
@@ -39,25 +36,27 @@ sub new {
 	for my $v ($tcm->vertices) {
 	    next if $u eq $v && ! $opt{ reflexive };
 	    my $j = $tcm01->{ $v };
-	    if (
-		# $tcm->is_transitive($u, $v)
-		# $tcm->[0]->get($u, $v)
-		vec($tcm00i, $j, 1)
-	       ) {
-		my $val = $g->_get_edge_attribute($u, $v, $attr);
-		$val = $u eq $v ? 0 : 1 if !defined $val;
-		$tcg->_set_edge_attribute($u, $v, $attr, $val);
-	    }
+	    $tcg->add_edge($u, $v) if vec($tcm00i, $j, 1);
+				      # $tcm->is_transitive($u, $v)
+				      # $tcm->[0]->get($u, $v)
 	}
     }
-    $tcg->set_graph_attribute('_tcm', $tcm);
+    $tcg->set_graph_attribute('_tcm', [ $g->[ _G ], $tcm ]);
     bless $tcg, $class;
+}
+
+sub _transitive_closure_matrix_compute {
+    Graph::TransitiveClosure::Matrix->new(@_);
 }
 
 sub is_transitive {
     my $g = shift;
     $g->expect_no_args(@_);
     Graph::TransitiveClosure::Matrix::is_transitive($g);
+}
+
+sub transitive_closure_matrix {
+    $_[0]->get_graph_attribute('_tcm')->[1];
 }
 
 1;

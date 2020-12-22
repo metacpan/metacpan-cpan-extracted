@@ -88,7 +88,7 @@ subtest "missing data", sub {
     ));
     my $dict = Data::CompactReadonly->read($fh);
     throws_ok { $dict->indices() }
-        qr/sysread failed to read/,
+        qr/read.. tried to read/,
         "fatal read errors bomb out fast";
 };
 

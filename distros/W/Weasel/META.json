@@ -4,13 +4,13 @@
       "Erik Huelsmann <ehuels@gmail.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Weasel",
    "prereqs" : {
@@ -38,6 +38,7 @@
             "List::Util" : "0",
             "Module::Runtime" : "0",
             "Moose" : "0",
+            "Weasel::DriverRole" : "0.04",
             "namespace::autoclean" : "0",
             "perl" : "v5.10.1"
          }
@@ -60,7 +61,12 @@
          "web" : "https://github.com/perl-weasel/weasel"
       }
    },
-   "version" : "0.26",
-   "x_serialization_backend" : "JSON::XS version 3.03"
+   "version" : "0.27",
+   "x_contributors" : [
+      "Brock Wilcox <bwilcox@optoro.com>",
+      "Yves Lavoie <ylavoie@yveslavoie.com>"
+   ],
+   "x_generated_by_perl" : "v5.24.4",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.12"
 }
 

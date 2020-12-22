@@ -1,6 +1,6 @@
 package Lab::Connection::VISA_GPIB::Trace;
 #ABSTRACT: ???
-$Lab::Connection::VISA_GPIB::Trace::VERSION = '3.730';
+$Lab::Connection::VISA_GPIB::Trace::VERSION = '3.731';
 use v5.20;
 
 use warnings;
@@ -33,7 +33,7 @@ Lab::Connection::VISA_GPIB::Trace - ???
 
 =head1 VERSION
 
-version 3.730
+version 3.731
 
 =head1 COPYRIGHT AND LICENSE
 

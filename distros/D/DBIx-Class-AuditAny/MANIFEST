@@ -37,6 +37,7 @@ t/011_sakila.t
 t/012_wackyrels.t
 t/013_skip_env.t
 t/014_multi_pk.t
+t/015_deep_create.t
 t/97_pod.t
 t/98_podspelling.t
 t/99_podcoverage.t

@@ -27,6 +27,10 @@ $flowr = new Net::NfDump(InputFiles => [ "t/v4_rec.tmp" ] );
 while ( my $row = $flowr->fetchrow_hashref() )  {
 #	diag Dumper(flow2txt($row));
 	#diag Dumper($DS{'v4_txt'});
+	
+	# remove exporter_id because this is assigned internally 
+	delete($row->{'exporterid'});
+
 	ok( eq_hash( $DS{'v4_raw'}, $row) );
 	ok( eq_hash( $DS{'v4_txt'}, flow2txt($row)) );
 	my $rr = flow2txt($row);
@@ -49,6 +53,8 @@ $floww->finish();
 
 $flowr = new Net::NfDump(InputFiles => [ "t/v6_rec.tmp" ] );
 while ( my $row = $flowr->fetchrow_hashref() )  {
+	# remove exporter_id because this is assigned internally 
+	delete($row->{'exporterid'});
 	my $rr = flow2txt($row);
 	ok( eq_hash( $DS{'v6_raw'}, $row) );
 	ok( eq_hash( $DS{'v6_txt'}, flow2txt($row)) );

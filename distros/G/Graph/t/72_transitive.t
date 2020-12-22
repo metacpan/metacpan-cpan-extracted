@@ -1,5 +1,5 @@
 use strict; use warnings;
-use Test::More tests => 292;
+use Test::More tests => 295;
 
 use Graph::Directed;
 use Graph::Undirected;
@@ -159,15 +159,15 @@ is("@{[$t3->path_vertices(qw(c a))]}", "");
 is("@{[$t3->path_vertices(qw(c b))]}", "");
 is("@{[$t3->path_vertices(qw(c c))]}", "");
 
-is($t3->path_predecessor(qw(a a)), undef);
-is($t3->path_predecessor(qw(a b)), "b");
-is($t3->path_predecessor(qw(a c)), "b");
-is($t3->path_predecessor(qw(b a)), undef);
-is($t3->path_predecessor(qw(b b)), undef);
-is($t3->path_predecessor(qw(b c)), "c");
-is($t3->path_predecessor(qw(c a)), undef);
-is($t3->path_predecessor(qw(c b)), undef);
-is($t3->path_predecessor(qw(c c)), undef);
+is($t3->path_successor(qw(a a)), undef);
+is($t3->path_successor(qw(a b)), "b");
+is($t3->path_successor(qw(a c)), "b");
+is($t3->path_successor(qw(b a)), undef);
+is($t3->path_successor(qw(b b)), undef);
+is($t3->path_successor(qw(b c)), "c");
+is($t3->path_successor(qw(c a)), undef);
+is($t3->path_successor(qw(c b)), undef);
+is($t3->path_successor(qw(c c)), undef);
 
 ok( $t3->is_transitive);
 
@@ -191,15 +191,15 @@ is("@{[$g3->path_vertices(qw(c a))]}", "");
 is("@{[$g3->path_vertices(qw(c b))]}", "");
 is("@{[$g3->path_vertices(qw(c c))]}", "");
 
-is($g3->path_predecessor(qw(a a)), undef);
-is($g3->path_predecessor(qw(a b)), "b");
-is($g3->path_predecessor(qw(a c)), "b");
-is($g3->path_predecessor(qw(b a)), undef);
-is($g3->path_predecessor(qw(b b)), undef);
-is($g3->path_predecessor(qw(b c)), "c");
-is($g3->path_predecessor(qw(c a)), undef);
-is($g3->path_predecessor(qw(c b)), undef);
-is($g3->path_predecessor(qw(c c)), undef);
+is($g3->path_successor(qw(a a)), undef);
+is($g3->path_successor(qw(a b)), "b");
+is($g3->path_successor(qw(a c)), "b");
+is($g3->path_successor(qw(b a)), undef);
+is($g3->path_successor(qw(b b)), undef);
+is($g3->path_successor(qw(b c)), "c");
+is($g3->path_successor(qw(c a)), undef);
+is($g3->path_successor(qw(c b)), undef);
+is($g3->path_successor(qw(c c)), undef);
 
 {
     # Found by Nathan Goodman.
@@ -309,7 +309,7 @@ is($g3->path_predecessor(qw(c c)), undef);
 
 # TransitiveClosure_Floyd_Warshall is just an alias for TransitiveClosure.
 
-my $t0tcfw = Graph->TransitiveClosure_Floyd_Warshall($g0->deep_copy);
+my $t0tcfw = $g0->deep_copy->TransitiveClosure_Floyd_Warshall;
 
 is($t0, $t0tcfw);
 
@@ -337,15 +337,15 @@ is("@{[$t3apspfw->path_vertices(qw(c a))]}", "");
 is("@{[$t3apspfw->path_vertices(qw(c b))]}", "");
 is("@{[$t3apspfw->path_vertices(qw(c c))]}", "");
 
-is($t3apspfw->path_predecessor(qw(a a)), undef);
-is($t3apspfw->path_predecessor(qw(a b)), "b");
-is($t3apspfw->path_predecessor(qw(a c)), "b");
-is($t3apspfw->path_predecessor(qw(b a)), undef);
-is($t3apspfw->path_predecessor(qw(b b)), undef);
-is($t3apspfw->path_predecessor(qw(b c)), "c");
-is($t3apspfw->path_predecessor(qw(c a)), undef);
-is($t3apspfw->path_predecessor(qw(c b)), undef);
-is($t3apspfw->path_predecessor(qw(c c)), undef);
+is($t3apspfw->path_successor(qw(a a)), undef);
+is($t3apspfw->path_successor(qw(a b)), "b");
+is($t3apspfw->path_successor(qw(a c)), "b");
+is($t3apspfw->path_successor(qw(b a)), undef);
+is($t3apspfw->path_successor(qw(b b)), undef);
+is($t3apspfw->path_successor(qw(b c)), "c");
+is($t3apspfw->path_successor(qw(c a)), undef);
+is($t3apspfw->path_successor(qw(c b)), undef);
+is($t3apspfw->path_successor(qw(c c)), undef);
 
 {
     # From Andras Salamon
@@ -526,4 +526,45 @@ EOF
 	is_deeply $got, $paths, "paths $u $v" or diag explain $got;
 	is $tcg->path_length($u, $v), $dist, "dist $u $v";
     }
+}
+
+{
+    # 9 4 8 are a cycle, plus longer cycle 9 4 8 7
+    # other paths: 1-7, 6-2-3
+    my @example = (
+	[9, 4],
+	[2, 3],
+	[7, 9],
+	[8, 7],
+	[6, 2],
+	[4, 8],
+	[8, 9],
+	[1, 7],
+    );
+    my $g = Graph::Directed->new;
+    $g->add_weighted_edge(@$_, 1) for @example;
+    my $tcg = $g->transitive_closure;
+    is $tcg->transitive_closure_matrix->[0]->stringify, <<'EOF', 'adjacency';
+ to:    1    2    3    4    6    7    8    9
+   1    1    0    0    1    0    1    1    1
+   2    0    1    1    0    0    0    0    0
+   3    0    0    1    0    0    0    0    0
+   4    0    0    0    1    0    1    1    1
+   6    0    1    1    0    1    0    0    0
+   7    0    0    0    1    0    1    1    1
+   8    0    0    0    1    0    1    1    1
+   9    0    0    0    1    0    1    1    1
+EOF
+    is $tcg->transitive_closure_matrix->[1]->stringify, <<'EOF', 'distances';
+ to:    1    2    3    4    6    7    8    9
+   1    0              3         1    4    2
+   2         0    1                         
+   3              0                         
+   4                   0         2    1    2
+   6         1    2         0               
+   7                   2         0    3    1
+   8                   2         1    0    1
+   9                   1         3    2    0
+EOF
+    ok $tcg->is_reachable(7, 8), '7-8 reachable when on cycle';
 }

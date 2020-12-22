@@ -7,7 +7,7 @@ use Data::CompactReadonly::V0::Node;
 
 # Yuck, semver. I give in, the stupid cult that doesn't understand
 # what the *number* bit of *version number* means has won.
-our $VERSION = '0.0.3';
+our $VERSION = '0.0.4';
 
 =head1 NAME
 
@@ -178,13 +178,13 @@ sub create {
         my $byte5 = chr(($version << 3) + $ptr_size - 1);
         open(my $fh, '>:unix', $file) || die("Can't write $file: $! \n");
         print $fh "CROD$byte5";
-        my $already_seen = {};
         eval {
             "Data::CompactReadonly::V${version}::Node"->_create(
-                fh           => $fh,
-                ptr_size     => $ptr_size,
-                data         => $data,
-                already_seen => $already_seen
+                filename => $file,
+                fh       => $fh,
+                ptr_size => $ptr_size,
+                data     => $data,
+                globals  => { next_free_ptr => tell($fh), already_seen  => {} }
             );
         };
         if($@ && index($@, "Data::CompactReadonly::V${version}::Node"->_ptr_blown()) != -1) {

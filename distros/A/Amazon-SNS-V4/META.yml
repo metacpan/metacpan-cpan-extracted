@@ -16,13 +16,13 @@ name: Amazon-SNS-V4
 provides:
   Amazon::SNS::V4:
     file: lib/Amazon/SNS/V4.pm
-    version: '1.7'
+    version: '1.9'
   Amazon::SNS::V4::Target:
     file: lib/Amazon/SNS/V4/Target.pm
-    version: '1.7'
+    version: '1.9'
   Amazon::SNS::V4::Topic:
     file: lib/Amazon/SNS/V4/Topic.pm
-    version: '1.7'
+    version: '1.9'
 requires:
   AWS::Signature4: '0'
   Class::Accessor: '0'
@@ -30,6 +30,10 @@ requires:
   HTTP::Request::Common: '0'
   JSON: '0'
   XML::Simple: '0'
-version: '1.7'
+resources:
+  IRC: irc://irc.styxnet.tech/#perl
+  bugtracker: https://github.com/tehmoth/Amazon-SNS-V4/issues
+  repository: https://github.com/tehmoth/Amazon-SNS-V4.git
+version: '1.9'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_spdx_expression: GPL-2.0-only

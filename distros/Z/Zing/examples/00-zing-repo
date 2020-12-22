@@ -31,7 +31,7 @@ warn 'repo actions pull', ' ', $r->store->lpull($actions)->{created};
 warn 'repo actions size', ' ', $r->store->size($actions);
 warn 'repo actions term', ' ', $actions;
 
-my $i = join ", ", @{$r->keys};
+my $i = join ", ", @{$r->search->where(bucket => '*')->results};
 
 warn 'repo keys present', ' ', $i;
 warn 'repo data saved under', ' ', $r->term;

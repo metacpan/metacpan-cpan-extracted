@@ -93,7 +93,7 @@
          "web" : "https://github.com/vanstyn/DBIx-Class-AuditAny"
       }
    },
-   "version" : "0.200100",
+   "version" : "0.200200",
    "x_contributors" : [
       "Peter Rabbitson <ribasushi@cpan.org>",
       "Tom Bloor <tom.bloor@googlemail.com>",

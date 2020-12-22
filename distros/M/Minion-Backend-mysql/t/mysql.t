@@ -39,7 +39,7 @@ subtest 'Nothing to repair' => sub {
 };
 
 subtest 'Migrate up and down' => sub {
-  is $minion->backend->mysql->migrations->active, 7, 'active version is 7';
+  is $minion->backend->mysql->migrations->active, 8, 'active version is 8';
   is $minion->backend->mysql->migrations->migrate(0)->active, 0, 'active version is 0';
 
   # Test the migration from 6 to 7: This is a dangerous migration that
@@ -70,7 +70,7 @@ subtest 'Migrate up and down' => sub {
     'note is migrated safely';
   $minion->backend->mysql->db->delete( 'minion_jobs' );
 
-  is $minion->backend->mysql->migrations->migrate->active, 7, 'active version is 7';
+  is $minion->backend->mysql->migrations->migrate->active, 8, 'active version is 8';
 };
 
 subtest 'Register and unregister' => sub {

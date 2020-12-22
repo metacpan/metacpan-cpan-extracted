@@ -24,6 +24,7 @@ our $dir;
 
  SKIP: {
    -x '/bin/tar' or skip "Missing /bin/tar on this system";
+   qx'/bin/tar --version' =~ /GNU tar/ or skip "No GNU tar on this system";
 
    require './t/test.pl';
 

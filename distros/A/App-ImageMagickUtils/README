@@ -1,0 +1,86 @@
+NAME
+    App::ImageMagickUtils - Utilities related to ImageMagick
+
+VERSION
+    This document describes version 0.001 of App::ImageMagickUtils (from
+    Perl distribution App-ImageMagickUtils), released on 2020-06-25.
+
+FUNCTIONS
+  downsize_image
+    Usage:
+
+     downsize_image(%args) -> [status, msg, payload, meta]
+
+    Reduce image size, by default via compressing to JPEG quality 40 and
+    downsizing to 1024p.
+
+    This utility uses convert utility to compress an image into JPEG with
+    default quality of 40 and downsized to 1024p (shortest side to 1024px).
+
+    Output filenames are:
+
+     ORIGINAL_NAME.q40.jpg
+
+    or (if downsizing is done):
+
+     ORIGINAL_NAME.1024p-q40.jgp
+
+    This function is not exported.
+
+    This function supports dry-run operation.
+
+    Arguments ('*' denotes required arguments):
+
+    *   downsize_to => *str* (default: 1024)
+
+        Downsizing will only be done if the input image's shortest side is
+        indeed larger then the target downsize.
+
+        To disable downsizing, set "--downsize-to" to '' (empty string), or
+        specify on "--dont-downsize" on the CLI.
+
+    *   files* => *array[filename]*
+
+    *   q => *int* (default: 40)
+
+    Special arguments:
+
+    *   -dry_run => *bool*
+
+        Pass -dry_run=>1 to enable simulation mode.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/App-ImageMagickUtils>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-App-ImageMagickUtils>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=App-ImageMagickUtils>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2020 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

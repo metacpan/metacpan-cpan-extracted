@@ -1,3 +1,6 @@
+0.2.21  2020-12-20
+    - Non-zero exit code if some files failed to backup.
+    - Report about deleted files for free up space.
 0.2.20	2020-12-12
 	- Before backup storage fix instead of storage check (for more simplicity).
 0.2.19	2020-12-02

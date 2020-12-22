@@ -19,7 +19,7 @@ use Zing::Queue;
 use Time::Crontab;
 use Time::Piece;
 
-our $VERSION = '0.13'; # VERSION
+our $VERSION = '0.20'; # VERSION
 
 # ATTRIBUTES
 

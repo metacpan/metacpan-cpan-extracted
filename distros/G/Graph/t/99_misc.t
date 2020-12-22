@@ -1,6 +1,6 @@
 use strict; use warnings;
 
-use Test::More tests => 38;
+use Test::More tests => 36;
 
 use Graph::Directed;
 use Graph::Undirected;
@@ -42,23 +42,14 @@ is($g0->subgraph_by_radius('b', 3)->stringify, "b-d,b-e");
     ];
 }
 
-{
-  my $gh = Graph->new(hypervertexed => 1);
-  $gh->add_vertex(@$_) for (
-      ['a'], [qw(a c)], [qw(a b c)], [qw(a c e)], [qw(a c d)], [],
-  );
-  $gh->add_edge('a', 'b');
-  $gh->add_edge('c', 'd');
-  is $gh, "a-b,c-d,[],[a b c],[a c d],[a c e],[a c],[a],[b],[c],[d],[e]";
-}
-
-for ({}, {countvertexed => 1}, {hypervertexed => 1}, {multivertexed => 1}) {
+for ({}, {countvertexed => 1}, {multivertexed => 1}) {
   my $gr = Graph::Directed->new(%$_);
   $gr->add_edge(@$_) for @E;
   $gr->rename_vertex('b', 'b1');
-  is $gr->subgraph_by_radius('a', 3), "a-b1,a-c,b1-d,b1-e,c-f,c-g";
+  my $label = ref($gr->[ 2 ]) . ' {' . join('=>', %$_) . '}';
+  is $gr->subgraph_by_radius('a', 3), "a-b1,a-c,b1-d,b1-e,c-f,c-g", $label;
   $gr->rename_vertices(sub { uc $_[0] });
-  is $gr->subgraph_by_radius('A', 3), "A-B1,A-C,B1-D,B1-E,C-F,C-G";
+  is $gr->subgraph_by_radius('A', 3), "A-B1,A-C,B1-D,B1-E,C-F,C-G", $label;
 }
 
 my $g1 = Graph::Undirected->new;
@@ -117,3 +108,5 @@ $g3->add_edge(0,1);
 my @dummy = $g3->SP_Dijkstra(1,0);
 is $w, '';
 }
+
+is_deeply [ sort(Graph::__fisher_yates_shuffle(1..3)) ], [ 1..3 ];

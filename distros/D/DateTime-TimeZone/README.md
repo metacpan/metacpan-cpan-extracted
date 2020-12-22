@@ -4,7 +4,7 @@ DateTime::TimeZone - Time zone object base class and factory
 
 # VERSION
 
-version 2.44
+version 2.45
 
 # SYNOPSIS
 
@@ -327,6 +327,7 @@ Dave Rolsky <autarch@urth.org>
 - Karen Etheridge <ether@cpan.org>
 - karupanerura <karupa@cpan.org>
 - kclaggett <kclaggett@proofpoint.com>
+- Matthew Horsfall <wolfsage@gmail.com>
 - Mohammad S Anwar <mohammad.anwar@yahoo.com>
 - Olaf Alders <olaf@wundersolutions.com>
 - Peter Rabbitson <ribasushi@cpan.org>

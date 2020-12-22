@@ -20,7 +20,7 @@ use Module::Load::Conditional   qw[check_install];
 use version;
 
 use vars qw[$VERSION];
-$VERSION = "0.9908";
+$VERSION = "0.9910";
 
 =pod
 
@@ -116,30 +116,10 @@ An example entry would like this:
     ### default host list
     $Conf->{'conf'}->{'hosts'} = [
             {
-                'scheme' => 'ftp',
-                'path' => '/pub/CPAN/',
-                'host' => 'ftp.cpan.org'
-            },
-            {
                 'scheme' => 'http',
                 'path' => '/',
                 'host' => 'www.cpan.org'
             },
-            {
-                'scheme' => 'ftp',
-                'path' => '/',
-                'host' => 'cpan.hexten.net'
-            },
-            {
-                'scheme' => 'ftp',
-                'path' => '/CPAN/',
-                'host' => 'cpan.cpantesters.org'
-            },
-            {
-                'scheme' => 'ftp',
-                'path' => '/pub/languages/perl/CPAN/',
-                'host' => 'ftp.funet.fi'
-            }
         ];
 
 =item allow_build_interactivity

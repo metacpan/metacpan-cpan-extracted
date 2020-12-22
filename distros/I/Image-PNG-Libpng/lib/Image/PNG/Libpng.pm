@@ -11,6 +11,7 @@ use Carp;
 our @ISA = qw(Exporter);
 our @EXPORT_OK = qw/
 	access_version_number
+	color_type_channels
 	color_type_name
 	copy_row_pointers
 	create_read_struct
@@ -22,7 +23,10 @@ our @EXPORT_OK = qw/
 	get_bKGD
 	get_bit_depth
 	get_cHRM
+	get_cHRM_XYZ
 	get_channels
+	get_chunk_cache_max
+	get_chunk_malloc_max
 	get_color_type
 	get_compression_buffer_size
 	get_eXIf
@@ -35,6 +39,8 @@ our @EXPORT_OK = qw/
 	get_oFFs
 	get_pCAL
 	get_pHYs
+	get_palette_max
+	get_rgb_to_gray_status
 	get_row_pointers
 	get_rowbytes
 	get_rows
@@ -49,7 +55,10 @@ our @EXPORT_OK = qw/
 	get_unknown_chunks
 	get_valid
 	init_io
+	init_io_x
 	libpng_supports
+	permit_mng_features
+	read_end
 	read_from_scalar
 	read_image
 	read_info
@@ -59,8 +68,16 @@ our @EXPORT_OK = qw/
 	scalar_as_input
 	set_IHDR
 	set_PLTE
+	set_add_alpha
+	set_alpha_mode
 	set_bKGD
+	set_back
+	set_background
+	set_bgr
 	set_cHRM
+	set_cHRM_XYZ
+	set_chunk_cache_max
+	set_chunk_malloc_max
 	set_compression_buffer_size
 	set_compression_level
 	set_compression_mem_level
@@ -70,30 +87,42 @@ our @EXPORT_OK = qw/
 	set_crc_action
 	set_eXIf
 	set_expand
+	set_expand_16
+	set_expand_gray_1_2_4_to_8
 	set_filler
 	set_filter
 	set_gAMA
+	set_gamma
 	set_gray_to_rgb
 	set_hIST
 	set_iCCP
 	set_image_data
+	set_invert_alpha
+	set_invert_mono
 	set_keep_unknown_chunks
 	set_oFFs
 	set_pCAL
 	set_pHYs
 	set_packing
+	set_packswap
+	set_palette_to_rgb
+	set_quantize
 	set_rgb_to_gray
-	set_rgb_to_gray_fixed
 	set_row_pointers
 	set_rows
 	set_sBIT
 	set_sCAL
 	set_sPLT
 	set_sRGB
+	set_scale_16
 	set_strip_16
+	set_strip_alpha
+	set_swap
+	set_swap_alpha
 	set_tIME
 	set_tRNS
 	set_tRNS_pointer
+	set_tRNS_to_alpha
 	set_text
 	set_text_compression_level
 	set_text_compression_mem_level
@@ -103,13 +132,19 @@ our @EXPORT_OK = qw/
 	set_unknown_chunks
 	set_user_limits
 	set_verbosity
+	shift
 	sig_cmp
 	split_alpha
 	text_compression_name
+	write_end
+	write_image
+	write_info
 	write_png
 	write_to_scalar
-	color_type_name
+	any2gray8
 	copy_png
+	create_reader
+	create_writer
 	get_internals
 	image_data_diff
 	png_compare
@@ -123,7 +158,7 @@ our %EXPORT_TAGS = (
 );
 
 require XSLoader;
-our $VERSION = '0.52';
+our $VERSION = '0.55';
 
 XSLoader::load('Image::PNG::Libpng', $VERSION);
 
@@ -192,6 +227,8 @@ my %known_chunks = (
 bKGD => 1,
 
 cHRM => 1,
+
+
 
 
 
@@ -312,12 +349,14 @@ sub height
 sub image_data_diff
 {
     my ($file1, $file2, %options) = @_;
-    my $png1 = read_png_file ($file1, transforms => PNG_TRANSFORM_EXPAND);
-    my $png2 = read_png_file ($file2, transforms => PNG_TRANSFORM_EXPAND);
+    my $transforms = PNG_TRANSFORM_EXPAND | PNG_TRANSFORM_GRAY_TO_RGB;
+    my $png1 = read_png_file ($file1, transforms => $transforms);
+    my $png2 = read_png_file ($file2, transforms => $transforms);
     my $ihdr1 = $png1->get_IHDR ();
     my $ihdr2 = $png2->get_IHDR ();
     my @fields = qw/height width/;
     for my $field (@fields) {
+	print "$field: $ihdr1->{$field} != $ihdr2->{$field}\n";
 	if ($ihdr1->{$field} != $ihdr2->{$field}) {
 	    return "$field differs: $file1: ".
 	    "$ihdr1->{field}; $file2: $ihdr2->{field}";
@@ -334,7 +373,10 @@ sub image_data_diff
 		my @bytes1 = unpack "C*", $row1;
 		my @bytes2 = unpack "C*", $row2;
 		for my $byte (0..$#bytes1) {
-		    printf ("%02X,%02X ", $bytes1[$byte], $bytes2[$byte]);
+		    if ($bytes1[$byte] != $bytes2[$byte]) {
+			printf 'byte %0d: %02X,%02X' . "\n", $byte,
+				$bytes1[$byte], $bytes2[$byte];
+		    }
 		}
 		print "\n";
 	    }
@@ -348,8 +390,9 @@ sub image_data_diff
 sub png_compare
 {
     my ($file1, $file2, %options) = @_;
-    my $png1 = read_png_file ($file1, transforms => PNG_TRANSFORM_EXPAND);
-    my $png2 = read_png_file ($file2, transforms => PNG_TRANSFORM_EXPAND);
+    my $transforms = PNG_TRANSFORM_EXPAND | PNG_TRANSFORM_GRAY_TO_RGB;
+    my $png1 = read_png_file ($file1, transforms => $transforms);
+    my $png2 = read_png_file ($file2, transforms => $transforms);
     my $ihdr1 = $png1->get_IHDR ();
     my $ihdr2 = $png2->get_IHDR ();
     my @fields = qw/height width/;
@@ -370,6 +413,95 @@ sub png_compare
     }
     # No difference.
     return 0;
+}
+
+sub create_reader
+{
+    my ($file) = @_;
+    open my $in, "<:raw", $file or croak "Can't open '$file': $!";
+    my $png = create_read_struct ();
+    $png->init_io ($in);
+    return $png;
+}
+
+sub create_writer
+{
+    my ($file) = @_;
+    open my $in, ">:raw", $file or croak "Can't open '$file': $!";
+    my $png = create_write_struct ();
+    $png->init_io ($in);
+    return $png;
+}
+
+# White background for either RGB or grayscale.
+
+my %white = (red => 0xff, green => 0xff, blue => 0xff, gray => 0xff);
+
+sub any2gray8
+{
+    my ($file, %options) = @_;
+    my $reader = create_reader ($file);
+    $reader->set_verbosity (1);
+    $reader->read_info ();
+    my $ihdr = $reader->get_IHDR ();
+    my $bd = $ihdr->{bit_depth};
+    my $ct = $ihdr->{color_type};
+    if ($bd != 8) {
+	if ($bd == 16) {
+	    $reader->set_scale_16 ();
+	}
+	elsif ($bd < 8) {
+	    # There is no GRAY_ALPHA with less than 8 bits, so don't
+	    # worry about that.
+	    if ($ct == PNG_COLOR_TYPE_GRAY) {
+		$reader->set_expand_gray_1_2_4_to_8 ();
+	    }
+	    elsif ($ct == PNG_COLOR_TYPE_PALETTE) {
+		$reader->set_palette_expand_to_rgb ();
+		$reader->set_rgb_to_gray ();
+	    }
+	    else {
+		croak "Unknown color type $ct and bit-depth $bd combination in $file";
+	    }
+	}
+	else {
+	    croak "Unknown bit depth $bd in $file";
+	}
+    }
+    if ($ct & PNG_COLOR_MASK_ALPHA) {
+	# We need to add a background color.
+	my $bkgd = $reader->get_bKGD ();
+	if ($bkgd) {
+	    $reader->set_background ($bkgd, PNG_BACKGROUND_GAMMA_SCREEN, 1);
+	}
+	elsif ($options{bkgd}) {
+	    $reader->set_background ($bkgd, PNG_BACKGROUND_GAMMA_SCREEN, 1);
+	}
+	else {
+	    $reader->set_background (\%white, PNG_BACKGROUND_GAMMA_SCREEN, 1);
+	}
+    }
+    if ($ct & PNG_COLOR_MASK_COLOR) {
+	$reader->set_rgb_to_gray ();
+    }
+    elsif ($ct == PNG_COLOR_TYPE_PALETTE) {
+	$reader->set_palette_expand_to_rgb ();
+	$reader->set_rgb_to_gray ();
+    }
+    $reader->read_image ();
+    $reader->read_end ();
+    my $rows = $reader->get_rows ();
+    my $wpng = create_write_struct ();
+    my %ihdr = (
+	height => $ihdr->{height},
+	width => $ihdr->{width},
+	color_type => PNG_COLOR_TYPE_GRAY,
+	bit_depth => 8,
+	interlace_type => $ihdr->{interlace_type},
+    );
+    $wpng->set_IHDR (\%ihdr);
+    $wpng->set_rows ($rows);
+    return $wpng;
 }
 
 1;

@@ -75,6 +75,7 @@ These classes facilitate message-passing and communications:
 - [Zing::Data](https://metacpan.org/pod/Zing::Data): Process Data
 - [Zing::Domain](https://metacpan.org/pod/Zing::Domain): Shared State Management
 - [Zing::KeyVal](https://metacpan.org/pod/Zing::KeyVal): Key/Value Store
+- [Zing::Lookup](https://metacpan.org/pod/Zing::Lookup): Domain Index
 - [Zing::Mailbox](https://metacpan.org/pod/Zing::Mailbox): Process Mailbox
 - [Zing::PubSub](https://metacpan.org/pod/Zing::PubSub): Pub/Sub Store
 - [Zing::Queue](https://metacpan.org/pod/Zing::Queue): Message Queue
@@ -98,6 +99,18 @@ These base classes implement the underlying process (actor) logic:
 - [Zing::Timer](https://metacpan.org/pod/Zing::Timer): Timer Process
 - [Zing::Watcher](https://metacpan.org/pod/Zing::Watcher): Watcher Process
 - [Zing::Worker](https://metacpan.org/pod/Zing::Worker): Worker Process
+
+## stores
+
+These classes handle data persistence for all messaging abstractions:
+
+- [Zing::Store::Disk](https://metacpan.org/pod/Zing::Store::Disk): File-based Persistence
+- [Zing::Store::Hash](https://metacpan.org/pod/Zing::Store::Hash): In-Memory Persistence
+- [Zing::Store::Mysql](https://metacpan.org/pod/Zing::Store::Mysql): MySQL Persistence
+- [Zing::Store::Pg](https://metacpan.org/pod/Zing::Store::Pg): PostgreSQL Persistence
+- [Zing::Store::Redis](https://metacpan.org/pod/Zing::Store::Redis): Redis Persistence
+- [Zing::Store::SQLite](https://metacpan.org/pod/Zing::Store::SQLite): SQLite Persistence
+- [Zing::Store::Temp](https://metacpan.org/pod/Zing::Store::Temp): Temporary File-based Persistence
 
 ## ready-made
 
@@ -281,16 +294,19 @@ scale your deployments without changing your implementations.
     ZING_HOST=68.80.90.100
 
     # configure the resource target (e.g. when distributing across multiple hosts)
-    ZING_TARGET='global' # or 'local'
+    ZING_TARGET='global' # 'us-east', 'us-west', etc
 
-    # configure the system datastore (defaults to 'Zing::Redis')
-    ZING_STORE='Zing::Redis'
+    # configure the datastore (defaults to 'Zing::Store::Redis')
+    ZING_STORE='Zing::Store::Redis'
 
     # configure Redis driver without touching your source code
     ZING_REDIS='server=127.0.0.1:6379'
     ZING_REDIS='every=1_000_000,reconnect=60'
     ZING_REDIS='sentinels=127.0.0.1:12345|127.0.0.1:23456,sentinels_cnx_timeout=0.1'
     ZING_REDIS='server=192.168.0.1:6379,debug=0'
+
+    # configure the object encoder (defaults to 'Zing::Encoder::Json')
+    ZING_ENCODER='Zing::Encoder::Json'
 
     # configure where the command-line tool finds catridges and PID files
     ZING_APPDIR=./

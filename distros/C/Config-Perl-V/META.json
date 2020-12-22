@@ -1,20 +1,19 @@
 {
-   "version" : "0.32",
-   "meta-spec" : {
-      "version" : 2,
-      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec"
-      },
+   "author" : [
+      "H.Merijn Brand <h.m.brand@xs4all.nl>"
+      ],
    "dynamic_config" : 1,
+   "version" : "0.33",
    "prereqs" : {
-      "test" : {
-         "requires" : {
-            "Test::More" : "0",
-            "Test::NoWarnings" : "0"
-            }
-         },
       "build" : {
          "requires" : {
             "perl" : "5.006"
+            }
+         },
+      "runtime" : {
+         "requires" : {
+            "perl" : "5.006",
+            "Config" : "0"
             }
          },
       "configure" : {
@@ -22,40 +21,41 @@
             "ExtUtils::MakeMaker" : "0"
             }
          },
-      "runtime" : {
+      "test" : {
          "requires" : {
-            "Config" : "0",
-            "perl" : "5.006"
+            "Test::NoWarnings" : "0",
+            "Test::More" : "0"
             }
          }
       },
    "license" : [
       "perl_5"
       ],
-   "provides" : {
-      "Config::Perl::V" : {
-         "file" : "V.pm",
-         "version" : "0.32"
-         }
-      },
    "release_status" : "stable",
    "resources" : {
-      "repository" : {
-         "web" : "https://github.com/Tux/Config-Perl-V",
-         "url" : "https://github.com/Tux/Config-Perl-V",
-         "type" : "git"
-         },
       "license" : [
          "http://dev.perl.org/licenses/"
          ],
+      "repository" : {
+         "web" : "https://github.com/Tux/Config-Perl-V",
+         "type" : "git",
+         "url" : "https://github.com/Tux/Config-Perl-V"
+         },
       "bugtracker" : {
          "web" : "https://github.com/Tux/Config-Perl-V/issues"
          }
       },
-   "name" : "Config-Perl-V",
+   "generated_by" : "Author",
+   "provides" : {
+      "Config::Perl::V" : {
+         "file" : "V.pm",
+         "version" : "0.33"
+         }
+      },
+   "meta-spec" : {
+      "version" : 2,
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec"
+      },
    "abstract" : "Structured data retrieval of perl -V output",
-   "author" : [
-      "H.Merijn Brand <h.m.brand@xs4all.nl>"
-      ],
-   "generated_by" : "Author"
+   "name" : "Config-Perl-V"
    }

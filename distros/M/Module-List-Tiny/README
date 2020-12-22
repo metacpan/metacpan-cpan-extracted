@@ -2,8 +2,8 @@ NAME
     Module::List::Tiny - A fork of Module::List that starts faster
 
 VERSION
-    This document describes version 0.004002 of Module::List::Tiny (from
-    Perl distribution Module-List-Tiny), released on 2019-09-02.
+    This document describes version 0.004003 of Module::List::Tiny (from
+    Perl distribution Module-List-Tiny), released on 2020-09-21.
 
 SYNOPSIS
      use Module::List::Tiny qw(list_modules);
@@ -48,16 +48,13 @@ BUGS
     to an existing test-file that illustrates the bug or desired feature.
 
 SEE ALSO
-    Module::List
-
-    PERLANCAR::Module::List - my other, personal fork, with additional
-    features
+    Module::List, Module::List::Wildcard, Module::List::More
 
 AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2019 by perlancar@cpan.org.
+    This software is copyright (c) 2020, 2019 by perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

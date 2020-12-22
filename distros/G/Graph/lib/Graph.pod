@@ -144,7 +144,7 @@ original.
 
 Also the following vertex/edge attributes are copied:
 
-  refvertexed/hypervertexed/countvertexed/multivertexed
+  refvertexed/countvertexed/multivertexed
   hyperedged/countedged/multiedged/omniedged
 
 B<NOTE>: You can get an even shallower copy of a graph by
@@ -558,6 +558,12 @@ Return true if the graph is transitive, false otherwise.
 
 Return the transitive closure graph of the graph.
 
+=item transitive_closure_matrix_clear_cache
+
+    $g->transitive_closure_matrix_clear_cache
+
+See L</"Clearing cached results">.
+
 =back
 
 You can query the reachability from $u to $v with
@@ -927,7 +933,7 @@ L</biconnected_components>.
 For a directed graph, return the vertices of the ith connected
 component, the indexing starting from zero.  The order of vertices
 within a component is undefined, while the order of the connected
-components is the as from strongly_connected_components().
+components is as from strongly_connected_components().
 
 For the inverse, see L</strongly_connected_component_by_vertex>.
 
@@ -1377,7 +1383,7 @@ Related methods are
 
     @e = $g->edges_at($v)
 
-The union of edges from and edges to at the vertex.
+The union of edges from, and edges to, the vertex.
 
 =item edges_from
 
@@ -1726,7 +1732,7 @@ use C<next_root => sub { undef }>.  The rest of these options are
 booleans.  If none of them are true, a random unvisited vertex will be
 selected.
 
-The first start vertex is be available as the graph attribute
+The first start vertex is available as the graph attribute
 C<SPT_Dijkstra_root>).
 
 The result weights of vertices can be retrieved from the result graph by
@@ -1782,7 +1788,7 @@ is chosen.
 B<NOTE>: note that all the vertices might not be reachable from the
 selected (explicit or random) start vertex.
 
-The start vertex is be available as the graph attribute
+The start vertex is available as the graph attribute
 C<SPT_Bellman_Ford_root>).
 
 The result weights of vertices can be retrieved from the result graph by
@@ -1841,10 +1847,11 @@ that makes the vertices the same.
     my $apsp = $g->APSP_Floyd_Warshall(...);
 
 Return the all-pairs shortest path object computed from the graph
-using Floyd-Warshall's algorithm.  The length of a path between two
-vertices is the sum of weight attribute of the edges along the
-shortest path between the two vertices.  If no weight attribute name
-is specified explicitly
+using the Floyd-Warshall algorithm, of class L<Graph::TransitiveClosure>.
+
+The length of a path between two vertices is the sum of weight attribute
+of the edges along the shortest path between the two vertices.  If no
+weight attribute name is specified explicitly
 
     $g->APSP_Floyd_Warshall(attribute_name => 'height');
 
@@ -1869,11 +1876,11 @@ Return the length of the shortest path between the two vertices.
 
 Return the list of vertices along the shortest path.
 
-=item path_predecessor
+=item path_successor
 
-   my $u = $apsp->path_predecessor($v);
+   my $u = $apsp->path_successor($u, $v);
 
-Returns the predecessor of vertex $v in the all-pairs shortest paths.
+Returns the successor of vertex $u in the all-pairs shortest path to $v.
 
 =item all_paths
 
@@ -2625,15 +2632,21 @@ graph call is not as expected.
 
 =item expect_hyperedged
 
-=item expect_hypervertexed
+=item expect_multiedge
 
 =item expect_multiedged
+
+=item expect_multivertex
 
 =item expect_multivertexed
 
 =item expect_no_args
 
+=item expect_non_multiedge
+
 =item expect_non_multiedged
+
+=item expect_non_multivertex
 
 =item expect_non_multivertexed
 
@@ -2672,7 +2685,7 @@ The numbers are for a 32-bit platform and for Perl 5.8.8.
 Roughly, the above numbers mean that in a megabyte of memory you can
 fit for example a graph of about 1000 vertices and about 2500 edges.
 
-=head2 Hyperedges, hypervertices, hypergraphs
+=head2 Hyperedges, hypergraphs
 
 B<BEWARE>: this is a rather thinly tested feature, and the theory
 is even less so.  Do not expect this to stay as it is (or at all)
@@ -2685,43 +2698,16 @@ Caveat emptor.
 Hyperedges are edges that connect a number of vertices different
 from the usual two.
 
-Hypervertices are vertices that consist of a number of vertices
-different from the usual one.
-
-Note that for hypervertices there is an asymmetry: when adding
-hypervertices, the single vertices are also implicitly added.
-
 Hypergraphs are graphs with hyperedges.
 
 To enable hyperness when constructing Graphs use the C<hyperedged>
-and C<hypervertexed> attributes:
+attribute:
 
-   my $h = Graph->new(hyperedged => 1, hypervertexed => 1);
-
-To add hypervertexes, either explicitly use more than one vertex (or,
-indeed, I<no> vertices) when using add_vertex()
-
-   $h->add_vertex("a", "b")
-   $h->add_vertex()
-
-or implicitly with array references when using add_edge()
-
-   $h->add_edge(["a", "b"], "c")
-   $h->add_edge()
-
-Testing for existence and deletion of hypervertices and hyperedges
-works similarly.
+   my $h = Graph->new(hyperedged => 1);
 
 To test for hyperness of a graph use the
 
 =over 4
-
-=item is_hypervertexed
-
-=item hypervertexed
-
-    $g->is_hypervertexed
-    $g->hypervertexed
 
 =item is_hyperedged
 
@@ -2731,19 +2717,6 @@ To test for hyperness of a graph use the
     $g->hyperedged
 
 =back
-
-Since hypervertices consist of more than one vertex:
-
-=over 4
-
-=item vertices_at
-
-    $g->vertices_at($v)
-
-=back
-
-Return the vertices at the vertex.  This may return just the vertex
-or also other vertices.
 
 To go with the concept of undirected in normal (non-hyper) graphs,
 there is a similar concept of omnidirected I<(this is my own coinage,
@@ -2772,43 +2745,18 @@ false if not.
 
 =back
 
-You may be wondering why on earth did I make up this new concept, why
-didn't the "undirected" work for me?  Well, because of this:
-
-   $g = Graph->new(hypervertexed => 1, omnivertexed => 1);
-
-That's right, vertices can be omni, too - and that is indeed the
-default.  You can turn it off and then $g->add_vertex(qw(a b)) no
-more means adding also the (hyper)vertex qw(b a).  In other words,
-the "directivity" is orthogonal to (or independent of) the number of
-vertices in the vertex/edge.
-
-=over 4
-
-=item is_omnivertexed
-
-=item omnivertexed
-
-=back
-
-Another oddity that fell out of the implementation is the uniqueness
-attribute, that comes naturally in C<uniqedged> and C<uniqvertexed>
-flavours.  It does what it sounds like, to unique or not the vertices
-participating in edges and vertices (is the hypervertex qw(a b a) the
-same as the hypervertex qw(a b), for example).  Without too much
-explanation:
-
-=over 4
-
-=item is_uniqedged
-
-=item uniqedged
-
-=item is_uniqvertexed
-
-=item uniqvertexed
-
-=back
+For more information on directed hypergraphs, see
+L<Directed Hypergraphs and Applications|https://static.aminer.org/pdf/PDF/000/836/884/directed_hypergraphs_and_applications.pdf>.
+It defines hyperarcs (directed edges in a hypergraph) as ordered pairs
+of subsets of V, and hyperedges (undirected) as single subsets of
+V. Since sets are unordered and elements within them are unique, this
+implies that the only valuable use for hypergraphs is where in a given
+connection entity (edge or arc), each vertex only appears at most once.
+Additionally, how the C<hyper> property of edges works may
+change. The underpinning notion is that each edge will be considered
+an entry in an incidence matrix (dimensions |V| x |E|), with values of
+either (0, 1=participating) for undirected (hyperedges), or (-1=tail,
+0, 1=head) for directed (hyperarcs) against each vertex.
 
 =head2 DIAGNOSTICS
 

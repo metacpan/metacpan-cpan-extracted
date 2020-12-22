@@ -39,8 +39,9 @@ method: await
   use Zing::Poll;
   use Zing::KeyVal;
 
-  my $keyval = Zing::KeyVal->new(name => 'notes');
-  my $poll = Zing::Poll->new(name => 'last-week', repo => $keyval);
+  my $poll = Zing::Poll->new(repo => Zing::KeyVal->new(name => 'notes'));
+
+  # $poll->await(0);
 
 =cut
 
@@ -52,7 +53,6 @@ Zing::Types
 
 =attributes
 
-name: ro, req, Str
 repo: ro, req, Repo
 
 =cut
@@ -84,7 +84,7 @@ await(Int $secs) : Maybe[HashRef]
 
   # given: synopsis
 
-  $poll->repo->send('last-week', { task => 'write research paper' });
+  $poll->repo->send({ task => 'write research paper' });
 
   $poll->await(0);
 

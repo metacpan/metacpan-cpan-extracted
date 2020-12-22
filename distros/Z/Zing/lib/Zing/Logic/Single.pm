@@ -12,7 +12,7 @@ use Data::Object::Class;
 
 extends 'Zing::Logic';
 
-our $VERSION = '0.13'; # VERSION
+our $VERSION = '0.20'; # VERSION
 
 # METHODS
 

@@ -5,7 +5,7 @@ package Dancer2::Plugin::Minion;
 use Dancer2::Plugin;
 use Minion;
 
-our $VERSION = '0.3.1';
+our $VERSION = '0.3.3';
 
 plugin_keywords qw(
     minion
@@ -17,13 +17,13 @@ plugin_keywords qw(
 has _backend => (
     is          => 'ro',
     from_config => 'backend',
-    default     => sub{ '' },
+    default     => sub{ 'SQLite' },
 );
 
 has _dsn => (
     is          => 'ro',
     from_config => 'dsn',
-    default     => sub{ '' },
+    default     => sub{ ':temp:' },
 );
 
 has 'minion' => (
@@ -64,20 +64,14 @@ sub minion_app {
 }
 
 1;
-
 __END__
 
 =pod
 
-=encoding UTF-8
-
 =head1 NAME
 
-Dancer2::Plugin::Minion - Use the Minion job queue in your Dancer2 apps.
-
-=head1 VERSION
-
-version 0.3.1
+Dancer2::Plugin::Minion - Easy access to Minion job queue in your Dancer2 
+applications
 
 =head1 SYNOPSIS
 
@@ -128,17 +122,17 @@ are available to make it convenient to add and start new queued jobs.
 See the L<Minion> documentation for more complete documentation on the methods
 and functionality available.
 
-=head1 NAME
-
-Dancer2::Plugin::Minion - Easy access to Minion job queue in your Dancer2 
-applications
-
 =head1 ATTRIBUTES
 
 =head2 minion
 
 The L<Minion>-based object. See the L<Minion> documentation for a list of
 additional methods provided.
+
+If no backend is specified, Minion will default to an in-memory temporary
+database. This is not recommended for any serious use. See
+L<the Mojo::SQLite|https://metacpan.org/pod/Mojo::SQLite#BASICS> docs
+for details
 
 =head1 METHODS
 
@@ -164,7 +158,7 @@ slash in your mount path!
 You can optionally pass in an absolute URL to act as the "return to" link. The url must
 be absolute or else it will be made relative to the admin UI, which is probably
 not what you want. For example: 
-C<< mount '/dashboard/' => minion_app( '/foo/bar' )->start; >>
+C<< mount '/dashboard/' => minion_app( 'http://localhost:5000/foo' )->start; >>
 
 =head1 RUNNING JOBS
 
@@ -225,15 +219,5 @@ Copyright (c) 2020, Clearbuilt Technologies.
 This is free software; you can redistribute it and/or modify it under 
 the same terms as the Perl 5 programming language system itself.
 
-=head1 AUTHOR
-
-Jason A. Crome <cromedome@cpan.org>
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is copyright (c) 2020 by Clearbuilt Technologies.
-
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
-
 =cut
+

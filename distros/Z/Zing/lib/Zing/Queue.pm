@@ -12,9 +12,7 @@ use Data::Object::Class;
 
 extends 'Zing::PubSub';
 
-use Zing::Term;
-
-our $VERSION = '0.13'; # VERSION
+our $VERSION = '0.20'; # VERSION
 
 # METHODS
 
@@ -22,8 +20,8 @@ method recv() {
   return $self->store->lpull($self->term);
 }
 
-method send(HashRef $val) {
-  return $self->store->rpush($self->term, $val);
+method send(HashRef $value) {
+  return $self->store->rpush($self->term, $value);
 }
 
 method size() {
@@ -31,7 +29,7 @@ method size() {
 }
 
 method term() {
-  return Zing::Term->new($self)->queue;
+  return $self->app->term($self)->queue;
 }
 
 1;

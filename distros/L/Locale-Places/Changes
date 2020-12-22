@@ -1,0 +1,8 @@
+Revision history for Locale::Places
+
+0.02	Sat Dec 19 21:21:38 EST 2020
+	Allow source language to be set
+	Faster lookup
+
+0.01	Sat Dec 19 00:20:32 EST 2020
+        First draft

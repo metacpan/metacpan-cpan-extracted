@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Convert notes and chords to Roman numeral notation
 
-our $VERSION = '0.1703';
+our $VERSION = '0.1800';
 
 use List::MoreUtils qw/ any first_index /;
 use Moo;
@@ -57,7 +57,7 @@ sub parse {
     my $note_re = qr/[A-G][#b]?[#b]?/;
 
     # Get the roman representation of the scale
-    my @scale = $self->_get_scale_mode;
+    my @scale = $self->get_scale_mode;
     print "SCALE: @scale\n" if $self->verbose;
 
     my @notes;
@@ -105,13 +105,13 @@ sub parse {
     ( my $note = $chord ) =~ s/^($note_re).*$/$1/;
 
     my %bb_enharmonics = (
-        Cbb => 'Bb', #[qw/ Bb A# /],
-        Dbb => 'C',  #[qw/ C B# /],
-        Ebb => 'D',  #[qw/ D /],
-        Fbb => 'Eb', #[qw/ Eb D# /],
-        Gbb => 'F',  #[qw/ F /],
-        Abb => 'G',  #[qw/ G /],
-        Bbb => 'A',  #[qw/ A /],
+        Cbb => 'Bb',
+        Dbb => 'C',
+        Ebb => 'D',
+        Fbb => 'Eb',
+        Gbb => 'F',
+        Abb => 'G',
+        Bbb => 'A',
     );
 
     $note = $bb_enharmonics{$note}
@@ -127,7 +127,7 @@ sub parse {
             if $note eq 'Fb';
         $position = first_index { $_ eq $note } @notes;
     }
-    elsif ( $note eq 'E#' ) {
+    elsif ( $note eq 'E#' ) { # XXX Why does this work?
         $note = 'F';
     }
 
@@ -220,7 +220,8 @@ sub parse {
     return $roman;
 }
 
-sub _get_scale_mode {
+
+sub get_scale_mode {
     my ($self) = @_;
 
     my @scale = qw( I ii iii IV V vi vii ); # Default to major/ionian
@@ -344,7 +345,7 @@ Music::ToRoman - Convert notes and chords to Roman numeral notation
 
 =head1 VERSION
 
-version 0.1703
+version 0.1800
 
 =head1 SYNOPSIS
 
@@ -392,6 +393,8 @@ version 0.1703
   $roman = $mtr->parse('CMaj7');  # IIImaj7
   $roman = $mtr->parse('D7');     # IV7
   $roman = $mtr->parse('Em');     # v
+
+  my @mode = $mtr->get_scale_mode;
 
 =head1 DESCRIPTION
 
@@ -450,7 +453,9 @@ major/minor Roman numeral for the given diatonic mode B<scale_name>.
 
 =head2 verbose
 
-Show the progress of the B<parse> method.  Default C<0>
+Show the progress of the B<parse> method.
+
+Default: C<0>
 
 =head1 METHODS
 
@@ -491,6 +496,12 @@ of C<△> may be given for say the C<△7> major seventh chord.
 
 Parsing a double flatted chord will only work in select cases.
 
+=head2 get_scale_mode
+
+  @mode = $mtr->get_scale_mode;
+
+Return the Roman representation of the mode.
+
 =head1 SEE ALSO
 
 L<List::MoreUtils>
@@ -521,7 +532,7 @@ Gene Boggs <gene@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by Gene Boggs.
+This software is copyright (c) 2020 by Gene Boggs.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -23,4 +23,4 @@ sub get_grant {
 	$self->error ? () : $grant || ();
 }
 
-our $VERSION = '0.004';
+our $VERSION = '0.005';

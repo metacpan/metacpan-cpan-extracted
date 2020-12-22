@@ -42,8 +42,8 @@
       },
       "runtime" : {
          "requires" : {
-            "Getopt::EX" : "v1.19.1",
-            "Text::ANSI::Fold" : "1.07",
+            "Getopt::EX" : "v1.21.1",
+            "Text::ANSI::Fold" : "2.08",
             "perl" : "v5.14.0"
          }
       },
@@ -56,7 +56,7 @@
    "provides" : {
       "App::ansifold" : {
          "file" : "lib/App/ansifold.pm",
-         "version" : "1.04"
+         "version" : "1.05"
       }
    },
    "release_status" : "stable",
@@ -70,7 +70,7 @@
          "web" : "https://github.com/kaz-utashiro/ansifold"
       }
    },
-   "version" : "1.04",
+   "version" : "1.05",
    "x_authority" : "cpan:UTASHIRO",
    "x_contributors" : [
       "Kazumasa Utashiro <kaz@utashiro.com>",

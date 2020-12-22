@@ -1213,7 +1213,7 @@ END
    my $fa_builddir=fullauto_builddir($local,$sudo);
    my $ignore='';
    ($stdout,$stderr)=$handle->cwd('/opt/source');
-   ($stdout,$stderr)=$handle->cmd($sudo.'wget -qO- http://icanhazip.com');
+   ($stdout,$stderr)=$handle->cmd($sudo.'wget -qO- https://icanhazip.com');
    my $public_ip=$stdout if $stdout=~/^\d+\.\d+\.\d+\.\d+\s*/s;
    unless ($public_ip) {
       require Sys::Hostname;

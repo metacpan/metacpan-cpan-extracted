@@ -24,14 +24,17 @@
    "prereqs" : {},
    "release_status" : "stable",
    "resources" : {
-      "homepage" : "http://github.com/jib/cpanplus-devel",
+      "homepage" : "https://github.com/jib/cpanplus-devel",
       "license" : [
-         "http://dev.perl.org/licenses/"
+         "https://dev.perl.org/licenses/"
       ],
       "repository" : {
-         "url" : "http://github.com/jib/cpanplus-devel"
+         "url" : "https://github.com/jib/cpanplus-devel"
+      },
+      "bugtracker" : {
+         "web" : "https://github.com/jib/cpanplus-devel/issues"
       }
    },
-   "version" : "0.9908",
+   "version" : "0.9910",
    "x_serialization_backend" : "JSON::PP version 2.27300"
 }

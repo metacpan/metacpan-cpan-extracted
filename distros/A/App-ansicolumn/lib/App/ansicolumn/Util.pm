@@ -215,14 +215,4 @@ sub insert_space {
     } [], @_;
 }
 
-sub remove_topspaces ($$;$) {
-    my($lp, $len, $start) = @_;
-    for (my $page = $start // 0; (my $top = $page * $len) < @$lp; $page++) {
-	while ($top < @$lp and $lp->[$top] !~ /\S/) {
-	    splice @$lp, $top, 1;
-	}
-    }
-    @$lp;
-}
-
 1;

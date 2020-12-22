@@ -27,7 +27,7 @@ package SVG::TrafficLight;
 use Moose;
 use SVG;
 
-our $VERSION = '0.1.3';
+our $VERSION = '0.1.4';
 
 =head1 ATTRIBUTES AND METHODS
 
@@ -343,6 +343,7 @@ sub BUILD {
     $self->draw_a_lightset_at($light_set_x, $self->padding,
                               $self->sequence->[$i]);
   }
+}
 
 =head2 draw_a_lightset_at($x, $y, \%lights)
 
@@ -371,35 +372,37 @@ light is on) or a 0 (to indicate that the light is off).
 
 =cut
 
-  sub draw_a_lightset_at {
-    my $self = shift;
-    my ($x, $y, $lights) = @_;
+sub draw_a_lightset_at {
+  my $self = shift;
+  my ($x, $y, $lights) = @_;
 
-    $self->rect(
-      x      => $x,
-      y      => $y,
-      width  => $self->light_width,
-      height => $self->light_height,
-      fill   => 'black',
-      rx     => $self->corner_radius,
-      ry     => $self->corner_radius,
+  $self->rect(
+    x      => $x,
+    y      => $y,
+    width  => $self->light_width,
+    height => $self->light_height,
+    fill   => 'black',
+    rx     => $self->corner_radius,
+    ry     => $self->corner_radius,
+  );
+
+  my $light = 0;
+  for my $l (qw[red amber green]) {
+    my $fill = $self->colours->{$l}[$lights->{$l}];
+
+    $self->circle(
+      cx   => $x + $self->padding + $self->radius,
+      cy   => $y + $self->padding + $self->radius
+              + $light * ($self->diameter + $self->padding),
+      r    => $self->radius,
+      fill => $fill,
     );
-
-    my $light = 0;
-    for my $l (qw[red amber green]) {
-      my $fill = $self->colours->{$l}[$lights->{$l}];
-
-      $self->circle(
-        cx   => $x + $self->padding + $self->radius,
-        cy   => $y + $self->padding + $self->radius
-                + $light * ($self->diameter + $self->padding),
-        r    => $self->radius,
-        fill => $fill,
-      );
-      ++$light;
-    }
+    ++$light;
   }
 }
+
+no Moose;
+__PACKAGE__->meta->make_immutable;
 
 =head1 AUTHOR
 

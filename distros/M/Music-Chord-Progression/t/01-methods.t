@@ -7,10 +7,22 @@ use Test::Exception;
 
 use_ok 'Music::Chord::Progression';
 
-# Test the defaults
-my $obj = new_ok 'Music::Chord::Progression';
-my $expect = ['C4','E4','G4'];
+# Test setting a scale note and name
+my $obj = new_ok 'Music::Chord::Progression' => [
+    scale_note => 'A',
+    scale_name => 'minor',
+    chord_map => ['m','dim','','m','m','',''],
+#    verbose => 1,
+];
+my $expect = ['A4','C5','E5'];
 my $got = $obj->generate;
+is_deeply $got->[0], $expect, 'generate';
+is_deeply $got->[-1], $expect, 'generate';
+
+# Test the defaults
+$obj = new_ok 'Music::Chord::Progression';
+$expect = ['C4','E4','G4'];
+$got = $obj->generate;
 is scalar @$got, 8, 'generate';
 is_deeply $got->[0], $expect, 'generate';
 is_deeply $got->[-1], $expect, 'generate';
@@ -44,13 +56,15 @@ ok $got eq 9 || $got eq 11 || $got eq 13, 'substitution';
 
 # Test basic net
 $obj = new_ok 'Music::Chord::Progression' => [
-    max => 6,
-    net => { 1 => [2], 2 => [3], 3 => [4], 4 => [5], 5 => [6], 6 => [1] },
+    max => 7,
+    net => { 1 => [2], 2 => [3], 3 => [4], 4 => [5], 5 => [6], 6 => [7], 7 => [1] },
     resolve => 0,
+#    verbose => 1,
 ];
 $expect = [
     ['C4','E4','G4'], ['D4','F4','A4'], ['E4','G4','B4'],
-    ['F4','A4','C5'], ['G4','B4','D5'], ['C4','E4','G4'],
+    ['F4','A4','C5'], ['G4','B4','D5'], ['A4','C5','E5'],
+    ['B4','D5','F5'],
 ];
 $got = $obj->generate;
 is_deeply $got, $expect, 'generate';

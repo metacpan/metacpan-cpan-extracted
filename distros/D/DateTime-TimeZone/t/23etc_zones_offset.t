@@ -7,37 +7,30 @@ use T::RequireDateTime;
 use Test::More;
 use Test::Fatal;
 
-my %tz_to_offset = (
-    'Etc/GMT-0'   => 0,
-    'etc/gmt-0'   => 0,
-    'Etc/GMT+1'   => 3600,
-    'Etc/GMT+12'  => 43200,
-    'Etc/GMT-1'   => -3600,
-    'Etc/GMT-14'  => -50400,
-    'Etc/GMT-20'  => undef,
-    'Etc/GMT-999' => undef,
-    'Etc/UTC+7'   => 25200,
-    'etc/utc+7'   => 25200,
-    'Etc/UTC-9'   => -32400,
-    'Etc/UTC+20'  => undef,
-);
+my $dt = DateTime->new( year => 2020 );
 
-for my $tz ( sort keys %tz_to_offset ) {
-    if ( defined $tz_to_offset{$tz} ) {
-        my $dt = DateTime::TimeZone->new( name => $tz );
-        is(
-            $dt->offset_for_datetime,
-            $tz_to_offset{$tz},
-            "$tz matches offset"
-        );
+for my $h ( 0 .. 14 ) {
+    for my $zone (qw( GMT UTC )) {
+        for my $sign (qw( + - )) {
+            my $name   = "Etc/$zone$sign$h";
+            my $expect = $h * 3600;
+            $expect *= -1 if $sign eq '+';
+            my $tz = DateTime::TimeZone->new( name => $name );
+            is(
+                $tz->offset_for_datetime($dt),
+                "$expect",
+                "$name offset is $expect",
+            );
+        }
     }
-    else {
-        like(
-            exception { DateTime::TimeZone->new( name => $tz ) },
-            qr/Invalid/i,
-            "$tz is invalid"
-        );
-    }
+}
+
+for my $bad (qw( Etc/UTC+15 Etc/GMT-15 Etc/UTC+999 )) {
+    like(
+        exception { DateTime::TimeZone->new( name => $bad ) },
+        qr/\Q'$bad'\E is an invalid name/,
+        "$bad is an invalid time zone",
+    );
 }
 
 done_testing();

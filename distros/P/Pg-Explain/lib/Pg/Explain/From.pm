@@ -26,11 +26,11 @@ Pg::Explain::From - Base class for parsers of non-text explain formats.
 
 =head1 VERSION
 
-Version 1.03
+Version 1.04
 
 =cut
 
-our $VERSION = '1.03';
+our $VERSION = '1.04';
 
 =head1 SYNOPSIS
 
@@ -129,7 +129,9 @@ sub make_node_from {
     );
     $new_node->explain( $self->explain );
 
-    if ( !$struct->{ 'Actual Loops' } ) {
+    if (   ( defined $struct->{ 'Actual Startup Time' } )
+        && ( !$struct->{ 'Actual Loops' } ) )
+    {
         $new_node->never_executed( 1 );
     }
 

@@ -3,7 +3,7 @@ package Wikibase::Datatype;
 use strict;
 use warnings;
 
-our $VERSION = 0.03;
+our $VERSION = 0.04;
 
 1;
 
@@ -91,6 +91,16 @@ Wikibase time value datatype.
 
 =back
 
+Another projects:
+
+=over
+
+=item L<Wikibase::Datatype::Struct>
+
+Wikibase structure serialization.
+
+=back
+
 =head1 REPOSITORY
 
 L<https://github.com/michal-josef-spacek/Wikibase-Datatype>
@@ -109,6 +119,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.03
+0.04
 
 =cut

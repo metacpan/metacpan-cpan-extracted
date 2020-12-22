@@ -1,7 +1,7 @@
 #!/usr/bin/env perl
 
-# Test the flatted ionian keys
-# Skip some flat chords that have enharmonic scale notes but don't parse
+# Test sharpened ionian keys
+# Skip some chords in scales with enharmonic notes but don't parse
 
 use strict;
 use warnings;

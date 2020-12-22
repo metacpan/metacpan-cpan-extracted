@@ -1,11 +1,41 @@
+=head1 NAME
+
+DateTime::Format::W3CDTF - Parse and format W3CDTF datetime strings
+
+=head1 VERSION
+
+This document describes DateTime::Format::W3CDTF version 0.08
+
+=head1 SYNOPSIS
+
+  use DateTime::Format::W3CDTF;
+
+  my $w3c = DateTime::Format::W3CDTF->new(strict => 1);
+  my $dt = $w3c->parse_datetime( '2003-02-15T13:50:05-05:00' );
+
+  # 2003-02-15T13:50:05-05:00
+  $w3c->format_datetime($dt);
+
+=head1 DESCRIPTION
+
+This module understands the W3CDTF date/time format, an ISO 8601 profile,
+defined at http://www.w3.org/TR/NOTE-datetime.  This format as the native
+date format of RSS 1.0.
+
+It can be used to parse these formats in order to create the appropriate 
+objects.
+
+=cut
+
 package DateTime::Format::W3CDTF;
 
+use v5.8;
 use strict;
 use warnings;
 
 use vars qw ($VERSION);
 
-$VERSION = '0.07';
+$VERSION = '0.08';
 
 use DateTime;
 use DateTime::TimeZone;
@@ -13,11 +43,14 @@ use DateTime::TimeZone;
 sub new {
     my $class = shift;
 
-    return bless {}, $class;
+    return bless {@_}, $class;
 }
 
 sub parse_datetime {
     my ( $self, $date ) = @_;
+
+    # Dummy self if called as class method.
+    $self = $self->new() unless ref $self;
 
     my @fields = qw/ year month day hour minute second fraction time_zone /;
     my @values = 
@@ -41,6 +74,9 @@ sub parse_datetime {
        $p{$fields[$i]} = $values[$i];
     }
     
+    die "Invalid W3CDTF datetime string without timezone ($date)"
+        if $self->{strict} && $p{hour} && !$p{time_zone};
+
 ### support for YYYY-MM-DDT24:00:00 as a syntactic form for 00:00:00 on the day following YYYY-MM-DD
 ### this is allowed in xsd dateTime syntactic forms, but not W3CDTF.
 #     my $next_day    = 0;
@@ -76,6 +112,9 @@ sub parse_datetime {
 sub format_datetime {
     my ( $self, $dt ) = @_;
 
+    # Dummy self if called as class method.
+    $self = {} unless ref $self;
+
     my $base = sprintf(
         '%04d-%02d-%02dT%02d:%02d:%02d',
         $dt->year, $dt->month,  $dt->day,
@@ -90,15 +129,17 @@ sub format_datetime {
 
     my $tz = $dt->time_zone;
 
-    return $base if $tz->is_floating;
-
     return $base . 'Z' if $tz->is_utc;
 
-    my $offset = $dt->offset();
+    my $offset = $dt->offset;
 
-    return $base unless defined $offset;
+    if ($tz->is_floating or !defined $offset) {
+        die qq[Strict W3CDTF format does not support "floating" timezones]
+            if $self->{strict};
+        return $base;
+    }
 
-    return $base . _offset_as_string($offset)
+    return $base . _offset_as_string($offset);
 }
 
 sub format_date {
@@ -135,29 +176,6 @@ sub _offset_as_string {
 
 __END__
 
-=head1 NAME
-
-DateTime::Format::W3CDTF - Parse and format W3CDTF datetime strings
-
-=head1 SYNOPSIS
-
-  use DateTime::Format::W3CDTF;
-
-  my $w3c = DateTime::Format::W3CDTF->new;
-  my $dt = $w3c->parse_datetime( '2003-02-15T13:50:05-05:00' );
-
-  # 2003-02-15T13:50:05-05:00
-  $w3c->format_datetime($dt);
-
-=head1 DESCRIPTION
-
-This module understands the W3CDTF date/time format, an ISO 8601 profile,
-defined at http://www.w3.org/TR/NOTE-datetime.  This format as the native
-date format of RSS 1.0.
-
-It can be used to parse these formats in order to create the appropriate 
-objects.
-
 =head1 METHODS
 
 This API is currently experimental and may change in the future.
@@ -166,7 +184,15 @@ This API is currently experimental and may change in the future.
 
 =item * new()
 
-Returns a new W3CDTF parser object.
+Returns a new W3CDTF parser object.  Accepts a single C<strict> option:
+
+  DateTime::Format::W3CDTF->new(strict => 1);
+
+If true, parse_datetime() and format_datetime() will only accept and
+return strings in W3CDTF format, respectively.  In particular, the
+W3CDTF format requires all time components to have timezones.
+
+If false, timezones are optional.
 
 =item * parse_datetime($string)
 

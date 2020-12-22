@@ -1,3 +1,17 @@
+0.86    21 December 2020
+        Upgrade database schema to version 11 (text columns no longer have a
+          default value, for compatibility with MySQL strict mode).  To upgrade
+          your existing databases to the new schema, run wiki-toolkit-setupdb.
+          Use of schema version 10 and upgrades from this to newer versions
+          will continue to be supported for any releases made before
+          31 December 2021.
+        Remove code for dealing with upgrades to database schema version 10
+          (which came in over a decade ago).  PLEASE NOTE that if your schema
+          version is older than 10 (see the schema_info table in your database)
+          then you MUST upgrade to version 10 by running wiki-toolkit-setupdb
+          BEFORE you install this version of Wiki::Toolkit.
+        Fix an issue with MySQL locking of nodes with long names.
+
 0.85    16 December 2016
         Make ->rename_node try to ensure a valid new node name (depending on
           formatter parameters).

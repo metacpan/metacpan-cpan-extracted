@@ -1,0 +1,52 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.83.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA512
+
+SHA256 15c766f90ddf121ea7dcc9fbe85308c4998d78bc80a8ce82fd9d8e60ef30d27c Changes
+SHA256 9984f7b209d43761721f55f57d3b943c1d5308788d8d1818642db5deac235044 LICENSE
+SHA256 6a95967324031c75252e3ffb3e4348c2d6c42b41286af57deca0dde72735c5c1 MANIFEST
+SHA256 920450cf06d0cb21a480ee6850a3fc637e363421f00477daf306f4fbd320359f META.yml
+SHA256 a377d01b32f10583eecf3cf86134057d68cb39ec25f7bc38acdf796670a571db Makefile.PL
+SHA256 03e2fe3f6ae4abc034e00430ed362947277e1a8009c2e19eebabddbf9f3c2423 MixNMatch.pm
+SHA256 23a29052e61f780f99375de9430717145fa8c033e631afd8c0a20ce292348996 README
+SHA256 11c170ab97c2d25aca7b33a0aed8d7b616314c62eb4783e6454858087839e796 bin/mix-n-match
+SHA256 aaab868c025d28d3091ece3e453430eaa87224ac0aaf6e738abb71002c466dda examples/ex1.pl
+SHA256 67d139199c03b8bf8447a5a62f0d0b6dc1bd5bf6dbe04de6d21998c577823ed6 inc/Module/Install.pm
+SHA256 8bd506c33fb78f10f6451413e931ca23541fcc4eebe05fcb7c7c9577341223c4 inc/Module/Install/AuthorRequires.pm
+SHA256 1b5430a46a35142ef8914d8c745196fca825defc9dfa7e389299bf294613825e inc/Module/Install/AuthorTests.pm
+SHA256 6ebcc53a161dd5dc0aae69e4704575f2b00181901d768a82e26722a309cfdbe4 inc/Module/Install/Base.pm
+SHA256 d3f8c839d03fd21c197d05362dbb277cd7cadb15da6390d124b61e851f15146e inc/Module/Install/Can.pm
+SHA256 e9e72e18921c10c87bc4ea4c20af83e52015b9f5775d00ac64073042403717ca inc/Module/Install/Fetch.pm
+SHA256 a7a681bf2c9eee58a372cb642ffe42b0301d1200432ba8de9f7791cd1ecc9827 inc/Module/Install/Makefile.pm
+SHA256 aa887fa65a5eb6bbd1805706ce298b3f3cd55b353ecfd37aa7d35ae419331a49 inc/Module/Install/Metadata.pm
+SHA256 53825bc78e4c910b888160bc148c8bc211be58e02b99c8edcbf4854f95faa049 inc/Module/Install/ReadmeFromPod.pm
+SHA256 751bc4e2f98074c05c9e23d484f2406cef042099664b6c87a73d6530bbeda427 inc/Module/Install/Scripts.pm
+SHA256 26b166ff62aacdb55317d1659f160aa4935097eea9810ea980e6d747206b5dc0 inc/Module/Install/Win32.pm
+SHA256 5f73a6851a91ea44e65b924f918743ad6e860620ad7a38a39d0295e0c5652a9f inc/Module/Install/WriteAll.pm
+SHA256 2d2ccbf2c64a83c82d969f5017f5ea817d644544aae3092cd4259faa612bfdc5 t/App-Toolforge-MixNMatch/01-use.t
+SHA256 119bebc59ac930f013bd958e313f2a6f5fc931cb7b18288774330ba325756ac9 t/App-Toolforge-MixNMatch/02-version.t
+SHA256 77536bc6cb5188be402acdf4249dbda99d36804132e3cbabf3006b3090278bd6 xt/App-Toolforge-MixNMatch/01-pod_coverage.t
+SHA256 cc9d5786bdcc1ec88153a7267c8ddf3f9f7b1f272f7d09689aed1468b5ed584d xt/App-Toolforge-MixNMatch/02-pod.t
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCgAdFiEEAxWqUSy7qDLVZJQKKyiOZjWerHYFAl/eOgYACgkQKyiOZjWe
+rHY4/gf/Qft6HqkEiX072LAHTfMvN4Gjsbi6upsb0PBqQGJ2nznfdcEqlScnk2ub
+nTVRqiaV0sTLdO5RoajuMNRoqIaq8dDaf+vpVXWhUMKeXjs+oYOVjIRhofEtppeM
+1SyfGSU2PCZFbAOND0hzqAAA/cmkQmY8fIV5gMCj5kuXl4cGz4R2eqx2G1zYGBex
+zfnJpJE4K6NkFWilAD0TkUQ5SZ/AEELRyZyAyF6X5cz3Rrs4u1hk2O+9FMhfrH6S
+57xZJ4U6RNapvc2eHXnu4giYhGXOhMCJrNNR/j4yQlNmEaW68o72LRa1UWrxzdWu
+FqXPhQXstweWfY6u/d4Jf5VDSDZ3jQ==
+=qWpE
+-----END PGP SIGNATURE-----

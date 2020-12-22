@@ -5,14 +5,27 @@ use 5.014;
 use strict;
 use warnings;
 
-use registry;
+use registry 'Zing::Types';
 use routines;
 
 use Data::Object::Class;
+use Data::Object::ClassHas;
 
-use Carp ();
+extends 'Zing::Entity';
 
-our $VERSION = '0.13'; # VERSION
+our $VERSION = '0.20'; # VERSION
+
+# ATTRIBUTES
+
+has 'encoder' => (
+  is => 'ro',
+  isa => 'Encoder',
+  new => 1,
+);
+
+fun new_encoder($self) {
+  $self->app->encoder
+}
 
 # METHODS
 
@@ -23,60 +36,67 @@ sub args {
   $_[1] || ''
 }
 
-sub drop {
-  Carp::croak qq(Error in Store: (@{[ref$_[0]]}) method "drop" not implemented);
+method decode(Str $data) {
+  return $self->encoder->decode($data);
 }
 
-sub dump {
-  Carp::croak qq(Error in Store: (@{[ref$_[0]]}) method "dump" not implemented);
+method drop(Any @args) {
+  $self->throw(error_not_implemented($self, 'drop'));
 }
 
-sub keys {
-  Carp::croak qq(Error in Store: (@{[ref$_[0]]}) method "keys" not implemented);
+method encode(HashRef $data) {
+  return $self->encoder->encode($data);
 }
 
-sub load {
-  Carp::croak qq(Error in Store: (@{[ref$_[0]]}) method "load" not implemented);
+method keys(Any @args) {
+  $self->throw(error_not_implemented($self, 'keys'));
 }
 
-sub lpull {
-  Carp::croak qq(Error in Store: (@{[ref$_[0]]}) method "lpull" not implemented);
+method lpull(Any @args) {
+  $self->throw(error_not_implemented($self, 'lpull'));
 }
 
-sub lpush {
-  Carp::croak qq(Error in Store: (@{[ref$_[0]]}) method "lpush" not implemented);
+method lpush(Any @args) {
+  $self->throw(error_not_implemented($self, 'lpush'));
 }
 
-sub recv {
-  Carp::croak qq(Error in Store: (@{[ref$_[0]]}) method "recv" not implemented);
+method recv(Any @args) {
+  $self->throw(error_not_implemented($self, 'recv'));
 }
 
-sub rpull {
-  Carp::croak qq(Error in Store: (@{[ref$_[0]]}) method "rpull" not implemented);
+method rpull(Any @args) {
+  $self->throw(error_not_implemented($self, 'rpull'));
 }
 
-sub rpush {
-  Carp::croak qq(Error in Store: (@{[ref$_[0]]}) method "rpush" not implemented);
+method rpush(Any @args) {
+  $self->throw(error_not_implemented($self, 'rpush'));
 }
 
-sub send {
-  Carp::croak qq(Error in Store: (@{[ref$_[0]]}) method "send" not implemented);
+method send(Any @args) {
+  $self->throw(error_not_implemented($self, 'send'));
 }
 
-sub size {
-  Carp::croak qq(Error in Store: (@{[ref$_[0]]}) method "size" not implemented);
+method size(Any @args) {
+  $self->throw(error_not_implemented($self, 'size'));
 }
 
-sub slot {
-  Carp::croak qq(Error in Store: (@{[ref$_[0]]}) method "slot" not implemented);
+method slot(Any @args) {
+  $self->throw(error_not_implemented($self, 'slot'));
 }
 
 sub term {
   shift; return join(':', @_);
 }
 
-sub test {
-  Carp::croak qq(Error in Store: (@{[ref$_[0]]}) method "test" not implemented);
+method test(Any @args) {
+  $self->throw(error_not_implemented($self, 'test'));
+}
+
+# ERRORS
+
+fun error_not_implemented(Object $object, Str $method) {
+  code => 'error_not_implemented',
+  message => "@{[ref($object)]} method \"$method\" not implemented",
 }
 
 1;
@@ -85,13 +105,13 @@ sub test {
 
 =head1 NAME
 
-Zing::Store - Storage Interface
+Zing::Store - Storage Abstraction
 
 =cut
 
 =head1 ABSTRACT
 
-Data Storage Interface
+Data Storage Abstraction
 
 =cut
 
@@ -112,11 +132,33 @@ storage abstractions.
 
 =cut
 
+=head1 INHERITS
+
+This package inherits behaviors from:
+
+L<Zing::Entity>
+
+=cut
+
 =head1 LIBRARIES
 
 This package uses type constraints from:
 
 L<Zing::Types>
+
+=cut
+
+=head1 ATTRIBUTES
+
+This package has the following attributes:
+
+=cut
+
+=head2 encoder
+
+  encoder(Encoder)
+
+This attribute is read-only, accepts C<(Encoder)> values, and is optional.
 
 =cut
 
@@ -155,6 +197,28 @@ environment variable) meant to be used in object construction.
 
 =cut
 
+=head2 decode
+
+  decode(Str $data) : HashRef
+
+The decode method should decode the data provided and returns the data as a
+hashref.
+
+=over 4
+
+=item decode example #1
+
+  # given: synopsis
+
+  $store->decode('{ status => "ok" }');
+
+  # e.g.
+  # $ENV{ZING_ENCODER} # Zing::Encoder::Dump
+
+=back
+
+=cut
+
 =head2 drop
 
   drop(Str $key) : Int
@@ -173,20 +237,20 @@ The drop method should remove items from the datastore by key.
 
 =cut
 
-=head2 dump
+=head2 encode
 
-  dump(HashRef $data) : Str
+  encode(HashRef $data) : Str
 
-The dump method should encode and return the data provided in a format suitable
-for the underlying storage mechanism.
+The encode method should encode and return the data provided in a format
+suitable for the underlying storage mechanism.
 
 =over 4
 
-=item dump example #1
+=item encode example #1
 
   # given: synopsis
 
-  $store->dump({ status => 'ok' });
+  $store->encode({ status => 'ok' });
 
 =back
 
@@ -205,38 +269,7 @@ including itself.
 
   # given: synopsis
 
-  my $keys = $store->keys('nodel');
-
-=back
-
-=over 4
-
-=item keys example #2
-
-  # given: synopsis
-
-  # $store->send('model', { status => 'ok' });
-
-  my $keys = $store->keys('model');
-
-=back
-
-=cut
-
-=head2 load
-
-  load(Str $data) : HashRef
-
-The load method should decode the data provided and returns the data as a
-hashref.
-
-=over 4
-
-=item load example #1
-
-  # given: synopsis
-
-  $store->load('{"status":"ok"}');
+  my $keys = $store->keys('zing:main:global:model:temp');
 
 =back
 
@@ -254,19 +287,7 @@ The lpull method should pop data off of the top of a list in the datastore.
 
   # given: synopsis
 
-  $store->lpull('collection');
-
-=back
-
-=over 4
-
-=item lpull example #2
-
-  # given: synopsis
-
-  # $store->rpush('collection', { status => 'ok' });
-
-  $store->lpull('collection');
+  $store->lpull('zing:main:global:model:items');
 
 =back
 
@@ -284,10 +305,10 @@ The lpush method should push data onto the top of a list in the datastore.
 
   # given: synopsis
 
-  # $store->rpush('collection', { status => '1' });
-  # $store->rpush('collection', { status => '2' });
+  # $store->rpush('zing:main:global:model:items', { status => '1' });
+  # $store->rpush('zing:main:global:model:items', { status => '2' });
 
-  $store->lpush('collection', { status => '0' });
+  $store->lpush('zing:main:global:model:items', { status => '0' });
 
 =back
 
@@ -305,19 +326,7 @@ The recv method should fetch and return data from the datastore by its key.
 
   # given: synopsis
 
-  $store->recv('model');
-
-=back
-
-=over 4
-
-=item recv example #2
-
-  # given: synopsis
-
-  # $store->send('model', { status => 'ok' });
-
-  $store->recv('model');
+  $store->recv('zing:main:global:model:temp');
 
 =back
 
@@ -335,20 +344,7 @@ The rpull method should pop data off of the bottom of a list in the datastore.
 
   # given: synopsis
 
-  $store->rpull('collection');
-
-=back
-
-=over 4
-
-=item rpull example #2
-
-  # given: synopsis
-
-  # $store->rpush('collection', { status => 1 });
-  # $store->rpush('collection', { status => 2 });
-
-  $store->rpull('collection');
+  $store->rpull('zing:main:global:model:items');
 
 =back
 
@@ -366,7 +362,7 @@ The rpush method should push data onto the bottom of a list in the datastore.
 
   # given: synopsis
 
-  $store->rpush('collection', { status => 'ok' });
+  $store->rpush('zing:main:global:model:items', { status => 'ok' });
 
 =back
 
@@ -385,7 +381,7 @@ truthy (or falsy if not).
 
   # given: synopsis
 
-  $store->send('model', { status => 'ok' });
+  $store->send('zing:main:global:model:temp', { status => 'ok' });
 
 =back
 
@@ -403,19 +399,7 @@ The size method should return the size of a list in the datastore.
 
   # given: synopsis
 
-  my $size = $store->size('collection');
-
-=back
-
-=over 4
-
-=item size example #2
-
-  # given: synopsis
-
-  # $store->rpush('collection', { status => 'ok' });
-
-  my $size = $store->size('collection');
+  my $size = $store->size('zing:main:global:model:items');
 
 =back
 
@@ -434,38 +418,7 @@ position in the list.
 
   # given: synopsis
 
-  my $model = $store->slot('collection', 0);
-
-=back
-
-=over 4
-
-=item slot example #2
-
-  # given: synopsis
-
-  # $store->rpush('collection', { status => 'ok' });
-
-  my $model = $store->slot('collection', 0);
-
-=back
-
-=cut
-
-=head2 term
-
-  term(Str @keys) : Str
-
-The term method generates a term (safe string) for the datastore. This method
-doesn't need to be implemented.
-
-=over 4
-
-=item term example #1
-
-  # given: synopsis
-
-  $store->term('model');
+  my $model = $store->slot('zing:main:global:model:items', 0);
 
 =back
 
@@ -484,21 +437,9 @@ datastore.
 
   # given: synopsis
 
-  # $store->rpush('collection', { status => 'ok' });
+  # $store->rpush('zing:main:global:model:items', { status => 'ok' });
 
-  $store->test('collection');
-
-=back
-
-=over 4
-
-=item test example #2
-
-  # given: synopsis
-
-  # $store->drop('collection');
-
-  $store->test('collection');
+  $store->test('zing:main:global:model:items');
 
 =back
 

@@ -29,14 +29,14 @@
             "Carp" : "0",
             "Moo" : "0",
             "Types::Standard" : "0",
-            "perl" : "v5.6.0"
+            "perl" : "v5.10.0"
          }
       }
    },
    "provides" : {
       "Array::Compare" : {
          "file" : "lib/Array/Compare.pm",
-         "version" : "v3.0.7"
+         "version" : "v3.0.8"
       }
    },
    "release_status" : "stable",
@@ -53,6 +53,6 @@
          "web" : "https://github.com/davorg/array-compare"
       }
    },
-   "version" : "v3.0.7",
+   "version" : "v3.0.8",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

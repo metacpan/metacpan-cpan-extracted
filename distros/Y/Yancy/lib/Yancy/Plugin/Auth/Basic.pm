@@ -1,6 +1,6 @@
 package Yancy::Plugin::Auth::Basic;
-our $VERSION = '1.067';
-# ABSTRACT: A simple auth module for a site
+our $VERSION = '1.068';
+# ABSTRACT: (DEPRECATED) A simple auth module for a site
 
 #pod =encoding utf8
 #pod
@@ -423,11 +423,11 @@ sub _get_logout {
 
 =head1 NAME
 
-Yancy::Plugin::Auth::Basic - A simple auth module for a site
+Yancy::Plugin::Auth::Basic - (DEPRECATED) A simple auth module for a site
 
 =head1 VERSION
 
-version 1.067
+version 1.068
 
 =head1 SYNOPSIS
 

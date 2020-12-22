@@ -1,5 +1,5 @@
 package Data::CompactReadonly::V0::Text;
-our $VERSION = '0.0.3';
+our $VERSION = '0.0.4';
 
 use warnings;
 use strict;
@@ -23,9 +23,11 @@ sub _create {
     $class->_stash_already_seen(%args);
     (my $scalar_type = $class) =~ s/Text/Scalar/;
     my $text = $class->_text_to_bytes($args{data});
+
     print $fh $class->_type_byte_from_class().
               $scalar_type->_get_bytes_from_word(length($text)).
               $text;
+    $class->_set_next_free_ptr(%args);
 }
 
 sub _bytes_to_text {

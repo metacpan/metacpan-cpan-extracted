@@ -11,20 +11,15 @@ use routines;
 use Data::Object::Class;
 use Data::Object::ClassHas;
 
+extends 'Zing::Entity';
+
 use FlightRecorder;
 use POSIX;
 
-use Zing::Channel;
-use Zing::Data;
-use Zing::Fork;
 use Zing::Logic;
 use Zing::Loop;
-use Zing::Mailbox;
-use Zing::Node;
-use Zing::Registry;
-use Zing::Term;
 
-our $VERSION = '0.13'; # VERSION
+our $VERSION = '0.20'; # VERSION
 
 # ATTRIBUTES
 
@@ -41,7 +36,7 @@ has 'data' => (
 );
 
 fun new_data($self) {
-  Zing::Data->new(process => $self)
+  $self->app->data(name => $self->name)
 }
 
 has 'journal' => (
@@ -51,7 +46,7 @@ has 'journal' => (
 );
 
 fun new_journal($self) {
-  Zing::Channel->new(name => '$journal')
+  $self->app->journal
 }
 
 has 'log' => (
@@ -61,7 +56,7 @@ has 'log' => (
 );
 
 fun new_log($self) {
-  FlightRecorder->new(auto => undef, level => 'info')
+  $self->app->logger(auto => undef)
 }
 
 has 'logic' => (
@@ -71,7 +66,8 @@ has 'logic' => (
 );
 
 fun new_logic($self) {
-  Zing::Logic->new(process => $self);
+  my $debug = $self->env->debug;
+  Zing::Logic->new(debug => $debug, process => $self)
 }
 
 has 'loop' => (
@@ -91,27 +87,27 @@ has 'mailbox' => (
 );
 
 fun new_mailbox($self) {
-  Zing::Mailbox->new(process => $self)
+  $self->app->mailbox(name => $self->name)
+}
+
+has 'meta' => (
+  is => 'ro',
+  isa => 'Meta',
+  new => 1,
+);
+
+fun new_meta($self) {
+  $self->app->meta(name => $self->name)
 }
 
 has 'name' => (
   is => 'ro',
-  isa => 'Str',
+  isa => 'Name',
   new => 1,
 );
 
 fun new_name($self) {
-  $self->node->identifier
-}
-
-has 'node' => (
-  is => 'ro',
-  isa => 'Node',
-  new => 1,
-);
-
-fun new_node($self) {
-  Zing::Node->new
+  $self->app->id->string
 }
 
 has 'parent' => (
@@ -120,24 +116,14 @@ has 'parent' => (
   opt => 1,
 );
 
-has 'registry' => (
+has 'pid' => (
   is => 'ro',
-  isa => 'Registry',
+  isa => 'Int',
   new => 1,
 );
 
-fun new_registry($self) {
-  Zing::Registry->new
-}
-
-has 'server' => (
-  is => 'ro',
-  isa => 'Server',
-  new => 1,
-);
-
-fun new_server($self) {
-  Zing::Server->new
+fun new_pid($self) {
+  $self->app->pid
 }
 
 has 'signals' => (
@@ -187,7 +173,7 @@ method destroy() {
 
   $self->data->drop;
   $self->mailbox->drop;
-  $self->registry->drop($self);
+  $self->meta->drop;
 
   return $self;
 }
@@ -240,11 +226,10 @@ method metadata() {
   {
     name => $self->name,
     data => $self->data->term,
+    host => $self->app->host,
     mailbox => $self->mailbox->term,
-    node => $self->node->name,
-    parent => ($self->parent ? $self->parent->node->pid : undef),
-    process => $self->node->pid,
-    server => $self->server->name,
+    parent => ($self->parent ? $self->parent->pid : undef),
+    process => $self->pid,
     tag => $self->tag,
   }
 }
@@ -259,7 +244,7 @@ method reply(HashRef $mail, HashRef $data) {
 
 method send(Mailbox | Process | Str $to, HashRef $data) {
   if (!ref $to) {
-    return $self->mailbox->send(Zing::Term->new($to)->mailbox, $data);
+    return $self->mailbox->send($self->app->term($to)->mailbox, $data);
   }
   elsif ($to->isa('Zing::Mailbox')) {
     return $self->mailbox->send($to->term, $data);
@@ -268,7 +253,7 @@ method send(Mailbox | Process | Str $to, HashRef $data) {
     return $self->mailbox->send($to->mailbox->term, $data);
   }
   else {
-    return $self->mailbox->send(Zing::Term->new($to)->mailbox, $data);
+    return $self->mailbox->send($self->app->term($to)->mailbox, $data);
   }
 }
 
@@ -288,7 +273,7 @@ method signal(Int $pid, Str $type = 'kill') {
 
 method spawn(Scheme $scheme) {
   my $size = $scheme->[2];
-  my $fork = Zing::Fork->new(parent => $self, scheme => $scheme);
+  my $fork = $self->app->fork(parent => $self, scheme => $scheme);
 
   $SIG{CHLD} = 'IGNORE';
 
@@ -298,7 +283,7 @@ method spawn(Scheme $scheme) {
 }
 
 method term() {
-  return Zing::Term->new($self)->process;
+  return $self->app->term($self)->process;
 }
 
 method winddown() {
@@ -364,111 +349,111 @@ This attribute is read-only, accepts C<(Str)> values, and is optional.
 
 =head2 data
 
-  data(Str)
+  data(Data)
 
-This attribute is read-only, accepts C<(Str)> values, and is optional.
+This attribute is read-only, accepts C<(Data)> values, and is optional.
 
 =cut
 
 =head2 journal
 
-  journal(Str)
+  journal(Channel)
 
-This attribute is read-only, accepts C<(Str)> values, and is optional.
+This attribute is read-only, accepts C<(Channel)> values, and is optional.
 
 =cut
 
 =head2 log
 
-  log(Str)
+  log(Logger)
 
-This attribute is read-only, accepts C<(Str)> values, and is optional.
+This attribute is read-only, accepts C<(Logger)> values, and is optional.
 
 =cut
 
 =head2 logic
 
-  logic(Str)
+  logic(Logic)
 
-This attribute is read-only, accepts C<(Str)> values, and is optional.
+This attribute is read-only, accepts C<(Logic)> values, and is optional.
 
 =cut
 
 =head2 loop
 
-  loop(Str)
+  loop(Loop)
 
-This attribute is read-only, accepts C<(Str)> values, and is optional.
+This attribute is read-only, accepts C<(Loop)> values, and is optional.
 
 =cut
 
 =head2 mailbox
 
-  mailbox(Str)
+  mailbox(Mailbox)
 
-This attribute is read-only, accepts C<(Str)> values, and is optional.
+This attribute is read-only, accepts C<(Mailbox)> values, and is optional.
+
+=cut
+
+=head2 meta
+
+  meta(Meta)
+
+This attribute is read-only, accepts C<(Meta)> values, and is optional.
 
 =cut
 
 =head2 name
 
-  name(Str)
+  name(Name)
 
-This attribute is read-only, accepts C<(Str)> values, and is optional.
-
-=cut
-
-=head2 node
-
-  node(Str)
-
-This attribute is read-only, accepts C<(Str)> values, and is optional.
+This attribute is read-only, accepts C<(Name)> values, and is optional.
 
 =cut
 
 =head2 parent
 
-  parent(Str)
+  parent(Maybe[Process])
 
-This attribute is read-only, accepts C<(Str)> values, and is optional.
-
-=cut
-
-=head2 registry
-
-  registry(Str)
-
-This attribute is read-only, accepts C<(Str)> values, and is optional.
+This attribute is read-only, accepts C<(Maybe[Process])> values, and is optional.
 
 =cut
 
-=head2 server
+=head2 pid
 
-  server(Str)
+  pid(Int)
 
-This attribute is read-only, accepts C<(Str)> values, and is optional.
+This attribute is read-only, accepts C<(Int)> values, and is optional.
 
 =cut
 
 =head2 signals
 
-  signals(Str)
+  signals(HashRef[Str|CodeRef])
 
-This attribute is read-only, accepts C<(Str)> values, and is optional.
+This attribute is read-only, accepts C<(HashRef[Str|CodeRef])> values, and is optional.
 
 =cut
 
 =head2 started
 
-  started(Str)
+  started(Int)
 
-This attribute is read-only, accepts C<(Str)> values, and is optional.
+This attribute is read-only, accepts C<(Int)> values, and is optional.
 
 =cut
 
 =head2 stopped
 
-  stopped(Str)
+  stopped(Int)
+
+This attribute is read-only, accepts C<(Int)> values, and is optional.
+
+=cut
+
+=head2 tag
+
+  tag(Str)
 
 This attribute is read-only, accepts C<(Str)> values, and is optional.
 

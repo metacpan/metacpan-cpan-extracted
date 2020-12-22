@@ -1,5 +1,14 @@
 Revision history for Perl module RT::Extension::ResetPassword
 
+1.07 2020-12-17
+ - Update styles for RT 5
+ - Use SHA256 instead of MD5 to generate the token
+ - Store the temporary token in a cookie rather than Referrer header
+
+1.06 [not released]
+ - Add new options for creating accounts, setting passwords if a user has none,
+   creating users as privileged, and reseting only from the user admin page.
+
 1.05 2020-02-14
  - Update Module::Install so "make initdb" could work in recent perls
 

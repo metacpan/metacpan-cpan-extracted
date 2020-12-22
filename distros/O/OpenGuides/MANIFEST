@@ -102,6 +102,7 @@ t/106_test_tester.t
 t/107_commit_node.t
 t/108_http_headers.t
 t/109_autocreate.t
+t/110_config_via_envvar.t 
 t/200_edit_form.t
 t/201_rdf.t
 t/202_feed_recent_changes.t
@@ -193,3 +194,4 @@ t/909_external_class_metadata.t
 t/templates/105_test.tt
 wiki.cgi
 META.json
+SIGNATURE    Added here by Module::Build

@@ -327,6 +327,15 @@ t/57-function-scans.d/plan.plain.text
 t/57-function-scans.d/plan.plain.xml
 t/57-function-scans.d/plan.plain.yaml
 t/57-function-scans.t
+t/58-auto-explain.d/json-analyze.plan
+t/58-auto-explain.d/json-simple.plan
+t/58-auto-explain.d/text-analyze.plan
+t/58-auto-explain.d/text-simple.plan
+t/58-auto-explain.d/xml-analyze.plan
+t/58-auto-explain.d/xml-simple.plan
+t/58-auto-explain.d/yaml-analyze.plan
+t/58-auto-explain.d/yaml-simple.plan
+t/58-auto-explain.t
 t/99-manifest.t
 t/perlcriticrc
 t/perltidyrc

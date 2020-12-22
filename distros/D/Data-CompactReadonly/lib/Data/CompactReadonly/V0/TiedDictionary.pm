@@ -1,5 +1,5 @@
 package Data::CompactReadonly::V0::TiedDictionary;
-our $VERSION = '0.0.3';
+our $VERSION = '0.0.4';
 
 use strict;
 use warnings;
@@ -15,8 +15,8 @@ sub SCALAR { shift()->{object}->count(); }
 
 sub FIRSTKEY {
     my $tiedhash = shift();
-    $tiedhash->{nextkey} = 1;
-    $tiedhash->{object}->_nth_key(0);
+    $tiedhash->{nextkey} = 0;
+    $tiedhash->NEXTKEY();
 }
 
 sub NEXTKEY {

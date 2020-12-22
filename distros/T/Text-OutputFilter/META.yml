@@ -14,15 +14,16 @@ name: Text-OutputFilter
 provides: 
   Text::OutputFilter: 
     file: OutputFilter.pm
-    version: '0.22'
+    version: '0.23'
 recommends: 
-  Test::More: '1.302174'
+  Test::More: '1.302183'
 requires: 
   Carp: 0
   Test::More: 0
   Test::NoWarnings: 0
   perl: '5.008'
 resources: 
+  bugtracker: https://github.com/Tux/Text-OutputFilter/issues
   license: http://dev.perl.org/licenses/
   repository: https://github.com/Tux/Text-OutputFilter
-version: '0.22'
+version: '0.23'

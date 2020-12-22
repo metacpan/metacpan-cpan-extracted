@@ -1,3 +1,4 @@
+.gitattributes
 .github/workflows/ci-ubuntu.yml
 Changes
 cpanfile
@@ -44,6 +45,7 @@ t/migrate-from-assetpack.t
 t/migrate-from-assetpack/assets/assetpack.def
 t/migrate-from-assetpack/assets/js/app.js
 t/migrate-from-assetpack/assets/js/include-some-file.js
+t/migrate-from-assetpack/package-lock.json
 t/migrate-from-assetpack/package.json
 t/MyApp.pm
 t/MyApp/Plugin/Helper.pm
@@ -53,8 +55,9 @@ t/process-sass.t
 t/public/asset/add.development.js
 t/public/asset/basic.development.css
 t/public/asset/basic.development.js
-t/public/asset/myapp.1df3519d71cda2667d35.js
+t/public/asset/my_app.development.js
 t/public/asset/myapp.658763d47b8fd5499dbf.css
+t/public/asset/myapp.dd0706769ba999ffb1be.js
 t/public/asset/subtract.development.js
 t/public/asset/webpack.development.html
 t/public/asset/webpack.markup.html

@@ -1,8 +1,8 @@
-Acme-Cow-Interpreter version 0.01
+Acme-Cow-Interpreter version 0.02
 =================================
 
 Acme::Cow::Interpreter is a module for executing code written in the Cow
-programming language (http://www.bigzaphod.org/cow/).
+programming language (https://bigzaphod.github.io/COW/).
 
 INSTALLATION
 

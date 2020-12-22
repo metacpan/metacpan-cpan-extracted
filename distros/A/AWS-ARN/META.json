@@ -10,7 +10,7 @@
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "AWS-ARN",
    "prereqs" : {
@@ -37,11 +37,22 @@
    "provides" : {
       "AWS::ARN" : {
          "file" : "lib/AWS/ARN.pm",
-         "version" : "0.005"
+         "version" : "0.007"
       }
    },
    "release_status" : "stable",
-   "version" : "0.005",
-   "x_serialization_backend" : "JSON::PP version 2.27300",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/tehmoth/AWS-ARN/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/tehmoth/AWS-ARN.git",
+         "web" : "https://github.com/tehmoth/AWS-ARN"
+      },
+      "x_IRC" : "irc://irc.styxnet.tech/#perl"
+   },
+   "version" : "0.007",
+   "x_serialization_backend" : "JSON::PP version 4.02",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }

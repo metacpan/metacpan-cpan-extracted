@@ -13,7 +13,7 @@ use strict;
 use warnings;
 use namespace::autoclean;
 
-our $VERSION = '2.44';
+our $VERSION = '2.45';
 
 use Class::Singleton 1.03;
 use DateTime::TimeZone;

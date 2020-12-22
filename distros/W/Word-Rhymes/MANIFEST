@@ -1,0 +1,31 @@
+appveyor.yml
+bin/rhyme
+Changes
+lib/Word/Rhymes.pm
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+MYMETA.json.lock
+pod.html
+pod2htmd.tmp
+t/00-load.t
+t/05-max_results.t
+t/10-min_score.t
+t/15-min_syllables.t
+t/20-file.t
+t/22-return_raw.t
+t/25-multi_word.t
+t/30-sort_by.t
+t/35-mock.t
+t/40-print.t
+t/45-uri.t
+t/50-fetch.t
+t/data/print.data
+t/data/zoo.data
+t/data/zoo_farm.data
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+t/script/convert_to_json.pl
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

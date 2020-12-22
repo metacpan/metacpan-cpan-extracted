@@ -51,6 +51,7 @@ our @EXPORT_OK = qw(maybeIO_to_stream
     xdirectory_items
     xdirectory_paths
     xfile_lines xfile_lines0 xfile_lines0chop xfile_lines_chomp
+    xfile_chars
     fh_to_lines
     fh_to_chunks
     timestream
@@ -206,11 +207,12 @@ sub make_open_stream {
     my ($open, $read, $maybe_close) = @_;
     my $close = $maybe_close // the_method("xclose");
     sub {
+        @_ == 1 or @_ == 2 or fp_croak_arity("1 or 2");
         my ($path, $maybe_encoding) = @_;
         my $fh = &$open($path);
         if ($maybe_encoding) {
             binmode($fh, ":encoding($maybe_encoding)")
-                or die "binmode for :encoding($maybe_encoding): $!";
+                or croak "binmode for :encoding($maybe_encoding): $!";
         }
         fh_to_stream($fh, $read, $close)
     }
@@ -229,6 +231,11 @@ sub xfile_lines0chop;
 sub xfile_lines_chomp;
 *xfile_lines_chomp
     = make_open_stream(\&xopen_read, the_method("xreadline_chomp"));
+
+sub xfile_chars;
+*xfile_chars
+    = make_open_stream(\&xopen_read, the_method("xreadchar"));
+
 
 # Clojure calls this line-seq
 #  (http://clojure.github.io/clojure/clojure.core-api.html#clojure.core/line-seq)
@@ -277,19 +284,19 @@ sub timestream {
 }
 
 sub xstream_print {
-    @_ == 2 or @_ == 1 or die "wrong number of arguments";
+    @_ == 1 or @_ == 2 or fp_croak_arity "1 or 2";
     my ($s, $maybe_fh) = @_;
     my $fh = $maybe_fh // glob_to_fh(*STDOUT);
     weaken $_[0];
     $s->for_each(
         sub {
-            print $fh $_[0] or die "xstream_print: writing to $fh: $!";
+            print $fh $_[0] or croak "xstream_print: writing to $fh: $!";
         }
     );
 }
 
 sub xstream_to_file {
-    @_ == 2 or @_ == 3 or die "wrong number of arguments";
+    @_ == 2 or @_ == 3 or fp_croak_arity "2 or 3";
     my ($s, $path, $maybe_mode) = @_;
     my $out = xtmpfile $path;
     weaken $_[0];

@@ -39,3 +39,6 @@ Revision history for Perl extension Video::File::TVShow::Import.
 0.32 Sunday April 7th 2019
 	- Removed Video::Filename as a requirement.
 	- Now using my own module File::TVShow::Info to get information from Filename
+
+0.35.1 Wednesday December 9th 2020
+	- Update Makefile.PL with new meta data to handle rt.cpan.org being sunset.

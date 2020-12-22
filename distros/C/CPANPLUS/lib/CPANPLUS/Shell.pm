@@ -14,7 +14,7 @@ $Params::Check::VERBOSE = 1;
 
 use vars qw[@ISA $SHELL $DEFAULT $VERSION];
 
-$VERSION = "0.9908";
+$VERSION = "0.9910";
 $DEFAULT    = SHELL_DEFAULT;
 
 =pod

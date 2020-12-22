@@ -1,5 +1,5 @@
 package Lab::Moose::Instrument::ZI_MFLI;
-$Lab::Moose::Instrument::ZI_MFLI::VERSION = '3.730';
+$Lab::Moose::Instrument::ZI_MFLI::VERSION = '3.731';
 #ABSTRACT: Zurich Instruments MFLI Lock-in Amplifier
 
 use v5.20;
@@ -547,7 +547,6 @@ sub set_amplitude {
         value => { isa => 'Num' },
         demod => { isa => 'Int' },
     );
-    my $osc   = $self->_get_oscillator(%args);
     my $demod = delete $args{demod};
     return $self->cached_amplitude(
         $self->sync_set_value(
@@ -607,7 +606,7 @@ Lab::Moose::Instrument::ZI_MFLI - Zurich Instruments MFLI Lock-in Amplifier
 
 =head1 VERSION
 
-version 3.730
+version 3.731
 
 =head1 SYNOPSIS
 
@@ -782,19 +781,15 @@ Set demodulator filter order.
 =head2 get_amplitude
 
  # set amplitude for default oscillator
- my $amplitude = $mfli->get_amplitude();
+ my $amplitude = $mfli->get_amplitude(demod => ...);
 
- # set amplitude of oscillator 1
- my $amplitude = $mfli->get_amplitude(oscillator => 1);
-
-Get peak amplitude of voltage output. The default oscillator is determined by the C<oscillator> attribute.
+Get peak amplitude of voltage output.
 
 =head2 set_amplitude
 
- $mfli->set_amplitude(value => 300e-3);
  $mfli->set_amplitude(value => ..., demod => ...);
 
-Set peak amplitude of voltage output. The oscillator is determined by the C<oscillator> attribute.
+Set peak amplitude of voltage output.
 
 =head2 get_amplitude_rms/set_amplitude_rms
 

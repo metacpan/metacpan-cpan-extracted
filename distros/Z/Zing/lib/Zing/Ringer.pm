@@ -14,7 +14,7 @@ use Data::Object::Space;
 
 extends 'Zing::Ring';
 
-our $VERSION = '0.13'; # VERSION
+our $VERSION = '0.20'; # VERSION
 
 # ATTRIBUTES
 

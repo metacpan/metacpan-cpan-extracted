@@ -4,9 +4,23 @@
 ##################################################################################
 #                                                                                #
 # Autor             : Michael Plugge <m.plugge@hs-mannheim.de>                   #
-# Version           : 6.12                                                       #
-# Datum             : 27.02.2020                                                 #
+# Version           : 6.13                                                       #
+# Datum             : 21.12.2020                                                 #
 ##################################################################################
+
+##################################################################################
+###                      21.12.20 Version 6.13                                 ###
+##################################################################################
+
+   - Korrektur bei der Suche von 8-stelligen BICs: ein 8-stelliger BIC ist mit der
+     XXX Extension aufzulösen, falls eine solche in der SCL-Tabelle vorhanden ist.
+     Der 8-stellige BIC ist ein wildcard, die xxx BIC steht auch für die Erreichbarkeit
+     des 8-stelligen BIC (danke an Thimo Krämer für den Hinweis)
+   - Fehler bei der Suche nach ZWLBNL21XXX (letzter BIC) im BIC-Verzeichnis behoben
+   - die bic*() Routinen sind nun auch in Ruby verfügbar
+   - Testdateien für perl aktualisiert
+
+   Die Prüfziffermethoden und IBAN-Regeln sind weiterhin unverändert
 
 ##################################################################################
 ###                      27.02.20 Version 6.12                                 ###

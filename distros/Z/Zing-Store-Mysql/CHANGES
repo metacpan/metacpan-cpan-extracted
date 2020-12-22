@@ -1,0 +1,17 @@
+Changelog for Zing-Store-Mysql
+
+0.03 2020-12-20T22:06:56
+ - Add release updates
+ - Add fault-tolerance, and unique message per dequeue (#8)
+
+0.02 2020-12-20T09:33:33
+ - Built release version 0.02
+ - Add release updates
+ - Refactor persistence architecture (#5)
+
+0.01 2020-12-19T05:36:14
+ - Built release version 0.01
+ - Add release updates
+ - Update testing and release workflows
+ - Initial implementation (#2)
+ - Initial commit

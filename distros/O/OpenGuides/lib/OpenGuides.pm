@@ -14,7 +14,7 @@ use URI::Escape;
 
 use vars qw( $VERSION );
 
-$VERSION = '0.83';
+$VERSION = '0.84';
 
 =head1 NAME
 
@@ -1633,7 +1633,7 @@ project is available from the <a href="http://dev.openguides.org/">OpenGuides
 development site</a>.
 </p>
 <p>
-Copyright &copy;2003-2008, <a href="http://openguides.org/">The OpenGuides
+Copyright &copy;2003-2020, <a href="http://openguides.org/">The OpenGuides
 Project</a>. "OpenGuides", "[The] Open Guide To..." and "The guides made by
 you" are trademarks of The OpenGuides Project. Any uses on this site are made 
 with permission.
@@ -2619,7 +2619,7 @@ The OpenGuides Project (openguides-dev@lists.openguides.org)
 
 =head1 COPYRIGHT
 
-     Copyright (C) 2003-2013 The OpenGuides Project.  All Rights Reserved.
+     Copyright (C) 2003-2020 The OpenGuides Project.  All Rights Reserved.
 
 The OpenGuides distribution is free software; you can redistribute it
 and/or modify it under the same terms as Perl itself.

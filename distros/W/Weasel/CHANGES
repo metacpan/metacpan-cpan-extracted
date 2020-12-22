@@ -1,3 +1,6 @@
+** 0.27 / 2020-12-19
+   - Rely on driver to get input checkbox & radio selected state
+
 ** 0.26 / 2019-08-14
    - Add 'on_timeout' callback to 'wait_for' driver API
 

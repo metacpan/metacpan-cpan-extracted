@@ -33,7 +33,7 @@ BEGIN
 }
 
 # module/package version
-$VERSION = '0.41';
+$VERSION = '0.42';
 
 # file creation mode (octal, a la chmod)
 $FILEMODE = 0660;
@@ -663,7 +663,7 @@ sub send_amqp_message {
     };
 
     # override default send_opts with node-specific opts (where indicated)
-    foreach my $opt (keys $send_opts) {
+    foreach my $opt (keys %$send_opts) {
         $send_opts->{$opt} = $node->{$opt}
             if exists $node->{$opt};
     }
@@ -699,7 +699,7 @@ sub send_amqp_message {
 
     # add custom properties to send_props (where indicated)
     if(defined $custom_properties) {
-        foreach my $prop (keys $custom_properties) {
+        foreach my $prop (keys %$custom_properties) {
             $send_props->{$prop} = $custom_properties->{$prop};
         }
     }
@@ -726,7 +726,7 @@ sub send_amqp_message {
         if $send_opts->{amqp_sslcert} and $send_opts->{amqp_sslkey};
     $cmd .= sprintf(' --username %s', $send_opts->{amqp_username})
         if $send_opts->{amqp_username};
-    foreach my $prop (keys $send_props) {
+    foreach my $prop (keys %$send_props) {
         $cmd .= sprintf(' --property %s=%s', $prop, $send_props->{$prop})
             if $send_props->{$prop};
     }

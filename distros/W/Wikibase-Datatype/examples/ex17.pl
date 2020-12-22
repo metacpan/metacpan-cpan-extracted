@@ -3,23 +3,23 @@
 use strict;
 use warnings;
 
-use Wikibase::Datatype::Value::Property;
+use Wikibase::Datatype::Value::String;
 
 # Object.
-my $obj = Wikibase::Datatype::Value::Property->new(
-        'value' => 'P123',
+my $obj = Wikibase::Datatype::Value::String->new(
+        'value' => 'foo',
 );
-
-# Get value.
-my $value = $obj->value;
 
 # Get type.
 my $type = $obj->type;
+
+# Get value.
+my $value = $obj->value;
 
 # Print out.
 print "Type: $type\n";
 print "Value: $value\n";
 
 # Output:
-# Type: property
-# Value: P123
+# Type: string
+# Value: foo
