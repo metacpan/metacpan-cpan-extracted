@@ -620,6 +620,26 @@ Yes
 
 7 (တနင်္ဂနွေ)
 
+=head2 Strftime Patterns
+
+=head3 %c (%OC%Oy %b %Od %A %OI:%OM:%OS %p) - date time format
+
+   2008-02-05T18:30:30 = %OC%Oy ဖေ %Od အင်္ဂါ %OI:%OM:%OS ညနေ
+   1995-12-22T09:05:02 = %OC%Oy ဒီ %Od သောကြာ %OI:%OM:%OS နံနက်
+  -0010-09-15T04:44:23 = %OC%Oy စက် %Od စနေ %OI:%OM:%OS နံနက်
+
+=head3 %x (%OC%Oy %b %Od %A) - date format
+
+   2008-02-05T18:30:30 = %OC%Oy ဖေ %Od အင်္ဂါ
+   1995-12-22T09:05:02 = %OC%Oy ဒီ %Od သောကြာ
+  -0010-09-15T04:44:23 = %OC%Oy စက် %Od စနေ
+
+=head3 %X (%OI:%OM:%OS %p) - time format
+
+   2008-02-05T18:30:30 = %OI:%OM:%OS ညနေ
+   1995-12-22T09:05:02 = %OI:%OM:%OS နံနက်
+  -0010-09-15T04:44:23 = %OI:%OM:%OS နံနက်
+
 =head1 SUPPORT
 
 See L<DateTime::Locale>.

@@ -1,65 +1,45 @@
 {
-   "meta-spec" : {
-      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : 2
-      },
-   "generated_by" : "Author",
-   "license" : [
-      "perl_5"
-      ],
-   "author" : [
-      "H.Merijn Brand <h.m.brand@xs4all.nl>"
-      ],
-   "provides" : {
-      "App::geoip" : {
-         "file" : "lib/App/geoip.pm",
-         "version" : "0.13"
-         }
-      },
-   "release_status" : "stable",
-   "dynamic_config" : 1,
-   "name" : "App-geoip",
    "resources" : {
-      "x_IRC" : "irc://irc.perl.org/#csv",
       "repository" : {
          "web" : "https://github.com/Tux/GeoIP2",
          "url" : "https://github.com/Tux/GeoIP2",
          "type" : "git"
          },
-      "homepage" : "https://metacpan.org/pod/App::geoip",
+      "x_IRC" : "irc://irc.perl.org/#csv",
       "license" : [
          "http://dev.perl.org/licenses/"
-         ]
+         ],
+      "homepage" : "https://metacpan.org/pod/App::geoip",
+      "bugtracker" : {
+         "web" : "https://github.com/Tux/GeoIP2/issues"
+         }
       },
-   "abstract" : "Show geological data based on hostname or IP address(es)",
+   "meta-spec" : {
+      "version" : 2,
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec"
+      },
+   "version" : "0.14",
+   "abstract" : "Show geographical data based on hostname or IP address(es)",
+   "author" : [
+      "H.Merijn Brand <h.m.brand@xs4all.nl>"
+      ],
+   "license" : [
+      "perl_5"
+      ],
+   "dynamic_config" : 1,
+   "name" : "App-geoip",
+   "release_status" : "stable",
+   "generated_by" : "Author",
+   "provides" : {
+      "App::geoip" : {
+         "version" : "0.14",
+         "file" : "lib/App/geoip.pm"
+         }
+      },
    "prereqs" : {
-      "runtime" : {
-         "recommends" : {
-            "DBI" : "1.643",
-            "Data::Dumper" : "2.173",
-            "Getopt::Long" : "2.51",
-            "Socket" : "2.029",
-            "LWP::Simple" : "6.43",
-            "Net::CIDR" : "0.20",
-            "Pod::Usage" : "1.70",
-            "Archive::Zip" : "1.68",
-            "JSON::PP" : "4.04",
-            "Text::CSV_XS" : "1.41",
-            "Math::Trig" : "1.23"
-            },
+      "test" : {
          "requires" : {
-            "LWP::Simple" : "0",
-            "Getopt::Long" : "0",
-            "Data::Dumper" : "0",
-            "Math::Trig" : "0",
-            "JSON::PP" : "0",
-            "perl" : "5.014",
-            "Socket" : "0",
-            "DBI" : "0",
-            "Text::CSV_XS" : "1.39",
-            "Pod::Usage" : "0",
-            "Archive::Zip" : "0",
-            "Net::CIDR" : "0"
+            "Test::More" : "0"
             }
          },
       "build" : {
@@ -67,16 +47,40 @@
             "Config" : "0"
             }
          },
+      "runtime" : {
+         "recommends" : {
+            "Socket" : "2.030",
+            "Math::Trig" : "1.23",
+            "Net::CIDR" : "0.20",
+            "Archive::Zip" : "1.68",
+            "Text::CSV_XS" : "1.44",
+            "Data::Dumper" : "2.174",
+            "JSON::PP" : "4.05",
+            "Getopt::Long" : "2.52",
+            "Pod::Usage" : "2.01",
+            "DBI" : "1.643",
+            "LWP::Simple" : "6.50"
+            },
+         "requires" : {
+            "Text::CSV_XS" : "1.39",
+            "Net::CIDR" : "0",
+            "Math::Trig" : "0",
+            "Socket" : "0",
+            "DBI" : "0",
+            "perl" : "5.014",
+            "Data::Dumper" : "0",
+            "Archive::Zip" : "0",
+            "List::Util" : "0",
+            "LWP::Simple" : "0",
+            "Pod::Text" : "0",
+            "Getopt::Long" : "0",
+            "JSON::PP" : "0"
+            }
+         },
       "configure" : {
          "requires" : {
             "ExtUtils::MakeMaker" : "0"
             }
-         },
-      "test" : {
-         "requires" : {
-            "Test::More" : "0"
-            }
          }
-      },
-   "version" : "0.13"
+      }
    }

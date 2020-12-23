@@ -1,6 +1,14 @@
-Revision history for Crypt-X509-CRL
+Revision history for Perl extension Crypt::X509::CRL.
 
-0.01    January 01, 2007
-        First version, released in 2007
-0.02    December 21, 2020
-        Updated package files and fixed the bug in the new method
+0.03 Wed Dec 23 2020 gigageek
+    - Corrected the next_update examples in the POD
+    - Added a validate test to confirm handling of errors with known good and bad CRL test files
+    - Corrected packaged directory to properly include version number in the directory name
+    - Corrected META.yml formatting to address a bug related to building a RPM from the module
+
+0.02 Tue Dec 22 2020 gigageek
+    - Updated package files and fixed a reported bug in the new method that casued failures on subsequent calls to new
+
+0.01 Mon Jan 01 2007 gigageek
+    - original version: created based on Crypt::X509
+

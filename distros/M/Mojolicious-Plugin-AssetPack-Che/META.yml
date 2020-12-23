@@ -20,12 +20,11 @@ no_index:
 requires:
   CSS::Minifier::XS: '0.09'
   CSS::Sass: '3.0'
-  HTML::Packer: '2.03'
   JavaScript::Minifier::XS: '0.1'
   JavaScript::Packer: '2.0'
   Mojolicious::Plugin::AssetPack: '2.09'
   perl: '5.006'
 resources:
   repository: git://github.com/mche/Mojolicious-Plugin-AssetPack-Che.git
-version: '2.091'
+version: '2.102'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

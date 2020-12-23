@@ -1,3 +1,6 @@
+0.05 2020-12-23T15:41:04+01:00
+ - Improve doc for Lexeme.
+
 0.04 2020-12-20T02:27:02+01:00
  - Add check_lexeme() to Utils.
  - Add helper to Utils and rewrite to it.

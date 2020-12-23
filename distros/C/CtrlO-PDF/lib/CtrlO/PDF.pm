@@ -12,7 +12,7 @@ use PDF::API2;
 use PDF::Table;
 use PDF::TextBlock;
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 =head1 NAME 
 
@@ -24,7 +24,7 @@ CtrlO::PDF - high level PDF creator
   use Text::Lorem;
 
   my $pdf = CtrlO::PDF->new(
-      logo        => "logo.png", # optional
+      logo        => "sample/logo.png", # optional
       orientation => "portrait", # Default
       footer      => "My PDF document footer",
   );
@@ -61,6 +61,12 @@ CtrlO::PDF - high level PDF creator
   );
 
   my $file = $pdf->content;
+
+  # output the file
+  open my $pdf_out, '>', 'out.pdf';
+  binmode $pdf_out;
+  print $pdf_out $file;
+  close $pdf_out;
 
 =head1 DESCRIPTION
 
@@ -383,7 +389,7 @@ sub y_position
 
 =head2 set_y_position($pixels)
 
-Sets the current Y position. See L</current_y>.
+Sets the current Y position. See L</y_position>.
 
 =cut
 
@@ -397,7 +403,7 @@ sub set_y_position
 =head2 move_y_position($pixels)
 
 Moves the current Y position, relative to its current value. Positive values
-will move the cursor up the page, negative values down. See L</current_y>.
+will move the cursor up the page, negative values down. See L</y_position>.
 
 =cut
 
@@ -425,8 +431,27 @@ sub _y_start_default
 
 Add a heading. If called on a new page, will automatically move the cursor down
 to account for the heading's height (based on the assumption that one pixel
-equals one point). Options available are C<size>, C<indent>, C<topmargin> and
-C<bottommargin>.
+equals one point). Options available are:
+
+=over
+
+=item size I<n>
+
+C<n> is the font size in points, B<default 16>
+
+=item indent I<n>
+
+C<n> is the amount (in points) to indent the text, B<default 0>
+
+=item topmargin I<n>
+
+C<n> is the amount (in points) of vertical skip for the margin I<above> the heading, B<default 0>
+
+=item bottommargin I<n>
+
+C<n> is the amount (in points) of vertical skip for the margin I<below> the heading, B<default 10>
+
+=back
 
 =cut
 
@@ -462,8 +487,23 @@ sub heading
 
 =head2 text($text, %options)
 
-Add paragraph text. This will automatically paginate. Options available are
-C<size>, C<color> and C<indent>.
+Add paragraph text. This will automatically paginate. Options available are:
+
+=over
+
+=item size I<n>
+
+C<n> is the font size in points, B<default 10>
+
+=item indent I<n>
+
+C<n> is the amount (in points) to indent the paragraph first line, B<default 0>
+
+=item color I<name>
+
+C<name> is the string giving the text color, B<default 'black'>
+
+=back
 
 =cut
 
@@ -477,7 +517,7 @@ sub text
 
     if ($self->is_new_page)
     {
-        $self->_down($size);
+        $self->_down($size);  # TBD using font size as line height?
         $self->_set_is_new_page(0);
     }
 
@@ -509,7 +549,7 @@ sub text
         $self->_set__y($ypos);
         last unless $string; # while loop does not work with $string
         $self->add_page;
-        $self->_down($size);
+        $self->_down($size); # TBD again, font size as line height?
         $tb  = PDF::TextBlock->new({
             pdf   => $self->pdf,
             page  => $self->page,
@@ -528,6 +568,7 @@ sub text
     }
 
     $text->fillcolor('black') if $options{color}; # Reset color
+          # TBD what if the original color wasn't black?
     $self->_down(5);
 }
 
@@ -598,7 +639,15 @@ sub _image_type
 
 =head2 image($file, %options)
 
-Add an image. Options available are C<scaling>.
+Add an image. Options available are:
+
+=over
+
+=item scaling I<n>
+
+    C<n> is the scaling factor for the image, B<default 0.5> (50%)
+
+=back
 
 =cut
 
@@ -664,11 +713,11 @@ sub content
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2018 Ctrl O Ltd
+Copyright 2018-2020 Ctrl O Ltd
 
 This program is free software; you can redistribute it and/or modify it under
-the terms of either: the GNU General Public License as published by the Free
-Software Foundation; or the Artistic License.
+the terms of either: the GNU General Public License (GPL) as published by the 
+Free Software Foundation; or the Perl Artistic License (PAL).
 
 See http://dev.perl.org/licenses/ for more information.
 

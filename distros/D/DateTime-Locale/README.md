@@ -4,7 +4,7 @@ DateTime::Locale - Localization support for DateTime.pm
 
 # VERSION
 
-version 1.30
+version 1.31
 
 # SYNOPSIS
 

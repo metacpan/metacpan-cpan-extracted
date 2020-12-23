@@ -686,6 +686,26 @@ Yes
 
 1 (dilluns)
 
+=head2 Strftime Patterns
+
+=head3 %c (%A, %-d %B de %Y, %T) - date time format
+
+   2008-02-05T18:30:30 = dimarts, %-d de febrer de 2008, 18:30:30
+   1995-12-22T09:05:02 = divendres, %-d de desembre de 1995, 09:05:02
+  -0010-09-15T04:44:23 = dissabte, %-d de setembre de -10, 04:44:23
+
+=head3 %x (%-d/%-m/%y) - date format
+
+   2008-02-05T18:30:30 = %-d/%-m/08
+   1995-12-22T09:05:02 = %-d/%-m/95
+  -0010-09-15T04:44:23 = %-d/%-m/10
+
+=head3 %X (%T) - time format
+
+   2008-02-05T18:30:30 = 18:30:30
+   1995-12-22T09:05:02 = 09:05:02
+  -0010-09-15T04:44:23 = 04:44:23
+
 =head1 SUPPORT
 
 See L<DateTime::Locale>.

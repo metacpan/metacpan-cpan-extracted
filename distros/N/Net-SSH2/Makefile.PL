@@ -40,10 +40,10 @@ command line. E.g.:
 These can also be set through the LIBSSH2_LIB/LIBSSH2_INCLUDE/LIBSSH2_LDARGS
 environment variables.
 
-To build with libgcrypt instead of OpenSSL, pass 'gcrypt' as a parameter to
-Makefile.PL, e.g.:
+To build with libgcrypt instead of OpenSSL, use the crypto_backend
+option when calling Makefile.PL, e.g.:
 
-    perl Makefile.PL gcrypt
+    perl Makefile.PL crypto_backend=gcrypt
 
 EOF
 
@@ -92,11 +92,8 @@ for (@ARGV) {
         makemaker_append_once $arg2mmappend{$1} => $prefix.$value;
         $do_not_check_libs ||= /^($do_not_check_libs_keys)=/;
     }
-    elsif ($_ eq 'gcrypt') {
-        $crypto_backend = 'gcrypt';
-    }
-    elsif ($_ eq 'openssl') {
-        $crypto_backend = 'openssl';
+    elsif (/^crypto_backend=(.*)$/) {
+        $crypto_backend = $1;
     }
     else {
         push @pass_through_args, $_;
@@ -237,6 +234,7 @@ EOF
         }
     }
     $crypto_backend ||= 'openssl';
+    warn "crypto backend set to $crypto_backend\n";
 
     findlib(lib => 'z',
             header => 'zlib.h',
@@ -281,6 +279,8 @@ makemaker_append_once(CCFLAGS => '-DPERL_GCC_PEDANTIC -std=c99 -pedantic-errors 
     if $Module::Install::AUTHOR and $linux and $cc_gcc;
 
 resources repository => 'git://github.com/rkitover/net-ssh2.git';
+
+resources bugtracker => 'https://github.com/rkitover/net-ssh2/issues';
 
 my $gen = "util/gen_constants.pl";
 if (-f $gen) {

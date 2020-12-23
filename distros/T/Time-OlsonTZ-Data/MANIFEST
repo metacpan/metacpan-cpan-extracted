@@ -257,7 +257,6 @@ lib/Time/OlsonTZ/Data/Atlantic/Stanley.tz
 lib/Time/OlsonTZ/Data/Australia/Adelaide.tz
 lib/Time/OlsonTZ/Data/Australia/Brisbane.tz
 lib/Time/OlsonTZ/Data/Australia/Broken_Hill.tz
-lib/Time/OlsonTZ/Data/Australia/Currie.tz
 lib/Time/OlsonTZ/Data/Australia/Darwin.tz
 lib/Time/OlsonTZ/Data/Australia/Eucla.tz
 lib/Time/OlsonTZ/Data/Australia/Hobart.tz

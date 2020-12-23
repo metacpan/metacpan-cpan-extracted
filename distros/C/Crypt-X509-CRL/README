@@ -1,4 +1,4 @@
-Crypt-X509-CRL version 0.2
+Crypt-X509-CRL version 0.3
 
 Crypt::X509::CRL is an object oriented X.509 certificate revocation list
 parser with numerous methods for directly extracting information from
@@ -357,11 +357,11 @@ ACKNOWLEDGEMENTS
 
 
 AUTHOR
-    Duncan Segrest <cpan@gigageek.us>
+    Duncan Segrest
 
 
 LICENSE AND COPYRIGHT
-    This software is Copyright (c) 2007 by Duncan Segrest <cpan@gigageek.us>.
+    This software is Copyright (c) 2007 by Duncan Segrest.
 
     This is free software, licensed under:
 

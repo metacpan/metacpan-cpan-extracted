@@ -4,7 +4,7 @@ package Tk::GraphViz;
 use strict;
 use warnings;
 
-our $VERSION = '1.07';
+our $VERSION = '1.08';
 
 use Tk 800.020;
 use Tk::Font;
@@ -1744,6 +1744,34 @@ sub zoomToRect
   1;
 }
 
+sub scrollTo {
+  my ($self, $node) = @_;
+  return if !defined $node or !length $node;
+  my @f = $self->find(withtag => "node&&$node");
+  return if @f != 1;
+  my @c = $self->coords(@f);
+  $self->_centerView(@c);
+}
+
+sub _centerView {
+  my ($self, $x, $y) = @_;
+  my @xview = $self->xview;
+  my @yview = $self->yview;
+  my $xwidth = $xview[1]-$xview[0];
+  my $ywidth = $yview[1]-$yview[0];
+  my @scrollregion = @{$self->cget(-scrollregion)};
+  my ($tox, $toy);
+  if (!defined $x || !defined $y) {
+    ($tox, $toy) = (0.5, 0.5);
+  } else {
+    $tox = ($x-$scrollregion[0])/($scrollregion[2]-$scrollregion[0])
+      - $xwidth/2;
+    $toy = ($y-$scrollregion[1])/($scrollregion[3]-$scrollregion[1])
+      - $ywidth/2;
+  }
+  $self->xview('moveto' => $tox);
+  $self->yview('moveto' => $toy);
+}
 
 ######################################################################
 # Over-ridden createText Method
@@ -2040,6 +2068,11 @@ Zoom out by scaling everything down by the given scale factor.  This is equivale
     $gv->zoom ( -in => 1/factor )
 
 The factor should be > 1.0 in order to get reasonable behavior.
+
+=head2 $gv->scrollTo(nodename)
+
+If the given node (identified by being tagged with C<node> and that
+nodename) exists, the viewport is moved to have that at the centre.
 
 =head1 TAGS
 

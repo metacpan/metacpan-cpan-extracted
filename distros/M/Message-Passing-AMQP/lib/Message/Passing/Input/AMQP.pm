@@ -1,5 +1,5 @@
 package Message::Passing::Input::AMQP;
-use Moose;
+use Moo;
 use AnyEvent;
 use Scalar::Util qw/ weaken refaddr /;
 use Try::Tiny;
@@ -33,7 +33,6 @@ after '_set_queue' => sub {
     );
 };
 
-__PACKAGE__->meta->make_immutable;
 1;
 
 =head1 NAME

@@ -1,5 +1,9 @@
 Revision history for Music-MelodicDevice-Ornamentation
 
+0.0401 2020-12-22 12:50:03
+    - Show the trill if verbose.
+    - Improve documentation.
+
 0.0400 2020-12-19 18:45:13
     - Find enharmonic pitches if not found the first time.
 

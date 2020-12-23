@@ -12,7 +12,8 @@ sub persisttests {
     my ($DBD, $t) = @_;
 
     my %hash;
-    my $tbl = "t_tie_${t}_$$"."_persist";
+    my $rnd = sprintf "%d_%04d", $$, (time + int rand 10000) % 10000;
+    my $tbl = "t_tie_${t}_${rnd}_persist";
     my $dsn = dsn ($DBD);
     eval { tie %hash, "Tie::Hash::DBD", $dsn, { tbl => $tbl } };
 
@@ -23,7 +24,8 @@ sub persisttests {
     my %data = (
 	UND => undef,
 	IV  => 3,
-	NV  => 3.14159265358979001,
+#	NV  => 3.14159265358979001,
+	NV  => 3.14159265358830452896654605865479,
 	PV  => "pi", # "\xcf\x80" binary is tested elsewhere
 	);
     my $data = _bindata ();

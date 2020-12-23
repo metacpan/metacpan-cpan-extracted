@@ -1,0 +1,19 @@
+#!/pro/bin/perl
+
+use 5.12.1;
+use warnings;
+use autodie;
+
+open my $fh, "<", "geoip";
+my $src = do { local $/; <$fh> };
+close $fh;
+
+$src =~ s{^our \$VERSION\s*=\s*"([0-9.]+)\K\s*-\s*[-0-9]+(?=")}{}m;
+my $vsn = $1 or die "No version in geoip\n";
+say "Writing App::geoip version $vsn";
+
+-d "lib"	or mkdir "lib";
+-d "lib/App"	or mkdir "lib/App";
+open  $fh, ">", "lib/App/geoip.pm";
+print $fh $src;
+close $fh;

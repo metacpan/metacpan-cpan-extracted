@@ -11,7 +11,7 @@ binmode STDERR, ":encoding(utf-8)";
 binmode DATA,   ":encoding(utf-8)";
 
 # localtime will differ on other machines
-my %stamp = map { s{^Files/}{}r => "$_\t".localtime ((stat)[9]) } glob "Files/*";
+my %stamp = map { s{^Files/}{}r => "$_ ".localtime ((stat)[9]) } glob "Files/*";
 
 local $/ = "** EOT **\n";
 while (<DATA>) {
@@ -37,6 +37,27 @@ No options
 01_1.txt
 01_2.txt
 
+< STAMP:1
+> STAMP:2
+3,3c3,3
+< usu. Ad duo posse theophrastus, vim in accumsan
+---
+> usu. Ad duo posse theophrastus. Vim in accumsan
+** EOT **
+Unified with header
+01_1.txt
+01_2.txt
+-u0
+--- STAMP:1
++++ STAMP:2
+3,3c3,3
+-usu. Ad duo posse theophrastus, vim in accumsan
++usu. Ad duo posse theophrastus. Vim in accumsan
+** EOT **
+No header
+01_1.txt
+01_2.txt
+--no-header
 3,3c3,3
 < usu. Ad duo posse theophrastus, vim in accumsan
 ---

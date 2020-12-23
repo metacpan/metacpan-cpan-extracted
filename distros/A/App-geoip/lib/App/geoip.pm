@@ -3,7 +3,7 @@
 use 5.14.0;
 use warnings;
 
-our $VERSION = "0.13";
+our $VERSION = "0.14";
 our $CMD = $0 =~ s{.*/}{}r;
 
 sub usage {
@@ -22,7 +22,7 @@ sub usage {
     say "   -lL  --local=L      Specify local location LAT/LON";
     say "   -D   --DB=dsn       Specify geoip database DSN default: dbi:Pg:geoip";
     say "                       may be specified in \$GEOIP_DBI_DSN";
-    say "        --country=c    Find CIRDR's for country c";
+    say "        --country=c    Find CIDR's for country c";
     say "$CMD --man will show the full manual";
     exit $err;
     } # usage
@@ -35,9 +35,9 @@ use Data::Dumper;
 use Math::Trig;
 use LWP::Simple;
 use Archive::Zip;
-use Text::CSV_XS qw( csv );
 use JSON::PP;
-use Pod::Usage;
+use Text::CSV_XS qw( csv );
+use List::Util   qw( first sum );
 use Getopt::Long qw(:config bundling);
 
 # Optional modules
@@ -69,6 +69,8 @@ getconf ();
 GetOptions (
     "help|?"		=> sub { usage (0); },
     "V|version"		=> sub { say "$CMD [$VERSION]"; exit 0; },
+      "man"		=> sub { pod_nroff (); },
+      "info"		=> sub { pod_text  (); },
 
     "u|update!"		=> \$conf{update},
     "f|fetch!"		=> \$conf{fetch},
@@ -85,8 +87,29 @@ GetOptions (
       "country=s"	=> \ my $query_c,
 
     "v|verbose:1"	=> \(my $opt_v = 0),
-      "man"		=> sub { pod2usage (-verbose => 2, -exitstatus => 0); },
     ) or usage (1);
+
+sub pod_text {
+    require Pod::Text::Color;
+    my $m = $ENV{NO_COLOR} ? "Pod::Text" : "Pod::Text::Color";
+    my $p = $m->new ();
+    open my $fh, ">", \my $out;
+    $p->parse_from_file ($0, $fh);
+    close $fh;
+    print $out;
+    exit 0;
+    } # pod_text
+
+sub pod_nroff {
+    first { -x "$_/nroff" } grep { -d } split m/:+/ => $ENV{PATH} or pod_text ();
+
+    require Pod::Man;
+    my $p = Pod::Man->new ();
+    open my $fh, "|-", "nroff", "-man";
+    $p->parse_from_file ($0, $fh);
+    close $fh;
+    exit 0;
+    } # pod_nroff
 
 $opt_v >= 7 and _dump ("Configuration", \%conf);
 
@@ -101,18 +124,27 @@ if (defined $opt_J) {
     }
 $conf{json} and $opt_J = $conf{json_pretty};
 
-my $dbh = eval {
-    my %seen;
-    my $fail = sub { my $e = DBI->errstr or return; !$seen{$e}++ and warn "$e\n"; };
-    local $SIG{__WARN__} = $fail;
-    local $SIG{__DIE__}  = $fail;
-    DBI->connect ($conf{dsn}, undef, undef, {
-	AutoCommit		=> 0,
-	RaiseError		=> 1,
-	PrintError		=> 1,
-	ShowErrorStatement	=> 1,
-	});
-    } or die "Cannot continue without a working database\n";
+my $dbh = do {
+    my $dsn = $conf{dsn} =~ s{^b=(?=\w+:)}{}ir; # catch -DB=.. instead of --DB=
+    my $help = $dsn =~ m/^dbi:(\w+):/i
+	? "Did you forget to install DBD::$1?"
+	: "Maybe the matching DBD for $dsn is not installed";
+    eval {
+	my %seen;
+	my $fail = sub {
+	    my $e = DBI->errstr or return;
+	    !$seen{$e}++ and warn "$e\n";
+	    };
+	local $SIG{__WARN__} = $fail;
+	local $SIG{__DIE__}  = $fail;
+	DBI->connect ($conf{dsn}, undef, undef, {
+	    AutoCommit		=> 0,
+	    RaiseError		=> 1,
+	    PrintError		=> 1,
+	    ShowErrorStatement	=> 1,
+	    });
+	} or die "Cannot continue without a working database\n$help\n";
+    };
 
 sub _dump {
     my ($label, $ref) = @_;
@@ -131,17 +163,17 @@ my $truncate = $conf{dsn} =~ m/:SQLite/ ? "delete from" : "truncate table";
 
 unless (grep m/\b country \b/ix => $dbh->tables (undef, undef, undef, undef)) {
     say "Create table stamps";
-    $dbh->do (qq; create table stamps (                                                                                                                                       
+    $dbh->do (qq; create table stamps (
 	name		text		not null	primary key,
 	stamp		bigint);
 	);
     say "Create table continent";
-    $dbh->do (qq; create table continent (                                                                                                                                       
+    $dbh->do (qq; create table continent (
 	id		char (4)	not null	primary key,
 	name		text);
 	);
     say "Create table country";
-    $dbh->do (qq; create table country (                                                                                                                                       
+    $dbh->do (qq; create table country (
 	id		bigint		not null	primary key,
 	name		text		not null,
 	iso		text,
@@ -149,7 +181,7 @@ unless (grep m/\b country \b/ix => $dbh->tables (undef, undef, undef, undef)) {
 	eu		smallint);
 	);
     say "Create table ipv4"; # Country based
-    $dbh->do (qq; create table ipv4 (                                                                                                                                       
+    $dbh->do (qq; create table ipv4 (
 	cidr		cidr		not null	primary key,
 	id		bigint,
 	ip_from		text		not null,
@@ -163,7 +195,7 @@ unless (grep m/\b country \b/ix => $dbh->tables (undef, undef, undef, undef)) {
 	);
     $dbh->do (qq; create index i_ipv4_ip on ipv4 $idx_type (ip_from_n, ip_to_n););
     say "Create table provider";
-    $dbh->do (qq; create table provider (                                                                                                                                       
+    $dbh->do (qq; create table provider (
 	cidr		cidr		not null	primary key,
 	id		bigint,
 	name		text,
@@ -174,7 +206,7 @@ unless (grep m/\b country \b/ix => $dbh->tables (undef, undef, undef, undef)) {
 	);
     $dbh->do (qq; create index i_provider_ip on provider $idx_type (ip_from_n, ip_to_n););
     say "Create table city";
-    $dbh->do (qq; create table city (                                                                                                                                       
+    $dbh->do (qq; create table city (
 	id		bigint		not null	primary key,
 	name		text,
 	country_id	bigint,
@@ -183,7 +215,7 @@ unless (grep m/\b country \b/ix => $dbh->tables (undef, undef, undef, undef)) {
 	eu		smallint);
 	);
     say "Create table ipc4"; # City based
-    $dbh->do (qq; create table ipc4 (                                                                                                                                       
+    $dbh->do (qq; create table ipc4 (
 	cidr		cidr		not null	primary key,
 	id		bigint,
 	ip_from		text		not null,
@@ -710,7 +742,7 @@ for (sort { $a->{ip_from_n} <=> $b->{ip_to_n} ||
 	    $conf{json} or printf "   Distance  : \x{00b1} %.2f%s\n", $dist, $unit;
 	    }
 	}
-    if (!$conf{short} && $conf{whois} && $whois and my $wi = $whois->($_->{ip})) {
+    if ($conf{whois} && $whois and my $wi = $whois->($_->{ip})) {
 	my $address = join " " => grep { length } map { $wi->{$_} } qw(
 	    Address PostalCode StateProv Country address );
 	my %w = (
@@ -799,13 +831,15 @@ sub getconf {
 	}
     } # getconf
 
+1;
+
 __END__
 
 =encoding utf-8
 
 =head1 NAME
 
-geoip - a tool to show geological data based on hostname or IP address(es)
+geoip - a tool to show geographical data based on hostname or IP address(es)
 
 =head1 SYNOPSIS
 
@@ -829,11 +863,13 @@ The output is plain text or JSON. JSON may be short or formatted.
 
 The tool allows the use of configuration files. It tests for existence of
 the files listed here. All existing files is read (in this order) if it is
-only writable by the author
+only writable by the author (mode C<0640> should do).
 
    $home/geoip.rc
    $home/.geoiprc
    $home/.config/geoip
+
+where C<$home> is either of C<$HOME>, C<$USERPROFILE>, or C<$HOMEPATH>.
 
 The format of the file is
 
@@ -905,8 +941,8 @@ command line option : C<-s> or C<--short>
 default value       : False
 
 This option will disable the output of less-informative information like
-location, EU-membership, satellite and proxy. This option, if True, will also 
-implicitly disable the C<distance> and C<whois> information.
+location, EU-membership, satellite and proxy. This option, if True, will
+also implicitly disable the C<distance> and C<whois> information.
 
 =item dsn
 
@@ -921,10 +957,25 @@ not yet present.
 
 The order of usage is:
 
- 1. Command line argument (C<--DB=dsn>)
- 2. The C<GEOIP_DBI_DSN> environment variable
- 3. The value for C<dsn> in the configuration file(s)
- 4. C<dbi:Pg:dbname=geoip>
+=over 2
+
+=item 1
+
+Command line argument (C<--DB=dsn>)
+
+=item 2
+
+The C<GEOIP_DBI_DSN> environment variable
+
+=item 3
+
+The value for C<dsn> in the configuration file(s)
+
+=item 4
+
+C<dbi:Pg:dbname=geoip>
+
+=back
 
 =item json
 
@@ -1109,7 +1160,7 @@ available from [http://www.maxmind.com](http://www.maxmind.com).
 
 This library is free software;  you can redistribute and/or modify it under
 the same terms as Perl itself.
-See L<https://opensource.org/licenses/Artistic-2.0|here> 3).
+See L<here|https://opensource.org/licenses/Artistic-2.0> 3).
 
  1) https://creativecommons.org/licenses/by-sa/4.0/
  2) https://www.maxmind.com/en/geolite2/eula

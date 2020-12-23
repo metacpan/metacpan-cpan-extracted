@@ -1,3 +1,5 @@
+=encoding utf8
+
 =for comment POD_DERIVED_INDEX_GENERATED
 The following documentation is automatically generated.  Please do not edit
 this file, but rather the original, inline with Net::Async::Trello
@@ -41,9 +43,57 @@ Takes the following named parameters:
 
 Returns a L<Future>.
 
+=head2 card
+
+Returns information about a specific card.
+
+Takes the following named parameters:
+
+=over 4
+
+=item * C<id> - the card ID to retrieve
+
+=back
+
+Resolves to a L<Net::Async::Trello::Card> instance.
+
+=head2 member
+
+Returns information about a specific person (board/card member).
+
+Takes the following named parameters:
+
+=over 4
+
+=item * C<id> - the ID to retrieve
+
+=back
+
+Resolves to a L<Net::Async::Trello::Member> instance.
+
 =head2 search
 
-Performs a search.
+Performs a search for Trello objects by string, see L<https://developers.trello.com/reference/#search>
+for details on search options available.
+
+Example:
+
+ my (%result) = await $trello->search(
+  card_fields => [ qw(name url dateLastActivity) ],
+  query       => 'Shopping List',
+ );
+ # print the url of the first card returned.
+ my $card = $result{cards}->[0];
+ # This should be a Net::Async::Trello::Card instance, so we have a ->url method:
+ printf "Card %s url\n", $card->url;
+
+Takes the arguments as shown in the Trello API documentation as named parameters.
+
+The only compulsory argument is C<query>, the text string to search for.
+
+Returns a L<Future> which resolves to a list of key-value pairs.
+The value will be an instance of the appropriate
+type, with the exception of C<options> which is a plain hashref.
 
 =head1 METHODS - Internal
 
@@ -59,15 +109,15 @@ None of these are likely to be stable or of much use to external callers.
 
 =item L<IO::Async::Notifier>
 
-L<add_child|IO::Async::Notifier/add_child>, L<adopt_future|IO::Async::Notifier/adopt_future>, L<can_event|IO::Async::Notifier/can_event>, L<children|IO::Async::Notifier/children>, L<configure_unknown|IO::Async::Notifier/configure_unknown>, L<debug_printf|IO::Async::Notifier/debug_printf>, L<get_loop|IO::Async::Notifier/get_loop>, L<invoke_error|IO::Async::Notifier/invoke_error>, L<invoke_event|IO::Async::Notifier/invoke_event>, L<loop|IO::Async::Notifier/loop>, L<make_event_cb|IO::Async::Notifier/make_event_cb>, L<maybe_invoke_event|IO::Async::Notifier/maybe_invoke_event>, L<maybe_make_event_cb|IO::Async::Notifier/maybe_make_event_cb>, L<new|IO::Async::Notifier/new>, L<notifier_name|IO::Async::Notifier/notifier_name>, L<parent|IO::Async::Notifier/parent>, L<remove_child|IO::Async::Notifier/remove_child>, L<remove_from_parent|IO::Async::Notifier/remove_from_parent>
+L<add_child|IO::Async::Notifier/add_child>, L<adopt_future|IO::Async::Notifier/adopt_future>, L<adopted_futures|IO::Async::Notifier/adopted_futures>, L<can_event|IO::Async::Notifier/can_event>, L<children|IO::Async::Notifier/children>, L<configure_unknown|IO::Async::Notifier/configure_unknown>, L<debug_printf|IO::Async::Notifier/debug_printf>, L<get_loop|IO::Async::Notifier/get_loop>, L<invoke_error|IO::Async::Notifier/invoke_error>, L<invoke_event|IO::Async::Notifier/invoke_event>, L<loop|IO::Async::Notifier/loop>, L<make_event_cb|IO::Async::Notifier/make_event_cb>, L<maybe_invoke_event|IO::Async::Notifier/maybe_invoke_event>, L<maybe_make_event_cb|IO::Async::Notifier/maybe_make_event_cb>, L<new|IO::Async::Notifier/new>, L<notifier_name|IO::Async::Notifier/notifier_name>, L<parent|IO::Async::Notifier/parent>, L<remove_child|IO::Async::Notifier/remove_child>, L<remove_from_parent|IO::Async::Notifier/remove_from_parent>
 
 =back
 
 =head1 AUTHOR
 
-Tom Molesworth <TEAM@cpan.org>
+Tom Molesworth <TEAM@cpan.org> with contributions from C<@michaelmueller-binary>.
 
 =head1 LICENSE
 
-Copyright Tom Molesworth 2014-2017. Licensed under the same terms as Perl itself.
+Copyright Tom Molesworth 2014-2020. Licensed under the same terms as Perl itself.
 

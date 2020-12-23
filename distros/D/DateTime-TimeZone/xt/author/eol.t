@@ -257,7 +257,6 @@ my @files = (
     'lib/DateTime/TimeZone/Australia/Adelaide.pm',
     'lib/DateTime/TimeZone/Australia/Brisbane.pm',
     'lib/DateTime/TimeZone/Australia/Broken_Hill.pm',
-    'lib/DateTime/TimeZone/Australia/Currie.pm',
     'lib/DateTime/TimeZone/Australia/Darwin.pm',
     'lib/DateTime/TimeZone/Australia/Eucla.pm',
     'lib/DateTime/TimeZone/Australia/Hobart.pm',

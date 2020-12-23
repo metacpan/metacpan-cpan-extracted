@@ -16,10 +16,15 @@ PREREQUISITES
         .NET 2002/2003 (VC7) or earlier if your perl was built with Visual
         Studio 2005 (VC8) or later: see Perl RT#121448.)
 
+        This module is mostly redundant if your perl was built with Visual
+        Studio 2015 (VC14.0) or later.
+
     Perl
 
         Perl version 5.8.1 or later.
-        The latest version of Perl is available from http://www.perl.com/.
+        The latest version of Perl is available from https://www.perl.com/.
+
+        This module is wholly redundant if you are running Perl 5.33.5 or later.
 
     Perl Modules
 

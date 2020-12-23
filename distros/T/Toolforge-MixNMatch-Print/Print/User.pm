@@ -5,7 +5,7 @@ use warnings;
 
 use Error::Pure qw(err);
 
-our $VERSION = 0.03;
+our $VERSION = 0.04;
 
 sub print {
 	my $obj = shift;
@@ -110,6 +110,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.05
+0.04
 
 =cut

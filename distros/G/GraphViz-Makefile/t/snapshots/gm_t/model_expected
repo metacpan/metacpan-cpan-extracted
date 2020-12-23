@@ -1,0 +1,37 @@
+[
+  {
+    'rule:data/features.tab:0' => {
+      'recipe' => [
+        'perl prog3.pl $< > $@'
+      ],
+      'recipe_raw' => [
+        'perl prog3.pl $< > $@'
+      ]
+    },
+    'rule:model:0' => {
+      'recipe' => [
+        'perl prog1.pl $<'
+      ],
+      'recipe_raw' => [
+        'perl prog1.pl $<'
+      ]
+    },
+    'target:data/features.tab' => undef,
+    'target:model' => undef,
+    'target:otherfile' => undef
+  },
+  {
+    'rule:data/features.tab:0' => {
+      'target:otherfile' => {}
+    },
+    'rule:model:0' => {
+      'target:data/features.tab' => {}
+    },
+    'target:data/features.tab' => {
+      'rule:data/features.tab:0' => {}
+    },
+    'target:model' => {
+      'rule:model:0' => {}
+    }
+  }
+]

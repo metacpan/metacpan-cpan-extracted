@@ -1,5 +1,5 @@
 --- 
-abstract: Show geological data based on hostname or IP address(es)
+abstract: Show geographical data based on hostname or IP address(es)
 author: 
   - H.Merijn Brand <h.m.brand@xs4all.nl>
 build_requires: 
@@ -16,19 +16,19 @@ name: App-geoip
 provides: 
   App::geoip: 
     file: lib/App/geoip.pm
-    version: '0.13'
+    version: '0.14'
 recommends: 
   Archive::Zip: '1.68'
   DBI: '1.643'
-  Data::Dumper: '2.173'
-  Getopt::Long: '2.51'
-  JSON::PP: '4.04'
-  LWP::Simple: '6.43'
+  Data::Dumper: '2.174'
+  Getopt::Long: '2.52'
+  JSON::PP: '4.05'
+  LWP::Simple: '6.50'
   Math::Trig: '1.23'
   Net::CIDR: '0.20'
-  Pod::Usage: '1.70'
-  Socket: '2.029'
-  Text::CSV_XS: '1.41'
+  Pod::Usage: '2.01'
+  Socket: '2.030'
+  Text::CSV_XS: '1.44'
 requires: 
   Archive::Zip: 0
   DBI: 0
@@ -36,16 +36,18 @@ requires:
   Getopt::Long: 0
   JSON::PP: 0
   LWP::Simple: 0
+  List::Util: 0
   Math::Trig: 0
   Net::CIDR: 0
-  Pod::Usage: 0
+  Pod::Text: 0
   Socket: 0
   Test::More: 0
   Text::CSV_XS: '1.39'
   perl: '5.014'
 resources: 
   IRC: irc://irc.perl.org/#csv
+  bugtracker: https://github.com/Tux/GeoIP2/issues
   homepage: https://metacpan.org/pod/App::geoip
   license: http://dev.perl.org/licenses/
   repository: https://github.com/Tux/GeoIP2
-version: '0.13'
+version: '0.14'

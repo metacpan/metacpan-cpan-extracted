@@ -25,6 +25,8 @@ examples/ex3.pl
 examples/ex30.pl
 examples/ex31.pl
 examples/ex32.pl
+examples/ex33.pl
+examples/ex34.pl
 examples/ex4.pl
 examples/ex5.pl
 examples/ex6.pl
@@ -49,6 +51,7 @@ META.yml
 README
 SIGNATURE
 Struct.pm
+Struct/Form.pm
 Struct/Item.pm
 Struct/Language.pm
 Struct/Reference.pm
@@ -65,6 +68,10 @@ Struct/Value/Property.pm
 Struct/Value/Quantity.pm
 Struct/Value/String.pm
 Struct/Value/Time.pm
+t/Wikibase-Datatype-Struct-Form/01-use.t
+t/Wikibase-Datatype-Struct-Form/02-version.t
+t/Wikibase-Datatype-Struct-Form/03-obj2struct.t
+t/Wikibase-Datatype-Struct-Form/04-struct2obj.t
 t/Wikibase-Datatype-Struct-Item/01-use.t
 t/Wikibase-Datatype-Struct-Item/02-version.t
 t/Wikibase-Datatype-Struct-Item/03-obj2struct.t
@@ -131,6 +138,8 @@ t/Wikibase-Datatype-Struct-Value/03-obj2struct.t
 t/Wikibase-Datatype-Struct-Value/04-struct2obj.t
 t/Wikibase-Datatype-Struct/01-use.t
 t/Wikibase-Datatype-Struct/02-version.t
+xt/Wikibase-Datatype-Struct-Form/01-pod_coverage.t
+xt/Wikibase-Datatype-Struct-Form/02-pod.t
 xt/Wikibase-Datatype-Struct-Item/01-pod_coverage.t
 xt/Wikibase-Datatype-Struct-Item/02-pod.t
 xt/Wikibase-Datatype-Struct-Language/01-pod_coverage.t

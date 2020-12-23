@@ -632,6 +632,26 @@ Yes
 
 1 (Jumatatu)
 
+=head2 Strftime Patterns
+
+=head3 %c (%e %B %Y %I:%M:%S %p) - date time format
+
+   2008-02-05T18:30:30 =  5 Februari 2008 06:30:30 PM
+   1995-12-22T09:05:02 = 22 Desemba 1995 09:05:02 AM
+  -0010-09-15T04:44:23 = 15 Septemba -10 04:44:23 AM
+
+=head3 %x (%d/%m/%Y) - date format
+
+   2008-02-05T18:30:30 = 05/02/2008
+   1995-12-22T09:05:02 = 22/12/1995
+  -0010-09-15T04:44:23 = 15/09/-10
+
+=head3 %X (%I:%M:%S %p) - time format
+
+   2008-02-05T18:30:30 = 06:30:30 PM
+   1995-12-22T09:05:02 = 09:05:02 AM
+  -0010-09-15T04:44:23 = 04:44:23 AM
+
 =head1 SUPPORT
 
 See L<DateTime::Locale>.

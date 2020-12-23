@@ -249,6 +249,44 @@ This pod file contains examples of the locale data available for the
 
 { $locale->first_day_of_week } ({ $locale->day_stand_alone_wide->[ $locale->first_day_of_week - 1 ] })
 
+=head2 Strftime Patterns
+
+=head3 %c ({ $locale->glibc_datetime_format }) - date time format
+
+{
+  for my $dt (@example_dts) {
+      $OUT .= sprintf(
+          '  %20s = %s',
+          $dt->iso8601,
+          $dt->strftime( $locale->glibc_datetime_format )
+      );
+      $OUT .= "\n";
+  }
+}
+=head3 %x ({ $locale->glibc_date_format }) - date format
+
+{
+  for my $dt (@example_dts) {
+      $OUT .= sprintf(
+          '  %20s = %s',
+          $dt->iso8601,
+          $dt->strftime( $locale->glibc_date_format )
+      );
+      $OUT .= "\n";
+  }
+}
+=head3 %X ({ $locale->glibc_time_format }) - time format
+
+{
+  for my $dt (@example_dts) {
+      $OUT .= sprintf(
+          '  %20s = %s',
+          $dt->iso8601,
+          $dt->strftime( $locale->glibc_time_format )
+      );
+      $OUT .= "\n";
+  }
+}
 =head1 SUPPORT
 
 See L<DateTime::Locale>.

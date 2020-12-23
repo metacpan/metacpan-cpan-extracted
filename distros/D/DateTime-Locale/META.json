@@ -107,27 +107,27 @@
    "provides" : {
       "DateTime::Locale" : {
          "file" : "lib/DateTime/Locale.pm",
-         "version" : "1.30"
+         "version" : "1.31"
       },
       "DateTime::Locale::Base" : {
          "file" : "lib/DateTime/Locale/Base.pm",
-         "version" : "1.30"
+         "version" : "1.31"
       },
       "DateTime::Locale::Catalog" : {
          "file" : "lib/DateTime/Locale/Catalog.pm",
-         "version" : "1.30"
+         "version" : "1.31"
       },
       "DateTime::Locale::Data" : {
          "file" : "lib/DateTime/Locale/Data.pm",
-         "version" : "1.30"
+         "version" : "1.31"
       },
       "DateTime::Locale::FromData" : {
          "file" : "lib/DateTime/Locale/FromData.pm",
-         "version" : "1.30"
+         "version" : "1.31"
       },
       "DateTime::Locale::Util" : {
          "file" : "lib/DateTime/Locale/Util.pm",
-         "version" : "1.30"
+         "version" : "1.31"
       }
    },
    "release_status" : "stable",
@@ -143,7 +143,7 @@
       },
       "x_MailingList" : "datetime@perl.org"
    },
-   "version" : "1.30",
+   "version" : "1.31",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.030001"
@@ -901,6 +901,7 @@
                      "feira",
                      "fera",
                      "f\u1ecd",
+                     "gada",
                      "glindesdi",
                      "gumba",
                      "gw\u00e0",
@@ -957,6 +958,7 @@
                      "mandag",
                      "mbere",
                      "minggu",
+                     "mis",
                      "miz",
                      "mjesec",
                      "mm'min'ss",
@@ -994,6 +996,7 @@
                      "p\u00e9tuwak\u021fa",
                      "p\u00f3nd\u017aela",
                      "p\u00f3nje\u017aele",
+                     "ranar",
                      "roka",
                      "roku",
                      "sa",
@@ -1101,7 +1104,8 @@
                      "\u00fbse",
                      "\u0121img\u0127a",
                      "\u017ei",
-                     "\u1eccj\u1ecd"
+                     "\u1eccj\u1ecd",
+                     "\u1ecdj\u1ecd"
                   ],
                   "wordlist" : "Pod::Wordlist"
                }
@@ -1605,7 +1609,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "v1.30",
+                  "tag" : "v1.31",
                   "tag_format" : "v%V",
                   "tag_message" : "v%V"
                },

@@ -1,0 +1,24 @@
+'digraph Perl {
+ "rule:all:0" [ label="" shape="diamond" ]
+ "rule:all:0" -> "target:bar"
+ "rule:all:0" -> "target:sany"
+ "rule:sany:0" [ fillcolor="#dddddd" fontname="Monospace" fontsize="8" label="{<port1> cd\\ subdir\\ &&\\ $(MK)\\l|<port2> say\\ hi\\l}" shape="record" style="filled" ]
+ "rule:sany:0":"port1":"e" -> "target:subdir/all"
+ "rule:subdir/all:0" [ fillcolor="#dddddd" fontname="Monospace" fontsize="8" label="{<port1> cd\\ subsubdir\\ &&\\ make\\l}" shape="record" style="filled" ]
+ "rule:subdir/all:0" -> "target:subdir/sbar"
+ "rule:subdir/all:0" -> "target:subdir/sfoo"
+ "rule:subdir/all:0":"port1":"e" -> "target:subdir/subsubdir/all"
+ "rule:subdir/subsubdir/all:0" [ fillcolor="#dddddd" fontname="Monospace" fontsize="8" label="{<port1> echo\\ L3\\l}" shape="record" style="filled" ]
+ "target:all" [ fillcolor="#ffff99" fontname="Arial" fontsize="10" label="all" shape="box" style="filled" ]
+ "target:all" -> "rule:all:0"
+ "target:bar" [ fillcolor="#ffff99" fontname="Arial" fontsize="10" label="bar" shape="box" style="filled" ]
+ "target:sany" [ fillcolor="#ffff99" fontname="Arial" fontsize="10" label="sany" shape="box" style="filled" ]
+ "target:sany" -> "rule:sany:0"
+ "target:subdir/all" [ fillcolor="#ffff99" fontname="Arial" fontsize="10" label="subdir/all" shape="box" style="filled" ]
+ "target:subdir/all" -> "rule:subdir/all:0"
+ "target:subdir/sbar" [ fillcolor="#ffff99" fontname="Arial" fontsize="10" label="subdir/sbar" shape="box" style="filled" ]
+ "target:subdir/sfoo" [ fillcolor="#ffff99" fontname="Arial" fontsize="10" label="subdir/sfoo" shape="box" style="filled" ]
+ "target:subdir/subsubdir/all" [ fillcolor="#ffff99" fontname="Arial" fontsize="10" label="subdir/subsubdir/all" shape="box" style="filled" ]
+ "target:subdir/subsubdir/all" -> "rule:subdir/subsubdir/all:0"
+}
+'

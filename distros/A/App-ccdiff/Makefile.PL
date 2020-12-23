@@ -23,6 +23,7 @@ my %wmf = (
     PREREQ_PM			=> {
 	charnames		=> 0,
 	"Algorithm::Diff"	=> "1.1901",
+	"List::Util"		=> 0,
 	"Term::ANSIColor"	=> 0,
 	"Getopt::Long"		=> 0,
 	},
@@ -38,7 +39,7 @@ my %wmf = (
 
     META_MERGE			=> {
 	"meta-spec"		=> { version => 2 },
-	licence			=> "perl_5",
+	licence			=> "artistic_2",
 	resources		=> {
 	    type		=> "git",
 	    url			=> "git://github.com/Tux/App-ccdiff.git",
@@ -69,6 +70,11 @@ sub postamble {
 		'all::			lib/App/ccdiff.pm doc spellcheck cpanfile',
 		)
         : ();
+    -d "xt" && ($ENV{AUTOMATED_TESTING} || 0) != 1 and
+	push @mpm =>
+	    '',
+	    'test ::',
+	    '	-@env TEST_FILES="xt/*.t" make -e test_dynamic';
     join "\n" =>
         'cpanfile:',
         '	perl sandbox/genMETA.pl',
@@ -76,18 +82,18 @@ sub postamble {
         'spellcheck:',
         '	pod-spell-check --aspell --ispell ccdiff',
         '',
-        'meta:			META.json META.yml',
-        'META.json META.yml:	ccdiff Makefile.PL',
-        '	-@make metafile',
-        '	-@mv $(DISTVNAME)/META.* .',
-        '	-@rm -rf $(DISTVNAME)',
-        '',
-        'tgzdist: lib/App/ccdiff.pm META.json spellcheck $(DISTVNAME).tar.gz distcheck',
+	'checkmeta:	spellcheck',
+	'	perl sandbox/genMETA.pl -c',
+	'',
+	'fixmeta:	distmeta',
+	'	perl sandbox/genMETA.pl',
+	'',
+        'tgzdist: lib/App/ccdiff.pm doc checkmeta fixmeta $(DISTVNAME).tar.gz distcheck',
         '	-@mv -f $(DISTVNAME).tar.gz $(DISTVNAME).tgz',
         '	-@cpants_lint.pl $(DISTVNAME).tgz',
         '	-@rm -f Debian_CPANTS.txt',
         '',
-	'doc:			doc/ccdiff.md doc/ccdiff.html doc/ccdiff.man doc/README.md',
+	'doc docs:		doc/ccdiff.md doc/ccdiff.html doc/ccdiff.man doc/README.md',
 	'doc/ccdiff.md:		ccdiff',
 	'	pod2markdown  < $? > $@',
 	'doc/ccdiff.html:	ccdiff',

@@ -1,5 +1,6 @@
 package Message::Passing::AMQP::Role::BindsAQueue;
-use Moose::Role;
+use Moo::Role;
+use Types::Standard qw( Str HashRef );
 use Scalar::Util qw/ weaken /;
 use namespace::autoclean;
 
@@ -9,13 +10,13 @@ with qw/
 /;
 
 has bind_routing_key => (
-    isa => 'Str',
+    isa => Str,
     is => 'ro',
     default => '#',
 );
 
 has bind_arguments => (
-    isa => 'HashRef',
+    isa => HashRef,
     is => 'ro',
 );
 
@@ -49,6 +50,10 @@ Message::Passing::AMQP::Role::BindsAQueue
 Role for components which cause a single queue to be bound to a single exchange with a single routing key.
 
 =head1 ATTRIBUTES
+
+=head2 bind_arguments
+
+Gets passed to L<Message::Passing::AMQP::ConnectionManager>, defaults to false.
 
 =head2 bind_routing_key
 

@@ -7,7 +7,8 @@
 #   Makefile creation script.
 #
 # COPYRIGHT
-#   Copyright (C) 2003-2008, 2012, 2014-2015 Steve Hay.  All rights reserved.
+#   Copyright (C) 2003-2008, 2012, 2014-2015, 2020 Steve Hay.  All rights
+#   reserved.
 #
 # LICENCE
 #   This script is free software; you can redistribute it and/or modify it under
@@ -58,7 +59,7 @@ MAIN: {
             resources => {
                 repository => {
                     type => 'git',
-                    url  => 'https://github.com/steve-m-hay/Win32-UTCFileTime.git'
+                    web  => 'https://github.com/steve-m-hay/Win32-UTCFileTime'
                 }
             },
 

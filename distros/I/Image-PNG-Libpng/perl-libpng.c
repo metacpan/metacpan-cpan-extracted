@@ -4036,6 +4036,7 @@ perl_png_get_user_height_max (perl_libpng_t * png)
 #endif
 }
 
+#line 2956 "perl-libpng.c.tmpl"
 
 static SV *
 perl_png_get_eXIf (perl_libpng_t * png)
@@ -4072,18 +4073,48 @@ perl_png_set_eXIf (perl_libpng_t * png, SV * exif)
 #endif /*  PNG_eXIf_SUPPORTED */
 }
 
+/*
+  Make a new entry in "split" using "name" as the key, with "len"
+  bytes of memory. We tried newSV(len) but it didn't work,
+  because we didn't know how to turn that into anything other
+  than "undef", but assigning with an empty string but with the
+  length of data that we need seems to work to get us the length
+  of data we want, and the string value of the data that we
+  insert is also accessible by Perl. 
+*/
+
+/*
+  A failure of the type "segmentation fault" occurred on Solaris
+  somewhere in the split-alpha.t file, so we're adding lots of
+  debugging/checking code.  2020-12-22 07:25:10
+  http://www.cpantesters.org/cpan/report/f0c81600-43be-11eb-9b1a-56bbc304f86f
+*/
+
 static unsigned char *
-bullshit (HV * split, char * name, int name_length, int len)
+sv_memory (HV * split, char * name, int name_length, int len)
 {
     SV * sv;
-    /* newSV(len) didn't work, because it's not clear how to turn that
-       into anything other than "undef", but assigning with an empty
-       string but with the length of data that we need seems to work
-       to get us the length of data we want, and the string value of
-       the data that we insert is also accessible by Perl. */
-    sv = newSVpv ("", len);
-    hv_store (split, name, name_length, sv, 0);
-    return (unsigned char *) SvPVX (sv);
+    unsigned char * retval;
+    STRLEN sv_len;
+
+    sv_len = (STRLEN) len;
+    /* newSVpv with "" and this length caused some kind of problem,
+       detectable on a few people's computers and with valgrind, which
+       said it was an invalid read, so we switched to this method
+       based on Perl source code and the perlguts.  */
+    sv = newSV (sv_len);
+    SvPOK_on (sv);
+    SvCUR_set (sv, sv_len);
+    if (! hv_store (split, name, name_length, sv, 0)) {
+	croak ("%s:%d: hv_store %s, %d bytes failed",
+	       __FILE__, __LINE__, name, len);
+    }
+    retval = (unsigned char *) SvPVX (sv);
+    if (! retval) {
+	croak ("%s:%d: newSVpv/SvPVX %s, %d bytes failed",
+	       __FILE__, __LINE__, name, len);
+    }
+    return retval;
 }
 
 static SV *
@@ -4091,13 +4122,13 @@ perl_png_split_alpha (perl_libpng_t * png)
 {
     HV * split;
     SV * split_ref;
-    int datapix;
     png_uint_32 width;
     png_uint_32 height;
     int bit_depth;
     int color_type;
     int interlace_method;
     int rowbytes;
+    int datapix;
     int alphapix;
     unsigned char * databytes;
     unsigned char * alphabytes;
@@ -4111,12 +4142,13 @@ perl_png_split_alpha (perl_libpng_t * png)
 		  & bit_depth, & color_type, & interlace_method,
 		  UNUSED_ZERO_ARG, UNUSED_ZERO_ARG);
     rows = png_get_rows (pngi);
-    rowbytes = png_get_rowbytes (pngi);
-    if (bit_depth == 8) {
-	bytes = 1;
+    if (! rows) {
+	croak ("%s:%d: could not retrieve image data from PNG",
+	       __FILE__, __LINE__);
     }
-    else if (bit_depth == 16) {
-	bytes = 2;
+    rowbytes = png_get_rowbytes (pngi);
+    if (bit_depth == 8 || bit_depth == 16) {
+	bytes = bit_depth / 8;
     }
     else {
 	warn ("Bit depth of %d is not handled by split_alpha", bit_depth);
@@ -4132,12 +4164,19 @@ perl_png_split_alpha (perl_libpng_t * png)
     alphapix = bytes * height * width;
     datapix = colors * alphapix;
     split = newHV ();
-    alphabytes = bullshit (split, "alpha", strlen ("alpha"), alphapix);
-    databytes = bullshit (split, "data", strlen ("data"), datapix);
+    if (! split) {
+	croak ("%s:%d: newHV failed", __FILE__, __LINE__);
+    }
+    alphabytes = sv_memory (split, "alpha", strlen ("alpha"), alphapix);
+    databytes = sv_memory (split, "data", strlen ("data"), datapix);
     for (i = 0; i < height; i++) {
 	int j;
 	png_bytep row;
 	row = rows[i];
+	if (rowbytes < bytes * channels * width) {
+	    croak ("Unexpected rowbytes %d < %d", rowbytes,
+		   bytes*channels*width);
+	}
 	for (j = 0; j < width; j++) {
 	    int byte;
 	    int o;
@@ -4154,7 +4193,24 @@ perl_png_split_alpha (perl_libpng_t * png)
 		for (c = 0; c < colors; c++) {
 		    int r;
 		    r = bytes*c + byte;
+		    if (q + r >= rowbytes) {
+			croak ("%s:%d: Overflow %d (q=%d = %d x %d x %d + r=%d) >= rowbytes=%d",
+			       __FILE__, __LINE__, q + r, q, bytes, channels, j, r, rowbytes);
+		    }
+		    if (p + r >= datapix) {
+			croak ("%s:%d: Overflow %d (p=%d + r=%d) >= datapix=%d",
+			       __FILE__, __LINE__, p + r, p, r, datapix);
+		    }
 		    databytes[p + r] = row[q + r];
+		}
+		if (o + byte >= alphapix) {
+		    croak ("%s:%d: Overflow %d (o=%d + byte=%d) >= alphapix=%d",
+			   __FILE__, __LINE__, o + byte, o, byte, alphapix);
+		}
+		if (q + bytes*colors + byte >= rowbytes) {
+		    croak ("%s:%d: Overflow %d (%d + %d x %d + %d) >= %d",
+			   __FILE__, __LINE__,  q + bytes*colors + byte,
+			   q, bytes, colors, byte, rowbytes);
 		}
 		alphabytes[o + byte] = row[q + bytes*colors + byte];
 	    }

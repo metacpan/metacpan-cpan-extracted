@@ -35,22 +35,22 @@ no_index:
 provides:
   DateTime::Locale:
     file: lib/DateTime/Locale.pm
-    version: '1.30'
+    version: '1.31'
   DateTime::Locale::Base:
     file: lib/DateTime/Locale/Base.pm
-    version: '1.30'
+    version: '1.31'
   DateTime::Locale::Catalog:
     file: lib/DateTime/Locale/Catalog.pm
-    version: '1.30'
+    version: '1.31'
   DateTime::Locale::Data:
     file: lib/DateTime/Locale/Data.pm
-    version: '1.30'
+    version: '1.31'
   DateTime::Locale::FromData:
     file: lib/DateTime/Locale/FromData.pm
-    version: '1.30'
+    version: '1.31'
   DateTime::Locale::Util:
     file: lib/DateTime/Locale/Util.pm
-    version: '1.30'
+    version: '1.31'
 requires:
   Carp: '0'
   Dist::CheckConflicts: '0.02'
@@ -71,7 +71,7 @@ resources:
   bugtracker: https://github.com/houseabsolute/DateTime-Locale/issues
   homepage: https://metacpan.org/release/DateTime-Locale
   repository: git://github.com/houseabsolute/DateTime-Locale.git
-version: '1.30'
+version: '1.31'
 x_Dist_Zilla:
   perl:
     version: '5.030001'
@@ -772,6 +772,7 @@ x_Dist_Zilla:
             - feira
             - fera
             - fọ
+            - gada
             - glindesdi
             - gumba
             - gwà
@@ -828,6 +829,7 @@ x_Dist_Zilla:
             - mandag
             - mbere
             - minggu
+            - mis
             - miz
             - mjesec
             - "mm'min'ss"
@@ -865,6 +867,7 @@ x_Dist_Zilla:
             - pétuwakȟa
             - póndźela
             - pónjeźele
+            - ranar
             - roka
             - roku
             - sa
@@ -973,6 +976,7 @@ x_Dist_Zilla:
             - ġimgħa
             - ži
             - Ọjọ
+            - ọjọ
           wordlist: Pod::Wordlist
       name: '@DROLSKY/Test::PodSpelling'
       version: '2.007005'
@@ -1359,7 +1363,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v1.30
+          tag: v1.31
           tag_format: v%V
           tag_message: v%V
         Dist::Zilla::Role::Git::Repo:

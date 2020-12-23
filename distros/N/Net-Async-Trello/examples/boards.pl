@@ -5,7 +5,7 @@ use warnings;
 use IO::Async::Loop;
 use Net::Async::Trello;
 
-use Log::Any::Adapter qw(Stdout), log_level => 'trace';
+use Log::Any::Adapter qw(Stdout), log_level => 'info';
 
 use Getopt::Long;
 

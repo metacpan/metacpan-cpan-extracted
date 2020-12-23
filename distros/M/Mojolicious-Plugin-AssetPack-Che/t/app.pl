@@ -3,9 +3,12 @@ use Mojolicious::Lite;
 
 plugin 'AssetPack::Che' => {
   pipes => [qw(Css CombineFile JavaScriptPacker)],#
+  CombineFile => {
+      gzip => {min_size => 1000},
+    },
   process => {
     'main.css'=>['css/foo.css', 'css/bar.css',],
-    't1.html'=>['templates/1.html', 'templates/2.html'],
+    'шаблон 1.html?1111'=>['templates/1.html', 'templates/2.html'],
   },
 };
 

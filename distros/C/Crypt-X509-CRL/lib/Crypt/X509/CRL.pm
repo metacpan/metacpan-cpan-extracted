@@ -12,7 +12,7 @@ our @ISA = qw(Exporter);
 our %EXPORT_TAGS = ( 'all' => [qw()] );
 our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 our @EXPORT = qw( error new this_update next_update );
-our $VERSION = '0.2';
+our $VERSION = '0.3';
 
 my $parser = undef;
 my $asn = undef;
@@ -969,7 +969,7 @@ date of expiration.  Returns undef if not defined.
 =head3 Example:
 
   $decoded = Crypt::X509::CRL->new(crl => $crl);
-  if ( $decoded->next_update > time() ) {
+  if ( $decoded->next_update < time() ) {
   	warn "CRL has expired!";
   }
 

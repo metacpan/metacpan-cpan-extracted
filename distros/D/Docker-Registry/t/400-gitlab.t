@@ -20,16 +20,10 @@ my $d = Docker::Registry::Gitlab->new(
 {
     $io->set_content('{"repositories":["test2-registry","test1-registry"]}');
 
-    throws_ok(
-        sub {
-            my $result = $d->repositories;
-            isa_ok($result, 'Docker::Registry::Result::Repositories');
-            cmp_ok($result->repositories->[0], 'eq', 'test2-registry');
-            cmp_ok($result->repositories->[1], 'eq', 'test1-registry');
-        },
-        qr/not supported by GitLab/,
-        "GitLab doesn't support repositories method"
-    );
+    my $result = $d->repositories;
+    isa_ok($result, 'Docker::Registry::Result::Repositories');
+    cmp_ok($result->repositories->[0], 'eq', 'test2-registry');
+    cmp_ok($result->repositories->[1], 'eq', 'test1-registry');
 }
 
 {

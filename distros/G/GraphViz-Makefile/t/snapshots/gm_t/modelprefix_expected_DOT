@@ -1,0 +1,12 @@
+'digraph Perl {
+ "rule:testdata/features.tab:0" [ fillcolor="#dddddd" fontname="Monospace" fontsize="8" label="{<port1> perl\\ prog3.pl\\ $\\<\\ \\>\\ $@\\l}" shape="record" style="filled" ]
+ "rule:testdata/features.tab:0" -> "target:testotherfile"
+ "rule:testmodel:0" [ fillcolor="#dddddd" fontname="Monospace" fontsize="8" label="{<port1> perl\\ prog1.pl\\ $\\<\\l}" shape="record" style="filled" ]
+ "rule:testmodel:0" -> "target:testdata/features.tab"
+ "target:testdata/features.tab" [ fillcolor="#ffff99" fontname="Arial" fontsize="10" label="testdata/features.tab" shape="box" style="filled" ]
+ "target:testdata/features.tab" -> "rule:testdata/features.tab:0"
+ "target:testmodel" [ fillcolor="#ffff99" fontname="Arial" fontsize="10" label="testmodel" shape="box" style="filled" ]
+ "target:testmodel" -> "rule:testmodel:0"
+ "target:testotherfile" [ fillcolor="#ffff99" fontname="Arial" fontsize="10" label="testotherfile" shape="box" style="filled" ]
+}
+'

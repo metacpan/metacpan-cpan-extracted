@@ -2,12 +2,15 @@ use lib 'lib', '../lib';
 use Mojolicious::Lite;
 
 plugin 'AssetPack::Che' => {
-  pipes => [qw(Css CombineFile)],
+  pipes => [qw(Css HTML CombineFile)],
+  CombineFile => {
+    gzip => {min_size => 1000},
+  },
   process => {
     'main.css'=>['css/foo.css', 'css/bar.css',],
-    't1.html'=>['templates/1.html', 'templates/2.html'],
+    'папка/подпапка/шаблон.html?bar'=>['templates/1.html', 'templates/2.html',],
   },
-  CombineFile => {version=>'2'},
+  #~ CombineFile => {version=>'2'},
 };
 
 get '/' => sub {

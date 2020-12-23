@@ -3,7 +3,7 @@ use warnings;
 
 use English;
 use Error::Pure::Utils qw(clean);
-use Test::More 'tests' => 7;
+use Test::More 'tests' => 10;
 use Test::NoWarnings;
 use Toolforge::MixNMatch::Object::Catalog;
 use Toolforge::MixNMatch::Object::User;
@@ -136,3 +136,43 @@ eval {
 is($EVAL_ERROR, "Object isn't 'Toolforge::MixNMatch::Object::Catalog'.\n",
 	"Object isn't 'Toolforge::MixNMatch::Object::Catalog'.");
 clean();
+
+# Test.
+$obj = Toolforge::MixNMatch::Object::Catalog->new(
+	'count' => 1,
+	'type' => 'Q5',
+);
+$ret = Toolforge::MixNMatch::Print::Catalog::print($obj, {'type' => 1});
+$right_ret = <<'END';
+Type: Q5
+END
+chomp $right_ret;
+is($ret, $right_ret, 'Print catalog with only type.');
+
+# Test.
+$obj = Toolforge::MixNMatch::Object::Catalog->new(
+	'count' => 1,
+	'type' => 'Q5',
+);
+$ret = Toolforge::MixNMatch::Print::Catalog::print($obj, {'count' => 1});
+$right_ret = <<'END';
+Count: 1
+END
+chomp $right_ret;
+is($ret, $right_ret, 'Print catalog with only count.');
+
+# Test.
+$obj = Toolforge::MixNMatch::Object::Catalog->new(
+	'count' => 1,
+	'type' => 'Q5',
+);
+my @ret = Toolforge::MixNMatch::Print::Catalog::print($obj);
+my @right_ret = (
+	'Type: Q5',
+	'Count: 1',
+);
+is_deeply(
+	\@ret,
+	\@right_ret,
+	'Get array in print().',
+);

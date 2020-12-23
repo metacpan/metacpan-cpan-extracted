@@ -650,6 +650,26 @@ Yes
 
 6 (شنبه)
 
+=head2 Strftime Patterns
+
+=head3 %c (‫%A %Oe %B %Oy، %OH:%OM:%OS‬) - date time format
+
+   2008-02-05T18:30:30 = ‫سه‌شنبه %Oe فوریهٔ %Oy، %OH:%OM:%OS‬
+   1995-12-22T09:05:02 = ‫جمعه %Oe دسامبر %Oy، %OH:%OM:%OS‬
+  -0010-09-15T04:44:23 = ‫شنبه %Oe سپتامبر %Oy، %OH:%OM:%OS‬
+
+=head3 %x (%Oy/%Om/%Od) - date format
+
+   2008-02-05T18:30:30 = %Oy/%Om/%Od
+   1995-12-22T09:05:02 = %Oy/%Om/%Od
+  -0010-09-15T04:44:23 = %Oy/%Om/%Od
+
+=head3 %X (%OH:%OM:%OS) - time format
+
+   2008-02-05T18:30:30 = %OH:%OM:%OS
+   1995-12-22T09:05:02 = %OH:%OM:%OS
+  -0010-09-15T04:44:23 = %OH:%OM:%OS
+
 =head1 SUPPORT
 
 See L<DateTime::Locale>.

@@ -1,6 +1,6 @@
 package Message::Passing::AMQP::Role::DeclaresQueue;
-use Moose::Role;
-use Moose::Util::TypeConstraints;
+use Moo::Role;
+use Types::Standard qw( Bool Str HashRef );
 use Scalar::Util qw/ weaken /;
 use namespace::autoclean;
 
@@ -8,7 +8,7 @@ with 'Message::Passing::AMQP::Role::HasAChannel';
 
 has queue_name => (
     is => 'ro',
-    isa => 'Str',
+    isa => Str,
     predicate => '_has_queue_name',
     lazy => 1,
     default => sub {
@@ -20,19 +20,19 @@ has queue_name => (
 # FIXME - Should auto-build from _queue as above
 has queue_durable => (
     is => 'ro',
-    isa => 'Bool',
+    isa => Bool,
     default => 1,
 );
 
 has queue_exclusive => (
     is => 'ro',
-    isa => 'Bool',
+    isa => Bool,
     default => 0,
 );
 
 has queue_auto_delete => (
     is => 'ro',
-    isa => 'Bool',
+    isa => Bool,
     default => 0,
 );
 
@@ -44,7 +44,7 @@ has _queue => (
 );
 
 has queue_arguments => (
-    isa => 'HashRef',
+    isa => HashRef,
     is => 'ro',
     default => sub { {} }, # E.g. 'x-ha-policy' => 'all'
 );
@@ -79,6 +79,11 @@ Message::Passing::AMQP::Role::DeclaresQueue - Role for instances which have an A
 =head2 queue_name
 
 Defines the queue name, defaults to the name returned by the server.
+
+The server may place restrictions on queue names it generates that
+make them unsuitable in scenarios involving server restarts.
+
+Recommend explicitly defining the queue name in those cases.
 
 =head2 queue_durable
 

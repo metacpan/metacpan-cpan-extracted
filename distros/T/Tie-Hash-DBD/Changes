@@ -1,3 +1,7 @@
+0.22	- 21 Dec 2020, H.Merijn Brand
+    * Try to make persist tests use more unique table names
+    * Fix META issue for bugtracker
+
 0.21	- 09 Apr 2020, H.Merijn Brand
     * It's 2020
 

@@ -135,7 +135,6 @@ Creston
 Cuiaba
 Cunha
 Curacao
-Currie
 Czechia
 DK
 DM

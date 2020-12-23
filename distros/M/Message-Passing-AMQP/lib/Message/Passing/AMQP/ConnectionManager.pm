@@ -1,5 +1,6 @@
 package Message::Passing::AMQP::ConnectionManager;
-use Moose;
+use Moo;
+use Types::Standard qw( Bool Str Int );
 use Scalar::Util qw/ weaken /;
 use AnyEvent;
 use AnyEvent::RabbitMQ;
@@ -16,25 +17,19 @@ sub _default_port { 5672 }
 
 has vhost => (
     is => 'ro',
-    isa => 'Str',
+    isa => Str,
     required => 1,
-);
-
-has timeout => (
-    is => 'ro',
-    isa => 'Int',
-    default => sub { 30 },
 );
 
 has tls => (
     is => 'ro',
-    isa => 'Bool',
+    isa => Bool,
     default => sub { 0 },
 );
 
 has verbose => (
     is => 'ro',
-    isa => 'Bool',
+    isa => Bool,
     default => sub { 0 },
 );
 
@@ -70,7 +65,6 @@ sub _build_connection {
     return $client;
 }
 
-__PACKAGE__->meta->make_immutable;
 1;
 
 =head1 NAME

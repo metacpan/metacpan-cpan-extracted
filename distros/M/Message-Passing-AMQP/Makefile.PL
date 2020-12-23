@@ -11,7 +11,7 @@ resources(
 
 license 'LGPL_2_1';
 
-requires 'Moose';
+requires 'Moo' => 2.004004;
 requires 'namespace::autoclean';
 requires 'AnyEvent';
 requires 'AnyEvent::RabbitMQ' => '1.15';
@@ -19,6 +19,7 @@ requires 'JSON';
 requires 'JSON::XS';
 requires 'Try::Tiny';
 requires 'Task::Weaken';
+requires 'Types::Standard'=> 1.012000;
 requires 'Message::Passing' => '0.009';
 
 test_requires 'Test::More' => '0.88';

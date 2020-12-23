@@ -68,7 +68,7 @@
          "web" : "https://github.com/ology/Music-MelodicDevice-Ornamentation"
       }
    },
-   "version" : "0.0400",
+   "version" : "0.0401",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.030002"

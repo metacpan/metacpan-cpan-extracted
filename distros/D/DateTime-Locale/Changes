@@ -1,3 +1,8 @@
+1.31     2020-12-22
+
+- The docs for each locale now show examples of its strftime patterns as well.
+
+
 1.30     2020-12-15
 
 - The previous release included some locale data for locales that had been

@@ -1,0 +1,124 @@
+<template>
+
+<div>
+<v-progress-indeterminate v-show=" !ready " :color=" 'teal' " :message=" 'Загружается...' "></v-progress-indeterminate>
+
+<div v-if="ready" class="row padd-05 relative animated slideInUp">
+  <div style="position:absolute; top:0; right:0; z-index:1;">
+    <a v-show="!topFolder && UploadsLen" @click.stop="expandUploads = !expandUploads" href="javascript:" class="chip blue lighten-3 z-depth-1 hover-white padd-0" title="развернуть/свернуть список файлов"><i class="material-icons" :class="{'rotate180': expandUploads}">arrow_drop_down</i><!--sup style="position: absolute; top:0.3rem; right:0.5rem;">{{ UploadsLen }}</sup--></a>
+  </div>
+  <!-- табы папок -->
+  
+  <div v-if="folders" class="col m3 padd-0">
+    <ul v-if="topFolders.length" class="collection marg-0 padd-0  blue  lighten-4  striped nowrap" >
+      <li v-for="f in topFolders" v-show="f !== topFolder" class1="tab-shadow helmet z-depth-1 " class="collection-item nowrap padd-0-05" style="overflow: auto;" :class000="{'active bold blue lighten-5': f === topFolder, '':f !== topFolder, 'animated slideInRight': !f.name}">
+        <h5 class="" :class="{'bold':  f === topFolder}">
+          <a v-if="f.name" @click="TabFolder(f)" href="javascript:"  class="blue-text text-darken-3 hover-shadow3d">{{ f.name }} <sup v-show=" !!f['файлов'] " class="chip fs8">{{ f['файлов'] }}</sup><sup v-show="f._new" class="chip orange-text fs8">*новая*</sup><!-- UploadsFilteredLen --></a>
+        </h5>
+      </li>
+    </ul>
+    
+    <h4 class="right-align">
+      <a v-show="!topFolders[0] || !!topFolders[0].name" @click="AddFolder" href="javascript:" class="btn-flat blue lighten-4 z-depth-1 hover-white padd-05" style=" line-height: normal;" title="Добавить папку"><svg  xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 -8 394 394" class="blue-fill fill-darken-3" style="height: 1.7rem;" ><use xlink:href="/fonts/icons.svg?2020-12-10-1#add-folder" /></svg></a>
+      
+    </h4>
+    
+    
+    
+  </div>
+  <!-- список файлов -->
+  <div class=" " :class="{'col m9 padd-0-0-0-05':!!folders}">
+  
+    <h4 v-if="!!topFolder" :key="topFolder._id" class="helmet z-depth-1 blue lighten-5 fw500 width-100 animated slideInLeft fast">
+      <a v-show="!!topFolder.name" @click="TabFolder(topFolder)" href="javascript:" class="blue-text text-darken-3 hover-shadow3d">{{ topFolder.name }}<sup v-show=" !!topFolder['файлов'] " class="chip fs8">{{ topFolder['файлов'] }}</sup></a>
+      <a v-show="!topFolder.hasOwnProperty('_edit')" @click="EditFolder(topFolder)" href="javascript:" class="btn-flat blue lighten-4 z-depth-1 hover-white padd-0-05  right" title="Переименовать папку"><svg  xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 -13 445 445" class="orange-fill fill-darken-4" style="height: 1.7rem;" ><use xlink:href="/fonts/icons.svg?2020-12-10-2#edit-folder" /></svg></a>
+      <div v-show="!!topFolder.hasOwnProperty('_edit')" class="input-field chip width-100 z-depth-1 white">
+        <input type="text" name="edit-folder" v-model="topFolder._edit" class=" blue-text text-darken-3"  required pattern=".*\S+.*" @blur="BlurEditFolder(topFolder)">
+        <h6 class="placeholder chip white padd-0-05 fs8">новое имя папки</h6>
+      </div>
+      
+    </h4>
+    <div v-else v-show="folders && UploadsLen" class=" animated slideInLeft fast">
+      <h4 class="helmet z-depth-1  lighten-5  " :class="{'blue fw500':!filterEmptyFolder}">
+            <a @click="filterEmptyFolder = false" href="javascript:" class="hover-shadow3d blue-text text-darken-3">Все файлы</a>
+            <sup class="chip fs8">{{ UploadsLen }}</sup>
+      </h4>
+      <h4 class="helmet z-depth-1   lighten-5 " :class="{'blue fw500':filterEmptyFolder}">
+            <a @click="filterEmptyFolder = true" href="javascript:" class="hover-shadow3d blue-text text-darken-3">Без папки</a>
+            <sup v-show="filterEmptyFolder" class="chip fs8">{{ UploadsFilteredLen }}</sup>
+      </h4>
+    </div>
+      
+    
+    <ul v-if=" UploadsLen " :key000="uploadsFilteredKey" class="collection  blue striped lighten-4 marg-0 padd-0 animated slideInUp" :class="{'max-height-none':!!topFolder}" style="overflow:auto;" :style="expandUploads ? {} : {'max-height': 'calc(30vh)'}">
+      <li v-for="file in UploadsFiltered" :key="file.id" :id=" `file-${file.id}` " class="collection-item relative hover-childs-show  animated" :class="{' slideInRight': !!file._file, 'fadeIn000':!file._file, 'marg-05-0':file.hasOwnProperty('_edit')}" style="/*overflow:auto; border:none;*/">
+        <a @click.stop="ViewIframe(Object.assign(file, {'src': appRoutes.urlFor('файл-инлайн', [file.sha1])}))" href="javascript: void('просмотреть(скачать) файл')" class="hover-shadow3d input-field" title="просмотреть(скачать) файл">
+          <h6 v-for="(n, idx) in file.names" v-show="!topFolder || file.names.length == 1 || idx > 0" :key="idx" class="breadcrumb before-margin-0 inline ">
+            <span class="chip padd-0-05 blue-text-darken-3" :class="{'fw500 white': idx+1 == file.names.length || file.names.length == 1 , 'transparent': file.names.length > 1 && idx+1 != file.names.length, 'orange lighten-4': !!file._file,}" >{{ n }}</span>
+          </h6>
+          <span v-show="!!file._file" class="orange-text" style="position: absolute; z-index: 1; top:-0.5rem; right:-0.3rem;"  title=" новый файл ">✱</span>
+        </a>
+        <span class="padd-0-05 fs8 grey-text" :title="file.content_type"> {{ Size(file) }} </span>
+        <span class="padd-0-05 grey-text fs8" :title=" JSON.stringify(file.$last_modified) "> <span>{{ file.$last_modified.day }}</span> <span>{{ file.$last_modified['мес'] }}</span> <span v-show="(new Date).getYear()+1900 != file.$last_modified.year">{{ file.$last_modified.year }}</span> <span>{{ file.$last_modified.hour }}:{{ file.$last_modified.minute }}</span></span>
+        <span class="chip000 padd-0-05 grey-text fs8" :title=" JSON.stringify(file.$ts) "> <span>{{ file.$ts.day }}</span> <span>{{ file.$ts['мес'] }}</span> <span v-show="(new Date).getYear()+1900 != file.$ts.year">{{ file.$ts.year }}</span> <span>{{ file.$ts.hour }}:{{ file.$ts.minute }}</span></span>
+        <span v-show=" $AppUser.ID() != file.uid " class="chip transparent padd-0-05 fs8 truncate nowrap vbottom grey-text" style="max-width:5rem;" :title="file['@автор'].join(' ')">{{ file['@автор'].join(' ') }}</span>
+        
+        <!-- блок кнопок -->
+        <a @click.stop="ConfirmRemove(file)" href="javascript: void('удалить файл')" class="btn-flat  hover-z-depth-1 hover-parent-show-iblock hover-white remove-siblings" title="удалить файл"><svg xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 50 50" class="red-fill fill-lighten-1" style="height: 1.5rem;"><use xlink:href="/fonts/icons.svg#left-clear-fill"></use></svg></a>
+        <a v-show="!file.hasOwnProperty('_edit')" @click.stop="EditFile(file)" href="javascript: void('редактировать файл')" class="btn-flat  hover-z-depth-1 hover-parent-show-iblock hover-white"  title="редактировать файл"><svg xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 -1 401 401" class="green-fill fill-darken-3" style="height: 1.3rem;"><use xlink:href="/fonts/icons.svg?2020-12-09#edit-file"></use></svg></a>
+        <a v-if="topFolders.length > 1 ||(topFolders.length && file.names.length == 1) " @click.stop="ToggleMove(file)" href="javascript: void('переместить файл')" class="btn-flat  hover-z-depth-1 hover-white" :class="{'hover-parent-show-iblock':!file._move, 'white shadow-inset-10':!!file._move}" title="переместить в папку"><svg xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 -32 442 442" class="blue-fill fill-darken-3" style="height: 1.4rem;"><use xlink:href="/fonts/icons.svg?2020-12-10-1#into-folder"></use></svg></a>
+        <a @click.stop="FileAttachment(file)" href="javascript: void('скачать файл')" class="btn-flat  hover-z-depth-1 blue-text hover-parent-show-iblock hover-white"  title="скачать файл"><i class="material-icons">cloud_download</i></a>
+        
+        <!-- редактировать имя файла без расширения -->
+        <div v-show="file.hasOwnProperty('_edit') " class="input-field chip marg-05-0 white z-depth-1 width-100">
+          <input type="text" name="edit-file" v-model="file._edit" class=" blue-text text-darken-3" required pattern=".*\S+.*" @blur="BlurEditFile(file)" >
+          <span class="grey-text chip white shadow-inset-10" style="position:absolute; right:-1rem;">{{ file._ext }}</span>
+          <h6 class="placeholder chip white padd-0-05 fs8">новое имя файла</h6>
+        </div>
+
+      </li>
+    </ul>
+    
+    <h6 v-if="!UploadsFiltered.length && topFolder && topFolder._new && !!topFolder.name" class="red-text">Пустая папка без файлов -- при закрытии будет удалена!</h6>
+    
+    <div class="clearfix000"><v-uploader :options=" uploader.options" :file-status-text=" uploader.statusText " class="" @file-added=" FileAdded " @file-success=" FileSuccess "></v-uploader></div>
+  </div>
+  
+  <!---v-uploader :options="options" :file-status-text="statusText" class="uploader-example" ref="uploader" @file-complete=" FileComplete " @file-success=" FileSuccess " @complete=" Complete "></v-uploader-->
+</div>
+  <!-- Modal Structure -->
+  <div id="modal-confirm-remove" class="modal bottom-sheet"  data-overlay-in="animated fade-in-05" data-overlay-out="animated  fade-out-05 fast" data-modal-in="animated slideInUp" data-modal-out="animated slideOutDown fast">
+    <div class="modal-content blue-lighten-4">
+      <h3 class="center row">Подтвердите удаление файла</h3>
+      <div v-if="!!confirmFile" class="center" >
+        <h4 v-for="(n, idx) in confirmFile.names" :key="idx" class="breadcrumb before-margin-0 iblock " :class="{'orange-text-darken-3': !!confirmFile._file, 'blue-text-darken-3': !confirmFile._file}"><span class="chip" :class="{'fw500': idx == (confirmFile.names.length-1)}"  :title=" idx == (confirmFile.names.length-1) ? confirmFile.content_type : '' ">{{ n }}</span></h4>
+        <span class=""> {{ Size(confirmFile) }} </span>
+        <span class="chip " :title=" JSON.stringify(confirmFile.$last_modified) "> <span>{{ confirmFile.$last_modified.day }}</span> <span>{{ confirmFile.$last_modified['мес'] }}</span> <span v-show="(new Date).getYear()+1900 != confirmFile.$last_modified.year">{{ confirmFile.$last_modified.year }}</span> <span>{{ confirmFile.$last_modified.hour }}:{{ confirmFile.$last_modified.minute }}</span></span>
+        <span class="chip " :title=" JSON.stringify(confirmFile.$ts) "> <span>{{ confirmFile.$ts.day }}</span> <span>{{ confirmFile.$ts['мес'] }}</span> <span v-show="(new Date).getYear()+1900 != confirmFile.$ts.year">{{ confirmFile.$ts.year }}</span> <span>{{ confirmFile.$ts.hour }}:{{ confirmFile.$ts.minute }}</span></span>
+        <span v000-show=" $AppUser.ID() != confirmFile.uid " class="chip nowrap" style="">{{ confirmFile['@автор'].join(' ') }}</span>
+      </div>
+    </div>
+    <div class="modal-footer center grey-lighten-2">
+      <a @click.stop="Remove(confirmFile)" href="javascript:" class="modal-action modal-close btn-flat nofloat green lighten-3 green-text text-darken-4 z-depth-1">Да, удалить</a>
+      <a href="javascript:" class="modal-action modal-close btn-flat nofloat red lighten-3 red-text text-darken-3 z-depth-1" style="position:absolute; top:1rem; right:2rem;"><i class="material-icons">cancel</i><span>Отмена</span></a>
+    </div>
+  </div>
+  
+  <!-- Modal Structure -->
+  <div id="modal-view-in-iframe" class="modal" data-overlay-in="animated fade-in-05" data-overlay-out="animated  fade-out-05 fast" data-modal-in="animated slideInUp" data-modal-out="animated   slideOutDown fast"  style="max-height:90%; width:100%; bottom:0;">
+    <div class="modal-content0000">
+      <iframe 
+        v-if="iframeFile && iframeFile.src"
+        :src="iframeFile.src"
+        :height="iframeFile.height"
+        :width="iframeFile.width"
+        :type="iframeFile.content_type"
+        frameborder="0"
+      ></iframe>
+    </div>
+      <a click.stop=" ViewIframeClose " href="javascript:" class="modal-action modal-close waves-effect waves-green btn-flat red lighten-3 red-text text-darken-3" style="position:absolute;bottom:0; right:0;"><i class="material-icons">cancel</i><span>Закрыть просмотр</span></a>
+  </div>
+  
+</div>
+
+</template>

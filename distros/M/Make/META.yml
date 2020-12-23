@@ -36,5 +36,5 @@ resources:
   bugtracker: https://github.com/klp2/Make/issues
   homepage: https://metacpan.org/pod/Make
   repository: https://github.com/klp2/Make.git
-version: '2.010'
+version: '2.011'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

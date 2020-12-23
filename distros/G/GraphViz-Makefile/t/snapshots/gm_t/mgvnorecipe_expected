@@ -1,0 +1,88 @@
+[
+  {
+    'rule:all:0' => {
+      'recipe' => [],
+      'recipe_raw' => []
+    },
+    'rule:all:1' => {
+      'recipe' => [],
+      'recipe_raw' => []
+    },
+    'rule:any:0' => {
+      'recipe' => [
+        'echo larry',
+        'echo howdy'
+      ],
+      'recipe_raw' => [
+        'echo larry',
+        'echo howdy'
+      ]
+    },
+    'rule:any:1' => {
+      'recipe' => [],
+      'recipe_raw' => []
+    },
+    'rule:foo:0' => {
+      'recipe' => [
+        'echo Hi'
+      ],
+      'recipe_raw' => [
+        'echo Hi'
+      ]
+    },
+    'rule:foo:1' => {
+      'recipe' => [
+        'echo Hey'
+      ],
+      'recipe_raw' => [
+        'echo Hey'
+      ]
+    },
+    'target:all' => undef,
+    'target:any' => undef,
+    'target:bar' => undef,
+    'target:blah' => undef,
+    'target:blow' => undef,
+    'target:boo' => undef,
+    'target:buz' => undef,
+    'target:foo' => undef,
+    'target:hiya' => undef,
+    'target:howdy' => undef
+  },
+  {
+    'rule:all:0' => {
+      'target:foo' => {}
+    },
+    'rule:all:1' => {
+      'target:bar' => {}
+    },
+    'rule:any:0' => {
+      'target:foo' => {},
+      'target:hiya' => {}
+    },
+    'rule:any:1' => {
+      'target:blah' => {},
+      'target:blow' => {}
+    },
+    'rule:foo:0' => {
+      'target:blah' => {},
+      'target:boo' => {}
+    },
+    'rule:foo:1' => {
+      'target:buz' => {},
+      'target:howdy' => {}
+    },
+    'target:all' => {
+      'rule:all:0' => {},
+      'rule:all:1' => {}
+    },
+    'target:any' => {
+      'rule:any:0' => {},
+      'rule:any:1' => {}
+    },
+    'target:foo' => {
+      'rule:foo:0' => {},
+      'rule:foo:1' => {}
+    }
+  }
+]

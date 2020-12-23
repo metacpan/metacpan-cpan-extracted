@@ -1588,6 +1588,7 @@ SPVM_OP* SPVM_OP_build_package(SPVM_COMPILER* compiler, SPVM_OP* op_package, SPV
   
   package->module_file = compiler->cur_file;
   package->module_rel_file = compiler->cur_rel_file;
+
   
   int32_t is_anon;
   if (op_type) {
@@ -1598,26 +1599,53 @@ SPVM_OP* SPVM_OP_build_package(SPVM_COMPILER* compiler, SPVM_OP* op_package, SPV
     // Package is anon
     is_anon = 1;
     
+    SPVM_OP* op_sub = op_block->first->last;
+    assert(op_sub);
+    assert(op_sub->id == SPVM_OP_C_ID_SUB);
+
+    // int32_t max length is 10(2147483647)
+    int32_t int32_max_length = 10;
+    
+    // Create anon sub package name
+    // If Foo::Bar anon sub is defined line 123, keyword start pos 32, the anon sub package name become anon_Foo__Bar_123_32. This is uniqe in whole program.
+    const char* anon_sub_defined_rel_file_package_name = compiler->cur_rel_file_package_name;
+    int32_t anon_sub_defined_line = op_sub->line;
+    int32_t anon_sub_defined_keyword_start_pos = op_sub->keyword_start_pos;
+    int32_t anon_sub_package_name_length = 5 + strlen(anon_sub_defined_rel_file_package_name) + 1 + int32_max_length + 1 + int32_max_length;
+    
+    // warn("AAAAA %s %d %d", anon_sub_defined_rel_file_package_name, anon_sub_defined_line, anon_sub_defined_keyword_start_pos);
+    
     // Anon package name
-    char* name_package = SPVM_COMPILER_ALLOCATOR_safe_malloc_zero(compiler, strlen("anon2147483647") + 1);
-    sprintf(name_package, "anon%d", compiler->anon_package_length);
-    compiler->anon_package_length++;
+    char* name_package = SPVM_COMPILER_ALLOCATOR_safe_malloc_zero(compiler, anon_sub_package_name_length + 1);
+    sprintf(name_package, "anon_%s_%d_%d", anon_sub_defined_rel_file_package_name, anon_sub_defined_line, anon_sub_defined_keyword_start_pos);
+    for (int32_t i = 0; i < anon_sub_package_name_length; i++) {
+      if (name_package[i] == ':') {
+        name_package[i] = '_';
+      }
+    }
+    
     SPVM_OP* op_name_package = SPVM_OP_new_op_name(compiler, name_package, op_package->file, op_package->line);
     op_type = SPVM_OP_build_basic_type(compiler, op_name_package);
-    
-    // Add addede package names in this compile
-    SPVM_LIST_push(compiler->tmp_added_package_names, (void*)name_package);
   }
   
-  package->op_type = op_type;
-  
   const char* package_name = op_type->uv.type->basic_type->name;
+  package->op_type = op_type;
   
   // Add addede package names in this compile
   SPVM_LIST_push(compiler->tmp_added_package_names, (void*)package_name);
-
-  if (!is_anon && islower(package_name[0])) {
-    SPVM_COMPILER_error(compiler, "Package name \"%s\" must start with upper case at %s line %d\n", package_name, op_package->file, op_package->line);
+  
+  if (!is_anon) {
+    // If package name start with lower case, compile error occur.
+    if (islower(package_name[0])) {
+      SPVM_COMPILER_error(compiler, "Package name \"%s\" must start with upper case at %s line %d\n", package_name, op_package->file, op_package->line);
+    }
+    // If package name is different from the package name corresponding to the module file, compile error occur.
+    else if (strcmp(package_name, compiler->cur_rel_file_package_name) != 0) {
+      // If package fail load by if (require xxx) syntax, that is ok
+      if (!op_type->uv.type->basic_type->fail_load) {
+        SPVM_COMPILER_error(compiler, "Package name \"%s\" is different from the package name corresponding to the module file at %s line %d\n", package_name, op_package->file, op_package->line);
+      }
+    }
   }
   
   SPVM_HASH* package_symtable = compiler->package_symtable;
@@ -2019,8 +2047,8 @@ SPVM_OP* SPVM_OP_build_package(SPVM_COMPILER* compiler, SPVM_OP* op_package, SPV
       for (i = 0; i < package->subs->length; i++) {
         SPVM_SUB* sub = SPVM_LIST_fetch(package->subs, i);
         
-        if (sub->flag & SPVM_SUB_C_FLAG_NEW_CALLBACK_OBJECT) {
-          package->flag |= SPVM_PACKAGE_C_FLAG_CALLBACK_PACKAGE;
+        if (sub->flag & SPVM_SUB_C_FLAG_ANON) {
+          package->flag |= SPVM_PACKAGE_C_FLAG_ANON_SUB_PACKAGE;
           assert(package->subs->length == 1);
           assert(is_anon);
         }
@@ -2307,12 +2335,12 @@ SPVM_OP* SPVM_OP_build_has(SPVM_COMPILER* compiler, SPVM_OP* op_field, SPVM_OP* 
   return op_field;
 }
 
-SPVM_OP* SPVM_OP_build_sub(SPVM_COMPILER* compiler, SPVM_OP* op_sub, SPVM_OP* op_name_sub, SPVM_OP* op_return_type, SPVM_OP* op_args, SPVM_OP* op_descriptors, SPVM_OP* op_block, SPVM_OP* op_captures, SPVM_OP* op_dot3, int32_t is_begin, int32_t is_new_callback_object, int32_t can_precompile) {
+SPVM_OP* SPVM_OP_build_sub(SPVM_COMPILER* compiler, SPVM_OP* op_sub, SPVM_OP* op_name_sub, SPVM_OP* op_return_type, SPVM_OP* op_args, SPVM_OP* op_descriptors, SPVM_OP* op_block, SPVM_OP* op_captures, SPVM_OP* op_dot3, int32_t is_begin, int32_t is_anon, int32_t can_precompile) {
   SPVM_SUB* sub = SPVM_SUB_new(compiler);
   
-  // New callback object
-  if (is_new_callback_object) {
-    sub->flag |= SPVM_SUB_C_FLAG_NEW_CALLBACK_OBJECT;
+  // Is anon subroutine
+  if (is_anon) {
+    sub->flag |= SPVM_SUB_C_FLAG_ANON;
   }
   
   if (op_name_sub == NULL) {

@@ -14,7 +14,7 @@ configure_requires:
   ExtUtils::MakeMaker: '6.48'
   File::ShareDir::Install: '0.06'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.017, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -25,7 +25,7 @@ requires:
   Cache::LRU: '0.04'
   Dir::Self: '0'
   File::ShareDir: '1.102'
-  Future: '0.34'
+  Future: '0.40'
   HTTP::Request: '0'
   IO::Async::SSL: '0.19'
   JSON::MaybeUTF8: '1.000'
@@ -48,6 +48,7 @@ requires:
 resources:
   bugtracker: https://github.com/team-at-cpan/Net-Async-Trello/issues
   repository: git://github.com/team-at-cpan/Net-Async-Trello.git
-version: '0.005'
-x_generated_by_perl: v5.28.1
+version: '0.006'
+x_generated_by_perl: v5.32.0
 x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

@@ -25,7 +25,7 @@ if (! $vars) {
 
 my %wm = (
     NAME         => 'Image::PNG::Libpng',
-    VERSION      => '0.55',
+    VERSION      => '0.56',
     ABSTRACT     => 'Perl interface to libpng',
     OBJECT       => 'Libpng.o',
     LIBS         => '-lpng',
@@ -54,7 +54,7 @@ my %wm = (
 
 if ($optimize) {
     warn "Optimizing is on";
-    $wm{OPTIMIZE} = ' -Wall -O ';
+    $wm{OPTIMIZE} = ' -g -Wall -O ';
 }
 
 if ($vars) {

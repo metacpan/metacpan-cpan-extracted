@@ -7,7 +7,7 @@
 #   Win32.
 #
 # COPYRIGHT
-#   Copyright (C) 2003-2008, 2012-2014 Steve Hay.  All rights reserved.
+#   Copyright (C) 2003-2008, 2012-2014, 2020 Steve Hay.  All rights reserved.
 #
 # LICENCE
 #   This module is free software; you can redistribute it and/or modify it under
@@ -56,7 +56,7 @@ BEGIN {
         alt_stat
     );
     
-    $VERSION = '1.59';
+    $VERSION = '1.60';
 
     XSLoader::load(__PACKAGE__, $VERSION);
 }
@@ -326,11 +326,24 @@ Win32::UTCFileTime - Get/set UTC file times with stat/utime on Win32
 
 =head1 DESCRIPTION
 
+B<NOTE: In Perl 5.33.5, the built-in C<stat()> and C<utime()> functions were
+rewritten (and a proper implementation of C<lstat()> was added) in such a way
+that the UTC file time handling is now correct (including the case of C<utime()>
+being used on directories) regardless of which compiler perl is built with, thus
+rendering this module wholly redundant for Perl 5.33.5 or later.  The remainder
+of this man page is written from the perspective of earlier versions of Perl.>
+
 This module provides replacements for Perl's built-in C<stat()> and C<utime()>
 functions that respectively get and set "correct" UTC file times instead of the
 erroneous values read and written by Microsoft's implementation of C<stat(2)>
 and C<utime(2)>, which Perl's built-in functions inherit on Win32 when built
-with the Microsoft C library.
+with the Microsoft C library in Visual Studio 2013 (VC12) or earlier.
+
+The bugs in the Microsoft C library have since been fixed, so there is mostly no
+need for this module if you build perl with Visual Studio 2015 (VC14.0) or
+later, except that the use of C<utime()> on directories is a Perl extension over
+the underlying Microsoft C library function and still has incorrect UTC file
+time handling even for perls built with VC14.0 or later.
 
 For completeness, a replacement for Perl's built-in C<lstat()> function is also
 provided, although in practice that is unimplemented on Win32 and just calls
@@ -339,12 +352,13 @@ the override provided by this module, so you must use the C<lstat()> override
 provided by this module if you want "correct" UTC file times from C<lstat()>.)
 
 The problem with Microsoft's C<stat(2)> and C<utime(2)>, and hence Perl's
-built-in C<stat()>, C<lstat()> and C<utime()> when built with the Microsoft C
-library, is basically this: file times reported by C<stat(2)> or stored by
-C<utime(2)> may change by an hour as we move into or out of daylight saving time
-(DST) if the computer is set to "Automatically adjust clock for daylight saving
-changes" (which is the default setting) and the file is stored on an NTFS volume
-(which is the preferred filesystem used by Windows NT/2000/XP/2003).
+built-in C<stat()>, C<lstat()> and C<utime()> when built with the faulty
+Microsoft C library, is basically this: file times reported by C<stat(2)> or
+stored by C<utime(2)> may change by an hour as we move into or out of daylight
+saving time (DST) if the computer is set to "Automatically adjust clock for
+daylight saving changes" (which is the default setting) and the file is stored
+on an NTFS volume (which is the preferred filesystem used by Windows NT
+onwards).
 
 It seems particularly ironic that the problem should afflict the NTFS filesystem
 because the C<time_t> values used by both C<stat(2)> and C<utime(2)> express
@@ -378,8 +392,11 @@ one of the fields in its C<struct tm> argument.
 
 Additionally, if you build perl with Visual Studio 2013 (VC12) then perl's
 C<utime()> function will suffer from a new bug introduced into the C RTL DLL's
-C<utime(2)> function, which Microsoft do not intend to fix until a future
-version of Visual Studio.
+C<utime(2)> function.
+
+All the bugs are fixed in Visual Studio 2015 (VC14.0) onwards, but note that the
+C RTL DLL's C<utime(2)> function isn't used for C<utime()> calls on directories,
+which unfortunately retain their buggy behaviour.
 
 See L<"BACKGROUND REFERENCE"> for more details.
 
@@ -798,10 +815,10 @@ available for Visual C++ 6.0.)
 
 An excellent overview of the problem with Microsoft's C<stat(2)> was written by
 Jonathan M Gilligan and posted on the Code Project website
-(L<http://www.codeproject.com/>).  He has kindly granted permission to use his
+(L<https://www.codeproject.com/>).  He has kindly granted permission to use his
 article here to describe the problem more fully.  A slightly edited version of
 it now follows; the original article can be found at the URL
-L<http://www.codeproject.com/datetime/dstbugs.asp>.
+L<https://www.codeproject.com/datetime/dstbugs.asp>.
 
 (The article was accompanied by a C library, adapted from code written for CVSNT
 (L<http://www.cvsnt.org/>) by Jonathan and Tony M Hoyle, which implemented the
@@ -1438,10 +1455,49 @@ time, which was not the case in previous versions of Visual Studio since
 C<stat(2)> used to have the same DST bug as C<utime(2)>, thus at least yielding
 consistent results.
 
-Details of this problem can be found here: L<https://connect.microsoft.com/VisualStudio/feedback/details/811534/utime-sometimes-fails-to-set-the-correct-file-times-in-visual-c-2013>.
+Details of this problem could previously be found here: L<https://connect.microsoft.com/VisualStudio/feedback/details/811534/utime-sometimes-fails-to-set-the-correct-file-times-in-visual-c-2013>.  Unfortunately, Microsoft Connect has now
+been retired.  Visual C++ bugs should have been migrated over to the Developer
+Community site for C++ (see: L<https://developercommunity.visualstudio.com/spaces/62/index.html>), but this particular bug doesn't seem to have been migrated,
+perhaps because it is now resolved (see L<"A Happy Ending"> below).
 
 Fortunately, the replacement C<utime()> function provided by this module fixes
 this problem too.
+
+=head2 A Happy Ending
+
+With the release of Visual Studio 2015 (VC14.0), Microsoft finally resolved all
+the problems with C<stat(2)> and C<utime(2)>, rendering this module mostly
+redundant (but see below).  The following words are taken from "Microsoft C/C++
+change history 2003 - 2015" (see: L<https://docs.microsoft.com/en-us/cpp/porting/visual-cpp-change-history-2003-2015?view=msvc-160#VC_2015>):
+
+    Visual Studio 2015 Conformance Changes
+    C Runtime Library (CRT)
+
+    In previous versions, the _stat, fstat, and _utime functions handle daylight
+    savings time incorrectly.  Prior to Visual Studio 2013, all of these
+    functions incorrectly adjusted standard time times as if they were in
+    daylight time.
+
+    In Visual Studio 2013, the problem was fixed in the _stat family of
+    functions, but the similar problems in the fstat and _utime families of
+    functions were not fixed.  This partial fix led to problems due to the
+    inconsistency between the functions.  The fstat and _utime families of
+    functions have now been fixed, so all of these functions now handle daylight
+    savings time correctly and consistently.
+
+There is still one fly in the ointment: The Microsoft implementation of
+C<utime(2)> doesn't work on directories, and whilst Perl's built-in C<utime()>
+function works around that, it unfortunately does so in such a way that the UTC
+file time handling is still not correct even for perls built with VC14.0 or
+later.
+
+B<However, all this was finally put to bed with the resolution of CPAN RT#18513
+(see https://github.com/Perl/perl5/issues/6080) in Perl 5.33.5, in which Perl's
+built-in C<stat()> and C<utime()> functions were rewritten (and a proper
+implementation of C<lstat()> was added) in such a way that the UTC file time
+handling is now correct (including the case of C<utime()> being used on
+directories) regardless of which compiler perl is built with, thus rendering
+this module wholly redundant.>
 
 =head1 EXPORTS
 
@@ -1490,11 +1546,15 @@ C<GetFileTime()> is not used by it.)
 Likewise, if corrections such as those applied by this module were ever
 incorporated into the Perl core (so that Perl's built-in C<stat()>, C<lstat()>
 and C<utime()> functions get/set correct UTC values themselves, even when built
-on the faulty Microsoft C library functions) then again, the corrections applied
-by this module would not be appropriate.
+on the faulty Microsoft C library functions) then the corrections applied by
+this module would not be necessary.
 
 In either case, this module would either need updating appropriately, or may
 even become redundant.
+
+B<In fact, as noted above (see L<"A Happy Ending">), this module became mostly
+redundant with the release of Visual Studio 2015 (VC14.0), and wholly redundant
+with the release of Perl 5.33.5.>
 
 =back
 
@@ -1512,13 +1572,13 @@ Currently active requests on the CPAN Request Tracker can be viewed at
 L<https://rt.cpan.org/Public/Dist/Display.html?Status=Active;Queue=Win32-UTCFileTime>.
 
 Please test this distribution.  See CPAN Testers Reports at
-L<http://www.cpantesters.org/> for details of how to get involved.
+L<https://www.cpantesters.org/> for details of how to get involved.
 
 Previous test results on CPAN Testers can be viewed at
-L<http://www.cpantesters.org/distro/W/Win32-UTCFileTime.html>.
+L<https://www.cpantesters.org/distro/W/Win32-UTCFileTime.html>.
 
 Please rate this distribution on CPAN Ratings at
-L<http://cpanratings.perl.org/rate/?distribution=Win32-UTCFileTime>.
+L<https://cpanratings.perl.org/rate/?distribution=Win32-UTCFileTime>.
 
 =head1 SEE ALSO
 
@@ -1541,7 +1601,7 @@ the problem and his solution to it in the L<"BACKGROUND REFERENCE"> section of
 this manpage.
 
 Credit is also due to Slaven Rezic for finding Jonathan's work on the Code
-Project website (L<http://www.codeproject.com/>) in response to my bug report
+Project website (L<https://www.codeproject.com/>) in response to my bug report
 (Perl RT#18513).
 
 The custom C<import()> method is based on that in the standard library module
@@ -1564,9 +1624,9 @@ L<perlmodlib/"CPAN"> for details) at
 
 L<https://metacpan.org/release/Win32-UTCFileTime> or
 
-L<http://www.cpan.org/authors/id/S/SH/SHAY/> or
+L<https://www.cpan.org/authors/id/S/SH/SHAY/> or
 
-L<http://www.cpan.org/modules/by-module/Win32/>.
+L<https://www.cpan.org/modules/by-module/Win32/>.
 
 The latest source code is available from GitHub at
 L<https://github.com/steve-m-hay/Win32-UTCFileTime>.
@@ -1581,7 +1641,7 @@ Steve Hay E<lt>L<shay@cpan.org|mailto:shay@cpan.org>E<gt>.
 
 =head1 COPYRIGHT
 
-Copyright (C) 2003-2008, 2012-2015 Steve Hay.  All rights reserved.
+Copyright (C) 2003-2008, 2012-2015, 2020 Steve Hay.  All rights reserved.
 
 Portions Copyright (C) 2001 Jonathan M Gilligan.  Used with permission.
 
@@ -1595,11 +1655,11 @@ License or the Artistic License, as specified in the F<LICENCE> file.
 
 =head1 VERSION
 
-Version 1.59
+Version 1.60
 
 =head1 DATE
 
-31 Jul 2018
+23 Dec 2020
 
 =head1 HISTORY
 

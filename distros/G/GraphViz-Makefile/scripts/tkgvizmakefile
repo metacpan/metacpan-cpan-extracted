@@ -1,0 +1,201 @@
+#!/usr/bin/perl
+# -*- perl -*-
+
+# Author: Slaven Rezic
+#
+# Copyright (C) 2002,2003 Slaven Rezic. All rights reserved.
+# This program is free software; you can redistribute it and/or
+# modify it under the same terms as Perl itself.
+#
+# Mail: slaven@rezic.de
+# WWW:  http://www.rezic.de/eserte/
+
+use GraphViz::Makefile;
+use strict;
+use warnings;
+our $VERSION = '1.09';
+
+use Getopt::Long;
+
+$ENV{MAKE}="make" if !defined $ENV{MAKE}; # to propagate MAKE to submakefiles
+
+my $file       = "Makefile";
+my $outputtype = "tkcanvas";
+my $outputfile;
+my $prefix = "";
+my $reversed = 0;
+if (!GetOptions("f|file=s" => \$file,
+                "T=s" => \$outputtype,
+                "o=s" => \$outputfile,
+                "v!"  => \$GraphViz::Makefile::V,
+                "prefix=s" => \$prefix,
+                "reversed!" => \$reversed,
+               )) {
+    require Pod::Usage;
+    Pod::Usage::pod2usage(1);
+}
+my $rule = shift || "all";
+my $gm_args = {};
+my $graphviz = generate_graphviz($file, $prefix, $reversed, $gm_args);
+
+if ($outputtype eq 'tkcanvas') {
+    tkcanvas_output($rule, $graphviz, $prefix, $reversed, $gm_args);
+} else {
+    die "-o is missing" if !defined $outputfile;
+    if ($outputtype eq 'canon') {
+        open my $fh, '>', $outputfile or die "$outputfile: $!";
+        print $fh $graphviz->dot_input;
+        exit;
+    }
+    $graphviz->run(format => $outputtype, output_file => $outputfile);
+}
+
+sub generate_graphviz {
+    my ($file, $prefix, $reversed, $gm_args) = @_;
+    my $gm = GraphViz::Makefile->new(undef, $file, $prefix, %$gm_args);
+    my $g = GraphViz2->new(
+        $reversed ? (edge => { dir => 'back' }, graph => { rankdir => 'BT' }) : (),
+        global => { combine_node_and_port => 0, directed => 1 },
+    );
+    $g->from_graph(GraphViz::Makefile::graphvizify($gm->generate_graph));
+    $g;
+}
+
+sub tkcanvas_output {
+    my ($rule, $graphviz, $prefix, $reversed, $gm_args) = @_;
+    require Tk;
+    require Tk::GraphViz;
+    my $mw = MainWindow->new;
+    my $c = $mw->Scrolled("GraphViz", -scrollbars => "osoe", -background => 'white');
+    $c->createBindings;
+    $c->bind('node', '<Button-1>', sub {
+        my @tags = $c->gettags('current');
+        push @tags, undef unless (@tags % 2) == 0;
+        my %tags = @tags;
+        printf "Clicked node: '%s' => %s\n", $tags{node}, $tags{label};
+    });
+    $c->itemconfigure('edge', -activefill => 'green');
+    $c->pack(-fill=>"both", -expand=>1, -side => 'top');
+    my $buttonFrame = $mw->Frame->pack(-side => 'bottom');
+    cmdButton($buttonFrame, Open => 0, [
+        \&choose_new_file, $mw, $prefix, $reversed, $gm_args
+    ], 'left');
+    cmdButton($buttonFrame, Quit => 0, [$mw, 'destroy'], 'right');
+    cmdButton($buttonFrame, 'Zoom in' => 0, [$c, qw(zoom -in 1.5)], 'left');
+    cmdButton($buttonFrame, 'Zoom out X' => 9, [$c, qw(zoom -out 1.5)], 'left');
+    cmdButton($buttonFrame, 'Find node' => 0, [\&findNode, $c], 'left');
+    cmdButton($buttonFrame, 'About' => 0, [
+         $mw, qw(messageBox -icon info -type ok),
+         -message => "tkgvizmakefile\n(c)2002,2003 by Slaven Rezic",
+    ], 'left');
+    cmdButton($buttonFrame, "tkgvizmakefile Doc" => 15, [ \&tkDoc, $0 ], 'left');
+    cmdButton($buttonFrame, "GraphViz::Makefile Doc" => 10, [ \&tkDoc, "GraphViz::Makefile" ], 'left');
+    $mw->Advertise(Graph => $c);
+    draw_graph($mw, $graphviz);
+    $c->idletasks;
+    $c->scrollTo("$prefix$rule");
+    &Tk::MainLoop;
+}
+
+sub findNode {
+    my ($mw, $gv) = @_;
+    $gv->scrollTo(simpleDialog($mw, 'Rule Name Dialog'));
+}
+
+sub simpleDialog {
+    my ($mw, $title) = @_;
+    require Tk::DialogBox;
+    require Tk::Entry;
+    my $dialog = $mw->DialogBox(-title => $title, -default_button => 'OK', -buttons => [qw/OK Cancel/]);
+    my $entry = $dialog->add('Entry')->pack;
+    $dialog->configure(-focus => $entry);
+    my $ans = $dialog->Show;
+    my $text = $entry->get;
+    $dialog->destroy;
+    $ans ne 'OK' ? undef : $text;
+}
+
+sub tkDoc {
+    my ($mw, $file) = @_;
+    require Tk::Pod;
+    $mw->Pod(-file => $file);
+}
+
+sub cmdButton {
+    my ($frame, $label, $underline_index, $cmd, $pack) = @_;
+    my $key = lc substr $label, $underline_index, 1;
+    my $mw = $frame->MainWindow;
+    $mw->bind("<Key-$key>" => $cmd);
+    my @button_cmd = @$cmd;
+    splice @button_cmd, 1, 0, $mw if ref($cmd->[0]) eq 'CODE';
+    $frame->Button(-command => \@button_cmd, -text => $label, -underline => $underline_index)->pack(-side => $pack);
+}
+
+sub draw_graph {
+    my ($w, $graphviz) = @_;
+    my $c = $w->Subwidget("Graph");
+    $c->show($graphviz);
+}
+
+sub choose_new_file {
+    my ($w, $prefix, $reversed, $gm_args) = @_;
+    my $new_file = $w->getOpenFile;
+    if (defined $new_file) {
+        my $graphviz = generate_graphviz($new_file, $prefix, $reversed, $gm_args);
+        draw_graph($w, $graphviz);
+    }
+}
+
+=head1 NAME
+
+tkgvizmakefile - create Tk graphs from Makefiles
+
+=head1 SYNOPSIS
+
+    tkgvizmakefile [-f makefile] [-T output] [-o outputfile]
+                   [-reversed] [-prefix prefix] [rule]
+
+=head1 DESCRIPTION
+
+Uses L<Tk::GraphViz> to visualise the given makefile.
+
+=head1 OPTIONS
+
+=over
+
+=item -f F<makefile>
+
+Use another makefile. Default is C<Makefile>
+
+=item -T I<output>
+
+Choose an output type. Every GraphViz-supported output type is
+possible (see the description for the C<-T> option in the dot manpage)
+and there is additionally the C<tkcanvas> type for dumping the graph
+to a Canvas widget.
+
+=item -o F<outputfile>
+
+Write the output to the named file. Ignored for the C<tkcanvas> type.
+
+=item -reversed
+
+Reverse the arrows.
+
+=item -prefix I<prefix>
+
+Add the given prefix to each rule
+
+=item rule
+
+Start graph output from the named Makefile rule. If missing, the
+C<all> or first rule is used.
+
+=back
+
+=head1 SEE ALSO
+
+L<dot(1)>, L<GraphViz2>, L<GraphViz::Makefile>, L<Tk>, L<Tk::GraphViz>.
+
+=cut
+

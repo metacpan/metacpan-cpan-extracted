@@ -1,28 +1,28 @@
 {
+   "provides" : {
+      "App::ccdiff" : {
+         "file" : "lib/App/ccdiff.pm",
+         "version" : "0.30"
+         }
+      },
+   "meta-spec" : {
+      "version" : 2,
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec"
+      },
    "abstract" : "Colored Character Diff",
-   "author" : [
-      "H.Merijn Brand"
-      ],
-   "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.36, CPAN::Meta::Converter version 2.150010",
+   "version" : "0.30",
    "license" : [
       "artistic_2"
       ],
-   "meta-spec" : {
-      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : 2
-      },
-   "name" : "App-ccdiff",
-   "no_index" : {
-      "directory" : [
-         "t",
-         "inc"
-         ]
-      },
+   "author" : [
+      "H.Merijn Brand <perl5@tux.freedom.nl>"
+      ],
+   "release_status" : "stable",
    "prereqs" : {
-      "build" : {
+      "test" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0"
+            "Capture::Tiny" : "0",
+            "Test::More" : "0"
             }
          },
       "configure" : {
@@ -31,35 +31,41 @@
             }
          },
       "runtime" : {
+         "recommends" : {
+            "Algorithm::Diff" : "1.201",
+            "Algorithm::Diff::XS" : "0.04"
+            },
          "requires" : {
-            "Algorithm::Diff" : "1.1901",
             "Getopt::Long" : "0",
-            "Term::ANSIColor" : "0",
+            "List::Util" : "0",
             "charnames" : "0",
+            "Algorithm::Diff" : "1.1901",
+            "Term::ANSIColor" : "0",
             "perl" : "5.014000"
             }
          },
-      "test" : {
+      "build" : {
          "requires" : {
-            "Capture::Tiny" : "0",
-            "Test::More" : "0"
+            "Config" : "0"
             }
          }
       },
-   "provides" : {
-      "App::ccdiff" : {
-         "file" : "ccdiff",
-         "version" : "0.28"
-         }
-      },
-   "release_status" : "stable",
+   "name" : "App-ccdiff",
    "resources" : {
-      "X_type" : "git",
-      "X_url" : "git://github.com/Tux/App-ccdiff.git",
-      "X_web" : "https://github.com/Tux/App-ccdiff",
-      "x_IRC" : "irc://irc.perl.org/#csv"
+      "repository" : {
+         "type" : "git",
+         "web" : "https://github.com/Tux/App-ccdiff",
+         "url" : "https://github.com/Tux/App-ccdiff"
+         },
+      "bugtracker" : {
+         "web" : "https://github.com/Tux/App-ccdiff/issues"
+         },
+      "x_IRC" : "irc://irc.perl.org/#csv",
+      "homepage" : "https://metacpan.org/pod/App::ccdiff",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+         ]
       },
-   "version" : "0.28",
-   "x_licence" : "perl_5",
-   "x_serialization_backend" : "JSON::PP version 4.04"
+   "dynamic_config" : 1,
+   "generated_by" : "Author"
    }

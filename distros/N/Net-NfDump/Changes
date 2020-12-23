@@ -1,5 +1,10 @@
 Revision history for C and Perl extension of nfdump.
 
+1.30 2020-12-22
+	- fixed issue with building ffilter code on FreeBSD
+	- fixed issue when no exporters are configured 
+	- removed memory leask (https://github.com/VUTBR/libnf/issues/14)
+
 1.29 2020-12-20
 	- updated to nfdump 1.6.22
 	- c: fixed issue with creating exporter map 
@@ -9,7 +14,6 @@ Revision history for C and Perl extension of nfdump.
 	- nfdump: fixed issue when -O flags was zeroing last 8 bits in src and dst
 	  address
 	- perl: updated info in perl documentation 
-
 
 1.28 2020-04-10
 	- updated to nfdump 1.6.20
@@ -26,7 +30,6 @@ Revision history for C and Perl extension of nfdump.
 	- updated to nfdump 1.6.18
 	- removed support for legacy nadump V0 format 
 	- some test files in perl/t/ dir converted from V0 format 
-
 
 1.26 2018-06-xx - never released
 	- updated to nfdump 1.6.17

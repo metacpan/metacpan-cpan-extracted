@@ -19,7 +19,7 @@ WriteMakefile(
     },
     PREREQ_PM => {
         'Mojolicious::Plugin::AssetPack'              => '2.09',
-        'HTML::Packer'=> '2.03',
+        ###'HTML::Packer'=> '2.03',
         'IO::Compress::Gzip '=> '2.0',
         'CSS::Minifier::XS'	=> '0.09',
         'CSS::Sass'     =>  '3.0',

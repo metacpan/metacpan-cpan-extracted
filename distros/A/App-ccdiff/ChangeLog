@@ -1,9 +1,26 @@
-0.27	- 2019-09-02
+0.30	- 2020-12-23
+    * Add --swap/-s
+    * Fix META issue for bugtracker
+
+0.29	- 2020-09-16
+    * Fix Changes
+    * Default changed by $ENV{CLICOLOR} - see https://bixense.com/clicolors/
+    * It's 2020
+    * Fallback to Pod::Text if nroff not available for --man
+    * Support header colors and header for non-u
+    * Refuse to diff character and block devices
+    * Warn that --recurse and folders are not yet supported
+    * Prefer Algorithm::Diff::XS if installed (raf)
+    * Support arrarefs for when used as module
+
+0.28	- 2019-09-02
+    * Add cpanfile
+
+0.27	- 2019-01-15
     * Requires Algorithm::Diff 1.1901
     * Default no-color to $ENV{NO_COLOR} - see https://no-color.org
     * Happy 2019
     * Make sure file arg - only reads STDIN
-    * Add cpanfile
 
 0.26	- 2018-10-14
     * Update git-ccdiff

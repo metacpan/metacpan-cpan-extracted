@@ -680,6 +680,26 @@ Yes
 
 1 (Dydd Llun)
 
+=head2 Strftime Patterns
+
+=head3 %c (Dydd %A %d mis %B %Y %T %Z) - date time format
+
+   2008-02-05T18:30:30 = Dydd Dydd Mawrth 05 mis Chwefror 2008 18:30:30 UTC
+   1995-12-22T09:05:02 = Dydd Dydd Gwener 22 mis Rhagfyr 1995 09:05:02 UTC
+  -0010-09-15T04:44:23 = Dydd Dydd Sadwrn 15 mis Medi -10 04:44:23 UTC
+
+=head3 %x (%d.%m.%y) - date format
+
+   2008-02-05T18:30:30 = 05.02.08
+   1995-12-22T09:05:02 = 22.12.95
+  -0010-09-15T04:44:23 = 15.09.10
+
+=head3 %X (%T) - time format
+
+   2008-02-05T18:30:30 = 18:30:30
+   1995-12-22T09:05:02 = 09:05:02
+  -0010-09-15T04:44:23 = 04:44:23
+
 =head1 SUPPORT
 
 See L<DateTime::Locale>.

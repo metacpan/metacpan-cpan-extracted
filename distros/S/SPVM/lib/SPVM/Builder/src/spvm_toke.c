@@ -33,6 +33,16 @@ SPVM_OP* SPVM_TOKE_newOP(SPVM_COMPILER* compiler, int32_t type) {
   return op;
 }
 
+SPVM_OP* SPVM_TOKE_newOP_with_keyword_start_pos(SPVM_COMPILER* compiler, int32_t type, int32_t keyword_start_pos) {
+  
+  SPVM_OP* op = SPVM_OP_new_op(compiler, type, compiler->cur_file, compiler->cur_line);
+  
+  // keyword_start_pos is only used to decide anon sub uniquness
+  op->keyword_start_pos = keyword_start_pos;
+  
+  return op;
+}
+
 int32_t SPVM_TOKE_is_white_space(SPVM_COMPILER* compiler, char ch) {
   (void)compiler;
   // SP, CR, LF, HT, FF
@@ -241,6 +251,7 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
               
               compiler->cur_file = cur_file;
               compiler->cur_rel_file = cur_rel_file;
+              compiler->cur_rel_file_package_name = package_name;
               
               // Read file content
               fseek(fh, 0, SEEK_END);
@@ -1571,6 +1582,9 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
         }
         // Keyword or name
         else if (isalpha(ch) || ch == '_') {
+          // Keyword start position
+          int32_t keyword_start_pos = compiler->bufptr - compiler->line_start_ptr;
+          
           // Save current position
           const char* cur_token_ptr = compiler->bufptr;
           
@@ -1886,7 +1900,7 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
                   return SWITCH;
                 }
                 else if (strcmp(keyword, "sub") == 0) {
-                  yylvalp->opval = SPVM_TOKE_newOP(compiler, SPVM_OP_C_ID_SUB);
+                  yylvalp->opval = SPVM_TOKE_newOP_with_keyword_start_pos(compiler, SPVM_OP_C_ID_SUB, keyword_start_pos);
                   compiler->expect_sub_name = 1;
                   
                   return SUB;
@@ -1976,6 +1990,14 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
           // Symbol name can't conatain __
           if (strstr(keyword, "__")) {
             SPVM_COMPILER_error(compiler, "Symbol name \"%s\" must not contains __ at %s line %d\n", keyword, compiler->cur_file, compiler->cur_line);
+          }
+
+          // Symbol name can't 
+          if (strlen(keyword) >= 9
+            && keyword[0] == 'A' && keyword[1] == 'N' && keyword[2] == 'O' && keyword[3] == 'N' && keyword[4] == '_'
+            && keyword[5] == 'S' && keyword[6] == 'U' && keyword[7] == 'B' && keyword[8] == '_')
+          {
+            SPVM_COMPILER_error(compiler, "Symbol name \"%s\" can't start with ANON_SUB_. This is preserved for anon subroutine at %s line %d\n", keyword, compiler->cur_file, compiler->cur_line);
           }
           
           SPVM_OP* op_name = SPVM_OP_new_op_name(compiler, keyword, compiler->cur_file, compiler->cur_line);

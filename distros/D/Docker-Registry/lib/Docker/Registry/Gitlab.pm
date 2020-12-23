@@ -50,9 +50,6 @@ around build_auth => sub {
     );
 };
 
-around 'repositories' => sub {
-  die "_catalog operation is not supported by GitLab provider";
-};
 
 __PACKAGE__->meta->make_immutable;
 

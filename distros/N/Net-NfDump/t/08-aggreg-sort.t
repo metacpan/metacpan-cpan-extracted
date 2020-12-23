@@ -64,8 +64,10 @@ for (my $i = 0; $i < 1000; $i++) {
 	$row4{'bytes'} = $i * 2;
 	$row6{'srcip'} = sprintf("2001:67c:1220:%d::10", $i % 10);
 	$row6{'bytes'} = $i * 6;
-	delete($row4{'ip'});
-	delete($row6{'ip'});
+	for ('ip', 'srcnet', 'net') { # aliases to srcip
+		delete($row4{$_});
+		delete($row6{$_});
+	}
 	$floww->storerow_hashref( txt2flow(\%row4) );
 	$floww->storerow_hashref( txt2flow(\%row6) );
 	$floww->storerow_hashref( txt2flow(\%row6) );

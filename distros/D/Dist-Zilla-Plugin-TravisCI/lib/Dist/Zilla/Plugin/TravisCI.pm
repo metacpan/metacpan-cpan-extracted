@@ -1,7 +1,7 @@
 package Dist::Zilla::Plugin::TravisCI;
 our $AUTHORITY = 'cpan:GETTY';
 # ABSTRACT: Integrating the generation of .travis.yml into your dzil
-$Dist::Zilla::Plugin::TravisCI::VERSION = '0.013';
+$Dist::Zilla::Plugin::TravisCI::VERSION = '0.014';
 use Moose;
 use Path::Tiny qw( path );
 use Dist::Zilla::File::FromCode;
@@ -116,7 +116,7 @@ sub build_travis_yml {
 
   unshift @{$phases_commands{before_install}}, (
     'git config --global user.name "Dist Zilla Plugin TravisCI"',
-    'git config --global user.email $HOSTNAME":not-for-mail@travis-ci.org"',
+    'git config --global user.email $HOSTNAME":not-for-mail@travis-ci.com"',
   );
 
   my @extra_deps = @{$self->extra_dep};
@@ -219,7 +219,7 @@ Dist::Zilla::Plugin::TravisCI - Integrating the generation of .travis.yml into y
 
 =head1 VERSION
 
-version 0.013
+version 0.014
 
 =head1 SYNOPSIS
 
@@ -256,9 +256,7 @@ version 0.013
 
 =head1 DESCRIPTION
 
-Adds a B<.travis.yml> to your repository on B<build> or B<release>. This is a
-very early release, more features are planned and upcoming, including more
-documentation :).
+Adds a B<.travis.yml> to your repository on B<build> or B<release>.
 
 =head1 BASED ON
 
@@ -299,12 +297,12 @@ IRC
 
 Repository
 
-  http://github.com/Getty/p5-dist-zilla-plugin-travisci
+  https://github.com/Getty/p5-dist-zilla-plugin-travisci
   Pull request and additional contributors are welcome
 
 Issue Tracker
 
-  http://github.com/Getty/p5-dist-zilla-plugin-travisci/issues
+  https://github.com/Getty/p5-dist-zilla-plugin-travisci/issues
 
 =head1 AUTHOR
 

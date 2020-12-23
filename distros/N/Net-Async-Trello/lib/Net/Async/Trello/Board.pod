@@ -1,3 +1,5 @@
+=encoding utf8
+
 =for comment POD_DERIVED_INDEX_GENERATED
 The following documentation is automatically generated.  Please do not edit
 this file, but rather the original, inline with Net::Async::Trello::Board
@@ -13,6 +15,8 @@ sure you change the first line.
 =head2 lists
 
 =head2 cards
+
+=head2 members
 
 =head2 create_card
 
@@ -31,4 +35,12 @@ L<closed|Net::Async::Trello::Generated::Board/closed>, L<date_last_activity|Net:
 L<new|Net::Async::Trello::Common/new>, L<trello|Net::Async::Trello::Common/trello>
 
 =back
+
+=head1 AUTHOR
+
+Tom Molesworth <TEAM@cpan.org>
+
+=head1 LICENSE
+
+Copyright Tom Molesworth 2014-2020. Licensed under the same terms as Perl itself.
 

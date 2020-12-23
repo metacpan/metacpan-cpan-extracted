@@ -31,7 +31,7 @@ sub _dsn {
 	my $xsv = eval q{use Text::CSV_XS; $Text::CSV_XS::VERSION; } || 0;
 	my $dbv = eval q{use DBD::CSV;     $DBD::CSV::VERSION;     } || 0;
 	$tempdb = "csv_$rnd";
-	mkdir $tempdb;
+	mkdir $tempdb, 0777;
 	my $dsn = "dbi:CSV:f_dir=$tempdb;f_ext=.csv/r;csv_null=1";
 	$xsv > 1.01 && $dbv > 0.47     and $dsn .= ";csv_decode_utf8=0";
 	$dbv > 0.29 && $]   < 5.008009 and $dsn .= ";csv_auto_diag=0";
@@ -85,9 +85,8 @@ sub _dsn {
 
 sub dsn {
     my $type = shift;
-    my $dsn  = _dsn ($type);
     cleanup ($type);
-    return $dsn;
+    return _dsn ($type);
     } # dsn
 
 sub plan_fail {
@@ -186,7 +185,8 @@ sub deep {
     my %deep = (
 	UND => undef,
 	IV  => 1,
-	NV  => 3.14159265358979001,
+#	NV  => 3.14159265358979001,
+	NV  => 3.14159265358830452896654605865479,
 	PV  => "string",
 	PV8 => "ab\ncd\x{20ac}\t",
 	PVM => $!,

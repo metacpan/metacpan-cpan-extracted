@@ -12,124 +12,136 @@
 #
 
 package GraphViz::Makefile;
-use GraphViz;
+use GraphViz2;
 use Make;
 use strict;
+use warnings;
+use Graph;
 
-use vars qw($VERSION $V);
-$VERSION = '1.18';
+our $VERSION = '1.19';
 
-$V = 0 unless defined $V;
+our $V = 0 unless defined $V;
+my @ALLOWED_ARGS = qw();
+my %ALLOWED_ARGS = map {($_,undef)} @ALLOWED_ARGS;
+
+our %NodeStyleTarget = (
+    shape     => 'box',
+    style     => 'filled',
+    fillcolor => '#ffff99',
+    fontname  => 'Arial',
+    fontsize  => 10,
+);
+our %NodeStyleRecipe = (
+    shape     => 'record',
+    style     => 'filled',
+    fillcolor => '#dddddd',
+    fontname  => 'Monospace',
+    fontsize  => 8,
+);
+our %NodeStyleRule = (
+    shape => 'diamond',
+    label => '',
+);
+my %GRAPHVIZ_GRAPH_ARGS = (global => {directed => 1, combine_node_and_port => 0});
 
 sub new {
-    my($pkg, $g, $make, $prefix, %args) = @_;
-    $g = GraphViz->new unless $g;
+    my ($pkg, $g, $make, $prefix, %args) = @_;
     if (!$make) {
-	$make = Make->new;
+        $make = Make->new;
     } elsif (!UNIVERSAL::isa($make, "Make")) {
-	my $makefile = $make;
-	$make = Make->new;
-	$make->parse($makefile);
+        my $makefile = $make;
+        $make = Make->new;
+        $make->parse($makefile);
     }
-
-    my @allowed_args = qw(reversed);
-    my %allowed_args = map {($_,undef)} @allowed_args;
-    while(my($k,$v) = each %args) {
-	die "Unrecognized argument $k, known arguments are @allowed_args"
-	    if !exists $allowed_args{$k};
-    }
-
-    my $self = { GraphViz => $g,
-		 Make     => $make,
-		 Prefix   => ($prefix||""),
-		 %args
-	       };
+    my @illegal_args = grep !exists $ALLOWED_ARGS{$_}, keys %args;
+    die "Unrecognized arguments @illegal_args, known arguments are @ALLOWED_ARGS"
+        if @illegal_args;
+    my $self = {
+        GraphViz => $g,
+        Make => $make,
+        Prefix => ($prefix||""),
+        %args,
+    };
     bless $self, $pkg;
 }
 
-sub GraphViz { shift->{GraphViz} }
-sub Make     { shift->{Make}     }
+sub GraphViz { shift->{GraphViz} ||= GraphViz2->new(global => {combine_node_and_port => 0, directed => 1}) }
+sub Make     { shift->{Make} }
 
 sub generate {
-    my($self, $target) = @_;
-    $target = "all" if !defined $target;
-    $self->_generate($self->{Make}->expand($target), {});
+    my ($self) = @_;
+    $self->GraphViz->from_graph(graphvizify($self->generate_graph));
 }
 
-sub _generate {
-    my($self, $target, $seen) = @_;
-    return if $seen->{$target};
-    $seen->{$target}++;
-    if (!$self->{Make}->has_target($target)) {
-	warn "Can't get make target for $target\n" if $V;
-	return;
+my %CHR2ENCODE = ("\\" => '\\\\', "\n" => "\\l");
+my $CHR_PAT = join '|', map quotemeta, sort keys %CHR2ENCODE;
+sub _recipe2label {
+    my ($recipe) = @_;
+    [
+        [ map {
+            my $t = $_; $t =~ s/($CHR_PAT)/$CHR2ENCODE{$1}/gs; "$t\\l";
+        } @$recipe ]
+    ];
+}
+
+sub graphvizify {
+    my ($g) = @_;
+    my $gvg = Graph->new;
+    for my $v ($g->vertices) {
+        my $attrs = $g->get_vertex_attributes($v);
+        my ($type, $name) = @{ Make::name_decode($v) };
+        $gvg->add_edge(@$_) for $g->edges_from($v);
+        if ($type eq 'target') {
+            $gvg->set_vertex_attribute($v, graphviz => {
+                label => graphviz_escape($name),
+                %NodeStyleTarget,
+            });
+        } else {
+            my $recipe_raw = $attrs->{recipe_raw};
+            if (!@$recipe_raw) {
+                # bare rule
+                $gvg->set_vertex_attribute($v, graphviz => \%NodeStyleRule);
+                next;
+            }
+            $gvg->set_vertex_attribute($v, graphviz => {
+                label => _recipe2label($recipe_raw),
+                %NodeStyleRecipe,
+            });
+            for my $e ($g->edges_from($v)) {
+                next if !defined(my $fromline = $g->get_edge_attribute(@$e, 'fromline'));
+                $gvg->set_edge_attributes(@$e, { graphviz => {
+                    tailport => ['port' . ($fromline+1), 'e'],
+                } });
+            }
+        }
     }
-    my $make_target = $self->{Make}->target($target);
-    my @depends = $self->_all_depends($make_target);
-    if (!@depends) {
-	warn "No depends for target $target\n" if $V;
-	return;
-    }
-    my $g = $self->{GraphViz};
+    $gvg->set_graph_attribute(graphviz => \%GRAPHVIZ_GRAPH_ARGS);
+    $gvg;
+}
+
+sub generate_graph {
+    my ($self) = @_;
     my $prefix = $self->{Prefix};
-    $g->add_node($prefix.$target);
-    foreach my $dep (@depends) {
-	$g->add_node($prefix.$dep) unless $seen->{$dep};
-	if ($self->{reversed}) {
-	    $g->add_edge($prefix.$dep, $prefix.$target);
-	    warn "$prefix$dep => $prefix$target\n" if $V >= 2;
-	} else {
-	    $g->add_edge($prefix.$target, $prefix.$dep);
-	    warn "$prefix$target => $prefix$dep\n" if $V >= 2;
-	}
-    }
-    $self->_generate($_, $seen) for @depends;
+    my $g = $self->{Make}->as_graph(recursive_make => 1);
+    $g->rename_vertices(sub {
+        my ($type, $name, @other) = @{ Make::name_decode($_[0]) };
+        Make::name_encode([ $type, $prefix.$name, @other ]);
+    });
 }
 
-sub guess_external_makes {
-    my($self, $target_name, $cmd) = @_;
-    if (defined $cmd && $cmd =~ /\bcd\s+(\w+)\s*(?:;|&&)\s*make\s*(.*)/) {
-	my($dir, $makeargs) = ($1, $2);
-	my $makefile;
-	my $rule;
-	{
-	    require Getopt::Long;
-	    local @ARGV = split /\s+/, $makeargs;
-	    $makefile = "makefile";
-	    # XXX parse more options
-	    Getopt::Long::GetOptions("f=s" => \$makefile);
-	    my @env;
-	    foreach (@ARGV) {
-		if (!defined $rule) {
-		    $rule = $_;
-		} elsif (/=/) {
-		    push @env, $_;
-		}
-	    }
-	}
-
-#	warn "dir: $dir, file: $makefile, rule: $rule\n";
-	my $f = "$dir/$makefile"; # XXX make better. use $make->{GNU}
-	$f = "$dir/Makefile" if !-r $f;
-	my $gm2 = GraphViz::Makefile->new($self->{GraphViz}, $f, "$dir/"); # XXX save_pwd verwenden; -f option auswerten
-	$gm2->generate($rule);
-
-	$self->{GraphViz}->add_edge($target_name, "$dir/$rule");
-    } else {
-	warn "can't match external make command in $cmd\n" if $V;
-    }
-}
-
-sub _all_depends {
-    my($self, $make_target) = @_;
-    my @rules = @{ $make_target->rules };
-    $self->guess_external_makes($make_target->Name, $_)
-	for map @{ $_->exp_recipe($make_target) }, @rules;
-    map @{ $_->prereqs }, @rules;
+my %GRAPHVIZ_ESCAPE = (
+  "\n" => "n",
+  map +($_ => $_), qw({ } " \\ < > [ ]),
+);
+my $GRAPHVIZ_ESCAPE_CHARS = join '|',
+    map quotemeta, sort keys %GRAPHVIZ_ESCAPE;
+sub graphviz_escape {
+    my ($text) = @_;
+    $text =~ s/($GRAPHVIZ_ESCAPE_CHARS)/\\$GRAPHVIZ_ESCAPE{$1}/gs;
+    $text;
 }
 
 1;
-
 
 __END__
 
@@ -143,23 +155,23 @@ Output to a .png file:
 
     use GraphViz::Makefile;
     my $gm = GraphViz::Makefile->new(undef, "Makefile");
-    $gm->generate("all"); # or another makefile target
-    open my $ofh, ">", "makefile.png" or die $!;
-    binmode $ofh;
-    print $ofh $gm->GraphViz->as_png;
+    my $g = GraphViz2->new(global => {combine_node_and_port => 0, directed => 1});
+    $g->from_graph(GraphViz::Makefile::graphvizify($gm->generate_graph));
+    $g->run(format => "png", output_file => "makefile.png");
 
-Output to a .ps file:
+To output to a .ps file, just replace C<png> with C<ps> in the filename
+and method above.
+
+Or, using the deprecated mutation style:
 
     use GraphViz::Makefile;
     my $gm = GraphViz::Makefile->new(undef, "Makefile");
-    $gm->generate("all"); # or another makefile target
-    open my $ofh, ">", "makefile.ps" or die $!;
-    binmode $ofh;
-    print $ofh $gm->GraphViz->as_ps;
+    $gm->generate;
+    $gm->GraphViz->run(format => "png", output_file => "makefile.png");
 
 =head1 DESCRIPTION
 
-B<GraphViz::Makefile> uses the L<GraphViz> and L<Make> modules to
+B<GraphViz::Makefile> uses the L<GraphViz2> and L<Make> modules to
 visualize Makefile dependencies.
 
 =head2 METHODS
@@ -169,33 +181,35 @@ visualize Makefile dependencies.
 =item new($graphviz, $makefile, $prefix, %args)
 
 Create a C<GraphViz::Makefile> object. The first argument should be a
-C<GraphViz> object or C<undef>. In the latter case, a new C<GraphViz>
-object is created by the constructor. The second argument should be a
+C<GraphViz2> object or C<undef>. The second argument should be a
 C<Make> object, the filename of a Makefile, or C<undef>. In the latter
 case, the default Makefile is used. The third argument C<$prefix> is
 optional and can be used to prepend a prefix to all rule names in the
 graph output.
 
-Further arguments (specified as key-value pairs):
+The created nodes are named C<$prefix$name>.
 
-=over
+Further arguments (specified as key-value pairs): none at present.
 
-=item reversed => 1
+=item generate
 
-Point arrows in the direction of dependencies. If not set, then the
-arrows point in the direction of "build flow".
+Generate the graph. Mutates the internal C<GraphViz2> object.
 
-=back
+=item generate_graph
 
-=item generate($rule)
+    my $gm = GraphViz::Makefile->new(undef, "Makefile");
+    my $graph = $gm->generate_graph;
+    $gv->from_graph(GraphViz::Makefile::graphvizify($graph));
+    $gv->run(format => "png", output_file => "makefile.png");
 
-Generate the graph, beginning at the named Makefile rule. If C<$rule>
-is not given, C<all> is used instead.
+Return a L<Graph> object representing this Makefile.
 
 =item GraphViz
 
-Return a reference to the C<GraphViz> object. This object can be used
-for the output methods.
+Return a reference to the C<GraphViz2> object. This object will be used
+for the output methods. Will only be created if used. It is recommended
+to instead use the C<generate_graph> method and make the calls on an
+externally-controlled L<GraphViz2> object.
 
 =item Make
 
@@ -203,20 +217,22 @@ Return a reference to the C<Make> object.
  
 =back
 
-=head2 MEMBERS
+=head1 FUNCTIONS
 
-For backward compatibility, the following members in the hash-based
-C<GraphViz::Makefile> object may be used instead of the methods:
+=head2 graphviz_escape
 
-=over
+Turn characters in the given string, that are considered special by
+GraphViz, into escaped versions so that they will appear literally as
+given in the visualisation.
 
-=item * GraphViz
+=head2 graphvizify
 
-=item * Make
+    my $gv_graph = GraphViz::Makefile::graphvizify($make_graph);
 
-=back
+Given a L<Graph> object representing a makefile, creates a new object
+to visualise it using L<GraphViz2/from_graph>.
 
-=head2 ALTERNATIVES
+=head1 ALTERNATIVES
 
 There's another module doing the same thing: L<Makefile::GraphViz>.
 
@@ -232,6 +248,6 @@ it under the same terms as Perl itself.
 
 =head1 SEE ALSO
 
-L<GraphViz>, L<Make>, L<make(1)>, L<tkgvizmakefile>.
+L<GraphViz2>, L<Make>, L<make(1)>, L<tkgvizmakefile>.
 
 =cut

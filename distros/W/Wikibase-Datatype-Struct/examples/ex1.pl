@@ -4,44 +4,47 @@ use strict;
 use warnings;
 
 use Data::Printer;
-use Wikibase::Datatype::Reference;
-use Wikibase::Datatype::Snak;
-use Wikibase::Datatype::Struct::Reference qw(obj2struct);
-use Wikibase::Datatype::Value::Item;
-use Wikibase::Datatype::Value::String;
-use Wikibase::Datatype::Value::Time;
+use Wikibase::Datatype::Form;
+use Wikibase::Datatype::Statement;
+use Wikibase::Datatype::Struct::Form qw(obj2struct);
+use Wikibase::Datatype::Value::Monolingual;
+
+# Statement.
+my $statement = Wikibase::Datatype::Statement->new(
+        # instance of (P31) human (Q5)
+        'snak' => Wikibase::Datatype::Snak->new(
+                'datatype' => 'wikibase-item',
+                'datavalue' => Wikibase::Datatype::Value::Item->new(
+                        'value' => 'Q5',
+                ),
+                'property' => 'P31',
+        ),
+);
 
 # Object.
-# instance of (P31) human (Q5)
-my $obj = Wikibase::Datatype::Reference->new(
-         'snaks' => [
-                 # stated in (P248) Virtual International Authority File (Q53919)
-                 Wikibase::Datatype::Snak->new(
-                          'datatype' => 'wikibase-item',
-                          'datavalue' => Wikibase::Datatype::Value::Item->new(
-                                  'value' => 'Q53919',
-                          ),
-                          'property' => 'P248',
-                 ),
-
-                 # VIAF ID (P214) 113230702
-                 Wikibase::Datatype::Snak->new(
-                          'datatype' => 'external-id',
-                          'datavalue' => Wikibase::Datatype::Value::String->new(
-                                  'value' => '113230702',
-                          ),
-                          'property' => 'P214',
-                 ),
-
-                 # retrieved (P813) 7 December 2013
-                 Wikibase::Datatype::Snak->new(
-                          'datatype' => 'time',
-                          'datavalue' => Wikibase::Datatype::Value::Time->new(
-                                  'value' => '+2013-12-07T00:00:00Z',
-                          ),
-                          'property' => 'P813',
-                 ),
-         ],
+my $obj = Wikibase::Datatype::Form->new(
+        'grammatical_features' => [
+                Wikibase::Datatype::Value::Item->new(
+                        'value' => 'Q163012',
+                ),
+                Wikibase::Datatype::Value::Item->new(
+                        'value' => 'Q163014',
+                ),
+        ],
+        'id' => 'ID',
+        'representations' => [
+                Wikibase::Datatype::Value::Monolingual->new(
+                        'language' => 'en',
+                        'value' => 'Representation en',
+                ),
+                Wikibase::Datatype::Value::Monolingual->new(
+                        'language' => 'cs',
+                        'value' => 'Representation cs',
+                ),
+        ],
+        'statements' => [
+                $statement,
+        ],
 );
 
 # Get structure.
@@ -52,55 +55,40 @@ p $struct_hr;
 
 # Output:
 # \ {
-#     snaks         {
-#         P214   [
+#     claims                {
+#         P31   [
 #             [0] {
-#                 datatype    "external-id",
-#                 datavalue   {
-#                     type    "string",
-#                     value   113230702
+#                 mainsnak   {
+#                     datatype    "wikibase-item",
+#                     datavalue   {
+#                         type    "wikibase-entityid",
+#                         value   {
+#                             entity-type   "item",
+#                             id            "Q5",
+#                             numeric-id    5
+#                         }
+#                     },
+#                     property    "P31",
+#                     snaktype    "value"
 #                 },
-#                 property    "P214",
-#                 snaktype    "value"
-#             }
-#         ],
-#         P248   [
-#             [0] {
-#                 datatype    "wikibase-item",
-#                 datavalue   {
-#                     type    "wikibase-entityid",
-#                     value   {
-#                         entity-type   "item",
-#                         id            "Q53919",
-#                         numeric-id    53919
-#                     }
-#                 },
-#                 property    "P248",
-#                 snaktype    "value"
-#             }
-#         ],
-#         P813   [
-#             [0] {
-#                 datatype    "time",
-#                 datavalue   {
-#                     type    "time",
-#                     value   {
-#                         after           0,
-#                         before          0,
-#                         calendarmodel   "http://test.wikidata.org/entity/Q1985727",
-#                         precision       11,
-#                         time            "+2013-12-07T00:00:00Z",
-#                         timezone        0
-#                     }
-#                 },
-#                 property    "P813",
-#                 snaktype    "value"
+#                 rank       "normal",
+#                 type       "statement"
 #             }
 #         ]
 #     },
-#     snaks-order   [
-#         [0] "P248",
-#         [1] "P214",
-#         [2] "P813"
-#     ]
+#     grammaticalFeatures   [
+#         [0] "Q163012",
+#         [1] "Q163014"
+#     ],
+#     id                    "ID",
+#     represenations        {
+#         cs   {
+#             language   "cs",
+#             value      "Representation cs"
+#         },
+#         en   {
+#             language   "en",
+#             value      "Representation en"
+#         }
+#     }
 # }

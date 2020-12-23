@@ -632,6 +632,26 @@ Yes
 
 1 (hétfő)
 
+=head2 Strftime Patterns
+
+=head3 %c (%Y. %b. %-e., %A, %H:%M:%S %Z) - date time format
+
+   2008-02-05T18:30:30 = 2008. febr.. %-e., kedd, 18:30:30 UTC
+   1995-12-22T09:05:02 = 1995. dec.. %-e., péntek, 09:05:02 UTC
+  -0010-09-15T04:44:23 = -10. szept.. %-e., szombat, 04:44:23 UTC
+
+=head3 %x (%Y-%m-%d) - date format
+
+   2008-02-05T18:30:30 = 2008-02-05
+   1995-12-22T09:05:02 = 1995-12-22
+  -0010-09-15T04:44:23 = -10-09-15
+
+=head3 %X (%H:%M:%S) - time format
+
+   2008-02-05T18:30:30 = 18:30:30
+   1995-12-22T09:05:02 = 09:05:02
+  -0010-09-15T04:44:23 = 04:44:23
+
 =head1 SUPPORT
 
 See L<DateTime::Locale>.

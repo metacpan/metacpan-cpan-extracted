@@ -1,5 +1,14 @@
 Revision history for Perl distribution Win32-UTCFileTime
 
+1.60 2020-12-23
+
+    - Note that this module is wholly redundant for Perl 5.33.5 or later, and
+      skip tests that would otherwise fail on new Perls; they aren't worth
+      fixing.
+
+    - Note that this module is mostly redundant when perl is built with VC14 or
+      later.
+
 1.59 2018-07-31
 
     - Fixed broken link for active bugs on the CPAN Request Tracker.

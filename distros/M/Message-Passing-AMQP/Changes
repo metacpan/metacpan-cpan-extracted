@@ -1,3 +1,8 @@
+0.008  2020-12-22 20:35:00+01:00 Europe/Vienna
+  - Convert to Moo
+    to not add another dependency because Message::Passing is also Moo based
+  - Fix missing documentation for tls and bind_arguments
+
 0.007  2015-10-28 09:57:00+01:00 Europe/Vienna
   - Add support for headers exchanges
   - Add a serialize callback to Output::AMQP for simpler header construction

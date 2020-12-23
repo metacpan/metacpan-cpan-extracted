@@ -29,7 +29,7 @@
 %type <opval> opt_packages packages package package_block refcnt
 %type <opval> opt_declarations declarations declaration
 %type <opval> enumeration enumeration_block opt_enumeration_values enumeration_values enumeration_value
-%type <opval> sub new_callback_object opt_args args arg invocant has use require our string_length
+%type <opval> sub anon_sub opt_args args arg invocant has use require our string_length
 %type <opval> opt_descriptors descriptors sub_names opt_sub_names
 %type <opval> opt_statements statements statement if_statement else_statement 
 %type <opval> for_statement while_statement switch_statement case_statement default_statement
@@ -296,11 +296,14 @@ sub
        $$ = SPVM_OP_build_sub(compiler, $2, NULL, $4, $6, $1, NULL, NULL, $7, 0, 0, can_precompile);
      }
 
-new_callback_object
+anon_sub
   : opt_descriptors SUB ':' type_or_void '(' opt_args opt_vaarg')' block
      {
+       int32_t is_begin = 0;
+       int32_t is_anon = 1;
        int32_t can_precompile = 1;
-       $$ = SPVM_OP_build_sub(compiler, $2, NULL, $4, $6, $1, $9, NULL, $7, 0, 1, can_precompile);
+       
+       $$ = SPVM_OP_build_sub(compiler, $2, NULL, $4, $6, $1, $9, NULL, $7, is_begin, is_anon, can_precompile);
      }
   | '[' args ']' opt_descriptors SUB ':' type_or_void '(' opt_args opt_vaarg')' block
      {
@@ -313,8 +316,10 @@ new_callback_object
          SPVM_OP_insert_child(compiler, op_list_args, op_list_args->last, $2);
        }
        
+       int32_t is_begin = 0;
+       int32_t is_anon = 1;
        int32_t can_precompile = 1;
-       $$ = SPVM_OP_build_sub(compiler, $5, NULL, $7, $9, $4, $12, op_list_args, $10, 0, 1, can_precompile);
+       $$ = SPVM_OP_build_sub(compiler, $5, NULL, $7, $9, $4, $12, op_list_args, $10, is_begin, is_anon, can_precompile);
      }
 
 opt_args
@@ -932,25 +937,28 @@ new
     {
       $$ = SPVM_OP_build_new(compiler, $1, $2, NULL);
     }
-  | new_callback_object
+  | anon_sub
     {
+      // Sub
+      SPVM_OP* op_sub = $1;
+      
       // Package
-      SPVM_OP* op_package = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_PACKAGE, $1->file, $1->line);
+      SPVM_OP* op_package = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_PACKAGE, op_sub->file, op_sub->line);
       
       // Create class block
-      SPVM_OP* op_class_block = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_CLASS_BLOCK, $1->file, $1->line);
+      SPVM_OP* op_class_block = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_CLASS_BLOCK, op_sub->file, op_sub->line);
       SPVM_OP* op_list_declarations = SPVM_OP_new_op_list(compiler, compiler->cur_file, compiler->cur_line);
-      SPVM_OP_insert_child(compiler, op_list_declarations, op_list_declarations->last, $1);
+      SPVM_OP_insert_child(compiler, op_list_declarations, op_list_declarations->last, op_sub);
       SPVM_OP_insert_child(compiler, op_class_block, op_class_block->last, op_list_declarations);
       
       // Build package
       SPVM_OP_build_package(compiler, op_package, NULL, op_class_block, NULL);
 
       // Type
-      SPVM_OP* op_type = SPVM_OP_new_op_type(compiler, op_package->uv.package->op_type->uv.type, $1->file, $1->line);
+      SPVM_OP* op_type = SPVM_OP_new_op_type(compiler, op_package->uv.package->op_type->uv.type, op_sub->file, op_sub->line);
       
       // New
-      SPVM_OP* op_new = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_NEW, $1->file, $1->line);
+      SPVM_OP* op_new = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_NEW, op_sub->file, op_sub->line);
       $$ = SPVM_OP_build_new(compiler, op_new, op_type, NULL);
     }
 

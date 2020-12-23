@@ -4,10 +4,12 @@ author:
   - 'Slaven Rezic <srezic@cpan.org>'
 build_requires:
   ExtUtils::MakeMaker: '0'
+  Test::More: '1.001002'
+  Test::Snapshot: '0.06'
 configure_requires:
   ExtUtils::MakeMaker: '0'
-dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 7.54, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -17,10 +19,17 @@ no_index:
   directory:
     - t
     - inc
+recommends:
+  Tk::GraphViz: '1.08'
 requires:
-  GraphViz: '0'
-  Make: '2.002'
+  Graph: '0.9708'
+  GraphViz2: '2.62'
+  Make: '2.009'
+  perl: '5.008008'
 resources:
-  repository: git://github.com/eserte/graphviz-makefile.git
-version: '1.18'
+  IRC: irc://irc.perl.org/#graphql-perl
+  bugtracker: https://github.com/eserte/graphviz-makefile/issues
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/eserte/graphviz-makefile
+version: '1.19'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

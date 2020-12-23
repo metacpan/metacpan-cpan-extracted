@@ -4,22 +4,9 @@ use strict;
 use warnings;
 
 use Test::More;
-use Tie::Hash::DBD;
 
-require "./t/util.pl";
+require "./t/autoc.pl";
 
-my %hash;
-my $DBD = "MariaDB";
-cleanup ($DBD);
-my $tbl = "t_tie_56_$$"."_persist";
-eval { tie %hash, "Tie::Hash::DBD", dsn ($DBD), { tbl => $tbl } };
-
-tied %hash or plan_fail ($DBD);
-
-ok (tied %hash,				"Hash tied");
-ok ((tied %hash)->{dbh}{AutoCommit},    "AutoCommit ON");
-
-untie %hash;
-cleanup ($DBD);
+autoctests ("MariaDB", 56);
 
 done_testing;

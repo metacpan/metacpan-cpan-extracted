@@ -896,6 +896,7 @@ fọ
 ga
 ga_GB
 ga_IE
+gada
 gd
 gd_GB
 gl
@@ -1100,6 +1101,7 @@ mgo_CM
 mi
 mi_NZ
 minggu
+mis
 miz
 mjesec
 mk
@@ -1231,6 +1233,7 @@ qu
 qu_BO
 qu_EC
 qu_PE
+ranar
 rbreiddal
 rm
 rm_CH
@@ -1520,3 +1523,4 @@ zu_ZA
 ġimgħa
 ži
 Ọjọ
+ọjọ

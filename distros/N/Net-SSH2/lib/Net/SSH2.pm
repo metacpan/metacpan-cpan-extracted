@@ -1,6 +1,6 @@
 package Net::SSH2;
 
-our $VERSION = '0.71';
+our $VERSION = '0.72';
 
 use 5.006;
 use strict;
@@ -243,8 +243,7 @@ sub auth {
     # is given
     $p{fallback} = 1 unless defined $p{password} or defined $p{passphrase};
 
-    TYPE: for(my $i = 0; $i < @rank; $i++) {
-        my $type = $rank[$i];
+    TYPE: for my $type (@rank) {
         my $data = $self->_auth_methods->{$type};
         unless ($data) {
             carp "unknown authentication method '$type'";
@@ -279,6 +278,9 @@ sub auth {
     }
 
     return 'none' if  $self->auth_ok;
+
+    $self->_set_error(LIBSSH2_ERROR_AUTHENTICATION_FAILED(),
+                     "All authentication methods failed");
     return;  # failure
 }
 
@@ -1542,7 +1544,7 @@ Copyright (C) 2005 - 2010 by David B. Robins (dbrobins@cpan.org).
 
 Copyright (C) 2010 - 2020 by Rafael Kitover (rkitover@cpan.org).
 
-Copyright (C) 2011 - 2019 by Salvador FandiE<ntilde>o (salva@cpan.org).
+Copyright (C) 2011 - 2020 by Salvador FandiE<ntilde>o (salva@cpan.org).
 
 All rights reserved.
 

@@ -21,7 +21,7 @@ use namespace::autoclean;
 use File::ShareDir qw( dist_file );
 use File::Spec;
 
-our $VERSION = '1.30';
+our $VERSION = '1.31';
 
 #<<<
 ### :start CLDRVersion:
@@ -6128,7 +6128,7 @@ DateTime::Locale::Data - Locale data generated from CLDR
 
 =head1 VERSION
 
-version 1.30
+version 1.31
 
 =head1 DESCRIPTION
 

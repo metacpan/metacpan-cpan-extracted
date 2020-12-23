@@ -1,3 +1,9 @@
+0.14	- 2020-12-23, H.Merijn Brand
+    * geological -> geographical (Shlomi Fish)
+    * Use Pod::Text
+    * Give more diagnostics if a database connection fails
+    * Fix META issue for bugtracker
+
 0.13	- 2020-04-09, H.Merijn Brand
     * Make 5.14.0 explicit in Makefile.PL
 

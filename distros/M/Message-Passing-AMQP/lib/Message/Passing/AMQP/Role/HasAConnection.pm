@@ -1,5 +1,6 @@
 package Message::Passing::AMQP::Role::HasAConnection;
-use Moose::Role;
+use Moo::Role;
+use Types::Standard qw( Bool Str );
 use namespace::autoclean;
 
 with qw/
@@ -12,19 +13,19 @@ sub _default_port { 5672 }
 
 has tls => (
     is => 'ro',
-    isa => 'Bool',
+    isa => Bool,
     default => sub { 0 },
 );
 
 has vhost => (
     is => 'ro',
-    isa => 'Str',
+    isa => Str,
     default => sub { '/' },
 );
 
 has verbose => (
     is => 'ro',
-    isa => 'Bool',
+    isa => Bool,
     default => sub { 0 },
 );
 
@@ -38,6 +39,10 @@ sub _connection_manager_attributes { [qw/ username password hostname port tls vh
 Message::Passing::AMQP::Role::HasAConnection - Implements the Message::Passing::Role::HasAConnection interface..
 
 =head1 ATTRIBUTES
+
+=head2 tls
+
+Gets passed to L<Message::Passing::AMQP::ConnectionManager>, defaults to false.
 
 =head2 vhost
 

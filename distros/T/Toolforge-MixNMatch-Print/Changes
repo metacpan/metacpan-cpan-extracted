@@ -1,3 +1,7 @@
+0.04 2020-12-23T08:36:24+01:00
+ - Add minimal dependency to perl 5.10.1.
+ - Add tests for Catalog.
+
 0.03 2020-12-22T13:19:25+01:00
  - Add check for objects to print.
  - Add documentation.

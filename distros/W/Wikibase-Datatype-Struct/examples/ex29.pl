@@ -4,26 +4,28 @@ use strict;
 use warnings;
 
 use Data::Printer;
-use Wikibase::Datatype::Value::Item;
-use Wikibase::Datatype::Struct::Value::Item qw(obj2struct);
+use Wikibase::Datatype::Value::Globecoordinate;
+use Wikibase::Datatype::Struct::Value::Globecoordinate qw(obj2struct);
 
 # Object.
-my $obj = Wikibase::Datatype::Value::Item->new(
-        'value' => 'Q123',
+my $obj = Wikibase::Datatype::Value::Globecoordinate->new(
+        'value' => [49.6398383, 18.1484031],
 );
 
 # Get structure.
-my $struct_hr = obj2struct($obj);
+my $struct_hr = obj2struct($obj, 'http://test.wikidata.org/entity/');
 
 # Dump to output.
 p $struct_hr;
 
 # Output:
 # \ {
-#     type    "wikibase-entityid",
+#     type    "globecoordinate",
 #     value   {
-#         entity-type   "item",
-#         id            "Q123",
-#         numeric-id    123
+#         altitude    "null",
+#         globe       "http://test.wikidata.org/entity/Q2",
+#         latitude    49.6398383,
+#         longitude   18.1484031,
+#         precision   1e-07
 #     }
 # }

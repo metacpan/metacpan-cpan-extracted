@@ -1,5 +1,5 @@
 package Message::Passing::AMQP::Role::HasAChannel;
-use Moose::Role;
+use Moo::Role;
 use Scalar::Util qw/ weaken /;
 use AnyEvent;
 use AnyEvent::RabbitMQ;

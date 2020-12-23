@@ -38,7 +38,7 @@ Libpng-like interface:
         print "$k: $header->{$k}\n";
     }
 
-(This example is included as L<F<examples/synopsis.pl>|https://fastapi.metacpan.org/source/BKB/Image-PNG-Libpng-0.55/examples/synopsis.pl>
+(This example is included as L<F<examples/synopsis.pl>|https://fastapi.metacpan.org/source/BKB/Image-PNG-Libpng-0.56/examples/synopsis.pl>
 in the distribution.)
 
 
@@ -65,13 +65,13 @@ Simple interface:
     $wpng->write_png_file ('new.png');
     
 
-(This example is included as L<F<examples/synopsis-easy.pl>|https://fastapi.metacpan.org/source/BKB/Image-PNG-Libpng-0.55/examples/synopsis-easy.pl>
+(This example is included as L<F<examples/synopsis-easy.pl>|https://fastapi.metacpan.org/source/BKB/Image-PNG-Libpng-0.56/examples/synopsis-easy.pl>
 in the distribution.)
 
 
 =head1 VERSION
 
-This document describes Image::PNG::Libpng version 0.55, corresponding to git commit L<940b46f375c92f3ef0da6d21a6a5dea6be3696c0|https://github.com/benkasminbullock/image-png-libpng/commit/940b46f375c92f3ef0da6d21a6a5dea6be3696c0> at Mon Dec 21 20:36:46 2020 +0900.
+This document describes Image::PNG::Libpng version 0.56, corresponding to git commit L<2ca3f20707e31fd38b2a3c3c658efb3f18eb12df|https://github.com/benkasminbullock/image-png-libpng/commit/2ca3f20707e31fd38b2a3c3c658efb3f18eb12df> at Wed Dec 23 07:44:31 2020 +0900.
 
 Unless otherwise qualified, comments in this document on the libpng
 source code and documentation refer to libpng version 1.6.37. Libpng is not bundled with this distribution, so
@@ -133,7 +133,7 @@ The following example demonstrates copying a PNG.
     $pngout->set_text ([{key => 'Name', text => 'Shunsaku Kudo'}]); 
     # $pngout->write_png_file ('copy.png');
 
-(This example is included as L<F<examples/copy-png.pl>|https://fastapi.metacpan.org/source/BKB/Image-PNG-Libpng-0.55/examples/copy-png.pl>
+(This example is included as L<F<examples/copy-png.pl>|https://fastapi.metacpan.org/source/BKB/Image-PNG-Libpng-0.56/examples/copy-png.pl>
 in the distribution.)
 
 
@@ -164,13 +164,13 @@ L</set_background> to replace the alpha channel.
     my $wpng = copy_png ($png);
     $wpng->write_png_file ("$Bin/set-background.png");
 
-(This example is included as L<F<examples/set-background.pl>|https://fastapi.metacpan.org/source/BKB/Image-PNG-Libpng-0.55/examples/set-background.pl>
+(This example is included as L<F<examples/set-background.pl>|https://fastapi.metacpan.org/source/BKB/Image-PNG-Libpng-0.56/examples/set-background.pl>
 in the distribution.)
 
 
 
 
-L<examples/luv.png|https://fastapi.metacpan.org/source/BKB/Image-PNG-Libpng-0.55/examples/luv.png> is included in the distribution.
+L<examples/luv.png|https://fastapi.metacpan.org/source/BKB/Image-PNG-Libpng-0.56/examples/luv.png> is included in the distribution.
 
 =begin html
 
@@ -180,12 +180,12 @@ L<examples/luv.png|https://fastapi.metacpan.org/source/BKB/Image-PNG-Libpng-0.55
 <table>
 <tr>
 <td>
-<img src="https://fastapi.metacpan.org/source/BKB/Image-PNG-Libpng-0.55/examples/luv.png">
+<img src="https://fastapi.metacpan.org/source/BKB/Image-PNG-Libpng-0.56/examples/luv.png">
 </td>
 </tr>
 <tr>
 <th>
-<a href='https://fastapi.metacpan.org/source/BKB/Image-PNG-Libpng-0.55/examples/luv.png'>examples/luv.png</a>
+<a href='https://fastapi.metacpan.org/source/BKB/Image-PNG-Libpng-0.56/examples/luv.png'>examples/luv.png</a>
 </th>
 </tr>
 </table>
@@ -195,7 +195,7 @@ L<examples/luv.png|https://fastapi.metacpan.org/source/BKB/Image-PNG-Libpng-0.55
 
 
 
-L<examples/set-background.png|https://fastapi.metacpan.org/source/BKB/Image-PNG-Libpng-0.55/examples/set-background.png> is included in the distribution.
+L<examples/set-background.png|https://fastapi.metacpan.org/source/BKB/Image-PNG-Libpng-0.56/examples/set-background.png> is included in the distribution.
 
 =begin html
 
@@ -205,12 +205,12 @@ L<examples/set-background.png|https://fastapi.metacpan.org/source/BKB/Image-PNG-
 <table>
 <tr>
 <td>
-<img src="https://fastapi.metacpan.org/source/BKB/Image-PNG-Libpng-0.55/examples/set-background.png">
+<img src="https://fastapi.metacpan.org/source/BKB/Image-PNG-Libpng-0.56/examples/set-background.png">
 </td>
 </tr>
 <tr>
 <th>
-<a href='https://fastapi.metacpan.org/source/BKB/Image-PNG-Libpng-0.55/examples/set-background.png'>examples/set-background.png</a>
+<a href='https://fastapi.metacpan.org/source/BKB/Image-PNG-Libpng-0.56/examples/set-background.png'>examples/set-background.png</a>
 </th>
 </tr>
 </table>
@@ -260,7 +260,7 @@ This is useful when image data is stored in a Perl scalar. For example
     $jc->indent (1);
     print $jc->run ($header);
 
-(This example is included as L<F<examples/get-www-png.pl>|https://fastapi.metacpan.org/source/BKB/Image-PNG-Libpng-0.55/examples/get-www-png.pl>
+(This example is included as L<F<examples/get-www-png.pl>|https://fastapi.metacpan.org/source/BKB/Image-PNG-Libpng-0.56/examples/get-www-png.pl>
 in the distribution.)
 
 
@@ -350,7 +350,7 @@ So, for example,
         return int (rand () * 0x100);
     }
 
-(This example is included as L<F<examples/png-cgi.pl>|https://fastapi.metacpan.org/source/BKB/Image-PNG-Libpng-0.55/examples/png-cgi.pl>
+(This example is included as L<F<examples/png-cgi.pl>|https://fastapi.metacpan.org/source/BKB/Image-PNG-Libpng-0.56/examples/png-cgi.pl>
 in the distribution.)
 
 
@@ -437,13 +437,13 @@ and then L</write_end> to actually write the PNG data to the file.
         return ($height, $width, \@rows);
     }
 
-(This example is included as L<F<examples/libpng-write.pl>|https://fastapi.metacpan.org/source/BKB/Image-PNG-Libpng-0.55/examples/libpng-write.pl>
+(This example is included as L<F<examples/libpng-write.pl>|https://fastapi.metacpan.org/source/BKB/Image-PNG-Libpng-0.56/examples/libpng-write.pl>
 in the distribution.)
 
 
 
 
-L<examples/mono.png|https://fastapi.metacpan.org/source/BKB/Image-PNG-Libpng-0.55/examples/mono.png> is included in the distribution.
+L<examples/mono.png|https://fastapi.metacpan.org/source/BKB/Image-PNG-Libpng-0.56/examples/mono.png> is included in the distribution.
 
 =begin html
 
@@ -453,12 +453,12 @@ L<examples/mono.png|https://fastapi.metacpan.org/source/BKB/Image-PNG-Libpng-0.5
 <table>
 <tr>
 <td>
-<img src="https://fastapi.metacpan.org/source/BKB/Image-PNG-Libpng-0.55/examples/mono.png">
+<img src="https://fastapi.metacpan.org/source/BKB/Image-PNG-Libpng-0.56/examples/mono.png">
 </td>
 </tr>
 <tr>
 <th>
-<a href='https://fastapi.metacpan.org/source/BKB/Image-PNG-Libpng-0.55/examples/mono.png'>examples/mono.png</a>
+<a href='https://fastapi.metacpan.org/source/BKB/Image-PNG-Libpng-0.56/examples/mono.png'>examples/mono.png</a>
 </th>
 </tr>
 </table>
@@ -828,7 +828,7 @@ case, with words separated by underscores, as in C<RGB_ALPHA>.
     my $name = color_type_name ($png->get_IHDR->{color_type});
     print "Your PNG has colour type $name.\n";
 
-(This example is included as L<F<examples/color-type-name.pl>|https://fastapi.metacpan.org/source/BKB/Image-PNG-Libpng-0.55/examples/color-type-name.pl>
+(This example is included as L<F<examples/color-type-name.pl>|https://fastapi.metacpan.org/source/BKB/Image-PNG-Libpng-0.56/examples/color-type-name.pl>
 in the distribution.)
 
 
@@ -1267,7 +1267,7 @@ This function corresponds to C<png_set_text> in libpng.
     }]);
     $png->write_png_file ('copyright.png');
 
-(This example is included as L<F<examples/set-text.pl>|https://fastapi.metacpan.org/source/BKB/Image-PNG-Libpng-0.55/examples/set-text.pl>
+(This example is included as L<F<examples/set-text.pl>|https://fastapi.metacpan.org/source/BKB/Image-PNG-Libpng-0.56/examples/set-text.pl>
 in the distribution.)
 
 
@@ -2575,7 +2575,7 @@ whether an image marked as RGB is really monochrome or not.
         print "The two files contain different image data.\n";
     }
 
-(This example is included as L<F<examples/xkcd.pl>|https://fastapi.metacpan.org/source/BKB/Image-PNG-Libpng-0.55/examples/xkcd.pl>
+(This example is included as L<F<examples/xkcd.pl>|https://fastapi.metacpan.org/source/BKB/Image-PNG-Libpng-0.56/examples/xkcd.pl>
 in the distribution.)
 
 
@@ -2589,7 +2589,7 @@ The output looks like this:
 
 
 
-L<examples/life-gray.png|https://fastapi.metacpan.org/source/BKB/Image-PNG-Libpng-0.55/examples/life-gray.png> is included in the distribution.
+L<examples/life-gray.png|https://fastapi.metacpan.org/source/BKB/Image-PNG-Libpng-0.56/examples/life-gray.png> is included in the distribution.
 
 =begin html
 
@@ -2599,12 +2599,12 @@ L<examples/life-gray.png|https://fastapi.metacpan.org/source/BKB/Image-PNG-Libpn
 <table>
 <tr>
 <td>
-<img src="https://fastapi.metacpan.org/source/BKB/Image-PNG-Libpng-0.55/examples/life-gray.png">
+<img src="https://fastapi.metacpan.org/source/BKB/Image-PNG-Libpng-0.56/examples/life-gray.png">
 </td>
 </tr>
 <tr>
 <th>
-<a href='https://fastapi.metacpan.org/source/BKB/Image-PNG-Libpng-0.55/examples/life-gray.png'>examples/life-gray.png</a>
+<a href='https://fastapi.metacpan.org/source/BKB/Image-PNG-Libpng-0.56/examples/life-gray.png'>examples/life-gray.png</a>
 </th>
 </tr>
 </table>
@@ -2870,13 +2870,13 @@ using colors picked from the image at random:
         return \@p;
     }
 
-(This example is included as L<F<examples/q.pl>|https://fastapi.metacpan.org/source/BKB/Image-PNG-Libpng-0.55/examples/q.pl>
+(This example is included as L<F<examples/q.pl>|https://fastapi.metacpan.org/source/BKB/Image-PNG-Libpng-0.56/examples/q.pl>
 in the distribution.)
 
 
 
 
-L<examples/wave.png|https://fastapi.metacpan.org/source/BKB/Image-PNG-Libpng-0.55/examples/wave.png> is included in the distribution.
+L<examples/wave.png|https://fastapi.metacpan.org/source/BKB/Image-PNG-Libpng-0.56/examples/wave.png> is included in the distribution.
 
 =begin html
 
@@ -2886,12 +2886,12 @@ L<examples/wave.png|https://fastapi.metacpan.org/source/BKB/Image-PNG-Libpng-0.5
 <table>
 <tr>
 <td>
-<img src="https://fastapi.metacpan.org/source/BKB/Image-PNG-Libpng-0.55/examples/wave.png">
+<img src="https://fastapi.metacpan.org/source/BKB/Image-PNG-Libpng-0.56/examples/wave.png">
 </td>
 </tr>
 <tr>
 <th>
-<a href='https://fastapi.metacpan.org/source/BKB/Image-PNG-Libpng-0.55/examples/wave.png'>examples/wave.png</a>
+<a href='https://fastapi.metacpan.org/source/BKB/Image-PNG-Libpng-0.56/examples/wave.png'>examples/wave.png</a>
 </th>
 </tr>
 </table>
@@ -2901,7 +2901,7 @@ L<examples/wave.png|https://fastapi.metacpan.org/source/BKB/Image-PNG-Libpng-0.5
 
 
 
-L<examples/random-wave.png|https://fastapi.metacpan.org/source/BKB/Image-PNG-Libpng-0.55/examples/random-wave.png> is included in the distribution.
+L<examples/random-wave.png|https://fastapi.metacpan.org/source/BKB/Image-PNG-Libpng-0.56/examples/random-wave.png> is included in the distribution.
 
 =begin html
 
@@ -2911,12 +2911,12 @@ L<examples/random-wave.png|https://fastapi.metacpan.org/source/BKB/Image-PNG-Lib
 <table>
 <tr>
 <td>
-<img src="https://fastapi.metacpan.org/source/BKB/Image-PNG-Libpng-0.55/examples/random-wave.png">
+<img src="https://fastapi.metacpan.org/source/BKB/Image-PNG-Libpng-0.56/examples/random-wave.png">
 </td>
 </tr>
 <tr>
 <th>
-<a href='https://fastapi.metacpan.org/source/BKB/Image-PNG-Libpng-0.55/examples/random-wave.png'>examples/random-wave.png</a>
+<a href='https://fastapi.metacpan.org/source/BKB/Image-PNG-Libpng-0.56/examples/random-wave.png'>examples/random-wave.png</a>
 </th>
 </tr>
 </table>
@@ -2926,7 +2926,7 @@ L<examples/random-wave.png|https://fastapi.metacpan.org/source/BKB/Image-PNG-Lib
 
 
 
-L<examples/picked-wave.png|https://fastapi.metacpan.org/source/BKB/Image-PNG-Libpng-0.55/examples/picked-wave.png> is included in the distribution.
+L<examples/picked-wave.png|https://fastapi.metacpan.org/source/BKB/Image-PNG-Libpng-0.56/examples/picked-wave.png> is included in the distribution.
 
 =begin html
 
@@ -2936,12 +2936,12 @@ L<examples/picked-wave.png|https://fastapi.metacpan.org/source/BKB/Image-PNG-Lib
 <table>
 <tr>
 <td>
-<img src="https://fastapi.metacpan.org/source/BKB/Image-PNG-Libpng-0.55/examples/picked-wave.png">
+<img src="https://fastapi.metacpan.org/source/BKB/Image-PNG-Libpng-0.56/examples/picked-wave.png">
 </td>
 </tr>
 <tr>
 <th>
-<a href='https://fastapi.metacpan.org/source/BKB/Image-PNG-Libpng-0.55/examples/picked-wave.png'>examples/picked-wave.png</a>
+<a href='https://fastapi.metacpan.org/source/BKB/Image-PNG-Libpng-0.56/examples/picked-wave.png'>examples/picked-wave.png</a>
 </th>
 </tr>
 </table>
@@ -2991,13 +2991,13 @@ C<$green_weight> both set to negative values.
     $wpng->set_IHDR ($ihdr);
     $wpng->write_png_file ("$Bin/grayface.png");
 
-(This example is included as L<F<examples/rgb-to-gray.pl>|https://fastapi.metacpan.org/source/BKB/Image-PNG-Libpng-0.55/examples/rgb-to-gray.pl>
+(This example is included as L<F<examples/rgb-to-gray.pl>|https://fastapi.metacpan.org/source/BKB/Image-PNG-Libpng-0.56/examples/rgb-to-gray.pl>
 in the distribution.)
 
 
 
 
-L<examples/grayface.png|https://fastapi.metacpan.org/source/BKB/Image-PNG-Libpng-0.55/examples/grayface.png> is included in the distribution.
+L<examples/grayface.png|https://fastapi.metacpan.org/source/BKB/Image-PNG-Libpng-0.56/examples/grayface.png> is included in the distribution.
 
 =begin html
 
@@ -3007,12 +3007,12 @@ L<examples/grayface.png|https://fastapi.metacpan.org/source/BKB/Image-PNG-Libpng
 <table>
 <tr>
 <td>
-<img src="https://fastapi.metacpan.org/source/BKB/Image-PNG-Libpng-0.55/examples/grayface.png">
+<img src="https://fastapi.metacpan.org/source/BKB/Image-PNG-Libpng-0.56/examples/grayface.png">
 </td>
 </tr>
 <tr>
 <th>
-<a href='https://fastapi.metacpan.org/source/BKB/Image-PNG-Libpng-0.55/examples/grayface.png'>examples/grayface.png</a>
+<a href='https://fastapi.metacpan.org/source/BKB/Image-PNG-Libpng-0.56/examples/grayface.png'>examples/grayface.png</a>
 </th>
 </tr>
 </table>
@@ -4111,7 +4111,7 @@ unevaluated arguments, which have all been eliminated from this
 module.
 
 If you are interested in exactly which libpng arguments are omitted,
-you can find each instance L<in the file C<perl-libpng.c> in the top directory of the distribution|https://fastapi.metacpan.org/source/BKB/Image-PNG-Libpng-0.55/perl-libpng.c> in the macro
+you can find each instance L<in the file C<perl-libpng.c> in the top directory of the distribution|https://fastapi.metacpan.org/source/BKB/Image-PNG-Libpng-0.56/perl-libpng.c> in the macro
 C<UNUSED_ZERO_ARG>.
 
 =head2 Useless functions omitted

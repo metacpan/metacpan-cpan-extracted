@@ -638,6 +638,26 @@ Yes
 
 1 (Alatsinainy)
 
+=head2 Strftime Patterns
+
+=head3 %c (%a %d %b %Y %T) - date time format
+
+   2008-02-05T18:30:30 = Tal 05 Feb 2008 18:30:30
+   1995-12-22T09:05:02 = Zom 22 Des 1995 09:05:02
+  -0010-09-15T04:44:23 = Asab 15 Sep -10 04:44:23
+
+=head3 %x (%d.%m.%Y) - date format
+
+   2008-02-05T18:30:30 = 05.02.2008
+   1995-12-22T09:05:02 = 22.12.1995
+  -0010-09-15T04:44:23 = 15.09.-10
+
+=head3 %X (%T) - time format
+
+   2008-02-05T18:30:30 = 18:30:30
+   1995-12-22T09:05:02 = 09:05:02
+  -0010-09-15T04:44:23 = 04:44:23
+
 =head1 SUPPORT
 
 See L<DateTime::Locale>.

@@ -1,3 +1,6 @@
+0.27	- 23 Dec 2020, H.Merijn Brand
+    * Fix META issue for bugtracker
+
 0.26	- 23 Apr 2020, H.Merijn Brand
     * Small doc fix (typo)
     * Name sccs2git-r in README

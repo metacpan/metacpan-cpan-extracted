@@ -638,6 +638,26 @@ No
 
 7 (ରବିବାର)
 
+=head2 Strftime Patterns
+
+=head3 %c (%Oe %B %Oy %OI:%OM:%OS %p) - date time format
+
+   2008-02-05T18:30:30 = %Oe ଫେବୃଆରୀ %Oy %OI:%OM:%OS PM
+   1995-12-22T09:05:02 = %Oe ଡିସେମ୍ବର %Oy %OI:%OM:%OS AM
+  -0010-09-15T04:44:23 = %Oe ସେପ୍ଟେମ୍ବର %Oy %OI:%OM:%OS AM
+
+=head3 %x (%Od-%Om-%Oy) - date format
+
+   2008-02-05T18:30:30 = %Od-%Om-%Oy
+   1995-12-22T09:05:02 = %Od-%Om-%Oy
+  -0010-09-15T04:44:23 = %Od-%Om-%Oy
+
+=head3 %X (%OI:%OM:%OS %p) - time format
+
+   2008-02-05T18:30:30 = %OI:%OM:%OS PM
+   1995-12-22T09:05:02 = %OI:%OM:%OS AM
+  -0010-09-15T04:44:23 = %OI:%OM:%OS AM
+
 =head1 SUPPORT
 
 See L<DateTime::Locale>.

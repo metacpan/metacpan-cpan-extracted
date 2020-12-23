@@ -1,0 +1,37 @@
+'digraph Perl {
+ "rule:all:0" [ label="" shape="diamond" ]
+ "rule:all:0" -> "target:foo"
+ "rule:all:1" [ fillcolor="#dddddd" fontname="Monospace" fontsize="8" label="{<port1> echo\\ hallo\\ perl\\\\lib\\ double\\\\\\\\l\\l}" shape="record" style="filled" ]
+ "rule:all:1" -> "target:bar"
+ "rule:any:0" [ fillcolor="#dddddd" fontname="Monospace" fontsize="8" label="{<port1> echo\\ larry\\l|<port2> echo\\ howdy\\l}" shape="record" style="filled" ]
+ "rule:any:0" -> "target:foo"
+ "rule:any:0" -> "target:hiya"
+ "rule:any:1" [ label="" shape="diamond" ]
+ "rule:any:1" -> "target:blah"
+ "rule:any:1" -> "target:blow"
+ "rule:foo:0" [ fillcolor="#dddddd" fontname="Monospace" fontsize="8" label="{<port1> echo\\ Hi\\l}" shape="record" style="filled" ]
+ "rule:foo:0" -> "target:blah"
+ "rule:foo:0" -> "target:boo"
+ "rule:foo:1" [ fillcolor="#dddddd" fontname="Monospace" fontsize="8" label="{<port1> echo\\ Hey\\l}" shape="record" style="filled" ]
+ "rule:foo:1" -> "target:buz"
+ "rule:foo:1" -> "target:howdy"
+ "target:all" [ fillcolor="#ffff99" fontname="Arial" fontsize="10" label="all" shape="box" style="filled" ]
+ "target:all" -> "rule:all:0"
+ "target:all" -> "rule:all:1"
+ "target:any" [ fillcolor="#ffff99" fontname="Arial" fontsize="10" label="any" shape="box" style="filled" ]
+ "target:any" -> "rule:any:0"
+ "target:any" -> "rule:any:1"
+ "target:bar" [ fillcolor="#ffff99" fontname="Arial" fontsize="10" label="bar" shape="box" style="filled" ]
+ "target:blah" [ fillcolor="#ffff99" fontname="Arial" fontsize="10" label="blah" shape="box" style="filled" ]
+ "target:blow" [ fillcolor="#ffff99" fontname="Arial" fontsize="10" label="blow" shape="box" style="filled" ]
+ "target:boo" [ fillcolor="#ffff99" fontname="Arial" fontsize="10" label="boo" shape="box" style="filled" ]
+ "target:buz" [ fillcolor="#ffff99" fontname="Arial" fontsize="10" label="buz" shape="box" style="filled" ]
+ "target:foo" [ fillcolor="#ffff99" fontname="Arial" fontsize="10" label="foo" shape="box" style="filled" ]
+ "target:foo" -> "rule:foo:0"
+ "target:foo" -> "rule:foo:1"
+ "target:hiya" [ fillcolor="#ffff99" fontname="Arial" fontsize="10" label="hiya" shape="box" style="filled" ]
+ "target:howdy" [ fillcolor="#ffff99" fontname="Arial" fontsize="10" label="howdy" shape="box" style="filled" ]
+ "target:second" [ fillcolor="#ffff99" fontname="Arial" fontsize="10" label="second" shape="box" style="filled" ]
+ "target:second" -> "rule:any:0"
+}
+'

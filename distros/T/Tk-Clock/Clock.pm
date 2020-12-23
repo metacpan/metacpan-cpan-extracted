@@ -5,7 +5,7 @@ package Tk::Clock;
 use strict;
 use warnings;
 
-our $VERSION = "0.41";
+our $VERSION = "0.42";
 
 use Carp;
 
@@ -486,6 +486,12 @@ sub config {
 	}
     else {
 	croak "Bad hash";
+	}
+
+    # -anaScale -> anaScale
+    for (grep m/^-(\w+)$/ => keys %$conf) {
+	(my $attr = $_) =~ s/^-//;
+	$conf->{$attr} = delete $conf->{$_};
 	}
 
     my $data = $clock->privateData;

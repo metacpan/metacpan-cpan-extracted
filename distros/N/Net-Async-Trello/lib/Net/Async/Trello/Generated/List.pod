@@ -1,3 +1,5 @@
+=encoding utf8
+
 =for comment POD_DERIVED_INDEX_GENERATED
 The following documentation is automatically generated.  Please do not edit
 this file, but rather the original, inline with Net::Async::Trello::Generated::List
@@ -25,6 +27,26 @@ Provides an accessor for C<id>.
 =head2 name
 
 Provides an accessor for C<name>.
+
+=head2 id_board
+
+Provides an accessor for C<idBoard>.
+
+=head2 closed
+
+Provides an accessor for C<closed>.
+
+=head2 pos
+
+Provides an accessor for C<pos>.
+
+=head2 subscribed
+
+Provides an accessor for C<subscribed>.
+
+=head2 soft_limit
+
+Provides an accessor for C<softLimit>.
 
 =head2 cards
 

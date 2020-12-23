@@ -279,14 +279,9 @@ use strict;
 				olson_description => "South Australia",
 				timezone_name => "Australia/Adelaide",
 			},
-			"Tasmania (King Island)" => {
-				location_coords => "-3956+14352",
-				olson_description => "Tasmania (King Island)",
-				timezone_name => "Australia/Currie",
-			},
-			"Tasmania (most areas)" => {
+			Tasmania => {
 				location_coords => "-4253+14719",
-				olson_description => "Tasmania (most areas)",
+				olson_description => "Tasmania",
 				timezone_name => "Australia/Hobart",
 			},
 			Victoria => {
@@ -738,6 +733,16 @@ use strict;
 				olson_description => "MST - BC (Ft Nelson)",
 				timezone_name => "America/Fort_Nelson",
 			},
+			"MST - Yukon (east)" => {
+				location_coords => "+6043-13503",
+				olson_description => "MST - Yukon (east)",
+				timezone_name => "America/Whitehorse",
+			},
+			"MST - Yukon (west)" => {
+				location_coords => "+6404-13925",
+				olson_description => "MST - Yukon (west)",
+				timezone_name => "America/Dawson",
+			},
 			"Mountain - AB; BC (E); SK (W)" => {
 				location_coords => "+5333-11328",
 				olson_description => "Mountain - AB; BC (E); SK (W)",
@@ -767,16 +772,6 @@ use strict;
 				location_coords => "+4916-12307",
 				olson_description => "Pacific - BC (most areas)",
 				timezone_name => "America/Vancouver",
-			},
-			"Pacific - Yukon (east)" => {
-				location_coords => "+6043-13503",
-				olson_description => "Pacific - Yukon (east)",
-				timezone_name => "America/Whitehorse",
-			},
-			"Pacific - Yukon (west)" => {
-				location_coords => "+6404-13925",
-				olson_description => "Pacific - Yukon (west)",
-				timezone_name => "America/Dawson",
 			},
 		},
 	},
@@ -2685,6 +2680,11 @@ use strict;
 				olson_description => "MSK+00 - Moscow area",
 				timezone_name => "Europe/Moscow",
 			},
+			"MSK+00 - Volgograd" => {
+				location_coords => "+4844+04425",
+				olson_description => "MSK+00 - Volgograd",
+				timezone_name => "Europe/Volgograd",
+			},
 			"MSK+01 - Astrakhan" => {
 				location_coords => "+4621+04803",
 				olson_description => "MSK+01 - Astrakhan",
@@ -2704,11 +2704,6 @@ use strict;
 				location_coords => "+5420+04824",
 				olson_description => "MSK+01 - Ulyanovsk",
 				timezone_name => "Europe/Ulyanovsk",
-			},
-			"MSK+01 - Volgograd" => {
-				location_coords => "+4844+04425",
-				olson_description => "MSK+01 - Volgograd",
-				timezone_name => "Europe/Volgograd",
 			},
 			"MSK+02 - Urals" => {
 				location_coords => "+5651+06036",

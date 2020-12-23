@@ -81,7 +81,7 @@ extends 'Template::Provider';
 
 use Pandoc ();
 
-our $VERSION = '0.0.3';
+our $VERSION = '0.0.4';
 
 has pandoc => (
   isa => 'Pandoc',
@@ -155,7 +155,7 @@ around _template_content => sub {
     }
   }
 
-  if (!$done and exists $self->{EXTENSIONS}{'*'}) {
+  if (not $done and exists $self->{EXTENSIONS}{'*'}) {
     $data = $self->convert(
       $self->{EXTENSIONS}{'*'} => $self->{OUTPUT_FORMAT}, $data
     );

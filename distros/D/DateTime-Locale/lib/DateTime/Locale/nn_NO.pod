@@ -638,6 +638,26 @@ Yes
 
 1 (måndag)
 
+=head2 Strftime Patterns
+
+=head3 %c (%a %d. %b %Y kl. %H.%M %z) - date time format
+
+   2008-02-05T18:30:30 = ty. 05. feb. 2008 kl. 18.30 +0000
+   1995-12-22T09:05:02 = fr. 22. des. 1995 kl. 09.05 +0000
+  -0010-09-15T04:44:23 = la. 15. sep. -10 kl. 04.44 +0000
+
+=head3 %x (%d. %b %Y) - date format
+
+   2008-02-05T18:30:30 = 05. feb. 2008
+   1995-12-22T09:05:02 = 22. des. 1995
+  -0010-09-15T04:44:23 = 15. sep. -10
+
+=head3 %X (kl. %H.%M %z) - time format
+
+   2008-02-05T18:30:30 = kl. 18.30 +0000
+   1995-12-22T09:05:02 = kl. 09.05 +0000
+  -0010-09-15T04:44:23 = kl. 04.44 +0000
+
 =head1 SUPPORT
 
 See L<DateTime::Locale>.

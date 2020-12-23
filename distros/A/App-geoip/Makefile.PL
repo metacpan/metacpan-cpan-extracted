@@ -5,31 +5,58 @@ use ExtUtils::MakeMaker;
 
 -f "lib/App/geoip.pm" or system $^X, "./2lib";
 
+my $VERSION;
+open my $fh, "<", "geoip";
+while (<$fh>) {
+    m/VERSION\s*=\s*["']?([0-9.]+)/ or next;
+    $VERSION = $1;
+    last;
+    }
+close $fh;
+
 my %wmf = (
-    NAME               => "App::geoip",
-    DISTNAME           => "App-geoip",
-    ABSTRACT           => "Show geological data based on hostname or IP address(es)",
-    AUTHOR             => "H.Merijn Brand",
-    EXE_FILES          => [ "geoip" ],
-    VERSION_FROM       => "lib/App/geoip.pm",
-    MIN_PERL_VERSION   => "5.14.0",
-    PREREQ_PM          => {
-	"DBI"			=> 0,
-	"Socket"		=> 0,
-	"Net::CIDR"		=> 0,
-	"Data::Dumper"		=> 0,
-	"Math::Trig"		=> 0,
-	"LWP::Simple"		=> 0,
-	"Archive::Zip"		=> 0,
-	"Text::CSV_XS"		=> "1.39",
-	"JSON::PP"		=> 0,
-	"Pod::Usage"		=> 0,
-	"Getopt::Long"		=> 0,
+    NAME		=> "App::geoip",
+    DISTNAME		=> "App-geoip",
+    ABSTRACT		=> "Show geographical data based on hostname or IP address(es)",
+    AUTHOR		=> "H.Merijn Brand",
+    EXE_FILES		=> [ "geoip" ],
+    VERSION		=> $VERSION,
+    MIN_PERL_VERSION	=> "5.14.0",
+    PREREQ_PM		=> {
+	"DBI"		=> 0,
+	"Socket"	=> 0,
+	"Net::CIDR"	=> 0,
+	"Data::Dumper"	=> 0,
+	"Math::Trig"	=> 0,
+	"LWP::Simple"	=> 0,
+	"Archive::Zip"	=> 0,
+	"Text::CSV_XS"	=> "1.39",
+	"JSON::PP"	=> 0,
+	"Pod::Text"	=> 0,
+	"List::Util"	=> 0,
+	"Getopt::Long"	=> 0,
 	},
-    LICENSE            => "artistic_2",
-    CONFIGURE_REQUIRES => { "ExtUtils::MakeMaker" => 0 },
-    TEST_REQUIRES      => { "Test::More"          => 0 },
-    macro              => { TARFLAGS => "--format=ustar -c -v -f", },
+    LICENSE		=> "artistic_2",
+    CONFIGURE_REQUIRES	=> { "ExtUtils::MakeMaker" => 0 },
+    TEST_REQUIRES	=> { "Test::More"          => 0 },
+    macro		=> { TARFLAGS => "--format=ustar -c -v -f", },
+
+    META_MERGE			=> {
+	"meta-spec"		=> { version => 2 },
+	licence			=> "artistic_2",
+	resources		=> {
+	    type		=> "git",
+	    url			=> "git://github.com/Tux/GeoIP2.git",
+	    web			=> "https://github.com/Tux/GeoIP2",
+	    IRC			=> "irc://irc.perl.org/#csv",
+	    },
+	provides		=> {
+	    "App::geoip"	=> {
+		file		=> "geoip",
+		version		=> $VERSION,
+		},
+	    },
+	},
     );
 
 eval { ExtUtils::MakeMaker->VERSION (6.63_03) } or
@@ -63,9 +90,14 @@ my $rv = WriteMakefile (%wmf);
 package MY;
 
 sub postamble {
-    my $mpm = (-d ".git" && -x "2lib")
-        ? "lib/App/geoip.pm: geoip\n\tperl ./2lib\n"
-        : "";
+    my @mpm = (-d ".git" || -x "2lib")
+        ? ("", "lib/App/geoip.pm: geoip\n\t$^X ./2lib\n")
+        : ();
+    -d "xt" && ($ENV{AUTOMATED_TESTING} || 0) != 1 and
+	push @mpm =>
+	    '',
+	    'test ::',
+	    '	-@env TEST_FILES="xt/*.t" make -e test_dynamic';
     join "\n" =>
         'spellcheck:',
         '	pod-spell-check --aspell --ispell geoip',
@@ -95,8 +127,7 @@ sub postamble {
 	'	pod2man       < $? > $@',
 	'doc/geoip.man:	doc/geoip.3',
 	'	nroff -mandoc < $? > $@',
-	'',
-        $mpm;
+        @mpm;
     } # postamble
 
 1;

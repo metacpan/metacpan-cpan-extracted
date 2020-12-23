@@ -11,7 +11,7 @@ configure_requires:
   ExtUtils::MakeMaker: 6.59
 distribution_type: module
 dynamic_config: 1
-generated_by: 'Module::Install version 1.17'
+generated_by: 'Module::Install version 1.19'
 license: zlib
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -42,7 +42,9 @@ requires:
   XML::LibXML: 1.7
   perl: 5.8.0
 resources:
-  homepage: http://search.cpan.org/dist/RDF-Endpoint/
+  IRC: irc://irc.perl.org/#perlrdf
+  bugtracker: https://github.com/kasei/perlrdf/issues
+  homepage: https://metacpan.org/release/RDF-Endpoint/
   license: http://dev.perl.org/licenses/
-  repository: http://github.com/kasei/perlrdf/
-version: '0.10'
+  repository: https://github.com/kasei/perlrdf/
+version: '0.11'

@@ -632,6 +632,26 @@ Yes
 
 1 (Litinin)
 
+=head2 Strftime Patterns
+
+=head3 %c (ranar %A, %d ga %B cikin %r) - date time format
+
+   2008-02-05T18:30:30 = ranar Talata, 05 ga Faburairu cikin 06:30:30 YM
+   1995-12-22T09:05:02 = ranar Jummaʼa, 22 ga Disamba cikin 09:05:02 SF
+  -0010-09-15T04:44:23 = ranar Asabar, 15 ga Satumba cikin 04:44:23 SF
+
+=head3 %x (%d/%m/%y) - date format
+
+   2008-02-05T18:30:30 = 05/02/08
+   1995-12-22T09:05:02 = 22/12/95
+  -0010-09-15T04:44:23 = 15/09/10
+
+=head3 %X (%r) - time format
+
+   2008-02-05T18:30:30 = 06:30:30 YM
+   1995-12-22T09:05:02 = 09:05:02 SF
+  -0010-09-15T04:44:23 = 04:44:23 SF
+
 =head1 SUPPORT
 
 See L<DateTime::Locale>.

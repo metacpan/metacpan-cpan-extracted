@@ -8,7 +8,7 @@ use Indent;
 use Toolforge::MixNMatch::Print::User;
 use Toolforge::MixNMatch::Print::YearMonth;
 
-our $VERSION = 0.03;
+our $VERSION = 0.04;
 
 sub print {
 	my ($obj, $opts_hr) = @_;
@@ -181,6 +181,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.05
+0.04
 
 =cut

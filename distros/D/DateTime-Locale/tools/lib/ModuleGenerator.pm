@@ -398,6 +398,7 @@ sub _write_pod_files ($self) {
 
         my $locale = DateTime::Locale->load($code)
             or die "Cannot load $code";
+        $_->set_locale($locale) for @example_dts;
 
         my $name   = $locale->name;
         my $filled = $template->fill_in(

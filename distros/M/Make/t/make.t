@@ -86,6 +86,7 @@ my @SUBs  = (
     [ "\$(shell \"$^X\" -pe 1 \$(mktmp hi))", 'hi' ],
     [ '$(wildcard Chan* RE* NO*)',            'Changes README NOT' ],
     [ '$(addprefix x/,1 2)',                  'x/1 x/2' ],
+    [ '$(addsuffix /x,1 2)',                  '1/x 2/x' ],
     [ '$(notdir x/1 x/2)',                    '1 2' ],
     [ '$(dir x/1 y/2 3)',                     'x y ./' ],
     [ ' a ${dir $(call}',                     undef, qr/Syntax error/ ],

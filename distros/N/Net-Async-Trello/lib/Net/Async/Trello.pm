@@ -6,7 +6,7 @@ use warnings;
 
 use parent qw(IO::Async::Notifier);
 
-our $VERSION = '0.005';
+our $VERSION = '0.006';
 
 =head1 NAME
 
@@ -22,6 +22,8 @@ features.
 =cut
 
 no indirect;
+
+use overload '""' => sub { 'Net::Async::Trello' }, bool => sub { 1 }, fallback => 1;
 
 use Dir::Self;
 use curry;
@@ -49,6 +51,7 @@ use Net::Async::Trello::Organisation;
 use Net::Async::Trello::Member;
 use Net::Async::Trello::Board;
 use Net::Async::Trello::Card;
+use Net::Async::Trello::CardAction;
 use Net::Async::Trello::List;
 
 use Ryu::Async;
@@ -121,11 +124,29 @@ sub board {
     )
 }
 
+=head2 card
+
+Returns information about a specific card.
+
+Takes the following named parameters:
+
+=over 4
+
+=item * C<id> - the card ID to retrieve
+
+=back
+
+Resolves to a L<Net::Async::Trello::Card> instance.
+
+=cut
+
 sub card {
     my ($self, %args) = @_;
     my $id = delete $args{id};
+    my $uri = URI->new($self->base_uri . 'cards/' . $id);
+    $uri->query_param($_ => delete $args{$_}) for keys %args;
     $self->http_get(
-        uri => URI->new($self->base_uri . 'cards/' . $id)
+        uri => $uri,
     )->transform(
         done => sub {
             Net::Async::Trello::Card->new(
@@ -136,25 +157,93 @@ sub card {
     )
 }
 
+=head2 member
+
+Returns information about a specific person (board/card member).
+
+Takes the following named parameters:
+
+=over 4
+
+=item * C<id> - the ID to retrieve
+
+=back
+
+Resolves to a L<Net::Async::Trello::Member> instance.
+
+=cut
+
+sub member {
+    my ($self, %args) = @_;
+    my $id = delete $args{id};
+    $self->http_get(
+        uri => URI->new($self->base_uri . 'members/' . $id)
+    )->transform(
+        done => sub {
+            Net::Async::Trello::Member->new(
+                %{ $_[0] },
+                trello => $self,
+            )
+        }
+    )
+}
+
 =head2 search
 
-Performs a search.
+Performs a search for Trello objects by string, see L<https://developers.trello.com/reference/#search>
+for details on search options available.
+
+Example:
+   
+ my (%result) = await $trello->search(
+  card_fields => [ qw(name url dateLastActivity) ],
+  query       => 'Shopping List',
+ );
+ # print the url of the first card returned.
+ my $card = $result{cards}->[0];
+ # This should be a Net::Async::Trello::Card instance, so we have a ->url method:
+ printf "Card %s url\n", $card->url;
+
+Takes the arguments as shown in the Trello API documentation as named parameters.
+
+The only compulsory argument is C<query>, the text string to search for.
+
+Returns a L<Future> which resolves to a list of key-value pairs.
+The value will be an instance of the appropriate
+type, with the exception of C<options> which is a plain hashref.
 
 =cut
 
 sub search {
     my ($self, %args) = @_;
+    my $uri = $self->endpoint(
+        'search',
+    );
+    $uri->query_param($_ => $args{$_}) for keys %args;
+
     $self->http_get(
-        uri => $self->endpoint(
-            'search',
-            
-        ),
+        uri => $uri,
     )->transform(
         done => sub {
-            Net::Async::Trello::Card->new(
-                %{ $_[0] },
-                trello => $self,
-            )
+            my ($results) = @_;
+			my %types = (
+                options => delete($results->{options}),
+            );
+            for my $type (keys(%{$results})) {
+                # Drop the trailing `s` and hope that we don't run into English issues...
+                my $module_postfix = ucfirst($type =~ s{s$}{}r);
+
+                $types{$type} = [];
+                for my $item (@{$results->{$type}}) {
+                    my $class = 'Net::Async::Trello::' . $module_postfix;
+                    my $object = $class->new(
+                        trello => $self,
+                        %{$item},
+                    );
+                    push @{$types{$type}}, $object;
+                }
+            }
+            return %types;
         }
     )
 }
@@ -181,11 +270,12 @@ sub http {
         $self->add_child(
             my $ua = Net::Async::HTTP->new(
                 fail_on_error            => 1,
+                close_after_request      => 0,
                 max_connections_per_host => 2,
-                pipeline                 => 0,
+                pipeline                 => 1,
                 max_in_flight            => 4,
                 decode_content           => 1,
-                timeout                  => 30,
+                stall_timeout            => 15,
                 user_agent               => 'Mozilla/4.0 (perl; Net::Async::Trello; TEAM@cpan.org)',
             )
         );
@@ -261,7 +351,7 @@ sub http_get {
         return { } if $resp->code == 204;
         return { } if 3 == ($resp->code / 100);
         try {
-            return Future->done(decode_json_utf8($resp->decoded_content))
+            return Future->done(decode_json_utf8($resp->content))
         } catch {
             $log->errorf("JSON decoding error %s from HTTP response %s", $@, $resp->as_string("\n"));
             return Future->fail($@ => json => $resp);
@@ -298,7 +388,7 @@ sub http_post {
         return { } if $resp->code == 204;
         return { } if 3 == ($resp->code / 100);
         try {
-            return Future->done(decode_json_utf8($resp->decoded_content))
+            return Future->done(decode_json_utf8($resp->content))
         } catch {
             $log->errorf("JSON decoding error %s from HTTP response %s", $@, $resp->as_string("\n"));
             return Future->fail($@ => json => $resp);
@@ -335,7 +425,7 @@ sub http_put {
         return { } if $resp->code == 204;
         return { } if 3 == ($resp->code / 100);
         try {
-            return Future->done(decode_json_utf8($resp->decoded_content))
+            return Future->done(decode_json_utf8($resp->content))
         } catch {
             $log->errorf("JSON decoding error %s from HTTP response %s", $@, $resp->as_string("\n"));
             return Future->fail($@ => json => $resp);
@@ -396,7 +486,10 @@ sub api_get_list {
     ? $self->endpoint(
         $args{endpoint},
         %{$args{endpoint_args}}
-    ) : URI->new(
+    )
+    : ref($args{uri})
+    ? $args{uri}
+    : URI->new(
         $self->base_uri . $args{uri}
     );
 
@@ -568,11 +661,13 @@ sub oauth_request {
 
 1;
 
+__END__
+
 =head1 AUTHOR
 
-Tom Molesworth <TEAM@cpan.org>
+Tom Molesworth <TEAM@cpan.org> with contributions from C<@michaelmueller-binary>.
 
 =head1 LICENSE
 
-Copyright Tom Molesworth 2014-2017. Licensed under the same terms as Perl itself.
+Copyright Tom Molesworth 2014-2020. Licensed under the same terms as Perl itself.
 

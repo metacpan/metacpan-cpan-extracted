@@ -8,7 +8,7 @@ CtrlO::PDF - high level PDF creator
     use Text::Lorem;
 
     my $pdf = CtrlO::PDF->new(
-        logo        => "logo.png",
+        logo        => "sample/logo.png", # optional
         orientation => "portrait", # Default
         footer      => "My PDF document footer",
     );
@@ -45,6 +45,12 @@ CtrlO::PDF - high level PDF creator
     );
 
     my $file = $pdf->content;
+
+    # output the file
+    open my $pdf_out, '>', 'out.pdf';
+    binmode $pdf_out;
+    print $pdf_out $file;
+    close $pdf_out;
 
 # DESCRIPTION
 
@@ -136,16 +142,61 @@ default).
 
 The padding below the logo before the text. Defaults to 10 pixels.
 
+## y\_position
+
+Returns the current y position on the page. This value updates as the page is
+written to, and is the location that content will be positioned at the next
+write. Note that the value is measured from the bottom of the page.
+
+## set\_y\_position($pixels)
+
+Sets the current Y position. See _y\_position_.
+
+## move\_y\_position($pixels)
+
+Moves the current Y position, relative to its current value. Positive values
+will move the cursor up the page, negative values down. See _y\_position_.
+
 ## heading($text, %options)
 
 Add a heading. If called on a new page, will automatically move the cursor down
 to account for the heading's height (based on the assumption that one pixel
-equals one point). Options available are `size`, `topmargin` and
-`bottommargin`.
+equals one point). Options available are:
+
+    size _n_
+
+        `n` is the font size in points, **default 16**
+
+    indent _n_
+
+        `n` is the amount (in points) to indent the text, **default 0**
+
+    topmargin _n_
+
+        `n` is the amount (in points) of vertical skip for the margin 
+        _above_ the heading, **default 0**
+
+    bottommargin _n_
+
+        `n` is the amount (in points) of vertical skip for the margin 
+        _below_ the heading, **default 10**
 
 ## text($text, %options)
 
-Add paragraph text. This will automatically paginate. Options available are `color`.
+Add paragraph text. This will automatically paginate. Options available are:
+
+    size _n_
+
+        `n` is the font size in points, **default 10**
+
+    indent _n_
+
+        `n` is the amount (in points) to indent the paragraph first line, 
+        **default 0**
+
+    color _name_
+
+        `name` is the string giving the text color, **default 'black'**
 
 ## table(%options)
 
@@ -155,7 +206,11 @@ PDF::Table.
 
 ## image($file, %options)
 
-Add an image. Options available are `scaling`.
+Add an image. Options available are:
+
+    scaling _n_
+
+        `n` is the scaling factor for the image, **default 0.5** (50%)
 
 ## content
 
@@ -163,10 +218,10 @@ Return the PDF content.
 
 # LICENSE AND COPYRIGHT
 
-Copyright 2018 Ctrl O Ltd
+Copyright 2018-2020 Ctrl O Ltd
 
 This program is free software; you can redistribute it and/or modify it under
-the terms of either: the GNU General Public License as published by the Free
-Software Foundation; or the Artistic License.
+the terms of either: the GNU General Public License (GPL) as published by the 
+Free Software Foundation; or the Perl Artistic License (PAL).
 
 See http://dev.perl.org/licenses/ for more information.

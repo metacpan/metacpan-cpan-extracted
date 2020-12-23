@@ -9,7 +9,7 @@ configure_requires:
   ExtUtils::MakeMaker: 6.36
 distribution_type: module
 dynamic_config: 1
-generated_by: 'Module::Install version 1.16'
+generated_by: 'Module::Install version 1.19'
 license: lgpl_2_1
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -26,12 +26,13 @@ requires:
   JSON: 0
   JSON::XS: 0
   Message::Passing: '0.009'
-  Moose: 0
+  Moo: 2.004004
   Task::Weaken: 0
   Try::Tiny: 0
+  Types::Standard: 1.012
   namespace::autoclean: 0
 resources:
   license: http://opensource.org/licenses/lgpl-license.php
   repository: git://github.com/suretec/Message-Passing-AMQP.git
-version: '0.007'
+version: '0.008'
 x_authority: cpan:GHENRY

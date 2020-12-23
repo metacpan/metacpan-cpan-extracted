@@ -620,6 +620,26 @@ No
 
 1 (Palichimo)
 
+=head2 Strftime Patterns
+
+=head3 %c (%a %d %b %Y %R) - date time format
+
+   2008-02-05T18:30:30 = Palichibuli 05 Feb 2008 18:30
+   1995-12-22T09:05:02 = Palichisano 22 Dis 1995 09:05
+  -0010-09-15T04:44:23 = Pachibelushi 15 Sep -10 04:44
+
+=head3 %x (%m/%d/%Y) - date format
+
+   2008-02-05T18:30:30 = 02/05/2008
+   1995-12-22T09:05:02 = 12/22/1995
+  -0010-09-15T04:44:23 = 09/15/-10
+
+=head3 %X (%T) - time format
+
+   2008-02-05T18:30:30 = 18:30:30
+   1995-12-22T09:05:02 = 09:05:02
+  -0010-09-15T04:44:23 = 04:44:23
+
 =head1 SUPPORT
 
 See L<DateTime::Locale>.

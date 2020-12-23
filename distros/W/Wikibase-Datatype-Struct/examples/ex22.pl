@@ -3,16 +3,29 @@
 use strict;
 use warnings;
 
-use Wikibase::Datatype::Struct::Value::String qw(struct2obj);
+use Wikibase::Datatype::Struct::Value::Time qw(struct2obj);
 
-# String structure.
+# Time structure.
 my $struct_hr = {
-        'type' => 'string',
-        'value' => 'foo',
+        'type' => 'time',
+        'value' => {
+                'after' => 0,
+                'before' => 0,
+                'calendarmodel' => 'http://test.wikidata.org/entity/Q1985727',
+                'precision' => 10,
+                'time' => '+2020-09-01T00:00:00Z',
+                'timezone' => 0,
+        },
 };
 
 # Get object.
 my $obj = struct2obj($struct_hr);
+
+# Get calendar model.
+my $calendarmodel = $obj->calendarmodel;
+
+# Get precision.
+my $precision = $obj->precision;
 
 # Get type.
 my $type = $obj->type;
@@ -21,9 +34,13 @@ my $type = $obj->type;
 my $value = $obj->value;
 
 # Print out.
+print "Calendar model: $calendarmodel\n";
+print "Precision: $precision\n";
 print "Type: $type\n";
 print "Value: $value\n";
 
 # Output:
-# Type: string
-# Value: foo
+# Calendar model: Q1985727
+# Precision: 10
+# Type: time
+# Value: +2020-09-01T00:00:00Z

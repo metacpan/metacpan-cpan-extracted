@@ -14,16 +14,16 @@ name: Tie-Hash-DBD
 provides: 
   Tie::Array::DBD: 
     file: lib/Tie/Array/DBD.pm
-    version: '0.21'
+    version: '0.22'
   Tie::Hash::DBD: 
     file: lib/Tie/Hash/DBD.pm
-    version: '0.21'
+    version: '0.22'
 recommends: 
-  DBD::CSV: '0.54'
-  DBD::Pg: v3.10.5
-  DBD::SQLite: '1.64'
+  DBD::CSV: '0.57'
+  DBD::Pg: v3.14.2
+  DBD::SQLite: '1.66'
   DBI: '1.643'
-  Test::More: '1.302174'
+  Test::More: '1.302183'
 requires: 
   Carp: 0
   DBI: '1.613'
@@ -33,6 +33,7 @@ requires:
   Time::HiRes: 0
   perl: '5.008003'
 resources: 
+  bugtracker: https://github.com/Tux/Tie-Hash-DBD/issues
   license: http://dev.perl.org/licenses/
   repository: https://github.com/Tux/Tie-Hash-DBD
-version: '0.21'
+version: '0.22'

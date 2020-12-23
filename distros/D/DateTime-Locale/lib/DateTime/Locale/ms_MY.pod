@@ -620,6 +620,26 @@ No
 
 1 (Isnin)
 
+=head2 Strftime Patterns
+
+=head3 %c (%A %d %b %Y %I:%M:%S %p) - date time format
+
+   2008-02-05T18:30:30 = Selasa 05 Feb 2008 06:30:30 PTG
+   1995-12-22T09:05:02 = Jumaat 22 Dis 1995 09:05:02 PG
+  -0010-09-15T04:44:23 = Sabtu 15 Sep -10 04:44:23 PG
+
+=head3 %x (%A %d %b %Y) - date format
+
+   2008-02-05T18:30:30 = Selasa 05 Feb 2008
+   1995-12-22T09:05:02 = Jumaat 22 Dis 1995
+  -0010-09-15T04:44:23 = Sabtu 15 Sep -10
+
+=head3 %X (%I:%M:%S %p %Z) - time format
+
+   2008-02-05T18:30:30 = 06:30:30 PTG UTC
+   1995-12-22T09:05:02 = 09:05:02 PG UTC
+  -0010-09-15T04:44:23 = 04:44:23 PG UTC
+
 =head1 SUPPORT
 
 See L<DateTime::Locale>.

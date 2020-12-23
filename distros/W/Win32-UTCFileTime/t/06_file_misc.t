@@ -7,7 +7,7 @@
 #   Test script to check getting miscellaneous file information.
 #
 # COPYRIGHT
-#   Copyright (C) 2003-2005, 2014 Steve Hay.  All rights reserved.
+#   Copyright (C) 2003-2005, 2014, 2020 Steve Hay.  All rights reserved.
 #
 # LICENCE
 #   This script is free software; you can redistribute it and/or modify it under
@@ -49,10 +49,16 @@ MAIN: {
     @astats = Win32::UTCFileTime::alt_stat($file);
 
     is($rstats[0], $cstats[0], "stat() gets 'dev' field OK");
-    is($astats[0], $cstats[0], "alt_stat() gets 'dev' field OK");
+    SKIP: {
+        skip "Built-in stat() was rewritten in v5.33.5", 1 if $] >= 5.033005;
+        is($astats[0], $cstats[0], "alt_stat() gets 'dev' field OK");
+    }
 
     is($rstats[1], $cstats[1], "stat() gets 'ino' field OK");
-    is($astats[1], $cstats[1], "alt_stat() gets 'ino' field OK");
+    SKIP: {
+        skip "Built-in stat() was rewritten in v5.33.5", 1 if $] >= 5.033005;
+        is($astats[1], $cstats[1], "alt_stat() gets 'ino' field OK");
+    }
 
     is($rstats[3], $cstats[3], "stat() gets 'nlink' field OK");
     is($astats[3], $cstats[3], "alt_stat() gets 'nlink' field OK");
@@ -64,7 +70,10 @@ MAIN: {
     is($astats[5], $cstats[5], "alt_stat() gets 'gid' field OK");
 
     is($rstats[6], $cstats[6], "stat() gets 'rdev' field OK");
-    is($astats[6], $cstats[6], "alt_stat() gets 'rdev' field OK");
+    SKIP: {
+        skip "Built-in stat() was rewritten in v5.33.5", 1 if $] >= 5.033005;
+        is($astats[6], $cstats[6], "alt_stat() gets 'rdev' field OK");
+    }
 
     is($rstats[7], $cstats[7], "stat() gets 'size' field OK");
     is($astats[7], $cstats[7], "alt_stat() gets 'size' field OK");

@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Chromatic and diatonic melodic ornamentation
 
-our $VERSION = '0.0400';
+our $VERSION = '0.0401';
 
 use Data::Dumper::Compact qw(ddc);
 use List::SomeUtils qw(first_index);
@@ -136,6 +136,7 @@ sub trill {
     my @trill;
 
     push @trill, [$z, $pitch], [$z, $alt] for 1 .. $number;
+    print 'Trill: ', ddc(\@trill) if $self->verbose;
 
     return \@trill;
 }
@@ -190,7 +191,7 @@ Music::MelodicDevice::Ornamentation - Chromatic and diatonic melodic ornamentati
 
 =head1 VERSION
 
-version 0.0400
+version 0.0401
 
 =head1 SYNOPSIS
 
@@ -213,6 +214,13 @@ version 0.0400
 
 C<Music::MelodicDevice::Ornamentation> provides chromatic and diatonic
 musical melodic ornamentation methods.
+
+Each returns a note-set specification.  This specification is a list
+of two part array-references: a B<duration> and a B<pitch>.  The list
+B<duration> component is a division of the given duration argument,
+and is based on the arithmetic of each ornament.  The list B<pitch>
+varies around the given pitch argument by the given offset, and also
+depends on the particular ornament re-phrasing.
 
 =head1 ATTRIBUTES
 

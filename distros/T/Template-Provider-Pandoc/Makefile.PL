@@ -22,6 +22,9 @@ WriteMakefile(
         url  => 'https://github.com/davorg/template-provider-pandoc.git',
         web  => 'https://github.com/davorg/template-provider-pandoc',
       },
+      bugtracker => {
+        web  => 'https://github.com/davorg/template-provider-pandoc/issues',
+      },
     },
   }
 );

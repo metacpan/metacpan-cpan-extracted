@@ -1,6 +1,6 @@
 package Mojolicious::Plugin::AssetPack::Che;
 use Mojo::Base 'Mojolicious::Plugin::AssetPack';
-use Mojolicious::Plugin::AssetPack::Util qw( checksum );
+use Mojolicious::Plugin::AssetPack::Util qw( DEBUG diag checksum );#
 use Mojo::URL;
 
 has [qw(app config)];
@@ -44,7 +44,7 @@ sub process {
       next;
     }
     my $asset = Scalar::Util::blessed($url) ? $url : $self->store->asset($url);
-    die qq(Could not find input asset "$url".) unless Scalar::Util::blessed($asset);
+    die qq(Could not find input asset "$url" .) unless Scalar::Util::blessed($asset);
     push @$assets, $asset;
   }
  
@@ -64,6 +64,7 @@ sub serve_cb {
       my $checksum_gzip = checksum($asset->url.$self->revision.'.gzip');
       $asset = $self->{by_checksum}{$checksum_gzip}
         and $c->res->headers->content_encoding('gzip')
+        and (DEBUG ?  diag("Sent GZIPed topic [%s]", $asset->url) : 1)#$self->minify ? $self->app->log->info('') : 
         and $self->store->serve_asset($c, $asset)
         and return $c->rendered;
     }
@@ -99,11 +100,11 @@ Since version 1.28.
 
 =head1 VERSION
 
-Version 2.091 (test on base Mojolicious::Plugin::AssetPack v2.09)
+Version 2.102 (test on base Mojolicious::Plugin::AssetPack v2.10)
 
 =cut
 
-our $VERSION = '2.091';
+our $VERSION = '2.102';
 
 
 =head1 SYNOPSIS
@@ -139,7 +140,7 @@ Please report any bugs or feature requests at L<https://github.com/mche/Mojolici
 
 =head1 COPYRIGHT
 
-Copyright 2016+ Mikhail Che.
+Copyright 2016-2020 Mikhail Che.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

@@ -15,7 +15,7 @@ author_requires 'Test::Pod' => 0;
 author_requires 'Test::Pod::Coverage' => 0;
 license 'bsd';
 name 'Toolforge-MixNMatch-Print';
-perl_version 5.006002;
+perl_version 5.010;
 readme_from 'Print.pm';
 recursive_author_tests('xt');
 requires 'Error::Pure' => 0;
@@ -29,7 +29,7 @@ test_requires 'Test::More' => 0;
 test_requires 'Test::NoWarnings' => 0;
 test_requires 'Toolforge::MixNMatch::Object' => 0;
 tests_recursive;
-version '0.03';
+version '0.04';
 
 # Run.
 WriteAll();

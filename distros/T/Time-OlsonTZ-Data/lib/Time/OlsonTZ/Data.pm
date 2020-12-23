@@ -37,7 +37,7 @@ package Time::OlsonTZ::Data;
 use warnings;
 use strict;
 
-our $VERSION = "0.202004";
+our $VERSION = "0.202005";
 
 use parent "Exporter";
 our @EXPORT_OK = qw(
@@ -77,7 +77,7 @@ retain this format in the future.
 
 =cut
 
-use constant olson_version => "2020d";
+use constant olson_version => "2020e";
 
 =item olson_code_version
 
@@ -89,7 +89,7 @@ piece of information.
 
 =cut
 
-use constant olson_code_version => "2020d";
+use constant olson_code_version => "2020e";
 
 =item olson_data_version
 
@@ -101,7 +101,7 @@ piece of information.
 
 =cut
 
-use constant olson_data_version => "2020d";
+use constant olson_data_version => "2020e";
 
 =back
 
@@ -186,21 +186,21 @@ my $cn = q(+{ map { ($_ => undef) } qw(
 	Atlantic/Bermuda Atlantic/Canary Atlantic/Cape_Verde Atlantic/Faroe
 	Atlantic/Madeira Atlantic/Reykjavik Atlantic/South_Georgia
 	Atlantic/Stanley Australia/Adelaide Australia/Brisbane
-	Australia/Broken_Hill Australia/Currie Australia/Darwin Australia/Eucla
-	Australia/Hobart Australia/Lindeman Australia/Lord_Howe
-	Australia/Melbourne Australia/Perth Australia/Sydney CET CST6CDT EET EST
-	EST5EDT Etc/GMT Etc/GMT+1 Etc/GMT+10 Etc/GMT+11 Etc/GMT+12 Etc/GMT+2
-	Etc/GMT+3 Etc/GMT+4 Etc/GMT+5 Etc/GMT+6 Etc/GMT+7 Etc/GMT+8 Etc/GMT+9
-	Etc/GMT-1 Etc/GMT-10 Etc/GMT-11 Etc/GMT-12 Etc/GMT-13 Etc/GMT-14
-	Etc/GMT-2 Etc/GMT-3 Etc/GMT-4 Etc/GMT-5 Etc/GMT-6 Etc/GMT-7 Etc/GMT-8
-	Etc/GMT-9 Etc/UTC Europe/Amsterdam Europe/Andorra Europe/Astrakhan
-	Europe/Athens Europe/Belgrade Europe/Berlin Europe/Brussels
-	Europe/Bucharest Europe/Budapest Europe/Chisinau Europe/Copenhagen
-	Europe/Dublin Europe/Gibraltar Europe/Helsinki Europe/Istanbul
-	Europe/Kaliningrad Europe/Kiev Europe/Kirov Europe/Lisbon Europe/London
-	Europe/Luxembourg Europe/Madrid Europe/Malta Europe/Minsk Europe/Monaco
-	Europe/Moscow Europe/Oslo Europe/Paris Europe/Prague Europe/Riga
-	Europe/Rome Europe/Samara Europe/Saratov Europe/Simferopol Europe/Sofia
+	Australia/Broken_Hill Australia/Darwin Australia/Eucla Australia/Hobart
+	Australia/Lindeman Australia/Lord_Howe Australia/Melbourne
+	Australia/Perth Australia/Sydney CET CST6CDT EET EST EST5EDT Etc/GMT
+	Etc/GMT+1 Etc/GMT+10 Etc/GMT+11 Etc/GMT+12 Etc/GMT+2 Etc/GMT+3 Etc/GMT+4
+	Etc/GMT+5 Etc/GMT+6 Etc/GMT+7 Etc/GMT+8 Etc/GMT+9 Etc/GMT-1 Etc/GMT-10
+	Etc/GMT-11 Etc/GMT-12 Etc/GMT-13 Etc/GMT-14 Etc/GMT-2 Etc/GMT-3
+	Etc/GMT-4 Etc/GMT-5 Etc/GMT-6 Etc/GMT-7 Etc/GMT-8 Etc/GMT-9 Etc/UTC
+	Europe/Amsterdam Europe/Andorra Europe/Astrakhan Europe/Athens
+	Europe/Belgrade Europe/Berlin Europe/Brussels Europe/Bucharest
+	Europe/Budapest Europe/Chisinau Europe/Copenhagen Europe/Dublin
+	Europe/Gibraltar Europe/Helsinki Europe/Istanbul Europe/Kaliningrad
+	Europe/Kiev Europe/Kirov Europe/Lisbon Europe/London Europe/Luxembourg
+	Europe/Madrid Europe/Malta Europe/Minsk Europe/Monaco Europe/Moscow
+	Europe/Oslo Europe/Paris Europe/Prague Europe/Riga Europe/Rome
+	Europe/Samara Europe/Saratov Europe/Simferopol Europe/Sofia
 	Europe/Stockholm Europe/Tallinn Europe/Tirane Europe/Ulyanovsk
 	Europe/Uzhgorod Europe/Vienna Europe/Vilnius Europe/Volgograd
 	Europe/Warsaw Europe/Zaporozhye Europe/Zurich Factory HST Indian/Chagos
@@ -367,6 +367,7 @@ my $li = q(+{
 	"Atlantic/St_Helena" => "Africa/Abidjan",
 	"Australia/ACT" => "Australia/Sydney",
 	"Australia/Canberra" => "Australia/Sydney",
+	"Australia/Currie" => "Australia/Hobart",
 	"Australia/LHI" => "Australia/Lord_Howe",
 	"Australia/NSW" => "Australia/Sydney",
 	"Australia/North" => "Australia/Darwin",

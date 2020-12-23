@@ -3,7 +3,7 @@ package Make::Functions;
 use strict;
 use warnings;
 
-our $VERSION = '2.010';
+our $VERSION = '2.011';
 
 my @temp_handles;    # so they don't get destroyed before end of program
 
@@ -25,6 +25,13 @@ sub addprefix {
     my ( $fsmap, $prefix, $text_input ) = @_;
     ## no critic (BuiltinFunctions::RequireBlockMap)
     return map $prefix . $_, @{ Make::tokenize($text_input) };
+    ## use critic
+}
+
+sub addsuffix {
+    my ( $fsmap, $suffix, $text_input ) = @_;
+    ## no critic (BuiltinFunctions::RequireBlockMap)
+    return map $_ . $suffix, @{ Make::tokenize($text_input) };
     ## use critic
 }
 
@@ -104,6 +111,13 @@ Prefixes each word in the second arg with first arg:
 
     $(addprefix x/,1 2)
     # becomes x/1 x/2
+
+=head2 addsuffix
+
+Suffixes each word in the second arg with first arg:
+
+    $(addprefix /x,1 2)
+    # becomes 1/x 2/x
 
 =head2 notdir
 

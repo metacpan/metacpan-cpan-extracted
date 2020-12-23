@@ -1,3 +1,6 @@
+0.08 2020-12-22
+ - Support for GitLab repositories call (PR #18, waterkip)
+
 0.07 2020-03-10
  - Implement result pagination for all calls (osoriano)
  - use Test::Lib in tests (waterkip) 

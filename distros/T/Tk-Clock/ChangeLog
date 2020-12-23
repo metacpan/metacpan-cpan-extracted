@@ -1,3 +1,7 @@
+0.42	- 23 Dec 2020, H.Merijn Brand
+    * Ignore leading dash in config
+    * Fix META issue for bugtracker
+
 0.41	- 09 Apr 2020, H.Merijn Brand
     * It's 2017
     * It's 2018

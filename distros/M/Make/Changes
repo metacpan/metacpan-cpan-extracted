@@ -1,3 +1,6 @@
+2.011 2020-12-23
+- add_suffix function - thanks @jwrightecs
+
 2.010 2020-12-06
 - as_graph(no_rules) uses multiedged to store recipes in edges, redundancy function uses
 

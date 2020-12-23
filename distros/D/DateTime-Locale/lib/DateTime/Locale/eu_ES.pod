@@ -638,6 +638,26 @@ Yes
 
 1 (astelehena)
 
+=head2 Strftime Patterns
+
+=head3 %c (%y-%m-%d %T) - date time format
+
+   2008-02-05T18:30:30 = 08-02-05 18:30:30
+   1995-12-22T09:05:02 = 95-12-22 09:05:02
+  -0010-09-15T04:44:23 = 10-09-15 04:44:23
+
+=head3 %x (%a, %Y.eko %bren %da) - date format
+
+   2008-02-05T18:30:30 = ar., 2008.eko ots.ren 05a
+   1995-12-22T09:05:02 = or., 1995.eko abe.ren 22a
+  -0010-09-15T04:44:23 = lr., -10.eko ira.ren 15a
+
+=head3 %X (%T) - time format
+
+   2008-02-05T18:30:30 = 18:30:30
+   1995-12-22T09:05:02 = 09:05:02
+  -0010-09-15T04:44:23 = 04:44:23
+
 =head1 SUPPORT
 
 See L<DateTime::Locale>.

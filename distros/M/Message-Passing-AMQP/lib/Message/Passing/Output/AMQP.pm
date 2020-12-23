@@ -1,5 +1,6 @@
 package Message::Passing::Output::AMQP;
-use Moose;
+use Moo;
+use Types::Standard qw( Str CodeRef );
 use namespace::autoclean;
 
 with qw/
@@ -8,18 +9,18 @@ with qw/
 /;
 
 has routing_key => (
-    isa => 'Str',
+    isa => Str,
     is => 'ro',
     default => '',
 );
 
 has header_cb => (
-    isa => 'CodeRef',
+    isa => CodeRef,
     is => 'ro',
 );
 
 has serialize_cb => (
-    isa => 'CodeRef',
+    isa => CodeRef,
     is => 'ro',
 );
 
@@ -49,7 +50,6 @@ sub consume {
     );
 }
 
-__PACKAGE__->meta->make_immutable;
 1;
 
 =head1 NAME

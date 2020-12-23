@@ -638,6 +638,26 @@ No
 
 7 (Sunday)
 
+=head2 Strftime Patterns
+
+=head3 %c (%A, %B %d, %Y %p%I:%M:%S) - date time format
+
+   2008-02-05T18:30:30 = Tuesday, February 05, 2008 pm06:30:30
+   1995-12-22T09:05:02 = Friday, December 22, 1995 am09:05:02
+  -0010-09-15T04:44:23 = Saturday, September 15, -10 am04:44:23
+
+=head3 %x (%A, %B %d, %Y) - date format
+
+   2008-02-05T18:30:30 = Tuesday, February 05, 2008
+   1995-12-22T09:05:02 = Friday, December 22, 1995
+  -0010-09-15T04:44:23 = Saturday, September 15, -10
+
+=head3 %X (%I:%M:%S %p %Z) - time format
+
+   2008-02-05T18:30:30 = 06:30:30 pm UTC
+   1995-12-22T09:05:02 = 09:05:02 am UTC
+  -0010-09-15T04:44:23 = 04:44:23 am UTC
+
 =head1 SUPPORT
 
 See L<DateTime::Locale>.

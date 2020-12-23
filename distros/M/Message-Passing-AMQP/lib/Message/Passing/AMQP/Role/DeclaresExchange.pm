@@ -1,6 +1,6 @@
 package Message::Passing::AMQP::Role::DeclaresExchange;
-use Moose::Role;
-use Moose::Util::TypeConstraints;
+use Moo::Role;
+use Types::Standard qw( Bool Str Enum );
 use Scalar::Util qw/ weaken /;
 use namespace::autoclean;
 
@@ -9,24 +9,24 @@ with 'Message::Passing::AMQP::Role::HasAChannel';
 has exchange_name => (
     is => 'ro',
     required => 1,
-    isa => 'Str',
+    isa => Str,
 );
 
 has exchange_type => (
     is => 'ro',
-    isa => enum([qw/ topic direct fanout headers /]),
+    isa => Enum([qw( topic direct fanout headers )]),
     default => 'topic',
 );
 
 has exchange_durable => (
     is => 'ro',
-    isa => 'Bool',
+    isa => Bool,
     default => 1,
 );
 
 has exchange_auto_delete => (
     is => 'ro',
-    isa => 'Bool',
+    isa => Bool,
     default => 0,
 );
 

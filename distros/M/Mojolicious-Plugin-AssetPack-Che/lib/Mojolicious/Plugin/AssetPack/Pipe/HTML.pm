@@ -1,6 +1,6 @@
 package Mojolicious::Plugin::AssetPack::Pipe::HTML;
 use Mojo::Base 'Mojolicious::Plugin::AssetPack::Pipe';
-use Mojolicious::Plugin::AssetPack::Util qw(diag load_module DEBUG);
+use Mojolicious::Plugin::AssetPack::Util qw(diag DEBUG);
 use HTML::Packer;
 
 my $packer = HTML::Packer->init();
@@ -12,9 +12,9 @@ sub process {
   my ($self, $assets) = @_;
   my $store = $self->assetpack->store;
   
-  return unless $self->assetpack->minify;
+  return unless $self->assetpack->minify;# skip development
   
-  my $file;
+  my $content;
   return $assets->each(
     sub {
       my ($asset, $index) = @_;
@@ -22,16 +22,16 @@ sub process {
       $attrs->{key}      = 'html-min';
       $attrs->{minified} = 1;
       
-      #~ warn "Process HTML, attrs: ", $self->assetpack->app->dumper($attrs);
+      #~ 
       
       return
        if $asset->format ne 'html' || $asset->minified;
-
-      ($file = $store->load($attrs)) && return $asset->content($file)->minified(1);
-      length(my $content = $asset->content) || return;
-      
-      #~ load_module 'HTML::Packer'
-        #~ || die qq(Could not load "HTML::Packer": $@);
+       
+      DEBUG && diag "Process HTML: [%s]", $asset->url;#$self->assetpack->app->dumper($asset)
+       
+      ($content = $store->load($attrs)) && return $asset->content($content)->minified(1);
+      length($content = $asset->content) || return;
+        
       DEBUG && diag "Minify asset=[%s] with checksum=[%s] and minify_opts=[@{[ %{$self->minify_opts} ]}]", $asset->url, $asset->checksum, ;
       $packer->minify(\$content, $self->minify_opts);
       $asset->content($store->save(\$content, $attrs))->minified(1);

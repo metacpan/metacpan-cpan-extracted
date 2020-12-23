@@ -1,9 +1,9 @@
 package Module::List::Wildcard::Patch::Hide;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-02-13'; # DATE
+our $DATE = '2020-09-21'; # DATE
 our $DIST = 'Module-List-Wildcard-Patch-Hide'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 use 5.010001;
 use strict;
@@ -67,7 +67,7 @@ Module::List::Wildcard::Patch::Hide - Hide some modules from Module::List::Wildc
 
 =head1 VERSION
 
-This document describes version 0.001 of Module::List::Wildcard::Patch::Hide (from Perl distribution Module-List-Wildcard-Patch-Hide), released on 2020-02-13.
+This document describes version 0.002 of Module::List::Wildcard::Patch::Hide (from Perl distribution Module-List-Wildcard-Patch-Hide), released on 2020-09-21.
 
 =head1 SYNOPSIS
 
@@ -125,7 +125,8 @@ L<Module::Patch>
 
 L<Module::List::Wildcard>
 
-L<Module::List::Patch::Hide>, L<Module::List::Tiny::Patch::Hide>
+L<Module::List::Patch::Hide>, L<Module::List::Tiny::Patch::Hide>,
+L<Module::List::More::Patch::Hide>
 
 L<Module::Path::Patch::Hide>, L<Module::Path::More::Patch::Hide>.
 

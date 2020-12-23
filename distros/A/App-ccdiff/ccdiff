@@ -5,11 +5,11 @@ package App::ccdiff;
 use 5.014000;
 use warnings;
 use charnames ();
-use Algorithm::Diff;
+use List::Util      qw( first  max     );
 use Term::ANSIColor qw(:constants color);
 use Getopt::Long    qw(:config bundling);
 
-our $VERSION = "0.28";
+our $VERSION = "0.30";
 our $CMD     = $0 =~ s{.*/}{}r;
 
 sub usage {
@@ -43,6 +43,7 @@ sub usage {
     say "         --bg=white     Background color for colored indicators";
     say "   -p    --pink         Shortcut for --old=magenta";
     say "   -r    --reverse      Reverse/invert the colors of the indicators";
+    say "   -s    --swap         Swap old/new color indicators";
     say "         --settings     Show default settings (after reading rc)";
     exit $err;
     } # usage
@@ -59,13 +60,14 @@ my %rc = (
     chr_old	=> "\x{25bc}",
     ellipsis	=> 0,
     emacs	=> 0,
-    header	=> 1,
+    header	=> 1,	# A color name is allowed
     heuristics	=> 0,
     index	=> 0,
     markers	=> 0,
     new		=> "green",
     old		=> "red",
     reverse	=> 0,
+    swap	=> 0,
     threshold	=> 2,
     utf8	=> 0,
     verbose	=> "cyan",
@@ -83,6 +85,7 @@ my $opt_i;
 my $opt_I = $rc{index};
 my $opt_m = $rc{markers};
 my $opt_r = $rc{reverse};
+my $opt_s = $rc{swap};
 my $opt_t = $rc{threshold};
 my $opt_e = $rc{ellipsis};
 my $opt_u = $rc{unified};
@@ -94,19 +97,25 @@ my $emacs     = $rc{emacs};
 my $old_color = $rc{old};
 my $new_color = $rc{new};
 my $rev_color = $rc{bg};
+my $cli_color = $ENV{CLICOLOR};	# https://bixense.com/clicolors/
 my $no_colors = $ENV{NO_COLOR}; # https://no-color.org
 my $list_colors;
+
+if ($no_colors) {
+    $ENV{CLICOLOR_FORCE}	and $no_colors = 0;
+    }
+elsif (defined $cli_color) {
+    # true $cli_color is the default for ccdiff
+    !$cli_color || !-t		and $no_colors = 1;
+    }
 
 unless (caller) {
     $ENV{CCDIFF_OPTIONS} and unshift @ARGV, split m/\s+/ => $ENV{CCDIFF_OPTIONS};
     GetOptions (
 	"help|?"	=> sub { usage (0); },
 	"V|version"	=> sub { say "$CMD [$VERSION]"; exit 0; },
-	  "man"		=> sub { exec "pod2man $0 | nroff -man"; },
-	  "info"	=> sub { require Pod::Usage;
-				 Pod::Usage::pod2usage (VERBOSE => 2);
-				 exit;
-				 },
+	  "man"		=> sub { pod_nroff (); },
+	  "info"	=> sub { pod_text  (); },
 
 	"U|utf-8!"		=> \$opt_U,
 
@@ -115,6 +124,7 @@ unless (caller) {
 	"I|idx|index:-1"	=> \$opt_I,
 	"t|threshold=i"		=> \$opt_t,
 	"H|header!"		=> \$opt_H,
+	  "HC|header-color=s"	=> \$opt_H,
 	"h|heuristics=i"	=> \$opt_h,
 	"e|ellipsis=i"		=> \$opt_e,
 	  "emacs!"		=> \$emacs,
@@ -122,6 +132,7 @@ unless (caller) {
 	"a|ascii"		=> sub { $opt_a ^= 1 },
 	"m|markers"		=> sub { $opt_m ^= 1 },
 	"r|reverse|invert"	=> sub { $opt_r ^= 1 },
+	"s|swap!"		=> sub { $opt_s ^= 1 },
 
 	"i|ignore-case!"			=> \$opt_i,
 	"w|ignore-all-space!"			=> \$opt_w,
@@ -149,6 +160,28 @@ unless (caller) {
 $opt_w      and $opt_b = $opt_Z = $opt_E = $opt_B = 1;
 $opt_h >= 1 and $opt_h /= 100;
 
+sub pod_text {
+    require Pod::Text::Color;
+    my $m = $no_colors ? "Pod::Text" : "Pod::Text::Color";
+    my $p = $m->new ();
+    open my $fh, ">", \my $out;
+    $p->parse_from_file ($0, $fh);
+    close $fh;
+    print $out;
+    exit 0;
+    } # pod_text
+
+sub pod_nroff {
+    first { -x "$_/nroff" } grep { -d } split m/:+/ => $ENV{PATH} or pod_text ();
+
+    require Pod::Man;
+    my $p = Pod::Man->new ();
+    open my $fh, "|-", "nroff", "-man";
+    $p->parse_from_file ($0, $fh);
+    close $fh;
+    exit 0;
+    } # pod_nroff
+
 # Color initialization
 for ($old_color, $new_color, $rev_color) {
     s/^(.*)[ _]bold$/bold $1/i;
@@ -161,17 +194,13 @@ my %clr = map { $_ => color (s{^(.*)[ _]bold$}{bold $1}ir =~
 $clr{$_} //= color ($_) for tac_colors ();
 $no_colors and $clr{$_} = "" for keys %clr;
 $clr{none} = $clr{on_none} = "";
-for ([ \$old_color, $rc{old} ], [ \$new_color, $rc{new} ], [ \$rev_color, $rc{bg} ]) {
-    my ($c, $def) = @$_;
-    $$c && exists $clr{$$c} and next;
-    warn "color ", $$c // "(undefined)", " is unknown, using $def instead\n";
-    $$c = $def;
-    }
-my $clr_red = $clr{$old_color};
-my $clr_grn = $clr{$new_color};
-my $clr_rev = $clr{$rev_color};
-my $clr_dbg = $opt_r && exists $clr{"on_$rc{verbose}"} ? $clr{"on_$rc{verbose}"} : $clr{$rc{verbose}};
-my $reset   = $no_colors ? "" : RESET;
+
+my ($reset,   $bg_new,  $bg_old,
+    $chr_cml, $chr_cmr, $chr_ctx, $chr_eli, $chr_eql, $chr_lft,
+    $chr_new, $chr_old, $chr_rgt,
+    $clr_dbg, $clr_grn, $clr_new, $clr_old, $clr_red, $clr_rev,
+    $cmp_sub) = (RESET);
+
 if ($list_colors) {
     my @clr = map { sprintf "%s%-18s%s", $clr{$_}, $_, $reset } sort keys %clr;
     while (@clr) {
@@ -180,39 +209,63 @@ if ($list_colors) {
     exit;
     }
 
-my $bg_old = $clr{$rc{bg_old} || ($opt_r ? "on_$old_color" =~ s/bold //ir :
-					   "on_$rev_color" =~ s/bold //ir)};
-my $bg_new = $clr{$rc{bg_new} || ($opt_r ? "on_$new_color" =~ s/bold //ir :
-					   "on_$rev_color" =~ s/bold //ir)};
-my $clr_old = $opt_r ? $clr_rev . $bg_old : $clr_red . $bg_old;
-my $clr_new = $opt_r ? $clr_rev . $bg_new : $clr_grn . $bg_new;
-# Indicators
-$opt_a and
-    @rc{qw( chr_old chr_new chr_cml chr_cmr chr_eli chr_eli_v )} = qw( ^ ^ > < - <> );
-my $chr_old = $clr_old . $rc{chr_old} . $reset;
-my $chr_new = $clr_new . $rc{chr_new} . $reset;
-my $chr_cml = $clr_dbg . $rc{chr_cml} . $reset;
-my $chr_cmr = $clr_dbg . $rc{chr_cmr} . $reset;
-my $chr_eql =            $rc{chr_eql};
-my $chr_lft = $clr_old . (defined $opt_u ? "-" : "< ") . $reset;
-my $chr_rgt = $clr_new . (defined $opt_u ? "+" : "> ") . $reset;
-my $chr_ctx =             defined $opt_u ? " " : "  ";
-my $chr_eli = $opt_v >= 2 ? $rc{chr_eli_v} : $rc{chr_eli};
-$opt_m && $opt_v > 1 && length ($chr_eli) > 1 and $opt_m = 0;
+sub set_options {
+    for ([ \$old_color, $rc{old} ], [ \$new_color, $rc{new} ], [ \$rev_color, $rc{bg} ]) {
+	my ($c, $def) = @$_;
+	$$c && exists $clr{$$c} and next;
+	warn "color ", $$c // "(undefined)", " is unknown, using $def instead\n";
+	$$c = $def;
+	}
+    $clr_red = $clr{$old_color};
+    $clr_grn = $clr{$new_color};
+    $clr_rev = $clr{$rev_color};
+    $clr_dbg = $opt_r && exists $clr{"on_$rc{verbose}"} ? $clr{"on_$rc{verbose}"} : $clr{$rc{verbose}};
+    $reset   = $no_colors ? "" : RESET;
 
-my $cmp_sub = $opt_i || $opt_b || $opt_Z ? { keyGen => sub {
-    my $line = shift;
-    $opt_i and $line = lc $line;
-    $opt_Z and $line =~ s/[ \t]+$//g;
-    $opt_b and $line =~ s/[ \t]+/ /g;
-    return $line;
-    }} : undef;
+    $bg_old = $clr{$rc{bg_old} || ($opt_r ? "on_$old_color" =~ s/bold //ir :
+					       "on_$rev_color" =~ s/bold //ir)};
+    $bg_new = $clr{$rc{bg_new} || ($opt_r ? "on_$new_color" =~ s/bold //ir :
+					       "on_$rev_color" =~ s/bold //ir)};
+    $clr_old = $opt_r ? $clr_rev . $bg_old : $clr_red . $bg_old;
+    $clr_new = $opt_r ? $clr_rev . $bg_new : $clr_grn . $bg_new;
+    $opt_s and ($clr_new, $clr_old) = ($clr_old, $clr_new);
+    # Indicators
+    $opt_a and
+	@rc{qw( chr_old chr_new chr_cml chr_cmr chr_eli chr_eli_v )} = qw( ^ ^ > < - <> );
+    $chr_old = $clr_old . $rc{chr_old} . $reset;
+    $chr_new = $clr_new . $rc{chr_new} . $reset;
+    $chr_cml = $clr_dbg . $rc{chr_cml} . $reset;
+    $chr_cmr = $clr_dbg . $rc{chr_cmr} . $reset;
+    $chr_eql =            $rc{chr_eql};
+    $chr_lft = $clr_old . (defined $opt_u ? "-" : "< ") . $reset;
+    $chr_rgt = $clr_new . (defined $opt_u ? "+" : "> ") . $reset;
+    $chr_ctx =             defined $opt_u ? " " : "  ";
+    $chr_eli = $opt_v >= 2 ? $rc{chr_eli_v} : $rc{chr_eli};
+    $opt_m && $opt_v > 1 && length ($chr_eli) > 1 and $opt_m = 0;
+
+    $cmp_sub = $opt_i || $opt_b || $opt_Z ? { keyGen => sub {
+	my $line = shift;
+	$opt_i and $line = lc $line;
+	$opt_Z and $line =~ s/[ \t]+$//g;
+	$opt_b and $line =~ s/[ \t]+/ /g;
+	return $line;
+	}} : undef;
+    } # set_options
+
+my $diff_class = eval { require Algorithm::Diff::XS; "Algorithm::Diff::XS"; }
+	      || eval { require Algorithm::Diff;     "Algorithm::Diff";     }
+	      or die "Cannot load Algorithm::Diff:\n";
 
 caller or ccdiff (@ARGV);
 
 sub ccdiff {
     my $f1 = shift or usage (1);
     my $f2 = $_[0] // "-";
+
+    -b $f1 || -c $f1 || -b $f2 || -c $f2 and
+	die "Character and block devices are not supported\n";
+    -d $f1 || -d $f2 and
+	die "$CMD does not yet support recursive diff and/or directory diff\n";
 
     my $fh;
 
@@ -239,6 +292,7 @@ sub ccdiff {
 	    $o eq "new"				and $new_color = $v;
 	    $o eq "old"				and $old_color = $v;
 	    $o eq "reverse"			and $opt_r = $v;
+	    $o eq "swap"			and $opt_s = $v;
 	    $o eq "threshold"			and $opt_t = $v;
 	    $o eq "unified"			and $opt_u = $v;
 	    $o eq "unified"			and $opt_u = $v;
@@ -252,6 +306,7 @@ sub ccdiff {
 	    }
 	}
 
+    set_options ();
     $emacs and @_ == 0 && -f $f1 && -f "$f1~" and ($f1, $f2) = ("$f1~", $f1);
 
     $f1 eq "-" && $f2 eq "-" and usage (1);
@@ -261,29 +316,51 @@ sub ccdiff {
     $opt_U and binmode STDIN,  ":encoding(utf-8)";
     $opt_U and binmode STDOUT, ":encoding(utf-8)";
 
-    my @d1 = $f1 eq "-" ? <STDIN> : do {
+    my @d1 = ref $f1 eq "ARRAY" ? @$f1 : $f1 eq "-" ? <STDIN> : do {
 	open my $fh, "<", $f1 or die "$f1: $!\n";
 	$opt_U and binmode $fh, ":encoding(utf-8)";
 	<$fh>;
 	};
-    my @d2 = $f2 eq "-" ? <STDIN> : do {
+    my @d2 = ref $f2 eq "ARRAY" ? @$f2 : $f2 eq "-" ? <STDIN> : do {
 	open my $fh, "<", $f2 or die "$f2: $!\n";
 	$opt_U and binmode $fh, ":encoding(utf-8)";
 	<$fh>;
 	};
-    if ($opt_H and defined $opt_u) {
-	# diff -c also provides (ugly) headers, but opt_c is NYI
-	for ([ "---", $f1 ], [ "+++", $f2 ]) {
-	    if (-f $_->[1]) {
-		say $_->[0], " $_->[1]\t", scalar localtime ((stat $_->[1])[9]);
+    if ($opt_H) {
+	my $hc = "";
+	if ($opt_H =~ m/^\w\w+/) {
+	    my ($hfg, $hbg) = split m/_?(?=on_)/ => lc $opt_H =~ s/\s+/_/gr;
+	    $hfg && defined $clr{$hfg} and $hc .= $clr{$hfg};
+	    $hbg && defined $clr{$hbg} and $hc .= $clr{$hbg};
+	    }
+	my $nl = max length $f1, length $f2, 7;
+	my $sl = $hc ? ($ENV{COLUMNS} || 80) - 4 - $nl : 1;
+	my @h = map { -f $_
+	    ? { tag   => "",
+		name  => $_,
+		stamp => scalar localtime ((stat $_)[9]),
 		}
-	    else {
-		say $_->[0], " *STDIN\t",  scalar localtime;
+	    : { tag   => "",
+		name  => "*STDIN",
+		stamp => scalar localtime,
 		}
+	    } $f1, $f2;
+	if (defined $opt_u) {
+	    ($h[0]{tag}, $h[1]{tag}) = ("---", "+++");
+	    $sl -= 2;
+	    printf "%s%s %-*s %-*s%s\n", $hc, $_->{tag},
+		$nl, $_->{name}, $sl, $_->{stamp}, $clr{reset} for @h;
+	    }
+	#elsif ($opt_c) { # diff -c also provides (ugly) headers, but opt_c is NYI
+	#   }
+	else {
+	    ($h[0]{tag}, $h[1]{tag}) = ("<", ">");
+	    printf "%s%s %-*s %-*s%s\n", $hc, $_->{tag},
+		$nl, $_->{name}, $sl, $_->{stamp}, $clr{reset} for @h;
 	    }
 	}
 
-    my $diff = Algorithm::Diff->new (\@d1, \@d2, $cmp_sub);
+    my $diff = $diff_class->new (\@d1, \@d2, $cmp_sub);
     $diff->Base (1);
 
     my ($N, $idx, @s) = (0, 0);
@@ -355,7 +432,7 @@ sub ccdiff {
 
 sub subdiff {
     my ($old, $new, $heu) = @_;
-    my $d = Algorithm::Diff->new (map { [ map { split m// } @$_ ] } $old, $new);
+    my $d = $diff_class->new (map { [ map { split m// } @$_ ] } $old, $new);
     my ($d1, $d2, $x1, $x2, @h1, @h2) = ("", "", "", "");
     my ($cml, $cmr) = $opt_v < 2 ? ("", "") : ($chr_cml, $chr_cmr);
     my ($cmd, $cma) = ($chr_old, $chr_new);
@@ -684,6 +761,10 @@ Reverse/invert the foreground and background for the colored indicators.
 If the foreground color has C<bold>, it will be stripped from the new background
 color.
 
+=item --swap -s
+
+Swap the colors for new and old.
+
 =item --list-colors
 
 List available colors and exit.
@@ -692,6 +773,10 @@ List available colors and exit.
 
 Disable all colors. Useful for redirecting the diff output to a file that is to
 be included in documentation.
+
+This is the default if the environment variable C<$NO_COLOR> has a true value or
+if the environment variable C<$CLICOLOR> is set to a false value.  If set,
+C<$CLICOLOR_FORCE> will overrule the default of C<$NO_COLOR>.
 
 =item --old=color
 
@@ -854,6 +939,12 @@ or background-color over foreground-color. The default is C<false>, so it will
 color the changes with the appropriate color (C<new> or C<old>) over the
 default background color.
 
+=item swap (-s)
+
+ reverse : false
+
+Swap the colors for new and old.
+
 =item new (--new)
 
  new     : green
@@ -915,6 +1006,18 @@ This option may also be specified as
  background_color
  background-colour
  background_colour
+
+=item header (-H --header --HC=color --header-color=color)
+
+ header  : 1
+ header  : blue_on_white
+
+Defines if a header is displayed above the diff (default is 1), supported
+colors are allowed.
+
+If the values is a valid supported color, it will show the header in that
+color scheme.  To disable the header set it to C<0> in the RC file or use
+C<--no-header> as a command line argument.
 
 =item verbose
 
@@ -1102,9 +1205,16 @@ From then on you can do
 Due to the implementation, where both sides of the comparison are completely
 kept in memory, this tool might not be able to deal with (very) large datasets.
 
+=head2 Speed
+
+There are situations where L<Algorithm::Diff> takes considerable more time
+compared to e.g. GNU diff. Installing L<Algorithm::Diff::XS> will make
+C<ccdiff> a lot faster. C<ccdiff> will choose L<Algorithm::Diff::XS> if
+available.
+
 =head1 SEE ALSO
 
-L<Algorithm::Diff>, L<Text::Diff>
+L<Algorithm::Diff::XS>, L<Algorithm::Diff>, L<Text::Diff>
 
 =head1 AUTHOR
 
@@ -1112,7 +1222,7 @@ H.Merijn Brand
 
 =head1 COPYRIGHT AND LICENSE
 
- Copyright (C) 2018-2019 H.Merijn Brand.  All rights reserved.
+ Copyright (C) 2018-2020 H.Merijn Brand.  All rights reserved.
 
 This library is free software;  you can redistribute and/or modify it under
 the same terms as The Artistic License 2.0.

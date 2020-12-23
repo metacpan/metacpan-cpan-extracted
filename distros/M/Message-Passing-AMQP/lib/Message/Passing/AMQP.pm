@@ -1,8 +1,8 @@
 package Message::Passing::AMQP;
-use Moose ();
+use Moo;
 use namespace::autoclean;
 
-our $VERSION = "0.007";
+our $VERSION = "0.008";
 $VERSION = eval $VERSION;
 
 1;
