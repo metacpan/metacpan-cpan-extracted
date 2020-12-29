@@ -24,3 +24,7 @@ Change History for Text::Indent
 	- Remove test snippets from Pod
 	- Remove generated content from tests
 	- Add tests for instance accessor and arg
+
+0.033   29 December 2020
+
+        - Remove VERSION test from 01_use.t

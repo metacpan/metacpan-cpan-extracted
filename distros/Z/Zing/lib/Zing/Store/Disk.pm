@@ -15,7 +15,7 @@ extends 'Zing::Store';
 
 use File::Spec;
 
-our $VERSION = '0.21'; # VERSION
+our $VERSION = '0.22'; # VERSION
 
 # ATTRIBUTES
 
@@ -32,7 +32,7 @@ fun new_root($self) {
 # BUILDERS
 
 fun new_encoder($self) {
-  require Zing::Encoder::Json; Zing::Encoder::Json->new;
+  require Zing::Encoder::Dump; Zing::Encoder::Dump->new;
 }
 
 # METHODS
@@ -226,6 +226,20 @@ L<Zing::Store>
 This package uses type constraints from:
 
 L<Zing::Types>
+
+=cut
+
+=head1 ATTRIBUTES
+
+This package has the following attributes:
+
+=cut
+
+=head2 root
+
+  root(Str)
+
+This attribute is read-only, accepts C<(Str)> values, and is optional.
 
 =cut
 

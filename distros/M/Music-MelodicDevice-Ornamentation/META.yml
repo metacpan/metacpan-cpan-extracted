@@ -37,7 +37,7 @@ requires:
 resources:
   homepage: https://github.com/ology/Music-MelodicDevice-Ornamentation
   repository: https://github.com/ology/Music-MelodicDevice-Ornamentation.git
-version: '0.0600'
+version: '0.0601'
 x_Dist_Zilla:
   perl:
     version: '5.030002'

@@ -5,7 +5,7 @@ use Module::Build;
 my $builder = Module::Build->new(
     module_name         => 'Text::KnuthPlass',
     license             => 'Perl',
-    dist_author         => q{Phil Perry <pmperry at cpan.org>},
+    dist_author         => q{Phil Perry},
     dist_version_from   => 'lib/Text/KnuthPlass.pm',
     include_dirs        => ['.'],
     build_requires => {

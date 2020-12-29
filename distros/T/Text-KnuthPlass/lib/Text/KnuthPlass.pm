@@ -4,8 +4,8 @@ use constant DEBUG => 0;
 use warnings;
 use strict;
 
-our $VERSION = '1.04'; # VERSION
-my $LAST_UPDATE = '1.03'; # manually update whenever file is edited
+our $VERSION = '1.05'; # VERSION
+my $LAST_UPDATE = '1.05'; # manually update whenever file is edited
 
 eval { XSLoader::load("Text::KnuthPlass", $VERSION); } or die $@;
 # Or else there's a Perl version
@@ -601,18 +601,23 @@ sub penaltyclass {
 
 originally written by Simon Cozens, C<< <simon at cpan.org> >>
 
-since 2020, maintained by Phil Perry C<< <pmperry at cpan.org> >>
+since 2020, maintained by Phil Perry
 
 =head1 ACKNOWLEDGEMENTS
 
-This module is a Perl translation of Bram Stein's Javascript Knuth-Plass
-implementation. Any bugs, however, are probably my fault.
+This module is a Perl translation of Bram Stein's "Typeset" Javascript 
+Knuth-Plass implementation. Any bugs, however, are probably my fault.
 
 =head1 BUGS
 
 Please report any bugs or feature requests to the _issues_ section of 
-C<https://github.com/PhilterPaper/Text-KnuthPlass>, or via email (please see
-C<README.md> for details).
+C<https://github.com/PhilterPaper/Text-KnuthPlass>.
+
+Do NOT under ANY circumstances open a PR (Pull Request) to report a bug. It is 
+a waste of both your and our time and effort. Open a regular ticket (issue), 
+and attach a Perl (.pl) program illustrating the problem, if possible. If you
+believe that you have a program patch, and offer to share it as a PR, we may
+give the go-ahead. Unsolicited PRs may be closed without further action.
 
 =head1 COPYRIGHT & LICENSE
 

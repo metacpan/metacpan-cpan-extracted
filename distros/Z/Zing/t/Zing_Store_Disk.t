@@ -47,6 +47,12 @@ method: test
 
 =cut
 
+=attributes
+
+root: ro, opt, Str
+
+=cut
+
 =synopsis
 
   use Zing::Store::Disk;

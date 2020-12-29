@@ -3,7 +3,7 @@ package Catmandu::Importer::Pure::Parser::raw;
 use Catmandu::Sane;
 use Moo;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 sub parse {
     my ($self,$dom) = @_;

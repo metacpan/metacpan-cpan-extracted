@@ -12,14 +12,17 @@ use XML::LibXML::XPathContext;
 use Data::Validate::URI qw(is_web_uri);
 use Scalar::Util qw(blessed);
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 with 'Catmandu::Importer';
 
 has base     => ( is => 'ro' );
 has endpoint => ( is => 'ro' );
+has path     => ( is => 'ro' );
+has apiKey   => ( is => 'ro' );
 has user     => ( is => 'ro' );
 has password => ( is => 'ro' );
+has post_xml => ( is => 'ro' );
 
 has handler =>
   ( is => 'ro', default => sub { 'simple' }, coerce => \&_coerce_handler );
@@ -43,16 +46,16 @@ has max_retries => ( is => 'ro', default => sub { 0 } );
 has _currentRecordSet => ( is => 'ro' );
 has _n                => ( is => 'ro', default => sub { 0 } );
 has _start            => ( is => 'ro', default => sub { 0 } );
-has _max_results      => ( is => 'ro', default => sub { 0 } );
-has _total_results    => ( is => 'ro', default => sub { 0 } );
-has _resumption_token => ( is => 'ro' );
-has _namespaces       => ( is => 'ro' );
+has _rs_size          => ( is => 'ro', default => sub { 0 } );
+has _total_size       => ( is => 'ro', default => sub { 0 } );
+has _next_url         => ( is => 'ro');
+
 
 sub BUILD {
     my $self = shift;
 
-    Catmandu::BadVal->throw("Base URL and endpoint are required")
-      unless $self->base && $self->endpoint;
+    Catmandu::BadVal->throw("Base URL, endpoint and apiKey are required")
+      unless $self->base && $self->endpoint && $self->apiKey;
 
     Catmandu::BadVal->throw( "Password is needed for user " . $self->user )
       if $self->user && !$self->password;
@@ -77,18 +80,27 @@ sub BUILD {
     }
 
     my $options = $self->options;
-    if ( !$self->fullResponse && $options->{'window.offset'} ) {
-        $self->{_start} = $options->{'window.offset'};
+
+    if ( !$self->fullResponse && $self->post_xml ) {
+        if ( $options->{offset} ||  $options->{page} ||
+            (defined $options->{size} && $options->{size}==0) )  {
+            $self->{fullResponse} = 1;
+        }
+    }
+    if ( !$self->fullResponse && $options->{offset} ) {
+        $self->{_start} = $options->{offset};
     }
 }
 
 sub _build_furl {
-    my ( $user, $password ) = ( $_[0]->user, $_[0]->password );
+    my ( $user, $password, $apiKey ) = ( $_[0]->user, $_[0]->password, $_[0]->apiKey );
     my @headers;
 
     push @headers,
       ( 'Authorization' => ( 'Basic ' . encode_base64("$user:$password") ) )
       if $user;
+    push @headers, ( 'api-key' => $apiKey )
+      if $apiKey;    
     Furl->new(
         agent   => $_[0]->userAgent,
         timeout => $_[0]->timeout,
@@ -124,13 +136,15 @@ sub _coerce_options {
     my ($options) = @_;
 
     return $options if !%$options;
-    my $flat_options = {};
-    _set_key_values( '', $options, $flat_options );
-    return $flat_options;
+    
+    return { # arrays to comman separated values
+        map { $_ => (ref $options->{$_} eq 'ARRAY' ? join (',', @{$options->{$_}}) : $options->{$_})}
+            keys %$options
+    };
 }
 
 sub _request {
-    my ( $self, $url ) = @_;
+    my ( $self, $url, $rcontent ) = @_;
 
     $self->log->debug("requesting $url\n");
 
@@ -138,7 +152,10 @@ sub _request {
     my $tries = $self->max_retries;
     try {
         do {
-            $res = $self->furl->get($url);
+            
+            $res = $rcontent
+                 ? $self->furl->post($url, ['Content-Type' =>  'application/xml'], $$rcontent) 
+                 :  $self->furl->get($url);
           } while ( $res->status >= 500 && $tries-- && sleep(10) )
           ;    # Retry on server error;
         die( $res->status_line )
@@ -155,9 +172,10 @@ sub _request {
 sub _url {
     my ( $self, $options ) = @_;
 
-    my $url = $self->base . '/' . $self->endpoint;
+    my $url = $self->base . '/' . $self->endpoint
+        . ($self->path ? '/' . $self->path : '');
 
-    if (%$options) {
+    if ($options && %$options) {
         $url .= '?' . join '&',
           map { "$_=" . uri_escape( $options->{$_}, "^A-Za-z0-9\-\._~," ) }
           sort keys %{$options};
@@ -165,51 +183,18 @@ sub _url {
     return $url;
 }
 
-sub _set_key_values {
-    my ( $k, $v, $args ) = @_;
-
-    my $t = ref $v;
-    if ( $t eq 'ARRAY' ) {
-        if ( !grep { ref } @$v ) {
-            $args->{$k} = join ',', @$v;    #, should not be escaped!!
-        } else {
-            my $i = 0;
-            for my $av (@$v) {
-                _set_key_values( "$k\[$i\]", $av, $args );
-                $i++;
-            }
-        }
-    } elsif ( $t eq 'HASH' ) {
-        for my $vk ( keys %$v ) {
-            _set_key_values( ( ( $k && $vk ) ? "$k.$vk" : ( $k || $vk ) ),
-                $v->{$vk}, $args );
-        }
-    } else {
-        $args->{$k} = $v;
-    }
-}
-
-# Internal: gets the next set of results.
-# Returns a array representation of the resultset.
 sub _nextRecordSet {
     my ($self) = @_;
 
     my %options = %{ $self->options };
+    
+    if (!$self->fullResponse && $self->post_xml) {
+         $options{offset} = $self->_start;
+    } 
+ 
+    my $url = $self->_next_url || $self->_url( \%options );
 
-    if ( $self->_resumption_token ) {
-        $options{'resumptionToken'} = $self->_resumption_token;
-    } elsif ( !$self->fullResponse ) {
-        if ( $self->_max_results ) {
-            $options{'window.size'} = $self->_max_results;
-        }
-
-        if ( $self->_start ) {
-            $options{'window.offset'} = $self->_start;
-        }
-    }
-
-    my $url = $self->_url( \%options );
-    my $xml = $self->_request($url);
+    my $xml = $self->_request(  $url, ($self->post_xml ? \$self->post_xml : undef) );
 
     if ( $self->filter ) {
         &{ $self->filter }( \$xml );
@@ -219,45 +204,32 @@ sub _nextRecordSet {
 
     if ( exists $hash->{'error'} ) {
         Catmandu::Error->throw(
-                "Requested '$url'\nPure REST Error: "
-              . $hash->{error}{message}
+                "Requested '$url'\nPure REST Error ($hash->{error}{code}): "
+              . $hash->{error}{title}
               . (
-                $hash->{'error'}{'details'}
-                ? "\nDetails:\n" . $hash->{error}{details}
+                $hash->{'error'}{'description'}
+                ? "\nDescription:\n" . $hash->{error}{description}
                 : ''
               )
         );
     }
 
     if ( $self->fullResponse ) {
-        $self->{_max_results}   = 1;
-        $self->{_total_results} = 1;
-        return $hash->{results};
+        $self->{_rs_size}   = 1;
+        $self->{_total_size} = 1;
+        return $hash->{results}; #check
     }
+    
+    $self->{_next_url} = $hash->{next_url}; #only GET requests
 
     # get total number of results
-    $self->{_total_results} = $hash->{count};
+    $self->{_total_size} = $hash->{count};
 
     my $set = $hash->{results};
 
-    if ( $hash->{resumptionToken} ) {
-        $self->{_resumption_token} = $hash->{resumptionToken};
-    } else {
-        if ( $self->_resumption_token ) {
-            delete $self->{_resumption_token};
-        } else {
-            $self->{_total_results} ||= scalar(@$set);
-        }
-    }
+    $self->{_rs_size} = scalar(@$set);
 
-    if (   !$self->_total_results
-        || !$self->_max_results
-        || ( @$set <= $self->_total_results ) )
-    {
-        $self->{_max_results} = scalar(@$set);
-    }
-
-    return \@{$set};
+    return $set;
 }
 
 # Internal: gets the next record from our current resultset.
@@ -266,28 +238,22 @@ sub _nextRecord {
     my ($self) = @_;
 
     # fetch recordset if we don't have one yet.
-    $self->{_currentRecordSet} = $self->_nextRecordSet
-      unless $self->_currentRecordSet;
-
-    return if $self->_max_results == 0;
+    $self->{_currentRecordSet} ||= $self->_nextRecordSet || return;
 
     return
-      if $self->_total_results
+      if (!$self->_next_url ) && $self->_total_size
       && ( $self->_start + $self->_n ) >=
-      $self->_total_results;    # no more results
-
-    return unless $self->_currentRecordSet;
+      $self->_total_size;    # no more results
 
     # check for a exhausted recordset.
-    if ( $self->_n >= $self->_max_results ) {
-        $self->{_start} += $self->_max_results;
-        $self->{_n}                = 0;
+    if ( $self->_n >= $self->_rs_size ) {
+        $self->{_start} += $self->_rs_size;
+        $self->{_n}  = 0;
         $self->{_currentRecordSet} = $self->_nextRecordSet;
     }
-
-    # return the next record.
+    
     my $record_dom = $self->_currentRecordSet->[ $self->{_n}++ ];
-
+    
     return $self->_handle_record($record_dom);
 
 }
@@ -319,37 +285,33 @@ sub _hashify {
     my $out;
 
     if ( $xc->exists('/error') ) {
-        my $message = $xc->findvalue('/error/message');
-        my $details = $xc->findvalue('/error/details');
+         my $code = $xc->findvalue('/error/code');
+         my $title = $xc->findvalue('/error/title');
+         my $description = $xc->findvalue('/error/description');
 
-        $out->{error} = { message => $message, details => $details };
+        $out->{error} = { code => $code, title => $title, description => $description };
+        return $out;
     }
 
-    my $count = $xc->findvalue("/*/*[local-name()='count']");
-    $out->{count} = $count if $count;
+    my $next_url = $xc->findvalue('/result/navigationLink[@ref="next"]/@href|/result/navigationLinks/navigationLink[@ref="next"]/@href');
+    $next_url =~ s/&amp;/&/g if $next_url;
+    $out->{next_url} = $next_url if $next_url;
 
-    my $resumptionToken = $root->getAttribute('resumptionToken');
-    $out->{resumptionToken} = $resumptionToken if $resumptionToken;
+    $out->{count} = $xc->findvalue("/result/count");
+
+    my @result_nodes;
+
+    if ( $xc->exists('/result/items') ) {
+        @result_nodes = $xc->findnodes('/result/items/*');
+    } elsif ($self->endpoint eq 'changes') {
+        @result_nodes = $xc->findnodes('/result/contentChange');
+    } else {
+        @result_nodes = $xc->findnodes('/result/*[@uuid]');
+    };
 
     if ( $self->fullResponse ) {
         $out->{results} = [$root];
         return $out;
-    }
-
-    $self->{_namespaces} ||= [ $root->getNamespaces ];
-
-    my $results = [];
-    my @result_nodes;
-    if ( !defined($count) || $count eq '' ) {
-        @result_nodes = $xc->findnodes("/*/*");
-    } else {
-        @result_nodes = $xc->findnodes("/*/*[local-name() = 'result']/*");
-    }
-
-    for my $x (@result_nodes) {
-        for my $ns ( @{ $self->_namespaces } ) {
-            $x->setNamespace( $ns->getData, $ns->getLocalName(), 0 );
-        }
     }
 
     $out->{results} = \@result_nodes;
@@ -366,12 +328,13 @@ sub _handle_record {
       : $self->handler->($dom);
 }
 
+
 # Public Methods. --------------------------------------------------------------
 
 sub url {
     my ($self) = @_;
     return $self->_url( $self->options )
-      ;    #check not updated!!  should save the URL for retrieval
+      ;
 }
 
 sub generator {
@@ -391,15 +354,22 @@ sub generator {
 =head1 SYNOPSIS
 
   # From the command line
-  $ catmandu convert Pure --base https://purehost/ws/rest --endpoint publication
+  $ catmandu convert Pure \
+        --base https://host/ws/api/... \
+        --endpoint research-outputs \
+        --apiKey "..."
 
   # In Perl
   use Catmandu;
 
   my %attrs = (
     base => 'http://host/path',
-    endpoint => 'publication',
+    endpoint => 'research-outputs',
+    apiKey => '...',
   );
+
+TODO: add options
+
 
   my $importer = Catmandu->importer('Pure', %attrs);
 
@@ -412,23 +382,21 @@ sub generator {
   my $count = Catmandu->importer(
     'Pure',
     base         => base,
-    endpoint     => 'publication',
+    endpoint     => 'research-outputs',
+    apiKey       => '...',
     fullResponse => 1,
-    options      => {
-      'window.size'   => 0,
-      'workflowState' => [
-        { '' => 'appproved', workflowName=> 'publication'},
-        { '' => 'validated', workflowName=> 'publication'},
-      ]
-    }
-  )->first->{count};
+    post_xml => '<?xml version="1.0" encoding="utf-8"?>' 
+        . '<researchOutputsQuery>',
+        . '<workflowSteps>approved</workflowSteps>',
+        . '</researchOutputsQuery>',   
+  )->first->{result}{count};
 
 =head1 DESCRIPTION
 
   Catmandu::Importer::Pure is a Catmandu package that seamlessly imports data from Elsevier's Pure system using its REST service.
-  Currently documentation describing the REST service can usually be viewed at /ws/doc/ on a host where
-  Pure is installed, for instance, http://experts-us.demo.atira.dk/ws/doc/.
-  ...
+  In order to use the Pure Web Service you need an API key. List of all available endpoints and further documentation can currently
+  be found under /ws on a webserver that is running Pure. Note that this version of the importer is tested with Pure API version
+  5.18 and might not work with later versions.
 
 =head1 CONFIGURATION
 
@@ -436,11 +404,19 @@ sub generator {
 
 =item base
 
-Base URL for the REST service is required, for example 'http://experts-us.demo.atira.dk/ws/rest'
+Base URL for the REST service is required, for example 'http://purehost.com/ws/api/518'
 
 =item endpoint
 
-Valid endpoint is required, like 'publications'
+Valid endpoint is required, like 'research-outputs'
+
+=item apiKey
+
+Valid API key is required for access
+
+=item path
+
+Path after the endpoint 
 
 =item user
 
@@ -454,10 +430,14 @@ Password if basic authentication is used
 
 Options passed as parameters to the REST service, for example:
 {
-    'window.size' => 20,
-    'format'      => 'xml_long',
-    'namespaces'  => 'remove'
+    'size' => 20,
+    'fields' => 'title,type,authors.*'
 }
+
+
+=item post_xml
+
+xml containing a query that will be submitted with a POST request
 
 =item fullResponse
 
@@ -507,7 +487,7 @@ user input. Note that there is a small performance penalty when using this optio
 
 Optional reference to function that processes the XML response before it is parsed. The argument to the function is a reference to the XML text,
 which is then used to modify it. This is option is normally not needed but can helpful if there is a problem parsing the response due to a bug
-in the REST service, for example.
+in the REST service.
 
 =back
 

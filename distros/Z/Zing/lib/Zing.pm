@@ -13,7 +13,7 @@ use Data::Object::ClassHas;
 
 extends 'Zing::Kernel';
 
-our $VERSION = '0.21'; # VERSION
+our $VERSION = '0.22'; # VERSION
 
 # ATTRIBUTES
 
@@ -35,7 +35,7 @@ method start() {
 
 =head1 NAME
 
-Zing - Multi-Process Management System
+Zing - Actor-Model Toolkit
 
 =cut
 
@@ -262,7 +262,7 @@ L<Zing::Store::Redis>: Redis Persistence
 
 =item *
 
-L<Zing::Store::SQLite>: SQLite Persistence
+L<Zing::Store::Sqlite>: SQLite Persistence
 
 =item *
 

@@ -14,7 +14,7 @@ use Zing::Logic::Watcher;
 
 extends 'Zing::Process';
 
-our $VERSION = '0.21'; # VERSION
+our $VERSION = '0.22'; # VERSION
 
 # BUILDERS
 

@@ -232,7 +232,7 @@ The object method reifies an object from its resource identifier.
 
 =signature object
 
-object() : Object
+object(Maybe[Env] $env) : Object
 
 =example-1 object
 

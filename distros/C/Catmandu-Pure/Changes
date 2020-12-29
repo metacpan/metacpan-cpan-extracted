@@ -1,5 +1,7 @@
 Revision history for Catmandu-Pure
 
+0.03  2020-12-29 19:50:52 CET
+  - Updated to work with API 5.18
 0.02  2017-07-19 13:36:36 CEST
   - Missing dependencies added to distribution
 0.01  2017-07-18 11:06:08 CEST

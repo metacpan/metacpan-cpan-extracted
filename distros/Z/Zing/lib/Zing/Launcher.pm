@@ -13,7 +13,7 @@ use Data::Object::Space;
 
 extends 'Zing::Worker';
 
-our $VERSION = '0.21'; # VERSION
+our $VERSION = '0.22'; # VERSION
 
 # METHODS
 

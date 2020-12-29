@@ -1997,10 +1997,8 @@ END
       print $output;
       if (-1<index $output,'user') {
          $handle->print('yes');
-         sleep 1;
          $output='';
-         next;
-      }
+      } sleep 1;
    }
    ($stdout,$stderr)=$handle->cmd($sudo.
       'bin/install-jsdeps.sh','__display__');
@@ -2038,6 +2036,7 @@ END
    ($stdout,$stderr)=$handle->cmd($sudo.
       'git clone --recursive https://github.com/vstakhov/rspamd.git',
       '__display__');
+   # https://ninja-build.org/
    ($stdout,$stderr)=$handle->cmd($sudo.
       'git clone git://github.com/ninja-build/ninja.git',
       '__display__');
@@ -2048,6 +2047,101 @@ END
       '/usr/local/bin/cmake -Bbuild-cmake -H.','__display__');
    ($stdout,$stderr)=$handle->cmd($sudo.
       '/usr/local/bin/cmake --build build-cmake','__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'cp -v ./build-cmake/ninja /usr/local/bin','__display__');
+   # https://developer.gnome.org/glib/stable/glib-building.html
+   ($stdout,$stderr)=$handle->cwd('/opt/source');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'git clone --recursive https://gitlab.gnome.org/GNOME/glib.git',
+      '__display__');
+   ($stdout,$stderr)=$handle->cwd('glib');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'PATH=/usr/local/bin:$PATH /usr/local/bin/meson _build',
+      '__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'PATH=/usr/local/bin:$PATH /usr/local/bin/ninja -C _build install',
+      '__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'cp ./_build/glib/glibconfig.h /usr/local/include/glib-2.0/',
+      '__display__');
+   ($stdout,$stderr)=$handle->cwd('/opt/source');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'wget -qO- http://www.colm.net/open-source/ragel/');
+   $stdout=~s/^.*?Stable.*?href=["](.*?)["].*$/$1/s;
+   $gtarfile=$stdout;
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      "wget --random-wait --progress=dot http://www.colm.net".$stdout,
+      '__display__');
+   $gtarfile=~s/^.*\///;
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      "tar xvf $gtarfile",'__display__');
+   $gtarfile=~s/^(.*)[.]tar.*$/$1/;
+   ($stdout,$stderr)=$handle->cwd($gtarfile);
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      "./configure",'__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      "make install",'__display__');
+   ($stdout,$stderr)=$handle->cwd('/opt/source');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'git clone https://luajit.org/git/luajit-2.0.git','__display__');
+   ($stdout,$stderr)=$handle->cwd('luajit-2.0.git');
+
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'git clone https://luajit.org/git/luajit-2.0.git','__display__');
+   ($stdout,$stderr)=$handle->cwd('luajit-2.0.git');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'make install','__display__');
+   ($stdout,$stderr)=$handle->cwd('/opt/source');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'git clone --recursive https://github.com/boostorg/boost.git',
+      '__display__');
+   ($stdout,$stderr)=$handle->cwd('boost');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      './boostrap.sh','__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      './b2 install','__display__');
+   ($stdout,$stderr)=$handle->cwd('/opt/source');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'git clone https://github.com/intel/hyperscan.git',
+      '__display__');
+   ($stdout,$stderr)=$handle->cwd('hyperscan');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      '/usr/local/bin/cmake -DCMAKE_POSITION_INDEPENDENT_CODE=ON .',
+      '__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'make install','__display__');
+   ($stdout,$stderr)=$handle->cwd('/opt/source');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'git clone --recursive https://github.com/threatstack/libmagic.git',
+      '__display__');
+   ($stdout,$stderr)=$handle->cwd('libmagic');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      './autogen.sh','__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      './configure','__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'make','__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'make install','__display__');
+   #($stdout,$stderr)=$handle->cwd('/opt/source');
+   #($stdout,$stderr)=$handle->cmd($sudo.
+   #   'wget -qO- http://site.icu-project.org/download');
+   #$stdout=~s/^.*[<]i[>]ICU (.*?) is now available.*$/$1/s;
+   #$stdout=~s/\./-/g;
+   #($stdout,$stderr)=$handle->cmd($sudo.
+   #   'git clone https://github.com/unicode-org/icu.git '.
+   #   "--depth=1 --branch=release-$stdout",'__display__');
+   ($stdout,$stderr)=$handle->cwd('/opt/source');
+   ($stdout,$stderr)=$handle->cwd('rspamd');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'mkdir -v rspamd.build','__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'cmake .. -DENABLE_HYPERSCAN=ON -DENABLE_LUAJIT=ON '.
+      '-DCMAKE_BUILD_TYPE=RelWithDebuginfo','__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'make','__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'make install','__display__');
 
 #cleanup;
 

@@ -116,4 +116,11 @@ $expect = [['d24','D5'], ['d24','C#5'], ['d48','D5']];
 $got = $obj->mordent('qn', 'D5', -1);
 is_deeply $got, $expect, 'mordent lower';
 
+$expect = [ ['d24','D5'], ['d24','D#5'], ['d24','E5'], ['d24','F5'] ];
+$got = $obj->slide('qn', 'D5', 'F5');
+is_deeply $got, $expect, 'slide up';
+$expect = [ ['d24','D5'], ['d24','C#5'], ['d24','C5'], ['d24','B4'] ];
+$got = $obj->slide('qn', 'D5', 'B4');
+is_deeply $got, $expect, 'slide down';
+
 done_testing();

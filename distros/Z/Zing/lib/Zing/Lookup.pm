@@ -15,7 +15,7 @@ extends 'Zing::Domain';
 
 use Digest::SHA ();
 
-our $VERSION = '0.21'; # VERSION
+our $VERSION = '0.22'; # VERSION
 
 # BUILDERS
 
@@ -111,7 +111,7 @@ method restore(HashRef $data) {
 
 method set(Str $key) {
   my $hash = $self->hash($key);
-  my $name = join('#', $self->name, $hash);
+  my $name = $key;
   my $domain = $self->app->domain(name => $name);
   my $prev = $self->apply->head;
   if ($prev && $self->state->{$prev}) {

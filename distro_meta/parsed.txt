@@ -69326,3 +69326,12 @@ M/MC/MCHE/Mojolicious-Plugin-AssetPack-Che-2.105.tar.gz
 M/MA/MAJENSEN/Neo4j-Client-0.40.tar.gz
 J/JD/JDEGUEST/Net-API-REST-v0.6.2.tar.gz
 B/BL/BLAINEM/Text-Indent-0.032.tar.gz
+R/RE/REEDFISH/Net-FullAuto-1.0000546.tar.gz
+B/BR/BRIEM/Catmandu-Pure-0.03.tar.gz
+C/CS/CSSON/Dist-Zilla-Plugin-CheckForUnwantedFiles-0.0100.tar.gz
+G/GE/GENE/Music-MelodicDevice-Ornamentation-0.0601.tar.gz
+S/SI/SIMCOP/Sys-Linux-KernelVersion-0.101.tar.gz
+B/BL/BLAINEM/Text-Indent-0.033.tar.gz
+P/PM/PMPERRY/Text-KnuthPlass-1.05.tar.gz
+Z/ZE/ZEFRAM/Time-OlsonTZ-Data-0.202006.tar.gz
+A/AW/AWNCORP/Zing-0.22.tar.gz

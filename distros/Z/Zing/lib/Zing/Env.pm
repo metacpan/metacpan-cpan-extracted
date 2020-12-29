@@ -14,7 +14,7 @@ use Data::Object::ClassHas;
 use Cwd ();
 use Sys::Hostname ();
 
-our $VERSION = '0.21'; # VERSION
+our $VERSION = '0.22'; # VERSION
 
 # ATTRIBUTES
 

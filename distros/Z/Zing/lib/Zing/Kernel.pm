@@ -15,7 +15,7 @@ extends 'Zing::Watcher';
 
 use Zing::Logic::Kernel;
 
-our $VERSION = '0.21'; # VERSION
+our $VERSION = '0.22'; # VERSION
 
 # ATTRIBUTES
 

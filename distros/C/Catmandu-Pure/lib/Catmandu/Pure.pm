@@ -1,6 +1,6 @@
 package Catmandu::Pure;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 1;
 __END__
@@ -29,9 +29,7 @@ L<Catmandu::Importer::Pure>
 =head1 DESCRIPTION
 
   Catmandu::Importer::Pure is a Catmandu package that seamlessly imports data from Elsevier's Pure system using its REST service.
-  Currently documentation describing the REST service can usually be viewed at /ws/doc/ on a host where
-  Pure is installed, for instance, http://experts-us.demo.atira.dk/ws/doc/.
-  ...
+  Currently documentation describing the REST service can be found under /ws on a webserver that is running Pure.
 
 =head1 SEE ALSO
 

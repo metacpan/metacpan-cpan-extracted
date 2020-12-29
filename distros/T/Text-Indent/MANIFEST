@@ -16,3 +16,4 @@ t/08_indent_level_reset.t
 t/09_indent.t
 t/10_indent_level_reset.t
 t/11_accessors.t
+t/12_instance.t

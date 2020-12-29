@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Chromatic and diatonic melodic ornamentation
 
-our $VERSION = '0.0600';
+our $VERSION = '0.0601';
 
 use Carp qw(croak);
 use Data::Dumper::Compact qw(ddc);
@@ -168,7 +168,7 @@ sub mordent {
 sub slide {
     my ($self, $duration, $from, $to) = @_;
 
-    my @scale = map { get_scale_MIDI($self->scale_note, $_, $self->scale_name) } -1 .. OCTAVES - 1;
+    my @scale = map { get_scale_MIDI($self->scale_note, $_, 'chromatic') } -1 .. OCTAVES - 1;
 
     (my $i, $from) = $self->_find_pitch($from, \@scale);
     (my $j, $to) = $self->_find_pitch($to, \@scale);
@@ -224,7 +224,7 @@ Music::MelodicDevice::Ornamentation - Chromatic and diatonic melodic ornamentati
 
 =head1 VERSION
 
-version 0.0600
+version 0.0601
 
 =head1 SYNOPSIS
 

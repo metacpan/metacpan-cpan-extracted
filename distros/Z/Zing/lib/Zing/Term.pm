@@ -18,7 +18,7 @@ use Scalar::Util ();
 
 use overload '""' => 'string';
 
-our $VERSION = '0.21'; # VERSION
+our $VERSION = '0.22'; # VERSION
 
 # ATTRIBUTES
 
@@ -223,10 +223,11 @@ method meta() {
   return $self->string;
 }
 
-method object() {
+method object(Maybe[Env] $env) {
   require Zing::Env;
 
-  my $env = Zing::Env->new(
+  $env = Zing::Env->new(
+    ($env ? %{$env} : ()),
     handle => $self->handle,
     target => $self->target,
   );
@@ -565,7 +566,7 @@ The meta method validates and returns a "meta" resource identifier.
 
 =head2 object
 
-  object() : Object
+  object(Maybe[Env] $env) : Object
 
 The object method reifies an object from its resource identifier.
 

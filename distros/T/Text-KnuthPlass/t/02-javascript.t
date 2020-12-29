@@ -43,16 +43,22 @@ for (0..$#nodes) {
 }
 ok($ok, $mess);
 
-my $bps = [ { position=>0, ratio=>0},  { position=>15,
-ratio=>0.857143},  { position=>35, ratio=>0.2222222222222222},
-{ position=>49, ratio=>0.3333333333333333},  { position=>54,
-ratio=>0.0038998050097495125}];
+my $bps = [ 
+	    { position=>0,  ratio=>0 },  
+	    { position=>15, ratio=>0.857143 },     # 0.8571428571428571
+	    { position=>35, ratio=>0.222222 },     # 0.2222222222222222
+	    { position=>49, ratio=>0.333333 },     # 0.3333333333333333
+	    { position=>54, ratio=>0.003899805 },  # 0.0038998050097495125
+	  ];
 my @breakpoints = $t->break(\@nodes);
 ok(@breakpoints, "Broke OK");
 
-# round 0.8571428... value to small number of decimal places, so no difference
-# between regular, long double, and quad math Perls
+# round some numbers to a small number of decimal places, so no difference
+# between regular (double), long double, and quad math Perls
 $breakpoints[1]->{'ratio'} = int(1000000*$breakpoints[1]->{'ratio'} + 0.5)/1000000;
+$breakpoints[2]->{'ratio'} = int(1000000*$breakpoints[2]->{'ratio'} + 0.5)/1000000;
+$breakpoints[3]->{'ratio'} = int(1000000*$breakpoints[3]->{'ratio'} + 0.5)/1000000;
+$breakpoints[4]->{'ratio'} = int(1000000000*$breakpoints[4]->{'ratio'} + 0.5)/1000000000;
 
 is_deeply(\@breakpoints,$bps, "Beakpoints match JS ones");
 

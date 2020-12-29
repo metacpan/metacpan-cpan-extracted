@@ -2,9 +2,6 @@
 use strict;
 use warnings;
 
-use Data::Dumper::Compact 'ddc';
-use lib map { "$ENV{HOME}/sandbox/$_/lib" } qw(MIDI-Util);
-use MIDI::Util;
 use Music::MelodicDevice::Ornamentation;
 
 my $note = shift || 'C';
@@ -33,6 +30,3 @@ elsif ($ornament eq 'slide') {
 else {
     $spec = $md->$ornament(@note, $offset);
 }
-
-$spec = [ map { [ MIDI::Util::midi_format(@$_) ] } @$spec ];
-print 'Spec: ', ddc($spec);

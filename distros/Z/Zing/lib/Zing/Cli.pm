@@ -17,7 +17,7 @@ use Data::Object::ClassHas;
 
 extends 'Data::Object::Cli';
 
-our $VERSION = '0.21'; # VERSION
+our $VERSION = '0.22'; # VERSION
 
 # ATTRIBUTES
 

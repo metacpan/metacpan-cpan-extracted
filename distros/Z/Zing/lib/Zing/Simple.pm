@@ -14,7 +14,7 @@ extends 'Zing::Process';
 
 use Zing::Logic::Simple;
 
-our $VERSION = '0.21'; # VERSION
+our $VERSION = '0.22'; # VERSION
 
 # BUILDERS
 

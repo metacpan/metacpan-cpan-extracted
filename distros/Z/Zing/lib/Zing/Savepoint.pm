@@ -13,7 +13,7 @@ use Data::Object::ClassHas;
 
 extends 'Zing::Entity';
 
-our $VERSION = '0.21'; # VERSION
+our $VERSION = '0.22'; # VERSION
 
 # ATTRIBUTES
 

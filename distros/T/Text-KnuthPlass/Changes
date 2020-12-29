@@ -1,3 +1,25 @@
+2020-12-29  1.05  (Phil M Perry)
+
+  examples/KP.pl
+   Fix superfluous hyphen when splitting at an existing hyphen. It is not clear
+    whether this is the best practice, or that it would be better to handle
+    this "upstream" in KnuthPlass.pm. Also, other hyphens and dashes do not
+    seem to be well handled.
+
+  META.yml, README.md
+   Clean up support-related email addresses and pages.
+
+  README.md  remove example code (is still found in examples/KP.pl) to 
+    shorten this file to a reasonable length.
+
+  META.yml
+   Add repository (GitHub) and bugtracker (GitHub) entries. Want to cut over
+    to GitHub because RT ticket system is going away in March.
+
+  t/02-javascript.t
+   Got another floating point failure (long double or quadmath), so went 
+    ahead and rounded the rest of the floating point constants in that test.
+
 2020-12-10  1.04  (Phil M Perry)
 
   Makefile.PL removed, Build.PL, META.yml, MANIFEST, README.md

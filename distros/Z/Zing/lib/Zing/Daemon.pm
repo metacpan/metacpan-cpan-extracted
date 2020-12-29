@@ -18,7 +18,7 @@ use File::Spec;
 use FlightRecorder;
 use POSIX;
 
-our $VERSION = '0.21'; # VERSION
+our $VERSION = '0.22'; # VERSION
 
 # ATTRIBUTES
 

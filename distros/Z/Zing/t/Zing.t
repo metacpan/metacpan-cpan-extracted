@@ -18,7 +18,7 @@ Zing
 
 =tagline
 
-Multi-Process Management System
+Actor-Model Toolkit
 
 =cut
 

@@ -1,5 +1,10 @@
 Revision history for Music-MelodicDevice-Ornamentation
 
+0.0601 2020-12-29 13:46:43
+    - Fix the scale name in the ->slide ornament.
+    - Simplify the eg/ornament program.
+    - Update ->slide tests.
+
 0.0600 2020-12-28 08:49:24
     - Add the eg/ornament program.
     - Use midinums for the internal scale, and use Music::Note to convert.

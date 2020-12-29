@@ -19,7 +19,7 @@ use POSIX;
 use Zing::Logic;
 use Zing::Loop;
 
-our $VERSION = '0.21'; # VERSION
+our $VERSION = '0.22'; # VERSION
 
 # ATTRIBUTES
 

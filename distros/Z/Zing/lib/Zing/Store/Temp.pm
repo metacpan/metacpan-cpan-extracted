@@ -13,7 +13,7 @@ use Data::Object::ClassHas;
 
 extends 'Zing::Store::Disk';
 
-our $VERSION = '0.21'; # VERSION
+our $VERSION = '0.22'; # VERSION
 
 # ATTRIBUTES
 

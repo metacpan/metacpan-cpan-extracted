@@ -1,6 +1,15 @@
 Changelog for Zing
 
-0.21 2020-12-26T07:17:14
+0.22 2020-12-29T17:32:02
+ - Add release updates
+ - Update tagline
+ - Optionally inflate object via env from term (#252)
+ - Leave Zing::Lookup derived domain names unaltered (#251)
+ - Fix Zing::Store::Disk default encoder (#248)
+ - Update TEMPLATE_MAIN
+
+0.21 2020-12-26T07:17:21
+ - Built release version 0.21
  - Add release updates
  - Remove Zing::Lookup savepoint on drop (#244)
  - Decouple Zing::Zang from Zing (#243)

@@ -4,13 +4,13 @@
       "Snorri Briem <briem@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Milla version v1.0.18, Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "Dist::Milla version v1.0.20, Dist::Zilla version 6.017, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Catmandu-Pure",
    "no_index" : {
@@ -36,7 +36,7 @@
       },
       "develop" : {
          "requires" : {
-            "Dist::Milla" : "v1.0.18",
+            "Dist::Milla" : "v1.0.20",
             "Test::Pod" : "1.41"
          }
       },
@@ -73,11 +73,14 @@
          "web" : "https://github.com/LibreCat/Catmandu-Pure"
       }
    },
-   "version" : "0.02",
+   "version" : "0.03",
    "x_contributors" : [
       "Patrick Hochstenbach <patrick.hochstenbach@ugent.be>",
       "Snorri Briem <Snorri.Briem@ub.lu.se>"
    ],
-   "x_serialization_backend" : "JSON::XS version 3.01"
+   "x_generated_by_perl" : "v5.28.2",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.11",
+   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later",
+   "x_static_install" : 0
 }
 

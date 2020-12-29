@@ -1,6 +1,6 @@
 NAME
 
-    Zing - Multi-Process Management System
+    Zing - Actor-Model Toolkit
 
 ABSTRACT
 
@@ -136,7 +136,7 @@ PRIMATIVES
 
       * Zing::Store::Redis: Redis Persistence
 
-      * Zing::Store::SQLite: SQLite Persistence
+      * Zing::Store::Sqlite: SQLite Persistence
 
       * Zing::Store::Temp: Temporary File-based Persistence
 
