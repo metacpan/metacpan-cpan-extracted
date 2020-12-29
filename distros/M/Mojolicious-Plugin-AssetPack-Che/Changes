@@ -3,12 +3,15 @@ Revision history for Mojolicious-Plugin-AssetPack-Che
 0.01    Date/time
         First version, released on an unsuspecting world.
 
-1.451	2017-08-07
+1.451  2017-08-07
        Add version option to config Pipe::CombineFile.
 
-2.102 	2020-12-23
+2.102   2020-12-23
      Mojolicious::Plugin::AssetPack::Pipe::VueTemplateCompiler
 
-2.104 	2020-12-25
+2.104   2020-12-25
      Autoclean `assets/cache` dir
      Cosmetics changes
+
+2.105   2020-12-29
+     node_modules 'vue-template-compiler', '@vue/component-compiler-utils'

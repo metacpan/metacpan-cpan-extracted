@@ -1,17 +1,21 @@
 # -*- perl -*-
 ##----------------------------------------------------------------------------
-## REST API Framework - ~/lib/Net/API/REST/Cookies.pm
-## Version v0.2.7
+## REST API Framework - ~/usr/local/src/perl/Net-API-REST/lib/Net/API/REST/Cookies.pm
+## Version v0.2.8
 ## Copyright(c) 2020 DEGUEST Pte. Ltd.
-## Author: Jacques Deguest <@sitael.tokyo.deguest.jp>
+## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/10/08
-## Modified 2020/05/21
+## Modified 2020/12/17
+## All rights reserved
 ## 
+## This program is free software; you can redistribute  it  and/or  modify  it
+## under the same terms as Perl itself.
 ##----------------------------------------------------------------------------
 package Net::API::REST::Cookies;
 BEGIN
 {
 	use strict;
+    use warnings;
 	use parent qw( Module::Generic );
 	use APR::Pool ();
 	use APR::Request::Cookie;
@@ -19,7 +23,7 @@ BEGIN
 	use Nice::Try;
 	use Cookie::Baker ();
 	use Scalar::Util;
-	our $VERSION = 'v0.2.7';
+	our $VERSION = 'v0.2.8';
 };
 
 sub init
@@ -211,7 +215,7 @@ sub as_string
 		$value = sprintf( '"%s"', $value ) if( $wrapped_in_double_quotes );
 	}
 	my @parts = ( "${name}=${value}" );
-	push( @parts, sprintf( 'Domain=%s', $self->domain ) );
+	push( @parts, sprintf( 'Domain=%s', $self->domain ) ) if( $self->domain );
 	push( @parts, sprintf( 'Port=%d', $self->port ) ) if( $self->port );
 	push( @parts, sprintf( 'Path=%s', $self->path ) ) if( $self->path );
 	## Could be empty. If not specified, it would be a session cookie
@@ -419,7 +423,7 @@ Net::API::REST::Cookies - Cookie Jar and cookie management
 
 =head1 VERSION
 
-    v0.2.7
+    v0.2.8
 
 =head1 DESCRIPTION
 

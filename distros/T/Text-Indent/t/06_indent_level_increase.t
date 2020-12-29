@@ -1,7 +1,3 @@
-#
-# $Id$
-#
-
 use strict;
 use warnings;
 
@@ -16,6 +12,3 @@ $i->increase;
 is( $i->level, 1, "level increased to 1");
 $i->increase(2);
 is( $i->level, 3, "level increased to 3");
-
-#
-# EOF

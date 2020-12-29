@@ -18,3 +18,9 @@ Change History for Text::Indent
 	- Spelling corrections
 	- Update git and MANIFEST ignore lists
 	- Convert build to ExtUtils::MakeMaker
+
+0.032	29 December 2020
+
+	- Remove test snippets from Pod
+	- Remove generated content from tests
+	- Add tests for instance accessor and arg

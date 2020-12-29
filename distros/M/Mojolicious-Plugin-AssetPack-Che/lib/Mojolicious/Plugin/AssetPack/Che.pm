@@ -101,11 +101,11 @@ Since version 1.28.
 
 =head1 VERSION
 
-Version 2.104 (test on base Mojolicious::Plugin::AssetPack v2.10)
+Version 2.105 (test on base Mojolicious::Plugin::AssetPack v2.10)
 
 =cut
 
-our $VERSION = '2.104';
+our $VERSION = '2.105';
 
 
 =head1 SYNOPSIS

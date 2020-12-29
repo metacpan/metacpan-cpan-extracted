@@ -228,6 +228,12 @@ static void req_destroy  (eio_req *grp);
 # define PAGESIZE sysconf (_SC_PAGESIZE)
 #endif
 
+#if HAVE_SYSCALL
+#include <sys/syscall.h>
+#else
+# define syscall(nr,...) (errno = ENOSYS, -1)
+#endif
+
 /*****************************************************************************/
 
 #if !_POSIX_MAPPED_FILES
@@ -1330,6 +1336,28 @@ BOOT:
     const_iv (STATX_ATTR_NODUMP)
     const_iv (STATX_ATTR_ENCRYPTED)
     const_iv (STATX_ATTR_AUTOMOUNT)
+
+    const_iv (AT_FDCWD)
+    const_iv (AT_SYMLINK_NOFOLLOW)
+    const_iv (AT_EACCESS)
+    const_iv (AT_REMOVEDIR)
+    const_iv (AT_SYMLINK_FOLLOW)
+    const_iv (AT_NO_AUTOMOUNT)
+    const_iv (AT_EMPTY_PATH)
+    const_iv (AT_STATX_SYNC_TYPE)
+    const_iv (AT_STATX_AS_STAT)
+    const_iv (AT_STATX_FORCE_SYNC)
+    const_iv (AT_STATX_DONT_SYNC)
+    const_iv (AT_RECURSIVE)
+
+    const_iv (OPEN_TREE_CLONE)
+
+    const_iv (MOVE_MOUNT_F_SYMLINKS)
+    const_iv (MOVE_MOUNT_F_AUTOMOUNTS)
+    const_iv (MOVE_MOUNT_F_EMPTY_PATH)
+    const_iv (MOVE_MOUNT_T_SYMLINKS)
+    const_iv (MOVE_MOUNT_T_AUTOMOUNTS)
+    const_iv (MOVE_MOUNT_T_EMPTY_PATH)
 
     /* these are libeio constants, and are independent of gendef0 */
     const_eio (SEEK_SET)
@@ -2598,6 +2626,54 @@ pipe2 (int flags = 0)
             PUSHs (newmortalFH (fd[0], O_RDONLY));
             PUSHs (newmortalFH (fd[1], O_WRONLY));
           }
+}
+
+void
+pidfd_open (int pid, unsigned int flags = 0)
+	PPCODE:
+{
+        /*GENDEF0_SYSCALL(pidfd_open,434)*/
+        int fd = syscall (SYS_pidfd_open, pid, flags);
+        XPUSHs (newmortalFH (fd, O_RDWR));
+}
+
+int
+pidfd_send_signal (SV *pidfh, int sig, SV *siginfo = &PL_sv_undef, unsigned int flags = 0)
+	PPCODE:
+{
+	int res;
+	siginfo_t si = { 0 };
+
+        if (SvOK (siginfo))
+          {
+            HV *hv;
+            SV **svp;
+
+            if (!SvROK (siginfo) || SvTYPE (SvRV (siginfo)) != SVt_PVHV)
+              croak ("siginfo argument must be a hashref code, pid, uid and value_int or value_ptr members, caught");
+
+            hv = (HV *)SvRV (siginfo);
+
+            if ((svp = hv_fetchs (hv, "code"     , 0))) si.si_code            =         SvIV (*svp);
+            if ((svp = hv_fetchs (hv, "pid"      , 0))) si.si_pid             =         SvIV (*svp);
+            if ((svp = hv_fetchs (hv, "uid"      , 0))) si.si_uid             =         SvIV (*svp);
+            if ((svp = hv_fetchs (hv, "value_int", 0))) si.si_value.sival_int =         SvIV (*svp);
+            if ((svp = hv_fetchs (hv, "value_ptr", 0))) si.si_value.sival_ptr = (void *)SvIV (*svp);
+          }
+
+        /*GENDEF0_SYSCALL(pidfd_send_signal,424)*/
+        res = syscall (SYS_pidfd_send_signal, s_fileno_croak (pidfh, 0), sig, SvOK (siginfo) ? &si : 0, flags);
+
+        XPUSHs (sv_2mortal (newSViv (res)));
+}
+
+void
+pidfd_getfd (SV *pidfh, int targetfd, unsigned int flags = 0)
+	PPCODE:
+{
+        /*GENDEF0_SYSCALL(pidfd_getfd,438)*/
+        int fd = syscall (SYS_pidfd_getfd, s_fileno_croak (pidfh, 0), targetfd, flags);
+        XPUSHs (newmortalFH (fd, O_RDWR));
 }
 
 void

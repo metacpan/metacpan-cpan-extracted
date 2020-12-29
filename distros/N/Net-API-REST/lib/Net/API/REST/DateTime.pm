@@ -12,6 +12,7 @@ package Net::API::REST::DateTime;
 BEGIN
 {
 	use strict;
+    use warnings;
 	use common::sense;
 	use parent qw( Module::Generic );
 	use Nice::Try;

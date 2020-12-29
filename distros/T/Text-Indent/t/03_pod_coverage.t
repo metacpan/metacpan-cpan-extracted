@@ -1,7 +1,3 @@
-#
-# $Id$
-#
-
 use strict;
 use warnings;
 
@@ -13,6 +9,3 @@ all_pod_coverage_ok(
         also_private => [ qr/^_\w+/, qw|init instance| ]
     },
 'all modules have POD covered');
-
-#
-# EOF

@@ -1,0 +1,275 @@
+=encoding utf8
+
+=head1 NAME
+
+Net::API::REST::Request::Params - Apache2 Request Fields Object
+
+=head1 SYNOPSIS
+
+    use Net::API::REST::Request::Params;
+    ## $r is the Apache2::RequestRec object
+    my $req = Net::API::REST::Request::Params->new(
+        request         => $r,
+        # pool of 2Mb
+        brigade_limit   => 2097152,
+        disable_uploads => 0,
+        # For example: 3Mb
+        read_limit      => 3145728,
+        temp_dir        => '/home/me/my/tmp'
+        upload_hook     => sub
+        {
+            my( $upload, $new_data ) = @_; 
+            # do something
+        },
+    );
+
+    my $form = $req->args;
+    # but it is more efficient to call $request->params with $request being a Net::API::REST::Request object
+    my @args = $req->args;
+    my $val = $req->args( 'first_name' );
+
+    my $status = $req->args_status;
+
+    my @names = $req->body;
+    my @vals = $req->body( 'field' );
+    my $status = $req->body_status;
+
+    $req->brigade_limit( 1024 );
+    my $bucket = $req->bucket_alloc;
+
+    # No upload please
+    $req->disable_uploads( 1 );
+
+    # Returns a APR::Request::Cookie::Table object
+    my $jar = $req->jar;
+    my $cookie = $req->jar( 'cookie_name' );
+    my @all = $req->jar( 'cookie_name' );
+    my $status = $req->jar_status;
+
+    # Returns a APR::Request::Param::Table object
+    my $object = $req->param;
+    my $val = $req->param( 'first_name' );
+    my @multi_choice_values = $req->param( 'multi_choice_field' );
+    # Note that $self->request->param( 'multi_choice_field' ) would return an array reference
+    # $self being your object inheriting from Net::API::REST
+    my $status = $req->param_status;
+
+    $req->parse;
+    # Returns a APR::Pool object
+    my $pool = $req->pool;
+
+    my $limit = $req->read_limit;
+
+    my $temp_dir = $req->temp_dir;
+
+    my $upload_accessor = $req->upload;
+    # Returns a Net::API::REST::Request::Upload object
+    my $object = $req->upload( 'file_upload' );
+    # Returns a APR::Request::Param::Table object
+    my $uploads = $req->uploads;
+
+    $req->upload_hook( \&some_sub );
+
+=head1 VERSION
+
+    v0.1.0
+
+=head1 DESCRIPTION
+
+This is an interface to Apache mod_perl methods to access and manipulate the request data and the way Apache handles those incoming data.
+
+This is taken from L<APR::Request>, L<APR::Request::Params>, L<APR::Request::Apache2> and L<Apache2::Request>
+
+There are some differences with L<Apache2::Request> that provides similar interface. L<Net::API::REST::Request::Params> is more cautious when dealing with L<APR::Request::body> and checks its status is 0 (i.e. successful) and traps any exceptions. 
+
+The instantiation makes no assumptions as to the data provided, which otherwise could lead to some unpleasant error, and we thrive to provide reliability as the backbone of a REST API.
+
+Finally, it provides access to more L<APR::Request> methods.
+
+=head1 METHODS
+
+=head2 new
+
+This takes an hash or an hash reference of parameters, of which 1 is mandatory: the I<request> parameter that must be an L<Apache2::RequestRec> object.
+
+The L<Apache2::RequestRec> object can be retrieved with L<Net::API::REST::Request/request> and this module object can be instantiated more simply by calling L<Net::API::REST::Request/apr>, which is basically a shortcut.
+
+Other possible parameters are: L</brigade_limit>, L</disable_uploads>, L</read_limit>, L</temp_dir>, L</upload_hook>.
+
+They can also be accessed as methods as documented below.
+
+=head2 args
+
+With no arguments, this method returns a tied L<APR::Request::Param::Table> object (or undef if the query string is absent) in scalar context, or the names (in order, with repetitions) of all the parsed query-string arguments.
+
+With the $key argument, in scalar context this method fetches the first matching query-string arg.  In list context it returns all matching args.
+
+args() will throw an L<APR::Request::Error> object whenever args_status() is non-zero and the return value is potentially invalid (eg "scalar $req->args($key)" will not die if the desired query argument was successfully parsed).
+
+    $args = $req->args;
+    @arg_names = $req->args;
+    if( $args->isa('APR::Request::Param::Table') )
+    {
+        # ok then
+    }
+    ok shift( @arg_names ) eq $_ for( keys( %$args ) );
+
+    $foo = $req->args( 'foo' );
+    @bar = $req->args( 'bar' );
+
+=head2 args_status
+
+Returns the final status code of the L<Apache2::RequestRec> handle's query-string parser.
+
+=head2 body
+
+With no arguments, this method returns a tied L<APR::Request::Param::Table> object (or undef if the request body is absent) in scalar context, or the names (in order, with repetitions) of all the parsed cookies.
+
+With the $key argument, in scalar context this method fetches the first matching body param.  In list context it returns all matching body params.
+
+L</body> will throw an L<APR::Request::Error> object whenever body_status() is non-zero and the return value is potentially invalid (eg "scalar $req->body($key)" will not die if the desired body param was successfully parsed).
+
+    my $body = $req->body;
+    my @body_names = $req->body;
+    if( $body->isa('APR::Request::Param::Table') )
+    {
+        # ok then
+    }
+    ok shift( @body_names ) eq $_ for( keys( %$body ) );
+
+    my $alpha = $req->body( 'alpha' );
+    my @beta = $req->body( 'beta' );
+
+=head2 body_status
+
+Returns the final status code of the L<Apache2::RequestRec> handle's body parser.
+
+=head2 brigade_limit integer
+
+Get/set the brigade_limit for the current parser. This limit determines how many bytes of a file upload that the parser may spool into main memory. Uploads exceeding this limit are written directly to disk.
+
+=head2 bucket_alloc
+
+Returns the L<APR::BucketAlloc> object associated to this L<Apache2::RequestRec> handle.
+
+=head2 disable_uploads boolean
+
+Engage the disable_uploads hook for this request.
+
+=head2 jar
+
+With no arguments, this method returns a tied L<APR::Request::Cookie::Table> object (or undef if the "Cookie" header is absent) in scalar context, or the names (in order, with repetitions) of all the parsed cookies.
+
+With the $key argument, in scalar context this method fetches the first matching cookie. In list context it returns all matching cookies.  The returned cookies are the values as they appeared in the incoming Cookie header.
+
+This will trigger an L<APR::Request::Error> if L</jar_status> returned value is not zero.
+
+    my $jar = $req->jar;
+    my @cookie_names = $req->jar;
+    if( $jar->isa( 'APR::Request::Cookie::Table' ) )
+    {
+        # ok then
+    }
+    ok shift( @cookie_names ) eq $_ for( keys( %$jar ) );
+
+    my $cookie = $req->jar('apache');
+    my @cookies = $req->jar('apache');
+
+=head2 jar_status
+
+Returns the final status code of the L<Apache2::RequestRec> handle's cookie header parser.
+
+=head2 param
+
+With no arguments, this method returns a tied L<APR::Request::Param::Table> object (or undef, if the query string and request body are absent) in scalar context, or the names (in order, with repetitions) of all the incoming (args + body) params.
+
+With the $key argument, in scalar context this method fetches the first matching param. In list context it returns all matching params.
+
+L</param> will throw an L<APR::Request::Error> object whenever param_status() is non-zero and the return value is potentially invalid (eg "scalar $req->param($key)" will not die if the desired param was successfully parsed).
+
+    my $param = $req->param;
+    my @param_names = $req->param;
+    if( $param->isa(' APR::Request::Param::Table' ) )
+    {
+        # ok then
+    }
+    ok shift( @param_names ) eq $_ for( keys( %$param ) );
+
+    my $foo = $req->param( 'foo' );
+    my @foo = $req->param( 'foo' );
+
+=head2 param_status
+
+Returns "($req->args_status, $req->body_status)" in list context; otherwise returns "$req->args_status || $req->body_status".
+
+=head2 parse
+
+Parses the jar, args, and body tables. Returns "$req->jar_status, $req->args_status, $req->body_status".
+
+However, it is more efficient to write:
+
+    sub handler
+    {
+        my $r = shift( @_ );
+        my $req = Net::API::REST::Request::Params->new( request => $r );
+        # efficiently parses the request body
+        $r->discard_request_body;
+        my $parser_status = $req->body_status;
+        # ...
+    }
+
+=head2 pool
+
+Returns the L<APR::Pool> object associated to this L<Apache2::RequestRec> handle.
+
+=head2 read_limit integer
+
+Get/set the read limit, which controls the total amount of bytes that can be fed to the current parser.
+
+=head2 temp_dir string
+
+Get/set the spool directory for uploads which exceed the configured brigade_limit.
+
+=head2 upload
+
+With no arguments, this method returns a tied L<APR::Request::Param::Table> object (or undef if the request body is absent) in scalar context (whose entries are L<Net::API::REST::Request::Params::Upload> objects inherited from L<APR::Request::Param>), or the names (in order, with repetitions) of all the incoming uploads.
+
+If one ore more arguments are provided, they are taken as data upload field names and their corresponding L<Net::API::REST::Request::Params::Upload> objects are returned as a list in list context or the first one on the list in scalar context.
+
+More generally, L</upload> follows the same pattern as L</param> with respect to its return values and argument list. The main difference is that its returned values are L<Net::API::REST::Request::Param::Upload> object refs, not simple scalars.
+
+=head2 uploads
+
+This returns an L<APR::Request::Param::Table>. This is different from the L<Net::API::REST::Request/upload> who returns an array reference of L<Net::API::REST::Request::Params::Upload> objects.
+
+=head2 upload_hook code reference
+
+Provided with a code reference, this adds an upload hook callback for this request. The arguments to the $callback sub are ($upload, $new_data).
+
+    $r->upload_hook(sub
+    {
+        my( $upload, $new_data ) = @_;
+        # do something
+    });
+
+=head1 AUTHOR
+
+Jacques Deguest E<lt>F<jack@deguest.jp>E<gt>
+
+CPAN ID: jdeguest
+
+https://git.deguest.jp/jack/Net-API-REST
+
+=head1 SEE ALSO
+
+L<Apache2::Request>, L<APR::Request>, L<APR::Request::Param>, L<APR::Request::Apache2>
+
+=head1 COPYRIGHT & LICENSE
+
+Copyright (c) 2018-2019 DEGUEST Pte. Ltd.
+
+You can use, copy, modify and redistribute this package and associated
+files under the same terms as Perl itself.
+
+=cut
+

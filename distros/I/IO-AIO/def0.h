@@ -588,3 +588,90 @@
 #ifndef STATX_ATTR_AUTOMOUNT
 #define STATX_ATTR_AUTOMOUNT 0
 #endif
+#ifndef AT_FDCWD
+#define AT_FDCWD 0
+#endif
+#ifndef AT_SYMLINK_NOFOLLOW
+#define AT_SYMLINK_NOFOLLOW 0
+#endif
+#ifndef AT_EACCESS
+#define AT_EACCESS 0
+#endif
+#ifndef AT_REMOVEDIR
+#define AT_REMOVEDIR 0
+#endif
+#ifndef AT_SYMLINK_FOLLOW
+#define AT_SYMLINK_FOLLOW 0
+#endif
+#ifndef AT_NO_AUTOMOUNT
+#define AT_NO_AUTOMOUNT 0
+#endif
+#ifndef AT_EMPTY_PATH
+#define AT_EMPTY_PATH 0
+#endif
+#ifndef AT_STATX_SYNC_TYPE
+#define AT_STATX_SYNC_TYPE 0
+#endif
+#ifndef AT_STATX_AS_STAT
+#define AT_STATX_AS_STAT 0
+#endif
+#ifndef AT_STATX_FORCE_SYNC
+#define AT_STATX_FORCE_SYNC 0
+#endif
+#ifndef AT_STATX_DONT_SYNC
+#define AT_STATX_DONT_SYNC 0
+#endif
+#ifndef AT_RECURSIVE
+#define AT_RECURSIVE 0
+#endif
+#ifndef OPEN_TREE_CLONE
+#define OPEN_TREE_CLONE 0
+#endif
+#ifndef MOVE_MOUNT_F_SYMLINKS
+#define MOVE_MOUNT_F_SYMLINKS 0
+#endif
+#ifndef MOVE_MOUNT_F_AUTOMOUNTS
+#define MOVE_MOUNT_F_AUTOMOUNTS 0
+#endif
+#ifndef MOVE_MOUNT_F_EMPTY_PATH
+#define MOVE_MOUNT_F_EMPTY_PATH 0
+#endif
+#ifndef MOVE_MOUNT_T_SYMLINKS
+#define MOVE_MOUNT_T_SYMLINKS 0
+#endif
+#ifndef MOVE_MOUNT_T_AUTOMOUNTS
+#define MOVE_MOUNT_T_AUTOMOUNTS 0
+#endif
+#ifndef MOVE_MOUNT_T_EMPTY_PATH
+#define MOVE_MOUNT_T_EMPTY_PATH 0
+#endif
+#if HAVE_SYSCALL
+# if __linux__ && !defined(SYS_pidfd_open)
+#  define SYS_pidfd_open 434
+# endif
+#else
+# undef SYS_pidfd_open
+#endif
+#ifndef SYS_pidfd_open
+# define SYS_pidfd_open -1
+#endif
+#if HAVE_SYSCALL
+# if __linux__ && !defined(SYS_pidfd_send_signal)
+#  define SYS_pidfd_send_signal 424
+# endif
+#else
+# undef SYS_pidfd_send_signal
+#endif
+#ifndef SYS_pidfd_send_signal
+# define SYS_pidfd_send_signal -1
+#endif
+#if HAVE_SYSCALL
+# if __linux__ && !defined(SYS_pidfd_getfd)
+#  define SYS_pidfd_getfd 438
+# endif
+#else
+# undef SYS_pidfd_getfd
+#endif
+#ifndef SYS_pidfd_getfd
+# define SYS_pidfd_getfd -1
+#endif

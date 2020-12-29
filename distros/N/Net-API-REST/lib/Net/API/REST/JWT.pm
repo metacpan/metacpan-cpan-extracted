@@ -12,6 +12,7 @@ package Net::API::REST::JWT;
 BEGIN
 {
     use strict;
+    use warnings;
     use common::sense;
     use Exporter 'import';
     our %EXPORT_TAGS = ( all => [qw(decode_jwt encode_jwt)] );

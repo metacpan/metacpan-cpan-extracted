@@ -1,0 +1,18 @@
+use alienfile;
+use Env qw(@PATH);
+
+eval 'require tool::M4; 1' or die "tool::M4 must be built before tool::AC";
+
+unshift @PATH, tool::M4->bin_dir;
+probe sub { 'share' };
+share {
+  plugin 'Build::Autoconf';
+  start_url 'autoconf-2.69.tar.gz';
+  plugin 'Fetch::Local';
+  plugin 'Extract' => 'tar.gz';
+  build [
+    '%{configure}',
+    '%{make}',
+    '%{make} install',
+   ];
+};

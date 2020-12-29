@@ -1,7 +1,3 @@
-#
-# $Id$
-#
-
 use strict;
 use warnings;
 
@@ -15,6 +11,3 @@ BEGIN {
 
 use_ok('Text::Indent');
 is($Text::Indent::VERSION, '0.031', 'check module version');
-
-#
-# EOF

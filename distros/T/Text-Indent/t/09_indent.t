@@ -1,7 +1,3 @@
-#
-# $Id$
-#
-
 use strict;
 use warnings;
 
@@ -29,6 +25,3 @@ $i->reset;
 is( $i->indent("foo"), "foo", "reset indent level");
 $i->decrease;
 is( $i->indent("foo"), "foo", "negative indent has no effect");
-
-#
-# EOF

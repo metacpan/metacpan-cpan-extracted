@@ -1,17 +1,18 @@
 # -*- perl -*-
 ##----------------------------------------------------------------------------
 ## REST API Framework - ~/lib/Net/API/REST/Response.pm
-## Version v0.4.10
-## Copyright(c) 2019 DEGUEST Pte. Ltd.
+## Version v0.4.11
+## Copyright(c) 2020 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <@sitael.tokyo.deguest.jp>
 ## Created 2019/09/01
-## Modified 2020/05/16
+## Modified 2020/06/15
 ## 
 ##----------------------------------------------------------------------------
 package Net::API::REST::Response;
 BEGIN
 {
     use strict;
+    use warnings;
     use common::sense;
     use parent qw( Module::Generic );
     use Devel::Confess;
@@ -22,13 +23,14 @@ BEGIN
     use Apache2::RequestRec ();
     use Apache2::SubRequest ();
     use Apache2::Const -compile => qw( :common :http );
+    use APR::Request ();
     use APR::Request::Cookie;
     use Net::API::REST::Cookies;
     use Cookie::Baker ();
     use Scalar::Util;
     use Net::API::REST::Status;
     use Nice::Try;
-    our $VERSION = 'v0.4.10';
+    our $VERSION = 'v0.4.11';
 };
 
 sub init
@@ -294,6 +296,18 @@ sub cookie_set
 #  }
 sub custom_response { return( shift->_try( '_request', 'custom_response', @_ ) ); }
 
+sub decode
+{
+    my $self = shift( @_ );
+    return( APR::Request::decode( shift( @_ ) ) );
+}
+
+sub encode
+{
+    my $self = shift( @_ );
+    return( APR::Request::encode( shift( @_ ) ) );
+}
+
 sub env
 {
     my $self = shift( @_ );
@@ -522,6 +536,10 @@ sub status { return( shift->_try( '_request', 'status', @_ ) ); }
 
 sub update_mtime { return( shift->_try( '_request', 'update_mtime', @_ ) ); }
 
+sub url_decode { return( shift->decode( @_ ) ); }
+
+sub url_encode { return( shift->encode( @_ ) ); }
+
 ## e.g. $cnt = $r->write($buffer);
 ## $cnt = $r->write( $buffer, $len );
 ## $cnt = $r->write( $buffer, $len, $offset );
@@ -567,7 +585,7 @@ Net::API::REST::Response - Apache2 Outgoing Response Access and Manipulation
 
 =head1 VERSION
 
-    v0.4.10
+    v0.4.11
 
 =head1 DESCRIPTION
 
@@ -728,6 +746,18 @@ B<custom_response>() does not alter the response code, but is used to replace th
 When squirrels can't run any more, the handler will return 403, with the custom message:
 
      It's siesta time, please try later
+
+=head2 decode( $string )
+
+Given a url-encoded string, this returns the decoded string
+
+This uses L<APR::Request> XS method.
+
+=head2 encode( $string )
+
+Given a string, this returns its url-encoded version
+
+This uses L<APR::Request> XS method.
 
 =head2 env( name, [ name => value ] )
 

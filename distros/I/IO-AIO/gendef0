@@ -12,6 +12,22 @@ print <<EOF;
 EOF
 
 while (<>) {
+   if (/\/\*GENDEF0_SYSCALL\((.*),(.*)\)\*\//) {
+      my ($syscall, $linux) = ($1, $2);
+      print <<EOF;
+#if HAVE_SYSCALL
+# if __linux__ && !defined(SYS_$syscall)
+#  define SYS_$syscall $linux
+# endif
+#else
+# undef SYS_$syscall
+#endif
+#ifndef SYS_$syscall
+# define SYS_$syscall -1
+#endif
+EOF
+   }
+
    if (/^\s*const_iv\s*\((\S+)\)\s*$/ || /^\s*const_niv\s*\([^,]+,\s*(\S+)\)\s*$/) {
       print "#ifndef $1\n",
             "#define $1 0\n",

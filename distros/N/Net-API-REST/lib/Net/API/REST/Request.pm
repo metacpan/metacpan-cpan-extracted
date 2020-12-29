@@ -1,20 +1,22 @@
 # -*- perl -*-
 ##----------------------------------------------------------------------------
 ## REST API Framework - ~/lib/Net/API/REST/Request.pm
-## Version v0.8.6
+## Version v0.9.0
 ## Copyright(c) 2020 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <@sitael.tokyo.deguest.jp>
 ## Created 2019/09/01
-## Modified 2020/06/13
+## Modified 2020/06/15
 ## 
 ##----------------------------------------------------------------------------
 package Net::API::REST::Request;
 BEGIN
 {
     use strict;
+    use warnings;
     use common::sense;
     use parent qw( Module::Generic );
     use Encode ();
+    use utf8 ();
     use Devel::Confess;
     use Apache2::Request;
     use Scalar::Util;
@@ -26,9 +28,12 @@ BEGIN
     use Apache2::RequestIO ();
     use Apache2::Log;
     use APR::Pool ();
+    use APR::Request ();
     use APR::Socket ();
     use APR::Request::Cookie;
     use APR::Request::Apache2;
+    # For subnet_of() method
+    use APR::IpSubnet ();
     use Net::API::REST::Cookies;
     use URI;
     use Net::API::REST::Query;
@@ -40,7 +45,7 @@ BEGIN
     use JSON;
     use Nice::Try;
     use version;
-    our $VERSION = 'v0.8.6';
+    our $VERSION = 'v0.9.0';
     our @DoW = qw( Sun Mon Tue Wed Thu Fri Sat );
     our @MoY = qw( Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec );
     our $MoY = {};
@@ -131,6 +136,37 @@ sub aborted { return( shift->_try( 'connection', 'aborted' ) ); }
 ## e.g. text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8
 sub accept { return( shift->headers->{ 'Accept' } ); }
 
+sub acceptable
+{
+    my $self = shift( @_ );
+    if( @_ )
+    {
+        my $ref = scalar( @_ ) == 1
+            ? Scalar::Util::reftype( $_[0] ) eq 'ARRAY'
+                ? shift( @_ )
+                : [ @_ ]
+            : [ @_ ];
+        $self->{acceptable} = $ref;
+    }
+    if( !$self->{acceptable} )
+    {
+        my $accept_raw = $self->accept;
+        $self->{acceptable} = [];
+        if( $accept_raw )
+        {
+            my $accept_def = $self->_split_str( $accept_raw );
+            ## Typical value from Aja call: application/json, text/javascript, */*
+            my $accept = $accept_def->{value};
+            $self->{acceptable} = [ split( /\,[[:blank:]]+/, $accept ) ];
+            for( @{$self->{acceptable}} )
+            {
+                $_ = lc( $_ );
+            }
+        }
+    }
+    return( wantarray() ? @{$self->{acceptable}} : $self->{acceptable}->[0] ) if( $self->{acceptable} );
+}
+
 ## e.g. gzip, deflate, br
 sub accept_encoding { return( shift->headers->{ 'Accept-Encoding' } ); }
 
@@ -139,6 +175,8 @@ sub accept_language { return( shift->headers->{ 'Accept-Language' } ); }
 
 ## The allowed methods, GET, POST, PUT, OPTIONS, HEAD, etc
 sub allowed { return( shift->_try( 'request', 'allowed', @_ ) ); }
+
+sub apr { return( Net::API::REST::Request::Params->new( shift->request ) ); }
 
 sub args { return( shift->_try( 'request', 'args', @_ ) ); }
 
@@ -164,7 +202,7 @@ sub auto_header
     return( $self->request->assbackwards );
 }
 
-## See Apache2::Request
+## See APR::Request
 sub body { return( shift->_try( 'request', 'body', @_ ) ); }
 
 sub charset { return( shift->_set_get_scalar( 'charset', @_ ) ); }
@@ -363,7 +401,24 @@ sub data
 
 sub datetime { return( Net::API::REST::DateTime->new( debug => shift->debug ) ); }
 
+sub decode
+{
+    my $self = shift( @_ );
+    return( APR::Request::decode( shift( @_ ) ) );
+}
+
+## Do not track: 1 or 0
+sub dnt { return( shift->env( 'HTTP_DNT', @_ ) ); }
+
+sub encode
+{
+    my $self = shift( @_ );
+    return( APR::Request::encode( shift( @_ ) ) );
+}
+
 sub document_root { return( shift->_try( 'request', 'document_root', @_ ) ); }
+
+sub document_uri { return( shift->env( 'document_uri', @_ ) ); }
 
 sub env
 {
@@ -407,6 +462,9 @@ sub filename { return( shift->_try( 'request', 'filename' ) ); }
 
 ## APR::Finfo
 sub finfo { return( shift->_try( 'request', 'finfo' ) ) }
+
+## example: CGI/1.1
+sub gateway_interface { return( shift->env( 'GATEWAY_INTERFACE', @_ ) ); }
 
 ## $handlers_list = $r->get_handlers($hook_name);
 ## https://perl.apache.org/docs/2.0/api/Apache2/RequestUtil.html#C_get_handlers_
@@ -505,6 +563,8 @@ sub is_header_only { return( shift->request->header_only ); }
 ## To find out if a PerlOptions is activated like +GlobalRequest or -GlobalRequest
 sub is_perl_option_enabled { return( shift->_try( 'request', 'is_perl_option_enabled', @_ ) ); }
 
+sub is_secure { return( shift->env( 'HTTPS' ) eq 'on' ? 1 : 0 ); }
+
 sub json
 {
     my $self = shift( @_ );
@@ -540,6 +600,11 @@ sub log_error { return( shift->_try( 'request', 'log_error' ) ); }
 
 sub method { return( shift->_try( 'request', 'method' ) ); }
 
+sub mod_perl { return( shift->env( 'MOD_PERL', @_ ) ); }
+
+## example: mod_perl/2.0.11
+sub mod_perl_version { return( version->parse( ( shift->mod_perl =~ /^mod_perl\/(\d+\.[\d\.]+)/ )[0] ) ); }
+
 sub mtime { return( shift->_try( 'request', 'mtime' ) ); }
 
 sub next { return( shift->_try( 'request', 'next' ) ); }
@@ -572,15 +637,42 @@ sub notes
 
 sub output_filters { return( shift->_try( 'request', 'output_filters' ) ); }
 
+sub param
+{
+    my $self = shift( @_ );
+    my $name = shift( @_ ) || return;
+    my $r = Net::API::REST::Request::Params->new( $self->request );
+    if( @_ )
+    {
+        return( $r->param( $name, @_ ) );
+    }
+    else
+    {
+        my $val = $r->param( $name );
+        my $up = $r->upload( $name );
+        ## Return the Net:::API::REST::Request::Upload object if it is one
+        return( $up ) if( Scalar::Util::blessed( $up ) );
+        return( $val );
+    }
+}
+
 sub params
 {
     my $self = shift( @_ );
-    my $r = Apache2::Request->new( $self->request );
     return( $self->query ) if( $self->method eq 'GET' );
+    ## my $r = Apache2::Request->new( $self->request );
+    my $r = Net::API::REST::Request::Params->new( request => $self->request );
     ## https://perl.apache.org/docs/1.0/guide/snippets.html#Reusing_Data_from_POST_request
     ## my %params = $r->method eq 'POST' ? $r->content : $r->args;
     ## Data are in pure utf8; not perl's internal, so it is up to us to decode them
     my( @params ) = $r->param;
+    my( @uploads ) = $r->upload;
+    my $upload_fields = {};
+    ## To make it easy to check if it exists
+    if( scalar( @uploads ) )
+    {
+        @$upload_fields{ @uploads } = ( 1 ) x scalar( @uploads );
+    }
     # $self->message( 3, "Found the following keys in post data: '", join( "', '", @params ), "'," );
     my $form = {};
     #my $io = IO::File->new( ">/tmp/form_data.txt" );
@@ -594,10 +686,23 @@ sub params
         # $self->message( 3, "Adding value '", $values[0], "' for key '$k'." );
         #$raw->print( "$k => " );
         #$io->print( "$k => " );
-        my $name = Encode::is_utf8( $k ) ? $k : Encode::decode_utf8( $k );
+        my $name = utf8::is_utf8( $k ) ? $k : Encode::decode_utf8( $k );
         #$io2->print( "$name => " );
         $form->{ $name } = scalar( @values ) > 1 ? \@values : $values[0];
-        if( ref( $form->{ $name } ) )
+        if( CORE::exists( $upload_fields->{ $name } ) )
+        {
+            my $up = $r->upload( $name );
+            if( !$up )
+            {
+                CORE::warn( "Error: could not get the Net::API::REST::Params::Upload object for this upload field \"$name\".\n" );
+                next;
+            }
+            else
+            {
+                $form->{ $name } = $up;
+            }
+        }
+        elsif( ref( $form->{ $name } ) )
         {
             #$raw->print( "[\n" );
             #$io->print( "[\n" );
@@ -606,7 +711,7 @@ sub params
             {
                 #$raw->print( "\t[$i]: ", $form->{ $name }->[ $i ], "\n" );
                 #$io->print( "\t[$i]: ", $form->{ $name }->[ $i ], "\n" );
-                $form->{ $name }->[ $i ] = Encode::is_utf8( $form->{ $name }->[ $i ] ) ? $form->{ $name }->[ $i ] : Encode::decode_utf8( $form->{ $name }->[ $i ] );
+                $form->{ $name }->[ $i ] = utf8::is_utf8( $form->{ $name }->[ $i ] ) ? $form->{ $name }->[ $i ] : Encode::decode_utf8( $form->{ $name }->[ $i ] );
                 #$io2->print( "\t[$i]: ", $form->{ $name }->[ $i ], "\n" );
             }
             #$raw->print( "];\n" );
@@ -617,7 +722,7 @@ sub params
         {
             #$raw->print( $form->{ $name }, "\n" );
             #$io->print( $form->{ $name }, "\n" );
-            $form->{ $name } = Encode::is_utf8( $form->{ $name } ) ? $form->{ $name } : Encode::decode_utf8( $form->{ $name } );
+            $form->{ $name } = utf8::is_utf8( $form->{ $name } ) ? $form->{ $name } : Encode::decode_utf8( $form->{ $name } );
             #$io2->print( $form->{ $name }, "\n" );
         }
     }
@@ -626,6 +731,9 @@ sub params
     #$io2->close;
     return( $form );
 }
+
+## example: /bin:/usr/bin:/usr/local/bin
+sub path { return( shift->env( 'PATH', @_ ) ); }
 
 sub path_info { return( shift->_try( 'request', 'path_info', @_ ) ); }
 
@@ -699,6 +807,15 @@ sub query_string { return( shift->_try( 'request', 'args', @_ ) ); }
 ## Apache2::RequestIO
 sub read { return( shift->_try( 'request', 'read', @_ ) ); }
 
+sub redirect_error_notes { return( shift->env( 'REDIRECT_ERROR_NOTES', @_ ) ); }
+
+sub redirect_query_string { return( shift->env( 'REDIRECT_QUERY_STRING', @_ ) ); }
+
+sub redirect_status { return( shift->env( 'REDIRECT_STATUS', @_ ) ); }
+
+## https://httpd.apache.org/docs/2.4/custom-error.html
+sub redirect_url { return( shift->env( 'REDIRECT_URL', @_ ) ); }
+
 sub referer { return( shift->headers->{Referer} ); }
 
 ## sub remote_addr { return( shift->connection->remote_ip ); }
@@ -767,6 +884,8 @@ sub remote_ip
     }
 }
 
+sub remote_port { return( shift->env( 'REMOTE_PORT', @_ ) ); }
+
 sub reply
 {
     my $self = shift( @_ );
@@ -826,6 +945,8 @@ sub reply
 
 sub request { return( shift->_set_get_object( 'request', 'Apache2::Request', @_ ) ); }
 
+sub request_scheme { return( shift->env( 'REQUEST_SCHEME', @_ ) ); }
+
 # sub request_time { return( shift->request->request_time ); }
 sub request_time
 {
@@ -838,16 +959,37 @@ sub request_time
     return( $dt );
 }
 
+sub request_uri { return( shift->env( 'REQUEST_URI', @_ ) ); }
+
+sub script_filename { return( shift->env( 'SCRIPT_FILENAME', @_ ) ); }
+
+sub script_name { return( shift->env( 'SCRIPT_NAME', @_ ) ); }
+
+## Example: https://example.com/cgi-bin/prog.cgi/path/info
+sub script_uri { return( URI->new( shift->env( 'SCRIPT_URI', @_ ) ) ); }
+
+## Example: /cgi-bin/prog.cgi/path/info
+sub script_url { return( shift->env( 'SCRIPT_URL', @_ ) ); }
+
 ## Return Apache2::ServerUtil object
 sub server { return( shift->request->server ); }
 
 sub server_admin { return( shift->_try( 'server', 'server_admin', @_ ) ); }
+
+sub server_addr { return( shift->env( 'SERVER_ADDR', @_ ) ); }
 
 sub server_hostname { return( shift->_try( 'server', 'server_hostname', @_ ) ); }
 
 sub server_name { return( shift->_try( 'request', 'get_server_name' ) ); }
 
 sub server_port { return( shift->_try( 'request', 'get_server_port' ) ); }
+
+## Example: HTTP/1.1
+sub server_protocol { return( shift->env( 'SERVER_PROTOCOL', @_ ) ); }
+
+sub server_signature { return( shift->env( 'SERVER_SIGNATURE', @_ ) ); }
+
+sub server_software { return( shift->env( 'SERVER_SOFTWARE', @_ ) ); }
 
 ## Or maybe the environment variable SERVER_SOFTWARE, e.g. Apache/2.4.18
 ## sub server_version { return( version->parse( Apache2::ServerUtil::get_server_version ) ); }
@@ -934,6 +1076,33 @@ sub status { return( shift->_try( 'request', 'status', @_ ) ); }
 
 sub status_line { return( shift->_try( 'request', 'status_line' ) ); }
 
+sub subnet_of
+{
+    my $self = shift( @_ );
+    my( $ip, $mask ) = @_;
+    my $ipsub;
+    try
+    {
+        if( $ip && $mask )
+        {
+            $ipsub = APR::IpSubnet->new( $self->pool, $ip, $mask );
+        }
+        elsif( $ip )
+        {
+            $ipsub = APR::IpSubnet->new( $self->pool, $ip );
+        }
+        else
+        {
+            return( $self->error( "No ip address or block was provided to evaluate current ip against" ) );
+        }
+    }
+    catch( $e )
+    {
+        return( $self->error( "An error occurred while trying to create a APR::IpSubnet object with ip \"$ip\" and mask \"$mask\": $e" ) );
+    }
+    return( $ipsub->test( $self->remote_addr ) );
+}
+
 sub subprocess_env { return( shift->_try( 'request', 'subprocess_env' ) ); }
 
 sub type
@@ -970,6 +1139,27 @@ sub unparsed_uri
     return( $unparsed_uri );
 }
 
+sub uploads
+{
+    my $self = shift( @_ );
+    my $r = Net::API::REST::Request::Params->new( $self->request );
+    my( @uploads ) = $r->upload;
+    my $objs = [];
+    foreach my $name ( @uploads )
+    {
+        my $up = $r->upload( $name );
+        if( !$up )
+        {
+            CORE::warn( "Error: could not get the Net::API::REST::Params::Upload object for this upload field \"$name\".\n" );
+        }
+        else
+        {
+            CORE::push( @$objs, $up );
+        }
+    }
+    return( $objs );
+}
+
 #sub uri { return( URI->new( shift->request->uri( @_ ) ) ); }
 ## FYI, there is also the APR::URI module, but I could not see the value of it
 ## https://perl.apache.org/docs/2.0/api/APR/URI.html
@@ -983,6 +1173,10 @@ sub uri
     my $path = $r->unparsed_uri;
     return( URI->new( "${proto}://${host}:${port}${path}" ) );
 }
+
+sub url_decode { return( shift->decode( @_ ) ); }
+
+sub url_encode { return( shift->encode( @_ ) ); }
 
 sub user { return( shift->_try( 'request', 'user' ) ); }
 
@@ -1066,6 +1260,171 @@ sub _try
     }
 }
 
+package Net::API::REST::Request::Params;
+BEGIN
+{
+    use strict;
+    use warnings;
+    use APR::Request::Param;
+    ## Which itself inherits from APR::Request
+    use parent qw( APR::Request::Apache2 );
+    use Nice::Try;
+    use Scalar::Util ();
+    use version;
+    our $ERROR;
+    our $VERSION = 'v0.1.0';
+};
+
+sub new
+{
+    my $this = shift( @_ );
+    my $class = ref( $this ) || $this;
+    my $r;
+    $r = shift( @_ ) if( @_ && Scalar::Util::blessed( $_[0] ) && $_[0]->isa( 'Apache2::RequestRec' ) );
+    my $hash = {};
+    if( @_ )
+    {
+        if( scalar( @_ ) == 1 && ref( $_[0] ) eq 'HASH' )
+        {
+            $hash = shift( @_ );
+        }
+        elsif( !( scalar( @_ ) % 2 ) )
+        {
+            $hash = { @_ };
+        }
+        else
+        {
+            return( __PACKAGE__->error( "Odd number of parameters provided. I was expecting a hash or hash reference." ) );
+        }
+    }
+    $hash->{request} = $r if( $r );
+    return( $this->error( "No Apache2::RequestRec was provided to instantiate our object Net::API::REST::Request::Params" ) ) if( !$hash->{request} );
+    return( $this->error( "Object provided is not an Apache2::RequestRec object." ) ) if( !ref( $hash->{request} ) || ( Scalar::Util::blessed( $hash->{request} ) && !$hash->{request}->isa( 'Apache2::RequestRec' ) ) );
+    my $req = $class->APR::Request::Apache2::handle( $hash->{request} );
+    my @ok_meth = qw( brigade_limit disable_uploads read_limit temp_dir upload_hook  );
+    foreach my $meth ( @ok_meth )
+    {
+        if( CORE::exists( $hash->{ $meth } ) )
+        {
+            $req->$meth( $hash->{ $meth } );
+        }
+    }
+    return( $req );
+}
+
+sub error
+{
+    my $self = shift( @_ );
+    if( @_ )
+    {
+        $ERROR = join( '', @_ );
+        return;
+    }
+    return( $ERROR );
+}
+
+## Borrowed from Apache2::Upload so we can better trap exception and implement more methods
+sub upload
+{
+    ## $self is a APR::Request::Apache2 object itself inheriting from APR::Request
+    my $self = shift( @_ );
+    ## As per APR::Request: "upload() will throw an APR::Request::Error object whenever body_status() is non-zero"
+    my $body;
+    try
+    {
+        if( $self->body_status != 0 )
+        {
+            $ERROR = "APR::Request::body_status returned non-zero (" . $req->body_status . ")";
+            return;
+        }
+        $body = $self->body or return;
+    }
+    catch( $e )
+    {
+        return( $self->error( "Unable to get the APR::Request body objet: $e" ) );
+    }
+    ## So further call on this object will be handled by Net::API::REST::Request::Params::Field below
+    $body->param_class( 'Net::API::REST::Request::Upload' );
+    if( @_ )
+    {
+        my @uploads = grep( $_->upload, $body->get( @_ ) );
+        return( wantarray() ? @uploads : $uploads[0] );
+    }
+
+    return map{ $_->upload ? $_->name : () } values( %$body ) if( wantarray() );
+    return( $body->uploads( $self->pool ) );
+}
+
+sub uploads
+{
+    my $self = shift( @_ );
+    my $body;
+    try
+    {
+        if( $self->body_status != 0 )
+        {
+            $ERROR = "APR::Request::body_status returned non-zero (" . $req->body_status . ")";
+            return;
+        }
+        $body = $self->body or return;
+    }
+    catch( $e )
+    {
+        return( $self->error( "Unable to get the APR::Request body objet: $e" ) );
+    }
+    ## So further call on this object will be handled by Net::API::REST::Request::Params::Field below
+    $body->param_class( __PACKAGE__ . '::Field' );
+    return( $body->uploads( $self->pool ) );
+}
+
+package Net::API::REST::Request::Upload;
+BEGIN
+{
+    use strict;
+    use warnings;
+    use APR::Request::Param;
+    use parent qw( APR::Request::Param );
+    use version;
+    our $VERSION = 'v0.1.0';
+};
+
+sub bucket { return( shift->upload( @_ ) ); }
+
+# This one is not very useful, since the charaset value here is an integer: 0, 1, 2, 8
+# sub charset
+
+sub fh { return( shift->upload_fh( @_ ) ); }
+
+sub filename { return( shift->upload_filename( @_ ) ); }
+
+## The header for this field
+# sub info
+
+sub io { return( shift->upload_io( @_ ) ); }
+
+# sub is_tainted
+
+sub length { return( shift->upload_size( @_ ) ); }
+
+sub link { return( shift->upload_link( @_ ) ); }
+
+# sub make
+
+# sub name
+
+sub size { return( shift->upload_size( @_ ) ); }
+
+sub slurp { return( shift->upload_slurp( @_ ) ); }
+
+sub tempname { return( shift->upload_tempname( @_ ) ); }
+
+sub type { return( shift->upload_type( @_ ) ); }
+
+## Returns an APR::Brigade, if any
+# upload
+
+# sub value
+
 1;
 
 __END__
@@ -1086,7 +1445,7 @@ Net::API::REST::Request - Apache2 Incoming Request Access and Manipulation
 
 =head1 VERSION
 
-    v0.8.6
+    v0.9.0
 
 =head1 DESCRIPTION
 
@@ -1130,6 +1489,14 @@ Tells whether the connection has been aborted or not
 
 Returns the http C<Accept> header value, such as C<text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8>
 
+=head2 acceptable()
+
+This method parse the request header C<Accept> which could be, for example:
+
+    application/json, text/javascript, */*
+
+And return a list of acceptable content types in list context, or the first content type of the list in scalar context.
+
 =head2 accept_encoding()
 
 Returns the http C<Accept-Encoding> header value
@@ -1141,6 +1508,10 @@ Returns the http C<Accept-Language> header value such as C<en-GB,fr-FR;q=0.8,fr;
 =head2 allowed()
 
 Returns the allowed methods, such as GET, POST, PUT, OPTIONS, HEAD, etc
+
+=head2 apr()
+
+Returns a L<Net::API::REST::Request::Param> object used to access Apache mod_perl methods to manipulate request data.
 
 =head2 as_string()
 
@@ -1170,7 +1541,7 @@ See L<Apache2::RequestRec> for more information on this.
 
 =head2 body( name )
 
-Returns an APR::Request::Param::Table object containing the POST data parameters of the Apache2::Request object.
+Returns an L<APR::Request::Param::Table> object containing the POST data parameters of the Apache2::Request object.
 
     my $body = $req->body;
 
@@ -1183,6 +1554,12 @@ This is similar to the C<param> method with slight difference. Check L<Apache2::
 =head2 charset()
 
 Returns the charset, if any, found in the http request received and processed upon initialisation of this module object.
+
+So for example, if the http request C<Content-type> is
+
+    Content-Type: application/json; encoding=utf-8
+
+Then, L</charset> would return C<utf-8>
 
 =head2 checkonly( boolean )
 
@@ -1205,6 +1582,8 @@ Returns the client api version requested, if provided. This is set during the ob
 An example header to require api version 1.0 would be:
 
     Accept: application/json; version=1.0; encoding=utf-8
+
+In this case, this would return C<1.0>
 
 =head2 close()
 
@@ -1271,6 +1650,18 @@ This is specifically designed for json payload.
 
 It returns a string of data.
 
+=head2 decode( $string )
+
+Given a url-encoded string, this returns the decoded string
+
+This uses L<APR::Request> XS method.
+
+=head2 dnt()
+
+This is an abbreviation for C<Do not track>
+
+If available, typical value is a boolean such as C<0> or C<1>
+
 =head2 document_root( [ string ] )
 
 Retrieve the document root for this server.
@@ -1278,6 +1669,12 @@ Retrieve the document root for this server.
 If a value is provided, it sets the document root to a new value only for the duration of the current request.
 
 See L<Apache2::RequestUtil> for more information.
+
+=head2 encode( $string )
+
+Given a string, this returns its url-encoded version
+
+This uses L<APR::Request> XS method.
 
 =head2 env
 
@@ -1305,15 +1702,21 @@ See L<Apache2::RequestRec> for more information.
 
 =head2 filename( string )
 
-Get/set the filename on disk corresponding to this response
+Get/set the filename (full file path) on disk corresponding to this request or response
 
-See L<Apache2::RequestRec> for more information.
+See L<Apache2::RequestRec/filename> for more information.
 
 =head2 finfo()
 
 Get and set the finfo request record member
 
-See L<Apache2::RequestRec> for more information.
+See L<Apache2::RequestRec/finfo> for more information.
+
+=head2 gateway_interface()
+
+Typical value returned from the environment variable C<GATEWAY_INTERFACE> is C<CGI/1.1>
+
+If an argument is provided, this will set the value.
 
 =head2 get_handlers( hook_name )
 
@@ -1470,6 +1873,10 @@ See also: PerlOptions and the equivalent function for server level PerlOptions f
 
 See the L<Apache2::RequestUtil> module documentation for more information.
 
+=head2 is_secure
+
+Returns true (1) if the connection is made under ssl, i.e. of the environment variable C<HTTPS> is set to C<on>, other it returns false (0).
+
 =head2 json()
 
 Returns a C<JSON> object with the C<relaxed> attribute enabled so that it allows more relaxed json data.
@@ -1550,6 +1957,24 @@ Get/set the current request method (e.g. "GET", "HEAD", "POST", etc.).
 
 if a new value was passed the previous value is returned.
 
+=head2 mod_perl( "mod_perl/2.0.11" )
+
+Returns the value for the environment variable C<MOD_PERL>.
+
+If a value is provided, it will set the environment variable accordingly.
+
+=head2 mod_perl_version()
+
+Read-only. This is based on the value returned by L</mod_perl>.
+
+This returns a L<version> object of the mod perl version being used, so you can call it like:
+
+    my $min_version = version->declare( 'v2.0.11' );
+    if( $req->mod_perl_version >= $min_version )
+    {
+        ## ok
+    }
+
 =head2 mtime()
 
 Last modified time of the requested resource.
@@ -1613,7 +2038,13 @@ For example instead of using C<$r->print()> to send the response body, one could
      }
 
 In fact that's what C<$r->read()> does behind the scenes. But it also knows to parse HTTP headers passed together with the data and it also implements buffering, which the above function does not.
-       
+
+=head2 param( $name )
+
+Provided a name, this returns its equivalent value. If $name is an upload field, ie part of a multipart post data, it returns a L<Net::API::REST::Request::Upload> object instead.
+
+If a value is provided, this calls L<Net::API::REST::Request::Param/param> providing it with the name ane value. This uses L<APR::Request::Param>.
+
 =head2 params( key => value )
 
 Get the request parameters (using case-insensitive keys) by mimicing the OO interface of L<CGI::param>.
@@ -1758,7 +2189,7 @@ Returns the value of the Referer http header, if any.
 
 =head2 remote_addr()
 
-Returns the remote host socket address
+Returns the remote host socket address as a L<APR::SockAddr> object.
 
 This checks which version of Apache is running, because the Apache2 mod_perl api has changed.
 
@@ -1771,6 +2202,13 @@ Returns the remote client host name.
 Returns the ip address of the client, ie remote host making the request.
 
 It returns a string representing an ip address,
+
+=head2 remote_port( 1234 )
+
+It returns the value for the environment variable C<REMOTE_PORT> or set its value with the argument provided if any.
+
+    $req->remote_port( 51234 );
+    print( "Remote port is: ", $req->remote_port, "\n" );
 
 =head2 reply( code integer, hash reference )
 
@@ -1790,9 +2228,51 @@ Returns the embedded L<Apache2::RequestRec> object provided initially at object 
 
 Time when the request started in second since epoch.
 
+=head2 request_uri( URI )
+
+This returns the current value for the environment variable C<REQUEST_URI>, or set its value if an argument is provided.
+
+The uri provided by this environment variable include the path info if any.
+
+For example, assuming you have a cgi residing in C</cgi-bin/prog.cgi> and it is called with the path info C</some/value>, the value returned would then be C</cgi-bin/prog.cgi/some/value>
+
+=head2 script_filename( FILE PATH )
+
+This returns the current value for the environment variable C<SCRIPT_FILENAME>, or set its value if an argument is provided.
+
+For example, if the file being served resides at the uri C</about.html> and your document root is C</var/www>, the the value returned would be C</var/www/about.html>
+
+It is noteworthy that this environment variable does not include any path info set, if any.
+
+=head2 script_name( URI )
+
+This returns the current value for the environment variable C<SCRIPT_NAME>, or set its value if an argument is provided.
+
+For example, if the file being served resides at the uri C</about.html>, the value returned would be C</about.html>.
+
+Even though the environment variable name is C<SCRIPT_NAME>, its value is any file being served and contrary to what you might believe, it is not limited to a script, such as a program.
+
+=head2 script_uri( URI )
+
+This returns the current value for the environment variable C<SCRIPT_URI>, or set its value if an argument is provided.
+
+It is similar to L</request_uri>, except this returns a full uri including the protocol and host name. For example: C<https://example.com/cgi-bin/prog.cgi/path/info>
+
+=head2 script_url( URL )
+
+This returns the current value for the environment variable C<SCRIPT_URL>, or set its value if an argument is provided.
+
+The value returned is identical to that of L</request_uri>, i.e, for example: C</cgi-bin/prog.cgi/path/info>
+
 =head2 server()
 
 Get the L<Apache2::ServerRec> object for the server the request $r is running under.
+
+=head2 server_addr( IP ADDRESS )
+
+This returns the current value for the environment variable C<SERVER_ADDR>, or set its value if an argument is provided.
+
+Typical value is an ip address.
 
 =head2 server_admin()
 
@@ -1813,6 +2293,24 @@ See L<Apache2::RequestUtil> for more information.
 Get the current server port
 
 See L<Apache2::RequestUtil> for more information.
+
+=head2 server_protocol( "HTTP/1.1" )
+
+This returns the current value for the environment variable C<SERVER_PROTOCOL>, or set its value if an argument is provided.
+
+Typical value is C<HTTP/1.1>
+
+=head2 server_signature( STRING )
+
+This returns the current value for the environment variable C<SERVER_SIGNATURE>, or set its value if an argument is provided.
+
+The value of this environment variable can be empty if the Apache configuration parameter C<ServerSignature> is set to C<Off>
+
+=head2 server_software( STRING )
+
+This returns the current value for the environment variable C<SERVER_SOFTWARE>, or set its value if an argument is provided.
+
+This is typically something like C<Apache/2.4.41 (Ubuntu)>
 
 =head2 server_version
 
@@ -1884,6 +2382,24 @@ This method is also handy when you extend the HTTP protocol and add new response
 
 Here 499 is the new response code, and We have been FooBared is the custom response message.
 
+=head2 subnet_of( $ip, $mask )
+
+Provided with an ip address (v4 or v6), and optionally a subnet mask, and this will return a boolean value indicating if the current connection ip address is part of the provided subnet.
+
+The mask can be a string or a number of bits.
+
+It uses L<APR::IpSubnet> and performs the test using the object from L<APR::SockAddr> as provided with L</remote_addr>
+
+    my $ok = $r->subnet_of( '127.0.0.1' );
+    my $ok = $r->subnet_of( '::1' );
+    my $ok = $r->subnet_of( '127.0.0.1', '255.0.0.0' );
+    my $ok = $r->subnet_of( '127.0.0.1', 15 );
+
+    if( !$r->subnet_of( '127.0.0.1' ) )
+    {
+        print( "Sorry, only local connections allowed\n" );
+    }
+
 =head2 subprocess_env()
 
 Get/set the Apache C<subprocess_env> table, or optionally set the value of a named entry.
@@ -1928,6 +2444,12 @@ Get or set the first HTTP request header as a string. For example:
 
 Returns the content type of the request received. This value is set at object initiation phase.
 
+So for example, if the http request C<Content-type> is
+
+    Content-Type: application/json; encoding=utf-8
+
+Then, L</type> would return C<application/json>
+
 =head2 unparsed_uri()
 
 The URI without any parsing performed.
@@ -1951,6 +2473,14 @@ Returns a C<URI> object representing the full uri of the request.
 This is different from the original L<Apache2::RequestRec> which only returns the path portion of the URI.
 
 So, to get the path portion using our B<uri> method, one would simply do C<$req->uri->path()>
+
+=head2 url_decode( $string )
+
+This is merely a convenient pointer to L</decode>
+
+=head2 url_encode( $string )
+
+This is merely a convenient pointer to L</encode>
 
 =head2 user()
 

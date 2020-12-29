@@ -3,16 +3,24 @@ abstract: 'Build and use the libneo4j-client library'
 author:
   - 'Mark A. Jensen (majensen -at- cpan -dot- org)'
 build_requires:
-  ExtUtils::MakeMaker: '0'
-  File::ShareDir: '0'
-  Pod::Usage: '0'
-  Test::Exception: '0'
+  Alien::Build::MM: '0.25'
+  Alien::Build::Plugin::Gather::IsolateDynamic: '0.48'
+  Config: '0'
+  Test2::V0: '0'
+  Test::Alien: '0'
+  tool::AC: '0'
+  tool::AM: '0'
 configure_requires:
-  ExtUtils::CChecker: '0'
-  IPC::Run: '0'
-  Try::Tiny: '0'
+  Alien::Build: '1.19'
+  Alien::Build::MM: '0.25'
+  Alien::Build::Plugin::Fetch::LocalDir: '0.72'
+  Alien::OpenSSL: '0'
+  Capture::Tiny: '0'
+  Env: '0'
+  File::Which: '0'
+  Path::Tiny: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.1002, CPAN::Meta::Converter version 2.150005'
+generated_by: 'ExtUtils::MakeMaker version 7.58, CPAN::Meta::Converter version 2.150005'
 license: apache
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -23,7 +31,24 @@ no_index:
     - t
     - inc
 requires:
-  perl: '5.010'
+  Alien::Build: '0.25'
+  Alien::OpenSSL: '0'
+  Capture::Tiny: '0'
+  Env: '0'
+  File::Which: '0'
+  Path::Tiny: '0'
 resources: {}
-version: '0.21'
+version: '0.40'
+x_alienfile:
+  generated_by: 'Alien::Build::MM version 2.37'
+  requires:
+    share:
+      Alien::Build::Plugin::Gather::IsolateDynamic: '0.48'
+      Config: '0'
+      tool::AC: '0'
+      tool::AM: '0'
+    system: {}
+x_contributors:
+  - 'Mark A. Jensen <majensen.org>'
+  - 'Mohawk (ETJ)'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

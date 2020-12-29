@@ -173,7 +173,7 @@ use common::sense;
 use base 'Exporter';
 
 BEGIN {
-   our $VERSION = 4.73;
+   our $VERSION = 4.74;
 
    our @AIO_REQ = qw(aio_sendfile aio_seek aio_read aio_write aio_open aio_close
                      aio_stat aio_lstat aio_unlink aio_rmdir aio_readdir aio_readdirx
@@ -2411,7 +2411,7 @@ truncated.
 To accept name-less sockets, use C<undef> for C<$sockaddr> and C<0> for
 C<$sockaddr_maxlen>.
 
-The main reasons to use this syscall rather than portable C«accept(2)>
+The main reasons to use this syscall rather than portable C<accept(2)>
 are that you can specify C<SOCK_NONBLOCK> and/or C<SOCK_CLOEXEC>
 flags and you can accept name-less sockets by specifying C<0> for
 C<$sockaddr_maxlen>, which is sadly not possible with perl's interface to
@@ -2486,7 +2486,72 @@ C<IO::AIO::MFD_ALLOW_SEALING> and C<IO::AIO::MFD_HUGETLB>.
 Example: create a new memfd.
 
    my $fh = IO::AIO::memfd_create "somenameforprocfd", IO::AIO::MFD_CLOEXEC
-      or die "m,emfd_create: $!\n";
+      or die "memfd_create: $!\n";
+
+=item $fh = IO::AIO::pidfd_open $pid[, $flags]
+
+This is an interface to the Linux L<pidfd_open(2)> system call. The
+default for C<$flags> is C<0>.
+
+On success, a new pidfd filehandle is returned (that is already set to
+close-on-exec), otherwise returns C<undef>. If the syscall is missing,
+fails with C<ENOSYS>.
+
+Example: open pid 6341 as pidfd.
+
+   my $fh = IO::AIO::pidfd_open 6341
+      or die "pidfd_open: $!\n";
+
+=item $status = IO::AIO::pidfd_send_signal $pidfh, $signal[, $siginfo[, $flags]]
+
+This is an interface to the Linux L<pidfd_send_signal> system call. The
+default for C<$siginfo> is C<undef> and the default for C<$flags> is C<0>.
+
+Returns the system call status.  If the syscall is missing, fails with
+C<ENOSYS>.
+
+When specified, C<$siginfo> must be a reference to a hash with one or more
+of the following members:
+
+=over
+
+=item code - the C<si_code> member
+
+=item pid - the C<si_pid> member
+
+=item uid - the C<si_uid> member
+
+=item value_int - the C<si_value.sival_int> member
+
+=item value_ptr - the C<si_value.sival_ptr> member, specified as an integer
+
+=back
+
+Example: send a SIGKILL to the specified process.
+
+   my $status = IO::AIO::pidfd_send_signal $pidfh, 9, undef
+      and die "pidfd_send_signal: $!\n";
+
+Example: send a SIGKILL to the specified process with extra data.
+
+   my $status = IO::AIO::pidfd_send_signal $pidfh, 9,  { code => -1, value_int => 7 }
+      and die "pidfd_send_signal: $!\n";
+
+=item $fh = IO::AIO::pidfd_getfd $pidfh, $targetfd[, $flags]
+
+This is an interface to the Linux L<pidfd_getfd> system call. The default
+for C<$flags> is C<0>.
+
+On success, returns a dup'ed copy of the target file descriptor (specified
+as an integer) returned (that is already set to close-on-exec), otherwise
+returns C<undef>. If the syscall is missing, fails with C<ENOSYS>.
+
+Example: get a copy of standard error of another process and print soemthing to it.
+
+   my $errfh = IO::AIO::pidfd_getfd $pidfh, 2
+      or die "pidfd_getfd: $!\n";
+   print $errfh "stderr\n";
+
 =item $fh = IO::AIO::eventfd [$initval, [$flags]]
 
 This is a direct interface to the Linux L<eventfd(2)> system call. The

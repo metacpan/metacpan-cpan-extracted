@@ -1,0 +1,67 @@
+use alienfile;
+
+# M4 takes a long time to build, so provide a system-installed one if possible.
+use Capture::Tiny qw/capture/;
+use File::Which qw/which/;
+use Path::Tiny;
+
+probe sub {
+  my($build) = @_;
+  # this is shamelessly lifted from Alien::m4
+  foreach my $command (qw( m4 gm4 gnum4 ), $ENV{M4})
+  {
+    my @stdout;
+    capture { @stdout = `$command --version` };
+    if(defined $stdout[0] && $stdout[0] =~ /^(GNU |)m4/i && $stdout[0] =~ /([0-9\.]+)$/)
+    {
+      my $version = $1;
+      my @version = split /\./, $version;
+ 
+      # GNU M4 seems to have a history of brokenness
+      # so says AutoConf:
+      # GNU M4 1.4.6 or later is required; 1.4.16 or newer is recommended.
+      # GNU M4 1.4.15 uses a buggy replacement strstr on some systems.
+      # Glibc 2.9 - 2.12 and GNU M4 1.4.11 - 1.4.15 have another strstr bug.
+ 
+      return 'share' unless $version[0] >= 1;
+ 
+      if($version[0] == 1)
+      {
+        return 'share' unless $version[1] >= 4;
+ 
+        if($version[1] == 4)
+        {
+          return 'share' unless $version[2] >= 6;
+          return 'share' if $version[2] =~ /^(11|12|13|14|15)$/;
+        }
+      }
+ 
+      $build->install_prop->{my_version} = $version;
+      $build->install_prop->{my_command} = $command;
+ 
+      return 'system';
+    }
+  }
+};
+
+share {
+  plugin 'Build::Autoconf';
+  start_url 'm4-1.4.18-patched.tar.gz';
+  plugin 'Fetch::Local';
+  plugin 'Extract' => 'tar.gz';
+  build [
+    '%{configure}',
+    '%{make}',
+    '%{make} install',
+   ];
+};
+
+sys {
+  gather sub {
+    my ($bld) = @_;
+    meta_prop->{bin_dir} = Path::Tiny->new(which $bld->install_prop->{my_command})
+      ->parent->stringify;
+  };
+}
+  
+

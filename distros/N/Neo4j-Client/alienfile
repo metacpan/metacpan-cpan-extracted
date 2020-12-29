@@ -1,0 +1,125 @@
+#-*-cperl-*-
+use alienfile;
+use Env qw/@PATH @AC_PATH/;
+use File::Spec;
+use Alien::OpenSSL;
+use Alien::Build::CommandSequence;
+
+meta_prop->{env}->{OPENSSL_LIBS} = Alien::OpenSSL->libs;
+meta_prop->{env}->{OPENSSL_CFLAGS} = Alien::OpenSSL->cflags;
+my ($ssl_ver) = Alien::OpenSSL->version =~ /^([0-9]\.[0-9])/;
+meta_prop->{env}->{CFLAGS} = "-DHAVE_BIO_METH_NEW" if 0+$ssl_ver > 1.0;
+
+meta->around_hook(
+  probe => sub {
+    my $pb = shift;
+    my $bld = shift;
+    my $pwd = Path::Tiny->new($bld->install_prop->{root})->parent;
+    eval 'require tool::M4; 1' or do {
+      my $m4d = $pwd->child(qw/tools m4/);
+      Alien::Build::CommandSequence->new(
+	"cd $m4d",
+	"$^X Makefile.PL",
+	"make install",
+	"make realclean"
+       )->execute($bld);
+      eval 'require tool::M4';
+    };
+    unshift @PATH, tool::M4->bin_dir;
+    
+    eval 'require tool::AC; 1' or do {
+      my $acd = $pwd->child(qw/tools ac/);
+      Alien::Build::CommandSequence->new(
+	"cd $acd",
+	"$^X Makefile.PL",
+	"make install",
+	"make realclean"
+       )->execute($bld);
+      eval 'require tool::AC';
+    };
+    unshift @PATH, tool::AC->bin_dir;
+    
+    eval 'require tool::AM; 1' or do {
+      my $amd = $pwd->child(qw/tools am/);
+      Alien::Build::CommandSequence->new(
+	"cd $amd",
+	"$^X Makefile.PL",
+	"make install",
+	"make realclean"
+       )->execute($bld);
+      eval 'require tool::AM';
+    };
+    $pb->($bld,@_);
+  });
+
+probe sub { 'share' };
+share sub {
+  # probe is run in the Makefile, so the tool::XX will get made at configure time
+  # but the following is a build-time requirement - the tools may not exist when
+  # alienfile is compiled
+  requires 'tool::AC';
+  requires 'tool::AM';
+  # these will be loaded by Alien::Build at build time
+  # but in the meantime (at config, perl Makefile.PL), need to hide the calls from the complier,
+  # so we put them in evals...
+  meta_prop->{env}->{AUTOCONF} = Path::Tiny->new(eval'tool::AC->bin_dir','autoconf')->stringify;
+  meta_prop->{env}->{AUTOMAKE} = Path::Tiny->new(eval'tool::AM->bin_dir','automake')->stringify;
+  meta_prop->{env}->{ACLOCAL} = Path::Tiny->new(eval'tool::AM->bin_dir','aclocal-1.16')->stringify;
+  unshift @PATH, Path::Tiny->new(eval'tool::AC->bin_dir'," ")->stringify, Path::Tiny->new(eval'tool::AM->bin_dir'," ")->stringify;
+  plugin 'Build::Autoconf';
+  start_url 'build';
+  plugin 'Fetch::LocalDir';
+  plugin 'Extract::Directory';
+  build [
+    '%{configure} --disable-tools',
+    '%{make}',
+    '%{make} install',
+   ];
+  gather sub {
+    my ($bld) = @_;
+    my ($dev_cflags, $pt_cflags, $pt_libs) = scan_config_log($bld);
+    my $pfx = $bld->runtime_prop->{prefix};
+    $bld->runtime_prop->{libs} = join(' ', "-L${pfx}/dynamic", $pt_libs, Alien::OpenSSL->libs, "-lneo4j-client");
+    $bld->runtime_prop->{libs_static} = join(' ', "-L${pfx}/lib", $pt_libs, Alien::OpenSSL->libs, "-lneo4j-client");
+    $bld->runtime_prop->{cflags} = join(' ', "-I${pfx}/include", "-iquote${pfx}/include", $pt_cflags, Alien::OpenSSL->cflags);
+    $bld->runtime_prop->{dev_cflags} = $dev_cflags;
+  };
+};
+plugin "Gather::IsolateDynamic";
+
+
+sub scan_config_log {
+  my ($bld) = @_;
+  log("Scanning config.log for flags");
+  my $lfn;
+  for (qw/root extract stage/) {
+    if (! -d $bld->install_prop->{$_}) {
+      log("$_ dir is gone!!");
+    }
+    else {
+      $lfn = File::Spec->catfile($bld->install_prop->{$_},"config.log");
+      if (-e $lfn) {
+	log("Found config.log in $_ dir");
+	last;
+      }
+    }
+  }
+  unless ($lfn) {
+    log("Can't find the config.log"); return ("", "");
+  }
+  open my $lf,$lfn or die "What?";
+  my @log = <$lf>;
+  my %pthread = map { chomp;my @a = split /=/; $a[1]=~s/'//g; @a } grep /PTHREAD_(?:CFLAGS|LIBS)/,@log;
+  if (%pthread) {
+    ($pthread{PTHREAD_CFLAGS} =~ /-pthread/) && do {
+      # put -pthread in linker flags, or CBuilder won't see it for some reason
+      $pthread{PTHREAD_CFLAGS} =~ s/-pthread//;
+      # $pthread{PTHREAD_LIBS} = join(' ',$pthread{PTHREAD_LIBS},'-pthread');
+    };
+  }
+  my ($cflags) = grep /^CFLAGS=/,@log;
+  $cflags =~ s/^CFLAGS='//; $cflags =~ s/'\s*$//;
+  $cflags =~ s/\s+-W[a-zA-Z-_=]*//g;
+  return $cflags, $pthread{PTHREAD_CFLAGS}, $pthread{PTHREAD_LIBS};
+}
+  

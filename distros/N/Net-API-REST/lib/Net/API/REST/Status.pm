@@ -11,6 +11,7 @@ package Net::API::REST::Status;
 BEGIN
 {
     use strict;
+    use warnings;
     use common::sense;
     use Apache2::Const -compile => qw( :http );
     use Apache2::RequestUtil;

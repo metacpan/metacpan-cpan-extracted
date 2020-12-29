@@ -1,0 +1,19 @@
+use alienfile;
+use Env qw(@PATH);
+eval 'require tool::AC; 1' or die "tool::AC must be built before tool::AM";
+unshift @PATH, tool::AC->bin_dir;
+
+probe sub { 'share' };
+share {
+  plugin 'Build::Autoconf';
+  start_url 'automake-1.16.3.tar.gz';
+  plugin 'Fetch::Local';
+  plugin 'Extract' => 'tar.gz';
+  build [
+    '%{configure}',
+    '%{make}',
+    '%{make} install',
+   ];
+};
+  
+ 

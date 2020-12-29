@@ -11,7 +11,7 @@ package mb;
 use 5.00503;    # Universal Consensus 1998 for primetools
 # use 5.008001; # Lancaster Consensus 2013 for toolchains
 
-$VERSION = '0.15';
+$VERSION = '0.16';
 $VERSION = $VERSION;
 
 # internal use
@@ -369,8 +369,12 @@ sub mb::dosglob {
 sub mb::eval {
     local $_ = shift if @_;
 
-    # run as Perl script
-    return CORE::eval mb::parse();
+    # run as Perl script in caller package
+    return CORE::eval sprintf(<<'END', (caller)[0,2,1], mb::parse());
+package %s;
+#line %s "%s"
+CORE::eval { %s };
+END
 }
 
 #---------------------------------------------------------------------
@@ -4581,6 +4585,79 @@ sub escape_to_hex {
 }
 
 #---------------------------------------------------------------------
+# import Perl module in MBCS encoding
+BEGIN { $INC{'mb/PERL.pm'} = __FILE__ }
+sub mb::PERL::import {
+    my $self = shift; # 'mb::PERL' (not used)
+    my $module = shift;
+    my @caller = caller;
+
+    # require file
+    CORE::eval sprintf(<<'END', @caller[0,2,1], $module);
+package %s;
+#line %s "%s"
+mb::require %s;
+END
+
+    # calling VERSION()
+    if (defined($_[0]) and ($_[0] =~ /\A [0-9] /x)) {
+        my $want_version = shift;
+        if ($module->can('VERSION')) {
+            CORE::eval sprintf(<<'END', @caller[0,2,1], $module, $want_version);
+package %s;
+#line %s "%s"
+%s->VERSION(%s);
+END
+        }
+    }
+
+    # calling import()
+    if ($module->can('import')) {
+        CORE::eval sprintf(<<'END', @caller[0,2,1], $module, "@_");
+package %s;
+#line %s "%s"
+%s->import(qw(%s));
+END
+    }
+}
+
+#---------------------------------------------------------------------
+# unimport Perl module in MBCS encoding
+sub mb::PERL::unimport {
+    my $self = shift; # 'mb::PERL' (not used)
+    my $module = shift;
+    my @caller = caller;
+
+    # require file
+    CORE::eval sprintf(<<'END', @caller[0,2,1], $module);
+package %s;
+#line %s "%s"
+mb::require %s;
+END
+
+    # calling VERSION()
+    if (defined($_[0]) and ($_[0] =~ /\A [0-9] /x)) {
+        my $want_version = shift;
+        if ($module->can('VERSION')) {
+            CORE::eval sprintf(<<'END', @caller[0,2,1], $module, $want_version);
+package %s;
+#line %s "%s"
+%s->VERSION(%s);
+END
+        }
+    }
+
+    # calling unimport()
+    if ($module->can('unimport')) {
+        CORE::eval sprintf(<<'END', @caller[0,2,1], $module, "@_");
+package %s;
+#line %s "%s"
+%s->unimport(qw(%s));
+END
+    }
+}
+
+#---------------------------------------------------------------------
 
 1;
 
@@ -4621,7 +4698,7 @@ mb - run Perl script in MBCS encoding (not only CJK ;-)
     mb::rindex(...);
     mb::rindex_byte(...);
     mb::substr(...);
-    use mb::PERL Module;
+    use mb::PERL 'Module';
 
   MBCS special variables:
     $mb::PERL
@@ -4694,7 +4771,7 @@ To install this software without make, type the following:
   * codepoint range by hyphen of tr/// and y/// support US-ASCII only
   * You have to write mb::* subroutines if you want codepoint semantics
 
-  Let's enjoy MBSC scripting in Perl, together!!
+  Let's enjoy MBSC scripting in Perl!!
 
 =head1 TERMINOLOGY
 
@@ -4752,7 +4829,7 @@ To install this software without make, type the following:
              https://en.wikipedia.org/wiki/Big5
              * needs multibyte anchoring
              * needs escaping meta char of 2nd octet
-             * unsafe US-ASCII casefolding
+             * unsafe US-ASCII casefolding of 2nd octet
   ------------------------------------------------------------------------------
   big5hkscs (Big5-HKSCS)
              1st       2nd
@@ -4761,7 +4838,7 @@ To install this software without make, type the following:
              https://en.wikipedia.org/wiki/Hong_Kong_Supplementary_Character_Set
              * needs multibyte anchoring
              * needs escaping meta char of 2nd octet
-             * unsafe US-ASCII casefolding
+             * unsafe US-ASCII casefolding of 2nd octet
   ------------------------------------------------------------------------------
   eucjp (EUC-JP)
              1st       2nd
@@ -4770,7 +4847,7 @@ To install this software without make, type the following:
              https://en.wikipedia.org/wiki/Extended_Unix_Code#EUC-JP
              * needs multibyte anchoring
              * needs no escaping meta char of 2nd octet
-             * safe US-ASCII casefolding
+             * safe US-ASCII casefolding of 2nd octet
   ------------------------------------------------------------------------------
   gb18030 (GB18030)
              1st       2nd       3rd       4th
@@ -4780,7 +4857,7 @@ To install this software without make, type the following:
              https://en.wikipedia.org/wiki/GB_18030
              * needs multibyte anchoring
              * needs escaping meta char of 2nd octet
-             * unsafe US-ASCII casefolding
+             * unsafe US-ASCII casefolding of 2nd-4th octet
   ------------------------------------------------------------------------------
   gbk (GBK)
              1st       2nd
@@ -4789,7 +4866,7 @@ To install this software without make, type the following:
              https://en.wikipedia.org/wiki/GBK_(character_encoding)
              * needs multibyte anchoring
              * needs escaping meta char of 2nd octet
-             * unsafe US-ASCII casefolding
+             * unsafe US-ASCII casefolding of 2nd octet
   ------------------------------------------------------------------------------
   sjis (Shift_JIS-like encodings)
              1st       2nd
@@ -4800,7 +4877,7 @@ To install this software without make, type the following:
              https://en.wikipedia.org/wiki/Shift_JIS
              * needs multibyte anchoring
              * needs escaping meta char of 2nd octet
-             * unsafe US-ASCII casefolding
+             * unsafe US-ASCII casefolding of 2nd octet
   ------------------------------------------------------------------------------
   uhc (UHC)
              1st       2nd
@@ -4808,8 +4885,8 @@ To install this software without make, type the following:
              00..7F
              https://en.wikipedia.org/wiki/Unified_Hangul_Code
              * needs multibyte anchoring
-             * needs escaping meta char of 2nd octet
-             * unsafe US-ASCII casefolding
+             * needs no escaping meta char of 2nd octet
+             * unsafe US-ASCII casefolding of 2nd octet
   ------------------------------------------------------------------------------
   utf8 (UTF-8)
              1st       2nd       3rd       4th
@@ -4824,8 +4901,8 @@ To install this software without make, type the following:
              00..7F
              https://en.wikipedia.org/wiki/UTF-8
              * needs no multibyte anchoring
-             * needs no escaping meta char of 1st-4th octets
-             * safe US-ASCII casefolding
+             * needs no escaping meta char of 2nd-4th octets
+             * safe US-ASCII casefolding of 2nd-4th octet
              * enforces surrogate codepoints must be paired
   ------------------------------------------------------------------------------
   wtf8 (WTF-8)
@@ -4840,8 +4917,8 @@ To install this software without make, type the following:
              http://simonsapin.github.io/wtf-8/
              * superset of UTF-8 that encodes surrogate codepoints if they are not in a pair
              * needs no multibyte anchoring
-             * needs no escaping meta char of 1st-4th octets
-             * safe US-ASCII casefolding
+             * needs no escaping meta char of 2nd-4th octets
+             * safe US-ASCII casefolding of 2nd-4th octet
   ------------------------------------------------------------------------------
 
 =head1 MBCS subroutines provided by this software
@@ -4894,7 +4971,7 @@ To install this software without make, type the following:
   ---                do 'file'          do 'file'          mb::do 'file'           
   ---                eval 'string'      eval 'string'      mb::eval 'string'       
   ---                require 'file'     require 'file'     mb::require 'file'      
-  ---                use Module         use Module         use mb::PERL Module     
+  ---                use Module         use Module         use mb::PERL 'Module'   
   $^X                ---                ---                $^X                     
   ---                $^X                $^X                $mb::PERL               
   $0                 $0                 $0                 $mb::ORIG_PROGRAM_NAME  
@@ -4919,6 +4996,9 @@ To install this software without make, type the following:
   mb::index_byte          codepoint       octet           useful, JPerl like
   mb::rindex_byte         codepoint       octet           useful, JPerl like
   ------------------------------------------------------------------------------------------
+  Sometimes "compatibility" means "compromise." In that case, "best compatibility" means
+  "most useful compromise." That's what mb::index_byte() and mb::rindex_byte() are.
+  But sorry for the long name.
 
 =head1 MBCS special variables provided by this software
 
@@ -4960,6 +5040,7 @@ To install this software without make, type the following:
   lcfirst                   lcfirst
   length                    length
   no Module                 no Module
+  no Module qw(ARGUMENTS)   no Module qw(ARGUMENTS)
   ord                       ord
   require 'file'            require 'file'
   reverse                   reverse
@@ -4968,6 +5049,8 @@ To install this software without make, type the following:
   uc                        uc
   ucfirst                   ucfirst
   use Module                use Module
+  use Module qw(ARGUMENTS)  use Module qw(ARGUMENTS)
+  use Module ()             use Module ()
   -----------------------------------------------------------------
 
 =head1 Porting from script in JPerl4, and JPerl5
@@ -4980,12 +5063,14 @@ To install this software without make, type the following:
   do 'file'                 mb::do 'file'
   eval 'string'             mb::eval 'string'
   index                     mb::index_byte
-  no Module                 no mb::PERL Module *1
+  no Module                 no mb::PERL 'Module'
+  no Module qw(ARGUMENTS)   no mb::PERL Module => qw(ARGUMENTS)
   require 'file'            mb::require 'file'
   rindex                    mb::rindex_byte
-  use Module                use mb::PERL Module *1
+  use Module                use mb::PERL 'Module'
+  use Module qw(ARGUMENTS)  use mb::PERL Module => qw(ARGUMENTS)
+  use Module ()             BEGIN { mb::require Module }
   -----------------------------------------------------------------
-  *1 mb::PERL module comes later
 
 =head1 Porting from script with utf8 pragma
 
@@ -5002,7 +5087,8 @@ To install this software without make, type the following:
   lc                        ---
   lcfirst                   ---
   length                    mb::length
-  no Module                 no mb::PERL Module *2
+  no Module                 no mb::PERL 'Module'
+  no Module qw(ARGUMENTS)   no mb::PERL Module => qw(ARGUMENTS)
   ord                       mb::ord
   require 'file'            mb::require 'file'
   reverse                   mb::reverse
@@ -5010,11 +5096,12 @@ To install this software without make, type the following:
   substr                    mb::substr
   uc                        ---
   ucfirst                   ---
-  use Module                use mb::PERL Module *2
+  use Module                use mb::PERL 'Module'
+  use Module qw(ARGUMENTS)  use mb::PERL Module => qw(ARGUMENTS)
+  use Module ()             BEGIN { mb::require Module }
   -----------------------------------------------------------------
-  *2 mb::PERL module comes later, and module must be without utf8 pragma.
 
-=head1 What are DAMEMOJI
+=head1 What are DAMEMOJI?
 
   In single quote, DAMEMOJI are double-byte characters that include the
   following metacharacters ('', q{}, <<'END', qw{}, m'', s''', split(''),

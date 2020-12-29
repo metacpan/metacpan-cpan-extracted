@@ -3089,11 +3089,11 @@ fi
 
 
 
-GCC_CFLAGS="-fvisibility=hidden -pipe -Wall -W -Wno-unused-parameter \
+GCC_CFLAGS=" -pipe -Wall -W -Wno-unused-parameter \
     -Wno-missing-field-initializers -Wpointer-arith -Wstrict-prototypes \
     -Wcast-qual -Wcast-align -Wno-error=unused-function \
     -Wno-error=unused-variable -Wno-error=deprecated-declarations \
-    -Wno-error=stringop-truncation -Wno-unknown-warning-option"
+    -Wno-error=stringop-truncation "
 
 # Check whether --enable-werror was given.
 if test "${enable_werror+set}" = set; then :
@@ -15398,7 +15398,7 @@ fi
 REQUIRES=`echo "$REQUIRES" | cut -c3-`
 
 
-ac_config_files="$ac_config_files Makefile lib/Makefile lib/src/Makefile"
+ac_config_files="$ac_config_files Makefile lib/Makefile lib/src/Makefile lib/src/neo4j-client.h"
 
 cat >confcache <<\_ACEOF
 # This file is a shell script that caches the results of configure
@@ -16439,6 +16439,7 @@ do
     "Makefile") CONFIG_FILES="$CONFIG_FILES Makefile" ;;
     "lib/Makefile") CONFIG_FILES="$CONFIG_FILES lib/Makefile" ;;
     "lib/src/Makefile") CONFIG_FILES="$CONFIG_FILES lib/src/Makefile" ;;
+    "lib/src/neo4j-client.h") CONFIG_FILES="$CONFIG_FILES lib/src/neo4j-client.h" ;;
 
   *) as_fn_error $? "invalid argument: \`$ac_config_target'" "$LINENO" 5;;
   esac

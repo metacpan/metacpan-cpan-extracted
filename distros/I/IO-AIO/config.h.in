@@ -96,6 +96,9 @@
 /* sync_file_range(2) is available */
 #undef HAVE_SYNC_FILE_RANGE
 
+/* unix syscall interface */
+#undef HAVE_SYSCALL
+
 /* Define to 1 if you have the <sys/mkdev.h> header file. */
 #undef HAVE_SYS_MKDEV_H
 

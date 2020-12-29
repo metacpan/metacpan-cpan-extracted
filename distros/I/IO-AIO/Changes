@@ -45,6 +45,17 @@ TODO: copy_file_range
 TODO: write more abpout the thread model, maybe bump some defaults?
 TODO: io_uring, but it's so broken  :/
 TODO: allow import of fds as aio_wd
+TODO: fsopen/fspick/fsconfig, fsmount
+TODO: close_range
+TODO: move_mount, open_tree
+
+4.74 Tue Dec 29 16:19:28 CET 2020
+	- added pidfd_open, pidfd_getfd and pidfd_send_signal functions.
+        - rework bin/treescan to avoid recursion. This fixes two bugs
+          where a deep directory traversal or a lot of command line
+          arguments could cause it to crash.
+	- added (but not documented) open_tree, AT_* and move_mount flags.
+        - support defining syscall numbers in gendef0.
 
 4.73 Fri Dec  4 02:08:37 CET 2020
 	- def0.h was not uptodate, running into musl problems

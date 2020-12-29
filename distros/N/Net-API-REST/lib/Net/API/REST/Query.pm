@@ -1,19 +1,22 @@
 ##----------------------------------------------------------------------------
 ## REST API Framework - ~/lib/Net/API/REST/Query.pm
-## Version v0.1.0
+## Version v0.1.1
 ## Copyright(c) 2020 DEGUEST Pte. Ltd.
-## Author: Jacques Deguest <@sitael.tokyo.deguest.jp>
+## Author: Jacques Deguest <@gabriel-vm>
 ## Created 2020/06/13
-## Modified 2020/06/13
+## Modified 2020/10/07
 ## 
 ##----------------------------------------------------------------------------
 package Net::API::REST::Query;
 BEGIN
 {
     use strict;
+    use warnings;
     use common::sense;
+    use Encode ();
+    use utf8 ();
     use parent qw( URI::Query );
-    our $VERSION = 'v0.1.0';
+    our $VERSION = 'v0.1.1';
 };
 
 sub _parse_qs
@@ -23,8 +26,8 @@ sub _parse_qs
     for( split( /[&;]/, $qs ) )
     {
         my( $key, $value ) = map{ URI::Escape::uri_unescape( $_ ) } split( /=/, $_, 2 );
-        $key = Encode::decode_utf8( $key ) if( !Encode::is_utf8( $key ) );
-        $value = Encode::decode_utf8( $value ) if( !Encode::is_utf8( $value ) );
+        $key = Encode::decode_utf8( $key ) if( !utf8::is_utf8( $key ) );
+        $value = Encode::decode_utf8( $value ) if( !utf8::is_utf8( $value ) );
         $self->{qq}->{$key} ||= [];
         push( @{$self->{qq}->{$key}}, $value ) if( defined( $value ) && $value ne '' );
     }
@@ -39,7 +42,7 @@ sub _init_from_arrayref
         my $key   = shift( @$arrayref );
         my $value = shift( @$arrayref );
         my $key_unesc = URI::Escape::uri_unescape( $key );
-        $key_unesc = Encode::decode_utf8( $key_unesc ) if( !Encode::is_utf8( $key_unesc ) );
+        $key_unesc = Encode::decode_utf8( $key_unesc ) if( !utf8::is_utf8( $key_unesc ) );
 
         $self->{qq}->{$key_unesc} ||= [];
         if( defined( $value ) && $value ne '' )
@@ -61,7 +64,7 @@ sub _init_from_arrayref
             for( @values )
             {
                 $_ = URI::Escape::uri_unescape( $_ );
-                $_ = UTF::decode_utf8( $_ ) if( !Encode::is_utf8( $_ ) );
+                $_ = UTF::decode_utf8( $_ ) if( !utf8::is_utf8( $_ ) );
                 push( @{$self->{qq}->{$key_unesc}}, $_ );
             }
         }
@@ -136,7 +139,7 @@ Net::API::REST::Query - utf8 compliant URI query string manipulation
 
 =head1 VERSION
 
-    v0.1.0
+    v0.1.1
 
 =head1 DESCRIPTION
 

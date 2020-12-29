@@ -70,6 +70,16 @@ AC_CHECK_HEADERS([sys/mkdev.h])
 dnl readv / preadv, vmsplice
 AC_CHECK_HEADERS([sys/uio.h])
 
+AC_CACHE_CHECK([for unix-style syscall interface], ac_cv_syscall, [AC_LINK_IFELSE([AC_LANG_SOURCE([
+#include <unistd.h>
+#include <sys/syscall.h>
+int main (void)
+{
+   long res = syscall (SYS_exit, 0);
+   return 0;
+}
+])],ac_cv_syscall=yes,ac_cv_syscall=no)])
+test $ac_cv_syscall = yes && AC_DEFINE(HAVE_SYSCALL, 1, unix syscall interface)
 
 AC_CACHE_CHECK([for splice, vmsplice and tee], ac_cv_linux_splice, [AC_LINK_IFELSE([AC_LANG_SOURCE([
 #include <sys/types.h>

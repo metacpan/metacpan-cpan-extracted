@@ -1,7 +1,3 @@
-#
-# $Id$
-#
-
 use strict;
 use warnings;
 
@@ -19,6 +15,3 @@ my @accessors = qw|
 for( @accessors ) {
     can_ok('Text::Indent', $_);
 }
-
-#
-# EOF

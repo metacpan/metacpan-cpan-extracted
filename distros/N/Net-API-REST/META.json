@@ -92,6 +92,15 @@
       }
    },
    "release_status" : "stable",
-   "version" : "v0.5.9",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://rt.cpan.org/NoAuth/Bugs.html?Dist=Net-API-REST"
+      },
+      "repository" : {
+         "type" : "git",
+         "web" : "https://git.deguest.jp/jack/Net-API-REST"
+      }
+   },
+   "version" : "v0.6.2",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

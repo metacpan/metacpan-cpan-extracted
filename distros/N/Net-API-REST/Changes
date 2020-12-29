@@ -1,5 +1,21 @@
 Revision history for Perl module Net::API::REST
 
+0.6.2 2020-12-11T20:15:03+0900
+    - Modified jwt_encode to allow to pass additional parameters accepted by Net::API::REST::JWT::jwt_encode
+    - Updated the as_string method in Net::API::REST::Cookies which required a domain to be set
+    - Added methods acceptable, dnt, document_uri, gateway_interface, is_secure, mod_perl, mod_perl_version, redirect_error_notes, redirect_query_string, redirect_status, redirect_url, remote_port, request_uri, script_filename, script_name, script_uri, script_url, server_addr, server_protocol, server_signature and server_software to Net::API::REST::Request
+    - Correcting an inaccurate, albeit working, call to Encode in encode_utf8 and decode_utf8 in Net::API::REST
+
+0.6.1 2020-10-07T23:22:04+0900
+
+0.6.0 2020-06-15T00:13:42+0900
+    - Added Net::API::REST::Request::Params and Net::API::Rest::Request::Upload to handle uploaded data and provide full access to the underlying Apache APR::Request methods
+    - Added method decode and encode for url-encoded data in Net::API::REST::Request and Net::API::REST::Response and decode_url and encode_url to Net::API::REST
+    - Added new method apr for easy access to Net::API::REST::Request::Params
+    - Added new method param to access Net::API::REST::Request::Params param method
+    - Added method uploads to return an array reference of all Net::API::REST::Request::Upload object matching upload fields
+    - Added method subnet_of to check if current connection socket address is a subnet of the provided ip or block of ips
+
 0.5.9 2020-06-13T16:51:22+0900
     - Implemented Net::API::REST::Query to implement a workaround to URI::Query version 0.16 bug RT #132815 for its lack of utf8 decoding on query strings.
 

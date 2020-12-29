@@ -4428,6 +4428,36 @@ fi
 done
 
 
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for unix-style syscall interface" >&5
+$as_echo_n "checking for unix-style syscall interface... " >&6; }
+if ${ac_cv_syscall+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+#include <unistd.h>
+#include <sys/syscall.h>
+int main (void)
+{
+   long res = syscall (SYS_exit, 0);
+   return 0;
+}
+
+_ACEOF
+if ac_fn_c_try_link "$LINENO"; then :
+  ac_cv_syscall=yes
+else
+  ac_cv_syscall=no
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_syscall" >&5
+$as_echo "$ac_cv_syscall" >&6; }
+test $ac_cv_syscall = yes &&
+$as_echo "#define HAVE_SYSCALL 1" >>confdefs.h
+
 
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for splice, vmsplice and tee" >&5
 $as_echo_n "checking for splice, vmsplice and tee... " >&6; }

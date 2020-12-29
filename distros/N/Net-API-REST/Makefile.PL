@@ -69,10 +69,10 @@ my %WriteMakefileArgs = (
     },
     LICENSE				=> 'perl_5',
     MIN_PERL_VERSION	=> 5.6.0,
-    ( eval { ExtUtils::MakeMaker->VERSION(6.46) } ? () : ( META_MERGE => {
+    ( eval { ExtUtils::MakeMaker->VERSION(6.46) } ? ( META_MERGE => {
         'meta-spec' => { version => 2 },
         dynamic_config => 1,
-        #resources => {
+        resources => {
         #    homepage    => undef,
             repository  => {
                 url         => 'git@git.deguest.jp:jack/Net-API-REST.git',
@@ -83,7 +83,7 @@ my %WriteMakefileArgs = (
                 web         => 'https://rt.cpan.org/NoAuth/Bugs.html?Dist=Net-API-REST',
             },
         },
-    )),
+    }) : ()),
 );
 
 WriteMakefile(%WriteMakefileArgs);

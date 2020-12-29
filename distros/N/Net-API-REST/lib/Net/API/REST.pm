@@ -1,17 +1,21 @@
 # -*- perl -*-
 ##----------------------------------------------------------------------------
 ## REST API Framework - ~/lib/Net/API/REST.pm
-## Version v0.5.9
+## Version v0.6.2
 ## Copyright(c) 2020 DEGUEST Pte. Ltd.
-## Author: Jacques Deguest <@sitael.tokyo.deguest.jp>
+## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/09/01
-## Modified 2020/06/13
+## Modified 2020/12/11
+## All rights reserved
 ## 
+## This program is free software; you can redistribute  it  and/or  modify  it
+## under the same terms as Perl itself.
 ##----------------------------------------------------------------------------
 package Net::API::REST;
 BEGIN
 {
     use strict;
+    use warnings;
     use common::sense;
     use parent qw( Module::Generic );
     use curry;
@@ -26,6 +30,7 @@ BEGIN
     use Apache2::Reload;
     use Apache2::Log;
     use APR::Base64 ();
+    use APR::Request ();
     use APR::UUID ();
     use JSON::PP ();
     use Regexp::Common;
@@ -47,7 +52,7 @@ BEGIN
     use Net::API::REST::Response;
     use Net::API::REST::Status;
     our( $VERSION, $DEBUG, $VERBOSE, $API_VERSION );
-    $VERSION = 'v0.5.9';
+    $VERSION = 'v0.6.2';
 };
 
 {
@@ -200,6 +205,12 @@ sub decode_json
     return( $hash );
 }
 
+sub decode_url
+{
+    my $self = shift( @_ );
+    return( APR::Request::decode( shift( @_ ) ) );
+}
+
 sub decode_utf8
 {
     my $self = shift( @_ );
@@ -215,7 +226,7 @@ sub decode_utf8
     my $rv = eval
     {
         ## utf8 is more lax than the strict standard of utf-8; see Encode man page
-        Encode::decode( 'utf8', $v, FB_CROAK );
+        Encode::decode( 'utf8', $v, Encode::FB_CROAK );
     };
     if( $@ )
     {
@@ -263,6 +274,12 @@ sub encode_json
     return( $data );
 }
 
+sub encode_url
+{
+    my $self = shift( @_ );
+    return( APR::Request::encode( shift( @_ ) ) );
+}
+
 sub encode_utf8
 {
     my $self = shift( @_ );
@@ -279,7 +296,7 @@ sub encode_utf8
     my $rv = eval
     {
         ## utf8 is more lax than the strict standard of utf-8; see Encode man page
-        Encode::encode( 'utf8', $v, FB_CROAK );
+        Encode::encode( 'utf8', $v, Encode::FB_CROAK );
     };
     if( $@ )
     {
@@ -784,17 +801,36 @@ sub jwt_encode
         $payload->{exp} = $opts->{iat} + $opts->{ttl};
     }
     my $token;
+    my %params =
+    (
+    payload => $payload,
+    ## do NOT allow the "none" algorithm, as this is massively insecure
+    allow_none => 0,
+    alg  => $opts->{algo},
+    key  => ( $opts->{key} || $self->key ),
+    enc  => $opts->{encoding},
+    );
+    my @possible_additional_parameters = qw(
+        allow_none
+        auto_iat
+        extra_headers
+        keypass
+        relative_exp
+        relative_nbf
+        serialization
+        shared_unprotected_headers
+        unprotected_headers
+        zip
+    );
+    for( @possible_additional_parameters )
+    {
+        $params{ $_ } = $opts->{ $_ } if( CORE::exists( $opts->{ $_ } ) && CORE::length( $opts->{ $_ } ) );
+    }
+    
     try
     {
         ## $token = Crypt::JWT::encode_jwt(
-        $token = Net::API::REST::JWT::encode_jwt(
-            payload => $payload,
-            ## do NOT allow the "none" algorithm, as this is massively insecure
-            allow_none => 0,
-            alg  => $opts->{algo},
-            key  => ( $opts->{key} || $self->key ),
-            enc  => $opts->{encoding},
-        );
+        $token = Net::API::REST::JWT::encode_jwt( %params );
     }
     catch( $e )
     {
@@ -1171,7 +1207,7 @@ sub reply
         $ref->{code} = $code if( !CORE::length( $ref->{code} ) );
     }
     
-    my $json = $self->json->utf8->encode( $ref );
+    my $json = $self->json->utf8->relaxed(0)->encode( $ref );
     $self->message( 3, "Sending back json using encoding '", $self->response->content_encoding, "'" );
 #   try
 #   {
@@ -1783,7 +1819,7 @@ Net::API::REST - Framework for RESTful APIs
 
 =head1 VERSION
 
-    v0.5.9
+    v0.6.2
 
 =head1 DESCRIPTION
 
@@ -1849,6 +1885,12 @@ This decode from utf8 some data into a perl structure.
 
 If an error occurs, it will return undef and set an exception that can be accessed with the B<error> method.
 
+=head2 decode_url( $string )
+
+Given a url-encoded string, this returns the decoded string
+
+This uses L<APR::Request> XS method.
+
 =head2 decode_utf8( data )
 
 Decode some data from ut8 into perl internal utf8 representation.
@@ -1868,6 +1910,12 @@ Given some data, this will encode it using base64 algorithm. It uses L<APR::Base
 Given a hash reference, this will encode it into a json data representation.
 
 However, this will not utf8 encode it, because this is done upon printing the data and returning it to the client.
+
+=head2 encode_url( $string )
+
+Given a string, this returns its url-encoded version
+
+This uses L<APR::Request> XS method.
 
 =head2 encode_utf8( data )
 
@@ -1970,6 +2018,62 @@ The chosen algorithm to create JWT tokens
 Given a JWT token, this will decode it and returns a hash reference
 
 =head2 jwt_encode
+
+Provided with an hash reference of parameters, and this will prepare the token data and call L<Net::API::REST::JWT/encode_jwt>
+
+It accepts the following arguments and additional arguments recognised by L<Net::API::REST::JWT> can also be provided and will be passed to L<Net::API::REST::JWT/encode_jwt> directly.
+
+It returns the encrypted token as a string or C<undef> if an error occurred which can be retrieved using the L<Module::Generic/error> method.
+
+=over 4
+
+=item I<algo>
+
+This will set the I<alg> property in the token.
+
+=item I<audience>
+
+This will set the I<aud> property in the token payload.
+
+=item I<encoding>
+
+This will set the I<enc> property in the token payload.
+
+=item I<encrypt>
+
+If true, this will encrypt the token. When provided this will affect the I<algo>.
+
+For example, when not encrypted, by default the algorithm used is C<HS256>, but when encryption is activated, the algorithm becomes C<PBES2-HS256+A128KW>
+
+=item I<expires>
+
+This will set the I<exp> property in the token payload.
+
+=item I<issued_at>
+
+This will set the I<iat> property in the token payload.
+
+=item I<issuer>
+
+This will set the I<iss> property in the token payload.
+
+=item I<key>
+
+This will set the I<key> property in the token payload.
+
+=item I<payload>
+
+The hash data to become the token payload. It can contains discretionary elements.
+
+=item I<subject>
+
+This will set the I<sub> property in the token payload.
+
+=item I<ttl>
+
+If provided, this will set the I<exp> property to I<iat> + I<ttl>
+
+=back
 
 =head2 jwt_encoding
 

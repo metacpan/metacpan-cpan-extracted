@@ -39,10 +39,6 @@ instance confident that if it were being called directly no indent would be
 applied but if module A was calling it then it's output would be indented
 one level.
 
-=for testing
-use_ok('Text::Indent');
-eval "use Test::NoWarnings";
-
 =cut
 
 package Text::Indent;
@@ -50,7 +46,7 @@ package Text::Indent;
 use strict;
 use warnings;
 
-our $VERSION = '0.031';
+our $VERSION = '0.032';
 
 use Params::Validate    qw|:all|;
 
@@ -99,15 +95,6 @@ Whether the newly constructed Text::Indent object should become the new
 singleton instance returned by the B<instance> accessor. Defaults to TRUE.
 
 =back
-
-=begin testing
-
-eval { Text::Indent->new };
-ok( ! $@, "can create an object");
-eval {  Text::Indent->new( Foo => 'Bar' ) };
-ok( $@, "constructor dies on invalid args");
-
-=end testing
 
 =cut
 
@@ -181,14 +168,6 @@ sub instance
 This method increases the level of indentation by $how_many levels.  If
 not provided, $how_many defaults to 1.
 
-=for testing
-my $i = Text::Indent->new;
-is( $i->level, 0, "level initialized to 0");
-$i->increase;
-is( $i->level, 1, "level increased to 1");
-$i->increase(2);
-is( $i->level, 3, "level increased to 3");
-
 =cut
 
 sub increase
@@ -208,14 +187,6 @@ sub increase
 This method decreases the level of indentation by $how_many levels.  If
 not provided, $how_many defaults to 1.
 
-=for testing
-my $i = Text::Indent->new( Level => 5 );
-is( $i->level, 5, "level initialized to 5");
-$i->decrease;
-is( $i->level, 4, "level decreased to 4");
-$i->decrease(2);
-is( $i->level, 2, "level decreased to 2");
-
 =cut
 
 sub decrease
@@ -234,12 +205,6 @@ sub decrease
 
 This method resets the level of indentation to 0.  It is functionally
 equivalent to $indent->level(0).
-
-=for testing
-my $i = Text::Indent->new( Level => 5 );
-is( $i->level, 5, "level initialized to 5");
-$i->reset;
-is( $i->level, 0, "level reset to 0");
 
 =cut
 
@@ -276,22 +241,6 @@ is set.
 
 If the indent level drops is a negative value, no indent is applied.
 
-=for testing
-my $i = Text::Indent->new;
-is( $i->indent("foo"), "foo\n", "no indentation");
-$i->increase;
-is( $i->indent("foo"), "  foo\n", "indent level 1");
-$i->spaces(4);
-is( $i->indent("foo"), "    foo\n", "change spaces to 4");
-$i->spacechar("+");
-is( $i->indent("foo"), "++++foo\n", "chance spacechar to +");
-$i->add_newline(0);
-is( $i->indent("foo"), "++++foo", "unset add_newline");
-$i->reset;
-is( $i->indent("foo"), "foo", "reset indent level");
-$i->decrease;
-is( $i->indent("foo"), "foo", "negative indent has no effect");
-
 =cut
 
 sub indent
@@ -313,17 +262,6 @@ __END__
 
 
 =head1 ACCESSORS
-
-=for testing
-my @accessors = qw|
-    spaces
-    spacechar
-    level
-    add_newline
-|;
-for( @accessors ) {
-    can_ok('Text::Indent', $_);
-}
 
 =head2 spaces
 

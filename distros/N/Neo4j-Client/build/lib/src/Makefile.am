@@ -1,6 +1,6 @@
 lib_LTLIBRARIES = libneo4j-client.la
 
-include_HEADERS = neo4j-client.h
+include_HEADERS = neo4j-client.h atomic.h buffering_iostream.h chunking_iostream.h client_config.h connection.h deserialization.h iostream.h job.h logging.h memory.h messages.h metadata.h network.h print.h posix_iostream.h render.h result_stream.h ring_buffer.h serialization.h thread.h tofu.h transaction.h uri.h util.h values.h
 libneo4j_client_la_SOURCES = \
 	atomic.h \
 	error_handling.c \

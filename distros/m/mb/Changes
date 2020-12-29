@@ -1,5 +1,9 @@
 Revision history for this software.
 
+0.16  2020-12-29 00:00:00
+  - supports mb::PERL (use Perl module in MBCS encoding)
+  - created by INABA Hitoshi
+
 0.15  2020-12-27 00:00:00
   - supports codepoint range of codepoint class of regular expression by hyphen
   - supports new octal syntax 0oddddd
