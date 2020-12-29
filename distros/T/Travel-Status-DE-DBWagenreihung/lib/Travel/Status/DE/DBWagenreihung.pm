@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use 5.020;
 
-our $VERSION = '0.03';
+our $VERSION = '0.05';
 
 use Carp qw(cluck confess);
 use JSON;
@@ -309,14 +309,18 @@ sub train_subtype {
 	my $with_restaurant = 0;
 
 	my %ml = (
-		'ICE 1'     => 0,
-		'ICE 2'     => 0,
-		'ICE 3'     => 0,
-		'ICE 3 V'   => 0,
-		'ICE 4'     => 0,
-		'ICE T 411' => 0,
-		'ICE T 415' => 0,
-		'IC2'       => 0,
+		'ICE 1'        => 0,
+		'ICE 2'        => 0,
+		'ICE 3 403.1'  => 0,
+		'ICE 3 403.2'  => 0,
+		'ICE 3 406'    => 0,
+		'ICE 3 Velaro' => 0,
+		'ICE 4'        => 0,
+		'ICE T 411.1'  => 0,
+		'ICE T 411.2'  => 0,
+		'ICE T 415'    => 0,
+		'IC2 Twindexx' => 0,
+		'IC2 KISS'     => 0,
 	);
 
 	for my $wagon (@wagons) {
@@ -336,8 +340,15 @@ sub train_subtype {
 		{
 			$ml{'ICE 2'}++;
 		}
-		elsif ( $wagon->model == 403 or $wagon->model == 406 ) {
-			$ml{'ICE 3'}++;
+		elsif ( $wagon->model == 403 and substr( $wagon->uic_id, 9, 2 ) <= 37 )
+		{
+			$ml{'ICE 3 403.1'}++;
+		}
+		elsif ( $wagon->model == 403 and substr( $wagon->uic_id, 9, 2 ) > 37 ) {
+			$ml{'ICE 3 403.2'}++;
+		}
+		elsif ( $wagon->model == 406 ) {
+			$ml{'ICE 3 406'}++;
 		}
 		elsif ( $wagon->model == 407 ) {
 			$ml{'ICE 3 Velaro'}++;
@@ -345,14 +356,24 @@ sub train_subtype {
 		elsif ( $wagon->model == 412 or $wagon->model == 812 ) {
 			$ml{'ICE 4'}++;
 		}
-		elsif ( $wagon->model == 411 or $wagon->model == 415 ) {
-			$ml{'ICE T'}++;
+		elsif ( $wagon->model == 411 and substr( $wagon->uic_id, 9, 2 ) <= 32 )
+		{
+			$ml{'ICE T 411.1'}++;
+		}
+		elsif ( $wagon->model == 411 and substr( $wagon->uic_id, 9, 2 ) > 32 ) {
+			$ml{'ICE T 411.2'}++;
+		}
+		elsif ( $wagon->model == 415 ) {
+			$ml{'ICE T 415'}++;
 		}
 		elsif ( $wagon->model == 475 ) {
 			$ml{'TGV'}++;
 		}
+		elsif ( $self->train_type eq 'IC' and $wagon->model == 110 ) {
+			$ml{'IC2 KISS'}++;
+		}
 		elsif ( $self->train_type eq 'IC' and $wagon->is_dosto ) {
-			$ml{'IC2'}++;
+			$ml{'IC2 Twindexx'}++;
 		}
 	}
 
@@ -366,7 +387,7 @@ sub train_subtype {
 
 	$self->{train_subtype} = $likelihood[0];
 
-	if ( $self->{train_subtype} eq 'ICE 3' and $with_restaurant ) {
+	if ( $self->{train_subtype} =~ m{ICE 3 4} and $with_restaurant ) {
 		$self->{train_subtype} = 'ICE 3 Redesign';
 	}
 	return $self->{train_subtype};
@@ -478,7 +499,7 @@ Travel::Status::DE::DBWagenreihung - Interface to Deutsche Bahn Wagon Order API.
 
 =head1 VERSION
 
-version 0.03
+version 0.05
 
 This is beta software. The API may change without notice.
 
@@ -593,7 +614,7 @@ Returns a string describing the train type, e.g. "ICE" or "IC".
 =item $wr->train_subtype
 
 Returns a string describing the rolling stock used for this train, e.g. "ICE 4"
-or "IC2".
+or "IC2 KISS".
 
 =item $wr->wagons
 

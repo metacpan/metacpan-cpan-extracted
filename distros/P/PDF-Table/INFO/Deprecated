@@ -10,8 +10,8 @@ so that you don't end up getting caught flat-footed by the removal of a name,
 and have to scurry to update your code! Anything added to the deprecated list
 should also show up in "Changes", giving you a "heads up".
 
-At some point in the near future, before warning or error messages are given,
-the examples and the t tests will be updated to use the new forms.
+The POD, examples, and t-tests have been updated to use the new forms. There
+should not be any use of deprecated setting names anywhere.
 
 In order of scheduled removal date:
 
@@ -31,7 +31,7 @@ font_color_even   entry in global args, *_prop properties
 
 background_color   entry in global args, *_prop properties
    This has been renamed to 'bg_color', as it is the cell (background) color 
-   (for all rows). 
+   (for all rows). Note that 'bg_color' was already permitted in header_props.
    'background_color' is scheduled to be removed after November 2022.
 
 background_color_odd   entry in global args, *_prop properties
@@ -89,4 +89,5 @@ leading '-' on setting names (hash key, e.g., '-next_h') will no longer be
 *** If I have missed any deprecated interfaces, please let me know! ***
 
 ======= Deprecated items that have already been removed =====================
+(first entry expected December, 2022 or later)
 

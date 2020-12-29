@@ -1,4 +1,4 @@
-# DocKnot 3.05
+# DocKnot
 
 [![Build
 status](https://github.com/rra/docknot/workflows/build/badge.svg)](https://github.com/rra/docknot/actions)
@@ -13,11 +13,11 @@ distributed under a BSD-style license.  Please see the section
 ## Blurb
 
 DocKnot is a system for generating consistent human-readable software
-package documentation from metadata files and templates.  The metadata is
-primarily JSON files, but can include files of documentation snippets.
-The goal is to generate both web pages and distributed documentation files
-(such as `README`) from the same source, using templates for consistency
-across multiple packages.
+package documentation from a YAML metadata file and templates.  The goal
+is to generate both web pages and distributed documentation files (such as
+`README`) from the same source, using templates for consistency across
+multiple packages.  DocKnot also automates generating distribution
+tarballs for software packages.
 
 ## Description
 
@@ -30,13 +30,17 @@ straw was when GitHub became popular and I wanted to provide a Markdown
 version of `README` as well, avoiding the ugly text rendering on the
 GitHub page for a package.
 
-This package uses one metadata directory as its source information and
+This package uses one metadata file as its source information and
 generates all the various bits of documentation for a package.  This
 allows me to make any changes in one place and then just regenerate the
 web page, included documentation, and other files to incorporate those
 changes.  It also lets me make changes to the templates to improve shared
 wording and push that out to every package I maintain during its next
 release, without having to remember which changes I wanted to make.
+
+DocKnot is also slowly absorbing other tools that I use for software
+distribution and web site maintenance, such as generating distribution
+tarballs for software packages.
 
 DocKnot was designed and written for my personal needs, and I'm not sure
 it will be useful for anyone else.  At the least, the template files are
@@ -63,9 +67,11 @@ The following additional Perl modules are required to use it:
 * IPC::Run
 * IPC::System::Simple
 * JSON::MaybeXS
+* Kwalify
 * List::SomeUtils
 * Perl6::Slurp
 * Template (part of Template Toolkit)
+* YAML::XS
 
 ## Building and Installation
 
@@ -125,11 +131,11 @@ The [DocKnot web page](https://www.eyrie.org/~eagle/software/docknot/)
 will always have the current version of this package, the current
 documentation, and pointers to any additional resources.
 
-For bug tracking, use the [CPAN bug
-tracker](https://rt.cpan.org/Dist/Display.html?Name=App-DocKnot).
-However, please be aware that I tend to be extremely busy and work
-projects often take priority.  I'll save your report and get to it as soon
-as I can, but it may take me a couple of months.
+For bug tracking, use the [issue tracker on
+GitHub](https://github.com/rra/docknot/issues).  However, please be aware
+that I tend to be extremely busy and work projects often take priority.
+I'll save your report and get to it as soon as I can, but it may take me a
+couple of months.
 
 ## Source Repository
 
@@ -143,9 +149,7 @@ web](https://git.eyrie.org/?p=devel/docknot.git).
 
 The eyrie.org repository is the canonical one, maintained by the author,
 but using GitHub is probably more convenient for most purposes.  Pull
-requests are gratefully reviewed and normally accepted.  It's probably
-better to use the CPAN bug tracker than GitHub issues, though, to keep all
-Perl module issues in the same place.
+requests are gratefully reviewed and normally accepted.
 
 ## License
 

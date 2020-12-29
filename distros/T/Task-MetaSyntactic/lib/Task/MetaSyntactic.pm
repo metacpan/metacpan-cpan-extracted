@@ -1,5 +1,5 @@
 package Task::MetaSyntactic;
-$Task::MetaSyntactic::VERSION = '1.043';
+$Task::MetaSyntactic::VERSION = '1.044';
 use strict;
 use warnings;
 
@@ -77,6 +77,12 @@ L<Acme::MetaSyntactic::errno> - The Errno theme (BOOK)
 
 L<Acme::MetaSyntactic::frasier> - Characters from the sitcom Frasier (1993) (PERLANCAR)
 
+L<Acme::MetaSyntactic::gavan> - The Space Sheriff Gavan theme (PERLANCAR)
+
+L<Acme::MetaSyntactic::id_beverages> - The Indonesian beverages theme (PERLANCAR)
+
+L<Acme::MetaSyntactic::id_dishes> - The Indonesian dishes theme (PERLANCAR)
+
 L<Acme::MetaSyntactic::id_names> - Most common Indonesian first names (PERLANCAR)
 
 L<Acme::MetaSyntactic::legobatman> - LEGO Batman theme (BINGOS)
@@ -105,6 +111,8 @@ L<Acme::MetaSyntactic::legothehobbit> - LEGO The Hobbit game theme (BINGOS)
 
 L<Acme::MetaSyntactic::legoworlds> - LEGO Worlds theme (BINGOS)
 
+L<Acme::MetaSyntactic::metal_heroes> - The Metal Heroes series theme (PERLANCAR)
+
 L<Acme::MetaSyntactic::mlpfim> - a meta syntactic variable for everypony! (SHLOMIF)
 
 L<Acme::MetaSyntactic::morning_musume> - The Mumusu theme (ELBEHO)
@@ -114,6 +122,8 @@ L<Acme::MetaSyntactic::nethack> - The largest time waster in the world of *nix (
 L<Acme::MetaSyntactic::seinfeld> - Characters from the sitcom Seinfeld (1989) (PERLANCAR)
 
 L<Acme::MetaSyntactic::soviet> - NATO codenames for Soviet-designed equipment (JFORGET)
+
+L<Acme::MetaSyntactic::unyil> - The Unyil theme (PERLANCAR)
 
 L<Acme::MetaSyntactic::vim> - The vim theme (ELLIOTJS)
 
@@ -254,6 +264,12 @@ First released on 2017-02-17.
 
 An alternative to the L<meta> front-end to L<Acme::MetaSyntactic>.
 
+=item L<WordListBase::MetaSyntactic> (PERLANCAR)
+
+First release on 2020-05-01.
+
+Base class for C<WordList::MetaSyntactic::*>.
+
 =back
 
 =head1 AUTHOR
@@ -262,7 +278,7 @@ Philippe Bruhat (BooK), <book@cpan.org>.
 
 =head1 COPYRIGHT
 
-Copyright 2005-2017 Philippe Bruhat (BooK), All Rights Reserved.
+Copyright 2005-2020 Philippe Bruhat (BooK), All Rights Reserved.
 
 =head1 LICENSE
 

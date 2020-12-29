@@ -28,6 +28,7 @@ WriteMakefile(
   },
   ABSTRACT => 'Tk widget (derived from Canvas) for displaying graphs in the GraphViz format.',
   AUTHOR => 'Jeremy Slade <jeremy@jkslade.net>',
+  EXE_FILES => [ glob 'scripts/*' ],
   META_MERGE => {
     "meta-spec" => { version => 2 },
     dynamic_config => 0,
@@ -44,6 +45,11 @@ WriteMakefile(
       license => [ 'http://dev.perl.org/licenses/' ],
     },
     prereqs => {
+      runtime => {
+        recommends => {
+          'Tk::MatchEntry' => '0.5',
+        },
+      },
       develop => {
         requires => {
           'Test::Pod::Coverage' => '1.08',

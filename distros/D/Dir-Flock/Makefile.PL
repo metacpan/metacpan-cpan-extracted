@@ -16,8 +16,8 @@ WriteMakefile(
     PL_FILES            => {},
     PREREQ_PM => {
         'Test::More' => 0,
-        'Time::HiRes' => '1.92',      # Time::HiRes::stat  required
-        'File::Temp' => 0,
+	'Time::HiRes' => 0,
+	'File::Temp' => 0,
     },
     LICENSE             => 'perl_5',
     MIN_PERL_VERSION    => '5.008001',

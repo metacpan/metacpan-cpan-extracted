@@ -50,7 +50,7 @@ package Text::Indent;
 use strict;
 use warnings;
 
-our $VERSION = '0.03';
+our $VERSION = '0.031';
 
 use Params::Validate    qw|:all|;
 
@@ -233,7 +233,7 @@ sub decrease
 =head2 reset
 
 This method resets the level of indentation to 0.  It is functionally
-equivalent to $ident->level(0).
+equivalent to $indent->level(0).
 
 =for testing
 my $i = Text::Indent->new( Level => 5 );
@@ -368,7 +368,7 @@ In Bar.pm:
    return $i->indent("bar");
  }
 
-The output from the preceeding example would be (> indicates the left edge
+The output from the preceding example would be (> indicates the left edge
 of output and is for illustrative purposes only):
 
  >  foo

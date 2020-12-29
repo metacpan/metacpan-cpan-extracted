@@ -1,5 +1,26 @@
 Change log for PDF::API2 version 2.xxx (predecessor to PDF::Builder)
 
+2.039     2020-12-12
+
+    - add missing trailing commas in Content.pm (not done in PDF::Builder)
+
+    - update code style in Resource/Font/CoreFont.pm (not worth doing in 
+      PDF::Builder)
+
+    - expression form of grep changed in Basic/PDF/File.pm
+
+    - PDF::API2->open($filename) no longer reads the entire file into memory
+      before working on it, instead reading from the file as needed.  This
+      results in a substantial reduction in memory usage and start-up time for
+      large PDF files, particularly in cases where the calling script doesn't
+      need to access all of the contents of the PDF.
+      (not yet implemented in PDF::Builder, want to gain some experience 
+      with PDF::API2 first)
+
+2.038     2020-08-31
+
+    - Use libpng.a PNG processing to speed up (already in PDF::Builder)
+
 2.037     2020-02-05
 
     - Allow PDF 2.0 files to be opened. [already in PDF::Builder]

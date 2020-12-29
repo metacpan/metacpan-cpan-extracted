@@ -1,3 +1,25 @@
+0.017     2020-12-28 23:26:25-08:00 America/Los_Angeles
+
+    - Fix off-by-1 bug in get_line_burst_or_data
+    - Pick a better default read size
+    - Make read size configurable
+    - expose fill_buffer()
+
+0.016     2020-12-25 23:43:43-08:00 America/Los_Angeles
+
+    - MASSIVE PERFORMANCE IMPROVEMENTS
+    - Rewrite to use an internal buffer to reduce sysread calls
+    - Fix incorrect assumptions about data recieved from pipe (it is always treated as bytes)
+    - If internal state is messed up all future operations throw the error.
+
+0.015     2020-12-24 19:53:36-08:00 America/Los_Angeles
+
+    - Fix some bugs in mixed_data mode
+    - Better EOF detection (not trustworthy before this fix)
+    - get_line_burst_or_data fixes:
+        - Return partial lines at EOF (line without newline termination)
+        - Report incomplete messages or partial bursts (as exceptions)
+
 0.014     2020-12-21 19:44:01-08:00 America/Los_Angeles
 
     - Add mixed_data_mode (get_line_burst_or_data)

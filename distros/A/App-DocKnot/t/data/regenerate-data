@@ -32,9 +32,9 @@ closedir($datadir);
 for my $package (@packages) {
     my $metadata;
     if ($package eq 'docknot') {
-        $metadata = File::Spec->catdir('docs', 'metadata');
+        $metadata = File::Spec->catdir('docs', 'docknot.yaml');
     } else {
-        $metadata = File::Spec->catdir($data, $package, 'metadata');
+        $metadata = File::Spec->catdir($data, $package, 'docknot.yaml');
     }
     my $output = File::Spec->catdir($data, $package, 'output');
     opendir(my $outputdir, $output);

@@ -25,3 +25,5 @@ MYMETA..*
 # Don't include the outputs from running the examples
 ^examples/.*-out\.txt$
 ^xt/.*\.t$
+# These are for github only
+^copied/.*$

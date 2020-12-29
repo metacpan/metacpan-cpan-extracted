@@ -27,7 +27,7 @@ my $obj_handler = sub {
 	return 'null';
     }
 };
-my $jc = JSON::Create->new ();
+my $jc = JSON::Create->new (indent => 1, sort => 1);
 print $jc->run ($monkeys), "\n";
 $jc->obj_handler ($obj_handler);
 print $jc->run ($monkeys), "\n";

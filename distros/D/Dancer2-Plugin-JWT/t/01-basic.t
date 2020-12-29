@@ -59,6 +59,21 @@ $mech->add_header("Authorization" => $authorization);
 $mech->get_ok("/defined/jwt");
 $mech->content_is("DEFINED", "We got something");
 
+# Auth header with Bearer schema
+$mech->add_header("Authorization" => 'Bearer ' . $authorization);
+$mech->get_ok("/defined/jwt");
+$mech->content_is("DEFINED", "We got something");
+
+# Wrong number of spaces in Auth header
+$mech->add_header("Authorization" => 'Bearer  ' . $authorization);
+$mech->get_ok("/redirect/jwt");
+$mech->content_is("OK", "we redirected");
+
+# Auth header with a wrong schema
+$mech->add_header("Authorization" => 'Basic ' . $authorization);
+$mech->get_ok("/redirect/jwt");
+$mech->content_is("OK", "we redirected");
+
 $mech->delete_header("Authorization");
 $mech->get_ok("/redirect/jwt");
 $mech->content_is("OK", "we redirected");

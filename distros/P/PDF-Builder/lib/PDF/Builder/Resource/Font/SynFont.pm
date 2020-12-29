@@ -3,10 +3,11 @@ package PDF::Builder::Resource::Font::SynFont;
 use base 'PDF::Builder::Resource::Font';
 
 use strict;
-no warnings qw[ deprecated recursion uninitialized ];
+use warnings;
+#no warnings qw[ deprecated recursion uninitialized ];
 
-our $VERSION = '3.020'; # VERSION
-my $LAST_UPDATE = '3.017'; # manually update whenever code is changed
+our $VERSION = '3.021'; # VERSION
+my $LAST_UPDATE = '3.021'; # manually update whenever code is changed
 
 use Math::Trig;    # CAUTION: deg2rad(0) = deg2rad(360) = 0!
 use Unicode::UCD 'charinfo';
@@ -90,7 +91,7 @@ sub new
 {
     my ($class, $pdf, $font, @opts) = @_;
 
-    my ($self, $data);
+    my ($self);
     my %opts = @opts;
     my $first = 1;
     my $last = 255;
@@ -111,7 +112,7 @@ sub new
     if (defined $opts{'-encode'}) {
         if ($opts{'-encode'} =~ m/^utf/i) {
 	    die "Invalid multibyte encoding for synfont: $opts{'-encode'}\n";
-	    # probably more encodings to check
+	    # TBD probably more multibyte encodings to check
         }
         $font->encodeByName($opts{'-encode'});
     }
@@ -171,7 +172,8 @@ sub new
     $self->{'Resources'}->{'Font'}->{'FSN'} = $font;
     foreach my $w ($first .. $last) {
         $self->data()->{'char'}->[$w] = $font->glyphByEnc($w);
-        $self->data()->{'uni'}->[$w] = uniByName($self->data()->{'char'}->[$w]);
+	# possible non-standard name... use $w as Unicode value
+        $self->data()->{'uni'}->[$w] = (uniByName($self->data()->{'char'}->[$w]))||$w;
         $self->data()->{'u2e'}->{$self->data()->{'uni'}->[$w]} = $w;
     }
 
@@ -319,7 +321,11 @@ sub new
         $pdf->new_obj($char);
     } # loop through 255 standard encoding points
 
-    $procs->{'.notdef'} = $procs->{$font->data()->{'char'}->[32]};
+#  the array as 0 elements at this point! 'space' (among others) IS defined,
+#  so copy that, but TBD what kind of fallback if no such element exists?
+#   $procs->{'.notdef'} = $procs->{$font->data()->{'char'}->[32]};
+    $procs->{'.notdef'} = $procs->{'space'};
+
     $self->{'Widths'} = PDFArray(map { PDFNum($_) } @widths);
     $self->data()->{'e2n'} = $self->data()->{'char'};
     $self->data()->{'e2u'} = $self->data()->{'uni'};

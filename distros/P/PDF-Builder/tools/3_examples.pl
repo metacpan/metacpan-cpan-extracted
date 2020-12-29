@@ -7,7 +7,7 @@
 use strict;
 use warnings;
 
-our $VERSION = '3.020'; # VERSION
+our $VERSION = '3.021'; # VERSION
 my $LAST_UPDATE = '3.018'; # manually update whenever code is changed
 
 # dependent on optional packages:
@@ -59,7 +59,7 @@ my (@example_list, @example_results);
   push @example_results, "create examples/024_bdffonts.<font name>.pdf, showing one page of 256 glyphs\n and a page of Lorem Ipsum text.\n";
 
   push @example_list, "025_unifonts";
-  push @example_results, "create examples/025_unifonts.pdf, with the first 45 lines of an attached PDF-J\n file in four different Western+CJK fonts.\n";
+  push @example_results, "create examples/025_unifonts.pdf, with the first 45 lines of an attached PDF-J\n file in four different Western + CJK fonts. Don't worry about long lines\n running off the right margin.\n";
 
   push @example_list, "026_unifont2";
   push @example_results, "create examples/026_unifont2.pdf, showing pages with labeled sections and\n full descriptive name on each character.\n";

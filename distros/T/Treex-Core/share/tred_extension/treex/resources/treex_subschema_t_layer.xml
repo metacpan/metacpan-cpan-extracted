@@ -32,11 +32,27 @@
       <member name="children" role="#CHILDNODES">
         <list ordered="1" type="t-node.type"/>
       </member>
+      <member name="mwes" required="0">
+        <list ordered="0" type="st-node.type"/>
+      </member>
       <member name="anot_error" type="t-anot_error.type" />
       <member name="pcedt_coref" type="t-pcedt_coref-root.type" />
       <member name="subtree_scores"  type="subtree_scores.type"/>
       <member name="src_tnode.rf"><cdata format="PMLREF"/></member>
       <member name="wild_dump"><cdata format="any"/></member>
+    </structure>
+  </type>
+
+  <type name="st-node.type">
+    <structure name="st-node">
+      <member as_attribute="1" name="id" role="#ID" required="1"><cdata format="ID"/></member>
+      <member name="basic-form" required="0"><cdata format="any"/></member>
+      <member name="type" required="1"><cdata format="any"/></member>
+      <member name="tnode.rfs">
+        <list ordered="0">
+          <cdata format="PMLREF"/>
+        </list>
+      </member>
     </structure>
   </type>
 
@@ -87,6 +103,7 @@
       <member name="is_infin" type="bool.type"/>
       <member name="is_reflexive" type="bool.type"/>
       <member name="is_optimizable" type="bool.type"/>
+      <member name="discourse_special" type="t-discourse-special.type" required="0"/>
 
       <!--  References -->
       <member name="compl.rf"><list ordered="0"><cdata format="PMLREF"/></list></member>
@@ -99,6 +116,12 @@
       </member>
       <member name="coref_gram.rf"><list ordered="0"><cdata format="PMLREF"/></list></member>
       <member name="coref_special" type="coref_special.type"/>
+            <member name="discourse" required="0">
+        <list ordered="0" type="t-discourse-link.type"/>
+      </member>
+      <member name="discourse_groups" required="0">
+        <list ordered="0" type="t-discourse-groups.type"/>
+      </member>
       <member name="pcedt" type="t-pcedt.type"/>
       <member name="val_frame.rf"><alt><cdata format="PMLREF"/></alt></member>
       <member name="original_parent.rf"><cdata format="PMLREF"/></member><!-- When doing temporary changes of a tree structure, original parent  is saved before changing so it can be later restored. (popel 19.2.2009) -->
@@ -175,6 +198,63 @@
 	  		<member name="tag"><cdata format="any"/></member>
 	  	</structure>
 	  </member>
+
+      <!-- 14.2.2017 fucikova: for manual correction of val_frame slot alignment
+      between EngValLex and PDTVALLEX to create Czengvallex (Jana Sindlerova, Zdenka Uresova) -->
+      <member name="valalign">
+          <structure>
+              <member name="czengvallex_functor" >
+                  <alt type="func.type"/>
+              </member>
+              <member name="manual">
+                  <structure>
+                      <member name="aligned" type="bool.type"/>
+                      <member name="counterpart.rf">
+                          <cdata format="PMLREF"/>
+                      </member>
+                  </structure>
+              </member>
+              <member name="note">
+                  <list ordered="0" type="t-czengvallex_note.type"/>
+              </member>
+              <member name="coref.rf"><list ordered="0"><cdata format="PMLREF"/></list></member>
+              <member name="not_collect" type="bool.type"/>
+              <member name="slot_remove" type="bool.type"/>
+              <!-- The following links should not be saved to files:
+              <member name="vallex">
+              <structure>
+              <member name="status">
+              <choice>
+              <value>aligned</value>
+              <value>unaligned</value>
+              <value>not-in-frame</value>
+              </choice>
+              </member>
+              <member name="counterpart.rf">
+              <cdata format="PMLREF"/>
+              </member>
+              </structure>
+              </member>
+              <member name="auto">
+              <structure>
+              <member name="aligned" type="bool.type"/>
+              <member name="counterpart.rf">
+              <cdata format="PMLREF"/>
+              </member>
+              </structure>
+              </member>
+              <member name="verb">
+              <structure>
+              <member name="counterpart.rf">
+              <cdata format="PMLREF"/>
+              </member>
+              </structure>
+              </member>
+              -->
+          </structure>
+      </member>
+
+
 	<!-- ********* DEPRECATED / QUESTIONABLE ATTRIBUTES  ********* -->
 	
 	<!-- Named entities should be stored in n-trees - see treex_subschema_n_layer.xml
@@ -192,6 +272,25 @@
   </type>
 
 <!-- *************** Types of t-layer attributes *******************  -->
+
+  <type name="t-czengvallex_note.type">
+      <structure>
+          <member name="type" required="1">
+              <choice>
+                  <value>Frame</value>
+                  <value>Functor</value>
+                  <value>Structure</value>
+                  <value>Translation</value>
+                  <value>Question</value>
+                  <value>Other</value>
+              </choice>
+          </member>
+          <member name="text">
+              <cdata format="any"/>
+          </member>
+      </structure>
+  </type>
+
   <type name="t-anot_error.type">
     <list ordered="0">
 	  <cdata format="any"/>
@@ -268,6 +367,121 @@
       </structure>          
   </type>
     
+  <type name="t-discourse-special.type">
+    <choice>
+      <value>caption</value>
+      <value>heading</value>
+      <value>metatext</value>
+    </choice>
+  </type>
+
+  <type name="t-discourse-groups.type">
+    <structure>
+      <member name="id" required="1">
+        <cdata format="nonNegativeInteger"/>
+      </member>
+    </structure>
+  </type>
+
+  <type name="t-discourse-link.type">
+    <structure>
+      <member name="target_node.rf" required="0">
+        <cdata format="PMLREF"/>
+      </member>
+      <member name="type" required="1">
+        <choice>
+          <value>discourse</value>
+          <value>list</value>
+        </choice>
+      </member>
+      <member name="start_group_id" required="0">
+        <cdata format="nonNegativeInteger"/>
+      </member>
+      <member name="start_range" required="1">
+        <cdata format="any"/>
+      </member>
+      <member name="target_group_id" required="0">
+        <cdata format="nonNegativeInteger"/>
+      </member>
+      <member name="target_range" required="0">
+        <cdata format="any"/>
+      </member>
+      <member name="discourse_type"  type="t-discourse-type.type" required="0"/>
+      <member name="is_negated" type="bool.type" required="0"/>
+      <member name="comment" required="0">
+        <cdata format="any"/>
+      </member>
+      <member name="src" required="0"> <!-- for annotation purposes only (not in the distributed data) -->
+        <cdata format="any"/>
+      </member>
+      <member name="a-connectors.rf" required="0">
+        <list ordered="0">
+          <cdata format="PMLREF"/>
+        </list>
+      </member>
+      <member name="t-connectors.rf" required="0">
+        <list ordered="0">
+          <cdata format="PMLREF"/>
+        </list>
+      </member>
+      <member name="a-connectors_ext.rf" required="0">
+        <list ordered="0">
+          <cdata format="PMLREF"/>
+        </list>
+      </member>
+      <member name="t-connectors_ext.rf" required="0">
+        <list ordered="0">
+          <cdata format="PMLREF"/>
+        </list>
+      </member>
+      <member name="is_secondary" type="bool.type" required="0"/>
+      <member name="all_a-connectors.rf" required="0"> <!-- for searching in PML-TQ only (not in the distributed data) -->
+        <list ordered="0">
+          <cdata format="PMLREF"/>
+        </list>
+      </member>
+      <member name="connective" required="0"> <!-- for searching in PML-TQ only (not in the distributed data) -->
+        <cdata format="any"/>
+      </member>
+      <member name="all_a-connectors_ext.rf" required="0"> <!-- for searching in PML-TQ only (not in the distributed data) -->
+        <list ordered="0">
+          <cdata format="PMLREF"/>
+        </list>
+      </member>
+      <member name="connective_ext" required="0"> <!-- for searching in PML-TQ only (not in the distributed data) -->
+        <cdata format="any"/>
+      </member>
+
+    </structure>
+  </type>
+
+  <type name="t-discourse-type.type">
+    <choice>
+      <value>conc</value>
+      <value>cond</value>
+      <value>confr</value>
+      <value>conj</value>
+      <value>conjalt</value>
+      <value>corr</value>
+      <value>disjalt</value>
+      <value>equiv</value>
+      <value>exempl</value>
+      <value>explicat</value>
+      <value>f_cond</value>
+      <value>f_opp</value>
+      <value>f_reason</value>
+      <value>gener</value>
+      <value>grad</value>
+      <value>opp</value>
+      <value>preced</value>
+      <value>purp</value>
+      <value>reason</value>
+      <value>restr</value>
+      <value>spec</value>
+      <value>synchr</value>
+      <value>other</value>
+    </choice>
+  </type>
 
   <type name="t-tfa.type">
     <choice>
@@ -298,7 +512,33 @@
       <member name="negation" type="t-negation.type"/>
       <member name="definiteness" type="t-definiteness.type"/>
       <member name="diathesis" type="t-diathesis.type"/>
+      <member name="diatgram" type="t-diatgram.type"/>
+      <member name="factmod" type="t-factmod.type"/>
     </structure>
+  </type>
+
+  <type name="t-diatgram.type">
+    <choice>
+      <value>act</value>
+      <value>deagent</value>
+      <value>disp</value>
+      <value>pas</value>
+      <value>recip</value>
+      <value>res1</value>
+      <value>res2.1</value>
+      <value>res2.2</value>
+    </choice>
+  </type>
+
+  <type name="t-factmod.type">
+    <choice>
+      <value>appeal</value>
+      <value>asserted</value>
+      <value>irreal</value>
+      <value>potential</value>
+      <value>nil</value>
+      <value>nr</value>
+    </choice>
   </type>
 
   <type name="t-pcedt.type">
@@ -512,6 +752,7 @@
       <value>sg</value>
       <value>du</value>
       <value>pl</value>
+      <value>sg|pl</value>
       <value>inher</value>
       <value>nr</value>
     </choice>
@@ -531,6 +772,11 @@
       <value>inan</value>
       <value>fem</value>
       <value>neut</value>
+      <value>fem|neut</value>
+      <value>anim|inan</value>
+      <value>inan|fem</value>
+      <value>anim|inan|neut</value>
+      <value>anim|inan|fem|neut</value>
       <value>inher</value>
       <value>nr</value>
     </choice>

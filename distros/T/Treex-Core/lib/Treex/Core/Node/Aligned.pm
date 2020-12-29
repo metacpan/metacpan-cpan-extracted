@@ -1,5 +1,5 @@
 package Treex::Core::Node::Aligned;
-$Treex::Core::Node::Aligned::VERSION = '2.20160630';
+$Treex::Core::Node::Aligned::VERSION = '2.20201228';
 use Moose::Role;
 
 # with Moose >= 2.00, this must be present also in roles
@@ -20,6 +20,10 @@ sub _set_directed_as_default {
 
 sub get_aligned_nodes {
     my ($self, $filter) = @_;
+
+    # return self if both language and selector of a counterpart should be the same as the self's ones
+    return ([$self], ["self"]) if (defined $filter->{language} && defined $filter->{selector} &&
+        $filter->{language} eq $self->language && $filter->{selector} eq $self->selector);
 
     $filter = _set_directed_as_default($filter); 
     # retrieve aligned nodes and its types outcoming links
@@ -251,7 +255,7 @@ Treex::Core::Node::Aligned
 
 =head1 VERSION
 
-version 2.20160630
+version 2.20201228
 
 =head1 DESCRIPTION
 

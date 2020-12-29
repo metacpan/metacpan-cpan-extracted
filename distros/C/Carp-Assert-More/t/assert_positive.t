@@ -20,7 +20,7 @@ my @cases = (
 );
 
 for my $case ( @cases ) {
-    my ($val,$status) = @$case;
+    my ($val,$status) = @{$case};
 
     my $desc = "Checking \"$val\"";
     eval { assert_positive( $val ) };

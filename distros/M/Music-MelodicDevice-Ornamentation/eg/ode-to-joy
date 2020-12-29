@@ -10,9 +10,9 @@ use Music::MelodicDevice::Ornamentation;
 my $score = MIDI::Util::setup_score(patch => 68);
 
 my $md = Music::MelodicDevice::Ornamentation->new(
-    scale_note => 'C',
-    scale_name => 'major',
-#    verbose => 1,
+    scale_note => 'D',
+    scale_name => 'minor',
+    verbose => 1,
 );
 
 my $motif = [(('qn') x 12), qw(dqn en hn)];

@@ -1,10 +1,10 @@
 {
    "abstract" : "Facilitates the creation and modification of PDF files",
    "author" : [
-      "Phil Perry <phil4597@catskilltech.com>"
+      "Phil Perry"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.56, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.58, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "open_source"
    ],
@@ -47,16 +47,15 @@
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "mailto" : "support2854 [at] catskilltech.com",
          "web" : "https://github.com/PhilterPaper/Perl-PDF-Builder/issues"
       },
-      "homepage" : "https://www.catskilltech.com",
+      "homepage" : "https://metacpan.org/pod/PDF::Builder",
       "repository" : {
          "type" : "git",
          "url" : "git://github.com/PhilterPaper/Perl-PDF-Builder.git",
          "web" : "https://github.com/PhilterPaper/Perl-PDF-Builder"
       }
    },
-   "version" : "3.020",
+   "version" : "3.021",
    "x_serialization_backend" : "JSON::PP version 4.05"
 }

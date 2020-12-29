@@ -1,5 +1,30 @@
 Revision history for Music-MelodicDevice-Ornamentation
 
+0.0600 2020-12-28 08:49:24
+    - Add the eg/ornament program.
+    - Use midinums for the internal scale, and use Music::Note to convert.
+
+0.0505 2020-12-25 12:51:49
+    - Sort the scale notes!
+    - Add more tests.
+
+0.0504 2020-12-25 08:36:45
+    - Improve documentation and code comments.
+    - Use constants, instead of magic literals.
+
+0.0503 2020-12-24 13:40:27
+    - Improve documentation again!
+
+0.0502 2020-12-24 13:32:25
+    - Improve documentation.
+
+0.0501 2020-12-24 11:45:38
+    - Use Carp and croak if a pitch cannot be found in a scale.
+    - Improve documentation slightly.
+
+0.0500 2020-12-24 11:19:06
+    - Add a ->slide (AKA "glissando") ornament method.
+
 0.0401 2020-12-22 12:50:03
     - Show the trill if verbose.
     - Improve documentation.

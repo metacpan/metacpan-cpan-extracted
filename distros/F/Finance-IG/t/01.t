@@ -7,7 +7,7 @@ use Test::Simple tests=>5;
 
 my $tester=$FindBin::RealBin."/../Testing/test.pl"; 
 
-open(F,"$tester -h  |") or die "unable to run ".$FindBin::RealBin. "/../Testing/test.pl"; 
+open(F,"$^X $tester -h  |") or die "unable to run $^X ".$FindBin::RealBin. "/../Testing/test.pl"; 
 my $lc=0; 
 while (<F>)
 { 
@@ -18,7 +18,7 @@ ok($?>>8==1,"-h command exits status 1");
 ok($lc>10,"-h command produces at least 10 lines of output"); 
 
 $lc=0; 
-open(F,"$tester |") or die "unable to run ".$FindBin::RealBin. "/../Testing/test.pl"; 
+open(F,"$^X $tester |") or die "unable to run $^X".$FindBin::RealBin. "/../Testing/test.pl"; 
 my $md5=Digest::MD5->new;
 while (<F>)
 { 

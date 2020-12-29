@@ -3,8 +3,8 @@ NAME
     Exchange (static version)
 
 VERSION
-    This document describes version 20201028.0.1 of Finance::SE::IDX::Static
-    (from Perl distribution Finance-SE-IDX-Static), released on 2020-11-03.
+    This document describes version 20201222.0.1 of Finance::SE::IDX::Static
+    (from Perl distribution Finance-SE-IDX-Static), released on 2020-12-27.
 
 SYNOPSIS
     Use like you would use Finance::SE::IDX.
@@ -18,8 +18,105 @@ DESCRIPTION
 
 FUNCTIONS
   list_idx_boards
+    Usage:
+
+     list_idx_boards() -> [status, msg, payload, meta]
+
+    List boards on IDX.
+
+    This function is not exported by default, but exportable.
+
+    No arguments.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  list_idx_brokers
+    Usage:
+
+     list_idx_brokers() -> [status, msg, payload, meta]
+
+    List brokers listed on the IDX.
+
+    REPLACE ME
+
+    This function is not exported by default, but exportable.
+
+    No arguments.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
   list_idx_firms
+    Usage:
+
+     list_idx_firms(%args) -> [status, msg, payload, meta]
+
+    List firms listed on the IDX.
+
+    REPLACE ME
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   board => *str*
+
+        Filter by value of board.
+
+    *   sector => *str*
+
+        Filter by value of sector.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
   list_idx_sectors
+    Usage:
+
+     list_idx_sectors() -> [status, msg, payload, meta]
+
+    List sectors on IDX.
+
+    This function is not exported by default, but exportable.
+
+    No arguments.
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
 HOMEPAGE
     Please visit the project's homepage at
     <https://metacpan.org/release/Finance-SE-IDX-Static>.
@@ -30,8 +127,7 @@ SOURCE
 
 BUGS
     Please report any bugs or feature requests on the bugtracker website
-    <https://rt.cpan.org/Public/Dist/Display.html?Name=Finance-SE-IDX-Static
-    >
+    <https://github.com/perlancar/perl-Finance-SE-IDX-Static/issues>
 
     When submitting a bug or request, please include a test-file or a patch
     to an existing test-file that illustrates the bug or desired feature.

@@ -5,7 +5,8 @@ use warnings;
 package Dist::Iller::Plugin;
 
 our $AUTHORITY = 'cpan:CSSON'; # AUTHORITY
-our $VERSION = '0.1408';
+# ABSTRACT: Handle a Dist::Zilla/Pod::Weaver plugin
+our $VERSION = '0.1409';
 
 use Dist::Iller::Elk;
 use Types::Standard qw/Str Enum HashRef/;
@@ -143,11 +144,11 @@ __END__
 
 =head1 NAME
 
-Dist::Iller::Plugin
+Dist::Iller::Plugin - Handle a Dist::Zilla/Pod::Weaver plugin
 
 =head1 VERSION
 
-Version 0.1408, released 2016-03-12.
+Version 0.1409, released 2020-12-27.
 
 =head1 SOURCE
 

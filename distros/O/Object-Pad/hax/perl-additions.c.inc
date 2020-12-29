@@ -10,6 +10,10 @@
 #  define PadnameIsNULL(pn)  (!(pn) || (pn) == &PL_sv_undef)
 #endif
 
+#ifndef hv_deletes
+#  define hv_deletes(hv, skey, flags)  hv_delete((hv), ("" skey ""), (sizeof(skey) - 1), flags)
+#endif
+
 #if HAVE_PERL_VERSION(5, 22, 0)
 #  define PadnameOUTER_off(pn)  (PadnameFLAGS(pn) &= ~PADNAMEt_OUTER)
 #else

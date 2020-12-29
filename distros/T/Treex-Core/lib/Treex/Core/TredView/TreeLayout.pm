@@ -1,5 +1,5 @@
 package Treex::Core::TredView::TreeLayout;
-$Treex::Core::TredView::TreeLayout::VERSION = '2.20160630';
+$Treex::Core::TredView::TreeLayout::VERSION = '2.20201228';
 use Moose;
 use Moose::Util::TypeConstraints;
 
@@ -443,7 +443,7 @@ Treex::Core::TredView::TreeLayout - Layout of trees in Tred
 
 =head1 VERSION
 
-version 2.20160630
+version 2.20201228
 
 =head1 DESCRIPTION
 

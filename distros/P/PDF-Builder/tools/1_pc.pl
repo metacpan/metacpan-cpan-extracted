@@ -7,8 +7,8 @@
 use strict;
 use warnings;
 
-our $VERSION = '3.020'; # VERSION
-my $LAST_UPDATE = '3.016'; # manually update whenever code is changed
+our $VERSION = '3.021'; # VERSION
+my $LAST_UPDATE = '3.021'; # manually update whenever code is changed
 
 # command line:
 # -5  run perlcritic -5 .  (should be clean)
@@ -30,9 +30,12 @@ my @ignore_list = (
   # should not ignore any level 5 warnings
      "Use IO::Interactive::is_interactive",
                               # not a core module!
+
   # common level 4 warnings to ignore
-     "Code before warnings",  # due to use of "no warnings" pragma 
-     "Warnings disabled at",  # due to use of "no warnings" pragma
+# removed 'no warnings' in 3.021. remove next line 3.022 or later
+#    "Code before warnings",  # due to use of "no warnings" pragma 
+# removed 'no warnings' in 3.021. remove next line 3.022 or later
+#    "Warnings disabled at",  # due to use of "no warnings" pragma
      "Close filehandles as soon as possible", 
                               # it thinks there is no "close" on an open 
 			      # filehandle, due to either too many lines for 
@@ -40,20 +43,50 @@ my @ignore_list = (
      "Always unpack ",        # Always unpack @_ first at line
                               # not using @_ or $_[n] directly is good practice,
                               # but it doesn't seem to recognize legitimate uses
+#  'default' in Builder.pm would have to be deprecated, and changed to defaultB
+#      Perl 'default' (CORE::) not used
+#  'close' in Content-Lite.pm would have to be deprecated, and changed to 
+#      closePath. Perl 'close' (CORE::) not used in Content-Lite.pm
+#  'print' in Lite.pm would have to be deprecated, and changed to 
+#      printB. Perl 'print' (CORE::) not used in Lite.pm
+#  'link' in NamedDestination.pm would have to be deprecated, and changed to 
+#      linkPage. Perl 'link' (CORE::) not used in NamedDestination.pm
+#  'next', 'last' in Outline.pm is undocumented internal routine, can rename
+#  'open' in Outline.pm would have to be deprecated, and changed to openB.
+#      Perl 'open' (CORE::) not used
+#  'open' in File.pm would have to be deprecated, and changed to openB
+#      Perl 'open' (CORE::) is ALSO used
      "Subroutine name is a homonym for builtin function", 
                               # e.g., we define "open" when there is already a 
 			      # system (CORE::) open (ambiguous unless CORE:: 
-			      # added)
+			      # added)      TBD consider removing
      "Symbols are exported by default", 
                               # it doesn't like something about our use of 
 			      # @EXPORT and @EXPORT_OK
+# 4 'use constant' for conversion factors in Boxes.pl, 3 in RMtutorial.pl
      "Pragma \"constant\" used at", # will have to investigate why "use constant"
                                     # is flagged. TBD
+
   # common level 3 warnings to ignore for now
      '"die" used instead of "croak"',  # 
      '"warn" used instead of "carp"',  # 
      'Regular expression without "/x" flag',  # 
-     "Backtick operator used",  # 
+     "Backtick operator used",  # what's the problem?
+     "high complexity score",  #
+     "Cascading if-elsif chain",  #
+     "Hard tabs used at",  # consider updating (ViM editor [ ] likes to 
+                           #replace spaces with tabs)
+     '"local" variable not initialized',  # variable set in next line -- 
+                                          # no problem
+     "Reused variable name in lexical scope",  # what's the problem?
+     'in condition for an "unless"',  
+              # doesn't like inequality tests in "unless" for some reason
+              # perhaps it's confusing in this "negative" test?
+     "Unrestricted '## no critic' annotation",  
+              # need documentation [ ] on how to restrict policies
+     "Ambiguously named variable",  
+              # bitches about last, left, right as "ambiguous". sigh.
+    # Return value of eval not tested, can't depend on $@.  should fix [ ]
 	          );
 
 # Note that level 4 includes any level 5 errors, etc.

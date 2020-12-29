@@ -25,6 +25,7 @@ diag "Reading packages from $cache";
 my %seen;
 my @latest = sort grep !$seen{$_}++,
     map { $_->{uri} =~ m{cpan:///distfile/.*/(.*)-[^-]*$} }
+    grep $_->{package} !~ /^Acme::MetaSyntactic::test_wlb_meta$/,
     $index->search_packages( { package => qr{^Acme::MetaSyntactic::[a-z]} } );
 
 # get the current prereqs

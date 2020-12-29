@@ -1,5 +1,26 @@
 Change history for Perl extension PDF::Table.
 
+=== Version 1.002 (2020-12-27)
+
+ README.md, lib/PDF/Table.pm, Makefile.PL
+  Miscellaneous updates to clean up support URLs, emails, etc.
+
+ util/pod2cpanhtml.pl
+  Remove use of search.cpan.org CSS reference, as that site no longer exists.
+   Looking for a good replacement, possibly Bootstrap, that doesn't require 
+   that a phone be turned to landscape orientation in order to read text at
+   a decent size.
+
+ lib/PDF/Table.pm
+  Cells spanning columns only had the first part (cell) of the bottom 
+   horizontal rule drawn. Reported by "stefanalt". Fixed to draw full spanned 
+   width.
+
+ t/PDF-Table.t 
+  One calculated value was considerably different between standard Perl (uses
+   doubles for floats), long-double Perl, and quad-math Perl. Round the 
+   calculated value to 6 decimal digits so that it works on any system.
+
 === Version 1.001 (2020-11-05)
 
  lib/PDF/Table.pm  fix edge case where no borders led to no rules [GH 55].

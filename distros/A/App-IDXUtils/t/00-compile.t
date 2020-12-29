@@ -6,7 +6,7 @@ use warnings;
 
 use Test::More;
 
-plan tests => 4 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 9 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'App/IDXUtils.pm'
@@ -14,8 +14,13 @@ my @module_files = (
 
 my @scripts = (
     'script/list-idx-boards',
+    'script/list-idx-boards-static',
+    'script/list-idx-brokers',
+    'script/list-idx-brokers-static',
     'script/list-idx-firms',
-    'script/list-idx-sectors'
+    'script/list-idx-firms-static',
+    'script/list-idx-sectors',
+    'script/list-idx-sectors-static'
 );
 
 # no fake home requested

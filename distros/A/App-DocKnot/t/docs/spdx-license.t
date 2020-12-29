@@ -66,8 +66,8 @@ my @IGNORE_PATHS = (
     qr{ \A [.] /docs/metadata/ }xms,          # Package license should be fine
     qr{ \A [.] /README ( [.] .* )? \z }xms,   # Package license should be fine
     qr{ \A [.] /share/ }xms,                  # Package license should be fine
-    qr{ \A [.] /t/data .* /metadata/ }xms,    # Test metadata
-    qr{ \A [.] /t/data .* /output/ }xms,      # Test output
+    qr{ \A [.] /t/data/generate/ }xms,        # Test metadata
+    qr{ \A [.] /t/data/update/ }xms,          # Test output
     qr{ \A [.] /t/data .* [.] json \z }xms,   # Test metadata
 );
 ## use critic

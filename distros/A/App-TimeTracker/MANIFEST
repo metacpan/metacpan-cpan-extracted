@@ -16,12 +16,14 @@ helper/convert_2_003_to_2_004.pl
 helper/convert_legacy_data_to_json.pl
 lib/App/TimeTracker.pm
 lib/App/TimeTracker/Command/Core.pm
+lib/App/TimeTracker/Constants.pm
 lib/App/TimeTracker/Data/Task.pm
 lib/App/TimeTracker/Proto.pm
 lib/App/TimeTracker/Utils.pm
 t/00-load.t
 t/Command/core.t
 t/Command/rt_73859_daychange.t
+t/Command/rt_88867_start_help.t
 t/Proto/config.t
 t/Proto/run.t
 t/Task/current.t

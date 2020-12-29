@@ -1,5 +1,13 @@
 Revision history for Perl extension Spreadsheet::ReadSXC.
 
+0.33  2020-12-28
+    * Read style attributes immediately from Twig. This increases memory usage
+      but removes problems when we recycle the Twig object for parsing another
+      file
+    * Custom styles are now better supported and don't crash the module
+      immediately (issue GH #5 , reported with test file by mario-minati)
+    * Point bug tracker meta data to Github
+
 0.32  2020-10-06
     * Eliminate a warning when reading a numeric format without a defined
       number of digits, reported by Tux

@@ -1,5 +1,5 @@
 package Treex::Core::Block;
-$Treex::Core::Block::VERSION = '2.20160630';
+$Treex::Core::Block::VERSION = '2.20201228';
 use Moose;
 use Treex::Core::Common;
 use Treex::Core::Resource;
@@ -387,11 +387,6 @@ sub process_start {
     return;
 }
 
-after 'process_start' => sub {
-    my ($self) = @_;
-    $self->_set_is_started(1);
-};
-
 sub process_end {
     my ($self) = @_;
 
@@ -477,7 +472,7 @@ Treex::Core::Block - the basic data-processing unit in the Treex framework
 
 =head1 VERSION
 
-version 2.20160630
+version 2.20201228
 
 =head1 SYNOPSIS
 

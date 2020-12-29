@@ -58,8 +58,6 @@ plugins:
 
  - +plugin: MakeMaker
 
- - +plugin: MakeMaker
-
  - +plugin: Manifest
 
  - +plugin: TestRelease
@@ -130,3 +128,4 @@ doctype: gitignore
 
 always:
  - ThisFile
+ - $self.distribution_name

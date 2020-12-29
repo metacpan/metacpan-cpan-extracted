@@ -1,7 +1,9 @@
 package Finance::SE::IDX::Any;
 
-our $DATE = '2018-10-14'; # DATE
-our $VERSION = '0.002'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-12-24'; # DATE
+our $DIST = 'Finance-SE-IDX-Any'; # DIST
+our $VERSION = '0.003'; # VERSION
 
 use 5.010001;
 use strict 'subs', 'vars';
@@ -14,6 +16,7 @@ use Exporter;
 our @ISA = qw(Exporter);
 our @EXPORT_OK = qw(
                        list_idx_boards
+                       list_idx_brokers
                        list_idx_firms
                        list_idx_sectors
                );
@@ -56,6 +59,8 @@ sub _doit {
 
 sub list_idx_boards  { _doit("list_idx_boards", @_) }
 
+sub list_idx_brokers  { _doit("list_idx_brokers", @_) }
+
 sub list_idx_firms   { _doit("list_idx_firms", @_) }
 
 sub list_idx_sectors { _doit("list_idx_sectors", @_) }
@@ -75,7 +80,7 @@ Finance::SE::IDX::Any - Get information from Indonesian Stock Exchange
 
 =head1 VERSION
 
-This document describes version 0.002 of Finance::SE::IDX::Any (from Perl distribution Finance-SE-IDX-Any), released on 2018-10-14.
+This document describes version 0.003 of Finance::SE::IDX::Any (from Perl distribution Finance-SE-IDX-Any), released on 2020-12-24.
 
 =head1 SYNOPSIS
 
@@ -102,7 +107,7 @@ a failure. Default is 4*3600 (4 hours).
 
 Usage:
 
- list_idx_boards() -> [status, msg, result, meta]
+ list_idx_boards() -> [status, msg, payload, meta]
 
 List boards.
 
@@ -118,18 +123,47 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
 Return value:  (any)
 
 
+
+=head2 list_idx_brokers
+
+Usage:
+
+ list_idx_brokers() -> [status, msg, payload, meta]
+
+List brokers.
+
+By default caches results for 8 hours (by locally setting CACHE_MAX_AGE). Can be
+overriden by using HTTP_TINY_CACHE_MAX_AGE.
+
+This function is not exported by default, but exportable.
+
+No arguments.
+
+Returns an enveloped result (an array).
+
+First element (status) is an integer containing HTTP status code
+(200 means OK, 4xx caller error, 5xx function error). Second element
+(msg) is a string containing error message, or 'OK' if status is
+200. Third element (payload) is optional, the actual result. Fourth
+element (meta) is called result metadata and is optional, a hash
+that contains extra information.
+
+Return value:  (any)
+
+
+
 =head2 list_idx_firms
 
 Usage:
 
- list_idx_firms(%args) -> [status, msg, result, meta]
+ list_idx_firms(%args) -> [status, msg, payload, meta]
 
 List firms.
 
@@ -146,6 +180,7 @@ Arguments ('*' denotes required arguments):
 
 =item * B<sector> => I<str>
 
+
 =back
 
 Returns an enveloped result (an array).
@@ -153,18 +188,19 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
 Return value:  (any)
 
 
+
 =head2 list_idx_sectors
 
 Usage:
 
- list_idx_sectors() -> [status, msg, result, meta]
+ list_idx_sectors() -> [status, msg, payload, meta]
 
 List sectors.
 
@@ -180,7 +216,7 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
@@ -196,7 +232,7 @@ Source repository is at L<https://github.com/perlancar/perl-Finance-SE-IDX-Any>.
 
 =head1 BUGS
 
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Finance-SE-IDX-Any>
+Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-Finance-SE-IDX-Any/issues>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
@@ -214,7 +250,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2018 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

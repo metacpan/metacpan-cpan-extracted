@@ -1,5 +1,8 @@
 Revision history for MIDI-Util
 
+0.0705 2020-12-26 02:27:47
+    - Handle double-flats and double-sharps in midi_format().
+
 0.0704 2020-12-18 09:47:22
     - Add the TICKS dump functionality.
 

@@ -5,8 +5,8 @@ Makefile.PL
 MANIFEST			This list of files
 parseRecordLabel.yp
 README
+scripts/tkgraphviz
 t/2.t
-t/compareGraphs
 t/graphs/directed/abstract.dot
 t/graphs/directed/alf.dot
 t/graphs/directed/awilliams.dot
@@ -63,7 +63,5 @@ t/graphs/makefile-small.dot
 t/graphs/makefile.dot
 t/record.t
 t/test1.dot
-t/test1.pl
-t/test2.pl
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

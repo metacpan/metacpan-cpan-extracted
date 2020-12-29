@@ -1,0 +1,248 @@
+# Kwalify schema for DocKnot metadata.
+#
+# Copyright 2020 Russ Allbery <rra@cpan.org>
+#
+# SPDX-License-Identifier: MIT
+
+type: map
+mapping:
+  advisories:
+    type: seq
+    sequence:
+      - type: map
+        mapping:
+          date:
+            type: text
+            required: true
+          versions:
+            type: text
+            required: true
+          threshold:
+            type: text
+            required: true
+  blurb:
+    type: text
+    required: true
+  build:
+    type: map
+    mapping:
+      autoconf:
+        type: text
+      automake:
+        type: text
+      autotools:
+        type: bool
+      bootstrap:
+        type: text
+      cplusplus:
+        type: bool
+      gssapi:
+        type: bool
+      install:
+        type: bool
+      kerberos:
+        type: bool
+      manpages:
+        type: bool
+      middle:
+        type: text
+      reduced_depends:
+        type: bool
+      suffix:
+        type: text
+      type:
+        type: text
+        enum:
+          - Autoconf
+          - ExtUtils::MakeMaker
+          - Module::Build
+          - make
+      valgrind:
+        type: bool
+  copyrights:
+    type: seq
+    sequence:
+      - type: map
+        mapping:
+          holder:
+            type: text
+            required: true
+            unique: true
+          years:
+            type: text
+            required: true
+  description:
+    type: text
+    required: true
+  distribution:
+    type: map
+    mapping:
+      cpan:
+        type: text
+      ignore:
+        type: seq
+        sequence:
+          - type: text
+      packaging:
+        type: map
+        mapping:
+          debian:
+            type: map
+            mapping:
+              package:
+                type: text
+              personal:
+                type: bool
+              summary:
+                type: text
+          extra:
+            type: text
+      section:
+        type: text
+        required: true
+      tarname:
+        type: text
+        required: true
+      version:
+        type: text
+        required: true
+  docs:
+    type: map
+    mapping:
+      api: &pagelist
+        type: seq
+        sequence:
+          - type: map
+            mapping:
+              name:
+                type: text
+                required: true
+                unique: true
+              title:
+                type: text
+                required: true
+      contrib: *pagelist
+      developer: *pagelist
+      extra:
+        type: seq
+        sequence:
+          - type: map
+            mapping:
+              title:
+                type: text
+                required: true
+              links: *pagelist
+      user: *pagelist
+  format:
+    type: text
+    required: true
+    enum:
+      - v1
+  license:
+    type: map
+    mapping:
+      name:
+        type: text
+        required: true
+      notices:
+        type: text
+  maintainer:
+    type: text
+    required: true
+  name:
+    type: text
+    required: true
+  orphaned:
+    type: text
+  quote:
+    type: map
+    mapping:
+      author:
+        type: text
+        required: true
+      broken:
+        type: bool
+      date:
+        type: text
+      text:
+        type: text
+        required: true
+      title:
+        type: text
+      work:
+        type: text
+  requirements:
+    type: text
+    required: true
+  sections:
+    type: seq
+    sequence:
+      - type: map
+        mapping:
+          body:
+            type: text
+            required: true
+          title:
+            type: text
+            required: true
+  support:
+    type: map
+    mapping:
+      email:
+        type: text
+        required: true
+      extra:
+        type: text
+      github:
+        type: text
+      listname:
+        type: text
+      listurl:
+        type: text
+      web:
+        type: text
+        required: true
+  synopsis:
+    type: text
+    required: true
+  test:
+    type: map
+    mapping:
+      lancaster:
+        type: bool
+      override:
+        type: text
+      prefix:
+        type: text
+      suffix:
+        type: text
+  vcs:
+    type: map
+    mapping:
+      browse:
+        type: text
+        required: true
+      github:
+        type: text
+      openhub:
+        type: text
+      status:
+        type: map
+        mapping:
+          travis:
+            type: text
+          workflow:
+            type: text
+            enum:
+              - build
+      type:
+        type: text
+        required: true
+        enum:
+          - Git
+      url:
+        type: text
+        required: true
+  version:
+    type: text
+    required: true

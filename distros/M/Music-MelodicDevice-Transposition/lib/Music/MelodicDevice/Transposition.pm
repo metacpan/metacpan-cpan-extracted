@@ -3,14 +3,17 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Apply chromatic and diatonic transposition to notes
 
-our $VERSION = '0.0300';
+our $VERSION = '0.0400';
 
 use Data::Dumper::Compact qw(ddc);
 use List::SomeUtils qw(first_index);
-use Music::Scales qw(get_scale_notes is_scale);
+use Music::Note;
+use Music::Scales qw(get_scale_MIDI is_scale);
 use Moo;
 use strictures 2;
 use namespace::clean;
+
+use constant OCTAVES => 10;
 
 
 has scale_note => (
@@ -34,32 +37,10 @@ has _scale => (
 sub _build__scale {
     my ($self) = @_;
 
-    my @scale = get_scale_notes($self->scale_note, $self->scale_name);
+    my @scale = map { get_scale_MIDI($self->scale_note, $_, $self->scale_name) } -1 .. OCTAVES - 1;
     print 'Scale: ', ddc(\@scale) if $self->verbose;
 
-    my @with_octaves = map { my $o = $_; map { $_ . $o } @scale } 0 .. 10;
-    print 'With octaves: ', ddc(\@with_octaves) if $self->verbose;
-
-    return \@with_octaves;
-}
-
-has _enharmonics => (
-    is        => 'lazy',
-    init_args => undef,
-);
-
-sub _build__enharmonics {
-  my ($self) = @_;
-  my %enharmonics = (
-      'C#' => 'Db',
-      'D#' => 'Eb',
-      'E#' => 'F',
-      'F#' => 'Gb',
-      'G#' => 'Ab',
-      'A#' => 'Bb',
-      'B#' => 'C',
-  );
-  return { %enharmonics, reverse %enharmonics }
+    return \@scale;
 }
 
 
@@ -76,8 +57,10 @@ sub transpose {
     my @transposed;
 
     for my $n (@$notes) {
-        (my $i, $n) = $self->_find_pitch($n);
-        push @transposed, $i == -1 ? undef : $self->_scale->[ $i + $offset ];
+        my ($i, $pitch) = $self->_find_pitch($n);
+        push @transposed, $i == -1
+            ? undef
+            : Music::Note->new($self->_scale->[ $i + $offset ], 'midinum')->format('ISO');
     }
     print 'Transposed: ', ddc(\@transposed) if $self->verbose;
 
@@ -86,12 +69,11 @@ sub transpose {
 
 sub _find_pitch {
     my ($self, $pitch) = @_;
-    my $i = first_index { $_ eq $pitch } @{ $self->_scale };
-    if ($i == -1) {
-        my $enharmonics = $self->_enharmonics;
-        $pitch =~ s/^([A-G][#b]?)(\d+)$/$enharmonics->{$1}$2/;
-        $i = first_index { $_ eq $pitch } @{ $self->_scale };
-    }
+
+    $pitch = Music::Note->new($pitch, 'ISO')->format('midinum');
+
+    my $i = first_index { $_ == $pitch } @{ $self->_scale };
+
     return $i, $pitch;
 }
 
@@ -109,7 +91,7 @@ Music::MelodicDevice::Transposition - Apply chromatic and diatonic transposition
 
 =head1 VERSION
 
-version 0.0300
+version 0.0400
 
 =head1 SYNOPSIS
 
@@ -178,6 +160,8 @@ appropriately based on the number of notes in the chosen scale.
 =head1 SEE ALSO
 
 The F<t/01-methods.t> test file
+
+L<Data::Dumper::Compact>
 
 L<List::SomeUtils>
 

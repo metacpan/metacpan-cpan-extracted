@@ -9,47 +9,35 @@ package main;
 use warnings;
 use strict;
 
-use Test::More tests => 6;
+use Test::More tests => 7;
 
 use Carp::Assert::More;
 
-local $@;
-$@ = '';
+use Test::Exception;
+
+my $FAILED = qr/Assertion failed/;
 
 # {} is a hashref
-eval {
-    assert_hashref( {} );
-};
-is( $@, '' );
+lives_ok( sub { assert_hashref( {} ) } );
 
-# a ref to a hash with stuff in it is a hashref
+# A ref to a hash with stuff in it is a hashref.
 my %hash = ( foo => 'foo', bar => 'bar' );
-eval {
-    assert_hashref( \%hash );
-};
-is( $@, '' );
+lives_ok( sub { assert_hashref( \%hash ) } );
 
-# 3 is not a hashref
-eval {
-    assert_hashref( 3 );
-};
-like( $@, qr/Assertion.*failed/ );
+# 3 is not a hashref.
+throws_ok( sub { assert_hashref( 3 ) }, $FAILED );
+
+# A ref to 3 is not a hashref.
+throws_ok( sub { assert_hashref( \3 ) }, $FAILED );
 
 # [] is not a hashref
-eval {
-    assert_hashref( [] );
-};
-like( $@, qr/Assertion.*failed/ );
+throws_ok( sub { assert_hashref( [] ) }, $FAILED );
 
 # sub {} is not a hashref
-eval {
-    assert_hashref( sub {} );
-};
-like( $@, qr/Assertion.*failed/ );
+my $coderef = sub {};
+throws_ok( sub { assert_hashref( $coderef ) }, $FAILED );
 
 # Foo->new->isa("HASH") returns true, so do we
-eval {
-    assert_hashref( Foo->new );
-};
-is( $@, '' );
+lives_ok( sub { assert_hashref( Foo->new ) } );
 
+exit 0;

@@ -4,8 +4,9 @@ use warnings;
 
 package Pod::Elemental::Transformer::Splint::AttributeRenderer;
 
-our $VERSION = '0.1201'; # VERSION
 # ABSTRACT: Role for attribute renderers
+our $AUTHORITY = 'cpan:CSSON'; # AUTHORITY
+our $VERSION = '0.1202';
 
 use Moose::Role;
 use Pod::Simple::XHTML;
@@ -34,7 +35,7 @@ Pod::Elemental::Transformer::Splint::AttributeRenderer - Role for attribute rend
 
 =head1 VERSION
 
-Version 0.1201, released 2016-02-03.
+Version 0.1202, released 2020-12-26.
 
 =head1 SOURCE
 

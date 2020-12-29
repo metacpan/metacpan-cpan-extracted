@@ -1,5 +1,5 @@
 package Treex::Core;
-$Treex::Core::VERSION = '2.20160630';
+$Treex::Core::VERSION = '2.20201228';
 use strict;
 use warnings;
 use Treex::Core::Document;
@@ -21,7 +21,7 @@ Treex::Core - interface to linguistic structures and processing units in Treex
 
 =head1 VERSION
 
-version 2.20160630
+version 2.20201228
 
 =head1 SYNOPSIS
 

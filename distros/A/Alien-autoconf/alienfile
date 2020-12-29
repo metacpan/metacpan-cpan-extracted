@@ -108,6 +108,7 @@ share {
         {
           @lines = (
             ": \${AUTOM4TE=`alien_autoconf_root`'/bin/autom4te'}\n",
+	    ": \${trailer_m4=`alien_autoconf_root`'/share/autoconf/autoconf/trailer.m4'}\n",
             @lines
           );
           $exe->spew($shebang, @lines);

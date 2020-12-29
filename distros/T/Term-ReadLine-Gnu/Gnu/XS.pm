@@ -1,9 +1,9 @@
 #
 #	XS.pm : perl function definition for Term::ReadLine::Gnu
 #
-#	$Id: XS.pm 566 2019-01-14 05:30:33Z hayashi $
+#	$Id: XS.pm 576 2020-12-27 03:21:45Z hayashi $
 #
-#	Copyright (c) 1999-2016 Hiroo Hayashi.  All rights reserved.
+#	Copyright (c) 1999-2020 Hiroo Hayashi.  All rights reserved.
 #
 #	This program is free software; you can redistribute it and/or
 #	modify it under the same terms as Perl itself.
@@ -16,7 +16,7 @@ use warnings;
 use AutoLoader 'AUTOLOAD';
 
 our $VERSION;
-$VERSION='1.36';	# added for CPAN
+$VERSION='1.37';	# added for CPAN
 
 # make aliases
 our %Attribs;
@@ -40,9 +40,6 @@ our %Attribs;
 *rl_unbind_command_in_map  = \&unbind_command;
 
 rl_add_defun('history-expand-line',	 \&history_expand_line);
-# bind operate-and-get-next to \C-o by default for the compatibility
-# with bash and Term::ReadLine::Perl
-rl_add_defun('operate-and-get-next',	 \&operate_and_get_next, ord "\co");
 rl_add_defun('display-readline-version', \&display_readline_version);
 rl_add_defun('change-ornaments',	 \&change_ornaments);
 
@@ -407,7 +404,7 @@ sub history_expand_line {
 }
 
 # The equivalent of the Korn shell C-o operate-and-get-next-history-line
-# editing command. 
+# editing command.
 
 # This routine was borrowed from bash.
 sub operate_and_get_next {
@@ -536,7 +533,7 @@ sub _ch_wrapper {
 	}
 
 	# add to history buffer
-	add_history($line) 
+	add_history($line)
 	    if ($Attribs{MinLength} > 0
 		&& length($line) >= $Attribs{MinLength});
     }

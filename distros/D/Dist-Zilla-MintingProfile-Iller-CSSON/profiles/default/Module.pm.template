@@ -4,8 +4,9 @@ use warnings;
 
 package {{$name}};
 
-# VERSION
 # ABSTRACT: Short intro
+# AUTHORITY
+our $VERSION = '0.0100';
 
 
 

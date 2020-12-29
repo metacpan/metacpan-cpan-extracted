@@ -5,14 +5,15 @@ use warnings;
 package Dist::Iller::DocType;
 
 our $AUTHORITY = 'cpan:CSSON'; # AUTHORITY
-our $VERSION = '0.1408';
+# ABSTRACT: Role for document types that can be used in Dist::Iller configs
+our $VERSION = '0.1409';
 
 use Moose::Role;
 use MooseX::AttributeShortcuts;
 use namespace::autoclean;
 use Try::Tiny;
 use Text::Diff;
-use Types::Standard qw/ConsumerOf Str HashRef InstanceOf/;
+use Types::Standard qw/ConsumerOf Str HashRef InstanceOf Maybe/;
 use Module::Load qw/load/;
 use String::CamelCase qw/decamelize/;
 use YAML::Tiny;
@@ -56,6 +57,11 @@ has included_configs => (
         has_included_configs => 'count',
     },
 );
+has global => (
+    is => 'ro',
+    isa => Maybe[InstanceOf['Dist::Iller::DocType::Global']],
+    predicate => 1,
+);
 
 around parse => sub {
     my $next = shift;
@@ -90,7 +96,11 @@ sub parse_config {
             croak "Can't find $config_class ($_)";
         };
 
-        my $configobj = $config_class->new(%{ $yaml }, maybe distribution_name => ($self->$_can('name') ? $self->name : undef));
+        my $configobj = $config_class->new(
+            %{ $yaml },
+            maybe distribution_name => ($self->$_can('name') ? $self->name : undef),
+            maybe global => ($self->global ? $self->global : undef),
+        );
         my $configdoc = $configobj->get_yaml_for($self->doctype);
         return if !defined $configdoc;
 
@@ -127,6 +137,8 @@ around to_string => sub {
 
 sub generate_file {
     my $self = shift;
+
+    return if !$self->filename; # for doctype:global
 
     my $path = Path->check($self->filename) ? $self->filename : Path->coerce($self->filename);
 
@@ -174,11 +186,11 @@ __END__
 
 =head1 NAME
 
-Dist::Iller::DocType
+Dist::Iller::DocType - Role for document types that can be used in Dist::Iller configs
 
 =head1 VERSION
 
-Version 0.1408, released 2016-03-12.
+Version 0.1409, released 2020-12-27.
 
 =head1 SOURCE
 

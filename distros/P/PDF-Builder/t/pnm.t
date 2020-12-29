@@ -25,7 +25,8 @@ like($pdf->stringify(), qr/q 216 0 0 288 72 144 cm \S+ Do Q/,
 # Filehandle
 
 $pdf = PDF::Builder->new();
-open my $fh, '<', 't/resources/1x1.pbm';
+open my $fh, '<', 't/resources/1x1.pbm' or 
+    die "Can't open file t/resources/1x1.pbm";
 $pnm = $pdf->image_pnm($fh);
 isa_ok($pnm, 'PDF::Builder::Resource::XObject::Image::PNM',
        q{$pdf->image_pnm(filehandle)});

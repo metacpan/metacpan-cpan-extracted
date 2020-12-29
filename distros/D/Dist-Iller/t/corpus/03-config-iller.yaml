@@ -1,8 +1,12 @@
 ---
+doctype: global
+
+distribution_name: My-Own-Dist
+
+---
 doctype: dist
 
 header:
-  name: My-Own-Dist
   author:
    - Erik Carlsson
    - Ex Ample

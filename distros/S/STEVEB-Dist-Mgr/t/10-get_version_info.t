@@ -1,11 +1,11 @@
 use warnings;
 use strict;
+
 use Test::More;
 
 use Data::Dumper;
 use Hook::Output::Tiny;
 use STEVEB::Dist::Mgr qw(:all);
-use Module::Installed qw(module_installed);
 
 use lib 't/lib';
 use Helper qw(:all);
@@ -67,14 +67,13 @@ my $d = 't/data/orig';
     my $h = Hook::Output::Tiny->new;
 
     $h->hook('stderr');
-    my $info = get_version_info($d);
+    get_version_info($d);
     $h->unhook('stderr');
 
     my @stderr = $h->stderr;
 
-    like $stderr[0], qr/No\.pm.*\$VERSION definition/, "No.pm croaks about no ver def ok";
-    like $stderr[1], qr/Bad\.pm.*valid version/, "Bad.pm croaks about no valid ver ok";
-
+    is grep(/No.pm.*\$VERSION definition/, @stderr), 1, "No.pm croaks about no ver def ok";
+    is grep(/Bad\.pm.*valid version/, @stderr), 1, "Bad.pm croaks about no valid ver ok";
 }
 
 done_testing();

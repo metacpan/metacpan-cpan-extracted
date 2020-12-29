@@ -1,4 +1,8 @@
 ---
+doctype: global
+
+distribution_name: Dist-Iller
+---
 doctype: dist
 
 header:
@@ -48,8 +52,6 @@ plugins:
     +with: ModuleShareDirs
     Dist::Zilla::MintingProfile::DistIller::Basic: profiles
 
-  - +extend_plugin: TravisYML
-
   - +extend_plugin: ExecDir
     dir: script
 
@@ -70,5 +72,3 @@ doctype: gitignore
 
 config: Author::CSSON
 
-always:
- - /Dist-Iller-*

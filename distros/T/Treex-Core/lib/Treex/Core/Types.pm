@@ -1,5 +1,5 @@
 package Treex::Core::Types;
-$Treex::Core::Types::VERSION = '2.20160630';
+$Treex::Core::Types::VERSION = '2.20201228';
 use strict;
 use warnings;
 use utf8;
@@ -43,25 +43,66 @@ subtype 'Treex::Type::ZoneCode'
 # Added code for Modern Greek which comes under ISO 639-3 (but normally it is encoded using ISO 639-1 'el').
 use Locale::Language;
 my %EXTRA_LANG_CODES = (
+    'abq'     => "Abaza",
+    'aii'     => "Assyrian",
+    'ajp'     => "South Levantine Arabic",
+    'akk'     => "Akkadian",
+    'apu'     => "Apurina", # Apurinã
+    'aqz'     => "Akuntsu",
+    'bho'     => "Bhojpuri",
     'bxr'     => "Buryat",
+    'ckb'     => "Sorani", # Central Kurdish
+    'ckt'     => "Chukchi",
     'cop'     => "Coptic",        # ISO 639-2
+    'dbl'     => "Dyirbal",
     'dsb'     => "Lower Sorbian",
     'ell'     => "Modern Greek",  # ISO 639-3
+    'fro'     => "Old French",
     'got'     => "Gothic",        # ISO 639-2
     'grc'     => "Ancient Greek", # ISO 639-2
+    'gsw'     => "Swiss German",
+    'gun'     => "Mbya Guarani",
     'hit'     => "Hittite",       # ISO 639-2
     'hsb'     => "Upper Sorbian",
     'hak'     => "Hakka",
     'kaa'     => "Karakalpak",
+    'kfm'     => "Khunsari",
+    'kmr'     => "Kurmanji", # Northern Kurdish
+    'koi'     => "Komi Permyak",
+    'kpv'     => "Komi Zyrian",
+    'krl'     => "Karelian",
     'ku-latn' => "Kurdish in Latin script",
     'ku-arab' => "Kurdish in Arabic script",
     'ku-cyrl' => "Kurdish in Cyrillic script",
+    'lzh'     => "Classical Chinese",
+    'mdf'     => "Moksha",
+    'mga'     => "Middle Irish",
     'mul'     => "multiple languages", # ISO 639-2 code
+    'myu'     => "Munduruku", # Mundurukú
+    'myv'     => "Erzya",
     'nan'     => "Taiwanese",
+    'ndg'     => "Ndengeleko",
+    'nyq'     => "Nayini",
+    'olo'     => "Livvi", # Olonets Karelian
+    'orv'     => "Old Russian",
+    'otk'     => "Old Turkish",
+    'pcm'     => "Nigerian Pidgin (Naija)",
+    'pgl'     => "Archaic Irish",
     'rmy'     => "Romany",
+    'qhe'     => "Hindi-English", # used in UD bilingual corpora
+    'qtd'     => "Turkish-German", # used in UD bilingual corpora
+    'quz'     => "Cusco Quechua",
     'sah'     => "Yakut",
+    'sga'     => "Old Irish",
+    'sme'     => "North Sami",
+    'sms'     => "Skolt Sami",
+    'soj'     => "Soi",
+    'swl'     => "Swedish Sign Language",
+    'tpn'     => "Tupinamba", # Tupinambá
     'und'     => "unknown", # ISO 639-2 code for undetermined/unknown language
     'xal'     => "Kalmyk",
+    'wbp'     => "Warlpiri",
+    'yii'     => "Yidiny",
     'yue'     => "Cantonese",
 );
 
@@ -88,7 +129,7 @@ Treex::Core::Types - types used in Treex framework
 
 =head1 VERSION
 
-version 2.20160630
+version 2.20201228
 
 =head1 DESCRIPTION
 

@@ -1,0 +1,114 @@
+format: v1
+
+name: PGP::Sign
+maintainer: Russ Allbery <rra@cpan.org>
+version: '1.00'
+synopsis: create and verify detached PGP signatures
+
+license:
+  name: Perl
+copyrights:
+  - holder: Russ Allbery <rra@cpan.org>
+    years: 1997-2000, 2002, 2004, 2018, 2020
+
+build:
+  type: Module::Build
+distribution:
+  cpan: PGP-Sign
+  ignore:
+    - ^t/data/gnupg1/random_seed$
+    - ^t/data/gnupg./trustdb\.gpg$
+  packaging:
+    debian:
+      package: libpgp-sign-perl
+      summary: |
+        PGP::Sign is packaged for Debian as libpgp-sign-perl.
+  section: perl
+  tarname: PGP-Sign
+  version: pgp-sign
+support:
+  email: rra@cpan.org
+  github: rra/pgp-sign
+  web: https://www.eyrie.org/~eagle/software/pgp-sign/
+vcs:
+  browse: https://git.eyrie.org/?p=perl/pgp-sign.git
+  github: rra/pgp-sign
+  status:
+    workflow: build
+  type: Git
+  url: https://git.eyrie.org/git/perl/pgp-sign.git
+
+quote:
+  author: William Shakespeare
+  broken: true
+  text: |
+    This above all: to thine own self be true,
+    And it must follow, as the night the day,
+    Thou canst not then be false to any man.
+  work: Hamlet
+docs:
+  user:
+    - name: docs
+      title: Module documentation
+    - name: thanks
+      title: Thanks and credits
+
+blurb: |
+  PGP::Sign is a Perl module for generating and verifying detached OpenPGP
+  signatures of textual data using GnuPG.  It was written to support Netnews
+  article signatures for signed control messages and PGPMoose.
+
+description: |
+  PGP::Sign is a Perl module that can generate and verify OpenPGP signatures
+  on some data.  Currently, only textual data (data that can be processed
+  using GnuPG's `--textmode` option) is supported.  It uses GnuPG under the
+  hood to do the work.
+
+  The original purpose of this module was to factor out common code in a
+  News::Article class written by Andrew Gierth that handled PGPMoose and
+  control message signatures.  It is used to verify control message
+  signatures for the ftp.isc.org Netnews metadata archive, and to generate
+  signed control messages for the Big Eight Usenet hierarchies.
+
+  Data to be signed or verified can be passed into PGP::Sign in a wide
+  variety of formats: scalars, arrays, open files, even code references that
+  act as generators.  Keys with passphrases are supported and the passphrase
+  is passed to GnuPG securely (although getting the passphrase to the
+  PGP::Sign module is a problem for the calling application).
+
+  This module supports both GnuPG v2 and GnuPG v1 and, when used with GnuPG
+  v1, supports using OpenPGP keys and generating and verifying signatures
+  that are backward-compatible with PGP 2.6.2.
+
+  PGP::Sign provides both a (recommended) object-oriented API and a (legacy)
+  function-based API that uses global variables for configuration and is
+  backward-compatible with earlier versions of PGP::Sign.
+
+requirements: |
+  Perl 5.20 or later and Module::Build are required to build this module,
+  and IPC::Run is required to use it.  Either GnuPG v2 or GnuPG v1
+  (selectable at runtime) is also required.  It has not been tested with
+  versions of GnuPG older than 1.4.23.
+
+  PGP::Sign uses IPC::Run features that are documented as not available on
+  Windows (primarily higher-numbered file descriptors) and has never been
+  tested with Gpg4win, so will probably not work on Windows (or, for that
+  matter, other non-UNIX systems).
+
+test:
+  lancaster: true
+  suffix: |
+    The following additional Perl modules will be used by the test suite if
+    present:
+
+    * Devel::Cover
+    * Test::MinimumVersion
+    * Test::Perl::Critic
+    * Test::Pod
+    * Test::Pod::Coverage
+    * Test::Spelling
+    * Test::Strict
+    * Test::Synopsis
+
+    All are available on CPAN.  Those tests will be skipped if the modules are
+    not available.

@@ -6,9 +6,11 @@ requires 'IO::Compress::Xz';
 requires 'IPC::Run';
 requires 'IPC::System::Simple';
 requires 'JSON::MaybeXS';
+requires 'Kwalify';
 requires 'List::SomeUtils';
 requires 'Perl6::Slurp';
 requires 'Template';
+requires 'YAML::XS';
 
 on 'test' => sub {
     requires 'Capture::Tiny';

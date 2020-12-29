@@ -1,5 +1,7 @@
 .gitignore
+.travis.yml
 Changes
+copy.pl
 examples/reporter.pl
 examples/set-file.pl
 examples/synopsis.pl
@@ -11,6 +13,9 @@ MANIFEST			This list of files
 MANIFEST.SKIP
 README
 script/checkxs
+t/av-len.t
+t/comment.t
+t/deref.t
 t/xs-check.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

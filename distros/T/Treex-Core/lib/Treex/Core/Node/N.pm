@@ -1,5 +1,5 @@
 package Treex::Core::Node::N;
-$Treex::Core::Node::N::VERSION = '2.20160630';
+$Treex::Core::Node::N::VERSION = '2.20201228';
 use namespace::autoclean;
 
 use Moose;
@@ -43,7 +43,7 @@ Treex::Core::Node::N
 
 =head1 VERSION
 
-version 2.20160630
+version 2.20201228
 
 =head1 DESCRIPTION
 

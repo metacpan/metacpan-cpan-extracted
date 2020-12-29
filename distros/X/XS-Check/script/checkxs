@@ -2,8 +2,32 @@
 use warnings;
 use strict;
 use XS::Check;
+use Getopt::Long;
 
-my $check = XS::Check->new ();
+my $ok = GetOptions (
+    verbose => \my $verbose,
+    version => \my $version,
+);
+
+if (! $ok) {
+    print <<EOF;
+
+$0: options are:
+
+--verbose		Print debugging messages
+--version		Print version and exit
+
+perldoc XS::Check for information about this application.
+EOF
+}
+
+if ($version) {
+    my $xs_check_version = $XS::Check::VERSION;
+    print "XS::Check version $xs_check_version; perldoc XS::Check for info\n";
+    exit;
+}
+
+my $check = XS::Check->new (verbose => $verbose);
 for (@ARGV) {
     $check->check_file ($_);
 }

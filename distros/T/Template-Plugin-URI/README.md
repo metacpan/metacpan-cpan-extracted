@@ -4,16 +4,16 @@ Template::Plugin::URI - A Template Plugin To Use URI Objects
 
 # VERSION
 
-version 0.02
+version 0.03
 
 # INSTALLATION
 
 To install this module, run the following commands:
 
-    perl Build.PL
-    ./Build
-    ./Build test
-    ./Build install
+    perl Makefile.PL
+    make
+    make test
+    make install
 
 # SYNOPSIS
 
@@ -36,6 +36,6 @@ This module allows you to use URI objects in TT templates
 
 # LICENSE AND COPYRIGHT
 
-Copyright (C) 2018 Denis Boyun
+Copyright (C) 2020 Denis Boyun
 
 This is free software; you can redistribute it and/or modify it under the same terms as the Perl 5 programming language system itself.

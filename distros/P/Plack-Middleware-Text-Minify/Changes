@@ -1,4 +1,20 @@
 Revision history for Plack-Middleware-Text-Minify:
 
+v0.1.1    2020-12-28 17:29:28+00:00 Europe/London
+  [Enhancements]
+  - Downgrade minimum version to v5.9.3 (same as Text::Minify::XS).
+
+  [Bug Fixes]
+  - Skip if the response is missing a body.
+
+  - Skip if the response code does not have a body, GH#1.
+
+  - Skip if the request is not a GET or POST request, GH#1.
+
+  - Update the Content-Length header, if it is set.
+
+  [Documentation]
+  - Add note to KNOWN ISSUES about older Perl versions.
+
 v0.1.0    2020-12-11 12:15:09+00:00 Europe/London
   - Initial release.

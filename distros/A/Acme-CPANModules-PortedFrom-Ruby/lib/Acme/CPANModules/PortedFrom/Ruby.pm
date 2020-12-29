@@ -3,7 +3,7 @@ package Acme::CPANModules::PortedFrom::Ruby;
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2020-10-16'; # DATE
 our $DIST = 'Acme-CPANModules-PortedFrom-Ruby'; # DIST
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.003'; # VERSION
 
 our $LIST = {
     summary => "Modules/applications that are ported from (or inspired by) ".
@@ -24,6 +24,11 @@ _
             #ruby_package => undef',
             #tags => [''],
         },
+        {
+            module => 'HTTP::Server::Brick',
+            #ruby_package => undef',
+            tags => ['web'],
+        },
     ],
 };
 
@@ -42,7 +47,7 @@ Acme::CPANModules::PortedFrom::Ruby - Modules/applications that are ported from 
 
 =head1 VERSION
 
-This document describes version 0.002 of Acme::CPANModules::PortedFrom::Ruby (from Perl distribution Acme-CPANModules-PortedFrom-Ruby), released on 2020-10-16.
+This document describes version 0.003 of Acme::CPANModules::PortedFrom::Ruby (from Perl distribution Acme-CPANModules-PortedFrom-Ruby), released on 2020-10-16.
 
 =head1 DESCRIPTION
 
@@ -55,6 +60,8 @@ If you know of others, please drop me a message.
 =item * L<App::Sass>
 
 =item * L<Scientist>
+
+=item * L<HTTP::Server::Brick>
 
 =back
 

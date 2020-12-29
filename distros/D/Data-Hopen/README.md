@@ -6,7 +6,7 @@
 
 `Data::Hopen` is a dataflow library that runs actions you specify, moves data
 between those actions, and permits transforming data as the data moves.  It is
-the underlying engine of the [App::hopen](https://metacpan.org/pod/App::hopen) cross-platform software build
+the underlying engine of the [App::hopen](https://metacpan.org/pod/App%3A%3Ahopen) cross-platform software build
 generator, but can be used for any dataflow task that can be represented as a
 directed acyclic graph (DAG).
 

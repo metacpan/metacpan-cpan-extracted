@@ -6,7 +6,7 @@ use Carp;
 use Time::HiRes;
 use Config;
 
-our $VERSION = '0.14';
+our $VERSION = '0.15';
 our $DEBUG = $ENV{FORKS_QUEUE_DEBUG} || 0;
 
 our $NOTIFY_OK = $ENV{FORKS_QUEUE_NOTIFY} // do {
@@ -254,7 +254,7 @@ Forks::Queue - queue that can be shared safely across processes
 
 =head1 VERSION
 
-0.14
+0.15
 
 =head1 SYNOPSIS
 
@@ -815,10 +815,6 @@ You can also look for information at:
 
 =over 4
 
-=item * RT: CPAN's request tracker (report bugs here)
-
-L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Forks-Queue>
-
 =item * CPAN Ratings
 
 L<http://cpanratings.perl.org/d/Forks-Queue>
@@ -827,12 +823,18 @@ L<http://cpanratings.perl.org/d/Forks-Queue>
 
 L<http://search.cpan.org/dist/Forks-Queue/>
 
+=item * E<lt>mob@cpan.orgE<gt>
+
+CPAN's request tracker at L<http://rt.cpan.org/> is being decommissioned.
+You can report bugs and make feature requests for this distribution
+directly to the author's email, E<lt>mob@cpan.orgE<gt>.
+
 =back
 
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (c) 2017-2019, Marty O'Brien.
+Copyright (c) 2017-2020, Marty O'Brien.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.10.1 or,

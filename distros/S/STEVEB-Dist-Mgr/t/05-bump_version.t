@@ -58,8 +58,8 @@ copy_module_files();
 
     like $out[1], qr/Dry run/, "dry run output ok";
 
-    like $err[0], qr/No\.pm: Can't find a \$V/, "...and warning is sane";
-    like $err[1], qr/Bad\.pm: Can't find a valid/, "...and warning is sane";
+    is grep(/No.pm.*\$VERSION definition/, @err), 1, "No.pm croaks about no ver def ok";
+    is grep(/Bad\.pm.*valid version/, @err), 1, "Bad.pm croaks about no valid ver ok";
 
     is $data->{"$d/One.pm"}{from}, '0.01', "One has proper from ver";
     is $data->{"$d/One.pm"}{to},   '3.77', "One has proper to ver";
@@ -90,8 +90,8 @@ copy_module_files();
 
     is scalar @err, 2, "proper warning count ok";
 
-    like $err[0], qr/No\.pm: Can't find a \$V/, "...and warning is sane";
-    like $err[1], qr/Bad\.pm: Can't find a valid/, "...and warning is sane";
+    is grep(/No.pm.*\$VERSION definition/, @err), 1, "No.pm croaks about no ver def ok";
+    is grep(/Bad\.pm.*valid version/, @err), 1, "Bad.pm croaks about no valid ver ok";
 
     is $data->{"$d/One.pm"}{from}, '0.01', "One has proper from ver";
     is $data->{"$d/One.pm"}{to},   '3.77', "One has proper to ver";

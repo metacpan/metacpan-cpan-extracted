@@ -83,6 +83,7 @@ typedef enum {
     NODE_LITERAL,
     NODE_SIGIL
 } NodeType;
+#ifdef DEBUG
 static char* strNodeTypes[] = {
     "empty",
     "whitespace",
@@ -92,6 +93,7 @@ static char* strNodeTypes[] = {
     "literal",
     "sigil"
     };
+#endif
 
 struct _Node;
 typedef struct _Node Node;
@@ -452,7 +454,7 @@ Node* JsTokenizeString(const char* string) {
                 }
             }
         }
-        else if ((doc.buffer[doc.offset] == '"') || (doc.buffer[doc.offset] == '\''))
+        else if ((doc.buffer[doc.offset] == '"') || (doc.buffer[doc.offset] == '\'')  || (doc.buffer[doc.offset] == '`'))
             _JsExtractLiteral(&doc, node);
         else if (charIsWhitespace(doc.buffer[doc.offset]))
             _JsExtractWhitespace(&doc, node);

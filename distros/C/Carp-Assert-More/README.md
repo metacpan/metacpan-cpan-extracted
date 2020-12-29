@@ -1,6 +1,6 @@
 # Carp::Assert::More
 
-[![Build Status](https://travis-ci.org/petdance/carp-assert-more.svg?branch=dev)](https://travis-ci.org/petdance/carp-assert-more)
+[![Build Status](https://github.com/petdance/carp-assert-more/workflows/testsuite/badge.svg?branch=dev)](https://github.com/petdance/carp-assert-more/actions?query=workflow%3Atestsuite+branch%3Adev)
 
 # NAME
 

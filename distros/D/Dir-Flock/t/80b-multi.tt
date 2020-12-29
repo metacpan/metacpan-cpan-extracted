@@ -8,9 +8,14 @@ use Dir::Flock;
 # for a directory with another process
 # using Dir::Flock
 
+if ($ENV{MULTI_DIR_OUTPUT}) {
+    open OUT, ">", $ENV{MULTI_DIR_OUTPUT};
+    select OUT;
+}
+
 $| = 1;
-print "name: secondary\n";
-print "start: ",time,"\n";
+print "[b]name: secondary\n";
+print "[b]start: ",time,"\n";
 my $dirfile = $ENV{MULTI_DIR_FILE} ||
     "t/80a.dir";
 
@@ -27,32 +32,32 @@ open my $fh, "<", $dirfile;
 my $dir = <$fh>;
 close $fh;
 unlink $dirfile;
-print "dir: $dir\n";
-print "read_dir: ",time,"\n";
+print "[b]dir: $dir\n";
+print "[b]read_dir: ",time,"\n";
 
-print "start_sh_nb1: ", time, "\n";
+print "[b]start_sh_nb1: ", time, "\n";
 my $z = Dir::Flock::lock_sh($dir,0);
-print "end_sh_nb1: ",time, "\n";
-print "status_sh_nb1: ",$z||0,"\n";
+print "[b]end_sh_nb1: ",time, "\n";
+print "[b]status_sh_nb1: ",$z||0,"\n";
 if ($z) {
     $z = Dir::Flock::unlock($dir);
-    print "status_unlock1: $z\n";
+    print "[b]status_unlock1: $z\n";
 }
-print "start_sh: ",time,"\n";
+print "[b]start_sh: ",time,"\n";
 $z = Dir::Flock::lock_sh($dir);
-print "end_sh: ",time,"\n";
-print "status_sh: $z\n";
+print "[b]end_sh: ",time,"\n";
+print "[b]status_sh: $z\n";
 if ($z) {
-    print "start_sleep1: ",time,"\n";
+    print "[b]start_sleep1: ",time,"\n";
     sleep 10;
-    print "end_sleep1: ",time,"\n";
-    print "start_unlock2: ",time,"\n";
+    print "[b]end_sleep1: ",time,"\n";
+    print "[b]start_unlock2: ",time,"\n";
     my $z1 = Dir::Flock::unlock($dir);
     my $z2 = -d $dir;
-    print "end_unlock2: ",time,"\n";
-    print "status_unlock2: ",$z1||0," ",$z2||0,"\n";
+    print "[b]end_unlock2: ",time,"\n";
+    print "[b]status_unlock2: ",$z1||0," ",$z2||0,"\n";
 }
-print "finish: ",time,"\n";
+print "[b]finish: ",time,"\n";
 
 __END__
 

@@ -1,6 +1,28 @@
 ==================================================
-Changes from 2015-11-22 00:00:00 +0000 to present.
+Changes from 2015-12-25 00:00:00 +0000 to present.
 ==================================================
+
+-----------------------------------------
+version 2.06 at 2020-12-23 17:32:27 +0000
+-----------------------------------------
+
+  Change: 3d44f83c8ccc5eba3ad3f449bab2a985464b7726
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2020-12-23 17:32:27 +0000
+
+    Fixes for Big Sur
+
+    Dynaloader fix:
+
+    https://github.com/perl/perl5/commit/d296ead16762852ec34d173616a271c8
+    56711f77
+
+    ExtUtils::MakeMaker fix:
+
+    https://github.com/Perl-Toolchain-Gang/ExtUtils-MakeMaker/commit/21a4
+    41da515d55654bca4971f21ad2550de069d2
+
+    Made adjustments to the check_patchperl tool 
 
 -----------------------------------------
 version 2.04 at 2020-11-20 12:36:29 +0000
@@ -678,22 +700,6 @@ version 1.42 at 2016-04-21 16:08:59 +0000
 
     Fixes GH #24 
 
------------------------------------------
-version 1.40 at 2015-12-16 23:26:59 +0000
------------------------------------------
-
-  Change: 2470c63125a797ae436d0bc3cca165e5e38ba268
-  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
-  Date : 2015-12-16 23:26:59 +0000
-
-    Update hints files 
-
-  Change: 6571d84e655c6feddb346beb46d44a87d41c1ef7
-  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
-  Date : 2015-09-29 20:20:58 +0000
-
-    Add BuiltbyPatchPerl entry to %Config::Config 
-
 =================================================
-Plus 69 releases after 2015-11-22 00:00:00 +0000.
+Plus 70 releases after 2015-12-25 00:00:00 +0000.
 =================================================

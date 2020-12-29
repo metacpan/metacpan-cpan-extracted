@@ -162,6 +162,27 @@ int nodeEndsWith(Node* node, const char* string) {
 #define nodeIsPOSTFIXSIGIL(node)        (nodeIsSIGIL(node) && charIsPostfix(node->contents[0]))
 #define nodeIsCHAR(node,ch)             ((node->contents[0]==ch) && (node->length==1))
 
+/* checks if this node is the start of "!important" (with optional intravening
+ * whitespace. */
+int nodeStartsBANGIMPORTANT(Node* node) {
+    if (!node) return 0;
+
+    /* Doesn't start with a "!", nope */
+    if (!nodeIsCHAR(node,'!')) return 0;
+
+    /* Skip any following whitespace */
+    Node* next = node->next;
+    while (next && nodeIsWHITESPACE(next)) {
+        next = node->next;
+    }
+    if (!next) return 0;
+
+    /* Next node _better be_ "important" */
+    if (!nodeIsIDENTIFIER(next)) return 0;
+    if (nodeEquals(next, "important")) return 1;
+    return 0;
+}
+
 /* ****************************************************************************
  * NODE MANIPULATION FUNCTIONS
  * ****************************************************************************
@@ -379,53 +400,85 @@ Node* CssTokenizeString(const char* string) {
  * ****************************************************************************
  */
 
-/* checks to see if the string represents a "zero unit" */
-int CssIsZeroUnit(char* str) {
-    char* ptr = str;
+/* Skips over any "zero value" found in the provided string, returning a
+ * pointer to the next character _after_ the zero value.  If no zero value is
+ * found, return NULL.
+ */
+char* CssSkipZeroValue(char* str) {
     int foundZero = 0;
 
     /* Find and skip over any leading zero value */
-    while (*ptr == '0') {   /* leading zeros */
+    while (*str == '0') {   /* leading zeros */
         foundZero ++;
-        ptr++;
+        str++;
     }
-    if (*ptr == '.') {      /* decimal point */
-        ptr++;
+    if (*str == '.') {      /* decimal point */
+        str++;
     }
-    while (*ptr == '0') {   /* following zeros */
+    while (*str == '0') {   /* following zeros */
         foundZero ++;
-        ptr++;
+        str++;
     }
 
-    /* If we didn't find a zero, this isn't a Zero Unit */
-    if (!foundZero) {
+    /* If we found a Zero, return the pointer to the next char *after* it */
+    if (foundZero) {
+        return str;
+    }
+    return NULL;
+}
+
+/* checks to see if the string contains a known CSS unit */
+int CssIsKnownUnit(char* str) {
+    /* If it ends with a known Unit, its a Zero Unit */
+    if (0 == strcmp(str, "em"))   { return 1; }
+    if (0 == strcmp(str, "ex"))   { return 1; }
+    if (0 == strcmp(str, "ch"))   { return 1; }
+    if (0 == strcmp(str, "rem"))  { return 1; }
+    if (0 == strcmp(str, "vw"))   { return 1; }
+    if (0 == strcmp(str, "vh"))   { return 1; }
+    if (0 == strcmp(str, "vmin")) { return 1; }
+    if (0 == strcmp(str, "vmax")) { return 1; }
+    if (0 == strcmp(str, "cm"))   { return 1; }
+    if (0 == strcmp(str, "mm"))   { return 1; }
+    if (0 == strcmp(str, "in"))   { return 1; }
+    if (0 == strcmp(str, "px"))   { return 1; }
+    if (0 == strcmp(str, "pt"))   { return 1; }
+    if (0 == strcmp(str, "pc"))   { return 1; }
+    if (0 == strcmp(str, "%"))    { return 1; }
+
+    /* Nope */
+    return 0;
+}
+
+/* checks to see if the string represents a "zero unit" */
+int CssIsZeroUnit(char* str) {
+    /* Does it start with a zero value? */
+    char* ptr = CssSkipZeroValue(str);
+    if (ptr == NULL) {
         return 0;
     }
 
-    /* If it ends with a known Unit, its a Zero Unit */
-    if (0 == strcmp(ptr, "em"))   { return 1; }
-    if (0 == strcmp(ptr, "ex"))   { return 1; }
-    if (0 == strcmp(ptr, "ch"))   { return 1; }
-    if (0 == strcmp(ptr, "rem"))  { return 1; }
-    if (0 == strcmp(ptr, "vw"))   { return 1; }
-    if (0 == strcmp(ptr, "vh"))   { return 1; }
-    if (0 == strcmp(ptr, "vmin")) { return 1; }
-    if (0 == strcmp(ptr, "vmax")) { return 1; }
-    if (0 == strcmp(ptr, "cm"))   { return 1; }
-    if (0 == strcmp(ptr, "mm"))   { return 1; }
-    if (0 == strcmp(ptr, "in"))   { return 1; }
-    if (0 == strcmp(ptr, "px"))   { return 1; }
-    if (0 == strcmp(ptr, "pt"))   { return 1; }
-    if (0 == strcmp(ptr, "pc"))   { return 1; }
-    if (0 == strcmp(ptr, "%"))    { return 1; }
+    /* And how about a known unit? */
+    return CssIsKnownUnit(ptr);
+}
 
-    /* Nope, string contains something else; its not a Zero Unit */
+/* checks to see if the string represents a "zero percentage" */
+int CssIsZeroPercent(char* str) {
+    /* Does it start with a zero value? */
+    char* ptr = CssSkipZeroValue(str);
+    if (ptr == NULL) {
+        return 0;
+    }
+
+    /* And does it end with a "%"? */
+    if (0 == strcmp(ptr, "%")) { return 1; }
     return 0;
 }
 
 /* collapses all of the nodes to their shortest possible representation */
 void CssCollapseNodes(Node* curr) {
     int inMacIeCommentHack = 0;
+    int inFunction = 0;
     while (curr) {
         Node* next = curr->next;
         switch (curr->type) {
@@ -447,9 +500,17 @@ void CssCollapseNodes(Node* curr) {
                 }
                 } break;
             case NODE_IDENTIFIER:
-                if (CssIsZeroUnit(curr->contents)) {
-                    CssSetNodeContents(curr, "0", 1);
+                if (CssIsZeroUnit(curr->contents) && !inFunction) {
+                    if (CssIsZeroPercent(curr->contents)) {
+                        CssSetNodeContents(curr, "0%", 2);
+                    }
+                    else {
+                        CssSetNodeContents(curr, "0", 1);
+                    }
                 }
+            case NODE_SIGIL:
+                if (nodeIsCHAR(curr,'(')) { inFunction = 1; }
+                if (nodeIsCHAR(curr,')')) { inFunction = 0; }
             default:
                 break;
         }
@@ -486,6 +547,10 @@ int CssCanPrune(Node* node) {
             /* remove whitespace after comment blocks */
             if (prev && nodeIsBLOCKCOMMENT(prev))
                 return PRUNE_CURRENT;
+            /* remove whitespace before "!important" */
+            if (next && nodeStartsBANGIMPORTANT(next)) {
+                return PRUNE_CURRENT;
+            }
             /* leading whitespace gets pruned */
             if (!prev)
                 return PRUNE_CURRENT;

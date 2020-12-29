@@ -38,6 +38,8 @@ B<docknot> generate [B<-m> I<metadata>] [B<-w> I<width>] I<template> [I<output>]
 
 B<docknot> generate-all [B<-m> I<metadata>] [B<-w> I<width>]
 
+B<docknot> update [B<-m> I<metadata>] [B<-o> I<output>]
+
 =head1 DESCRIPTION
 
 B<docknot> can perform various actions related to documenting or releasing
@@ -66,6 +68,10 @@ metadata format, configuration files, and paths.
 Like C<generate>, but generates all of the package documentation for which
 default output files are configured.  This is a quick short-cut to generating
 all documentation that's shipped with the package.
+
+=item update
+
+Update the DocKnot package configuration from an older format.
 
 =back
 
@@ -150,6 +156,25 @@ current directory (which is the recommended metadata path for a project).
 =item B<-w> I<width>, B<--width>=I<width>
 
 Column width at which the generated output is wrapped.  Default: 74.
+
+=back
+
+=head2 update
+
+=over 4
+
+=item B<-m> I<metadata>, B<--metdata>=I<metadata>
+
+The path to the JSON metadata files for the package that should be converted
+to the new YAML format.  This should be a directory containing all the package
+metadata files required by App::DocKnot.  Default: F<docs/metadata> relative
+to the current directory.
+
+=item B<-o> I<output>, B<--output>=I<output>
+
+The output file for the updated package configuration.  Default:
+F<docs/docknot.yaml> relative to the current directory (which is the
+recommended metadata path for a project).
 
 =back
 

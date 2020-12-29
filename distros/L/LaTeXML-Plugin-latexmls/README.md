@@ -1,7 +1,8 @@
 # LaTeXML::Plugin::latexmls
 
-[![Build Status](https://secure.travis-ci.org/dginev/LaTeXML-Plugin-latexmls.png?branch=master)](https://travis-ci.org/dginev/LaTeXML-Plugin-latexmls)
+[![Build Status](https://github.com/dginev/LaTeXML-Plugin-latexmls/workflows/CI/badge.svg)](https://github.com/dginev/LaTeXML-Plugin-latexmls/actions?query=workflow%3ACI)
 [![license](http://img.shields.io/badge/license-Unlicense-blue.svg)](https://raw.githubusercontent.com/dginev/LaTeXML-Plugin-latexmls/master/LICENSE)
+[![CPAN version](https://badge.fury.io/pl/LaTeXML-Plugin-latexmls.svg)](https://badge.fury.io/pl/LaTeXML-Plugin-latexmls)
 
 A socket server for daemonized LaTeXML processing
 
@@ -12,7 +13,7 @@ Just another Perl module:
 perl Makefile.PL ; make ; make test; sudo make install
 ```
 
-Or ```cpanm latexmls```.
+Or ```cpanm .```.
 
 Make sure that LaTeXML has been installed prior to installing this Plugin, as well as all modules reported missing by Makefile.PL.
 

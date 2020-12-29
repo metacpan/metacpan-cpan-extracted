@@ -3,7 +3,7 @@ package Data::Hopen::G::Link;
 use strict;
 use Data::Hopen::Base;
 
-our $VERSION = '0.000018';
+our $VERSION = '0.000019';
 
 use parent 'Data::Hopen::G::Runnable';
 use Class::Tiny {
@@ -39,7 +39,7 @@ By default, the output is a copy of the inputs
 =cut
 
 sub _run {
-    my ($self, %args) = getparameters('self', [qw(; phase visitor)], @_);
+    my ($self, %args) = getparameters('self', [qw(; visitor)], @_);
     return $self->passthrough(-nocontext => 1);
 } #run()
 

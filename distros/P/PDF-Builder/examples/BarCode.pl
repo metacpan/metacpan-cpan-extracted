@@ -9,8 +9,8 @@
 use warnings;
 use strict;
 
-our $VERSION = '3.020'; # VERSION
-my $LAST_UPDATE = '3.013'; # manually update whenever code is changed
+our $VERSION = '3.021'; # VERSION
+my $LAST_UPDATE = '3.021'; # manually update whenever code is changed
 
 use Math::Trig;
 use List::Util qw(min max);
@@ -31,13 +31,11 @@ my $PDFname = $0;
 my $globalX = 0; 
 my $globalY = 0;
 
-my ($unused, $cell_height, $j, $cont);
-
 my $pdf = PDF::Builder->new(-compress => $compress);
 
 my ($page, $grfx, $text); # objects for page, graphics, text
-my (@base, @styles, @points, $i, $lw, $angle, @npts);
-my (@cellLoc, @cellSize, $font, $width, $d1, $d2, $d3, $d4);
+my (@base, @points, $i);
+my (@cellLoc, @cellSize, $font, $width);
 my @axisOffset = (5, 5); # clear the edge of the cell
 my ($barcode, $type, $content, $bar_height, $mils, $scale);
 

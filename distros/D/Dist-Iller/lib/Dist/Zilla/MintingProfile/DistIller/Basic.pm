@@ -5,7 +5,8 @@ use warnings;
 package Dist::Zilla::MintingProfile::DistIller::Basic;
 
 our $AUTHORITY = 'cpan:CSSON'; # AUTHORITY
-our $VERSION = '0.1408';
+# ABSTRACT: A basic minting profile for Dist::Iller
+our $VERSION = '0.1409';
 
 use Moose;
 use namespace::autoclean;
@@ -23,11 +24,11 @@ __END__
 
 =head1 NAME
 
-Dist::Zilla::MintingProfile::DistIller::Basic
+Dist::Zilla::MintingProfile::DistIller::Basic - A basic minting profile for Dist::Iller
 
 =head1 VERSION
 
-Version 0.1408, released 2016-03-12.
+Version 0.1409, released 2020-12-27.
 
 =head1 SOURCE
 

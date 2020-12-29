@@ -12,7 +12,7 @@ use Crypt::OpenToken::KeyGenerator;
 use Crypt::OpenToken::Serializer;
 use Crypt::OpenToken::Token;
 
-our $VERSION = '0.06';
+our $VERSION = '0.08';
 our $DEBUG   = 0;
 
 # shared encryption password
@@ -377,6 +377,8 @@ to use:
 "TripleDES" encryption, 168-bit.  Requires C<Crypt::DES>.
 
 =back
+
+=for Pod::Coverage CIPHERS TOKEN_PACK
 
 =head1 CAVEATS
 

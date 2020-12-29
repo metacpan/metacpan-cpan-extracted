@@ -3,6 +3,9 @@ package Graph::AdjacencyMap;
 use strict;
 use warnings;
 
+# $SIG{__DIE__ } = \&Graph::__carp_confess;
+# $SIG{__WARN__} = \&Graph::__carp_confess;
+
 my (@FLAGS, %FLAG_COMBOS, %FLAG2I);
 BEGIN {
     @FLAGS = qw(_COUNT _MULTI _HYPER _UNORD _UNIQ _REF _UNIONFIND _LIGHT _STR);
@@ -33,7 +36,7 @@ use vars qw(@ISA @EXPORT_OK %EXPORT_TAGS);
 @ISA = qw(Exporter);
 %EXPORT_TAGS =
     (flags =>  [@FLAGS, keys %FLAG_COMBOS, qw(_GEN_ID)],
-     fields => [qw(_n _f _arity _i _s _p _g _u _ni _nc _na _nm)]);
+     fields => [qw(_n _f _arity _i _s _attr _u _ni _nc _na _nm)]);
 @EXPORT_OK = map @$_, values %EXPORT_TAGS;
 
 my $_GEN_ID = 0;
@@ -50,19 +53,62 @@ sub _f () { 1 } # Flags.
 sub _arity () { 2 } # Arity.
 sub _i () { 3 } # Index to path.
 sub _s () { 4 } # Successors / Path to Index.
-sub _p () { 5 } # Predecessors.
-sub _g () { 6 } # Graph (AdjacencyMap::Light)
-
-sub _V () { 2 }  # Graph::_V()
+sub _attr () { 5 } # attributes (AdjacencyMap::Light)
 
 sub stringify {
     my $m = shift;
-    <<EOF;
-@{[ref $m]} arity=@{[$m->[ _arity ]]} flags: @{[_stringify_fields($m->[ _f ])]}
-EOF
+    my @rows;
+    my $a = $m->[ _arity ];
+    my $s = $m->[ _s ];
+    my $f = $m->[ _f ];
+    my $hyper = $f & _HYPER;
+    my $multi = $f & _MULTI;
+    my @p = map $_->[0], sort _s_sort map [$_,"@$_"], $m->paths; # use the Schwartz
+    if ($a == 2) {
+	my (%p, %s);
+	for my $t (@p) {
+	    my ($u, $v) = @$t;
+	    $p{$u} = $s{$v} = 1;
+	}
+	my @s = sort keys %s;
+	@rows = [ 'to:', @s ];
+	for my $u (sort keys %p) {
+	    my @r = $u;
+	    for my $v (@s) {
+		my $text = $m->has_path($u, $v) ? 1 : '';
+		my $attrs = $multi
+		    ? (( $m->__get_path_node( $u, $v ) )[0] || [])->[-1]
+		    : $m->_get_path_attrs( $u, $v )
+		    if $text;
+		$text = $m->_dumper($attrs) if defined $attrs;
+		push @r, $text;
+	    }
+	    push @rows, \@r;
+	}
+    } elsif ($a == 1) {
+	for my $v (@p) {
+	    my @r = $v->[0];
+	    my ($text) = $m->get_ids_by_paths([ $v ]);
+	    my $attrs = $multi
+		? (( $m->__get_path_node( @$v ) )[0] || [])->[-1]
+		: $m->_get_path_attrs(@$v);
+	    $text .= ",".$m->_dumper($attrs) if defined $attrs;
+	    push @r, $text;
+	    push @rows, \@r;
+	}
+    }
+    join '',
+	map "$_\n",
+	"@{[ref $m]} arity=@{[$m->[ _arity ]]} flags: @{[_stringify_fields($m->[ _f ])]}",
+	map join(' ', map sprintf('%4s', $_), @$_),
+	@rows;
 }
 
+# because in BLOCK mode, $a is 1 while $b is right - probable perl bug
+sub _s_sort { $a->[1] cmp $b->[1] }
+
 sub _stringify_fields {
+    return '0' if !$_[0];
     join '|', grep $_[0] & $FLAG2I{$_}, @FLAGS;
 }
 
@@ -77,8 +123,8 @@ sub _dumper {
 }
 
 sub _new {
-    my $class = shift;
-    bless [ 0, @_ ], $class;
+    my ($class, $flags, $arity, @extra) = @_;
+    bless [ 0, $flags, $arity, [], ($flags & _HYPER ? [] : {}), @extra ], $class;
 }
 
 sub _ids {
@@ -136,6 +182,39 @@ sub __get_path_node {
     }
     my $l = defined $k->[-1] ? $k->[-1] : "";
     exists $p->[-1]->{ $l } ? ( $p->[-1]->{ $l }, $p, $k, $l ) : ();
+}
+
+sub __set_path_node {
+    my ($m, $p, $l, @args) = @_;
+    my $f = $m->[ _f ];
+    my $id = pop @args if $f & _MULTI;
+    my $arity = $m->[ _arity ];
+    return $m->_inc_node( \$p->[-1]->{ $l }, $id ) if exists $p->[-1]->{ $l };
+    my $i = $m->_new_node( \$p->[-1]->{ $l }, $id );
+    die "undefined index" if !defined $i;
+    $m->[ _i ][ $i ] = \@args;
+    defined $id ? ($id eq _GEN_ID ? $$id : $id) : $i;
+}
+
+sub __has_path {
+    my ($m) = @_;
+    my $f = $m->[ _f ];
+    &Graph::AdjacencyMap::__arg;
+    return if !defined(my $p = $m->[ _s ]);
+    return if ($f & _HYPER) and !defined($p = $p->[ @_ - 1 ]);
+    my @p = $p;
+    my @k;
+    my @a = @_[1..$#_];
+    @a = map ref() ? __strval($_, $f) : $_, @a if $f & _REF;
+    while (@a) {
+	my $k = shift @a;
+	if (@a) {
+	    return unless defined($p = $p->{ $k });
+	    push @p, $p;
+	}
+	push @k, $k;
+    }
+    return (\@p, \@k);
 }
 
 sub set_path {
@@ -222,33 +301,63 @@ sub paths {
     grep defined, @{ $_[0]->[ _i ] || [] };
 }
 
+sub get_ids_by_paths {
+    my ($m, $list) = @_;
+    my ($n, $f, $a, $i, $s) = @$m;
+    my $unord = $a > 1 && ($f & _UNORD);
+    return map { # Fast path
+	my @p = @$_;
+	@p = sort @p if $unord;
+	my $this_s = $s;
+	$this_s = $this_s->{ shift @p } while defined $this_s and @p;
+	defined $this_s ? ref $this_s ? $this_s->[ _ni ] : $this_s : ();
+    } @$list if $a == 2 && !($f & (_HYPER|_REF|_UNIQ));
+    my @n;
+    map !(@n = $m->_get_path_node(@$_)) ? () : ref $n[0] ? $n[0]->[ _ni ] : $n[0], @$list;
+}
+
+sub rename_path {
+    my ($m, $from, $to) = @_;
+    return 1 if $m->[ _arity ] > 1; # arity > 1, all integers, no names
+    return unless my ($n, $p, $k, $l) = $m->__get_path_node( $from );
+    $m->[ _i ][ ref $n ? $n->[ _ni ] : $n ] = [ $to ];
+    $p->[ -1 ]{ $to } = delete $p->[ -1 ]{ $l };
+    return 1;
+}
+
 sub _has_path_attrs {
-    return undef unless defined(my $attrs = &_get_path_attrs);
+    return undef unless defined(my $attrs = &{ $_[0]->can('_get_path_attrs') });
     keys %$attrs ? 1 : 0;
 }
 
-sub _set_path_attrs {
+sub _set_path_attr_common {
     my $f = $_[0]->[ _f ];
-    my $attrs = pop;
     my $id   = pop if ($f & _MULTI);
-    &{ $_[0]->can('__attr') };
+    &__arg;
     my ($m) = @_;
     push @_, $id if ($f & _MULTI);
     my ($p, $k) = &{ $m->can('__set_path') };
     my $l = $k->[-1];
     $m->__set_path_node( $p, $l, @_[1..$#_] ) unless exists $p->[-1]->{ $l };
     if (($f & _MULTI)) {
-	$p->[-1]->{ $l }->[ _nm ]->{ $id } = $attrs;
+	return \$p->[-1]->{ $l }->[ _nm ]->{ $id };
     } else {
 	# Extend the node if it is a simple id node.
 	$p->[-1]->{ $l } = [ $p->[-1]->{ $l }, 1 ] unless ref $p->[-1]->{ $l };
-	$p->[-1]->{ $l }->[ _na ] = $attrs;
+	return \$p->[-1]->{ $l }->[ _na ];
     }
+}
+
+sub _set_path_attrs {
+    my $f = $_[0]->[ _f ];
+    my $attrs = pop;
+    my $handle = &{ $_[0]->can('_set_path_attr_common') };
+    $$handle = $attrs;
 }
 
 sub _has_path_attr {
     my $attr = pop;
-    return undef unless defined(my $attrs = &_get_path_attrs);
+    return undef unless defined(my $attrs = &{ $_[0]->can('_get_path_attrs') });
     exists $attrs->{$attr};
 }
 
@@ -256,27 +365,39 @@ sub _set_path_attr {
     my $f = $_[0]->[ _f ];
     my $val  = pop;
     my $attr = pop;
-    my $id   = pop if ($f & _MULTI);
-    &{ $_[0]->can('__attr') }; # _LIGHT maps need this to get upgraded when needed, also sorts for _UNORD
-    my ($m) = @_;
-    push @_, $id if ($f & _MULTI);
-    my ($p, $k) = &{ $m->can('__set_path') };
-    my $l = $k->[-1];
-    $m->__set_path_node( $p, $l, @_[1..$#_] ) unless exists $p->[-1]->{ $l };
-    if (($f & _MULTI)) {
-	$p->[-1]->{ $l }->[ _nm ]->{ $id }->{ $attr } = $val;
-    } else {
-	# Extend the node if it is a simple id node.
-	$p->[-1]->{ $l } = [ $p->[-1]->{ $l }, 1 ] unless ref $p->[-1]->{ $l };
-	$p->[-1]->{ $l }->[ _na ]->{ $attr } = $val;
+    my $handle = &{ $_[0]->can('_set_path_attr_common') };
+    return $$handle->{ $attr } = $val;
+}
+
+sub __strval {
+    my ($k, $f) = @_;
+    return $k unless ref $k && ($f & _REF);
+    require overload;
+    (($f & _STR) xor overload::Method($k, '""')) ? overload::StrVal($k) : $k;
+}
+
+sub __set_path {
+    my $m = $_[0];
+    my $f = $m->[ _f ];
+    my $id = pop if my $is_multi = $f & _MULTI;
+    &Graph::AdjacencyMap::__arg;
+    my @p = my $p = ($f & _HYPER) ?
+	(( $m->[ _s ] )->[ @_-1 ] ||= { }) :
+	(  $m->[ _s ]             ||= { });
+    my @k;
+    my @a = @_[1..$#_];
+    push @_, $id if $is_multi;
+    while (@a) {
+	push @k, my $q = __strval(my $k = shift @a, $f);
+	push @p, $p = $p->{ $q } ||= {} if @a;
     }
-    return $val;
+    return (\@p, \@k);
 }
 
 sub _get_path_attrs {
     my $f = $_[0]->[ _f ];
     my $id = pop if ($f & _MULTI);
-    &{ $_[0]->can('__attr') };
+    &__arg;
     my ($m) = @_;
     if (($f & _MULTI)) {
 	return unless my ($p, $k) = &{ $m->can('__has_path') };
@@ -292,34 +413,52 @@ sub _get_path_attrs {
 
 sub _get_path_attr {
     my $attr = pop;
-    return undef unless defined(my $attrs = &_get_path_attrs);
+    return undef unless defined(my $attrs = &{ $_[0]->can('_get_path_attrs') });
     $attrs->{$attr};
 }
 
 sub _get_path_attr_names {
-    return unless defined(my $attrs = &_get_path_attrs);
+    return unless defined(my $attrs = &{ $_[0]->can('_get_path_attrs') });
     keys %$attrs;
 }
 
 sub _get_path_attr_values {
-    return unless defined(my $attrs = &_get_path_attrs);
+    return unless defined(my $attrs = &{ $_[0]->can('_get_path_attrs') });
     values %$attrs;
+}
+
+sub _get_path_node {
+    my $m = $_[0];
+    my $f = $m->[ _f ];
+    goto &{ $m->can('__get_path_node') } # Slow path
+	if !($m->[ _arity ] == 2 && @_ == 3 && !($f & (_HYPER|_REF|_UNIQ)));
+    &Graph::AdjacencyMap::__arg;
+    return unless exists $m->[ _s ]->{ $_[1] };
+    my $p = [ $m->[ _s ], $m->[ _s ]->{ $_[1] } ];
+    my $l = $_[2];
+    exists $p->[-1]->{ $l } ? ( $p->[-1]->{ $l }, $p, [ @_[1,2] ], $l ) : ();
+}
+
+sub _get_path_count {
+    my $m = $_[0];
+    return undef unless my ($n) = &{ $m->can('_get_path_node') };
+    my $f = $m->[ _f ];
+    return
+        ($f & _COUNT) ? $n->[ _nc ] :
+        ($f & _MULTI) ? scalar keys %{ $n->[ _nm ] } : 1;
 }
 
 sub _del_path_attrs {
     my $f = $_[0]->[ _f ];
     my $id = pop if ($f & _MULTI);
-    &{ $_[0]->can('__attr') };
+    &__arg;
     my ($m) = @_;
     if ($f & _MULTI) {
 	return unless my ($p, $k) = &{ $m->can('__has_path') };
 	push @_, $id;
 	my $l = defined $k->[-1] ? $k->[-1] : "";
-	delete $p->[-1]->{ $l }->[ _nm ]->{ $id };
-	delete $p->[-1]->{ $l }
-	    unless keys %{ $p->[-1]->{ $l }->[ _nm ] } ||
-		   (defined $p->[-1]->{ $l }->[ _na ] &&
-		    keys %{ $p->[-1]->{ $l }->[ _na ] });
+	$p->[-1]->{ $l }->[ _nm ]->{ $id } = undef;
+	return 1;
     } else {
 	return undef unless my ($n) = &{ $m->can('__get_path_node') };
 	return 0 if !ref $n;
@@ -331,7 +470,7 @@ sub _del_path_attrs {
 
 sub _del_path_attr {
     my $attr = pop;
-    return unless defined(my $attrs = &_get_path_attrs);
+    return unless defined(my $attrs = &{ $_[0]->can('_get_path_attrs') });
     return 0 unless exists $attrs->{$attr};
     delete $attrs->{$attr};
     return 1 if keys %$attrs;
@@ -353,7 +492,6 @@ sub __arg {
     # Alphabetic or numeric sort, does not matter as long as it unifies.
     @_ = ($_[0], $f & _UNORD ? sort @a : @a);
 }
-*__attr = \&__arg;
 
 1;
 __END__

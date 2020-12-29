@@ -9,6 +9,9 @@ WriteMakefile (
 	ABSTRACT		=> 'Queries Rundeck\'s REST API',
 	LICENSE			=> 'GPL',
 	PL_FILES		=> {'script/main.pl'},
+    CONFIGURE_REQUIRES => {
+        'ExtUtils::MakeMaker' => '0',
+    },
 	PREREQ_PM => {
 		'File::Basename'		=> 2.77,
 		'LWP::UserAgent'		=> 5.833,
@@ -20,6 +23,8 @@ WriteMakefile (
 	TEST_REQUIRES => {
 			'Test::More'		=> 0.98,
 	},
+    dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
+    clean => { FILES => 'RundeckAPI-*' },
 );
 
 =pod

@@ -4,6 +4,12 @@ TODO
   - RE-write Net::UPnP interfaces as Net:UPnP is not good at error trapping or timeouts.
   - Update error handling for Power::Outlet::Hue->name
 
+0.36 2020-12-23
+  - Updated lib/Power/Outlet/Virtual.pm - added support for Windows CPAN testers
+  - Updated t/003_Virtual_live.t - addeed support for CPAN testers without a writable temp folder
+  - Updated lib/Power/Outlet/Common/IP/SNMP.pm - added support for perl 5.8
+  - Updated scripts/power-outlet-json.cgi - updated Node-Red documentation
+
 0.35 2020-12-21
   - Updated scripts/power-outlet-json.cgi.pod
 

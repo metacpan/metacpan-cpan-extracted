@@ -1,6 +1,6 @@
 package JavaScript::Minifier::XS;
 
-use 5.6.0;
+use 5.8.1;
 use strict;
 use warnings;
 
@@ -9,7 +9,7 @@ require DynaLoader;
 our @ISA = qw(Exporter DynaLoader);
 our @EXPORT_OK = qw(minify);
 
-our $VERSION = '0.11';
+our $VERSION = '0.12';
 
 bootstrap JavaScript::Minifier::XS $VERSION;
 
@@ -112,15 +112,9 @@ single JavaScript string, which is then returned back to the caller.
 
 Graham TerMarsch (cpan@howlingfrog.com)
 
-=head1 REPORTING BUGS
-
-Please report bugs via RT
-(L<http://rt.cpan.org/Dist/Display.html?Queue=JavaScript::Minifier::XS>),
-and be sure to include the JavaScript that you're having troubles minifying.
-
 =head1 COPYRIGHT
 
-Copyright (C) 2007-2008, Graham TerMarsch.  All Rights Reserved.
+Copyright (C) 2007-, Graham TerMarsch.  All Rights Reserved.
 
 This is free software; you can redistribute it and/or modify it under the same
 license as Perl itself.

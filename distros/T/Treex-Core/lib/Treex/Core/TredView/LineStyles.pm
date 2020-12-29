@@ -1,5 +1,5 @@
 package Treex::Core::TredView::LineStyles;
-$Treex::Core::TredView::LineStyles::VERSION = '2.20160630';
+$Treex::Core::TredView::LineStyles::VERSION = '2.20201228';
 use Moose;
 use Treex::Core::Log;
 
@@ -52,7 +52,7 @@ Treex::Core::TredView::LineStyles - List of line styles used in TrEd
 
 =head1 VERSION
 
-version 2.20160630
+version 2.20201228
 
 =head1 DESCRIPTION
 

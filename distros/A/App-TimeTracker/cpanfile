@@ -23,6 +23,7 @@ requires "Term::ANSIColor" => "0";
 requires "Text::Table" => "0";
 requires "Try::Tiny" => "0";
 requires "User::pwent" => "0";
+requires "constant" => "0";
 requires "namespace::autoclean" => "0";
 requires "parent" => "0";
 requires "perl" => "5.010";

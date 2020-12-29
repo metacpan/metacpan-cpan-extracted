@@ -3,10 +3,11 @@ package PDF::Builder::Resource::CIDFont::CJKFont;
 use base 'PDF::Builder::Resource::CIDFont';
 
 use strict;
-no warnings qw[ deprecated recursion uninitialized ];
+use warnings;
+#no warnings qw[ deprecated recursion uninitialized ];
 
-our $VERSION = '3.020'; # VERSION
-my $LAST_UPDATE = '3.016'; # manually update whenever code is changed
+our $VERSION = '3.021'; # VERSION
+my $LAST_UPDATE = '3.021'; # manually update whenever code is changed
 
 use PDF::Builder::Util;
 use PDF::Builder::Basic::PDF::Utils;
@@ -104,7 +105,7 @@ sub new {
     $data->{'g2u'} = [ @{$cmap->{'g2u'}} ];
 
     $class = ref $class if ref $class;
-    my $self = $class->SUPER::new($pdf, $data->{'apiname'}.pdfkey());
+    my $self = $class->SUPER::new($pdf, (defined($data->{'apiname'})? $data->{'apiname'}: '').pdfkey());
     $pdf->new_obj($self) if defined($pdf) && !$self->is_obj($pdf);
 
     $self->{' data'} = $data;

@@ -1,5 +1,5 @@
 name = PDF-Builder
-author = Phil Perry <phil4597@catskilltech.com>
+author = Phil Perry <no-reply@catskilltech.com>
 license = LGPL_2_1
 copyright_holder = Phil Perry
 
@@ -12,7 +12,7 @@ repository.type = git
 format = %-9v %{yyyy-MM-dd}d
 
 [Prereqs]
-perl = v5.18.0
+perl = v5.20.0
 Compress::Zlib = 1.0
 Font::TTF = 1.06
 

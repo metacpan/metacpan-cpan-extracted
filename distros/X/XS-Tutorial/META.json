@@ -4,13 +4,13 @@
       "David Farrell"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "freebsd"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "XS-Tutorial",
    "no_index" : {
@@ -27,12 +27,16 @@
       },
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0"
+            "ExtUtils::MakeMaker" : "7.12"
          }
       },
       "runtime" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "7.12",
+            "perl" : "5.008005"
+         }
+      },
+      "test" : {
+         "requires" : {
             "Test::More" : "0"
          }
       }
@@ -45,6 +49,6 @@
          "web" : "https://github.com/dnmfarrell/XS-Tutorial"
       }
    },
-   "version" : 0.03,
-   "x_serialization_backend" : "JSON::PP version 2.27400_02"
+   "version" : 0.04,
+   "x_serialization_backend" : "JSON::PP version 4.04"
 }

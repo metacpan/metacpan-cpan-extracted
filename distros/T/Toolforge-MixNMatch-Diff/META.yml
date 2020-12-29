@@ -20,16 +20,17 @@ meta-spec:
 name: Toolforge-MixNMatch-Diff
 no_index:
   directory:
+    - examples
     - inc
     - t
     - xt
 requires:
   Error::Pure: 0
   Toolforge::MixNMatch::Object: 0.01
-  perl: 5.6.2
+  perl: 5.01
 resources:
   bugtracker: https://github.com/michal-josef-spacek/Toolforge-MixNMatch-Diff/issues
   homepage: https://github.com/michal-josef-spacek/Toolforge-MixNMatch-Diff
   license: http://opensource.org/licenses/bsd-license.php
   repository: git://github.com/michal-josef-spacek/Toolforge-MixNMatch-Diff
-version: '0.01'
+version: '0.02'

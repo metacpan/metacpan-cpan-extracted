@@ -1,52 +1,38 @@
 ---
-name: Crypt-OpenToken
-version: 0.06
+abstract: "Perl implementation of Ping Identity's \"OpenToken\""
 author:
-  - Graham TerMarsch (cpan@howlingfrog.com)
-abstract: Perl implementation of Ping Identity's "OpenToken"
-license: artistic_2
-resources:
-  license: http://opensource.org/licenses/artistic-license-2.0.php
+  - 'Graham TerMarsch <cpan@howlingfrog.com>'
 build_requires:
-  Test::Differences: 0
-  Test::Exception: 0
-  Test::More: 0
-requires:
-  Compress::Zlib: 0
-  Crypt::Rijndael: 0
-  Date::Parse: 0
-  DateTime: 0
-  Digest::HMAC_SHA1: 0
-  Digest::SHA1: 0
-  MIME::Base64: 0
-  Moose: 0
-recommends:
-  Crypt::CBC: 0
-  Crypt::DES_EDE3: 0
-  Crypt::NULL: 0
+  Test::Differences: '0'
+  Test::Exception: '0'
+  Test::More: '0.96'
 configure_requires:
-  Module::Build: 0.35
-provides:
-  Crypt::OpenToken:
-    file: lib/Crypt/OpenToken.pm
-    version: 0.06
-  Crypt::OpenToken::Cipher:
-    file: lib/Crypt/OpenToken/Cipher.pm
-  Crypt::OpenToken::Cipher::AES128:
-    file: lib/Crypt/OpenToken/Cipher/AES128.pm
-  Crypt::OpenToken::Cipher::AES256:
-    file: lib/Crypt/OpenToken/Cipher/AES256.pm
-  Crypt::OpenToken::Cipher::DES3:
-    file: lib/Crypt/OpenToken/Cipher/DES3.pm
-  Crypt::OpenToken::Cipher::null:
-    file: lib/Crypt/OpenToken/Cipher/null.pm
-  Crypt::OpenToken::KeyGenerator:
-    file: lib/Crypt/OpenToken/KeyGenerator.pm
-  Crypt::OpenToken::Serializer:
-    file: lib/Crypt/OpenToken/Serializer.pm
-  Crypt::OpenToken::Token:
-    file: lib/Crypt/OpenToken/Token.pm
-generated_by: Module::Build version 0.35
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.017, CPAN::Meta::Converter version 2.150010'
+license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
+name: Crypt-OpenToken
+recommends:
+  Crypt::CBC: '0'
+  Crypt::DES_EDE3: '0'
+  Crypt::NULL: '0'
+requires:
+  Compress::Zlib: '0'
+  Crypt::Rijndael: '0'
+  Date::Parse: '0'
+  DateTime: '0'
+  Digest::HMAC_SHA1: '0'
+  Digest::SHA1: '0'
+  MIME::Base64: '0'
+  Moose: '0'
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/bleargh45/Crypt-OpenToken/issues
+  repository: https://github.com/bleargh45/Crypt-OpenToken.git
+version: '0.08'
+x_generated_by_perl: v5.32.0
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: Artistic-2.0

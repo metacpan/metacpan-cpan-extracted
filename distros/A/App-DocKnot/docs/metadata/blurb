@@ -1,6 +1,0 @@
-DocKnot is a system for generating consistent human-readable software
-package documentation from metadata files and templates.  The metadata is
-primarily JSON files, but can include files of documentation snippets.
-The goal is to generate both web pages and distributed documentation files
-(such as `README`) from the same source, using templates for consistency
-across multiple packages.

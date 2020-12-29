@@ -1,4 +1,4 @@
-# remctl 3.15
+# remctl
 
 [![Build
 status](https://travis-ci.org/rra/remctl.svg?branch=master)](https://travis-ci.org/rra/remctl)
@@ -246,11 +246,11 @@ you need to specify a different Kerberos installation root via
 
 You can also individually set the paths to the include directory and the
 library directory with `--with-krb5-include` and `--with-krb5-lib`.  You
-may need to do this if Autoconf can't figure out whether to use lib,
-lib32, or lib64 on your platform.
+may need to do this if Autoconf can't figure out whether to use `lib`,
+`lib32`, or `lib64` on your platform.
 
-To not use krb5-config and force library probing even if there is a
-krb5-config script on your path, set PATH_KRB5_CONFIG to a nonexistent
+To not use `krb5-config` and force library probing even if there is a
+`krb5-config` script on your path, set `PATH_KRB5_CONFIG` to a nonexistent
 path:
 
 ```

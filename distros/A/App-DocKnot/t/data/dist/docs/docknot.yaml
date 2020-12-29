@@ -1,0 +1,27 @@
+format: v1
+
+name: Empty
+maintainer: Russ Allbery <rra@cpan.org>
+version: '1.00'
+synopsis: An empty package
+
+license:
+  name: Expat
+
+build:
+  type: Module::Build
+distribution:
+  ignore:
+    - \Aignored-file\z
+  section: devel
+  tarname: Empty
+  version: empty
+
+blurb: |
+  Test package.
+
+description: |
+  Test package.
+
+requirements: |
+  Test package.

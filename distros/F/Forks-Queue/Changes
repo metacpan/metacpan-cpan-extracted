@@ -1,5 +1,8 @@
 Revision history for Forks-Queue
 
+0.15	2020-12-27
+	Upgrade Dir::Flock
+
 0.14    2019-11-25
 	Test fixes.
 	Improved compatibility with Thread::Queue

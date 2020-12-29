@@ -15,7 +15,7 @@ extends 'Zing::Domain';
 
 use Digest::SHA ();
 
-our $VERSION = '0.20'; # VERSION
+our $VERSION = '0.21'; # VERSION
 
 # BUILDERS
 
@@ -70,6 +70,9 @@ around del($key) {
 }
 
 around drop() {
+  if (my $savepoint = $self->savepoint) {
+    $savepoint->drop if $savepoint->test;
+  }
   for my $value (values %{$self->state}) {
     $self->app->domain(name => $value->{name})->drop;
   }
@@ -269,6 +272,20 @@ The drop method deletes all data associated with the lookup.
   # given: synopsis
 
   $lookup->set('user-12345', 'me@example.com');
+
+  $lookup->drop;
+
+=back
+
+=over 4
+
+=item drop example #2
+
+  # given: synopsis
+
+  $lookup->set('user-12345', 'me@example.com');
+
+  $lookup->savepoint->send;
 
   $lookup->drop;
 

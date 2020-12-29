@@ -27,6 +27,14 @@ our $dir;
 
 require './t/test.pl';
 
+# robots
+my $page = query_gemini("$base/robots.txt");
+my @urls = qw(/raw/* /html/* /diff/* /history/* /do/changes* /do/all/changes* /do/all/latest/changes* /do/rss /do/atom /do/new /do/more /do/match /do/search);
+for (map { ($_, "/alex$_", "/berta$_") } @urls) {
+  my $url = quotemeta;
+  like($page, qr/^Disallow: $url/m, "Robots are disallowed from $url");
+}
+
 my $titan = "titan://$host:$port";
 
 # save haiku in the alex space
@@ -37,7 +45,7 @@ Back hurts, arms hurt, must go pee
 Just one more to finish
 EOT
 
-my $page = query_gemini("$titan/alex/raw/Haiku;size=83;mime=text/plain;token=hello", $haiku);
+$page = query_gemini("$titan/alex/raw/Haiku;size=83;mime=text/plain;token=hello", $haiku);
 like($page, qr/^30 $base\/alex\/page\/Haiku\r$/, "Titan haiku");
 ok(-d "$dir/127.0.0.1/alex", "alex subdirectory created");
 

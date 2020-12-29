@@ -35,7 +35,8 @@ like($pdf->stringify(), qr/q 216 0 0 288 72 144 cm \S+ Do Q/,
 # Filehandle 2 tests
 
 $pdf = PDF::Builder->new();
-open my $fh, '<', 't/resources/1x1.png';
+open my $fh, '<', 't/resources/1x1.png' or
+    die "Can't open file t/resources/1x1.png";
 $png = $pdf->image_png($fh);
 if ($png->usesLib() == 1) {
     isa_ok($png, 'PDF::Builder::Resource::XObject::Image::PNG_IPL',

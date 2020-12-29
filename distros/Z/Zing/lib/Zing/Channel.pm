@@ -12,7 +12,7 @@ use Data::Object::Class;
 
 extends 'Zing::PubSub';
 
-our $VERSION = '0.20'; # VERSION
+our $VERSION = '0.21'; # VERSION
 
 # BUILDERS
 
@@ -80,7 +80,7 @@ Multi-process Communication Mechanism
 
 =head1 DESCRIPTION
 
-This package provides represents a mechanism of interprocess communication and
+This package represents a mechanism of interprocess communication and
 synchronization via message passing.
 
 =cut

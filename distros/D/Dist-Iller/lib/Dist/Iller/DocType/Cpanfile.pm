@@ -5,7 +5,8 @@ use warnings;
 package Dist::Iller::DocType::Cpanfile;
 
 our $AUTHORITY = 'cpan:CSSON'; # AUTHORITY
-our $VERSION = '0.1408';
+# ABSTRACT: Turn the Dist::Iller config into a .cpanfile file
+our $VERSION = '0.1409';
 
 use Dist::Iller::Elk;
 use JSON::MaybeXS qw/decode_json/;
@@ -92,11 +93,11 @@ __END__
 
 =head1 NAME
 
-Dist::Iller::DocType::Cpanfile
+Dist::Iller::DocType::Cpanfile - Turn the Dist::Iller config into a .cpanfile file
 
 =head1 VERSION
 
-Version 0.1408, released 2016-03-12.
+Version 0.1409, released 2020-12-27.
 
 =head1 SOURCE
 

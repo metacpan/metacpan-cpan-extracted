@@ -1,5 +1,5 @@
 package Treex::Core::Bundle;
-$Treex::Core::Bundle::VERSION = '2.20160630';
+$Treex::Core::Bundle::VERSION = '2.20201228';
 use namespace::autoclean;
 
 use Moose;
@@ -289,7 +289,7 @@ Treex::Core::Bundle - a set of equivalent sentences in the Treex framework
 
 =head1 VERSION
 
-version 2.20160630
+version 2.20201228
 
 =head1 DESCRIPTION
 

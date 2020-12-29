@@ -4,8 +4,9 @@ use warnings;
 
 package Pod::Elemental::Transformer::Splint;
 
-our $VERSION = '0.1201'; # VERSION
 # ABSTRACT: Documentation from class metadata
+our $AUTHORITY = 'cpan:CSSON'; # AUTHORITY
+our $VERSION = '0.1202';
 
 use Moose;
 use namespace::autoclean;
@@ -411,22 +412,20 @@ Pod::Elemental::Transformer::Splint - Documentation from class metadata
 
 
 
-=begin HTML
+=begin html
 
-<p><img src="https://img.shields.io/badge/perl-5.10.1+-brightgreen.svg" alt="Requires Perl 5.10.1+" /> <a href="https://travis-ci.org/Csson/p5-Pod-Elemental-Transformer-Splint"><img src="https://api.travis-ci.org/Csson/p5-Pod-Elemental-Transformer-Splint.svg?branch=master" alt="Travis status" /></a> <img src="https://img.shields.io/badge/coverage-81.4%-orange.svg" alt="coverage 81.4%" /></p>
+<p>
+<img src="https://img.shields.io/badge/perl-5.10.1+-blue.svg" alt="Requires Perl 5.10.1+" />
+<a href="http://cpants.cpanauthors.org/release/CSSON/Pod-Elemental-Transformer-Splint-0.1202"><img src="http://badgedepot.code301.com/badge/kwalitee/CSSON/Pod-Elemental-Transformer-Splint/0.1202" alt="Distribution kwalitee" /></a>
+<a href="http://matrix.cpantesters.org/?dist=Pod-Elemental-Transformer-Splint%200.1202"><img src="http://badgedepot.code301.com/badge/cpantesters/Pod-Elemental-Transformer-Splint/0.1202" alt="CPAN Testers result" /></a>
+<img src="https://img.shields.io/badge/coverage-81.4%-orange.svg" alt="coverage 81.4%" />
+</p>
 
-=end HTML
-
-
-=begin markdown
-
-![Requires Perl 5.10.1+](https://img.shields.io/badge/perl-5.10.1+-brightgreen.svg) [![Travis status](https://api.travis-ci.org/Csson/p5-Pod-Elemental-Transformer-Splint.svg?branch=master)](https://travis-ci.org/Csson/p5-Pod-Elemental-Transformer-Splint) ![coverage 81.4%](https://img.shields.io/badge/coverage-81.4%-orange.svg)
-
-=end markdown
+=end html
 
 =head1 VERSION
 
-Version 0.1201, released 2016-02-03.
+Version 0.1202, released 2020-12-26.
 
 =head1 SYNOPSIS
 

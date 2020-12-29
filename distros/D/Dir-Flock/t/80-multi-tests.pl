@@ -74,6 +74,7 @@ sub multi_test_file_to_hash {
     while (<$fh>) {
         chomp;
         my ($key, $val) = split /: /, $_, 2;
+	$key =~ s/^\[\w\]//;
         $hash{$key} = $val;
     }
     close $fh;

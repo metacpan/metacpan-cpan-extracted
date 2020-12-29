@@ -11,6 +11,7 @@ contrib/oddmuse.pl
 contrib/page-headings.pl
 contrib/README.md
 contrib/registered-editors-only.pl
+contrib/speed-bump.pl
 contrib/toki-pona.pl
 contrib/web-comments.pl
 contrib/web-edit.pl
@@ -36,6 +37,7 @@ t/html-spaces.t
 t/html.t
 t/locks.t
 t/spaces.t
+t/speed-bump.t
 t/test.pl
 t/virtual-hosting.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)

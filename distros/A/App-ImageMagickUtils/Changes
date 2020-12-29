@@ -1,3 +1,13 @@
+0.003   2020-09-23  Released-By: PERLANCAR; Urgency: medium
+
+	- Add CLI: image-resize-notation-to-human.
+
+
+0.002   2020-09-23  Released-By: PERLANCAR; Urgency: medium
+
+	- Add CLI: calc-image-resized-size.
+
+
 0.001   2020-06-25  Released-By: PERLANCAR
 
 	- First release.

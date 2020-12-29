@@ -7,6 +7,7 @@ use Test::More 0.98;
 
 use Finance::SE::IDX::Static qw(
                                    list_idx_boards
+                                   list_idx_brokers
                                    list_idx_firms
                                    list_idx_sectors
                            );
@@ -19,10 +20,16 @@ subtest list_idx_boards => sub {
     is(scalar(@{ $res->[2] }), 3) or diag explain $res->[2];
 };
 
+subtest list_idx_brokers => sub {
+    $res = list_idx_brokers();
+    is($res->[0], 200);
+    is(scalar(@{ $res->[2] }), 98) or diag explain $res->[2];
+};
+
 subtest list_idx_firms => sub {
     $res = list_idx_firms();
     is($res->[0], 200);
-    is(scalar(@{ $res->[2] }), 709);
+    is(scalar(@{ $res->[2] }), 712);
 
     $res = list_idx_firms(sector => "AGRI", board => "PENGEMBANGAN");
     is($res->[0], 200);

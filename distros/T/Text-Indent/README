@@ -88,7 +88,7 @@ METHODS
 
   reset
     This method resets the level of indentation to 0. It is functionally
-    equivalent to $ident->level(0).
+    equivalent to $indent->level(0).
 
   indent(@what)
     This is the primary workhorse method of Text::Indent. It takes a list of
@@ -144,7 +144,7 @@ EXAMPLES
        return $i->indent("bar");
      }
 
-    The output from the preceeding example would be (> indicates the left
+    The output from the preceding example would be (> indicates the left
     edge of output and is for illustrative purposes only):
 
      >  foo

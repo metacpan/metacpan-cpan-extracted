@@ -1,0 +1,97 @@
+NAME
+
+    Device::Chip::BME280 - chip driver for BME280
+
+SYNOPSIS
+
+       use Device::Chip::BME280;
+       use Future::AsyncAwait;
+    
+       my $chip = Device::Chip::BME280->new;
+       await $chip->mount( Device::Chip::Adapter::...->new );
+    
+       await $chip->change_config(
+          OSRS_H => 4,
+          OSRS_P => 4,
+          OSRS_T => 4,
+          MODE   => "NORMAL",
+       );
+    
+       my ( $pressure, $temperature, $humidity ) = await $chip->read_sensor;
+    
+       printf "Temperature=%.2fC  ", $temperature;
+       printf "Pressure=%dPa  ", $pressure;
+       printf "Humidity=%.2f%%\n", $humidity;
+
+DESCRIPTION
+
+    This Device::Chip subclass provides specific communication to a Bosch
+    BME280 attached to a computer via an I²C adapter.
+
+    The reader is presumed to be familiar with the general operation of
+    this chip; the documentation here will not attempt to explain or define
+    chip-specific concepts or features, only the use of this module to
+    access them.
+
+METHODS
+
+    The following methods documented in an await expression return Future
+    instances.
+
+ read_id
+
+       $id = await $chip->read_id
+
+    Returns the chip ID.
+
+ read_config
+
+       $config = await $chip->read_config
+
+    Returns a HASH reference containing the chip config, using fields named
+    from the data sheet.
+
+       FILTER   => OFF | 2 | 4 | 8 | 16
+       MODE     => SLEEP | FORCED | NORMAL
+       OSRS_H   => SKIP | 1 | 2 | 4 | 8 | 16
+       OSRS_P   => SKIP | 1 | 2 | 4 | 8 | 16
+       OSRS_T   => SKIP | 1 | 2 | 4 | 8 | 16
+       SPI3W_EN => 0 | 1
+       T_SB     => 0.5 | 10 | 20 | 62.5 | 125 | 250 | 500 | 1000
+
+ change_config
+
+       await $chip->change_config( %changes )
+
+    Writes updates to the configuration registers.
+
+    Note that these two methods use a cache of configuration bytes to make
+    subsequent modifications more efficient.
+
+ read_status
+
+       $status = await $chip->read_status;
+
+ read_raw
+
+       ( $adc_P, $adc_T, $adc_H ) = await $chip->read_raw
+
+    Returns three integers containing the raw ADC reading values from the
+    sensor.
+
+    This method is mostly for testing or internal purposes only. For
+    converted sensor readings in real-world units you want to use
+    "read_sensor".
+
+ read_sensor
+
+       ( $pressure, $temperature, $humidity ) = await $chip->read_sensor
+
+    Returns the sensor readings appropriately converted into units of
+    Pascals for pressure, degrees Celcius for temperature, and percentage
+    relative for humidity.
+
+AUTHOR
+
+    Paul Evans <leonerd@leonerd.org.uk>
+

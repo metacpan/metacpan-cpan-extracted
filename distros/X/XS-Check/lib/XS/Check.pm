@@ -3,7 +3,7 @@ use warnings;
 use strict;
 use Carp;
 use utf8;
-our $VERSION = '0.08';
+our $VERSION = '0.11';
 use C::Tokenize '0.14', ':all';
 use Text::LineNumber;
 use File::Slurper 'read_text';
@@ -15,6 +15,13 @@ use Carp qw/croak carp cluck confess/;
 # |  __/| |  | |\ V / (_| | ||  __/
 # |_|   |_|  |_| \_/ \__,_|\__\___|
 #                                 
+
+sub debugmsg
+{
+    my (undef, $file, $line) = caller ();
+    printf ("%s:%d: ", $file, $line);
+    print "@_\n";
+}
 
 sub get_line_number
 {
@@ -67,7 +74,9 @@ sub check_svpv
 	my $arg2 = $4;
 	my $lvar_type = $o->get_type ($lvar);
 	my $arg2_type = $o->get_type ($arg2);
-	#print "<$match> $lvar_type $arg2_type\n";
+	if ($o->{verbose}) {
+	    debugmsg ("<$match> $lvar_type $arg2_type");
+	}
 	if ($lvar_type && $lvar_type !~ /\bconst\b/) {
 	    $o->report ("$lvar not a constant type");
 	}
@@ -87,12 +96,13 @@ my %equiv = (
     realloc => 'Renew',
 );
 
-# Look for malloc/calloc/realloc/free and suggest replacing them.
+# Look for calls to malloc/calloc/realloc/free and suggest replacing
+# them.
 
 sub check_malloc
 {
     my ($o) = @_;
-    while ($o->{xs} =~ /\b((?:m|c|re)alloc|free)\b/g) {
+    while ($o->{xs} =~ /\b((?:m|c|re)alloc|free)\s*\(/g) {
 	# Bad function
 	my $badfun = $1;
 	my $equiv = $equiv{$badfun};
@@ -143,7 +153,9 @@ sub read_declarations
     while ($o->{xs} =~ /$declare_re/g) {
 	my $type = $2;
 	my $var = $3;
-	#print "type = $type for $var\n";
+	if ($o->{verbose}) {
+	    debugmsg ("type = $type for $var");
+	}
 	if ($o->{vars}{$type}) {
 	    # This is very likely to produce false positives in a long
 	    # file. A better way to do this would be to have variables
@@ -230,6 +242,61 @@ sub check_void_arg
     }
 }
 
+sub
+check_hash_comments
+{
+    my ($o) = @_;
+    while ($o->{xs} =~ /^#\s*(\w*)/gsm) {
+	my $hash = $1;
+	if ($hash !~ /^(?:
+			  define|
+			  else|
+			  endif|
+			  error|
+			  ifdef|
+			  ifndef|
+			  if|
+			  include|
+			  line|
+			  undef|
+			  warning|
+			  ZZZZZZZZZZZ)(\s+|$)/x) {
+	    $o->report ("Put whitespace before # in comments");
+	}
+    }
+}
+
+sub
+check_c_pre
+{
+    my ($o) = @_;
+    while ($o->{xs} =~ /^#\s*(\w*)/gsm) {
+	my $hash = $1;
+	if ($hash =~ /(?:if|else|endif)\s+/) {
+	    # Complicated!
+	}
+    }
+}
+
+sub check_fetch_deref
+{
+    my ($o) = @_;
+    while ($o->{xs} =~ m!(\*\s*(?:a|h)v_fetch)!g) {
+	$o->report ("Dereference of av/hv_fetch");
+    }
+}
+
+sub check_av_len
+{
+    my ($o) = @_;
+    while ($o->{xs} =~ m!^(.*av_len\s*\([^\)]*\)(.*))!g) {
+	my $later = $2;
+	if ($later !~ /\+\s*1/) {
+	    $o->report ("Add one to av_len");
+	}
+    }
+}
+
 #  _   _                       _     _ _     _      
 # | | | |___  ___ _ __  __   _(_)___(_) |__ | | ___ 
 # | | | / __|/ _ \ '__| \ \ / / / __| | '_ \| |/ _ \
@@ -248,6 +315,9 @@ sub new
 	else {
 	    $o->{reporter} = $r;
 	}
+    }
+    if (defined $options{verbose}) {
+	$o->{verbose} = $options{verbose};
     }
     return $o;
 }
@@ -274,6 +344,10 @@ sub check
     $o->check_malloc ();
     $o->check_perl_prefix ();
     $o->check_void_arg ();
+    $o->check_c_pre ();
+    $o->check_hash_comments ();
+    $o->check_fetch_deref ();
+    $o->check_av_len ();
     # Final line
     $o->cleanup ();
 }

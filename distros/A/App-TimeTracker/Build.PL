@@ -18,7 +18,7 @@ my %module_build_args = (
     "Thomas Klausner <domm\@cpan.org>"
   ],
   "dist_name" => "App-TimeTracker",
-  "dist_version" => "3.005",
+  "dist_version" => "3.007",
   "license" => "perl",
   "module_name" => "App::TimeTracker",
   "recursive_test_files" => 1,
@@ -48,6 +48,7 @@ my %module_build_args = (
     "Text::Table" => 0,
     "Try::Tiny" => 0,
     "User::pwent" => 0,
+    "constant" => 0,
     "namespace::autoclean" => 0,
     "parent" => 0,
     "perl" => "5.010",

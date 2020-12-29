@@ -10,6 +10,7 @@ lib/Types/TypedCodeRef/Factory.pm
 minil.toml
 t/00_compile.t
 t/01_typed_code_ref.t
+t/10-unit/Factory/_is_callable.t
 t/10-unit/Factory/coercion_generator.t
 t/10-unit/Factory/constraint_generator.t
 t/10-unit/Factory/name_generator.t

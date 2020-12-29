@@ -4,8 +4,9 @@ use warnings;
 
 package Pod::Elemental::Transformer::Splint::AttributeRenderer::HtmlDefault;
 
-our $VERSION = '0.1201'; # VERSION
 # ABSTRACT: Default html attribute renderer
+our $AUTHORITY = 'cpan:CSSON'; # AUTHORITY
+our $VERSION = '0.1202';
 
 use Moose;
 use namespace::autoclean;
@@ -146,7 +147,7 @@ Pod::Elemental::Transformer::Splint::AttributeRenderer::HtmlDefault - Default ht
 
 =head1 VERSION
 
-Version 0.1201, released 2016-02-03.
+Version 0.1202, released 2020-12-26.
 
 =head1 SOURCE
 

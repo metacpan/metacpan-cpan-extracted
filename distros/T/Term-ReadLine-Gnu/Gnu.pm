@@ -1,9 +1,9 @@
 #
 #	Gnu.pm --- The GNU Readline/History Library wrapper module
 #
-#	$Id: Gnu.pm 566 2019-01-14 05:30:33Z hayashi $
+#	$Id: Gnu.pm 576 2020-12-27 03:21:45Z hayashi $
 #
-#	Copyright (c) 1996-2019 Hiroo Hayashi.  All rights reserved.
+#	Copyright (c) 1996-2020 Hiroo Hayashi.  All rights reserved.
 #
 #	This program is free software; you can redistribute it and/or
 #	modify it under the same terms as Perl itself.
@@ -32,7 +32,7 @@ Term::ReadLine::Gnu - Perl extension for the GNU Readline/History Library
 This is an implementation of
 L<Term::ReadLine|http://search.cpan.org/dist/Term-ReadLine/> using
 L<the GNU ReadlineE<sol>History
-Library|http://cnswww.cns.cwru.edu/php/chet/readline/rltop.html>.
+Library|https://tiswww.cwru.edu/php/chet/readline/rltop.html>.
 
 For basic functions object oriented interface is provided. These are
 described in the section L</"Standard Methods"> and
@@ -46,9 +46,9 @@ and
 L</"C<Term::ReadLine::Gnu>
 Variables"> briefly.  For further details of the GNU Readline/History
 Library, see L<GNU Readline Library
-Manual|http://cnswww.cns.cwru.edu/php/chet/readline/readline.html> and
+Manual|https://tiswww.cwru.edu/php/chet/readline/readline.html> and
 L<GNU History Library
-Manual|http://cnswww.cns.cwru.edu/php/chet/readline/history.html>.
+Manual|https://tiswww.cwru.edu/php/chet/readline/history.html>.
 
 There are some C<Term::ReadLine::Gnu> original features.  They are
 described in the section L</"C<Term::ReadLine::Gnu> Specific
@@ -84,7 +84,7 @@ END
 # https://rt.cpan.org/Ticket/Display.html?id=123398
 # Debian Bug Report #99843
 BEGIN {
-    if (!defined($ENV{TERM}) || $ENV{TERM} =~ /^(dumb|emacs|unknown)$/) {
+    if (!exists($ENV{TERM}) || !defined($ENV{TERM}) || $ENV{TERM} =~ /^(dumb|emacs|unknown|)$/) {
 	croak "dumb terminal.";
     }
 }
@@ -93,7 +93,7 @@ BEGIN {
     use Exporter ();
     use DynaLoader;
 
-    our $VERSION = '1.36';		# update Gnu::XS::VERSION also.
+    our $VERSION = '1.37';		# update Gnu::XS::VERSION also.
 
     # Term::ReadLine::Gnu::AU makes a function in
     # `Term::ReadLine::Gnu::XS' as a method.
@@ -219,7 +219,7 @@ sub RL_STATE_REDISPLAYING	{	       # updating terminal display [6.1]
     $readline_version < 0x0700 ? 0x80_0000 : 0x100_0000;
 }
 sub RL_STATE_DONE {			       # done; accepted line
-    $readline_version < 0x0501 ? 0x8_0000 : 
+    $readline_version < 0x0501 ? 0x8_0000 :
 	($readline_version < 0x0601 ? 0x80_0000 :
 	 ($readline_version < 0x0700 ? 0x100_0000 : 0x200_0000));
 }
@@ -271,7 +271,7 @@ sub new {
     $Attribs{utf8_mode} ||= ${^UNICODE} & 1 || defined ${^ENCODING};
     #printf "\${^UNICODE}: 0x%X, ", ${^UNICODE};
     #print "\${^ENCODING}: ", defined ${^ENCODING} ? 'defined' : 'undef', "\n";
-    
+
     # set tty before calling rl_initialize() not to output some
     # charactores to STDIO.
     # https://rt.cpan.org/Ticket/Display.html?id=96569
@@ -288,7 +288,7 @@ sub new {
 	# enable UTF-8 mode if input stream has the utf8 layer.
 	my @layers = PerlIO::get_layers($_[0]);
 	$Attribs{utf8_mode} ||= ($layers[$#layers] eq 'utf8');
-    
+
 	$self->newTTY(@_);
     }
 
@@ -302,6 +302,13 @@ sub new {
 
     # keep rl_readline_version value for efficiency
     $readline_version = $Attribs{readline_version};
+
+    # bind operate-and-get-next to \C-o by default for the compatibility
+    # with bash and Term::ReadLine::Perl
+    # GNU Readline 8.1 and later support operate-and-get-next natively.
+    Term::ReadLine::Gnu::XS::rl_add_defun('operate-and-get-next',
+					  \&Term::ReadLine::Gnu::XS::operate_and_get_next, ord "\co")
+	if ($readline_version < 0x801);
 
     $self;
 }
@@ -465,9 +472,9 @@ minimal interface: C<appname> should be present if the first argument
 to C<new> is recognized, and C<minline> should be present if
 C<MinLine> method is not dummy.  C<autohistory> should be present if
 lines are put into history automatically (maybe subject to
-C<MinLine>), and C<addHistory> if C<AddHistory> method is not dummy. 
+C<MinLine>), and C<addHistory> if C<AddHistory> method is not dummy.
 C<preput> means the second argument to C<readline> method is processed.
-C<getHistory> and C<setHistory> denote that the corresponding methods are 
+C<getHistory> and C<setHistory> denote that the corresponding methods are
 present. C<tkRunning> denotes that a Tk application may run while ReadLine
 is getting input.
 
@@ -873,7 +880,7 @@ function is called as C<$term-E<gt>foo()>.
 The titles of the following sections are same as the titles of the
 corresponding sections in the "Programming with GNU Readline" section
 in the L<GNU Readline Library
-Manual|http://cnswww.cns.cwru.edu/php/chet/readline/readline.html>.
+Manual|https://tiswww.cwru.edu/php/chet/readline/readline.html>.
 Refer them for further details.
 
 Although it is preferred to use method interface, most methods have
@@ -895,7 +902,7 @@ C<KEY> is pressed.  The C<FUNCTION> can be a reference to a Perl
 function (see L</"Custom Functions">) or a "named function" named by
 C<add_defun()> function or commands described in the "Bindable
 Readline Commands" section in the L<GNU Readline Library
-Manual|http://cnswww.cns.cwru.edu/php/chet/readline/readline.html>.
+Manual|https://tiswww.cwru.edu/php/chet/readline/readline.html>.
 
 	$term->bind_key(ord "\ci, 'tab-insert');
 
@@ -915,13 +922,13 @@ Here is an example;
 
 	sub reverse_line {		# reverse a whole line
 	    my($count, $key) = @_;	# ignored in this sample function
-    	
+
 	    $t->modifying(0, $a->{end}); # save undo information
 	    $a->{line_buffer} = reverse $a->{line_buffer};
 	}
 
 See the "Writing a New Function" section in the L<GNU Readline Library
-Manual|http://cnswww.cns.cwru.edu/php/chet/readline/readline.html> for
+Manual|https://tiswww.cwru.edu/php/chet/readline/readline.html> for
 further details.
 
 =head3 Readline Convenience Functions
@@ -1055,7 +1062,7 @@ Bind C<KEY> to the null function.  Returns non-zero in case of error.
 Parse C<LINE> as if it had been read from the F<~/.inputrc> file and
 perform any key bindings and variable assignments found.  For further
 detail see L<GNU Readline Library
-Manual|http://cnswww.cns.cwru.edu/php/chet/readline/readline.html>.
+Manual|https://tiswww.cwru.edu/php/chet/readline/readline.html>.
 
 =item C<read_init_file([FILENAME])>
 
@@ -1365,7 +1372,23 @@ When C<MAX> is omitted, the max length of an item in C<@matches> is used.
 
 =item C<clear_history>
 
-    void	rl_clear_history()				# GRL 6.3
+	void	rl_clear_history()				# GRL 6.3
+
+=item C<activate_mark>
+
+	void	rl_activate_mark()				# GRL 8.1
+
+=item C<deactivate_mark>
+
+	void	rl_deactivate_mark()				# GRL 8.1
+
+=item C<keep_mark_active>
+
+	void	rl_keep_mark_active()				# GRL 8.1
+
+=item C<mark_active_p>
+
+	int	rl_mark_active_p()				# GRL 8.1
 
 =back
 
@@ -1695,9 +1718,9 @@ Note that this function returns C<expansion> in the scalar context.
 
 Following GNU Readline/History Library variables can be accessed by a
 Perl program.  See L<GNU Readline Library
-Manual|http://cnswww.cns.cwru.edu/php/chet/readline/readline.html> and
+Manual|https://tiswww.cwru.edu/php/chet/readline/readline.html> and
 L<GNU History Library
-Manual|http://cnswww.cns.cwru.edu/php/chet/readline/history.html> for
+Manual|https://tiswww.cwru.edu/php/chet/readline/history.html> for
 details of each variable.  You can access them by using C<Attribs>
 methods.  Names of keys in this hash conform to standard conventions
 with the leading C<rl_> stripped.
@@ -1829,7 +1852,7 @@ described along with examples.
 
 Most of descriptions in this section came from L<GNU Readline
 Library
-Manual|http://cnswww.cns.cwru.edu/php/chet/readline/readline.html>.
+Manual|https://tiswww.cwru.edu/php/chet/readline/readline.html>.
 
 =over 4
 
@@ -2069,7 +2092,7 @@ follows;
 
 For further details, see the section "Readline Init File" in the L<GNU
 Readline Library
-Manual|http://cnswww.cns.cwru.edu/php/chet/readline/readline.html>
+Manual|https://tiswww.cwru.edu/php/chet/readline/readline.html>
 
 =back
 
@@ -2135,9 +2158,9 @@ further details.
 
 =item L<Term::ReadLine::Gnu Project Home Page|http://sourceforge.net/projects/perl-trg/>
 
-=item L<GNU Readline Library Manual|http://cnswww.cns.cwru.edu/php/chet/readline/readline.html>
+=item L<GNU Readline Library Manual|https://tiswww.cwru.edu/php/chet/readline/readline.html>
 
-=item L<GNU History Library Manual|http://cnswww.cns.cwru.edu/php/chet/readline/history.html>
+=item L<GNU History Library Manual|https://tiswww.cwru.edu/php/chet/readline/history.html>
 
 =item Sample and test programs (F<eg/*> and F<t/*>) in L<the C<Term::ReadLine::Gnu> distribution|http://search.cpan.org/dist/Term-ReadLine-Gnu/>
 
@@ -2175,7 +2198,7 @@ of Synopsys' shells.
 Pfm is a terminal-based file manager written in Perl, based on PFM.COM
 for MS-DOS (originally by Paul Culley and Henk de Heer).
 
-=item L<The soundgrab|http://brittonkerin.com/soundgrab/soundgrab.html>
+=item L<The soundgrab|https://sourceforge.net/projects/soundgrab/>
 
 soundgrab is designed to help you slice up a big long raw audio file
 (by default 44.1 kHz 2 channel signed sixteen bit little endian) and
@@ -2235,7 +2258,7 @@ L<https://rt.perl.org/Public/Bug/Display.html?id=121456> for details.
 
 =head1 LICENSE
 
-Copyright (c) 1996-2016 Hiroo Hayashi.  All rights reserved.
+Copyright (c) 1996-2020 Hiroo Hayashi.  All rights reserved.
 
 This program is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

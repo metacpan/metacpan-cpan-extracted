@@ -20,7 +20,7 @@ has storage => (is => 'rw', isa => 'HashRef',
                       unique_columns => ['name'],
                     },
                     dbxref =>{
-                      id_counter => 204,
+                      id_counter => 205,
                       column_names => [
                         'dbxref_id', 'accession', 'db_id',
                       ],
@@ -29,11 +29,12 @@ has storage => (is => 'rw', isa => 'HashRef',
                         [ 201, 'exact', 101 ],
                         [ 202, 'narrow', 101 ],
                         [ 203, 'cv_version', 101 ],
+                        [ 204, 'replaced_by', 101 ],
                       ],
                       unique_columns => ['accession', 'db_id'],
                     },
                     cv => {
-                      id_counter => 302,
+                      id_counter => 304,
                       column_names => [
                         'cv_id', 'name',
                       ],
@@ -41,11 +42,12 @@ has storage => (is => 'rw', isa => 'HashRef',
                         [ 300, 'relationship' ],
                         [ 301, 'synonym_type' ],
                         [ 302, 'cv_property_type' ],
+                        [ 303, 'cvterm_property_type' ],
                       ],
                       unique_columns => ['name'],
                     },
                     cvterm => {
-                      id_counter => 401,
+                      id_counter => 405,
                       column_names => [
                         'cvterm_id', 'name', 'definition', 'cv_id',
                         'dbxref_id', 'is_relationshiptype', 'is_obsolete',
@@ -55,6 +57,7 @@ has storage => (is => 'rw', isa => 'HashRef',
                         [ 401, 'exact', 'exact', 301, 201, 0, 0],
                         [ 402, 'narrow', 'narrow', 301, 202, 0, 0],
                         [ 403, 'cv_version', 'cv_version', 302, 203, 0, 0],
+                        [ 404, 'replaced_by', 'replaced_by', 303, 204, 0, 0],
                       ],
                       unique_columns => ['name', 'cv_id'],
                     },
@@ -89,7 +92,15 @@ has storage => (is => 'rw', isa => 'HashRef',
                       ],
                       rows => [
                       ],
-                    }
+                    },
+                    cvtermprop => {
+                      id_counter => 901,
+                      column_names => [
+                        'cvtermprop_id', 'cvterm_id', 'type_id', 'value',
+                      ],
+                      rows => [
+                      ],
+                    },
                   }
                 });
 

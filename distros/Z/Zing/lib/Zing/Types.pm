@@ -11,7 +11,7 @@ use base 'Data::Object::Types::Library';
 
 extends 'Types::Standard';
 
-our $VERSION = '0.20'; # VERSION
+our $VERSION = '0.21'; # VERSION
 
 register {
   name => 'App',
@@ -121,7 +121,7 @@ register {
 declare 'Key',
   as Str(),
   where {
-    $_ =~ qr(^[^\:\*]+:[^\:\*]+:[^\:\*]+:[^\:\*]+:[^\:\*]+$)
+    $_ =~ qr(^[^\:]+:[^\:]+:[^\:]+:[^\:]+:[^\:]+$)
   };
 
 register {

@@ -13,6 +13,7 @@ my @files = (
     'lib/Dist/Iller/DocType/Cpanfile.pm',
     'lib/Dist/Iller/DocType/Dist.pm',
     'lib/Dist/Iller/DocType/Gitignore.pm',
+    'lib/Dist/Iller/DocType/Global.pm',
     'lib/Dist/Iller/DocType/Weaver.pm',
     'lib/Dist/Iller/Elk.pm',
     'lib/Dist/Iller/Plugin.pm',

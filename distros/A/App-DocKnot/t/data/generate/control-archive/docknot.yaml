@@ -1,0 +1,342 @@
+format: v1
+
+name: control-archive
+maintainer: Russ Allbery <eagle@eyrie.org>
+version: 1.8.0
+synopsis: processing and archiving of Netnews control messages
+
+license:
+  name: Expat
+  notices: |
+    This product includes software developed by UUNET Technologies, Inc.
+copyrights:
+  - holder: Russ Allbery <eagle@eyrie.org>
+    years: 2002-2004, 2007-2014, 2016-2018
+  - holder: Marco d'Itri
+    years: '2001'
+  - holder: UUNET Technologies, Inc.
+    years: '1996'
+
+build:
+  install: false
+  type: make
+distribution:
+  section: usenet
+  tarname: control-archive
+  version: control-archive
+support:
+  email: eagle@eyrie.org
+  extra: |
+    Configuration updates should be sent to usenet-config@isc.org.
+  github: rra/control-archive
+  web: https://www.eyrie.org/~eagle/software/control-archive/
+vcs:
+  browse: https://git.eyrie.org/?p=usenet/control.archive.git
+  github: rra/control-archive
+  type: Git
+  url: https://git.eyrie.org/git/usenet/control-archive.git
+
+quote:
+  author: Gene Spafford
+  text: |
+    Usenet is like a herd of performing elephants with diarrhea — massive,
+    difficult to redirect, awe-inspiring, entertaining, and a source of
+    mind-boggling amounts of excrement when you least expect it.
+docs:
+  user:
+    - name: control-summary
+      title: control-summary manual page
+    - name: export-control
+      title: export-control manual page
+    - name: generate-files
+      title: generate-files manual page
+    - name: process-control
+      title: process-control manual page
+    - name: update-control
+      title: update-control manual page
+
+blurb: |
+  This software generates an INN control.ctl configuration file from
+  hierarchy configuration fragments, verifies control messages using GnuPG
+  where possible, processes new control messages to update a newsgroup list,
+  archives new control messages, and exports the list of newsgroups in a
+  format suitable for synchronizing the newsgroup list of a Netnews news
+  server.  It is the software that maintains the control message and
+  newsgroup lists available from ftp.isc.org.
+
+description: |
+  This package contains three major components:
+
+  * All of the configuration used to generate a `control.ctl` file for INN
+    and the `PGPKEYS` and `README.html` files distributed with pgpcontrol,
+    along with the script to generate those files.
+
+  * Software to process control messages, verify them against that
+    authorization information, and maintain a control message archive and
+    list of active newsgroups.  Software is also included to generate
+    reports of recent changes to the list of active newsgroups.
+
+  * The documentation files included in the control message archive and
+    newsgroup lists on ftp.isc.org.
+
+  Manual changes to the canonical newsgroup list are supported in a way that
+  generates the same log messages and uses the same locking structure so
+  that they can co-exist with automated changes and be included in the same
+  reports.
+
+  This is the software that generates the [active newsgroup
+  lists](ftp://ftp.isc.org/pub/usenet/CONFIG/) and [control message
+  archive](ftp://ftp.isc.org/pub/usenet/control/) hosted on ftp.isc.org, and
+  the source of the `control.ctl` file provided with INN.
+
+  For a web presentation of the information recorded here, as well as other
+  useful information about Usenet hierarchies, please see the [list of
+  Usenet managed hierarchies](http://usenet.trigofacile.com/hierarchies/).
+    
+requirements: |
+  Perl 5.6 or later plus the following additional Perl modules are required:
+
+  * Compress::Zlib (included in Perl 5.10 and later)
+  * Date::Parse (part of TimeDate)
+  * Net::NNTP (included in Perl 5.8 and later)
+  * Text::Template
+
+  [gzip](https://www.gnu.org/software/gzip/) and
+  [bzip2](http://www.bzip.org/) are required.  Both are generally available
+  with current operating systems, possibly as supplemental packages.
+
+  process-control expects to be fed file names and message IDs of control
+  messages on standard input and therefore needs to be run from a news
+  server or some other source of control messages.  A minimalist news server
+  like tinyleaf is suitable for this (I wrote tinyleaf, available as part of
+  [INN](https://www.eyrie.org/~eagle/software/inn/), for this purpose).
+
+sections:
+  - title: Versioning
+    body: |
+      This package uses a three-part version number.  The first number
+      will be incremented for major changes, major new functionality,
+      incompatible changes to the configuration format (more than just
+      adding new keys), or similar disruptive changes.  For lesser
+      changes, the second number will be incremented for any change to the
+      code or functioning of the software.  A change to the third part of
+      the version number indicates a release with changes only to the
+      configuration, PGP keys, and documentation files.
+  - title: Layout
+    body: |
+      The configuration data is in one file per hierarchy in the `config`
+      directory.  Each file has the format specified in FORMAT and is
+      designed to be readable by INN's new configuration parser in case
+      this can be further automated down the road.  The `config/special`
+      directory contains overrides, raw `control.ctl` fragments that
+      should be used for particular hierarchies instead of
+      automatically-generated entries (usually for special comments).
+      Eventually, the format should be extended to handle as many of these
+      cases as possible.
+
+      The `keys` directory contains the PGP public keys for every
+      hierarchy that has one.  The user IDs on these keys must match the
+      signer expected by the configuration data for the corresponding
+      hierarchy.
+
+      The `forms` directory contains the basic file structure for the
+      three generated files.
+
+      The `scripts` directory contains all the software that generates the
+      configuration and documentation files, processes control messages,
+      updates the database, creates the newsgroup lists, and generates
+      reports.  Most scripts in that directory have POD documentation
+      included at the end of the script, viewable by running perldoc on
+      the script.
+
+      The `templates` directory contains templates for the
+      `control-summary` script.  These are the templates I use myself.
+      Other installations should customize them.
+
+      The `docs` directory contains the extra documentation files that are
+      distributed from ftp.isc.org in the control message archive and
+      newsgroup list directories, plus the DocKnot metadata for this
+      package.
+  - title: Installation
+    body: |
+      This software is set up to run from `/srv/control`.  To use a
+      different location, edit the paths at the beginning of each of the
+      scripts in the `scripts` directory to use different paths.  By
+      default, copying all the files from the distribution into a
+      `/srv/control` directory is almost all that's needed.  An install
+      rule is provided to do this.  To install the software, run:
+
+      ```sh
+          make install
+      ```
+
+      You will need write access to `/srv/control` or permission to create
+      it.
+
+      `process-control` and `generate-files` need a GnuPG keyring
+      containing all of the honored hierarchy keys.  To generate this
+      keyring, run `make install` or:
+
+      ```sh
+          mkdir keyring
+          gpg --homedir=keyring --allow-non-selfsigned-uid --import keys/*
+      ```
+
+      from the top level of this distribution.  `process-control` also
+      expects a `control.ctl` file in `/srv/control/control.ctl`, which
+      can be generated from the files included here (after creating the
+      keyring as described above) by running `make install` or:
+
+      ```sh
+          scripts/generate-files
+      ```
+
+      Both of these are done automatically as part of `make install`.
+      process-control expects `/srv/control/archive` to exist and archives
+      control messages there.  It expects `/srv/control/tmp` to exist and
+      uses it for temporary files for GnuPG control message verification.
+
+      To process incoming control messages, you need to run
+      `process-control` on each message.  `process-control` expects to
+      receive, on standard input, lines consisting of a path to a file, a
+      space, and a message ID.  This input format is designed to work with
+      the tinyleaf server that comes with INN 2.5 and later, but it should
+      also work as a channel feed from pre-storage-API versions of INN
+      (1.x).  It will not work without modification via a channel feed
+      from a current version of INN, since it doesn't understand the
+      storage API and doesn't know how to retrieve articles by tokens.
+      This could be easily added; I just haven't needed it.
+
+      If you're using tinyleaf, here is the setup process:
+
+      1. Create a directory that tinyleaf will use to store incoming
+         articles temporarily, the archive directory, and the logs
+         directory and install the software:
+
+         ```sh
+             make install
+         ```
+
+      2. Run tinyleaf on some port, configuring it to use that directory
+         and to run process-control.  A typical tinyleaf command line
+         would be:
+
+         ```sh
+             tinyleaf /srv/control/spool /srv/control/scripts/process-control
+         ```
+
+         I run tinyleaf using systemd, but any inetd implementation should
+         work equally well.
+
+      3. Set up a news feed to the system running tinyleaf that sends
+         control messages of interest.  You should be careful not to send
+         cancel control messages or you'll get a ton of junk in your logs.
+         The INN newsfeeds entry I use is:
+
+         ```
+             isc-control:control,control.*,!control.cancel:Tf,Wnm:
+         ```
+
+         combined with nntpsend to send the articles.
+
+      That should be all there is to it.  Watch the logs directory to see
+      what happens for incoming messages.
+
+      `scripts/process-control` just maintains a database file.  To export
+      that data in a format that's useful for other software, run
+      `scripts/export-control`.  This expects a `/srv/control/export`
+      directory into which it stores active and newsgroups files, a copy
+      of the `control.ctl` file, and all of the logs in a `LOGS`
+      subdirectory.  This export directory can then be made available on
+      the web, copied to another system, or whatever else is appropriate.
+      Generally, `scripts/export-control` should be run periodically from
+      cron.
+
+      Reports can be generated using `scripts/control-summary`.  This
+      script needs configuration before running; see the top of the script
+      and its included POD documentation.  There is a sample template in
+      the `templates` directory, and `scripts/weekly-report` shows a
+      sample cron job for sending out a regular report.
+  - title: Bootstrapping
+    body: |
+      This package is intended to provide all of the tools, configuration,
+      and information required to duplicate the ftp.isc.org control
+      message archive and newsgroup list service if you so desire.  To set
+      up a similar service based on that service, however, you will also
+      want to bootstrap from the existing data.  Here is the procedure for
+      that:
+
+      1. Be sure that you're starting from the latest software and set of
+         configuration files.  I will generally try to make a new release
+         after committing a batch of changes, but I may not make a new
+         release after every change.  See the sections below for
+         information about the Git repository in which this package is
+         maintained.  You can always clone that repository to get the
+         latest configuration (and then merge or cherry-pick changes from
+         my repository into your repository as you desire).
+
+      2. Download the current newsgroup list from:
+
+             ftp://ftp.isc.org/pub/usenet/CONFIG/newsgroups.bz2
+
+         and then bootstrap the database from it:
+
+         ```sh
+             bzip2 -dc newsgroups.bz2 | scripts/update-control bulkload
+         ```
+
+      3. If you want the log information so that your reports will include
+         changes made in the ftp.isc.org archive before you created your
+         own, copy the contents of
+         ftp://ftp.isc.org/pub/usenet/CONFIG/LOGS/ into
+         `/srv/control/logs`.
+
+      4. If you want to start with the existing control message
+         repository, download the contents of
+         ftp://ftp.isc.org/pub/usenet/control/ into
+         `/srv/control/archive`.  You can do this using a recursive
+         download tool that understands FTP, such as wget, but please use
+         the options that add delays and don't hammer the server to death.
+
+      After finishing those steps, you will have a copy of the ftp.isc.org
+      archive and can start processing control messages, possibly with
+      different configuration choices.  You can generate the files that
+      are found in ftp://ftp.isc.org/pub/usenet/CONFIG/ by running
+      `scripts/export-control` as described above.
+  - title: Maintenance
+    body: |
+      To add a new hierarchy, add a configuration fragment in the `config`
+      directory named after the hierarchy, following the format of the
+      existing files, and run `scripts/generate-files` to create a new
+      `control.ctl` file.  See the documentation in
+      `scripts/generate-files` for details about the supported
+      configuration keys.
+
+      If the hierarchy uses PGP-signed control messages, also put the PGP
+      key into the `keys` directory in a file named after the hierarchy.
+      Then, run:
+
+      ```sh
+          gpg --homedir=keyring --import keys/<hierarchy>
+      ```
+
+      to add the new key to the working keyring.
+
+      The first user ID on the key must match the signer expected by the
+      configuration data for the corresponding hierarchy.  If a hierarchy
+      administrator sets that up wrong (usually by putting additional key
+      IDs on the key), this can be corrected by importing the key into a
+      keyring with GnuPG, using `gpg --edit-key` to remove the offending
+      user ID, and exporting the key again with `gpg --export --ascii`.
+
+      When adding a new hierarchy, it's often useful to bootstrap the
+      newsgroup list by importing the current checkgroups.  To do this,
+      obtain the checkgroups as a text file (containing only the groups
+      without any news headers) and run:
+
+      ```sh
+          scripts/update-control checkgroups <hierarchy> < <checkgroups>
+      ```
+
+      where <hierarchy> is the hierarchy the checkgroups is for and
+      <checkgroups> is the path to the checkgroups file.

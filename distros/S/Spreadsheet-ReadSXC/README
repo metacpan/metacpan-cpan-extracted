@@ -104,6 +104,10 @@ Should you wish to install this module manually, the procedure is
 
 
 
+BUG TRACKER
+
+Please report bugs in this module via the Github bug queue at
+L<https://github.com/Corion/Spreadsheet-ReadSXC/issues>
 
 
 SEE ALSO
@@ -119,8 +123,8 @@ Christoph Terhechte, E<lt>terhechte@cpan.orgE<gt>
 
 COPYRIGHT AND LICENSE
 
-
 Copyright 2005-2019 by Christoph Terhechte
+
 Copyright 2019- by Max Maischein
 
 This library is free software; you can redistribute it and/or modify

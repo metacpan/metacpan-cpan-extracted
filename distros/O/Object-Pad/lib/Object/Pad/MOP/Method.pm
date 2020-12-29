@@ -8,7 +8,7 @@ package Object::Pad::MOP::Method;
 use v5.14;
 use warnings;
 
-our $VERSION = '0.34';
+our $VERSION = '0.35';
 
 # This is an XS-implemented object type provided by Object::Pad itself
 require Object::Pad;

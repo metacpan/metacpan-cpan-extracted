@@ -1,0 +1,17 @@
+# Kwalify schema for the licenses.yaml metadata file.
+#
+# Copyright 2020 Russ Allbery <rra@cpan.org>
+#
+# SPDX-License-Identifier: MIT
+
+type: map
+mapping:
+  =:
+    type: map
+    mapping:
+      summary:
+        type: text
+        required: true
+      text:
+        type: text
+        required: true

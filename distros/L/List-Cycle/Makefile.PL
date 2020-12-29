@@ -13,7 +13,7 @@ my %parms = (
     ABSTRACT_FROM       => 'Cycle.pm',
     PL_FILES            => {},
     PREREQ_PM => {
-        'Test::More' => 0,
+        'Test::More' => '0.98', # For subtest()
         'Carp'       => 0,
     },
     dist                => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
@@ -27,9 +27,9 @@ if ( $ExtUtils::MakeMaker::VERSION =~ /^\d\.\d\d$/ and $ExtUtils::MakeMaker::VER
 if ( $ExtUtils::MakeMaker::VERSION ge '6.46' ) {
     $parms{META_MERGE} = {
         resources => {
-            bugtracker  => 'http://rt.cpan.org/NoAuth/Bugs.html?Dist=List-Cycle',
+            bugtracker  => 'https://github.com/petdance/list-cycle/issues',
             repository  => 'git://github.com/petdance/list-cycle.git',
-            license     => 'http://www.opensource.org/licenses/artistic-license-2.0.php',
+            license     => 'https://opensource.org/licenses/artistic-license-2.0.php',
         }
     };
 }

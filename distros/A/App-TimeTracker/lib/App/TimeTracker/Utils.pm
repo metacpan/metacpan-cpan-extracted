@@ -16,11 +16,11 @@ our @EXPORT_OK   = qw(pretty_date now error_message warning_message);
 our %EXPORT_TAGS = ( all => \@EXPORT_OK );
 
 sub error_message {
-    return _message( 'bold red', @_ );
+    _message( 'bold red', @_ );
 }
 
 sub warning_message {
-    return _message( 'bold yellow', @_ );
+    _message( 'bold yellow', @_ );
 }
 
 sub _message {
@@ -75,7 +75,7 @@ App::TimeTracker::Utils - Utility Methods/Functions for App::TimeTracker
 
 =head1 VERSION
 
-version 3.005
+version 3.007
 
 =head1 AUTHOR
 

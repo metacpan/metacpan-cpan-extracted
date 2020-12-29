@@ -1,10 +1,10 @@
 {
    "abstract" : "A utility class for building table layouts in a PDF::Builder  (or PDF::API2) object.",
    "author" : [
-      "Phil Perry <omega@cpan.org>"
+      "Phil Perry"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.50, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.58, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -45,6 +45,6 @@
          "url" : "https://github.com/PhilterPaper/PDF-Table"
       }
    },
-   "version" : "1.001",
+   "version" : "1.002",
    "x_serialization_backend" : "JSON::PP version 4.05"
 }

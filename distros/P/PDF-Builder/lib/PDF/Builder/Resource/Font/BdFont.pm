@@ -3,10 +3,11 @@ package PDF::Builder::Resource::Font::BdFont;
 use base 'PDF::Builder::Resource::Font';
 
 use strict;
-no warnings qw[ deprecated recursion uninitialized ];
+use warnings;
+#no warnings qw[ deprecated recursion uninitialized ];
 
-our $VERSION = '3.020'; # VERSION
-my $LAST_UPDATE = '3.017'; # manually update whenever code is changed
+our $VERSION = '3.021'; # VERSION
+my $LAST_UPDATE = '3.021'; # manually update whenever code is changed
 
 use PDF::Builder::Util;
 use PDF::Builder::Basic::PDF::Utils;
@@ -144,7 +145,8 @@ sub new {
     $self->{'Resources'} = PDFDict();
     $self->{'Resources'}->{'ProcSet'} = PDFArray(map { PDFName($_) } qw(PDF Text ImageB ImageC ImageI));
     foreach my $w ($first .. $last) {
-        $self->data()->{'uni'}->[$w] = uniByName($self->data()->{'char'}->[$w]);
+	# if not a standard glyph name, use $w as the value
+        $self->data()->{'uni'}->[$w] = (uniByName($self->data()->{'char'}->[$w]))||$w;
         $self->data()->{'u2e'}->{$self->data()->{'uni'}->[$w]} = $w;
     }
     my @widths = ();
@@ -298,9 +300,12 @@ sub new {
 sub readBDF {
     my ($self, $file) = @_;
     my $data = {};
-    $data->{'char'} = [];
-    $data->{'char2'} = [];
-    $data->{'wx'} = {};
+    $data->{'char'} = [];  # ENCODING is NAME from char2
+    $data->{'char2'} = []; # NAME from STARTCHAR record, E_encoding# default
+                           # hex from BITMAP records as one long string, 
+			   #   can be empty (such as space x20)
+			   # BBX arrayref from BBX record
+    $data->{'wx'} = {};    # width (by name) from char2 SWIDTH record
 
     if (! -e $file) {
 	die "BDF file='$file' not found.";
@@ -310,28 +315,39 @@ sub readBDF {
     while ($_ = <$afmf>) {
         chomp($_);
         if (/^STARTCHAR/ .. /^ENDCHAR/) {
-            if (/^STARTCHAR\s+(\S+)/) {
+            if (/^STARTCHAR\s+(\S+)/) { # start of one glyph
                 my $name = $1;
                 $name =~ s|^(\d+.*)$|X_$1|;
                 push @{$data->{'char2'}}, {'NAME' => $name};
-            } elsif (/^BITMAP/ .. /^ENDCHAR/) {
+            } elsif (/^BITMAP/ .. /^ENDCHAR/) { # bitmap itself
                 next if(/^BITMAP/);
-                if (/^ENDCHAR/) {
+                if (/^ENDCHAR/) { # done reading, finalize
+		    # fallback NAME is E_<encoding #>
                     $data->{'char2'}->[-1]->{'NAME'} ||= 'E_'.$data->{'char2'}->[-1]->{'ENCODING'};
-                    $data->{'char'}->[$data->{'char2'}->[-1]->{'ENCODING'}] = $data->{'char2'}->[-1]->{'NAME'};
-                    ($data->{'wx'}->{$data->{'char2'}->[-1]->{'NAME'}}) = split(/\s+/, $data->{'char2'}->[-1]->{'SWIDTH'});
+		    my $charName = $data->{'char2'}->[-1]->{'NAME'};
+		    # char ENCODING is char2's NAME
+                    $data->{'char'}->[$data->{'char2'}->[-1]->{'ENCODING'}] = $charName;
+		    # width (2 element vector) from char2 SWIDTH
+                    ($data->{'wx'}->{$charName}) = split(/\s+/, $data->{'char2'}->[-1]->{'SWIDTH'});
+		    # bounding box (4 element vector) from char2 BBX
                     $data->{'char2'}->[-1]->{'BBX'} = [split(/\s+/, $data->{'char2'}->[-1]->{'BBX'})];
-                } else {
+                } else { # the bitmap data record appended
                     $data->{'char2'}->[-1]->{'hex'} .= $_;
                 }
             } else {
-                m|^(\S+)\s+(.+)$|;
-                $data->{'char2'}->[-1]->{uc($1)} .= $2;
+                # a few fields (records) here, just grab <name> <value> pairs
+                if (m|^(\S+)\s+(.+)$|) {
+                    $data->{'char2'}->[-1]->{uc($1)} .= $2;
+		}
             }
-        ## } elsif (/^STARTPROPERTIES/ .. /^ENDPROPERTIES/) {
+        ## } elsif (/^STARTPROPERTIES/ .. /^ENDPROPERTIES/) { not implemented
         } else {
-                m|^(\S+)\s+(.+)$|;
-                $data->{uc($1)} .= $2;
+                # all sorts of random stuff here, STARTFONT, START/END 
+		# PROPERTIES, etc. just grab anything that looks like a
+		# <name> <value> record
+                if (m|^(\S+)\s+(.+)$|) {
+                    $data->{uc($1)} .= $2;
+		}
         }
     }
     close($afmf);
@@ -382,7 +398,7 @@ sub readBDF {
     $data->{'underlineposition'} = -200;
     $data->{'underlinethickness'} = 10;
     $data->{'xheight'} = $data->{'RAW_XHEIGHT'}
-        || int($data->{'FONT_XHEIGHT'} * 1000 / $data->{'upm'})
+        || int(($data->{'FONT_XHEIGHT'}||0) * 1000 / $data->{'upm'})
         || int($data->{'ascender'} / 2);
     $data->{'firstchar'} = 0;
     $data->{'lastchar'} = 255;

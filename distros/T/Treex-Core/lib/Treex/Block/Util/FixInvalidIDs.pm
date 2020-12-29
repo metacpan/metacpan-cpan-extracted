@@ -1,5 +1,5 @@
 package Treex::Block::Util::FixInvalidIDs;
-$Treex::Block::Util::FixInvalidIDs::VERSION = '2.20160630';
+$Treex::Block::Util::FixInvalidIDs::VERSION = '2.20201228';
 use Treex::Core::Common;
 use Moose;
 extends 'Treex::Core::Block';
@@ -56,7 +56,7 @@ Treex::Block::Util::FixInvalidIDs
 
 =head1 VERSION
 
-version 2.20160630
+version 2.20201228
 
 =head1 DESCRIPTION
 

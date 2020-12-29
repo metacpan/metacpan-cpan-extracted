@@ -7,8 +7,8 @@
 use strict;
 use warnings;
 
-our $VERSION = '1.001'; # VERSION
-my $LAST_UPDATE = '0.12'; # manually update whenever code is changed
+our $VERSION = '1.002'; # VERSION
+my $LAST_UPDATE = '1.002'; # manually update whenever code is changed
 
 # command line:
 # -5  run perlcritic -5 .  (should be clean)
@@ -28,9 +28,14 @@ my $LAST_UPDATE = '0.12'; # manually update whenever code is changed
 # output <source name> OK is always ignored
 my @ignore_list = (
   # should not ignore any level 5 warnings
+     "Use IO::Interactive::is_interactive",
+                              # not a core module!
+
   # common level 4 warnings to ignore
-     "Code before warnings",  # due to use of "no warnings" pragma 
-     "Warnings disabled at",  # due to use of "no warnings" pragma
+# removed 'no warnings' in 3.021. remove next line 3.022 or later
+#    "Code before warnings",  # due to use of "no warnings" pragma 
+# removed 'no warnings' in 3.021. remove next line 3.022 or later
+#    "Warnings disabled at",  # due to use of "no warnings" pragma
      "Close filehandles as soon as possible", 
                               # it thinks there is no "close" on an open 
 			      # filehandle, due to either too many lines for 
@@ -47,11 +52,16 @@ my @ignore_list = (
 			      # @EXPORT and @EXPORT_OK
      "Pragma \"constant\" used at", # will have to investigate why "use constant"
                                     # is flagged. TBD
+
   # common level 3 warnings to ignore for now
      '"die" used instead of "croak"',  # 
      '"warn" used instead of "carp"',  # 
      'Regular expression without "/x" flag',  # 
      "Backtick operator used",  # 
+     "high complexity score",  #
+     "Cascading if-elsif chain",  #
+     "Hard tabs used at",  #
+     '"local" variable not initialized',  #
 	          );
 
 # Note that level 4 includes any level 5 errors, etc.

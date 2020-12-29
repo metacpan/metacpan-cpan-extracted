@@ -8,7 +8,7 @@
 use strict;
 use warnings;
 
-our $VERSION = '1.001'; # VERSION
+our $VERSION = '1.002'; # VERSION
 my $LAST_UPDATE = '1.000'; # manually update whenever code is changed
 
 # dependent on optional packages:

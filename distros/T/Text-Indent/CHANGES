@@ -3,12 +3,18 @@ Change History for Text::Indent
 
 0.01    10 Dec 2003
 
-        initial release
+        - initial release
 
 0.02    22 September 2010
 
-        fix warning when AddNewline is undefined.  Patch from Neil Hooey
+        - fix warning when AddNewline is undefined.  Patch from Neil Hooey
 
 0.03	30 December 2018
 
-	fix warning for Negative repeat count.
+	- fix warning for Negative repeat count.
+
+0.031	26 December 2020
+
+	- Spelling corrections
+	- Update git and MANIFEST ignore lists
+	- Convert build to ExtUtils::MakeMaker

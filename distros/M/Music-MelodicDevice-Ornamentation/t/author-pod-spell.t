@@ -25,6 +25,8 @@ Gene
 MelodicDevice
 Music
 Ornamentation
+acciaccatura
+appoggiatura
 enharmonic
 gene
 lib

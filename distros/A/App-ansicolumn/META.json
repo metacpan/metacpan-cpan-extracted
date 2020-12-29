@@ -48,7 +48,7 @@
             "Text::ANSI::Fold" : "2.08",
             "Text::ANSI::Fold::Util" : "0",
             "Text::ANSI::Printf" : "1.03",
-            "perl" : "v5.14.0"
+            "perl" : "v5.16.0"
          }
       },
       "test" : {
@@ -60,7 +60,7 @@
    "provides" : {
       "App::ansicolumn" : {
          "file" : "lib/App/ansicolumn.pm",
-         "version" : "1.03"
+         "version" : "1.04"
       },
       "App::ansicolumn::Border" : {
          "file" : "lib/App/ansicolumn/Border.pm"
@@ -80,7 +80,7 @@
          "web" : "https://github.com/kaz-utashiro/App-ansicolumn"
       }
    },
-   "version" : "1.03",
+   "version" : "1.04",
    "x_authority" : "cpan:UTASHIRO",
    "x_contributors" : [
       "Kazumasa Utashiro <kaz@utashiro.com>"

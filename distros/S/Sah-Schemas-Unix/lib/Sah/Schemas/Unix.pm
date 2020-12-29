@@ -1,7 +1,7 @@
 package Sah::Schemas::Unix;
 
-our $DATE = '2020-06-13'; # DATE
-our $VERSION = '0.012'; # VERSION
+our $DATE = '2020-10-16'; # DATE
+our $VERSION = '0.013'; # VERSION
 
 1;
 # ABSTRACT: Various Sah schemas for Unix
@@ -18,7 +18,7 @@ Sah::Schemas::Unix - Various Sah schemas for Unix
 
 =head1 VERSION
 
-This document describes version 0.012 of Sah::Schemas::Unix (from Perl distribution Sah-Schemas-Unix), released on 2020-06-13.
+This document describes version 0.013 of Sah::Schemas::Unix (from Perl distribution Sah-Schemas-Unix), released on 2020-10-16.
 
 =head1 HOMEPAGE
 

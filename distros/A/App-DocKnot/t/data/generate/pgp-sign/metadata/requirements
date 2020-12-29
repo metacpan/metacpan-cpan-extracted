@@ -1,9 +1,0 @@
-Perl 5.20 or later and Module::Build are required to build this module,
-and IPC::Run is required to use it.  Either GnuPG v2 or GnuPG v1
-(selectable at runtime) is also required.  It has not been tested with
-versions of GnuPG older than 1.4.23.
-
-PGP::Sign uses IPC::Run features that are documented as not available on
-Windows (primarily higher-numbered file descriptors) and has never been
-tested with Gpg4win, so will probably not work on Windows (or, for that
-matter, other non-UNIX systems).

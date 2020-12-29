@@ -3,7 +3,7 @@
 # Test the generate_output method.  This doubles as a test for whether the
 # package metadata is consistent with the files currently in the distribution.
 #
-# Copyright 2016, 2018-2019 Russ Allbery <rra@cpan.org>
+# Copyright 2016, 2018-2020 Russ Allbery <rra@cpan.org>
 #
 # SPDX-License-Identifier: MIT
 
@@ -25,7 +25,7 @@ use Test::More tests => 7;
 BEGIN { use_ok('App::DocKnot::Generate') }
 
 # Initialize the App::DocKnot object using the default metadata path.
-my $metadata_path = File::Spec->catfile(getcwd(), 'docs', 'metadata');
+my $metadata_path = File::Spec->catfile(getcwd(), 'docs', 'docknot.yaml');
 my $docknot = App::DocKnot::Generate->new({ metadata => $metadata_path });
 isa_ok($docknot, 'App::DocKnot::Generate');
 

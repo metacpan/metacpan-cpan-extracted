@@ -1,7 +1,7 @@
 package Sah::Schema::unix::pid;
 
-our $DATE = '2020-06-13'; # DATE
-our $VERSION = '0.012'; # VERSION
+our $DATE = '2020-10-16'; # DATE
+our $VERSION = '0.013'; # VERSION
 
 our $schema = [posint => {
     summary => 'Process identifier (PID)',
@@ -32,7 +32,7 @@ Sah::Schema::unix::pid - Process identifier (PID)
 
 =head1 VERSION
 
-This document describes version 0.012 of Sah::Schema::unix::pid (from Perl distribution Sah-Schemas-Unix), released on 2020-06-13.
+This document describes version 0.013 of Sah::Schema::unix::pid (from Perl distribution Sah-Schemas-Unix), released on 2020-10-16.
 
 =head1 SYNOPSIS
 

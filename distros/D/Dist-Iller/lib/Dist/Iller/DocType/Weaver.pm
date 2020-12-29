@@ -5,7 +5,8 @@ use warnings;
 package Dist::Iller::DocType::Weaver;
 
 our $AUTHORITY = 'cpan:CSSON'; # AUTHORITY
-our $VERSION = '0.1408';
+# ABSTRACT: Turn the Dist::Iller config into a weaver.ini file
+our $VERSION = '0.1409';
 
 use Dist::Iller::Elk;
 with qw/
@@ -88,11 +89,11 @@ __END__
 
 =head1 NAME
 
-Dist::Iller::DocType::Weaver
+Dist::Iller::DocType::Weaver - Turn the Dist::Iller config into a weaver.ini file
 
 =head1 VERSION
 
-Version 0.1408, released 2016-03-12.
+Version 0.1409, released 2020-12-27.
 
 =head1 SOURCE
 

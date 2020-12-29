@@ -6,8 +6,8 @@
 use warnings;
 use strict;
 
-our $VERSION = '3.020'; # VERSION
-my $LAST_UPDATE = '3.010'; # manually update whenever code is changed
+our $VERSION = '3.021'; # VERSION
+my $LAST_UPDATE = '3.021'; # manually update whenever code is changed
 
 use Math::Trig;
 use List::Util qw(min max);
@@ -66,9 +66,9 @@ my ($unused, $cell_height, $j, $cont);
 
 my $pdf = PDF::Builder->new();
 my ($page, $grfx, $text); # objects for page, graphics, text
-my (@base, @styles, @points, $i, $lw, $angle, @npts);
+my (@base, @points, $i, $lw);
 #$pdf->{'forcecompress'} = 0;  # don't compress, so we can see what's happening
-my (@cellLoc, @cellSize, $font, $width, $d1, $d2, $d3, $d4);
+my (@cellLoc, @cellSize, $font, $width);
 my @axisOffset = (5, 5); # clear the edge of the cell
 
 my $pageNo = 0;
@@ -102,13 +102,13 @@ $grfx->poly(155,120, 155,10);
 $grfx->stroke();
 
 $text->translate($base[0]+15, $base[1]+100);
-$text->text_left('When in the course', 140);
+$text->text_left('When in the course');
 $text->translate($base[0]+15, $base[1]+ 80);
-$text->text_left('of human events, it becomes', 140);
+$text->text_left('of human events, it becomes');
 $text->translate($base[0]+15, $base[1]+ 60);
-$text->text_left('necessary for one people to dissolve the', 140);
+$text->text_left('necessary for one people to dissolve the');
 $text->translate($base[0]+15, $base[1]+ 40);
-$text->text_left('political bands...', 140);
+$text->text_left('political bands...');
 
 # caption
 drawCaption(['text_left()'], 'LC');

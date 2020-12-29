@@ -1,5 +1,5 @@
 package Treex::Core::TredView::Styles;
-$Treex::Core::TredView::Styles::VERSION = '2.20160630';
+$Treex::Core::TredView::Styles::VERSION = '2.20201228';
 use Moose;
 use Treex::Core::Log;
 use Treex::Core::TredView::Colors;
@@ -66,6 +66,9 @@ sub node_style {
 sub _anode_style {
     my ( $self, $node ) = @_;
     my $linestyle = $node->wild->{changed} ? '#{Line-width:5}' : '';
+    if (defined $node->wild->{edgecolor}) {
+        $linestyle .= '#{Line-fill:' . $node->wild->{edgecolor} . '}';
+    }
     $linestyle .= '#{Line-width:5}' if $node->wild->{joined};
     $linestyle .= '#{Line-fill:#ff0000}' if $node->wild->{unchangeable};
     if ( $node->clause_number ) {
@@ -290,7 +293,7 @@ Treex::Core::TredView::Styles - Styling of trees in Tred (how they look)
 
 =head1 VERSION
 
-version 2.20160630
+version 2.20201228
 
 =head1 DESCRIPTION
 

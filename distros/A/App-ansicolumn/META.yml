@@ -26,7 +26,7 @@ no_index:
 provides:
   App::ansicolumn:
     file: lib/App/ansicolumn.pm
-    version: '1.03'
+    version: '1.04'
   App::ansicolumn::Border:
     file: lib/App/ansicolumn/Border.pm
   App::ansicolumn::default:
@@ -38,12 +38,12 @@ requires:
   Text::ANSI::Fold: '2.08'
   Text::ANSI::Fold::Util: '0'
   Text::ANSI::Printf: '1.03'
-  perl: v5.14.0
+  perl: v5.16.0
 resources:
   bugtracker: https://github.com/kaz-utashiro/App-ansicolumn/issues
   homepage: https://github.com/kaz-utashiro/App-ansicolumn
   repository: git://github.com/kaz-utashiro/App-ansicolumn.git
-version: '1.03'
+version: '1.04'
 x_authority: cpan:UTASHIRO
 x_contributors:
   - 'Kazumasa Utashiro <kaz@utashiro.com>'

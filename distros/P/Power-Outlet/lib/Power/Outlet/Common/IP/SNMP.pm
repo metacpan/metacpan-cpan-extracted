@@ -2,9 +2,9 @@ package Power::Outlet::Common::IP::SNMP;
 use strict;
 use warnings;
 use base qw{Power::Outlet::Common::IP};
-use Net::SNMP qw{INTEGER};
+use Net::SNMP qw{};
 
-our $VERSION='0.24';
+our $VERSION='0.36';
 
 
 =head1 NAME
@@ -131,7 +131,8 @@ sub snmp_multiset {
   die("Error: parameter oids must be an array reference") unless ref($oids) eq "ARRAY";
   my $value   = shift;
   die("Error: parameter values required") unless defined($value);
-  my $type    = shift // INTEGER;
+  my $type    = shift;
+  $type       = Net::SNMP::INTEGER unless defined($type);
   my $session = $self->snmp_session;
   $session->set_request(-varbindlist=>[map {$_, $type, $value} @$oids]) or die(sprintf("Error: %s", $session->error));
   return "SUCCESS";

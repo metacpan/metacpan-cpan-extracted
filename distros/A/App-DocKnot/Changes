@@ -1,5 +1,48 @@
                        User-Visible DocKnot Changes
 
+DocKnot 4.00 (2020-12-25)
+
+    Change the metadata format to a single YAML file, with a slightly
+    different internal representation, whose default location is
+    docs/docknot.yaml.  The new docknot update command (or the
+    App::DocKnot::Update module) will convert from the old JSON format.
+    The new metadata format is checked against a schema when read.
+    DocKnot now depends on YAML::XS and Kwalify.
+
+    Support a test.override metadata key that overrides the Testing
+    section in README and README.md files entirely, except for the note
+    about Lancaster Consensus environment variables.
+
+    Move bootstrap metadata to build.bootstrap, build.lancaster to
+    test.lancaster, packaging to distribution.packaging, packaging.debian
+    to distribution.packaging.debian.package, debian to
+    distribution.packaging.debian, and readme.sections to sections to
+    clean up some old issues with the schema now that there's an upgrade
+    process.  If readme.sections defined a testing section, move that to
+    test.override.
+
+    Drop support for the support.cpan metadata key, since the CPAN RT
+    instance is going away.  For packages with support.cpan set, if
+    vcs.github was set and support.github was not, set support.github to
+    match vcs.github during a docknot update.
+
+    Drop the current version number from the title of README.md.  This is
+    not a common practice and doesn't seem to add much value.
+
+    Word wrap numeric lists and, in Markdown output, quoted paragraphs.
+    Previously these preserved the original spacing from the input text
+    snippets.
+
+    Require paragraphs be indented by at least six spaces, not five, to be
+    treated as verbatim paragraphs and left unwrapped.  (Markdown
+    paragraphs can still use four spaces because they are wrapped in
+    markup lines.)
+
+    Add some additional markup to the Markdown version of building
+    instructions for packages that use Kerberos and Autoconf.
+
+    Use https for the link and badge for unmaintained packages.
+
 DocKnot 3.05 (2020-08-09)
 
     Change the heuristic for when to refrain from wrapping output

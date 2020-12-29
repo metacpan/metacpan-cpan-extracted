@@ -6,14 +6,16 @@ use warnings;
 
 use Test::More;
 
-plan tests => 2 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 4 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'App/ImageMagickUtils.pm'
 );
 
 my @scripts = (
-    'script/downsize-image'
+    'script/calc-image-resized-size',
+    'script/downsize-image',
+    'script/image-resize-notation-to-human'
 );
 
 # no fake home requested

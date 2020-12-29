@@ -23,7 +23,7 @@ WriteMakefile(
       #   Carp (required) (is core)
       #  And of course, PDF::API2 *OR* PDF::Builder (both can be installed)
     ABSTRACT_FROM     => 'lib/PDF/Table.pm', # retrieve abstract from module
-    AUTHOR            => 'Phil Perry <omega@cpan.org>',
+    AUTHOR            => 'Phil Perry',
     META_MERGE        => {
         resources => {
             bugtracker => 'https://github.com/PhilterPaper/PDF-Table/issues',

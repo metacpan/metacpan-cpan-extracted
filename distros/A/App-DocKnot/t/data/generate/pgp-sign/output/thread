@@ -52,7 +52,7 @@
     \link[todo.html][To-do list] \break
     \link[https://github.com/rra/pgp-sign]
          [GitHub] \break
-    \link[https://rt.cpan.org/Dist/Display.html?Name=PGP-Sign]
+    \link[https://github.com/rra/pgp-sign/issues]
          [Bug tracker] \break
     \link[https://git.eyrie.org/?p=perl/pgp-sign.git]
          [Git repository] \break
@@ -152,7 +152,7 @@ Developer documentation:
 \doc[todo.html][To-do list]
 \doc[https://github.com/rra/pgp-sign]
     [GitHub]
-\doc[https://rt.cpan.org/Dist/Display.html?Name=PGP-Sign]
+\doc[https://github.com/rra/pgp-sign/issues]
     [Bug tracker]
 
 \h2[License]

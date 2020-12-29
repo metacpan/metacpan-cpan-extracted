@@ -86,6 +86,7 @@ lib/Net/LDAP/Control/SortResult.pm
 lib/Net/LDAP/Control/SyncDone.pm
 lib/Net/LDAP/Control/SyncRequest.pm
 lib/Net/LDAP/Control/SyncState.pm
+lib/Net/LDAP/Control/TreeDelete.pm
 lib/Net/LDAP/Control/VLV.pm
 lib/Net/LDAP/Control/VLVResponse.pm
 lib/Net/LDAP/DSML.pm

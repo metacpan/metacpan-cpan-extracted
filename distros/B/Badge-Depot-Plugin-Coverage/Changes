@@ -1,6 +1,65 @@
 Revision history for Badge-Depot-Plugin-Coverage
 
-0.0101 2016-02-17 19:13:34 UTC
+0.0102 2020-12-26 21:35:37 UTC
+ [Bug Fixes]
+ - Url-encode the percentage sign
+
+ [Stats & Dependency Changes]
+ - 3 files changed, 55 insertions(+), 6 deletions(-)
+ - (run req) ~ DateTime (any) --> 1.05
+ - (run req) ~ JSON::MaybeXS (any) --> 1.003003
+ - (run req) ~ Moose (any) --> 2.1803
+ - (run req) ~ MooseX::AttributeShortcuts (any) --> 0.028
+ - (run req) ~ Path::Tiny (any) --> 0.072
+ - (run req) ~ Types::Standard (any) --> 1.000006
+ - (run req) ~ namespace::autoclean (any) --> 0.22
+ - (dev req) + Dist::Zilla 6.015
+ - (dev req) +
+   Dist::Zilla::Plugin::Author::CSSON::GithubActions::Workflow::TestWithMakefile
+   0.0106
+ - (dev req) + Dist::Zilla::Plugin::Git 2.046
+ - (dev req) + Dist::Zilla::Plugin::MetaConfig (any)
+ - (dev req) + Dist::Zilla::Plugin::PromptIfStale 0.057
+ - (dev req) + Pod::Weaver::Section::GenerateSection 1.01
+ - (dev req) + Test::EOF (any)
+ - (dev req) + Test::Version 1
+ - (dev req) ~ Dist::Zilla::Plugin::BumpVersionAfterRelease::Transitional
+   (any) --> 0.009
+ - (dev req) ~ Dist::Zilla::Plugin::ChangeStats::Dependencies::Git (any)
+   --> 0.0200
+ - (dev req) ~ Dist::Zilla::Plugin::CheckChangesHasContent (any) --> 0.011
+ - (dev req) ~ Dist::Zilla::Plugin::Clean (any) --> 0.07
+ - (dev req) ~ Dist::Zilla::Plugin::CopyFilesFromBuild (any) --> 0.170880
+ - (dev req) ~ Dist::Zilla::Plugin::Git::CheckFor::CorrectBranch 0.013 -->
+   0.014
+ - (dev req) ~ Dist::Zilla::Plugin::Git::Contributors (any) --> 0.035
+ - (dev req) ~ Dist::Zilla::Plugin::GithubMeta (any) --> 0.54
+ - (dev req) ~ Dist::Zilla::Plugin::InstallRelease (any) --> 0.008
+ - (dev req) ~ Dist::Zilla::Plugin::MetaProvides::Package (any) -->
+   2.004003
+ - (dev req) ~ Dist::Zilla::Plugin::NextRelease::Grouped (any) --> 0.0200
+ - (dev req) ~ Dist::Zilla::Plugin::PodWeaver (any) --> 4.006
+ - (dev req) ~ Dist::Zilla::Plugin::ReadmeAnyFromPod (any) --> 0.163250
+ - (dev req) ~ Dist::Zilla::Plugin::RunExtraTests (any) --> 0.029
+ - (dev req) ~ Dist::Zilla::Plugin::Test::Compile (any) --> 2.058
+ - (dev req) ~ Dist::Zilla::Plugin::Test::EOF (any) --> 0.0501
+ - (dev req) ~ Dist::Zilla::Plugin::Test::EOL (any) --> 0.18
+ - (dev req) ~ Dist::Zilla::Plugin::Test::NoTabs (any) --> 0.15
+ - (dev req) ~ Dist::Zilla::Plugin::Test::ReportPrereqs (any) --> 0.027
+ - (dev req) ~ Dist::Zilla::Plugin::Test::Version (any) --> 1.09
+ - (dev req) ~ Test::NoTabs (any) --> 1.4
+ - (dev req) ~ Test::Warnings (any) --> 0.026
+ - (dev req) - Dist::Zilla::Plugin::MetaProvides::Class
+ - (dev req) - Dist::Zilla::Plugin::PodnameFromClassname
+ - (dev req) - Dist::Zilla::Plugin::Prereqs::Plugins
+ - (dev req) - Dist::Zilla::Plugin::Test::Kwalitee::Extra
+ - (dev req) - Dist::Zilla::Plugin::TravisYML
+ - (dev req) - Pod::Weaver::Section::Homepage::DefaultCPAN
+ - (dev req) - Pod::Weaver::Section::Source::DefaultGitHub
+ - (dev sug) ~ Dist::Iller 0.1406 --> 0.1409
+ - (dev sug) ~ Dist::Iller::Config::Author::CSSON 0.0307 --> 0.0327
+
+0.0101 2016-02-17T19:13:34Z UTC
  [Bug Fixes]
  - Make it work on 5.10, for real.
 

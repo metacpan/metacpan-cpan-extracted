@@ -1,9 +1,9 @@
 package Data::Sah::Filter::perl::Unix::check_gid_exists;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-06-13'; # DATE
+our $DATE = '2020-10-16'; # DATE
 our $DIST = 'Sah-Schemas-Unix'; # DIST
-our $VERSION = '0.012'; # VERSION
+our $VERSION = '0.013'; # VERSION
 
 use 5.010001;
 use strict;
@@ -47,7 +47,7 @@ Data::Sah::Filter::perl::Unix::check_gid_exists
 
 =head1 VERSION
 
-This document describes version 0.012 of Data::Sah::Filter::perl::Unix::check_gid_exists (from Perl distribution Sah-Schemas-Unix), released on 2020-06-13.
+This document describes version 0.013 of Data::Sah::Filter::perl::Unix::check_gid_exists (from Perl distribution Sah-Schemas-Unix), released on 2020-10-16.
 
 =for Pod::Coverage ^(meta|filter)$
 

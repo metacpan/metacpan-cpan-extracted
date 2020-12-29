@@ -3,10 +3,11 @@ package PDF::Builder::Resource::CIDFont;
 use base 'PDF::Builder::Resource::BaseFont';
 
 use strict;
-no warnings qw[ deprecated recursion uninitialized ];
+use warnings;
+#no warnings qw[ deprecated recursion uninitialized ];
 
-our $VERSION = '3.020'; # VERSION
-my $LAST_UPDATE = '3.018'; # manually update whenever code is changed
+our $VERSION = '3.021'; # VERSION
+my $LAST_UPDATE = '3.021'; # manually update whenever code is changed
 
 use Encode qw(:all);
 
@@ -69,6 +70,8 @@ sub uniByCId {
     return $uni;
 }
 
+# note that cidByUni has been seen returning 'undef' in some cases. be sure
+# to handle this!
 sub cidByUni { 
     return $_[0]->data()->{'u2g'}->{$_[1]}; 
 }
@@ -175,7 +178,7 @@ Returns the CID-encoded string from utf8-string.
 sub cidsByUtf {
     my ($self, $s) = @_;
 
-    $s = pack('n*', map { $self->cidByUni($_) } (map { $_>0x7f && $_<0xA0? uniByName(nameByUni($_)): $_ } unpack('U*', $s)));
+    $s = pack('n*', map { $self->cidByUni($_)||0 } (map { $_>0x7f && $_<0xA0? uniByName(nameByUni($_)): $_ } unpack('U*', $s)));
     utf8::downgrade($s);
     return $s;
 }

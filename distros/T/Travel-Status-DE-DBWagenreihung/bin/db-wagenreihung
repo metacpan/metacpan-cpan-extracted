@@ -4,7 +4,7 @@ use warnings;
 use 5.020;
 use utf8;
 
-our $VERSION = '0.03';
+our $VERSION = '0.05';
 
 use Getopt::Long;
 use List::Util qw(min);
@@ -160,7 +160,7 @@ B<db-wagenreihung> I<station> I<train-number>
 
 =head1 VERSION
 
-version 0.03
+version 0.05
 
 This is beta software: API and output format may change without notice.
 

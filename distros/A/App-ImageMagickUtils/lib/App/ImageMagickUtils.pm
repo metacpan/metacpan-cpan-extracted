@@ -1,9 +1,9 @@
 package App::ImageMagickUtils;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-06-25'; # DATE
+our $DATE = '2020-09-23'; # DATE
 our $DIST = 'App-ImageMagickUtils'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.003'; # VERSION
 
 use 5.010001;
 use strict;
@@ -185,7 +185,7 @@ App::ImageMagickUtils - Utilities related to ImageMagick
 
 =head1 VERSION
 
-This document describes version 0.001 of App::ImageMagickUtils (from Perl distribution App-ImageMagickUtils), released on 2020-06-25.
+This document describes version 0.003 of App::ImageMagickUtils (from Perl distribution App-ImageMagickUtils), released on 2020-09-23.
 
 =head1 FUNCTIONS
 

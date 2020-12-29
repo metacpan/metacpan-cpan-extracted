@@ -1,14 +1,14 @@
 package Sah::Schema::unix::signal;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-06-13'; # DATE
+our $DATE = '2020-10-16'; # DATE
 our $DIST = 'Sah-Schemas-Unix'; # DIST
-our $VERSION = '0.012'; # VERSION
+our $VERSION = '0.013'; # VERSION
 
 our $schema = ['str' => {
     'summary' => 'Unix signal name (e.g. TERM or KILL) or number (9 or 15)',
     match => '\A(?:[A-Z]+[0-9]*|[1-9][0-9]*)\z',
-    'x.examples' => [qw/HUP INT QUIT ILL ABRT FPE KILL SEGV PIPE ALRM TERM USR1 USR2 CHLD CONT STOP TSTP TTIN TTOU/, 1..15],
+    examples => [qw/HUP INT QUIT ILL ABRT FPE KILL SEGV PIPE ALRM TERM USR1 USR2 CHLD CONT STOP TSTP TTIN TTOU/, 1..15],
 _
 }, {}];
 
@@ -27,7 +27,7 @@ Sah::Schema::unix::signal - Unix signal name (e.g. TERM or KILL) or number (9 or
 
 =head1 VERSION
 
-This document describes version 0.012 of Sah::Schema::unix::signal (from Perl distribution Sah-Schemas-Unix), released on 2020-06-13.
+This document describes version 0.013 of Sah::Schema::unix::signal (from Perl distribution Sah-Schemas-Unix), released on 2020-10-16.
 
 =head1 SYNOPSIS
 
@@ -89,6 +89,76 @@ L<Perinci::CmdLine> to create a CLI:
  % ./myapp.pl --version
 
  % ./myapp.pl --arg1 ...
+
+Sample data:
+
+ undef  # INVALID
+
+ undef  # INVALID
+
+ undef  # INVALID
+
+ undef  # INVALID
+
+ undef  # INVALID
+
+ undef  # INVALID
+
+ undef  # INVALID
+
+ undef  # INVALID
+
+ undef  # INVALID
+
+ undef  # INVALID
+
+ undef  # INVALID
+
+ undef  # INVALID
+
+ undef  # INVALID
+
+ undef  # INVALID
+
+ undef  # INVALID
+
+ undef  # INVALID
+
+ undef  # INVALID
+
+ undef  # INVALID
+
+ undef  # INVALID
+
+ undef  # INVALID
+
+ undef  # INVALID
+
+ undef  # INVALID
+
+ undef  # INVALID
+
+ undef  # INVALID
+
+ undef  # INVALID
+
+ undef  # INVALID
+
+ undef  # INVALID
+
+ undef  # INVALID
+
+ undef  # INVALID
+
+ undef  # INVALID
+
+ undef  # INVALID
+
+ undef  # INVALID
+
+ undef  # INVALID
+
+ undef  # INVALID
 
 =head1 HOMEPAGE
 

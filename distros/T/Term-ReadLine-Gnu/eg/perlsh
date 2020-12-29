@@ -1,6 +1,6 @@
 #! /usr/local/bin/perl
 #
-#	$Id: perlsh 475 2014-12-13 03:20:00Z hayashi $	
+#	$Id: perlsh 569 2020-04-23 13:32:23Z hayashi $	
 #
 #	Copyright (c) 1996 Hiroo Hayashi. All Rights Reserved.
 #
@@ -474,7 +474,7 @@ for details.
 
 L<Term::ReadLine::Gnu|http://search.cpan.org/dist/Term-ReadLine-Gnu/>
 
-L<GNU Readline Library|http://cnswww.cns.cwru.edu/php/chet/readline/rltop.html>
+L<GNU Readline Library|https://tiswww.cwru.edu/php/chet/readline/rltop.html>
 
 =head1 AUTHOR
 

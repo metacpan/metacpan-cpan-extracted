@@ -1,3 +1,7 @@
+0.018  2020-12-26
+   - Support the 'Bearer' keyword in the authorization field.
+     (Mikko Koivunalho)
+
 0.017  2018-12-08
    - Fix issue with Headers object redirection (Issue #8)
    - Declare minimum required Perl version (Mohammad S Anwar)

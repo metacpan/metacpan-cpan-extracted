@@ -1,8 +1,17 @@
 =head1 NAME
 
-STEVEB::Dist::Mgr - My distribution release cycle toolkit
+STEVEB::Dist::Mgr - My distribution development cycle toolkit
+
+=for html
+<a href="https://github.com/stevieb9/steveb-dist-mgr/actions"><img src="https://github.com/stevieb9/steveb-dist-mgr/workflows/CI/badge.svg"/></a>
+<a href='https://coveralls.io/github/stevieb9/steveb-dist-mgr?branch=master'><img src='https://coveralls.io/repos/stevieb9/steveb-dist-mgr/badge.svg?branch=master&service=github' alt='Coverage Status' /></a>
 
 =head1 DESCRIPTION
+
+This distribution is for my personal development cycle. At this time, is relies
+on using L<Module::Starter> for initial distribution creation, Github for
+repository and bugtracker, and the L<ExtUtils::MakeMaker> build system, which
+utilizes C<Makefile.PL> files.
 
 =head1 SYNOPSIS
 
@@ -17,6 +26,10 @@ STEVEB::Dist::Mgr - My distribution release cycle toolkit
 We do not automatically import anything into your namespace, you must request
 functionality explicitly. Available functions are:
 
+    # Create a new distribution
+
+    init
+
     # Makefile.PL functions
 
     add_bugtracker
@@ -26,6 +39,23 @@ functionality explicitly. Available functions are:
 
     bump_version
     get_version_info
+
+    # CI functions
+
+    ci_github
+    ci_badges
+
+    # MANIFEST.SKIP functions
+
+    manifest_skip
+
+    # Git functions
+
+    git_ignore
+
+    # Maintenance functions
+
+    remove_unwanted_files
 
 NOTE: You can auto import everything at once by specifying the C<:all> tag.
 
@@ -124,6 +154,49 @@ I<Returns>: An HoH:
         },
     };
 
+=head2 ci_badges
+
+Inserts various CI and coverage badges into module files.
+
+I<Parameters>:
+
+    $author
+
+I<Mandatory, String>: The repository owner (eg. mine is 'stevieb9').
+
+    $repository
+
+I<Mandatory, String>: The name of the repository (eg. this one is
+'steveb-dist-mgr').
+
+    $fs_entry
+
+I<Optional, String>: The path and name of a Perl module file, or a directory
+that contains Perl module files. If a directory is sent in, we'll operate
+recursively.
+
+I<Returns>: C<0> upon success.
+
+=head2 ci_github
+
+Installs a Github Actions configuration file into C<.github/workflows>. We'll
+create the directory if it doesn't exist.
+
+I<Parameters>:
+
+    $os
+
+I<Optional, Array Reference>: A list of the Operating Systems you want to run
+your tests on.
+
+I<Valid values>: C<l>, C<w>, C<m>, where:
+
+    l == Linux (Ubuntu to be specific)
+    w == Windows
+    m == MacOS
+
+I<Returns>: An array of the contents of the generated file.
+
 =head2 get_version_info
 
 Fetches the file version information of Perl module files. Can operate on a
@@ -148,19 +221,60 @@ I<Returns>: Hash reference:
         't/data/orig/No.pm'     => undef,   # No $VERSION defined
     };
 
-=head1 AUTHOR
+=head2 git_ignore
 
-Steve Bertrand, C<< <steveb at cpan.org> >>
+Generates a C<.gitignore> file.
 
-=head1 LICENSE AND COPYRIGHT
+I<Parameters>:
 
-Copyright 2020 Steve Bertrand.
+    $directory
 
-This program is free software; you can redistribute it and/or modify it
-under the terms of the the Artistic License (2.0). You may obtain a
-copy of the full license at:
+I<Optional, String>: The directory where we'll create the file. If not
+specified, we'll create it in the current directory, C<.>.
 
-L<http://www.perlfoundation.org/artistic_license_2_0>
+I<Returns>: An array of the file's contents.
+
+=head2 init
+
+Initializes a new distribution using L<Module::Starter>. The new directory will
+be placed into the current working directory (C<.>).
+
+I<Parameters>:
+
+    module  => "Test::Module"
+
+I<Mandatory, String>: The name of the main module of the distribution.
+
+    author  => "Steve Bertrand"
+
+I<Mandatory, String>: The name of the distribution's author.
+
+    email  => "steveb@cpan.org"
+
+I<Mandatory, String>: The email address of the author.
+
+    license  => "artistic2"
+
+I<Optional, String>: The license to apply to the new distribution. Defaults to
+C<artistic2>. See L<Module::Starter> for valid entries.
+
+=head2 manifest_skip
+
+Generates a C<MANIFEST.SKIP> file.
+
+I<Parameters>:
+
+    $directory
+
+I<Optional, String>: The directory where we'll create the file. If not
+specified, we'll create it in the current directory, C<.>.
+
+I<Returns>: An array of the file's contents.
+
+=head2 remove_unwanted_files
+
+Removes unwanted file system entries. We always operate from the perspective of
+the current working directory (C<.>).
 
 =head1 AUTHOR
 

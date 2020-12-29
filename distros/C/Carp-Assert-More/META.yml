@@ -24,8 +24,7 @@ requires:
   Test::Exception: '0'
   Test::More: '0.18'
 resources:
-  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Carp-Assert-More
-  license: http://www.opensource.org/licenses/artistic-license-2.0.php
-  repository: https://github.com/petdance/carp-assert-more/tree/master
-version: '1.24'
+  bugtracker: https://github.com/petdance/carp-assert-more/issues
+  license: https://opensource.org/licenses/artistic-license-2.0.php
+version: '1.26'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.011'

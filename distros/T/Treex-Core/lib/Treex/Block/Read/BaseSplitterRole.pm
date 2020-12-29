@@ -1,5 +1,5 @@
 package Treex::Block::Read::BaseSplitterRole;
-$Treex::Block::Read::BaseSplitterRole::VERSION = '2.20160630';
+$Treex::Block::Read::BaseSplitterRole::VERSION = '2.20201228';
 use strict;
 use warnings;
 use Moose::Role;
@@ -59,7 +59,7 @@ Treex::Block::Read::BaseSplitterRole
 
 =head1 VERSION
 
-version 2.20160630
+version 2.20201228
 
 =head1 DESCRIPTION
 

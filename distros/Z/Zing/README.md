@@ -637,10 +637,9 @@ actor-model system:
 - In Zing, actors are always active (each runs its own infinite event-loop).
 - In Zing, actors can communicate unrestricted (no approved communicators).
 - In Zing, actors can block using `poll` but do not block by default.
-- In Zing, the default datastore/backend is [Redis](https://redis.io) which means
-the system is (by default) subject to the guarantees and limitations of that
-system. Data is serialized as [JSON](https://json.org) and stored in
-plain-text.
+- In Zing, the system responsible for persistence and atomicity is pluggable and
+as such is subject to the guarantees and limitations of that underlying system.
+Data serialization, e.g. [JSON](https://json.org), is also pluggable.
 
 # AUTHOR
 

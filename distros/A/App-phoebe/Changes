@@ -1,3 +1,11 @@
+2.07
+
+- Fixed serving of robots.txt in a virtual hosting environment;
+  ignoring query and fragment when deciding whether to serve the
+  default robots.txt.
+
+- phoebe-ctl can export HTML.
+
 2.02
 
 - Handle international domain names: when you provide them with the

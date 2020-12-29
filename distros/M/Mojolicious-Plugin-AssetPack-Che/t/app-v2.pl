@@ -6,10 +6,10 @@ plugin 'AssetPack::Che' => {
   CombineFile => {
     gzip => {min_size => 1000},
   },
-  process => {
-    'main.css'=>['css/foo.css', 'css/bar.css',],
-    'папка/подпапка/шаблон.html?bar'=>['templates/1.html', 'templates/2.html',],
-  },
+  process => [
+    ['main.css'=>qw(css/foo.css css/bar.css)],
+    ['папка/подпапка/шаблон.html?bar'=>qw(templates/1.html templates/2.html)],
+  ],
   #~ CombineFile => {version=>'2'},
 };
 

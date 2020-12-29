@@ -7,7 +7,7 @@ use_ok ('XS::Check');
 use XS::Check;
 my $warning;
 $SIG{__WARN__} = sub {
-$warning = shift;
+    $warning = shift;
 };
 my $checker = XS::Check->new ();
 $checker->check (<<EOF);
@@ -107,9 +107,9 @@ ok ($warning, "warning from bad reporter value");
 like ($warning, qr/code reference/, "correct warning");
 
 TODO: {
-local $TODO='read function arguments';
-$warning = undef;
-$checker->check (<<'EOF');
+    local $TODO='read function arguments';
+    $warning = undef;
+    $checker->check (<<'EOF');
 static void
 sv_to_text_fuzzy (SV * text, STRLEN length)
 {
@@ -117,8 +117,9 @@ sv_to_text_fuzzy (SV * text, STRLEN length)
     /* Copy the string in "text" into "text_fuzzy". */
     stuff = (unsigned char *) SvPV (text, length);
 EOF
-ok (! $warning, "No warning with variable from function argument");
-};
+    ok (! $warning, "No warning with variable from function argument");
+}
+;
 
 
 

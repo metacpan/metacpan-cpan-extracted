@@ -3,7 +3,7 @@ package Data::Hopen::G::Runnable;
 use strict;
 use Data::Hopen::Base;
 
-our $VERSION = '0.000018';
+our $VERSION = '0.000019';
 
 use Data::Hopen;
 use Data::Hopen::Scope::Hash;
@@ -77,10 +77,6 @@ A L<Data::Hopen::Scope> or subclass including the inputs the caller wants to
 pass to the Runnable.  The L</scope> of the Runnable itself may override
 values in the C<context>.
 
-=item -phase
-
-If given, the phase that is currently under way in a build-system run.
-
 =item -visitor
 
 If given, an instance that supports C<visit_goal()> and C<visit_node()> calls.
@@ -106,7 +102,7 @@ scope.
 =cut
 
 sub run {
-    my ($self, %args) = getparameters('self', [qw(; context phase visitor nocontext)], @_);
+    my ($self, %args) = getparameters('self', [qw(; context visitor nocontext)], @_);
     my $context_scope = $args{context};     # which may be undef - that's OK
     croak "Can't combine -context and -nocontext" if $args{context} && $args{nocontext};
 
@@ -115,7 +111,7 @@ sub run {
 
     hlog { '->', ref($self), $self->name, 'input', Dumper($self->scope->as_hashref) } 3;
 
-    my $retval = $self->_run(forward_opts(\%args, {'-'=>1}, qw[phase visitor]));
+    my $retval = $self->_run(forward_opts(\%args, {'-'=>1}, qw[visitor]));
 
     die "$self\->_run() did not return a hashref" unless ref $retval eq 'HASH';
         # Prevent errors about `non-hashref 1` or `invalid key`.
@@ -131,13 +127,13 @@ The internal method that implements L</run>.  Must be implemented by
 subclasses.  When C<_run> is called, C<< $self->scope >> has been hooked
 to the context scope, if any.
 
-Parameters are C<-phase> and C<-visitor>, and are always passed by name
-(C<< -phase=>$p, -visitor=>$v >>).  C<_run> is always called in scalar context,
+The only parameter is C<-visitor>, which is always passed by name
+(C<< -visitor=>$v >>).  C<_run> is always called in scalar context,
 and B<must> return a new hashref.
 
 I recommend starting your C<_run> function with:
 
-    my ($self, %args) = getparameters('self', [qw(; phase visitor)], @_);
+    my ($self, %args) = getparameters('self', [qw(; visitor)], @_);
 
 and working from there.
 

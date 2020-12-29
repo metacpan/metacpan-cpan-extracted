@@ -1,10 +1,10 @@
-# [% name %] [% version %]
-[% IF vcs.status || distribution.cpan || orphaned || packaging.debian %]
-[% IF orphaned %][![No maintenance intended](http://unmaintained.tech/badge.svg)](http://unmaintained.tech/) [% END -%]
+# [% name %]
+[% IF vcs.status || distribution.cpan || orphaned || distribution.packaging.debian %]
+[% IF orphaned %][![No maintenance intended](https://unmaintained.tech/badge.svg)](https://unmaintained.tech/) [% END -%]
 [% IF vcs.status.travis %][![Build status](https://travis-ci.org/[% vcs.status.travis %].svg?branch=master)](https://travis-ci.org/[% vcs.status.travis %]) [% END -%]
 [% IF vcs.status.workflow %][![Build status](https://github.com/[% vcs.github %]/workflows/[% vcs.status.workflow %]/badge.svg)](https://github.com/[% vcs.github %]/actions) [% END -%]
 [% IF distribution.cpan %][![CPAN version](https://img.shields.io/cpan/v/[% distribution.cpan %])](https://metacpan.org/release/[% distribution.cpan %])[% IF vcs.github %] [![License](https://img.shields.io/cpan/l/[% distribution.cpan %])](https://github.com/[% vcs.github %]/blob/master/LICENSE)[% END %] [% END -%]
-[% IF packaging.debian %][![Debian package](https://img.shields.io/debian/v/[% packaging.debian %]/unstable)](https://tracker.debian.org/pkg/[% packaging.debian %])[% END -%]
+[% IF distribution.packaging.debian.package %][![Debian package](https://img.shields.io/debian/v/[% distribution.packaging.debian.package %]/unstable)](https://tracker.debian.org/pkg/[% distribution.packaging.debian.package %])[% END -%]
 
 [% END %]
 [% FOREACH copr IN copyrights %]Copyright [% copr.years %]
@@ -35,8 +35,8 @@ and need to regenerate Makefile.in, you will need Automake
 configure.ac or any of the m4 files it includes and need to regenerate
 configure or config.h.in, you will need Autoconf [% build.autoconf %] or
 later.[% IF build.manpages %]  Perl is also required to generate manual
-pages from a fresh Git checkout.[% END %][% IF bootstrap %]
-[% bootstrap %][% END %]
+pages from a fresh Git checkout.[% END %][% IF build.bootstrap %]
+[% build.bootstrap %][% END %]
 [% END %][% IF build.type == 'Module::Build' %]
 ## Building and Installation
 
@@ -117,11 +117,11 @@ you need to specify a different Kerberos installation root via
 
 You can also individually set the paths to the include directory and the
 library directory with `--with-krb5-include` and `--with-krb5-lib`.  You
-may need to do this if Autoconf can't figure out whether to use lib,
-lib32, or lib64 on your platform.
+may need to do this if Autoconf can't figure out whether to use `lib`,
+`lib32`, or `lib64` on your platform.
 
-To not use krb5-config and force library probing even if there is a
-krb5-config script on your path, set PATH_KRB5_CONFIG to a nonexistent
+To not use `krb5-config` and force library probing even if there is a
+`krb5-config` script on your path, set `PATH_KRB5_CONFIG` to a nonexistent
 path:
 
 ```
@@ -155,9 +155,11 @@ that make shared library migrations more difficult.  If none of the above
 made any sense to you, don't bother with this flag.
 [% END %][% IF build.suffix %]
 [% build.suffix %]
-[% END %][% END %][% IF !readme.testing && (build.type == 'Module::Build' || build.type == 'ExtUtils::MakeMaker' || build.type == 'Autoconf') %]
+[% END %][% END %][% IF test.override || build.type == 'Module::Build' || build.type == 'ExtUtils::MakeMaker' || build.type == 'Autoconf' %]
 ## Testing
-[% IF test.prefix %]
+[% IF test.override %]
+[% test.override %]
+[% ELSE %][% IF test.prefix %]
 [% test.prefix %]
 [% ELSE %]
 [% name %] comes with a test suite, which you can run after building with:
@@ -196,7 +198,7 @@ Do this instead of running the test program directly since it will ensure
 that necessary environment variables are set up.
 [% END %][% IF test.suffix %]
 [% test.suffix %]
-[% END %][% IF build.lancaster %]
+[% END %][% END %][% IF test.lancaster %]
 To enable tests that don't detect functionality problems but are used to
 sanity-check the release, set the environment variable `RELEASE_TESTING`
 to a true value.  To enable tests that may be sensitive to the local
@@ -204,19 +206,11 @@ environment or that produce a lot of false positives without uncovering
 many problems, set the environment variable `AUTHOR_TESTING` to a true
 value.
 [% END %][% END %]
-[% FOREACH section IN readme.sections %]## [% section.title %]
+[% FOREACH section IN sections %]## [% section.title %]
 
 [% section.body %]
 
-[% IF section.title == 'Testing' && build.lancaster %]
-To enable tests that don't detect functionality problems but are used to
-sanity-check the release, set the environment variable `RELEASE_TESTING`
-to a true value.  To enable tests that may be sensitive to the local
-environment or that produce a lot of false positives without uncovering
-many problems, set the environment variable `AUTHOR_TESTING` to a true
-value.
-
-[% END %][% END %]## Support
+[% END %]## Support
 
 The [[% name %] web page]([% support.web %]) will always have the current
 version of this package, the current documentation, and pointers to any
@@ -228,9 +222,7 @@ mailing list.  To subscribe or see the list archives, go to the
 [% END %][% IF support.extra %]
 [% support.extra %]
 [% END %]
-[% IF support.cpan %]
-For bug tracking, use the [CPAN bug
-tracker](https://rt.cpan.org/Dist/Display.html?Name=[% support.cpan %]).[% ELSIF support.github %]
+[% IF support.github %]
 For bug tracking, use the [issue tracker on
 GitHub](https://github.com/[% support.github %]/issues).[% ELSE %]
 I welcome bug reports and patches for this package at
@@ -252,12 +244,9 @@ or [view the repository on the web]([% vcs.browse %]).
 The eyrie.org repository is the canonical one, maintained by the
 author, but using GitHub is probably more convenient for most purposes.
 Pull requests are gratefully reviewed and normally accepted.
-[% IF support.cpan %]It's probably better to use the CPAN bug tracker than
-GitHub issues, though, to keep all Perl module issues in the same
-place.[% END %]
 [% ELSIF vcs.type == 'Git' %]
 When contributing modifications, patches (possibly generated by
-git-format-patch) are preferred to Git pull requests.
+`git-format-patch`) are preferred to Git pull requests.
 [% END %]
 ## License
 
@@ -267,7 +256,7 @@ statement and license:
 > Copyright [% copr.years %]
 >     [% copr.holder %]
 >[% END %]
-[% indent(license.full, 1, '>') %][% IF license.notices %]
+[% indent(license.text, 1, '>') %][% IF license.notices %]
 >
 [% indent(license.notices, 1, '>') %][% END %]
 

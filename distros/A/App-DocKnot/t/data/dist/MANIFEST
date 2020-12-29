@@ -1,8 +1,5 @@
 Build.PL
-docs/metadata/blurb
-docs/metadata/description
-docs/metadata/metadata.json
-docs/metadata/requirements
+docs/docknot.yaml
 lib/Empty.pm
 MANIFEST			This list of files
 MANIFEST.SKIP

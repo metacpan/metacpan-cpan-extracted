@@ -4,7 +4,7 @@ Plack::Middleware::Text::Minify - minify text responses on the fly
 
 # VERSION
 
-version v0.1.0
+version v0.1.1
 
 # SYNOPSIS
 
@@ -36,7 +36,8 @@ does not match, then the response won't be minified.
 
 The callback takes the `PATH_INFO` and Plack environment as arguments.
 
-By default, it will match against any path.
+By default, it will match against any path except for HTTP status
+codes with no bodies, or request methods other than `GET` or `POST`.
 
 ## type
 
@@ -47,6 +48,13 @@ The callback takes the content-type header and the Plack reponse as
 arguments.
 
 By default, it will match against any "text/" MIME type.
+
+# KNOWN ISSUES
+
+## Support for older Perl versions
+
+This module requires Perl v5.9.3 or newer, which is the minimum
+version supported by [Text::Minify::XS](https://metacpan.org/pod/Text::Minify::XS).
 
 # SEE ALSO
 

@@ -1,9 +1,10 @@
 ---
-abstract: unknown
+abstract: 'A Template Plugin To Use URI Objects'
 author:
-  - unknown
+  - 'Denis Boyun <denisboyun@gmail.com>'
 build_requires:
   ExtUtils::MakeMaker: '0'
+  Test::More: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
@@ -18,9 +19,10 @@ no_index:
     - t
     - inc
 requires:
-  Module::Build: '0'
   Template: '2.26'
-  Test::More: '0'
   URI: '1.74'
-version: '0.02'
+  perl: '5.006'
+resources:
+  bugtracker: https://github.com/dboys/Template-Plugin-URI/issues
+version: '0.03'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

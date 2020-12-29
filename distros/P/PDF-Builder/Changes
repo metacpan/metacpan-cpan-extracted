@@ -2,6 +2,65 @@ See also INFO/Changes-ver_2 for changes released for PDF::API2, and
 incorporated into PDF::Builder.
 See also INFO/Changes_2019 for earlier version 3 release logs.
 
+3.021     2020-12-28
+
+    Makefile.PL, CONTRIBUTING, INFO/SUPPORT, INFO/old/dist.ini.old, README.md
+     Some cleanup of email addresses and obsolete support venues.
+
+    Makefile.PL, lib/PDF/Builder.pm, t/00-all-usable.t
+     New minimum version for Image::PNG::Libpng is now 0.56. There was a change
+      introduced in 0.53 that broke PDF::Builder, but has now been fixed. As
+      far as we know, versions 0.47 through 0.52 should still work, if you 
+      happen to have that installed, but for automated install/upgrade, the 
+      new minimum is now 0.56.
+
+    lib/PDF/Builder/Resource/XObject/Image/TIFF_GT.pm
+     Added some support for TIFF with alpha channel display [CTS 33, with some
+      help from 'carygravel']. Limited testing due to lack of sample .tif 
+      files, and currently not doing anything about transparency mask type or
+      any higher-numbered PhotometricInterpretation types.
+
+    tools/1_pc.pl, lib/PDF/Builder/Resource/Glyphs.pm, 
+      t/gif-png-pnm-rt120397-tiff.t
+     Clean up a few things Perl Critic doesn't like, and exclude a few more
+      frivolous things (in the exclusion list).
+
+    lib/PDF/Builder.pm, t/00-all-usable.t
+     Consolidate "optional" library versions to make update easier.
+
+    lib/PDF/Builder/Basic/PDF/File.pm
+     Change grep from expression format to { }, per PDF::API2 change.
+
+    README.md (added), README (removed), MANIFEST
+     Replace the plain text README with a markdown-formatted README.md
+
+    lib/PDF/Builder.pm, lib/PDF/Builder/Content-Lite-NamedDestination-UniWrap-
+      Util.pm, lib/PDF/Builder/Basic/PDF/Dict-File-Literal.pm,
+      lib/PDF/Builder/Basic/PDF/Filter/LZWDecode.pm, 
+      lib/PDF/Builder/Resource/CIDFont-ColorSpace-ExtGState-Font.pm,
+      lib/PDF/Builder/Resource/CIDFont/CJKFont-TrueType.pm,
+      lib/PDF/Builder/Resource/CIDFont/TrueType/FontFile.pm,
+      lib/PDF/Builder/Resource/ColorSpace/DeviceN-Indexed-Separation.pm,
+      lib/PDF/Builder/Resource/ColorSpace/Indexed/ACTFile-Hue-WebColor.pm,
+      lib/PDF/Builder/Resource/Font/BDFont-CoreFont-Postscript-SynFont.pm,
+      lib/PDF/Builder/Resource/XObject/Image/GD-GIF-PNM-TIFF-TIFF_GT.pm,
+      examples/Windows/Win32.pm, examples/Content-ContentText.pl,
+      examples/021_synfonts-023_cjkfonts-025_unifonts, 
+      tools/1_pc.pl, tools/3_examples.pl, t/deprecations.t
+     Change any "no warnings" directive to "use warnings", and fix any
+      resulting issues. This makes perlcritic and CPAN kwalitee a bit happier.
+
+      For now, just commented out "no warnings". If no reports of problems,
+      will physically remove commented-out lines in 3.022 or later. If you 
+      encounter Perl warnings from specific routines, you can uncomment the
+      "no warnings" and comment out "use warnings", to get past the warnings,
+      but please also file a bug report!
+
+    t/00-all-usable.t, Makefile.PL, lib/PDF/Builder.pm,
+      lib/PDF/Builder/Resource/XObject/Image/TIFF_GT.pm
+     Make both t-tests and runtime a bit more robust if an optional library
+      (Graphics::TIFF and/or Image::PNG::Libpng) is installed, but back-level.
+
 3.020     2020-11-29
 
     lib/PDF/Builder/Content-Outline-NamedDestination.pm, INFO/DEPRECATED

@@ -8,6 +8,12 @@ The official repository for PDF::Table module collaboration:
 
 Any patches, pull requests, issues and feedback are more than welcome.
 
+Do NOT under ANY circumstances open a PR (Pull Request) to report a bug. It is
+a waste of both your and our time and effort. Open a regular ticket (issue),
+and attach a Perl (.pl) program illustrating the problem, if possible. If you
+believe that you have a program patch, and offer to share it as a PR, we may
+give the go-ahead. Unsolicited PRs may be closed without further action.
+
 ## Prerequisites
 
 Required for installation: Test::More
@@ -34,9 +40,8 @@ To see a list of changes, please do one or more of the following:
 
 ## Contacts
 
-- Use the issue tracker on GitHub
-- See "http://search.cpan.org/~omega/"
-- See "http://search.cpan.org/~jbazik/"
+- Use the issue tracker on GitHub, "https://github.com/PhilterPaper/PDF-Table/issues"
+- See "https://metacpan.org/pod/PDF::Table" for distribution and more information
 
 ## License
 Copyright (C) 2006 by Daemmon Hughes

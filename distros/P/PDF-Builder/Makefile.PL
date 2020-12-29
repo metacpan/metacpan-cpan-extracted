@@ -8,7 +8,7 @@ use ExtUtils::MakeMaker 6.5503;
 my $PERL_version = '5.020000';  # can't use in "use" statement above! eval?
                                 # could read from .perl-version file otherwise
 my $MakeMaker_version = '6.5503';
-my $version = '3.020';          # PDFbuild.pl updates from 'version' file
+my $version = '3.021';          # PDFbuild.pl updates from 'version' file
 
 # optional libraries... prompt user whether or not to install
 # nice to have but not vital for many users
@@ -21,9 +21,11 @@ my @choice_list = ( # use array to guarantee order
 	# 'a' and 'n' are reserved, do not use as key [0]
 	# [1] is actual library name [2] is minimum version [3] description
   ["t", "Graphics::TIFF", 7, "TIFF image support"],
-        # improved TIFF image processing
-  ["p", "Image::PNG::Libpng", 0.47, "PNG image support"],
-        # advanced/fast PNG image processing
+        # improved TIFF image processing. DON'T FORGET TO UPDATE VERSION in
+	#   t/00-all-usable.t, lib/PDF/Builder.pm
+  ["p", "Image::PNG::Libpng", 0.56, "PNG image support"],
+        # advanced/fast PNG image processing. DON'T FORGET TO UPDATE VERSION in
+	#   t/00-all-usable.t, lib/PDF/Builder.pm
   ["h", "HarfBuzz::Shaper", 0.23, "complex script support"],
         # text shaping for Latin script ligatures and kerning, and for 
 	# many complex scripts both LTR and RTL directions.
@@ -77,7 +79,7 @@ my %WriteMakefileArgs =
 # ABSTRACT_FROM	 => $master,
  ABSTRACT       => "Facilitates the creation and modification of PDF files",
 
- AUTHOR		=> 'Phil Perry <phil4597@catskilltech.com>',
+ AUTHOR		=> 'Phil Perry',
  LICENSE	=> "lgpl",
  MIN_PERL_VERSION	=> $PERL_version,
  INSTALLDIRS	=> "site",
@@ -118,7 +120,7 @@ my %WriteMakefileArgs =
 
     resources => {
 
-      homepage => "https://www.catskilltech.com",
+      homepage => "https://metacpan.org/pod/PDF::Builder",
 
       repository => {
           type => 'git',
@@ -128,7 +130,6 @@ my %WriteMakefileArgs =
 
       bugtracker => {
 	  web => 'https://github.com/PhilterPaper/Perl-PDF-Builder/issues',
-	  mailto => 'support2854 [at] catskilltech.com',
       },
 
     },
@@ -172,7 +173,7 @@ if (scalar @choice_list > 0) {  # in case all disabled!
 # $c should have one or more of a,n (contradictory!) t,p,h
 
 if ($c !~ m/n/) { # remind user that librarie(s) to be installed/updated
-print <<END;
+print <<'END';
 ===========================================================================
 The installation process will attempt to install or update several OPTIONAL
 prerequisite packages. If one or more should fail to install, Don't Panic

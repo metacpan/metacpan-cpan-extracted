@@ -18,8 +18,6 @@ package Text::CSV_XS;
 
 require 5.006001;
 
-#use p7;
-#use standard;
 use strict;
 use warnings;
 
@@ -28,7 +26,7 @@ use XSLoader;
 use Carp;
 
 use vars   qw( $VERSION @ISA @EXPORT_OK );
-$VERSION   = "1.44";
+$VERSION   = "1.45";
 @ISA       = qw( Exporter );
 @EXPORT_OK = qw( csv );
 XSLoader::load ("Text::CSV_XS", $VERSION);
@@ -1154,7 +1152,11 @@ sub _csv_attr {
 	qq{ csv (in => csv (in => "$in"), out => "$out");\n});
 
     if ($out) {
-	if ((ref $out and "SCALAR" ne ref $out) or "GLOB" eq ref \$out) {
+	if (ref $out and ("ARRAY" eq ref $out or "HASH" eq ref $out)) {
+	    delete $attr{'out'};
+	    $sink = 1;
+	    }
+	elsif ((ref $out and "SCALAR" ne ref $out) or "GLOB" eq ref \$out) {
 	    $fh = $out;
 	    }
 	elsif (ref $out and "SCALAR" eq ref $out and defined ${$out} and ${$out} eq "skip") {
@@ -1461,7 +1463,30 @@ sub csv {
 	    }
 	}
 
-    $c->{'sink'} and return;
+    if ($c->{'sink'}) {
+	my $ro = ref $c->{'out'} or return;
+
+	$ro eq "SCALAR" && ${$c->{'out'}} eq "skip" and
+	    return;
+
+	$ro eq ref $ref or
+	    croak ($csv->_SetDiagInfo (5001, "Output type mismatch"));
+
+	if ($ro eq "ARRAY") {
+	    if (@{$c->{'out'}} and @$ref and ref $c->{'out'}[0] eq ref $ref->[0]) {
+		push @{$c->{'out'}} => @$ref;
+		return $c->{'out'};
+		}
+	    croak ($csv->_SetDiagInfo (5001, "Output type mismatch"));
+	    }
+
+	if ($ro eq "HASH") {
+	    @{$c->{'out'}}{keys %{$ref}} = values %{$ref};
+	    return $c->{'out'};
+	    }
+
+	croak ($csv->_SetDiagInfo (5002, "Unsupported output type"));
+	}
 
     defined wantarray or
 	return csv (
@@ -3116,6 +3141,9 @@ X<status>
 This method returns the status of the last invoked L</combine> or L</parse>
 call. Status is success (true: C<1>) or failure (false: C<undef> or C<0>).
 
+Note that as this only keeps track of the status of above mentioned methods,
+you are probably looking for L<C<error_diag>|/error_diag> instead.
+
 =head2 error_input
 X<error_input>
 
@@ -3124,6 +3152,9 @@ X<error_input>
 This method returns the erroneous argument (if it exists) of L</combine> or
 L</parse>,  whichever was called more recently.  If the last invocation was
 successful, C<error_input> will return C<undef>.
+
+Depending on the type of error, it I<might> also hold the data for the last
+error-input of L</getline>.
 
 =head2 error_diag
 X<error_diag>
@@ -3276,6 +3307,10 @@ X<out>
  csv (in => $aoa, out =>  undef);
  csv (in => $aoa, out => \"skip");
 
+ csv (in => $fh,  out => \@aoa);
+ csv (in => $fh,  out => \@aoh, bom => 1);
+ csv (in => $fh,  out => \%hsh, key => "key");
+
 In output mode, the default CSV options when producing CSV are
 
  eol       => "\r\n"
@@ -3307,6 +3342,22 @@ filter for side effects only.
 
 Currently,  setting C<out> to any false value  (C<undef>, C<"">, 0) will be
 equivalent to C<\"skip">.
+
+If the C<in> argument point to something to parse, and the C<out> is set to
+a reference to an C<ARRAY> or a C<HASH>, the output is appended to the data
+in the existing reference. The result of the parse should match what exists
+in the reference passed. This might come handy when you have to parse a set
+of files with similar content (like data stored per period) and you want to 
+collect that into a single data structure:
+
+ my %hash;
+ csv (in => $_, out => \%hash, key => "id") for sort glob "foo-[0-9]*.csv";
+
+ my @list; # List of arrays
+ csv (in => $_, out => \@list)              for sort glob "foo-[0-9]*.csv";
+
+ my @list; # List of hashes
+ csv (in => $_, out => \@list, bom => 1)    for sort glob "foo-[0-9]*.csv";
 
 =head3 encoding
 X<encoding>
@@ -4265,6 +4316,13 @@ C<CSV> file and report on its content.
  using Text::CSV_XS 1.32 with perl 5.26.0 and Unicode 9.0.0
  OK: rows: 1, columns: 2
      sep = <,>, quo = <">, bin = <1>, eol = <"\n">
+
+=item csv-split
+X<csv-split>
+
+This command splits C<CSV> files into smaller files,  keeping (part of) the
+header.  Options include maximum number of (data) rows per file and maximum
+number of columns per file or a combination of the two.
 
 =item csv2xls
 X<csv2xls>

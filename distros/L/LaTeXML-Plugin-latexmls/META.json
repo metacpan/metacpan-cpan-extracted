@@ -1,16 +1,16 @@
 {
    "abstract" : "latexmls - A socket server for daemonized LaTeXML processing",
    "author" : [
-      "Deyan Ginev <d.ginev@jacobs-university.de>"
+      "Deyan Ginev <deyan.ginev@gmail.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.150001",
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "unknown"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "LaTeXML-Plugin-latexmls",
    "no_index" : {
@@ -33,9 +33,9 @@
       "runtime" : {
          "requires" : {
             "Encode" : "0",
-            "HTTP::Daemon" : "0",
+            "HTTP::Daemon" : "6",
             "JSON::XS" : "0",
-            "LaTeXML" : "v0.8.1",
+            "LaTeXML" : "v0.8.5",
             "POSIX" : "0",
             "URI" : "0"
          }
@@ -49,5 +49,6 @@
          "web" : "https://github.com/dginev/LaTeXML-Plugin-latexmls"
       }
    },
-   "version" : "v1.4.3"
+   "version" : "1.5",
+   "x_serialization_backend" : "JSON::PP version 4.02"
 }

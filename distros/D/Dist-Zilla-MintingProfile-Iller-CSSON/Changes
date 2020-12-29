@@ -1,15 +1,89 @@
 Revision history for Dist-Zilla-MintingProfile-Iller-CSSON
 
-0.0101 2016-01-20T20:46:58Z UTC
- [Bug Fixes]
- - Removed faulty Build.PL (fixes #1).
+0.0102 2020-12-28 12:40:20 UTC
+ [New Features]
+ - Added a global doc to the template iller.yaml, where distribution_name
+   will be set to the minted distribution's name. By also having a
+   gitignore doc in iller.yaml, this will automatically create a .gitignore
+   file where the minted distribution's build directories are excluded.
 
+ [Stats & Dependency Changes]
+ - 6 files changed, 84 insertions(+), 9 deletions(-)
+ - (run req) ~ Carp (any) --> 1.38
+ - (run req) ~ File::ShareDir (any) --> 1.102
+ - (run req) ~ Moose 2.00 --> 2.1803
+ - (run req) ~ namespace::autoclean (any) --> 0.22
+ - (run req) ~ perl 5.010001 --> 5.014000
+ - (test req) + IO::Handle (any)
+ - (test req) + IPC::Open3 (any)
+ - (dev req) + Badge::Depot 0.0103
+ - (dev req) + Badge::Depot::Plugin::Coverage (any)
+ - (dev req) + Badge::Depot::Plugin::Githubactions (any)
+ - (dev req) + Badge::Depot::Plugin::Perl (any)
+ - (dev req) + Dist::Zilla 6.015
+ - (dev req) +
+   Dist::Zilla::Plugin::Author::CSSON::GithubActions::Workflow::TestWithMakefile
+   0.0106
+ - (dev req) + Dist::Zilla::Plugin::Authority 1.009
+ - (dev req) + Dist::Zilla::Plugin::BumpVersionAfterRelease::Transitional
+   0.009
+ - (dev req) + Dist::Zilla::Plugin::ChangeStats::Dependencies::Git 0.0200
+ - (dev req) + Dist::Zilla::Plugin::Git 2.046
+ - (dev req) + Dist::Zilla::Plugin::Git::CheckFor::CorrectBranch 0.014
+ - (dev req) + Dist::Zilla::Plugin::Git::Commit (any)
+ - (dev req) + Dist::Zilla::Plugin::MetaConfig (any)
+ - (dev req) + Dist::Zilla::Plugin::NextRelease::Grouped 0.0200
+ - (dev req) + Dist::Zilla::Plugin::PromptIfStale 0.057
+ - (dev req) + Dist::Zilla::Plugin::RewriteVersion::Transitional 0.007
+ - (dev req) + Dist::Zilla::Plugin::Test::Compile 2.058
+ - (dev req) + Dist::Zilla::Plugin::Test::EOF 0.0501
+ - (dev req) + Dist::Zilla::Plugin::Test::EOL 0.18
+ - (dev req) + Dist::Zilla::Plugin::Test::NoTabs 0.15
+ - (dev req) + Dist::Zilla::Plugin::Test::Version 1.09
+ - (dev req) + Pod::Weaver::Section::GenerateSection 1.01
+ - (dev req) + Test::EOF (any)
+ - (dev req) + Test::EOL (any)
+ - (dev req) + Test::More 0.88
+ - (dev req) + Test::NoTabs 1.4
+ - (dev req) + Test::Version 1
+ - (dev req) ~ Dist::Zilla::Plugin::CheckChangesHasContent (any) --> 0.011
+ - (dev req) ~ Dist::Zilla::Plugin::Clean (any) --> 0.07
+ - (dev req) ~ Dist::Zilla::Plugin::CopyFilesFromBuild (any) --> 0.170880
+ - (dev req) ~ Dist::Zilla::Plugin::Git::Contributors (any) --> 0.035
+ - (dev req) ~ Dist::Zilla::Plugin::GithubMeta (any) --> 0.54
+ - (dev req) ~ Dist::Zilla::Plugin::InstallRelease (any) --> 0.008
+ - (dev req) ~ Dist::Zilla::Plugin::MetaProvides::Package (any) -->
+   2.004003
+ - (dev req) ~ Dist::Zilla::Plugin::PodWeaver (any) --> 4.006
+ - (dev req) ~ Dist::Zilla::Plugin::ReadmeAnyFromPod (any) --> 0.163250
+ - (dev req) ~ Dist::Zilla::Plugin::RunExtraTests (any) --> 0.029
+ - (dev req) ~ Dist::Zilla::Plugin::Test::ReportPrereqs (any) --> 0.027
+ - (dev req) ~ Pod::Weaver::Section::Badges (any) --> 0.0401
+ - (dev req) ~ Test::Warnings (any) --> 0.026
+ - (dev req) - Dist::Zilla::Plugin::CheckExtraTests
+ - (dev req) - Dist::Zilla::Plugin::MetaProvides::Class
+ - (dev req) - Dist::Zilla::Plugin::NextRelease
+ - (dev req) - Dist::Zilla::Plugin::NextVersion::Semantic
+ - (dev req) - Dist::Zilla::Plugin::OurPkgVersion
+ - (dev req) - Dist::Zilla::Plugin::PodnameFromClassname
+ - (dev req) - Dist::Zilla::Plugin::Prereqs::Plugins
+ - (dev req) - Dist::Zilla::Plugin::PreviousVersion::Changelog
+ - (dev req) - Dist::Zilla::Plugin::ReversionOnRelease
+ - (dev req) - Dist::Zilla::Plugin::TravisYML
+ - (dev req) - Pod::Weaver::Section::Homepage::DefaultCPAN
+ - (dev req) - Pod::Weaver::Section::Source::DefaultGitHub
+ - (dev sug) + Dist::Iller 0.1409
+ - (dev sug) + Dist::Iller::Config::Author::CSSON 0.0328
+
+0.0101 2016-01-20T20:46:58Z UTC
  [Enhancements]
  - Added simple test template.
 
  [Requirements]
  - Added missing prereqs: Carp, Dist::Zilla::Role::MintingProfile
 
+ [Bug Fixes]
+ - Removed faulty Build.PL (fixes #1).
+
 0.0100 2016-01-14T23:40:08Z UTC
  - Initial release
-

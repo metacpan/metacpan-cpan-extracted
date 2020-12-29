@@ -1,5 +1,5 @@
 package Treex::Core::Run;
-$Treex::Core::Run::VERSION = '2.20160630';
+$Treex::Core::Run::VERSION = '2.20201228';
 use 5.008;
 
 use Moose;
@@ -610,7 +610,7 @@ Treex::Core::Run + treex - applying Treex blocks and/or scenarios on data
 
 =head1 VERSION
 
-version 2.20160630
+version 2.20201228
 
 =head1 SYNOPSIS
 
@@ -655,104 +655,8 @@ create new runner and runs scenario given in parameters
 
 =head1 USAGE
 
- usage: treex [-?dEehjLmpqSstv] [long options...] scenario [-- treex_files]
- scenario is a sequence of blocks or *.scen files
- options:
- 	-h -? --usage --help                Prints this usage information.
- 	-s --save                           save all documents
- 	-q --quiet                          Warning, info and debug messages
- 	                                    are suppressed. Only fatal errors
- 	                                    are reported.
- 	--cleanup                           Delete all temporary files.
- 	-e STR --error_level STR            Possible values: ALL, DEBUG,
- 	                                    INFO, WARN, FATAL
- 	-L STR --language STR --lang STR    shortcut for adding
- 	                                    "Util::SetGlobal language=xy" at
- 	                                    the beginning of the scenario
- 	-S STR --selector STR               shortcut for adding
- 	                                    "Util::SetGlobal selector=xy" at
- 	                                    the beginning of the scenario
- 	-t --tokenize                       shortcut for adding
- 	                                    "Read::Sentences W2A::Tokenize"
- 	                                    at the beginning of the scenario
- 	                                    (or W2A::XY::Tokenize if used
- 	                                    with --lang=xy)
- 	--watch STR                         re-run when the given file is
- 	                                    changed TODO better doc
- 	-d --dump_scenario                  Just dump (print to STDOUT) the
- 	                                    given scenario and exit.
- 	--dump_required_files               Just dump (print to STDOUT) files
- 	                                    required by the given scenario
- 	                                    and exit.
- 	--cache STR                         Use cache. Required memory is
- 	                                    specified in format
- 	                                    memcached,loading. Numbers are in
- 	                                    GB.
- 	-v --version                        Print treex and perl version
- 	-E STR --forward_error_level STR    messages with this level or
- 	                                    higher will be forwarded from the
- 	                                    distributed jobs to the main
- 	                                    STDERR
- 	-p --parallel                       Parallelize the task on SGE
- 	                                    cluster (using qsub).
- 	-j INT --jobs INT                   Number of jobs for
- 	                                    parallelization, default 10.
- 	                                    Requires -p.
- 	--local                             Run jobs locally (might help with
- 	                                    multi-core machines). Requires -p.
- 	--priority INT                      Priority for qsub, an integer in
- 	                                    the range -1023 to 0 (or 1024 for
- 	                                    admins), default=-100. Requires
- 	                                    -p.
- 	--memory STR -m STR --mem STR       How much memory should be
- 	                                    allocated for cluster jobs,
- 	                                    default=2G. Requires -p.
- 	                                    Translates to "qsub -hard -l
- 	                                    mem_free=$mem -l h_vmem=2*$mem -l
- 	                                    act_mem_free=$mem". Use --mem=0
- 	                                    and --qsub to set your own SGE
- 	                                    settings (e.g. if act_mem_free is
- 	                                    not available).
- 	--name STR                          Prefix of submitted jobs.
- 	                                    Requires -p. Translates to "qsub
- 	                                    -N $name-jobname".
- 	--queue STR                         SGE queue. Translates to "qsub -q
- 	                                    $queue".
- 	--qsub STR                          Additional parameters passed to
- 	                                    qsub. Requires -p. See --priority
- 	                                    and --mem. You can use e.g.
- 	                                    --qsub="-q *@p*,*@s*" to use just
- 	                                    machines p* and s*. Or e.g.
- 	                                    --qsub="-q *@!(twi*|pan*)" to
- 	                                    skip twi* and pan* machines.
- 	--workdir STR                       working directory for temporary
- 	                                    files in parallelized processing;
- 	                                    one can create automatic
- 	                                    directories by using patterns:
- 	                                    {NNN} is replaced by an ordinal
- 	                                    number with so many leading zeros
- 	                                    to have length of the number of
- 	                                    Ns, {XXXX} is replaced by a
- 	                                    random string, whose length is
- 	                                    the same as the number of Xs
- 	                                    (min. 4). If not specified,
- 	                                    directories such as
- 	                                    001-cluster-run, 002-cluster-run
- 	                                    etc. are created
- 	--survive                           Continue collecting jobs' outputs
- 	                                    even if some of them crashed
- 	                                    (risky, use with care!).
- 	--jobindex INT                      Not to be used manually. If
- 	                                    number of jobs is set to J and
- 	                                    modulo set to M, only I-th files
- 	                                    fulfilling I mod J == M are
- 	                                    processed.
- 	--outdir STR                        Not to be used manually. Dictory
- 	                                    for collecting standard and error
- 	                                    outputs in parallelized
- 	                                    processing.
- 	--server STR                        Not to be used manually. Used to
- 	                                    point parallel jobs to the head.
+ Can't locate Treex/Core/Run.pm in @INC (you may need to install the Treex::Core::Run module) (@INC contains: /home/martin/perl5/lib/perl5/5.26.1/x86_64-linux-gnu-thread-multi /home/martin/perl5/lib/perl5/5.26.1 /home/martin/perl5/lib/perl5/x86_64-linux-gnu-thread-multi /home/martin/perl5/lib/perl5 /etc/perl /usr/local/lib/x86_64-linux-gnu/perl/5.26.1 /usr/local/share/perl/5.26.1 /usr/lib/x86_64-linux-gnu/perl5/5.26 /usr/share/perl5 /usr/lib/x86_64-linux-gnu/perl/5.26 /usr/share/perl/5.26 /home/martin/perl5/lib/perl5/5.26.0 /home/martin/perl5/lib/perl5/5.26.0/x86_64-linux-gnu-thread-multi /usr/local/lib/site_perl /usr/lib/x86_64-linux-gnu/perl-base) at bin/treex line 5.
+ BEGIN failed--compilation aborted at bin/treex line 5.
 
 =head1 AUTHORS
 

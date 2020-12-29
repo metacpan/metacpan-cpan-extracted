@@ -5,6 +5,11 @@ use warnings;
 
 # read in first 45 lines from SJIS-encoded attached PDF-J file, convert to
 # UTF-8, and output in 4 different CJK+Western font combinations
+#
+# NOTE: This code is meant as an example of what could be done. If it was
+#       intended to be a serious utility, we would have to fold long lines that
+#       currently run off the right side of the page, so that content would
+#       not be lost.
 
 use File::Basename;
 use PDF::Builder;
@@ -76,7 +81,7 @@ my %fonts = (
 'KozGo-Italic + Georgia-Italic' => $u3
 );
 
-my ($pdf, $page, $gfx, $text, $y, $line);
+my ($page, $gfx, $text, $y, $line);
 
 foreach my $fontname (keys %fonts) {
     $y = 800; # title line this page

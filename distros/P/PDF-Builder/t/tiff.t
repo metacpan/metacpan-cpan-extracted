@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 use warnings;
 use strict;
-use English qw' -no_match_vars ';
+use English qw( -no_match_vars );
 use IPC::Cmd qw(can_run);
 use Test::More tests => 12;
 
@@ -37,7 +37,8 @@ like($pdf->stringify(), qr/q 216 0 0 288 72 144 cm \S+ Do Q/,
 # Filehandle (old library only)  2 tests
 
 $pdf = PDF::Builder->new();
-open my $fh, '<', 't/resources/1x1.tif';
+open my $fh, '<', 't/resources/1x1.tif' or
+   die "Couldn't open file t/resources/1x1.tif";
 $tiff = $pdf->image_tiff($fh, -nouseGT => 1);
 isa_ok($tiff, 'PDF::Builder::Resource::XObject::Image::TIFF',
     q{$pdf->image_tiff(filehandle)});

@@ -35,6 +35,7 @@ for my $impl (IMPL()) {
        'insert past start successfully added at front');
 
     ok($q->pending == 17, 'count correct so far');
+    diag "\n>>> Expect 'buffer is full' warning";
     ok(3 == $q->insert(10, qw[23 29 31 37 41]),
        'queue limit respected on insert');
     ok($q->peek(10) eq '23' && $q->peek(12) eq '31'

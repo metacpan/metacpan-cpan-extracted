@@ -3,10 +3,11 @@ package PDF::Builder::Resource::CIDFont::TrueType::FontFile;
 use base 'PDF::Builder::Basic::PDF::Dict';
 
 use strict;
-no warnings qw[ recursion uninitialized ];
+use warnings;
+#no warnings qw[ recursion uninitialized ];
 
-our $VERSION = '3.020'; # VERSION
-my $LAST_UPDATE = '3.016'; # manually update whenever code is changed
+our $VERSION = '3.021'; # VERSION
+my $LAST_UPDATE = '3.021'; # manually update whenever code is changed
 
 use Carp;
 use Encode qw(:all);
@@ -339,7 +340,7 @@ sub new {
     $self->{' font'} = $font;
     $self->{' data'} = $data;
     
-    $data->{'noembed'} = $opts{'-noembed'}==1? 1: 0;
+    $data->{'noembed'} = ($opts{'-noembed'}||0)==1? 1: 0;
     $data->{'iscff'} = (defined $font->{'CFF '})? 1: 0;
 
     $self->{'Subtype'} = PDFName('CIDFontType0C') if $data->{'iscff'};

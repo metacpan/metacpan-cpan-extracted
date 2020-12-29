@@ -108,10 +108,16 @@ while (my $impl = tq::IMPL()) {
     $rpt->enqueue('go');
 
     # (7) - Done
-    $th->join;
+    {
+        local $Carp::verbose = 0;
+        $th->join;
+    }
 
     # It's an error to call dequeue methods with COUNT > LIMIT
-    eval { $q->dequeue(5); };
+    {
+        local $Carp::verbose = 0;
+        eval { $q->dequeue(5); };
+    }
     like($@, qr/exceeds queue size limit/, $@);
 
     # Bug #120157

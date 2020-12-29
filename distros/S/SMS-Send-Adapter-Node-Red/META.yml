@@ -1,0 +1,26 @@
+---
+abstract: 'SMS::Send Adapter to Node-RED JSON HTTP request'
+author:
+  - 'Michael R. Davis'
+build_requires:
+  ExtUtils::MakeMaker: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.68, CPAN::Meta::Converter version 2.120921'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: SMS-Send-Adapter-Node-Red
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  CGI: 0
+  JSON: 0
+  Package::New: 0
+  SMS::Send: 0
+  SMS::Send::VoIP::MS: 0
+version: 0.05

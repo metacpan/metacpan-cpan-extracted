@@ -21,5 +21,5 @@ on "test" => sub {
     requires   "Test::Harness";
     requires   "Test::More"               => "0.90";
 
-    recommends "Test::More"               => "1.302171";
+    recommends "Test::More"               => "1.302183";
     };

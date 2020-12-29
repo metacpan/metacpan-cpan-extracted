@@ -16,7 +16,7 @@ foreach my $impl (IMPL()) {
     ok(@u == 1 && $u[0] == 1, 'bare extract gets last elem') or diag @u;
 
     my @t = $q->extract(5);
-    ok(@t == 1);
+    ok(@t == 1, "extract(arg) gets 1 elem");
     ok($t[0] == 7, 'extract(arg) gets arg+1-th elem') or diag @t;
 
     @u = $q->extract(-10);

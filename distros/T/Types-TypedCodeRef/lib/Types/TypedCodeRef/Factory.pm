@@ -21,13 +21,15 @@ use namespace::autoclean;
 
 our @CARP_NOT;
 
+sub _is_callable {
+  my $callable = shift;
+  my $reftype = Scalar::Util::reftype($callable);
+  ( defined $reftype && $reftype eq 'CODE' ) || defined overload::Method($callable, '&{}');
+}
+
 my $CallableType = Type::Tiny->new(
   name       => 'Callable',
-  constraint => sub {
-    my $callable = shift;
-    my $reftype = Scalar::Util::reftype($callable);
-    ( defined $reftype && $reftype eq 'CODE' ) || overload::Overloaded($callable);
-  },
+  constraint => \&_is_callable,
 );
 
 has name => (
@@ -114,8 +116,8 @@ sub _build_constraint_generator {
         state $validator = do {
           my $TypeConstraint = HasMethods[qw( check get_message )];
           compile(
-            $TypeConstraint | ArrayRef[$TypeConstraint] | HashRef[$TypeConstraint],
-            $TypeConstraint | ArrayRef[$TypeConstraint]
+            $TypeConstraint | ArrayRef([$TypeConstraint]) | HashRef([$TypeConstraint]),
+            $TypeConstraint | ArrayRef([$TypeConstraint])
           );
         };
         my ($params, $returns) = $validator->(@_);

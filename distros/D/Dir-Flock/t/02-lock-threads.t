@@ -32,7 +32,7 @@ my $thr = threads->create( sub {
     sleep 10;
     Dir::Flock::unlock($dir);
     close P2;
-                           } );
+} );
 $thr->detach;
 
 close P2;
@@ -42,6 +42,7 @@ close P1;
 @t = glob("$dir/dir-flock-*");
 ok(@t > 0, "lock directory is not empty because child has lock");
 
+sleep 2;
 my $t1 = time;
 my $p = Dir::Flock::lock($dir, 0);
 my $t2 = time;

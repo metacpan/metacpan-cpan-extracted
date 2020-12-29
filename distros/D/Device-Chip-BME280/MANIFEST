@@ -1,0 +1,13 @@
+Build.PL
+examples/bme280.pl
+lib/Device/Chip/BME280.pm
+MANIFEST			This list of files
+t/00use.t
+t/01id.t
+t/02config.t
+t/03read.t
+t/99pod.t
+README
+LICENSE
+META.yml
+META.json

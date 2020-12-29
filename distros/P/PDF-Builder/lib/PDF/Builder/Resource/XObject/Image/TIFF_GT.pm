@@ -5,10 +5,10 @@ use base 'PDF::Builder::Resource::XObject::Image';
 use strict;
 use warnings;
 
-no warnings 'uninitialized';
+#no warnings 'uninitialized';
 
-our $VERSION = '3.020'; # VERSION
-my $LAST_UPDATE = '3.020'; # manually update whenever code is changed
+our $VERSION = '3.021'; # VERSION
+my $LAST_UPDATE = '3.021'; # manually update whenever code is changed
 
 use Compress::Zlib;
 
@@ -16,7 +16,8 @@ use PDF::Builder::Basic::PDF::Utils;
 use PDF::Builder::Resource::XObject::Image::TIFF::File_GT;
 use PDF::Builder::Util;
 use Scalar::Util qw(weaken);
-use Graphics::TIFF 7 ':all';  # have already confirmed that this exists
+#use Graphics::TIFF 7 ':all';  # have already confirmed that this exists
+use Graphics::TIFF ':all';  # have already confirmed that this version exists
 
 =head1 NAME
 
@@ -26,6 +27,8 @@ PDF::Builder::Resource::XObject::Image::TIFF_GT - TIFF image support
 =head1 METHODS
 
 =over
+
+=item  $res = PDF::Builder::Resource::XObject::Image::TIFF_GT->new($pdf, $file, $name, %opts)
 
 =item  $res = PDF::Builder::Resource::XObject::Image::TIFF_GT->new($pdf, $file, $name)
 
@@ -39,10 +42,40 @@ If the Graphics::TIFF package is installed, and its use is not suppressed via
 the C<-nouseGT> flag (see Builder documentation for C<image_tiff>), the TIFF_GT
 library will be used. Otherwise, the TIFF library will be used instead.
 
+Options:
+
+=over
+
+=item -notrans => 1
+
+Ignore any alpha layer (transparency) and make the image fully opaque.
+
+=back
+
+TIFF support (when using Graphics::TIFF) is for C<PhotometricInterpretation>
+values of 0 (bilevel/gray, white is 0), 1 (bilevel/gray, black is 0), 2 (RGB),
+and 3 (Palette color). It currently does I<not> support 4 (transparency mask),
+5 (separated CMYK), 6 (YCbCr), 8 (CIELab), or higher. There is limited support 
+for an Alpha (transparency) channel (due to extremely limited test cases). 
+Some tags are not supported, and a PlanarConfiguration of 2 is unknown until 
+we get some test cases.
+
+Some applications seem to take odd liberties with TIFF tags, such as adding a
+SamplePerPixel without specifying ExtraSamples type. In such cases, we treat
+one extra sample (not otherwise defined) as an Alpha channel, and hope for 
+the best!
+
+If there are invalid tags or field values within a tag, the Graphics::TIFF
+library will attempt to pop-up a warning dialog, rather than just ignoring 
+invalid things. If we can find a switch to disable this behavior, we will
+look into adding it as an option. According to Graphic::TIFF's owner 
+(ticket RT 133955), this is coming directly from libtiff (as write to STDERR), 
+so he can't do anything about it!
+
 =cut
 
 sub new {
-    my ($class, $pdf, $file, $name) = @_;
+    my ($class, $pdf, $file, $name, %opts) = @_;
 
     my $self;
 
@@ -59,7 +92,39 @@ sub new {
     $self->{' apipdf'} = $pdf;
     weaken $self->{' apipdf'};
 
-    $self->read_tiff($pdf, $tif);
+    # set up dict stream for any Alpha channel to be split out from $buffer
+    my $dict = PDFDict();
+
+    # let's try to clarify various strange tag combinations
+    # one extra SamplesPerPixel (2/4) and no ExtraSamples (or is 0)?
+    #   treat as an Alpha channel with ExtraSamples 2 (unassociated alpha)
+    if ($tif->{'colorSpace'} eq 'DeviceGray' && 
+	$tif->{'SamplesPerPixel'} == 2 &&
+        (!defined $tif->{'ExtraSamples'} || $tif->{'ExtraSamples'} == 0)) {
+        # let's assume it's realy SPP 1 with ExtraSamples UNASSOC_ALPHA
+        $tif->{'SamplesPerPixel'} = 1;
+	$tif->{'ExtraSamples'} = EXTRASAMPLE_UNASSALPHA;  # 2
+	#print "  changed SPP 2 to 1, ES 0 to 2, to treat as GA\n";
+    }
+    if ($tif->{'colorSpace'} eq 'DeviceRGB' && 
+	$tif->{'SamplesPerPixel'} == 4 &&
+        (!defined $tif->{'ExtraSamples'} || $tif->{'ExtraSamples'} == 0)) {
+        # let's assume it's realy SPP 3 with ExtraSamples UNASSOC_ALPHA
+        $tif->{'SamplesPerPixel'} = 3;
+	$tif->{'ExtraSamples'} = EXTRASAMPLE_UNASSALPHA;  # 2
+	#print "  changed SPP 4 to 3, ES 0 to 2, to treat as RGBA\n";
+    }
+    # otherwise ExtraSamples is in order, but have "extra" sample
+    if ($tif->{'colorSpace'} eq 'DeviceGray' && 
+	$tif->{'SamplesPerPixel'} == 2) {
+        $tif->{'SamplesPerPixel'} = 1;
+    }
+    if ($tif->{'colorSpace'} eq 'DeviceRGB' && 
+	$tif->{'SamplesPerPixel'} == 4) {
+        $tif->{'SamplesPerPixel'} = 3;
+    }
+
+    $self->read_tiff($pdf, $tif, %opts);
 
     $tif->close();
 
@@ -74,7 +139,7 @@ installed but not used (-nouseGT option given to C<image_tiff>).
 B<Caution:> this method can only be used I<after> the image object has been
 created. It can't tell you whether Graphics::TIFF is available in
 advance of actually using it, in case you want to use some functionality
-available only in TIFF_GT. See the <PDF::Builder> LA_GT() call if you
+available only in TIFF_GT. See the L<PDF::Builder> LA_GT() call if you
 need to know in advance.
 
 =back
@@ -88,10 +153,16 @@ sub usesLib {
 }
 
 sub handle_generic {
-    my ($self, $pdf, $tif) = @_;
+    my ($self, $pdf, $tif, %opts) = @_;
     my ($stripcount, $buffer);
 
     $self->filters('FlateDecode');
+    # colorspace DeviceGray or DeviceRGB already set in read_tiff()
+    # bits_per_component 1 2 4 8 16? already set in read_tiff()
+    my $dict = PDFDict();
+    $self->{'DecodeParms'} = PDFArray($dict);
+    $dict->{'BitsPerComponent'} = PDFNum($tif->{'bitsPerSample'});
+    $dict->{'Colors'} = PDFNum($tif->{'colorSpace'} eq 'DeviceGray'?1 :3);
 
     $stripcount = $tif->{'object'}->NumberOfStrips();
     $buffer = '';
@@ -99,24 +170,412 @@ sub handle_generic {
         $buffer .= $tif->{'object'}->ReadEncodedStrip($i, -1);
     }
 
-    if ($tif->{'SamplesPerPixel'} == $tif->{'bitsPerSample'} + 1) {
-	if ($tif->{'ExtraSamples'} == EXTRASAMPLE_ASSOCALPHA) {
-	    if ($tif->{'bitsPerSample'} == 1) {
-		$buffer = sample_greya_to_a($buffer);
-            } else {
-		warn "Don't know what to do with RGBA image\n";
-            }
-        } else {
-	    warn "Don't know what to do with alpha layer in TIFF\n";
+    my $transparency = (defined $opts{'-notrans'} && $opts{'-notrans'} == 1)? 0: 1;
+    my $alpha;
+
+    # handle any Alpha channel/layer
+    my $h = $tif->{'imageHeight'};  # in pixels
+    my $w = $tif->{'imageWidth'};
+    $dict->{'Columns'} = PDFNum($w);
+    my $samples = 1; # fallback
+
+#    # code common to associated and unassociated alpha
+#    if (defined $tif->{'ExtraSamples'} &&
+#	($tif->{'ExtraSamples'} == EXTRASAMPLE_ASSOCALPHA ||
+#	 $tif->{'ExtraSamples'} == EXTRASAMPLE_UNASSALPHA)) {
+##print STDERR "This file has Alpha layer\n";
+#    }
+
+    if      (defined $tif->{'ExtraSamples'} &&
+	     $tif->{'ExtraSamples'} == EXTRASAMPLE_ASSOCALPHA) {
+	# Gray or RGB pre-multiplication will likely have to be backed out
+        if      ($tif->{'colorSpace'} eq 'DeviceGray') {
+	    # Gray or Bilevel (pre-multiplied) + Alpha 
+	    $samples = 1;
+        } elsif ($tif->{'colorSpace'} eq 'DeviceRGB') {
+	    # RGB (pre-multiplied) + Alpha 
+	    $samples = 3;
+	} else {
+	    warn "Invalid TIFF file, requested Alpha for $tif->{'colorSpace'}".
+	         ", PDF will likely be defective!\n";
 	}
+	($buffer, $alpha) = split_alpha($buffer, $samples, $tif->{'bitsPerSample'}, $w*$h);
+	$buffer = descale($buffer, $samples, $tif->{'bitsPerSample'}, $alpha, $w*$h);
+    } elsif (defined $tif->{'ExtraSamples'} &&
+	     $tif->{'ExtraSamples'} == EXTRASAMPLE_UNASSALPHA) {
+	# Gray or RGB at full value, no adjustment needed
+        if      ($tif->{'colorSpace'} eq 'DeviceGray') {
+	    # Gray or Bilevel + Alpha 
+	    $samples = 1;
+        } elsif ($tif->{'colorSpace'} eq 'DeviceRGB') {
+	    # RGB + Alpha 
+	    $samples = 3;
+	} else {
+	    warn "Invalid TIFF file, requested Alpha for $tif->{'colorSpace'}".
+	         ", PDF will likely be defective!\n";
+	}
+	($buffer, $alpha) = split_alpha($buffer, $samples, $tif->{'bitsPerSample'}, $w*$h);
     }
+
     $self->{' stream'} .= $buffer;
+    # $alpha is undef if no alpha layer found
+    if (defined $alpha) {
+	# an alpha layer was found. use it?
+        if (!$transparency) {
+            # suppress any transparency (alpha layer)?
+	    $alpha = undef;
+        } else {
+	    # we will have transparency
+	    $pdf->new_obj($dict);
+            $dict->{'Type'} = PDFName('XObject');
+            $dict->{'Subtype'} = PDFName('Image');
+            $dict->{'Width'} = PDFNum($w);
+            $dict->{'Height'} = PDFNum($h);
+            $dict->{'ColorSpace'} = PDFName('DeviceGray');  # Alpha is always
+            $dict->{'BitsPerComponent'} = PDFNum($tif->{'bitsPerSample'});
+            $self->{'SMask'} = $dict;
+            delete $self->{' nofilt'};
+	    $dict->{' stream'} = $alpha;
+        }
+    } 
+
+    # compress all but short streams
+    if (length($self->{' stream'}) > 32) {
+        $self->{' stream'} = Compress::Zlib::compress($self->{' stream'});
+        $self->filters('FlateDecode');  # tell reader it's compressed...
+        $self->{' nofilt'} = 1;  # ...but writer not to compress on the fly
+    } else {
+        # too short to bother compressing. '/Filter [ /FlateDecode ] ' 
+        # takes up 25 bytes all by itself
+        delete $self->{'Filter'};
+        $self->{' nofilt'} = 1;
+    }
+    if (defined $dict->{' stream'}) {  # there is transparency?
+        if (length($dict->{' stream'}) > 32) {
+            $dict->{' stream'} = Compress::Zlib::compress($dict->{' stream'});
+            $dict->filters('FlateDecode');  # tell reader it's compressed...
+            $dict->{' nofilt'} = 1;  # ...but writer not to compress on the fly
+        } else {
+            # too short to bother compressing. '/Filter [ /FlateDecode ] ' 
+            # takes up 25 bytes all by itself
+            delete $dict->{'Filter'};
+            $dict->{' nofilt'} = 1;
+        }
+    }
 
     return $self;
+} # end of handle_generic()
+
+# split alpha from buffer (both strings)
+# bps = width of a sample in bits, samples 1 (G) or 3 (RGB)
+# returns $buffer and $alpha strings
+# TBD: fill order or other directional issues?
+sub split_alpha {
+    my ($inbuf, $samples, $bps, $count) = @_;
+    my $outbuf = '';
+    my $alpha = '';
+
+## debug
+#my @slice; # TEMP
+#if ($count == 999*1056) {
+# # French text pag1.tif
+# @slice = (823*999, 823*999+125); # row 824/1056
+#}elsif($count == 1000*568) {
+# # Lorem ipsum alpha.tif
+# @slice = (283*1000, 283*1000+125); # row 284/568
+#}else{
+# @slice = (-1, -1);
+#}
+ 
+## debug
+## upon entry, what is raw input row? # TEMP
+#if ($slice[0]>-1 && $bps==16){
+# print "bps==16 raw input slice: ";
+# for (my $i=$slice[0]; $i<$slice[1]; $i++){
+#  my $pixel = substr($inbuf, $i*($samples+1)*2, ($samples+1)*2);
+#  my @pixelbytes = split //, $pixel;
+#  foreach (@pixelbytes) {printf("%02X", ord($_));}
+#  print " ";
+# }
+# print "\n";
+#}
+#if ($slice[0]>-1 && $bps==8){
+# print "bps==8 raw input slice: ";
+# for (my $i=$slice[0]; $i<$slice[1]; $i++){
+#  my $pixel = substr($inbuf, $i*($samples+1), $samples+1);
+#  my @pixelbytes = split //, $pixel;
+#  foreach (@pixelbytes) {printf("%02X", ord($_));}
+#  print " ";
+# }
+# print "\n";
+#}
+## bps<8 is ugly to dump and not worth doing
+
+    # this could be pretty slow. test of concept. TBD
+    # COULD have different number of bits per sample, unless GT prevents this
+    if      ($bps == 16) {
+        # full double bytes to work with (not sure if 16bps in TIFF)
+        for (my $i=0; $i<$count; $i++) {
+ 	    substr($outbuf, $i*$samples*2, $samples*2) =
+	        substr($inbuf, $i*($samples+1)*2, $samples*2);
+ 	    substr($alpha, $i*2, 2) =
+	        substr($inbuf, $i*($samples+1)*2+$samples*2, 2);
+        }
+    } elsif ($bps == 8) {
+        # full bytes to work with
+        for (my $i=0; $i<$count; $i++) {
+ 	    substr($outbuf, $i*$samples, $samples) =
+	        substr($inbuf, $i*($samples+1), $samples);
+        substr($alpha, $i, 1) =
+            substr($inbuf, $i*($samples+1)+$samples, 1);
+        }
+    } else {
+        # fractional bytes (bps < 8) possible to have not 2**N?
+        my $strideBits = $bps*($samples+1);
+	my @inBits = ();    # bits from inbuf string
+	my @outBits = ();   # bits to outbuf string (starts empty)
+	my @outABits = ();  # build alpha string (starts empty)
+	my $inByte = 0;
+	my $outByte = 0;
+	my $outAByte = 0;
+        for (my $i=0; $i<$count; $i++) {
+	    # i-th pixel is next 2 or more bits in inBits
+	    # build up enough bits in inBits
+	    while (scalar(@inBits) < $strideBits) {
+		push @inBits, split(//, unpack('B8', substr($inbuf, $inByte++, 1)));
+	    }
+	    # now have enough bits in inBits array for adding to output buffer
+	    push @outBits, splice(@inBits, 0, $samples*$bps);
+	    # now have enough bits in inBits array for adding to alpha buffer
+	    push @outABits, splice(@inBits, 0, $bps);
+	    # do we have at least one full byte to output to outbuf?
+	    while (scalar(@outBits) >= 8) {
+		substr($outbuf, $outByte++, 1) = pack('B8', join('', splice(@outBits, 0, 8)));
+	    }
+	    # do we have at least one full byte to output to alpha?
+	    while (scalar(@outABits) >= 8) {
+		substr($alpha, $outAByte++, 1) = pack('B8', join('', splice(@outABits, 0, 8)));
+	    }
+	    # there may be leftover bits (for next pixel) in inBits
+	    # outBits and outABits may also have partial content yet to write
+        }
+	# got to the end. anything not yet written in @outBits and @outABits?
+	if (scalar(@outBits)) {
+            # pad out to 8 bits in length (should be no more than 7)
+            while (scalar(@outBits) < 8) {
+                push @outBits, 0;
+            }
+	    substr($outbuf, $outByte++, 1) = pack('B8', join('', @outBits));
+        }
+	if (scalar(@outABits)) {
+            # pad out to 8 bits in length (should be no more than 7)
+            while (scalar(@outABits) < 8) {
+                push @outABits, 0;
+            }
+	    substr($alpha, $outAByte++, 1) = pack('B8', join('', @outABits));
+        }
+    } # end of fractional byte (bits) handling
+
+## debug
+## upon exit, what is output data row? # TEMP
+#if ($slice[0]>-1 && $bps==16){
+# print "bps==16 output data slice: ";
+# for (my $i=$slice[0]; $i<$slice[1]; $i++){
+#  my $pixel = substr($outbuf, $i*$samples*2, $samples*2);
+#  my @pixelbytes = split //, $pixel;
+#  foreach (@pixelbytes) {printf("%02X", ord($_));}
+#  print " ";
+# }
+# print "\n";
+#}
+#if ($slice[0]>-1 && $bps==8){
+# print "bps==8 output data slice: ";
+# for (my $i=$slice[0]; $i<$slice[1]; $i++){
+#  my $pixel = substr($outbuf, $i*$samples, $samples);
+#  my @pixelbytes = split //, $pixel;
+#  foreach (@pixelbytes) {printf("%02X", ord($_));}
+#  print " ";
+# }
+# print "\n";
+#}
+## upon exit, what is output alpha row? # TEMP
+#if ($slice[0]>-1 && $bps==16){
+# print "bps==16 output alpha slice: ";
+# for (my $i=$slice[0]; $i<$slice[1]; $i++){
+#  my $pixel = substr($alpha, $i*2, 2);
+#  my @pixelbytes = split //, $pixel;
+#  foreach (@pixelbytes) {printf("%02X", ord($_));}
+#  print " ";
+# }
+# print "\n";
+#}
+#if ($slice[0]>-1 && $bps==8){
+# print "bps==8 output alpha slice: ";
+# for (my $i=$slice[0]; $i<$slice[1]; $i++){
+#  my $pixel = substr($alpha, $i, 1);
+#  my @pixelbytes = split //, $pixel;
+#  foreach (@pixelbytes) {printf("%02X", ord($_));}
+#  print " ";
+# }
+# print "\n";
+#}
+
+    return ($outbuf, $alpha);
+} # end of split_alpha()
+
+# bps = width of a sample in bits, samples 1 (G) or 3 (RGB)
+# return updated buffer  WARNING: not tested!
+sub descale {
+    my ($inbuf, $samples, $bps, $alpha, $count) = @_;
+    my $outbuf = '';
+    if ($bps == 1) {
+        # 1 bps no effect
+        $outbuf = $inbuf; 
+        return $outbuf;
+    }
+    # 1. assuming alpha is 0.0 fully transparent to 1.0 fully opaque
+    # 2. sample has already been multiplied by alpha (0 if fully transparent)
+    # 3. if alpha is 0, leave sample as 0. otherwise...
+    # 4. convert sample and alpha to decimal 0.0..1.0
+    # 5. sample = sample/alpha
+    # 6. round, integerize, and clamp sample to 0..max val range
+    my $maxVal = 2**$bps - 1;
+    my ($pixR, @samplesR, @samplesC, $alphaR);
+
+    # items used for fractional byte (bits)
+    my $strideBits = $bps*$samples;
+    my @inBits = ();    # bits from inbuf string
+    my @outBits = ();   # bits to outbuf string (starts empty)
+    my @inABits = ();   # bits from alpha string
+    my $inByte = 0;     # 1 or 3 samples only, not changing alpha values
+    my $outByte = 0;
+    my $inAByte = 0;
+
+    for (my $pix = 0; $pix < $count; $pix++) {
+	if      ($bps == 16) { # not sure if TIFF does 16bps 
+	    @samplesC = split //, substr($alpha, $pix, 2);
+	    $alphaR = (ord($samplesC[0])*256 + ord($samplesC[1]))*1.0/$maxVal;
+	    if ($alphaR > 0.0) {
+		@samplesC = split //, substr($inbuf, $pix*$samples*2, $samples*2);
+		for (my $i=0; $i<$samples; $i++) {
+		    $pixR = (ord($samplesC[2*$i])*256+ord($samplesC[2*$i+1]))*1.0/$maxVal;
+		    $pixR /= $alphaR;
+		    $pixR = int($pixR * $maxVal);
+		    $outbuf .= chr($pixR>>8);
+		    $outbuf .= chr($pixR%256);
+		}
+	    } else {
+		# alpha is 0 for this pixel, so just use original value
+		$outbuf .= substr($inbuf, $pix*$samples*2, $samples*2);
+	    }
+	} elsif ($bps == 8) {
+	    $alphaR = ord(substr($alpha, $pix, 1))*1.0/$maxVal;
+	    if ($alphaR > 0.0) {
+		@samplesC = split //, substr($inbuf, $pix*$samples, $samples);
+		foreach (@samplesC) {
+		    $pixR = ord($_)*1.0/$maxVal;
+		    $pixR /= $alphaR;
+		    $outbuf .= chr(int($pixR * $maxVal));
+		}
+	    } else {
+		# alpha is 0 for this pixel, so just use original value
+		$outbuf .= substr($inbuf, $pix*$samples, $samples);
+	    }
+	} else { # 1 < $bps < 8. $pix-th pixel, $samples 1 or 3
+	    # fractions of a byte per sample
+	    # pix-th pixel is next 2 or more bits in inBits
+	     
+	    # build up enough bits in inBits to get full pixel data
+	    while (scalar(@inBits) < $strideBits) {
+		push @inBits, split(//, unpack('B8', substr($inbuf, $inByte++, 1)));
+	    }
+	    my @Bits = ();
+	    for (my $i=0; $i<$samples; $i++) {
+		push @Bits, [splice(@inBits, 0, $bps)];
+	    }
+	    # now have enough bits in Bits array for recalculating or 
+	    #   adding to output buffer (if skip due to alpha)
+
+	    # build up enough bits in inABits to get next alpha
+	    while (scalar(@inABits) < $bps) {
+		push @inABits, split(//, unpack('B8', substr($alpha, $inAByte++, 1)));
+	    }
+	    # now have enough bits in inABits array for calculating alpha 
+	    my @ABits = splice(@inABits, 0, $bps);
+	    $alphaR = ba2ui(@ABits)*1.0/$maxVal;
+	    
+	    # calculate alpha, and if > 0, make real 0.0-1.0...
+	    if ($alphaR > 0.0) {
+	        # ...turn sample(s) into reals 0.0-1.0, divide by alpha
+	        # turn samples back into ints, then bits to add to outBits
+                for (my $i=0; $i<$samples; $i++) {
+		    $pixR = ba2ui(@{ $Bits[$i] })*1.0/$maxVal;
+		    $pixR /= $alphaR;
+		    $Bits[$i] = ui2ba(int($pixR*$maxVal), $bps);
+		}
+	    }
+	    
+	    # @Bits returned to outBits, whether original or recalculated
+	    for (my $i=0; $i<$samples; $i++) {
+	        push @outBits, @{ $Bits[$i] };
+	    }
+
+	    # do we have at least one full byte to output to outbuf?
+	    while (scalar(@outBits) >= 8) {
+		substr($outbuf, $outByte++, 1) = pack('B8', join('', splice(@outBits, 0, 8)));
+	    }
+	    # there may be leftover bits (for next pixel) in inBits
+	    # outBits may also have partial content yet to write
+            
+        } # end of fractional byte section
+    } # loop through pixels ($pix)
+
+    # fractional bytes, anything waiting to be written out?
+    # @outBits should be empty for bps=8/16, may be empty otherwise
+    if (scalar(@outBits)) {
+        # pad out to 8 bits in length (should be no more than 7)
+        while (scalar(@outBits) < 8) {
+            push @outBits, 0;
+        }
+        substr($outbuf, $outByte++, 1) = pack('B8', join('', @outBits));
+    }
+
+    # not changing Alpha array at all
+    return $outbuf;
+} # end of descale()
+
+# binary bit stream array to unsigned integer
+sub ba2ui {
+    my @inArray = @_;
+
+    my $value = 0;
+    foreach (@inArray) {
+        $value = 2*$value + $_;
+    }
+    return $value;
+}
+
+# unsigned integer to binary bit stream array
+sub ui2ba {
+    my ($inVal, $maxBits) = @_;
+
+    my $maxVal = 2**$maxBits-1; # not to exceed this value
+    if ($inVal > $maxVal) { $inVal = $maxVal; }
+    if ($inVal < 0) { $inVal = 0; }
+
+    my @array = ();
+    my $bit;
+    foreach (1 .. $maxBits) {
+        $bit = $inVal%2;
+	unshift @array, $bit;
+	$inVal >>= 1;
+    }
+
+    return @array;
 }
 
 sub handle_ccitt {
-    my ($self, $pdf, $tif) = @_;
+    my ($self, $pdf, $tif, %opts) = @_;
     my ($stripcount);
 
     $self->{' nofilt'} = 1;
@@ -160,7 +619,7 @@ sub handle_ccitt {
 	    for my $j ( 0 .. length($self->{' stream'}) ) {
 	        # swapping j-th byte of stream
 		$oldByte = ord(substr($self->{' stream'}, $j, 1));
-		if ($oldByte eq 0 || $oldByte eq 255) { next; }
+		if ($oldByte == 0 || $oldByte == 255) { next; }
 		$newByte = 0;
 		if ($oldByte & 0x01) { $newByte |= 0x80; }
 		if ($oldByte & 0x02) { $newByte |= 0x40; }
@@ -176,13 +635,20 @@ sub handle_ccitt {
     }
 
     return $self;
-}
+} # end of handle_ccitt()
 
 sub read_tiff {
-    my ($self, $pdf, $tif) = @_;
+    my ($self, $pdf, $tif, %opts) = @_;
+
+    # not sure why blackIsZero needs to be flipped around???
+    if (defined $tif->{'blackIsZero'}) {
+        $tif->{'blackIsZero'} = $tif->{'blackIsZero'} == 1? 0: 1;
+        $tif->{'whiteIsZero'} = $tif->{'blackIsZero'} == 1? 0: 1;
+    }
 
     $self->width($tif->{'imageWidth'});
     $self->height($tif->{'imageHeight'});
+
     if ($tif->{'colorSpace'} eq 'Indexed') {
         my $dict = PDFDict();
         $pdf->new_obj($dict);
@@ -196,26 +662,36 @@ sub read_tiff {
             $dict->{' stream'} .= pack('C', ($blue->[$i]/256));
         }
     } else {
+	# DeviceGray or DeviceRGB
         $self->colorspace($tif->{'colorSpace'});
     }
 
     $self->{'Interpolate'} = PDFBool(1);
     $self->bits_per_component($tif->{'bitsPerSample'});
 
-    if ($tif->{'whiteIsZero'} == 1 && $tif->{'filter'} ne 'CCITTFaxDecode') {
+    if (($tif->{'whiteIsZero'}||0) == 1 &&
+	($tif->{'filter'}||'') ne 'CCITTFaxDecode') {
         $self->{'Decode'} = PDFArray(PDFNum(1), PDFNum(0));
     }
 
+## debug  dump $tif
+#foreach (sort keys %$tif) {
+# if (defined $tif->{$_}) {
+#  print "\$tif->{'$_'} = '$tif->{$_}'\n";
+# } else {
+#  print "\$tif->{'$_'} = ?\n";
+# }
+#}
     # check filters and handle separately
     if (defined $tif->{'filter'} and $tif->{'filter'} eq 'CCITTFaxDecode') {
-        $self->handle_ccitt($pdf, $tif);
+        $self->handle_ccitt($pdf, $tif, %opts);
     } else {
-        $self->handle_generic($pdf, $tif);
+        $self->handle_generic($pdf, $tif, %opts);
     }
 
     $self->{' tiff'} = $tif;
 
     return $self;
-}
+} # end of read_tiff()
 
 1;

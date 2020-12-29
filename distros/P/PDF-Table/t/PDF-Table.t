@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 use Test::More tests => 11;
-use Config; 
+#use Config;  no longer needed
 
 use lib 't/lib'; # Needed for 'make test' from project dirs
 use TestData qw();
@@ -27,11 +27,11 @@ is_deeply( $col_widths, [ 100, 100, 100, 100 ], 'CalcColumnWidths - even');
 	[ 51, 600,  48 ]
 );
 
-if ($Config{uselongdouble}) {
-  is_deeply( $col_widths, [ 51, 300.758439703998205, 48 ], 'CalcColumnWidths - uneven');
-} else {
-  is_deeply( $col_widths, [ 51, 300.758439703998, 48 ], 'CalcColumnWidths - uneven');
-}
+# round 300.758... value to small number of decimal places, so no difference
+# between regular, long double, and quad math Perls
+$col_widths->[1] = int(1000*$col_widths->[1] + 0.5)/1000;
+
+is_deeply( $col_widths, [ 51, 300.758, 48 ], 'CalcColumnWidths - uneven');
 
 ($col_widths, undef) = PDF::Table::CalcColumnWidths(
 	400,

@@ -20,7 +20,9 @@ my %WriteMakefileArgs = (
     "Data::Dumper::Compact" => 0,
     "List::SomeUtils" => 0,
     "Moo" => 2,
+    "Music::Note" => 0,
     "Music::Scales" => 0,
+    "constant" => 0,
     "namespace::clean" => 0,
     "strictures" => 2
   },
@@ -33,7 +35,7 @@ my %WriteMakefileArgs = (
     "strict" => 0,
     "warnings" => 0
   },
-  "VERSION" => "0.0300",
+  "VERSION" => "0.0400",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -47,8 +49,10 @@ my %FallbackPrereqs = (
   "IPC::Open3" => 0,
   "List::SomeUtils" => 0,
   "Moo" => 2,
+  "Music::Note" => 0,
   "Music::Scales" => 0,
   "Test::More" => "0.88",
+  "constant" => 0,
   "namespace::clean" => 0,
   "strict" => 0,
   "strictures" => 2,

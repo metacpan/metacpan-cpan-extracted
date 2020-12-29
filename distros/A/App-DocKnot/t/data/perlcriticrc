@@ -105,8 +105,9 @@ min_value = 100000
 
 # IO::Uncompress::Gunzip puts the error message in a package variable.
 # Text::Wrap has a broken interface that requires use of package variables.
+# YAML::XS also cannot be configured without package variables.
 [Variables::ProhibitPackageVars]
-add_packages = IO::Uncompress::Gunzip Text::Wrap
+add_packages = IO::Uncompress::Gunzip Text::Wrap YAML::XS
 
 # use English was one of the worst ideas in the history of Perl.  It makes the
 # code slightly more readable for amateurs at the cost of confusing

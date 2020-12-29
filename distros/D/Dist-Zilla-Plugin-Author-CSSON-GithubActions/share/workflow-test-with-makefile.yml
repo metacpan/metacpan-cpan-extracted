@@ -1,0 +1,43 @@
+---
+name: makefile-test
+
+on:
+  pull_request:
+    branches:
+    - '*'
+  push:
+    branches:
+    - '*'
+jobs:
+  perl-job:
+    container: perldocker/perl-tester:${{ matrix.perl-version }}
+    name: Perl ${{ matrix.perl-version }}
+    runs-on: ${{ matrix.os }}
+    steps:
+    - uses: actions/checkout@v2
+    - name: Regular tests
+      run: |
+        cpanm Class::XSAccessor --notest
+        cpanm --installdeps --notest .
+        perl Makefile.PL
+        make
+        make test
+
+    - name: Prepare for release tests
+      run: |
+        cpanm --installdeps .
+        cpanm --notest Test::CheckManifest Test::Pod::Coverage Pod::Coverage Test::Pod
+
+    - name: Release tests
+      run: |
+        perl Makefile.PL
+        make
+        make test
+
+    strategy:
+      fail-fast: false
+      matrix:
+        os:
+        - ubuntu-latest
+        perl-version:
+        - '5.32'

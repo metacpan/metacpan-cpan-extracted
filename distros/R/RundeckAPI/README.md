@@ -2,7 +2,9 @@
 
 RundeckAPI - simplifies authenticate, connect, queries to a Rundeck
 instance via REST API
+
 # SYNOPSIS
+
     use RundeckAPI;
 
     # create an object of type RundeckAPI :
@@ -18,6 +20,7 @@ instance via REST API
     $hashRef = $api->put(/api/27/endpoint_for_put, $json);
 
 # METHODS
+
   "new"         Returns an object authenticated and connected to a Rundeck
                 Instance. The field 'login' is not stricto sensu required,
                 but it is a good security measure to check if login/token match
@@ -38,14 +41,21 @@ instance via REST API
 
   "putData"     PUT some data. Similar to postData
 
+  "postFile"    Alias for compatibility for postData
+
+  "putFile"     Alias for compatibility for putData
+
+
 # RETURN VALUE
+
 Returns a hash reference containing the data sent by Rundeck.
 
 The returned value is structured like the following :
 
 the fields `httpstatus` (200, 403, etc) and `requstatus` (OK, CRIT) are always present.
 
-the content is in the hash itself if the data type is JSON, else in the field `content` if we have text or binary
+the field `content` is hash (if the mime-type of the result is JSON), text or binary
+
 
 # SEE ALSO
 

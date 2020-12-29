@@ -1,3 +1,25 @@
+20201222.0.1  2020-12-27  Released-By: PERLANCAR; Urgency: medium
+
+	      - Add Rinci metadata.
+
+
+20201222.0.0  2020-12-24  Released-By: PERLANCAR; Urgency: medium
+
+	      - Update data to 2020-12-22, add list_idx_brokers() like in
+		Finance::SE::IDX 0.005.
+
+              - New firms:
+                + ATAP (Trimitra Prawara Goldland Tbk.)
+                + PMMP (Panca Mitra Multiperdana Tbk.)
+                + PTDU (Djasa Ubersakti Tbk.)
+                + VICI (Victoria Care Indonesia Tbk.)
+
+              - Delisted firms:
+                + GREN (Evergreen Invesco Tbk.)
+
+              - Total firms now 712 (from 709)
+
+
 20201028.0.1  2020-11-03  Released-By: PERLANCAR; Urgency: medium
 
               - No data update.

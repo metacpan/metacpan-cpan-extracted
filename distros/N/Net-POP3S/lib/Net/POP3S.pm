@@ -8,7 +8,7 @@ package Net::POP3S;
 
 use vars qw ( $VERSION @ISA );
 
-$VERSION = '0.11';
+$VERSION = '0.12';
 
 use strict;
 use base qw ( Net::POP3 );
@@ -182,12 +182,6 @@ sub auth {
 }
 
 sub _STLS { shift->command("STLS")->response() == CMD_OK }
-
-# Fix #121006 no timeout issue.
-sub getline {
-  my $self = shift;
-  $self->Net::Cmd::getline(@_);
-}
 
 1;
 

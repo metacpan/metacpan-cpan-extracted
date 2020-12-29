@@ -10,10 +10,8 @@ my %crazyhash = (
     'regex' => qr/.*/,
     'glob' => *STDOUT,
 );
-my $jc = JSON::Create->new ();
 # Let's validate the output of the subroutine below.
-$jc->validate (1);
-$jc->indent (1);
+my $jc = JSON::Create->new (validate => 1, indent => 1, sort => 1);
 # Try this one weird old trick to convert your Perl type.
 $jc->type_handler (
     sub {
@@ -26,7 +24,8 @@ $jc->type_handler (
 	else {
 	    $value = "$thing";
 	}
-	return create_json ({ type => $type, value => $value, });
+	return create_json ({ type => $type, value => $value, },
+			    indent => 1, sort => 1);
     }
 );
 print $jc->run (\%crazyhash), "\n";

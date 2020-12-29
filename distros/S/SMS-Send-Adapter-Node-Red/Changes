@@ -1,0 +1,17 @@
+Revision history for Perl extension SMS::Send::Adapter::Node::Red.
+
+0.05 2020-12-28
+  - Updated Makefile.PL - Added JSON requirement (CPAN testers)
+  - Updated Documentation
+
+0.04 2020-12-27
+  - Cleanup for CPAN release
+
+0.03 2020-12-27
+  - Documentation
+
+0.02 2020-12-26
+  - In Testing
+
+0.01 2020-12-26
+  - original version; created by h2xs 1.23

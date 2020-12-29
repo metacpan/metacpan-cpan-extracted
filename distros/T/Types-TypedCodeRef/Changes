@@ -1,9 +1,16 @@
 Revision history for Perl extension Types-TypedCodeRef
 
+0.05 2020-12-27T16:46:24Z
+    - Fix determining callable value
+    - Fix error occured on v5.12, v5.14
+   
+
 0.04 2020-12-12T20:57:47Z
+
     - Support a coercion from plain coderefs
 
 0.03 2020-12-12T14:13:22Z
+
     - Fix the version of Type::Tiny
 
 0.02 2020-09-27T13:07:33Z

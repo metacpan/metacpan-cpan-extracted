@@ -48,7 +48,7 @@ my @BAD_STRINGS = qw(rra@stanford.edu RRA_MAINTAINER_TESTS);
 
 # File or directory names to always skip.
 my %SKIP = map { $_ => 1 } qw(
-  .git Changes _build blib changelog cover_db obsolete-strings.t
+  .git .pc Changes _build blib changelog cover_db obsolete-strings.t
 );
 
 # Only run this test during automated testing, since failure doesn't indicate

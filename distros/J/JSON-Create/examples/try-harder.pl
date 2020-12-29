@@ -17,6 +17,8 @@ sub try_harder
     }
     elsif ($obj->can ('to_string')) {
 	print "Stringifying $type with 'to_string'.\n";
+	# The call to "create_json" makes sure that the string is
+	# valid as a JSON string.
 	return create_json ($obj->to_string ());
     }
     else {
@@ -24,8 +26,7 @@ sub try_harder
     }
 }
 
-my $jc = JSON::Create->new ();
-$jc->validate (1);
+my $jc = JSON::Create->new (indent => 1, sort => 1, validate => 1);
 $jc->obj_handler (\& try_harder);
 print $jc->run ({
     url => Mojo::URL->new('http://sri:foo@example.com:3000/foo?foo=bar#23'),

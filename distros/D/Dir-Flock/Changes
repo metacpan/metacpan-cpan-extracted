@@ -1,5 +1,9 @@
 Revision history for Dir-Flock
 
+0.08	2020-12-28
+	Simplified implementation that does not rely on Time::HiRes::stat
+	Removed Dir::Flock::Mock package
+
 0.04	2019-11-25
 	Test fixes, robustness improvements
 

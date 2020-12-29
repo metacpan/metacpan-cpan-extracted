@@ -1,6 +1,14 @@
 Changelog for Zing
 
-0.20 2020-12-19T01:06:11
+0.21 2020-12-26T07:17:14
+ - Add release updates
+ - Remove Zing::Lookup savepoint on drop (#244)
+ - Decouple Zing::Zang from Zing (#243)
+ - Document Zing::Journal (#242)
+ - Fix type constraint in Zing::Types#Key (#240)
+
+0.20 2020-12-19T01:06:26
+ - Built release version 0.20
  - Add release updates
  - Fix Zing::Cursor#count bug in Perl 5.18+
  - Refactor and Implement Dependency Injection (#231)

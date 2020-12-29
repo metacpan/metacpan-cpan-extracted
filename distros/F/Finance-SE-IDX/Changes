@@ -1,21 +1,26 @@
-0.004   2018-10-09 (PERLANCAR)
+0.005   2020-12-22  Released-By: PERLANCAR; Urgency: medium
+
+	- Add function: list_idx_brokers().
+
+
+0.004   2018-10-09  Released-By: PERLANCAR
 
 	- Implement caching.
 
 
-0.003   2018-09-07 (PERLANCAR)
+0.003   2018-09-07  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- [doc] Mention Finance::SE::IDX::Static.
 
 
-0.002   2018-09-07 (PERLANCAR)
+0.002   2018-09-07  Released-By: PERLANCAR
 
 	- [bugfix] There's a hard limit on number of rows returned by
 	  GetSecuritiesStock endpoint, iterate to get all results.
 
 
-0.001   2018-09-07 (PERLANCAR)
+0.001   2018-09-07  Released-By: PERLANCAR
 
         - First release.

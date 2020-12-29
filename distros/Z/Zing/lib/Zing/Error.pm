@@ -12,7 +12,7 @@ use Data::Object::Class;
 
 extends 'Data::Object::Exception';
 
-our $VERSION = '0.20'; # VERSION
+our $VERSION = '0.21'; # VERSION
 
 1;
 

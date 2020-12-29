@@ -1,12 +1,16 @@
 package PDF::Builder;
 
 use strict;
-no warnings qw[ deprecated recursion uninitialized ];
+use warnings;
+#no warnings qw[ deprecated recursion uninitialized ];
 
 # $VERSION defined here so developers can run PDF::Builder from git.
 # it should be automatically updated as part of the CPAN build.
-our $VERSION = '3.020'; # VERSION
-my $LAST_UPDATE = '3.020'; # manually update whenever code is changed
+our $VERSION = '3.021'; # VERSION
+my $LAST_UPDATE = '3.021'; # manually update whenever code is changed
+
+my $GrTFversion = 7;     # minimum version of Graphics::TIFF
+my $LpngVersion = 0.56;  # minimum version of Image::PNG::Libpng
 
 use Carp;
 use Encode qw(:all);
@@ -156,11 +160,13 @@ PDF::Builder is currently being maintained by Phil M. Perry.
 
 =head2 SUPPORT
 
-Full source is on https://github.com/PhilterPaper/Perl-PDF-Builder
+The full source is on https://github.com/PhilterPaper/Perl-PDF-Builder.
 
-Bug reports are on https://github.com/PhilterPaper/Perl-PDF-Builder/issues?q=is%3Aissue+sort%3Aupdated-desc (with "bug" label), feature requests have an "enhancement" label, and general discussions (architecture, roadmap, etc.) have a "general discussion" label. Please do not use the RT.cpan system to report issues, as it is not regularly monitored.
+The release distribution is on CPAN: https://metacpan.org/pod/PDF::Builder.
 
-Release distribution is on CPAN: https://metacpan.org/pod/PDF::Builder
+Bug reports are on https://github.com/PhilterPaper/Perl-PDF-Builder/issues?q=is%3Aissue+sort%3Aupdated-desc (with "bug" label), feature requests have an "enhancement" label, and general discussions (architecture, roadmap, etc.) have a "general discussion" label.
+
+Do B<not> under I<any> circumstances open a PR (Pull Request) to report a bug. It is a waste of both your and our time and effort. Open a regular ticket (issue), and attach a Perl (.pl) program illustrating the problem, if possible. If you believe that you have a program patch, and offer to share it as a PR, we may give the go-ahead. Unsolicited PRs may be closed without further action.
 
 =head1 LICENSE
 
@@ -306,17 +312,17 @@ sub new {
     $self->preferences(%options);
     if (defined $options{'-outver'}) {
         if ($options{'-outver'} >= 1.4) {
-	        $self->{'pdf'}->{' version'} = $outVer = $options{'-outver'};
-	    } else {
-	        print STDERR "Invalid -outver given, or less than 1.4. Ignored.\n";
-	    }
+	    $self->{'pdf'}->{' version'} = $outVer = $options{'-outver'};
+	} else {
+	    print STDERR "Invalid -outver given, or less than 1.4. Ignored.\n";
+	}
     }
     if (defined $options{'-msgver'}) {
-	    if ($options{'-msgver'} == 0 || $options{'-msgver'} == 1) {
+        if ($options{'-msgver'} == 0 || $options{'-msgver'} == 1) {
             $msgVer = $options{'-msgver'};
-	    } else {
-	        print STDERR "Invalid -msgver given, not 0 or 1. Ignored.\n";
-	    }
+        } else {
+            print STDERR "Invalid -msgver given, not 0 or 1. Ignored.\n";
+        }
     }
     if ($options{'-file'}) {
         $self->{'pdf'}->create_file($options{'-file'});
@@ -546,7 +552,7 @@ sub open_scalar {
     if (exists $options{'-diaglevel'}) {
       $self->{'diaglevel'} = $options{'-diaglevel'};
       if ($self->{'diaglevel'} < 0 || $self->{'diaglevel'} > 5) {
-	$self->{'diaglevel'} = 2;
+        $self->{'diaglevel'} = 2;
       }
     } else {
       $self->{'diaglevel'} = 2;
@@ -2191,12 +2197,12 @@ sub image_tiff {
     if ($rc == 1) {
 	# Graphics::TIFF (_GT suffix) available and to be used
         require PDF::Builder::Resource::XObject::Image::TIFF_GT;
-        $obj = PDF::Builder::Resource::XObject::Image::TIFF_GT->new($self->{'pdf'}, $file);
+        $obj = PDF::Builder::Resource::XObject::Image::TIFF_GT->new($self->{'pdf'}, $file, 'Ix'.pdfkey(), %opts);
         $self->{'pdf'}->out_obj($self->{'pages'});
     } else {
 	# Graphics::TIFF not available, or is but is not to be used
         require PDF::Builder::Resource::XObject::Image::TIFF;
-        $obj = PDF::Builder::Resource::XObject::Image::TIFF->new($self->{'pdf'}, $file);
+        $obj = PDF::Builder::Resource::XObject::Image::TIFF->new($self->{'pdf'}, $file, 'Ix'.pdfkey(), %opts);
         $self->{'pdf'}->out_obj($self->{'pages'});
 
 	if ($rc == 0 && $MSG_COUNT[0]++ == 0) {
@@ -2241,6 +2247,10 @@ sub LA_GT {
         1;
     };
     if (!defined $rc) { $rc = 0; }  # else is 1
+    if ($rc) {
+	# installed, but not up to date?
+	if ($Graphics::TIFF::VERSION < $GrTFversion) { $rc = 0; }
+    }
 
     return $rc;
 }
@@ -2348,6 +2358,10 @@ sub LA_IPL {
         1;
     };
     if (!defined $rc) { $rc = 0; }  # else is 1
+    if ($rc) {
+	# installed, but not up to date?
+	if ($Image::PNG::Libpng::VERSION < $LpngVersion) { $rc = 0; }
+    }
 
     return $rc;
 }

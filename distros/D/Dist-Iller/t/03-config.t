@@ -10,6 +10,7 @@ use lib 't/corpus/lib';
 use Dist::Iller::Config::DistIllerTestConfig;
 
 my $iller = Dist::Iller->new(filepath => 't/corpus/03-config-iller.yaml');
+$iller->parse('first');
 $iller->parse('before');
 
 my $tempdir = Path::Tiny->tempdir();
@@ -60,7 +61,8 @@ like $generated_cpanfile, qr/ExtUtils::MakeMaker/, 'cpanfile, configure requires
 like $generated_cpanfile, qr/suggests 'Another::Crufter' => '1.2'/, 'cpanfile, added prereq from plugin';
 
 like $generated_gitignore, qr/MYMETA/, 'gitignore: MYMETA.* is ignored';
-like $generated_gitignore, qr/ThisFile/, 'gitignore: Ignores file added in config';
+like $generated_gitignore, qr/ThisFile/, 'gitignore: Ignores file added in config' or diag explain $generated_gitignore;
+like $generated_gitignore, qr{/My-Own-Dist-*}, 'gitignore: Ignores built distribution dir, added by $self.distribution_name' or diag explain $generated_gitignore;
 unlike $generated_gitignore, qr/inc/, 'gitignore: inc is not ignored, since it does not exist';
 
 done_testing;

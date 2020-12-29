@@ -17,11 +17,13 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.010",
   "NAME" => "Music::MelodicDevice::Ornamentation",
   "PREREQ_PM" => {
+    "Carp" => 0,
     "Data::Dumper::Compact" => 0,
     "List::SomeUtils" => 0,
     "MIDI::Simple" => 0,
     "Moo" => 2,
     "Music::Duration" => 0,
+    "Music::Note" => 0,
     "Music::Scales" => 0,
     "constant" => 0,
     "namespace::clean" => 0,
@@ -36,7 +38,7 @@ my %WriteMakefileArgs = (
     "strict" => 0,
     "warnings" => 0
   },
-  "VERSION" => "0.0401",
+  "VERSION" => "0.0600",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -44,6 +46,7 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
+  "Carp" => 0,
   "Data::Dumper::Compact" => 0,
   "File::Spec" => 0,
   "IO::Handle" => 0,
@@ -52,6 +55,7 @@ my %FallbackPrereqs = (
   "MIDI::Simple" => 0,
   "Moo" => 2,
   "Music::Duration" => 0,
+  "Music::Note" => 0,
   "Music::Scales" => 0,
   "Test::More" => "0.88",
   "constant" => 0,

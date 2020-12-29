@@ -30,7 +30,7 @@ do { my $x = {
                                       'Ref::Util' => '0',
                                       'Text::Minify::XS' => 'v0.3.1',
                                       'parent' => '0',
-                                      'perl' => 'v5.10.0',
+                                      'perl' => 'v5.9.3',
                                       'strict' => '0',
                                       'warnings' => '0'
                                     }

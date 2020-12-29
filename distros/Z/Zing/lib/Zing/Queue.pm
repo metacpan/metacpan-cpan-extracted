@@ -12,7 +12,7 @@ use Data::Object::Class;
 
 extends 'Zing::PubSub';
 
-our $VERSION = '0.20'; # VERSION
+our $VERSION = '0.21'; # VERSION
 
 # METHODS
 

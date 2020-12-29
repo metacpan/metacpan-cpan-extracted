@@ -352,8 +352,8 @@ BUILDING ON WINDOWS
      parameters "/xp /release".
 
   2. Run the configure.bat script, giving it as an argument the location
-     of the Kerberos for Windows SDK.  For example, if you installed the KfW
-     SDK in "c:\KfW SDK", you should run:
+     of the Kerberos for Windows SDK.  For example, if you installed the
+     KfW SDK in "c:\KfW SDK", you should run:
 
          configure "c:\KfW SDK"
 

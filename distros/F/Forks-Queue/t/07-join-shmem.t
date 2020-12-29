@@ -6,7 +6,7 @@ require "t/exercises.tt";
 
 PREP('Shmem');
 
-my $TEMP = TEMP_DIR();
+my $TEMP = "/dev/shm";
 diag "$0: temp dir is $TEMP";
 my $qfile1 = "q7m-$$";
 my $qfile2 = "q7n-$$";
@@ -16,3 +16,4 @@ unlink "$TEMP/$qfile1", "$TEMP/$qfile2";
 exercise_join( impl => 'Shmem', file1 => "$qfile1", file2 => "$qfile2" );
 
 done_testing;
+

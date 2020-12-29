@@ -1,0 +1,113 @@
+---
+blurb: |
+  lbcd is a daemon that runs on a UNIX system and answers UDP queries with
+  information about system load, number of logged-on users, uptime, and free
+  /tmp space.  This information can be used to accumulate system status
+  across a cluster with light-weight queries or can be used as input to a
+  load-balancing system to choose the best system to which to direct new
+  incoming connections.
+build:
+  autoconf: '2.64'
+  automake: '1.11'
+  autotools: true
+  middle: |
+    lbcd looks for `$sysconfdir/nolbcd` and returns the maximum load if that
+    file is present, allowing one to effectively drop a system out of a
+    load-balanced pool by touching that file.  By default, the path is
+    `/usr/local/etc/nolbcd`, but you may want to pass `--sysconfdir=/etc` to
+    configure to use `/etc/nolbcd`.
+
+    lbcdclient is written in Perl, so you may have to edit the first line of
+    the script to point to the correct Perl location on your system.  It does
+    not use any sophisticated Perl features or add-on modules.
+  suffix: |
+    You will generally want to start lbcd at system boot.  All that is needed
+    is a simple init script to start lbcd with the appropriate options or kill
+    it again.  It writes its PID into `/var/run/lbcd.pid` by default (and this
+    can be changed with the `-P` option).  On many systems, lbcd will need to
+    run as root or as a member of particular groups to obtain system load
+    average and uptime information.
+  type: Autoconf
+copyrights:
+- holder: The Board of Trustees of the Leland Stanford Junior University
+  years: 1993-1994, 1996-1998, 2000, 2003-2009, 2012-2013
+description: |
+  lbcd provides a lightweight way to query a system via unauthenticated UDP
+  for system load information plus some related information that may be
+  relevant to determining which system to hand out.  It was designed for use
+  with the [lbnamed DNS load
+  balancer](https://www.stanford.edu/~riepel/lbnamed/).  System load, number
+  of logged-in users, free /tmp space, and system uptime are always
+  returned.  lbcd can also be configured to probe various local services and
+  modify the returned weights based on whether those services are reachable,
+  or to return a static weight for round-robin load balancing.
+
+  The information provided isn't particularly sophisticated, and a good
+  hardware load balancer will be able to consider such things as connection
+  latency and responsiveness to make better decisions.  However, lbcd with
+  lbnamed works quite well for smaller scale problems, scales well to
+  multiple load balance pools for different services, provides a simple UDP
+  health check service, and is much simpler and cheaper to understand and
+  deploy.
+
+  Included in this package is a small client program, lbcdclient, which can
+  query an lbcd server and display a formatted version of the returned
+  information.
+
+  It was originally written by Roland Schemers.  Larry Schwimmer rewrote it
+  to add protocol version 3 with some additional features and service
+  probing, and then I rewrote it again to update the coding style and use my
+  standard portability layer.
+distribution:
+  packaging:
+    debian:
+      package: lbcd
+      summary: |
+        A Debian package is included in Debian 5.0 (lenny) and later releases.
+        Thanks to Guido Guenther for doing the initial upload to Debian.
+  section: system
+  tarname: lbcd
+  version: lbcd
+docs:
+  user:
+  - name: lbcd
+    title: lbcd manual page
+  - name: lbcdclient
+    title: lbcdclient manual page
+format: v1
+license:
+  name: Expat
+maintainer: Russ Allbery <eagle@eyrie.org>
+name: lbcd
+orphaned: |
+  Although I believe it is still useful, I no longer use this method of DNS
+  load balancing and am no longer maintaining this package.  If you would
+  like to pick up maintenance of it, please feel free.  Contact me if you
+  would like this page to redirect to its new home.
+requirements: |
+  lbcd is written in C, so you'll need a C compiler.  It also uses kernel
+  calls to obtain load and uptime information, and at present has only been
+  ported to Linux, Solaris, AIX, various BSD systems, Mac OS X, HP-UX, IRIX,
+  and Tru64.  It is currently primarily tested on Linux.  Platforms not
+  listed may require some porting effort, as may old or unusual platforms
+  that aren't regularly tested.
+
+  The lbcdclient program requires Perl 5.6 or later and requires the
+  IO::Socket::INET6 module for IPv6 support.
+support:
+  email: eagle@eyrie.org
+  listname: lbnamed-users
+  listurl: https://mailman.stanford.edu/mailman/listinfo/lbnamed-users
+  web: https://www.eyrie.org/~eagle/software/lbcd/
+synopsis: responder for load balancing
+test:
+  lancaster: true
+  suffix: |
+    Currently, the test suite only checks the portability and utility
+    libraries, not the functionality of lbcd or lbcdclient.
+vcs:
+  browse: https://git.eyrie.org/?p=system/lbcd.git
+  github: rra/lbcd
+  type: Git
+  url: https://git.eyrie.org/git/system/lbcd.git
+version: 3.4.2

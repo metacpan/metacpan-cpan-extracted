@@ -1,9 +1,9 @@
 package Sah::Schema::unix::local_uid;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-06-13'; # DATE
+our $DATE = '2020-10-16'; # DATE
 our $DIST = 'Sah-Schemas-Unix'; # DIST
-our $VERSION = '0.012'; # VERSION
+our $VERSION = '0.013'; # VERSION
 
 our $schema = ["unix::uid" => {
     summary => 'User identifier (UID) that has to exist (has associated username) on the system',
@@ -33,7 +33,7 @@ Sah::Schema::unix::local_uid - User identifier (UID) that has to exist (has asso
 
 =head1 VERSION
 
-This document describes version 0.012 of Sah::Schema::unix::local_uid (from Perl distribution Sah-Schemas-Unix), released on 2020-06-13.
+This document describes version 0.013 of Sah::Schema::unix::local_uid (from Perl distribution Sah-Schemas-Unix), released on 2020-10-16.
 
 =head1 SYNOPSIS
 

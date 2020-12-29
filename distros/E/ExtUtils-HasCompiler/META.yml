@@ -21,7 +21,7 @@ name: ExtUtils-HasCompiler
 provides:
   ExtUtils::HasCompiler:
     file: lib/ExtUtils/HasCompiler.pm
-    version: '0.022'
+    version: '0.023'
 requires:
   Carp: '0'
   DynaLoader: '0'
@@ -37,7 +37,7 @@ requires:
 resources:
   bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=ExtUtils-HasCompiler
   repository: git://github.com/Leont/extutils-hascompiler.git
-version: '0.022'
+version: '0.023'
 x_contributors:
   - 'bulk88 <bulk88@hotmail.com>'
   - 'Craig A. Berry <craigberry@mac.com>'

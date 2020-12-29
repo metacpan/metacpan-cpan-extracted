@@ -54,14 +54,21 @@ for my $impl (IMPL()) {
     my $t = time;
     until ($s->{end}) {
         sleep 1;
+        if (time - $t > 20) {
+            diag "exercise_forks: ",
+                "Taking too long for queue to become availabile";
+            $q->end;
+        }
         $s = $q->status;
-        if (time - $t > 15) {
+        if (time - $t > 30) {
             die "Took too long for queue to become available";
         }
     }
+    my $proctime = Time::HiRes::time - $t;
     if ($^O !~ /freebsd/) {
-        ok(Time::HiRes::time - $t < 10,
-           'threads: simultaneous queue access from 3 procs not too slow');
+        ok($proctime < 10,
+           'threads: simultaneous queue access from 3 procs not too slow'
+           . " ($proctime s)");
     }
     is($q->pending, 30, 'threads: 30 items on queue');
     my @g = $q->get(30);

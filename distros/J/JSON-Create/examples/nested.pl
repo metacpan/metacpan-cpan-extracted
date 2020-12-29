@@ -12,4 +12,4 @@ my $nested = {
 	australia => 'orange',
     },
 };
-print create_json ($nested);
+print create_json ($nested, sort => 1, indent => 1);

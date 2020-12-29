@@ -11,7 +11,7 @@
 # Modules and declarations
 ##############################################################################
 
-package App::DocKnot 3.05;
+package App::DocKnot 4.00;
 
 use 5.024;
 use autodie;
@@ -35,7 +35,6 @@ use Perl6::Slurp;
 # We therefore try File::BaseDir first (which handles the XDG paths) and fall
 # back on using File::ShareDir to locate the data.
 #
-# $self - The App::DocKnot object
 # @path - The relative path of the file as a list of components
 #
 # Returns: The absolute path to the application data
@@ -57,7 +56,6 @@ sub appdata_path {
 # and returns the resulting decoded contents.  This uses the relaxed parsing
 # mode, so comments and commas after data elements are supported.
 #
-# $self - The App::DocKnot object
 # @path - The path of the file to load, as a list of components
 #
 # Returns: Anonymous hash or array resulting from decoding the JSON object

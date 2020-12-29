@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 26;
+use Test::More tests => 27;
 use Test::Deep;
 
 use PomBase::Chobo::ParseOBO;
@@ -89,7 +89,7 @@ my $dodgy_term_ontology_data = PomBase::Chobo::OntologyData->new();
 $parser->parse(filename => 't/data/mini_go.obo',
                ontology_data => $dodgy_term_ontology_data);
 
-is ($dodgy_term_ontology_data->get_terms(), 2);
+is ($dodgy_term_ontology_data->get_terms(), 3);
 
 my @dodgy_terms = sort map {
   $_->{name}
@@ -98,7 +98,8 @@ my @dodgy_terms = sort map {
 cmp_deeply(\@dodgy_terms,
            [
              'cyanidin 3-O-glucoside-(2"-O-xyloside) 6\'\'-O-acyltransferase activity',
-             'molecular_function'
+             'molecular_function',
+             'obsolete repairosome',
            ]);
 
 
@@ -144,3 +145,9 @@ my @expected_synonyms =
 
   cmp_deeply(\@expected_synonyms,
              [sort { $a->{synonym} cmp $b->{synonym} } $fypo_0001320->synonyms()]);
+
+
+my $fypo_0009876_term =
+  $ontology_data->get_term_by_id('FYPO:0009876');
+
+is($fypo_0009876_term->replaced_by(), 'FYPO:0001006');

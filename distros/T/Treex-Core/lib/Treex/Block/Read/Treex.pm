@@ -1,5 +1,5 @@
 package Treex::Block::Read::Treex;
-$Treex::Block::Read::Treex::VERSION = '2.20160630';
+$Treex::Block::Read::Treex::VERSION = '2.20201228';
 use Moose;
 use Treex::Core::Common;
 extends 'Treex::Block::Read::BaseReader';
@@ -33,7 +33,7 @@ Treex::Block::Read::Treex
 
 =head1 VERSION
 
-version 2.20160630
+version 2.20201228
 
 =head1 DESCRIPTION
 

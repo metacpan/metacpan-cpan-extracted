@@ -1,7 +1,4 @@
-Build.PL
 Changes
-cpanfile
-dist.ini
 ignore.txt
 lib/Template/Plugin/URI.pm
 LICENSE

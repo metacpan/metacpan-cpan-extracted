@@ -23,11 +23,13 @@ my $fx = 20;
 
 my ($pdf, $f1, $gfx, $text, $page);
 # font name list
-my @fontnames = qw[ Ming Ming-Bold Ming-Italic Ming-BoldItalic
-    Song Song-Bold Song-Italic Song-BoldItalic
-    MyungJo MyungJo-Bold MyungJo-Italic MyungJo-BoldItalic
-    KozMin KozMin-Bold KozMin-Italic KozMin-BoldItalic
-    KozGo KozGo-Bold KozGo-Italic KozGo-BoldItalic ];
+my @fontnames = qw[ 
+  Ming Ming-Bold Ming-Italic Ming-BoldItalic
+  Song Song-Bold Song-Italic Song-BoldItalic
+  MyungJo MyungJo-Bold MyungJo-Italic MyungJo-BoldItalic
+  KozMin KozMin-Bold KozMin-Italic KozMin-BoldItalic
+  KozGo KozGo-Bold KozGo-Italic KozGo-BoldItalic 
+];
 
 foreach my $fn (@fontnames) {
    #if ($fn eq 'Ming-Bold') { last; } # for testing

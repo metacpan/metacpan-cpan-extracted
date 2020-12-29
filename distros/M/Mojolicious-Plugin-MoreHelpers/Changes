@@ -7,3 +7,11 @@
   - Helpers headers_more and route_params added.
   - Basic module documentation.
 
+0.03 2020-11-18
+  - Added 'inet_address' and 'email_address' validators.
+
+0.04 2020-12-25
+  - Refactor reply_json logic.
+  - Configurable message_header attribute.
+  - Headers management with reply_headers anonsub.
+

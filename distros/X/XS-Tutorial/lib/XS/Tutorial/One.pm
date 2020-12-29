@@ -99,24 +99,24 @@ indicates the name of the C function to be called I<and> it defines the
 signature of the xsub.
 
 In this case we're calling C<rand> and accepting no parameters. This isn't
-Perl's built-in rand function, I<this> rand comes from stdlib.h.
+Perl's built-in rand function, I<this> rand comes from F<stdlib.h>.
 
 The final thing we need is a F<Makefile.PL> script - as XS code is compiled, we
 need a tool to build it before we can use it:
 
   use 5.008005;
-  use ExtUtils::MakeMaker 7.12; # for XSMULTI option
+  use ExtUtils::MakeMaker;
 
   WriteMakefile(
-    NAME           => 'XS::Tutorial',
-    VERSION_FROM   => 'lib/XS/Tutorial.pm',
-    PREREQ_PM      => { 'ExtUtils::MakeMaker' => '7.12' },
+    NAME => 'XS::Tutorial',
+    VERSION_FROM => 'lib/XS/Tutorial.pm',
+    CONFIGURE_REQUIRES => { 'ExtUtils::MakeMaker' => '7.12' }, # for XSMULTI option
     ABSTRACT_FROM  => 'lib/XS/Tutorial.pm',
-    AUTHOR         => 'David Farrell',
-    CCFLAGS        => '-Wall -std=c99',
-    OPTIMIZE       => '-O3',
-    LICENSE        => 'freebsd',
-    XSMULTI        => 1,
+    AUTHOR => 'David Farrell',
+    CCFLAGS => '-Wall -std=c99',
+    OPTIMIZE => '-O3',
+    LICENSE => 'freebsd',
+    XSMULTI => 1,
   );
 
 The ExtUtils::MakeMaker L<docs|https://metacpan.org/pod/ExtUtils::MakeMaker> explain these options.
@@ -124,7 +124,7 @@ The ExtUtils::MakeMaker L<docs|https://metacpan.org/pod/ExtUtils::MakeMaker> exp
 But let's talk about C<XSMULTI>. This is a relatively new feature which allows
 you to have separate .xs files for modules. By default EUMM assumes the xs
 file matches the distribution name. In this case that would mean having a single
-Tutorial.xs file, with multiple xs C<MODULE> and C<PACKAGE> declarations in it.
+F<Tutorial.xs> file, with multiple xs C<MODULE> and C<PACKAGE> declarations in it.
 By using C<XSMULTI>, we can have multiple XS files, one for each module in the
 distribution instead.
 
@@ -169,7 +169,7 @@ happened to our C<rand> xsub:
 
 C<xsubpp> has replaced our XS code with some rather ugly C macros! These macros
 are part of the Perl interpreter's C API. Many are documented in L<perlapi|http://perldoc.perl.org/perlapi.html>
-and they are usually defined in C<XSUB.h> or C<perl.h> in the Perl source code.
+and they are usually defined in F<XSUB.h> or F<perl.h> in the Perl source code.
 
 So what are these macros doing? At a high level, C<dVAR> and C<dXSARGS> setup
 the global pointer stack and some local variables. C<items> is a count of the
@@ -278,10 +278,10 @@ This will rebuild and test the distribution. Because XS code is compiled,
 writing tests and using that one liner, you can quickly cycle through coding
 and testing.
 
-Don't forget to add Test::More to the C<PREREQ_PM> entry in F<Makefile.PL>. When
+Don't forget to add Test::More to your F<Makefile.PL>. When
 you don't have a specific minimum version, you can just use 0:
 
-  PREREQ_PM => { 'Test::More' => 0, 'ExtUtils::MakeMaker' => '7.12' },
+  TEST_REQUIRES => { 'Test::More' => 0 },
 
 =head2 Cleanup
 
@@ -306,7 +306,7 @@ This will delete all the build files and reset the working directory to normal.
 
 =item * For writing Makefile.PL files: ExtUtils::MakeMaker L<docs|https://metacpan.org/pod/ExtUtils::MakeMaker> are invaluable
 
-=item * Perl's built-in L<rand|http://perldoc.perl.org/functions/rand.html> and <srand|http://perldoc.perl.org/functions/srand.html> functions
+=item * Perl's built-in L<rand|http://perldoc.perl.org/functions/rand.html> and L<srand|http://perldoc.perl.org/functions/srand.html> functions
 
 =back
 

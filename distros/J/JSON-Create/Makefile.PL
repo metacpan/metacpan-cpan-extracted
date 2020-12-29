@@ -46,6 +46,8 @@ my %WriteMakefileArgs = (
 	'Scalar::Util' => 0,
 	# Used in the PP version
 	'POSIX' => 0,
+	# Used in the PP version
+	'Unicode::UTF8' => '0.62',
     },
     TEST_REQUIRES => $tr,
     META_MERGE => {

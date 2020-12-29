@@ -1,6 +1,6 @@
 package LaTeXML::Plugin::Latexmls;
 {
-  $LaTeXML::Plugin::Latexmls::VERSION = '1.4.3';
+  $LaTeXML::Plugin::Latexmls::VERSION = '1.5';
 }
 
 1;

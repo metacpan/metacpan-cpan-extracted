@@ -5,7 +5,8 @@ use warnings;
 package Dist::Iller::DocType::Dist;
 
 our $AUTHORITY = 'cpan:CSSON'; # AUTHORITY
-our $VERSION = '0.1408';
+# ABSTRACT: Turn the Dist::Iller config into a dist.ini file
+our $VERSION = '0.1409';
 
 use Dist::Iller::Elk;
 with qw/
@@ -18,11 +19,13 @@ use Types::Standard qw/HashRef ArrayRef Str Int Bool/;
 use PerlX::Maybe qw/maybe provided/;
 use List::Util qw/any/;
 
+
 has name => (
     is => 'rw',
     isa => Str,
     predicate => 1,
     init_arg => undef,
+    documentation => q{Since 0.1409, consider using 'distribution_name' in doctype:global instead.},
 );
 has author => (
     is => 'rw',
@@ -101,6 +104,9 @@ sub parse_header {
         if(!$self->$predicate && $value) {
             $self->$setting($value);
         }
+    }
+    if (!$self->has_name && $self->global && $self->global->has_distribution_name) {
+        $self->name($self->global->distribution_name);
     }
 }
 
@@ -289,11 +295,11 @@ __END__
 
 =head1 NAME
 
-Dist::Iller::DocType::Dist
+Dist::Iller::DocType::Dist - Turn the Dist::Iller config into a dist.ini file
 
 =head1 VERSION
 
-Version 0.1408, released 2016-03-12.
+Version 0.1409, released 2020-12-27.
 
 =head1 SOURCE
 

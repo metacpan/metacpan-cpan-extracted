@@ -5,13 +5,14 @@ use warnings;
 package Dist::Iller::Config;
 
 our $AUTHORITY = 'cpan:CSSON'; # AUTHORITY
-our $VERSION = '0.1408';
+# ABSTRACT: Role for Dist::Iller configs
+our $VERSION = '0.1409';
 
 use Moose::Role;
 use MooseX::AttributeShortcuts;
 use namespace::autoclean;
 use Module::Load qw/load/;
-use Types::Standard qw/Bool Str/;
+use Types::Standard qw/Bool Str Maybe InstanceOf/;
 use YAML::Tiny;
 use Path::Tiny;
 use Try::Tiny;
@@ -33,10 +34,17 @@ has main_module => (
 has distribution_name => (
     is => 'ro',
     isa => Str,
+    lazy => 1,
     predicate => 1,
+    default => sub { undef },
     traits => ['Documented'],
     documentation_order => 0,
 );
+has global => (
+    is => 'ro',
+    isa => Maybe[InstanceOf['Dist::Iller::DocType::Global']],
+);
+
 
 sub config_location {
     my $self = shift;
@@ -84,11 +92,11 @@ __END__
 
 =head1 NAME
 
-Dist::Iller::Config
+Dist::Iller::Config - Role for Dist::Iller configs
 
 =head1 VERSION
 
-Version 0.1408, released 2016-03-12.
+Version 0.1409, released 2020-12-27.
 
 =head1 SOURCE
 

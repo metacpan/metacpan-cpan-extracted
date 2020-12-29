@@ -1,1 +1,2 @@
 AC_INIT
+AC_OUTPUT

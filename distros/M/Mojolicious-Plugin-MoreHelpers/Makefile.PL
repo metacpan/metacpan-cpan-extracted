@@ -15,8 +15,12 @@ WriteMakefile(
   META_MERGE    => {
     'meta-spec'   => { version => 2 },
     resources     => {
-      bugtracker  => { web => 'https://github.com/bitnoize/mojolicious-plugin-morehelpers/issues' },
-      license     => ['http://www.opensource.org/licenses/artistic-license-2.0'],
+      bugtracker  => {
+        web => 'https://github.com/bitnoize/mojolicious-plugin-morehelpers/issues'
+      },
+      license     => [
+        'http://www.opensource.org/licenses/artistic-license-2.0'
+      ],
       repository  => {
         type  => 'git',
         url   => 'git://github.com/bitnoize/mojolicious-plugin-morehelpers.git',
@@ -25,7 +29,9 @@ WriteMakefile(
     },
   },
   PREREQ_PM     => {
-    "Mojolicious" => '8.12'
+    'Mojolicious'         => '8.12',
+    'Data::Validate::IP'  => '0.27',
+    'Email::Address'      => '1.912'
   },
   test => { TESTS => 't/*.t' }
 );

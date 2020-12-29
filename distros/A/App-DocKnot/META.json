@@ -27,9 +27,11 @@
             "IPC::Run" : "0",
             "IPC::System::Simple" : "0",
             "JSON::MaybeXS" : "0",
+            "Kwalify" : "0",
             "List::SomeUtils" : "0",
             "Perl6::Slurp" : "0",
             "Template" : "0",
+            "YAML::XS" : "0.81",
             "perl" : "5.024"
          }
       },
@@ -43,30 +45,33 @@
    "provides" : {
       "App::DocKnot" : {
          "file" : "lib/App/DocKnot.pm",
-         "version" : "3.05"
+         "version" : "4.00"
       },
       "App::DocKnot::Command" : {
          "file" : "lib/App/DocKnot/Command.pm",
-         "version" : "3.05"
+         "version" : "4.00"
       },
       "App::DocKnot::Config" : {
          "file" : "lib/App/DocKnot/Config.pm",
-         "version" : "3.05"
+         "version" : "4.00"
       },
       "App::DocKnot::Dist" : {
          "file" : "lib/App/DocKnot/Dist.pm",
-         "version" : "3.05"
+         "version" : "4.00"
       },
       "App::DocKnot::Generate" : {
          "file" : "lib/App/DocKnot/Generate.pm",
-         "version" : "3.05"
+         "version" : "4.00"
+      },
+      "App::DocKnot::Update" : {
+         "file" : "lib/App/DocKnot/Update.pm",
+         "version" : "4.00"
       }
    },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "mailto" : "bug-App-DocKnot@rt.cpan.org",
-         "web" : "https://rt.cpan.org/Dist/Display.html?Name=App-DocKnot"
+         "web" : "https://github.com/rra/docknot/issues"
       },
       "homepage" : "https://www.eyrie.org/~eagle/software/docknot",
       "license" : [
@@ -78,6 +83,6 @@
          "web" : "https://github.com/rra/docknot"
       }
    },
-   "version" : "3.05",
-   "x_serialization_backend" : "JSON::PP version 4.02"
+   "version" : "4.00",
+   "x_serialization_backend" : "JSON::PP version 4.04"
 }

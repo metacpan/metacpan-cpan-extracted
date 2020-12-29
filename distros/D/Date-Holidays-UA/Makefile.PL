@@ -22,6 +22,14 @@ my %WriteMakefileArgs = (
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'Date-Holidays-UA-*' },
+    META_MERGE        => {
+        'meta-spec' => { version => 2 },
+        resources => {
+            bugtracker => {
+                "web" => "https://github.com/dboys/perl-date-holidays-ua/issues"
+            }
+        },
+    },
 );
 
 # Compatibility with old versions of ExtUtils::MakeMaker

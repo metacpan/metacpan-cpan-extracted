@@ -2,7 +2,7 @@
 #
 # Tests for App::DocKnot::Dist command selection to generate a distribution.
 #
-# Copyright 2019 Russ Allbery <rra@cpan.org>
+# Copyright 2019-2020 Russ Allbery <rra@cpan.org>
 #
 # SPDX-License-Identifier: MIT
 
@@ -46,7 +46,8 @@ $docknot = App::DocKnot::Dist->new({ distdir => q{.}, perl => '/a/perl' });
 is_deeply(\@seen, \@expected, 'Module::Build');
 
 # ExtUtils::MakeMaker distribution.
-my $metadata_path = File::Spec->catfile($dataroot, 'ansicolor', 'metadata');
+my $metadata_path
+  = File::Spec->catfile($dataroot, 'ansicolor', 'docknot.yaml');
 $docknot
   = App::DocKnot::Dist->new({ distdir => q{.}, metadata => $metadata_path });
 #<<<
@@ -60,7 +61,7 @@ $docknot
 is_deeply(\@seen, \@expected, 'ExtUtils::MakeMaker');
 
 # Autoconf distribution.
-$metadata_path = File::Spec->catfile($dataroot, 'lbcd', 'metadata');
+$metadata_path = File::Spec->catfile($dataroot, 'lbcd', 'docknot.yaml');
 $docknot
   = App::DocKnot::Dist->new({ distdir => q{.}, metadata => $metadata_path });
 #<<<
@@ -82,7 +83,8 @@ $docknot
 is_deeply(\@seen, \@expected, 'Autoconf');
 
 # Autoconf distribution with C++ and valgrind.
-$metadata_path = File::Spec->catfile($dataroot, 'c-tap-harness', 'metadata');
+$metadata_path
+  = File::Spec->catfile($dataroot, 'c-tap-harness', 'docknot.yaml');
 $docknot
   = App::DocKnot::Dist->new({ distdir => q{.}, metadata => $metadata_path });
 #<<<
@@ -108,7 +110,8 @@ $docknot
 is_deeply(\@seen, \@expected, 'Autoconf with C++');
 
 # Makefile only distribution (make).
-$metadata_path = File::Spec->catfile($dataroot, 'control-archive', 'metadata');
+$metadata_path
+  = File::Spec->catfile($dataroot, 'control-archive', 'docknot.yaml');
 $docknot
   = App::DocKnot::Dist->new({ distdir => q{.}, metadata => $metadata_path });
 @expected = (['make', 'dist']);

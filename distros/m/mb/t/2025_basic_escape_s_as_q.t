@@ -1330,62 +1330,62 @@ END2
     sub { $_=<<'END1'; mb::parse() eq regexp(<<'END2'); }, # test no 264
 s'[アソゾABC1-3]'1'
 END1
-s{(\G${mb::_anchor})@{[qr'(?:(?=(?:ア)|(?:\x83\x5C)|(?:\x83\x5D)|[ABC1-3])(?-xism:(?>(?>[\x81-\x9F\xE0-\xFC][\x00-\xFF]|[\x80-\xFF])|[\x00-\x7F])))' ]}@{[mb::_s_passed()]}}{$1 . '1'}e
+s{(\G${mb::_anchor})@{[qr'(?:(?=(?:ア)|(?:\x83\x5C)|(?:\x83\x5D)|[\x31-\x33]|[ABC])(?-xism:(?>(?>[\x81-\x9F\xE0-\xFC][\x00-\xFF]|[\x80-\xFF])|[\x00-\x7F])))' ]}@{[mb::_s_passed()]}}{$1 . '1'}e
 END2
     sub { $_=<<'END1'; mb::parse() eq regexp(<<'END2'); }, # test no 265
 s'[^アソゾABC1-3]'1'
 END1
-s{(\G${mb::_anchor})@{[qr'(?:(?!(?:ア)|(?:\x83\x5C)|(?:\x83\x5D)|[ABC1-3])(?-xism:(?>(?>[\x81-\x9F\xE0-\xFC][\x00-\xFF]|[\x80-\xFF])|[\x00-\x7F])))' ]}@{[mb::_s_passed()]}}{$1 . '1'}e
+s{(\G${mb::_anchor})@{[qr'(?:(?!(?:ア)|(?:\x83\x5C)|(?:\x83\x5D)|[\x31-\x33]|[ABC])(?-xism:(?>(?>[\x81-\x9F\xE0-\xFC][\x00-\xFF]|[\x80-\xFF])|[\x00-\x7F])))' ]}@{[mb::_s_passed()]}}{$1 . '1'}e
 END2
     sub { $_=<<'END1'; mb::parse() eq regexp(<<'END2'); }, # test no 266
 s'[アソゾABC1-3[:alnum:]]'1'
 END1
-s{(\G${mb::_anchor})@{[qr'(?:(?=(?:ア)|(?:\x83\x5C)|(?:\x83\x5D)|[ABC1-3\x30-\x39\x41-\x5A\x61-\x7A])(?-xism:(?>(?>[\x81-\x9F\xE0-\xFC][\x00-\xFF]|[\x80-\xFF])|[\x00-\x7F])))' ]}@{[mb::_s_passed()]}}{$1 . '1'}e
+s{(\G${mb::_anchor})@{[qr'(?:(?=(?:ア)|(?:\x83\x5C)|(?:\x83\x5D)|[\x31-\x33]|[ABC\x30-\x39\x41-\x5A\x61-\x7A])(?-xism:(?>(?>[\x81-\x9F\xE0-\xFC][\x00-\xFF]|[\x80-\xFF])|[\x00-\x7F])))' ]}@{[mb::_s_passed()]}}{$1 . '1'}e
 END2
     sub { $_=<<'END1'; mb::parse() eq regexp(<<'END2'); }, # test no 267
 s'[^アソゾABC1-3[:alnum:]]'1'
 END1
-s{(\G${mb::_anchor})@{[qr'(?:(?!(?:ア)|(?:\x83\x5C)|(?:\x83\x5D)|[ABC1-3\x30-\x39\x41-\x5A\x61-\x7A])(?-xism:(?>(?>[\x81-\x9F\xE0-\xFC][\x00-\xFF]|[\x80-\xFF])|[\x00-\x7F])))' ]}@{[mb::_s_passed()]}}{$1 . '1'}e
+s{(\G${mb::_anchor})@{[qr'(?:(?!(?:ア)|(?:\x83\x5C)|(?:\x83\x5D)|[\x31-\x33]|[ABC\x30-\x39\x41-\x5A\x61-\x7A])(?-xism:(?>(?>[\x81-\x9F\xE0-\xFC][\x00-\xFF]|[\x80-\xFF])|[\x00-\x7F])))' ]}@{[mb::_s_passed()]}}{$1 . '1'}e
 END2
     sub { $_=<<'END1'; mb::parse() eq regexp(<<'END2'); }, # test no 268
 s'[アソゾ${_}ABC1-3[:alnum:]]'1'
 END1
-s{(\G${mb::_anchor})@{[qr'(?:(?=(?:ア)|(?:\x83\x5C)|(?:\x83\x5D)|[${_}ABC1-3\x30-\x39\x41-\x5A\x61-\x7A])(?-xism:(?>(?>[\x81-\x9F\xE0-\xFC][\x00-\xFF]|[\x80-\xFF])|[\x00-\x7F])))' ]}@{[mb::_s_passed()]}}{$1 . '1'}e
+s{(\G${mb::_anchor})@{[qr'(?:(?=(?:ア)|(?:\x83\x5C)|(?:\x83\x5D)|[\x31-\x33]|[${_}ABC\x30-\x39\x41-\x5A\x61-\x7A])(?-xism:(?>(?>[\x81-\x9F\xE0-\xFC][\x00-\xFF]|[\x80-\xFF])|[\x00-\x7F])))' ]}@{[mb::_s_passed()]}}{$1 . '1'}e
 END2
     sub { $_=<<'END1'; mb::parse() eq regexp(<<'END2'); }, # test no 269
 s'[^アソゾ${_}ABC1-3[:alnum:]]'1'
 END1
-s{(\G${mb::_anchor})@{[qr'(?:(?!(?:ア)|(?:\x83\x5C)|(?:\x83\x5D)|[${_}ABC1-3\x30-\x39\x41-\x5A\x61-\x7A])(?-xism:(?>(?>[\x81-\x9F\xE0-\xFC][\x00-\xFF]|[\x80-\xFF])|[\x00-\x7F])))' ]}@{[mb::_s_passed()]}}{$1 . '1'}e
+s{(\G${mb::_anchor})@{[qr'(?:(?!(?:ア)|(?:\x83\x5C)|(?:\x83\x5D)|[\x31-\x33]|[${_}ABC\x30-\x39\x41-\x5A\x61-\x7A])(?-xism:(?>(?>[\x81-\x9F\xE0-\xFC][\x00-\xFF]|[\x80-\xFF])|[\x00-\x7F])))' ]}@{[mb::_s_passed()]}}{$1 . '1'}e
 END2
     sub { $_=<<'END1'; mb::parse() eq regexp(<<'END2'); }, # test no 270
 s'Abア[アソゾABC1-3]'1'i
 END1
-s{(\G${mb::_anchor})@{[mb::_ignorecase(qr'Ab(?:ア)(?:(?=(?:ア)|(?:\x83\x5C)|(?:\x83\x5D)|[ABC1-3])(?-xism:(?>(?>[\x81-\x9F\xE0-\xFC][\x00-\xFF]|[\x80-\xFF])|[\x00-\x7F])))')]}@{[mb::_s_passed()]}}{$1 . '1'}e
+s{(\G${mb::_anchor})@{[mb::_ignorecase(qr'Ab(?:ア)(?:(?=(?:ア)|(?:\x83\x5C)|(?:\x83\x5D)|[\x31-\x33]|[ABC])(?-xism:(?>(?>[\x81-\x9F\xE0-\xFC][\x00-\xFF]|[\x80-\xFF])|[\x00-\x7F])))')]}@{[mb::_s_passed()]}}{$1 . '1'}e
 END2
     sub { $_=<<'END1'; mb::parse() eq regexp(<<'END2'); }, # test no 271
 s'Abア[^アソゾABC1-3]'1'i
 END1
-s{(\G${mb::_anchor})@{[mb::_ignorecase(qr'Ab(?:ア)(?:(?!(?:ア)|(?:\x83\x5C)|(?:\x83\x5D)|[ABC1-3])(?-xism:(?>(?>[\x81-\x9F\xE0-\xFC][\x00-\xFF]|[\x80-\xFF])|[\x00-\x7F])))')]}@{[mb::_s_passed()]}}{$1 . '1'}e
+s{(\G${mb::_anchor})@{[mb::_ignorecase(qr'Ab(?:ア)(?:(?!(?:ア)|(?:\x83\x5C)|(?:\x83\x5D)|[\x31-\x33]|[ABC])(?-xism:(?>(?>[\x81-\x9F\xE0-\xFC][\x00-\xFF]|[\x80-\xFF])|[\x00-\x7F])))')]}@{[mb::_s_passed()]}}{$1 . '1'}e
 END2
     sub { $_=<<'END1'; mb::parse() eq regexp(<<'END2'); }, # test no 272
 s'Abア[アソゾABC1-3[:alnum:]]'1'i
 END1
-s{(\G${mb::_anchor})@{[mb::_ignorecase(qr'Ab(?:ア)(?:(?=(?:ア)|(?:\x83\x5C)|(?:\x83\x5D)|[ABC1-3\x30-\x39\x41-\x5A\x61-\x7A])(?-xism:(?>(?>[\x81-\x9F\xE0-\xFC][\x00-\xFF]|[\x80-\xFF])|[\x00-\x7F])))')]}@{[mb::_s_passed()]}}{$1 . '1'}e
+s{(\G${mb::_anchor})@{[mb::_ignorecase(qr'Ab(?:ア)(?:(?=(?:ア)|(?:\x83\x5C)|(?:\x83\x5D)|[\x31-\x33]|[ABC\x30-\x39\x41-\x5A\x61-\x7A])(?-xism:(?>(?>[\x81-\x9F\xE0-\xFC][\x00-\xFF]|[\x80-\xFF])|[\x00-\x7F])))')]}@{[mb::_s_passed()]}}{$1 . '1'}e
 END2
     sub { $_=<<'END1'; mb::parse() eq regexp(<<'END2'); }, # test no 273
 s'Abア[^アソゾABC1-3[:alnum:]]'1'i
 END1
-s{(\G${mb::_anchor})@{[mb::_ignorecase(qr'Ab(?:ア)(?:(?!(?:ア)|(?:\x83\x5C)|(?:\x83\x5D)|[ABC1-3\x30-\x39\x41-\x5A\x61-\x7A])(?-xism:(?>(?>[\x81-\x9F\xE0-\xFC][\x00-\xFF]|[\x80-\xFF])|[\x00-\x7F])))')]}@{[mb::_s_passed()]}}{$1 . '1'}e
+s{(\G${mb::_anchor})@{[mb::_ignorecase(qr'Ab(?:ア)(?:(?!(?:ア)|(?:\x83\x5C)|(?:\x83\x5D)|[\x31-\x33]|[ABC\x30-\x39\x41-\x5A\x61-\x7A])(?-xism:(?>(?>[\x81-\x9F\xE0-\xFC][\x00-\xFF]|[\x80-\xFF])|[\x00-\x7F])))')]}@{[mb::_s_passed()]}}{$1 . '1'}e
 END2
     sub { $_=<<'END1'; mb::parse() eq regexp(<<'END2'); }, # test no 274
 s'Abア[アソゾ${_}ABC1-3[:alnum:]]'1'i
 END1
-s{(\G${mb::_anchor})@{[mb::_ignorecase(qr'Ab(?:ア)(?:(?=(?:ア)|(?:\x83\x5C)|(?:\x83\x5D)|[${_}ABC1-3\x30-\x39\x41-\x5A\x61-\x7A])(?-xism:(?>(?>[\x81-\x9F\xE0-\xFC][\x00-\xFF]|[\x80-\xFF])|[\x00-\x7F])))')]}@{[mb::_s_passed()]}}{$1 . '1'}e
+s{(\G${mb::_anchor})@{[mb::_ignorecase(qr'Ab(?:ア)(?:(?=(?:ア)|(?:\x83\x5C)|(?:\x83\x5D)|[\x31-\x33]|[${_}ABC\x30-\x39\x41-\x5A\x61-\x7A])(?-xism:(?>(?>[\x81-\x9F\xE0-\xFC][\x00-\xFF]|[\x80-\xFF])|[\x00-\x7F])))')]}@{[mb::_s_passed()]}}{$1 . '1'}e
 END2
     sub { $_=<<'END1'; mb::parse() eq regexp(<<'END2'); }, # test no 275
 s'Abア[^アソゾ${_}ABC1-3[:alnum:]]'1'i
 END1
-s{(\G${mb::_anchor})@{[mb::_ignorecase(qr'Ab(?:ア)(?:(?!(?:ア)|(?:\x83\x5C)|(?:\x83\x5D)|[${_}ABC1-3\x30-\x39\x41-\x5A\x61-\x7A])(?-xism:(?>(?>[\x81-\x9F\xE0-\xFC][\x00-\xFF]|[\x80-\xFF])|[\x00-\x7F])))')]}@{[mb::_s_passed()]}}{$1 . '1'}e
+s{(\G${mb::_anchor})@{[mb::_ignorecase(qr'Ab(?:ア)(?:(?!(?:ア)|(?:\x83\x5C)|(?:\x83\x5D)|[\x31-\x33]|[${_}ABC\x30-\x39\x41-\x5A\x61-\x7A])(?-xism:(?>(?>[\x81-\x9F\xE0-\xFC][\x00-\xFF]|[\x80-\xFF])|[\x00-\x7F])))')]}@{[mb::_s_passed()]}}{$1 . '1'}e
 END2
 );
 

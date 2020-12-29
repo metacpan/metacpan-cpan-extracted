@@ -5,10 +5,10 @@ use base 'PDF::Builder::Resource::XObject::Image';
 use strict;
 use warnings;
 
-no warnings 'uninitialized';
+#no warnings 'uninitialized';
 
-our $VERSION = '3.020'; # VERSION
-my $LAST_UPDATE = '3.020'; # manually update whenever code is changed
+our $VERSION = '3.021'; # VERSION
+my $LAST_UPDATE = '3.021'; # manually update whenever code is changed
 
 use Compress::Zlib;
 
@@ -272,7 +272,8 @@ sub read_tiff {
     $self->{'Interpolate'} = PDFBool(1);
     $self->bits_per_component($tif->{'bitsPerSample'});
 
-    if ($tif->{'whiteIsZero'} == 1 && $tif->{'filter'} ne 'CCITTFaxDecode') {
+    if (($tif->{'whiteIsZero'}||0) == 1 &&
+	($tif->{'filter'}||'') ne 'CCITTFaxDecode') {
         $self->{'Decode'} = PDFArray(PDFNum(1), PDFNum(0));
     }
 

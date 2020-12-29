@@ -66,7 +66,7 @@ foreach my $have_contributors (1, 0)
     ) if $have_contributors;
 
     is(
-        (grep { /^\[Git::Contributors\] WARNING! You appear to ...+ version 0.008!$/ } @{$tzil->log_messages}),
+        (grep /^\[Git::Contributors\] WARNING! You appear to ...+ version 0.008!$/, @{$tzil->log_messages}),
         0,
         'got no warning about [Contributors] being too old',
     ) if not $have_contributors;

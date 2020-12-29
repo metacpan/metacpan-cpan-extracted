@@ -1,9 +1,14 @@
-0.002   2018-10-14 (PERLANCAR)
+0.003   2020-12-24  Released-By: PERLANCAR; Urgency: medium
+
+	- Add list_brokers() (Finance::SE::IDX 0.005).
+
+
+0.002   2018-10-14  Released-By: PERLANCAR
 
 	- Bump requirement version: Finance::SE::IDX::Static ->
 	  20181012.0.0 [RT#127360].
 
 
-0.001   2018-09-08 (PERLANCAR)
+0.001   2018-09-08  Released-By: PERLANCAR
 
         - First release.

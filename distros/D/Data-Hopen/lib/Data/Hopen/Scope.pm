@@ -5,7 +5,7 @@ use Data::Hopen::Base;
 use Exporter 'import';
 use Scalar::Util qw(refaddr);
 
-our $VERSION = '0.000018';
+our $VERSION = '0.000019';
 
 # Class definition
 use Class::Tiny {

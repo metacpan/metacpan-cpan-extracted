@@ -31,7 +31,7 @@ name: Plack-Middleware-Text-Minify
 provides:
   Plack::Middleware::Text::Minify:
     file: lib/Plack/Middleware/Text/Minify.pm
-    version: v0.1.0
+    version: v0.1.1
 recommends:
   Ref::Util::XS: '0'
 requires:
@@ -39,13 +39,13 @@ requires:
   Ref::Util: '0'
   Text::Minify::XS: v0.3.1
   parent: '0'
-  perl: v5.10.0
+  perl: v5.9.3
   strict: '0'
   warnings: '0'
 resources:
   bugtracker: https://github.com/robrwo/Plack-Middleware-Text-Minify/issues
   repository: git://github.com/robrwo/Plack-Middleware-Text-Minify.git
-version: v0.1.0
+version: v0.1.1
 x_authority: cpan:RRWO
 x_generated_by_perl: v5.28.1
 x_serialization_backend: 'YAML::Tiny version 1.73'

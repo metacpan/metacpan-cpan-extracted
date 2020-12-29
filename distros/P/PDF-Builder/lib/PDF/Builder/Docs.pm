@@ -3,7 +3,7 @@ package PDF::Builder::Docs;
 use strict;
 use warnings;
 
-our $VERSION = '3.020'; # VERSION
+our $VERSION = '3.021'; # VERSION
 my $LAST_UPDATE = '3.020'; # manually update whenever code is changed
 
 # originally part of Builder.pm, it was split out due to its length

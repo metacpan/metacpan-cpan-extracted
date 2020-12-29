@@ -1,0 +1,351 @@
+format: v1
+
+maintainer: Russ Allbery <eagle@eyrie.org>
+name: wallet
+version: '1.4'
+synopsis: secure data management system
+
+license:
+  name: Expat
+copyrights:
+  - holder: Russ Allbery <eagle@eyrie.org>
+    years: 2014, 2016, 2018
+  - holder: The Board of Trustees of the Leland Stanford Junior University
+    years: 2006-2010, 2012-2014
+
+build:
+  autoconf: '2.64'
+  automake: '1.11'
+  autotools: true
+  install: true
+  kerberos: true
+  manpages: true
+  middle: |
+    If you are upgrading the wallet server from an earlier installed version,
+    run `wallet-admin upgrade` after installation to upgrade the database
+    schema.  See the wallet-admin manual page for more information.
+
+    You can pass the `--with-wallet-server` and `--with-wallet-port` options
+    to configure to compile in a default wallet server and port.  If no port
+    is set, the remctl default port is used.  If no server is set, the server
+    must be specified either in `krb5.conf` configuration or on the wallet
+    command line or the client will exit with an error.
+
+    By default, wallet uses whatever Perl executable exists in the current
+    `PATH`.  That Perl's path is what the server scripts will use, and that
+    Perl's configuration will be used to determine where the server Perl
+    modules will be installed.
+
+    To specify a particular Perl executable to use, either set the `PERL`
+    environment variable or pass it to configure like:
+
+    ```
+        ./configure PERL=/path/to/my/perl
+    ```
+
+    By default, wallet installs itself under `/usr/local` except for the
+    server Perl modules, which are installed into whatever default site module
+    path is used by your Perl installation.  To change the installation
+    location of the files other than the Perl modules, pass the `--prefix=DIR`
+    argument to configure.
+
+    If remctl was installed in a path not normally searched by your compiler,
+    you must specify its installation prefix to configure with the
+    `--with-remctl=DIR` option, or alternately set the path to the include
+    files and libraries separately with `--with-remctl-include=DIR` and
+    `--with-remctl-lib=DIR`.
+  reduced_depends: true
+  type: Autoconf
+distribution:
+  packaging:
+    debian:
+      personal: true
+  section: kerberos
+  tarname: wallet
+  version: wallet
+support:
+  email: eagle@eyrie.org
+  github: rra/wallet
+  listname: kerberos
+  listurl: https://mailman.mit.edu/mailman/listinfo/kerberos
+  web: https://www.eyrie.org/~eagle/software/wallet/
+vcs:
+  browse: https://git.eyrie.org/?p=kerberos/wallet.git
+  github: rra/wallet
+  openhub: https://www.openhub.net/p/wallet
+  status:
+    workflow: build
+  type: Git
+  url: https://git.eyrie.org/git/kerberos/wallet.git
+
+docs:
+  api:
+    - name: api/acl
+      title: Wallet::ACL
+    - name: api/acl-base
+      title: Wallet::ACL::Base
+    - name: api/acl-external
+      title: Wallet::ACL::External
+    - name: api/acl-krb5
+      title: Wallet::ACL::Krb5
+    - name: api/acl-krb5-regex
+      title: Wallet::ACL::Krb5::Regex
+    - name: api/acl-ldap-attr
+      title: Wallet::ACL::LDAP::Attribute
+    - name: api/acl-ldap-attr-root
+      title: Wallet::ACL::LDAP::Attribute::Root
+    - name: api/acl-nested
+      title: Wallet::ACL::Nested
+    - name: api/acl-netdb
+      title: Wallet::ACL::NetDB
+    - name: api/acl-netdb-root
+      title: Wallet::ACL::NetDB::Root
+    - name: api/admin
+      title: Wallet::Admin
+    - name: api/config
+      title: Wallet::Config
+    - name: api/database
+      title: Wallet::Database
+    - name: api/kadmin
+      title: Wallet::Kadmin
+    - name: api/kadmin-ad
+      title: Wallet::Kadmin::AD
+    - name: api/kadmin-heimdal
+      title: Wallet::Kadmin::Heimdal
+    - name: api/kadmin-mit
+      title: Wallet::Kadmin::MIT
+    - name: api/object-base
+      title: Wallet::Object::Base
+    - name: api/object-duo
+      title: Wallet::Object::Duo
+    - name: api/object-file
+      title: Wallet::Object::File
+    - name: api/object-keytab
+      title: Wallet::Object::Keytab
+    - name: api/object-password
+      title: Wallet::Object::Password
+    - name: api/object-wakeyring
+      title: Wallet::Object::WAKeyring
+    - name: api/policy-stanford
+      title: Wallet::Policy::Stanford
+    - name: api/report
+      title: Wallet::Report
+    - name: api/schema
+      title: Wallet::Schema
+    - name: api/server
+      title: Wallet::Server
+  contrib:
+    - name: ad-keytab
+      title: ad-keytab
+    - name: used-principals
+      title: used-principals
+    - name: wallet-contacts
+      title: wallet-contacts
+    - name: wallet-rekey-periodic
+      title: wallet-rekey-periodic
+    - name: wallet-summary
+      title: wallet-summary
+    - name: wallet-unknown-hosts
+      title: wallet-unknown-hosts
+  developer:
+    - name: design
+      title: Overall design
+    - name: design-acl
+      title: ACL design
+    - name: design-api
+      title: Server module API design
+    - name: notes
+      title: Implementation notes
+  user:
+    - name: setup
+      title: Setup and configuration
+    - name: config
+      title: Configuration options
+    - name: objects-and-schemes
+      title: Objects and ACL schemes
+    - name: wallet
+      title: wallet
+    - name: wallet-admin
+      title: wallet-admin
+    - name: wallet-backend
+      title: wallet-backend
+    - name: wallet-report
+      title: wallet-report
+    - name: keytab-backend
+      title: keytab-backend
+    - name: naming
+      title: Stanford wallet naming policy
+    - name: thanks
+      title: Thanks and credits
+quote:
+  author: John M. Ford
+  broken: true
+  text: |
+    An architect
+    who does not believe
+    in privacy
+    may also lack faith
+    in keeping out the rain
+  work: Growing Up Weightless
+
+blurb: |
+  The wallet is a system for managing secure data, authorization rules to
+  retrieve or change that data, and audit rules for documenting actions
+  taken on that data.  Objects of various types may be stored in the wallet
+  or generated on request and retrieved by authorized users.  The wallet
+  tracks ACLs, metadata, and trace information.  It is built on top of the
+  remctl protocol and uses Kerberos GSS-API authentication.  One of the
+  object types it supports is Kerberos keytabs, making it suitable as a
+  user-accessible front-end to Kerberos kadmind with richer ACL and metadata
+  operations.
+
+description: |
+  The wallet is a client/server system using a central server with a
+  supporting database and a stand-alone client that can be widely
+  distributed to users.  The server runs on a secure host with access to a
+  local database; tracks object metadata such as ACLs, attributes, history,
+  expiration, and ownership; and has the necessary access privileges to
+  create wallet-managed objects in external systems (such as Kerberos
+  service principals).  The client uses the remctl protocol to send commands
+  to the server, store and retrieve objects, and query object metadata.  The
+  same client can be used for both regular user operations and wallet
+  administrative actions.
+
+  All wallet actions are controlled by a fine-grained set of ACLs.  Each
+  object has an owner ACL and optional get, store, show, destroy, and flags
+  ACLs that control more specific actions.  A global administrative ACL
+  controls access to administrative actions.  An ACL consists of zero or
+  more entries, each of which is a generic scheme and identifier pair,
+  allowing the ACL system to be extended to use any existing authorization
+  infrastructure.  Supported ACL types include Kerberos principal names,
+  regexes matching Kerberos principal names, and LDAP attribute checks.
+
+  Currently, the object types supported are simple files, passwords,
+  Kerberos keytabs, WebAuth keyrings, and Duo integrations.  By default,
+  whenever a Kerberos keytab object is retrieved from the wallet, the key is
+  changed in the Kerberos KDC and the wallet returns a keytab for the new
+  key.  However, a keytab object can also be configured to preserve the
+  existing keys when retrieved.  Included in the wallet distribution is a
+  script that can be run via remctl on an MIT Kerberos KDC to extract the
+  existing key for a principal, and the wallet system will use that
+  interface to retrieve the current key if the unchanging flag is set on a
+  Kerberos keytab object for MIT Kerberos.  (Heimdal doesn't require any
+  special support.)
+
+requirements: |
+  The wallet client requires the C
+  [remctl](https://www.eyrie.org/~eagle/software/remctl/) client library and
+  a Kerberos library.  It will build with either MIT Kerberos or Heimdal.
+
+  The wallet server is written in Perl and requires Perl 5.8.0 or later plus
+  the following Perl modules:
+
+  * Date::Parse (part of the TimeDate distribution)
+  * DBI
+  * DBIx::Class
+  * Module::Build
+  * SQL::Translator
+
+  You will also need a DBD Perl module for the database backend that you
+  intend to use, and the DateTime::Format::* module corresponding to that
+  DBD module (such as DateTime::Format::SQLite or DateTime::Format::PG).
+
+  Currently, the server has only been tested against SQLite 3, MySQL 5, and
+  PostgreSQL, and prebuilt SQL files (for database upgrades) are only
+  provided for those servers.  It will probably not work fully with other
+  database backends.  Porting is welcome.
+
+  The wallet server is intended to be run under `remctld` and use `remctld`
+  to do authentication.  It can be ported to any other front-end, but doing
+  so will require writing a new version of `server/wallet-backend` that
+  translates the actions in that protocol into calls to the Wallet::Server
+  Perl object.
+
+  The keytab support in the wallet server supports Heimdal and MIT Kerberos
+  KDCs and has experimental support for Active Directory.  The Heimdal
+  support requires the Heimdal::Kadm5 Perl module.  The MIT Kerberos support
+  requires the MIT Kerberos `kadmin` client program be installed.  The
+  Active Directory support requires the Net::LDAP, Authen::SASL, and
+  IPC::Run Perl modules and the `msktutil` client program.
+
+  To support the unchanging flag on keytab objects with an MIT Kerberos KDC,
+  the Net::Remctl Perl module (shipped with remctl) must be installed on the
+  server and the `keytab-backend` script must be runnable via remctl on the
+  KDC.  This script also requires an MIT Kerberos `kadmin.local` binary that
+  supports the `-norandkey` option to `ktadd`.  This option is included in
+  MIT Kerberos 1.7 and later.
+
+  The WebAuth keyring object support in the wallet server requires the
+  WebAuth Perl module from
+  [WebAuth 4.4.0 or later](https://www.eyrie.org/~eagle/software/webauth/).
+
+  The Duo integration object support in the wallet server requires the
+  [Net::Duo](https://www.eyrie.org/~eagle/software/net-duo/), JSON, and
+  Perl6::Slurp Perl modules.
+
+  The password object support in the wallet server requires the
+  Crypt::GeneratePassword Perl module.
+
+  The LDAP attribute ACL verifier requires the Authen::SASL and Net::LDAP
+  Perl modules.  This verifier only works with LDAP servers that support
+  GSS-API binds.
+
+  The NetDB ACL verifier (only of interest at sites using NetDB to manage
+  DNS) requires the Net::Remctl Perl module.
+
+sections:
+  - title: Configuration
+    body: |
+      Before setting up the wallet server, review the Wallet::Config
+      documentation (with man Wallet::Config or perldoc Wallet::Config).
+      There are many customization options, some of which must be set.
+      You may also need to create a Kerberos keytab for the keytab object
+      backend and give it appropriate ACLs, and set up `keytab-backend`
+      and its `remctld` configuration on your KDC if you want unchanging
+      flag support.
+
+      For the basic setup and configuration of the wallet server, see the
+      file `docs/setup` in the source distribution.  You will need to set
+      up a database on the server (unless you're using SQLite), initialize
+      the database, install `remctld` and the wallet Perl modules, and set
+      up `remctld` to run the `wallet-backend` program.
+
+      The wallet client supports reading configuration settings from the
+      system `krb5.conf` file.  For more information, see the
+      CONFIGURATION section of the wallet client man page (`man wallet`).
+
+test:
+  lancaster: true
+  prefix: |
+    The wallet comes with a comprehensive test suite, but it requires some
+    configuration in order to test anything other than low-level utility
+    functions.  To enable the full test suite, follow the instructions in:
+
+    * `tests/config/README`
+    * `perl/t/data/README`
+
+    Now, you can run the test suite with:
+  suffix: |
+    The test suite requires `remctld` be installed and available in the user's
+    path or in `/usr/local/sbin` or `/usr/sbin`; and that `sqlite3`, `kinit`,
+    and either `kvno` or `kgetcred` be installed and available on the user's
+    path.  The test suite will also need to be able to bind to 127.0.0.1 on
+    ports 11119 and 14373 to test client/server network interactions.
+
+    The test suite uses a SQLite database for server-side and end-to-end
+    testing and therefore requires the DBD::SQLite and
+    DateTime::Format::SQLite Perl modules.
+
+    All of the requirements listed above will be required to run the full test
+    suite of server functionality, but tests will be selectively skipped if
+    their requirements aren't found.
+
+    The following additional Perl modules will be used if present:
+
+    * Test::MinimumVersion
+    * Test::Pod
+    * Test::Spelling
+    * Test::Strict
+
+    All are available on CPAN.  Those tests will be skipped if the modules are
+    not available.

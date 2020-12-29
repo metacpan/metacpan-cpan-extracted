@@ -1,9 +1,9 @@
 # -*- perl -*-
 #	readline.t - Test script for Term::ReadLine:GNU
 #
-#	$Id: readline.t 555 2016-11-03 14:04:27Z hayashi $
+#	$Id: readline.t 570 2020-04-23 15:05:14Z hayashi $
 #
-#	Copyright (c) 1996-2016 Hiroo Hayashi.  All rights reserved.
+#	Copyright (c) 1996-2020 Hiroo Hayashi.  All rights reserved.
 #
 #	This program is free software; you can redistribute it and/or
 #	modify it under the same terms as Perl itself.
@@ -13,7 +13,7 @@
 
 use strict;
 use warnings;
-use Test::More tests => 147;
+use Test::More tests => 148;
 use Data::Dumper;
 
 # redefine Test::Mode::note due to it requires Perl 5.10.1.
@@ -733,6 +733,16 @@ $INSTR = "t/comp\cI\cM";
 $line = $t->readline("null completion 2>");
 ok($line eq 't/comptest/', "null completion 2\t[$line]");
 
+# [rt.cpan.org #132384]: the 1st arg should not be undef
+$a->{attempted_completion_function} = sub { (undef, "abc", "def"); };
+*OLD_STDERR = *STDERR;
+open my $dev_null, '>>', '/dev/null';
+*STDERR = $dev_null;    # surpress warning message
+$INSTR = "t/comp\cI\cM";
+$line = $t->readline("null completion 3>");
+*STDERR = *OLD_STDERR;
+ok($line eq 't/comptest/', "null completion 3\t[$line]");
+
 sub sample_completion {
     my ($text, $line, $start, $end) = @_;
     # If first word then username completion, else filename completion
@@ -752,7 +762,9 @@ undef $a->{attempted_completion_function};
 
 # ignore_some_completions_function
 $a->{ignore_some_completions_function} = sub {
-    return (grep m|/$| || ! m|^(.*/)?[0-9]*$|, @_);
+    # Retrun ths 1st arg, LCD (least common denominator), as is.
+    my $lcd = shift;
+    return ($lcd, grep m|/$| || ! m|^(.*/)?[0-9]*$|, @_);
 };
 $INSTR = "t/co\cIRE\cI\cM";
 $line = $t->readline("ignore_some_completion>");

@@ -17,6 +17,18 @@ ok(-w $dir, 'getDir return value is writeable');
 my @t = glob("$dir/dir-flock-*");
 ok(@t == 0, "lock directory is empty because it is new");
 
+# back to basics
+my $z1 = Dir::Flock::lock($dir);
+ok($z1, "lock successful");
+@t = glob("$dir/dir-flock-*");
+ok(@t == 1, "lock directory has one file");
+$z1 = Dir::Flock::unlock($dir);
+ok($z1, "unlock successful");
+@t = glob("$dir/dir-flock-*");
+ok(@t == 0, "lock directory is empty after unlock")
+    or diag "expect empty, $dir/dir-flock-* has: @t";
+
+
 if (fork() == 0) {
     close P1;
     my $z = Dir::Flock::lock($dir);

@@ -1,11 +1,12 @@
 #!perl
 
 # Note: This script is a CLI for Riap function /Finance/SE/IDX/Any/list_idx_boards
-# and generated automatically using Perinci::CmdLine::Gen version 0.486
+# and generated automatically using Perinci::CmdLine::Gen version 0.497
 
-our $DATE = '2018-09-08'; # DATE
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-12-27'; # DATE
 our $DIST = 'App-IDXUtils'; # DIST
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.004'; # VERSION
 
 use 5.010001;
 use strict;
@@ -37,13 +38,19 @@ list-idx-boards - List boards
 
 =head1 VERSION
 
-This document describes version 0.002 of list-idx-boards (from Perl distribution App-IDXUtils), released on 2018-09-08.
+This document describes version 0.004 of list-idx-boards (from Perl distribution App-IDXUtils), released on 2020-12-27.
 
 =head1 SYNOPSIS
 
 Usage:
 
- % list-idx-boards [options]
+ % list-idx-boards [--format=name] [--json] [--(no)naked-res]
+     [--page-result[=program]] [--view-result[=program]]
+
+=head1 DESCRIPTION
+
+By default caches results for 8 hours (by locally setting CACHE_MAX_AGE). Can be
+overriden by using HTTP_TINY_CACHE_MAX_AGE.
 
 =head1 OPTIONS
 
@@ -85,6 +92,14 @@ you want to pipe the result for more post-processing. In this case you can use
 
     [1,2,3]
 
+
+=item B<--page-result>
+
+Filter output through a pager.
+
+=item B<--view-result>
+
+View output using a viewer.
 
 =back
 
@@ -146,7 +161,7 @@ Source repository is at L<https://github.com/perlancar/perl-App-IDXUtils>.
 
 =head1 BUGS
 
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-IDXUtils>
+Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-App-IDXUtils/issues>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
@@ -158,7 +173,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by perlancar@cpan.org.
+This software is copyright (c) 2020, 2018 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

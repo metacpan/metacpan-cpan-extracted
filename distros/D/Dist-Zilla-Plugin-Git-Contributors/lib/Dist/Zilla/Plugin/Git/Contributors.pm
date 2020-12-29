@@ -1,11 +1,11 @@
 use strict;
 use warnings;
-package Dist::Zilla::Plugin::Git::Contributors; # git description: v0.034-6-g18fa0ce
-# vim: set ts=8 sts=4 sw=4 tw=115 et :
+package Dist::Zilla::Plugin::Git::Contributors; # git description: v0.035-12-gb31d49d
+# vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Add contributor names from git to your distribution
 # KEYWORDS: plugin distribution metadata git contributors authors commits
 
-our $VERSION = '0.035';
+our $VERSION = '0.036';
 
 use Moose;
 with 'Dist::Zilla::Role::MetaProvider',
@@ -149,19 +149,13 @@ sub _build_contributors
         {
             email => 1,
             summary => 1,
-            $self->order_by eq 'commits' ? ( numbered => 1 ) : (),
+            numbered => 1,
         },
         'HEAD', '--', $self->paths,
     );
 
-    my @contributors = map { m/^\s*\d+\s*(.*)$/g; } @data;
-
-    $self->log_debug([ 'extracted contributors from git: %s',
-        sub {
-            require Data::Dumper;
-            chomp(my $str = Data::Dumper->new([ \@contributors ])->Indent(2)->Terse(1)->Dump);
-            $str;
-        } ]);
+    # [ count, email ]
+    my @counts_and_contributors = map [ split ' ', $_, 2 ], @data;
 
     my $fc = "$]" >= '5.016001'
         ? \&CORE::fc
@@ -171,15 +165,36 @@ sub _build_contributors
         };
 
     # remove duplicates by email address, keeping the latest associated name
-    @contributors = uniq_by { $fc->((/(<[^>]+>)/g)[-1]) } @contributors;
+    my $count = @counts_and_contributors;
+    @counts_and_contributors = uniq_by { $fc->(($_->[1] =~ /(<[^>]+>)/g)[-1]) } @counts_and_contributors;
 
-    @contributors = Unicode::Collate->new(level => 1)->sort(@contributors) if $self->order_by eq 'name';
+    $self->log('multiple names with the same email found: you may want to use a .mailmap file (https://www.kernel.org/pub/software/scm/git/docs/git-shortlog.html#_mapping_authors)') if @counts_and_contributors != $count;
+
+    # sort by name or count depending on choice (numeric descending, name ascending)
+    my $Collator = Unicode::Collate->new(level => 1);
+
+    my $sort_sub =
+        $self->order_by eq 'name' ? sub { $Collator->cmp($a->[1], $b->[1]) }
+      : $self->order_by eq 'commits' ? sub { $b->[0] <=> $a->[0] || $Collator->cmp($a->[1], $b->[1]) }
+      : die 'unrecognized option order_by=', $self->order_by;
+
+    my @contributors =
+      map $_->[1],
+      sort $sort_sub
+      @counts_and_contributors;
+
+    $self->log_debug([ 'extracted contributors from git: %s',
+        sub {
+            require Data::Dumper;
+            chomp(my $str = Data::Dumper->new([ \@contributors ])->Indent(2)->Terse(1)->Dump);
+            $str;
+        } ]);
 
     if (not $self->include_authors)
     {
         my @authors = eval { Dist::Zilla->VERSION('7.000') } ? $self->zilla->authors : @{ $self->zilla->authors };
 
-        my @author_emails = map { /(<[^>]+>)/g } @authors;
+        my @author_emails = map /(<[^>]+>)/g, @authors;
         @contributors = grep {
             my $contributor = $_;
             none { $contributor =~ /\Q$_\E/i } @author_emails;
@@ -188,7 +203,7 @@ sub _build_contributors
 
     if (not $self->include_releaser and my $releaser = $self->_releaser)
     {
-        @contributors = grep { $fc->($_) ne $fc->($releaser) } @contributors;
+        @contributors = grep $fc->($_) ne $fc->($releaser), @contributors;
     }
 
     if ($self->remove)
@@ -270,7 +285,7 @@ Dist::Zilla::Plugin::Git::Contributors - Add contributor names from git to your 
 
 =head1 VERSION
 
-version 0.035
+version 0.036
 
 =head1 SYNOPSIS
 
@@ -332,7 +347,10 @@ I<You should almost certainly not need this.>
 
 Available since version 0.011.
 
-Any contributor entry matching this regular expression is removed from inclusion.
+=for stopwords unanchored
+
+Any contributor entry matching this (unanchored, case-sensitive) regular expression is removed
+from inclusion.
 Can be used more than once.
 
 =for stopwords canonicalizing
@@ -381,7 +399,7 @@ L<Dist::Zilla::Plugin::Meta::Contributors> - adds an explicit list of names to x
 
 =item *
 
-L<Dist::Zilla::Plugin::ContributorsFromGit> - more dependencies, problematic tests, passes around a lot of extra data in stashes unnecessarily
+L<Dist::Zilla::Plugin::ContributorsFromGit> - more dependencies, problematic tests, passes around a lot of extra data in stashes unnecessarily, not unicode-clean
 
 =item *
 
@@ -410,7 +428,7 @@ L<http://dzil.org/#mailing-list>.
 There is also an irc channel available for users of this distribution, at
 L<C<#distzilla> on C<irc.perl.org>|irc://irc.perl.org/#distzilla>.
 
-I am also usually active on irc, as 'ether' at C<irc.perl.org>.
+I am also usually active on irc, as 'ether' at C<irc.perl.org> and C<irc.freenode.org>.
 
 =head1 AUTHOR
 
@@ -418,13 +436,21 @@ Karen Etheridge <ether@cpan.org>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Kent Fredric Matthew Horsfall Mohammad S Anwar Ricardo Signes Klaus Eichner Ioan Rogers
+=for stopwords Kent Fredric Ioan Rogers Klaus Eichner Matthew Horsfall Mohammad S Anwar Ricardo Signes
 
 =over 4
 
 =item *
 
 Kent Fredric <kentnl@cpan.org>
+
+=item *
+
+Ioan Rogers <ioan@dirtysoft.ca>
+
+=item *
+
+Klaus Eichner <klaus03@gmail.com>
 
 =item *
 
@@ -437,14 +463,6 @@ Mohammad S Anwar <mohammad.anwar@yahoo.com>
 =item *
 
 Ricardo Signes <rjbs@cpan.org>
-
-=item *
-
-Klaus Eichner <klaus03@gmail.com>
-
-=item *
-
-Ioan Rogers <ioan@dirtysoft.ca>
 
 =back
 

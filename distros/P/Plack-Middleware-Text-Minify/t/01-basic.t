@@ -12,8 +12,11 @@ use Plack::Builder;
 use Plack::MIME;
 use Plack::Test;
 
+my $Orig;
+
 my $handler = builder {
 
+    enable "Head";
     enable "Text::Minify";
     enable "ContentLength";
 
@@ -34,9 +37,14 @@ my $handler = builder {
 </html>
 EOB
 
+        $Orig = length($body);
+
         return [
             200,
-            [ 'Content-Type' => $type || 'text/plain; charset=utf8' ],
+            [
+             'Content-Type' => $type || 'text/plain; charset=utf8',
+             'Content-Length' => $Orig,
+            ],
             [ $body ]
         ];
     };
@@ -54,6 +62,8 @@ test_psgi
             my $res = $cb->($req);
 
             unlike $res->content, qr/\n[ ]/, "no leading spaces";
+            isnt $res->header('Content-Length'), $Orig, "content-length updated";
+
         };
 
         subtest 'not text' => sub {
@@ -62,6 +72,18 @@ test_psgi
             my $res = $cb->($req);
 
             like $res->content, qr/\n[ ]/, "has leading spaces";
+
+            is $res->header('Content-Length'), $Orig, "content-length unchanged";
+
+
+        };
+
+        subtest 'head' => sub {
+
+            my $req = HEAD '/';
+            my $res = $cb->($req);
+
+            unlike $res->content, qr/\n[ ]/, "no leading spaces";
         };
 
 };

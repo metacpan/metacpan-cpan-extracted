@@ -1,0 +1,282 @@
+format: v1
+
+name: rra-c-util
+maintainer: Russ Allbery <eagle@eyrie.org>
+version: '6.1'
+synopsis: Russ Allbery's utility libraries for C
+
+license:
+  name: Expat
+copyrights:
+  - holder: Russ Allbery <eagle@eyrie.org>
+    years: 2000, 2009-2010, 2013-2016
+  - holder: The Board of Trustees of the Leland Stanford Junior University
+    years: 2009-2014
+
+build:
+  autoconf: '2.64'
+  automake: '1.11'
+  autotools: true
+  gssapi: true
+  install: false
+  kerberos: true
+  manpages: true
+  middle: |
+    Pass `--enable-kafs` to configure to attempt to build kafs support,
+    which will use either an existing libkafs or libkopenafs library or
+    build the kafs replacement included in this package.  You can also add
+    `--without-libkafs` to force the use of the internal kafs replacement.
+  type: Autoconf
+distribution:
+  section: devel
+  tarname: rra-c-util
+  version: rra-c-util
+support:
+  email: eagle@eyrie.org
+  github: rra/rra-c-util
+  web: https://www.eyrie.org/~eagle/software/rra-c-util/
+vcs:
+  browse: https://git.eyrie.org/?p=devel/rra-c-util.git
+  github: rra/rra-c-util
+  openhub: https://www.openhub.net/p/rra-c-util
+  type: Git
+  url: https://git.eyrie.org/git/devel/rra-c-util.git
+
+quote:
+  author: Phil Greenspun
+  text: |
+    Greenspun's Tenth Rule of Programming: any sufficiently complicated C or
+    Fortran program contains an ad hoc informally-specified bug-ridden slow
+    implementation of half of Common Lisp.
+docs:
+  api:
+    - name: xmalloc
+      title: xmalloc, xcalloc, and xrealloc
+  extra:
+    - title: Test scripts
+      links:
+        - name: module-version
+          title: tests/perl/module-version-t
+        - name: module-version-perl
+          title: t/style/module-version.t
+  user:
+    - name: fakepam
+      title: PAM testing
+    - name: test-rra
+      title: Test::RRA
+    - name: test-rra-automake
+      title: Test::RRA::Automake
+    - name: test-rra-config
+      title: Test::RRA::Config
+    - name: test-rra-moduleversion
+      title: Test::RRA::ModuleVersion
+
+blurb: |
+  rra-c-util is my collection of portability functions, utility functions,
+  Autoconf macros, and related shared C infrastructure, akin to gnulib but
+  without any GPL-covered code and additional support for Kerberos and PAM
+  development.  It serves as a common repository of code and infrastructure
+  used across multiple projects so that files have a canonical latest
+  version.  It's not intended for installation as a regular package;
+  instead, other packages are expected to copy files from here as needed.
+
+description: |
+  The origins of this package are in the libinn utility library in INN.
+  Some of the utility and portability functions here are directly inspired
+  by or based on versions in older versions of INN, and I wrote and rewrote
+  considerable additional portability code and utility libraries when I took
+  over INN maintenance.  When I started maintaining other C packages, I
+  started copying pieces of libinn into those packages and merging it with
+  other portability and utility code.  Over time, each package gained a
+  slightly different version of various utility functions, replacements for
+  missing functions, and Autoconf macros.
+
+  The goal of this package is to merge all the various versions of any
+  portability or utility code that's used in more than one of my packages in
+  one place.  Then, each package can update to the latest rra-c-util version
+  before each release and gain from the improvements made for all other
+  packages.  You can think of it as my version of
+  [Gnulib](https://www.gnu.org/software/gnulib/), with everything released
+  under a permissive license (no GPL).
+
+  As well as C portability frameworks, Autoconf macros, and a general C
+  utility library, this package has also accumulated a considerable
+  collection of standard tests (for C and Perl packages) and a large library
+  of test utilities and support functions.  It also includes extensive
+  support for writing and testing PAM modules, and a portable implementation
+  of AFS PAGs.
+
+  This package uses the infrastructure of C TAP Harness for testing, but is
+  not the canonical version of `tests/runtests.c`, `tests/tap/basic.[ch]`,
+  `tests/tap/macros.h`, or `tests/tap/libtap.sh`.  Those files should be
+  pulled from [C TAP
+  Harness](https://www.eyrie.org/~eagle/software/c-tap-harness/) instead.
+
+sections:
+  - title: Using This Code
+    body: |
+      While there is an install target, it's present only because Automake
+      provides it automatically.  Its use is not recommended.  Instead,
+      the code in this package is intended to be copied into your package
+      and refreshed from the latest release of rra-c-util for each
+      release.
+
+      You can obviously copy the code and integrate it however works best
+      for your package and your build system.  Here's how I do it for my
+      packages as an example:
+
+      * Create a portable directory and copy `macros.h`, `system.h`,
+        `stdbool.h`, and `dummy.c` along with whatever additional
+        functions that your package uses that may not be present on all
+        systems.  If you use much of the `util` directory (see below),
+        you'll need `asprintf.c`, `reallocarray.c`, and `snprintf.c` at
+        least.  If you use `util/network.c`, you'll also need
+        `getaddrinfo.c`, `getaddrinfo.h`, `getnameinfo.c`,
+        `getnameinfo.h`, `inet_*.c`, and `socket.h`.  You'll need
+        `winsock.c` for networking portability to Windows.
+
+      * Copy the necessary portions of `configure.ac` from this package
+        into your package.  `configure.ac` is commented to try to give you
+        a guide for what you need to copy over.  You will also need to
+        make an `m4` subdirectory, add the code to `configure.ac` to load
+        Autoconf macros from `m4`, and copy over `m4/snprintf.m4` and
+        possibly `m4/socket.m4` and `m4/inet-ntoa.m4`.
+
+      * Copy the code from `Makefile.am` for building `libportable.a` into
+        your package and be sure to link your package binaries with
+        `libportable.a`.  If you include this code in a shared library,
+        you'll need to build `libportable.la` instead; see the Automake
+        manual for the differences.  You'll need to change `LIBRARIES` to
+        `LTLIBRARIES` and `LIBOBJS` to `LTLIBOBJS` in addition to renaming
+        the targets.
+
+      * Create a `util` directory and copy over the portions of the
+        utility library that you want.  You will probably need
+        `messages.[ch]` and `xmalloc.[ch]` if you copy anything over at
+        all, since most of the rest of the library uses those.  You will
+        also need `m4/vamacros.m4` if you use `messages.[ch]`.
+
+      * Copy the code from `Makefile.am` for building `libutil.a` into
+        your package and be sure to link your package binaries with
+        `libutil.a`.  As with `libportable.a`, if you want to use the
+        utility functions in a shared library, you'll need to instead
+        build `libutil.la` and change some of the Automake variables.
+
+      * If your package uses a TAP-based test suite written in C, consider
+        using the additional TAP utility functions in `tests/tap`
+        (specifically `messages.*`, `process.*`, and `string.*`).
+
+      * If you're using the Kerberos portability code, copy over
+        `portable/krb5.h`, `portable/krb5-extra.c`, `m4/krb5.m4`,
+        `m4/lib-depends.m4`, `m4/lib-pathname.m4`, and optionally
+        `util/messages-krb5.[ch]`.  You'll also need the relevant
+        fragments of `configure.ac`.  You may want to remove some things
+        from `krb5.h` and `krb5-extra.c` the corresponding configure
+        checks if your code doesn't need all of those functions.  If you
+        need `krb5_get_renewed_creds`, also copy over `krb5-renew.c`.
+        Don't forget to add `$(KRB5_CPPFLAGS)` to `CPPFLAGS` for
+        `libportable` and possibly `libutil`, and if you're building a
+        shared library, also add `$(KRB5_LDFLAGS)` to `LDFLAGS` and
+        `$(KRB5_LIBS)` to `LIBADD` for those libraries.
+
+        For a Kerberos-enabled test suite, also consider copying the
+        `kerberos.*` libraries in `tests/tap` for a Kerberos-enabled test
+        suite.  If you want to use `kerberos_generate_conf` from
+        `tests/tap/kerberos.c`, also copy over
+        `tests/data/generate-krb5-conf`.
+
+      * For testing that requires making Kerberos administrative changes,
+        consider copying over the `kadmin.*` libraries in `tests/tap`.
+
+      * For testing packages that use remctl, see the `tests/tap/remctl.c`
+        and `tests/tap/remctl.h` files for C tests and
+        `tests/tap/remctl.sh` for shell scripts.
+
+      * If you're using the kafs portability code, copy over the `kafs`
+        directory, `m4/kafs.m4`, `m4/lib-pathname.m4`,
+        `portable/k_haspag.c`, the code to build kafs from `Makefile.am`,
+        and the relevant fragments of `configure.ac`.
+
+      * If you're using the PAM portability code, copy over `pam-util/*`,
+        `portable/pam*`, `m4/pam-const.m4`, and the relevant fragments of
+        `configure.ac`.
+
+      * Copy over any other Autoconf macros that you want to use in your
+        package from the m4 directory.
+
+      * Copy over any generic tests from `tests/docs` and `tests/perl`
+        that are appropriate for your package.  If you use any of these,
+        also copy over the `tests/tap/perl` directory and
+        `tests/data/perl.conf` (and customize the latter for your
+        package).
+
+      * If the package embeds a Perl module, copy over any tests from the
+        `perl/t` directory that are applicable.  This can provide generic
+        testing of the embedded Perl module using Perl's own test
+        infrastructure.  If you use any of these, also copy over the
+        `perl/t/data/perl.conf` file and customize it for your package.
+        You will need to arrange for `perl/t/data` to contain copies of
+        the `perlcriticrc` and `perltidyrc` files, either by making copies
+        of the files from `tests/data` or by using make to copy them.
+
+      I also copy over all the relevant tests from the `tests` directory
+      and the build machinery for them from `Makefile.am` so that the
+      portability and utility layer are tested along with the rest of the
+      package.  The test driver should come from C TAP Harness.
+
+requirements: |
+  Everything requires a C compiler to build and expects an ISO C89 or later
+  C compiler and libraries.  Presence of strdup is also assumed, which is
+  guaranteed by POSIX 2008 but common in many earlier C libraries as well.
+  Otherwise, the files are meant to be copied into packages and the
+  requirements depend on which files one copies.
+
+  A Kerberos library, either MIT Kerberos or Heimdal, is required to build
+  this package as-is, since the Kerberos portability layer is built and
+  tested by default.  The other code will run fine without this requirement
+  when copied into other packages.
+
+  PAM libraries and headers are required to build the package as-is, since
+  the PAM supporting library is built and tested by default.  Other code can
+  be copied from this package without introducing a PAM dependency.
+
+  To build the the kafs portability layer, one of Linux, Mac OS X, Solaris
+  11, the kafs library that comes with either Heimdal or KTH Kerberos, the
+  kopenafs library that comes with newer OpenAFS, AFS header files (on any
+  other platform besides AIX or IRIX), or AFS libraries (on AIX and IRIX) is
+  required.  AIX binaries with AFS PAG support may not run on AIX systems
+  that do not have an AFS client installed due to how AIX handles system
+  calls.
+
+  To run the full test suite, and to use the Perl test support libraries,
+  Perl 5.6.2 or later is required.  The following additional Perl modules
+  will be used if present:
+
+  * IPC::System::Simple
+  * Test::MinimumVersion
+  * Test::Perl::Critic
+  * Test::Pod
+  * Test::Spelling
+  * Test::Strict
+
+  All are available on CPAN.  Those tests will be skipped if the modules are
+  not available.
+
+test:
+  lancaster: true
+  override: |
+    rra-c-util comes with an extensive test suite, which you can run after
+    building with:
+
+    ```
+        make check
+    ```
+
+    If a test fails, you can run a single test with verbose output via:
+
+    ```
+        tests/runtests -o <name-of-test>
+    ```
+
+    Do this instead of running the test program directly since it will
+    ensure that necessary environment variables are set up.

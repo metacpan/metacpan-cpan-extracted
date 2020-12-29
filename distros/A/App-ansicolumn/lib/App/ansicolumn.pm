@@ -1,6 +1,6 @@
 package App::ansicolumn;
 
-our $VERSION = "1.03";
+our $VERSION = "1.04";
 
 use v5.14;
 use warnings;
@@ -42,6 +42,7 @@ sub new {
 	linestyle        => '',
 	boundary         => '',
 	linebreak        => '',
+	pagebreak        => 1,
 	runin            => 2,
 	runout           => 2,
 	border           => undef,
@@ -66,7 +67,7 @@ sub run {
     local @ARGV = map { utf8::is_utf8($_) ? $_ : decode('utf8', $_) } @_;
     GetOptions(
 	$obj,
-	map { s/^(?=\w*_)(\w+)\K/"|" . $1 =~ tr[_][-]r/er }
+	map { s/^(?=\w+_)(\w+)\K/"|".$1=~tr[_][-]r."|".$1=~tr[_][]dr/er }
 	"output_width|c=i",
 	"fillrows|x",
 	"table|t",
@@ -86,7 +87,8 @@ sub run {
 	"linestyle|ls=s",
 	"boundary=s",
 	"linebreak|lb=s", "runin=i", "runout=i",
-	"border!",
+	"pagebreak!",
+	"border:s",
 	"border_style|bs=s",
 	"document|D",
 	"colormap|cm=s@",
@@ -119,16 +121,25 @@ sub run {
 sub setup_options {
     my $obj = shift;
 
+    ## --border takes optional border-style value
+    if (defined(my $border = $obj->{border})) {
+	if ($border ne '') {
+	    $obj->{border_style} = $border;
+	}
+	$obj->{border} = 1;
+    }
+
+    ## --linestyle
     if ($obj->{linestyle} !~ /^(?<style>|none|wordwrap|wrap|truncate)$/) {
 	die "$obj->{linestyle}: unknown style.\n";
     } elsif ($+{style} eq 'wordwrap') {
 	$obj->{linestyle} = 'wrap';
 	$obj->{boundary} = 'word';
     }
-    $obj->{fullwidth} = 1 if $obj->{pane} and not $obj->{pane_width};
 
     ## -P
     if (defined $obj->{page}) {
+	$obj->{fullwidth} = 1 if $obj->{pane} and not $obj->{pane_width};
 	$obj->{height} ||= $obj->{page} || $obj->term_height - 1;
 	$obj->{linestyle} ||= 'wrap';
 	$obj->{border} //= 1;
@@ -169,8 +180,9 @@ sub setup_options {
     use charnames ':loose';
     for my $opt (qw(tabhead tabspace)) {
 	for ($obj->{$opt}) {
-	    defined or length or next;
-	    $_ = do { eval qq("\\N{$_}") or die "$!" } if length > 1;
+	    defined && length or next;
+	    $_ = charnames::string_vianame($_) || die "$_: invalid name\n"
+		if length > 1;
 	    Text::ANSI::Fold->configure($opt => $_);
 	}
     }
@@ -227,6 +239,9 @@ sub column_out {
 
     ## --white-space, --isolation, --fillup, top/bottom border
     $obj->layout(\@data);
+
+    ## --border
+    $obj->insert_border(\@data);
 
     my @data_index = 0 .. $#data;
     my $is_last_data = sub { $_[0] == $#data };

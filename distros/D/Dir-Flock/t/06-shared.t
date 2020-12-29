@@ -22,9 +22,12 @@ if (fork() == 0) {
     if (!$z) {
         diag "child failed to get lock. Expect trouble";
     }
+    diag "lock_ex in child";
     print P2 "$z\n";
     sleep 10;
     Dir::Flock::unlock($dir);
+    diag "unlock in child";
+    diag glob("$dir/*");
     close P2;
     exit 0;
 }
@@ -50,6 +53,7 @@ $t2 = time;
 ok(!$p, "failed to get exclusive lock")
     or Dir::Flock::unlock($dir);
 ok($t2-$t1 < 2, "timed out quickly");
+diag "dir is $dir, main pid is $$";
 my $q = Dir::Flock::lock_sh($dir);
 my $t3 = time;
 ok($q, "flock succeeded in parent");

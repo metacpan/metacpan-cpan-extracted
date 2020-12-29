@@ -64,7 +64,7 @@ has ua        => sub { Mojo::UserAgent->new };
 has validator => sub { Mojolicious::Validator->new };
 
 our $CODENAME = 'Supervillain';
-our $VERSION  = '8.67';
+our $VERSION  = '8.69';
 
 sub BUILD_DYNAMIC {
   my ($class, $method, $dyn_methods) = @_;
@@ -774,6 +774,18 @@ Licensed under the MIT License, L<http://creativecommons.org/licenses/MIT>.
   Copyright (C) 2006, Ivan Sagalaev.
 
 Licensed under the BSD License, L<https://github.com/highlightjs/highlight.js/blob/master/LICENSE>.
+
+=head2 Bootstrap
+
+  Copyright 2011-2020 The Bootstrap Authors.
+  Copyright 2011-2020 Twitter, Inc.
+
+Licensed under the MIT License, L<http://creativecommons.org/licenses/MIT>.
+
+=head2 Font Awesome
+
+Licensed under the CC-BY License, Version 4.0 L<https://creativecommons.org/licenses/by/4.0/> and SIL OFL, Version 1.1
+L<https://opensource.org/licenses/OFL-1.1>.
 
 =head1 CODE NAMES
 

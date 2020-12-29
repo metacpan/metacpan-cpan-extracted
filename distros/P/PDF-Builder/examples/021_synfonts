@@ -81,7 +81,8 @@ if ($type == 0) {
     verdanabold
     verdanabolditalic
     wingdings
-    webdings);
+    webdings
+  );
 }
 if ($type == 1) {
   @font_list = qw( Times-Roman ); 

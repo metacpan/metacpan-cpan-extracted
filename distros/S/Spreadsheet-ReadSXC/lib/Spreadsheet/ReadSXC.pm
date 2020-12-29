@@ -7,7 +7,7 @@ use warnings;
 use Exporter 'import';
 
 our @EXPORT_OK = qw(read_sxc read_sxc_fh read_xml_file read_xml_string);
-our $VERSION = '0.32';
+our $VERSION = '0.33';
 
 use Archive::Zip ':ERROR_CODES';
 use Carp qw(croak);
@@ -451,6 +451,11 @@ Parses an XML string and eturns the worksheets as a data structure.
     my $fh = fetch_url('http://example.com/example.ods');
     my $sheet = read_sxc_fh( $fh );
 
+=head1 BUG TRACKER
+
+Please report bugs in this module via the Github bug queue at
+L<https://github.com/Corion/Spreadsheet-ReadSXC/issues>
+
 =head1 SEE ALSO
 
 L<https://www.openoffice.org/xml/general.html> has extensive documentation
@@ -465,11 +470,10 @@ Christoph Terhechte, E<lt>terhechte@cpan.orgE<gt>
 
 Max Maischein, L<mailto:corion@cpan.org>
 
-
 =head1 COPYRIGHT AND LICENSE
 
-
 Copyright 2005-2019 by Christoph Terhechte
+
 Copyright 2019- by Max Maischein
 
 This library is free software; you can redistribute it and/or modify

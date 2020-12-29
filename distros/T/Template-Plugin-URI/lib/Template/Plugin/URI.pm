@@ -3,7 +3,7 @@ package Template::Plugin::URI;
 use strict;
 use warnings;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 use URI;
 
@@ -54,7 +54,7 @@ L<Template>
  
 =head1 AUTHOR
  
-Copyright 2018 Denis Boyun, C<< <denisboyun at gmail.com> >>
+Copyright 2020 Denis Boyun, C<< <denisboyun at gmail.com> >>
 
 This is free software; you can redistribute it and/or modify it under the same terms as the Perl 5 programming language system itself.
  

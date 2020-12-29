@@ -1,12 +1,12 @@
 #!/pro/bin/perl
 
 # csv2xlsx: Convert csv to xlsx
-#	   (m)'20 [25 Mar 2020] Copyright H.M.Brand 2007-2020
+#	   (m)'20 [30 Nov 2020] Copyright H.M.Brand 2007-2020
 
 use 5.14.0;
 use warnings;
 
-our $VERSION = "1.07";
+our $VERSION = "1.11";
 
 sub usage {
     my $err = shift and select STDERR;
@@ -25,7 +25,8 @@ usage: csv2xlsx [-s <sep>] [-q <quot>] [-w <width>] [-d <dtfmt>]
                   if from standard input, defaults to csv2xlsx.xlsx
        -F         allow formula's. Otherwise fields starting with
                   an equal sign are forced to string
-         --Fa=aaa Define formula action: die/croak/diag/empty/undef
+         --Fa=aaa Define formula action: none/die/croak/diag/empty/undef
+         --Ft     Formula's will be stored as text (formula actions: none)
          --Fd     Formula's will cause a die
          --Fc     Formula's will cause a croak
          --FD     Formula's will cause a warning (this is the default)
@@ -35,7 +36,9 @@ usage: csv2xlsx [-s <sep>] [-q <quot>] [-w <width>] [-d <dtfmt>]
        -d <dtfmt> use <dtfmt> as date formats.   Default = 'dd-mm-yyyy'
        -C <C:fmt> use <fmt> as currency formats for currency <C>, no default
        -D cols    only convert dates in columns <cols>. Default is everywhere.
+       -L N       limit export to N rows
        -u         CSV is UTF8
+         --de     Some CSV fields might be double-encoded. Try to fix that.
        -m         merge multiple CSV's into a single xlsx (separate sheets)
 		    -o is required, all arguments should be existing files
        -v [<lvl>] verbosity (default = 1)
@@ -68,13 +71,16 @@ GetOptions (
     "f|force!"		=> \my $frc,
     "F|formulas!"	=> \my $frm,
       "Fa=s"		=> \$fac,
+      "Ft"		=> sub { $fac = "none";		},
       "Fd"		=> sub { $fac = "die";		},
       "Fc"		=> sub { $fac = "croak";	},
       "FD"		=> sub { $fac = "diag";		},
       "Fe"		=> sub { $fac = "empty";	},
       "Fu"		=> sub { $fac = "undef";	},
     "u|utf-8|utf8!"	=> \my $utf,
+      "de|fix-utf8!"	=> \my $dutf, # double encoded? \x{c3}\x{ab} => \x{100}
     "m|merge!"		=> \my $mrg,
+    "L|row-limit=i"	=> \my $row_limit,
     "v|verbose:1"	=> \$opt_v,
     ) or usage (1);
 
@@ -86,7 +92,7 @@ if ($mrg) {
 	    $xls = $_;
 	    next;
 	    }
-	if (m/\.(csv|png|jpe?g|bmp|gif|tiff|xpm)$/i && -s) {
+	if (m/\.(?:csv|png|jpe?g|bmp|gif|tiff|xpm)$/i && -s) {
 	    push @csv, $_;
 	    next;
 	    }
@@ -105,12 +111,27 @@ if (-s $xls) {
     print STDERR "File '$xls' already exists. Overwrite? [y/N] > N\b";
     scalar <STDIN> =~ m/^[yj](?:es|a)?$/i or exit;
     }
+# Test if the file can be created
+# The error from Excel::Writer::XLSX is not very informative if it fails
+# e.g. when the folder cannot be used for whatever reason
+{   open my $fh, ">", $xls or die "$xls: $!\n";
+    close $fh;
+    unlink $xls;
+    }
 
 # Don't split ourselves when modules do it _much_ better, and follow the standards
 use Text::CSV_XS;
 use Date::Calc qw( Delta_Days Days_in_Month );
 use Excel::Writer::XLSX;
 use Encode qw( from_to );
+
+if ($dutf) {
+    eval { require Encode::DoubleEncodedUTF8; };
+    if ($@) {
+	$dutf = 0;
+	warn "Cannot load Encode::DoubleEncodedUTF8; --de ignored\n";
+	}
+    }
 
 my $wbk = Excel::Writer::XLSX->new ($xls);
    $dtf =~ s/j/y/g;
@@ -204,12 +225,16 @@ foreach my $csvf (@args) {
 	}
 
     while ($row && @$row or $row = $csv->getline ($fh)) {
+	$row_limit and $csv->record_number > $row_limit and last;
 	my @row = @$row;
 	@row > $w and push @w, ($wdt) x (($w = @row) - @w);
 	foreach my $c (0 .. $#row) {
 	    my $val = $row[$c] // "";
 	    my $l = length $val;
 	    $l > ($w[$c] // -1) and $w[$c] = $l;
+
+	    $dutf and $csv->is_binary ($c) and utf8::valid ($val) and
+		$val = Encode::decode ("utf-8-de", $val);
 
 	    if ($utf and $csv->is_binary ($c)) {
 		from_to ($val, "utf-8", "ucs2");

@@ -1,9 +1,12 @@
+use 5.14.0;
 use strict;
 use warnings;
+
 package Dist::Zilla::MintingProfile::Iller::CSSON;
 
-our $VERSION = '0.0101'; # VERSION:
 # ABSTRACT: Minting profile
+our $AUTHORITY = 'cpan:CSSON'; # AUTHORITY
+our $VERSION = '0.0102';
 
 use Moose;
 with 'Dist::Zilla::Role::MintingProfile';
@@ -40,22 +43,19 @@ Dist::Zilla::MintingProfile::Iller::CSSON - Minting profile
 
 
 
-=begin HTML
+=begin html
 
-<p><img src="https://img.shields.io/badge/perl-5.10.1+-brightgreen.svg" alt="Requires Perl 5.10.1+" /> <a href="https://travis-ci.org/Csson/p5-Dist-Zilla-MintingProfile-Iller-CSSON"><img src="https://api.travis-ci.org/Csson/p5-Dist-Zilla-MintingProfile-Iller-CSSON.svg?branch=master" alt="Travis status" /></a> </p>
+<p>
+<img src="https://img.shields.io/badge/perl-5.14+-blue.svg" alt="Requires Perl 5.14+" />
+<img src="https://img.shields.io/badge/coverage-100.0%25-brightgreen.svg" alt="coverage 100.0%" />
+<a href="https://github.com/Csson/p5-Dist-Zilla-MintingProfile-Iller-CSSON/actions?query=workflow%3Amakefile-test"><img src="https://img.shields.io/github/workflow/status/Csson/p5-Dist-Zilla-MintingProfile-Iller-CSSON/makefile-test" alt="Build status at Github" /></a>
+</p>
 
-=end HTML
-
-
-=begin markdown
-
-![Requires Perl 5.10.1+](https://img.shields.io/badge/perl-5.10.1+-brightgreen.svg) [![Travis status](https://api.travis-ci.org/Csson/p5-Dist-Zilla-MintingProfile-Iller-CSSON.svg?branch=master)](https://travis-ci.org/Csson/p5-Dist-Zilla-MintingProfile-Iller-CSSON) 
-
-=end markdown
+=end html
 
 =head1 VERSION
 
-Version 0.0101, released 2016-01-20.
+Version 0.0102, released 2020-12-28.
 
 =head1 SYNOPSIS
 

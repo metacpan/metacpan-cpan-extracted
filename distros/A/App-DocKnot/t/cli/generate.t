@@ -2,7 +2,7 @@
 #
 # Tests for the App::DocKnot command dispatch for generate.
 #
-# Copyright 2018-2019 Russ Allbery <rra@cpan.org>
+# Copyright 2018-2020 Russ Allbery <rra@cpan.org>
 #
 # SPDX-License-Identifier: MIT
 
@@ -55,7 +55,7 @@ my $tempdir = File::Temp->newdir();
 # Save the paths to various files in the source directory.
 my $readme_path    = File::Spec->catfile(getcwd(), 'README');
 my $readme_md_path = File::Spec->catfile(getcwd(), 'README.md');
-my $metadata_path  = File::Spec->catfile(getcwd(), 'docs', 'metadata');
+my $metadata_path  = File::Spec->catfile(getcwd(), 'docs', 'docknot.yaml');
 
 # Generate all of the files using generate-all in a new temporary directory.
 my $tmpdir = File::Temp->newdir();

@@ -20,11 +20,11 @@ You will need an API key to use this module, available free from IG Markets.
 
 =head1 VERSION
 
-Version 0.01
+Version 0.04
 
 =cut
 
-our $VERSION = '0.02';
+our $VERSION = '0.04';
 
 
 =head1 SYNOPSIS
@@ -108,8 +108,8 @@ return a reference to an array of transactions for that time span. Each transact
 use Moose;
 use JSON;
 use REST::Client;
-use Data::Dump qw(dump);
-use Scalar::Util;
+#use Data::Dump qw(dump); # used in some commented out debug statements
+#use Scalar::Util;
 use Time::Piece;
 
 BEGIN {

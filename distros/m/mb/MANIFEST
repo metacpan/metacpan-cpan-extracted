@@ -55,6 +55,14 @@ t/3016_CORE_quantifier.t
 t/3017_CORE_quantifier_capture_all.t
 t/3018_mb_quantifier_sbcs.t
 t/3019_mb_quantifier_mbcs.t
+t/3020_qr_posixclass.t
+t/3021_qr_neg_posixclass.t
+t/3023_charclass_hyphen_gb18030.t
+t/3024_charclass_hyphen_big5.t
+t/3025_charclass_hyphen_eucjp.t
+t/3026_charclass_hyphen_sjis.t
+t/3027_charclass_hyphen_utf8_1of2.t
+t/3028_charclass_hyphen_utf8_2of2.t
 t/4001_mb_chop.t
 t/4002_mb_chr.t
 t/4003_mb_do.t

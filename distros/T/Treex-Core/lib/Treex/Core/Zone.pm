@@ -1,5 +1,5 @@
 package Treex::Core::Zone;
-$Treex::Core::Zone::VERSION = '2.20160630';
+$Treex::Core::Zone::VERSION = '2.20201228';
 # antecedent of DocZone and BundleZone
 
 use Moose;
@@ -88,7 +88,7 @@ Treex::Core::Zone - base class for Zones
 
 =head1 VERSION
 
-version 2.20160630
+version 2.20201228
 
 =head1 DESCRIPTION
 

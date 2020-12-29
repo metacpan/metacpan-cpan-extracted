@@ -1,0 +1,35 @@
+name: CI
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+  workflow_dispatch:
+jobs:
+  ubuntu:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ ubuntu-latest, macos-latest ]
+        perl-version: [ '5.32', '5.30' ]
+        include:
+          - perl-version: '5.30'
+            os: ubuntu-latest
+            release-test: false
+            coverage: true
+    container: perl:${{ matrix.perl-version }}
+    steps:
+      - uses: actions/checkout@v2
+      - run: cpanm -n --installdeps .
+      - run: perl -V
+      - name: Run tests (no coverage)
+        if: ${{ !matrix.coverage }}
+        run: prove -l t
+      - name: Run tests (with coverage)
+        if: ${{ matrix.coverage }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          cpanm -n Devel::Cover::Report::Coveralls
+          cover -test -report Coveralls

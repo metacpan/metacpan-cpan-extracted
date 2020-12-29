@@ -96,9 +96,9 @@ sub foldsub {
 sub layout {
     my $obj = shift;
     my $dp = shift;
+    $obj->pagebreak($dp);
     $obj->space_layout($dp);
     $obj->fillup($dp);
-    $obj->insert_border($dp);
 }
 
 sub space_layout {
@@ -124,18 +124,38 @@ sub space_layout {
     @$dp;
 }
 
+sub _fillup {
+    my($dp, $len, $str) = @_;
+    if (my $remmant = @$dp % $len) {
+	push @$dp, ($str) x ($len - $remmant);
+    }
+}
+
 sub fillup {
     my $obj = shift;
     my $dp = shift;
-    my $height = $obj->{height} - $obj->{border_height};
+    my $line = $obj->{height} - $obj->{border_height};
     defined $obj->{fillup} and $obj->{fillup} !~ /^(?:no|none)$/
 	or return;
     $obj->{fillup} ||= 'pane';
-    my $line = $height;
     $line *= $obj->{panes} if $obj->{fillup} eq 'page';
-    if (my $remmant = @$dp % $line) {
-	push @$dp, ($obj->{fillup_str}) x ($line - $remmant);
+    _fillup $dp, $line, $obj->{fillup_str};
+}
+
+sub pagebreak {
+    my $obj = shift;
+    $obj->{pagebreak} or return;
+    my $dp = shift;
+    my $height = $obj->{height} - $obj->{border_height};
+    my @up;
+    use List::Util qw(first);
+    while (defined(my $i = first { $dp->[$_] =~ /\f/ } 0 .. $#{$dp})) {
+	push @up, splice @$dp, 0, $i;
+	$dp->[0] =~ s/^([^\f]*)\f// or die;
+	push @up, $1, if $1 ne '';
+	_fillup \@up, $height, $obj->{fillup_str};
     }
+    unshift @$dp, @up if @up;
 }
 
 sub insert_border {

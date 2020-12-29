@@ -1644,7 +1644,7 @@ sub serve_main_menu_via_http {
   $stream->write("</head>\n");
   $stream->write("<body>\n");
   if ($page) {
-    $stream->write(encode_utf8 to_html($stream, text($host, $space, $page)) . "\n");
+    $stream->write(encode_utf8 to_html(text($host, $space, $page)) . "\n");
   } else {
     $stream->write("<h1>Welcome to Phoebe!</h1>\n");
   }
@@ -2695,15 +2695,14 @@ sub html_page {
   $stream->write("</head>\n");
   $stream->write("<body>\n");
   $stream->write(encode_utf8 "<h1>" . quote_html($id) . "</h1>\n");
-  $stream->write(encode_utf8 to_html($stream, text($host, $space, $id, $revision)) . "\n");
-  $stream->write(encode_utf8 to_html($stream, html_footer($stream, $host, $space, $id, $revision)) . "\n");
+  $stream->write(encode_utf8 to_html(text($host, $space, $id, $revision)) . "\n");
+  $stream->write(encode_utf8 to_html(html_footer($stream, $host, $space, $id, $revision)) . "\n");
   $stream->write("</body>\n");
   $stream->write("</html>\n");
 }
 
 # returns lines!
 sub to_html {
-  my $stream = shift;
   my $text = shift;
   my @lines;
   my $list;
@@ -2932,7 +2931,7 @@ EOT
   return $ban
       . join("\n",
 	     map {
-	       my $space = $_;
+	       my $space = (split /\//)[-1];
 	       join("\n", "# $space", map { "Disallow: /$space$_" } @disallows)
 	     } @{$server->{wiki_space}}) . "\n";
 }
@@ -3247,7 +3246,7 @@ sub wiki_dir {
   my $space = shift;
   my $dir = $server->{wiki_dir};
   if (keys %{$server->{host}} > 1) {
-    $dir .= "/$host" ;
+    $dir .= "/$host";
     mkdir($dir) unless -d $dir;
   }
   $dir .= "/$space" if $space;
@@ -3377,7 +3376,7 @@ sub process_http {
     } elsif (($space, $id, $n) = $request =~ m!^GET (?:/($spaces))?/raw/([^/]*)(?:/(\d+))? HTTP/1\.[01]$!
 	     and ($host) = $headers->{host} =~ m!^($hosts)(?::$port)$!) {
       serve_raw_via_http($stream, $host, space($stream, $host, $space), decode_utf8(uri_unescape($id)), $n);
-    } elsif ($request =~ m!^GET /robots.txt HTTP/1\.[01]$!
+    } elsif ($request =~ m!^GET /robots.txt(?:[#?].*)? HTTP/1\.[01]$!
 	     and ($host) = $headers->{host} =~ m!^($hosts)(?::$port)$!) {
       serve_raw_via_http($stream, $host, undef, 'robots');
     } elsif (($space, $id, $n) = $request =~ m!^GET (?:/($spaces))?/do/changes(?:/(\d+))? HTTP/1\.[01]$!
@@ -3631,7 +3630,7 @@ sub process_gemini {
       serve_atom($stream, $host, space($stream, $host, $space));
     } elsif (($host, $space) = $url =~ m!^(?:gemini:)?//($hosts)(?::$port)?(?:/($spaces))?/do/all/atom$!) {
       serve_all_atom($stream, $host);
-    } elsif ($url =~ m!^(?:gemini:)?//($hosts)(?::$port)?/robots.txt$!) {
+    } elsif (($host) = $url =~ m!^(?:gemini:)?//($hosts)(?::$port)?/robots.txt(?:[#?].*)?$!) {
       serve_raw($stream, $host, undef, "robots");
     } elsif (($host, $space, $id, $n, $style) = $url =~ m!^(?:gemini:)?//($hosts)(?::$port)?(?:/($spaces))?/history/([^/]*)(?:/(\d+))?(?:/(colour|fancy))?$!) {
       serve_history($stream, $host, space($stream, $host, $space), decode_utf8(uri_unescape($id)), $n||10, $style);

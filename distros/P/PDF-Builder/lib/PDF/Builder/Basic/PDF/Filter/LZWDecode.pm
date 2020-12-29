@@ -3,10 +3,11 @@ package PDF::Builder::Basic::PDF::Filter::LZWDecode;
 use base 'PDF::Builder::Basic::PDF::Filter::FlateDecode';
 
 use strict;
-no warnings qw[ deprecated recursion uninitialized ];
+use warnings;
+#no warnings qw[ deprecated recursion uninitialized ];
 
-our $VERSION = '3.020'; # VERSION
-my $LAST_UPDATE = '2.029'; # manually update whenever code is changed
+our $VERSION = '3.021'; # VERSION
+my $LAST_UPDATE = '3.021'; # manually update whenever code is changed
 
 =head1 NAME
 

@@ -9,7 +9,7 @@ use Time::HiRes 'time';
 use base 'Forks::Queue';
 use 5.010;    #  implementation contains  // //=  operators
 
-our $VERSION = '0.14';
+our $VERSION = '0.15';
 our ($DEBUG,$XDEBUG);
 *DEBUG = \$Forks::Queue::DEBUG;
 *XDEBUG = \$Forks::Queue::XDEBUG;
@@ -21,6 +21,7 @@ our $jsonizer = JSON->new->allow_nonref(1)->ascii(1);
 sub new {
     my $class = shift;
     my %opts = (%Forks::Queue::OPTS, @_);
+    my $_DEBUG = $DEBUG || $opts{debug};
 
     if ($opts{join} && !$opts{db_file}) {
         croak "Forks::Queue::SQLite: db_file opt required with join";
@@ -47,14 +48,29 @@ sub new {
     my $self = bless { %opts }, $class;
 
     if (!$exists) {
+	# sometimes unlink doesn't work -- just on NTFS or on other
+	# systems, too?
+	my $z1 = -f $opts{db_file};
+        my $z2 = unlink $opts{db_file};
+	$_DEBUG && print STDERR "Creating new database at ",
+	    $opts{db_file}," (unlink=$z1 ^ $z2)\n";
         my $dbh = DBI->connect("dbi:SQLite:dbname=" . $opts{db_file},
                                "", "");
         $self->{_dbh} = $opts{_dbh} = $dbh;
+	if ($z1 && !$z2) {
+	    # file is not fresh. Reinitialize.
+	    my $z3 = $dbh->do("DROP TABLE the_queue");
+	    my $z4 = $dbh->do("DROP TABLE pids");
+	    my $z5 = $dbh->do("DROP TABLE status");
+	    $_DEBUG && print STDERR "Could not erase existing db file ",
+		$opts{db_file}, " for reuse ... reinitialized $z3 $z4 $z5\n";
+	}
         if (!eval { $self->_init }) {
             carp __PACKAGE__, ": db initialization failed";
             return;
         }
     } else {
+	$_DEBUG && print STDERR "Using existing database at ",$opts{db_file},"\n";
         $self->_dbh;
     }
     if (defined($list)) {
@@ -135,6 +151,10 @@ sub _dbh {
     if ($self->{_dbh} && $$ == $self->{_pid}[0] && $tid == $self->{_pid}[1]) {
         return $self->{_dbh};
     }
+    if (Forks::Queue::__inGD()) {
+        # database already destroyed? Don't try to recreate in GD.
+        return;
+    }
 
     $self->{_pid} = [$$,$tid];
     $self->{_dbh} =
@@ -152,11 +172,20 @@ sub _dbh {
     return $self->{_dbh};
 }
 
+# DESTROY responsibilities for F::Q::SQLite:
+#    remove pid+tid from pids table
+#    disconnect from database
+#    delete database file if last pid/tid and !persist
 sub DESTROY {
     my $self = shift;
     $self->{_DESTROY}++;
     my $_DEBUG = $self->{debug} // $DEBUG;
-    my $dbh = $self->_dbh;
+    my $dbh;
+    if (Forks::Queue::__inGD()) {
+        return unless eval { $dbh = $self->_dbh; 1 };
+    } else {
+        $dbh = $self->_dbh;
+    }
     my $tid = $self->{_pid} ? $self->{_pid}[1] : TID();
     my $t = [[-1]];
     my $pid_rm = $dbh && eval {
@@ -951,7 +980,7 @@ Forks::Queue::SQLite - SQLite-based implementation of Forks::Queue
 
 =head1 VERSION
 
-0.14
+0.15
 
 =head1 SYNOPSIS
 

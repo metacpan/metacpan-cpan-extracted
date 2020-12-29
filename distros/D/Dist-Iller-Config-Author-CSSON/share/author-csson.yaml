@@ -56,7 +56,7 @@ plugins:
  - +plugin: PromptIfStale
    +version: 0.057
    check_all_plugins: 1
-   phase: build
+   phase: release
 
  - +plugin: CopyFilesFromBuild
    +version: 0.170880
@@ -152,9 +152,9 @@ plugins:
  - +plugin: Git::Contributors
    +version: 0.035
 
- - +plugin: Test::Kwalitee::Extra
-   +version: v0.2.1
-   arg: "!prereq_matches_use !build_prereq_matches_use"
+ #- +plugin: Test::Kwalitee::Extra
+ #  +version: v0.2.1
+ #  arg: "!prereq_matches_use !build_prereq_matches_use"
 
  - +plugin: Test::NoTabs
    +version: 0.15
@@ -210,10 +210,9 @@ plugins:
  - +plugin: UploadToCPAN
    +add_if: $self.is_cpan_release
 
- - +plugin: TravisYML
-   +add_if: $self.travis
-   +version: 1.15
-   perl_version: $self.travis_perl
+ - +plugin: Author::CSSON::GithubActions::Workflow::TestWithMakefile
+   +add_if: $self.is_cpan_release
+   +version: 0.0106
 
  - +plugin: CommitBeforeTag
    +base: Git::Commit
@@ -263,17 +262,20 @@ plugins:
    +prereqs:
     - develop_requires: Badge::Depot 0.0103
     - develop_requires: Badge::Depot::Plugin::Perl
-    - develop_requires: Badge::Depot::Plugin::Kwalitee
-    - develop_requires: Badge::Depot::Plugin::Cpantesters
+    #- develop_requires: Badge::Depot::Plugin::Kwalitee
+    #- develop_requires: Badge::Depot::Plugin::Cpantesters
     - develop_requires: Badge::Depot::Plugin::Coverage
+    - develop_requires: Badge::Depot::Plugin::Githubactions
     - develop_requires: Pod::Weaver::Section::Badges 0.0401
    badge:
     - perl
-    - kwalitee
-    - cpantesters
+    #- kwalitee
+    #- cpantesters
     - coverage
+    - githubactions
    formats: html, markdown
-   -kwalitee_author: CSSON
+   #-kwalitee_author: CSSON
+   -githubactions_workflow: makefile-test
 
  - +plugin: Version
    format: Version %v, released %{YYYY-MM-dd}d.
@@ -344,6 +346,7 @@ always:
  - MYMETA.*
  - '!META.json'
  - /.prove
+ - $self.distribution_name
 
 onexist:
  - .coverhistory.json

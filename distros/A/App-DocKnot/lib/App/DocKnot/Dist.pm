@@ -10,7 +10,7 @@
 # Modules and declarations
 ##############################################################################
 
-package App::DocKnot::Dist 3.05;
+package App::DocKnot::Dist 4.00;
 
 use 5.024;
 use autodie;
@@ -94,7 +94,6 @@ our @DIST_IGNORE = (
 # Given the path to the source tree, generate a list of files that we expect
 # to find in the distribution tarball.
 #
-# $self - The App::DocKnot::Dist object
 # $path - The directory path
 #
 # Returns: A list of files (no directories) that the distribution tarball
@@ -131,7 +130,6 @@ sub _expected_dist_files {
 
 # Find the tarball compressed with gzip given a directory and a prefix.
 #
-# $self   - The App::DocKnot::Dist object
 # $path   - The directory path
 # $prefix - The tarball file prefix
 #
@@ -149,7 +147,6 @@ sub _find_gzip_tarball {
 
 # Find matching tarballs given a directory and a prefix.
 #
-# $self   - The App::DocKnot::Dist object
 # $path   - The directory path
 # $prefix - The tarball file prefix
 #
@@ -167,7 +164,6 @@ sub _find_matching_tarballs {
 # all the desired compression formats exist.  Currently this only handles
 # generating the xz version of a gzip tarball.
 #
-# $self   - The App::DocKnot::Dist object
 # $path   - The directory path
 # $prefix - The tarball file prefix
 #
@@ -201,7 +197,6 @@ sub _generate_compression_formats {
 # signatures), and a destination directory, move all matching files from the
 # source directory to the destination directory.
 #
-# $self        - The App::DocKnot::Dist object
 # $source_path - The source directory path
 # $prefix      - The tarball file prefix
 # $dest_path   - The destination directory path
@@ -223,7 +218,6 @@ sub _move_tarballs {
 # configured path to Perl, if any.  Assumes that the perl configuration
 # parameter is set in the object and should not be called if this is not true.
 #
-# $self        - The App::DocKnot::Dist object
 # $command_ref - Reference to an array representing a command with arguments
 #
 # Returns: Reference to an array representing a command with arguments, with
@@ -246,7 +240,6 @@ sub _replace_perl_path {
 # Create a new App::DocKnot::Dist object, which will be used for subsequent
 # calls.
 #
-# $class - Class of object to create
 # $args  - Anonymous hash of arguments with the following keys:
 #   distdir  - Path to the directory for distribution tarball
 #   metadata - Path to the directory containing package metadata
@@ -288,7 +281,6 @@ sub new {
 # distribution tarball.  Assumes that it is run from the root of the source
 # directory.
 #
-# $self    - The App::DocKnot::Dist object
 # $source  - Path to the source directory
 # $tarball - Path to a gzip-compressed distribution tarball
 #
@@ -309,8 +301,6 @@ sub check_dist {
 
 # Analyze a source directory and return the list of commands to run to
 # generate a distribution tarball.
-#
-# $self - The App::DocKnot::Dist object
 #
 # Returns: List of commands, each of which is a list of strings representing
 #          a command and its arguments
@@ -353,8 +343,6 @@ sub commands {
 # directory of the package to release and that it is a Git repository.  It
 # exports the Git repository, runs the commands to generate the tarball, and
 # then removes the working tree.
-#
-# $self - The App::DocKnot::Dist object
 #
 # Throws: Text exception if any of the commands fail
 #         Text exception if the distribution is missing files

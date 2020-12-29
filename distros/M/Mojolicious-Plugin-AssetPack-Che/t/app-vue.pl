@@ -3,9 +3,12 @@ use Mojolicious::Lite;
 
 plugin 'AssetPack::Che' => {
   pipes => [qw(VueTemplateCompiler CombineFile)],#CombineFile
-    CombineFile => {
-      gzip => {min_size => 1000},
-    },
+  CombineFile => {
+    gzip => {min_size => 1000},
+  },
+  VueTemplateCompiler => {
+    enabled=>$ENV{MOJO_ASSETPACK_VueTemplateCompiler} || 0,
+  },
   process => [
     ['js/dist/рендер.js?333'=>qw(js/App.vue.html js/файлы.vue.html), 'js/components/Шаблон №1.vue.html',],
     #~ 'main.js'=>[qw(.js js/component1.vue.js js/2.vue.js)]

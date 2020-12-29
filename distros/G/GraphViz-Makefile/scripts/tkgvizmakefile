@@ -93,26 +93,33 @@ sub tkcanvas_output {
     $mw->Advertise(Graph => $c);
     draw_graph($mw, $graphviz);
     $c->idletasks;
-    $c->scrollTo("$prefix$rule");
+    $c->scrollTo("target:$prefix$rule");
     &Tk::MainLoop;
 }
 
 sub findNode {
     my ($mw, $gv) = @_;
-    $gv->scrollTo(simpleDialog($mw, 'Rule Name Dialog'));
+    my @targets = sort map { s/^target:// ? $_ : () } $gv->nodes;
+    my $t = getNodeSearch($mw, 'Rule Name Dialog', \@targets);
+    return if !defined $t or !length $t;
+    $gv->scrollTo("target:$t");
 }
 
-sub simpleDialog {
-    my ($mw, $title) = @_;
-    require Tk::DialogBox;
-    require Tk::Entry;
-    my $dialog = $mw->DialogBox(-title => $title, -default_button => 'OK', -buttons => [qw/OK Cancel/]);
-    my $entry = $dialog->add('Entry')->pack;
-    $dialog->configure(-focus => $entry);
-    my $ans = $dialog->Show;
-    my $text = $entry->get;
-    $dialog->destroy;
-    $ans ne 'OK' ? undef : $text;
+sub getNodeSearch {
+  my ($mw, $title, $choices) = @_;
+  require Tk::DialogBox;
+  my $dialog = $mw->DialogBox(-title => $title, -default_button => 'OK', -buttons => [qw/OK Cancel/]);
+  my ($text, $entry);
+  if (eval { require Tk::MatchEntry; 1 }) {
+    $entry = $dialog->add('MatchEntry', -variable => \$text, choices => $choices)->pack;
+  } else {
+    require Tk::BrowseEntry;
+    $entry = $dialog->add('BrowseEntry', -variable => \$text, choices => $choices)->pack;
+  }
+  $dialog->configure(-focus => $entry);
+  my $ans = $dialog->Show;
+  $dialog->destroy;
+  $ans ne 'OK' ? undef : $text;
 }
 
 sub tkDoc {

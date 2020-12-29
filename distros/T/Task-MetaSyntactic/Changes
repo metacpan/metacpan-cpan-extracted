@@ -1,5 +1,13 @@
 Revision history for Task-MetaSyntactic
 
+1.044 2020-12-29 BOOK
+    - add Acme::MetaSyntactic::gavan
+    - add Acme::MetaSyntactic::id_beverages
+    - add Acme::MetaSyntactic::id_dishes
+    - add Acme::MetaSyntactic::metal_heroes
+    - add Acme::MetaSyntactic::unyil
+    - list WordListBase::MetaSyntactic under "OTHER METASYNTACTIC MODULES"
+
 1.043 2018-02-27 BOOK
     - add Acme::MetaSyntactic::legoworlds
 

@@ -74,10 +74,16 @@ typedef struct json_create {
     SV * type_handler;
     /* User obj handler. */
     SV * obj_handler;
-    /* User non-finite-float handler. */
+    /* User non-finite-float handler, what to do with "inf", "nan"
+       type numbers. */
     SV * non_finite_handler;
+    /* User's sorter for entries. */
+    SV * cmp;
     /* Indentation depth (no. of tabs). */
     unsigned int depth;
+
+    /* One-bit flags. */
+
     /* Do any of the SVs have a Unicode flag? */
     unsigned int unicode : 1;
     /* Should we convert / into \/? */
@@ -102,6 +108,8 @@ typedef struct json_create {
     unsigned int strict : 1;
     /* Add whitespace to output to make it human-readable. */
     unsigned int indent : 1;
+    /* Sort the keys of objects. */
+    unsigned int sort : 1;
 }
 json_create_t;
 
@@ -275,6 +283,39 @@ add_str_len (json_create_t * jc, const char * s, unsigned int slen)
 	   checking routines. */
 	for (i = 0; i < slen; i++) {
 	    CALL (add_char (jc, (unsigned char) s[i]));
+	}
+    }
+    return json_create_ok;
+}
+
+static json_create_status_t newline_indent(json_create_t * jc)
+{
+    int d;
+    CALL (add_char (jc, '\n'));
+    for (d = 0; d < jc->depth; d++) {
+	CALL (add_char (jc, '\t'));		\
+    }    
+    return json_create_ok;
+}
+
+
+static INLINE json_create_status_t
+add_str_len_indent (json_create_t * jc, const char * s, unsigned int slen)
+{
+    int i;
+
+    for (i = 0; i < slen; i++) {
+	int d;
+	unsigned char c;
+	c = (unsigned char) s[i];
+	if (c == '\n') {
+	    if (i < slen - 1) {
+		CALL (newline_indent (jc));
+	    }
+	    // else just discard it, final newline
+	}
+	else {
+	    CALL (add_char (jc, c));
 	}
     }
     return json_create_ok;
@@ -866,7 +907,12 @@ json_create_call_to_json (json_create_t * jc, SV * cv, SV * r)
 	/* This string may contain invalid UTF-8. */
 	jc->utf8_dangerous = 1;
     }
-    CALL (add_str_len (jc, jsonc, jsonl));
+    if (jc->indent) {
+	CALL (add_str_len_indent (jc, jsonc, jsonl));
+    }
+    else {
+	CALL (add_str_len (jc, jsonc, jsonl));
+    }
     SvREFCNT_dec (json);
     return json_create_ok;
 }
@@ -969,16 +1015,6 @@ json_create_add_stringified (json_create_t * jc, SV *r)
 #define DINC if (jc->indent) { jc->depth++; }
 #define DDEC if (jc->indent) { jc->depth--; }
 
-static json_create_status_t newline_indent(json_create_t * jc)
-{
-    int d;
-    CALL (add_char (jc, '\n'));
-    for (d = 0; d < jc->depth; d++) {
-	CALL (add_char (jc, '\t'));		\
-    }    
-    return json_create_ok;
-}
-
 /* Add a comma where necessary. This is shared between objects and
    arrays. */
 
@@ -1021,6 +1057,102 @@ add_close (json_create_t * jc, unsigned char c)
 
 //#define JCDEBUGTYPES
 
+static int
+json_create_user_compare (void * thunk, const void * va, const void * vb)
+{
+    dSP;
+    SV * sa;
+    SV * sb;
+    json_create_t * jc;
+    int n;
+    int c;
+
+    sa = *(SV **) va;
+    sb = *(SV **) vb;
+    jc = (json_create_t *) thunk;
+
+    ENTER;
+    SAVETMPS;
+    PUSHMARK(SP);
+    EXTEND(SP, 2);
+    XPUSHs(sv_2mortal (newSVsv (sa)));
+    XPUSHs(sv_2mortal (newSVsv (sb)));
+    PUTBACK;
+    n = call_sv (jc->cmp, G_SCALAR);
+    if (n != 1) {
+	croak ("Wrong number of return values %d from comparison function",
+	       n);
+    }
+    SPAGAIN;
+    c = POPi;
+    PUTBACK;
+    FREETMPS;
+    LEAVE;
+    return c;
+}
+
+static INLINE json_create_status_t
+json_create_add_object_sorted (json_create_t * jc, HV * input_hv)
+{
+    I32 n_keys;
+    int i;
+    SV * value;
+    char * key;
+    SV ** keys;
+
+    n_keys = hv_iterinit (input_hv);
+    if (n_keys == 0) {
+	CALL (add_str_len (jc, "{}", strlen ("{}")));
+	return json_create_ok;
+    }
+    CALL (add_open (jc, '{'));
+    Newxz (keys, n_keys, SV *);
+    jc->n_mallocs++;
+    for (i = 0; i < n_keys; i++) {
+	HE * he;
+	he = hv_iternext (input_hv);
+	keys[i] = hv_iterkeysv (he);
+	if (HeUTF8 (he)) {
+	    jc->unicode = 1;
+	}
+    }
+
+    if (jc->cmp) {
+	json_create_qsort_r (keys, n_keys, sizeof (SV **), jc,
+			     json_create_user_compare);
+    }
+    else {
+	sortsv_flags (keys, (size_t) n_keys, Perl_sv_cmp, /* flags */ 0);
+    }
+
+    for (i = 0; i < n_keys; i++) {
+	SV * key_sv;
+	SV ** sv_ptr;
+	char * key;
+	STRLEN keylen;
+	HE * he;
+
+	COMMA;
+	key_sv = keys[i];
+	key = SvPV (key_sv, keylen);
+	CALL (json_create_add_key_len (jc, (const unsigned char *) key,
+				       keylen));
+	he = hv_fetch_ent (input_hv, key_sv, 0, 0);
+	if (! he) {
+	    croak ("%s:%d: invalid sv_ptr for '%s' at offset %d",
+		   __FILE__, __LINE__, key, i);
+	}
+	CALL (add_char (jc, ':'));
+	CALL (json_create_recursively (jc, HeVAL(he)));
+    }
+    Safefree (keys);
+    jc->n_mallocs--;
+
+    CALL (add_close (jc, '}'));
+
+    return json_create_ok;
+}
+
 /* Given a reference to a hash in "input_hv", recursively process it
    into JSON. "object" here means "JSON object", not "Perl object". */
 
@@ -1031,10 +1163,19 @@ json_create_add_object (json_create_t * jc, HV * input_hv)
     int i;
     SV * value;
     char * key;
+    /* I32 is correct, not STRLEN; see hv.c. */
     I32 keylen;
 
-    CALL (add_open (jc, '{'));
+    if (jc->sort) {
+	return json_create_add_object_sorted (jc, input_hv);
+    }
+
     n_keys = hv_iterinit (input_hv);
+    if (n_keys == 0) {
+	CALL (add_str_len (jc, "{}", strlen ("{}")));
+	return json_create_ok;
+    }
+    CALL (add_open (jc, '{'));
     for (i = 0; i < n_keys; i++) {
 	HE * he;
 
@@ -1548,15 +1689,6 @@ json_create_strict (SV * input)
     return json_create_run (& jc, input);
 }
 
-/* Entry point for "create_json". */
-
-static INLINE SV *
-json_create (SV * input)
-{
-    json_create_t jc = {0};
-    return json_create_run (& jc, input);
-}
-
 /*  __  __      _   _               _     
    |  \/  | ___| |_| |__   ___   __| |___ 
    | |\/| |/ _ \ __| '_ \ / _ \ / _` / __|
@@ -1661,6 +1793,17 @@ json_create_remove_non_finite_handler (json_create_t * jc)
 }
 
 static json_create_status_t
+json_create_remove_cmp (json_create_t * jc)
+{
+    if (jc->cmp) {
+	SvREFCNT_dec (jc->cmp);
+	jc->cmp = 0;
+	jc->n_mallocs--;
+    }
+    return json_create_ok;
+}
+
+static json_create_status_t
 json_create_free (json_create_t * jc)
 {
     CALL (json_create_free_fformat (jc));
@@ -1668,6 +1811,7 @@ json_create_free (json_create_t * jc)
     CALL (json_create_remove_type_handler (jc));
     CALL (json_create_remove_obj_handler (jc));
     CALL (json_create_remove_non_finite_handler (jc));
+    CALL (json_create_remove_cmp (jc));
 
     /* Finished, check we have no leaks before freeing. */
 

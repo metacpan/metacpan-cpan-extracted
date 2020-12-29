@@ -1,11 +1,14 @@
 ---
+doctype: global
+
+distribution_name: {{ $dist->name }}
+---
 # This file is used together with Dist::Iller and
 # Dist::Iller::Config::Author::CSSON to generate
 # dist.ini and weaver.ini.
 doctype: dist
 
 header:
-  name: {{ $dist->name }}
   author:
 {{ join "\n" => map { "    - $_" } @{ $dist->authors} }}
   license: Perl_5
@@ -15,7 +18,7 @@ header:
 prereqs:
   runtime:
     requires:
-      - perl: 5.014000
+      - perl: 5.010000
 
 plugins:
   - +config: Author::CSSON
@@ -25,3 +28,11 @@ doctype: weaver
 
 plugins:
   - +config: Author::CSSON
+
+---
+doctype: cpanfile
+
+---
+doctype: gitignore
+
+config: Author::CSSON

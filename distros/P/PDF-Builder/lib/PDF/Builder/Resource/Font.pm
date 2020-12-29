@@ -3,10 +3,11 @@ package PDF::Builder::Resource::Font;
 use base 'PDF::Builder::Resource::BaseFont';
 
 use strict;
-no warnings qw[ deprecated recursion uninitialized ];
+use warnings;
+#no warnings qw[ deprecated recursion uninitialized ];
 
-our $VERSION = '3.020'; # VERSION
-my $LAST_UPDATE = '3.006'; # manually update whenever code is changed
+our $VERSION = '3.021'; # VERSION
+my $LAST_UPDATE = '3.021'; # manually update whenever code is changed
 
 use Encode qw(:all);
 
@@ -24,9 +25,7 @@ sub encodeByData {
 
     my $data = $self->data();
 
-    my ($firstChar, $lastChar);
-
-    if ($self->issymbol() || $encoding eq 'asis') {
+    if ($self->issymbol() || ($encoding||'') eq 'asis') {
         $encoding = undef;
     }
 

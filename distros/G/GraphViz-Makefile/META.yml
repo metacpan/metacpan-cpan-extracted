@@ -31,5 +31,5 @@ resources:
   bugtracker: https://github.com/eserte/graphviz-makefile/issues
   license: http://dev.perl.org/licenses/
   repository: https://github.com/eserte/graphviz-makefile
-version: '1.19'
+version: '1.20'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

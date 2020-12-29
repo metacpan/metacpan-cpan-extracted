@@ -25,19 +25,19 @@ my $required = [ x => 10,
                  start_h => 40,
                  next_h => 500 ];
 
-ok($object->table($pdf, $page, [$data], @$required));
+ok($object->table($pdf, $page, [$data], @$required), "basic test");
 
 eval { $object->table('pdf', $page, [$data], @$required) };
-like($@, qr/Error: Invalid PDF object received/);
+like($@, qr/Error: Invalid PDF object received/, "Invalid PDF object received");
 
 eval { $object->table($pdf, 'page', [$data], @$required) };
-like($@, qr/Error: Invalid page object received/);
+like($@, qr/Error: Invalid page object received/, "Invalid page object received");
 
 eval { $object->table($pdf, $page, 'data', @$required) };
-like($@, qr/Error: Invalid data received/);
+like($@, qr/Error: Invalid data received/, "Invalid data received");
 
 eval { $object->table($pdf, $page, 'data', 'required') };
-like($@, qr/Odd number of elements in hash assignment/);
+like($@, qr/Odd number of elements in hash assignment/, "Odd number of elements in hash assignment");
 
 done_testing();
 

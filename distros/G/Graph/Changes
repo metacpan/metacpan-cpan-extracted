@@ -1,3 +1,11 @@
+0.9714 2020-12-25
+- remove "omni*" - hypergraphs are simply directed or undirected
+- as_hashes works with undirected hypergraphs
+- add_edge with != 2 vertices only for undirected hypergraph
+- any_edge
+- delete_*_attributes_by_id (and deleting last attribute) now don't destroy that entity
+- AdjacencyMap::Light can have attributes, so no slowdown if use (eg APSP)
+
 0.9713 2020-12-19
 - fix edges_at on self-edges in scalar context
 - fix refvertexed_stringified predicate

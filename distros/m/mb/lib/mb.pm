@@ -11,7 +11,7 @@ package mb;
 use 5.00503;    # Universal Consensus 1998 for primetools
 # use 5.008001; # Lancaster Consensus 2013 for toolchains
 
-$VERSION = '0.14';
+$VERSION = '0.15';
 $VERSION = $VERSION;
 
 # internal use
@@ -152,9 +152,9 @@ END
     # poor "make"
     (my $script_oo = $ARGV[0]) =~ s{\A (.*) \. ([^.]+) \z}{$1.oo.$2}xms;
     if (
-        (not -e $script_oo)                      or
-        (_mtime($script_oo) <= _mtime($ARGV[0])) or
-        (_mtime($script_oo) <= _mtime(__FILE__))
+        (not -e $script_oo)                    or
+        (mtime($script_oo) <= mtime($ARGV[0])) or
+        (mtime($script_oo) <= mtime(__FILE__))
     ) {
 
         # read application script
@@ -242,7 +242,7 @@ sub confess {
 
 #---------------------------------------------------------------------
 # short cut of (stat(file))[9]
-sub _mtime {
+sub mtime {
     my($file) = @_;
     return ((stat $file)[9]);
 }
@@ -286,9 +286,9 @@ sub mb::do {
             # poor "make"
             (my $prefix_file_oo = $prefix_file) =~ s{\A (.*) \. ([^.]+) \z}{$1.oo.$2}xms;
             if (
-                (not -e $prefix_file_oo)                          or
-                (_mtime($prefix_file_oo) <= _mtime($prefix_file)) or
-                (_mtime($prefix_file_oo) <= _mtime(__FILE__))
+                (not -e $prefix_file_oo)                        or
+                (mtime($prefix_file_oo) <= mtime($prefix_file)) or
+                (mtime($prefix_file_oo) <= mtime(__FILE__))
             ) {
                 mb::_open_r(my $fh, $prefix_file) or confess "$0(@{[__LINE__]}): cant't open file: $prefix_file\n";
                 local $_ = CORE::do { local $/; <$fh> };
@@ -536,9 +536,9 @@ sub mb::require {
                 # poor "make"
                 (my $prefix_file_oo = $prefix_file) =~ s{\A (.*) \. ([^.]+) \z}{$1.oo.$2}xms;
                 if (
-                    (not -e $prefix_file_oo)                          or
-                    (_mtime($prefix_file_oo) <= _mtime($prefix_file)) or
-                    (_mtime($prefix_file_oo) <= _mtime(__FILE__))
+                    (not -e $prefix_file_oo)                        or
+                    (mtime($prefix_file_oo) <= mtime($prefix_file)) or
+                    (mtime($prefix_file_oo) <= mtime(__FILE__))
                 ) {
                     mb::_open_r(my $fh, $prefix_file) or confess "$0(@{[__LINE__]}): cant't open file: $prefix_file\n";
                     local $_ = CORE::do { local $/; <$fh> };
@@ -733,7 +733,7 @@ sub mb::set_script_encoding {
     }
 
     # codepoint class shortcuts in qq-like regular expression
-    @{mb::_dot} = "(?>${mb::over_ascii}|.)";
+    @{mb::_dot} = "(?>${mb::over_ascii}|.)"; # supports /s modifier by /./
     @{mb::_B} = "(?:(?<![$mb::bare_w])(?![$mb::bare_w])|(?<=[$mb::bare_w])(?=[$mb::bare_w]))";
     @{mb::_D} = "(?:(?![0-9])${mb::x})";
     @{mb::_H} = "(?:(?![\\x09\\x20])${mb::x})";
@@ -812,7 +812,7 @@ END
 
 #---------------------------------------------------------------------
 # tr/A-C/1-3/ for UTF-8 codepoint
-sub _list_all_ASCII_by_hyphen {
+sub list_all_ASCII_by_hyphen {
     my @hyphened = @_;
     my @list_all = ();
     for (my $i=0; $i <= $#hyphened; ) {
@@ -847,8 +847,8 @@ sub _list_all_ASCII_by_hyphen {
 # tr/// and y/// for MBCS encoding
 sub mb::tr {
     my @x           = $_[0] =~ /\G${mb::x}/g;
-    my @search      = _list_all_ASCII_by_hyphen($_[1] =~ /\G${mb::x}/g);
-    my @replacement = _list_all_ASCII_by_hyphen($_[2] =~ /\G${mb::x}/g);
+    my @search      = list_all_ASCII_by_hyphen($_[1] =~ /\G${mb::x}/g);
+    my @replacement = list_all_ASCII_by_hyphen($_[2] =~ /\G${mb::x}/g);
     my %modifier    = (defined $_[3]) ? (map { $_ => 1 } CORE::split //, $_[3]) : ();
 
     my %tr = ();
@@ -1821,6 +1821,7 @@ sub parse_expr {
     # "\x39" [9] DIGIT NINE (U+0039)
     elsif (/\G ( 
         0x    [0-9A-Fa-f_]+ |
+        0o    [0-7_]+       | # since perl v5.33.5 Core Enhancements New octal syntax 0oddddd
         0b    [01_]+        |
         0     [0-7_]*       |
         [1-9] [0-9_]* (?: \.[0-9_]* )? (?: [Ee] [0-9_]+ )?
@@ -3445,84 +3446,455 @@ END
 }
 
 #---------------------------------------------------------------------
+# qr/ [A-Z] / for Shift_JIS-like encoding
+sub list_all_by_hyphen_sjis_like {
+    my($a, $b) = @_;
+    my @a = (undef, unpack 'C*', $a);
+    my @b = (undef, unpack 'C*', $b);
+
+    if (0) { }
+    elsif (CORE::length($a) == 1) {
+        if (0) { }
+        elsif (CORE::length($b) == 1) {
+            return (
+(($a[1] <= 0x80) and (0xA0 <= $b[1])) ?
+                sprintf(join('', qw( [\x%02x-\x80\xA0-\x%02x] )), $a[1],
+                                                                  $b[1]) :
+$a[1]<=$b[1] ?  sprintf(join('', qw( [\x%02x-\x%02x]          )), $a[1],
+                                                                  $b[1]) : (),
+            );
+        }
+        elsif (CORE::length($b) == 2) {
+            return (
+                sprintf(join('', qw(       \x%02x           [\x00-\x%02x] )), $b[1], $b[2]),
+0x81 <  $b[1] ? sprintf(join('', qw( [\x81-\x%02x]          [\x00-\xFF  ] )), $b[1]-1     ) : (),
+$a[1] <= 0x80 ? sprintf(join('', qw( [\x%02x-\x80\xA0-\xDF]               )), $a[1]) :
+$a[1] <  0xA0 ? ()                                                                   :
+$a[1] <= 0xDF ? sprintf(join('', qw( [\x%02x-\xDF]                        )), $a[1]) : (),
+            );
+        }
+    }
+    elsif (CORE::length($a) == 2) {
+        if (0) { }
+        elsif (CORE::length($b) == 2) {
+            my $lower_limit = join('|',
+$a[1] < 0xFC ?  sprintf(join('', qw( [\x%02x-\xFC] [\x00-\xFF  ] )), $a[1]+1     ) : (),
+                sprintf(join('', qw(  \x%02x       [\x%02x-\xFF] )), $a[1], $a[2]),
+            );
+            my $upper_limit = join('|',
+                sprintf(join('', qw(       \x%02x  [\x00-\x%02x] )), $b[1], $b[2]),
+0x81 < $b[1] ?  sprintf(join('', qw( [\x81-\x%02x] [\x00-\xFF  ] )), $b[1]-1     ) : (),
+            );
+            return qq{(?=$lower_limit)(?=$upper_limit)};
+        }
+    }
+
+    # over range of codepoint
+    confess sprintf(qq{@{[__FILE__]}: codepoint class [$_[0]-$_[1]] is not 1 to 4 octets (%d-%d)}, CORE::length($a), CORE::length($b));
+}
+
+#---------------------------------------------------------------------
+# qr/ [A-Z] / for EUC-JP-like encoding
+sub list_all_by_hyphen_eucjp_like {
+    my($a, $b) = @_;
+    my @a = (undef, unpack 'C*', $a);
+    my @b = (undef, unpack 'C*', $b);
+
+    if (0) { }
+    elsif (CORE::length($a) == 1) {
+        if (0) { }
+        elsif (CORE::length($b) == 1) {
+            return (
+$a[1]<=$b[1] ?  sprintf(join('', qw( [\x%02x-\x%02x]             )), $a[1],
+                                                                     $b[1]) : (),
+            );
+        }
+        elsif (CORE::length($b) == 2) {
+            return (
+                sprintf(join('', qw(       \x%02x  [\x00-\x%02x] )), $b[1], $b[2]),
+0xA1 < $b[1] ?  sprintf(join('', qw( [\xA1-\x%02x] [\x00-\xFF  ] )), $b[1]-1     ) : (),
+                sprintf(join('', qw( [\x%02x-\x7F]               )), $a[1]       ),
+            );
+        }
+    }
+    elsif (CORE::length($a) == 2) {
+        if (0) { }
+        elsif (CORE::length($b) == 2) {
+            my $lower_limit = join('|',
+$a[1] < 0xFE ?  sprintf(join('', qw( [\x%02x-\xFE] [\x00-\xFF  ] )), $a[1]+1     ) : (),
+                sprintf(join('', qw(  \x%02x       [\x%02x-\xFF] )), $a[1], $a[2]),
+            );
+            my $upper_limit = join('|',
+                sprintf(join('', qw(       \x%02x  [\x00-\x%02x] )), $b[1], $b[2]),
+0xA1 < $b[1] ?  sprintf(join('', qw( [\xA1-\x%02x] [\x00-\xFF  ] )), $b[1]-1     ) : (),
+            );
+            return qq{(?=$lower_limit)(?=$upper_limit)};
+        }
+    }
+
+    # over range of codepoint
+    confess sprintf(qq{@{[__FILE__]}: codepoint class [$_[0]-$_[1]] is not 1 to 4 octets (%d-%d)}, CORE::length($a), CORE::length($b));
+}
+
+#---------------------------------------------------------------------
+# qr/ [A-Z] / for Big5-like encoding
+sub list_all_by_hyphen_big5_like {
+    my($a, $b) = @_;
+    my @a = (undef, unpack 'C*', $a);
+    my @b = (undef, unpack 'C*', $b);
+
+    if (0) { }
+    elsif (CORE::length($a) == 1) {
+        if (0) { }
+        elsif (CORE::length($b) == 1) {
+            return (
+$a[1]<=$b[1] ?  sprintf(join('', qw( [\x%02x-\x%02x]             )), $a[1],
+                                                                     $b[1]) : (),
+            );
+        }
+        elsif (CORE::length($b) == 2) {
+            return (
+                sprintf(join('', qw(       \x%02x  [\x00-\x%02x] )), $b[1], $b[2]),
+0x81 < $b[1] ?  sprintf(join('', qw( [\x81-\x%02x] [\x00-\xFF  ] )), $b[1]-1     ) : (),
+                sprintf(join('', qw( [\x%02x-\x7F]               )), $a[1]       ),
+            );
+        }
+    }
+    elsif (CORE::length($a) == 2) {
+        if (0) { }
+        elsif (CORE::length($b) == 2) {
+            my $lower_limit = join('|',
+$a[1] < 0xFE ?  sprintf(join('', qw( [\x%02x-\xFE] [\x00-\xFF  ] )), $a[1]+1     ) : (),
+                sprintf(join('', qw(  \x%02x       [\x%02x-\xFF] )), $a[1], $a[2]),
+            );
+            my $upper_limit = join('|',
+                sprintf(join('', qw(       \x%02x  [\x00-\x%02x] )), $b[1], $b[2]),
+0x81 < $b[1] ?  sprintf(join('', qw( [\x81-\x%02x] [\x00-\xFF  ] )), $b[1]-1     ) : (),
+            );
+            return qq{(?=$lower_limit)(?=$upper_limit)};
+        }
+    }
+
+    # over range of codepoint
+    confess sprintf(qq{@{[__FILE__]}: codepoint class [$_[0]-$_[1]] is not 1 to 4 octets (%d-%d)}, CORE::length($a), CORE::length($b));
+}
+
+#---------------------------------------------------------------------
+# qr/ [A-Z] / for GB18030-like encoding
+sub list_all_by_hyphen_gb18030_like {
+    my($a, $b) = @_;
+    my @a = (undef, unpack 'C*', $a);
+    my @b = (undef, unpack 'C*', $b);
+
+    if (0) { }
+    elsif (CORE::length($a) == 1) {
+        if (0) { }
+        elsif (CORE::length($b) == 1) {
+            return (
+$a[1]<=$b[1] ?  sprintf(join('', qw( [\x%02x-\x%02x]                                         )), $a[1],
+                                                                                                 $b[1]) : (),
+            );
+        }
+        elsif (CORE::length($b) == 2) {
+            return (
+                sprintf(join('', qw(       \x%02x  [\x00-\x2F\x3A-\x%02x]                    )), $b[1], $b[2]),
+0x81 < $b[1] ?  sprintf(join('', qw( [\x81-\x%02x] [^\x30-\x39 ]                             )), $b[1]-1     ) : (),
+                sprintf(join('', qw( [\x%02x-\x7F]                                           )), $a[1]       ),
+            );
+        }
+        elsif (CORE::length($b) == 4) {
+            return (
+                sprintf(join('', qw(       \x%02x        \x%02x        \x%02x  [\x30-\x%02x] )), $b[1], $b[2], $b[3], $b[4]),
+0x81 < $b[3] ?  sprintf(join('', qw(       \x%02x        \x%02x  [\x81-\x%02x] [\x30-\x39  ] )), $b[1], $b[2], $b[3]-1     ) : (),
+0x30 < $b[2] ?  sprintf(join('', qw(       \x%02x  [\x30-\x%02x] [\x81-\xFE  ] [\x30-\x39  ] )), $b[1], $b[2]-1            ) : (),
+0x81 < $b[1] ?  sprintf(join('', qw( [\x81-\x%02x] [\x30-\x39  ] [\x81-\xFE  ] [\x30-\x39  ] )), $b[1]-1                   ) : (),
+                sprintf(join('', qw( [\x81-\xFE  ] [^\x30-\x39 ]                             )),                           ),
+                sprintf(join('', qw( [\x%02x-\x7F]                                           )), $a[1]                     ),
+            );
+        }
+    }
+    elsif (CORE::length($a) == 2) {
+        if (0) { }
+        elsif (CORE::length($b) == 2) {
+            my $lower_limit = join('|',
+$a[1] < 0xFE ?  sprintf(join('', qw( [\x%02x-\xFE] [^\x30-\x39 ]                             )), $a[1]+1     ) : (),
+                sprintf(join('', qw(  \x%02x       [\x%02x-\xFF]                             )), $a[1], $a[2]),
+            );
+            my $upper_limit = join('|',
+                sprintf(join('', qw(       \x%02x  [\x00-\x%02x]                             )), $b[1], $b[2]),
+0x81 < $b[1] ?  sprintf(join('', qw( [\x81-\x%02x] [^\x30-\x39 ]                             )), $b[1]-1     ) : (),
+            );
+            return qq{(?=$lower_limit)(?=$upper_limit)};
+        }
+        elsif (CORE::length($b) == 4) {
+            return (
+                sprintf(join('', qw(       \x%02x        \x%02x        \x%02x  [\x30-\x%02x] )), $b[1], $b[2], $b[3], $b[4]),
+0x81  < $b[3] ? sprintf(join('', qw(       \x%02x        \x%02x  [\x81-\x%02x] [\x30-\x39  ] )), $b[1], $b[2], $b[3]-1     ) : (),
+0x30  < $b[2] ? sprintf(join('', qw(       \x%02x  [\x30-\x%02x] [\x81-\xFE  ] [\x30-\x39  ] )), $b[1], $b[2]-1            ) : (),
+0x81  < $b[1] ? sprintf(join('', qw( [\x81-\x%02x] [\x30-\x39  ] [\x81-\xFE  ] [\x30-\x39  ] )), $b[1]-1                   ) : (),
+$a[1] < 0xFE  ? sprintf(join('', qw( [\x%02x-\xFE] [^\x30-\x39 ]                             )), $a[1]+1                   ) : (),
+                sprintf(join('', qw(  \x%02x       [\x%02x-\xFF]                             )), $a[1], $a[2]              ),
+            );
+        }
+    }
+    elsif (CORE::length($a) == 4) {
+        if (0) { }
+        elsif (CORE::length($b) == 4) {
+            my $lower_limit = join('|',
+$a[1] < 0xFE ?  sprintf(join('', qw( [\x%02x-\xFE] [\x30-\x39  ] [\x81-\xFE  ] [\x30-\x39  ] )), $a[1]+1                   ) : (),
+$a[2] < 0x39 ?  sprintf(join('', qw(  \x%02x       [\x%02x-\x39] [\x81-\xFE  ] [\x30-\x39  ] )), $a[1], $a[2]+1            ) : (),
+$a[3] < 0xFE ?  sprintf(join('', qw(  \x%02x        \x%02x       [\x%02x-\xFE] [\x30-\x39  ] )), $a[1], $a[2], $a[3]+1     ) : (),
+                sprintf(join('', qw(  \x%02x        \x%02x        \x%02x       [\x%02x-\x39] )), $a[1], $a[2], $a[3], $a[4]),
+            );
+            my $upper_limit = join('|',
+                sprintf(join('', qw(       \x%02x        \x%02x        \x%02x  [\x30-\x%02x] )), $b[1], $b[2], $b[3], $b[4]),
+0x81 < $b[3] ?  sprintf(join('', qw(       \x%02x        \x%02x  [\x81-\x%02x] [\x30-\x39  ] )), $b[1], $b[2], $b[3]-1     ) : (),
+0x30 < $b[2] ?  sprintf(join('', qw(       \x%02x  [\x30-\x%02x] [\x81-\xFE  ] [\x30-\x39  ] )), $b[1], $b[2]-1            ) : (),
+0x81 < $b[1] ?  sprintf(join('', qw( [\x81-\x%02x] [\x30-\x39  ] [\x81-\xFE  ] [\x30-\x39  ] )), $b[1]-1                   ) : (),
+            );
+            return qq{(?=$lower_limit)(?=$upper_limit)};
+        }
+    }
+
+    # over range of codepoint
+    confess sprintf(qq{@{[__FILE__]}: codepoint class [$_[0]-$_[1]] is not 1 to 4 octets (%d-%d)}, CORE::length($a), CORE::length($b));
+}
+
+#---------------------------------------------------------------------
+# qr/ [A-Z] / for UTF-8-like encoding
+sub list_all_by_hyphen_utf8_like {
+    my($a, $b) = @_;
+    my @a = (undef, unpack 'C*', $a);
+    my @b = (undef, unpack 'C*', $b);
+
+    if (0) { }
+    elsif (CORE::length($a) == 1) {
+        if (0) { }
+        elsif (CORE::length($b) == 1) {
+            return (
+$a[1]<=$b[1] ?  sprintf(join('', qw( [\x%02x-\x%02x]                                         )), $a[1],
+                                                                                                 $b[1]) : (),
+            );
+        }
+        elsif (CORE::length($b) == 2) {
+            return (
+                sprintf(join('', qw(       \x%02x  [\x80-\x%02x]                             )), $b[1], $b[2]),
+0xC2 < $b[1] ?  sprintf(join('', qw( [\xC2-\x%02x] [\x80-\xBF  ]                             )), $b[1]-1     ) : (),
+                sprintf(join('', qw( [\x%02x-\x7F]                                           )), $a[1]       ),
+            );
+        }
+        elsif (CORE::length($b) == 3) {
+            return (
+                sprintf(join('', qw(       \x%02x        \x%02x  [\x80-\x%02x]               )), $b[1], $b[2], $b[3]),
+0x80 < $b[2] ?  sprintf(join('', qw(       \x%02x  [\x80-\x%02x] [\x80-\xBF  ]               )), $b[1], $b[2]-1     ) : (),
+0xE0 < $b[1] ?  sprintf(join('', qw( [\xE0-\x%02x] [\x80-\xBF  ] [\x80-\xBF  ]               )), $b[1]-1            ) : (),
+                sprintf(join('', qw( [\xC2-\xDF  ] [\x80-\xBF  ]                             )),                    ),
+                sprintf(join('', qw( [\x%02x-\x7F]                                           )), $a[1]              ),
+            );
+        }
+        elsif (CORE::length($b) == 4) {
+            return (
+                sprintf(join('', qw(       \x%02x        \x%02x        \x%02x  [\x80-\x%02x] )), $b[1], $b[2], $b[3], $b[4]),
+0x80 < $b[3] ?  sprintf(join('', qw(       \x%02x        \x%02x  [\x80-\x%02x] [\x80-\xBF  ] )), $b[1], $b[2], $b[3]-1     ) : (),
+0x80 < $b[2] ?  sprintf(join('', qw(       \x%02x  [\x80-\x%02x] [\x80-\xBF  ] [\x80-\xBF  ] )), $b[1], $b[2]-1            ) : (),
+0xF0 < $b[1] ?  sprintf(join('', qw( [\xF0-\x%02x] [\x80-\xBF  ] [\x80-\xBF  ] [\x80-\xBF  ] )), $b[1]-1                   ) : (),
+                sprintf(join('', qw( [\xE0-\xEF  ] [\x80-\xBF  ] [\x80-\xBF  ]               )),                           ),
+                sprintf(join('', qw( [\xC2-\xDF  ] [\x80-\xBF  ]                             )),                           ),
+                sprintf(join('', qw( [\x%02x-\x7F]                                           )), $a[1]                     ),
+            );
+        }
+    }
+    elsif (CORE::length($a) == 2) {
+        if (0) { }
+        elsif (CORE::length($b) == 2) {
+            my $lower_limit = join('|',
+$a[1] < 0xDF ?  sprintf(join('', qw( [\x%02x-\xDF] [\x80-\xBF  ]                             )), $a[1]+1     ) : (),
+                sprintf(join('', qw(  \x%02x       [\x%02x-\xBF]                             )), $a[1], $a[2]),
+            );
+            my $upper_limit = join('|',
+                sprintf(join('', qw(       \x%02x  [\x80-\x%02x]                             )), $b[1], $b[2]),
+0xC2 < $b[1] ?  sprintf(join('', qw( [\xC2-\x%02x] [\x80-\xBF  ]                             )), $b[1]-1     ) : (),
+            );
+            return qq{(?=$lower_limit)(?=$upper_limit)};
+        }
+        elsif (CORE::length($b) == 3) {
+            return (
+                sprintf(join('', qw(       \x%02x        \x%02x  [\x80-\x%02x]               )), $b[1], $b[2], $b[3] ),
+0x80 < $b[2] ?  sprintf(join('', qw(       \x%02x  [\x80-\x%02x] [\x80-\xBF  ]               )), $b[1], $b[2]-1      ) : (),
+0xE0 < $b[1] ?  sprintf(join('', qw( [\xE0-\x%02x] [\x80-\xBF  ] [\x80-\xBF  ]               )), $b[1]-1             ) : (),
+$a[1] < 0xDF ?  sprintf(join('', qw( [\x%02x-\xDF] [\x80-\xBF  ]                             )), $a[1]+1             ) : (),
+                sprintf(join('', qw(  \x%02x       [\x%02x-\xBF]                             )), $a[1], $a[2]        ),
+            );
+        }
+        elsif (CORE::length($b) == 4) {
+            return (
+                sprintf(join('', qw(       \x%02x        \x%02x        \x%02x  [\x80-\x%02x] )), $b[1], $b[2], $b[3], $b[4]),
+0x80 < $b[3] ?  sprintf(join('', qw(       \x%02x        \x%02x  [\x80-\x%02x] [\x80-\xBF  ] )), $b[1], $b[2], $b[3]-1     ) : (),
+0x80 < $b[2] ?  sprintf(join('', qw(       \x%02x  [\x80-\x%02x] [\x80-\xBF  ] [\x80-\xBF  ] )), $b[1], $b[2]-1            ) : (),
+0xF0 < $b[1] ?  sprintf(join('', qw( [\xF0-\x%02x] [\x80-\xBF  ] [\x80-\xBF  ] [\x80-\xBF  ] )), $b[1]-1                   ) : (),
+                sprintf(join('', qw( [\xE0-\xEF  ] [\x80-\xBF  ] [\x80-\xBF  ]               )),                           ),
+$a[1] < 0xDF ?  sprintf(join('', qw( [\x%02x-\xDF] [\x80-\xBF  ]                             )), $a[1]+1                   ) : (),
+                sprintf(join('', qw(  \x%02x       [\x%02x-\xBF]                             )), $a[1], $a[2]              ),
+            );
+        }
+    }
+    elsif (CORE::length($a) == 3) {
+        if (0) { }
+        elsif (CORE::length($b) == 3) {
+            my $lower_limit = join('|',
+$a[1] < 0xEF ?  sprintf(join('', qw( [\x%02x-\xEF] [\x80-\xBF  ] [\x80-\xBF  ]               )), $a[1]+1            ) : (),
+$a[2] < 0xBF ?  sprintf(join('', qw(  \x%02x       [\x%02x-\xBF] [\x80-\xBF  ]               )), $a[1], $a[2]+1     ) : (),
+                sprintf(join('', qw(  \x%02x        \x%02x       [\x%02x-\xBF]               )), $a[1], $a[2], $a[3]),
+            );
+            my $upper_limit = join('|',
+                sprintf(join('', qw(       \x%02x        \x%02x  [\x80-\x%02x]               )), $b[1], $b[2], $b[3]),
+0x80 < $b[2] ?  sprintf(join('', qw(       \x%02x  [\x80-\x%02x] [\x80-\xBF  ]               )), $b[1], $b[2]-1     ) : (),
+0xE0 < $b[1] ?  sprintf(join('', qw( [\xE0-\x%02x] [\x80-\xBF  ] [\x80-\xBF  ]               )), $b[1]-1            ) : (),
+            );
+            return qq{(?=$lower_limit)(?=$upper_limit)};
+        }
+        elsif (CORE::length($b) == 4) {
+            return (
+                sprintf(join('', qw(       \x%02x        \x%02x        \x%02x  [\x80-\x%02x] )), $b[1], $b[2], $b[3], $b[4]),
+0x80 < $b[3] ?  sprintf(join('', qw(       \x%02x        \x%02x  [\x80-\x%02x] [\x80-\xBF  ] )), $b[1], $b[2], $b[3]-1     ) : (),
+0x80 < $b[2] ?  sprintf(join('', qw(       \x%02x  [\x80-\x%02x] [\x80-\xBF  ] [\x80-\xBF  ] )), $b[1], $b[2]-1            ) : (),
+0xF0 < $b[1] ?  sprintf(join('', qw( [\xF0-\x%02x] [\x80-\xBF  ] [\x80-\xBF  ] [\x80-\xBF  ] )), $b[1]-1                   ) : (),
+$a[1] < 0xEF ?  sprintf(join('', qw( [\x%02x-\xEF] [\x80-\xBF  ] [\x80-\xBF  ]               )), $a[1]+1                   ) : (),
+$a[2] < 0xBF ?  sprintf(join('', qw(  \x%02x       [\x%02x-\xBF] [\x80-\xBF  ]               )), $a[1], $a[2]+1            ) : (),
+                sprintf(join('', qw(  \x%02x        \x%02x       [\x%02x-\xBF]               )), $a[1], $a[2], $a[3]       ),
+            );
+        }
+    }
+    elsif (CORE::length($a) == 4) {
+        if (0) { }
+        elsif (CORE::length($b) == 4) {
+            my $lower_limit = join('|',
+$a[1] < 0xF4 ?  sprintf(join('', qw( [\x%02x-\xF4] [\x80-\xBF  ] [\x80-\xBF  ] [\x80-\xBF  ] )), $a[1]+1                   ) : (),
+$a[2] < 0xBF ?  sprintf(join('', qw(  \x%02x       [\x%02x-\xBF] [\x80-\xBF  ] [\x80-\xBF  ] )), $a[1], $a[2]+1            ) : (),
+$a[3] < 0xBF ?  sprintf(join('', qw(  \x%02x        \x%02x       [\x%02x-\xBF] [\x80-\xBF  ] )), $a[1], $a[2], $a[3]+1     ) : (),
+                sprintf(join('', qw(  \x%02x        \x%02x        \x%02x       [\x%02x-\xBF] )), $a[1], $a[2], $a[3], $a[4]),
+            );
+            my $upper_limit = join('|',
+                sprintf(join('', qw(       \x%02x        \x%02x        \x%02x  [\x80-\x%02x] )), $b[1], $b[2], $b[3], $b[4]),
+0x80 < $b[3] ?  sprintf(join('', qw(       \x%02x        \x%02x  [\x80-\x%02x] [\x80-\xBF  ] )), $b[1], $b[2], $b[3]-1     ) : (),
+0x80 < $b[2] ?  sprintf(join('', qw(       \x%02x  [\x80-\x%02x] [\x80-\xBF  ] [\x80-\xBF  ] )), $b[1], $b[2]-1            ) : (),
+0xF0 < $b[1] ?  sprintf(join('', qw( [\xF0-\x%02x] [\x80-\xBF  ] [\x80-\xBF  ] [\x80-\xBF  ] )), $b[1]-1                   ) : (),
+            );
+            return qq{(?=$lower_limit)(?=$upper_limit)};
+        }
+    }
+
+    # over range of codepoint
+    confess sprintf(qq{@{[__FILE__]}: codepoint class [$_[0]-$_[1]] is not 1 to 4 octets (%d-%d)}, CORE::length($a), CORE::length($b));
+}
+
+#---------------------------------------------------------------------
 # parse codepoint class
 sub parse_re_codepoint_class {
-    my($classmate) = @_;
-    my $parsed = '';
+    my($codepoint_class) = @_;
     my @sbcs = ();
     my @xbcs = (); # "xbcs" means DBCS, TBCS, QBCS, ...
-    while (1) {
-        if ($classmate =~ /\G \z /xmsgc) {
-            $parsed =
-                ( @sbcs and  @xbcs) ? join('|', @xbcs, '['.join('',@sbcs).']') :
-                (!@sbcs and  @xbcs) ? join('|', @xbcs                        ) :
-                ( @sbcs and !@xbcs) ?                  '['.join('',@sbcs).']'  :
-                die;
-            last;
+
+    # get members from class
+    my @classmate = ();
+    while (not $codepoint_class =~ /\G \z /xmsgc) {
+        if (0) { }
+        elsif ($codepoint_class =~ /\G\\o\{([01234567]+)\}/xmsgc) {
+            push @classmate, mb::chr(oct $1);
         }
-        elsif ($classmate =~ /\G (\\ \]) /xmsgc) {
-            push @sbcs, $1;
+        elsif ($codepoint_class =~ /\G\\x\{([0123456789ABCDEFabcdef]+)\}/xmsgc) {
+            push @classmate, mb::chr(hex $1);
         }
-        elsif ($classmate =~ /\G (\\\\) /xmsgc) {
-            push @sbcs, $1;
+        elsif ($codepoint_class =~ /\G(\[:.+?:\])/xmsgc) {
+            push @classmate, $1;
+        }
+        elsif ($codepoint_class =~ /\G((?>\\${mb::x}))/xmsgc) {
+            push @classmate, $1;
+        }
+        elsif ($codepoint_class =~ /\G(${mb::x})/xmsgc) {
+            push @classmate, $1;
+        }
+        else {
+            confess qq{@{[__FILE__]}: codepoint_class=($codepoint_class), classmate=(@classmate)};
+        }
+    }
+
+    # get regular expression for MBCS codepoint class
+    for (my $i=0; $i <= $#classmate; $i++) {
+        my $classmate = $classmate[$i];
+
+        # hyphen of [A-Z] or [^A-Z]
+        if (($i < $#classmate) and ($classmate[$i+1] eq '-')) {
+            my $a = $classmate[$i];
+            my $b = $classmate[$i+2];
+            if (0) { }
+            elsif ($script_encoding =~ /\A (?: sjis ) \z/xms) {
+                push @xbcs, list_all_by_hyphen_sjis_like   ($a, $b);
+            }
+            elsif ($script_encoding =~ /\A (?: eucjp ) \z/xms) {
+                push @xbcs, list_all_by_hyphen_eucjp_like  ($a, $b);
+            }
+            elsif ($script_encoding =~ /\A (?: gbk | uhc | big5 | big5hkscs ) \z/xms) {
+                push @xbcs, list_all_by_hyphen_big5_like   ($a, $b);
+            }
+            elsif ($script_encoding =~ /\A (?: gb18030 ) \z/xms) {
+                push @xbcs, list_all_by_hyphen_gb18030_like($a, $b);
+            }
+            elsif ($script_encoding =~ /\A (?: utf8 | wtf8 ) \z/xms) {
+                push @xbcs, list_all_by_hyphen_utf8_like   ($a, $b);
+            }
+            else {
+                push @sbcs, "$a-$b";
+            }
+            $i += 2;
         }
 
         # classic perl codepoint class shortcuts
-        elsif ($classmate =~ /\G \\D /xmsgc) { push @xbcs, "(?:(?![$mb::bare_d])${mb::x})"; }
-        elsif ($classmate =~ /\G \\H /xmsgc) { push @xbcs, "(?:(?![$mb::bare_h])${mb::x})"; }
-#       elsif ($classmate =~ /\G \\N /xmsgc) { push @xbcs, "(?:(?!\\n)${mb::x})";           } # \N in a codepoint class must be a named character: \N{...} in regex
-#       elsif ($classmate =~ /\G \\R /xmsgc) { push @xbcs, "(?>\\r\\n|[$mb::bare_v])";      } # Unrecognized escape \R in codepoint class passed through in regex
-        elsif ($classmate =~ /\G \\S /xmsgc) { push @xbcs, "(?:(?![$mb::bare_s])${mb::x})"; }
-        elsif ($classmate =~ /\G \\V /xmsgc) { push @xbcs, "(?:(?![$mb::bare_v])${mb::x})"; }
-        elsif ($classmate =~ /\G \\W /xmsgc) { push @xbcs, "(?:(?![$mb::bare_w])${mb::x})"; }
-        elsif ($classmate =~ /\G \\b /xmsgc) { push @sbcs, $mb::bare_backspace;             }
-        elsif ($classmate =~ /\G \\d /xmsgc) { push @sbcs, $mb::bare_d;                     }
-        elsif ($classmate =~ /\G \\h /xmsgc) { push @sbcs, $mb::bare_h;                     }
-        elsif ($classmate =~ /\G \\s /xmsgc) { push @sbcs, $mb::bare_s;                     }
-        elsif ($classmate =~ /\G \\v /xmsgc) { push @sbcs, $mb::bare_v;                     }
-        elsif ($classmate =~ /\G \\w /xmsgc) { push @sbcs, $mb::bare_w;                     }
+        elsif ($classmate eq '\\D') { push @xbcs, "(?:(?![$mb::bare_d])${mb::x})"; }
+        elsif ($classmate eq '\\H') { push @xbcs, "(?:(?![$mb::bare_h])${mb::x})"; }
+#       elsif ($classmate eq '\\N') { push @xbcs, "(?:(?!\\n)${mb::x})";           } # \N in a codepoint class must be a named character: \N{...} in regex
+#       elsif ($classmate eq '\\R') { push @xbcs, "(?>\\r\\n|[$mb::bare_v])";      } # Unrecognized escape \R in codepoint class passed through in regex
+        elsif ($classmate eq '\\S') { push @xbcs, "(?:(?![$mb::bare_s])${mb::x})"; }
+        elsif ($classmate eq '\\V') { push @xbcs, "(?:(?![$mb::bare_v])${mb::x})"; }
+        elsif ($classmate eq '\\W') { push @xbcs, "(?:(?![$mb::bare_w])${mb::x})"; }
+        elsif ($classmate eq '\\b') { push @sbcs, $mb::bare_backspace;             }
+        elsif ($classmate eq '\\d') { push @sbcs, $mb::bare_d;                     }
+        elsif ($classmate eq '\\h') { push @sbcs, $mb::bare_h;                     }
+        elsif ($classmate eq '\\s') { push @sbcs, $mb::bare_s;                     }
+        elsif ($classmate eq '\\v') { push @sbcs, $mb::bare_v;                     }
+        elsif ($classmate eq '\\w') { push @sbcs, $mb::bare_w;                     }
 
         # [:POSIX:]
-        elsif ($classmate =~ /\G \[:alnum:\]  /xmsgc) { push @sbcs, '\x30-\x39\x41-\x5A\x61-\x7A';                  }
-        elsif ($classmate =~ /\G \[:alpha:\]  /xmsgc) { push @sbcs, '\x41-\x5A\x61-\x7A';                           }
-        elsif ($classmate =~ /\G \[:ascii:\]  /xmsgc) { push @sbcs, '\x00-\x7F';                                    }
-        elsif ($classmate =~ /\G \[:blank:\]  /xmsgc) { push @sbcs, '\x09\x20';                                     }
-        elsif ($classmate =~ /\G \[:cntrl:\]  /xmsgc) { push @sbcs, '\x00-\x1F\x7F';                                }
-        elsif ($classmate =~ /\G \[:digit:\]  /xmsgc) { push @sbcs, '\x30-\x39';                                    }
-        elsif ($classmate =~ /\G \[:graph:\]  /xmsgc) { push @sbcs, '\x21-\x7F';                                    }
-        elsif ($classmate =~ /\G \[:lower:\]  /xmsgc) { push @sbcs, 'abcdefghijklmnopqrstuvwxyz';                   } # /i modifier requires 'a' to 'z' literally
-        elsif ($classmate =~ /\G \[:print:\]  /xmsgc) { push @sbcs, '\x20-\x7F';                                    }
-        elsif ($classmate =~ /\G \[:punct:\]  /xmsgc) { push @sbcs, '\x21-\x2F\x3A-\x3F\x40\x5B-\x5F\x60\x7B-\x7E'; }
-        elsif ($classmate =~ /\G \[:space:\]  /xmsgc) { push @sbcs, '\s\x0B';                                       } # "\s" and vertical tab ("\cK")
-        elsif ($classmate =~ /\G \[:upper:\]  /xmsgc) { push @sbcs, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';                   } # /i modifier requires 'A' to 'Z' literally
-        elsif ($classmate =~ /\G \[:word:\]   /xmsgc) { push @sbcs, '\x30-\x39\x41-\x5A\x5F\x61-\x7A';              }
-        elsif ($classmate =~ /\G \[:xdigit:\] /xmsgc) { push @sbcs, '\x30-\x39\x41-\x46\x61-\x66';                  }
+        elsif ($classmate eq '[:alnum:]' ) { push @sbcs, '\x30-\x39\x41-\x5A\x61-\x7A';                  }
+        elsif ($classmate eq '[:alpha:]' ) { push @sbcs, '\x41-\x5A\x61-\x7A';                           }
+        elsif ($classmate eq '[:ascii:]' ) { push @sbcs, '\x00-\x7F';                                    }
+        elsif ($classmate eq '[:blank:]' ) { push @sbcs, '\x09\x20';                                     }
+        elsif ($classmate eq '[:cntrl:]' ) { push @sbcs, '\x00-\x1F\x7F';                                }
+        elsif ($classmate eq '[:digit:]' ) { push @sbcs, '\x30-\x39';                                    }
+        elsif ($classmate eq '[:graph:]' ) { push @sbcs, '\x21-\x7F';                                    }
+        elsif ($classmate eq '[:lower:]' ) { push @sbcs, 'abcdefghijklmnopqrstuvwxyz';                   } # /i modifier requires 'a' to 'z' literally
+        elsif ($classmate eq '[:print:]' ) { push @sbcs, '\x20-\x7F';                                    }
+        elsif ($classmate eq '[:punct:]' ) { push @sbcs, '\x21-\x2F\x3A-\x3F\x40\x5B-\x5F\x60\x7B-\x7E'; }
+        elsif ($classmate eq '[:space:]' ) { push @sbcs, '\s\x0B';                                       } # "\s" and vertical tab ("\cK")
+        elsif ($classmate eq '[:upper:]' ) { push @sbcs, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';                   } # /i modifier requires 'A' to 'Z' literally
+        elsif ($classmate eq '[:word:]'  ) { push @sbcs, '\x30-\x39\x41-\x5A\x5F\x61-\x7A';              }
+        elsif ($classmate eq '[:xdigit:]') { push @sbcs, '\x30-\x39\x41-\x46\x61-\x66';                  }
 
         # [:^POSIX:]
-        elsif ($classmate =~ /\G \[:\^alnum:\]  /xmsgc) { push @xbcs, "(?:(?![\\x30-\\x39\\x41-\\x5A\\x61-\\x7A])${mb::x})";                      }
-        elsif ($classmate =~ /\G \[:\^alpha:\]  /xmsgc) { push @xbcs, "(?:(?![\\x41-\\x5A\\x61-\\x7A])${mb::x})";                                 }
-        elsif ($classmate =~ /\G \[:\^ascii:\]  /xmsgc) { push @xbcs, "(?:(?![\\x00-\\x7F])${mb::x})";                                            }
-        elsif ($classmate =~ /\G \[:\^blank:\]  /xmsgc) { push @xbcs, "(?:(?![\\x09\\x20])${mb::x})";                                             }
-        elsif ($classmate =~ /\G \[:\^cntrl:\]  /xmsgc) { push @xbcs, "(?:(?![\\x00-\\x1F\\x7F])${mb::x})";                                       }
-        elsif ($classmate =~ /\G \[:\^digit:\]  /xmsgc) { push @xbcs, "(?:(?![\\x30-\\x39])${mb::x})";                                            }
-        elsif ($classmate =~ /\G \[:\^graph:\]  /xmsgc) { push @xbcs, "(?:(?![\\x21-\\x7F])${mb::x})";                                            }
-        elsif ($classmate =~ /\G \[:\^lower:\]  /xmsgc) { push @xbcs, "(?:(?![abcdefghijklmnopqrstuvwxyz])${mb::x})";                             } # /i modifier requires 'a' to 'z' literally
-        elsif ($classmate =~ /\G \[:\^print:\]  /xmsgc) { push @xbcs, "(?:(?![\\x20-\\x7F])${mb::x})";                                            }
-        elsif ($classmate =~ /\G \[:\^punct:\]  /xmsgc) { push @xbcs, "(?:(?![\\x21-\\x2F\\x3A-\\x3F\\x40\\x5B-\\x5F\\x60\\x7B-\\x7E])${mb::x})"; }
-        elsif ($classmate =~ /\G \[:\^space:\]  /xmsgc) { push @xbcs, "(?:(?![\\s\\x0B])${mb::x})";                                               } # "\s" and vertical tab ("\cK")
-        elsif ($classmate =~ /\G \[:\^upper:\]  /xmsgc) { push @xbcs, "(?:(?![ABCDEFGHIJKLMNOPQRSTUVWXYZ])${mb::x})";                             } # /i modifier requires 'A' to 'Z' literally
-        elsif ($classmate =~ /\G \[:\^word:\]   /xmsgc) { push @xbcs, "(?:(?![\\x30-\\x39\\x41-\\x5A\\x5F\\x61-\\x7A])${mb::x})";                 }
-        elsif ($classmate =~ /\G \[:\^xdigit:\] /xmsgc) { push @xbcs, "(?:(?![\\x30-\\x39\\x41-\\x46\\x61-\\x66])${mb::x})";                      }
-
-        # \o{...}
-        elsif ($classmate =~ /\G \\o\{ (.*?) \} /xmsgc) {
-            push @xbcs, '(?:' . escape_to_hex(mb::chr(oct $1), ']') . ')';
-        }
-
-        # \x{...}
-        elsif ($classmate =~ /\G \\x\{ (.*?) \} /xmsgc) {
-            push @xbcs, '(?:' . escape_to_hex(mb::chr(hex $1), ']') . ')';
-        }
+        elsif ($classmate eq '[:^alnum:]' ) { push @xbcs, "(?:(?![\\x30-\\x39\\x41-\\x5A\\x61-\\x7A])${mb::x})";                      }
+        elsif ($classmate eq '[:^alpha:]' ) { push @xbcs, "(?:(?![\\x41-\\x5A\\x61-\\x7A])${mb::x})";                                 }
+        elsif ($classmate eq '[:^ascii:]' ) { push @xbcs, "(?:(?![\\x00-\\x7F])${mb::x})";                                            }
+        elsif ($classmate eq '[:^blank:]' ) { push @xbcs, "(?:(?![\\x09\\x20])${mb::x})";                                             }
+        elsif ($classmate eq '[:^cntrl:]' ) { push @xbcs, "(?:(?![\\x00-\\x1F\\x7F])${mb::x})";                                       }
+        elsif ($classmate eq '[:^digit:]' ) { push @xbcs, "(?:(?![\\x30-\\x39])${mb::x})";                                            }
+        elsif ($classmate eq '[:^graph:]' ) { push @xbcs, "(?:(?![\\x21-\\x7F])${mb::x})";                                            }
+        elsif ($classmate eq '[:^lower:]' ) { push @xbcs, "(?:(?![abcdefghijklmnopqrstuvwxyz])${mb::x})";                             } # /i modifier requires 'a' to 'z' literally
+        elsif ($classmate eq '[:^print:]' ) { push @xbcs, "(?:(?![\\x20-\\x7F])${mb::x})";                                            }
+        elsif ($classmate eq '[:^punct:]' ) { push @xbcs, "(?:(?![\\x21-\\x2F\\x3A-\\x3F\\x40\\x5B-\\x5F\\x60\\x7B-\\x7E])${mb::x})"; }
+        elsif ($classmate eq '[:^space:]' ) { push @xbcs, "(?:(?![\\s\\x0B])${mb::x})";                                               } # "\s" and vertical tab ("\cK")
+        elsif ($classmate eq '[:^upper:]' ) { push @xbcs, "(?:(?![ABCDEFGHIJKLMNOPQRSTUVWXYZ])${mb::x})";                             } # /i modifier requires 'A' to 'Z' literally
+        elsif ($classmate eq '[:^word:]'  ) { push @xbcs, "(?:(?![\\x30-\\x39\\x41-\\x5A\\x5F\\x61-\\x7A])${mb::x})";                 }
+        elsif ($classmate eq '[:^xdigit:]') { push @xbcs, "(?:(?![\\x30-\\x39\\x41-\\x46\\x61-\\x66])${mb::x})";                      }
 
         # \any
         elsif ($classmate =~ /\G (\\) (${mb::x}) /xmsgc) {
@@ -3532,26 +3904,6 @@ sub parse_re_codepoint_class {
             else {
                 push @xbcs, '(?:' . $1 . escape_to_hex($2, ']') . ')';
             }
-        }
-
-        # supported character ranges
-        elsif ($classmate =~ /\G ((?:[\x20-\x7E]|\\[0-3][0-7][0-7]|\\x[0-9A-Fa-f][0-9A-Fa-f])-(?:[\x20-\x7E]|\\[0-3][0-7][0-7]|\\x[0-9A-Fa-f][0-9A-Fa-f])) /xmsgc) {
-            push @sbcs, $1;
-        }
-
-        # other character ranges are no longer supported
-        # range specification by '-' in codepoint class of regular expression supports US-ASCII only
-        # this limitation makes it easier to change the script encoding
-        elsif ($classmate =~ /\G (-) /xmsgc) {
-            if ($^W) {
-                cluck <<END;
-[$parsed...] in regular expression
-
-range specification by '-' in codepoint class of regular expression supports US-ASCII only.
-this limitation makes it easier to change the script encoding.
-END
-            }
-            push @sbcs, '\\x2D';
         }
 
         # any
@@ -3574,6 +3926,13 @@ $0(@{[__LINE__]}): something wrong happened in script at pos=%s
 END
         }
     }
+
+    # return codepoint class
+    my $parsed =
+        ( @sbcs and  @xbcs) ? join('|', @xbcs, '['.join('',@sbcs).']') :
+        (!@sbcs and  @xbcs) ? join('|', @xbcs                        ) :
+        ( @sbcs and !@xbcs) ?                  '['.join('',@sbcs).']'  :
+        die;
     return $parsed;
 }
 
@@ -3617,16 +3976,7 @@ END
             }
 
             # parse codepoint class
-            if ($classmate =~ s{\A \^ }{}xms) {
-                $parsed .= '(?:(?!';
-                $parsed .= parse_re_codepoint_class($classmate);
-                $parsed .= ")${mb::x})";
-            }
-            else {
-                $parsed .= '(?:(?=';
-                $parsed .= parse_re_codepoint_class($classmate);
-                $parsed .= ")${mb::x})";
-            }
+            $parsed .= mb::_cc($classmate);
         }
 
         # /./ or \any
@@ -4341,10 +4691,8 @@ To install this software without make, type the following:
   * supports special variables $`, $&, and $'
   * does not change features of octet-oriented built-in functions
   * lc(), lcfirst(), uc(), and ucfirst() convert US-ASCII only
-  * codepoint range by hyphen of regular expression supports US-ASCII only
   * codepoint range by hyphen of tr/// and y/// support US-ASCII only
   * You have to write mb::* subroutines if you want codepoint semantics
-  * supports WTF-8
 
   Let's enjoy MBSC scripting in Perl, together!!
 
@@ -4504,54 +4852,54 @@ To install this software without make, type the following:
   subroutines will not help you very much. Traditional functions of Perl are
   useful still now in octet-oriented semantics.
 
-  elder <--                            age                             --> younger
-  --------------------------------------------------------------------------------
-  bare Perl4         JPerl4                                                       
-  bare Perl5         JPerl5             use utf8;          mb.pm                  
-  bare Perl7                            pragma             modulino               
-  --------------------------------------------------------------------------------
-  chop               ---                ---                chop                   
-  chr                chr                bytes::chr         chr                    
-  getc               getc               ---                getc                   
-  index              ---                bytes::index       index                  
-  lc                 lc                 ---                lc                     
-  lcfirst            lcfirst            ---                lcfirst                
-  length             length             bytes::length      length                 
-  ord                ord                bytes::ord         ord                    
-  reverse            reverse            ---                reverse                
-  rindex             ---                bytes::rindex      rindex                 
-  substr             substr             bytes::substr      substr                 
-  uc                 uc                 ---                uc                     
-  ucfirst            ucfirst            ---                ucfirst                
-  ---                chop               chop               mb::chop               
-  ---                ---                chr                mb::chr                
-  ---                ---                getc               mb::getc               
-  ---                index              ---                mb::index_byte         
-  ---                ---                index              mb::index              
-  ---                ---                lc                 ---                    
-  ---                ---                lcfirst            ---                    
-  ---                ---                length             mb::length             
-  ---                ---                ord                mb::ord                
-  ---                ---                reverse            mb::reverse            
-  ---                rindex             ---                mb::rindex_byte        
-  ---                ---                rindex             mb::rindex             
-  ---                ---                substr             mb::substr             
-  ---                ---                uc                 ---                    
-  ---                ---                ucfirst            ---                    
-  --------------------------------------------------------------------------------
-  do 'file'          ---                ---                do 'file'              
-  eval 'string'      ---                ---                eval 'string'          
-  require 'file'     ---                ---                require 'file'         
-  use Module         ---                ---                use Module             
-  ---                do 'file'          do 'file'          mb::do 'file'          
-  ---                eval 'string'      eval 'string'      mb::eval 'string'      
-  ---                require 'file'     require 'file'     mb::require 'file'     
-  ---                use Module         use Module         use mb::PERL Module    
-  $^X                ---                ---                $^X                    
-  ---                $^X                $^X                $mb::PERL              
-  $0                 $0                 $0                 $mb::ORIG_PROGRAM_NAME 
-  ---                ---                ---                $0                     
-  --------------------------------------------------------------------------------
+  elder <--                            age                              --> younger
+  ---------------------------------------------------------------------------------
+  bare Perl4         JPerl4                                                        
+  bare Perl5         JPerl5             use utf8;          mb.pm                   
+  bare Perl7                            pragma             modulino                
+  ---------------------------------------------------------------------------------
+  chop               ---                ---                chop                    
+  chr                chr                bytes::chr         chr                     
+  getc               getc               ---                getc                    
+  index              ---                bytes::index       index                   
+  lc                 lc                 ---                lc (by internal mb::lc) 
+  lcfirst            lcfirst            ---                lcfirst (by internal mb::lcfirst)
+  length             length             bytes::length      length                  
+  ord                ord                bytes::ord         ord                     
+  reverse            reverse            ---                reverse                 
+  rindex             ---                bytes::rindex      rindex                  
+  substr             substr             bytes::substr      substr                  
+  uc                 uc                 ---                uc (by internal mb::uc) 
+  ucfirst            ucfirst            ---                ucfirst (by internal mb::ucfirst)
+  ---                chop               chop               mb::chop                
+  ---                ---                chr                mb::chr                 
+  ---                ---                getc               mb::getc                
+  ---                index              ---                mb::index_byte          
+  ---                ---                index              mb::index               
+  ---                ---                lc                 ---                     
+  ---                ---                lcfirst            ---                     
+  ---                ---                length             mb::length              
+  ---                ---                ord                mb::ord                 
+  ---                ---                reverse            mb::reverse             
+  ---                rindex             ---                mb::rindex_byte         
+  ---                ---                rindex             mb::rindex              
+  ---                ---                substr             mb::substr              
+  ---                ---                uc                 ---                     
+  ---                ---                ucfirst            ---                     
+  ---------------------------------------------------------------------------------
+  do 'file'          ---                ---                do 'file'               
+  eval 'string'      ---                ---                eval 'string'           
+  require 'file'     ---                ---                require 'file'          
+  use Module         ---                ---                use Module              
+  ---                do 'file'          do 'file'          mb::do 'file'           
+  ---                eval 'string'      eval 'string'      mb::eval 'string'       
+  ---                require 'file'     require 'file'     mb::require 'file'      
+  ---                use Module         use Module         use mb::PERL Module     
+  $^X                ---                ---                $^X                     
+  ---                $^X                $^X                $mb::PERL               
+  $0                 $0                 $0                 $mb::ORIG_PROGRAM_NAME  
+  ---                ---                ---                $0                      
+  ---------------------------------------------------------------------------------
 
   DOS-like glob() as MBCS subroutine
   -----------------------------------------------------------------
@@ -5266,15 +5614,9 @@ expression in parentheses. Because $` and $& needs $1 to implement its.
 In the past, Perl scripts with special variables $` and $& had a problem with
 slow execution. Both that era and today, capturing by parentheses works well.
 
-=item * character ranges by hyphen
+=item * character ranges by hyphen of tr///
 
-Character ranges by hyphen of regular expression supports US-ASCII only.
-And also tr/// and y/// support ranges only US-ASCII by hyphen. This limitation
-dares to exist to help you when you change the encoding of your script. If you
-want to be perfect, you need to check the use of the following operators when
-changing the encoding of your script.
-
-  eq  ne  le  lt  ge  gt  cmp  sort
+tr/// and y/// support ranges only US-ASCII by hyphen.
 
 =item * return value from tr///s
 

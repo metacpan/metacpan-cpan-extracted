@@ -37,7 +37,7 @@ use PDF::Builder;
 use PDF::Builder::Util;
 use Unicode::UCD 'charinfo';
 
-my ($gfx, $tx, $pdf, $page, $y);
+my ($pdf);
 
 # loop through command line list of font file names
 die "Need one or more TTF file names on command line!\n" if !scalar(@ARGV);

@@ -196,18 +196,18 @@ sub oddmuse_serve_robots {
   success($stream, 'text/plain');
   $stream->write(<<'EOT');
 User-agent: *
-Disallow: raw/*
-Disallow: html/*
-Disallow: diff/*
-Disallow: history/*
-Disallow: do/changes
-Disallow: do/rss
-Disallow: do/atom
-Disallow: do/new
-Disallow: do/more
-Disallow: do/match
-Disallow: do/search
-# allowing do/index!
+Disallow: /raw/*
+Disallow: /html/*
+Disallow: /diff/*
+Disallow: /history/*
+Disallow: /do/changes
+Disallow: /do/rss
+Disallow: /do/atom
+Disallow: /do/new
+Disallow: /do/more
+Disallow: /do/match
+Disallow: /do/search
+# allowing /do/index!
 Crawl-delay: 10
 EOT
 }

@@ -5,7 +5,7 @@ ansicolumn - ANSI terminal sequence aware column command
 
 # VERSION
 
-Version 1.03
+Version 1.04
 
 # SYNOPSIS
 
@@ -121,11 +121,18 @@ default, from the standard input.
     Set the number of runin/runout column.
     Default is both 2.
 
-- **--**\[**no-**\]**border**
+- **--**\[**no-**\]**pagebreak**
 
-    Print border.  Enabled by **--page** option automatically.  Use
-    **--no-border** to disable it.  Border style is specified by
-    **--border-style** option.
+    Move to next pane when form feed character found.
+    Default true.
+
+- **--border**\[=_style_\]
+
+    Print border.  Enabled by **--page** option automatically.  If the
+    optional _style_ is given, it is used as a border style and precedes
+    to **--border-style** option.  Use **--border=none** to disable it.
+
+    Border style is specified by **--border-style** option.
 
 - **--border-style**=_style_, **--bs**=...
 
@@ -138,6 +145,7 @@ default, from the standard input.
     line, heavy-line,
     ascii-frame, ascii-box,
     box, frame, page-frame,
+    shadow, shadow-box,
     comb, rake, mesh,
     dumbbell, heavy-dumbbell,
     ribbon, round-ribbon, double-ribbon, double-double-ribbon, heavy-ribbon

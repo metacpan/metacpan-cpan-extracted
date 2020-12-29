@@ -1,13 +1,14 @@
 ---
-doctype: dist
+doctype: global
 
-header:
-  name: Dist-Iller-Config-Author-CSSON
+distribution_name: Dist-Iller-Config-Author-CSSON
+---
+doctype: dist
 
 prereqs:
   runtime:
     requires:
-      - perl: 5.010000
+      - perl: 5.014000
       - Path::Tiny
       - Dist::Iller: 0.1401
       - Moose: 2.0000
@@ -33,6 +34,3 @@ doctype: cpanfile
 doctype: gitignore
 
 config: Author::CSSON
-
-always:
- - /Dist-Iller-Config-Author-CSSON-*

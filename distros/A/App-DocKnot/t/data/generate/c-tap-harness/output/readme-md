@@ -1,4 +1,4 @@
-# C TAP Harness 4.0
+# C TAP Harness
 
 Copyright 2000-2001, 2004, 2006-2016 Russ Allbery <eagle@eyrie.org>.
 Copyright 2006-2009, 2011-2013 The Board of Trustees of the Leland
@@ -96,8 +96,8 @@ on using the harness below.
 
 ## Testing
 
-C TAP Harness comes with a comprehensive test suite, which you can run
-after building with:
+C TAP Harness comes with a test suite, which you can run after building
+with:
 
 ```
     make check

@@ -5,7 +5,8 @@ use warnings;
 package Dist::Iller::Prereq;
 
 our $AUTHORITY = 'cpan:CSSON'; # AUTHORITY
-our $VERSION = '0.1408';
+# ABSTRACT: Handle a prerequisite
+our $VERSION = '0.1409';
 
 use Dist::Iller::Elk;
 use Types::Standard qw/Str Enum/;
@@ -43,11 +44,11 @@ __END__
 
 =head1 NAME
 
-Dist::Iller::Prereq
+Dist::Iller::Prereq - Handle a prerequisite
 
 =head1 VERSION
 
-Version 0.1408, released 2016-03-12.
+Version 0.1409, released 2020-12-27.
 
 =head1 SOURCE
 

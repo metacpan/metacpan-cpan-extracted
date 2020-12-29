@@ -3,10 +3,11 @@ package PDF::Builder::Resource::Font::Postscript;
 use base 'PDF::Builder::Resource::Font';
 
 use strict;
-no warnings qw[ deprecated recursion uninitialized ];
+use warnings;
+#no warnings qw[ deprecated recursion uninitialized ];
 
-our $VERSION = '3.020'; # VERSION
-my $LAST_UPDATE = '3.017'; # manually update whenever code is changed
+our $VERSION = '3.021'; # VERSION
+my $LAST_UPDATE = '3.021'; # manually update whenever code is changed
 
 use Encode qw(:all);
 use IO::File qw();
@@ -23,8 +24,8 @@ PDF::Builder::Resource::Font::Postscript - support routines for using PostScript
 sub new {
     my ($class, $pdf, $psfile, %opts) = @_;
 
-    my ($self,$encoding);
-    my (@w,$data);
+    my ($self);
+    my ($data);
     $opts{'-encode'} ||= 'asis';  # provide default encoding
 
     if (defined $opts{'-afmfile'}) {
@@ -181,7 +182,7 @@ sub readAFM {
             $bbox =~ s/\s+$//;
             # Should also parse ligature data (format: L successor ligature)
             $data->{'avgwidth2'} += $wx ;
-            $data->{'maxwidth'} = $data->{'maxwidth'} < $wx? $wx: $data->{'maxwidth'};
+            $data->{'maxwidth'} = ($data->{'maxwidth'}||0) < $wx? $wx: $data->{'maxwidth'}||0;
             $data->{'wx'}->{$name} = $wx;
             $data->{'bbox'}->{$name} = [split(/\s+/,$bbox)];
             if ($ch > 0) {
@@ -430,13 +431,13 @@ sub readPFM {
     $data->{'stemv'} = 0;
     $data->{'stemh'} = 0;
 
-    $data->{'lastchar'} = $df{'LastChar'};
-    $data->{'firstchar'} = $df{'FirstChar'};
+    $data->{'lastchar'} = $df{'LastChar'}||0;  # running max
+    $data->{'firstchar'} = $df{'FirstChar'}||255;  # running min
 
     $data->{'missingwidth'} = $df{'AvgWidth'};
     $data->{'maxwidth'} = $df{'MaxWidth'};
     $data->{'ascender'} = $df{'Ascent'};
-    $data->{'descender'} =- $df{'LowerCaseDescent'};
+    $data->{'descender'} = -$df{'LowerCaseDescent'};
 
     $data->{'flags'} = 0;
     # FixedPitch 1
@@ -462,9 +463,9 @@ sub readPFM {
     $data->{'uni'} = [ unpack('U*', decode('cp1252', pack('C*',(0..255)))) ];
     $data->{'char'} = [ map { nameByUni($_) || '.notdef' } @{$data->{'uni'}} ];
 
-    $data->{'italicangle'} =- 12*$df{'Italic'};
+    $data->{'italicangle'} = -12*$df{'Italic'};
     $data->{'isfixedpitch'} = ($df{'PitchAndFamily'} & 8) || ($df{'PitchAndFamily'} & 1);
-    $data->{'underlineposition'} =- $df{'UnderlineOffset'};
+    $data->{'underlineposition'} = -$df{'UnderlineOffset'};
     $data->{'underlinethickness'} = $df{'UnderlineWidth'};
 
     seek($fh, $df{'ExtentTable'}, 0);

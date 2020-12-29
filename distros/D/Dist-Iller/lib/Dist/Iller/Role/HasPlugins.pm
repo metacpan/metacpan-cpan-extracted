@@ -5,7 +5,8 @@ use warnings;
 package Dist::Iller::Role::HasPlugins;
 
 our $AUTHORITY = 'cpan:CSSON'; # AUTHORITY
-our $VERSION = '0.1408';
+# ABSTRACT: A role for DocTypes that contains plugins (like dist/weaver)
+our $VERSION = '0.1409';
 
 use Moose::Role;
 use namespace::autoclean;
@@ -347,11 +348,11 @@ __END__
 
 =head1 NAME
 
-Dist::Iller::Role::HasPlugins
+Dist::Iller::Role::HasPlugins - A role for DocTypes that contains plugins (like dist/weaver)
 
 =head1 VERSION
 
-Version 0.1408, released 2016-03-12.
+Version 0.1409, released 2020-12-27.
 
 =head1 SOURCE
 

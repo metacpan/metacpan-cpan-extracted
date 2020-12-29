@@ -35,7 +35,7 @@ under the same terms as Perl itself.
 
 =cut
 
-our $VERSION = '0.029'; # VERSION
+our $VERSION = '0.032'; # VERSION
 
 use Mouse;
 use Carp;
@@ -57,6 +57,7 @@ has alt_id => (is => 'ro', isa => 'ArrayRef');
 has subset => (is => 'ro', isa => 'ArrayRef');
 has is_relationshiptype => (is => 'ro', isa => 'Bool');
 has is_obsolete => (is => 'ro', isa => 'Bool');
+has replaced_by => (is => 'ro', isa => 'Str');
 has source_file => (is => 'ro', isa => 'Str', required => 1);
 has source_file_line_number => (is => 'ro', isa => 'Str', required => 1);
 has metadata => (is => 'ro');
@@ -132,6 +133,19 @@ sub make_object
 
   if (!defined $object) {
     croak "no argument passed to new()";
+  }
+
+  if ($object->{def} && $object->{def}->{dbxrefs} && $object->{alt_id}) {
+    for my $alt_id (@{$object->{alt_id}}) {
+      # filter alt_ids from the definition xrefs to avoid:
+      #   duplicate key value violates unique constraint "cvterm_dbxref_c1"
+      # see also: https://github.com/kimrutherford/go-ontology/commit/92dca313a69ffb073c226b94242faa8f321efcf2
+      @{$object->{def}->{dbxrefs}} =
+        grep {
+          my $xref = $_;
+          $alt_id ne $xref;
+        } @{$object->{def}->{dbxrefs}};
+    }
   }
 
   if ($object->{is_obsolete} && $object->{name} && $object->{name} !~ /^obsolete/i) {

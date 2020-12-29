@@ -1,2 +1,6 @@
+0.02 2020-12-25T01:09:18+01:00
+ - Add documentation.
+ - Add minimal dependency to perl 5.10.
+
 0.01 2020-12-19T02:36:33+01:00
  - First version.

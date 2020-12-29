@@ -39,19 +39,23 @@ use LaTeXML::Util::Pathname;
 
 # Bookkeeping
 my $ARGV_SAVED = [@ARGV],    #Save, so that we reinvoke when flushed
-  # Read default options
-  my $g_opts = LaTeXML::Common::Config->new('input_limit' => 100, expire => 600);
+# Read default options
+my $g_opts = LaTeXML::Common::Config->new('input_limit' => 100, expire => 600);
 $g_opts->read(\@ARGV);
 
 # Set up the server
+# Global constants can be read into fixed variables:
 my $address = $g_opts->get('address') || 'localhost';
 my $port = $g_opts->get('port') || '3334';
 my $server = setup_server($address, $port);
 my $server_port = $server->sockport();
+my $input_limit = $g_opts->get('input_limit');
+my $input_counter = 0;
 print STDERR "LaTeXML server listening on $server_port\n";
 #**********************************************************************
-# Daemonize
-daemonize();
+# Daemonize,
+#   if we expect to auto-reboot and want standalone robustness
+daemonize($input_limit);
 #**********************************************************************
 # Set up the processing.
 
@@ -126,19 +130,22 @@ while (my $client = $server->accept()) {
 
     # Boot/find a daemon:
     my $converter = LaTeXML->get_converter($opts);
-    #Override/extend with session-specific options in $opt:
-    $converter->prepare_session($opts);
+    # Initialize if needed
+    $converter->initialize_session unless $$converter{ready};
 
     #Send a request:
-    $g_opts->set('input_counter', ($g_opts->get('input_counter') || 0) + 1);
+    $input_counter++ if $input_limit;
     my $response = $converter->convert($source);
 
-    # Send back the serialized XML, log and status:
+    # Send back the serialized result, log and status:
+    # ensure these are well-typed for consumers that will be doing strict JSON
+    $$response{status_code} = int($$response{status_code}); # ensure integer
+    $$response{result} = "" if ! defined $$response{result}; # avoid null
     $client->send_response(HTTP::Response->new(200, 'OK', undef, encode_json($response)));
 
     #Flush daemon, every $input_limit files:
-    if ($g_opts->get('input_limit') &&
-      (($g_opts->get('input_counter') || 0) >= $g_opts->get('input_limit'))) {
+    if ($input_limit &&
+      ($input_counter >= $input_limit)) {
       $client->close;
       exec("$RealBin_safe/latexmls", @$ARGV_SAVED)
         or croak("Fatal:server:restart Daemon autoflush Failed!");
@@ -146,10 +153,6 @@ while (my $client = $server->accept()) {
 
     # Terminate immediately if requested
     timeout_handler() if ($opts->get('expire') == -1);
-
-    # Important performance enhancement: if the conversion ended with a Fatal that threatened state,
-    #   a second initialization is needed, and we should do it *before* we accept the next job.
-    $converter->initialize_session unless $$converter{ready};
 
     # Continue looking for a new request, timeout if inactive for too long...
     alarm($opts->get('expire'));
@@ -173,22 +176,23 @@ sub term_handler {
 # TODO: Think about if the croaks can't be done better, so that the client
 #       receives the error/log message? or is that overkill?
 sub daemonize {
+  my $restartable = shift;
   #This causes more problems than it solves (e.g. sTeX setup)
   #chdir '/'                 or croak "Can't chdir to /: $!";
   open STDIN, '<', '/dev/null'
     or croak("Fatal:server:daemonize  Can't read /dev/null: $!");
   open STDOUT, '>', '/dev/null'
     or croak("Fatal:server:daemonize  Can't write to /dev/null: $!");
-  defined(my $pid = fork)
-    or croak("Fatal:server:daemonize  Can't fork: $!");
-  exit if $pid;
-  setsid
-    or croak("Fatal:server:daemonize  Can't start a new session: $!");
+  if ($restartable && $restartable > 0) {
+    defined(my $pid = fork)
+      or croak("Fatal:server:daemonize  Can't fork: $!");
+    exit if $pid;
+    setsid
+      or croak("Fatal:server:daemonize  Can't start a new session: $!"); }
   *STDERR_SAVED = *STDERR;
   *STDERR       = *STDOUT
     or croak("Fatal:server:daemonize Can't dup stdout: $!");
-  return;
-}
+  return; }
 
 sub setup_server {
   my ($localaddress, $localport) = @_;
@@ -199,7 +203,7 @@ sub setup_server {
     Proto     => 'tcp',
     Reuse     => 1,
   );
-  croak("Fatal:server:init can't setup server") unless $http_server;
+  croak("Fatal:server:init can't setup server on $localaddress:$localport") unless $http_server;
   return $http_server;
 }
 

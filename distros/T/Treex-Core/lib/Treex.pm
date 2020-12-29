@@ -1,5 +1,5 @@
 package Treex;
-$Treex::VERSION = '2.20160630';
+$Treex::VERSION = '2.20201228';
 use strict;
 use warnings;
 1;
@@ -14,7 +14,7 @@ Treex - Natural Language Processing framework
 
 =head1 VERSION
 
-version 2.20160630
+version 2.20201228
 
 =head1 INTRODUCTION
 

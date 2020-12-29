@@ -1,5 +1,14 @@
 Revision history for List::Cycle
 
+
+1.04    Wed Dec 23 14:52:05 CST 2020
+------------------------------------
+No new features.
+
+[FIXES]
+Correct the minimum module requirements.
+
+
 1.02    Sun Dec 23 22:01:38 CST 2012
 ------------------------------------
 No new features.

@@ -13,7 +13,7 @@ BEGIN {
 }
 require_ok('PDF::Table');
 
-my ( $pdf, $page, $tab, @data, %opts );
+my ( $pdf, $page, $tab, @data );
 
 $pdf  = PDF::API2->new();
 $page = $pdf->page();

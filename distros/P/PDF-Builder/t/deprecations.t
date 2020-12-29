@@ -4,7 +4,7 @@ use warnings;
 
 use Test::More tests => 1;
 
-no warnings 'deprecated'; ## no critic
+#no warnings 'deprecated'; ## no critic
 
 use PDF::Builder;
 use PDF::Builder::Resource::XObject::Image::JPEG;

@@ -11,31 +11,17 @@ use autodie;
 use warnings;
 
 use File::ShareDir qw(module_file);
-use File::Spec;
-use JSON::MaybeXS qw(JSON);
-use Perl6::Slurp;
-use Test::More;
+use Kwalify qw(validate);
+use Test::More tests => 2;
+use YAML::XS ();
 
 # Load the module.
 BEGIN { use_ok('App::DocKnot') }
 
-# Load the licenses.json file.
-my $path = module_file('App::DocKnot', 'licenses.json');
-my $json = JSON->new;
-$json->relaxed;
-my $licenses_ref = $json->decode(scalar(slurp($path)));
-
-# The number of tests will be one plus two times the number of licenses.
-my $num_tests = 1 + 2 * keys($licenses_ref->%*);
-
-# Ensure that, for every license listed in this file, there is a summary and a
-# corresponding file containing license text.
-for my $key (sort keys($licenses_ref->%*)) {
-    ok(defined($licenses_ref->{$key}{summary}), "summary for $key");
-    my $license = File::Spec->catfile('licenses', $key);
-    eval { $path = module_file('App::DocKnot', $license) };
-    ok(!$@, "license file for $key");
-}
-
-# Check the number of tests was correct.
-done_testing($num_tests);
+# Check the schema of the licenses.yaml file.
+my $licenses_path = module_file('App::DocKnot', 'licenses.yaml');
+my $licenses_ref  = YAML::XS::LoadFile($licenses_path);
+my $schema_path   = module_file('App::DocKnot', 'schema/licenses.yaml');
+my $schema_ref    = YAML::XS::LoadFile($schema_path);
+eval { validate($schema_ref, $licenses_ref) };
+is($@, q{}, 'licenses.yaml fails schema validation');

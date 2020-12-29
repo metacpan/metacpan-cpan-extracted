@@ -1,0 +1,172 @@
+#!perl
+
+use strict;
+use warnings;
+use Tk;
+use Tk::Pane;
+use Tk::GraphViz;
+use Getopt::Long;
+
+my $compare = 0;
+my @dots;
+if (!GetOptions(
+  "c!" => \$compare,
+) or !(@dots = @ARGV)) {
+  require Pod::Usage;
+  Pod::Usage::pod2usage(1);
+}
+
+my $async = 1;
+my $mw = MainWindow->new();
+
+# Frame for the two images
+my $topFrame = $mw->Frame->pack(-side => 'top', -fill => 'both', -expand => 1);
+
+# left image, including a label
+my $imageLabel = makeScrolledWidget(
+  $topFrame, 'left', "Dot-Generated GIF Image", 'packAdjust',
+  Pane => -sticky => 'nsew',
+)->Label->pack(-fill => 'both', -expand => 1) if $compare;
+
+# right image, including a label
+# Right picture is a Tk::GraphViz object
+my $gv = makeScrolledWidget(
+  $topFrame, 'left', 'Tk::GraphViz-Generated Canvas', 'pack',
+  GraphViz => -background => 'white',
+)->createBindings;
+
+my $buttonFrame = $mw->Frame->pack(-side => 'bottom');
+my $statusText = '';
+$mw->Label(-textvariable => \$statusText)->pack(-side => 'bottom');
+my $nextButton = cmdButton($buttonFrame, Next => 0, [\&showDots], qw(left -state disabled));
+cmdButton($buttonFrame, 'Find node' => 0, [\&findNode, $gv], 'left');
+cmdButton($buttonFrame, 'Zoom in' => 0, [$gv, qw(zoom -in 1.5)], 'left');
+cmdButton($buttonFrame, 'Zoom out X' => 9, [$gv, qw(zoom -out 1.5)], 'left');
+cmdButton($buttonFrame, Quit => 0, [$mw, 'destroy'], 'right');
+
+my $currentFile;
+$gv->bind($_, '<Any-Enter>', _bindClosure($_)) for qw(node edge subgraph);
+$gv->bind('all', '<Any-Leave>', sub { $statusText = $currentFile });
+
+sub _bindClosure {
+  my $type = $_[0];
+  sub {
+    # if bind to '<Button-1>', acts when click an entity
+    my @tags = $gv->gettags('current');
+    my ($entity) = map /^$type=(.*)/, @tags;
+    $statusText = $entity;
+  };
+}
+
+$mw->geometry("800x400");
+showDots();
+
+MainLoop;
+
+sub findNode {
+  my ($mw, $gv) = @_;
+  $gv->scrollTo(getNodeSearch($mw, 'Node Name Dialog', [ sort $gv->nodes ]));
+}
+
+sub getNodeSearch {
+  my ($mw, $title, $choices) = @_;
+  require Tk::DialogBox;
+  my $dialog = $mw->DialogBox(-title => $title, -default_button => 'OK', -buttons => [qw/OK Cancel/]);
+  my ($text, $entry);
+  if (eval { require Tk::MatchEntry; 1 }) {
+    $entry = $dialog->add('MatchEntry', -variable => \$text, choices => $choices)->pack;
+  } else {
+    require Tk::BrowseEntry;
+    $entry = $dialog->add('BrowseEntry', -variable => \$text, choices => $choices)->pack;
+  }
+  $dialog->configure(-focus => $entry);
+  my $ans = $dialog->Show;
+  $dialog->destroy;
+  $ans ne 'OK' ? undef : $text;
+}
+
+sub cmdButton {
+  my ($frame, $label, $underline_index, $cmd, $pack, @but_args) = @_;
+  my $key = lc substr $label, $underline_index, 1;
+  my $mw = $frame->MainWindow;
+  $mw->bind("<Key-$key>" => $cmd);
+  my @button_cmd = @$cmd;
+  splice @button_cmd, 1, 0, $mw if ref($cmd->[0]) eq 'CODE';
+  $frame->Button(-command => \@button_cmd, -text => $label, -underline => $underline_index, @but_args)->pack(-side => $pack);
+}
+
+sub makeScrolledWidget {
+  my ($top, $side, $label, $pack, @scrolled) = @_;
+  my $frame = $top->Frame(-relief => 'sunken')
+    ->$pack(-fill => 'both', -expand => 1, -side => $side);
+  $frame->Label(-text => $label)->pack(-side => 'top');
+  $frame->Scrolled(@scrolled, -scrollbars => 'osoe')
+    ->pack(-fill => 'both', -expand => 1,  -side => 'top');
+}
+
+sub showDots {
+  return if !@dots;
+  $currentFile = shift @dots;
+  $mw->Busy;
+  if ($compare) {
+    $mw->update;
+    $statusText = "Generating GIF for $currentFile ...";
+    $imageLabel->configure(-image => GenerateImage($imageLabel, $currentFile));
+  }
+  $statusText = "Generating Tk::GraphViz Canvas for $currentFile ...";
+  $mw->update;
+  $gv->show($currentFile, async => $async);
+  $statusText = $currentFile;
+  $mw->Unbusy;
+  $nextButton->configure(-state => @dots ? 'normal' : 'disabled');
+}
+
+##############################################
+# Sub to generate gif file from dot file
+sub GenerateImage {
+  require File::Temp;
+  my ($frame, $filename) = @_;
+  die "Can't find file '$filename'\n" unless -f $filename;
+  my (undef, $tempfile) = File::Temp::tempfile('XXXX', TMPDIR => 1, UNLINK => 1);
+  my @command = (qw(dot -Tgif), $filename, qq{-o$tempfile});
+  print "Processing: @command\n";
+  system @command and die "Error executing @command\n".$!;
+  $frame->Photo(-file => $tempfile);
+}
+
+=head1 NAME
+
+tkgraphviz - visualise graphviz files with Tk
+
+=head1 SYNOPSIS
+
+    tkgraphviz [-c] file...
+
+=head1 DESCRIPTION
+
+Uses L<Tk::GraphViz> to visualise the given graph file, in Graphviz C<DOT>
+format. Allows you to scroll instantly to a specified node.
+
+When the pointer is over a node or edge, shows you their name or
+incident nodes.
+
+If L<Tk::MatchEntry> is available, the search functionality will use it
+to autocomplete the node name. If not, L<Tk::BrowseEntry> is used so
+you can select from the dropdown, or type the name.
+
+=head1 OPTIONS
+
+=over
+
+=item -c
+
+Put another pane on the left, with an image generated by C<dot>. Allows
+you to compare that with how L<Tk::GraphViz> did.
+
+=back
+
+=head1 SEE ALSO
+
+L<Tk::GraphViz>, dot(1), L<GraphViz2>, L<Tk>.
+
+=cut

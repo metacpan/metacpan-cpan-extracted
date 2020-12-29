@@ -2,24 +2,23 @@ use strict; use warnings;
 use Test::More tests => 14;
 
 use Graph;
-my $g = Graph->new(hyperedged => 1);
+my $g = Graph->new(hyperedged => 1, directed => 0);
 
 $g->add_edge("a", "b");
-$g->add_edge("b", "a");
 $g->add_edge("d" ,"e");
 $g->add_edge("a", "b", "c");
 
 sub deref {
     my $r = shift;
-    ref $r ? "[" . join(" ", map { deref($_) } @$r) . "]" : $_;
+    ref $r ? "[" . join(" ", sort map { deref($_) } @$r) . "]" : $_;
 }
 
 sub at {
     join(" ", sort map { deref($_) } $g->edges_at(@_));
 }
 
-is( at("a"), "[a b c] [a b] [b a]");
-is( at("b"), "[a b c] [a b] [b a]");
+is( at("a"), "[a b c] [a b]");
+is( at("b"), "[a b c] [a b]");
 is( at("c"), "[a b c]");
 is( at("d"), "[d e]");
 is( at("e"), "[d e]");

@@ -1,3 +1,7 @@
+20201227
+	Version 1.3.3
+	/!\ Breaking change /!\ returne data is always in $returnedHash->{'content'}
+
 20201212
 	version 1.3.0
 	Handle more response types (json, text, binary)

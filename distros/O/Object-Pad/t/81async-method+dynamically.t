@@ -50,9 +50,9 @@ BEGIN {
 
    my $during_level;
    my $f1 = Future->new;
-   my $fret = $logger->verbosely(sub {
+   my $fret = $logger->verbosely(async sub {
       $during_level = $logger->level;
-      return $f1;
+      await $f1;
    });
 
    is( $logger->level, 1, '$logger->level while verbosely suspended' );

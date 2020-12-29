@@ -37,6 +37,9 @@
          }
       },
       "runtime" : {
+         "recommends" : {
+            "Tk::MatchEntry" : "0.5"
+         },
          "requires" : {
             "Tk" : "800.020"
          }
@@ -56,6 +59,6 @@
       },
       "x_IRC" : "irc://irc.perl.org/#graphql-perl"
    },
-   "version" : "1.08",
+   "version" : "1.09",
    "x_serialization_backend" : "JSON::PP version 4.00"
 }

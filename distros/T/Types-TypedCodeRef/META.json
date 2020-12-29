@@ -62,7 +62,7 @@
    "provides" : {
       "Types::TypedCodeRef" : {
          "file" : "lib/Types/TypedCodeRef.pm",
-         "version" : "0.04"
+         "version" : "0.05"
       },
       "Types::TypedCodeRef::Factory" : {
          "file" : "lib/Types/TypedCodeRef/Factory.pm"
@@ -79,7 +79,7 @@
          "web" : "https://github.com/ybrliiu/p5-Types-TypedCodeRef"
       }
    },
-   "version" : "0.04",
+   "version" : "0.05",
    "x_contributors" : [
       "kusuda <kusuda@mfac.jp>"
    ],

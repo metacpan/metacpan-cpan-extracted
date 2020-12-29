@@ -23,10 +23,10 @@ requires:
   strict: '0'
   warnings: '0'
 resources:
-  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Finance-SE-IDX-Static
+  bugtracker: https://github.com/perlancar/perl-Finance-SE-IDX-Static/issues
   homepage: https://metacpan.org/release/Finance-SE-IDX-Static
   repository: git://github.com/perlancar/perl-Finance-SE-IDX-Static.git
-version: 20201028.0.1
+version: 20201222.0.1
 x_Dist_Zilla:
   perl:
     version: '5.030000'
@@ -122,7 +122,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::PERLANCAR::MetaResources
       name: '@Author::PERLANCAR/PERLANCAR::MetaResources'
-      version: '0.041'
+      version: '0.042'
     -
       class: Dist::Zilla::Plugin::CheckChangeLog
       name: '@Author::PERLANCAR/CheckChangeLog'
@@ -391,6 +391,22 @@ x_Dist_Zilla:
           phase: test
           type: requires
       name: TestRequires
+      version: '6.012'
+    -
+      class: Dist::Zilla::Plugin::Prereqs
+      config:
+        Dist::Zilla::Plugin::Prereqs:
+          phase: develop
+          type: requires
+      name: DevelopRequires
+      version: '6.012'
+    -
+      class: Dist::Zilla::Plugin::Prereqs
+      config:
+        Dist::Zilla::Plugin::Prereqs:
+          phase: develop
+          type: x_spec
+      name: DevelopX_spec
       version: '6.012'
     -
       class: Dist::Zilla::Plugin::FinderCode

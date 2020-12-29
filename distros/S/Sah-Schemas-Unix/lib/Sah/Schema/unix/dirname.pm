@@ -1,9 +1,9 @@
 package Sah::Schema::unix::dirname;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-06-13'; # DATE
+our $DATE = '2020-10-16'; # DATE
 our $DIST = 'Sah-Schemas-Unix'; # DIST
-our $VERSION = '0.012'; # VERSION
+our $VERSION = '0.013'; # VERSION
 
 our $schema = ["dirname::unix" => {
     summary => 'Directory name (with optional path) on a Unix system',
@@ -33,7 +33,7 @@ Sah::Schema::unix::dirname - Directory name (with optional path) on a Unix syste
 
 =head1 VERSION
 
-This document describes version 0.012 of Sah::Schema::unix::dirname (from Perl distribution Sah-Schemas-Unix), released on 2020-06-13.
+This document describes version 0.013 of Sah::Schema::unix::dirname (from Perl distribution Sah-Schemas-Unix), released on 2020-10-16.
 
 =head1 SYNOPSIS
 

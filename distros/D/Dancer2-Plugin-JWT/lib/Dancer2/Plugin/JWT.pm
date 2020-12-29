@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package Dancer2::Plugin::JWT;
 # ABSTRACT: JSON Web Token made simple for Dancer2
-$Dancer2::Plugin::JWT::VERSION = '0.017';
+$Dancer2::Plugin::JWT::VERSION = '0.018';
 use Dancer2::Plugin;
 use Crypt::JWT qw(encode_jwt decode_jwt);
 use URI;
@@ -175,6 +175,14 @@ on_plugin_import {
                 my $app = shift;
                 my $encoded = $app->request->headers->authorization;
 
+                if( defined $encoded ) {
+                    # Remove "Bearer " (sic) from the beginning of the Authorization header if present.
+                    # "Bearer" signifies the schema and should be present
+                    # but due to backwards compatibility we support also without it.
+                    # https://jwt.io/introduction/ (How do JSON Web Tokens work?)
+                    $encoded =~ m/^ (?: Bearer [[:space:]]{1} | ) (?<token> [^[:space:]]{0,} ) $/msx;
+                    $encoded = $+{token};
+                }
 
                 if ($app->request->cookies->{_jwt}) {
                     $encoded = $app->request->cookies->{_jwt}->value ;

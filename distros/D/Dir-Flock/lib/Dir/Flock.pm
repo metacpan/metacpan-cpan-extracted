@@ -2,14 +2,14 @@ package Dir::Flock;
 use strict;
 use warnings;
 use Carp;
+use Time::HiRes;
 use File::Temp;
-use Time::HiRes 1.92;
 use Fcntl ':flock';
 use Data::Dumper;    # when debugging is on
 use base 'Exporter';
 
-our $VERSION = '0.04';
-my @TMPFILE;
+our $VERSION = '0.08';
+my %TMPFILE;
 my %LOCK;
 our @EXPORT_OK = qw(getDir lock lock_ex lock_sh unlock lockobj lockobj_ex
                     lockobj_sh sync sync_ex sync_sh);
@@ -20,16 +20,7 @@ our $errstr;
 our $LOCKFILE_STUB = "dir-flock-";
 our $PAUSE_LENGTH = 0.001;          # seconds
 our $HEARTBEAT_CHECK = 30;          # seconds
-our $TEMPFILE_XLENGTH = 12;
 our $_DEBUG = $ENV{DEBUG} || $ENV{DIR_FLOCK_DEBUG} || 0;
-
-if ($^O eq 'MSWin32') {
-    require Dir::Flock::Mock;
-    $_DEBUG && print STDERR "loading Dir::Flock::Mock for this system\n";
-} elsif (eval { Time::HiRes::d_hires_stat() } <= 0) {
-    require Dir::Flock::Mock;
-    $_DEBUG && print STDERR "loading Dir::Flock::Mock for this system\n";
-}
 
 sub getDir {
     my $rootdir = shift;
@@ -53,29 +44,27 @@ sub lock_ex {
     $errstr = "";
     return if !_validate_dir($dir);
     my $P = $_DEBUG && _pid();
-    my $now = Time::HiRes::time;
+    my ($filename,$now) = _create_tempfile( $dir, "excl" );
     my $last_check = $now;
     my $expire = $now + ($timeout || 0);
-    my $filename = _create_tempfile( $dir, "excl" );
-    push @TMPFILE, "$dir/$filename";
-    _write_lock_data("$dir/$filename");
+    $TMPFILE{ $filename } = _pid();
     while (_oldest_file($dir) ne $filename) {
+	unlink $filename;
+	delete $TMPFILE{$filename};
         $P && print STDERR "$P $filename not the oldest file...\n";
         if (defined($timeout) && Time::HiRes::time > $expire) {
             $errstr = "timeout waiting for exclusive lock for '$dir'";
             $P && print STDERR "$P timeout waiting for lock\n";
-            unlink "$dir/$filename";
             return;
         }
-
-        # randomize wait length to mitigate contention, like Ethernet does
-        Time::HiRes::sleep 0.00001 + 2 * rand() * $PAUSE_LENGTH;
-        
+        Time::HiRes::sleep $PAUSE_LENGTH * (1 + 2 * rand());
         if (Time::HiRes::time > $last_check + $HEARTBEAT_CHECK) {
             $P && print STDERR "$P check heartbeat of lock holder\n";
             _ping_oldest_file($dir);
             $last_check = Time::HiRes::time;
         }
+	($filename,$now) = _create_tempfile( $dir, "excl" );
+	$TMPFILE{ $filename } = _pid();
     }
     $P && print STDERR "$P lock successful to $filename\n";
     $LOCK{$dir}{_pid()} = $filename;
@@ -83,63 +72,34 @@ sub lock_ex {
 }
 
 sub lock_sh {
-    # TODO: lock_ex and lock_sh are too DRY
     my ($dir, $timeout) = @_;
     $errstr = "";
     return if !_validate_dir($dir);
     my $P = $_DEBUG && _pid();
-    my $now = Time::HiRes::time;
+    my ($filename,$now) = _create_tempfile( $dir, "shared" );
     my $last_check = $now;
     my $expire = $now + ($timeout || 0);
-    my $filename = _create_tempfile( $dir, "shared" );
-    push @TMPFILE, "$dir/$filename";
-    _write_lock_data("$dir/$filename");
+    $TMPFILE{ $filename } = _pid();
     while (_oldest_file($dir) =~ /_excl_/) {
+	unlink $filename;
+	delete $TMPFILE{$filename};
         $P && print STDERR "$P $filename not the oldest file...\n";
         if (defined($timeout) && Time::HiRes::time > $expire) {
-            $errstr = "timeout waiting for shared lock for '$dir'";
+            $errstr = "timeout waiting for exclusive lock for '$dir'";
             $P && print STDERR "$P timeout waiting for lock\n";
-            unlink "$dir/$filename";
             return;
         }
-
-        Time::HiRes::sleep 0.00001 + 2 * rand() * $PAUSE_LENGTH;
-
+        Time::HiRes::sleep $PAUSE_LENGTH * (1 + 2 * rand());
         if (Time::HiRes::time > $last_check + $HEARTBEAT_CHECK) {
             $P && print STDERR "$P check heartbeat of lock holder\n";
-            _ping_oldest_file($dir,"excl");
+            _ping_oldest_file($dir);
             $last_check = Time::HiRes::time;
         }
+	($filename,$now) = _create_tempfile( $dir, "shared" );
+	$TMPFILE{ $filename } = _pid();
     }
     $P && print STDERR "$P lock successful to $filename\n";
     $LOCK{$dir}{_pid()} = $filename;
-    1;
-}
-
-sub _refresh_dir {
-    # https://stackoverflow.com/a/30630912
-    # "Within a given process, calling opendir and closedir on the
-    #  parent directory of a file invalidates the NFS cache."
-    my $dir = shift;
-    my $dh;
-    opendir $dh, $dir;
-    closedir $dh;
-    return;
-}
-
-sub _validate_dir {
-    my $dir = shift;
-    if (! -d $dir) {
-        $errstr = "lock dir '$dir' is not a directory";
-        carp "Dir::Flock::lock: $errstr";
-        return;
-    }
-    if (! -r $dir && -w $dir && -x $dir) {
-        $errstr = "lock dir '$dir' is not an accessible directory";
-        carp "Dir::Flock::lock: $errstr";
-        return;
-    }
-    _refresh_dir($dir);
     1;
 }
 
@@ -181,23 +141,25 @@ sub unlock {
         carp "Dir::Flock::unlock: $errstr";
         return;
     }
-    $_DEBUG && print STDERR _pid()," unlocking $dir/$filename\n";
-    if (! -f "$dir/$filename") {
+    $_DEBUG && print STDERR _pid()," unlocking $filename\n";
+    if (! -f $filename) {
         return if __inGD();
-        $errstr = "lock file '$dir/$filename' is missing";
+        $errstr = "lock file '$filename' is missing";
         carp "Dir::Flock::unlock: lock file is missing ",
             %{$LOCK{$dir}};
         return;
     }
-    my $z = unlink("$dir/$filename");
-    if (! $z) {
-        return if __inGD();
-        $errstr = "unlink called failed on file '$dir/$filename'";
-        carp "Dir::Flock::unlock: failed to unlink lock file ",
-            "'$dir/$filename'";
-        return;   # this could be bad
+    my $z = unlink($filename);
+    if ($z) {
+	$_DEBUG && print STDERR _pid()," deleted $filename\n";
+	delete $TMPFILE{$filename};
+	return $z;
     }
-    $z;
+    return if __inGD();
+    $errstr = "unlink called failed on file '$filename'";
+    carp "Dir::Flock::unlock: failed to unlink lock file ",
+	"'$filename'";
+    return;   # this could be bad
 }
 
 ### scope semantics
@@ -208,17 +170,17 @@ sub lockobj_ex {
     my ($dir, $timeout) = @_;
     my $ok = lock_ex($dir,$timeout);
     return if !$ok;
-    return bless \$dir, 'Dir::Flock::SyncObject';
+    return bless \$dir, 'Dir::Flock::SyncObject2';
 }
 
 sub lockobj_sh {
     my ($dir, $timeout) = @_;
     my $ok = lock_sh($dir,$timeout);
     return if !$ok;
-    return bless \$dir, 'Dir::Flock::SyncObject';
+    return bless \$dir, 'Dir::Flock::SyncObject2';
 }
 
-sub Dir::Flock::SyncObject::DESTROY {
+sub Dir::Flock::SyncObject2::DESTROY {
     my $self = shift;
     my $dir = $$self;
     my $ok = unlock($dir);
@@ -275,61 +237,54 @@ sub sync_sh (&$;$) {
 
 ### utilities
 
-sub _pid {
-    my $host = $ENV{HOSTNAME} || "localhost";
-    join("_", $host, $$, $INC{"threads.pm"} ? threads->tid : ());
+sub _host {
+    $ENV{HOSTNAME} || ($^O eq 'MSWin32' && $ENV{COMPUTERNAME})
+	|| "localhost";
 }
 
-sub _create_token {
-    my ($n) = @_;
-    my @bag = ('a'..'z', '0'..'9');
-    my $token = join("", map { $bag[rand(@bag)] } 0..$n);
-    $_DEBUG && print STDERR _pid()," created token: $token\n";
-    $token;
+sub _pid {
+    my $host = _host();
+    join("_", $host, $$, $INC{"threads.pm"} ? threads->tid : ());
 }
 
 sub _create_tempfile {
     my ($dir,$type) = @_;
     $type ||= "excl";
-    my $file = $LOCKFILE_STUB . "_${type}_"
-        . _pid() . _create_token($TEMPFILE_XLENGTH);
-    return $file;
+    my $now = Time::HiRes::time;
+    my $file = sprintf "$dir/%s_%s_%s_%s", $LOCKFILE_STUB,
+	$now, $type, _pid();
+    open my $fh, ">>", $file;
+    return ($file,$now);
 }
 
 sub _oldest_file {
     my ($dir, $excl) = @_;
     my $dh;
     _refresh_dir($dir);  # is this necessary? is this sufficient?
-    opendir $dh, $dir;
-    my @f1 = grep /^${LOCKFILE_STUB}_/, readdir $dh;
-    closedir $dh;
+    my @f1 = sort glob("$dir/$LOCKFILE_STUB*");
     if ($excl) {
         @f1 = grep /_excl_/, @f1;
     }
-    my @f = map {
-        my @s = Time::HiRes::stat("$dir/$_");
-        [ $_, $s[9] ]
-    } @f1;
-
-    # the defined() check is necessary in case file disappears between
-    # the time it is readdir'd and the time it is stat'd.
-    my @F = sort { $a->[1] <=> $b->[1] || $a->[0] cmp $b->[0] }
-            grep(defined $_->[1], @f);
-    $_DEBUG && print STDERR _pid()," Files:", Dumper(\@F),"\n";
-    @F && $F[0][0];
+    @f1 > 0 && $f1[0];
 }
 
 sub _ping_oldest_file {
     my ($dir,$excl) = @_;
     my $file = _oldest_file($dir,$excl);
     return unless $file;
-    open my $fh, "<", "$dir/$file" or return;
-    my @data = <$fh>;
-    close $fh;
-    my $status;
-    my ($host,$pid,$tid) = split /_/, $data[0];
+    my $file0 = $file;
+    $file0 =~ s/.*$LOCKFILE_STUB.//;
+    my ($time, $type, $host, $pid, $tid) = split /_/, $file0;
+    $pid =~ s/\D+$//;
     $_DEBUG && print STDERR _pid(), ": ping  host=$host pid=$pid tid=$tid\n";
-    if ($host eq ($ENV{HOSTNAME} || 'localhost') || $host eq 'localhost') {
+    $_DEBUG && print STDERR "$dir holds:\n", join(" ",glob("$dir/*")),"\n";
+    my $status;
+
+
+    # TODO: what if $tid is defined? How do you signal a thread
+    # and how do you signal or terminate a remote thread?
+    
+    if ($host eq _host() || $host eq 'localhost') {
         # TODO: more robust way to inspect process on local machine.
         #     kill 'ZERO',...  can mislead for a number of reasons, such as
         #     if the process is owned by a different user.
@@ -343,18 +298,36 @@ sub _ping_oldest_file {
                              " remote kill ZERO => $host:$pid: $status\n";
     }
     if (! $status) {
-        warn "Dir::Flock: lock holder that created $dir/$file appears dead\n";
-        unlink("$dir/$file");
+        warn "Dir::Flock: lock holder that created $file appears dead\n";
+        unlink $file;
     }
 }
 
-sub _write_lock_data {
-    my ($filename) = @_;
-    my $now = Time::HiRes::time;
-    open my $fh, ">", $filename;
-    print $fh _pid(), "\n",
-              $now, "\n";
-    close $fh;
+sub _refresh_dir {
+    # https://stackoverflow.com/a/30630912
+    # "Within a given process, calling opendir and closedir on the
+    #  parent directory of a file invalidates the NFS cache."
+    my $dir = shift;
+    my $dh;
+    opendir $dh, $dir;
+    closedir $dh;
+    return;
+}
+
+sub _validate_dir {
+    my $dir = shift;
+    if (! -d $dir) {
+        $errstr = "lock dir '$dir' is not a directory";
+        carp "Dir::Flock::lock: $errstr";
+        return;
+    }
+    if (! -r $dir && -w $dir && -x $dir) {
+        $errstr = "lock dir '$dir' is not an accessible directory";
+        carp "Dir::Flock::lock: $errstr";
+        return;
+    }
+    _refresh_dir($dir);
+    1;
 }
 
 BEGIN {
@@ -367,12 +340,11 @@ BEGIN {
 }
 
 END {
+    my $p = _pid();
     no warnings 'redefine';
     *DB::DB = sub {};
     *__inGD = sub () { 1 };
-    if (@TMPFILE) {
-        unlink @TMPFILE;
-    }
+    unlink grep{ $TMPFILE{$_} eq $p } keys %TMPFILE;
 }
 
 1;
@@ -385,7 +357,7 @@ Dir::Flock - advisory locking of a dedicated directory
 
 =head1 VERSION
 
-0.04
+0.08
 
 
 
@@ -496,28 +468,6 @@ directory.
     Dir::Flock::sync {
        ... synchronized code ...
     } "/some/path";
-
-=head2 System requirements
-
-The locking algorithm requires a version of L<Time::HiRes>
-with the C<stat> function (namely v1.92 or better, though
-later versions seem to have some fixes related to the C<stat>
-function). It also requires that the operating system have
-support for subsecond file timestamps (look for a positive
-return value from C<&Time::HiRes::d_hires_stat>) and
-filesystem support.
-
-Version 0.03 of C<Dir::Flock> includes the L<Dir::Flock::Mock>
-package, which implements the C<Dir::Flock> API of advisory
-directory locking in terms of the builtin C<flock>. C<Dir::Flock>
-will load and use C<Dir::Flock::Mock> on MSWin32 systems and
-when it is detected that the operating system does not support
-subseceond file timestamps. The user may also call
-
-    require Dir::Flock::Mock
-
-in any other context where the requirements to use C<Dir::Flock>
-may not be met.
 
 
 =head1 FUNCTIONS
@@ -675,6 +625,11 @@ Analogue of L<"sync_ex"> but executes the code block while
 there is an advisory shared lock on the given directory.
 
 
+=head1 DEPENDENCIES
+
+C<Dir::Flock> requires L<Time::HiRes> where the C<Time::HiRes::time>
+function has subsection resolution.
+
 
 =head1 EXPORTS
 
@@ -739,13 +694,15 @@ You can also look for information at:
 
 =over 4
 
-=item * RT: CPAN's request tracker (report bugs here)
-
-L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Dir-Flock>
-
 =item * CPAN Ratings
 
 L<http://cpanratings.perl.org/d/Dir-Flock>
+
+=item * E<lt>mob@cpan.orgE<gt>
+
+With the decommissioning of http://rt.cpan.org/, 
+please send bug reports and feature requests
+directly to the author's email address.
 
 =back
 
@@ -761,7 +718,7 @@ Marty O'Brien, E<lt>mob@cpan.orgE<gt>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (c) 2019, Marty O'Brien
+Copyright (c) 2019-2020, Marty O'Brien
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.8.8 or,
@@ -775,16 +732,6 @@ See http://dev.perl.org/licenses/ for more information.
 
 =begin TODO
 
-Enhancements to the lock file
-
-    e.g., lock file specification is:
-        1024 char header with host, process, thread, start time information
-        additional lines with timestamps of when the process was verified
-            to be alive
-    then to check a process that holds the lock, you seek to 1024 in the
-        lock file, read a line, and see if the process needs to be checked
-        again
-
 Heartbeat
 
     a running process should be able to update the timestamp of
@@ -792,5 +739,13 @@ Heartbeat
     in the file data themselves) to let other processes (on the
     same and other hosts) know that the locking process is still
     alive. Can you do that without releasing the lock?
+
+    Include heartbeat data in the file names?
+
+Threads
+
+    In  _ping_oldest_file , how to detect whether a thread is
+    still alive? How to detect whether a thread on a remote
+    machine is still alive?
 
 =end TODO

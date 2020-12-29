@@ -34,7 +34,7 @@ sub make_dag {  # See t/121-dag-single-goal.t for the explanation of this
     use Data::Hopen;
     use parent 'Data::Hopen::G::Link';
     sub _run {
-        my ($self, %args) = getparameters('self', [qw(; phase visitor)], @_);
+        my ($self, %args) = getparameters('self', [qw(; visitor)], @_);
         return { xyzzy => 'plugh' };
     }
 }
@@ -46,7 +46,7 @@ sub make_dag {  # See t/121-dag-single-goal.t for the explanation of this
     use Class::Tiny {to_add => sub { +{ xyzzy => 'plugh' } } };
 
     sub _run {
-        my ($self, %args) = getparameters('self', [qw(; phase visitor)], @_);
+        my ($self, %args) = getparameters('self', [qw(; visitor)], @_);
         my $inputs = $self->scope->as_hashref(-levels => 3);
         return +{ %$inputs, %{$self->to_add} };
     }
@@ -57,7 +57,7 @@ sub make_dag {  # See t/121-dag-single-goal.t for the explanation of this
     use Data::Hopen;
     use parent 'Data::Hopen::G::Link';
     sub _run {
-        my ($self, %args) = getparameters('self', [qw(; phase visitor)], @_);
+        my ($self, %args) = getparameters('self', [qw(; visitor)], @_);
         my $inputs = $self->scope->as_hashref;
         my $multiplier = $inputs->{multiplier} // 2;
         $inputs->{foo} *= $multiplier if exists $inputs->{foo};

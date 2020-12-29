@@ -1,3 +1,9 @@
+0.29 2020-12-24
+* Allow options in new, create_json, and create_json_strict
+* Add "set" to set most of the options
+* Add sorting of indented output by key
+* Add user-defined sort
+
 0.28 2020-11-24
 * Test context-dependent variables & use numerical part only if valid.
 

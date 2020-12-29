@@ -21,16 +21,16 @@ name: DBD-Unify
 provides: 
   DBD::Unify: 
     file: lib/DBD/Unify.pm
-    version: '0.90'
+    version: '0.91'
   DBD::Unify::GetInfo: 
     file: lib/DBD/Unify/GetInfo.pm
-    version: '0.90'
+    version: '0.91'
   DBD::Unify::TypeInfo: 
     file: lib/DBD/Unify/TypeInfo.pm
-    version: '0.90'
+    version: '0.91'
 recommends: 
   DBI: '1.643'
-  Test::More: '1.302171'
+  Test::More: '1.302183'
   perl: '5.030001'
 requires: 
   Carp: 0
@@ -40,6 +40,7 @@ requires:
   Test::More: '0.90'
   perl: '5.008006'
 resources: 
+  bugtracker: https://github.com/perl5-dbi/DBD-Unify/issues
   license: http://dev.perl.org/licenses/
   repository: https://github.com/perl5-dbi/DBD-Unify
-version: '0.90'
+version: '0.91'

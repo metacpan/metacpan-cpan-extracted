@@ -3,7 +3,7 @@ NAME
     ported from (or inspired by) Ruby libraries
 
 VERSION
-    This document describes version 0.002 of
+    This document describes version 0.003 of
     Acme::CPANModules::PortedFrom::Ruby (from Perl distribution
     Acme-CPANModules-PortedFrom-Ruby), released on 2020-10-16.
 
@@ -14,6 +14,8 @@ MODULES INCLUDED IN THIS ACME::CPANMODULE MODULE
     *   App::Sass
 
     *   Scientist
+
+    *   HTTP::Server::Brick
 
 FAQ
   What are ways to use this module?

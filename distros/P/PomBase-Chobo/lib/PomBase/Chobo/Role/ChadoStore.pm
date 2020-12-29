@@ -35,7 +35,7 @@ under the same terms as Perl itself.
 
 =cut
 
-our $VERSION = '0.029'; # VERSION
+our $VERSION = '0.032'; # VERSION
 
 use Mouse::Role;
 use Text::CSV::Encoded;
@@ -153,7 +153,6 @@ my %row_makers = (
         if (!defined $accession) {
           die "accession is null for accession in db: $db_name\n";
         }
-        $accession =~ s|\\(.)|$1|g;
         [$db_id, $accession];
       } @ont_db_termids;
     } $ontology_data->get_db_names();
@@ -207,6 +206,34 @@ my %row_makers = (
       [$name, $definition, $cv_id, $dbxref_id, $is_relationshiptype, $is_obsolete];
     } $ontology_data->get_terms();
   },
+  cvtermprop => sub {
+    my $ontology_data = shift;
+    my $chado_data = shift;
+
+    my $prop_type_cv =
+      $chado_data->get_cv_by_name('cvterm_property_type');
+
+    if (!defined $prop_type_cv) {
+      die qq|no "cvterm_property_type" CV in database\n|;
+    }
+
+    my %prop_types =
+      %{$chado_data->get_cvterms_by_cv_id($prop_type_cv->{cv_id})};
+
+    map {
+      my $term = $_;
+
+      my $replaced_by = $term->replaced_by();
+
+      if (defined $replaced_by) {
+        my $cvterm_id =
+          $chado_data->get_cvterm_by_termid($term->id())->cvterm_id();
+        [$cvterm_id, $prop_types{replaced_by}->cvterm_id(), $replaced_by];
+      } else {
+        ()
+      }
+    } $ontology_data->get_terms();
+  },
   cvtermsynonym => sub {
     my $ontology_data = shift;
     my $chado_data = shift;
@@ -252,7 +279,7 @@ my %row_makers = (
         my $dbxref_details = $chado_data->get_dbxref_by_termid($id);
 
         if (!defined $dbxref_details) {
-          die "no dbxref details for $id";
+          die "no dbxref details for $id ", $term->name(), "\n";
         }
 
         my $dbxref_id = $dbxref_details->{dbxref_id};
@@ -348,6 +375,7 @@ my %table_column_names = (
   dbxref => [qw(db_id accession)],
   cv => [qw(name)],
   cvterm => [qw(name definition cv_id dbxref_id is_relationshiptype is_obsolete)],
+  cvtermprop => [qw(cvterm_id type_id value)],
   cvtermsynonym => [qw(cvterm_id synonym type_id)],
   cvterm_dbxref => [qw(cvterm_id dbxref_id is_for_definition)],
   cvterm_relationship => [qw(subject_id type_id object_id)],
@@ -363,7 +391,7 @@ sub chado_store
   my @cvterm_column_names =
     @PomBase::Chobo::ChadoData::cvterm_column_names;
 
-  my @tables_to_store = qw(db dbxref cv cvterm cvtermsynonym cvterm_dbxref cvterm_relationship cvprop);
+  my @tables_to_store = qw(db dbxref cv cvterm cvtermprop cvtermsynonym cvterm_dbxref cvterm_relationship cvprop);
 
   for my $table_to_store (@tables_to_store) {
     my $chado_data = PomBase::Chobo::ChadoData->new(dbh => $self->dbh());

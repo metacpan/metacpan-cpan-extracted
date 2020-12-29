@@ -1,11 +1,89 @@
 Revision history for Pod-Elemental-Transformer-Splint
 
-0.1201 2016-02-03T10:27:59Z UTC
- [Documentation]
- - Remove empty section.
+0.1202 2020-12-26 17:05:06 UTC
+ [Requirements]
+ - Added missing req Pod::Elemental::Transformer
 
+ [Other Changes]
+ - Explicitly set $VERSION
+ - Replace TravisCI with Github Actions
+
+ [Stats & Dependency Changes]
+ - 8 files changed, 62 insertions(+), 6 deletions(-)
+ - (run req) + Pod::Elemental::Transformer 0.103004
+ - (run req) ~ List::MoreUtils (any) --> 0.408
+ - (run req) ~ List::Util (any) --> 1.45
+ - (run req) ~ Module::Load (any) --> 0.26
+ - (run req) ~ Path::Tiny (any) --> 0.072
+ - (run req) ~ Safe::Isa (any) --> 1.000005
+ - (run req) ~ Try::Tiny (any) --> 0.24
+ - (run req) ~ Types::Standard (any) --> 1.000006
+ - (run req) ~ namespace::autoclean (any) --> 0.22
+ - (dev req) + Badge::Depot 0.0103
+ - (dev req) + Badge::Depot::Plugin::Coverage (any)
+ - (dev req) + Badge::Depot::Plugin::Cpantesters (any)
+ - (dev req) + Badge::Depot::Plugin::Kwalitee (any)
+ - (dev req) + Badge::Depot::Plugin::Perl (any)
+ - (dev req) + Dist::Zilla 6.015
+ - (dev req) +
+   Dist::Zilla::Plugin::Author::CSSON::GithubActions::Workflow::TestWithMakefile
+   0.0106
+ - (dev req) + Dist::Zilla::Plugin::Authority 1.009
+ - (dev req) + Dist::Zilla::Plugin::BumpVersionAfterRelease::Transitional
+   0.009
+ - (dev req) + Dist::Zilla::Plugin::ChangeStats::Dependencies::Git 0.0200
+ - (dev req) + Dist::Zilla::Plugin::Git 2.046
+ - (dev req) + Dist::Zilla::Plugin::Git::CheckFor::CorrectBranch 0.014
+ - (dev req) + Dist::Zilla::Plugin::Git::Commit (any)
+ - (dev req) + Dist::Zilla::Plugin::MetaConfig (any)
+ - (dev req) + Dist::Zilla::Plugin::NextRelease::Grouped 0.0200
+ - (dev req) + Dist::Zilla::Plugin::PromptIfStale 0.057
+ - (dev req) + Dist::Zilla::Plugin::RewriteVersion::Transitional 0.007
+ - (dev req) + Pod::Weaver::Section::GenerateSection 1.01
+ - (dev req) + Test::EOF (any)
+ - (dev req) + Test::Version 1
+ - (dev req) ~ Dist::Zilla::Plugin::CheckChangesHasContent (any) --> 0.011
+ - (dev req) ~ Dist::Zilla::Plugin::Clean (any) --> 0.07
+ - (dev req) ~ Dist::Zilla::Plugin::CopyFilesFromBuild (any) --> 0.170880
+ - (dev req) ~ Dist::Zilla::Plugin::Git::Contributors (any) --> 0.035
+ - (dev req) ~ Dist::Zilla::Plugin::GithubMeta (any) --> 0.54
+ - (dev req) ~ Dist::Zilla::Plugin::InstallRelease (any) --> 0.008
+ - (dev req) ~ Dist::Zilla::Plugin::MetaProvides::Package (any) -->
+   2.004003
+ - (dev req) ~ Dist::Zilla::Plugin::PodWeaver (any) --> 4.006
+ - (dev req) ~ Dist::Zilla::Plugin::ReadmeAnyFromPod (any) --> 0.163250
+ - (dev req) ~ Dist::Zilla::Plugin::RunExtraTests (any) --> 0.029
+ - (dev req) ~ Dist::Zilla::Plugin::Test::Compile (any) --> 2.058
+ - (dev req) ~ Dist::Zilla::Plugin::Test::EOF (any) --> 0.0501
+ - (dev req) ~ Dist::Zilla::Plugin::Test::EOL (any) --> 0.18
+ - (dev req) ~ Dist::Zilla::Plugin::Test::NoTabs (any) --> 0.15
+ - (dev req) ~ Dist::Zilla::Plugin::Test::ReportPrereqs (any) --> 0.027
+ - (dev req) ~ Dist::Zilla::Plugin::Test::Version (any) --> 1.09
+ - (dev req) ~ Pod::Weaver::Section::Badges (any) --> 0.0401
+ - (dev req) ~ Test::NoTabs (any) --> 1.4
+ - (dev req) ~ Test::Warnings (any) --> 0.026
+ - (dev req) - Dist::Iller::Config::Author::CSSON
+ - (dev req) - Dist::Zilla::Plugin::MetaProvides::Class
+ - (dev req) - Dist::Zilla::Plugin::NextRelease
+ - (dev req) - Dist::Zilla::Plugin::NextVersion::Semantic
+ - (dev req) - Dist::Zilla::Plugin::OurPkgVersion
+ - (dev req) - Dist::Zilla::Plugin::PodnameFromClassname
+ - (dev req) - Dist::Zilla::Plugin::Prereqs::Plugins
+ - (dev req) - Dist::Zilla::Plugin::PreviousVersion::Changelog
+ - (dev req) - Dist::Zilla::Plugin::ReversionOnRelease
+ - (dev req) - Dist::Zilla::Plugin::Test::Kwalitee::Extra
+ - (dev req) - Dist::Zilla::Plugin::TravisYML
+ - (dev req) - Pod::Weaver::Section::Homepage::DefaultCPAN
+ - (dev req) - Pod::Weaver::Section::Source::DefaultGitHub
+ - (dev sug) + Dist::Iller 0.1409
+ - (dev sug) + Dist::Iller::Config::Author::CSSON 0.0327
+
+0.1201 2016-02-03T10:27:59Z UTC
  [Requirements]
  - Require List::Util+List::MoreUtils instead of List::AllUtils.
+
+ [Documentation]
+ - Remove empty section.
 
 0.1200 2016-02-02T21:11:41Z UTC
  [Requirements]
@@ -19,26 +97,30 @@ Revision history for Pod-Elemental-Transformer-Splint
    attribute_renderer.
  - Breaking change: html_method_renderer is replaced by method_renderer.
 
- [Documentation]
- - Document weaver.ini configuration options.
-
  [New Features]
  - The new render settings in weaver.ini makes it possible to render to
    many formats.
-
- [Other Changes]
- - ::HtmlRenderer: Minor improvements to rendered html.
 
  [Requirements]
  - New prereq: Module::Load
  - New prereq: Types::Standard
  - New prereq: Ref::Util
 
+ [Other Changes]
+ - ::HtmlRenderer: Minor improvements to rendered html.
+
+ [Documentation]
+ - Document weaver.ini configuration options.
+
 0.1003 2016-01-11T21:39:31Z UTC
  [Other Changes]
  - Converted to use latest Dist::Iller::Config::Author::CSSON
 
 0.1002 2015-01-18T00:37:18Z CET
+ [New Features]
+ - (Undocumented feature: ':splint methods' will try to render metadata on
+   all methods.)
+
  [Enhancements]
  - Improved the order that attributes are rendered.
  - Improve output for method parameters that are hash or array refs, and
@@ -49,26 +131,21 @@ Revision history for Pod-Elemental-Transformer-Splint
  - MethodRenderer/HtmlDefault: Use (mildly) different colours in the three
    headings
 
- [New Features]
- - (Undocumented feature: ':splint methods' will try to render metadata on
-   all methods.)
-
  [Requirements]
  - Added new requirements List::UtilsBy and Try::Tiny.
  - Bump required version of Syntax-Feature-Qs to 0.2003.
 
 0.1001 2015-01-14T03:06:07Z CET
- [Documentation]
- - Fixed Moops class example.
-
- [Enhancements]
- - Uses 'pseudo colspan'. Metacpan seem to remove colspan attributes.
-
  [Meta]
  - Fixed test prereqs.
  - Fixed no-op test to actually test.
  - Setup build on travis.
 
+ [Enhancements]
+ - Uses 'pseudo colspan'. Metacpan seem to remove colspan attributes.
+
+ [Documentation]
+ - Fixed Moops class example.
+
 0.1000 2015-01-14T00:58:31Z CET
  - Initial release
-

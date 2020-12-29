@@ -167,4 +167,24 @@ my $c2 = $p->load_config($tmp->subdir(qw(other_project)));
     is_deeply(\@lines, \@core_commands, 'default list of core commands is sorted');
 }
 
+{ # report global
+    @ARGV = ('report');
+    my $class = $p->setup_class( $c1, 'report' );
+    my $t = $class->name->new( home => $home, config => $c1 );
+    trap { $t->cmd_report };
+    like ($trap->stdout, qr/total\s+00:45:00/, 'report global');
+};
+
+{ # report filter project
+    @ARGV = ('report');
+    my $class = $p->setup_class( $c1, 'report' );
+    my $t = $class->name->new(
+        home             => $home,
+        config           => $c1,
+        fprojects =>  ['some_project']
+    );
+    trap { $t->cmd_report };
+    like ($trap->stdout, qr/total\s+00:30:00/, 'report filter project');
+}
+
 done_testing();

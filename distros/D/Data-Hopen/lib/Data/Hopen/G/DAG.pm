@@ -3,7 +3,7 @@ package Data::Hopen::G::DAG;
 use strict;
 use Data::Hopen::Base;
 
-our $VERSION = '0.000018';
+our $VERSION = '0.000019';
 
 use parent 'Data::Hopen::G::Op';
 use Class::Tiny {
@@ -142,7 +142,7 @@ the order those predecessors were added to the graph.
 
 # The implementation of run().  $self->scope has already been linked to the context.
 sub _run {
-    my ($self, %args) = getparameters('self', [qw(; phase visitor)], @_);
+    my ($self, %args) = getparameters('self', [qw(; visitor)], @_);
     my $retval = {};
 
     # --- Get the initialization ops ---
@@ -269,7 +269,6 @@ sub _run {
 
                 $hrLinkOutputs = $link->run(
                     -context=>$scLinkInputs,
-                    forward_opts(\%args, {'-'=>1}, 'phase')
                     # visitor not passed to links.
                 );
                 $scLinkInputs = make_link_inputs($hrLinkOutputs);
@@ -281,7 +280,7 @@ sub _run {
         } #foreach predecessor node
 
         my $step_output = $node->run(-context=>$node_inputs,
-            forward_opts(\%args, {'-'=>1}, 'phase', 'visitor')
+            forward_opts(\%args, {'-'=>1}, 'visitor')
         );
         $node->outputs($step_output);
 

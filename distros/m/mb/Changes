@@ -1,5 +1,10 @@
 Revision history for this software.
 
+0.15  2020-12-27 00:00:00
+  - supports codepoint range of codepoint class of regular expression by hyphen
+  - supports new octal syntax 0oddddd
+  - created by INABA Hitoshi
+
 0.14  2020-12-13 00:00:00
   - supports WTF-8
   - created by INABA Hitoshi

@@ -5,7 +5,7 @@ Changes
 CONTRIBUTING
 Makefile.PL
 MANIFEST
-README
+README.md
 tools/1_pc.pl
 tools/2_t-tests.pl
 tools/3_examples.pl

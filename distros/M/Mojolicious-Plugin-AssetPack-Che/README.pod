@@ -3,14 +3,15 @@ use Mojo::Base 'Mojolicious::Plugin::AssetPack';
 use Mojolicious::Plugin::AssetPack::Util qw( DEBUG diag checksum );#
 use Mojo::URL;
 
-has [qw(app config)];
+has [qw(config app)] => undef,  weak=>1;
 has revision => sub { my $app = shift->app; $app->config('revision') // $app->config('version') // $app->config('версия') // ''; };
 
 sub register {
   my ($self, $app, $config) = @_;
   $self->config($config);
   $self->app($app);
-  Scalar::Util::weaken($self->{app});
+  #~ Scalar::Util::weaken($self->{app});
+  Mojo::File->new($app->home->rel_file('assets'), 'cache')->remove_tree({keep_root => 1});
   $self->SUPER::register($app, $config);
   
   # Patch the asset route
@@ -100,11 +101,11 @@ Since version 1.28.
 
 =head1 VERSION
 
-Version 2.102 (test on base Mojolicious::Plugin::AssetPack v2.10)
+Version 2.104 (test on base Mojolicious::Plugin::AssetPack v2.10)
 
 =cut
 
-our $VERSION = '2.102';
+our $VERSION = '2.104';
 
 
 =head1 SYNOPSIS

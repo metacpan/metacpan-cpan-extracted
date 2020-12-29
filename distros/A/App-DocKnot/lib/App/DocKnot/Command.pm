@@ -10,7 +10,7 @@
 # Modules and declarations
 ##############################################################################
 
-package App::DocKnot::Command 3.05;
+package App::DocKnot::Command 4.00;
 
 use 5.024;
 use autodie;
@@ -18,6 +18,7 @@ use warnings;
 
 use App::DocKnot::Dist;
 use App::DocKnot::Generate;
+use App::DocKnot::Update;
 use Getopt::Long;
 
 # Defines the subcommands, their options, and the module and method that
@@ -74,6 +75,12 @@ our %COMMANDS = (
         options => ['metadata|m=s', 'width|w=i'],
         maximum => 0,
     },
+    update => {
+        method  => 'update',
+        module  => 'App::DocKnot::Update',
+        options => ['metadata|m=s', 'output|o=s'],
+        maximum => 0,
+    },
 );
 
 ##############################################################################
@@ -82,7 +89,6 @@ our %COMMANDS = (
 
 # Parse command-line options and do any required error handling.
 #
-# $self        - The App::DocKnot::Command object
 # $command     - The command being run or undef for top-level options
 # $options_ref - A reference to the options specification
 # @args        - The arguments to the command
@@ -123,7 +129,6 @@ sub _parse_options {
 
 # Parse command-line options for a given command.
 #
-# $self    - The App::DocKnot::Command object
 # $command - The command being run
 # @args    - The arguments to the command
 #
@@ -143,8 +148,6 @@ sub _parse_command {
 
 # Create a new App::DocKnot::Command object.
 #
-# $class - Class of object to create
-#
 # Returns: Newly created object
 sub new {
     my ($class) = @_;
@@ -156,7 +159,6 @@ sub new {
 # Parse command-line options to determine which command to run, and then
 # dispatch that command.
 #
-# $self - The App::DocKnot::Command object
 # @args - Command-line arguments (optional, default: @ARGV)
 #
 # Returns: undef
@@ -206,13 +208,9 @@ sub run {
 
     # Dispatch the command and turn exceptions into error messages.
     eval {
-        if ($COMMANDS{$command}{code}) {
-            $COMMANDS{$command}{code}->($opts_ref, $args_ref->@*);
-        } else {
-            my $object = $COMMANDS{$command}{module}->new($opts_ref);
-            my $method = $COMMANDS{$command}{method};
-            $object->$method($args_ref->@*);
-        }
+        my $object = $COMMANDS{$command}{module}->new($opts_ref);
+        my $method = $COMMANDS{$command}{method};
+        $object->$method($args_ref->@*);
     };
     if ($@) {
         my $error = $@;
@@ -285,7 +283,7 @@ Russ Allbery <rra@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 2018-2019 Russ Allbery <rra@cpan.org>
+Copyright 2018-2020 Russ Allbery <rra@cpan.org>
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

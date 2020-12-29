@@ -1,3 +1,6 @@
+1.20 2020-12-24
+- use Tk::MatchEntry to autocomplete script target-finding
+
 1.19 2020-12-23
 - cruelly drop support for 5.005 because three-arg open
 - remove obsolete internal structure docs

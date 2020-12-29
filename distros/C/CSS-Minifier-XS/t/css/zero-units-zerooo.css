@@ -1,4 +1,6 @@
-/* "zeroooooo" can be expressed without a unit */
+/* "zeroooooo" can be expressed without a unit.
+ * BUT... "0000%" is preserved (as it may be needed for CSS animations)
+ */
 p.in  { width: 000in }
 p.cm  { width: 000cm }
 p.mm  { width: 000mm }

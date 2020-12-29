@@ -7,16 +7,9 @@ not good to spend a lot of time working on something that no one is interested
 in!
 
 You can contribute to the discussion by posting bug reports, feature requests, 
-observations, etc. to either the GitHub issues area, https://github.com/
+observations, etc. to the GitHub issues area, https://github.com/
 PhilterPaper/Perl-PDF-Builder/issues?q=is%3Aissue+sort%3Aupdated-desc (please 
-tag new threads accordingly ["Labels"]) or to the Forum on catskilltech.com, 
-https:://www.catskilltech.com/forum/index.html#c5 (please place a new topic in 
-the appropriate area ["board"]). We will cross-post from one to the other as 
-necessary. If you don't have an account on either system, and want to 
-occasionally post something, there is a Contact form on the Forum where you can 
-send in something for us to post. Please do not abuse this system -- if you are 
-regularly posting via the Contact form, please take a minute to register on 
-one or both systems. We do not use CPAN's "RT" bug tracking system.
+tag new threads accordingly, using ["Labels"]).
 
 Please also read INFO/RoadMap to get an idea of where we would like for 
 PDF::Builder to be heading, and may give you an idea of where you could
@@ -37,6 +30,12 @@ goes and what it does. If the volume of such work becomes excessive (i.e., a
 burden to us), we reserve the right to limit the ways that code changes can be 
 submitted. At this point, the volume is low enough that almost anything can be 
 handled.
+
+Do NOT under ANY circumstances open a PR (Pull Request) to report a bug. It is 
+a waste of both your and our time and effort. Open a regular ticket (issue), 
+and attach a Perl (.pl) program illustrating the problem, if possible. If you
+believe that you have a program patch, and offer to share it as a PR, we may
+give the go-ahead. Unsolicited PRs may be closed without further action.
 
 Please do not start on a massive project (especially, new function), without 
 discussing it with us first (via email or one of the discussion areas). This 

@@ -70,6 +70,7 @@ sub exercise_fifo {
     ok(!defined($g2), 'fifo: 2nd return value to get(2) call is empty');
 
     print STDERR "\n";
+    diag ">>> Expect 'put call after end call' warning";
     ok(0 == $q->put("blech"), 'fifo: put fails after end call');
 }
 
@@ -110,20 +111,21 @@ sub exercise_forks {
     my $t = Time::HiRes::time;
     until ($s->{end}) {
         sleep 1;
-        if (time - $t > 15) {
+        if (time - $t > 20) {
             diag "exercise_forks: ",
                 "Taking too long for queue to become availabile";
             $q->end;
         }
         $s = $q->status;
-        if (time - $t > 20) {
+        if (time - $t > 30) {
             die "Took too long for queue to become available";
         }
     }
+    my $proctime = Time::HiRes::time - $t;
     if ($^O !~ /freebsd/i) {
-        ok(Time::HiRes::time - $t < 10,
-           'forks: simultaneous queue access from 3 procs not too slow')
-            or diag Time::HiRes::time-$t,"s";
+        ok($proctime < 12.5,
+           "forks: simultaneous queue access from 3 procs not too slow "
+           . "($proctime s)");
     }
     ok($q->pending == 30, 'forks: 30 items on queue')
         or diag $q->pending;
@@ -200,6 +202,7 @@ sub exercise_lifo {
     ok(!defined($g2), 'lifo: 2nd return value to get(2) call is empty');
 
     print STDERR "\n";
+    diag ">>> Expect 'put call after end call' warning";
     ok(0 == $q->put("blech"), 'lifo: put fails after end call');
 
     local $SIG{ALRM} = sub { die "Timeout\n" };
@@ -242,12 +245,14 @@ sub exercise_limits {
         ok($q->put(44), 'limits_f: 4th job ok');
         ok($q->put(55), 'limits_f: 5th job ok');
         print STDERR "\n";
+        diag ">>> Expect 'buffer is full' warning";
         ok(!$q->put(66), 'limits_f: 6th job exceeded limit');
 
         ok(5 == $q->get(100) && $q->pending == 0,
            'limits_f: cleared the queue');
 
         ok(3 == $q->put(7,8,9), 'limits_f: put first 3 jobs ok');
+        diag ">>> Expect 'buffer is full' warning";
         ok(2 == $q->put(10,11,12,13), 'limits_f: put 2/4 jobs ok');
         ok(5 == $q->get(100) && $q->pending == 0,
            'limits: cleared the queue');
@@ -419,33 +424,43 @@ sub exercise_join {
         open RESULT, ">", "$file.result";
         print RESULT $sum;
         close RESULT;
+	my $lockdir = $qq->{_lockdir};
         $qq->end;
-        sleep 2;
+        sleep 10;
+        diag "Process $$ no longer using original queue in $file";
+	rmdir $lockdir if $lockdir;
         exit;
     }
     for (1..5) {
         last if -f $file;
+        diag "waiting on $file ($_)";
         sleep 1;
     }
     ok(-f $file, "join: queue file created in child");
     print STDERR "\n";
+
+    diag ">>> Expect 'file already exists' warning:";
     my $q = Forks::Queue->new(%opts, join => 0);
-    if ($q) {
-        ok($q, 'join: got queue');
+    if (ok($q, 'join: got queue')) {
         ok($q->pending == 0, 'join => 0   overwrites existing queue');
         unlink "$file.result";
+	if ($q->{_lockdir}) {
+	    rmdir $q->{_lockdir};
+	}
         undef $q;
       SKIP: {
           sleep 2;
           if ($^O eq 'MSWin32') {
-              skip "queue file deletion happens at program end for MSWin32",1;
+              skip "- queue file deletion happens at program end for MSWin32",1;
           }
+	  if ($^O eq 'cygwin') {
+	      skip "queue file deletion check on Cygwin";
+	  }
           ok(! -f $file, 'join: destruction of queue deletes queue file')
               or diag $!," $file ",-s $file;
         }
     } else {
-        ok(1, "join: Constructor for $opts{impl} queue failed; this is "
-           . "an acceptable result");
+        diag "join: Constructor for $opts{impl} queue failed";
     }
     waitpid $pid1,0;
 
@@ -459,13 +474,15 @@ sub exercise_join {
     my $pid2 = fork();
     if ($pid2 == 0) {
         my $qq = Forks::Queue->new(%opts, persist => 1);
+	diag "child $$ [persist=>1] created new queue";
         my $sum = 0;
         $qq->put( map { my $z=int(213*rand); $sum+=$z; [$_,$z] } 0..137 );
         open RESULT,">$file.result";
         print RESULT $sum;
         close RESULT;
         $qq->end;
-        sleep 2;
+        sleep 5;
+	diag "child $$ [persist=>1] exiting";
         exit;
     }
     for (1..5) {
@@ -489,9 +506,11 @@ sub exercise_join {
         or diag "got $sum expected $sumc\n";
     waitpid $pid2,0;
     ok(-f $file, "join: queue file $file exists while queue object exists");
+    my $lockdir = $q->{_lockdir};
     undef $q;
     ok(! -f $file, 'join: destruction of queue deletes queue file');
     unlink "$file.result";
+    rmdir $lockdir if $lockdir;
     return;
 }
 

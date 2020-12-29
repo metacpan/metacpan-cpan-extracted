@@ -1,7 +1,7 @@
 #
 #	Makefile.PL for Term::ReadLine::Gnu
 #
-#	$Id: Makefile.PL 563 2017-11-25 13:50:26Z hayashi $
+#	$Id: Makefile.PL 568 2020-04-23 13:25:35Z hayashi $
 #
 #	Copyright (c) 1996-2017 Hiroo Hayashi.  All rights reserved.
 #		<hiroo.hayashi@computer.org>
@@ -30,6 +30,13 @@ my $err = $ENV{AUTOMATED_TESTING} ? 0 : 1;
 # test /dev/tty for CPAN Testers
 if ($ENV{AUTOMATED_TESTING} && !open(SESAMI, '/dev/tty')) {
     warn "cannot open /dev/tty\n";
+    exit 0;
+}
+# test $TERM for CPAN Testers
+# https://rt.cpan.org/Ticket/Display.html?id=128806
+if ($ENV{AUTOMATED_TESTING} 
+    && (!exists($ENV{TERM}) || !defined($ENV{TERM}) || $ENV{TERM} =~ /^(dumb|emacs|unknown|)$/)) {
+    warn "wrong \$TERM value: $ENV{TERM}\n";
     exit 0;
 }
 # I could not reach a tester, "Chris Williams (BINGOS)".

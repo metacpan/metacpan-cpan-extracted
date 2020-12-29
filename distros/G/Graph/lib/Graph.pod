@@ -17,6 +17,7 @@ Graph - graph data structures and algorithms
 
         $g->add_edge(...);
         $g->has_edge(...)
+        $g->any_edge(...)
         $g->delete_edge(...);
 
         $g->add_vertex(...);
@@ -78,7 +79,7 @@ A boolean option telling that an undirected graph should be created.
 One could also use the C<new()> constructor the Graph::Undirected class
 instead.
 
-Note that while often it is possible to think undirected graphs as
+Note that while often it is possible to think of undirected graphs as
 bidirectional graphs, or as directed graphs with edges going both ways,
 in this module directed graphs and undirected graphs are two different
 things that often behave differently.
@@ -145,7 +146,7 @@ original.
 Also the following vertex/edge attributes are copied:
 
   refvertexed/countvertexed/multivertexed
-  hyperedged/countedged/multiedged/omniedged
+  hyperedged/countedged/multiedged
 
 B<NOTE>: You can get an even shallower copy of a graph by
 
@@ -291,6 +292,11 @@ By default idempotent, but a graph can be created I<countedged>.
 
 An edge is also known as an I<arc>.
 
+For a hypergraph, the interface is different: if undirected, give a list
+of one or more vertices. If directed, give a list of two array-refs of
+vertices. As conceptually these are sets, the ordering of the contents
+is not important.
+
 =item has_vertex
 
     $g->has_vertex($v)
@@ -302,6 +308,15 @@ Return true if the vertex exists in the graph, false otherwise.
     $g->has_edge($u, $v)
 
 Return true if the edge exists in the graph, false otherwise.
+
+=item any_edge
+
+    $g->any_edge($u, $v)
+
+Return true if any edge in the graph connects the first vertex to the second,
+false otherwise. Note this is a different question from C<has_edge>. It
+will give the same result as checking the first vertex's L</successors>
+to see if any match the second one, but in a more efficient way.
 
 =item delete_vertex
 
@@ -441,7 +456,7 @@ false otherwise.
 
    $g->delete_path($a, $b, $c, ..., $x, $y, $z)
 
-Delete all the edges edges $a-$b, $b-$c, ..., $x-$y, $y-$z
+Delete all the edges $a-$b, $b-$c, ..., $x-$y, $y-$z
 (regardless of whether they exist or not).  Returns the graph.
 
 =item add_cycle
@@ -467,7 +482,7 @@ L</find_a_cycle>.
 
    $g->delete_cycle($a, $b, $c, ..., $x, $y, $z)
 
-Delete all the edges edges $a-$b, $b-$c, ..., $x-$y, $y-$z, and $z-$a
+Delete all the edges $a-$b, $b-$c, ..., $x-$y, $y-$z, and $z-$a
 (regardless of whether they exist or not).  Returns the graph.
 
 =item has_a_cycle
@@ -614,6 +629,10 @@ even (0th, 2nd, 4th, ...) items are start vertices and the odd
 (1st, 3rd, 5th, ...) are the corresponding end vertices.
 Returns the graph.
 
+For a hypergraph, each item in this list must be an array-ref of arguments
+suitable for C<add_edge> - so for undirected, of vertices;
+for directed, of two array-refs of vertices.
+
 =item rename_vertex
 
     $g->rename_vertex('d', 'e')
@@ -706,7 +725,7 @@ Return true if the graph has any edges, false otherwise.
 
     $g->is_connected
 
-For an undirected graph, return true is the graph is connected, false
+For an undirected graph, return true if the graph is connected, false
 otherwise.  Being connected means that from every vertex it is possible
 to reach every other vertex.
 
@@ -1297,6 +1316,16 @@ values be the multivertex's ID, and the third level will be attributes
 as above.
 
 If C<multiedged> is true, similar will be true for the edges hash.
+
+For a hypergraph, the edges will instead be an array-ref of hashes with
+a key of C<attributes>, value a hash-ref (if C<multiedged>, two-level
+as above). Then with values of array-refs of vertex-names, for undirected:
+
+=over
+
+=item vertices
+
+=back
 
 =back
 
@@ -2002,10 +2031,10 @@ recomputing the potentially expensive operation, and this also gives
 additional determinism (once a correct result has been computed, the
 same result will always be given).
 
-However, sometimes the exact opposite is desireable, and the possible
+However, sometimes the exact opposite is desirable, and the possible
 alternative results are wanted (within the limits of the pseudorandomness:
 not all the possible solutions are guaranteed to be returned, usually only
-a subset is retuned).  To undo the caching, the following methods are
+a subset is returned).  To undo the caching, the following methods are
 available:
 
 =over 4
@@ -2715,33 +2744,6 @@ To test for hyperness of a graph use the
 
     $g->is_hyperedged
     $g->hyperedged
-
-=back
-
-To go with the concept of undirected in normal (non-hyper) graphs,
-there is a similar concept of omnidirected I<(this is my own coinage,
-"all-directions")> for hypergraphs, and you can naturally test for it by
-
-=over 4
-
-=item is_omnidirected
-
-=item omnidirected
-
-=item is_omniedged
-
-=item omniedged
-
-   $g->is_omniedged
-
-   $g->omniedged
-
-   $g->is_omnidirected
-
-   $g->omnidirected
-
-Return true if the graph is omnidirected (edges have no direction),
-false if not.
 
 =back
 

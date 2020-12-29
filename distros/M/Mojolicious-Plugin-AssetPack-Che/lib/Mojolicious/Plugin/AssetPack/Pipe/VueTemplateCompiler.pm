@@ -3,8 +3,8 @@ use Mojo::Base 'Mojolicious::Plugin::AssetPack::Pipe';
 use Mojolicious::Plugin::AssetPack::Util qw(diag $CWD DEBUG checksum);
 use Mojo::Util qw(url_unescape decode);
 
-#~ has config => sub { my $self = shift; my $config = $self->assetpack->config || $self->assetpack->config({}); $config->{HTML} ||= {} };
-#~ has minify_opts => sub { {remove_comments => 1, remove_newlines => 0, no_compress_comment => 1, html5 => 1, %{shift->config->{minify_opts} ||= {}}, } };# do_javascript => 'clean', do_stylesheet => 'minify' ,
+has config => sub { my $self = shift; my $config = $self->assetpack->config || $self->assetpack->config({}); $config->{VueTemplateCompiler} ||= {} };
+has enabled => sub { shift->config->{enabled} || 0 };
 #~ has parceljs => sub { [qw(parcel build --no-cache )] };#--out-file --out-dir
 has parceljs => "/tmp/node_modules/parcel-bundler/bin/cli.js"; #--out-file --out-dir
 #~ has compiler => sub { Mojo::File->new(__FILE__)->sibling('vue-template-compiler.js') };
@@ -36,7 +36,7 @@ sub process {
   
   
   
-  if ($self->assetpack->minify) {# production loads development
+  if ($self->assetpack->minify || !$self->enabled) {# production loads development
     #~ my $asset = $store->load($attrs)
     my $file = Mojo::File->new($self->app->static->paths->[0], $topic);
     splice @$assets, 0, scalar @$assets,
@@ -55,6 +55,7 @@ sub process {
 
       return
        if $asset->format ne 'html' || $asset->minified;
+      
       return
         unless $asset->name =~ /\.vue$/;
       
@@ -78,11 +79,16 @@ sub process {
     # заменить:
     # const ATTRS = {}, ATTRS000 = {
     # /tmp/node_modules/parcel-bundler/bin/cli.js build --no-cache ...
- 
-    #~ $self->_install_node_modules('vue-template-compiler', 'parcel-bundler@1')
-      #~ unless $self->{installed}++;
+  
+  #~ unless (-f $self->parceljs) {#~ unless $self->{installed}++;
+    #~ $self->_install_node_modules('vue-template-compiler', 'parcel-bundler@1');
+    #~ ### `sed -i '/const ATTRS = {/c const ATTRS = {}, ATTRS000 = {' /tmp/node_modules/parcel-bundler/src/assets/HTMLAsset.js`;
+    #~ system q|perl -pi.bak -e 's/const\s+ATTRS\s+=\\s+{\n/const ATTRS = {}, ATTRS000 = {\n/' /tmp/node_modules/parcel-bundler/src/assets/HTMLAsset.js|;
+  #~ }
+   
+    
     my $tmp_vue = $asset->path->copy_to(Mojo::File->new("/tmp/".$asset->name));#
-      $self->run([$self->parceljs, 'build', ' --no-cache', '--out-file', $tmp_vue->path.'.js', '--out-dir', '.', $tmp_vue->path,  ], undef, undef,);# \my $content
+      $self->run(['node', $self->parceljs, 'build', ' --no-cache', '--out-file', $tmp_vue->path.'.js', '--out-dir', '.', $tmp_vue->path,  ], undef, undef,);# \my $content
       my $js = Mojo::File->new($tmp_vue->path.'.js');
       #~ diag sprintf qq|"%s":function(){%s}|, $asset->url, $self->_parse_render_function($js->slurp);
       #~ my $content = sprintf qq|"%s":function(){%s}|, $url, $self->_parse_render_function($js->slurp);
@@ -169,11 +175,12 @@ Mojolicious::Plugin::AssetPack::Pipe::VueTemplateCompiler - if you like separate
 
   $app->plugin('AssetPack::Che' => {
           pipes => [qw(VueTemplateCompiler CombineFile)],
-          process => {
-            'js/dist/templates/app★.js?bla'=>['components/foo.vue.html', 'components/bar.vue.html',],
-            'app.js'=>[qw('js/dist/templates/app★.js components/foo.vue.js components/bar.vue.js)]
+          VueTemplateCompiler=>{enabled=>$ENV{MOJO_ASSETPACK_VUE_TEMPLATE_COMPILER} || 0},# pipe options
+          process => [
+            ['js/dist/templates/app★.js?bla'=>qw(components/foo.vue.html components/bar.vue.html)],
+            ['app.js'=>qw('js/dist/templates/app★.js components/foo.vue.js components/bar.vue.js)],
             ...,
-          },
+          ],
         });
 
 =head1 Обязательно REQUIRED
@@ -183,16 +190,17 @@ Mojolicious::Plugin::AssetPack::Pipe::VueTemplateCompiler - if you like separate
   $ cd /tmp
   $ npm i vue-template-compiler parcel-bundler@1
 
-Короч, стал использовать Parcel-bundler (ver < 2) L<https://github.com/parcel-bundler/parcel>, пушто напрямую L<https://github.com/vuejs/vue/tree/dev/packages/vue-template-compiler#readme> выдает блоками with(this){...}
+Короч, стал использовать Parcel-bundler (version < 2.0!) L<https://github.com/parcel-bundler/parcel>, пушто напрямую L<https://github.com/vuejs/vue/tree/dev/packages/vue-template-compiler#readme> выдает блоками with(this){...}
 
-Патчить строку #11 файлика B</tmp/node_modules/parcel-bundler/src/assets/HTMLAsset.js> чтобы он не потрошил атрибуты src href для ассетов
+Патчить строку #11 файлика B</tmp/node_modules/parcel-bundler/src/assets/HTMLAsset.js>,
+чтобы он не потрошил атрибуты src href для ассетов
 
-  const ATTRS = {}, ATTRS000 = {
+  $ perl -pi.bak -e 's/const\s+ATTRS\s+=\s+{\n/const ATTRS = {}, ATTRS000 = {\n/' /tmp/node_modules/parcel-bundler/src/assets/HTMLAsset.js
 
 
 =head1 Конфигурация CONFIG
 
-Обработка файлов-шаблонов B< <path|url>.vue.html > пойдет только (ONLY) в режиме development.
+Обработка файлов-шаблонов B<< \<path|url>.vue.html >> пойдет только (ONLY) в режиме development.
 
 Обработанные топики шаблонов сохраняются в пути этого топика относительно static L<https://metacpan.org/pod/Mojolicious#static>.
 

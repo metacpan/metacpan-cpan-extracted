@@ -2,12 +2,23 @@ package Atomic::Pipe;
 use strict;
 use warnings;
 
-our $VERSION = '0.014';
+our $VERSION = '0.017';
 
 use IO();
-use Carp qw/croak/;
+use Fcntl();
+use bytes();
 
-use constant IS_WIN32 => ($^O eq 'MSWin32' ? 1 : 0);
+use Carp qw/croak confess/;
+use Config qw/%Config/;
+use List::Util qw/min/;
+use Scalar::Util qw/blessed/;
+
+use Errno qw/EINTR EAGAIN/;
+my %RETRY_ERRNO;
+BEGIN {
+    %RETRY_ERRNO = (EINTR() => 1);
+    $RETRY_ERRNO{Errno->ERESTART} = 1 if Errno->can('ERESTART');
+}
 
 BEGIN {
     # POSIX says writes of 512 or less are atomic, but some platforms allow for
@@ -19,24 +30,62 @@ BEGIN {
     else {
         *PIPE_BUF = sub() { 512 };
     }
+
+    if (POSIX->can('SSIZE_MAX') && eval { POSIX::SSIZE_MAX() }) {
+        *SSIZE_MAX = \&POSIX::SSIZE_MAX;
+    }
+    else {
+        *SSIZE_MAX = sub() { 512 };
+    }
+
+    {
+        # Using the default pipe size as a read size is significantly faster
+        # than a larger value on my test machine.
+        my $read_size = min(SSIZE_MAX(), 65_536);
+        *DEFAULT_READ_SIZE = sub() { $read_size };
+    }
+
+    my $can_thread = 1;
+    $can_thread &&= $] >= 5.008001;
+    $can_thread &&= $Config{'useithreads'};
+
+    # Threads are broken on perl 5.10.0 built with gcc 4.8+
+    if ($can_thread && $] == 5.010000 && $Config{'ccname'} eq 'gcc' && $Config{'gccversion'}) {
+        my @parts = split /\./, $Config{'gccversion'};
+        $can_thread = 0 if $parts[0] > 4 || ($parts[0] == 4 && $parts[1] >= 8);
+    }
+
+    $can_thread &&= !$INC{'Devel/Cover.pm'};
+
+    if (!$can_thread) {
+        *_get_tid = sub() { 0 };
+    }
+    elsif ($INC{'threads.pm'}) {
+        *_get_tid = sub() { threads->tid() };
+    }
+    else {
+        *_get_tid = sub() { $INC{'threads.pm'} ? threads->tid() : 0 };
+    }
+
+    if ($^O eq 'MSWin32') {
+        local $@;
+        eval { require Win32::API;     1 } or die "non-blocking on windows requires Win32::API please install it.\n$@";
+        eval { require Win32API::File; 1 } or die "non-blocking on windows requires Win32API::File please install it.\n$@";
+        *IS_WIN32 = sub() { 1 };
+    }
+    else {
+        *IS_WIN32 = sub() { 0 };
+    }
 }
 
-use Errno qw/EINTR EAGAIN/;
-my %RETRY_ERRNO;
-BEGIN {
-    %RETRY_ERRNO = (EINTR() => 1);
-    $RETRY_ERRNO{Errno->ERESTART} = 1 if Errno->can('ERESTART');
-}
-use Fcntl();
-require bytes;
-
-use List::Util qw/min/;
-use Scalar::Util qw/blessed/;
-
+use constant READ_SIZE      => 'read_size';
 use constant RH             => 'rh';
 use constant WH             => 'wh';
+use constant EOF            => 'eof';
 use constant STATE          => 'state';
 use constant OUT_BUFFER     => 'out_buffer';
+use constant IN_BUFFER      => 'in_buffer';
+use constant IN_BUFFER_SIZE => 'in_buffer_size';
 use constant READ_BLOCKING  => 'read_blocking';
 use constant WRITE_BLOCKING => 'write_blocking';
 use constant BURST_PREFIX   => 'burst_prefix';
@@ -44,13 +93,108 @@ use constant BURST_POSTFIX  => 'burst_postfix';
 use constant ADJUSTED_DSIZE => 'adjusted_dsize';
 use constant MESSAGE_KEY    => 'message_key';
 use constant MIXED_BUFFER   => 'mixed_buffer';
+use constant DELIMITER_SIZE => 'delimiter_size';
+use constant INVALID_STATE  => 'invalid_state';
 
-sub wh { shift->{+WH} }
-sub rh { shift->{+RH} }
+sub wh  { shift->{+WH} }
+sub rh  { shift->{+RH} }
 
-sub _get_tid {
-    return 0 unless $INC{'threads.pm'};
-    return threads->tid();
+sub throw_invalid {
+    my $self = shift;
+    $self->{+INVALID_STATE} //= @_ ? shift : 'Unknown Error';
+    confess "Pipe is in an invalid state '$self->{+INVALID_STATE}'";
+}
+
+sub read_size {
+    my $self = shift;
+    ($self->{+READ_SIZE}) = @_ if @_;
+    return $self->{+READ_SIZE} ||= DEFAULT_READ_SIZE();
+}
+
+sub fill_buffer {
+    my $self = shift;
+
+    $self->throw_invalid() if $self->{+INVALID_STATE};
+
+    my $rh = $self->{+RH} or die "Not a read handle";
+
+    return 0 if $self->{+EOF};
+
+    $self->{+IN_BUFFER_SIZE} //= 0;
+
+    my $to_read = $self->{+READ_SIZE} || DEFAULT_READ_SIZE();
+    if (IS_WIN32 && defined($self->{+READ_BLOCKING}) && !$self->{+READ_BLOCKING}) {
+        $to_read = min($self->_win32_pipe_ready(), READ_SIZE());
+    }
+
+    return 0 unless $to_read;
+
+    while(1) {
+        my $rbuff = '';
+        my $got = sysread($rh, $rbuff, $to_read);
+        unless(defined $got) {
+            return 0 if $! == EAGAIN; # NON-BLOCKING
+            next if $RETRY_ERRNO{0 + $!}; # interrupted or something, try again
+            $self->throw_invalid("$!");
+        }
+
+        if ($got) {
+            $self->{+IN_BUFFER} .= $rbuff;
+            $self->{+IN_BUFFER_SIZE} += $got;
+            return $got;
+        }
+        else {
+            $self->{+EOF} = 1;
+            return 0;
+        }
+    }
+
+    return 0;
+}
+
+sub _get_from_buffer  { $_[0]->_from_buffer($_[1], remove => 1) }
+sub _peek_from_buffer { shift->_from_buffer(@_) }
+
+sub _from_buffer {
+    my $self = shift;
+    my ($size, %params) = @_;
+
+    unless ($self->{+IN_BUFFER_SIZE} && $self->{+IN_BUFFER_SIZE} >= $size) {
+        $self->fill_buffer;
+        unless($self->{+IN_BUFFER_SIZE} >= $size) {
+            return unless $params{eof_invalid} && $self->{+EOF};
+            $self->throw_invalid($params{eof_invalid});
+        }
+    }
+
+    my $out;
+
+    if ($params{remove}) {
+        $self->{+IN_BUFFER_SIZE} -= $size;
+        $out = substr($self->{+IN_BUFFER}, 0, $size, '');
+    }
+    else {
+        $out = substr($self->{+IN_BUFFER}, 0, $size);
+    }
+
+    return $out;
+}
+
+sub eof {
+    my $self = shift;
+
+    $self->throw_invalid() if $self->{+INVALID_STATE};
+
+    return 0 if $self->fill_buffer;
+    return 0 unless $self->{+EOF};
+    return 0 if $self->{+IN_BUFFER_SIZE};
+
+    if (my $buffer = $self->{+MIXED_BUFFER}) {
+        return 0 if $buffer->{lines} || length $buffer->{lines};
+        return 0 if $buffer->{burst} || length $buffer->{burst};
+    }
+
+    return 1;
 }
 
 sub _fh_mode {
@@ -167,6 +311,8 @@ sub pair {
 sub set_mixed_data_mode {
     my $self = shift;
 
+    $self->throw_invalid() if $self->{+INVALID_STATE};
+
     $self->read_blocking(0) if $self->{+RH};
 
     $self->{+BURST_PREFIX}  //= "\x0E";    # Shift out
@@ -176,7 +322,6 @@ sub set_mixed_data_mode {
 
 sub get_line_burst_or_data {
     my $self = shift;
-    my %params = @_;
 
     my $rh = $self->{+RH} // croak "Not a read handle";
 
@@ -185,117 +330,97 @@ sub get_line_burst_or_data {
     my $key     = $self->{+MESSAGE_KEY}   // croak "missing 'message_key', not in mixed_data_mode";
 
     my $buffer = $self->{+MIXED_BUFFER} //= {
-        raw      => '',
-        lines    => '',
-        burst    => '',
-        in_burst => 0,
+        lines         => '',
+        burst         => '',
+        in_burst      => 0,
+        in_message    => 0,
         do_extra_loop => 0,
+        strip_term    => 0,
     };
 
     while (1) {
-        my $start = length($buffer->{raw} //= '');
+        $self->throw_invalid('Incomplete message received before EOF')
+            if $self->{+EOF} && (keys(%{$self->{+STATE}->{buffers}}) || keys (%{$self->{+STATE}->{parts}}));
 
-        if (IS_WIN32) {
-            if (my $size = $self->_win32_pipe_ready()) {
-                $size = $params{read_size} if $params{read_size} && $params{read_size} < $size;
-                my $x = '';
-                sysread($rh, $x, $size);
-                $buffer->{raw} .= $x;
+        if($buffer->{lines} || length($buffer->{lines})) {
+            # Look for a complete line
+            my ($line, $term);
+            ($line, $term, $buffer->{lines}) = split /(\r?\n|\r\n?)/, $buffer->{lines}, 2;
+
+            return (line => "${line}${term}") if $term;
+            return (line => $line) if $self->{+EOF} && !$self->{+IN_BUFFER_SIZE} && defined($line) && length($line);
+
+            $buffer->{lines} = $line;
+        }
+
+        if ($buffer->{in_message}) {
+            my ($id, $message) = $self->_extract_message(one_part_only => 1);
+
+            unless(defined $id) {
+                next unless $self->{+EOF} && !$self->{+IN_BUFFER_SIZE};
+                $self->throw_invalid('Incomplete burst data received before end of pipe');
             }
-        }
-        elsif (my $size = $params{read_size}) {
-            my $x = '';
-            sysread($rh, $x, $size);
-            $buffer->{raw} .= $x;
-        }
-        else {
-            local $/;
-            $buffer->{raw} .= <$rh> // '';
-        }
 
-        my $delta = length($buffer->{raw}) - $start;
-
-        return () unless length($buffer->{raw}) || $buffer->{do_extra_loop};
-        $buffer->{do_extra_loop}-- if $buffer->{do_extra_loop};
+            $buffer->{strip_term}++;
+            $buffer->{in_message} = 0;
+            return (message => $message) if defined $message;
+        }
 
         if ($buffer->{strip_term}) {
-            next unless $buffer->{raw};
-            die "Internal Error: No Terminator?" unless substr($buffer->{raw}, 0, 1, '') eq $postfix;
+            my $term = $self->_get_from_buffer(1, eof_invalid => 'EOF before message terminator') // return;
+
+            $self->throw_invalid("No message terminator") unless $term eq $postfix;
             $buffer->{strip_term}--;
-            next;
         }
-        elsif ($buffer->{in_message}) {
-            my $state = $buffer->{+STATE} //= {};
 
-            my ($id, $message) = $self->_extract_message(
-                state => $state,
-                one_part_only => 1,
-                read => sub {
-                    if (bytes::length($buffer->{raw}) >= $_[1]) {
-                        $_[0] //= '';
-                        $_[0] .= bytes::substr($buffer->{raw}, 0, $_[1], '');
-                        $! = 0;
-                        return $_[1];
-                    }
+        if ($buffer->{in_burst}) {
+            my $peek = $self->_peek_from_buffer(1, eof_invalid => 'Incomplete burst data received before end of pipe') // next;
 
-                    $! = EAGAIN;
-                    return undef;
-                },
-            );
-
-            next unless defined $id;
-
-            if (substr($buffer->{raw}, 0, 1) eq $postfix) {
-                substr($buffer->{raw}, 0, 1, '');
-            }
-            else {
-                $buffer->{strip_term}++;
-            }
-
-            $buffer->{in_message} = 0;
-            $buffer->{do_extra_loop}++;
-            return (message => $message) if defined $message;
-            next;
-        }
-        elsif ($buffer->{in_burst}) {
-            if (substr($buffer->{raw}, 0, 1) eq $key) {
-                substr($buffer->{raw}, 0, 1, ''); # Strip off the key
+            if ($peek eq $key) {
+                $self->_get_from_buffer(1); # Strip the key
                 $buffer->{in_message} = 1;
                 $buffer->{in_burst} = 0;
-                $buffer->{do_extra_loop}++;
                 next;
             }
 
             $buffer->{burst} //= '';
             my ($burst_data, $term);
-            ($burst_data, $term, $buffer->{raw}) = split /(\Q$postfix\E)/, $buffer->{raw}, 2;
+            ($burst_data, $term, $self->{+IN_BUFFER}) = split /(\Q$postfix\E)/, $self->{+IN_BUFFER}, 2;
             $buffer->{burst} .= $burst_data;
 
             if ($term) {
+                $self->{+IN_BUFFER_SIZE} = length($self->{+IN_BUFFER});
                 $buffer->{in_burst} = 0;
                 $buffer->{do_extra_loop}++;
                 return (burst => delete($buffer->{burst}));
             }
-
-            next;
-        }
-        else {
-            # Look for the start of a burst
-            $buffer->{lines} //= '';
-            my $linedata;
-            ($linedata, $buffer->{in_burst}, $buffer->{raw}) = split /(\Q$prefix\E)/, $buffer->{raw}, 2;
-            $buffer->{lines} .= $linedata if length($linedata);
-
-            # Look for a complete line
-            my $term;
-            ($linedata, $term, $buffer->{lines}) = split /(\r?\n)/, $buffer->{lines}, 2;
-            if ($term) {
-                $buffer->{do_extra_loop}++;
-                return (line => "${linedata}${term}");
+            else {
+                $self->{+IN_BUFFER_SIZE} = 0;
             }
 
-            # No line found, put the linedata back in the buffer
-            $buffer->{lines} = $linedata;
+            $self->throw_invalid('Incomplete burst data received before end of pipe') if $self->{+EOF};
+        }
+
+        unless ($self->{+IN_BUFFER_SIZE} || $self->fill_buffer()) {
+            return unless $self->{+EOF};
+
+            # Do at least one more iteration after EOF
+            return if $buffer->{+EOF}++;
+
+            # But do not try to split the empty buffer
+            next;
+        }
+
+        # Look for the start of a burst, anything before a burst is line data
+        my $linedata;
+        ($linedata, $buffer->{in_burst}, $self->{+IN_BUFFER}) = split /(\Q$prefix\E)/, $self->{+IN_BUFFER}, 2;
+        $buffer->{lines} .= $linedata if defined $linedata;
+
+        if ($buffer->{in_burst}) {
+            $self->{+IN_BUFFER_SIZE} -= length($linedata) + length($buffer->{in_burst});
+        }
+        else {
+            $self->{+IN_BUFFER_SIZE} = 0;
         }
     }
 }
@@ -334,6 +459,8 @@ sub _win32_pipe_ready {
 
     my $ret = $peek_named_pipe->Call($wh, $buf, $buflen, $got, $avail, $remain);
 
+    $self->{+EOF} = 1 if $ret == 0;
+
     return unpack('L', $avail);
 }
 
@@ -354,27 +481,13 @@ sub _win32_set_pipe_state {
     return $ret;
 }
 
-my $WIN32_API_LOADED = 0;
-
-sub _load_win32_api {
-    return 1 if $WIN32_API_LOADED;
-
-    eval { require Win32::API;     1 } or die "non-blocking on windows requires Win32::API please install it.\n$@";
-    eval { require Win32API::File; 1 } or die "non-blocking on windows requires Win32API::File please install it.\n$@";
-
-    return $WIN32_API_LOADED = 1;
-}
-
 sub read_blocking {
     my $self = shift;
     my $rh   = $self->{+RH} or croak "Not a reader";
 
     ($self->{+READ_BLOCKING}) = @_ if @_;
 
-    if (IS_WIN32) {
-        _load_win32_api() unless $self->{+READ_BLOCKING} || $WIN32_API_LOADED;
-    }
-    else {
+    unless (IS_WIN32) {
         $rh->blocking(@_);
     }
 
@@ -391,7 +504,6 @@ sub write_blocking {
     $self->{+WRITE_BLOCKING} = $val;
 
     if (IS_WIN32) {
-        _load_win32_api() unless $self->{+WRITE_BLOCKING} || $WIN32_API_LOADED;
         $self->_win32_set_pipe_state(@_) if @_;
     }
     else {
@@ -516,14 +628,16 @@ sub close {
 my $psize = 16; # 32bit pid, 32bit tid, 32 bit size, 32 bit int part id;
 my $dsize = PIPE_BUF - $psize;
 
+sub delimiter_size {
+    return $_[0]->{+DELIMITER_SIZE} if defined $_[0]->{+DELIMITER_SIZE};
+    return $_[0]->{+DELIMITER_SIZE} //= bytes::length($_[0]->{+BURST_PREFIX} // '') + bytes::length($_[0]->{+BURST_POSTFIX} // '');
+}
+
 sub fits_in_burst {
     my $self = shift;
     my ($data) = @_;
 
-    my $prefix  = $self->{+BURST_PREFIX}  // '';
-    my $postfix = $self->{+BURST_POSTFIX} // '';
-
-    my $size = bytes::length($prefix . $data . $postfix);
+    my $size = bytes::length($data) + ($self->{+DELIMITER_SIZE} // $self->delimiter_size);
     return undef unless $size <= PIPE_BUF;
 
     return $size;
@@ -604,67 +718,51 @@ sub _adjusted_dsize {
     return $self->{+ADJUSTED_DSIZE} = $dsize - $fix_size;
 }
 
-sub parts_needed {
-    my $self = shift;
-    my ($data) = @_;
-
-    my $adjusted_dsize = $self->_adjusted_dsize;
-
-    my $dtotal = bytes::length($data);
-    my $parts = int($dtotal / $adjusted_dsize);
-    $parts++ if $dtotal % $adjusted_dsize;
-
-    return $parts;
-}
-
 sub write_message {
     my $self = shift;
     my ($data) = @_;
 
-    my $parts = $self->parts_needed($data);
+    my $tid            = _get_tid();
+    my $message_key    = $self->{+MESSAGE_KEY}    // '';
+    my $adjusted_dsize = $self->{+ADJUSTED_DSIZE} // $self->_adjusted_dsize;
+    my $dtotal         = bytes::length($data);
 
-    my $adjusted_dsize = $self->_adjusted_dsize;
-    my $message_key = $self->{+MESSAGE_KEY} // '';
+    my $parts = int($dtotal / $adjusted_dsize);
+    $parts++ if $dtotal % $adjusted_dsize;
 
     my $id = $parts - 1;
-    for (my $part = 0; $part < $parts; $part++) {
-        my $bytes = bytes::substr($data, $part * $adjusted_dsize, $adjusted_dsize);
-        my $size = bytes::length($bytes);
-        my $out = $message_key . pack("l2L2a$size", $$, _get_tid(), $id--, $size, $bytes);
 
-        $self->write_burst($out);
+    # Unwinding the loop for a 1-part message for micro-optimization
+    if ($parts == 1) {
+        my $bytes = $data;
+        my $size  = $dtotal;
+        my $out   = $message_key . pack("l2L2", $$, $tid, $id--, $size) . $bytes;
+
+        my $out_size = $dtotal + ($self->{+DELIMITER_SIZE} // $self->delimiter_size) + $psize + ($message_key ? 1 : 0);
+
+        push @{$self->{+OUT_BUFFER} //= []} => [$out, $out_size];
+    }
+    else {
+        for (my $part = 0; $part < $parts; $part++) {
+            my $bytes = bytes::substr($data, $part * $adjusted_dsize, $adjusted_dsize);
+            my $size  = bytes::length($bytes);
+
+            my $out = $message_key . pack("l2L2", $$, $tid, $id--, $size) . $bytes;
+
+            my $out_size = bytes::length($out) + ($self->{+DELIMITER_SIZE} // $self->delimiter_size);
+            push @{$self->{+OUT_BUFFER} //= []} => [$out, $out_size];
+        }
     }
 
+    $self->flush();
     return $parts;
 }
-
-sub eof { shift->{+STATE}->{EOF} ? 1 : 0 }
 
 sub read_message {
     my $self = shift;
     my %params = @_;
 
-    my $state = $self->{+STATE} //= {};
-
-    return if $state->{EOF};
-
-    my $rh = $self->{+RH} or croak "Not a reader";
-
-    if (IS_WIN32 && defined($self->{+READ_BLOCKING}) && !$self->{+READ_BLOCKING}) {
-        return undef unless $self->_win32_pipe_ready();
-    }
-
-    my ($id, $out) = $self->_extract_message(
-        %params,
-        state => $state,
-        read => sub {
-            my $buffer = '';
-            my $out = sysread($rh, $buffer, $_[1]);
-            $_[0] //= '';
-            $_[0] .= $buffer if $out;
-            return $out;
-        },
-    );
+    my ($id, $out) = $self->_extract_message(%params);
 
     return $out if defined $id;
     return;
@@ -673,61 +771,28 @@ sub read_message {
 sub _extract_message {
     my $self   = shift;
     my %params = @_;
-    my $state  = $params{state};
-    my $read   = $params{read};
+
+    my $state = $self->{+STATE} //= {};
 
     while (1) {
-        my $pb_size = $state->{pb_size} //= 0;
-        while ($pb_size < $psize) {
-            my $read = $read->($state->{p_buffer}, $psize - $pb_size);
-            unless (defined $read) {
-                return if $! == EAGAIN; # NON-BLOCKING
-                next if $RETRY_ERRNO{0 + $!};
-                croak "Error $!";
-            }
-
-            unless ($read) {
-                $state->{EOF} = 1;
-                return;
-            }
-
-            $pb_size = $state->{pb_size} += $read;
-        }
-
         unless ($state->{key}) {
+            my $key_bytes = $self->_get_from_buffer($psize) or return;
+
             my %key;
-            @key{qw/pid tid id size/} = unpack('l2L2', $state->{p_buffer});
+            @key{qw/pid tid id size/} = unpack('l2L2', $key_bytes);
             $state->{key} = \%key;
         }
 
         my $key = $state->{key};
-        my $db_size = $state->{db_size} //= 0;
-        while ($db_size < $key->{size}) {
-            my $read = $read->($state->{d_buffer}, $key->{size} - $db_size);
-            unless (defined $read) {
-                return if $! == EAGAIN; # NON-BLOCKING
-                next if $RETRY_ERRNO{0 + $!};
-                croak "Error $!";
-            }
 
-            unless ($read) {
-                $state->{EOF} = 1;
-                return;
-            }
+        my $data = $self->_get_from_buffer($key->{size}, eof_invalid => "EOF before end of message") // return;
 
-            $db_size = $state->{db_size} += $read;
-        }
-
-        my $id = $key->{id};
-        my $tag = join ':' => @{$key}{qw/pid tid/};
-        $state->{buffers}->{$tag} = $state->{buffers}->{$tag} ? $state->{buffers}->{$tag} . $state->{d_buffer} : $state->{d_buffer};
+        my $id   = $key->{id};
+        my $tag  = join ':' => @{$key}{qw/pid tid/};
         push @{$state->{parts}->{$tag} //= []} => $id;
+        $state->{buffers}->{$tag} = $state->{buffers}->{$tag} ? $state->{buffers}->{$tag} . $data : $data;
 
-        %$state = (
-            buffers => $state->{buffers},
-            parts   => $state->{parts},
-            EOF     => $state->{EOF},
-        );
+        delete $state->{key};
 
         unless ($id == 0) {
             return ($id, undef) if $params{one_part_only};
@@ -1059,11 +1124,6 @@ set C<< $p->blocking(0) >>. If blocking is turned off, and no message is ready,
 this will return undef. This will also return undef when the pipe is closed
 (EOF).
 
-=item $count = $self->parts_needed($data)
-
-Get the number of parts the data will be split into for it to be written in
-atomic chunks.
-
 =item $p->blocking($bool)
 
 =item $bool = $p->blocking
@@ -1079,9 +1139,13 @@ chunks/bursts in the buffer it will block until all can be written.
 Write any buffered items. This is only useful on writers that are in
 non-blocking mode, it is a no-op everywhere else.
 
-=item $bool = $p->eof
+=item $bool = $r->eof()
 
-True if EOF (all writers are closed).
+True if all writers are closed, and the buffers do not contain any usable data.
+
+Usable data means raw data that has yet to be processed, complete messages, or
+complete data bursts. Any of these can still be retreieved using
+C<read_message()>, or C<get_line_burst_or_data()>.
 
 =item $p->close
 
@@ -1113,6 +1177,23 @@ of 512 bytes on systems that support atomic pipes accoring to POSIX).
 =item $fh = $p->wh
 
 Get the read or write handles.
+
+=item $read_size = $p->read_size()
+
+=item $p->read_size($read_size)
+
+Get/set the read size. This is how much data to ATTEMPT to read each time
+C<fill_buffer()> is called. The default is 65,536 which is the default pipe
+size on linux, though the value is hardcoded currently.
+
+=item $bytes = $p->fill_buffer
+
+Read a chunk of data from the pipe and store it in the internal buffer. Bytes
+read are returned. This is only useful if you want to pull data out of the pipe
+(maybe to unblock the writer?) but do not want to process any of the data yet.
+
+This is automatically called as needed by other methods, usually you do not
+need to use it directly.
 
 =back
 

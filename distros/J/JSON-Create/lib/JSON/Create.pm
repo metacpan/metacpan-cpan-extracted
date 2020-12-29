@@ -7,7 +7,7 @@ require Exporter;
 );
 use warnings;
 use strict;
-our $VERSION = '0.28';
+our $VERSION = '0.29';
 
 # Are we running as XS?
 
@@ -101,15 +101,103 @@ sub validate
     $obj->set_validate ($value);
 }
 
+sub set
+{
+    my ($jc, %args) = @_;
+    for my $k (keys %args) {
+	my $value = $args{$k};
+
+	# Options are in alphabetical order
+
+	if ($k eq 'bool') {
+	    $jc->bool (@$value);
+	    next;
+	}
+	if ($k eq 'cmp') {
+	    $jc->cmp ($value);
+	    next;
+	}
+	if ($k eq 'downgrade_utf8') {
+	    $jc->downgrade_utf8 ($value);
+	    next;
+	}
+	if ($k eq 'escape_slash') {
+	    $jc->escape_slash ($value);
+	    next;
+	}
+	if ($k eq 'fatal_errors') {
+	    $jc->fatal_errors ($value);
+	    next;
+	}
+	if ($k eq 'indent') {
+	    $jc->indent ($value);
+	    next;
+	}
+	if ($k eq 'no_javascript_safe') {
+	    $jc->no_javascript_safe ($value);
+	    next;
+	}
+	if ($k eq 'non_finite_handler') {
+	    $jc->non_finite_handler ($value);
+	    next;
+	}
+	if ($k eq 'obj_handler') {
+	    $jc->obj_handler ($value);
+	    next;
+	}
+	if ($k eq 'replace_bad_utf8') {
+	    $jc->replace_bad_utf8 ($value);
+	    next;
+	}
+	if ($k eq 'sort') {
+	    $jc->sort ($value);
+	    next;
+	}
+	if ($k eq 'strict') {
+	    $jc->strict ($value);
+	    next;
+	}
+	if ($k eq 'unicode_upper') {
+	    $jc->unicode_upper ($value);
+	    next;
+	}
+	if ($k eq 'validate') {
+	    $jc->validate ($value);
+	    next;
+	}
+	warn "Unknown option '$k'";
+    }
+}
+
 sub new
 {
-    my ($class) = @_;
+    my ($class, %args) = @_;
+    my $jc;
     if ($xsok) {
-	return bless jcnew (), $class;
+	$jc = bless jcnew (), $class;
     }
     else {
-	return JSON::Create::PP->new ();
+	$jc = JSON::Create::PP->new ();
     }
+    # "set" is pure perl, and this JSON::Create:: prefix makes the
+    # following work in either PP or XS mode.
+    JSON::Create::set ($jc, %args);
+    return $jc;
+}
+
+sub create_json
+{
+    my ($obj, %args) = @_;
+    my $jc = JSON::Create->new (%args);
+    return $jc->run ($obj);
+}
+
+sub create_json_strict
+{
+    my ($obj, %args) = @_;
+    $args{strict} = 1;
+    my $jc = JSON::Create->new (%args);
+    return $jc->run ($obj);
 }
 
 1;

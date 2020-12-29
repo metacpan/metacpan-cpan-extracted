@@ -25,7 +25,8 @@ like($pdf->stringify(), qr/q 216 0 0 288 72 144 cm \S+ Do Q/,
 # Filehandle
 
 $pdf = PDF::Builder->new();
-open my $fh, '<', 't/resources/1x1.gif';
+open my $fh, '<', 't/resources/1x1.gif' or 
+    die "Can't open file t/resources/1x1.gif";
 $gif = $pdf->image_gif($fh);
 isa_ok($gif, 'PDF::Builder::Resource::XObject::Image::GIF',
        q{$pdf->image_gif(filehandle)});

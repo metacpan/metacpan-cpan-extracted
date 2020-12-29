@@ -1,5 +1,5 @@
 package Treex::Core::Node::Interset;
-$Treex::Core::Node::Interset::VERSION = '2.20160630';
+$Treex::Core::Node::Interset::VERSION = '2.20201228';
 use MooseX::Role::Parameterized;
 
 parameter interset_attribute => (
@@ -9,7 +9,7 @@ parameter interset_attribute => (
 
 use Treex::Core::Log;
 use List::Util qw(first); # TODO: this wouldn't be needed if there was Treex::Core::Common for roles
-use Lingua::Interset 2.050;
+use Lingua::Interset 3.006;
 use Lingua::Interset::FeatureStructure;
 use Data::Dumper;
 
@@ -40,11 +40,13 @@ has $interset_attribute => (
         is_additive
         is_adessive
         is_adjective
+        is_admirative
         is_adposition
         is_adverb
         is_affirmative
         is_allative
         is_animate
+        is_antipassive
         is_aorist
         is_archaic
         is_article
@@ -58,7 +60,10 @@ has $interset_attribute => (
         is_conditional
         is_conjunction
         is_conjunctive
+        is_construct
+        is_converb
         is_coordinator
+        is_count_plural
         is_dative
         is_definite
         is_delative
@@ -67,25 +72,37 @@ has $interset_attribute => (
         is_destinative
         is_determiner
         is_diminutive
+        is_direct_voice
         is_distributive
         is_dual
         is_elative
+        is_elevating
+        is_equative
         is_ergative
         is_essive
         is_exclamative
         is_factive
         is_feminine
         is_finite_verb
+        is_first_hand
         is_first_person
         is_foreign
+        is_formal
+        is_fourth_person
         is_future
         is_genitive
         is_gerund
         is_gerundive
+        is_greater_paucal
+        is_greater_plural
+        is_habitual
+        is_human
+        is_humbling
         is_hyph
         is_illative
         is_imperative
         is_imperfect
+        is_impersonal
         is_inanimate
         is_indefinite
         is_indicative
@@ -97,6 +114,8 @@ has $interset_attribute => (
         is_interjection
         is_interrogative
         is_intransitive
+        is_inverse_number
+        is_iterative
         is_jussive
         is_lative
         is_locative
@@ -110,6 +129,7 @@ has $interset_attribute => (
         is_necessitative
         is_negative
         is_nominative
+        is_non_first_hand
         is_nonhuman
         is_neuter
         is_noun
@@ -120,6 +140,7 @@ has $interset_attribute => (
         is_particle
         is_partitive
         is_past
+        is_paucal
         is_perfect
         is_personal
         is_personal_pronoun
@@ -137,6 +158,7 @@ has $interset_attribute => (
         is_progressive
         is_prospective
         is_punctuation
+        is_purposive
         is_quotative
         is_rare
         is_reciprocal
@@ -144,6 +166,7 @@ has $interset_attribute => (
         is_relative
         is_second_person
         is_singular
+        is_specific
         is_subjunctive
         is_sublative
         is_subordinator
@@ -158,10 +181,13 @@ has $interset_attribute => (
         is_transgressive
         is_transitive
         is_translative
+        is_trial
         is_typo
         is_verb
+        is_verbal_noun
         is_vocative
         is_wh
+        is_zero_person
     )],
    # Note that we cannot export
    # $anode->iset->is_auxiliary as it would clash with the existing $anode->is_auxiliary
@@ -294,7 +320,7 @@ method set_iset_conll_feat => sub {
     my ($self, $feat_string) = @_;
     my @pairs = split /\|/, $feat_string;
     foreach my $pair (@pairs) {
-        $pair =~ s/;/|/g;
+        $pair =~ s/[;,]/|/g;
         my ($feature, $value) = split /=/, $pair;
         $self->set_iset($feature, $value);
     }
@@ -335,38 +361,86 @@ method match_iset => sub {
     return 1;
 };
 
+#------------------------------------------------------------------------------
 # Goal: convert multivalues from arrays to strings:
 # e.g. iset/gender = ["fem", "neut"] becomes iset/gender = "fem|neut"
 # to enable storing in a PML file.
-method serialize_iset => sub {
+# Features tagset and other are not serialized. If they are set, copy them as
+# wild attributes so that they can be stored.
+#------------------------------------------------------------------------------
+method serialize_iset => sub
+{
     my ($self) = @_;
-    foreach my $feature ( $self->$interset_attribute->get_nonempty_features() ) {
+    foreach my $feature ( $self->$interset_attribute->get_nonempty_features() )
+    {
         my $value = $self->get_iset($feature);
-        unless ( $value eq '' ) {
+        unless ( $value eq '' )
+        {
             $self->set_attr("$interset_attribute/$feature", $value);
         }
+    }
+    if ( defined($self->$interset_attribute->{other}) && ref($self->$interset_attribute->{other}) eq 'HASH' )
+    {
+        # We assume that 'other' is a simple set of attribute-value pairs and we create a shallow copy.
+        my $i = $self->$interset_attribute;
+        my $w = $self->wild();
+        my @keys = keys(%{$i->{other}});
+        foreach my $k (@keys)
+        {
+            $w->{isetother}{$k} = $i->{other}{$k};
+        }
+        # We must also save the original tagset identifier. Without it the values in other are meaningless.
+        if($i->tagset() ne '')
+        {
+            $w->{isettagset} = $i->tagset();
+        }
+    }
+    else
+    {
+        delete($self->wild()->{isetother});
     }
     return;
 };
 
-
-
+#------------------------------------------------------------------------------
 # Goal: convert multivalues from strings to arrays:
 # e.g. iset/gender = "fem|neut" becomes iset/gender = ["fem", "neut"]
-method deserialize_iset => sub {
+# Features tagset and other are not serialized with Interset but they may have
+# been serialized as wild attributes.
+#------------------------------------------------------------------------------
+method deserialize_iset => sub
+{
     my ($self) = @_;
-
-    if (! $Treex::Core::Config::running_in_tred) {
+    if (! $Treex::Core::Config::running_in_tred)
+    {
         # iset
         # ttred does not like arrayrefs so only unserilaize if not in ttred
-        if ($self->$interset_attribute) {
+        if ($self->$interset_attribute)
+        {
             # this looks a bit weird,
             # but it ensures correct deserialization of multivalues,
             # i.e. turning e.g. "fem|neut" into ["fem", "neut"]
             $self->set_iset($self->$interset_attribute);
+            if (exists($self->wild()->{isetother}) && ref($self->wild()->{isetother}) eq 'HASH')
+            {
+                # We assume that 'other' is a simple set of attribute-value pairs and we create a shallow copy.
+                my $i = $self->$interset_attribute;
+                my $w = $self->wild();
+                delete($i->{other}) if(exists($i->{other}));
+                my @keys = keys(%{$w->{isetother}});
+                foreach my $k (@keys)
+                {
+                    $i->{other}{$k} = $w->{isetother}{$k};
+                }
+                delete($self->wild()->{isetother});
+            }
+            # We must also retreive the original tagset identifier. Without it the values in other are meaningless.
+            if (exists($self->wild()->{isettagset}))
+            {
+                $self->$interset_attribute->set_tagset($self->wild()->{isettagset});
+            }
         }
     }
-
     # iset_dump
     # (backward compatibility for files
     # created when iset_dump was used to store iset)
@@ -379,7 +453,6 @@ method deserialize_iset => sub {
             $self->serialize_iset();
         }
     }
-
     return;
 };
 
@@ -398,7 +471,7 @@ Treex::Core::Node::Interset
 
 =head1 VERSION
 
-version 2.20160630
+version 2.20201228
 
 =head1 DESCRIPTION
 

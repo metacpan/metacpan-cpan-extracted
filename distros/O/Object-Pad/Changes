@@ -1,5 +1,16 @@
 Revision history for Object-Pad
 
+0.35    2020-12-28
+        [CHANGES]
+         * Permit roles to request their methods still be directly invokable,
+           to provide back/forward compatibility during code migration
+
+        [BUGFIXES]
+         * More sanity checking around `extends` and `implements` keywords
+         * Better complaint about non-invokable methods directly from roles
+         * Workaround for string buffer swipe of stack temporaries in
+           O:P::MOP::Class->add_method()
+
 0.34    2020-11-04
         [CHANGES]
          * Reword the "experimental warning" at the top of the docs

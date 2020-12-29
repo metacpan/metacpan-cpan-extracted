@@ -166,7 +166,7 @@ subtest Fatal => sub {
 };
 
 subtest '"debug.html.ep" route suggestion' => sub {
-  $t->get_ok('/does_not_exist')->status_is(404)->element_exists('#mojobar')->content_like(qr!/does_not_exist!);
+  $t->get_ok('/does_not_exist')->status_is(404)->element_exists('nav')->content_like(qr!/does_not_exist!);
 };
 
 subtest '"debug.html.ep" route suggestion' => sub {
@@ -251,7 +251,7 @@ subtest 'Exception in helper' => sub {
 
 subtest 'Missing template' => sub {
   $t->get_ok('/missing_template')->status_is(404)->content_type_is('text/html;charset=UTF-8')
-    ->content_like(qr/Page not found/);
+    ->content_like(qr/Page Not Found/);
 };
 
 subtest 'Missing template with different format' => sub {
@@ -261,7 +261,7 @@ subtest 'Missing template with different format' => sub {
 
 subtest 'Missing template with unsupported format' => sub {
   $t->get_ok('/missing_template.json')->status_is(404)->content_type_is('text/html;charset=UTF-8')
-    ->content_like(qr/Page not found/);
+    ->content_like(qr/Page Not Found/);
 };
 
 subtest 'Missing template with custom rendering' => sub {
@@ -271,12 +271,12 @@ subtest 'Missing template with custom rendering' => sub {
 
 subtest 'Missing template (failed rendering)' => sub {
   $t->get_ok('/missing_template/too')->status_is(404)->header_is('X-Not-Found' => 1)
-    ->content_type_is('text/html;charset=UTF-8')->content_like(qr/Page not found/);
+    ->content_type_is('text/html;charset=UTF-8')->content_like(qr/Page Not Found/);
 };
 
 subtest 'Missing helper (correct context)' => sub {
   $t->get_ok('/missing_helper')->status_is(500)->content_type_is('text/html;charset=UTF-8')
-    ->content_like(qr/Server error/)->content_like(qr/shift-&gt;missing_helper/);
+    ->content_like(qr/Server Error/)->content_like(qr/shift-&gt;missing_helper/);
 };
 
 subtest 'Reuse exception' => sub {
@@ -296,10 +296,28 @@ subtest 'Bundled static files' => sub {
   $t->get_ok('/mojo/highlight.js/mojolicious.min.js')->status_is(200)->content_type_is('application/javascript');
   $t->get_ok('/mojo/highlight.js/highlight-mojo-dark.css')->status_is(200)->content_type_is('text/css');
 
+  $t->get_ok('/mojo/bootstrap/bootstrap.js')->status_is(200)->content_type_is('application/javascript');
+  $t->get_ok('/mojo/bootstrap/bootstrap.css')->status_is(200)->content_type_is('text/css');
+
+  $t->get_ok('/mojo/fontawesome/fontawesome.css')->status_is(200)->content_type_is('text/css');
+  $t->get_ok('/mojo/webfonts/fa-brands-400.eot')->status_is(200)->content_type_is('application/octet-stream');
+  $t->get_ok('/mojo/webfonts/fa-brands-400.svg')->status_is(200)->content_type_is('image/svg+xml');
+  $t->get_ok('/mojo/webfonts/fa-brands-400.ttf')->status_is(200)->content_type_is('font/ttf');
+  $t->get_ok('/mojo/webfonts/fa-brands-400.woff')->status_is(200)->content_type_is('font/woff');
+  $t->get_ok('/mojo/webfonts/fa-brands-400.woff2')->status_is(200)->content_type_is('font/woff2');
+  $t->get_ok('/mojo/webfonts/fa-regular-400.eot')->status_is(200)->content_type_is('application/octet-stream');
+  $t->get_ok('/mojo/webfonts/fa-regular-400.svg')->status_is(200)->content_type_is('image/svg+xml');
+  $t->get_ok('/mojo/webfonts/fa-regular-400.ttf')->status_is(200)->content_type_is('font/ttf');
+  $t->get_ok('/mojo/webfonts/fa-regular-400.woff')->status_is(200)->content_type_is('font/woff');
+  $t->get_ok('/mojo/webfonts/fa-regular-400.woff2')->status_is(200)->content_type_is('font/woff2');
+  $t->get_ok('/mojo/webfonts/fa-solid-900.eot')->status_is(200)->content_type_is('application/octet-stream');
+  $t->get_ok('/mojo/webfonts/fa-solid-900.svg')->status_is(200)->content_type_is('image/svg+xml');
+  $t->get_ok('/mojo/webfonts/fa-solid-900.ttf')->status_is(200)->content_type_is('font/ttf');
+  $t->get_ok('/mojo/webfonts/fa-solid-900.woff')->status_is(200)->content_type_is('font/woff');
+  $t->get_ok('/mojo/webfonts/fa-solid-900.woff2')->status_is(200)->content_type_is('font/woff2');
+
   $t->get_ok('/mojo/failraptor.png')->status_is(200)->content_type_is('image/png');
   $t->get_ok('/mojo/logo.png')->status_is(200)->content_type_is('image/png');
-  $t->get_ok('/mojo/logo-black.png')->status_is(200)->content_type_is('image/png');
-  $t->get_ok('/mojo/logo-black-2x.png')->status_is(200)->content_type_is('image/png');
   $t->get_ok('/mojo/logo-white.png')->status_is(200)->content_type_is('image/png');
   $t->get_ok('/mojo/logo-white-2x.png')->status_is(200)->content_type_is('image/png');
   $t->get_ok('/mojo/noraptor.png')->status_is(200)->content_type_is('image/png');

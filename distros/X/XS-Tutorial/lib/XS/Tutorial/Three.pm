@@ -14,7 +14,8 @@ In L<XS::Tutorial::Two>, we learned how to write our own functions in XS, how to
 process multiple arguments, and return different values, including C<undef>.
 
 In this tutorial I'm going to cover some useful routines for common cases you'll
-encounter when programming in XS. One that you've already seen is C<SvOK> which can tell you if a scalar is defined or not.
+encounter when programming in XS. One that you've already seen is C<SvOK> which
+can tell you if a scalar is defined or not. These are the topics I'll discuss:
 
 =over 2
 
@@ -41,7 +42,7 @@ required:
   1;
 
 
-That should be saved as C<lib/XS/Tutorial/Three.pm>.
+That should be saved as F<lib/XS/Tutorial/Three.pm>.
 
 =head2 XS Code
 
@@ -56,7 +57,7 @@ The top of the XS file will look similar to the previous chapter:
   PROTOTYPES: ENABLE
 
 Remember to append any XS code after the C<PROTOTYPES> line. This should be saved
-as C<lib/XS/Tutorial/Three.xs>.
+as F<lib/XS/Tutorial/Three.xs>.
 
 =head2 Scheduling XS code to run at startup
 
@@ -69,7 +70,7 @@ check to see if the init code has been run, and if not, run it before
 executing the rest of the function code.
 
 However XS offers another way to do it by using the C<BOOT> keyword. Any C code
-included below the keyword, will be executed during the startup process:
+included below the keyword will be executed during the startup process:
 
   BOOT:
   printf("We're starting up!\n");
@@ -87,7 +88,7 @@ regular Perl, XS does B<not> execute tied code automatically.
 
 XS does provide L<functions|https://perldoc.perl.org/perlapi.html#Magical-Functions> for working with tied variables though. One you'll
 see in a lot of XS code is C<SvGETMAGIC>. Imagine your function is passed a
-tied variable; it's value will be undefined in XS, until you call C<mg_get>
+tied variable; its value will be undefined in XS, until you call C<mg_get>
 ("magic get") on it, which calls C<FETCH>.
 
 Unfortunately, C<mg_get> can only be called on tied scalars so you don't want to
@@ -168,8 +169,8 @@ compatible characters (decimal values 0-127).
       PUSHs(sv_2mortal(newSViv(1)));
     }
 
-This function returns true if the scalar contains UTF-8 data I<and> it is
-downgrade-able to ASCII. It does that by using the C<sv_utf8_downgrade>
+This function returns false if the scalar contains UTF-8 data I<and> it is
+not downgrade-able to ASCII. It does that by using the C<sv_utf8_downgrade>
 function, which accepts the scalar and a boolean value indicating if it's
 ok to fail. As the second argument is C<TRUE>, the function simply returns
 false if the scalar is not downgrade-able (otherwise it would C<croak>).

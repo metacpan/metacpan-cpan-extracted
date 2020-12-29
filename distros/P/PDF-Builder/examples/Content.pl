@@ -6,8 +6,8 @@
 use warnings;
 use strict;
 
-our $VERSION = '3.020'; # VERSION
-my $LAST_UPDATE = '3.013'; # manually update whenever code is changed
+our $VERSION = '3.021'; # VERSION
+my $LAST_UPDATE = '3.021'; # manually update whenever code is changed
 
 use Math::Trig;
 use List::Util qw(min max);
@@ -2412,13 +2412,13 @@ $grfx->poly(155,120, 155,10);
 $grfx->stroke();
 
 $text->translate($base[0]+15, $base[1]+100);
-$text->text('When in the course', 140);
+$text->text('When in the course');
 $text->translate($base[0]+15, $base[1]+ 80);
-$text->text('of human events, it becomes', 140);
+$text->text('of human events, it becomes');
 $text->translate($base[0]+15, $base[1]+ 60);
-$text->text('necessary for one people to dissolve the', 140);
+$text->text('necessary for one people to dissolve the');
 $text->translate($base[0]+15, $base[1]+ 40);
-$text->text('political bands...', 140);
+$text->text('political bands...');
 
 # caption
 drawCaption(['text()'], 'LC');

@@ -17,7 +17,7 @@ ansicolumn - ANSI terminal sequence aware column command
 
 =head1 VERSION
 
-Version 1.03
+Version 1.04
 
 =head1 SYNOPSIS
 
@@ -139,11 +139,18 @@ Set the linebreak mode.
 Set the number of runin/runout column.
 Default is both 2.
 
-=item B<-->[B<no->]B<border>
+=item B<-->[B<no->]B<pagebreak>
 
-Print border.  Enabled by B<--page> option automatically.  Use
-B<--no-border> to disable it.  Border style is specified by
-B<--border-style> option.
+Move to next pane when form feed character found.
+Default true.
+
+=item B<--border>[=I<style>]
+
+Print border.  Enabled by B<--page> option automatically.  If the
+optional I<style> is given, it is used as a border style and precedes
+to B<--border-style> option.  Use B<--border=none> to disable it.
+
+Border style is specified by B<--border-style> option.
 
 =item B<--border-style>=I<style>, B<--bs>=...
 
@@ -156,6 +163,7 @@ vbar, fence,
 line, heavy-line,
 ascii-frame, ascii-box,
 box, frame, page-frame,
+shadow, shadow-box,
 comb, rake, mesh,
 dumbbell, heavy-dumbbell,
 ribbon, round-ribbon, double-ribbon, double-double-ribbon, heavy-ribbon

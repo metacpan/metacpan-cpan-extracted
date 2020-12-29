@@ -18,7 +18,7 @@ use POSIX ();
 
 use Config;
 
-our $VERSION = '0.20'; # VERSION
+our $VERSION = '0.21'; # VERSION
 
 # ATTRIBUTES
 

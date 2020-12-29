@@ -194,6 +194,16 @@ sub get_detail {
     return $detail;
 }
 
+sub compact_time {
+    my $self = shift;
+
+    my @times = ($self->start->strftime('%d.%m: %H:%M'));
+    if ($self->stop) {
+        push(@times, '->', $self->stop->strftime('%H:%M'),  '('.$self->duration.')');
+    }
+    return join (' ',@times);
+}
+
 __PACKAGE__->meta->make_immutable;
 1;
 
@@ -209,7 +219,7 @@ App::TimeTracker::Data::Task - App::TimeTracker Task storage
 
 =head1 VERSION
 
-version 3.005
+version 3.007
 
 =head1 DESCRIPTION
 

@@ -83,6 +83,7 @@ sub POST{
   my $file="$datapath/".md5_hex($url,$jdata,$jheaders).".txt"; 
   $fdebug and print "Reading $file\n"; 
   open(F,"<",$file) or die "Cannot open file $file for read"; 
+  binmode(F); 
   read F, $content, 1000000; 
   close F; 
 } 

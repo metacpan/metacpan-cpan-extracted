@@ -1,10 +1,12 @@
 bench/bench
 bench/bench.pl
 Changes
+copied/README
 Create.xs
 examples/array.pl
 examples/boolean.pl
 examples/closure.pl
+examples/cmp.pl
 examples/escape-all-no-utf8.pl
 examples/escape-all.pl
 examples/escape-slash.pl
@@ -24,6 +26,7 @@ examples/non-finite-handler.pl
 examples/obj-handler.pl
 examples/object.pl
 examples/set-fformat.pl
+examples/sort.pl
 examples/strict-non-finite.pl
 examples/synopsis.pl
 examples/too-many-values.pl
@@ -43,6 +46,7 @@ Makefile.PL
 MANIFEST			This list of files
 MANIFEST.SKIP
 ppport.h
+qsort-r.c
 README
 t/bool.t
 t/code.t
@@ -56,6 +60,8 @@ t/json-parse.t
 t/leading-zero.t
 t/object.t
 t/scalar-ref.t
+t/sort-cmp.t
+t/sort.t
 t/strict.t
 t/to-json.t
 t/unicode.t

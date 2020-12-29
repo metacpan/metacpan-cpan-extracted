@@ -8,7 +8,7 @@ package Object::Pad;
 use v5.14;
 use warnings;
 
-our $VERSION = '0.34';
+our $VERSION = '0.35';
 
 use Carp;
 
@@ -68,7 +68,7 @@ change it.
 That all said, please do get in contact if you find the module overall useful.
 The more feedback you provide in terms of what features you are using, what
 you find works, and what doesn't, will help the ongoing development and
-hopefully eventual stability of the design. See the L<FEEDBACK> section.
+hopefully eventual stability of the design. See the L</FEEDBACK> section.
 
 =head2 Automatic Construction
 
@@ -243,6 +243,37 @@ I<Since version 0.33.>
 
       method slot { return $slot }
    }
+
+The following role attributes are supported:
+
+=head3 :compat(invokable)
+
+I<Since version 0.35.>
+
+Enables a form of backward-compatibility behaviour useful for gradually
+upgrading existing code from classical Perl inheritance or mixins into using
+roles.
+
+Normally, methods of a role cannot be directly invoked and the role must be
+applied to an L<Object::Pad>-based class in order to be used. This however
+presents a problem when gradually upgrading existing code that already uses
+techniques like roles, multiple inheritance or mixins when that code may be
+split across multiple distributions, or for some other reason cannot be
+upgraded all at once. Methods within a role that has the C<:compat(invokable)>
+attribute applied to it may be directly invoked on any object instance. This
+allows the creation of a role that can still provide code for existing classes
+written in classical Perl that has not yet been rewritten to use
+C<Object::Pad>.
+
+The tradeoff is that a C<:compat(invokable)> role may not create slot data
+using the L</has> keyword. Whatever behaviours the role wishes to perform
+must be provided only by calling other methods on C<$self>, or perhaps by
+making assumptions about the representation type of instances.
+
+It should be stressed again: This option is I<only> intended for gradual
+upgrade of existing classical Perl code into using C<Object::Pad>. When all
+existing code is using C<Object::Pad> then this attribute can be removed from
+the role.
 
 =head2 has
 

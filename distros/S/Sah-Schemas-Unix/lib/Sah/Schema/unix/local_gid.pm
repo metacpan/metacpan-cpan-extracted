@@ -1,9 +1,9 @@
 package Sah::Schema::unix::local_gid;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-06-13'; # DATE
+our $DATE = '2020-10-16'; # DATE
 our $DIST = 'Sah-Schemas-Unix'; # DIST
-our $VERSION = '0.012'; # VERSION
+our $VERSION = '0.013'; # VERSION
 
 our $schema = ["unix::gid" => {
     summary => 'Group identifier (GID) that has to exist on the system',
@@ -33,7 +33,7 @@ Sah::Schema::unix::local_gid - Group identifier (GID) that has to exist on the s
 
 =head1 VERSION
 
-This document describes version 0.012 of Sah::Schema::unix::local_gid (from Perl distribution Sah-Schemas-Unix), released on 2020-06-13.
+This document describes version 0.013 of Sah::Schema::unix::local_gid (from Perl distribution Sah-Schemas-Unix), released on 2020-10-16.
 
 =head1 SYNOPSIS
 

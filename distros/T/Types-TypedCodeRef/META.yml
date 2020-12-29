@@ -27,7 +27,7 @@ no_index:
 provides:
   Types::TypedCodeRef:
     file: lib/Types/TypedCodeRef.pm
-    version: '0.04'
+    version: '0.05'
   Types::TypedCodeRef::Factory:
     file: lib/Types/TypedCodeRef/Factory.pm
 requires:
@@ -43,7 +43,7 @@ resources:
   bugtracker: https://github.com/ybrliiu/p5-Types-TypedCodeRef/issues
   homepage: https://github.com/ybrliiu/p5-Types-TypedCodeRef
   repository: git://github.com/ybrliiu/p5-Types-TypedCodeRef.git
-version: '0.04'
+version: '0.05'
 x_contributors:
   - 'kusuda <kusuda@mfac.jp>'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

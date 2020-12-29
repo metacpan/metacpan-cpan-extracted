@@ -1,7 +1,7 @@
 {
-   "abstract" : "unknown",
+   "abstract" : "A Template Plugin To Use URI Objects",
    "author" : [
-      "unknown"
+      "Denis Boyun <denisboyun@gmail.com>"
    ],
    "dynamic_config" : 1,
    "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
@@ -32,14 +32,23 @@
       },
       "runtime" : {
          "requires" : {
-            "Module::Build" : "0",
             "Template" : "2.26",
-            "Test::More" : "0",
-            "URI" : "1.74"
+            "URI" : "1.74",
+            "perl" : "5.006"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "0.02",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/dboys/Template-Plugin-URI/issues"
+      }
+   },
+   "version" : "0.03",
    "x_serialization_backend" : "JSON::PP version 2.27400"
 }

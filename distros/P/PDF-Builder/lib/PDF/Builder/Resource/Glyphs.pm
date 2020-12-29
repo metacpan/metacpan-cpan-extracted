@@ -3,8 +3,8 @@ package PDF::Builder::Resource::Glyphs;
 use strict;
 use warnings;
 
-our $VERSION = '3.020'; # VERSION
-my $LAST_UPDATE = '3.013'; # manually update whenever code is changed
+our $VERSION = '3.021'; # VERSION
+my $LAST_UPDATE = '3.021'; # manually update whenever code is changed
 
 =head1 NAME
 
@@ -28,7 +28,8 @@ sub _generate {
     die 'uniglyph.txt not found' unless -f $uniglyph_file;
 
     my $fh;
-    open $fh, '<', $uniglyph_file;
+    open $fh, '<', $uniglyph_file or
+        die "Can't open input uniglyph file $uniglyph_file";
     my $uuu = {};
     while (my $line = <$fh>) {
         next if $line =~ m|^#|;

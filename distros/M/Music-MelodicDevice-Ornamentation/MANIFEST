@@ -9,6 +9,7 @@ README
 README.md
 dist.ini
 eg/ode-to-joy
+eg/ornament
 lib/Music/MelodicDevice/Ornamentation.pm
 t/00-compile.t
 t/01-methods.t

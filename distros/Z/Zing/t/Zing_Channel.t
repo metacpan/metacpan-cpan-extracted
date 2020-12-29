@@ -69,7 +69,7 @@ name: ro, opt, Str
 
 =description
 
-This package provides represents a mechanism of interprocess communication and
+This package represents a mechanism of interprocess communication and
 synchronization via message passing.
 
 =cut

@@ -25,14 +25,16 @@ requires:
   Data::Dumper::Compact: '0'
   List::SomeUtils: '0'
   Moo: '2'
+  Music::Note: '0'
   Music::Scales: '0'
+  constant: '0'
   namespace::clean: '0'
   perl: '5.006'
   strictures: '2'
 resources:
   homepage: https://github.com/ology/Music-MelodicDevice-Inversion
   repository: https://github.com/ology/Music-MelodicDevice-Inversion.git
-version: '0.0300'
+version: '0.0400'
 x_Dist_Zilla:
   perl:
     version: '5.030002'

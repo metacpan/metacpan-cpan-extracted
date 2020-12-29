@@ -75,6 +75,14 @@ cmp_deeply(
     'duplicate contributor names are resolved',
 ) or diag 'got distmeta: ', explain $tzil->distmeta;
 
+cmp_deeply(
+    $tzil->log_messages,
+    superbagof(
+        re(qr/^\[Git::Contributors\] multiple names with the same /),
+    ),
+    'got a warning about duplicate names',
+);
+
 diag 'got log messages: ', explain $tzil->log_messages
     if not Test::Builder->new->is_passing;
 

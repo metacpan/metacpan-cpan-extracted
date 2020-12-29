@@ -200,7 +200,8 @@ my $configure_emailserver=sub {
          ' ncurses-devel xmlto autoconf libmcrypt libmcrypt-devel'.
          ' libcurl libcurl-devel libicu libicu-devel re2c'.
          ' libpng-devel.x86_64 freetype-devel.x86_64 cmake'.
-         ' oniguruma oniguruma-devel tcl tcl-devel git-all',
+         ' oniguruma oniguruma-devel tcl tcl-devel git-all'.
+         ' libffi-devel',
          '__display__');
       ($stdout,$stderr)=$handle->cmd($sudo.
          'yum -y update','__display__');
@@ -1973,7 +1974,7 @@ END
    ($stdout,$stderr)=$handle->cmd($sudo.
       'wget -qO- https://roundcube.net/download/');
    $stdout=~s/^.*?Stable version.*?href=["](https[^"]+)?["].*$/$1/s;
-   my $gtarfile=$stdout;
+   $gtarfile=$stdout;
    ($stdout,$stderr)=$handle->cmd($sudo.
       "wget --random-wait --progress=dot ".$stdout,
       '__display__');
@@ -1987,9 +1988,20 @@ END
       "https://getcomposer.org/composer-stable.phar",
       '__display__');
    ($stdout,$stderr)=$handle->cmd($sudo.
-      'mv composer.json-dist composer.json');
-   ($stdout,$stderr)=$handle->cmd($sudo.
-      'php composer-stable.phar install --no-dev','__display__');
+      'cp -v composer.json-dist composer.json','__display__');
+   $handle->print($sudo.'php composer-stable.phar install --no-dev');
+   $prompt=$handle->prompt();
+   while (1) {
+      my $output.=fetch($handle);
+      last if $output=~/$prompt/;
+      print $output;
+      if (-1<index $output,'user') {
+         $handle->print('yes');
+         sleep 1;
+         $output='';
+         next;
+      }
+   }
    ($stdout,$stderr)=$handle->cmd($sudo.
       'bin/install-jsdeps.sh','__display__');
 

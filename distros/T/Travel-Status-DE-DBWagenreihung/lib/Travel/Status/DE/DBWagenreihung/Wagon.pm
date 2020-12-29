@@ -8,7 +8,7 @@ use utf8;
 use parent 'Class::Accessor';
 use Carp qw(cluck);
 
-our $VERSION = '0.03';
+our $VERSION = '0.05';
 Travel::Status::DE::DBWagenreihung::Wagon->mk_ro_accessors(
 	qw(attributes class_type has_ac has_accessibility has_bahn_comfort
 	  has_bike_storage has_bistro has_compartments has_family_area
@@ -34,7 +34,7 @@ our %type_attributes = (
 		['has_family_area'], undef, ['has_bahn_comfort'],        # 5 6 7
 		[ 'has_quiet_area', 'has_phone_area', 'has_bahn_comfort' ], undef  # 8 9
 	],
-	'ICE 3 V' => [
+	'ICE 3 Velaro' => [
 		['has_quiet_area'], undef, undef, ['has_family_area'],    # 1 2 3 4
 		['has_bahn_comfort'], ['has_bahn_comfort'], undef, undef, # 5 6 (7) 8
 		[ 'has_quiet_area', 'has_phone_area' ]                    # 9
@@ -58,7 +58,7 @@ our %type_attributes = (
 		undef, undef, ['has_family_area'],
 		[ 'has_quiet_area', 'has_bahn_comfort' ]    # (5) (6) 7 8
 	],
-	'IC2' => [
+	'IC2 Twindexx' => [
 		[ 'has_family_area', 'has_bike_storage' ], ['has_bike_storage'],   # 1 2
 		['has_bike_storage'], [ 'has_bike_storage', 'has_bahn_comfort' ],  # 3 4
 		[ 'has_bahn_comfort', 'has_quiet_area', 'has_phone_area' ]         # 5

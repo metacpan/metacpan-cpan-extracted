@@ -34,11 +34,13 @@
       },
       "runtime" : {
          "requires" : {
+            "Carp" : "0",
             "Data::Dumper::Compact" : "0",
             "List::SomeUtils" : "0",
             "MIDI::Simple" : "0",
             "Moo" : "2",
             "Music::Duration" : "0",
+            "Music::Note" : "0",
             "Music::Scales" : "0",
             "constant" : "0",
             "namespace::clean" : "0",
@@ -68,7 +70,7 @@
          "web" : "https://github.com/ology/Music-MelodicDevice-Ornamentation"
       }
    },
-   "version" : "0.0401",
+   "version" : "0.0600",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.030002"
@@ -300,6 +302,8 @@
                   "stopwords" : [
                      "Acciaccatura",
                      "Appoggiatura",
+                     "acciaccatura",
+                     "appoggiatura",
                      "enharmonic",
                      "mordent"
                   ],

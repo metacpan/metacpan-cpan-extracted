@@ -15,17 +15,18 @@ Carp::Assert::More - convenience wrappers around Carp::Assert
 
 =head1 VERSION
 
-Version 1.24
+Version 1.26
 
 =cut
 
 BEGIN {
-    $VERSION = '1.24';
+    $VERSION = '1.26';
     @ISA = qw(Exporter);
     @EXPORT = qw(
         assert_all_keys_in
         assert_aoh
         assert_arrayref
+        assert_arrayref_nonempty
         assert_coderef
         assert_datetime
         assert_defined
@@ -33,6 +34,7 @@ BEGIN {
         assert_exists
         assert_fail
         assert_hashref
+        assert_hashref_nonempty
         assert_in
         assert_integer
         assert_is
@@ -620,11 +622,29 @@ sub assert_hashref($;$) {
     return assert_isa( $ref, 'HASH', $name );
 }
 
+=head2 assert_hashref_nonempty( $ref [,$name] )
+
+Asserts that I<$ref> is defined and is a reference to a hash with at
+least one key/value pair.
+
+=cut
+
+sub assert_hashref_nonempty($;$) {
+    my $ref = shift;
+    my $name = shift;
+
+    assert_isa( $ref, 'HASH', $name );
+
+    return assert_nonempty( $ref, $name );
+}
+
+
 =head2 assert_arrayref( $ref [, $name] )
 
 =head2 assert_listref( $ref [,$name] )
 
-Asserts that I<$ref> is defined, and is a reference to a (possibly empty) list.
+Asserts that I<$ref> is defined, and is a reference to an array, which
+may or may not be empty.
 
 B<NB:> The same caveat about objects whose underlying structure is a
 hash (see C<assert_hashref>) applies here; this method returns false
@@ -642,6 +662,22 @@ sub assert_arrayref($;$) {
     return assert_isa( $ref, 'ARRAY', $name );
 }
 *assert_listref = *assert_arrayref;
+
+
+=head2 assert_arrayref_nonempty( $ref [, $name] )
+
+Asserts that I<$ref> is reference to an array that has at least one element in it.
+
+=cut
+
+sub assert_arrayref_nonempty($;$) {
+    my $ref  = shift;
+    my $name = shift;
+
+    assert_isa( $ref, 'ARRAY', $name );
+
+    return assert_nonempty( $ref, $name );
+}
 
 
 =head2 assert_aoh( $ref [, $name ] )

@@ -11,8 +11,8 @@
 use strict;
 use warnings;
 
-our $VERSION = '3.020'; # VERSION
-my $LAST_UPDATE = '3.019'; # manually update whenever code is changed
+our $VERSION = '3.021'; # VERSION
+my $LAST_UPDATE = '3.021'; # manually update whenever code is changed
 
 my $PDFname = $0;
    $PDFname =~ s/\..*$//;  # remove extension such as .pl
@@ -65,7 +65,7 @@ my $pdf = PDF::Builder->new(-compress => 'none');
 $pdf->mediabox('universal');  # narrower and shorter of US letter and A4, so
                               # it should be printable on either paper
 my $labelFont = $pdf->corefont('Helvetica');
-my ($font, @chars);
+my ($font);
 
 # A collection of text in various scripts. Non-Latin (English) lines include
 # "PDF::Builder" chunks in the middle, to demonstrate switching back and forth

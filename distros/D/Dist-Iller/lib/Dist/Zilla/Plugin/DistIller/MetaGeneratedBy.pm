@@ -5,7 +5,8 @@ use warnings;
 package Dist::Zilla::Plugin::DistIller::MetaGeneratedBy;
 
 our $AUTHORITY = 'cpan:CSSON'; # AUTHORITY
-our $VERSION = '0.1408';
+# ABSTRACT: Add Dist::Iller version to meta_data.generated_by
+our $VERSION = '0.1409';
 
 use Moose;
 use namespace::autoclean;
@@ -33,11 +34,11 @@ __END__
 
 =head1 NAME
 
-Dist::Zilla::Plugin::DistIller::MetaGeneratedBy
+Dist::Zilla::Plugin::DistIller::MetaGeneratedBy - Add Dist::Iller version to meta_data.generated_by
 
 =head1 VERSION
 
-Version 0.1408, released 2016-03-12.
+Version 0.1409, released 2020-12-27.
 
 =head1 SOURCE
 

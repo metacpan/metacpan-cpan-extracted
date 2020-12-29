@@ -1,10 +1,11 @@
-use 5.008005;
-use ExtUtils::MakeMaker 7.12; # for XSMULTI option
+use ExtUtils::MakeMaker;
 
 WriteMakefile(
   NAME           => 'XS::Tutorial',
   VERSION_FROM   => 'lib/XS/Tutorial.pm',
-  PREREQ_PM      => { 'Test::More' => 0, 'ExtUtils::MakeMaker' => '7.12' },
+  CONFIGURE_REQUIRES => { 'ExtUtils::MakeMaker' => '7.12' }, # for XSMULTI option
+  MIN_PERL_VERSION => '5.008005',
+  TEST_REQUIRES  => { 'Test::More' => 0 },
   ABSTRACT_FROM  => 'lib/XS/Tutorial.pm',
   AUTHOR         => 'David Farrell',
   CCFLAGS        => '-Wall -std=c99',

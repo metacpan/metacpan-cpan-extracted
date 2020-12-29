@@ -105,7 +105,7 @@ Perl. Let's update the C<add_ints> xsub to accept n values:
 
 First off, notice I've updated the return value. One issue with using C<int> in
 C is it may be a different size on different machine architectures. C<int32_t>
-is from the C<stdint.h> library, and guaranteed to be a 32 bit signed integer.
+is from the F<stdint.h> header, and guaranteed to be a 32 bit signed integer.
 
 I've replaced the function parameters with C<...> which indicates the function
 accepts a variable number of arguments, just like in C. In the C<CODE> section,
@@ -136,7 +136,7 @@ start:
 
   done_testing;
 
-I saved that file as C<t/two.t>, and run it by building the distribution with
+I saved that file as F<t/two.t>, and run it by building the distribution with
 C<make>:
 
   perl Makefile.PL && make && make test
@@ -180,7 +180,7 @@ value of xsub ourselves, hence the C<OUTPUT> section is gone.
 
 I've declared a new variable called C<total> to capture the running total of the
 arguments as they're added. If we received at least one argument, total is copied
-into a new scalar integer value (C<newSViv>), it's reference count is corrected
+into a new scalar integer value (C<newSViv>), its reference count is corrected
 (C<sv_2mortal>) and it is pushed onto the stack pointer (C<PUSHs>).
 
 Otherwise a new C<undef> scalar is declared with C<sv_newmortal> and that is pushed

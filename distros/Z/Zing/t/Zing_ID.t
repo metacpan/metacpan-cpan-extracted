@@ -18,13 +18,13 @@ Zing::ID
 
 =tagline
 
-Globally Unique Identifier
+Conditionally Unique Identifier
 
 =cut
 
 =abstract
 
-Globally Unique Identifier
+Conditionally Unique Identifier
 
 =cut
 

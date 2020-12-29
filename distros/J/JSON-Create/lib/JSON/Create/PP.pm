@@ -56,7 +56,7 @@ use Carp qw/croak carp confess cluck/;
 use Scalar::Util qw/looks_like_number blessed reftype/;
 use Unicode::UTF8 qw/decode_utf8 valid_utf8/;
 use B;
-our $VERSION = '0.28';
+our $VERSION = '0.29';
 
 # http://stackoverflow.com/questions/1185822/how-do-i-create-or-test-for-nan-or-infinity-in-perl#1185828
 
@@ -328,7 +328,18 @@ sub create_json_recursively
     if ($ref) {
 	if ($ref eq 'HASH') {
 	    $jc->openB ('{');
-	    for my $k (keys %$input) {
+	    my @keys = keys %$input;
+	    if ($jc->{_sort}) {
+		if ($jc->{cmp}) {
+		    @keys = sort {&{$jc->{cmp}} ($a, $b)} @keys;
+		}
+		else {
+		    @keys = sort @keys;
+		}
+	    }
+	    my $i = 0;
+	    my $n = scalar (@keys);
+	    for my $k (@keys) {
 		my $error = stringify ($jc, $k);
 		if ($error) {
 		    return $error;
@@ -344,13 +355,17 @@ sub create_json_recursively
 			return $error;
 		    }
 		}
-		$jc->comma ();
+		$i++;
+		if ($i < $n) {
+		    $jc->comma ();
+		}
 	    }
-	    $jc->{output} =~ s/,(\s*)$/$1/;
 	    $jc->closeB ('}');
 	}
 	elsif ($ref eq 'ARRAY') {
 	    $jc->openB ('[');
+	    my $i = 0;
+	    my $n = scalar (@$input);
 	    for my $k (@$input) {
 		my $bool = isbool (\$k);
 		if ($bool) {
@@ -362,9 +377,11 @@ sub create_json_recursively
 			return $error;
 		    }
 		}
-		$jc->comma ();
+		$i++;
+		if ($i < $n) {
+		    $jc->comma ();
+		}
 	    }
-	    $jc->{output} =~ s/,(\s*)$/$1/;
 	    $jc->closeB (']');
 	}
 	elsif ($ref eq 'SCALAR') {
@@ -609,6 +626,24 @@ sub indent
 {
     my ($jc, $onoff) = @_;
     $jc->{_indent} = !! $onoff;
+}
+
+sub JSON::Create::PP::sort
+{
+    my ($jc, $onoff) = @_;
+    $jc->{_sort} = !! $onoff;
+}
+
+sub set
+{
+    # This is pure Perl in JSON::Create.
+    JSON::Create::set (@_);
+}
+
+sub cmp
+{
+    my ($jc, $cmp) = @_;
+    $jc->{cmp} = $cmp;
 }
 
 1;

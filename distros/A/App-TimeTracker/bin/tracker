@@ -23,9 +23,12 @@ tracker - run App::TimeTracker
 
 =head1 VERSION
 
-version 3.005
+version 3.007
 
 =head1 SYNOPSIS
+
+  # initialize tracker for the 'Some-Project' directory
+  ~/perl/Some-Project$ tracker init
 
   ~/perl/Some-Project$ tracker start
   Started working on Some-Project at 09:03:41

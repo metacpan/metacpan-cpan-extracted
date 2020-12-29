@@ -1,5 +1,20 @@
 Revision history for Perl module XS::Check
 
+0.11 2020-12-27
+
+- Documentation work
+- Skip more C preprocessor commands
+- Add options to the checkxs script
+
+0.10 2020-12-26
+
+- Check that one is added to av_len
+
+0.09 2020-12-25
+
+- Insist on whitespace before # comments
+- Warn about dereferencing of av_fetch and hv_fetch
+
 0.08 2017-08-28
 
 - Internal changes (strip_comments moved to C::Tokenize)

@@ -1,5 +1,8 @@
 Revision history for ExtUtils-HasCompiler
 
+0.023     2020-12-24 15:10:29+01:00 Europe/Amsterdam
+          - Take into account new Apple include paths
+
 0.022     2020-07-20 22:05:15+02:00 Europe/Amsterdam
           - Adds support for MSYS2
 

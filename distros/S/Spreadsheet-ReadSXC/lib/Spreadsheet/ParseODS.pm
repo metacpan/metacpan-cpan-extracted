@@ -9,7 +9,7 @@ use XML::Twig::XPath;
 use Carp qw(croak);
 use List::Util 'max';
 
-our $VERSION = '0.32';
+our $VERSION = '0.33';
 our @CARP_NOT = (qw(XML::Twig));
 
 use Filter::signatures;
@@ -265,13 +265,32 @@ sub parse( $self, $source, @options ) {
         };
     };
 
-    $handlers{ "//office:automatic-styles/style:style" } = sub {
+    $handlers{ "//office:automatic-styles/style:style" } =
+    $handlers{ "//office:styles/style:style" } =
+    $style_handlers{ "//office:automatic-styles/style:style" } =
+    $style_handlers{ "//office:styles/style:style" } = sub {
         my( $twig, $style ) = @_;
         my $style_name = $style->att('style:name');
-        $table_styles{ $style_name } = $style;
+
+        my %style;
+
+        $style{ data_style_name } = $style->att('style:data-style-name');
+        ($style{table_cell_properties}) = $style->findnodes('style:table-cell-properties');
+
+        if( my $prop = $style->first_child('style:table-properties')) {
+            my $display = $prop->att('table:display')
+                        || '';
+            my $tab_color = $prop->att('tableooo:tab-color');
+            $style{ display } = $display;
+            $style{ tab_color } = $tab_color;
+        };
+
+        $table_styles{ $style_name } = \%style;
     };
 
+    $handlers{ "//office:styles" } =
     $handlers{ "//office:automatic-styles" } =
+    $style_handlers{ "//office:styles" } =
     $style_handlers{ "//office:automatic-styles" } = sub {
         my( $twig, $style ) = @_;
         $styles->read_from_twig( $style );
@@ -302,12 +321,11 @@ sub parse( $self, $source, @options ) {
         if( my $style_name = $table->att('table:style-name')) {
             my $style = $table_styles{$style_name};
             die "No style for '$style_name'" unless $style;
-            if( my $prop = $style->first_child('style:table-properties')) {
-                my $display = $prop->att('table:display')
+
+                my $display = $style->{display}
                         || '';
                 $table_hidden = $display eq 'false' ? 1 : undef;
-                $tab_color = $prop->att('tableooo:tab-color');
-            };
+                $tab_color = $style->{tab_color};
         };
 
         my $print_areas;
@@ -442,9 +460,17 @@ sub parse( $self, $source, @options ) {
                         my $is_hidden;
                         my $f;
                         if( "Default" ne $style_name ) {
-                            my $s = $table_styles{ $style_name }->att('style:data-style-name');
+                            my $ts = $table_styles{ $style_name }
+                                or croak "Internal error: Style '$style_name' encountered but not defined in XML";
+                            my $s = $ts->{data_style_name};
                             # Find if the cell is protected/hidden
-                            my ($cellprops) = $table_styles{ $style_name }->findnodes('style:table-cell-properties');
+                            my ($cellprops) = $ts->{table_cell_properties};
+                            if( $cellprops ) {
+                                my $protect = $cellprops->att('style:cell-protect');
+                                if( $protect ) {
+                                    $is_hidden = ($protect =~ /^(?:formula-hidden|hidden-and-protected)$/);
+                                };
+                            };
 
                             if( $s ) {
                                 $f = $styles->styles->{ $s }->{format};
@@ -455,14 +481,6 @@ sub parse( $self, $source, @options ) {
                                     #warn Dumper $styles->styles;
                                     #die;
                             };
-
-                            if( $cellprops ) {
-                                my $protect = $cellprops->att('style:cell-protect');
-                                if( $protect ) {
-                                    $is_hidden = ($protect =~ /^(?:formula-hidden|hidden-and-protected)$/);
-                                };
-                            };
-
                         };
 
                         $cell_obj = Spreadsheet::ParseODS::Cell->new({
@@ -688,3 +706,36 @@ sub _build_styles( $self, $styles ) {
 }
 
 1;
+
+=head1 REPOSITORY
+
+The public repository of this module is
+L<https://github.com/Corion/Spreadsheet-ReadSXC>.
+
+=head1 SUPPORT
+
+The public support forum of this module is L<https://perlmonks.org/>.
+
+=head1 BUG TRACKER
+
+Please report bugs in this module via the Github bug queue at
+L<https://github.com/Corion/Spreadsheet-ReadSXC/issues>
+
+=head1 AUTHOR
+
+Max Maischein C<corion@cpan.org>
+
+=head1 CONTRIBUTORS
+
+H. Merijn Brand C<hmbrand@cpan.org>
+Mohammad S Anwar C<manwar@cpan.org>
+
+=head1 COPYRIGHT (c)
+
+Copyright 2019-2020 by Max Maischein C<corion@cpan.org>.
+
+=head1 LICENSE
+
+This module is released under the same terms as Perl itself.
+
+=cut

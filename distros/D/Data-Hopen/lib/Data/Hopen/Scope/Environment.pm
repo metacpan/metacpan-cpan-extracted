@@ -4,7 +4,7 @@ package Data::Hopen::Scope::Environment;
 use strict;
 use Data::Hopen::Base;
 
-our $VERSION = '0.000018';
+our $VERSION = '0.000019';
 
 use Data::Hopen::Scope qw(:default :internal);
 use parent 'Data::Hopen::Scope';

@@ -11,5 +11,13 @@ BEGIN {
 use strict;
 use warnings;
 
-use Test::Perl::Critic (-profile => "perlcritic.rc") x!! -e "perlcritic.rc";
-all_critic_ok();
+# this test was generated with Dist::Zilla::Plugin::Test::Perl::Critic::Subset 3.001.005
+
+use Test::Perl::Critic (-profile => "") x!! -e "";
+
+my $filenames = ['lib/App/IDXUtils.pm','script/list-idx-boards','script/list-idx-boards-static','script/list-idx-brokers','script/list-idx-brokers-static','script/list-idx-firms','script/list-idx-firms-static','script/list-idx-sectors','script/list-idx-sectors-static'];
+unless ($filenames && @$filenames) {
+    $filenames = -d "blib" ? ["blib"] : ["lib"];
+}
+
+all_critic_ok(@$filenames);

@@ -5,7 +5,8 @@ use warnings;
 package Dist::Iller::Role::HasPrereqs;
 
 our $AUTHORITY = 'cpan:CSSON'; # AUTHORITY
-our $VERSION = '0.1408';
+# ABSTRACT: A role for DocTypes that contains prereqs (like dist/cpanfile)
+our $VERSION = '0.1409';
 
 use Moose::Role;
 use namespace::autoclean;
@@ -127,11 +128,11 @@ __END__
 
 =head1 NAME
 
-Dist::Iller::Role::HasPrereqs
+Dist::Iller::Role::HasPrereqs - A role for DocTypes that contains prereqs (like dist/cpanfile)
 
 =head1 VERSION
 
-Version 0.1408, released 2016-03-12.
+Version 0.1409, released 2020-12-27.
 
 =head1 SOURCE
 

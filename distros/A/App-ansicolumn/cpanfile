@@ -1,4 +1,4 @@
-requires 'perl', 'v5.14';
+requires 'perl', 'v5.16';
 
 requires 'List::Util', '1.45';
 requires 'Term::ReadKey';

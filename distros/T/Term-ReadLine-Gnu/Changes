@@ -1,5 +1,21 @@
 	-*- Indented-text -*-
-	$Id: Changes 566 2019-01-14 05:30:33Z hayashi $
+	$Id: Changes 576 2020-12-27 03:21:45Z hayashi $
+
+1.37  2020-12-27
+	- readline-8.1 support
+	    new function
+		rl_activate_mark
+		rl_deactivate_mark
+		rl_keep_mark_active
+		rl_mark_active_p
+	    use native operate_and_get_next on GNU ReadLine 8.1 and later.
+	- Gnu.xs: warns if attempted completion function returns undef in pos 0.
+	  [rt.cpan.org #132384]
+	- ppport.h: update from version 3.31 to version 3.52.
+	- fixes to be more CPAN Testers friendly
+	  - Makefile.PL exits 0 when $TERM is not set properly. [rt.cpan.org #128806]
+        - update URLs of the GNU Readline Library manual website. [rt.cpan.org #131362]
+        - update URLs of soundgrab.
 
 1.36  2019-01-14
 	- readline-8.0 support

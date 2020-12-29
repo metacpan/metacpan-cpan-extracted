@@ -72,8 +72,8 @@
 use strict;
 use warnings;
 
-our $VERSION = '3.020'; # VERSION
-my $LAST_UPDATE = '3.002'; # manually update whenever code is changed
+our $VERSION = '3.021'; # VERSION
+my $LAST_UPDATE = '3.021'; # manually update whenever code is changed
 
 use PDF::Builder;
 use PDF::Builder::Util;
@@ -125,7 +125,7 @@ my $PGheight;		# Physical sheet height in points.
 my $PGwidth;		# Physical sheet height in points.
 my ($left, $right, $top, $bottom);  # margins in points
 my ($LineStart, $LineBottom);
-my ($gfx, $txt, $gfx_border, $gfx_image);
+my ($gfx, $txt, $gfx_border);
 our ($pageNum,$filename); 
 
 # other variables
@@ -133,7 +133,6 @@ my @FILES;            	# list of input files, in case of glob
 my @INFILES;		# command line list of files and globs
 my $destpath;           # destination path
 my $outfile;          	# output path & file
-my $arg;              	# command line argument being processed
 my $help;               # Flag for displaying help
 
 my $FontTypeStr;     	# C means Core, TT means TrueType.

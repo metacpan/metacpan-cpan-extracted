@@ -1,10 +1,10 @@
 {
-   "abstract" : "check XS for problems",
+   "abstract" : "Check XS for some common problems",
    "author" : [
       "Ben Bullock <bkb@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.3, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -32,9 +32,8 @@
       },
       "runtime" : {
          "requires" : {
-            "C::Tokenize" : "0.14",
-            "Carp" : "0",
-            "File::Slurper" : "0.009",
+            "C::Tokenize" : "0.18",
+            "File::Slurper" : "0.012",
             "Text::LineNumber" : "0.02",
             "perl" : "5.006001"
          }
@@ -51,6 +50,6 @@
          "web" : "https://github.com/benkasminbullock/xs-check"
       }
    },
-   "version" : "0.08",
-   "x_serialization_backend" : "JSON::PP version 2.94"
+   "version" : "0.11",
+   "x_serialization_backend" : "JSON::PP version 4.04"
 }

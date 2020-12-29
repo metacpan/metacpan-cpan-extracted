@@ -13,6 +13,7 @@ for my $impl (IMPL()) {
     ok($q->limit == 10, "limit set in $impl constructor");
     ok($q->{on_limit} eq 'fail', 'on_limit set in constructor');
 
+    diag ">>> Expect 'buffer is full' warning";
     my $c = $q->put(1..20);
     ok($c == 10, 'limit respected');
 
@@ -47,6 +48,7 @@ for my $impl (IMPL()) {
     ok($q->limit == 12, 'limit reset in 2-arg call');
     ok($q->{on_limit} eq 'fail', 'on_limit reset in 2-arg call');
 
+    diag "\n>>> Expect 'buffer is full' warning";
     $c = $q->put(1..15);
     ok($c == 12, 'limit respected');
     ok($q->pending == 12, 'limit respected');
@@ -59,6 +61,7 @@ for my $impl (IMPL()) {
     } else {
         $q->limit = 6;
         is($q->{limit}, 6, "limit lvalue in $impl");
+        diag ">>> Expect 'buffer is full' warning";
         $c = $q->put(1..40);
         is($c, 6, 'limit from lvalue respected') or diag $c;
     }

@@ -1,6 +1,6 @@
 =head1 NAME
 
-power-outlet-json.cgi - Control Power::Outlet device with web service
+power-outlet-json.cgi - Control Power::Outlet device with JSON web service (e.g. Node-Red)
 
 =head1 DESCRIPTION
 
@@ -10,10 +10,10 @@ power-outlet-json.cgi is a CGI application to control a Power::Outlet device wit
 
 The script is called over HTTP with name and action parameters.  The name is the Section Name from the INI file and the action is one of on, off, query, or switch.
 
-  http://localhost/power-outlet/power-outlet-json.cgi?name=Lamp&action=off
-  http://localhost/power-outlet/power-outlet-json.cgi?name=Lamp&action=on
-  http://localhost/power-outlet/power-outlet-json.cgi?name=Lamp&action=query
-  http://localhost/power-outlet/power-outlet-json.cgi?name=Lamp&action=switch
+  http://localhost/power-outlet/power-outlet-json.cgi?name=Lamp;action=off
+  http://localhost/power-outlet/power-outlet-json.cgi?name=Lamp;action=on
+  http://localhost/power-outlet/power-outlet-json.cgi?name=Lamp;action=query
+  http://localhost/power-outlet/power-outlet-json.cgi?name=Lamp;action=switch
 
 Return is a JSON hash with keys status and state.  status is OK if there are no errors, state is the state of the switch after command either ON or OFF.
 
@@ -23,19 +23,43 @@ Return is a JSON hash with keys status and state.  status is OK if there are no 
 
 Use three nodes: inject, http request, and debug.
 
-In the inject node
-  - Set the "Payload" to one of "ON", "OFF", "QUERY" or "SWITCH"
-  - Set the "Topic" to the desired INI config file [section] name.
+=over
 
-In the http request nodei
-  - Set the "Method" to GET (script also supports POST)
-  - Set the "URL" to https://127.0.0.1/power-outlet/power-outlet-json.cgi?name={{topic}};action={{payload}}
-  - Set the "Return" to a parsed JSON Object
+=item * In the inject node
 
-In the debug node 
-  - Set the "Output" to msg.payload.state which returns "ON" or "OFF"
+=over
 
-[{"id":"736cc2df.cc616c","type":"inject","z":"bbbcee28.8891c","name":"","topic":"Christmas Tree","payload":"Off","payloadType":"str","repeat":"","crontab":"","once":false,"onceDelay":0.1,"x":330,"y":1480,"wires":[["6f024760.ea5058"]]},{"id":"6f024760.ea5058","type":"http request","z":"bbbcee28.8891c","name":"power-outlet-json.cgi","method":"GET","ret":"obj","paytoqs":false,"url":"https://127.0.0.1/power-outlet/power-outlet-json.cgi?name={{topic}};action={{payload}}","tls":"","persist":false,"proxy":"","authType":"","x":560,"y":1480,"wires":[["2673faca.21f8d6"]],"inputLabels":["Topic=>name, Payload=>action"]},{"id":"2673faca.21f8d6","type":"debug","z":"bbbcee28.8891c","name":"","active":true,"tosidebar":true,"console":false,"tostatus":false,"complete":"payload.state","targetType":"msg","x":790,"y":1480,"wires":[]}]
+=item * Set the "Topic" to the desired INI config file [section] name.
+
+=item * Set the "Payload" to one of "ON", "OFF", "QUERY" or "SWITCH"
+
+=back
+
+=item * In the http request node
+
+=over
+
+=item * Set the "Method" to GET (script also supports POST)
+
+=item * Set the "URL" to https://127.0.0.1/power-outlet/power-outlet-json.cgi?name={{topic}};action={{payload}}
+
+=item * Set the "Return" to a parsed JSON Object
+
+=back
+
+=item * In the debug node
+
+=over
+
+=item * Set the "Output" to msg.payload.state which returns "ON" or "OFF"
+
+=back
+
+=back
+
+=head2 Node Red Example
+
+  [{"id":"736cc2df.cc616c","type":"inject","z":"bbbcee28.8891c","name":"","topic":"Christmas Tree","payload":"On","payloadType":"str","repeat":"","crontab":"","once":false,"onceDelay":0.1,"x":330,"y":1480,"wires":[["6f024760.ea5058"]]},{"id":"6f024760.ea5058","type":"http request","z":"bbbcee28.8891c","name":"power-outlet-json.cgi","method":"GET","ret":"obj","paytoqs":false,"url":"https://127.0.0.1/power-outlet/power-outlet-json.cgi?name={{topic}};action={{payload}}","tls":"","persist":false,"proxy":"","authType":"","x":560,"y":1480,"wires":[["2673faca.21f8d6"]],"inputLabels":["Topic=>name, Payload=>action"]},{"id":"2673faca.21f8d6","type":"debug","z":"bbbcee28.8891c","name":"","active":true,"tosidebar":true,"console":false,"tostatus":false,"complete":"payload.state","targetType":"msg","x":790,"y":1480,"wires":[]}]
 
 =head1 CONFIGURATION
 

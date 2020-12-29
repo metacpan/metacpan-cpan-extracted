@@ -5,8 +5,8 @@ use base 'PDF::Builder::Content::Text';
 use strict;
 use warnings;
 
-our $VERSION = '3.020'; # VERSION
-my $LAST_UPDATE = '3.018'; # manually update whenever code is changed
+our $VERSION = '3.021'; # VERSION
+my $LAST_UPDATE = '3.021'; # manually update whenever code is changed
 
 =head1 NAME
 
@@ -36,7 +36,7 @@ word-splitting rules, as well as worrying about the appearance of the results
 sub splitWord {
     my ($self, $word, $width, %opts) = @_;
 
-    my ($leftWord, $rightWord, @splitLoc, @chars, $i, $j, $len, $ptLen);
+    my ($leftWord, $rightWord, @splitLoc, @chars, $i, $j, $len);
 
     # various settings, some of which may be language-specific
     my $minBegin = 2;  # minimum 2 characters before split

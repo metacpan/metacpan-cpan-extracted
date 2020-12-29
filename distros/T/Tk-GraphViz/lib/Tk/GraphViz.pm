@@ -4,14 +4,11 @@ package Tk::GraphViz;
 use strict;
 use warnings;
 
-our $VERSION = '1.08';
+our $VERSION = '1.09';
 
 use Tk 800.020;
 use Tk::Font;
 use Tk::IO;
-
-# Parse::Yapp-generated Parser for parsing record node labels
-use Tk::GraphViz::parseRecordLabel;
 
 use base qw(Tk::Derived Tk::Canvas);
 
@@ -508,7 +505,10 @@ sub _createSubgraph
   # it is 'clickable'
   my $fill = $self->cget('-background');
 
-  my $tags = [ subgraph => $label, %attrs ];
+  my $tags = [
+    subgraph => ($label ? "subgraph=$label" : ()),
+    map "$_=$attrs{$_}", sort keys %attrs
+  ];
 
   # Get/Check a valid color
   $color = $self->_tryColor($color);
@@ -536,7 +536,7 @@ sub _createSubgraph
     my $id = $self->createRectangle ( $x1, -1 * $y2, $x2, -1 * $y1,
 				      -outline => $color,
 				      -fill => $fill, @styleArgs,
-				      -tags => $tags );
+				      -tags => [ @$tags, 'outermost' ] );
     $self->lower($id); # make sure it doesn't obscure anything
   }
 
@@ -547,7 +547,6 @@ sub _createSubgraph
     if ( $lp eq '' ) { ($x,$y) = ($x1, $y2); }
 
     $label =~ s/\\n/\n/g;
-    $tags->[0] = 'subgraphlabel'; # Replace 'subgraph' w/ 'subgraphlabel'
     my @args = ( $x, -1 * $y,
 		 -text => $label,
 		 -tags => $tags );
@@ -589,7 +588,7 @@ sub _createNode
   #STDERR->printf ( "createNode: $name \"$label\" ($x1,$y1) ($x2,$y2)\n" );
 
   # Node shape
-  my $tags = [ node => $name, %attrs ];
+  my @tags = (node => "node=$name", map "$_=$attrs{$_}", sort keys %attrs);
 
   my @args = ();
 
@@ -627,17 +626,16 @@ sub _createNode
 
   my $orient = $attrs{orientation} || 0.0;
   if ( $shape eq 'record' ) {
-    $self->_createRecordNode ( $label, \@args, %attrs, tags => $tags );
+    $self->_createRecordNode ( $label, \@args, %attrs, tags => \@tags );
   } else {
     $self->_createShapeNode ( $shape, $x1, -1*$y2, $x2, -1*$y1,
-			      $orient, @args, -tags => $tags );
+			      $orient, 1, @args, -tags => \@tags );
     $label = undef if ( $shape eq 'point' );
     # Node label
     if ( defined $label ) {
-      $tags->[0] = 'nodelabel'; # Replace 'node' w/ 'nodelabel'
       @args = ( ($x1 + $x2)/2, -1*($y2 + $y1)/2, -text => $label,
 		-anchor => 'center', -justify => 'center',
-		-tags => $tags, -fill => $fontcolor );
+		-tags => \@tags, -fill => $fontcolor );
       push @args, ( -state => 'disabled' );
       push @args, -font => $self->_getFont(@attrs{qw(fontname fontsize)});
       $self->createText ( @args );
@@ -696,12 +694,14 @@ my %polyShapes =
 
 sub _createShapeNode
 {
-  my ($self, $shape, $x1, $y1, $x2, $y2, $orient, %args) = @_;
+  my ($self, $shape, $x1, $y1, $x2, $y2, $orient, $outermost, %args) = @_;
 
   #STDERR->printf ( "createShape: $shape ($x1,$y1) ($x2,$y2)\n" );
   my $id = undef;
 
   my @extraArgs = ();
+  my $tags = $args{-tags};
+  my @outermostArgs = $outermost ? (-tags => [@$tags, 'outermost']) : ();
 
   # Special handling for recursive calls to create periphery shapes
   # (for double-, triple-, etc)
@@ -719,7 +719,7 @@ sub _createShapeNode
   if ( exists $polyShapes{$shape} ) {
     $id = $self->_createPolyShape ( $polyShapes{$shape}, 
 				    $x1, $y1, $x2, $y2, $orient,
-				    %args, @extraArgs );
+				    %args, @extraArgs, @outermostArgs );
   }
 
   # Other special-case shapes:
@@ -727,14 +727,14 @@ sub _createShapeNode
   elsif ( $shape =~ s/^double// ) {
     my $diam = max(abs($x2-$x1),abs($y2-$y1));
     my $inset = max(2,min(5,$diam*.1));
-    return $self->_createShapeNode ( $shape, $x1, $y1, $x2, $y2, $orient,
+    return $self->_createShapeNode ( $shape, $x1, $y1, $x2, $y2, $orient, 0,
 				     %args, _periph => [ 1, $inset ] );
   }
 
   elsif ( $shape =~ s/^triple// ) {
     my $diam = max(abs($x2-$x1),abs($y2-$y1));
     my $inset = min(5,$diam*.1);
-    return $self->_createShapeNode ( $shape, $x1, $y1, $x2, $y2, $orient,
+    return $self->_createShapeNode ( $shape, $x1, $y1, $x2, $y2, $orient, 0,
 				     %args, _periph => [ 2, $inset ] );
   }
 
@@ -767,15 +767,15 @@ sub _createShapeNode
 
   if ( !defined $id ) {
     if ( $shape eq 'oval' ) {
-      $id = $self->createOval ( $x1, $y1, $x2, $y2, %args, @extraArgs );
+      $id = $self->createOval ( $x1, $y1, $x2, $y2, %args, @extraArgs, @outermostArgs );
     } else {
-      $id = $self->createRectangle ( $x1, $y1, $x2, $y2, %args, @extraArgs );
+      $id = $self->createRectangle ( $x1, $y1, $x2, $y2, %args, @extraArgs, @outermostArgs );
     }
   }
 
   # Need to create additional periphery shapes?
   if ( defined $periphShape ) {
-    # This method of stepping in a fixed ammount in x and y is not
+    # This method of stepping in a fixed amount in x and y is not
     # correct, because the aspect of the overall shape changes...
     my $inset = $periphShape->[1];
     $x1 += $inset;
@@ -787,7 +787,7 @@ sub _createShapeNode
     } else {
       @extraArgs = ();
     }
-    return $self->_createShapeNode ( $shape, $x1, $y1, $x2, $y2, $orient,
+    return $self->_createShapeNode ( $shape, $x1, $y1, $x2, $y2, $orient, 0,
 				     %args, @extraArgs );
   }
 
@@ -845,6 +845,7 @@ sub _createPolyShape
 
 sub _parse {
   my ($label, $debug) = @_;
+  require Tk::GraphViz::parseRecordLabel;
   # Setup to parse the label (Label parser object created using Parse::Yapp)
   my $parser = Tk::GraphViz::parseRecordLabel->new;
   $parser->YYData->{INPUT} = $label;
@@ -887,17 +888,17 @@ sub _createRecordNode
     # use port index for name, if one not defined
     $port = $portIndex unless ( $port =~ /\S/);
 
-    my %portTags = (@$tags); # copy of tags
-    $portTags{port} = $port;
+    my @portTags = @$tags;
+    push @portTags, "port=$port";
 
     # get rid of leading trailing whitespace
     $text =~ s/^\s+//;
     $text =~ s/\s+$//;
 
-    $portTags{label} = $text;
+    push @portTags, "label=$text";
 
     my ($x1,$y1,$x2,$y2) = @$rectCoords;
-    $self->createRectangle ( $x1, -$y1, $x2, -$y2, @$shape_args, -tags => [%portTags] );
+    $self->createRectangle ( $x1, -$y1, $x2, -$y2, @$shape_args, -tags => [@portTags, $portIndex == 1 ? "outermost" : ()] );
     my ($y_anchor, $anchor_arg, $x_anchor) = (-($y1 + $y2)/2);
     my %label_attrs = _label2attrs($text);
     if ($label_attrs{-justify} eq 'left') {
@@ -910,10 +911,9 @@ sub _createRecordNode
       $x_anchor = ($x1 + $x2)/2;
       $anchor_arg = 'center';
     }
-    $portTags{nodelabel} = delete $portTags{node}; # Replace 'node' w/ 'nodelabel'
     $self->createText(
       $x_anchor, $y_anchor, -anchor => $anchor_arg,
-      -text => $text, -tags => [%portTags],
+      -text => $text, -tags => \@portTags,
       -font => $self->_getFont(@attrs{qw(fontname fontsize)}),
     );
 
@@ -935,9 +935,10 @@ sub _createEdge
   my $x2 = undef;
   my $y2 = undef;
 
-  my $tags = [ edge => "$n1 $n2",
-	       node1 => $n1, node2 => $n2,
-	       %attrs ];
+  my $tags = [ edge => "edge=$n1 $n2",
+	       "node1=$n1", "node2=$n2",
+               map "$_=$attrs{$_}", sort keys %attrs,
+               ];
 
   # Parse the edge position
   my $pos = $attrs{pos} || return;
@@ -1744,12 +1745,18 @@ sub zoomToRect
   1;
 }
 
-sub scrollTo {
+sub _findNode {
   my ($self, $node) = @_;
   return if !defined $node or !length $node;
-  my @f = $self->find(withtag => "node&&$node");
+  my @f = $self->find(withtag => "outermost&&node=$node");
   return if @f != 1;
-  my @c = $self->coords(@f);
+  $f[0];
+}
+
+sub scrollTo {
+  my ($self, $node) = @_;
+  return if !defined(my $id = $self->_findNode($node));
+  my @c = $self->coords($id);
   $self->_centerView(@c);
 }
 
@@ -1773,6 +1780,19 @@ sub _centerView {
   $self->yview('moveto' => $toy);
 }
 
+sub nodes {
+  my ($self) = @_;
+  map /^node=(.*)/, map $self->gettags($_), $self->find(withtag => "outermost&&node");
+}
+
+sub edges {
+  my ($self) = @_;
+  map {
+    my %tags_h = map split(/=/, $_, 2), grep /^node\d+=/, $self->gettags($_);
+    [ map $tags_h{"node$_"}, 1..keys %tags_h ];
+  } $self->find ( withtag => 'edge' );
+}
+
 ######################################################################
 # Over-ridden createText Method
 #
@@ -1785,9 +1805,11 @@ sub createText
     %attrs = (%attrs, _label2attrs($attrs{-text}));
     # Fix the label tag, if there is one
     if( defined(my $tags = $attrs{-tags})){
-      my %tags = (@$tags);
-      $tags{label} = $attrs{-text} if defined $tags{label};
-      $attrs{-tags} = [%tags];
+      my ($label) = map /^label=(.*)/, @$tags;
+      if (defined $label) {
+        $label = $attrs{-text};
+        $attrs{-tags} = ["label=$label", grep !/^label=/, @$tags];
+      }
     }
     $attrs{-font} = $self->_defaultFont unless defined $attrs{-font};
   }
@@ -2074,29 +2096,59 @@ The factor should be > 1.0 in order to get reasonable behavior.
 If the given node (identified by being tagged with C<node> and that
 nodename) exists, the viewport is moved to have that at the centre.
 
+=head2 $gv->nodes
+
+Returns a list of the names of the graph's nodes, as identified by being
+tagged with C<node>.
+
+=head2 $gv->edges
+
+Returns a list of the graph's edges, as identified by being tagged with
+C<edge>, as array-refs with the incident nodes' names.
+
 =head1 TAGS
 
-In order to facilitate binding, etc, all of the graph elements (nodes, edges, subgraphs) that a created in the cavas.  Specific tags are given to each class of element.  Additionally, all attributes attached to an element in the graph description (e.g. 'color', 'style') will be included as tags.
+In order to facilitate binding, etc, all of the graph elements (nodes,
+edges, subgraphs) that are created in the canvas will be tagged.
+Prior to version 1.09, this was done in pairs of tags, but that is not
+how tags in Tk work: they are individual things.
+
+Each element is composed of several parts, typically at least a shape,
+and text. Each of these parts will be tagged with its element type
+(e.g. C<node>), so that all of the visible area will be bindable as
+such. They will also all be tagged with e.g. C<node=thisNodeName>,
+for use together with C<gettags>. Only the outermost (or for a record,
+the first) will be tagged with C<outermost>, so that a single part can
+be found with e.g. a C<withtags "outermost&&node=thisNodeName">, such
+as to find the coordinates of the whole element.
+
+Additionally, all attributes attached to an element in the graph
+description (e.g. C<color>, C<style>, C<label>) will be included as tags,
+in the form e.g. C<color=red>.
 
 =head2 Nodes
 
-Node elements are identified with a 'node' tag.  For example, to bind something to all nodes in a graph:
+Node elements are identified with a 'node' tag.  For example, to bind
+something to all nodes in a graph:
 
     $gv->bind ( 'node', '<Any-Enter>', sub { ... } );
 
-The value of the 'node' tag is the name of the node in the graph (which is not equivalent to the node label -- that is the 'label' tag)
-
 =head2 Edges
 
-Edge elements are identified with a 'edge' tag.  For example, to bind something to all edges in a graph:
+Edge elements are identified with a 'edge' tag.  For example, to bind
+something to all edges in a graph:
 
     $gv->bind ( 'edge', '<Any-Enter>', sub { ... } );
 
-The value of the 'edge' tag is an a string of the form "node1 node2", where node1 and node2 are the names of the respective nodes.  To make it convenient to get the individual node names, the edge also has tags 'node1' and 'node2', which give the node names separately.
+The "naming tag" will be string of the form C<edge=node1 node2>,
+where node1 and node2 are the names of the respective nodes.  To make
+it convenient to get the individual node names, the edge also has tags
+'node1' and 'node2', which give the node names separately. Components
+of edges do not have an C<outermost> tag.
 
 =head2 Subgraphs
 
-Subgraph elements are identified with a 'subgraph' tag.  The value of the 'subgraph' is the name of the subgraph / cluster.
+Subgraph elements are identified with a 'subgraph' tag.
 
 =head1 EXAMPLES
 
@@ -2112,12 +2164,11 @@ The following example creates a GraphViz widgets to display a graph from a file 
       ->pack ( -expand => '1', -fill => 'both' );
 
     $gv->bind ( 'node', '<Button-1>', sub {
-                my @tags = $gv->gettags('current');
-                push @tags, undef unless (@tags % 2) == 0;
-                my %tags = @tags;
-                printf ( "Clicked node: '%s' => %s\n",
-                         $tags{node}, $tags{label} );
-                } );
+        my @tags = $gv->gettags('current');
+        my ($label) = map /^label=(.*)/, @tags;
+        my ($node) = map /^node=(.*)/, @tags;
+        printf ( "Clicked node: '%s' => %s\n", $node, $label );
+    } );
 
     $gv->show ( shift );
     MainLoop;

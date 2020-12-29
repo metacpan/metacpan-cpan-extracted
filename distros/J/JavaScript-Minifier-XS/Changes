@@ -1,5 +1,13 @@
 Revision history for Perl extension JavaScript::Minifier::XS.
 
+0.12      2020-12-28 08:31:31-08:00 America/Vancouver
+    - Switch to GitHub Actions, from Travis-CI.
+    - Add META links to GitHub repository and issue tracker
+    - Switch to Dist::Zilla
+    - Bump minimum required Perl to 5.8.1
+    - RT #130347; handle ES6 template literals.
+      Thanks to Robert Rothenberg.
+
 0.11        Tue Jan 27 16:50 PST 2015
     - RT #58416; don't segfault when trying to minify non-javascript
 

@@ -174,13 +174,13 @@ INSTALLATION
 
          tinyleaf /srv/control/spool /srv/control/scripts/process-control
 
-     I run tinyleaf using systemd, but any inetd implementation should work
-     equally well.
+     I run tinyleaf using systemd, but any inetd implementation should
+     work equally well.
 
   3. Set up a news feed to the system running tinyleaf that sends control
-     messages of interest.  You should be careful not to send cancel control
-     messages or you'll get a ton of junk in your logs.  The INN newsfeeds
-     entry I use is:
+     messages of interest.  You should be careful not to send cancel
+     control messages or you'll get a ton of junk in your logs.  The INN
+     newsfeeds entry I use is:
 
          isc-control:control,control.*,!control.cancel:Tf,Wnm:
 
@@ -213,12 +213,12 @@ BOOTSTRAPPING
   bootstrap from the existing data.  Here is the procedure for that:
 
   1. Be sure that you're starting from the latest software and set of
-     configuration files.  I will generally try to make a new release after
-     committing a batch of changes, but I may not make a new release after
-     every change.  See the sections below for information about the Git
-     repository in which this package is maintained.  You can always clone
-     that repository to get the latest configuration (and then merge or
-     cherry-pick changes from my repository into your repository as you
+     configuration files.  I will generally try to make a new release
+     after committing a batch of changes, but I may not make a new release
+     after every change.  See the sections below for information about the
+     Git repository in which this package is maintained.  You can always
+     clone that repository to get the latest configuration (and then merge
+     or cherry-pick changes from my repository into your repository as you
      desire).
 
   2. Download the current newsgroup list from:

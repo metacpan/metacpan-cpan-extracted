@@ -36,7 +36,7 @@ $sock = IO::Socket::INET->new(
 
 ok($sock, 'latexmls not available after boot'); # socket is up and running
 
-my $test_message = "source=literal:test";
+my $test_message = "source=literal:\\TeX";
 my $test_message_length = length($test_message);
 my $test_route = "$test_address:$test_address";
 my $payload = <<"PAYLOADEND";
@@ -63,21 +63,22 @@ my $response = decode_json($http_response->content);
 ok($response, "JSON payload was malformed.");
 ($result, $status, $log) = map { $$response{$_} } qw(result status log);
 
+# We dont control for searchpaths here, drop that line:
+$result =~ s/\<\?latexml searchpaths="[^"]*"\?\>\n//;
+
 my $expected_xml = <<XML;
 <?xml version="1.0" encoding="UTF-8"?>
-<?latexml searchpaths=""?>
 <?latexml RelaxNGSchema="LaTeXML"?>
 <document xmlns="http://dlmf.nist.gov/LaTeXML">
   <resource src="LaTeXML.css" type="text/css"/>
   <para>
-    <p>test
-</p>
+    <p>TeX</p>
   </para>
 </document>
 XML
 
-is($expected_xml, $result, 'wrong result');
-is("No obvious problems", $status, 'wrong status');
+is($result, $expected_xml, 'wrong result');
+is($status, "No obvious problems", 'wrong status');
 like($log, qr/Status\:conversion\:0/, 'malformed log messages');
 
 done_testing();

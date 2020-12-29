@@ -49,7 +49,7 @@
     \link[todo.html][To-do list] \break
     \link[https://github.com/rra/ansicolor]
          [GitHub] \break
-    \link[https://rt.cpan.org/Dist/Display.html?Name=Term-ANSIColor]
+    \link[https://github.com/rra/ansicolor/issues]
          [Bug tracker] \break
     \link[https://git.eyrie.org/?p=perl/ansicolor.git]
          [Git repository]
@@ -160,7 +160,7 @@ Developer documentation:
 \doc[todo.html][To-do list]
 \doc[https://github.com/rra/ansicolor]
     [GitHub]
-\doc[https://rt.cpan.org/Dist/Display.html?Name=Term-ANSIColor]
+\doc[https://github.com/rra/ansicolor/issues]
     [Bug tracker]
 
 \h2[License]

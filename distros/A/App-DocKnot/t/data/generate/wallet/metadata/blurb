@@ -1,9 +1,0 @@
-The wallet is a system for managing secure data, authorization rules to
-retrieve or change that data, and audit rules for documenting actions
-taken on that data.  Objects of various types may be stored in the wallet
-or generated on request and retrieved by authorized users.  The wallet
-tracks ACLs, metadata, and trace information.  It is built on top of the
-remctl protocol and uses Kerberos GSS-API authentication.  One of the
-object types it supports is Kerberos keytabs, making it suitable as a
-user-accessible front-end to Kerberos kadmind with richer ACL and metadata
-operations.

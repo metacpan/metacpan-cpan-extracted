@@ -9,7 +9,7 @@
 # Modules and declarations
 ##############################################################################
 
-package App::DocKnot::Config 3.05;
+package App::DocKnot::Config 4.00;
 
 use 5.024;
 use autodie;
@@ -18,71 +18,8 @@ use warnings;
 
 use Carp qw(croak);
 use File::Spec;
-use JSON::MaybeXS qw(JSON);
-use Perl6::Slurp;
-
-# Additional files to load from the metadata directory if they exist.  The
-# contents of these files will be added to the configuration in a key of the
-# same name.  If the key contains a slash, like foo/bar, it will be stored as
-# a nested hash, as $data{foo}{bar}.
-our @METADATA_FILES = qw(
-  bootstrap
-  build/middle
-  build/suffix
-  debian/summary
-  packaging/extra
-  support/extra
-  test/prefix
-  test/suffix
-);
-
-##############################################################################
-# Helper methods
-##############################################################################
-
-# Internal helper routine to return the path of a file or directory from the
-# package metadata directory.  The resulting file or directory path is not
-# checked for existence.
-#
-# $self - The App::DocKnot::Generate object
-# @path - The relative path of the file as a list of components
-#
-# Returns: The absolute path in the metadata directory
-sub _metadata_path {
-    my ($self, @path) = @_;
-    return File::Spec->catdir($self->{metadata}, @path);
-}
-
-# Internal helper routine to read a file from the package metadata directory
-# and return the contents.  The file is specified as a list of path
-# components.
-#
-# $self - The App::DocKnot::Generate object
-# @path - The path of the file to load, as a list of components
-#
-# Returns: The contents of the file as a string
-#  Throws: slurp exception on failure to read the file
-sub _load_metadata {
-    my ($self, @path) = @_;
-    return slurp($self->_metadata_path(@path));
-}
-
-# Like _load_metadata, but interprets the contents of the metadata file as
-# JSON and decodes it, returning the resulting object.  This uses the relaxed
-# parsing mode, so comments and commas after data elements are supported.
-#
-# $self - The App::DocKnot::Generate object
-# @path - The path of the file to load, as a list of components
-#
-# Returns: Anonymous hash or array resulting from decoding the JSON object
-#  Throws: slurp or JSON exception on failure to load or decode the object
-sub _load_metadata_json {
-    my ($self, @path) = @_;
-    my $data = $self->_load_metadata(@path);
-    my $json = JSON->new;
-    $json->relaxed;
-    return $json->decode($data);
-}
+use Kwalify qw(validate);
+use YAML::XS ();
 
 ##############################################################################
 # Public Interface
@@ -91,9 +28,8 @@ sub _load_metadata_json {
 # Create a new App::DocKnot::Config object, which will be used for subsequent
 # calls.
 #
-# $class - Class of object to create
 # $args  - Anonymous hash of arguments with the following keys:
-#   metadata - Path to the directory containing package metadata
+#   metadata - Path to the docknot.yaml file
 #
 # Returns: Newly created object
 #  Throws: Text exceptions on invalid metadata directory path
@@ -101,12 +37,9 @@ sub new {
     my ($class, $args_ref) = @_;
 
     # Ensure we were given a valid metadata argument.
-    my $metadata = $args_ref->{metadata};
-    if (!defined($metadata)) {
-        $metadata = 'docs/metadata';
-    }
-    if (!-d $metadata) {
-        croak("metadata path $metadata does not exist or is not a directory");
+    my $metadata = $args_ref->{metadata} // 'docs/docknot.yaml';
+    if (!-e $metadata) {
+        croak("metadata path $metadata does not exist");
     }
 
     # Create and return the object.
@@ -117,86 +50,51 @@ sub new {
 
 # Load the DocKnot package configuration.
 #
-# $self - The App::DocKnot::Config object
-#
 # Returns: The package configuration as a dict
-#  Throws: autodie exception on failure to read metadata
+#  Throws: YAML::XS exception on invalid package metadata
+#          Text exception on schema mismatch for package metadata
 #          Text exception on inconsistencies in the package data
 sub config {
     my ($self) = @_;
 
-    # Localize $@ since we catch and ignore a lot of exceptions and don't want
-    # to leak changes to $@ to the caller.
-    local $@ = q{};
+    # Tell YAML::XS to use real booleans.  Otherwise, Kwalify is unhappy with
+    # data elements set to false.
+    local $YAML::XS::Boolean = 'JSON::PP';
 
-    # Load the package metadata from JSON.
-    my $data_ref = $self->_load_metadata_json('metadata.json');
+    # Load the metadata and check it against the schema.
+    my $data_ref    = YAML::XS::LoadFile($self->{metadata});
+    my $schema_path = $self->appdata_path('schema/docknot.yaml');
+    my $schema_ref  = YAML::XS::LoadFile($schema_path);
+    eval { validate($schema_ref, $data_ref) };
+    if ($@) {
+        my $errors = $@;
+        chomp($errors);
+        die "Schema validation for $self->{metadata} failed:\n$errors\n";
+    }
 
     # build.install defaults to true.
     if (!exists($data_ref->{build}{install})) {
         $data_ref->{build}{install} = 1;
     }
 
-    # Load supplemental README sections.  readme.sections will contain a list
-    # of sections to add to the README file.
-    for my $section ($data_ref->{readme}{sections}->@*) {
-        my $title = $section->{title};
-
-        # The file containing the section data will match the title, converted
-        # to lowercase and with spaces changed to dashes.
-        my $file = lc($title);
-        $file =~ tr{ }{-};
-
-        # Load the section content.
-        $section->{body} = $self->_load_metadata('sections', $file);
-
-        # If this contains a testing section, that overrides our default.  Set
-        # a flag so that the templates know this has happened.
-        if ($file eq 'testing') {
+    # Set a flag indicating whether the testing section was overridden.  This
+    # is easier for templates to check.
+    for my $section_ref ($data_ref->{readme}{sections}->@*) {
+        if (lc($section_ref->{title}) eq 'testing') {
             $data_ref->{readme}{testing} = 1;
+            last;
         }
-    }
-
-    # If the package is marked orphaned, load the explanation.
-    if ($data_ref->{orphaned}) {
-        $data_ref->{orphaned} = $self->_load_metadata('orphaned');
-    }
-
-    # If the package has a quote, load the text of the quote.
-    if ($data_ref->{quote}) {
-        $data_ref->{quote}{text} = $self->_load_metadata('quote');
     }
 
     # Expand the package license into license text.
-    my $license      = $data_ref->{license};
-    my $licenses_ref = $self->load_appdata_json('licenses.json');
+    my $license       = $data_ref->{license}{name};
+    my $licenses_path = $self->appdata_path('licenses.yaml');
+    my $licenses_ref  = YAML::XS::LoadFile($licenses_path);
     if (!exists($licenses_ref->{$license})) {
         die "Unknown license $license\n";
     }
-    my $license_text = slurp($self->appdata_path('licenses', $license));
-    $data_ref->{license} = { $licenses_ref->{$license}->%* };
-    $data_ref->{license}{full} = $license_text;
-
-    # Load additional license notices if they exist.
-    eval { $data_ref->{license}{notices} = $self->_load_metadata('notices') };
-
-    # Load the standard sections.
-    $data_ref->{blurb}        = $self->_load_metadata('blurb');
-    $data_ref->{description}  = $self->_load_metadata('description');
-    $data_ref->{requirements} = $self->_load_metadata('requirements');
-
-    # Load optional information if it exists.
-    for my $file (@METADATA_FILES) {
-        my @file = split(m{/}xms, $file);
-        if (scalar(@file) == 1) {
-            eval { $data_ref->{$file} = $self->_load_metadata(@file) };
-        } else {
-            eval {
-                $data_ref->{ $file[0] }{ $file[1] }
-                  = $self->_load_metadata(@file);
-            };
-        }
-    }
+    $data_ref->{license}{summary} = $licenses_ref->{$license}{summary};
+    $data_ref->{license}{text}    = $licenses_ref->{$license}{text};
 
     # Return the resulting configuration.
     return $data_ref;
@@ -210,7 +108,7 @@ sub config {
 __END__
 
 =for stopwords
-Allbery DocKnot MERCHANTABILITY NONINFRINGEMENT sublicense CPAN XDG
+Allbery DocKnot MERCHANTABILITY NONINFRINGEMENT sublicense CPAN XDG Kwalify
 
 =head1 NAME
 
@@ -219,13 +117,13 @@ App::DocKnot::Config - Read and return DocKnot package configuration
 =head1 SYNOPSIS
 
     use App::DocKnot::Config;
-    my $reader = App::DocKnot::Config->new({ metadata => 'docs/metadata' });
+    my $reader = App::DocKnot::Config->new({ metadata => 'docs/docknot.yaml' });
     my $config = $reader->config();
 
 =head1 REQUIREMENTS
 
-Perl 5.24 or later and the modules File::BaseDir, File::ShareDir, JSON, and
-Perl6::Slurp, all of which are available from CPAN.
+Perl 5.24 or later and the modules File::BaseDir, File::ShareDir, Kwalify, and
+YAML::XS, all of which are available from CPAN.
 
 =head1 DESCRIPTION
 
@@ -253,8 +151,8 @@ Files included in the package.
 
 =back
 
-Default license metadata files are included with the App::DocKnot module and
-are used unless more specific configuration files exist.
+Default license metadata is included with the App::DocKnot module and is used
+unless more specific configuration files exist.
 
 =head1 CLASS METHODS
 
@@ -270,8 +168,8 @@ following keys:
 
 =item metadata
 
-The path to the directory containing metadata for a package.  Default:
-F<docs/metadata> relative to the current directory.
+The path to the metadata for a package.  Default: F<docs/docknot.yaml>
+relative to the current directory.
 
 =back
 

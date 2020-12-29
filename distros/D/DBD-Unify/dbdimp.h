@@ -35,7 +35,7 @@ char *ufchmsg (USTATUS errnum,    USTATUS *status);
 int   uinimsg (char *programname, USTATUS *status); /* assigns program name
 						     * to logging system */
 
-USTATUS	SQLCODE;
+extern USTATUS	SQLCODE;
 
 /* ====== define data types ====== */
 

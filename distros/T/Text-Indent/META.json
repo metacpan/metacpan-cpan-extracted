@@ -1,10 +1,10 @@
 {
    "abstract" : "simple indentation of text shared among modules",
    "author" : [
-      "James FitzGibbon, E<lt>jfitz@CPAN.orgE<gt>"
+      "James FitzGibbon, <jfitz@CPAN.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4224",
+   "generated_by" : "ExtUtils::MakeMaker version 7.56, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -13,10 +13,21 @@
       "version" : 2
    },
    "name" : "Text-Indent",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
    "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.46"
+         }
+      },
       "configure" : {
          "requires" : {
-            "Module::Build" : "0.42"
+            "ExtUtils::MakeMaker" : "6.46"
          }
       },
       "runtime" : {
@@ -24,20 +35,19 @@
             "Class::MethodMaker" : "1.12",
             "Params::Validate" : "0.5"
          }
-      }
-   },
-   "provides" : {
-      "Text::Indent" : {
-         "file" : "lib/Text/Indent.pm",
-         "version" : "0.03"
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
       }
    },
    "release_status" : "stable",
    "resources" : {
-      "license" : [
-         "http://dev.perl.org/licenses/"
-      ]
+      "bugtracker" : {
+         "web" : "https://github.com/renderorange/Text-Indent/issues"
+      }
    },
-   "version" : "0.03",
-   "x_serialization_backend" : "JSON::PP version 2.97001"
+   "version" : "0.031",
+   "x_serialization_backend" : "JSON::PP version 4.02"
 }

@@ -40,30 +40,55 @@ the developer wanted to see as they were fixing bugs.
 
 =head2 Commands
 
-=over
-
-=item C<help>
+C<help>
 
 This is what you're reading right now.
 
-=item C<update-changes>
+C<update-changes>
 
 This command looks at all the pages in the F<page> directory and generates new
 entries for your changes log into F<changes.log>.
 
-=item C<erase-page>
+C<erase-page>
 
 This command removes pages from the F<page> directory, removes all the kept
 revisions in the F<keep> directory, and all the mentions in the F<change.log>.
 Use this if spammers and vandals created page names you want to eliminate.
 
-=back
+C<html-export> [--source=F<subdirectory> ...] [--target=F<directory>] [--no-extension]
+
+This command converts all the pages in the subdirectories provided to HTML and
+writes the HTML files into the target directory. The subdirectories must exist
+inside your wiki data directory. The default wiki data directory is F<wiki> and
+the default source subdirectory is undefined, so the actual files to be
+processed are F<wiki/page/*.gmi>; if you're using virtual hosting, the
+subdirectory might be your host name; if you're using spaces, those need to be
+appended as well.
+
+Example:
+
+    phoebe-ctl html-export --wiki_dir=/home/alex/phoebe \
+      --source=transjovian.org \
+      --source=transjovian.org/phoebe \
+      --source=transjovian.org/gemini \
+      --source=transjovian.org/titan \
+      --target=/home/alex/transjovian.org
+
+This will create HTML files in F</home/alex/transjovian.org>,
+F</home/alex/transjovian.org/phoebe>, F</home/alex/transjovian.org/gemini>, and
+F</home/alex/transjovian.org/titan>.
+
+Note that the links in these HTML do not include the F<.html> extension, so this
+relies on your web server doing the right thing: if you request C</foo it must
+serve F<foo.html> in the document root. If that doesn't work, perhaps using
+C<--no-extension> is your best bet: the HTML files will be written without the
+F<.html> extension.
 
 =cut
 
 package Gemini::Wiki::Control;
 use Modern::Perl '2018';
-use File::Slurper qw(read_dir read_lines write_text);
+use File::Slurper qw(read_dir read_lines read_text write_text);
 use Encode qw(encode_utf8 decode_utf8);
 use Getopt::Long;
 use Pod::Text;
@@ -74,14 +99,22 @@ binmode(STDOUT, ":utf8");
 
 my $log = 2;
 my $dir = "./wiki";
+my @sources;
+my $target;
+my $no_extension;
 GetOptions (
   "log=i" => \$log,
-  "wiki_dir=s" => \$dir, );
+  "wiki_dir=s" => \$dir,
+  "source=s" => \@sources,
+  "target=s" => \$target,
+  "no-extension" => \$no_extension, );
+@sources = ("") unless @sources;
 
 my $subcommands = {
   "help" => 0,
   "update-changes" => \&update_changes,
-  "erase-page" => \&erase_page, };
+  "erase-page" => \&erase_page,
+  "html-export" => \&html_export, };
 
 my $subcommand;
 $subcommand = shift(@ARGV) if @ARGV;
@@ -176,4 +209,96 @@ sub erase_page {
 	or die "Cannot rename $dir/index to index~: $!";
     write_text("$dir/index", join("\n", @index));
   }
+}
+
+sub html_export {
+  die "You need to provide a target directory for the HTML files using --target=directory\n" unless $target;
+  for my $source (@sources) {
+    my $source_dir = "$dir$source";
+    die "Source directory $source_dir does not exist\n" unless -d $source_dir;
+    my $target_dir = "$target$source";
+    mkdir $target_dir or die "Cannot create target directory $target_dir: $!\n"
+	unless -d $target_dir;
+    for my $page (map { s/\.gmi$//; $_ } grep /\.gmi$/, read_dir("$source_dir/page")) {
+      my $id = decode_utf8 $page;
+      my $text = read_text("$source_dir/page/$page.gmi"); # fatal if it does not exist
+      say "Converting $id";
+      my $filename = "$target_dir/$page";
+      $filename .= ".html" unless $no_extension;
+      open(my $fh, ">:utf8", $filename)
+	  or die "Cannot write $filename: $!\n";
+      say $fh "<!DOCTYPE html>";
+      say $fh "<html>";
+      say $fh "<head>";
+      say $fh "<meta charset=\"utf-8\">";
+      say $fh "<title>" . quote_html($id) . "</title>";
+      say $fh "<link type=\"text/css\" rel=\"stylesheet\" href=\"/default.css\"/>";
+      say $fh "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">";
+      say $fh "</head>";
+      say $fh "<body>";
+      say $fh "<h1>" . quote_html($id) . "</h1>";
+      say $fh to_html($text);
+      # skipping footers
+      say $fh "</body>";
+      say $fh "</html>";
+    }
+  }
+}
+
+sub quote_html {
+  my $html = shift;
+  $html =~ s/&/&amp;/g;
+  $html =~ s/</&lt;/g;
+  $html =~ s/>/&gt;/g;
+  $html =~ s/[\x00-\x08\x0b\x0c\x0e-\x1f]/ /g; # legal xml: #x9 | #xA | #xD | [#x20-#xD7FF] | [#xE000-#xFFFD] | [#x10000-#x10FFFF]
+  return $html;
+}
+
+# returns lines!
+sub to_html {
+  my $text = shift;
+  my @lines;
+  my $list;
+  my $code;
+  for (split /\n/, quote_html($text)) {
+    if (/^```(?:type=([a-z]+))?/) {
+      my $type = $1||"default";
+      if ($code) {
+	push @lines, "</pre>";
+	$code = 0;
+      } else {
+	push @lines, "</ul>" if $list;
+	$list = 0;
+	push @lines, "<pre class=\"$type\">";
+	$code = 1;
+      }
+    } elsif ($code) {
+      push @lines, $_;
+    } elsif (/^\* +(.*)/) {
+      push @lines, "<ul>" unless $list;
+      push @lines, "<li>$1";
+      $list = 1;
+    } elsif (my ($url, $text) = /^=&gt;\s*(\S+)\s*(.*)/) { # quoted HTML!
+      push @lines, "<ul>" unless $list;
+      $text ||= $url;
+      push @lines, "<li><a href=\"$url\">$text</a>";
+      $list = 1;
+    } elsif (/^(#{1,6})\s*(.*)/) {
+      push @lines, "</ul>" if $list;
+      $list = 0;
+      my $level = length($1);
+      push @lines, "<h$level>$2</h$level>";
+    } elsif (/^&gt;\s*(.*)/) { # quoted HTML!
+      push @lines, "</ul>" if $list;
+      $list = 0;
+      push @lines, "<blockquote>$1</blockquote>";
+    } else {
+      push @lines, "</ul>" if $list;
+      $list = 0;
+      push @lines, "<p>$_";
+    }
+  }
+  push @lines, "</pre>" if $code;
+  push @lines, "</ul>" if $list;
+  return join("\n", @lines);
 }

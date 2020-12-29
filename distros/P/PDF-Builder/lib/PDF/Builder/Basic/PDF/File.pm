@@ -15,10 +15,11 @@
 package PDF::Builder::Basic::PDF::File;
 
 use strict;
-no warnings qw[ deprecated recursion uninitialized ];
+use warnings;
+#no warnings qw[ deprecated recursion uninitialized ];
 
-our $VERSION = '3.020'; # VERSION
-my $LAST_UPDATE = '3.020'; # manually update whenever code is changed
+our $VERSION = '3.021'; # VERSION
+my $LAST_UPDATE = '3.021'; # manually update whenever code is changed
 
 =head1 NAME
 
@@ -419,7 +420,7 @@ sub out_file {
 =head2 $p->create_file($fname)
 
 Creates a new output file (no check is made of an existing open file) of
-the given filename or IO object. Note, make sure that C<< $p->{' version'} >> 
+the given filename or IO object. Note: make sure that C<< $p->{' version'} >>
 is set correctly before calling this function.
 
 =cut
@@ -469,7 +470,7 @@ sub close_file {
     $tdict->{'Size'} = $self->{'Size'} || PDFNum(1);
     $tdict->{'Prev'} = PDFNum($self->{' loc'}) if $self->{' loc'};
     if ($self->{' update'}) {
-        foreach my $key (grep ($_ !~ m/^[\s\-]/, keys %$self)) { ## no critic
+        foreach my $key (grep { $_ !~ m/^[\s\-]/ } keys %$self) {
             $tdict->{$key} = $self->{$key} unless defined $tdict->{$key};
         }
 
@@ -936,8 +937,8 @@ sub remove_obj {
     delete $self->{' objects'}{$objind->uid()};
     delete $self->{' outlist_cache'}{$objind};
     delete $self->{' printed_cache'}{$objind};
-    @{$self->{' outlist'}} = grep($_ ne $objind, @{$self->{' outlist'}}); ## no critic
-    @{$self->{' printed'}} = grep($_ ne $objind, @{$self->{' printed'}}); ## no critic
+    @{$self->{' outlist'}} = grep { $_ ne $objind } @{$self->{' outlist'}};
+    @{$self->{' printed'}} = grep { $_ ne $objind } @{$self->{' printed'}};
     $self->{' objcache'}{$objind->{' objnum'}, $objind->{' objgen'}} = undef
         if $self->{' objcache'}{$objind->{' objnum'}, $objind->{' objgen'}} eq $objind;
 
@@ -1268,8 +1269,9 @@ sub readxrtr {
             my $entry_size = 20;
             # test read first entry, see if $cr in expected place, adjust size
             $fh->read($buf, $entry_size * 1 - $xdiff + 15, $xdiff);
-            $buf =~ m/^(.*?)$cr/;
-            $entry_size = length($1) + 2;
+            if ($buf =~ m/^(.*?)$cr/) {
+                $entry_size = length($1) + 2;
+	    }
             if ($entry_size != 20 && $options{'-diags'} == 1) {
                 warn "Xref entries supposed to be 20 bytes long, are $entry_size.\n";
             }

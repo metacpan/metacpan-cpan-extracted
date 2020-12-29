@@ -18,7 +18,7 @@ use strict;
 use warnings;
 use Graph;
 
-our $VERSION = '1.19';
+our $VERSION = '1.20';
 
 our $V = 0 unless defined $V;
 my @ALLOWED_ARGS = qw();

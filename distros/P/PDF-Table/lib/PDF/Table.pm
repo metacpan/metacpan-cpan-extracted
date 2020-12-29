@@ -10,8 +10,9 @@ package PDF::Table;
 use Carp;
 use List::Util qw[min max];  # core
 
-our $VERSION = '1.001'; # fixed, read by Makefile.PL
-my $LAST_UPDATE = '1.001'; # manually update whenever code is changed
+our $VERSION = '1.002'; # fixed, read by Makefile.PL
+my $LAST_UPDATE = '1.002'; # manually update whenever code is changed
+# don't forget to update VERSION down in POD area
 
 my $compat_mode = 0; # 0 = new behaviors, 1 = compatible with old
 # NOTE that a number of t-tests will FAIL in mode 1 (compatible with old)
@@ -366,8 +367,8 @@ sub table {
     my $h_row_widths = [];
 
     # Scalars that hold sum of the maximum and minimum widths of all columns
-    my ( $max_col_w  , $min_col_w ) = ( 0,0 );
-    my ( $row, $col_name, $col_fnt_size, $space_w );
+    my ( $max_col_w, $min_col_w ) = ( 0,0 );
+    my ( $row, $space_w );
 
     my $word_widths   = {};
     my $rows_height   = [];
@@ -1199,7 +1200,7 @@ sub table {
                     $gfx->linewidth($cell_h_rule_w);
                     $gfx->strokecolor($cell_h_rule_c);
                     $gfx->move($cur_x, $cur_y-$actual_row_height);
-                    $gfx->hline( $cur_x + $calc_column_widths->[$col_idx] );
+                    $gfx->hline( $cur_x + $actual_column_widths[$row_idx][$col_idx] );
                     $gfx->stroke(); # don't confuse different widths and colors
                 }
 
@@ -1285,7 +1286,6 @@ sub CalcColumnWidths {
 
     my $min_width   = 0;     # calculate minimum overall table width needed
     my $calc_widths ;        # each column's calculated width
-    my $temp;
 
     # total requested minimum width (min_w property) plus min for content
     for (my $j = 0; $j < scalar(@$col_min_width); $j++) {
@@ -2882,7 +2882,7 @@ The return value is a 3 item list where
 
 =head1 VERSION
 
-1.000
+1.002
 
 =head1 AUTHOR
 

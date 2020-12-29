@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 24;
+use Test::More tests => 29;
 use Test::Deep;
 
 use lib qw(t/lib);
@@ -20,7 +20,7 @@ $chobo->read_obo(filename => 't/data/mini_go.obo');
 
 $chobo->chado_store();
 
-is($ontology_data->get_terms(), 2);
+is($ontology_data->get_terms(), 3);
 
 my $cyanidin_name =
   qq|cyanidin 3-O-glucoside-(2"-O-xyloside) 6''-O-acyltransferase activity|;
@@ -33,7 +33,14 @@ cmp_deeply([
   } map {
     { name => $_->{name}, id => $_->{id}, definition => $_->{def}->{definition} }
   } $ontology_data->get_terms()],
-           [{ name => 'molecular_function', id => 'GO:0003674',
+           [
+             {
+               'definition' => 'OBSOLETE. A stable complex of proteins',
+               'name' => 'obsolete repairosome',
+               'id' => 'GO:0000108'
+             },
+             {
+              name => 'molecular_function', id => 'GO:0003674',
               definition => 'Elemental activities, such as catalysis or binding, describing the actions of a gene product at the molecular level. A given gene product may exhibit one or more molecular functions.' },
             { name => $cyanidin_name, id => 'GO:0102583',
               definition => $cyanidin_def }]);
@@ -55,6 +62,10 @@ my $molecular_function_term = $sth->fetchrow_hashref();
 is ($molecular_function_term->{name}, 'molecular_function');
 my $narrow_term = $sth->fetchrow_hashref();
 is ($narrow_term->{name}, 'narrow');
+my $obsolete_term = $sth->fetchrow_hashref();
+is ($obsolete_term->{name}, 'obsolete repairosome (obsolete GO:0000108)');
+my $replaced_by_term = $sth->fetchrow_hashref();
+is ($replaced_by_term->{name}, 'replaced_by');
 is ($sth->fetchrow_hashref(), undef);
 
 
@@ -130,6 +141,8 @@ my @cvterm_dbxrefs = ();
 push @cvterm_dbxrefs, $sth->fetchrow_hashref();
 push @cvterm_dbxrefs, $sth->fetchrow_hashref();
 push @cvterm_dbxrefs, $sth->fetchrow_hashref();
+push @cvterm_dbxrefs, $sth->fetchrow_hashref();
+push @cvterm_dbxrefs, $sth->fetchrow_hashref();
 
 is ($sth->fetchrow_hashref(), undef);
 
@@ -144,4 +157,14 @@ my @cv_version_values = $chado_data->get_cvprop_values('molecular_function', 'cv
 is(scalar(@cv_version_values), 1);
 is($cv_version_values[0], 'releases/2016-05-07');
 
+
+
+$sth = $fake_handle->prepare("select cvterm_id, type_id, value from cvtermprop");
+$sth->execute();
+
+my $prop_row = $sth->fetchrow_hashref();
+
+is($prop_row->{cvterm_id}, $obsolete_term->{cvterm_id});
+is($prop_row->{type_id}, $replaced_by_term->{cvterm_id});
+is($prop_row->{value}, 'GO:0000109');
 

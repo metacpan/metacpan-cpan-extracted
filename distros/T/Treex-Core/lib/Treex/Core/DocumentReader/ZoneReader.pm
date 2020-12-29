@@ -1,5 +1,5 @@
 package Treex::Core::DocumentReader::ZoneReader;
-$Treex::Core::DocumentReader::ZoneReader::VERSION = '2.20160630';
+$Treex::Core::DocumentReader::ZoneReader::VERSION = '2.20201228';
 use Moose;
 use Treex::Core::Common;
 use autodie;
@@ -129,7 +129,7 @@ Treex::Core::DocumentReader::ZoneReader - base implementation of one-zone docume
 
 =head1 VERSION
 
-version 2.20160630
+version 2.20201228
 
 =head1 DESCRIPTION
 

@@ -10,7 +10,7 @@ use routines;
 
 use Data::Object::Class;
 
-our $VERSION = '0.20'; # VERSION
+our $VERSION = '0.21'; # VERSION
 
 # METHODS
 

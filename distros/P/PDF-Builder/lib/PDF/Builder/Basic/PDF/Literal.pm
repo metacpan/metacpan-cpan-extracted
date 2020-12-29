@@ -4,15 +4,16 @@ package PDF::Builder::Basic::PDF::Literal;
 use base 'PDF::Builder::Basic::PDF::Objind';
 
 use strict;
+use warnings;
 
-our $VERSION = '3.020'; # VERSION
-my $LAST_UPDATE = '3.016'; # manually update whenever code is changed
+our $VERSION = '3.021'; # VERSION
+my $LAST_UPDATE = '3.021'; # manually update whenever code is changed
 
 use PDF::Builder::Basic::PDF::Filter;
 use PDF::Builder::Basic::PDF::Name;
 use Scalar::Util qw(blessed);
 
-no warnings qw[ deprecated recursion uninitialized ];
+#no warnings qw[ deprecated recursion uninitialized ];
 
 =head1 NAME
 

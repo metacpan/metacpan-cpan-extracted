@@ -1,6 +1,49 @@
 Revision history for Dist-Iller
 
-0.1408 2016-03-12 20:16:19 UTC
+0.1409 2020-12-27 17:05:17 UTC
+ [New Features]
+ - Added new DocType: Global, used for settings common to multiple DocTypes
+   (so far only distribution_name)
+ - The global document (if it exists in iller.yaml) will be passed to
+   Config objects
+ - in DocType/Gitignore, it is now possible to use $self.distribution_name
+   in 'always' and 'onexist', so that distribution build directories are
+   automatically ignored.
+
+ [Stats & Dependency Changes]
+ - 21 files changed, 213 insertions(+), 53 deletions(-)
+ - (run req) ~ List::Util 1.42 --> 1.45
+ - (dev req) +
+   Dist::Zilla::Plugin::Author::CSSON::GithubActions::Workflow::TestWithMakefile
+   0.0106
+ - (dev req) + Dist::Zilla::Plugin::MetaConfig (any)
+ - (dev req) + Dist::Zilla::Plugin::PromptIfStale 0.057
+ - (dev req) ~ Dist::Zilla 5.000 --> 6.015
+ - (dev req) ~ Dist::Zilla::Plugin::BumpVersionAfterRelease::Transitional
+   0.007 --> 0.009
+ - (dev req) ~ Dist::Zilla::Plugin::ChangeStats::Dependencies::Git 0.0100
+   --> 0.0200
+ - (dev req) ~ Dist::Zilla::Plugin::CheckChangesHasContent 0.008 --> 0.011
+ - (dev req) ~ Dist::Zilla::Plugin::CopyFilesFromBuild 0.151680 -->
+   0.170880
+ - (dev req) ~ Dist::Zilla::Plugin::Git 2.036 --> 2.046
+ - (dev req) ~ Dist::Zilla::Plugin::Git::CheckFor::CorrectBranch 0.013 -->
+   0.014
+ - (dev req) ~ Dist::Zilla::Plugin::Git::Contributors 0.017 --> 0.035
+ - (dev req) ~ Dist::Zilla::Plugin::MetaProvides::Package 2.003001 -->
+   2.004003
+ - (dev req) ~ Dist::Zilla::Plugin::ReadmeAnyFromPod 0.150250 --> 0.163250
+ - (dev req) ~ Dist::Zilla::Plugin::RunExtraTests 0.028 --> 0.029
+ - (dev req) ~ Dist::Zilla::Plugin::Test::Compile 2.054 --> 2.058
+ - (dev req) ~ Dist::Zilla::Plugin::Test::ReportPrereqs 0.021 --> 0.027
+ - (dev req) ~ Dist::Zilla::Plugin::Test::Version 1.05 --> 1.09
+ - (dev req) - Badge::Depot::Plugin::Travis
+ - (dev req) - Dist::Zilla::Plugin::Test::Kwalitee::Extra
+ - (dev req) - Dist::Zilla::Plugin::TravisYML
+ - (dev sug) ~ Dist::Iller 0.1408 --> 0.1409
+ - (dev sug) ~ Dist::Iller::Config::Author::CSSON 0.0309 --> 0.0327
+
+0.1408 2016-03-12T20:16:19Z UTC
  [New Features]
  - Can add all prereqs as authordeps (add_prereqs_as_authordeps)
 

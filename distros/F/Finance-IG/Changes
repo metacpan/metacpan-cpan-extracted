@@ -1,4 +1,7 @@
 Revision history for Finance-IG
 
 0.01    First release, 16 December 2020
+0.02    Small progress towards passing the tests on CPAN
+0.03    Updated Makefile.PL dependencies  as progress towards passing tests on CPAN 
+0.04    Updated Makefile.PL dependencies  as progress towards passing tests on CPAN again. 
 

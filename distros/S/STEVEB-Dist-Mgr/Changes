@@ -1,5 +1,17 @@
 Revision history for STEVEB-Dist-Mgr
 
+0.04    - Last test CPAN release
+        - Added git_ignore()
+        - Added remove_unwanted_files()
+        - Added init(), creates the actual distribution directory structure
+        - Added support for Coveralls.io test coverage testing for ci_github()
+
+0.03    2020-12-22
+        - Test release
+        - Added ci_github()
+        - Added ci_badges()
+        - Added manifest_skip()
+
 0.02    2020-12-22
         - Added add_repository() and add_bugtracker()
         - This is another formatting check on MetaCPAN

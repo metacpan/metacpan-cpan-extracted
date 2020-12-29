@@ -1,5 +1,5 @@
 package Treex::Core::Config;
-$Treex::Core::Config::VERSION = '2.20160630';
+$Treex::Core::Config::VERSION = '2.20201228';
 use strict;
 use warnings;
 
@@ -233,7 +233,7 @@ Treex::Core::Config - centralized info about Treex configuration
 
 =head1 VERSION
 
-version 2.20160630
+version 2.20201228
 
 =head1 SYNOPSIS
 

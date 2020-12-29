@@ -5,8 +5,8 @@ use base 'PDF::Builder::Resource::XObject::Image';
 use strict;
 use warnings;
 
-our $VERSION = '3.020'; # VERSION
-my $LAST_UPDATE = '3.020'; # manually update whenever code is changed
+our $VERSION = '3.021'; # VERSION
+my $LAST_UPDATE = '3.021'; # manually update whenever code is changed
 
 use Compress::Zlib;
 use POSIX qw(ceil floor);
@@ -83,10 +83,14 @@ channels to 8bps, permitting use on PDF 1.4 output.
        transparency). The Alpha channel is ignored if the -notrans 
        option is given. The tRNS chunk is not permitted.
 
+   (5) B<RESERVED> for grayscale via palette + Alpha channel
+
    (6) RGB truecolor with 8 or 16 bits per sample, with equal-sized 
        Alpha channel (256 or 65536 levels of transparency). The Alpha 
        channel is ignored if the -notrans option is given. The tRNS 
        chunk is not permitted.
+
+   (7) B<RESERVED> for truecolor via palette + Alpha channel
 
 In all cases, 16 bits per sample forces PDF 1.5 (or higher) output, unless
 you give the C<-force8bps> option, to "strip" 16 bit samples to 8 bits, and
@@ -458,7 +462,7 @@ sub new {
 	    $dict->{' stream'} = '';
 	    $self->{' stream'} = '';
             # high-speed splitting out of alpha channel
-            my $split = split_alpha($png);
+            my $split = $png->split_alpha();
             $self->{' stream'} = $split->{'data'};
             $dict->{' stream'} = $split->{'alpha'};
         }
@@ -524,7 +528,7 @@ sub new {
 	    $dict->{' stream'} = '';
 	    $self->{' stream'} = '';
             # high-speed splitting out of alpha channel
-            my $split = split_alpha($png);
+            my $split = $png->split_alpha();
             $self->{' stream'} = $split->{'data'};
             $dict->{' stream'} = $split->{'alpha'};
         }
@@ -582,7 +586,7 @@ need to know in advance.
 =cut
 
 sub usesLib {
-    my ($self) = shift;
+    my ($self) = @_;
     # should be 0 for Image::PNG::Libpng not installed, or -1 for is installed,
     # but not using it
     return $self->{'usesIPL'}->val();

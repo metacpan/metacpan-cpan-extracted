@@ -10,7 +10,8 @@ my ($result, $remainder);
 
 sub readval {
     my ($read, $unread, %options) = @_;
-    open my $fh, '<', \$unread;
+    open my $fh, '<', \$unread or
+        die "Can't open 'unread' for input";
     my $parser = { ' INFILE' => $fh };
     bless $parser, 'PDF::Builder::Basic::PDF::File';
     my ($result, $remainder) = $parser->readval($read, %options);

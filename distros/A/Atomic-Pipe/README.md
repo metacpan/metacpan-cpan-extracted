@@ -278,11 +278,6 @@ include the necessary control characters.
     this will return undef. This will also return undef when the pipe is closed
     (EOF).
 
-- $count = $self->parts\_needed($data)
-
-    Get the number of parts the data will be split into for it to be written in
-    atomic chunks.
-
 - $p->blocking($bool)
 - $bool = $p->blocking
 
@@ -297,9 +292,13 @@ include the necessary control characters.
     Write any buffered items. This is only useful on writers that are in
     non-blocking mode, it is a no-op everywhere else.
 
-- $bool = $p->eof
+- $bool = $r->eof()
 
-    True if EOF (all writers are closed).
+    True if all writers are closed, and the buffers do not contain any usable data.
+
+    Usable data means raw data that has yet to be processed, complete messages, or
+    complete data bursts. Any of these can still be retreieved using
+    `read_message()`, or `get_line_burst_or_data()`.
 
 - $p->close
 
@@ -330,6 +329,22 @@ include the necessary control characters.
 - $fh = $p->wh
 
     Get the read or write handles.
+
+- $read\_size = $p->read\_size()
+- $p->read\_size($read\_size)
+
+    Get/set the read size. This is how much data to ATTEMPT to read each time
+    `fill_buffer()` is called. The default is 65,536 which is the default pipe
+    size on linux, though the value is hardcoded currently.
+
+- $bytes = $p->fill\_buffer
+
+    Read a chunk of data from the pipe and store it in the internal buffer. Bytes
+    read are returned. This is only useful if you want to pull data out of the pipe
+    (maybe to unblock the writer?) but do not want to process any of the data yet.
+
+    This is automatically called as needed by other methods, usually you do not
+    need to use it directly.
 
 ### RESIZING THE PIPE BUFFER
 

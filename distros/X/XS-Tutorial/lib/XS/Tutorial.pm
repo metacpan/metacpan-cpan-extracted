@@ -1,5 +1,5 @@
 package XS::Tutorial;
-BEGIN { our $VERSION = 0.03 }
+BEGIN { our $VERSION = 0.04 }
 1;
 
 =encoding utf8
@@ -48,7 +48,7 @@ A thorough L<introduction|https://www.manning.com/books/extending-and-embedding-
 
 =head3 ExtUtils::MakeMaker
 
-The L<documentation|https://metacpan.org/pod/ExtUtils::MakeMaker> explains all of the options in C<Makefile.PL>. Useful if you need to pass additional flags or options to to the C compiler.
+The L<documentation|https://metacpan.org/pod/ExtUtils::MakeMaker> explains all of the options in C<Makefile.PL>. Useful if you need to pass additional flags or options to the C compiler.
 
 =head3 ppport.h
 

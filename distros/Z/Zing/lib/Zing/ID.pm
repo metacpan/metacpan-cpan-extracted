@@ -18,7 +18,7 @@ use overload (
   fallback => 1
 );
 
-our $VERSION = '0.20'; # VERSION
+our $VERSION = '0.21'; # VERSION
 
 # ATTRIBUTES
 
@@ -94,13 +94,13 @@ method string() {
 
 =head1 NAME
 
-Zing::ID - Globally Unique Identifier
+Zing::ID - Conditionally Unique Identifier
 
 =cut
 
 =head1 ABSTRACT
 
-Globally Unique Identifier
+Conditionally Unique Identifier
 
 =cut
 

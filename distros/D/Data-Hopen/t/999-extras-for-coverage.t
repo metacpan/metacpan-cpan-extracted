@@ -118,6 +118,22 @@ package TestDataHopen {
     }
 } #package DH
 
+package TestDataHopenScope {
+    use Data::Hopen ':all';
+    use Data::Hopen::Scope;
+    use HopenTest;
+    use Capture::Tiny qw(capture_stderr);
+    use Test::Fatal;
+
+    sub run {
+        my $dut = Data::Hopen::Scope->new;
+        foreach my $method (qw(put merge _names_here _find_here)) {
+            like exception { $dut->$method; }, qr/Unimplemented/,
+                "abstract $method dies";
+       }
+    }
+} #package DHScope
+
 package TestDataHopenGOutputOp {
     use HopenTest;
     use Capture::Tiny;

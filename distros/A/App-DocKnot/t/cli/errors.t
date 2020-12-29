@@ -57,10 +57,7 @@ is_error($@, 'generate-all: too many arguments', 'Too many arguments');
 
 # Trigger an error in a submodule to test error rewriting.
 eval { $docknot->run('generate', '-m', '/nonexistent', 'readme') };
-is_error(
-    $@,
-'generate: metadata path /nonexistent does not exist or is not a directory',
-);
+is_error($@, 'generate: metadata path /nonexistent does not exist');
 
 # Check for a missing required argument.
 eval { $docknot->run('dist') };

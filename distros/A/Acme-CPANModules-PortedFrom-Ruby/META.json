@@ -41,6 +41,7 @@
       "x_mentions" : {
          "x_mentions" : {
             "App::Sass" : "0",
+            "HTTP::Server::Brick" : "0",
             "Scientist" : "0"
          }
       }
@@ -57,7 +58,7 @@
          "web" : "https://github.com/perlancar/perl-Acme-CPANModules-PortedFrom-Ruby"
       }
    },
-   "version" : "0.002",
+   "version" : "0.003",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.030000"

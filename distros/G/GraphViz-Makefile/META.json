@@ -62,6 +62,6 @@
       },
       "x_IRC" : "irc://irc.perl.org/#graphql-perl"
    },
-   "version" : "1.19",
+   "version" : "1.20",
    "x_serialization_backend" : "JSON::PP version 4.00"
 }

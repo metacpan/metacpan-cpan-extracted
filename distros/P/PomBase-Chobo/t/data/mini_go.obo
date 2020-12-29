@@ -29,3 +29,11 @@ synonym: "cyanidin 3-O-glucoside-yadda" EXACT []
 synonym: "cyanidin 3-O-glucoside-yadda" NARROW []
 synonym: "cyanidin 3-O-glucoside-yadda-three" EXACT []
 synonym: "cyanidin 3-O-glucoside-\"something\"" NARROW []
+
+[Term]
+id: GO:0000108
+name: obsolete repairosome
+namespace: molecular_function
+def: "OBSOLETE. A stable complex of proteins" [PMID:10681587, PMID:9852079]
+is_obsolete: true
+replaced_by: GO:0000109

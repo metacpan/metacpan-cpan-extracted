@@ -22,13 +22,29 @@ ok(@t == 0, "lock directory is empty because it is new");
 if (fork() == 0) {
     close P1;
     my $z1 = Dir::Flock::lock($dir);
+    my ($z2,$z3);
     # make a copy of the lockfile
     my ($t) = glob("$dir/dir-flock-*");
-    my $z2 = open my $fh2, ">", "$t-copy";
-    my $z3 = open my $fh1, "<", $t;
-    print $fh2 readline($fh1);
-    close $fh1;
-    close $fh2;
+    if (-f $t) {
+	diag "duplicating $t";
+	$z2 = open my $fh2, ">", "$t-copy";
+	$z3 = open my $fh1, "<", $t;
+	print $fh2 readline($fh1);
+	close $fh1;
+	close $fh2;
+    } elsif (-d $t) {
+	mkdir "$dir/dir-flock-2";
+	for my $tt (glob("$dir/dir-flock-1/*")) {
+	    diag "duplicating $tt";
+	    my $uu = $tt;
+	    $uu =~ s/flock-1/flock-2/;
+	    $z2 = open my $fh2, ">", $uu;
+	    $z3 = open my $fh1, "<", $tt;
+	    print $fh2 readline($fh1);
+	    close $fh1;
+	    close $fh2;
+	}
+    }
     my $z4 = Dir::Flock::unlock($dir);
     no warnings 'uninitialized';
     diag "child status: $z1/$z2/$z3/$z4\n";

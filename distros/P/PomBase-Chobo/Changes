@@ -1,5 +1,15 @@
 Revision history for PomBase-Chobo
 
+0.032     2020-12-26 20:32:43
+          Filter alt_ids from the definition xrefs to avoid
+          duplicate key violations 
+
+0.031     2020-12-24 13:52:54
+          Store the "replaced_by" property as a cvtermprop
+
+0.030     2020-12-24 13:34:14
+          Fix bug caused by de-quoting change in v0.028
+
 0.029     2020-12-22 00:39:02
           Fix check for duplicate cvterm definition dbxrefs
 

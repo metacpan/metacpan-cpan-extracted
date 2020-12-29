@@ -43,15 +43,12 @@
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Carp-Assert-More"
+         "web" : "https://github.com/petdance/carp-assert-more/issues"
       },
       "license" : [
-         "http://www.opensource.org/licenses/artistic-license-2.0.php"
-      ],
-      "repository" : {
-         "url" : "https://github.com/petdance/carp-assert-more/tree/master"
-      }
+         "https://opensource.org/licenses/artistic-license-2.0.php"
+      ]
    },
-   "version" : "1.24",
+   "version" : "1.26",
    "x_serialization_backend" : "JSON::PP version 4.05"
 }

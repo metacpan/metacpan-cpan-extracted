@@ -7,7 +7,7 @@ use Time::HiRes;
 use base 'Forks::Queue';
 use 5.010;    #  sorry, v5.08. I love the // //=  operators too much
 
-our $VERSION = '0.14';
+our $VERSION = '0.15';
 our $DEBUG;
 *DEBUG = \$Forks::Queue::DEBUG;
 
@@ -49,9 +49,10 @@ sub _lock {
         my $z = Dir::Flock::lock($self->{_lockdir});
         $_DEBUG && print STDERR ">> flock_dir lock by ".
             _PID() . " z=$z \!$=$!\n";
-        if (!$z) {
+        if (!$z && !$self->{_DESTROY}) {
             carp "Forks::Queue: lock queue by flock_dir failed: $!";
         }
+	$self->{__locked} = $z;
     } elsif ($self->{lock}) {
         # file-based advisory file locking with flock
         # Doesn't work across threads in Solaris, since fcntl implementation
@@ -66,6 +67,7 @@ sub _lock {
         }
         $self->{lockfh} = $lockfh;
         $_DEBUG && print STDERR ">> flock lock by " . _PID() . "\n";
+	$self->{__locked} = $z;
     }
     $self->{_locked} = 1;
 }
@@ -95,9 +97,10 @@ sub _SYNC (&$) {
     return if Forks::Queue::__inGD();
     my $_DEBUG = $self->{debug} // $DEBUG;
 
+    # _lock can fail if queue object is being DESTROYed.
     $self->_lock;
     my $result = $block->($self);
-    $self->_unlock;
+    $self->_unlock if $self->{__locked} || !$self->{_DESTROY};
     return $result;
 }
 
@@ -148,9 +151,9 @@ sub new {
 
     my $self = bless { %opts }, $class;
 
-    # Normal flock can not be used with multi-threaded solaris,
+    # Normal flock can not be used with multi-threaded solaris or aix
     # and may be flaky with files on NFS directories.
-    if ($^O eq 'solaris') {
+    if ($^O eq 'solaris' || $^O eq 'aix') {
         $opts{dflock} //= 1;
     } elsif (${^_nfs}) {
         $opts{dflock} //= 1;
@@ -164,7 +167,6 @@ sub new {
         # the queue.
         no warnings 'numeric';
         require Dir::Flock;
-        $self->{_lockdir} = Dir::Flock::getDir( $opts{lock} );
         $Dir::Flock::HEARTBEAT_CHECK = 5;
         $Dir::Flock::PAUSE_LENGTH = 0.01;
     }
@@ -180,7 +182,7 @@ sub new {
         if (-f $opts{file}) {
             carp "Forks::Queue: Queue file $opts{file} already exists. ",
                  "Expect trouble if another process created this file.";
-            unlink $opts{file};
+            my $z = unlink $opts{file};
         }
         open my $fh3, '>', $opts{file} or die;
         close $fh3 or die;
@@ -189,6 +191,9 @@ sub new {
         my $fhx = select $fh4; $| = 1; select $fhx;
         $self->{_fh} = *$fh4;
         seek $fh4, 0, 0;
+	if ($opts{dflock}) {
+	    $self->{_lockdir} = Dir::Flock::getDir($opts{lock},$opts{persist});
+	}
 
         $self->{_locked}++;
         $self->_write_header;
@@ -204,7 +209,6 @@ sub new {
             carp "Forks::Queue::new: 'list' option must be an array ref";
         }
     }
-
     return $self;
 }
 
@@ -257,7 +261,7 @@ sub DESTROY {
     $self->{_fh} && close $self->{_fh};
     $_DEBUG and print STDERR "$pid DESTROY: remaining pids: ",
                                 join(" ",keys %{$self->{_pids}}),"\n";
-    if ($self->{_pids} && 0 == keys %{$self->{_pids}}) {
+    if ($self->{_pids} && 0 == keys %{$self->{_pids}} && !$self->{persist}) {
         $_DEBUG and print STDERR "$$ Unlinking files from here\n";
         my $u2 = -1;
         my $u1 = unlink $self->{lock};
@@ -1256,7 +1260,7 @@ Forks::Queue::File - file-based implementation of Forks::Queue
 
 =head1 VERSION
 
-0.14
+0.15
 
 =head1 SYNOPSIS
 

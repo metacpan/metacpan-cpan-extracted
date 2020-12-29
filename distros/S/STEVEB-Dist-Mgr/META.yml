@@ -20,6 +20,8 @@ no_index:
     - inc
 requires:
   File::Find::Rule: '0'
+  File::Path: '0'
+  Module::Starter: '0'
   PPI: '0'
   Tie::File: '0'
   perl: '5.010'
@@ -27,5 +29,5 @@ requires:
 resources:
   bugtracker: https://github.com/stevieb9/steveb-dist-mgr/issues
   repository: https://github.com/stevieb9/steveb-dist-mgr.git
-version: '0.02'
+version: '0.04'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

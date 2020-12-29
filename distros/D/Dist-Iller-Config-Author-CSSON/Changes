@@ -1,6 +1,41 @@
 Revision history for Dist-Iller-Config-Author-Csson
 
-0.0326 2020-12-15 20:52:38 UTC
+0.0328 2020-12-28 12:17:24 UTC
+ [Config Changes]
+ - Add Githubactions badge.
+ - Remove Kwalitee and Cpantesters badges (hopefully temporarily).
+ - Move PromptIfStale from 'build' to 'release'.
+
+ [Other Changes]
+ - Set required Perl version to 5.14, since that is what Dist::Zilla
+   requires.
+
+ [Stats & Dependency Changes]
+ - 4 files changed, 14 insertions(+), 11 deletions(-)
+ - (run req) ~ perl 5.010000 --> 5.014000
+ - (dev req) + Badge::Depot::Plugin::Githubactions (any)
+ - (dev req) - Badge::Depot::Plugin::Cpantesters
+ - (dev req) - Badge::Depot::Plugin::Kwalitee
+ - (dev sug) ~ Dist::Iller::Config::Author::CSSON 0.0327 --> 0.0328
+
+0.0327 2020-12-27T18:32:55Z UTC
+ [Config Changes]
+ - Replaced [TravisYML] with [Author::CSSON::GithubActions]
+ - Temporarily (hopefully) removed [Test::Kwalitee::Extra], due to
+   installation issues
+ - Use $self.distribution_name in gitignore, so that it gets set
+   automatically
+
+ [Stats & Dependency Changes]
+ - 5 files changed, 67 insertions(+), 16 deletions(-)
+ - (dev req) +
+   Dist::Zilla::Plugin::Author::CSSON::GithubActions::Workflow::TestWithMakefile
+   0.0106
+ - (dev req) - Dist::Zilla::Plugin::Test::Kwalitee::Extra
+ - (dev sug) ~ Dist::Iller 0.1408 --> 0.1409
+ - (dev sug) ~ Dist::Iller::Config::Author::CSSON 0.0326 --> 0.0327
+
+0.0326 2020-12-15T20:52:38Z UTC
  [Config Changes]
  - Removed .travis.yml from Author::CSSON::MapMetro
  - Disabled travis by default

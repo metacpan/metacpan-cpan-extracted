@@ -13,7 +13,7 @@ use Data::Object::ClassHas;
 
 extends 'Zing::Kernel';
 
-our $VERSION = '0.20'; # VERSION
+our $VERSION = '0.21'; # VERSION
 
 # ATTRIBUTES
 
@@ -886,10 +886,9 @@ In Zing, actors can block using C<poll> but do not block by default.
 
 =item *
 
-In Zing, the default datastore/backend is L<Redis|https://redis.io> which means
-the system is (by default) subject to the guarantees and limitations of that
-system. Data is serialized as L<JSON|https://json.org> and stored in
-plain-text.
+In Zing, the system responsible for persistence and atomicity is pluggable and
+as such is subject to the guarantees and limitations of that underlying system.
+Data serialization, e.g. L<JSON|https://json.org>, is also pluggable.
 
 =back
 

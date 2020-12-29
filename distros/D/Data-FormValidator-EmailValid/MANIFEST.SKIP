@@ -1,9 +1,0 @@
-Build
-_build/
-.git/
-\..*\.swp
-blib/
-.prove
-.travis.yml
-^MYMETA\.yml$
-^MYMETA\.json$

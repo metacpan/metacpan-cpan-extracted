@@ -16,8 +16,8 @@ use strict;
 use warnings;
 use Getopt::Long;
 
-our $VERSION = '3.020'; # VERSION
-my $LAST_UPDATE = '3.020'; # manually update whenever code is changed
+our $VERSION = '3.021'; # VERSION
+my $LAST_UPDATE = '3.021'; # manually update whenever code is changed
 
 # =============
 # CONFIGURATION  these may be overridden by command-line flags. If reading from
@@ -715,7 +715,7 @@ sub process {
     if ($len <= 1) { return; }  # single element won't have any children
 
     my ($i, $j, $dir);
-    my ($start2, $len2, $ref, $refc);
+    my ($len2, $ref, $refc);
     
     # if $start row's pmnameA is now empty, that means that $start is the 
     # parent of everything else below it

@@ -32,8 +32,8 @@
 
     \download[[% name %]][[% distribution.version %]]
         [[% distribution.section %]/[% distribution.tarname %]-\version[[% distribution.version %]]]
-[% IF packaging.debian %]
-    \link[https://packages.debian.org/source/sid/[% packaging.debian %]]
+[% IF distribution.packaging.debian.package %]
+    \link[https://packages.debian.org/source/sid/[% distribution.packaging.debian.package %]]
          [Debian packages] \break[% END %]
     \link[https://archives.eyrie.org/software/ARCHIVE/[% distribution.tarname %]/]
          [Archive]
@@ -56,8 +56,6 @@
     \link[https://github.com/[% vcs.github %]]
          [GitHub][% END %][% IF support.github %] \break
     \link[https://github.com/[% support.github %]/issues]
-         [Bug tracker][% ELSIF support.cpan %] \break
-    \link[https://rt.cpan.org/Dist/Display.html?Name=[% support.cpan %]]
          [Bug tracker][% END %][% IF vcs.type == 'Git' %] \break
     \link[[% vcs.browse %]]
          [Git repository][% END %][% IF vcs.status.travis %] \break
@@ -66,8 +64,8 @@
     \link[https://metacpan.org/release/[% distribution.cpan %]]
          [MetaCPAN][% END %][% IF vcs.openhub %] \break
     \link[[% vcs.openhub %]]
-         [Open HUB code analysis][% END %][% IF packaging.debian %] \break
-    \link[https://tracker.debian.org/pkg/[% packaging.debian %]]
+         [Open HUB code analysis][% END %][% IF distribution.packaging.debian.package %] \break
+    \link[https://tracker.debian.org/pkg/[% distribution.packaging.debian.package %]]
          [Debian package tracker][% END %]
 ]
 [% IF orphaned %]
@@ -94,8 +92,8 @@ need to regenerate Makefile.in, you will need Automake
 configure.ac or any of the m4 files it includes and need to regenerate
 configure or config.h.in, you will need Autoconf [% build.autoconf %] or
 later.[% IF build.manpages %]  Perl is also required to generate manual
-pages from a fresh Git checkout.[% END %][% IF bootstrap %]
-[% to_thread(bootstrap) %][% END %]
+pages from a fresh Git checkout.[% END %][% IF build.bootstrap %]
+[% to_thread(build.bootstrap) %][% END %]
 [% END %]
 \h2[Download]
 
@@ -110,13 +108,14 @@ An \link[https://archives.eyrie.org/software/ARCHIVE/[% distribution.tarname %]/
 [archive of older releases] is also available.[% IF advisories %]
 \class(alert)[Versions older than [% advisories.0.threshold %] have known
 security vulnerabilities and should not be used.][% END %]
-[% IF debian.summary %]
-[% to_thread(debian.summary) | trim %][% IF debian.summary.match('\n\n') %]
+[% IF distribution.packaging.debian.summary %]
+[% to_thread(distribution.packaging.debian.summary) | trim %][% IF distribution.packaging.debian.summary.match('\n\n') %]
 
 [% ELSE %]  [% END %]See the \link[https://tracker.debian.org/pkg/[%
-packaging.debian %]][Debian package tracker] for more information.
+distribution.packaging.debian.package %]][Debian package tracker] for more
+information.
 
-[% ELSIF debian.personal %]
+[% ELSIF distribution.packaging.debian.personal %]
 A Debian package is available from my \link[../debian.html][personal
 repository].
 [% END %][% IF distribution.cpan %]
@@ -124,8 +123,8 @@ repository].
 \link[https://metacpan.org/release/[% distribution.cpan %]]
 [[% distribution.cpan %] distribution].
 [% END %]
-[% IF packaging.extra %]
-[% to_thread(packaging.extra) %]
+[% IF distribution.packaging.extra %]
+[% to_thread(distribution.packaging.extra) %]
 [% END %][% name %] is maintained using the [% vcs.type %] version control
 system.  To check out the current development tree, [% IF vcs.github %]see
 \link[https://github.com/[% vcs.github %]][GitHub] or [% END %]clone:
@@ -157,8 +156,6 @@ also \link[[% vcs.browse %]][browse the current development source].
     \doc[https://github.com/[% vcs.github %]]
         [GitHub][% END %][% IF support.github %]
     \doc[https://github.com/[% support.github %]/issues]
-        [Bug tracker][% ELSIF support.cpan %]
-    \doc[https://rt.cpan.org/Dist/Display.html?Name=[% support.cpan %]]
         [Bug tracker][% END %][% IF vcs.status.travis %]
     \doc[https://travis-ci.org/[% vcs.status.travis %]]
         [Travis-CI][% END %][% IF vcs.openhub %]
@@ -202,8 +199,6 @@ Developer documentation:
 \doc[https://github.com/[% vcs.github %]]
     [GitHub][% END %][% IF support.github %]
 \doc[https://github.com/[% support.github %]/issues]
-    [Bug tracker][% ELSIF support.cpan %]
-\doc[https://rt.cpan.org/Dist/Display.html?Name=[% support.cpan %]]
     [Bug tracker][% END %][% IF vcs.status.travis %]
 \doc[https://travis-ci.org/[% vcs.status.travis %]]
     [Travis-CI][% END %][% IF vcs.openhub %]
@@ -225,7 +220,7 @@ and license:
         [% copr.holder %]
 [% END %]
 
-[% indent(to_thread(license.full), 4) %]
+[% indent(to_thread(license.text), 4) %]
 [% IF license.notices %]
 [% indent(to_thread(license.notices), 4) %]
 [% END %]

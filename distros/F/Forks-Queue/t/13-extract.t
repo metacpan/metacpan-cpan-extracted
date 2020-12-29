@@ -9,14 +9,14 @@ foreach my $impl (IMPL()) {
 
     my $q = Forks::Queue->new( impl => $impl, list => [ 1 .. 50 ],
                                style => 'fifo' );
-    ok($q);
+    ok($q, "$impl queue created");
     ok($q->pending == 50, '50 items found');
 
     my @u = $q->extract;
     ok(@u == 1 && $u[0] == 1, 'bare extract gets 1st elem') or diag @u;
 
     my @t = $q->extract(5);
-    ok(@t == 1);
+    ok(@t == 1, "extract(arg) retrieves 1 elem");
     ok($t[0] == 7, 'extract(arg) gets arg+1-th elem') or diag @t;
 
     @u = $q->extract(-10);

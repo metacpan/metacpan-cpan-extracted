@@ -8,7 +8,7 @@ use strict;
 use warnings;
 use Pod::Simple::HTML;
 
-our $VERSION = '1.001'; # VERSION
+our $VERSION = '1.002'; # VERSION
 my $LAST_UPDATE = '1.000'; # manually update whenever code is changed
 
 my $parser = Pod::Simple::HTML->new();
@@ -28,7 +28,10 @@ if (defined $ARGV[1]) {
 }
 
 $parser->index(1);
-$parser->html_css('http://search.cpan.org/s/style.css');
+# site no longer exists. TBD see if there is some good replacement out there,
+# preferably one that doesn't require turning a phone to landscape mode in
+# order to see text at a decent size.
+#$parser->html_css('http://search.cpan.org/s/style.css');
 
 $parser->output_fh(*$OUT);
 $parser->parse_file(*$IN);

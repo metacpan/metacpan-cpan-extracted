@@ -1,10 +1,11 @@
 package Power::Outlet::Virtual;
 use strict;
 use warnings;
-use Path::Class qw{file};
+use File::Spec qw{};
+use Path::Class qw{};
 use base qw{Power::Outlet::Common};
 
-our $VERSION='0.24';
+our $VERSION='0.36';
 
 =head1 NAME
 
@@ -53,11 +54,17 @@ sub _id_default {1};
 
 =cut
 
-sub _folder {$ENV{'TMPDIR'} || '/tmp'};
+sub _folder {
+  my $self           = shift;
+  $self->{'_folder'} = shift if @_;
+  $self->{'_folder'} = File::Spec->tmpdir() unless defined $self->{'_folder'};
+  die(sprintf('Error: Directory "%s" is not writable', $self->{'_folder'})) unless -w $self->{'_folder'};
+  return $self->{'_folder'};
+}
 
 sub _file {
   my $self = shift;
-  return file($self->_folder, sprintf("power-outlet.%s.outlet", $self->id));
+  return Path::Class::file($self->_folder, sprintf("power-outlet.%s.outlet", $self->id));
 }
 
 =head2 query

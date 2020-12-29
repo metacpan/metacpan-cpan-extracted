@@ -123,6 +123,16 @@ drop() : Int
 
   $lookup->drop;
 
+=example-2 drop
+
+  # given: synopsis
+
+  $lookup->set('user-12345', 'me@example.com');
+
+  $lookup->savepoint->send;
+
+  $lookup->drop;
+
 =method get
 
 The get method return the L<Zing::Domain> associated with a specific key.
@@ -216,6 +226,15 @@ $subs->example(-1, 'drop', 'method', fun($tryable) {
   ok my $result = $tryable->result;
   my $lookup = Zing::Lookup->new(name => 'users');
   ok !%{$lookup->state};
+
+  $result
+});
+
+$subs->example(-2, 'drop', 'method', fun($tryable) {
+  ok my $result = $tryable->result;
+  my $lookup = Zing::Lookup->new(name => 'users');
+  ok !%{$lookup->state};
+  ok !$lookup->savepoint->test;
 
   $result
 });

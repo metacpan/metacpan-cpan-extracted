@@ -3,10 +3,11 @@ package PDF::Builder::NamedDestination;
 use base 'PDF::Builder::Basic::PDF::Dict';
 
 use strict;
-no warnings qw[ recursion uninitialized ];
+use warnings;
+#no warnings qw[ recursion uninitialized ];
 
-our $VERSION = '3.020'; # VERSION
-my $LAST_UPDATE = '3.020'; # manually update whenever code is changed
+our $VERSION = '3.021'; # VERSION
+my $LAST_UPDATE = '3.021'; # manually update whenever code is changed
 
 # TBD: do -rect and -border apply to Named Destinations (link, url, file)? 
 #      There is nothing to implement these options. Perhaps the code was copied 

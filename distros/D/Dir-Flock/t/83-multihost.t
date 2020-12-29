@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use File::Basename;
 use Cwd;
-require "t/80-multi-tests.pl";
+require "./t/80-multi-tests.pl";
 
 # 83-multihost.t: content for a directory with a process
 #     on a remote host. To properly test this, you must

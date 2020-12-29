@@ -1,9 +1,9 @@
 package Sah::SchemaR::unix::filename;
 
-our $DATE = '2020-06-13'; # DATE
-our $VERSION = '0.012'; # VERSION
+our $DATE = '2020-10-16'; # DATE
+our $VERSION = '0.013'; # VERSION
 
-our $rschema = ["str",[{match=>"\\A(?:/|/?(?:[^/\\0]{1,255})(?:/[^/\\0]{1,255})*)\\z",prefilters=>["Path::expand_tilde","Path::strip_slashes"],summary=>"Filesystem file name on a Unix system","x.completion"=>["filename"]},{description=>"\nThis is just a convenient alias for filename::unix.\n\n",examples=>[],summary=>"File name (with optional path) on a Unix system"}],["filename::unix","str"]];
+our $rschema = ["str",[{examples=>[{valid=>0,value=>""},{valid=>1,value=>"foo"},{valid=>1,value=>"foo/bar"},{valid=>1,validated_value=>"foo/bar",value=>"foo//bar"},{summary=>"Path element too long",valid=>0,value=>"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"},{summary=>"Contains null character",valid=>0,value=>"foo\0"}],match=>"\\A(?:/|/?(?:[^/\\0]{1,255})(?:/[^/\\0]{1,255})*)\\z",prefilters=>["Path::expand_tilde","Path::strip_slashes"],summary=>"Filesystem file name on a Unix system","x.completion"=>["filename"]},{description=>"\nThis is just a convenient alias for filename::unix.\n\n",examples=>[],summary=>"File name (with optional path) on a Unix system"}],["filename::unix","str"]];
 
 1;
 # ABSTRACT: File name (with optional path) on a Unix system
@@ -20,7 +20,7 @@ Sah::SchemaR::unix::filename - File name (with optional path) on a Unix system
 
 =head1 VERSION
 
-This document describes version 0.012 of Sah::SchemaR::unix::filename (from Perl distribution Sah-Schemas-Unix), released on 2020-06-13.
+This document describes version 0.013 of Sah::SchemaR::unix::filename (from Perl distribution Sah-Schemas-Unix), released on 2020-10-16.
 
 =head1 DESCRIPTION
 

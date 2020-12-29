@@ -1,25 +1,27 @@
 ---
 abstract: 'simple indentation of text shared among modules'
 author:
-  - 'James FitzGibbon, E<lt>jfitz@CPAN.orgE<gt>'
-build_requires: {}
+  - 'James FitzGibbon, <jfitz@CPAN.org>'
+build_requires:
+  ExtUtils::MakeMaker: '6.46'
+  Test::More: '0'
 configure_requires:
-  Module::Build: '0.42'
+  ExtUtils::MakeMaker: '6.46'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4224, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.56, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: Text-Indent
-provides:
-  Text::Indent:
-    file: lib/Text/Indent.pm
-    version: '0.03'
+no_index:
+  directory:
+    - t
+    - inc
 requires:
   Class::MethodMaker: '1.12'
   Params::Validate: '0.5'
 resources:
-  license: http://dev.perl.org/licenses/
-version: '0.03'
+  bugtracker: https://github.com/renderorange/Text-Indent/issues
+version: '0.031'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

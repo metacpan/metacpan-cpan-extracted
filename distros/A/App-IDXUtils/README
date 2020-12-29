@@ -3,8 +3,8 @@ NAME
     Exchange
 
 VERSION
-    This document describes version 0.002 of App::IDXUtils (from Perl
-    distribution App-IDXUtils), released on 2018-09-08.
+    This document describes version 0.004 of App::IDXUtils (from Perl
+    distribution App-IDXUtils), released on 2020-12-27.
 
 SYNOPSIS
 DESCRIPTION
@@ -13,9 +13,19 @@ DESCRIPTION
 
     *   list-idx-boards
 
+    *   list-idx-boards-static
+
+    *   list-idx-brokers
+
+    *   list-idx-brokers-static
+
     *   list-idx-firms
 
+    *   list-idx-firms-static
+
     *   list-idx-sectors
+
+    *   list-idx-sectors-static
 
 HOMEPAGE
     Please visit the project's homepage at
@@ -27,7 +37,7 @@ SOURCE
 
 BUGS
     Please report any bugs or feature requests on the bugtracker website
-    <https://rt.cpan.org/Public/Dist/Display.html?Name=App-IDXUtils>
+    <https://github.com/perlancar/perl-App-IDXUtils/issues>
 
     When submitting a bug or request, please include a test-file or a patch
     to an existing test-file that illustrates the bug or desired feature.
@@ -36,7 +46,7 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2018 by perlancar@cpan.org.
+    This software is copyright (c) 2020, 2018 by perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

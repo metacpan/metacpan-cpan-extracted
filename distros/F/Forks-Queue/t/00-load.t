@@ -6,6 +6,7 @@ use Test::More;
 diag "Forks::Queue test on $^O $]";
 use_ok( 'Forks::Queue' );
 use_ok( 'Forks::Queue::File' );
+use_ok( 'Dir::Flock' );
 
 {
     no warnings 'once';
@@ -13,5 +14,7 @@ use_ok( 'Forks::Queue::File' );
 }
 my $q = eval { Forks::Queue->new };
 ok(!$q && $@, 'impl  option must be present to instantiate Forks::Queue');
+diag "Forks::Queue ",$Forks::Queue::VERSION;
+diag "Dir::Flock ",$Dir::Flock::VERSION;
 
 done_testing();

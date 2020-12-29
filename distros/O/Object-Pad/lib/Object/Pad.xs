@@ -313,7 +313,9 @@ enum ReprType {
 struct ClassMeta {
   enum MetaType type : 8;
   enum ReprType repr : 8;
-  bool sealed;
+
+  unsigned int sealed : 1;
+  unsigned int role_is_invokable : 1;
 
   SLOTOFFSET start_slotix; /* first slot index of this partial within its instance */
   SLOTOFFSET next_slotix;  /* 1 + final slot index of this partial within its instance; includes slots in roles */
@@ -364,6 +366,9 @@ static CV *S_embed_cv(pTHX_ CV *cv, RoleEmbedding *embedding)
 
 /* Empty MGVTBL simply for locating instance slots AV */
 static MGVTBL vtbl_slotsav = {};
+
+/* Empty role embedding that is applied to all invokable role methods */
+static RoleEmbedding embedding_standalone = {};
 
 #define get_obj_slotsav(self, repr, create)  S_obj_get_slotsav(aTHX_ self, repr, create)
 static SV *S_obj_get_slotsav(pTHX_ SV *self, enum ReprType repr, bool create)
@@ -473,22 +478,34 @@ static OP *pp_methstart(pTHX)
     /* Embedding info is stored in pad1; PAD_SVl() will look at CvDEPTH. We'll
      * have to grab it manually */
     PAD *pad1 = PadlistARRAY(CvPADLIST(find_runcv(0)))[1];
-    embedding = (RoleEmbedding *)SvPVX(PadARRAY(pad1)[PADIX_EMBEDDING]);
+    SV *embeddingsv = PadARRAY(pad1)[PADIX_EMBEDDING];
 
-    assert(embedding);
-
-    classstash = embedding->classmeta->stash;
-    offset     = embedding->offset;
+    if(embeddingsv && embeddingsv != &PL_sv_undef &&
+       (embedding = (RoleEmbedding *)SvPVX(embeddingsv))) {
+      if(embedding == &embedding_standalone) {
+        classstash = NULL;
+        offset     = 0;
+      }
+      else {
+        classstash = embedding->classmeta->stash;
+        offset     = embedding->offset;
+      }
+    }
+    else {
+      croak("Cannot invoke a role method directly");
+    }
   }
   else {
     classstash = CvSTASH(find_runcv(0));
     offset     = 0;
   }
 
-  const char *stashname = HvNAME(classstash);
+  if(classstash) {
+    const char *stashname = HvNAME(classstash);
 
-  if(!stashname || !sv_derived_from(self, stashname))
-    croak("Cannot invoke foreign method on non-derived instance");
+    if(!stashname || !sv_derived_from(self, stashname))
+      croak("Cannot invoke foreign method on non-derived instance");
+  }
 
   save_clearsv(&PAD_SVl(PADIX_SELF));
   sv_setsv(PAD_SVl(PADIX_SELF), self);
@@ -496,18 +513,23 @@ static OP *pp_methstart(pTHX)
   SV *slotsav;
 
   if(is_role) {
-    SV *instancedata = get_obj_slotsav(self, embedding->classmeta->repr, create);
-
-    if(create) {
-      slotsav = instancedata;
-      SvREFCNT_inc(slotsav);
+    if(embedding == &embedding_standalone) {
+      slotsav = NULL;
     }
     else {
-      slotsav = (SV *)newAV();
-      /* MASSIVE CHEAT */
-      AvARRAY(slotsav) = AvARRAY(instancedata) + offset;
-      AvFILLp(slotsav) = AvFILLp(instancedata) - offset;
-      AvREAL_off(slotsav);
+      SV *instancedata = get_obj_slotsav(self, embedding->classmeta->repr, create);
+
+      if(create) {
+        slotsav = instancedata;
+        SvREFCNT_inc(slotsav);
+      }
+      else {
+        slotsav = (SV *)newAV();
+        /* MASSIVE CHEAT */
+        AvARRAY(slotsav) = AvARRAY(instancedata) + offset;
+        AvFILLp(slotsav) = AvFILLp(instancedata) - offset;
+        AvREAL_off(slotsav);
+      }
     }
   }
   else {
@@ -516,9 +538,11 @@ static OP *pp_methstart(pTHX)
     SvREFCNT_inc(slotsav);
   }
 
-  SAVESPTR(PAD_SVl(PADIX_SLOTS));
-  PAD_SVl(PADIX_SLOTS) = slotsav;
-  save_freesv(slotsav);
+  if(slotsav) {
+    SAVESPTR(PAD_SVl(PADIX_SLOTS));
+    PAD_SVl(PADIX_SLOTS) = slotsav;
+    save_freesv(slotsav);
+  }
 
   return PL_op->op_next;
 }
@@ -1053,6 +1077,7 @@ static ClassMeta *S_mop_create_class(pTHX_ enum MetaType type, SV *name, SV *sup
   HV *stash = meta->stash = gv_stashsv(name, GV_ADD);
 
   meta->sealed = false;
+  meta->role_is_invokable = false;
   meta->start_slotix = 0;
   meta->slots   = newAV();
   meta->methods = newAV();
@@ -1104,6 +1129,9 @@ static ClassMeta *S_mop_create_class(pTHX_ enum MetaType type, SV *name, SV *sup
 
     if(supermeta) {
       /* A subclass of an Object::Pad class */
+      if(supermeta->type != METATYPE_CLASS)
+        croak("%" SVf " is not a class", SVfARG(superclassname));
+
       meta->start_slotix = supermeta->next_slotix;
       meta->repr = supermeta->repr;
       meta->foreign_new = supermeta->foreign_new;
@@ -1176,8 +1204,24 @@ static void S_set_class_repr(pTHX_ ClassMeta *meta, const char *val, void *_)
     croak("Unrecognised class representation type %s", val);
 }
 
+static void S_set_class_compat(pTHX_ ClassMeta *meta, const char *val, void *_)
+{
+  if(!val)
+    croak(":compat attribute requires an argument");
+
+  if(strEQ(val, "invokable")) {
+    if(meta->type != METATYPE_ROLE)
+      croak(":compat(invokable) only applies to a role");
+
+    meta->role_is_invokable = true;
+  }
+  else
+    croak("Unrecognised class compatibility argument %s", val);
+}
+
 static struct AttributeDefinition class_attributes[] = {
   { "repr", (AttributeHandler *)&S_set_class_repr, NULL },
+  { "compat", (AttributeHandler *)&S_set_class_compat, NULL },
   { 0 },
 };
 
@@ -1591,6 +1635,9 @@ static int keyword_classlike(pTHX_ enum MetaType type, OP **op_ptr)
   SV *superclassname = NULL;
 
   if(lex_consume("extends")) {
+    if(type != METATYPE_CLASS)
+      croak("Only a class may extend another");
+
     if(superclassname)
       croak("Multiple superclasses are not currently supported");
 
@@ -1769,6 +1816,9 @@ static int keyword_has(pTHX_ OP **op_ptr)
 {
   if(!have_compclassmeta)
     croak("Cannot 'has' outside of 'class'");
+
+  if(compclassmeta->role_is_invokable)
+    croak("Cannot add slot data to an invokable role");
 
   lex_read_space(0);
   SV *name = lex_scan_lexvar();
@@ -1975,6 +2025,18 @@ static void parse_post_blockstart(pTHX_ struct XSParseSublikeContext *ctx, void 
     PADOFFSET padix = pad_add_name_pvs("$(embedding)", 0, NULL, NULL);
     if(padix != PADIX_EMBEDDING)
       croak("ARGH: Expected that padix[$(embedding)] = 3");
+
+    PAD *pad1 = PadlistARRAY(CvPADLIST(PL_compcv))[1];
+
+    if(compclassmeta->role_is_invokable) {
+      SV *sv = PadARRAY(pad1)[PADIX_EMBEDDING];
+      sv_setpvn(sv, "", 0);
+      SvPVX(sv) = (void *)&embedding_standalone;
+    }
+    else {
+      SvREFCNT_dec(PadARRAY(pad1)[PADIX_EMBEDDING]);
+      PadARRAY(pad1)[PADIX_EMBEDDING] = &PL_sv_undef;
+    }
   }
 
   intro_my();
@@ -2392,6 +2454,9 @@ add_method(self, mname, code)
     CV *code
   CODE:
   {
+    /* Take a copy now to run FETCH magic */
+    mname = sv_2mortal(newSVsv(mname));
+
     ClassMeta *meta = NUM2PTR(ClassMeta *, SvUV(SvRV(self)));
 
     if(SvOK(mname) && SvPOK(mname) && strEQ(SvPVX(mname), "BUILD")) {
@@ -2400,7 +2465,7 @@ add_method(self, mname, code)
       XSRETURN(0);
     }
 
-    MethodMeta *methodmeta = mop_class_add_method(meta, sv_mortalcopy(mname));
+    MethodMeta *methodmeta = mop_class_add_method(meta, mname);
 
     I32 klen = SvCUR(mname);
     if(SvUTF8(mname))

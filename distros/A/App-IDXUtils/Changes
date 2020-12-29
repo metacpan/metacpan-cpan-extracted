@@ -1,8 +1,18 @@
-0.002   2018-09-08 (PERLANCAR)
+0.004   2020-12-27  Released-By: PERLANCAR; Urgency: medium
+
+	- Add CLIs: list-idx-{boards,brokers,firms,sectors}-static.
+
+
+0.003   2020-12-24  Released-By: PERLANCAR; Urgency: medium
+
+	- Add CLI: list-idx-brokers.
+
+
+0.002   2018-09-08  Released-By: PERLANCAR
 
 	- Use Finance::SE::IDX::Any as backend instead of Finance::SE::IDX.
 
 
-0.001   2018-09-07 (PERLANCAR)
+0.001   2018-09-07  Released-By: PERLANCAR
 
         - First release.
