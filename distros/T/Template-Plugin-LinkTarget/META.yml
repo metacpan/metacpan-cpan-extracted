@@ -1,22 +1,35 @@
 ---
-name: Template-Plugin-LinkTarget
-version: 0.02
+abstract: 'Template Toolkit filter to add "target" attribute to all HTML links'
 author:
-  - Graham TerMarsch (cpan@howlingfrog.com)
-abstract: TT filter to add "target" attribute to all HTML links
-license: perl
-resources:
-  license: ~
-requires:
-  HTML::Parser: 0
-  Template: 2
+  - 'Graham TerMarsch <cpan@howlingfrog.com>'
 build_requires:
-  Test::More: 0
-provides:
-  Template::Plugin::LinkTarget:
-    file: lib/Template/Plugin/LinkTarget.pm
-    version: 0.02
-generated_by: Module::Build version 0.32
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  Test::DiagINC: '0.002'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.017, CPAN::Meta::Converter version 2.150010'
+license: perl
 meta-spec:
-  url: http://module-build.sourceforge.net/META-spec-v1.2.html
-  version: 1.2
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Template-Plugin-LinkTarget
+no_index:
+  directory:
+    - t
+    - xt
+requires:
+  HTML::Entities: '0'
+  HTML::Parser: '0'
+  Template::Plugin::Filter: '0'
+  namespace::clean: '0'
+resources:
+  bugtracker: https://github.com/bleargh45/Template-Plugin-LinkTarget/issues
+  repository: git://github.com/bleargh45/Template-Plugin-LinkTarget.git
+version: '0.03'
+x_generated_by_perl: v5.32.0
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'
+x_static_install: 1

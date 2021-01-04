@@ -4,6 +4,7 @@ use warnings;
 
 # ABSTRACT: run Net::Matrix::Webhook
 # PODNAME: http2matrix.pl
+our $VERSION = '0.901'; # VERSION
 
 use Getopt::Long;
 use Log::Any::Adapter ( $ENV{LOGADAPTER} || 'Stdout', log_level => $ENV{LOGLEVEL} || 'info' );
@@ -33,7 +34,7 @@ http2matrix.pl - run Net::Matrix::Webhook
 
 =head1 VERSION
 
-version 0.900
+version 0.901
 
 =head1 SYNOPSIS
 
@@ -53,11 +54,11 @@ Per default, output will go to C<STDOUT> via L<Log::Any> with a default log leve
 
 =head1 AUTHOR
 
-Thomas Klausner <domm@cpan.org>
+Thomas Klausner <domm@plix.at>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by Thomas Klausner.
+This software is copyright (c) 2020 - 2021 by Thomas Klausner.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

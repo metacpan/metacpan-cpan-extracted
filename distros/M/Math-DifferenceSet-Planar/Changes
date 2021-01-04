@@ -1,5 +1,17 @@
 Revision history for Perl extension Math::DifferenceSet::Planar.
 
+0.009   Fri, 01 Jan 2021 22:19:25 +0100
+        - added methods:
+          - check_elements
+          - find_delta
+          - start_element
+          - peak_elements
+          - eta
+          - contains
+        - more example scripts
+        - some optimizations
+        - switched to artistic license
+
 0.008   Tue, 17 Sep 2019 23:44:16 +0200
         - made raw data format more space-efficient
         - moved elements unpacking into database API

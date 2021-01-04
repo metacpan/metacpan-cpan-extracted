@@ -2,7 +2,7 @@ package Web::Request::Role::AbsoluteUriFor;
 
 # ABSTRACT: Construct an absolute URI honoring script_name
 
-our $VERSION = '1.001';
+our $VERSION = '1.002'; # VERSION
 
 use 5.010;
 use Moose::Role;
@@ -46,7 +46,7 @@ Web::Request::Role::AbsoluteUriFor - Construct an absolute URI honoring script_n
 
 =head1 VERSION
 
-version 1.001
+version 1.002
 
 =head1 SYNOPSIS
 
@@ -95,11 +95,11 @@ L<validad.com|https://www.validad.com/> for supporting Open Source.
 
 =head1 AUTHOR
 
-Thomas Klausner <domm@cpan.org>
+Thomas Klausner <domm@plix.at>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Thomas Klausner.
+This software is copyright (c) 2017 - 2021 by Thomas Klausner.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

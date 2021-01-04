@@ -28,7 +28,7 @@ my $tr = {
     # This only affects the file t/json-parse.t, the other tests are
     # unaffected.
 
-    'JSON::Parse' => '0.38',
+    'JSON::Parse' => '0.58',
 };
 
 my %WriteMakefileArgs = (
@@ -82,5 +82,5 @@ unless ( eval { ExtUtils::MakeMaker->VERSION(6.63_03) } ) {
  
 WriteMakefile(
     %WriteMakefileArgs,
-#    OPTIMIZE => '-g -Wall ',
+#    OPTIMIZE => ' -g -Wall -O ',
 );

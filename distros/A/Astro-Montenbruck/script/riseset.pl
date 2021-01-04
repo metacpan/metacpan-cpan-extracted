@@ -106,10 +106,10 @@ sub process_twilight {
 
 my $now = DateTime->now()->set_locale($LOCALE);
 
-my $man      = 0;
-my $help     = 0;
-my $date     = $now->strftime('%F');
-my $tzone;
+my $man     = 0;
+my $help    = 0;
+my $date    = $now->strftime('%F');
+my $tzone   = $now->strftime('%z');
 my @place;
 my $theme    = 'dark';
 my $twilight = $TWILIGHT_NAUTICAL;
@@ -150,7 +150,16 @@ print_data(
 );
 my $utc = $local->time_zone ne 'UTC' ? $local->clone->set_time_zone('UTC')
                                      : $local;
-my ($lat, $lon) = parse_geocoords(@place);
+
+my ($lat, $lon);
+
+# first, check if geo-coordinates are given in decimal format
+if  (grep(/^[\+\-]?(\d+(\.?\d+)?|(\.\d+))$/, @place) == 2) {
+    ($lat, $lon) = @place;
+} else {
+    ($lat, $lon) = parse_geocoords(@place);
+}
+
 print_data(
     'Place',
     format_geo($lat, $lon),
@@ -231,11 +240,16 @@ in format B<+HHMM> / B<-HHMM>, like C<+0300>.
     --timezone=GMT # Greenwich Mean Time, same as the UTC
     --timezone=+0300 # UTC + 3h (eastward from Greenwich)
 
-Local timezone by default.
+By default, local timezone by default, UTC under Windows.
+
+Please, note: Windows platform does not recognize some time zone names, 
+C<MSK> for instance. In such cases, use 
+I<offset from Greenwich> format, as described above.
+
 
 =item B<--place>
 
-The observer's location. Contains 2 elements, space separated, in any order:
+The observer's location. Contains 2 elements, space separated. 
 
 =over
 
@@ -246,6 +260,20 @@ The observer's location. Contains 2 elements, space separated, in any order:
 =back
 
 E.g.: C<--place=51N28 0W0> for I<Greenwich, UK> (the default).
+
+B<Decimal numbers> are also supported. In that case
+
+=over
+
+=item * The latitude always goes first
+
+=item * Negative numbers represent I<South> latitude and I<East> longitudes. 
+
+=back
+
+C<--place=55.75 -37.58> for I<Moscow, Russian Federation>.
+C<--place=40.73 73.935> for I<New-York, NY, USA>.
+
 
 =item B<--twilight> type of twilight:
 

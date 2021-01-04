@@ -1,0 +1,39 @@
+---
+abstract: 'Distribution development cycle toolkit'
+author:
+  - 'Steve Bertrand <steveb@cpan.org>'
+build_requires:
+  Capture::Tiny: '0'
+  File::Touch: '0'
+  Hook::Output::Tiny: '0'
+  Mock::Sub: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Dist-Mgr
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  CPAN::Uploader: '0'
+  File::Copy::Recursive: '0'
+  File::Find::Rule: '0'
+  File::Path: '0'
+  Module::Starter: '1.77'
+  PPI: '0'
+  Term::ReadKey: '0'
+  Tie::File: '0'
+  perl: '5.006'
+  version: '0'
+resources:
+  bugtracker: https://github.com/stevieb9/dist-mgr/issues
+  repository: https://github.com/stevieb9/dist-mgr.git
+version: '1.00'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

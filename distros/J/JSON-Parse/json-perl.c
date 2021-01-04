@@ -14,7 +14,7 @@
 
 #define PREFIX(x) x
 #define SVPTR SV *
-#define SETVALUE value = 
+#define SETVALUE value =
 
 #elif defined(TOKENING)
 
@@ -30,7 +30,7 @@
 
 #define PREFIX(x) valid_ ## x
 #define SVPTR void
-#define SETVALUE 
+#define SETVALUE
 
 #endif /* def PERLING */
 
@@ -248,7 +248,11 @@ PREFIX (number) (json_parse_t * parser)
 
  exp_number_end:
     parser->end--;
+#ifdef PERLING
     d = strtod (start, & end);
+#else
+    strtod (start, & end);
+#endif
     if ((unsigned char *) end == parser->end) {
 	/* Success, strtod worked as planned. */
 #ifdef PERLING
@@ -493,7 +497,7 @@ PREFIX (string) (json_parse_t * parser)
 
 #define ADDBYTE len++
 #include "utf8-byte-one.c"
-	
+
 	/* Not a fall through. */
     case BADBYTES:
 	ILLEGALBYTE;
@@ -697,10 +701,12 @@ static SVPTR PREFIX (object) (json_parse_t * parser);
  break;						\
 						\
  case '{':					\
+ INCDEPTH;					\
  SETVALUE PREFIX (object) (parser);		\
  break;						\
 						\
  case '[':					\
+ INCDEPTH;					\
  SETVALUE PREFIX (array) (parser);		\
  break;						\
 						\
@@ -817,6 +823,7 @@ PREFIX (array) (json_parse_t * parser)
     goto array_middle;
 
  array_end:
+    DECDEPTH;
 
 #ifdef PERLING
     return newRV_noinc ((SV *) av);
@@ -994,11 +1001,13 @@ PREFIX (object) (json_parse_t * parser)
 	   copy the value but have to process it to remove the
 	   escapes. */
 
+#ifdef PERLING
 	int klen;
 	klen = resolve_string (parser, & key);
-#ifdef PERLING
 	key.start = parser->buffer;
 	key.length = klen;
+#else
+	resolve_string (parser, & key);
 #endif
     }
 #ifdef PERLING
@@ -1024,6 +1033,7 @@ PREFIX (object) (json_parse_t * parser)
     goto hash_middle;
 
  hash_end:
+    DECDEPTH;
 
 #ifdef PERLING
     return newRV_noinc ((SV *) hv);
@@ -1112,6 +1122,11 @@ json_parse_set_null (json_parse_t * parser, SV * user_null)
 static void
 json_parse_free (json_parse_t * parser)
 {
+    /* We can get here with depth > 0 if the parser fails and then the
+       error is caught. */
+    if (parser->depth < 0) {
+	warn ("Parser depth underflow %d", parser->depth);
+    }
     json_parse_delete_true (parser);
     json_parse_delete_false (parser);
     json_parse_delete_null (parser);
@@ -1121,7 +1136,7 @@ json_parse_free (json_parse_t * parser)
 static void
 json_parse_copy_literals (json_parse_t * parser, SV * onoff)
 {
-    if (! parser->no_warn_literals && 
+    if (! parser->no_warn_literals &&
 	(parser->user_true || parser->user_false || parser->user_null)) {
 	warn ("User-defined value overrules copy_literals");
     }
@@ -1129,4 +1144,3 @@ json_parse_copy_literals (json_parse_t * parser, SV * onoff)
 }
 
 #endif /* def PERLING */
-

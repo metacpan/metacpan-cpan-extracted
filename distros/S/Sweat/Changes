@@ -1,5 +1,9 @@
 Revision history for Perl extension Sweat
 
+202101030 2021-01-03T21:36:31Z
+
+    - Adding a choice of news articles or Wikipedia entries to the interactive mode.
+
 202005170 2020-05-17T13:28:23Z
 
     - More graceful reaction to articles failing to load at the start of the workout.

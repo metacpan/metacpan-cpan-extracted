@@ -5,7 +5,7 @@ package App::Regather::Plugin::list;
 
 =head1 NAME
 
-list - prints all available commands with short descriptions
+list - prints all available plugins with short descriptions
 
 =cut
 

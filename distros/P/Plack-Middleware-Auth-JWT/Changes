@@ -1,5 +1,10 @@
 Revision history for Plack::Middleware::Auth::JWT
 
+0.905     2021-01-03 17:44:47+01:00
+    - dist housekeeping: github issues,
+      Dist::Zilla::PluginBundle::Author::DOMM
+
+
 0.904   2019-07-29T11:17:53
     - Make Crypt::JWT decode failure test work with both 0.021 and
       0.023+ (jwright)

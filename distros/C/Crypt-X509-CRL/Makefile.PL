@@ -5,7 +5,7 @@ use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
     NAME             => 'Crypt::X509::CRL',
-    AUTHOR           => q{Duncan Segrest <cpan@gigageek.us>},
+    AUTHOR           => q{Duncan Segrest},
     VERSION_FROM     => 'lib/Crypt/X509/CRL.pm',
     ABSTRACT_FROM    => 'lib/Crypt/X509/CRL.pm',
     LICENSE          => 'artistic_2',
@@ -19,6 +19,20 @@ my %WriteMakefileArgs = (
     PREREQ_PM => {'Convert::ASN1' => '0.19'},
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'Crypt-X509-CRL-*' },
+    META_MERGE => {
+        'meta-spec' => { version => 2 },
+        resources => {
+            repository => {
+                type => 'git',
+                url => 'https://github.com/gigageeks/Crypt-X509-CRL.git',
+                web => 'https://github.com/gigageeks/Crypt-X509-CRL',
+            },
+            bugtracker => {
+                web => 'https://github.com/gigageeks/Crypt-X509-CRL/issues'
+            },
+            homepage => 'https://github.com/gigageeks/',
+        },
+    },
 );
 
 # Compatibility with old versions of ExtUtils::MakeMaker

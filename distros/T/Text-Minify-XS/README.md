@@ -4,7 +4,7 @@ Text::Minify::XS - Simple text minification
 
 # VERSION
 
-version v0.3.2
+version v0.3.4
 
 # SYNOPSIS
 
@@ -36,6 +36,15 @@ It does not recognise any form of markup, comments or text quoting.
 
 # KNOWN ISSUES
 
+## Support for older Perl versions
+
+This module requires Perl v5.9.3 or newer.
+
+Pull requests to support older versions of Perl are welcome. See
+["SOURCE"](#source).
+
+## Malformed UTF-8
+
 Malformed UTF-8 characters may be be mangled or omitted from the
 output. You should ensure that the input string is properly encoded as
 UTF-8.
@@ -60,7 +69,7 @@ Robert Rothenberg <rrwo@cpan.org>
 
 # COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2020 by Robert Rothenberg.
+This software is Copyright (c) 2020-2021 by Robert Rothenberg.
 
 This is free software, licensed under:
 

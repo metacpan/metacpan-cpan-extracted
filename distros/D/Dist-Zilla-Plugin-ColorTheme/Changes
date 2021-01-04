@@ -1,3 +1,9 @@
+0.002   2020-11-13  Released-By: PERLANCAR; Urgency: medium
+
+	- Update prereq's new name: Require::Hook::DzilBuild ->
+	  Require::Hook::Source::DzilBuild.
+
+
 0.001   2020-06-08  Released-By: PERLANCAR
 
         - First release.

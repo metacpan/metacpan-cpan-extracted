@@ -2,6 +2,7 @@
 use warnings;
 use strict;
 use JSON::Repair ':all';
-print repair_json ("{how many roads must a man walk down:42}",
-		   verbose => undef), "\n";
+print repair_json (
+    "{how many roads must a man walk down:42}"
+);
 

@@ -68,8 +68,8 @@ my @max_ok = qw(2**62 2**32+1 2**32 2**32-1 4294967297 4294967296 4294967295
     3000000000 2**31+1 2**31 2**31-1 2147483649 2147483648 2147483647
     2 1.8 1.5 1.3 1.0 1 0.8 0.5 0.3 0.0 0 -0.0 -0);
 
-if ($Config{ARCH} eq "sparc64") {
-    # sparc has better conversion from double to int
+if ($Config{ARCH} eq "sparc64" || $Config{ARCH} eq "aarch64") {
+    # sparc and arm have different conversion from double to int
     push @max_ok, qw(2**63+1 2**63 2**63-1)
 } else {
     push @max_fail, qw(2**63+1 2**63 2**63-1)

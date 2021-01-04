@@ -1,9 +1,11 @@
 package Org::Document;
 
-our $DATE = '2020-09-17'; # DATE
-our $VERSION = '0.553'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2020-12-30'; # DATE
+our $DIST = 'Org-Parser'; # DIST
+our $VERSION = '0.554'; # VERSION
 
-use 5.010;
+use 5.010001;
 use locale;
 use Log::ger;
 use Moo;
@@ -26,7 +28,7 @@ has time_zone               => (is => 'rw');
 
 has ignore_unknown_settings => (is => 'rw');
 
-our $tags_re       = qr/:(?:[A-Za-z0-9_@#%]+:)+/;
+our $tags_re       = qr/:(?:[\w@]+:)+/u;
 my  $ls_re         = qr/(?:(?<=[\015\012])|\A)/; # line start
 my  $le_re         = qr/(?:\R|\z)/;              # line end
 our $arg_re        = qr/(?: '(?<squote> [^']*)' |
@@ -806,7 +808,7 @@ Org::Document - Represent an Org document
 
 =head1 VERSION
 
-This document describes version 0.553 of Org::Document (from Perl distribution Org-Parser), released on 2020-09-17.
+This document describes version 0.554 of Org::Document (from Perl distribution Org-Parser), released on 2020-12-30.
 
 =head1 SYNOPSIS
 
@@ -866,9 +868,22 @@ If set to true, unknown settings will not cause a parse failure.
 
 =for Pod::Coverage BUILD
 
-=head2 new(from_string => ...)
+=head2 new
 
-Create object from string.
+Usage:
+
+ $doc = Org::Document->new(%args);
+
+Create document object. If C<from_string> argument is specified, will parse
+the string. Otherwise, will create an empty document object. Arguments:
+
+=over
+
+=item * from_string
+
+String. String to parse into document object tree content.
+
+=back
 
 =head2 load_element_modules()
 
@@ -905,7 +920,7 @@ Source repository is at L<https://github.com/perlancar/perl-Org-Parser>.
 
 =head1 BUGS
 
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Org-Parser>
+Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-Org-Parser/issues>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired

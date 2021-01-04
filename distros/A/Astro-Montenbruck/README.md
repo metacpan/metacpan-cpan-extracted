@@ -21,12 +21,15 @@ As the book authors state in Introduction to the 4-th edition, _"The errors in t
 - [Astro::Montenbruck::CoCo](lib/Astro/Montenbruck/CoCo.pm) — Coordinates conversions.
 - [Astro::Montenbruck::NutEqu](lib/Astro/Montenbruck/NutEqu.pm) — Nutation and obliquity of ecliptic.
 - [Astro::Montenbruck::RiseSet](lib/Astro/Montenbruck/RiseSet.pm) — Rise, set, transit and twilight time.
+- [Astro::Montenbruck::Lunation](lib/Astro/Montenbruck/Lunation.pm) — Lunar phases
+- [Astro::Montenbruck::Lunation](lib/Astro/Montenbruck/SolEqu.pm) — Solstices and equinoxes
+
 
 ## Requirements
 
 * __Perl__ >= 5.22
 
-Tested on Linux 64-bit and macOS 10.14. There should be no problems at other platforms, as the code is pure Perl.
+Tested on Linux 64-bit, macOS 10.14 and Windows 10 64-bit. There should be no problems at other platforms, as the code is pure Perl.
 
 Perl dependencies are minimal, most of the external modules are part of the standard distribution.
 [DateTime](https://metacpan.org/pod/DateTime) is not really required. It is used only in example scripts and tests, not the library itself.
@@ -38,6 +41,7 @@ To install this module, run the following commands:
 ```
 $ perl Build.PL
 $ ./Build
+$ ./Build installdeps
 $ ./Build test
 $ ./Build install
 ```
@@ -59,9 +63,15 @@ $ perl script/createdocs.pl
 
 Documentation files will be installed to **docs/** directory.
 
-## Usage
+## Scripts
 
 [script/](script/) directory contains examples of the library usage. They will be extended over time.
+
+* **planpos.pl** — positions of Sun, Moon and the planets
+* **riseset.pl** — rises and sets of celestial objects 
+* **phases.pl** — lunar phases
+
+### Example
 
 To display current planetary positions, type:
 
@@ -78,7 +88,7 @@ $ perl script/planpos.pl --help
 
 ## License And Copyright
 
-Copyright (C) 2010-2019 Sergey Krushinsky
+Copyright (C) 2010-2020 Sergey Krushinsky
 
 This program is free software; you can redistribute it and/or modify it under the terms of the the Artistic License (1.0). You may obtain a copy of the full license at:
 

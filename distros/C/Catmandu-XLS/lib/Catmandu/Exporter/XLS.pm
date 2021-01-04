@@ -1,33 +1,16 @@
 package Catmandu::Exporter::XLS;
 
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 
 use namespace::clean;
 use Catmandu::Sane;
 use Spreadsheet::WriteExcel;
 use Moo;
 
-with 'Catmandu::Exporter';
+with 'Catmandu::TabularExporter';
 
 has xls       => (is => 'ro', lazy => 1, builder => '_build_xls');
 has worksheet => (is => 'ro', lazy => 1, builder => '_build_worksheet');
-has header => (is => 'ro', default => sub {1});
-has fields => (
-    is     => 'rw',
-    coerce => sub {
-        my $fields = $_[0];
-        if (ref $fields eq 'ARRAY') {return $fields}
-        return [split ',', $fields];
-    },
-);
-has columns => (
-    is     => 'rw',
-    coerce => sub {
-        my $columns = $_[0];
-        if (ref $columns eq 'ARRAY') {return $columns}
-        return [split ',', $columns];
-    },
-);
 has _n => (is => 'rw', default => sub {0});
 
 sub BUILD {
@@ -115,30 +98,36 @@ L<Catmandu> exporter for Excel XLS files.
 
 =head1 METHODS
 
-See L<Catmandu::Exporter>, L<Catmandu::Addable>, L<Catmandu::Fixable>, 
+See L<Catmandu::Exporter>, L<Catmandu::Addable>, L<Catmandu::Fixable>,
 L<Catmandu::Counter>, and L<Catmandu::Logger> for a full list of methods.
 
 =head1 CONFIGURATION
- 
+
 In addition to the configuration provided by L<Catmandu::Exporter> (C<file>,
 C<fh>, etc.) the importer can be configured with the following parameters:
- 
+
 =over
- 
+
 =item header
 
-Include a header line with column names, if set to 1 (default). 
+Include a header line with column names, if set to 1 (default).
 
 =item fields
 
-List of fields to be used as columns, given as array reference or 
+List of fields to be used as columns, given as array reference or
 comma-separated string
 
 =item columns
 
-List of custom column names, given as array reference or comma-separated 
-list. 
- 
+List of custom column names, given as array reference or comma-separated
+list.
+
+=item collect_fields
+
+This option will first read the complete stream to create a complete list
+of fields to export. When this option is not set, only the fields of the first
+record (or the ones provided in the C<fields> option will be exported).
+
 =back
 
 =head1 SEE ALSO

@@ -93,19 +93,23 @@ Mojolicious::Plugin::AssetPack::Che - Child of Mojolicious::Plugin::AssetPack fo
 
 Can process assets during register plugin.
 
+Can nested assets.
+
 Can pipe HTML files with L<Mojolicious::Plugin::AssetPack::Pipe::HTML>.
+
+Can compile Vue templates L<Mojolicious::Plugin::AssetPack::Pipe::VueTemplateCompiler>.
 
 Can pipe CSS, JS, JSON, HTML with L<Mojolicious::Plugin::AssetPack::Pipe::CombineFile> into disk cache. This pipe can also gzip and cache gzipped assets.
 
-Since version 1.28.
+Since parent version 1.28.
 
 =head1 VERSION
 
-Version 2.105 (test on base Mojolicious::Plugin::AssetPack v2.10)
+Version 2.106 (test on base Mojolicious::Plugin::AssetPack v2.10)
 
 =cut
 
-our $VERSION = '2.105';
+our $VERSION = '2.106';
 
 
 =head1 SYNOPSIS
@@ -120,8 +124,9 @@ On register the plugin  C<config> can contain additional optional argument B<pro
     HTML => {minify_opts=>{remove_newlines => 1,}},# pipe based on HTML::Packer
     JavaScriptPacker => {minify_opts=>{}},# pipe based on JavaScript::Packer
     process => [
-      ['foo.js'=>qw(path/to/foo1.js path/to/foo2.js)],
-      ['foo.html'=>qw(path/to/foo1.html path/to/foo2.html)],
+      ['foo.js' => qw(path/to/foo1.js path/to/foo2.js)],
+      ['bar.js' => qw(foo.js path/to/bar1.js path/to/bar2.js)], # nested topic
+      ['foo.html' => qw(path/to/foo1.html path/to/foo2.html)],
       ...
     ],
   );

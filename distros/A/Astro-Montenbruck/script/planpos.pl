@@ -266,9 +266,9 @@ Prints the manual page and exits.
 Date and time, either a I<calendar entry> in format C<YYYY-MM-DD HH:MM Z>, or
 C<YYYY-MM-DD HH:MM Z>, or a floating-point I<Julian Day>:
 
-  --datetime="2019-06-08 12:00 +0300"
-  --datetime="2019-06-08 09:00 UTC"
-  --datetime=2458642.875
+  --time="2019-06-08 12:00 +0300"
+  --time="2019-06-08 09:00 UTC"
+  --time=2458642.875
 
 Calendar entries should be enclosed in quotation marks. Optional B<"Z"> stands for
 time zone, short name or offset from UTC. C<"+00300"> in the example above means

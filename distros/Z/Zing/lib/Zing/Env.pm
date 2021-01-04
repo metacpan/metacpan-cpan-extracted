@@ -14,7 +14,7 @@ use Data::Object::ClassHas;
 use Cwd ();
 use Sys::Hostname ();
 
-our $VERSION = '0.22'; # VERSION
+our $VERSION = '0.25'; # VERSION
 
 # ATTRIBUTES
 
@@ -135,6 +135,16 @@ has target => (
 
 fun new_target($self) {
   $ENV{ZING_TARGET}
+}
+
+has system => (
+  is => 'ro',
+  isa => 'Name',
+  new => 1,
+);
+
+fun new_system($self) {
+  'zing'
 }
 
 1;
@@ -259,6 +269,14 @@ This attribute is read-only, accepts C<(Maybe[Str])> values, and is optional.
   store(Maybe[Str])
 
 This attribute is read-only, accepts C<(Maybe[Str])> values, and is optional.
+
+=cut
+
+=head2 system
+
+  system(Name)
+
+This attribute is read-only, accepts C<(Name)> values, and is optional.
 
 =cut
 

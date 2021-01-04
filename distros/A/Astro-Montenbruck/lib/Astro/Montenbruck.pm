@@ -3,7 +3,7 @@ use 5.22.0;
 use strict;
 use warnings;
 
-our $VERSION = 0.06;
+our $VERSION = 1.00;
 
 1;
 __END__
@@ -19,7 +19,7 @@ Montenbruck - Lightweight Ephemeris
 
 =head1 DESCRIPTION
 
-Library of astronomical calculations, based on
+Library of astronomical calculations, based mainly on
 I<"Astronomy On The Personal Computer"> by I<O.Montenbruck> and I<T.Phleger>,
 I<Fourth Edition, Springer-Verlag, 2000>.
 
@@ -57,6 +57,10 @@ of the Sun, the Moon, and the planets amount to about 1″-3″."
 
 =item * L<Astro::Montenbruck::RiseSet> — Rise, set, transit and twilight time.
 
+=item * L<Astro::Montenbruck::Lunation> — Lunar phases.
+
+=item * L<Astro::Montenbruck::SolEqu> — Solstices and equinoxes
+
 =back
 
 
@@ -66,7 +70,7 @@ Sergey Krushinsky, C<< <krushi at cpan.org> >>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2010-2019 by Sergey Krushinsky
+Copyright (C) 2010-2020 by Sergey Krushinsky
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

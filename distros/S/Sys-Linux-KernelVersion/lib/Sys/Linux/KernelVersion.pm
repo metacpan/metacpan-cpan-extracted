@@ -6,7 +6,7 @@ use v5.8.3;
 use strict;
 use warnings;
 
-our $VERSION = '0.101';
+our $VERSION = '0.102';
 use Exporter 'import';
 
 our @EXPORT_OK = qw/is_linux_kernel get_kernel_version is_at_least_kernel_version is_development_kernel stringify_kernel_version/;
@@ -65,8 +65,8 @@ sub _cmp_version {
 sub is_at_least_kernel_version {
   my $input = shift; # just a string as input
 
-  my $running_version = get_version();
-  my $input_version = _parse_version($input);
+  my $running_version = get_kernel_version();
+  my $input_version = _parse_version_spec($input);
 
   my $cmp = _cmp_version($running_version, $input_version);
 

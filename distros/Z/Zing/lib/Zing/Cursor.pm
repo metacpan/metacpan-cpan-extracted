@@ -13,7 +13,7 @@ use Data::Object::ClassHas;
 
 extends 'Zing::Entity';
 
-our $VERSION = '0.22'; # VERSION
+our $VERSION = '0.25'; # VERSION
 
 # ATTRIBUTES
 
@@ -78,11 +78,19 @@ method next() {
 
     delete $self->{prev_null};
 
+    if (!$position) {
+      return undef;
+    }
+
     my $current = $self->lookup->state->{$position} or return undef;
 
     $self->position($position);
 
     return $self->app->domain(name => $current->{name});
+  }
+
+  if (!$position) {
+    return undef;
   }
 
   my $current = $self->lookup->state->{$position} or return undef;
@@ -114,11 +122,19 @@ method prev() {
 
     delete $self->{next_null};
 
+    if (!$position) {
+      return undef;
+    }
+
     my $current = $self->lookup->state->{$position} or return undef;
 
     $self->position($position);
 
     return $self->app->domain(name => $current->{name});
+  }
+
+  if (!$position) {
+    return undef;
   }
 
   my $current = $self->lookup->state->{$position} or return undef;

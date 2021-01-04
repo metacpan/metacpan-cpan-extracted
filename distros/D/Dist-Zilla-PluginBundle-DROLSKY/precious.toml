@@ -1,0 +1,26 @@
+exclude = [
+    ".build/**/*",
+    "Dist-Zilla-PluginBundle-DROLSKY-*/**/*",
+    "blib/**/*",
+    "t/00-*",
+    "t/author-*",
+    "t/release-*",
+    "t/zzz-*",
+    "xt/**/*",
+]
+
+[commands.perlcritic]
+type = "lint"
+include = [ "**/*.{pl,pm,t,psgi}" ]
+cmd = [ "perlcritic", "--profile=$PRECIOUS_ROOT/perlcriticrc" ]
+ok_exit_codes = 0
+lint_failure_exit_codes = 1
+
+[commands.perltidy]
+type = "both"
+include = [ "**/*.{pl,pm,t,psgi}" ]
+cmd = [ "perltidy", "--profile=$PRECIOUS_ROOT/perltidyrc" ]
+lint_flags = [ "--assert-tidy", "--standard-output" ]
+tidy_flags = [ "--backup-and-modify-in-place", "--backup-file-extension=/" ]
+ok_exit_codes = 0
+lint_failure_exit_codes = 1

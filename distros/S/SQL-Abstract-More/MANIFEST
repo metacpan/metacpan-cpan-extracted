@@ -20,6 +20,7 @@ t/02-order-by.t
 t/03-join_with_constants.t
 t/04-multicols_in.t
 t/05-join-with-using.t
+t/06_with_table_expression.t
 t/99_sqla_tests.t
 t/lib/UsurpSQLA.pm
 t/pod.t

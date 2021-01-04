@@ -7,6 +7,7 @@ lib/Device/Chip/Adapter.pm
 lib/Device/Chip/Authoring.pod
 lib/Device/Chip/Base/RegisteredI2C.pm
 lib/Device/Chip/ProtocolBase/SPI.pm
+lib/Device/Chip/Sensor.pm
 lib/Test/Device/Chip/Adapter.pm
 LICENSE
 MANIFEST			This list of files
@@ -17,6 +18,7 @@ t/00use.t
 t/01adapter-new.t
 t/10chip-registered-i2c.t
 t/20protocolbase-spi.t
+t/30sensor.t
 t/50test-gpio.t
 t/51test-spi.t
 t/52test-i2c.t

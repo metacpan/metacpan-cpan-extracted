@@ -1,13 +1,13 @@
 #
 # This file is part of Config-Model-TkUI
 #
-# This software is Copyright (c) 2008-2019 by Dominique Dumont.
+# This software is Copyright (c) 2008-2021 by Dominique Dumont.
 #
 # This is free software, licensed under:
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::Tk::LeafViewer 1.371;
+package Config::Model::Tk::LeafViewer 1.372;
 
 use strict;
 use warnings;
@@ -110,48 +110,9 @@ sub Populate {
     $cw->SUPER::Populate($args);
 }
 
-sub get_info {
+sub cme_object {
     my $cw = shift;
-
-    my $leaf = $cw->{leaf};
-
-    my $type       = $leaf->value_type;
-    my @choice     = $type eq 'enum' ? $leaf->get_choice : ();
-    my $choice_str = @choice ? ' (' . join( ',', @choice ) . ')' : '';
-
-    my @items = ( 'type : ' . $leaf->value_type . $choice_str, );
-
-    my $std = $leaf->fetch(qw/mode standard check no/);
-
-    if ( defined $leaf->upstream_default ) {
-        push @items, "upstream_default value: " . $leaf->upstream_default;
-    }
-    elsif ( defined $std ) {
-        push @items, "default value: $std";
-    }
-    elsif ( defined $leaf->refer_to ) {
-        push @items, "reference to: " . $leaf->refer_to;
-    }
-    elsif ( defined $leaf->computed_refer_to ) {
-        push @items, "computed reference to: " . $leaf->computed_refer_to;
-    }
-
-    my $m = $leaf->mandatory;
-    push @items, "is mandatory: " . ( $m ? 'yes' : 'no' ) if defined $m;
-
-    foreach my $what (qw/min max warn grammar/) {
-        my $v = $leaf->$what();
-        push @items, "$what value: $v" if defined $v;
-    }
-
-    foreach my $what (qw/warn_if_match warn_unless_match/) {
-        my $v = $leaf->$what();
-        foreach my $k ( keys %$v ) {
-            push @items, "$what value: $k";
-        }
-    }
-
-    return $leaf->element_name, @items;
+    return $cw->{leaf};
 }
 
 1;

@@ -1,6 +1,11 @@
 Revision history for Plack::Middleware::PrettyException
 all changes by Thomas Klausner unless noted otherwise
 
+1.009     2021-01-03 17:50:56+01:00
+    - dist housekeeping: github issues,
+      Dist::Zilla::PluginBundle::Author::DOMM
+
+
 1.008   2019-07-22T23:32:27
     - fix bad url reported when using --path (#2)
 

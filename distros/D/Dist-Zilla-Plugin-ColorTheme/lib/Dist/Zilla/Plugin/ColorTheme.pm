@@ -1,9 +1,9 @@
 package Dist::Zilla::Plugin::ColorTheme;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-06-08'; # DATE
+our $DATE = '2020-11-13'; # DATE
 our $DIST = 'Dist-Zilla-Plugin-ColorTheme'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 use 5.010001;
 use strict;
@@ -11,7 +11,7 @@ use warnings;
 use Moose;
 
 #use PMVersions::Util qw(version_from_pmversions);
-use Require::Hook::DzilBuild;
+use Require::Hook::Source::DzilBuild;
 
 with (
     'Dist::Zilla::Role::CheckPackageDeclared',
@@ -33,7 +33,7 @@ sub _load_colortheme_modules {
 
     return $self->{_our_colortheme_modules} if $self->{_loaded_colortheme_modules}++;
 
-    local @INC = (Require::Hook::DzilBuild->new(zilla => $self->zilla, die=>1, debug=>1), @INC);
+    local @INC = (Require::Hook::Source::DzilBuild->new(zilla => $self->zilla, die=>1, debug=>1), @INC);
 
     my %res;
     for my $file (@{ $self->found_files }) {
@@ -61,7 +61,7 @@ sub _load_colorthemes_modules {
 
     return $self->{_our_colorthemes_modules} if $self->{_loaded_colorthemes_modules}++;
 
-    local @INC = (Require::Hook::DzilBuild->new(zilla => $self->zilla, die=>1, debug=>1), @INC);
+    local @INC = (Require::Hook::Source::DzilBuild->new(zilla => $self->zilla, die=>1, debug=>1), @INC);
 
     my %res;
     for my $file (@{ $self->found_files }) {
@@ -137,7 +137,7 @@ Dist::Zilla::Plugin::ColorTheme - Plugin to use when building distribution that 
 
 =head1 VERSION
 
-This document describes version 0.001 of Dist::Zilla::Plugin::ColorTheme (from Perl distribution Dist-Zilla-Plugin-ColorTheme), released on 2020-06-08.
+This document describes version 0.002 of Dist::Zilla::Plugin::ColorTheme (from Perl distribution Dist-Zilla-Plugin-ColorTheme), released on 2020-11-13.
 
 =head1 SYNOPSIS
 

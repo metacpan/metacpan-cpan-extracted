@@ -4,7 +4,7 @@
       "Dominique Dumont"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.017, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "lgpl_2_1"
    ],
@@ -32,7 +32,7 @@
       "runtime" : {
          "requires" : {
             "Carp" : "0",
-            "Config::Model" : "2.137",
+            "Config::Model" : "2.139",
             "Config::Model::ObjTreeScanner" : "0",
             "File::HomeDir" : "0",
             "List::MoreUtils" : "0",
@@ -70,7 +70,6 @@
       },
       "test" : {
          "requires" : {
-            "Config::Model" : "2.137",
             "Config::Model::Tester::Setup" : "0",
             "Config::Model::Value" : "0",
             "Test::Log::Log4perl" : "0",
@@ -93,8 +92,9 @@
          "web" : "https://github.com/dod38fr/config-model-tk-ui"
       }
    },
-   "version" : "1.371",
-   "x_generated_by_perl" : "v5.30.0",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.17"
+   "version" : "1.372",
+   "x_generated_by_perl" : "v5.32.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.25",
+   "x_spdx_expression" : "LGPL-2.1"
 }
 

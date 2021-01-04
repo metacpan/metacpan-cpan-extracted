@@ -13,11 +13,11 @@ LocalConf::Parser - read config to an hashref from local conf files.
 
 =head1 VERSION
 
-Version 0.01
+Version 0.02
 
 =cut
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 
 =head1 SYNOPSIS
@@ -27,7 +27,14 @@ Quick summary of what the module does.
     use config::parser;
 
     my $confref = conf_parser($config_file_loc);
-    ...
+
+    in the local conf file:
+        
+        uut_user = "root"
+        uut_pw = "1q2w3e4r5t"
+        log_file = 'reboot_test'
+        # interval for the poweroff
+    
 
 =head1 EXPORT
 

@@ -4,6 +4,7 @@ use Inline::MakeMaker;
 WriteMakefile(
     'NAME'         => 'Ogg::Vorbis::Header',
     'VERSION_FROM' => 'lib/Ogg/Vorbis/Header.pm', # finds $VERSION
+    'LICENSE'      => 'gpl_2',
     'PREREQ_PM'    => {
        Inline::C   => 0,
     }, # e.g., Module::Name => 1.1
@@ -18,6 +19,9 @@ WriteMakefile(
           type => 'git',
           url  => 'https://github.com/davorg/Ogg-Vorbis-Header.git',
           web  => 'https://github.com/davorg/Ogg-Vorbis-Header',
+        },
+        bugtracker => {
+          web  => 'https://github.com/davorg/Ogg-Vorbis-Header/issues',
         },
       },
     },

@@ -1,5 +1,5 @@
 package Treex::Core::TredView::Labels;
-$Treex::Core::TredView::Labels::VERSION = '2.20201228';
+$Treex::Core::TredView::Labels::VERSION = '2.20210102';
 use Moose;
 use Treex::Core::TredView::Common;
 use Treex::Core::Log;
@@ -388,7 +388,7 @@ Treex::Core::TredView::Labels - Labels of tree nodes in Tred
 
 =head1 VERSION
 
-version 2.20201228
+version 2.20210102
 
 =head1 DESCRIPTION
 

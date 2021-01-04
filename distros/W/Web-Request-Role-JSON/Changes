@@ -1,5 +1,12 @@
 Revision history for Web::Request::Role::JSON
 
+1.007     2021-01-01 18:41:36+01:00
+
+
+1.007	2021-01-01T15:55:20
+    - only some dist housekeeping
+
+
 1.006   2018-10-31T17:47:33
     - Fixed minor typo in the pod. (Mohammad S Anwar)
 

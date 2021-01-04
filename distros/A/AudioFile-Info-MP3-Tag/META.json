@@ -21,7 +21,8 @@
       },
       "configure" : {
          "requires" : {
-            "Module::Build" : "0.42"
+            "Module::Build" : "0.42",
+            "YAML" : "0"
          }
       },
       "runtime" : {
@@ -39,11 +40,14 @@
       },
       "AudioFile::Info::MP3::Tag" : {
          "file" : "lib/AudioFile/Info/MP3/Tag.pm",
-         "version" : "v1.6.2"
+         "version" : "v1.6.3"
       }
    },
    "release_status" : "stable",
    "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/davorg/audiofile-info-mp3-tag/issues"
+      },
       "license" : [
          "http://dev.perl.org/licenses/"
       ],
@@ -53,6 +57,6 @@
          "web" : "https://github.com/davorg/audiofile-info-mp3-tag"
       }
    },
-   "version" : "v1.6.2",
+   "version" : "v1.6.3",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

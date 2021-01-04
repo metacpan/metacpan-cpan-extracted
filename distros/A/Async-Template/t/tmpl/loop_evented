@@ -1,0 +1,6 @@
+[%
+FOREACH rec = list;
+   USE Second; EVENT s = Second.start(0);
+   rec;
+END 
+-%]

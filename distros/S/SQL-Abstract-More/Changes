@@ -1,6 +1,16 @@
 Revision history for SQL-Abstract-More
 
-1.33
+1.34 01.01.2021
+  - support for common table expressions (WITH RECURSIVE)
+  - support for -add_sql parameter in insert/update/delete (additional SQL keywords)
+  - support for insert(-select => ..)
+  - internals :
+     - rearrange update() because the parent method was refactored in SQLA 1.85
+     - report errors through puke/belch instead of croak/carp
+     - fixed tests for bind_params() -- no longer necessary to monkey patch DBD::Mock,
+       and the old tests were plainly wrong !
+
+1.33 14.01.2018
   - removed the option introduced in 1.32, replaced by new syntax for "USING"
 
 1.32 08.01.2018

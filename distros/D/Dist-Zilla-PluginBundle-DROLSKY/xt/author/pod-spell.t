@@ -24,14 +24,16 @@ License
 MakeMaker
 Mark
 PayPal
+PerlLinterConfigFiles
 Plugin
 PluginBundle
 Pod
+Precious
 Role
 Rolsky
 Rolsky's
 RunExtraTests
-TidyAll
+Test
 Weaver
 WeaverConfig
 Zilla
@@ -44,4 +46,4 @@ mark
 optimizations
 perlcriticrc
 perltidyrc
-tidyall
+toml

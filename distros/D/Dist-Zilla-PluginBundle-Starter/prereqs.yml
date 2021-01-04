@@ -25,6 +25,7 @@ runtime:
     Dist::Zilla::Plugin::Pod2Readme: '0.004' # source_filename attribute
     Dist::Zilla::Plugin::PodSyntaxTests: '5.040' # moved to author tests
     Dist::Zilla::Plugin::PruneCruft: 0
+    Dist::Zilla::Plugin::PruneFiles: 0
     Dist::Zilla::Plugin::ReadmeAnyFromPod: 0
     Dist::Zilla::Plugin::Regenerate::AfterReleasers: 0
     Dist::Zilla::Plugin::RewriteVersion: 0

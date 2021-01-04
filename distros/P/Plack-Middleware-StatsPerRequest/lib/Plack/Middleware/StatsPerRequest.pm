@@ -2,7 +2,7 @@ package Plack::Middleware::StatsPerRequest;
 
 # ABSTRACT: Measure HTTP stats on each request
 
-our $VERSION = '0.901';
+our $VERSION = '0.902'; # VERSION
 
 use strict;
 use warnings;
@@ -129,7 +129,7 @@ Plack::Middleware::StatsPerRequest - Measure HTTP stats on each request
 
 =head1 VERSION
 
-version 0.901
+version 0.902
 
 =head1 SYNOPSIS
 
@@ -305,11 +305,11 @@ L<validad.com|https://www.validad.com/> for supporting Open Source.
 
 =head1 AUTHOR
 
-Thomas Klausner <domm@cpan.org>
+Thomas Klausner <domm@plix.at>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by Thomas Klausner.
+This software is copyright (c) 2018 - 2021 by Thomas Klausner.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

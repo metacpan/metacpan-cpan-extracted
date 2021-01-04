@@ -1,23 +1,22 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2018 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2018-2020 -- leonerd@leonerd.org.uk
 
-package Device::Chip::ProtocolBase::SPI;
+use v5.26;
+use Object::Pad 0.35; # role :compat(invokable)
 
-use strict;
-use warnings;
-
-our $VERSION = '0.15';
+package Device::Chip::ProtocolBase::SPI 0.16;
+role Device::Chip::ProtocolBase::SPI :compat(invokable);
 
 =head1 NAME
 
-C<Device::Chip::ProtocolBase::SPI> - a base class for implementing SPI protocols
+C<Device::Chip::ProtocolBase::SPI> - a role for implementing SPI protocols
 
 =head1 DESCRIPTION
 
-This abstract base class provides some convenient wrapper methods for
-providing higher-level SPI protocol implementations, by using simpler
+This role (or abstract base class) provides some convenient wrapper methods
+for providing higher-level SPI protocol implementations, by using simpler
 lower-level ones. It can be used by implementation classes to help provide
 parts of the API.
 
@@ -29,23 +28,20 @@ parts of the API.
 
 =head2 write
 
-   $protocol->write( $words )->get
+   await $protocol->write( $words );
 
 A wrapper for L</readwrite> that ignores the result.
 
 =cut
 
-sub write
+method write ( $words )
 {
-   my $self = shift;
-   my ( $words ) = @_;
-
    $self->readwrite( $words )->then_done();
 }
 
 =head2 read
 
-   $words = $protocol->read( $len )->get
+   $words = await $protocol->read( $len );
 
 A wrapper for L</readwrite> that sends unspecified data which the chip will
 ignore, returning the result.
@@ -54,11 +50,8 @@ This implementation currently sends all-bits-low.
 
 =cut
 
-sub read
+method read ( $len )
 {
-   my $self = shift;
-   my ( $len ) = @_;
-
    $self->readwrite( "\x00" x $len );
 }
 
@@ -68,11 +61,8 @@ A wrapper for L</readwrite_no_ss> that ignores the result.
 
 =cut
 
-sub write_no_ss
+method write_no_ss ( $words )
 {
-   my $self = shift;
-   my ( $words ) = @_;
-
    $self->readwrite_no_ss( $words )->then_done();
 }
 
@@ -85,28 +75,22 @@ This implemention currenetly sends all-bits-low.
 
 =cut
 
-sub read_no_ss
+method read_no_ss ( $len )
 {
-   my $self = shift;
-   my ( $len ) = @_;
-
    $self->readwrite_no_ss( "\x00" x $len );
 }
 
 =head2 readwrite
 
-   $words_in = $protocol->readwrite( $words_out )->get
+   $words_in = await $protocol->readwrite( $words_out );
 
 A wrapper for performing a complete SPI transfer, using L</assert_ss>,
 L</readwrite_no_ss>, L</release_ss>.
 
 =cut
 
-sub readwrite
+method readwrite ( $words_out )
 {
-   my $self = shift;
-   my ( $words_out ) = @_;
-
    $self->assert_ss
       ->then( sub { $self->readwrite_no_ss( $words_out ) } )
       ->followed_by( sub {
@@ -117,18 +101,15 @@ sub readwrite
 
 =head2 write_then_read
 
-   $words_in = $protocol->write_then_read( $words_out, $len_in )
+   $words_in = await $protocol->write_then_read( $words_out, $len_in )
 
 A wrapper for performing a complete SPI transfer in two phases, using
 L</assert_ss>, L</write_no_ss>, L</read_no_ss> and L</release_ss>.
 
 =cut
 
-sub write_then_read
+method write_then_read ( $words_out, $len_in )
 {
-   my $self = shift;
-   my ( $words_out, $len_in ) = @_;
-
    $self->assert_ss
       ->then( sub { $self->write_no_ss( $words_out ) } )
       ->then( sub { $self->read_no_ss( $len_in ) } )

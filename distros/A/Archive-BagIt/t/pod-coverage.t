@@ -14,5 +14,7 @@ my $min_pc = 0.18;
 eval "use Pod::Coverage $min_pc";
 plan skip_all => "Pod::Coverage $min_pc required for testing POD coverage"
     if $@;
-plan tests => 1;
+plan tests => 3;
 pod_coverage_ok("Archive::BagIt");
+pod_coverage_ok("Archive::BagIt::Base", { also_private =>[ qw( BUILD BUILDARGS) ]});
+pod_coverage_ok("Archive::BagIt::Fast");

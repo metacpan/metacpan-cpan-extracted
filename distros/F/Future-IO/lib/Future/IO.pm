@@ -9,7 +9,7 @@ use strict;
 use warnings;
 use 5.010;  # //
 
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 use Carp;
 
@@ -74,6 +74,33 @@ happen as part of the test.
 =head1 METHODS
 
 =cut
+
+=head2 alarm
+
+   $f = Future::IO->alarm( $epoch )
+
+I<Since version 0.08.>
+
+Returns a L<Future> that will become at a fixed point in the future, given as
+an epoch timestamp (such as returned by C<time()>). This value may be
+fractional.
+
+=cut
+
+sub alarm
+{
+   shift;
+   my ( $epoch ) = @_;
+
+   $IMPL //= "Future::IO::_DefaultImpl";
+
+   if( $IMPL->can( "alarm" ) ) {
+      return $IMPL->alarm( $epoch );
+   }
+   else {
+      return $IMPL->sleep( $epoch - Time::HiRes::time() );
+   }
+}
 
 =head2 sleep
 
@@ -277,6 +304,12 @@ readonly_struct Alarm => [qw( time f )];
 readonly_struct Reader => [qw( fh length f )];
 readonly_struct Writer => [qw( fh bytes f )];
 
+sub alarm
+{
+   my $class = shift;
+   return $class->_done_at( shift );
+}
+
 sub sleep
 {
    my $class = shift;
@@ -360,11 +393,13 @@ sub _await_once
    # always break. Instead, we'll only select() if we're waiting on more than
    # one of alarm, reader, writer. If not we'll just presume the one operation
    # we're waiting for is definitely ready right now.
+   my $do_select = @alarms || ( @readers && @writers );
 
    my $rready;
    my $wready;
 
-   if( @alarms or ( @readers && @writers ) ) {
+redo_select:
+   if( $do_select ) {
       my $rvec = '';
       vec( $rvec, $readers[0]->fh->fileno, 1 ) = 1 if @readers;
 
@@ -398,6 +433,7 @@ sub _await_once
          $r->f->done();
       }
       elsif( $! == EAGAIN or $! == EWOULDBLOCK ) {
+         $do_select = 1, goto redo_select if !$do_select;
          # ignore it
       }
       else {
@@ -414,6 +450,7 @@ sub _await_once
          $w->f->done( $len );
       }
       elsif( $! == EAGAIN or $! == EWOULDBLOCK ) {
+         $do_select = 1, goto redo_select if !$do_select;
          # ignore it
       }
       else {

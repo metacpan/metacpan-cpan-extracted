@@ -1,4 +1,9 @@
 Revision history for Test-ExpectAndCheck
 
+0.02    2021-01-02
+        [CHANGES]
+         * Return deferred futures by default
+         * Added ->immediately method to make some returns immediate
+
 0.01    2020-11-25
         First version, released on an unsuspecting world.

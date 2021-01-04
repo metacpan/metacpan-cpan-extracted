@@ -9,8 +9,7 @@ do { my $x = {
                       'requires' => {
                                       'Badge::Depot' => '0.0103',
                                       'Badge::Depot::Plugin::Coverage' => '0',
-                                      'Badge::Depot::Plugin::Cpantesters' => '0',
-                                      'Badge::Depot::Plugin::Kwalitee' => '0',
+                                      'Badge::Depot::Plugin::Githubactions' => '0',
                                       'Badge::Depot::Plugin::Perl' => '0',
                                       'Dist::Zilla' => '6.015',
                                       'Dist::Zilla::Plugin::Authority' => '1.009',
@@ -54,7 +53,6 @@ do { my $x = {
                                       'Dist::Zilla::Plugin::Test::Compile' => '2.058',
                                       'Dist::Zilla::Plugin::Test::EOF' => '0.0501',
                                       'Dist::Zilla::Plugin::Test::EOL' => '0.18',
-                                      'Dist::Zilla::Plugin::Test::Kwalitee::Extra' => 'v0.2.1',
                                       'Dist::Zilla::Plugin::Test::NoTabs' => '0.15',
                                       'Dist::Zilla::Plugin::Test::ReportPrereqs' => '0.027',
                                       'Dist::Zilla::Plugin::Test::Version' => '1.09',
@@ -84,7 +82,7 @@ do { my $x = {
                                     },
                       'suggests' => {
                                       'Dist::Iller' => '0.1409',
-                                      'Dist::Iller::Config::Author::CSSON' => '0.0327'
+                                      'Dist::Iller::Config::Author::CSSON' => '0.0328'
                                     }
                     },
        'runtime' => {
@@ -100,10 +98,11 @@ do { my $x = {
                                       'Path::Tiny' => '0.072',
                                       'Test::Exception' => '0',
                                       'Try::Tiny' => '0.24',
+                                      'Types::Path::Tiny' => '0.005',
                                       'Types::Standard' => '1.000006',
                                       'YAML::XS' => '0',
                                       'namespace::autoclean' => '0.22',
-                                      'perl' => '5.010000'
+                                      'perl' => '5.014000'
                                     }
                     },
        'test' => {

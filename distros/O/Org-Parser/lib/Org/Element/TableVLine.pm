@@ -1,7 +1,7 @@
 package Org::Element::TableVLine;
 
-our $DATE = '2020-09-17'; # DATE
-our $VERSION = '0.553'; # VERSION
+our $DATE = '2020-12-30'; # DATE
+our $VERSION = '0.554'; # VERSION
 
 use 5.010;
 use locale;
@@ -29,7 +29,7 @@ Org::Element::TableVLine - Represent Org table vertical line
 
 =head1 VERSION
 
-This document describes version 0.553 of Org::Element::TableVLine (from Perl distribution Org-Parser), released on 2020-09-17.
+This document describes version 0.554 of Org::Element::TableVLine (from Perl distribution Org-Parser), released on 2020-12-30.
 
 =head1 DESCRIPTION
 
@@ -51,7 +51,7 @@ Source repository is at L<https://github.com/perlancar/perl-Org-Parser>.
 
 =head1 BUGS
 
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Org-Parser>
+Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-Org-Parser/issues>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired

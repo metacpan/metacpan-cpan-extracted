@@ -1,7 +1,10 @@
 #!/bin/env perl
 ########################################################################
-# locate a config file in the first etc dir using the basename of this
-# file with '.conf' added to it.
+# locate the first "etc' dir looking up the tree, store its path into
+# $conf_dir.
+#
+# Note that if ./t/etc exists this can be used to put test-specific 
+# config files in ./t, keeping them separate from "real" configs.
 ########################################################################
 
 use File::Basename;

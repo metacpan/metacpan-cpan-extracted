@@ -627,6 +627,21 @@
 #ifndef OPEN_TREE_CLONE
 #define OPEN_TREE_CLONE 0
 #endif
+#ifndef FSOPEN_CLOEXEC
+#define FSOPEN_CLOEXEC 0
+#endif
+#ifndef FSPICK_CLOEXEC
+#define FSPICK_CLOEXEC 0
+#endif
+#ifndef FSPICK_SYMLINK_NOFOLLOW
+#define FSPICK_SYMLINK_NOFOLLOW 0
+#endif
+#ifndef FSPICK_NO_AUTOMOUNT
+#define FSPICK_NO_AUTOMOUNT 0
+#endif
+#ifndef FSPICK_EMPTY_PATH
+#define FSPICK_EMPTY_PATH 0
+#endif
 #ifndef MOVE_MOUNT_F_SYMLINKS
 #define MOVE_MOUNT_F_SYMLINKS 0
 #endif
@@ -644,6 +659,69 @@
 #endif
 #ifndef MOVE_MOUNT_T_EMPTY_PATH
 #define MOVE_MOUNT_T_EMPTY_PATH 0
+#endif
+#ifndef P_PID
+#define P_PID 0
+#endif
+#ifndef P_PIDFD
+#define P_PIDFD 0
+#endif
+#ifndef P_PGID
+#define P_PGID 0
+#endif
+#ifndef P_ALL
+#define P_ALL 0
+#endif
+#ifndef FSCONFIG_SET_FLAG
+#define FSCONFIG_SET_FLAG 0
+#endif
+#ifndef FSCONFIG_SET_STRING
+#define FSCONFIG_SET_STRING 0
+#endif
+#ifndef FSCONFIG_SET_BINARY
+#define FSCONFIG_SET_BINARY 0
+#endif
+#ifndef FSCONFIG_SET_PATH
+#define FSCONFIG_SET_PATH 0
+#endif
+#ifndef FSCONFIG_SET_PATH_EMPTY
+#define FSCONFIG_SET_PATH_EMPTY 0
+#endif
+#ifndef FSCONFIG_SET_FD
+#define FSCONFIG_SET_FD 0
+#endif
+#ifndef FSCONFIG_CMD_CREATE
+#define FSCONFIG_CMD_CREATE 0
+#endif
+#ifndef FSCONFIG_CMD_RECONFIGURE
+#define FSCONFIG_CMD_RECONFIGURE 0
+#endif
+#ifndef MOUNT_ATTR_RDONLY
+#define MOUNT_ATTR_RDONLY 0
+#endif
+#ifndef MOUNT_ATTR_NOSUID
+#define MOUNT_ATTR_NOSUID 0
+#endif
+#ifndef MOUNT_ATTR_NODEV
+#define MOUNT_ATTR_NODEV 0
+#endif
+#ifndef MOUNT_ATTR_NOEXEC
+#define MOUNT_ATTR_NOEXEC 0
+#endif
+#ifndef MOUNT_ATTR__ATIME
+#define MOUNT_ATTR__ATIME 0
+#endif
+#ifndef MOUNT_ATTR_RELATIME
+#define MOUNT_ATTR_RELATIME 0
+#endif
+#ifndef MOUNT_ATTR_NOATIME
+#define MOUNT_ATTR_NOATIME 0
+#endif
+#ifndef MOUNT_ATTR_STRICTATIME
+#define MOUNT_ATTR_STRICTATIME 0
+#endif
+#ifndef MOUNT_ATTR_NODIRATIME
+#define MOUNT_ATTR_NODIRATIME 0
 #endif
 #if HAVE_SYSCALL
 # if __linux__ && !defined(SYS_pidfd_open)

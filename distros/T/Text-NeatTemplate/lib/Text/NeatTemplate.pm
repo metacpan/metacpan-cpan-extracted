@@ -1,5 +1,5 @@
 package Text::NeatTemplate;
-$Text::NeatTemplate::VERSION = '0.1300';
+$Text::NeatTemplate::VERSION = '0.1400';
 use strict;
 use warnings;
 
@@ -9,7 +9,7 @@ Text::NeatTemplate - a fast, middleweight template engine.
 
 =head1 VERSION
 
-version 0.1300
+version 0.1400
 
 =head1 SYNOPSIS
 
@@ -645,45 +645,33 @@ sub convert_value {
 	    $value =~ s/(^w|\b\w)/uc($1)/eg;
 	    return $value;
 	};
-	/^month/i && do {
+        # YYYY-MM-DD dates
+	/^date_year/i && do {
 	    return $value if !$value;
-	    return ($value == 1
-		    ? 'January'
-		    : ($value == 2
-		       ? 'February'
-		       : ($value == 3
-			  ? 'March'
-			  : ($value == 4
-			     ? 'April'
-			     : ($value == 5
-				? 'May'
-				: ($value == 6
-				   ? 'June'
-				   : ($value == 7
-				      ? 'July'
-				      : ($value == 8
-					 ? 'August'
-					 : ($value == 9
-					    ? 'September'
-					    : ($value == 10
-					       ? 'October'
-					       : ($value == 11
-						  ? 'November'
-						  : ($value == 12
-						     ? 'December'
-						     : $value
-						    )
-						 )
-					      )
-					   )
-					)
-				     )
-				  )
-			       )
-			    )
-			  )
-			  )
-	    );
+	    $value =~ s/^([0-9]+)-.*/$1/;
+	    return $value;
+	};
+	/^date_mth/i && do {
+	    return $value if !$value;
+	    $value =~ s/^([0-9]+)-([0-9]+)-([0-9]+)/$2/;
+	    return $value;
+	};
+	/^date_day/i && do {
+	    return $value if !$value;
+	    $value =~ s/^([0-9]+)-([0-9]+)-([0-9]+)/$3/;
+	    return $value;
+	};
+	/^date_month/i && do {
+	    return $value if !$value;
+	    if ($value =~ /^([0-9]+)-([0-9]+)-([0-9]+)/)
+            {
+                my $mth = $2;
+                $value = $self->number_to_month($mth);
+            }
+	    return $value;
+	};
+	/^month/i && do {
+            return $self->number_to_month($value);
 	};
 	/^nth/i && do {
 	    return $value if !$value;
@@ -841,6 +829,59 @@ sub simple_html {
     $value =~ s/\s&\s/ &amp; /sg;
     return $value;
 } # simple_html
+
+=head2 number_to_month
+
+$val = $tobj->number_to_month($val);
+
+Give the month name for this month-number.
+
+=cut
+sub number_to_month {
+    my $self = shift;
+    my $value = shift;
+
+    return $value if !$value;
+    return ($value == 1
+        ? 'January'
+        : ($value == 2
+            ? 'February'
+            : ($value == 3
+                ? 'March'
+                : ($value == 4
+                    ? 'April'
+                    : ($value == 5
+                        ? 'May'
+                        : ($value == 6
+                            ? 'June'
+                            : ($value == 7
+                                ? 'July'
+                                : ($value == 8
+                                    ? 'August'
+                                    : ($value == 9
+                                        ? 'September'
+                                        : ($value == 10
+                                            ? 'October'
+                                            : ($value == 11
+                                                ? 'November'
+                                                : ($value == 12
+                                                    ? 'December'
+                                                    : $value
+                                                )
+                                            )
+                                        )
+                                    )
+                                )
+                            )
+                        )
+                    )
+                )
+            )
+        )
+    );
+    # fallthrough
+    return $value;
+} # number_to_month
 
 =head1 Callable Functions
 

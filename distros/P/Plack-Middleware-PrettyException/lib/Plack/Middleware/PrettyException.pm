@@ -2,7 +2,7 @@ package Plack::Middleware::PrettyException;
 
 # ABSTRACT: Capture exceptions and present them as HTML or JSON
 
-our $VERSION = '1.008';
+our $VERSION = '1.009'; # VERSION
 
 use 5.010;
 use strict;
@@ -136,7 +136,7 @@ sub render_html_error {
         my @more;
         if ($exception->does('Throwable::X')) {
             push(@more, "<li><strong>".$exception->ident."</strong></li>");
-            push(@more, "<li><strong>".$exception->message."</strong></li>");
+            push(@more, "<li><strong>".($exception->message || 'unknown exception message')."</strong></li>");
             my $payload = $exception->payload;
             while (my ($k, $v) = each %$payload) {
                 push(@more,sprintf("<li>%s: %s</li>", $k, $v // ''));
@@ -173,7 +173,7 @@ Plack::Middleware::PrettyException - Capture exceptions and present them as HTML
 
 =head1 VERSION
 
-version 1.008
+version 1.009
 
 =head1 SYNOPSIS
 
@@ -430,11 +430,11 @@ L<sixtease|https://metacpan.org/author/SIXTEASE> for coming up with C<Oel> as th
 
 =head1 AUTHOR
 
-Thomas Klausner <domm@cpan.org>
+Thomas Klausner <domm@plix.at>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by Thomas Klausner.
+This software is copyright (c) 2016 - 2021 by Thomas Klausner.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -1,0 +1,98 @@
+{
+   "abstract" : "Async Template Toolkit",
+   "author" : [
+      "Serguei Okladnikov <oklaspec@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.1.11",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Async-Template",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.07",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "HTML::Entities" : "0",
+            "Template::Toolkit" : "0",
+            "perl" : "5.010001"
+         }
+      }
+   },
+   "provides" : {
+      "Async::Template" : {
+         "file" : "lib/Async/Template.pm",
+         "version" : "0.12"
+      },
+      "Async::Template::Context" : {
+         "file" : "lib/Async/Template/Context.pm",
+         "version" : "0.12"
+      },
+      "Async::Template::Directive" : {
+         "file" : "lib/Async/Template/Directive.pm",
+         "version" : "0.12"
+      },
+      "Async::Template::Document" : {
+         "file" : "lib/Async/Template/Document.pm"
+      },
+      "Async::Template::Grammar" : {
+         "file" : "lib/Async/Template/Grammar.pm",
+         "version" : "0.12"
+      },
+      "Async::Template::Parser" : {
+         "file" : "lib/Async/Template/Parser.pm"
+      },
+      "Async::Template::Provider" : {
+         "file" : "lib/Async/Template/Provider.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/oklas/async-template/issues"
+      },
+      "homepage" : "https://github.com/oklas/async-template",
+      "repository" : {
+         "url" : "git://github.com/oklas/async-template.git",
+         "web" : "https://github.com/oklas/async-template"
+      }
+   },
+   "version" : "0.12",
+   "x_authority" : "cpan:OKLAS",
+   "x_serialization_backend" : "JSON::PP version 4.04",
+   "x_static_install" : 1
+}

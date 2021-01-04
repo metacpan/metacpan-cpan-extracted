@@ -1,0 +1,73 @@
+NAME
+    Acme::CPANModules::ContainingJustData - Modules that just contain data
+
+VERSION
+    This document describes version 0.002 of
+    Acme::CPANModules::ContainingJustData (from Perl distribution
+    Acme-CPANModules-ContainingJustData), released on 2020-11-22.
+
+DESCRIPTION
+    Modules under WordList::* contain lists of words.
+    Games::Word::Wordlist::* modules also contain lists of words.
+
+    Modules under Tables::* contains table data.
+
+    DataDist::* distributions also contain mostly data.
+
+MODULES INCLUDED IN THIS ACME::CPANMODULES MODULE
+    *   WordList
+
+    *   Tables
+
+    *   DataDist
+
+FAQ
+  What are ways to use this Acme::CPANModules module?
+    Aside from reading this Acme::CPANModules module's POD documentation,
+    you can install all the listed modules (entries) using cpanmodules CLI
+    (from App::cpanmodules distribution):
+
+        % cpanmodules ls-entries ContainingJustData | cpanm -n
+
+    or Acme::CM::Get:
+
+        % perl -MAcme::CM::Get=ContainingJustData -E'say $_->{module} for @{ $LIST->{entries} }' | cpanm -n
+
+    or directly:
+
+        % perl -MAcme::CPANModules::ContainingJustData -E'say $_->{module} for @{ $Acme::CPANModules::ContainingJustData::LIST->{entries} }' | cpanm -n
+
+    This Acme::CPANModules module also helps lcpan produce a more meaningful
+    result for "lcpan related-mods" command when it comes to finding related
+    modules for the modules listed in this Acme::CPANModules module.
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Acme-CPANModules-ContainingJustData>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Acme-CPANModules-ContainingJustData>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Acme-CPANModules-Cont
+    ainingJustData>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    Acme::CPANModules - about the Acme::CPANModules namespace
+
+    cpanmodules - CLI tool to let you browse/view the lists
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2020 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

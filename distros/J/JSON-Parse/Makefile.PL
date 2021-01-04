@@ -30,10 +30,6 @@ WriteMakefile (
 		web => "$repo/issues",
 	    },
         },
-        x_contributors => [
-	    'Shlomi Fish <shlomif@cpan.org>',
-            'kolmogorov42',
-        ],
     },
     # All the C files are actually #included into Json3.xs so there is
     # only one object file.

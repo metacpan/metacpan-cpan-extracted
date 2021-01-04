@@ -1,0 +1,26 @@
+Changelog for Nano
+
+0.04 2021-01-03T00:48:53
+ - Add release updates
+ - Enable search results ordering (#19)
+ - Ensure Nano::Search {first,last,next,prev} iterates (#18)
+ - Ensure underlying domain is dropped (#17)
+ - Refactor to use Zing::{KeyVal,Table} classes (#14)
+
+0.03 2020-12-31T18:36:56
+ - Built release version 0.03
+ - Add release updates
+ - Prevent serialization of non-array/hash references (#10)
+ - Implement entity reload method (#9)
+
+0.02 2020-12-30T21:14:03
+ - Built release version 0.02
+ - Add release updates
+ - Update documentation (#5)
+
+0.01 2020-12-30T20:23:57
+ - Built release version 0.01
+ - Add release updates
+ - Update distribution config
+ - Initial implementation (#2)
+ - Initial commit

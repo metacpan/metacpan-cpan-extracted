@@ -1,5 +1,5 @@
 package Treex::Core::RememberArgs;
-$Treex::Core::RememberArgs::VERSION = '2.20201228';
+$Treex::Core::RememberArgs::VERSION = '2.20210102';
 use Moose::Role;
 
 has args => (
@@ -62,7 +62,7 @@ Treex::Core::RememberArgs - role for remembering constructor's arguments
 
 =head1 VERSION
 
-version 2.20201228
+version 2.20210102
 
 =head1 SYNOPSIS
 

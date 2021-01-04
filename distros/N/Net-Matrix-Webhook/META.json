@@ -1,10 +1,10 @@
 {
    "abstract" : "A http->matrix webhook",
    "author" : [
-      "Thomas Klausner <domm@cpan.org>"
+      "Thomas Klausner <domm@plix.at>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "Dist::Zilla version 6.017, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -13,6 +13,13 @@
       "version" : 2
    },
    "name" : "Net-Matrix-Webhook",
+   "no_index" : {
+      "directory" : [
+         "examples",
+         "t",
+         "xt"
+      ]
+   },
    "prereqs" : {
       "build" : {
          "requires" : {
@@ -31,6 +38,7 @@
             "Encode" : "0",
             "Getopt::Long" : "0",
             "IO::Async::Loop" : "0",
+            "IO::Async::SSL" : "0",
             "IO::Async::Timer::Countdown" : "0",
             "Log::Any" : "0",
             "Log::Any::Adapter" : "0",
@@ -39,27 +47,40 @@
             "Plack::Request" : "0",
             "Plack::Response" : "0",
             "base" : "0",
-            "perl" : "5.010",
-            "strict" : "0",
-            "warnings" : "0"
+            "perl" : "5.010"
          }
       },
       "test" : {
          "requires" : {
+            "File::Spec" : "0",
+            "File::Temp" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
             "Test::More" : "0"
          }
       }
    },
+   "provides" : {
+      "Net::Matrix::Webhook" : {
+         "file" : "lib/Net/Matrix/Webhook.pm",
+         "version" : "0.901"
+      }
+   },
    "release_status" : "stable",
    "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/domm/Net-Matrix-Webhook/issues"
+      },
+      "homepage" : "https://github.com/domm/Net-Matrix-Webhook",
       "repository" : {
          "type" : "git",
-         "url" : "git://github.com/domm/Net-Matrix-Webhook.git",
+         "url" : "https://github.com/domm/Net-Matrix-Webhook.git",
          "web" : "https://github.com/domm/Net-Matrix-Webhook"
       }
    },
-   "version" : "0.900",
-   "x_generated_by_perl" : "v5.24.0",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0225"
+   "version" : "0.901",
+   "x_generated_by_perl" : "v5.32.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.25",
+   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }
 

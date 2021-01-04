@@ -1,6 +1,35 @@
 Revision history for Dist-Iller
 
-0.1409 2020-12-27 17:05:17 UTC
+0.1411 2021-01-01 19:00:59 UTC
+ [Test Changes]
+ - Fix a test failure that started to appear this year, caused by
+   yesterday's change regarding copyright_year. Fixes #5, thanks SREZIC!
+
+ [Stats & Dependency Changes]
+ - 17 files changed, 18 insertions(+), 18 deletions(-)
+ - (dev sug) ~ Dist::Iller 0.1409 --> 0.1410
+
+0.1410 2020-12-31T17:59:13Z UTC
+ [Enhancements]
+ - copyright_year in dist now defaults to the current year. Previously, the
+   config needed to be updated each year.
+
+ [Requirements]
+ - Required Perl is 5.14, since that is what Dist::Zilla requires.
+
+ [Stats & Dependency Changes]
+ - 19 files changed, 47 insertions(+), 37 deletions(-)
+ - (run req) ~ Dist::Zilla 5.000 --> 6.015
+ - (run req) ~ Moose 2.1400 --> 2.1803
+ - (run req) ~ Types::Standard 1.000000 --> 1.000006
+ - (run req) ~ namespace::autoclean 0.18 --> 0.22
+ - (run req) ~ perl 5.010000 --> 5.014000
+ - (dev req) + Badge::Depot::Plugin::Githubactions (any)
+ - (dev req) - Badge::Depot::Plugin::Cpantesters
+ - (dev req) - Badge::Depot::Plugin::Kwalitee
+ - (dev sug) ~ Dist::Iller::Config::Author::CSSON 0.0327 --> 0.0328
+
+0.1409 2020-12-27T17:05:17Z UTC
  [New Features]
  - Added new DocType: Global, used for settings common to multiple DocTypes
    (so far only distribution_name)

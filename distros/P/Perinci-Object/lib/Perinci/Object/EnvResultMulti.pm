@@ -1,7 +1,9 @@
 package Perinci::Object::EnvResultMulti;
 
-our $DATE = '2018-10-18'; # DATE
-our $VERSION = '0.310'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2021-01-02'; # DATE
+our $DIST = 'Perinci-Object'; # DIST
+our $VERSION = '0.311'; # VERSION
 
 use 5.010;
 use strict;
@@ -18,11 +20,16 @@ sub new {
 
 sub add_result {
     my ($self, $status, $message, $extra) = @_;
+    $extra //= {};
     my $num_ok  = 0;
     my $num_nok = 0;
 
     push @{ ${$self}->[3]{results} },
-        {status=>$status, message=>$message, %{ $extra // {} }};
+        {status=>$status, message=>$message, %$extra};
+    if (exists $extra->{payload}) {
+        ${$self}->[2] //= [];
+        push @{ ${$self}->[2] }, $extra->{payload};
+    }
     for (@{ ${$self}->[3]{results} // [] }) {
         if ($_->{status} =~ /\A(2|304)/) {
             $num_ok++;
@@ -68,7 +75,7 @@ Perinci::Object::EnvResultMulti - Represent enveloped result (multistatus)
 
 =head1 VERSION
 
-This document describes version 0.310 of Perinci::Object::EnvResultMulti (from Perl distribution Perinci-Object), released on 2018-10-18.
+This document describes version 0.311 of Perinci::Object::EnvResultMulti (from Perl distribution Perinci-Object), released on 2020-01-02.
 
 =head1 SYNOPSIS
 
@@ -103,6 +110,16 @@ This document describes version 0.310 of Perinci::Object::EnvResultMulti (from P
      # ]}]
  } # myfunc
 
+To add a payload for each result:
+
+ my $envres = Perinci::Object::EnvResultMulti->new;
+ $envres->add_result(200, "OK", {item_id=>1, payload=>"a"});
+ $envres->add_result(200, "OK", {item_id=>2, payload=>"b"});
+ $envres->add_result(200, "OK", {item_id=>3, payload=>"c"});
+
+ return $envres->as_struct;
+ # => [200, "All success", ["a","b","c"], ...]
+
 =head1 DESCRIPTION
 
 This class is a subclass of L<Perinci::Object::EnvResult> and provides a
@@ -122,6 +139,19 @@ specified, the default is C<< [200, "Success/no items"] >>.
 
 Add an item result.
 
+Extra keys:
+
+=over
+
+=item * item_id
+
+=item * payload
+
+If you want to add a payload for this result. The final overall payload will be
+an array composed from this payload.
+
+=back
+
 =head1 HOMEPAGE
 
 Please visit the project's homepage at L<https://metacpan.org/release/Perinci-Object>.
@@ -132,7 +162,7 @@ Source repository is at L<https://github.com/perlancar/perl-Perinci-Object>.
 
 =head1 BUGS
 
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Perinci-Object>
+Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-Perinci-Object/issues>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
@@ -150,7 +180,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018, 2017, 2016, 2015, 2014, 2013, 2012, 2011 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2017, 2016, 2015, 2014, 2013, 2012, 2011 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -15,6 +15,9 @@ my $b = AudioFile::Info::Build->new(
     build_requires => {
         Module::Build   => 0
     },
+    configure_requires => {
+        YAML => 0,
+    },
     create_makefile_pl => 'traditional',
     meta_merge => {
         'meta-spec' => { version => 2 },
@@ -23,6 +26,9 @@ my $b = AudioFile::Info::Build->new(
                 type => 'git',
                 url  => 'https://github.com/davorg/audiofile-info-mp3-tag.git',
                 web  => 'https://github.com/davorg/audiofile-info-mp3-tag',
+            },
+            bugtracker => {
+                web  => 'https://github.com/davorg/audiofile-info-mp3-tag/issues',
             },
         },
     },

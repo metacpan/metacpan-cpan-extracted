@@ -1,5 +1,5 @@
 package Slack::Notify {
-$Slack::Notify::VERSION = '0.002';
+$Slack::Notify::VERSION = '0.003';
 # ABSTRACT: Trigger Slack incoming webhooks
 
 use namespace::autoclean;
@@ -9,19 +9,21 @@ use Types::Standard qw(Str);
 use Type::Utils qw(class_type);
 
 use HTTP::Tiny;
-use JSON::MaybeXS;
+use JSON::MaybeXS ();
 
 has hook_url => ( is => 'ro', isa => Str, required => 1 );
 
 has _http => ( is => 'lazy', isa => class_type('HTTP::Tiny') );
 sub _build__http { HTTP::Tiny->new }
 
+my $JSON = JSON::XS->new->ascii;
+
 sub post {
   my ($self, %args) = @_;
   my $payload = Slack::Notify::Payload->new(%args);
   $self->_http->post_form(
     $self->hook_url,
-    { payload => encode_json($payload->to_hash) },
+    { payload => $JSON->encode($payload->to_hash) },
   );
 }
 

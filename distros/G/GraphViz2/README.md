@@ -157,7 +157,7 @@ This key is optional.
 
 This option specifies which external program to run to process the output stream.
 
-The default is to use [File::Which](https://metacpan.org/pod/File::Which)'s which() method to find the 'dot' program.
+The default is to use [File::Which](https://metacpan.org/pod/File%3A%3AWhich)'s which() method to find the 'dot' program.
 
 This key is optional.
 
@@ -234,7 +234,7 @@ This key is optional.
 
 Provides a logger object so $logger\_object -> $level($message) can be called at certain times. Any object with `debug` and `error` methods
 will do, since these are the only levels emitted by this module.
-One option is a [Log::Handler](https://metacpan.org/pod/Log::Handler) object.
+One option is a [Log::Handler](https://metacpan.org/pod/Log%3A%3AHandler) object.
 
 Retrieve and update the value with the logger() method.
 
@@ -303,7 +303,7 @@ This key is optional.
 ## Validating Parameters
 
 The secondary keys (under the primary keys 'edge|graph|node') are checked against lists of valid attributes (stored at the end of this
-module, after the \_\_DATA\_\_ token, and made available using [Data::Section::Simple](https://metacpan.org/pod/Data::Section::Simple)).
+module, after the \_\_DATA\_\_ token, and made available using [Data::Section::Simple](https://metacpan.org/pod/Data%3A%3ASection%3A%3ASimple)).
 
 This mechanism has the effect of hard-coding [Graphviz](http://www.graphviz.org/) options in the source code of [GraphViz2](https://metacpan.org/pod/GraphViz2).
 
@@ -337,6 +337,12 @@ Will also use any node-, edge-, and graph-level attributes named
 `graphviz` as a hash-ref for setting attributes on the corresponding
 entities in the constructed GraphViz2 object. These will override the
 figured-out defaults referred to above.
+
+For a `multivertexed` graph, will only create one node per vertex,
+but will search all the multi-IDs for a `graphviz` attribute, taking
+the first one it finds (sorted alphabetically).
+
+For a `multiedged` graph, will create one edge per multi-edge.
 
 Will only set the `global` attribute if called as a constructor. This
 will be dropped from any passed-in graph-level `graphviz` attribute
@@ -873,7 +879,7 @@ See scripts/rank.sub.graph.\[12\].pl and scripts/sub.graph.frames.pl for sample 
 Returns a hashref of all attributes known to this module, keyed by type
 to hashrefs to true values.
 
-Stored in this module, using [Data::Section::Simple](https://metacpan.org/pod/Data::Section::Simple).
+Stored in this module, using [Data::Section::Simple](https://metacpan.org/pod/Data%3A%3ASection%3A%3ASimple).
 
 These attributes are used to validate attributes in many situations.
 
@@ -892,7 +898,7 @@ Here, \[\] indicate optional parameters.
 $driver is the name of the external program to run.
 
 It defaults to the value supplied in the call to new(global => {driver => '...'}), which in turn defaults
-to [File::Which](https://metacpan.org/pod/File::Which)'s which('dot') return value.
+to [File::Which](https://metacpan.org/pod/File%3A%3AWhich)'s which('dot') return value.
 
 $format is the type of output file to write.
 

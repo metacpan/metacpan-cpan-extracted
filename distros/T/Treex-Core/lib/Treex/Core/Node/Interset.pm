@@ -1,5 +1,5 @@
 package Treex::Core::Node::Interset;
-$Treex::Core::Node::Interset::VERSION = '2.20201228';
+$Treex::Core::Node::Interset::VERSION = '2.20210102';
 use MooseX::Role::Parameterized;
 
 parameter interset_attribute => (
@@ -471,7 +471,7 @@ Treex::Core::Node::Interset
 
 =head1 VERSION
 
-version 2.20201228
+version 2.20210102
 
 =head1 DESCRIPTION
 

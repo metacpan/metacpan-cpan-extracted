@@ -1,5 +1,5 @@
 package Treex::Core::Phrase::Builder;
-$Treex::Core::Phrase::Builder::VERSION = '2.20201228';
+$Treex::Core::Phrase::Builder::VERSION = '2.20210102';
 use namespace::autoclean;
 use Moose;
 use Treex::Core::Common;
@@ -74,7 +74,7 @@ Treex::Core::Phrase::Builder
 
 =head1 VERSION
 
-version 2.20201228
+version 2.20210102
 
 =head1 DESCRIPTION
 

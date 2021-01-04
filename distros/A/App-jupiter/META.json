@@ -57,6 +57,6 @@
          "web" : "https://alexschroeder.ch/cgit/planet-jupiter/about/"
       }
    },
-   "version" : 1.02,
+   "version" : 1.03,
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

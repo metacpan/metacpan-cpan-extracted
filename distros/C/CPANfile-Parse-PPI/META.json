@@ -28,6 +28,7 @@
       },
       "runtime" : {
          "requires" : {
+            "Carp" : "0",
             "Moo" : "2.003",
             "PPI" : "1.270"
          }
@@ -38,14 +39,16 @@
             "File::Spec" : "3.30",
             "IO::File" : "1.16",
             "JSON::PP" : "2.27",
-            "Test::More" : "0.72"
+            "Test::Exception" : "0.43",
+            "Test::More" : "0.72",
+            "Test::Warn" : "0.36"
          }
       }
    },
    "provides" : {
       "CPANfile::Parse::PPI" : {
          "file" : "lib/CPANfile/Parse/PPI.pm",
-         "version" : "0.02"
+         "version" : "0.04"
       }
    },
    "release_status" : "stable",
@@ -60,7 +63,7 @@
          "web" : "https://github.com/perlservices/CPANfile-Parse-PPI"
       }
    },
-   "version" : "0.02",
+   "version" : "0.04",
    "x_contributors" : [
       "reneeb <info@perl-services.de>"
    ],

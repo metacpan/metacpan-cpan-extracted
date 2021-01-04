@@ -8,11 +8,12 @@ use warnings;
 use HTML::Parser;
 use HTML::Entities qw(encode_entities);
 use base qw(Template::Plugin::Filter);
+use namespace::clean;
 
 ###############################################################################
 # Version number.
 ###############################################################################
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 ###############################################################################
 # Subroutine:   init()
@@ -87,7 +88,7 @@ sub filter {
 
 =head1 NAME
 
-Template::Plugin::LinkTarget - TT filter to add "target" attribute to all HTML links
+Template::Plugin::LinkTarget - Template Toolkit filter to add "target" attribute to all HTML links
 
 =head1 SYNOPSIS
 
@@ -101,8 +102,8 @@ Template::Plugin::LinkTarget - TT filter to add "target" attribute to all HTML l
 
 =head1 DESCRIPTION
 
-C<Template::Plugin::LinkTarget> is a filter plugin for TT, which adds a
-C<target> attribute to all HTML links found in the filtered text.
+C<Template::Plugin::LinkTarget> is a filter plugin for C<Template::Toolkit>,
+which adds a C<target> attribute to all HTML links found in the filtered text.
 
 Through the use of the C<exclude> option, you can specify URLs that are I<not>
 given a new C<target> attribute.  This can be used to set up a filter that
@@ -119,11 +120,11 @@ defaulting to "_blank".
 
 =item init()
 
-Initializes the template plugin. 
+Initializes the template plugin.
 
 =item filter($text, $args, $conf)
 
-Filters the given text, and adds the "target" attribute to links. 
+Filters the given text, and adds the "target" attribute to links.
 
 =back
 

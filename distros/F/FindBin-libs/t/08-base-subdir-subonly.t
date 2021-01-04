@@ -2,8 +2,6 @@ package Testophile;
 
 use v5.8;
 
-use File::Spec::Functions  qw( catpath );
-
 use Test::More tests => 2;
 
 BEGIN   { mkdir './blib/foo', 0555  }
@@ -13,12 +11,23 @@ require FindBin::libs;
 
 FindBin::libs->import( qw( base=blib subdir=foo subonly ) );
 
-my $expect  = catpath '' => qw( blib foo );
+# Note: Old test uses File::Spec::catpath to compose a subdir
+# for comparision. Catch is that windoze can't decide which
+# slashes to use and end returning with C:/foo/bar on some
+# systems C:\foo\bar on others and catpath is consistent. 
+# Fix is replacing the literal with a regex; less specific 
+# test but should work well enough for the purpose.
 
-like $INC[0], qr{\Q$expect\E $}x, 'Found only foo subdir';
+for my $expect ( qr{ \W blib \W foo $ }x )
+{
+    like $INC[0], $expect, "Found only foo subdir ($INC[0])";
+}
 
 FindBin::libs->import;
 
-like $INC[0], qr{\b lib $}x, 'Added lib dir';
+for my $expect ( qr{ \W lib $ }x )
+{
+    like $INC[0], $expect, "Added lib dir ($INC[0])";
+}
 
 __END__

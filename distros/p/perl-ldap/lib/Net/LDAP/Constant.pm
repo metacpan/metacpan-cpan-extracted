@@ -4,7 +4,7 @@
 
 package Net::LDAP::Constant;
 
-our $VERSION = '0.23';
+our $VERSION = '0.24';
 
 use Exporter qw(import);
 
@@ -18,6 +18,11 @@ while (<DATA>) {
   my ($name, $value) = ($1, $2);
   *{$name} = sub () { $value };
   push @EXPORT_OK, $name;
+  push @{$EXPORT_TAGS{codes}}, $name  if $protocol_const;
+  push @{$EXPORT_TAGS{controls}}, $name      if ($name =~ /^LDAP_CONTROL_/);
+  push @{$EXPORT_TAGS{features}}, $name      if ($name =~ /^LDAP_FEATURE_/);
+  push @{$EXPORT_TAGS{extensions}}, $name    if ($name =~ /^LDAP_EXTENSION_/);
+  push @{$EXPORT_TAGS{capabilities}}, $name  if ($name =~ /^LDAP_CAP_/);
   $err2name[$value] = $name  if $protocol_const;
 }
 
@@ -81,8 +86,39 @@ Net::LDAP::Constant - Constants for use with Net::LDAP
 
 =head1 DESCRIPTION
 
-B<Net::LDAP::Constant> exports constant subroutines for the following LDAP
-error codes.
+B<Net::LDAP::Constant> exports constants, technically: constant subroutines,
+for the LDAP status codes and OIDs listed in the sections below.
+
+In addition to exporting individual constants, the following tags can be used to
+export groups of constants.
+
+=over 4
+
+=item :all
+
+Export all constants known to C<Net::LDAP::Constant>.
+
+=item C<:codes>
+
+Export all LDAP status codes mentioned in the section L</Protocol Constants>.
+
+=item C<:controls>
+
+Export all C<LDAP_CONTROL_*> constants.
+
+=item C<:extensions>
+
+Export all C<LDAP_EXTENSION_*> constants.
+
+=item C<:features>
+
+Export all C<LDAP_FEATURE_*> constants.
+
+=item C<:capabilities>
+
+Export all C<LDAP_CAP_*> constants.
+
+=back
 
 =head2 Protocol Constants
 
@@ -432,35 +468,67 @@ Refresh Required.
 
 =head2 Control OIDs
 
+B<Control OIDs> identify L<LDAP Controls|Net::LDAP::Control>.
+
+By announcing the respective OIDs in the operational attribute
+C<supportedControls> of the L<Root DSE|Net::LDAP::RootDSE>
+an LDAP server indicates which L<LDAP Controls|Net::LDAP::Control>
+it supports.
+
 =over 4
 
 =item LDAP_CONTROL_SORTREQUEST (1.2.840.113556.1.4.473)
+
+See L<Net::LDAP::Control::Sort>.
 
 =item LDAP_CONTROL_SORTRESULT (1.2.840.113556.1.4.474)
 
 =item LDAP_CONTROL_SORTRESPONSE (1.2.840.113556.1.4.474)
 
+See L<Net::LDAP::Control::SortResult>.
+
 =item LDAP_CONTROL_VLVREQUEST (2.16.840.1.113730.3.4.9)
 
+See L<Net::LDAP::Control::VLV>.
+
 =item LDAP_CONTROL_VLVRESPONSE (2.16.840.1.113730.3.4.10)
+
+See L<Net::LDAP::Control::VLVResponse>.
 
 =item LDAP_CONTROL_PROXYAUTHORIZATION (2.16.840.1.113730.3.4.18)
 
 =item LDAP_CONTROL_PROXYAUTHENTICATION (2.16.840.1.113730.3.4.18)
 
+See L<Net::LDAP::Control::ProxyAuth>.
+
 =item LDAP_CONTROL_PAGED (1.2.840.113556.1.4.319)
+
+See L<Net::LDAP::Control::Paged>.
 
 =item LDAP_CONTROL_TREE_DELETE (1.2.840.113556.1.4.805)
 
+See L<Net::LDAP::Control::TreeDelete>.
+
 =item LDAP_CONTROL_MATCHEDVALS (1.2.826.0.1.3344810.2.2)
+
+Outdated OID mentioned in predecessors to RFC 3876.
+Superseded by C<LDAP_CONTROL_MATCHEDVALUES>.
 
 =item LDAP_CONTROL_MATCHEDVALUES (1.2.826.0.1.3344810.2.3)
 
+See L<Net::LDAP::Control::MatchedValues>.
+
 =item LDAP_CONTROL_MANAGEDSAIT (2.16.840.1.113730.3.4.2)
+
+See L<Net::LDAP::Control::ManageDsaIT>.
 
 =item LDAP_CONTROL_PERSISTENTSEARCH (2.16.840.1.113730.3.4.3)
 
+See L<Net::LDAP::Control::PersistentSearch>.
+
 =item LDAP_CONTROL_ENTRYCHANGE (2.16.840.1.113730.3.4.7)
+
+See L<Net::LDAP::Control::EntryChange>.
 
 =item LDAP_CONTROL_PWEXPIRED (2.16.840.1.113730.3.4.4)
 
@@ -470,25 +538,49 @@ Refresh Required.
 
 =item LDAP_CONTROL_RELAX (1.3.6.1.4.1.4203.666.5.12)
 
+See L<Net::LDAP::Control::Relax>.
+
 =item LDAP_CONTROL_PASSWORDPOLICY (1.3.6.1.4.1.42.2.27.8.5.1)
+
+See L<Net::LDAP::Control::PasswordPolicy>.
 
 =item LDAP_CONTROL_PERMISSIVEMODIFY (1.2.840.113556.1.4.1413)
 
 =item LDAP_CONTROL_PREREAD (1.3.6.1.1.13.1)
 
+See L<Net::LDAP::Control::PreRead>.
+
 =item LDAP_CONTROL_POSTREAD (1.3.6.1.1.13.2)
+
+See L<Net::LDAP::Control::PostRead>.
 
 =item LDAP_CONTROL_ASSERTION (1.3.6.1.1.12)
 
+See L<Net::LDAP::Control::Assertion>.
+
 =item LDAP_CONTROL_DONTUSECOPY (1.3.6.1.1.22)
+
+See L<Net::LDAP::Control::DontUseCopy>.
 
 =item LDAP_CONTROL_NOOP (1.3.6.1.4.1.4203.666.5.2)
 
+See L<Net::LDAP::Control::NoOp>.
+
+=item LDAP_CONTROL_SUBENTRIES (1.3.6.1.4.1.4203.1.10.1)
+
+See L<Net::LDAP::Control::Subentries>.
+
 =item LDAP_CONTROL_SYNC (1.3.6.1.4.1.4203.1.9.1.1)
+
+See L<Net::LDAP::Control::SyncRequest>.
 
 =item LDAP_CONTROL_SYNC_STATE (1.3.6.1.4.1.4203.1.9.1.2)
 
+See L<Net::LDAP::Control::SyncState>.
+
 =item LDAP_CONTROL_SYNC_DONE (1.3.6.1.4.1.4203.1.9.1.3)
+
+See L<Net::LDAP::Control::SyncDone>.
 
 =item LDAP_SYNC_INFO (1.3.6.1.4.1.4203.1.9.1.4)
 
@@ -572,36 +664,149 @@ The new password was used too recently.
 
 =back
 
+=head3 Active Directory Control OIDs
+
+See section I<LDAP Extended Controls> in
+L<https://winprotocoldoc.blob.core.windows.net/productionwindowsarchives/MS-ADTS/[MS-ADTS].pdf>.
+
+=over 4
+
+=item LDAP_CONTROL_SHOW_DELETED (1.2.840.113556.1.4.417)
+
+=for comment #=item LDAP_CONTROL_X_SHOW_DELETED (1.2.840.113556.1.4.417)
+
+=item LDAP_CONTROL_CROSSDOMAIN_MOVE (1.2.840.113556.1.4.521)
+
+=item LDAP_CONTROL_SERVER_NOTIFICATION (1.2.840.113556.1.4.528)
+
+=for comment #=item LDAP_CONTROL_X_SERVER_NOTIFICATION (1.2.840.113556.1.4.528)
+
+=item LDAP_CONTROL_EXTENDED_DN (1.2.840.113556.1.4.529)
+
+=for comment #=item LDAP_CONTROL_X_EXTENDED_DN (1.2.840.113556.1.4.529)
+
+=item LDAP_CONTROL_LAZY_COMMIT (1.2.840.113556.1.4.619)
+
+=for comment #=item LDAP_CONTROL_X_LAZY_COMMIT (1.2.840.113556.1.4.619)
+
+=item LDAP_CONTROL_SD_FLAGS (1.2.840.113556.1.4.801)
+
+=item LDAP_CONTROL_RANGE_OPTION (1.2.840.113556.1.4.802)
+
+=for comment #=item LDAP_CONTROL_X_INCREMENTAL_VALUES (1.2.840.113556.1.4.802)
+
+=item LDAP_CONTROL_DIRSYNC (1.2.840.113556.1.4.841)
+
+=for comment #=item LDAP_CONTROL_X_DIRSYNC (1.2.840.113556.1.4.841)
+
+=item LDAP_CONTROL_GET_STATS (1.2.840.113556.1.4.970)
+
+=item LDAP_CONTROL_VERIFY_NAME (1.2.840.113556.1.4.1338)
+
+=item LDAP_CONTROL_DOMAIN_SCOPE (1.2.840.113556.1.4.1339)
+
+=for comment #=item LDAP_CONTROL_X_DOMAIN_SCOPE (1.2.840.113556.1.4.1339)
+
+=item LDAP_CONTROL_SEARCH_OPTIONS (1.2.840.113556.1.4.1340)
+
+=for comment #=item LDAP_CONTROL_X_SEARCH_OPTIONS (1.2.840.113556.1.4.1340)
+
+=item LDAP_CONTROL_RODC_DCPROMO (1.2.840.113556.1.4.1341)
+
+=item LDAP_CONTROL_ASQ (1.2.840.113556.1.4.1504)
+
+=item LDAP_CONTROL_QUOTA_CONTROL (1.2.840.113556.1.4.1852)
+
+=item LDAP_CONTROL_SHUTDOWN_NOTIFY (1.2.840.113556.1.4.1907)
+
+=item LDAP_CONTROL_RANGE_RETRIEVAL_NOERR (1.2.840.113556.1.4.1948)
+
+=item LDAP_CONTROL_FORCE_UPDATE (1.2.840.113556.1.4.1974)
+
+=item LDAP_CONTROL_DN_INPUT (1.2.840.113556.1.4.2026)
+
+=item LDAP_CONTROL_SHOW_RECYCLED (1.2.840.113556.1.4.2064)
+
+=item LDAP_CONTROL_SHOW_DEACTIVATED_LINK (1.2.840.113556.1.4.2065)
+
+=item LDAP_CONTROL_POLICY_HINTS_DEPRECATED (1.2.840.113556.1.4.2066)
+
+=item LDAP_CONTROL_DIRSYNC_EX (1.2.840.113556.1.4.2090)
+
+=item LDAP_CONTROL_TREE_DELETE_EX (1.2.840.113556.1.4.2204)
+
+=item LDAP_CONTROL_UPDATE_STATS (1.2.840.113556.1.4.2205)
+
+=item LDAP_CONTROL_SEARCH_HINTS (1.2.840.113556.1.4.2206)
+
+=item LDAP_CONTROL_EXPECTED_ENTRY_COUNT (1.2.840.113556.1.4.2211)
+
+=item LDAP_CONTROL_POLICY_HINTS (1.2.840.113556.1.4.2239)
+
+=item LDAP_CONTROL_SET_OWNER (1.2.840.113556.1.4.2255)
+
+=item LDAP_CONTROL_BYPASS_QUOTA (1.2.840.113556.1.4.2256)
+
+=item LDAP_CONTROL_LINK_TTL (1.2.840.113556.1.4.2309)
+
+=item LDAP_CONTROL_SET_CORRELATION_ID (1.2.840.113556.1.4.2330)
+
+=item LDAP_CONTROL_THREAD_TRACE_OVERRIDE (1.2.840.113556.1.4.2354)
+
+=back
+
 =head2 Extension OIDs
 
-B<Net::LDAP::Constant> exports constant subroutines for the following LDAP
-extension OIDs.
+B<Extension OIDs> identify L<LDAP Extended operations|Net::LDAP::Extension>.
+
+By announcing the respective OIDs in the operational attribute
+C<supportedExtension> of the L<Root DSE|Net::LDAP::RootDSE>
+an LDAP server indicates which L<LDAP Extended operations|Net::LDAP::Extension>
+it supports.
 
 =over 4
 
 =item LDAP_NOTICE_OF_DISCONNECTION (1.3.6.1.4.1.1466.20036)
 
-Indicates that the server is about to close the connection due to an error (RFC 4511)
+Indicates that the server is about to close the connection due to an error (RFC 4511).
 
 =item LDAP_EXTENSION_START_TLS (1.3.6.1.4.1.1466.20037)
 
-Indicates if the server supports the Start TLS extension (RFC 4513)
+Indicates if the server supports the Start TLS extension (RFC 4513).
+See L<Net::LDAP/start_tls>.
 
 =item LDAP_EXTENSION_PASSWORD_MODIFY (1.3.6.1.4.1.4203.1.11.1)
 
-Indicates that the server supports the Password Modify extension (RFC 3062)
+Indicates that the server supports the Password Modify extension (RFC 3062).
+See L<Net::LDAP::Extension::SetPassword>.
 
 =item LDAP_EXTENSION_WHO_AM_I (1.3.6.1.4.1.4203.1.11.3)
 
-Indicates that the server supports the "Who am I?" extension (RFC 4532)
+Indicates that the server supports the "Who am I?" extension (RFC 4532).
+See L<Net::LDAP::Extension::WhoAmI>.
 
 =item LDAP_EXTENSION_REFRESH (1.3.6.1.4.1.1466.101.119.1)
 
-Indicates that the server supports the Refresh extension (RFC 2589)
+Indicates that the server supports the Refresh extension (RFC 2589).
+See L<Net::LDAP::Extension::Refresh>.
 
 =item LDAP_EXTENSION_CANCEL (1.3.6.1.1.8)
 
-Indicates the server supports the Cancel extension (RFC 3909)
+Indicates the server supports the Cancel extension (RFC 3909).
+See L<Net::LDAP::Extension::Cancel>.
+
+=back
+
+=head3 Active Directory Extension OIDs
+
+See section I<LDAP Extended Operations> in
+L<https://winprotocoldoc.blob.core.windows.net/productionwindowsarchives/MS-ADTS/[MS-ADTS].pdf>.
+
+=over 4
+
+=item LDAP_EXTENSION_FAST_BIND (1.2.840.113556.1.4.1781)
+
+=item LDAP_EXTENSION_BATCH_REQUEST (1.2.840.113556.1.4.2212)
 
 =back
 
@@ -717,8 +922,11 @@ Indicates the server supports the Cancel extension (RFC 3909)
 
 =head2 Feature OIDs
 
-B<Net::LDAP::Constant> exports constant subroutines for the following LDAP
-feature OIDs.
+B<Feature OIDs> identify LDAP features.
+
+By announcing the respective OIDs in the operational attribute
+C<supportedFeature> of the L<Root DSE|Net::LDAP::RootDSE>
+an LDAP server indicates which LDAP features it supports.
 
 =over 4
 
@@ -748,15 +956,17 @@ Indicates that the server supports language tag range options (RFC 3866)
 
 =item LDAP_FEATURE_MODIFY_INCREMENT (1.3.6.1.1.14)
 
-Indicates if the server supports the Modify Increment extension (RFC 4525)
+Indicates if the server supports the Modify Increment extension (RFC 4525).
+See L<Net::LDAP/modify>.
 
 =back
 
 =head2 Active Directory Capability OIDs
 
 The following constants are specific to Microsoft Active Directory.
-They serve to denote capabilities via the non-standard attribute
-C<supportedCapabilities> in the Root DSE.
+They serve to denote capabilities via the non-standard operational attribute
+C<supportedCapabilities> in the L<Root DSE|Net::LDAP::RootDSE> of an
+an LDAP server.
 
 =over 4
 

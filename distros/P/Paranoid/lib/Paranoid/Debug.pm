@@ -1,11 +1,25 @@
 # Paranoid::Debug -- Debug support for paranoid programs
 #
-# (c) 2005 - 2017, Arthur Corliss <corliss@digitalmages.com>
+# $Id: lib/Paranoid/Debug.pm, 2.08 2020/12/31 12:10:06 acorliss Exp $
 #
-# $Id: lib/Paranoid/Debug.pm, 2.07 2019/01/30 18:25:27 acorliss Exp $
+# This software is free software.  Similar to Perl, you can redistribute it
+# and/or modify it under the terms of either:
 #
-#    This software is licensed under the same terms as Perl, itself.
-#    Please see http://dev.perl.org/licenses/ for more information.
+#   a)     the GNU General Public License
+#          <https://www.gnu.org/licenses/gpl-1.0.html> as published by the 
+#          Free Software Foundation <http://www.fsf.org/>; either version 1
+#          <https://www.gnu.org/licenses/gpl-1.0.html>, or any later version
+#          <https://www.gnu.org/licenses/license-list.html#GNUGPL>, or
+#   b)     the Artistic License 2.0
+#          <https://opensource.org/licenses/Artistic-2.0>,
+#
+# subject to the following additional term:  No trademark rights to
+# "Paranoid" have been or are conveyed under any of the above licenses.
+# However, "Paranoid" may be used fairly to describe this unmodified
+# software, in good faith, but not as a trademark.
+#
+# (c) 2005 - 2020, Arthur Corliss (corliss@digitalmages.com)
+# (tm) 2008 - 2020, Paranoid Inc. (www.paranoid.com)
 #
 #####################################################################
 
@@ -23,7 +37,7 @@ use vars qw($VERSION @EXPORT @EXPORT_OK %EXPORT_TAGS);
 use base qw(Exporter);
 use Paranoid;
 
-($VERSION) = ( q$Revision: 2.07 $ =~ /(\d+(?:\.\d+)+)/sm );
+($VERSION) = ( q$Revision: 2.08 $ =~ /(\d+(?:\.\d+)+)/sm );
 
 @EXPORT = qw(PDEBUG pdebug pIn pOut
     PDEBUG1 PDEBUG2 PDEBUG3 PDEBUG4 PDEBUG5 PDEBUG6 PDEBUG7 PDEBUG8);
@@ -31,7 +45,13 @@ use Paranoid;
     @EXPORT,
     qw(pderror PDPREFIX PDLEVEL1 PDLEVEL2 PDLEVEL3 PDLEVEL4 PDMAXINDENT),
     );
-%EXPORT_TAGS = ( all => [@EXPORT_OK], );
+%EXPORT_TAGS = (
+    all       => [@EXPORT_OK],
+    constants => [
+        qw(PDEBUG1 PDEBUG2 PDEBUG3 PDEBUG4 PDEBUG5 PDEBUG6
+            PDEBUG7 PDEBUG8)
+        ],
+        );
 
 use constant PDLEVEL1 => 9;
 use constant PDLEVEL2 => 10;
@@ -217,7 +237,7 @@ Paranoid::Debug - Trace message support for paranoid programs
 
 =head1 VERSION
 
-$Id: lib/Paranoid/Debug.pm, 2.07 2019/01/30 18:25:27 acorliss Exp $
+$Id: lib/Paranoid/Debug.pm, 2.08 2020/12/31 12:10:06 acorliss Exp $
 
 =head1 SYNOPSIS
 
@@ -257,10 +277,21 @@ B<NOTE:> All modules within the Paranoid framework use this module.  Their
 debug levels range from 9 and up.  You should use 1 - 8 for your own modules
 or code.
 
-=head2 EXPORT TARGETS
+=head1 IMPORT LISTS
 
-Only I<PDEBUG>, I<pdebug>, I<pIn>, and I<pOut> are exported by default.  All
-other functions and constants can be exported with the I<:all> tag set.
+This module exports the following symbols by default:
+
+    PDEBUG pdebug pIn pOut
+
+The following specialized import lists also exist:
+
+    List        Members
+    --------------------------------------------------------
+    constants   PDEBUG1 PDEBUG2 PDEBUG3 PDEBUG4 PDEBUG5 
+                PDEBUG6 PDEBUG7 PDEBUG8
+    all         @defaults @constants 
+                pderror PDPREFIX PDLEVEL1 PDLEVEL2 
+                PDLEVEL3 PDLEVEL4 PDMAXINDENT
 
 =head1 CONSTANTS
 
@@ -270,6 +301,11 @@ There are eight constants exported by default for use by developers that allow
 for up to eight levels of diagnostic output.  None of these levels are used by
 internal B<Paranoid> code, they are reserved for use by third parties.
 
+=head2 PDLEVEL1 - PDLEVEL4
+
+These constants are not intended for use by other modules, rather the exist
+for the internal debug levels used by all Paranoid::* modules.
+
 =head1 SUBROUTINES/METHODS
 
 =head2 PDEBUG
@@ -277,6 +313,14 @@ internal B<Paranoid> code, they are reserved for use by third parties.
 B<PDEBUG> is an lvalue subroutine which is initially set to 0, but can be 
 set to any positive integer.  The higher the number the more pdebug 
 statements are printed.
+
+=head2 PDPREFIX
+
+B<PDPREFIX> is an lvalue subroutine that contants a code reference to a
+subroutine that returns an appropriate prefix for debug messages.  The default
+subroutine prints an indented string (indented according to depth on the call 
+stack) that prints the process PID, debug level, and the current routine/or 
+method that B<pdebug> was called in.
 
 =head2 PDMAXINDENT
 
@@ -316,7 +360,7 @@ and the debug statement is printed if PDEBUG is equal to it or higher.
 The return value is always the debug statement itself.  This allows for a
 single statement to produce debug output and set variables.  For instance:
 
-  Paranoid::ERROR = pdebug("Something bad happened!", 3);
+    Paranoid::ERROR = pdebug("Something bad happened!", 3);
 
 As an added benefit you can pass a L<printf> template along with their values
 and they will be handled appropriately.  String values passed as B<undef> will
@@ -357,8 +401,22 @@ Arthur Corliss (corliss@digitalmages.com)
 
 =head1 LICENSE AND COPYRIGHT
 
-This software is licensed under the same terms as Perl, itself. 
-Please see http://dev.perl.org/licenses/ for more information.
+This software is free software.  Similar to Perl, you can redistribute it
+and/or modify it under the terms of either:
 
-(c) 2005 - 2017, Arthur Corliss (corliss@digitalmages.com)
+  a)     the GNU General Public License
+         <https://www.gnu.org/licenses/gpl-1.0.html> as published by the 
+         Free Software Foundation <http://www.fsf.org/>; either version 1
+         <https://www.gnu.org/licenses/gpl-1.0.html>, or any later version
+         <https://www.gnu.org/licenses/license-list.html#GNUGPL>, or
+  b)     the Artistic License 2.0
+         <https://opensource.org/licenses/Artistic-2.0>,
+
+subject to the following additional term:  No trademark rights to
+"Paranoid" have been or are conveyed under any of the above licenses.
+However, "Paranoid" may be used fairly to describe this unmodified
+software, in good faith, but not as a trademark.
+
+(c) 2005 - 2020, Arthur Corliss (corliss@digitalmages.com)
+(tm) 2008 - 2020, Paranoid Inc. (www.paranoid.com)
 

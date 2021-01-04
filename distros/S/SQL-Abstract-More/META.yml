@@ -13,7 +13,7 @@ configure_requires:
   ExtUtils::MakeMaker: 6.59
 distribution_type: module
 dynamic_config: 1
-generated_by: 'Module::Install version 1.18'
+generated_by: 'Module::Install version 1.19'
 license: artistic2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -24,10 +24,9 @@ no_index:
     - inc
     - t
 requires:
-  Carp: 0
   MRO::Compat: 0
   Params::Validate: 0
-  SQL::Abstract: 1.84
+  SQL::Abstract: 1.85
   Scalar::Util: 0
   namespace::clean: 0
   parent: 0
@@ -37,4 +36,4 @@ resources:
   homepage: https://metacpan.org/author/DAMI
   license: http://www.perlfoundation.org/artistic_license_2_0
   repository: git://github.com/damil/SQL-Abstract-More.git
-version: '1.33'
+version: '1.34'

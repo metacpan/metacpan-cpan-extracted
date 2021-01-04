@@ -1,5 +1,9 @@
 Revision history for Perl extension CSS::Minifier::XS.
 
+0.11      2020-12-30 21:27:39-08:00 America/Vancouver
+    - POD spelling fixes
+    - Switch to DZil Author Bundle
+
 0.10      2020-12-28 11:00:17-08:00 America/Vancouver
     - RT #90879; correct minification of %s in "hsl()" and "hsla()" functions
       Thanks to Philipp Soehnlein

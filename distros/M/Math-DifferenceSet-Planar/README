@@ -1,4 +1,4 @@
-Math-DifferenceSet-Planar version 0.008
+Math-DifferenceSet-Planar version 0.009
 =======================================
 
 A planar difference set in a finite group (G, +) is a subset D of G
@@ -41,11 +41,10 @@ To build and install, it also needs:
 
 COPYRIGHT AND LICENCE
 
-Copyright (C) 2019 by Martin Becker, Blaubeuren.
+Copyright (c) 2019-2021 by Martin Becker, Blaubeuren.
 
-This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself, either Perl version 5.010 or,
-at your option, any later version of Perl 5 you may have available.
+This library is free software; you can distribute it and/or modify it
+under the terms of the Artistic License 2.0 (see the LICENSE file).
 
 DISCLAIMER OF WARRANTY
 

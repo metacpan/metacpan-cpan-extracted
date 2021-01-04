@@ -1,3 +1,11 @@
+2021-01-04  Dave Cross <dave@perlhacks.com>
+
+  * Version 1.8.3
+
+  * Fix configure_requires
+
+  * Fix pod coverage tests
+
 2020-11-17  Dave Cross <dave@perlhacks.com>
 
   * Version 1.8.1

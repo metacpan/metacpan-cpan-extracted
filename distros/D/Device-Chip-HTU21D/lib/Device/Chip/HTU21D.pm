@@ -6,9 +6,11 @@
 use v5.26;
 use Object::Pad 0.19;
 
-package Device::Chip::HTU21D 0.06;
+package Device::Chip::HTU21D 0.07;
 class Device::Chip::HTU21D
    extends Device::Chip;
+
+use utf8;
 
 use Carp;
 
@@ -16,6 +18,9 @@ use Data::Bitfield 0.02 qw( bitfield boolfield );
 use List::Util qw( first );
 
 use Future::AsyncAwait 0.38; # async method
+use Future::Mutex;
+
+use Device::Chip::Sensor -declare;
 
 use constant PROTOCOL => "I2C";
 
@@ -136,23 +141,29 @@ async method change_config ( %changes )
    await $self->protocol->write( pack "C a", CMD_WRITE_REG, $val );
 }
 
+has $_mutex;
+
 async method _trigger_nohold ( $cmd )
 {
    my $protocol = $self->protocol;
 
-   await $self->protocol->write( pack "C", $cmd );
+   $_mutex //= Future::Mutex->new;
 
-   my $attempts = 10;
-   while( $attempts ) {
-      my $f = $protocol->read( 2 );
-      $attempts-- and $f = $f->else_done( undef );
+   return await $_mutex->enter( async sub {
+      await $self->protocol->write( pack "C", $cmd );
 
-      my $bytes = await $f;
-      defined $bytes and
-         return unpack "S>", $bytes;
+      my $attempts = 10;
+      while( $attempts ) {
+         my $f = $protocol->read( 2 );
+         $attempts-- and $f = $f->else_done( undef );
 
-      await $protocol->sleep( 0.01 );
-   }
+         my $bytes = await $f;
+         defined $bytes and
+            return unpack "S>", $bytes;
+
+         await $protocol->sleep( 0.01 );
+      }
+   });
 }
 
 =head1 METHODS
@@ -166,6 +177,10 @@ async method _trigger_nohold ( $cmd )
 Triggers a reading of the temperature sensor, returning a number in degrees C.
 
 =cut
+
+declare_sensor temperature =>
+   units     => "°C",
+   precision => 2;
 
 async method read_temperature ()
 {
@@ -181,6 +196,10 @@ async method read_temperature ()
 Triggers a reading of the humidity sensor, returning a number in % RH.
 
 =cut
+
+declare_sensor humidity =>
+   units     => "%RH",
+   precision => 1;
 
 async method read_humidity ()
 {

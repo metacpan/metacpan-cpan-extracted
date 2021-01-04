@@ -20,9 +20,12 @@ my %WriteMakefileArgs = (
     "Email::Valid" => 0
   },
   "TEST_REQUIRES" => {
+    "ExtUtils::MakeMaker" => 0,
+    "File::Spec" => 0,
+    "Test::DiagINC" => "0.002",
     "Test::More" => "0.96"
   },
-  "VERSION" => "0.06",
+  "VERSION" => "0.07",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -32,6 +35,9 @@ my %WriteMakefileArgs = (
 my %FallbackPrereqs = (
   "Data::FormValidator" => "4.0",
   "Email::Valid" => 0,
+  "ExtUtils::MakeMaker" => 0,
+  "File::Spec" => 0,
+  "Test::DiagINC" => "0.002",
   "Test::More" => "0.96"
 );
 

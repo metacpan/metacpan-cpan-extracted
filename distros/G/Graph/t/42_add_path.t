@@ -1,26 +1,34 @@
 use strict; use warnings;
-use Test::More tests => 12;
+use Test::More tests => 16;
 
 use Graph;
+
 my $g = Graph->new;
+$g->add_path("a", "b", "c"); # @todo: hyperedges
+is $g, "a-b,b-c";
+ok(   $g->has_path("a", "b", "c") );
+ok( ! $g->has_path("a", "c", "b") );
+ok( ! $g->has_path("b", "a", "c") );
+ok( ! $g->has_path("b", "c", "a") );
+ok( ! $g->has_path("c", "a", "b") );
+ok( ! $g->has_path("c", "b", "a") );
 
-$g->add_path("a", "b", "c");
-
-ok(   $g->has_edge("a", "b") );
-ok( ! $g->has_edge("a", "c") ); # @todo: hyperedges
-ok( ! $g->has_edge("b", "a") );
-ok(   $g->has_edge("b", "c") );
-ok( ! $g->has_edge("c", "a") );
-ok( ! $g->has_edge("c", "b") );
-
-my $h = Graph->new(undirected => 1);
-
+my $h = Graph->new(undirected => 1); # @todo: hyperedges
 $h->add_path("a", "b", "c");
+is $h, "a=b,b=c";
+ok(   $h->has_path("a", "b", "c") );
+ok( ! $h->has_path("a", "c", "b") );
+ok( ! $h->has_path("b", "a", "c") );
+ok( ! $h->has_path("b", "c", "a") );
+ok( ! $h->has_path("c", "a", "b") );
+ok(   $h->has_path("c", "b", "a") );
 
-ok(   $h->has_edge("a", "b") );
-ok( ! $h->has_edge("a", "c") ); # @todo: hyperedges
-ok(   $h->has_edge("b", "a") );
-ok(   $h->has_edge("b", "c") );
-ok( ! $h->has_edge("c", "a") ); # @todo: hyperedges
-ok(   $h->has_edge("c", "b") );
+$g = Graph->new;
+$g->add_path("a", "b", "c", "d", "e");
+$g->delete_path("a", "b", "c");
+is $g, "c-d,d-e,a,b";
 
+$h = Graph->new(undirected => 1);
+$h->add_path("a", "b", "c", "d", "e");
+$h->delete_path("a", "b", "c");
+is $h, "c=d,d=e,a,b";

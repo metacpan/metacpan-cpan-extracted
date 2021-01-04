@@ -5,6 +5,8 @@ use Mojo::Util qw(url_unescape decode);
 
 has config => sub { my $self = shift; my $config = $self->assetpack->config || $self->assetpack->config({}); $config->{VueTemplateCompiler} ||= {} };
 has enabled => sub { shift->config->{enabled} || 0 };
+has mt => sub { Mojo::Template->new->vars(1) };
+has dist_template => sub { shift->config->{dist_template} || q|parcelRequire.register("<%= $asset_url %>", (function(){<%= $content %>; return {render,staticRenderFns};})());| };
 #~ has parceljs => sub { [qw(parcel build --no-cache )] };#--out-file --out-dir
 #~ has parceljs => "/tmp/node_modules/parcel-bundler/bin/cli.js"; #--out-file --out-dir
 #~ has compiler => sub { Mojo::File->new(__FILE__)->sibling('vue-template-compiler.js') };
@@ -21,8 +23,6 @@ has _compiler => sub {
 sub process {
   my ($self, $assets) = @_;
 
-  #~ my $topic = $self->topic;
-  #~ my $topicURL  = Mojo::URL->new($topic);
   my $topicURL  = Mojo::URL->new($self->topic);
   my $topic =  url_unescape($topicURL->path->to_string);
   my $format = $topicURL->path->[-1] =~ /\.(\w+)$/ ? lc $1 : '';
@@ -82,7 +82,8 @@ sub process {
       
       $self->_install_node_modules('vue-template-compiler', '@vue/component-compiler-utils');
       $self->run([$self->_find_app([qw(nodejs node)]), $self->_compiler->realpath], \$asset->content, \my $content);
-      $content = sprintf qq|parcelRequire.register("%s", (function(){%s; return {render,staticRenderFns};})());|, $url, $content;
+      #~ $content = sprintf qq|parcelRequire.register("%s", (function(){%s; return {render,staticRenderFns};})());|, $url, $content;
+      $content = $self->mt->render($self->dist_template, {asset => $asset, asset_url => $url, content => $content});
       push @content, $content;
       $asset->content($store->save(\$content, $attrs)->minified(1));
     }
@@ -92,7 +93,7 @@ sub process {
     unless scalar @content;
   
   my $content = join "\n", @content;
-  $self->_save_topic($topic, $content);
+  my $path = $self->_save_topic($topic, $content);
   
   #~ my $asset = Mojolicious::Plugin::AssetPack::Asset->new(url => $topic)->checksum($checksum)->minified(1)
       #~ ->content($content);
@@ -101,6 +102,7 @@ sub process {
   #~ $self->assetpack->{by_checksum}{$checksum} 
   my $asset = $store->save(\$content, $attrs);#decode('UTF-8', $topic)
   $self->assetpack->{by_topic}{$topic} = [$asset];
+  #~ $self->assetpack->process($topic=>$path);
 }
 
 sub _save_topic {
@@ -136,7 +138,11 @@ Mojolicious::Plugin::AssetPack::Pipe::VueTemplateCompiler - if you like separate
 
   $app->plugin('AssetPack::Che' => {
           pipes => [qw(VueTemplateCompiler CombineFile)],
-          VueTemplateCompiler=>{enabled=>$ENV{MOJO_ASSETPACK_VUE_TEMPLATE_COMPILER} || 0},# pipe options
+          VueTemplateCompiler=>{# pipe options
+            enabled=>$ENV{MOJO_ASSETPACK_VUE_TEMPLATE_COMPILER} || 0,
+            # dist_template pass to Mojo::Template->render, $content is compiled source template to JS render and staticRenderFns
+            dist_template=>q|parcelRequire.register("<%= $asset_url %>", (function(){<%= $content %>; return {render,staticRenderFns};})());|,
+          },
           process => [
             ['js/dist/templates/app★.js?bla'=>qw(components/foo.vue.html components/bar.vue.html)],
             ['app.js'=>qw('js/dist/templates/app★.js components/foo.vue.js components/bar.vue.js)],

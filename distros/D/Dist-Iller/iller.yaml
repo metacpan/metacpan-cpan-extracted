@@ -7,20 +7,21 @@ doctype: dist
 
 header:
   name: Dist-Iller
+  copyright_year: 2020
 
 prereqs:
   runtime:
     requires:
-      - perl: 5.010000
-      - Moose: 2.1400
-      - namespace::autoclean: 0.18
-      - Dist::Zilla: 5.000
+      - perl: 5.014000
+      - Moose
+      - namespace::autoclean
+      - Dist::Zilla: 6.015
       - Safe::Isa
       - File::chdir
       - MooseX::AttributeDocumented
       - MooseX::AttributeShortcuts
       - MooseX::StrictConstructor
-      - Types::Standard: 1.000000
+      - Types::Standard
       - Types::Path::Tiny
       - JSON::MaybeXS
       - DateTime

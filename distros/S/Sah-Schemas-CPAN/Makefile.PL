@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-
+use 5.014;
 
 use ExtUtils::MakeMaker;
 
@@ -14,11 +14,16 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "Sah-Schemas-CPAN",
   "LICENSE" => "perl",
+  "MIN_PERL_VERSION" => "5.014",
   "NAME" => "Sah::Schemas::CPAN",
   "PREREQ_PM" => {
     "Data::Sah::Coerce::perl::To_str::From_str::to_upper" => 0,
     "Perinci::Sub::XCompletion::lcpan_authorid" => 0,
+    "Perinci::Sub::XCompletion::lcpan_distname" => 0,
+    "Perinci::Sub::XCompletion::lcpan_modname" => 0,
     "Regexp::Pattern::CPAN" => "0.002",
+    "Sah::Schema::perl::distname" => 0,
+    "Sah::Schema::perl::modname" => 0,
     "strict" => 0
   },
   "TEST_REQUIRES" => {
@@ -27,7 +32,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.010",
+  "VERSION" => "0.012",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -40,7 +45,11 @@ my %FallbackPrereqs = (
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
   "Perinci::Sub::XCompletion::lcpan_authorid" => 0,
+  "Perinci::Sub::XCompletion::lcpan_distname" => 0,
+  "Perinci::Sub::XCompletion::lcpan_modname" => 0,
   "Regexp::Pattern::CPAN" => "0.002",
+  "Sah::Schema::perl::distname" => 0,
+  "Sah::Schema::perl::modname" => 0,
   "Test::More" => 0,
   "strict" => 0
 );

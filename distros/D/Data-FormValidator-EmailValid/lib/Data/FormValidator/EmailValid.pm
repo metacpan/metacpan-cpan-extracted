@@ -19,7 +19,7 @@ our @EXPORT_OK = qw(
 ###############################################################################
 # Version number.
 ###############################################################################
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 ###############################################################################
 # Subroutine:   FV_email_filter(%options)
@@ -89,6 +89,8 @@ sub FV_email {
 
 1;
 
+=for stopwords MX
+
 =head1 NAME
 
 Data::FormValidator::EmailValid - Data::FormValidator e-mail address constraint/filter
@@ -97,17 +99,20 @@ Data::FormValidator::EmailValid - Data::FormValidator e-mail address constraint/
 
   use Data::FormValidator::EmailValid qw(FV_email_filter FV_email);
 
-  $results = Data::FormValidator->check(
-        { 'email' => 'Graham TerMarsch <cpan@howlingfrog.com>',
-        },
-        { 'required' => [qw( email )],
-          'field_filters' => {
-              'email' => FV_email_filter(),
-          },
-          'constraint_methods' => {
-              'email' => FV_email(),
-          },
-        );
+  my $results = Data::FormValidator->check(
+    {
+      'email' => 'Graham TerMarsch <cpan@howlingfrog.com>',
+    },
+    {
+      'required'      => [qw( email )],
+      'field_filters' => {
+        'email' => FV_email_filter(),
+      },
+      'constraint_methods' => {
+        'email' => FV_email(),
+      },
+    },
+  );
 
 =head1 DESCRIPTION
 
@@ -127,33 +132,33 @@ filtering any of the data provided to you by the user).
 =item FV_email_filter(%options)
 
 Filter method which cleans up the given value and returns valid e-mail
-addresses (or nothing, if the value isn't a valid e-mail address). 
+addresses (or nothing, if the value isn't a valid e-mail address).
 
 "Valid" is deemed to mean "looks like an e-mail"; no other tests are done
 to ensure that a valid MX exists or that the address is actually
-deliverable. 
+deliverable.
 
 This filter method automatically converts all e-mail addresses to
 lower-case. This behaviour can be disabled by passing through an
-C<lc=E<gt>0> option. 
+C<lc=E<gt>0> option.
 
 You may also pass through any additional C<Email::Valid> C<%options> that
-you want to use; they're handed straight through to C<Email::Valid>. 
+you want to use; they're handed straight through to C<Email::Valid>.
 
 =item FV_email(%options)
 
 Constraint method which checks to see if the value being constrained is a
 valid e-mail address or not. Returns true if the e-mail address is valid,
-false otherwise. 
+false otherwise.
 
 This differs from the "email" constraint that comes with
 C<Data::FormValidator> in that we not only check to make sure that the
 e-mail looks valid, but also that a valid MX record exists for the address.
 No other checks are done to ensure that the address is actually
-deliverable, however. 
+deliverable, however.
 
 You can also pass through any additional C<Email::Valid> C<%options> that
-you want to use; they're handed straight through to C<Email::Valid>. 
+you want to use; they're handed straight through to C<Email::Valid>.
 
 =back
 

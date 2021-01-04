@@ -3,9 +3,9 @@ NAME
     chart (a.k.a. growth reference, growth standards)
 
 VERSION
-    This document describes version 0.002 of WHO::GrowthReference::Table
+    This document describes version 0.003 of WHO::GrowthReference::Table
     (from Perl distribution WHO-GrowthReference-Table), released on
-    2018-08-22.
+    2021-01-04.
 
 SYNOPSIS
      use WHO::GrowthReference::Table qw(get_who_growth_reference);
@@ -35,7 +35,7 @@ FUNCTIONS
   get_who_growth_reference
     Usage:
 
-     get_who_growth_reference(%args) -> [status, msg, result, meta]
+     get_who_growth_reference(%args) -> [status, msg, payload, meta]
 
     Lookup height/weight in the WHO growth chart (a.k.a. growth reference,
     growth standards).
@@ -61,7 +61,7 @@ FUNCTIONS
     First element (status) is an integer containing HTTP status code (200
     means OK, 4xx caller error, 5xx function error). Second element (msg) is
     a string containing error message, or 'OK' if status is 200. Third
-    element (result) is optional, the actual result. Fourth element (meta)
+    element (payload) is optional, the actual result. Fourth element (meta)
     is called result metadata and is optional, a hash that contains extra
     information.
 
@@ -77,8 +77,7 @@ SOURCE
 
 BUGS
     Please report any bugs or feature requests on the bugtracker website
-    <https://rt.cpan.org/Public/Dist/Display.html?Name=WHO-GrowthReference-T
-    able>
+    <https://github.com/perlancar/perl-WHO-GrowthReference-Table/issues>
 
     When submitting a bug or request, please include a test-file or a patch
     to an existing test-file that illustrates the bug or desired feature.
@@ -92,7 +91,7 @@ AUTHOR
     perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2018 by perlancar@cpan.org.
+    This software is copyright (c) 2021, 2018 by perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

@@ -1,5 +1,5 @@
 package Treex::Core::DocZone;
-$Treex::Core::DocZone::VERSION = '2.20201228';
+$Treex::Core::DocZone::VERSION = '2.20210102';
 use Moose;
 
 extends 'Treex::Core::Zone';
@@ -19,7 +19,7 @@ Treex::Core::DocZone - document zone for the text attribute
 
 =head1 VERSION
 
-version 2.20201228
+version 2.20210102
 
 =head1 SYNOPSIS
 

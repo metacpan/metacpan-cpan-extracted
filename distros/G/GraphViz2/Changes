@@ -1,3 +1,9 @@
+2.64 2021-01-01
+- fix multigraph-handling
+
+2.63 2021-01-01
+- from_graph to handle multigraphs
+
 2.62 2020-11-16
 - fix label quoting
 

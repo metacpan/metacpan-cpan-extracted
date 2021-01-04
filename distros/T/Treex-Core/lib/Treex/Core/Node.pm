@@ -1,5 +1,5 @@
 package Treex::Core::Node;
-$Treex::Core::Node::VERSION = '2.20201228';
+$Treex::Core::Node::VERSION = '2.20210102';
 use namespace::autoclean;
 
 use Moose;
@@ -956,7 +956,7 @@ sub descendants {
 # TODO: How to do this in an elegant way?
 # Unless we find a better way, we must disable two perlcritics
 package Treex::Core::Node::Removed;    ## no critic (ProhibitMultiplePackages)
-$Treex::Core::Node::Removed::VERSION = '2.20201228';
+$Treex::Core::Node::Removed::VERSION = '2.20210102';
 use Treex::Core::Log;
 
 sub AUTOLOAD {                         ## no critic (ProhibitAutoloading)
@@ -1032,7 +1032,7 @@ Treex::Core::Node - smallest unit that holds information in Treex
 
 =head1 VERSION
 
-version 2.20201228
+version 2.20210102
 
 =head1 DESCRIPTION
 

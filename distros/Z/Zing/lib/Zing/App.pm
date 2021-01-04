@@ -12,7 +12,7 @@ use Data::Object::Class;
 use Data::Object::ClassHas;
 use Data::Object::Space;
 
-our $VERSION = '0.22'; # VERSION
+our $VERSION = '0.25'; # VERSION
 
 # ATTRIBUTES
 
@@ -423,6 +423,18 @@ method store_namespace() {
 
 method store_specification(Any @args) {
   return [$self->store_namespace, [encoder => $self->encoder, @args]];
+}
+
+method table(Any @args) {
+  return $self->reify($self->table_specification(@args));
+}
+
+method table_namespace() {
+  return [$self->name, 'table'];
+}
+
+method table_specification(Any @args) {
+  return [$self->table_namespace, [@args]];
 }
 
 method term(Any @args) {
@@ -2495,6 +2507,70 @@ args, for the reifier.
   $app->store_specification;
 
   # [['zing', 'store'], [@args]]
+
+=back
+
+=cut
+
+=head2 table
+
+  table(Any @args) : Table
+
+The table method returns a new L<Zing::Table> object based on the currenrt C<env>.
+
+=over 4
+
+=item table example #1
+
+  # given: synopsis
+
+  my $table = $app->table(
+    name => 'people',
+  );
+
+  # Zing::Table->new(...)
+
+=back
+
+=cut
+
+=head2 table_namespace
+
+  table_namespace() : ArrayRef[Str]
+
+The table_namespace method returns a wordlist that represents a I<table> class
+name.
+
+=over 4
+
+=item table_namespace example #1
+
+  # given: synopsis
+
+  $app->table_namespace;
+
+  # ['zing', 'table']
+
+=back
+
+=cut
+
+=head2 table_specification
+
+  table_specification(Any @args) : Tuple[ArrayRef, ArrayRef]
+
+The table_specification method returns a I<table> specification, class name and
+args, for the reifier.
+
+=over 4
+
+=item table_specification example #1
+
+  # given: synopsis
+
+  $app->table_specification;
+
+  # [['zing', 'table'], [@args]]
 
 =back
 

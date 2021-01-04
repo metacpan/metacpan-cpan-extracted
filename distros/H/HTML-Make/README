@@ -6,7 +6,7 @@
                                                           
 
 
-This is the README for HTML::Make version 0.10.
+This is the README for HTML::Make version 0.12.
 
 HTML::Make is a "module" for the Perl computer programming language, a
 library of computer code to install on a computer.  This document contains
@@ -34,12 +34,11 @@ HTML lists or tables, rather than complete HTML pages.
 2. DOCUMENTATION
 
 You can read the documentation for the module online at the following
-websites:
+website:
 
-    * http://search.cpan.org/perldoc?HTML::Make
     * http://metacpan.org/release/HTML-Make
 
-(These links go to the latest version of the module.)
+(This link goes to the latest version of the module.)
 
 After installing the module, you can read the documentation on your
 computer using
@@ -60,11 +59,11 @@ If you have the App::cpanminus installer, you may prefer
 
     cpanm HTML::Make
 
-To install the module from the source file, HTML-Make-0.10.tar.gz, follow
+To install the module from the source file, HTML-Make-0.12.tar.gz, follow
 this sequence of commands:
 
-    tar xfz HTML-Make-0.10.tar.gz
-    cd HTML-Make-0.10
+    tar xfz HTML-Make-0.12.tar.gz
+    cd HTML-Make-0.12
     perl Makefile.PL
     make
     make install
@@ -89,6 +88,6 @@ repository on github at
 
 -----------------------------------------------------------------------------
 
-This README was written on Sat Oct 14 16:41:34 2017.
+This README was written on Fri Jan  1 23:47:58 2021.
 
 -----------------------------------------------------------------------------

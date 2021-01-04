@@ -12,6 +12,7 @@ share/jupiter.png
 share/jupiter.svg
 share/personalize.js
 share/template.html
+t/atom.t
 t/author.t
 t/basic-operation.t
 t/duplicate-links.t

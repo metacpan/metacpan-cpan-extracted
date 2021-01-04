@@ -15,20 +15,19 @@ use base 'Graph::AdjacencyMap';
 
 sub _is_COUNT    () { 0 }
 sub _is_MULTI    () { 0 }
-sub _is_HYPER    () { 0 }
 sub _is_UNIQ     () { 0 }
 sub _is_REF      () { 0 }
 
 sub _new {
     my ($class, $flags, $arity) = @_;
-    $class->SUPER::_new($flags | _LIGHT, $arity, {});
+    (my $m = $class->SUPER::_new($flags | _LIGHT, $arity))->[ _attr ] = {};
+    $m;
 }
 
 sub set_path {
-    my ($m, @args) = @_;
+    my ($m, @args) = ($_[0], @{ $_[1] });
     return if @args == 0;
     my ($n, $f, $a, $i, $s) = @$m;
-    @args = sort @args if ($f & _UNORD) and $a == 2;
     my $e0 = shift @args;
     return $n if exists $s->{ $e0 } && (($a == 1) or exists $s->{ $e0 }->{ $args[0] });
     $n = $m->[ _n ]++;
@@ -50,10 +49,8 @@ sub paths_non_existing {
 sub _paths_lookup {
     my ($m, $list, $want_exist) = @_;
     my ($n, $f, $a, $i, $s) = @$m;
-    my $unord = $a > 1 && ($f & _UNORD);
     map {
 	my @p = @$_;
-	@p = sort @p if $unord;
 	my $this_s = $s;
 	$this_s = $this_s->{ shift @p } while defined $this_s and @p;
 	($want_exist xor !defined $this_s) ? ($want_exist ? $this_s : $_) : ();
@@ -61,10 +58,8 @@ sub _paths_lookup {
 }
 
 sub has_path {
-    my ($f, $a, $s, @args) = ( @{ $_[0] }[ _f, _arity, _s ], @_[1..$#_] );
+    my ($f, $a, $s, @args) = ( @{ $_[0] }[ _f, _arity, _s ], @{ $_[1] } );
     return 0 unless $a == @args;
-    @args = sort @args if ($f & _UNORD);
-    my $e;
     $s = $s->{ shift @args } while defined $s and @args;
     defined $s ? 1 : 0;
 }
@@ -81,18 +76,18 @@ sub _get_path_count {
 sub has_paths { keys %{ $_[0]->[ _s ] } }
 
 sub del_path {
-    my $m = shift;
-    my ($n, $f, $a, $i, $s) = @$m;
-    @_ = sort @_ if @_ > 1 and $f & _UNORD;
-    my $e0 = shift;
-    return 0 if !defined($n = $s->{ $e0 });
-    if (@_ == 1) {
-	my $e1 = shift;
-	return 0 if !defined($n = $n->{ $e1 }); # "actual" n ie id
+    my ($i, $s, $attr, @args) = ( @{ my $m = $_[0] }[ _i, _s, _attr ], @{ $_[1] } );
+    return 0 if !defined(my $n = $s->{ my $e0 = shift @args });
+    if (@args == 1) {
+	my $e1 = shift @args;
+	return 0 if !defined($n = $n->{ $e1 });
 	delete $s->{ $e0 }->{ $e1 };
 	delete $s->{ $e0 } unless keys %{ $s->{ $e0 } };
+	delete $attr->{ $e0 }->{ $e1 };
+	delete $attr->{ $e0 } unless keys %{ $attr->{ $e0 } };
     } else {
 	delete $s->{ $e0 };
+	delete $attr->{ $e0 };
     }
     delete $i->[ $n ];
     return 1;
@@ -100,7 +95,7 @@ sub del_path {
 
 sub rename_path {
     my ($m, $from, $to) = @_;
-    my (undef, undef, $a, $i, $s, $attr) = @$m;
+    my ($a, $i, $s, $attr) = @$m[ _arity, _i, _s, _attr ];
     return 1 if $a > 1; # arity > 1, all integers, no names
     return 0 unless exists $s->{ $from };
     $s->{ $to } = delete $s->{ $from };
@@ -110,28 +105,21 @@ sub rename_path {
 }
 
 sub _set_path_attr_common {
-    &Graph::AdjacencyMap::__arg;
     &set_path;
-    my ($m, @e) = @_;
-    my $attr = $m->[ _attr ];
+    my ($attr, @e) = ( @{ $_[0] }[ _attr ], @{ $_[1] } );
     $attr = $attr->{ shift @e } ||= {} while $attr and @e > 1;
     \$attr->{ $e[0] };
 }
 
 sub _get_path_attrs {
-    &Graph::AdjacencyMap::__arg;
-    my ($m, @e) = @_;
-    my $attr = $m->[ _attr ];
+    my ($attr, @e) = ( @{ $_[0] }[ _attr ], @{ $_[1] } );
     $attr = $attr->{ shift @e } while $attr and @e > 0;
-    return $attr if $attr;
-    return;
+    $attr ? $attr : ();
 }
 
 sub _del_path_attrs {
-    &Graph::AdjacencyMap::__arg;
     return undef unless &has_path;
-    my ($m, @e) = @_;
-    my $attr = $m->[ _attr ];
+    my ($attr, @e) = ( @{ $_[0] }[ _attr ], @{ $_[1] } );
     $attr = $attr->{ shift @e } while $attr and @e > 1;
     return 0 unless $attr and exists $attr->{ $e[0] };
     delete $attr->{ $e[0] };

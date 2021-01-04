@@ -1,5 +1,5 @@
 package Treex::Core::Resource;
-$Treex::Core::Resource::VERSION = '2.20201228';
+$Treex::Core::Resource::VERSION = '2.20210102';
 use strict;
 use warnings;
 
@@ -105,7 +105,7 @@ Treex::Core::Resource - Access to shared resources
 
 =head1 VERSION
 
-version 2.20201228
+version 2.20210102
 
 =head1 SYNOPSIS
 

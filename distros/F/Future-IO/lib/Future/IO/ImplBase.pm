@@ -1,14 +1,14 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2019 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2019-2020 -- leonerd@leonerd.org.uk
 
 package Future::IO::ImplBase;
 
 use strict;
 use warnings;
 
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 use Errno qw( EAGAIN EWOULDBLOCK );
 
@@ -53,6 +53,20 @@ These methods are provided based on lower-level functionallity that the
 implementing class should provide.
 
 =cut
+
+=head2 alarm
+
+Implemented by wrapping C<sleep>.
+
+=cut
+
+sub alarm
+{
+   my $self = shift;
+   my ( $time ) = @_;
+
+   return $self->sleep( $time - Time::HiRes::time() );
+}
 
 =head2 sysread
 

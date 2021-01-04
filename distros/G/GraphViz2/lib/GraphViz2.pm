@@ -11,7 +11,7 @@ use Moo;
 use IPC::Run3; # For run3().
 use Types::Standard qw/Any ArrayRef HasMethods HashRef Int Str/;
 
-our $VERSION = '2.62';
+our $VERSION = '2.64';
 
 my $DATA_SECTION = get_data_section; # load once
 my $DEFAULT_COMBINE = 1; # default for combine_node_and_port
@@ -622,12 +622,23 @@ sub from_graph {
 		$self->add_node(name => $_) for @{ $group->{nodes} || [] };
 		$self->pop_subgraph;
 	}
-	for my $v (sort $g->vertices) {
-		my $attrs = $g->get_vertex_attribute($v, 'graphviz') || {};
+	my ($is_multiv, $is_multie) = map $g->$_, qw(multivertexed multiedged);
+	my ($v_attr, $e_attr) = qw(get_vertex_attribute get_edge_attribute);
+	$v_attr .= '_by_id' if $is_multiv;
+	$e_attr .= '_by_id' if $is_multie;
+	for my $v (sort $g->unique_vertices) {
+		my @vargs = $v;
+		if ($is_multiv) {
+			my ($found_id) = grep $g->has_vertex_attribute_by_id($v, $_, 'graphviz'), sort $g->get_multivertex_ids($v);
+			@vargs = defined $found_id ? (@vargs, $found_id) : ();
+		}
+		my $attrs = @vargs ? $g->$v_attr(@vargs, 'graphviz') || {} : {};
 		$self->add_node(name => $v, %$attrs) if keys %$attrs;
 		for my $e (sort {$a->[1] cmp $b->[1]} $g->edges_from($v)) {
-			my $e_a = $g->get_edge_attribute(@$e, 'graphviz')||{};
-			$self->add_edge(from => $v, to => $e->[1], %$e_a);
+			my @edges = $is_multie
+				? map $g->$e_attr(@$e, $_, 'graphviz') || {}, sort $g->get_multiedge_ids(@$e)
+				: $g->$e_attr(@$e, 'graphviz')||{};
+			$self->add_edge(from => $v, to => $e->[1], %$_) for @edges;
 		}
 	}
 	$self;
@@ -982,6 +993,12 @@ Will also use any node-, edge-, and graph-level attributes named
 C<graphviz> as a hash-ref for setting attributes on the corresponding
 entities in the constructed GraphViz2 object. These will override the
 figured-out defaults referred to above.
+
+For a C<multivertexed> graph, will only create one node per vertex,
+but will search all the multi-IDs for a C<graphviz> attribute, taking
+the first one it finds (sorted alphabetically).
+
+For a C<multiedged> graph, will create one edge per multi-edge.
 
 Will only set the C<global> attribute if called as a constructor. This
 will be dropped from any passed-in graph-level C<graphviz> attribute

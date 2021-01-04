@@ -23,7 +23,8 @@
          "requires" : {
             "List::Util" : "0",
             "Test::Builder" : "1.302",
-            "Test::Deep" : "0"
+            "Test::Deep" : "0",
+            "Test::Future::Deferred" : "0"
          }
       },
       "test" : {
@@ -36,11 +37,11 @@
    "provides" : {
       "Test::ExpectAndCheck" : {
          "file" : "lib/Test/ExpectAndCheck.pm",
-         "version" : "0.01"
+         "version" : "0.02"
       },
       "Test::ExpectAndCheck::Future" : {
          "file" : "lib/Test/ExpectAndCheck/Future.pm",
-         "version" : "0.01"
+         "version" : "0.02"
       }
    },
    "release_status" : "stable",
@@ -49,6 +50,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.01",
+   "version" : "0.02",
    "x_serialization_backend" : "JSON::PP version 4.05"
 }

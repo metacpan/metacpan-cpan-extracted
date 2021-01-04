@@ -1,6 +1,8 @@
 package Crypt::OpenToken::Cipher::AES256;
 
 use Moose;
+use namespace::autoclean;
+
 # Crypt::Rijndael will figure out whether its 128 or 256 bit mode depending on
 # the key we use, so leverage the implementation in C:OT:C:AES128
 extends 'Crypt::OpenToken::Cipher::AES128';

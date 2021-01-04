@@ -1,5 +1,9 @@
 Revision history for Proc-ProcessTable-ncps
 
+0.1.2	 2020-12-30/05:00
+		 - Now use ColorThemes::Standard.
+		 - Fix --stats.
+
 0.1.1	 2020-10-04/03:30
 		 - Update so it plays nicely with Text::ANSITable 0.600
 

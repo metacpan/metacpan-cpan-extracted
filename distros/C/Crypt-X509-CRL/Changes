@@ -1,5 +1,9 @@
 Revision history for Perl extension Crypt::X509::CRL.
 
+0.04 Wed Dec 31 2020 gigageek
+    - Fixed the 01-validate.t test to correctly fetch the crl files in the /t/ directory
+    - Added module to github and added META links to github project
+
 0.03 Wed Dec 23 2020 gigageek
     - Corrected the next_update examples in the POD
     - Added a validate test to confirm handling of errors with known good and bad CRL test files

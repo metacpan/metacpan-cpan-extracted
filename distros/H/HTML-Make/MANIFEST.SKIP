@@ -14,3 +14,5 @@ MYMETA\.
 ^xt/.*$
 # Example outputs shouldn't go to CPAN
 ^examples/.*-out\.txt$
+^copy\.pl$
+^copied/.*$

@@ -15,6 +15,13 @@ Alien::liburing - Alien wrapper for liburing
 
 =head1 DESCRIPTION
 
+
+=begin html
+
+<a href="https://github.com/simcop2387/Alien-liburing/actions?query=workflow%3A%22CI+-+Distzilla%22"><img src="https://github.com/simcop2387/Alien-liburing/workflows/CI%20-%20Distzilla/badge.svg"></a>
+
+=end html
+
 This module provides bindings for the C<libuing> C library, for
 working with the io_uring Linux kernel subsystem.  This library is
 only available or relavent for Linux, and will fail to install on

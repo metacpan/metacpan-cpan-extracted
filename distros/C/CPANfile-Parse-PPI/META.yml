@@ -7,7 +7,9 @@ build_requires:
   File::Spec: '3.30'
   IO::File: '1.16'
   JSON::PP: '2.27'
+  Test::Exception: '0.43'
   Test::More: '0.72'
+  Test::Warn: '0.36'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
@@ -20,15 +22,16 @@ name: CPANfile-Parse-PPI
 provides:
   CPANfile::Parse::PPI:
     file: lib/CPANfile/Parse/PPI.pm
-    version: '0.02'
+    version: '0.04'
 requires:
+  Carp: '0'
   Moo: '2.003'
   PPI: '1.270'
 resources:
   bugtracker: https://github.com/perlservices/CPANfile-Parse-PPI/issues
   homepage: http://github.com/perlservices/CPANfile-Parse-PPI
   repository: https://github.com/perlservices/CPANfile-Parse-PPI.git
-version: '0.02'
+version: '0.04'
 x_contributors:
   - 'reneeb <info@perl-services.de>'
 x_serialization_backend: 'YAML::Tiny version 1.70'

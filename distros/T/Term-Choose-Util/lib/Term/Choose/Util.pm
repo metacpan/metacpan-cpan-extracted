@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '0.121';
+our $VERSION = '0.122';
 use Exporter 'import';
 our @EXPORT_OK = qw( choose_a_directory choose_a_file choose_directories choose_a_number choose_a_subset settings_menu
                      insert_sep get_term_size get_term_width get_term_height unicode_sprintf );
@@ -93,7 +93,7 @@ sub _valid_options {
         hide_cursor         => '[ 0 1 ]',
         index               => '[ 0 1 ]',
         keep_chosen         => '[ 0 1 ]',
-        mouse               => '[ 0 1 2 3 4 ]',     # 05.09.2019    # after transition -> '[ 0 1 ]',
+        mouse               => '[ 0 1 ]',
         order               => '[ 0 1 ]',
         show_hidden         => '[ 0 1 ]',
         small_first         => '[ 0 1 ]',
@@ -990,7 +990,7 @@ Term::Choose::Util - TUI-related functions for selecting directories, files, num
 
 =head1 VERSION
 
-Version 0.121
+Version 0.122
 
 =cut
 
@@ -1494,7 +1494,7 @@ L<stackoverflow|http://stackoverflow.com> for the help.
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2014-2020 Matthäus Kiem.
+Copyright 2014-2021 Matthäus Kiem.
 
 This library is free software; you can redistribute it and/or modify it under the same terms as Perl 5.10.0. For
 details, see the full text of the licenses in the file LICENSE.

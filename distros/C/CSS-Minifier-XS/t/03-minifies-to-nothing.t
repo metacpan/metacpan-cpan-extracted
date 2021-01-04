@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 2;
+use if $ENV{AUTOMATED_TESTING}, 'Test::DiagINC'; use Test::More tests => 2;
 use CSS::Minifier::XS qw(minify);
 
 my $results;

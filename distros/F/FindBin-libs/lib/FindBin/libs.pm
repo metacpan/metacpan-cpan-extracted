@@ -1,20 +1,9 @@
-package FindBin::libs;
+package libs.pm;
 
-sub import
-{
-
-    die <<'MSG';
-This is a placeholder.
-Please execute "perl Makefile.PL" in the
-module's distribution directory in order
-to have the correct file(s) installed.
-MSG
-
-}
-1
+die "Please use Makefile.PL to detect the correct module version.\n";
 __END__
-=head1 PLACEHOLDER
+=head1 Placeholder for real file copied via Makefile.pl
 
-This is a placeholder.
-
-The correct files are copied as part of processing the Makefile.PL.
+If you see this then Makefile.PL was not run or failed to find 
+a working perl executable in order to detect the version, or the
+perl on your path is older than 5.8.

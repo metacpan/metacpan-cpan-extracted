@@ -1,3 +1,17 @@
+0.005     2021-01-01 13:20:55 PST
+  - Fix some issues with gcc and linking.  I hate gcc.
+
+0.004     2021-01-01 11:53:49 PST
+  - Create supplimental library that contains missing functions.  
+    These are functions that are only present in the liburing.h file 
+    that are marked as static inline.  This make sense in C since 
+    their all small tiny functions that just make things more ergonomic 
+    or help setup structs but we need them as real functions to help from perl.
+  - Do some clean up of the dist.ini and bump it's revision of starter
+
+0.003     2020-12-29 18:15:53 PST
+  - Update to a preview of 0.8 of liburing, to get some of the 5.11 support.  Might not work but it contains lots of fixes since 0.7
+
 0.002     2020-02-05 16:02:41 PST
   - Updated dist.ini for easier publishing
   - Moved the OS check to dist.ini instead of alienfile, should behave better now on cpantesters

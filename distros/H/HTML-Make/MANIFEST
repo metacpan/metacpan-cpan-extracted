@@ -1,6 +1,8 @@
+.travis.yml
 Changes
 examples/json-to-html.pl
 examples/li-class-beano.pl
+examples/link-example.pl
 examples/multiply.pl
 examples/nocheck.pl
 examples/p-double-class.pl

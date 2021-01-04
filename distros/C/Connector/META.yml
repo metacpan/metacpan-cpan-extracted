@@ -49,5 +49,7 @@ requires:
   Moose: 0
   perl: 5.10.1
 resources:
+  bugtracker: https://github.com/mrscotty/connector/issues
   license: http://dev.perl.org/licenses/
-version: '1.35'
+  repository: https://github.com/mrscotty/connector
+version: '1.36'

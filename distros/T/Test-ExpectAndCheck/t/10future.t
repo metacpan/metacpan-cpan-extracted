@@ -15,14 +15,18 @@ my ( $controller, $puppet ) = Test::ExpectAndCheck::Future->create;
 
 # pass
 {
-   test_out q[ok 1 - $puppet->sleep is done];
+   test_out q[ok 1 - $puppet->sleep is not done before get];
+   test_out q[ok 2 - $puppet->sleep is done after get];
    test_out q[# Subtest: ->sleep];
    test_out q[    ok 1 - ->sleep('0.5')];
    test_out q[    1..1];
-   test_out q[ok 2 - ->sleep];
+   test_out q[ok 3 - ->sleep];
 
    $controller->expect( sleep => 0.5 );
-   ok( $puppet->sleep( 0.5 )->is_done, '$puppet->sleep is done' );
+   my $f = $puppet->sleep( 0.5 );
+   ok( !$f->is_done, '$puppet->sleep is not done before get' );
+   $f->get;
+   ok( $f->is_done, '$puppet->sleep is done after get' );
    $controller->check_and_clear( '->sleep' );
 
    test_test 'sleep OK';
@@ -58,6 +62,24 @@ my ( $controller, $puppet ) = Test::ExpectAndCheck::Future->create;
    $controller->check_and_clear( '->two' );
 
    test_test 'two fails';
+}
+
+# immediate
+{
+   test_out q[ok 1 - $f is done immediately];
+   test_out q[ok 2 - $f->result];
+   test_out q[# Subtest: ->imm];
+   test_out q[    ok 1 - ->imm('ABC')];
+   test_out q[    1..1];
+   test_out q[ok 3 - ->imm];
+
+   $controller->expect( imm => "ABC" )->returns( "DEF" )->immediately;
+   my $f = $puppet->imm( "ABC" );
+   ok( $f->is_done, '$f is done immediately' );
+   is( $f->result, "DEF", '$f->result' );
+   $controller->check_and_clear( '->imm' );
+
+   test_test 'immediate';
 }
 
 done_testing;

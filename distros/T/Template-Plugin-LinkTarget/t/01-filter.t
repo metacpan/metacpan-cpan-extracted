@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Template;
+use if $ENV{AUTOMATED_TESTING}, 'Test::DiagINC'; use Template;
 use Test::More tests => 11;
 
 my $text     = qq{<a href="http://www.google.com/">Google</a>};

@@ -1,6 +1,10 @@
 Revision history for Term::Choose
 
 
+1.713   2021-01-01
+    - Add bugracker info to the Makefile.PL.
+    - Update year copyright.
+
 1.712   2020-10-25
     - Removed deprecated options 'justify' and 'lf'.
     - Option 'mouse': values other than 0 and 1 are no longer allowed.

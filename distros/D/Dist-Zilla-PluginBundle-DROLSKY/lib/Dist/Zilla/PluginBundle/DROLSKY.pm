@@ -7,7 +7,7 @@ use warnings;
 use autodie;
 use namespace::autoclean;
 
-our $VERSION = '1.09';
+our $VERSION = '1.11';
 
 use Devel::PPPort 3.42;
 use Dist::Zilla 6.0;
@@ -26,8 +26,10 @@ use Dist::Zilla::Plugin::CopyFilesFromBuild;
 use Dist::Zilla::Plugin::DROLSKY::Contributors;
 use Dist::Zilla::Plugin::DROLSKY::License;
 use Dist::Zilla::Plugin::DROLSKY::MakeMaker;
+use Dist::Zilla::Plugin::DROLSKY::PerlLinterConfigFiles;
+use Dist::Zilla::Plugin::DROLSKY::Precious;
 use Dist::Zilla::Plugin::DROLSKY::RunExtraTests;
-use Dist::Zilla::Plugin::DROLSKY::TidyAll;
+use Dist::Zilla::Plugin::DROLSKY::Test::Precious;
 use Dist::Zilla::Plugin::DROLSKY::WeaverConfig;
 use Dist::Zilla::Plugin::EnsureChangesHasContent 0.02;
 use Dist::Zilla::Plugin::GenerateFile::FromShareDir 0.013;
@@ -64,7 +66,6 @@ use Dist::Zilla::Plugin::Test::PodSpelling;
 use Dist::Zilla::Plugin::Test::Portability;
 use Dist::Zilla::Plugin::Test::ReportPrereqs;
 use Dist::Zilla::Plugin::Test::Synopsis;
-use Dist::Zilla::Plugin::Test::TidyAll 0.04;
 use Dist::Zilla::Plugin::Test::Version;
 use Dist::Zilla::Plugin::VersionFromMainModule 0.02;
 
@@ -192,16 +193,6 @@ has stopwords_file => (
     predicate => '_has_stopwords_file',
 );
 
-has tidyall_section => (
-    traits   => ['Array'],
-    is       => 'ro',
-    isa      => 'ArrayRef[Str]',
-    required => 1,
-    handles  => {
-        _has_tidyall_section => 'count',
-    },
-);
-
 has next_release_width => (
     is      => 'ro',
     isa     => 'Int',
@@ -313,7 +304,8 @@ sub _build_plugins {
         $self->_maybe_ppport_plugin,
         'DROLSKY::License',
         $self->_release_check_plugins,
-        $self->_tidyall_plugin,
+        'DROLSKY::PerlLinterConfigFiles',
+        $self->_precious_plugin,
         $self->_git_plugins,
 
         # This needs to be last so that MakeMaker::Awesome can see all the
@@ -523,11 +515,17 @@ sub _explicit_prereq_plugins {
         }
         ];
 
-    return (
-        $test_more,
+    # These are needed for use with tidyall, but they're not direct tidyall
+    # prereqs.
+    my @lint_tool_prereqs;
+    my %shared_lint_prereqs = (
+        'Perl::Critic'        => '1.138',
+        'Perl::Critic::Moose' => '1.05',
+        'Perl::Tidy'          => '20201207',
+    );
 
-        # Because Code::TidyAll does not depend on them
-        [
+    if ( -e 'tidyall.ini' ) {
+        @lint_tool_prereqs = (
             'Prereqs' => 'Modules for use with tidyall' => {
                 -phase                                        => 'develop',
                 -type                                         => 'requires',
@@ -535,11 +533,25 @@ sub _explicit_prereq_plugins {
                 'Code::TidyAll::Plugin::SortLines::Naturally' => '0.000003',
                 'Code::TidyAll::Plugin::Test::Vars'           => '0.02',
                 'Parallel::ForkManager'                       => '1.19',
-                'Perl::Critic'                                => '1.126',
-                'Perl::Tidy'                                  => '20160302',
                 'Test::Vars'                                  => '0.009',
+                %shared_lint_prereqs,
             }
-        ],
+        );
+    }
+    else {
+        @lint_tool_prereqs = (
+            'Prereqs' => 'Tools for use with precious' => {
+                -phase         => 'develop',
+                -type          => 'requires',
+                'Perl::Critic' => '1.126',
+                'Perl::Tidy'   => '20160302',
+            },
+        );
+    }
+
+    return (
+        $test_more,
+        \@lint_tool_prereqs,
         [
             'Prereqs' =>
                 'Test::Version which fixes https://github.com/plicease/Test-Version/issues/7'
@@ -585,7 +597,12 @@ sub _prompt_if_stale_plugin {
                         Dist::Zilla::Plugin::DROLSKY::Contributors
                         Dist::Zilla::Plugin::DROLSKY::Git::CheckFor::CorrectBranch
                         Dist::Zilla::Plugin::DROLSKY::License
-                        Dist::Zilla::Plugin::DROLSKY::TidyAll
+                        Dist::Zilla::Plugin::DROLSKY::MakeMaker
+                        Dist::Zilla::Plugin::DROLSKY::PerlLinterConfigFiles
+                        Dist::Zilla::Plugin::DROLSKY::Precious
+                        Dist::Zilla::Plugin::DROLSKY::Role::CoreCounter
+                        Dist::Zilla::Plugin::DROLSKY::RunExtraTests
+                        Dist::Zilla::Plugin::DROLSKY::Test::Precious
                         Dist::Zilla::Plugin::DROLSKY::WeaverConfig
                         Pod::Weaver::PluginBundle::DROLSKY
                         )
@@ -666,6 +683,7 @@ sub _extra_test_plugins {
     return (
         qw(
             DROLSKY::RunExtraTests
+            DROLSKY::Test::Precious
             MojibakeTests
             Test::CleanNamespaces
             Test::CPAN::Changes
@@ -675,15 +693,6 @@ sub _extra_test_plugins {
             Test::Portability
             Test::Synopsis
             ),
-        [
-            'Test::TidyAll' => {
-                verbose => 1,
-                jobs    => 4,
-
-                # Test::Vars requires this version
-                minimum_perl => '5.010',
-            }
-        ],
         [ 'Test::Compile'       => { xt_mode        => 1 } ],
         [ 'Test::ReportPrereqs' => { verify_prereqs => 1 } ],
         [ 'Test::Version'       => { is_strict      => 1 } ],
@@ -763,17 +772,15 @@ sub _release_check_plugins {
     );
 }
 
-sub _tidyall_plugin {
+sub _precious_plugin {
     my $self = shift;
 
-    my %tidyall_config;
-    $tidyall_config{sections} = $self->tidyall_section
-        if $self->_has_tidyall_section;
-    $tidyall_config{stopwords_file} = $self->stopwords_file
+    my %precious_config;
+    $precious_config{stopwords_file} = $self->stopwords_file
         if $self->_has_stopwords_file;
 
-    return 'DROLSKY::TidyAll' unless keys %tidyall_config;
-    return [ 'DROLSKY::TidyAll' => \%tidyall_config ];
+    return 'DROLSKY::Precious' unless keys %precious_config;
+    return [ 'DROLSKY::Precious' => \%precious_config ];
 }
 
 sub _git_plugins {
@@ -827,7 +834,7 @@ sub _build_allow_dirty {
         @{ $self->_exclude_filenames },
         qw(
             Changes
-            tidyall.ini
+            precious.toml
             )
     ];
 }
@@ -860,7 +867,7 @@ Dist::Zilla::PluginBundle::DROLSKY - DROLSKY's plugin bundle
 
 =head1 VERSION
 
-version 1.09
+version 1.11
 
 =head1 SYNOPSIS
 
@@ -987,14 +994,11 @@ This is more or less equivalent to the following F<dist.ini>:
     -type  = requires
     Test::More = 0.96
 
-    [Prereqs / Modules for use with tidyall]
+    [Prereqs / Modules for use with precious]
     -phase = develop
     -type  = requires
-    Code::TidyAll::Plugin::Test::Vars = 0.02
-    Parallel::ForkManager'            = 1.19
     Perl::Critic                      = 1.126
     Perl::Tidy                        = 20160302
-    Test::Vars                        = 0.009
 
     [Prereqs / Test::Version which fixes https://github.com/plicease/Test-Version/issues/7]
     -phase = develop
@@ -1013,7 +1017,12 @@ This is more or less equivalent to the following F<dist.ini>:
     skip = Dist::Zilla::Plugin::DROLSKY::Contributors
     skip = Dist::Zilla::Plugin::DROLSKY::Git::CheckFor::CorrectBranch
     skip = Dist::Zilla::Plugin::DROLSKY::License
-    skip = Dist::Zilla::Plugin::DROLSKY::TidyAll
+    skip = Dist::Zilla::Plugin::DROLSKY::MakeMaker
+    skip = Dist::Zilla::Plugin::DROLSKY::PerlLinterConfigFiles
+    skip = Dist::Zilla::Plugin::DROLSKY::Precious
+    skip = Dist::Zilla::Plugin::DROLSKY::Role::CoreCounter
+    skip = Dist::Zilla::Plugin::DROLSKY::RunExtraTests
+    skip = Dist::Zilla::Plugin::DROLSKY::WeaverConfig
     skip = Pod::Weaver::PluginBundle::DROLSKY
 
     [Test::Pod::Coverage::Configurable]
@@ -1031,6 +1040,7 @@ This is more or less equivalent to the following F<dist.ini>:
     [PodSyntaxTests]
 
     [DROLSKY::RunExtraTests]
+    [DROLSKY::Test::Precious]
     [MojibakeTests]
     [Test::CleanNamespaces]
     [Test::CPAN::Changes]
@@ -1039,11 +1049,6 @@ This is more or less equivalent to the following F<dist.ini>:
     [Test::NoTabs]
     [Test::Portability]
     [Test::Synopsis]
-
-    [Test::TidyAll]
-    verbose = 1
-    jobs    = 4
-    minimum_perl = 5.010
 
     [Test::Compile]
     xt_mode = 1
@@ -1104,8 +1109,10 @@ This is more or less equivalent to the following F<dist.ini>:
 
     [Git::CheckFor::MergeConflicts]
 
-    ; Generates/updates tidyall.ini, perlcriticrc, and perltidyrc
-    [DROLSKY::TidyAll]
+    ; Generates/updates perlcriticrc, and perltidyrc
+    [DROLSKY::PerlLinterConfigFiles]
+    ; Generates/updates precious.toml
+    [DROLSKY::Precious]
 
     ; The allow_dirty list is basically all of the generated or munged files
     ; in the distro, including:
@@ -1118,7 +1125,7 @@ This is more or less equivalent to the following F<dist.ini>:
     ;     README.md
     ;     cpanfile
     ;     ppport.h
-    ;     tidyall.ini
+    ;     precious.toml
     [Git::Check]
     allow_dirty = ...
 

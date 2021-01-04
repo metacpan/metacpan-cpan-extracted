@@ -56,7 +56,30 @@ use Carp qw/croak carp confess cluck/;
 use Scalar::Util qw/looks_like_number blessed reftype/;
 use Unicode::UTF8 qw/decode_utf8 valid_utf8/;
 use B;
-our $VERSION = '0.29';
+our $VERSION = '0.30';
+
+sub create_json
+{
+    my ($input, %options) = @_;
+    my $jc = bless {
+	output => '',
+    };
+    $jc->{_strict} = !! $options{strict};
+    my $error = create_json_recursively ($jc, $input);
+    if ($error) {
+	$jc->user_error ($error);
+	delete $jc->{output};
+	return undef;
+    }
+    return $jc->{output};
+}
+
+sub create_json_strict
+{
+    my ($input, %options) = @_;
+    $options{strict} = 1;
+    return create_json ($input, %options);
+}
 
 # http://stackoverflow.com/questions/1185822/how-do-i-create-or-test-for-nan-or-infinity-in-perl#1185828
 
@@ -466,29 +489,6 @@ sub user_error
     }
 }
 
-sub create_json
-{
-    my ($input, %options) = @_;
-    my $jc = bless {
-	output => '',
-    };
-    $jc->{_strict} = !! $options{strict};
-    my $error = create_json_recursively ($jc, $input);
-    if ($error) {
-	$jc->user_error ($error);
-	delete $jc->{output};
-	return undef;
-    }
-    return $jc->{output};
-}
-
-sub create_json_strict
-{
-    my ($input, %options) = @_;
-    $options{strict} = 1;
-    return create_json ($input, %options);
-}
-
 sub new
 {
     return bless {
@@ -515,15 +515,6 @@ sub non_finite_handler
     return undef;
 }
 
-sub obj
-{
-    my ($jc, %things) = @_;
-    my $handlers = $jc->get_handlers ();
-    for my $k (keys %things) {
-	$handlers->{$k} = $things{$k};
-    }
-}
-
 sub bool
 {
     my ($jc, @list) = @_;
@@ -533,27 +524,55 @@ sub bool
     }
 }
 
+sub cmp
+{
+    my ($jc, $cmp) = @_;
+    $jc->{cmp} = $cmp;
+}
+
 sub escape_slash
 {
     my ($jc, $onoff) = @_;
     $jc->{_escape_slash} = !! $onoff;
 }
 
-sub set_fformat_unsafe
+sub fatal_errors
 {
-    my ($jc, $fformat) = @_;
-    if ($fformat) {
-	$jc->{_fformat} = $fformat;
-    }
-    else {
-	delete $jc->{_fformat};
+    my ($jc, $onoff) = @_;
+    $jc->{_fatal_errors} = !! $onoff;
+}
+
+sub indent
+{
+    my ($jc, $onoff) = @_;
+    $jc->{_indent} = !! $onoff;
+}
+
+sub no_javascript_safe
+{
+    my ($jc, $onoff) = @_;
+    $jc->{_no_javascript_safe} = !! $onoff;
+}
+
+sub obj
+{
+    my ($jc, %things) = @_;
+    my $handlers = $jc->get_handlers ();
+    for my $k (keys %things) {
+	$handlers->{$k} = $things{$k};
     }
 }
 
-sub set_fformat
+sub obj_handler
 {
-    my ($jc, $fformat) = @_;
-    JSON::Create::set_fformat ($jc, $fformat);
+    my ($jc, $handler) = @_;
+    $jc->{_obj_handler} = $handler;
+}
+
+sub replace_bad_utf8
+{
+    my ($jc, $onoff) = @_;
+    $jc->{_replace_bad_utf8} = !! $onoff;
 }
 
 sub run
@@ -569,28 +588,107 @@ sub run
     return $jc->{output};
 }
 
-sub type_handler
+sub set_fformat
 {
-    my ($jc, $handler) = @_;
-    $jc->{_type_handler} = $handler;
+    my ($jc, $fformat) = @_;
+    JSON::Create::set_fformat ($jc, $fformat);
 }
 
-sub obj_handler
+sub set_fformat_unsafe
 {
-    my ($jc, $handler) = @_;
-    $jc->{_obj_handler} = $handler;
-}
-
-sub no_javascript_safe
-{
-    my ($jc, $onoff) = @_;
-    $jc->{_no_javascript_safe} = !! $onoff;
+    my ($jc, $fformat) = @_;
+    if ($fformat) {
+	$jc->{_fformat} = $fformat;
+    }
+    else {
+	delete $jc->{_fformat};
+    }
 }
 
 sub set_validate
 {
     my ($jc, $onoff) = @_;
     $jc->{_validate} = !! $onoff;
+}
+
+sub JSON::Create::PP::sort
+{
+    my ($jc, $onoff) = @_;
+    $jc->{_sort} = !! $onoff;
+}
+
+sub set
+{
+    my ($jc, %args) = @_;
+    for my $k (keys %args) {
+	my $value = $args{$k};
+
+	# Options are in alphabetical order
+
+	if ($k eq 'bool') {
+	    $jc->bool (@$value);
+	    next;
+	}
+	if ($k eq 'cmp') {
+	    $jc->cmp ($value);
+	    next;
+	}
+	if ($k eq 'downgrade_utf8') {
+	    $jc->downgrade_utf8 ($value);
+	    next;
+	}
+	if ($k eq 'escape_slash') {
+	    $jc->escape_slash ($value);
+	    next;
+	}
+	if ($k eq 'fatal_errors') {
+	    $jc->fatal_errors ($value);
+	    next;
+	}
+	if ($k eq 'indent') {
+	    $jc->indent ($value);
+	    next;
+	}
+	if ($k eq 'no_javascript_safe') {
+	    $jc->no_javascript_safe ($value);
+	    next;
+	}
+	if ($k eq 'non_finite_handler') {
+	    $jc->non_finite_handler ($value);
+	    next;
+	}
+	if ($k eq 'obj_handler') {
+	    $jc->obj_handler ($value);
+	    next;
+	}
+	if ($k eq 'replace_bad_utf8') {
+	    $jc->replace_bad_utf8 ($value);
+	    next;
+	}
+	if ($k eq 'sort') {
+	    $jc->sort ($value);
+	    next;
+	}
+	if ($k eq 'strict') {
+	    $jc->strict ($value);
+	    next;
+	}
+	if ($k eq 'unicode_upper') {
+	    $jc->unicode_upper ($value);
+	    next;
+	}
+	if ($k eq 'validate') {
+	    $jc->validate ($value);
+	    next;
+	}
+	warn "Unknown option '$k'";
+    }
+}
+
+sub type_handler
+{
+    my ($jc, $handler) = @_;
+    $jc->{_type_handler} = $handler;
 }
 
 sub unicode_escape_all
@@ -605,45 +703,15 @@ sub unicode_upper
     $jc->{_unicode_upper} = !! $onoff;
 }
 
-sub fatal_errors
-{
-    my ($jc, $onoff) = @_;
-    $jc->{_fatal_errors} = !! $onoff;
-}
-
-sub replace_bad_utf8
-{
-    my ($jc, $onoff) = @_;
-    $jc->{_replace_bad_utf8} = !! $onoff;
-}
-
 sub validate
 {
     return JSON::Create::validate (@_);
 }
 
-sub indent
+sub write_json
 {
-    my ($jc, $onoff) = @_;
-    $jc->{_indent} = !! $onoff;
-}
-
-sub JSON::Create::PP::sort
-{
-    my ($jc, $onoff) = @_;
-    $jc->{_sort} = !! $onoff;
-}
-
-sub set
-{
-    # This is pure Perl in JSON::Create.
-    JSON::Create::set (@_);
-}
-
-sub cmp
-{
-    my ($jc, $cmp) = @_;
-    $jc->{cmp} = $cmp;
+    # Parent module function is pure perl.
+    JSON::Create::write_json (@_);
 }
 
 1;

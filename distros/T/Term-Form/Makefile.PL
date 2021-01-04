@@ -18,6 +18,9 @@ WriteMakefile(
     META_MERGE => {
         'meta-spec' => { version => 2 },
         resources   => {
+            bugtracker => {
+                web => "https://github.com/kuerbis/Term-Form/issues",
+            },
             repository => {
               type => 'git',
               web  => 'https://github.com/kuerbis/Term-Form',

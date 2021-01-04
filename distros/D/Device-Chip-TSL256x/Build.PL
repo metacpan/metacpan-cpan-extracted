@@ -12,12 +12,15 @@ my $build = Module::Build->new(
 
       'Data::Bitfield' => 0,
       'Device::Chip' => '0.03',
+      'Device::Chip::Sensor' => 0,
    },
-   build_requires => {
+   test_requires => {
       'Test::Device::Chip::Adapter' => 0,
       'Test::More' => '0.88', # done_testing
    },
-   auto_configure_requires => 0, # Don't add M::B to configure_requires
+   configure_requires => {
+      'Module::Build' => '0.4004', # test_requires
+   },
    license => 'perl',
    create_license => 1,
    create_readme  => 1,

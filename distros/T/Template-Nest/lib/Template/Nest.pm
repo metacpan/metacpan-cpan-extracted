@@ -6,7 +6,7 @@ use File::Spec;
 use Carp;
 use Data::Dumper;
 
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 
 sub new{
 	my ($class,%opts) = @_;
@@ -330,7 +330,7 @@ sub _fill_in{
                 } else {
                     @spaces_repl = $frags[$i] =~ m/([^\S\r\n]*)(\Q$tda\E\s+$param_name\s+\Q$tdb\E)/g;
                 }
-
+				
                 while(@spaces_repl){
                     my $sp = shift @spaces_repl;
                     my $repl = shift @spaces_repl;
@@ -338,9 +338,9 @@ sub _fill_in{
                     $param_out =~ s/\n/\n$sp/g;
 
                     if ( $esc ){
-                        $replaced = 1 if $frags[$i] =~ s/(?<!\Q$esc\E)$repl/$param_out/;
+                        $replaced = 1 if $frags[$i] =~ s/(?<!\Q$esc\E)\Q$repl\E/$param_out/;
                     } else {
-                        $replaced = 1 if $frags[$i] =~ s/$repl/$param_out/;
+                        $replaced = 1 if $frags[$i] =~ s/\Q$repl\E/$param_out/;
                     }
                 }
             }

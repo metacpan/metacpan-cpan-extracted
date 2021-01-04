@@ -1,5 +1,5 @@
 package Treex::Core::Phrase;
-$Treex::Core::Phrase::VERSION = '2.20201228';
+$Treex::Core::Phrase::VERSION = '2.20210102';
 use utf8;
 use namespace::autoclean;
 
@@ -291,7 +291,7 @@ Treex::Core::Phrase
 
 =head1 VERSION
 
-version 2.20201228
+version 2.20210102
 
 =head1 DESCRIPTION
 

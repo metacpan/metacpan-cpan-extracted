@@ -1,0 +1,68 @@
+Revision history for Dist-Mgr
+
+1.00    2020-12-30
+    - Fix issue where ABSTRACT was being pulled from one of the test
+      modules. We now pull it from the proper POD file (fixes #4)
+    - t/20-ci_config_files.t no longer overwrites this distribution's
+      production CI config file (fixes #3)
+    - Commented out package statement in test module template so it doesn't
+      get indexed on the CPAN (fixes #7)
+    - Renamed all instances of Acme::STEVEB and Acme-STEVEB with
+      Acme-STEVEB and Acme-STEVEB
+    - We now send in all of the proper variables to the module template
+      (fixes #11)
+    - Renamed _makefile_load() and _module_load() to _makefile_tie() and
+      _module_tie(), which are by far more appropriate names
+    - CI config now installs ExtUtils::MakeMaker to a recent version,
+      fixing an issue where prereqs weren't being installed (fixes #9)
+    - Remove container from CI config, as containers only work on ubuntu
+      (fixes #10)
+    - Updated CI template, enabled ubuntu-latest, windows-latest and
+      macos-latest, with coveralls.io support (closes #12)
+    - 100% test coverage
+    - Added move_distribution_files()
+    - Finished t/50-full_run.t, goes through every function to create an
+      entire distribution with all customizations in place. Can be used as a
+      roadmap for a binary script
+    - We now croak() if the new version sent into version_bump() is less
+      than or equal to the current version (closes #14)
+    - Add tests that compare a full run against a saved template
+      distribution (closes #17)
+    - Renamed distribution to Dist::Mgr and repo to dist-mgr (closes #18)
+    - Renamed bump_version() to version_bump()
+    - Renamed get_version_info() to version_info()
+    - Added changes(), installs our custom Changes file
+    - Added changes_date(), replaces the UNREL placeholder with today's date
+      in preparation for release
+    - Added changes_bump(), prepares the Changes file for a new development
+      cycle
+    - Added POD to FileData, added section for creating new file entries
+      (closes #8)
+    - FileData functions are no longer exported by default
+    - Added make_test()
+    - Added git_release(), _git_commit(), _git_push(), _validate_git()
+    - Added export tag 'private', exports certain private functions
+    - Added tests for git functions
+    - Moved all Git functionality to Git.pm
+    - All tests pass; ready for dev release for doc review, and move on to
+      writing the release procedures and binaries
+
+0.04    2020-12-23
+    - Last test CPAN release
+    - Added git_ignore()
+    - Added remove_unwanted_files()
+    - Added init(), creates the actual distribution directory structure
+    - Added support for Coveralls.io test coverage testing for ci_github()
+
+0.03    2020-12-22
+    - Test release
+    - Added ci_github()
+    - Added ci_badges()
+    - Added manifest_skip()
+
+0.02    2020-12-22
+    - Added add_repository() and add_bugtracker()
+    - This is another formatting check on MetaCPAN
+
+0.01    2020-12-22
+    - Initial release; Much more to add, just checking POD formatting etc.

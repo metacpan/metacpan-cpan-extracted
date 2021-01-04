@@ -13,15 +13,11 @@ use Data::Object::ClassHas;
 
 extends 'Zing::Domain';
 
-use Digest::SHA ();
-
-our $VERSION = '0.22'; # VERSION
+our $VERSION = '0.25'; # VERSION
 
 # BUILDERS
 
 fun BUILD($self) {
-  $self->reset;
-
   my $savepoint = $self->savepoint;
 
   if ($savepoint->test) {
@@ -50,19 +46,16 @@ around del($key) {
   my $next = $item->{next};
   my $prev = $item->{prev};
   if ($next && $prev) {
-    # prev.next = item.next AND next.prev = item.prev
     $self->change('set', $prev, {%{$self->state->{$prev}}, next => $next});
     $self->change('set', $next, {%{$self->state->{$next}}, prev => $prev});
   }
   elsif ($next && !$prev) {
-    # next.prev = undef
     $self->metadata->{tail} = $next;
-    $self->change('set', $next, { %{$self->state->{$next}}, prev => undef });
+    $self->change('set', $next, {%{$self->state->{$next}}, prev => undef});
   }
   elsif (!$next && $prev) {
-    # prev.next = undef
     $self->metadata->{head} = $prev;
-    $self->change('set', $prev, { %{$self->state->{$prev}}, next => undef });
+    $self->change('set', $prev, {%{$self->state->{$prev}}, next => undef});
   }
   $self->$orig($name);
   $self->app->domain(name => $item->{name})->drop;
@@ -72,9 +65,6 @@ around del($key) {
 around drop() {
   if (my $savepoint = $self->savepoint) {
     $savepoint->drop if $savepoint->test;
-  }
-  for my $value (values %{$self->state}) {
-    $self->app->domain(name => $value->{name})->drop;
   }
   return $self->$orig;
 }
@@ -94,7 +84,7 @@ method incr(Any @args) {
 }
 
 method hash(Str $key) {
-  return Digest::SHA::sha1_hex($key);
+  require Digest::SHA; Digest::SHA::sha1_hex($key);
 }
 
 method pop(Any @args) {
@@ -115,11 +105,11 @@ method set(Str $key) {
   my $domain = $self->app->domain(name => $name);
   my $prev = $self->apply->head;
   if ($prev && $self->state->{$prev}) {
-    $self->change('set', $prev, { %{$self->state->{$prev}}, next => $hash });
+    $self->change('set', $prev, {%{$self->state->{$prev}}, next => $hash});
   }
   $self->metadata->{head} = $hash;
   $self->metadata->{tail} = $hash if !$self->metadata->{tail};
-  $self->change('set', $hash, { name => $name, next => undef, prev => $prev });
+  $self->change('set', $hash, {name => $name, next => undef, prev => $prev});
   return $domain;
 }
 
@@ -263,7 +253,8 @@ The del method deletes the L<Zing::Domain> associated with a specific key.
 
   drop() : Int
 
-The drop method deletes all data associated with the lookup.
+The drop method returns truthy if the lookup has been destroyed. This operation
+does not cascade.
 
 =over 4
 

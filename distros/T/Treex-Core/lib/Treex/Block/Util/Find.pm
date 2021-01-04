@@ -1,5 +1,5 @@
 package Treex::Block::Util::Find;
-$Treex::Block::Util::Find::VERSION = '2.20201228';
+$Treex::Block::Util::Find::VERSION = '2.20210102';
 use Moose;
 use Treex::Core::Common;
 extends 'Treex::Block::Util::Eval';
@@ -89,7 +89,7 @@ Treex::Block::Util::Find - Finding nodes based on criteria specified by paramete
 
 =head1 VERSION
 
-version 2.20201228
+version 2.20210102
 
 =head1 SYNOPSIS
 

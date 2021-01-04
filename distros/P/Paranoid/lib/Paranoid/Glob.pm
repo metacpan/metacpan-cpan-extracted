@@ -1,11 +1,25 @@
 # Paranoid::Glob -- Paranoid Glob objects
 #
-# (c) 2005 - 2017, Arthur Corliss <corliss@digitalmages.com>
+# $Id: lib/Paranoid/Glob.pm, 2.08 2020/12/31 12:10:06 acorliss Exp $
 #
-# $Id: lib/Paranoid/Glob.pm, 2.07 2019/01/30 18:25:27 acorliss Exp $
+# This software is free software.  Similar to Perl, you can redistribute it
+# and/or modify it under the terms of either:
 #
-#    This software is licensed under the same terms as Perl, itself.
-#    Please see http://dev.perl.org/licenses/ for more information.
+#   a)     the GNU General Public License
+#          <https://www.gnu.org/licenses/gpl-1.0.html> as published by the 
+#          Free Software Foundation <http://www.fsf.org/>; either version 1
+#          <https://www.gnu.org/licenses/gpl-1.0.html>, or any later version
+#          <https://www.gnu.org/licenses/license-list.html#GNUGPL>, or
+#   b)     the Artistic License 2.0
+#          <https://opensource.org/licenses/Artistic-2.0>,
+#
+# subject to the following additional term:  No trademark rights to
+# "Paranoid" have been or are conveyed under any of the above licenses.
+# However, "Paranoid" may be used fairly to describe this unmodified
+# software, in good faith, but not as a trademark.
+#
+# (c) 2005 - 2020, Arthur Corliss (corliss@digitalmages.com)
+# (tm) 2008 - 2020, Paranoid Inc. (www.paranoid.com)
 #
 #####################################################################
 
@@ -30,7 +44,7 @@ use File::Glob qw(bsd_glob);
 use Paranoid;
 use Paranoid::Debug qw(:all);
 
-($VERSION) = ( q$Revision: 2.07 $ =~ /(\d+(?:\.\d+)+)/s );
+($VERSION) = ( q$Revision: 2.08 $ =~ /(\d+(?:\.\d+)+)/s );
 
 #####################################################################
 #
@@ -507,7 +521,7 @@ Paranoid::Glob - Paranoid Glob objects
 
 =head1 VERSION
 
-$Id: lib/Paranoid/Glob.pm, 2.07 2019/01/30 18:25:27 acorliss Exp $
+$Id: lib/Paranoid/Glob.pm, 2.08 2020/12/31 12:10:06 acorliss Exp $
 
 =head1 SYNOPSIS
 
@@ -763,8 +777,22 @@ Arthur Corliss (corliss@digitalmages.com)
 
 =head1 LICENSE AND COPYRIGHT
 
-This software is licensed under the same terms as Perl, itself. 
-Please see http://dev.perl.org/licenses/ for more information.
+This software is free software.  Similar to Perl, you can redistribute it
+and/or modify it under the terms of either:
 
-(c) 2005 - 2017, Arthur Corliss (corliss@digitalmages.com)
+  a)     the GNU General Public License
+         <https://www.gnu.org/licenses/gpl-1.0.html> as published by the 
+         Free Software Foundation <http://www.fsf.org/>; either version 1
+         <https://www.gnu.org/licenses/gpl-1.0.html>, or any later version
+         <https://www.gnu.org/licenses/license-list.html#GNUGPL>, or
+  b)     the Artistic License 2.0
+         <https://opensource.org/licenses/Artistic-2.0>,
+
+subject to the following additional term:  No trademark rights to
+"Paranoid" have been or are conveyed under any of the above licenses.
+However, "Paranoid" may be used fairly to describe this unmodified
+software, in good faith, but not as a trademark.
+
+(c) 2005 - 2020, Arthur Corliss (corliss@digitalmages.com)
+(tm) 2008 - 2020, Paranoid Inc. (www.paranoid.com)
 

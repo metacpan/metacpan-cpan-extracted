@@ -19,3 +19,5 @@ t/exporter.t
 t/importer.t
 t/test.xls
 t/test.xlsx
+t/test2.xls
+t/test2.xlsx

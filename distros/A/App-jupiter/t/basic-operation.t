@@ -14,7 +14,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 use Modern::Perl;
-use Test::More;
+use Test::More tests => 32;
 use XML::LibXML;
 use File::Slurper qw(read_binary write_binary);
 use Cpanel::JSON::XS;
@@ -40,7 +40,7 @@ my $messages = decode_json read_binary "test-$id/rss2sample.json";
 ok($messages->{"http://127.0.0.1:$port/"}, "Messages for this feed were cached");
 is($messages->{"http://127.0.0.1:$port/"}->{code}, "200", "HTTP status code is 200");
 is($messages->{"http://127.0.0.1:$port/"}->{message}, "OK", "HTTP status message is 'OK'");
-is($messages->{"http://127.0.0.1:$port/"}->{title}, "RSS 2.0 Sample File", "Title was taken from the OPML file");
+is($messages->{"http://127.0.0.1:$port/"}->{title}, "Feed", "Title was taken from the OPML file");
 
 Jupiter::make_html("test-$id/rss2sample.html", "test-$id/rss2sample.xml", "test-$id/rss2sample.opml");
 

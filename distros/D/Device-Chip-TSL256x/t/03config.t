@@ -18,13 +18,17 @@ await $chip->mount(
 
 # ->read_config
 {
+   $adapter->expect_write_then_read( "\x80", 1 )
+      ->returns( "\x00" );
    $adapter->expect_write_then_read( "\x81", 1 )
       ->returns( "\x02" );
 
    is_deeply( await $chip->read_config,
       {
-         GAIN => 1,
+         POWER => "OFF",
+         GAIN  => 1,
          INTEG => "402ms",
+         integ_msec => 402,
       },
       '$chip->read_config returns config'
    );
@@ -35,7 +39,7 @@ await $chip->mount(
    $adapter->check_and_clear( '$chip->read_config' );
 
    # gut-wrench to clear test data
-   undef $chip->META->get_slot( '$_TIMINGbytes' )->value( $chip );
+   undef $chip->META->get_slot( '$_TIMINGbyte' )->value( $chip );
 }
 
 # ->change_config
@@ -49,8 +53,10 @@ await $chip->mount(
    # subsequent read does not talk to chip a second time but yields new values
    is_deeply( await $chip->read_config,
       {
+         POWER => "OFF",
          GAIN  => 16,
          INTEG => "402ms",
+         integ_msec => 402,
       },
       '$chip->read_config returns new config after ->change_config'
    );

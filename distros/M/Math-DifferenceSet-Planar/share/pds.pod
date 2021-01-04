@@ -28,15 +28,15 @@ SQLite 3.x database.
     exponent integer NOT NULL,
     modulus  integer NOT NULL,
     n_planes integer NOT NULL,
-    deltas   text    NOT NULL
+    deltas   blob    NOT NULL
   );
 
 =head1 DATA REPRESENTATION
 
-If I<D = { d_1, d_2, ..., d_k } (mod m)> is a canonical cyclic planar
-difference set of order I<k - 1> with I<d_1 E<8801> 0> and
-I<d_1 E<8801> 1 (mod m)>, I<deltas> is a string with I<k - 2> numeric
-values separated by blanks, calculated as differences of consecutive
+If I<D = { d_1, d_2, ..., d_k } (mod m)> is a canonical cyclic
+planar difference set of order I<k - 1> with I<d_1 E<8801> 0> and
+I<d_2 E<8801> 1 (mod m)>, I<deltas> is a sequence of I<k - 2> numeric
+values packed in 'w*' format, calculated as differences of consecutive
 residue values of I<D> starting with I<d_3 - d_2>.  The difference of
 the smallest two values in a canonical set is always 1 and thus not
 important to store.

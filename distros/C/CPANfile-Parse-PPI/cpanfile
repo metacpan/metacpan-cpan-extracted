@@ -1,5 +1,6 @@
-requires 'PPI' => 1.270;
-requires 'Moo' => 2.003;
+requires 'PPI'  => 1.270;
+requires 'Moo'  => 2.003;
+requires 'Carp' => 0;
 
 on test => sub {
     requires 'Test::More'            => 0.72;
@@ -7,4 +8,5 @@ on test => sub {
     requires 'File::Spec::Functions' => 3.30;
     requires 'IO::File'              => 1.16;
     requires 'JSON::PP'              => 2.27;
+    requires 'Test::Warn'            => 0.36;
 };

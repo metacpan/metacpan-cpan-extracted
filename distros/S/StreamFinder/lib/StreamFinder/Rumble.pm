@@ -367,8 +367,8 @@ sub new
 	#DEPRECIATED (VIDEO-IDS NOW INCLUDE STUFF BEFORE THE DASH: ($self->{'id'} = $url) =~ s#^.*\-([a-z]\d+)\/?$#$1#;
 	if ($url2fetch =~ m#^https?\:#) {
 		$url2fetch .= '.html'  unless ($url2fetch =~ /\.html?$/);  #NEEDED FOR Fauxdacious!
-		$self->{'id'} = $1  if ($url2fetch =~ m#\/([^\.]+)\.html?$#);
-		$self->{'id'} =~ s/[\?\&].*$//;
+		$self->{'id'} = $1  if ($url2fetch =~ m#\/([^\/]+)\.html?$#);
+		$self->{'id'} =~ s#^\-?([^\-\.]+).*$#$1#;
 	} else {
 		$self->{'id'} = $url;
 		$url2fetch = 'https://rumble.com/' . $url . '.html';

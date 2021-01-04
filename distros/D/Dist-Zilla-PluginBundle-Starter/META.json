@@ -4,7 +4,7 @@
       "Dan Book <dbook@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.014, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.017, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
    ],
@@ -66,6 +66,7 @@
             "Dist::Zilla::Plugin::Pod2Readme" : "0.004",
             "Dist::Zilla::Plugin::PodSyntaxTests" : "5.040",
             "Dist::Zilla::Plugin::PruneCruft" : "0",
+            "Dist::Zilla::Plugin::PruneFiles" : "0",
             "Dist::Zilla::Plugin::ReadmeAnyFromPod" : "0",
             "Dist::Zilla::Plugin::Regenerate::AfterReleasers" : "0",
             "Dist::Zilla::Plugin::RewriteVersion" : "0",
@@ -103,15 +104,15 @@
    "provides" : {
       "Dist::Zilla::MintingProfile::Starter" : {
          "file" : "lib/Dist/Zilla/MintingProfile/Starter.pm",
-         "version" : "v4.0.1"
+         "version" : "v5.0.1"
       },
       "Dist::Zilla::PluginBundle::Starter" : {
          "file" : "lib/Dist/Zilla/PluginBundle/Starter.pm",
-         "version" : "v4.0.1"
+         "version" : "v5.0.1"
       },
       "Dist::Zilla::Starter" : {
          "file" : "lib/Dist/Zilla/Starter.pm",
-         "version" : "v4.0.1"
+         "version" : "v5.0.1"
       }
    },
    "release_status" : "stable",
@@ -127,12 +128,13 @@
       },
       "x_IRC" : "irc://irc.perl.org/#distzilla"
    },
-   "version" : "v4.0.1",
+   "version" : "v5.0.1",
    "x_contributors" : [
-      "Dan Book <grinnz@grinnz.com>"
+      "Dan Book <grinnz@grinnz.com>",
+      "raf <68724930+rafork@users.noreply.github.com>"
    ],
-   "x_generated_by_perl" : "v5.30.2",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.19",
+   "x_generated_by_perl" : "v5.32.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.25",
    "x_spdx_expression" : "Artistic-2.0"
 }
 

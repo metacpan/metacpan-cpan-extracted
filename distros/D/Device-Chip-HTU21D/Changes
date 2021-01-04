@@ -1,5 +1,9 @@
 Revision history for Device-Chip-HTU21D
 
+0.07    2021-01-02
+        [CHANGES]
+         * Implement the Device::Chip::Sensor API
+
 0.06    2020-12-06
         [CHANGES]
          * Use new toplevel 'await' syntax from Future::AsyncAwait 0.47

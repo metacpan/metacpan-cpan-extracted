@@ -4,13 +4,12 @@ package JSON::Schema::Draft201909::Vocabulary;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Base role for JSON Schema vocabulary classes
 
-our $VERSION = '0.019';
+our $VERSION = '0.020';
 
 use 5.016;
 no if "$]" >= 5.031009, feature => 'indirect';
 no if "$]" >= 5.033001, feature => 'multidimensional';
 use Ref::Util 0.100 'is_ref';
-use Storable 'dclone';
 use JSON::Schema::Draft201909::Utilities qw(jsonp A assert_keyword_type);
 use Moo::Role;
 use strictures 2;
@@ -56,12 +55,6 @@ sub traverse_object_schemas {
   }
 }
 
-sub annotate_self {
-  my (undef, $data, $schema, $state) = @_;
-  A($state, is_ref($schema->{$state->{keyword}}) ? dclone($schema->{$state->{keyword}})
-    : $schema->{$state->{keyword}});
-}
-
 1;
 
 __END__
@@ -76,7 +69,7 @@ JSON::Schema::Draft201909::Vocabulary - Base role for JSON Schema vocabulary cla
 
 =head1 VERSION
 
-version 0.019
+version 0.020
 
 =head1 SYNOPSIS
 
@@ -122,10 +115,6 @@ Recursively traverses the list of subschemas at the current keyword.
 =head2 traverse_object_schemas
 
 Recursively traverses the (subschema) values of the object at the current keyword.
-
-=head2 annotate_self
-
-Produces an annotation whose value is the same as that of the current keyword.
 
 =head1 SUPPORT
 

@@ -1,10 +1,10 @@
 ---
-abstract: 'serialize data to JSON'
+abstract: 'Create JSON'
 author:
   - 'Ben Bullock <bkb@cpan.org>'
 build_requires:
   ExtUtils::MakeMaker: '0'
-  JSON::Parse: '0.38'
+  JSON::Parse: '0.58'
   Test::More: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
@@ -29,5 +29,5 @@ requires:
 resources:
   bugtracker: https://github.com/benkasminbullock/json-create/issues
   repository: git://github.com/benkasminbullock/json-create.git
-version: '0.29'
+version: '0.30'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

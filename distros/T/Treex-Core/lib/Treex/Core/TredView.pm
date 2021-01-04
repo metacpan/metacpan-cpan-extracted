@@ -1,5 +1,5 @@
 package Treex::Core::TredView;
-$Treex::Core::TredView::VERSION = '2.20201228';
+$Treex::Core::TredView::VERSION = '2.20210102';
 # planned to be used from contrib.mac of tred's extensions
 
 use Moose;
@@ -889,7 +889,7 @@ Treex::Core::TredView - visualization of Treex files in TrEd
 
 =head1 VERSION
 
-version 2.20201228
+version 2.20210102
 
 =head1 DESCRIPTION
 

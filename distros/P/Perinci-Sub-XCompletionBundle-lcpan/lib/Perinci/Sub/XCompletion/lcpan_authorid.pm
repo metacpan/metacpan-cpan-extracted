@@ -1,7 +1,7 @@
 package Perinci::Sub::XCompletion::lcpan_authorid;
 
-our $DATE = '2019-01-13'; # DATE
-our $VERSION = '0.001'; # VERSION
+our $DATE = '2021-01-01'; # DATE
+our $VERSION = '0.002'; # VERSION
 
 use 5.010001;
 use strict;
@@ -55,7 +55,7 @@ Perinci::Sub::XCompletion::lcpan_authorid - Generate completion of CPAN author I
 
 =head1 VERSION
 
-This document describes version 0.001 of Perinci::Sub::XCompletion::lcpan_authorid (from Perl distribution Perinci-Sub-XCompletionBundle-lcpan), released on 2019-01-13.
+This document describes version 0.002 of Perinci::Sub::XCompletion::lcpan_authorid (from Perl distribution Perinci-Sub-XCompletionBundle-lcpan), released on 2020-01-01.
 
 =head1 FUNCTIONS
 
@@ -91,7 +91,7 @@ Source repository is at L<https://github.com/perlancar/perl-Perinci-Sub-XComplet
 
 =head1 BUGS
 
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Perinci-Sub-XCompletionBundle-lcpan>
+Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-Perinci-Sub-XCompletionBundle-lcpan/issues>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
@@ -103,7 +103,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by perlancar@cpan.org.
+This software is copyright (c) 2021 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

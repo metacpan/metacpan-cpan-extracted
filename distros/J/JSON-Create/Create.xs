@@ -21,9 +21,48 @@
 
 typedef json_create_t * JSON__Create;
 
+#define JCSET						\
+    if (items > 1) {					\
+	if ((items - 1) % 2 != 0) {			\
+	    warn ("odd number of arguments ignored");	\
+	}						\
+	else {						\
+	    int i;					\
+	    for (i = 1; i < items; i += 2) {		\
+		json_create_set (jc, ST(i), ST(i+1));	\
+	    }						\
+	}						\
+    }
+
+
 MODULE=JSON::Create PACKAGE=JSON::Create
 
 PROTOTYPES: DISABLE
+
+SV *
+create_json (input, ...)
+	SV * input;
+PREINIT:
+	json_create_t jc_stack = {0};
+	json_create_t * jc = & jc_stack;
+CODE:
+	JCSET;
+	RETVAL = json_create_run (jc, input);
+OUTPUT:
+	RETVAL
+
+SV *
+create_json_strict (input, ...)
+	SV * input;
+PREINIT:
+	json_create_t jc_stack = {0};
+	json_create_t * jc = & jc_stack;
+CODE:
+	JCSET;
+	jc_stack.strict = 1;
+	RETVAL = json_create_run (jc, input);
+OUTPUT:
+	RETVAL
 
 void
 DESTROY (jc)
@@ -52,7 +91,9 @@ sort (jc, onoff)
 	JSON::Create jc;
 	SV * onoff;
 CODE:
+#ifdef INDENT
 	jc->sort = SvTRUE (onoff) ? 1 : 0;
+#endif
 
 void
 cmp (jc, cmp)
@@ -65,8 +106,6 @@ CODE:
 	    SvREFCNT_inc (cmp);
 	    jc->n_mallocs++;
 	}
-
-
 
 void
 set_fformat_unsafe (jc, fformat)
@@ -144,18 +183,9 @@ indent (jc, onoff)
 	JSON::Create jc;
 	SV * onoff;
 CODE:
+#ifdef INDENT
 	jc->indent = SvTRUE (onoff) ? 1 : 0;
-
-void
-set_handlers (jc, handlers)
-	JSON::Create jc
-	HV * handlers
-CODE:
-        PERLJCCALL (json_create_remove_handlers (jc));
-	SvREFCNT_inc ((SV*) handlers);
-	jc->n_mallocs++;
-	jc->handlers = handlers;
-OUTPUT:
+#endif
 
 HV *
 get_handlers (jc)
@@ -170,19 +200,6 @@ OUTPUT:
 	RETVAL
 
 void
-type_handler (jc, crh = & PL_sv_undef)
-	JSON::Create jc;
-	SV * crh;
-CODE:
-	/* Remove a previous ref handler, if it exists. */
-	PERLJCCALL (json_create_remove_type_handler (jc));
-	if (SvTRUE (crh)) {
-	    jc->type_handler = crh;
-	    SvREFCNT_inc (crh);
-	    jc->n_mallocs++;
-	}
-
-void
 obj_handler (jc, oh = & PL_sv_undef)
 	JSON::Create jc;
 	SV * oh;
@@ -190,9 +207,7 @@ CODE:
 	/* Remove a previous ref handler, if it exists. */
 	PERLJCCALL (json_create_remove_obj_handler (jc));
 	if (SvTRUE (oh)) {
-	    jc->obj_handler = oh;
-	    SvREFCNT_inc (oh);
-	    jc->n_mallocs++;
+		set_object_handler (jc, oh);
 	}
 
 void
@@ -203,8 +218,33 @@ CODE:
 	/* Remove a previous ref handler, if it exists. */
 	PERLJCCALL (json_create_remove_non_finite_handler (jc));
 	if (SvTRUE (oh)) {
-	    jc->non_finite_handler = oh;
-	    SvREFCNT_inc (oh);
-	    jc->n_mallocs++;
+		set_non_finite_handler (jc, oh);
+	}
+
+void
+set (jc, ...)
+	JSON::Create jc;
+CODE:
+	JCSET;
+
+void
+set_handlers (jc, handlers)
+	JSON::Create jc
+	HV * handlers
+CODE:
+        PERLJCCALL (json_create_remove_handlers (jc));
+	SvREFCNT_inc ((SV*) handlers);
+	jc->n_mallocs++;
+	jc->handlers = handlers;
+
+void
+type_handler (jc, crh = & PL_sv_undef)
+	JSON::Create jc;
+	SV * crh;
+CODE:
+	/* Remove a previous ref handler, if it exists. */
+	PERLJCCALL (json_create_remove_type_handler (jc));
+	if (SvTRUE (crh)) {
+		set_type_handler (jc, crh);
 	}
 

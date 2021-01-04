@@ -27,6 +27,8 @@ await $chip->mount(
 
 # ->read_lux
 {
+   $adapter->expect_write_then_read( "\x80", 1 )
+      ->returns( "\x00" );
    $adapter->expect_write_then_read( "\x81", 1 )
       ->returns( "\x02" );
    $adapter->expect_write_then_read( "\x8C", 4 )
@@ -41,7 +43,7 @@ await $chip->mount(
    $adapter->check_and_clear( '$chip->read_lux' );
 
    # gut-wrench to clear test data
-   undef $chip->META->get_slot( '$_TIMINGbytes' )->value( $chip );
+   undef $chip->META->get_slot( '$_TIMINGbyte' )->value( $chip );
 }
 
 # ->read_lux respects GAIN
@@ -60,7 +62,7 @@ await $chip->mount(
    $adapter->check_and_clear( '$chip->read_lux at GAIN=16' );
 
    # gut-wrench to clear test data
-   undef $chip->META->get_slot( '$_TIMINGbytes' )->value( $chip );
+   undef $chip->META->get_slot( '$_TIMINGbyte' )->value( $chip );
 }
 
 # ->read_lux respects INTEG
@@ -79,7 +81,7 @@ await $chip->mount(
    $adapter->check_and_clear( '$chip->read_lux at INTEG=101ms' );
 
    # gut-wrench to clear test data
-   undef $chip->META->get_slot( '$_TIMINGbytes' )->value( $chip );
+   undef $chip->META->get_slot( '$_TIMINGbyte' )->value( $chip );
 }
 
 # ->read_lux also returns DATA0/DATA1
@@ -99,7 +101,7 @@ await $chip->mount(
    $adapter->check_and_clear( '$chip->read_lux list context' );
 
    # gut-wrench to clear test data
-   undef $chip->META->get_slot( '$_TIMINGbytes' )->value( $chip );
+   undef $chip->META->get_slot( '$_TIMINGbyte' )->value( $chip );
 }
 
 done_testing;

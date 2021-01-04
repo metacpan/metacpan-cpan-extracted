@@ -7,3 +7,11 @@ Revision history for AstroScript
 
 2019-08-10 - module for calculating rise, set and transit events with example
              script.
+2020-12-20 - ability to use decimal lat/lon input
+
+2020-12-21 - Lunar phases module and script
+
+2020-12-26 - Solstices and Equinoxes 
+             Aparent position of the Sun
+2020-12-31 - Apparent positions of the objects, Planet interface changed
+             Numerous bugfixes

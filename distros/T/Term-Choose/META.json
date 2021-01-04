@@ -47,12 +47,15 @@
    },
    "release_status" : "stable",
    "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/kuerbis/Term-Choose/issues"
+      },
       "repository" : {
          "type" : "git",
          "url" : "https://github.com/kuerbis/Term-Choose.git",
          "web" : "https://github.com/kuerbis/Term-Choose"
       }
    },
-   "version" : "1.712",
+   "version" : "1.713",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

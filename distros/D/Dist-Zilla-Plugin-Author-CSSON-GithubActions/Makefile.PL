@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-use 5.010000;
+use 5.014000;
 
 use ExtUtils::MakeMaker;
 
@@ -21,7 +21,7 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "Dist-Zilla-Plugin-Author-CSSON-GithubActions",
   "LICENSE" => "perl",
-  "MIN_PERL_VERSION" => "5.010000",
+  "MIN_PERL_VERSION" => "5.014000",
   "NAME" => "Dist::Zilla::Plugin::Author::CSSON::GithubActions",
   "PREREQ_PM" => {
     "Dist::Zilla::File::InMemory" => 0,
@@ -35,6 +35,7 @@ my %WriteMakefileArgs = (
     "Path::Tiny" => "0.072",
     "Test::Exception" => 0,
     "Try::Tiny" => "0.24",
+    "Types::Path::Tiny" => "0.005",
     "Types::Standard" => "1.000006",
     "YAML::XS" => 0,
     "namespace::autoclean" => "0.22"
@@ -50,7 +51,7 @@ my %WriteMakefileArgs = (
     "Test::More" => "0.96",
     "YAML::XS" => 0
   },
-  "VERSION" => "0.0106",
+  "VERSION" => "0.0107",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -75,6 +76,7 @@ my %FallbackPrereqs = (
   "Test::Exception" => 0,
   "Test::More" => "0.96",
   "Try::Tiny" => "0.24",
+  "Types::Path::Tiny" => "0.005",
   "Types::Standard" => "1.000006",
   "YAML::XS" => 0,
   "namespace::autoclean" => "0.22"

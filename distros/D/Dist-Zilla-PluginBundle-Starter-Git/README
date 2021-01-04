@@ -12,7 +12,7 @@ SYNOPSIS
       version = 0.001
   
       [@Starter::Git]      ; all that is needed to start
-      revision = 4         ; always defaults to revision 3
+      revision = 5         ; always defaults to revision 3
   
       ; configuring examples
       installer = ModuleBuildTiny
@@ -23,8 +23,11 @@ SYNOPSIS
 
 DESCRIPTION
     The "[@Starter::Git]" plugin bundle for Dist::Zilla is a subclass of the
-    [@Starter] plugin bundle designed to support a Git-based workflow. See
-    the documentation for [@Starter] for further details.
+    [@Starter] plugin bundle designed to support a Git-based workflow.
+
+    See the Dist::Zilla::Starter guide and the base [@Starter]
+    documentation, as this documentation only details the specifics of this
+    subclass.
 
     For one-line initialization of a new "[@Starter::Git]"-based
     distribution, try Dist::Zilla::MintingProfile::Starter::Git.
@@ -36,7 +39,7 @@ OPTIONS
 
   revision
       [@Starter::Git]
-      revision = 3
+      revision = 5
 
     As in "revision" in Dist::Zilla::PluginBundle::Starter, but defaults to
     revision 3. "[@Starter::Git]" requires at least revision 3.
@@ -118,6 +121,10 @@ REVISIONS
 
   Revision 4
     Revision 4 has no specific differences beyond the changes in Revision 4
+    in [@Starter].
+
+  Revision 5
+    Revision 5 has no specific differences beyond the changes in Revision 5
     in [@Starter].
 
 BUGS

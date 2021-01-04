@@ -4,7 +4,7 @@ use strict;
 use utf8;
 use JSON::Parse 'parse_json';
 use HTML::Make;
-binmode STDOUT, ":utf8";
+binmode STDOUT, ":encoding(utf8)";
 my $json =<<EOF;
 {"words":[{"j_pron_only":"パイプ","word":"pipe"},{"word":"cutting","j_pron_only":"カティング"},{"word":"implement","j_pron_only":"インプリムント"}]}
 EOF

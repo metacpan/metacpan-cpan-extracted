@@ -80,8 +80,8 @@ has 'tagmanifest_entries' => (
 sub __build_xxxmanifest_entries {
     my ($self, $xxmanifest_file) = @_;
     my $xxmanifest_entries = {};
-    open(my $XXMANIFEST, "<:encoding(UTF-8)", $xxmanifest_file) or croak("Cannot open $xxmanifest_file: $!");
     my $algorithm = $self->algorithm()->name;
+    open(my $XXMANIFEST, "<:encoding(UTF-8)", $xxmanifest_file) or croak("Cannot open $xxmanifest_file: $!");
     while (my $line = <$XXMANIFEST>) {
         $line = chomp_portable($line);
         my ($digest, $file) = split(/\s+/, $line, 2);
@@ -314,7 +314,7 @@ Archive::BagIt::Role::Manifest - A role that handles all manifest files for a sp
 
 =head1 VERSION
 
-version 0.069
+version 0.070
 
 =head2 calc_digests($bagit, $digestobj, $filenames_ref, $opts)
 
@@ -353,7 +353,7 @@ Rob Schmidt <rjeschmi@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by Rob Schmidt and William Wueppelmann and Andreas Romeyke.
+This software is copyright (c) 2021 by Rob Schmidt and William Wueppelmann and Andreas Romeyke.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

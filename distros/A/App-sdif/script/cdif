@@ -310,15 +310,23 @@ my $visible_chars = join "", do {
     }
     keys %opt_visible;
 };
-my $converter = do {
+my($visible_chars_re, @converter) = do {
     if ($visible_chars eq '') {
-	undef;
+	(undef);
     } else {
 	my %hash = map { @$_ } values %visible;
 	my $re = qr/[\Q$visible_chars\E]/;
-	sub {
-	    s/($re)/$hash{$1}/g;
-	}
+	my $sub0 = sub {          s/($re)/$hash{$1}/g };
+	my $sub1 = sub { $_[0] =~ s/($re)/$hash{$1}/gr };
+	my $sub2 = sub {
+	    my $mark_re = shift;
+	    for (@_) {
+		s{^$mark_re\K(?=.*$re)(.*\R?)}{
+		    $sub1->($1);
+		}mge;
+	    }
+	};
+	($re, $sub0, $sub1, $sub2);
     }
 };
 my $effector = do {
@@ -327,7 +335,7 @@ my $effector = do {
 	my $e = ansi_code($color =~ s/(?=.)/~/gr);
 	my $chars = join '', map { $_->[-1] =~ s/\s+//gr } values %visible;
 	my $chars_re = qr/[\Q$chars\E]/;
-	sub { s/($chars_re)/${s}${1}${e}/g };
+	sub { s/($chars_re+)/${s}${1}${e}/g };
     } else {
 	undef;
     }
@@ -424,6 +432,9 @@ while (<DIFF>) {
 	    } else {
 		@new = read_diffc(*DIFF, $nline);
 	    }
+	    if (@converter) {
+		$converter[2]->(qr/[\-\+\!\ ][ \t]/, @old, @new);
+	    }
 	    my $mark_re = qr/![ \t]/;
 	    for my $i (0 .. $#old) {
 		my $cmark = "! ";
@@ -483,6 +494,12 @@ while (<DIFF>) {
 	    my $mark = '.' x ($column - 1);
 	    qr/$mark/;
 	};
+
+	if (@converter) {
+	    map { $converter[2]->($mark_re, @$_) }
+	    map { $_->lists }
+	    @buf;
+	}
 
 	for my $buf (@buf) {
 	    my @result = compare_unified($column, $buf, $mark_re);
@@ -655,10 +672,6 @@ sub compare {
     if ($omark_re) {
 	$$old =~ s/^($omark_re)/push(@omark, $1), ""/mge;
 	$$new =~ s/^($nmark_re)/push(@nmark, $1), ""/mge;
-    }
-
-    if ($converter) {
-	$converter->() for $$old, $$new;
     }
 
     ($$old, $$new) = context($$old, $$new);
@@ -1172,21 +1185,20 @@ output.
 Set visible attribute for specified characters.  Visible character is
 converted to corresponding Unicode symbol character.  Default visible:
 nul, bel, bs, vt, np, cr, esc, del.  Default invisible: ht, nl, sp.
-Currently this option is effective only for modified lines.
 
-    NAME  CODE  Unicode NAME
-    ----  ----  --------------------------------
-    nul   \000  SYMBOL FOR NULL
-    bel   \007  SYMBOL FOR BELL
-    bs    \010  SYMBOL FOR BACKSPACE
-    ht    \011  SYMBOL FOR HORIZONTAL TABULATION
-    nl    \012  SYMBOL FOR NEWLINE
-    vt    \013  SYMBOL FOR VERTICAL TABULATION
-    np    \014  SYMBOL FOR FORM FEED
-    cr    \015  SYMBOL FOR CARRIAGE RETURN
-    esc   \033  SYMBOL FOR ESCAPE
-    sp    \040  SYMBOL FOR SPACE
-    del   \177  SYMBOL FOR DELETE
+    NAME  CODE  Unicode NAME                      DEFAULT
+    ----  ----  --------------------------------  -------
+    nul   \000  SYMBOL FOR NULL                   YES
+    bel   \007  SYMBOL FOR BELL                   YES
+    bs    \010  SYMBOL FOR BACKSPACE              YES
+    ht    \011  SYMBOL FOR HORIZONTAL TABULATION  NO
+    nl    \012  SYMBOL FOR NEWLINE                NO
+    vt    \013  SYMBOL FOR VERTICAL TABULATION    YES
+    np    \014  SYMBOL FOR FORM FEED              YES
+    cr    \015  SYMBOL FOR CARRIAGE RETURN        YES
+    esc   \033  SYMBOL FOR ESCAPE                 YES
+    sp    \040  SYMBOL FOR SPACE                  NO
+    del   \177  SYMBOL FOR DELETE                 YES
 
 Multiple characters can be specified at once, by assembling them by
 commna (C<,>) like C<--visible ht=1,sp=1>; or connecting them by equal

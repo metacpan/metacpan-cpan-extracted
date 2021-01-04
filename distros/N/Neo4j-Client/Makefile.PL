@@ -43,8 +43,7 @@ WriteMakefile($mm->mm_args(
        },
     },
     x_contributors => [
-      "Mark A. Jensen <majensen@cpan.org>",
-      "Mohawk (ETJ)"
+      'Mohawk (ETJ)'
      ]
   }
  ));

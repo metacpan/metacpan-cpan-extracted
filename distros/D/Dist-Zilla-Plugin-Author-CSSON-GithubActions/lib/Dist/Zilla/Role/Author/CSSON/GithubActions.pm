@@ -6,7 +6,7 @@ package Dist::Zilla::Role::Author::CSSON::GithubActions;
 
 # ABSTRACT: Role for Github Actions workflows
 our $AUTHORITY = 'cpan:CSSON'; # AUTHORITY
-our $VERSION = '0.0106';
+our $VERSION = '0.0107';
 
 use Moose::Role;
 use namespace::autoclean;
@@ -190,7 +190,7 @@ Dist::Zilla::Role::Author::CSSON::GithubActions - Role for Github Actions workfl
 
 =head1 VERSION
 
-Version 0.0106, released 2020-12-26.
+Version 0.0107, released 2020-12-30.
 
 =head1 SYNOPSIS
 

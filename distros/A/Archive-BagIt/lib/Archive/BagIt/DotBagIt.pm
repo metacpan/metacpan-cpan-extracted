@@ -1,6 +1,6 @@
 package Archive::BagIt::DotBagIt;
 
-our $VERSION = '0.069'; # VERSION
+our $VERSION = '0.070'; # VERSION
 use strict;
 use warnings;
 use Carp;
@@ -50,7 +50,7 @@ Archive::BagIt::DotBagIt
 
 =head1 VERSION
 
-version 0.069
+version 0.070
 
 =head1 NAME
 
@@ -73,7 +73,7 @@ Rob Schmidt <rjeschmi@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by Rob Schmidt and William Wueppelmann and Andreas Romeyke.
+This software is copyright (c) 2021 by Rob Schmidt and William Wueppelmann and Andreas Romeyke.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

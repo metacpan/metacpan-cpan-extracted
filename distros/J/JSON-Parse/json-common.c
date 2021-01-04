@@ -233,6 +233,14 @@ typedef struct parser {
 
     int valid_bytes[JSON3MAXBYTE];
 
+    /* Current depth into arrays or objects. */
+
+    int depth;
+
+    /* Maximum depth we accept. */
+
+    int max_depth;
+
     /* Perl SV * pointers to copy for our true, false, and null
        values. */
     void * user_true;
@@ -290,6 +298,42 @@ typedef struct parser {
 #endif /* def TESTRANDOM */
 }
 json_parse_t;
+
+/* Maximum depth of parsing. */
+
+#define JSON_PARSE_DEFAULT_MAX_DEPTH 10000
+
+static void
+json_parse_init (json_parse_t * parser)
+{
+    parser->max_depth = JSON_PARSE_DEFAULT_MAX_DEPTH;
+}
+
+/* Check if the user has set something different from the default, and
+   don't croak if we are still OK. */
+
+/* Increment the parsing depth, with check. */
+
+//#define DEBUG_DEPTH
+
+#ifdef DEBUG_DEPTH
+#define PRINT_DEPTH							\
+    printf ("%s:%d: %d\n", __FILE__, __LINE__, parser->depth);
+#else
+#define PRINT_DEPTH
+#endif
+
+#define INCDEPTH							\
+    PRINT_DEPTH;							\
+    parser->depth++;							\
+    if (parser->depth > parser->max_depth) {				\
+	croak ("error: too many [ or {, maximum is %d",			\
+	       parser->max_depth);					\
+    }
+
+#define DECDEPTH							\
+    parser->depth--;							\
+    PRINT_DEPTH;
 
 #ifndef NOPERL
 static SV * error_to_hash (json_parse_t * parser, char * error_as_string);
@@ -668,7 +712,7 @@ failbadinput (json_parse_t * parser)
 	else if (parser->bad_byte) {
 	    croak ("JSON error at line %d, byte %d/%d: %s",
 		   parser->line,
-		   parser->bad_byte - parser->input + 1,
+		   (int) (parser->bad_byte - parser->input + 1),
 		   parser->length, buffer);
 	}
 	else {
@@ -695,7 +739,7 @@ static INLINE void failresources (json_parse_t * parser, const char * format, ..
     vsnprintf (buffer, ERRORMSGBUFFERSIZE, format, a);
     va_end (a);
     croak ("Parsing failed at line %d, byte %d/%d: %s", parser->line,
-	   parser->end - parser->input,
+	   (int) (parser->end - parser->input),
 	   parser->length, buffer);
 }
 

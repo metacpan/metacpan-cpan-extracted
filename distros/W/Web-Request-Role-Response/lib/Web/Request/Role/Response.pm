@@ -2,7 +2,7 @@ package Web::Request::Role::Response;
 
 # ABSTRACT: Generate various HTTP responses from a Web::Request
 
-our $VERSION = '1.005';
+our $VERSION = '1.006'; # VERSION
 
 use 5.010;
 use Moose::Role;
@@ -80,7 +80,7 @@ Web::Request::Role::Response - Generate various HTTP responses from a Web::Reque
 
 =head1 VERSION
 
-version 1.005
+version 1.006
 
 =head1 SYNOPSIS
 
@@ -177,11 +177,11 @@ L<validad.com|https://www.validad.com/> for supporting Open Source.
 
 =head1 AUTHOR
 
-Thomas Klausner <domm@cpan.org>
+Thomas Klausner <domm@plix.at>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 - 2019 by Thomas Klausner.
+This software is copyright (c) 2017 - 2021 by Thomas Klausner.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

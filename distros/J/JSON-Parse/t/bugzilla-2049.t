@@ -1,10 +1,10 @@
 use warnings;
 use strict;
 use Test::More;
-use JSON::Parse 'json_file_to_perl';
+use JSON::Parse 'read_json';
 eval {
-my $type = '';
-my $tri2file = json_file_to_perl ('$type-tri2file.txt');
+    my $type = '';
+    my $tri2file = read_json ('$type-tri2file.txt');
 };
 ok ($@);
 note ($@);

@@ -61,7 +61,7 @@ while(1) {
    }
 
    # See if we should switch down to low gain
-   if( $gain == 16 and ( $data0 > 0xff00 or $data1 > 0xff00 ) ) {
+   if( $gain == 16 and ( $data0 > 0x8000 or $data1 > 0x8000 ) ) {
       print "Switching to GAIN=1\n";
       $gain = 1;
       await $chip->change_config( GAIN => 1 );

@@ -9,7 +9,6 @@ use diagnostics;
 
 use Carp;
 use File::Basename;
-use File::Temp;
 use Getopt::Long qw(:config no_ignore_case gnu_getopt auto_version);
 use IPC::Open2;
 use List::Util   qw(uniqstr);
@@ -41,7 +40,7 @@ use App::Regather::Plugin;
 use constant SYNST => [ qw( LDAP_SYNC_PRESENT LDAP_SYNC_ADD LDAP_SYNC_MODIFY LDAP_SYNC_DELETE ) ];
 
 # my @DAEMONARGS = ($0, @ARGV);
-our $VERSION   = '0.80.02';
+our $VERSION   = '0.80.03';
 
 sub new {
   my $class = shift;
@@ -124,6 +123,8 @@ sub new {
 
 sub progname { shift->{_progname} }
 
+sub progargs { return join(' ', @{shift->{_daemonargs}}); }
+
 sub cf { shift->{_opt}{cf} }
 
 sub l { shift->{_opt}{l} }
@@ -151,6 +152,8 @@ sub run {
     if $self->cf->get(qw(core dryrun));
   $self->l->cc( pr => 'info', fm => "%s: Config::Parse object as hash:\n%s",
 	    ls => [ __PACKAGE__, $self->cf->as_hash ] ) if $self->o('v') > 3;
+  $self->l->cc( pr => 'info', fm => "%s: %s",
+	    ls => [ __PACKAGE__, $self->progargs ] );
   $self->l->cc( pr => 'info', fm => "%s: %s v.%s is starting ...",
 	    ls => [ __PACKAGE__, $self->progname, $VERSION, ] );
 
@@ -355,16 +358,19 @@ sub daemonize {
     open (STDERR, ">&STDOUT")   || do { print "Can't redirect STDERR to STDOUT\n\n";    exit 1; };
   }
 
-  $SIG{HUP}  = sub { my $sig = @_;
-		     $self->l->cc( pr => 'warning', fm => "%s: SIG $sig received, restarting" );
-		     exec('perl', @{$self->o('_daemonargs')}); };
+  $SIG{HUP}  =
+    sub { my $sig = @_;
+	  $self->l->cc( pr => 'warning', fm => "%s: SIG %s received, restarting", ls => [ __PACKAGE__, $sig ] );
+	  exec('perl', @{$self->o('_daemonargs')}); };
   $SIG{INT} = $SIG{QUIT} = $SIG{ABRT} = $SIG{TERM} =
     sub { my $sig = @_;
-	  $self->l->cc( pr => 'warning', fm => "%s:  SIG $sig received, exiting" );
-	  $self->o('last_forever') = 0;};
+	  $self->l->cc( pr => 'warning', fm => "%s:  SIG %s received, exiting", ls => [ __PACKAGE__, $sig ] );
+	  $self->{_opt}{last_forever} = 0;
+	};
   $SIG{PIPE} = 'ignore';
-  $SIG{USR1} = sub { my $sig = @_;
-		     $self->l->cc( pr => 'warning', fm => "%s: SIG $sig received, doing nothing" ) };
+  $SIG{USR1} =
+    sub { my $sig = @_;
+	  $self->l->cc( pr => 'warning', fm => "%s: SIG %s received, doing nothing" ), ls => [ __PACKAGE__, $sig ] };
 
   if ( $self->cf->is_set(qw(core uid)) && $self->cf->is_set(qw(core gid)) ) {
     setgid ( $self->cf->get(qw(core gid_number)) ) || do { print "setgid went wrong: $!\n\n"; exit 1; };

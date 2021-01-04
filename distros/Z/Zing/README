@@ -76,11 +76,13 @@ PRIMATIVES
 
       * Zing::Data: Process Data
 
-      * Zing::Domain: Shared State Management
+      * Zing::Domain: Shared State
 
       * Zing::KeyVal: Key/Value Store
 
       * Zing::Lookup: Domain Index
+
+      * Zing::Table: Generic Index
 
       * Zing::Mailbox: Process Mailbox
 

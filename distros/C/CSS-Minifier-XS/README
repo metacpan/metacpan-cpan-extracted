@@ -1,95 +1,116 @@
 NAME
+
     CSS::Minifier::XS - XS based CSS minifier
 
 SYNOPSIS
+
       use CSS::Minifier::XS qw(minify);
-      $minified = minify($css);
+      my $css      = '...';
+      my $minified = minify($css);
 
 DESCRIPTION
-    "CSS::Minifier::XS" is a CSS "minifier"; its designed to remove
-    un-necessary whitespace and comments from CSS files, while also not
+
+    CSS::Minifier::XS is a CSS "minifier"; its designed to remove
+    unnecessary whitespace and comments from CSS files, while also not
     breaking the CSS.
 
-    "CSS::Minifier::XS" is similar in function to "CSS::Minifier", but is
+    CSS::Minifier::XS is similar in function to CSS::Minifier, but is
     substantially faster as its written in XS and not just pure Perl.
 
 METHODS
+
     minify($css)
-        Minifies the given $css, returning the minified CSS back to the
-        caller.
+
+      Minifies the given $css, returning the minified CSS back to the
+      caller.
 
 HOW IT WORKS
-    "CSS::Minifier::XS" minifies the CSS by removing un-necessary whitespace
-    from CSS documents. Comment blocks are also removed, *except* when (a)
+
+    CSS::Minifier::XS minifies the CSS by removing unnecessary whitespace
+    from CSS documents. Comment blocks are also removed, except when (a)
     they contain the word "copyright" in them, or (b) they're needed to
     implement the "Mac/IE Comment Hack".
 
     Internally, the minification is done by taking multiple passes through
     the CSS document:
 
-  Pass 1: Tokenize
+ Pass 1: Tokenize
+
     First, we go through and parse the CSS document into a series of tokens
     internally. The tokenizing process does not check to make sure that
     you've got syntactically valid CSS, it just breaks up the text into a
     stream of tokens suitable for processing by the subsequent stages.
 
-  Pass 2: Collapse
-    We then march through the token list and collapse certain tokens down to
-    their smallest possible representation. *If* they're still included in
+ Pass 2: Collapse
+
+    We then march through the token list and collapse certain tokens down
+    to their smallest possible representation. If they're still included in
     the final results we only want to include them at their shortest.
 
     Whitespace
-        Runs of multiple whitespace characters are reduced down to a single
-        whitespace character. If the whitespace contains any "end of line"
-        (EOL) characters, then the end result is the *first* EOL character
-        encountered. Otherwise, the result is the first whitespace character
-        in the run.
+
+      Runs of multiple whitespace characters are reduced down to a single
+      whitespace character. If the whitespace contains any "end of line"
+      (EOL) characters, then the end result is the first EOL character
+      encountered. Otherwise, the result is the first whitespace character
+      in the run.
 
     Comments
-        Comments implementing the "Mac/IE Comment Hack" are collapsed down
-        to the smallest possible comment that would still implement the hack
-        ("/*\*/" to start the hack, and "/**/" to end it).
+
+      Comments implementing the "Mac/IE Comment Hack" are collapsed down to
+      the smallest possible comment that would still implement the hack
+      ("/*\*/" to start the hack, and "/**/" to end it).
 
     Zero Units
-        Zero Units (e.g. "0px") are reduced down to just "0", as the CSS
-        specification indicates that the unit is not required when its a
-        zero value.
 
-  Pass 3: Pruning
-    We then go back through the token list and prune and remove un-necessary
+      Zero Units (e.g. 0px) are reduced down to just "0", as the CSS
+      specification indicates that the unit is not required when its a zero
+      value.
+
+ Pass 3: Pruning
+
+    We then go back through the token list and prune and remove unnecessary
     tokens.
 
     Whitespace
-        Wherever possible, whitespace is removed; before+after comment
-        blocks, and before+after various symbols/sigils.
+
+      Wherever possible, whitespace is removed; before+after comment
+      blocks, and before+after various symbols/sigils.
 
     Comments
-        Comments that either (a) are needed to implement the "Mac/IE Comment
-        Hack", or that (b) contain the word "copyright" in them are
-        preserved. All other comments are removed.
+
+      Comments that either (a) are needed to implement the "Mac/IE Comment
+      Hack", or that (b) contain the word "copyright" in them are
+      preserved. All other comments are removed.
 
     Symbols/Sigils
-        Semi-colons that are immediately followed by a closing brace (e.g.
-        ";}") are removed; semi-colons are needed to separate multiple
-        declarations, but aren't required at the end of a group.
+
+      Semi-colons that are immediately followed by a closing brace (e.g.
+      ";}") are removed; semi-colons are needed to separate multiple
+      declarations, but aren't required at the end of a group.
 
     Everything else
-        We keep everything else; identifiers, quoted literal strings,
-        symbols/sigils, etc.
 
-  Pass 4: Re-assembly
+      We keep everything else; identifiers, quoted literal strings,
+      symbols/sigils, etc.
+
+ Pass 4: Re-assembly
+
     Lastly, we go back through the token list and re-assemble it all back
     into a single CSS string, which is then returned back to the caller.
 
 AUTHOR
+
     Graham TerMarsch (cpan@howlingfrog.com)
 
 COPYRIGHT
+
     Copyright (C) 2007-, Graham TerMarsch. All Rights Reserved.
 
     This is free software; you can redistribute it and/or modify it under
     the same license as Perl itself.
 
 SEE ALSO
-    "CSS::Minifier".
+
+    CSS::Minifier.
 

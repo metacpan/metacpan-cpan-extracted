@@ -12,8 +12,10 @@ my $build = Module::Build->new(
 
       'Data::Bitfield' => '0.02',
       'Device::Chip::Base::RegisteredI2C' => '0.03',
+      'Future::Mutex' => '0.47', # weaken() bugfix
    },
    test_requires => {
+      'Test::ExpectAndCheck::Future' => '0.02', # deferred results
       'Test::More' => '0.88', # done_testing
    },
    configure_requires => {

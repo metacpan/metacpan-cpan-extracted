@@ -1,0 +1,11 @@
+0.002   2021-01-03  Released-By: PERLANCAR; Urgency: medium
+
+	- [doc] Add examples.
+
+	- [bugfix] [dist] Fix dependency version (Perinci::Object too high,
+	  0.312 -> 0.311).
+
+
+0.001   2021-01-02  Released-By: PERLANCAR
+
+        - First release.

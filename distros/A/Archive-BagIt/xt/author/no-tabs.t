@@ -23,8 +23,6 @@ my @files = (
     't/00-load.t',
     't/access_bag.t',
     't/base.t',
-    't/cover.css',
-    't/coverage.html',
     't/dotbagit.t',
     't/fast.t',
     't/internal.t',

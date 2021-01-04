@@ -29,7 +29,7 @@ while (gcd($t, $m) != 1) {
     $t  = 1 + int rand($m - 1);
 }
 my $s1 = $s0->multiply($t)->translate(int rand $m);
-my @e  = $s1->elements_sorted;
+my @e  = $s1->elements;
 print "@e\n";
 
 __END__
@@ -53,11 +53,10 @@ Martin Becker, E<lt>becker-cpan-mp I<at> cozap.comE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2019 by Martin Becker, Blaubeuren.  All rights reserved.
+Copyright (c) 2019-2021 by Martin Becker, Blaubeuren.
 
-This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself, either Perl version 5.10.0 or,
-at your option, any later version of Perl 5 you may have available.
+This library is free software; you can distribute it and/or modify it
+under the terms of the Artistic License 2.0 (see the LICENSE file).
 
 =head1 DISCLAIMER OF WARRANTY
 

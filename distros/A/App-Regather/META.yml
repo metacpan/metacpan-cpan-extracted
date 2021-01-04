@@ -32,5 +32,5 @@ requires:
   perl: '5.016001'
 resources:
   repository: ssh://git@github.com:z-eos/regather.git
-version: v0.80.02
+version: v0.80.03
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

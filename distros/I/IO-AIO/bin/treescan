@@ -211,7 +211,6 @@ IO::AIO::min_parallel 20;
 
 while () {
    if (@todo) {
-printf "(%d)",scalar @todo;$|=1;#d#
       my $seed = pop @todo;
       $seed =~ s/\/+$//;
       aio_lstat "$seed/.", sub {
@@ -224,7 +223,6 @@ printf "(%d)",scalar @todo;$|=1;#d#
          }
       };
    } else {
-print "w";$|=1;#d#
       IO::AIO::poll_wait;
    }
 

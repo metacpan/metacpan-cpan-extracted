@@ -16,7 +16,7 @@ use base qw(Exporter);    ## no critic (ProhibitUseBase)
 our @EXPORT_OK = qw(breakdown);
 
 # Specify package version
-our $VERSION = '0.22';
+our $VERSION = '0.23';
 
 # Dispatch table of functions to handle different ref types for the spec
 # hashref's values
@@ -24,16 +24,16 @@ my %types = (
 
     # If it's a hash, apply breakdown() again as if it were another root-level
     # spec
-    HASH => sub {
+    ref {} => sub {
         my $spec = shift;
         return { breakdown( $spec, @_ ) };
     },
 
     # If it's an array, we're doing numeric bounds checking [a,b)
-    ARRAY => sub {
+    ref [] => sub {
         my $bounds = shift;
         @{$bounds} == 2
-          or croak 'ARRAY ref for bounds needs two items';
+          or croak 'arrayref for bounds needs two items';
         return [
             grep {
                       ( not defined $bounds->[0] or $_ >= $bounds->[0] )
@@ -44,14 +44,14 @@ my %types = (
 
     # If it's a subroutine, return a arrayref of all elements for which it
     # returns true
-    CODE => sub {
+    ref sub { } => sub {
         my $sub = shift;
         return [ grep { $sub->() } @_ ];
     },
 
     # If it's a regular expression, return an arrayref of all elements it
     # matches
-    Regexp => sub {
+    ref qr//msx => sub {
         my $re = shift;
         return [ grep { $_ =~ $re } @_ ];
     },
@@ -63,8 +63,8 @@ sub breakdown {
     my ( $spec, @items ) = @_;
 
     # Check the spec is a hashref
-    ref $spec eq 'HASH'
-      or croak 'HASH ref expected for first argument';
+    ref $spec eq ref {}
+      or croak 'hashref expected for first argument';
 
     # Start building a results hash
     my %results;
@@ -103,7 +103,7 @@ List::Breakdown - Build sublist structures matching conditions
 
 =head1 VERSION
 
-Version 0.22
+Version 0.23
 
 =head1 SYNOPSIS
 

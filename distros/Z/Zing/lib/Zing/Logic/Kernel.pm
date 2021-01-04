@@ -13,7 +13,7 @@ use Data::Object::ClassHas;
 
 extends 'Zing::Logic::Watcher';
 
-our $VERSION = '0.22'; # VERSION
+our $VERSION = '0.25'; # VERSION
 
 # METHODS
 

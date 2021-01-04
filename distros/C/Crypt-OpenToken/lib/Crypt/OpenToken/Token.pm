@@ -3,6 +3,7 @@ package Crypt::OpenToken::Token;
 use Moose;
 use DateTime;
 use Date::Parse qw(str2time);
+use namespace::autoclean;
 
 # XXX: this could be a *lot* smarter; right now its just a glorified hashref
 has 'version' => (
@@ -97,14 +98,22 @@ Crypt::OpenToken::Token - OpenToken data object
 
   use Crypt::OpenToken;
 
-  $factory = Crypt::OpenToken->new($password);
-  $token   = $factory->parse($token_string);
+  # the OpenToken that you're looking to validate
+  my $token_string = '.....';
 
-  if ($token->is_valid(clock_skew => $allowable_skew)) {
+  # create factory based on shared password, and parse the token
+  my $factory = Crypt::OpenToken->new(password => 'abc123');
+  my $token   = $factory->parse($token_string);
+
+  # check if the token is still valid or requires renewal, based on
+  # an allowable time skew (in seconds)
+  my $skew = 5;
+
+  if ($token->is_valid(clock_skew => $skew)) {
      # token is valid, do something with the data
   }
 
-  if ($token->requires_renewal(clock_skew => $allowable_skew)) {
+  if ($token->requires_renewal(clock_skew => $skew)) {
      # token should be renewed by authenticating the User again
   }
 

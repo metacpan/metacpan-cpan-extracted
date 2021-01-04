@@ -7,7 +7,7 @@ build_requires:
   Test::More: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
-dynamic_config: 0
+dynamic_config: 1
 generated_by: 'ExtUtils::MakeMaker version 7.46, CPAN::Meta::Converter version 2.150010'
 license: artistic_2
 meta-spec:
@@ -21,5 +21,9 @@ no_index:
 requires:
   Convert::ASN1: '0.19'
   perl: '5.006'
-version: '0.3'
+resources:
+  bugtracker: https://github.com/gigageeks/Crypt-X509-CRL/issues
+  homepage: https://github.com/gigageeks/
+  repository: https://github.com/gigageeks/Crypt-X509-CRL.git
+version: '0.4'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

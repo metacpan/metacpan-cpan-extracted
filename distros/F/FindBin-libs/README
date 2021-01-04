@@ -15,10 +15,9 @@ passing in switches. The one used here was chosen because it supports
 qw( ... ) syntax with optional parameters (e.g., qw(export) and 
 qw(export=foo)).
 
-Versions are currently availble for Perl before 5.10 one after, 
-with the minimum supported version beingn 5.8. Any later versions
-of Perl supported will be in ./versions (see Module::FromPerlVer
-for description).
+Versions of the module support Perl v5.8 - v5.13, v5.14 - v5.27,
+and v5.28+. The 5.8-10 and v.14-28 versions are unmaintained 
+other than the tests which are common to all versions.
 
 Installation:
 
@@ -28,4 +27,4 @@ Installation:
 
 also see the examples for come common use cases.
 
-enjoi
+Zei gesund

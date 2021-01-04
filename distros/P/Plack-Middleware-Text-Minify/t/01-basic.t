@@ -63,6 +63,7 @@ test_psgi
 
             unlike $res->content, qr/\n[ ]/, "no leading spaces";
             isnt $res->header('Content-Length'), $Orig, "content-length updated";
+            is $res->header('Content-Length'), 97, "content-length lower";
 
         };
 

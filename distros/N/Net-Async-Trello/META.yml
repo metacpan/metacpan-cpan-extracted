@@ -48,7 +48,7 @@ requires:
 resources:
   bugtracker: https://github.com/team-at-cpan/Net-Async-Trello/issues
   repository: git://github.com/team-at-cpan/Net-Async-Trello.git
-version: '0.006'
+version: '0.007'
 x_generated_by_perl: v5.32.0
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

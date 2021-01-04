@@ -1,5 +1,5 @@
 package Treex::Core::Document;
-$Treex::Core::Document::VERSION = '2.20201228';
+$Treex::Core::Document::VERSION = '2.20210102';
 use Moose;
 use Treex::Core::Common;
 use Treex::Core::Config;
@@ -645,7 +645,7 @@ Treex::Core::Document - representation of a text and its linguistic analyses in 
 
 =head1 VERSION
 
-version 2.20201228
+version 2.20210102
 
 =head1 DESCRIPTION
 

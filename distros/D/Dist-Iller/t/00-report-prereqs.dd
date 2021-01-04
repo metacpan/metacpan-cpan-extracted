@@ -9,8 +9,7 @@ do { my $x = {
                       'requires' => {
                                       'Badge::Depot' => '0.0103',
                                       'Badge::Depot::Plugin::Coverage' => '0',
-                                      'Badge::Depot::Plugin::Cpantesters' => '0',
-                                      'Badge::Depot::Plugin::Kwalitee' => '0',
+                                      'Badge::Depot::Plugin::Githubactions' => '0',
                                       'Badge::Depot::Plugin::Perl' => '0',
                                       'Dist::Zilla' => '6.015',
                                       'Dist::Zilla::Plugin::Author::CSSON::GithubActions::Workflow::TestWithMakefile' => '0.0106',
@@ -85,22 +84,22 @@ do { my $x = {
                                       'Test::Warnings' => '0.026'
                                     },
                       'suggests' => {
-                                      'Dist::Iller' => '0.1409',
-                                      'Dist::Iller::Config::Author::CSSON' => '0.0327'
+                                      'Dist::Iller' => '0.1410',
+                                      'Dist::Iller::Config::Author::CSSON' => '0.0328'
                                     }
                     },
        'runtime' => {
                       'requires' => {
                                       'Carp' => '1.38',
                                       'DateTime' => '1.05',
-                                      'Dist::Zilla' => '5.000',
+                                      'Dist::Zilla' => '6.015',
                                       'File::ShareDir' => '1.102',
                                       'File::chdir' => '0.1010',
                                       'JSON::MaybeXS' => '1.003003',
                                       'List::MoreUtils' => '0.408',
                                       'List::Util' => '1.45',
                                       'Module::Load' => '0.26',
-                                      'Moose' => '2.1400',
+                                      'Moose' => '2.1803',
                                       'MooseX::AttributeDocumented' => '0.1003',
                                       'MooseX::AttributeShortcuts' => '0.028',
                                       'MooseX::StrictConstructor' => '0.19',
@@ -111,10 +110,10 @@ do { my $x = {
                                       'Text::Diff' => '1.43',
                                       'Try::Tiny' => '0.24',
                                       'Types::Path::Tiny' => '0.005',
-                                      'Types::Standard' => '1.000000',
+                                      'Types::Standard' => '1.000006',
                                       'YAML::Tiny' => '1.67',
-                                      'namespace::autoclean' => '0.18',
-                                      'perl' => '5.010000',
+                                      'namespace::autoclean' => '0.22',
+                                      'perl' => '5.014000',
                                       'version' => '0.9913'
                                     }
                     },

@@ -1,3 +1,7 @@
+0.102     2021-01-03 12:41:50 PST
+* Fix missing tests on is_at_least_kernel_version()
+* Fix broken is_at_least_kernel_version()
+
 0.101     2020-12-29 13:16:40 PST
 * Fix README.pod in dist
 

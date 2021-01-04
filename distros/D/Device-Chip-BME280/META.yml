@@ -4,7 +4,10 @@ author:
   - 'Paul Evans <leonerd@leonerd.org.uk>'
 build_requires:
   Test::Device::Chip::Adapter: '0'
+  Test::ExpectAndCheck::Future: '0.02'
   Test::More: '0.88'
+configure_requires:
+  Module::Build: '0.4004'
 dynamic_config: 1
 generated_by: 'Module::Build version 0.4231, CPAN::Meta::Converter version 2.150010'
 license: perl
@@ -15,14 +18,16 @@ name: Device-Chip-BME280
 provides:
   Device::Chip::BME280:
     file: lib/Device/Chip/BME280.pm
-    version: '0.01'
+    version: '0.02'
 requires:
   Data::Bitfield: '0'
   Device::Chip: '0.03'
+  Device::Chip::Sensor: '0'
   Future::AsyncAwait: '0.47'
+  Future::Mutex: '0.47'
   Object::Pad: '0.19'
   perl: '5.026'
 resources:
   license: http://dev.perl.org/licenses/
-version: '0.01'
+version: '0.02'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

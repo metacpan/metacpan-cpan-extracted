@@ -1,16 +1,21 @@
-0.310   2018-10-18 (PERLANCAR)
+0.311   2021-01-02  Released-By: PERLANCAR; Urgency: medium
+
+	- envresmulti: Allow adding payload in add_result().
+
+
+0.310   2018-10-18  Released-By: PERLANCAR
 
 	- [Bugfix] envresmulti(): If all statuses are 304, return final
 	  status as 304 instead of 200.
 
 
-0.30    2017-02-03 (PERLANCAR)
+0.30    2017-02-03  Released-By: PERLANCAR
 
 	- EnvResultMulti: Allow add_result() to override status/message
 	  keys.
 
 
-0.29    2016-12-28 (PERLANCAR)
+0.29    2016-12-28  Released-By: PERLANCAR
 
 	- No functional changes.
 
@@ -18,26 +23,26 @@
           copy-paste prereq relationship with x_copypaste.
 
 
-0.28    2016-12-27 (PERLANCAR)
+0.28    2016-12-27  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- [dist] Use _SPEC and _COPYPASTE prefixes for dependencies.
 
 
-0.27    2016-12-26 (PERLANCAR)
+0.27    2016-12-26  Released-By: PERLANCAR
 
 	- Downgrade prereq String::Trim::More from RuntimeRequires to
 	  DevelopSuggests, copy-paste routine trim_blank_lines().
 
 
-0.26    2016-12-15 (PERLANCAR)
+0.26    2016-12-15  Released-By: PERLANCAR
 
 	- risub: Add method default_dry_run to check default dry-run mode
 	  (Rinci 1.1.83).
 
 
-0.25    2016-11-21 (PERLANCAR)
+0.25    2016-11-21  Released-By: PERLANCAR
 
         - [doc] Fix typo in Synopsis.
 
@@ -45,7 +50,7 @@
           shortcut to instantiate this class.
 
 
-0.24    2015-09-03 (PERLANCAR)
+0.24    2015-09-03  Released-By: PERLANCAR
 
 	- No functional changes.
 
@@ -54,25 +59,25 @@
 	  requirement.
 
 
-0.23    2015-09-03 (PERLANCAR)
+0.23    2015-09-03  Released-By: PERLANCAR
 
 	- Assume LANG=C will use the default en_US, this fixes lots of
 	  '{en_US ...}' marks on lots of dists using this.
 
 
-0.22    2015-09-03 (PERLANCAR)
+0.22    2015-09-03  Released-By: PERLANCAR
 
 	- Mark requested language to aid debugging.
 
 
-0.21    2014-12-11 (PERLANCAR)
+0.21    2014-12-11  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- [ux] Add example of using riresmulti() in Synopsis.
 
 
-0.20    2014-12-10 (PERLANCAR)
+0.20    2014-12-10  Released-By: PERLANCAR
 
 	- No functional changes.
 
@@ -80,12 +85,12 @@
 	  String::Trim::More.
 
 
-0.19    2014-11-07 (PERLANCAR)
+0.19    2014-11-07  Released-By: PERLANCAR
 
 	- Regard status 304 as success.
 
 
-0.18    2014-10-29 (PERLANCAR)
+0.18    2014-10-29  Released-By: PERLANCAR
 
 	- [Incompatible change] envresmulti(): change 'response'
 	  terminology to 'result' to follow Rinci 1.1.63, so now the method
@@ -94,7 +99,7 @@
 	  'responses'.
 
 
-0.17    2014-10-28 (PERLANCAR)
+0.17    2014-10-28  Released-By: PERLANCAR
 
 	[INCOMPATIBLE CHANGES]
 
@@ -111,19 +116,19 @@
           They all use langprop() under the hood.
 
 
-0.16    2014-10-28 (PERLANCAR)
+0.16    2014-10-28  Released-By: PERLANCAR
 
 	- Add envresmulti() (Perinci::Object::EnvResultMulti).
 
 
-0.15    2014-10-20 (PERLANCAR)
+0.15    2014-10-20  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- Fix typo in test which caused CT failure reports.
 
 
-0.14     2014-10-16 (PERLANCAR)
+0.14     2014-10-16  Released-By: PERLANCAR
 
          - langprop(): Search PROP.alt.lang.xx in addition to
            PROP.alt.lang.xx_XX.
@@ -131,43 +136,43 @@
          - Rename module files.
 
 
-0.13     2014-01-03 (SHARYANTO)
+0.13     2014-01-03  Released-By: SHARYANTO
 
          - Trim language from locale env (e.g. "en_US.UTF-8" to "en_US") to
            avoid unnecessary mark.
 
 
-0.12     2013-12-11 (SHARYANTO)
+0.12     2013-12-11  Released-By: SHARYANTO
 
          - langprop() now observes LANG/LANGUAGE environment.
 
 
-0.11     2012-08-29 (SHARYANTO)
+0.11     2012-08-29  Released-By: SHARYANTO
 
          - function: Add features() and can_dry_run().
 
 
-0.10     2012-03-23 (SHARYANTO)
+0.10     2012-03-23  Released-By: SHARYANTO
 
          - No functional changes. Resolve circular dependency problem with
            SHARYANTO-Utils by splitting SHARYANTO::String::Util to its own dist.
            [RT#75987, thanks Slaven]
 
 
-0.09     2012-03-22 (SHARYANTO)
+0.09     2012-03-22  Released-By: SHARYANTO
 
          - No functional changes. Try to work around dependency problem (some
            systems cannot find SHARYANTO::String::Util, new in SHARYANTO-Utils
            0.16+).
 
 
-0.08     2012-03-20 (SHARYANTO)
+0.08     2012-03-20  Released-By: SHARYANTO
 
          - No functional changes. Fix Perl version dependency ('parent' requires
            5.10.1).
 
 
-0.07     2012-03-15 (SHARYANTO)
+0.07     2012-03-15  Released-By: SHARYANTO
 
          [FIXES]
 
@@ -179,14 +184,14 @@
          - langprop(): rename option 'mark_fallback_text' to 'mark_different_lang'.
 
 
-0.06     2012-03-15 (SHARYANTO)
+0.06     2012-03-15  Released-By: SHARYANTO
 
          [ENHANCEMENTS]
 
          - Add 'rimeta'.
 
 
-0.05     2012-03-15 (SHARYANTO)
+0.05     2012-03-15  Released-By: SHARYANTO
 
          [INCOMPATIBLE CHANGES]
 
@@ -200,7 +205,7 @@
          - Add langprop() method.
 
 
-0.04     2012-01-26 (SHARYANTO)
+0.04     2012-01-26  Released-By: SHARYANTO
 
          - First release, rename from Sub-Spec-Object to Perinci-Object. Now
            follows Rinci (currently 1.1) specification instead of Sub::Spec 1.0

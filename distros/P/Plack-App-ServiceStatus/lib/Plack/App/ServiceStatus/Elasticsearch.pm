@@ -1,11 +1,12 @@
 package Plack::App::ServiceStatus::Elasticsearch;
+
+# ABSTRACT: Check Elasticsearch connection
+
+our $VERSION = '0.904'; # VERSION
+
 use 5.018;
 use strict;
 use warnings;
-
-our $VERSION = '0.900';
-
-# ABSTRACT: Check Elasticsearch connection
 
 sub check {
     my ( $class, $es ) = @_;
@@ -29,7 +30,7 @@ Plack::App::ServiceStatus::Elasticsearch - Check Elasticsearch connection
 
 =head1 VERSION
 
-version 0.903
+version 0.904
 
 =head1 SYNOPSIS
 
@@ -45,11 +46,11 @@ Calls C<ping> on the C<$elasticsearch> object.
 
 =head1 AUTHOR
 
-Thomas Klausner <domm@cpan.org>
+Thomas Klausner <domm@plix.at>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by Thomas Klausner.
+This software is copyright (c) 2016 - 2021 by Thomas Klausner.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

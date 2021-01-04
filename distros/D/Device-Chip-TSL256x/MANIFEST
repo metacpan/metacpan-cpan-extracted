@@ -13,4 +13,6 @@ t/02power.t
 t/03config.t
 t/10read-data.t
 t/11read-lux.t
+t/20agc.t
+t/70sensors.t
 t/99pod.t

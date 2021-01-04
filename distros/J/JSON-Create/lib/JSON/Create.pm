@@ -1,13 +1,13 @@
 package JSON::Create;
 require Exporter;
 @ISA = qw(Exporter);
-@EXPORT_OK = qw/create_json create_json_strict/;
+@EXPORT_OK = qw/create_json create_json_strict write_json/;
 %EXPORT_TAGS = (
     all => \@EXPORT_OK,
 );
 use warnings;
 use strict;
-our $VERSION = '0.29';
+our $VERSION = '0.30';
 
 # Are we running as XS?
 
@@ -101,74 +101,6 @@ sub validate
     $obj->set_validate ($value);
 }
 
-sub set
-{
-    my ($jc, %args) = @_;
-    for my $k (keys %args) {
-	my $value = $args{$k};
-
-	# Options are in alphabetical order
-
-	if ($k eq 'bool') {
-	    $jc->bool (@$value);
-	    next;
-	}
-	if ($k eq 'cmp') {
-	    $jc->cmp ($value);
-	    next;
-	}
-	if ($k eq 'downgrade_utf8') {
-	    $jc->downgrade_utf8 ($value);
-	    next;
-	}
-	if ($k eq 'escape_slash') {
-	    $jc->escape_slash ($value);
-	    next;
-	}
-	if ($k eq 'fatal_errors') {
-	    $jc->fatal_errors ($value);
-	    next;
-	}
-	if ($k eq 'indent') {
-	    $jc->indent ($value);
-	    next;
-	}
-	if ($k eq 'no_javascript_safe') {
-	    $jc->no_javascript_safe ($value);
-	    next;
-	}
-	if ($k eq 'non_finite_handler') {
-	    $jc->non_finite_handler ($value);
-	    next;
-	}
-	if ($k eq 'obj_handler') {
-	    $jc->obj_handler ($value);
-	    next;
-	}
-	if ($k eq 'replace_bad_utf8') {
-	    $jc->replace_bad_utf8 ($value);
-	    next;
-	}
-	if ($k eq 'sort') {
-	    $jc->sort ($value);
-	    next;
-	}
-	if ($k eq 'strict') {
-	    $jc->strict ($value);
-	    next;
-	}
-	if ($k eq 'unicode_upper') {
-	    $jc->unicode_upper ($value);
-	    next;
-	}
-	if ($k eq 'validate') {
-	    $jc->validate ($value);
-	    next;
-	}
-	warn "Unknown option '$k'";
-    }
-}
-
 sub new
 {
     my ($class, %args) = @_;
@@ -179,25 +111,23 @@ sub new
     else {
 	$jc = JSON::Create::PP->new ();
     }
-    # "set" is pure perl, and this JSON::Create:: prefix makes the
-    # following work in either PP or XS mode.
-    JSON::Create::set ($jc, %args);
+    $jc->set (%args);
     return $jc;
 }
 
-sub create_json
+sub write_json
 {
-    my ($obj, %args) = @_;
-    my $jc = JSON::Create->new (%args);
-    return $jc->run ($obj);
-}
-
-sub create_json_strict
-{
-    my ($obj, %args) = @_;
-    $args{strict} = 1;
-    my $jc = JSON::Create->new (%args);
-    return $jc->run ($obj);
+    my ($filename, $obj, %options) = @_;
+    my $json = create_json ($obj, %options);
+    # create_json's output is either ASCII or it is marked as utf8, so
+    # the following is always safe.
+    my $encoding = ':encoding(utf8)';
+    if ($options{downgrade_utf8}) {
+	$encoding = ':raw';
+    }
+    open my $out, ">$encoding", $filename or die $!;
+    print $out $json;
+    close $out or die $!;
 }
 
 1;

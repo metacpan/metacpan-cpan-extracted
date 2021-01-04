@@ -3,13 +3,12 @@
 #
 #  (C) Paul Evans, 2015-2020 -- leonerd@leonerd.org.uk
 
-package Test::Device::Chip::Adapter;
+use v5.26;
+use Object::Pad 0.19;
 
-use strict;
-use warnings;
-use base qw( Device::Chip::Adapter );
-
-our $VERSION = '0.15';
+package Test::Device::Chip::Adapter 0.16;
+class Test::Device::Chip::Adapter
+   implements Device::Chip::Adapter;
 
 use Carp;
 
@@ -28,6 +27,8 @@ C<Test::Device::Chip::Adapter> - unit testing on C<Device::Chip>
    use Test::More;
    use Test::Device::Chip::Adapter;
 
+   use Future::AsyncAwait;
+
    my $adapter = Test::Device::Chip::Adapter->new;
 
    $chip_under_test->mount( $adapter );
@@ -36,7 +37,7 @@ C<Test::Device::Chip::Adapter> - unit testing on C<Device::Chip>
    $adapter->expect_readwrite( "123" )
       ->returns( "45" );
 
-   is( $chip->do_thing( "123" )->get, "45", 'result of ->do_thing' );
+   is( await $chip->do_thing( "123" ), "45", 'result of ->do_thing' );
 
    $adapter->check_and_clear( '->do_thing' );
 
@@ -49,53 +50,46 @@ test script to declare upfront what methods are expected to be called, and
 what values they return.
 
 Futures returned by this module will not yield results immediately; they must
-be awaited by invoking the C<< ->get >> method. This ensures that unit tests
-correctly perform the required asynchronisation.
+be awaited by a toplevel C<await> keyword or invoking the C<< ->get >> method.
+This ensures that unit tests correctly perform the required asynchronisation.
 
 =cut
 
-sub new
+has $_protocol;
+
+has $_controller;
+has $_obj;
+
+BUILD
 {
-   my $class = shift;
-
-   my ( $controller, $obj ) = Test::ExpectAndCheck::Future->create;
-
-   return bless {
-      builder => Test::Builder->new,
-      controller => $controller,
-      obj        => $obj,
-   }, $class;
+   ( $_controller, $_obj ) = Test::ExpectAndCheck::Future->create;
 }
 
-sub make_protocol_GPIO
+method make_protocol_GPIO ()
 {
-   my $self = shift;
-   $self->{protocol} = "GPIO";
+   $_protocol = "GPIO";
    return Test::Future::Deferred->done_later( $self );
 }
 
-sub make_protocol_I2C
+method make_protocol_I2C ()
 {
-   my $self = shift;
-   $self->{protocol} = "I2C";
+   $_protocol = "I2C";
    return Test::Future::Deferred->done_later( $self );
 }
 
-sub make_protocol_SPI
+method make_protocol_SPI ()
 {
-   my $self = shift;
-   $self->{protocol} = "SPI";
+   $_protocol = "SPI";
    return Test::Future::Deferred->done_later( $self );
 }
 
-sub make_protocol_UART
+method make_protocol_UART ()
 {
-   my $self = shift;
-   $self->{protocol} = "UART";
+   $_protocol = "UART";
    return Test::Future::Deferred->done_later( $self );
 }
 
-sub configure
+method configure ( % )
 {
    Test::Future::Deferred->done_later;
 }
@@ -127,57 +121,58 @@ invocation should return or throw.
 
 =cut
 
-my %METHODS = (
-   sleep           => [ undef,
-                        [qw( GPIO SPI I2C UART )] ],
-   write_gpios     => [ sub { my ( $v ) = @_; join ",", map { $v->{$_} ? $_ : "!$_" } sort keys %$v },
-                        [qw( GPIO SPI I2C UART )] ],
-   read_gpios      => [ sub { my ( $v ) = @_; join ",", @$v },
-                        [qw( GPIO SPI I2C UART )] ],
-   tris_gpios      => [ sub { my ( $v ) = @_; join ",", @$v },
-                        [qw( GPIO SPI I2C UART )] ],
-   write           => [ undef,
-                        [qw( SPI I2C UART )] ],
-   read            => [ undef,
-                        [qw( SPI I2C UART )] ],
-   write_then_read => [ undef,
-                        [qw( SPI I2C )] ],
-   readwrite       => [ undef,
-                        [qw( SPI )] ],
-   assert_ss       => [ undef,
-                        [qw( SPI )] ],
-   release_ss      => [ undef,
-                        [qw( SPI )] ],
-   write_no_ss     => [ undef,
-                        [qw( SPI )] ],
-   readwrite_no_ss => [ undef,
-                        [qw( SPI )] ],
-);
-foreach my $method ( keys %METHODS ) {
-   my ( $canonicalise, $allowed_protos ) = @{ $METHODS{$method} };
+BEGIN {
+   my %METHODS = (
+      sleep           => [ undef,
+                           [qw( GPIO SPI I2C UART )] ],
+      write_gpios     => [ sub { my ( $v ) = @_; join ",", map { $v->{$_} ? $_ : "!$_" } sort keys %$v },
+                           [qw( GPIO SPI I2C UART )] ],
+      read_gpios      => [ sub { my ( $v ) = @_; join ",", @$v },
+                           [qw( GPIO SPI I2C UART )] ],
+      tris_gpios      => [ sub { my ( $v ) = @_; join ",", @$v },
+                           [qw( GPIO SPI I2C UART )] ],
+      write           => [ undef,
+                           [qw( SPI I2C UART )] ],
+      read            => [ undef,
+                           [qw( SPI I2C UART )] ],
+      write_then_read => [ undef,
+                           [qw( SPI I2C )] ],
+      readwrite       => [ undef,
+                           [qw( SPI )] ],
+      assert_ss       => [ undef,
+                           [qw( SPI )] ],
+      release_ss      => [ undef,
+                           [qw( SPI )] ],
+      write_no_ss     => [ undef,
+                           [qw( SPI )] ],
+      readwrite_no_ss => [ undef,
+                           [qw( SPI )] ],
+   );
 
-   my $expect = sub {
-      my $self = shift;
-      @_ = $canonicalise->( @_ ) if $canonicalise;
+   foreach my $method ( keys %METHODS ) {
+      my ( $canonicalise, $allowed_protos ) = @{ $METHODS{$method} };
 
-      return $self->{controller}->expect( $method => @_ );
-   };
+      __PACKAGE__->META->add_method(
+         "expect_$method" => method {
+            @_ = $canonicalise->( @_ ) if $canonicalise;
 
-   my $actual = sub {
-      my $self = shift;
-      @_ = $canonicalise->( @_ ) if $canonicalise;
+            return $_controller->expect( $method => @_ );
+         }
+      );
 
-      my @args = @_;
+      __PACKAGE__->META->add_method(
+         "$method" => method {
+            @_ = $canonicalise->( @_ ) if $canonicalise;
 
-      any { $_ eq $self->{protocol} } @$allowed_protos or
-         croak "Method ->$method not allowed in $self->{protocol} protocol";
+            my @args = @_;
 
-      return $self->{obj}->$method( @args );
-   };
+            any { $_ eq $_protocol } @$allowed_protos or
+               croak "Method ->$method not allowed in $_protocol protocol";
 
-   no strict 'refs';
-   *{"expect_$method"} = $expect;
-   *{$method}          = $actual;
+            return $_obj->$method( @args );
+         }
+      );
+   }
 }
 
 =head1 METHODS
@@ -198,12 +193,9 @@ also cleared out ready for the start of the next test.
 
 =cut
 
-sub check_and_clear
+method check_and_clear ( $name )
 {
-   my $self = shift;
-   my ( $name ) = @_;
-
-   $self->{controller}->check_and_clear( $name );
+   $_controller->check_and_clear( $name );
    return;
 }
 

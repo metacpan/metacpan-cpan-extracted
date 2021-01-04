@@ -1,5 +1,5 @@
 package Treex::Block::Write::Sentences;
-$Treex::Block::Write::Sentences::VERSION = '2.20201228';
+$Treex::Block::Write::Sentences::VERSION = '2.20210102';
 use Moose;
 use Treex::Core::Common;
 extends 'Treex::Block::Write::BaseTextWriter';
@@ -42,7 +42,7 @@ Treex::Block::Write::Sentences
 
 =head1 VERSION
 
-version 2.20201228
+version 2.20210102
 
 =head1 DESCRIPTION
 

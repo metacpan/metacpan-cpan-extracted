@@ -194,3 +194,17 @@ Revision history for StreamFinder
 1.37    2020/11/25
         - Add StreamFinder::Rumble for videos on rumble.com
         - StreamFinder::Castbox: Return full description for podcast episodes.
+1.38    2021/01/01
+        - StreamFinder::IHeartRadio: Handle streamless custom radio-station 
+        urls, ie. "https://station.iheart.com" (revealed by CPAN bug# 133982).  
+        These reference the correct "live" url that contains the steams!  
+        Also fix description, artist and albumartist fields failing to return 
+        values for (some?) podcasts.
+        - StreamFinder::Rumble: Strip the podcast ID field to just it's 
+        unique ID.
+        - StreamFinder::Reciva will likely be removed next release after 
+        01/30/2021 due to that site's announcement to go offline after 
+        that date!
+1.40    2021/01/04
+        - Add StreamFinder::Google for Google (podcasts.google.com) podcasts. 
+        (closes CPAN feature# 133993).

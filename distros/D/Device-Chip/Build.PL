@@ -6,13 +6,15 @@ use Module::Build;
 my $build = Module::Build->new(
    module_name => 'Device::Chip',
    requires => {
+      'perl' => '5.026', # signatures in Object::Pad
+      'Future::AsyncAwait' => '0.47', # toplevel await
+      'Object::Pad' => '0.35',  # role :compat(invokable)
+
       'Future' => '0.26',
       'List::Util' => '1.33',
       'Struct::Dumb' => 0,
       'Test::Builder' => 0,
       'Test::ExpectAndCheck::Future' => 0,
-
-      'perl' => '5.010', #  //
    },
    test_requires => {
       'Test::More' => '0.88', # done_testing

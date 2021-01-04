@@ -1,5 +1,13 @@
 Revision history for Future-IO
 
+0.08    2020-12-31
+        [CHANGES]
+         * Added Future::IO->alarm
+
+        [BUGFIXES]
+         * Avoid CPU-spin in the single-filehandle case on nonblocking
+           filehandles
+
 0.07    2020-03-24
         [CHANGES]
          * Make the ->await method wait until the future instance is ready

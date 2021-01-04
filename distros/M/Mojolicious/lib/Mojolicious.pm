@@ -64,7 +64,7 @@ has ua        => sub { Mojo::UserAgent->new };
 has validator => sub { Mojolicious::Validator->new };
 
 our $CODENAME = 'Supervillain';
-our $VERSION  = '8.69';
+our $VERSION  = '8.70';
 
 sub BUILD_DYNAMIC {
   my ($class, $method, $dyn_methods) = @_;
@@ -933,6 +933,8 @@ Charlie Brady
 Chas. J. Owens IV
 
 Chase Whitener
+
+Chris Scheller
 
 Christian Hansen
 

@@ -7,13 +7,13 @@ etc/regather.d/djb.tt
 etc/regather.d/nsd.tt
 etc/regather.d/ovpn.tt
 etc/regather.d/sieve.tt
+lib/App/Regather.pm
 lib/App/Regather/Config.pm
 lib/App/Regather/Logg.pm
 lib/App/Regather/Plugin.pm
 lib/App/Regather/Plugin/configfile.pm
 lib/App/Regather/Plugin/list.pm
 lib/App/Regather/Plugin/nsupdate.pm
-lib/App/Regather.pm
 LICENSE
 Makefile.PL
 MANIFEST

@@ -12,7 +12,7 @@ our @ISA = qw(Exporter);
 our %EXPORT_TAGS = ( 'all' => [qw()] );
 our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 our @EXPORT = qw( error new this_update next_update );
-our $VERSION = '0.3';
+our $VERSION = '0.4';
 
 my $parser = undef;
 my $asn = undef;

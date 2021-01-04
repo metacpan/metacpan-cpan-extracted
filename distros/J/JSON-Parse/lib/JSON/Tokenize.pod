@@ -48,8 +48,8 @@ This outputs
 
 =head1 VERSION
 
-This documents version 0.57 of JSON::Tokenize corresponding to
-L<git commit 42e099ed38a3e85daed46f53bf367fa2b828e152|https://github.com/benkasminbullock/JSON-Parse/commit/42e099ed38a3e85daed46f53bf367fa2b828e152> released on Thu Jul 9 07:16:33 2020 +0900.
+This documents version 0.59 of JSON::Tokenize corresponding to
+L<git commit e10440285845d6b0f29746bce84c6b546e557f6f|https://github.com/benkasminbullock/JSON-Parse/commit/e10440285845d6b0f29746bce84c6b546e557f6f> released on Mon Jan 4 08:46:00 2021 +0900.
 
 
 
@@ -130,7 +130,7 @@ Ben Bullock, <bkb@cpan.org>
 =head1 COPYRIGHT & LICENCE
 
 This package and associated files are copyright (C) 
-2016-2020
+2016-2021
 Ben Bullock.
 
 You can use, copy, modify and redistribute this package and associated

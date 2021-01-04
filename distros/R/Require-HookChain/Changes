@@ -1,3 +1,10 @@
+0.003   2020-11-13  Released-By: PERLANCAR; Urgency: low
+
+	- No functional changes.
+
+	- [doc] Update example.
+
+
 0.002   2020-11-13  Released-By: PERLANCAR; Urgency: medium
 
 	- Rearrange namespace, add category: Require::HookChain::prepend ->

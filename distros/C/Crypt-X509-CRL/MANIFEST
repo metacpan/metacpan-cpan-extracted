@@ -1,14 +1,18 @@
 Changes
+Crypt-X509-CRL-0.4.tar
+ignore.txt
 lib/Crypt/X509/CRL.pm
 Makefile.PL
 MANIFEST			This list of files
+META.json
+META.yml
 README
 t/00-load.t
 t/01-validate.t
+t/bad.crl
+t/crl.crl
+t/Crypt-X509-CRL.t
+t/good.crl
 t/manifest.t
 t/pod-coverage.t
 t/pod.t
-t/crl.crl
-t/bad.crl
-t/good.crl
-t/Crypt-X509-CRL.t

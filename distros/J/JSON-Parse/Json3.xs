@@ -78,6 +78,7 @@ CODE:
 	    croak ("no class");
 	}
 	Newxz (RETVAL, 1, json_parse_t);
+	json_parse_init (RETVAL);
 OUTPUT:
 	RETVAL
 
@@ -195,6 +196,27 @@ detect_collisions (parser, onoff)
 CODE:
 	parser->detect_collisions = SvTRUE (onoff) ? 1 : 0;
 
+void
+set_max_depth (json, max_depth)
+	JSON::Parse json;
+	int max_depth;
+CODE:
+	if (max_depth < 0) {
+		croak ("Invalid max depth %d", max_depth);
+	}
+	json->max_depth = max_depth;
+
+int
+get_max_depth (json)
+	JSON::Parse json;
+CODE:
+	RETVAL = json->max_depth;
+	if (json->max_depth == 0) {
+		RETVAL = JSON_PARSE_DEFAULT_MAX_DEPTH;
+	}
+OUTPUT:
+	RETVAL
+
 #ifdef TESTRANDOM
 
 int random_json ()
@@ -218,6 +240,7 @@ OUTPUT:
 JSON::Tokenize tokenize_child (token)
  	JSON::Tokenize token
 CODE:
+	RETVAL = token;
 	if (token->child) {
 		RETVAL = token->child;
 		RETVAL->blessed = 1;

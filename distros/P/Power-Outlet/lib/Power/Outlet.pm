@@ -2,7 +2,7 @@ package Power::Outlet;
 use strict;
 use warnings;
 
-our $VERSION='0.36';
+our $VERSION='0.39';
 
 =head1 NAME
 

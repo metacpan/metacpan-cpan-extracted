@@ -1,0 +1,9 @@
+Revision history for Device-Chip-BME280
+
+0.02    2021-01-02
+        [CHANGES]
+         * Implement the Device::Chip::Sensor API
+
+0.01    2020-31-28
+        First version, released on an unsuspecting world.
+

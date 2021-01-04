@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use IO::File;
+use if $ENV{AUTOMATED_TESTING}, 'Test::DiagINC'; use IO::File;
 use Test::More;
 use CSS::Minifier::XS qw(minify);
 

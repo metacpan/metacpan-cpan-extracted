@@ -5,6 +5,7 @@ lib/StreamFinder/Bitchute.pm
 lib/StreamFinder/Blogger.pm
 lib/StreamFinder/Brighteon.pm
 lib/StreamFinder/Castbox.pm
+lib/StreamFinder/Google.pm
 lib/StreamFinder/IHeartRadio.pm
 lib/StreamFinder/RadioNet.pm
 lib/StreamFinder/Reciva.pm

@@ -1,5 +1,5 @@
 package Treex::Core::WildAttr;
-$Treex::Core::WildAttr::VERSION = '2.20201228';
+$Treex::Core::WildAttr::VERSION = '2.20210102';
 use Moose::Role;
 
 use Treex::Core::Log;
@@ -82,7 +82,7 @@ Treex::Core::WildAttr - role for arbitrary attributes of Treex objects
 
 =head1 VERSION
 
-version 2.20201228
+version 2.20210102
 
 =for test_synopsis my ($node, $value);
 =head1 SYNOPSIS

@@ -2,7 +2,7 @@
 
 use strict;
 use warnings;
-use POSIX qw(strftime);
+use if $ENV{AUTOMATED_TESTING}, 'Test::DiagINC'; use POSIX qw(strftime);
 use Test::More tests => 16;
 use Crypt::OpenToken::Token;
 

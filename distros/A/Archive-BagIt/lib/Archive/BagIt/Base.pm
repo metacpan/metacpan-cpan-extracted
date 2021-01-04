@@ -13,7 +13,7 @@ use POSIX qw(strftime);
 use Moo;
 with "Archive::BagIt::Role::Portability";
 
-our $VERSION = '0.069'; # VERSION
+our $VERSION = '0.070'; # VERSION
 
 # ABSTRACT: The common base for Archive::BagIt. This is the module for experts. ;)
 
@@ -241,7 +241,7 @@ sub is_baginfo_key_reserved {
         (Bag-Count)|
         (Internal-Sender-Identifier)|
         (Internal-Sender-Description)$/ix
-    
+
 }
 
 ###############################################
@@ -264,7 +264,7 @@ sub _find_baginfo_idx {
         my $info = $self->bag_info();
         my $size = scalar(@{$info});
         my $lc_flag = $self->is_baginfo_key_reserved($searchkey);
-        for (my $idx = 0; $idx < $size; $idx++) {
+        foreach my $idx (0.. $size-1) {
             my %entry = %{$info->[$idx]};
             my ($key, $value) = %entry;
             if (__case_aware_compare_for_baginfo($key, $searchkey, $lc_flag)) {
@@ -689,7 +689,7 @@ sub _build_bag_info {
     if (-e $file) {
         open(my $BAGINFO, "<:encoding(UTF-8)", $file) or croak("Cannot read $file: $!");
         my @lines;
-        foreach my $line (<$BAGINFO>) {
+        while ( my $line = <$BAGINFO>) {
             push @lines, $line;
         }
         close($BAGINFO);
@@ -937,7 +937,7 @@ Archive::BagIt::Base - The common base for Archive::BagIt. This is the module fo
 
 =head1 VERSION
 
-version 0.069
+version 0.070
 
 =head1 NAME
 
@@ -1156,6 +1156,10 @@ Getter/Setter for bag info. Expects/returns an array of HashRefs implementing si
 
 HINT: RFC8493 does not allow *reordering* of entries!
 
+=head2 has_bag_info()
+
+returns true if bag info exists.
+
 =head2 errors()
 
 Getter to return collected errors after a C<verify_bag()> call with Option C<report_all_errors>
@@ -1309,7 +1313,7 @@ Rob Schmidt <rjeschmi@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by Rob Schmidt and William Wueppelmann and Andreas Romeyke.
+This software is copyright (c) 2021 by Rob Schmidt and William Wueppelmann and Andreas Romeyke.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -187,7 +187,7 @@ sub __apply_to_cols {
     $cf->__print_filter_info( $sql, $count_static_rows, [ '<<', $sf->{i}{ok}, @$header ] ); #
 
     my $c;
-    for my $row ( @$aoa ) { # modifiers $aoa
+    for my $row ( @$aoa ) { # modifies $aoa
         for my $i ( @$col_idx ) {
             for my $sr_group ( @$all_sr_groups ) {
                 for my $sr_single ( @$sr_group ) {

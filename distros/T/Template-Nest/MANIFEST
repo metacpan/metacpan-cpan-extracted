@@ -15,9 +15,12 @@ t/templates/escapes_e.html
 t/templates/nested_default_contents.html
 t/templates/nested_default_outer.html
 t/templates/table.html
+t/templates/table_sq.html
 t/templates/td.html
+t/templates/td_sq.html
 t/templates/tr.html
 t/templates/tr_default.html
 t/templates/tr_default_ns.html
+t/templates/tr_sq.html
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

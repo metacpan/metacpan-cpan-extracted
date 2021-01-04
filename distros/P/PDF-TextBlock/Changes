@@ -1,5 +1,9 @@
 Revision history for PDF-TextBlock
 
+0.11    2020-12-30
+        Github issue #4 resolved by Filipe Custódio. Thanks!
+        https://github.com/jhannah/pdf-textblock/issues/4
+
 0.10    2020-12-17
         Apparently we have to leave a $VERSION in lib/PDF/TextBlock/Font.pm
         or PAUSE gets mad at us when we upload. We don't have to increment that

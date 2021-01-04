@@ -7,7 +7,11 @@ META.yml
 Makefile.PL
 README
 dist.ini
+lib/Sah/Schema/cpan/distname.pm
+lib/Sah/Schema/cpan/modname.pm
 lib/Sah/Schema/cpan/pause_id.pm
+lib/Sah/SchemaR/cpan/distname.pm
+lib/Sah/SchemaR/cpan/modname.pm
 lib/Sah/SchemaR/cpan/pause_id.pm
 lib/Sah/Schemas/CPAN.pm
 t/00-compile.t

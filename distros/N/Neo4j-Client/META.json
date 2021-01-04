@@ -60,7 +60,7 @@
    },
    "release_status" : "stable",
    "resources" : {},
-   "version" : "0.40",
+   "version" : "0.43",
    "x_alienfile" : {
       "generated_by" : "Alien::Build::MM version 2.37",
       "requires" : {
@@ -74,7 +74,6 @@
       }
    },
    "x_contributors" : [
-      "Mark A. Jensen <majensen.org>",
       "Mohawk (ETJ)"
    ],
    "x_serialization_backend" : "JSON::PP version 2.27300_01"

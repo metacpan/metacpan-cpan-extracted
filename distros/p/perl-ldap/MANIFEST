@@ -74,6 +74,7 @@ lib/Net/LDAP/Control/DontUseCopy.pm
 lib/Net/LDAP/Control/EntryChange.pm
 lib/Net/LDAP/Control/ManageDsaIT.pm
 lib/Net/LDAP/Control/MatchedValues.pm
+lib/Net/LDAP/Control/NoOp.pm
 lib/Net/LDAP/Control/Paged.pm
 lib/Net/LDAP/Control/PasswordPolicy.pm
 lib/Net/LDAP/Control/PersistentSearch.pm
@@ -83,6 +84,7 @@ lib/Net/LDAP/Control/ProxyAuth.pm
 lib/Net/LDAP/Control/Relax.pm
 lib/Net/LDAP/Control/Sort.pm
 lib/Net/LDAP/Control/SortResult.pm
+lib/Net/LDAP/Control/Subentries.pm
 lib/Net/LDAP/Control/SyncDone.pm
 lib/Net/LDAP/Control/SyncRequest.pm
 lib/Net/LDAP/Control/SyncState.pm

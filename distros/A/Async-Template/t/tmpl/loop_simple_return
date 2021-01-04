@@ -1,0 +1,4 @@
+[% FOREACH rec = list -%]
+   [%- rec -%]
+   [%- RETURN -%]
+[% END -%]

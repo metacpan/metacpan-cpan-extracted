@@ -38,7 +38,7 @@ requires:
   File::Which: '0'
   Path::Tiny: '0'
 resources: {}
-version: '0.40'
+version: '0.43'
 x_alienfile:
   generated_by: 'Alien::Build::MM version 2.37'
   requires:
@@ -49,6 +49,5 @@ x_alienfile:
       tool::AM: '0'
     system: {}
 x_contributors:
-  - 'Mark A. Jensen <majensen.org>'
   - 'Mohawk (ETJ)'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -4,7 +4,7 @@ Archive::BagIt - An interface to make and verify bags according to the BagIt sta
 
 # VERSION
 
-version 0.069
+version 0.070
 
 # WARNING
 
@@ -34,7 +34,7 @@ If a data directory exists, assume it is already a bag (no checking for invalid 
 
 An interface to verify a bag.
 
-You might also want to check [Archive::BagIt::Fast](https://metacpan.org/pod/Archive::BagIt::Fast) to see a more direct way of
+You might also want to check [Archive::BagIt::Fast](https://metacpan.org/pod/Archive%3A%3ABagIt%3A%3AFast) to see a more direct way of
 accessing files (and thus faster).
 
 ## get\_checksum
@@ -130,7 +130,7 @@ Rob Schmidt <rjeschmi@gmail.com>
 
 # COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by Rob Schmidt and William Wueppelmann and Andreas Romeyke.
+This software is copyright (c) 2021 by Rob Schmidt and William Wueppelmann and Andreas Romeyke.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

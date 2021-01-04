@@ -1,0 +1,179 @@
+use strict;
+use warnings;
+no warnings 'qw';
+
+use SQL::Abstract::More;
+
+use Test::More;
+use SQL::Abstract::Test import => [qw/is_same_sql_bind/];
+
+my $sqla = SQL::Abstract::More->new;
+my ($sql, @bind, $join);
+
+
+# NOTE: test cases below are inspired from the SQLite documentation for WITH clauses :
+# https://sqlite.org/lang_with.html
+
+
+# simple graph retrieval
+($sql, @bind) = $sqla->with_recursive(
+  -table     => 'nodes',
+  -columns   => [qw/x/],
+  -as_select => {-from      => 'DUAL',
+                 -columns   => [qw/59/],
+                 -union_all => [-from    => [-join => qw/edge {bb=x} nodes/],
+                                -columns => [qw/aa/],
+                              ],
+                },
+ )->select(
+   -columns => 'x',
+   -from    => 'nodes',
+  );
+is_same_sql_bind(
+  $sql, \@bind,
+  q{WITH RECURSIVE nodes(x) AS (          SELECT 59 FROM DUAL
+                                UNION ALL SELECT aa FROM edge INNER JOIN nodes ON edge.bb=nodes.x)
+    SELECT x FROM nodes},
+  [],
+  "1-branch graph retrieval",
+  );
+
+
+
+# graph retrieval with 2 branches
+($sql, @bind) = $sqla->with_recursive(
+  -table     => 'nodes',
+  -columns   => [qw/x/],
+  -as_select => {-from      => 'DUAL',
+                 -columns   => [qw/59/],
+                 -union_all => [-from    => [-join => qw/edge {bb=x} nodes/],
+                                -columns => [qw/aa/],
+                                -union_all => [-from  => [-join => qw/edge {aa=x} nodes/],
+                                               -columns => [qw/bb/]],
+                              ],
+                },
+ )->select(
+   -columns => 'x',
+   -from    => 'nodes',
+  );
+is_same_sql_bind(
+  $sql, \@bind,
+  q{WITH RECURSIVE nodes(x) AS (          SELECT 59 FROM DUAL
+                                UNION ALL SELECT aa FROM edge INNER JOIN nodes ON edge.bb=nodes.x
+                                UNION ALL SELECT bb FROM edge INNER JOIN nodes ON edge.aa=nodes.x)
+    SELECT x FROM nodes},
+  [],
+  "2-branch graph retrieval",
+  );
+
+
+# several table expressions in the same WITH statement
+($sql, @bind) = $sqla->with_recursive(
+  [ -table     => 'parent_of',
+    -columns   => [qw/name parent/],
+    -as_select => {-columns => [qw/name mom/],
+                   -from    => 'family',
+                   -union => [-columns => [qw/name dad/], -from => 'family']},
+   ],
+
+  [ -table     => 'ancestor_of_alice',
+    -columns   => [qw/name/],
+    -as_select => {-columns => [qw/parent/],
+                   -from    => 'parent_of',
+                   -where   => {name => 'Alice'},
+                   -union_all => [-columns => [qw/parent/],
+                                    -from => [qw/-join parent_of {name} ancestor_of_alice/]],
+               },
+   ],
+  )->select(
+   -columns => 'family.name',
+   -from    => [qw/-join ancestor_of_alice {name} family/],
+   -where   => {died                     => undef},
+   -order_by => 'born',
+  );
+
+is_same_sql_bind(
+  $sql, \@bind,
+  q{WITH RECURSIVE
+     parent_of(name, parent) AS
+       (SELECT name, mom FROM family 
+        UNION SELECT name, dad FROM family),
+     ancestor_of_alice(name) AS
+       (SELECT parent FROM parent_of WHERE name = ?
+        UNION ALL
+        SELECT parent FROM parent_of INNER JOIN ancestor_of_alice USING(name))
+    SELECT family.name FROM ancestor_of_alice INNER JOIN family USING(name)
+      WHERE died IS NULL
+      ORDER BY born},
+  ['Alice'],
+  "several CTEs in the same WITH clause",
+  );
+
+# auxiliary data for insert / update / delete
+my $sqla2 = $sqla->with_recursive(
+  -table     => 'nodes',
+  -columns   => [qw/x/],
+  -as_select => {-from      => 'DUAL',
+                 -columns   => [qw/59/],
+                 -union_all => [-from    => [-join => qw/edge {bb=x} nodes/],
+                                -columns => [qw/aa/],
+                              ],
+                },
+ );
+my @subquery = $sqla->select(-columns => 'x', -from => "nodes");
+
+
+# insert - TODO - NO SUPPORT FOR INSERT .. SELECT 
+# ($sql, @bind) = $sqla2->insert(
+#   -into   => "edge",
+#   -values => \\@subquery,
+#  );
+# is_same_sql_bind(
+#   $sql, \@bind,
+#   q{WITH RECURSIVE nodes(x) AS (          SELECT 59 FROM DUAL
+#                                 UNION ALL SELECT aa FROM edge INNER JOIN nodes ON edge.bb=nodes.x)
+#     INSERT INTO edge(aa) SELECT x FROM nodes
+#   [],
+#   "insert",
+#   );
+
+
+# update
+($sql, @bind) = $sqla2->update(
+  -table  => "edge",
+  -set    => {foo => "bar"},
+  -where  => {aa => {-in => \\@subquery}}
+ );
+is_same_sql_bind(
+  $sql, \@bind,
+  q{WITH RECURSIVE nodes(x) AS (          SELECT 59 FROM DUAL
+                                UNION ALL SELECT aa FROM edge INNER JOIN nodes ON edge.bb=nodes.x)
+    UPDATE edge SET foo = ? 
+    WHERE aa IN (SELECT x FROM nodes)},
+  ["bar"],
+  "update",
+  );
+
+
+# delete
+($sql, @bind) = $sqla2->delete(
+  -from  => "edge",
+  -where  => {aa => {-in => \\@subquery}}
+ );
+is_same_sql_bind(
+  $sql, \@bind,
+  q{WITH RECURSIVE nodes(x) AS (          SELECT 59 FROM DUAL
+                                UNION ALL SELECT aa FROM edge INNER JOIN nodes ON edge.bb=nodes.x)
+    DELETE FROM edge
+    WHERE aa IN (SELECT x FROM nodes)},
+  [],
+  "delete",
+  );
+
+
+
+
+
+done_testing();
+
+

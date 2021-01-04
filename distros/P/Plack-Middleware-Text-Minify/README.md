@@ -4,7 +4,7 @@ Plack::Middleware::Text::Minify - minify text responses on the fly
 
 # VERSION
 
-version v0.1.1
+version v0.1.3
 
 # SYNOPSIS
 
@@ -82,7 +82,7 @@ Robert Rothenberg <rrwo@cpan.org>
 
 # COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2020 by Robert Rothenberg.
+This software is Copyright (c) 2020-2021 by Robert Rothenberg.
 
 This is free software, licensed under:
 

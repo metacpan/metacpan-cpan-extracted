@@ -2,9 +2,9 @@ package InfluxDB::LineProtocol;
 use strict;
 use warnings;
 
-our $VERSION = '1.012';
-
 # ABSTRACT: Write and read InfluxDB LineProtocol
+
+our $VERSION = '1.013'; # VERSION
 
 use Carp qw(croak);
 use Time::HiRes qw(gettimeofday);
@@ -337,7 +337,7 @@ InfluxDB::LineProtocol - Write and read InfluxDB LineProtocol
 
 =head1 VERSION
 
-version 1.012
+version 1.013
 
 =head1 SYNOPSIS
 
@@ -503,11 +503,11 @@ handling large scientific notation data.
 
 =head1 AUTHOR
 
-Thomas Klausner <domm@cpan.org>
+Thomas Klausner <domm@plix.at>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by Thomas Klausner.
+This software is copyright (c) 2016 - 2021 by Thomas Klausner.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

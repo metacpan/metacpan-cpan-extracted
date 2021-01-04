@@ -3,10 +3,10 @@ use strict;
 use warnings;
 
 use Readonly;
-use Math::Trig qw/:pi rad2deg/;
-use Astro::Montenbruck::MathUtils qw/frac polar/;
+use Math::Trig qw/:pi rad2deg deg2rad/;
+use Astro::Montenbruck::MathUtils qw/frac polar cart  /;
 
-our $VERSION = 0.02;
+our $VERSION = 0.04;
 
 Readonly our $MO => 'Moon';
 Readonly our $SU => 'Sun';
@@ -24,9 +24,11 @@ Readonly::Array our @PLANETS =>
 
 use Exporter qw/import/;
 
-our %EXPORT_TAGS = ( ids => [qw/$MO $SU $ME $VE $MA $JU $SA $UR $NE $PL/], );
-
-our @EXPORT_OK = ( @{ $EXPORT_TAGS{'ids'} }, '@PLANETS' );
+our %EXPORT_TAGS = (
+  ids   => [ qw/$MO $SU $ME $VE $MA $JU $SA $UR $NE $PL/ ],
+  funcs => [ qw/true2apparent light_travel/ ]
+);
+our @EXPORT_OK = ( @{ $EXPORT_TAGS{'ids'} }, '@PLANETS', @{ $EXPORT_TAGS{'funcs'} });
 
 sub new {
     my ( $class, %arg ) = @_;
@@ -52,6 +54,7 @@ sub _posvel {
     $x, $y, $z, $vx, $vy, $vz;
 }
 
+# geocentric ecliptic coordinates (light-time corrected)
 sub _geocentric {
     my ( $self, $t, $hpla_ref, $gsun_ref ) = @_;
 
@@ -78,7 +81,7 @@ sub _geocentric {
     my $delta0 = sqrt( $x * $x + $y * $y + $z * $z );
     my $fac    = 0.00578 * $delta0 * 1E-4;
 
-    # apparent
+    # correct for light travel
     $x -= $fac * ( $vx + $vxs );
     $y -= $fac * ( $vy + $vys );
     $z -= $fac * ( $vz + $vzs );
@@ -86,22 +89,26 @@ sub _geocentric {
     $x, $y, $z # ecliptic geocentric coordinates of the planet
 }
 
-sub position {
-    my ( $self, $t, $sun, $nut_func ) = @_;
-    my ( $l, $b, $r ) = $self->heliocentric($t);
-    # geocentric ecliptic coordinates (light-time corrected)
-    my ( $rad, $the, $phi ) = polar(
-        $nut_func->(
-            $self->_geocentric( $t, { l => $l, b => $b, r => $r }, $sun )
-        )
-    );
-    # convert to degrees
-    rad2deg($phi), rad2deg($the), $rad;
+sub apparent {
+    my $self = shift;
+    my ( $t, $lbr, $sun, $nut_func ) = @_;
+     my ( $l, $b, $r ) = @$lbr; # $self->heliocentric($t);
+    # geocentric ecliptic coordinates (light-time corrected, referred to the mean equinox of date)
+    my @mean = $self->_geocentric( $t, { l => $l, b => $b, r => $r }, $sun );
+    # true equinox of date
+    my @date = $nut_func->(\@mean);
+    # rectangular -> polar
+    ($r, $b, $l) = polar(@date);
+    rad2deg($l), rad2deg($b), $r;
 }
+
 
 sub heliocentric {
     die "Must be overriden by a descendant";
 }
+
+
+
 
 1;
 __END__
@@ -137,9 +144,9 @@ method.
 
 Constructor. B<$id> is identifier from C<@PLANETS> array (See L</"EXPORTED CONSTANTS">).
 
-=head2 $self->position($t, $sun)
+=head2 $self->apparent($t, $lbr, $sun, $nut_func)
 
-Geocentric ecliptic coordinates of a planet
+Geocentric ecliptic coordinates of a planet, referred to the true equinox of date.
 
 =head3 Arguments
 
@@ -147,11 +154,24 @@ Geocentric ecliptic coordinates of a planet
 
 =item *
 
-B<$t> — time in Julian centuries since J2000: C<(JD-2451545.0)/36525.0>
+B<$t> — time in Julian centuries since J2000: C<(JD-2451545.0) / 36525.0>
 
 =item *
 
-B<$sun> — ecliptic geocentric coordinates of the Sun (hashref with B<'x'>, B<'y'>, B<'z'> keys)
+B<$lbr> — arrayref of heliocentric coordinates of the planet
+          returned by L<$self-&gt;heliocentric($t)>
+
+=item *
+
+B<$sun> — ecliptic geocentric coordinates of the Sun (hashref with B<'l'>, B<'b'>, B<'r'> keys),
+          returned by L<Astro::Montenbruck::Ephemeris::Planet::Sun::sunpos($t)>
+
+
+=item *
+
+B<$nut_func> — function for converting geocntric coordinates from mean to true equinox of date,
+          returned by L<Astro::Montenbruck::NutEqu::mean2true($t)>
+
 
 =back
 
@@ -171,14 +191,14 @@ Array of geocentric ecliptical coordinates.
 
 =head2 $self->heliocentric($t)
 
-Given time in centuries since epoch 2000.0, calculate apparent geocentric
-ecliptical coordinates C<($l, $b, $r)>.
+Given time in centuries since epoch 2000.0, calculate heliocentric ecliptical 
+coordinates C<($l, $b, $r)>.
 
 =over
 
-=item * B<$l> — longitude, radians
+=item * B<$l> — longitude, arc-degrees
 
-=item * B<$b> — latitude, radians
+=item * B<$b> — latitude, arc-degrees
 
 =item * B<$r> — distance from Earth, A.U.
 
@@ -214,13 +234,14 @@ ecliptical coordinates C<($l, $b, $r)>.
 
 =back
 
+
 =head1 AUTHOR
 
 Sergey Krushinsky, C<< <krushi at cpan.org> >>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2009-2019 by Sergey Krushinsky
+Copyright (C) 2009-2020 by Sergey Krushinsky
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

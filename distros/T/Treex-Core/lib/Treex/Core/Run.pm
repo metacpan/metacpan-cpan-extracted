@@ -1,5 +1,5 @@
 package Treex::Core::Run;
-$Treex::Core::Run::VERSION = '2.20201228';
+$Treex::Core::Run::VERSION = '2.20210102';
 use 5.008;
 
 use Moose;
@@ -610,7 +610,7 @@ Treex::Core::Run + treex - applying Treex blocks and/or scenarios on data
 
 =head1 VERSION
 
-version 2.20201228
+version 2.20210102
 
 =head1 SYNOPSIS
 

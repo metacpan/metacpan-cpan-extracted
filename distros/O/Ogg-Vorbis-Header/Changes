@@ -20,3 +20,9 @@ Revision history for Perl extension Ogg::Vorbis::Header.
 
 0.06  Sun Mar 04 10:45:00 GMT 2018
   - Added repo details to metadata
+
+0.10  Mon Mar 19 15:30:00 GMT 2018
+  - Move to a modern distribution layout
+
+0.11  Mon Jan 04 13:36:00 GMT 2021
+  - Add bugtracker details to metadata

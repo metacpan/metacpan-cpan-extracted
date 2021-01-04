@@ -1,4 +1,4 @@
-# This file was auto-generated from iller.yaml by Dist::Iller on 2020-12-26 11:11:13 UTC.
+# This file was auto-generated from iller.yaml by Dist::Iller on 2020-12-30 19:56:22 UTC.
 
 on runtime => sub {
     requires 'Dist::Zilla::File::InMemory' => '0';
@@ -12,10 +12,11 @@ on runtime => sub {
     requires 'Path::Tiny' => '0.072';
     requires 'Test::Exception' => '0';
     requires 'Try::Tiny' => '0.24';
+    requires 'Types::Path::Tiny' => '0.005';
     requires 'Types::Standard' => '1.000006';
     requires 'YAML::XS' => '0';
     requires 'namespace::autoclean' => '0.22';
-    requires 'perl' => '5.010000';
+    requires 'perl' => '5.014000';
 };
 on test => sub {
     requires 'ExtUtils::MakeMaker' => '0';
@@ -38,8 +39,7 @@ on configure => sub {
 on develop => sub {
     requires 'Badge::Depot' => '0.0103';
     requires 'Badge::Depot::Plugin::Coverage' => '0';
-    requires 'Badge::Depot::Plugin::Cpantesters' => '0';
-    requires 'Badge::Depot::Plugin::Kwalitee' => '0';
+    requires 'Badge::Depot::Plugin::Githubactions' => '0';
     requires 'Badge::Depot::Plugin::Perl' => '0';
     requires 'Dist::Zilla' => '6.015';
     requires 'Dist::Zilla::Plugin::Authority' => '1.009';
@@ -83,7 +83,6 @@ on develop => sub {
     requires 'Dist::Zilla::Plugin::Test::Compile' => '2.058';
     requires 'Dist::Zilla::Plugin::Test::EOF' => '0.0501';
     requires 'Dist::Zilla::Plugin::Test::EOL' => '0.18';
-    requires 'Dist::Zilla::Plugin::Test::Kwalitee::Extra' => 'v0.2.1';
     requires 'Dist::Zilla::Plugin::Test::NoTabs' => '0.15';
     requires 'Dist::Zilla::Plugin::Test::ReportPrereqs' => '0.027';
     requires 'Dist::Zilla::Plugin::Test::Version' => '1.09';
@@ -113,5 +112,5 @@ on develop => sub {
 };
 on develop => sub {
     suggests 'Dist::Iller' => '0.1409';
-    suggests 'Dist::Iller::Config::Author::CSSON' => '0.0327';
+    suggests 'Dist::Iller::Config::Author::CSSON' => '0.0328';
 };

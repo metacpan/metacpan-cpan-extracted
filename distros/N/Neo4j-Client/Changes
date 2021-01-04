@@ -1,13 +1,18 @@
 Revision history for Perl module Neo4j::Client
-0.1 2020-05-31
-    - Initial version
-0.11 2020-06-02
-    - Pull CFLAGS from configure run and append
-0.12 2020-06-02
-    - Abort Makefile.PL on MSWin
-0.16 2020-06-03
-    - Install config.h, libneo4j-client src/lib/*.h, and add DEV_CCFLAGS
-0.17 2020-06-03
-    - Workaround when pkg-config not present, but ssl libs are (freebsd)
+0.43 2021-01-02
+    - Complete refactor to employ Alien build framework
+    - majensen/libneo4j-client (source for build/ dir)
+      can handle up to to Bolt v4.0
 0.20 2020-12-19
     - Add -DHAVE_BIO_METH_NEW for openssl 1.1.1
+0.17 2020-06-03
+    - Workaround when pkg-config not present, but ssl libs are (freebsd)
+0.16 2020-06-03
+    - Install config.h, libneo4j-client src/lib/*.h, and add DEV_CCFLAGS
+0.12 2020-06-02
+    - Abort Makefile.PL on MSWin
+0.11 2020-06-02
+    - Pull CFLAGS from configure run and append
+0.1 2020-05-31
+    - Initial version
+

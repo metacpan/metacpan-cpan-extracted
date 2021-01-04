@@ -1,5 +1,5 @@
 package Treex::Core::DocumentReader::Base;
-$Treex::Core::DocumentReader::Base::VERSION = '2.20201228';
+$Treex::Core::DocumentReader::Base::VERSION = '2.20210102';
 use Moose;
 use Treex::Core::Common;
 with 'Treex::Core::DocumentReader';
@@ -225,7 +225,7 @@ Treex::Core::DocumentReader::Base - base implementation of document readers
 
 =head1 VERSION
 
-version 2.20201228
+version 2.20210102
 
 =head1 DESCRIPTION
 

@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    version 0.02
+    version 0.04
 
 SYNOPSIS
 
@@ -74,6 +74,39 @@ ATTRIBUTES
                 version   3.6
             }
         ]
+
+LIMITATIONS
+
+    As this is a static parser, this module cannot handle dynamic code like
+
+        for my $module (qw/
+            IO::All
+            Zydeco::Lite::App
+        /) {
+            requires $module, '0';
+        }
+
+    This module warns when the required "module" doesn't look like a
+    package name.
+
+    You can make it die when you pass -strict to the module when you load
+    it:
+
+        use CPANfile::Parse::PPI -strict;
+        use Data::Printer;
+    
+        my $required = do { local $/; <DATA> };
+        my $cpanfile = CPANfile::Parse::PPI->new( \$required );
+        
+        my $modules = $cpanfile->modules;
+        
+        __DATA__
+        for my $module (qw/
+            IO::All
+            Zydeco::Lite::App
+        /) {
+            requires $module, '0';
+        }
 
 AUTHOR
 

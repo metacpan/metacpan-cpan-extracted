@@ -11,8 +11,9 @@ use Data::Dumper qw(Dumper);
 use Crypt::OpenToken::KeyGenerator;
 use Crypt::OpenToken::Serializer;
 use Crypt::OpenToken::Token;
+use namespace::autoclean;
 
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 our $DEBUG   = 0;
 
 # shared encryption password
@@ -289,6 +290,8 @@ no Moose;
 
 1;
 
+=for stopwords OpenTokens Socialtext PingFederate TripleDES Base64 decrypts merchantability
+
 =head1 NAME
 
 Crypt::OpenToken - Perl implementation of Ping Identity's "OpenToken"
@@ -297,22 +300,22 @@ Crypt::OpenToken - Perl implementation of Ping Identity's "OpenToken"
 
   use Crypt::OpenToken;
 
-  $data = {
+  my $data = {
       foo => 'bar',
       bar => 'baz',
   };
 
   # create an OpenToken factory based on a given shared password
-  $factory = Crypt::OpenToken->new($password);
+  my $factory = Crypt::OpenToken->new(password => 'abc123');
 
   # encrypt a hash-ref of data into an OpenToken.
-  $token_str = $factory->create(
+  my $token_str = $factory->create(
       Crypt::OpenToken::CIPHER_AES128,
       $data,
   );
 
   # decrypt an OpenToken, check if its valid, and get data back out
-  $token = $factory->parse($token_str);
+  my $token = $factory->parse($token_str);
   if ($token->is_valid) {
       $data = $token->data();
   }
@@ -326,7 +329,7 @@ defined by Ping Identity in their IETF Draft.
 
 =over
 
-=item Crypt::OpenToken->new($password)
+=item Crypt::OpenToken->new(password => $password)
 
 Instantiates a new OpenToken factory, which can encrypt/decrypt OpenTokens
 using the specified shared C<$password>.
@@ -355,7 +358,7 @@ valid (see L<Crypt::OpenToken::Token> for details).
 
 =head1 CONSTANTS
 
-The following constant values are available for selecting an encrytion cipher
+The following constant values are available for selecting an encryption cipher
 to use:
 
 =over
@@ -439,7 +442,7 @@ Corporation, and released under the MIT License:
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+to use, copy, modify, merge, publish, distribute, sub-license, and/or sell
 copies of the Software, and to permit persons to whom the Software is
 furnished to do so, subject to the following conditions:
 
@@ -448,7 +451,7 @@ copies or substantial portions of the Software.
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT. IN NO EVENT SHALL THE
 AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
@@ -458,7 +461,12 @@ SOFTWARE.
 
 =head1 SEE ALSO
 
-L<http://tools.ietf.org/html/draft-smith-opentoken-02>
-L<http://www.pingidentity.com/opentoken>
+=over
+
+=item L<http://tools.ietf.org/html/draft-smith-opentoken-02>
+
+=item L<http://www.pingidentity.com/opentoken>
+
+=back
 
 =cut

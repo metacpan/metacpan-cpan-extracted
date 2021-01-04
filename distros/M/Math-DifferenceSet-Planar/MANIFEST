@@ -1,5 +1,6 @@
 CONTRIBUTING
 Changes
+LICENSE
 MANIFEST
 Makefile.PL
 README
@@ -7,6 +8,7 @@ examples/numlist_sort
 examples/pds_canonize
 examples/pds_enumerate
 examples/pds_multiply
+examples/pds_optable
 examples/pds_planes
 examples/pds_sort_elements
 examples/pds_statistic

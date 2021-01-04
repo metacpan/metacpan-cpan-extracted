@@ -61,9 +61,6 @@
 /* Define to 1 if you have the `mkstemp' function. */
 #undef HAVE_MKSTEMP
 
-/* Define to 1 if you have MSG_NOSIGNAL in the <sys/socket.h> header file. */
-#undef HAVE_MSG_NOSIGNAL
-
 /* Define to 1 if you have ntohll. */
 #undef HAVE_NTOHLL
 
@@ -92,9 +89,6 @@
 
 /* Define to 1 if you have the <readpassphrase.h> header file. */
 #undef HAVE_READPASSPHRASE_H
-
-/* Define to 1 if you have SO_NOSIGPIPE in the <sys/socket.h> header file. */
-#undef HAVE_SO_NOSIGPIPE
 
 /* Define to 1 if you have the <stdatomic.h> header file. */
 #undef HAVE_STDATOMIC_H

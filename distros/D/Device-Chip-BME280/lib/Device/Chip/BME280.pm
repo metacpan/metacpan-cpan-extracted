@@ -6,12 +6,16 @@
 use v5.26;
 use Object::Pad 0.19;
 
-package Device::Chip::BME280 0.01;
+package Device::Chip::BME280 0.02;
 class Device::Chip::BME280
    extends Device::Chip::Base::RegisteredI2C;
 
+use Device::Chip::Sensor -declare;
+
 use Data::Bitfield qw( bitfield enumfield boolfield );
 use Future::AsyncAwait;
+
+use utf8;
 
 =encoding UTF-8
 
@@ -153,6 +157,20 @@ async method change_config ( %changes )
    await $self->cached_write_reg( REG_CTRL_MEAS, substr( $bytes, 2, 2 ) );
 }
 
+async method initialize_sensors ()
+{
+   await $self->change_config(
+      MODE => "NORMAL",
+      OSRS_H => 4,
+      OSRS_P => 4,
+      OSRS_T => 4,
+      FILTER => 4,
+   );
+
+   # First read after startup contains junk values
+   await $self->read_sensor;
+}
+
 =head2 read_status
 
    $status = await $chip->read_status;
@@ -283,6 +301,40 @@ async method read_sensor
       await $self->_compensate_humidity( $adc_H ),
    );
 }
+
+has $_pending_read_f;
+
+declare_sensor pressure =>
+   method => async method {
+      $_pending_read_f //= $self->read_raw;
+      my ( $rawP, $rawT, undef ) = await $_pending_read_f;
+      undef $_pending_read_f;
+      $self->_compensate_temperature( $rawT );
+      return await $self->_compensate_pressure( $rawP );
+   },
+   units => "pascals",
+   precision => 0;
+
+declare_sensor temperature =>
+   method => async method {
+      $_pending_read_f //= $self->read_raw;
+      my ( undef, $rawT, undef ) = await $_pending_read_f;
+      undef $_pending_read_f;
+      return await $self->_compensate_temperature( $rawT );
+   },
+   units => "°C",
+   precision => 2;
+
+declare_sensor humidity =>
+   method => async method {
+      $_pending_read_f //= $self->read_raw;
+      my ( undef, $rawT, $rawH ) = await $_pending_read_f;
+      undef $_pending_read_f;
+      $self->_compensate_temperature( $rawT );
+      return await $self->_compensate_humidity( $rawH );
+   },
+   units => "%RH",
+   precision => 2;
 
 =head1 AUTHOR
 

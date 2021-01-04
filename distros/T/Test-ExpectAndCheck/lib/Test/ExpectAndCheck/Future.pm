@@ -9,7 +9,7 @@ use strict;
 use warnings;
 use base qw( Test::ExpectAndCheck );
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 use constant EXPECTATION_CLASS => "Test::ExpectAndCheck::Future::_Expectation";
 
@@ -49,15 +49,26 @@ of invoked methods. Every invoked method will return a L<Future> instance. The
 L</returns> or L</throws> method can then set the desired eventual result of
 that future instance for each expectation.
 
+These return instances are implemented using L<Test::Future::Deferred>, so
+they are not immediately ready. Instead they will only become ready after a
+toplevel C<await> expression or call to the C<get> method. This should help
+unit tests to run similarly to real-world behaviour, where most futures
+returned by real-world interfaces (such as IO systems) would not be
+immediately ready. This behaviour can be switched off for individual
+expectations by using the L</immediately> method.
+
 =cut
 
 package
    Test::ExpectAndCheck::Future::_Expectation;
 use base qw( Test::ExpectAndCheck::_Expectation );
 
+use Test::Future::Deferred;
+
 use constant {
    RETURNS => 3,
    FAILURE => 6,
+   IMMEDIATE => 7,
 };
 
 =head1 EXPECTATIONS
@@ -84,15 +95,40 @@ sub fails
    my $self = shift;
 
    $self->[FAILURE] = [ @_ ];
+
+   return $self;
+}
+
+=head2 immediately
+
+   $exp->returns( ... )->immediately
+
+   $exp->fails( ... )->immediately
+
+Switches this expectation to return an immediate future, rather than a
+deferred one.
+
+=cut
+
+sub immediately
+{
+   my $self = shift;
+
+   $self->[IMMEDIATE]++;
 }
 
 sub _result
 {
    my $self = shift;
-   require Future;
 
-   return Future->fail( @{ $self->[FAILURE] } ) if $self->[FAILURE];
-   return Future->done( @{ $self->[RETURNS] } );
+   if( $self->[IMMEDIATE] ) {
+      return Future->fail( @{ $self->[FAILURE] } ) if $self->[FAILURE];
+      return Future->done( @{ $self->[RETURNS] } );
+   }
+   else {
+      return Test::Future::Deferred->fail_later( @{ $self->[FAILURE] } ) if $self->[FAILURE];
+      return Test::Future::Deferred->done_later( @{ $self->[RETURNS] } );
+   }
 }
 
 =head1 AUTHOR

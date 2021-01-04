@@ -2,16 +2,19 @@ NAME
     Acme::CPANModules::DiffWrappers - Wrappers for the diff Unix command
 
 VERSION
-    This document describes version 0.002 of Acme::CPANModules::DiffWrappers
+    This document describes version 0.003 of Acme::CPANModules::DiffWrappers
     (from Perl distribution Acme-CPANModules-DiffWrappers), released on
-    2020-08-26.
+    2020-10-27.
 
-INCLUDED MODULES
+MODULES INCLUDED IN THIS ACME::CPANMODULE MODULE
     *   App::diffwc - Wraps (or filters output of) diff to add colors and
         highlight words
 
     *   App::DiffDocText - Diffs two office word-processor documents by
         first converting them to plaintext
+
+    *   App::DiffXlsText - Diffs two office spreadsheets by first converting
+        them to directories of CSV files
 
     *   App::sdif - Provides sdif (diff side-by-side with nice color theme),
         cdif (highlight words with nice color scheme), and watchdiff (watch

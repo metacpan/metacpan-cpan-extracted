@@ -1,0 +1,238 @@
+#  You may distribute under the terms of either the GNU General Public License
+#  or the Artistic License (the same terms as Perl itself)
+#
+#  (C) Paul Evans, 2020 -- leonerd@leonerd.org.uk
+
+use v5.26;
+use Object::Pad 0.35;
+
+package Device::Chip::Sensor 0.16;
+
+use strict;
+use warnings;
+
+use experimental 'signatures';
+
+use Carp;
+
+=head1 NAME
+
+C<Device::Chip::Sensor> - declarations of sensor readings for C<Device::Chip>
+
+=head1 SYNOPSIS
+
+   class Device::Chip::MySensorChip
+      extends Device::Chip;
+
+   use Device::Chip::Sensor -declare;
+
+   ...
+
+   declare_sensor voltage =>
+      units     => "volts",
+      precision => 3;
+
+   async method read_voltage () {
+      ...
+   }
+
+=head1 DESCRIPTION
+
+This package provides some helper methods for describing metadata on
+L<Device::Chip> drivers that provide sensor values. The resulting metadata
+helps to describe the quantities that the sensor chip can measure, and
+provides a consistent API for accessing them.
+
+=cut
+
+my %SENSORS_FOR_CLASS;
+
+=head1 CHIP METHODS
+
+When imported into a C<Device::Chip> driver class using the C<-declare> option
+the following methods are added to it.
+
+=cut
+
+=head2 list_sensors
+
+   @sensors = $chip->list_sensors;
+
+Returns a list of individual sensor objects. Each object represents a single
+sensor reading that can be measured.
+
+=head1 OPTIONAL CHIP METHODS
+
+The following methods may also be provided by the chip driver class if
+required. Callers should check they are implemented (e.g. with C<can>) before
+attempting to call them.
+
+=head2 initialize_sensors
+
+   await $chip->initialize_sensors;
+
+If the chip requires any special configuration changes, initial calibrations,
+startup delay, or other operations before the sensors are available then this
+method should perform it. It can presume that the application wishes to
+interact with the chip primarily via the sensors API, and thus if required it
+can presume particular settings to make this happen.
+
+=head1 SENSOR DECLARATIONS
+
+Sensor metadata is provided by the following function.
+
+=head2 declare_sensor
+
+   declare_sensor $name => %params;
+
+Declares a new sensor object with the given name and parameters.
+
+The following named parameters are recognised:
+
+=over 4
+
+=item units => STRING
+
+A string describing the units in which the value is returned. This should be
+an empty string for purely abstract counting sensors, or else describe the
+measured quantities in physical units (such as C<volts>, C<seconds>,
+C<metres>, C<Hz>, ...)
+
+=item precision => INT
+
+The number of decimal places of floating-point accuracy that values should
+be printed with. This should be 0 for integer readings.
+
+=item method => STRING or CODE
+
+Optional string or code reference giving the method on the main chip object to
+call to obtain a new reading of this sensor's current value. If not provided a
+default will be created by prefixing C<"read_"> onto the sensor name.
+
+=back
+
+=cut
+
+sub import ( @opts )
+{
+   my $caller = caller;
+   declare_into( $caller ) if grep { $_ eq "-declare" } @opts;
+}
+
+sub declare_into ( $caller )
+{
+   my $classmeta = $caller->META;
+
+   my $sensors = $SENSORS_FOR_CLASS{$classmeta->name} //= [];
+
+   $classmeta->add_method( list_sensors => sub ( $self ) {
+      # TODO: some sort of superclass merge?
+      return map { $_->bind( $self ) } $sensors->@*;
+   } );
+
+   my $declare = sub ( $name, %params ) {
+      push $sensors->@*, Device::Chip::Sensor->new(
+         name => $name,
+         %params,
+      );
+   };
+
+   no strict 'refs';
+   *{"${caller}::declare_sensor"} = $declare;
+}
+
+class Device::Chip::Sensor;
+
+use Future::AsyncAwait 0.38;
+
+=head1 SENSOR METHODS
+
+Each returned sensor object provides the following methods.
+
+=head2 name
+
+=head2 units
+
+=head2 precision
+
+   $name = $sensor->name;
+
+   $units = $sensor->units;
+
+   $prec = $sensor->precision;
+
+Metadata fields from the sensor's declaration.
+
+=head2 chip
+
+   $chip = $sensor->chip;
+
+The L<Device::Chip> instance this sensor is a part of.
+
+=cut
+
+has $_name :reader;
+has $_units :reader;
+has $_precision :reader;
+
+has $_method;
+
+has $_chip :reader;
+
+BUILD ( %params )
+{
+   $_name      = $params{name};
+   $_units     = $params{units};
+   $_precision = $params{precision} // 0;
+
+   $_method = $params{method} // "read_$_name";
+
+   $_chip = $params{chip};
+}
+
+method bind ( $chip )
+{
+   return Device::Chip::Sensor->new(
+      chip   => $chip,
+
+      name      => $_name,
+      units     => $_units,
+      precision => $_precision,
+      method    => $_method,
+   );
+}
+
+=head2 read
+
+   $value = await $sensor->read;
+
+Performs an actual read operation on the sensor chip to return the currently
+measured value.
+
+=cut
+
+async method read ()
+{
+   return await $_chip->$_method();
+}
+
+=head2 format
+
+   $string = $sensor->format( $value );
+
+Returns a string by formatting an observed value to the required precision.
+
+=cut
+
+method format ( $value )
+{
+   return sprintf "%.*f", $_precision, $value;
+}
+
+=head1 AUTHOR
+
+Paul Evans <leonerd@leonerd.org.uk>
+
+=cut
+
+0x55AA;

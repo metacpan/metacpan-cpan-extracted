@@ -50,6 +50,6 @@
          "web" : "https://github.com/mche/Mojolicious-Plugin-AssetPack-Che"
       }
    },
-   "version" : "2.105",
+   "version" : "2.106",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

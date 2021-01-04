@@ -11,7 +11,11 @@ ok($ai, 'Got something');
 isa_ok($ai, 'AudioFile::Info::Dummy');
 
 is($ai->artist, 'ARTIST', 'Artist is correct');
+is($ai->title,  'TITLE',  'Title is correct');
+is($ai->album,  'ALBUM',  'Album is correct');
 is($ai->track,  0,        'Track is correct');
+is($ai->year,   'YEAR',   'Year is correct');
+is($ai->genre,  'GENRE',  'Genre is correct');
 
 # Hard to test anything really as we don't have any plugins installed
 # at this point

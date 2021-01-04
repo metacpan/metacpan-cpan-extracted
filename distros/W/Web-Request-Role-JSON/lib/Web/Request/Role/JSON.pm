@@ -2,7 +2,7 @@ package Web::Request::Role::JSON;
 
 # ABSTRACT: Make handling JSON easier in Web::Request
 
-our $VERSION = '1.006';
+our $VERSION = '1.007'; # VERSION
 
 use 5.010;
 use MooseX::Role::Parameterized;
@@ -93,7 +93,7 @@ Web::Request::Role::JSON - Make handling JSON easier in Web::Request
 
 =head1 VERSION
 
-version 1.006
+version 1.007
 
 =head1 SYNOPSIS
 
@@ -167,7 +167,7 @@ valid status code or not. You're old enough to not do stupid things..)
 
 An optional C<content_type> parameter can be added on role application to
 restore previous behaviour. Browsers tend to like the 'charset=utf-8' better,
-but you might have your reasons. 
+but you might have your reasons.
 
     package MyRequest;
     extends 'OX::Request';
@@ -193,7 +193,7 @@ L<validad.com|https://www.validad.com/> for supporting Open Source.
 
 =item *
 
-Thomas Klausner <domm@cpan.org>
+Thomas Klausner <domm@plix.at>
 
 =item *
 
@@ -203,7 +203,7 @@ Klaus Ita <koki@itascraft.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Thomas Klausner.
+This software is copyright (c) 2017 - 2021 by Thomas Klausner.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

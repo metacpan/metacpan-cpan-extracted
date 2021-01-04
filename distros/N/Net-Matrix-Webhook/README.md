@@ -4,7 +4,7 @@ Net::Matrix::Webhook - A http->matrix webhook
 
 # VERSION
 
-version 0.900
+version 0.901
 
 # SYNOPSIS
 
@@ -25,7 +25,7 @@ version 0.900
 
 L\[matrix|https://matrix.org/\] is an open network for secure, decentralized communication. A bit like IRC, but less 90ies.
 
-`Net::Matrix::Webhook` implements a webhook, so you can easily post messages to your matrix chat rooms via HTTP requests. It uses [IO::Async](https://metacpan.org/pod/IO::Async) to start a web server and connect as a client to matrix. It will then forward your messages.
+`Net::Matrix::Webhook` implements a webhook, so you can easily post messages to your matrix chat rooms via HTTP requests. It uses [IO::Async](https://metacpan.org/pod/IO%3A%3AAsync) to start a web server and connect as a client to matrix. It will then forward your messages.
 
 Per default, everybody can now post to this endpoint. If you want to add a tiny bit of "security", you can pass a `secret` to `Net::Matrix::Webhook`. If you do this, you will also have to send a `token` consisting of a `sha1_hex` of the message and the secret:
 
@@ -83,7 +83,7 @@ If you use [http2matrix.pl](https://metacpan.org/pod/http2matrix.pl), you can us
 # SEE ALSO
 
 - [https://matrix.org/](https://matrix.org/)
-- [Net::Async::Matrix](https://metacpan.org/pod/Net::Async::Matrix)
+- [Net::Async::Matrix](https://metacpan.org/pod/Net%3A%3AAsync%3A%3AMatrix)
 
 # THANKS
 
@@ -93,11 +93,11 @@ Thanks to
 
 # AUTHOR
 
-Thomas Klausner <domm@cpan.org>
+Thomas Klausner <domm@plix.at>
 
 # COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by Thomas Klausner.
+This software is copyright (c) 2020 - 2021 by Thomas Klausner.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

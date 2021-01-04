@@ -14,7 +14,7 @@ extends 'Zing::Encoder';
 
 use Data::Dumper ();
 
-our $VERSION = '0.22'; # VERSION
+our $VERSION = '0.25'; # VERSION
 
 # METHODS
 

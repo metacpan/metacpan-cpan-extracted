@@ -1,0 +1,78 @@
+NAME
+    App::streamfinder - CLI for StreamFinder, a module to fetch actual raw
+    streamable URLs from video & podcasts sites
+
+VERSION
+    This document describes version 0.002 of App::streamfinder (from Perl
+    distribution App-streamfinder), released on 2020-01-03.
+
+FUNCTIONS
+  app
+    Usage:
+
+     app(%args) -> [status, msg, payload, meta]
+
+    CLI for StreamFinder, a module to fetch actual raw streamable URLs from
+    video & podcasts sites.
+
+    Examples:
+
+     % streamfinder https://www.youtube.com/watch?v=6yVIKvcPa6Q
+     https://r5---sn-htgx20capjpq-jb3l.googlevideo.com/videoplayback?exp...
+ 
+     % streamfinder https://www.youtube.com/watch?v=6yVIKvcPa6Q -l
+     +--------------+------------------------- ...+-------+-------------+------------+--------------...+-----------...+-------------------------...+
+     | artist       | description                 | genre | num_streams | stream_num | stream_url      | title        | url                        |
+     +--------------+------------------------- ...+-------+-------------+------------+--------------...+-----------...+-------------------------...+
+     | Powerful JRE | Another hilarious moment ...|       | 1           | 1          | https://r5---...| Pinky And ...| https://www.youtube.com/...|
+     +--------------+--------------------------...+-------+-------------+------------+--------------...+-----------...+-------------------------...+
+ 
+     % streamfinder https://www.youtube.com/watch?v=6yVIKvcPa6Q https://www.youtube.com/watch?v=6yzVtlUI02w --json
+     ...
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   detail => *bool*
+
+    *   urls* => *array[str]*
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/App-streamfinder>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-App-streamfinder>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=App-streamfinder>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    StreamFinder
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2021 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

@@ -1,16 +1,15 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2015-2018 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2015-2020 -- leonerd@leonerd.org.uk
 
-package Device::Chip::Adapter;
+use v5.26;
+use Object::Pad 0.35;
 
-use strict;
-use warnings;
+package Device::Chip::Adapter 0.16;
+role Device::Chip::Adapter :repr(HASH) :compat(invokable);
 
 use utf8;
-
-our $VERSION = '0.15';
 
 use Carp;
 
@@ -127,14 +126,14 @@ sub new_from_description
 
 =head1 METHODS
 
-The following methods documented with a trailing call to C<< ->get >> return
-L<Future> instances.
+The following methods documented in an C<await> expression return L<Future>
+instances.
 
 =cut
 
 =head2 make_protocol
 
-   $protocol = $adapter->make_protocol( $pname )->get
+   $protocol = await $adapter->make_protocol( $pname );
 
 Returns an object that satisfies one of the interfaces documented below in
 L</PROTOCOLS>, depending on the protocol name given by I<$pname>. This should
@@ -155,9 +154,8 @@ adapter is only capable of one kind of protocol.
 
 # A default implementation that uses some reflection to simplify
 # implementations
-sub make_protocol
+method make_protocol
 {
-   my $self = shift;
    my ( $pname ) = @_;
 
    if( my $code = $self->can( "make_protocol_$pname" ) ) {
@@ -187,7 +185,7 @@ The following methods are common to all protocol instances:
 
 =head2 sleep
 
-   $protocol->sleep( $secs )->get
+   await $protocol->sleep( $secs );
 
 Causes a fixed delay, given in (fractional) seconds. Adapter module authors
 should attempt to perform this delay concurrently, overlapping IO with other
@@ -195,7 +193,7 @@ operations where possible.
 
 =head2 configure
 
-   $protocol->configure( %args )->get
+   await $protocol->configure( %args );
 
 Sets configuration options for the protocol. The actual set of options
 available will depend on the type of the protocol.
@@ -206,7 +204,7 @@ apply multiple changes in one go.
 
 =head2 power
 
-   $protocol->power( $on )->get
+   await $protocol->power( $on );
 
 Switches on or off the power to the actual chip or module, if such ability is
 provided by the adapter.
@@ -269,7 +267,7 @@ readonly_struct GPIODefinition => [qw( name dir invert )];
 
 =head2 write_gpios
 
-   $protocol->write_gpios( \%pin_values )->get
+   await $protocol->write_gpios( \%pin_values );
 
 Sets the named GPIO pins as driven outputs, and gives their new values. Any
 GPIO pins not named are left as they are; either driving outputs at the
@@ -280,7 +278,7 @@ the L</list_gpios> method) to boolean logic levels.
 
 =head2 read_gpios
 
-   \%pin_values = $protocol->read_gpios( \@pin_names )->get;
+   \%pin_values = await $protocol->read_gpios( \@pin_names );
 
 Sets the named GPIO pins as high-impedence inputs, and reads their current
 state. Any GPIO pins not named here are left as they are; either driving
@@ -292,7 +290,7 @@ C<HASH> reference which maps pin names to boolean logic levels.
 
 =head2 tris_gpios
 
-   $protocol->tris_gpios( \@pin_names )->get;
+   await $protocol->tris_gpios( \@pin_names );
 
 Sets the named GPIO pins as high-impedence inputs ("tristate"). Any GPIO pins
 not named here are left as they are.
@@ -345,7 +343,7 @@ such as created by the C<chr()> function.
 
 =head2 readwrite
 
-   $words_in = $spi->readwrite( $words_out )->get
+   $words_in = await $spi->readwrite( $words_out );
 
 Performs a complete SPI transaction; assert the SS pin, synchronously clock
 the data given by the I<$words_out> out of the MOSI pin of the adapter while
@@ -355,7 +353,7 @@ the returned future.
 
 =head2 write
 
-   $spi->write( $words )->get
+   await $spi->write( $words );
 
 A variant of C<readwrite> where the caller does not intend to make use of the
 data returned by the device, and so the adapter does not need to return it.
@@ -365,7 +363,7 @@ C<readwrite> method and ignoring the return value.
 
 =head2 read
 
-   $words = $spi->read( $len )->get
+   $words = await $spi->read( $len );
 
 A variant of C<readwrite> where the chip will not care what data is written
 to it, so the caller does not need to supply it. This may or may not make a
@@ -375,7 +373,7 @@ in some constant string of appropriate length.
 
 =head2 write_then_read
 
-    $words_in = $spi->write_then_read( $words_out, $len_in )->get
+    $words_in = await $spi->write_then_read( $words_out, $len_in );
 
 Performs a complete SPI transaction; assert the SS pin, synchronously clock
 the data given by I<$words_out> out of the MOSI pin of the adapter, then clock
@@ -393,9 +391,9 @@ sending unspecified data.
 
 =head2 release_ss
 
-   $spi->assert_ss->get
+   await $spi->assert_ss;
 
-   $spi->release_ss->get
+   await $spi->release_ss;
 
 Lower-level access methods to directly assert or release the SS pin of the
 adapter. These would typically be used in conjunction with L</readwrite_no_ss>
@@ -407,11 +405,11 @@ or L</write_no_ss>.
 
 =head2 read_no_ss
 
-   $words_in = $spi->readwrite_no_ss( $words_out )->get
+   $words_in = await $spi->readwrite_no_ss( $words_out );
 
-   $spi->write_no_ss( $words )->get
+   await $spi->write_no_ss( $words );
 
-   $words = $spi->read_no_ss( $len )->get
+   $words = await $spi->read_no_ss( $len );
 
 Lower-level access methods to directly perform a data transfer across the
 MOSI/MISO pins of the adapter, without touching the SS pin. A complete SPI
@@ -471,7 +469,7 @@ communication may happen at some rate slower than this.
 
 =head2 write
 
-    $i2c->write( $bytes_out )->get
+    await $i2c->write( $bytes_out );
 
 Performs a complete I²C transaction to send the given bytes to the slave chip.
 This includes the start condition, sending the addressing byte (which is
@@ -480,7 +478,7 @@ condition.
 
 =head2 read
 
-    $bytes_in = $i2c->read( $len_in )->get
+    $bytes_in = await $i2c->read( $len_in );
 
 Performs a complete I²C transaction to receive the given number of bytes back
 from the slave chip. This includes the start condition, sending the addressing
@@ -488,7 +486,7 @@ byte and ending in a stop condition.
 
 =head2 write_then_read
 
-    $bytes_in = $i2c->write_then_read( $bytes_out, $len_in )->get
+    $bytes_in = await $i2c->write_then_read( $bytes_out, $len_in );
 
 Performs a complete I²C transaction to first send the given bytes to the slave
 chip then reads the give number of bytes back, returning them. These two
@@ -532,13 +530,13 @@ The size of the stop state, in bits. Either 1 or 2.
 
 =head2 write
 
-   $uart->write( $bytes )->get
+   await $uart->write( $bytes );
 
 Transmits the given bytes over the UART TX line.
 
 =head2 read
 
-   $bytes = $uart->read( $len )->get
+   $bytes = await $uart->read( $len );
 
 Receives the given number of bytes from the UART RX line. The returned future
 will not complete until the requested number of bytes are available.

@@ -4,7 +4,7 @@ use Mojo::Base -base;
 use Role::Tiny;
 use Carp qw/croak/;
 
-our $VERSION = '1.004001'; # VERSION
+our $VERSION = '1.004002'; # VERSION
 
 sub click_ok {
     my ( $self, $selector_or_dom, $extra_params ) = @_;
@@ -82,7 +82,7 @@ sub _get_controls {
 
     my %controls;
     for ( @els ) {
-        my $vals = $self->_gather_vals( $_ ) or next;
+        defined(my $vals = $self->_gather_vals( $_ )) or next;
         push @{ $controls{$_->{name}} }, ref $vals ? @$vals : $vals;
     }
     $#$_ or $_= $_->[0] for values %controls; # chage 1-el arrayrefs to strings

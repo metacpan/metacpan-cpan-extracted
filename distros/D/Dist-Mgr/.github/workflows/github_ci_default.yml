@@ -1,0 +1,54 @@
+name: CI
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: ['ubuntu-latest', 'macos-latest', 'windows-latest']
+        perl: [ '5.32', '5.28', '5.24', '5.18' ]
+        include:
+          - perl: '5.32'
+            os: ubuntu-latest
+            coverage: true
+    name: Perl ${{ matrix.perl }} on ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up perl
+        uses: shogo82148/actions-setup-perl@v1
+        with:
+          perl-version: ${{ matrix.perl }}
+      - run: perl -V
+      - run: cpanm ExtUtils::PL2Bat
+      - run: cpanm ExtUtils::MakeMaker
+      - run: cpanm --installdeps .
+      - name: Run tests (no coverage)
+        if: ${{ !matrix.coverage }}
+        env:
+          CPAN_USERNAME: test
+          CPAN_PASSWORD: test
+        run: prove -lv t
+      - name: Run tests (with coverage)
+        if: ${{ matrix.coverage }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          CPAN_USERNAME: test
+          CPAN_PASSWORD: test
+        run: |
+          cpanm -n Devel::Cover::Report::Coveralls
+          cover -ignore Git.pm$ -test -report Coveralls
+  finish:
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Coveralls Finished
+        uses: coverallsapp/github-action@master
+        with:
+          github-token: ${{ secrets.github_token }}
+          parallel-finished: true

@@ -35,3 +35,6 @@ Revision history for Perl extension Template::Nest.
 
 0.09  Sun Nov 29 20:51:02 2020
 	- Correct incorrect token resolution when using square bracket tokens
+
+0.10  Fri Jan 01 14:26:08 2021
+	- Another square bracket token bug fix when using fixed_indent = 1 

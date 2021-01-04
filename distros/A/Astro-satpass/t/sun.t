@@ -226,6 +226,27 @@ use constant ASTRONOMICAL_UNIT => 149_597_870; # Meeus, Appendix 1, pg 407
 	$tolerance, 'December solstice 2005', \&format_dyn );
 }
 
+{
+    note <<EOD;
+
+We repeat the first equinox test because there was a bug in the
+closed-form calculation if the initial time was after the last solstice
+but before the end of the year.
+
+This was introduced in 0.089 (released 2018-02-02) when I went to Meeus'
+closed-form equinox/solstice algorithm. The bug is in my interface to
+Meeus' algorithm, not the algorithm itself.
+EOD
+    my $time = greg_time_gm( 0, 0, 0, 31, 11, 2004 );
+    my $sun = Astro::Coord::ECI::Sun->universal( $time );
+#   my $tolerance = 16 * 60 + 40;
+    my $tolerance = 1 * 60;
+
+    $sun->next_quarter();
+    tolerance( $sun->dynamical(), greg_time_gm( 29, 34, 12, 20, 2, 2005 ),
+	$tolerance, 'March equinox 2005', \&format_dyn );
+}
+
 
 # Singleton object
 

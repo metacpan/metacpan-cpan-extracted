@@ -1,0 +1,65 @@
+{
+   "abstract" : "Distribution development cycle toolkit",
+   "author" : [
+      "Steve Bertrand <steveb@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Dist-Mgr",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Capture::Tiny" : "0",
+            "File::Touch" : "0",
+            "Hook::Output::Tiny" : "0",
+            "Mock::Sub" : "0",
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "CPAN::Uploader" : "0",
+            "File::Copy::Recursive" : "0",
+            "File::Find::Rule" : "0",
+            "File::Path" : "0",
+            "Module::Starter" : "1.77",
+            "PPI" : "0",
+            "Term::ReadKey" : "0",
+            "Tie::File" : "0",
+            "perl" : "5.006",
+            "version" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/stevieb9/dist-mgr/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/stevieb9/dist-mgr.git",
+         "web" : "https://github.com/stevieb9/dist-mgr"
+      }
+   },
+   "version" : "1.00",
+   "x_serialization_backend" : "JSON::PP version 2.27400_02"
+}

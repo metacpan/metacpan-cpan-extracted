@@ -36,5 +36,11 @@ t/data/Time-Duration-ja-cpanfile
 t/data/Web-Library-jQuery-cpanfile
 t/data/WebService-Simple-cpanfile
 t/data/Webservice-Diffbot-cpanfile
+t/die/001.t
+t/die/002.t
+t/die/003.t
 t/simple.t
 t/tests.json
+t/warnings/001.t
+t/warnings/002.t
+t/warnings/003.t

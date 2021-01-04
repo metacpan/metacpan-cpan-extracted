@@ -1,0 +1,64 @@
+#!/usr/bin/env perl
+
+use 5.022;
+use strict;
+use warnings;
+
+$| = 1;
+
+while (<<>>) {
+    s/^\s+//;
+    my @e = split /\s+/;
+    if (!@e || grep { !/^(?:0|[1-9][0-9]*)\z/ } @e) {
+        print;
+        next;
+    }
+
+    my $m = (@e - 1) * @e + 1;
+    my $fmt = $m < 1000? '%4d': '%4x';
+    print
+        '+--+---', '----' x @e, "-+\n",
+        '|  |   ', (map { sprintf $fmt, $_ } @e), " |\n",
+        '|  +--+', '----' x @e, "-+\n",
+        (map {
+            my $a = $_;
+            '|', sprintf($fmt, $a), ' |',
+            (map { sprintf $fmt, ($a - $_) % $m } @e),
+            " |\n"
+        } @e),
+        '+-----+', '----' x @e, "-+\n";
+}
+
+__END__
+=head1 NAME
+
+pds_optable - print difference table for planar difference sets
+
+=head1 SYNOPSIS
+
+  pds_optable [file]...
+
+=head1 DESCRIPTION
+
+This example program reads lists of non-negative integer numbers, one
+per line, separated by whitespace, converts them to ASCII-formatted
+difference tables, and writes the results to standard output.
+
+=head1 AUTHOR
+
+Martin Becker, E<lt>becker-cpan-mp I<at> cozap.comE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (c) 2019-2021 by Martin Becker, Blaubeuren.
+
+This library is free software; you can distribute it and/or modify it
+under the terms of the Artistic License 2.0 (see the LICENSE file).
+
+=head1 DISCLAIMER OF WARRANTY
+
+This library is distributed in the hope that it will be useful, but
+without any warranty; without even the implied warranty of merchantability
+or fitness for a particular purpose.
+
+=cut

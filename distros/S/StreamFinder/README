@@ -127,22 +127,27 @@ DESCRIPTION
     The currently-supported websites are: podcasts.apple.com
     (StreamFinder::Apple), bitchute.com (StreamFinder::Bitchute, blogger.com
     (StreamFinder::Blogger), brighteon.com (StreamFinder::Brighteon),
-    castbox.fm (StreamFinder::Castbox), iheartradio.com
-    (StreamFinder::IHeartRadio), radio.net (StreamFinder::RadioNet),
-    reciva.com (StreamFinder::Reciva), rumble.com (StreamFinder::Rumble),
-    sermonaudio.com (StreamFinder::SermonAudio), spreaker.com podcasts
+    castbox.fm (StreamFinder::Castbox), podcasts.google.com
+    (StreamFinder::Google), iheartradio.com (StreamFinder::IHeartRadio),
+    radio.net (StreamFinder::RadioNet), reciva.com (StreamFinder::Reciva),
+    rumble.com (StreamFinder::Rumble), sermonaudio.com
+    (StreamFinder::SermonAudio), spreaker.com podcasts
     (StreamFinder::Spreaker), tunein.com (StreamFinder::Tunein), vimeo.com
     (StreamFinder::Vimeo), and (youtube.com, et. al and other sites that
     youtube-dl supports) (StreamFinder::Youtube).
+
+    NOTE: StreamFinder::Reciva will likely be removed next release after
+    January 30, 2021 due to that site's announcement that they're going
+    offline after that date!
 
     NOTE: Facebook (Streamfinder::Facebook) has been removed because logging
     into Facebook via the call to youtube-dl is now interpreted by Facebook
     as a "rogue app. login" and will cause them to LOCK your account and
     FORCE you to change your password the next time you log in to Facebook!
 
-    NOTE: For some sites, ie. Youtube, Vimeo, Apple, Spreaker, Castbox, etc.
-    the "station" object actually refers to a specific video or podcast, but
-    functions the same way.
+    NOTE: For some sites, ie. Youtube, Vimeo, Apple, Spreaker, Castbox,
+    Google, etc. the "station" object actually refers to a specific video or
+    podcast, but functions the same way.
 
     Each site is supported by a separate subpackage
     (StreamFinder::*Package*), which is determined and selected based on the
@@ -256,9 +261,9 @@ SUBROUTINES/METHODS
     $station->getType()
         Returns the station / podcast / video's type (*submodule-name*).
         (one of: "Apple", "BitChute", "Blogger", "Brighteon", "Castbox",
-        "IHeartRadio", "RadioNet", "Reciva", "Rumble", "SermonAudio",
-        "Spreaker", "Tunein", "Youtube" or "Vimeo" - depending on the sight
-        that matched the URL.
+        "Google", "IHeartRadio", "RadioNet", "Reciva", "Rumble",
+        "SermonAudio", "Spreaker", "Tunein", "Youtube" or "Vimeo" -
+        depending on the sight that matched the URL.
 
 CONFIGURATION FILES
     ~/.config/StreamFinder/config

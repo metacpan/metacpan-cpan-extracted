@@ -18,4 +18,4 @@ my $rjson = <<'(RAW)';
   d: "more stuff",
 }
 (RAW)
-print repair_json ($rjson, verbose => undef);
+print repair_json ($rjson);

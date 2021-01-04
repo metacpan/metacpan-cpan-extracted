@@ -1,7 +1,7 @@
 ---
 abstract: "It's Perl support for AWS Lambda Custom Runtime."
 author:
-  - '@gmail.com>'
+  - 'Ichinose Shogo'
 build_requires:
   File::Slurp: '9999.25'
   Test::Deep: '1.128'
@@ -11,7 +11,7 @@ build_requires:
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v3.1.10, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Minilla/v3.1.11, CPAN::Meta::Converter version 2.150010'
 license: mit
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -30,7 +30,7 @@ no_index:
 provides:
   AWS::Lambda:
     file: lib/AWS/Lambda.pm
-    version: v0.0.22
+    version: v0.0.23
   AWS::Lambda::Bootstrap:
     file: lib/AWS/Lambda/Bootstrap.pm
   AWS::Lambda::Context:
@@ -52,7 +52,7 @@ resources:
   bugtracker: https://github.com/shogo82148/p5-aws-lambda/issues
   homepage: https://github.com/shogo82148/p5-aws-lambda
   repository: git://github.com/shogo82148/p5-aws-lambda.git
-version: 0.0.22
+version: 0.0.23
 x_contributors:
   - 'Ichinose Shogo <shogo82148@gmail.com>'
   - 'Jose Luis Martinez <jlmartinez@capside.com>'

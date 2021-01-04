@@ -12,7 +12,7 @@ use XML::LibXML::XPathContext;
 use Data::Validate::URI qw(is_web_uri);
 use Scalar::Util qw(blessed);
 
-our $VERSION = '0.03';
+our $VERSION = '0.05';
 
 with 'Catmandu::Importer';
 
@@ -299,6 +299,11 @@ sub _hashify {
 
     $out->{count} = $xc->findvalue("/result/count");
 
+    if ( $self->fullResponse ) {
+        $out->{results} = [$root];
+        return $out;
+    }
+
     my @result_nodes;
 
     if ( $xc->exists('/result/items') ) {
@@ -308,11 +313,6 @@ sub _hashify {
     } else {
         @result_nodes = $xc->findnodes('/result/*[@uuid]');
     };
-
-    if ( $self->fullResponse ) {
-        $out->{results} = [$root];
-        return $out;
-    }
 
     $out->{results} = \@result_nodes;
 
@@ -363,13 +363,11 @@ sub generator {
   use Catmandu;
 
   my %attrs = (
-    base => 'http://host/path',
+    base     => 'https://host/path',
     endpoint => 'research-outputs',
-    apiKey => '...',
+    apiKey   => '...',
+    options  => { 'fields' => 'title,type,authors.*' } 
   );
-
-TODO: add options
-
 
   my $importer = Catmandu->importer('Pure', %attrs);
 
@@ -378,25 +376,29 @@ TODO: add options
     # ...
   });
 
-  # get number of valid and approved publications
+  # get number of validated and approved publications
   my $count = Catmandu->importer(
     'Pure',
-    base         => base,
+    base         => 'https://host/path',
     endpoint     => 'research-outputs',
     apiKey       => '...',
     fullResponse => 1,
-    post_xml => '<?xml version="1.0" encoding="utf-8"?>' 
-        . '<researchOutputsQuery>',
-        . '<workflowSteps>approved</workflowSteps>',
-        . '</researchOutputsQuery>',   
-  )->first->{result}{count};
+    post_xml => '<?xml version="1.0" encoding="utf-8"?>'
+      . '<researchOutputsQuery>'
+      . '<size>0</size>'
+      . '<workflowSteps>'
+      . '  <workflowStep>approved</workflowStep>'
+      . '  <workflowStep>validated</workflowStep>'
+      . '</workflowSteps>'
+      . '</researchOutputsQuery>'
+  )->first->{count};
 
 =head1 DESCRIPTION
 
-  Catmandu::Importer::Pure is a Catmandu package that seamlessly imports data from Elsevier's Pure system using its REST service.
-  In order to use the Pure Web Service you need an API key. List of all available endpoints and further documentation can currently
-  be found under /ws on a webserver that is running Pure. Note that this version of the importer is tested with Pure API version
-  5.18 and might not work with later versions.
+Catmandu::Importer::Pure is a Catmandu package that seamlessly imports data from Elsevier's Pure system using its REST service.
+In order to use the Pure Web Service you need an API key. List of all available endpoints and further documentation can currently
+be found under /ws on a webserver that is running Pure. Note that this version of the importer is tested with Pure API version
+5.18 and might not work with later versions.
 
 =head1 CONFIGURATION
 
@@ -486,7 +488,7 @@ user input. Note that there is a small performance penalty when using this optio
 =item filter( sub {} )
 
 Optional reference to function that processes the XML response before it is parsed. The argument to the function is a reference to the XML text,
-which is then used to modify it. This is option is normally not needed but can helpful if there is a problem parsing the response due to a bug
+which is then used to modify it. This option is normally not needed but can helpful if there is a problem parsing the response due to a bug
 in the REST service.
 
 =back
@@ -505,13 +507,13 @@ Return the current Pure REST request URL (useful for debugging).
 
 =head1 SEE ALSO
 
+L<Catmandu>
+
 L<Catmandu::Importer>
 
 L<Catmandu::Iterable>
 
-Furl
-
-http://librecat.org
+L<Furl>
 
 =head1 AUTHOR
 

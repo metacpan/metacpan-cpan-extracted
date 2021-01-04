@@ -1,4 +1,4 @@
-package Dancer2::Template::Handlebars::Helpers 0.3;
+package Dancer2::Template::Handlebars::Helpers 0.4;
 
 # ABSTRACT: parent class for Handlebars' helper collections
 
@@ -37,7 +37,7 @@ Dancer2::Template::Handlebars::Helpers - parent class for Handlebars' helper col
 
 =head1 VERSION
 
-version 0.3
+version 0.4
 
 =head1 SYNOPSIS
 
@@ -90,11 +90,11 @@ without the help of C<Dancer2::Template::Handlebars::Helpers>, one could do:
 
 =head1 AUTHOR
 
-Ruth Holloway <ruth@hiruthie.me>
+D Ruth Holloway <ruth@hiruthie.me>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by Ruth Holloway.
+This software is copyright (c) 2020 by D Ruth Holloway.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

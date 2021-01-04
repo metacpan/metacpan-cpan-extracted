@@ -6,7 +6,7 @@ package Dist::Zilla::Plugin::Author::CSSON::GithubActions::Workflow::TestWithMak
 
 # ABSTRACT: Workflow for testing with Makefile.PL
 our $AUTHORITY = 'cpan:CSSON'; # AUTHORITY
-our $VERSION = '0.0106';
+our $VERSION = '0.0107';
 
 use Moose;
 use Types::Standard qw/ArrayRef/;
@@ -63,7 +63,7 @@ Dist::Zilla::Plugin::Author::CSSON::GithubActions::Workflow::TestWithMakefile - 
 
 =head1 VERSION
 
-Version 0.0106, released 2020-12-26.
+Version 0.0107, released 2020-12-30.
 
 =head1 SYNOPSIS
 

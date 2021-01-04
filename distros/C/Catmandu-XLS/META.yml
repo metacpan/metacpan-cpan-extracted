@@ -21,13 +21,14 @@ no_index:
     - t
     - xt
 requires:
-  Catmandu: '0.9'
+  Catmandu: '1.00'
   Excel::Writer::XLSX: '0.77'
   Module::Build: '0.4229'
   Moo: '0'
   Spreadsheet::ParseExcel: '0.65'
   Spreadsheet::ParseXLSX: '0'
   Spreadsheet::WriteExcel: '2.37'
+  Type::Tiny: '1.002001'
   XML::LibXML::Reader: '2.0'
   namespace::clean: '0.24'
   perl: v5.10.1
@@ -35,7 +36,7 @@ resources:
   bugtracker: https://github.com/LibreCat/Catmandu-XLS/issues
   homepage: https://github.com/LibreCat/Catmandu-XLS
   repository: https://github.com/LibreCat/Catmandu-XLS.git
-version: '0.09'
+version: '0.10'
 x_contributors:
   - 'Johann Rolschewski <jorol@cpan.org>'
   - 'Johann Rolschewski <rolschewski@gmail.com>'
@@ -43,6 +44,6 @@ x_contributors:
   - 'Nicolas Steenlant <nicolas.steenlant@ugent.be>'
   - 'Patrick Hochstenbach <patrick.hochstenbach@ugent.be>'
   - 'vpeil <vitali.peil@uni-bielefeld.de>'
-x_generated_by_perl: v5.28.1
+x_generated_by_perl: v5.30.0
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_static_install: 1

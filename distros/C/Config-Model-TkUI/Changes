@@ -1,3 +1,13 @@
+1.372 2021-01-03
+
+   Bug fixes:
+    * fix (LeafEditor): fix confusing handling of trailing \n
+      when using external editor.
+
+   Other changes:
+    * Use get_info moved in Config::Model
+    * requires Config::Model 2.139
+
 1.371 2019-12-11
 
   This releases fixes the tests broken by Config::Model 2.137.  The

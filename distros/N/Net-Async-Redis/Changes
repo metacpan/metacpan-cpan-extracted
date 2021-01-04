@@ -1,5 +1,11 @@
 Revision history for Net-Async-Redis
 
+3.007     2020-12-31 07:23:30+08:00 Asia/Kuala_Lumpur
+    New features:
+
+    - latest commands from 6.2
+    - this includes ->geosearch, ->client_info, ->client_trackinginfo etc.
+
 3.006     2020-12-04 05:33:59+08:00 Asia/Kuala_Lumpur
     New features:
 

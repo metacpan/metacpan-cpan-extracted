@@ -1,0 +1,9 @@
+0.002   2020-11-22  Released-By: PERLANCAR; Urgency: medium
+
+	- Rename distro
+	  Acme-CPANModules-{ModulesThatContainJustData,ContainingJustData}.
+
+
+0.001   2020-06-01  Released-By: PERLANCAR
+
+        - First release.

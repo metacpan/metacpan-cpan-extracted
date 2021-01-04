@@ -16,7 +16,7 @@ use Path::Tiny;
 
 extends 'App::VTide::Command::Run';
 
-our $VERSION = version->new('0.1.13');
+our $VERSION = version->new('0.1.14');
 our $NAME    = 'who';
 our $OPTIONS = [
     'set|s=s',
@@ -69,7 +69,7 @@ App::VTide::Command::Who - Tells you about the terminal you are in
 
 =head1 VERSION
 
-This documentation refers to App::VTide::Command::Who version 0.1.13
+This documentation refers to App::VTide::Command::Who version 0.1.14
 
 =head1 SYNOPSIS
 

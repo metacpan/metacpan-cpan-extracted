@@ -233,7 +233,7 @@ In the above case, Planet Jupiter will write a feed called `atom.xml` based on
 `template.xml` and a HTML file called `planet.html` based on `template.html`,
 using the cached entries matching the feeds in `feed.opml`.
 
-# WRITING TEMPLATES
+# TEMPLATES
 
 The page template is called with three hash references: `globals`, `feeds`,
 and `entries`. The keys of these three hash references are documented below.

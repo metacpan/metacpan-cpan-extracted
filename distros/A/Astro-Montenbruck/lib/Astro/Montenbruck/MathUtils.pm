@@ -429,7 +429,7 @@ Calculate sin(phi); phi in units of 1 revolution = 360 degrees
 
 =head2 cart($r, $theta, $phi)
 
-Conversion of polar coordinates (r,theta,phi) into certesian (x,y,z).
+Conversion of polar coordinates (r,theta,phi) into cartesian (x,y,z).
 
 =head3 Arguments
 
@@ -495,7 +495,7 @@ Sergey Krushinsky, C<< <krushi at cpan.org> >>
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright 2009-2019 Sergey Krushinsky.
+Copyright 2009-2020 Sergey Krushinsky.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

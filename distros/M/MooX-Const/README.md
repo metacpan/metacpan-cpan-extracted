@@ -4,7 +4,7 @@ MooX::Const - Syntactic sugar for constant and write-once Moo attributes
 
 # VERSION
 
-version v0.4.5
+version v0.5.0
 
 # SYNOPSIS
 
@@ -46,18 +46,22 @@ object.
 Simple value types such as `Int` or `Str` are silently converted to
 read-only attributes.
 
-As of v0.2.0, it also supports write-once ("wo") attributes for
+As of v0.5.0, it also supports write-once ("once") attributes for
 references:
 
 ```perl
 has setting => (
-  is  => 'wo',
+  is  => 'once',
   isa => HashRef,
 );
 ```
 
 This allows you to set the attribute _once_. The value is coerced
 into a constant, and cannot be changed again.
+
+Note that "wo" is a deprecated synonym for "once". It will be removed
+in the future, since "wo" is used for "write-only" in some Moose-like
+extensions.
 
 As of v0.4.0, this now supports the `strict` setting:
 
@@ -97,6 +101,8 @@ It does not work with [Mouse](https://metacpan.org/pod/Mouse). Pull requests are
 
 [Class::Accessor](https://metacpan.org/pod/Class::Accessor) antlers/moose-like mode uses "wo" for write-only
 attributes, not write-once attributes.
+
+As of v0.5.0, you should be using "once" instead of "wo".
 
 # SEE ALSO
 

@@ -1,6 +1,10 @@
 Revision history for Term::Choose::Util
 
 
+0.122   2021-01-01
+        - Add bugracker info to the Makefile.PL.
+        - Update year copyright.
+
 0.121   2020-04-21
         - "Term::Choose": minimum version is "1.711".
         - Option validation: rename ARRAY to Array_Int.

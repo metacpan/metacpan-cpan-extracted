@@ -3093,7 +3093,7 @@ GCC_CFLAGS=" -pipe -Wall -W -Wno-unused-parameter \
     -Wno-missing-field-initializers -Wpointer-arith -Wstrict-prototypes \
     -Wcast-qual -Wcast-align -Wno-error=unused-function \
     -Wno-error=unused-variable -Wno-error=deprecated-declarations \
-    -Wno-error=stringop-truncation "
+     "
 
 # Check whether --enable-werror was given.
 if test "${enable_werror+set}" = set; then :
@@ -14355,8 +14355,6 @@ ac_fn_c_check_decl "$LINENO" "SO_NOSIGPIPE" "ac_cv_have_decl_SO_NOSIGPIPE" "
 "
 if test "x$ac_cv_have_decl_SO_NOSIGPIPE" = xyes; then :
 
-$as_echo "#define HAVE_SO_NOSIGPIPE 1" >>confdefs.h
-
 fi
 
 
@@ -14365,8 +14363,6 @@ ac_fn_c_check_decl "$LINENO" "MSG_NOSIGNAL" "ac_cv_have_decl_MSG_NOSIGNAL" "
 
 "
 if test "x$ac_cv_have_decl_MSG_NOSIGNAL" = xyes; then :
-
-$as_echo "#define HAVE_MSG_NOSIGNAL 1" >>confdefs.h
 
 fi
 

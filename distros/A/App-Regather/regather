@@ -1,8 +1,6 @@
-#!/bin/sh
-#! -*-perl-*-
-eval 'exec perl -x -wS $0 ${1+"$@"}' if 0;
-#
+#!/usr/bin/env perl
 # -*- mode: cperl; eval: (follow-mode) -*-
+#
 
 use strict;
 use warnings;
@@ -31,7 +29,7 @@ you set (like create/delete directories or other).
 I<regather> performs all actions through plugins. Plugins currently
 implemented you can know with option I<--plugin-list>
 
-It uses L<Net::LDAP> to do all LDAP related stuff and L<Template> to
+It uses L<Net::LDAP(3)> to do all LDAP related stuff and L<Template> to
 generate files. Config file is processed with L<Config::Parser> (look
 B<CONFIG FILE> section bellow)
 
@@ -49,30 +47,37 @@ for all> configured I<service>s
 
 Search results are used to provide data for plugins.
 
-Module Template(3) is used to write target file, using configured
+Module L<Template(3)> is used to write target file, using configured
 I<core.tt_path/service.XXX.tt_file>
 
-Net::DNS(3) is used to nsupdate dyn zones.
+L<Net::DNS(3)> is used to nsupdate dyn zones.
 
 =head1 OPERATIONS
 
 On LDAP repl event, consumer receives syncstate, we process these three:
 
-    LDAP_SYNC_ADD
-    LDAP_SYNC_MODIFY
-    LDAP_SYNC_DELETE
+=over
+
+=item * LDAP_SYNC_ADD
+
+=item * LDAP_SYNC_MODIFY
+
+=item * LDAP_SYNC_DELETE
+
+=back
 
 on LDAP_SYNC_ADD and LDAP_SYNC_MODIFY we just overwrite all configured
 for the service things (files, directories e.t.c.)
 
 ModRDN event comes as LDAP_SYNC_MODIFY, and since in DN it has the new
 RDN, the only way to know the old one (to delete all resources related
-to it) we need search accesslog DB for the attribute reqNewRDN=new-RDN
+to it, first) we need search accesslog DB (see L<slapo-accesslog(5)>)
+for the attribute reqNewRDN=new-RDN
 
 LDAP_SYNC_DELETE differs a bit, it can be spawned by deletion of LDAP
 object itself or by deletion of some attribute of the object. So, on that
 event we restore previous state of the object from accesslog DB (which
-is mandatory for our work) and look at the attribute reqType value. 
+is mandatory for our work) and look at the attribute reqType value.
 
 There are two cases we take care of:
 
@@ -150,16 +155,32 @@ shows version
 
 =head1 EXAMPLES
 
-regather -c /some/regather.conf.config-tiny \
-         -C core.altroot=/tmp/regather-altroot.d \
-         -C core.tt_path=/path/regather.d \
+regather -c /some/regather.conf.config-tiny 
+         -C core.altroot=/tmp/regather-altroot.d 
+         -C core.tt_path=/path/regather.d 
          --colors -f -Fvvv
 
 this does next:
-    - use separate config file
-    - use alternate-to-config-file-defined directory to place the results to
-    - use alternate-to-config-file-defined directory for templates
-    - use terminal colors in foreground and force re-generation of service files
+
+=over
+
+=item *
+
+use separate config file
+
+=item *
+
+use alternate-to-config-file-defined directory to place the results to
+
+=item *
+
+use alternate-to-config-file-defined directory for templates
+
+=item *
+
+use terminal colors in foreground and force re-generation of service files
+
+=back
 
 =head1 FILES
 
@@ -182,11 +203,41 @@ HUP - restart
 INT, QUIT, ABRT, TERM - terminate
 
 
+=head1 BUGS
+
+=over
+
+=item * replication related missfunction can not be identified
+
+It is rather feature than bug. Sometimes replication related problem/s
+which does not break slapd(8c) functionality, occures. For example, when
+master ACL are not set properly, some needed object, finally will be
+absent on replica side and in slapd log file you can see this:
+
+C<LDAP_RES_SEARCH_RESULT (53) Server is unwilling to perform>
+
+for now I don't know the way to catch it.
+
+=item * no action can be taken for objects not present in accesslog DB
+
+It is, as well, rather feature than bug. While creatin of target
+resource (LDAP_SYNC_ADD) uses currently present in LDAP objects,
+delete (LDAP_SYNC_DELETE) event is using accesslog information. If for
+some reason this information is absent, then target resource which was
+created before, won't be deleted.
+
+So you need to delete it by hands. Or you can delete all target
+directory files and restart regather.
+
+=back
+
 =head1 SEE ALSO
 
-L<Net::LDAP>,
-L<Template>,
-L<Regather::Config>
+L<Net::LDAP(3)>,
+L<Net::LDAP::Control::SyncRequest(3)>
+L<Template(3)>,
+L<App::Regather::Config(3)>
+L<slapo-accesslog(5)>
 
 =head1 AUTHOR
 
@@ -194,7 +245,7 @@ Zeus Panchenko E<lt>zeus@gnu.org.uaE<gt>
 
 =head1 COPYRIGHT
 
-Copyright 2019 Zeus Panchenko.
+Copyright 2020 Zeus Panchenko.
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by

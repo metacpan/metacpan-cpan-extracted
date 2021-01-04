@@ -7,6 +7,8 @@ use base 'WordList';
 
 # ABSTRACT: default word list for CtrlO::Crypt::XkcdPassword
 
+our $VERSION = '1.009'; # VERSION
+
 
 'correct horse battery staple';
 
@@ -20,7 +22,7 @@ CtrlO::Crypt::XkcdPassword::Wordlist::en_gb - default word list for CtrlO::Crypt
 
 =head1 VERSION
 
-version 1.008
+version 1.009
 
 =head1 DESCRIPTION
 
@@ -83,11 +85,11 @@ Using Git Commit From: Thu Aug 24 14:36:19 2017 -0400 [2614b88]
 
 =head1 AUTHOR
 
-Thomas Klausner <domm@cpan.org>
+Thomas Klausner <domm@plix.at>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 - 2019 by Thomas Klausner.
+This software is copyright (c) 2018 - 2021 by Thomas Klausner.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

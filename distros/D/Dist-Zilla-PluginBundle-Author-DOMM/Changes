@@ -1,0 +1,30 @@
+Revision history for Dist::Zilla::PluginBundle::Author::DOMM
+
+0.907     2021-01-03 18:38:23+01:00
+
+0.906     2021-01-01 18:46:39+01:00
+    - remove MetaChanges, too much noise in META.json, IMO
+
+
+0.905     2021-01-01 18:37:49+01:00
+    - fixed dist-name
+
+
+0.904     2021-01-01 18:23:41+01:00
+    - fiddle with NextRealease format
+
+
+0.903     2021-01-01 18:18:27+01:00 Europe/Vienna
+
+
+0.902   2021-01-01T18:10:48
+    - fiddle with NextRelease & Git::Push
+
+
+0.901   2021-01-01T18:03:03
+    - move some dist.ini data into ~/.dzil/config.ini
+
+
+0.900   2021-01-01T17:04:54
+    - first release
+

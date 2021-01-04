@@ -51,6 +51,16 @@ DESCRIPTION
 
 METHODS
 
+ alarm
+
+       $f = Future::IO->alarm( $epoch )
+
+    Since version 0.08.
+
+    Returns a Future that will become at a fixed point in the future, given
+    as an epoch timestamp (such as returned by time()). This value may be
+    fractional.
+
  sleep
 
        $f = Future::IO->sleep( $secs )

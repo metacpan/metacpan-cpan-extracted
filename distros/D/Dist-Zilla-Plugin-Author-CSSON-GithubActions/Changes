@@ -1,6 +1,20 @@
 Revision history for Dist-Zilla-Plugin-Author-CSSON-GithubActions
 
-0.0106 2020-12-26 15:26:00 UTC
+0.0107 2020-12-30 20:04:02 UTC
+ [Requirements]
+ - Added missing prereq, fixes #2 (thanks SREZIC!)
+
+ [Stats & Dependency Changes]
+ - 5 files changed, 53 insertions(+), 13 deletions(-)
+ - (run req) + Types::Path::Tiny 0.005
+ - (run req) ~ perl 5.010000 --> 5.014000
+ - (dev req) + Badge::Depot::Plugin::Githubactions (any)
+ - (dev req) - Badge::Depot::Plugin::Cpantesters
+ - (dev req) - Badge::Depot::Plugin::Kwalitee
+ - (dev req) - Dist::Zilla::Plugin::Test::Kwalitee::Extra
+ - (dev sug) ~ Dist::Iller::Config::Author::CSSON 0.0327 --> 0.0328
+
+0.0106 2020-12-26T15:26:00Z UTC
  [Bug Fixes]
  - Fix bugs in distribution_name, so that it looks in the correct share
    directory.

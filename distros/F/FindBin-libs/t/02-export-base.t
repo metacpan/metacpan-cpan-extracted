@@ -21,39 +21,54 @@ $, = "\n\t";
 
 BEGIN
 {
-    eval { symlink qw( /nonexistant/path/to/foobar ./foobar ) }
+    eval
+    {
+        symlink qw( /nonexistant/path/to/something ./dead-link )
+    }
 }
 
 END
 {
-    unlink './foobar';
+    eval
+    {
+        unlink './dead-link';
+    }
 }
 
-use FindBin::libs qw( export                            );
-use FindBin::libs qw( export=found base=blib            );
-use FindBin::libs qw( export=junk  base=frobnicatorium  );
-use FindBin::libs qw( export       base=foobar          );
+# libs & found should be populated.
+# missing and dead should be empty.
+
+use FindBin::libs qw( export                                        );
+use FindBin::libs qw( export=found      base=blib                   );
+use FindBin::libs qw( export=missing    base=non-existant-directory );
+use FindBin::libs qw( export=dead       base=dead-link              );
 
 my %testz
 = qw
 (
-    lib     1
-    found   1
-    junk    0
-    foobar  0
+    lib         1
+    found       1
+    missing     0
+    dead-link   0
 );
 
-plan tests => 1 * keys %testz;
+plan tests => scalar keys %testz;
 
-while( my ($name, $true) = each %testz )
+while( my ($name, $populated) = each %testz )
 {
     my $dest    = qualify        $name;
     my $ref     = qualify_to_ref $dest;
 
-    $true 
-    ? ok   @{ *$ref }, "Non-empty: $dest"
-    : ok ! @{ *$ref }, "Empty: $dest"
-    ;
+    eval
+    {
+        $populated 
+        ? ok   @{ *$ref }, "Non-empty: \@$dest"
+        : ok ! @{ *$ref }, "Empty: \@$dest"
+        ;
+
+        1
+    }
+    or fail "Not installed: '$name', $@";
 }
 
 exit 0;

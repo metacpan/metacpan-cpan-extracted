@@ -1,6 +1,10 @@
 Revision history for Term::TablePrint
 
 
+0.124   2021-01-01
+        - Add bugracker info to the Makefile.PL.
+        - Update year copyright.
+
 0.123   2020-10-25
         - Term::Choose minimum version 1.712.
         - New option 'table_name'.

@@ -8,6 +8,8 @@ CREDITS
 lib/Paranoid.pm
 lib/Paranoid/Args.pm
 lib/Paranoid/Data.pm
+lib/Paranoid/Data/AVLTree.pm
+lib/Paranoid/Data/AVLTree/AVLNode.pm
 lib/Paranoid/Debug.pm
 lib/Paranoid/Filesystem.pm
 lib/Paranoid/Glob.pm
@@ -44,11 +46,13 @@ t/26_filesystem_pchown.t
 t/30_log.t
 t/31_log_buffer.t
 t/32_log_file.t
+t/33_log_pdebug.t
 t/40_socket.t
 t/41_ipv4.t
 t/42_ipv6.t
 t/43_network.t
 t/50_process.t
+t/60_avltree.t
 t/98_pod_coverage.t
 t/99_pod.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)

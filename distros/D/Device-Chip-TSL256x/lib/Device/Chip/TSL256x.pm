@@ -6,9 +6,11 @@
 use v5.26;
 use Object::Pad 0.19;
 
-package Device::Chip::TSL256x 0.04;
+package Device::Chip::TSL256x 0.05;
 class Device::Chip::TSL256x
    extends Device::Chip;
+
+use Device::Chip::Sensor -declare;
 
 use Data::Bitfield qw( bitfield enumfield );
 use Future;
@@ -75,9 +77,10 @@ use constant {
    REG_DATA1      => 0x0E, # 16bit
 };
 
-bitfield { format => "bytes-LE" }, TIMING =>
-   GAIN  => enumfield( 4, qw( 1 16 )),
-   INTEG => enumfield( 0, qw( 13ms 101ms 402ms ));
+bitfield { format => "bytes-LE" }, CONFIG =>
+   POWER => enumfield(     0, qw( OFF . . ON )),
+   GAIN  => enumfield( 1*8+4, qw( 1 16 )),
+   INTEG => enumfield( 1*8+0, qw( 13ms 101ms 402ms ));
 
 async method _read ( $addr, $len )
 {
@@ -104,17 +107,25 @@ instances.
 
    $config = await $chip->read_config;
 
-Returns a C<HASH> reference of the contents of timing control register, using
-fields named from the data sheet.
+Returns a C<HASH> reference of the contents of control and timing registers,
+using fields named from the data sheet.
 
+   POWER => OFF | ON
    GAIN  => 1 | 16
-   INTEG => 13ms | 101ms | 420ms
+   INTEG => 13ms | 101ms | 402ms
+
+Additionally, the following keys are provided calculated from those, as a
+convenience.
+
+   integ_msec => 13.7 | 101 | 402
 
 =head2 change_config
 
    await $chip->change_config( %changes );
 
-Writes updates to the timing control register.
+Writes updates to the control and timing registers.
+
+Note that this method will ignore the C<integ_msec> convenience value.
 
 Note that these two methods use a cache of configuration bytes to make
 subsequent modifications more efficient. This cache will not respect the
@@ -122,16 +133,25 @@ subsequent modifications more efficient. This cache will not respect the
 
 =cut
 
-has $_TIMINGbytes;
+has $_CONTROLbyte;
+has $_TIMINGbyte;
 
-async method _cached_read_TIMING ()
-{
-   return $_TIMINGbytes //= await $self->_read( REG_TIMING, 1 );
-}
+my %INTEG_to_msec = (
+   '13ms'  => 13.7,
+   '101ms' => 101,
+   '402ms' => 402,
+);
 
 async method read_config ()
 {
-   return { unpack_TIMING( await $self->_cached_read_TIMING ) };
+   my %config = unpack_CONFIG( pack "a1 a1",
+      $_CONTROLbyte //= await $self->_read( REG_CONTROL, 1 ),
+      $_TIMINGbyte  //= await $self->_read( REG_TIMING, 1 ),
+   );
+
+   $config{integ_msec} = $INTEG_to_msec{ $config{INTEG} };
+
+   return \%config;
 }
 
 async method change_config ( %changes )
@@ -140,9 +160,43 @@ async method change_config ( %changes )
 
    $config->{$_} = $changes{$_} for keys %changes;
 
-   my $TIMING = $_TIMINGbytes = pack_TIMING( %$config );
+   delete $config->{integ_msec};
 
-   await $self->_write( REG_TIMING, $TIMING );
+   my ( $CONTROL, $TIMING ) = unpack "a1 a1", pack_CONFIG( %$config );
+
+   if( $CONTROL ne $_CONTROLbyte ) {
+      await $self->_write( REG_CONTROL, $_CONTROLbyte = $CONTROL );
+   }
+   if( $TIMING ne $_TIMINGbyte ) {
+      await $self->_write( REG_TIMING, $_TIMINGbyte = $TIMING );
+   }
+}
+
+async method initialize_sensors ()
+{
+   await $self->power( 1 );
+
+   $self->enable_agc( 1 );
+
+   # Wait for one integration cycle
+   await $self->protocol->sleep( ( await $self->read_config )->{integ_msec} / 1000 );
+}
+
+=head2 enable_agc
+
+   $chip->enable_agc( $agc )
+
+Accessor for the internal gain-control algorithm. If enabled, the C<GAIN>
+configuration will be automatically controlled to switch between high- and
+low-level settings.
+
+=cut
+
+has $_agc_enabled;
+
+method enable_agc ( $agc )
+{
+   $_agc_enabled = $agc;
 }
 
 =head2 read_id
@@ -207,8 +261,13 @@ Enables or disables the main power control bits in the C<CONTROL> register.
 
 async method power ( $on )
 {
-   await $self->_write( REG_CONTROL, $on ? "\x03" : "\x00" );
+   await $self->_write( REG_CONTROL, $_CONTROLbyte = ( $on ? "\x03" : "\x00" ) );
 }
+
+declare_sensor light =>
+   method    => "read_lux",
+   units     => "lux",
+   precision => 2;
 
 =head2 read_lux
 
@@ -228,11 +287,7 @@ The controlling code may wish to use these to adjust the gain if required.
 
 =cut
 
-my %INTEG_to_msec = (
-   '13ms'  => 13.7,
-   '101ms' => 101,
-   '402ms' => 402,
-);
+has $_smallcount;
 
 async method read_lux ()
 {
@@ -242,10 +297,12 @@ async method read_lux ()
    );
 
    my $gain = $config->{GAIN};
-   my $msec = $INTEG_to_msec{ $config->{INTEG} };
+   my $msec = $config->{integ_msec};
 
    my $ch0 = $data0 * ( 16 / $gain ) * ( 402 / $msec );
    my $ch1 = $data1 * ( 16 / $gain ) * ( 402 / $msec );
+
+   return if !$ch0;
 
    my $ratio = $ch1 / $ch0;
 
@@ -266,6 +323,20 @@ async method read_lux ()
    }
    else {
       $lux = 0;
+   }
+
+   if( $_agc_enabled ) {
+      if( $gain == 1 and $data0 < 0x1000 and $data1 < 0x1000 ) {
+         $_smallcount++;
+         await $self->change_config( GAIN => 16 ) if $_smallcount >= 4;
+      }
+      else {
+         $_smallcount = 0;
+      }
+
+      if( $gain == 16 and ( $data0 > 0x8000 or $data1 > 0x8000 ) ) {
+         await $self->change_config( GAIN => 1 );
+      }
    }
 
    return $lux if !wantarray;

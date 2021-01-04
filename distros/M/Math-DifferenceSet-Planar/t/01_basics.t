@@ -1,6 +1,6 @@
-# Copyright (c) 2019 Martin Becker, Blaubeuren.  All rights reserved.
-# This package is free software; you can redistribute it and/or modify it
-# under the same terms as Perl itself.
+# Copyright (c) 2019-2021 Martin Becker, Blaubeuren.
+# This package is free software; you can distribute it and/or modify it
+# under the terms of the Artistic License 2.0 (see LICENSE file).
 
 # Before 'make install' is performed this script should be runnable with
 # 'make test'. After 'make install' it should work as 'perl 01_basics.t'
@@ -11,7 +11,7 @@ use strict;
 use warnings;
 use File::Spec;
 
-use Test::More tests => 107;
+use Test::More tests => 135;
 BEGIN { use_ok('Math::DifferenceSet::Planar') };
 
 #########################
@@ -51,6 +51,8 @@ ok(!Math::DifferenceSet::Planar->available(6));
 ok(!Math::DifferenceSet::Planar->available(4, 1));
 ok(!Math::DifferenceSet::Planar->available(0, 2));
 ok(!Math::DifferenceSet::Planar->available(2, 30));
+ok(!Math::DifferenceSet::Planar->available(3, -1));
+ok(!Math::DifferenceSet::Planar->available(2, 40));
 
 my $ds = Math::DifferenceSet::Planar->new(9);
 my @el = $ds->elements;
@@ -76,6 +78,11 @@ is($ds->element(10), undef);
 my $ds1 = $ds->translate(10);
 my @el1 = map { ($_ + 10) % 91 } @el;
 pds_ok($ds1, "@el1");
+is($ds1->start_element, 10);
+
+my $ds1a = $ds->translate(-1);
+my @el1a = map { ($_ - 1) % 91 } @el;
+pds_ok($ds1a, "@el1a");
 
 my @se = $ds->elements_sorted;
 is("@se", "@el");
@@ -87,6 +94,43 @@ my $ds2 = $ds1->canonize;
 pds_ok($ds2, "@el");
 $ds2 = $ds->canonize;
 pds_ok($ds2, "@el");
+
+my @e;
+foreach my $d (71, 0, 45) {
+    @e = $ds->find_delta($d);
+    ok(2 == @e);
+    ok(2 == grep { 0 <= $_ && $_ < 91 } @e);
+    my $delta = $e[1] - $e[0];
+    ok($delta == $d || $delta == $d - 91);
+}
+
+my $nods = Math::DifferenceSet::Planar->from_elements(
+    0, 1, 5, 7, 17, 28, 31, 49
+);
+my @noe = eval { $nods->find_delta(19) };
+ok(0 == @noe);
+like($@, qr/^bogus set: delta not found: 19 \(mod 57\)/);
+
+my @pe = $ds->peak_elements;
+my $dmax = ($ds->modulus - 1) / 2;
+ok(@pe == 2);
+ok(($pe[1] - $pe[0]) % $ds->modulus == $dmax);
+ok($ds->contains($pe[0]));
+ok($ds->contains($pe[1]));
+my @pe2 = $ds->peak_elements;
+is("@pe2", "@pe");
+my @set = grep { $ds->contains($_) } -1 .. 91;
+is("@set", "@el");
+my @set1 = grep { $ds1->contains($_) } -1 .. 91;
+is("@set1", "@el1s");
+
+my $eta = $ds->eta;
+ok(0 <= $eta && $eta < 91);
+my @mp  = $ds->multiply(3)->elements;
+my @te  = $ds->translate($eta)->elements;
+is("@mp", "@te");
+my $eta2 = $ds->eta;
+ok($eta == $eta2);
 
 SequentialIteratorTest: {
     local $Math::DifferenceSet::Planar::_MAX_ENUM_COUNT = 0;
@@ -196,7 +240,7 @@ $ds3 = eval { Math::DifferenceSet::Planar->from_elements(
     0, 2, 4
 )};
 is($ds3, undef);
-like($@, qr/^elements of PDS expected/);
+like($@, qr/^delta 1 elements missing/);
 
 $ds3 = eval { Math::DifferenceSet::Planar->from_elements(
     0, 1, 1
@@ -334,4 +378,12 @@ SKIP: {
     else {
         skip 'temporary file not writable', 2;
     }
+}
+
+MEMO_TEST: {
+    local $Math::DifferenceSet::Planar::_MAX_MEMO_COUNT = 1;
+    my $ds = Math::DifferenceSet::Planar->from_elements(
+        0, 1, 3, 7, 15, 31, 36, 54, 63
+    );
+    pds_ok($ds, '0 1 3 7 15 31 36 54 63');
 }

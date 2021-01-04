@@ -3,9 +3,8 @@ Date-Holidays-KZ
 Determine Kazakhstan official holidays and business days
 
 Sources:
-- 2018 https://online.zakon.kz/Document/?doc_id=33843977#pos=25;-101&sdoc_params=text%3D%25D0%259F%25D1%2580%25D0%25BE%25D0%25B8%25D0%25B7%25D0%25B2%25D0%25BE%25D0%25B4%25D1%2581%25D1%2582%25D0%25B2%25D0%25B5%25D0%25BD%25D0%25BD%25D1%258B%25D0%25B9%2520%25D0%25BA%25D0%25B0%25D0%25BB%25D0%25B5%25D0%25BD%25D0%25B4%25D0%25B0%25D1%2580%25D1%258C%25202018%26mode%3Dindoc%26topic_id%3D33843977%26spos%3D1%26tSynonym%3D1%26tShort%3D1%26tSuffix%3D1&sdoc_pos=0
-- 2019 https://online.zakon.kz/Document/?doc_id=34186053#pos=10;-245&sdoc_params=text%3D%25D0%259F%25D1%2580%25D0%25BE%25D0%25B8%25D0%25B7%25D0%25B2%25D0%25BE%25D0%25B4%25D1%2581%25D1%2582%25D0%25B2%25D0%25B5%25D0%25BD%25D0%25BD%25D1%258B%25D0%25B9%2520%25D0%25BA%25D0%25B0%25D0%25BB%25D0%25B5%25D0%25BD%25D0%25B4%25D0%25B0%25D1%2580%25D1%258C%26mode%3Dindoc%26topic_id%3D34186053%26spos%3D1%26tSynonym%3D1%26tShort%3D1%26tSuffix%3D1&sdoc_pos=0
-- 2020 https://online.zakon.kz/Document/?doc_id=35202565#pos=32;-50&sdoc_params=text%3D%25D0%259F%25D1%2580%25D0%25BE%25D0%25B8%25D0%25B7%25D0%25B2%25D0%25BE%25D0%25B4%25D1%2581%25D1%2582%25D0%25B2%25D0%25B5%25D0%25BD%25D0%25BD%25D1%258B%25D0%25B9%2520%25D0%25BA%25D0%25B0%25D0%25BB%25D0%25B5%25D0%25BD%25D0%25B4%25D0%25B0%25D1%2580%25D1%258C%2520%25D0%25BD%25D0%25B0%25202020%2520%25D0%25B3%25D0%25BE%25D0%25B4%26mode%3Dindoc%26topic_id%3D35202565%26spos%3D1%26tSynonym%3D1%26tShort%3D1%26tSuffix%3D1&sdoc_pos=0
+https://online.zakon.kz "Производственный календарь YYYY"
+see saved doc in docs/
 
 INSTALLATION
 
@@ -39,10 +38,9 @@ Do something with code and test:
 	(don't forget change release in dist.init)
 	carton exec dzil build
 	(git commit/push)
-	carton exec dzil release
-Clean:
-	carton exec dzil clean (build)
-	perl dev/clean-dev.pl (dependencies)
+	carton exec dzil release (sets the tag verstion in git)
+Clean dependencies and build:
+	perl dev/clean-dev.pl
 
 
 SUPPORT AND DOCUMENTATION

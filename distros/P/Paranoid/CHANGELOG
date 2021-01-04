@@ -1,5 +1,22 @@
 CHANGELOG
 
+v2.08 (2020/12/31)
+==================
+--Updated licensing information to reflect Paranoid trademark impact
+--Added IMPORT LISTS section to all modules with exportable functions
+Paranoid::Args:
+--Added template list for exports
+Paranoid::Data::AVLTree:
+--Added a tree & node class implementing AVL-balanced tree structures
+Paranoid:Debug:
+--Added constants list for exports
+--Documentation updates
+Paranoid::Log:
+--Minor internal refactoring
+Paranoid::Process:
+--Added pcommFork to facilitate forking with bi-directional process
+  communication
+
 v2.07 (2019/02/01)
 ==================
 Paranoid::Args:

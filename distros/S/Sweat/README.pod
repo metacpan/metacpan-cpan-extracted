@@ -111,7 +111,7 @@ Alternately, you can run these commands under `sudo` to install Sweat at the sys
 
 Clone this repository locally, and then run these commands:
 
- cpanm --installdeps .
+ cpanm --installdeps --notest .
  perl Build.PL
  perl Build build
  perl Build install    # run under sudo to install at system-level

@@ -9,11 +9,9 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '0.46';
+our $VERSION = '0.47';
 
 use Future;
-
-use Scalar::Util qw( weaken );
 
 =head1 NAME
 
@@ -143,7 +141,7 @@ sub enter
    };
 
    my $retf = $down_f->then( $code )->on_ready( $up );
-   $self->{waitf} or weaken( $self->{waitf} = $retf );
+   $self->{waitf} or $self->{waitf} = $retf;
    return $retf;
 }
 

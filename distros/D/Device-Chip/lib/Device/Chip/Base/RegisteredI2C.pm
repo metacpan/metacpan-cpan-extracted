@@ -3,15 +3,15 @@
 #
 #  (C) Paul Evans, 2015-2019 -- leonerd@leonerd.org.uk
 
-package Device::Chip::Base::RegisteredI2C;
+use v5.26;
+use Object::Pad 0.19;
 
-use strict;
-use warnings;
-use base qw( Device::Chip );
+package Device::Chip::Base::RegisteredI2C 0.16;
+class Device::Chip::Base::RegisteredI2C extends Device::Chip;
 
 use utf8;
 
-our $VERSION = '0.15';
+use Future::AsyncAwait 0.38; # async method
 
 use Carp;
 
@@ -51,10 +51,8 @@ of the C<$len> parameter to the register reading and writing methods.
 
 =cut
 
-sub REG_DATA_BYTES
+method REG_DATA_BYTES
 {
-   my $self = shift;
-
    my $bytes = int( ( $self->REG_DATA_SIZE + 7 ) / 8 );
 
    # cache it for next time
@@ -66,74 +64,68 @@ sub REG_DATA_BYTES
 
 =head1 METHODS
 
-The following methods documented with a trailing call to C<< ->get >> return
-L<Future> instances.
+The following methods documented in an C<await> expression return L<Future>
+instances.
 
 =cut
 
+has @_regcache;
+
 =head2 read_reg
 
-   $val = $chip->read_reg( $reg, $len )->get
+   $val = await $chip->read_reg( $reg, $len );
 
 Performs a C<write_then_read> I²C transaction, sending the register number as
 a single byte value, then attempts to read the given number of register slots.
 
 =cut
 
-sub read_reg
+async method read_reg ( $reg, $len, $__forcecache = 0 )
 {
-   my $self = shift;
-   my ( $reg, $len, $_forcecache ) = @_;
-
    $self->REG_ADDR_SIZE == 8 or
       croak "TODO: Currently unable to cope with REG_ADDR_SIZE != 8";
 
    my $f = $self->protocol->write_then_read( pack( "C", $reg ), $len * $self->REG_DATA_BYTES );
 
    foreach my $offs ( 0 .. $len-1 ) {
-      $_forcecache || $self->{devicechip_regcache}[$reg + $offs] and
-         $self->{devicechip_regcache}[$reg + $offs] = $f->then( sub {
-            Future->done(
-               my $bytes = substr $_[0], $offs * $self->REG_DATA_BYTES, $self->REG_DATA_BYTES
-            );
+      $__forcecache || $_regcache[$reg + $offs] and
+         $_regcache[$reg + $offs] = $f->then( async sub ( $bytes ) {
+            return substr $bytes, $offs * $self->REG_DATA_BYTES, $self->REG_DATA_BYTES
          });
    }
 
-   return $f;
+   return await $f;
 }
 
 =head2 write_reg
 
-   $chip->write_reg( $reg, $val )->get
+   await $chip->write_reg( $reg, $val );
 
 Performs a C<write> I²C transaction, sending the register number as a single
 byte value followed by the data to write into it.
 
 =cut
 
-sub write_reg
+async method write_reg ( $reg, $val, $__forcecache = 0 )
 {
-   my $self = shift;
-   my ( $reg, $val, $_forcecache ) = @_;
-
    $self->REG_ADDR_SIZE == 8 or
       croak "TODO: Currently unable to cope with REG_ADDR_SIZE != 8";
 
    my $len = length( $val ) / $self->REG_DATA_BYTES;
 
    foreach my $offs ( 0 .. $len-1 ) {
-      $_forcecache || defined $self->{devicechip_regcache}[$reg + $offs] and
-         $self->{devicechip_regcache}[$reg + $offs] = Future->done(
+      $__forcecache || defined $_regcache[$reg + $offs] and
+         $_regcache[$reg + $offs] = Future->done(
             my $bytes = substr $val, $offs * $self->REG_DATA_BYTES, $self->REG_DATA_BYTES
          );
    }
 
-   $self->protocol->write( pack( "C", $reg ) . $val );
+   await $self->protocol->write( pack( "C", $reg ) . $val );
 }
 
 =head2 cached_read_reg
 
-   $val = $chip->cached_read_reg( $reg, $len )->get
+   $val = await $chip->cached_read_reg( $reg, $len );
 
 Implements a cache around the given register location. Returns the last value
 known to have been read from or written to the register; or reads it from the
@@ -148,23 +140,20 @@ chip itself will update.
 
 =cut
 
-sub cached_read_reg
+async method cached_read_reg ( $reg, $len )
 {
-   my $self = shift;
-   my ( $reg, $len ) = @_;
-
    my @f;
 
    my $endreg = $reg + $len;
 
    while( $reg < $endreg ) {
-      if( defined $self->{devicechip_regcache}[$reg] ) {
-         push @f, $self->{devicechip_regcache}[$reg++];
+      if( defined $_regcache[$reg] ) {
+         push @f, $_regcache[$reg++];
       }
       else {
          $len = 1;
          $len++ while $reg + $len < $endreg and
-            !defined $self->{devicechip_regcache}[ $reg + $len ];
+            !defined $_regcache[ $reg + $len ];
 
          my $thisreg = $reg;
          push @f, $self->read_reg( $reg, $len, "forcecache" );
@@ -173,14 +162,12 @@ sub cached_read_reg
       }
    }
 
-   return Future->needs_all( @f )->then(sub {
-      return Future->done( join "", @_ );
-   });
+   return join "", await Future->needs_all( @f );
 }
 
 =head2 cached_write_reg
 
-   $chip->cached_write_reg( $reg, $val )->get
+   await $chip->cached_write_reg( $reg, $val );
 
 Optionally writes a new value for the given register location. This method
 will invoke C<write_reg> except if the register already exists in the cache
@@ -193,37 +180,33 @@ chip itself will update.
 
 =cut
 
-sub cached_write_reg
+async method cached_write_reg ( $reg, $val )
 {
-   my $self = shift;
-   my ( $reg, $val ) = @_;
-
    my $len = length( $val ) / ( my $datasize = $self->REG_DATA_BYTES );
 
-   Future->needs_all(
+   my @current = await Future->needs_all(
       map {
-         $self->{devicechip_regcache}[$reg + $_] // Future->done( "" )
+         $_regcache[$reg + $_] // Future->done( "" )
       } 0 .. $len-1
-   )->then( sub {
-      my @current = @_;
-      my @want    = $val =~ m/(.{$datasize})/g;
+   );
 
-      # Determine chunks that need rewriting
-      my @f;
-      my $offs = 0;
-      while( $offs < $len ) {
-         $offs++, next if $current[$offs] eq $want[$offs];
+   my @want = $val =~ m/(.{$datasize})/g;
 
-         my $startoffs = $offs++;
-         $offs++ while $offs < $len and
-            $current[$offs] ne $want[$offs];
+   # Determine chunks that need rewriting
+   my @f;
+   my $offs = 0;
+   while( $offs < $len ) {
+      $offs++, next if $current[$offs] eq $want[$offs];
 
-         push @f, $self->write_reg( $reg + $startoffs,
-            join( "", @want[$startoffs..$offs-1] ), "forcecache" );
-      }
+      my $startoffs = $offs++;
+      $offs++ while $offs < $len and
+         $current[$offs] ne $want[$offs];
 
-      return Future->needs_all( @f );
-   });
+      push @f, $self->write_reg( $reg + $startoffs,
+         join( "", @want[$startoffs..$offs-1] ), "forcecache" );
+   }
+
+   await Future->needs_all( @f );
 }
 
 =head1 AUTHOR

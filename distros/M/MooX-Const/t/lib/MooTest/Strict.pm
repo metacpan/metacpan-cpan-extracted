@@ -26,7 +26,7 @@ has baz => (
 );
 
 has bo => (
-    is  => 'wo',
+    is  => 'once',
     isa => HashRef,
     strict => 0,
 );

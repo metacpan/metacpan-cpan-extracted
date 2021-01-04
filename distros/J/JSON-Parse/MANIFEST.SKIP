@@ -48,6 +48,15 @@ benchmarks
 ^lib/JSON/Tokenize\.pod\.tmpl$
 # Obsolete files
 ^obsolete/.*$
+# Files which are so that the distribution can be built from the
+# github repository rather than the CPAN distribution file.
+^copy\.pl$
+^copied/.*$
+# Author version change script
+^versionup\.pl$
+# CI control files
+^\.travis\.yml$
+^build/.*$
 # Local variables:
 # comment-start: "#" 
 # End:

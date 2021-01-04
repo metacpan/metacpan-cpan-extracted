@@ -1,0 +1,532 @@
+=head1 NAME
+
+Dist::Mgr - Distribution development cycle toolkit
+
+=for html
+<a href="https://github.com/stevieb9/dist-mgr/actions"><img src="https://github.com/stevieb9/dist-mgr/workflows/CI/badge.svg"/></a>
+<a href='https://coveralls.io/github/stevieb9/dist-mgr?branch=master'><img src='https://coveralls.io/repos/stevieb9/dist-mgr/badge.svg?branch=master&service=github' alt='Coverage Status' /></a>
+
+=head1 DESCRIPTION
+
+This distribution is essentially a bunch of tools that revolve around a base
+distribution created with C<module-starter>.
+
+At this time, it relies on using L<Module::Starter> for initial distribution
+creation, Github for repository and bugtracker, and the L<ExtUtils::MakeMaker>
+build system, which utilizes C<Makefile.PL> files.
+
+=head1 SYNOPSIS
+
+    use Dist::Mgr qw(:all)
+
+    my $results = version_bump('2.02');
+
+    my $file_versions = version_info();
+
+=head1 EXPORT_OK
+
+We do not automatically import anything into your namespace, you must request
+functionality explicitly. Use the C<:all> tag, or have a peruse through the
+L</FUNCTIONS> section for what's available.
+
+=head1 FUNCTIONS
+
+=head2 add_bugtracker
+
+Adds bugtracker information to the C<Makefile.PL> file. If the required
+C<META_MERGE> section doesn't exist, we'll create it.
+
+Currently, only Github is supported.
+
+I<Use>: After L</init>, or any time.
+
+I<Parameters>:
+
+    $author
+
+I<Mandatory, String>: The Github username of the software author. For example,
+mine is C<stevieb9>.
+
+    $repository
+
+I<Mandatory, String>: The name of the repository. For example, the repository
+name for this distribution is C<dist-mgr>.
+
+    $makefile
+
+I<Optional, String>: The path and name of the C<Makefile.PL> file to use. We
+default to C<./Makefile.PL>.
+
+I<Returns>: C<0> upon success.
+
+=head2 add_repository
+
+Adds repository information to the C<Makefile.PL> file. If the required
+C<META_MERGE> section doesn't exist, we'll create it.
+
+Currently, only Github is supported.
+
+I<Use>: After L</init>, or any time.
+
+I<Parameters>:
+
+    $author
+
+I<Mandatory, String>: The Github username of the software author. For example,
+mine is C<stevieb9>.
+
+    $repository
+
+I<Mandatory, String>: The name of the repository. For example, the repository
+name for this distribution is C<dist-mgr>.
+
+    $makefile
+
+I<Optional, String>: The path and name of the C<Makefile.PL> file to use. We
+default to C<./Makefile.PL>.
+
+I<Returns>: C<0> upon success.
+
+=head2 changes
+
+Creates or updates the initial L<Module::Starter> C<Changes> file to my custom
+standard format.
+
+I<Use>: After L</init>.
+
+I<Parameters>:
+
+    $module
+
+I<Mandatory, String>: The name of the module (eg. C<Acme-STEVEB>).
+
+    $file
+
+I<Optional, String>: The path and name of the C<Changes> file to operate on. By
+default, we operate on the C<Changes> file within the current working directory,
+C<.>.
+
+I<Returns:> The contents that were added into the file.
+
+=head2 changes_bump
+
+Prepares the C<Changes> file for a new development cycle after a release.
+
+I<Use>: After L</changes_date> and the release has been published.
+
+I<Parameters>:
+
+    $version
+
+I<Mandatory, Version>: A valid Perl version number. Must be higher than the
+previous release version.
+
+    $file
+
+I<Optional, String>: The name of the C<Changes> file to operate on. Defaults to
+the one in the current working directory.
+
+=head2 changes_date
+
+Replaces the C<UNREL> tag with today's date, in preparation of a release.
+
+I<Use>: As part of the release cycle, before release and L</changes_bump>.
+
+I<Parameters>:
+
+    $file
+
+I<Optional, String>: The name of the C<Changes> file to operate on. By default,
+we operate on the one in the current working directory.
+
+=head2 ci_badges
+
+Inserts various CI and coverage badges into module files.
+
+I<Use>: After L</init>, or any time.
+
+I<Parameters>:
+
+    $author
+
+I<Mandatory, String>: The repository owner (eg. mine is 'stevieb9').
+
+    $repository
+
+I<Mandatory, String>: The name of the repository (eg. this one is
+'dist-mgr').
+
+    $fs_entry
+
+I<Optional, String>: The path and name of a Perl module file, or a directory
+that contains Perl module files. If a directory is sent in, we'll operate
+recursively.
+
+I<Returns>: C<0> upon success.
+
+=head2 ci_github
+
+Installs a Github Actions configuration file into C<.github/workflows>. We'll
+create the directory if it doesn't exist.
+
+I<Use>: Any time.
+
+I<Parameters>:
+
+    $os
+
+I<Optional, Array Reference>: A list of the Operating Systems you want to run
+your tests on.
+
+I<Valid values>: C<l>, C<w>, C<m>, where:
+
+    l == Linux (Ubuntu to be specific)
+    w == Windows
+    m == MacOS
+
+I<Defaults>: Test suite will be run on Operating Systems C<ubuntu-latest>,
+C<windows-latest>, C<macos-latest>. Each OS will run the tests on Perls C<5.32>,
+C<5.24>, C<5.18>, C<5.14> and C<5.10>.
+
+I<Returns>: An array of the contents of the generated file.
+
+=head2 cpan_upload
+
+Uploads the distribution tarball to PAUSE.
+
+I<Use>: After L</make_dist>.
+
+I<Parameters>:
+
+    $tarball_name
+
+I<Mandatory, String>: The name of the distribution's tarball file.
+
+    %args
+
+I<Optional, Hash>: See L<CPAN::Uploader> for full details. A couple of notes:
+
+=over
+
+=item The C<user> and C<password> parameters can be set in the C<CPAN_USERNAME>
+and C<CPAN_PASSWORD> environment variables instead of passing them in with the
+hash.
+
+=item You can add C<< dry_run => 1 >> to the hash to skip the actual upload
+process.
+
+=back
+
+I<Returns>: C<1> (true) on success.
+
+=head2 git_add
+
+Adds all files in the current working directory to the repository.
+
+B<Note>: Calls C<Dist::Mgr::Git::_git_add()> internally.
+
+I<Use>: Any time.
+
+I<Parameters>:
+    $verbose
+
+I<Optional, Bool>: Set to true to display the Git command output. Defaults to
+false.
+
+I<Returns>: Exit code from the C<system> call.
+
+=head2 git_ignore
+
+Generates a C<.gitignore> file.
+
+I<Use>: Any time.
+
+I<Parameters>:
+
+    $directory
+
+I<Optional, String>: The directory where we'll create the file. If not
+specified, we'll create it in the current directory, C<.>.
+
+I<Returns>: An array of the file's contents.
+
+=head2 git_commit
+
+Commits all changes to the repository.
+
+B<Note>: Calls C<Dist::Mgr::Git::_git_commit()> internally.
+
+I<Use>: Any time.
+
+I<Parameters>:
+
+    $version
+
+I<Mandatory, String>: The version of the distribution. This will be used in the
+commit message.
+
+    $verbose
+
+I<Optional, Bool>: Set to true to display the Git command output. Defaults to
+false.
+
+I<Returns>: Exit code from the C<system> call.
+
+=head2 git_push
+
+Pushes the repository to Github.
+
+B<Note>: Calls C<Dist::Mgr::Git::_git_push()> internally.
+
+I<Use>: Any time.
+
+I<Parameters>:
+
+    $verbose
+
+I<Optional, Bool>: Set to true to display the Git command output. Defaults to
+false.
+
+I<Returns>: Exit code from the C<system> call.
+
+=head2 git_pull
+
+Does a C<git pull> to fetch any update from the upstream.
+
+B<Note>: Calls C<Dist::Mgr::Git::_git_pull()> internally.
+
+I<Use>: Any time.
+
+I<Parameters>:
+
+    $verbose
+
+I<Optional, Bool>: Set to true to display the Git command output. Defaults to
+false.
+
+I<Returns>: Exit code from the C<system> call.
+
+=head2 git_release
+
+Commits and pushes the repository, and executes the CI test pipeline (if
+available).
+
+Internally, this method calls L</git_pull>, L</git_commit> then L</git_push>,
+all with their respective C<$verbose> flags set to false. If you want to enable
+verbosity, instead of calling this function, call each one of those in order and
+set C<$verbose> to true in each one.
+
+I<Use>: After L</make_test>.
+
+I<Parameters>:
+
+    $version
+
+I<Mandatory, String>: The release version of the distribution.
+
+    $wait_for_ci
+
+I<Optional, Bool>: Whether to wait for keyboard interaction while CI testing
+runs. If set, we'll wait for you to press either C<CTRL-C> to signifiy tests
+were successful and we should continue with the release cycle, or C<ENTER> to
+signify that we should stop and wait for you to fix any test errors before
+running again.
+
+I<Default>: C<1>, Enabled.
+
+I<Returns>: C<0> on test success (CTRL-C), C<1> on test failure (ENTER).
+
+=head2 git_tag
+
+Tags the current state of the repository.
+
+I<Parameters>:
+
+    $tag
+
+I<Mandatory, String>: The tag for the commit.
+
+B<Note>: Calls C<Dist::Mgr::Git::_git_tag()> internally.
+
+I<Use>: Any time.
+
+I<Returns>: Exit code from the C<system> call.
+
+=head2 init
+
+Initializes a new distribution using L<Module::Starter>. The new directory will
+be placed into the current working directory (C<.>).
+
+I<Use>: To create a brand new distribution skeleton.
+
+I<Parameters>:
+
+    module  => "Acme-STEVEB"
+
+I<Mandatory, String>: The name of the main module of the distribution.
+
+    author  => "Steve Bertrand"
+
+I<Mandatory, String>: The name of the distribution's author.
+
+    email  => "steveb@cpan.org"
+
+I<Mandatory, String>: The email address of the author.
+
+    license  => "artistic2"
+
+I<Optional, String>: The license to apply to the new distribution. Defaults to
+C<artistic2>. See L<Module::Starter> for valid entries.
+
+=head2 make_dist
+
+Perform a C<make dist> that creates a CPAN-ready distribution tarball file in
+the current working directory.
+
+I<Use>: After all other release functions have been called.
+
+I<Returns>: C<0> on success. Anything other than C<0> is a failure.
+
+=head2 make_distclean
+
+Perform a C<make distclean> on the project directory.
+
+I<Use>: After all other post-release functions have been called.
+
+I<Returns>: C<0> on success. Anything other than C<0> is a failure.
+
+=head2 make_test
+
+Perform a C<%^X Makefile.PL> and C<make test>.
+
+I<Use>: After L</changes_date> and before all other release cycle functions.
+
+B<Note>: Do not call this function from within the test suite, or else it'll
+spin off into an infinite loop.
+
+B<Note>: Always check the return value of this function before proceeding with
+the rest of the release cycle. Zero C<0> is success, everything else is fail.
+
+I<Returns>: C<0> on success. Anything other than C<0> is a failure.
+
+=head2 manifest_skip
+
+Generates a C<MANIFEST.SKIP> file.
+
+I<Use>: Any time.
+
+I<Parameters>:
+
+    $directory
+
+I<Optional, String>: The directory where we'll create the file. If not
+specified, we'll create it in the current directory, C<.>.
+
+I<Returns>: An array of the file's contents.
+
+=head2 move_distribution_files
+
+After an L</init>, this method will scoop up all of the files and directories
+from within the newly created temp module directory into the current working
+dir, then remove the temp module directory.
+
+I<Use>: Immediately after L</init>.
+
+I<Parameters>:
+
+    $module
+
+I<Mandatory, String>: The name of the module that was created with L</init>, eg.
+C<Acme-STEVEB>.
+
+I<Returns>: C<0> upon success.
+
+=head2 remove_unwanted_files
+
+Removes unwanted file system entries. We always operate from the perspective of
+the current working directory (C<.>).
+
+I<Use>: Immediately after L</init> and L</move_distribution_files>.
+
+=head2 version_bump
+
+Finds and updates the version number of a Perl module file, or all Perl
+module files in a directory structure.
+
+I<Use>: After publishing a release.
+
+I<Parameters>:
+
+    $version
+
+I<Mandatory, String>: The new version to update to.
+
+=head3 Dry run mode
+
+The C<$version> parameter can be prepended with an optional dash (C<->), and if
+so, we'll operate in "dry-run" mode, where we'll return the results, but won't
+have written to any files. Eg: C<version_bump('-1.01')>.
+
+    $fs_entry
+
+I<Optional, String>: The directory or file to operate on. If a directory is
+sent in, we'll iterate over all files in all directories recursively.
+
+I<Default>: C<lib/>
+
+I<Returns>: An HoH:
+
+    $VAR1 = {
+        't/data/work/Two.pm' => {
+            'dry_run'   => 0,
+            'from'      => '2.66',
+            'to'        => '2.67',
+            'content'   => '' # Module file code (snipped for brevity)
+        },
+        't/data/work/One.pm' => {
+            'dry_run'   => 0,
+            'from'      => '2.66',
+            'to'        => '2.67',
+            'content'   => '' # Module file code (snipped for brevity)
+        },
+    };
+
+=head2 version_info
+
+Fetches the file version information of Perl module files. Can operate on a
+single file, or iterate over a directory structure.
+
+I<Use>: Any time.
+
+I<Parameters>:
+
+    $fs_entry
+
+I<Optional, String>: The directory or file to operate on. If a directory is
+sent in, we'll iterate over all files in all directories recursively.
+
+I<Default>: C<lib/>
+
+I<Returns>: Hash reference:
+
+    $VAR1 = {
+        't/data/orig/One.pm'    => '2.66'
+        't/data/orig/Two.pm'    => '2.66',
+        't/data/orig/Three.pm'  => '2.66',
+        't/data/orig/Bad.pm'    => undef,   # $VERSION can't be parsed
+        't/data/orig/No.pm'     => undef,   # No $VERSION defined
+    };
+
+=head1 AUTHOR
+
+Steve Bertrand, C<< <steveb at cpan.org> >>
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright 2020 Steve Bertrand.
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of the the Artistic License (2.0). You may obtain a
+copy of the full license at:
+
+L<http://www.perlfoundation.org/artistic_license_2_0>

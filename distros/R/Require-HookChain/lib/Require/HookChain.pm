@@ -3,7 +3,7 @@ package Require::HookChain;
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2020-11-13'; # DATE
 our $DIST = 'Require-HookChain'; # DIST
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.003'; # VERSION
 
 use strict;
 use warnings;
@@ -117,21 +117,22 @@ Require::HookChain - Chainable require hook
 
 =head1 VERSION
 
-This document describes version 0.002 of Require::HookChain (from Perl distribution Require-HookChain), released on 2020-11-13.
+This document describes version 0.003 of Require::HookChain (from Perl distribution Require-HookChain), released on 2020-11-13.
 
 =head1 SYNOPSIS
 
 Say you want to create a require hook to prepend some code to the module source
-code that is loaded. In your hook source, in F<Require/HookChain/prepend.pm>:
+code that is loaded. In your hook source, in
+F<Require/HookChain/munge/prepend.pm>:
 
- package Require::HookChain::prepend;
+ package Require::HookChain::munge::prepend;
 
  sub new {
      my ($class, $preamble) = @_;
      bless { preamble => $preamble }, $class;
  }
 
- sub Require::HookChain::prepend::INC {
+ sub Require::HookChain::munge::prepend::INC {
      my ($self, $r) = @_;
 
      # safety, in case we are not called by Require::HookChain
@@ -147,7 +148,7 @@ code that is loaded. In your hook source, in F<Require/HookChain/prepend.pm>:
 
 In a code to use this hook:
 
- use Require::HookChain prepend => 'use strict';
+ use Require::HookChain 'munge::prepend' => 'use strict';
  use Foo::Bar; # Foo/Bar.pm will be loaded with added 'use strict;' at the start
 
 Install another hook, but put it at the end of C<@INC> instead of at the

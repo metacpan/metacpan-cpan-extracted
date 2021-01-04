@@ -45,4 +45,8 @@ time_about sub {
    ok( $f1->is_ready, '$f1 is also ready after ->await' );
 }
 
+time_about sub {
+   Future::IO->alarm( time() + 0.2 )->get;
+}, 0.2, 'Future::IO->alarm( now + 0.2 ) sleeps 0.2 seconds';
+
 done_testing;

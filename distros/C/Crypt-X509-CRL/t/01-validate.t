@@ -10,7 +10,7 @@ my $crl;
 my $decoded;
 
 # Load a known good CRL
-open FH, "./good.crl";
+open FH, "t/good.crl";
 binmode FH;
 $crl = undef;
 while ( <FH> ) {
@@ -24,7 +24,7 @@ $decoded = Crypt::X509::CRL->new( crl => $crl );
 ok ( ! $decoded->error() );
 
 # Load a known bad CRL
-open FH, "./bad.crl";
+open FH, "t/bad.crl";
 binmode FH;
 $crl = undef;
 while ( <FH> ) {

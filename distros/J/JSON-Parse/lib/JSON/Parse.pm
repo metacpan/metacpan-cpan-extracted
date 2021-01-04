@@ -7,6 +7,7 @@ require Exporter;
 		   json_to_perl
 		   parse_json
 		   parse_json_safe
+		   read_json
 		   valid_json
 		   validate_json
 	       /;
@@ -17,7 +18,7 @@ require Exporter;
 use warnings;
 use strict;
 use Carp;
-our $VERSION = '0.57';
+our $VERSION = '0.59';
 require XSLoader;
 XSLoader::load (__PACKAGE__, $VERSION);
 
@@ -64,19 +65,22 @@ sub validate_json
     goto &assert_valid_json;
 }
 
+sub read_json
+{
+    goto &json_file_to_perl;
+}
+
 sub valid_json
 {
     my ($json) = @_;
     if (! $json) {
 	return 0;
     }
-    eval {
+    my $ok = eval {
 	assert_valid_json (@_);
+	1;
     };
-    if ($@) {
-	return 0;
-    }
-    return 1;
+    return $ok;
 }
 
 sub json_file_to_perl

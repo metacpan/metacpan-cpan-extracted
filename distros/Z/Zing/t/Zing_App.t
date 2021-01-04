@@ -122,6 +122,9 @@ method: store
 method: store_namespace
 method: store_specification
 method: term
+method: table
+method: table_namespace
+method: table_specification
 method: timer
 method: timer_namespace
 method: timer_specification
@@ -1948,6 +1951,64 @@ term(Any @args) : Term
 
 =cut
 
+=method table
+
+The table method returns a new L<Zing::Table> object based on the currenrt C<env>.
+
+=signature table
+
+table(Any @args) : Table
+
+=example-1 table
+
+  # given: synopsis
+
+  my $table = $app->table(
+    name => 'people',
+  );
+
+  # Zing::Table->new(...)
+
+=cut
+
+=method table_namespace
+
+The table_namespace method returns a wordlist that represents a I<table> class
+name.
+
+=signature table_namespace
+
+table_namespace() : ArrayRef[Str]
+
+=example-1 table_namespace
+
+  # given: synopsis
+
+  $app->table_namespace;
+
+  # ['zing', 'table']
+
+=cut
+
+=method table_specification
+
+The table_specification method returns a I<table> specification, class name and
+args, for the reifier.
+
+=signature table_specification
+
+table_specification(Any @args) : Tuple[ArrayRef, ArrayRef]
+
+=example-1 table_specification
+
+  # given: synopsis
+
+  $app->table_specification;
+
+  # [['zing', 'table'], [@args]]
+
+=cut
+
 =method timer
 
 The timer method returns a new L<Zing::Timer> object based on the currenrt C<env>.
@@ -2777,6 +2838,26 @@ $subs->example(-1, 'store_specification', 'method', fun($tryable) {
 
 $subs->example(-1, 'term', 'method', fun($tryable) {
   ok my $result = $tryable->result;
+
+  $result
+});
+
+$subs->example(-1, 'table', 'method', fun($tryable) {
+  ok my $result = $tryable->result;
+
+  $result
+});
+
+$subs->example(-1, 'table_namespace', 'method', fun($tryable) {
+  ok my $result = $tryable->result;
+  is_deeply $result, ['zing', 'table'];
+
+  $result
+});
+
+$subs->example(-1, 'table_specification', 'method', fun($tryable) {
+  ok my $result = $tryable->result;
+  is_deeply $result, [['zing', 'table'], []];
 
   $result
 });

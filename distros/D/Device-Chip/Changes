@@ -1,5 +1,10 @@
 Revision history for Device-Chip
 
+0.16    2021-01-01
+        [CHANGES]
+         * Initial implementation of Device::Chip::Sensor API
+         * Updated base classes to use Object::Pad
+
 0.15    2020-11-25
         [CHANGES]
          * Migrate Test::Device::Chip::Adapter testing logic into

@@ -28,3 +28,6 @@ MYMETA..*
 ^bench\..*$
 # Author tests can be downloaded from github.
 ^xt/.*$
+^copied/.*$
+^\.(github|travis).*$
+^versionup\.pl$

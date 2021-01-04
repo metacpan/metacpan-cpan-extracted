@@ -1,3 +1,13 @@
+2021-01-04  Dave Cross <dave@perlhacks.com>
+
+  * Version 1.6.3
+
+  * Add YAML to configure_requires
+
+  * Improved Build.pm
+
+  * Fixed pod coverage test
+
 2020-11-17  Dave Cross <dave@perlhacks.com>
 
   * Version 1.6.1

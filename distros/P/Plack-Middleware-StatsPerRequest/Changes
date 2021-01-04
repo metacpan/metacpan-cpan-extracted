@@ -1,5 +1,10 @@
 Revision history for Plack::Middleware::StatsPerRequest
 
+0.902     2021-01-03 18:03:04+01:00
+    - dist housekeeping: github issues,
+      Dist::Zilla::PluginBundle::Author::DOMM
+
+
 0.901   2018-03-02T07:45:22
     - add has_headers
     - use usleep in test to sleep 1.5 secs to work around some

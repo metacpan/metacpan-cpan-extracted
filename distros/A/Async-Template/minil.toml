@@ -1,0 +1,6 @@
+name = "Async-Template"
+authority = "cpan:OKLAS"
+module_maker="ModuleBuildTiny"
+static_install = "auto"
+readme_from="lib/Async/Template.pm"
+

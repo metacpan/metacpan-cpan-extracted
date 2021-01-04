@@ -6,7 +6,9 @@ use warnings qw(FATAL utf8);	   # Fatalize encoding glitches.
 use File::Spec;
 use File::Temp;
 use GraphViz2;
+use Graph;
 use Test::More;
+use Test::Snapshot;
 
 # ------------------------------------------------
 
@@ -58,5 +60,20 @@ foreach my $tuple ( @methods ) {
 }
 
 is GraphViz2::escape_some_chars(q{\\\\"}, '\\{\\}\\|<>\\s"'), '\\\\\\"', 'quoting';
+
+for ([0,0], [0,1], [1,0], [1,1]) {
+  my ($is_multiv, $is_multie) = @$_;
+  my ($v_attr, $e_attr) = qw(set_vertex_attribute set_edge_attribute);
+  $v_attr .= '_by_id' if $is_multiv;
+  $e_attr .= '_by_id' if $is_multie;
+  my $g = Graph->new(multiedged => $is_multie, multivertexed => $is_multiv);
+  $g->$v_attr(@$_, graphviz => { label => "@$_" })
+    for $is_multiv ? ([ qw(a w) ], [ qw(a z) ]) : [ qw(a) ];
+  $g->$e_attr(@$_, graphviz => { label => "@$_" })
+    for $is_multie ? ([ qw(a b x) ], [ qw(a b y) ]) : [ qw(a b) ];
+  my $gv = GraphViz2->from_graph($g);
+  is_deeply_snapshot $gv->node_hash, "mve nodes $is_multiv $is_multie";
+  is_deeply_snapshot $gv->edge_hash, "mve edges $is_multiv $is_multie";
+}
 
 done_testing;

@@ -1,0 +1,15 @@
+Changes
+MANIFEST
+Makefile.PL
+README.md
+lib/App/Dusage.pm
+script/dusage.pl
+script/pp.PL
+t/00-load.t
+t/01-du.t
+t/10-d1.t
+t/du.d1
+t/du.d2
+
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

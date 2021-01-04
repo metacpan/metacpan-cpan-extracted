@@ -4,7 +4,7 @@ Text::NeatTemplate - a fast, middleweight template engine.
 
 # VERSION
 
-version 0.1300
+version 0.1400
 
 # SYNOPSIS
 
@@ -99,8 +99,8 @@ arguments.
 
 ## Justification For Existence
 
-When I was writing SQLite::Work, I originally tried using [Text::Template](https://metacpan.org/pod/Text::Template)
-(my favourite template engine) and also tried [Text::FillIn](https://metacpan.org/pod/Text::FillIn).  Both
+When I was writing SQLite::Work, I originally tried using [Text::Template](https://metacpan.org/pod/Text%3A%3ATemplate)
+(my favourite template engine) and also tried [Text::FillIn](https://metacpan.org/pod/Text%3A%3AFillIn).  Both
 of them had some lovely, powerful features.  Unfortunately, they were
 also relatively slow.  In testing them with a 700-row table, using
 Text::Template took about 15 seconds to generate the report, and using
@@ -120,7 +120,7 @@ and, the most powerful of all, calling external functions.
 
 This is a middleweight engine rather than a lightweight one, because
 I needed more than just simple variable substitution, such as one
-has with [Template::Trivial](https://metacpan.org/pod/Template::Trivial).  I consider the trade-off worth it,
+has with [Template::Trivial](https://metacpan.org/pod/Template%3A%3ATrivial).  I consider the trade-off worth it,
 and others might also, so I made this a separate module.
 
 # FORMATTING
@@ -355,6 +355,12 @@ $val = $tobj->simple\_html($val);
 Do a simple HTML conversion of the value.
 bold, italic, &lt;br>
 
+## number\_to\_month
+
+$val = $tobj->number\_to\_month($val);
+
+Give the month name for this month-number.
+
 # Callable Functions
 
 ## safe\_backtick
@@ -412,12 +418,12 @@ Therefore you will need to change the PERL5LIB variable to add
 
 # SEE ALSO
 
-[Text::Template](https://metacpan.org/pod/Text::Template)
-[Text::FillIn](https://metacpan.org/pod/Text::FillIn)
-[Text::QuickTemplate](https://metacpan.org/pod/Text::QuickTemplate)
-[Template::Trivial](https://metacpan.org/pod/Template::Trivial)
-[Template::Toolkit](https://metacpan.org/pod/Template::Toolkit)
-[HTML::Template](https://metacpan.org/pod/HTML::Template)
+[Text::Template](https://metacpan.org/pod/Text%3A%3ATemplate)
+[Text::FillIn](https://metacpan.org/pod/Text%3A%3AFillIn)
+[Text::QuickTemplate](https://metacpan.org/pod/Text%3A%3AQuickTemplate)
+[Template::Trivial](https://metacpan.org/pod/Template%3A%3ATrivial)
+[Template::Toolkit](https://metacpan.org/pod/Template%3A%3AToolkit)
+[HTML::Template](https://metacpan.org/pod/HTML%3A%3ATemplate)
 
 # BUGS
 

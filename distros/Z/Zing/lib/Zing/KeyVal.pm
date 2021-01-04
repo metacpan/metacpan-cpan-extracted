@@ -14,7 +14,7 @@ extends 'Zing::Repo';
 
 use Zing::Poll;
 
-our $VERSION = '0.22'; # VERSION
+our $VERSION = '0.25'; # VERSION
 
 # METHODS
 

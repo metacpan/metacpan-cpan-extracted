@@ -1,9 +1,9 @@
 package Dist::Zilla::Plugin::Sah::Schemas;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-06-13'; # DATE
+our $DATE = '2020-11-13'; # DATE
 our $DIST = 'Dist-Zilla-Plugin-Sah-Schemas'; # DIST
-our $VERSION = '0.021'; # VERSION
+our $VERSION = '0.022'; # VERSION
 
 use 5.010001;
 use strict;
@@ -11,7 +11,7 @@ use warnings;
 use Moose;
 
 use PMVersions::Util qw(version_from_pmversions);
-use Require::Hook::DzilBuild;
+use Require::Hook::Source::DzilBuild;
 
 with (
     'Dist::Zilla::Role::CheckPackageDeclared',
@@ -35,7 +35,7 @@ sub _load_schema_modules {
 
     return $self->{_our_schema_modules} if $self->{_loaded_schema_modules}++;
 
-    local @INC = (Require::Hook::DzilBuild->new(zilla => $self->zilla, die=>1, debug=>1), @INC);
+    local @INC = (Require::Hook::Source::DzilBuild->new(zilla => $self->zilla, die=>1, debug=>1), @INC);
 
     my %res;
     for my $file (@{ $self->found_files }) {
@@ -63,7 +63,7 @@ sub _load_schemas_modules {
 
     return $self->{_our_schemas_modules} if $self->{_loaded_schemas_modules}++;
 
-    local @INC = (Require::Hook::DzilBuild->new(zilla => $self->zilla, die=>1, debug=>1), @INC);
+    local @INC = (Require::Hook::Source::DzilBuild->new(zilla => $self->zilla, die=>1, debug=>1), @INC);
 
     my %res;
     for my $file (@{ $self->found_files }) {
@@ -317,7 +317,7 @@ Dist::Zilla::Plugin::Sah::Schemas - Plugin to use when building Sah-Schemas-* di
 
 =head1 VERSION
 
-This document describes version 0.021 of Dist::Zilla::Plugin::Sah::Schemas (from Perl distribution Dist-Zilla-Plugin-Sah-Schemas), released on 2020-06-13.
+This document describes version 0.022 of Dist::Zilla::Plugin::Sah::Schemas (from Perl distribution Dist-Zilla-Plugin-Sah-Schemas), released on 2020-11-13.
 
 =head1 SYNOPSIS
 

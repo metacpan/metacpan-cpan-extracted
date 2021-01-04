@@ -50,13 +50,35 @@ produces output
     </table>
 
 
-(This example is included as L<F<synopsis.pl>|https://fastapi.metacpan.org/source/BKB/HTML-Make-0.10/examples/synopsis.pl> in the distribution.)  
+=begin html
+
+<p>As HTML this looks like this:</p>
+
+<table>
+<tr><th>Item<th>Cost<tr>
+<td>camera</td>
+<td style="padding:1em">1080</td>
+</tr>
+<tr>
+<td>compressor</td>
+<td style="padding:1em">12800</td>
+</tr>
+<tr>
+<td>heater</td>
+<td style="padding:1em">free</td>
+</tr>
+</table>
+
+
+=end html
+
+(This example is included as L<F<synopsis.pl>|https://fastapi.metacpan.org/source/BKB/HTML-Make-0.12/examples/synopsis.pl> in the distribution.)  
 
 =head1 VERSION
 
-This documents HTML::Make version 0.10 corresponding to git
-commit L<e0ad4e3ee19618f273cd14e0f1023ea0315296e4|https://github.com/benkasminbullock/HTML-Make/commit/e0ad4e3ee19618f273cd14e0f1023ea0315296e4>
-released on Sat Oct 14 16:41:15 2017 +0900.
+This documents HTML::Make version 0.12 corresponding to git
+commit L<2419de0d9bc9ccdec56ae906b625162e111dd639|https://github.com/benkasminbullock/HTML-Make/commit/2419de0d9bc9ccdec56ae906b625162e111dd639>
+released on Fri Jan 1 23:43:22 2021 +0900.
 
 =head1 DESCRIPTION
 
@@ -64,6 +86,117 @@ HTML::Make is an HTML generator. It generates HTML fragments, such as
 HTML lists or tables, rather than complete HTML pages.
 
 =head1 METHODS
+
+=head2 add_attr
+
+    $obj->add_attr (class => 'buggles');
+
+Add attributes to C<$obj>. The following adds a class "beano" to the
+"li" element:
+
+    
+    use HTML::Make;
+    my $obj = HTML::Make->new ('li');
+    $obj->add_attr (class => 'beano');
+    print $obj->text ();
+    
+    
+
+
+produces output
+
+    <li class="beano"></li>
+
+
+(This example is included as L<F<li-class-beano.pl>|https://fastapi.metacpan.org/source/BKB/HTML-Make-0.12/examples/li-class-beano.pl> in the distribution.)  
+
+This issues a warning of the form B<"Overwriting attribute 'class' for
+'p'"> if the object already contains an attribute of the specified
+type.
+
+    
+    use HTML::Make;
+    my $p = HTML::Make->new ('p', attr => {class => 'big'});
+    $p->add_attr (class => 'small');
+    
+
+
+produces output
+
+    Overwriting attribute 'class' for 'p' tag at /usr/home/ben/projects/html-make/examples/p-double-class.pl line 6.
+
+
+(This example is included as L<F<p-double-class.pl>|https://fastapi.metacpan.org/source/BKB/HTML-Make-0.12/examples/p-double-class.pl> in the distribution.)  
+
+This also issues a warning if the attribute is not valid for the tag,
+according to L<HTML::Valid::Tagset/tag_attr_ok>. This is restricted to
+what is valid in HTML5.
+
+=head2 add_comment
+
+    $element->add_comment ('This should be fixed!');
+
+Add an HTML comment to the element.
+
+=head2 add_text
+
+    $element->add_text ('buggles');
+
+Add text to C<$element>. For example,
+
+    my $element = HTML::Make->new ('p');
+    $element->add_text ('peanuts');
+    print $element->text ();
+    # <p>peanuts</p>
+
+The text may contain HTML elements:
+
+    my $element = HTML::Make->new ('p');
+    $element->add_text ('peanuts <i>eggs</i>');
+    print $element->text ();
+    # <p>peanuts <i>eggs</i></p>
+
+The return value is the added text object.
+
+=head2 multiply
+
+    my @elements = $obj->multiply ('li', \@contents);
+
+Given an HTML tag type as the first argument, and an array reference
+as the second argument, this adds multiple child elements to C<$obj>
+of type given by the first argument, with text contents given by
+C<\@contents>.
+
+    
+    use HTML::Make;
+    my $ol = HTML::Make->new ('ol');
+    $ol->multiply ('li', ['one', 'two', 'three']);
+    print $ol->text ();
+
+
+produces output
+
+    <ol>
+    <li>one</li>
+    <li>two</li>
+    <li>three</li>
+    </ol>
+
+
+=begin html
+
+<p>As HTML this looks like this:</p>
+
+<ol>
+<li>one</li>
+<li>two</li>
+<li>three</li>
+</ol>
+
+
+=end html
+
+(This example is included as L<F<multiply.pl>|https://fastapi.metacpan.org/source/BKB/HTML-Make-0.12/examples/multiply.pl> in the distribution.)  
 
 =head2 new
 
@@ -102,72 +235,15 @@ produces output
     </freaky>
 
 
-(This example is included as L<F<nocheck.pl>|https://fastapi.metacpan.org/source/BKB/HTML-Make-0.10/examples/nocheck.pl> in the distribution.)  
+(This example is included as L<F<nocheck.pl>|https://fastapi.metacpan.org/source/BKB/HTML-Make-0.12/examples/nocheck.pl> in the distribution.)  
 
-=head2 add_attr
+=head2 opening_tag
 
-    $obj->add_attr (class => 'buggles');
+    my $tag = $obj->opening_tag ();
 
-Add attributes to C<$obj>. The following adds a class "beano" to the
-"li" element:
-
-    
-    use HTML::Make;
-    my $obj = HTML::Make->new ('li');
-    $obj->add_attr (class => 'beano');
-    print $obj->text ();
-    
-    
-
-
-produces output
-
-    <li class="beano"></li>
-
-
-(This example is included as L<F<li-class-beano.pl>|https://fastapi.metacpan.org/source/BKB/HTML-Make-0.10/examples/li-class-beano.pl> in the distribution.)  
-
-This issues a warning of the form B<"Overwriting attribute 'class' for
-'p'"> if the object already contains an attribute of the specified
-type.
-
-    
-    use HTML::Make;
-    my $p = HTML::Make->new ('p', attr => {class => 'big'});
-    $p->add_attr (class => 'small');
-    
-
-
-produces output
-
-    Overwriting attribute 'class' for 'p' tag at /usr/home/ben/projects/html-make/examples/p-double-class.pl line 6.
-
-
-(This example is included as L<F<p-double-class.pl>|https://fastapi.metacpan.org/source/BKB/HTML-Make-0.10/examples/p-double-class.pl> in the distribution.)  
-
-This also issues a warning if the attribute is not valid for the tag,
-according to L<HTML::Valid::Tagset/tag_attr_ok>. This is restricted to
-what is valid in HTML5.
-
-=head2 add_text
-
-    $element->add_text ('buggles');
-
-Add text to C<$element>. For example,
-
-    my $element = HTML::Make->new ('p');
-    $element->add_text ('peanuts');
-    print $element->text ();
-    # <p>peanuts</p>
-
-The text may contain HTML elements:
-
-    my $element = HTML::Make->new ('p');
-    $element->add_text ('peanuts <i>eggs</i>');
-    print $element->text ();
-    # <p>peanuts <i>eggs</i></p>
-
-The return value is the added text object.
+Returns the text value of the HTML tag opening, complete with
+attributes. There is no "closing_tag" method, the module just prints
+"</$tag>" within the L</text> method.
 
 =head2 push
 
@@ -196,7 +272,41 @@ produces output
     </table>
 
 
-(This example is included as L<F<table.pl>|https://fastapi.metacpan.org/source/BKB/HTML-Make-0.10/examples/table.pl> in the distribution.)  
+(This example is included as L<F<table.pl>|https://fastapi.metacpan.org/source/BKB/HTML-Make-0.12/examples/table.pl> in the distribution.)  
+
+C<push> takes all of the same arguments as L</new>, for example:
+
+    
+    use HTML::Make;
+    my $element = HTML::Make->new ('p', text => 'Here is a ');
+    $element->push ('a', attr => {href => 'http://www.example.org/'}, text => 'link to example');
+    print $element->text ();
+    
+
+
+produces output
+
+    <p>
+    Here is a <a href="http://www.example.org/">
+    link to example</a>
+    </p>
+
+
+=begin html
+
+<p>As HTML this looks like this:</p>
+
+<p>
+Here is a <a href="http://www.example.org/">
+link to example</a>
+</p>
+
+
+=end html
+
+(This example is included as L<F<link-example.pl>|https://fastapi.metacpan.org/source/BKB/HTML-Make-0.12/examples/link-example.pl> in the distribution.)  
+
+=head3 Making a colourful list
 
 An object created with HTML::Make may also be pushed:
 
@@ -237,76 +347,27 @@ produces output
     </ul>
 
 
-(This example is included as L<F<push-new.pl>|https://fastapi.metacpan.org/source/BKB/HTML-Make-0.10/examples/push-new.pl> in the distribution.)  
+=begin html
+
+<p>As HTML this looks like this:</p>
+
+<ul>
+<li style="background: #EE7800">daidai</li>
+<li style="background: #884898">murasaki</li>
+<li style="background: #B9C42F">kimidori</li>
+<li style="background: #6A4D32">kogecha</li>
+<li style="background: #838B0D">uguisuiro</li>
+</ul>
+
+
+=end html
+
+(This example is included as L<F<push-new.pl>|https://fastapi.metacpan.org/source/BKB/HTML-Make-0.12/examples/push-new.pl> in the distribution.)  
 
 See also L<Make a list of colours with
 HTML::Make|https://www.lemoda.net/perl/colour-list/index.html>.
 
-It's also possible to add all of the same arguments as L</new>, for
-example
-
-    $element->push ('a', attr => {href => 'http://www.example.org/'});
-
-This warns if you add some types of elements to possibly inappropriate
-parent elements. For example if you add an <li> tag to a <tr> it
-reacts like this:
-
-    
-    use HTML::Make;
-    my $tr = HTML::Make->new ('tr');
-    $tr->push ('li');
-
-
-produces output
-
-    Pushing non-table element <li> to a table row at /usr/home/ben/projects/html-make/examples/push-li-to-tr.pl line 6.
-
-
-(This example is included as L<F<push-li-to-tr.pl>|https://fastapi.metacpan.org/source/BKB/HTML-Make-0.10/examples/push-li-to-tr.pl> in the distribution.)  
-
-=head2 opening_tag
-
-    my $tag = $obj->opening_tag ();
-
-Returns the text value of the HTML tag opening, complete with
-attributes.
-
-=head2 text
-
-    $element->text ();
-
-This returns the element and its child elements as text.
-
-=head2 multiply
-
-    my @elements = $obj->multiply ('li', \@contents);
-
-Given an HTML tag type as the first argument, and an array reference
-as the second argument, this adds multiple child elements to C<$obj>
-of type given by the first argument, with text contents given by
-C<\@contents>.
-
-    
-    use HTML::Make;
-    my $ol = HTML::Make->new ('ol');
-    $ol->multiply ('li', ['one', 'two', 'three']);
-    print $ol->text ();
-
-
-produces output
-
-    <ol>
-    <li>one</li>
-    <li>two</li>
-    <li>three</li>
-    </ol>
-
-
-(This example is included as L<F<multiply.pl>|https://fastapi.metacpan.org/source/BKB/HTML-Make-0.10/examples/multiply.pl> in the distribution.)  
-
-=head1 EXTENDED EXAMPLES
-
-=head2 JSON to HTML
+=head3 JSON to HTML
 
 This script converts arbitrary JSON to HTML:
 
@@ -400,19 +461,122 @@ produces output
     </table>
 
 
-(This example is included as L<F<json-to-html.pl>|https://fastapi.metacpan.org/source/BKB/HTML-Make-0.10/examples/json-to-html.pl> in the distribution.)  
+=begin html
+
+<p>As HTML this looks like this:</p>
+
+<table>
+<tr>
+<th>words</th>
+<td><ol>
+<li><table>
+<tr>
+<th>j_pron_only</th>
+<td><span>パイプ</span>
+</td>
+</tr>
+<tr>
+<th>word</th>
+<td><span>pipe</span>
+</td>
+</tr>
+</table>
+</li>
+<li><table>
+<tr>
+<th>j_pron_only</th>
+<td><span>カティング</span>
+</td>
+</tr>
+<tr>
+<th>word</th>
+<td><span>cutting</span>
+</td>
+</tr>
+</table>
+</li>
+<li><table>
+<tr>
+<th>j_pron_only</th>
+<td><span>インプリムント</span>
+</td>
+</tr>
+<tr>
+<th>word</th>
+<td><span>implement</span>
+</td>
+</tr>
+</table>
+</li>
+</ol>
+</td>
+</tr>
+</table>
+
+
+=end html
+
+(This example is included as L<F<json-to-html.pl>|https://fastapi.metacpan.org/source/BKB/HTML-Make-0.12/examples/json-to-html.pl> in the distribution.)  
 
 See also L<Convert JSON to HTML with JSON::Parse and
 HTML::Make|https://www.lemoda.net/perl/json-to-html/index.html>.
+
+=head3 There are some ad-hoc guardrails
+
+This warns if you add some types of elements to possibly inappropriate
+parent elements. For example if you add an <li> tag to a <tr> it
+reacts like this:
+
+    
+    use HTML::Make;
+    my $tr = HTML::Make->new ('tr');
+    $tr->push ('li');
+
+
+produces output
+
+    Pushing non-table element <li> to a table row at /usr/home/ben/projects/html-make/examples/push-li-to-tr.pl line 6.
+
+
+(This example is included as L<F<push-li-to-tr.pl>|https://fastapi.metacpan.org/source/BKB/HTML-Make-0.12/examples/push-li-to-tr.pl> in the distribution.)  
+
+I've never received a single bug report for this module, and so these
+warnings are mostly added in an ad-hoc fashion as I've found myself
+making various mistakes. If you find yourself tripping over some kind
+of error repeatedly, then feel free to ask me to add that to this
+module.
+
+=head2 text
+
+    $element->text ();
+
+This returns the element and its child elements as text, so usually
+this is called at the final stage.
+
+=head1 OUTPUT FORMAT
+
+This section discusses the way that HTML is output by the module.
+
+=head2 Whitespace
+
+=over
+
+=item Indentation
+
+The output HTML is not indented.
+
+=item New lines
+
+New lines are added after block-level elements, according to L<HTML::Valid::Tagset/%isBlock>, and after <tr> elements.
+
+=back
 
 =head1 BUGS
 
 This module assumes you want to make HTML5.
 
-There is no way to control the whitespace in the output HTML.
-
-There is no way to add HTML comments to the output except by adding
-them as text.
+There is no way to control the whitespace in the output HTML such as
+indentation.
 
 =head1 DEPENDENCIES
 
@@ -432,6 +596,12 @@ L<HTML::Valid::Tagset> is used to validate tags and tag/attribute pairs.
 
 =head1 SEE ALSO
 
+=head2 CPAN modules
+
+These are the other modules I've found on CPAN (one is only on
+sourceforge) which generate HTML programmatically, rather than by
+template substitution.
+
 =over
 
 =item L<CGI>
@@ -439,9 +609,23 @@ L<HTML::Valid::Tagset> is used to validate tags and tag/attribute pairs.
 The CGI module contains HTML generation. See also
 L<CGI::HTML::Functions>.
 
+=item L<HTML::Builder>
+
+=item L<HTML::Declare>
+
+An HTML mini-language.
+
+=item L<HTML::FromArrayref>
+
+Output HTML described by a Perl data structure
+
 =item L<HTML::Generator|http://cleancode.sourceforge.net/api/perl/HTML/Generator.html>
 
 This project is on the SourceForge site, not CPAN.
+
+=item L<HTML::HTML5::Builder>
+
+"erect some scaffolding for your documents"
 
 =item L<HTML::Native>
 
@@ -460,21 +644,17 @@ An HTML-like templating language.
 This is similar to the HTML generation which is in L<CGI>. Its last
 update, version 1.05, was in 2009, and it doesn't include HTML5 tags.
 
-=item L<HTML::FromArrayref>
-
-Output HTML described by a Perl data structure
-
-=item L<HTML::Declare>
-
-An HTML mini-language.
-
 =item L<HTML::Untidy>
 
-=item L<HTML::Builder>
-
-=item L<HTML::HTML5::Builder>
-
 =back
+
+=head2 HTML validator
+
+My L<HTML validator is on
+github|https://github.com/benkasminbullock/html-validate>. This is in
+the Go language, not in Perl.
+
+
 
 
 =head1 AUTHOR
@@ -484,7 +664,7 @@ Ben Bullock, <bkb@cpan.org>
 =head1 COPYRIGHT & LICENCE
 
 This package and associated files are copyright (C) 
-2012-2017
+2012-2021
 Ben Bullock.
 
 You can use, copy, modify and redistribute this package and associated

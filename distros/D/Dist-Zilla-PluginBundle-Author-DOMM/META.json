@@ -1,0 +1,77 @@
+{
+   "abstract" : "Dist::Zilla config suiting my needs",
+   "author" : [
+      "Thomas Klausner <domm@plix.at>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.017, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Dist-Zilla-PluginBundle-Author-DOMM",
+   "no_index" : {
+      "directory" : [
+         "examples",
+         "t",
+         "xt"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build" : "0.28"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.28"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Dist::Zilla::Role::PluginBundle::Config::Slicer" : "0",
+            "Dist::Zilla::Role::PluginBundle::Easy" : "0",
+            "Dist::Zilla::Role::PluginBundle::PluginRemover" : "0",
+            "Moose" : "0",
+            "namespace::autoclean" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Spec" : "0",
+            "File::Temp" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "Test::More" : "0",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "provides" : {
+      "Dist::Zilla::PluginBundle::Author::DOMM" : {
+         "file" : "lib/Dist/Zilla/PluginBundle/Author/DOMM.pm",
+         "version" : "0.907"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/domm/Dist-Zilla-PluginBundle-Author-DOMM/issues"
+      },
+      "homepage" : "https://github.com/domm/Dist-Zilla-PluginBundle-Author-DOMM",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/domm/Dist-Zilla-PluginBundle-Author-DOMM.git",
+         "web" : "https://github.com/domm/Dist-Zilla-PluginBundle-Author-DOMM"
+      }
+   },
+   "version" : "0.907",
+   "x_generated_by_perl" : "v5.32.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.25",
+   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
+}
+

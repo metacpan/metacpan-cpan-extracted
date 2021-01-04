@@ -57,6 +57,8 @@ json_create_status_t;
 
 #define MARGIN 0x40
 
+#define INDENT
+
 typedef struct json_create {
     /* The length of the input string. */
     int length;
@@ -79,8 +81,10 @@ typedef struct json_create {
     SV * non_finite_handler;
     /* User's sorter for entries. */
     SV * cmp;
+#ifdef INDENT
     /* Indentation depth (no. of tabs). */
     unsigned int depth;
+#endif /* def INDENT */
 
     /* One-bit flags. */
 
@@ -106,10 +110,12 @@ typedef struct json_create {
     unsigned int utf8_dangerous : 1;
     /* Strict mode, reject lots of things. */
     unsigned int strict : 1;
+#ifdef INDENT
     /* Add whitespace to output to make it human-readable. */
     unsigned int indent : 1;
     /* Sort the keys of objects. */
     unsigned int sort : 1;
+#endif /* INDENT */
 }
 json_create_t;
 
@@ -288,6 +294,8 @@ add_str_len (json_create_t * jc, const char * s, unsigned int slen)
     return json_create_ok;
 }
 
+#ifdef INDENT
+
 static json_create_status_t newline_indent(json_create_t * jc)
 {
     int d;
@@ -298,14 +306,12 @@ static json_create_status_t newline_indent(json_create_t * jc)
     return json_create_ok;
 }
 
-
 static INLINE json_create_status_t
 add_str_len_indent (json_create_t * jc, const char * s, unsigned int slen)
 {
     int i;
 
     for (i = 0; i < slen; i++) {
-	int d;
 	unsigned char c;
 	c = (unsigned char) s[i];
 	if (c == '\n') {
@@ -320,6 +326,8 @@ add_str_len_indent (json_create_t * jc, const char * s, unsigned int slen)
     }
     return json_create_ok;
 }
+
+#endif /* def INDENT */
 
 /* "Add a string" macro, this just saves cut and pasting a string and
    typing "strlen" over and over again. For ASCII values only, not
@@ -387,6 +395,7 @@ add_u (json_create_t * jc, unsigned int u)
 	/* We have to switch on Unicode otherwise the replacement */	\
 	/* characters don't work as intended. */			\
 	jc->unicode = 1;						\
+	/* This is �, U+FFFD, as UTF-8 bytes. */			\
 	CALL (add_str_len (jc, "\xEF\xBF\xBD", 3));			\
     }									\
     else {								\
@@ -509,7 +518,8 @@ json_create_add_ascii_key_len (json_create_t * jc, const unsigned char * key, ST
 
     CALL (add_char (jc, '"'));
     for (i = 0; i < keylen; ) {
-	char c;
+	unsigned char c;
+
 	c = key[i];
 	switch (jump[c]) {
 
@@ -907,12 +917,16 @@ json_create_call_to_json (json_create_t * jc, SV * cv, SV * r)
 	/* This string may contain invalid UTF-8. */
 	jc->utf8_dangerous = 1;
     }
+#ifdef INDENT
     if (jc->indent) {
-	CALL (add_str_len_indent (jc, jsonc, jsonl));
+       	CALL (add_str_len_indent (jc, jsonc, jsonl));
     }
     else {
+#endif
 	CALL (add_str_len (jc, jsonc, jsonl));
+#ifdef INDENT
     }
+#endif
     SvREFCNT_dec (json);
     return json_create_ok;
 }
@@ -1012,12 +1026,15 @@ json_create_add_stringified (json_create_t * jc, SV *r)
     return add_str_len (jc, s, (unsigned int) rlen);
 }
 
+#ifdef INDENT
 #define DINC if (jc->indent) { jc->depth++; }
 #define DDEC if (jc->indent) { jc->depth--; }
+#endif /* def INDENT */
 
 /* Add a comma where necessary. This is shared between objects and
    arrays. */
 
+#ifdef INDENT
 #define COMMA					\
     if (i > 0) {				\
 	CALL (add_char (jc, ','));		\
@@ -1025,33 +1042,45 @@ json_create_add_stringified (json_create_t * jc, SV *r)
 	    CALL (newline_indent (jc));		\
 	}					\
     }
+#else /* INDENT */
+#define COMMA					\
+    if (i > 0) {				\
+	CALL (add_char (jc, ','));		\
+    }
+#endif /* INDENT */
 
 static INLINE json_create_status_t
 add_open (json_create_t * jc, unsigned char c)
 {
     CALL (add_char (jc, c));
+#ifdef INDENT
     if (jc->indent) {
-	DINC;
-	CALL (newline_indent (jc));		\
+       	DINC;
+       	CALL (newline_indent (jc));		\
     }
+#endif /* INDENT */
     return json_create_ok;
 }
 
 static INLINE json_create_status_t
 add_close (json_create_t * jc, unsigned char c)
 {
+#ifdef INDENT
     if (jc->indent) {
-	DDEC;
-	CALL (newline_indent (jc));		\
+       	DDEC;
+       	CALL (newline_indent (jc));		\
     }
+#endif /* def INDENT */
     CALL (add_char (jc, c));
+#ifdef INDENT
     if (jc->indent) {
-	/* Add a new line after the final brace, otherwise we have no
-	   newline on the final line of output. */
-	if (jc->depth == 0) {
-	    CALL (add_char (jc, '\n'));
-	}
+       	/* Add a new line after the final brace, otherwise we have no
+       	   newline on the final line of output. */
+       	if (jc->depth == 0) {
+       	    CALL (add_char (jc, '\n'));
+       	}
     }
+#endif /* def INDENT */
     return json_create_ok;
 }
 
@@ -1096,8 +1125,6 @@ json_create_add_object_sorted (json_create_t * jc, HV * input_hv)
 {
     I32 n_keys;
     int i;
-    SV * value;
-    char * key;
     SV ** keys;
 
     n_keys = hv_iterinit (input_hv);
@@ -1105,7 +1132,11 @@ json_create_add_object_sorted (json_create_t * jc, HV * input_hv)
 	CALL (add_str_len (jc, "{}", strlen ("{}")));
 	return json_create_ok;
     }
+#if 1
     CALL (add_open (jc, '{'));
+#else
+    CALL (add_char (jc, '{'));
+#endif
     Newxz (keys, n_keys, SV *);
     jc->n_mallocs++;
     for (i = 0; i < n_keys; i++) {
@@ -1127,7 +1158,6 @@ json_create_add_object_sorted (json_create_t * jc, HV * input_hv)
 
     for (i = 0; i < n_keys; i++) {
 	SV * key_sv;
-	SV ** sv_ptr;
 	char * key;
 	STRLEN keylen;
 	HE * he;
@@ -1148,7 +1178,11 @@ json_create_add_object_sorted (json_create_t * jc, HV * input_hv)
     Safefree (keys);
     jc->n_mallocs--;
 
+#if 1
     CALL (add_close (jc, '}'));
+#else
+    CALL (add_char (jc, '}'));
+#endif
 
     return json_create_ok;
 }
@@ -1165,11 +1199,11 @@ json_create_add_object (json_create_t * jc, HV * input_hv)
     char * key;
     /* I32 is correct, not STRLEN; see hv.c. */
     I32 keylen;
-
+#ifdef INDENT
     if (jc->sort) {
-	return json_create_add_object_sorted (jc, input_hv);
+       	return json_create_add_object_sorted (jc, input_hv);
     }
-
+#endif /* INDENT */
     n_keys = hv_iterinit (input_hv);
     if (n_keys == 0) {
 	CALL (add_str_len (jc, "{}", strlen ("{}")));
@@ -1280,7 +1314,7 @@ json_create_handle_unknown_type (json_create_t * jc, SV * r)
     if (jc->strict) {							\
 	goto handle_type;						\
     }
-
+//#define JCDEBUGTYPES
 static INLINE json_create_status_t
 json_create_handle_ref (json_create_t * jc, SV * input)
 {
@@ -1326,11 +1360,17 @@ json_create_handle_ref (json_create_t * jc, SV * input)
 	break;
 
     case SVt_PV:
+#ifdef JCDEBUGTYPES
+	fprintf (stderr, "%s:%d: PV\n", __FILE__, __LINE__);
+#endif /* JCDEBUGTYPES */
 	STRICT_NO_SCALAR;
 	CALL (json_create_add_string (jc, r));
 	break;
 
     case SVt_PVMG:
+#ifdef JCDEBUGTYPES
+	fprintf (stderr, "%s:%d: PVMG\n", __FILE__, __LINE__);
+#endif /* JCDEBUGTYPES */
 	STRICT_NO_SCALAR;
 	/* There are some edge cases with blessed references
 	   containing numbers which we need to handle correctly. */
@@ -1351,6 +1391,7 @@ json_create_handle_ref (json_create_t * jc, SV * input)
     }
     return json_create_ok;
 }
+#undef JCDEBUGTYPES
 
 /* In strict mode, if no object handlers exist, then we reject the
    object. */
@@ -1679,16 +1720,6 @@ json_create_run (json_create_t * jc, SV * input)
     return jc->output;
 }
 
-/* Entry point for "create_json_strict". */
-
-static INLINE SV *
-json_create_strict (SV * input)
-{
-    json_create_t jc = {0};
-    jc.strict = 1;
-    return json_create_run (& jc, input);
-}
-
 /*  __  __      _   _               _     
    |  \/  | ___| |_| |__   ___   __| |___ 
    | |\/| |/ _ \ __| '_ \ / _ \ / _` / __|
@@ -1822,4 +1853,74 @@ json_create_free (json_create_t * jc)
     }
     Safefree (jc);
     return json_create_ok;
+}
+
+static void
+bump (json_create_t * jc, SV * h)
+{
+    SvREFCNT_inc (h);
+    jc->n_mallocs++;
+}
+
+static void
+set_non_finite_handler (json_create_t * jc, SV * oh)
+{
+    jc->non_finite_handler = oh;
+    bump (jc, oh);
+}
+
+static void
+set_object_handler (json_create_t * jc, SV * oh)
+{
+    jc->obj_handler = oh;
+    bump (jc, oh);
+}
+
+static void
+set_type_handler (json_create_t * jc, SV * th)
+{
+    jc->type_handler = th;
+    bump (jc, th);
+}
+
+/* Save time and money by using strlen. This is known as "premature
+   optimization". */
+
+#define CMP(x) (strlen(#x) == (size_t) key_len && strncmp(#x, key, key_len) == 0)
+
+#define BOOL(x)								\
+    if (CMP(x)) {							\
+	jc->x = SvTRUE (value) ? 1 : 0;					\
+	return;								\
+    }
+
+#define HANDLER(x)				\
+    if (CMP(x ## _handler)) {			\
+	set_ ## x ## _handler (jc, value);	\
+	return;					\
+    }
+
+static void
+json_create_set (json_create_t * jc, SV * key_sv, SV * value)
+{
+    const char * key;
+    STRLEN key_len;
+    
+    key = SvPV (key_sv, key_len);
+
+    BOOL (downgrade_utf8);
+    BOOL (escape_slash);
+    BOOL (fatal_errors);
+    BOOL (indent);
+    BOOL (no_javascript_safe);
+    BOOL (replace_bad_utf8);
+    BOOL (sort);
+    BOOL (strict);
+    BOOL (unicode_upper);
+    BOOL (unicode_escape_all);
+    BOOL (validate);
+    HANDLER (non_finite);
+    HANDLER (object);
+    HANDLER (type);
+    warn ("Unknown option '%s'", key);
 }

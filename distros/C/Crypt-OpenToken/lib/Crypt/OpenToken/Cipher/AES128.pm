@@ -2,6 +2,7 @@ package Crypt::OpenToken::Cipher::AES128;
 
 use Moose;
 use Crypt::Rijndael;
+use namespace::autoclean;
 
 with 'Crypt::OpenToken::Cipher';
 

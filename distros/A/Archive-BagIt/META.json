@@ -4,7 +4,7 @@
       "Rob Schmidt <rjeschmi@gmail.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.014, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.017, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -72,7 +72,7 @@
             "Time::HiRes" : "0",
             "namespace::autoclean" : "0",
             "open" : "0",
-            "perl" : "5.014",
+            "perl" : "5.010",
             "strict" : "0",
             "utf8" : "0",
             "warnings" : "0"
@@ -96,58 +96,58 @@
             "Test::More" : "0",
             "Test::Warnings" : "0",
             "lib" : "0",
-            "perl" : "5.014"
+            "perl" : "5.010"
          }
       }
    },
    "provides" : {
       "Archive::BagIt" : {
          "file" : "lib/Archive/BagIt.pm",
-         "version" : "0.069"
+         "version" : "0.070"
       },
       "Archive::BagIt::Base" : {
          "file" : "lib/Archive/BagIt/Base.pm",
-         "version" : "0.069"
+         "version" : "0.070"
       },
       "Archive::BagIt::DotBagIt" : {
          "file" : "lib/Archive/BagIt/DotBagIt.pm",
-         "version" : "0.069"
+         "version" : "0.070"
       },
       "Archive::BagIt::Fast" : {
          "file" : "lib/Archive/BagIt/Fast.pm",
-         "version" : "0.069"
+         "version" : "0.070"
       },
       "Archive::BagIt::Plugin::Algorithm::MD5" : {
          "file" : "lib/Archive/BagIt/Plugin/Algorithm/MD5.pm",
-         "version" : "0.069"
+         "version" : "0.070"
       },
       "Archive::BagIt::Plugin::Algorithm::SHA512" : {
          "file" : "lib/Archive/BagIt/Plugin/Algorithm/SHA512.pm",
-         "version" : "0.069"
+         "version" : "0.070"
       },
       "Archive::BagIt::Plugin::Manifest::MD5" : {
          "file" : "lib/Archive/BagIt/Plugin/Manifest/MD5.pm",
-         "version" : "0.069"
+         "version" : "0.070"
       },
       "Archive::BagIt::Plugin::Manifest::SHA512" : {
          "file" : "lib/Archive/BagIt/Plugin/Manifest/SHA512.pm",
-         "version" : "0.069"
+         "version" : "0.070"
       },
       "Archive::BagIt::Role::Algorithm" : {
          "file" : "lib/Archive/BagIt/Role/Algorithm.pm",
-         "version" : "0.069"
+         "version" : "0.070"
       },
       "Archive::BagIt::Role::Manifest" : {
          "file" : "lib/Archive/BagIt/Role/Manifest.pm",
-         "version" : "0.069"
+         "version" : "0.070"
       },
       "Archive::BagIt::Role::Plugin" : {
          "file" : "lib/Archive/BagIt/Role/Plugin.pm",
-         "version" : "0.069"
+         "version" : "0.070"
       },
       "Archive::BagIt::Role::Portability" : {
          "file" : "lib/Archive/BagIt/Role/Portability.pm",
-         "version" : "0.069"
+         "version" : "0.070"
       }
    },
    "release_status" : "stable",
@@ -159,7 +159,7 @@
          "web" : "https://art1pirat.spdns.org/art1/Archive-BagIt"
       }
    },
-   "version" : "0.069",
+   "version" : "0.070",
    "x_contributors" : [
       "Andreas Romeyke <art1@andreas-romeyke.de>",
       "Michiel Beijen <michiel.beijen@gmail.com>",
@@ -170,7 +170,7 @@
       "Russell McOrmond <russell.mcormond@canadiana.ca>"
    ],
    "x_generated_by_perl" : "v5.28.1",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.09",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.25",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }
 

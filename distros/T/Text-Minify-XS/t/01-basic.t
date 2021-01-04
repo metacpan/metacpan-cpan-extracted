@@ -7,6 +7,12 @@ use Encode qw/ encode_utf8 /;
 
 use_ok "Text::Minify::XS", "minify";
 
+is minify("") => "", "empty";
+
+is minify(" ") => "", "empty";
+
+is minify("\t\t \n") => "", "empty";
+
 is minify("simple") => "simple";
 
 is minify("\n  simple") => "simple";

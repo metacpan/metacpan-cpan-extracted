@@ -4,7 +4,7 @@ Dancer2::Template::Handlebars - Dancer2 wrapper for Handlebars templating engine
 
 # VERSION
 
-version 0.3
+version 0.4
 
 # SYNOPSIS
 
@@ -22,14 +22,14 @@ in your Dancer2 app config.yml:
 # HELPERS
 
 You can create custom modules full of helpers to use in your Handlebars templates. For
-more details on creating these, see [Dancer2::Template::Handlebars::Helpers](https://metacpan.org/pod/Dancer2::Template::Handlebars::Helpers).
+more details on creating these, see [Dancer2::Template::Handlebars::Helpers](https://metacpan.org/pod/Dancer2%3A%3ATemplate%3A%3AHandlebars%3A%3AHelpers).
 
 Handlebars comes with helpers `with`, `each`, `if`, and `unless`.
 
 # GRATEFUL THANKS
 
-...to Yanick, for his prior work on [Dancer::Template::Handlebars](https://metacpan.org/pod/Dancer::Template::Handlebars) and
-[Dancer2::Template::Mustache](https://metacpan.org/pod/Dancer2::Template::Mustache). Most all of the code you see in this
+...to Yanick, for his prior work on [Dancer::Template::Handlebars](https://metacpan.org/pod/Dancer%3A%3ATemplate%3A%3AHandlebars) and
+[Dancer2::Template::Mustache](https://metacpan.org/pod/Dancer2%3A%3ATemplate%3A%3AMustache). Most all of the code you see in this
 module is his work, or very, very close to his original code; I
 merely remixed it, and got tests working for my own purposes.
 
@@ -37,7 +37,7 @@ merely remixed it, and got tests working for my own purposes.
 
 [http://handlebarsjs.com](http://handlebarsjs.com)
 
-[Text::Handlebars](https://metacpan.org/pod/Text::Handlebars)
+[Text::Handlebars](https://metacpan.org/pod/Text%3A%3AHandlebars)
 
 # SUPPORT
 
@@ -65,11 +65,11 @@ You can also look for information at:
 
 # AUTHOR
 
-Ruth Holloway <ruth@hiruthie.me>
+D Ruth Holloway <ruth@hiruthie.me>
 
 # COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by Ruth Holloway.
+This software is copyright (c) 2020 by D Ruth Holloway.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

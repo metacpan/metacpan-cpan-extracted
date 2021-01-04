@@ -1,5 +1,12 @@
 Revision history for JSON-Schema-Draft201909
 
+0.020     2021-01-02 17:12:09Z
+          - the default value for "validate_formats" is now true, to reflect
+            the most typical usecase.
+          - gracefully handle the erroneous schema { "type": null }
+          - fixes to relative-json-pointer format validation
+          - new "annotate_unknown_keywords" config option
+
 0.019     2020-12-08 18:40:10Z
           - further improvements to the "terse" output format
           - add_schema will now die with a Result object rather than a

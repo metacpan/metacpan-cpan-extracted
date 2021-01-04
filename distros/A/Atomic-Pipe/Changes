@@ -1,3 +1,7 @@
+0.018     2020-12-29 15:29:31-08:00 America/Los_Angeles
+
+    - Fix windows bug
+
 0.017     2020-12-28 23:26:25-08:00 America/Los_Angeles
 
     - Fix off-by-1 bug in get_line_burst_or_data

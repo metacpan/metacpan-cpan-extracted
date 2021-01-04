@@ -1,11 +1,25 @@
-# Paranoid::Input -- Paranoid input functions
+# Paranoid::Input -- Paranoid Input functions
 #
-# (c) 2005 - 2017, Arthur Corliss <corliss@digitalmages.com>
+# $Id: lib/Paranoid/Input.pm, 2.08 2020/12/31 12:10:06 acorliss Exp $
 #
-# $Id: lib/Paranoid/Input.pm, 2.07 2019/01/30 18:25:27 acorliss Exp $
+# This software is free software.  Similar to Perl, you can redistribute it
+# and/or modify it under the terms of either:
 #
-#    This software is licensed under the same terms as Perl, itself.
-#    Please see http://dev.perl.org/licenses/ for more information.
+#   a)     the GNU General Public License
+#          <https://www.gnu.org/licenses/gpl-1.0.html> as published by the 
+#          Free Software Foundation <http://www.fsf.org/>; either version 1
+#          <https://www.gnu.org/licenses/gpl-1.0.html>, or any later version
+#          <https://www.gnu.org/licenses/license-list.html#GNUGPL>, or
+#   b)     the Artistic License 2.0
+#          <https://opensource.org/licenses/Artistic-2.0>,
+#
+# subject to the following additional term:  No trademark rights to
+# "Paranoid" have been or are conveyed under any of the above licenses.
+# However, "Paranoid" may be used fairly to describe this unmodified
+# software, in good faith, but not as a trademark.
+#
+# (c) 2005 - 2020, Arthur Corliss (corliss@digitalmages.com)
+# (tm) 2008 - 2020, Paranoid Inc. (www.paranoid.com)
 #
 #####################################################################
 
@@ -27,7 +41,7 @@ use Paranoid;
 use Paranoid::Debug qw(:all);
 use Carp;
 
-($VERSION) = ( q$Revision: 2.07 $ =~ /(\d+(?:\.\d+)+)/sm );
+($VERSION) = ( q$Revision: 2.08 $ =~ /(\d+(?:\.\d+)+)/sm );
 
 @EXPORT      = qw(detaint stringMatch pchomp);
 @EXPORT_OK   = ( @EXPORT, qw(NEWLINE_REGEX) );
@@ -282,7 +296,7 @@ Paranoid::Input - Paranoid input functions
 
 =head1 VERSION
 
-$Id: lib/Paranoid/Input.pm, 2.07 2019/01/30 18:25:27 acorliss Exp $
+$Id: lib/Paranoid/Input.pm, 2.08 2020/12/31 12:10:06 acorliss Exp $
 
 =head1 SYNOPSIS
 
@@ -312,6 +326,18 @@ $Id: lib/Paranoid/Input.pm, 2.07 2019/01/30 18:25:27 acorliss Exp $
 This provides some generic functions for working with text-based input.  The
 main benefirst of this module is a relatively simple way of validating and
 detainting formatted text and performing platform-agnostic chomps.
+
+=head1 IMPORT LISTS
+
+This module exports the following symbols by default:
+
+    detaint stringMatch pchomp
+
+The following specialized import lists also exist:
+
+    List        Members
+    --------------------------------------------------------
+    all         @defaults NEWLINE_REGEX
 
 =head1 VARIABLES
 
@@ -434,8 +460,22 @@ Arthur Corliss (corliss@digitalmages.com)
 
 =head1 LICENSE AND COPYRIGHT
 
-This software is licensed under the same terms as Perl, itself. 
-Please see http://dev.perl.org/licenses/ for more information.
+This software is free software.  Similar to Perl, you can redistribute it
+and/or modify it under the terms of either:
 
-(c) 2005 - 2017, Arthur Corliss (corliss@digitalmages.com)
+  a)     the GNU General Public License
+         <https://www.gnu.org/licenses/gpl-1.0.html> as published by the 
+         Free Software Foundation <http://www.fsf.org/>; either version 1
+         <https://www.gnu.org/licenses/gpl-1.0.html>, or any later version
+         <https://www.gnu.org/licenses/license-list.html#GNUGPL>, or
+  b)     the Artistic License 2.0
+         <https://opensource.org/licenses/Artistic-2.0>,
+
+subject to the following additional term:  No trademark rights to
+"Paranoid" have been or are conveyed under any of the above licenses.
+However, "Paranoid" may be used fairly to describe this unmodified
+software, in good faith, but not as a trademark.
+
+(c) 2005 - 2020, Arthur Corliss (corliss@digitalmages.com)
+(tm) 2008 - 2020, Paranoid Inc. (www.paranoid.com)
 

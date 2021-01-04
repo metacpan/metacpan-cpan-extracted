@@ -231,7 +231,7 @@ package Astro::Coord::ECI::TLE;
 use strict;
 use warnings;
 
-our $VERSION = '0.116';
+our $VERSION = '0.117';
 
 use base qw{ Astro::Coord::ECI Exporter };
 
@@ -8262,14 +8262,14 @@ sub _next_elevation_screen {
 #
 #   $ eg/visual -merge
 #
-# Last-Modified: Sat, 08 Aug 2020 22:27:28 GMT
+# Last-Modified: Sat, 21 Nov 2020 01:34:13 GMT
 
 # The following constants are unsupported, and may be modified or
 # revoked at any time. They exist to support
 # xt/author/magnitude_status.t
-use constant _CELESTRAK_VISUAL => 'Thu, 18 Jun 2020 03:33:36 GMT';
+use constant _CELESTRAK_VISUAL => 'Sat, 21 Nov 2020 01:34:13 GMT';
 use constant _MCCANTS_VSNAMES  => 'Thu, 25 May 2017 00:30:11 GMT';
-use constant _MCCANTS_QUICKSAT => 'Sat, 08 Aug 2020 22:27:28 GMT';
+use constant _MCCANTS_QUICKSAT => 'Mon, 14 Sep 2020 13:12:56 GMT';
 
 %magnitude_table = (
   '00694' => 3.5,
@@ -8523,7 +8523,6 @@ use constant _MCCANTS_QUICKSAT => 'Sat, 08 Aug 2020 22:27:28 GMT';
   '40354' => 4.9,
   '40382' => 3.4,
   '41395' => 3.9,
-  '41765' => 3.9, # Assumed 3.9 (old Tiangong 1 value)
   '42689' => 4.9,
 );
 
@@ -8973,13 +8972,19 @@ orbital element sets. The L<Astro::Coords|Astro::Coords> package by Tim
 Jenness provides calculations using orbital elements, but the NORAD
 elements are tweaked for use by the models implemented in this package.
 
+=head1 SUPPORT
+
+Support is by the author. Please file bug reports at
+L<https://github.com/trwyant/perl-Astro-Coord-ECI/issues>, or in
+electronic mail to the author.
+
 =head1 AUTHOR
 
 Thomas R. Wyant, III (F<wyant at cpan dot org>)
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2005-2020 by Thomas R. Wyant, III
+Copyright (C) 2005-2021 by Thomas R. Wyant, III
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl 5.10.0. For more details, see the full text

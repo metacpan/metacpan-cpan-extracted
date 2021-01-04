@@ -1,11 +1,25 @@
 # Paranoid::Network::IPv4 -- IPv4-specific network functions
 #
-# (c) 2005 - 2017, Arthur Corliss <corliss@digitalmages.com>
+# $Id: lib/Paranoid/Network/IPv4.pm, 2.08 2020/12/31 12:10:06 acorliss Exp $
 #
-# $Id: lib/Paranoid/Network/IPv4.pm, 2.07 2019/01/30 18:25:27 acorliss Exp $
+# This software is free software.  Similar to Perl, you can redistribute it
+# and/or modify it under the terms of either:
 #
-#    This software is licensed under the same terms as Perl, itself.
-#    Please see http://dev.perl.org/licenses/ for more information.
+#   a)     the GNU General Public License
+#          <https://www.gnu.org/licenses/gpl-1.0.html> as published by the 
+#          Free Software Foundation <http://www.fsf.org/>; either version 1
+#          <https://www.gnu.org/licenses/gpl-1.0.html>, or any later version
+#          <https://www.gnu.org/licenses/license-list.html#GNUGPL>, or
+#   b)     the Artistic License 2.0
+#          <https://opensource.org/licenses/Artistic-2.0>,
+#
+# subject to the following additional term:  No trademark rights to
+# "Paranoid" have been or are conveyed under any of the above licenses.
+# However, "Paranoid" may be used fairly to describe this unmodified
+# software, in good faith, but not as a trademark.
+#
+# (c) 2005 - 2020, Arthur Corliss (corliss@digitalmages.com)
+# (tm) 2008 - 2020, Paranoid Inc. (www.paranoid.com)
 #
 #####################################################################
 
@@ -32,7 +46,7 @@ my @constants = qw(MAXIPV4CIDR IPV4REGEX IPV4CIDRRGX IPV4BASE IPV4BRDCST
     IPV4MASK);
 my @ipv4sort = qw(ipv4NumSort ipv4StrSort ipv4PackedSort);
 
-($VERSION) = ( q$Revision: 2.07 $ =~ /(\d+(?:\.\d+)+)/sm );
+($VERSION) = ( q$Revision: 2.08 $ =~ /(\d+(?:\.\d+)+)/sm );
 @EXPORT      = @base;
 @EXPORT_OK   = ( @base, @constants, @ipv4sort );
 %EXPORT_TAGS = (
@@ -244,7 +258,7 @@ Paranoid::Network::IPv4 - IPv4-related functions
 
 =head1 VERSION
 
-$Id: lib/Paranoid/Network/IPv4.pm, 2.07 2019/01/30 18:25:27 acorliss Exp $
+$Id: lib/Paranoid/Network/IPv4.pm, 2.08 2020/12/31 12:10:06 acorliss Exp $
 
 =head1 SYNOPSIS
 
@@ -271,15 +285,21 @@ $Id: lib/Paranoid/Network/IPv4.pm, 2.07 2019/01/30 18:25:27 acorliss Exp $
 This module contains a few convenience functions for working with IPv4
 addresses.
 
-By default only B<ipv4NetConvert> and B<ipv4NetIntersect> are imported.  
-Other symbol sets are:
+=head1 IMPORT LISTS
 
-    Name        Description
-    ---------------------------------------------
-    all         all functions/constants
-    base        default exported functions
-    constants   constants
-    ipv4Sort    sort functions
+This module exports the following symbols by default:
+
+    ipv4NetConvert ipv4NetIntersect
+
+The following specialized import lists also exist:
+
+    List        Members
+    --------------------------------------------------------
+    base        @defaults
+    constants   MAXIPV4CIDR IPV4REGEX IPV4CIDRRGX IPV4BASE 
+                IPV4BRDCST IPV4MASK
+    ipv4Sort    ipv4NumSort ipv4StrSort ipv4PackedSort
+    all         @base @constants @ipv4sort
 
 =head1 SUBROUTINES/METHODS
 
@@ -412,8 +432,22 @@ Arthur Corliss (corliss@digitalmages.com)
 
 =head1 LICENSE AND COPYRIGHT
 
-This software is licensed under the same terms as Perl, itself. 
-Please see http://dev.perl.org/licenses/ for more information.
+This software is free software.  Similar to Perl, you can redistribute it
+and/or modify it under the terms of either:
 
-(c) 2005 - 2017, Arthur Corliss (corliss@digitalmages.com)
+  a)     the GNU General Public License
+         <https://www.gnu.org/licenses/gpl-1.0.html> as published by the 
+         Free Software Foundation <http://www.fsf.org/>; either version 1
+         <https://www.gnu.org/licenses/gpl-1.0.html>, or any later version
+         <https://www.gnu.org/licenses/license-list.html#GNUGPL>, or
+  b)     the Artistic License 2.0
+         <https://opensource.org/licenses/Artistic-2.0>,
+
+subject to the following additional term:  No trademark rights to
+"Paranoid" have been or are conveyed under any of the above licenses.
+However, "Paranoid" may be used fairly to describe this unmodified
+software, in good faith, but not as a trademark.
+
+(c) 2005 - 2020, Arthur Corliss (corliss@digitalmages.com)
+(tm) 2008 - 2020, Paranoid Inc. (www.paranoid.com)
 

@@ -44,43 +44,43 @@ no_index:
 provides:
   JSON::Schema::Draft201909:
     file: lib/JSON/Schema/Draft201909.pm
-    version: '0.019'
+    version: '0.020'
   JSON::Schema::Draft201909::Annotation:
     file: lib/JSON/Schema/Draft201909/Annotation.pm
-    version: '0.019'
+    version: '0.020'
   JSON::Schema::Draft201909::Document:
     file: lib/JSON/Schema/Draft201909/Document.pm
-    version: '0.019'
+    version: '0.020'
   JSON::Schema::Draft201909::Error:
     file: lib/JSON/Schema/Draft201909/Error.pm
-    version: '0.019'
+    version: '0.020'
   JSON::Schema::Draft201909::Result:
     file: lib/JSON/Schema/Draft201909/Result.pm
-    version: '0.019'
+    version: '0.020'
   JSON::Schema::Draft201909::Utilities:
     file: lib/JSON/Schema/Draft201909/Utilities.pm
-    version: '0.019'
+    version: '0.020'
   JSON::Schema::Draft201909::Vocabulary:
     file: lib/JSON/Schema/Draft201909/Vocabulary.pm
-    version: '0.019'
+    version: '0.020'
   JSON::Schema::Draft201909::Vocabulary::Applicator:
     file: lib/JSON/Schema/Draft201909/Vocabulary/Applicator.pm
-    version: '0.019'
+    version: '0.020'
   JSON::Schema::Draft201909::Vocabulary::Content:
     file: lib/JSON/Schema/Draft201909/Vocabulary/Content.pm
-    version: '0.019'
+    version: '0.020'
   JSON::Schema::Draft201909::Vocabulary::Core:
     file: lib/JSON/Schema/Draft201909/Vocabulary/Core.pm
-    version: '0.019'
+    version: '0.020'
   JSON::Schema::Draft201909::Vocabulary::Format:
     file: lib/JSON/Schema/Draft201909/Vocabulary/Format.pm
-    version: '0.019'
+    version: '0.020'
   JSON::Schema::Draft201909::Vocabulary::MetaData:
     file: lib/JSON/Schema/Draft201909/Vocabulary/MetaData.pm
-    version: '0.019'
+    version: '0.020'
   JSON::Schema::Draft201909::Vocabulary::Validation:
     file: lib/JSON/Schema/Draft201909/Vocabulary/Validation.pm
-    version: '0.019'
+    version: '0.020'
 requires:
   B: '0'
   Carp: '0'
@@ -115,10 +115,10 @@ resources:
   bugtracker: https://github.com/karenetheridge/JSON-Schema-Draft201909/issues
   homepage: https://github.com/karenetheridge/JSON-Schema-Draft201909
   repository: https://github.com/karenetheridge/JSON-Schema-Draft201909.git
-version: '0.019'
+version: '0.020'
 x_Dist_Zilla:
   perl:
-    version: '5.033004'
+    version: '5.033005'
   plugins:
     -
       class: Dist::Zilla::Plugin::Run::BeforeRelease
@@ -595,13 +595,13 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::Git::Contributors
       config:
         Dist::Zilla::Plugin::Git::Contributors:
-          git_version: 2.28.0
+          git_version: 2.29.2
           include_authors: 0
           include_releaser: 1
           order_by: commits
           paths: []
       name: '@Author::ETHER/Git::Contributors'
-      version: '0.035'
+      version: '0.036'
     -
       class: Dist::Zilla::Plugin::StaticInstall
       config:
@@ -662,7 +662,7 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::EnsureLatestPerl
       config:
         Dist::Zilla::Plugin::EnsureLatestPerl:
-          Module::CoreList: '5.20201120'
+          Module::CoreList: '5.20201220'
       name: '@Author::ETHER/EnsureLatestPerl'
       version: '0.008'
     -
@@ -687,7 +687,7 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.28.0
+          git_version: 2.29.2
           repo_root: .
       name: '@Author::ETHER/initial check'
       version: '2.047'
@@ -695,7 +695,7 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::Git::CheckFor::MergeConflicts
       config:
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.28.0
+          git_version: 2.29.2
           repo_root: .
       name: '@Author::ETHER/Git::CheckFor::MergeConflicts'
       version: '0.014'
@@ -703,7 +703,7 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::Git::CheckFor::CorrectBranch
       config:
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.28.0
+          git_version: 2.29.2
           repo_root: .
       name: '@Author::ETHER/Git::CheckFor::CorrectBranch'
       version: '0.014'
@@ -729,7 +729,7 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.28.0
+          git_version: 2.29.2
           repo_root: .
       name: '@Author::ETHER/after tests'
       version: '2.047'
@@ -813,7 +813,7 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.28.0
+          git_version: 2.29.2
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -826,11 +826,11 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v0.019
+          tag: v0.020
           tag_format: v%V
           tag_message: v%v%t
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.28.0
+          git_version: 2.29.2
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -868,7 +868,7 @@ x_Dist_Zilla:
             - (?^:^lib/.*\.pm$)
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.28.0
+          git_version: 2.29.2
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -890,7 +890,7 @@ x_Dist_Zilla:
             - origin
           remotes_must_exist: 1
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.28.0
+          git_version: 2.29.2
           repo_root: .
       name: '@Author::ETHER/Git::Push'
       version: '2.047'
@@ -1020,7 +1020,7 @@ x_Dist_Zilla:
       is_trial: '0'
     version: '6.017'
 x_authority: cpan:ETHER
-x_generated_by_perl: v5.33.4
+x_generated_by_perl: v5.33.5
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'
 x_static_install: 1

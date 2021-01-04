@@ -27,6 +27,7 @@ my %WriteMakefileArgs = (
 									   'Statistics::Basic'=>'1.6611',
 									   'List::Util'=>'0.0',
 									   'Proc::ProcessTable::InfoString' => '0.0.1',
+									   'ColorTheme::NoColor'=>'0.0',
 									   },
 						 dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
 						 clean => { FILES => 'Proc-ProcessTable-ncps-*' },

@@ -4,7 +4,7 @@ Dist::Zilla::PluginBundle::DROLSKY - DROLSKY's plugin bundle
 
 # VERSION
 
-version 1.09
+version 1.11
 
 # SYNOPSIS
 
@@ -131,14 +131,11 @@ This is more or less equivalent to the following `dist.ini`:
     -type  = requires
     Test::More = 0.96
 
-    [Prereqs / Modules for use with tidyall]
+    [Prereqs / Modules for use with precious]
     -phase = develop
     -type  = requires
-    Code::TidyAll::Plugin::Test::Vars = 0.02
-    Parallel::ForkManager'            = 1.19
     Perl::Critic                      = 1.126
     Perl::Tidy                        = 20160302
-    Test::Vars                        = 0.009
 
     [Prereqs / Test::Version which fixes https://github.com/plicease/Test-Version/issues/7]
     -phase = develop
@@ -157,7 +154,12 @@ This is more or less equivalent to the following `dist.ini`:
     skip = Dist::Zilla::Plugin::DROLSKY::Contributors
     skip = Dist::Zilla::Plugin::DROLSKY::Git::CheckFor::CorrectBranch
     skip = Dist::Zilla::Plugin::DROLSKY::License
-    skip = Dist::Zilla::Plugin::DROLSKY::TidyAll
+    skip = Dist::Zilla::Plugin::DROLSKY::MakeMaker
+    skip = Dist::Zilla::Plugin::DROLSKY::PerlLinterConfigFiles
+    skip = Dist::Zilla::Plugin::DROLSKY::Precious
+    skip = Dist::Zilla::Plugin::DROLSKY::Role::CoreCounter
+    skip = Dist::Zilla::Plugin::DROLSKY::RunExtraTests
+    skip = Dist::Zilla::Plugin::DROLSKY::WeaverConfig
     skip = Pod::Weaver::PluginBundle::DROLSKY
 
     [Test::Pod::Coverage::Configurable]
@@ -175,6 +177,7 @@ This is more or less equivalent to the following `dist.ini`:
     [PodSyntaxTests]
 
     [DROLSKY::RunExtraTests]
+    [DROLSKY::Test::Precious]
     [MojibakeTests]
     [Test::CleanNamespaces]
     [Test::CPAN::Changes]
@@ -183,11 +186,6 @@ This is more or less equivalent to the following `dist.ini`:
     [Test::NoTabs]
     [Test::Portability]
     [Test::Synopsis]
-
-    [Test::TidyAll]
-    verbose = 1
-    jobs    = 4
-    minimum_perl = 5.010
 
     [Test::Compile]
     xt_mode = 1
@@ -248,8 +246,10 @@ This is more or less equivalent to the following `dist.ini`:
 
     [Git::CheckFor::MergeConflicts]
 
-    ; Generates/updates tidyall.ini, perlcriticrc, and perltidyrc
-    [DROLSKY::TidyAll]
+    ; Generates/updates perlcriticrc, and perltidyrc
+    [DROLSKY::PerlLinterConfigFiles]
+    ; Generates/updates precious.toml
+    [DROLSKY::Precious]
 
     ; The allow_dirty list is basically all of the generated or munged files
     ; in the distro, including:
@@ -262,7 +262,7 @@ This is more or less equivalent to the following `dist.ini`:
     ;     README.md
     ;     cpanfile
     ;     ppport.h
-    ;     tidyall.ini
+    ;     precious.toml
     [Git::Check]
     allow_dirty = ...
 

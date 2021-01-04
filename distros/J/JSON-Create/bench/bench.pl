@@ -5,10 +5,18 @@
 use warnings;
 use strict;
 use utf8;
-#use Benchmark ':all';
 use FindBin '$Bin';
 use Time::HiRes;
 use Text::Table::Tiny 'generate_table';
+use Getopt::Long;
+
+my $ok = GetOptions (
+    quicky => \my $quicky,
+);
+
+if (! $ok) {
+    die;
+}
 
 # Just so I can use the latest versions
 
@@ -18,9 +26,8 @@ use lib '/home/ben/projects/json-create/blib/arch';
 # Contenders
 
 use JSON::Create 'create_json';
-use JSON::XS;
-use Cpanel::JSON::XS;
-use JSON::DWIW;
+use JSON::XS ();
+use Cpanel::JSON::XS ();
 
 # Number of repetitions. No matter how large this is made, the results
 # always vary wildly from run to run.
@@ -28,9 +35,14 @@ use JSON::DWIW;
 my $count = 1000;
 my $times = 200;
 
+if ($quicky) {
+    $count = 100;
+    $times = 20;
+}
+
 print "Versions used:\n";
+
 my @modules = qw/Cpanel::JSON::XS JSON::XS JSON::Create/;
-# JSON::DWIW/;
 my @mvp;
 for my $module (@modules) {
     my $abbrev = $module;
@@ -39,11 +51,11 @@ for my $module (@modules) {
     push @mvp, [$abbrev, $module, $version];
 }
 print generate_table (rows => \@mvp, separate_rows => 1);
+
 my %these = (
     'JC' => 'JSON::Create::create_json ($stuff)',
     'JX' => 'JSON::XS::encode_json ($stuff)',
     'CJX' => 'Cpanel::JSON::XS::encode_json ($stuff)',
-#    'JD' => 'JSON::DWIW->new->to_json ($stuff)',
 );
 
 # ASCII string test
@@ -67,7 +79,6 @@ header ("hash of ASCII strings");
 
 cmpthese ($stuff);
 
-#exit;
 my $h2n = {
     a => 1,
     b => 2,

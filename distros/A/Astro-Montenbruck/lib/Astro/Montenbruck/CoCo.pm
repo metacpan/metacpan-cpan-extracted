@@ -12,7 +12,7 @@ Readonly::Scalar our $ECL => 1;
 Readonly::Scalar our $EQU => 2;
 
 our %EXPORT_TAGS = (
-    all => [ qw/ecl2equ equ2ecl equ2hor hor2equ/ ],
+    all => [ qw/ecl2equ equ2ecl equ2hor hor2equ ecl2equ_rect equ2ecl_rect/ ],
 );
 
 our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} }, qw/$ECL $EQU/ );
@@ -71,6 +71,7 @@ sub equ2hor {
 sub hor2equ {
     equ2hor(@_)
 }
+
 
 
 1;
@@ -250,7 +251,7 @@ Sergey Krushinsky, C<< <krushi at cpan.org> >>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2009-2019 by Sergey Krushinsky
+Copyright (C) 2009-2020 by Sergey Krushinsky
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

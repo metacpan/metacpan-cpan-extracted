@@ -65,6 +65,7 @@ use utf8;
 use Encode;
 use open IO => ':utf8';
 use Carp;
+use charnames ':full';
 use List::Util qw(min max reduce sum pairmap first);
 use Pod::Usage;
 use Text::ParseWords qw(shellwords);
@@ -118,15 +119,15 @@ my $opt_prefix = my $opt_prefix_default = 1;
 my $opt_prefix_pattern = q/(?:\\| )*(?:  )?/;
 my $opt_W;
 my $opt_colortable;
+my %opt_visible;
+my $opt_tabstop  = 8;
+my $opt_tabhead  = "\N{MEDIUM SHADE}";
+my $opt_tabspace = "\N{LIGHT SHADE}";
 
 #
 # options only for cdif
 #
 my $opt_unit = my $opt_unit_default = 'word';
-
-binmode STDIN,  ":encoding(utf8)";
-binmode STDOUT, ":encoding(utf8)";
-binmode STDERR, ":encoding(utf8)";
 
 ##
 ## Special treatment --noenv option.
@@ -137,6 +138,9 @@ if (grep { $_ eq '--noenv' } @ARGV) {
 if ($opt_env and my $env = $ENV{'SDIFOPTS'}) {
     unshift(@ARGV, shellwords($env));
 }
+
+use open IO => ':utf8', ':std';
+map { $_ = decode 'utf8', $_ unless utf8::is_utf8($_) } @ARGV;
 
 my @optargs = (
     "n|number!" => \$opt_n,
@@ -180,6 +184,10 @@ my @optargs = (
     "cdifopts=s" => sub { push @opt_cdifopts, shellwords $_[1] },
     "colortable" => \$opt_colortable,
     "lenience!" => \$opt_lenience,
+    "visible=i" => \%opt_visible,
+    "tabstop=i" => \$opt_tabstop,
+    "tabhead=s" => \$opt_tabhead,
+    "tabspace=s" => \$opt_tabspace,
 
     "unit=s" => \$opt_unit,
     "mecab!" => sub { $opt_unit = $_[1] ? 'mecab' : $opt_unit_default },
@@ -197,6 +205,23 @@ $App::sdif::Util::NO_WARNINGS = $opt_lenience;
 
 use Text::VisualWidth::PP qw(vwidth);
 use Text::ANSI::Fold qw(ansi_fold :constants);
+Text::ANSI::Fold->configure(padding => 1, expand => 1, tabstop => $opt_tabstop);
+
+if ($opt_visible{ht}) {
+    Text::ANSI::Fold->configure(
+	tabhead  => unicode($opt_tabhead),
+	tabspace => unicode($opt_tabspace),
+    );
+}
+
+sub unicode {
+    my $char = shift;
+    if ($char =~ /^\X$/) {
+	$char;
+    } else {
+	eval qq["\\N{$char}"] or die "$!";
+    }
+}
 
 if ($opt_ambiguous =~ /^(?:detect|auto)$/) {
     use Unicode::EastAsianWidth::Detect qw(is_cjk_lang);
@@ -735,17 +760,14 @@ sub print_column_23 {
     my $nspace = $print_number ? ' ' : '';
     if (defined $old) {
 	chomp $old;
-	$old = expand_tab($old);
 	$onum = linenum($oline) if $print_number;
     }
     if (defined $new) {
 	chomp $new;
-	$new = expand_tab($new);
 	$nnum = linenum($nline) if $print_number;
     }
     if (defined $mrg) {
 	chomp $mrg;
-	$mrg = expand_tab($mrg);
 	$mnum = linenum($mline) if $print_number;
     }
 
@@ -760,13 +782,13 @@ sub print_column_23 {
     while (1) {
 	(my $o, $old) = ansi_fold($old,
 				  max(1, $width - length($onum . $nspace)),
-				  @boundary, padding => 1);
+				  @boundary);
 	(my $n, $new) = ansi_fold($new,
 				  max(1, $width - length($nnum . $nspace)),
-				  @boundary, padding => 1);
+				  @boundary);
 	(my $m, $mrg) = ansi_fold($mrg,
 				  max(1, $width - length($mnum . $nspace)),
-				  @boundary, padding => 1)
+				  @boundary)
 	    if $column >= 3;
 
 	my @f;
@@ -810,11 +832,8 @@ sub print_command_n {
 
     for my $i (0 .. $#_) {
 	local $_ = $_[$i];
-	if (defined $_) {
-	    chomp $_;
-	    $_ = expand_tab($_);
-	}
-	($_) = ansi_fold($_, $width, padding => 1);
+	chomp if defined;
+	($_) = ansi_fold($_, $width);
 	my %f;
 	my $color = $i < @color ? $color[$i] : $color[-1];
 	$f{TEXT} = $painter->($color, $_);
@@ -856,29 +875,6 @@ sub range {
     local $_ = shift;
     my($from, $to) = /,/ ? split(/,/) : ($_, $_);
     wantarray ? ($from, $to) : $to - $from + 1;
-}
-
-my @tabspace;
-BEGIN {
-    @tabspace = map { ' ' x (8 - $_) } 0..7;
-}
-sub expand_tab {
-    local $_ = shift;
-    1 while s{^([^\t]*)\t(\t*)}{
-	$1 . $tabspace[pwidth($1) % 8] . $tabspace[0] x length($2)
-    }e;
-    $_;
-}
-
-sub pwidth {
-    local $_ = shift;
-    if (/[\010\e\f\r]/) {
-	s/^.*[\f\r]//;
-	s/$color_re//g;
-	1 while s/[^\010]\010//;
-	s/^\010+//;
-    }
-    vwidth $_;
 }
 
 sub terminal_width {
@@ -1154,6 +1150,23 @@ output.
 Supress warning message for unexpected input from diff command.  True
 by default.
 
+=item B<--visible> I<chaname>=[0,1]
+
+=item B<--tabhead>=I<char>
+
+=item B<--tabspace>=I<char>
+
+Visualize characters.  Currently only C<ht> (horizontal tab) is
+supported.  Each tab character is converted to B<tabhead> and
+following B<tabspace> characters.  They can be specified by
+B<--tabhead> and B<--tabspace> option and default value is C<\N{MEDIUM
+SHADE}> and C<\N{LIGHT SHADE}>.  If the option value is longer than
+single characger, it is evaluated as unicode name.
+
+=item B<--tabstop>=I<n>
+
+Specify tab stop.  Default is 8.
+
 =item B<--colormap>=I<colormap>, B<--cm>=I<colormap>
 
 Basic I<colormap> format is :
@@ -1302,7 +1315,7 @@ Environment variable B<SDIFOPTS> is used to set default options.
 
 =head1 LICENSE
 
-Copyright 1992-2020 Kazumasa Utashiro
+Copyright 1992-2021 Kazumasa Utashiro
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

@@ -1,3 +1,15 @@
+0.012   2021-01-02  Released-By: PERLANCAR; Urgency: medium
+
+	- Bump perl prereq to 5.014 because during build
+	  Sah::SchemaR::cpan::pause_id will contain regex sequence (?^...)
+	  [GH#1].
+
+
+0.011   2021-01-01  Released-By: PERLANCAR; Urgency: medium
+
+	- Add schemas: cpan::distname, cpan::modname.
+
+
 0.010   2020-03-08  Released-By: PERLANCAR; Urgency: medium
 
         - No functional changes.

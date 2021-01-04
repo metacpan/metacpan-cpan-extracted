@@ -3,8 +3,9 @@ README
 MANIFEST
 Makefile.PL
 lib/FindBin/libs.pm
-version/v5.14/lib/FindBin/libs.pm
 version/v5.8/lib/FindBin/libs.pm
+version/v5.14/lib/FindBin/libs.pm
+version/v5.28/lib/FindBin/libs.pm
 example/multi_config_dir
 example/p5run
 example/single_config_dir

@@ -1,5 +1,5 @@
 package Treex::Core::Scenario;
-$Treex::Core::Scenario::VERSION = '2.20201228';
+$Treex::Core::Scenario::VERSION = '2.20210102';
 use Moose;
 use Treex::Core::Common;
 use File::Basename;
@@ -595,7 +595,7 @@ Treex::Core::Scenario - a larger Treex processing unit, composed of blocks
 
 =head1 VERSION
 
-version 2.20201228
+version 2.20210102
 
 =head1 SYNOPSIS
 

@@ -3,6 +3,8 @@ use inc::Module::Install;
 name     'Connector';
 all_from 'lib/Connector.pm';
 #license  'perl';
+repository 'https://github.com/mrscotty/connector';
+bugtracker 'https://github.com/mrscotty/connector/issues';
 
 requires   'Moose';
 requires    'Log::Log4perl';

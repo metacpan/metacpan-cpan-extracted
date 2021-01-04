@@ -1,5 +1,5 @@
 use strict; use warnings;
-use Test::More tests => 181;
+use Test::More;
 
 use Graph::Directed;
 use Graph::Undirected;
@@ -13,7 +13,8 @@ sub test_graphs {
       my $gs = $g->stringify;
       for my $call ( @{ $this_m->{$k} } ) {
 	my ($arg, $expected) = @$call;
-	is "@{[sort $g->$m($arg)]}", $expected, "$label $k($gs) $m ($arg)";
+        my @args = split ' ', $arg;
+	is "@{[sort $g->$m(@args)]}", $expected, "$label $k($gs) $m (@args)";
       }
     }
   }
@@ -43,17 +44,17 @@ my %V_E = (
 
 {
     my $dg = make_graphs(\%V_E, 'Graph::Directed', 'd');
+    is $dg->{$_->[0]}, $_->[1], $_->[0] for (
+	[ d0 => "" ],
+	[ d1 => "a" ],
+	[ d2a => "a,b" ],
+	[ d2b => "a-b" ],
+	[ d2c => "a-b,b-a" ],
+	[ d3 => "a-b,a-c,b-d,b-e,c-f,c-g" ],
+	[ d4 => "a-a,a-b,b-a" ],
+	[ d5 => "a-a" ],
+    );
     test_graphs($dg, {
-	successors => {
-	    d0 => [ ['a', ""] ],
-	    d1 => [ ['a', ""] ],
-	    d2a => [ ['a', ""], ['b', ""] ],
-	    d2b => [ ['a', "b"], ['b', ""] ],
-	    d2c => [ ['a', "b"], ['b', "a"] ],
-	    d3 => [ ['a', "b c"], ['b', "d e"], ['c', "f g"], ['d', ""], ['e', ""], ['f', ""], ['g', ""] ],
-	    d4 => [ ['a', "a b"], ['b', "a"] ],
-	    d5 => [ ['a', "a"] ],
-	},
 	all_successors => {
 	    d0 => [ ['a', ""] ],
 	    d1 => [ ['a', ""] ],
@@ -62,16 +63,6 @@ my %V_E = (
 	    d2c => [ ['a', "a b"], ['b', "a b"] ],
 	    d3 => [ ['a', "b c d e f g"], ['b', "d e"], ['c', "f g"], ['d', ""], ['e', ""], ['f', ""], ['g', ""] ],
 	    d4 => [ ['a', "a b"], ['b', "a b"] ],
-	    d5 => [ ['a', "a"] ],
-	},
-	predecessors => {
-	    d0 => [ ['a', ""] ],
-	    d1 => [ ['a', ""] ],
-	    d2a => [ ['a', ""], ['b', ""] ],
-	    d2b => [ ['a', ""], ['b', "a"] ],
-	    d2c => [ ['a', "b"], ['b', "a"] ],
-	    d3 => [ ['a', ""], ['b', "a"], ['c', "a"], ['d', "b"], ['e', "b"], ['f', "c"], ['g', "c"] ],
-	    d4 => [ ['a', "a b"], ['b', "a"] ],
 	    d5 => [ ['a', "a"] ],
 	},
 	all_predecessors => {
@@ -83,6 +74,16 @@ my %V_E = (
 	    d3 => [ ['a', ""], ['b', "a"], ['c', "a"], ['d', "a b"], ['e', "a b"], ['f', "a c"], ['g', "a c"] ],
 	    d4 => [ ['a', "a b"], ['b', "a b"] ],
 	    d5 => [ ['a', "a"] ],
+	},
+	predecessors_by_radius => {
+	    d0 => [ ['a 1', ""] ],
+	    d1 => [ ['a 1', ""] ],
+	    d2a => [ ['a 1', ""], ['b 1', ""] ],
+	    d2b => [ ['a 1', ""], ['b 1', "a"], ['b 2', "a"] ],
+	    d2c => [ ['a 0', ""], ['b 1', "a"], ['b 2', "a b"] ],
+	    d3 => [ ['a 1', ""], ['b 1', "a"], ['c 2', "a"], ['d 1', "b"], ['d 2', "a b"], ['e 1', "b"], ['f 1', "c"], ['g 1', "c"], ['g 2', "a c"] ],
+	    d4 => [ ['a 1', "a b"], ['b 1', "a"] ],
+	    d5 => [ ['a 1', "a"] ],
 	},
 	all_neighbors => {
 	    d0 => [ ['a', ""] ],
@@ -109,27 +110,17 @@ my %V_E = (
 
 {
     my $dg = make_graphs(\%V_E, 'Graph::Undirected', 'u');
+    is $dg->{$_->[0]}, $_->[1], $_->[0] for (
+	[ u0 => "" ],
+	[ u1 => "a" ],
+	[ u2a => "a,b" ],
+	[ u2b => "a=b" ],
+	[ u2c => "a=b" ],
+	[ u3 => "a=b,a=c,b=d,b=e,c=f,c=g" ],
+	[ u4 => "a=a,a=b" ],
+	[ u5 => "a=a" ],
+    );
     test_graphs($dg, {
-	successors => {
-	    u0 => [ ['a', ""] ],
-	    u1 => [ ['a', ""] ],
-	    u2a => [ ['a', ""], ['b', ""] ],
-	    u2b => [ ['a', "b"], ['b', "a"] ],
-	    u2c => [ ['a', "b"], ['b', "a"] ],
-	    u3 => [ ['a', "b c"], ['b', "a d e"], ['c', "a f g"], ['d', "b"], ['e', "b"], ['f', "c"], ['g', "c"] ],
-	    u4 => [ ['a', "a b"], ['b', "a"] ],
-	    u5 => [ ['a', "a"] ],
-	},
-	predecessors => {
-	    u0 => [ ['a', ""] ],
-	    u1 => [ ['a', ""] ],
-	    u2a => [ ['a', ""], ['b', ""] ],
-	    u2b => [ ['a', "b"], ['b', "a"] ],
-	    u2c => [ ['a', "b"], ['b', "a"] ],
-	    u3 => [ ['a', "b c"], ['b', "a d e"], ['c', "a f g"], ['d', "b"], ['e', "b"], ['f', "c"], ['g', "c"] ],
-	    u4 => [ ['a', "a b"], ['b', "a"] ],
-	    u5 => [ ['a', "a"] ],
-	},
 	all_neighbors => {
 	    u0 => [ ['a', ""] ],
 	    u1 => [ ['a', ""] ],
@@ -161,3 +152,5 @@ my %V_E = (
     is_deeply \@g, [ 0, 1 ],
       'all_successors works on false names' or diag explain \@g;
 }
+
+done_testing;

@@ -82,11 +82,11 @@ my %WriteMakefileArgs = (
     "File::Spec" => 0,
     "FindBin" => 0,
     "Test::Fatal" => 0,
-    "Test::More" => 0,
+    "Test::More" => "0.96",
     "Test::Needs" => 0,
     "Test::RequiresInternet" => 0
   },
-  "VERSION" => "6.50",
+  "VERSION" => "6.51",
   "test" => {
     "TESTS" => "t/*.t t/base/*.t t/base/protocols/*.t t/leak/*.t t/local/*.t t/robot/*.t"
   }
@@ -123,7 +123,7 @@ my %FallbackPrereqs = (
   "Net::HTTP" => "6.18",
   "Scalar::Util" => 0,
   "Test::Fatal" => 0,
-  "Test::More" => 0,
+  "Test::More" => "0.96",
   "Test::Needs" => 0,
   "Test::RequiresInternet" => 0,
   "Try::Tiny" => 0,

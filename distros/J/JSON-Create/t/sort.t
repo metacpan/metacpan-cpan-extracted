@@ -76,4 +76,14 @@ my $expect = <<EOF;
 }
 EOF
 is ($out, $expect, "Got expected value");
+
+my $jc_options = JSON::Create->new (sort => 1, indent => 1);
+my $out_options = $jc_options->run (\%emojis);
+is ($out_options, $expect, "Got expected value with options");
+
+my $jc_set = JSON::Create->new ();
+$jc_set->set (sort => 1, indent => 1);
+my $out_set = $jc_set->run (\%emojis);
+is ($out_set, $expect, "Got expected value with set");
+
 done_testing ();

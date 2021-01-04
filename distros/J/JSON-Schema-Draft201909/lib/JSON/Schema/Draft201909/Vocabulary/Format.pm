@@ -4,7 +4,7 @@ package JSON::Schema::Draft201909::Vocabulary::Format;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Implementation of the JSON Schema Draft 2019-09 Format vocabulary
 
-our $VERSION = '0.019';
+our $VERSION = '0.020';
 
 use 5.016;
 no if "$]" >= 5.031009, feature => 'indirect';
@@ -111,16 +111,19 @@ has _format_validations => (
         fc(Mojo::URL->new($_[0])->to_unsafe_string) eq fc($_[0]) && $_[0] !~ /[^[:ascii:]]/;
       },
       iri => sub { Mojo::URL->new($_[0])->is_abs },
-      'iri-reference' => sub { 1 },
       uuid => sub { $_[0] =~ /^[[:xdigit:]]{8}-(?:[[:xdigit:]]{4}-){3}[[:xdigit:]]{12}$/ },
-      'uri-template' => sub { 1 },
       'json-pointer' => sub { (!length($_[0]) || $_[0] =~ m{^/}) && $_[0] !~ m{~(?![01])} },
-      'relative-json-pointer' => sub { $_[0] =~ m{^[0-9]+(?:#$|$|/)} && $_[0] !~ m{~(?![01])} },
+      'relative-json-pointer' => sub { $_[0] =~ m{^(?:0|[1-9][0-9]*)(?:#$|$|/)} && $_[0] !~ m{~(?![01])} },
       regex => sub { eval { qr/$_[0]/; 1 ? 1 : 0 } },
+
+      # TODO: if the metaschema's $vocabulary entry is true, then we must die on
+      # encountering these unimplemented formats.
+      'iri-reference' => sub { 1 },
+      'uri-template' => sub { 1 },
     };
 
     # the subrefs from JSON::Schema::Draft201909->new(format_evaluations => { ... })
-    my $args = +{ $self->evaluator->format_validations };
+    my $args = +{ $self->evaluator->_format_validations };
 
     return +{
       map +(
@@ -135,13 +138,13 @@ has _format_validations => (
 sub _traverse_keyword_format {
   my ($self, $schema, $state) = @_;
   return if not assert_keyword_type($state, $schema, 'string');
+  # TODO: if the metaschema's $vocabulary entry is true, then we must die on
+  # encountering unimplemented formats specified by the vocabulary (iri-reference, uri-template).
 }
 
 sub _eval_keyword_format {
   my ($self, $data, $schema, $state) = @_;
 
-  # TODO: instead of checking 'validate_formats', we should be referring to the metaschema's entry
-  # for $vocabulary: { <format url>: <bool> }
   if ($state->{validate_formats}
       and my $spec = $self->_get_format_validation($schema->{format})) {
     return E($state, 'not a%s %s', $schema->{format} =~ /^[aeio]/ ? 'n' : '', $schema->{format})
@@ -165,7 +168,7 @@ JSON::Schema::Draft201909::Vocabulary::Format - Implementation of the JSON Schem
 
 =head1 VERSION
 
-version 0.019
+version 0.020
 
 =head1 DESCRIPTION
 

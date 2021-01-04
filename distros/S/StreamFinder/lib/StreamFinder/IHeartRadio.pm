@@ -113,7 +113,7 @@ One or more stream URLs can be returned for each station or podcast.
 Accepts an iheartradio.com station / podcast ID or URL and creates and returns a 
 new station (or podcast) object, or I<undef> if the URL is not a valid IHeart 
 station or podcast, or no streams are found.  The URL can be the full URL, 
-ie. https://www.iheart.com/live/B<station-id>, 
+ie. https://www.iheart.com/live/B<station-id>, https://B<station-id>.iheart.com, 
 https://www.iheart.com/podcast/B<podcast-id>/episode/B<episode-id>, or just 
 I<station-id>, or I<podcast-id>/I<episode-id>.  NOTE:  For podcasts, you must 
 include the I<episode-id> if not specifying a full URL, otherwise, the 
@@ -430,16 +430,45 @@ sub new
 	} else {
 		my ($id, $podcastid) = split(m#\/#, $url2fetch);
 		$self->{'id'} = $id;
-		$url2fetch = ($podcastid ? 'https://www.iheart.com/podcast/' : 'https://www.iheart.com/live/') . $id;
+		$url2fetch = $podcastid ? "https://www.iheart.com/podcast/$id" : "https://${id}.iheart.com/";
 		$url2fetch .= '/episode/' . $podcastid  if ($podcastid);
 	}
+	return undef  unless ($self->{'id'});  #STEP 1 FAILED, INVALID STATION URL, PUNT!
+
 	my $html = '';
-	print STDERR "-1 FETCHING URL=$url2fetch= ID=".$self->{'id'}."=\n"  if ($DEBUG);
 	my $ua = LWP::UserAgent->new(@userAgentOps);		
+	my $response;
+
 	$ua->timeout($uops{'timeout'});
 	$ua->cookie_jar({});
 	$ua->env_proxy;
-	my $response = $ua->get($url2fetch);
+	print STDERR "-1 FETCHING URL=$url2fetch= ID=".$self->{'id'}."=\n"  if ($DEBUG);
+	if ($url2fetch =~ m#\.iheart\.com\/?$#) { #URL FORMAT:  https://station.iheart.com (SEE CPAN BUG# 133982):
+		$response = $ua->get($url2fetch);
+		if ($response->is_success) {
+			$html = $response->decoded_content;
+		} else {
+			print STDERR $response->status_line  if ($DEBUG);
+		}
+		$url2fetch = '';
+		print STDERR "-1a: html=$html=\n"  if ($DEBUG > 1);
+		if ($html && $html =~ m#\<div\s+class\=\"play\-icon\"\>([^\>]+)#s) {
+			my $playHtml = $1;
+			if ($playHtml =~ m#href\=\"([^\"]+)#s) {
+				my $playlink = $1;
+				if ($playlink =~ m#\/live\/([a-z0-9\-]+)#) {
+					$self->{'id'} = $1;
+					$url2fetch = $playlink;
+					print STDERR "-1a FETCHING REDIRECTED URL=$url2fetch= ID=".$self->{'id'}."=\n"  if ($DEBUG);
+				}
+			}
+		}
+		#IF NO REDIRECT FOUND, RESET TO CONVENTIONAL "live" URL AND TRY THAT:
+		$url2fetch ||= 'https://www.iheart.com/live/' . $self->{'id'};
+	}
+
+	print STDERR "-1: FINAL FETCH URL=$url2fetch=\n"  if ($DEBUG);
+	$response = $ua->get($url2fetch);
 	if ($response->is_success) {
 		$html = $response->decoded_content;
 	} else {
@@ -453,6 +482,7 @@ sub new
 	print STDERR "-2: streamhtml=$streamhtml0=\n"  if ($DEBUG);
 	$self->{'cnt'} = 0;
 	$self->{'title'} = '';
+	$self->{'description'} = '';
 	$self->{'artist'} = '';
 	$self->{'created'} = '';
 	$self->{'year'} = '';
@@ -465,14 +495,23 @@ sub new
 		return undef  unless ($self->{'cnt'} > 0);
 		my $id = $url;
 		$id =~ s#\/$##;
-		$id = $1  if ($id =~ m#([^\/]+)$#);
+		$id = $1  if ($id =~ m#([^\/]+)\/episode\/#);
+		my $seedID = ($id =~ /(\d+)$/) ? $1 : '';  #NUMERIC PART
 		$self->{'id'} .= '/' . $id  if ($id);
 		$self->{'title'} = $1  if ($html =~ s# rel\=\"alternate\"\s+title\=\"([^\"]+)\"##s);
 		$self->{'title'} ||= ($html =~ s#\<title[^\>]+\>([^\<]+)\<\/title\>##s) ? $1 : '';
-		$self->{'description'} = ($html =~ s#\"podcastDescription\"\>\<p\>(.+?)\<\/p\>##s) ? $1 : '';
+		$self->{'description'} = $1  if ($html =~ s#\"description\"\:\"([^\"]+)##s);
+		$self->{'description'} ||= $1  if ($html =~ s#\"podcastDescription\"\>\<p\>(.+?)\<\/p\>##s);
 		$self->{'description'} ||= ($html =~ s#\"podcastDescription\"\>(?:\<[^\>]+\>)?([^\<]+)##s) ? $1 : $self->{'title'};
 		$self->{'description'} = HTML::Entities::decode_entities($self->{'description'});
 		$self->{'description'} = uri_unescape($self->{'description'});
+		($self->{'albumartist'} = $url) =~ s#\/episode.+$##;
+		if ($seedID) {
+			my $albumHtml = $1  if ($html =~ m#\"seedShowId\"\:$seedID([^\}]+)#);
+			if ($albumHtml) {
+				$self->{'artist'} = $1  if ($albumHtml =~ m#\"title\"\:\"([^\"]+)#);
+			}
+		}
 		if ($html =~ m#\<span class\=\"css\-\w+ \w+\"\>\<span\>([^\<]+)\<\/span\>\<\/span\>\<\/a\>\</div\>\<span\>\<div class\=\"css\-\w+ \w+\"\>([^\<]+)\<\!\-\- \-\-\>#) {
 			$self->{'title'} = $1;
 			$self->{'created'} = $2;

@@ -24,6 +24,21 @@ subtest "all success" => sub {
     ], "final results") or diag explain $res;
 };
 
+subtest "all success, with payload" => sub {
+    my $envres = envresmulti;
+    $envres->add_result(200, "OK", {item_id=>1, payload=>"a"});
+    $envres->add_result(202, "OK", {item_id=>2, note=>"blah", payload=>"b"});
+    $envres->add_result(304, "Not modified", {item_id=>3});
+    my $res = $envres->as_struct;
+    is($res->[0], 200, "final status");
+    is_deeply($res->[2], ["a","b"], "final payload");
+    is_deeply($res->[3]{results}, [
+        {status=>200, message=>"OK", item_id=>1, payload=>"a"},
+        {status=>202, message=>"OK", item_id=>2, note=>"blah", payload=>"b"},
+        {status=>304, message=>"Not modified", item_id=>3},
+    ], "final results") or diag explain $res;
+};
+
 subtest "partial success (success first)" => sub {
     my $envres = envresmulti;
     my $res;

@@ -12,11 +12,11 @@ use parent qw/ Plack::Middleware /;
 use Plack::Util;
 use Plack::Util::Accessor qw/ path type /;
 use Ref::Util qw/ is_arrayref is_coderef /;
-use Text::Minify::XS v0.3.1 ();
+use Text::Minify::XS v0.3.3 ();
 
 # RECOMMEND PREREQ:  Ref::Util::XS
 
-our $VERSION = 'v0.1.1';
+our $VERSION = 'v0.1.3';
 
 sub call {
     my ($self, $env) = @_;
@@ -67,7 +67,7 @@ sub call {
 
 
             if (Plack::Util::header_exists( $res->[1], 'content-length' )) {
-                Plack::Util::header_set( $res->[1], 'content-length', length($res->[2]) );
+                Plack::Util::header_set( $res->[1], 'content-length', length( $res->[2][0] ) );
             }
 
             return;
@@ -91,7 +91,7 @@ Plack::Middleware::Text::Minify - minify text responses on the fly
 
 =head1 VERSION
 
-version v0.1.1
+version v0.1.3
 
 =head1 SYNOPSIS
 
@@ -167,7 +167,7 @@ Robert Rothenberg <rrwo@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2020 by Robert Rothenberg.
+This software is Copyright (c) 2020-2021 by Robert Rothenberg.
 
 This is free software, licensed under:
 

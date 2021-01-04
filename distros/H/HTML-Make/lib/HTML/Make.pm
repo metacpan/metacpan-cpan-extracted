@@ -1,7 +1,7 @@
 package HTML::Make;
 use warnings;
 use strict;
-our $VERSION = '0.10';
+our $VERSION = '0.12';
 use Carp;
 use HTML::Valid::Tagset ':all';
 
@@ -99,6 +99,14 @@ sub add_text
 {
     my ($obj, $text) = @_;
     my $x = __PACKAGE__->new ($texttype, text => $text);
+    CORE::push @{$obj->{children}}, $x;
+    return $x;
+}
+
+sub add_comment
+{
+    my ($obj, $comment) = @_;
+    my $x = __PACKAGE__->new ($texttype, text => "<!-- $comment -->");
     CORE::push @{$obj->{children}}, $x;
     return $x;
 }

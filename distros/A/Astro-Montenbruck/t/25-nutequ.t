@@ -30,10 +30,11 @@ subtest 'mean2true' => sub {
     plan tests => 3;
 
     my $f = mean2true($t);
-    my ($x, $y, $z) = $f->(1, 1, 1);
-    delta_ok($x, 1.0001103, 'X');
-    delta_ok($y, 0.9999400, 'Y');
-    delta_ok($z, 0.9999497, 'Z');
+    my ($x, $y, $z) = $f->([1, 1, 1]);
+    print("$x, $y, $z\n");
+    delta_ok($x, 1.00008389272267, 'X');
+    delta_ok($y, 0.99993305001848, 'Y');
+    delta_ok($z, 0.99998305725885, 'Z');
 };
 
 delta_ok(obliquity($t), 23.4367663, 'obliquity');

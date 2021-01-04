@@ -105,7 +105,7 @@ my $configure_emailserver=sub {
    ($stdout,$stderr)=setup_aws_security(
       'EmailServerSecurityGroup','EmailServer.com Security Group');
    ($stdout,$stderr)=$handle->cmd($sudo.'id www-data');
-   if ($stdout=~/no such user/) {
+   if ($stdout=~/no such user/ || $stderr=~/no such user/) {
       ($stdout,$stderr)=$handle->cmd($sudo.'groupadd www-data');
       ($stdout,$stderr)=$handle->cmd($sudo.
          'adduser -r -m -g www-data www-data');
@@ -1094,164 +1094,6 @@ if ($do==1) {
          '__display__');
    }
 }
-   ($stdout,$stderr)=$handle->cwd('/opt/source');
-   my $install_postfix=<<'END';
-
-
-          o o    o .oPYo. ooooo    .oo o     o     o o    o .oPYo.
-          8 8b   8 8        8     .P 8 8     8     8 8b   8 8    8
-          8 8`b  8 `Yooo.   8    .P  8 8     8     8 8`b  8 8
-          8 8 `b 8     `8   8   oPooo8 8     8     8 8 `b 8 8   oo
-          8 8  `b8      8   8  .P    8 8     8     8 8  `b8 8    8
-          8 8   `8 `YooP'   8 .P     8 8oooo 8oooo 8 8   `8 `YooP8
-          ........................................................
-          ::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-      
-        ########   #######   ######  ######## ######## #### ##     ##
-        ##     ## ##     ## ##    ##    ##    ##        ##   ##   ##
-        ##     ## ##     ## ##          ##    ##        ##    ## ##
-        ########  ##     ##  ######     ##    ######    ##     ###
-        ##        ##     ##       ##    ##    ##        ##    ## ##
-        ##        ##     ## ##    ##    ##    ##        ##   ##   ##
-        ##         #######   ######     ##    ##       #### ##     ##
-
-
-          (POSTFIX is **NOT** a sponsor of the FullAuto© Project.)
-
-
-END
-   ($stdout,$stderr)=$handle->cwd('/opt/source');
-   print $install_postfix;
-   sleep 5;
-   # https://www.linuxbabe.com/redhat/run-your-own-email-server-centos-postfix-smtp-server
-   ($stdout,$stderr)=$handle->cmd($sudo.
-      'wget -qO- http://ftp.porcupine.org/mirrors/postfix-release/index.html');
-   $stdout=~s/^.*?href=["]([^"]+)?["][>]Source code.*$/$1/s;
-   my $gtarfile=$stdout;
-   ($stdout,$stderr)=$handle->cmd($sudo.
-      "wget --random-wait --progress=dot ".
-      "http://ftp.porcupine.org/mirrors/postfix-release/$stdout",
-      '__display__');
-   $gtarfile=~s/^.*\///;
-   ($stdout,$stderr)=$handle->cmd($sudo.
-      "tar zxvf $gtarfile",'__display__');
-   $gtarfile=~s/.tar.gz$//;
-   ($stdout,$stderr)=$handle->cwd($gtarfile);
-   ($stdout,$stderr)=$handle->cmd($sudo.
-      "make -f Makefile.init makefiles",'__display__');
-   ($stdout,$stderr)=$handle->cmd($sudo.
-      "make",'__display__');
-   $handle->print($sudo.'make install');
-   $prompt=$handle->prompt();
-   while (1) {
-      my $output=fetch($handle);
-      last if $output=~/$prompt/;
-      print $output;
-      if (-1<index $output,'install_root:') {
-         $handle->print();
-      } elsif (-1<index $output,'tempdir:') {
-         $handle->print();
-      } elsif (-1<index $output,'config_directory:') {
-         $handle->print();
-      } elsif (-1<index $output,'command_directory:') {
-         $handle->print();
-      } elsif (-1<index $output,'daemon_directory:') {
-         $handle->print();
-      } elsif (-1<index $output,'data_directory:') {
-         $handle->print();
-      } elsif (-1<index $output,'html_directory:') {
-         $handle->print();
-      } elsif (-1<index $output,'mail_owner:') {
-         $handle->print();
-      } elsif (-1<index $output,'mailq_path:') {
-         $handle->print();
-      } elsif (-1<index $output,'manpage_directory:') {
-         $handle->print();
-      } elsif (-1<index $output,'newaliases_path:') {
-         $handle->print();
-      } elsif (-1<index $output,'queue_directory:') {
-         $handle->print();
-      } elsif (-1<index $output,'readme_directory:') {
-         $handle->print();
-      } elsif (-1<index $output,'sendmail_path:') {
-         $handle->print();
-      } elsif (-1<index $output,'setgid_group:') {
-         $handle->print();
-      } elsif (-1<index $output,'shlib_directory:') {
-         $handle->print();
-      } elsif (-1<index $output,'meta_directory:') {
-         $handle->print();
-      }
-      next;
-   }
-   ($stdout,$stderr)=$handle->cmd($sudo.
-      "systemctl start postfix",'__display__');
-   ($stdout,$stderr)=$handle->cmd($sudo.
-      "systemctl enable postfix",'__display__');
-   ($stdout,$stderr)=$handle->cmd($sudo.
-      "systemctl status postfix",'__display__');
-   ($stdout,$stderr)=$handle->cmd($sudo.
-      "postconf -e \"inet_interfaces = all\"",'__display__');
-   ($stdout,$stderr)=$handle->cmd($sudo.
-      "yum -y install nmap",'__display__');
-   ($stdout,$stderr)=$handle->cmd($sudo.
-      "yum -y install telnet",'__display__');
-
-   my $install_dovecot=<<'END';
-
-
-          o o    o .oPYo. ooooo    .oo o     o     o o    o .oPYo.
-          8 8b   8 8        8     .P 8 8     8     8 8b   8 8    8
-          8 8`b  8 `Yooo.   8    .P  8 8     8     8 8`b  8 8
-          8 8 `b 8     `8   8   oPooo8 8     8     8 8 `b 8 8   oo
-          8 8  `b8      8   8  .P    8 8     8     8 8  `b8 8    8
-          8 8   `8 `YooP'   8 .P     8 8oooo 8oooo 8 8   `8 `YooP8
-          ........................................................
-          ::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-
-       ######    ######  ######## ########  ######   ######  ########
-       #    ##  ##    ## #  ##  # #      # ##    ## ##    ## #      #
-       #  #  ## #  ##  # #  ##  # #  ##### #  ##  # #  ##  # ###  ###
-       #  ##  # #  ##  # #  ##  # #    #   #  ##### #  ##  #   #  #
-       #  ##  # #  ##  # #  ##  # #  ###   #  ##### #  ##  #   #  #
-       #  #  ## #  ##  # ##    ## #  ##### #  ##  # #  ##  #   #  #
-       #    ##  ##    ##  ##  ##  #      # ##    ## ##    ##   #  #
-       ######    ######    ####   ########  ######   ######    ####
-
-
-          (DOVECOT is **NOT** a sponsor of the FullAuto© Project.)
-
-
-END
-   ($stdout,$stderr)=$handle->cwd('/opt/source');
-   print $install_dovecot;
-   sleep 5;
-
-   ($stdout,$stderr)=$handle->cmd($sudo.
-      'wget -qO- https://dovecot.org/download');
-   $stdout=~s/^.*?EOL statement.*?[<]a href=["]([^"]+)?["]\s.*$/$1/s;
-   $gtarfile=$stdout;
-   ($stdout,$stderr)=$handle->cmd($sudo.
-      "wget --random-wait --progress=dot ".$stdout,
-      '__display__');
-   $gtarfile=~s/^.*\///;
-   ($stdout,$stderr)=$handle->cmd($sudo.
-      "tar zxvf $gtarfile",'__display__');
-   $gtarfile=~s/.tar.gz$//;
-   ($stdout,$stderr)=$handle->cwd($gtarfile);
-   #($stdout,$stderr)=$handle->cmd($sudo.
-   #   'mkdir -vp /usr/local/etc','__display__');
-   #($stdout,$stderr)=$handle->cmd($sudo.
-   #   'cp -r doc/dovecot/example-config/* /usr/local/etc/dovecot/',
-   #   '__display__');
-   ($stdout,$stderr)=$handle->cmd($sudo.
-      "./configure",'__display__');
-   ($stdout,$stderr)=$handle->cmd($sudo.
-      "make",'__display__');
-   ($stdout,$stderr)=$handle->cmd($sudo.
-      "make install",'__display__');
 
    #
    # echo-ing/streaming files over ssh can be tricky. Use echo -e
@@ -1614,28 +1456,29 @@ END
       print $out if $output!~/^MariaDB.*?>\s*$/;
       last if $output=~/$prompt|Bye/;
       if (!$cmd_sent && $output=~/MariaDB.*?>\s*$/) {
-         my $cmd='DROP DATABASE emailserver;';
+         my $cmd='DROP DATABASE roundcube;';
          print "$cmd\n";
          $handle->print($cmd);
          $cmd_sent++;
          sleep 1;
          next;
       } elsif ($cmd_sent==1 && $output=~/MariaDB.*?>\s*$/) {
-         my $cmd="CREATE DATABASE emailserver;";
+         my $cmd='CREATE roundcube DEFAULT CHARACTER SET '.
+                 'utf8 COLLATE utf8_general_ci;';
          print "$cmd\n";
          $handle->print($cmd);
          $cmd_sent++;
          sleep 1;
          next;
       } elsif ($cmd_sent==2 && $output=~/MariaDB.*?>\s*$/) {
-         my $cmd='DROP USER emailserveruser@localhost;';
+         my $cmd='DROP USER roundcubeuser@localhost;';
          print "$cmd\n";
          $handle->print($cmd);
          $cmd_sent++;
          sleep 1;
          next;
       } elsif ($cmd_sent==3 && $output=~/MariaDB.*?>\s*$/) {
-         my $cmd='CREATE USER emailserveruser@localhost IDENTIFIED BY '.
+         my $cmd='CREATE USER roundcubeuser@localhost IDENTIFIED BY '.
                  "'".$service_and_cert_password."';";
          print "$cmd\n";
          $handle->print($cmd);
@@ -1643,8 +1486,8 @@ END
          sleep 1;
          next;
       } elsif ($cmd_sent==4 && $output=~/MariaDB.*?>\s*$/) {
-         my $cmd='GRANT ALL PRIVILEGES ON emailserver.*'.
-                 ' TO emailserveruser@localhost;';
+         my $cmd='GRANT ALL PRIVILEGES ON roundcube.*'.
+                 ' TO roundcubeuser@localhost;';
          print "$cmd\n";
          $handle->print($cmd);
          $cmd_sent++;
@@ -1775,6 +1618,8 @@ END
          '--enable-fpm '.
          '--enable-gd '.
          '--with-freetype '.
+         '--with-imap '.
+         '--with-imap-ssl '.
          '--with-jpeg '.
          '--enable-intl '.
          '--enable-exif '.
@@ -1942,6 +1787,165 @@ END
    }
 
    ($stdout,$stderr)=$handle->cwd('/opt/source');
+   my $install_postfix=<<'END';
+
+
+          o o    o .oPYo. ooooo    .oo o     o     o o    o .oPYo.
+          8 8b   8 8        8     .P 8 8     8     8 8b   8 8    8
+          8 8`b  8 `Yooo.   8    .P  8 8     8     8 8`b  8 8
+          8 8 `b 8     `8   8   oPooo8 8     8     8 8 `b 8 8   oo
+          8 8  `b8      8   8  .P    8 8     8     8 8  `b8 8    8
+          8 8   `8 `YooP'   8 .P     8 8oooo 8oooo 8 8   `8 `YooP8
+          ........................................................
+          ::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+
+        ########   #######   ######  ######## ######## #### ##     ##
+        ##     ## ##     ## ##    ##    ##    ##        ##   ##   ##
+        ##     ## ##     ## ##          ##    ##        ##    ## ##
+        ########  ##     ##  ######     ##    ######    ##     ###
+        ##        ##     ##       ##    ##    ##        ##    ## ##
+        ##        ##     ## ##    ##    ##    ##        ##   ##   ##
+        ##         #######   ######     ##    ##       #### ##     ##
+
+
+          (POSTFIX is **NOT** a sponsor of the FullAuto© Project.)
+
+
+END
+   ($stdout,$stderr)=$handle->cwd('/opt/source');
+   print $install_postfix;
+   sleep 5;
+   # https://www.linuxbabe.com/redhat/run-your-own-email-server-centos-postfix-smtp-server
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'wget -qO- http://ftp.porcupine.org/mirrors/postfix-release/index.html');
+   $stdout=~s/^.*?href=["]([^"]+)?["][>]Source code.*$/$1/s;
+   my $gtarfile=$stdout;
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      "wget --random-wait --progress=dot ".
+      "http://ftp.porcupine.org/mirrors/postfix-release/$stdout",
+      '__display__');
+   $gtarfile=~s/^.*\///;
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      "tar zxvf $gtarfile",'__display__');
+   $gtarfile=~s/.tar.gz$//;
+   ($stdout,$stderr)=$handle->cwd($gtarfile);
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      "make -f Makefile.init makefiles",'__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      "make",'__display__');
+   $handle->print($sudo.'make install');
+   $prompt=$handle->prompt();
+   while (1) {
+      my $output=fetch($handle);
+      last if $output=~/$prompt/;
+      print $output;
+      if (-1<index $output,'install_root:') {
+         $handle->print();
+      } elsif (-1<index $output,'tempdir:') {
+         $handle->print();
+      } elsif (-1<index $output,'config_directory:') {
+         $handle->print();
+      } elsif (-1<index $output,'command_directory:') {
+         $handle->print();
+      } elsif (-1<index $output,'daemon_directory:') {
+         $handle->print();
+      } elsif (-1<index $output,'data_directory:') {
+         $handle->print();
+      } elsif (-1<index $output,'html_directory:') {
+         $handle->print();
+      } elsif (-1<index $output,'mail_owner:') {
+         $handle->print();
+      } elsif (-1<index $output,'mailq_path:') {
+         $handle->print();
+      } elsif (-1<index $output,'manpage_directory:') {
+         $handle->print();
+      } elsif (-1<index $output,'newaliases_path:') {
+         $handle->print();
+      } elsif (-1<index $output,'queue_directory:') {
+         $handle->print();
+      } elsif (-1<index $output,'readme_directory:') {
+         $handle->print();
+      } elsif (-1<index $output,'sendmail_path:') {
+         $handle->print();
+      } elsif (-1<index $output,'setgid_group:') {
+         $handle->print();
+      } elsif (-1<index $output,'shlib_directory:') {
+         $handle->print();
+      } elsif (-1<index $output,'meta_directory:') {
+         $handle->print();
+      }
+      next;
+   }
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      "systemctl start postfix",'__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      "systemctl enable postfix",'__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      "systemctl status postfix",'__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      "postconf -e \"inet_interfaces = all\"",'__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      "yum -y install nmap",'__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      "yum -y install telnet",'__display__');
+
+   my $install_dovecot=<<'END';
+
+
+          o o    o .oPYo. ooooo    .oo o     o     o o    o .oPYo.
+          8 8b   8 8        8     .P 8 8     8     8 8b   8 8    8
+          8 8`b  8 `Yooo.   8    .P  8 8     8     8 8`b  8 8
+          8 8 `b 8     `8   8   oPooo8 8     8     8 8 `b 8 8   oo
+          8 8  `b8      8   8  .P    8 8     8     8 8  `b8 8    8
+          8 8   `8 `YooP'   8 .P     8 8oooo 8oooo 8 8   `8 `YooP8
+          ........................................................
+          ::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+
+       ######    ######  ######## ########  ######   ######  ########
+       #    ##  ##    ## #  ##  # #      # ##    ## ##    ## #      #
+       #  #  ## #  ##  # #  ##  # #  ##### #  ##  # #  ##  # ###  ###
+       #  ##  # #  ##  # #  ##  # #    #   #  ##### #  ##  #   #  #
+       #  ##  # #  ##  # #  ##  # #  ###   #  ##### #  ##  #   #  #
+       #  #  ## #  ##  # ##    ## #  ##### #  ##  # #  ##  #   #  #
+       #    ##  ##    ##  ##  ##  #      # ##    ## ##    ##   #  #
+       ######    ######    ####   ########  ######   ######    ####
+
+
+          (DOVECOT is **NOT** a sponsor of the FullAuto© Project.)
+
+
+END
+   ($stdout,$stderr)=$handle->cwd('/opt/source');
+   print $install_dovecot;
+   sleep 5;
+
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'wget -qO- https://dovecot.org/download');
+   $stdout=~s/^.*?EOL statement.*?[<]a href=["]([^"]+)?["]\s.*$/$1/s;
+   $gtarfile=$stdout;
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      "wget --random-wait --progress=dot ".$stdout,
+      '__display__');
+   $gtarfile=~s/^.*\///;
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      "tar zxvf $gtarfile",'__display__');
+   $gtarfile=~s/.tar.gz$//;
+   ($stdout,$stderr)=$handle->cwd($gtarfile);
+   #($stdout,$stderr)=$handle->cmd($sudo.
+   #   'mkdir -vp /usr/local/etc','__display__');
+   #($stdout,$stderr)=$handle->cmd($sudo.
+   #   'cp -r doc/dovecot/example-config/* /usr/local/etc/dovecot/',
+   #   '__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      "./configure",'__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      "make",'__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      "make install",'__display__');
+
+   ($stdout,$stderr)=$handle->cwd('/opt/source');
    my $install_roundcube=<<'END';
 
 
@@ -2002,6 +2006,17 @@ END
    }
    ($stdout,$stderr)=$handle->cmd($sudo.
       'bin/install-jsdeps.sh','__display__');
+   my $rcfile='./SQL/mysql.initial.sql';
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'mysql --verbose --force -u roundcube -p'.
+      "'".$service_and_cert_password."' roundcube < $rcfile",
+      '__display__');
+   ($stdout,$stderr)=$handle->cwd('/opt/source');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      'mkdir -vp /var/www/html/roundcube','__display__');
+   ($stdout,$stderr)=$handle->cmd($sudo.
+      "cp -Rv $gtarfile/* /var/www/html/roundcube",
+      '__display__');
 
    ($stdout,$stderr)=$handle->cwd('/opt/source');
    my $install_rspamd=<<'END';
@@ -2084,11 +2099,7 @@ END
    ($stdout,$stderr)=$handle->cwd('/opt/source');
    ($stdout,$stderr)=$handle->cmd($sudo.
       'git clone https://luajit.org/git/luajit-2.0.git','__display__');
-   ($stdout,$stderr)=$handle->cwd('luajit-2.0.git');
-
-   ($stdout,$stderr)=$handle->cmd($sudo.
-      'git clone https://luajit.org/git/luajit-2.0.git','__display__');
-   ($stdout,$stderr)=$handle->cwd('luajit-2.0.git');
+   ($stdout,$stderr)=$handle->cwd('luajit-2.0');
    ($stdout,$stderr)=$handle->cmd($sudo.
       'make install','__display__');
    ($stdout,$stderr)=$handle->cwd('/opt/source');
@@ -2097,7 +2108,7 @@ END
       '__display__');
    ($stdout,$stderr)=$handle->cwd('boost');
    ($stdout,$stderr)=$handle->cmd($sudo.
-      './boostrap.sh','__display__');
+      './bootstrap.sh','__display__');
    ($stdout,$stderr)=$handle->cmd($sudo.
       './b2 install','__display__');
    ($stdout,$stderr)=$handle->cwd('/opt/source');
@@ -2135,6 +2146,7 @@ END
    ($stdout,$stderr)=$handle->cwd('rspamd');
    ($stdout,$stderr)=$handle->cmd($sudo.
       'mkdir -v rspamd.build','__display__');
+   ($stdout,$stderr)=$handle->cwd('rspamd.build');
    ($stdout,$stderr)=$handle->cmd($sudo.
       'cmake .. -DENABLE_HYPERSCAN=ON -DENABLE_LUAJIT=ON '.
       '-DCMAKE_BUILD_TYPE=RelWithDebuginfo','__display__');

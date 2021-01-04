@@ -8,7 +8,7 @@ use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
   "ABSTRACT" => "Perl implementation of Ping Identity's \"OpenToken\"",
-  "AUTHOR" => "Graham TerMarsch <cpan\@howlingfrog.com>",
+  "AUTHOR" => "Graham TerMarsch <cpan\@howlingfrog.com>, Shawn Devlin <shawn.devlin\@socialtext.com>",
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0
   },
@@ -24,14 +24,18 @@ my %WriteMakefileArgs = (
     "Digest::HMAC_SHA1" => 0,
     "Digest::SHA1" => 0,
     "MIME::Base64" => 0,
-    "Moose" => 0
+    "Moose" => 0,
+    "namespace::autoclean" => 0
   },
   "TEST_REQUIRES" => {
+    "ExtUtils::MakeMaker" => 0,
+    "File::Spec" => 0,
+    "Test::DiagINC" => "0.002",
     "Test::Differences" => 0,
     "Test::Exception" => 0,
     "Test::More" => "0.96"
   },
-  "VERSION" => "0.08",
+  "VERSION" => "0.09",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -45,11 +49,15 @@ my %FallbackPrereqs = (
   "DateTime" => 0,
   "Digest::HMAC_SHA1" => 0,
   "Digest::SHA1" => 0,
+  "ExtUtils::MakeMaker" => 0,
+  "File::Spec" => 0,
   "MIME::Base64" => 0,
   "Moose" => 0,
+  "Test::DiagINC" => "0.002",
   "Test::Differences" => 0,
   "Test::Exception" => 0,
-  "Test::More" => "0.96"
+  "Test::More" => "0.96",
+  "namespace::autoclean" => 0
 );
 
 

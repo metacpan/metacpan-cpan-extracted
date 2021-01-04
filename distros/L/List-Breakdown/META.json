@@ -4,13 +4,13 @@
       "Tom Ryder <tom@sanctum.geek.nz>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.58, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "List-Breakdown",
    "no_index" : {
@@ -41,7 +41,7 @@
    "provides" : {
       "List::Breakdown" : {
          "file" : "lib/List/Breakdown.pm",
-         "version" : "0.22"
+         "version" : "0.23"
       }
    },
    "release_status" : "stable",
@@ -53,6 +53,6 @@
          "web" : "https://sanctum.geek.nz/cgit/List-Breakdown.git/"
       }
    },
-   "version" : "0.22",
-   "x_serialization_backend" : "JSON::PP version 2.27400_02"
+   "version" : "0.23",
+   "x_serialization_backend" : "JSON::PP version 4.05"
 }

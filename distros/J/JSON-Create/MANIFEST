@@ -1,7 +1,6 @@
-bench/bench
 bench/bench.pl
 Changes
-copied/README
+copy.pl
 Create.xs
 examples/array.pl
 examples/boolean.pl
@@ -66,6 +65,7 @@ t/strict.t
 t/to-json.t
 t/unicode.t
 t/user-undef.t
+t/write-json.t
 typemap
 unicode.c
 unicode.h

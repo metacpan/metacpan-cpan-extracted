@@ -1,36 +1,81 @@
 use strict; use warnings;
-use Test::More tests => 36;
+use Test::More tests => 194;
 
 use Graph::Undirected;
 use Graph::Directed;
 
 my $g0 = Graph::Undirected->new;
 my $g1 = Graph::Directed->new;
+is $_, "" for $g0, $g1;
+ok !$_->has_edge('a') for $g0, $g1;
+ok !$_->has_edge('a', 'a') for $g0, $g1;
 
-$g0->add_edge(qw(a b)); $g1->add_edge(qw(a b));
-$g0->add_edge(qw(a c)); $g1->add_edge(qw(a c));
-$g0->add_edge(qw(a d)); $g1->add_edge(qw(a d));
-$g0->add_edge(qw(a e)); $g1->add_edge(qw(a e));
-$g0->add_edge(qw(a f)); $g1->add_edge(qw(a f));
+my @EDGES = (
+    [qw(a b)], [qw(a c)], [qw(a d)], [qw(a e)], [qw(a f)],
+    [qw(b c)], [qw(c b)], [qw(b d)], [qw(d b)],
+    [qw(b e)], [qw(e b)], [qw(b f)], [qw(f b)],
+    [qw(d c)], [qw(e c)], [qw(f c)],
+    [qw(d e)], [qw(d f)],
+    [qw(e f)],
+);
+$g0->add_edge(@$_) for @EDGES;
+$g1->add_edge(@$_) for @EDGES;
 
-$g0->add_edge(qw(b c)); $g1->add_edge(qw(b c));
-$g0->add_edge(qw(b d)); $g1->add_edge(qw(b d));
-$g0->add_edge(qw(b e)); $g1->add_edge(qw(b e));
-$g0->add_edge(qw(b f)); $g1->add_edge(qw(b f));
+ok !$_->has_edge('a') for $g0, $g1;
+ok !$_->has_edge('a', 'a') for $g0, $g1;
+ok !$_->has_edge('a', 'x') for $g0, $g1;
 
-$g0->add_edge(qw(c b)); $g1->add_edge(qw(c b));
-$g0->add_edge(qw(d b)); $g1->add_edge(qw(d b));
-$g0->add_edge(qw(e b)); $g1->add_edge(qw(e b));
-$g0->add_edge(qw(f b)); $g1->add_edge(qw(f b));
+# undirected, directed
+my %SUCCESSORS = (
+    a => [ [qw(b c d e f)], [qw(b c d e f)] ],
+    b => [ [qw(a c d e f)], [qw(c d e f)] ],
+    c => [ [qw(a b d e f)], [qw(b)] ],
+    d => [ [qw(a b c e f)], [qw(b c e f)] ],
+    e => [ [qw(a b c d f)], [qw(b c f)] ],
+    f => [ [qw(a b c d e)], [qw(b c)] ],
+);
+for my $v (sort keys %SUCCESSORS) {
+    my ($u, $d) = @{ $SUCCESSORS{$v} };
+    for my $t ([$g0, $u], [$g1, $d]) {
+	my ($g, $r) = @$t;
+	is("@{[sort $g->successors($v)]}", "@$r", "successors u $v");
+	my %expected_edges; @expected_edges{ @$r } = ();
+	my %not_edges; @not_edges{ grep $_ ne $v, $g->vertices } = ();
+	delete @not_edges{ keys %expected_edges };
+	ok $g->has_edge($v, $_) for keys %expected_edges;
+	ok !$g->has_edge($v, $_) for keys %not_edges;
+    }
+}
 
-$g0->add_edge(qw(d c)); $g1->add_edge(qw(d c));
-$g0->add_edge(qw(e c)); $g1->add_edge(qw(e c));
-$g0->add_edge(qw(f c)); $g1->add_edge(qw(f c));
+my %PREDECESSORS = (
+    a => [ [qw(b c d e f)], [qw()] ],
+    b => [ [qw(a c d e f)], [qw(a c d e f)] ],
+    c => [ [qw(a b d e f)], [qw(a b d e f)] ],
+    d => [ [qw(a b c e f)], [qw(a b)] ],
+    e => [ [qw(a b c d f)], [qw(a b d)] ],
+    f => [ [qw(a b c d e)], [qw(a b d e)] ],
+);
+for my $v (sort keys %PREDECESSORS) {
+    my ($u, $d) = @{ $PREDECESSORS{$v} };
+    for my $t ([$g0, $u], [$g1, $d]) {
+	my ($g, $r) = @$t;
+	is("@{[sort $g->predecessors($v)]}", "@$r", "predecessors u $v");
+	my %expected_edges; @expected_edges{ @$r } = ();
+	my %not_edges; @not_edges{ grep $_ ne $v, $g->vertices } = ();
+	delete @not_edges{ keys %expected_edges };
+	ok $g->has_edge($_, $v) for keys %expected_edges;
+	ok !$g->has_edge($_, $v) for keys %not_edges;
+    }
+}
 
-$g0->add_edge(qw(d e)); $g1->add_edge(qw(d e));
-$g0->add_edge(qw(d f)); $g1->add_edge(qw(d f));
-
-$g0->add_edge(qw(e f)); $g1->add_edge(qw(e f));
+is_deeply [ $g0->as_hashes ], [
+    { map +($_ => {}), keys %SUCCESSORS },
+    { map +($_ => { map +($_ => {}), @{ $SUCCESSORS{$_}[0] } }), keys %SUCCESSORS },
+], "undirected as_hashes" or diag explain [ $g0->as_hashes ];
+is_deeply [ $g1->as_hashes ], [
+    { map +($_ => {}), keys %SUCCESSORS },
+    { map +($_ => { map +($_ => {}), @{ $SUCCESSORS{$_}[1] } }), keys %SUCCESSORS },
+], "directed as_hashes" or diag explain [ $g1->as_hashes ];
 
 is($g0, 'a=b,a=c,a=d,a=e,a=f,b=c,b=d,b=e,b=f,c=d,c=e,c=f,d=e,d=f,e=f')
     for 1..10;
@@ -51,9 +96,9 @@ Graph::AdjacencyMap::Light arity=2 flags: _UNORD|_LIGHT
  to:    1    2    3    4    5
    0    1    1    1    1    1
    1         1    1    1    1
-   2    1         1    1    1
-   3    1    1         1    1
-   4    1    1    1         1
+   2              1    1    1
+   3                   1    1
+   4                        1
 EOF
 
 is $g1->[ Graph::_V ]->stringify, <<'EOF';

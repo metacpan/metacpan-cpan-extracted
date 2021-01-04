@@ -37,8 +37,7 @@ sub save_opml {
   write_binary("test-$id/$filename", <<"EOT");
 <opml version="2.0">
   <body>
-    <outline title="RSS 2.0 Sample File"
-             xmlUrl="http://127.0.0.1:$port/"/>
+    <outline title="Feed" xmlUrl="http://127.0.0.1:$port/"/>
   </body>
 </opml>
 EOT

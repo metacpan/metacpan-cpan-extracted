@@ -11,7 +11,7 @@ SYNOPSIS
       version = 0.001
   
       [@Starter]           ; all that is needed to start
-      revision = 4         ; always defaults to revision 1
+      revision = 5         ; always defaults to revision 1
   
       ; configuring examples
       installer = ModuleBuildTiny
@@ -21,7 +21,7 @@ SYNOPSIS
       regenerate = LICENSE ; copy LICENSE to root after release and dzil regenerate
 
       [@Starter::Git]      ; drop-in variant bundle for git workflows
-      revision = 4         ; requires/defaults to revision 3
+      revision = 5         ; requires/defaults to revision 3
 
 DESCRIPTION
     The "[@Starter]" plugin bundle for Dist::Zilla is designed to do the
@@ -31,112 +31,39 @@ DESCRIPTION
     plugins is intended to be unopinionated and unobtrusive, so that it is
     usable for any well-formed CPAN distribution.
 
-    The Dist::Zilla::Starter guide is a starting point if you are new to
-    Dist::Zilla or CPAN distribution building. See "EXAMPLES" for example
-    configurations of this bundle.
+    "[@Starter]" supports bundle revisions specified as an option, in order
+    to allow authors to opt-in to future changes to distribution packaging
+    and releasing practices. Existing revisions and the default revision
+    number will not be changed, to preserve consistent functionality in
+    existing dist.ini configurations.
 
-    For a variant of this bundle with built-in support for a git-based
-    workflow, see [@Starter::Git].
+    You probably want [@Starter::Git], an extension of this bundle, if you
+    are using a git-based workflow.
+
+    Dist::Milla is another simple, if opinionated, way to use Dist::Zilla
+    without requiring any configuration ("convention over configuration"),
+    and performing all of the tasks in "EXTENDING" by default. The
+    "[@Starter]" bundle can also be configured to operate much like
+    Dist::Milla, as in the "Dist::Milla equivalent" example.
+
+GETTING STARTED
+    The Dist::Zilla::Starter guide is a starting point if you are new to
+    Dist::Zilla or CPAN distribution building.
 
     For one-line initialization of a new "[@Starter]"-based distribution,
     try Dist::Zilla::MintingProfile::Starter (or
     Dist::Zilla::MintingProfile::Starter::Git).
 
-    Migrating from "[@Basic]" is easy for most cases. Most of the bundle is
-    the same, so just make sure to remove any extra plugins that
+    Migrating from "[@Basic]" is easy for most cases. The core of the bundle
+    is the same, so just make sure to remove any extra plugins that
     "[@Starter]" already includes, and configure the included plugins if
-    needed (see "CONFIGURING"). Migrating a more complex set of plugins,
-    including some that interact with the additional generated files, may
-    require more careful consideration.
+    needed. Migrating a more complex set of plugins, including some that
+    interact with the additional generated files, may require more careful
+    consideration.
 
-    "[@Starter]" composes the PluginRemover and Config::Slicer roles to make
-    it easier to customize and extend. Also, it supports bundle revisions
-    specified as an option, in order to incorporate future changes to
-    distribution packaging and releasing practices. Existing revisions will
-    not be changed to preserve backwards compatibility.
-
-    The "FAKE_RELEASE" environment variable is supported as in Dist::Milla
-    and Minilla. It replaces the [UploadToCPAN] plugin with [FakeRelease],
-    to test the release process (including any version bumping and commits!)
-    without actually uploading to CPAN.
-
-      $ FAKE_RELEASE=1 dzil release
-
-    Another simple way to use Dist::Zilla is with Dist::Milla, an
-    opinionated bundle that requires no configuration and performs all of
-    the tasks in "EXTENDING" by default. This bundle can also be configured
-    to operate much like Dist::Milla, as in the "Dist::Milla equivalent"
-    example.
-
-EXAMPLES
-    Some example dist.ini configurations to get started with.
-
-  Just the basics
-      name    = Acme-Foo
-      author  = Jane Doe <example@example.com>
-      license = Artistic_2_0
-      copyright_holder = Jane Doe
-      copyright_year   = 2019
-      version = 1.00
-
-      [@Starter]
-      revision = 4
-
-      [Prereqs / RuntimeRequires]
-      perl = 5.010001
-      Exporter = 5.57
-      Path::Tiny = 0
-
-      [Prereqs / TestRequires]
-      Test::More = 0.88
-
-  Managed boilerplate
-      name    = Acme-Foo
-      author  = Jane Doe <example@example.com>
-      license = Artistic_2_0
-      copyright_holder = Jane Doe
-      copyright_year   = 2019
-
-      [@Starter::Git]
-      revision = 4
-      managed_versions = 1
-      regenerate = Makefile.PL
-      regenerate = META.json
-      regenerate = LICENSE
-
-      [AutoPrereqs]
-
-  Dist::Milla equivalent
-      [CheckChangesHasContent]
-
-      [ReadmeAnyFromPod]
-      type = markdown
-      filename = README.md
-      location = root
-      phase = release
-      [Regenerate::AfterReleasers]
-      plugin = ReadmeAnyFromPod
-
-      [@Starter::Git]
-      revision = 4
-      installer = ModuleBuildTiny
-      managed_versions = 1
-      regenerate = Build.PL
-      regenerate = META.json
-      regenerate = LICENSE
-      ExecDir.dir = script
-      Release_Commit.allow_dirty[] = README.md
-      BumpVersionAfterRelease.munge_build_pl = 0
-
-      [NameFromDirectory]
-      [LicenseFromModule]
-      override_author = 1
-      [Prereqs::FromCPANfile]
-      [StaticInstall]
-      mode = auto
-      [GithubMeta]
-      issues = 1
-      [Git::Contributors]
+    See "EXAMPLES" for example configurations of this bundle, "CONFIGURING"
+    for suggestions to customize the bundle to your needs, and "EXTENDING"
+    for examples of other common tasks Dist::Zilla can facilitate.
 
 OPTIONS
     "[@Starter]" currently only has a few direct options; it can be further
@@ -144,7 +71,7 @@ OPTIONS
 
   revision
       [@Starter]
-      revision = 4
+      revision = 5
 
     Selects the revision to use, from "REVISIONS". Defaults to revision 1.
 
@@ -159,6 +86,11 @@ OPTIONS
       revision = 2
       installer = MakeMaker::Awesome
       MakeMaker::Awesome.WriteMakefile_arg[0] = (clean => { FILES => 't/generated/*' })
+
+      [@Starter]
+      revision = 5
+      installer = ModuleBuild
+      ModuleBuild.mb_class = My::Module::Builder
 
     The default installer is [MakeMaker], which works with no extra
     configuration for most cases. The "installer" option can be used to
@@ -181,6 +113,11 @@ OPTIONS
     When using a Module::Build::Tiny-based installer, the [ExecDir] plugin
     will be set to mark the script/ directory for executables instead of the
     default bin/.
+
+    Since revision 5, [ModuleBuild] is supported as an installer, and will
+    generate a Build.PL that uses Module::Build. This is not generally
+    recommended unless converting a distribution that is already using a
+    Module::Build subclass.
 
   managed_versions
     Requires revision 3 or higher.
@@ -305,6 +242,92 @@ REVISIONS
     because it adds significant clutter to the generated META files without
     much benefit. It can easily be added to the dist.ini if desired.
 
+  Revision 5
+    Revision 5 is similar to Revision 4, with these differences:
+
+    * Includes an instance of the [PruneFiles] plugin to remove README.pod
+      from the distribution build if present. The CPAN toolchain expects
+      ".pod" files to be documentation and installs them alongside the
+      module files, sometimes even if they are outside the lib/
+      subdirectory, due to historical distribution layouts. But this is not
+      the purpose of README.pod, so it is excluded from the build to avoid
+      cluttering users' install locations and confusing MetaCPAN and similar
+      documentation indexes. README.pod files generated in the source tree
+      using [ReadmeAnyFromPod] (with "location = root") are already
+      automatically excluded from the build by that plugin.
+
+    * The "installer" option now supports "ModuleBuild".
+
+EXAMPLES
+    Some example dist.ini configurations to get started with.
+
+  Just the basics
+      name    = Acme-Foo
+      author  = Jane Doe <example@example.com>
+      license = Artistic_2_0
+      copyright_holder = Jane Doe
+      copyright_year   = 2019
+      version = 1.00
+
+      [@Starter]
+      revision = 5
+
+      [Prereqs / RuntimeRequires]
+      perl = 5.010001
+      Exporter = 5.57
+      Path::Tiny = 0
+
+      [Prereqs / TestRequires]
+      Test::More = 0.88
+
+  Managed boilerplate
+      name    = Acme-Foo
+      author  = Jane Doe <example@example.com>
+      license = Artistic_2_0
+      copyright_holder = Jane Doe
+      copyright_year   = 2019
+
+      [@Starter::Git]
+      revision = 5
+      managed_versions = 1
+      regenerate = Makefile.PL
+      regenerate = META.json
+      regenerate = LICENSE
+
+      [AutoPrereqs]
+
+  Dist::Milla equivalent
+      [CheckChangesHasContent]
+
+      [ReadmeAnyFromPod]
+      type = markdown
+      filename = README.md
+      location = root
+      phase = release
+      [Regenerate::AfterReleasers]
+      plugin = ReadmeAnyFromPod
+
+      [@Starter::Git]
+      revision = 5
+      installer = ModuleBuildTiny
+      managed_versions = 1
+      regenerate = Build.PL
+      regenerate = META.json
+      regenerate = LICENSE
+      ExecDir.dir = script
+      Release_Commit.allow_dirty[] = README.md
+      BumpVersionAfterRelease.munge_build_pl = 0
+
+      [NameFromDirectory]
+      [LicenseFromModule]
+      override_author = 1
+      [Prereqs::FromCPANfile]
+      [StaticInstall]
+      mode = auto
+      [GithubMeta]
+      issues = 1
+      [Git::Contributors]
+
 CONFIGURING
     By using the PluginRemover or Config::Slicer role options, the
     "[@Starter]" bundle's included plugins can be customized as desired.
@@ -335,10 +358,7 @@ CONFIGURING
     distribution's "main_module" in Dist::Zilla by default, but can be
     configured to look elsewhere. The standard README should always be
     plaintext, but in order to generate a non-plaintext README in addition,
-    [ReadmeAnyFromPod] can simply be used separately. Note that POD-format
-    READMEs should not be included in the distribution build because they
-    will get indexed and installed due to an oddity in CPAN installation
-    tools.
+    [ReadmeAnyFromPod] can simply be used separately.
 
       [@Starter]
       revision = 2
@@ -354,6 +374,15 @@ CONFIGURING
       phase = release ; avoid changing files in the root with dzil build or dzil test
       [Regenerate::AfterReleasers] ; allows regenerating with dzil regenerate
       plugin = Pod_Readme
+
+    Alternatively, you can remove the default README plugin to ship a
+    manually maintained file, or generate one with another plugin such as
+    [Readme::Brief].
+
+      [Readme::Brief]
+      [@Starter]
+      revision = 2
+      -remove = Pod2Readme
 
   MetaNoIndex
     The distribution may include additional files or directories that should
@@ -416,12 +445,13 @@ EXTENDING
     "dzil authordeps --missing | cpanm" or with "dzil installdeps".
 
   Name
-    To automatically set the distribution name from the current directory,
-    use [NameFromDirectory].
+    To automatically set the distribution name from the project directory
+    name, use [NameFromDirectory].
 
   License and Copyright
-    To extract the license and copyright information from the main module,
-    and optionally set the author as well, use [LicenseFromModule].
+    To extract the license and copyright information from the main module
+    documentation, and optionally set the author as well, use
+    [LicenseFromModule].
 
   Changelog
     To automatically add the new release version to the distribution
@@ -444,6 +474,14 @@ EXTENDING
     prereqs.yml, use [PrereqsFile]. To specify prereqs in dist.ini, use
     [Prereqs]. To automatically guess the distribution's prereqs by parsing
     the code, use [AutoPrereqs].
+
+ENVIRONMENT
+    The "FAKE_RELEASE" environment variable is supported as in Dist::Milla
+    and Minilla. It replaces the [UploadToCPAN] plugin with [FakeRelease],
+    to test the release process (including any version bumping and commits!)
+    without actually uploading to CPAN.
+
+      $ FAKE_RELEASE=1 dzil release
 
 BUGS
     Report any issues on the public bugtracker.

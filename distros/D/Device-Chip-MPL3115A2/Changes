@@ -1,5 +1,9 @@
 Revision history for Device-Chip-MPL3115A2
 
+0.08    2021-01-02
+        [CHANGES]
+         * Implement the Device::Chip::Sensor API
+
 0.07    2020-12-06
         [CHANGES]
          * Updated to use Object::Pad

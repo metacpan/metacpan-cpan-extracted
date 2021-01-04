@@ -4,6 +4,7 @@ use Test::Differences;
 use Dist::Iller;
 use syntax 'qs';
 use Path::Tiny;
+use DateTime;
 use File::chdir;
 
 my $iller = Dist::Iller->new(filepath => 't/corpus/02-builder.yaml');
@@ -36,10 +37,12 @@ sub clean {
 }
 
 sub dist {
+    my $current_year = DateTime->now->year;
     return qqs{
         ; This file was auto-generated from iller.yaml by Dist::Iller on
 
         author = Erik Carlsson
+        copyright_year = $current_year
 
         [GatherDir]
 

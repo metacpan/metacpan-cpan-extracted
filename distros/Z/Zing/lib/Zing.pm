@@ -13,7 +13,7 @@ use Data::Object::ClassHas;
 
 extends 'Zing::Kernel';
 
-our $VERSION = '0.22'; # VERSION
+our $VERSION = '0.25'; # VERSION
 
 # ATTRIBUTES
 
@@ -142,7 +142,7 @@ L<Zing::Data>: Process Data
 
 =item *
 
-L<Zing::Domain>: Shared State Management
+L<Zing::Domain>: Shared State
 
 =item *
 
@@ -151,6 +151,10 @@ L<Zing::KeyVal>: Key/Value Store
 =item *
 
 L<Zing::Lookup>: Domain Index
+
+=item *
+
+L<Zing::Table>: Generic Index
 
 =item *
 

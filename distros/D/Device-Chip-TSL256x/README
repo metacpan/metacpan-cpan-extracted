@@ -36,21 +36,37 @@ ACCESSORS
 
        $config = await $chip->read_config;
 
-    Returns a HASH reference of the contents of timing control register,
-    using fields named from the data sheet.
+    Returns a HASH reference of the contents of control and timing
+    registers, using fields named from the data sheet.
 
+       POWER => OFF | ON
        GAIN  => 1 | 16
-       INTEG => 13ms | 101ms | 420ms
+       INTEG => 13ms | 101ms | 402ms
+
+    Additionally, the following keys are provided calculated from those, as
+    a convenience.
+
+       integ_msec => 13.7 | 101 | 402
 
  change_config
 
        await $chip->change_config( %changes );
 
-    Writes updates to the timing control register.
+    Writes updates to the control and timing registers.
+
+    Note that this method will ignore the integ_msec convenience value.
 
     Note that these two methods use a cache of configuration bytes to make
     subsequent modifications more efficient. This cache will not respect
     the "one-shot" nature of the Manual bit.
+
+ enable_agc
+
+       $chip->enable_agc( $agc )
+
+    Accessor for the internal gain-control algorithm. If enabled, the GAIN
+    configuration will be automatically controlled to switch between high-
+    and low-level settings.
 
  read_id
 

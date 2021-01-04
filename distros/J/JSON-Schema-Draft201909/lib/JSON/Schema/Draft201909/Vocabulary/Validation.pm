@@ -4,7 +4,7 @@ package JSON::Schema::Draft201909::Vocabulary::Validation;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Implementation of the JSON Schema Draft 2019-09 Validation vocabulary
 
-our $VERSION = '0.019';
+our $VERSION = '0.020';
 
 use 5.016;
 no if "$]" >= 5.031009, feature => 'indirect';
@@ -34,14 +34,14 @@ sub _traverse_keyword_type {
 
   if (is_plain_arrayref($schema->{type})) {
     foreach my $type (@{$schema->{type}}) {
-      return E($state, 'unrecognized type "%s"', $type)
-        if not any { $type eq $_ } qw(null boolean object array string number integer);
+      return E($state, 'unrecognized type "%s"', $type//'<null>')
+        if not any { ($type//'') eq $_ } qw(null boolean object array string number integer);
     }
     return E($state, '"type" values are not unique') if not is_elements_unique($schema->{type});
   }
   else {
-    return E($state, 'unrecognized type "%s"', $schema->{type})
-      if not any { $schema->{type} eq $_ } qw(null boolean object array string number integer);
+    return E($state, 'unrecognized type "%s"', $schema->{type}//'<null>')
+      if not any { ($schema->{type}//'') eq $_ } qw(null boolean object array string number integer);
   }
 }
 
@@ -309,7 +309,7 @@ JSON::Schema::Draft201909::Vocabulary::Validation - Implementation of the JSON S
 
 =head1 VERSION
 
-version 0.019
+version 0.020
 
 =head1 DESCRIPTION
 

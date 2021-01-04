@@ -4,7 +4,7 @@
       "Steven Lembark <lembark@wrkhors.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.32, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.58, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -54,6 +54,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "2.019002",
-   "x_serialization_backend" : "JSON::PP version 2.97001"
+   "version" : "v2.20.2",
+   "x_serialization_backend" : "JSON::PP version 4.05"
 }

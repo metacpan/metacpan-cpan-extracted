@@ -1,6 +1,6 @@
-# Copyright (c) 2019 Martin Becker, Blaubeuren.  All rights reserved.
-# This package is free software; you can redistribute it and/or modify it
-# under the same terms as Perl itself.
+# Copyright (c) 2019-2021 Martin Becker, Blaubeuren.
+# This package is free software; you can distribute it and/or modify it
+# under the terms of the Artistic License 2.0 (see LICENSE file).
 
 use strict;
 use ExtUtils::MakeMaker;
@@ -42,7 +42,7 @@ WriteMakefile(
     ABSTRACT_FROM       => 'lib/Math/DifferenceSet/Planar.pm',
     AUTHOR              => 'Martin Becker <becker-cpan-mp (at) cozap.com>',
     SIGN                => 1,
-    LICENSE             => 'perl_5',
+    LICENSE             => 'artistic_2',
     META_MERGE          => {
         'meta-spec'     => { version => 2 },
         provides        => \%versions,

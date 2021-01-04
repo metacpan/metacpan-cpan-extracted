@@ -7,8 +7,11 @@ use warnings;
 
 use PPI;
 use Moo;
+use Carp qw(carp croak);
 
-our $VERSION = '0.02';
+our $VERSION = '0.04';
+
+my $strict;
 
 has modules => (
     is  => 'ro',
@@ -26,6 +29,10 @@ sub BUILDARGS {
     return {
         modules => \@modules,
     };
+}
+
+sub import {
+    $strict = 1 if grep{ $_ eq '-strict' }@_;
 }
 
 sub _parse {
@@ -57,6 +64,16 @@ sub _parse {
             $value->content;
 
         next REQUIRED if $prereq eq 'perl';
+
+        if (
+            $value->isa('PPI::Token::Symbol') ||
+            $prereq =~ m{\A[^A-Za-z]}
+        ) {
+            carp  'Cannot handle dynamic code' if !$strict;
+            croak 'Cannot handle dynamic code' if $strict;
+
+            next REQUIRED;
+        }
 
         my $stage = '';
 
@@ -121,7 +138,7 @@ CPANfile::Parse::PPI - Parse I<cpanfile>s with PPI
 
 =head1 VERSION
 
-version 0.02
+version 0.04
 
 =head1 SYNOPSIS
 
@@ -143,6 +160,8 @@ version 0.02
 =begin pod_coverage
 
 =head2 BUILDARGS
+
+=head2 import
 
 =end pod_coverage
 
@@ -201,6 +220,40 @@ Each element is a hashref with these keys:
             version   3.6
         }
     ]
+
+=head1 LIMITATIONS
+
+As this is a static parser, this module cannot handle dynamic
+code like
+
+    for my $module (qw/
+        IO::All
+        Zydeco::Lite::App
+    /) {
+        requires $module, '0';
+    }
+
+This module warns when the required "module" doesn't look like
+a package name.
+
+You can make it die when you pass C<-strict> to the module
+when you load it:
+
+    use CPANfile::Parse::PPI -strict;
+    use Data::Printer;
+
+    my $required = do { local $/; <DATA> };
+    my $cpanfile = CPANfile::Parse::PPI->new( \$required );
+    
+    my $modules = $cpanfile->modules;
+    
+    __DATA__
+    for my $module (qw/
+        IO::All
+        Zydeco::Lite::App
+    /) {
+        requires $module, '0';
+    }
 
 =head1 AUTHOR
 

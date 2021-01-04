@@ -1,126 +1,80 @@
 use strict; use warnings;
-use Test::More tests => 88;
+use Test::More tests => 42;
 
 use Graph::Directed;
 use Graph::Undirected;
 
-my $g0 = Graph::Directed->new;
-my $g1 = Graph::Undirected->new;
-my $g2 = Graph::Directed->new;
-my $g3 = Graph::Undirected->new;
-my $g4 = Graph::Directed->new;
-my $g5 = Graph::Undirected->new;
+my ($g0, $g2, $g4) = map Graph::Directed->new, 1..3;
+my ($g1, $g3, $g5) = map Graph::Undirected->new, 1..3;
 
-$g0->add_path(qw(a b c));
-$g0->add_path(qw(d b e));
+$_->add_path(qw(a b c)) for $g0, $g1;
+$_->add_path(qw(d b e)) for $g0, $g1;
 
-$g1->add_path(qw(a b c));
-$g1->add_path(qw(d b e));
+$_->add_path(qw(a b c d)) for $g2, $g3;
+$_->add_path(qw(c a)) for $g2, $g3;
 
-$g2->add_path(qw(a b c d));
-$g2->add_path(qw(c a));
+$_->add_path(qw(a b c)) for $g4, $g5;
+$_->add_path(qw(b a)) for $g4, $g5;
 
-$g3->add_path(qw(a b c d));
-$g3->add_path(qw(c a));
+is $g0->copy, "a-b,b-c,b-e,d-b";
+is $g1->copy, "a=b,b=c,b=d,b=e";
+is $g2->copy, "a-b,b-c,c-a,c-d";
+is $g3->copy, "a=b,a=c,b=c,c=d";
+is $g4->copy, "a-b,b-a,b-c";
+is $g5->copy, "a=b,b=c";
 
-$g4->add_path(qw(a b c));
-$g4->add_path(qw(b a));
+is $g0->undirected_copy, $g1;
+is $g2->undirected_copy, $g3;
+is $g4->undirected_copy, $g5;
 
-$g5->add_path(qw(a b c));
-$g5->add_path(qw(b a));
+is $g1->directed_copy, "a-b,b-a,b-c,b-d,b-e,c-b,d-b,e-b";
+is $g3->directed_copy, "a-b,a-c,b-a,b-c,c-a,c-b,c-d,d-c";
+is $g5->directed_copy, "a-b,b-a,b-c,c-b";
 
-my $g0c = $g0->copy;
-my $g1c = $g1->copy;
-my $g2c = $g2->copy;
-my $g3c = $g3->copy;
-my $g4c = $g4->copy;
-my $g5c = $g5->copy;
+is $g0->transpose, "b-a,b-d,c-b,e-b";
+is $g1->transpose, "a=b,b=c,b=d,b=e";
+is $g2->transpose, "a-c,b-a,c-b,d-c";
+is $g3->transpose, "a=b,a=c,b=c,c=d";
+is $g4->transpose, "a-b,b-a,c-b";
+is $g5->transpose, "a=b,b=c";
 
-is("@{[sort $g0c->successors('a')]}", "b");
-is("@{[sort $g0c->successors('b')]}", "c e");
-is("@{[sort $g0c->successors('c')]}", "");
-is("@{[sort $g0c->successors('d')]}", "b");
-is("@{[sort $g0c->successors('e')]}", "");
+my $g6 = Graph->new;
+is($g6->complete->edges, 0);
+is($g6->complement->edges, 0);
 
-is("@{[sort $g0c->predecessors('a')]}", "");
-is("@{[sort $g0c->predecessors('b')]}", "a d");
-is("@{[sort $g0c->predecessors('c')]}", "b");
-is("@{[sort $g0c->predecessors('d')]}", "");
-is("@{[sort $g0c->predecessors('e')]}", "b");
+my $g7 = Graph::Directed->new();
+$g7->add_edge(qw(a b));
+$g7->add_edge(qw(a c));
+is($g7, "a-b,a-c");
+is($g7->complete, "a-b,a-c,b-a,b-c,c-a,c-b");
+is($g7->complement, "b-a,b-c,c-a,c-b");
 
-is("@{[sort $g1c->successors('a')]}", "b");
-is("@{[sort $g1c->successors('b')]}", "a c d e");
-is("@{[sort $g1c->successors('c')]}", "b");
-is("@{[sort $g1c->successors('d')]}", "b");
-is("@{[sort $g1c->successors('e')]}", "b");
+my $g8 = Graph::Undirected->new();
+$g8->add_edge(qw(a b));
+$g8->add_edge(qw(a c));
+is($g8, "a=b,a=c");
+is($g8->complete, "a=b,a=c,b=c");
+is($g8->complement, "b=c,a");
 
-is("@{[sort $g1c->predecessors('a')]}", "b");
-is("@{[sort $g1c->predecessors('b')]}", "a c d e");
-is("@{[sort $g1c->predecessors('c')]}", "b");
-is("@{[sort $g1c->predecessors('d')]}", "b");
-is("@{[sort $g1c->predecessors('e')]}", "b");
-
-is("@{[sort $g2c->successors('a')]}", "b");
-is("@{[sort $g2c->successors('b')]}", "c");
-is("@{[sort $g2c->successors('c')]}", "a d");
-is("@{[sort $g2c->successors('d')]}", "");
-
-is("@{[sort $g2c->predecessors('a')]}", "c");
-is("@{[sort $g2c->predecessors('b')]}", "a");
-is("@{[sort $g2c->predecessors('c')]}", "b");
-is("@{[sort $g2c->predecessors('d')]}", "c");
-
-is("@{[sort $g3c->successors('a')]}", "b c");
-is("@{[sort $g3c->successors('b')]}", "a c");
-is("@{[sort $g3c->successors('c')]}", "a b d");
-is("@{[sort $g3c->successors('d')]}", "c");
-
-is("@{[sort $g3c->predecessors('a')]}", "b c");
-is("@{[sort $g3c->predecessors('b')]}", "a c");
-is("@{[sort $g3c->predecessors('c')]}", "a b d");
-is("@{[sort $g3c->predecessors('d')]}", "c");
-
-is("@{[sort $g4c->successors('a')]}", "b");
-is("@{[sort $g4c->successors('b')]}", "a c");
-is("@{[sort $g4c->successors('c')]}", "");
-
-is("@{[sort $g4c->predecessors('a')]}", "b");
-is("@{[sort $g4c->predecessors('b')]}", "a");
-is("@{[sort $g4c->predecessors('c')]}", "b");
-
-is("@{[sort $g5c->successors('a')]}", "b");
-is("@{[sort $g5c->successors('b')]}", "a c");
-is("@{[sort $g5c->successors('c')]}", "b");
-
-is("@{[sort $g5c->predecessors('a')]}", "b");
-is("@{[sort $g5c->predecessors('b')]}", "a c");
-is("@{[sort $g5c->predecessors('c')]}", "b");
-
-my $g0u = $g0->undirected_copy;
-my $g2u = $g2->undirected_copy;
-my $g4u = $g4->undirected_copy;
-
-is($g0u, $g1);
-is($g2u, $g3);
-is($g4u, $g5);
-
-my $g1d = $g1->directed_copy;
-my $g3d = $g3->directed_copy;
-my $g5d = $g5->directed_copy;
-
-for my $i ([$g1d, $g1],
-	   [$g3d, $g3],
-	   [$g5d, $g5]) {
-    my ($d, $u) = @$i;
-    for my $e ($u->edges) {
-	my @e = @$e;
-	ok($d->has_edge(@e));
-	ok($d->has_edge(reverse @e));
-    }
-    for my $v ($u->vertices) {
-	ok($d->has_vertex($v));
+my $g9 = Graph::Directed->new(countedged => 1);
+$g9->add_edge(qw(a b));
+$g9->add_edge(qw(a c));
+my $c9 = $g9->complete_graph;
+is $c9, "a-b,a-c,b-a,b-c,c-a,c-b";
+for my $u (qw(a b c)) {
+    for my $v (qw(a b c)) {
+	next if $u eq $v;
+	is($c9->get_edge_count($u, $v), 1);
     }
 }
+is $g9->complement_graph, "b-a,b-c,c-a,c-b";
+
+my $g10 = Graph::Undirected->new();
+$g10->add_edge(qw(a b));
+is scalar($g10->vertices), 2;
+my $c10 = $g10->complement_graph;
+is scalar($c10->vertices), 2;
+is scalar($c10->edges), 0;
 
 {
     my $g = Graph->new;

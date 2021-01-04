@@ -1,4 +1,4 @@
-use 5.10.0;
+use 5.14.0;
 use strict;
 use warnings;
 
@@ -6,7 +6,7 @@ package Dist::Iller;
 
 # ABSTRACT: A Dist::Zilla & Pod::Weaver preprocessor
 our $AUTHORITY = 'cpan:CSSON'; # AUTHORITY
-our $VERSION = '0.1409';
+our $VERSION = '0.1411';
 
 use Dist::Iller::Elk;
 use Types::Standard qw/Map Str ConsumerOf/;
@@ -122,17 +122,16 @@ Dist::Iller - A Dist::Zilla & Pod::Weaver preprocessor
 =begin html
 
 <p>
-<img src="https://img.shields.io/badge/perl-5.10+-blue.svg" alt="Requires Perl 5.10+" />
-<a href="http://cpants.cpanauthors.org/release/CSSON/Dist-Iller-0.1409"><img src="http://badgedepot.code301.com/badge/kwalitee/CSSON/Dist-Iller/0.1409" alt="Distribution kwalitee" /></a>
-<a href="http://matrix.cpantesters.org/?dist=Dist-Iller%200.1409"><img src="http://badgedepot.code301.com/badge/cpantesters/Dist-Iller/0.1409" alt="CPAN Testers result" /></a>
-<img src="https://img.shields.io/badge/coverage-84.3%25-orange.svg" alt="coverage 84.3%" />
+<img src="https://img.shields.io/badge/perl-5.14+-blue.svg" alt="Requires Perl 5.14+" />
+<img src="https://img.shields.io/badge/coverage-84.4%25-orange.svg" alt="coverage 84.4%" />
+<a href="https://github.com/Csson/p5-Dist-Iller/actions?query=workflow%3Amakefile-test"><img src="https://img.shields.io/github/workflow/status/Csson/p5-Dist-Iller/makefile-test" alt="Build status at Github" /></a>
 </p>
 
 =end html
 
 =head1 VERSION
 
-Version 0.1409, released 2020-12-27.
+Version 0.1411, released 2020-01-01.
 
 =head1 SYNOPSIS
 
@@ -356,7 +355,7 @@ Erik Carlsson <info@code301.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by Erik Carlsson.
+This software is copyright (c) 2021 by Erik Carlsson.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

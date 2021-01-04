@@ -1,0 +1,21 @@
+0.003   2021-01-01  Released-By: PERLANCAR; Urgency: low
+
+	- No functional changes.
+
+	- [doc] Add some examples.
+
+
+0.002   2021-01-01  Released-By: PERLANCAR; Urgency: medium
+
+	- Add CLI: list-metacpan-releases.
+
+	- Add option --fields (-f) to select which fields to return.
+
+	- Observe METACPANUTILS_DUMP_API_RESULT.
+
+        - Add logging.
+
+
+0.001   2020-12-30  Released-By: PERLANCAR
+
+        - First release.

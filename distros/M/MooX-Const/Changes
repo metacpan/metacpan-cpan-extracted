@@ -1,5 +1,10 @@
 Revision history for MooX-Const:
 
+v0.5.0    2020-12-30 16:54:53+00:00 Europe/London
+  [Enhancements]
+  - Added "once" as alternative to "wo" attributes. "wo" is now an
+    alias for "once", and is documented as deprecated, GH#3.
+
 v0.4.5    2020-11-21 12:44:03+00:00 Europe/London
   [Documentation]
   - Noted different meaning of "wo" attributes in Class::Accessor.

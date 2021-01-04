@@ -2,7 +2,7 @@ package Web::Request::Role::JWT;
 
 # ABSTRACT: Accessors for JSON Web Token (JWT) stored in psgix
 
-our $VERSION = '1.001';
+our $VERSION = '1.002'; # VERSION
 
 use 5.010;
 use Moose::Role;
@@ -79,14 +79,13 @@ sub requires_jwt_claim_sub {
 sub requires_jwt_claim_aud {
     my $self = shift;
 
-    my $sub = $self->get_jwt_claim_aud;
+    my $aud = $self->get_jwt_claim_aud;
 
-    return $sub if $sub;
+    return $aud if $aud;
 
     $log->error("Claim 'aud' not found in JWT");
     http_throw( 'Unauthorized' => { www_authenticate => 'bearer' } );
 }
-
 
 1;
 
@@ -102,7 +101,7 @@ Web::Request::Role::JWT - Accessors for JSON Web Token (JWT) stored in psgix
 
 =head1 VERSION
 
-version 1.001
+version 1.002
 
 =head1 SYNOPSIS
 
@@ -208,11 +207,11 @@ L<validad.com|https://www.validad.com/> for supporting Open Source.
 
 =head1 AUTHOR
 
-Thomas Klausner <domm@cpan.org>
+Thomas Klausner <domm@plix.at>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Thomas Klausner.
+This software is copyright (c) 2017 - 2021 by Thomas Klausner.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

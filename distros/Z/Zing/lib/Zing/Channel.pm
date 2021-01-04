@@ -12,12 +12,12 @@ use Data::Object::Class;
 
 extends 'Zing::PubSub';
 
-our $VERSION = '0.22'; # VERSION
+our $VERSION = '0.25'; # VERSION
 
 # BUILDERS
 
 fun BUILD($self) {
-  $self->{position} = $self->size;
+  $self->{position} = $self->size if !$self->isa('Zing::Table');
 
   return $self;
 }

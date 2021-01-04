@@ -1,0 +1,111 @@
+NAME
+    App::MetaCPANUtils - CLI utilities related to MetaCPAN
+
+VERSION
+    This document describes version 0.003 of App::MetaCPANUtils (from Perl
+    distribution App-MetaCPANUtils), released on 2020-01-01.
+
+DESCRIPTION
+    This distribution contains CLI utilities related to MetaCPAN:
+
+    *   list-metacpan-releases
+
+    *   list-recent-metacpan-releases
+
+FUNCTIONS
+  list_metacpan_releases
+    Usage:
+
+     list_metacpan_releases(%args) -> [status, msg, payload, meta]
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   author => *cpan::pause_id*
+
+    *   distribution => *cpan::distname*
+
+    *   fields => *array[str]* (default:
+        ["release","date","author","maturity","version","distribution","abst
+        ract"])
+
+    *   from_date => *date*
+
+    *   sort => *str* (default: "-date")
+
+    *   to_date => *date*
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+  list_recent_metacpan_releases
+    Usage:
+
+     list_recent_metacpan_releases(%args) -> [status, msg, payload, meta]
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   fields => *array[str]* (default:
+        ["release","date","author","maturity","version","distribution","abst
+        ract"])
+
+    *   n => *posint*
+
+    Returns an enveloped result (an array).
+
+    First element (status) is an integer containing HTTP status code (200
+    means OK, 4xx caller error, 5xx function error). Second element (msg) is
+    a string containing error message, or 'OK' if status is 200. Third
+    element (payload) is optional, the actual result. Fourth element (meta)
+    is called result metadata and is optional, a hash that contains extra
+    information.
+
+    Return value: (any)
+
+ENVIRONMENT
+  METACPANUTILS_DUMP_API_RESULT
+    If set to true, will log the API result at the "trace" level.
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/App-MetaCPANUtils>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-App-MetaCPANUtils>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://github.com/perlancar/perl-App-MetaCPANUtils/issues>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    <https://metacpan.org>
+
+    Other distributions providing CLIs for MetaCPAN: MetaCPAN::Clients,
+    App::metacpansearch.
+
+    MetaCPAN API Client: MetaCPAN::Client
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2021, 2020 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

@@ -34,8 +34,7 @@
          "requires" : {
             "Badge::Depot" : "0.0103",
             "Badge::Depot::Plugin::Coverage" : "0",
-            "Badge::Depot::Plugin::Cpantesters" : "0",
-            "Badge::Depot::Plugin::Kwalitee" : "0",
+            "Badge::Depot::Plugin::Githubactions" : "0",
             "Badge::Depot::Plugin::Perl" : "0",
             "Dist::Zilla" : "6.015",
             "Dist::Zilla::Plugin::Authority" : "1.009",
@@ -79,7 +78,6 @@
             "Dist::Zilla::Plugin::Test::Compile" : "2.058",
             "Dist::Zilla::Plugin::Test::EOF" : "0.0501",
             "Dist::Zilla::Plugin::Test::EOL" : "0.18",
-            "Dist::Zilla::Plugin::Test::Kwalitee::Extra" : "v0.2.1",
             "Dist::Zilla::Plugin::Test::NoTabs" : "0.15",
             "Dist::Zilla::Plugin::Test::ReportPrereqs" : "0.027",
             "Dist::Zilla::Plugin::Test::Version" : "1.09",
@@ -109,7 +107,7 @@
          },
          "suggests" : {
             "Dist::Iller" : "0.1409",
-            "Dist::Iller::Config::Author::CSSON" : "0.0327"
+            "Dist::Iller::Config::Author::CSSON" : "0.0328"
          }
       },
       "runtime" : {
@@ -125,10 +123,11 @@
             "Path::Tiny" : "0.072",
             "Test::Exception" : "0",
             "Try::Tiny" : "0.24",
+            "Types::Path::Tiny" : "0.005",
             "Types::Standard" : "1.000006",
             "YAML::XS" : "0",
             "namespace::autoclean" : "0.22",
-            "perl" : "5.010000"
+            "perl" : "5.014000"
          }
       },
       "test" : {
@@ -151,15 +150,15 @@
    "provides" : {
       "Dist::Zilla::Plugin::Author::CSSON::GithubActions" : {
          "file" : "lib/Dist/Zilla/Plugin/Author/CSSON/GithubActions.pm",
-         "version" : "0.0106"
+         "version" : "0.0107"
       },
       "Dist::Zilla::Plugin::Author::CSSON::GithubActions::Workflow::TestWithMakefile" : {
          "file" : "lib/Dist/Zilla/Plugin/Author/CSSON/GithubActions/Workflow/TestWithMakefile.pm",
-         "version" : "0.0106"
+         "version" : "0.0107"
       },
       "Dist::Zilla::Role::Author::CSSON::GithubActions" : {
          "file" : "lib/Dist/Zilla/Role/Author/CSSON/GithubActions.pm",
-         "version" : "0.0106"
+         "version" : "0.0107"
       }
    },
    "release_status" : "stable",
@@ -174,7 +173,7 @@
          "web" : "https://github.com/Csson/p5-Dist-Zilla-Plugin-Author-CSSON-GithubActions"
       }
    },
-   "version" : "0.0106",
+   "version" : "0.0107",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.020001"
@@ -211,7 +210,7 @@
                   "check_all_plugins" : 1,
                   "check_all_prereqs" : 0,
                   "modules" : [],
-                  "phase" : "build",
+                  "phase" : "release",
                   "run_under_travis" : 0,
                   "skip" : []
                }
@@ -483,11 +482,6 @@
             "version" : "0.036"
          },
          {
-            "class" : "Dist::Zilla::Plugin::Test::Kwalitee::Extra",
-            "name" : "Test::Kwalitee::Extra",
-            "version" : "v0.2.1"
-         },
-         {
             "class" : "Dist::Zilla::Plugin::Test::NoTabs",
             "config" : {
                "Dist::Zilla::Plugin::Test::NoTabs" : {
@@ -673,7 +667,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "0.0106",
+                  "tag" : "0.0107",
                   "tag_format" : "%v",
                   "tag_message" : "Release %v%n%n%c"
                },

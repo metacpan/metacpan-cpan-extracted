@@ -15,7 +15,7 @@ extends 'Zing::Entity';
 
 use File::Spec;
 
-our $VERSION = '0.22'; # VERSION
+our $VERSION = '0.25'; # VERSION
 
 # ATTRIBUTES
 

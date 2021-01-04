@@ -37,7 +37,7 @@ https://metacpan.org/release/{{ $dist->name }}
 You can use [`cpanminus`](https://metacpan.org/pod/App::cpanminus) to do this
 without downloading the tarball first:
 
-    $ cpanm --reinstall --installdeps --with-recommends {{
+    $> cpanm --reinstall --installdeps --with-recommends {{
   $main_package = $dist->main_module->name;
   $main_package =~ s{^lib/}{};
   $main_package =~ s{\.pm$}{};
@@ -50,30 +50,30 @@ authoring tool, but requires a number of author-specific plugins. If you would
 like to use it for contributing, install it from CPAN, then the following
 command to install the needed distros:
 
-    $ dzil authordeps --missing | cpanm
+    $> dzil authordeps --missing | cpanm
 
 There may also be additional requirements not needed by the dzil build which
 are needed for tests or other development:
 
-    $ dzil listdeps --author --missing | cpanm
+    $> dzil listdeps --author --missing | cpanm
 
 Or, you can use the 'dzil stale' command to install all requirements at once:
 
-    $ cpanm Dist::Zilla::App::Command::stale
-    $ dzil stale --all | cpanm
+    $> cpanm Dist::Zilla::App::Command::stale
+    $> dzil stale --all | cpanm
 
 You can also do this via cpanm directly:
 
-    $ cpanm --reinstall --installdeps --with-develop --with-recommends {{ $main_package }}
+    $> cpanm --reinstall --installdeps --with-develop --with-recommends {{ $main_package }}
 
 Once installed, here are some dzil commands you might try:
 
-    $ dzil build
-    $ dzil test
-    $ dzil test --release
-    $ dzil xtest
-    $ dzil listdeps --json
-    $ dzil build --notgz
+    $> dzil build
+    $> dzil test
+    $> dzil test --release
+    $> dzil xtest
+    $> dzil listdeps --json
+    $> dzil build --notgz
 
 You can learn more about Dist::Zilla at http://dzil.org/.
 {{
@@ -89,39 +89,17 @@ requests](https://help.github.com/articles/creating-a-pull-request)'; }
 
 If you have found a bug, but do not have an accompanying patch to fix it, you
 can submit an issue report [via the web]({{ $dist->distmeta->{resources}{bugtracker}{web} // 'WARNING: bugtracker data not set!' }}){{ $dist->distmeta->{resources}{bugtracker}{mailto} ? ' or [via email](' . $dist->distmeta->{resources}{bugtracker}{mailto} . ')' : q{} }}.
-{{
-my $extra = $dist->distmeta->{resources}{x_MailingList}
-    ? "\n\n" . 'There is a mailing list available for users of this distribution,' . "\n" . $dist->distmeta->{resources}{x_MailingList}
-    : '';
-$extra .= $dist->distmeta->{resources}{x_IRC}
-    ? "\n\n" . 'This distribution also has an IRC channel at' . "\n" . $dist->distmeta->{resources}{x_IRC}
-    : '';
-$extra;
-}}
-{{ if ( -e '.travis.yml' ) {
-    my ($path) = `git remote show -n origin` =~ /github\.com:(.+)\.git/;
-    my $ci_links = "on Linux by [Travis](https://travis-ci.org/$path)";
-    if ( -e 'appveyor.yml' ) {
-        # AppVeyor paths use my username, not the GitHub group name.
-        $path =~ s{^.+/}{autarch/};
-        $ci_links .= " and on Windows by [AppVeyor](https://ci.appveyor.com/project/$path)";
-    }
-    my $ci = "
+{{ if ( -e 'azure-pipelines.yml' ) {
+'
 ## Continuous Integration
 
-All pull requests for this distribution will be automatically tested
-$ci_links.";
-
-$ci .= '
+All pull requests for this distribution will be automatically tested using
+[Azure Pipelines](https://dev.azure.com/houseabsolute/houseabsolute/_build).
 
 All CI results will be visible in the pull request on GitHub. Follow the
 appropriate links for details when tests fail. PRs cannot be merged until tests
-pass.';
-
-$ci;
-
+pass.'
 } }}
-
 {{ if ( -e 'tidyall.ini' ) {
 '
 ## TidyAll
@@ -131,8 +109,23 @@ This distribution uses
 uniform coding style. This is tested as part of the author testing suite. You
 can install and run tidyall by running the following commands:
 
-    $ cpanm Code::TidyAll
-    $ tidyall -a
+    $> cpanm Code::TidyAll
+    $> tidyall -a
+
+Please run this before committing your changes and address any issues it
+brings up.'
+} elsif ( -e 'precious.toml') {
+'
+## Precious
+
+This distribution uses [precious](https://github.com/houseabsolute/precious)
+to enforce a uniform coding style. This is tested as part of the author
+testing suite. You can install and run precious by running the following
+command:
+
+    $> curl https://raw.githubusercontent.com/houseabsolute/precious/master/dev/bin/install-precious.packed.pl \
+           | perl
+    $> precious lint -a
 
 Please run this before committing your changes and address any issues it
 brings up.'

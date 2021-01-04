@@ -1,6 +1,6 @@
 #!/usr/bin/perl -T
 
-use Test::More tests => 36;
+use Test::More tests => 39;
 use Paranoid;
 use Paranoid::Process qw(:all);
 use Paranoid::IO qw(:all);
@@ -155,6 +155,32 @@ for ( 1 .. 5 ) {
 while ( childrenCount() ) { sleep 1 }
 $rv = $sigpid ? 1 : 0;
 is( $rv, 1, 'SIGCHLD 1' );
+
+# Test pcommFork
+my ( $rh, $wh, $response );
+$rv = pcommFork( $rh, $wh );
+if ( defined $rv ) {
+    if ($rv) {
+        ok( defined $rv, 'pcommFork 1' );
+        print $wh "Hello, child\n";
+        $response = <$rh>;
+        is( $response, "Hello, parent\n", 'pcommFork 2' );
+        print $wh "Goodbye, child\n";
+        $response = <$rh>;
+        is( $response, "Goodbye, parent\n", 'pcommFork 3' );
+    } else {
+        $response = <$rh>;
+        print $wh "Hello, parent\n";
+        $response = <$rh>;
+        print $wh "Goodbye, parent\n";
+        sleep 1;
+        exit 0;
+    }
+} else {
+    ok( defined $rv, 'pcommFork failed 1' );
+    ok( defined $rv, 'pcommFork failed 2' );
+    ok( defined $rv, 'pcommFork failed 3' );
+}
 
 my ( $crv, $out );
 

@@ -15,7 +15,7 @@ extends 'Zing::Channel';
 
 use Scalar::Util ();
 
-our $VERSION = '0.22'; # VERSION
+our $VERSION = '0.25'; # VERSION
 
 # ATTRIBUTES
 
@@ -29,14 +29,25 @@ fun new_metadata($self) {
   {}
 }
 
+has 'snapshots' => (
+  is => 'ro',
+  isa => 'Bool',
+  def => 0,
+);
+
 # BUILDERS
 
 fun BUILD($self) {
-  $self->{position} = $self->size;
+  if ($self->snapshots) {
+    $self->{position} = $self->size;
+    $self->{position}-- if $self->{position};
+  }
+  else {
+    $self->reset;
+    $self->state;
+  }
 
-  $self->{position}-- if $self->{position};
-
-  return $self->apply;
+  return !$self->isa('Zing::Lookup') ? $self->apply : $self;
 }
 
 # SHIMS
@@ -253,7 +264,7 @@ method shift(Str $key) {
 }
 
 method snapshot() {
-  return _copy($self->state);
+  return $self->snapshots ? _copy($self->state) : {};
 }
 
 method state() {

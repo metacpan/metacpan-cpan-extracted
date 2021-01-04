@@ -1,5 +1,5 @@
 This file contains message digests of all files listed in MANIFEST,
-signed via the Module::Signature module, version 0.81.
+signed via the Module::Signature module, version 0.87.
 
 To verify the content in this distribution, first make sure you have
 Module::Signature installed, then type:
@@ -12,37 +12,37 @@ the distribution may already have been compromised, and you should
 not run its Makefile.PL or Build.PL.
 
 -----BEGIN PGP SIGNED MESSAGE-----
-Hash: SHA512
+Hash: RIPEMD160
 
-SHA1 bd3b73d5a8d638c6ce05dafc5fb87d3a3fed7ea8 Changes
-SHA1 f92175a32a06d94dcf6d1a19c7e002f2bb2b9b7f LICENSE
-SHA1 ccdad0d20b7502626b91e86d786177f999157f80 MANIFEST
-SHA1 fb9fb76bc5538f0c7939127e1711542a8ee5b3c9 META.json
-SHA1 b92096dc2e0bf47be5774f9cefee23393450cf42 META.yml
-SHA1 c29150439c30b4dacd990e56c0c952c0e371c1d2 Makefile.PL
-SHA1 45c7b23c9e3ed2d761dd5de8c9cd3092ede74319 README
-SHA1 1da1099fff2b03cfabf16d62e87b2875bf93ec36 lib/List/Breakdown.pm
-SHA1 baa455f2aa7b294092cf151abe180b243ac4e52c t/errors.t
-SHA1 85aab03fb152a38af0e0850a32666cccb246d029 t/intervals.t
-SHA1 5384e4202871d97a50829d68172ec02b27b5db11 t/monitoring.t
-SHA1 13337a401d5bbdd08d9112630d8a2025da6a134a t/records.t
-SHA1 acf15cf02d7f028b086523cc8b9d018c5829c80b t/words.t
-SHA1 7d9bdd979932caf83ddd20b96c26dc1986b16365 xt/manifest.t
-SHA1 59e7d967227ea6d3c29c0e08a3bb3c134aedeb0a xt/pod-coverage.t
-SHA1 1a3d2d6b8f39547b9ee68bf5cfa562e5be5ebdb7 xt/pod.t
+SHA256 c3427c6ccd855053fb042664acaf17cd334df4907367ee1ecb0720b81a017cfc Changes
+SHA256 8883a1a07b2a2bac0a4876da10db10d82128eeabb696425f3066dc735a45580b LICENSE
+SHA256 59dc59a84d5a98b091603c13aaa947ec8453dab05e742b31721d3fd9465e4c01 MANIFEST
+SHA256 5c72e1c01337d25b020beb007c4ad4dce48e4bf44bd6f3553fd0410dcbcba598 META.json
+SHA256 62751c6f4e1799f256c4d9ffc9d2af02035ac54699d2de8f109168e634e18b00 META.yml
+SHA256 7cf67453f2eb50f9b2350175ced35e8d74b40ee8a95ad9638ecac5983c4e46d6 Makefile.PL
+SHA256 72f8457f9dc857bf52a4ce9a758d2fb7f6206e6d9076f873c2961c9ab577eeb0 README
+SHA256 c6208f77201da968963ccb6b3120939f6e044b261fff06b3873b58028ce3ca94 lib/List/Breakdown.pm
+SHA256 383faa2d48b7c38f387c460b6fe8de72d179bb85b98ec7544a3b878f0739f022 t/errors.t
+SHA256 9f89f415e0944a04ecec70e7d0af7f528e97de8245317d1d8fbcd680214bf3da t/intervals.t
+SHA256 a7abceb63bfc4735587c5ac02d851419134f51c23a4ed95ed553007d9dd53d0e t/monitoring.t
+SHA256 7cac9e6dbe9bb28b21b3e1f6654768b70b9296aceddc4e771ae8582678f7ce50 t/records.t
+SHA256 d6b30cf5840bfe4c1df868b4d5f8d2c9b07b663bfdb5546ffe91e547804bbe19 t/words.t
+SHA256 5fc8bbca360e086ff7aa50d2c6c0274bb11dc921e1b3bca6c6c93d9b1a440748 xt/manifest.t
+SHA256 0375c50f98d3810e27107bb94b632381b37d23426b5e57e83495f2f0aa96b980 xt/pod-coverage.t
+SHA256 fa3772622926e05727193ccb961698f6cfc1dea7a415ef6ec0540a3f9bde5e3a xt/pod.t
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCgAdFiEEMXmQoUWXofz4LZU6ta9fiSWSZgkFAlsOAl4ACgkQta9fiSWS
-Zgk4QRAAtM7I8Rzzp6e4rw8WcEl/K5DHdW6pWjJw5CK6qrKwrtKL3dYDlyf4jf5n
-ySOLph5MmV4qLjBVjSIpBIeTHmOzYd+BwyzYE4Iq5n42WENA+vq2g4nrcndNAiwg
-EyZRUL+RF+BmaWanurzmmjOz/DpmPfoy9hqK0xQejxzy9P3+Oxv5lrqxTswp1nKM
-L9RfHfb1+KcXh+ttIBQ66NRjHwEk8yIDBCiuUADvcIxBGYFpVxYhln1ZFi/qoj0C
-+Vn7rLJDKT6eh1TW9lc5tyQLPUA2Zn85FA+Dr+WU85kBKNwJSkaHpxI74AmCWMLh
-6kERvCAJ9YPjbKZ6wjY5RvKxKgLVs1mNvgV3tpDFj/suFMvBC3fdKuiI2HugFBgb
-gUvyW2VOKFkchaouguFtgteo15iD6G4SGadqbX9+AlFiYe8UZcaCH+t5yYZVNODh
-gODiKWfCQV2UN0AbW+lDvLXQtk2YfGyDSq/QEKGT50bq4hf7Wy04T6iVa182175D
-TkCnnNeSVetg5ayft3n1P5j1dTakyvvWjGjjUqEcXp5nhSgPBdqTfZhWRTrwBo0I
-z8trEqEWo//KUfobN2uHkv9bSHCL80Jvo0Z/PDQoKTQ5bWurOHrr+e7Ht5IV1xo2
-yJ/Lzdl6U8/lerF+yN8ZA7xAUl8MLDyx2lFV0xF63/zl5hF67N8=
-=m/4S
+iQIzBAEBAwAdFiEEMXmQoUWXofz4LZU6ta9fiSWSZgkFAl/wGYAACgkQta9fiSWS
+ZglQwhAAl+56X8rvvtKIz4R5TWSYSQqVCtkDw0eCUjx8c3knqaFpdOn2CvPms1tb
+pnHFZZBf0jHBRrSnT2AZsp4eqc02gD/On04flt8sUNL9Shl+h9m/w4mUIEJXoh1C
+ZFQN7dLk/mUwtuR9tcQpJzwSMufJ/erO7+cFQEJbXOoAg7Odee1SpPHDhroo9Cu0
+tI0WS05KujHiGBLoqrAIgJmUIHbe2DHxic1mvi/QvVjH/jk234g/ChP7UTo9sMpr
+jWBLNhdVuNDyaRZm4LJBpcw+l5Mwa4UunKs7WLKwzf5oNwTTJvtaffhB/xgf+vwf
+HHhBtzV+IZkN3IzmeSlSXz0jD+8DRnLtaHsdgalJfWbWmuGoSItZygTr5As2acrc
+Oy0zHVKtfzGuKbJEWUCg1s7BxKQTNaNWTUjr5ngi9ULKjJQEqemeY07oO4+iSQI5
+pD5x5hKuCETDv3uOYk2Ax5fa08I1gIJge0l9zE7OH0TYFUKUcnZzPiGyvRKq6MNv
+FJjRy+0b56T93V0SVfflLHvLWzztEvjHne6+3xOU+b3bhFzFEq9OwkC+9JpDHu8M
+UAtsg99j/Gbpd0O+irQas9N5hUoblGXU/h722txsFxbT4XOzbg8vCcIbrp/PFfss
+CB/EVa3lICGOIcSXanOzSdKPABpo5uCICLXIGTH3Ajm59EzJByw=
+=WHmT
 -----END PGP SIGNATURE-----

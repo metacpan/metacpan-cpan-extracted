@@ -18,9 +18,12 @@ my %WriteMakefileArgs = (
   "NAME" => "JavaScript::Minifier::XS",
   "PREREQ_PM" => {},
   "TEST_REQUIRES" => {
+    "ExtUtils::MakeMaker" => 0,
+    "File::Spec" => 0,
+    "Test::DiagINC" => "0.002",
     "Test::More" => "0.96"
   },
-  "VERSION" => "0.12",
+  "VERSION" => "0.13",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -28,6 +31,9 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
+  "ExtUtils::MakeMaker" => 0,
+  "File::Spec" => 0,
+  "Test::DiagINC" => "0.002",
   "Test::More" => "0.96"
 );
 

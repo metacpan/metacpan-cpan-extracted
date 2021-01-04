@@ -5,14 +5,15 @@ use 5.008;
 use strict;
 use version;
 
-#use Module::FromPerlVer;
 use ExtUtils::MakeMaker;
 
 use Cwd             qw( getcwd      );
 use File::Basename  qw( basename    );
 use List::Util      qw( first       );
 
-my $version = version->parse( '2.19.2' )->numify;
+########################################################################
+# deal with MakeMaker version.
+
 my $mm_v    = ExtUtils::MakeMaker->VERSION;
 
 my @config_requires
@@ -53,44 +54,10 @@ my @config_requires
     )
 ;
 
-WriteMakefile
-(
-    qw
-    (
-        NAME            FindBin::libs
-        LICENSE         perl
-    ),
-    VERSION         => $version,
-	AUTHOR     	    => 'Steven Lembark <lembark@wrkhors.com>',
-    PREREQ_PM       =>
-    {
-        # standard distro, particular versions
-        # are unlikely to cause pain.
-
-        'Cwd'
-        => version->parse( 'v3.73'  )->numify,
-
-        'File::Copy::Recursive::Reduced'
-        => version->parse( 'v0.002' )->numify,
-
-		qw
-        (
-
-            Carp                    0
-            File::Basename          0
-            File::Spec::Functions   0
-            File::Temp              0
-            FindBin                 0
-            List::Util              0
-            Test::More              0
-            Symbol                  0
-            strict                  0
-            version                 0
-        )
-    },
-
-    @config_requires,
-);
+########################################################################
+# install the correct version of libs.pm based on the running perl
+# version. after that take the version from whatever's on the disk.
+########################################################################
 
 my $perl_v
 = eval
@@ -158,7 +125,50 @@ require File::Copy::Recursive::Reduced;
 File::Copy::Recursive::Reduced::dircopy( $src_d => '.' )
 or die "Failed copy from $src_d.\n";
 
-# at this point there is a module, and whatever else, in place
-# for the perl version.
+########################################################################
+# reasonable question as to whether all of the version/* files represent
+# the same version of code: the older ones have minimal bug maintainence
+# only and it doesn't seem reasonable to up their version number if they
+# don't change.
+########################################################################
+
+WriteMakefile
+(
+    qw
+    (
+        NAME            FindBin::libs
+        LICENSE         perl
+    ),
+    VERSION         => 'v2.20.2',
+    AUTHOR          => 'Steven Lembark <lembark@wrkhors.com>',
+    PREREQ_PM       =>
+    {
+        'Cwd'
+        => version->parse( 'v3.73'  )->numify,
+
+        'File::Copy::Recursive::Reduced'
+        => version->parse( 'v0.002' )->numify,
+
+        # standard distro, particular versions
+        # are unlikely to cause pain.
+
+        qw
+        (
+
+            Carp                    0
+            File::Basename          0
+            File::Spec::Functions   0
+            File::Temp              0
+            FindBin                 0
+            List::Util              0
+            Test::More              0
+            Symbol                  0
+            strict                  0
+            version                 0
+        )
+    },
+
+    @config_requires,
+);
 
 __END__

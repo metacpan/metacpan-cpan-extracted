@@ -6,7 +6,7 @@ use warnings;
 
 use parent qw(IO::Async::Notifier);
 
-our $VERSION = '0.006';
+our $VERSION = '0.007';
 
 =head1 NAME
 
@@ -28,6 +28,7 @@ use overload '""' => sub { 'Net::Async::Trello' }, bool => sub { 1 }, fallback =
 use Dir::Self;
 use curry;
 use Future;
+use Future::Utils qw(try_repeat);
 use URI;
 use URI::QueryParam;
 use URI::Template;
@@ -342,10 +343,14 @@ sub http_get {
     );
 
     $log->tracef("GET %s { %s }", ''. $args{uri}, \%args);
-    $self->http->GET(
-        (delete $args{uri}),
-        %args
-    )->then(sub {
+    my $uri = delete $args{uri};
+    my $count;
+    (try_repeat {
+        $self->http->GET(
+            $uri,
+            %args
+        )
+    } until => sub { shift->is_done or $count++ > 3 })->then(sub {
         my ($resp) = @_;
         $log->tracef("%s => %s", $args{uri}, $resp->decoded_content);
         return { } if $resp->code == 204;
@@ -360,7 +365,7 @@ sub http_get {
         my ($err, $src, $resp, $req) = @_;
         $src //= '';
         if($src eq 'http') {
-            $log->errorf("HTTP error %s, request was %s with response %s", $err, $req->as_string("\n"), $resp->as_string("\n"));
+            $log->errorf("HTTP error %s, request was %s with response %s", $err, $req && $req->as_string("\n"), $resp && $resp->as_string("\n"));
         } else {
             $log->errorf("Other failure (%s): %s", $src // 'unknown', $err);
         }
@@ -501,9 +506,12 @@ sub api_get_list {
 #        $uri->query_param(
 #            before => $per_page
 #        );
-        $self->http_get(
-            uri => $uri,
-        )->on_done(sub {
+        my $count;
+        (try_repeat {
+            $self->http_get(
+                uri => $uri,
+            )
+        } until => sub { shift->is_done or $count++ > 3 })->on_done(sub {
             $log->tracef("we received %s", $_[0]);
             $src->emit(
                 $args{class}->new(

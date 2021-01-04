@@ -37,29 +37,34 @@ is related to algebra, geometry, and combinatorics.  They are also
 the essence of desarguesian finite projective planes (unlike other
 difference sets).
 
-Possible improvements may support interoperability with related,
-or more general, or application software.  New interfaces such as a
-command line tool, an interactive tool, or a web service may be added
+Possible improvements of the software may support interoperability with
+related, or more general, or application software.  New interfaces such as
+a command line tool, an interactive tool, or a web service may be added
 as well.  The functionality of the scripts in the examples directory
 may be included in such tools.  More ways to present difference sets,
 especially graphically, could be a nice addition.
 
-A new database format could allow to store sample sets more efficiently.
+We also want to add more functionality for geometric aspects, like
+line intersection, collinearity, and coordinate mapping.
+
 An XS implementation could increase performance with large sets.
 Computation of more data will be included as soon as a prerequisite Perl
 library, Math-GaloisField, is publicly available.
 
+An interface to remote databases may provide a good alternative to
+distributing ever larger databases for local use.
+
 As it can be expected that downloading sets will always be faster than
 generating them, a non-programmer contribution could be to host a large
-database of sample sets.  Especially helpful would be a solution that even
-allows to submit more data.  The author already has generated sets for
-all orders up to 65543.  Extending this to, say, 2 million, would require
-thousands of CPU years, and be conceivable as a project for distributed
-computation.  Not much scientific merit, alas, is going to be earned for
-such an effort, as the existence as well as most of the "interesting"
-properties of these sets are already known facts.  Future applications
-of planar difference sets, however, might benefit from somewhat larger
-sample sets than currently available.
+database of sample sets.  Especially helpful would be a solution that
+even allows to submit more data.  The author already has collected sets
+with orders up to seven figures.  Extending this to a list covering
+all orders up to, say, 2 ** 21 would require thousands of CPU years,
+and be conceivable as a project for distributed computation.  Not much
+scientific merit, alas, is going to be earned for such an effort, as the
+existence as well as most of the "interesting" properties of these sets
+are already known facts.  Future applications of planar difference sets,
+however, might benefit from larger sample sets than currently available.
 
 The documentation, finally, could include more literature, or be clearer
 or better formatted.  We might create POD, HTML, and PDF from a common
@@ -76,38 +81,57 @@ The git repository contains these files the CPAN release does not:
 
 .gitignore
 maint/create_cpan_db
+maint/create_extra_db
 maint/create_large_db
 maint/create_test_db
+maint/dump_pds
 maint/fill_pds
 maint/make_pod
 maint/template.pod
 
-To create the databases in the share and t/db directories of the
-CPAN distribution, as well as a larger database not for CPAN,
-you also need these files:
+To create the databases in the share and t/db directories of the CPAN
+distribution, as well as some larger databases not for CPAN, you also
+need these files:
 
+data/extra_2096993.txt
 data/pdm_00002-04096.txt
 data/pdm_04099-10993.txt
-data/pdx_00002-04096.txt
-data/pdx_04099-08192.txt
-data/pdx_08209-12281.txt
-data/pdx_12289-16384.txt
-data/pdx_16411-20479.txt
-data/pdx_20483-24571.txt
-data/pdx_24593-28669.txt
-data/pdx_28687-32768.txt
-data/pdx_32771-36857.txt
-data/pdx_36871-40949.txt
-data/pdx_40961-45053.txt
-data/pdx_45061-49139.txt
-data/pdx_49157-53239.txt
-data/pdx_53267-57331.txt
-data/pdx_57347-61417.txt
-data/pdx_61441-65543.txt
+data/pdx_000002-004096.txt
+data/pdx_004099-008192.txt
+data/pdx_008209-012289.txt
+data/pdx_012301-016384.txt
+data/pdx_016411-020483.txt
+data/pdx_020507-024571.txt
+data/pdx_024593-028669.txt
+data/pdx_028687-032771.txt
+data/pdx_032779-036871.txt
+data/pdx_036877-040961.txt
+data/pdx_040973-045061.txt
+data/pdx_045077-049157.txt
+data/pdx_049169-053239.txt
+data/pdx_053267-057349.txt
+data/pdx_057367-061441.txt
+data/pdx_061463-065551.txt
+data/pdx_065557-069623.txt
+data/pdx_069653-073727.txt
+data/pdx_073751-077839.txt
+data/pdx_077849-081937.txt
+data/pdx_081943-086029.txt
+data/pdx_086069-090127.txt
+data/pdx_090149-094229.txt
+data/pdx_094249-098327.txt
+data/pdx_098347-102409.txt
+data/pdx_102433-106501.txt
+data/pdx_106531-110609.txt
+data/pdx_110623-114713.txt
+data/pdx_114743-118801.txt
+data/pdx_118819-122891.txt
+data/pdx_122921-126989.txt
+data/pdx_127031-131101.txt
 
 These text representations of planar difference sets are distributed
 separately in order not to bloat the software repository.  They occupy
-2.1 GB of storage.  A download location is yet to be determined.
+8.2 GB of storage.  A download location is yet to be determined.
 Please contact the author if you urgently need the data or want to help.
 
 For convenience, a subset sufficient to create the CPAN release is
@@ -119,4 +143,4 @@ Author's Note
 Thanks again for your interest.
 I am looking forward to your report or e-mail.
 
-Martin Becker, September 5, 2019
+Martin Becker, January 1, 2021.

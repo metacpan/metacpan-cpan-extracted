@@ -1,5 +1,5 @@
 use strict; use warnings;
-use Test::More tests => 272;
+use Test::More;
 
 use Graph::Directed;
 use Graph::Undirected;
@@ -48,9 +48,10 @@ $ga->add_edge(qw(d f));
 sub simple {
     my $g = shift;
     my @v = $g->vertices;
-    is(@_, @v, "vertices");
+    local $Test::Builder::Level = $Test::Builder::Level + 1;
+    is(@_, @v, "vertices") or diag explain \@_;
     my %v; $v{$_}++ for @_;
-    is_deeply [ grep { ($v{$_} || 0) != 1 } @v ], [], "... once";
+    is_deeply [ grep { ($v{$_} || 0) != 1 } @v ], [], "... once" or diag explain \%v;
 }
 
 {
@@ -364,13 +365,9 @@ sub simple {
     is($t->seen,   0);
     is($t->seeing, 0);
 
-    my @t0 = $t->preorder;
-    my @t1 = $t->postorder;
-    my @t2 = $t->dfs;
-
-    simple($g7, @t0);
-    simple($g7, @t1);
-    simple($g7, @t2);
+    simple($g7, $t->preorder);
+    simple($g7, $t->postorder);
+    simple($g7, $t->dfs);
 }
 
 {
@@ -382,13 +379,11 @@ sub simple {
     is($t->seen,   0);
     is($t->seeing, 0);
 
-    my @t0 = $t->preorder;
-    my @t1 = $t->postorder;
-    my @t2 = $t->dfs;
+    simple($g8, $t->preorder);
+    simple($g8, $t->postorder);
+    simple($g8, $t->dfs);
 
-    simple($g8, @t0);
-    simple($g8, @t1);
-    simple($g8, @t2);
+    is_deeply [ sort $t->seen ], [ $g8->vertices ] or diag explain [ $t->seen ];
 }
 
 {
@@ -495,14 +490,6 @@ is($gb[10], "non_tree_edge a c", "non_tree_edge");
 is($gb[11], "down_edge a c",    "down_edge");
 is( @gb, 12 );
 
-ok( $tb->tree->has_edge('a', 'b'), "tree edge");
-ok( $tb->tree->has_edge('b', 'c'), "tree edge");
-ok( $tb->tree->has_edge('a', 'd'), "tree edge");
-
-ok(!$tb->tree->has_edge('c', 'a'), "non_tree edge");
-ok(!$tb->tree->has_edge('d', 'b'), "non_tree edge");
-ok(!$tb->tree->has_edge('a', 'c'), "non_tree edge");
-
 is( $tb->tree, "a-b,a-d,b-c", "tree" );
 
 is( $tb->preorder_by_vertex('a'), 0, "preorder of a" );
@@ -580,7 +567,7 @@ my $td1 = Graph::Traversal::DFS->new($gd, next_alphabetic => 1, pre => sub { pus
 $td1->dfs;
 is( "@gd1", "0 1 10 9", "next_alphabetic" );
 
-eval { Graph::Traversal::DFS->new(next_alphabetic => 1) };
+eval { Graph::Traversal::DFS->new('next_alphabetic') };
 like($@, qr/Graph::Traversal: first argument is not a Graph/, "sane args");
 
 eval { Graph::Traversal::DFS->new($gd, next_alphazetic => 1) };
@@ -607,9 +594,8 @@ is($td1->get_state('zot'), undef, "get_state");
     use Graph::Directed;
     my $g = new Graph::Directed;
     ok($g = $g->add_edge('a','b'), "rt.cpan.org 4420");
-    ok($g->has_edge('a','b'));
     ok($g = $g->add_edge('b','a'));
-    ok($g->has_edge('b','a'));
+    is $g, "a-b,b-a";
     my @toposort;
     eval { @toposort = $g->toposort };
     like($@, qr/Graph::topological_sort: expected directed acyclic graph, got cyclic/);
@@ -655,3 +641,5 @@ is($td1->get_state('zot'), undef, "get_state");
     ok(!$t->is_root('b') );
     ok(!$t->is_root('c') );
 }
+
+done_testing;

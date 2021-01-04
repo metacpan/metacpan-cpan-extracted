@@ -2,7 +2,7 @@ package SQL::Abstract::More;
 use strict;
 use warnings;
 
-use SQL::Abstract 1.84;
+use SQL::Abstract 1.85;
 use parent 'SQL::Abstract';
 use MRO::Compat;
 use mro 'c3'; # implements next::method
@@ -10,36 +10,47 @@ use mro 'c3'; # implements next::method
 use Params::Validate  qw/validate SCALAR SCALARREF CODEREF ARRAYREF HASHREF
                                   UNDEF  BOOLEAN/;
 use Scalar::Util      qw/blessed reftype/;
-use Carp;
 
-# import the "puke" function from SQL::Abstract (kind of "die")
-BEGIN {*puke = \&SQL::Abstract::puke;}
+# import error-reporting functions from SQL::Abstract
+BEGIN {*puke = \&SQL::Abstract::puke; *belch = \&SQL::Abstract::belch;}
 
 # remove all previously defined or imported functions
 use namespace::clean;
 
-our $VERSION = '1.33';
+our $VERSION = '1.34';
 
 
 #----------------------------------------------------------------------
-# utility function : cheap version of Scalar::Does (too heavy to be included)
+# Utility functions -- not methods -- declared _after_
+# namespace::clean so that they can remain visible by external
+# modules. In particular, DBIx::DataModel imports these functions.
 #----------------------------------------------------------------------
+
+# shallow_clone(): copies of the top-level keys and values, blessed into the same class
+sub shallow_clone {
+  my $orig = shift;
+
+  my $class = ref $orig
+    or puke "arg must be an object";
+  my $clone = {%$orig};
+  return bless $clone, $class;
+}
+
+
+# does(): cheap version of Scalar::Does
 my %meth_for = (
   ARRAY  => '@{}',
   HASH   => '%{}',
   SCALAR => '${}',
   CODE   => '&{}',
  );
-
 sub does ($$) {
   my ($data, $type) = @_;
   my $reft = reftype $data;
   return defined $reft && $reft eq $type
       || blessed $data && overload::Method($data, $meth_for{$type});
 }
-# Note : this is a utility function, not a method; but it is declared
-# _after_ namespace::clean so that it can remain visible by external
-# modules. In particular, DBIx::DataModel imports this function.
+
 
 
 #----------------------------------------------------------------------
@@ -142,8 +153,11 @@ my %params_for_select = (
 );
 my %params_for_insert = (
   -into         => {type => SCALAR},
-  -values       => {type => SCALAR|ARRAYREF|HASHREF},
+  -values       => {type => SCALAR|ARRAYREF|HASHREF, optional => 1},
+  -select       => {type => HASHREF,                 optional => 1},
+  -columns      => {type => ARRAYREF,                optional => 1},
   -returning    => {type => SCALAR|ARRAYREF|HASHREF, optional => 1},
+  -add_sql      => {type => SCALAR,                  optional => 1},
 );
 my %params_for_update = (
   -table        => {type => SCALAR|SCALARREF|ARRAYREF},
@@ -152,13 +166,21 @@ my %params_for_update = (
   -order_by     => {type => SCALAR|ARRAYREF|HASHREF, optional => 1},
   -limit        => {type => SCALAR,                  optional => 1},
   -returning    => {type => SCALAR|ARRAYREF|HASHREF, optional => 1},
+  -add_sql      => {type => SCALAR,                  optional => 1},
 );
 my %params_for_delete = (
   -from         => {type => SCALAR},
   -where        => {type => SCALAR|ARRAYREF|HASHREF, optional => 1},
   -order_by     => {type => SCALAR|ARRAYREF|HASHREF, optional => 1},
   -limit        => {type => SCALAR,                  optional => 1},
+  -add_sql      => {type => SCALAR,                  optional => 1},
 );
+my %params_for_WITH = (
+  -table        => {type => SCALAR},
+  -columns      => {type => SCALAR|ARRAYREF,         optional => 1},
+  -as_select    => {type => HASHREF},
+);
+
 
 
 #----------------------------------------------------------------------
@@ -179,7 +201,7 @@ sub new {
   my $dialect = delete $more_params{sql_dialect};
   if ($dialect) {
     my $dialect_params = $sql_dialects{$dialect}
-      or croak "no such sql dialect: $dialect";
+      or puke "no such sql dialect: $dialect";
     $more_params{$_} ||= $dialect_params->{$_} foreach keys %$dialect_params;
   }
 
@@ -189,7 +211,7 @@ sub new {
 
   # check some of the params for parent -- because SQLA doesn't do it :-(
   !$params{quote_char} || exists $params{name_sep}
-    or carp "when 'quote_char' is present, 'name_sep' should be present too";
+    or belch "when 'quote_char' is present, 'name_sep' should be present too";
 
   # call parent constructor
   my $self = $class->next::method(%params);
@@ -216,6 +238,64 @@ sub new {
    ]x;
 
   return $self;
+}
+
+
+
+#----------------------------------------------------------------------
+# support for WITH or WITH RECURSIVE
+#----------------------------------------------------------------------
+
+sub with_recursive {
+  my $self = shift;
+
+  my $new_instance = $self->with(@_);
+  $new_instance->{with_recursive} = 1; # flag to be used in _prepend_WITH_clause()
+
+  return $new_instance;
+}
+
+sub with {
+  my $self = shift;
+
+  ! $self->{common_table_expressions}
+    or puke "calls to the with() or with_recursive() method cannot be chained";
+
+  @_
+    or puke "->with() : missing arguments";
+
+  my @cte_params_list = does($_[0], 'ARRAY') ? @_ : ( [ @_]);
+  my @cte_list;
+  foreach my $cte_params (@cte_params_list) {
+    my %cte = validate(@$cte_params, \%params_for_WITH);
+    ($cte{sql}, @{$cte{bind}}) = $self->select(%{$cte{-as_select}});
+    push @cte_list, \%cte;
+  }
+
+  my $copy = {%$self};
+  $copy->{common_table_expressions} = \@cte_list;
+  return bless $copy, ref $self;
+}
+
+
+sub _prepend_WITH_clause {
+  my ($self, $ref_sql, $ref_bind) = @_;
+
+  return if !$self->{common_table_expressions};
+
+  my $preamble = "";
+  foreach my $cte (@{$self->{common_table_expressions}}) {
+    $preamble .= ", " if $preamble;
+    $preamble .= $cte->{-table};
+    $preamble .= "(" . join(", ", @{$cte->{-columns}}) . ")" if $cte->{-columns};
+    $preamble .= " AS ($cte->{sql}) ";
+    unshift @$ref_bind, @{$cte->{bind}};
+  }
+  if ($preamble) {
+    substr($preamble, 0, 0, 'RECURSIVE ') if $self->{with_recursive};
+    substr($preamble, 0, 0, 'WITH ');
+    substr($$ref_sql, 0, 0, $preamble);
+  }
 }
 
 
@@ -259,7 +339,7 @@ sub select {
 
   # reorganize pagination
   if ($args{-page_index} || $args{-page_size}) {
-    not exists $args{$_} or croak "-page_size conflicts with $_"
+    not exists $args{$_} or puke "-page_size conflicts with $_"
       for qw/-limit -offset/;
     $args{-limit} = $args{-page_size};
     if ($args{-page_index}) {
@@ -322,6 +402,10 @@ sub select {
   my $for = exists $args{-for} ? $args{-for} : $self->{select_implicitly_for};
   $sql .= " FOR $for" if $for;
 
+  # initial WITH clause
+  $self->_prepend_WITH_clause(\$sql, \@bind);
+
+  # return results
   if ($args{-want_details}) {
     return {sql             => $sql,
             bind            => \@bind,
@@ -342,16 +426,41 @@ sub insert {
 
   my @old_API_args;
   my $returning_into;
+  my $sql_to_add;
 
   if (&_called_with_named_args) {
     # extract named args and translate to old SQLA API
     my %args = validate(@_, \%params_for_insert);
-    @old_API_args = @args{qw/-into -values/};
+    $old_API_args[0] = $args{-into}
+      or puke "insert(..) : need -into arg";
+
+    if ($args{-values}) {
+
+      # check mutually exclusive parameters
+      !$args{$_}
+        or puke "insert(-into => .., -values => ...) : cannot use $_ => "
+        for qw/-select -columns/;
+
+      $old_API_args[1] = $args{-values};
+    }
+    elsif ($args{-select}) {
+      my ($sql, @bind) = $self->select(%{$args{-select}});
+      $old_API_args[1] = \ [$sql, @bind];
+      if (my $cols = $args{-columns}) {
+        $old_API_args[0] .= "(" . CORE::join(", ", @$cols) . ")";
+      }
+    }
+    else {
+      puke "insert(-into => ..) : need either -values arg or -select arg";
+    }
 
     # deal with -returning arg
     ($returning_into, my $old_API_options) 
       = $self->_compute_returning($args{-returning});
     push @old_API_args, $old_API_options if $old_API_options;
+
+    # SQL to add after the INSERT keyword
+    $sql_to_add = $args{-add_sql};
   }
   else {
     @old_API_args = @_;
@@ -365,6 +474,12 @@ sub insert {
     $sql .= ' INTO ' . join(", ", ("?") x @$returning_into);
     push @bind, @$returning_into;
   }
+
+  # SQL to add after the INSERT keyword
+  $sql =~ s/\b(INSERT)\b/$1 $sql_to_add/i if $sql_to_add;
+
+  # initial WITH clause
+  $self->_prepend_WITH_clause(\$sql, \@bind);
 
   return ($sql, @bind);
 }
@@ -396,11 +511,11 @@ sub update {
   }
 
   # call clone of parent method and merge with bind values from $join_info
-  my ($sql, @bind) = $self->_overridden_update(@old_API_args);
+  my ($sql, @bind) = $self->next::method(@old_API_args);
   unshift @bind, @{$join_info->{bind}} if $join_info;
 
-  # maybe need to handle additional args
-  $self->_handle_additional_args_for_update_delete(\%args, \$sql, \@bind);
+  # handle additional args if needed
+  $self->_handle_additional_args_for_update_delete(\%args, \$sql, \@bind, qr/UPDATE/);
 
   # inject more stuff if using Oracle's "RETURNING ... INTO ..."
   if ($returning_into) {
@@ -408,8 +523,12 @@ sub update {
     push @bind, @$returning_into;
   }
 
+  # initial WITH clause
+  $self->_prepend_WITH_clause(\$sql, \@bind);
+
   return ($sql, @bind);
 }
+
 
 sub _compute_returning {
   my ($self, $arg_returning) = @_; 
@@ -423,7 +542,7 @@ sub _compute_returning {
 
     if (does $arg_returning, 'HASH') {
       my @keys = sort keys %$arg_returning
-        or croak "-returning => {} : the hash is empty";
+        or puke "-returning => {} : the hash is empty";
 
       $old_API_options = {returning => \@keys};
       $returning_into  = [@{$arg_returning}{@keys}];
@@ -438,7 +557,7 @@ sub _compute_returning {
 
 
 sub _handle_additional_args_for_update_delete {
-  my ($self, $args, $sql_ref, $bind_ref) = @_;
+  my ($self, $args, $sql_ref, $bind_ref, $keyword_regex) = @_;
 
   if (defined $args->{-order_by}) {
     my ($sql_ob, @bind_ob) = $self->_order_by($args->{-order_by});
@@ -449,6 +568,9 @@ sub _handle_additional_args_for_update_delete {
     # can't call $self->limit_offset(..) because there shouldn't be any offset
     $$sql_ref .= $self->_sqlcase(' limit ?');
     push @$bind_ref, $args->{-limit};
+  }
+  if (defined $args->{-add_sql}) {
+    $$sql_ref =~ s/\b($keyword_regex)\b/$1 $args->{-add_sql}/i;
   }
 }
 
@@ -491,7 +613,10 @@ sub delete {
   my ($sql, @bind) = $self->next::method(@old_API_args);
 
   # maybe need to handle additional args
-  $self->_handle_additional_args_for_update_delete(\%args, \$sql, \@bind);
+  $self->_handle_additional_args_for_update_delete(\%args, \$sql, \@bind, qr/DELETE/);
+
+  # initial WITH clause
+  $self->_prepend_WITH_clause(\$sql, \@bind);
 
   return ($sql, @bind);
 }
@@ -533,7 +658,7 @@ sub join {
   while (@_) {
     # shift 2 items : next join specification and next table
     my $join_spec  = shift;
-    my $table_spec = shift or croak "join(): improper number of operands";
+    my $table_spec = shift or puke "improper number of operands";
 
     $join_spec  = $self->_parse_join_spec($join_spec) unless ref $join_spec;
     $table_spec = $self->_parse_table($table_spec)    unless ref $table_spec;
@@ -571,7 +696,7 @@ sub merge_conditions {
 our $INOUT_MAX_LEN = 99; # chosen arbitrarily; see L<DBI/bind_param_inout>
 sub bind_params {
   my ($self, $sth, @bind) = @_;
-  $sth->isa('DBI::st') or croak "sth argument is not a DBI statement handle";
+  $sth->isa('DBI::st') or puke "sth argument is not a DBI statement handle";
   foreach my $i (0 .. $#bind) {
     my $val = $bind[$i];
     if (does $val, 'SCALAR') {
@@ -608,7 +733,7 @@ sub is_bind_value_with_type {
     }
     # other options like 'sqlt_datatype', 'dbic_colname' are not supported
     else {
-      croak "unsupported options for bind type : "
+      puke "unsupported options for bind type : "
            . CORE::join(", ", sort keys %$args);
     }
 
@@ -659,9 +784,9 @@ sub _parse_join_spec {
 
   # parse the join specification
   $join_spec
-    or croak "empty join specification";
+    or puke "empty join specification";
   my ($op, $bracket, $cond_list) = ($join_spec =~ $self->{join_regex})
-    or croak "incorrect join specification : $join_spec\n$self->{join_regex}";
+    or puke "incorrect join specification : $join_spec\n$self->{join_regex}";
   $op        ||= '<=>';
   $bracket   ||= '{';
   $cond_list ||= '';
@@ -732,14 +857,14 @@ sub _single_join {
 
     if ($join_spec->{using}) {
       not $join_spec->{condition}
-        or croak "join specification has both {condition} and {using} fields";
+        or puke "join specification has both {condition} and {using} fields";
 
       $syntax =~ s/\bON\s+%s/USING (%s)/;
       $sql = CORE::join ",", @{$join_spec->{using}};
     }
     elsif ($join_spec->{condition}) {
       not $join_spec->{using}
-        or croak "join specification has both {condition} and {using} fields";
+        or puke "join specification has both {condition} and {using} fields";
 
       # compute the "ON" clause
       ($sql, @bind) = $self->where($join_spec->{condition});
@@ -766,31 +891,6 @@ sub _single_join {
 
   return \%result;
 }
-
-
-
-# sub _try_replace_ON_by_USING {
-#   my ($self, $syntax, $sql) = @_;
-
-#   # if there is an ON clause, replace it by a USING clause
-#   $syntax =~ s/\bON\s+%s/USING (%s)/ or return;
-
-#   # if there are equality conditions like Table1.col=Table2.col, just keep col
-#   my $n_cond = $sql =~ s/\w+\.(\w+)\s*=\s*\w+\.\1\b/$1/g or return;
-
-#   # if there were several equalities, replace the AND's by commas
-#   my $n_and  = $sql =~ s/\s+\bAND\b/,/g;
-
-#   # the number of equalities must match the number of AND's minus 1
-#   $n_cond == $n_and + 1 or return;
-
-#   # remove unnecessary parentheses
-#   $sql =~ s/^(\(\s*)+// and $sql =~ s/(\)\s*)+$//;
-
-#   # all criteria are good, let's replace strings in the caller (call-by-name)
-#   @_[1, 2] = ($syntax, $sql);
-# }
-
 
 
 #----------------------------------------------------------------------
@@ -962,8 +1062,8 @@ sub _where_field_op_ARRAYREF {
 sub _assert_no_bindtype_columns {
   my ($self) = @_;
   $self->{bindtype} ne 'columns'
-    or croak 'values of shape [$val, \%type] are not compatible'
-           . 'with ...->new(bindtype => "columns")';
+    or puke 'values of shape [$val, \%type] are not compatible'
+          . 'with ...->new(bindtype => "columns")';
 }
 
 
@@ -1023,21 +1123,12 @@ sub _insert_value { # called from _insert_values() in parent class
 
 
 
-sub _overridden_update {
-  # unfortunately, we can't just override the ARRAYREF part, so the whole
-  # parent method is copied here
 
-  my $self  = shift;
-  my $table = $self->_table(shift);
-  my $data  = shift || return;
-  my $where = shift;
-  my $options = shift;
 
-  # first build the 'SET' part of the sql statement
+sub _update_set_values { # called from update() in parent class
+  my ($self, $data) = @_;
+
   my (@set, @all_bind);
-  puke "Unsupported data type specified to \$sql->update"
-    unless ref $data eq 'HASH';
-
   for my $k (sort keys %$data) {
     my $v = $data->{$k};
     my $r = ref $v;
@@ -1045,8 +1136,8 @@ sub _overridden_update {
 
     $self->_SWITCH_refkind($v, {
       ARRAYREF => sub {
-        if ($self->{array_datatypes}
-            || $self->is_bind_value_with_type($v)) {
+        if ($self->{array_datatypes}                  # array datatype
+            || $self->is_bind_value_with_type($v)) {  # or bind value with type
           push @set, "$label = ?";
           push @all_bind, $self->_bindtype($k, $v);
         }
@@ -1073,7 +1164,7 @@ sub _overridden_update {
           if (@rest or not $op =~ /^\-(.+)/);
 
         local $self->{_nested_func_lhs} = $k;
-        my ($sql, @bind) = $self->_where_unary_op ($1, $arg);
+        my ($sql, @bind) = $self->_where_unary_op($1, $arg);
 
         push @set, "$label = $sql";
         push @all_bind, @bind;
@@ -1086,23 +1177,13 @@ sub _overridden_update {
   }
 
   # generate sql
-  my $sql = $self->_sqlcase('update') . " $table " . $self->_sqlcase('set ')
-          . CORE::join ', ', @set;
+  my $sql = CORE::join ', ', @set;
 
-  if ($where) {
-    my($where_sql, @where_bind) = $self->where($where);
-    $sql .= $where_sql;
-    push @all_bind, @where_bind;
-  }
-
-  if ($options->{returning}) {
-    my ($returning_sql, @returning_bind) = $self->_update_returning($options);
-    $sql .= $returning_sql;
-    push @all_bind, @returning_bind;
-  }
-
-  return wantarray ? ($sql, @all_bind) : $sql;
+  return ($sql, @all_bind);
 }
+
+
+
 
 
 
@@ -1149,7 +1230,7 @@ sub _choose_LIMIT_OFFSET_dialect {
   my $self = shift;
   my $dialect = $self->{limit_offset};
   my $method = $limit_offset_dialects{$dialect}
-    or croak "no such limit_offset dialect: $dialect";
+    or puke "no such limit_offset dialect: $dialect";
   $self->{limit_offset} = $method;
 }
 
@@ -1173,7 +1254,7 @@ SQL::Abstract::More - extension of SQL::Abstract with more constructs and more f
 
 =head1 DESCRIPTION
 
-Generates SQL from Perl data structures.  This is a subclass of
+This module generates SQL from Perl data structures.  It is a subclass of
 L<SQL::Abstract>, fully compatible with the parent class, but with
 some improvements :
 
@@ -1187,7 +1268,7 @@ like C<-where>, C<-order_by>, C<-group_by>, etc.
 
 =item *
 
-additional SQL constructs like C<-union>, C<-group_by>, C<join>, etc.
+additional SQL constructs like C<-union>, C<-group_by>, C<join>, C<with recursive>, etc.
 are supported
 
 =item *
@@ -1265,14 +1346,20 @@ and has no API to let the client instantiate from any other class.
    -where    => {"foo/bar/buz" => {-in => ['1/a/X', '2/b/Y', '3/c/Z']}},
   );
 
-  # merging several criteria
+  # ex6: merging several criteria
   my $merged = $sqla->merge_conditions($cond_A, $cond_B, ...);
   ($sql, @bind) = $sqla->select(..., -where => $merged, ..);
 
-  # insert / update / delete
+  # ex7: insert / update / delete
   ($sql, @bind) = $sqla->insert(
-    -into   => $table,
-    -values => {col => $val, ...},
+    -add_sql => 'OR IGNORE',        # SQLite syntax
+    -into    => $table,
+    -values  => {col => $val, ...},
+  );
+  ($sql, @bind) = $sqla->insert(
+    -into    => $table,
+    -columns => [qw/a b/],
+    -select  => {-from => 'Bar', -columns => [qw/x y/], -where => ...},
   );
   ($sql, @bind) = $sqla->update(
     -table => $table,
@@ -1283,6 +1370,32 @@ and has no API to let the client instantiate from any other class.
     -from  => $table
     -where => \%conditions,
   );
+
+  # ex8 : initial WITH clause -- example borrowed from https://sqlite.org/lang_with.html
+  ($sql, @bind) = $sqla->with_recursive(
+    [ -table     => 'parent_of',
+      -columns   => [qw/name parent/],
+      -as_select => {-columns => [qw/name mom/],
+                     -from    => 'family',
+                     -union   => [-columns => [qw/name dad/], -from => 'family']},
+     ],
+
+    [ -table     => 'ancestor_of_alice',
+      -columns   => [qw/name/],
+      -as_select => {-columns   => [qw/parent/],
+                     -from      => 'parent_of',
+                     -where     => {name => 'Alice'},
+                     -union_all => [-columns => [qw/parent/],
+                                    -from    => [qw/-join parent_of {name} ancestor_of_alice/]],
+                 },
+     ],
+    )->select(
+     -columns  => 'family.name',
+     -from     => [qw/-join ancestor_of_alice {name} family/],
+     -where    => {died => undef},
+     -order_by => 'born',
+    );
+
 
 =head1 CLASS METHODS
 
@@ -1698,19 +1811,29 @@ parsing the C<-columns> parameter.
   # positional parameters, directly passed to the parent class
   ($sql, @bind) = $sqla->insert($table, \@values || \%fieldvals, \%options);
 
-  # named parameters, handled in this class 
+  # named parameters, handled in this class
   ($sql, @bind) = $sqla->insert(
     -into      => $table,
     -values    => {col => $val, ...},
     -returning => $return_structure,
+    -add_sql   => $keyword,
+  );
+
+  # insert from a subquery
+  ($sql, @bind) = $sqla->insert(
+    -into    => $destination_table,
+    -columns => \@columns_into
+    -select  => {-from => $source_table, -columns => \@columns_from, -where => ...},
   );
 
 Like for L</select>, values assigned to columns can have associated
 SQL types; see L</"BIND VALUES WITH TYPES">.
 
-Named parameters to the C<insert()> method are just syntactic sugar
-for better readability of the client's code. Parameters
-C<-into> and C<-values> are passed verbatim to the parent method.
+Parameters C<-into> and C<-values> are passed verbatim to the parent method.
+
+Parameters C<-select> and C<-columns> are used for selecting from
+subqueries -- this is incompatible with the C<-values> parameter.
+
 Parameter C<-returning> is optional and only
 supported by some database vendors (see L<SQL::Abstract/insert>);
 if the C<$return_structure> is 
@@ -1744,6 +1867,13 @@ present module is there for help. Example:
 
 =back
 
+Optional parameter C<-add_sql> is used with some specific SQL dialects, for
+injecting additional SQL keywords after the C<INSERT> keyword. Examples :
+
+  $sqla->insert(..., -add_sql => 'IGNORE')     # produces "INSERT IGNORE ..."    -- MySQL
+  $sqla->insert(..., -add_sql => 'OR IGNORE')  # produces "INSERT OR IGNORE ..." -- SQLite
+
+
 
 =head2 update
 
@@ -1758,6 +1888,7 @@ present module is there for help. Example:
     -order_by  => \@order,
     -limit     => $limit,
     -returning => $return_structure,
+    -add_sql   => $keyword,
   );
 
 This works in the same spirit as the L</insert> method above.
@@ -1770,6 +1901,11 @@ MySQL does -- see L<http://dev.mysql.com/doc/refman/5.6/en/update.html>.
 
 Optional parameter C<-returning> works like for the L</insert> method.
 
+Optional parameter C<-add_sql> is used with some specific SQL dialects, for
+injecting additional SQL keywords after the C<UPDATE> keyword. Examples :
+
+  $sqla->update(..., -add_sql => 'IGNORE')     # produces "UPDATE IGNORE ..."    -- MySQL
+  $sqla->update(..., -add_sql => 'OR IGNORE')  # produces "UPDATE OR IGNORE ..." -- SQLite
 
 =head2 delete
 
@@ -1782,7 +1918,7 @@ Optional parameter C<-returning> works like for the L</insert> method.
     -where    => \%conditions,
     -order_by => \@order,
     -limit    => $limit,
-
+    -add_sql  => $keyword,
   );
 
 Positional parameters are supported for backwards compatibility
@@ -1792,7 +1928,72 @@ they improve the readability of the client's code.
 Few DBMS would support parameters C<-order_by> and C<-limit>, but
 MySQL does -- see L<http://dev.mysql.com/doc/refman/5.6/en/update.html>.
 
+Optional parameter C<-add_sql> is used with some specific SQL dialects, for
+injecting additional SQL keywords after the C<DELETE> keyword. Examples :
+
+  $sqla->delete(..., -add_sql => 'IGNORE')     # produces "DELETE IGNORE ..."    -- MySQL
+  $sqla->delete(..., -add_sql => 'OR IGNORE')  # produces "DELETE OR IGNORE ..." -- SQLite
+
+
+=head2 with_recursive, with
+
+  my $new_sqla = $sqla->with_recursive( # or: $sqla->with(
+
+    [ -table     => $CTE_table_name,
+      -columns   => \@CTE_columns,
+      -as_select => \%select_args ],
+
+    [ -table     => $CTE_table_name2,
+      -columns   => \@CTE_columns2,
+      -as_select => \%select_args2 ],
+    ...
+
+   );
+   ($sql, @bind) = $new_sqla->insert(...);
+  
+  # or, if there is only one table expression
+  my $new_sqla = $sqla->with_recursive(
+      -table     => $CTE_table_name,
+      -columns   => \@CTE_columns,
+      -as_select => \%select_args,
+     );
+
+
+Returns a new instance with an encapsulated I<common table expression (CTE)>, i.e. a
+kind of local view that can be used as a table name for the rest of the SQL statement
+-- see L<https://en.wikipedia.org/wiki/Hierarchical_and_recursive_queries_in_SQL> for
+an explanation of such expressions. The next C<select> on that instance will automatically
+build a C<WITH RECURSIVE> clause added as a preamble to the usual SQL statement.
+This works not only for C<select> but also for C<insert>, C<update> and C<delete>.
+The C<with()> variant produces the same result but without the C<RECURSIVE> keyword.
+
+Arguments to C<with_recursive()> are expressed as a list of arrayrefs; each arrayref
+corresponds to one table expression, with the following named parameters :
+
+=over
+
+=item C<-table>
+
+The name to be assigned to the table expression
+
+=item C<-columns>
+
+An optional list of column aliases to be assigned to the
+columns resulting from the internal select
+
+=item C<-as_select>
+
+The implementation of the table expression, given as a hashref
+of arguments following the same syntax as the L</select> method.
+
+=back
+
+If there is only one table expression, its arguments can be passed directly
+as an array instead of a single arrayref.
+
+
 =head2 table_alias
+
 
   my $sql = $sqla->table_alias($table_name, $alias);
 
@@ -2126,15 +2327,22 @@ L</bind_params> from the present module to perform the appropriate
 bindings before executing the statement.
 
 
-=head1 EXPORTED FUNCTIONS
+=head1 UTILITY FUNCTIONS
+
+=head2 shallow_clone
+
+  my $clone = SQL::Abstract::More::shallow_clone($some_object);
+
+Returns a shallow copy of the object passed as argument. A new hash is created
+with copies of the top-level keys and values, and it is blessed into the same
+class as the original object. Not to be confused with the full recursive copy
+performed by L<Clone/clone>.
 
 =head2 does()
 
-  use SQL::Abstract::More qw/does/;
+  if (SQL::Abstract::More::does $ref, 'ARRAY') {...}
 
-  if (does $ref, 'ARRAY') {...}
-
-This module contains a very cheap version of a C<does()> method, that
+Very cheap version of a C<does()> method, that
 checks whether a given reference can act as an ARRAY, HASH, SCALAR or
 CODE. This was designed for the limited internal needs of this module
 and of L<DBIx::DataModel>; for more complete implementations of a

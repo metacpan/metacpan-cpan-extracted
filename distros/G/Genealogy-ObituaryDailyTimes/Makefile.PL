@@ -22,6 +22,7 @@ unless(defined($ENV{'AUTOMATED_TESTING'})) {
 	$prereqs->{'HTML::Entities'} = 0;
 	$prereqs->{'HTTP::Cache::Transparent'} = 0;
 	$prereqs->{'LWP::ConnCache'} = 0;
+	$prereqs->{'LWP::Protocol::https'} = 0;
 	$prereqs->{'LWP::UserAgent::WithCache'} = 0;
 	$prereqs->{'Lingua::EN::NameCase'} = 0;
 	$prereqs->{'Try::Tiny'} = 0;
@@ -51,7 +52,7 @@ WriteMakefile(
 	# META_ADD => {
 		# provides => {}
 	# },
-	META_MERGE		=> {
+	META_MERGE => {	# https://perldoc.perl.org/CPAN::Meta::Spec
 		'meta-spec' => { version => 2 },
 		resources => {
 			repository => {
@@ -64,9 +65,8 @@ WriteMakefile(
 				# web => 'https://rt.cpan.org/Public/Dist/Display.html?Name=Genealogy-ObituaryDailyTimes',
 				# mailto => 'bug-Genealogy-ObituaryDailyTimes@rt.cpan.org'
 				web => 'https://github.com/nigelhorne/Genealogy-ObituaryDailyTimes/issues',
-				url => 'https://github.com/nigelhorne/Genealogy-ObituaryDailyTimes/issues',
-			}
-
+				mailto => 'bug-Genealogy-ObituaryDailyTimes@rt.cpan.org'
+			}, homepage => 'https://sites.rootsweb.com/~obituary',
 		},
 	},
 	# PPM_INSTALL_EXEC	=> 'perl',

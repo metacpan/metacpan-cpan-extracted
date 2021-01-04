@@ -24,6 +24,7 @@ isa_ok($exporter, 'Catmandu::Exporter::XLS');
 can_ok($exporter, 'add');
 can_ok($exporter, 'add_many');
 can_ok($exporter, 'commit');
+
 for my $row (@rows) {
     $exporter->add($row);
 }
@@ -86,6 +87,7 @@ isa_ok($exporter, 'Catmandu::Exporter::XLSX');
 can_ok($exporter, 'add');
 can_ok($exporter, 'add_many');
 can_ok($exporter, 'commit');
+
 for my $row (@rows) {
     $exporter->add($row);
 }

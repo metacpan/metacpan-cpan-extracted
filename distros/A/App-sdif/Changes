@@ -1,8 +1,17 @@
 Revision history for Perl application 'sdif-tools'.
 
+4.18.1 2021-01-03T14:28:40Z
+
+    - Add --tabstop option.
+
+4.18.0 2020-12-31T03:54:29Z
+
+    sdif:
+    - Add --visible, --tabhead, --tabspace options.
+
 4.17.0 2020-12-14T09:51:48Z
 
-    - Implement "VISUAL" effect for --visible characters.
+    - Implement "VISIBLE" effect for --visible characters.
 
 4.16.1 2020-08-26T07:24:30Z
 

@@ -1,5 +1,10 @@
 Changes for InfluxDB::LineProtocol
 
+1.013     2021-01-03 16:55:02+01:00
+    - dist housekeeping: github issues,
+      Dist::Zilla::PluginBundle::Author::DOMM
+
+
 1.012   2020-05-12T14:48:25
     - Bugfix encoding for big floats (fixes #14) (Adrian Popa)
 

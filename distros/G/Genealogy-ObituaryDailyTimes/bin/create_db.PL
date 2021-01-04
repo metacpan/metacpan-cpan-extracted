@@ -15,11 +15,13 @@ use LWP::ConnCache;
 use LWP::UserAgent::WithCache;
 use Lingua::EN::NameCase qw(nc);
 use Try::Tiny;
+use autodie qw(:all);
 
 sub freelists($$);
 sub mlarchives($$);
-sub queue($$$$$$$);
+sub queue($$$$$$$$);
 sub flush($);
+sub normalise_name($);
 
 BEGIN {
 	$SIG{__WARN__} = sub {
@@ -34,23 +36,18 @@ exit if($ENV{'AUTOMATED_TESTING'});
 
 my $dir = 'lib/Genealogy/ObituaryDailyTimes/database';
 my $filename = File::Spec->catdir($dir, 'obituaries.sql');
+my %normalised;
 
 if(!-d $dir) {
 	mkdir $dir;
 }
 
 if(-r $filename) {
-	# Don't bother downloading if the file is less than a day old
-	exit if(-M $filename < 1);
-}
-
-my $dbh = DBI->connect("dbi:SQLite:dbname=$filename", undef, undef, { RaiseError => 1, AutoCommit => 0, synchronous => 0, locking_mode => 'EXCLUSIVE' });
-if($dbh) {
-	$dbh->do('CREATE TABLE obituaries(first VARCHAR, last VARCHAR NOT NULL, maiden VARCHAR, age INTEGER, place VARCHAR, newspaper VARCHAR NOT NULL, date DATE NOT NULL)');
-	$dbh->do('PRAGMA cache_size = -65536');	# 64MB
-	$dbh->do('PRAGMA journal_mode = OFF');
-} else {
-	die "obituaries.sql: $!";
+	if((-s $filename) > 0) {
+		# Don't bother downloading if the file is less than a day old
+		exit if(-M $filename < 1);
+	}
+	unlink $filename;
 }
 
 my $cachedir = $ENV{'CACHEDIR'};
@@ -77,24 +74,32 @@ $ua->conn_cache()->total_capacity(undef);
 
 # print '"last","first","maiden","age","place","newspapername","newspaperdate","tag"', "\n";
 
-my $page = 1;
 my @queue;
-while(1) {
-	last if(!mlarchives($ua, $page));
+my $page = 1;
+while(mlarchives($ua, $page)) {
 	$page++;
-}
+};
+
+print ' ' x 78, "\r";
 
 my $issue = 9;
-while(1) {
-	last if(!freelists($ua, 'v25no' . sprintf('%03d', $issue)));
+while(freelists($ua, 'v25no' . sprintf('%03d', $issue))) {
 	$issue++;
 }
 
 print "\n";
 
-flush($dbh);
-$dbh->commit();
-$dbh->disconnect();
+if(my $dbh = DBI->connect("dbi:SQLite:dbname=$filename", undef, undef, { RaiseError => 1, AutoCommit => 0, synchronous => 0, locking_mode => 'EXCLUSIVE' })) {
+	$dbh->do('CREATE TABLE obituaries(first VARCHAR, last VARCHAR NOT NULL, maiden VARCHAR, age INTEGER, place VARCHAR, newspaper VARCHAR NOT NULL, date DATE NOT NULL, url VARCHAR NOT NULL)');
+	$dbh->do('PRAGMA cache_size = -65536');	# 64MB
+	$dbh->do('PRAGMA journal_mode = OFF');
+
+	flush($dbh);
+	$dbh->commit();
+	$dbh->disconnect();
+} else {
+	die "obituaries.sql: $!";
+}
 
 sub mlarchives($$) {
 	my $ua = shift;
@@ -112,7 +117,7 @@ sub mlarchives($$) {
 		$data = $response->decoded_content();
 	} else {
 		if($response->status_line() ne '404 Not Found') {
-			warn "\n$url: ", $response->status_line();
+			die "\n$url: ", $response->status_line();
 		}
 		return 0;
 	}
@@ -125,6 +130,7 @@ sub mlarchives($$) {
 	my @lines = split(/$/ms, $data);
 
 	my $last_line;
+	my $rc;
 
 	while(my $line = shift(@lines)) {
 		# LAST NAME, First Name (MAIDEN); Age; Place of Death; Newspaper Name; Newspaper date; tagname
@@ -137,7 +143,7 @@ sub mlarchives($$) {
 		if($line =~ /^------/) {
 			if($stage == -1) {
 				if($line =~ /No Results/) {
-					# last page
+					# Last page
 					return 0;
 				}
 				# Introduction to a post about to start
@@ -150,6 +156,19 @@ sub mlarchives($$) {
 				$stage = 0;
 			}
 			next;
+		} elsif($stage == -1) {
+			if($line =~ /^LAST NAME/) {
+				# The ----- probably didn't start a line
+				# e.g. https://mlarchives.rootsweb.com/listindexes/emails?listname=gen-obit&page=41
+				$stage = 0;
+			} elsif($line =~ /Re: \[GEN-OBIT\]/) {
+				# It's a reply to a post, not an actual post
+				# e.g. https://mlarchives.rootsweb.com/listindexes/emails?listname=gen-obit&page=46
+				return 1;
+			} elsif($line =~ /No Results/) {
+				# Last page
+				return 0;
+			}
 		}
 		next unless($stage == 1);
 
@@ -177,19 +196,20 @@ sub mlarchives($$) {
 		my $maiden;
 		if($first) {
 			if($first =~ /(.+)\s\((.+)\)$/) {
-				$first = nc($1);
-				$maiden = nc($2);
+				$first = normalise_name($1);
+				$maiden = normalise_name($2);
 			} else {
-				$first = nc($first);
+				$first = normalise_name($first);
 			}
 		}
-		$last = nc($last);
 		# $age //= '';
 
 		# print "$line->>>>>>>>>>\n";
-		queue($first, $last, $maiden, $age, $place, $date, $newspaper) if($last =~ /^[A-Z]/);
+		queue($first, normalise_name($last), $maiden, $age, $place, $date, $newspaper, $url) if($last =~ /^[A-Z]/);
 		# print "\"$last\",\"$first\",\"$maiden\",\"$age\",\"$place\",\"$date\",\"$newspaper\"\n" if($last =~ /^[A-Z]/);
+		$rc = 1;
 	}
+	die "Couldn't parse $url" if(!defined($rc));
 	return 1;
 }
 
@@ -209,7 +229,7 @@ sub freelists($$) {
 		$data = $response->decoded_content();
 	} else {
 		if($response->status_line() ne '404 Not Found') {
-			warn "\n$url: ", $response->status_line();
+			die "\n$url: ", $response->status_line();
 		}
 		return 0;
 	}
@@ -222,6 +242,7 @@ sub freelists($$) {
 	# $data =~ s/(.*?)^\-\-\-\-+<br>$/$1/ms;
 
 	my @lines = split(/<br>$/ms, $data);
+	my $rc;
 
 	while(my $line = shift(@lines)) {
 		# LAST NAME, First Name (MAIDEN); Age; Place of Death; Newspaper Name; Newspaper date; tagname
@@ -256,27 +277,26 @@ sub freelists($$) {
 		my $maiden;
 		if($first) {
 			if($first =~ /(.+)\s\((.+)\)$/) {
-				$first = nc($1);
-				$maiden = nc($2);
+				$first = normalise_name($1);
+				$maiden = normalise_name($2);
 			} else {
-				$first = nc($first);
+				$first = normalise_name($first);
 			}
-		} else {
-			$first = '';
 		}
-		$last = nc($last);
 		# $age //= '';
 
 		# print "$line->>>>>>>>>>\n";
 		# print "\"$last\",\"$first\",\"$maiden\",\"$age\",\"$place\",\"$date\",\"$newspaper\"\n" if($last =~ /^[A-Z]/);
-		queue($first, $last, $maiden, $age, $place, $date, $newspaper) if($last =~ /^[A-Z]/);
+		queue($first, normalise_name($last), $maiden, $age, $place, $date, $newspaper, $url) if($last =~ /^[A-Z]/);
+		$rc = 1;
 	}
+	die "Couldn't parse $url" if(!defined($rc));
 	return 1;
 }
 
-sub queue($$$$$$$)
+sub queue($$$$$$$$)
 {
-	my ($first, $last, $maiden, $age, $place, $date, $newspaper) = @_;
+	my ($first, $last, $maiden, $age, $place, $date, $newspaper, $url) = @_;
 
 	my %columns;
 	$columns{'first'} = $first;
@@ -295,6 +315,7 @@ sub queue($$$$$$$)
 		return;	# If we don't know the date of publication, it's not easy to find
 	}
 	$columns{'newspaper'} = $newspaper;
+	$columns{'url'} = $url;
 
 	push @queue, \%columns;
 }
@@ -307,7 +328,7 @@ sub flush($)
 
 	while(my $row = pop @queue) {
 		if(!defined($query)) {
-			$query = 'INSERT INTO obituaries(first, last, maiden, age, place, date, newspaper) VALUES (';
+			$query = 'INSERT INTO obituaries(first, last, maiden, age, place, date, newspaper, url) VALUES (';
 		} else {
 			$query .= ',(';
 		}
@@ -338,7 +359,7 @@ sub flush($)
 		} else {
 			$query .= 'NULL,';
 		}
-		$query .= "'" . $columns{'newspaper'} . "')";
+		$query .= "'" . $columns{'newspaper'} . "','" . $columns{'url'} . "')";
 	}
 
 	# $| = 1;
@@ -352,4 +373,18 @@ sub flush($)
 		die "\nError in insert ($query) called from line ",
 			$call_details[2], ': ', $dbh->errstr(), "\n";
 	};
+}
+
+# Reduce the very large number of calls to Lingua::EN::NameCase
+sub normalise_name($)
+{
+	my $name = shift;
+	my $key = lc($name);
+
+	if($normalised{$key}) {
+		return $normalised{$key};
+	}
+	my $value = nc($name);
+	$normalised{$key} = $value;
+	return $value;
 }

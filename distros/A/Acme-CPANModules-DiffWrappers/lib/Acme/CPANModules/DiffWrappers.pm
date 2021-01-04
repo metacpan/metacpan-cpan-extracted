@@ -1,9 +1,9 @@
 package Acme::CPANModules::DiffWrappers;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2020-08-26'; # DATE
+our $DATE = '2020-10-27'; # DATE
 our $DIST = 'Acme-CPANModules-DiffWrappers'; # DIST
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.003'; # VERSION
 
 require Acme::CPANModules::CLI::Wrapper::UnixCommand;
 my $srclist = $Acme::CPANModules::CLI::Wrapper::UnixCommand::LIST;
@@ -35,15 +35,17 @@ Acme::CPANModules::DiffWrappers - Wrappers for the diff Unix command
 
 =head1 VERSION
 
-This document describes version 0.002 of Acme::CPANModules::DiffWrappers (from Perl distribution Acme-CPANModules-DiffWrappers), released on 2020-08-26.
+This document describes version 0.003 of Acme::CPANModules::DiffWrappers (from Perl distribution Acme-CPANModules-DiffWrappers), released on 2020-10-27.
 
-=head1 INCLUDED MODULES
+=head1 MODULES INCLUDED IN THIS ACME::CPANMODULE MODULE
 
 =over
 
 =item * L<App::diffwc> - Wraps (or filters output of) diff to add colors and highlight words
 
 =item * L<App::DiffDocText> - Diffs two office word-processor documents by first converting them to plaintext
+
+=item * L<App::DiffXlsText> - Diffs two office spreadsheets by first converting them to directories of CSV files
 
 =item * L<App::sdif> - Provides sdif (diff side-by-side with nice color theme), cdif (highlight words with nice color scheme), and watchdiff (watch command and diff output)
 

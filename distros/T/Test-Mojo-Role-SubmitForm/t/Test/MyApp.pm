@@ -40,6 +40,7 @@ __DATA__
   <input type="radio" name="e" value="Z">
   <input type="hidden" name="$&quot;bar" value="42">
   <input type="hidden" name="©☺♥" value="24">
+  <input type="hidden" name="empty_val" value="">
   <select name="f" multiple>
     <option value="F">G</option>
     <optgroup label="Options">

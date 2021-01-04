@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.008003;
 
-our $VERSION = '0.123';
+our $VERSION = '0.124';
 use Exporter 'import';
 our @EXPORT_OK = qw( print_table );
 
@@ -741,7 +741,7 @@ Term::TablePrint - Print a table to the terminal and browse it interactively.
 
 =head1 VERSION
 
-Version 0.123
+Version 0.124
 
 =cut
 
@@ -1098,7 +1098,7 @@ Matthäus Kiem <cuer2s@gmail.com>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2013-2020 Matthäus Kiem.
+Copyright 2013-2021 Matthäus Kiem.
 
 This library is free software; you can redistribute it and/or modify it under the same terms as Perl 5.10.0. For
 details, see the full text of the licenses in the file LICENSE.

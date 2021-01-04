@@ -26,7 +26,7 @@ use Ogg::Vorbis::Header;
 require Inline;
 Inline->init;
 
-our $VERSION = '1.8.2';
+our $VERSION = '1.8.3';
 
 my %data = (artist => 'ARTIST',
             title  => 'TITLE',

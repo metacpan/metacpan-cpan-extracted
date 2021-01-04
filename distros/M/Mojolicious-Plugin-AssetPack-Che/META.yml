@@ -27,5 +27,5 @@ requires:
   perl: '5.006'
 resources:
   repository: git://github.com/mche/Mojolicious-Plugin-AssetPack-Che.git
-version: '2.105'
+version: '2.106'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

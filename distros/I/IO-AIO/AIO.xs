@@ -86,6 +86,7 @@
 
   #include <sys/time.h>
   #include <sys/select.h>
+  #include <sys/wait.h>
   #include <unistd.h>
   #include <utime.h>
   #include <signal.h>
@@ -1352,12 +1353,44 @@ BOOT:
 
     const_iv (OPEN_TREE_CLONE)
 
+    const_iv (FSOPEN_CLOEXEC)
+
+    const_iv (FSPICK_CLOEXEC)
+    const_iv (FSPICK_SYMLINK_NOFOLLOW)
+    const_iv (FSPICK_NO_AUTOMOUNT)
+    const_iv (FSPICK_EMPTY_PATH)
+
     const_iv (MOVE_MOUNT_F_SYMLINKS)
     const_iv (MOVE_MOUNT_F_AUTOMOUNTS)
     const_iv (MOVE_MOUNT_F_EMPTY_PATH)
     const_iv (MOVE_MOUNT_T_SYMLINKS)
     const_iv (MOVE_MOUNT_T_AUTOMOUNTS)
     const_iv (MOVE_MOUNT_T_EMPTY_PATH)
+
+    /* waitid */
+    const_iv (P_PID)
+    const_iv (P_PIDFD)
+    const_iv (P_PGID)
+    const_iv (P_ALL)
+
+    const_iv (FSCONFIG_SET_FLAG)
+    const_iv (FSCONFIG_SET_STRING)
+    const_iv (FSCONFIG_SET_BINARY)
+    const_iv (FSCONFIG_SET_PATH)
+    const_iv (FSCONFIG_SET_PATH_EMPTY)
+    const_iv (FSCONFIG_SET_FD)
+    const_iv (FSCONFIG_CMD_CREATE)
+    const_iv (FSCONFIG_CMD_RECONFIGURE)
+
+    const_iv (MOUNT_ATTR_RDONLY)
+    const_iv (MOUNT_ATTR_NOSUID)
+    const_iv (MOUNT_ATTR_NODEV)
+    const_iv (MOUNT_ATTR_NOEXEC)
+    const_iv (MOUNT_ATTR__ATIME)
+    const_iv (MOUNT_ATTR_RELATIME)
+    const_iv (MOUNT_ATTR_NOATIME)
+    const_iv (MOUNT_ATTR_STRICTATIME)
+    const_iv (MOUNT_ATTR_NODIRATIME)
 
     /* these are libeio constants, and are independent of gendef0 */
     const_eio (SEEK_SET)

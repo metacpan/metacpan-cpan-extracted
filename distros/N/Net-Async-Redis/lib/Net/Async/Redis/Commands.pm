@@ -3,7 +3,7 @@ package Net::Async::Redis::Commands;
 use strict;
 use warnings;
 
-our $VERSION = '3.006'; # VERSION
+our $VERSION = '3.007'; # VERSION
 
 =head1 NAME
 
@@ -53,6 +53,7 @@ our %KEY_FINDER = (
     'GEOPOS' => 1,
     'GEORADIUS' => 1,
     'GEORADIUSBYMEMBER' => 1,
+    'GEOSEARCH' => 1,
     'GET' => 1,
     'GETBIT' => 1,
     'GETRANGE' => 1,
@@ -668,6 +669,19 @@ sub client_id : method {
     $self->execute_command(qw(CLIENT ID) => @args)
 }
 
+=head2 client_info
+
+Returns information about the current client connection.
+
+L<https://redis.io/commands/client-info>
+
+=cut
+
+sub client_info : method {
+    my ($self, @args) = @_;
+    $self->execute_command(qw(CLIENT INFO) => @args)
+}
+
 =head2 client_kill
 
 Kill the connection of a client.
@@ -704,6 +718,8 @@ Get the list of client connections.
 =over 4
 
 =item * [TYPE normal|master|replica|pubsub]
+
+=item * [ID client-id [client-id ...]]
 
 =back
 
@@ -802,6 +818,19 @@ L<https://redis.io/commands/client-tracking>
 sub client_tracking : method {
     my ($self, @args) = @_;
     $self->execute_command(qw(CLIENT TRACKING) => @args)
+}
+
+=head2 client_trackinginfo
+
+Return information about server assisted client side caching for the current connection.
+
+L<https://redis.io/commands/client-trackinginfo>
+
+=cut
+
+sub client_trackinginfo : method {
+    my ($self, @args) = @_;
+    $self->execute_command(qw(CLIENT TRACKINGINFO) => @args)
 }
 
 =head2 client_unblock
@@ -1644,6 +1673,84 @@ sub georadiusbymember : method {
     $self->execute_command(qw(GEORADIUSBYMEMBER) => @args)
 }
 
+=head2 geosearch
+
+Query a sorted set representing a geospatial index to fetch members inside an area of a box or a circle.
+
+=over 4
+
+=item * key
+
+=item * [FROMMEMBER member]
+
+=item * [FROMLONLAT longitude latitude]
+
+=item * [BYRADIUS radius m|km|ft|mi]
+
+=item * [BYBOX width height m|km|ft|mi]
+
+=item * [ASC|DESC]
+
+=item * [COUNT count]
+
+=item * [WITHCOORD]
+
+=item * [WITHDIST]
+
+=item * [WITHHASH]
+
+=back
+
+L<https://redis.io/commands/geosearch>
+
+=cut
+
+sub geosearch : method {
+    my ($self, @args) = @_;
+    $self->execute_command(qw(GEOSEARCH) => @args)
+}
+
+=head2 geosearchstore
+
+Query a sorted set representing a geospatial index to fetch members inside an area of a box or a circle, and store the result in another key.
+
+=over 4
+
+=item * destination
+
+=item * source
+
+=item * [FROMMEMBER member]
+
+=item * [FROMLONLAT longitude latitude]
+
+=item * [BYRADIUS radius m|km|ft|mi]
+
+=item * [BYBOX width height m|km|ft|mi]
+
+=item * [ASC|DESC]
+
+=item * [COUNT count]
+
+=item * [WITHCOORD]
+
+=item * [WITHDIST]
+
+=item * [WITHHASH]
+
+=item * [STOREDIST]
+
+=back
+
+L<https://redis.io/commands/geosearchstore>
+
+=cut
+
+sub geosearchstore : method {
+    my ($self, @args) = @_;
+    $self->execute_command(qw(GEOSEARCHSTORE) => @args)
+}
+
 =head1 METHODS - Hash
 
 =head2 hdel
@@ -2212,11 +2319,13 @@ sub lmove : method {
 
 =head2 lpop
 
-Remove and get the first element in a list.
+Remove and get the first elements in a list.
 
 =over 4
 
 =item * key
+
+=item * [count]
 
 =back
 
@@ -2392,11 +2501,13 @@ sub ltrim : method {
 
 =head2 rpop
 
-Remove and get the last element in a list.
+Remove and get the last elements in a list.
 
 =over 4
 
 =item * key
+
+=item * [count]
 
 =back
 

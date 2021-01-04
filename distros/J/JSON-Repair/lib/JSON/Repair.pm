@@ -11,9 +11,10 @@ use Carp;
 # JSON::Parse.
 
 use 5.014;
-use JSON::Parse '0.49';
+use JSON::Parse '0.58';
 use C::Tokenize '$comment_re';
-our $VERSION = '0.07';
+
+our $VERSION = '0.08';
 
 sub repair_json
 {
@@ -107,6 +108,7 @@ sub repair_json
 			if ($verbose) {
 			    print "Deleting comment '$1'.\n";
 			}
+			rm_trailing_h (\$previous, $verbose);
 			$output = $previous . $remaining;
 			next;
 		    }
@@ -119,6 +121,7 @@ sub repair_json
 			if ($verbose) {
 			    print "Deleting comment '$1'.\n";
 			}
+			rm_trailing_h (\$previous, $verbose);
 			$output = $previous . $remaining;
 			next;
 		    }
@@ -155,6 +158,13 @@ sub repair_json
 			print "Adding quotes to key '$bad_char$1'\n";
 		    }
 		    $output = $previous . '"' . $bad_char . $remaining;
+		    # For strings missing quotes like <a :>, use <"a" :>
+		    # rather than <"a ":>
+		    if ($output =~ s/(\s+)"[:,]/"$1:/g) {
+			if ($verbose) {
+			    print "Moved whitespace '$1' before \" to after \"";
+			}
+		    }
 		    next;
 		}
 		if ($previous =~ /:\s*$/) {
@@ -172,7 +182,8 @@ sub repair_json
 		if ($bad_byte < 0x20) {
 		    $bad_char = json_escape ($bad_char);
 		    if ($verbose) {
-			print "Changing $bad_byte into $bad_char.\n";
+			printf "Changing bad byte %X into $bad_char.\n",
+			    ord ($bad_byte);
 		    }
 		    $output = $previous . $bad_char . $remaining;
 		    next;
@@ -180,6 +191,9 @@ sub repair_json
 	    }
 	    # Add a zero to a fraction
 	    if ($bad_char eq '.' && $remaining =~ /^[0-9]+/) {
+		if ($verbose) {
+		    print "Missing zero before a fraction?\n";
+		}
 		$output = $previous . "0." . $remaining;
 		next;
 	    }
@@ -283,6 +297,18 @@ sub json_escape
     $input =~ s/\t/\\t/g;
     $input =~ s/([\x00-\x1f])/sprintf ("\\u%04x", ord ($1))/ge;
     return $input;
+}
+
+sub rm_trailing_h
+{
+    my ($previous_ref, $verbose) = @_;
+    my $previous = $$previous_ref;
+    if ($previous =~ s/\h+$//) {
+	if ($verbose) {
+	    print "Also removed whitespace before comment.\n";
+	}
+    }
+    $$previous_ref = $previous;
 }
 
 1;

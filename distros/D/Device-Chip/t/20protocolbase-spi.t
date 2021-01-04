@@ -6,16 +6,20 @@ use warnings;
 use Test::More;
 use Test::Device::Chip::Adapter;
 
+use Future::AsyncAwait 0.47;
+
 use Device::Chip::ProtocolBase::SPI;
 
 {
-   package TestAdapter;
-   # T:D:C:Adapter yields itself as all protocol implementations
-   use base qw( Device::Chip::ProtocolBase::SPI Test::Device::Chip::Adapter );
+   use Object::Pad;
+
+   class TestAdapter
+      extends Test::Device::Chip::Adapter
+      implements Device::Chip::ProtocolBase::SPI;
 }
 
 my $adapter = TestAdapter->new;
-my $protocol = $adapter->make_protocol( "SPI" )->get;
+my $protocol = await $adapter->make_protocol( "SPI" );
 
 # readwrite
 {
@@ -23,7 +27,7 @@ my $protocol = $adapter->make_protocol( "SPI" )->get;
    $adapter->expect_readwrite_no_ss( "AB" )->returns( "CD" );
    $adapter->expect_release_ss;
 
-   is( $protocol->readwrite( "AB" )->get, "CD",
+   is( await $protocol->readwrite( "AB" ), "CD",
       '->readwrite value' );
 
    $adapter->check_and_clear( '->readwrite' );
@@ -35,7 +39,7 @@ my $protocol = $adapter->make_protocol( "SPI" )->get;
    $adapter->expect_readwrite_no_ss( "EF" )->returns( "XX" );
    $adapter->expect_release_ss;
 
-   is( $protocol->write( "EF" )->get, undef,
+   is( await $protocol->write( "EF" ), undef,
       '->write value' );
 
    $adapter->check_and_clear( '->write' );
@@ -47,7 +51,7 @@ my $protocol = $adapter->make_protocol( "SPI" )->get;
    $adapter->expect_readwrite_no_ss( "\0\0" )->returns( "KL" );
    $adapter->expect_release_ss;
 
-   is( $protocol->read( 2 )->get, "KL",
+   is( await $protocol->read( 2 ), "KL",
       '->read value' );
 
    $adapter->check_and_clear( '->read' );
@@ -60,7 +64,7 @@ my $protocol = $adapter->make_protocol( "SPI" )->get;
    $adapter->expect_readwrite_no_ss( "\0\0" )->returns( "IJ" );
    $adapter->expect_release_ss;
 
-   is( $protocol->write_then_read( "GH", 2 )->get, "IJ",
+   is( await $protocol->write_then_read( "GH", 2 ), "IJ",
       '->write_then_read value' );
 
    $adapter->check_and_clear( '->write_then_read' );

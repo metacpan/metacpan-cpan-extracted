@@ -4,7 +4,7 @@ use Moose;
 extends 'Dist::Zilla::PluginBundle::Starter';
 use namespace::clean;
 
-our $VERSION = 'v4.0.0';
+our $VERSION = 'v5.0.0';
 
 has '+revision' => (
   default => sub { $_[0]->payload->{revision} // 3 },
@@ -61,7 +61,7 @@ Dist::Zilla::PluginBundle::Starter::Git - A minimal Dist::Zilla plugin bundle fo
   version = 0.001
   
   [@Starter::Git]      ; all that is needed to start
-  revision = 4         ; always defaults to revision 3
+  revision = 5         ; always defaults to revision 3
   
   ; configuring examples
   installer = ModuleBuildTiny
@@ -74,8 +74,11 @@ Dist::Zilla::PluginBundle::Starter::Git - A minimal Dist::Zilla plugin bundle fo
 
 The C<[@Starter::Git]> plugin bundle for L<Dist::Zilla> is a subclass of the
 L<[@Starter]|Dist::Zilla::PluginBundle::Starter> plugin bundle designed to
-support a Git-based workflow. See the documentation for
-L<[@Starter]|Dist::Zilla::PluginBundle::Starter> for further details.
+support a Git-based workflow.
+
+See the L<Dist::Zilla::Starter> guide and the base
+L<[@Starter]|Dist::Zilla::PluginBundle::Starter> documentation, as this
+documentation only details the specifics of this subclass.
 
 For one-line initialization of a new C<[@Starter::Git]>-based distribution, try
 L<Dist::Zilla::MintingProfile::Starter::Git>.
@@ -89,7 +92,7 @@ configured by the composed roles, as in L</"CONFIGURING">.
 =head2 revision
 
   [@Starter::Git]
-  revision = 3
+  revision = 5
 
 As in L<Dist::Zilla::PluginBundle::Starter/"revision">, but defaults to
 revision 3. C<[@Starter::Git]> requires at least revision 3.
@@ -218,6 +221,11 @@ L<[Git::Push]|Dist::Zilla::Plugin::Git::Push>.
 
 Revision 4 has no specific differences beyond the changes in
 L<Revision 4 in [@Starter]|Dist::Zilla::PluginBundle::Starter/"Revision 4">.
+
+=head2 Revision 5
+
+Revision 5 has no specific differences beyond the changes in
+L<Revision 5 in [@Starter]|Dist::Zilla::PluginBundle::Starter/"Revision 5">.
 
 =head1 BUGS
 

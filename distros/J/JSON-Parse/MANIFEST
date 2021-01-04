@@ -1,4 +1,5 @@
 Changes
+CONTRIBUTING.md
 errors.c
 examples/array.pl
 examples/assert.pl
@@ -32,6 +33,7 @@ MANIFEST			This list of files
 MANIFEST.SKIP
 README
 script/validjson
+see-also-info.json
 t/array.t
 t/bugzilla-2049.t
 t/collision.t
@@ -39,6 +41,7 @@ t/JSON-Parse.t
 t/json-tokenize.t
 t/Json3.t
 t/kolmorogov42-1.t
+t/max-depth.t
 t/numbers.t
 t/object.t
 t/perl-monks-1165399.t

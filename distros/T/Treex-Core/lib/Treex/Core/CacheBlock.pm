@@ -1,5 +1,5 @@
 package Treex::Core::CacheBlock;
-$Treex::Core::CacheBlock::VERSION = '2.20201228';
+$Treex::Core::CacheBlock::VERSION = '2.20210102';
 use Moose;
 use Treex::Core::Common;
 use Treex::Core::Resource;
@@ -50,7 +50,7 @@ sub process_document {
     if ( ! $cached_document ) {
         if ( ! $self->_loaded() ) {
             $self->block->process_start();
-            $block->_set_is_started(1);
+            $self->block->_set_is_started(1);
             $self->_set_loaded(1);
         }
         log_info("CACHE: calling process_document " . $self->block->get_block_name());
@@ -118,7 +118,7 @@ Treex::Core::CacheBlock - Treex::Core::Block with caching
 
 =head1 VERSION
 
-version 2.20201228
+version 2.20210102
 
 =head1 SYNOPSIS
 

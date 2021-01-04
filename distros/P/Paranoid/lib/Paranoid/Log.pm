@@ -1,11 +1,25 @@
 # Paranoid::Log -- Log support for paranoid programs
 #
-# (c) 2005 - 2017, Arthur Corliss <corliss@digitalmages.com>
+# $Id: lib/Paranoid/Log.pm, 2.08 2020/12/31 12:10:06 acorliss Exp $
 #
-# $Id: lib/Paranoid/Log.pm, 2.07 2019/01/30 18:25:27 acorliss Exp $
+# This software is free software.  Similar to Perl, you can redistribute it
+# and/or modify it under the terms of either:
 #
-#    This software is licensed under the same terms as Perl, itself.
-#    Please see http://dev.perl.org/licenses/ for more information.
+#   a)     the GNU General Public License
+#          <https://www.gnu.org/licenses/gpl-1.0.html> as published by the 
+#          Free Software Foundation <http://www.fsf.org/>; either version 1
+#          <https://www.gnu.org/licenses/gpl-1.0.html>, or any later version
+#          <https://www.gnu.org/licenses/license-list.html#GNUGPL>, or
+#   b)     the Artistic License 2.0
+#          <https://opensource.org/licenses/Artistic-2.0>,
+#
+# subject to the following additional term:  No trademark rights to
+# "Paranoid" have been or are conveyed under any of the above licenses.
+# However, "Paranoid" may be used fairly to describe this unmodified
+# software, in good faith, but not as a trademark.
+#
+# (c) 2005 - 2020, Arthur Corliss (corliss@digitalmages.com)
+# (tm) 2008 - 2020, Paranoid Inc. (www.paranoid.com)
 #
 #####################################################################
 
@@ -27,7 +41,7 @@ use Paranoid::Debug qw(:all);
 use Paranoid::Module;
 use Paranoid::Input;
 
-($VERSION) = ( q$Revision: 2.07 $ =~ /(\d+(?:\.\d+)+)/sm );
+($VERSION) = ( q$Revision: 2.08 $ =~ /(\d+(?:\.\d+)+)/sm );
 
 @EXPORT = qw(
     PL_DEBUG     PL_INFO      PL_NOTICE    PL_WARN
@@ -355,7 +369,7 @@ our @_levels = (
                 # to increment the output value since pdebug equates 0 as
                 # disabled.
                 #
-                # In addition to that, we'll also make it a negative number to
+                # Finally, we'll also make it a negative number to
                 # signal pdebug to dive deeper into the call stack to find the
                 # true originator of the message.  Otherwise, it would report
                 # plog as the originator, which is less than helpful.
@@ -424,8 +438,8 @@ sub plverbosity {
 
     my $level  = shift;
     my $max    = 3;
-    my $outidx = 2;
-    my $erridx = 5;
+    my $outidx = PL_NOTICE;
+    my $erridx = PL_CRIT;
     my $rv     = 1;
 
     pdebug( 'entering w/(%s)', PDLEVEL3, $level );
@@ -437,7 +451,7 @@ sub plverbosity {
     # Cap $level
     $level = $max if $level > $max;
 
-    # First, stop an current logging
+    # First, stop any current logging
     foreach ( 0 .. 7 ) {
         stopLogger( $_ < 3 ? "Stdout$_" : "Stderr$_" );
     }
@@ -477,7 +491,7 @@ Paranoid::Log - Log Functions
 
 =head1 VERSION
 
-$Id: lib/Paranoid/Log.pm, 2.07 2019/01/30 18:25:27 acorliss Exp $
+$Id: lib/Paranoid/Log.pm, 2.08 2020/12/31 12:10:06 acorliss Exp $
 
 =head1 SYNOPSIS
 
@@ -498,6 +512,20 @@ distribution itself it supports logging to files, STDERR, and named buffers.
 Additional modules exist on CPAN to allow for distribution to e-mail, syslog,
 and more.  It is also relatively trivial to write your own log mechanism to
 work with this framework.
+
+=head1 IMPORT LISTS
+
+This module exports the following symbols by default:
+
+    PL_DEBUG PL_INFO PL_NOTICE PL_WARN PL_ERR PL_CRIT
+    PL_ALERT PL_EMERG PL_EQ PL_NE PL_GE PL_LE
+    startLogger stopLogger plog plverbosity
+
+The following specialized import lists also exist:
+
+    List        Members
+    --------------------------------------------------------
+    all         @defaults
 
 =head1 LOGGING MECHANISMS
 
@@ -640,6 +668,12 @@ programs/functions that need support varying levels of verbosity for the
 console.  From that perspective, it will be assumed that all user
 notifications would be simple one-line messages.
 
+B<NOTE:> I<PL_EMERG> and I<PL_ALERT> are always enabled if you use this
+function.  Any error messages that should always be printed to the console
+regardless of verbosity settings should be sent to one of those two levels.
+The remaining levels (I<PL_WARN> through I<PL_CRIT>) will be optionally
+enabled, just like I<PL_DEBUG>> through I<PL_NOTICE>.
+
 =head1 DEPENDENCIES
 
 =over
@@ -700,8 +734,22 @@ Arthur Corliss (corliss@digitalmages.com)
 
 =head1 LICENSE AND COPYRIGHT
 
-This software is licensed under the same terms as Perl, itself. 
-Please see http://dev.perl.org/licenses/ for more information.
+This software is free software.  Similar to Perl, you can redistribute it
+and/or modify it under the terms of either:
 
-(c) 2005 - 2017, Arthur Corliss (corliss@digitalmages.com)
+  a)     the GNU General Public License
+         <https://www.gnu.org/licenses/gpl-1.0.html> as published by the 
+         Free Software Foundation <http://www.fsf.org/>; either version 1
+         <https://www.gnu.org/licenses/gpl-1.0.html>, or any later version
+         <https://www.gnu.org/licenses/license-list.html#GNUGPL>, or
+  b)     the Artistic License 2.0
+         <https://opensource.org/licenses/Artistic-2.0>,
+
+subject to the following additional term:  No trademark rights to
+"Paranoid" have been or are conveyed under any of the above licenses.
+However, "Paranoid" may be used fairly to describe this unmodified
+software, in good faith, but not as a trademark.
+
+(c) 2005 - 2020, Arthur Corliss (corliss@digitalmages.com)
+(tm) 2008 - 2020, Paranoid Inc. (www.paranoid.com)
 

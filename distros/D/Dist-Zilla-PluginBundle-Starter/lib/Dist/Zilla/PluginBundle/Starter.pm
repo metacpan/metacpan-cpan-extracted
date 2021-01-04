@@ -6,7 +6,7 @@ with 'Dist::Zilla::Role::PluginBundle::Easy',
   'Dist::Zilla::Role::PluginBundle::PluginRemover';
 use namespace::clean;
 
-our $VERSION = 'v4.0.1';
+our $VERSION = 'v5.0.1';
 
 # Revisions can include entries with the standard plugin name, array ref of plugin/name/config,
 # or coderefs which are passed the pluginbundle object and return a list of plugins in one of these formats.
@@ -104,11 +104,36 @@ my %revisions = (
     'ShareDir',
     sub { $_[0]->pluginset_execdir },
   ],
+  5 => [
+    sub { $_[0]->pluginset_gatherer },
+    'MetaYAML',
+    'MetaJSON',
+    'License',
+    'Pod2Readme',
+    'PodSyntaxTests',
+    'Test::ReportPrereqs',
+    ['Test::Compile' => { xt_mode => 1 }],
+    sub { $_[0]->pluginset_installer },
+    'Manifest',
+    'PruneCruft',
+    ['PruneFiles' => { filename => ['README.pod'] }],
+    'ManifestSkip',
+    'RunExtraTests',
+    sub { $_[0]->pluginset_release_management }, # before test/confirm for before-release verification
+    'TestRelease',
+    'ConfirmRelease',
+    sub { $_[0]->pluginset_releaser },
+    ['MetaNoIndex' => { directory => [qw(t xt inc share eg examples)] }],
+    sub { $_[0]->pluginset_metaprovides },
+    'ShareDir',
+    sub { $_[0]->pluginset_execdir },
+  ],
 );
 
 my %allowed_installers = (
   MakeMaker => 1,
   'MakeMaker::Awesome' => 1,
+  ModuleBuild => 1,
   ModuleBuildTiny => 1,
   'ModuleBuildTiny::Fallback' => 1,
 );
@@ -243,7 +268,7 @@ Dist::Zilla::PluginBundle::Starter - A minimal Dist::Zilla plugin bundle
   version = 0.001
   
   [@Starter]           ; all that is needed to start
-  revision = 4         ; always defaults to revision 1
+  revision = 5         ; always defaults to revision 1
   
   ; configuring examples
   installer = ModuleBuildTiny
@@ -253,7 +278,7 @@ Dist::Zilla::PluginBundle::Starter - A minimal Dist::Zilla plugin bundle
   regenerate = LICENSE ; copy LICENSE to root after release and dzil regenerate
 
   [@Starter::Git]      ; drop-in variant bundle for git workflows
-  revision = 4         ; requires/defaults to revision 3
+  revision = 5         ; requires/defaults to revision 3
 
 =head1 DESCRIPTION
 
@@ -264,116 +289,39 @@ additional features to stay up to date and allow greater customization. The
 selection of included plugins is intended to be unopinionated and unobtrusive,
 so that it is usable for any well-formed CPAN distribution.
 
-The L<Dist::Zilla::Starter> guide is a starting point if you are new to
-L<Dist::Zilla> or CPAN distribution building. See L</"EXAMPLES"> for example
-configurations of this bundle.
+C<[@Starter]> supports bundle revisions specified as an option, in order to
+allow authors to opt-in to future changes to distribution packaging and
+releasing practices. Existing revisions and the default revision number will
+not be changed, to preserve consistent functionality in existing F<dist.ini>
+configurations.
 
-For a variant of this bundle with built-in support for a git-based workflow,
-see L<[@Starter::Git]|Dist::Zilla::PluginBundle::Starter::Git>.
+You probably want L<[@Starter::Git]|Dist::Zilla::PluginBundle::Starter::Git>,
+an extension of this bundle, if you are using a git-based workflow.
+
+L<Dist::Milla> is another simple, if opinionated, way to use L<Dist::Zilla>
+without requiring any configuration ("convention over configuration"), and
+performing all of the tasks in L</"EXTENDING"> by default. The C<[@Starter]>
+bundle can also be configured to operate much like L<Dist::Milla>, as in the
+L</"Dist::Milla equivalent"> example.
+
+=head1 GETTING STARTED
+
+The L<Dist::Zilla::Starter> guide is a starting point if you are new to
+L<Dist::Zilla> or CPAN distribution building.
 
 For one-line initialization of a new C<[@Starter]>-based distribution, try
 L<Dist::Zilla::MintingProfile::Starter> (or
 L<Dist::Zilla::MintingProfile::Starter::Git>).
 
-Migrating from C<[@Basic]> is easy for most cases. Most of the bundle is the
-same, so just make sure to remove any extra plugins that C<[@Starter]> already
-includes, and configure the included plugins if needed (see L</"CONFIGURING">).
-Migrating a more complex set of plugins, including some that interact with the
-additional generated files, may require more careful consideration.
+Migrating from C<[@Basic]> is easy for most cases. The core of the bundle is
+the same, so just make sure to remove any extra plugins that C<[@Starter]>
+already includes, and configure the included plugins if needed. Migrating a
+more complex set of plugins, including some that interact with the additional
+generated files, may require more careful consideration.
 
-C<[@Starter]> composes the L<PluginRemover|Dist::Zilla::Role::PluginBundle::PluginRemover>
-and L<Config::Slicer|Dist::Zilla::Role::PluginBundle::Config::Slicer> roles to
-make it easier to customize and extend. Also, it supports bundle revisions
-specified as an option, in order to incorporate future changes to distribution
-packaging and releasing practices. Existing revisions will not be changed to
-preserve backwards compatibility.
-
-The C<FAKE_RELEASE> environment variable is supported as in L<Dist::Milla> and
-L<Minilla>. It replaces the L<[UploadToCPAN]|Dist::Zilla::Plugin::UploadToCPAN>
-plugin with L<[FakeRelease]|Dist::Zilla::Plugin::FakeRelease>, to test the
-release process (including any version bumping and commits!) without actually
-uploading to CPAN.
-
-  $ FAKE_RELEASE=1 dzil release
-
-Another simple way to use L<Dist::Zilla> is with L<Dist::Milla>, an opinionated
-bundle that requires no configuration and performs all of the tasks in
-L</"EXTENDING"> by default. This bundle can also be configured to operate much
-like L<Dist::Milla>, as in the L</"Dist::Milla equivalent"> example.
-
-=head1 EXAMPLES
-
-Some example F<dist.ini> configurations to get started with.
-
-=head2 Just the basics
-
-  name    = Acme-Foo
-  author  = Jane Doe <example@example.com>
-  license = Artistic_2_0
-  copyright_holder = Jane Doe
-  copyright_year   = 2019
-  version = 1.00
-
-  [@Starter]
-  revision = 4
-
-  [Prereqs / RuntimeRequires]
-  perl = 5.010001
-  Exporter = 5.57
-  Path::Tiny = 0
-
-  [Prereqs / TestRequires]
-  Test::More = 0.88
-
-=head2 Managed boilerplate
-
-  name    = Acme-Foo
-  author  = Jane Doe <example@example.com>
-  license = Artistic_2_0
-  copyright_holder = Jane Doe
-  copyright_year   = 2019
-
-  [@Starter::Git]
-  revision = 4
-  managed_versions = 1
-  regenerate = Makefile.PL
-  regenerate = META.json
-  regenerate = LICENSE
-
-  [AutoPrereqs]
-
-=head2 Dist::Milla equivalent
-
-  [CheckChangesHasContent]
-
-  [ReadmeAnyFromPod]
-  type = markdown
-  filename = README.md
-  location = root
-  phase = release
-  [Regenerate::AfterReleasers]
-  plugin = ReadmeAnyFromPod
-
-  [@Starter::Git]
-  revision = 4
-  installer = ModuleBuildTiny
-  managed_versions = 1
-  regenerate = Build.PL
-  regenerate = META.json
-  regenerate = LICENSE
-  ExecDir.dir = script
-  Release_Commit.allow_dirty[] = README.md
-  BumpVersionAfterRelease.munge_build_pl = 0
-
-  [NameFromDirectory]
-  [LicenseFromModule]
-  override_author = 1
-  [Prereqs::FromCPANfile]
-  [StaticInstall]
-  mode = auto
-  [GithubMeta]
-  issues = 1
-  [Git::Contributors]
+See L</"EXAMPLES"> for example configurations of this bundle, L</"CONFIGURING">
+for suggestions to customize the bundle to your needs, and L</"EXTENDING"> for
+examples of other common tasks L<Dist::Zilla> can facilitate.
 
 =head1 OPTIONS
 
@@ -383,7 +331,7 @@ configured by the composed roles, as in L</"CONFIGURING">.
 =head2 revision
 
   [@Starter]
-  revision = 4
+  revision = 5
 
 Selects the revision to use, from L</"REVISIONS">. Defaults to revision 1.
 
@@ -399,6 +347,11 @@ Requires revision 2 or higher.
   revision = 2
   installer = MakeMaker::Awesome
   MakeMaker::Awesome.WriteMakefile_arg[0] = (clean => { FILES => 't/generated/*' })
+
+  [@Starter]
+  revision = 5
+  installer = ModuleBuild
+  ModuleBuild.mb_class = My::Module::Builder
 
 The default installer is L<[MakeMaker]|Dist::Zilla::Plugin::MakeMaker>, which
 works with no extra configuration for most cases. The C<installer> option can
@@ -421,6 +374,11 @@ installer that don't understand configure dependencies.
 When using a L<Module::Build::Tiny>-based installer, the
 L<[ExecDir]|Dist::Zilla::Plugin::ExecDir> plugin will be set to mark the
 F<script/> directory for executables instead of the default F<bin/>.
+
+Since revision 5, L<[ModuleBuild]|Dist::Zilla::Plugin::ModuleBuild> is
+supported as an installer, and will generate a F<Build.PL> that uses
+L<Module::Build>. This is not generally recommended unless converting a
+distribution that is already using a L<Module::Build> subclass.
 
 =head2 managed_versions
 
@@ -605,6 +563,106 @@ L<[MetaConfig]|Dist::Zilla::Plugin::MetaConfig> plugin because it adds
 significant clutter to the generated META files without much benefit. It can
 easily be added to the F<dist.ini> if desired.
 
+=head2 Revision 5
+
+Revision 5 is similar to Revision 4, with these differences:
+
+=over 2
+
+=item *
+
+Includes an instance of the L<[PruneFiles]|Dist::Zilla::Plugin::PruneFiles>
+plugin to remove F<README.pod> from the distribution build if present. The CPAN
+toolchain expects C<.pod> files to be documentation and installs them alongside
+the module files, sometimes even if they are outside the F<lib/> subdirectory,
+due to historical distribution layouts. But this is not the purpose of
+F<README.pod>, so it is excluded from the build to avoid cluttering users'
+install locations and confusing MetaCPAN and similar documentation indexes.
+F<README.pod> files generated in the source tree using
+L<[ReadmeAnyFromPod]|Dist::Zilla::Plugin::ReadmeAnyFromPod> (with
+C<location = root>) are already automatically excluded from the build by that
+plugin.
+
+=item *
+
+The L</"installer"> option now supports C<ModuleBuild>.
+
+=back
+
+=head1 EXAMPLES
+
+Some example F<dist.ini> configurations to get started with.
+
+=head2 Just the basics
+
+  name    = Acme-Foo
+  author  = Jane Doe <example@example.com>
+  license = Artistic_2_0
+  copyright_holder = Jane Doe
+  copyright_year   = 2019
+  version = 1.00
+
+  [@Starter]
+  revision = 5
+
+  [Prereqs / RuntimeRequires]
+  perl = 5.010001
+  Exporter = 5.57
+  Path::Tiny = 0
+
+  [Prereqs / TestRequires]
+  Test::More = 0.88
+
+=head2 Managed boilerplate
+
+  name    = Acme-Foo
+  author  = Jane Doe <example@example.com>
+  license = Artistic_2_0
+  copyright_holder = Jane Doe
+  copyright_year   = 2019
+
+  [@Starter::Git]
+  revision = 5
+  managed_versions = 1
+  regenerate = Makefile.PL
+  regenerate = META.json
+  regenerate = LICENSE
+
+  [AutoPrereqs]
+
+=head2 Dist::Milla equivalent
+
+  [CheckChangesHasContent]
+
+  [ReadmeAnyFromPod]
+  type = markdown
+  filename = README.md
+  location = root
+  phase = release
+  [Regenerate::AfterReleasers]
+  plugin = ReadmeAnyFromPod
+
+  [@Starter::Git]
+  revision = 5
+  installer = ModuleBuildTiny
+  managed_versions = 1
+  regenerate = Build.PL
+  regenerate = META.json
+  regenerate = LICENSE
+  ExecDir.dir = script
+  Release_Commit.allow_dirty[] = README.md
+  BumpVersionAfterRelease.munge_build_pl = 0
+
+  [NameFromDirectory]
+  [LicenseFromModule]
+  override_author = 1
+  [Prereqs::FromCPANfile]
+  [StaticInstall]
+  mode = auto
+  [GithubMeta]
+  issues = 1
+  [Git::Contributors]
+
 =head1 CONFIGURING
 
 By using the L<PluginRemover|Dist::Zilla::Role::PluginBundle::PluginRemover> or
@@ -643,9 +701,7 @@ distribution's L<Dist::Zilla/"main_module"> by default, but can be configured
 to look elsewhere. The standard F<README> should always be plaintext, but in
 order to generate a non-plaintext F<README> in addition,
 L<[ReadmeAnyFromPod]|Dist::Zilla::Plugin::ReadmeAnyFromPod> can simply be used
-separately. Note that POD-format F<README>s should not be included in the
-distribution build because they will get indexed and installed due to an oddity
-in CPAN installation tools.
+separately.
 
   [@Starter]
   revision = 2
@@ -661,6 +717,15 @@ in CPAN installation tools.
   phase = release ; avoid changing files in the root with dzil build or dzil test
   [Regenerate::AfterReleasers] ; allows regenerating with dzil regenerate
   plugin = Pod_Readme
+
+Alternatively, you can remove the default F<README> plugin to ship a manually
+maintained file, or generate one with another plugin such as
+L<[Readme::Brief]|Dist::Zilla::Plugin::Readme::Brief>.
+
+  [Readme::Brief]
+  [@Starter]
+  revision = 2
+  -remove = Pod2Readme
 
 =head2 MetaNoIndex
 
@@ -730,13 +795,13 @@ L<< C<dzil installdeps>|Dist::Zilla::App::Command::installdeps >>.
 
 =head2 Name
 
-To automatically set the distribution name from the current directory, use
+To automatically set the distribution name from the project directory name, use
 L<[NameFromDirectory]|Dist::Zilla::Plugin::NameFromDirectory>.
 
 =head2 License and Copyright
 
-To extract the license and copyright information from the main module, and
-optionally set the author as well, use
+To extract the license and copyright information from the main module
+documentation, and optionally set the author as well, use
 L<[LicenseFromModule]|Dist::Zilla::Plugin::LicenseFromModule>.
 
 =head2 Changelog
@@ -769,6 +834,16 @@ L<[PrereqsFile]|Dist::Zilla::Plugin::PrereqsFile>. To specify prereqs in
 F<dist.ini>, use L<[Prereqs]|Dist::Zilla::Plugin::Prereqs>. To automatically
 guess the distribution's prereqs by parsing the code, use
 L<[AutoPrereqs]|Dist::Zilla::Plugin::AutoPrereqs>.
+
+=head1 ENVIRONMENT
+
+The C<FAKE_RELEASE> environment variable is supported as in L<Dist::Milla> and
+L<Minilla>. It replaces the L<[UploadToCPAN]|Dist::Zilla::Plugin::UploadToCPAN>
+plugin with L<[FakeRelease]|Dist::Zilla::Plugin::FakeRelease>, to test the
+release process (including any version bumping and commits!) without actually
+uploading to CPAN.
+
+  $ FAKE_RELEASE=1 dzil release
 
 =head1 BUGS
 

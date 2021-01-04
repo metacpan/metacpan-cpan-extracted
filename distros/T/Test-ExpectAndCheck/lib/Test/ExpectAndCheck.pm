@@ -8,7 +8,7 @@ package Test::ExpectAndCheck;
 use strict;
 use warnings;
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 use Carp;
 
@@ -226,6 +226,8 @@ sub returns
 
    $self->[RETURNS] = [ @_ ];
    undef $self->[THROWS];
+
+   return $self;
 }
 
 =head2 throws
@@ -240,6 +242,8 @@ sub throws
 {
    my $self = shift;
    ( $self->[THROWS] ) = @_;
+
+   return $self;
 }
 
 sub _consume

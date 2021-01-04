@@ -1,5 +1,8 @@
 Revision history for Dist-Zilla-Plugin-GitHubREADME-Badge
 
+0.33  2021-01-04 08:39:08 CST
+        - cpants minor fix: The link to the image should be https (reneeb)
+
 0.32  2020-08-21 20:37:30 CST
         - Fix min perl version (JRaspass)
 

@@ -14,15 +14,10 @@
    },
    "name" : "AudioFile-Info-Ogg-Vorbis-Header",
    "prereqs" : {
-      "build" : {
+      "configure" : {
          "requires" : {
             "Module::Build" : "0",
             "YAML" : "0"
-         }
-      },
-      "configure" : {
-         "requires" : {
-            "Module::Build" : "0.42"
          }
       },
       "runtime" : {
@@ -39,11 +34,14 @@
       },
       "AudioFile::Info::Ogg::Vorbis::Header" : {
          "file" : "lib/AudioFile/Info/Ogg/Vorbis/Header.pm",
-         "version" : "v1.8.2"
+         "version" : "v1.8.3"
       }
    },
    "release_status" : "stable",
    "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/davorg/audiofile-info-ogg-vorbis-header/issues"
+      },
       "license" : [
          "http://dev.perl.org/licenses/"
       ],
@@ -53,6 +51,6 @@
          "web" : "https://github.com/davorg/audiofile-info-ogg-vorbis-header"
       }
    },
-   "version" : "v1.8.2",
+   "version" : "v1.8.3",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

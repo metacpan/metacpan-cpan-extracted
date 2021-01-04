@@ -40,9 +40,15 @@ throws_ok {
 
 lives_ok {
 
-    has f => ( is => 'wo', isa => Ref, trigger => sub {}  );
+    has f => ( is => 'once', isa => Ref, trigger => sub {}  );
 
 } 'triggers allowed for write-once attributes';
+
+lives_ok {
+
+    has f2 => ( is => 'wo', isa => Ref, trigger => sub {}  );
+
+} 'triggers allowed for write-once attributes (deprecated)';
 
 throws_ok {
 

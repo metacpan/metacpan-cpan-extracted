@@ -1,10 +1,45 @@
 ==================================================
-Changes from 2019-10-22 00:00:00 +0000 to present.
+Changes from 2020-01-04 00:00:00 +0000 to present.
 ==================================================
 
 ------------------------------------------
-version 0.069 at 2020-10-21 07:07:34 +0000
+version 0.070 at 2021-01-03 13:19:59 +0000
 ------------------------------------------
+
+  Change: 331ea58f0c7cb18009d53800f8f791f9ba550521
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2021-01-03 14:18:12 +0000
+
+    - minor improvement 
+
+  Change: 597b0582a2ab33d4eab000644895cff6780da2df
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2021-01-03 14:17:47 +0000
+
+    - minor improvements 
+
+  Change: f55e74712070326091194922a82b93e210a3298b
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2021-01-03 14:16:18 +0000
+
+    - enhanced Pod::Coverage for Archive::BagIt::Base and
+    Archive::BagIt::Fast 
+
+  Change: e00c4fe82fe3bce904eb4179d90d0d9788e45c5c
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2021-01-03 14:15:43 +0000
+
+    - enhanced tests for Archive::BagIt::Fast 
+
+------------------------------------------
+version 0.069 at 2020-10-21 07:08:05 +0000
+------------------------------------------
+
+  Change: 0d949e7dda851f1efd0fbf21416bebfa259d7a79
+  Author: Andreas Romeyke <art1@andreas-romeyke.de>
+  Date : 2020-10-21 09:08:05 +0000
+
+    Released 0.069 
 
   Change: ce177b5df0ba6cb0659f6b94a0411f1c8732ccfa
   Author: Andreas Romeyke <art1@andreas-romeyke.de>
@@ -1613,5 +1648,5 @@ version 0.055 at 2020-04-15 09:44:51 +0000
     Adding a plugin structure 
 
 ================================================
-Plus 9 releases after 2019-10-22 00:00:00 +0000.
+Plus 9 releases after 2020-01-04 00:00:00 +0000.
 ================================================

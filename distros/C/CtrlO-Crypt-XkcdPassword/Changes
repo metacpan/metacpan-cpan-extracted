@@ -1,5 +1,10 @@
 Revision history for CtrlO-Crypt-XkcdPassword
 
+1.009     2021-01-03 17:23:09+01:00
+    - dist housekeeping: github issues,
+      Dist::Zilla::PluginBundle::Author::DOMM
+
+
 1.008   2020-04-30T14:34:00
     - Avoid generating negative integers (Tom Hukins)
 

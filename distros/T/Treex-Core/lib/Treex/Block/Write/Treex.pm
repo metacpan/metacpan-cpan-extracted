@@ -1,5 +1,5 @@
 package Treex::Block::Write::Treex;
-$Treex::Block::Write::Treex::VERSION = '2.20201228';
+$Treex::Block::Write::Treex::VERSION = '2.20210102';
 use Moose;
 use Treex::Core::Common;
 use File::Path;
@@ -78,7 +78,7 @@ Treex::Block::Write::Treex
 
 =head1 VERSION
 
-version 2.20201228
+version 2.20210102
 
 =head1 DESCRIPTION
 

@@ -3,6 +3,7 @@ use Test::More;
 use Test::Differences;
 use Path::Tiny;
 use File::chdir;
+use DateTime;
 use Dist::Iller;
 use syntax 'qi';
 
@@ -25,6 +26,7 @@ $iller->parse('after');
     local $CWD = $tempdir->stringify;
     $iller->generate_files('after');
 }
+my $current_year = DateTime->now->year;
 
 my $generated_dist_ini = $tempdir->child('dist.ini')->slurp_utf8;
 my $generated_weaver_ini = $tempdir->child('weaver.ini')->slurp_utf8;
@@ -46,6 +48,7 @@ like $generated_dist_ini, qr/\[Readme\] $spaces
 like $generated_dist_ini, qr/\[ExecDir\]$spaces dir $equals bin $spaces \[PlacedAfter::ExecDir\]/x, '[PlacedAfter::ExecDir] inserted correctly';
 like $generated_dist_ini, qr/\[LastPlugin\] $spaces \[Prereqs /x, '[LastPlugin] is the last plugin';
 like $generated_dist_ini, qr{\[Prereqs / DevelopSuggests\][\n\r\s]*Dist::Iller}, 'Dist::Iller only suggested';
+like $generated_dist_ini, qr/copyright_year = $current_year/, 'Copyright year set to current year';
 
 like $generated_dist_ini, qr{Cruft::Pruner = 0}, 'Added prereq from plugin';
 like $generated_dist_ini, qr/Another::Crufter = 1.2/, 'Added suggests prereq from plugin';
@@ -85,6 +88,7 @@ sub clean {
 }
 
 sub dist {
+
     return qqi{
         ; This file was auto-generated from iller.yaml by Dist::Iller on...
         ; The following configs were used:
@@ -93,6 +97,7 @@ sub dist {
         name = My-Own-Dist
         author = Erik Carlsson
         author = Ex Ample
+        copyright_year = $current_year
 
         [GatherDir]
 

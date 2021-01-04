@@ -19,7 +19,7 @@ TODO: extra socket/tcp constants &c?
 TODO: name_to_handle_At + open_by_handle_at = clone fds
 TODO: lchown
 TODO: mount/umount2/MS_* flags
-TODO: fsmount/fsconfig et al. https://lwn.net/Articles/759499/
+TODO: fsmount/fspick/fsconfig/fsmount et al. https://lwn.net/Articles/759499/
 
 TODO: rewrite rmtree et al. to support working directories (also speed them up)
 TODO: maybe IO::AIO leaks fds when requests are cancelled? maybe initialise result to -1?
@@ -45,9 +45,13 @@ TODO: copy_file_range
 TODO: write more abpout the thread model, maybe bump some defaults?
 TODO: io_uring, but it's so broken  :/
 TODO: allow import of fds as aio_wd
-TODO: fsopen/fspick/fsconfig, fsmount
 TODO: close_range
 TODO: move_mount, open_tree
+
+4.75 Wed Dec 30 08:44:55 CET 2020
+	- removed leftover debug output from treescan.
+	- added (but not documented) waitid-P_*, FSPICK_*, FSOPEN_*,
+          FSCONFIG_*, MOUNT_ATTR_* constants.
 
 4.74 Tue Dec 29 16:19:28 CET 2020
 	- added pidfd_open, pidfd_getfd and pidfd_send_signal functions.

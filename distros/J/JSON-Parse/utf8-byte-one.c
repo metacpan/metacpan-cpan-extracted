@@ -18,7 +18,8 @@
 	ADDBYTE;
 	goto byte23_80_9f;
 
-    case BYTE_EE_EF:
+    case 0xEE:
+    case 0xEF:
 	ADDBYTE;
 	goto byte_penultimate_80_bf;
 

@@ -24,12 +24,14 @@
             "Data::Bitfield" : "0.02",
             "Device::Chip::Base::RegisteredI2C" : "0.03",
             "Future::AsyncAwait" : "0.47",
+            "Future::Mutex" : "0.47",
             "Object::Pad" : "0.19",
             "perl" : "5.026"
          }
       },
       "test" : {
          "requires" : {
+            "Test::ExpectAndCheck::Future" : "0.02",
             "Test::More" : "0.88"
          }
       }
@@ -37,7 +39,7 @@
    "provides" : {
       "Device::Chip::MPL3115A2" : {
          "file" : "lib/Device/Chip/MPL3115A2.pm",
-         "version" : "0.07"
+         "version" : "0.08"
       }
    },
    "release_status" : "stable",
@@ -46,6 +48,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.07",
+   "version" : "0.08",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

@@ -1,5 +1,10 @@
 Revision history for App-VTide
 
+0.1.14   2021-01-04
+        Updating for release of version 0.1.14
+        Updated date (Ivan Wills)
+        Adding show option to restart menu (Ivan Wills)
+
 0.1.13   2020-07-01
         Updating for release of version 0.1.13
         Updaging docs (Ivan Wills)

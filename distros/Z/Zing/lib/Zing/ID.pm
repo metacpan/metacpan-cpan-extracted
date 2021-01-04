@@ -18,7 +18,7 @@ use overload (
   fallback => 1
 );
 
-our $VERSION = '0.22'; # VERSION
+our $VERSION = '0.25'; # VERSION
 
 # ATTRIBUTES
 

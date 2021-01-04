@@ -10,7 +10,7 @@ use Mojo::Util qw(humanize_bytes);
 
 use constant MACOS => $^O eq 'darwin';
 
-our $VERSION = '1.12';
+our $VERSION = '1.13';
 
 sub register {
   my ($self, $app, $config) = @_;
@@ -66,7 +66,7 @@ sub _activity {
           my ($rid, $proto) = @{$req}{qw(request_id protocol)};
 
           my $str = "$req->{method} $req->{path}";
-          $str .= "?$req->{query}"      if $req->{query};
+          $str .= "?$req->{query}"    if $req->{query};
           $str .= " → $req->{status}" if $req->{status};
 
           my $finished = $active ? time : $req->{finished};
@@ -201,7 +201,7 @@ sub _slowest {
   my @table;
   for my $req (@{$all->{slowest}}) {
     my $str = "$req->{method} $req->{path}";
-    $str .= "?$req->{query}"      if $req->{query};
+    $str .= "?$req->{query}"    if $req->{query};
     $str .= " → $req->{status}" if $req->{status};
     my $time = sprintf '%.2f', $req->{time};
     push @table, [$time, $str, @{$req}{qw(request_id worker client started)}];
@@ -285,8 +285,7 @@ Mojolicious::Plugin::Status - Mojolicious server status
   plugin 'Status';
 
   # Secure access to the server status ui with Basic authentication
-  my $under = $self->routes->under('/status' => sub {
-    my $c = shift;
+  my $under = $self->routes->under('/status' => sub ($c) {
     return 1 if $c->req->url->to_abs->userinfo eq 'Bender:rocks';
     $c->res->headers->www_authenticate('Basic');
     $c->render(text => 'Authentication required!', status => 401);

@@ -32,7 +32,7 @@ DESCRIPTION
     
        my $adapter = Device::Chip::Adapter::FTDI->new;
     
-       $chip->mount( $adapter )->get;
+       await $chip->mount( $adapter );
 
 CONSTRUCTOR
 
@@ -44,8 +44,8 @@ CONSTRUCTOR
 
 METHODS
 
-    The following methods documented with a trailing call to ->get return
-    Future instances.
+    The following methods documented in an await expression return Future
+    instances.
 
     This allows them to easily be used as a simple synchronous method by
     using the trailing "get" in Future call. Alternatively, if the
@@ -55,7 +55,7 @@ METHODS
 
  mount
 
-       $chip = $chip->mount( $adapter, %params )->get
+       $chip = await $chip->mount( $adapter, %params );
 
     Supplies the chip driver with the means to actually communicate with
     the connected device, via some electrical interface connected to the
@@ -66,7 +66,7 @@ METHODS
 
  mount_from_paramstr
 
-       $chip = $chip->mount_from_paramstr( $adapter, $paramstr )->get
+       $chip = await $chip->mount_from_paramstr( $adapter, $paramstr );
 
     A variant of "mount" that parses its options from the given string.
     This string should be a comma-separated list of parameters, where each

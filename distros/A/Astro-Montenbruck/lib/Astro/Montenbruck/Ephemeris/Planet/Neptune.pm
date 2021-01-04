@@ -9,7 +9,7 @@ use Astro::Montenbruck::Ephemeris::Pert qw/pert/;
 use Astro::Montenbruck::MathUtils qw /frac ARCS/;
 use Astro::Montenbruck::Ephemeris::Planet qw/$NE/;
 
-our $VERSION = 0.01;
+our $VERSION = 0.02;
 
 sub new {
     my $class = shift;
@@ -26,12 +26,16 @@ sub heliocentric {
     my $m8 = pi2 * frac( 0.7214906 + 0.6068526 * $t );
 
     my ( $dl, $dr, $db ) = ( 0, 0, 0 );    # Corrections in longitude ["],
-    my $pert_cb = sub { $dl += $_[0]; $dr += $_[1]; $db += $_[2] };
+    my $pert_cb = sub { 
+        $dl += $_[0]; 
+        $dr += $_[1]; 
+        $db += $_[2] 
+    };
 
-    # Perturbations by Neptune
+    # Perturbations by Jupiter
     my $term = pert(
         T        => $t,
-        M        => $m6,
+        M        => $m8,
         m        => $m5,
         I_min    => 0,
         I_max    => 2,
@@ -164,7 +168,7 @@ Sergey Krushinsky, C<< <krushi at cpan.org> >>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2009-2019 by Sergey Krushinsky
+Copyright (C) 2009-2020 by Sergey Krushinsky
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

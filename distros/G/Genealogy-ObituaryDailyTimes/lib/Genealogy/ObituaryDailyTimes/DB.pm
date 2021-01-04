@@ -612,6 +612,9 @@ sub DESTROY {
 	if($self->{'temp'}) {
 		unlink delete $self->{'temp'};
 	}
+	if(my $table = delete $self->{'table'}) {
+		$table->finish();
+	}
 }
 
 1;

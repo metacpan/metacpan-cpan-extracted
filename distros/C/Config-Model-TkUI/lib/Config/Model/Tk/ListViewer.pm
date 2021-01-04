@@ -1,13 +1,13 @@
 #
 # This file is part of Config-Model-TkUI
 #
-# This software is Copyright (c) 2008-2019 by Dominique Dumont.
+# This software is Copyright (c) 2008-2021 by Dominique Dumont.
 #
 # This is free software, licensed under:
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::Tk::ListViewer 1.371;
+package Config::Model::Tk::ListViewer 1.372;
 
 use strict;
 use warnings;
@@ -71,34 +71,9 @@ sub Populate {
     $cw->SUPER::Populate($args);
 }
 
-sub get_info {
+sub cme_object {
     my $cw         = shift;
-    my $info_frame = shift;
-
-    my $list = $cw->{list};
-
-    my @items = (
-        'type : ' . $list->get_type,
-        'index : ' . $list->index_type,
-        'cargo : ' . $list->cargo_type,
-    );
-
-    if ( $list->cargo_type eq 'node' ) {
-        push @items, "cargo class: " . $list->config_class_name;
-    }
-
-    if ( $list->cargo_type eq 'leaf' ) {
-        push @items, "leaf value type: " . ( $list->get_cargo_info('value_type') || '' );
-    }
-
-    foreach my $what (qw/min_index max_index/) {
-        my $v   = $list->$what();
-        my $str = $what;
-        $str =~ s/_/ /g;
-        push @items, "$str: $v" if defined $v;
-    }
-
-    return $list->element_name, @items;
+    return $cw->{list};
 }
 
 1;

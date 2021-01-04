@@ -1,18 +1,25 @@
 {
    "abstract" : "Check and report status of various services needed by your app",
    "author" : [
-      "Thomas Klausner <domm@cpan.org>"
+      "Thomas Klausner <domm@plix.at>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.010, CPAN::Meta::Converter version 2.143240",
+   "generated_by" : "Dist::Zilla version 6.017, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Plack-App-ServiceStatus",
+   "no_index" : {
+      "directory" : [
+         "examples",
+         "t",
+         "xt"
+      ]
+   },
    "prereqs" : {
       "build" : {
          "requires" : {
@@ -33,24 +40,58 @@
             "Plack::Response" : "0",
             "Try::Tiny" : "0",
             "base" : "0",
-            "perl" : "5.018",
-            "strict" : "0",
-            "warnings" : "0"
+            "perl" : "5.018"
          }
       },
       "test" : {
          "requires" : {
-            "Module::Pluggable" : "0",
+            "File::Spec" : "0",
+            "File::Temp" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
             "Test::MockModule" : "0",
             "Test::MockObject" : "0",
-            "Test::More" : "0",
-            "lib" : "0"
+            "Test::More" : "0"
          }
       }
    },
+   "provides" : {
+      "Plack::App::ServiceStatus" : {
+         "file" : "lib/Plack/App/ServiceStatus.pm",
+         "version" : "0.904"
+      },
+      "Plack::App::ServiceStatus::DBIC" : {
+         "file" : "lib/Plack/App/ServiceStatus/DBIC.pm",
+         "version" : "0.904"
+      },
+      "Plack::App::ServiceStatus::Elasticsearch" : {
+         "file" : "lib/Plack/App/ServiceStatus/Elasticsearch.pm",
+         "version" : "0.904"
+      },
+      "Plack::App::ServiceStatus::NetStomp" : {
+         "file" : "lib/Plack/App/ServiceStatus/NetStomp.pm",
+         "version" : "0.904"
+      },
+      "Plack::App::ServiceStatus::Redis" : {
+         "file" : "lib/Plack/App/ServiceStatus/Redis.pm",
+         "version" : "0.904"
+      }
+   },
    "release_status" : "stable",
-   "resources" : {},
-   "version" : "0.903",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0104"
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/domm/Plack-App-ServiceStatus/issues"
+      },
+      "homepage" : "https://github.com/domm/Plack-App-ServiceStatus",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/domm/Plack-App-ServiceStatus.git",
+         "web" : "https://github.com/domm/Plack-App-ServiceStatus"
+      }
+   },
+   "version" : "0.904",
+   "x_generated_by_perl" : "v5.32.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.25",
+   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }
 

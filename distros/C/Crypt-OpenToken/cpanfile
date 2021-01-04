@@ -7,6 +7,7 @@ requires 'Moose';
 requires 'DateTime';
 requires 'Date::Parse';
 requires 'Compress::Zlib';
+requires 'namespace::autoclean';
 
 recommends 'Crypt::CBC';
 recommends 'Crypt::DES_EDE3';

@@ -4,7 +4,7 @@ use warnings;
 
 # ABSTRACT: Yet another xkcd style password generator
 
-our $VERSION = '1.008';
+our $VERSION = '1.009'; # VERSION
 
 use Carp qw(croak);
 use Crypt::Rijndael;
@@ -150,7 +150,7 @@ CtrlO::Crypt::XkcdPassword - Yet another xkcd style password generator
 
 =head1 VERSION
 
-version 1.008
+version 1.009
 
 =head1 SYNOPSIS
 
@@ -394,11 +394,11 @@ L<https://www.explainxkcd.com/wiki/index.php/936:_Password_Strength>
 
 =head1 AUTHOR
 
-Thomas Klausner <domm@cpan.org>
+Thomas Klausner <domm@plix.at>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 - 2019 by Thomas Klausner.
+This software is copyright (c) 2018 - 2021 by Thomas Klausner.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

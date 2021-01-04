@@ -26,10 +26,7 @@ lib/Astro/Montenbruck/Time.pm
 lib/Astro/Montenbruck/Time/DeltaT.pm
 lib/Astro/Montenbruck/Time/Sidereal.pm
 LICENSE
-locale.log
 MANIFEST			This list of files
-META.json
-META.yml
 README
 README.md
 script/createdocs.pl

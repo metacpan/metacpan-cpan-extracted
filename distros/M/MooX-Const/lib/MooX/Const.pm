@@ -19,7 +19,7 @@ use Types::Standard qw( Value Object Ref );
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.4.5';
+our $VERSION = 'v0.5.0';
 
 
 sub import {
@@ -48,7 +48,11 @@ sub _process_has {
 
     my $is = $opts{is};
 
-    if ($is && $is =~ /^(?:const|wo)$/ ) {
+    $is = "once" if $is && $is eq "wo";
+
+    my $once = $is && $is eq "once";
+
+    if ($is && $is =~ /^(?:const|once)$/ ) {
 
         if ( my $isa = $opts{isa} ) {
 
@@ -58,7 +62,7 @@ sub _process_has {
 
             if ($isa->is_a_type_of(Value)) {
 
-                if ($is eq 'wo') {
+                if ($once) {
 
                     croak "write-once attributes are not supported for Value types";
 
@@ -85,11 +89,12 @@ sub _process_has {
                     $opts{coerce} = $opts{isa}->coercion;
                 }
 
-                if ($opts{trigger} && ($is ne 'wo')) {
+
+                if ($opts{trigger} && ($is ne "once")) {
                     croak "triggers are not applicable to const attributes";
                 }
 
-                $opts{is}  = $is eq 'wo' ? 'rw' : 'ro';
+                $opts{is}  = $once ? 'rw' : 'ro';
 
             }
 
@@ -120,7 +125,7 @@ MooX::Const - Syntactic sugar for constant and write-once Moo attributes
 
 =head1 VERSION
 
-version v0.4.5
+version v0.5.0
 
 =head1 SYNOPSIS
 
@@ -158,16 +163,20 @@ object.
 Simple value types such as C<Int> or C<Str> are silently converted to
 read-only attributes.
 
-As of v0.2.0, it also supports write-once ("wo") attributes for
+As of v0.5.0, it also supports write-once ("once") attributes for
 references:
 
   has setting => (
-    is  => 'wo',
+    is  => 'once',
     isa => HashRef,
   );
 
 This allows you to set the attribute I<once>. The value is coerced
 into a constant, and cannot be changed again.
+
+Note that "wo" is a deprecated synonym for "once". It will be removed
+in the future, since "wo" is used for "write-only" in some Moose-like
+extensions.
 
 As of v0.4.0, this now supports the C<strict> setting:
 
@@ -205,6 +214,8 @@ It does not work with L<Mouse>. Pull requests are welcome.
 
 L<Class::Accessor> antlers/moose-like mode uses "wo" for write-only
 attributes, not write-once attributes.
+
+As of v0.5.0, you should be using "once" instead of "wo".
 
 =head1 SEE ALSO
 

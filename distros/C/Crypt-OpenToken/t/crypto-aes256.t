@@ -2,7 +2,7 @@
 
 use strict;
 use warnings;
-use Test::More;
+use if $ENV{AUTOMATED_TESTING}, 'Test::DiagINC'; use Test::More;
 use Test::Differences;
 use MIME::Base64;
 use Crypt::OpenToken;

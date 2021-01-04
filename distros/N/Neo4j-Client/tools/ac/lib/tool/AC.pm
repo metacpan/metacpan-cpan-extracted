@@ -1,4 +1,5 @@
-package tool::AC;
+package
+  tool::AC;
 use strict;
 use warnings;
 use base qw( Alien::Base );

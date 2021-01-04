@@ -1,5 +1,9 @@
 Revision history for Perl extension IO::FDPass
 
+1.3  Mon Jan  4 00:46:36 CET 2021
+	- do not leak memory on unsuccessful recv (based on patch
+          by Eric Wong).
+
 1.2  Sun Sep 25 01:43:14 CEST 2016
         - compatibility macros were still using C++ syntax, fortunately
           only affecting the solaris platform that apparently doesn't

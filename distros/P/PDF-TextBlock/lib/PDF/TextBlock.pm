@@ -22,7 +22,7 @@ PDF::TextBlock - Easier creation of text blocks when using PDF::API2
 
 =cut
 
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 
 =head1 SYNOPSIS
 
@@ -398,6 +398,15 @@ sub apply {
       # in here we'll have to split the line up word for word.
       if ( $align eq 'justify' or (grep /<.*>/, @line) ) {
          # TODO: #4 This loop is DOA for align 'right' and 'center' with any tags. 
+         # FMCC Fix proposal
+         if ( $align eq 'center' ) {
+         	# Fix $xpos
+         	$xpos += ( $self->w / 2 ) - ( $line_width / 2 );
+         } elsif ( $align eq 'right' ) {
+         	# Fix $xpos
+         	$xpos += $self->w - $line_width;;         
+         }
+         # END FMCC Fix Proposal
          foreach my $word (@line) {
             if (($tag) = ($word =~ /<(.*?)>/)) {
                # warn "tag is $tag";
@@ -546,22 +555,6 @@ sub _apply_defaults {
 =head1 AUTHOR
 
 Jay Hannah, C<< <jay at jays.net> >>
-
-=head1 BUGS
-
-=over
-
-=item align 'right' and 'center' with any markup tags is broken 
-
-This software can't currently handle those alignments with any markup tags. 
-As written the software is in a loop calculating x position of each word, 
-one word at a time from left to right. But in the case of aligns 'right' 
-and 'center' we don't know the position of the first word until we know the 
-x positions of ALL words. 
-We need a smarter handler for this scenario. See t/30-demo.t.
-https://github.com/jhannah/pdf-textblock/issues/4
-
-=back
 
 =head1 SUPPORT
 

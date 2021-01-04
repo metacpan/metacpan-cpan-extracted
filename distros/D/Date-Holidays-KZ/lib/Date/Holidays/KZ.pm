@@ -1,5 +1,5 @@
 package Date::Holidays::KZ;
-our $VERSION = '0.2020.0'; # VERSION
+our $VERSION = '0.2021.0'; # VERSION
 
 =encoding utf8
 
@@ -58,8 +58,8 @@ INACCURATE_TIMES_SINCE after this year dates of holidays and working day shift a
 
 =cut
 
-our $HOLIDAYS_VALID_SINCE = 2017; # TODO add all old
-our $INACCURATE_TIMES_SINCE = 2021;
+our $HOLIDAYS_VALID_SINCE = 2016; # TODO add all old
+our $INACCURATE_TIMES_SINCE = 2022;
 
 
 =head2 $Date::Holidays::KZ::strict
@@ -125,14 +125,17 @@ my @REGULAR_HOLIDAYS = (
 );
 
 my %HOLIDAYS_SPECIAL = (
+    2016 => [ qw( 0104 0307 0502 0510 0912 1219 ) ],
     2017 => [ qw( 0103 0320 0508 0707 0901 1218 1219 ) ],
     2018 => [ qw( 0821 0309 0508 0430 0831 1203 1218 1231 ) ],
     2019 => [ qw( 0325 0510 0708 1202 0811 ) ],
     2020 => [ qw( 0103 0309 0324 0325 0508 0831 1218 ) ],
+    2021 => [ qw( 0104 0303 0324 0720 0910 ) ],
 );
 
 
 my %BUSINESS_DAYS_ON_WEEKENDS = (
+    2016 => [ qw( 0305 ) ],
     2017 => [ qw( 0318 0701 ) ],
     2018 => [ qw( 0303 0505 0825 1229 ) ],
     2019 => [ qw( 0504 ) ],
@@ -271,7 +274,7 @@ sub _get_date_key {
 
 =head1 LICENSE
 
-This software is copyright (c) 2019 by Vladimir Varlamov.
+This software is copyright (c) 2021 by Vladimir Varlamov.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -355,6 +355,12 @@ METHODS
 
     Do a simple HTML conversion of the value. bold, italic, <br>
 
+ number_to_month
+
+    $val = $tobj->number_to_month($val);
+
+    Give the month name for this month-number.
+
 Callable Functions
 
  safe_backtick

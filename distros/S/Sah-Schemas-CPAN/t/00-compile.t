@@ -6,10 +6,14 @@ use warnings;
 
 use Test::More;
 
-plan tests => 3 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 7 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
+    'Sah/Schema/cpan/distname.pm',
+    'Sah/Schema/cpan/modname.pm',
     'Sah/Schema/cpan/pause_id.pm',
+    'Sah/SchemaR/cpan/distname.pm',
+    'Sah/SchemaR/cpan/modname.pm',
     'Sah/SchemaR/cpan/pause_id.pm',
     'Sah/Schemas/CPAN.pm'
 );

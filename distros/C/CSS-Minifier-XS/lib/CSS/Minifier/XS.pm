@@ -8,11 +8,13 @@ require DynaLoader;
 our @ISA = qw(Exporter DynaLoader);
 our @EXPORT_OK = qw(minify);
 
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 
 bootstrap CSS::Minifier::XS $VERSION;
 
 1;
+
+=for stopwords minifier minifies minified minification eol tokenizing
 
 =head1 NAME
 
@@ -21,11 +23,12 @@ CSS::Minifier::XS - XS based CSS minifier
 =head1 SYNOPSIS
 
   use CSS::Minifier::XS qw(minify);
-  $minified = minify($css);
+  my $css      = '...';
+  my $minified = minify($css);
 
 =head1 DESCRIPTION
 
-C<CSS::Minifier::XS> is a CSS "minifier"; its designed to remove un-necessary
+C<CSS::Minifier::XS> is a CSS "minifier"; its designed to remove unnecessary
 whitespace and comments from CSS files, while also B<not> breaking the CSS.
 
 C<CSS::Minifier::XS> is similar in function to C<CSS::Minifier>, but is
@@ -43,7 +46,7 @@ Minifies the given C<$css>, returning the minified CSS back to the caller.
 
 =head1 HOW IT WORKS
 
-C<CSS::Minifier::XS> minifies the CSS by removing un-necessary whitespace from
+C<CSS::Minifier::XS> minifies the CSS by removing unnecessary whitespace from
 CSS documents.  Comment blocks are also removed, I<except> when (a) they
 contain the word "copyright" in them, or (b) they're needed to implement the
 "Mac/IE Comment Hack".
@@ -81,14 +84,14 @@ the hack, and "/**/" to end it).
 
 =item Zero Units
 
-Zero Units (e.g. "0px") are reduced down to just "0", as the CSS specification
+Zero Units (e.g. C<0px>) are reduced down to just "0", as the CSS specification
 indicates that the unit is not required when its a zero value.
 
 =back
 
 =head2 Pass 3: Pruning
 
-We then go back through the token list and prune and remove un-necessary
+We then go back through the token list and prune and remove unnecessary
 tokens.
 
 =over

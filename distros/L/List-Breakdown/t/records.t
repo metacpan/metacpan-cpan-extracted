@@ -8,7 +8,7 @@ use Test::More tests => 1;
 
 use List::Breakdown 'breakdown';
 
-our $VERSION = '0.22';
+our $VERSION = '0.23';
 
 my @records = (
     "NEW CUSTOMER John O''Connor\r 2017-01-01",

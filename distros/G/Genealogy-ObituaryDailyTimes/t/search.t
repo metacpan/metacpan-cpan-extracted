@@ -3,7 +3,7 @@
 use strict;
 
 use lib 'lib';
-use Test::Most tests => 4;
+use Test::Most tests => 5;
 use lib 't/lib';
 use MyLogger;
 
@@ -28,4 +28,7 @@ SKIP: {
 	ok(scalar(@smiths) >= 1);
 	# FIXME, test either last == Smith or maiden == Smith
 	is($smiths[0]->{'last'}, 'Smith', 'Returned Smiths');
+
+	my $baal = $search->search({ first => 'Eric', last => 'Baal' });
+	is($baal->{'url'}, 'https://mlarchives.rootsweb.com/listindexes/emails?listname=gen-obit&page=96', 'Check URL');
 }

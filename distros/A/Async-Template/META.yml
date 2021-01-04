@@ -1,0 +1,56 @@
+---
+abstract: 'Async Template Toolkit'
+author:
+  - 'Serguei Okladnikov <oklaspec@gmail.com>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.1.11, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Async-Template
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Async::Template:
+    file: lib/Async/Template.pm
+    version: '0.12'
+  Async::Template::Context:
+    file: lib/Async/Template/Context.pm
+    version: '0.12'
+  Async::Template::Directive:
+    file: lib/Async/Template/Directive.pm
+    version: '0.12'
+  Async::Template::Document:
+    file: lib/Async/Template/Document.pm
+  Async::Template::Grammar:
+    file: lib/Async/Template/Grammar.pm
+    version: '0.12'
+  Async::Template::Parser:
+    file: lib/Async/Template/Parser.pm
+  Async::Template::Provider:
+    file: lib/Async/Template/Provider.pm
+requires:
+  HTML::Entities: '0'
+  Template::Toolkit: '0'
+  perl: '5.010001'
+resources:
+  bugtracker: https://github.com/oklas/async-template/issues
+  homepage: https://github.com/oklas/async-template
+  repository: git://github.com/oklas/async-template.git
+version: '0.12'
+x_authority: cpan:OKLAS
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

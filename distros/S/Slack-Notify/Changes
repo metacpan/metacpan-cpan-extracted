@@ -1,5 +1,8 @@
 Revision history for Slack-Notify
 
+0.003     2021-01-04 13:18:43+11:00 Australia/Melbourne
+- avoid mojibake (thanks rjbs!)
+
 0.002     2019-07-15 11:48:41+10:00 Australia/Melbourne
 - added a dumb program, slack-notify, to send things from the command line
 

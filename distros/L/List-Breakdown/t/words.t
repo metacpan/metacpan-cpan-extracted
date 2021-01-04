@@ -8,7 +8,7 @@ use Test::More tests => 1;
 
 use List::Breakdown 'breakdown';
 
-our $VERSION = '0.22';
+our $VERSION = '0.23';
 
 my @words   = qw(foo bar baz quux wibble florb);
 my $filters = {

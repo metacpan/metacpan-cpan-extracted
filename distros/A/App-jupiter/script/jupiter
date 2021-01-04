@@ -1,6 +1,6 @@
 #! /usr/bin/env perl
 # Planet Jupiter is a feed aggregator that creates a single HTML file
-# Copyright (C) 2020  Alex Schroeder <alex@gnu.org>
+# Copyright (C) 2020–2021  Alex Schroeder <alex@gnu.org>
 
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as published by
@@ -470,7 +470,7 @@ sub apply_template {
   return $mnt->render(@_);
 }
 
-=head1 WRITING TEMPLATES
+=head1 TEMPLATES
 
 The page template is called with three hash references: C<globals>, C<feeds>,
 and C<entries>. The keys of these three hash references are documented below.
@@ -734,9 +734,23 @@ sub add_data {
     }
     my @categories = map { xml_escape strip_html($_->to_literal) } $xpc->findnodes('category | atom:category/@term', $element);
     $entry->{categories} = @categories ? \@categories : undef; # key must exist in the hash
-    my $content = $xpc->findvalue('description | atom:content | summary | atom:summary', $element);
-    $entry->{content} = xml_escape $content;
-    $entry->{excerpt} = excerpt($content);
+    $entry->{excerpt} = '';
+    $entry->{content} = '';
+    my @nodes = $xpc->findnodes('description | atom:content', $element);
+    @nodes = $xpc->findnodes('summary | atom:summary', $element) unless @nodes;
+    my $content = shift(@nodes);
+    # The default is that the content is either plain text or escaped HTML,
+    # which is what we want for RSS. For Atom feeds, type="xhtml" means that the
+    # content is XHTML, so it needs to be escaped.
+    if ($content) {
+      my $is_xhtml = $content->hasAttribute("type") && $content->getAttribute("type") eq "xhtml";
+      $entry->{excerpt} = excerpt($content->to_literal);
+      for my $child ($content->childNodes()) {
+	my $c = $child->toString();
+	$c = xml_escape $c if $is_xhtml;
+	$entry->{content} .= $c;
+      }
+    }
   }
 }
 
@@ -751,7 +765,7 @@ sub excerpt {
   for my $node ($doc->findnodes('//p | //br | //blockquote | //li | //td | //th | //div')) {
     $node->appendTextNode($separator);
   }
-  my $text = strip_html($doc->textContent()); # hack: fix double escaping!
+  my $text = strip_html($doc->textContent());
   $text =~ s/( +|----+)/ /g;
   # collapse whitespace and trim
   $text =~ s/\s+/ /g;

@@ -26,7 +26,7 @@ WriteMakefile(
         'meta-spec' => { version => 2 },
         provides => {
             'List::Breakdown' => {
-                version => '0.22',
+                version => '0.23',
                 file => 'lib/List/Breakdown.pm',
             },
         },

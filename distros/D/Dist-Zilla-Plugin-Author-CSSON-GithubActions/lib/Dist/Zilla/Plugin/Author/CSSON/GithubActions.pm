@@ -6,7 +6,7 @@ package Dist::Zilla::Plugin::Author::CSSON::GithubActions;
 
 # ABSTRACT: Ease creation of common Github Actions workflows
 our $AUTHORITY = 'cpan:CSSON'; # AUTHORITY
-our $VERSION = '0.0106';
+our $VERSION = '0.0107';
 
 __END__
 
@@ -23,17 +23,16 @@ Dist::Zilla::Plugin::Author::CSSON::GithubActions - Ease creation of common Gith
 =begin html
 
 <p>
-<img src="https://img.shields.io/badge/perl-5.10+-blue.svg" alt="Requires Perl 5.10+" />
-<a href="http://cpants.cpanauthors.org/release/CSSON/Dist-Zilla-Plugin-Author-CSSON-GithubActions-0.0106"><img src="http://badgedepot.code301.com/badge/kwalitee/CSSON/Dist-Zilla-Plugin-Author-CSSON-GithubActions/0.0106" alt="Distribution kwalitee" /></a>
-<a href="http://matrix.cpantesters.org/?dist=Dist-Zilla-Plugin-Author-CSSON-GithubActions%200.0106"><img src="http://badgedepot.code301.com/badge/cpantesters/Dist-Zilla-Plugin-Author-CSSON-GithubActions/0.0106" alt="CPAN Testers result" /></a>
-<img src="https://img.shields.io/badge/coverage-84.6%-orange.svg" alt="coverage 84.6%" />
+<img src="https://img.shields.io/badge/perl-5.14+-blue.svg" alt="Requires Perl 5.14+" />
+<img src="https://img.shields.io/badge/coverage-84.6%25-orange.svg" alt="coverage 84.6%" />
+<a href="https://github.com/Csson/p5-Dist-Zilla-Plugin-Author-CSSON-GithubActions/actions?query=workflow%3Amakefile-test"><img src="https://img.shields.io/github/workflow/status/Csson/p5-Dist-Zilla-Plugin-Author-CSSON-GithubActions/makefile-test" alt="Build status at Github" /></a>
 </p>
 
 =end html
 
 =head1 VERSION
 
-Version 0.0106, released 2020-12-26.
+Version 0.0107, released 2020-12-30.
 
 =head1 SYNOPSIS
 

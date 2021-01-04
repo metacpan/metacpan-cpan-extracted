@@ -33,13 +33,13 @@ no_index:
 provides:
   Dist::Zilla::Plugin::Author::CSSON::GithubActions:
     file: lib/Dist/Zilla/Plugin/Author/CSSON/GithubActions.pm
-    version: '0.0106'
+    version: '0.0107'
   Dist::Zilla::Plugin::Author::CSSON::GithubActions::Workflow::TestWithMakefile:
     file: lib/Dist/Zilla/Plugin/Author/CSSON/GithubActions/Workflow/TestWithMakefile.pm
-    version: '0.0106'
+    version: '0.0107'
   Dist::Zilla::Role::Author::CSSON::GithubActions:
     file: lib/Dist/Zilla/Role/Author/CSSON/GithubActions.pm
-    version: '0.0106'
+    version: '0.0107'
 requires:
   Dist::Zilla::File::InMemory: '0'
   Dist::Zilla::Role::FileGatherer: '0'
@@ -52,15 +52,16 @@ requires:
   Path::Tiny: '0.072'
   Test::Exception: '0'
   Try::Tiny: '0.24'
+  Types::Path::Tiny: '0.005'
   Types::Standard: '1.000006'
   YAML::XS: '0'
   namespace::autoclean: '0.22'
-  perl: '5.010000'
+  perl: '5.014000'
 resources:
   bugtracker: https://github.com/Csson/p5-Dist-Zilla-Plugin-Author-CSSON-GithubActions/issues
   homepage: https://metacpan.org/release/Dist-Zilla-Plugin-Author-CSSON-GithubActions
   repository: https://github.com/Csson/p5-Dist-Zilla-Plugin-Author-CSSON-GithubActions.git
-version: '0.0106'
+version: '0.0107'
 x_Dist_Zilla:
   perl:
     version: '5.020001'
@@ -91,7 +92,7 @@ x_Dist_Zilla:
           check_all_plugins: 1
           check_all_prereqs: 0
           modules: []
-          phase: build
+          phase: release
           run_under_travis: 0
           skip: []
       name: PromptIfStale
@@ -301,10 +302,6 @@ x_Dist_Zilla:
       name: Git::Contributors
       version: '0.036'
     -
-      class: Dist::Zilla::Plugin::Test::Kwalitee::Extra
-      name: Test::Kwalitee::Extra
-      version: v0.2.1
-    -
       class: Dist::Zilla::Plugin::Test::NoTabs
       config:
         Dist::Zilla::Plugin::Test::NoTabs:
@@ -447,7 +444,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: '0.0106'
+          tag: '0.0107'
           tag_format: '%v'
           tag_message: 'Release %v%n%n%c'
         Dist::Zilla::Role::Git::Repo:

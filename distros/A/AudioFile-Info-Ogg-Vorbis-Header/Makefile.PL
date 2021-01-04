@@ -7,9 +7,7 @@ WriteMakefile
   'VERSION_FROM' => 'lib/AudioFile/Info/Ogg/Vorbis/Header.pm',
   'PREREQ_PM' => {
                    'AudioFile::Info' => 0,
-                   'Module::Build' => 0,
-                   'Ogg::Vorbis::Header' => '0.04',
-                   'YAML' => 0
+                   'Ogg::Vorbis::Header' => '0.04'
                  },
   'INSTALLDIRS' => 'site',
   'EXE_FILES' => [],

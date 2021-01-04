@@ -2,8 +2,10 @@
 
 package Perinci::Object;
 
-our $DATE = '2018-10-18'; # DATE
-our $VERSION = '0.310'; # VERSION
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2021-01-02'; # DATE
+our $DIST = 'Perinci-Object'; # DIST
+our $VERSION = '0.311'; # VERSION
 
 use 5.010001;
 use strict;
@@ -69,7 +71,7 @@ Perinci::Object - Object-oriented interface for Rinci metadata
 
 =head1 VERSION
 
-This document describes version 0.310 of Perinci::Object (from Perl distribution Perinci-Object), released on 2018-10-18.
+This document describes version 0.311 of Perinci::Object (from Perl distribution Perinci-Object), released on 2020-01-02.
 
 =head1 SYNOPSIS
 
@@ -132,8 +134,8 @@ This document describes version 0.310 of Perinci::Object (from Perl distribution
      my $envres = envresmulti();
 
      # add result for each item
-     $envres->add_result(200, "OK", {item_id=>1});
-     $envres->add_result(202, "OK", {item_id=>2, note=>"blah"});
+     $envres->add_result(200, "OK", {item_id=>1, payload=>"a"});
+     $envres->add_result(202, "OK", {item_id=>2, note=>"blah", payload=>"b"});
      $envres->add_result(404, "Not found", {item_id=>3});
      ...
 
@@ -201,7 +203,7 @@ Source repository is at L<https://github.com/perlancar/perl-Perinci-Object>.
 
 =head1 BUGS
 
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Perinci-Object>
+Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-Perinci-Object/issues>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
@@ -217,7 +219,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018, 2017, 2016, 2015, 2014, 2013, 2012, 2011 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2017, 2016, 2015, 2014, 2013, 2012, 2011 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

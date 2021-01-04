@@ -1,7 +1,7 @@
 package WHO::GrowthReference::Table;
 
-our $DATE = '2018-08-22'; # DATE
-our $VERSION = '0.002'; # VERSION
+our $DATE = '2021-01-04'; # DATE
+our $VERSION = '0.003'; # VERSION
 
 use 5.010001;
 use strict;
@@ -90837,6 +90837,13 @@ our $data_weight_girl_5_19y = [
 ];
 # END FRAGMENT id=data-growth_ref_who_weight_age_girl_5_19y
 
+my @percentiles = qw/P01 P1 P3 P5 P10 P15 P25 P50 P75 P85 P90 P95 P97 P99 P999/;
+
+sub _interpolate {
+    my ($x, $x1, $y1, $x2, $y2) = @_;
+    sprintf "%.1f", $y1 + ($y2-$y1)/($x2-$x1)*($x-$x1);
+}
+
 sub _calc_percentile {
     my ($val, $row, $meta) = @_;
 
@@ -90941,8 +90948,22 @@ sub get_who_growth_reference {
 
         $res->[3]{'func.raw_height'} = $row;
         $res->[2]{mean_height} = $row->[ $meta->{fields}{P50}{pos} ];
+
+        for (@percentiles) {
+            $res->[2]{"height_$_"} = $row->[ $meta->{fields}{$_}{pos} ];
+        }
+        $res->[2]{"height_Z-3"} = _interpolate( 0.170,  0.1 => $row->[ $meta->{fields}{P01}{pos} ],  1   => $row->[ $meta->{fields}{P1}{pos} ]);
+        $res->[2]{"height_Z-2"} = _interpolate( 2.287,  1   => $row->[ $meta->{fields}{P1}{pos}  ],  3   => $row->[ $meta->{fields}{P3}{pos} ]);
+        $res->[2]{"height_Z-1"} = _interpolate(15.867, 15   => $row->[ $meta->{fields}{P15}{pos} ], 25   => $row->[ $meta->{fields}{P25}{pos} ]);
+        $res->[2]{"height_Z+1"} = _interpolate(84.133, 75   => $row->[ $meta->{fields}{P75}{pos} ], 85   => $row->[ $meta->{fields}{P85}{pos} ]);
+        $res->[2]{"height_Z+2"} = _interpolate(97.713, 97   => $row->[ $meta->{fields}{P97}{pos} ], 99   => $row->[ $meta->{fields}{P99}{pos} ]);
+        $res->[2]{"height_Z+3"} = _interpolate(99.830, 99   => $row->[ $meta->{fields}{P99}{pos} ], 99.9 => $row->[ $meta->{fields}{P999}{pos} ]);
+        
         if ($args{height}) {
-            $res->[2]{height_percentile} = _calc_percentile($args{height}, $row, $meta);
+            my $pct = _calc_percentile($args{height}, $row, $meta);
+            $res->[2]{height_percentile} = $pct;
+            require Statistics::Standard_Normal;
+            $res->[2]{height_zscore} = Statistics::Standard_Normal::pct_to_z($pct);
         }
     }
 
@@ -90963,8 +90984,22 @@ sub get_who_growth_reference {
 
         $res->[3]{'func.raw_weight'} = $row;
         $res->[2]{mean_weight} = $row->[ $meta->{fields}{P50}{pos} ];
+        
+        for (@percentiles) {
+            $res->[2]{"weight_$_"} = $row->[ $meta->{fields}{$_}{pos} ];
+        }
+        $res->[2]{"weight_Z-3"} = _interpolate( 0.170,  0.1 => $row->[ $meta->{fields}{P01}{pos} ],  1   => $row->[ $meta->{fields}{P1}{pos} ]);
+        $res->[2]{"weight_Z-2"} = _interpolate( 2.287,  1   => $row->[ $meta->{fields}{P1}{pos}  ],  3   => $row->[ $meta->{fields}{P3}{pos} ]);
+        $res->[2]{"weight_Z-1"} = _interpolate(15.867, 15   => $row->[ $meta->{fields}{P15}{pos} ], 25   => $row->[ $meta->{fields}{P25}{pos} ]);
+        $res->[2]{"weight_Z+1"} = _interpolate(84.133, 75   => $row->[ $meta->{fields}{P75}{pos} ], 85   => $row->[ $meta->{fields}{P85}{pos} ]);
+        $res->[2]{"weight_Z+2"} = _interpolate(97.713, 97   => $row->[ $meta->{fields}{P97}{pos} ], 99   => $row->[ $meta->{fields}{P99}{pos} ]);
+        $res->[2]{"weight_Z+3"} = _interpolate(99.830, 99   => $row->[ $meta->{fields}{P99}{pos} ], 99.9 => $row->[ $meta->{fields}{P999}{pos} ]);
+        
         if ($args{weight}) {
-            $res->[2]{weight_percentile} = _calc_percentile($args{weight}, $row, $meta);
+            my $pct = _calc_percentile($args{weight}, $row, $meta);
+            $res->[2]{weight_percentile} = $pct;
+            require Statistics::Standard_Normal;
+            $res->[2]{weight_zscore} = Statistics::Standard_Normal::pct_to_z($pct);
         }
     }
 
@@ -90986,7 +91021,7 @@ WHO::GrowthReference::Table - Lookup height/weight in the WHO growth chart (a.k.
 
 =head1 VERSION
 
-This document describes version 0.002 of WHO::GrowthReference::Table (from Perl distribution WHO-GrowthReference-Table), released on 2018-08-22.
+This document describes version 0.003 of WHO::GrowthReference::Table (from Perl distribution WHO-GrowthReference-Table), released on 2021-01-04.
 
 =head1 SYNOPSIS
 
@@ -91020,9 +91055,9 @@ This document describes version 0.002 of WHO::GrowthReference::Table (from Perl 
 
 Usage:
 
- get_who_growth_reference(%args) -> [status, msg, result, meta]
+ get_who_growth_reference(%args) -> [status, msg, payload, meta]
 
-Lookup height/weight in the WHO growth chart (a.k.a. growth reference, growth standards).
+Lookup heightE<sol>weight in the WHO growth chart (a.k.a. growth reference, growth standards).
 
 This function is not exported by default, but exportable.
 
@@ -91042,6 +91077,7 @@ Specify height to calculate percentile.
 
 Specify weight to calculate percentile.
 
+
 =back
 
 Returns an enveloped result (an array).
@@ -91049,7 +91085,7 @@ Returns an enveloped result (an array).
 First element (status) is an integer containing HTTP status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
 (msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
+200. Third element (payload) is optional, the actual result. Fourth
 element (meta) is called result metadata and is optional, a hash
 that contains extra information.
 
@@ -91065,7 +91101,7 @@ Source repository is at L<https://github.com/perlancar/perl-WHO-GrowthReference-
 
 =head1 BUGS
 
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=WHO-GrowthReference-Table>
+Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-WHO-GrowthReference-Table/issues>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
@@ -91083,7 +91119,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2018 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -1,11 +1,25 @@
 # Paranoid::Process -- Process management support for paranoid programs
 #
-# (c) 2005 - 2017, Arthur Corliss <corliss@digitalmages.com>
+# $Id: lib/Paranoid/Process.pm, 2.08 2020/12/31 12:10:06 acorliss Exp $
 #
-# $Id: lib/Paranoid/Process.pm, 2.07 2019/01/30 18:25:27 acorliss Exp $
+# This software is free software.  Similar to Perl, you can redistribute it
+# and/or modify it under the terms of either:
 #
-#    This software is licensed under the same terms as Perl, itself.
-#    Please see http://dev.perl.org/licenses/ for more information.
+#   a)     the GNU General Public License
+#          <https://www.gnu.org/licenses/gpl-1.0.html> as published by the 
+#          Free Software Foundation <http://www.fsf.org/>; either version 1
+#          <https://www.gnu.org/licenses/gpl-1.0.html>, or any later version
+#          <https://www.gnu.org/licenses/license-list.html#GNUGPL>, or
+#   b)     the Artistic License 2.0
+#          <https://opensource.org/licenses/Artistic-2.0>,
+#
+# subject to the following additional term:  No trademark rights to
+# "Paranoid" have been or are conveyed under any of the above licenses.
+# However, "Paranoid" may be used fairly to describe this unmodified
+# software, in good faith, but not as a trademark.
+#
+# (c) 2005 - 2020, Arthur Corliss (corliss@digitalmages.com)
+# (tm) 2008 - 2020, Paranoid Inc. (www.paranoid.com)
 #
 #####################################################################
 
@@ -28,21 +42,23 @@ use Paranoid::Debug qw(:all);
 use POSIX qw(getuid setuid setgid WNOHANG setsid);
 use Carp;
 
-($VERSION) = ( q$Revision: 2.07 $ =~ /(\d+(?:\.\d+)+)/sm );
+($VERSION) = ( q$Revision: 2.08 $ =~ /(\d+(?:\.\d+)+)/sm );
 
 @EXPORT    = qw(switchUser daemonize);
 @EXPORT_OK = (
     @EXPORT, qw(MAXCHILDREN childrenCount installChldHandler
-        sigchld pfork ptranslateUser ptranslateGroup pcapture
+        sigchld pfork pcommFork ptranslateUser ptranslateGroup pcapture
         installSIGH uninstallSIGH installSIGD uninstallSIGD
         ) );
 %EXPORT_TAGS = (
     all   => [@EXPORT_OK],
+    misc  => [qw(pcapture)],
     pfork => [
         qw(MAXCHILDREN childrenCount installChldHandler
-            sigchld pfork daemonize)
+            sigchld pfork pcommFork daemonize)
         ],
     signal => [qw(installSIGH uninstallSIGH installSIGD uninstallSIGD)],
+    user   => [qw(switchUser ptranslateUser ptranslateGroup)],
     );
 
 #####################################################################
@@ -341,6 +357,58 @@ sub pfork {
     return $rv;
 }
 
+sub pcommFork (\$\$) {
+
+    # Purpose:  Creates pipes for bi-directional communiation, then calls
+    #           pfork()
+    # Returns:  Return value of children handler if installed, otherwise
+    #           undef.
+    # Usage:    $rv = pcommFork($procr, $procw);
+
+    my ( $procr, $procw ) = @_;
+    my ( $tp, $fp, $tc, $fc, $sfd, $rv );
+
+    pdebug( 'entering', PDLEVEL1 );
+    pIn();
+
+    if ( pipe( $fc, $tp ) and pipe( $fp, $tc ) ) {
+        $sfd = select $tc;
+        $|   = 1;
+        select $tp;
+        $| = 1;
+        select $sfd;
+
+        $rv = pfork();
+        if ( defined $rv ) {
+            if ($rv) {
+                close $tp;
+                close $fp;
+                $$procw = $tc;
+                $$procr = $fc;
+            } else {
+                close $tc;
+                close $fc;
+                $$procw = $tp;
+                $$procr = $fp;
+            }
+        } else {
+            $$procr = undef;
+            $$procw = undef;
+            close $tp;
+            close $fp;
+            close $tc;
+            close $fc;
+        }
+    } else {
+        pdebug( 'failed to create pipes: %s', PDLEVEL1, $! );
+    }
+
+    pOut();
+    pdebug( 'leaving w/rv: %s', PDLEVEL1, $rv );
+
+    return $rv;
+}
+
 sub ptranslateUser {
 
     # Purpose:  Translates a string account name into the UID
@@ -552,7 +620,7 @@ Paranoid::Process - Process Management Functions
 
 =head1 VERSION
 
-$Id: lib/Paranoid/Process.pm, 2.07 2019/01/30 18:25:27 acorliss Exp $
+$Id: lib/Paranoid/Process.pm, 2.08 2020/12/31 12:10:06 acorliss Exp $
 
 =head1 SYNOPSIS
 
@@ -566,6 +634,7 @@ $Id: lib/Paranoid/Process.pm, 2.07 2019/01/30 18:25:27 acorliss Exp $
   $count = childrenCount();
   installChldHandler(&cleanup);
   $rv = pfork();
+  $rv = pcommFork($rh, $wh);
 
   $uid = ptranslateUser("foo");
   $gid = ptranslateGroup("foo");
@@ -585,14 +654,42 @@ $Id: lib/Paranoid/Process.pm, 2.07 2019/01/30 18:25:27 acorliss Exp $
 =head1 DESCRIPTION
 
 This module provides a few functions meant to make life easier when managing
-processes.  The following export targets are provided:
+processes.
 
-  all               All functions within this module
-  pfork             All child management functions
-  signal            All signal dispatcher functions
+=head1 IMPORT LISTS
 
-Only the functions B<switchUser> and B<daemonize> are currently exported by 
-default.
+This module exports the following symbols by default:
+
+    switchUser daemonize
+
+The following specialized import lists also exist:
+
+    List        Members
+    --------------------------------------------------------
+    misc        pcapture
+    pfork       MAXCHILDREN childrenCount installChldHandler
+                sigchld pfork pcommFork daemonize
+    signal      installSIGH uninstallSIGH installSIGD 
+                uninstallSIGD
+    user        switchUser ptranslateUser ptranslateGroup
+    all         @misc @pfork @signal @user
+
+=head1 IMPORT LISTS
+
+This module exports the following symbols by default:
+
+    switchUser daemonize
+
+The following specialized import lists also exist:
+
+    List        Members
+    --------------------------------------------------------
+    pfork       MAXCHILDREN childrenCount installChldHandler
+                sigchld pfork pcommFork daemonize
+    signal      installSIGH uninstallSIGH installSIGD 
+                uninstallSIGD
+    user        switchUser ptranslateUser ptranslateGroup
+    misc        pcapture
 
 =head1 SUBROUTINES/METHODS
 
@@ -651,6 +748,18 @@ This function should be used in lieu of Perl's fork if you want to take
 advantage of a blocking fork call that respects the MAXCHILDREN limit.  Use of
 this function, however, also assumes the use of B<sigchld> as the signal
 handler for SIGCHLD.
+
+=head2 pcommFork
+
+    $rv = pcommFork($rh, $wh);
+
+This function extends B<pfork> by automatically setting up bidirectional pipes
+for interprocess communication.  The two scalars passed as arguments will have
+the appropriate ends of the pipe returned to both the parent and the child.
+
+In the event that a fork fails, B<undef> will be assigned to both scalars.
+
+The return value will be the result of the B<fork> call.
 
 =head2 ptranslateUser
 
@@ -801,8 +910,22 @@ Arthur Corliss (corliss@digitalmages.com)
 
 =head1 LICENSE AND COPYRIGHT
 
-This software is licensed under the same terms as Perl, itself. 
-Please see http://dev.perl.org/licenses/ for more information.
+This software is free software.  Similar to Perl, you can redistribute it
+and/or modify it under the terms of either:
 
-(c) 2005 - 2017, Arthur Corliss (corliss@digitalmages.com)
+  a)     the GNU General Public License
+         <https://www.gnu.org/licenses/gpl-1.0.html> as published by the 
+         Free Software Foundation <http://www.fsf.org/>; either version 1
+         <https://www.gnu.org/licenses/gpl-1.0.html>, or any later version
+         <https://www.gnu.org/licenses/license-list.html#GNUGPL>, or
+  b)     the Artistic License 2.0
+         <https://opensource.org/licenses/Artistic-2.0>,
+
+subject to the following additional term:  No trademark rights to
+"Paranoid" have been or are conveyed under any of the above licenses.
+However, "Paranoid" may be used fairly to describe this unmodified
+software, in good faith, but not as a trademark.
+
+(c) 2005 - 2020, Arthur Corliss (corliss@digitalmages.com)
+(tm) 2008 - 2020, Paranoid Inc. (www.paranoid.com)
 

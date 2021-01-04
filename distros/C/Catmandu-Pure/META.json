@@ -73,7 +73,7 @@
          "web" : "https://github.com/LibreCat/Catmandu-Pure"
       }
    },
-   "version" : "0.03",
+   "version" : "0.05",
    "x_contributors" : [
       "Patrick Hochstenbach <patrick.hochstenbach@ugent.be>",
       "Snorri Briem <Snorri.Briem@ub.lu.se>"

@@ -1,10 +1,16 @@
-0.002   2018-08-22 (PERLANCAR)
+0.003   2021-01-03  Released-By: PERLANCAR; Urgency: medium
+
+	- Return various z-scores and percentiles, return z-3, z-2, z-1,
+	  z+1, z+2, z+3 results.
+
+
+0.002   2018-08-22  Released-By: PERLANCAR
 
 	- [doc] Add example and mention App::WHOGrowthReferenceUtils.
 
 	- Accept 'weight' and 'height' to calculate percentiles.
 
 
-0.001   2018-08-21 (PERLANCAR)
+0.001   2018-08-21  Released-By: PERLANCAR
 
         - First early release.

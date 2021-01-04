@@ -1,6 +1,10 @@
 Revision history for App-DBBrowser
 
 
+2.256    2021-01-01
+        - Add bugracker info to the Makefile.PL.
+        - Update year copyright.
+
 2.255    2020-12-07
         - Disabled input filter: bugfix menu behavior.
 

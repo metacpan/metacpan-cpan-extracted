@@ -1,5 +1,22 @@
 Revision history for Text-Minify-XS:
 
+v0.3.4    2021-01-04 14:00:54+00:00 Europe/London
+  [Documentation]
+  - Updated copyright year.
+
+v0.3.3    2021-01-04 13:57:25+00:00 Europe/London
+  [Bug Fixes]
+  - Handle empty strings and strings containing only spaces.
+
+  [Documentation]
+  - Add note to KNOWN ISSUES about older Perl versions.
+
+  [Tests]
+  - Add author ppport test.
+
+  [Other]
+  - Update Dist::Zilla config to include `ppport.h`.
+
 v0.3.2    2020-12-11 09:28:45+00:00 Europe/London
   [Tests]
   - Fix tests on some older Perl versions.

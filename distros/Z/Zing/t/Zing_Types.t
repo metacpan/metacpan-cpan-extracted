@@ -130,6 +130,37 @@ Zing::Types
 
 =cut
 
+=type Cursor
+
+  Cursor
+
+=type-library Cursor
+
+Zing::Types
+
+=type-composite Cursor
+
+  InstanceOf["Zing::Cursor"]
+
+=type-parent Cursor
+
+  Object
+
+=type-example-1 Cursor
+
+  # given: synopsis
+
+  use Zing::Cursor;
+  use Zing::Lookup;
+
+  my $cursor = Zing::Cursor->new(
+    lookup => Zing::Lookup->new(
+      name => 'people'
+    )
+  );
+
+=cut
+
 =type Daemon
 
   Daemon
@@ -212,6 +243,32 @@ Zing::Types
 
 =cut
 
+=type Encoder
+
+  Encoder
+
+=type-library Encoder
+
+Zing::Types
+
+=type-composite Encoder
+
+  InstanceOf["Zing::Encoder"]
+
+=type-parent Encoder
+
+  Object
+
+=type-example-1 Encoder
+
+  # given: synopsis
+
+  use Zing::Encoder;
+
+  my $encoder = Zing::Encoder->new;
+
+=cut
+
 =type Entity
 
   Entity
@@ -235,6 +292,32 @@ Zing::Types
   use Zing::Entity;
 
   my $app = Zing::Entity->new;
+
+=cut
+
+=type Error
+
+  Error
+
+=type-library Error
+
+Zing::Types
+
+=type-composite Error
+
+  InstanceOf["Zing::Error"]
+
+=type-parent Error
+
+  Object
+
+=type-example-1 Error
+
+  # given: synopsis
+
+  use Zing::Error;
+
+  my $error = Zing::Error->new;
 
 =cut
 
@@ -315,6 +398,28 @@ Zing::Types
 
   my $scheme = ['MyApp', [], 1];
   my $fork = Zing::Fork->new(scheme => $scheme, parent => Zing::Process->new);
+
+=cut
+
+=type ID
+
+  ID
+
+=type-library ID
+
+Zing::Types
+
+=type-composite ID
+
+  InstanceOf["Zing::ID"]
+
+=type-example-1 ID
+
+  # given: synopsis
+
+  use Zing::ID;
+
+  my $id = Zing::ID->new;
 
 =cut
 
@@ -438,6 +543,34 @@ Zing::Types
   use Zing::Process;
 
   my $logic = Zing::Logic->new(process => Zing::Process->new);
+
+=cut
+
+=type Lookup
+
+  Lookup
+
+=type-library Lookup
+
+Zing::Types
+
+=type-composite Lookup
+
+  InstanceOf["Zing::Lookup"]
+
+=type-parent Lookup
+
+  Object
+
+=type-example-1 Lookup
+
+  # given: synopsis
+
+  use Zing::Lookup;
+
+  my $lookup = Zing::Lookup->new(
+    name => 'users'
+  );
 
 =cut
 
@@ -838,6 +971,34 @@ Zing::Types
   use Zing::Store;
 
   my $store = Zing::Store->new;
+
+=cut
+
+=type Table
+
+  Table
+
+=type-library Table
+
+Zing::Types
+
+=type-composite Table
+
+  InstanceOf["Zing::Table"]
+
+=type-parent Table
+
+  Object
+
+=type-example-1 Table
+
+  # given: synopsis
+
+  use Zing::Table;
+
+  my $table = Zing::Table->new(
+    name => 'users'
+  );
 
 =cut
 

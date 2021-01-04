@@ -2,7 +2,11 @@
 abstract: "Perl implementation of Ping Identity's \"OpenToken\""
 author:
   - 'Graham TerMarsch <cpan@howlingfrog.com>'
+  - 'Shawn Devlin <shawn.devlin@socialtext.com>'
 build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  Test::DiagINC: '0.002'
   Test::Differences: '0'
   Test::Exception: '0'
   Test::More: '0.96'
@@ -15,6 +19,10 @@ meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: Crypt-OpenToken
+no_index:
+  directory:
+    - t
+    - xt
 recommends:
   Crypt::CBC: '0'
   Crypt::DES_EDE3: '0'
@@ -28,11 +36,13 @@ requires:
   Digest::SHA1: '0'
   MIME::Base64: '0'
   Moose: '0'
+  namespace::autoclean: '0'
   perl: '5.008001'
 resources:
   bugtracker: https://github.com/bleargh45/Crypt-OpenToken/issues
-  repository: https://github.com/bleargh45/Crypt-OpenToken.git
-version: '0.08'
+  repository: git://github.com/bleargh45/Crypt-OpenToken.git
+version: '0.09'
 x_generated_by_perl: v5.32.0
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: Artistic-2.0
+x_static_install: 1

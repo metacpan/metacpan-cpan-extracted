@@ -1,5 +1,8 @@
 Revision history for Test-Mojo-Role-SubmitForm
 
+1.004002  2020-12-30
+    - Fix loss of params that are present but have empty string values
+
 1.004001  2020-04-20
     - Fix spurious warnings
     - Add means to remove forms params

@@ -1,0 +1,384 @@
+package Nano::Types;
+
+use 5.014;
+
+use strict;
+use warnings;
+
+use Data::Object::Types::Keywords;
+
+use base 'Data::Object::Types::Library';
+
+extends 'Types::Standard';
+
+our $VERSION = '0.04'; # VERSION
+
+register {
+  name => 'Nano',
+  parent => 'Object',
+  validation => is_instance_of('Nano'),
+};
+
+register {
+  name => 'Node',
+  parent => 'Object',
+  validation => is_instance_of('Nano::Node'),
+};
+
+register {
+  name => 'Nodes',
+  parent => 'Object',
+  validation => is_instance_of('Nano::Nodes'),
+};
+
+register {
+  name => 'Search',
+  parent => 'Object',
+  validation => is_instance_of('Nano::Search'),
+};
+
+register {
+  name => 'Env',
+  parent => 'Object',
+  validation => is_instance_of('Zing::Env'),
+};
+
+register {
+  name => 'KeyVal',
+  parent => 'Object',
+  validation => is_instance_of('Zing::KeyVal'),
+};
+
+register {
+  name => 'Table',
+  parent => 'Object',
+  validation => is_instance_of('Zing::Table'),
+};
+
+1;
+
+=encoding utf8
+
+=head1 NAME
+
+Nano::Types - Type Library
+
+=cut
+
+=head1 ABSTRACT
+
+Type Library
+
+=cut
+
+=head1 SYNOPSIS
+
+  package main;
+
+  use Nano::Types;
+
+  1;
+
+=cut
+
+=head1 DESCRIPTION
+
+This package provides type constraints for the L<Nano> object persistence
+framework.
+
+=cut
+
+=head1 LIBRARIES
+
+This package uses type constraints from:
+
+L<Types::Standard>
+
+=cut
+
+=head1 CONSTRAINTS
+
+This package declares the following type constraints:
+
+=cut
+
+=head2 env
+
+  Env
+
+This type is defined in the L<Nano::Types> library.
+
+=over 4
+
+=item env parent
+
+  Object
+
+=back
+
+=over 4
+
+=item env composition
+
+  InstanceOf["Zing::Env"]
+
+=back
+
+=over 4
+
+=item env example #1
+
+  # given: synopsis
+
+  use Zing::Env;
+
+  my $env = Zing::Env->new;
+
+=back
+
+=cut
+
+=head2 keyval
+
+  KeyVal
+
+This type is defined in the L<Nano::Types> library.
+
+=over 4
+
+=item keyval parent
+
+  Object
+
+=back
+
+=over 4
+
+=item keyval composition
+
+  InstanceOf["Zing::KeyVal"]
+
+=back
+
+=over 4
+
+=item keyval example #1
+
+  # given: synopsis
+
+  use Zing::KeyVal;
+
+  my $domain = Zing::KeyVal->new(name => 'user-12345');
+
+=back
+
+=cut
+
+=head2 nano
+
+  Nano
+
+This type is defined in the L<Nano::Types> library.
+
+=over 4
+
+=item nano parent
+
+  Object
+
+=back
+
+=over 4
+
+=item nano composition
+
+  InstanceOf["Nano"]
+
+=back
+
+=over 4
+
+=item nano example #1
+
+  # given: synopsis
+
+  use Nano;
+
+  my $nano = Nano->new;
+
+=back
+
+=cut
+
+=head2 node
+
+  Node
+
+This type is defined in the L<Nano::Types> library.
+
+=over 4
+
+=item node parent
+
+  Object
+
+=back
+
+=over 4
+
+=item node composition
+
+  InstanceOf["Nano::Node"]
+
+=back
+
+=over 4
+
+=item node example #1
+
+  # given: synopsis
+
+  use Nano::Node;
+
+  my $node = Nano::Node->new;
+
+=back
+
+=cut
+
+=head2 nodes
+
+  Nodes
+
+This type is defined in the L<Nano::Types> library.
+
+=over 4
+
+=item nodes parent
+
+  Object
+
+=back
+
+=over 4
+
+=item nodes composition
+
+  InstanceOf["Nano::Nodes"]
+
+=back
+
+=over 4
+
+=item nodes example #1
+
+  # given: synopsis
+
+  use Nano::Nodes;
+
+  my $nodes = Nano::Nodes->new;
+
+=back
+
+=cut
+
+=head2 search
+
+  Search
+
+This type is defined in the L<Nano::Types> library.
+
+=over 4
+
+=item search parent
+
+  Object
+
+=back
+
+=over 4
+
+=item search composition
+
+  InstanceOf["Nano::Search"]
+
+=back
+
+=over 4
+
+=item search example #1
+
+  # given: synopsis
+
+  use Nano::Nodes;
+  use Nano::Search;
+
+  my $search = Nano::Search->new(nodes => Nano::Nodes->new);
+
+=back
+
+=cut
+
+=head2 table
+
+  Table
+
+This type is defined in the L<Nano::Types> library.
+
+=over 4
+
+=item table parent
+
+  Object
+
+=back
+
+=over 4
+
+=item table composition
+
+  InstanceOf["Zing::Table"]
+
+=back
+
+=over 4
+
+=item table example #1
+
+  # given: synopsis
+
+  use Zing::Table;
+
+  my $lookup = Zing::Table->new(name => 'users');
+
+=back
+
+=cut
+
+=head1 AUTHOR
+
+Al Newkirk, C<awncorp@cpan.org>
+
+=head1 LICENSE
+
+Copyright (C) 2011-2019, Al Newkirk, et al.
+
+This is free software; you can redistribute it and/or modify it under the terms
+of the The Apache License, Version 2.0, as elucidated in the L<"license
+file"|https://github.com/cpanery/nano/blob/master/LICENSE>.
+
+=head1 PROJECT
+
+L<Wiki|https://github.com/cpanery/nano/wiki>
+
+L<Project|https://github.com/cpanery/nano>
+
+L<Initiatives|https://github.com/cpanery/nano/projects>
+
+L<Milestones|https://github.com/cpanery/nano/milestones>
+
+L<Contributing|https://github.com/cpanery/nano/blob/master/CONTRIBUTE.md>
+
+L<Issues|https://github.com/cpanery/nano/issues>
+
+=cut

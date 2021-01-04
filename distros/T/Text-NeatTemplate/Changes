@@ -1,6 +1,12 @@
 Revision History for Text-NeatTemplate
 ======================================
 
+v0.1400 2020-12-31
+------------------
+
+* 2020-12-29 20:35:29 +1100
+  New formatting for simple YYYY-MM-DD dates.
+
 v0.1300 2019-08-05
 ------------------
 

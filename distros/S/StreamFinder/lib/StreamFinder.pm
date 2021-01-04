@@ -129,6 +129,7 @@ site URL as the argument.  You can then edit it to tailor it to your needs.
 The currently-supported websites are:  podcasts.apple.com (L<StreamFinder::Apple>), 
 bitchute.com (L<StreamFinder::Bitchute>, blogger.com (L<StreamFinder::Blogger>), 
 brighteon.com (L<StreamFinder::Brighteon>), castbox.fm (L<StreamFinder::Castbox>), 
+podcasts.google.com (L<StreamFinder::Google>), 
 iheartradio.com (L<StreamFinder::IHeartRadio>), radio.net (L<StreamFinder::RadioNet>), 
 reciva.com (L<StreamFinder::Reciva>), rumble.com (L<StreamFinder::Rumble>),
 sermonaudio.com (L<StreamFinder::SermonAudio>), 
@@ -137,13 +138,17 @@ tunein.com (L<StreamFinder::Tunein>), vimeo.com (L<StreamFinder::Vimeo>),
 and (youtube.com, et. al and other sites that youtube-dl supports) 
 (L<StreamFinder::Youtube>).  
 
+NOTE:  StreamFinder::Reciva will likely be removed next release after 
+January 30, 2021 due to that site's announcement that they're going 
+offline after that date!
+
 NOTE:  Facebook (Streamfinder::Facebook) has been removed because 
 logging into Facebook via the call to youtube-dl is now interpreted by 
 Facebook as a "rogue app. login" and will cause them to LOCK your account 
 and FORCE you to change your password the next time you log in 
 to Facebook!
 
-NOTE:  For some sites, ie. Youtube, Vimeo, Apple, Spreaker, Castbox, 
+NOTE:  For some sites, ie. Youtube, Vimeo, Apple, Spreaker, Castbox, Google, 
 etc. the "station" object actually refers to a specific video or podcast, but 
 functions the same way.
 
@@ -271,7 +276,7 @@ the "icon image" data, if any, will be returned.
 
 Returns the station / podcast / video's type (I<submodule-name>).  
 (one of:  "Apple", "BitChute", "Blogger", "Brighteon", "Castbox", 
-"IHeartRadio", "RadioNet", "Reciva", "Rumble", "SermonAudio", 
+"Google", "IHeartRadio", "RadioNet", "Reciva", "Rumble", "SermonAudio", 
 "Spreaker", "Tunein", "Youtube" or "Vimeo" - 
 depending on the sight that matched the URL.
 
@@ -407,14 +412,14 @@ use strict;
 use warnings;
 use vars qw(@ISA @EXPORT $VERSION);
 
-our $VERSION = '1.37';
+our $VERSION = '1.40';
 our $DEBUG = 0;
 
 require Exporter;
 
 @ISA = qw(Exporter);
 @EXPORT = qw();
-my @supported_mods = (qw(Apple Bitchute Blogger Brighteon Castbox IHeartRadio
+my @supported_mods = (qw(Apple Bitchute Blogger Brighteon Castbox Google IHeartRadio
 		RadioNet Reciva Rumble SermonAudio Spreaker Tunein Vimeo Youtube));
 
 my %haveit;
@@ -459,6 +464,8 @@ sub new
 		return new StreamFinder::Blogger($url, @args);
 	} elsif ($haveit{'Castbox'} && $url =~ m#\bcastbox\.\w+\/#) {
 		return new StreamFinder::Castbox($url, @args);
+	} elsif ($haveit{'Google'} && $url =~ m#\b\.google\.\w+\/#) {
+		return new StreamFinder::Google($url, @args);
 	} elsif ($haveit{'SermonAudio'} && $url =~ m#\bsermonaudio\.com\/#) {
 		return new StreamFinder::SermonAudio($url, @args);
 	} elsif ($haveit{'Youtube'}) {  #DEFAULT TO youtube-dl SINCE SO MANY URLS ARE HANDLED THERE NOW.

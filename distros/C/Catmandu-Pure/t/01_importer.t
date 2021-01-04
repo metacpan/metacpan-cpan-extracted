@@ -354,7 +354,7 @@ if ( $ENV{RELEASE_TESTING} ) {
         endpoint     => 'organisational-units',
         fullResponse => 1,
         options      => { 'size' => 0 }
-    )->first->{result}[0]{count};
+    )->first->{count};
     ok( $count > 1, 'count organisations' );
     
     my $offset = $count - 5;
@@ -367,14 +367,14 @@ if ( $ENV{RELEASE_TESTING} ) {
     ok( $count == $pcount + $offset, 'get organisational-units from offset' );
     
     $rec = $pkg->new( %connect_args, endpoint => 'classification-schemes' )->first;
-    ok( $rec->{classificationScheme}, 'endpoint classification-schemes' );
+    ok( $rec, 'endpoint classification-schemes' );
     
     $rec = $pkg->new(
         %connect_args,
         endpoint => 'changes',
         path  => '2002-01-22',
     )->slice( 100, 1 )->first;
-    ok( $rec->{contentChange}, 'endpoint changes' );
+    ok( $rec, 'endpoint changes' );
 }
 
 done_testing;

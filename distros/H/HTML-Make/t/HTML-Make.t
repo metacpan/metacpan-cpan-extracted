@@ -100,6 +100,31 @@ ok ($@, "dies if text is not a scalar");
 	  "got correct warning for cellspacing on table");
 };
 
+{
+    my @warnings;
+    local $SIG{__WARN__} = sub {
+	push @warnings, @_;
+    };
+    my $ul = HTML::Make->new ('ul');
+    my $td = $ul->push ('td');
+    is (@warnings, 1, "got warning with pushing <td> to non-tr");
+    like ($warnings[0], qr/Pushing <td> to a non-tr element/);
+};
+
+# Check that there is no closing tag for the input tag, bugzilla bug
+# 2015.
+
+my $input = HTML::Make->new ('input');
+my $inputtext = $input->text ();
+unlike ($inputtext, qr!</input>!, "No closing tag for <input>");
+
+my $el = HTML::Make->new ('ul');
+my $li = $el->push ('li', text => 'item');
+$li->add_comment ("Too much monkey business!");
+my $text = $el->text ();
+ok (index ($text, '<li>item<!-- Too much monkey business! --></li>') != -1,
+    "Comment added OK");
+
 TODO: {
     local $TODO = 'not yet';
 };

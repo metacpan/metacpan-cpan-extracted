@@ -1,10 +1,10 @@
 {
    "abstract" : "Dancer2 wrapper for Handlebars templating engine",
    "author" : [
-      "Ruth Holloway <ruth@hiruthie.me>"
+      "D Ruth Holloway <ruth@hiruthie.me>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.014, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "Dist::Zilla version 6.017, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -32,7 +32,7 @@
             "Sub::Attribute" : "0",
             "Text::Handlebars" : "0",
             "Try::Tiny" : "0",
-            "perl" : "5.008"
+            "perl" : "5.012"
          }
       },
       "test" : {
@@ -54,33 +54,33 @@
    "provides" : {
       "Dancer2::Template::Handlebars" : {
          "file" : "lib/Dancer2/Template/Handlebars.pm",
-         "version" : "0.3"
+         "version" : "0.4"
       },
       "Dancer2::Template::Handlebars::Helpers" : {
          "file" : "lib/Dancer2/Template/Handlebars/Helpers.pm",
-         "version" : "0.3"
+         "version" : "0.4"
       }
    },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://gitlab.com/GeekRuthie/dancer2-template-handlebars/-/issues"
+         "web" : "https://gitlab.com/GeekRuthie/Dancer2-Template-Handlebars/-/issues"
       },
       "repository" : {
          "type" : "git",
-         "url" : "https://gitlab.com/GeekRuthie/dancer2-template-handlebars.git",
-         "web" : "https://gitlab.com/GeekRuthie/dancer2-template-handlebars"
+         "url" : "https://gitlab.com/GeekRuthie/Dancer2-Template-Handlebars.git",
+         "web" : "https://gitlab.com/GeekRuthie/Dancer2-Template-Handlebars"
       }
    },
-   "version" : "0.3",
+   "version" : "0.4",
    "x_author_pledge" : {
       "version" : 1
    },
    "x_contributor_covenant" : {
       "version" : 0.02
    },
-   "x_generated_by_perl" : "v5.24.1",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.19",
+   "x_generated_by_perl" : "v5.30.3",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.25",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }
 

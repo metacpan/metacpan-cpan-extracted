@@ -1,5 +1,5 @@
 package Treex::Block::Read::BaseReader;
-$Treex::Block::Read::BaseReader::VERSION = '2.20201228';
+$Treex::Block::Read::BaseReader::VERSION = '2.20210102';
 use Moose;
 use Treex::Core::Common;
 use File::Slurp;
@@ -180,7 +180,7 @@ Treex::Block::Read::BaseReader - abstract ancestor for document readers
 
 =head1 VERSION
 
-version 2.20201228
+version 2.20210102
 
 =head1 DESCRIPTION
 

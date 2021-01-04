@@ -1,19 +1,17 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2015 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2015-2020 -- leonerd@leonerd.org.uk
 
-package Device::Chip;
+use v5.26;
+use Object::Pad 0.19;
 
-use strict;
-use warnings;
-use 5.010; #  //
-
-our $VERSION = '0.15';
+package Device::Chip 0.16;
+class Device::Chip :repr(HASH);
 
 use Carp;
 
-use Future 0.26; # ->done / ->fail as constructor
+use Future::AsyncAwait 0.38; # async method
 
 =head1 NAME
 
@@ -51,7 +49,7 @@ it. This is supplied by invoking the L</mount> method. For example:
 
    my $adapter = Device::Chip::Adapter::FTDI->new;
 
-   $chip->mount( $adapter )->get;
+   await $chip->mount( $adapter );
 
 =cut
 
@@ -67,16 +65,10 @@ Returns a new instance of a chip driver object.
 
 =cut
 
-sub new
-{
-   my $class = shift;
-   bless {}, $class;
-}
-
 =head1 METHODS
 
-The following methods documented with a trailing call to C<< ->get >> return
-L<Future> instances.
+The following methods documented in an C<await> expression return L<Future>
+instances.
 
 This allows them to easily be used as a simple synchronous method by using the
 trailing L<Future/get> call. Alternatively, if the underlying adapter allows a
@@ -85,23 +77,23 @@ for futures to provide more asynchronous use of the device.
 
 =cut
 
-sub adapter
+has $_adapter;
+method adapter
 {
-   my $self = shift;
-   return $self->{adapter} //
+   return $_adapter //
       croak "This chip has not yet been mounted on an adapter";
 }
 
-sub protocol
+has $_protocol;
+method protocol
 {
-   my $self = shift;
-   return $self->{protocol} //
+   return $_protocol //
       croak "This chip has not yet been connected to a protocol";
 }
 
 =head2 mount
 
-   $chip = $chip->mount( $adapter, %params )->get
+   $chip = await $chip->mount( $adapter, %params );
 
 Supplies the chip driver with the means to actually communicate with the
 connected device, via some electrical interface connected to the computer.
@@ -111,31 +103,26 @@ question, and should be documented there.
 
 =cut
 
-sub mount
+async method mount ( $adapter, %params )
 {
-   my $self = shift;
-   ( $self->{adapter}, my %params ) = @_;
+   $_adapter = $adapter;
 
    my $pname = $self->PROTOCOL;
 
-   $self->{adapter}->make_protocol( $pname )
-      ->then( sub {
-         ( $self->{protocol} ) = @_;
+   $_protocol = await $_adapter->make_protocol( $pname );
 
-         my $code = $self->can( "${pname}_options" ) or
-            return Future->done( $self );
+   my $code = $self->can( "${pname}_options" ) or
+      return $self;
 
-         $self->protocol->configure(
-            $self->$code( %params )
-         )->then_done( $self );
-      });
+   await $self->protocol->configure(
+      $self->$code( %params )
+   );
+
+   return $self;
 }
 
-sub _parse_options
+sub _parse_options ( $, $str )
 {
-   shift;
-   my ( $str ) = @_;
-
    return map { m/^([^=]+)=(.*)$/ ? ( $1 => $2 ) : ( $_ => 1 ) }
           split m/,/, $str // "";
 
@@ -143,7 +130,7 @@ sub _parse_options
 
 =head2 mount_from_paramstr
 
-   $chip = $chip->mount_from_paramstr( $adapter, $paramstr )->get
+   $chip = await $chip->mount_from_paramstr( $adapter, $paramstr );
 
 A variant of L</mount> that parses its options from the given string. This
 string should be a comma-separated list of parameters, where each is given as
@@ -153,12 +140,9 @@ boolean flags.
 
 =cut
 
-sub mount_from_paramstr
+async method mount_from_paramstr ( $adapter, $paramstr )
 {
-   my $self = shift;
-   my ( $adapter, $paramstr ) = @_;
-
-   $self->mount( $adapter, $self->_parse_options( $paramstr ) );
+   await $self->mount( $adapter, $self->_parse_options( $paramstr ) );
 }
 
 =head1 AUTHOR

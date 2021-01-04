@@ -1,3 +1,19 @@
+0.59 2021-01-04
+
+* "json_file_to_perl" renamed "read_json"
+* Documentation work
+ -- Benchmarks section updated with latest versions, add Cpanel::JSON::XS
+ -- Add Metacpan vote ratings to other CPAN modules section
+ -- Sections reordered to put methods above parsing details
+
+0.58 2021-01-01
+
+* Protect against stack overflows by having maximum parsing depth
+ -- set_max_depth, get_max_depth methods added
+* Documentation updated
+ -- JSON RFC changed to 8259
+ -- Discussion of Unicode tests in JSON Test Suite
+
 0.57 2020-07-09
 
 * Bug fix for long strings

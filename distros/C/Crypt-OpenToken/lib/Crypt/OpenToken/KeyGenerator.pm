@@ -4,6 +4,7 @@ use strict;
 use warnings;
 use POSIX qw();
 use Digest::HMAC_SHA1 qw(hmac_sha1);
+use namespace::autoclean;
 
 sub generate {
     my ($password, $keysize) = @_;
@@ -22,7 +23,7 @@ sub generate {
         my $sha = $digest->digest;
 
         # generate the next block, and grab up to "$blocksize" chars out of it
-        my $block    = _generate_block($password, $sha, $iters, $idx);
+        my $block    = _generate_block($password, $sha, $iters);
         my $need     = $keysize - $offset;
         my $grabbing = $need < $blocksize ? $need : $blocksize;
         $key .= substr($block, 0, $grabbing);
@@ -32,7 +33,7 @@ sub generate {
 }
 
 sub _generate_block {
-    my ($password, $sha, $iters, $idx) = @_;
+    my ($password, $sha, $iters) = @_;
     my $result  = $sha;
     my $current = $sha;
 
@@ -53,7 +54,9 @@ Crypt::OpenToken::KeyGenerator - Generates keys based on shared passwords
 
   use Crypt::OpenToken::KeyGenerator;
 
-  $key = Crypt::OpenToken::KeyGenerator::generate($password, $keysize);
+  my $keysize  = 16;          # Key size, in Bytes
+  my $password = 'abc123';    # shared password
+  my $key      = Crypt::OpenToken::KeyGenerator::generate($password, $keysize);
 
 =head1 DESCRIPTION
 

@@ -7,7 +7,7 @@ our $VERSION = 0.01;
 
 use FindBin qw/$Bin/;
 use lib "$Bin/../lib";
-use Test::More tests => 9;
+use Test::More;
 use Test::Number::Delta within => 1e-6;
 
 BEGIN {
@@ -191,3 +191,40 @@ subtest 'Sidereal Time' => sub {
             or diag("Expected: $_->{lst}, got: $got");
     }
 };
+
+subtest 'Leap Year' => sub {
+    my @cases = (
+        [1800, 0],
+        [1804, 1],
+        [1805, 0],
+        [1980, 1],
+        [1984, 1],
+        [2000, 1],
+        [2001, 0],
+        [2001, 0],
+        [2010, 0],
+        [2012, 1],
+    );
+    plan tests => scalar @cases;
+    for (@cases) {
+        cmp_ok(is_leapyear($_->[0]), '==', $_->[1], "year $_->[0]")
+    }
+};
+
+
+subtest 'Day of Year' => sub {
+    my @cases = (
+        [[1965,  3,  1],  60],
+        [[1984,  3,  1],  61],
+        [[1984, 12, 31], 366],
+        [[1985,  1,  1],   1],
+    );
+    plan tests => scalar @cases;
+    for (@cases) {
+        my @ymd = @{$_->[0]};
+        cmp_ok(day_of_year(@ymd), '==', $_->[1], sprintf('%d-%d-%d -> %d', @ymd, $_->[1]))
+    }
+};
+
+
+done_testing();

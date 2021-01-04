@@ -1,5 +1,5 @@
 package Treex::Core::Loader;
-$Treex::Core::Loader::VERSION = '2.20201228';
+$Treex::Core::Loader::VERSION = '2.20210102';
 use strict;
 use warnings;
 
@@ -57,7 +57,7 @@ Treex::Core::Loader - Loader
 
 =head1 VERSION
 
-version 2.20201228
+version 2.20210102
 
 =head1 SYNOPSIS
 

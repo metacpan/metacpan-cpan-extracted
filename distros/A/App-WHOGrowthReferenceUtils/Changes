@@ -1,3 +1,8 @@
-0.001   2018-08-26 (PERLANCAR)
+0.002   2021-01-03  Released-By: PERLANCAR
+
+        - [build] Rebuild to update prereqs to Sah coerce rule modules.
+
+
+0.001   2018-08-26  Released-By: PERLANCAR
 
         - First release.

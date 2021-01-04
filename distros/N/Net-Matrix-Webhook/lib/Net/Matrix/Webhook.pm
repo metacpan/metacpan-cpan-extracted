@@ -1,17 +1,17 @@
 package Net::Matrix::Webhook;
 
 # ABSTRACT: A http->matrix webhook
+our $VERSION = '0.901'; # VERSION
 
 use strict;
 use warnings;
 use 5.010;
 
-our $VERSION = "0.900";
-
 use Net::Async::HTTP::Server::PSGI;
 use Net::Async::Matrix;
 use IO::Async::Loop;
 use IO::Async::Timer::Countdown;
+use IO::Async::SSL;
 use Plack::Request;
 use Plack::Response;
 use Digest::SHA1 qw(sha1_hex);
@@ -94,7 +94,7 @@ Net::Matrix::Webhook - A http->matrix webhook
 
 =head1 VERSION
 
-version 0.900
+version 0.901
 
 =head1 SYNOPSIS
 
@@ -194,11 +194,11 @@ L<validad.com|https://www.validad.com/> for supporting Open Source.
 
 =head1 AUTHOR
 
-Thomas Klausner <domm@cpan.org>
+Thomas Klausner <domm@plix.at>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by Thomas Klausner.
+This software is copyright (c) 2020 - 2021 by Thomas Klausner.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

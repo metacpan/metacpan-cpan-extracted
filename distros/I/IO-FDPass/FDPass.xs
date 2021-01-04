@@ -191,7 +191,10 @@ fd_recv (int socket)
   msg.msg_controllen = CMSG_SPACE (sizeof (int));
 
   if (recvmsg (socket, &msg, 0) <= 0)
-    return -1;
+    {
+      free (buf);
+      return -1;
+    }
 
   int fd = -1;
   errno = EDOM;

@@ -1,3 +1,8 @@
+1.03
+
+- Fixed handling of Atom feeds with content elements having
+  type="xhtml".
+
 1.00
 
 - New on CPAN

@@ -1,3 +1,8 @@
-0.001    2019-01-13 (PERLANCAR)
+0.002   2021-01-01  Released-By: PERLANCAR; Urgency: medium
+
+	- Add XCompletion: lcpan_distname, lcpan_modname.
+
+
+0.001    2019-01-13  Released-By: PERLANCAR
 
          - First release.

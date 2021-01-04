@@ -3,7 +3,7 @@
 ##
 ## watchdiff: watch difference
 ##
-## Copyright (c) 2014- Kazumasa Utashiro
+## Copyright 2014- Kazumasa Utashiro
 ##
 ## Original version on Feb 15 2014
 ##
@@ -22,7 +22,7 @@ use App::sdif;
 my $version = $App::sdif::VERSION;
 
 my $opt_d;
-my $opt_unit;
+my $opt_unit = '';
 my $opt_diff;
 my $opt_date = 1;
 my $opt_refresh = 1;
@@ -178,7 +178,7 @@ exit;
 
 =head1 NAME
 
-watchdiff - repeat command and watch the differences
+watchdiff - repeat command and watch a difference
 
 =head1 SYNOPSIS
 
@@ -212,9 +212,14 @@ Options:
 
 	watchdiff -e uptime -e iostat -e df
 
-	watchdiff -psr --diff 'sdif --no-command -U-1' netstat -S -I en0
+	watchdiff -ps --diff 'sdif --no-command -U-1' netstat -S -I en0
 
 	watchdiff -pc18i10r0 date; say tea is ready
+
+
+=head1 DESCRIPTION
+
+Use C<^C> to terminate.
 
 
 =head1 AUTHOR
@@ -226,7 +231,7 @@ L<https://github.com/kaz-utashiro/sdif-tools>
 
 =head1 LICENSE
 
-Copyright 2014-2020 Kazumasa Utashiro
+Copyright 2014- Kazumasa Utashiro
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

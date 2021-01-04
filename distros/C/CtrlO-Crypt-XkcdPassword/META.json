@@ -1,10 +1,10 @@
 {
    "abstract" : "Yet another xkcd style password generator",
    "author" : [
-      "Thomas Klausner <domm@cpan.org>"
+      "Thomas Klausner <domm@plix.at>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "Dist::Zilla version 6.017, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -13,6 +13,13 @@
       "version" : 2
    },
    "name" : "CtrlO-Crypt-XkcdPassword",
+   "no_index" : {
+      "directory" : [
+         "examples",
+         "t",
+         "xt"
+      ]
+   },
    "prereqs" : {
       "build" : {
          "requires" : {
@@ -47,15 +54,18 @@
             "Pod::Usage" : "0",
             "WordList" : "0",
             "base" : "0",
-            "perl" : "5.010",
-            "strict" : "0",
-            "utf8" : "0",
-            "warnings" : "0"
+            "perl" : "5.010"
          }
       },
       "test" : {
+         "recommends" : {
+            "Bad::Words" : "0.09"
+         },
          "requires" : {
             "File::Spec" : "0",
+            "File::Temp" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
             "Test::Exception" : "0",
             "Test::More" : "0",
             "Test::SharedFork" : "0",
@@ -63,16 +73,31 @@
          }
       }
    },
+   "provides" : {
+      "CtrlO::Crypt::XkcdPassword" : {
+         "file" : "lib/CtrlO/Crypt/XkcdPassword.pm",
+         "version" : "1.009"
+      },
+      "CtrlO::Crypt::XkcdPassword::Wordlist::en_gb" : {
+         "file" : "lib/CtrlO/Crypt/XkcdPassword/Wordlist/en_gb.pm",
+         "version" : "1.009"
+      }
+   },
    "release_status" : "stable",
    "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/domm/CtrlO-Crypt-XkcdPassword/issues"
+      },
+      "homepage" : "https://github.com/domm/CtrlO-Crypt-XkcdPassword",
       "repository" : {
          "type" : "git",
-         "url" : "git://github.com/domm/CtrlO-Crypt-XkcdPassword.git",
+         "url" : "https://github.com/domm/CtrlO-Crypt-XkcdPassword.git",
          "web" : "https://github.com/domm/CtrlO-Crypt-XkcdPassword"
       }
    },
-   "version" : "1.008",
-   "x_generated_by_perl" : "v5.24.0",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0225"
+   "version" : "1.009",
+   "x_generated_by_perl" : "v5.32.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.25",
+   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }
 

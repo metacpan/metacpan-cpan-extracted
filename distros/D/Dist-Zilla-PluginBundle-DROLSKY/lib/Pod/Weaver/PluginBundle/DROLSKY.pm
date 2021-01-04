@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use namespace::autoclean -also => ['_exp'];
 
-our $VERSION = '1.09';
+our $VERSION = '1.11';
 
 use Dist::Zilla::Plugin::PodWeaver;
 use List::Util qw( first );
@@ -52,9 +52,9 @@ sub configure {
     my @weaver_config = (
         '@CorePrep',
         [ '-SingleEncoding' => { encoding => 'UTF-8' } ],
-        [ '-Transformer'    => List => { transformer => 'List' } ],
-        [ '-Transformer' => Verbatim => { transformer => 'Verbatim' } ],
-        [ 'Region'       => 'header' ],
+        [ '-Transformer'    => List     => { transformer => 'List' } ],
+        [ '-Transformer'    => Verbatim => { transformer => 'Verbatim' } ],
+        [ 'Region'          => 'header' ],
         'Name',
         'Version',
         [ 'Region'  => 'prelude' ],
@@ -322,7 +322,7 @@ Pod::Weaver::PluginBundle::DROLSKY - A plugin bundle for pod woven by DROLSKY
 
 =head1 VERSION
 
-version 1.09
+version 1.11
 
 =head1 SYNOPSIS
 

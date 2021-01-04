@@ -1,10 +1,10 @@
 {
    "abstract" : "sdif and family tools, cdif and watchdiff",
    "author" : [
-      "Kazumasa Utashiro"
+      "- Kazumasa Utashiro."
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.1.10",
+   "generated_by" : "Minilla/v3.1.11",
    "license" : [
       "perl_5"
    ],
@@ -46,7 +46,7 @@
             "Getopt::EX::termcolor" : "1.07",
             "List::Util" : "1.45",
             "Term::ReadKey" : "0",
-            "Text::ANSI::Fold" : "2.07",
+            "Text::ANSI::Fold" : "2.08",
             "Text::VisualWidth::PP" : "0.05",
             "Unicode::EastAsianWidth::Detect" : "0",
             "perl" : "v5.14.0"
@@ -82,7 +82,7 @@
       },
       "App::sdif" : {
          "file" : "lib/App/sdif.pm",
-         "version" : "v4.17.0"
+         "version" : "v4.18.1"
       },
       "App::sdif::Divert" : {
          "file" : "lib/App/sdif/Divert.pm"
@@ -114,7 +114,7 @@
          "web" : "https://github.com/kaz-utashiro/sdif-tools"
       }
    },
-   "version" : "4.17.0",
+   "version" : "4.18.1",
    "x_authority" : "cpan:UTASHIRO",
    "x_contributors" : [
       "Kazumasa Utashiro <kaz@utashiro.com>",

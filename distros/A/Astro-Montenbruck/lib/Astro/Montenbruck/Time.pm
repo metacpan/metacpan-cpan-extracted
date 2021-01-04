@@ -7,18 +7,22 @@ our $VERSION = 0.01;
 
 use Exporter qw/import/;
 
-our $SEC_PER_DAY = 86400; # Seconds per day
+our $SEC_PER_DAY = 86400;        # Seconds per day
 our $SEC_PER_CEN = 3155760000;
-our $J2000 = 2451545; # Standard Julian Date for 1.1.2000 12:00
-our $J1900 = 2415020; # Standard Julian Date for  31.12.1899 12:00 (astronomical epoch 1900.0)
-our $SOLAR_TO_SIDEREAL = 1.002737909350795; # Difference in between Sidereal and Solar hour (the former is shorter)
-our $GREGORIAN_START = 15821004; # Start of Gregorian calendar (YYYYMMDD)
-our $JD_UNIX_EPOCH = _gmtime2jd(gmtime(0));  # Standard Julian date for the beginning of Unix epoch, Jan 1 1970 on most Unix systems
+our $J2000       = 2451545;      # Standard Julian Date for 1.1.2000 12:00
+our $J1900       = 2415020
+  ;    # Standard Julian Date for  31.12.1899 12:00 (astronomical epoch 1900.0)
+our $SOLAR_TO_SIDEREAL = 1.002737909350795
+  ;    # Difference in between Sidereal and Solar hour (the former is shorter)
+our $GREGORIAN_START = 15821004;    # Start of Gregorian calendar (YYYYMMDD)
+our $JD_UNIX_EPOCH = _gmtime2jd( gmtime(0) )
+  ; # Standard Julian date for the beginning of Unix epoch, Jan 1 1970 on most Unix systems
 
 our %EXPORT_TAGS = (
     all => [
         qw/jd_cent after_gregorian cal2jd jd2cal jd0 unix2jd jd2mjd mjd2jd
           jd2unix jdnow t1900 jd2gst jd2lst
+          is_leapyear day_of_year
           $SEC_PER_DAY $SEC_PER_CEN $J2000 $J1900 $GREGORIAN_START $JD_UNIX_EPOCH/
     ],
 );
@@ -29,19 +33,19 @@ use POSIX;
 use Astro::Montenbruck::MathUtils qw/polynome ddd frac to_range/;
 
 sub after_gregorian {
-    my $y = shift;
-    my $m = shift;
-    my $d = shift;
-    my %arg = (gregorian_start => $GREGORIAN_START, @_);
+    my $y   = shift;
+    my $m   = shift;
+    my $d   = shift;
+    my %arg = ( gregorian_start => $GREGORIAN_START, @_ );
     return 0 unless defined $arg{gregorian_start};
     polynome( 100, $d, $m, $y ) >= $arg{gregorian_start};
 }
 
 sub cal2jd {
-    my $ye = shift;
-    my $mo = shift;
-    my $da = shift;
-    my %arg = (gregorian_start => $GREGORIAN_START, @_);
+    my $ye  = shift;
+    my $mo  = shift;
+    my $da  = shift;
+    my %arg = ( gregorian_start => $GREGORIAN_START, @_ );
 
     my $j = $da + 1720996.5;
     my ( $m, $y ) = ( $mo > 2 ) ? ( $mo, $ye ) : ( $mo + 12, $ye - 1 );
@@ -51,26 +55,26 @@ sub cal2jd {
     else {
         $j += int( ( $y + 4716 ) / 4 ) - 1181;
     }
-    $j + 365 * $y + floor( 30.6001 * ( $m + 1 ) )
+    $j + 365 * $y + floor( 30.6001 * ( $m + 1 ) );
 }
 
 sub jd2cal {
     my $jd = shift;
-    my %arg = (gregorian => 1, @_);
+    my %arg = ( gregorian => 1, @_ );
 
-    my ( $f, $i ) = modf($jd - $J1900 + 0.5);
-    if ($arg{gregorian} && $i > -115860) {
-        my $a = floor($i / 36524.25 + 9.9835726e-1) + 14;
-        $i += 1 + $a - floor($a / 4);
+    my ( $f, $i ) = modf( $jd - $J1900 + 0.5 );
+    if ( $arg{gregorian} && $i > -115860 ) {
+        my $a = floor( $i / 36524.25 + 9.9835726e-1 ) + 14;
+        $i += 1 + $a - floor( $a / 4 );
     }
 
-    my $b = floor($i / 365.25 + 8.02601e-1);
-    my $c = $i - floor(365.25 * $b + 7.50001e-1) + 416;
-    my $g = floor($c / 30.6001);
-    my $da = $c - floor(30.6001 * $g) + $f;
-    my $mo = $g - ($g > 13.5 ? 13 : 1);
-    my $ye = $b + ($mo < 2.5 ? 1900 : 1899);
-    $ye, $mo, $da
+    my $b  = floor( $i / 365.25 + 8.02601e-1 );
+    my $c  = $i - floor( 365.25 * $b + 7.50001e-1 ) + 416;
+    my $g  = floor( $c / 30.6001 );
+    my $da = $c - floor( 30.6001 * $g ) + $f;
+    my $mo = $g - ( $g > 13.5 ? 13 : 1 );
+    my $ye = $b + ( $mo < 2.5 ? 1900 : 1899 );
+    $ye, $mo, $da;
 }
 
 sub jd0 {
@@ -79,30 +83,24 @@ sub jd0 {
 }
 
 sub unix2jd {
-    $JD_UNIX_EPOCH + $_[0] / $SEC_PER_DAY
+    $JD_UNIX_EPOCH + $_[0] / $SEC_PER_DAY;
 }
 
 sub jd2unix {
-    int( ($_[0] - $JD_UNIX_EPOCH) * $SEC_PER_DAY )
+    int( ( $_[0] - $JD_UNIX_EPOCH ) * $SEC_PER_DAY );
 }
 
 sub _gmtime2jd {
-    cal2jd(
-        $_[5] + 1900,
-        $_[4] + 1,
-        $_[3] + ddd(@_[2, 1, 0]) / 24
-    )
+    cal2jd( $_[5] + 1900, $_[4] + 1, $_[3] + ddd( @_[ 2, 1, 0 ] ) / 24 );
 }
 
-
 sub jdnow {
-    _gmtime2jd(gmtime())
+    _gmtime2jd( gmtime() );
 }
 
 sub jd2mjd {
     $_[0] - $J2000;
 }
-
 
 sub mjd2jd {
     $_[0] + $J2000;
@@ -117,16 +115,13 @@ sub _t {
     ( $jd - $epoch ) / 36525;
 }
 
-
 sub jd_cent {
     _t( $_[0], $J2000 );
 }
 
-
 sub t1900 {
     _t( $_[0], $J1900 );
 }
-
 
 sub jd2gst {
     my $jh = shift;
@@ -141,6 +136,24 @@ sub jd2lst {
     to_range( jd2gst($jd) - $lon / 15, 24 );
 }
 
+sub is_leapyear {
+    my $yr = shift;
+    my %arg = ( gregorian => 1, @_ );
+    $yr = int($yr);
+    return $arg{gregorian}
+      ? ( $yr % 4 == 0 ) && ( ( $yr % 100 != 0 ) || ( $yr % 400 == 0 ) )
+      : $yr % 4 == 0;
+}
+
+sub day_of_year {
+    my $yr = shift;
+    my $mo = shift;
+    my $dy = shift;
+
+    my $k = is_leapyear($yr, @_) ? 1 : 2;
+    $dy = int($dy);
+    int(275 * $mo / 9.0) - ($k * int(($mo + 9) / 12.0)) + $dy - 30
+}
 
 1;
 

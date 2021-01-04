@@ -29,7 +29,7 @@ module. Have I mentioned that it is really small, too?
 package IO::FDPass;
 
 BEGIN {
-   $VERSION = 1.2;
+   $VERSION = 1.3;
 
    require XSLoader;
    XSLoader::load (__PACKAGE__, $VERSION);

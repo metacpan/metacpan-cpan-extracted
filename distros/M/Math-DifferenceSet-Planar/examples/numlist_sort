@@ -55,11 +55,7 @@ Martin Becker, E<lt>becker-cpan-mp I<at> cozap.comE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2019 by Martin Becker, Blaubeuren.  All rights reserved.
-
-This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself, either Perl version 5.10.0 or,
-at your option, any later version of Perl 5 you may have available.
+Copyright (c) 2019-2021 by Martin Becker, Blaubeuren.
 
 =head1 DISCLAIMER OF WARRANTY
 

@@ -1,0 +1,71 @@
+NAME
+    Module::List::More::Patch::Hide - Hide some modules from
+    Module::List::More
+
+VERSION
+    This document describes version 0.001 of Module::List::More::Patch::Hide
+    (from Perl distribution Module-List-More-Patch-Hide), released on
+    2020-09-21.
+
+SYNOPSIS
+     % PERL5OPT=-MModule::List::More::Patch::Hide=-module,'Foo::Bar;Baz' app.pl
+
+    In the above example "app.pl" will think that "Foo::Bar" and "Baz" are
+    not installed even though they might actually be installed.
+
+DESCRIPTION
+    This module can be used to simulate the absence of certain modules. This
+    only works if the application uses Module::List::More's "list_modules()"
+    to check the availability of modules.
+
+    This module works by patching "list_modules()" and strip the target
+    modules from the result.
+
+PATCH CONTENTS
+    *   wrap "list_modules"
+
+PATCH CONFIGURATION
+    *   -module => str
+
+        A string containing semicolon-separated list of module names to
+        hide.
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Module-List-More-Patch-Hide>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Module-List-More-Patch-Hide>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Module-List-More-Patc
+    h-Hide>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    Module::Patch
+
+    Module::List::More
+
+    Module::List::Patch::Hide, Module::List::Wildcard::Patch::Hide,
+    Module::List::Tiny::Patch::Hide
+
+    Module::Path::Patch::Hide, Module::Path::More::Patch::Hide.
+
+    If the application checks he availability of modules by actually trying
+    to "require()" them, you can try: lib::filter, lib::disallow,
+    Devel::Hide.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2020 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

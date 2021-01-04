@@ -5,8 +5,9 @@ use warnings;
 
 # ABSTRACT: run ALL the apps via Bread::Board
 
-our $VERSION = '0.903';
+our $VERSION = '0.904'; # VERSION
 
+use Bread::Board qw();
 use Carp;
 use Module::Runtime qw(use_module);
 use Scalar::Util qw(blessed);
@@ -156,7 +157,7 @@ Bread::Runner - run ALL the apps via Bread::Board
 
 =head1 VERSION
 
-version 0.903
+version 0.904
 
 =head1 SYNOPSIS
 
@@ -314,11 +315,11 @@ L<Klaus Ita|https://metacpan.org/author/KOKI> for feedback & input during inital
 
 =head1 AUTHOR
 
-Thomas Klausner <domm@cpan.org>
+Thomas Klausner <domm@plix.at>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 - 2019 by Thomas Klausner.
+This software is copyright (c) 2016 - 2021 by Thomas Klausner.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

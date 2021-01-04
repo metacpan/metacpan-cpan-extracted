@@ -1,13 +1,13 @@
 #
 # This file is part of Config-Model-TkUI
 #
-# This software is Copyright (c) 2008-2019 by Dominique Dumont.
+# This software is Copyright (c) 2008-2021 by Dominique Dumont.
 #
 # This is free software, licensed under:
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::Tk::CheckListViewer 1.371;
+package Config::Model::Tk::CheckListViewer 1.372;
 
 use strict;
 use warnings;
@@ -105,16 +105,9 @@ sub set_value_help {
     $cw->update_help($cw->{value_help_widget}, join("\n\n", @help));
 }
 
-sub get_info {
+sub cme_object {
     my $cw = shift;
-
-    my @items = ();
-    my $leaf  = $cw->{leaf};
-    if ( defined $leaf->refer_to ) {
-        push @items, "refer_to: " . $leaf->refer_to;
-    }
-    push @items, "ordered: " . ( $leaf->ordered ? 'yes' : 'no' );
-    return $leaf->element_name, @items;
+    return $cw->{leaf};
 }
 
 1;

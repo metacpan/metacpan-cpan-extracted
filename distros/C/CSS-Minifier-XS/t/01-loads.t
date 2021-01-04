@@ -1,5 +1,5 @@
 use strict;
-use Test::More tests=>1;
+use if $ENV{AUTOMATED_TESTING}, 'Test::DiagINC'; use Test::More tests=>1;
 BEGIN {
     use_ok( 'CSS::Minifier::XS' );
 }

@@ -1,5 +1,8 @@
 package Sah::Schemas::CPAN;
 
+# during build by perl >= 5.014, Sah::SchemaR::cpan::pause_id will contain sequence (?^...) which is not supported by perl <= 5.012
+use 5.014;
+
 1;
 # ABSTRACT: Sah schemas related to CPAN
 
@@ -15,7 +18,7 @@ Sah::Schemas::CPAN - Sah schemas related to CPAN
 
 =head1 VERSION
 
-This document describes version 0.010 of Sah::Schemas::CPAN (from Perl distribution Sah-Schemas-CPAN), released on 2020-03-08.
+This document describes version 0.012 of Sah::Schemas::CPAN (from Perl distribution Sah-Schemas-CPAN), released on 2020-01-02.
 
 =head1 SYNOPSIS
 
@@ -29,7 +32,7 @@ Source repository is at L<https://github.com/perlancar/perl-Sah-Schemas-CPAN>.
 
 =head1 BUGS
 
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Sah-Schemas-CPAN>
+Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-Sah-Schemas-CPAN/issues>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
@@ -49,7 +52,7 @@ perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020, 2019, 2018, 2017 by perlancar@cpan.org.
+This software is copyright (c) 2021, 2020, 2019, 2018, 2017 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

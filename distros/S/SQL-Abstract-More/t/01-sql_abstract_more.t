@@ -7,11 +7,10 @@ use SQL::Abstract::More;
 use Test::More;
 use SQL::Abstract::Test import => [qw/is_same_sql_bind/];
 
-use constant N_DBI_MOCK_TESTS =>  2;
-use constant N_BASIC_TESTS    => 68;
-plan tests => (N_BASIC_TESTS + N_DBI_MOCK_TESTS);
-
 diag( "Testing SQL::Abstract::More $SQL::Abstract::More::VERSION, Perl $], $^X" );
+
+use constant N_DBI_MOCK_TESTS =>  2;
+
 
 
 my $sqla = SQL::Abstract::More->new;
@@ -78,6 +77,7 @@ is_same_sql_bind(
   $sql, \@bind,
   "SELECT /*+ FIRST_ROWS (100) */ foo, bar FROM Foo", [],
 );
+
 
 
 # -join
@@ -532,30 +532,31 @@ is_same_sql_bind(
 # select_implicitly_for
 #----------------------------------------------------------------------
 
-$sqla = SQL::Abstract::More->new(
+my $sqla_RO = SQL::Abstract::More->new(
   select_implicitly_for => 'READ ONLY',
  );
 
-($sql, @bind) = $sqla->select(-from => 'Foo');
+($sql, @bind) = $sqla_RO->select(-from => 'Foo');
 is_same_sql_bind(
   $sql, \@bind,
   'SELECT * FROM FOO FOR READ ONLY',  [],
   "select_implicitly_for - basic",
 );
 
-($sql, @bind) = $sqla->select(-from => 'Foo', -for => 'UPDATE');
+($sql, @bind) = $sqla_RO->select(-from => 'Foo', -for => 'UPDATE');
 is_same_sql_bind(
   $sql, \@bind,
   'SELECT * FROM FOO FOR UPDATE',  [],
   "select_implicitly_for - override",
 );
 
-($sql, @bind) = $sqla->select(-from => 'Foo', -for => undef);
+($sql, @bind) = $sqla_RO->select(-from => 'Foo', -for => undef);
 is_same_sql_bind(
   $sql, \@bind,
   'SELECT * FROM FOO',  [],
   "select_implicitly_for - disable",
 );
+
 
 
 #----------------------------------------------------------------------
@@ -571,6 +572,7 @@ is_same_sql_bind(
   $sql, \@bind,
   'INSERT INTO Foo(bar, foo) VALUES (?, ?)',
   [2, 1],
+  "insert - hashref",
 );
 
 # arrayref syntax
@@ -582,7 +584,25 @@ is_same_sql_bind(
   $sql, \@bind,
   'INSERT INTO Foo VALUES (?, ?)',
   [1, 2],
+  "insert - arrayref",
 );
+
+
+# insert .. select
+($sql, @bind) = $sqla->insert(
+  -into    => 'Foo',
+  -columns => [qw/a b/],
+  -select  => {-from => 'Bar', -columns => [qw/x y/]},
+);
+is_same_sql_bind(
+  $sql, \@bind,
+  'INSERT INTO Foo(a, b) SELECT x, y FROM Bar',
+  [],
+  "insert .. select",
+);
+
+
+
 
 # old API
 ($sql, @bind) = $sqla->insert('Foo', {foo => 1, bar => 2}); 
@@ -594,6 +614,29 @@ is_same_sql_bind(
 
 ($sql, @bind) = eval {$sqla->insert(-foo => 3); };
 ok($@, 'unknown arg to insert()');
+
+# add_sql
+($sql, @bind) = $sqla->insert(
+  -into       => 'Foo',
+  -add_sql    => 'IGNORE',    # MySQL syntax
+  -values     => {foo => 1, bar => 2},
+);
+is_same_sql_bind(
+  $sql, \@bind,
+  'INSERT IGNORE INTO Foo(bar, foo) VALUES (?, ?)',
+  [2, 1],
+);
+($sql, @bind) = $sqla->insert(
+  -into       => 'Foo',
+  -add_sql    => 'OR IGNORE',    # SQLite syntax
+  -values     => {foo => 1, bar => 2},
+);
+is_same_sql_bind(
+  $sql, \@bind,
+  'INSERT OR IGNORE INTO Foo(bar, foo) VALUES (?, ?)',
+  [2, 1],
+);
+
 
 
 # returning
@@ -636,20 +679,8 @@ is_same_sql_bind(
 # bind_params
 
 SKIP: {
-  eval "use DBD::Mock; 1"
-    or skip "DBD::Mock does not seem to be installed", N_DBI_MOCK_TESTS;
-  {
-    # DIRTY HACK: remote surgery into DBD::Mock::st to compensate for the
-    # missing support for ternary form of bind_param().
-    require DBD::Mock::st;
-    no warnings 'redefine';
-    my $orig = \&DBD::Mock::st::bind_param;
-    *DBD::Mock::st::bind_param = sub {
-      my ( $sth, $param_num, $val, $attr ) = @_;
-      $val = [$val, $attr] if $attr;
-      return $sth->$orig($param_num, $val);
-    };
-  }
+  eval "use DBD::Mock 1.48; 1"
+    or skip "DBD::Mock 1.48 does not seem to be installed", N_DBI_MOCK_TESTS;
 
   my $dbh = DBI->connect('DBI:Mock:', '', '', {RaiseError => 1});
   my $sth = $dbh->prepare($sql);
@@ -659,11 +690,15 @@ SKIP: {
 
   # test 3-args form of bind_param
   $sth = $dbh->prepare('INSERT INTO Foo(bar, foo) VALUES (?, ?)');
-  @bind= ([123, {pg_type => 99}],
-          [456, {ora_type => 88}]);
+  @bind= ([{dbd_attrs => {pg_type  => 99}}, 123],
+          [{dbd_attrs => {ora_type => 88}}, 456]);
   $sqla->bind_params($sth, @bind);
-  $mock_params = $sth->{mock_params};
-  is_deeply($mock_params, \@bind, 'bind_param($val, \%type)');
+  is_deeply($sth->{mock_params},
+            [map {$_->[1]} @bind],
+            'bind_param($val, \%type) - values');
+  is_deeply($sth->{mock_param_attrs},
+            [map {$_->[0]{dbd_attrs}} @bind],
+            'bind_param($val, \%type) - attrs');
 }
 
 
@@ -771,6 +806,23 @@ is_same_sql_bind(
 
 
 
+# additional keywords
+($sql, @bind) = $sqla->update(
+  -add_sql    => 'IGNORE',   # MySQL syntax
+  -table      => 'Foo',
+  -set        => {foo => 1},
+
+);
+is_same_sql_bind(
+  $sql, \@bind,
+  'UPDATE IGNORE Foo SET foo = ?',
+  [1],
+  'update IGNORE',
+);
+
+
+
+
 #----------------------------------------------------------------------
 # delete
 #----------------------------------------------------------------------
@@ -810,6 +862,22 @@ is_same_sql_bind(
 );
 
 
+# additional keywords
+($sql, @bind) = $sqla->delete(
+  -from => 'Foo',
+  -where => {buz => 3},
+  -add_sql    => 'IGNORE',   # MySQL syntax
+
+);
+is_same_sql_bind(
+  $sql, \@bind,
+  'DELETE IGNORE FROM Foo WHERE buz = ?',
+  [3],
+  'delete IGNORE',
+);
+
+
+
 
 #----------------------------------------------------------------------
 # quote
@@ -842,3 +910,11 @@ is_same_sql_bind(
 
   [],
 );
+
+
+#----------------------------------------------------------------------
+# THE END
+#----------------------------------------------------------------------
+
+
+done_testing();

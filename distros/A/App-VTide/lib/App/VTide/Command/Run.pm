@@ -19,7 +19,7 @@ use IO::Prompt qw/prompt/;
 
 extends 'App::VTide::Command';
 
-our $VERSION = version->new('0.1.13');
+our $VERSION = version->new('0.1.14');
 our $NAME    = 'run';
 our $OPTIONS = [
     'name|n=s',
@@ -114,6 +114,15 @@ sub restart {
             msg  => 'clear screen',
             exec => sub {
                 system "clear";
+                $self->restart($cmd, $no_watch);
+            },
+        },
+        s => {
+            msg  => 'Show command',
+            exec => sub {
+                my $params = $self->params( $cmd );
+                print "\nThis terminals command:\n";
+                print join ' ', $self->command( $params ), "\n\n";
                 $self->restart($cmd, $no_watch);
             },
         },
@@ -376,7 +385,7 @@ App::VTide::Command::Run - Run a terminal command
 
 =head1 VERSION
 
-This documentation refers to App::VTide::Command::Run version 0.1.13
+This documentation refers to App::VTide::Command::Run version 0.1.14
 
 =head1 SYNOPSIS
 

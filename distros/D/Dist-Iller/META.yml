@@ -17,7 +17,7 @@ configure_requires:
   ExtUtils::MakeMaker: '0'
   File::ShareDir::Install: '0.06'
 dynamic_config: 0
-generated_by: 'Dist::Iller version 0.1409, Dist::Zilla version 6.017, CPAN::Meta::Converter version 2.143240'
+generated_by: 'Dist::Iller version 0.1410, Dist::Zilla version 6.017, CPAN::Meta::Converter version 2.143240'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -34,60 +34,60 @@ no_index:
 provides:
   Dist::Iller:
     file: lib/Dist/Iller.pm
-    version: '0.1409'
+    version: '0.1411'
   Dist::Iller::Config:
     file: lib/Dist/Iller/Config.pm
-    version: '0.1409'
+    version: '0.1411'
   Dist::Iller::DocType:
     file: lib/Dist/Iller/DocType.pm
-    version: '0.1409'
+    version: '0.1411'
   Dist::Iller::DocType::Cpanfile:
     file: lib/Dist/Iller/DocType/Cpanfile.pm
-    version: '0.1409'
+    version: '0.1411'
   Dist::Iller::DocType::Dist:
     file: lib/Dist/Iller/DocType/Dist.pm
-    version: '0.1409'
+    version: '0.1411'
   Dist::Iller::DocType::Gitignore:
     file: lib/Dist/Iller/DocType/Gitignore.pm
-    version: '0.1409'
+    version: '0.1411'
   Dist::Iller::DocType::Global:
     file: lib/Dist/Iller/DocType/Global.pm
-    version: '0.1409'
+    version: '0.1411'
   Dist::Iller::DocType::Weaver:
     file: lib/Dist/Iller/DocType/Weaver.pm
-    version: '0.1409'
+    version: '0.1411'
   Dist::Iller::Elk:
     file: lib/Dist/Iller/Elk.pm
-    version: '0.1409'
+    version: '0.1411'
   Dist::Iller::Plugin:
     file: lib/Dist/Iller/Plugin.pm
-    version: '0.1409'
+    version: '0.1411'
   Dist::Iller::Prereq:
     file: lib/Dist/Iller/Prereq.pm
-    version: '0.1409'
+    version: '0.1411'
   Dist::Iller::Role::HasPlugins:
     file: lib/Dist/Iller/Role/HasPlugins.pm
-    version: '0.1409'
+    version: '0.1411'
   Dist::Iller::Role::HasPrereqs:
     file: lib/Dist/Iller/Role/HasPrereqs.pm
-    version: '0.1409'
+    version: '0.1411'
   Dist::Zilla::MintingProfile::DistIller::Basic:
     file: lib/Dist/Zilla/MintingProfile/DistIller/Basic.pm
-    version: '0.1409'
+    version: '0.1411'
   Dist::Zilla::Plugin::DistIller::MetaGeneratedBy:
     file: lib/Dist/Zilla/Plugin/DistIller/MetaGeneratedBy.pm
-    version: '0.1409'
+    version: '0.1411'
 requires:
   Carp: '1.38'
   DateTime: '1.05'
-  Dist::Zilla: '5.000'
+  Dist::Zilla: '6.015'
   File::ShareDir: '1.102'
   File::chdir: '0.1010'
   JSON::MaybeXS: '1.003003'
   List::MoreUtils: '0.408'
   List::Util: '1.45'
   Module::Load: '0.26'
-  Moose: '2.1400'
+  Moose: '2.1803'
   MooseX::AttributeDocumented: '0.1003'
   MooseX::AttributeShortcuts: '0.028'
   MooseX::StrictConstructor: '0.19'
@@ -98,16 +98,16 @@ requires:
   Text::Diff: '1.43'
   Try::Tiny: '0.24'
   Types::Path::Tiny: '0.005'
-  Types::Standard: '1.000000'
+  Types::Standard: '1.000006'
   YAML::Tiny: '1.67'
-  namespace::autoclean: '0.18'
-  perl: '5.010000'
+  namespace::autoclean: '0.22'
+  perl: '5.014000'
   version: '0.9913'
 resources:
   bugtracker: https://github.com/Csson/p5-Dist-Iller/issues
   homepage: https://metacpan.org/release/Dist-Iller
   repository: https://github.com/Csson/p5-Dist-Iller.git
-version: '0.1409'
+version: '0.1411'
 x_Dist_Zilla:
   perl:
     version: '5.020001'
@@ -138,7 +138,7 @@ x_Dist_Zilla:
           check_all_plugins: 1
           check_all_prereqs: 0
           modules: []
-          phase: build
+          phase: release
           run_under_travis: 0
           skip: []
       name: PromptIfStale
@@ -335,7 +335,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::DistIller::MetaGeneratedBy
       name: DistIller::MetaGeneratedBy
-      version: '0.1409'
+      version: '0.1410'
     -
       class: Dist::Zilla::Plugin::Git::Contributors
       config:
@@ -465,7 +465,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::Author::CSSON::GithubActions::Workflow::TestWithMakefile
       name: Author::CSSON::GithubActions::Workflow::TestWithMakefile
-      version: '0.0106'
+      version: '0.0107'
     -
       class: Dist::Zilla::Plugin::Git::Commit
       config:
@@ -494,7 +494,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: '0.1409'
+          tag: '0.1411'
           tag_format: '%v'
           tag_message: 'Release %v%n%n%c'
         Dist::Zilla::Role::Git::Repo:

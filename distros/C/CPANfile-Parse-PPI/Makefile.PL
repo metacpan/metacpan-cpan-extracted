@@ -16,6 +16,7 @@ my %WriteMakefileArgs = (
   "LICENSE" => "artistic_2",
   "NAME" => "CPANfile::Parse::PPI",
   "PREREQ_PM" => {
+    "Carp" => 0,
     "Moo" => "2.003",
     "PPI" => "1.270"
   },
@@ -24,23 +25,28 @@ my %WriteMakefileArgs = (
     "File::Spec" => "3.30",
     "IO::File" => "1.16",
     "JSON::PP" => "2.27",
-    "Test::More" => "0.72"
+    "Test::Exception" => "0.43",
+    "Test::More" => "0.72",
+    "Test::Warn" => "0.36"
   },
-  "VERSION" => "0.02",
+  "VERSION" => "0.04",
   "test" => {
-    "TESTS" => "t/*.t"
+    "TESTS" => "t/*.t t/die/*.t t/warnings/*.t"
   }
 );
 
 
 my %FallbackPrereqs = (
+  "Carp" => 0,
   "File::Basename" => "2.76",
   "File::Spec" => "3.30",
   "IO::File" => "1.16",
   "JSON::PP" => "2.27",
   "Moo" => "2.003",
   "PPI" => "1.270",
-  "Test::More" => "0.72"
+  "Test::Exception" => "0.43",
+  "Test::More" => "0.72",
+  "Test::Warn" => "0.36"
 );
 
 

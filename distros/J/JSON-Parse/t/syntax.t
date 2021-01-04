@@ -5,9 +5,9 @@ use warnings;
 use strict;
 use FindBin '$Bin';
 use Test::More;
-use JSON::Parse 'json_file_to_perl';
+use JSON::Parse 'read_json';
 eval {
-    my $json = json_file_to_perl ("$Bin/syntax-error-1.json");
+    my $json = read_json ("$Bin/syntax-error-1.json");
 };
 note ($@);
 ok (! $@);

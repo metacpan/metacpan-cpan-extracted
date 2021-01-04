@@ -109,7 +109,8 @@ del(Str $key) : Lookup
 
 =method drop
 
-The drop method deletes all data associated with the lookup.
+The drop method returns truthy if the lookup has been destroyed. This operation
+does not cascade.
 
 =signature drop
 

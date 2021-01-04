@@ -1,5 +1,5 @@
 package Treex::Tool::Probe;
-$Treex::Tool::Probe::VERSION = '2.20201228';
+$Treex::Tool::Probe::VERSION = '2.20210102';
 use Treex::Core::Common;
 
 use strict;
@@ -89,7 +89,7 @@ Treex::Tool::Probe
 
 =head1 VERSION
 
-version 2.20201228
+version 2.20210102
 
 =head1 DESCRIPTION
 

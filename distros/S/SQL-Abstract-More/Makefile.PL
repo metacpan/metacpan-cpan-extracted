@@ -29,12 +29,11 @@ test_requires (
 
 requires (
   'MRO::Compat'          => 0,
-  'SQL::Abstract'        => 1.84,
+  'SQL::Abstract'        => 1.85,
   'Params::Validate'     => 0,
   'parent'               => 0,
   'namespace::clean'     => 0,
   'Scalar::Util'         => 0,
-  'Carp'                 => 0,
 );
 
 install_as_cpan;

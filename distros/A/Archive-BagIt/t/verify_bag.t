@@ -4,7 +4,7 @@ BEGIN { chdir 't' if -d 't' }
 use warnings;
 use utf8;
 use open ':std', ':encoding(UTF-8)';
-use Test::More tests => 122;
+use Test::More tests => 139;
 use Test::Exception;
 use strict;
 
@@ -18,8 +18,10 @@ use File::Copy;
 use File::Temp qw(tempdir);
 use File::Slurp qw( read_file write_file);
 
-my $Class = 'Archive::BagIt::Base';
-use_ok($Class);
+my $Class1 = 'Archive::BagIt::Base';
+use_ok($Class1);
+my $Class2 = 'Archive::BagIt::Fast';
+use_ok($Class2);
 
 my @ROOT = grep {length} 'src';
 
@@ -70,18 +72,31 @@ foreach my $prefix (@prefix_manifestfiles) {
             ok($bag_ok2->verify_bag(), "check if bag is verified correctly (with slash)");
             _modify_bag("$bag_dir/$prefix-$alg.txt");
             my $bag_invalid1 = new_ok("Archive::BagIt::Base" => [ bag_path => $bag_dir ]);
-            print "----\n";
+            my $bag_invalid2 = new_ok("Archive::BagIt::Fast" => [ bag_path => $bag_dir ]);
+
             throws_ok(
                 sub {
                     $bag_invalid1->verify_bag(
                         { return_all_errors => 1 }
                     )
                 }, qr{bag verify for bagit version '1.0' failed with invalid files}, "check if bag fails verification of broken $prefix-$alg.txt (all errors)");
-
-            my $bag_invalid2 = new_ok("Archive::BagIt::Base" => [ bag_path => $bag_dir ]);
             throws_ok(
                 sub {
-                    $bag_invalid2->verify_bag()
+                    $bag_invalid2->verify_bag(
+                        { return_all_errors => 1 }
+                    )
+                }, qr{bag verify for bagit version '1.0' failed with invalid files}, "check if bag fails verification of broken $prefix-$alg.txt (all errors)");
+
+
+            my $bag_invalid3 = new_ok("Archive::BagIt::Base" => [ bag_path => $bag_dir ]);
+            throws_ok(
+                sub {
+                    $bag_invalid3->verify_bag()
+                }, qr{digest \($alg\) calculated=.*, but expected=}, "check if bag fails verification of broken $prefix-$alg.txt (first error)");
+            my $bag_invalid4 = new_ok("Archive::BagIt::Fast" => [ bag_path => $bag_dir ]);
+            throws_ok(
+                sub {
+                    $bag_invalid3->verify_bag()
                 }, qr{digest \($alg\) calculated=.*, but expected=}, "check if bag fails verification of broken $prefix-$alg.txt (first error)");
         }
     }
@@ -179,7 +194,7 @@ foreach my $prefix (@prefix_manifestfiles) {
         [qw(../bagit_conformance_suite/v0.97/valid/bag-with-space), "bagit_conformance_suite/v0.97/valid/bag-with-space"],
     );
     note "version 0.97 conformance tests";
-    
+
     foreach my $entry (@should_fail_bags_097) {
         my $bagdir = $entry->[0];
         my $descr = $bagdir; $descr =~ s|../bagit_conformance_suite/||;

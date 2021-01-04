@@ -2,7 +2,7 @@
 
 use strict;
 use warnings;
-use Test::More;
+use if $ENV{AUTOMATED_TESTING}, 'Test::DiagINC'; use Test::More;
 use Data::FormValidator;
 use Data::FormValidator::EmailValid qw(FV_email_filter FV_email);
 

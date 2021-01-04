@@ -11,7 +11,7 @@ use base 'Data::Object::Types::Library';
 
 extends 'Types::Standard';
 
-our $VERSION = '0.22'; # VERSION
+our $VERSION = '0.25'; # VERSION
 
 register {
   name => 'App',
@@ -269,10 +269,13 @@ register {
 };
 
 register {
-  name => 'Task',
+  name => 'Table',
   parent => 'Object',
-  validation => is_instance_of('Zing::Task'),
+  validation => is_instance_of('Zing::Table'),
 };
+
+declare 'TableType',
+  as Enum([qw(channel domain keyval lookup queue repo table)]);
 
 register {
   name => 'Term',
@@ -458,6 +461,47 @@ This type is defined in the L<Zing::Types> library.
 
 =cut
 
+=head2 cursor
+
+  Cursor
+
+This type is defined in the L<Zing::Types> library.
+
+=over 4
+
+=item cursor parent
+
+  Object
+
+=back
+
+=over 4
+
+=item cursor composition
+
+  InstanceOf["Zing::Cursor"]
+
+=back
+
+=over 4
+
+=item cursor example #1
+
+  # given: synopsis
+
+  use Zing::Cursor;
+  use Zing::Lookup;
+
+  my $cursor = Zing::Cursor->new(
+    lookup => Zing::Lookup->new(
+      name => 'people'
+    )
+  );
+
+=back
+
+=cut
+
 =head2 daemon
 
   Daemon
@@ -570,6 +614,42 @@ This type is defined in the L<Zing::Types> library.
 
 =cut
 
+=head2 encoder
+
+  Encoder
+
+This type is defined in the L<Zing::Types> library.
+
+=over 4
+
+=item encoder parent
+
+  Object
+
+=back
+
+=over 4
+
+=item encoder composition
+
+  InstanceOf["Zing::Encoder"]
+
+=back
+
+=over 4
+
+=item encoder example #1
+
+  # given: synopsis
+
+  use Zing::Encoder;
+
+  my $encoder = Zing::Encoder->new;
+
+=back
+
+=cut
+
 =head2 entity
 
   Entity
@@ -637,6 +717,42 @@ This type is defined in the L<Zing::Types> library.
   use Zing::Env;
 
   my $env = Zing::Env->new;
+
+=back
+
+=cut
+
+=head2 error
+
+  Error
+
+This type is defined in the L<Zing::Types> library.
+
+=over 4
+
+=item error parent
+
+  Object
+
+=back
+
+=over 4
+
+=item error composition
+
+  InstanceOf["Zing::Error"]
+
+=back
+
+=over 4
+
+=item error example #1
+
+  # given: synopsis
+
+  use Zing::Error;
+
+  my $error = Zing::Error->new;
 
 =back
 
@@ -711,6 +827,34 @@ This type is defined in the L<Zing::Types> library.
 
   my $scheme = ['MyApp', [], 1];
   my $fork = Zing::Fork->new(scheme => $scheme, parent => Zing::Process->new);
+
+=back
+
+=cut
+
+=head2 id
+
+  ID
+
+This type is defined in the L<Zing::Types> library.
+
+=over 4
+
+=item id composition
+
+  InstanceOf["Zing::ID"]
+
+=back
+
+=over 4
+
+=item id example #1
+
+  # given: synopsis
+
+  use Zing::ID;
+
+  my $id = Zing::ID->new;
 
 =back
 
@@ -916,6 +1060,44 @@ This type is defined in the L<Zing::Types> library.
   use Zing::Process;
 
   my $logic = Zing::Logic->new(process => Zing::Process->new);
+
+=back
+
+=cut
+
+=head2 lookup
+
+  Lookup
+
+This type is defined in the L<Zing::Types> library.
+
+=over 4
+
+=item lookup parent
+
+  Object
+
+=back
+
+=over 4
+
+=item lookup composition
+
+  InstanceOf["Zing::Lookup"]
+
+=back
+
+=over 4
+
+=item lookup example #1
+
+  # given: synopsis
+
+  use Zing::Lookup;
+
+  my $lookup = Zing::Lookup->new(
+    name => 'users'
+  );
 
 =back
 
@@ -1430,6 +1612,44 @@ This type is defined in the L<Zing::Types> library.
   use Zing::Store;
 
   my $store = Zing::Store->new;
+
+=back
+
+=cut
+
+=head2 table
+
+  Table
+
+This type is defined in the L<Zing::Types> library.
+
+=over 4
+
+=item table parent
+
+  Object
+
+=back
+
+=over 4
+
+=item table composition
+
+  InstanceOf["Zing::Table"]
+
+=back
+
+=over 4
+
+=item table example #1
+
+  # given: synopsis
+
+  use Zing::Table;
+
+  my $table = Zing::Table->new(
+    name => 'users'
+  );
 
 =back
 

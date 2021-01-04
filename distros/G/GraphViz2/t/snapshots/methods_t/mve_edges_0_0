@@ -1,0 +1,13 @@
+{
+  'a' => {
+    'b' => [
+      {
+        'attributes' => {
+          'label' => 'a b'
+        },
+        'from_port' => '',
+        'to_port' => ''
+      }
+    ]
+  }
+}

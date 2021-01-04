@@ -4,9 +4,28 @@ TODO
   - RE-write Net::UPnP interfaces as Net:UPnP is not good at error trapping or timeouts.
   - Update error handling for Power::Outlet::Hue->name
 
+0.39 2021-01-01
+  - Updated lib/Power/Outlet/Shelly.pm
+    - Added style method to add support for Shelly Lights and Dimmers.
+    - Dropped unnecessary http_path override
+    - Updated _call api
+    - Fixed version and documentation
+
+0.38 2021-01-01
+  - Added t/003_Shelly_live.psgi - Shelly REST API simulator
+  - Updated t/003_Shelly_live.t - Note: I do not own a Shelly please report any issues.
+  - Fixed lib/Power/Outlet/Shelly.pm
+    - Fixed _index_default
+    - Fixed call to url to clear cache for diff http_path on different calls
+  - Updated lib/Power/Outlet/Shelly.pm - _call api to return hash
+
+0.37 2020-12-31
+  - Added lib/Power/Outlet/Shelly.pm
+  - Added t/003_Shelly_live.t
+
 0.36 2020-12-23
   - Updated lib/Power/Outlet/Virtual.pm - added support for Windows CPAN testers
-  - Updated t/003_Virtual_live.t - addeed support for CPAN testers without a writable temp folder
+  - Updated t/003_Virtual_live.t - added support for CPAN testers without a writable temp folder
   - Updated lib/Power/Outlet/Common/IP/SNMP.pm - added support for perl 5.8
   - Updated scripts/power-outlet-json.cgi - updated Node-Red documentation
 

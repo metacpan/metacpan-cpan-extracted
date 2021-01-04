@@ -19,6 +19,8 @@ t/noplan.t
 t/pod-cm.t
 t/pod.t
 t/search.t
+t/snippets.t
+t/strict.t
 t/unused.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,5 +1,5 @@
 package Treex::Block::Read::Sentences;
-$Treex::Block::Read::Sentences::VERSION = '2.20201228';
+$Treex::Block::Read::Sentences::VERSION = '2.20210102';
 use Moose;
 use Treex::Core::Common;
 extends 'Treex::Block::Read::BaseTextReader';
@@ -36,7 +36,7 @@ Treex::Block::Read::Sentences
 
 =head1 VERSION
 
-version 2.20201228
+version 2.20210102
 
 =head1 SYNOPSIS
 

@@ -55,5 +55,6 @@ my $doc = XML::LibXML->load_html(location => "test-$id/rss2sample.html");
 like($doc->findvalue('//li'), qr/Schröder’s Blog/, "Encoded feed title in the info list");
 is($doc->findvalue('//h3/a[position()=1]'), "Schröder’s Blog", "Encoded feed title");
 is($doc->findvalue('//h3/a[position()=2]'), "Fuß", "Encoded item title");
+is($doc->findvalue('//div[@class="content"]'), "Hello Schröder!", "Encoded item content");
 
 done_testing;

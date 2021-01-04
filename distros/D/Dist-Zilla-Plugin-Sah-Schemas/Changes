@@ -1,3 +1,9 @@
+0.022   2020-11-13  Released-By: PERLANCAR; Urgency: medium
+
+	- Update prereq's new name: Require::Hook::DzilBuild ->
+	  Require::Hook::Source::DzilBuild.
+
+
 0.021   2020-06-13  Released-By: PERLANCAR; Urgency: medium
 
 	- [bugfix] Derp, didn't bump prereq version of Test::Sah::Schema

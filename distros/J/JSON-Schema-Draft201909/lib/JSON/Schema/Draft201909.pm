@@ -1,11 +1,11 @@
 use strict;
 use warnings;
-package JSON::Schema::Draft201909; # git description: v0.018-4-g676ef6e
+package JSON::Schema::Draft201909; # git description: v0.019-12-g3184c99
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Validate data against a schema
 # KEYWORDS: JSON Schema data validation structure specification
 
-our $VERSION = '0.019';
+our $VERSION = '0.020';
 
 use 5.016;  # for fc, unicode_strings features
 no if "$]" >= 5.031009, feature => 'indirect';
@@ -29,7 +29,7 @@ use Types::Standard 1.010002 qw(Bool Int Str HasMethods Enum InstanceOf HashRef 
 use JSON::Schema::Draft201909::Error;
 use JSON::Schema::Draft201909::Result;
 use JSON::Schema::Draft201909::Document;
-use JSON::Schema::Draft201909::Utilities qw(get_type canonical_schema_uri E abort);
+use JSON::Schema::Draft201909::Utilities qw(get_type canonical_schema_uri E abort annotate_self);
 use namespace::clean;
 
 has output_format => (
@@ -54,24 +54,29 @@ has max_traversal_depth => (
 has validate_formats => (
   is => 'ro',
   isa => Bool,
-  default => 0, # as specified by https://json-schema.org/draft/2019-09/schema#/$vocabulary
+  default => 1,
 );
 
 has collect_annotations => (
   is => 'ro',
   isa => Bool,
-  predicate => '_has_collect_annotations',
 );
 
-has format_validations => (
+has annotate_unknown_keywords => (
+  is => 'ro',
+  isa => Bool,
+);
+
+has _format_validations => (
   is => 'bare',
   isa => Dict[
     (map +($_ => Optional[CodeRef]), qw(date-time date time duration email idn-email hostname idn-hostname ipv4 ipv6 uri uri-reference iri iri-reference uuid uri-template json-pointer relative-json-pointer regex)),
     slurpy HashRef[Dict[type => Enum[qw(null object array boolean string number integer)], sub => CodeRef]],
   ],
+  init_arg => 'format_validations',
   handles_via => 'Hash',
   handles => {
-    format_validations => 'elements',
+    _format_validations => 'elements',
   },
   lazy => 1,
   default => sub { {} },
@@ -251,7 +256,7 @@ sub evaluate {
       (map {
         my $val = $config_override->{$_} // $self->$_;
         defined $val ? ( $_ => $val ) : ()
-      } qw(short_circuit collect_annotations validate_formats)),
+      } qw(short_circuit collect_annotations validate_formats annotate_unknown_keywords)),
       %$state,
     };
 
@@ -351,6 +356,8 @@ sub _eval {
 
   my $result = 1;
 
+  my %unknown_keywords = map +($_ => undef), keys %$schema;
+
   foreach my $vocabulary (@{$state->{vocabularies}}) {
     foreach my $keyword ($vocabulary->keywords) {
       next if not exists $schema->{$keyword};
@@ -359,9 +366,12 @@ sub _eval {
       my $method = '_eval_keyword_'.($keyword =~ s/^\$//r);
       $result = 0 if $vocabulary->can($method) and not $vocabulary->$method($data, $schema, $state);
 
+      delete $unknown_keywords{$keyword};
       last if not $result and $state->{short_circuit};
     }
   }
+
+  annotate_self(+{ %$state, keyword => $_ }, $schema) foreach sort keys %unknown_keywords;
 
   @{$state->{annotations}} = @parent_annotations if not $result;
   return $result;
@@ -536,7 +546,7 @@ JSON::Schema::Draft201909 - Validate data against a schema
 
 =head1 VERSION
 
-version 0.019
+version 0.020
 
 =head1 SYNOPSIS
 
@@ -579,8 +589,10 @@ other, or badly-written schemas that could be optimized. Defaults to 50.
 
 =head2 validate_formats
 
-When true, the C<format> keyword will be treated as an assertion, not merely an annotation. Defaults
-to false.
+When false, the C<format> keyword will be treated as an annotation only (that is, no evaluation
+failure will result if the format of the data string is not as specified). When true, the C<format>
+keyword will be treated as an assertion, where failure is possible.
+Defaults to true.
 
 =head2 format_validations
 
@@ -598,9 +610,16 @@ When true, annotations are collected from keywords that produce them, when valid
 These annotations are available in the returned result (see L<JSON::Schema::Draft201909::Result>).
 Defaults to false.
 
+=head2 annotate_unknown_keywords
+
+When true, keywords that are not recognized by any vocabulary are collected as annotations (where
+the value of the annotation is the value of the keyword). L</collect_annotations> must also be true
+in order for this to have any effect.
+Defaults to false (for now).
+
 =head1 METHODS
 
-=for Pod::Coverage BUILD keywords
+=for Pod::Coverage keywords
 
 =head2 evaluate_json_string
 
@@ -632,8 +651,8 @@ or a URI string indicating the location where such a schema is located.
 =back
 
 Optionally, a hashref can be passed as a third parameter which allows changing the values of the
-L</short_circuit>, L</collect_annotations> and/or L</validate_formats> settings for just this
-evaluation call.
+L</short_circuit>, L</collect_annotations>, L</annotate_unknown_keywords> and/or
+L</validate_formats> settings for just this evaluation call.
 
 The result is a L<JSON::Schema::Draft201909::Result> object, which can also be used as a boolean.
 
@@ -667,7 +686,8 @@ or a URI string indicating the location where such a schema is located.
 =back
 
 Optionally, a hashref can be passed as a third parameter which allows changing the values of the
-L</short_circuit>, L</collect_annotations> and/or L</validate_formats> settings for just this
+L</short_circuit>, L</collect_annotations>, L</annotate_unknown_keywords> and/or
+L</validate_formats> settings for just this
 evaluation call.
 
 The result is a L<JSON::Schema::Draft201909::Result> object, which can also be used as a boolean.

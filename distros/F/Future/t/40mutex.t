@@ -157,6 +157,24 @@ use Future::Mutex;
    ok( $mutex->available, 'Mutex is available after chain done' );
 }
 
+# queueing with weakly held intermediates
+{
+   my $mutex = Future::Mutex->new;
+
+   my ( $f1, $f2, $f3, $f4 );
+   my $f = Future->needs_all(
+      $mutex->enter( sub { ( $f1 = Future->new )->then( sub { $f2 = Future->new } ) } ),
+      $mutex->enter( sub { ( $f3 = Future->new )->then( sub { $f4 = Future->new } ) } ),
+   );
+
+   $f1->done;
+   $f2->done;
+   $f3->done;
+   $f4->done;
+
+   ok( $f->is_done, 'Chain is done' );
+}
+
 # counting
 {
    my $mutex = Future::Mutex->new( count => 2 );

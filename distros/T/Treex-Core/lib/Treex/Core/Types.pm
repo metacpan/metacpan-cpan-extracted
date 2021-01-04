@@ -1,5 +1,5 @@
 package Treex::Core::Types;
-$Treex::Core::Types::VERSION = '2.20201228';
+$Treex::Core::Types::VERSION = '2.20210102';
 use strict;
 use warnings;
 use utf8;
@@ -129,7 +129,7 @@ Treex::Core::Types - types used in Treex framework
 
 =head1 VERSION
 
-version 2.20201228
+version 2.20210102
 
 =head1 DESCRIPTION
 

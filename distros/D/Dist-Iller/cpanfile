@@ -1,16 +1,16 @@
-# This file was auto-generated from iller.yaml by Dist::Iller on 2020-12-27 12:40:43 UTC.
+# This file was auto-generated from iller.yaml by Dist::Iller on 2021-01-01 18:53:06 UTC.
 
 on runtime => sub {
     requires 'Carp' => '1.38';
     requires 'DateTime' => '1.05';
-    requires 'Dist::Zilla' => '5.000';
+    requires 'Dist::Zilla' => '6.015';
     requires 'File::ShareDir' => '1.102';
     requires 'File::chdir' => '0.1010';
     requires 'JSON::MaybeXS' => '1.003003';
     requires 'List::MoreUtils' => '0.408';
     requires 'List::Util' => '1.45';
     requires 'Module::Load' => '0.26';
-    requires 'Moose' => '2.1400';
+    requires 'Moose' => '2.1803';
     requires 'MooseX::AttributeDocumented' => '0.1003';
     requires 'MooseX::AttributeShortcuts' => '0.028';
     requires 'MooseX::StrictConstructor' => '0.19';
@@ -21,10 +21,10 @@ on runtime => sub {
     requires 'Text::Diff' => '1.43';
     requires 'Try::Tiny' => '0.24';
     requires 'Types::Path::Tiny' => '0.005';
-    requires 'Types::Standard' => '1.000000';
+    requires 'Types::Standard' => '1.000006';
     requires 'YAML::Tiny' => '1.67';
-    requires 'namespace::autoclean' => '0.18';
-    requires 'perl' => '5.010000';
+    requires 'namespace::autoclean' => '0.22';
+    requires 'perl' => '5.014000';
     requires 'version' => '0.9913';
 };
 on test => sub {
@@ -49,8 +49,7 @@ on configure => sub {
 on develop => sub {
     requires 'Badge::Depot' => '0.0103';
     requires 'Badge::Depot::Plugin::Coverage' => '0';
-    requires 'Badge::Depot::Plugin::Cpantesters' => '0';
-    requires 'Badge::Depot::Plugin::Kwalitee' => '0';
+    requires 'Badge::Depot::Plugin::Githubactions' => '0';
     requires 'Badge::Depot::Plugin::Perl' => '0';
     requires 'Dist::Zilla' => '6.015';
     requires 'Dist::Zilla::Plugin::Author::CSSON::GithubActions::Workflow::TestWithMakefile' => '0.0106';
@@ -125,6 +124,6 @@ on develop => sub {
     requires 'Test::Warnings' => '0.026';
 };
 on develop => sub {
-    suggests 'Dist::Iller' => '0.1409';
-    suggests 'Dist::Iller::Config::Author::CSSON' => '0.0327';
+    suggests 'Dist::Iller' => '0.1410';
+    suggests 'Dist::Iller::Config::Author::CSSON' => '0.0328';
 };

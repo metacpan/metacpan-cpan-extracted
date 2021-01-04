@@ -510,6 +510,8 @@ error handler
 
 =cut
 
+=back
+
 sub error {
   my $self = shift;
   my $err  = shift;

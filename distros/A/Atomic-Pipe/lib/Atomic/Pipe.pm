@@ -2,7 +2,7 @@ package Atomic::Pipe;
 use strict;
 use warnings;
 
-our $VERSION = '0.017';
+our $VERSION = '0.018';
 
 use IO();
 use Fcntl();
@@ -124,7 +124,7 @@ sub fill_buffer {
 
     my $to_read = $self->{+READ_SIZE} || DEFAULT_READ_SIZE();
     if (IS_WIN32 && defined($self->{+READ_BLOCKING}) && !$self->{+READ_BLOCKING}) {
-        $to_read = min($self->_win32_pipe_ready(), READ_SIZE());
+        $to_read = min($self->_win32_pipe_ready(), $to_read);
     }
 
     return 0 unless $to_read;

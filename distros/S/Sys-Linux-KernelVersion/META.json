@@ -62,7 +62,7 @@
    "provides" : {
       "Sys::Linux::KernelVersion" : {
          "file" : "lib/Sys/Linux/KernelVersion.pm",
-         "version" : "0.101"
+         "version" : "0.102"
       }
    },
    "release_status" : "stable",
@@ -76,7 +76,7 @@
          "web" : "https://github.com/simcop2387/sys-linux-kernelversion"
       }
    },
-   "version" : "0.101",
+   "version" : "0.102",
    "x_generated_by_perl" : "v5.32.0",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.23",
    "x_spdx_expression" : "Artistic-2.0"

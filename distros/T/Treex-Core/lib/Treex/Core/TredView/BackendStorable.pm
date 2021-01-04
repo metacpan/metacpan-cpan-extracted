@@ -1,7 +1,7 @@
 package Treex::Core::TredView::BackendStorable;
-$Treex::Core::TredView::BackendStorable::VERSION = '2.20201228';
+$Treex::Core::TredView::BackendStorable::VERSION = '2.20210102';
 package Treex::PML::Backend::Treex::Core::TredView::BackendStorable;
-$Treex::PML::Backend::Treex::Core::TredView::BackendStorable::VERSION = '2.20201228';
+$Treex::PML::Backend::Treex::Core::TredView::BackendStorable::VERSION = '2.20210102';
 use strict;
 use warnings;
 
@@ -58,7 +58,7 @@ Treex::Core::TredView::Backend::Storable - I/O backend for opening .streex files
 
 =head1 VERSION
 
-version 2.20201228
+version 2.20210102
 
 =head1 DESCRIPTION
 

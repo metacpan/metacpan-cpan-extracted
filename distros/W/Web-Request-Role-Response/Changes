@@ -1,5 +1,10 @@
 Revision history for Web::Request::Role::Response
 
+1.006     2021-01-01 18:52:31+01:00
+    - dist housekeeping: github issues,
+      Dist::Zilla::PluginBundle::Author::DOMM
+
+
 1.005	2019-08-01T17:30:28
     - Fixed minor typo in the pod. (Mohammad S Anwar)
 

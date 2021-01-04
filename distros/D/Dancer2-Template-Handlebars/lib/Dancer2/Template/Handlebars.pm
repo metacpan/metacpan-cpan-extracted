@@ -1,4 +1,4 @@
-package Dancer2::Template::Handlebars 0.3;
+package Dancer2::Template::Handlebars 0.4;
 
 # ABSTRACT: Dancer2 wrapper for Handlebars templating engine
 
@@ -85,7 +85,7 @@ Dancer2::Template::Handlebars - Dancer2 wrapper for Handlebars templating engine
 
 =head1 VERSION
 
-version 0.3
+version 0.4
 
 =head1 SYNOPSIS
 
@@ -150,11 +150,11 @@ L<http://cpanratings.perl.org/d/Dancer2-Template-Handlebars>
 
 =head1 AUTHOR
 
-Ruth Holloway <ruth@hiruthie.me>
+D Ruth Holloway <ruth@hiruthie.me>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by Ruth Holloway.
+This software is copyright (c) 2020 by D Ruth Holloway.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

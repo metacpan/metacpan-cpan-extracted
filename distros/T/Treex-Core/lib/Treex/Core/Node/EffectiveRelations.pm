@@ -1,5 +1,5 @@
 package Treex::Core::Node::EffectiveRelations;
-$Treex::Core::Node::EffectiveRelations::VERSION = '2.20201228';
+$Treex::Core::Node::EffectiveRelations::VERSION = '2.20210102';
 use Moose::Role;
 
 # with Moose >= 2.00, this must be present also in roles
@@ -312,7 +312,7 @@ Treex::Core::Node::EffectiveRelations
 
 =head1 VERSION
 
-version 2.20201228
+version 2.20210102
 
 =head1 DESCRIPTION
 

@@ -1,13 +1,13 @@
 #
 # This file is part of Config-Model-TkUI
 #
-# This software is Copyright (c) 2008-2019 by Dominique Dumont.
+# This software is Copyright (c) 2008-2021 by Dominique Dumont.
 #
 # This is free software, licensed under:
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::Tk::NodeViewer 1.371;
+package Config::Model::Tk::NodeViewer 1.372;
 
 use strict;
 use warnings;
@@ -145,19 +145,9 @@ sub reload {
     map { $hl->delete( entry => $_ ); } keys %old_elt;
 }
 
-sub get_info {
+sub cme_object {
     my $cw = shift;
-
-    my $node = $cw->{node};
-
-    my @items = ( 'type : ' . $node->get_type, 'class name : ' . $node->config_class_name, );
-
-    my @rexp = $node->accept_regexp;
-    if (@rexp) {
-        push @items, 'accept : /^' . join( '$/, /^', @rexp ) . '$/';
-    }
-
-    return $node->element_name, @items;
+    return $cw->{node};
 }
 
 1;

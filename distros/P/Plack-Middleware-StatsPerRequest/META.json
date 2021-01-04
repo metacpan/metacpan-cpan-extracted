@@ -1,10 +1,10 @@
 {
    "abstract" : "Measure HTTP stats on each request",
    "author" : [
-      "Thomas Klausner <domm@cpan.org>"
+      "Thomas Klausner <domm@plix.at>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "Dist::Zilla version 6.017, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -13,6 +13,13 @@
       "version" : 2
    },
    "name" : "Plack-Middleware-StatsPerRequest",
+   "no_index" : {
+      "directory" : [
+         "examples",
+         "t",
+         "xt"
+      ]
+   },
    "prereqs" : {
       "build" : {
          "requires" : {
@@ -34,15 +41,17 @@
             "Plack::Util::Accessor" : "0",
             "Time::HiRes" : "0",
             "parent" : "0",
-            "perl" : "5.010",
-            "strict" : "0",
-            "warnings" : "0"
+            "perl" : "5.010"
          }
       },
       "test" : {
          "requires" : {
+            "File::Spec" : "0",
+            "File::Temp" : "0",
             "FindBin" : "0",
             "HTTP::Request::Common" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
             "Log::Any::Test" : "0",
             "Measure::Everything::Adapter" : "0",
             "Plack::Builder" : "0",
@@ -51,15 +60,27 @@
          }
       }
    },
+   "provides" : {
+      "Plack::Middleware::StatsPerRequest" : {
+         "file" : "lib/Plack/Middleware/StatsPerRequest.pm",
+         "version" : "0.902"
+      }
+   },
    "release_status" : "stable",
    "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/domm/Plack-Middleware-StatsPerRequest/issues"
+      },
+      "homepage" : "https://github.com/domm/Plack-Middleware-StatsPerRequest",
       "repository" : {
          "type" : "git",
-         "url" : "git://github.com/domm/Plack-Middleware-StatsPerRequest.git",
+         "url" : "https://github.com/domm/Plack-Middleware-StatsPerRequest.git",
          "web" : "https://github.com/domm/Plack-Middleware-StatsPerRequest"
       }
    },
-   "version" : "0.901",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0225"
+   "version" : "0.902",
+   "x_generated_by_perl" : "v5.32.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.25",
+   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }
 

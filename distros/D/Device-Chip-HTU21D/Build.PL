@@ -11,7 +11,9 @@ my $build = Module::Build->new(
 
       'Data::Bitfield' => '0.02',
       'Device::Chip' => '0.03',
+      'Device::Chip::Sensor' => 0,
       'Future::AsyncAwait' => '0.47', # toplevel await
+      'Future::Mutex' => '0.47', # weaken() bugfix
    },
    test_requires => {
       'Test::Device::Chip::Adapter' => '0.09',

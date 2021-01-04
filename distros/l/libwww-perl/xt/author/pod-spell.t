@@ -75,7 +75,6 @@ FWILES
 Fabian
 Father
 Fesler
-Fiegehenn
 Finch
 Fowler
 Frank
@@ -124,7 +123,6 @@ Joerg
 John
 Jonathan
 Jr
-Julien
 KONISHI
 Kaji
 Kaminsky

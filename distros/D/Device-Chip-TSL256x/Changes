@@ -1,5 +1,11 @@
 Revision history for Device-Chip-TSL256x
 
+0.05    2021-01-02
+        [CHANGES]
+         * Implement the Device::Chip::Sensor API
+         * Add an automatic gain control algorithm
+         * Include POWER setting in read/change config method
+
 0.04    2020-12-15
         [BUGFIXES]
          * Re-packed tarball, removing stale Makefile.PL

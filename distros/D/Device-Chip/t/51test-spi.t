@@ -6,10 +6,12 @@ use warnings;
 use Test::Builder::Tester;
 use Test::More;
 
+use Future::AsyncAwait 0.47;
+
 use Test::Device::Chip::Adapter;
 
 my $adapter = Test::Device::Chip::Adapter->new;
-my $spi = $adapter->make_protocol( 'SPI' )->get;
+my $spi = await $adapter->make_protocol( 'SPI' );
 
 ok( defined $spi, 'defined $spi' );
 
@@ -20,7 +22,7 @@ ok( defined $spi, 'defined $spi' );
    test_out( "ok 1 - ->write" );
 
    $adapter->expect_write( "ABC" );
-   $spi->write( "ABC" )->get;
+   await $spi->write( "ABC" );
    $adapter->check_and_clear( '->write' );
 
    test_test( '->write' );
@@ -35,7 +37,7 @@ ok( defined $spi, 'defined $spi' );
 
    $adapter->expect_readwrite( "ABC" )
       ->returns( "DEF" );
-   is( $spi->readwrite( "ABC" )->get, "DEF", '->readwrite return' );
+   is( await $spi->readwrite( "ABC" ), "DEF", '->readwrite return' );
    $adapter->check_and_clear( '->readwrite' );
 
    test_test( '->readwrite' );

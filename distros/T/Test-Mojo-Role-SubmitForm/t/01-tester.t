@@ -18,6 +18,7 @@ my %form_one = (
     '$"bar' => 42,
     q{©☺♥} => 24,
     meows  => 42,
+    empty_val => "",
 
     mult_a => [qw/A B/],
     mult_b => [qw/C D E/],
@@ -81,6 +82,7 @@ my %form_one = (
             meows  => undef,
             mult_m => [qw/FOO BAR/],
             mult_a => sub { my $r = shift; [ 1, 2, 3, @$r ] },
+            empty_val => "foo",
         })->status_is(200)->json_is({
             %form_one_sans_meows,
             a => '42',
@@ -91,6 +93,7 @@ my %form_one = (
             '©☺♥' => 55,
             mult_m => [qw/FOO BAR/],
             mult_a => [1, 2, 3, qw/A B/],
+            empty_val => "foo",
         })
 }
 

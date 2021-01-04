@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-use 5.010000;
+use 5.014000;
 
 use ExtUtils::MakeMaker;
 
@@ -24,19 +24,19 @@ my %WriteMakefileArgs = (
     "script/iller"
   ],
   "LICENSE" => "perl",
-  "MIN_PERL_VERSION" => "5.010000",
+  "MIN_PERL_VERSION" => "5.014000",
   "NAME" => "Dist::Iller",
   "PREREQ_PM" => {
     "Carp" => "1.38",
     "DateTime" => "1.05",
-    "Dist::Zilla" => "5.000",
+    "Dist::Zilla" => "6.015",
     "File::ShareDir" => "1.102",
     "File::chdir" => "0.1010",
     "JSON::MaybeXS" => "1.003003",
     "List::MoreUtils" => "0.408",
     "List::Util" => "1.45",
     "Module::Load" => "0.26",
-    "Moose" => "2.1400",
+    "Moose" => "2.1803",
     "MooseX::AttributeDocumented" => "0.1003",
     "MooseX::AttributeShortcuts" => "0.028",
     "MooseX::StrictConstructor" => "0.19",
@@ -47,9 +47,9 @@ my %WriteMakefileArgs = (
     "Text::Diff" => "1.43",
     "Try::Tiny" => "0.24",
     "Types::Path::Tiny" => "0.005",
-    "Types::Standard" => "1.000000",
+    "Types::Standard" => "1.000006",
     "YAML::Tiny" => "1.67",
-    "namespace::autoclean" => "0.18",
+    "namespace::autoclean" => "0.22",
     "version" => "0.9913"
   },
   "TEST_REQUIRES" => {
@@ -64,7 +64,7 @@ my %WriteMakefileArgs = (
     "Test::More" => "0.96",
     "syntax" => 0
   },
-  "VERSION" => "0.1409",
+  "VERSION" => "0.1411",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -74,7 +74,7 @@ my %WriteMakefileArgs = (
 my %FallbackPrereqs = (
   "Carp" => "1.38",
   "DateTime" => "1.05",
-  "Dist::Zilla" => "5.000",
+  "Dist::Zilla" => "6.015",
   "ExtUtils::MakeMaker" => 0,
   "File::ShareDir" => "1.102",
   "File::Spec" => 0,
@@ -85,7 +85,7 @@ my %FallbackPrereqs = (
   "List::MoreUtils" => "0.408",
   "List::Util" => "1.45",
   "Module::Load" => "0.26",
-  "Moose" => "2.1400",
+  "Moose" => "2.1803",
   "MooseX::AttributeDocumented" => "0.1003",
   "MooseX::AttributeShortcuts" => "0.028",
   "MooseX::StrictConstructor" => "0.19",
@@ -100,9 +100,9 @@ my %FallbackPrereqs = (
   "Text::Diff" => "1.43",
   "Try::Tiny" => "0.24",
   "Types::Path::Tiny" => "0.005",
-  "Types::Standard" => "1.000000",
+  "Types::Standard" => "1.000006",
   "YAML::Tiny" => "1.67",
-  "namespace::autoclean" => "0.18",
+  "namespace::autoclean" => "0.22",
   "syntax" => 0,
   "version" => "0.9913"
 );

@@ -35,7 +35,8 @@ static void check_end (json_parse_t * parser)
     /* Our collection of bits and pieces. */	\
 						\
     json_parse_t parser_o = {0};		\
-    json_parse_t * parser = & parser_o
+    json_parse_t * parser = & parser_o;		\
+    json_parse_init (parser)
 
 #ifndef NOPERL
 
@@ -92,10 +93,12 @@ json_parse_run (json_parse_t * parser, SV * json)
     switch (NEXTBYTE) {
 
     case '{':
+	INCDEPTH;
 	r = object (parser);
 	break;
 
     case '[':
+	INCDEPTH;
 	r = array (parser);
 	break;
 
@@ -196,10 +199,12 @@ c_validate (json_parse_t * parser)
     switch (NEXTBYTE) {
 
     case '{':
+	INCDEPTH;
 	valid_object (parser);
 	break;
 
     case '[':
+	INCDEPTH;
 	valid_array (parser);
 	break;
 
@@ -287,10 +292,6 @@ c_tokenize (json_parse_t * parser)
     }
 
     check_end (parser);
-#if 0
-    printf ("TOKENS:\n");
-    print_tokens (r);
-#endif /* 0 */
     return r;
 }
 
@@ -298,7 +299,6 @@ static void
 tokenize_free (json_token_t * token)
 {
     json_token_t * next;
-    static int nfree;
     next = token->child;
     if (next) {
 	if (! next->blessed) {
@@ -314,8 +314,6 @@ tokenize_free (json_token_t * token)
 	token->next = 0;
     }
     if (! token->blessed) {
-	//nfree++;
-	//fprintf (stderr, "Free %d %p\n", nfree, token);
 	Safefree (token);
     }
 }

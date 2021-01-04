@@ -176,6 +176,32 @@ sub run_wizard {
 
     $sweat->entertainment( $entertainment ) if defined $entertainment;
 
+    if ($sweat->entertainment && $sweat->newsapi_key) {
+        my $no_news;
+        my $default = 'news';
+        until (defined $no_news) {
+            say "Do you want news or Wikipedia articles? ($default)";
+
+            chomp(my $input = <STDIN>);
+            if ($input =~ /^w/i) {
+                $no_news = 1;
+            }
+            elsif ($input =~ /^n/i) {
+                $no_news = 0;
+            }
+            elsif (not length $input) {
+                last;
+            }
+            else {
+                say 'Please answer "news" or "Wikipedia", or just press '
+                    .'[Return] ';
+                say 'to accept the default answer.';
+            }
+            say q{};
+        }
+        $sweat->newsapi_key( undef ) if $no_news;
+    }
+
     return $sweat;
 }
 

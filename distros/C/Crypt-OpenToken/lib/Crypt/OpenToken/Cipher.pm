@@ -1,6 +1,7 @@
 package Crypt::OpenToken::Cipher;
 
 use Moose::Role;
+use namespace::autoclean;
 
 requires 'keysize';
 requires 'iv_len';

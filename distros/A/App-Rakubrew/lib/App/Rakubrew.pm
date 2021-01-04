@@ -2,7 +2,7 @@ package App::Rakubrew;
 use strict;
 use warnings;
 use 5.010;
-our $VERSION = '14';
+our $VERSION = '15';
 
 use Encode::Locale qw(env);
 if (-t) {
@@ -199,6 +199,11 @@ EOL
     } elsif ($arg eq 'build-rakudo' || $arg eq 'build') {
         my ($impl, $ver, @args) =
             App::Rakubrew::VersionHandling::match_version(@args);
+        if (!$ver) {
+            my @versions = App::Rakubrew::Build::available_rakudos();
+            @versions = grep { /^\d\d\d\d\.\d\d/ } @versions;
+            $ver = $versions[-1];
+        }
 
         if ($impl eq "panda") {
             say "panda is discontinued; please use zef (rakubrew build-zef) instead";
@@ -244,7 +249,7 @@ EOL
 
             # Might have new executables now -> rehash.
             rehash();
-            unless (get_version()) {
+            if (get_version() eq 'system') {
                 set_global_version($name);
             }
             say "Done, $name built";
@@ -256,7 +261,7 @@ EOL
 
         # Might have new executables now -> rehash
         rehash();
-        unless (get_version()) {
+        if (get_version() eq 'system') {
             set_global_version($name);
         }
         say "Done, $name built";
@@ -274,7 +279,7 @@ EOL
 
         # Might have new executables now -> rehash
         rehash();
-        unless (get_version()) {
+        if (get_version() eq 'system') {
             set_global_version("$impl-$ver");
         }
         say "Done, $impl-$ver installed";
@@ -306,11 +311,13 @@ EOL
 
     } elsif ($arg eq 'build-zef') {
         my $version = get_version();
+        my $zef_version = shift(@args);
         if (!$version) {
             say STDERR "$brew_name: No version set.";
             exit 1;
         }
-        App::Rakubrew::Build::build_zef($version);
+        say "Building zef ", $zef_version?$zef_version:"latest";
+        App::Rakubrew::Build::build_zef($version, $zef_version);
         # Might have new executables now -> rehash
         rehash();
         say "Done, built zef for $version";

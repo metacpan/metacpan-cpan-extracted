@@ -155,9 +155,13 @@ sub ldap_sync_add_modify {
   $tt_vars->{server}     = ( split(/\@/, $self->obj->get_value('authorizedService')) )[1]
     if $self->obj->exists('authorizedService');
   $tt_vars->{createdby}  =
-    ( split(/=/, ( split(/,/, $self->obj->get_value('creatorsName')) )[0]) )[1];
+    $self->obj->exists('creatorsName') ?
+    ( split(/=/, ( split(/,/, $self->obj->get_value('creatorsName')) )[0]) )[1] :
+    'UNKNOWN';
   $tt_vars->{modifiedby} =
-    ( split(/=/, ( split(/,/, $self->obj->get_value('modifiersName')) )[0]) )[1];
+    $self->obj->exists('modifiersName') ?
+    ( split(/=/, ( split(/,/, $self->obj->get_value('modifiersName')) )[0]) )[1] :
+    'UNKNOWN';
 
   if ( ! $self->force && -e $out_to &&
        ( generalizedTime_to_time($self->obj->get_value('modifyTimestamp'))

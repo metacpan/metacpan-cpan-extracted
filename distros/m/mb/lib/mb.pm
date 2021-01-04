@@ -5,13 +5,13 @@ package mb;
 #
 # https://metacpan.org/release/mb
 #
-# Copyright (c) 2020 INABA Hitoshi <ina@cpan.org> in a CPAN
+# Copyright (c) 2020, 2021 INABA Hitoshi <ina@cpan.org> in a CPAN
 ######################################################################
 
 use 5.00503;    # Universal Consensus 1998 for primetools
 # use 5.008001; # Lancaster Consensus 2013 for toolchains
 
-$VERSION = '0.16';
+$VERSION = '0.17';
 $VERSION = $VERSION;
 
 # internal use
@@ -231,7 +231,7 @@ sub confess {
     my $i = 0;
     my @confess = ();
     while (my($package,$filename,$line,$subroutine) = caller($i)) {
-        push @confess, "[$i] $filename($line) $package::$subroutine\n";
+        push @confess, "[$i] $filename($line) $package"."::$subroutine\n";
         $i++;
     }
     print STDERR CORE::reverse @confess;
@@ -373,7 +373,7 @@ sub mb::eval {
     return CORE::eval sprintf(<<'END', (caller)[0,2,1], mb::parse());
 package %s;
 #line %s "%s"
-CORE::eval { %s };
+%s
 END
 }
 
@@ -523,16 +523,16 @@ sub mb::require {
 
     # require expr
     else {
-        if (exists $INC{$_}) {
-            undef $@;
-            return 1 if $INC{$_};
-            confess "Compilation failed in require";
-        }
 
         # find expr in @INC
         my $file = $_;
         if (($file =~ s{::}{/}g) or ($file !~ m{[\./\\]})) {
             $file .= '.pm';
+        }
+        if (exists $INC{$file}) {
+            undef $@;
+            return 1 if $INC{$file};
+            confess "Compilation failed in require";
         }
         for my $prefix_file ($file, map { "$_/$file" } @INC) {
             if (-f $prefix_file) {
@@ -2648,6 +2648,38 @@ sub parse_expr {
         $term = 1;
     }
 
+    # mb::use
+    elsif (/\G mb::use \s+ ([A-Za-z_][A-Za-z_0-9]* (?: ::[A-Za-z_][A-Za-z_0-9]*)* ) \s* (.*?) (?=[;\}]|\Z) /xmsgc) {
+        my $module = $1;
+        my $list   = $2;
+        if ($list eq '') {
+            $parsed .= qq{BEGIN { mb::require '$module'; $module->import; }};
+        }
+        elsif (scalar(CORE::eval("()=$list")) == 0) {
+            $parsed .= qq{BEGIN { mb::require '$module'; }};
+        }
+        else {
+            $parsed .= qq{BEGIN { mb::require '$module'; $module->import($list); }};
+        }
+        $term = 1;
+    }
+
+    # mb::no
+    elsif (/\G mb::no \s+ ([A-Za-z_][A-Za-z_0-9]* (?: ::[A-Za-z_][A-Za-z_0-9]*)* ) \s* (.*?) (?=[;\}]|\Z) /xmsgc) {
+        my $module = $1;
+        my $list   = $2;
+        if ($list eq '') {
+            $parsed .= qq{BEGIN { mb::require '$module'; $module->unimport; }};
+        }
+        elsif (scalar(CORE::eval("()=$list")) == 0) {
+            $parsed .= qq{BEGIN { mb::require '$module'; }};
+        }
+        else {
+            $parsed .= qq{BEGIN { mb::require '$module'; $module->unimport($list); }};
+        }
+        $term = 1;
+    }
+
     # mb::getc() --> mb::getc()
     #                       vvvvvvvvvvvvvvvvvvvvvvvvvv
     #                           vvvvvvvvvvvv
@@ -4698,7 +4730,8 @@ mb - run Perl script in MBCS encoding (not only CJK ;-)
     mb::rindex(...);
     mb::rindex_byte(...);
     mb::substr(...);
-    use mb::PERL 'Module';
+    mb::use Module;
+    mb::no Module;
 
   MBCS special variables:
     $mb::PERL
@@ -4968,10 +5001,12 @@ To install this software without make, type the following:
   eval 'string'      ---                ---                eval 'string'           
   require 'file'     ---                ---                require 'file'          
   use Module         ---                ---                use Module              
+  no Module          ---                ---                no Module               
   ---                do 'file'          do 'file'          mb::do 'file'           
   ---                eval 'string'      eval 'string'      mb::eval 'string'       
   ---                require 'file'     require 'file'     mb::require 'file'      
-  ---                use Module         use Module         use mb::PERL 'Module'   
+  ---                use Module         use Module         mb::use Module          
+  ---                no Module          no Module          mb::no Module           
   $^X                ---                ---                $^X                     
   ---                $^X                $^X                $mb::PERL               
   $0                 $0                 $0                 $mb::ORIG_PROGRAM_NAME  
@@ -5063,13 +5098,13 @@ To install this software without make, type the following:
   do 'file'                 mb::do 'file'
   eval 'string'             mb::eval 'string'
   index                     mb::index_byte
-  no Module                 no mb::PERL 'Module'
-  no Module qw(ARGUMENTS)   no mb::PERL Module => qw(ARGUMENTS)
+  no Module                 mb::no Module
+  no Module qw(ARGUMENTS)   mb::no Module qw(ARGUMENTS)
   require 'file'            mb::require 'file'
   rindex                    mb::rindex_byte
-  use Module                use mb::PERL 'Module'
-  use Module qw(ARGUMENTS)  use mb::PERL Module => qw(ARGUMENTS)
-  use Module ()             BEGIN { mb::require Module }
+  use Module                mb::use Module
+  use Module qw(ARGUMENTS)  mb::use Module qw(ARGUMENTS)
+  use Module ()             mb::use Module ()
   -----------------------------------------------------------------
 
 =head1 Porting from script with utf8 pragma
@@ -5087,8 +5122,8 @@ To install this software without make, type the following:
   lc                        ---
   lcfirst                   ---
   length                    mb::length
-  no Module                 no mb::PERL 'Module'
-  no Module qw(ARGUMENTS)   no mb::PERL Module => qw(ARGUMENTS)
+  no Module                 mb::no Module
+  no Module qw(ARGUMENTS)   mb::no Module qw(ARGUMENTS)
   ord                       mb::ord
   require 'file'            mb::require 'file'
   reverse                   mb::reverse
@@ -5096,9 +5131,9 @@ To install this software without make, type the following:
   substr                    mb::substr
   uc                        ---
   ucfirst                   ---
-  use Module                use mb::PERL 'Module'
-  use Module qw(ARGUMENTS)  use mb::PERL Module => qw(ARGUMENTS)
-  use Module ()             BEGIN { mb::require Module }
+  use Module                mb::use Module
+  use Module qw(ARGUMENTS)  mb::use Module qw(ARGUMENTS)
+  use Module ()             mb::use Module ()
   -----------------------------------------------------------------
 
 =head1 What are DAMEMOJI?
@@ -5199,6 +5234,18 @@ To install this software without make, type the following:
   require 'file'                             require 'file'
   mb::require 123                            mb::require 123
   mb::require 'file'                         mb::require 'file'
+  use Module                                 use Module
+  use Module qw(A B C)                       use Module qw(A B C)
+  use Module ()                              use Module ()
+  mb::use Module                             BEGIN { mb::require 'Module'; Module->import; }
+  mb::use Module qw(A B C)                   BEGIN { mb::require 'Module'; Module->import(qw(A B C)); }
+  mb::use Module ()                          BEGIN { mb::require 'Module'; }
+  no Module                                  no Module
+  no Module qw(A B C)                        no Module qw(A B C)
+  no Module ()                               no Module ()
+  mb::no Module                              BEGIN { mb::require 'Module'; Module->unimport; }
+  mb::no Module qw(A B C)                    BEGIN { mb::require 'Module'; Module->unimport(qw(A B C)); }
+  mb::no Module ()                           BEGIN { mb::require 'Module'; }
   chop                                       chop
   lc                                         mb::lc
   lcfirst                                    mb::lcfirst

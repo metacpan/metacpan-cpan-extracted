@@ -1,11 +1,12 @@
 package Plack::App::ServiceStatus;
+
+# ABSTRACT: Check and report status of various services needed by your app
+
+our $VERSION = '0.904'; # VERSION
+
 use 5.018;
 use strict;
 use warnings;
-
-our $VERSION = '0.903';
-
-# ABSTRACT: Check and report status of various services needed by your app
 
 use base 'Class::Accessor::Fast';
 __PACKAGE__->mk_accessors(qw(app version checks));
@@ -112,7 +113,7 @@ Plack::App::ServiceStatus - Check and report status of various services needed b
 
 =head1 VERSION
 
-version 0.903
+version 0.904
 
 =head1 SYNOPSIS
 
@@ -248,11 +249,11 @@ Net::Stomp and a Icinga/Nagios check script.
 
 =head1 AUTHOR
 
-Thomas Klausner <domm@cpan.org>
+Thomas Klausner <domm@plix.at>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by Thomas Klausner.
+This software is copyright (c) 2016 - 2021 by Thomas Klausner.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

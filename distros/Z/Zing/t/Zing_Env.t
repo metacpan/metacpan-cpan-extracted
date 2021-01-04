@@ -55,6 +55,7 @@ host: ro, opt, Maybe[Str]
 piddir: ro, opt, Maybe[Str]
 store: ro, opt, Maybe[Str]
 target: ro, opt, Maybe[Name]
+system: ro, opt, Name
 
 =cut
 

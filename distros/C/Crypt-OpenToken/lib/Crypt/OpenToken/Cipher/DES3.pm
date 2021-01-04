@@ -3,6 +3,7 @@ package Crypt::OpenToken::Cipher::DES3;
 use Moose;
 use Crypt::CBC;
 use Crypt::DES_EDE3;
+use namespace::autoclean;
 
 with 'Crypt::OpenToken::Cipher';
 

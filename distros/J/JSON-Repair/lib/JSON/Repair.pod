@@ -30,20 +30,23 @@ produces output
     }
 
 
-(This example is included as L<F<synopsis.pl>|https://fastapi.metacpan.org/source/BKB/JSON-Repair-0.07/examples/synopsis.pl> in the distribution.)
+(This example is included as L<F<synopsis.pl>|https://fastapi.metacpan.org/source/BKB/JSON-Repair-0.08/examples/synopsis.pl> in the distribution.)
 
 
 =head1 VERSION
 
-This documents version 0.07 of JSON::Repair corresponding to
-git commit L<33380f296af9a5b7a6276d894dada27bbd2a3903|https://github.com/benkasminbullock/json-repair/commit/33380f296af9a5b7a6276d894dada27bbd2a3903> released on Fri Oct 5 10:03:54 2018 +0900.
+This documents version 0.08 of JSON::Repair corresponding to
+git commit L<0d223c0746505268a2a620e28a5917f0de928c3f|https://github.com/benkasminbullock/json-repair/commit/0d223c0746505268a2a620e28a5917f0de928c3f> released on Fri Jan 1 20:19:15 2021 +0900.
 
 =head1 DESCRIPTION
 
 Given some "relaxed" JSON text containing such things as trailing
 commas, comments, or strings containing tab characters or newlines,
 this module uses heuristics to convert these into strictly compliant
-JSON.
+JSON. 
+
+JSON::Repair is an example of the use of the machine-readable
+error messages in L<JSON::Parse>.
 
 =head1 FUNCTIONS
 
@@ -73,7 +76,7 @@ produces output
     {"answer":["bob dylan",42]}
 
 
-(This example is included as L<F<trailing-commas.pl>|https://fastapi.metacpan.org/source/BKB/JSON-Repair-0.07/examples/trailing-commas.pl> in the distribution.)
+(This example is included as L<F<trailing-commas.pl>|https://fastapi.metacpan.org/source/BKB/JSON-Repair-0.08/examples/trailing-commas.pl> in the distribution.)
 
 
 =item Change single quotes to double quotes in keys
@@ -90,31 +93,32 @@ produces output
     {"answer":42}
 
 
-(This example is included as L<F<single-quotes.pl>|https://fastapi.metacpan.org/source/BKB/JSON-Repair-0.07/examples/single-quotes.pl> in the distribution.)
+(This example is included as L<F<single-quotes.pl>|https://fastapi.metacpan.org/source/BKB/JSON-Repair-0.08/examples/single-quotes.pl> in the distribution.)
 
 
 =item Add missing object-end, string-end and array-end markers
 
     
     use JSON::Repair ':all';
-    my $r = repair_json ('{"stuff":["good');
-    print "$r\n";
+    print repair_json (
+        '{"stuff":["good'
+    );
 
 
 produces output
 
     {"stuff":["good"]}
 
-
-(This example is included as L<F<missing-ends.pl>|https://fastapi.metacpan.org/source/BKB/JSON-Repair-0.07/examples/missing-ends.pl> in the distribution.)
+(This example is included as L<F<missing-ends.pl>|https://fastapi.metacpan.org/source/BKB/JSON-Repair-0.08/examples/missing-ends.pl> in the distribution.)
 
 
 =item Add quotes to unquoted keys
 
     
     use JSON::Repair ':all';
-    print repair_json ("{how many roads must a man walk down:42}",
-                       verbose => undef), "\n";
+    print repair_json (
+        "{how many roads must a man walk down:42}"
+    );
     
 
 
@@ -122,8 +126,7 @@ produces output
 
     {"how many roads must a man walk down":42}
 
-
-(This example is included as L<F<unquoted-keys.pl>|https://fastapi.metacpan.org/source/BKB/JSON-Repair-0.07/examples/unquoted-keys.pl> in the distribution.)
+(This example is included as L<F<unquoted-keys.pl>|https://fastapi.metacpan.org/source/BKB/JSON-Repair-0.08/examples/unquoted-keys.pl> in the distribution.)
 
 
 =item Add missing commas to objects and arrays
@@ -142,7 +145,7 @@ produces output
     [1, 2, 3, 4, {"six":7, "eight":9}]
 
 
-(This example is included as L<F<missing-commas.pl>|https://fastapi.metacpan.org/source/BKB/JSON-Repair-0.07/examples/missing-commas.pl> in the distribution.)
+(This example is included as L<F<missing-commas.pl>|https://fastapi.metacpan.org/source/BKB/JSON-Repair-0.08/examples/missing-commas.pl> in the distribution.)
 
 
 =item Remove comments
@@ -170,25 +173,25 @@ This example uses the example from the synopsis of L<JSON::Relaxed>:
       d: "more stuff",
     }
     (RAW)
-    print repair_json ($rjson, verbose => undef);
+    print repair_json ($rjson);
 
 
 produces output
 
     
     {
-        "a ": "Larry",
-      "b ": "Curly",
+      "a" : "Larry",
+      "b" : "Curly",
        
-        "c": [
+      "c": [
          {"a":1, "b":2}
       ],
        
-        "d": "more stuff"
+      "d": "more stuff"
     }
 
 
-(This example is included as L<F<comments.pl>|https://fastapi.metacpan.org/source/BKB/JSON-Repair-0.07/examples/comments.pl> in the distribution.)
+(This example is included as L<F<comments.pl>|https://fastapi.metacpan.org/source/BKB/JSON-Repair-0.08/examples/comments.pl> in the distribution.)
 
 
 This example demonstrates removing hash comments:
@@ -206,11 +209,11 @@ This example demonstrates removing hash comments:
 produces output
 
     {
-        "rate": 1000
+      "rate": 1000
     }
 
 
-(This example is included as L<F<hash-comments.pl>|https://fastapi.metacpan.org/source/BKB/JSON-Repair-0.07/examples/hash-comments.pl> in the distribution.)
+(This example is included as L<F<hash-comments.pl>|https://fastapi.metacpan.org/source/BKB/JSON-Repair-0.08/examples/hash-comments.pl> in the distribution.)
 
 
 The facility to remove hash comments was added in version 0.02 of the
@@ -219,10 +222,12 @@ regexes.
 
 =item Sort out broken numbers
 
-JSON does not allow various kinds of numbers, such as decimals without
-a leading zero, like .123, decimals with an exponent but without a
-fraction, like 1.e9, or integers with a leading zero. JSON::Repair
-adds or removes digits to make them parseable.
+JSON does not allow various kinds of numbers, such as decimals less
+than one without a leading zero, such as C<.123> (should be C<0.123>),
+decimals with an exponent but without a fraction, such as C<1.e9>
+(should be C<1.0e9>), or integers with a leading zero, such as C<0123>
+(should be C<123>). JSON::Repair adds or removes digits to make
+them parseable.
 
     
     use JSON::Repair ':all';
@@ -233,11 +238,11 @@ produces output
 
     [0.123,123,1.0e9]
 
-(This example is included as L<F<numbers.pl>|https://fastapi.metacpan.org/source/BKB/JSON-Repair-0.07/examples/numbers.pl> in the distribution.)
+(This example is included as L<F<numbers.pl>|https://fastapi.metacpan.org/source/BKB/JSON-Repair-0.08/examples/numbers.pl> in the distribution.)
 
 
-JSON::Repair strips leading zeros like 0123 without converting the
-result to octal (base 8). It doesn't attempt to repair hexadecimal
+JSON::Repair strips leading zeros as in C<0123> without converting
+the result to octal (base 8). It doesn't attempt to repair hexadecimal
 (base 16) numbers.
 
 The facility to reinterpret numbers was added in version 0.02 of the
@@ -260,7 +265,7 @@ produces output
     "\t\u0000\n"
 
 
-(This example is included as L<F<strings.pl>|https://fastapi.metacpan.org/source/BKB/JSON-Repair-0.07/examples/strings.pl> in the distribution.)
+(This example is included as L<F<strings.pl>|https://fastapi.metacpan.org/source/BKB/JSON-Repair-0.08/examples/strings.pl> in the distribution.)
 
 
 This was added in version 0.04 of the module.
@@ -314,7 +319,7 @@ produces output
     Deleting comment ' comment'.
     Unexpected character '
     ' at byte 20.
-    Changing 10 into \n.
+    Changing bad byte 31 into \n.
     Unexpected character ''' at byte 31.
     Changing single to double quote.
     Unexpected character 'v' at byte 39.
@@ -333,7 +338,7 @@ produces output
     }
 
 
-(This example is included as L<F<synopsis-verbose.pl>|https://fastapi.metacpan.org/source/BKB/JSON-Repair-0.07/examples/synopsis-verbose.pl> in the distribution.)
+(This example is included as L<F<synopsis-verbose.pl>|https://fastapi.metacpan.org/source/BKB/JSON-Repair-0.08/examples/synopsis-verbose.pl> in the distribution.)
 
 
 =back
@@ -368,8 +373,9 @@ L<Carp> is used to report errors.
 =item Perl 5.14
 
 Unfortunately L<JSON::Parse/diagnostics_hash> is only available for
-Perl 5.14 or later, because it relies on L<perlapi/croak_sv>, which
-was introduced in Perl 5.14. I'm not sure if there is a way to get the
+Perl 5.14 or later, because it relies on L<croak_sv in
+perlapi|https://perldoc.perl.org/perlapi#croak_sv>, which was
+introduced in Perl 5.14. I'm not sure if there is a way to get the
 same behaviour with earlier versions of Perl.
 
 =back
@@ -430,7 +436,7 @@ Ben Bullock, <bkb@cpan.org>
 =head1 COPYRIGHT & LICENCE
 
 This package and associated files are copyright (C) 
-2016-2018
+2016-2021
 Ben Bullock.
 
 You can use, copy, modify and redistribute this package and associated

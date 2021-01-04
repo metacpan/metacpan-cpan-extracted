@@ -15,7 +15,7 @@ use constant _F_DATA     => 0;  # result set object
 use constant _F_PATH     => 1;  # result set object
 use constant _NFIELDS    => 2;
 
-our $VERSION  = '0.008';
+our $VERSION  = '0.009';
 our @CARP_NOT = qw(Math::DifferenceSet::Planar);
 
 our $DATABASE_DIR = dist_dir('Math-DifferenceSet-Planar');
@@ -124,7 +124,7 @@ Math::DifferenceSet::Planar::Data - storage of sample planar difference sets
 
 =head1 VERSION
 
-This documentation refers to version 0.008 of
+This documentation refers to version 0.009 of
 Math::DifferenceSet::Planar::Data.
 
 =head1 SYNOPSIS
@@ -171,8 +171,9 @@ C<$VERSION> is the version number of the module.
 =item I<$DATABASE_DIR>
 
 C<$DATABASE_DIR> is the directory containing databases for this module.
-It is initialized automatically to refer to the location where its data
-has been installed.
+It is initialized automatically to refer to the location where its
+data has been installed.  It may be set to another absolute path before
+calling I<new>.
 
 =back
 
@@ -303,11 +304,10 @@ Martin Becker, E<lt>becker-cpan-mp I<at> cozap.comE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2019 by Martin Becker, Blaubeuren.  All rights reserved.
+Copyright (c) 2019-2021 by Martin Becker, Blaubeuren.
 
-This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself, either Perl version 5.10.0 or,
-at your option, any later version of Perl 5 you may have available.
+This library is free software; you can distribute it and/or modify it
+under the terms of the Artistic License 2.0 (see the LICENSE file).
 
 =head1 DISCLAIMER OF WARRANTY
 

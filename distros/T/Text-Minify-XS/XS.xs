@@ -18,10 +18,17 @@ STATIC U8* TextMinify(pTHX_ U8* src, STRLEN len, STRLEN* packed) {
   if (!dest) /* malloc failed */
     return dest;
 
+  /* initialize to end-of-string in case string contains only spaces */
+  *dest = NULL;
+
   U8* end = src + len;
   U8* ptr = dest;
   U8* leading = ptr;
   U8* trailing = NULL;
+
+  if (len == 0) {
+    return src;
+  }
 
   while (len) {
 

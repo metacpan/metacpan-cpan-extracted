@@ -1,7 +1,7 @@
 package Org::Element::FixedWidthSection;
 
-our $DATE = '2020-09-17'; # DATE
-our $VERSION = '0.553'; # VERSION
+our $DATE = '2020-12-30'; # DATE
+our $VERSION = '0.554'; # VERSION
 
 use 5.010;
 use locale;
@@ -32,7 +32,7 @@ Org::Element::FixedWidthSection - Represent Org fixed-width section
 
 =head1 VERSION
 
-This document describes version 0.553 of Org::Element::FixedWidthSection (from Perl distribution Org-Parser), released on 2020-09-17.
+This document describes version 0.554 of Org::Element::FixedWidthSection (from Perl distribution Org-Parser), released on 2020-12-30.
 
 =head1 SYNOPSIS
 
@@ -82,7 +82,7 @@ Source repository is at L<https://github.com/perlancar/perl-Org-Parser>.
 
 =head1 BUGS
 
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Org-Parser>
+Please report any bugs or feature requests on the bugtracker website L<https://github.com/perlancar/perl-Org-Parser/issues>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired

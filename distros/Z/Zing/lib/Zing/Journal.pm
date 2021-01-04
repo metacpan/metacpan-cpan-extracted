@@ -13,7 +13,7 @@ use Data::Object::ClassHas;
 
 extends 'Zing::Channel';
 
-our $VERSION = '0.22'; # VERSION
+our $VERSION = '0.25'; # VERSION
 
 # ATTRIBUTES
 
