@@ -1,6 +1,7 @@
 package Form::Tiny::Strict;
 
-use v5.10; use warnings;
+use v5.10;
+use warnings;
 use Types::Standard qw(Bool);
 
 use Form::Tiny::Error;
@@ -18,7 +19,7 @@ sub join_path
 
 use Moo::Role;
 
-our $VERSION = '1.01';
+our $VERSION = '1.11';
 
 use constant META_SKIP => "skip";
 use constant META_ARRAY => "array";

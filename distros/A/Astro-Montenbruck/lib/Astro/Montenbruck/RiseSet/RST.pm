@@ -112,27 +112,38 @@ sub rst_function {
         }
         die "m is out of range: $m" unless ( 0 <= $m ) && ( $m <= 1 );
 
+        my $err;
         for ( 0 .. $arg{max_iter} ) {
             my $m0 = $m;
             my $theta0 =
               deg2rad( reduce_deg( rad2deg($gstm) + 360.985647 * $m ) );
             my $n  = $m + $dt;
-            my $ra = _interpolate_angle3( $n, \@alpha );
+            my $ra = _interpolate_angle3( $n, \@alpha);
             my $h1 = diff_angle( 0, $theta0 - $lambda - $ra, 'radians' );
+           
             my $dm = do {
-                given ($evt) {
-                    -( $h1 / pi2 ) when $EVT_TRANSIT;
-                    default {
-                        my $de = _interpolate3( $n, \@delta );
-                        my ( $az, $alt ) = map { deg2rad($_) }
-                          equ2hor( map { rad2deg($_) } ( $h1, $de, $phi ) );
-                        ( $alt - $h ) /
-                          ( pi2 * cos($de) * cos($phi) * sin($h1) );
+                eval {
+                    given ($evt) {
+                        -( $h1 / pi2 ) when $EVT_TRANSIT;
+                        default {
+                            eval {
+                                my $de = _interpolate3( $n, \@delta );
+                                my ( $az, $alt ) = map { deg2rad($_) } equ2hor(
+                                    map { rad2deg($_) } ( $h1, $de, $phi ) 
+                                );
+                                ( $alt - $h ) /  ( pi2 * cos($de) * cos($phi) * sin($h1) );
+                            };
+                            if ($@) {
+                                $err = $@;
+                                warn "$evt: $err";
+                                0;
+                            }
+                        }
                     }
-                }
+                };
             };
             $m += $dm;
-            if ( abs( $m - $m0 ) < $delta ) {
+            if ( abs( $m - $m0 ) < $delta || $err ) {
                 $arg{on_event}->( $jdm + $m );
                 return;
             }
@@ -259,7 +270,7 @@ Sergey Krushinsky, C<< <krushi at cpan.org> >>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2010-2020 by Sergey Krushinsky
+Copyright (C) 2010-2021 by Sergey Krushinsky
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

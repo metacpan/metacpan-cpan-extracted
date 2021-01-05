@@ -140,7 +140,7 @@ __END__
 
 =head1 NAME
 
-Astro::Montenbruck::Core::MathUtils - Core mathematical routines used by AstroScript modules.
+Astro::Montenbruck::Core::MathUtils - Core mathematical routines used by Astro::Montenbruck modules.
 
 =head1 VERSION
 
@@ -495,7 +495,7 @@ Sergey Krushinsky, C<< <krushi at cpan.org> >>
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright 2009-2020 Sergey Krushinsky.
+Copyright 2009-2021 Sergey Krushinsky.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

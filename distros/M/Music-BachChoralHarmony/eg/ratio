@@ -25,6 +25,8 @@ for my $id ( keys %$songs ) {
 }
 
 for my $id ( keys %score ) {
-    $score{$id}->{ratio} = $score{$id}->{minor} / $score{$id}->{major};
+    $score{$id}->{ratio} = $score{$id}->{minor} / ($score{$id}->{major} + $score{$id}->{minor});
 }
-use Data::Dumper;warn(Dumper\%score);
+
+my @sorted = map { "$_ => $score{$_}->{ratio}" } sort { $score{$a}->{ratio} <=> $score{$b}->{ratio} } keys %score;
+use Data::Dumper;warn Dumper\@sorted;

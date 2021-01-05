@@ -1,6 +1,7 @@
 package Form::Tiny::FieldDefinition;
 
-use v5.10; use warnings;
+use v5.10;
+use warnings;
 use Moo;
 use Types::Standard qw(Enum Bool HasMethods CodeRef Maybe Str);
 use Types::Common::String qw(NonEmptySimpleStr);
@@ -11,7 +12,7 @@ use Form::Tiny::Error;
 
 use namespace::clean;
 
-our $VERSION = '1.01';
+our $VERSION = '1.11';
 
 our $nesting_separator = q{.};
 our $array_marker = q{*};
@@ -155,7 +156,8 @@ sub validate
 					);
 				}
 				else {
-					$exception = Form::Tiny::Error::DoesNotValidate->new({
+					$exception = Form::Tiny::Error::DoesNotValidate->new(
+						{
 							field => $self->name,
 							error => $exception,
 						}
@@ -166,7 +168,8 @@ sub validate
 			}
 		}
 		else {
-			my $exception = Form::Tiny::Error::DoesNotValidate->new({
+			my $exception = Form::Tiny::Error::DoesNotValidate->new(
+				{
 					field => $self->name,
 					error => $error,
 				}

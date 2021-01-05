@@ -3,11 +3,11 @@
 use 5.22.0;
 use strict;
 no warnings qw/experimental/;
-use feature qw/state switch/;
+use feature qw/switch/;
 
 use utf8;
 use FindBin qw/$Bin/;
-use lib ("$Bin/lib", "$Bin/../lib");
+use lib ("$Bin/../lib");
 use Getopt::Long qw/GetOptions/;
 use Pod::Usage qw/pod2usage/;
 use DateTime;
@@ -20,9 +20,8 @@ use Astro::Montenbruck::Ephemeris::Planet qw/@PLANETS/;
 use Astro::Montenbruck::Time qw/jd2unix cal2jd/;
 use Astro::Montenbruck::RiseSet::Constants qw/:events :twilight/;
 use Astro::Montenbruck::RiseSet qw/:all/;
-use Helpers qw/parse_datetime parse_geocoords format_geo hms_str
-               $LOCALE @DEFAULT_PLACE/;
-use Display qw/%LIGHT_THEME %DARK_THEME print_data/;
+use Astro::Montenbruck::Utils::Helpers qw/parse_datetime parse_geocoords format_geo hms_str local_now current_timezone @DEFAULT_PLACE/;
+use Astro::Montenbruck::Utils::Display qw/%LIGHT_THEME %DARK_THEME print_data/;
 
 binmode(STDOUT, ":encoding(UTF-8)");
 
@@ -104,12 +103,12 @@ sub process_twilight {
     }
 }
 
-my $now = DateTime->now()->set_locale($LOCALE);
+my $now = local_now();
 
 my $man     = 0;
 my $help    = 0;
 my $date    = $now->strftime('%F');
-my $tzone   = $now->strftime('%z');
+my $tzone   = current_timezone();
 my @place;
 my $theme    = 'dark';
 my $twilight = $TWILIGHT_NAUTICAL;

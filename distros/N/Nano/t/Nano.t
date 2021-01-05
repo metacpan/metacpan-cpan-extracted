@@ -28,6 +28,7 @@ Minimalist Object Persistence
 =includes
 
 method: dump
+method: hash
 method: find
 method: keyval
 method: name
@@ -186,6 +187,24 @@ dump(Object $object) : HashRef
 
 =cut
 
+=method hash
+
+The hash method returns a SHA-1 digest for the string provided.
+
+=signature hash
+
+hash(Str $name) : Str
+
+=example-1 hash
+
+  my $nano = Nano->new;
+
+  my $email = 'me@example.com';
+
+  $nano->hash($email);
+
+=cut
+
 =method find
 
 The find method finds, inflates, and returns a prior persisted object for the
@@ -329,6 +348,13 @@ $subs->example(-1, 'find', 'method', fun($tryable) {
   is $result->id, 'phoebe';
   is $result->name, 'phoebe';
   ok $result->friends;
+
+  $result
+});
+
+$subs->example(-1, 'hash', 'method', fun($tryable) {
+  ok my $result = $tryable->result;
+  isnt $result, 'me@example.com';
 
   $result
 });

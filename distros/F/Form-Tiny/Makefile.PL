@@ -15,6 +15,7 @@ WriteMakefile(
 	PREREQ_PM => {
 		"Moo" => "0",
 		"Type::Tiny" => "1.004000",
+		"Import::Into" => "0",
 		"namespace::clean" => "0",
 	},
 

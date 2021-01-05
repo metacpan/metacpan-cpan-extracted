@@ -12,11 +12,11 @@ use parent qw/ Plack::Middleware /;
 use Plack::Util;
 use Plack::Util::Accessor qw/ path type /;
 use Ref::Util qw/ is_arrayref is_coderef /;
-use Text::Minify::XS v0.3.3 ();
+use Text::Minify::XS v0.3.6 ();
 
 # RECOMMEND PREREQ:  Ref::Util::XS
 
-our $VERSION = 'v0.1.3';
+our $VERSION = 'v0.1.4';
 
 sub call {
     my ($self, $env) = @_;
@@ -91,7 +91,7 @@ Plack::Middleware::Text::Minify - minify text responses on the fly
 
 =head1 VERSION
 
-version v0.1.3
+version v0.1.4
 
 =head1 SYNOPSIS
 

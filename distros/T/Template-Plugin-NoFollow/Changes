@@ -1,5 +1,10 @@
 Revision history for Perl extension Template::Plugin::NoFollow
 
+1.03      2021-01-04 22:49:16-08:00 America/Vancouver
+    - Switch to Dist::Zilla for release management
+    - POD cleanups; whitespace, spelling
+    - Move to GitHub
+
 1.02    Fri Apr 23 22:11 PDT 2010
     - Switch to Git
 

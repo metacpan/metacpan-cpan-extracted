@@ -17,7 +17,7 @@ extends 'Zing::Entity';
 use Zing::Store;
 use Zing::Term;
 
-our $VERSION = '0.25'; # VERSION
+our $VERSION = '0.26'; # VERSION
 
 # ATTRIBUTES
 

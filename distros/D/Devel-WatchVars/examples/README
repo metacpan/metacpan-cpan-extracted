@@ -1,0 +1,6 @@
+To run these example scripts before module installation, you must
+explicitly include the library directory on the command line.
+For example:
+
+    perl -Ilib examples/simple.plx
+

@@ -44,7 +44,7 @@ our @EXPORT_OK = qw(get post put delete postData putData postFile putFile);
 ## CONSTANTS
 #####
 our $TIMEOUT = 10;
-our $VERSION = "1.3.3";
+our $VERSION = "1.3.4.1";
 #####
 ## VARIABLES
 #####
@@ -274,7 +274,7 @@ sub putFile() {	# for compatibility only, must use a ... what ? File path or fil
 	my $mimetype = shift;
 	my $data = shift;
 
-	reeturn $self->putData($endpoint, $mimetype, $data);
+	return $self->putData($endpoint, $mimetype, $data);
 
 }
 sub putData() {		# endpoint, mimetype, data

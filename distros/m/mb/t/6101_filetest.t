@@ -5,6 +5,7 @@ die "This script is for perl only. You are using $^X.\n" if $^X =~ /jperl/i;
 use strict;
 use FindBin;
 use File::Path;
+use File::Basename;
 use lib "$FindBin::Bin/../lib";
 use mb;
 mb::set_script_encoding('sjis');
@@ -27,14 +28,15 @@ BEGIN {
 @test = ();
 my $endchar = (qw( A B ƒ\ ))[0];
 
-BEGIN {
-    # make working directory
-    File::Path::mkpath("$FindBin::Bin/temp", 0, 0777);
-}
+# make working directory
+use vars qw($tempdir $scriptno);
+($scriptno) = File::Basename::basename(__FILE__) =~ /\A([0-9]+)/;
+$tempdir = "$FindBin::Bin/$scriptno.$$.temp";
+File::Path::mkpath($tempdir, 0, 0777);
 
 END {
     # remove testee file
-    File::Path::rmtree("$FindBin::Bin/temp", 0, 1);
+    rmdir($tempdir);
 }
 
 my @tester = 
@@ -57,7 +59,7 @@ for my $tester (@tester) {
         return 'SKIP' if not ((length($endchar) == 1) or $MSWin32_MBCS);
 
         # make testee file
-        my $filename = "$FindBin::Bin/temp/NOTEXISTS";
+        my $filename = "$tempdir/NOTEXISTS";
 
         # do test file
         my $a = CORE::eval(qq{$tester "$filename.A"});
@@ -86,7 +88,7 @@ for my $tester (@tester) {
         return 'SKIP' if not ((length($endchar) == 1) or $MSWin32_MBCS);
 
         # make testee file
-        my $filename = "$FindBin::Bin/temp/NOTEXISTS";
+        my $filename = "$tempdir/NOTEXISTS";
 
         # do test file
         my $a = CORE::eval(qq{$tester "$filename.A"});
@@ -116,7 +118,7 @@ for my $tester (@tester) {
         return 'SKIP' if not ((length($endchar) == 1) or $MSWin32_MBCS);
 
         # make testee file
-        my $filename = "$FindBin::Bin/temp/NOTEXISTS";
+        my $filename = "$tempdir/NOTEXISTS";
 
         # do test file
         my $a = CORE::eval(qq{$tester "$filename.A"});
@@ -162,7 +164,7 @@ for my $tester (@tester) {
             return 'SKIP' if not ((length($endchar) == 1) or $MSWin32_MBCS);
 
             # make testee file
-            my $filename = "$FindBin::Bin/temp/testee";
+            my $filename = "$tempdir/testee";
             open(FILE,">$filename.A");
             binmode(FILE);
             print FILE $content;
@@ -205,7 +207,7 @@ for my $tester (@tester) {
             return 'SKIP' if not ((length($endchar) == 1) or $MSWin32_MBCS);
 
             # make testee file
-            my $filename = "$FindBin::Bin/temp/testee";
+            my $filename = "$tempdir/testee";
             open(FILE,">$filename.A");
             binmode(FILE);
             print FILE $content;
@@ -249,7 +251,7 @@ for my $tester (@tester) {
             return 'SKIP' if not ((length($endchar) == 1) or $MSWin32_MBCS);
 
             # make testee file
-            my $filename = "$FindBin::Bin/temp/testee";
+            my $filename = "$tempdir/testee";
             open(FILE,">$filename.A");
             binmode(FILE);
             print FILE $content;
@@ -303,7 +305,7 @@ for my $tester (@tester) {
             return 'SKIP' if not ((length($endchar) == 1) or $MSWin32_MBCS);
 
             # make testee file
-            my $filename = "$FindBin::Bin/temp/testee";
+            my $filename = "$tempdir/testee";
             open(FILE,">$filename.EXE");
             binmode(FILE);
             print FILE $content;
@@ -340,7 +342,7 @@ for my $tester (@tester) {
             return 'SKIP' if not ((length($endchar) == 1) or $MSWin32_MBCS);
 
             # make testee file
-            my $filename = "$FindBin::Bin/temp/testee";
+            my $filename = "$tempdir/testee";
             open(FILE,">$filename.EXE");
             binmode(FILE);
             print FILE $content;
@@ -378,7 +380,7 @@ for my $tester (@tester) {
             return 'SKIP' if not ((length($endchar) == 1) or $MSWin32_MBCS);
 
             # make testee file
-            my $filename = "$FindBin::Bin/temp/testee";
+            my $filename = "$tempdir/testee";
             open(FILE,">$filename.EXE");
             binmode(FILE);
             print FILE $content;
@@ -429,7 +431,7 @@ for my $tester (@tester) {
             return 'SKIP' if not ((length($endchar) == 1) or $MSWin32_MBCS);
 
             # make testee directory
-            my $filename = "$FindBin::Bin/temp/testee";
+            my $filename = "$tempdir/testee";
             mkdir("$filename.A",        $mode);
             mkdir("$filename.$endchar", $mode);
 
@@ -464,7 +466,7 @@ for my $tester (@tester) {
             return 'SKIP' if not ((length($endchar) == 1) or $MSWin32_MBCS);
 
             # make testee directory
-            my $filename = "$FindBin::Bin/temp/testee";
+            my $filename = "$tempdir/testee";
             mkdir("$filename.A",        $mode);
             mkdir("$filename.$endchar", $mode);
 
@@ -500,7 +502,7 @@ for my $tester (@tester) {
             return 'SKIP' if not ((length($endchar) == 1) or $MSWin32_MBCS);
 
             # make testee directory
-            my $filename = "$FindBin::Bin/temp/testee";
+            my $filename = "$tempdir/testee";
             mkdir("$filename.A",        $mode);
             mkdir("$filename.$endchar", $mode);
 

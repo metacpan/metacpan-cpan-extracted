@@ -8,7 +8,6 @@ do { my $x = {
                       'requires' => {
                                       'Pod::Coverage::TrustPod' => '0',
                                       'Test::CPAN::Changes' => '0.19',
-                                      'Test::Code::TidyAll' => '0.50',
                                       'Test::EOL' => '0',
                                       'Test::Mojibake' => '0',
                                       'Test::More' => '0.96',

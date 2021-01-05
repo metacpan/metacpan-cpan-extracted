@@ -11,6 +11,7 @@ cpanfile
 dist.ini
 lib/Atomic/Pipe.pm
 t/burst.t
+t/epipe.t
 t/fifo.t
 t/ipc.t
 t/mixed_data_mode.t

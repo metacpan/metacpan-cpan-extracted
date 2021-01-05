@@ -4,7 +4,7 @@ use 5.008_001;
 use strict;
 use warnings;
 
-our $VERSION = '0.16';
+our $VERSION = '0.17';
 
 use XSLoader;
 XSLoader::load(__PACKAGE__, $VERSION);
@@ -130,7 +130,7 @@ Test::LeakTrace - Traces memory leaks
 
 =head1 VERSION
 
-This document describes Test::LeakTrace version 0.15.
+This document describes Test::LeakTrace version 0.17.
 
 =head1 SYNOPSIS
 

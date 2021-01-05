@@ -27,6 +27,7 @@ my $builder = Module::Build->new(
         #'Log::Log4perl' => '1.49',
         'DateTime'        => '1.44',
         'DateTime::Format::Strptime' => '1.76',
+        'List::MoreUtils'  => '0.43',
     },
     add_to_cleanup        => [ 'Astro-*' ],
 );

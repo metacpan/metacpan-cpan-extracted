@@ -4,7 +4,7 @@ Plack::Middleware::Text::Minify - minify text responses on the fly
 
 # VERSION
 
-version v0.1.3
+version v0.1.4
 
 # SYNOPSIS
 

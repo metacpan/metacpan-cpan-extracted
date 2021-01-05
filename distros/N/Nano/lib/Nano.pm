@@ -14,7 +14,7 @@ use Data::Object::Space;
 
 use Scalar::Util ();
 
-our $VERSION = '0.04'; # VERSION
+our $VERSION = '0.05'; # VERSION
 
 # ATTRIBUTES
 
@@ -25,7 +25,7 @@ has env => (
 );
 
 fun new_env($self) {
-  require Zing::Env; Zing::Env->new
+  require Nano::Env; Nano::Env->new
 }
 
 # SUBS
@@ -119,6 +119,10 @@ method find(Str $name) {
     }
   }
   return undef;
+}
+
+method hash(Str $name) {
+  require Digest::SHA; Digest::SHA::sha1_hex($name);
 }
 
 method keyval(Str $name) {
@@ -326,6 +330,26 @@ ID provided.
   my $nano = Nano->new;
 
   my $phoebe = $nano->find('phoebe');
+
+=back
+
+=cut
+
+=head2 hash
+
+  hash(Str $name) : Str
+
+The hash method returns a SHA-1 digest for the string provided.
+
+=over 4
+
+=item hash example #1
+
+  my $nano = Nano->new;
+
+  my $email = 'me@example.com';
+
+  $nano->hash($email);
 
 =back
 

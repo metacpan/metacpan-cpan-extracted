@@ -1,12 +1,13 @@
 package App::TimeTracker::Proto;
+
+# ABSTRACT: App::TimeTracker Proto Class
+our $VERSION = '3.008'; # VERSION
+
 use strict;
 use warnings;
 use 5.010;
 
-# ABSTRACT: App::TimeTracker Proto Class
-
 use App::TimeTracker::Utils qw(error_message);
-
 use Moose;
 use MooseX::Types::Path::Class;
 use File::HomeDir ();
@@ -15,7 +16,6 @@ use Hash::Merge qw(merge);
 use JSON::XS;
 use Carp;
 use Try::Tiny;
-
 use App::TimeTracker::Data::Task;
 use App::TimeTracker::Constants qw(MISSING_PROJECT_HELP_MSG);
 
@@ -271,7 +271,7 @@ App::TimeTracker::Proto - App::TimeTracker Proto Class
 
 =head1 VERSION
 
-version 3.007
+version 3.008
 
 =head1 DESCRIPTION
 
@@ -279,11 +279,11 @@ Ugly internal stuff, see L<YAPC::Europe 2011 talk...|https://domm.plix.at/talks/
 
 =head1 AUTHOR
 
-Thomas Klausner <domm@cpan.org>
+Thomas Klausner <domm@plix.at>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2011 - 2020 by Thomas Klausner.
+This software is copyright (c) 2011 - 2021 by Thomas Klausner.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

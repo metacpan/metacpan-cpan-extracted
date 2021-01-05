@@ -1,0 +1,37 @@
+README
+Changes
+
+.proverc
+
+Makefile.PL
+
+MANIFEST.SKIP
+MANIFEST			This list of files
+
+META.json                       Module JSON meta-data (added by MakeMaker)
+META.yml                        Module YAML meta-data (added by MakeMaker)
+
+lib/Devel/WatchVars.pm
+lib/Devel/WatchVars/Tie/Scalar.pm
+
+t/lib/Test/Devel/WatchVars.pm
+t/lib/test_setup.pm
+
+t/000-load.t
+t/010-manifest.t
+t/200-compilation_errors.t
+t/250-invocation_errors.t
+t/500-with_name.t
+t/510-without_name.t
+t/520-without_unwatch.t
+t/530-global_destruction.t
+t/800-examples_compile.t
+
+examples/README
+examples/array.plx
+examples/copied.plx
+examples/destroyed.plx
+examples/global-destruction.plx
+examples/hash.plx
+examples/refs.plx
+examples/simple.plx

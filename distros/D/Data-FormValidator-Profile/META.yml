@@ -1,26 +1,40 @@
 ---
 abstract: 'Profile object for Data::FormValidator'
 author:
-  - 'Graham TerMarsch (cpan@howlingfrog.com)'
+  - 'Graham TerMarsch <cpan@howlingfrog.com>'
 build_requires:
-  Test::Exception: 0
-  Test::More: 0
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  File::Temp: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::DiagINC: '0.002'
+  Test::Exception: '0'
+  Test::More: '0.96'
 configure_requires:
-  Module::Build: 0.40
-dynamic_config: 1
-generated_by: 'Module::Build version 0.4004, CPAN::Meta::Converter version 2.120921'
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.017, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: Data-FormValidator-Profile
-provides:
-  Data::FormValidator::Profile:
-    file: lib/Data/FormValidator/Profile.pm
-    version: 0.07
+no_index:
+  directory:
+    - t
+    - xt
 requires:
-  Data::FormValidator: 4.5
-  List::MoreUtils: 0
+  Data::FormValidator: '4.5'
+  List::MoreUtils: '0'
+  namespace::clean: '0'
+  perl: '5.010'
 resources:
-  license: http://dev.perl.org/licenses/
-version: 0.07
+  bugtracker: https://github.com/bleargh45/Data-FormValidator-Profile/issues
+  homepage: http://metacpan.org/release/Data-FormValidator-Profile/
+  repository: git://github.com/bleargh45/Data-FormValidator-Profile.git
+version: '0.08'
+x_generated_by_perl: v5.32.0
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'
+x_static_install: 1

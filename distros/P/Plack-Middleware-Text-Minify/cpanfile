@@ -3,7 +3,7 @@
 
 requires "Plack::Middleware" => "0";
 requires "Ref::Util" => "0";
-requires "Text::Minify::XS" => "v0.3.3";
+requires "Text::Minify::XS" => "v0.3.6";
 requires "parent" => "0";
 requires "perl" => "v5.9.3";
 requires "strict" => "0";

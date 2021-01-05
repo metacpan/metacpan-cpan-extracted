@@ -34,8 +34,7 @@ sub _learn_from_dom {
   }
 
   # Mojopaste, Perlbot and other pages with <pre> tags
-  $tmp = $dom->at('pre#paste') || $dom->at('pre.paste') || $dom->at('body > pre') || $dom->at('body > div > pre');
-  if ($tmp and !@{$tmp->children}) {
+  if ($tmp = $dom->at('pre#paste') || $dom->at('pre.paste') || $dom->at('body > pre') || $dom->at('body > div > pre')) {
     $self->{paste} = $tmp->text;
     $self->template->[1] = 'paste.html.ep';
   }

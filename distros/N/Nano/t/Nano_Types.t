@@ -56,7 +56,7 @@ Nano::Types
 
 =type-composite Env
 
-  InstanceOf["Zing::Env"]
+  InstanceOf["Nano::Env"]
 
 =type-parent Env
 
@@ -66,9 +66,9 @@ Nano::Types
 
   # given: synopsis
 
-  use Zing::Env;
+  use Nano::Env;
 
-  my $env = Zing::Env->new;
+  my $env = Nano::Env->new;
 
 =cut
 

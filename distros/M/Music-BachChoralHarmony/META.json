@@ -66,7 +66,7 @@
          "web" : "https://github.com/ology/Music-BachChoralHarmony"
       }
    },
-   "version" : "0.0406",
+   "version" : "0.0410",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.030002"
@@ -470,7 +470,7 @@
    },
    "x_authority" : "cpan:GENE",
    "x_generated_by_perl" : "v5.30.2",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.19",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.25",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }
 

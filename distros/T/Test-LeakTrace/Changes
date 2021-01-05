@@ -1,5 +1,8 @@
 Revision history for Perl extension Test::LeakTrace
 
+0.17 2021-01-05
+    - Point issue tracker at github
+
 0.16 2017-06-17
     - Fix build and test issues with perl5.26 due to removal of . from @INC
       (PR #4 - thanks to jkeenan)

@@ -393,6 +393,10 @@ the signature handling.
 
 Object cleanup.
 
+=head3 DEBUG
+
+Constant picked from AMW_DEBUG environment.
+
 =cut
 
 sub computed_signature {

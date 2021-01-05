@@ -1,6 +1,6 @@
 package Data::Money;
 
-$Data::Money::VERSION   = '0.18';
+$Data::Money::VERSION   = '0.19';
 $Data::Money::AUTHORITY = 'cpan:GPHAT';
 
 =head1 NAME
@@ -9,7 +9,7 @@ Data::Money - Money/currency with formatting and overloading.
 
 =head1 VERSION
 
-Version 0.18
+Version 0.19
 
 =cut
 
@@ -210,6 +210,7 @@ sub clone {
 
     $param{code}   = $self->code   unless (exists $param{code}   && defined $param{code});
     $param{format} = $self->format unless (exists $param{format} && defined $param{format});
+    $param{value}  = $self->value  unless (exists $param{value}  && defined $param{value});
     return $self->new(\%param);
 }
 
@@ -357,8 +358,8 @@ Note that this B<does not> modify the existing object.
 =cut
 
 sub subtract {
-    my $self = shift;
-    my $num  = shift || 0;
+    my ($self, $num, $swap) = @_;
+    $num //= 0;
 
     if (ref($num) eq ref($self)) {
         Data::Money::BaseException::MismatchCurrencyType->throw
@@ -367,7 +368,9 @@ sub subtract {
         return $self->clone(value => $self->value->copy->bsub($num->value));
     }
 
-    return $self->clone(value => $self->value->copy->bsub($self->clone(value => $num)->value))
+    my $result = $self->clone(value => $self->value->copy->bsub($self->clone(value => $num)->value));
+    $result = -$result if $swap;
+    return $result;
 }
 
 =head2 substract_in_place($num)
@@ -517,8 +520,8 @@ Both numerical and string comparators work.
 =cut
 
 sub three_way_compare {
-    my $self = shift;
-    my $num  = shift || 0;
+    my ($self, $num, $swap) = @_;
+    $num  //= 0;
 
     my $other;
     if (ref($num) eq ref($self)) {
@@ -536,7 +539,11 @@ sub three_way_compare {
         })
         if ($self->code ne $other->code);
 
-    return $self->value->copy->bfround(0 - $self->_decimal_precision) <=> $other->value->copy->bfround(0 - $self->_decimal_precision);
+    return $swap
+      ? $other->value->copy->bfround( 0 - $self->_decimal_precision )
+      <=> $self->value->copy->bfround( 0 - $self->_decimal_precision )
+      : $self->value->copy->bfround( 0 - $self->_decimal_precision )
+      <=> $other->value->copy->bfround( 0 - $self->_decimal_precision );
 }
 
 #

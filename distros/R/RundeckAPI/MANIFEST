@@ -2,7 +2,7 @@ Changes
 lib/RundeckAPI.pm
 LICENSE
 Makefile.PL
-MANIFEST			This list of files
+MANIFEST
 README
 README.md
 script/main.pl

@@ -1,12 +1,13 @@
 package Form::Tiny::Inline;
 
-use v5.10; use warnings;
+use v5.10;
+use warnings;
 use Moo;
 use Types::Standard qw(RoleName Str);
 
 use namespace::clean;
 
-our $VERSION = '1.01';
+our $VERSION = '1.11';
 
 with "Form::Tiny";
 

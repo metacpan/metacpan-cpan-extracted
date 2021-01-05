@@ -9,6 +9,10 @@ t/chaining.t
 t/define.t
 t/inheritance.t
 t/lib/ExampleModule.pm
+t/lib/ScopedStrict/Mockee1.pm
+t/lib/ScopedStrict/Mockee2.pm
+t/lib/ScopedStrict/NonStrictMocker.pm
+t/lib/ScopedStrict/StrictMocker.pm
 t/main.t
 t/mock_strict.t
 t/mockmodule.t
@@ -16,5 +20,6 @@ t/pod.t
 t/pod_coverage.t
 t/prototype.t
 t/redefine.t
+t/strict_scoped_files.t
 META.yml
 META.json

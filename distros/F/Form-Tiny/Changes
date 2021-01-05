@@ -1,5 +1,12 @@
 Revision history for Perl extension Form::Tiny.
 
+1.11  Tue Jan 5 14:00:00 2021
+	- fix broken release
+
+1.10  Tue Jan 5 13:00:00 2021
+	- add syntactic sugar mode with -flag import
+	- improve documentation
+
 1.01  Mon Sep 28 19:00:00 2020
 	- fix Type::Tiny dependency minimum version
 	- fix and improve documentation

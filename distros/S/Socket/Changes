@@ -1,5 +1,19 @@
 Revision history for Socket
 
+2.031   2021-01-05
+        [CHANGES]
+         * Warn about truncation of out-of-range port numbers in
+           pack_sockaddr_in*
+
+        [BUGFIXES]
+         * Avoid size warnings in leftshift operator (RT129217)
+         * Don't wrap the now-deprecated addrinfo IDN constants
+           ALLOW_UNASSIGNED and USE_STD3_ASCII_RULES (RT129660)
+         * Skip the socketpair AF_UNIX+SOCK_DGRAM tests if the OS claims them
+           to be unsupported (RT132946)
+         * Prefer getaddrinfo() to implement inet_aton() because the
+           alternative gethostbyname() has thread races (RT129189)
+
 2.030   2020-06-07
         [CHANGES]
          * Prepare for a stricter perl:

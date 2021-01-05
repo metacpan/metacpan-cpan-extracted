@@ -1,5 +1,19 @@
 Revision history for Music-BachChoralHarmony
 
+0.0410 2021-01-04 15:52:20
+    - Rollback eg/* program incorrect "improvements." Whoops.
+
+0.0409 2021-01-04 12:46:26
+    - Improve the eg/* programs.
+    - Improve documentation.
+
+0.0408 2021-01-04 10:57:45
+    - Improve the eg/tension-sort program.
+
+0.0407 2021-01-04 10:14:48
+    - Add the eg/tension-net program.
+    - Add the eg/tension-sort program.
+
 0.0406 2020-08-10 08:24:43
     - Improve the eg/tension program.
     - Improve the tests.

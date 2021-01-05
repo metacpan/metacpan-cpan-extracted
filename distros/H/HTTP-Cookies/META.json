@@ -30,7 +30,6 @@
          "requires" : {
             "Pod::Coverage::TrustPod" : "0",
             "Test::CPAN::Changes" : "0.19",
-            "Test::Code::TidyAll" : "0.50",
             "Test::EOL" : "0",
             "Test::Mojibake" : "0",
             "Test::More" : "0.96",
@@ -79,10 +78,10 @@
          "web" : "https://github.com/libwww-perl/HTTP-Cookies"
       }
    },
-   "version" : "6.09",
+   "version" : "6.10",
    "x_Dist_Zilla" : {
       "perl" : {
-         "version" : "5.030002"
+         "version" : "5.030003"
       },
       "plugins" : [
          {
@@ -147,11 +146,6 @@
             },
             "name" : "@Author::OALDERS/stale modules, release",
             "version" : "0.057"
-         },
-         {
-            "class" : "Dist::Zilla::Plugin::OALDERS::TidyAll",
-            "name" : "@Author::OALDERS/OALDERS::TidyAll",
-            "version" : "0.000029"
          },
          {
             "class" : "Dist::Zilla::Plugin::CheckChangesHasContent",
@@ -289,11 +283,6 @@
             "class" : "Dist::Zilla::Plugin::Test::ReportPrereqs",
             "name" : "@Author::OALDERS/Test::ReportPrereqs",
             "version" : "0.028"
-         },
-         {
-            "class" : "Dist::Zilla::Plugin::Test::TidyAll",
-            "name" : "@Author::OALDERS/Test::TidyAll",
-            "version" : "0.04"
          },
          {
             "class" : "Dist::Zilla::Plugin::Test::Version",
@@ -499,7 +488,7 @@
                }
             },
             "name" : "@Author::OALDERS/Git::Contributors",
-            "version" : "0.035"
+            "version" : "0.036"
          },
          {
             "class" : "Dist::Zilla::Plugin::ReadmeAnyFromPod",
@@ -617,7 +606,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "v6.09",
+                  "tag" : "v6.10",
                   "tag_format" : "v%V",
                   "tag_message" : "v%V"
                },
@@ -818,10 +807,12 @@
       "Philip J. Ludlam <p.ludlam@cv-library.co.uk>",
       "phrstbrn <phrstbrn@gmail.com>",
       "Robert Stone <talby@trap.mtview.ca.us>",
+      "robnagler <github@q33.us>",
       "Rolf Grossmann <rg@progtech.net>",
       "ruff <ruff@ukrpost.net>",
       "sasao <sasao@yugen.org>",
       "Sean M. Burke <sburke@cpan.org>",
+      "simbabque <simbabque@cpan.org>",
       "Slaven Rezic <slaven@rezic.de>",
       "Spiros Denaxas <s.denaxas@gmail.com>",
       "Steve Hay <SteveHay@planit.com>",
@@ -833,7 +824,7 @@
       "Yuri Karaban <tech@askold.net>",
       "Zefram <zefram@fysh.org>"
    ],
-   "x_generated_by_perl" : "v5.30.2",
+   "x_generated_by_perl" : "v5.30.3",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.19",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later",
    "x_static_install" : 0

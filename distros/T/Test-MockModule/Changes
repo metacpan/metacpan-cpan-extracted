@@ -1,5 +1,13 @@
 Revision history for Test::MockModule
 
+v0.176.0
+- 3ba8bc7 lexically scoped strictness - David Cantrell
+- e57fc5a Update ci with dockerhub auth - Geoff Franks
+- bfe1e63 Update GitHub workflow with deprecated add-path - Nicolas R
+
+vX.XXX.X
+- XXXXXXX 'strict' mode is now lexically scoped
+
 v0.175.0
 - 964aa2a Ignore CI files and whitesource - Nicolas R
 

@@ -1,4 +1,5 @@
-use v5.10; use warnings;
+use v5.10;
+use warnings;
 use Test::More;
 use Types::Standard qw(Int);
 use Form::Tiny::Inline;

@@ -1,12 +1,13 @@
 package Form::Tiny::Filtered;
 
-use v5.10; use warnings;
+use v5.10;
+use warnings;
 use Types::Standard qw(Str ArrayRef InstanceOf);
 
 use Form::Tiny::Filter;
 use Moo::Role;
 
-our $VERSION = '1.01';
+our $VERSION = '1.11';
 
 requires qw(pre_mangle _clear_form);
 

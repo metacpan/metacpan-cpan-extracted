@@ -1,0 +1,22 @@
+Revision history for Devel-WatchVars
+
+1.0.0    2020-12-21 08:57:48 -0700 (MST)
+         Initial release.
+
+1.0.1    2020-12-21 15:27:54 -0700 (MST)
+         Forgot build dependency on "no indirect" in Makefile.PL
+
+1.0.2    2020-12-24 09:50:38 -0700 (MST)
+         Add "overloading" dependency to Makefile.PL for v5.10.0; it only became core in v5.10.1
+
+1.0.3    2020-12-28 13:22:47 -0700 (MST)
+         Fuss with the dist meta building to try to get metacpan indexing to work.
+         Expose the internal tie module to indexing.
+         Add $ENV{DEVEL_WATCHVARS_VERBOSE}=1 for longmess not shortmess.
+
+1.0.4    2021-01-03 10:57:17 -0700 (MST)
+         Yet another attempt to get metacpan indexing working.
+
+1.0.5    2021-01-05 08:18:14 -0700 (MST)
+         Quote assigned $VERSION value to make PAUSE/metacpan happy.
+         Expand SYNOPSIS to illustrate array and hash usage.

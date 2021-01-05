@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More 'no_plan';
+use if $ENV{AUTOMATED_TESTING}, 'Test::DiagINC'; use Test::More 'no_plan';
 use Test::Exception;
 BEGIN {
     use_ok( 'Data::FormValidator::Profile' );

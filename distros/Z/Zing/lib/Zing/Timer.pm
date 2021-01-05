@@ -14,7 +14,7 @@ use Zing::Logic::Timer;
 
 extends 'Zing::Process';
 
-our $VERSION = '0.25'; # VERSION
+our $VERSION = '0.26'; # VERSION
 
 # BUILDERS
 

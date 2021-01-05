@@ -7,7 +7,7 @@ use feature qw/state switch/;
 
 use utf8;
 use FindBin qw/$Bin/;
-use lib ("$Bin/lib", "$Bin/../lib");
+use lib ("$Bin/../lib");
 use Getopt::Long qw/GetOptions/;
 use Pod::Usage qw/pod2usage/;
 use DateTime;
@@ -22,10 +22,10 @@ use Astro::Montenbruck::CoCo qw/:all/;
 use Astro::Montenbruck::NutEqu qw/obliquity/;
 use Astro::Montenbruck::Ephemeris qw/find_positions/;
 use Astro::Montenbruck::Ephemeris::Planet qw/@PLANETS/;
-use Helpers qw/
-    parse_datetime parse_geocoords format_geo hms_str dms_or_dec_str dmsz_str
-    $LOCALE @DEFAULT_PLACE/;
-use Display qw/%LIGHT_THEME %DARK_THEME print_data/;
+use Astro::Montenbruck::Utils::Helpers qw/
+    parse_datetime parse_geocoords format_geo hms_str dms_or_dec_str dmsz_str local_now
+    @DEFAULT_PLACE/;
+use Astro::Montenbruck::Utils::Display qw/%LIGHT_THEME %DARK_THEME print_data/;
 
 sub ecliptic_to_horizontal {
     my ($lambda, $beta, $eps, $lst, $theta) = @_;
@@ -149,7 +149,7 @@ sub print_header {
 my $man    = 0;
 my $help   = 0;
 my $use_dt = 1;
-my $time   = DateTime->now()->set_locale($LOCALE)->strftime('%F %T');
+my $time   = local_now()->strftime('%F %T');
 my @place;
 my $format = 'S';
 my $coords = 1;
@@ -243,7 +243,7 @@ __END__
 
 =head1 NAME
 
-planpos — calculate planetary positions for given time and place.
+planpos - calculate planetary positions for given time and place.
 
 =head1 SYNOPSIS
 
@@ -288,21 +288,21 @@ The observer's location. Contains 2 elements, space separated, in any order:
 
 E.g.: C<--place=51N28 0W0> for I<Greenwich, UK>.
 
-=item B<--coordinates> — type and format of coordinates to display:
+=item B<--coordinates> - type and format of coordinates to display:
 
 =over
 
-=item * B<1> — Ecliptical, angular units (default)
+=item * B<1> - Ecliptical, angular units (default)
 
-=item * B<2> — Ecliptical, zodiac
+=item * B<2> - Ecliptical, zodiac
 
-=item * B<3> — Equatorial, time units
+=item * B<3> - Equatorial, time units
 
-=item * B<4> — Equatorial, angular units
+=item * B<4> - Equatorial, angular units
 
-=item * B<5> — Horizontal, time units
+=item * B<5> - Horizontal, time units
 
-=item * B<6> — Horizontal, angular units
+=item * B<6> - Horizontal, angular units
 
 =back
 

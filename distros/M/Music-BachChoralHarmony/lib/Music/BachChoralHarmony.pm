@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Parse the UCI Bach choral harmony data set
 
-our $VERSION = '0.0406';
+our $VERSION = '0.0410';
 
 use Moo;
 use strictures 2;
@@ -57,7 +57,7 @@ sub parse {
 
     # Collect the events
     my $csv = Text::CSV->new( { binary => 1 } )
-        or die "Can't use CSV: ", Text::CSV->error_diag();
+        or die "Can't use CSV: ", Text::CSV->error_diag;
 
     open $fh, '<', $self->data_file
         or die "Can't read ", $self->data_file, ": $!";
@@ -93,7 +93,7 @@ sub parse {
         push @{ $progression->{$id}{events} }, $struct;
     }
 
-    $csv->eof or die $csv->error_diag();
+    $csv->eof or die $csv->error_diag;
     close $fh;
 
     $self->data($progression);
@@ -343,7 +343,7 @@ Music::BachChoralHarmony - Parse the UCI Bach choral harmony data set
 
 =head1 VERSION
 
-version 0.0406
+version 0.0410
 
 =head1 SYNOPSIS
 
@@ -384,9 +384,7 @@ version 0.0406
 =head1 DESCRIPTION
 
 C<Music::BachChoralHarmony> parses the UCI Bach choral harmony data set of 60
-chorales.
-
-This module does a few simple things:
+chorales and does a few things:
 
 * It turns the UCI CSV data into a perl data structure.
 
@@ -402,6 +400,9 @@ filled-in from L<https://bach-chorales.com/>.  The keys were computed
 with a L<music21|https://web.mit.edu/music21/> program, and if missing
 filled-in again from L<https://bach-chorales.com/>.  Check out the
 links in the L</SEE ALSO> section for more information.
+
+The main purpose of this module is to produce the results of the
+F<eg/*> programs.  So check 'em out!
 
 =head1 ATTRIBUTES
 
@@ -432,15 +433,15 @@ The data resulting from the L</parse> method.
 
 =head2 new
 
-  $bach = Music::BachChoralHarmony->new();
+  $bach = Music::BachChoralHarmony->new;
 
 Create a new C<Music::BachChoralHarmony> object.
 
 =head2 parse
 
-  $songs = $bach->parse();
+  $songs = $bach->parse;
 
-Parse the B<data_file> and B<key_title> files into a B<data> hash
+Parse the B<data_file> and B<key_title> files into the B<data> hash
 reference of each song keyed by the song id.  Each song includes a BWV
 identifier, title, key and list of events.  The event list is made of
 hash references with a B<notes> bit-string, B<bass> note, the
@@ -490,21 +491,17 @@ The dataset B<notes> bit-string is defined by position as follows:
   10 => A# or Bb
   11 => B
 
-So if a C<C> note is present in the current phrase, the first bit will
-be set to C<1>, otherwise C<0>.  If a C<Bb> note is present, the
-penultimate bit will be set, etc.
-
 =head1 SEE ALSO
 
 The F<eg/*> and F<t/01-methods.t> files in this distribution.
 
-L<Moo>
-
-L<Text::CSV>
-
 L<File::ShareDir>
 
 L<List::Util>
+
+L<Moo>
+
+L<Text::CSV>
 
 L<https://archive.ics.uci.edu/ml/datasets/Bach+Choral+Harmony>
 is the dataset itself.

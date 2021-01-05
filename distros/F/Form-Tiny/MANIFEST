@@ -1,6 +1,7 @@
 Changes
-examples/basic_form.pl
+examples/bare_bones_form.pl
 examples/inline_form.pl
+examples/syntactic_sugar_form.pl
 lib/Form/Tiny.pm
 lib/Form/Tiny/Error.pm
 lib/Form/Tiny/FieldData.pm
@@ -35,6 +36,7 @@ t/17-nested-mixed.t
 t/18-triple-nest.t
 t/19-hooks.t
 t/20-data.t
+t/21-declarative.t
 t/99-examples.t
 t/lib/TestForm.pm
 t/lib/TestInnerForm.pm

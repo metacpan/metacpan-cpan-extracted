@@ -6,37 +6,34 @@ Form::Tiny::Manual - reference for working with Form::Tiny
 
 =head1 SYNOPSIS
 
-	use Moo;
+	use Form::Tiny -base;
+	use Form::Tiny::Error;
 	use Types::Common::String qw(SimpleStr);
 	use Types::Common::Numeric qw(PositiveInt);
 
-	with "Form::Tiny";
 
-	sub build_fields {
-		return (
-			{
-				name => "name",
-				type => SimpleStr,
-				adjust => sub { ucfirst shift },
-				required => 1,
-			},
-			{
-				name => "lucky_number",
-				type => PositiveInt,
-				required => 1,
-			}
-		);
-	}
+	form_field "name" => (
+		type => SimpleStr,
+		adjust => sub { ucfirst shift },
+		required => 1,
+	);
 
-	sub build_cleaner {
-		return sub {
-			my ($self, $data) = @_;
+	form_field "lucky_number" => (
+		type => PositiveInt,
+		required => 1,
+	);
 
-			if ($data->{name} eq "Perl" && $data->{lucky_number} == 6) {
-				$self->add_error(Form::Tiny::Error::DoesNotValidate->new("Perl6 is Raku"));
-			}
-		};
-	}
+	form_cleaner sub {
+		my ($self, $data) = @_;
+
+		if ($data->{name} eq "Perl" && $data->{lucky_number} == 6) {
+			$self->add_error(
+				Form::Tiny::Error::DoesNotValidate->new(
+					error =>"Perl6 is now Raku"
+				)
+			);
+		}
+	};
 
 =head1 DESCRIPTION
 
@@ -58,9 +55,51 @@ I<(Note that not every step on that pipeline is ran every time - it depends on f
 
 The module always tries to get as much data from input as possible and copy that into output. It will never copy any data that is not explicitly specified in the form fields configuration.
 
-=head2 Basic usage
+=head2 Moose-like syntax sugar
 
-To use Form::Tiny as data validator you have to declare your own class mixing in the I<Form::Tiny> role and define a I<build_fields> sub, returning a list of field definitions for the form. A class containing these two basic requirements is ready to be instantiated and passed input to be validated.
+Starting with version 1.10, Form::Tiny now allows you to define forms much like you would define a Moose class. The new syntax is presented below:
+
+	use Form::Tiny -base, -filtered; # -strict is also possible
+
+	# basic form field definitions
+	form_field 'name' => (
+		type => Int,
+		required => 1,
+		... # the rest of a normal Form::Tiny field definition
+	);
+
+	form_field 'surname' => (
+		...
+	);
+
+	# will run the sub for cleaning up the form
+	form_cleaner sub {
+		my ($self, $data) = @_;
+		... # perform cleaning
+	};
+
+	# will filter Int values before they get validated
+	form_filter Int, sub { abs shift };
+
+Adding any argument to C<use Form::Tiny> line will cause it to enable the new syntax. Currently supported flags are:
+
+=over
+
+=item * C<-base> - imports Moo into your package (turning it into a Moo class and enabling all Moo keywords), mixes in the L<Form::Tiny> role and adds C<form_field> and C<form_cleaner> functions to your namespace. This flag is optional if you specify any other flag for the import.
+
+=item * C<-strict> - mixes in the L<Form::Tiny::Strict> role.
+
+=item * C<-filtered> - mixes in the L<Form::Tiny::Filtered> role and adds C<form_filter> function to your namespace.
+
+=back
+
+This way you can have syntax that resembles and mixes in with Moose syntax better, and avoid a lot of boilerplate. This may however be a suboptimal option if for example you want your class to use Moose instead of Moo or have more control over class building.
+
+=head2 Composing as a role
+
+To use Form::Tiny as a Moo role you have to declare your own class (preferably Moo / Moose) mixing in the I<Form::Tiny> role and define a I<build_fields> sub, returning a list of field definitions for the form. A class containing these two basic requirements is ready to be instantiated and passed input to be validated.
+
+=head2 Basic usage
 
 Input can be passed as a hashref to the constructor or with the I<set_input> method. Every call to that method will cause the form instance to be cleared, so that it can be used again for different data.
 
@@ -92,16 +131,30 @@ The example below illustrates how a form class could be used to validate data.
 
 =head2 Form building
 
-Every class applying the I<Form::Tiny> role has to have a sub called I<build_fields>. This method should return a list of hashrefs, where each of them will be coerced into an object of the L<Form::Tiny::FieldDefinition> class. You can also provide an instance of the class yourself, which should be helpful if you're willing to use your own definition implementation.
+If you imported I<Form::Tiny> with flags, you can use I<form_field> function to declare form fields, just like you would use I<has> to declare class properties in Moose. Every class applying the I<Form::Tiny> role explicitly has to have a sub called I<build_fields>, which should return a list of hashrefs.
+
+Each of field definition will be coerced into an object of the L<Form::Tiny::FieldDefinition> class. When using I<build_fields> you can also provide an instance of the class yourself, which should be helpful if you're willing to use your own definition implementation.
+
+	# syntactic sugar version
+
+	form_field 'some_name';
+	form_field 'another_name' => (
+		required => 'soft',
+	);
+
+	# explicit builder version
 
 	sub build_fields {
 		return (
+			# first field
 			{ name => "some_name" },
-			{ ... },
+
+			# second field
+			MyFieldDefinition->new(...),
 		);
 	}
 
-The only required element of this hashref is key I<name>, which contains the string with name of the field in the form input. Other possible elements are:
+The only required element of this hashref is key I<name>, which contains the string with name of the field in the form input. In I<form_field>, the name should not be given explicitly, as it will be overwritten by the first argument to that function. Other possible elements are:
 
 =over
 
@@ -145,18 +198,15 @@ While building your form fields, it's possible to save some extra data along wit
 
 	use Types::Common::String qw(NonEmptySimpleStr);
 
-	sub build_fields {
-		return ({
-			name => "first name",
-			type => NonEmptySimpleStr,
-			data => {
-				element => "input",
-				properties => {
-					type => "text",
-				},
+	form_field "first name" => (
+		type => NonEmptySimpleStr,
+		data => {
+			element => "input",
+			properties => {
+				type => "text",
 			},
-		});
-	}
+		},
+	);
 
 The data field can hold any value you want and later retrieved with an instantiated form object:
 
@@ -169,16 +219,24 @@ The data field can hold any value you want and later retrieved with an instantia
 
 =head2 Cleaning
 
-While I<build_fields> allows for single-field validation, sometimes a need arises to check if some fields are synchronized correctly. This can be done with the I<build_cleaner> method, which will be only fired after the validation for every individual field was successful. The cleaner subroutine should look like this:
+While the above properties allow for single-field validation, sometimes a need arises to check if some fields are synchronized correctly, or even to perform some more complex validation. This can be done with the I<cleaner> method, which will be only fired after the validation for every individual field was successful. The cleaner subroutine should look like this:
 
+	sub {
+		my ($self, $data) = @_;
+
+		# do something with $data
+		# call $self->add_error if necessary
+	};
+
+A subroutine like the one above should either be returned by I<build_cleaner> method, or specified in a I<form_cleaner> helper call.
+
+	# either ...
 	sub build_cleaner {
-		return sub {
-			my ($self, $data) = @_;
-
-			# do something with $data
-			# call $self->add_error if necessary
-		};
+		return sub { ... }; # cleaner sub
 	}
+
+	# or (when imported with -flags) ...
+	form_cleaner sub { ... };
 
 Cleaning sub is also allowed to change the $data, which is a hash reference to the runnig copy of the input. Note that this is the final step in the validation process, so anything that is in $data after cleaning will be available in the form's I<fields> after validation.
 
@@ -212,11 +270,11 @@ The module provides two roles which use these mechanisms to achieve common tasks
 
 =item * L<Form::Tiny::Strict>
 
-Enables strict mode for the form. Validation will fail if the form input contains any data not specified in the field definitions.
+Enables strict mode for the form. Validation will fail if the form input contains any data not specified in the field definitions. Can also be mixed in with I<-strict> flag.
 
 =item * L<Form::Tiny::Filtered>
 
-Enables initial filtering for the input fields. By default, this will only cause strings to be trimmed, but any code can be attached to any field that meets a given type constraint. See the role documentation for details
+Enables initial filtering for the input fields. By default, this will only cause strings to be trimmed, but any code can be attached to any field that meets a given type constraint. See the role documentation for details. Can also be mixed in with I<-filtered> flag.
 
 =back
 
@@ -266,20 +324,60 @@ Other example is two nested arrays that not necessarily contain a hash at the en
 Every form class created with the I<Form::Tiny> role mixed in can be used as a field definition type in other form. The outer and inner forms will validate independently, but inner form errors will be added to outer form with the outer field name prepended.
 
 	# in Form2
-	sub build_fields {
-		# everything under "nested" key will be validated using Form1 instance
-		# every error for "nested" will also start with "nested"
-		return ({
-			name => "nested",
-			type => Form1->new,
-		});
-	}
+	# everything under "nested" key will be validated using Form1 instance
+	# every error for "nested" will also start with "nested"
+	form_field "nested" => (
+		type => Form1->new,
+	);
 
 Be aware of a special case, an adjustment will be inserted here automatically like the following:
 
 	adjust => sub { $instance->fields }
 
 this will make sure that any coercions and adjustments made in the nested form will be added to the outer form as well. If you want to specify your own adjustment here, make sure to use the data provided by the I<fields> method of the nested form.
+
+=head3 Mixing form fields with class fields
+
+It is possible and often very helpful to have both form and class fields inside the same form class:
+
+	use Form::Tiny -base;
+	use Types::Standard qw(Str);
+	use Form::Tiny::Error;
+
+	has 'user' => (
+		is => 'rw',
+	);
+
+	form_field 'username' => (
+		type => Str,
+		required => 1,
+	);
+
+	form_field 'password' => (
+		type => Str,
+		required => 1,
+	);
+
+	form_cleaner sub {
+		my ($self, $data) = @_;
+
+		# load user from the storage service using $data->{username}
+		my $user = ...;
+		if ($user->validate_password($data->{password})) {
+			# set the user for the class, will be available after validation
+			$self->user($user);
+		}
+		else {
+			$self->add_error(
+				Form::Tiny::Error::DoesNotValidate->new(
+					field => 'password',
+					error => 'invalid password'
+				)
+			);
+		}
+	};
+
+While doing so, make sure not to override any of the Form::Tiny symbols (Moo / Moose should complain about it when it happens).
 
 =head1 SEE ALSO
 

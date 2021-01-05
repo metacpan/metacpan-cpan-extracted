@@ -1,0 +1,4 @@
+Revision history for Perl extension Dist::Zilla::Plugin::GitHub::RequireGreenBuild
+
+0.01      2021-01-04 22:34:44-08:00 America/Vancouver
+    - Initial release

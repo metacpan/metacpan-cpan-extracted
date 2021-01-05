@@ -12,7 +12,7 @@ use Data::Object::Class;
 use Data::Object::ClassHas;
 use Data::Object::Space;
 
-our $VERSION = '0.25'; # VERSION
+our $VERSION = '0.26'; # VERSION
 
 # ATTRIBUTES
 

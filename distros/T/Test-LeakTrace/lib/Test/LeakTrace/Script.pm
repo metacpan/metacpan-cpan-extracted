@@ -1,6 +1,7 @@
 package Test::LeakTrace::Script;
 
 use strict;
+use warnings;
 
 use Test::LeakTrace ();
 

@@ -1,13 +1,14 @@
 package Form::Tiny::Error;
 
-use v5.10; use warnings;
+use v5.10;
+use warnings;
 use Moo;
 use Types::Standard qw(Maybe Str Object ArrayRef InstanceOf);
 use Carp qw(confess);
 
 use namespace::clean;
 
-our $VERSION = '1.01';
+our $VERSION = '1.11';
 
 use overload
 	q{""} => "as_string",

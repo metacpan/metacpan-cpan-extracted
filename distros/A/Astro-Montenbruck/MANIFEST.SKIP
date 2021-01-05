@@ -84,3 +84,6 @@
 \B\docs\b
 \B\.vstags\b
 \B\_build\b
+
+\B.vscode\b
+\bMontenbruck.komodoproject\b

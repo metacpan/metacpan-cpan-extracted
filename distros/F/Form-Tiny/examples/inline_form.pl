@@ -1,4 +1,5 @@
-use v5.10; use warnings;
+use v5.10;
+use warnings;
 use Test::More;
 use Form::Tiny::Inline;
 use Types::Common::String qw(SimpleStr);
@@ -28,7 +29,8 @@ my $form = Form::Tiny::Inline->new(
 	},
 );
 
-$form->set_input({
+$form->set_input(
+	{
 		input_file => "/home/user/test",
 		output_file => "/home/user/test_out",
 	}

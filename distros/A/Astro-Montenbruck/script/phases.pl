@@ -7,7 +7,7 @@ use feature qw/switch/;
 
 use utf8;
 use FindBin qw/$Bin/;
-use lib ("$Bin/lib", "$Bin/../lib");
+use lib ("$Bin/../lib");
 use Getopt::Long qw/GetOptions/;
 use POSIX qw /floor/;
 use Pod::Usage qw/pod2usage/;
@@ -15,17 +15,18 @@ use DateTime;
 use Term::ANSIColor;
 
 use Readonly;
-use Helpers qw/parse_datetime $LOCALE/;
-use Display qw/%LIGHT_THEME %DARK_THEME print_data/;
-use Astro::Montenbruck::Time qw/jd0 cal2jd jd2cal jd2unix/;
+use Astro::Montenbruck::Utils::Helpers qw/parse_datetime current_timezone local_now/;
+use Astro::Montenbruck::Utils::Display qw/%LIGHT_THEME %DARK_THEME print_data/;
+use Astro::Montenbruck::Time qw/jd2cal jd2unix/;
 use Astro::Montenbruck::Lunation qw/:all/;
 
 
-my $now = DateTime->now()->set_locale($LOCALE);
+my $now = local_now();
 
 my $help   = 0;
+my $man    = 0;
 my $date   = $now->strftime('%F');
-my $tzone  = $now->strftime('%z');
+my $tzone  = current_timezone();
 my @place;
 my $theme  = 'dark';
 
@@ -33,12 +34,14 @@ my $theme  = 'dark';
 # or if usage was explicitly requested.
 GetOptions(
     'help|?'     => \$help,
+    'man'        => \$man,
     'date:s'     => \$date,
     'theme:s'    => \$theme,
     'timezone:s' => \$tzone,
 ) or pod2usage(2);
 
 pod2usage(1) if $help;
+pod2usage(-verbose => 2) if $man;
 
 my $scheme = do {
     given (lc $theme) {

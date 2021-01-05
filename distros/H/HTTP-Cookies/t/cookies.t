@@ -1,7 +1,7 @@
 #!perl -w
 
 use Test;
-plan tests => 80;
+plan tests => 81;
 
 use HTTP::Cookies;
 use HTTP::Request;
@@ -605,7 +605,7 @@ $c->add_cookie_header($req);
 ok(!$req->header("Cookie"));
 
 
-# Test cookie called 'exipres' <https://rt.cpan.org/Ticket/Display.html?id=8108>
+# Test cookie called 'expires' <https://rt.cpan.org/Ticket/Display.html?id=8108>
 $c = HTTP::Cookies->new;
 $req = HTTP::Request->new("GET" => "http://example.com");
 $res = HTTP::Response->new(200, "OK");
@@ -733,6 +733,19 @@ $c->add_cookie_header($req);
 $h = $req->header("Cookie");
 ok($h =~ /foo=bar/);
 unlink($file) || warn "Can't unlink $file: $!";
+
+# Test discard isn't set when max-age is set
+$c = HTTP::Cookies->new;
+$req = HTTP::Request->new("GET" => "http://example.com");
+$res = HTTP::Response->new(200, "OK");
+$res->request($req);
+$res->header("Set-Cookie" => "foo=bar; max-age=1337");
+$c->extract_cookies($res);
+#print $c->as_string;
+ok($c->as_string, <<'EOT');
+Set-Cookie3: foo=bar; path="/"; domain=example.com; version=0
+EOT
+
 
 
 #-------------------------------------------------------------------

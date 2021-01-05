@@ -13,7 +13,7 @@ use Data::Object::ClassHas;
 
 extends 'Zing::Channel';
 
-our $VERSION = '0.25'; # VERSION
+our $VERSION = '0.26'; # VERSION
 
 # ATTRIBUTES
 
@@ -64,7 +64,7 @@ method head() {
   my $position = 0;
 
   if (my $data = $self->store->slot($self->term, $position)) {
-    return $self->app->term($data->{term})->object;
+    return $self->app->term($data->{term})->object($self->env);
   }
   else {
     return undef;
@@ -73,7 +73,7 @@ method head() {
 
 method index(Int $position) {
   if (my $data = $self->store->slot($self->term, $position)) {
-    return $self->app->term($data->{term})->object;
+    return $self->app->term($data->{term})->object($self->env);
   }
   else {
     return undef;
@@ -95,7 +95,7 @@ method next() {
   }
   if (my $data = $self->store->slot($self->term, $position)) {
     $self->position($position);
-    return $self->app->term($data->{term})->object;
+    return $self->app->term($data->{term})->object($self->env);
   }
   else {
     $self->position($position) if $position == $self->size;
@@ -118,7 +118,7 @@ method prev() {
   }
   if (my $data = $self->store->slot($self->term, $position)) {
     $self->position($position);
-    return $self->app->term($data->{term})->object;
+    return $self->app->term($data->{term})->object($self->env);
   }
   else {
     return undef;
@@ -127,7 +127,7 @@ method prev() {
 
 around recv() {
   if (my $data = $self->$orig) {
-    return $self->app->term($data->{term})->object;
+    return $self->app->term($data->{term})->object($self->env);
   }
   else {
     return undef;
@@ -155,7 +155,7 @@ method tail() {
   my $position = $size ? ($size - 1) : 0;
 
   if (my $data = $self->store->slot($self->term, $position)) {
-    return $self->app->term($data->{term})->object;
+    return $self->app->term($data->{term})->object($self->env);
   }
   else {
     return undef;

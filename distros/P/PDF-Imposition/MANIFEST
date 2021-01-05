@@ -15,6 +15,7 @@ lib/PDF/Imposition/Schema2up.pm
 lib/PDF/Imposition/Schema2x4x1.pm
 lib/PDF/Imposition/Schema2x4x2.pm
 lib/PDF/Imposition/Schema4up.pm
+lib/PDF/Imposition/Schemaduplex2up.pm
 lib/PDF/Imposition/Schemaea4x4.pm
 LICENSE
 Makefile.PL

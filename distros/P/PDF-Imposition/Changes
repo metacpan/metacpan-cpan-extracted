@@ -1,5 +1,9 @@
 Revision history for perl module PDF-Imposition
 
+0.26 2020-01-05
+
+ - New schema, duplex2up (2up for duplex printers)
+
 0.25 2018-05-12
 
  - New schema, 2x4x1, contributed by @drennanelawar

@@ -1,6 +1,13 @@
 Changes
-Fields.pm
-MANIFEST
+INSTALL.SKIP
+lib/Sort/Fields.pm
+LICENSE
 Makefile.PL
-test.pl
-README
+MANIFEST			This list of files
+MANIFEST.SKIP
+README.pod
+t/test.t
+t/test_manifest
+xt/changes.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

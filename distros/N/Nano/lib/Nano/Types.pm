@@ -11,7 +11,13 @@ use base 'Data::Object::Types::Library';
 
 extends 'Types::Standard';
 
-our $VERSION = '0.04'; # VERSION
+our $VERSION = '0.05'; # VERSION
+
+register {
+  name => 'Env',
+  parent => 'Object',
+  validation => is_instance_of('Nano::Env'),
+};
 
 register {
   name => 'Nano',
@@ -35,12 +41,6 @@ register {
   name => 'Search',
   parent => 'Object',
   validation => is_instance_of('Nano::Search'),
-};
-
-register {
-  name => 'Env',
-  parent => 'Object',
-  validation => is_instance_of('Zing::Env'),
 };
 
 register {
@@ -120,7 +120,7 @@ This type is defined in the L<Nano::Types> library.
 
 =item env composition
 
-  InstanceOf["Zing::Env"]
+  InstanceOf["Nano::Env"]
 
 =back
 
@@ -130,9 +130,9 @@ This type is defined in the L<Nano::Types> library.
 
   # given: synopsis
 
-  use Zing::Env;
+  use Nano::Env;
 
-  my $env = Zing::Env->new;
+  my $env = Nano::Env->new;
 
 =back
 

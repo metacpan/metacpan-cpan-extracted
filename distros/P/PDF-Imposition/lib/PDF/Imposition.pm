@@ -24,11 +24,11 @@ PDF::Imposition - Perl module to manage the PDF imposition
 
 =head1 VERSION
 
-Version 0.25
+Version 0.26
 
 =cut
 
-our $VERSION = '0.25';
+our $VERSION = '0.26';
 
 sub version {
     return "PDF::Imposition $VERSION PDF::Cropmarks "
@@ -86,6 +86,10 @@ The schema to use.
 =item 2up
 
 See L<PDF::Imposition::Schema2up>
+
+=item duplex2up
+
+See L<PDF::Imposition::Schemaduplex2up>
 
 =item 2down
 
@@ -340,6 +344,7 @@ E.g.
 sub available_schemas {
     return qw/2up 2down 2side 2x4x2 1x4x2cutfoldbind
               2x4x1
+              duplex2up
               4up 1repeat2top 1repeat2side 1repeat4 ea4x4
               1x8x2 1x1/
 }
@@ -351,6 +356,10 @@ sub available_schemas {
 =item BUILDARGS
 
 =item imposer
+
+=item DEBUG
+
+Constant picked from AMW_DEBUG environment.
 
 =back
 

@@ -5,24 +5,37 @@ use vars qw/$VERSION/;
 use Scalar::Util qw/reftype weaken/;
 use Carp;
 use SUPER;
-$VERSION = '0.175.0';
-
-our $STRICT_MODE;
+$VERSION = '0.176.0';
 
 sub import {
     my ( $class, @args ) = @_;
 
+    # default if no args
+    $^H{'Test::MockModule/STRICT_MODE'} = 0;
+
     foreach my $arg (@args) {
         if ( $arg eq 'strict' ) {
-            $STRICT_MODE = 1;
-        }
-        else {
+            $^H{'Test::MockModule/STRICT_MODE'} = 1;
+        } elsif ( $arg eq 'nostrict' ) {
+            $^H{'Test::MockModule/STRICT_MODE'} = 0;
+        } else {
             warn "Test::MockModule unknown import option '$arg'";
         }
     }
-
     return;
 }
+
+sub _strict_mode {
+    my $depth = 0;
+    while(my @fields = caller($depth++)) {
+        my $hints = $fields[10];
+        if($hints && grep { /^Test::MockModule\// } keys %{$hints}) {
+            return $hints->{'Test::MockModule/STRICT_MODE'};
+        }
+    }
+    return 0;
+}
+
 my %mocked;
 sub new {
 	my $class = shift;
@@ -102,7 +115,7 @@ sub define {
 sub mock {
 	my ($self, @mocks) = (shift, @_);
 
-	croak "mock is not allowed in strict mode. Please use define or redefine" if $STRICT_MODE;
+	croak "mock is not allowed in strict mode. Please use define or redefine" if($self->_strict_mode());
 
 	return $self->_mock(@mocks);
 }
@@ -140,7 +153,7 @@ sub _mock {
 sub noop {
     my $self = shift;
 
-    croak "noop is not allowed in strict mode. Please use define or redefine" if $STRICT_MODE;
+    croak "noop is not allowed in strict mode. Please use define or redefine" if($self->_strict_mode());
 
     $self->_mock($_,1) for @_;
 
@@ -287,7 +300,7 @@ Test::MockModule - Override subroutines in a module for unit testing
 	}
 
     # If you want to prevent noop and mock from working, you can
-    # load Test::MockModule in strict mode
+    # load Test::MockModule in strict mode.
 
     use Test::MockModule qw/strict/;
     my $module = Test::MockModule->new('Module::Name');
@@ -296,6 +309,16 @@ Test::MockModule - Override subroutines in a module for unit testing
     $module->redefine('other_subroutine', sub { ... });
 
     # Dies since you specified you wanted strict mode.
+    $module->mock('subroutine', sub { ... });
+
+    # Turn strictness off in this lexical scope
+    {
+        use Test::MockModule 'nostrict';
+        # ->mock() works now
+        $module->mock('subroutine', sub { ... });
+    }
+
+    # Back in the strict scope, so mock() dies here
     $module->mock('subroutine', sub { ... });
 
 =head1 DESCRIPTION
@@ -307,6 +330,53 @@ A C<Test::MockModule> object is set up to mock subroutines for a given
 module. The object remembers the original subroutine so it can be easily
 restored. This happens automatically when all MockModule objects for the given
 module go out of scope, or when you C<unmock()> the subroutine.
+
+=head1 STRICT MODE
+
+One of the weaknesses of testing using mocks is that the implementation of the
+interface that you are mocking might change, while your mocks get left alone.
+You are not now mocking what you thought you were, and your mocks might now be
+hiding bugs that will only be spotted in production. To help prevent this you
+can load Test::MockModule in 'strict' mode:
+
+    use Test::MockModule qw(strict);
+
+This will disable use of the C<mock()> method, making it a fatal runtime error.
+You should instead define mocks using C<redefine()>, which will only mock
+things that already exist and die if you try to redefine something that doesn't
+exist.
+
+Strictness is lexically scoped, so you can do this in one file:
+
+    use Test::MockModule qw(strict);
+    
+    ...->redefine(...);
+
+and this in another:
+
+    use Test::MockModule; # the default is nostrict
+
+    ...->mock(...);
+
+You can even mix n match at different places in a single file thus:
+
+    use Test::MockModule qw(strict);
+    # here mock() dies
+
+    {
+        use Test::MockModule qw(nostrict);
+        # here mock() works
+    }
+
+    # here mock() goes back to dieing
+
+    use Test::MockModule qw(nostrict);
+    # and from here on mock() works again
+
+NB that strictness must be defined at compile-time, and set using C<use>. If
+you think you're going to try and be clever by calling Test::MockModule's
+C<import()> method at runtime then what happens in undefined, with results
+differing from one version of perl to another. What larks!
 
 =head1 METHODS
 
@@ -537,6 +607,8 @@ L<Sub::Override>
 Current Maintainer: Geoff Franks <gfranks@cpan.org>
 
 Original Author: Simon Flack E<lt>simonflk _AT_ cpan.orgE<gt>
+
+Lexical scoping of strictness: David Cantrell E<lt>david@cantrell.org.ukE<gt>
 
 =head1 COPYRIGHT
 

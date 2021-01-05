@@ -23,6 +23,7 @@ my @files = (
     't/02-path-regex.t',
     't/03-type-callback.t',
     't/03-type-regex.t',
+    't/04-empty.t',
     't/author-critic.t',
     't/author-eof.t',
     't/author-eol.t',

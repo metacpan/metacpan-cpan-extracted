@@ -53,7 +53,7 @@ sub _do_impose {
                                  $self->orig_width * 2,
                                  $self->orig_height * 2,
                                 );
-    # here we work with fixed signatures of 16, with the module
+    # here we work with fixed signatures of 8, with the module
     my $total = $self->total_pages;
     my @pages = (1..$total);
 

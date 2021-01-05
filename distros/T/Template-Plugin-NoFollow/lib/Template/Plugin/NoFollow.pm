@@ -11,7 +11,7 @@ use base qw(Template::Plugin::Filter);
 ###############################################################################
 # Version number.
 ###############################################################################
-our $VERSION = '1.02';
+our $VERSION = '1.03';
 
 ###############################################################################
 # Subroutine:   init()
@@ -78,7 +78,7 @@ sub filter {
 
 =head1 NAME
 
-Template::Plugin::NoFollow - TT filter to add rel="nofollow" to all HTML links
+Template::Plugin::NoFollow - Template Toolkit filter to add rel="nofollow" to all HTML links
 
 =head1 SYNOPSIS
 
@@ -92,8 +92,8 @@ Template::Plugin::NoFollow - TT filter to add rel="nofollow" to all HTML links
 
 =head1 DESCRIPTION
 
-C<Template::Plugin::NoFollow> is a filter plugin for TT, which adds
-C<rel="nofollow"> to all HTML links found in the filtered text.
+C<Template::Plugin::NoFollow> is a filter plugin for L<Template::Toolkit>, which
+adds C<rel="nofollow"> to all HTML links found in the filtered text.
 
 Through the use of the C<allow> option, you can specify URLs that are I<not>
 marked as C<rel="nofollow">.  This can be used to set up a filter that leaves
@@ -106,11 +106,11 @@ C<allow> accepts regular expressions, so you can be as elaborate as you'd like.
 
 =item init()
 
-Initializes the template plugin. 
+Initializes the template plugin.
 
 =item filter($text, $args, $conf)
 
-Filters the given text, and adds rel="nofollow" to links. 
+Filters the given text, and adds rel="nofollow" to links.
 
 =back
 

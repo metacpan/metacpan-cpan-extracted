@@ -12,7 +12,7 @@ use Data::Object::Class;
 
 extends 'Zing::Worker';
 
-our $VERSION = '0.25'; # VERSION
+our $VERSION = '0.26'; # VERSION
 
 # METHODS
 

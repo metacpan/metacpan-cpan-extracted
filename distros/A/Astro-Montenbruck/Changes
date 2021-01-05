@@ -15,3 +15,6 @@ Revision history for AstroScript
              Aparent position of the Sun
 2020-12-31 - Apparent positions of the objects, Planet interface changed
              Numerous bugfixes
+2021-01-01 - Demo script for computing solstices / Equinoxes
+             Utility modules renamed to avoid CPAN authorization issues
+2021-01-05 - List::MoreUtils dependency added to build prerequisites

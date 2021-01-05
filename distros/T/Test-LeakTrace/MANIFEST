@@ -11,13 +11,6 @@ example/script.pl
 example/simple.pl
 example/test_fail.pl
 example/weakref.pl
-inc/Module/Install.pm
-inc/Module/Install/AuthorTests.pm
-inc/Module/Install/Base.pm
-inc/Module/Install/Makefile.pm
-inc/Module/Install/MakeMaker.pm
-inc/Module/Install/Metadata.pm
-inc/Module/Install/Repository.pm
 LeakTrace.xs
 lib/Test/LeakTrace.pm
 lib/Test/LeakTrace/JA.pod
@@ -25,7 +18,6 @@ lib/Test/LeakTrace/Script.pm
 Makefile.PL
 MANIFEST			This list of files
 MANIFEST.SKIP
-META.yml
 ppport.h
 ptr_table.h
 README
@@ -49,3 +41,5 @@ xt/02_pod.t
 xt/03_pod-coverage.t
 xt/04_synopsis.t
 xt/05_valgrind.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

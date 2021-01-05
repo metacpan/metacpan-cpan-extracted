@@ -1,5 +1,11 @@
 Revision history for perl distribution LinkEmbedder
 
+1.16 2021-01-05T08:15:56+0900
+ - Fix handling pastebin with child nodes
+
+1.15 2020-11-30T11:40:00+0900
+ - Will also detect Jitsi links by looking at "title"
+
 1.15 2020-11-25T10:43:25+0900
  - Add support for Jitsi links
 

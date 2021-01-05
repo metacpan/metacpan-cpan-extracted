@@ -1,13 +1,13 @@
 package App::TimeTracker;
+
+# ABSTRACT: time tracking for impatient and lazy command line lovers
+our $VERSION = '3.008'; # VERSION
+
 use strict;
 use warnings;
 use 5.010;
 
-our $VERSION = "3.007";
-# ABSTRACT: time tracking for impatient and lazy command line lovers
-
 use App::TimeTracker::Data::Task;
-
 use DateTime;
 use Moose;
 use Moose::Util::TypeConstraints;
@@ -307,7 +307,7 @@ App::TimeTracker - time tracking for impatient and lazy command line lovers
 
 =head1 VERSION
 
-version 3.007
+version 3.008
 
 =head1 SYNOPSIS
 
@@ -456,11 +456,11 @@ Maros Kollar, Klaus Ita, Yanick Champoux, Lukas Rampa, David Schmidt, Michael Kr
 
 =head1 AUTHOR
 
-Thomas Klausner <domm@cpan.org>
+Thomas Klausner <domm@plix.at>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2011 - 2020 by Thomas Klausner.
+This software is copyright (c) 2011 - 2021 by Thomas Klausner.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

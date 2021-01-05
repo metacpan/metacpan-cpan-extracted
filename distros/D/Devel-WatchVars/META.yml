@@ -1,0 +1,32 @@
+---
+abstract: 'trace access to scalar variables'
+author:
+  - 'Tom Christiansen <tchrist53147@gmail.com>'
+build_requires:
+  Capture::Tiny: '0'
+  Import::Base: '0'
+  Test2::V0: '0'
+  Test::CheckManifest: '0.9'
+  Test::Script: '0'
+  Test::Warn: '0'
+  indirect: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.58, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Devel-WatchVars
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Devel::GlobalDestruction: '0'
+  namespace::clean: '0'
+  overloading: '0'
+  perl: '5.010'
+version: v1.0.5
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,0 +1,83 @@
+NAME
+    Acme::CPANModules::PERLANCAR::Forked - List of my modules which are
+    forked from others
+
+VERSION
+    This document describes version 0.002 of
+    Acme::CPANModules::PERLANCAR::Forked (from Perl distribution
+    Acme-CPANModules-PERLANCAR-Forked), released on 2020-11-22.
+
+DESCRIPTION
+    This list serves as a reminder to check upstream for updates from time
+    to time.
+
+MODULES INCLUDED IN THIS ACME::CPANMODULES MODULE
+    *   PERLANCAR::Module::List
+
+        Also: Module::List::Tiny, Module::List::Wildcard.
+
+    *   Sys::RunAlone::Flexible
+
+        Also: Sys::RunAlone::Flexible2.
+
+        But since I have co-maint on Sys::RunAlone, I plan to merge all
+        these.
+
+    *   File::Slurper::Dash
+
+    *   anywhere
+
+    *   App::HTTPSThis
+
+    *   Date::Extract::PERLANCAR
+
+FAQ
+  What are ways to use this Acme::CPANModules module?
+    Aside from reading this Acme::CPANModules module's POD documentation,
+    you can install all the listed modules (entries) using cpanmodules CLI
+    (from App::cpanmodules distribution):
+
+        % cpanmodules ls-entries PERLANCAR::Forked | cpanm -n
+
+    or Acme::CM::Get:
+
+        % perl -MAcme::CM::Get=PERLANCAR::Forked -E'say $_->{module} for @{ $LIST->{entries} }' | cpanm -n
+
+    or directly:
+
+        % perl -MAcme::CPANModules::PERLANCAR::Forked -E'say $_->{module} for @{ $Acme::CPANModules::PERLANCAR::Forked::LIST->{entries} }' | cpanm -n
+
+    This Acme::CPANModules module also helps lcpan produce a more meaningful
+    result for "lcpan related-mods" command when it comes to finding related
+    modules for the modules listed in this Acme::CPANModules module.
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Acme-CPANModules-PERLANCAR-Forked>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Acme-CPANModules-PERLANCAR-Forked>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Acme-CPANModules-PERL
+    ANCAR-Forked>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+SEE ALSO
+    Acme::CPANModules - about the Acme::CPANModules namespace
+
+    cpanmodules - CLI tool to let you browse/view the lists
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2020, 2019 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

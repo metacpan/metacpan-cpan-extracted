@@ -1,17 +1,19 @@
 package Form::Tiny;
 
-use v5.10; use warnings;
+use v5.10;
+use warnings;
 use Types::Standard qw(Str Maybe ArrayRef InstanceOf HashRef Bool CodeRef);
 use Carp qw(croak);
 use Storable qw(dclone);
 use Scalar::Util qw(blessed);
+use Import::Into;
 
 use Form::Tiny::FieldDefinition;
 use Form::Tiny::Error;
 use Form::Tiny::FieldData;
 use Moo::Role;
 
-our $VERSION = '1.01';
+our $VERSION = '1.11';
 
 with "Form::Tiny::Form";
 
@@ -75,6 +77,93 @@ has "cleaner" => (
 	},
 );
 
+sub import
+{
+	my ($package, $caller) = (shift, scalar caller);
+	return unless @_;
+
+	my @wanted = @_;
+	my @wanted_subs = qw(form_field form_cleaner);
+	my @wanted_roles = qw(Form::Tiny);
+
+	my %subs = (
+		form_field => sub {
+			my ($name, %params) = @_;
+			$params{name} = $name;
+			my $previous = $caller->can('build_fields') // sub { () };
+
+			no strict 'refs';
+			no warnings 'redefine';
+			*{"${caller}::build_fields"} = sub {
+				return (
+					$previous->(@_),
+					\%params,
+				);
+			};
+		},
+		form_cleaner => sub {
+			my ($sub) = @_;
+
+			no strict 'refs';
+			*{"${caller}::build_cleaner"} = sub {
+				return $sub;
+			};
+		},
+		form_filter => sub {
+			my ($type, $sub) = @_;
+			my $previous = $caller->can('build_filters') // sub { () };
+
+			no strict 'refs';
+			no warnings 'redefine';
+			*{"${caller}::build_filters"} = sub {
+				return (
+					$previous->(@_),
+					[$type, $sub],
+				);
+			};
+		},
+	);
+
+	my %behaviors = (
+		-base => {
+			subs => [],
+			roles => [],
+		},
+		-strict => {
+			subs => [],
+			roles => [qw(Form::Tiny::Strict)],
+		},
+		-filtered => {
+			subs => [qw(form_filter)],
+			roles => [qw(Form::Tiny::Filtered)],
+		},
+	);
+
+	require Moo;
+	Moo->import::into($caller);
+
+	foreach my $type (@wanted) {
+		croak "no Form::Tiny import behavior for: $type"
+			unless exists $behaviors{$type};
+		push @wanted_subs, @{$behaviors{$type}->{subs}};
+		push @wanted_roles, @{$behaviors{$type}->{roles}};
+	}
+
+	{
+		no strict 'refs';
+
+		*{"${caller}::build_fields"} = $caller->can('build_fields') // sub { () };
+
+		Moo::Role->apply_roles_to_package(
+			$caller, @wanted_roles
+		);
+
+		*{"${caller}::$_"} = $subs{$_} foreach @wanted_subs;
+	}
+
+	return;
+}
+
 sub _clear_form
 {
 	my ($self) = @_;
@@ -114,7 +203,8 @@ sub _find_field
 	my ($self, $fields, $field_def) = @_;
 
 	my @found;
-	my $traverser; $traverser = sub {
+	my $traverser;
+	$traverser = sub {
 		my ($curr_path, $next_path, $value) = @_;
 
 		if (@$next_path == 0) {
@@ -290,6 +380,26 @@ Form::Tiny - Input validator implementation centered around Type::Tiny
 =head1 DESCRIPTION
 
 Main class of the Form::Tiny system - this is a role that provides most of the module's functionality.
+
+=head1 IMPORTING
+
+Starting with version 1.10 you can enable syntactic sugar instead of bare-bones role mixing by using import flags:
+
+	package MyForm;
+
+	use Form::Tiny -base;
+
+	# new syntax for defining form fields
+	form_field 'field' => (
+		...
+	);
+
+	# new syntax for defining a form cleaner
+	form_cleaner sub {
+		...
+	};
+
+Consult L<Form::Tiny::Manual> for more information and examples.
 
 =head1 ADDED INTERFACE
 

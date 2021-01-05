@@ -1,5 +1,11 @@
 Revision history for Data::Money
 
+0.19  2021-01-05 MANWAR
+      - Applied patch to resolve issue #6 by @mrenvoize.
+        "Clone is either mis-documented or mis-coded"
+      - Applied patch to resolve issue #7 by @mrenvoize.
+        "Overloaded math operators fail for mixed types"
+
 0.18  2020-11-19 MANWAR
       - Addressed issue #2 raised by @pjlsergeant.
 

@@ -287,6 +287,11 @@ include the necessary control characters.
     write as much as it can again. If the instance is garbage collected with
     chunks/bursts in the buffer it will block until all can be written.
 
+- $bool = $p->pending\_output
+
+    True if the pipe is a non-blocking writer and there is pending output waiting
+    for a flush (and for the pipe to have room for the new data).
+
 - $w->flush()
 
     Write any buffered items. This is only useful on writers that are in

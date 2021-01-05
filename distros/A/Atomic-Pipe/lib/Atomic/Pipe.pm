@@ -2,7 +2,7 @@ package Atomic::Pipe;
 use strict;
 use warnings;
 
-our $VERSION = '0.018';
+our $VERSION = '0.019';
 
 use IO();
 use Fcntl();
@@ -13,7 +13,7 @@ use Config qw/%Config/;
 use List::Util qw/min/;
 use Scalar::Util qw/blessed/;
 
-use Errno qw/EINTR EAGAIN/;
+use Errno qw/EINTR EAGAIN EPIPE/;
 my %RETRY_ERRNO;
 BEGIN {
     %RETRY_ERRNO = (EINTR() => 1);
@@ -95,6 +95,7 @@ use constant MESSAGE_KEY    => 'message_key';
 use constant MIXED_BUFFER   => 'mixed_buffer';
 use constant DELIMITER_SIZE => 'delimiter_size';
 use constant INVALID_STATE  => 'invalid_state';
+use constant HIT_EPIPE      => 'hit_epipe';
 
 sub wh  { shift->{+WH} }
 sub rh  { shift->{+RH} }
@@ -657,7 +658,15 @@ sub write_burst {
 
 sub DESTROY {
     my $self = shift;
-    $self->flush(blocking => 1) if $self->{+OUT_BUFFER} && @{$self->{+OUT_BUFFER}};
+    return if $self->{+HIT_EPIPE};
+    $self->flush(blocking => 1) if $self->pending_output;
+}
+
+sub pending_output {
+    my $self = shift;
+    my $buffer = $self->{+OUT_BUFFER} or return 0;
+    return 0 unless @$buffer;
+    return 1;
 }
 
 sub flush {
@@ -686,6 +695,8 @@ sub _write_burst {
 
     my $wh = $self->{+WH} or croak "Cannot call write on a pipe reader";
 
+    croak "Disconnected pipe" if $self->{+HIT_EPIPE};
+
     my $prefix  = $self->{+BURST_PREFIX}  // '';
     my $postfix = $self->{+BURST_POSTFIX} // '';
 
@@ -695,7 +706,12 @@ sub _write_burst {
     my $loop = 0;
     SWRITE: {
         $wrote = syswrite($wh, $data, $size);
-        return undef if $! == EAGAIN || ($! == 28 && IS_WIN32); # NON-BLOCKING
+        if ($! == EPIPE || (IS_WIN32 && $! == 22)) {
+            $self->{+HIT_EPIPE} = 1;
+            delete $self->{+OUT_BUFFER};
+            croak "Disconnected pipe";
+        }
+        return undef if $! == EAGAIN || (IS_WIN32 && $! == 28); # NON-BLOCKING
         redo SWRITE if !$wrote || $RETRY_ERRNO{0 + $!};
         last SWRITE if $wrote == $size;
         $wrote //= "<NULL>";
@@ -1133,6 +1149,11 @@ will write as many chunks/bursts as it can, then buffer any remaining until
 your next write_message(), write_burst(), or flush(), at which point it will
 write as much as it can again. If the instance is garbage collected with
 chunks/bursts in the buffer it will block until all can be written.
+
+=item $bool = $p->pending_output
+
+True if the pipe is a non-blocking writer and there is pending output waiting
+for a flush (and for the pipe to have room for the new data).
 
 =item $w->flush()
 

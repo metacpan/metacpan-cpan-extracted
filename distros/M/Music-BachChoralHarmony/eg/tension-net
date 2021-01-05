@@ -1,0 +1,72 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+
+use Data::Dumper::Compact 'ddc';
+use GraphViz2;
+use List::Util qw/max/;
+use Music::BachChoralHarmony;
+use Music::Tension::Cope;
+
+my $thresh = shift || 20;
+
+my $tension = Music::Tension::Cope->new;
+
+my $bach = Music::BachChoralHarmony->new;
+my $songs = $bach->parse();
+
+my @scale = 0 .. 11;
+
+my %by_song;
+
+for my $song ( sort keys %$songs ) {
+    for my $event ( @{ $songs->{$song}{events} } ) {
+        # Convert the bitstring to scale notes
+        my @notes;
+        my $i = 0;
+        for my $bit ( split //, $event->{notes} ) {
+            push @notes, $scale[$i]
+                if $bit;
+            $i++;
+        }
+        # Tally the tension defined by the notes
+        push @{ $by_song{$song} }, scalar($tension->vertical(\@notes));
+    }
+}
+#warn(__PACKAGE__,' ',__LINE__," MARK: ",ddc(\%by_song));exit;
+
+my %score;
+
+for my $song (sort keys %by_song) {
+    my $last;
+
+    for my $value (@{ $by_song{$song} }) {
+        $score{ $last . ' ' . $value }++ if $last;
+        $last = $value;
+    }
+}
+#warn(__PACKAGE__,' ',__LINE__," MARK: ",ddc([map {"$_ => $score{$_}"} sort {$score{$a} <=> $score{$b}} keys %score]));
+
+my $g = GraphViz2->new(
+    global => { directed => 1 },
+    node   => { shape => 'oval' },
+    edge   => { color => 'grey' },
+);
+
+my %nodes;
+my %edges;
+
+for my $bigram ( keys %score ) {
+    next unless $score{$bigram} >= $thresh;
+
+    my ($i, $j) = split ' ', $bigram;
+
+    $g->add_node(name => $i)
+        unless $nodes{$i}++;
+    $g->add_node(name => $j)
+        unless $nodes{$j}++;
+    $g->add_edge(from => $i, to => $j, label => $score{$bigram})
+        unless $edges{$bigram}++;
+}
+
+$g->run( format => 'png', output_file => "$0.png" );

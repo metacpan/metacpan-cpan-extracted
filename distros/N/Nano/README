@@ -153,6 +153,20 @@ METHODS
       
         my $phoebe = $nano->find('phoebe');
 
+ hash
+
+      hash(Str $name) : Str
+
+    The hash method returns a SHA-1 digest for the string provided.
+
+    hash example #1
+
+        my $nano = Nano->new;
+      
+        my $email = 'me@example.com';
+      
+        $nano->hash($email);
+
  keyval
 
       keyval(Str $name) : KeyVal

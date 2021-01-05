@@ -92,7 +92,7 @@ Version 0.01
 
 =head1 DESCRIPTION
 
-Celestial sphera related calculations used by AstroScript modules.
+Celestial sphera related calculations used by Astro::Montenbruck modules.
 
 =head1 EXPORT
 
@@ -251,7 +251,7 @@ Sergey Krushinsky, C<< <krushi at cpan.org> >>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2009-2020 by Sergey Krushinsky
+Copyright (C) 2009-2021 by Sergey Krushinsky
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

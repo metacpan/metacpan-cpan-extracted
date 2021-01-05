@@ -1,6 +1,7 @@
 #XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
 name:         Gnome2-Canvas
-version:      1.004
+abstract:     (DEPRECATED) A structured graphics canvas
+version:      1.006
 version_from: Canvas.pm
 installdirs:  site
 requires:
@@ -12,3 +13,4 @@ configure_requires:
   Glib: '1.120'
 distribution_type: module
 generated_by: ExtUtils::MakeMaker version 6.10_03
+x_deprecated: 1

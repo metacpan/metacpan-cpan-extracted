@@ -1,5 +1,9 @@
 Revision history for HTTP-Message
 
+6.27      2021-01-05 03:02:01Z
+    - Clean up backcompat code (GH#148) (Dan Book)
+    - Add "308 Permanent Redirect" to is_cacheable_by_default (GH#150) (simbabque)
+
 6.26      2020-09-10 02:34:25Z
     - Update comment which explains in which RFC 451 is defined (GH#143) (Olaf
       Alders). Reported by Toby Inkster.

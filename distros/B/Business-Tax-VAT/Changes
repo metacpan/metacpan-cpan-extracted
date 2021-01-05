@@ -1,5 +1,10 @@
 Revision history
 
+1.11 2021-01-04 feature release: "Brexit", update recommended
+
+- Removed UK from list of EU countries
+
+
 1.10 2015-08-11 maintenance release, update not required
 
 - Added tests and documentation demonstrating how to address RT:16941
@@ -9,7 +14,7 @@ Revision history
 
 1.09 2015-08-03 maintenance release, update not required
 
-- Added MetaProvides to Dist::Zilla build, this should assist in 
+- Added MetaProvides to Dist::Zilla build, this should assist in
   addressing the issue listed on CPANTS and on github
 
   Ref: https://github.com/jonasbn/Business-Tax-VAT/issues/1
@@ -18,7 +23,7 @@ Revision history
 
 - Removed the hack to present the proper tax rate for Luxembourg,
   patch was handling a future, change this is not necessary anymore
-    
+
 - Corrected the Luxembourg rate in the POD
 
 

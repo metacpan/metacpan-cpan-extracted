@@ -33,7 +33,7 @@ requires:
 resources:
   homepage: https://github.com/ology/Music-BachChoralHarmony
   repository: https://github.com/ology/Music-BachChoralHarmony.git
-version: '0.0406'
+version: '0.0410'
 x_Dist_Zilla:
   perl:
     version: '5.030002'

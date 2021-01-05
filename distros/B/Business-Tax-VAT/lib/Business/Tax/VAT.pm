@@ -5,7 +5,7 @@ use warnings;
 use vars qw($VERSION);
 use 5.008;
 
-$VERSION = '1.10';
+$VERSION = '1.11';
 
 =begin markdown
 
@@ -21,20 +21,20 @@ Business::Tax::VAT - perform European VAT calculations
 
 =head1 VERSION
 
-This pod describes version 1.10
+This pod describes version 1.11
 
 =head1 SYNOPSIS
 
   use Business::Tax::VAT;
 
-  my $vat = Business::Tax::VAT->new(qw/uk ie/);
+  my $vat = Business::Tax::VAT->new(qw/at ie/);
 
   my $price = $vat->item(120 => 'ie');
   my $price_to_customer = $price->full;     # 120
   my $vat_charged       = $price->vat;      #  20
   my $net_price_to_me   = $price->net;      # 100
 
-  my $price = $vat->business_item(102 => 'uk');
+  my $price = $vat->business_item(102 => 'at');
   my $price_to_customer = $price->full;     # 102
   my $vat_charged       = $price->vat;      #  17
   my $net_price_to_me   = $price->net;      #  85
@@ -67,7 +67,7 @@ sub _item {
 package Business::Tax::VAT::Price;
 
 use vars qw($VERSION);
-$VERSION = '1.10';
+$VERSION = '1.11';
 
 our %RATE;
 
@@ -88,7 +88,7 @@ sub _calculate_vat_rates {
         fr => 20, #france
         gr => 23, #greece
         hr => 25, #crotia
-        hu => 27, #hungary 
+        hu => 27, #hungary
         ie => 23, #ireland
         it => 22, #italy
         lt => 21, #lithuania
@@ -102,7 +102,6 @@ sub _calculate_vat_rates {
         se => 25, #sweden
         si => 22, #slovenia
         sk => 20, #slovakia
-        uk => 20, #united kingdom
     );
 }
 
@@ -228,15 +227,14 @@ This module uses the following rates and codes:
   si, Slovenia, 20%
   es, Spain, 16%
   se, Sweden, 25%
-  uk, United Kingdom, 20%
 
 If any of these rates become incorrect, or if you wish to use
-different rates due to the nature of the product (e.g. books are 0%
-VAT in the UK), then you can (locally) set the rate by assigning to
+different rates due to the nature of the product (e.g. transport is 0%
+VAT in Austria), then you can (locally) set the rate by assigning to
 %Business::Tax::VAT::Price::RATE.  e.g.:
 
-  local $Business::Tax::VAT::Price::RATE{uk} = 0 
-    if ($product_type eq 'book' and $country eq 'uk');
+  local $Business::Tax::VAT::Price::RATE{at} = 0
+    if ($product_type eq 'book' and $country eq 'at');
 
 =head1 DYNAMICAALY ADDING A COUNTRY
 
@@ -277,7 +275,7 @@ Please direct all correspondence regarding this module to:
 
 =head1 COPYRIGHT
 
-  Copyright (C) 2001-2015 Tony Bowden.
+  Copyright (C) 2001-2021 Tony Bowden.
 
   This program is free software; you can redistribute it and/or modify it under
   the terms of the GNU General Public License; either version 2 of the License,

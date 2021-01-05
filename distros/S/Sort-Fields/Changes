@@ -1,8 +1,21 @@
-Revision history for Perl extension Sort::Fields.
+Revision history for Perl extension Sort::Fields
 
-0.01  Sat Jan 24 01:20:08 1998
-	- original version; created by h2xs 1.16
+1.001 2021-01-04T23:52:23Z
+	* rt.cpan.org will shut down in March 2021, so it's a good time
+	to give this module different meta data
+	* brian d foy is maintaining the distro, but this is limited to
+	making it work with current services. The code is all Joseph Hall's.
+	No future development or features is planned
+	* The test.pl is moved, with slight modifications, to t/test.t and
+	Test::More
+	* If you experience problems, report them in GitHub:
+	https://github.com/briandfoy/sort-fields
+	* If you'd like to take over the module, open an issue.
 
-0.90 Fri Jan 30 13:33:13 MST 1998
-	- first reasonable beta version
-	- incorporates a stable sorting option
+0.90 - 1998-01-30
+	* first reasonable beta version
+	* incorporates a stable sorting option
+
+0.01 - 1998-01-24
+	* original version; created by h2xs 1.16
+

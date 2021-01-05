@@ -13,7 +13,7 @@ use Data::Object::ClassHas;
 
 use Zing::Flow;
 
-our $VERSION = '0.25'; # VERSION
+our $VERSION = '0.26'; # VERSION
 
 # ATTRIBUTES
 

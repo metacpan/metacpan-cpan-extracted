@@ -23,15 +23,15 @@ my $vat = Business::Tax::VAT->new(qw/uk ie/);
 {
   my $price = $vat->item(102 => 'uk');
   is $price->full, 102, "Full price correct - UK consumer";
-  is $price->vat,  17,  "VAT correct - UK consumer";
-  is $price->net,  85,   "Net price correct - UK consumer";
+  is $price->vat,  0,  "VAT correct - UK consumer";
+  is $price->net,  102,   "Net price correct - UK consumer";
 }
 
 {
   my $price = $vat->item(102);
   is $price->full, 102, "Full price correct - implied UK consumer";
-  is $price->vat,  17, "VAT correct - implied UK consumer";
-  is $price->net,  85,   "Net price correct - implied UK consumer";
+  is $price->vat,  0, "VAT correct - implied UK consumer";
+  is $price->net,  102,   "Net price correct - implied UK consumer";
 }
 
 {
@@ -63,11 +63,11 @@ my $vat = Business::Tax::VAT->new(qw/uk ie/);
 }
 
 {
-	local $Business::Tax::VAT::Price::RATE{uk} = 0;
-  my $price = $vat->item(100 => 'uk');
-  is $price->full, 100, "Full price correct - uk book";
-  is $price->vat,    0, "No VAT - uk book";
-  is $price->net,  100, "Net price correct - uk book";
+  local $Business::Tax::VAT::Price::RATE{at} = 0;
+  my $price = $vat->item(100 => 'at');
+  is $price->full, 100, "Full price correct - AT transport";
+  is $price->vat,    0, "No VAT - AT transport";
+  is $price->net,  100, "Net price correct - AT transport";
 }
 
 done_testing();

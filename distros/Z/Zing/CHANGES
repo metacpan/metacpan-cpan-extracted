@@ -1,6 +1,11 @@
 Changelog for Zing
 
-0.25 2021-01-03T19:09:43
+0.26 2021-01-04T22:35:13
+ - Add release updates
+ - Ensure Zing::Table objects inflate using current environment (#272)
+
+0.25 2021-01-03T19:09:49
+ - Built release version 0.25
  - Add release updates
  - Ensure no "drop" operation cascades (#269)
  - Fix Zing::Table next/prev sol/eol cycling (#268)

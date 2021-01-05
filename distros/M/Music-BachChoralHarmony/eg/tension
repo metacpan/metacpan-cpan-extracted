@@ -3,10 +3,11 @@ use strict;
 use warnings;
 
 use Data::Dumper::Compact 'ddc';
-use Chart::LinesPoints;
+use Chart::Lines;
 use List::Util qw/max/;
 use Music::BachChoralHarmony;
 use Music::Tension::Cope;
+use Statistics::Basic qw(mean);
 
 my $width  = shift || 800;
 my $height = shift || 400;
@@ -37,7 +38,7 @@ for my $song ( sort keys %$songs ) {
 #warn(__PACKAGE__,' ',__LINE__," MARK: ",ddc(\%by_song));exit;
 
 for my $song (sort keys %by_song) {
-    my $chart = Chart::LinesPoints->new($width, $height);
+    my $chart = Chart::Lines->new($width, $height);
 
     $chart->set(
         legend       => 'none',
@@ -54,6 +55,10 @@ for my $song (sort keys %by_song) {
 
     $chart->add_dataset(1 .. @{ $by_song{$song} });
     $chart->add_dataset(@{ $by_song{$song} });
+
+    my $avg = '' . mean(@{ $by_song{$song} });
+    my @avgs = map { $avg } 1 .. @{ $by_song{$song} };
+    $chart->add_dataset(@avgs);
 
     $chart->png("$song.png");
 

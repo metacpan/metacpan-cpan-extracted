@@ -34,12 +34,12 @@ WriteMakefile(
     (eval { ExtUtils::MakeMaker->VERSION(6.46) } ? (META_MERGE => {
         'meta-spec' => { version => 2 },
         provides  => {
-            'Data::Money'                                       => { file => 'lib/Data/Money.pm',                                     version => '0.18' },
-            'Data::Money::BaseException'                        => { file => 'lib/Data/Money/BaseException.pm',                       version => '0.18' },
-            'Data::Money::BaseException::ExcessivePrecision'    => { file => 'lib/Data/Money/BaseException/ExcessivePrecision.pm',    version => '0.18' },
-            'Data::Money::BaseException::InvalidCurrencyCode'   => { file => 'lib/Data/Money/BaseException/InvalidCurrencyCode.pm',   version => '0.18' },
-            'Data::Money::BaseException::InvalidCurrencyFormat' => { file => 'lib/Data/Money/BaseException/InvalidCurrencyFormat.pm', version => '0.18' },
-            'Data::Money::BaseException::MismatchCurrencyType'  => { file => 'lib/Data/Money/BaseException/MismatchCurrencyType.pm',  version => '0.18' },
+            'Data::Money'                                       => { file => 'lib/Data/Money.pm',                                     version => '0.19' },
+            'Data::Money::BaseException'                        => { file => 'lib/Data/Money/BaseException.pm',                       version => '0.19' },
+            'Data::Money::BaseException::ExcessivePrecision'    => { file => 'lib/Data/Money/BaseException/ExcessivePrecision.pm',    version => '0.19' },
+            'Data::Money::BaseException::InvalidCurrencyCode'   => { file => 'lib/Data/Money/BaseException/InvalidCurrencyCode.pm',   version => '0.19' },
+            'Data::Money::BaseException::InvalidCurrencyFormat' => { file => 'lib/Data/Money/BaseException/InvalidCurrencyFormat.pm', version => '0.19' },
+            'Data::Money::BaseException::MismatchCurrencyType'  => { file => 'lib/Data/Money/BaseException/MismatchCurrencyType.pm',  version => '0.19' },
         },
         resources => {
             repository => {

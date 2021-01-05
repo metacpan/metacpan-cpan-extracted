@@ -1,0 +1,63 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+
+# Plot the Cope tension for each song.
+
+use Data::Dumper::Compact qw(ddc);
+use Chart::Points;
+use List::Util qw(sum0);
+use Music::BachChoralHarmony;
+use lib '/Users/gene/sandbox/Statistics-Diversity-Shannon/lib';
+use Music::Tension::Cope;
+
+my $tension = Music::Tension::Cope->new;
+
+my $bach = Music::BachChoralHarmony->new;
+my $songs = $bach->parse();
+#warn(__PACKAGE__,' ',__LINE__," MARK: ",ddc($songs));exit;
+
+my @scale = 0 .. 11;
+
+my %by_song;
+
+for my $song ( sort keys %$songs ) {
+    for my $event ( @{ $songs->{$song}{events} } ) {
+        # Convert the bitstring to scale notes
+        my @notes;
+        my $i = 0;
+        for my $bit ( split //, $event->{notes} ) {
+            push @notes, $scale[$i]
+                if $bit;
+            $i++;
+        }
+
+        # Tally the tension defined by the notes
+        push @{ $by_song{$song}->{tension} }, scalar($tension->vertical(\@notes));
+    }
+
+    $by_song{$song}->{events} = @{ $songs->{$song}{events} };
+}
+#warn(__PACKAGE__,' ',__LINE__," MARK: ",ddc(\%by_song));exit;
+
+my %score = map { $_ => sum0(@{ $by_song{$_}->{tension} }) / $by_song{$_}->{events} } keys %by_song;
+#warn(__PACKAGE__,' ',__LINE__," MARK: ",ddc(\%score));exit;
+
+my $chart = Chart::Points->new(1000, 400);
+
+$chart->set(
+    title         => 'Sorted Tension by BWV',
+    pt_size       => 10,
+    legend_labels => ['Sum'],
+    x_label       => 'Chorale BWV',
+    y_label       => 'Tension',
+    x_ticks       => 'vertical',
+    grid_lines    => 1,
+    colors        => { grid_lines => 'gray' },
+);
+
+my @sorted = sort { $score{$a} <=> $score{$b} } keys %score;
+$chart->add_dataset( map { $songs->{$_}{bwv} } @sorted );
+$chart->add_dataset( map { $score{$_} } @sorted );
+
+$chart->png("$0.png");

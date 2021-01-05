@@ -1,6 +1,12 @@
 Changelog for Nano
 
-0.04 2021-01-03T00:48:53
+0.05 2021-01-05T13:54:48
+ - Add release updates
+ - Implement Nano::Env abstraction (#25)
+ - Add convenience "hash" digest method (#22)
+
+0.04 2021-01-03T00:48:55
+ - Built release version 0.04
  - Add release updates
  - Enable search results ordering (#19)
  - Ensure Nano::Search {first,last,next,prev} iterates (#18)

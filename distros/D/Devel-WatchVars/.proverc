@@ -1,0 +1,3 @@
+--timer
+--trap
+-I lib -I t/lib -r

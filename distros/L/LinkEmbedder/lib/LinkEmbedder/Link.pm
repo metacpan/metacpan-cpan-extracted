@@ -167,7 +167,7 @@ sub _maybe_rebless_p {
   return unless ref $self eq 'LinkEmbedder::Link::Basic';
   return unless $self->type eq 'rich';
 
-  if ($tx->res->body =~ m!\bJitsiMeetJS\b!) {
+  if ($self->title eq 'Jitsi Meet' or $tx->res->body =~ m!\bJitsiMeetJS\b!) {
     require LinkEmbedder::Link::Jitsi;
     bless $self, 'LinkEmbedder::Link::Jitsi';
     return $self->learn_p;

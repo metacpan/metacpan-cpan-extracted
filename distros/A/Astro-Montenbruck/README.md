@@ -22,7 +22,7 @@ As the book authors state in Introduction to the 4-th edition, _"The errors in t
 - [Astro::Montenbruck::NutEqu](lib/Astro/Montenbruck/NutEqu.pm) — Nutation and obliquity of ecliptic.
 - [Astro::Montenbruck::RiseSet](lib/Astro/Montenbruck/RiseSet.pm) — Rise, set, transit and twilight time.
 - [Astro::Montenbruck::Lunation](lib/Astro/Montenbruck/Lunation.pm) — Lunar phases
-- [Astro::Montenbruck::Lunation](lib/Astro/Montenbruck/SolEqu.pm) — Solstices and equinoxes
+- [Astro::Montenbruck::SolEqu](lib/Astro/Montenbruck/SolEqu.pm) — Solstices and equinoxes
 
 
 ## Requirements
@@ -88,7 +88,7 @@ $ perl script/planpos.pl --help
 
 ## License And Copyright
 
-Copyright (C) 2010-2020 Sergey Krushinsky
+Copyright (C) 2010-2021 Sergey Krushinsky
 
 This program is free software; you can redistribute it and/or modify it under the terms of the the Artistic License (1.0). You may obtain a copy of the full license at:
 

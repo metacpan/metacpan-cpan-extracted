@@ -1,3 +1,16 @@
+Overview of Changes in 1.006
+============================
+
+* Added deprecation notice to POD in `Canvas.pm`
+* Deprecation release 1.006, this module is now no longer maintained.
+  See the README file for more deprecation information.
+
+Overview of Changes in 1.005
+============================
+
+* Deprecation release 1.005, this module is now no longer maintained.
+  See the README file for more deprecation information.
+
 Overview of Changes in 1.004
 ============================
 

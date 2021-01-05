@@ -1,6 +1,6 @@
 package Data::Money::BaseException::ExcessivePrecision;
 
-$Data::Money::BaseException::ExcessivePrecision::VERSION   = '0.18';
+$Data::Money::BaseException::ExcessivePrecision::VERSION   = '0.19';
 $Data::Money::BaseException::ExcessivePrecision::AUTHORITY = 'cpan:GPHAT';
 
 =head1 NAME
@@ -9,7 +9,7 @@ Data::Money::BaseException::ExcessivePrecision - Exception handle for 'excessive
 
 =head1 VERSION
 
-Version 0.18
+Version 0.19
 
 =cut
 
